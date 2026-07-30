@@ -82,6 +82,13 @@ export const orderFromApiSchema = z
     deliveryAddress: z.string(),
     paymentMethod: z.enum(ORDER_PAYMENT_METHODS),
     status: z.enum(ORDER_STATUSES),
+    fulfillmentMethod: z.enum(["pickup", "delivery"]).optional(),
+    shippingProvider: z.string().nullable().optional(),
+    shippingServiceType: z.string().nullable().optional(),
+    shippingTrackingNumber: z.string().nullable().optional(),
+    shippingTrackingUrl: z.string().nullable().optional(),
+    shippingExternalId: z.string().nullable().optional(),
+    shippingCarrierStatus: z.string().nullable().optional(),
     createdAt: z.string().optional(),
     updatedAt: z.string().optional(),
   })

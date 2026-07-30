@@ -25,7 +25,7 @@
 }
 
 .product-manage-toggle-row_pressable:hover:not(:disabled):not(
-    .product-manage-toggle-row_disabled
+    .product-manage-toggle-row_locked
   ) {
   background: var(--iz-color-action-border);
 }
@@ -35,8 +35,7 @@
   outline-offset: 2px;
 }
 
-.product-manage-toggle-row_disabled {
-  opacity: 0.55;
+.product-manage-toggle-row_locked {
   cursor: not-allowed;
 }
 
@@ -119,7 +118,7 @@
   cursor: pointer;
 }
 
-.product-manage-toggle-row_disabled .product-manage-toggle-row__switch {
+.product-manage-toggle-row_locked .product-manage-toggle-row__switch {
   cursor: not-allowed;
 }
 

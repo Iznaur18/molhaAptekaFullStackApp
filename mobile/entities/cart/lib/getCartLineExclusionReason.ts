@@ -8,10 +8,10 @@ export type CartLineExclusionReason =
   | "own_product"
   | "missing_pickup";
 
-export const getCartLineExclusionReason = (
+export function getCartLineExclusionReason(
   line: CartLine,
   currentUserId?: string | null,
-): CartLineExclusionReason | null => {
+): CartLineExclusionReason | null {
   if (line.isMissing) {
     return "missing";
   }
@@ -24,10 +24,13 @@ export const getCartLineExclusionReason = (
     return "own_product";
   }
 
-  const pickup = String(line.product?.productPickupAddress ?? "").trim();
-  if (!pickup) {
-    return "missing_pickup";
+  const pickupOn = line.product?.productPickupEnabled !== false;
+  if (pickupOn) {
+    const pickup = String(line.product?.productPickupAddress ?? "").trim();
+    if (!pickup) {
+      return "missing_pickup";
+    }
   }
 
   return null;
-};
+}

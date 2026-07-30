@@ -15,6 +15,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { resolveProductImageUrls } from "@/entities/product/lib/resolveProductImageUrls";
 import { resolveProductPreviewVideoUrl } from "@/entities/product/lib/resolveProductPreviewVideoUrl";
+import { setProductInstallmentEnabled } from "@/entities/installment/lib/setProductInstallmentEnabled";
 import {
   canSellerDeleteProduct,
   canSellerEditProduct,
@@ -95,6 +96,8 @@ export default function ProductDetailScreen() {
   const [manageErrorMessage, setManageErrorMessage] = useState("");
   const [isAvailabilityTogglePending, setIsAvailabilityTogglePending] = useState(false);
   const [isAuctionTogglePending, setIsAuctionTogglePending] = useState(false);
+  const [isWholesaleTogglePending, setIsWholesaleTogglePending] = useState(false);
+  const [isInstallmentTogglePending, setIsInstallmentTogglePending] = useState(false);
   const [reportSuccessMessage, setReportSuccessMessage] = useState("");
   const [viewerCount, setViewerCount] = useState<number | null>(null);
 
@@ -398,6 +401,59 @@ export default function ProductDetailScreen() {
     }
   };
 
+  const handleSetProductWholesale = async (
+    targetProductId: string,
+    wholesaleEnabled: boolean,
+  ) => {
+    setIsWholesaleTogglePending(true);
+    setManageErrorMessage("");
+    try {
+      const updated = await patchMutation.mutateAsync({
+        productId: targetProductId,
+        body: { productWholesaleEnabled: wholesaleEnabled },
+      });
+      syncPromotionProduct(updated as Record<string, unknown> & { _id: string });
+    } catch (error) {
+      setManageErrorMessage(
+        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+      );
+    } finally {
+      setIsWholesaleTogglePending(false);
+    }
+  };
+
+  const handleWholesaleSaved = (updated: Record<string, unknown> & { _id: string }) => {
+    syncPromotionProduct(updated);
+  };
+
+  const handleSetProductInstallment = async (
+    targetProductId: string,
+    installmentEnabled: boolean,
+  ) => {
+    setIsInstallmentTogglePending(true);
+    setManageErrorMessage("");
+    try {
+      const result = await setProductInstallmentEnabled(targetProductId, installmentEnabled);
+      if (result.needsSetup) {
+        return { needsSetup: true };
+      }
+      const nextEnabled = result.productInstallmentEnabled === true;
+      syncPromotionProduct({
+        _id: targetProductId,
+        productInstallmentEnabled: nextEnabled,
+      } as Record<string, unknown> & { _id: string });
+      await queryClient.invalidateQueries({ queryKey: myProductsQueryKeys.all });
+      return { productInstallmentEnabled: nextEnabled };
+    } catch (error) {
+      setManageErrorMessage(
+        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+      );
+      return undefined;
+    } finally {
+      setIsInstallmentTogglePending(false);
+    }
+  };
+
   return (
     <View style={[styles.screen, { paddingTop: insets.top }]}>
       <View style={[styles.scrollArea, centeredContentStyle]}>
@@ -460,6 +516,7 @@ export default function ProductDetailScreen() {
                   onOpenInstallmentTab={handleInstallmentShortcut}
                   onOpenAuctionTab={handleAuctionShortcut}
                   auctionActive={auctionUi.auctionActive}
+                  canShowAddToCart={canShowAddToCart}
                 />
               ) : null}
               {activeTab === "reviews" ? (
@@ -610,6 +667,9 @@ export default function ProductDetailScreen() {
         onSubmit={handleSubmitPromotion}
         onSetProductAvailability={isOwnProduct ? handleSetMyProductAvailability : undefined}
         onSetProductAuction={isOwnProduct ? handleSetProductAuction : undefined}
+        onSetProductWholesale={isOwnProduct ? handleSetProductWholesale : undefined}
+        onSetProductInstallment={isOwnProduct ? handleSetProductInstallment : undefined}
+        onWholesaleSaved={isOwnProduct ? handleWholesaleSaved : undefined}
         onDeleteProduct={
           isOwnProduct || isAdmin
             ? async (id) => {
@@ -631,6 +691,8 @@ export default function ProductDetailScreen() {
         }
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
+        isWholesaleTogglePending={isWholesaleTogglePending}
+        isInstallmentTogglePending={isInstallmentTogglePending}
         isDeletePending={deleteMutation.isPending}
         manageErrorMessage={manageErrorMessage}
         canManageEdit={

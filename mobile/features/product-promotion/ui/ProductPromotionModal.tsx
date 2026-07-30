@@ -30,6 +30,7 @@ import type {
 import { useProductPromotionModalTab } from "@/features/product-promotion/model/useProductPromotionModalTab";
 import { ProductPromotionManageTab } from "@/features/product-promotion/ui/ProductPromotionManageTab";
 import { InstallmentProgramModal } from "@/entities/installment/ui/InstallmentProgramModal";
+import { WholesalePriceModal } from "@/entities/product/ui/WholesalePriceModal";
 import { ProductPromotionModalTabs } from "@/features/product-promotion/ui/ProductPromotionModalTabs";
 import { PRODUCT_CARD_UI, PRODUCT_PROMOTION_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
@@ -67,8 +68,19 @@ type ProductPromotionModalProps = {
     productId: string,
     productAuctionEnabled: boolean,
   ) => void | Promise<void>;
+  onSetProductWholesale?: (
+    productId: string,
+    productWholesaleEnabled: boolean,
+  ) => void | Promise<void>;
+  onSetProductInstallment?: (
+    productId: string,
+    productInstallmentEnabled: boolean,
+  ) => void | Promise<void | { needsSetup?: boolean }>;
+  onWholesaleSaved?: (product: CatalogProduct) => void;
   isAvailabilityTogglePending?: boolean;
   isAuctionTogglePending?: boolean;
+  isWholesaleTogglePending?: boolean;
+  isInstallmentTogglePending?: boolean;
   isDeletePending?: boolean;
   manageErrorMessage?: string;
   canManageEdit?: boolean;
@@ -98,9 +110,14 @@ export const ProductPromotionModal = ({
   onSubmit,
   onSetProductAvailability,
   onSetProductAuction,
+  onSetProductWholesale,
+  onSetProductInstallment,
+  onWholesaleSaved,
   onDeleteProduct,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
+  isWholesaleTogglePending = false,
+  isInstallmentTogglePending = false,
   isDeletePending = false,
   manageErrorMessage = "",
   canManageEdit = true,
@@ -131,11 +148,13 @@ export const ProductPromotionModal = ({
   const [selectedTier, setSelectedTier] = useState(defaultTier);
   const [selectedDurationCode, setSelectedDurationCode] = useState(defaultDuration);
   const [isInstallmentProgramOpen, setIsInstallmentProgramOpen] = useState(false);
+  const [isWholesaleOpen, setIsWholesaleOpen] = useState(false);
   const bodyScrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     if (!visible) {
       setIsInstallmentProgramOpen(false);
+      setIsWholesaleOpen(false);
       return;
     }
     setSelectedTier(defaultTier);
@@ -350,9 +369,13 @@ export const ProductPromotionModal = ({
         product={product}
         onSetAvailability={onSetProductAvailability}
         onSetAuction={onSetProductAuction}
+        onSetWholesale={onSetProductWholesale}
+        onSetInstallment={onSetProductInstallment}
         onDelete={onDeleteProduct}
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
+        isWholesaleTogglePending={isWholesaleTogglePending}
+        isInstallmentTogglePending={isInstallmentTogglePending}
         isDeletePending={isDeletePending}
         errorMessage={manageErrorMessage}
         canEdit={canManageEdit}
@@ -362,6 +385,7 @@ export const ProductPromotionModal = ({
         onToggleRaffleParticipation={onToggleRaffleParticipation}
         isRaffleParticipationPending={isRaffleParticipationPending}
         onOpenInstallmentProgram={() => setIsInstallmentProgramOpen(true)}
+        onOpenWholesaleSettings={() => setIsWholesaleOpen(true)}
         isSubmitting={isSubmitting}
       />
     );
@@ -468,6 +492,15 @@ export const ProductPromotionModal = ({
             productPrice={resolvedProductPrice}
             onClose={() => setIsInstallmentProgramOpen(false)}
             onSaved={onInstallmentProgramSaved}
+          />
+        ) : null}
+        {isWholesaleOpen ? (
+          <WholesalePriceModal
+            embedded
+            visible
+            product={product}
+            onClose={() => setIsWholesaleOpen(false)}
+            onSaved={onWholesaleSaved}
           />
         ) : null}
       </View>

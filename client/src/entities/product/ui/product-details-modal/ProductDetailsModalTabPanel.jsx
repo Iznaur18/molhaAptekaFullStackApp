@@ -1,4 +1,5 @@
 import { ProductDetailsModalAuctionTab } from "./ProductDetailsModalAuctionTab.jsx";
+import { ProductDetailsModalCompareTab } from "./ProductDetailsModalCompareTab.jsx";
 import { ProductDetailsModalDetailsTab } from "./ProductDetailsModalDetailsTab.jsx";
 import { ProductDetailsModalInstallmentTab } from "./ProductDetailsModalInstallmentTab.jsx";
 import { ProductDetailsModalReviewsTab } from "./ProductDetailsModalReviewsTab.jsx";
@@ -52,6 +53,7 @@ export function ProductDetailsModalTabPanel({
     topOffers,
     showReviewsTab,
     showSimilarTab,
+    showCompareTab,
     showAuctionTab,
     showInstallmentTab,
     handleReviewStatsChange,
@@ -89,6 +91,18 @@ export function ProductDetailsModalTabPanel({
       <ProductDetailsModalSimilarTab
         product={product}
         excludeProductId={productId}
+        enabled={isOpen}
+        isAuthorized={isAuthorized}
+        onRequestLoginAddToCart={onRequestLogin}
+        currentUserId={currentUserId}
+      />
+    );
+  }
+
+  if (detailsTab === "compare" && showCompareTab) {
+    return (
+      <ProductDetailsModalCompareTab
+        productId={productId}
         enabled={isOpen}
         isAuthorized={isAuthorized}
         onRequestLoginAddToCart={onRequestLogin}

@@ -26,15 +26,18 @@ import { normalizeProductSaleCity } from "./productSaleCity.js";
 import { resolveProductSaleCityNormalized } from "./ruCityNormalized.js";
 import { assertProductStockPatchAllowed } from "./productStock.js";
 import {
+  assertProductFulfillmentMethods,
   normalizeProductPickupAddress,
   normalizeProductPickupCoords,
   resolveProductDeliveryEnabledForWrite,
+  resolveProductPickupEnabledForWrite,
 } from "./productPickup.js";
 
 import {
   CATALOG_VISIBILITY_BLOCK_MESSAGE,
   EMPTY_PATCH_BODY_MESSAGE,
 } from "./patchMyProductConstants.js";
+import { applyWholesaleFields } from "./applyWholesaleFields.js";
 
 const hasBodyField = (body, field) =>
   Object.prototype.hasOwnProperty.call(body, field);
@@ -187,8 +190,15 @@ const applyPickupFields = (body, $set, existing) => {
   const touchesLat = hasBodyField(body, "productPickupLat");
   const touchesLon = hasBodyField(body, "productPickupLon");
   const touchesDelivery = hasBodyField(body, "productDeliveryEnabled");
+  const touchesPickupEnabled = hasBodyField(body, "productPickupEnabled");
 
-  if (!touchesAddress && !touchesLat && !touchesLon && !touchesDelivery) {
+  if (
+    !touchesAddress &&
+    !touchesLat &&
+    !touchesLon &&
+    !touchesDelivery &&
+    !touchesPickupEnabled
+  ) {
     return;
   }
 
@@ -209,6 +219,29 @@ const applyPickupFields = (body, $set, existing) => {
       $set.productDeliveryEnabled = resolveProductDeliveryEnabledForWrite(
         body.productDeliveryEnabled,
       );
+    }
+
+    if (touchesPickupEnabled) {
+      $set.productPickupEnabled = resolveProductPickupEnabledForWrite(
+        body.productPickupEnabled,
+      );
+    }
+
+    const nextPickupEnabled = Object.prototype.hasOwnProperty.call(
+      $set,
+      "productPickupEnabled",
+    )
+      ? $set.productPickupEnabled
+      : existing.productPickupEnabled !== false;
+    const nextDeliveryEnabled = Object.prototype.hasOwnProperty.call(
+      $set,
+      "productDeliveryEnabled",
+    )
+      ? $set.productDeliveryEnabled === true
+      : existing.productDeliveryEnabled === true;
+
+    if (touchesDelivery || touchesPickupEnabled) {
+      assertProductFulfillmentMethods(nextPickupEnabled, nextDeliveryEnabled);
     }
   } catch (error) {
     if (error instanceof AppError) {
@@ -399,6 +432,7 @@ export async function buildProductPatchSet({ existing, body, isAdmin, productId 
   await applyStockField(body, $set, existing, productId);
 
   const auctionState = applyAuctionField(body, $set, existing);
+  applyWholesaleFields(body, $set, existing);
 
   if (Object.keys($set).length === 0) {
     throw new AppError(400, EMPTY_PATCH_BODY_MESSAGE);

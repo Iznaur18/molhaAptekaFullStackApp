@@ -640,9 +640,7 @@
   background: color-mix(in srgb, var(--iz-color-on-contrast) 55%, transparent);
   backdrop-filter: blur(18px) saturate(1.5);
   -webkit-backdrop-filter: blur(18px) saturate(1.5);
-  box-shadow:
-    0 1px 0 color-mix(in srgb, var(--iz-color-on-contrast) 65%, transparent) inset,
-    0 6px 16px rgba(15, 23, 42, 0.08);
+  box-shadow: none;
 }
 
 .app-shell--header-v2 .app-shell__header-top {
@@ -677,7 +675,7 @@
   padding-left: 1rem;
   border-color: transparent;
   border-radius: 999px;
-  background: var(--iz-color-surface-muted);
+  background: color-mix(in srgb, var(--iz-color-text) 7%, transparent);
 }
 
 .app-shell--header-v2
@@ -688,7 +686,7 @@
 }
 
 .app-shell--header-v2 .app-shell__header-search .search-input__field:hover {
-  background: color-mix(in srgb, var(--iz-color-text) 9%, transparent);
+  background: color-mix(in srgb, var(--iz-color-text) 11%, transparent);
 }
 
 .app-shell--header-v2 .app-shell__header-search .search-input__field:focus {

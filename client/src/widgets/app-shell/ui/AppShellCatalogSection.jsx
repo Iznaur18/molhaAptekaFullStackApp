@@ -4,10 +4,10 @@ import { HomeCuratedProductListsSection } from "../../../entities/curated-produc
 import { CuratedProductListCarouselSkeleton } from "../../../entities/curated-product-list/ui/CuratedProductListCarouselSkeleton.jsx";
 import { RaffleFeaturedHomeSection } from "../../../entities/raffle/ui/RaffleFeaturedHomeSection.jsx";
 import { UserStoriesStrip } from "../../../entities/user-story/ui/UserStoriesStrip.jsx";
+import { CatalogBrowserBreadcrumb } from "../../../entities/product-category-display/ui/CatalogBrowserBreadcrumb.jsx";
 import { CatalogBrowserLanding } from "../../../entities/product-category-display/ui/CatalogBrowserLanding.jsx";
 import { CatalogSubcategoryPicker } from "../../../entities/product-category-display/ui/CatalogSubcategoryPicker.jsx";
 import { buildRafflePath } from "../../../shared/lib/rafflePaths.js";
-import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import { CatalogGridSkeleton } from "../../catalog-product-grid/ui/CatalogGridSkeleton.jsx";
 import { HomeCatalogGrid } from "../../catalog-product-grid/ui/HomeCatalogGrid.jsx";
@@ -262,6 +262,7 @@ export function AppShellCatalogGridSection({
  *   onEditFeedTileClick: (tileKey: string) => void;
  *   selectedCategoryLabel: string | null;
  *   activeCatalogFeedLabel: string | null;
+ *   onCatalogRootClick?: (() => void) | null;
  *   catalogGridSectionProps: import('./AppShellCatalogSection.jsx').AppShellCatalogGridSection extends never ? never : Parameters<typeof AppShellCatalogGridSection>[0];
  * }} props
  */
@@ -289,6 +290,7 @@ export function AppShellCatalogSection({
   onEditFeedTileClick,
   selectedCategoryLabel,
   activeCatalogFeedLabel,
+  onCatalogRootClick = null,
   catalogGridSectionProps,
 }) {
   if (isCatalogSubcategoryPickerActive) {
@@ -336,16 +338,10 @@ export function AppShellCatalogSection({
   return (
     <>
       {breadcrumbCurrentLabel ? (
-        <div className="catalog-categories-browser__toolbar">
-          <nav
-            className="catalog-categories-browser__breadcrumb"
-            aria-label={HOME_PAGE_UI.BREADCRUMB_CATALOG}
-          >
-            <span className="catalog-categories-browser__breadcrumb-current">
-              {breadcrumbCurrentLabel}
-            </span>
-          </nav>
-        </div>
+        <CatalogBrowserBreadcrumb
+          label={breadcrumbCurrentLabel}
+          onCatalogRootClick={onCatalogRootClick}
+        />
       ) : null}
       <AppShellCatalogGridSection {...catalogGridSectionProps} />
     </>

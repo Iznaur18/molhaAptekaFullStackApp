@@ -20,7 +20,15 @@
   margin-inline: calc(-1 * var(--app-shell-content-inline-padding, var(--iz-space-4)));
   padding-top: var(--cart-page-list-padding-top);
   padding-bottom: calc(
-    10rem + var(--app-shell-mobile-bottom-nav-height, 0px) +
+    2rem + var(--app-shell-mobile-bottom-nav-height, 0px) +
+      var(--app-shell-mobile-bottom-nav-float-offset, 0px) +
+      env(safe-area-inset-bottom, 0px)
+  );
+}
+
+.cart-page--sections {
+  padding-bottom: calc(
+    2rem + var(--app-shell-mobile-bottom-nav-height, 0px) +
       var(--app-shell-mobile-bottom-nav-float-offset, 0px) +
       env(safe-area-inset-bottom, 0px)
   );
@@ -116,15 +124,56 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
+  gap: 6px;
   flex: 1;
   min-width: 0;
 }
 
-.cart-page__total-label {
+.cart-page__dock-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 1.25rem;
+  line-height: 1.25;
+}
+
+.cart-page__dock-total-row--meta,
+.cart-page__dock-total-row--discount {
+  align-items: center;
+}
+
+.cart-page__total-label,
+.cart-page__payable-label,
+.cart-page__discount-label {
   font-size: 0.8125rem;
   font-weight: 500;
+  line-height: 1.25;
   color: var(--iz-color-text-muted);
+}
+
+.cart-page__payable-label {
+  color: var(--iz-color-ink);
+  font-weight: 700;
+}
+
+.cart-page__discount-value {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--iz-color-danger);
+  text-align: right;
+}
+
+.cart-page__list-price {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--iz-color-ink);
+  text-align: right;
 }
 
 .cart-page__total-value {
@@ -133,12 +182,15 @@
   font-weight: 800;
   letter-spacing: -0.3px;
   color: var(--iz-color-ink);
+  text-align: right;
 }
 
-.cart-page__full-total-hint {
-  font-size: 0.75rem;
+.cart-page__items-count {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--iz-color-text-muted);
+  line-height: 1.25;
+  color: var(--iz-color-text-secondary);
 }
 
 .cart-page__checkout-hint {
@@ -170,6 +222,20 @@
 .cart-page__checkout-cta:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+.cart-page__checkout-legal {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--iz-color-text-muted);
+}
+
+.cart-page__checkout-legal-link {
+  color: var(--iz-color-link, var(--iz-color-action));
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .cart-page__clear-button {

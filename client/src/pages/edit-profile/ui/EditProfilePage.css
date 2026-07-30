@@ -5,6 +5,24 @@
   width: 100%;
   max-width: 44rem;
   min-width: 0;
+  background: #fff;
+}
+
+/*
+ * Белый fill везде — иначе body `--iz-color-bg` (#e5eef2) просвечивает
+ * над клавиатурой iOS (как guest-profile / wholesale modal).
+ */
+html:has(.edit-profile-page),
+body:has(.edit-profile-page),
+body:has(.edit-profile-page) #root,
+body:has(.edit-profile-page) .app-main,
+body:has(.edit-profile-page) .app-shell,
+body:has(.edit-profile-page) .my-profile-page,
+body:has(.edit-profile-page) .my-profile-page__layout,
+body:has(.edit-profile-page) .my-profile-page__main,
+body:has(.edit-profile-page) .my-profile-page__body,
+body:has(.edit-profile-page) .my-profile-page__tab-content {
+  background: #fff;
 }
 
 .edit-profile-page_centered {
@@ -130,10 +148,13 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  min-width: 0;
+  max-width: 100%;
   padding: 1rem;
   border-radius: 1rem;
   border: 1px solid var(--iz-color-border);
   background: var(--iz-color-surface);
+  overflow: hidden;
 }
 
 .edit-profile-page__media {
@@ -143,17 +164,22 @@
 }
 
 .edit-profile-page__footer {
-  position: sticky;
-  bottom: 0;
-  z-index: 2;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   margin: 0 -0.25rem;
   padding: 0.875rem 0.25rem calc(0.875rem + env(safe-area-inset-bottom, 0));
-  background: color-mix(in srgb, var(--iz-color-bg) 92%, transparent);
-  backdrop-filter: blur(8px);
+  background: #fff;
   border-top: 1px solid var(--iz-color-border);
+}
+
+/*
+ * iOS поднимает fixed bottom nav над клавиатурой.
+ * На фокусе инпута — nav скрыт, чтобы не прыгал вверх.
+ */
+html.edit-profile-keyboard-open .mobile-bottom-nav {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .edit-profile-page__feedback {

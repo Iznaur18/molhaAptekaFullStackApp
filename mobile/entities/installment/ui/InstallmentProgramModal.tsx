@@ -73,7 +73,6 @@ export const InstallmentProgramModal = ({
   const headerInsetTop = Math.max(insets.top, 16);
   const footerInsetBottom = Math.max(insets.bottom, 12);
   const { upsertProgramMutation } = useInstallmentMutations();
-  const [isEnabled, setIsEnabled] = useState(true);
   const [plans, setPlans] = useState<InstallmentProgramPlanDraft[]>([createEmptyPlan()]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -122,7 +121,6 @@ export const InstallmentProgramModal = ({
 
     const program = programQuery.data;
     if (program) {
-      setIsEnabled(program.isEnabled !== false);
       setPlans(
         program.plans?.length
           ? program.plans.map((plan) => {
@@ -146,7 +144,6 @@ export const InstallmentProgramModal = ({
       return;
     }
 
-    setIsEnabled(true);
     setPlans([buildDefaultPlan(1)]);
   }, [buildDefaultPlan, isLoading, productPrice, programQuery.data, visible]);
 
@@ -193,6 +190,11 @@ export const InstallmentProgramModal = ({
     }
 
     try {
+      const existingPlans = programQuery.data?.plans;
+      const isEnabled =
+        Array.isArray(existingPlans) && existingPlans.length > 0
+          ? programQuery.data?.isEnabled === true
+          : true;
       const result = await upsertProgramMutation.mutateAsync({
         productId,
         body: {
@@ -211,7 +213,7 @@ export const InstallmentProgramModal = ({
           ? result.message.trim()
           : INSTALLMENT_UI.PROGRAM_MODAL_SUCCESS;
       setSuccess(successMessage);
-      onSaved?.(result.product);
+      onSaved?.({ productInstallmentEnabled: isEnabled });
       onClose();
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : INSTALLMENT_UI.ERROR_GENERIC);
@@ -270,11 +272,6 @@ export const InstallmentProgramModal = ({
               </Text>
             ) : null}
             {moderationHint ? <Text style={styles.info}>{moderationHint}</Text> : null}
-
-            <View style={styles.enabledRow}>
-              <Text style={styles.enabledLabel}>{INSTALLMENT_UI.PROGRAM_MODAL_ENABLED}</Text>
-              <Switch value={isEnabled} onValueChange={setIsEnabled} disabled={isSubmitting} />
-            </View>
 
             {plans.map((plan, index) => {
               const monthsCount = Math.floor(Number(plan.monthsCount) || 0);

@@ -32,6 +32,9 @@ export const resolveProductCardBadgeColors = (c: ThemeColors) =>
     installmentBorder: `${c.success}66`,
     installmentBg: c.successSurface,
     installmentText: c.successText,
+    wholesaleBorder: `${c.action}66`,
+    wholesaleBg: `${c.action}14`,
+    wholesaleText: c.action,
     /** Розыгрыш — розовая палитра (не warning/жёлтый). */
     raffleBorder: "#f9a8d466",
     raffleBg: "#fdf2f8",

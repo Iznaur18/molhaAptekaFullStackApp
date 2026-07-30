@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   ORDER_FULFILLMENT_DELIVERY,
   ORDER_FULFILLMENT_PICKUP,
   PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
+  SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT,
 } from "@molha/api-contract";
 
 import { addressValueFromUser } from "@/entities/address/lib/addressValueFromUser";
@@ -12,7 +13,7 @@ import { validateRuDeliveryAddressForm } from "@/entities/address/lib/validateRu
 import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
 import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import {
-  ORDER_PAYMENT_METHOD_CARD_PREPAID,
+  ORDER_PAYMENT_METHOD_DEFAULT,
   type OrderPaymentMethod,
 } from "@/entities/order/model/constants";
 import type { RuDeliveryAddressValue } from "@/entities/address/model/types";
@@ -21,10 +22,13 @@ import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useCheckoutFormStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 import { CheckoutPaymentMethodPicker } from "@/features/checkout/ui/CheckoutPaymentMethodPicker";
+import { CheckoutShippingProviderPicker } from "@/features/checkout/ui/CheckoutShippingProviderPicker";
 
 type CheckoutFormProps = {
   defaultUser?: Record<string, unknown> | null;
   pickupAddressSummary?: string;
+  deliveryAvailable?: boolean;
+  pickupAvailable?: boolean;
   isSubmitting: boolean;
   submitError: string;
   submitSuccess: string;
@@ -42,6 +46,8 @@ type CheckoutFormProps = {
 export const CheckoutForm = ({
   defaultUser,
   pickupAddressSummary = "",
+  deliveryAvailable = false,
+  pickupAvailable = true,
   isSubmitting,
   submitError,
   submitSuccess,
@@ -60,24 +66,55 @@ export const CheckoutForm = ({
     addressValueFromUser(defaultUser),
   );
   const [paymentMethod, setPaymentMethod] = useState<OrderPaymentMethod>(
-    ORDER_PAYMENT_METHOD_CARD_PREPAID,
+    ORDER_PAYMENT_METHOD_DEFAULT,
   );
   const [localError, setLocalError] = useState("");
+
+  const deliverySelectable =
+    PRODUCT_DELIVERY_FULFILLMENT_ENABLED && deliveryAvailable;
+  const pickupSelectable = pickupAvailable;
+
+  useEffect(() => {
+    if (!deliverySelectable && fulfillmentMethod === ORDER_FULFILLMENT_DELIVERY) {
+      if (pickupSelectable) {
+        setFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
+      }
+      return;
+    }
+    if (!pickupSelectable && fulfillmentMethod === ORDER_FULFILLMENT_PICKUP) {
+      if (deliverySelectable) {
+        setFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
+      }
+    }
+  }, [deliverySelectable, pickupSelectable, fulfillmentMethod]);
 
   const isPickup = fulfillmentMethod === ORDER_FULFILLMENT_PICKUP;
   const pickupReady = String(pickupAddressSummary ?? "").trim().length > 0;
 
   const isAddressValid = useMemo(() => {
     if (isPickup) {
-      return pickupReady;
+      return pickupSelectable && pickupReady;
     }
-    return validateRuDeliveryAddressForm(deliveryAddress, { required: true }) === null;
-  }, [deliveryAddress, isPickup, pickupReady]);
+    return (
+      deliverySelectable &&
+      validateRuDeliveryAddressForm(deliveryAddress, { required: true }) === null
+    );
+  }, [deliveryAddress, deliverySelectable, isPickup, pickupReady, pickupSelectable]);
+
+  const deliveryOptionHint = !PRODUCT_DELIVERY_FULFILLMENT_ENABLED
+    ? SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT
+    : !deliveryAvailable
+      ? CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_UNAVAILABLE
+      : null;
+
+  const pickupOptionHint = !pickupAvailable
+    ? CHECKOUT_FORM_UI.FULFILLMENT_PICKUP_UNAVAILABLE
+    : null;
 
   const handleSubmit = () => {
     if (isPickup) {
-      if (!pickupReady) {
-        setLocalError(CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED);
+      if (!pickupSelectable || !pickupReady) {
+        setLocalError(pickupOptionHint || CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED);
         return;
       }
       setLocalError("");
@@ -90,8 +127,10 @@ export const CheckoutForm = ({
       return;
     }
 
-    if (!PRODUCT_DELIVERY_FULFILLMENT_ENABLED) {
-      setLocalError(CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_SOON);
+    if (!deliverySelectable) {
+      setLocalError(
+        deliveryOptionHint || CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_UNAVAILABLE,
+      );
       return;
     }
 
@@ -122,32 +161,72 @@ export const CheckoutForm = ({
         <Text style={checkoutStyles.fieldLabel}>{CHECKOUT_FORM_UI.LABEL_FULFILLMENT}</Text>
         <View style={checkoutStyles.fulfillmentRow}>
           <Pressable
-            disabled={isDisabled || isSubmitting}
-            onPress={() => setFulfillmentMethod(ORDER_FULFILLMENT_PICKUP)}
+            disabled={!pickupSelectable || isDisabled || isSubmitting}
+            onPress={() => {
+              if (!pickupSelectable) {
+                return;
+              }
+              setFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
+            }}
             style={[
               checkoutStyles.fulfillmentOption,
               isPickup && checkoutStyles.fulfillmentOptionActive,
+              !pickupSelectable && checkoutStyles.fulfillmentOptionDisabled,
             ]}
           >
             <Text
               style={[
                 checkoutStyles.fulfillmentOptionText,
                 isPickup && checkoutStyles.fulfillmentOptionTextActive,
+                !pickupSelectable && checkoutStyles.fulfillmentOptionTextDisabled,
               ]}
             >
               {CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}
             </Text>
+            {pickupOptionHint ? (
+              <Text
+                style={[
+                  checkoutStyles.fulfillmentOptionHint,
+                  isPickup && checkoutStyles.fulfillmentOptionHintActive,
+                ]}
+              >
+                {pickupOptionHint}
+              </Text>
+            ) : null}
           </Pressable>
           <Pressable
-            disabled={!PRODUCT_DELIVERY_FULFILLMENT_ENABLED || isDisabled || isSubmitting}
-            style={[checkoutStyles.fulfillmentOption, checkoutStyles.fulfillmentOptionDisabled]}
+            disabled={!deliverySelectable || isDisabled || isSubmitting}
+            onPress={() => {
+              if (!deliverySelectable) {
+                return;
+              }
+              setFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
+            }}
+            style={[
+              checkoutStyles.fulfillmentOption,
+              !isPickup && checkoutStyles.fulfillmentOptionActive,
+              !deliverySelectable && checkoutStyles.fulfillmentOptionDisabled,
+            ]}
           >
-            <Text style={checkoutStyles.fulfillmentOptionTextDisabled}>
+            <Text
+              style={[
+                checkoutStyles.fulfillmentOptionText,
+                !isPickup && checkoutStyles.fulfillmentOptionTextActive,
+                !deliverySelectable && checkoutStyles.fulfillmentOptionTextDisabled,
+              ]}
+            >
               {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
-              {" ("}
-              {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_SOON}
-              {")"}
             </Text>
+            {deliveryOptionHint ? (
+              <Text
+                style={[
+                  checkoutStyles.fulfillmentOptionHint,
+                  !isPickup && checkoutStyles.fulfillmentOptionHintActive,
+                ]}
+              >
+                {deliveryOptionHint}
+              </Text>
+            ) : null}
           </Pressable>
         </View>
 
@@ -181,6 +260,8 @@ export const CheckoutForm = ({
               editable={!isDisabled && !isSubmitting}
               keyboardType="default"
             />
+
+            <CheckoutShippingProviderPicker disabled={isDisabled || isSubmitting} />
           </>
         )}
 

@@ -75,6 +75,9 @@ export const CartLineItem = ({ line, selected, onToggleSelected }: CartLineItemP
 
         <View style={styles.info}>
           {product ? <ProductPriceDisplay product={product} variant="cart" /> : null}
+          {line.isWholesaleApplied ? (
+            <Text style={styles.wholesaleBadge}>{CART_PAGE_UI.WHOLESALE_LINE_BADGE}</Text>
+          ) : null}
           {stockHint ? <Text style={styles.stockHint}>{stockHint}</Text> : null}
           {product ? (
             <Pressable onPress={handleOpenProduct}>

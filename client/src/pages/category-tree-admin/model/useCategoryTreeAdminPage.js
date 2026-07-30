@@ -12,6 +12,7 @@ import {
   isCategoryStructureChanged,
   isValidCategorySlug,
   parseKeywordsCsv,
+  parseCharacteristicKeysLines,
   sortCategoryRows,
 } from "../lib/categoryTreeAdminUtils.js";
 
@@ -47,6 +48,7 @@ export function useCategoryTreeAdminPage() {
   const [newParentId, setNewParentId] = useState("");
   const [newIsLeaf, setNewIsLeaf] = useState(false);
   const [newKeywordsCsv, setNewKeywordsCsv] = useState("");
+  const [newCharacteristicKeysText, setNewCharacteristicKeysText] = useState("");
   const [newLegacySlug, setNewLegacySlug] = useState("");
   const [actionError, setActionError] = useState("");
 
@@ -113,6 +115,7 @@ export function useCategoryTreeAdminPage() {
       parentId: row.parentId ?? "",
       isLeaf: row.isLeaf,
       keywordsCsv: (row.searchKeywords ?? []).join(", "),
+      characteristicKeysText: (row.defaultCharacteristicKeys ?? []).join("\n"),
       legacyProductCategory: row.legacyProductCategory ?? "",
     });
     setActionError("");
@@ -124,6 +127,7 @@ export function useCategoryTreeAdminPage() {
     setNewParentId("");
     setNewIsLeaf(false);
     setNewKeywordsCsv("");
+    setNewCharacteristicKeysText("");
     setNewLegacySlug("");
   };
 
@@ -143,6 +147,10 @@ export function useCategoryTreeAdminPage() {
         parentId: newParentId.trim() || null,
         isLeaf: newParentId.trim() ? newIsLeaf : false,
         searchKeywords: newParentId.trim() ? parseKeywordsCsv(newKeywordsCsv) : [],
+        defaultCharacteristicKeys:
+          newParentId.trim() && newIsLeaf
+            ? parseCharacteristicKeysLines(newCharacteristicKeysText)
+            : [],
         legacyProductCategory: newParentId.trim() ? newLegacySlug.trim() || null : null,
       });
       updateRows((prev) => [...prev, created]);
@@ -170,6 +178,10 @@ export function useCategoryTreeAdminPage() {
           parentId: String(editDraft.parentId ?? "").trim() || null,
           isLeaf: editDraft.isLeaf === true,
           searchKeywords: parseKeywordsCsv(String(editDraft.keywordsCsv ?? "")),
+          defaultCharacteristicKeys:
+            editDraft.isLeaf === true
+              ? parseCharacteristicKeysLines(String(editDraft.characteristicKeysText ?? ""))
+              : [],
           legacyProductCategory:
             String(editDraft.legacyProductCategory ?? "").trim() || null,
         },
@@ -247,6 +259,8 @@ export function useCategoryTreeAdminPage() {
     setNewIsLeaf,
     newKeywordsCsv,
     setNewKeywordsCsv,
+    newCharacteristicKeysText,
+    setNewCharacteristicKeysText,
     newLegacySlug,
     setNewLegacySlug,
     displayError,

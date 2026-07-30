@@ -141,6 +141,7 @@ export function ProductDetailsModal({
   const isAltDetailsTab =
     ctrl.detailsTab === "reviews" ||
     ctrl.detailsTab === "similar" ||
+    ctrl.detailsTab === "compare" ||
     ctrl.detailsTab === "auction" ||
     ctrl.detailsTab === "installment";
   const tabPanelClassName = [
@@ -159,6 +160,7 @@ export function ProductDetailsModal({
         showInstallmentTab={ctrl.showInstallmentTab}
         showReviewsTab={ctrl.showReviewsTab}
         showSimilarTab={ctrl.showSimilarTab}
+        showCompareTab={ctrl.showCompareTab}
         reviewsTabLabel={ctrl.reviewsTabLabel}
       />
     ) : null;

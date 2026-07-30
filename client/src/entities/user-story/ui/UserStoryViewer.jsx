@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { useUserStoryMutations } from "../model/useUserStoryMutations.js";
 import {
   resolveUserStoryAvatarUrl,
@@ -55,6 +56,8 @@ export function UserStoryViewer({
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [incomingRevealed, setIncomingRevealed] = useState(false);
   const [pendingIndex, setPendingIndex] = useState(/** @type {number | null} */ (null));
+
+  useScrollLock(isOpen);
 
   const authorId = String(author._id);
   const isOwn = currentUserId != null && authorId === String(currentUserId);
@@ -342,6 +345,17 @@ export function UserStoryViewer({
   return (
     <>
       <div className="user-story-viewer" role="dialog" aria-modal="true">
+        {phase !== "ready" ? (
+          <button
+            type="button"
+            className="user-story-viewer__close user-story-viewer__close_viewer"
+            onClick={onClose}
+            aria-label={USER_STORY_UI.CLOSE}
+          >
+            ×
+          </button>
+        ) : null}
+
         {phase === "loading" ? (
           <p className="user-story-viewer__state">{USER_STORY_UI.LOADING}</p>
         ) : null}
@@ -361,20 +375,33 @@ export function UserStoryViewer({
 
         {phase === "ready" && activeStory ? (
           <div className="user-story-viewer__stage">
-            {hasMultiple ? (
-              <button
-                type="button"
-                className="user-story-viewer__edge user-story-viewer__edge_prev"
-                aria-label={USER_STORY_UI.PREV_STORY}
-                disabled={isReportOpen || isTransitioning || activeIndex <= 0}
-                onClick={handlePrev}
-              />
-            ) : null}
-
             <div
               className="user-story-viewer__frame"
               onPointerDown={isVideoStoryReady ? resumeIfPaused : undefined}
             >
+              {hasMultiple ? (
+                <>
+                  <button
+                    type="button"
+                    className="user-story-viewer__edge user-story-viewer__edge_prev"
+                    aria-label={USER_STORY_UI.PREV_STORY}
+                    disabled={isReportOpen || isTransitioning || activeIndex <= 0}
+                    onClick={handlePrev}
+                  />
+                  <button
+                    type="button"
+                    className="user-story-viewer__edge user-story-viewer__edge_next"
+                    aria-label={USER_STORY_UI.NEXT_STORY}
+                    disabled={
+                      isReportOpen ||
+                      isTransitioning ||
+                      activeIndex >= stories.length - 1
+                    }
+                    onClick={handleNext}
+                  />
+                </>
+              ) : null}
+
               <button
                 type="button"
                 className="user-story-viewer__close"
@@ -493,18 +520,6 @@ export function UserStoryViewer({
                 </footer>
               ) : null}
             </div>
-
-            {hasMultiple ? (
-              <button
-                type="button"
-                className="user-story-viewer__edge user-story-viewer__edge_next"
-                aria-label={USER_STORY_UI.NEXT_STORY}
-                disabled={
-                  isReportOpen || isTransitioning || activeIndex >= stories.length - 1
-                }
-                onClick={handleNext}
-              />
-            ) : null}
           </div>
         ) : null}
       </div>

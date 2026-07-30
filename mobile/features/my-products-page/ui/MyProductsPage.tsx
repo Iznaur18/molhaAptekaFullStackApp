@@ -251,9 +251,14 @@ export const MyProductsPage = () => {
         onSubmit={pageActions.handleSubmitPromotion}
         onSetProductAvailability={pageActions.handleSetMyProductAvailability}
         onSetProductAuction={pageActions.handleSetProductAuction}
+        onSetProductWholesale={pageActions.handleSetProductWholesale}
+        onSetProductInstallment={pageActions.handleSetProductInstallment}
+        onWholesaleSaved={pageActions.handleWholesaleSaved}
         onDeleteProduct={pageActions.handleDeleteProduct}
         isAvailabilityTogglePending={pageActions.isAvailabilityTogglePending}
         isAuctionTogglePending={pageActions.isAuctionTogglePending}
+        isWholesaleTogglePending={pageActions.isWholesaleTogglePending}
+        isInstallmentTogglePending={pageActions.isInstallmentTogglePending}
         isDeletePending={pageActions.isDeletePending}
         manageErrorMessage={pageActions.manageErrorMessage}
         canManageEdit={

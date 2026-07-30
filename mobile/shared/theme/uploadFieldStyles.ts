@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { semanticColors } from "@/shared/theme/semanticColors";
@@ -204,9 +204,11 @@ export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 16,
     borderWidth: 1,
     borderColor: theme.colors.action,
+    borderRadius: 20,
     backgroundColor: theme.colors.action,
     alignItems: "center",
     justifyContent: "center",
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   detailDockGoToCartButton: {
     marginTop: 0,
@@ -216,9 +218,11 @@ export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 16,
     borderWidth: 1,
     borderColor: theme.colors.success,
+    borderRadius: 20,
     backgroundColor: theme.colors.success,
     alignItems: "center",
     justifyContent: "center",
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   detailDockAddButtonText: {
     color: theme.colors.onContrast,
@@ -233,9 +237,11 @@ export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 16,
     borderWidth: 1,
     borderColor: theme.colors.action,
+    borderRadius: 20,
     backgroundColor: theme.colors.action,
     alignItems: "center",
     justifyContent: "center",
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   detailDockLoginButtonText: {
     color: theme.colors.onContrast,

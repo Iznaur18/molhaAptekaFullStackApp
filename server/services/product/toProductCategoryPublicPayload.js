@@ -15,6 +15,9 @@ export const toProductCategoryPublicPayload = (row) => ({
   searchKeywords: Array.isArray(row.searchKeywords)
     ? row.searchKeywords.map(String)
     : [],
+  defaultCharacteristicKeys: Array.isArray(row.defaultCharacteristicKeys)
+    ? row.defaultCharacteristicKeys.map(String)
+    : [],
 });
 
 /**

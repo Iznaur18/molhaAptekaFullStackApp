@@ -32,9 +32,13 @@ export function ProductPromotionManageSection({
   product,
   onSetAvailability,
   onSetAuction,
+  onSetWholesale,
+  onSetInstallment,
   onDelete,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
+  isWholesaleTogglePending = false,
+  isInstallmentTogglePending = false,
   isDeletePending = false,
   errorMessage = "",
   canEdit = true,
@@ -45,6 +49,7 @@ export function ProductPromotionManageSection({
   isRaffleParticipationPending = false,
   isSubmitting = false,
   onOpenInstallmentProgram,
+  onOpenWholesaleSettings,
   embeddedInTab = false,
 }) {
   const sectionClassName = [
@@ -73,9 +78,13 @@ export function ProductPromotionManageSection({
         product={product}
         onSetAvailability={onSetAvailability}
         onSetAuction={onSetAuction}
+        onSetWholesale={onSetWholesale}
+        onSetInstallment={onSetInstallment}
         onDelete={onDelete}
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
+        isWholesaleTogglePending={isWholesaleTogglePending}
+        isInstallmentTogglePending={isInstallmentTogglePending}
         isDeletePending={isDeletePending}
         errorMessage={errorMessage}
         canEdit={canEdit}
@@ -86,6 +95,7 @@ export function ProductPromotionManageSection({
         isRaffleParticipationPending={isRaffleParticipationPending}
         disabled={isSubmitting}
         onOpenInstallmentProgram={onOpenInstallmentProgram}
+        onOpenWholesaleSettings={onOpenWholesaleSettings}
         canOpenInstallmentProgram={
           (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===
           PRODUCT_MODERATION_APPROVED

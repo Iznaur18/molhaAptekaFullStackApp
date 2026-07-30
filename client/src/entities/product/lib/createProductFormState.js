@@ -24,10 +24,14 @@ export const CREATE_PRODUCT_INITIAL_FORM = {
   productStockQuantity: "1",
   loyaltyPointsPerUnit: "0",
   productCharacteristicRows: [],
+  categoryDefaultCharacteristicKeys: [],
+  productCharacteristicsSellerTouched: false,
+  productCharacteristicsAutoAppliedForCategoryId: null,
   productRegionCode: "RU-MOW",
   productPickupAddress: "",
   productPickupLat: null,
   productPickupLon: null,
+  productPickupEnabled: true,
   productDeliveryEnabled: false,
   productReturnEnabled: null,
   returnTermRows: [],
@@ -71,6 +75,9 @@ export function createProductFormStateFromProduct(product) {
         : "1",
     loyaltyPointsPerUnit: String(resolveProductLoyaltyPointsPerUnit(product)),
     productCharacteristicRows: characteristicRowsFromApi(product.productCharacteristics),
+    categoryDefaultCharacteristicKeys: [],
+    productCharacteristicsSellerTouched: true,
+    productCharacteristicsAutoAppliedForCategoryId: null,
     productRegionCode: product.productRegionCode?.trim() || "RU-MOW",
     productPickupAddress: String(product.productPickupAddress ?? "").trim(),
     productPickupLat:
@@ -81,7 +88,8 @@ export function createProductFormStateFromProduct(product) {
       product.productPickupLon != null && Number.isFinite(Number(product.productPickupLon))
         ? Number(product.productPickupLon)
         : null,
-    productDeliveryEnabled: false,
+    productPickupEnabled: product.productPickupEnabled !== false,
+    productDeliveryEnabled: product.productDeliveryEnabled === true,
     productReturnEnabled: product.productReturnEnabled === true,
     returnTermRows:
       product.productReturnEnabled === true

@@ -1,3 +1,4 @@
+import { formatProductWholesaleBadgeLabel } from "@izibuy/shared-lib";
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
 import {
   getProductPromotionTierLabel,
@@ -85,6 +86,11 @@ export function ProductCatalogStatusBadges({
       {showInstallmentBadge && flags.showInstallmentBadge ? (
         <p className="product-card__installment-badge" role="status">
           {PRODUCT_CARD_UI.INSTALLMENT_BADGE}
+        </p>
+      ) : null}
+      {flags.showWholesaleBadge && flags.wholesaleBadgeLabel ? (
+        <p className="product-card__wholesale-badge" role="status">
+          {flags.wholesaleBadgeLabel}
         </p>
       ) : null}
       {flags.showPromotionBoostBadge ? (

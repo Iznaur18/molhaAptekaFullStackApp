@@ -15,9 +15,9 @@ export const ORDER_FULFILLMENT_METHODS = [
 
 /**
  * Когда true — продавец может включить доставку, покупатель выбрать delivery.
- * Пока false: UI disabled, сервер отклоняет delivery / productDeliveryEnabled=true.
+ * Перевозчики (СДЭК и т.п.) — отдельно: SHIPPING_PROVIDERS_ENABLED.
  */
-export const PRODUCT_DELIVERY_FULFILLMENT_ENABLED = false;
+export const PRODUCT_DELIVERY_FULFILLMENT_ENABLED = true;
 
 export const PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE =
   "Укажите адрес самовывоза";
@@ -25,8 +25,66 @@ export const PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE =
 export const PRODUCT_DELIVERY_NOT_AVAILABLE_MESSAGE =
   "Доставка пока недоступна — выберите самовывоз";
 
+export const PRODUCT_DELIVERY_NOT_ENABLED_FOR_ITEMS_MESSAGE =
+  "Доставка недоступна для одного или нескольких товаров в заказе";
+
 export const PRODUCT_PICKUP_MISSING_FOR_ORDER_MESSAGE =
   "У одного или нескольких товаров нет адреса самовывоза";
+
+export const PRODUCT_PICKUP_NOT_ENABLED_FOR_ITEMS_MESSAGE =
+  "Самовывоз недоступен для одного или нескольких товаров в заказе";
+
+export const PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE =
+  "Выберите хотя бы один способ: самовывоз или доставку";
+
+export const CART_FULFILLMENT_SECTION_PICKUP = "pickup";
+export const CART_FULFILLMENT_SECTION_DELIVERY = "delivery";
+
+/**
+ * Секция корзины: dual/pickup → самовывоз; delivery-only → доставка.
+ * @param {{ productPickupEnabled?: boolean | null; productDeliveryEnabled?: boolean | null } | null | undefined} product
+ * @returns {"pickup" | "delivery"}
+ */
+export function resolveCartLineFulfillmentSection(product) {
+  const pickupOn = product?.productPickupEnabled !== false;
+  const deliveryOn = product?.productDeliveryEnabled === true;
+  if (!pickupOn && deliveryOn) {
+    return CART_FULFILLMENT_SECTION_DELIVERY;
+  }
+  return CART_FULFILLMENT_SECTION_PICKUP;
+}
+
+/**
+ * Все товары поддерживают самовывоз (по умолчанию true для старых документов).
+ * @param {Array<{ productPickupEnabled?: boolean | null; productPickupAddress?: string | null } | null | undefined>} products
+ * @returns {boolean}
+ */
+export function doProductsSupportPickup(products) {
+  if (!Array.isArray(products) || products.length === 0) {
+    return false;
+  }
+  return products.every((product) => {
+    if (product?.productPickupEnabled === false) {
+      return false;
+    }
+    return String(product?.productPickupAddress ?? "").trim().length > 0;
+  });
+}
+
+/**
+ * Все товары поддерживают доставку продавцом.
+ * @param {Array<{ productDeliveryEnabled?: boolean | null } | null | undefined>} products
+ * @returns {boolean}
+ */
+export function doProductsSupportSellerDelivery(products) {
+  if (!PRODUCT_DELIVERY_FULFILLMENT_ENABLED) {
+    return false;
+  }
+  if (!Array.isArray(products) || products.length === 0) {
+    return false;
+  }
+  return products.every((product) => product?.productDeliveryEnabled === true);
+}
 
 export const productPickupLatFieldSchema = z.coerce.number().min(-90).max(90);
 export const productPickupLonFieldSchema = z.coerce.number().min(-180).max(180);
@@ -75,10 +133,23 @@ export const productPickupCreateFieldsSchema = z
     productPickupAddress: productPickupAddressFieldSchema,
     productPickupLat: productPickupLatSchema.nullable().optional(),
     productPickupLon: productPickupLonSchema.nullable().optional(),
-    /** Игнорируется / отклоняется, пока PRODUCT_DELIVERY_FULFILLMENT_ENABLED=false. */
+    /** Самовывоз для покупателя; default true. */
+    productPickupEnabled: z.coerce.boolean().optional(),
+    /** Доставка продавцом; отклоняется, пока PRODUCT_DELIVERY_FULFILLMENT_ENABLED=false. */
     productDeliveryEnabled: z.coerce.boolean().optional(),
   })
-  .superRefine((body, ctx) => assertPickupCoordsPair(body, ctx));
+  .superRefine((body, ctx) => {
+    assertPickupCoordsPair(body, ctx);
+    const pickupOn = body.productPickupEnabled !== false;
+    const deliveryOn = body.productDeliveryEnabled === true;
+    if (!pickupOn && !deliveryOn) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["productPickupEnabled"],
+        message: PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
+      });
+    }
+  });
 
 /** Поля самовывоза для patch (все optional). */
 export const productPickupPatchFieldsSchema = z
@@ -86,6 +157,7 @@ export const productPickupPatchFieldsSchema = z
     productPickupAddress: productPickupAddressFieldSchema.optional(),
     productPickupLat: productPickupLatSchema.nullable().optional(),
     productPickupLon: productPickupLonSchema.nullable().optional(),
+    productPickupEnabled: z.coerce.boolean().optional(),
     productDeliveryEnabled: z.coerce.boolean().optional(),
   })
   .superRefine((body, ctx) => {

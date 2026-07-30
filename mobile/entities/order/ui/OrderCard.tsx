@@ -1,5 +1,13 @@
 import { useState, type ReactNode } from "react";
-import { Pressable, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import {
+  Linking,
+  Pressable,
+  Text,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
+import { resolveOrderShippingTrackingUrl } from "@molha/api-contract";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
 import { isOrderLineItemProductClickable } from "@/entities/order/lib/isOrderLineItemProductClickable";
@@ -14,6 +22,7 @@ import {
 import { resolveOrderLineItemName } from "@/entities/order/lib/resolveOrderLineItemName";
 import { resolveOrderStatusBadgeStyle } from "@/entities/order/lib/resolveOrderStatusBadgeStyle";
 import { resolveOrderStatusLabelRu } from "@/entities/order/lib/resolveOrderStatusLabelRu";
+import { resolveOrderSellers } from "@/entities/order/lib/resolveOrderSellers";
 import { OrderCardLineItemThumb } from "@/entities/order/ui/OrderCardLineItemThumb";
 import { BuyerPassportSharePanel } from "@/entities/installment/ui/BuyerPassportSharePanel";
 import {
@@ -27,13 +36,17 @@ import { INSTALLMENT_UI, MY_ORDERS_PAGE_UI, ORDER_CARD_UI, PRODUCT_CARD_UI } fro
 import { formatIsoDateTime, formatPriceRub } from "@/shared/lib";
 import { useOrderCardStyles } from "@/shared/theme/commerceScreenStyles";
 import { CommerceCardExpandToggle } from "@/shared/ui/CommerceCardExpandToggle";
+import {
+  formatRuPhoneDisplayOrEmpty,
+  toRuPhoneTelHref,
+} from "@/entities/user/lib/ruPhone";
 
 type OrderItemActionContext = {
   orderId: string;
   itemIndex: number;
 };
 
-type OrderBuyer = { _id?: string; userName?: string; email?: string } | string | null | undefined;
+type OrderBuyer = { _id?: string; userName?: string; email?: string; userPhoneNumber?: string } | string | null | undefined;
 
 type OrderCardOrder = {
   _id: string;
@@ -42,6 +55,9 @@ type OrderCardOrder = {
   deliveryAddress?: string;
   paymentMethod?: string;
   createdAt?: string;
+  shippingProvider?: string | null;
+  shippingTrackingNumber?: string | null;
+  shippingTrackingUrl?: string | null;
   priceOfferId?: string | null;
   installmentContractId?: string | null;
   userBuyerId?: OrderBuyer;
@@ -55,15 +71,33 @@ type OrderCardOrder = {
     passportSelfiePhotoUrl?: string;
     consentAt?: string | null;
   } | null;
-  items?: { status?: string }[];
+  items?: Array<{
+    status?: string;
+    productId?:
+      | string
+      | {
+          productSeller?:
+            | string
+            | {
+                _id?: string;
+                userName?: string;
+                email?: string;
+                userPhoneNumber?: string;
+              }
+            | null;
+        }
+      | null;
+  }>;
 };
 
 type OrderCardProps = {
   order: OrderCardOrder;
   compact?: boolean;
   showBuyer?: boolean;
+  showSeller?: boolean;
   statusSlot?: ReactNode;
   onBuyerNameClick?: (userId: string) => void;
+  onSellerNameClick?: (userId: string) => void;
   onProductClick?: (item: unknown) => void;
   onConfirmDelivered?: (ctx: OrderItemActionContext) => void | Promise<void>;
   onCancelItem?: (ctx: OrderItemActionContext) => void | Promise<void>;
@@ -97,34 +131,93 @@ const resolveBuyerId = (buyer: OrderBuyer): string | null => {
   return buyer._id != null ? String(buyer._id) : null;
 };
 
+const openTelHref = (href: string) => {
+  void Linking.openURL(href).catch(() => undefined);
+};
+
+const CounterpartyValue = ({
+  user,
+  onNameClick,
+}: {
+  user: OrderBuyer;
+  onNameClick?: (userId: string) => void;
+}) => {
+  const styles = useOrderCardStyles();
+  if (user == null || typeof user === "string") {
+    return <Text style={styles.metaValue}>—</Text>;
+  }
+  const label = formatBuyerLabel(user);
+  const userId = resolveBuyerId(user);
+  const canLink = Boolean(onNameClick) && userId != null;
+  const phoneDisplay = formatRuPhoneDisplayOrEmpty(user.userPhoneNumber);
+  const phoneHref = toRuPhoneTelHref(user.userPhoneNumber);
+
+  return (
+    <View style={styles.counterpartyValue}>
+      {canLink ? (
+        <Pressable onPress={() => onNameClick?.(userId!)}>
+          <Text style={styles.buyerLink}>{label}</Text>
+        </Pressable>
+      ) : (
+        <Text style={styles.metaValue}>{label}</Text>
+      )}
+      {phoneHref ? (
+        <Pressable onPress={() => openTelHref(phoneHref)}>
+          <Text style={styles.counterpartyPhone}>{phoneDisplay}</Text>
+        </Pressable>
+      ) : phoneDisplay ? (
+        <Text style={styles.counterpartyPhoneText}>{phoneDisplay}</Text>
+      ) : null}
+    </View>
+  );
+};
+
 type OrderCardMetaProps = {
   order: OrderCardOrder;
   showBuyer: boolean;
+  showSeller: boolean;
   onBuyerNameClick?: (userId: string) => void;
+  onSellerNameClick?: (userId: string) => void;
   isInstallmentOrder: boolean;
 };
 
 const OrderCardMeta = ({
   order,
   showBuyer,
+  showSeller,
   onBuyerNameClick,
+  onSellerNameClick,
   isInstallmentOrder,
 }: OrderCardMetaProps) => {
   const styles = useOrderCardStyles();
-  const buyerId = resolveBuyerId(order.userBuyerId);
-  const canLinkBuyer = Boolean(onBuyerNameClick) && buyerId != null;
+  const sellers = showSeller ? resolveOrderSellers(order) : [];
+  const trackingNumber = String(order.shippingTrackingNumber ?? "").trim();
+  const trackingUrl = trackingNumber
+    ? resolveOrderShippingTrackingUrl(order)
+    : null;
 
   return (
     <View>
       {showBuyer ? (
         <View style={styles.metaRow}>
           <Text style={styles.metaLabel}>{ORDER_CARD_UI.BUYER_LABEL}:</Text>
-          {canLinkBuyer ? (
-            <Pressable onPress={() => onBuyerNameClick?.(buyerId!)}>
-              <Text style={styles.buyerLink}>{formatBuyerLabel(order.userBuyerId)}</Text>
-            </Pressable>
+          <CounterpartyValue user={order.userBuyerId} onNameClick={onBuyerNameClick} />
+        </View>
+      ) : null}
+      {showSeller ? (
+        <View style={styles.metaRow}>
+          <Text style={styles.metaLabel}>{ORDER_CARD_UI.SELLER_LABEL}:</Text>
+          {sellers.length === 0 ? (
+            <Text style={styles.metaValue}>—</Text>
           ) : (
-            <Text style={styles.metaValue}>{formatBuyerLabel(order.userBuyerId)}</Text>
+            <View style={styles.counterpartyList}>
+              {sellers.map((seller, index) => (
+                <View key={seller._id} style={styles.counterpartyListItem}>
+                  {index > 0 ? <Text style={styles.metaValue}>, </Text> : null}
+                  <CounterpartyValue user={seller} onNameClick={onSellerNameClick} />
+                </View>
+              ))}
+            </View>
           )}
         </View>
       ) : null}
@@ -136,6 +229,18 @@ const OrderCardMeta = ({
         <Text style={styles.metaLabel}>{ORDER_CARD_UI.ADDRESS_LABEL}:</Text>
         <Text style={styles.metaValue}>{order.deliveryAddress || "—"}</Text>
       </View>
+      {trackingNumber ? (
+        <View style={styles.metaRow}>
+          <Text style={styles.metaLabel}>{ORDER_CARD_UI.TRACKING_LABEL}:</Text>
+          {trackingUrl ? (
+            <Pressable onPress={() => void Linking.openURL(trackingUrl)}>
+              <Text style={styles.buyerLink}>{trackingNumber}</Text>
+            </Pressable>
+          ) : (
+            <Text style={styles.metaValue}>{trackingNumber}</Text>
+          )}
+        </View>
+      ) : null}
       <View style={styles.metaRow}>
         <Text style={styles.metaLabel}>{ORDER_CARD_UI.PAYMENT_LABEL}:</Text>
         <Text style={styles.metaValue}>{formatPayment(order.paymentMethod)}</Text>
@@ -157,8 +262,10 @@ export const OrderCard = ({
   order,
   compact = false,
   showBuyer = false,
+  showSeller = false,
   statusSlot = null,
   onBuyerNameClick,
+  onSellerNameClick,
   onProductClick,
   onConfirmDelivered,
   onCancelItem,
@@ -451,7 +558,9 @@ export const OrderCard = ({
               <OrderCardMeta
                 order={order}
                 showBuyer={showBuyer}
+                showSeller={showSeller}
                 onBuyerNameClick={onBuyerNameClick}
+                onSellerNameClick={onSellerNameClick}
                 isInstallmentOrder={isInstallmentOrder}
               />
               {showBuyer && order.buyerPassportShare ? (
@@ -477,7 +586,9 @@ export const OrderCard = ({
                   <OrderCardMeta
                     order={order}
                     showBuyer={showBuyer}
+                    showSeller={showSeller}
                     onBuyerNameClick={onBuyerNameClick}
+                    onSellerNameClick={onSellerNameClick}
                     isInstallmentOrder={isInstallmentOrder}
                   />
                   {showBuyer && order.buyerPassportShare ? (

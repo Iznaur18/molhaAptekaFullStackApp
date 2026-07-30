@@ -71,7 +71,11 @@ export function CreateProductBasicSection({
       <ProductCharacteristicsEditor
         rows={form.productCharacteristicRows}
         onRowsChange={(productCharacteristicRows) =>
-          setForm((prev) => ({ ...prev, productCharacteristicRows }))
+          setForm((prev) => ({
+            ...prev,
+            productCharacteristicRows,
+            productCharacteristicsSellerTouched: true,
+          }))
         }
         disabled={isSubmitting}
       />

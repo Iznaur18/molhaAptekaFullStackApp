@@ -60,8 +60,35 @@
 }
 
 .checkout-payment-method-picker__card:disabled {
-  opacity: 0.55;
   cursor: not-allowed;
+}
+
+.checkout-payment-method-picker__card:disabled:not(
+    .checkout-payment-method-picker__card--locked
+  ) {
+  opacity: 0.55;
+}
+
+.checkout-payment-method-picker__card--locked,
+.checkout-payment-method-picker__card--locked:disabled {
+  opacity: 1;
+  background: var(--iz-color-surface-muted);
+  border-color: var(--iz-color-border);
+  color: var(--iz-color-text-muted);
+}
+
+.checkout-payment-method-picker__card--locked:not(
+    .checkout-payment-method-picker__card--selected
+  ) {
+  background: var(--iz-color-surface-muted);
+  border-color: var(--iz-color-border);
+  color: var(--iz-color-text-muted);
+}
+
+.checkout-payment-method-picker__soon {
+  font-weight: var(--iz-weight-semibold);
+  color: inherit;
+  opacity: 0.85;
 }
 
 /* cardLabel: 13/17, 600, по центру */

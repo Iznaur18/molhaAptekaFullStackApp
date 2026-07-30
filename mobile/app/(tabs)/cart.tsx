@@ -1,10 +1,17 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  CART_FULFILLMENT_SECTION_DELIVERY,
+  CART_FULFILLMENT_SECTION_PICKUP,
+  doProductsSupportPickup,
+  doProductsSupportSellerDelivery,
+} from "@molha/api-contract";
 
 import { getCartLineExclusionReason } from "@/entities/cart/lib/getCartLineExclusionReason";
+import { groupCartLinesByFulfillment } from "@/entities/cart/lib/groupCartLinesByFulfillment";
 import { selectCartCheckoutSummary } from "@/entities/cart/lib/selectCartCheckoutSummary";
 import { selectCartLines } from "@/entities/cart/lib/selectCartLines";
 import { useCartActions } from "@/entities/cart/model/useCartActions";
@@ -12,8 +19,7 @@ import { useCartProductsQuery } from "@/entities/cart/model/useCartProductsQuery
 import { useCartSelection } from "@/entities/cart/model/useCartSelection";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useMyCartQuery } from "@/entities/cart/model/useMyCartQuery";
-import { CartLineItem } from "@/entities/cart/ui/CartLineItem";
-import { CartSelectAllRow } from "@/entities/cart/ui/CartSelectAllRow";
+import { CartFulfillmentSection } from "@/entities/cart/ui/CartFulfillmentSection";
 import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import { useCreateOrderMutation } from "@/entities/order/model/useCreateOrderMutation";
@@ -23,24 +29,20 @@ import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuer
 import { CartAuctionSection } from "@/features/cart-auction/ui/CartAuctionSection";
 import { CheckoutSheetModal } from "@/features/checkout/ui/CheckoutSheetModal";
 import { orderQueryKeys, priceOfferQueryKeys } from "@/shared/api";
-import { API_CLIENT_UI, AUTH_UI, CART_AUCTION_UI, CART_PAGE_UI, CART_STICKY_FOOTER_TOP_RADIUS, CHECKOUT_FORM_UI } from "@/shared/config";
-import { formatApiErrorMessage, formatPriceRub } from "@/shared/lib";
+import {
+  API_CLIENT_UI,
+  AUTH_UI,
+  CART_AUCTION_UI,
+  CART_PAGE_UI,
+  CHECKOUT_FORM_UI,
+} from "@/shared/config";
+import { formatApiErrorMessage } from "@/shared/lib";
 import { resolveMobileBottomNavLayoutHeight } from "@/shared/lib/mobileBottomNavLayout";
 import { useCartScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { AppButton } from "@/shared/ui/AppButton";
-import { SquircleView } from "@/shared/ui/SquircleView";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
-
-/** Примерная высота закреплённой карточки footer (итог + CTA) с паддингами. */
-const CART_STICKY_FOOTER_HEIGHT = 160;
-
-/** Боковой инсет плавающей карточки — паритет с карточками товаров (rowOuter marginHorizontal). */
-const CART_STICKY_FOOTER_FLOAT_INSET = 12;
-
-/** Зазор между карточкой footer и навбаром. */
-const CART_STICKY_FOOTER_FLOAT_GAP = 8;
 
 export default function CartScreen() {
   const router = useRouter();
@@ -55,7 +57,9 @@ export default function CartScreen() {
   const { clearCart, removeItems, isUpdating } = useCartActions();
   const createOrderMutation = useCreateOrderMutation();
 
-  const [checkoutSheetOpen, setCheckoutSheetOpen] = useState(false);
+  const [checkoutSection, setCheckoutSection] = useState<"pickup" | "delivery" | null>(
+    null,
+  );
   const [auctionCheckoutBid, setAuctionCheckoutBid] = useState<MyPriceOfferBid | null>(null);
   const [submitState, setSubmitState] = useState({
     isSubmitting: false,
@@ -82,19 +86,48 @@ export default function CartScreen() {
     [lines, currentUserId],
   );
 
+  const { pickupLines, deliveryLines } = useMemo(
+    () => groupCartLinesByFulfillment(visibleLines),
+    [visibleLines],
+  );
+
   const purchasableIds = useMemo(
     () => visibleLines.map((line) => line.productId),
     [visibleLines],
   );
-  const { deselectedIds, isLineSelected, toggleLine, toggleAll, areAllSelected, selectedCount } =
-    useCartSelection(purchasableIds);
-
-  const checkoutSummary = useMemo(
-    () => selectCartCheckoutSummary(lines, currentUserId, deselectedIds),
-    [lines, currentUserId, deselectedIds],
+  const pickupIds = useMemo(
+    () => pickupLines.map((line) => line.productId),
+    [pickupLines],
+  );
+  const deliveryIds = useMemo(
+    () => deliveryLines.map((line) => line.productId),
+    [deliveryLines],
   );
 
-  const canCheckout = checkoutSummary.selectedLines.length > 0;
+  const {
+    deselectedIds,
+    isLineSelected,
+    toggleLine,
+    toggleAllIn,
+    areAllSelectedIn,
+    selectedCountIn,
+  } = useCartSelection(purchasableIds);
+
+  const pickupSummary = useMemo(
+    () => selectCartCheckoutSummary(pickupLines, currentUserId, deselectedIds),
+    [pickupLines, currentUserId, deselectedIds],
+  );
+  const deliverySummary = useMemo(
+    () => selectCartCheckoutSummary(deliveryLines, currentUserId, deselectedIds),
+    [deliveryLines, currentUserId, deselectedIds],
+  );
+
+  const activeSummary =
+    checkoutSection === CART_FULFILLMENT_SECTION_DELIVERY
+      ? deliverySummary
+      : pickupSummary;
+
+  const canCheckoutActive = activeSummary.selectedLines.length > 0;
 
   const pickupAddressSummary = useMemo(() => {
     if (auctionCheckoutBid) {
@@ -104,14 +137,45 @@ export default function CartScreen() {
       return String(product?.productPickupAddress ?? "").trim();
     }
     const addresses: string[] = [];
-    for (const line of checkoutSummary.selectedLines) {
+    for (const line of activeSummary.selectedLines) {
       const address = String(line.product?.productPickupAddress ?? "").trim();
       if (address && !addresses.includes(address)) {
         addresses.push(address);
       }
     }
     return addresses.join("; ");
-  }, [auctionCheckoutBid, checkoutSummary.selectedLines, productsQuery.products]);
+  }, [auctionCheckoutBid, activeSummary.selectedLines, productsQuery.products]);
+
+  const deliveryAvailable = useMemo(() => {
+    if (auctionCheckoutBid) {
+      const product = (productsQuery.products ?? []).find(
+        (item) => String(item._id) === String(auctionCheckoutBid.productId),
+      );
+      return doProductsSupportSellerDelivery([
+        product as { productDeliveryEnabled?: boolean | null } | undefined,
+      ]);
+    }
+    return doProductsSupportSellerDelivery(
+      activeSummary.selectedLines.map((line) => line.product),
+    );
+  }, [auctionCheckoutBid, activeSummary.selectedLines, productsQuery.products]);
+
+  const pickupAvailable = useMemo(() => {
+    if (auctionCheckoutBid) {
+      const product = (productsQuery.products ?? []).find(
+        (item) => String(item._id) === String(auctionCheckoutBid.productId),
+      );
+      return doProductsSupportPickup([
+        product as {
+          productPickupEnabled?: boolean | null;
+          productPickupAddress?: string | null;
+        } | undefined,
+      ]);
+    }
+    return doProductsSupportPickup(
+      activeSummary.selectedLines.map((line) => line.product),
+    );
+  }, [auctionCheckoutBid, activeSummary.selectedLines, productsQuery.products]);
 
   const handleRefresh = useCallback(async () => {
     await Promise.all([cartQuery.refetch(), productsQuery.refetch(), acceptedBidsQuery.refetch()]);
@@ -119,7 +183,14 @@ export default function CartScreen() {
 
   const handleOpenAuctionCheckout = (bid: MyPriceOfferBid) => {
     setSubmitState({ isSubmitting: false, error: "", success: "" });
+    setCheckoutSection(null);
     setAuctionCheckoutBid(bid);
+  };
+
+  const openSectionCheckout = (section: "pickup" | "delivery") => {
+    setAuctionCheckoutBid(null);
+    setSubmitState({ isSubmitting: false, error: "", success: "" });
+    setCheckoutSection(section);
   };
 
   const handleAuctionCheckoutSubmit = async (payload: {
@@ -165,10 +236,10 @@ export default function CartScreen() {
     paymentMethod: OrderPaymentMethod;
   }) => {
     setSubmitState({ isSubmitting: true, error: "", success: "" });
-    const orderedProductIds = checkoutSummary.selectedLines.map((line) => line.productId);
+    const orderedProductIds = activeSummary.selectedLines.map((line) => line.productId);
     try {
       await createOrderMutation.mutateAsync({
-        items: checkoutSummary.selectedLines.map((line) => ({
+        items: activeSummary.selectedLines.map((line) => ({
           productId: line.productId,
           quantity: line.quantity,
         })),
@@ -177,9 +248,8 @@ export default function CartScreen() {
         deliveryAddressFlat: payload.deliveryAddressFlat,
         paymentMethod: payload.paymentMethod,
       });
-      // Невыбранные строки остаются в корзине.
       await removeItems(orderedProductIds);
-      setCheckoutSheetOpen(false);
+      setCheckoutSection(null);
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: orderQueryKeys.my() }),
         queryClient.invalidateQueries({ queryKey: orderQueryKeys.myActionCount() }),
@@ -194,10 +264,6 @@ export default function CartScreen() {
       });
     }
   };
-
-  const totalLabel = checkoutSummary.hasPartialSelection
-    ? CART_PAGE_UI.PURCHASABLE_TOTAL_LABEL
-    : CART_PAGE_UI.TOTAL_LABEL;
 
   if (!isAuthorized) {
     return (
@@ -264,95 +330,16 @@ export default function CartScreen() {
     );
   }
 
-  const checkoutFooter = (
-    <SquircleView
-      cornerRadii={{
-        topLeft: CART_STICKY_FOOTER_TOP_RADIUS,
-        topRight: CART_STICKY_FOOTER_TOP_RADIUS,
-        bottomLeft: CART_STICKY_FOOTER_TOP_RADIUS,
-        bottomRight: CART_STICKY_FOOTER_TOP_RADIUS,
-      }}
-      outerStyle={[
-        styles.stickyFooter,
-        {
-          left: CART_STICKY_FOOTER_FLOAT_INSET,
-          right: CART_STICKY_FOOTER_FLOAT_INSET,
-          bottom: bottomNavLayoutHeight + CART_STICKY_FOOTER_FLOAT_GAP,
-        },
-      ]}
-      style={styles.stickyFooterInner}
-      shadowStyle={styles.stickyFooterShadow}
-    >
-      <View style={styles.stickyFooterAccentBar} pointerEvents="none" />
-      <View style={styles.footerTopRow}>
-        <View style={styles.footerTotalBlock}>
-          <Text style={styles.footerTotalLabel}>{totalLabel}</Text>
-          <Text style={styles.footerTotalValue} numberOfLines={1}>
-            {formatPriceRub(checkoutSummary.selectedTotal)}
-          </Text>
-          {checkoutSummary.hasPartialSelection ? (
-            <Text style={styles.footerFullTotalHint} numberOfLines={1}>
-              {formatPriceRub(checkoutSummary.fullTotal)}
-            </Text>
-          ) : null}
-        </View>
-        <Pressable
-          style={[styles.clearButton, isUpdating && styles.buttonDisabled]}
-          onPress={() => clearCart()}
-          disabled={isUpdating}
-        >
-          <Text style={styles.clearButtonText}>{CART_PAGE_UI.CLEAR_ALL}</Text>
-        </Pressable>
-      </View>
-
-      {!canCheckout && checkoutSummary.checkoutBlockReason ? (
-        <Text style={styles.checkoutHint}>{checkoutSummary.checkoutBlockReason}</Text>
-      ) : null}
-
-      <AppButton
-        label={CART_PAGE_UI.CHECKOUT_OPEN}
-        variant="primary"
-        style={styles.footerCheckoutButton}
-        disabled={!canCheckout || isUpdating}
-        onPress={() => setCheckoutSheetOpen(true)}
-      />
-    </SquircleView>
-  );
-
   return (
     <View style={styles.container}>
       <View style={[styles.container, centeredContentStyle]}>
-        <FlatList
+        <ScrollView
           style={styles.container}
-          data={visibleLines}
-          keyExtractor={(line) => line.productId}
-          renderItem={({ item }) => (
-            <CartLineItem
-              line={item}
-              selected={isLineSelected(item.productId)}
-              onToggleSelected={toggleLine}
-            />
-          )}
-          ListHeaderComponent={
-            <>
-              <CartAuctionSection bids={auctionBids} onCheckout={handleOpenAuctionCheckout} />
-              {visibleLines.length > 0 ? (
-                <CartSelectAllRow
-                  selectedCount={selectedCount}
-                  totalCount={visibleLines.length}
-                  areAllSelected={areAllSelected}
-                  onToggleAll={toggleAll}
-                />
-              ) : null}
-            </>
-          }
           contentContainerStyle={[
             styles.list,
             {
               paddingTop: contentPaddingTop + 8,
-              paddingBottom:
-                bottomNavLayoutHeight +
-                (visibleLines.length > 0 ? CART_STICKY_FOOTER_HEIGHT : 0),
+              paddingBottom: bottomNavLayoutHeight + 24,
             },
           ]}
           refreshControl={
@@ -365,20 +352,50 @@ export default function CartScreen() {
               onRefresh={handleRefresh}
             />
           }
-        />
+        >
+          <CartAuctionSection bids={auctionBids} onCheckout={handleOpenAuctionCheckout} />
 
-        {visibleLines.length > 0 ? checkoutFooter : null}
+          <CartFulfillmentSection
+            title={CART_PAGE_UI.SECTION_PICKUP}
+            lines={pickupLines}
+            selectedCount={selectedCountIn(pickupIds)}
+            areAllSelected={areAllSelectedIn(pickupIds)}
+            onToggleAll={() => toggleAllIn(pickupIds)}
+            isLineSelected={isLineSelected}
+            onToggleSelected={toggleLine}
+            summary={pickupSummary}
+            canCheckout={pickupSummary.selectedLines.length > 0}
+            onCheckout={() => openSectionCheckout(CART_FULFILLMENT_SECTION_PICKUP)}
+            checkoutDisabled={isUpdating}
+          />
+
+          <CartFulfillmentSection
+            title={CART_PAGE_UI.SECTION_DELIVERY}
+            lines={deliveryLines}
+            selectedCount={selectedCountIn(deliveryIds)}
+            areAllSelected={areAllSelectedIn(deliveryIds)}
+            onToggleAll={() => toggleAllIn(deliveryIds)}
+            isLineSelected={isLineSelected}
+            onToggleSelected={toggleLine}
+            summary={deliverySummary}
+            canCheckout={deliverySummary.selectedLines.length > 0}
+            onCheckout={() => openSectionCheckout(CART_FULFILLMENT_SECTION_DELIVERY)}
+            checkoutDisabled={isUpdating}
+          />
+        </ScrollView>
       </View>
 
       <CheckoutSheetModal
-        visible={checkoutSheetOpen}
+        visible={checkoutSection != null}
         defaultUser={sessionQuery.data?.user}
         pickupAddressSummary={pickupAddressSummary}
+        deliveryAvailable={deliveryAvailable}
+        pickupAvailable={pickupAvailable}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}
         submitSuccess={submitState.success}
-        isDisabled={!canCheckout}
-        onClose={() => setCheckoutSheetOpen(false)}
+        isDisabled={!canCheckoutActive}
+        onClose={() => setCheckoutSection(null)}
         onSubmit={handleCheckoutSubmit}
       />
 
@@ -386,6 +403,8 @@ export default function CartScreen() {
         visible={auctionCheckoutBid != null}
         defaultUser={sessionQuery.data?.user}
         pickupAddressSummary={pickupAddressSummary}
+        deliveryAvailable={deliveryAvailable}
+        pickupAvailable={pickupAvailable}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}
         submitSuccess={submitState.success}

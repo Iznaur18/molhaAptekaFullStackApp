@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { PRODUCT_PROMOTION_UI } from "../../../shared/config/appUiCopy.js";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
 import { InstallmentProgramModal } from "../../installment/ui/InstallmentProgramModal.jsx";
+import { WholesalePriceModal } from "./WholesalePriceModal.jsx";
 import { calculateProductPromotionPointsCost } from "../lib/calculateProductPromotionPointsCost.js";
 import { ProductPromotionFormPanel } from "./product-promotion-modal/ProductPromotionFormPanel.jsx";
 import { ProductPromotionManageTab } from "./product-promotion-modal/ProductPromotionManageTab.jsx";
@@ -35,8 +36,22 @@ const PRODUCT_PROMOTION_MODAL_TITLE_ID = "product-promotion-modal-title";
  *     productId: string,
  *     productAuctionEnabled: boolean,
  *   ) => void | Promise<void>;
+ *   onSetProductWholesale?: (
+ *     productId: string,
+ *     productWholesaleEnabled: boolean,
+ *   ) => void | Promise<void>;
+ *   onSetProductInstallment?: (
+ *     productId: string,
+ *     productInstallmentEnabled: boolean,
+ *   ) => void | Promise<void | { needsSetup?: boolean }>;
+ *   onWholesaleSaved?: (product: import("../model/types.js").ProductFromApi) => void;
+ *   onInstallmentProgramSaved?: (productPatch?: {
+ *     productInstallmentEnabled?: boolean;
+ *   }) => void;
  *   isAvailabilityTogglePending?: boolean;
  *   isAuctionTogglePending?: boolean;
+ *   isWholesaleTogglePending?: boolean;
+ *   isInstallmentTogglePending?: boolean;
  *   isDeletePending?: boolean;
  *   manageErrorMessage?: string;
  *   canManageEdit?: boolean;
@@ -65,9 +80,15 @@ export function ProductPromotionModal({
   onSubmit,
   onSetProductAvailability,
   onSetProductAuction,
+  onSetProductWholesale,
+  onSetProductInstallment,
+  onWholesaleSaved,
+  onInstallmentProgramSaved,
   onDeleteProduct,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
+  isWholesaleTogglePending = false,
+  isInstallmentTogglePending = false,
   isDeletePending = false,
   manageErrorMessage = "",
   canManageEdit = true,
@@ -90,6 +111,7 @@ export function ProductPromotionModal({
     showManageTab: showManageSection,
   });
   const [isInstallmentProgramOpen, setIsInstallmentProgramOpen] = useState(false);
+  const [isWholesaleOpen, setIsWholesaleOpen] = useState(false);
   const defaultTier = tiers[0]?.tier ?? 1;
   const defaultDuration = durations[0]?.code ?? "";
   const [selectedTier, setSelectedTier] = useState(defaultTier);
@@ -100,6 +122,7 @@ export function ProductPromotionModal({
     setSelectedDurationCode(defaultDuration);
     if (!isOpen) {
       setIsInstallmentProgramOpen(false);
+      setIsWholesaleOpen(false);
     }
   }, [defaultDuration, defaultTier, isOpen]);
 
@@ -224,9 +247,13 @@ export function ProductPromotionModal({
             product={product}
             onSetAvailability={onSetProductAvailability}
             onSetAuction={onSetProductAuction}
+            onSetWholesale={onSetProductWholesale}
+            onSetInstallment={onSetProductInstallment}
             onDelete={onDeleteProduct}
             isAvailabilityTogglePending={isAvailabilityTogglePending}
             isAuctionTogglePending={isAuctionTogglePending}
+            isWholesaleTogglePending={isWholesaleTogglePending}
+            isInstallmentTogglePending={isInstallmentTogglePending}
             isDeletePending={isDeletePending}
             errorMessage={manageErrorMessage}
             canEdit={canManageEdit}
@@ -237,6 +264,7 @@ export function ProductPromotionModal({
             isRaffleParticipationPending={isRaffleParticipationPending}
             isSubmitting={isSubmitting}
             onOpenInstallmentProgram={() => setIsInstallmentProgramOpen(true)}
+            onOpenWholesaleSettings={() => setIsWholesaleOpen(true)}
           />
         )}
       </ProductModalShell>
@@ -245,9 +273,19 @@ export function ProductPromotionModal({
           isOpen={isInstallmentProgramOpen}
           productId={String(product._id)}
           productName={product.productName}
+          productPrice={
+            product.productPrice != null ? Number(product.productPrice) || 0 : 0
+          }
           onClose={() => setIsInstallmentProgramOpen(false)}
+          onSaved={onInstallmentProgramSaved}
         />
       ) : null}
+      <WholesalePriceModal
+        isOpen={isWholesaleOpen}
+        product={product}
+        onClose={() => setIsWholesaleOpen(false)}
+        onSaved={onWholesaleSaved}
+      />
     </>
   );
 }

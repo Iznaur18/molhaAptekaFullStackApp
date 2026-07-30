@@ -62,9 +62,26 @@ test("interleaveCatalogTier3Banners inserts banner after every N card rows", () 
   const bannerIds = interleaved.filter((item) => item._id?.startsWith("b")).map((item) => item._id);
 
   assert.equal(CATALOG_TIER3_BANNER_ROW_INTERVAL, 3);
-  assert.deepEqual(bannerIds, ["b-new"]);
+  assert.deepEqual(bannerIds, ["b-new", "b-old"]);
   assert.equal(
     interleaved.findIndex((item) => item._id === "b-new"),
     6,
+  );
+  assert.equal(interleaved.at(-1)?._id, "b-old");
+});
+
+test("interleaveCatalogTier3Banners appends leftover banners when feed is short", () => {
+  const products = [
+    regular("r1"),
+    regular("r2"),
+    regular("r3"),
+    banner("b1", "2026-02-01T00:00:00.000Z"),
+  ];
+
+  const interleaved = interleaveCatalogTier3Banners(products, 2, { enabled: true });
+
+  assert.deepEqual(
+    interleaved.map((item) => item._id),
+    ["r1", "r2", "r3", "b1"],
   );
 });

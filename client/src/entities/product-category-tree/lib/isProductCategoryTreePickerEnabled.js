@@ -1,2 +1,1 @@
-/** Временно: дерево подкатегорий в модалке товара — legacy select. */
-export const IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED = false;
+export { IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED } from "../../../shared/config/featureFlags.js";

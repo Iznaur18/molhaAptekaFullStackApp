@@ -106,6 +106,11 @@ export function CartLineItem({
             {product ? (
               <ProductPriceDisplay product={product} showLabel={false} variant="cart" />
             ) : null}
+            {line.isWholesaleApplied ? (
+              <p className="cart-line__wholesale-badge" role="status">
+                {CART_PAGE_UI.WHOLESALE_LINE_BADGE}
+              </p>
+            ) : null}
             {stockHint ? <p className="cart-line__stock-hint">{stockHint}</p> : null}
             {product ? (
               <button

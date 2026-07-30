@@ -6,7 +6,7 @@ import {
 
 type OrderStatusAttentionRole = "buyer" | "seller";
 
-/** Лейбл статуса: в продажах shipped → «Принять», иначе общий RU-словарь. */
+/** Лейбл статуса: в продажах shipped → «Принят», иначе общий RU-словарь. */
 export const resolveOrderStatusLabelRu = (
   status: string | undefined,
   attentionRole: OrderStatusAttentionRole = "buyer",

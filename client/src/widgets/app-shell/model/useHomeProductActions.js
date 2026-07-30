@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
+import { setProductInstallmentEnabled } from "../../../entities/installment/lib/setProductInstallmentEnabled.js";
 import { useEnsureProductPromotionTariffs } from "../../../entities/product/model/useEnsureProductPromotionTariffs.js";
 import { useMyProductMutations } from "../../../entities/product/model/useMyProductMutations.js";
 import { useRequestProductPromotionMutation } from "../../../entities/product/model/useRequestProductPromotionMutation.js";
@@ -31,6 +32,8 @@ export const useHomeProductActions = ({
   setDeletingProductId,
   setTogglingAvailabilityProductId,
   setTogglingAuctionProductId,
+  setTogglingWholesaleProductId,
+  setTogglingInstallmentProductId,
   setMyProductsCatalogError,
   setPromotionProduct,
   setPromotionConfig,
@@ -235,6 +238,116 @@ export const useHomeProductActions = ({
     ],
   );
 
+  const handleSetProductWholesale = useCallback(
+    async (productId, wholesaleEnabled) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return;
+      }
+      setTogglingWholesaleProductId(normalizedProductId);
+      setProductDetailsAdminError("");
+      try {
+        const updated = await patchMutation.mutateAsync({
+          productId: normalizedProductId,
+          body: { productWholesaleEnabled: wholesaleEnabled },
+        });
+        syncCatalogProductState(updated);
+        syncProductEditModalState(updated);
+      } catch (e) {
+        setProductDetailsAdminError(
+          e instanceof Error ? e.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+      } finally {
+        setTogglingWholesaleProductId(null);
+      }
+    },
+    [
+      patchMutation,
+      setProductDetailsAdminError,
+      setTogglingWholesaleProductId,
+      syncCatalogProductState,
+      syncProductEditModalState,
+    ],
+  );
+
+  const handleWholesaleSaved = useCallback(
+    (product) => {
+      syncCatalogProductState(product);
+      syncProductEditModalState(product);
+    },
+    [syncCatalogProductState, syncProductEditModalState],
+  );
+
+  const handleSetProductInstallment = useCallback(
+    async (productId, installmentEnabled) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return undefined;
+      }
+      setTogglingInstallmentProductId(normalizedProductId);
+      setProductDetailsAdminError("");
+      try {
+        const result = await setProductInstallmentEnabled(
+          normalizedProductId,
+          installmentEnabled,
+        );
+        if (result.needsSetup) {
+          return { needsSetup: true };
+        }
+        const nextEnabled = result.productInstallmentEnabled === true;
+        updateCatalogProduct(normalizedProductId, (prev) =>
+          prev ? { ...prev, productInstallmentEnabled: nextEnabled } : prev,
+        );
+        const mergeFlag = (prev) =>
+          prev && String(prev._id) === normalizedProductId
+            ? { ...prev, productInstallmentEnabled: nextEnabled }
+            : prev;
+        setProductToEdit(mergeFlag);
+        setPromotionProduct(mergeFlag);
+        return { productInstallmentEnabled: nextEnabled };
+      } catch (e) {
+        setProductDetailsAdminError(
+          e instanceof Error ? e.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+        return undefined;
+      } finally {
+        setTogglingInstallmentProductId(null);
+      }
+    },
+    [
+      setProductDetailsAdminError,
+      setProductToEdit,
+      setPromotionProduct,
+      setTogglingInstallmentProductId,
+      updateCatalogProduct,
+    ],
+  );
+
+  const handleInstallmentProgramSaved = useCallback(
+    (productPatch) => {
+      const productId = String(promotionProduct?._id ?? "").trim();
+      if (!productId || !productPatch || typeof productPatch !== "object") {
+        return;
+      }
+      const nextEnabled = productPatch.productInstallmentEnabled === true;
+      updateCatalogProduct(productId, (prev) =>
+        prev ? { ...prev, productInstallmentEnabled: nextEnabled } : prev,
+      );
+      const mergeFlag = (prev) =>
+        prev && String(prev._id) === productId
+          ? { ...prev, productInstallmentEnabled: nextEnabled }
+          : prev;
+      setProductToEdit(mergeFlag);
+      setPromotionProduct(mergeFlag);
+    },
+    [
+      promotionProduct?._id,
+      setProductToEdit,
+      setPromotionProduct,
+      updateCatalogProduct,
+    ],
+  );
+
   const handleDeleteMyProduct = useCallback(
     async (productId) => {
       try {
@@ -383,6 +496,10 @@ export const useHomeProductActions = ({
     handleAdminOpenEditProductFromDetails,
     handleSetMyProductAvailability,
     handleSetProductAuction,
+    handleSetProductWholesale,
+    handleWholesaleSaved,
+    handleSetProductInstallment,
+    handleInstallmentProgramSaved,
     handleDeleteMyProduct,
     handleOpenPromotionModal,
     handleClosePromotionModal,

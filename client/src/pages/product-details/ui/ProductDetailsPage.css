@@ -126,14 +126,14 @@
   position: absolute;
   top: 0.65rem;
   left: 0.65rem;
-  z-index: 2;
+  z-index: 1;
 }
 
 .product-details-modal--page .product-media-gallery-readonly__hero-actions {
   position: absolute;
   top: 0.65rem;
   right: 0.65rem;
-  z-index: 2;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 0.35rem;
@@ -347,7 +347,8 @@
   min-height: 3rem;
   padding: 0.75rem 1rem;
   font-size: 1.02rem;
-  border-radius: 0.7rem;
+  border-radius: 1.25rem;
+  corner-shape: squircle;
 }
 
 /* Installment / auction CTA: flex-sibling dock (same as purchase), not body overlay. */

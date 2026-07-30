@@ -66,6 +66,7 @@ export async function createProduct(body) {
       payload.productPickupLon = Number(body.productPickupLon);
     }
     payload.productDeliveryEnabled = body.productDeliveryEnabled === true;
+    payload.productPickupEnabled = body.productPickupEnabled !== false;
     if (body.productReturnEnabled != null) {
       payload.productReturnEnabled = body.productReturnEnabled === true;
       payload.productReturnTerms =

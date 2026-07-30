@@ -24,7 +24,8 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
             ? Number(form.productPickupLon)
             : null
         }
-        deliveryEnabled={false}
+        pickupEnabled={form.productPickupEnabled !== false}
+        deliveryEnabled={form.productDeliveryEnabled === true}
         disabled={isSubmitting}
         onChange={(next) => {
           setForm((prev) => ({
@@ -32,7 +33,8 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
             productPickupAddress: next.productPickupAddress,
             productPickupLat: next.productPickupLat,
             productPickupLon: next.productPickupLon,
-            productDeliveryEnabled: false,
+            productPickupEnabled: next.productPickupEnabled !== false,
+            productDeliveryEnabled: next.productDeliveryEnabled === true,
           }));
         }}
       />

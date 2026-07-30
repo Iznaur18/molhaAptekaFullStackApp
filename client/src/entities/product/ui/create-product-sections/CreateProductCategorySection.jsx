@@ -30,12 +30,23 @@ export function CreateProductCategorySection({
           productCategory: form.productCategory,
         }}
         disabled={isSubmitting}
-        onChange={({ productCategoryId, categoryBreadcrumbRu, productCategory }) =>
+        onChange={({
+          productCategoryId,
+          categoryBreadcrumbRu,
+          productCategory,
+          defaultCharacteristicKeys = [],
+        }) =>
           setForm((prev) => ({
             ...prev,
             productCategoryId,
             categoryBreadcrumbRu,
             productCategory,
+            categoryDefaultCharacteristicKeys: Array.isArray(defaultCharacteristicKeys)
+              ? defaultCharacteristicKeys
+              : [],
+            ...(prev.productCharacteristicsSellerTouched === true
+              ? {}
+              : { productCharacteristicsAutoAppliedForCategoryId: null }),
           }))
         }
       />

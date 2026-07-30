@@ -15,6 +15,8 @@ type CheckoutSheetModalProps = {
   visible: boolean;
   defaultUser?: Record<string, unknown> | null;
   pickupAddressSummary?: string;
+  deliveryAvailable?: boolean;
+  pickupAvailable?: boolean;
   isSubmitting: boolean;
   submitError: string;
   submitSuccess: string;
@@ -32,6 +34,8 @@ export const CheckoutSheetModal = ({
   visible,
   defaultUser,
   pickupAddressSummary = "",
+  deliveryAvailable = false,
+  pickupAvailable = true,
   isSubmitting,
   submitError,
   submitSuccess,
@@ -86,6 +90,8 @@ export const CheckoutSheetModal = ({
               key={defaultUser?._id != null ? String(defaultUser._id) : "guest"}
               defaultUser={defaultUser}
               pickupAddressSummary={pickupAddressSummary}
+              deliveryAvailable={deliveryAvailable}
+              pickupAvailable={pickupAvailable}
               isSubmitting={isSubmitting}
               submitError={submitError}
               submitSuccess={submitSuccess}

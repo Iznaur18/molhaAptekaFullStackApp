@@ -1,3 +1,4 @@
+import { isProductWholesaleConfigured } from "@izibuy/shared-lib";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -15,9 +16,16 @@ type ProductEditManageSectionProps = {
   product: CatalogProduct;
   onSetAvailability?: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
   onSetAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
+  onSetWholesale?: (productId: string, productWholesaleEnabled: boolean) => void | Promise<void>;
+  onSetInstallment?: (
+    productId: string,
+    productInstallmentEnabled: boolean,
+  ) => void | Promise<void | { needsSetup?: boolean }>;
   onDelete?: (productId: string) => void | Promise<void>;
   isAvailabilityTogglePending?: boolean;
   isAuctionTogglePending?: boolean;
+  isWholesaleTogglePending?: boolean;
+  isInstallmentTogglePending?: boolean;
   isDeletePending?: boolean;
   errorMessage?: string;
   canEdit?: boolean;
@@ -28,6 +36,7 @@ type ProductEditManageSectionProps = {
   isRaffleParticipationPending?: boolean;
   onOpenInstallmentProgram?: () => void;
   canOpenInstallmentProgram?: boolean;
+  onOpenWholesaleSettings?: () => void;
   disabled?: boolean;
 };
 
@@ -35,9 +44,13 @@ export const ProductEditManageSection = ({
   product,
   onSetAvailability,
   onSetAuction,
+  onSetWholesale,
+  onSetInstallment,
   onDelete,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
+  isWholesaleTogglePending = false,
+  isInstallmentTogglePending = false,
   isDeletePending = false,
   errorMessage = "",
   canEdit = true,
@@ -48,6 +61,7 @@ export const ProductEditManageSection = ({
   isRaffleParticipationPending = false,
   onOpenInstallmentProgram,
   canOpenInstallmentProgram = true,
+  onOpenWholesaleSettings,
   disabled = false,
 }: ProductEditManageSectionProps) => {
   const styles = useProductEditManageSectionStyles();
@@ -59,9 +73,14 @@ export const ProductEditManageSection = ({
   const showAuctionToggle = typeof onSetAuction === "function" && canEdit;
   const isAuctionEnabled = product.productAuctionEnabled === true;
   const isInstallmentEnabled = product.productInstallmentEnabled === true;
+  const isWholesaleEnabled = product.productWholesaleEnabled === true;
+  const wholesaleConfigured = isProductWholesaleConfigured(product);
+  const showWholesale =
+    typeof onOpenWholesaleSettings === "function" || typeof onSetWholesale === "function";
   const showRaffleToggle =
     sellerRaffleActive && typeof onToggleRaffleParticipation === "function";
-  const showInstallmentButton = typeof onOpenInstallmentProgram === "function";
+  const showInstallmentButton =
+    typeof onOpenInstallmentProgram === "function" || typeof onSetInstallment === "function";
   const showDelete = canDelete && typeof onDelete === "function";
   const isRaffleParticipant = isProductRaffleParticipant(product);
   const canOpenInstallment =
@@ -75,6 +94,8 @@ export const ProductEditManageSection = ({
     disabled ||
     isAvailabilityTogglePending ||
     isAuctionTogglePending ||
+    isWholesaleTogglePending ||
+    isInstallmentTogglePending ||
     isRaffleParticipationPending ||
     isDeletePending ||
     isDeleteConfirmOpen ||
@@ -129,6 +150,7 @@ export const ProductEditManageSection = ({
               isRaffleParticipationPending ||
               isAvailabilityTogglePending ||
               isAuctionTogglePending ||
+              isWholesaleTogglePending ||
               isDeletePending ||
               disabled
             }
@@ -148,12 +170,55 @@ export const ProductEditManageSection = ({
               disabled ||
               isAvailabilityTogglePending ||
               isAuctionTogglePending ||
+              isWholesaleTogglePending ||
+              isInstallmentTogglePending ||
               isRaffleParticipationPending ||
               isDeletePending ||
               !canOpenInstallment
             }
+            pending={isInstallmentTogglePending}
+            pendingLabel={CREATE_PRODUCT_UI.INSTALLMENT_TOGGLE_PENDING}
             variant="installment"
             onPress={() => onOpenInstallmentProgram?.()}
+            onCheckedChange={async (next) => {
+              if (product._id == null || !canOpenInstallment) {
+                return { revert: true };
+              }
+              if (typeof onSetInstallment !== "function") {
+                onOpenInstallmentProgram?.();
+                return { revert: true };
+              }
+              const result = await onSetInstallment(String(product._id), next);
+              if (result?.needsSetup) {
+                onOpenInstallmentProgram?.();
+                return { needsSetup: true };
+              }
+              return result;
+            }}
+          />
+        ) : null}
+        {showWholesale ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_UI.MANAGE_WHOLESALE_TITLE}
+            description={CREATE_PRODUCT_UI.MANAGE_WHOLESALE_HINT}
+            checked={isWholesaleEnabled}
+            disabled={actionsLocked}
+            pending={isWholesaleTogglePending}
+            pendingLabel={CREATE_PRODUCT_UI.WHOLESALE_TOGGLE_PENDING}
+            onPress={() => onOpenWholesaleSettings?.()}
+            onCheckedChange={(next) => {
+              if (product._id == null || actionsLocked) {
+                return { revert: true };
+              }
+              if (next && !wholesaleConfigured) {
+                onOpenWholesaleSettings?.();
+                return { revert: true };
+              }
+              if (typeof onSetWholesale === "function") {
+                void onSetWholesale(String(product._id), next);
+              }
+              return undefined;
+            }}
           />
         ) : null}
         {showVisibility ? (

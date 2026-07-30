@@ -116,6 +116,8 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
   const [productPickupAddress, setProductPickupAddress] = useState("");
   const [productPickupLat, setProductPickupLat] = useState<number | null>(null);
   const [productPickupLon, setProductPickupLon] = useState<number | null>(null);
+  const [productPickupEnabled, setProductPickupEnabled] = useState(true);
+  const [productDeliveryEnabled, setProductDeliveryEnabled] = useState(false);
   const [productImageUrls, setProductImageUrls] = useState<string[]>([]);
   const [characteristicRows, setCharacteristicRows] = useState<ProductCharacteristicRow[]>([]);
   const [productReturnEnabled, setProductReturnEnabled] = useState(false);
@@ -162,6 +164,8 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
     setProductPickupLon(
       lonRaw != null && Number.isFinite(Number(lonRaw)) ? Number(lonRaw) : null,
     );
+    setProductDeliveryEnabled(product.productDeliveryEnabled === true);
+    setProductPickupEnabled(product.productPickupEnabled !== false);
     setProductImageUrls(resolveProductImageUrls(product));
     setCharacteristicRows(mapProductCharacteristicsToRows(product.productCharacteristics));
     const returnPrefill = resolveReturnPolicyPrefill(product);
@@ -317,7 +321,8 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
           productPickupAddress: productPickupAddress.trim(),
           productPickupLat: hasLat ? productPickupLat : null,
           productPickupLon: hasLon ? productPickupLon : null,
-          productDeliveryEnabled: false,
+          productPickupEnabled: productPickupEnabled !== false,
+          productDeliveryEnabled: productDeliveryEnabled === true,
           productIsAvailable,
           productStockQuantity: productIsAvailable
             ? (parseStockQuantity(productStockQuantity) ?? PRODUCT_STOCK_QUANTITY_MIN)
@@ -621,11 +626,15 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
               address={productPickupAddress}
               lat={productPickupLat}
               lon={productPickupLon}
+              pickupEnabled={productPickupEnabled}
+              deliveryEnabled={productDeliveryEnabled}
               disabled={isBusy}
               onChange={(next) => {
                 setProductPickupAddress(next.productPickupAddress);
                 setProductPickupLat(next.productPickupLat);
                 setProductPickupLon(next.productPickupLon);
+                setProductPickupEnabled(next.productPickupEnabled !== false);
+                setProductDeliveryEnabled(next.productDeliveryEnabled === true);
               }}
             />
           </View>

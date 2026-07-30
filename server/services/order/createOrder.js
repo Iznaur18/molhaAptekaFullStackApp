@@ -2,7 +2,9 @@ import mongoose from "mongoose";
 
 import {
   ORDER_FULFILLMENT_PICKUP,
+  PRODUCT_DELIVERY_NOT_ENABLED_FOR_ITEMS_MESSAGE,
   PRODUCT_PICKUP_MISSING_FOR_ORDER_MESSAGE,
+  PRODUCT_PICKUP_NOT_ENABLED_FOR_ITEMS_MESSAGE,
 } from "@molha/api-contract";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { AppError } from "../../errors/AppError.js";
@@ -25,14 +27,15 @@ import {
   assertOrderItemsWithinAvailableStock,
   guardOrderItemsStockInTransaction,
 } from "../product/productStock.js";
+import { resolveProductUnitPrice } from "@izibuy/shared-lib";
 
 import { buildOrderStatusFromItems } from "./orderStatus.js";
 
-const calculateTotalAmount = (items, priceById) =>
-  items.reduce((sum, item) => {
-    const price = priceById[String(item.productId)];
-    return sum + (price ?? 0) * item.quantity;
-  }, 0);
+const calculateTotalAmount = (items) =>
+  items.reduce(
+    (sum, item) => sum + (item.unitPriceAtOrder ?? 0) * item.quantity,
+    0,
+  );
 
 /**
  * @param {Array<{ productId: unknown; quantity: number }>} items
@@ -42,11 +45,19 @@ const calculateTotalAmount = (items, priceById) =>
  *   loyaltyPointsPerUnit: number;
  *   sellerId: string;
  *   pickupAddress: string;
+ *   deliveryEnabled: boolean;
  * }>} productById
  */
 const buildItemsWithPriceSnapshot = (items, productById) =>
   items.map((item) => {
     const snapshot = productById[String(item.productId)];
+    const unitPrice = resolveProductUnitPrice({
+      productPrice: snapshot.price,
+      productWholesaleEnabled: snapshot.wholesaleEnabled === true,
+      productWholesaleMinQty: snapshot.wholesaleMinQty,
+      productWholesalePrice: snapshot.wholesalePrice,
+      quantity: item.quantity,
+    });
     const loyalty = buildOrderLineLoyaltySnapshot({
       loyaltyPointsPerUnit: snapshot.loyaltyPointsPerUnit,
       quantity: item.quantity,
@@ -55,7 +66,7 @@ const buildItemsWithPriceSnapshot = (items, productById) =>
     return {
       productId: item.productId,
       quantity: item.quantity,
-      unitPriceAtOrder: snapshot.price,
+      unitPriceAtOrder: unitPrice,
       productNameAtOrder: snapshot.name,
       ...loyalty,
     };
@@ -72,11 +83,11 @@ const fetchAvailableProductsForOrder = async (productIds) => {
     productStockQuantity: { $gt: 0 },
   })
     .select(
-      "_id productPrice productName loyaltyPointsPerUnit productSeller productPickupAddress",
+      "_id productPrice productName loyaltyPointsPerUnit productSeller productPickupAddress productPickupEnabled productDeliveryEnabled productWholesaleEnabled productWholesaleMinQty productWholesalePrice",
     )
     .lean();
 
-  /** @type {Record<string, { price: number; name: string; loyaltyPointsPerUnit: number; sellerId: string; pickupAddress: string }>} */
+  /** @type {Record<string, { price: number; name: string; loyaltyPointsPerUnit: number; sellerId: string; pickupAddress: string; pickupEnabled: boolean; deliveryEnabled: boolean; wholesaleEnabled: boolean; wholesaleMinQty: number | null; wholesalePrice: number | null }>} */
   const byId = {};
   for (const product of products) {
     const id = String(product._id);
@@ -89,9 +100,38 @@ const fetchAvailableProductsForOrder = async (productIds) => {
       ),
       sellerId: String(product.productSeller),
       pickupAddress: String(product.productPickupAddress ?? "").trim(),
+      pickupEnabled: product.productPickupEnabled !== false,
+      deliveryEnabled: product.productDeliveryEnabled === true,
+      wholesaleEnabled: product.productWholesaleEnabled === true,
+      wholesaleMinQty: product.productWholesaleMinQty ?? null,
+      wholesalePrice: product.productWholesalePrice ?? null,
     };
   }
   return byId;
+};
+
+/**
+ * @param {Record<string, { deliveryEnabled: boolean }>} productById
+ * @param {string[]} productIds
+ */
+const assertProductsSupportDelivery = (productById, productIds) => {
+  for (const id of productIds) {
+    if (!productById[id]?.deliveryEnabled) {
+      throw new AppError(400, PRODUCT_DELIVERY_NOT_ENABLED_FOR_ITEMS_MESSAGE);
+    }
+  }
+};
+
+/**
+ * @param {Record<string, { pickupEnabled: boolean }>} productById
+ * @param {string[]} productIds
+ */
+const assertProductsSupportPickup = (productById, productIds) => {
+  for (const id of productIds) {
+    if (productById[id]?.pickupEnabled === false) {
+      throw new AppError(400, PRODUCT_PICKUP_NOT_ENABLED_FOR_ITEMS_MESSAGE);
+    }
+  }
 };
 
 /**
@@ -158,7 +198,7 @@ export async function createOrder({
 
   const uniqueProductIds = [...new Set(items.map((item) => String(item.productId)))];
 
-  /** @type {Record<string, { price: number; name: string; loyaltyPointsPerUnit: number; sellerId: string; pickupAddress: string }>} */
+  /** @type {Record<string, { price: number; name: string; loyaltyPointsPerUnit: number; sellerId: string; pickupAddress: string; deliveryEnabled: boolean }>} */
   let productById = {};
   let linkedPriceOfferId = null;
 
@@ -180,7 +220,9 @@ export async function createOrder({
         productId,
       );
       const product = await ProductModel.findById(productId)
-        .select("loyaltyPointsPerUnit productSeller productPickupAddress")
+        .select(
+          "loyaltyPointsPerUnit productSeller productPickupAddress productPickupEnabled productDeliveryEnabled",
+        )
         .lean();
       if (!product) {
         throw new AppError(400, "Товар не найден");
@@ -193,6 +235,8 @@ export async function createOrder({
         ),
         sellerId: String(product.productSeller),
         pickupAddress: String(product.productPickupAddress ?? "").trim(),
+        pickupEnabled: product.productPickupEnabled !== false,
+        deliveryEnabled: product.productDeliveryEnabled === true,
       };
       linkedPriceOfferId = priceOfferId;
     } catch (error) {
@@ -221,6 +265,12 @@ export async function createOrder({
   const resolvedFulfillment =
     fulfillmentMethod === "delivery" ? "delivery" : ORDER_FULFILLMENT_PICKUP;
 
+  if (resolvedFulfillment === "delivery") {
+    assertProductsSupportDelivery(productById, uniqueProductIds);
+  } else {
+    assertProductsSupportPickup(productById, uniqueProductIds);
+  }
+
   const addressForOrder =
     resolvedFulfillment === ORDER_FULFILLMENT_PICKUP
       ? resolvePickupDeliveryAddress(productById, uniqueProductIds)
@@ -231,10 +281,7 @@ export async function createOrder({
   }
 
   const itemsWithPrice = buildItemsWithPriceSnapshot(items, productById);
-  const priceById = Object.fromEntries(
-    Object.entries(productById).map(([id, row]) => [id, row.price]),
-  );
-  const totalAmount = calculateTotalAmount(itemsWithPrice, priceById);
+  const totalAmount = calculateTotalAmount(itemsWithPrice);
   const status = buildOrderStatusFromItems(itemsWithPrice);
 
   const itemsForReserve = itemsWithPrice.map((line, index) => ({

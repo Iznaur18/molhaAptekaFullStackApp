@@ -10,12 +10,12 @@
   overflow: hidden;
   text-align: left;
   background: var(--iz-color-surface);
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
+  box-shadow: none;
   transition: box-shadow 0.15s ease;
 }
 
 .product-card:hover {
-  box-shadow: 0 6px 16px color-mix(in srgb, var(--iz-color-text) 8%, transparent);
+  box-shadow: none;
 }
 
 .product-card-promotion-frame,
@@ -39,7 +39,7 @@
 
   border: none;
   background: var(--iz-color-surface);
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
+  box-shadow: none;
 }
 
 .product-card-promotion-frame--tier-2 > .product-card {
@@ -48,7 +48,7 @@
 
   border: none;
   background: var(--iz-color-surface);
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
+  box-shadow: none;
 }
 
 .product-card-promotion-frame--tier-3 > .product-card {
@@ -57,37 +57,35 @@
 
   border: none;
   background: var(--iz-color-surface);
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
+  box-shadow: none;
 }
 
 .product-card-promotion-frame--tier-1 > .product-card:hover,
 .product-card-promotion-frame--tier-2 > .product-card:hover,
 .product-card-promotion-frame--tier-3 > .product-card:hover {
-  box-shadow: 0 6px 16px color-mix(in srgb, var(--iz-color-text) 8%, transparent);
+  box-shadow: none;
 }
 
-/* Premium-only / promo+premium: soft elevation, без цветной заливки (как mobile). */
+/* Premium-only / promo+premium: без цветной заливки (как mobile). */
 .product-card-premium-frame > .product-card {
   background: var(--iz-color-surface);
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
+  box-shadow: none;
 }
 
 .product-card-premium-frame > .product-card:hover {
-  box-shadow: 0 6px 16px color-mix(in srgb, var(--iz-color-text) 8%, transparent);
+  box-shadow: none;
 }
 
 .product-card-promotion-frame.product-card-premium-frame > .product-card {
   background: var(--iz-color-surface);
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
+  box-shadow: none;
 }
 
 .product-card-promotion-frame.product-card-premium-frame > .product-card:hover {
-  box-shadow: 0 6px 16px color-mix(in srgb, var(--iz-color-text) 8%, transparent);
+  box-shadow: none;
 }
 
 .product-card--raffle-participant {
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--iz-color-warning) 45%, transparent),
-    0 4px 12px color-mix(in srgb, var(--iz-color-text) 6%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--iz-color-warning) 45%, transparent);
   background: var(--iz-color-surface);
 }

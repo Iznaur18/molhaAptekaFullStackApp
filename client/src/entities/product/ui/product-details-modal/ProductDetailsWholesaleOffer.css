@@ -1,0 +1,31 @@
+/* Static teaser chrome — same shell as .product-details-teaser, not a button */
+.product-details-wholesale-offer.product-details-teaser {
+  cursor: default;
+}
+
+.product-details-wholesale-offer.product-details-teaser:hover {
+  border-color: var(--iz-color-border);
+}
+
+.product-details-wholesale-offer__go {
+  margin: 0;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: normal;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.product-details-wholesale-offer__go:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.product-details-wholesale-offer__go:focus-visible {
+  outline: 2px solid var(--iz-color-on-contrast);
+  outline-offset: 2px;
+}

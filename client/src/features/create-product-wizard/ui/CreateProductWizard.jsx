@@ -1,4 +1,7 @@
+import { useEffect } from "react";
+
 import { useCreateProductForm } from "../../../entities/product/model/useCreateProductForm.js";
+import { resolveCategoryDefaultCharacteristicRowsPatch } from "../../../entities/product/lib/resolveCategoryDefaultCharacteristicRowsPatch.js";
 import { CreateProductBasicSection } from "../../../entities/product/ui/create-product-sections/CreateProductBasicSection.jsx";
 import { CreateProductOriginalitySection } from "../../../entities/product/ui/create-product-sections/CreateProductOriginalitySection.jsx";
 import { CreateProductCategorySection } from "../../../entities/product/ui/create-product-sections/CreateProductCategorySection.jsx";
@@ -67,6 +70,17 @@ export function CreateProductWizard({
     sellerPointsMaxPerUnit,
     sellerCatalogCommitted: sellerLoyaltyBudget.catalogCommitted,
   });
+
+  useEffect(() => {
+    if (!isOpen || wizard.stepId !== "basic") {
+      return;
+    }
+    const patch = resolveCategoryDefaultCharacteristicRowsPatch(form);
+    if (!patch) {
+      return;
+    }
+    setForm((prev) => ({ ...prev, ...patch }));
+  }, [form, isOpen, setForm, wizard.stepId]);
 
   if (!isOpen) {
     return null;

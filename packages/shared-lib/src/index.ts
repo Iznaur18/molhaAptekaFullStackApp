@@ -135,6 +135,18 @@ export type {
   ProductDetailsContentLike,
 } from "./productDetailsContent.js";
 export {
+  PRODUCT_WHOLESALE_MIN_QTY_MIN,
+  formatProductWholesaleBadgeLabel,
+  isProductWholesaleConfigured,
+  resolveProductUnitPrice,
+  resolveProductWholesaleOffer,
+} from "./productWholesale.js";
+export type {
+  ProductWholesaleLike,
+  ProductWholesaleOffer,
+  ResolveProductUnitPriceInput,
+} from "./productWholesale.js";
+export {
   buildUsersPodiumPlaceById,
   excludeUsersPodiumFromList,
   getUserPodiumAverageRating,

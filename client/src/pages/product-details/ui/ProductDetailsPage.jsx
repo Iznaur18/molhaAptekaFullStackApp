@@ -223,7 +223,15 @@ export function ProductDetailsPage() {
                   ? PRODUCT_REPORT_MODAL_UI.ALREADY_REPORTED
                   : PRODUCT_REPORT_MODAL_UI.REPORT_BUTTON
               }
-              onClick={() => {
+              onPointerDown={(event) => {
+                event.stopPropagation();
+              }}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (hasPendingReport) {
+                  return;
+                }
                 if (!shell.isAuthorized) {
                   shell.setIsLoginModalOpen?.(true);
                   return;

@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 import { useEditProfileModal } from "../../../entities/user/model/useEditProfileModal.js";
 import { AddressStructuredFields } from "../../../entities/address/ui/AddressStructuredFields.jsx";
 import { RuRegionSelect } from "../../../entities/region/ui/RuRegionSelect.jsx";
@@ -17,6 +19,12 @@ import { EditProfileSocialLinksFields } from "../../../entities/user/ui/EditProf
 
 import "../../../entities/user/ui/EditProfileModal.css";
 import "./EditProfilePage.css";
+
+const EDIT_PROFILE_KEYBOARD_OPEN_CLASS = "edit-profile-keyboard-open";
+
+const isEditableField = (node) =>
+  node instanceof HTMLElement &&
+  (node.matches("input, textarea, select") || node.isContentEditable);
 
 const GENDER_OPTIONS = [USER_GENDER_MALE, USER_GENDER_FEMALE, USER_GENDER_NO_SELECTED];
 
@@ -83,6 +91,41 @@ export function EditProfilePage({
     allowStaffLoyaltyEdit,
     variant: "page",
   });
+  const pageRef = useRef(/** @type {HTMLElement | null} */ (null));
+
+  useEffect(() => {
+    const page = pageRef.current;
+    if (!page) {
+      return undefined;
+    }
+
+    const setKeyboardOpen = (open) => {
+      document.documentElement.classList.toggle(EDIT_PROFILE_KEYBOARD_OPEN_CLASS, open);
+    };
+
+    const onFocusIn = (event) => {
+      if (isEditableField(event.target)) {
+        setKeyboardOpen(true);
+      }
+    };
+
+    const onFocusOut = () => {
+      window.requestAnimationFrame(() => {
+        const active = document.activeElement;
+        if (!page.contains(active) || !isEditableField(active)) {
+          setKeyboardOpen(false);
+        }
+      });
+    };
+
+    page.addEventListener("focusin", onFocusIn);
+    page.addEventListener("focusout", onFocusOut);
+    return () => {
+      page.removeEventListener("focusin", onFocusIn);
+      page.removeEventListener("focusout", onFocusOut);
+      setKeyboardOpen(false);
+    };
+  }, [user]);
 
   if (!isAuthorized) {
     return (
@@ -104,7 +147,7 @@ export function EditProfilePage({
   }
 
   return (
-    <section className="edit-profile-page">
+    <section ref={pageRef} className="edit-profile-page">
       <div className="edit-profile-page__hero">
         <div className="edit-profile-page__hero-text">
           <h1 className="edit-profile-page__hero-title">{EDIT_PROFILE_MODAL_UI.TITLE}</h1>

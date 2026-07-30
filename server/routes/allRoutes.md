@@ -141,6 +141,7 @@
 | POST | `/product` | 🔑 | Создать товар |
 | GET | `/product/my` | 🔑 | Мои товары |
 | GET | `/product/:productId/catalog` | 🟡 | Карточка товара для каталога |
+| GET | `/product/:productId/compare` | 🔓 | Товары для блока «Сравнение» в деталях |
 | PATCH | `/product/:productId` | 🔑 | Обновить товар |
 | DELETE | `/product/:productId` | 🔑 | Удалить товар |
 | POST | `/product/:productId/view` | 🔑 | Засчитать просмотр |

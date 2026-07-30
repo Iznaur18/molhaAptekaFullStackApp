@@ -34,7 +34,7 @@ type ProductReviewSummaryBackgroundProps = {
 };
 
 export const ProductReviewSummaryBackground = ({
-  borderRadius = 12,
+  borderRadius = 20,
   style,
   palette,
 }: ProductReviewSummaryBackgroundProps) => {

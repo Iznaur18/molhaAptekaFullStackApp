@@ -2,6 +2,11 @@ import { CART_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import { getCartLineExclusionReason } from "./getCartLineExclusionReason.js";
 import { selectPurchasableCartLines } from "./selectPurchasableCartLines.js";
+import {
+  sumCartLinesCatalogDiscount,
+  sumCartLinesCatalogListTotal,
+  sumCartLinesWholesaleDiscount,
+} from "./sumCartLinesCatalogDiscount.js";
 
 /** @type {ReadonlySet<string>} */
 const EMPTY_DESELECTION = new Set();
@@ -11,6 +16,9 @@ const EMPTY_DESELECTION = new Set();
  *   selectedLines: import("./selectCartLines.js").CartLine[];
  *   checkoutBlockReason: string | null;
  *   selectedTotal: number;
+ *   selectedListTotal: number;
+ *   selectedDiscount: number;
+ *   selectedWholesaleDiscount: number;
  *   fullTotal: number;
  *   hasPartialSelection: boolean;
  * }} CartCheckoutSummary
@@ -95,6 +103,9 @@ export function selectCartCheckoutSummary(
       currentUserId,
     ),
     selectedTotal: sumLineTotals(selectedLines),
+    selectedListTotal: sumCartLinesCatalogListTotal(selectedLines),
+    selectedDiscount: sumCartLinesCatalogDiscount(selectedLines),
+    selectedWholesaleDiscount: sumCartLinesWholesaleDiscount(selectedLines),
     fullTotal: sumLineTotals(lines),
     hasPartialSelection: selectedLines.length < lines.length,
   };

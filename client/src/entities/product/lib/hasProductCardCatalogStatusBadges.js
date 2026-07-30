@@ -33,6 +33,7 @@ export function hasProductCardCatalogStatusBadges(vm) {
     shouldShowProductCardStatusSlot(vm) ||
     vm.showAuctionBadge ||
     vm.showInstallmentBadge ||
+    vm.showWholesaleBadge ||
     vm.showRaffleBadge
   );
 }

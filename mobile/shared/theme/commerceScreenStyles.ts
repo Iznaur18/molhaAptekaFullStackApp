@@ -240,10 +240,34 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     color: theme.colors.text,
   },
   buyerLink: {
-    flex: 1,
     fontSize: 13,
     color: theme.colors.link,
     fontWeight: "600",
+  },
+  counterpartyValue: {
+    flex: 1,
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: 2,
+  },
+  counterpartyList: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "baseline",
+  },
+  counterpartyListItem: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "baseline",
+  },
+  counterpartyPhone: {
+    fontSize: 12,
+    color: theme.colors.link,
+  },
+  counterpartyPhoneText: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
   },
   detailsFold: {
     marginTop: theme.spacing[2],
@@ -407,6 +431,12 @@ export const useCartLineItemStyles = createThemedStyles((theme) => ({
     fontSize: 12,
     fontWeight: "500",
     color: semanticColors.warning,
+  },
+  wholesaleBadge: {
+    fontSize: 12,
+    fontWeight: "700",
+    lineHeight: 14,
+    color: theme.colors.action,
   },
   name: {
     fontSize: 14,

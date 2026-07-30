@@ -1,6 +1,8 @@
 .product-modal-shell__backdrop {
   position: fixed;
   inset: 0;
+  height: auto;
+  max-height: none;
   z-index: var(--iz-z-modal-shell);
   display: flex;
   align-items: center;
@@ -8,9 +10,24 @@
   padding: var(--iz-space-4);
   /* mobile MODAL_BACKDROP_SCRIM — константа, одинаковая в обеих темах */
   background: var(--iz-color-modal-scrim);
+  overflow: visible;
+}
+
+/* Белая заливка под модалкой — зона над клавиатурой iOS */
+.product-modal-shell__keyboard-bleed {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 100vh;
+  background: #fff;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .product-modal-shell__panel {
+  position: relative;
+  z-index: 1;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -19,7 +36,7 @@
   min-height: 0;
   overflow: hidden;
   border-radius: var(--iz-radius-modal);
-  background: var(--iz-color-surface);
+  background: #fff;
   box-shadow: var(--iz-shadow-modal);
 }
 
@@ -105,7 +122,6 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
-  scroll-behavior: smooth;
   overscroll-behavior: contain;
 }
 
@@ -113,6 +129,7 @@
   flex-shrink: 0;
   padding: var(--iz-space-3) var(--iz-space-4) var(--iz-space-4);
   border-top: 1px solid var(--iz-color-border);
+  background: #fff;
 }
 
 .product-modal-shell__visually-hidden-title {

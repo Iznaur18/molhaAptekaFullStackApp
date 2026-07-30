@@ -35,6 +35,7 @@ export const CategoryTreeAdminCard = memo(function CategoryTreeAdminCard({
 }) {
   const pathLabel = formatCategoryPath(row);
   const keywords = row.searchKeywords ?? [];
+  const defaultCharacteristicKeys = row.defaultCharacteristicKeys ?? [];
 
   return (
     <li
@@ -109,6 +110,22 @@ export const CategoryTreeAdminCard = memo(function CategoryTreeAdminCard({
                   placeholder={CATEGORY_TREE_ADMIN_PAGE_UI.KEYWORDS_PLACEHOLDER}
                 />
               </label>
+              {editDraft.isLeaf === true ? (
+                <label className="admin-panel__field admin-panel__field_full">
+                  <span>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_DEFAULT_CHARACTERISTICS}</span>
+                  <textarea
+                    value={String(editDraft.characteristicKeysText ?? "")}
+                    onChange={(e) =>
+                      onDraftChange({ characteristicKeysText: e.target.value })
+                    }
+                    placeholder={CATEGORY_TREE_ADMIN_PAGE_UI.DEFAULT_CHARACTERISTICS_PLACEHOLDER}
+                    rows={5}
+                  />
+                  <small className="admin-panel__field-hint">
+                    {CATEGORY_TREE_ADMIN_PAGE_UI.DEFAULT_CHARACTERISTICS_HINT}
+                  </small>
+                </label>
+              ) : null}
             </div>
             <div className="admin-panel__edit-actions">
               <button
@@ -158,6 +175,12 @@ export const CategoryTreeAdminCard = memo(function CategoryTreeAdminCard({
                   </div>
                   {keywords.length > 0 ? (
                     <p className="admin-panel__keywords">{keywords.join(" · ")}</p>
+                  ) : null}
+                  {row.isLeaf && defaultCharacteristicKeys.length > 0 ? (
+                    <p className="admin-panel__keywords">
+                      {CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_DEFAULT_CHARACTERISTICS}:{" "}
+                      {defaultCharacteristicKeys.join(" · ")}
+                    </p>
                   ) : null}
                 </div>
                 <div className="admin-panel__card-actions">

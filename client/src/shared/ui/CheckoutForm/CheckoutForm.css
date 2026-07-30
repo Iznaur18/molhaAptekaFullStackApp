@@ -97,31 +97,82 @@
   cursor: pointer;
 }
 
+/* Паритет mobile useCheckoutFormStyles.fulfillmentRow / fulfillmentOption */
 .checkout-form__fulfillment {
   margin: 0;
   padding: 0;
   border: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
+}
+
+.checkout-form__fulfillment-row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
 }
 
 .checkout-form__fulfillment-option {
-  display: flex;
+  flex: 1 1 0;
+  display: inline-flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 2px;
   min-height: 44px;
-  font-size: var(--iz-font-md);
+  padding: 10px 8px;
+  border: var(--iz-border) solid var(--iz-color-border);
+  border-radius: var(--iz-radius-input);
+  background: var(--iz-color-surface);
   color: var(--iz-color-text);
+  font: inherit;
+  font-size: var(--iz-font-base);
+  font-weight: var(--iz-weight-semibold);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background var(--iz-transition-base),
+    border-color var(--iz-transition-base),
+    color var(--iz-transition-base),
+    opacity var(--iz-transition-base);
+}
+
+.checkout-form__fulfillment-option-title {
+  display: block;
+  line-height: 1.2;
+}
+
+.checkout-form__fulfillment-option--active {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
+}
+
+.checkout-form__fulfillment-option--active .checkout-form__soon {
+  color: color-mix(in srgb, var(--iz-color-on-contrast) 85%, transparent);
 }
 
 .checkout-form__fulfillment-option--disabled {
-  opacity: 0.55;
+  opacity: 0.65;
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text-muted);
+  cursor: not-allowed;
+}
+
+.checkout-form__fulfillment-option:disabled:not(.checkout-form__fulfillment-option--disabled) {
+  opacity: var(--iz-state-disabled-opacity);
+  cursor: not-allowed;
 }
 
 .checkout-form__soon {
-  font-size: var(--iz-font-sm);
-  color: var(--iz-color-text-secondary);
+  display: block;
+  max-width: 100%;
+  font-size: 0.6875rem;
+  font-weight: var(--iz-weight-medium);
+  line-height: 1.25;
+  color: var(--iz-color-text-muted);
+  text-wrap: balance;
 }
 
 .checkout-form__pickup {
@@ -156,7 +207,7 @@
   margin: var(--iz-space-1) 0 0;
   padding: var(--iz-control-btn-modal-padding-y) var(--iz-control-btn-padding-x);
   border: var(--iz-border) solid var(--iz-color-action);
-  border-radius: var(--iz-radius-button);
+  border-radius: 1rem;
   background: var(--iz-color-action);
   color: var(--iz-color-on-contrast);
   font: inherit;

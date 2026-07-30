@@ -100,24 +100,8 @@ export const ProductMediaGallery = ({
   return (
     <View style={rootStyle}>
       <View style={heroStyle}>
-        {isDetail && onBack ? (
-          <Pressable
-            style={styles.detailBackButton}
-            onPress={onBack}
-            accessibilityRole="button"
-            accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.BACK_ARIA}
-          >
-            <MaterialIcons name="chevron-left" size={28} />
-          </Pressable>
-        ) : null}
-        {isDetail ? (
-          <View style={styles.detailOverlay} pointerEvents="box-none">
-            {heroOverlay}
-            {reportOverlay ? <View style={styles.detailReportSlot}>{reportOverlay}</View> : null}
-          </View>
-        ) : null}
         <ProductMediaHorizontalPager
-          style={StyleSheet.absoluteFillObject}
+          style={[StyleSheet.absoluteFillObject, styles.detailPager]}
           slideCount={pagerSlideCount}
           activeIndex={safeSlideIndex}
           onIndexChange={setActiveSlideIndex}
@@ -129,6 +113,23 @@ export const ProductMediaGallery = ({
             />
           )}
         />
+        {isDetail && onBack ? (
+          <Pressable
+            style={styles.detailBackButton}
+            onPress={onBack}
+            accessibilityRole="button"
+            accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.BACK_ARIA}
+            hitSlop={8}
+          >
+            <MaterialIcons name="chevron-left" size={28} />
+          </Pressable>
+        ) : null}
+        {isDetail ? (
+          <View style={styles.detailOverlay} pointerEvents="box-none">
+            {heroOverlay}
+            {reportOverlay ? <View style={styles.detailReportSlot}>{reportOverlay}</View> : null}
+          </View>
+        ) : null}
         {renderCounter()}
       </View>
       {renderThumbs()}

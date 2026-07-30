@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 import { PROFILE_CONTENT_MAX_WIDTH_PHONE } from "@/shared/lib/screenBreakpoints";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
@@ -14,8 +14,8 @@ const PROFILE_AVATAR_SIZE = 72;
 /** Высота шапки-баннера профиля. Переиспользуется превью фона в редакторе. */
 export const PROFILE_BANNER_HEIGHT = PROFILE_AVATAR_SIZE * 3;
 export const PROFILE_CARD_SQUIRCLE_RADIUS = 24;
-/** Паритет с `PRODUCT_CARD_DETAIL_BADGE_ROW_CHROME.borderRadius` на карточке товара. */
-export const PRODUCT_DETAIL_SECTION_RADIUS = 12;
+/** Паритет с teaser/wholesale chrome на экране товара. */
+export const PRODUCT_DETAIL_SECTION_RADIUS = 20;
 const GUEST_BODY_PADDING_TOP = 0;
 const GUEST_BODY_MARGIN_TOP = 36;
 const GUEST_BODY_MARGIN_BOTTOM = 36;
@@ -494,7 +494,7 @@ export const useThemePreferenceToggleStyles = createThemedStyles((theme) => ({
 }));
 
 const USER_PROFILE_THUMB_SIZE = 64;
-export const USER_PROFILE_THUMB_SQUIRCLE_RADIUS = 14;
+export const USER_PROFILE_THUMB_SQUIRCLE_RADIUS = 18;
 export const USER_PROFILE_THUMB_GAP = 10;
 /** До первого onLayout — запасной размер ряда. */
 export const USER_PROFILE_THUMB_ROW_SIZE = 5;
@@ -528,6 +528,7 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
   rootHorizontalRadius: {
     borderRadius: PRODUCT_DETAIL_SECTION_RADIUS,
     overflow: "hidden",
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   header: {
     flexDirection: "row",

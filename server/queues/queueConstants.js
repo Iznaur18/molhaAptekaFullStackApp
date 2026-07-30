@@ -15,3 +15,5 @@ export const JOB_PROCESS_SITE_HEADER_BANNER_CAMPAIGN_CRON =
   "processSiteHeaderBannerCampaignCronTasks";
 export const JOB_PURGE_EXPIRED_BUYER_PASSPORT_SHARES =
   "purgeExpiredBuyerPassportShares";
+export const JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_CRON =
+  "processProductPriceMarketStatusCronTasks";

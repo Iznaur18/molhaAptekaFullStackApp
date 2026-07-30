@@ -95,6 +95,11 @@
   color: #0f766e;
 }
 
+.my-product-compact-card__feature-pill--wholesale {
+  background: color-mix(in srgb, #0284c7 14%, transparent);
+  color: #0369a1;
+}
+
 .my-product-compact-card__feature-pill--raffle {
   background: color-mix(in srgb, #db2777 14%, transparent);
   color: #9d174d;

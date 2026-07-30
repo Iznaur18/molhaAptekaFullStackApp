@@ -73,6 +73,14 @@ button.cart-line__image-wrap:hover {
   color: var(--iz-color-warning-text);
 }
 
+.cart-line__wholesale-badge {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--iz-color-action);
+}
+
 .cart-line__name,
 .cart-line__name-button {
   margin: 0;

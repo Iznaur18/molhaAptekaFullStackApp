@@ -21,6 +21,7 @@ import {
   resolveProductCategoryWriteFromId,
 } from "../../utils/resolveProductCategoryWrite.js";
 import { errorRes, successRes } from "../../services/http/index.js";
+import { refreshProductPriceMarketStatus } from "../../services/product/refreshProductPriceMarketStatus.js";
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
@@ -147,7 +148,16 @@ const { productId } = req.params;
     await product.save();
     await product.populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT);
 
-    const enriched = await attachProductSellerSnapshot(product.toObject());
+    let enriched = await attachProductSellerSnapshot(product.toObject());
+
+    try {
+      const marketStatus = await refreshProductPriceMarketStatus(String(product._id), {
+        refreshPeers: true,
+      });
+      enriched = { ...enriched, productPriceMarketStatus: marketStatus };
+    } catch (marketError) {
+      console.error("refreshProductPriceMarketStatus after approve:", marketError);
+    }
 
     try {
       await notifyFollowersOfSellerNewCatalogProduct(enriched);

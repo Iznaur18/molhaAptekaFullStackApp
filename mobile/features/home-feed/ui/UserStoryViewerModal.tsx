@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Modal,
+  Platform,
   Pressable,
   Text,
   useWindowDimensions,
@@ -83,6 +84,36 @@ export const UserStoryViewerModal = ({
       setUnderlayImageUrl(null);
     }
   }, [visible, authorId]);
+
+  useEffect(() => {
+    if (!visible || Platform.OS !== "web" || typeof document === "undefined") {
+      return undefined;
+    }
+
+    const body = document.body;
+    const html = document.documentElement;
+    const scrollY = window.scrollY;
+    const prevBodyOverflow = body.style.overflow;
+    const prevBodyPosition = body.style.position;
+    const prevBodyTop = body.style.top;
+    const prevBodyWidth = body.style.width;
+    const prevHtmlOverflow = html.style.overflow;
+
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+
+    return () => {
+      html.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
+      body.style.position = prevBodyPosition;
+      body.style.top = prevBodyTop;
+      body.style.width = prevBodyWidth;
+      window.scrollTo(0, scrollY);
+    };
+  }, [visible]);
 
   useEffect(() => {
     setIsMediaLoading(true);
@@ -196,6 +227,17 @@ export const UserStoryViewerModal = ({
       >
         <StatusBar style="light" />
         <View style={styles.viewer} accessibilityViewIsModal>
+          {!(activeStory && !storiesQuery.isPending) ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={USER_STORY_UI.CLOSE}
+              onPress={onClose}
+              style={[styles.closeButton, styles.closeButtonViewer]}
+            >
+              <Text style={styles.closeText}>×</Text>
+            </Pressable>
+          ) : null}
+
           {storiesQuery.isPending ? (
             <View style={styles.state}>
               <ActivityIndicator color={theme.colors.onContrast} size="large" />

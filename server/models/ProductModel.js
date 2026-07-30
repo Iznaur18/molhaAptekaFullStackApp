@@ -164,10 +164,15 @@ const ProductSchema = new Schema(
       min: -180,
       max: 180,
     },
-    /** Доставка продавцом; пока всегда false до интеграции. */
+    /** Доставка продавцом. */
     productDeliveryEnabled: {
       type: Boolean,
       default: false,
+    },
+    /** Самовывоз доступен покупателю (по умолчанию да). */
+    productPickupEnabled: {
+      type: Boolean,
+      default: true,
     },
     productCategory: {
       type: String,
@@ -286,6 +291,21 @@ const ProductSchema = new Schema(
     productInstallmentEnabled: {
       type: Boolean,
       default: false,
+    },
+    productWholesaleEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    productWholesaleMinQty: {
+      type: Number,
+      default: null,
+      min: 2,
+      max: 9999,
+    },
+    productWholesalePrice: {
+      type: Number,
+      default: null,
+      min: 1,
     },
     loyaltyPointsPerUnit: {
       type: Number,

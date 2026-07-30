@@ -31,6 +31,7 @@ import {
   getProductManageToggleDisplaysController,
   patchProductManageToggleDisplayController,
   getCatalogProductByIdController,
+  getComparableProductsController,
   deleteMyProductController,
   patchMyProductController,
   recordProductViewController,
@@ -541,6 +542,11 @@ router.get(
   productIdParamValidation,
   checkOptionalAuthMW,
   getCatalogProductByIdController,
+);
+router.get(
+  "/:productId/compare",
+  productIdParamValidation,
+  getComparableProductsController,
 );
 router.get(
   "/:productId/reviews/summary",

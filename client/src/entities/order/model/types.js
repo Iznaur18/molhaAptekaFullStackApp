@@ -3,7 +3,7 @@
  *
  * @typedef {object} OrderLineItem
  * @property {string} [_id]
- * @property {string | { _id: string; productName?: string; productPrice?: number; productImageUrls?: string[]; productImageUrl?: string; productSeller?: { _id: string; userName?: string } | string }} productId
+ * @property {string | { _id: string; productName?: string; productPrice?: number; productImageUrls?: string[]; productImageUrl?: string; productSeller?: { _id: string; userName?: string; userPhoneNumber?: string } | string }} productId
  * @property {number} quantity
  * @property {number} unitPriceAtOrder
  * @property {string} [productNameAtOrder] — снимок названия на момент заказа
@@ -45,6 +45,13 @@
  * @property {OrderLineItem[]} items
  * @property {number} totalAmount
  * @property {string} deliveryAddress
+ * @property {"pickup" | "delivery"} [fulfillmentMethod]
+ * @property {"cdek" | "yandex_delivery" | "russian_post" | null} [shippingProvider]
+ * @property {"pickup_point" | "courier" | null} [shippingServiceType]
+ * @property {string | null} [shippingTrackingNumber]
+ * @property {string | null} [shippingTrackingUrl]
+ * @property {string | null} [shippingExternalId]
+ * @property {string | null} [shippingCarrierStatus]
  * @property {import('./constants.js').ORDER_PAYMENT_METHODS[number]} paymentMethod
  * @property {import('./constants.js').ORDER_STATUSES[number]} status
  * @property {string | null} [priceOfferId]

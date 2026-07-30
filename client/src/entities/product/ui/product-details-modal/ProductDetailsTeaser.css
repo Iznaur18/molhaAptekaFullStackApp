@@ -8,7 +8,8 @@
   margin: 0;
   padding: 12px 14px;
   border: 1px solid var(--iz-color-border);
-  border-radius: 12px;
+  border-radius: 20px;
+  corner-shape: squircle;
   background: var(--iz-color-surface-muted);
   color: inherit;
   font: inherit;
@@ -54,7 +55,8 @@
   align-items: center;
   justify-content: center;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 14px;
+  corner-shape: squircle;
   background: var(--iz-color-action);
   color: var(--iz-color-on-contrast);
   font-size: 13px;

@@ -1,12 +1,17 @@
 import { z } from "zod";
 
-import { PRODUCT_CATEGORY_VALUES } from "./productWrite.js";
+import {
+  PRODUCT_CHARACTERISTICS_MAX_ITEMS,
+  PRODUCT_CATEGORY_VALUES,
+} from "./productWrite.js";
 import { mongoIdSchema } from "./mongoId.js";
 /** Синхрон с `server/constants/productCategoryTreeConstants.js`. */
 export const PRODUCT_CATEGORY_SLUG_MAX_LENGTH = 80;
 export const PRODUCT_CATEGORY_LABEL_RU_MAX_LENGTH = 120;
 export const PRODUCT_CATEGORY_SEARCH_KEYWORD_MAX_LENGTH = 40;
 export const PRODUCT_CATEGORY_SEARCH_KEYWORDS_MAX_COUNT = 30;
+/** Синхрон с `PRODUCT_CHARACTERISTIC_KEY_MAX_CHARS` в productWrite / server. */
+export const PRODUCT_CATEGORY_DEFAULT_CHARACTERISTIC_KEY_MAX_CHARS = 50;
 
 const CATEGORY_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const CATEGORY_SLUG_INVALID_MESSAGE =
@@ -32,6 +37,17 @@ const searchKeywordsFieldSchema = z
   .max(PRODUCT_CATEGORY_SEARCH_KEYWORDS_MAX_COUNT)
   .optional();
 
+const defaultCharacteristicKeysFieldSchema = z
+  .array(
+    z
+      .string()
+      .trim()
+      .min(1)
+      .max(PRODUCT_CATEGORY_DEFAULT_CHARACTERISTIC_KEY_MAX_CHARS),
+  )
+  .max(PRODUCT_CHARACTERISTICS_MAX_ITEMS)
+  .optional();
+
 export const productCategorySlugParamsSchema = z.object({
   categorySlug: categorySlugFieldSchema,
 });
@@ -55,6 +71,7 @@ export const createProductCategoryAdminBodySchema = z.object({
   sortOrder: z.coerce.number().int().min(0).max(9999).optional(),
   legacyProductCategory: categorySlugFieldSchema.nullable().optional(),
   searchKeywords: searchKeywordsFieldSchema,
+  defaultCharacteristicKeys: defaultCharacteristicKeysFieldSchema,
 });
 
 export const deleteProductCategoryAdminBodySchema = z
@@ -74,4 +91,5 @@ export const patchProductCategoryAdminBodySchema = z.object({
     .union([categorySlugFieldSchema, z.literal(""), z.null()])
     .optional(),
   searchKeywords: searchKeywordsFieldSchema,
+  defaultCharacteristicKeys: defaultCharacteristicKeysFieldSchema,
 });

@@ -1,3 +1,5 @@
+import { resolveOrderShippingTrackingUrl } from "@molha/api-contract";
+
 import {
   ORDER_STATUS_PENDING,
   ORDER_STATUS_DELIVERED,
@@ -13,6 +15,7 @@ import {
   resolveSellerOrderCollapsedPreview,
 } from "../lib/orderNeedsSellerAttention.js";
 import { resolveOrderStatusLabelRu } from "../lib/resolveOrderStatusLabelRu.js";
+import { resolveOrderSellers } from "../lib/resolveOrderSellers.js";
 import {
   COMMON_UI,
   INSTALLMENT_UI,
@@ -28,64 +31,104 @@ import { OrderCardLineItemThumb } from "./OrderCardLineItemThumb.jsx";
 import { BuyerPassportSharePanel } from "../../installment/ui/BuyerPassportSharePanel.jsx";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
+import {
+  formatRuPhoneDisplayOrEmpty,
+  toRuPhoneTelHref,
+} from "../../user/lib/ruPhone.js";
 
 import "./OrderCard.css";
 
 const formatPaymentMethod = (method) =>
   ORDER_PAYMENT_METHOD_LABEL_RU[method] ?? method ?? COMMON_UI.EM_DASH;
 
-const formatBuyer = (buyer) => {
-  if (buyer == null || typeof buyer === "string") return COMMON_UI.EM_DASH;
-  return buyer.userName?.trim() || buyer.email || COMMON_UI.EM_DASH;
+const formatCounterparty = (user) => {
+  if (user == null || typeof user === "string") return COMMON_UI.EM_DASH;
+  return user.userName?.trim() || user.email || COMMON_UI.EM_DASH;
 };
 
 /**
  * @param {{
- *   buyer: import("../model/types.js").Order["userBuyerId"];
- *   onBuyerNameClick?: (userId: string) => void;
+ *   user: { _id?: string; userName?: string; email?: string; userPhoneNumber?: string } | string | null | undefined;
+ *   onNameClick?: (userId: string) => void;
  * }} props
  */
-function renderBuyerValue(buyer, onBuyerNameClick) {
-  if (buyer == null || typeof buyer === "string") {
+function renderCounterpartyValue(user, onNameClick) {
+  if (user == null || typeof user === "string") {
     return COMMON_UI.EM_DASH;
   }
-  const label = formatBuyer(buyer);
-  const canLink = typeof onBuyerNameClick === "function" && buyer._id != null;
+  const label = formatCounterparty(user);
+  const canLink = typeof onNameClick === "function" && user._id != null;
+  const phoneDisplay = formatRuPhoneDisplayOrEmpty(user.userPhoneNumber);
+  const phoneHref = toRuPhoneTelHref(user.userPhoneNumber);
 
-  if (canLink) {
-    return (
-      <button
-        type="button"
-        className="order-card__buyer-link"
-        onClick={() => onBuyerNameClick(String(buyer._id))}
-      >
-        {label}
-      </button>
-    );
-  }
-  return label;
+  return (
+    <span className="order-card__counterparty">
+      {canLink ? (
+        <button
+          type="button"
+          className="order-card__buyer-link"
+          onClick={() => onNameClick(String(user._id))}
+        >
+          {label}
+        </button>
+      ) : (
+        <span className="order-card__counterparty-name">{label}</span>
+      )}
+      {phoneHref ? (
+        <a className="order-card__counterparty-phone" href={phoneHref}>
+          {phoneDisplay}
+        </a>
+      ) : phoneDisplay ? (
+        <span className="order-card__counterparty-phone-text">{phoneDisplay}</span>
+      ) : null}
+    </span>
+  );
 }
 
 /**
  * @param {{
  *   order: import("../model/types.js").Order;
  *   showBuyer?: boolean;
+ *   showSeller?: boolean;
  *   onBuyerNameClick?: (userId: string) => void;
+ *   onSellerNameClick?: (userId: string) => void;
  *   isInstallmentOrder: boolean;
  * }} props
  */
 function OrderCardMeta({
   order,
   showBuyer = false,
+  showSeller = false,
   onBuyerNameClick,
+  onSellerNameClick,
   isInstallmentOrder,
 }) {
+  const trackingUrl = order.shippingTrackingNumber
+    ? resolveOrderShippingTrackingUrl(order)
+    : null;
+  const sellers = showSeller ? resolveOrderSellers(order) : [];
+
   return (
     <dl className="order-card__meta">
       {showBuyer ? (
         <div className="order-card__meta-row">
           <dt>{ORDER_CARD_UI.BUYER_LABEL}</dt>
-          <dd>{renderBuyerValue(order.userBuyerId, onBuyerNameClick)}</dd>
+          <dd>{renderCounterpartyValue(order.userBuyerId, onBuyerNameClick)}</dd>
+        </div>
+      ) : null}
+      {showSeller ? (
+        <div className="order-card__meta-row">
+          <dt>{ORDER_CARD_UI.SELLER_LABEL}</dt>
+          <dd>
+            {sellers.length === 0
+              ? COMMON_UI.EM_DASH
+              : sellers.map((seller, index) => (
+                  <span key={seller._id}>
+                    {index > 0 ? ", " : null}
+                    {renderCounterpartyValue(seller, onSellerNameClick)}
+                  </span>
+                ))}
+          </dd>
         </div>
       ) : null}
       <div className="order-card__meta-row">
@@ -96,6 +139,20 @@ function OrderCardMeta({
         <dt>{ORDER_CARD_UI.ADDRESS_LABEL}</dt>
         <dd>{order.deliveryAddress || COMMON_UI.EM_DASH}</dd>
       </div>
+      {order.shippingTrackingNumber ? (
+        <div className="order-card__meta-row">
+          <dt>{ORDER_CARD_UI.TRACKING_LABEL}</dt>
+          <dd>
+            {trackingUrl ? (
+              <a href={trackingUrl} target="_blank" rel="noopener noreferrer">
+                {order.shippingTrackingNumber}
+              </a>
+            ) : (
+              order.shippingTrackingNumber
+            )}
+          </dd>
+        </div>
+      ) : null}
       <div className="order-card__meta-row">
         <dt>{ORDER_CARD_UI.PAYMENT_LABEL}</dt>
         <dd>{formatPaymentMethod(order.paymentMethod)}</dd>
@@ -316,6 +373,7 @@ function OrderCardLineItem({
  * @param {{
  *   order: import('../model/types.js').Order;
  *   showBuyer?: boolean;
+ *   showSeller?: boolean;
  *   statusSlot?: import('react').ReactNode;
  *   onProductClick?: (item: import('../model/types.js').OrderLineItem) => void;
  *   onMarkShipped?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
@@ -325,6 +383,7 @@ function OrderCardLineItem({
  *   pendingActionKey?: string | null;
  *   itemActionErrors?: Record<string, string>;
  *   onBuyerNameClick?: (userId: string) => void;
+ *   onSellerNameClick?: (userId: string) => void;
  *   compact?: boolean;
  *   collapsible?: boolean;
  *   expanded?: boolean;
@@ -335,6 +394,7 @@ function OrderCardLineItem({
 export function OrderCard({
   order,
   showBuyer = false,
+  showSeller = false,
   compact = false,
   statusSlot = null,
   onProductClick,
@@ -345,6 +405,7 @@ export function OrderCard({
   pendingActionKey = null,
   itemActionErrors = {},
   onBuyerNameClick,
+  onSellerNameClick,
   collapsible = false,
   expanded = true,
   onExpandedChange,
@@ -440,7 +501,9 @@ export function OrderCard({
               <OrderCardMeta
                 order={order}
                 showBuyer={showBuyer}
+                showSeller={showSeller}
                 onBuyerNameClick={onBuyerNameClick}
+                onSellerNameClick={onSellerNameClick}
                 isInstallmentOrder={isInstallmentOrder}
               />
               {showBuyer && order.buyerPassportShare ? (
@@ -470,7 +533,9 @@ export function OrderCard({
                 <OrderCardMeta
                   order={order}
                   showBuyer={showBuyer}
+                  showSeller={showSeller}
                   onBuyerNameClick={onBuyerNameClick}
+                  onSellerNameClick={onSellerNameClick}
                   isInstallmentOrder={isInstallmentOrder}
                 />
                 {showBuyer && order.buyerPassportShare ? (

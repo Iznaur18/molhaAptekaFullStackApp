@@ -24,6 +24,7 @@ export const useHomeCatalogSections = () => {
     setEditingFeedTileKey,
     selectedCategoryLabel,
     activeCatalogFeedLabel,
+    handleCatalogMenuClick,
     isCatalogSubcategoryPickerActive,
     subcategoryPickerTrail,
     subcategoryPickerLoadError,
@@ -68,6 +69,7 @@ export const useHomeCatalogSections = () => {
         onEditFeedTileClick={setEditingFeedTileKey}
         selectedCategoryLabel={selectedCategoryLabel}
         activeCatalogFeedLabel={activeCatalogFeedLabel}
+        onCatalogRootClick={handleCatalogMenuClick}
         catalogGridSectionProps={catalogGridSectionProps}
       />
     ),
@@ -83,7 +85,7 @@ export const useHomeCatalogSections = () => {
       handleSubcategoryPickerCategoryClick,
       setEditingCategoryNode,
       categoryRoots,
-    categoryDisplays,
+      categoryDisplays,
       feedTileDisplays,
       isAdmin,
       categoryDisplaysStatus,
@@ -95,6 +97,7 @@ export const useHomeCatalogSections = () => {
       setEditingCategorySlug,
       setEditingFeedTileKey,
       activeCatalogFeedLabel,
+      handleCatalogMenuClick,
       catalogGridSectionProps,
     ],
   );

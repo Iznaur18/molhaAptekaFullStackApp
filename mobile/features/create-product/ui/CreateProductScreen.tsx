@@ -1,4 +1,4 @@
-import { DEFAULT_VIEWER_REGION_CODE, isRuRegionCode, PRODUCT_IMAGE_URLS_MAX, PRODUCT_NAME_MAX_LENGTH, PRODUCT_PICKUP_ADDRESS_MIN_LENGTH, PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE, getRuRegionByCode } from "@molha/api-contract";
+import { DEFAULT_VIEWER_REGION_CODE, isRuRegionCode, PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE, PRODUCT_IMAGE_URLS_MAX, PRODUCT_NAME_MAX_LENGTH, PRODUCT_PICKUP_ADDRESS_MIN_LENGTH, PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE, getRuRegionByCode } from "@molha/api-contract";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
@@ -56,7 +56,7 @@ const PRODUCT_PRICE_RUB_MAX = 999_999_999;
 const LOYALTY_POINTS_MAX_LENGTH = 8;
 const CHARACTERISTICS_MAX = 10;
 
-const WIZARD_STEPS = ["basic", "originality", "media", "category", "pickup", "commerce", "returns", "review"] as const;
+const WIZARD_STEPS = ["category", "basic", "originality", "media", "pickup", "commerce", "returns", "review"] as const;
 type WizardStepId = (typeof WIZARD_STEPS)[number];
 
 const STEP_COPY: Record<WizardStepId, { title: string; subtitle: string; label: string }> = {
@@ -121,6 +121,8 @@ type WizardForm = {
   productPickupAddress: string;
   productPickupLat: number | null;
   productPickupLon: number | null;
+  productPickupEnabled: boolean;
+  productDeliveryEnabled: boolean;
   productPrice: string;
   productOldPrice: string;
   productIsAvailable: boolean;
@@ -148,6 +150,8 @@ const INITIAL_FORM: WizardForm = {
   productPickupAddress: "",
   productPickupLat: null,
   productPickupLon: null,
+  productPickupEnabled: true,
+  productDeliveryEnabled: false,
   productPrice: "",
   productOldPrice: "",
   productIsAvailable: true,
@@ -205,6 +209,9 @@ function validateStep(stepId: WizardStepId, form: WizardForm): string | null {
       const hasLon = form.productPickupLon != null && Number.isFinite(form.productPickupLon);
       if (hasLat !== hasLon) {
         return CREATE_PRODUCT_UI.ERROR_PICKUP_COORDS;
+      }
+      if (form.productPickupEnabled === false && form.productDeliveryEnabled !== true) {
+        return PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE;
       }
       return null;
     }
@@ -354,7 +361,8 @@ export const CreateProductScreen = () => {
         productPickupAddress: form.productPickupAddress.trim(),
         productPickupLat: form.productPickupLat,
         productPickupLon: form.productPickupLon,
-        productDeliveryEnabled: false,
+        productPickupEnabled: form.productPickupEnabled !== false,
+        productDeliveryEnabled: form.productDeliveryEnabled === true,
         loyaltyPointsPerUnit: Number.isFinite(loyalty) && loyalty > 0 ? loyalty : undefined,
         productCharacteristics: form.characteristicRows
           .filter((r) => r.key.trim() && r.value.trim())
@@ -940,6 +948,8 @@ function PickupStep({
         address={form.productPickupAddress}
         lat={form.productPickupLat}
         lon={form.productPickupLon}
+        pickupEnabled={form.productPickupEnabled !== false}
+        deliveryEnabled={form.productDeliveryEnabled === true}
         disabled={disabled}
         onChange={(next) => {
           setForm((prev) => ({
@@ -947,6 +957,8 @@ function PickupStep({
             productPickupAddress: next.productPickupAddress,
             productPickupLat: next.productPickupLat,
             productPickupLon: next.productPickupLon,
+            productPickupEnabled: next.productPickupEnabled !== false,
+            productDeliveryEnabled: next.productDeliveryEnabled === true,
           }));
         }}
       />

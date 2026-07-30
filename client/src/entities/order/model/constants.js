@@ -8,10 +8,8 @@ export const ORDER_PAYMENT_METHODS = [
 ];
 
 /**
- * Способы оплаты, реально доступные покупателю сейчас. `cardPrepaid` скрыт
- * до интеграции эквайринга: без провайдера заказ создавался бы без списания
- * средств. Вернуть способ — добавить его сюда (enum выше и server/contract
- * трогать не нужно).
+ * Способы оплаты, реально доступные покупателю сейчас. `cardPrepaid` виден
+ * в UI, но disabled до интеграции эквайринга.
  */
 export const ORDER_PAYMENT_METHODS_SELECTABLE = [
   ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
@@ -48,10 +46,10 @@ export const ORDER_STATUS_LABEL_RU = {
   [ORDER_STATUS_CANCELLED]: "Отменён",
 };
 
-/** Лейблы статусов в «Мои продажи» (seller): shipped → «Принять». */
+/** Лейблы статусов в «Мои продажи» (seller): shipped → «Принят». */
 export const SALES_ORDER_STATUS_LABEL_RU = {
   ...ORDER_STATUS_LABEL_RU,
-  [ORDER_STATUS_SHIPPED]: "Принять",
+  [ORDER_STATUS_SHIPPED]: "Принят",
 };
 
 export const ORDER_LINE_ITEM_QUANTITY_MIN = 1;

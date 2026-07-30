@@ -8,7 +8,8 @@
   min-width: 0;
   margin: 0;
   border: 1px solid var(--iz-color-border);
-  border-radius: 12px;
+  border-radius: 20px;
+  corner-shape: squircle;
   background: var(--iz-color-surface-muted);
   overflow: hidden;
 }
@@ -70,7 +71,8 @@
   margin: 0;
   padding: 0;
   border: 1px solid var(--iz-color-border);
-  border-radius: 14px;
+  border-radius: 18px;
+  corner-shape: squircle;
   background: var(--iz-color-surface-muted);
   overflow: hidden;
   cursor: pointer;

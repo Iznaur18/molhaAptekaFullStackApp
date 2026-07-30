@@ -39,8 +39,51 @@ export function useCartSelection(purchasableIds) {
     );
   }, [purchasableIdSet]);
 
+  /** Выбрать/снять все id секции (остальные секции не трогаем). */
+  const toggleAllIn = useCallback((ids) => {
+    setDeselectedIds((prev) => {
+      const idList = Array.from(ids);
+      if (idList.length === 0) {
+        return prev;
+      }
+      const allSelected = idList.every((id) => !prev.has(id));
+      const next = new Set(prev);
+      if (allSelected) {
+        for (const id of idList) {
+          next.add(id);
+        }
+      } else {
+        for (const id of idList) {
+          next.delete(id);
+        }
+      }
+      return next;
+    });
+  }, []);
+
   const isLineSelected = useCallback(
     (productId) => !deselectedIds.has(productId),
+    [deselectedIds],
+  );
+
+  const areAllSelectedIn = useCallback(
+    (ids) => {
+      const idList = Array.from(ids);
+      return idList.length > 0 && idList.every((id) => !deselectedIds.has(id));
+    },
+    [deselectedIds],
+  );
+
+  const selectedCountIn = useCallback(
+    (ids) => {
+      let count = 0;
+      for (const id of ids) {
+        if (!deselectedIds.has(id)) {
+          count += 1;
+        }
+      }
+      return count;
+    },
     [deselectedIds],
   );
 
@@ -49,6 +92,9 @@ export function useCartSelection(purchasableIds) {
     isLineSelected,
     toggleLine,
     toggleAll,
+    toggleAllIn,
+    areAllSelectedIn,
+    selectedCountIn,
     areAllSelected: deselectedIds.size === 0,
     selectedCount: purchasableIdSet.size - deselectedIds.size,
   };

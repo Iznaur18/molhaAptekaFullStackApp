@@ -17,6 +17,7 @@ export type ProductStatusBadgeVariant =
   | "promotionBanner"
   | "auction"
   | "installment"
+  | "wholesale"
   | "raffle"
   | "placeholder"
   | "loyaltyOvercommit"
@@ -143,6 +144,7 @@ export const useProductStatusBadgeVariantStyles = (
     const promotionBanner = fill(BC.promotionBannerBg, BC.promotionBannerText);
     const auction = fill(BC.auctionBg, BC.auctionText);
     const installment = fill(BC.installmentBg, BC.installmentText);
+    const wholesale = fill(BC.wholesaleBg, BC.wholesaleText);
     const raffle = fill(BC.raffleBg, BC.raffleText);
     const placeholder = fill(BC.statusPlaceholderBg, BC.statusPlaceholderText);
     const loyaltyOvercommit = fill(theme.colors.dangerSurface, theme.colors.dangerText);
@@ -190,6 +192,13 @@ export const useProductStatusBadgeVariantStyles = (
         BC.installmentBorder,
         installment.backgroundColor,
         installment.textColor,
+      ),
+      wholesale: createBadge(
+        layout,
+        baseText,
+        BC.wholesaleBorder,
+        wholesale.backgroundColor,
+        wholesale.textColor,
       ),
       raffle: createBadge(layout, baseText, BC.raffleBorder, raffle.backgroundColor, raffle.textColor),
       placeholder: createBadge(

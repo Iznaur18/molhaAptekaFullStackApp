@@ -5,6 +5,7 @@ import { PREMIUM_CRON_INTERVAL_MS } from "../constants/premiumConstants.js";
 import { PRODUCT_PROMOTION_CRON_INTERVAL_MS } from "../constants/productPromotionConstants.js";
 import { SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS } from "../constants/sellerPersonalCategoryConstants.js";
 import { SITE_HEADER_BANNER_CAMPAIGN_CRON_INTERVAL_MS } from "../constants/siteHeaderBannerCampaignConstants.js";
+import { PRODUCT_PRICE_MARKET_STATUS_CRON_INTERVAL_MS } from "../constants/productPriceMarketStatusConstants.js";
 import { expireStaleUserStories } from "../utils/userStoryHelpers.js";
 import { processInstallmentCronTasks } from "../utils/installmentHelpers.js";
 import { processPremiumCronTasks } from "../utils/premiumAccess.js";
@@ -13,6 +14,7 @@ import { processIntroAdCampaignCronTasks } from "../services/intro-ad/introAdCam
 import { processSellerPersonalCategoryCronTasks } from "../services/seller-personal-category/sellerPersonalCategoryHelpers.js";
 import { processSiteHeaderBannerCampaignCronTasks } from "../services/site-header-banner-campaign/siteHeaderBannerCampaignHelpers.js";
 import { purgeExpiredBuyerPassportShares } from "../services/passport-vault/index.js";
+import { processProductPriceMarketStatusCronTasks } from "../services/product/refreshProductPriceMarketStatus.js";
 
 import { isBullMqEnabled } from "../queues/bullMqEnabled.js";
 
@@ -85,6 +87,12 @@ export function startCronIntervals() {
       console.error("purgeExpiredBuyerPassportShares error:", error);
     });
   }, BUYER_PASSPORT_SHARE_PURGE_CRON_INTERVAL_MS);
+
+  setInterval(() => {
+    void processProductPriceMarketStatusCronTasks().catch((error) => {
+      console.error("processProductPriceMarketStatusCronTasks error:", error);
+    });
+  }, PRODUCT_PRICE_MARKET_STATUS_CRON_INTERVAL_MS);
 
   return true;
 }

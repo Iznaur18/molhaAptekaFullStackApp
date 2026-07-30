@@ -1,3 +1,30 @@
+import { INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB } from "../model/constants.js";
+
+/**
+ * @param {number} productPrice
+ * @param {number} monthsCount
+ * @param {number} markupPercent
+ * @returns {number}
+ */
+export function resolveInstallmentMonthlyFromMarkupPercent(
+  productPrice,
+  monthsCount,
+  markupPercent,
+) {
+  const productPriceRub = Math.max(0, Math.floor(Number(productPrice) || 0));
+  const safeMonths = Math.max(0, Math.floor(Number(monthsCount) || 0));
+  const safePercent = Math.max(0, Number(markupPercent) || 0);
+
+  if (productPriceRub <= 0 || safeMonths <= 0) {
+    return INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB;
+  }
+
+  const planTotalRub = Math.ceil(productPriceRub * (1 + safePercent / 100));
+  const monthlyAmountRub = Math.ceil(planTotalRub / safeMonths);
+
+  return Math.max(INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB, monthlyAmountRub);
+}
+
 /**
  * @param {number} productPrice
  * @param {number} monthsCount

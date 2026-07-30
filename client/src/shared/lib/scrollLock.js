@@ -1,8 +1,15 @@
 let lockCount = 0;
+let overflowOnlyLockCount = 0;
 
 /** @type {{ scrollY: number; body: Record<string, string>; html: Record<string, string> }} */
 let saved = {
   scrollY: 0,
+  body: {},
+  html: {},
+};
+
+/** @type {{ body: Record<string, string>; html: Record<string, string> }} */
+let overflowOnlySaved = {
   body: {},
   html: {},
 };
@@ -17,6 +24,7 @@ const BODY_LOCK_KEYS = [
   "paddingRight",
 ];
 const HTML_LOCK_KEYS = ["overflow"];
+const OVERFLOW_ONLY_BODY_KEYS = ["overflow"];
 
 /**
  * @param {HTMLElement} element
@@ -81,6 +89,35 @@ export function lockBodyScroll() {
       applyInlineStyles(document.body, saved.body);
       applyInlineStyles(document.documentElement, saved.html);
       window.scrollTo(0, saved.scrollY);
+    }
+  };
+}
+
+/**
+ * Лёгкий lock для bottom-sheet с inputs/keyboard.
+ * Без `position: fixed` на body — иначе mobile WebView ломает hit-testing после клавиатуры.
+ *
+ * @returns {() => void} unlock
+ */
+export function lockBodyScrollOverflowOnly() {
+  if (overflowOnlyLockCount === 0) {
+    overflowOnlySaved.body = readInlineStyles(document.body, OVERFLOW_ONLY_BODY_KEYS);
+    overflowOnlySaved.html = readInlineStyles(document.documentElement, HTML_LOCK_KEYS);
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+  }
+  overflowOnlyLockCount += 1;
+
+  let released = false;
+  return () => {
+    if (released) {
+      return;
+    }
+    released = true;
+    overflowOnlyLockCount = Math.max(0, overflowOnlyLockCount - 1);
+    if (overflowOnlyLockCount === 0) {
+      applyInlineStyles(document.body, overflowOnlySaved.body);
+      applyInlineStyles(document.documentElement, overflowOnlySaved.html);
     }
   };
 }

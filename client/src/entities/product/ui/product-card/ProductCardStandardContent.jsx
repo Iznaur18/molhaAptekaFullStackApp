@@ -113,6 +113,11 @@ export function ProductCardStandardContent({ vm }) {
                 {PRODUCT_CARD_UI.INSTALLMENT_BADGE}
               </p>
             ) : null}
+            {vm.showWholesaleBadge ? (
+              <p className="product-card__wholesale-badge" role="status">
+                {vm.wholesaleBadgeLabel}
+              </p>
+            ) : null}
             {!hasCatalogStatusBadges ? (
               <p
                 className="product-card__status-badge-placeholder"

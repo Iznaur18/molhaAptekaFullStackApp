@@ -105,7 +105,36 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
     setStep(PASSPORT_FORM_STEP_IDENTITY);
   }, [isOpen, statusQuery.dataUpdatedAt]);
 
-  useScrollLock(isOpen);
+  useScrollLock(isOpen, { strategy: "overflow" });
+
+  // iOS rubber-band: overflow:hidden alone не стопит скролл за модалкой.
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const isInsideModal = (target) => {
+      if (!(target instanceof Element)) {
+        return false;
+      }
+      return Boolean(target.closest(".data-confirmation-modal"));
+    };
+
+    const blockBackgroundScroll = (event) => {
+      if (isInsideModal(event.target)) {
+        return;
+      }
+      event.preventDefault();
+    };
+
+    document.addEventListener("touchmove", blockBackgroundScroll, { passive: false });
+    document.addEventListener("wheel", blockBackgroundScroll, { passive: false });
+
+    return () => {
+      document.removeEventListener("touchmove", blockBackgroundScroll);
+      document.removeEventListener("wheel", blockBackgroundScroll);
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -410,7 +439,7 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
               ) : null}
 
               {step === PASSPORT_FORM_STEP_SELFIE ? (
-                <label className="data-confirmation-modal__selfie">
+                <div className="data-confirmation-modal__selfie">
                   <span>{DATA_CONFIRMATION_MODAL_UI.LABEL_PASSPORT_SELFIE}</span>
                   <span className="data-confirmation-modal__selfie-hint">
                     {DATA_CONFIRMATION_MODAL_UI.HINT_PASSPORT_SELFIE}
@@ -447,7 +476,7 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
                       alt=""
                     />
                   ) : null}
-                </label>
+                </div>
               ) : null}
 
               {displayError ? (

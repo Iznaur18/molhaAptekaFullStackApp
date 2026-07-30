@@ -5,7 +5,7 @@ import {
 import { COMMON_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
- * Лейбл статуса: в продажах shipped → «Принять», иначе общий RU-словарь.
+ * Лейбл статуса: в продажах shipped → «Принят», иначе общий RU-словарь.
  * @param {string | undefined} status
  * @param {"buyer" | "seller"} [attentionRole="buyer"]
  */

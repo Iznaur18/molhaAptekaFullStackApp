@@ -8,6 +8,7 @@
  * @property {string[]} pathSlugs
  * @property {string[]} pathLabelRu
  * @property {string[]} searchKeywords
+ * @property {string[]} [defaultCharacteristicKeys]
  * @property {boolean} isLeaf
  * @property {string | null} [legacyProductCategory]
  * @property {number} sortOrder
@@ -21,6 +22,7 @@
  * @property {boolean} [isLeaf]
  * @property {string | null} [legacyProductCategory]
  * @property {string[]} [searchKeywords]
+ * @property {string[]} [defaultCharacteristicKeys]
  * @property {number} [sortOrder]
  */
 

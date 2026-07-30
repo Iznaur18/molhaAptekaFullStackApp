@@ -794,19 +794,6 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     lineHeight: 18,
     color: theme.colors.textSecondary,
   },
-  enabledRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-    paddingVertical: 4,
-  },
-  enabledLabel: {
-    flex: 1,
-    fontSize: 15,
-    fontWeight: "600",
-    color: theme.colors.text,
-  },
   planCard: {
     borderRadius: 10,
     borderWidth: 1,

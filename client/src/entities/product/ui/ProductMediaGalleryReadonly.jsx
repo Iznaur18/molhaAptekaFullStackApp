@@ -117,34 +117,38 @@ export function ProductMediaGalleryReadonly({
             }
           : {})}
       >
-        {typeof onBack === "function" ? (
-          <button
-            type="button"
-            className="product-media-gallery-readonly__back-btn"
-            aria-label={PRODUCT_DETAILS_MODAL_UI.BACK_ARIA}
-            onClick={(event) => {
-              event.stopPropagation();
-              onBack();
-            }}
-          >
-            <ChevronLeft size={ICON_SIZE_PX.lg} strokeWidth={2.25} aria-hidden="true" />
-          </button>
-        ) : null}
-        {heroOverlay}
-        {hasMultipleSlides ? (
-          <span
-            className="product-media-gallery-readonly__slider-counter"
-            aria-live="polite"
-          >
-            {safeSlideIndex + 1} / {slideCount}
-          </span>
-        ) : null}
         <ProductMediaHorizontalPager
+          className="product-media-gallery-readonly__pager"
           slideCount={slideCount}
           activeIndex={safeSlideIndex}
           onIndexChange={setActiveSlideIndex}
           renderSlide={renderSlide}
         />
+        <div className="product-media-gallery-readonly__chrome">
+          {typeof onBack === "function" ? (
+            <button
+              type="button"
+              className="product-media-gallery-readonly__back-btn"
+              aria-label={PRODUCT_DETAILS_MODAL_UI.BACK_ARIA}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onBack();
+              }}
+            >
+              <ChevronLeft size={ICON_SIZE_PX.lg} strokeWidth={2.25} aria-hidden="true" />
+            </button>
+          ) : null}
+          {heroOverlay}
+          {hasMultipleSlides ? (
+            <span
+              className="product-media-gallery-readonly__slider-counter"
+              aria-live="polite"
+            >
+              {safeSlideIndex + 1} / {slideCount}
+            </span>
+          ) : null}
+        </div>
       </div>
       {hasMultipleSlides ? (
         <div

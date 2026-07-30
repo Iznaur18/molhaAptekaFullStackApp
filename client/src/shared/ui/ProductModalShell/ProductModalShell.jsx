@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
 import { USER_DETAILS_MODAL_UI } from "../../config/appUiCopy.js";
+import { getTopModalFocusLayer } from "../../lib/modalFocusStack.js";
 import { useDialogFocusTrap } from "../../lib/useDialogFocusTrap.js";
 import { useScrollLock } from "../../lib/useScrollLock.js";
 import { ModalCloseIcon } from "../icon/index.js";
@@ -58,14 +59,35 @@ export function ProductModalShell({
   });
 
   useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtmlBg = html.style.backgroundColor;
+    const prevBodyBg = body.style.backgroundColor;
+    html.style.backgroundColor = "#fff";
+    body.style.backgroundColor = "#fff";
+    return () => {
+      html.style.backgroundColor = prevHtmlBg;
+      body.style.backgroundColor = prevBodyBg;
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
     if (!isOpen || !closeOnEscape) {
       return undefined;
     }
 
     const onKeyDown = (event) => {
-      if (event.key === "Escape") {
-        onClose();
+      if (event.key !== "Escape") {
+        return;
       }
+      const topLayer = getTopModalFocusLayer();
+      if (topLayer && topLayer.container !== panelRef.current) {
+        return;
+      }
+      onClose();
     };
 
     document.addEventListener("keydown", onKeyDown);
@@ -96,6 +118,7 @@ export function ProductModalShell({
 
   return createPortal(
     <div className="product-modal-shell__backdrop" role="presentation">
+      <div className="product-modal-shell__keyboard-bleed" aria-hidden="true" />
       <div
         ref={panelRef}
         className={panelClass}

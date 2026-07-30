@@ -172,7 +172,7 @@ export function useEditProfileModal({
       }
       onSaved(updated);
       if (isPageVariant) {
-        setFeedback({ kind: "success", message: EDIT_PROFILE_MODAL_UI.SAVED });
+        onClose();
         return;
       }
       handleClose();

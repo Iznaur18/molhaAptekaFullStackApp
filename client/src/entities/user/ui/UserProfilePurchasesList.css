@@ -36,6 +36,13 @@
   text-align: left;
 }
 
+.user-profile-purchases-section > .user-profile-purchases__heading_action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
 .user-profile-purchases-section:has(> .user-profile-purchases__heading)
   > .user-profile-purchases,
 .user-profile-purchases-section:has(> .user-profile-purchases__heading_action)
@@ -49,8 +56,18 @@
   text-decoration: none;
 }
 
+.user-profile-purchases__heading-chevron {
+  flex-shrink: 0;
+  color: var(--iz-color-on-contrast);
+  opacity: 0.85;
+}
+
 .user-profile-purchases__heading_action:hover {
   opacity: 0.9;
+}
+
+.user-profile-purchases__heading_action:hover .user-profile-purchases__heading-chevron {
+  opacity: 1;
 }
 
 .user-profile-purchases__state {

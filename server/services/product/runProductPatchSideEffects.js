@@ -9,6 +9,17 @@ import { rejectAllPendingOffersForProduct } from "./productPriceOfferHelpers.js"
 import { notifySellerAuctionToggledByAdmin } from "./productAuction.js";
 import { cancelProductPromotionsForProduct } from "./productPromotionHelpers.js";
 import { syncProductCatalogAfterStockChange } from "./productStock.js";
+import { refreshProductPriceMarketStatus } from "./refreshProductPriceMarketStatus.js";
+
+const MARKET_STATUS_PATCH_FIELDS = new Set([
+  "productPrice",
+  "productName",
+  "productCharacteristics",
+  "productCategoryId",
+  "productCategory",
+  "productIsAvailable",
+  "productModerationStatus",
+]);
 
 /**
  * @param {{
@@ -59,6 +70,17 @@ export async function runProductPatchSideEffects({
 
   if (Object.prototype.hasOwnProperty.call($set, "productStockQuantity")) {
     await syncProductCatalogAfterStockChange(productId);
+  }
+
+  const shouldRefreshMarketStatus = Object.keys($set).some((key) =>
+    MARKET_STATUS_PATCH_FIELDS.has(key),
+  );
+  if (shouldRefreshMarketStatus) {
+    try {
+      await refreshProductPriceMarketStatus(productId, { refreshPeers: true });
+    } catch (error) {
+      console.error("refreshProductPriceMarketStatus after patch:", error);
+    }
   }
 }
 

@@ -416,6 +416,7 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    gap: 2,
     minHeight: 44,
     borderWidth: 1,
     borderColor: theme.colors.border,
@@ -435,6 +436,7 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
   fulfillmentOptionText: {
     fontSize: 14,
     fontWeight: "600",
+    lineHeight: 17,
     color: theme.colors.text,
     textAlign: "center",
   },
@@ -442,10 +444,17 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     color: theme.colors.onContrast,
   },
   fulfillmentOptionTextDisabled: {
-    fontSize: 14,
-    fontWeight: "600",
+    color: theme.colors.textMuted,
+  },
+  fulfillmentOptionHint: {
+    fontSize: 11,
+    fontWeight: "500",
+    lineHeight: 14,
     color: theme.colors.textMuted,
     textAlign: "center",
+  },
+  fulfillmentOptionHintActive: {
+    color: "rgba(255,255,255,0.85)",
   },
   pickupAddressText: {
     fontSize: 15,
@@ -492,7 +501,7 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     marginTop: theme.spacing[4],
     minHeight: 52,
     paddingVertical: 14,
-    borderRadius: theme.radius.button,
+    borderRadius: CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT.borderRadius,
     shadowColor: theme.colors.action,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.22,

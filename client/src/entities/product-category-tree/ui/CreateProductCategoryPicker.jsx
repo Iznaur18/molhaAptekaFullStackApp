@@ -16,6 +16,7 @@ import "./CreateProductCategoryPicker.css";
  * @property {string | null} productCategoryId
  * @property {string} categoryBreadcrumbRu
  * @property {import('../../product/model/types.js').ProductCategory} productCategory
+ * @property {string[]} [defaultCharacteristicKeys]
  */
 
 /**
@@ -35,6 +36,7 @@ function LegacyProductCategoryPicker({ value, onChange, disabled = false }) {
           productCategoryId: null,
           categoryBreadcrumbRu: "",
           productCategory,
+          defaultCharacteristicKeys: [],
         })
       }
     />
@@ -64,7 +66,6 @@ export function CreateProductCategoryPicker(props) {
  * }} props
  */
 function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
-  const [useLegacyList, setUseLegacyList] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [trail, setTrail] = useState([]);
 
@@ -72,9 +73,12 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
     enabled: !value.productCategoryId,
   });
   const activeParentId = trail.length === 0 ? null : trail[trail.length - 1].id;
+  // Drill-down UI is shown when no category is selected yet (pickerOpen stays false
+  // until "Change category"). Must still fetch roots/children in that state.
+  const treeBrowserActive = pickerOpen || !value.productCategoryId;
   const levelQuery = useProductCategoryLevelQuery({
     parentId: activeParentId,
-    enabled: pickerOpen,
+    enabled: treeBrowserActive,
   });
 
   const hasTree =
@@ -113,6 +117,9 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
         productCategoryId: node.id,
         categoryBreadcrumbRu: buildCategoryBreadcrumbFromNode(node),
         productCategory: resolveLegacySlug(node, trail),
+        defaultCharacteristicKeys: Array.isArray(node.defaultCharacteristicKeys)
+          ? node.defaultCharacteristicKeys.map(String)
+          : [],
       });
       setPickerOpen(false);
       setTrail([]);
@@ -137,29 +144,6 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
   const openPicker = () => {
     setPickerOpen(true);
     setTrail([]);
-    setUseLegacyList(false);
-  };
-
-  const switchToLegacy = () => {
-    setUseLegacyList(true);
-    setPickerOpen(false);
-    setTrail([]);
-    onChange({
-      productCategoryId: null,
-      categoryBreadcrumbRu: "",
-      productCategory: value.productCategory ?? PRODUCT_CATEGORY_ELECTRONICS,
-    });
-  };
-
-  const switchToTree = () => {
-    setUseLegacyList(false);
-    setPickerOpen(true);
-    setTrail([]);
-    onChange({
-      productCategoryId: null,
-      categoryBreadcrumbRu: "",
-      productCategory: value.productCategory ?? PRODUCT_CATEGORY_ELECTRONICS,
-    });
   };
 
   if (hasTree === null) {
@@ -170,31 +154,11 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
     );
   }
 
-  if (useLegacyList || !hasTree) {
+  if (!hasTree) {
     return (
-      <div className="create-product-category-picker">
-        <CreateProductCategorySelect
-          value={value.productCategory}
-          disabled={disabled}
-          onChange={(productCategory) =>
-            onChange({
-              productCategoryId: null,
-              categoryBreadcrumbRu: "",
-              productCategory,
-            })
-          }
-        />
-        {hasTree ? (
-          <button
-            type="button"
-            className="create-product-category-picker__mode-link"
-            disabled={disabled}
-            onClick={switchToTree}
-          >
-            {PRODUCT_CATEGORY_TREE_UI.SWITCH_TO_TREE}
-          </button>
-        ) : null}
-      </div>
+      <p className="create-product-category-picker__error" role="alert">
+        {loadError || PRODUCT_CATEGORY_TREE_UI.LOAD_ERROR}
+      </p>
     );
   }
 
@@ -219,14 +183,6 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
           onClick={openPicker}
         >
           {PRODUCT_CATEGORY_TREE_UI.CHANGE_CATEGORY}
-        </button>
-        <button
-          type="button"
-          className="create-product-category-picker__mode-link"
-          disabled={disabled}
-          onClick={switchToLegacy}
-        >
-          {PRODUCT_CATEGORY_TREE_UI.SWITCH_TO_LEGACY}
         </button>
       </div>
     );
@@ -272,6 +228,10 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
           <li className="create-product-category-picker__loading">
             {PRODUCT_CATEGORY_TREE_UI.LOADING}
           </li>
+        ) : options.length === 0 ? (
+          <li className="create-product-category-picker__loading">
+            {PRODUCT_CATEGORY_TREE_UI.EMPTY_LEVEL}
+          </li>
         ) : (
           options.map((node) => (
             <li key={node.id} role="presentation">
@@ -297,8 +257,8 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
           ))
         )}
       </ul>
-      <div className="create-product-category-picker__actions">
-        {trail.length > 0 ? (
+      {trail.length > 0 ? (
+        <div className="create-product-category-picker__actions">
           <button
             type="button"
             className="create-product-category-picker__back"
@@ -307,16 +267,8 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
           >
             {PRODUCT_CATEGORY_TREE_UI.BACK}
           </button>
-        ) : null}
-        <button
-          type="button"
-          className="create-product-category-picker__mode-link"
-          disabled={disabled}
-          onClick={switchToLegacy}
-        >
-          {PRODUCT_CATEGORY_TREE_UI.SWITCH_TO_LEGACY}
-        </button>
-      </div>
+        </div>
+      ) : null}
     </div>
   );
 }

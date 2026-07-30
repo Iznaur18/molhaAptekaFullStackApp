@@ -98,6 +98,8 @@ export function useAppShellDomain(
     setDeletingProductId: shell.setDeletingProductId,
     setTogglingAvailabilityProductId: shell.setTogglingAvailabilityProductId,
     setTogglingAuctionProductId: shell.setTogglingAuctionProductId,
+    setTogglingWholesaleProductId: shell.setTogglingWholesaleProductId,
+    setTogglingInstallmentProductId: shell.setTogglingInstallmentProductId,
     setMyProductsCatalogError: shell.setMyProductsCatalogError,
     setPromotionProduct: shell.setPromotionProduct,
     setPromotionConfig: shell.setPromotionConfig,

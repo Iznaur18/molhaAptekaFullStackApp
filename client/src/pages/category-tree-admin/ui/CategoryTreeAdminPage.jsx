@@ -29,6 +29,8 @@ export function CategoryTreeAdminPage() {
     setNewIsLeaf,
     newKeywordsCsv,
     setNewKeywordsCsv,
+    newCharacteristicKeysText,
+    setNewCharacteristicKeysText,
     newLegacySlug,
     setNewLegacySlug,
     displayError,
@@ -96,6 +98,20 @@ export function CategoryTreeAdminPage() {
                 placeholder={CATEGORY_TREE_ADMIN_PAGE_UI.KEYWORDS_PLACEHOLDER}
               />
             </label>
+            {newIsLeaf ? (
+              <label className="admin-panel__field admin-panel__field_full">
+                <span>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_DEFAULT_CHARACTERISTICS}</span>
+                <textarea
+                  value={newCharacteristicKeysText}
+                  onChange={(e) => setNewCharacteristicKeysText(e.target.value)}
+                  placeholder={CATEGORY_TREE_ADMIN_PAGE_UI.DEFAULT_CHARACTERISTICS_PLACEHOLDER}
+                  rows={5}
+                />
+                <small className="admin-panel__field-hint">
+                  {CATEGORY_TREE_ADMIN_PAGE_UI.DEFAULT_CHARACTERISTICS_HINT}
+                </small>
+              </label>
+            ) : null}
             <label className="admin-panel__field">
               <span>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_LEGACY}</span>
               <select

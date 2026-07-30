@@ -1,15 +1,18 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useEffect, useState } from "react";
 import { Pressable, Switch, Text, View } from "react-native";
 
 import type { ProductManageToggleRowVariant } from "@/entities/product/lib/resolveProductManageToggleRowVisualStyles";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductManageToggleRowStyles } from "@/shared/theme/modalChromeStyles";
 
+type ToggleChangeResult = void | { needsSetup?: boolean; revert?: boolean };
+
 type ProductManageToggleRowProps = {
   title: string;
   description: string;
   checked?: boolean;
-  onCheckedChange?: (checked: boolean) => void;
+  onCheckedChange?: (checked: boolean) => void | Promise<ToggleChangeResult>;
   onPress?: () => void;
   disabled?: boolean;
   pending?: boolean;
@@ -25,11 +28,12 @@ type ProductManageToggleRowProps = {
 const resolveControl = (
   variant: ProductManageToggleRowVariant,
   onPress?: () => void,
+  onCheckedChange?: (checked: boolean) => void | Promise<ToggleChangeResult>,
 ): "switch" | "chevron" | "none" => {
   if (variant === "danger") {
     return "none";
   }
-  if (variant === "installment" && onPress) {
+  if (variant === "installment" && onPress && !onCheckedChange) {
     return "chevron";
   }
   return "switch";
@@ -49,53 +53,71 @@ export const ProductManageToggleRow = ({
 }: ProductManageToggleRowProps) => {
   const theme = useAppTheme();
   const styles = useProductManageToggleRowStyles();
-  const control = resolveControl(variant, onPress);
+  const control = resolveControl(variant, onPress, onCheckedChange);
   const isDanger = variant === "danger";
+  const isLocked = disabled || pending;
+  const statusLabel =
+    pending && pendingLabel ? pendingLabel : (ariaLabel ?? title);
+  const [displayChecked, setDisplayChecked] = useState(checked);
 
-  if (pending) {
-    return (
-      <View style={[styles.row, styles.rowPending]} accessibilityLiveRegion="polite">
-        <Text style={styles.pendingLabel}>{pendingLabel}</Text>
-      </View>
-    );
-  }
+  useEffect(() => {
+    setDisplayChecked(checked);
+  }, [checked]);
+
+  useEffect(() => {
+    if (!pending) {
+      setDisplayChecked(checked);
+    }
+  }, [pending, checked]);
+
+  const commitChange = (next: boolean) => {
+    setDisplayChecked(next);
+    if (typeof onCheckedChange !== "function") {
+      if (onPress) {
+        onPress();
+        setDisplayChecked(checked);
+      }
+      return;
+    }
+    void Promise.resolve(onCheckedChange(next)).then((result) => {
+      if (result?.needsSetup || result?.revert) {
+        setDisplayChecked(!next);
+      }
+    });
+  };
 
   const handleActivate = () => {
-    if (disabled) {
+    if (isLocked) {
       return;
     }
     if (onPress) {
       onPress();
       return;
     }
-    onCheckedChange?.(!checked);
+    commitChange(!displayChecked);
   };
 
   const handleSwitchChange = (next: boolean) => {
-    if (disabled) {
+    if (isLocked) {
       return;
     }
-    if (onPress) {
-      onPress();
-      return;
-    }
-    onCheckedChange?.(next);
+    commitChange(next);
   };
 
   if (control === "switch") {
     return (
       <View
-        style={[styles.row, disabled && styles.rowDisabled]}
+        style={styles.row}
         accessibilityRole="switch"
-        accessibilityState={{ disabled, checked }}
-        accessibilityLabel={ariaLabel ?? title}
+        accessibilityState={{ disabled: isLocked, checked: displayChecked, busy: pending }}
+        accessibilityLabel={statusLabel}
       >
         <Pressable
           style={styles.textPressable}
-          disabled={disabled}
+          disabled={isLocked}
           onPress={handleActivate}
           accessibilityRole="button"
-          accessibilityLabel={ariaLabel ?? title}
+          accessibilityLabel={statusLabel}
         >
           <Text style={styles.title} numberOfLines={1}>
             {title}
@@ -105,8 +127,8 @@ export const ProductManageToggleRow = ({
           </Text>
         </Pressable>
         <Switch
-          value={checked}
-          disabled={disabled}
+          value={displayChecked}
+          disabled={isLocked}
           onValueChange={handleSwitchChange}
           trackColor={{
             false: theme.colors.actionBorder,
@@ -122,14 +144,13 @@ export const ProductManageToggleRow = ({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ disabled }}
-      accessibilityLabel={ariaLabel ?? title}
-      disabled={disabled}
+      accessibilityState={{ disabled: isLocked, busy: pending }}
+      accessibilityLabel={statusLabel}
+      disabled={isLocked}
       style={({ pressed }) => [
         styles.row,
         isDanger && styles.rowDanger,
-        disabled && styles.rowDisabled,
-        pressed && !disabled && styles.rowPressed,
+        pressed && !isLocked && styles.rowPressed,
       ]}
       onPress={handleActivate}
     >

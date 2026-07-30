@@ -193,6 +193,12 @@ export const useProductCompactCardStyles = createThemedStyles((theme) => {
   featurePillTextInstallment: {
     color: BC.installmentText,
   },
+  featurePillWholesale: {
+    backgroundColor: BC.wholesaleBg,
+  },
+  featurePillTextWholesale: {
+    color: BC.wholesaleText,
+  },
   featurePillRaffle: {
     backgroundColor: BC.raffleBg,
   },

@@ -11,6 +11,7 @@ import { AppError } from "../../errors/AppError.js";
 import { ensureProductCategoryDisplayForSlug } from "../../services/product/ensureProductCategoryDisplayForSlug.js";
 import { computeProductCategoryNodePaths } from "../../services/product/computeProductCategoryNodePaths.js";
 import { normalizeProductCategorySearchKeywords } from "../../services/product/normalizeProductCategorySearchKeywords.js";
+import { normalizeProductCategoryDefaultCharacteristicKeys } from "../../services/product/normalizeProductCategoryDefaultCharacteristicKeys.js";
 import { rebuildProductCategorySubtreePaths } from "../../services/product/rebuildProductCategorySubtreePaths.js";
 import { syncProductsDenormForCategorySubtree } from "../../services/product/syncProductsDenormForCategorySubtree.js";
 import {
@@ -33,6 +34,9 @@ const toCategoryAdminPayload = (row) => ({
   pathSlugs: Array.isArray(row.pathSlugs) ? row.pathSlugs : [],
   pathLabelRu: Array.isArray(row.pathLabelRu) ? row.pathLabelRu : [],
   searchKeywords: Array.isArray(row.searchKeywords) ? row.searchKeywords : [],
+  defaultCharacteristicKeys: Array.isArray(row.defaultCharacteristicKeys)
+    ? row.defaultCharacteristicKeys
+    : [],
   isLeaf: row.isLeaf === true,
   legacyProductCategory:
     typeof row.legacyProductCategory === "string" ? row.legacyProductCategory : null,
@@ -110,11 +114,17 @@ export async function createProductCategoryAdminController(req, res) {
     ? new mongoose.Types.ObjectId(String(req.body.parentId))
     : null;
   const isRoot = !parentId;
-  const isLeaf = isRoot ? false : req.body?.isLeaf === true;
   const sortOrder = Number(req.body?.sortOrder) || 0;
   const searchKeywords = normalizeProductCategorySearchKeywords(
     req.body?.searchKeywords ?? [],
   );
+  const isLeaf = isRoot ? false : req.body?.isLeaf === true;
+  const defaultCharacteristicKeys =
+    isLeaf && req.body?.defaultCharacteristicKeys !== undefined
+      ? normalizeProductCategoryDefaultCharacteristicKeys(
+          req.body.defaultCharacteristicKeys,
+        )
+      : [];
 
   let legacyProductCategory = null;
   if (req.body?.legacyProductCategory != null) {
@@ -158,6 +168,7 @@ export async function createProductCategoryAdminController(req, res) {
     searchKeywords,
     isLeaf,
     sortOrder,
+    defaultCharacteristicKeys,
     ...(legacyProductCategory ? { legacyProductCategory } : {}),
   });
 
@@ -255,6 +266,15 @@ export async function patchProductCategoryAdminController(req, res) {
     } else {
       doc.set("legacyProductCategory", undefined);
     }
+  }
+
+  const nextIsLeaf = doc.isLeaf === true;
+  if (!nextIsLeaf) {
+    doc.defaultCharacteristicKeys = [];
+  } else if (req.body?.defaultCharacteristicKeys !== undefined) {
+    doc.defaultCharacteristicKeys = normalizeProductCategoryDefaultCharacteristicKeys(
+      req.body.defaultCharacteristicKeys,
+    );
   }
 
   if (structureChanged) {

@@ -1,3 +1,5 @@
+import { formatProductWholesaleBadgeLabel } from "@izibuy/shared-lib";
+
 import { getProductCardMineStatusBadge } from "@/entities/product/lib/getProductCardMineStatusBadge";
 import { resolveAuctionUiState } from "@/entities/product/lib/resolveAuctionUiState";
 import { PRODUCT_CARD_UI } from "@/shared/config";
@@ -5,6 +7,7 @@ import { PRODUCT_CARD_UI } from "@/shared/config";
 export type ProductCompactCardFeatureBadgeVariant =
   | "auction"
   | "installment"
+  | "wholesale"
   | "raffle"
   | "hidden"
   | "loyaltyOvercommit";
@@ -48,6 +51,15 @@ export const buildMyProductCompactCardFeatureBadges = ({
       key: "installment",
       label: PRODUCT_CARD_UI.INSTALLMENT_BADGE,
       variant: "installment",
+    });
+  }
+
+  const wholesaleLabel = formatProductWholesaleBadgeLabel(product);
+  if (wholesaleLabel) {
+    badges.push({
+      key: "wholesale",
+      label: wholesaleLabel,
+      variant: "wholesale",
     });
   }
 

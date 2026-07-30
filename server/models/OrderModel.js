@@ -1,4 +1,12 @@
 import mongoose from "mongoose";
+import {
+  SHIPPING_CARRIER_STATUS_MAX_LENGTH,
+  SHIPPING_EXTERNAL_ID_MAX_LENGTH,
+  SHIPPING_PROVIDERS,
+  SHIPPING_SERVICE_TYPES,
+  SHIPPING_TRACKING_NUMBER_MAX_LENGTH,
+  SHIPPING_TRACKING_URL_MAX_LENGTH,
+} from "@molha/api-contract";
 
 import { ADDRESS_LINE_MAX_LENGTH } from "../constants/dadataConstants.js";
 
@@ -142,6 +150,49 @@ const OrderSchema = new mongoose.Schema(
       required: true,
       enum: ["pickup", "delivery"],
       default: "pickup",
+    },
+    /** Каркас под СДЭК / Яндекс / Почту; заполняется вручную / API позже. */
+    shippingProvider: {
+      type: String,
+      default: null,
+      validate: {
+        validator: (value) =>
+          value == null || SHIPPING_PROVIDERS.includes(value),
+        message: "Неизвестный провайдер доставки",
+      },
+    },
+    shippingServiceType: {
+      type: String,
+      default: null,
+      validate: {
+        validator: (value) =>
+          value == null || SHIPPING_SERVICE_TYPES.includes(value),
+        message: "Неизвестный тип доставки",
+      },
+    },
+    shippingTrackingNumber: {
+      type: String,
+      trim: true,
+      maxlength: SHIPPING_TRACKING_NUMBER_MAX_LENGTH,
+      default: null,
+    },
+    shippingTrackingUrl: {
+      type: String,
+      trim: true,
+      maxlength: SHIPPING_TRACKING_URL_MAX_LENGTH,
+      default: null,
+    },
+    shippingExternalId: {
+      type: String,
+      trim: true,
+      maxlength: SHIPPING_EXTERNAL_ID_MAX_LENGTH,
+      default: null,
+    },
+    shippingCarrierStatus: {
+      type: String,
+      trim: true,
+      maxlength: SHIPPING_CARRIER_STATUS_MAX_LENGTH,
+      default: null,
     },
     paymentMethod: {
       type: String,

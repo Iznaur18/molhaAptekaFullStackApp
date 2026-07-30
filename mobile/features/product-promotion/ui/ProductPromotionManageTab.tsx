@@ -6,9 +6,16 @@ type ProductPromotionManageTabProps = {
   product: CatalogProduct;
   onSetAvailability?: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
   onSetAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
+  onSetWholesale?: (productId: string, productWholesaleEnabled: boolean) => void | Promise<void>;
+  onSetInstallment?: (
+    productId: string,
+    productInstallmentEnabled: boolean,
+  ) => void | Promise<void | { needsSetup?: boolean }>;
   onDelete?: (productId: string) => void | Promise<void>;
   isAvailabilityTogglePending?: boolean;
   isAuctionTogglePending?: boolean;
+  isWholesaleTogglePending?: boolean;
+  isInstallmentTogglePending?: boolean;
   isDeletePending?: boolean;
   errorMessage?: string;
   canEdit?: boolean;
@@ -18,6 +25,7 @@ type ProductPromotionManageTabProps = {
   onToggleRaffleParticipation?: (product: CatalogProduct, enabled: boolean) => void;
   isRaffleParticipationPending?: boolean;
   onOpenInstallmentProgram?: () => void;
+  onOpenWholesaleSettings?: () => void;
   isSubmitting?: boolean;
 };
 

@@ -5,7 +5,8 @@
   margin: 0;
   padding: 0.45rem 1rem;
   border: 1px solid var(--iz-color-action);
-  border-radius: 0.5rem;
+  border-radius: 1rem;
+  corner-shape: squircle;
   background: var(--iz-color-action);
   color: var(--iz-color-on-contrast);
   font: inherit;
@@ -38,7 +39,8 @@
   gap: 0.4rem;
   padding: 0.25rem 0.4rem;
   border: 1px solid var(--iz-color-action);
-  border-radius: 0.5rem;
+  border-radius: 1rem;
+  corner-shape: squircle;
   background: var(--iz-color-action-soft);
 }
 

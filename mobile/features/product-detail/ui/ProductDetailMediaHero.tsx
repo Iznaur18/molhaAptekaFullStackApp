@@ -46,6 +46,7 @@ export const ProductDetailMediaHero = ({
               ]}
               onPress={onReportPress}
               disabled={reportDisabled}
+              hitSlop={10}
               accessibilityRole="button"
               accessibilityLabel={
                 reportDisabled

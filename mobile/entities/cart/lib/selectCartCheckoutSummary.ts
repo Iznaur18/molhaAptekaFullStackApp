@@ -3,12 +3,20 @@ import { CART_PAGE_UI } from "@/shared/config";
 import { getCartLineExclusionReason } from "./getCartLineExclusionReason";
 import type { CartLine } from "./selectCartLines";
 import { selectPurchasableCartLines } from "./selectPurchasableCartLines";
+import {
+  sumCartLinesCatalogDiscount,
+  sumCartLinesCatalogListTotal,
+  sumCartLinesWholesaleDiscount,
+} from "./sumCartLinesCatalogDiscount";
 
 export type CartCheckoutSummary = {
   /** Строки, которые уйдут в заказ: доступные к покупке и отмеченные галочкой. */
   selectedLines: CartLine[];
   checkoutBlockReason: string | null;
   selectedTotal: number;
+  selectedListTotal: number;
+  selectedDiscount: number;
+  selectedWholesaleDiscount: number;
   fullTotal: number;
   /** Итог к оформлению меньше итога по корзине: часть строк исключена или не выбрана. */
   hasPartialSelection: boolean;
@@ -74,6 +82,9 @@ export const selectCartCheckoutSummary = (
       currentUserId,
     ),
     selectedTotal: sumLineTotals(selectedLines),
+    selectedListTotal: sumCartLinesCatalogListTotal(selectedLines),
+    selectedDiscount: sumCartLinesCatalogDiscount(selectedLines),
+    selectedWholesaleDiscount: sumCartLinesWholesaleDiscount(selectedLines),
     fullTotal: sumLineTotals(lines),
     hasPartialSelection: selectedLines.length < lines.length,
   };

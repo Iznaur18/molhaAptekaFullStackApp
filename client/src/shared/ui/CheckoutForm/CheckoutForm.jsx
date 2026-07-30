@@ -4,10 +4,12 @@ import {
   ORDER_FULFILLMENT_DELIVERY,
   ORDER_FULFILLMENT_PICKUP,
   PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
+  SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT,
 } from "@molha/api-contract";
 
 import { AddressDeliveryFields } from "../../../entities/address/ui/AddressDeliveryFields.jsx";
 import { CheckoutPaymentMethodPicker } from "../../../features/checkout/ui/CheckoutPaymentMethodPicker.jsx";
+import { CheckoutShippingProviderPicker } from "../../../features/checkout/ui/CheckoutShippingProviderPicker.jsx";
 import { addressValueFromUser } from "../../../entities/address/lib/addressValueFromUser.js";
 import { validateRuDeliveryAddressForm } from "../../../entities/address/lib/validateRuDeliveryAddressForm.js";
 import { ORDER_PAYMENT_METHOD_DEFAULT } from "../../../entities/order/model/constants.js";
@@ -24,6 +26,8 @@ import "./CheckoutForm.css";
  *     userAddressGeo?: { lat?: number; lon?: number } | null;
  *   }>;
  *   pickupAddressSummary?: string;
+ *   deliveryAvailable?: boolean;
+ *   pickupAvailable?: boolean;
  *   isSubmitting: boolean;
  *   submitError: string;
  *   submitSuccess: string;
@@ -42,6 +46,8 @@ import "./CheckoutForm.css";
 export function CheckoutForm({
   defaultDeliveryAddress,
   pickupAddressSummary = "",
+  deliveryAvailable = false,
+  pickupAvailable = true,
   isSubmitting,
   submitError,
   submitSuccess,
@@ -59,25 +65,58 @@ export function CheckoutForm({
   const [paymentMethod, setPaymentMethod] = useState(ORDER_PAYMENT_METHOD_DEFAULT);
   const [localError, setLocalError] = useState("");
 
+  const deliverySelectable =
+    PRODUCT_DELIVERY_FULFILLMENT_ENABLED && deliveryAvailable;
+  const pickupSelectable = pickupAvailable;
+
   useEffect(() => {
     setDeliveryAddress(addressValueFromUser(defaultDeliveryAddress));
   }, [defaultDeliveryAddress]);
+
+  useEffect(() => {
+    if (!deliverySelectable && fulfillmentMethod === ORDER_FULFILLMENT_DELIVERY) {
+      if (pickupSelectable) {
+        setFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
+      }
+      return;
+    }
+    if (!pickupSelectable && fulfillmentMethod === ORDER_FULFILLMENT_PICKUP) {
+      if (deliverySelectable) {
+        setFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
+      }
+    }
+  }, [deliverySelectable, pickupSelectable, fulfillmentMethod]);
 
   const isPickup = fulfillmentMethod === ORDER_FULFILLMENT_PICKUP;
   const pickupReady = String(pickupAddressSummary ?? "").trim().length > 0;
 
   const isAddressValid = useMemo(() => {
     if (isPickup) {
-      return pickupReady;
+      return pickupSelectable && pickupReady;
     }
-    return validateRuDeliveryAddressForm(deliveryAddress, { required: true }) === null;
-  }, [deliveryAddress, isPickup, pickupReady]);
+    return (
+      deliverySelectable &&
+      validateRuDeliveryAddressForm(deliveryAddress, { required: true }) === null
+    );
+  }, [deliveryAddress, deliverySelectable, isPickup, pickupReady, pickupSelectable]);
+
+  const deliveryOptionHint = !PRODUCT_DELIVERY_FULFILLMENT_ENABLED
+    ? SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT
+    : !deliveryAvailable
+      ? CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_UNAVAILABLE
+      : null;
+
+  const pickupOptionHint = !pickupAvailable
+    ? CHECKOUT_FORM_UI.FULFILLMENT_PICKUP_UNAVAILABLE
+    : null;
 
   const handleSubmit = (event) => {
     event.preventDefault();
     if (isPickup) {
-      if (!pickupReady) {
-        setLocalError(CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED);
+      if (!pickupSelectable || !pickupReady) {
+        setLocalError(
+          pickupOptionHint || CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED,
+        );
         return;
       }
       setLocalError("");
@@ -90,8 +129,10 @@ export function CheckoutForm({
       return;
     }
 
-    if (!PRODUCT_DELIVERY_FULFILLMENT_ENABLED) {
-      setLocalError(CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_SOON);
+    if (!deliverySelectable) {
+      setLocalError(
+        deliveryOptionHint || CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_UNAVAILABLE,
+      );
       return;
     }
 
@@ -161,40 +202,73 @@ export function CheckoutForm({
             <h2 className="checkout-form__heading">{CHECKOUT_FORM_UI.HEADING}</h2>
           ) : null}
 
-          <fieldset className="checkout-form__fulfillment">
-            <legend className="checkout-form__label">{CHECKOUT_FORM_UI.LABEL_FULFILLMENT}</legend>
-            <label className="checkout-form__fulfillment-option">
-              <input
-                type="radio"
-                name={`${formId}-fulfillment`}
-                checked={isPickup}
-                onChange={() => setFulfillmentMethod(ORDER_FULFILLMENT_PICKUP)}
-                disabled={isDisabled || isSubmitting}
-              />
-              <span>{CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}</span>
-            </label>
-            <label className="checkout-form__fulfillment-option checkout-form__fulfillment-option--disabled">
-              <input
-                type="radio"
-                name={`${formId}-fulfillment`}
-                checked={!isPickup}
-                disabled={!PRODUCT_DELIVERY_FULFILLMENT_ENABLED || isDisabled || isSubmitting}
-                onChange={() => {
-                  if (!PRODUCT_DELIVERY_FULFILLMENT_ENABLED) {
+          <div className="checkout-form__fulfillment">
+            <span className="checkout-form__label" id={`${formId}-fulfillment-label`}>
+              {CHECKOUT_FORM_UI.LABEL_FULFILLMENT}
+            </span>
+            <div
+              className="checkout-form__fulfillment-row"
+              role="radiogroup"
+              aria-labelledby={`${formId}-fulfillment-label`}
+            >
+              <button
+                type="button"
+                role="radio"
+                aria-checked={isPickup}
+                className={[
+                  "checkout-form__fulfillment-option",
+                  isPickup ? "checkout-form__fulfillment-option--active" : "",
+                  !pickupSelectable
+                    ? "checkout-form__fulfillment-option--disabled"
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                disabled={!pickupSelectable || isDisabled || isSubmitting}
+                onClick={() => {
+                  if (!pickupSelectable) {
+                    return;
+                  }
+                  setFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
+                }}
+              >
+                <span className="checkout-form__fulfillment-option-title">
+                  {CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}
+                </span>
+                {pickupOptionHint ? (
+                  <span className="checkout-form__soon">{pickupOptionHint}</span>
+                ) : null}
+              </button>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={!isPickup}
+                className={[
+                  "checkout-form__fulfillment-option",
+                  !isPickup ? "checkout-form__fulfillment-option--active" : "",
+                  !deliverySelectable
+                    ? "checkout-form__fulfillment-option--disabled"
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                disabled={!deliverySelectable || isDisabled || isSubmitting}
+                onClick={() => {
+                  if (!deliverySelectable) {
                     return;
                   }
                   setFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
                 }}
-              />
-              <span>
-                {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
-                <span className="checkout-form__soon">
-                  {" "}
-                  ({CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_SOON})
+              >
+                <span className="checkout-form__fulfillment-option-title">
+                  {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
                 </span>
-              </span>
-            </label>
-          </fieldset>
+                {deliveryOptionHint ? (
+                  <span className="checkout-form__soon">{deliveryOptionHint}</span>
+                ) : null}
+              </button>
+            </div>
+          </div>
 
           {isPickup ? (
             <div className="checkout-form__pickup">
@@ -232,6 +306,10 @@ export function CheckoutForm({
                   autoComplete="address-line2"
                 />
               </label>
+
+              <CheckoutShippingProviderPicker
+                disabled={isDisabled || isSubmitting}
+              />
             </>
           )}
 

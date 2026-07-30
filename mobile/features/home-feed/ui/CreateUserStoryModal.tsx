@@ -1,7 +1,8 @@
 import { Image } from "expo-image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Modal,
   Platform,
   Pressable,
@@ -51,6 +52,7 @@ type CreateUserStoryModalProps = {
 };
 
 const { enterMs, exitMs, sheetSlideDistance, maxHeightRatio } = CREATE_STORY_MODAL_ANIMATION;
+const DISMISS_GUARD_MS = 600;
 
 export const CreateUserStoryModal = ({
   visible,
@@ -75,6 +77,7 @@ export const CreateUserStoryModal = ({
   const { createMutation } = useUserStoryMutations();
   const uploadImageMutation = useUploadImageMutation();
   const uploadVideoMutation = useUploadVideoMutation();
+  const dismissGuardUntilRef = useRef(0);
 
   const [modalVisible, setModalVisible] = useState(visible);
   const [captionText, setCaptionText] = useState("");
@@ -149,6 +152,10 @@ export const CreateUserStoryModal = ({
     transform: [{ translateY: sheetTranslateY.value }],
   }));
 
+  const armDismissGuard = useCallback(() => {
+    dismissGuardUntilRef.current = Date.now() + DISMISS_GUARD_MS;
+  }, []);
+
   const handleClose = () => {
     if (isBusy) {
       return;
@@ -156,10 +163,19 @@ export const CreateUserStoryModal = ({
     onClose();
   };
 
+  const handleDismiss = () => {
+    if (Date.now() < dismissGuardUntilRef.current) {
+      return;
+    }
+    handleClose();
+  };
+
   const handlePickPhoto = async () => {
     setErrorMessage("");
+    armDismissGuard();
     try {
       const asset = await pickGalleryImageAsset();
+      armDismissGuard();
       if (!asset) {
         return;
       }
@@ -167,14 +183,17 @@ export const CreateUserStoryModal = ({
       setVideoFile(null);
       setMediaType(USER_STORY_MEDIA_TYPE_IMAGE);
     } catch (error) {
+      armDismissGuard();
       setErrorMessage(error instanceof Error ? error.message : USER_STORY_UI.ERROR_IMAGE);
     }
   };
 
   const handlePickVideo = async () => {
     setErrorMessage("");
+    armDismissGuard();
     try {
       const asset = await pickVideoAsset({ maxBytes: STORY_UPLOAD_VIDEO_MAX_BYTES });
+      armDismissGuard();
       if (!asset) {
         return;
       }
@@ -182,8 +201,30 @@ export const CreateUserStoryModal = ({
       setImageFile(null);
       setMediaType(USER_STORY_MEDIA_TYPE_VIDEO);
     } catch (error) {
+      armDismissGuard();
       setErrorMessage(error instanceof Error ? error.message : USER_STORY_UI.ERROR_GENERIC);
     }
+  };
+
+  const handlePreviewPress = () => {
+    if (isBusy) {
+      return;
+    }
+    Alert.alert(USER_STORY_UI.ERROR_MEDIA_REQUIRED, undefined, [
+      {
+        text: USER_STORY_UI.PICK_PHOTO,
+        onPress: () => {
+          void handlePickPhoto();
+        },
+      },
+      {
+        text: USER_STORY_UI.PICK_VIDEO,
+        onPress: () => {
+          void handlePickVideo();
+        },
+      },
+      { text: "Отмена", style: "cancel" },
+    ]);
   };
 
   const handlePublish = async () => {
@@ -228,7 +269,7 @@ export const CreateUserStoryModal = ({
         <Animated.View style={[styles.backdrop, backdropAnimatedStyle]} pointerEvents="box-none">
           <Pressable
             style={StyleSheet.absoluteFillObject}
-            onPress={handleClose}
+            onPress={handleDismiss}
             disabled={isBusy}
             accessibilityLabel={USER_STORY_UI.CLOSE}
           />
@@ -240,9 +281,10 @@ export const CreateUserStoryModal = ({
           <ScrollView
             style={[styles.bodyScroll, { maxHeight: bodyScrollMaxHeight }]}
             contentContainerStyle={styles.bodyScrollContent}
+            scrollEnabled={false}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
-            automaticallyAdjustKeyboardInsets={Platform.OS !== "web"}
+            automaticallyAdjustKeyboardInsets={false}
             showsVerticalScrollIndicator={false}
             bounces={false}
           >
@@ -253,13 +295,18 @@ export const CreateUserStoryModal = ({
               </Pressable>
             </View>
 
-            <View
+            <Pressable
               style={[
                 styles.preview,
                 previewSize.width > 0 && previewSize.height > 0
                   ? { width: previewSize.width, height: previewSize.height }
                   : null,
+                isBusy && styles.pickDisabled,
               ]}
+              onPress={handlePreviewPress}
+              disabled={isBusy}
+              accessibilityRole="button"
+              accessibilityLabel={USER_STORY_UI.ERROR_MEDIA_REQUIRED}
             >
               {previewUri && mediaType === USER_STORY_MEDIA_TYPE_VIDEO ? (
                 <ProductPreviewVideo uri={previewUri} />
@@ -270,26 +317,7 @@ export const CreateUserStoryModal = ({
               {!previewUri ? (
                 <Text style={styles.placeholder}>{USER_STORY_UI.ERROR_MEDIA_REQUIRED}</Text>
               ) : null}
-            </View>
-
-            <View style={styles.pickers}>
-              <Pressable
-                style={[styles.pickButton, isBusy && styles.pickDisabled]}
-                onPress={handlePickPhoto}
-                disabled={isBusy}
-              >
-                <Text style={styles.pickText}>{USER_STORY_UI.PICK_PHOTO}</Text>
-              </Pressable>
-              <Pressable
-                style={[styles.pickButton, isBusy && styles.pickDisabled]}
-                onPress={handlePickVideo}
-                disabled={isBusy}
-              >
-                <Text style={styles.pickText}>{USER_STORY_UI.PICK_VIDEO}</Text>
-              </Pressable>
-            </View>
-
-            <Text style={styles.videoHint}>{USER_STORY_UI.VIDEO_DURATION_HINT}</Text>
+            </Pressable>
 
             <View style={styles.captionBlock}>
               <Text style={styles.label}>{USER_STORY_UI.CAPTION_LABEL}</Text>
@@ -300,8 +328,10 @@ export const CreateUserStoryModal = ({
                 placeholder={USER_STORY_UI.CAPTION_PLACEHOLDER}
                 maxLength={USER_STORY_CAPTION_MAX_CHARS}
                 multiline
-                numberOfLines={2}
+                numberOfLines={6}
                 editable={!isBusy}
+                autoFocus={false}
+                scrollEnabled={true}
               />
 
               {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
@@ -313,7 +343,9 @@ export const CreateUserStoryModal = ({
           <View style={styles.submitFooter}>
             <Pressable
               style={[styles.submit, isBusy && styles.submitDisabled]}
-              onPress={handlePublish}
+              onPress={() => {
+                void handlePublish();
+              }}
               disabled={isBusy}
             >
               {isBusy ? (

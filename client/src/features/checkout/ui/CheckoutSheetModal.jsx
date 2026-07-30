@@ -15,6 +15,8 @@ import "./CheckoutSheetModal.css";
  *   onClose: () => void;
  *   defaultDeliveryAddress: Record<string, unknown>;
  *   pickupAddressSummary?: string;
+ *   deliveryAvailable?: boolean;
+ *   pickupAvailable?: boolean;
  *   isSubmitting: boolean;
  *   submitError: string;
  *   submitSuccess: string;
@@ -32,6 +34,8 @@ export function CheckoutSheetModal({
   onClose,
   defaultDeliveryAddress,
   pickupAddressSummary = "",
+  deliveryAvailable = false,
+  pickupAvailable = true,
   isSubmitting,
   submitError,
   submitSuccess,
@@ -48,6 +52,22 @@ export function CheckoutSheetModal({
     active: isOpen && isVisible,
     initialFocusRef: closeButtonRef,
   });
+
+  useEffect(() => {
+    if (!mounted) {
+      return undefined;
+    }
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtmlBg = html.style.backgroundColor;
+    const prevBodyBg = body.style.backgroundColor;
+    html.style.backgroundColor = "#fff";
+    body.style.backgroundColor = "#fff";
+    return () => {
+      html.style.backgroundColor = prevHtmlBg;
+      body.style.backgroundColor = prevBodyBg;
+    };
+  }, [mounted]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -84,6 +104,7 @@ export function CheckoutSheetModal({
         aria-label={CART_PAGE_UI.CHECKOUT_SHEET_CLOSE}
         onClick={onClose}
       />
+      <div className="checkout-sheet-modal__keyboard-bleed" aria-hidden="true" />
       <div
         ref={panelRef}
         className="checkout-sheet-modal__panel"
@@ -108,6 +129,8 @@ export function CheckoutSheetModal({
           <CheckoutForm
             defaultDeliveryAddress={defaultDeliveryAddress}
             pickupAddressSummary={pickupAddressSummary}
+            deliveryAvailable={deliveryAvailable}
+            pickupAvailable={pickupAvailable}
             isSubmitting={isSubmitting}
             submitError={submitError}
             submitSuccess={submitSuccess}

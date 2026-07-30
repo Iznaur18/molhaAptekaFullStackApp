@@ -1,9 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { useInstallmentMutations } from "../model/useInstallmentMutations.js";
 import { useProductInstallmentProgramQuery } from "../model/useProductInstallmentProgramQuery.js";
 import { validateInstallmentProgramPlans } from "../lib/validateInstallmentProgramPlans.js";
+import {
+  resolveInstallmentMonthlyFromMarkupPercent,
+  resolveInstallmentPlanPriceSummary,
+} from "../lib/resolveInstallmentPlanPriceSummary.js";
 import {
   INSTALLMENT_MODERATION_APPROVED,
   INSTALLMENT_MODERATION_REJECTED,
@@ -22,16 +26,12 @@ import "./InstallmentProgramModal.css";
 
 const DEFAULT_PLAN_TITLE = "Стандарт";
 
-const EMPTY_PLAN = {
-  title: DEFAULT_PLAN_TITLE,
+const createEmptyPlan = (planNumber = 1) => ({
+  title: planNumber <= 1 ? DEFAULT_PLAN_TITLE : `План ${planNumber}`,
   monthsCount: 3,
   monthlyAmountRub: INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB,
   firstPaymentRequiredNow: true,
-};
-
-const createEmptyPlan = (planNumber = 1) => ({
-  ...EMPTY_PLAN,
-  title: planNumber <= 1 ? DEFAULT_PLAN_TITLE : `План ${planNumber}`,
+  markupPercent: 0,
 });
 
 /**
@@ -39,20 +39,21 @@ const createEmptyPlan = (planNumber = 1) => ({
  *   isOpen: boolean;
  *   productId: string;
  *   productName?: string;
+ *   productPrice?: number;
  *   onClose: () => void;
- *   onSaved?: () => void;
+ *   onSaved?: (productPatch?: { productInstallmentEnabled?: boolean }) => void;
  * }} props
  */
 export function InstallmentProgramModal({
   isOpen,
   productId,
   productName = "",
+  productPrice = 0,
   onClose,
   onSaved,
 }) {
   const { upsertProgramMutation } = useInstallmentMutations();
-  const [isEnabled, setIsEnabled] = useState(true);
-  const [plans, setPlans] = useState([{ ...EMPTY_PLAN }]);
+  const [plans, setPlans] = useState([createEmptyPlan()]);
   const isSubmitting = upsertProgramMutation.isPending;
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -73,11 +74,43 @@ export function InstallmentProgramModal({
         ? INSTALLMENT_UI.PROGRAM_MODAL_APPROVED_HINT
         : null;
 
+  const buildDefaultPlan = useCallback(
+    (planNumber) => {
+      const base = createEmptyPlan(planNumber);
+      return {
+        ...base,
+        markupPercent: 0,
+        monthlyAmountRub: resolveInstallmentMonthlyFromMarkupPercent(
+          productPrice,
+          Number(base.monthsCount) || 0,
+          0,
+        ),
+      };
+    },
+    [productPrice],
+  );
+
   useScrollLock(isOpen);
   useDialogFocusTrap(panelRef, {
     active: isOpen,
     initialFocusRef: closeButtonRef,
   });
+
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtmlBg = html.style.backgroundColor;
+    const prevBodyBg = body.style.backgroundColor;
+    html.style.backgroundColor = "#fff";
+    body.style.backgroundColor = "#fff";
+    return () => {
+      html.style.backgroundColor = prevHtmlBg;
+      body.style.backgroundColor = prevBodyBg;
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -104,33 +137,49 @@ export function InstallmentProgramModal({
   }, [isOpen, onClose]);
 
   useEffect(() => {
-    if (!isOpen || !productId || programQuery.isLoading) {
+    if (!isOpen) {
+      setError("");
+      setSuccess("");
+      return undefined;
+    }
+    if (programQuery.isLoading) {
       return undefined;
     }
 
-    setError("");
-    setSuccess("");
-
     const program = programQuery.data;
     if (program) {
-      setIsEnabled(program.isEnabled);
       setPlans(
         program.plans.length > 0
-          ? program.plans.map((plan) => ({
-              title: plan.title,
-              monthsCount: plan.monthsCount,
-              monthlyAmountRub: plan.monthlyAmountRub,
-              firstPaymentRequiredNow: plan.firstPaymentRequiredNow !== false,
-            }))
-          : [{ ...createEmptyPlan(1) }],
+          ? program.plans.map((plan) => {
+              const monthsCount = Number(plan.monthsCount) || 3;
+              const monthlyAmountRub =
+                Number(plan.monthlyAmountRub) || INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB;
+              return {
+                title: plan.title ?? DEFAULT_PLAN_TITLE,
+                monthsCount,
+                monthlyAmountRub,
+                firstPaymentRequiredNow: plan.firstPaymentRequiredNow !== false,
+                markupPercent: resolveInstallmentPlanPriceSummary(
+                  productPrice,
+                  monthsCount,
+                  monthlyAmountRub,
+                ).markupPercent,
+              };
+            })
+          : [buildDefaultPlan(1)],
       );
       return undefined;
     }
 
-    setIsEnabled(true);
-    setPlans([createEmptyPlan(1)]);
+    setPlans([buildDefaultPlan(1)]);
     return undefined;
-  }, [isOpen, productId, programQuery.data, programQuery.isLoading]);
+  }, [
+    buildDefaultPlan,
+    isOpen,
+    productPrice,
+    programQuery.data,
+    programQuery.isLoading,
+  ]);
 
   useEffect(() => {
     if (programQuery.isError) {
@@ -154,7 +203,7 @@ export function InstallmentProgramModal({
 
   const addPlan = () => {
     if (plans.length >= INSTALLMENT_PLANS_MAX) return;
-    setPlans((prev) => [...prev, createEmptyPlan(prev.length + 1)]);
+    setPlans((prev) => [...prev, buildDefaultPlan(prev.length + 1)]);
   };
 
   const removePlan = (index) => {
@@ -176,6 +225,11 @@ export function InstallmentProgramModal({
     }
 
     try {
+      const existingPlans = programQuery.data?.plans;
+      const isEnabled =
+        Array.isArray(existingPlans) && existingPlans.length > 0
+          ? programQuery.data.isEnabled === true
+          : true;
       const result = await upsertProgramMutation.mutateAsync({
         productId,
         body: {
@@ -193,7 +247,7 @@ export function InstallmentProgramModal({
           ? result.message.trim()
           : INSTALLMENT_UI.PROGRAM_MODAL_SUCCESS;
       setSuccess(successMessage);
-      onSaved?.();
+      onSaved?.({ productInstallmentEnabled: isEnabled });
       const sentToModeration = successMessage.toLowerCase().includes("модерац");
       if (!sentToModeration) {
         onClose();
@@ -210,6 +264,7 @@ export function InstallmentProgramModal({
 
   return createPortal(
     <div className="installment-program-modal__backdrop" role="presentation">
+      <div className="installment-program-modal__keyboard-bleed" aria-hidden="true" />
       <div
         ref={panelRef}
         className="installment-program-modal"
@@ -230,7 +285,7 @@ export function InstallmentProgramModal({
             type="button"
             className="installment-program-modal__close"
             onClick={onClose}
-            aria-label="Закрыть"
+            aria-label={INSTALLMENT_UI.PROGRAM_MODAL_CLOSE}
           >
             ×
           </button>
@@ -246,39 +301,45 @@ export function InstallmentProgramModal({
             noValidate
             onSubmit={handleSubmit}
           >
-            {error ? (
-              <p className="installment-program-modal__error" role="alert">
-                {error}
-              </p>
-            ) : null}
-            {success ? (
-              <p className="installment-program-modal__success" role="status">
-                {success}
-              </p>
-            ) : null}
-            {moderationHint ? (
-              <p className="installment-program-modal__info" role="status">
-                {moderationHint}
-              </p>
-            ) : null}
             <div className="installment-program-modal__body">
-              <label className="installment-program-modal__toggle">
-                <input
-                  type="checkbox"
-                  checked={isEnabled}
-                  onChange={(event) => setIsEnabled(event.target.checked)}
-                  disabled={isSubmitting}
-                />
-                <span>{INSTALLMENT_UI.PROGRAM_MODAL_ENABLED}</span>
-              </label>
+              {error ? (
+                <p className="installment-program-modal__error" role="alert">
+                  {error}
+                </p>
+              ) : null}
+              {success ? (
+                <p className="installment-program-modal__success" role="status">
+                  {success}
+                </p>
+              ) : null}
+              {moderationHint ? (
+                <p className="installment-program-modal__info" role="status">
+                  {moderationHint}
+                </p>
+              ) : null}
 
               <div className="installment-program-modal__plans">
                 {plans.map((plan, index) => {
-                  const planTotalRub =
-                    Number(plan.monthsCount) * Number(plan.monthlyAmountRub);
+                  const monthsCount = Math.floor(Number(plan.monthsCount) || 0);
+                  const monthlyAmountRub = Math.floor(
+                    Number(plan.monthlyAmountRub) || 0,
+                  );
+                  const { planTotalRub, productPriceRub, markupRub } =
+                    resolveInstallmentPlanPriceSummary(
+                      productPrice,
+                      monthsCount,
+                      monthlyAmountRub,
+                    );
+                  const markupPercent = Math.max(
+                    0,
+                    Math.floor(Number(plan.markupPercent) || 0),
+                  );
 
                   return (
-                    <fieldset key={index} className="installment-program-modal__plan">
+                    <fieldset
+                      key={index}
+                      className="installment-program-modal__plan"
+                    >
                       <div className="installment-program-modal__plan-head">
                         <legend className="installment-program-modal__plan-name">
                           {INSTALLMENT_UI.PROGRAM_MODAL_PLAN_NUMBER(index + 1)}
@@ -304,7 +365,9 @@ export function InstallmentProgramModal({
                             id={`installment-plan-${index}-title`}
                             type="text"
                             value={plan.title}
-                            placeholder={INSTALLMENT_UI.PROGRAM_MODAL_PLAN_TITLE_PLACEHOLDER}
+                            placeholder={
+                              INSTALLMENT_UI.PROGRAM_MODAL_PLAN_TITLE_PLACEHOLDER
+                            }
                             onChange={(event) =>
                               updatePlan(index, { title: event.target.value })
                             }
@@ -322,17 +385,52 @@ export function InstallmentProgramModal({
                             <input
                               id={`installment-plan-${index}-months`}
                               type="number"
+                              inputMode="numeric"
                               min={INSTALLMENT_MONTHS_MIN}
                               max={INSTALLMENT_MONTHS_MAX}
                               value={plan.monthsCount}
-                              onChange={(event) =>
+                              onChange={(event) => {
+                                const nextMonths =
+                                  Number(event.target.value) || 0;
                                 updatePlan(index, {
-                                  monthsCount:
-                                    Number(event.target.value) ||
-                                    INSTALLMENT_MONTHS_MIN,
-                                })
-                              }
+                                  monthsCount: nextMonths,
+                                  monthlyAmountRub:
+                                    resolveInstallmentMonthlyFromMarkupPercent(
+                                      productPrice,
+                                      nextMonths,
+                                      markupPercent,
+                                    ),
+                                });
+                              }}
                               disabled={isSubmitting}
+                            />
+                          </label>
+                          <label className="installment-program-modal__field">
+                            <span className="installment-program-modal__label">
+                              {INSTALLMENT_UI.PROGRAM_MODAL_MARKUP_PERCENT}
+                            </span>
+                            <input
+                              id={`installment-plan-${index}-markup`}
+                              type="number"
+                              inputMode="numeric"
+                              min={0}
+                              value={markupPercent}
+                              onChange={(event) => {
+                                const nextMarkupPercent = Math.max(
+                                  0,
+                                  Math.floor(Number(event.target.value) || 0),
+                                );
+                                updatePlan(index, {
+                                  markupPercent: nextMarkupPercent,
+                                  monthlyAmountRub:
+                                    resolveInstallmentMonthlyFromMarkupPercent(
+                                      productPrice,
+                                      monthsCount,
+                                      nextMarkupPercent,
+                                    ),
+                                });
+                              }}
+                              disabled={isSubmitting || productPriceRub <= 0}
                             />
                           </label>
                           <label className="installment-program-modal__field">
@@ -342,30 +440,50 @@ export function InstallmentProgramModal({
                             <input
                               id={`installment-plan-${index}-monthly`}
                               type="number"
+                              inputMode="numeric"
                               min={INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB}
                               value={plan.monthlyAmountRub}
-                              onChange={(event) =>
+                              onChange={(event) => {
+                                const nextMonthly =
+                                  Number(event.target.value) || 0;
                                 updatePlan(index, {
-                                  monthlyAmountRub:
-                                    Number(event.target.value) ||
-                                    INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB,
-                                })
-                              }
+                                  monthlyAmountRub: nextMonthly,
+                                  markupPercent:
+                                    resolveInstallmentPlanPriceSummary(
+                                      productPrice,
+                                      monthsCount,
+                                      nextMonthly,
+                                    ).markupPercent,
+                                });
+                              }}
                               disabled={isSubmitting}
                             />
                           </label>
                         </div>
 
-                        <p className="installment-program-modal__plan-total">
-                          {INSTALLMENT_UI.PROGRAM_MODAL_PLAN_TOTAL(
-                            formatPriceRub(planTotalRub),
-                          )}
-                        </p>
+                        <div className="installment-program-modal__plan-total-block">
+                          <p className="installment-program-modal__plan-total-meta">
+                            {INSTALLMENT_UI.PROGRAM_MODAL_PLAN_ORIGINAL_PRICE(
+                              formatPriceRub(productPriceRub),
+                            )}
+                          </p>
+                          <p className="installment-program-modal__plan-total-meta">
+                            {INSTALLMENT_UI.PROGRAM_MODAL_PLAN_MARKUP(
+                              formatPriceRub(markupRub),
+                              markupPercent,
+                            )}
+                          </p>
+                          <p className="installment-program-modal__plan-total-main">
+                            {INSTALLMENT_UI.PROGRAM_MODAL_PLAN_TOTAL(
+                              formatPriceRub(planTotalRub),
+                            )}
+                          </p>
+                        </div>
 
                         <label className="installment-program-modal__checkbox">
                           <input
                             type="checkbox"
-                            checked={plan.firstPaymentRequiredNow}
+                            checked={plan.firstPaymentRequiredNow !== false}
                             onChange={(event) =>
                               updatePlan(index, {
                                 firstPaymentRequiredNow: event.target.checked,
@@ -380,9 +498,7 @@ export function InstallmentProgramModal({
                   );
                 })}
               </div>
-            </div>
 
-            <footer className="installment-program-modal__footer">
               {plans.length < INSTALLMENT_PLANS_MAX ? (
                 <button
                   type="button"
@@ -397,21 +513,21 @@ export function InstallmentProgramModal({
                   {INSTALLMENT_UI.PROGRAM_MODAL_MAX_PLANS(INSTALLMENT_PLANS_MAX)}
                 </p>
               )}
+            </div>
 
-              <div className="installment-program-modal__footer-actions">
-                <button
-                  type="button"
-                  className="installment-program-modal__btn installment-program-modal__btn_primary"
-                  disabled={isSubmitting}
-                  onClick={() => {
-                    void handleSave();
-                  }}
-                >
-                  {isSubmitting
-                    ? INSTALLMENT_UI.PROGRAM_MODAL_SAVING
-                    : INSTALLMENT_UI.PROGRAM_MODAL_SAVE}
-                </button>
-              </div>
+            <footer className="installment-program-modal__footer">
+              <button
+                type="button"
+                className="installment-program-modal__btn installment-program-modal__btn_primary installment-program-modal__btn_save"
+                disabled={isSubmitting || isLoading}
+                onClick={() => {
+                  void handleSave();
+                }}
+              >
+                {isSubmitting
+                  ? INSTALLMENT_UI.PROGRAM_MODAL_SAVING
+                  : INSTALLMENT_UI.PROGRAM_MODAL_SAVE}
+              </button>
             </footer>
           </form>
         )}

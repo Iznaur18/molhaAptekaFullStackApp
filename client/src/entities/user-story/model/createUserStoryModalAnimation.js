@@ -1,5 +1,5 @@
-/** Паритет mobile `CREATE_STORY_MODAL_ANIMATION`. */
+/** Паритет HomeFeaturedRaffleModal slide-up. */
 export const CREATE_USER_STORY_MODAL_ANIMATION = {
-  enterMs: 300,
-  exitMs: 240,
+  enterMs: 420,
+  exitMs: 220,
 };

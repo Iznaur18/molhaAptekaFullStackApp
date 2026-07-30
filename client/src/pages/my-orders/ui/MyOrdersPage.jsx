@@ -37,10 +37,11 @@ const EMPTY_ORDERS = [];
 /**
  * @param {{
  *   isAuthorized: boolean;
+ *   onSellerNameClick?: (userId: string) => void;
  *   onQueueChanged?: () => void;
  * }} props
  */
-export function MyOrdersPage({ isAuthorized, onQueueChanged }) {
+export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }) {
   const queryClient = useQueryClient();
   const { confirmItemMutation, cancelItemMutation } = useOrderMutations();
   const ordersQuery = useMyOrdersQuery({ enabled: isAuthorized });
@@ -312,6 +313,8 @@ export function MyOrdersPage({ isAuthorized, onQueueChanged }) {
                   collapsible
                   expanded={expandedIds.has(orderId)}
                   onExpandedChange={() => toggleExpanded(orderId)}
+                  showSeller
+                  onSellerNameClick={onSellerNameClick}
                   onProductClick={openCatalogProductFromOrderLine}
                   onConfirmDelivered={handleConfirmDelivered}
                   onCancelItem={handleCancelItem}

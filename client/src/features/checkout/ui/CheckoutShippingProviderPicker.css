@@ -1,0 +1,109 @@
+/* Каркас UI служб доставки — паритет с CheckoutPaymentMethodPicker */
+.checkout-shipping-provider-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: var(--iz-space-1);
+}
+
+.checkout-shipping-provider-picker__legend {
+  font-size: var(--iz-font-base);
+  font-weight: var(--iz-weight-semibold);
+  color: var(--iz-color-text-secondary);
+}
+
+.checkout-shipping-provider-picker__legend--sub {
+  margin-top: var(--iz-space-1);
+}
+
+.checkout-shipping-provider-picker__scroll {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.checkout-shipping-provider-picker__row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.checkout-shipping-provider-picker__card {
+  box-sizing: border-box;
+  flex: 1 1 0;
+  min-width: 6.5rem;
+  min-height: 4.5rem;
+  padding: 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text);
+  font: inherit;
+  text-align: center;
+}
+
+.checkout-shipping-provider-picker__card--idle {
+  background: var(--iz-color-action-soft);
+  border-color: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+}
+
+.checkout-shipping-provider-picker__card--selected {
+  background: var(--iz-color-surface);
+  border: 2px solid var(--iz-color-action);
+  color: var(--iz-color-text);
+}
+
+.checkout-shipping-provider-picker__card--locked,
+.checkout-shipping-provider-picker__card--locked:disabled {
+  cursor: not-allowed;
+  background: var(--iz-color-surface-muted);
+  border-color: var(--iz-color-border);
+  color: var(--iz-color-text-muted);
+}
+
+.checkout-shipping-provider-picker__chip {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 8px;
+  border: var(--iz-border) solid var(--iz-color-border);
+  border-radius: var(--iz-radius-input);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: var(--iz-font-base);
+  font-weight: var(--iz-weight-semibold);
+  text-align: center;
+}
+
+.checkout-shipping-provider-picker__chip--locked,
+.checkout-shipping-provider-picker__chip--locked:disabled {
+  cursor: not-allowed;
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text-muted);
+}
+
+.checkout-shipping-provider-picker__label {
+  font-size: var(--iz-font-sm);
+  line-height: var(--iz-leading-xs);
+  font-weight: var(--iz-weight-semibold);
+}
+
+.checkout-shipping-provider-picker__soon {
+  font-weight: var(--iz-weight-semibold);
+  opacity: 0.85;
+}
+
+.checkout-shipping-provider-picker__hint {
+  margin: 0;
+  font-size: var(--iz-font-sm);
+  line-height: 1.35;
+  color: var(--iz-color-text-muted);
+}

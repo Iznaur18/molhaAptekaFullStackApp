@@ -41,5 +41,7 @@ export default function EditProfileScreen() {
     );
   }
 
-  return <EditProfileForm user={user} />;
+  return (
+    <EditProfileForm user={user} onSaved={() => router.replace("/(tabs)/profile")} />
+  );
 }

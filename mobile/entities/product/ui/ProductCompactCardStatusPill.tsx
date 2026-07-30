@@ -17,6 +17,8 @@ const resolveFeaturePillStyles = (
       return { pill: styles.featurePillAuction, text: styles.featurePillTextAuction };
     case "installment":
       return { pill: styles.featurePillInstallment, text: styles.featurePillTextInstallment };
+    case "wholesale":
+      return { pill: styles.featurePillWholesale, text: styles.featurePillTextWholesale };
     case "raffle":
       return { pill: styles.featurePillRaffle, text: styles.featurePillTextRaffle };
     case "hidden":

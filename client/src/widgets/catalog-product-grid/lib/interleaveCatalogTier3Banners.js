@@ -18,6 +18,7 @@ function compareTier3BannerActivationOrder(a, b) {
 
 /**
  * Разносит L3-баннеры: после каждых {@link CATALOG_TIER3_BANNER_ROW_INTERVAL} рядов карточек.
+ * Не вместившиеся в слоты баннеры дописываются в конец (короткая лента не теряет L3).
  *
  * @param {import('../../../entities/product/model/types.js').ProductFromApi[]} products
  * @param {number} columnCount
@@ -73,6 +74,10 @@ export function interleaveCatalogTier3Banners(
       bannerIndex += 1;
       cardsSinceLastBanner = 0;
     }
+  }
+
+  if (bannerIndex < banners.length) {
+    interleaved.push(...banners.slice(bannerIndex));
   }
 
   return interleaved;

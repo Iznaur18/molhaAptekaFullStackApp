@@ -26,6 +26,24 @@ export const parseKeywordsCsv = (raw) =>
     .filter(Boolean);
 
 /**
+ * Одна характеристика на строку (пустые строки игнорируются).
+ * @param {string} raw
+ */
+export const parseCharacteristicKeysLines = (raw) => {
+  const seen = new Set();
+  const keys = [];
+  for (const line of String(raw ?? "").split(/\r?\n/)) {
+    const key = line.trim();
+    if (!key) continue;
+    const keyLower = key.toLowerCase();
+    if (seen.has(keyLower)) continue;
+    seen.add(keyLower);
+    keys.push(key);
+  }
+  return keys;
+};
+
+/**
  * @param {import('../../../entities/product-category-tree/model/adminTypes.js').ProductCategoryAdminRow[]} rows
  */
 export const sortCategoryRows = (rows) =>

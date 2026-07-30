@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 
+import { formatProductWholesaleBadgeLabel } from "@izibuy/shared-lib";
+
 import { isProductRaffleParticipant } from "@/entities/raffle/lib/isProductRaffleParticipant";
 
 import { resolveAuctionUiState } from "./resolveAuctionUiState";
@@ -50,6 +52,8 @@ export const useProductCardChromeFlags = (
     const showDiscountBadge = discountPercent != null && discountPercent > 0;
     const showLoyaltyPointsBadge = shouldShowProductLoyaltyPointsBadge(product);
     const showRaffleBadge = !isModerationQueue && isProductRaffleParticipant(product);
+    const wholesaleBadgeLabel = formatProductWholesaleBadgeLabel(product);
+    const showWholesaleBadge = !isModerationQueue && wholesaleBadgeLabel != null;
     const showRaffleParticipantChrome =
       (highlightRaffleProduct || showRaffleBadge) && !isMineMode && !isModerationQueue;
 
@@ -74,6 +78,8 @@ export const useProductCardChromeFlags = (
       showImageOverlayBadges: !showBannerLayout && (showDiscountBadge || showLoyaltyPointsBadge),
       showAuctionBadge: auctionActive,
       showInstallmentBadge: product.productInstallmentEnabled === true,
+      showWholesaleBadge,
+      wholesaleBadgeLabel,
       showRaffleBadge,
       showRaffleParticipantChrome,
     };

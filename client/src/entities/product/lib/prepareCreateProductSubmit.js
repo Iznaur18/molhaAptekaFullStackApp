@@ -4,6 +4,7 @@ import { IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED } from "../../product-category-
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { isRuRegionCode } from "@molha/api-contract";
 import {
+  PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
   PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
   PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
 } from "@molha/api-contract";
@@ -185,6 +186,12 @@ export function prepareCreateProductSubmit({
   const productPickupLat = hasLat ? Number(pickupLatRaw) : null;
   const productPickupLon = hasLon ? Number(pickupLonRaw) : null;
 
+  const productPickupEnabled = form.productPickupEnabled !== false;
+  const productDeliveryEnabled = form.productDeliveryEnabled === true;
+  if (!productPickupEnabled && !productDeliveryEnabled) {
+    return { ok: false, message: PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE };
+  }
+
   if (form.productReturnEnabled == null) {
     return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_RETURN_CHOICE };
   }
@@ -219,7 +226,8 @@ export function prepareCreateProductSubmit({
       productPickupAddress,
       productPickupLat,
       productPickupLon,
-      productDeliveryEnabled: false,
+      productPickupEnabled,
+      productDeliveryEnabled,
       productReturnEnabled,
       productReturnTerms,
     };
@@ -262,7 +270,8 @@ export function prepareCreateProductSubmit({
       productPickupAddress,
       productPickupLat,
       productPickupLon,
-      productDeliveryEnabled: false,
+      productPickupEnabled,
+      productDeliveryEnabled,
       productReturnEnabled,
       productReturnTerms,
     },

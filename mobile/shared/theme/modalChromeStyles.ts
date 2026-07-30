@@ -19,8 +19,8 @@ export const CREATE_STORY_MODAL_ANIMATION = {
   maxHeightRatio: 0.92,
 } as const;
 
-/** Множитель к `theme.spacing[4]` (16px) между полем подписи и «Опубликовать». */
-export const CREATE_STORY_CAPTION_SUBMIT_GAP_MULTIPLIER = 50;
+/** Зазор между полем подписи и sticky-footer «Опубликовать». */
+export const CREATE_STORY_CAPTION_SUBMIT_GAP_MULTIPLIER = 4.2;
 
 /** minHeight 48 + paddingVertical 28 + footer paddingTop/Bottom 16+32 */
 export const CREATE_STORY_SUBMIT_FOOTER_HEIGHT_PX = 124;
@@ -164,6 +164,8 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
     backgroundColor: MODAL_BACKDROP_SCRIM,
   },
   card: {
+    width: "100%",
+    alignSelf: "stretch",
     backgroundColor: theme.colors.surface,
     borderTopLeftRadius: theme.radius.md,
     borderTopRightRadius: theme.radius.md,
@@ -231,33 +233,8 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
     textAlign: "center",
     paddingHorizontal: theme.spacing[4],
   },
-  pickers: {
-    flexDirection: "row",
-    gap: 10,
-    marginTop: 14,
-    marginBottom: theme.spacing[4],
-  },
-  pickButton: {
-    flex: 1,
-    paddingVertical: theme.spacing[3],
-    borderRadius: 10,
-    backgroundColor: theme.colors.surfaceMuted,
-    alignItems: "center",
-  },
   pickDisabled: {
     opacity: 0.5,
-  },
-  pickText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: theme.colors.text,
-  },
-  videoHint: {
-    marginTop: theme.spacing[2],
-    marginBottom: 0,
-    fontSize: 13,
-    lineHeight: 18,
-    color: theme.colors.textMuted,
   },
   label: {
     marginTop: theme.spacing[2],
@@ -267,13 +244,16 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
   },
   caption: {
     marginTop: theme.spacing[4],
-    minHeight: 64,
+    minHeight: 192,
+    height: 192,
+    maxHeight: 192,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     borderRadius: 10,
     backgroundColor: theme.colors.surfaceMuted,
     padding: theme.spacing[3],
-    fontSize: 15,
+    fontSize: 16,
+    lineHeight: 22,
     color: theme.colors.text,
     textAlignVertical: "top",
   },
@@ -304,26 +284,28 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
 export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
   viewer: {
     flex: 1,
+    overflow: "hidden",
     backgroundColor: theme.colors.nearBlack,
   },
   stage: {
     flex: 1,
+    overflow: "hidden",
     alignItems: "center",
     justifyContent: "center",
   },
   edgePrev: {
     position: "absolute",
     left: 0,
-    top: 0,
-    bottom: 0,
+    top: 64,
+    bottom: 80,
     width: "28%",
     zIndex: 1,
   },
   edgeNext: {
     position: "absolute",
     right: 0,
-    top: 0,
-    bottom: 0,
+    top: 64,
+    bottom: 80,
     width: "28%",
     zIndex: 1,
   },
@@ -340,13 +322,17 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
     position: "absolute",
     top: 12,
     right: 12,
-    zIndex: 3,
+    zIndex: 5,
     width: 40,
     height: 40,
     borderRadius: theme.radius.pill,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: STORY_VIEWER_OVERLAY_SCRIM,
+  },
+  closeButtonViewer: {
+    top: 12,
+    right: 12,
   },
   closeText: {
     color: theme.colors.onContrast,
@@ -358,7 +344,7 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
     top: 12,
     left: 12,
     right: 60,
-    zIndex: 3,
+    zIndex: 4,
   },
   authorButton: {
     flexDirection: "row",
@@ -678,9 +664,7 @@ export const useProductManageToggleRowStyles = createThemedStyles((theme) => ({
     opacity: 0.92,
     backgroundColor: theme.colors.actionBorder,
   },
-  rowDisabled: {
-    opacity: 0.55,
-  },
+  rowDisabled: {},
   rowPending: {
     justifyContent: "center",
     minHeight: 52,

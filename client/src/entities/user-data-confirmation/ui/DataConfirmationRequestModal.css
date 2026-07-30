@@ -7,16 +7,23 @@
   justify-content: center;
   padding: 1rem;
   background: var(--iz-color-overlay);
+  overscroll-behavior: none;
+  touch-action: none;
 }
 
 .data-confirmation-modal {
   width: min(100%, 32rem);
   max-height: min(90vh, 40rem);
+  max-height: min(90svh, 40rem);
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
   padding: 1rem 1.25rem 1.25rem;
   border-radius: 12px;
   background: var(--iz-color-surface);
   box-shadow: 0 12px 40px var(--iz-shadow-dialog-dark);
+  pointer-events: auto;
 }
 
 .data-confirmation-modal__header {
@@ -37,6 +44,8 @@
   background: transparent;
   font-size: 1.25rem;
   cursor: pointer;
+  touch-action: manipulation;
+  pointer-events: auto;
 }
 
 .data-confirmation-modal__intro {
@@ -87,6 +96,7 @@
 .data-confirmation-modal__grid input,
 .data-confirmation-modal__grid textarea {
   font: inherit;
+  font-size: 16px;
   padding: 0.55rem 0.65rem;
   border: 1px solid var(--iz-color-border-strong, var(--iz-color-border));
   border-radius: 8px;
@@ -148,6 +158,8 @@
 }
 
 .data-confirmation-modal__file-btn {
+  position: relative;
+  z-index: 1;
   margin: 0;
   padding: 0.5rem 0.85rem;
   border: 1px solid var(--iz-color-action-soft);
@@ -160,6 +172,9 @@
   line-height: 1.25;
   white-space: nowrap;
   cursor: pointer;
+  touch-action: manipulation;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
   transition:
     background 0.15s ease,
     border-color 0.15s ease;
@@ -210,10 +225,20 @@
 }
 
 .data-confirmation-modal__actions {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
   margin-top: 1rem;
+  touch-action: manipulation;
+  pointer-events: auto;
+}
+
+.data-confirmation-modal__actions .app-btn {
+  touch-action: manipulation;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .data-confirmation-modal__state,
@@ -224,4 +249,10 @@
 
 .data-confirmation-modal__state_error {
   color: var(--iz-color-danger);
+}
+
+@media (max-width: 480px) {
+  .data-confirmation-modal__grid {
+    grid-template-columns: 1fr;
+  }
 }

@@ -8,10 +8,12 @@ import { PRODUCT_MODERATION_STATUSES, productFromApiSchema } from "./productFrom
 import { storedMediaUrlOrEmptySchema, storedMediaUrlSchema } from "./storedMediaUrl.js";
 import {
   assertPickupCoordsPair,
+  PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
   productPickupAddressFieldSchema,
   productPickupLatFieldSchema,
   productPickupLonFieldSchema,
 } from "./productPickup.js";
+import { productWholesalePatchFieldsShape } from "./productWholesale.js";
 
 /** Синхрон с `server/constants/productConstants.js` (legacy slug). */
 export const PRODUCT_CATEGORY_VALUES = [
@@ -230,13 +232,25 @@ export const createProductBodySchema = z
     productPickupAddress: productPickupAddressFieldSchema,
     productPickupLat: productPickupLatFieldSchema.nullable().optional(),
     productPickupLon: productPickupLonFieldSchema.nullable().optional(),
+    productPickupEnabled: z.coerce.boolean().optional(),
     productDeliveryEnabled: z.coerce.boolean().optional(),
   })
   .superRefine(assertCategoryIdOrLegacy)
   .superRefine(assertCreateProductRequiresPhoto)
   .superRefine((body, ctx) => assertOldPricePair(body, ctx, true))
   .superRefine(assertReturnPolicy)
-  .superRefine((body, ctx) => assertPickupCoordsPair(body, ctx));
+  .superRefine((body, ctx) => assertPickupCoordsPair(body, ctx))
+  .superRefine((body, ctx) => {
+    const pickupOn = body.productPickupEnabled !== false;
+    const deliveryOn = body.productDeliveryEnabled === true;
+    if (!pickupOn && !deliveryOn) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["productPickupEnabled"],
+        message: PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
+      });
+    }
+  });
 
 const patchFieldShape = {
   productName: productNameFieldSchema.optional(),
@@ -261,6 +275,7 @@ const patchFieldShape = {
     .max(PRODUCT_STOCK_QUANTITY_MAX)
     .optional(),
   productAuctionEnabled: z.coerce.boolean().optional(),
+  ...productWholesalePatchFieldsShape,
   loyaltyPointsPerUnit: z.coerce.number().int().min(0).optional(),
   productCharacteristics: z
     .array(productCharacteristicSchema)
@@ -277,6 +292,7 @@ const patchFieldShape = {
   productPickupAddress: productPickupAddressFieldSchema.optional(),
   productPickupLat: productPickupLatFieldSchema.nullable().optional(),
   productPickupLon: productPickupLonFieldSchema.nullable().optional(),
+  productPickupEnabled: z.coerce.boolean().optional(),
   productDeliveryEnabled: z.coerce.boolean().optional(),
 };
 

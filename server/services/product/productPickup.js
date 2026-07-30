@@ -1,6 +1,7 @@
 import {
   PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
   PRODUCT_DELIVERY_NOT_AVAILABLE_MESSAGE,
+  PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
   PRODUCT_PICKUP_ADDRESS_MAX_LENGTH,
   PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
   PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
@@ -51,7 +52,6 @@ export const normalizeProductPickupCoords = (latRaw, lonRaw) => {
 };
 
 /**
- * Доставка пока заблокирована флагом — всегда false.
  * @param {unknown} raw
  * @returns {boolean}
  */
@@ -66,6 +66,22 @@ export const resolveProductDeliveryEnabledForWrite = (raw) => {
 };
 
 /**
+ * @param {unknown} raw
+ * @returns {boolean}
+ */
+export const resolveProductPickupEnabledForWrite = (raw) => raw !== false;
+
+/**
+ * @param {boolean} pickupEnabled
+ * @param {boolean} deliveryEnabled
+ */
+export const assertProductFulfillmentMethods = (pickupEnabled, deliveryEnabled) => {
+  if (!pickupEnabled && !deliveryEnabled) {
+    throw new AppError(400, PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE);
+  }
+};
+
+/**
  * @param {Record<string, unknown>} body
  */
 export const resolveCreateProductPickupFields = (body) => {
@@ -75,12 +91,17 @@ export const resolveCreateProductPickupFields = (body) => {
       body?.productPickupLat,
       body?.productPickupLon,
     );
+    const productPickupEnabled = resolveProductPickupEnabledForWrite(
+      body?.productPickupEnabled,
+    );
     const productDeliveryEnabled = resolveProductDeliveryEnabledForWrite(
       body?.productDeliveryEnabled,
     );
+    assertProductFulfillmentMethods(productPickupEnabled, productDeliveryEnabled);
     return {
       productPickupAddress,
       ...coords,
+      productPickupEnabled,
       productDeliveryEnabled,
     };
   } catch (error) {

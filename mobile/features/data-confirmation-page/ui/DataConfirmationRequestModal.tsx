@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Image,
-  KeyboardAvoidingView,
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -204,11 +202,7 @@ export const DataConfirmationRequestModal = ({
           accessibilityRole="button"
           accessibilityLabel={DATA_CONFIRMATION_MODAL_UI.CANCEL}
         />
-        <KeyboardAvoidingView
-          style={styles.keyboardHost}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 24 : 0}
-        >
+        <View style={styles.keyboardHost}>
           <View style={styles.card} {...resolveDialogAccessibilityProps()}>
             <View style={styles.header}>
               <Text style={styles.title}>{DATA_CONFIRMATION_MODAL_UI.TITLE}</Text>
@@ -253,6 +247,7 @@ export const DataConfirmationRequestModal = ({
                 contentContainerStyle={styles.form}
                 keyboardShouldPersistTaps="handled"
                 keyboardDismissMode="on-drag"
+                automaticallyAdjustKeyboardInsets={false}
               >
                 <Text style={styles.intro}>{DATA_CONFIRMATION_MODAL_UI.INTRO}</Text>
 
@@ -402,7 +397,7 @@ export const DataConfirmationRequestModal = ({
               </ScrollView>
             ) : null}
           </View>
-        </KeyboardAvoidingView>
+        </View>
       </View>
     </Modal>
   );

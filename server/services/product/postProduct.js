@@ -27,6 +27,7 @@ import { resolveProductReturnWriteFromBody } from "./normalizeProductReturnTerms
 import { normalizeProductListingOrigin } from "./normalizeProductListingOrigin.js";
 import { normalizeProductIsOriginal } from "./normalizeProductIsOriginal.js";
 import { PRODUCT_PRICE_MARKET_STATUS_DEFAULT } from "../../constants/productPriceMarketStatusConstants.js";
+import { refreshProductPriceMarketStatus } from "./refreshProductPriceMarketStatus.js";
 import { buildProductSearchBlobFromFields } from "./buildProductSearchBlob.js";
 import { resolveProductCategoryWriteFromBody } from "./resolveProductCategoryWrite.js";
 import { resolveActiveSellerPersonalCategoryId } from "../seller-personal-category/sellerPersonalCategoryHelpers.js";
@@ -242,10 +243,18 @@ export async function postProduct({ userId, body }) {
   });
 
   await product.populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT);
-  const productPayload = await attachProductSellerSnapshot(product.toObject());
+  let productPayload = await attachProductSellerSnapshot(product.toObject());
 
   if (productModerationStatus === PRODUCT_MODERATION_APPROVED) {
     await notifyApprovedProductFollowers(productPayload);
+    try {
+      const marketStatus = await refreshProductPriceMarketStatus(String(product._id), {
+        refreshPeers: true,
+      });
+      productPayload = { ...productPayload, productPriceMarketStatus: marketStatus };
+    } catch (error) {
+      console.error("refreshProductPriceMarketStatus after create:", error);
+    }
   }
 
   return {

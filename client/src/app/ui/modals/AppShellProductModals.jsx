@@ -32,9 +32,15 @@ export function AppShellProductModals({
   handleDeleteMyProduct,
   handleSetMyProductAvailability,
   handleSetProductAuction,
+  handleSetProductWholesale,
+  handleWholesaleSaved,
+  handleSetProductInstallment,
+  handleInstallmentProgramSaved,
   deletingProductId,
   togglingAvailabilityProductId,
   togglingAuctionProductId,
+  togglingWholesaleProductId,
+  togglingInstallmentProductId,
   myProductsCatalogError,
   productDetailsAdminError,
   sellerRaffleActive,
@@ -91,6 +97,10 @@ export function AppShellProductModals({
         onSubmit={handleSubmitPromotionRequest}
         onSetProductAvailability={handleSetMyProductAvailability}
         onSetProductAuction={handleSetProductAuction}
+        onSetProductWholesale={handleSetProductWholesale}
+        onSetProductInstallment={handleSetProductInstallment}
+        onWholesaleSaved={handleWholesaleSaved}
+        onInstallmentProgramSaved={handleInstallmentProgramSaved}
         isAvailabilityTogglePending={
           promotionProduct?._id != null &&
           togglingAvailabilityProductId === String(promotionProduct._id)
@@ -98,6 +108,14 @@ export function AppShellProductModals({
         isAuctionTogglePending={
           promotionProduct?._id != null &&
           togglingAuctionProductId === String(promotionProduct._id)
+        }
+        isWholesaleTogglePending={
+          promotionProduct?._id != null &&
+          togglingWholesaleProductId === String(promotionProduct._id)
+        }
+        isInstallmentTogglePending={
+          promotionProduct?._id != null &&
+          togglingInstallmentProductId === String(promotionProduct._id)
         }
         manageErrorMessage={myProductsCatalogError || productDetailsAdminError}
         canManageEdit={

@@ -72,6 +72,9 @@ export {
   normalizeProductCategorySearchKeywords,
 } from "./normalizeProductCategorySearchKeywords.js";
 export {
+  normalizeProductCategoryDefaultCharacteristicKeys,
+} from "./normalizeProductCategoryDefaultCharacteristicKeys.js";
+export {
   cleanupProductCategoryDisplayForDeletedCategory,
   collectCategoryLegacySlugs,
   detachProductsFromCategoryLeaf,
@@ -86,6 +89,18 @@ export {
   toProductCategoryBreadcrumbPayload,
   toProductCategoryPublicPayload,
 } from "./toProductCategoryPublicPayload.js";
+export { findComparableProducts } from "./findComparableProducts.js";
+export {
+  buildCharacteristicPairSet,
+  countMatchingCharacteristicPairs,
+  evaluateProductCompareMatch,
+  sharesProductNameToken,
+  tokenizeProductNameForCompare,
+} from "./productCompareMatch.js";
+export {
+  processProductPriceMarketStatusCronTasks,
+  refreshProductPriceMarketStatus,
+} from "./refreshProductPriceMarketStatus.js";
 export { findCatalogProductById } from "./findCatalogProductById.js";
 export {
   dismissPendingReportsForProduct,

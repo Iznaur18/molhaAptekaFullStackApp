@@ -96,5 +96,9 @@ export const interleaveCatalogTier3Banners = <T extends CatalogTier3Product>(
     }
   }
 
+  if (bannerIndex < banners.length) {
+    interleaved.push(...banners.slice(bannerIndex));
+  }
+
   return interleaved;
 };

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
   PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
   PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
 } from "@molha/api-contract";
@@ -40,6 +41,24 @@ describe("prepareCreateProductSubmit pickup", () => {
     }
   });
 
+  it("rejects when no fulfillment method selected", () => {
+    const result = prepareCreateProductSubmit({
+      form: {
+        ...baseForm,
+        productPickupEnabled: false,
+        productDeliveryEnabled: false,
+      },
+      isEdit: false,
+      showCatalogAvailabilityToggle: true,
+      sellerPointsMaxPerUnit: 100,
+      sellerCatalogCommitted: 0,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.message).toBe(PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE);
+    }
+  });
+
   it("includes pickup fields in createBody", () => {
     const result = prepareCreateProductSubmit({
       form: baseForm,
@@ -55,7 +74,42 @@ describe("prepareCreateProductSubmit pickup", () => {
       );
       expect(result.createBody?.productPickupLat).toBe(55.75);
       expect(result.createBody?.productPickupLon).toBe(37.62);
+      expect(result.createBody?.productPickupEnabled).toBe(true);
       expect(result.createBody?.productDeliveryEnabled).toBe(false);
+    }
+  });
+
+  it("passes productDeliveryEnabled when seller enables delivery", () => {
+    const result = prepareCreateProductSubmit({
+      form: { ...baseForm, productDeliveryEnabled: true },
+      isEdit: false,
+      showCatalogAvailabilityToggle: true,
+      sellerPointsMaxPerUnit: 100,
+      sellerCatalogCommitted: 0,
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.createBody?.productDeliveryEnabled).toBe(true);
+      expect(result.createBody?.productPickupEnabled).toBe(true);
+    }
+  });
+
+  it("allows delivery-only listing", () => {
+    const result = prepareCreateProductSubmit({
+      form: {
+        ...baseForm,
+        productPickupEnabled: false,
+        productDeliveryEnabled: true,
+      },
+      isEdit: true,
+      showCatalogAvailabilityToggle: true,
+      sellerPointsMaxPerUnit: 100,
+      sellerCatalogCommitted: 0,
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.patchBody?.productPickupEnabled).toBe(false);
+      expect(result.patchBody?.productDeliveryEnabled).toBe(true);
     }
   });
 });

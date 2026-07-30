@@ -1,6 +1,7 @@
 import { getProductCardMineStatusBadge } from "./getProductCardMineStatusBadge.js";
 import { resolveAuctionUiState } from "./resolveAuctionUiState.js";
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
+import { formatProductWholesaleBadgeLabel } from "@izibuy/shared-lib";
 
 /**
  * @param {{
@@ -37,6 +38,15 @@ export function buildMyProductCompactCardFeatureBadges({
       key: "installment",
       label: PRODUCT_CARD_UI.INSTALLMENT_BADGE,
       variant: "installment",
+    });
+  }
+
+  const wholesaleLabel = formatProductWholesaleBadgeLabel(product);
+  if (wholesaleLabel) {
+    badges.push({
+      key: "wholesale",
+      label: wholesaleLabel,
+      variant: "wholesale",
     });
   }
 

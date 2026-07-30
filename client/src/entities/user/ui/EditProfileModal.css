@@ -83,6 +83,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  min-width: 0;
+  max-width: 100%;
   font-size: 0.875rem;
 }
 
@@ -99,12 +101,22 @@
 .edit-profile-modal__input {
   box-sizing: border-box;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   padding: 9px var(--iz-control-field-padding-x);
   border: var(--iz-border-hairline) solid var(--iz-color-border);
   border-radius: var(--iz-radius-input);
   background: var(--iz-color-surface-muted);
   color: var(--iz-color-text);
   font-size: var(--iz-font-md);
+}
+
+/* WebKit date: intrinsic min-width иначе вылезает из карточки */
+.edit-profile-modal__input[type="date"] {
+  min-width: 0;
+  max-width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .edit-profile-modal__input:focus {

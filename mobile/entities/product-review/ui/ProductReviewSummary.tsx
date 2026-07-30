@@ -10,7 +10,7 @@ import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 import { useProductDetailTabStyles } from "@/shared/theme/catalogProductStyles";
 
 const STAR_VALUES = [1, 2, 3, 4, 5] as const;
-const SUMMARY_BORDER_RADIUS = 12;
+const SUMMARY_BORDER_RADIUS = 20;
 
 type ProductReviewSummaryProps = {
   averageRating: number;

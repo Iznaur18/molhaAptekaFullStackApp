@@ -54,6 +54,40 @@ describe("CheckoutForm", () => {
     });
   });
 
+  it("disables delivery when cart products do not support it", () => {
+    const { container } = renderWithProviders(<CheckoutForm {...baseProps} />);
+
+    expect(container.querySelector(".checkout-form__soon")?.textContent).toContain(
+      CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_UNAVAILABLE,
+    );
+    expect(
+      screen.getByRole("radio", { name: new RegExp(CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY) }),
+    ).toBeDisabled();
+  });
+
+  it("enables delivery chip when deliveryAvailable", () => {
+    renderWithProviders(<CheckoutForm {...baseProps} deliveryAvailable />);
+
+    expect(
+      screen.getByRole("radio", { name: CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY }),
+    ).not.toBeDisabled();
+  });
+
+  it("switches to delivery chip layout like mobile", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<CheckoutForm {...baseProps} deliveryAvailable />);
+
+    const deliveryChip = screen.getByRole("radio", {
+      name: CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY,
+    });
+    await user.click(deliveryChip);
+
+    expect(deliveryChip).toHaveAttribute("aria-checked", "true");
+    expect(
+      screen.getByRole("radio", { name: CHECKOUT_FORM_UI.FULFILLMENT_PICKUP }),
+    ).toHaveAttribute("aria-checked", "false");
+  });
+
   it("shows submit error and success messages", () => {
     const { rerender } = renderWithProviders(
       <CheckoutForm {...baseProps} submitError="Ошибка оплаты" />,

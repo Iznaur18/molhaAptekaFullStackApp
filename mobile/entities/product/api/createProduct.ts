@@ -85,6 +85,7 @@ export const createProduct = async (body: CreateProductBody) => {
       payload.productPickupLon = parsedBody.productPickupLon;
     }
     payload.productDeliveryEnabled = parsedBody.productDeliveryEnabled === true;
+    payload.productPickupEnabled = parsedBody.productPickupEnabled !== false;
 
     const { data } = await apiClient.post("/product", payload);
     const parsed = parseCreateProductData(data);

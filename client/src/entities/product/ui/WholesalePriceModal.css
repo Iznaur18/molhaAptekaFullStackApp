@@ -1,0 +1,229 @@
+/**
+ * Bottom sheet: scrim fade + panel translateY (enter 280ms / exit 220ms).
+ * Паритет checkout-sheet-modal.
+ */
+.wholesale-price-modal__backdrop {
+  --wholesale-sheet-enter-ms: 280ms;
+  --wholesale-sheet-exit-ms: 220ms;
+  --wholesale-sheet-enter-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --wholesale-sheet-exit-ease: cubic-bezier(0.55, 0.055, 0.675, 1);
+  --wholesale-sheet-radius: var(--iz-radius-lg, 17px);
+
+  position: fixed;
+  inset: 0;
+  /* Не 100dvh: на iOS Safari при клавиатуре остаётся «дыра» с цветом страницы */
+  height: auto;
+  max-height: none;
+  /* Above ProductModalShell (1200); same nesting tier as InstallmentProgramModal */
+  z-index: 1300;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: transparent;
+  /* visible — keyboard-bleed рисуется ниже viewport */
+  overflow: visible;
+  overscroll-behavior: none;
+}
+
+.wholesale-price-modal__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--iz-color-ink) 28%, transparent) 0%,
+    color-mix(in srgb, var(--iz-color-ink) 48%, transparent) 38%,
+    color-mix(in srgb, var(--iz-color-ink) 68%, transparent) 68%,
+    color-mix(in srgb, var(--iz-color-ink) 82%, transparent) 100%
+  );
+  opacity: 0;
+  transition: opacity var(--wholesale-sheet-exit-ms) var(--wholesale-sheet-exit-ease);
+}
+
+.wholesale-price-modal__backdrop--open .wholesale-price-modal__scrim {
+  opacity: 1;
+  transition: opacity var(--wholesale-sheet-enter-ms) var(--wholesale-sheet-enter-ease);
+}
+
+.wholesale-price-modal__dismiss {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Белая заливка под sheet — зона над клавиатурой iOS (иначе синий фон страницы) */
+.wholesale-price-modal__keyboard-bleed {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 100vh;
+  background: #fff;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wholesale-price-modal__panel {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 30rem;
+  max-height: min(92dvh, 100%);
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--wholesale-sheet-radius) var(--wholesale-sheet-radius) 0 0;
+  background: #fff;
+  box-shadow: 0 -12px 40px color-mix(in srgb, var(--iz-color-ink) 18%, transparent);
+  overflow: hidden;
+  isolation: isolate;
+  transform: translate3d(0, 100%, 0);
+  transition: transform var(--wholesale-sheet-exit-ms) var(--wholesale-sheet-exit-ease);
+  will-change: transform;
+}
+
+.wholesale-price-modal__backdrop--open .wholesale-price-modal__panel {
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--wholesale-sheet-enter-ms) var(--wholesale-sheet-enter-ease);
+}
+
+.wholesale-price-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  padding: var(--iz-space-4) var(--iz-space-4) var(--iz-space-3);
+  border-bottom: 1px solid var(--iz-color-border);
+}
+
+.wholesale-price-modal__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--iz-color-text);
+}
+
+.wholesale-price-modal__close {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.25rem 0.15rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--iz-color-link, var(--iz-color-action));
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.wholesale-price-modal__close:hover {
+  text-decoration: underline;
+}
+
+.wholesale-price-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: .85rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--iz-space-4);
+}
+
+.wholesale-price-modal__hint,
+.wholesale-price-modal__retail {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--iz-color-text-muted);
+}
+
+.wholesale-price-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.wholesale-price-modal__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--iz-color-ink, var(--iz-color-text));
+}
+
+.wholesale-price-modal__input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: var(--iz-radius-control, 10px);
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-ink, var(--iz-color-text));
+  font-size: 1rem;
+}
+
+.wholesale-price-modal__input:focus {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 1px;
+}
+
+.wholesale-price-modal__error {
+  margin: 0;
+  color: var(--iz-color-danger-text, #b42318);
+  font-size: 0.9rem;
+}
+
+.wholesale-price-modal__footer {
+  flex-shrink: 0;
+  padding: var(--iz-space-3) var(--iz-space-4)
+    max(var(--iz-space-4), env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--iz-color-border);
+  background: #fff;
+}
+
+.wholesale-price-modal__save {
+  width: 100%;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: 0.7rem 1rem;
+  border: none;
+  border-radius: var(--iz-radius-control, 10px);
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast, #fff);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.wholesale-price-modal__save:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wholesale-price-modal__scrim,
+  .wholesale-price-modal__panel {
+    transition: none;
+  }
+
+  .wholesale-price-modal__panel {
+    transform: none;
+  }
+
+  .wholesale-price-modal__scrim {
+    opacity: 1;
+  }
+}

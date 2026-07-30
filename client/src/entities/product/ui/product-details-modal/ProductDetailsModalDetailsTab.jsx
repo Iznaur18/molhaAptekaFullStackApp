@@ -11,6 +11,7 @@ import { ProductDetailsInstallmentTeaser } from "./ProductDetailsInstallmentTeas
 import { ProductDetailsModalPurchaseActions } from "./ProductDetailsModalPurchaseActions.jsx";
 import { ProductDetailsSaleTeaser } from "./ProductDetailsSaleTeaser.jsx";
 import { ProductDetailsSellerProductsCarousel } from "./ProductDetailsSellerProductsCarousel.jsx";
+import { ProductDetailsWholesaleOffer } from "./ProductDetailsWholesaleOffer.jsx";
 import { renderProductDetailsFieldRows } from "./renderProductDetailsFieldRows.jsx";
 
 /**
@@ -77,6 +78,12 @@ export function ProductDetailsModalDetailsTab({
         showDiscountBadge
         showLoyaltyBadge
         isAuthorized={isAuthorized}
+      />
+      <ProductDetailsWholesaleOffer
+        product={product}
+        isAuthorized={isAuthorized}
+        onRequestLogin={onRequestLogin}
+        canShowAddToCart={canShowAddToCart}
       />
       <h3 id={productTitleId} className="product-details-modal__product-name">
         {product.productName?.trim() || "Товар"}

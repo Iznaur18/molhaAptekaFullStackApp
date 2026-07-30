@@ -1,11 +1,11 @@
-/** @typedef {'basic' | 'originality' | 'media' | 'category' | 'pickup' | 'commerce' | 'returns' | 'review'} CreateProductWizardStepId */
+/** @typedef {'category' | 'basic' | 'originality' | 'media' | 'pickup' | 'commerce' | 'returns' | 'review'} CreateProductWizardStepId */
 
 /** @type {readonly CreateProductWizardStepId[]} */
 export const CREATE_PRODUCT_WIZARD_STEP_IDS = [
+  "category",
   "basic",
   "originality",
   "media",
-  "category",
   "pickup",
   "commerce",
   "returns",

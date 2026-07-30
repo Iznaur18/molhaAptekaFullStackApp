@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 import { PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO } from "@izibuy/design-tokens";
 
@@ -1206,9 +1206,10 @@ export const useProductDetailsSellerPreviewStyles = createThemedStyles((theme) =
     padding: 14,
     borderWidth: 1,
     borderColor: `${theme.colors.ink}12`,
-    borderRadius: 16,
+    borderRadius: 24,
     backgroundColor: theme.colors.surfaceElevated,
     gap: 12,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   rootPressed: {
     borderColor: `${theme.colors.action}59`,
@@ -1449,7 +1450,8 @@ export const useProductMediaGalleryStyles = createThemedStyles((theme) => ({
     position: "absolute",
     top: 10.4,
     left: 10.4,
-    zIndex: 4,
+    zIndex: 5,
+    elevation: 5,
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -1460,17 +1462,23 @@ export const useProductMediaGalleryStyles = createThemedStyles((theme) => ({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.14,
     shadowRadius: 4,
-    elevation: 2,
   },
   detailOverlay: {
     ...StyleSheet.absoluteFillObject,
-    zIndex: 3,
+    zIndex: 4,
+    elevation: 4,
     pointerEvents: "box-none",
+  },
+  detailPager: {
+    zIndex: 0,
+    elevation: 0,
   },
   detailReportSlot: {
     position: "absolute",
     left: 10.4,
     bottom: 10.4,
+    zIndex: 5,
+    elevation: 5,
   },
   detailReportButton: {
     width: 40,
@@ -1483,7 +1491,7 @@ export const useProductMediaGalleryStyles = createThemedStyles((theme) => ({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.14,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 6,
   },
   detailReportButtonDisabled: {
     opacity: 0.55,
@@ -1519,7 +1527,8 @@ export const useProductMediaGalleryStyles = createThemedStyles((theme) => ({
     position: "absolute",
     right: 7.2,
     bottom: 5.6,
-    zIndex: 2,
+    zIndex: 3,
+    elevation: 3,
     paddingHorizontal: 6.4,
     paddingVertical: 2.4,
     borderRadius: 6,
@@ -1630,10 +1639,11 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
     gap: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    borderRadius: DBRC.borderRadius,
+    borderRadius: 20,
     backgroundColor: theme.colors.surfaceMuted,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   detailSellerExtras: {
     gap: PRODUCT_DETAILS_GAP,
@@ -1692,10 +1702,11 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
     flexShrink: 0,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: 8,
+    borderRadius: 14,
     backgroundColor: theme.colors.action,
     alignItems: "center",
     justifyContent: "center",
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   installmentTeaserGoText: {
     fontSize: 13,
@@ -1745,7 +1756,8 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.14,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 6,
+    zIndex: 5,
   },
   detailReportButtonDisabled: {
     opacity: 0.55,
@@ -1754,6 +1766,8 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
     position: "absolute",
     top: 10.4,
     right: 10.4,
+    zIndex: 5,
+    elevation: 5,
     flexDirection: "row",
     gap: 8,
   },
@@ -2171,11 +2185,12 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
   item: {
     paddingVertical: 12,
     paddingHorizontal: 14,
-    borderRadius: theme.radius.button,
+    borderRadius: 20,
     backgroundColor: theme.colors.surfaceMuted,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     gap: theme.spacing[1],
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   itemTitle: {
     fontSize: 14,
@@ -2292,7 +2307,7 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
   planCard: {
     borderWidth: 1,
     borderColor: theme.colors.border,
-    borderRadius: theme.radius.button,
+    borderRadius: 20,
     paddingVertical: 12,
     paddingHorizontal: 14,
     backgroundColor: theme.colors.surfaceMuted,
@@ -2304,6 +2319,7 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   planCardSelected: {
     borderColor: theme.colors.action,
@@ -2435,12 +2451,13 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 20,
     shadowColor: theme.colors.text,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 3,
     elevation: 1,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   summaryCardContent: {
     flexDirection: "row",
@@ -2498,11 +2515,12 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
     borderWidth: 1,
     borderStyle: "dashed",
     borderColor: theme.colors.border,
-    borderRadius: theme.radius.input,
+    borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 10,
     backgroundColor: theme.colors.surfaceMuted,
     gap: 2,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   totalBoxLabel: {
     fontSize: 12,

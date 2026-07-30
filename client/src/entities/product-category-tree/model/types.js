@@ -10,6 +10,7 @@
  * @property {boolean} isLeaf
  * @property {string | null} [legacyProductCategory]
  * @property {string[]} searchKeywords
+ * @property {string[]} [defaultCharacteristicKeys]
  */
 
 /**

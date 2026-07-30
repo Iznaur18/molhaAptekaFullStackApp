@@ -8,6 +8,16 @@ export const ORDER_PAYMENT_METHODS = [
 
 export type OrderPaymentMethod = (typeof ORDER_PAYMENT_METHODS)[number];
 
+/**
+ * Реально доступные покупателю. `cardPrepaid` заблокирован до эквайринга.
+ */
+export const ORDER_PAYMENT_METHODS_SELECTABLE: readonly OrderPaymentMethod[] = [
+  ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
+];
+
+export const ORDER_PAYMENT_METHOD_DEFAULT: OrderPaymentMethod =
+  ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY;
+
 export const ORDER_PAYMENT_METHOD_LABEL_RU: Record<OrderPaymentMethod, string> = {
   [ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY]: "Наличными при получении",
   [ORDER_PAYMENT_METHOD_CARD_PREPAID]: "Картой заранее",
@@ -37,8 +47,8 @@ export const ORDER_STATUS_LABEL_RU: Record<OrderStatus, string> = {
   [ORDER_STATUS_CANCELLED]: "Отменён",
 };
 
-/** Лейблы статусов в «Мои продажи» (seller): shipped → «Принять». */
+/** Лейблы статусов в «Мои продажи» (seller): shipped → «Принят». */
 export const SALES_ORDER_STATUS_LABEL_RU: Record<OrderStatus, string> = {
   ...ORDER_STATUS_LABEL_RU,
-  [ORDER_STATUS_SHIPPED]: "Принять",
+  [ORDER_STATUS_SHIPPED]: "Принят",
 };

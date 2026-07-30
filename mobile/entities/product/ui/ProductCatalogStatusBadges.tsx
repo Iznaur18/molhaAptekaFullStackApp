@@ -23,6 +23,7 @@ type ProductCatalogStatusBadgesProps = {
   scrollable?: boolean;
   showAuctionBadge?: boolean;
   showInstallmentBadge?: boolean;
+  showWholesaleBadge?: boolean;
 };
 
 type StatusBadgeItem = {
@@ -41,6 +42,7 @@ export const ProductCatalogStatusBadges = ({
   scrollable = true,
   showAuctionBadge = true,
   showInstallmentBadge = true,
+  showWholesaleBadge = true,
 }: ProductCatalogStatusBadgesProps) => {
   const flags = useProductCardChromeFlags(product, { isMineMode });
   const productStatusBadgeVariantStyles = useProductStatusBadgeVariantStyles(size);
@@ -85,6 +87,13 @@ export const ProductCatalogStatusBadges = ({
         key: "installment",
         label: PRODUCT_CARD_UI.INSTALLMENT_BADGE,
         variant: "installment",
+      });
+    }
+    if (showWholesaleBadge && flags.showWholesaleBadge && flags.wholesaleBadgeLabel) {
+      badges.push({
+        key: "wholesale",
+        label: flags.wholesaleBadgeLabel,
+        variant: "wholesale",
       });
     }
     if (flags.showPromotionBoostBadge) {

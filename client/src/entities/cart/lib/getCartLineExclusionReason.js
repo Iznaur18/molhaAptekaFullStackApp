@@ -22,9 +22,12 @@ export function getCartLineExclusionReason(line, currentUserId) {
     return "own_product";
   }
 
-  const pickup = String(line.product?.productPickupAddress ?? "").trim();
-  if (!pickup) {
-    return "missing_pickup";
+  const pickupOn = line.product?.productPickupEnabled !== false;
+  if (pickupOn) {
+    const pickup = String(line.product?.productPickupAddress ?? "").trim();
+    if (!pickup) {
+      return "missing_pickup";
+    }
   }
 
   return null;

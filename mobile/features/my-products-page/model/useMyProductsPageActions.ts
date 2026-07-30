@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 
+import { setProductInstallmentEnabled } from "@/entities/installment/lib/setProductInstallmentEnabled";
 import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
 import { useRequestProductPromotionMutation } from "@/entities/product/model/useRequestProductPromotionMutation";
 import { useProductPromotionManageSupport } from "@/features/product-promotion/model/useProductPromotionManageSupport";
@@ -29,6 +30,12 @@ export const useMyProductsPageActions = () => {
     null,
   );
   const [togglingAuctionProductId, setTogglingAuctionProductId] = useState<string | null>(null);
+  const [togglingWholesaleProductId, setTogglingWholesaleProductId] = useState<string | null>(
+    null,
+  );
+  const [togglingInstallmentProductId, setTogglingInstallmentProductId] = useState<string | null>(
+    null,
+  );
 
   const syncPromotionProduct = useCallback((updated: MyProductsCatalogProduct) => {
     setPromotionProduct((prev) =>
@@ -155,6 +162,75 @@ export const useMyProductsPageActions = () => {
     [patchMutation, syncPromotionProduct],
   );
 
+  const handleSetProductWholesale = useCallback(
+    async (productId: string, wholesaleEnabled: boolean) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return;
+      }
+
+      setTogglingWholesaleProductId(normalizedProductId);
+      setManageErrorMessage("");
+      try {
+        const updated = await patchMutation.mutateAsync({
+          productId: normalizedProductId,
+          body: { productWholesaleEnabled: wholesaleEnabled },
+        });
+        syncPromotionProduct(updated as MyProductsCatalogProduct);
+      } catch (error) {
+        setManageErrorMessage(
+          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+      } finally {
+        setTogglingWholesaleProductId(null);
+      }
+    },
+    [patchMutation, syncPromotionProduct],
+  );
+
+  const handleWholesaleSaved = useCallback(
+    (updated: MyProductsCatalogProduct) => {
+      syncPromotionProduct(updated);
+    },
+    [syncPromotionProduct],
+  );
+
+  const handleSetProductInstallment = useCallback(
+    async (productId: string, installmentEnabled: boolean) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return undefined;
+      }
+
+      setTogglingInstallmentProductId(normalizedProductId);
+      setManageErrorMessage("");
+      try {
+        const result = await setProductInstallmentEnabled(
+          normalizedProductId,
+          installmentEnabled,
+        );
+        if (result.needsSetup) {
+          return { needsSetup: true };
+        }
+        const nextEnabled = result.productInstallmentEnabled === true;
+        syncPromotionProduct({
+          _id: normalizedProductId,
+          productInstallmentEnabled: nextEnabled,
+        } as MyProductsCatalogProduct);
+        await queryClient.invalidateQueries({ queryKey: myProductsQueryKeys.all });
+        return { productInstallmentEnabled: nextEnabled };
+      } catch (error) {
+        setManageErrorMessage(
+          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+        return undefined;
+      } finally {
+        setTogglingInstallmentProductId(null);
+      }
+    },
+    [queryClient, syncPromotionProduct],
+  );
+
   const handleInstallmentProgramSaved = useCallback(
     async (productPatch?: Record<string, unknown>) => {
       manageSupport.handleInstallmentProgramSaved(productPatch);
@@ -198,6 +274,10 @@ export const useMyProductsPageActions = () => {
       promotionProductId != null && togglingAvailabilityProductId === promotionProductId,
     isAuctionTogglePending:
       promotionProductId != null && togglingAuctionProductId === promotionProductId,
+    isWholesaleTogglePending:
+      promotionProductId != null && togglingWholesaleProductId === promotionProductId,
+    isInstallmentTogglePending:
+      promotionProductId != null && togglingInstallmentProductId === promotionProductId,
     isDeletePending: deleteMutation.isPending,
     handleEditProduct,
     handlePromoteProduct,
@@ -205,6 +285,9 @@ export const useMyProductsPageActions = () => {
     handleSubmitPromotion,
     handleSetMyProductAvailability,
     handleSetProductAuction,
+    handleSetProductWholesale,
+    handleSetProductInstallment,
+    handleWholesaleSaved,
     handleDeleteProduct,
     sellerRaffleActive: manageSupport.sellerRaffleActive,
     handleToggleRaffleParticipation: manageSupport.handleToggleRaffleParticipation,

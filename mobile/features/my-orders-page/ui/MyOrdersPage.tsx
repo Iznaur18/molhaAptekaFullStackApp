@@ -267,6 +267,13 @@ export const MyOrdersPage = () => {
     [router],
   );
 
+  const handleSellerNameClick = useCallback(
+    (userId: string) => {
+      router.push({ pathname: "/user/[id]", params: { id: userId } });
+    },
+    [router],
+  );
+
   const emptyMessage =
     totalAll === 0
       ? MY_ORDERS_PAGE_UI.EMPTY
@@ -377,6 +384,8 @@ export const MyOrdersPage = () => {
               collapsible
               expanded={expandedIds.has(orderId)}
               onExpandedChange={() => toggleExpanded(orderId)}
+              showSeller
+              onSellerNameClick={handleSellerNameClick}
               onProductClick={handleProductClick}
               onConfirmDelivered={handleConfirmDelivered}
               onCancelItem={handleCancelItem}

@@ -17,6 +17,7 @@ import { UserProfileProductsList } from "@/entities/user/ui/UserProfileProductsL
 import { ProductDetailsAuctionTeaser } from "@/features/product-detail/ui/ProductDetailsAuctionTeaser";
 import { ProductDetailsInstallmentTeaser } from "@/features/product-detail/ui/ProductDetailsInstallmentTeaser";
 import { ProductDetailsSaleTeaser } from "@/features/product-detail/ui/ProductDetailsSaleTeaser";
+import { ProductDetailsWholesaleOffer } from "@/features/product-detail/ui/ProductDetailsWholesaleOffer";
 import { ProductPickupDetailsPanel } from "@/features/product-detail/ui/ProductPickupDetailsPanel";
 import { PRODUCT_DETAILS_MODAL_UI, SELLER_PRODUCTS_PAGE_UI } from "@/shared/config";
 import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
@@ -30,6 +31,7 @@ type ProductDetailsDetailsTabProps = {
   onOpenInstallmentTab?: () => void;
   onOpenAuctionTab?: () => void;
   auctionActive?: boolean;
+  canShowAddToCart?: boolean;
 };
 
 export const ProductDetailsDetailsTab = ({
@@ -38,6 +40,7 @@ export const ProductDetailsDetailsTab = ({
   onOpenInstallmentTab,
   onOpenAuctionTab,
   auctionActive = false,
+  canShowAddToCart = true,
 }: ProductDetailsDetailsTabProps) => {
   const styles = useProductDetailScreenStyles();
   const name = String(product.productName ?? "").trim() || "Товар";
@@ -89,6 +92,10 @@ export const ProductDetailsDetailsTab = ({
       <View style={styles.spec}>
         <View style={styles.priceBlock}>
           <ProductPriceDisplay product={product} showLabel={false} variant="detail" />
+          <ProductDetailsWholesaleOffer
+            product={product}
+            canShowAddToCart={canShowAddToCart}
+          />
           <Text style={styles.productName}>{name}</Text>
           <ProductDetailsBadgeStack product={product} />
           {(sellerId ||

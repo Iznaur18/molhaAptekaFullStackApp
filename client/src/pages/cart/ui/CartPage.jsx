@@ -1,8 +1,15 @@
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import {
+  CART_FULFILLMENT_SECTION_DELIVERY,
+  CART_FULFILLMENT_SECTION_PICKUP,
+  doProductsSupportPickup,
+  doProductsSupportSellerDelivery,
+} from "@molha/api-contract";
 
 import { getCartLineExclusionReason } from "../../../entities/cart/lib/getCartLineExclusionReason.js";
+import { groupCartLinesByFulfillment } from "../../../entities/cart/lib/groupCartLinesByFulfillment.js";
 import { selectCartCheckoutSummary } from "../../../entities/cart/lib/selectCartCheckoutSummary.js";
 import { selectCartLines } from "../../../entities/cart/lib/selectCartLines.js";
 import { useCart } from "../../../entities/cart/model/useCart.js";
@@ -19,11 +26,9 @@ import {
   CART_PAGE_UI,
   CHECKOUT_FORM_UI,
 } from "../../../shared/config/appUiCopy.js";
-import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 
 import { CartAuctionSection } from "./CartAuctionSection.jsx";
-import { CartLineItem } from "./CartLineItem.jsx";
-import { CartSelectAllRow } from "./CartSelectAllRow.jsx";
+import { CartFulfillmentSection } from "./CartFulfillmentSection.jsx";
 
 import "./CartPage.css";
 
@@ -74,7 +79,10 @@ export function CartPage({
     };
   }, [isAuthorized, user]);
 
-  const [checkoutSheetOpen, setCheckoutSheetOpen] = useState(false);
+  /** @type {"pickup" | "delivery" | null} */
+  const [checkoutSection, setCheckoutSection] = useState(
+    /** @type {"pickup" | "delivery" | null} */ (null),
+  );
   const [auctionCheckoutBid, setAuctionCheckoutBid] = useState(
     /** @type {import('../../../entities/product-price-offer/model/types.js').PriceOfferBuyerBidRow | null} */ (
       null
@@ -106,28 +114,53 @@ export function CartPage({
     [lines, currentUserId],
   );
 
+  const { pickupLines, deliveryLines } = useMemo(
+    () => groupCartLinesByFulfillment(visibleLines),
+    [visibleLines],
+  );
+
   const purchasableIds = useMemo(
     () => visibleLines.map((line) => line.productId),
     [visibleLines],
+  );
+  const pickupIds = useMemo(
+    () => pickupLines.map((line) => line.productId),
+    [pickupLines],
+  );
+  const deliveryIds = useMemo(
+    () => deliveryLines.map((line) => line.productId),
+    [deliveryLines],
   );
 
   const {
     deselectedIds,
     isLineSelected,
     toggleLine,
-    toggleAll,
-    areAllSelected,
-    selectedCount,
+    toggleAllIn,
+    areAllSelectedIn,
+    selectedCountIn,
   } = useCartSelection(purchasableIds);
 
-  const checkoutSummary = useMemo(
-    () => selectCartCheckoutSummary(lines, currentUserId, deselectedIds),
-    [lines, currentUserId, deselectedIds],
+  const pickupSummary = useMemo(
+    () => selectCartCheckoutSummary(pickupLines, currentUserId, deselectedIds),
+    [pickupLines, currentUserId, deselectedIds],
+  );
+  const deliverySummary = useMemo(
+    () =>
+      selectCartCheckoutSummary(deliveryLines, currentUserId, deselectedIds),
+    [deliveryLines, currentUserId, deselectedIds],
   );
 
-  const canCheckout = checkoutSummary.selectedLines.length > 0;
+  const activeSummary =
+    checkoutSection === CART_FULFILLMENT_SECTION_DELIVERY
+      ? deliverySummary
+      : pickupSummary;
+
+  const canCheckoutActive = activeSummary.selectedLines.length > 0;
   const isCartEmpty = lines.length === 0 && auctionBids.length === 0;
-  const isCheckoutSheetOpen = checkoutSheetOpen || auctionCheckoutBid != null;
+  const isCheckoutSheetOpen =
+    checkoutSection != null || auctionCheckoutBid != null;
+
   const pickupAddressSummary = useMemo(() => {
     if (auctionCheckoutBid) {
       const product = (productsQuery.data ?? []).find(
@@ -136,27 +169,54 @@ export function CartPage({
       return String(product?.productPickupAddress ?? "").trim();
     }
     const addresses = [];
-    for (const line of checkoutSummary.selectedLines) {
+    for (const line of activeSummary.selectedLines) {
       const address = String(line.product?.productPickupAddress ?? "").trim();
       if (address && !addresses.includes(address)) {
         addresses.push(address);
       }
     }
     return addresses.join("; ");
-  }, [auctionCheckoutBid, checkoutSummary.selectedLines, productsQuery.data]);
-  const totalLabel = checkoutSummary.hasPartialSelection
-    ? CART_PAGE_UI.PURCHASABLE_TOTAL_LABEL
-    : CART_PAGE_UI.TOTAL_LABEL;
+  }, [auctionCheckoutBid, activeSummary.selectedLines, productsQuery.data]);
+
+  const deliveryAvailable = useMemo(() => {
+    if (auctionCheckoutBid) {
+      const product = (productsQuery.data ?? []).find(
+        (item) => String(item._id) === String(auctionCheckoutBid.productId),
+      );
+      return doProductsSupportSellerDelivery([product]);
+    }
+    return doProductsSupportSellerDelivery(
+      activeSummary.selectedLines.map((line) => line.product),
+    );
+  }, [auctionCheckoutBid, activeSummary.selectedLines, productsQuery.data]);
+
+  const pickupAvailable = useMemo(() => {
+    if (auctionCheckoutBid) {
+      const product = (productsQuery.data ?? []).find(
+        (item) => String(item._id) === String(auctionCheckoutBid.productId),
+      );
+      return doProductsSupportPickup([product]);
+    }
+    return doProductsSupportPickup(
+      activeSummary.selectedLines.map((line) => line.product),
+    );
+  }, [auctionCheckoutBid, activeSummary.selectedLines, productsQuery.data]);
 
   const closeCheckoutSheet = () => {
-    setCheckoutSheetOpen(false);
+    setCheckoutSection(null);
     setAuctionCheckoutBid(null);
     setSubmitState({ isSubmitting: false, error: "", success: "" });
   };
 
+  const openSectionCheckout = (section) => {
+    setAuctionCheckoutBid(null);
+    setSubmitState({ isSubmitting: false, error: "", success: "" });
+    setCheckoutSection(section);
+  };
+
   const handleOpenAuctionCheckout = (bid) => {
     setSubmitState({ isSubmitting: false, error: "", success: "" });
-    setCheckoutSheetOpen(false);
+    setCheckoutSection(null);
     setAuctionCheckoutBid(bid);
   };
 
@@ -197,12 +257,12 @@ export function CartPage({
       return;
     }
 
-    const orderedProductIds = checkoutSummary.selectedLines.map(
+    const orderedProductIds = activeSummary.selectedLines.map(
       (line) => line.productId,
     );
     try {
       await createOrderMutation.mutateAsync({
-        items: checkoutSummary.selectedLines.map((line) => ({
+        items: activeSummary.selectedLines.map((line) => ({
           productId: line.productId,
           quantity: line.quantity,
         })),
@@ -212,7 +272,7 @@ export function CartPage({
         paymentMethod,
       });
       removeItems(orderedProductIds);
-      setCheckoutSheetOpen(false);
+      setCheckoutSection(null);
       setSubmitState({
         isSubmitting: false,
         error: "",
@@ -287,98 +347,57 @@ export function CartPage({
   }
 
   return (
-    <div className="cart-page">
+    <div className="cart-page cart-page--sections">
       <div className="cart-page__content">
         <CartAuctionSection
           bids={auctionBids}
           onCheckout={handleOpenAuctionCheckout}
         />
 
-        {visibleLines.length > 0 ? (
-          <>
-            <CartSelectAllRow
-              selectedCount={selectedCount}
-              totalCount={purchasableIds.length}
-              areAllSelected={areAllSelected}
-              onToggleAll={toggleAll}
-            />
-            <ul className="cart-page__list" role="list">
-              {visibleLines.map((line) => (
-                <li
-                  key={line.productId}
-                  className="cart-page__item"
-                  role="listitem"
-                >
-                  <CartLineItem
-                    line={line}
-                    selected={isLineSelected(line.productId)}
-                    onToggleSelected={toggleLine}
-                    onProductClick={handleProductClick}
-                  />
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : null}
+        <CartFulfillmentSection
+          title={CART_PAGE_UI.SECTION_PICKUP}
+          lines={pickupLines}
+          selectedCount={selectedCountIn(pickupIds)}
+          areAllSelected={areAllSelectedIn(pickupIds)}
+          onToggleAll={() => toggleAllIn(pickupIds)}
+          isLineSelected={isLineSelected}
+          onToggleSelected={toggleLine}
+          onProductClick={handleProductClick}
+          summary={pickupSummary}
+          canCheckout={pickupSummary.selectedLines.length > 0}
+          onCheckout={() =>
+            openSectionCheckout(CART_FULFILLMENT_SECTION_PICKUP)
+          }
+        />
+
+        <CartFulfillmentSection
+          title={CART_PAGE_UI.SECTION_DELIVERY}
+          lines={deliveryLines}
+          selectedCount={selectedCountIn(deliveryIds)}
+          areAllSelected={areAllSelectedIn(deliveryIds)}
+          onToggleAll={() => toggleAllIn(deliveryIds)}
+          isLineSelected={isLineSelected}
+          onToggleSelected={toggleLine}
+          onProductClick={handleProductClick}
+          summary={deliverySummary}
+          canCheckout={deliverySummary.selectedLines.length > 0}
+          onCheckout={() =>
+            openSectionCheckout(CART_FULFILLMENT_SECTION_DELIVERY)
+          }
+        />
       </div>
-
-      {visibleLines.length > 0 ? (
-        <div className="cart-page__dock">
-          <div className="cart-page__dock-top">
-            <div className="cart-page__dock-total">
-              <span className="cart-page__total-label">{totalLabel}</span>
-              <span className="cart-page__total-value">
-                {formatPriceRub(checkoutSummary.selectedTotal)}
-              </span>
-              {checkoutSummary.hasPartialSelection ? (
-                <span className="cart-page__full-total-hint">
-                  {formatPriceRub(checkoutSummary.fullTotal)}
-                </span>
-              ) : null}
-            </div>
-            <button
-              type="button"
-              className="cart-page__clear-button"
-              onClick={clearCart}
-            >
-              {CART_PAGE_UI.CLEAR_ALL}
-            </button>
-          </div>
-
-          {!canCheckout && checkoutSummary.checkoutBlockReason ? (
-            <p className="cart-page__checkout-hint">
-              {checkoutSummary.checkoutBlockReason}
-            </p>
-          ) : null}
-
-          <button
-            type="button"
-            className="cart-page__checkout-cta"
-            disabled={!canCheckout}
-            onClick={() => {
-              setAuctionCheckoutBid(null);
-              setSubmitState({
-                isSubmitting: false,
-                error: "",
-                success: "",
-              });
-              setCheckoutSheetOpen(true);
-            }}
-          >
-            {CART_PAGE_UI.CHECKOUT_OPEN}
-          </button>
-        </div>
-      ) : null}
 
       <CheckoutSheetModal
         isOpen={isCheckoutSheetOpen}
         onClose={closeCheckoutSheet}
         defaultDeliveryAddress={defaultAddress}
         pickupAddressSummary={pickupAddressSummary}
+        deliveryAvailable={deliveryAvailable}
+        pickupAvailable={pickupAvailable}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}
         submitSuccess={submitState.success}
-        isDisabled={auctionCheckoutBid == null && !canCheckout}
+        isDisabled={auctionCheckoutBid == null && !canCheckoutActive}
         onSubmit={handleCheckoutSubmit}
       />
     </div>

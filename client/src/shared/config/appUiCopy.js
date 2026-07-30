@@ -3,6 +3,7 @@
  * Не хранит динамические ответы сервера — только дефолты и шаблоны.
  */
 
+import { pluralizeRu } from "../lib/pluralizeRu.js";
 import { pluralizeRuBall } from "../lib/pluralizeRuBall.js";
 
 /** Общие символы и подписи */
@@ -261,6 +262,16 @@ export const PRODUCT_SIMILAR_UI = {
   LOADING: "Загрузка похожих товаров…",
   EMPTY: "Нет похожих товаров в этой категории.",
   FETCH_FALLBACK: "Не удалось загрузить похожие товары",
+};
+
+export const PRODUCT_COMPARE_UI = {
+  TAB: "Сравнение",
+  TITLE: "Сравнение",
+  SECTION_ARIA: "Сравнение с похожими товарами",
+  LOADING: "Подбираем товары для сравнения…",
+  EMPTY: "Нет данных для сравнения",
+  FETCH_FALLBACK: "Не удалось загрузить сравнение",
+  RETRY: "Повторить",
 };
 
 export const PRODUCT_SALE_UI = {
@@ -577,8 +588,19 @@ export const CART_PAGE_UI = {
   EMPTY: "Корзина пуста.",
   LOADING: "Загрузка корзины…",
   TOTAL_LABEL: "Итого",
+  PAYABLE_LABEL: "К оплате",
+  PRICE_LABEL: "Цена",
+  DISCOUNT_LABEL: "Скидка",
+  WHOLESALE_DISCOUNT_LABEL: "Оптовая скидка",
+  WHOLESALE_LINE_BADGE: "Опт",
+  /** @param {string} formatted */
+  DISCOUNT_AMOUNT: (formatted) => `−${formatted}`,
   PURCHASABLE_TOTAL_LABEL: "К оформлению",
   FULL_TOTAL_HINT: "Итого в корзине",
+  ITEMS_UNIT_FORMS: ["товар", "товара", "товаров"],
+  /** @param {number} count */
+  ITEMS_COUNT: (count) =>
+    `${count} ${pluralizeRu(count, CART_PAGE_UI.ITEMS_UNIT_FORMS)}`,
   REMOVE_LINE_ARIA: "Удалить из корзины",
   SELECT_LINE_ARIA: "Выбрать товар для оформления",
   SELECT_ALL: "Выбрать все",
@@ -595,11 +617,18 @@ export const CART_PAGE_UI = {
   CHECKOUT_BLOCKED_OWN_PRODUCTS_ONLY: "Нельзя оформить заказ на свои товары",
   CHECKOUT_BLOCKED_MISSING_PICKUP:
     "У товаров нет адреса самовывоза — оформить заказ нельзя",
+  SECTION_PICKUP: "Самовывоз",
+  SECTION_DELIVERY: "Доставка",
+  SECTION_FULFILLMENT_HINT: "Оформляется отдельным заказом",
   /** @param {number} left */
   STOCK_REMAINING: (left) => `Осталось ${left} шт`,
   STOCK_QUANTITY_LIMITED: "Количество ограничено",
   CHECKOUT_OPEN: "Оформить заказ",
   CHECKOUT_SHEET_CLOSE: "Закрыть",
+  CHECKOUT_LEGAL_HINT_PREFIX: "Нажимая на кнопку, вы соглашаетесь с ",
+  CHECKOUT_LEGAL_PRIVACY_LINK: "Условиями обработки персональных данных",
+  CHECKOUT_LEGAL_HINT_MIDDLE: ", а также с ",
+  CHECKOUT_LEGAL_OFFER_LINK: "Условиями продажи",
 };
 
 /** Секция выигранных аукционных лотов в корзине */
@@ -650,12 +679,23 @@ export const CHECKOUT_FORM_UI = {
   FULFILLMENT_PICKUP: "Самовывоз",
   FULFILLMENT_DELIVERY: "Доставка",
   FULFILLMENT_DELIVERY_SOON: "Скоро",
+  FULFILLMENT_DELIVERY_UNAVAILABLE: "недоступна для выбранных товаров",
+  FULFILLMENT_PICKUP_UNAVAILABLE: "недоступен для выбранных товаров",
   PICKUP_ADDRESS_LABEL: "Адрес самовывоза",
   LABEL_DELIVERY_ADDRESS: "Адрес доставки",
   PLACEHOLDER_DELIVERY_ADDRESS: "Город, улица, дом",
   LABEL_FLAT: "Квартира / офис",
   PLACEHOLDER_FLAT: "Необязательно",
   LABEL_PAYMENT_METHOD: "Способ оплаты",
+  PAYMENT_METHOD_CARD_SOON: "Скоро",
+  LABEL_SHIPPING_PROVIDER: "Служба доставки",
+  SHIPPING_PROVIDER_SELLER: "Продавцом",
+  SHIPPING_PROVIDER_SOON: "Скоро",
+  LABEL_SHIPPING_SERVICE: "Тип доставки",
+  SHIPPING_SERVICE_COURIER: "Курьер",
+  SHIPPING_SERVICE_PICKUP_POINT: "Пункт выдачи",
+  SHIPPING_PROVIDER_HINT:
+    "Сейчас товар доставляет продавец. СДЭК, Яндекс Доставка и Почта России появятся позже.",
   SUBMIT_IDLE: "Оформить заказ",
   SUBMIT_LOADING: "Оформляем…",
   SUCCESS: "Заказ успешно оформлен",
@@ -665,12 +705,19 @@ export const CHECKOUT_FORM_UI = {
 };
 
 export const PRODUCT_PICKUP_UI = {
-  FULFILLMENT_LEGEND: "Как покупатель получит товар",
+  FULFILLMENT_LEGEND: "Какие способы получения поддерживаете",
   FULFILLMENT_PICKUP: "Самовывоз",
-  FULFILLMENT_DELIVERY: "Доставка",
+  FULFILLMENT_DELIVERY: "Доставка продавцом",
+  CARRIERS_LEGEND: "Службы доставки (скоро)",
   SOON_BADGE: " · скоро",
+  METHODS_REQUIRED_HINT: "Можно выбрать несколько. Хотя бы один способ обязателен.",
+  METHODS_BOTH_HINT:
+    "Покупатель выберет самовывоз или доставку. Адрес ниже — точка самовывоза / отправления.",
   PICKUP_HINT: "Укажите адрес и отметьте точку на карте (или выберите из подсказок).",
+  DELIVERY_CARRIERS_HINT:
+    "Покупатель укажет адрес доставки. Службы СДЭК / Яндекс / Почта — позже; пока доставляете сами.",
   ADDRESS_LABEL: "Адрес самовывоза",
+  ADDRESS_LABEL_WAREHOUSE: "Адрес точки отправления",
   MAP_ARIA: "Карта точки самовывоза",
   MAP_KEY_MISSING:
     "Карта появится после добавления VITE_YANDEX_MAPS_API_KEY. Пока укажите адрес текстом или из подсказки.",
@@ -686,6 +733,7 @@ export const ORDER_CARD_UI = {
   DETAILS_FOLD_SUMMARY: "Подробности заказа",
   TOTAL_LABEL: "Итого",
   ADDRESS_LABEL: "Адрес доставки",
+  TRACKING_LABEL: "Трек-номер",
   PAYMENT_LABEL: "Оплата",
   STATUS_LABEL: "Статус",
   ITEM_STATUS_LABEL: "Статус позиции",
@@ -693,6 +741,7 @@ export const ORDER_CARD_UI = {
   ITEM_CONFIRMED_AT_LABEL: "Подтверждён",
   CREATED_LABEL: "Создан",
   BUYER_LABEL: "Покупатель",
+  SELLER_LABEL: "Продавец",
   ACTION_SHIPPED: "Принять",
   ACTION_DELIVERED: "Доставлен",
   ACTION_CONFIRM: "Подтвердить",
@@ -1523,6 +1572,20 @@ export const CREATE_PRODUCT_MODAL_UI = {
   MANAGE_AUCTION_STATUS_INACTIVE: "(неактивен)",
   MANAGE_INSTALLMENT_TITLE: "Рассрочка",
   MANAGE_INSTALLMENT_HINT: "Покупатель оплачивает товар частями по графику",
+  INSTALLMENT_TOGGLE_PENDING: "Обновляем рассрочку…",
+  MANAGE_WHOLESALE_TITLE: "Оптовая цена",
+  MANAGE_WHOLESALE_HINT: "Скидка при покупке от указанного количества",
+  MANAGE_WHOLESALE_PENDING: "Сохраняем опт…",
+  WHOLESALE_MODAL_TITLE: "Оптовая цена",
+  WHOLESALE_MODAL_MIN_QTY_LABEL: "Количество от, шт.",
+  WHOLESALE_MODAL_PRICE_LABEL: "Оптовая цена, ₽",
+  WHOLESALE_MODAL_SAVE: "Сохранить",
+  WHOLESALE_MODAL_CLOSE: "Закрыть",
+  WHOLESALE_MODAL_HINT: "Покупатель получит эту цену за единицу, если возьмёт не меньше указанного количества",
+  WHOLESALE_MODAL_ERROR_REQUIRED: "Укажите количество и оптовую цену",
+  WHOLESALE_MODAL_ERROR_MIN_QTY: "Минимум 2 шт.",
+  WHOLESALE_MODAL_ERROR_PRICE: "Оптовая цена должна быть меньше обычной",
+  WHOLESALE_TOGGLE_PENDING: "Обновляем опт…",
   MANAGE_VISIBILITY_TITLE_VISIBLE: "Виден в каталоге",
   MANAGE_VISIBILITY_TITLE_HIDDEN: "Скрыт от покупателей",
   MANAGE_VISIBILITY_STATUS_VISIBLE: "(виден)",
@@ -1818,7 +1881,30 @@ export const PRODUCT_CARD_UI = {
   AUCTION_TOGGLE_OFF: "Выключить аукцион",
   AUCTION_TOGGLE_PENDING: "Обновление…",
   INSTALLMENT_BADGE: "Рассрочка",
+  WHOLESALE_BADGE: "Опт",
   INSTALLMENT_SELL_BUTTON: "Продать в рассрочку",
+};
+
+/** Оптовая цена (карточка / детали) */
+export const PRODUCT_WHOLESALE_UI = {
+  DETAILS_OFFER_KICKER: "Оптовая цена",
+  DETAILS_OFFER_UNIT: "/ шт.",
+  /** @param {number} minQty */
+  DETAILS_OFFER_FROM_QTY: (minQty) => `от ${minQty} шт.`,
+  /**
+   * @param {number} minQty
+   * @param {string} priceLabel
+   * @param {number} percent
+   */
+  DETAILS_OFFER_SUBTITLE: (minQty, priceLabel, percent) =>
+    `от ${minQty} шт. ${priceLabel} (−${percent}%)`,
+  /** @param {string} savingsLabel */
+  DETAILS_OFFER_SAVINGS: (savingsLabel) => `экономия ${savingsLabel} с единицы`,
+  /** @param {number} percent */
+  DETAILS_OFFER_DISCOUNT: (percent) => `−${percent}%`,
+  DETAILS_OFFER_GO: "Купить оптом",
+  DETAILS_OFFER_GO_ARIA: "Добавить в корзину по оптовой цене",
+  DETAILS_OFFER_ARIA: "Доступна оптовая цена",
 };
 
 /** Рассрочка */
@@ -1870,7 +1956,6 @@ export const INSTALLMENT_UI = {
   MODERATION_APPROVED: "Рассрочка активна",
   SELLER_TAB_HINT: "Настройте планы в «Изменить товар» → «Продать в рассрочку».",
   PROGRAM_MODAL_TITLE: "Рассрочка на товар",
-  PROGRAM_MODAL_ENABLED: "Включить рассрочку",
   PROGRAM_MODAL_PLAN_NUMBER: (n) => `План ${n}`,
   PROGRAM_MODAL_PLAN_TITLE: "Название плана",
   PROGRAM_MODAL_PLAN_TITLE_PLACEHOLDER: "Например: Стандарт",
@@ -1888,7 +1973,11 @@ export const INSTALLMENT_UI = {
   PROGRAM_MODAL_ERROR_PLAN_MONTHLY: (planNumber, minRub) =>
     `План ${planNumber}: минимальный платёж ${minRub} ₽`,
   PROGRAM_MODAL_MONTHS: "Месяцев",
+  PROGRAM_MODAL_MARKUP_PERCENT: "Надбавка, %",
   PROGRAM_MODAL_MONTHLY: "Платёж, ₽",
+  PROGRAM_MODAL_PLAN_ORIGINAL_PRICE: (formatted) => `Цена товара: ${formatted}`,
+  PROGRAM_MODAL_PLAN_MARKUP: (rubFormatted, percent) =>
+    `Надбавка: +${rubFormatted} (+${percent}%)`,
   PROGRAM_MODAL_PLAN_TOTAL: (formatted) => `Итого ${formatted}`,
   PROGRAM_MODAL_FIRST_NOW: "Первый платёж сразу",
   PROGRAM_MODAL_ADD_PLAN: "Добавить план",
@@ -2799,6 +2888,10 @@ export const CATEGORY_TREE_ADMIN_PAGE_UI = {
   LABEL_LEAF: "Конечная (лист)",
   LABEL_KEYWORDS: "Ключевые слова поиска",
   KEYWORDS_PLACEHOLDER: "телефон, смартфон",
+  LABEL_DEFAULT_CHARACTERISTICS: "Характеристики по умолчанию",
+  DEFAULT_CHARACTERISTICS_HINT:
+    "По одной на строку. Подставляются продавцу при создании товара (можно удалить). Макс. 10.",
+  DEFAULT_CHARACTERISTICS_PLACEHOLDER: "Состояние\nЦвет\nПамять\nОЗУ",
   LABEL_LEGACY: "Legacy productCategory",
   LEGACY_NONE: "—",
   CREATE_BUTTON: "Создать",

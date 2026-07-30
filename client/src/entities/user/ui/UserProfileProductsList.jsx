@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { ChevronRight } from "lucide-react";
 
 import { USER_PROFILE_PRODUCTS_PAGE_SIZE } from "../api/fetchUserProducts.js";
 import { useUserProfileProductsAllPagesQuery } from "../model/useUserProfileProductsAllPagesQuery.js";
@@ -156,7 +157,13 @@ export function UserProfileProductsList({
           className="user-profile-purchases__heading user-profile-purchases__heading_action"
           onClick={onViewAllProducts}
         >
-          {USER_PROFILE_PRODUCTS_UI.HEADING}
+          <span>{USER_PROFILE_PRODUCTS_UI.HEADING}</span>
+          <ChevronRight
+            className="user-profile-purchases__heading-chevron"
+            size={16}
+            strokeWidth={2.5}
+            aria-hidden
+          />
         </button>
       ) : (
         <h3 className="user-profile-purchases__heading">

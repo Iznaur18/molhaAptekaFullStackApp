@@ -32,15 +32,21 @@ export function useDialogFocusTrap(containerRef, { active, initialFocusRef = nul
 
     pushModalFocusLayer(layerId, container, previousFocus);
 
+    const focusWithoutScroll = (element) => {
+      element.focus({ preventScroll: true });
+    };
+
     const focusInitial = () => {
       const preferred = initialFocusRef?.current;
       if (preferred instanceof HTMLElement) {
-        preferred.focus();
+        focusWithoutScroll(preferred);
         return;
       }
 
       const [firstFocusable] = getFocusableElements(container);
-      firstFocusable?.focus();
+      if (firstFocusable) {
+        focusWithoutScroll(firstFocusable);
+      }
     };
 
     const focusFrame = requestAnimationFrame(focusInitial);
@@ -68,13 +74,13 @@ export function useDialogFocusTrap(containerRef, { active, initialFocusRef = nul
 
       if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
-        last.focus();
+        focusWithoutScroll(last);
         return;
       }
 
       if (!event.shiftKey && document.activeElement === last) {
         event.preventDefault();
-        first.focus();
+        focusWithoutScroll(first);
       }
     };
 
@@ -87,7 +93,7 @@ export function useDialogFocusTrap(containerRef, { active, initialFocusRef = nul
       const removed = popModalFocusLayer(layerId);
       const restoreTarget = removed?.previousFocus;
       if (restoreTarget instanceof HTMLElement && restoreTarget.isConnected) {
-        restoreTarget.focus();
+        focusWithoutScroll(restoreTarget);
       }
     };
   }, [active, containerRef, initialFocusRef, layerId]);
