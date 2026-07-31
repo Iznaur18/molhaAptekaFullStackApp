@@ -794,6 +794,10 @@ export const useInstallmentProgramModalStyles = createThemedStyles((theme) => ({
     lineHeight: 18,
     color: theme.colors.textSecondary,
   },
+  retailPrice: {
+    color: theme.colors.action,
+    fontWeight: "600",
+  },
   planCard: {
     borderRadius: 10,
     borderWidth: 1,

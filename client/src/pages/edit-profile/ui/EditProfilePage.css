@@ -9,7 +9,7 @@
 }
 
 /*
- * Белый fill везде — иначе body `--iz-color-bg` (#e5eef2) просвечивает
+ * Белый fill везде — иначе body `--iz-color-bg` просвечивает
  * над клавиатурой iOS (как guest-profile / wholesale modal).
  */
 html:has(.edit-profile-page),

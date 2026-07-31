@@ -49,6 +49,11 @@ export const createOrderBodySchema = z
       .default(""),
     paymentMethod: z.enum(ORDER_PAYMENT_METHODS),
     priceOfferId: mongoIdSchema.optional(),
+    idempotencyKey: z
+      .string({ required_error: "Укажите idempotencyKey" })
+      .trim()
+      .min(1, "Укажите idempotencyKey")
+      .max(64),
   })
   .superRefine((body, ctx) => {
     if (body.fulfillmentMethod === "delivery") {
@@ -136,6 +141,12 @@ export const getAllOrdersQuerySchema = z.object({
   page: optionalPageQuery,
   limit: optionalLimitQuery,
   status: z.enum(ORDER_STATUSES).optional(),
+});
+
+/** Query `GET /order` (мои заказы). */
+export const getMyOrdersQuerySchema = z.object({
+  page: optionalPageQuery,
+  limit: z.coerce.number().int().min(1).max(100).optional().default(50),
 });
 
 /** Синхрон с `server/validations/order/getMySalesValidation.js`. */

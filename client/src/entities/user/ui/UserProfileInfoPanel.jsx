@@ -6,13 +6,18 @@ import {
   USER_PROFILE_COPY,
 } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
+import { fetchUserPhone } from "../api/fetchUserPhone.js";
 import {
   groupProfileRows,
   isBooleanProfileRow,
 } from "../lib/groupProfileRows.js";
 import { getProfileSectionTone } from "../lib/profileRowColors.js";
 import { getProfileRowIcon } from "../lib/profileRowIcons.js";
-import { RU_PHONE_EMPTY_LABEL } from "../lib/ruPhone.js";
+import {
+  formatRuPhoneDisplayOrEmpty,
+  RU_PHONE_EMPTY_LABEL,
+  toRuPhoneTelHref,
+} from "../lib/ruPhone.js";
 
 import "./UserProfileInfoPanel.css";
 
@@ -20,15 +25,17 @@ const PHONE_ROW_ID = "userPhoneNumber";
 
 /**
  * @param {{
- * rows: { id: string; label: string; value: string; href?: string }[];
+ * rows: { id: string; label: string; value: string; href?: string; needsPhoneReveal?: boolean }[];
  * className?: string;
  * hidePhoneUntilReveal?: boolean;
+ * userId?: string | null;
  * }} props
  */
 export function UserProfileInfoPanel({
   rows,
   className = "",
   hidePhoneUntilReveal = false,
+  userId = null,
 }) {
   const sections = useMemo(() => groupProfileRows(rows), [rows]);
 
@@ -45,6 +52,7 @@ export function UserProfileInfoPanel({
           title={section.title}
           rows={section.rows}
           hidePhoneUntilReveal={hidePhoneUntilReveal}
+          userId={userId}
         />
       ))}
     </div>
@@ -55,11 +63,18 @@ export function UserProfileInfoPanel({
  * @param {{
  * sectionId: string;
  * title: string | null;
- * rows: { id: string; label: string; value: string; href?: string }[];
+ * rows: { id: string; label: string; value: string; href?: string; needsPhoneReveal?: boolean }[];
  * hidePhoneUntilReveal: boolean;
+ * userId: string | null;
  * }} props
  */
-function ProfileDetailsSection({ sectionId, title, rows, hidePhoneUntilReveal }) {
+function ProfileDetailsSection({
+  sectionId,
+  title,
+  rows,
+  hidePhoneUntilReveal,
+  userId,
+}) {
   const sectionTone = getProfileSectionTone(sectionId);
 
   return (
@@ -84,7 +99,9 @@ function ProfileDetailsSection({ sectionId, title, rows, hidePhoneUntilReveal })
               <dd
                 className={[
                   "user-profile-info__detail-value",
-                  isEmpty ? "user-profile-info__detail-value_empty" : "",
+                  isEmpty && !row.needsPhoneReveal
+                    ? "user-profile-info__detail-value_empty"
+                    : "",
                   isBooleanProfileRow(row.id)
                     ? resolveBooleanValueClass(row.value)
                     : "",
@@ -95,6 +112,7 @@ function ProfileDetailsSection({ sectionId, title, rows, hidePhoneUntilReveal })
                 <ProfileDetailValue
                   row={row}
                   hidePhoneUntilReveal={hidePhoneUntilReveal}
+                  userId={userId}
                 />
               </dd>
             </div>
@@ -107,29 +125,85 @@ function ProfileDetailsSection({ sectionId, title, rows, hidePhoneUntilReveal })
 
 /**
  * @param {{
- * row: { id: string; value: string; href?: string };
+ * row: { id: string; value: string; href?: string; needsPhoneReveal?: boolean };
  * hidePhoneUntilReveal: boolean;
+ * userId: string | null;
  * }} props
  */
-function ProfileDetailValue({ row, hidePhoneUntilReveal }) {
+function ProfileDetailValue({ row, hidePhoneUntilReveal, userId }) {
   const [phoneRevealed, setPhoneRevealed] = useState(false);
+  const [revealedPhone, setRevealedPhone] = useState(/** @type {string | null} */ (null));
+  const [revealPending, setRevealPending] = useState(false);
+  const [revealError, setRevealError] = useState("");
+
   const needsReveal =
-    hidePhoneUntilReveal && row.id === PHONE_ROW_ID && Boolean(row.href);
+    hidePhoneUntilReveal &&
+    row.id === PHONE_ROW_ID &&
+    (Boolean(row.href) || Boolean(row.needsPhoneReveal));
 
   useEffect(() => {
     setPhoneRevealed(false);
-  }, [row.href, row.value]);
+    setRevealedPhone(null);
+    setRevealError("");
+  }, [row.href, row.value, row.needsPhoneReveal]);
 
   if (needsReveal && !phoneRevealed) {
     return (
-      <button
-        type="button"
-        className="user-profile-info__reveal-phone"
-        onClick={() => setPhoneRevealed(true)}
-      >
-        {USER_PROFILE_COPY.SHOW_PHONE_NUMBER}
-      </button>
+      <span className="user-profile-info__reveal-wrap">
+        <button
+          type="button"
+          className="user-profile-info__reveal-phone"
+          disabled={revealPending}
+          onClick={async () => {
+            if (row.needsPhoneReveal) {
+              if (!userId) {
+                setRevealError(USER_PROFILE_COPY.SHOW_PHONE_NUMBER_ERROR);
+                return;
+              }
+              setRevealPending(true);
+              setRevealError("");
+              try {
+                const phone = await fetchUserPhone(userId);
+                setRevealedPhone(phone);
+                setPhoneRevealed(true);
+              } catch (error) {
+                setRevealError(
+                  error instanceof Error
+                    ? error.message
+                    : USER_PROFILE_COPY.SHOW_PHONE_NUMBER_ERROR,
+                );
+              } finally {
+                setRevealPending(false);
+              }
+              return;
+            }
+            setPhoneRevealed(true);
+          }}
+        >
+          {revealPending
+            ? USER_PROFILE_COPY.SHOW_PHONE_NUMBER_PENDING
+            : USER_PROFILE_COPY.SHOW_PHONE_NUMBER}
+        </button>
+        {revealError ? (
+          <span className="user-profile-info__reveal-error" role="alert">
+            {revealError}
+          </span>
+        ) : null}
+      </span>
     );
+  }
+
+  if (row.id === PHONE_ROW_ID && revealedPhone) {
+    const href = toRuPhoneTelHref(revealedPhone);
+    const value = formatRuPhoneDisplayOrEmpty(revealedPhone);
+    if (href) {
+      return (
+        <a className="user-profile-info__detail-link" href={href}>
+          {value}
+        </a>
+      );
+    }
+    return value;
   }
 
   if (row.href) {

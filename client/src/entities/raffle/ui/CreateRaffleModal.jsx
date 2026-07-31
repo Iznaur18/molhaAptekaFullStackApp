@@ -384,6 +384,7 @@ export function CreateRaffleModal({
 
   return (
     <div className="create-raffle-modal__backdrop" role="presentation">
+      <div className="create-raffle-modal__keyboard-bleed" aria-hidden="true" />
       <div
         className="create-raffle-modal"
         role="dialog"
@@ -654,7 +655,7 @@ export function CreateRaffleModal({
           >
             <button
               type="button"
-              className="app-btn app-btn--cancel"
+              className="app-btn app-btn--secondary"
               onClick={handleCancelCreate}
               disabled={isSubmitting}
             >
@@ -663,7 +664,7 @@ export function CreateRaffleModal({
             {!isEdit && !isFirstStep ? (
               <button
                 type="button"
-                className="app-btn app-btn--cancel"
+                className="app-btn app-btn--secondary"
                 onClick={goBack}
                 disabled={isSubmitting}
               >

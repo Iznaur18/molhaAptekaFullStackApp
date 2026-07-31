@@ -2,18 +2,13 @@ import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
- * @param {{ amount: number }} input
- * @returns {Promise<{
- *   message: string;
- *   loyaltyPointsBalance: number;
- *   credited: number;
- * }>}
+ * @param {{ amount: number; idempotencyKey: string }} input
  */
-export async function adminCreditOwnLoyaltyPoints({ amount }) {
+export async function adminCreditOwnLoyaltyPoints({ amount, idempotencyKey }) {
   try {
     const { data } = await apiClient.post(
       "/user/me/loyalty-points/admin-free-credit",
-      { amount },
+      { amount, idempotencyKey },
     );
     if (!data?.success || !data?.data) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);

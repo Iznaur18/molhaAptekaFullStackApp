@@ -61,13 +61,10 @@ test("GET /health: mongo connected", async () => {
   assert.equal(response.status, 200);
   const body = await response.json();
   assert.equal(body.status, "ok");
-  assert.equal(body.mongo, "connected");
-  assert.equal(body.uploadStorage, "disk");
-  assert.ok(
-    body.gitCommit === null || typeof body.gitCommit === "string",
-  );
-  assert.equal(typeof body.uptimeSec, "number");
-  assert.equal(body.catalogSearch, "regex");
+  assert.equal(body.mongo, undefined);
+  assert.equal(body.uploadStorage, undefined);
+  assert.equal(body.gitCommit, undefined);
+  assert.equal(body.uptimeSec, undefined);
 });
 
 const parseSuccessData = async (response) => {
@@ -297,6 +294,7 @@ test("order smoke: без verify email → 403", async () => {
       deliveryAddress: "Москва, Тверская 1",
       deliveryAddressFlat: "1",
       paymentMethod: ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
+      idempotencyKey: `smoke-order-${Date.now()}`,
     }),
   });
   assert.equal(orderResponse.status, 403);

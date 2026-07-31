@@ -1,6 +1,7 @@
 import { SITE_HEADER_BANNER_SETTINGS_DEFAULTS } from "@molha/api-contract";
 
 import type { SiteHeaderBannerSettings } from "@/entities/site-header-banner/model/types";
+import { createClientIdempotencyKey } from "@/shared/lib/createClientIdempotencyKey";
 
 export type SiteHeaderBannerAdminForm = {
   enabled: boolean;
@@ -51,7 +52,7 @@ export const buildPatchSiteHeaderBannerSettingsBody = (form: SiteHeaderBannerAdm
 });
 
 export const createEmptySiteHeaderBannerItem = () => ({
-  id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}`,
+  id: createClientIdempotencyKey(),
   enabled: true,
   imageUrl: "",
   imageAlt: "",

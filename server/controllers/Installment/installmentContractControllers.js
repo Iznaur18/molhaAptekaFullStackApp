@@ -36,24 +36,28 @@ export const createInstallmentContractController = async (req, res) => {
 
 /** `GET /installment/contracts/my` */
 export const getMyInstallmentContractsController = async (req, res) => {
-  const contracts = await listInstallmentContracts({
+  const result = await listInstallmentContracts({
     userId: req.userId,
     statusFilter: req.query.status,
     role: "buyer",
+    page: req.query.page,
+    limit: req.query.limit,
   });
 
-  return successRes(res, { contracts });
+  return successRes(res, result);
 };
 
 /** `GET /installment/contracts/sales` */
 export const getMyInstallmentSalesController = async (req, res) => {
-  const contracts = await listInstallmentContracts({
+  const result = await listInstallmentContracts({
     userId: req.userId,
     statusFilter: req.query.status,
     role: "seller",
+    page: req.query.page,
+    limit: req.query.limit,
   });
 
-  return successRes(res, { contracts });
+  return successRes(res, result);
 };
 
 /** `PATCH /installment/contracts/:contractId/payments/:paymentIndex/mark-paid` */

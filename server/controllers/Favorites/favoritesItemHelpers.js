@@ -243,27 +243,18 @@ export async function removeProductIdsFromAllWishlists(productIds) {
     return 0;
   }
 
-  const wishlists = await WishlistModel.find({}).select("userId items").lean();
-  let updated = 0;
-
-  for (const wishlist of wishlists) {
-    const items = normalizeStoredWishlistItems(wishlist.items);
-    let changed = false;
-
-    for (const productId of idSet) {
-      if (Object.prototype.hasOwnProperty.call(items, productId)) {
-        delete items[productId];
-        changed = true;
-      }
-    }
-
-    if (!changed) {
-      continue;
-    }
-
-    await WishlistModel.updateOne({ userId: wishlist.userId }, { $set: { items } });
-    updated += 1;
+  /** @type {Record<string, 1>} */
+  const unset = {};
+  for (const productId of idSet) {
+    unset[`items.${productId}`] = 1;
   }
 
-  return updated;
+  const filter = {
+    $or: [...idSet].map((productId) => ({
+      [`items.${productId}`]: { $exists: true },
+    })),
+  };
+
+  const result = await WishlistModel.updateMany(filter, { $unset: unset });
+  return Number(result.modifiedCount) || 0;
 }

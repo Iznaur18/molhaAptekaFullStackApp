@@ -51,6 +51,12 @@ export const convertPartnerBalanceController = async (req, res) => {
     ) {
       return errorRes(res, 400, error.message);
     }
+    if (
+      error instanceof Error &&
+      error.message === "Укажите idempotencyKey для денежной операции"
+    ) {
+      return errorRes(res, 400, error.message);
+    }
     throw error;
   }
 };

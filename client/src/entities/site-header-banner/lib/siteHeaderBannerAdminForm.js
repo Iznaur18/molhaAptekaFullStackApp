@@ -1,5 +1,7 @@
 import { SITE_HEADER_BANNER_SETTINGS_DEFAULTS } from "@molha/api-contract";
 
+import { createClientIdempotencyKey } from "../../../shared/lib/createClientIdempotencyKey.js";
+
 /**
  * @param {import('../model/types.js').SiteHeaderBannerSettings | null | undefined} settings
  */
@@ -40,7 +42,7 @@ export const buildPatchSiteHeaderBannerSettingsBody = (form) => ({
 });
 
 export const createEmptySiteHeaderBannerItem = () => ({
-  id: crypto.randomUUID(),
+  id: createClientIdempotencyKey(),
   enabled: true,
   imageUrl: "",
   imageAlt: "",

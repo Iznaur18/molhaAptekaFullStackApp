@@ -1,10 +1,10 @@
-/** Поля продавца в карточке/модалке товара (без секретов). */
+/**
+ * Поля продавца в карточке/каталоге товара (без ПДн-контактов).
+ * email / userPhoneNumber / userAddress — только профиль (self/staff) или заказ.
+ */
 export const PRODUCT_SELLER_PUBLIC_FIELD_NAMES = [
   "_id",
   "userName",
-  "email",
-  "userPhoneNumber",
-  "userAddress",
   "userAvatarUrl",
   "userAvatarFocus",
   "userRatingByVotes",

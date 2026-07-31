@@ -10,12 +10,12 @@
   overflow: hidden;
   text-align: left;
   background: var(--iz-color-surface);
-  box-shadow: none;
+  box-shadow: var(--iz-shadow-card);
   transition: box-shadow 0.15s ease;
 }
 
 .product-card:hover {
-  box-shadow: none;
+  box-shadow: var(--iz-shadow-card);
 }
 
 .product-card-promotion-frame,

@@ -71,7 +71,11 @@ export async function fetchMyInstallmentContracts(params = {}) {
   try {
     const status = typeof params.status === "string" ? params.status.trim() : "";
     const { data } = await apiClient.get("/installment/contracts/my", {
-      params: status ? { status } : undefined,
+      params: {
+        page: 1,
+        limit: 100,
+        ...(status ? { status } : {}),
+      },
     });
     if (!data?.success || !Array.isArray(data.data?.contracts)) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
@@ -88,7 +92,11 @@ export async function fetchMyInstallmentSales(params = {}) {
   try {
     const status = typeof params.status === "string" ? params.status.trim() : "";
     const { data } = await apiClient.get("/installment/contracts/sales", {
-      params: status ? { status } : undefined,
+      params: {
+        page: 1,
+        limit: 100,
+        ...(status ? { status } : {}),
+      },
     });
     if (!data?.success || !Array.isArray(data.data?.contracts)) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);

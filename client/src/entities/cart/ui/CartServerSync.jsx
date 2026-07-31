@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
+import { resolveCartFetchHydrate } from "../lib/resolveCartFetchHydrate.js";
 import { cartQueryKeys } from "../model/cartQueryKeys.js";
 import { useMyCartQuery } from "../model/useMyCartQuery.js";
 import { useReplaceMyCartMutation } from "../model/useReplaceMyCartMutation.js";
@@ -40,18 +41,23 @@ export function CartServerSync({ isAuthorized }) {
       return undefined;
     }
 
-    if (cartQuery.isSuccess) {
+    const hydrateAction = resolveCartFetchHydrate({
+      isSuccess: cartQuery.isSuccess,
+      isError: cartQuery.isError,
+    });
+
+    if (hydrateAction === "hydrate") {
       hydrateCart(cartQuery.data);
       setRemoteReady(true);
       return undefined;
     }
 
-    if (cartQuery.isError) {
+    if (hydrateAction === "block-sync") {
       if (import.meta.env.DEV) {
         console.warn("[cart] fetchMyCart failed", cartQuery.error);
       }
-      hydrateCart({});
-      setRemoteReady(true);
+      // Как wishlist: не гидрируем {} — иначе debounced replaceCart({}) сотрёт сервер.
+      setRemoteReady(false);
     }
 
     return undefined;

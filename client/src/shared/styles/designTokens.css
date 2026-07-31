@@ -15,39 +15,44 @@
   --iz-color-text-secondary: #374151;
   --iz-color-text-placeholder: #9ca3af;
   --iz-color-ink: #0f172a;
-  --iz-color-bg: #e5eef2;
+  /*
+   * Neutrals v3 — минимум оттенков:
+   * canvas (#f3f4f6) = bg / muted / elevated; pure white = surface / onContrast.
+   * Soft-status: одна lightness-полоса (~#ee–#f7), только лёгкий hue.
+   */
+  --iz-color-bg: #f3f4f6;
+  --iz-color-surface-muted: #f3f4f6;
+  --iz-color-surface-elevated: #f3f4f6;
   --iz-color-surface: #ffffff;
-  --iz-color-surface-muted: #f9fafb;
-  --iz-color-surface-elevated: #f8fafc;
   --iz-color-on-contrast: #ffffff;
 
   /* Brand / interactive */
   --iz-color-primary: #284b7e;
   --iz-color-action: #1f6feb;
   --iz-color-action-hover: #1557b3;
-  --iz-color-action-soft: #eff6ff;
-  --iz-color-action-border: #dbeafe;
+  --iz-color-action-soft: #eef2f8;
+  --iz-color-action-border: #d9e2ef;
   --iz-color-link: #2563eb;
 
   /* Status */
   --iz-color-success: #16a34a;
-  --iz-color-success-surface: #f0fdf4;
+  --iz-color-success-surface: #eef5f0;
   --iz-color-success-text: #047857;
   --iz-color-warning: #d97706;
-  --iz-color-warning-surface: #fefce8;
+  --iz-color-warning-surface: #f7f3ea;
   --iz-color-warning-text: #92400e;
   --iz-color-danger: #c62828;
-  --iz-color-danger-surface: #fef2f2;
+  --iz-color-danger-surface: #f7eeee;
   --iz-color-danger-text: #991b1b;
   --iz-color-info: #0369a1;
-  --iz-color-info-soft: #f0f9ff;
+  --iz-color-info-soft: #eef2f8;
   --iz-color-info-deep: #1e40af;
 
   /* Borders & accent */
   --iz-color-border: #e5e7eb;
   --iz-color-border-strong: #d1d5db;
   --iz-color-accent: #7c3aed;
-  --iz-color-accent-soft: #ede9fe;
+  --iz-color-accent-soft: #f2eff7;
 
   /* Overlay & focus */
   --iz-color-overlay: rgb(15 23 42 / 45%);

@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 
 import { isClientSentryEnabled } from "../shared/lib/clientSentryEnv.js";
 import { disableDocumentPinchZoom } from "../shared/lib/disableDocumentPinchZoom.js";
+import { enableInputFocusPageScrollLock } from "../shared/lib/enableInputFocusPageScrollLock.js";
 import { initRuntimeDesignTokens } from "../shared/theme/runtimeDesignTokens.js";
 import "../index.css";
 import App from "./App.jsx";
@@ -15,6 +16,7 @@ if (isClientSentryEnabled()) {
 
 initRuntimeDesignTokens();
 disableDocumentPinchZoom();
+enableInputFocusPageScrollLock();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

@@ -21,11 +21,13 @@ import {
   userDataConfirmationRateLimiter,
   productPriceOfferRateLimiter,
   productReviewRateLimiter,
+  productCompareRateLimiter,
   emailVerificationResendRateLimiter,
   orderCreateRateLimiter,
   orderItemActionRateLimiter,
   addressSuggestRateLimiter,
   userSearchRateLimiter,
+  userPhoneRevealRateLimiter,
 } from "./rateLimitMW.js";
 import { csrfCookieOriginCheckMW } from "./csrfCookieOriginCheckMW.js";
 import {
@@ -64,11 +66,13 @@ export {
   userDataConfirmationRateLimiter,
   productPriceOfferRateLimiter,
   productReviewRateLimiter,
+  productCompareRateLimiter,
   emailVerificationResendRateLimiter,
   orderCreateRateLimiter,
   orderItemActionRateLimiter,
   addressSuggestRateLimiter,
   userSearchRateLimiter,
+  userPhoneRevealRateLimiter,
   errorHandler,
   notFoundHandler,
   asyncHandler,

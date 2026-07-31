@@ -44,12 +44,16 @@ export const deductRubBalance = async ({ userId, amount, session }) => {
 export const refundRubBalance = async ({ userId, amount, session }) => {
   const normalizedAmount = Math.ceil(Number(amount));
   if (normalizedAmount <= 0) {
-    return;
+    throw new Error("Сумма возврата баланса должна быть больше 0");
   }
 
-  await UserModel.updateOne(
+  const result = await UserModel.updateOne(
     { _id: userId },
     { $inc: { userRubBalance: normalizedAmount } },
     { session: session ?? undefined },
   );
+
+  if (result.matchedCount === 0) {
+    throw new Error("USER_NOT_FOUND");
+  }
 };

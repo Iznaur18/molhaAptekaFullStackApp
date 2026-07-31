@@ -15,3 +15,5 @@ export const setAuthTokens = async (tokens: {
 }): Promise<void> => setStoredAuthTokens(tokens);
 
 export const clearAuthTokens = async (): Promise<void> => clearStoredAuthTokens();
+
+export { isCookieAuthWeb } from "./authTokenStorage";

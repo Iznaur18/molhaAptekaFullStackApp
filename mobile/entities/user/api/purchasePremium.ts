@@ -2,9 +2,15 @@ import { apiClient } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
-export const purchasePremium = async () => {
+export const purchasePremium = async ({
+  idempotencyKey,
+}: {
+  idempotencyKey: string;
+}) => {
   try {
-    const { data } = await apiClient.post("/user/me/premium/purchase");
+    const { data } = await apiClient.post("/user/me/premium/purchase", {
+      idempotencyKey,
+    });
     if (!data?.success || !data.data) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

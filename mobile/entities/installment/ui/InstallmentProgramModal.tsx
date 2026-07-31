@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
   INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB,
+  INSTALLMENT_MONTHS_MIN,
   INSTALLMENT_PLANS_MAX,
 } from "@/entities/installment/model/programConstants";
 import {
@@ -321,19 +322,55 @@ export const InstallmentProgramModal = ({
                         <Text style={styles.fieldLabel}>{INSTALLMENT_UI.PROGRAM_MODAL_MONTHS}</Text>
                         <TextInput
                           style={styles.input}
-                          value={String(plan.monthsCount ?? "")}
+                          value={
+                            plan.monthsCount === ""
+                              ? ""
+                              : String(plan.monthsCount ?? "")
+                          }
                           keyboardType="number-pad"
                           editable={!isSubmitting}
-                          onFocus={() => scrollPlanFieldIntoView(index, 72)}
-                          onChangeText={(value) => {
-                            const monthsCount = Number(value) || 0;
+                          selectTextOnFocus
+                          onFocus={() => {
+                            scrollPlanFieldIntoView(index, 72);
+                            if (monthsCount === 0) {
+                              updatePlan(index, { monthsCount: "" });
+                            }
+                          }}
+                          onBlur={() => {
+                            if (plan.monthsCount !== "") return;
+                            const restoredMonths = INSTALLMENT_MONTHS_MIN;
                             updatePlan(index, {
-                              monthsCount,
-                              monthlyAmountRub: resolveInstallmentMonthlyFromMarkupPercent(
-                                productPrice,
-                                monthsCount,
-                                markupPercent,
-                              ),
+                              monthsCount: restoredMonths,
+                              monthlyAmountRub:
+                                resolveInstallmentMonthlyFromMarkupPercent(
+                                  productPrice,
+                                  restoredMonths,
+                                  markupPercent,
+                                ),
+                            });
+                          }}
+                          onChangeText={(value) => {
+                            if (value === "") {
+                              updatePlan(index, {
+                                monthsCount: "",
+                                monthlyAmountRub:
+                                  resolveInstallmentMonthlyFromMarkupPercent(
+                                    productPrice,
+                                    0,
+                                    markupPercent,
+                                  ),
+                              });
+                              return;
+                            }
+                            const nextMonths = Number(value) || 0;
+                            updatePlan(index, {
+                              monthsCount: nextMonths,
+                              monthlyAmountRub:
+                                resolveInstallmentMonthlyFromMarkupPercent(
+                                  productPrice,
+                                  nextMonths,
+                                  markupPercent,
+                                ),
                             });
                           }}
                         />
@@ -344,19 +381,56 @@ export const InstallmentProgramModal = ({
                         </Text>
                         <TextInput
                           style={styles.input}
-                          value={String(markupPercent)}
+                          value={
+                            plan.markupPercent === ""
+                              ? ""
+                              : String(markupPercent)
+                          }
                           keyboardType="number-pad"
                           editable={!isSubmitting && productPriceRub > 0}
-                          onFocus={() => scrollPlanFieldIntoView(index, 72)}
+                          onFocus={() => {
+                            scrollPlanFieldIntoView(index, 72);
+                            if (markupPercent === 0) {
+                              updatePlan(index, { markupPercent: "" });
+                            }
+                          }}
+                          onBlur={() => {
+                            if (plan.markupPercent !== "") return;
+                            updatePlan(index, {
+                              markupPercent: 0,
+                              monthlyAmountRub:
+                                resolveInstallmentMonthlyFromMarkupPercent(
+                                  productPrice,
+                                  monthsCount,
+                                  0,
+                                ),
+                            });
+                          }}
                           onChangeText={(value) => {
-                            const nextMarkupPercent = Math.max(0, Math.floor(Number(value) || 0));
+                            if (value === "") {
+                              updatePlan(index, {
+                                markupPercent: "",
+                                monthlyAmountRub:
+                                  resolveInstallmentMonthlyFromMarkupPercent(
+                                    productPrice,
+                                    monthsCount,
+                                    0,
+                                  ),
+                              });
+                              return;
+                            }
+                            const nextMarkupPercent = Math.max(
+                              0,
+                              Math.floor(Number(value) || 0),
+                            );
                             updatePlan(index, {
                               markupPercent: nextMarkupPercent,
-                              monthlyAmountRub: resolveInstallmentMonthlyFromMarkupPercent(
-                                productPrice,
-                                monthsCount,
-                                nextMarkupPercent,
-                              ),
+                              monthlyAmountRub:
+                                resolveInstallmentMonthlyFromMarkupPercent(
+                                  productPrice,
+                                  monthsCount,
+                                  nextMarkupPercent,
+                                ),
                             });
                           }}
                         />
@@ -365,19 +439,56 @@ export const InstallmentProgramModal = ({
                         <Text style={styles.fieldLabel}>{INSTALLMENT_UI.PROGRAM_MODAL_MONTHLY}</Text>
                         <TextInput
                           style={styles.input}
-                          value={String(plan.monthlyAmountRub ?? "")}
+                          value={
+                            plan.monthlyAmountRub === ""
+                              ? ""
+                              : String(plan.monthlyAmountRub ?? "")
+                          }
                           keyboardType="number-pad"
                           editable={!isSubmitting}
-                          onFocus={() => scrollPlanFieldIntoView(index, 72)}
+                          selectTextOnFocus
+                          onFocus={() => {
+                            scrollPlanFieldIntoView(index, 72);
+                            if (monthlyAmountRub === 0) {
+                              updatePlan(index, { monthlyAmountRub: "" });
+                            }
+                          }}
+                          onBlur={() => {
+                            if (plan.monthlyAmountRub !== "") return;
+                            const restoredMonthly =
+                              INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB;
+                            updatePlan(index, {
+                              monthlyAmountRub: restoredMonthly,
+                              markupPercent:
+                                resolveInstallmentPlanPriceSummary(
+                                  productPrice,
+                                  monthsCount,
+                                  restoredMonthly,
+                                ).markupPercent,
+                            });
+                          }}
                           onChangeText={(value) => {
+                            if (value === "") {
+                              updatePlan(index, {
+                                monthlyAmountRub: "",
+                                markupPercent:
+                                  resolveInstallmentPlanPriceSummary(
+                                    productPrice,
+                                    monthsCount,
+                                    0,
+                                  ).markupPercent,
+                              });
+                              return;
+                            }
                             const nextMonthly = Number(value) || 0;
                             updatePlan(index, {
                               monthlyAmountRub: nextMonthly,
-                              markupPercent: resolveInstallmentPlanPriceSummary(
-                                productPrice,
-                                monthsCount,
-                                nextMonthly,
-                              ).markupPercent,
+                              markupPercent:
+                                resolveInstallmentPlanPriceSummary(
+                                  productPrice,
+                                  monthsCount,
+                                  nextMonthly,
+                                ).markupPercent,
                             });
                           }}
                         />

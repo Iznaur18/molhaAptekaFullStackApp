@@ -8,12 +8,17 @@ import {
 } from "../../../entities/user/lib/profileImageFocus.js";
 import { resolveUserProfileBackgroundFromUser } from "../../../entities/user/lib/userBackgroundValue.js";
 import { pickUserProfilePhotoUrl } from "../../../entities/user/lib/pickUserProfilePhotoUrl.js";
+import { useMaxWidthMediaQuery } from "../../../shared/lib/useMaxWidthMediaQuery.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import {
   isFullWidthCatalogProfileTab,
   PROFILE_TAB_MY_PRODUCTS,
   PROFILE_TAB_OVERVIEW,
 } from "../../../widgets/app-shell/lib/profileTabs.js";
+import {
+  MY_PROFILE_DRAWER_LAYOUT_MAX_PX,
+  MY_PROFILE_MOBILE_NAV_EXIT_MS,
+} from "../lib/myProfileMobileNavConstants.js";
 
 /**
  * @param {{
@@ -32,8 +37,11 @@ export function useMyProfilePageUi({
   isRegularUser,
 }) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [isMobileNavMounted, setIsMobileNavMounted] = useState(false);
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
   const [backgroundLoadFailed, setBackgroundLoadFailed] = useState(false);
+
+  const isDrawerLayout = useMaxWidthMediaQuery(MY_PROFILE_DRAWER_LAYOUT_MAX_PX);
 
   const photoUrl = user ? pickUserProfilePhotoUrl(user) : null;
   const avatarObjectPosition = useMemo(
@@ -70,7 +78,71 @@ export function useMyProfilePageUi({
   const closeMobileNav = useCallback(() => setIsMobileNavOpen(false), []);
   const openMobileNav = useCallback(() => setIsMobileNavOpen(true), []);
 
-  useScrollLock(isMobileNavOpen);
+  // overflow-only: body position:fixed на iOS оставляет тёмные полосы в safe-area
+  useScrollLock(isMobileNavMounted, { strategy: "overflow" });
+
+  useEffect(() => {
+    if (!isMobileNavMounted) {
+      return undefined;
+    }
+
+    const root = document.documentElement;
+    root.classList.add("my-profile-mobile-nav-open");
+
+    const bg = getComputedStyle(root).getPropertyValue("--iz-color-bg").trim();
+    let themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    const previousThemeColor = themeColorMeta?.getAttribute("content") ?? null;
+    if (!themeColorMeta) {
+      themeColorMeta = document.createElement("meta");
+      themeColorMeta.setAttribute("name", "theme-color");
+      document.head.appendChild(themeColorMeta);
+    }
+    if (bg) {
+      themeColorMeta.setAttribute("content", bg);
+    }
+
+    return () => {
+      root.classList.remove("my-profile-mobile-nav-open");
+      if (!themeColorMeta) {
+        return;
+      }
+      if (previousThemeColor == null) {
+        themeColorMeta.remove();
+      } else {
+        themeColorMeta.setAttribute("content", previousThemeColor);
+      }
+    };
+  }, [isMobileNavMounted]);
+
+  useEffect(() => {
+    if (!isDrawerLayout) {
+      setIsMobileNavOpen(false);
+      setIsMobileNavMounted(false);
+    }
+  }, [isDrawerLayout]);
+
+  // Один источник правды — isMobileNavOpen. Монтируем сразу при открытии;
+  // при закрытии держим оверлей в DOM до конца exit-анимации, затем размонтируем.
+  // Появление/уход рисует CSS-анимация по data-state — без rAF-флипа visible.
+  useEffect(() => {
+    if (!isDrawerLayout) {
+      return undefined;
+    }
+
+    if (isMobileNavOpen) {
+      setIsMobileNavMounted(true);
+      return undefined;
+    }
+
+    if (!isMobileNavMounted) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setIsMobileNavMounted(false);
+    }, MY_PROFILE_MOBILE_NAV_EXIT_MS);
+    return () => window.clearTimeout(timeoutId);
+  }, [isDrawerLayout, isMobileNavOpen, isMobileNavMounted]);
 
   useEffect(() => {
     closeMobileNav();
@@ -107,7 +179,9 @@ export function useMyProfilePageUi({
     showEditOnBanner,
     isMyProductsTab,
     isFullWidthCatalogTab,
+    isDrawerLayout,
     isMobileNavOpen,
+    isMobileNavMounted,
     closeMobileNav,
     openMobileNav,
     avatarLoadFailed,

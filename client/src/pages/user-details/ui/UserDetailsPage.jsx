@@ -243,7 +243,11 @@ export function UserDetailsPage() {
           />
         ) : null}
 
-        <UserProfileInfoPanel rows={profileRows} hidePhoneUntilReveal />
+        <UserProfileInfoPanel
+          rows={profileRows}
+          hidePhoneUntilReveal
+          userId={userId}
+        />
 
         {canModerateProducts ? (
           <div className="user-details-page__staff">

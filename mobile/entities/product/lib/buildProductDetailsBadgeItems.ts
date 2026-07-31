@@ -1,3 +1,5 @@
+import { PRODUCT_PRICE_MARKET_STATUS_UNKNOWN } from "@molha/api-contract";
+
 import { PRODUCT_CARD_UI, PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
 
 import { isProductOriginalBadgeVisible } from "./productIsOriginal";
@@ -71,13 +73,15 @@ export const buildProductDetailsBadgeItems = ({
   const priceMarket = resolveProductPriceMarketStatusPresentation(
     product.productPriceMarketStatus,
   );
-  items.push({
-    key: "price-market",
-    kind: "priceMarket",
-    label: priceMarket.label,
-    backgroundColor: priceMarket.backgroundColor,
-    color: priceMarket.color,
-  });
+  if (priceMarket.status !== PRODUCT_PRICE_MARKET_STATUS_UNKNOWN) {
+    items.push({
+      key: "price-market",
+      kind: "priceMarket",
+      label: priceMarket.label,
+      backgroundColor: priceMarket.backgroundColor,
+      color: priceMarket.color,
+    });
+  }
 
   return sortProductDetailsBadgesByLabelLength(items);
 };

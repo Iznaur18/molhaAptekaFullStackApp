@@ -18,12 +18,18 @@ export const getMyLoyaltyPointsStatusController = async (req, res) => {
 export const adminCreditOwnLoyaltyPointsController = async (req, res) => {
   const userId = String(req.userId);
   const amount = req.body.amount;
+  const idempotencyKey = req.body.idempotencyKey;
 
-  const result = await adminCreditOwnLoyaltyPoints({ userId, amount });
+  const result = await adminCreditOwnLoyaltyPoints({
+    userId,
+    amount,
+    idempotencyKey,
+  });
 
   return successRes(res, {
-    message: "Баллы начислены",
+    message: result.duplicate ? "Баллы уже начислены" : "Баллы начислены",
     loyaltyPointsBalance: result.loyaltyPointsBalance,
     credited: result.credited,
+    duplicate: Boolean(result.duplicate),
   });
 };

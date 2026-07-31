@@ -122,7 +122,11 @@ export const createInstallmentContract = async (
 export const fetchMyInstallmentContracts = async (status?: string) => {
   try {
     const { data } = await apiClient.get("/installment/contracts/my", {
-      params: status ? { status } : undefined,
+      params: {
+        page: 1,
+        limit: 100,
+        ...(status ? { status } : {}),
+      },
     });
     if (!data?.success || !Array.isArray(data.data?.contracts)) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
@@ -136,14 +140,20 @@ export const fetchMyInstallmentContracts = async (status?: string) => {
 export const fetchMyInstallmentSales = async (status?: string) => {
   try {
     const { data } = await apiClient.get("/installment/contracts/sales", {
-      params: status ? { status } : undefined,
+      params: {
+        page: 1,
+        limit: 100,
+        ...(status ? { status } : {}),
+      },
     });
     if (!data?.success || !Array.isArray(data.data?.contracts)) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
     return data.data.contracts as InstallmentContract[];
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, "Не удалось загрузить продажи в рассрочку"));
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось загрузить продажи в рассрочку"),
+    );
   }
 };
 

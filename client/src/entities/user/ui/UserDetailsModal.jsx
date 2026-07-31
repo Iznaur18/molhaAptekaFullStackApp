@@ -260,6 +260,7 @@ export function UserDetailsModal({
                 <UserProfileInfoPanel
                   rows={rows}
                   hidePhoneUntilReveal={isOtherUserProfile}
+                  userId={user?._id ? String(user._id) : null}
                 />
               </div>
             ) : null}

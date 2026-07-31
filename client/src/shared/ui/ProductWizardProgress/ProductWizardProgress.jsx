@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 import { CREATE_PRODUCT_MODAL_UI } from "../../config/appUiCopy.js";
 
 import "./ProductWizardProgress.css";
@@ -20,15 +22,22 @@ export function ProductWizardProgress({
   resolveStepCopy,
   progressAria = CREATE_PRODUCT_MODAL_UI.WIZARD_PROGRESS_ARIA,
 }) {
+  const activeStepRef = useRef(/** @type {HTMLLIElement | null} */ (null));
+
+  useEffect(() => {
+    activeStepRef.current?.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",
+      block: "nearest",
+    });
+  }, [stepIndex]);
+
   return (
     <div className="product-wizard-progress" aria-label={progressAria}>
       <p className="product-wizard-progress__step-caption">
         {CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_OF(stepIndex + 1, stepIds.length)}
       </p>
-      <ol
-        className="product-wizard-progress__steps"
-        style={{ gridTemplateColumns: `repeat(${stepIds.length}, minmax(0, 1fr))` }}
-      >
+      <ol className="product-wizard-progress__steps">
         {stepIds.map((id, index) => {
           const copy = resolveStepCopy(id);
           const isActive = index === stepIndex;
@@ -37,6 +46,7 @@ export function ProductWizardProgress({
           return (
             <li
               key={id}
+              ref={isActive ? activeStepRef : undefined}
               className={[
                 "product-wizard-progress__step",
                 isActive ? "product-wizard-progress__step_active" : "",

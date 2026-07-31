@@ -52,7 +52,9 @@ describe("useCreateOrderMutation", () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(createOrderMock.mock.calls[0][0]).toEqual(payload);
+    expect(createOrderMock.mock.calls[0][0]).toMatchObject(payload);
+    expect(typeof createOrderMock.mock.calls[0][0].idempotencyKey).toBe("string");
+    expect(createOrderMock.mock.calls[0][0].idempotencyKey.length).toBeGreaterThan(0);
     expect(invalidateOrderQueriesMock).toHaveBeenCalledWith(queryClient);
     expect(result.current.data).toEqual(order);
   });

@@ -42,13 +42,16 @@ export const purchasePremiumController = async (req, res) => {
     const userId = String(req.userId);
     await syncPremiumExpiryForUser(userId);
 
-    const result = await purchasePremiumSubscription(userId);
+    const result = await purchasePremiumSubscription(userId, {
+      idempotencyKey: req.body.idempotencyKey,
+    });
 
     return successRes(res, {
       message: PREMIUM_PURCHASE_SUCCESS_MESSAGE,
       premiumExpiresAt: result.premiumExpiresAt,
       loyaltyPointsBalance: result.loyaltyPointsBalance,
       isActive: true,
+      duplicate: Boolean(result.duplicate),
     });
   } catch (error) {
     if (error instanceof PremiumAlreadyActiveError) {
@@ -67,6 +70,9 @@ export const purchasePremiumController = async (req, res) => {
       }
       if (error.message === "USER_NOT_FOUND") {
         return errorRes(res, 404, "Пользователь не найден");
+      }
+      if (error.message === "Укажите idempotencyKey для денежной операции") {
+        return errorRes(res, 400, error.message);
       }
     }
     console.error("purchasePremiumController error:", error);

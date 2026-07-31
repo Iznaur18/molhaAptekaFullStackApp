@@ -3,23 +3,47 @@
   inset: 0;
   z-index: var(--iz-z-modal);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  background: var(--iz-color-modal-scrim);
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0;
+  background: var(--iz-color-overlay);
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+.create-raffle-modal__keyboard-bleed {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 100vh;
+  background: var(--iz-color-bg);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .create-raffle-modal {
+  position: relative;
+  z-index: 1;
   box-sizing: border-box;
-  width: min(100%, 28rem);
-  max-height: min(92vh, 40rem);
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
   overflow: auto;
-  padding: 1rem 1.1rem 1.15rem;
-  border: 2px solid var(--iz-color-accent-soft);
-  border-radius: 16px;
-  background: var(--iz-gradient-raffle-modal);
-  box-shadow: 0 12px 38px var(--iz-color-accent-shadow-strong);
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  padding: max(1rem, env(safe-area-inset-top, 0px))
+    max(1.15rem, env(safe-area-inset-right, 0px))
+    max(1.15rem, env(safe-area-inset-bottom, 0px))
+    max(1.15rem, env(safe-area-inset-left, 0px));
+  border: none;
+  border-radius: 0;
+  background: var(--iz-color-surface);
+  box-shadow: none;
   color: var(--iz-color-text);
+  pointer-events: auto;
 }
 
 .create-raffle-modal__header {
@@ -29,54 +53,55 @@
   gap: 0.75rem;
   margin-bottom: 0.75rem;
   padding-bottom: 0.65rem;
-  border-bottom: 1px solid var(--iz-color-accent-ring);
+  border-bottom: 1px solid var(--iz-color-border);
 }
 
 .create-raffle-modal__header h2 {
   margin: 0;
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--iz-color-accent);
+  color: var(--iz-color-text);
 }
 
 .create-raffle-modal__close {
-  border: 1px solid var(--iz-color-accent);
+  border: 1px solid var(--iz-color-border);
   border-radius: 8px;
-  background: var(--iz-color-accent-soft);
-  color: var(--iz-color-accent);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text-secondary);
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
+}
+
+.create-raffle-modal__close:hover {
+  background: var(--iz-color-surface-muted);
 }
 
 .create-raffle-modal__form {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
+  min-height: calc(100% - 3.5rem);
 }
 
 .create-raffle-modal__section {
-  border: 1px solid var(--iz-color-accent-ring);
+  border: 1px solid var(--iz-color-border);
   border-radius: 0.7rem;
   background: var(--iz-color-surface);
   overflow: hidden;
-  box-shadow: 0 2px 8px var(--iz-color-accent-shadow);
+  box-shadow: none;
 }
 
 .create-raffle-modal__section-title {
   margin: 0;
   padding: 0.55rem 0.75rem;
-  border-bottom: 1px solid var(--iz-color-accent-ring-soft);
-  background: color-mix(
-    in srgb,
-    var(--iz-color-accent-soft) 70%,
-    var(--iz-color-surface) 30%
-  );
+  border-bottom: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface-muted);
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--iz-color-accent);
+  color: var(--iz-color-text-secondary);
 }
 
 .create-raffle-modal__section-body {
@@ -118,17 +143,26 @@
   max-width: 100%;
   min-width: 0;
   padding: 0.45rem 0.55rem;
-  border: 1px solid var(--iz-color-accent-ring);
+  border: 1px solid var(--iz-color-border);
   border-radius: 8px;
   font: inherit;
-  background: var(--iz-color-accent-soft);
+  background: var(--iz-color-surface-muted);
   color: inherit;
+}
+
+.create-raffle-modal__form input:focus,
+.create-raffle-modal__form textarea:focus,
+.create-raffle-modal__form select:focus,
+.create-raffle-modal__form .ru-region-select__trigger:focus {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-surface);
+  outline: none;
 }
 
 .create-raffle-modal__hint {
   margin: 0;
   font-size: 0.8rem;
-  color: var(--iz-color-accent);
+  color: var(--iz-color-text-muted);
   line-height: 1.4;
 }
 
@@ -140,31 +174,55 @@
 
 .create-raffle-modal__actions {
   display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-  margin-top: 0.35rem;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: stretch;
+  margin-top: auto;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--iz-color-border);
 }
 
-.create-raffle-modal__actions button {
-  padding: 0.45rem 0.75rem;
-  border-radius: 8px;
-  font: inherit;
-  cursor: pointer;
+.create-raffle-modal__actions .app-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0.55rem 1rem;
+  border-radius: 0.7rem;
+  font-size: 0.92rem;
+  font-weight: 700;
 }
 
-.create-raffle-modal__actions button[type="submit"] {
-  border: 1px solid var(--iz-color-accent);
-  background: var(--iz-color-accent);
+.create-raffle-modal__actions .app-btn--cancel,
+.create-raffle-modal__actions .app-btn--secondary {
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text-secondary);
+}
+
+.create-raffle-modal__actions .app-btn--cancel:hover:not(:disabled),
+.create-raffle-modal__actions .app-btn--secondary:hover:not(:disabled) {
+  border-color: var(--iz-color-border-strong);
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text);
+}
+
+.create-raffle-modal__actions .app-btn--primary {
+  border: 1px solid var(--iz-color-action);
+  background: var(--iz-color-action);
   color: var(--iz-color-on-contrast);
-  font-weight: 600;
+}
+
+.create-raffle-modal__actions .app-btn--primary:hover:not(:disabled) {
+  border-color: var(--iz-color-action-hover);
+  background: var(--iz-color-action-hover);
 }
 
 .create-raffle-modal__media-type {
   margin: 0;
   padding: 0.55rem 0.65rem;
-  border: 1px solid var(--iz-color-accent-ring-soft);
+  border: 1px solid var(--iz-color-border);
   border-radius: 8px;
-  background: var(--iz-color-accent-soft);
+  background: var(--iz-color-surface-muted);
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 1rem;
@@ -191,7 +249,7 @@
 
 .create-raffle-modal__media-type-option input[type="radio"] {
   width: auto;
-  accent-color: var(--iz-color-accent);
+  accent-color: var(--iz-color-action);
 }
 
 .create-raffle-modal__wizard {
@@ -201,12 +259,14 @@
 }
 
 .create-raffle-modal__actions_wizard {
-  display: flex;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  gap: 0.65rem;
 }
 
 .create-raffle-modal__actions_wizard .app-btn {
-  flex: 1;
+  flex: none;
+  width: 100%;
 }
 
 .create-raffle-modal__block-notice {

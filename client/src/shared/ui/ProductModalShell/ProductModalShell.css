@@ -13,14 +13,18 @@
   overflow: visible;
 }
 
-/* Белая заливка под модалкой — зона над клавиатурой iOS */
+/*
+ * Заливка под модалкой — зона, которую оголяет мобильная клавиатура (iOS/Android).
+ * Цвет = фон страницы (--iz-color-bg), фон html/body не форсим: иначе на телефоне
+ * с viewport-fit=cover перекрашивались safe-area полосы сверху/снизу экрана.
+ */
 .product-modal-shell__keyboard-bleed {
   position: absolute;
   left: 0;
   right: 0;
   top: 100%;
   height: 100vh;
-  background: #fff;
+  background: var(--iz-color-bg);
   pointer-events: none;
   z-index: 0;
 }
@@ -36,7 +40,7 @@
   min-height: 0;
   overflow: hidden;
   border-radius: var(--iz-radius-modal);
-  background: #fff;
+  background: var(--iz-color-surface);
   box-shadow: var(--iz-shadow-modal);
 }
 
@@ -129,7 +133,7 @@
   flex-shrink: 0;
   padding: var(--iz-space-3) var(--iz-space-4) var(--iz-space-4);
   border-top: 1px solid var(--iz-color-border);
-  background: #fff;
+  background: var(--iz-color-surface);
 }
 
 .product-modal-shell__visually-hidden-title {

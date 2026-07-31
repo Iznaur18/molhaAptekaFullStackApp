@@ -257,6 +257,7 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
 
   return createPortal(
     <div className="data-confirmation-modal__backdrop" role="presentation">
+      <div className="data-confirmation-modal__keyboard-bleed" aria-hidden="true" />
       <div
         className="data-confirmation-modal"
         role="dialog"

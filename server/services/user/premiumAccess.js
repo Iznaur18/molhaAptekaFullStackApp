@@ -16,6 +16,7 @@ import {
   deductLoyaltyPoints,
   InsufficientLoyaltyPointsError,
 } from "../loyalty/loyaltyPointsSpend.js";
+import { runMoneyIdempotentMutation } from "../loyalty/runMoneyIdempotentMutation.js";
 import {
   creditReferralCashbackFromSpend,
   notifyReferralCashbackCredited,
@@ -151,8 +152,20 @@ export const processPremiumCronTasks = async () => {
 
 /**
  * @param {string} userId
+ * @param {{ idempotencyKey: string }} options
  */
-export const purchasePremiumSubscription = async (userId) => {
+export const purchasePremiumSubscription = async (userId, { idempotencyKey }) =>
+  runMoneyIdempotentMutation({
+    scope: "premium_purchase",
+    actorUserId: userId,
+    idempotencyKey,
+    execute: () => purchasePremiumSubscriptionOnce(userId),
+  });
+
+/**
+ * @param {string} userId
+ */
+async function purchasePremiumSubscriptionOnce(userId) {
   const user = await UserModel.findById(userId)
     .select("isPremiumUser premiumExpiresAt isBlockedUser isActiveUser")
     .lean();
@@ -209,7 +222,7 @@ export const purchasePremiumSubscription = async (userId) => {
       premiumExpiresAt: result.premiumExpiresAt,
     };
   });
-};
+}
 
 /**
  * @param {Date | string | null | undefined} premiumExpiresAt

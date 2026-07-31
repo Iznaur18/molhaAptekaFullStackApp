@@ -11,6 +11,8 @@
   --raffle-modal-exit-ease: cubic-bezier(0.55, 0.055, 0.675, 1);
   --raffle-modal-height: 80vh;
   --raffle-modal-height: 80dvh;
+  /* Phone ≤640: edge-to-edge; ≥641: узкая колонка под квадрат приза */
+  --raffle-modal-max-width: 100%;
   --raffle-modal-radius: 2rem;
 
   position: fixed;
@@ -21,6 +23,12 @@
   justify-content: center;
   padding: 0;
   background: transparent;
+}
+
+@media (min-width: 641px) {
+  .home-featured-raffle-modal__backdrop {
+    --raffle-modal-max-width: min(26rem, 100%);
+  }
 }
 
 .home-featured-raffle-modal__scrim {
@@ -47,7 +55,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 100%;
+  max-width: var(--raffle-modal-max-width);
   height: var(--raffle-modal-height);
   max-height: var(--raffle-modal-height);
   margin: 0;

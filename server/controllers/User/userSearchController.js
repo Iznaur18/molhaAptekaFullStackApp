@@ -1,4 +1,3 @@
-import { sortUsersByPodiumCriteria } from "@izibuy/shared-lib";
 import { UserModel } from "../../models/index.js";
 import { successRes } from "../../services/http/index.js";
 import { buildRegexSearchOr } from "../../utils/buildRegexSearchOr.js";
@@ -50,6 +49,7 @@ const buildUsersQuery = ({ search }) => {
   return { usersQuery, hasTextSearch: Boolean(searchCondition) };
 };
 
+/** Поиск по имени — сортировка по рейтингу в Mongo. */
 const fetchUsersByRatingAggregate = async ({ usersQuery, skip, limit }) =>
   UserModel.aggregate([
     { $match: usersQuery },
@@ -81,35 +81,61 @@ const fetchUsersByRatingAggregate = async ({ usersQuery, skip, limit }) =>
     { $project: USER_SEARCH_LIST_PROJECTION },
   ]);
 
-const fetchAllUsersForPodiumListing = async (usersQuery) =>
-  UserModel.find(usersQuery, USER_SEARCH_LIST_PROJECTION).lean();
+/**
+ * Листинг без search: пагинация в Mongo (loyalty → rating), без find() всех users.
+ * sales/followers — display-only после attach (не пересортировываем страницу).
+ */
+const fetchUsersByPodiumAggregate = async ({ usersQuery, skip, limit }) =>
+  UserModel.aggregate([
+    { $match: usersQuery },
+    {
+      $addFields: {
+        ratingAvg: {
+          $cond: [
+            { $gt: ["$userRatingByVotes.countVotes", 0] },
+            {
+              $divide: [
+                "$userRatingByVotes.totalRating",
+                "$userRatingByVotes.countVotes",
+              ],
+            },
+            0,
+          ],
+        },
+      },
+    },
+    {
+      $sort: {
+        userLoyaltyPoints: -1,
+        ratingAvg: -1,
+        "userRatingByVotes.countVotes": -1,
+        _id: 1,
+      },
+    },
+    { $skip: skip },
+    { $limit: limit },
+    { $project: USER_SEARCH_LIST_PROJECTION },
+  ]);
 
 export const userSearchController = async (req, res) => {
-const { page, limit, skip } = parsePagination(req.query);
-    const { usersQuery, hasTextSearch } = buildUsersQuery(req.query);
-    const viewer = await getOptionalViewerFromRequest(req);
+  const { page, limit, skip } = parsePagination(req.query);
+  const { usersQuery, hasTextSearch } = buildUsersQuery(req.query);
+  const viewer = await getOptionalViewerFromRequest(req);
 
-    applyAdminVisibilityToUsersSearchQuery(usersQuery, {
-      viewer,
-      roleFilter: req.query.userRole,
-    });
+  applyAdminVisibilityToUsersSearchQuery(usersQuery, {
+    viewer,
+    roleFilter: req.query.userRole,
+  });
 
-    const total = await UserModel.countDocuments(usersQuery);
+  const total = await UserModel.countDocuments(usersQuery);
 
-    let usersRaw;
-    if (hasTextSearch) {
-      usersRaw = await fetchUsersByRatingAggregate({ usersQuery, skip, limit });
-    } else {
-      usersRaw = await fetchAllUsersForPodiumListing(usersQuery);
-    }
+  const usersRaw = hasTextSearch
+    ? await fetchUsersByRatingAggregate({ usersQuery, skip, limit })
+    : await fetchUsersByPodiumAggregate({ usersQuery, skip, limit });
 
-    const usersSanitized = sanitizeUsersSearchList(usersRaw, { viewer });
-    const usersWithCommerce = await attachUserListCommerceStats(usersSanitized);
-    const usersWithFollowers = await attachFollowersCountToUsers(usersWithCommerce);
+  const usersSanitized = sanitizeUsersSearchList(usersRaw, { viewer });
+  const usersWithCommerce = await attachUserListCommerceStats(usersSanitized);
+  const users = await attachFollowersCountToUsers(usersWithCommerce);
 
-    const users = hasTextSearch
-      ? usersWithFollowers
-      : sortUsersByPodiumCriteria(usersWithFollowers).slice(skip, skip + limit);
-
-    return successRes(res, { users, total, page, limit });
+  return successRes(res, { users, total, page, limit });
 };

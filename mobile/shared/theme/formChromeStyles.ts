@@ -604,8 +604,9 @@ export const useBottomSheetFormStyles = createThemedStyles((theme) => ({
     height: `${CHECKOUT_SHEET_HEIGHT_PERCENT}%`,
     maxHeight: `${CHECKOUT_SHEET_HEIGHT_PERCENT}%`,
     paddingBottom: 0,
-    borderTopLeftRadius: theme.radius.lg,
-    borderTopRightRadius: theme.radius.lg,
+    /* Паритет web/raffle sheet: 2rem top radius (squircle на web) */
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
   },
   checkoutScroll: {
     flex: 1,

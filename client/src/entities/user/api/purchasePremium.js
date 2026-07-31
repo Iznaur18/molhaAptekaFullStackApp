@@ -2,6 +2,7 @@ import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
+ * @param {{ idempotencyKey: string }} input
  * @returns {Promise<{
  *   message: string;
  *   loyaltyPointsBalance: number;
@@ -9,9 +10,11 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  *   isActive: boolean;
  * }>}
  */
-export async function purchasePremium() {
+export async function purchasePremium({ idempotencyKey }) {
   try {
-    const { data } = await apiClient.post("/user/me/premium/purchase");
+    const { data } = await apiClient.post("/user/me/premium/purchase", {
+      idempotencyKey,
+    });
     if (!data?.success || !data?.data) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

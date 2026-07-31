@@ -22,7 +22,6 @@ export function CreateProductCategorySection({
 }) {
   return (
     <div className={["create-product-section", className].filter(Boolean).join(" ")}>
-      <p className="create-product-section__lead">{CREATE_PRODUCT_MODAL_UI.WIZARD_CATEGORY_LEAD}</p>
       <CreateProductCategoryPicker
         value={{
           productCategoryId: form.productCategoryId,

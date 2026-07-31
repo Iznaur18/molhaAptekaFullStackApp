@@ -10,6 +10,9 @@ export const PRODUCT_COMPARE_CANDIDATE_SCAN_LIMIT = 200;
 /** Минимальная длина токена названия. */
 export const PRODUCT_COMPARE_NAME_TOKEN_MIN_LENGTH = 2;
 
+/** Лимит запросов к /compare (дорогой публичный расчёт) на 15 минут / IP. */
+export const PRODUCT_COMPARE_RATE_LIMIT_PER_15_MIN = 120;
+
 /** Служебные слова (RU/EN), не участвуют в совпадении названия. */
 export const PRODUCT_COMPARE_NAME_STOP_WORDS = new Set([
   "и",

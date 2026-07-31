@@ -108,10 +108,40 @@ export async function collectComparableMatchedPeers(productId) {
   rankedPeers.sort(
     (a, b) =>
       b.characteristicMatches - a.characteristicMatches ||
-      String(b.product.createdAt ?? "").localeCompare(String(a.product.createdAt ?? "")),
+      toCreatedAtTime(b.product.createdAt) - toCreatedAtTime(a.product.createdAt),
   );
 
   return { source, rankedPeers };
+}
+
+/**
+ * @param {unknown} value
+ * @returns {number}
+ */
+function toCreatedAtTime(value) {
+  const time = new Date(/** @type {string | number | Date} */ (value ?? 0)).getTime();
+  return Number.isFinite(time) ? time : 0;
+}
+
+/**
+ * Цены из уже собранных peers (без повторного скана БД).
+ * @param {{ source: Record<string, unknown>; rankedPeers: Array<{ product: Record<string, unknown> }> } | null} collected
+ * @returns {{ productPrice: number | null; peerPrices: number[] }}
+ */
+export function extractComparablePeerPrices(collected) {
+  if (!collected) {
+    return { productPrice: null, peerPrices: [] };
+  }
+
+  const productPrice = Math.floor(Number(collected.source.productPrice));
+  const peerPrices = collected.rankedPeers
+    .map((row) => Math.floor(Number(row.product.productPrice)))
+    .filter((value) => Number.isFinite(value) && value > 0);
+
+  return {
+    productPrice: Number.isFinite(productPrice) && productPrice > 0 ? productPrice : null,
+    peerPrices,
+  };
 }
 
 /**
@@ -135,23 +165,93 @@ export async function findComparableProducts(productId) {
 }
 
 /**
- * Цены всех matched peers (для рыночного статуса; не только top-10 UI).
+ * Лёгкий скан цен peers без populate seller (для market status).
  * @param {string} productId
- * @returns {Promise<{ productPrice: number | null; peerPrices: number[] }>}
  */
-export async function findComparablePeerPrices(productId) {
-  const collected = await collectComparableMatchedPeers(productId);
-  if (!collected) {
+export async function collectComparablePeerPricesOnly(productId) {
+  if (!mongoose.isValidObjectId(productId)) {
     return { productPrice: null, peerPrices: [] };
   }
 
-  const productPrice = Math.floor(Number(collected.source.productPrice));
-  const peerPrices = collected.rankedPeers
-    .map((row) => Math.floor(Number(row.product.productPrice)))
-    .filter((value) => Number.isFinite(value) && value > 0);
+  const source = await ProductModel.findById(productId)
+    .select(
+      "productName productPrice productCharacteristics productCategoryId productCategory productModerationStatus",
+    )
+    .lean();
 
-  return {
-    productPrice: Number.isFinite(productPrice) && productPrice > 0 ? productPrice : null,
-    peerPrices,
+  if (!source || source.productModerationStatus !== PRODUCT_MODERATION_APPROVED) {
+    return { productPrice: null, peerPrices: [] };
+  }
+
+  const sourceCharacteristicPairs = buildCharacteristicPairSet(
+    source.productCharacteristics,
+  );
+  if (sourceCharacteristicPairs.size < PRODUCT_COMPARE_MIN_CHARACTERISTIC_MATCHES) {
+    return extractComparablePeerPrices({ source, rankedPeers: [] });
+  }
+
+  const sourceNameTokens = tokenizeProductNameForCompare(source.productName);
+  if (sourceNameTokens.length === 0) {
+    return extractComparablePeerPrices({ source, rankedPeers: [] });
+  }
+
+  const categoryId =
+    source.productCategoryId != null ? String(source.productCategoryId) : "";
+  const legacyCategory =
+    typeof source.productCategory === "string" ? source.productCategory.trim() : "";
+
+  /** @type {Record<string, unknown>} */
+  const categoryFilter = {};
+  if (categoryId && mongoose.isValidObjectId(categoryId)) {
+    categoryFilter.productCategoryId = new mongoose.Types.ObjectId(categoryId);
+  } else if (legacyCategory) {
+    categoryFilter.productCategory = legacyCategory;
+  } else {
+    return extractComparablePeerPrices({ source, rankedPeers: [] });
+  }
+
+  const hiddenSellerIds = await getHiddenSellerIds();
+
+  /** @type {Record<string, unknown>} */
+  const match = {
+    _id: { $ne: source._id },
+    productModerationStatus: PRODUCT_MODERATION_APPROVED,
+    productIsAvailable: { $ne: false },
+    ...categoryFilter,
   };
+
+  if (hiddenSellerIds.length > 0) {
+    match.productSeller = { $nin: hiddenSellerIds };
+  }
+
+  const candidates = await ProductModel.find(match)
+    .sort({ createdAt: -1 })
+    .limit(PRODUCT_COMPARE_CANDIDATE_SCAN_LIMIT)
+    .select("productName productPrice productCharacteristics createdAt")
+    .lean();
+
+  const rankedPeers = [];
+  for (const candidate of candidates) {
+    const evaluation = evaluateProductCompareMatch({
+      sourceNameTokens,
+      sourceCharacteristicPairs,
+      candidateName: candidate.productName,
+      candidateCharacteristics: candidate.productCharacteristics,
+    });
+    if (!evaluation.ok) continue;
+    rankedPeers.push({
+      product: candidate,
+      characteristicMatches: evaluation.characteristicMatches,
+    });
+  }
+
+  return extractComparablePeerPrices({ source, rankedPeers });
+}
+
+/**
+ * Цены всех matched peers (UI/legacy).
+ * @param {string} productId
+ */
+export async function findComparablePeerPrices(productId) {
+  return collectComparablePeerPricesOnly(productId);
 }

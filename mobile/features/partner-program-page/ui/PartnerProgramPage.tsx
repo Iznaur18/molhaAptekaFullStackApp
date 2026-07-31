@@ -106,8 +106,22 @@ export const PartnerProgramPage = () => {
   const handleShare = async () => {
     try {
       await Share.share({ message: data.inviteUrl });
-    } catch {
-      // ignore cancel
+    } catch (error) {
+      const isCancel =
+        error instanceof Error &&
+        (error.name === "AbortError" ||
+          /cancel|dismiss/i.test(error.message));
+      if (isCancel) {
+        return;
+      }
+      try {
+        await Clipboard.setStringAsync(data.inviteUrl);
+        setFeedbackIsError(false);
+        setFeedback(PARTNER_PROGRAM_PAGE_UI.SHARE_COPIED);
+      } catch {
+        setFeedbackIsError(true);
+        setFeedback(PARTNER_PROGRAM_PAGE_UI.SHARE_FAILED);
+      }
     }
   };
 

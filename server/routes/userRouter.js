@@ -31,6 +31,7 @@ import {
   getMyReferralProgramController,
   convertPartnerBalanceController,
   getMonthlyLoyaltyPointsAwardedController,
+  getUserPhoneController,
 } from "../controllers/index.js";
 import {
   checkAuthMW,
@@ -42,6 +43,7 @@ import {
   userStoryCreateRateLimiter,
   userStoryReportRateLimiter,
   userSearchRateLimiter,
+  userPhoneRevealRateLimiter,
 } from "../middlewares/index.js";
 import {
   userIdParamValidation,
@@ -56,6 +58,7 @@ import {
   submitUserStoryReportValidation,
   resolveUserStoryReportsValidation,
   adminCreditLoyaltyPointsValidation,
+  purchasePremiumValidation,
   convertPartnerBalanceValidation,
 } from "../validations/index.js";
 
@@ -171,7 +174,12 @@ router.post(
 );
 
 router.get("/me/premium/status", checkAuthMW, getMyPremiumStatusController);
-router.post("/me/premium/purchase", checkAuthMW, purchasePremiumController);
+router.post(
+  "/me/premium/purchase",
+  checkAuthMW,
+  purchasePremiumValidation,
+  purchasePremiumController,
+);
 
 router.get(
   "/me/loyalty-points/status",
@@ -200,6 +208,12 @@ router.get(
   getMonthlyLoyaltyPointsAwardedController,
 );
 
+router.get(
+  "/:userIdClient/phone",
+  userPhoneRevealRateLimiter,
+  userIdParamValidation,
+  getUserPhoneController,
+);
 router.get(
   "/:userIdClient/purchases",
   checkAuthMW,

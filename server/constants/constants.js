@@ -47,7 +47,6 @@ export const ALLOWED_FIELDS_FOR_MODERATOR = [
   "premiumExpiresAt",
   "isUserDataConfirmed",
   "notesAboutUser",
-  "userLoyaltyPoints",
 ];
 
 /** Собственный профиль модератора (без блокировок, роли и начисления баллов себе). */

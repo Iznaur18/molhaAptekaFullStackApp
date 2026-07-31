@@ -135,6 +135,7 @@ export function getUserProfileRows(user, options = {}) {
       label: L.userPhoneNumber,
       value: formatRuPhoneDisplayOrEmpty(user.userPhoneNumber),
       href: toRuPhoneTelHref(user.userPhoneNumber) ?? undefined,
+      needsPhoneReveal: Boolean(user.hasPhoneNumber) && isEmpty(user.userPhoneNumber),
     },
     {
       id: "isUserDataConfirmed",

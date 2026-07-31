@@ -37,7 +37,6 @@ export function assertStaffCanManageTargetPremium({ editorRole, targetRole }) {
 export const STAFF_ADMIN_PROTECTED_PROFILE_FIELDS = [
   "isBlockedUser",
   "isActiveUser",
-  "userLoyaltyPoints",
   "isUserDataConfirmed",
   "isPremiumUser",
   "premiumExpiresAt",

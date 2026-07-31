@@ -43,6 +43,11 @@ export const requestProductPromotionBodySchema = z.object({
       (value) => PRODUCT_PROMOTION_DURATION_CODES.includes(value),
       "Неверный срок продвижения",
     ),
+  idempotencyKey: z
+    .string({ required_error: "Укажите idempotencyKey" })
+    .trim()
+    .min(1, "Укажите idempotencyKey")
+    .max(64),
 });
 
 export const myProductPromotionsQuerySchema = z.object({

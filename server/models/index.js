@@ -37,6 +37,7 @@ import { SellerPersonalCategoryCampaignModel } from "./SellerPersonalCategoryCam
 import StaffAuditLogModel from "./StaffAuditLogModel.js";
 import PassportVaultAccessLogModel from "./PassportVaultAccessLogModel.js";
 import ReferralLedgerEntryModel from "./ReferralLedgerEntryModel.js";
+import { MoneyIdempotencyRecordModel } from "./MoneyIdempotencyRecordModel.js";
 
 export {
   UserModel,
@@ -78,4 +79,5 @@ export {
   StaffAuditLogModel,
   PassportVaultAccessLogModel,
   ReferralLedgerEntryModel,
+  MoneyIdempotencyRecordModel,
 };

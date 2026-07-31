@@ -39,7 +39,11 @@ export const UserDetailsProfileBody = ({
         />
       ) : null}
 
-      <UserProfileInfoPanel rows={profileRows} hidePhoneUntilReveal />
+      <UserProfileInfoPanel
+        rows={profileRows}
+        hidePhoneUntilReveal
+        userId={userId}
+      />
     </View>
   );
 };

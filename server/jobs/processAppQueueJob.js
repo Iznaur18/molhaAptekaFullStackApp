@@ -8,6 +8,7 @@ import {
   JOB_PROCESS_SITE_HEADER_BANNER_CAMPAIGN_CRON,
   JOB_PURGE_EXPIRED_BUYER_PASSPORT_SHARES,
   JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_CRON,
+  JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_PEERS,
   JOB_SEND_EMAIL_VERIFICATION,
 } from "../queues/queueConstants.js";
 import { sendEmailVerificationForUser } from "../services/auth/emailVerification.js";
@@ -18,7 +19,10 @@ import { expireProductPromotionsAndSendNotifications } from "../utils/productPro
 import { processSellerPersonalCategoryCronTasks } from "../services/seller-personal-category/sellerPersonalCategoryHelpers.js";
 import { processSiteHeaderBannerCampaignCronTasks } from "../services/site-header-banner-campaign/siteHeaderBannerCampaignHelpers.js";
 import { purgeExpiredBuyerPassportShares } from "../services/passport-vault/index.js";
-import { processProductPriceMarketStatusCronTasks } from "../services/product/refreshProductPriceMarketStatus.js";
+import {
+  processProductPriceMarketStatusCronTasks,
+  processProductPriceMarketStatusPeers,
+} from "../services/product/refreshProductPriceMarketStatus.js";
 import { expireStaleUserStories } from "../utils/userStoryHelpers.js";
 
 /**
@@ -46,6 +50,8 @@ export async function processAppQueueJob(job) {
       return purgeExpiredBuyerPassportShares();
     case JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_CRON:
       return processProductPriceMarketStatusCronTasks();
+    case JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_PEERS:
+      return processProductPriceMarketStatusPeers(job.data.productIds);
     default:
       throw new Error(`Unknown BullMQ job: ${job.name}`);
   }

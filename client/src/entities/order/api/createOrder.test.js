@@ -29,6 +29,7 @@ describe("createOrder", () => {
       deliveryAddress: "г Москва, ул Тестовая, д 1",
       deliveryAddressFlat: "",
       paymentMethod: "cardPrepaid",
+      idempotencyKey: "test-order-key-1",
     };
 
     const result = await createOrder(payload);
@@ -48,6 +49,7 @@ describe("createOrder", () => {
         deliveryAddress: "г Москва",
         deliveryAddressFlat: "",
         paymentMethod: "cardPrepaid",
+        idempotencyKey: "test-order-key-2",
       }),
     ).rejects.toThrow("Недостаточно товара");
   });
@@ -61,6 +63,7 @@ describe("createOrder", () => {
         deliveryAddress: "г Москва",
         deliveryAddressFlat: "",
         paymentMethod: "cardPrepaid",
+        idempotencyKey: "test-order-key-3",
       }),
     ).rejects.toThrow(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
   });

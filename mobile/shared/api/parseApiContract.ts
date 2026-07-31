@@ -43,18 +43,8 @@ export const parseAuthSessionData = (payload: unknown) => {
     payload,
     API_CLIENT_UI.INVALID_SERVER_RESPONSE,
   );
-  if (
-    typeof session.accessToken !== "string" ||
-    session.accessToken.length < 1 ||
-    typeof session.refreshToken !== "string" ||
-    session.refreshToken.length < 1
-  ) {
-    throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
-  }
-  return session as typeof session & {
-    accessToken: string;
-    refreshToken: string;
-  };
+  // Expo web: cookies, токены в JSON могут отсутствовать.
+  return session;
 };
 
 const catalogProductDataSchema = z.object({

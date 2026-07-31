@@ -6,6 +6,17 @@
 
 .address-delivery-fields__line-wrap {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+}
+
+.address-delivery-fields__label {
+  padding: 0;
+  font-size: var(--iz-font-base);
+  font-weight: var(--iz-weight-semibold);
+  color: var(--iz-color-text-secondary);
 }
 
 .address-delivery-fields__suggestions {

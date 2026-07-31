@@ -55,10 +55,8 @@ export const createApp = () => {
   app.get("/health", (_req, res) => {
     const health = buildHealthPayload();
     const statusCode = health.status === "ok" ? 200 : 503;
-    if (isProduction) {
-      return res.status(statusCode).json({ status: health.status });
-    }
-    return res.status(statusCode).json(health);
+    // Публично только status — internals (mongo/git/uptime) не светим даже в dev/LAN.
+    return res.status(statusCode).json({ status: health.status });
   });
 
   // Локальные файлы (UPLOAD_STORAGE=disk) и legacy после миграции на S3/CDN.

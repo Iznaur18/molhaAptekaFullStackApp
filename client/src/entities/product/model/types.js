@@ -12,9 +12,6 @@
  * @typedef {object} ProductSellerPopulated
  * @property {string} _id
  * @property {string} [userName]
- * @property {string} [email]
- * @property {string} [userPhoneNumber]
- * @property {string} [userAddress]
  * @property {string} [userAvatarUrl]
  * @property {{ x?: number; y?: number }} [userAvatarFocus]
  * @property {UserRatingByVotes} [userRatingByVotes]

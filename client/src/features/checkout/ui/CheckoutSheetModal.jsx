@@ -54,22 +54,6 @@ export function CheckoutSheetModal({
   });
 
   useEffect(() => {
-    if (!mounted) {
-      return undefined;
-    }
-    const html = document.documentElement;
-    const body = document.body;
-    const prevHtmlBg = html.style.backgroundColor;
-    const prevBodyBg = body.style.backgroundColor;
-    html.style.backgroundColor = "#fff";
-    body.style.backgroundColor = "#fff";
-    return () => {
-      html.style.backgroundColor = prevHtmlBg;
-      body.style.backgroundColor = prevBodyBg;
-    };
-  }, [mounted]);
-
-  useEffect(() => {
     if (!isOpen) {
       return undefined;
     }

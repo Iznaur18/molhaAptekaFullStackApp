@@ -66,6 +66,20 @@ async function attachUserIdFromAccessToken(req, res) {
   return null;
 }
 
+/**
+ * @param {unknown} error
+ */
+function isJwtAuthFailure(error) {
+  const name = error && typeof error === "object" ? error.name : "";
+  const message = error instanceof Error ? error.message : "";
+  return (
+    name === "JsonWebTokenError" ||
+    name === "TokenExpiredError" ||
+    name === "NotBeforeError" ||
+    message === "INVALID_TOKEN_TYPE"
+  );
+}
+
 export const checkAuthMW = async (req, res, next) => {
   const token = getAuthTokenFromRequest(req);
 
@@ -79,8 +93,11 @@ export const checkAuthMW = async (req, res, next) => {
       return errorResponse;
     }
     return next();
-  } catch {
-    return errorRes(res, 401, "Не авторизован");
+  } catch (error) {
+    if (isJwtAuthFailure(error)) {
+      return errorRes(res, 401, "Не авторизован");
+    }
+    return next(error);
   }
 };
 
@@ -103,8 +120,12 @@ export const checkAuthMeMW = async (req, res, next) => {
       return errorRes(res, 401, "Не авторизован");
     }
 
-    clearAuthSessionCookies(res);
-    return next();
+    if (isJwtAuthFailure(error)) {
+      clearAuthSessionCookies(res);
+      return next();
+    }
+
+    return next(error);
   }
 };
 

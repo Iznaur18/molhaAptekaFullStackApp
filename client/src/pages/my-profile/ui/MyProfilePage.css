@@ -108,15 +108,15 @@
   --nav-tone-soft: var(--iz-color-surface-elevated);
   --nav-tone-strong: var(--iz-color-text-muted);
 
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
   width: 100%;
   margin: 0;
-  padding: 0.5rem 0.6rem 0.5rem calc(0.6rem - var(--my-profile-nav-accent-width));
+  padding: 0.5rem 0.6rem;
   border: none;
-  border-left: var(--my-profile-nav-accent-width) solid transparent;
   border-radius: 0.6rem;
   background: transparent;
   color: var(--iz-color-text-secondary);
@@ -127,9 +127,20 @@
   text-align: left;
   transition:
     background-color 0.15s ease,
-    border-color 0.15s ease,
-    color 0.15s ease,
-    transform 0.15s ease;
+    color 0.15s ease;
+}
+
+.my-profile-page__nav-button::before {
+  content: "";
+  position: absolute;
+  top: 0.35rem;
+  bottom: 0.35rem;
+  left: 0;
+  width: var(--my-profile-nav-accent-width);
+  border-radius: 999px;
+  background: transparent;
+  pointer-events: none;
+  transition: background-color 0.15s ease;
 }
 
 .my-profile-page__nav-button[data-tone="blue"] {
@@ -204,10 +215,13 @@
 }
 
 .my-profile-page__nav-button_active {
-  border-left-color: var(--nav-tone);
   background: color-mix(in srgb, var(--nav-tone-soft) 88%, var(--nav-tone) 12%);
   color: var(--nav-tone-strong);
   font-weight: 700;
+}
+
+.my-profile-page__nav-button_active::before {
+  background: var(--nav-tone);
 }
 
 .my-profile-page__nav-button_active .my-profile-page__nav-icon {
@@ -532,6 +546,21 @@
   background: var(--iz-color-danger);
 }
 
+.my-profile-page__mobile-nav-portal {
+  --my-profile-mobile-nav-width: min(18rem, 88vw);
+  --my-profile-mobile-nav-z-index: calc(var(--iz-z-dropdown) + 20);
+  --my-profile-mobile-nav-enter-ms: 360ms;
+  --my-profile-mobile-nav-exit-ms: 280ms;
+  --my-profile-mobile-nav-enter-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --my-profile-mobile-nav-exit-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  position: fixed;
+  inset: 0;
+  z-index: var(--my-profile-mobile-nav-z-index);
+  background: transparent;
+  pointer-events: none;
+}
+
 .my-profile-page__mobile-nav-toggle,
 .my-profile-page__mobile-nav-backdrop {
   display: none;
@@ -608,21 +637,90 @@
 }
 
 .my-profile-page__mobile-nav-backdrop {
-  position: fixed;
+  position: absolute;
   inset: 0;
-  z-index: calc(var(--my-profile-mobile-nav-z-index) - 1);
+  z-index: 0;
   margin: 0;
   padding: 0;
   border: none;
+  /* scrim поверх portal bg — без env(safe-area-*), единый цвет по всему экрану */
   background: color-mix(in srgb, var(--iz-color-ink) 48%, transparent);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.24s ease;
+  overscroll-behavior: none;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.my-profile-page__mobile-nav-backdrop--visible {
+/* Появление/уход рисуют keyframes по data-state портала. Один флаг isMobileNavOpen
+   управляет и enter, и exit — без промежуточного visible-состояния и rAF-флипа. */
+@keyframes my-profile-nav-scrim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes my-profile-nav-scrim-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes my-profile-nav-drawer-in {
+  from {
+    transform: translateX(var(--my-profile-nav-hidden-x, 0));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes my-profile-nav-drawer-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(var(--my-profile-nav-hidden-x, 0));
+  }
+}
+
+.my-profile-page__mobile-nav-portal[data-state="open"] .my-profile-page__mobile-nav-backdrop {
   opacity: 1;
   pointer-events: auto;
+  animation: my-profile-nav-scrim-in var(--my-profile-mobile-nav-enter-ms) ease both;
+}
+
+.my-profile-page__mobile-nav-portal[data-state="closing"] .my-profile-page__mobile-nav-backdrop {
+  opacity: 0;
+  pointer-events: none;
+  animation: my-profile-nav-scrim-out var(--my-profile-mobile-nav-exit-ms) ease both;
+}
+
+.my-profile-page__mobile-nav-portal[data-state="open"] .my-profile-page__sidebar-wrap {
+  transform: translateX(0);
+  pointer-events: auto;
+  animation: my-profile-nav-drawer-in var(--my-profile-mobile-nav-enter-ms)
+    var(--my-profile-mobile-nav-enter-ease) both;
+}
+
+.my-profile-page__mobile-nav-portal[data-state="closing"] .my-profile-page__sidebar-wrap {
+  transform: translateX(var(--my-profile-nav-hidden-x, 0));
+  pointer-events: none;
+  animation: my-profile-nav-drawer-out var(--my-profile-mobile-nav-exit-ms)
+    var(--my-profile-mobile-nav-exit-ease) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .my-profile-page__mobile-nav-portal[data-state] .my-profile-page__mobile-nav-backdrop,
+  .my-profile-page__mobile-nav-portal[data-state] .my-profile-page__sidebar-wrap {
+    animation: none;
+  }
 }
 
 @container app-viewport (max-width: 900px) {
@@ -653,29 +751,27 @@
   }
 
   .my-profile-page__sidebar-wrap {
-    position: fixed;
+    /* стартовая позиция за левым краем; direction задаёт data-state-анимация */
+    --my-profile-nav-hidden-x: calc(-100% - 0.75rem);
+    position: absolute;
     top: 0;
     left: 0;
     bottom: 0;
-    z-index: var(--my-profile-mobile-nav-z-index);
+    z-index: 1;
     flex: 0 0 auto;
     width: var(--my-profile-mobile-nav-width);
     max-width: var(--my-profile-mobile-nav-width);
     padding: 0.65rem 0.45rem 0.65rem 0.65rem;
-    background: var(--iz-color-bg);
+    border-radius: 0 2rem 2rem 0;
+    corner-shape: squircle;
+    background: var(--iz-color-surface);
     box-shadow: 12px 0 32px color-mix(in srgb, var(--iz-color-ink) 18%, transparent);
-    transform: translateX(calc(-100% - 0.75rem));
-    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translateX(var(--my-profile-nav-hidden-x));
+    overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
-    /* закрытый drawer не перехватывает тапы по bottom nav */
     pointer-events: none;
-  }
-
-  .my-profile-page__sidebar-wrap--open {
-    transform: translateX(0);
-    pointer-events: auto;
   }
 
   .my-profile-page__sidebar {
@@ -713,10 +809,6 @@
     .my-profile-page__mobile-nav-toggle:active {
       transform: none;
     }
-
-    .my-profile-page__sidebar-wrap {
-      transition: none;
-    }
   }
 
   .my-profile-page__mobile-nav-toggle-icon {
@@ -743,19 +835,20 @@
   }
 
   .my-profile-page__sidebar-wrap {
+    /* телефон: sheet выезжает справа — стартовая позиция за правым краем */
+    --my-profile-nav-hidden-x: calc(100% + 0.75rem);
     left: auto;
     right: 0;
+    top: 0;
+    bottom: 0;
     width: min(18rem, 88vw);
     max-width: min(18rem, 88vw);
     padding: 0.75rem 0.65rem 0.75rem 0.75rem;
-    border-radius: 1rem 0 0 1rem;
+    border-radius: 2rem 0 0 2rem;
+    corner-shape: squircle;
     background: var(--iz-color-surface);
     box-shadow: -12px 0 32px color-mix(in srgb, var(--iz-color-ink) 18%, transparent);
-    transform: translateX(calc(100% + 0.75rem));
-  }
-
-  .my-profile-page__sidebar-wrap--open {
-    transform: translateX(0);
+    transform: translateX(var(--my-profile-nav-hidden-x));
   }
 
   .my-profile-page__body .user-details-modal__banner {

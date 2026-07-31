@@ -25,6 +25,7 @@ export type ProfileRow = {
   label: string;
   value: string;
   href?: string;
+  needsPhoneReveal?: boolean;
 };
 
 const EM_DASH = "—";
@@ -172,6 +173,11 @@ export const getUserProfileRows = (
       label: USER_PROFILE_COPY.LABELS.userPhoneNumber,
       value: formatRuPhoneDisplayOrEmpty(user.userPhoneNumber),
       href: toRuPhoneTelHref(user.userPhoneNumber) ?? undefined,
+      needsPhoneReveal:
+        Boolean(user.hasPhoneNumber) &&
+        (user.userPhoneNumber === undefined ||
+          user.userPhoneNumber === null ||
+          user.userPhoneNumber === ""),
     },
     ...socialRows,
     {

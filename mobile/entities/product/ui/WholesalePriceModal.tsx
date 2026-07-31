@@ -146,7 +146,8 @@ export const WholesalePriceModal = ({
           <Text style={styles.info}>{CREATE_PRODUCT_UI.WHOLESALE_MODAL_HINT}</Text>
           {retailPrice > 0 ? (
             <Text style={styles.info}>
-              Обычная цена: {formatPriceRub(retailPrice)}
+              Обычная цена:{" "}
+              <Text style={styles.retailPrice}>{formatPriceRub(retailPrice)}</Text>
             </Text>
           ) : null}
 

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { createClientIdempotencyKey } from "../../../shared/lib/createClientIdempotencyKey.js";
 import { purchasePremium } from "../api/purchasePremium.js";
 import { invalidateLoyaltyPointsStatus } from "../lib/loyaltyPointsQueryCache.js";
 import { invalidatePremiumStatus } from "../lib/premiumQueryCache.js";
@@ -9,7 +10,8 @@ export function usePurchasePremiumMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: purchasePremium,
+    mutationFn: () =>
+      purchasePremium({ idempotencyKey: createClientIdempotencyKey() }),
     onSuccess: (result) => {
       queryClient.setQueryData(premiumQueryKeys.all, (old) => {
         if (!old) {

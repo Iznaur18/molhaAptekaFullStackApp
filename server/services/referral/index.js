@@ -6,7 +6,7 @@ export {
   creditReferralCashbackFromSpend,
   notifyReferralCashbackCredited,
 } from "./creditReferralCashbackFromSpend.js";
-export { reverseReferralCashbackForSource } from "./reverseReferralCashbackForSource.js";
+export { reverseReferralCashbackForSource, InsufficientPartnerBalanceForReversalError } from "./reverseReferralCashbackForSource.js";
 export { convertPartnerBalanceToLoyalty } from "./convertPartnerBalanceToLoyalty.js";
 export {
   getMyReferralProgram,

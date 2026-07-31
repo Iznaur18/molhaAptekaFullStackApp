@@ -8,16 +8,35 @@ import {
 } from "@molha/api-contract";
 
 test("adminCreditLoyaltyPointsBodySchema: accepts in-range amount", () => {
-  assert.deepEqual(adminCreditLoyaltyPointsBodySchema.parse({ amount: 100 }), {
-    amount: 100,
-  });
+  assert.deepEqual(
+    adminCreditLoyaltyPointsBodySchema.parse({
+      amount: 100,
+      idempotencyKey: "admin-credit-1",
+    }),
+    {
+      amount: 100,
+      idempotencyKey: "admin-credit-1",
+    },
+  );
   assert.equal(LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN, 1);
   assert.equal(LOYALTY_POINTS_ADMIN_FREE_CREDIT_MAX, 999_999);
 });
 
 test("adminCreditLoyaltyPointsBodySchema: rejects out of range", () => {
-  assert.throws(() => adminCreditLoyaltyPointsBodySchema.parse({ amount: 0 }));
   assert.throws(() =>
-    adminCreditLoyaltyPointsBodySchema.parse({ amount: 1_000_000 }),
+    adminCreditLoyaltyPointsBodySchema.parse({
+      amount: 0,
+      idempotencyKey: "x",
+    }),
   );
+  assert.throws(() =>
+    adminCreditLoyaltyPointsBodySchema.parse({
+      amount: 1_000_000,
+      idempotencyKey: "x",
+    }),
+  );
+});
+
+test("adminCreditLoyaltyPointsBodySchema: requires idempotencyKey", () => {
+  assert.throws(() => adminCreditLoyaltyPointsBodySchema.parse({ amount: 100 }));
 });

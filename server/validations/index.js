@@ -17,6 +17,7 @@ import {
 import { refreshAuthValidation } from "./user/refreshAuthValidation.js";
 import { verifyEmailTokenValidation } from "./user/verifyEmailTokenValidation.js";
 import { adminCreditLoyaltyPointsValidation } from "./user/adminCreditLoyaltyPointsValidation.js";
+import { purchasePremiumValidation } from "./user/purchasePremiumValidation.js";
 import { convertPartnerBalanceValidation } from "./user/referralValidation.js";
 import { makeProductValidation } from "./product/makeProductValidation.js";
 import { productIdParamValidation } from "./product/productIdParamValidation.js";
@@ -53,6 +54,7 @@ import { makeOrderValidation } from "./order/makeOrderValidation.js";
 import { updateOrderStatusValidation } from "./order/updateOrderStatusValidation.js";
 import { getAllOrdersValidation } from "./order/getAllOrdersValidation.js";
 import { getMySalesValidation } from "./order/getMySalesValidation.js";
+import { getMyOrdersValidation } from "./order/getMyOrdersValidation.js";
 import { orderItemActionValidation } from "./order/orderItemActionValidation.js";
 import { orderItemCancelValidation } from "./order/orderItemCancelValidation.js";
 import { replaceMyCartValidation } from "./cart/replaceMyCartValidation.js";
@@ -130,6 +132,7 @@ export {
   refreshAuthValidation,
   verifyEmailTokenValidation,
   adminCreditLoyaltyPointsValidation,
+  purchasePremiumValidation,
   convertPartnerBalanceValidation,
   registerPushTokenValidation,
   removePushTokenValidation,
@@ -160,6 +163,7 @@ export {
   updateOrderStatusValidation,
   getAllOrdersValidation,
   getMySalesValidation,
+  getMyOrdersValidation,
   orderItemActionValidation,
   orderItemCancelValidation,
   replaceMyCartValidation,

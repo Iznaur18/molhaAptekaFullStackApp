@@ -1,5 +1,6 @@
 import {
   apiClient,
+  isCookieAuthWeb,
   parseAuthSessionData,
   setAuthTokens,
 } from "@/shared/api";
@@ -15,10 +16,16 @@ export const loginUser = async (credentials: LoginCredentials) => {
   try {
     const { data } = await apiClient.post("/auth/login", credentials);
     const session = parseAuthSessionData(data);
-    await setAuthTokens({
-      accessToken: session.accessToken,
-      refreshToken: session.refreshToken,
-    });
+    if (
+      !isCookieAuthWeb() &&
+      typeof session.accessToken === "string" &&
+      typeof session.refreshToken === "string"
+    ) {
+      await setAuthTokens({
+        accessToken: session.accessToken,
+        refreshToken: session.refreshToken,
+      });
+    }
     return session;
   } catch (error) {
     throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.LOGIN_FALLBACK));

@@ -4,7 +4,6 @@ import { MODAL_BACKDROP_SCRIM } from "@/shared/theme/formChromeStyles";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const DIALOG_MAX_WIDTH = 420;
 export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,
@@ -166,34 +165,27 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
   },
 }));
 
-/** Центрированный dialog (не bottom-sheet): fade + тап по затемнению. */
+/** Fullscreen dialog: fade + тап по затемнению. */
 export const useDataConfirmationRequestModalStyles = createThemedStyles((theme) => ({
   root: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: MODAL_BACKDROP_SCRIM,
   },
   keyboardHost: {
-    width: "100%",
-    maxWidth: DIALOG_MAX_WIDTH,
-    maxHeight: "88%",
-  },
-  card: {
+    flex: 1,
     width: "100%",
     maxHeight: "100%",
-    borderRadius: theme.radius.lg,
+  },
+  card: {
+    flex: 1,
+    width: "100%",
+    maxHeight: "100%",
+    borderRadius: 0,
     backgroundColor: theme.colors.surface,
     overflow: "hidden",
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.2,
-    shadowRadius: 24,
-    elevation: 10,
   },
   header: {
     flexDirection: "row",

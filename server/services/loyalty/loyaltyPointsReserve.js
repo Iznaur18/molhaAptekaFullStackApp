@@ -58,10 +58,10 @@ export const releaseLoyaltyPointsReservation = async ({
 }) => {
   const normalizedAmount = Math.ceil(Number(amount));
   if (normalizedAmount <= 0) {
-    return;
+    throw new Error("Сумма снятия резерва должна быть больше 0");
   }
 
-  await UserModel.updateOne(
+  const result = await UserModel.updateOne(
     {
       _id: userId,
       userLoyaltyPointsReserved: { $gte: normalizedAmount },
@@ -69,6 +69,10 @@ export const releaseLoyaltyPointsReservation = async ({
     { $inc: { userLoyaltyPointsReserved: -normalizedAmount } },
     withMongoSession({}, session),
   );
+
+  if (result.matchedCount === 0) {
+    throw new Error("LOYALTY_RESERVE_RELEASE_FAILED");
+  }
 };
 
 /**

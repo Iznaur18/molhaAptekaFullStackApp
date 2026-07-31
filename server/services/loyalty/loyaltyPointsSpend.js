@@ -84,12 +84,16 @@ export const creditLoyaltyPoints = async ({ userId, amount, session }) => {
 export const refundLoyaltyPoints = async ({ userId, amount, session }) => {
   const normalizedAmount = Math.ceil(Number(amount));
   if (normalizedAmount <= 0) {
-    return;
+    throw new Error("Сумма возврата баллов должна быть больше 0");
   }
 
-  await UserModel.updateOne(
+  const result = await UserModel.updateOne(
     { _id: userId },
     { $inc: { userLoyaltyPoints: normalizedAmount } },
     { session: session ?? undefined },
   );
+
+  if (result.matchedCount === 0) {
+    throw new Error("USER_NOT_FOUND");
+  }
 };

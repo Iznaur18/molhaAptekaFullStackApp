@@ -18,7 +18,7 @@ body:has(.guest-profile) .app-shell__header {
   display: none !important;
 }
 
-/* Белый fill везде — иначе body `--iz-color-bg` (#e5eef2) бьётся с surface. */
+/* Белый fill везде — иначе body `--iz-color-bg` бьётся с surface. */
 body:has(.guest-profile),
 body:has(.guest-profile) #root {
   background: var(--iz-color-surface);

@@ -27,14 +27,33 @@
 
   position: fixed;
   inset: 0;
+  height: auto;
+  max-height: none;
   z-index: 1400;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   padding: 0;
   background: transparent;
+  overflow: visible;
   overscroll-behavior: none;
   touch-action: none;
+}
+
+/*
+ * Заливка под листом — зона, которую оголяет мобильная клавиатура (iOS/Android).
+ * Цвет = фон страницы (--iz-color-bg), фон html/body не форсим: иначе на телефоне
+ * с viewport-fit=cover перекрашивались safe-area полосы сверху/снизу экрана.
+ */
+.create-user-story-modal__keyboard-bleed {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 100vh;
+  background: var(--iz-color-bg);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .create-user-story-modal__scrim {

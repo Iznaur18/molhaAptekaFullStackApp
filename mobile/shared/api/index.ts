@@ -3,6 +3,7 @@ export {
   clearAuthTokens,
   getAccessToken,
   getRefreshToken,
+  isCookieAuthWeb,
   setAuthTokens,
 } from "./mobile-auth-storage";
 export {

@@ -13,6 +13,7 @@ import {
   PRODUCT_PROMOTION_TIER_META,
 } from "../../constants/productPromotionConstants.js";
 import { AppError } from "../../errors/AppError.js";
+import { runMoneyIdempotentMutation } from "../loyalty/runMoneyIdempotentMutation.js";
 import {
   activateProductPromotionRecord,
   expireProductPromotionsAndSendNotifications,
@@ -58,9 +59,44 @@ export function getProductPromotionTariffs() {
  *   productId: string;
  *   tier: unknown;
  *   tariffCode: unknown;
+ *   idempotencyKey: string;
  * }} input
  */
-export async function requestProductPromotion({ userId, productId, tier: rawTier, tariffCode: rawTariffCode }) {
+export async function requestProductPromotion({
+  userId,
+  productId,
+  tier: rawTier,
+  tariffCode: rawTariffCode,
+  idempotencyKey,
+}) {
+  return runMoneyIdempotentMutation({
+    scope: `product_promotion:${String(productId)}`,
+    actorUserId: userId,
+    idempotencyKey,
+    execute: () =>
+      requestProductPromotionOnce({
+        userId,
+        productId,
+        tier: rawTier,
+        tariffCode: rawTariffCode,
+      }),
+  });
+}
+
+/**
+ * @param {{
+ *   userId: string;
+ *   productId: string;
+ *   tier: unknown;
+ *   tariffCode: unknown;
+ * }} input
+ */
+async function requestProductPromotionOnce({
+  userId,
+  productId,
+  tier: rawTier,
+  tariffCode: rawTariffCode,
+}) {
   await expireProductPromotionsAndSendNotifications();
 
   const tier = Number(rawTier);

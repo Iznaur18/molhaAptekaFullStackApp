@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { mongoIdSchema } from "./mongoId.js";
 import { ORDER_LINE_ITEM_QUANTITY_MIN, ORDER_PAYMENT_METHODS } from "./order.js";
+import { optionalPageQuery } from "./queryHelpers.js";
 import { ADDRESS_LINE_MAX_LENGTH } from "./userFields.js";
 
 /** Синхрон с `server/constants/installmentConstants.js`. */
@@ -130,4 +131,6 @@ export const installmentIdempotencyBodySchema = z
 
 export const getMyInstallmentContractsListQuerySchema = z.object({
   status: z.enum(INSTALLMENT_SALES_LIST_FILTERS).optional(),
+  page: optionalPageQuery,
+  limit: z.coerce.number().int().min(1).max(100).optional().default(50),
 });

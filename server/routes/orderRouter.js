@@ -23,6 +23,7 @@ import {
   makeOrderValidation,
   updateOrderStatusValidation,
   getAllOrdersValidation,
+  getMyOrdersValidation,
   getMySalesValidation,
   orderItemActionValidation,
   orderItemCancelValidation,
@@ -38,7 +39,7 @@ router.get(
   getAllOrdersController,
 );
 router.get("/action-count", checkAuthMW, getMyOrdersActionCountController);
-router.get("/", checkAuthMW, getMyOrdersController);
+router.get("/", checkAuthMW, getMyOrdersValidation, getMyOrdersController);
 router.get("/sales/action-count", checkAuthMW, getMySalesActionCountController);
 router.get("/sales", checkAuthMW, getMySalesValidation, getMySalesController);
 router.post(

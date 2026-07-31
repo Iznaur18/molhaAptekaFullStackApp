@@ -20,6 +20,7 @@ export type CreateOrderPayload = {
   deliveryAddressFlat?: string;
   paymentMethod: OrderPaymentMethod;
   priceOfferId?: string;
+  idempotencyKey: string;
 };
 
 export const createOrder = async (payload: CreateOrderPayload) => {

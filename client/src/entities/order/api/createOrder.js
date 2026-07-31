@@ -4,8 +4,6 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 import { formatApiErrorMessage } from "@izibuy/shared-lib";
 
 /**
- * `POST /order` — оформление заказа авторизованным пользователем.
- *
  * @param {{
  *   items: { productId: string; quantity: number }[];
  *   fulfillmentMethod?: string;
@@ -13,8 +11,8 @@ import { formatApiErrorMessage } from "@izibuy/shared-lib";
  *   deliveryAddressFlat?: string;
  *   paymentMethod: import('../model/constants.js').ORDER_PAYMENT_METHODS[number];
  *   priceOfferId?: string;
+ *   idempotencyKey: string;
  * }} payload
- * @returns {Promise<import('../model/types.js').Order>}
  */
 export async function createOrder(payload) {
   try {

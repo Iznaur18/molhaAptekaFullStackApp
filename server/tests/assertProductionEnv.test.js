@@ -118,6 +118,8 @@ test("assertProductionEnv: production принимает Atlas mongodb+srv с au
         result.errors.some((e) => e.includes("PASSPORT_VAULT_KEK")),
         false,
       );
+      assert.ok(result.warnings.some((w) => w.includes("SENTRY_DSN")));
+      assert.ok(result.warnings.some((w) => w.includes("бэкап Mongo")));
     },
   );
 });

@@ -51,22 +51,6 @@ export function WholesalePriceModal({ isOpen, product, onClose, onSaved }) {
   });
 
   useEffect(() => {
-    if (!mounted) {
-      return undefined;
-    }
-    const html = document.documentElement;
-    const body = document.body;
-    const prevHtmlBg = html.style.backgroundColor;
-    const prevBodyBg = body.style.backgroundColor;
-    html.style.backgroundColor = "#fff";
-    body.style.backgroundColor = "#fff";
-    return () => {
-      html.style.backgroundColor = prevHtmlBg;
-      body.style.backgroundColor = prevBodyBg;
-    };
-  }, [mounted]);
-
-  useEffect(() => {
     if (!isOpen || !product) {
       return;
     }
@@ -194,7 +178,10 @@ export function WholesalePriceModal({ isOpen, product, onClose, onSaved }) {
           </p>
           {retailPrice > 0 ? (
             <p className="wholesale-price-modal__retail">
-              Обычная цена: {retailPrice.toLocaleString("ru-RU")} ₽
+              Обычная цена:{" "}
+              <span className="wholesale-price-modal__retail-price">
+                {retailPrice.toLocaleString("ru-RU")} ₽
+              </span>
             </p>
           ) : null}
           <label className="wholesale-price-modal__field">

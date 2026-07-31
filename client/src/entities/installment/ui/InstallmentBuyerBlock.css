@@ -208,14 +208,6 @@
   gap: 0.55rem;
 }
 
-.installment-buyer-block__address .address-delivery-fields label > span:first-child {
-  display: block;
-  margin-bottom: 0.3rem;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--iz-color-text-secondary);
-}
-
 .installment-buyer-block__error {
   margin: 0;
   padding: 0.55rem 0.65rem;

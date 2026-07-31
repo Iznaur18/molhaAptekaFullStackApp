@@ -9,13 +9,13 @@
 
 .user-profile-info [data-tone="accent"] {
   --row-tone: #3b6fd9;
-  --row-tone-soft: #e8f0fc;
+  --row-tone-soft: #eef2f8;
   --row-tone-strong: #2f5eb8;
 }
 
 .user-profile-info [data-tone="calm"] {
   --row-tone: #3d8f85;
-  --row-tone-soft: #e6f4f2;
+  --row-tone-soft: #eef5f0;
   --row-tone-strong: #2f736b;
 }
 
@@ -135,6 +135,19 @@
   color: var(--iz-color-link);
   cursor: pointer;
   text-align: right;
+}
+
+.user-profile-info__reveal-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.user-profile-info__reveal-error {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--iz-color-danger, #b42318);
 }
 
 .user-profile-info__reveal-phone:hover {

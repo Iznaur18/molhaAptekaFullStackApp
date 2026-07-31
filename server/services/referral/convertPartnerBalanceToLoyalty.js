@@ -1,12 +1,15 @@
-import { randomBytes } from "node:crypto";
-
 import { ReferralLedgerEntryModel, UserModel } from "../../models/index.js";
 import {
   REFERRAL_INSUFFICIENT_BALANCE_MESSAGE,
   REFERRAL_LEDGER_ENTRY_CONVERSION,
   REFERRAL_SOURCE_KIND_CONVERSION,
 } from "../../constants/referralConstants.js";
+import { AppError } from "../../errors/AppError.js";
 import { creditLoyaltyPoints } from "../loyalty/loyaltyPointsSpend.js";
+import {
+  MONEY_IDEMPOTENCY_KEY_REQUIRED_MESSAGE,
+  requireMoneyIdempotencyKey,
+} from "../loyalty/runMoneyIdempotentMutation.js";
 import { runInTransaction } from "../../utils/mongoTransaction.js";
 
 /**
@@ -44,33 +47,37 @@ async function loadExistingConversionResult(userId, sourceId, fallbackAmount) {
  * @param {{
  *   userId: string;
  *   amount: number;
- *   idempotencyKey?: string | null;
+ *   idempotencyKey: string;
  * }} params
  */
 export async function convertPartnerBalanceToLoyalty({
   userId,
   amount,
-  idempotencyKey = null,
+  idempotencyKey,
 }) {
   const normalizedAmount = Math.ceil(Number(amount));
   if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
     throw new Error("Сумма конвертации должна быть больше 0");
   }
 
-  const key = String(idempotencyKey ?? "").trim();
-  const sourceId = key
-    ? `conversion:${userId}:${key}`
-    : `conversion:${userId}:${Date.now()}:${randomBytes(4).toString("hex")}`;
-
-  if (key) {
-    const existing = await loadExistingConversionResult(
-      userId,
-      sourceId,
-      normalizedAmount,
-    );
-    if (existing) {
-      return existing;
+  let key;
+  try {
+    key = requireMoneyIdempotencyKey(idempotencyKey);
+  } catch (error) {
+    if (error instanceof AppError) {
+      throw new Error(MONEY_IDEMPOTENCY_KEY_REQUIRED_MESSAGE);
     }
+    throw error;
+  }
+  const sourceId = `conversion:${userId}:${key}`;
+
+  const existing = await loadExistingConversionResult(
+    userId,
+    sourceId,
+    normalizedAmount,
+  );
+  if (existing) {
+    return existing;
   }
 
   try {
@@ -127,14 +134,14 @@ export async function convertPartnerBalanceToLoyalty({
       };
     });
   } catch (error) {
-    if (error?.code === 11000 && key) {
-      const existing = await loadExistingConversionResult(
+    if (error?.code === 11000) {
+      const dup = await loadExistingConversionResult(
         userId,
         sourceId,
         normalizedAmount,
       );
-      if (existing) {
-        return existing;
+      if (dup) {
+        return dup;
       }
     }
     throw error;

@@ -95,6 +95,7 @@ import {
   productReportRateLimiter,
   productPriceOfferRateLimiter,
   productReviewRateLimiter,
+  productCompareRateLimiter,
 } from "../middlewares/index.js";
 import {
   makeProductValidation,
@@ -545,6 +546,7 @@ router.get(
 );
 router.get(
   "/:productId/compare",
+  productCompareRateLimiter,
   productIdParamValidation,
   getComparableProductsController,
 );

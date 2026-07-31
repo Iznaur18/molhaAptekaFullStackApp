@@ -11,7 +11,7 @@
   --checkout-sheet-enter-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
   --checkout-sheet-exit-ease: cubic-bezier(0.55, 0.055, 0.675, 1);
   --checkout-sheet-height: 70%;
-  --checkout-sheet-radius: var(--iz-radius-lg, 17px);
+  --checkout-sheet-radius: 2rem;
 
   position: fixed;
   inset: 0;
@@ -56,14 +56,18 @@
   cursor: pointer;
 }
 
-/* Белая заливка под sheet — зона над клавиатурой iOS */
+/*
+ * Заливка под sheet — зона, которую оголяет мобильная клавиатура (iOS/Android).
+ * Цвет = фон страницы (--iz-color-bg), а НЕ #fff: иначе на телефоне с viewport-fit=cover
+ * форс #fff перекрашивал safe-area полосы сверху/снизу в белый. Фон страницы не меняем.
+ */
 .checkout-sheet-modal__keyboard-bleed {
   position: absolute;
   left: 0;
   right: 0;
   top: 100%;
   height: 100vh;
-  background: #fff;
+  background: var(--iz-color-bg);
   pointer-events: none;
   z-index: 0;
 }
@@ -81,7 +85,8 @@
   padding: 0;
   border: none;
   border-radius: var(--checkout-sheet-radius) var(--checkout-sheet-radius) 0 0;
-  background: #fff;
+  corner-shape: squircle;
+  background: var(--iz-color-surface);
   box-shadow: 0 -12px 40px color-mix(in srgb, var(--iz-color-ink) 18%, transparent);
   overflow: hidden;
   isolation: isolate;

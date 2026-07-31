@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
+import { Platform } from "react-native";
 
 import { apiClient } from "@/shared/api/apiClient";
-import { getAccessToken } from "@/shared/api/mobile-auth-storage";
+import {
+  getAccessToken,
+  isCookieAuthWeb,
+} from "@/shared/api/mobile-auth-storage";
 import { API_BASE_URL } from "@/shared/config";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 
@@ -96,13 +100,19 @@ const fetchPrivateUploadBuffer = async (
 
   const requestOnce = async (): Promise<Response> => {
     const token = await getAccessToken();
+    const headers: Record<string, string> = {
+      Accept: "image/*,application/octet-stream",
+    };
+    if (Platform.OS !== "web") {
+      headers["X-Auth-Client"] = "mobile";
+    }
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
     return fetch(`${API_BASE_URL}${privatePath}`, {
       method: "GET",
-      headers: {
-        Accept: "image/*,application/octet-stream",
-        "X-Auth-Client": "mobile",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      credentials: isCookieAuthWeb() ? "include" : "same-origin",
+      headers,
     });
   };
 

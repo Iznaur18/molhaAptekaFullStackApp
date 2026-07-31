@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
 
 import { useCartActions } from "@/entities/cart/model/useCartActions";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
@@ -19,6 +19,14 @@ type AddToCartButtonProps = {
   productId: string;
   product?: unknown;
   variant?: "default" | "detailDock";
+};
+
+const showCartError = (error: unknown) => {
+  const message =
+    error instanceof Error && error.message
+      ? error.message
+      : ADD_TO_CART_UI.ADD_FAILED;
+  Alert.alert(ADD_TO_CART_UI.ADD_FAILED, message);
 };
 
 export const AddToCartButton = ({
@@ -43,11 +51,30 @@ export const AddToCartButton = ({
     if (!hasStockLimit || quantity <= purchaseLimit) {
       return;
     }
-    void setItemQuantity(productId, purchaseLimit);
+    void setItemQuantity(productId, purchaseLimit).catch(showCartError);
   }, [hasStockLimit, productId, purchaseLimit, quantity, setItemQuantity]);
 
   const handleLogin = () => {
     router.push("/(auth)/login");
+  };
+
+  const handleAdd = () => {
+    void addItem(productId, 1).catch(showCartError);
+  };
+
+  const handleDecrease = () => {
+    const run =
+      quantity <= 1
+        ? removeItem(productId)
+        : setItemQuantity(productId, quantity - 1);
+    void run.catch(showCartError);
+  };
+
+  const handleIncrease = () => {
+    if (hasStockLimit && quantity >= purchaseLimit) {
+      return;
+    }
+    void setItemQuantity(productId, quantity + 1).catch(showCartError);
   };
 
   if (!isAuthorized) {
@@ -81,7 +108,7 @@ export const AddToCartButton = ({
       return (
         <Pressable
           style={styles.detailDockPressable}
-          onPress={() => addItem(productId, 1)}
+          onPress={handleAdd}
           disabled={disabled}
         >
           <SquircleView
@@ -103,7 +130,7 @@ export const AddToCartButton = ({
     return (
       <Pressable
         style={[styles.addButton, disabled && styles.buttonDisabled]}
-        onPress={() => addItem(productId, 1)}
+        onPress={handleAdd}
         disabled={disabled}
       >
         {isUpdating ? (
@@ -134,21 +161,6 @@ export const AddToCartButton = ({
       </Pressable>
     );
   }
-
-  const handleDecrease = () => {
-    if (quantity <= 1) {
-      void removeItem(productId);
-      return;
-    }
-    void setItemQuantity(productId, quantity - 1);
-  };
-
-  const handleIncrease = () => {
-    if (hasStockLimit && quantity >= purchaseLimit) {
-      return;
-    }
-    void setItemQuantity(productId, quantity + 1);
-  };
 
   const increaseDisabled = isUpdating || (hasStockLimit && quantity >= purchaseLimit);
 

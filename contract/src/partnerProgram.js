@@ -11,10 +11,9 @@ export const convertPartnerBalanceBodySchema = z
       .positive("Сумма должна быть больше 0")
       .max(CONVERT_PARTNER_BALANCE_AMOUNT_MAX, "Слишком большая сумма"),
     idempotencyKey: z
-      .string()
+      .string({ required_error: "Укажите idempotencyKey" })
       .trim()
-      .min(1)
-      .max(CONVERT_PARTNER_IDEMPOTENCY_KEY_MAX_LENGTH)
-      .optional(),
+      .min(1, "Укажите idempotencyKey")
+      .max(CONVERT_PARTNER_IDEMPOTENCY_KEY_MAX_LENGTH),
   })
   .strict();

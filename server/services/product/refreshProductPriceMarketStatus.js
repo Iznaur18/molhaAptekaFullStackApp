@@ -5,26 +5,44 @@ import {
   PRODUCT_PRICE_MARKET_STATUS_UNKNOWN,
   resolveProductPriceMarketStatusFromPeers,
 } from "../../constants/productPriceMarketStatusConstants.js";
+import { getAppQueue } from "../../queues/appQueue.js";
+import { JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_PEERS } from "../../queues/queueConstants.js";
 import {
   collectComparableMatchedPeers,
-  findComparablePeerPrices,
+  collectComparablePeerPricesOnly,
+  extractComparablePeerPrices,
 } from "./findComparableProducts.js";
+
+/** Cron: только unknown или товары, обновлённые за N дней. */
+const PRODUCT_PRICE_MARKET_STATUS_CRON_DIRTY_DAYS = 3;
 
 /**
  * @param {string} productId
- * @param {{ refreshPeers?: boolean }} [options]
+ * @param {{ refreshPeers?: boolean; light?: boolean }} [options]
  * @returns {Promise<string>}
  */
 export async function refreshProductPriceMarketStatus(
   productId,
-  { refreshPeers = false } = {},
+  { refreshPeers = false, light = false } = {},
 ) {
   const id = String(productId ?? "").trim();
   if (!id) {
     return PRODUCT_PRICE_MARKET_STATUS_UNKNOWN;
   }
 
-  const { productPrice, peerPrices } = await findComparablePeerPrices(id);
+  let productPrice;
+  let peerPrices;
+  /** @type {string[]} */
+  let peerIds = [];
+
+  if (light && !refreshPeers) {
+    ({ productPrice, peerPrices } = await collectComparablePeerPricesOnly(id));
+  } else {
+    const collected = await collectComparableMatchedPeers(id);
+    ({ productPrice, peerPrices } = extractComparablePeerPrices(collected));
+    peerIds = (collected?.rankedPeers ?? []).map((row) => String(row.product._id));
+  }
+
   const status =
     productPrice == null
       ? PRODUCT_PRICE_MARKET_STATUS_UNKNOWN
@@ -38,31 +56,91 @@ export async function refreshProductPriceMarketStatus(
     { $set: { productPriceMarketStatus: status } },
   );
 
-  if (refreshPeers) {
-    const collected = await collectComparableMatchedPeers(id);
-    const peerIds = (collected?.rankedPeers ?? []).map((row) =>
-      String(row.product._id),
-    );
-    for (const peerId of peerIds) {
-      await refreshProductPriceMarketStatus(peerId, { refreshPeers: false });
-    }
+  if (refreshPeers && peerIds.length > 0) {
+    await enqueueProductPriceMarketStatusPeers(peerIds);
   }
 
   return status;
 }
 
 /**
- * Суточный батч по approved-товарам.
+ * Пересчёт peers только через BullMQ. Без Redis — skip (не thrash API).
+ * @param {string[]} peerIds
+ * @returns {Promise<{ queued: boolean }>}
+ */
+export async function enqueueProductPriceMarketStatusPeers(peerIds) {
+  const ids = [
+    ...new Set(
+      (Array.isArray(peerIds) ? peerIds : [])
+        .map((value) => String(value ?? "").trim())
+        .filter(Boolean),
+    ),
+  ];
+  if (ids.length === 0) {
+    return { queued: false };
+  }
+
+  const queue = getAppQueue();
+  if (!queue) {
+    return { queued: false };
+  }
+
+  await queue.add(
+    JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_PEERS,
+    { productIds: ids },
+    { removeOnComplete: 100, removeOnFail: 500 },
+  );
+  return { queued: true };
+}
+
+/**
+ * @param {string[]} productIds
+ * @returns {Promise<{ updated: number }>}
+ */
+export async function processProductPriceMarketStatusPeers(productIds) {
+  const ids = Array.isArray(productIds) ? productIds : [];
+  let updated = 0;
+
+  for (const peerId of ids) {
+    try {
+      await refreshProductPriceMarketStatus(String(peerId), {
+        refreshPeers: false,
+        light: true,
+      });
+      updated += 1;
+    } catch (error) {
+      console.error("refreshProductPriceMarketStatus peer:", peerId, error);
+    }
+  }
+
+  return { updated };
+}
+
+/**
+ * Батч: unknown + недавно обновлённые approved (не весь каталог).
  * @returns {Promise<{ scanned: number; updated: number }>}
  */
 export async function processProductPriceMarketStatusCronTasks() {
   let scanned = 0;
   let updated = 0;
   let lastId = null;
+  const dirtySince = new Date(
+    Date.now() - PRODUCT_PRICE_MARKET_STATUS_CRON_DIRTY_DAYS * 24 * 60 * 60 * 1000,
+  );
 
   for (;;) {
     /** @type {Record<string, unknown>} */
-    const filter = { productModerationStatus: PRODUCT_MODERATION_APPROVED };
+    const filter = {
+      productModerationStatus: PRODUCT_MODERATION_APPROVED,
+      $or: [
+        {
+          productPriceMarketStatus: {
+            $in: [null, PRODUCT_PRICE_MARKET_STATUS_UNKNOWN],
+          },
+        },
+        { updatedAt: { $gte: dirtySince } },
+      ],
+    };
     if (lastId) {
       filter._id = { $gt: lastId };
     }
@@ -81,7 +159,9 @@ export async function processProductPriceMarketStatusCronTasks() {
       scanned += 1;
       lastId = row._id;
       const prev = row.productPriceMarketStatus;
-      const next = await refreshProductPriceMarketStatus(String(row._id));
+      const next = await refreshProductPriceMarketStatus(String(row._id), {
+        light: true,
+      });
       if (next !== prev) {
         updated += 1;
       }

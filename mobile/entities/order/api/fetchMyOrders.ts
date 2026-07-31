@@ -4,7 +4,9 @@ import { formatApiErrorMessage } from "@/shared/lib";
 
 export const fetchMyOrders = async () => {
   try {
-    const { data } = await apiClient.get("/order");
+    const { data } = await apiClient.get("/order", {
+      params: { page: 1, limit: 100 },
+    });
     return parseMyOrdersData(data);
   } catch (error) {
     throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_MY_ORDERS_FALLBACK));

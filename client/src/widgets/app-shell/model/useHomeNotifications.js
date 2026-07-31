@@ -59,7 +59,7 @@ export const useHomeNotifications = ({
         void invalidateAuthMe();
       },
       onError: () => {
-        patchAuthMeNotifications([]);
+        markedReadRef.current = false;
       },
     });
 

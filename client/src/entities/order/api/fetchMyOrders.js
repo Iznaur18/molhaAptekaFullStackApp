@@ -8,7 +8,9 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  */
 export async function fetchMyOrders() {
   try {
-    const { data } = await apiClient.get("/order");
+    const { data } = await apiClient.get("/order", {
+      params: { page: 1, limit: 100 },
+    });
 
     if (!data?.success || !Array.isArray(data.data?.orders)) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);

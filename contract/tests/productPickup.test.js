@@ -94,6 +94,7 @@ describe("productPickup + order fulfillment", () => {
     const parsed = createOrderBodySchema.safeParse({
       items: [{ productId: "507f1f77bcf86cd799439011", quantity: 1 }],
       paymentMethod: "cashOnDelivery",
+      idempotencyKey: "order-key-1",
     });
     assert.equal(parsed.success, true);
     if (parsed.success) {
@@ -107,6 +108,7 @@ describe("productPickup + order fulfillment", () => {
       paymentMethod: "cashOnDelivery",
       fulfillmentMethod: "delivery",
       deliveryAddress: "",
+      idempotencyKey: "order-key-2",
     });
     assert.equal(parsed.success, false);
   });

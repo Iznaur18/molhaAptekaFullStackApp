@@ -36,7 +36,7 @@
   padding: 0.7rem 0.85rem;
   border: 1px solid color-mix(in srgb, var(--iz-color-border) 85%, transparent);
   border-radius: 0.65rem;
-  background: var(--iz-color-surface-muted, #f9fafb);
+  background: var(--iz-color-surface-muted, #f3f4f6);
   color: var(--iz-color-text);
   cursor: pointer;
   transition:
@@ -46,7 +46,7 @@
 
 .product-pickup-location-fields__check_on {
   border-color: var(--iz-color-action);
-  background: color-mix(in srgb, var(--iz-color-action) 10%, var(--iz-color-surface-muted, #f9fafb));
+  background: color-mix(in srgb, var(--iz-color-action) 10%, var(--iz-color-surface-muted, #f3f4f6));
 }
 
 .product-pickup-location-fields__check_soon,

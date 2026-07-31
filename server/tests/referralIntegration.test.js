@@ -129,6 +129,49 @@ test("referral: attribution + credit + reverse", async () => {
   assert.equal(dash.totalCashbackEarned, 0);
 });
 
+test("referral: reverse fails when partner balance already converted", async () => {
+  const referrer = await UserModel.create({
+    email: "ref-rev-convert@example.com",
+    passwordHash: "x",
+    userName: "refrevconvert",
+    userAvatarUrl: "https://example.com/a.png",
+    userBackgroundUrl: "preset:mist",
+    partnerBalance: 0,
+    userLoyaltyPoints: 100,
+  });
+  const referred = await UserModel.create({
+    email: "ref-rev-convert-buyer@example.com",
+    passwordHash: "x",
+    userName: "refrevconvertb",
+    userAvatarUrl: "https://example.com/a.png",
+    userBackgroundUrl: "preset:mist",
+    referredByUserId: referrer._id,
+  });
+
+  const sourceId = `premium:${referred._id}:already-spent`;
+  await creditReferralCashbackFromSpend({
+    spenderUserId: String(referred._id),
+    pointsSpent: PREMIUM_PRICE_POINTS,
+    sourceKind: REFERRAL_SOURCE_KIND_PREMIUM,
+    sourceId,
+  });
+
+  await convertPartnerBalanceToLoyalty({
+    userId: String(referrer._id),
+    amount: computeReferralCashbackAmount(PREMIUM_PRICE_POINTS),
+    idempotencyKey: "spent-before-reverse",
+  });
+
+  await assert.rejects(
+    () =>
+      reverseReferralCashbackForSource({
+        sourceKind: REFERRAL_SOURCE_KIND_PREMIUM,
+        sourceId,
+      }),
+    (error) => error?.name === "InsufficientPartnerBalanceForReversalError",
+  );
+});
+
 test("referral: convert is idempotent by key", async () => {
   const referrer = await UserModel.create({
     email: "ref-convert@example.com",

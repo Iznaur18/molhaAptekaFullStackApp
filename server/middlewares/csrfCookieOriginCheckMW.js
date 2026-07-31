@@ -2,18 +2,9 @@ import {
   AUTH_COOKIE_NAME,
 } from "../constants/authCookieConstants.js";
 import { errorRes } from "../services/http/index.js";
+import { parseFrontendOrigins } from "../utils/resolveFrontendOrigin.js";
 
 const UNSAFE_HTTP_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
-
-/**
- * @returns {string[]}
- */
-function getAllowedFrontendOrigins() {
-  return String(process.env.FRONTEND_URL ?? "")
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean);
-}
 
 /**
  * @param {import('express').Request} req
@@ -59,7 +50,7 @@ export function csrfCookieOriginCheckMW(req, res, next) {
     return next();
   }
 
-  const allowedOrigins = getAllowedFrontendOrigins();
+  const allowedOrigins = parseFrontendOrigins(process.env.FRONTEND_URL);
   if (allowedOrigins.length === 0) {
     if (process.env.NODE_ENV === "production") {
       return errorRes(res, 403, "Запрос отклонён (origin)");

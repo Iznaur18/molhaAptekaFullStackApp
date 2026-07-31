@@ -16,6 +16,8 @@ const VISUAL_SIZE_RATIO = 0.94;
 const SLIDE_GAP_PX = 12;
 const DRAG_THRESHOLD_PX = 48;
 const DIRECTION_LOCK_SLOP_PX = 8;
+/** `.home-featured-raffle-modal__scroll` padding-bottom */
+const SCROLL_PAD_BOTTOM_PX = 16;
 
 /**
  * @param {{
@@ -34,22 +36,35 @@ export function HomeFeaturedRaffleModal({
   getManage,
 }) {
   const dialogRef = useRef(/** @type {HTMLDivElement | null} */ (null));
+  const footerRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const closeButtonRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
   /** @type {import('react').MutableRefObject<{ pointerId: number; startX: number; startY: number; startIndex: number; captureTarget: HTMLElement; mode: 'pending' | 'active' } | null>} */
   const dragRef = useRef(null);
   const { mounted, isVisible } = useHomeFeaturedRaffleModalAnimation(visible);
-  const [viewportWidth, setViewportWidth] = useState(() =>
-    typeof window !== "undefined" ? window.innerWidth : 0,
-  );
+  const [dialogMetrics, setDialogMetrics] = useState({
+    width: 0,
+    height: 0,
+    footerHeight: 0,
+  });
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffsetPx, setDragOffsetPx] = useState(0);
 
   const slideCount = raffles.length;
-  const cardWidth = Math.max(0, viewportWidth);
-  const visualSize = Math.round(cardWidth * VISUAL_SIZE_RATIO);
-  const visualInsetPx = Math.max(0, Math.round((cardWidth - visualSize) / 2));
+  const cardWidth = Math.max(0, dialogMetrics.width);
+  const maxVisualByWidth = Math.round(cardWidth * VISUAL_SIZE_RATIO);
+  const maxVisualByHeight = Math.max(
+    0,
+    dialogMetrics.height - dialogMetrics.footerHeight - SCROLL_PAD_BOTTOM_PX,
+  );
+  const visualSize =
+    maxVisualByWidth > 0 && maxVisualByHeight > 0
+      ? Math.min(maxVisualByWidth, maxVisualByHeight)
+      : maxVisualByWidth;
+  const sideInsetPx = Math.max(0, Math.round((cardWidth - visualSize) / 2));
+  const roomAbovePx = Math.max(0, maxVisualByHeight - visualSize);
+  const visualInsetPx = Math.min(sideInsetPx, roomAbovePx);
   const stride = cardWidth + SLIDE_GAP_PX;
   const activeRaffle = raffles[activeIndex] ?? raffles[0] ?? null;
   const isInteractive = visible && isVisible;
@@ -65,13 +80,33 @@ export function HomeFeaturedRaffleModal({
       return undefined;
     }
 
-    const syncViewport = () => {
-      setViewportWidth(window.innerWidth);
+    const dialog = dialogRef.current;
+    if (!dialog) {
+      return undefined;
+    }
+
+    const syncDialogMetrics = () => {
+      setDialogMetrics({
+        width: dialog.clientWidth,
+        height: dialog.clientHeight,
+        footerHeight: footerRef.current?.offsetHeight ?? 0,
+      });
     };
 
-    syncViewport();
-    window.addEventListener("resize", syncViewport);
-    return () => window.removeEventListener("resize", syncViewport);
+    syncDialogMetrics();
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(syncDialogMetrics)
+        : null;
+    resizeObserver?.observe(dialog);
+    if (footerRef.current) {
+      resizeObserver?.observe(footerRef.current);
+    }
+    window.addEventListener("resize", syncDialogMetrics);
+    return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", syncDialogMetrics);
+    };
   }, [mounted]);
 
   useEffect(() => {
@@ -309,7 +344,7 @@ export function HomeFeaturedRaffleModal({
           {body}
         </div>
 
-        <div className="home-featured-raffle-modal__footer">
+        <div ref={footerRef} className="home-featured-raffle-modal__footer">
           <button
             type="button"
             className="home-featured-raffle-modal__footer-btn"

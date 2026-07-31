@@ -376,7 +376,7 @@ export const CreateRafflePage = () => {
               onPress={handleCancel}
               disabled={isSubmitting || isWithdrawing || isCancelling}
             >
-              <Text style={[styles.wizardSecondaryBtnText, { color: theme.colors.danger }]}>
+              <Text style={styles.wizardSecondaryBtnText}>
                 {CREATE_RAFFLE_MODAL_UI.BTN_CANCEL}
               </Text>
             </Pressable>

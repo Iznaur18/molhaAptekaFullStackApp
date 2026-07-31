@@ -1,3 +1,5 @@
+import { createPortal } from "react-dom";
+
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
 import { isPremiumActive } from "../../../entities/user/lib/isPremiumActive.js";
 import { USER_ROLE_USER } from "../../../entities/user/model/userConstants.js";
@@ -143,7 +145,9 @@ export function MyProfilePage({
     showEditOnBanner,
     isMyProductsTab,
     isFullWidthCatalogTab,
+    isDrawerLayout,
     isMobileNavOpen,
+    isMobileNavMounted,
     closeMobileNav,
     openMobileNav,
     avatarLoadFailed,
@@ -230,35 +234,47 @@ export function MyProfilePage({
         .join(" ")}
     >
       <div className="my-profile-page__layout">
-        <button
-          type="button"
-          className={[
-            "my-profile-page__mobile-nav-backdrop",
-            isMobileNavOpen && "my-profile-page__mobile-nav-backdrop--visible",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-          aria-label={MY_PROFILE_PAGE_UI.MOBILE_NAV_CLOSE_ARIA}
-          tabIndex={isMobileNavOpen ? 0 : -1}
-          onClick={closeMobileNav}
-        />
-        <div
-          className={[
-            "my-profile-page__sidebar-wrap",
-            isMobileNavOpen && "my-profile-page__sidebar-wrap--open",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-        >
-          <ProfileSidebar
-            id="my-profile-mobile-nav"
-            groups={navGroups}
-            activeTab={activeTab}
-            onItemSelect={closeMobileNav}
-            onLogout={onLogout}
-            user={user}
-          />
-        </div>
+        {isDrawerLayout
+          ? isMobileNavMounted
+            ? createPortal(
+                <div
+                  className="my-profile-page__mobile-nav-portal"
+                  role="presentation"
+                  data-state={isMobileNavOpen ? "open" : "closing"}
+                >
+                  <button
+                    type="button"
+                    className="my-profile-page__mobile-nav-backdrop"
+                    aria-label={MY_PROFILE_PAGE_UI.MOBILE_NAV_CLOSE_ARIA}
+                    tabIndex={isMobileNavOpen ? 0 : -1}
+                    onClick={closeMobileNav}
+                  />
+                  <div className="my-profile-page__sidebar-wrap">
+                    <ProfileSidebar
+                      id="my-profile-mobile-nav"
+                      groups={navGroups}
+                      activeTab={activeTab}
+                      onItemSelect={closeMobileNav}
+                      onLogout={onLogout}
+                      user={user}
+                    />
+                  </div>
+                </div>,
+                document.body,
+              )
+            : null
+          : (
+              <div className="my-profile-page__sidebar-wrap">
+                <ProfileSidebar
+                  id="my-profile-mobile-nav"
+                  groups={navGroups}
+                  activeTab={activeTab}
+                  onItemSelect={closeMobileNav}
+                  onLogout={onLogout}
+                  user={user}
+                />
+              </div>
+            )}
 
         <div className="my-profile-page__main">
           <button

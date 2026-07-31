@@ -2,7 +2,8 @@ import { ADMIN_ROLE, isStaffRole } from "../access/adminUserGuard.js";
 
 /**
  * Поля только для self/admin.
- * Телефон и баллы лояльности — публичны в карточке профиля (номер — через «Показать номер» на клиенте).
+ * Баллы лояльности — публичны в карточке профиля.
+ * Телефон чужим не отдаём в GET — только `hasPhoneNumber` + `GET .../phone` (rate limit).
  * Search по-прежнему режет телефон отдельно.
  */
 const USER_PRIVATE_PROFILE_FIELDS = [
@@ -72,12 +73,16 @@ export function sanitizeUserProfileForViewer(user, ctx) {
     return { ...user };
   }
 
-  const out = stripPrivateProfileFields(user);
+  const hasPhoneNumber = Boolean(String(user.userPhoneNumber ?? "").trim());
+  const out = stripPhoneNumber(stripPrivateProfileFields(user));
   delete out.userRole;
   delete out.isActiveUser;
   delete out.isBlockedUser;
   delete out.userDiscountPercent;
   delete out.notesAboutUser;
+  if (hasPhoneNumber) {
+    out.hasPhoneNumber = true;
+  }
 
   return out;
 }

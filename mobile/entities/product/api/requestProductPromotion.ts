@@ -5,6 +5,7 @@ import { formatApiErrorMessage } from "@/shared/lib";
 type RequestProductPromotionBody = {
   tier: number;
   tariffCode: string;
+  idempotencyKey: string;
 };
 
 export const requestProductPromotion = async (

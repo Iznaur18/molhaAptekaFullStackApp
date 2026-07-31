@@ -242,9 +242,14 @@ test("productReviewsListQuerySchema defaults limit", () => {
 });
 
 test("requestProductPromotionBodySchema validates tier and tariff", () => {
-  const parsed = requestProductPromotionBodySchema.parse({ tier: "2", tariffCode: "7d" });
+  const parsed = requestProductPromotionBodySchema.parse({
+    tier: "2",
+    tariffCode: "7d",
+    idempotencyKey: "promo-key-1",
+  });
   assert.equal(parsed.tier, 2);
   assert.equal(parsed.tariffCode, "7d");
+  assert.equal(parsed.idempotencyKey, "promo-key-1");
 });
 
 test("productPriceOfferBodySchema coerces offerPrice", () => {
@@ -488,6 +493,7 @@ test("createOrderBodySchema allows empty delivery flat", () => {
     deliveryAddress: "Москва, Тверская 1",
     deliveryAddressFlat: "",
     paymentMethod: "cashOnDelivery",
+    idempotencyKey: "order-flat-1",
   });
   assert.equal(parsed.deliveryAddressFlat, "");
 });

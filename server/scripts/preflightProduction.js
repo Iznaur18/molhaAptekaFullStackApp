@@ -73,6 +73,12 @@ const main = async () => {
   console.log("✓ CSP (nginx location /):");
   console.log(`  ${buildSpaContentSecurityPolicy()}`);
 
+  console.log("\nФаза 0 checklist (ручное на VPS):");
+  console.log("  [ ] SMTP проверен (npm run test:smtp) — server/docs/smtp-setup.md");
+  console.log("  [ ] Sentry DSN server + client — server/docs/SENTRY.md");
+  console.log("  [ ] Mongo backup (Atlas Continuous / mongodump cron) — server/docs/RUNBOOK.md");
+  console.log("  [ ] Smoke: login → каталог → upload → заказ — server/docs/production-checklist.md");
+
   console.log("\nДальше на VPS: docs/deploy/DEPLOY.md, CSP → npm run csp:print");
 };
 

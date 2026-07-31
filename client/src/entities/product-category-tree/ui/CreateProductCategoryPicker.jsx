@@ -165,9 +165,6 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
   if (!pickerOpen && value.productCategoryId) {
     return (
       <div className="create-product-category-picker">
-        <span className="create-product-category-picker__legend">
-          {getProductFieldEditLabel("productCategory")}
-        </span>
         <div className="create-product-category-picker__summary">
           <span className="create-product-category-picker__summary-label">
             {PRODUCT_CATEGORY_TREE_UI.SELECTED_PREFIX}
@@ -195,12 +192,6 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
 
   return (
     <div className="create-product-category-picker">
-      <span className="create-product-category-picker__legend">
-        {getProductFieldEditLabel("productCategory")}
-      </span>
-      <p className="create-product-category-picker__hint">
-        {PRODUCT_CATEGORY_TREE_UI.WIZARD_HINT}
-      </p>
       {trail.length > 0 ? (
         <nav
           className="create-product-category-picker__trail"

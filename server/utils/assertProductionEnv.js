@@ -199,5 +199,17 @@ export const assertProductionEnv = () => {
     );
   }
 
+  if (isProduction && isBlank(process.env.SENTRY_DSN)) {
+    warnings.push(
+      "SENTRY_DSN не задан — ошибки prod не попадут в Sentry (фаза 0: server/docs/SENTRY.md)",
+    );
+  }
+
+  if (isProduction) {
+    warnings.push(
+      "Фаза 0: убедитесь что бэкап Mongo включён (Atlas Continuous Backup или mongodump cron) — server/docs/RUNBOOK.md",
+    );
+  }
+
   return { ok: errors.length === 0, errors, warnings };
 };

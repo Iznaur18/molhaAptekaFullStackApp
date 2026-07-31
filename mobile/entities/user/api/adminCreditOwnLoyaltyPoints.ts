@@ -10,12 +10,15 @@ type AdminCreditOwnLoyaltyPointsResult = {
 
 export const adminCreditOwnLoyaltyPoints = async ({
   amount,
+  idempotencyKey,
 }: {
   amount: number;
+  idempotencyKey: string;
 }): Promise<AdminCreditOwnLoyaltyPointsResult> => {
   try {
     const { data } = await apiClient.post("/user/me/loyalty-points/admin-free-credit", {
       amount,
+      idempotencyKey,
     });
     if (!data?.success || !data.data) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);

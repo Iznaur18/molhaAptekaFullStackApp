@@ -3,13 +3,18 @@ import { useEffect, useMemo, useState } from "react";
 import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import { izColors } from "@izibuy/design-tokens";
 
+import { fetchUserPhone } from "@/entities/user/api/fetchUserPhone";
 import type { ProfileRow } from "@/entities/user/lib/getUserProfileRows";
 import {
   groupProfileRows,
   isBooleanProfileRow,
 } from "@/entities/user/lib/groupProfileRows";
 import { getProfileRowIcon } from "@/entities/user/lib/profileRowIcons";
-import { RU_PHONE_EMPTY_LABEL } from "@/entities/user/lib/ruPhone";
+import {
+  formatRuPhoneDisplayOrEmpty,
+  RU_PHONE_EMPTY_LABEL,
+  toRuPhoneTelHref,
+} from "@/entities/user/lib/ruPhone";
 import { USER_PROFILE_COPY } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { PROFILE_CARD_SQUIRCLE_RADIUS } from "@/shared/theme/profileChromeStyles";
@@ -21,6 +26,7 @@ const PHONE_ROW_ID = "userPhoneNumber";
 type UserProfileInfoPanelProps = {
   rows: ProfileRow[];
   hidePhoneUntilReveal?: boolean;
+  userId?: string | null;
 };
 
 /** Section chrome stays black/white in all themes (dark remaps `ink` to white). */
@@ -104,6 +110,13 @@ const useStyles = createThemedStyles((theme) => ({
     color: theme.colors.link,
     fontWeight: "700",
   },
+  revealError: {
+    marginTop: 4,
+    fontSize: 12,
+    fontWeight: "500",
+    color: theme.colors.danger,
+    textAlign: "right",
+  },
   detailValuePositive: {
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -127,33 +140,85 @@ const openProfileRowHref = (href: string) => {
 type ProfileDetailValueProps = {
   row: ProfileRow;
   hidePhoneUntilReveal: boolean;
+  userId: string | null;
   styles: ReturnType<typeof useStyles>;
 };
 
 const ProfileDetailValue = ({
   row,
   hidePhoneUntilReveal,
+  userId,
   styles,
 }: ProfileDetailValueProps) => {
   const [phoneRevealed, setPhoneRevealed] = useState(false);
+  const [revealedPhone, setRevealedPhone] = useState<string | null>(null);
+  const [revealPending, setRevealPending] = useState(false);
+  const [revealError, setRevealError] = useState("");
+
   const needsReveal =
-    hidePhoneUntilReveal && row.id === PHONE_ROW_ID && Boolean(row.href);
+    hidePhoneUntilReveal &&
+    row.id === PHONE_ROW_ID &&
+    (Boolean(row.href) || Boolean(row.needsPhoneReveal));
+
+  const displayHref =
+    revealedPhone != null ? toRuPhoneTelHref(revealedPhone) ?? undefined : row.href;
+  const displayValue =
+    revealedPhone != null ? formatRuPhoneDisplayOrEmpty(revealedPhone) : row.value;
+
   const isBoolean = isBooleanProfileRow(row.id);
-  const isYes = row.value === "Да";
-  const isNo = row.value === "Нет";
-  const isEmpty = row.value === "—" || row.value === RU_PHONE_EMPTY_LABEL;
+  const isYes = displayValue === "Да";
+  const isNo = displayValue === "Нет";
+  const isEmpty =
+    !row.needsPhoneReveal &&
+    (displayValue === "—" || displayValue === RU_PHONE_EMPTY_LABEL);
 
   useEffect(() => {
     setPhoneRevealed(false);
-  }, [row.href, row.value]);
+    setRevealedPhone(null);
+    setRevealError("");
+  }, [row.href, row.value, row.needsPhoneReveal]);
 
   if (needsReveal && !phoneRevealed) {
     return (
-      <Pressable onPress={() => setPhoneRevealed(true)}>
-        <Text style={[styles.detailValue, styles.revealPhone]}>
-          {USER_PROFILE_COPY.SHOW_PHONE_NUMBER}
-        </Text>
-      </Pressable>
+      <View>
+        <Pressable
+          disabled={revealPending}
+          onPress={() => {
+            void (async () => {
+              if (row.needsPhoneReveal) {
+                if (!userId) {
+                  setRevealError(USER_PROFILE_COPY.SHOW_PHONE_NUMBER_ERROR);
+                  return;
+                }
+                setRevealPending(true);
+                setRevealError("");
+                try {
+                  const phone = await fetchUserPhone(userId);
+                  setRevealedPhone(phone);
+                  setPhoneRevealed(true);
+                } catch (error) {
+                  setRevealError(
+                    error instanceof Error
+                      ? error.message
+                      : USER_PROFILE_COPY.SHOW_PHONE_NUMBER_ERROR,
+                  );
+                } finally {
+                  setRevealPending(false);
+                }
+                return;
+              }
+              setPhoneRevealed(true);
+            })();
+          }}
+        >
+          <Text style={[styles.detailValue, styles.revealPhone]}>
+            {revealPending
+              ? USER_PROFILE_COPY.SHOW_PHONE_NUMBER_PENDING
+              : USER_PROFILE_COPY.SHOW_PHONE_NUMBER}
+          </Text>
+        </Pressable>
+        {revealError ? <Text style={styles.revealError}>{revealError}</Text> : null}
+      </View>
     );
   }
 
@@ -162,17 +227,19 @@ const ProfileDetailValue = ({
       style={[
         styles.detailValue,
         isEmpty && styles.detailValueEmpty,
-        Boolean(row.href) && styles.detailValueLink,
+        Boolean(displayHref) && styles.detailValueLink,
         isBoolean && isYes && styles.detailValuePositive,
         isBoolean && isNo && styles.detailValueMuted,
       ]}
     >
-      {row.value}
+      {displayValue}
     </Text>
   );
 
-  if (row.href) {
-    return <Pressable onPress={() => openProfileRowHref(row.href!)}>{valueNode}</Pressable>;
+  if (displayHref) {
+    return (
+      <Pressable onPress={() => openProfileRowHref(displayHref)}>{valueNode}</Pressable>
+    );
   }
 
   return valueNode;
@@ -181,6 +248,7 @@ const ProfileDetailValue = ({
 export const UserProfileInfoPanel = ({
   rows,
   hidePhoneUntilReveal = false,
+  userId = null,
 }: UserProfileInfoPanelProps) => {
   const theme = useAppTheme();
   const styles = useStyles();
@@ -221,6 +289,7 @@ export const UserProfileInfoPanel = ({
                 <ProfileDetailValue
                   row={row}
                   hidePhoneUntilReveal={hidePhoneUntilReveal}
+                  userId={userId}
                   styles={styles}
                 />
               </View>

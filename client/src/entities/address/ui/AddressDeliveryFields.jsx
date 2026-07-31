@@ -109,7 +109,7 @@ export function AddressDeliveryFields({
   return (
     <div className="address-delivery-fields">
       <label className="address-delivery-fields__line-wrap" ref={wrapRef}>
-        <span>{lineLabel}</span>
+        <span className="address-delivery-fields__label">{lineLabel}</span>
         <input
           type="text"
           className={lineInputClassName}

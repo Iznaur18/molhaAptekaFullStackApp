@@ -100,22 +100,6 @@ export function InstallmentProgramModal({
     if (!isOpen) {
       return undefined;
     }
-    const html = document.documentElement;
-    const body = document.body;
-    const prevHtmlBg = html.style.backgroundColor;
-    const prevBodyBg = body.style.backgroundColor;
-    html.style.backgroundColor = "#fff";
-    body.style.backgroundColor = "#fff";
-    return () => {
-      html.style.backgroundColor = prevHtmlBg;
-      body.style.backgroundColor = prevBodyBg;
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return undefined;
-    }
 
     const onKeyDown = (event) => {
       if (event.key !== "Escape") {
@@ -388,10 +372,44 @@ export function InstallmentProgramModal({
                               inputMode="numeric"
                               min={INSTALLMENT_MONTHS_MIN}
                               max={INSTALLMENT_MONTHS_MAX}
-                              value={plan.monthsCount}
+                              value={
+                                plan.monthsCount === "" ? "" : plan.monthsCount
+                              }
+                              onFocus={(event) => {
+                                if (monthsCount === 0) {
+                                  updatePlan(index, { monthsCount: "" });
+                                  return;
+                                }
+                                event.currentTarget.select();
+                              }}
+                              onBlur={() => {
+                                if (plan.monthsCount !== "") return;
+                                const restoredMonths = INSTALLMENT_MONTHS_MIN;
+                                updatePlan(index, {
+                                  monthsCount: restoredMonths,
+                                  monthlyAmountRub:
+                                    resolveInstallmentMonthlyFromMarkupPercent(
+                                      productPrice,
+                                      restoredMonths,
+                                      markupPercent,
+                                    ),
+                                });
+                              }}
                               onChange={(event) => {
-                                const nextMonths =
-                                  Number(event.target.value) || 0;
+                                const raw = event.target.value;
+                                if (raw === "") {
+                                  updatePlan(index, {
+                                    monthsCount: "",
+                                    monthlyAmountRub:
+                                      resolveInstallmentMonthlyFromMarkupPercent(
+                                        productPrice,
+                                        0,
+                                        markupPercent,
+                                      ),
+                                  });
+                                  return;
+                                }
+                                const nextMonths = Number(raw) || 0;
                                 updatePlan(index, {
                                   monthsCount: nextMonths,
                                   monthlyAmountRub:
@@ -414,11 +432,43 @@ export function InstallmentProgramModal({
                               type="number"
                               inputMode="numeric"
                               min={0}
-                              value={markupPercent}
+                              value={
+                                plan.markupPercent === "" ? "" : markupPercent
+                              }
+                              onFocus={() => {
+                                if (markupPercent === 0) {
+                                  updatePlan(index, { markupPercent: "" });
+                                }
+                              }}
+                              onBlur={() => {
+                                if (plan.markupPercent !== "") return;
+                                updatePlan(index, {
+                                  markupPercent: 0,
+                                  monthlyAmountRub:
+                                    resolveInstallmentMonthlyFromMarkupPercent(
+                                      productPrice,
+                                      monthsCount,
+                                      0,
+                                    ),
+                                });
+                              }}
                               onChange={(event) => {
+                                const raw = event.target.value;
+                                if (raw === "") {
+                                  updatePlan(index, {
+                                    markupPercent: "",
+                                    monthlyAmountRub:
+                                      resolveInstallmentMonthlyFromMarkupPercent(
+                                        productPrice,
+                                        monthsCount,
+                                        0,
+                                      ),
+                                });
+                                  return;
+                                }
                                 const nextMarkupPercent = Math.max(
                                   0,
-                                  Math.floor(Number(event.target.value) || 0),
+                                  Math.floor(Number(raw) || 0),
                                 );
                                 updatePlan(index, {
                                   markupPercent: nextMarkupPercent,
@@ -442,10 +492,47 @@ export function InstallmentProgramModal({
                               type="number"
                               inputMode="numeric"
                               min={INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB}
-                              value={plan.monthlyAmountRub}
+                              value={
+                                plan.monthlyAmountRub === ""
+                                  ? ""
+                                  : plan.monthlyAmountRub
+                              }
+                              onFocus={(event) => {
+                                if (monthlyAmountRub === 0) {
+                                  updatePlan(index, { monthlyAmountRub: "" });
+                                  return;
+                                }
+                                event.currentTarget.select();
+                              }}
+                              onBlur={() => {
+                                if (plan.monthlyAmountRub !== "") return;
+                                const restoredMonthly =
+                                  INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB;
+                                updatePlan(index, {
+                                  monthlyAmountRub: restoredMonthly,
+                                  markupPercent:
+                                    resolveInstallmentPlanPriceSummary(
+                                      productPrice,
+                                      monthsCount,
+                                      restoredMonthly,
+                                    ).markupPercent,
+                                });
+                              }}
                               onChange={(event) => {
-                                const nextMonthly =
-                                  Number(event.target.value) || 0;
+                                const raw = event.target.value;
+                                if (raw === "") {
+                                  updatePlan(index, {
+                                    monthlyAmountRub: "",
+                                    markupPercent:
+                                      resolveInstallmentPlanPriceSummary(
+                                        productPrice,
+                                        monthsCount,
+                                        0,
+                                      ).markupPercent,
+                                  });
+                                  return;
+                                }
+                                const nextMonthly = Number(raw) || 0;
                                 updatePlan(index, {
                                   monthlyAmountRub: nextMonthly,
                                   markupPercent:

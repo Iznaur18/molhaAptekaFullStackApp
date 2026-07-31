@@ -3,12 +3,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
  * @param {string} productId
- * @param {{ tier: number; tariffCode: string }} body
- * @returns {Promise<{
- *   promotion: Record<string, unknown>;
- *   loyaltyPointsBalance: number | null;
- *   message: string | null;
- * }>}
+ * @param {{ tier: number; tariffCode: string; idempotencyKey: string }} body
  */
 export async function requestProductPromotion(productId, body) {
   try {

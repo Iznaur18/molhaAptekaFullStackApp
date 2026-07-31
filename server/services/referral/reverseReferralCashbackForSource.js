@@ -5,8 +5,24 @@ import {
 } from "../../constants/referralConstants.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
+export class InsufficientPartnerBalanceForReversalError extends Error {
+  /**
+   * @param {number} required
+   * @param {number} available
+   */
+  constructor(required, available) {
+    super(
+      "Нельзя откатить партнёрский кэшбэк: баланс уже конвертирован или недостаточен",
+    );
+    this.name = "InsufficientPartnerBalanceForReversalError";
+    this.required = required;
+    this.available = available;
+  }
+}
+
 /**
  * Откатывает партнёрский кэшбэк при refund баллов за ту же оплату.
+ * Без clamp-to-0: если баланса нет (уже convert) — ошибка, ledger reversal не пишем.
  *
  * @param {{
  *   sourceKind: string;
@@ -42,6 +58,40 @@ export async function reverseReferralCashbackForSource({
     return { reversed: false };
   }
 
+  const existingReversalLookup = ReferralLedgerEntryModel.findOne({
+    sourceKind,
+    sourceId: sourceIdNormalized,
+    entryType: REFERRAL_LEDGER_ENTRY_REVERSAL,
+  }).select("_id");
+  if (session) {
+    existingReversalLookup.session(session);
+  }
+  const existingReversal = await existingReversalLookup.lean();
+  if (existingReversal) {
+    return { reversed: false, duplicate: true };
+  }
+
+  const deducted = await UserModel.findOneAndUpdate(
+    {
+      _id: credit.referrerUserId,
+      partnerBalance: { $gte: amount },
+    },
+    { $inc: { partnerBalance: -amount } },
+    { session: session ?? undefined, returnDocument: "after" },
+  );
+
+  if (!deducted) {
+    const userLookup = UserModel.findById(credit.referrerUserId).select(
+      "partnerBalance",
+    );
+    if (session) {
+      userLookup.session(session);
+    }
+    const user = await userLookup.lean();
+    const available = Number(user?.partnerBalance) || 0;
+    throw new InsufficientPartnerBalanceForReversalError(amount, available);
+  }
+
   try {
     await ReferralLedgerEntryModel.create(
       [
@@ -60,33 +110,19 @@ export async function reverseReferralCashbackForSource({
     );
   } catch (error) {
     if (error?.code === 11000) {
+      await UserModel.updateOne(
+        { _id: credit.referrerUserId },
+        { $inc: { partnerBalance: amount } },
+        { session: session ?? undefined },
+      );
       return { reversed: false, duplicate: true };
     }
-    throw error;
-  }
-
-  const deducted = await UserModel.findOneAndUpdate(
-    {
-      _id: credit.referrerUserId,
-      partnerBalance: { $gte: amount },
-    },
-    { $inc: { partnerBalance: -amount } },
-    { session: session ?? undefined },
-  );
-
-  if (!deducted) {
     await UserModel.updateOne(
       { _id: credit.referrerUserId },
-      { $set: { partnerBalance: 0 } },
+      { $inc: { partnerBalance: amount } },
       { session: session ?? undefined },
     );
-    logServerEvent("warn", {
-      event: "referral_cashback_reversal_clamped",
-      referrerUserId: String(credit.referrerUserId),
-      sourceKind,
-      sourceId: sourceIdNormalized,
-      amount,
-    });
+    throw error;
   }
 
   logServerEvent("info", {

@@ -93,6 +93,18 @@ function applyThemeToRoot(scheme) {
   }
 
   document.documentElement.dataset.theme = scheme;
+  rootStyle.colorScheme = scheme;
+
+  const bg = theme.colors.bg;
+  if (typeof bg === "string" && bg.trim()) {
+    let themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    if (!themeColorMeta) {
+      themeColorMeta = document.createElement("meta");
+      themeColorMeta.setAttribute("name", "theme-color");
+      document.head.appendChild(themeColorMeta);
+    }
+    themeColorMeta.setAttribute("content", bg.trim());
+  }
 }
 
 function applyCurrentTheme() {

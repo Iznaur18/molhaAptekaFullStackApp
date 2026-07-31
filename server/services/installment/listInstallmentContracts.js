@@ -11,14 +11,41 @@ import {
 } from "./installmentHelpers.js";
 import { isInstallmentContractVisibleInLists } from "./installmentOrderAcceptGate.js";
 
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 50;
+const MAX_LIMIT = 100;
+
+/**
+ * @param {{ page?: number; limit?: number }} [query]
+ */
+function parseListPagination(query = {}) {
+  const page = Math.max(1, Number(query.page) || DEFAULT_PAGE);
+  const limit = Math.min(MAX_LIMIT, Math.max(1, Number(query.limit) || DEFAULT_LIMIT));
+  const skip = (page - 1) * limit;
+  return { page, limit, skip };
+}
+
 /**
  * @param {{
  *   userId: string;
  *   statusFilter?: string;
  *   role: "buyer" | "seller";
+ *   page?: number;
+ *   limit?: number;
  * }} input
  */
-export async function listInstallmentContracts({ userId, statusFilter, role }) {
+export async function listInstallmentContracts({
+  userId,
+  statusFilter,
+  role,
+  page: pageInput,
+  limit: limitInput,
+}) {
+  const { page, limit, skip } = parseListPagination({
+    page: pageInput,
+    limit: limitInput,
+  });
+
   const normalizedStatus =
     typeof statusFilter === "string" && statusFilter.trim() !== ""
       ? statusFilter.trim()
@@ -61,7 +88,10 @@ export async function listInstallmentContracts({ userId, statusFilter, role }) {
         priorityStatus: INSTALLMENT_CONTRACT_STATUS_PENDING_FIRST_PAYMENT,
       });
 
-  const payloads = await buildInstallmentContractPayloads(orderedRows);
+  const total = orderedRows.length;
+  const pageRows = orderedRows.slice(skip, skip + limit);
+
+  const payloads = await buildInstallmentContractPayloads(pageRows);
   const payloadsWithOrderStatus = payloads.map((payload) => {
     const order = payload.orderId ? orderById.get(payload.orderId) : null;
     return {
@@ -70,12 +100,22 @@ export async function listInstallmentContracts({ userId, statusFilter, role }) {
     };
   });
 
-  if (role !== "seller") {
-    return payloadsWithOrderStatus;
-  }
+  const contracts =
+    role !== "seller"
+      ? payloadsWithOrderStatus
+      : await attachSellerBuyerPassportShareToContracts(
+          payloadsWithOrderStatus,
+          orderById,
+        );
 
-  return attachSellerBuyerPassportShareToContracts(
-    payloadsWithOrderStatus,
-    orderById,
-  );
+  return {
+    contracts,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit) || 0,
+      hasMore: skip + limit < total,
+    },
+  };
 }

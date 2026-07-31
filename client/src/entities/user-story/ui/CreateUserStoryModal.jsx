@@ -50,7 +50,7 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
     uploadVideoMutation.isPending ||
     createMutation.isPending;
 
-  useScrollLock(mounted, { strategy: "overflow" });
+  useScrollLock(mounted);
 
   useEffect(() => {
     previewUrlRef.current = previewUrl;
@@ -232,6 +232,7 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
         disabled={isFormBusy}
         onClick={handleDismiss}
       />
+      <div className="create-user-story-modal__keyboard-bleed" aria-hidden="true" />
       <div
         ref={sheetRef}
         className="create-user-story-modal"

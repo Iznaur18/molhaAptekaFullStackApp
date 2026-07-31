@@ -2922,13 +2922,21 @@ export const useCatalogSubcategoryPickerStyles = createThemedStyles((theme) => (
 
 export const useCatalogBrowserSectionStyles = createThemedStyles((theme) => ({
   section: {
-    marginBottom: SCREEN_CONTENT_SECTION_GAP,
+    marginTop: 6,
+    marginBottom: Math.max(SCREEN_CONTENT_SECTION_GAP, 14),
+    paddingTop: 6,
   },
   sectionTitle: {
-    marginBottom: 12,
-    fontSize: 16,
-    fontWeight: "600",
+    marginTop: 10,
+    marginBottom: 15,
+    fontSize: 22,
+    fontWeight: "800",
+    letterSpacing: -0.7,
+    lineHeight: 26,
     color: theme.colors.ink,
+    paddingLeft: 12,
+    borderLeftWidth: 3.5,
+    borderLeftColor: theme.colors.action,
   },
   grid: {
     flexDirection: "row",
