@@ -752,6 +752,7 @@ export const ORDER_CARD_UI = {
   DELETED_PRODUCT_NAME: "Товар удалён",
   /** @param {number} points */
   LOYALTY_POINTS_LINE: (points) => `+${points} баллов за шт. (подтверждённому покупателю)`,
+  AFFILIATE_LINE_ARIA: "Партнёрская атрибуция",
 };
 
 /** Страница «Мои покупки» */
@@ -1586,6 +1587,22 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WHOLESALE_MODAL_ERROR_MIN_QTY: "Минимум 2 шт.",
   WHOLESALE_MODAL_ERROR_PRICE: "Оптовая цена должна быть меньше обычной",
   WHOLESALE_TOGGLE_PENDING: "Обновляем опт…",
+  MANAGE_AFFILIATE_TITLE: "Партнёрская услуга",
+  MANAGE_AFFILIATE_HINT:
+    "Пользователи делятся ссылкой и получают % с покупки",
+  MANAGE_AFFILIATE_HINT_ON: (percent) =>
+    `Сейчас ${percent}%. Пользователи делятся ссылкой и получают % с покупки`,
+  AFFILIATE_TOGGLE_PENDING: "Обновляем партнёрку…",
+  AFFILIATE_MODAL_TITLE: "Партнёрская услуга",
+  AFFILIATE_MODAL_PERCENT_LABEL: "Процент партнёру, %",
+  AFFILIATE_MODAL_SAVE: "Сохранить",
+  AFFILIATE_MODAL_CLOSE: "Закрыть",
+  AFFILIATE_MODAL_HINT:
+    "Обычные пользователи делятся ссылкой на объявление и получают % с подтверждённой покупки. % списывается со свободных баллов лояльности продавца. % может измениться до покупки.",
+  AFFILIATE_MODAL_BUDGET_HINT:
+    "Держите на балансе достаточно свободных баллов — иначе покупатель не сможет подтвердить заказ с партнёрской выплатой.",
+  AFFILIATE_MODAL_ERROR_REQUIRED: "Укажите процент от 1 до 50",
+  AFFILIATE_MODAL_PENDING: "Сохраняем…",
   MANAGE_VISIBILITY_TITLE_VISIBLE: "Виден в каталоге",
   MANAGE_VISIBILITY_TITLE_HIDDEN: "Скрыт от покупателей",
   MANAGE_VISIBILITY_STATUS_VISIBLE: "(виден)",
@@ -1598,6 +1615,12 @@ export const CREATE_PRODUCT_MODAL_UI = {
   MANAGE_RAFFLE_HINT: "Товар участвует в активном розыгрыше продавца",
   LABEL_AUCTION: "Проводить аукцион (предложения цены)",
   LABEL_LOYALTY_POINTS_PER_UNIT: "Баллов за 1 шт. покупателю",
+  LABEL_AFFILIATE_ENABLED: "Партнёрская услуга",
+  LABEL_AFFILIATE_PERCENT: "Процент партнёру за приведённого клиента",
+  HINT_AFFILIATE:
+    "Обычные пользователи смогут делиться ссылкой на объявление и получать % с покупки. % списывается со свободных баллов лояльности при подтверждении заказа. % может измениться до покупки.",
+  HINT_AFFILIATE_BUDGET:
+    "Держите достаточно свободных баллов — иначе покупатель не сможет подтвердить заказ с партнёрской выплатой.",
   /**
    * @param {number} available
    * @param {number} catalogCommitted
@@ -1788,6 +1811,13 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   PRICE_MARKET_STATUS_UNKNOWN: "Статус цены не определен",
   ORIGINAL_BADGE: "Оригинал",
   ORIGINAL_BADGE_ARIA: "Оригинальный товар",
+  AFFILIATE_BADGE: (percent) => `Партнёрам ${percent}%`,
+  AFFILIATE_SHARE: "Поделиться и заработать",
+  AFFILIATE_SHARE_LOGIN: "Войдите, чтобы делиться",
+  AFFILIATE_SHARE_COPIED: "Ссылка скопирована",
+  AFFILIATE_SHARE_FAILED: "Не удалось скопировать ссылку",
+  AFFILIATE_PERCENT_HINT:
+    "Процент может измениться до покупки. Выплата — после подтверждения заказа.",
   CONTENT_SWITCHER_ARIA: "Описание и характеристики товара",
   DESCRIPTION_SECTION_ARIA: "Описание товара",
   SALE_CITY_ALL: "Во всех городах",
@@ -1856,6 +1886,7 @@ export const PRODUCT_CARD_UI = {
   PROMOTION_TOP_BADGE: "Топ",
   PROMOTION_BANNER_BADGE: "Баннер",
   RAFFLE_BADGE: "Розыгрыш",
+  AFFILIATE_BADGE: (percent) => `Партнёрам ${percent}%`,
   AUCTION_BADGE: "Аукцион",
   LOYALTY_POINTS_TOOLTIP: "Даёт продавец; получает подтверждённый покупатель",
   /** @param {number} percent */
@@ -2567,6 +2598,25 @@ export const PARTNER_PROGRAM_PAGE_UI = {
   COL_CASHBACK: "Кэшбэк",
 };
 
+/** Раздел «Заработок с объявлений» (product affiliate) */
+export const AFFILIATE_LISTINGS_PAGE_UI = {
+  ARIA: "Заработок с объявлений",
+  NAV_LABEL: "Заработок с объявлений",
+  LOGIN_HINT: "Войдите, чтобы открыть заработок с объявлений.",
+  LOGIN_BUTTON: "Войти",
+  LOADING: "Загрузка…",
+  LOAD_ERROR: "Не удалось загрузить данные",
+  EARNINGS_TITLE: "Начисления за приведённых",
+  EARNINGS_EMPTY: "Пока нет выплат — делитесь ссылками с бейджем «Партнёрам %»",
+  EARNINGS_AMOUNT: "Сумма",
+  EARNINGS_PERCENT: "Процент",
+  EARNINGS_DATE: "Дата",
+  EARNINGS_PRODUCT: "Товар",
+  SELLER_PAYOUT_HINT:
+    "Если вы продавец с партнёркой на объявлении: при подтверждении заказа % списывается со свободных баллов лояльности.",
+  LOYALTY_BALANCE: "Ваши баллы",
+};
+
 /** Раздел «Премиум» в профиле */
 export const PREMIUM_PAGE_UI = {
   PAGE_ARIA: "Премиум",
@@ -2637,6 +2687,7 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_PREMIUM: "Премиум",
   TAB_LOYALTY_POINTS: "Баллы",
   TAB_PARTNER_PROGRAM: "Партнёрская программа",
+  TAB_AFFILIATE_LISTINGS: "Заработок с объявлений",
   TAB_ADVERTISING: "Реклама",
   EDIT_PROFILE: "Изменить профиль",
   LOGOUT: "Выйти",

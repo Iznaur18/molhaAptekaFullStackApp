@@ -312,6 +312,17 @@ const ProductSchema = new Schema(
       default: 0,
       min: 0,
     },
+    /** Партнёрская услуга на объявлении: % шареру с продажи. */
+    affiliateEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    affiliatePercent: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 50,
+    },
   },
   { timestamps: true },
 );

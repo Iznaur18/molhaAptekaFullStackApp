@@ -273,6 +273,12 @@
   font-weight: 600;
 }
 
+.order-card__item-affiliate {
+  font-size: 0.82rem;
+  color: var(--iz-color-success, #047857);
+  font-weight: 600;
+}
+
 .order-card__item-status {
   font-size: 0.82rem;
   color: var(--iz-color-text-secondary);

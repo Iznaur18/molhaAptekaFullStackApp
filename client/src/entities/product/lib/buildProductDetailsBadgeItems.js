@@ -5,6 +5,7 @@ import { isProductRaffleParticipant } from "../../raffle/lib/isProductRafflePart
 import { isProductOriginalBadgeVisible } from "./productIsOriginal.js";
 import { resolveProductListingOriginPresentation } from "./productListingOrigin.js";
 import { resolveProductPriceMarketStatusPresentation } from "./productPriceMarketStatus.js";
+import { resolveProductAffiliateOffer } from "./resolveProductAffiliateOffer.js";
 
 /**
  * @typedef {{
@@ -13,6 +14,7 @@ import { resolveProductPriceMarketStatusPresentation } from "./productPriceMarke
  * } & (
  *   | { kind: "original" }
  *   | { kind: "raffle" }
+ *   | { kind: "affiliate" }
  *   | { kind: "listingOrigin"; Icon: import("react").ComponentType<{ className?: string; size?: number; "aria-hidden"?: boolean }> }
  *   | { kind: "priceMarket"; backgroundColor: string; color: string }
  * )} ProductDetailsBadgeItem
@@ -56,6 +58,15 @@ export function buildProductDetailsBadgeItems({ product }) {
       key: "raffle",
       kind: "raffle",
       label: PRODUCT_CARD_UI.RAFFLE_BADGE,
+    });
+  }
+
+  const affiliate = resolveProductAffiliateOffer(product);
+  if (affiliate.enabled) {
+    items.push({
+      key: "affiliate",
+      kind: "affiliate",
+      label: PRODUCT_DETAILS_MODAL_UI.AFFILIATE_BADGE(affiliate.percent),
     });
   }
 

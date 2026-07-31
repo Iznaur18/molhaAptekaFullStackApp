@@ -19,6 +19,7 @@ export type ProductStatusBadgeVariant =
   | "installment"
   | "wholesale"
   | "raffle"
+  | "affiliate"
   | "placeholder"
   | "loyaltyOvercommit"
   | "promotionActive";
@@ -201,6 +202,13 @@ export const useProductStatusBadgeVariantStyles = (
         wholesale.textColor,
       ),
       raffle: createBadge(layout, baseText, BC.raffleBorder, raffle.backgroundColor, raffle.textColor),
+      affiliate: createBadge(
+        layout,
+        baseText,
+        "#6ee7b766",
+        "#ecfdf5",
+        "#047857",
+      ),
       placeholder: createBadge(
         layout,
         baseText,

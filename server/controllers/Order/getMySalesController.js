@@ -7,6 +7,7 @@ import { loadInstallmentPlanSummariesByIds } from "../../services/installment/in
 import { sanitizeOrderForSellerApi } from "../../services/order/buyerPassportShare.js";
 
 import { ORDER_BUYER_PUBLIC_FIELDS, ORDER_ITEMS_POPULATE } from "./orderQueries.js";
+import { ORDER_AFFILIATE_REFERRER_POPULATE } from "../../services/order/orderQueries.js";
 import {
   fetchMySalesOrderPageIds,
   orderRowsByIds,
@@ -149,6 +150,7 @@ const sellerId = String(req.userId);
         : await OrderModel.find({ _id: { $in: orderIds } })
             .populate("userBuyerId", ORDER_BUYER_PUBLIC_FIELDS)
             .populate(ORDER_ITEMS_POPULATE)
+            .populate(ORDER_AFFILIATE_REFERRER_POPULATE)
             .lean();
     const rawOrders = orderRowsByIds(orderIds, rawOrdersUnordered);
 

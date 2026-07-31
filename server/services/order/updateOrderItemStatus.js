@@ -19,6 +19,8 @@ import {
   releaseUnawardedLoyaltyReservesForOrder,
 } from "./orderLoyaltyPoints.js";
 import { settleLoyaltyPointsReservation } from "../loyalty/loyaltyPointsReserve.js";
+import { settleAffiliatePayoutForOrderItem } from "../affiliate/settleAffiliatePayoutForOrderItem.js";
+import { notifyAffiliatePayoutCredited } from "../affiliate/notifyAffiliatePayoutCredited.js";
 import { finalizeOffersAfterOrderConfirmed } from "../product/productPriceOfferHelpers.js";
 import { closeProductAuction } from "../product/productAuction.js";
 import { syncRaffleProgressForProductSale } from "../raffle/raffleHelpers.js";
@@ -271,9 +273,11 @@ export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, use
   const productId = resolveProductIdFromItem(targetItem.productId);
 
   let pointsEarned = 0;
+  /** @type {{ paid: number; referrerUserId?: string; deferNotification?: boolean } | null} */
+  let affiliatePayout = null;
 
   try {
-    pointsEarned = await runInTransaction(async (session) => {
+    const txnResult = await runInTransaction(async (session) => {
       const earned = prepareLoyaltyPointsForConfirmedOrderItem({
         order,
         itemIndex,
@@ -308,6 +312,13 @@ export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, use
         markOrderLineLoyaltyReserveReleased(targetItem);
       }
 
+      const affiliateResult = await settleAffiliatePayoutForOrderItem({
+        order,
+        targetItem,
+        buyerId,
+        session,
+      });
+
       targetItem.status = ORDER_STATUS_CONFIRMED;
       targetItem.confirmedAt = new Date();
       targetItem.confirmedBy = userId;
@@ -318,8 +329,10 @@ export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, use
         await decrementProductStockOnItemConfirmed(productId, targetItem.quantity, session);
       }
 
-      return earned;
+      return { earned, affiliateResult };
     });
+    pointsEarned = txnResult.earned;
+    affiliatePayout = txnResult.affiliateResult;
   } catch (txError) {
     if (txError instanceof AppError) {
       throw txError;
@@ -329,6 +342,19 @@ export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, use
       409,
       "Не удалось начислить баллы: у продавца недостаточно замороженных баллов",
     );
+  }
+
+  if (
+    affiliatePayout?.deferNotification &&
+    affiliatePayout.referrerUserId &&
+    affiliatePayout.paid > 0
+  ) {
+    await notifyAffiliatePayoutCredited({
+      referrerUserId: affiliatePayout.referrerUserId,
+      amount: affiliatePayout.paid,
+      buyerUserId: buyerId,
+      productId: productId ? String(productId) : null,
+    });
   }
 
   await runConfirmItemSideEffects(order, targetItem, productId);

@@ -158,6 +158,22 @@ export {
   CONVERT_PARTNER_IDEMPOTENCY_KEY_MAX_LENGTH,
 } from "./partnerProgram.js";
 export {
+  AFFILIATE_PERCENT_MIN,
+  AFFILIATE_PERCENT_MAX,
+  AFFILIATE_QUERY_PARAM,
+  AFFILIATE_CLICK_TTL_DAYS,
+  AFFILIATE_BUDGET_TOP_UP_AMOUNT_MAX,
+  AFFILIATE_IDEMPOTENCY_KEY_MAX_LENGTH,
+  AFFILIATE_LINE_STATUSES,
+  affiliatePercentSchema,
+  productAffiliatePatchFieldsShape,
+  assertAffiliatePatchPair,
+  topUpAffiliateBudgetBodySchema,
+  affiliateBudgetStatusDataSchema,
+  affiliateEarningsRowSchema,
+  myAffiliateEarningsDataSchema,
+} from "./productAffiliate.js";
+export {
   productCategorySlugParamsSchema,
   productCategoryDisplaySlugParamsSchema,
   productCategoryIdParamsSchema,

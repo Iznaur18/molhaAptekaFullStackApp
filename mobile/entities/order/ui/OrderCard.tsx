@@ -8,6 +8,7 @@ import {
   type ViewStyle,
 } from "react-native";
 import { resolveOrderShippingTrackingUrl } from "@molha/api-contract";
+import { resolveOrderLineAffiliateSellerLine } from "@izibuy/shared-lib";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
 import { isOrderLineItemProductClickable } from "@/entities/order/lib/isOrderLineItemProductClickable";
@@ -312,12 +313,20 @@ export const OrderCard = ({
       loyaltyPointsReservedTotal?: number;
       deliveredAt?: string;
       confirmedAt?: string;
+      affiliateStatus?: string;
+      affiliateAmount?: number;
+      affiliatePercentUsed?: number;
+      affiliateReferrerUserId?: unknown;
     };
     const productName = resolveOrderLineItemName(item);
     const loyaltyPerUnit = formatLoyaltyPoints(source.loyaltyPointsPerUnitAtOrder);
     const loyaltyReservedTotal = formatLoyaltyPoints(source.loyaltyPointsReservedTotal);
     const deliveredAtText = source.deliveredAt ? formatIsoDateTime(source.deliveredAt) : "";
     const confirmedAtText = source.confirmedAt ? formatIsoDateTime(source.confirmedAt) : "";
+    const affiliateSellerLine = resolveOrderLineAffiliateSellerLine({
+      item: source,
+      attentionRole,
+    });
 
     return (
       <View key={`extras-${index}`} style={styles.itemExtras}>
@@ -328,6 +337,14 @@ export const OrderCard = ({
           <Text style={styles.itemLoyalty}>
             {ORDER_CARD_UI.LOYALTY_POINTS_LINE(loyaltyPerUnit)}
             {(source.quantity ?? 1) > 1 ? ` · всего ${loyaltyReservedTotal}` : ""}
+          </Text>
+        ) : null}
+        {affiliateSellerLine ? (
+          <Text
+            style={styles.itemAffiliate}
+            accessibilityLabel={ORDER_CARD_UI.AFFILIATE_LINE_ARIA}
+          >
+            {affiliateSellerLine}
           </Text>
         ) : null}
         <Text style={styles.itemStatus}>
@@ -358,6 +375,10 @@ export const OrderCard = ({
       loyaltyPointsReservedTotal?: number;
       deliveredAt?: string;
       confirmedAt?: string;
+      affiliateStatus?: string;
+      affiliateAmount?: number;
+      affiliatePercentUsed?: number;
+      affiliateReferrerUserId?: unknown;
     };
     const itemIndex = getOrderItemIndex(source, index);
     const actionKey = `${order._id}:${itemIndex}`;
@@ -374,6 +395,10 @@ export const OrderCard = ({
     const loyaltyReservedTotal = formatLoyaltyPoints(source.loyaltyPointsReservedTotal);
     const deliveredAtText = source.deliveredAt ? formatIsoDateTime(source.deliveredAt) : "";
     const confirmedAtText = source.confirmedAt ? formatIsoDateTime(source.confirmedAt) : "";
+    const affiliateSellerLine = resolveOrderLineAffiliateSellerLine({
+      item: source,
+      attentionRole,
+    });
     const showSecondaryInline = !compact;
     const hasItemActions =
       (canMarkShipped && (onMarkShipped || onCancelItem)) ||
@@ -412,6 +437,15 @@ export const OrderCard = ({
               <Text style={styles.itemLoyalty}>
                 {ORDER_CARD_UI.LOYALTY_POINTS_LINE(loyaltyPerUnit)}
                 {(source.quantity ?? 1) > 1 ? ` · всего ${loyaltyReservedTotal}` : ""}
+              </Text>
+            ) : null}
+
+            {affiliateSellerLine ? (
+              <Text
+                style={styles.itemAffiliate}
+                accessibilityLabel={ORDER_CARD_UI.AFFILIATE_LINE_ARIA}
+              >
+                {affiliateSellerLine}
               </Text>
             ) : null}
 

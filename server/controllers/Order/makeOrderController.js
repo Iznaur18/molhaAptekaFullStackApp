@@ -18,6 +18,7 @@ export const makeOrderController = async (req, res) => {
         priceOfferId: req.body.priceOfferId,
         fulfillmentMethod: req.body.fulfillmentMethod,
         verifiedDeliveryAddress: req.verifiedDeliveryAddress,
+        affiliateCode: req.body.affiliateCode,
       });
 
       await order.populate("userBuyerId", ORDER_BUYER_PUBLIC_FIELDS);

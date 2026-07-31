@@ -59,6 +59,7 @@ const PROFILE_NAV_SECTION_TONE_MAP = {
   premium: "amber",
   "loyalty-points": "red",
   "partner-program": "green",
+  "affiliate-listings": "green",
   advertising: "amber",
   "edit-profile": "slate",
   "create-raffle": "purple",

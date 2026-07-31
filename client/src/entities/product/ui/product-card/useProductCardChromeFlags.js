@@ -58,6 +58,11 @@ export function useProductCardChromeFlags(props, currentUserId) {
   const showAuctionBadge = !isModerationQueue && auctionActive;
   const showInstallmentBadge =
     !isModerationQueue && product.productInstallmentEnabled === true;
+  const affiliatePercent = Math.floor(Number(product.affiliatePercent) || 0);
+  const showAffiliateBadge =
+    !isModerationQueue &&
+    product.affiliateEnabled === true &&
+    affiliatePercent > 0;
   const wholesaleBadgeLabel = !isModerationQueue
     ? formatProductWholesaleBadgeLabel(product)
     : null;
@@ -133,6 +138,8 @@ export function useProductCardChromeFlags(props, currentUserId) {
     showRaffleBadge,
     showAuctionBadge,
     showInstallmentBadge,
+    showAffiliateBadge,
+    affiliatePercent,
     showWholesaleBadge,
     wholesaleBadgeLabel,
     showBannerLayout,

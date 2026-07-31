@@ -50,6 +50,7 @@ export const PROFILE_NAV_ITEM_META = {
   premium: { icon: Crown },
   "loyalty-points": { icon: Sparkles },
   "partner-program": { icon: Users },
+  "affiliate-listings": { icon: Users },
   advertising: { icon: Megaphone },
   "edit-profile": { icon: Pencil },
   "create-raffle": { icon: Gift },

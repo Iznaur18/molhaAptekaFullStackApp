@@ -20,15 +20,21 @@ export type CreateOrderPayload = {
   deliveryAddressFlat?: string;
   paymentMethod: OrderPaymentMethod;
   priceOfferId?: string;
+  affiliateCode?: string;
   idempotencyKey: string;
 };
 
 export const createOrder = async (payload: CreateOrderPayload) => {
   try {
-    const { data } = await apiClient.post("/order", {
+    const body: Record<string, unknown> = {
       ...payload,
       deliveryAddressFlat: payload.deliveryAddressFlat ?? "",
-    });
+    };
+    const code = String(payload.affiliateCode ?? "").trim();
+    if (!code) {
+      delete body.affiliateCode;
+    }
+    const { data } = await apiClient.post("/order", body);
     const parsed = parseCreateOrderData(data);
     return parsed.order;
   } catch (error) {

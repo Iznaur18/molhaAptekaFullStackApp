@@ -99,6 +99,7 @@ export function useAppShellDomain(
     setTogglingAvailabilityProductId: shell.setTogglingAvailabilityProductId,
     setTogglingAuctionProductId: shell.setTogglingAuctionProductId,
     setTogglingWholesaleProductId: shell.setTogglingWholesaleProductId,
+    setTogglingAffiliateProductId: shell.setTogglingAffiliateProductId,
     setTogglingInstallmentProductId: shell.setTogglingInstallmentProductId,
     setMyProductsCatalogError: shell.setMyProductsCatalogError,
     setPromotionProduct: shell.setPromotionProduct,

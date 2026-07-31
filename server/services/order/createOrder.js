@@ -30,6 +30,10 @@ import {
 import { resolveProductUnitPrice } from "@izibuy/shared-lib";
 
 import { buildOrderStatusFromItems } from "./orderStatus.js";
+import {
+  resolveAffiliateReferrerUserId,
+  resolveOrderLineAffiliateAttribution,
+} from "../affiliate/resolveAffiliateAttribution.js";
 
 const calculateTotalAmount = (items) =>
   items.reduce(
@@ -46,9 +50,12 @@ const calculateTotalAmount = (items) =>
  *   sellerId: string;
  *   pickupAddress: string;
  *   deliveryEnabled: boolean;
+ *   affiliateEnabled: boolean;
+ *   affiliatePercent: number;
  * }>} productById
+ * @param {{ referrerUserId: string | null; buyerUserId: string }} affiliateCtx
  */
-const buildItemsWithPriceSnapshot = (items, productById) =>
+const buildItemsWithPriceSnapshot = (items, productById, affiliateCtx) =>
   items.map((item) => {
     const snapshot = productById[String(item.productId)];
     const unitPrice = resolveProductUnitPrice({
@@ -62,6 +69,13 @@ const buildItemsWithPriceSnapshot = (items, productById) =>
       loyaltyPointsPerUnit: snapshot.loyaltyPointsPerUnit,
       quantity: item.quantity,
     });
+    const affiliate = resolveOrderLineAffiliateAttribution({
+      referrerUserId: affiliateCtx.referrerUserId,
+      buyerUserId: affiliateCtx.buyerUserId,
+      sellerUserId: snapshot.sellerId,
+      affiliateEnabled: snapshot.affiliateEnabled === true,
+      affiliatePercent: snapshot.affiliatePercent,
+    });
 
     return {
       productId: item.productId,
@@ -69,6 +83,7 @@ const buildItemsWithPriceSnapshot = (items, productById) =>
       unitPriceAtOrder: unitPrice,
       productNameAtOrder: snapshot.name,
       ...loyalty,
+      ...affiliate,
     };
   });
 
@@ -83,11 +98,11 @@ const fetchAvailableProductsForOrder = async (productIds) => {
     productStockQuantity: { $gt: 0 },
   })
     .select(
-      "_id productPrice productName loyaltyPointsPerUnit productSeller productPickupAddress productPickupEnabled productDeliveryEnabled productWholesaleEnabled productWholesaleMinQty productWholesalePrice",
+      "_id productPrice productName loyaltyPointsPerUnit productSeller productPickupAddress productPickupEnabled productDeliveryEnabled productWholesaleEnabled productWholesaleMinQty productWholesalePrice affiliateEnabled affiliatePercent",
     )
     .lean();
 
-  /** @type {Record<string, { price: number; name: string; loyaltyPointsPerUnit: number; sellerId: string; pickupAddress: string; pickupEnabled: boolean; deliveryEnabled: boolean; wholesaleEnabled: boolean; wholesaleMinQty: number | null; wholesalePrice: number | null }>} */
+  /** @type {Record<string, { price: number; name: string; loyaltyPointsPerUnit: number; sellerId: string; pickupAddress: string; pickupEnabled: boolean; deliveryEnabled: boolean; wholesaleEnabled: boolean; wholesaleMinQty: number | null; wholesalePrice: number | null; affiliateEnabled: boolean; affiliatePercent: number }>} */
   const byId = {};
   for (const product of products) {
     const id = String(product._id);
@@ -105,6 +120,8 @@ const fetchAvailableProductsForOrder = async (productIds) => {
       wholesaleEnabled: product.productWholesaleEnabled === true,
       wholesaleMinQty: product.productWholesaleMinQty ?? null,
       wholesalePrice: product.productWholesalePrice ?? null,
+      affiliateEnabled: product.affiliateEnabled === true,
+      affiliatePercent: Math.floor(Number(product.affiliatePercent) || 0),
     };
   }
   return byId;
@@ -181,6 +198,7 @@ const appendOrderToBuyList = async (userId, orderId, session) => {
  *     flat?: string;
  *     fiasId: string;
  *   } | null;
+ *   affiliateCode?: string | null;
  * }} input
  */
 export async function createOrder({
@@ -190,6 +208,7 @@ export async function createOrder({
   priceOfferId,
   fulfillmentMethod = ORDER_FULFILLMENT_PICKUP,
   verifiedDeliveryAddress = null,
+  affiliateCode = null,
 }) {
   const emailCheck = await checkUserEmailVerified(userId);
   if (!emailCheck.ok) {
@@ -221,7 +240,7 @@ export async function createOrder({
       );
       const product = await ProductModel.findById(productId)
         .select(
-          "loyaltyPointsPerUnit productSeller productPickupAddress productPickupEnabled productDeliveryEnabled",
+          "loyaltyPointsPerUnit productSeller productPickupAddress productPickupEnabled productDeliveryEnabled affiliateEnabled affiliatePercent",
         )
         .lean();
       if (!product) {
@@ -237,6 +256,11 @@ export async function createOrder({
         pickupAddress: String(product.productPickupAddress ?? "").trim(),
         pickupEnabled: product.productPickupEnabled !== false,
         deliveryEnabled: product.productDeliveryEnabled === true,
+        wholesaleEnabled: false,
+        wholesaleMinQty: null,
+        wholesalePrice: null,
+        affiliateEnabled: product.affiliateEnabled === true,
+        affiliatePercent: Math.floor(Number(product.affiliatePercent) || 0),
       };
       linkedPriceOfferId = priceOfferId;
     } catch (error) {
@@ -280,7 +304,11 @@ export async function createOrder({
     throw new AppError(400, "Адрес доставки обязателен");
   }
 
-  const itemsWithPrice = buildItemsWithPriceSnapshot(items, productById);
+  const referrerUserId = await resolveAffiliateReferrerUserId(affiliateCode);
+  const itemsWithPrice = buildItemsWithPriceSnapshot(items, productById, {
+    referrerUserId,
+    buyerUserId: String(userId),
+  });
   const totalAmount = calculateTotalAmount(itemsWithPrice);
   const status = buildOrderStatusFromItems(itemsWithPrice);
 

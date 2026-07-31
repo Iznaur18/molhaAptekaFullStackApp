@@ -11,6 +11,7 @@ import { getProductSellerId } from "@/entities/product/lib/getProductSellerId";
 import { ProductCharacteristicsDetails } from "@/entities/product/ui/ProductCharacteristicsDetails";
 import { ProductDetailFieldRows } from "@/entities/product/ui/ProductDetailFieldRows";
 import { ProductDetailsBadgeStack } from "@/entities/product/ui/ProductDetailsBadgeStack";
+import { ProductAffiliateShareButton } from "@/entities/product/ui/ProductAffiliateShareButton";
 import { ProductDetailsSellerPreview } from "@/entities/product/ui/ProductDetailsSellerPreview";
 import { ProductPriceDisplay } from "@/entities/product/ui/ProductPriceDisplay";
 import { UserProfileProductsList } from "@/entities/user/ui/UserProfileProductsList";
@@ -32,6 +33,7 @@ type ProductDetailsDetailsTabProps = {
   onOpenAuctionTab?: () => void;
   auctionActive?: boolean;
   canShowAddToCart?: boolean;
+  onRequestLogin?: () => void;
 };
 
 export const ProductDetailsDetailsTab = ({
@@ -41,6 +43,7 @@ export const ProductDetailsDetailsTab = ({
   onOpenAuctionTab,
   auctionActive = false,
   canShowAddToCart = true,
+  onRequestLogin,
 }: ProductDetailsDetailsTabProps) => {
   const styles = useProductDetailScreenStyles();
   const name = String(product.productName ?? "").trim() || "Товар";
@@ -98,6 +101,12 @@ export const ProductDetailsDetailsTab = ({
           />
           <Text style={styles.productName}>{name}</Text>
           <ProductDetailsBadgeStack product={product} />
+          {typeof onRequestLogin === "function" ? (
+            <ProductAffiliateShareButton
+              product={product}
+              onRequestLogin={onRequestLogin}
+            />
+          ) : null}
           {(sellerId ||
             (productId && onOpenInstallmentTab) ||
             (auctionActive && onOpenAuctionTab)) ? (

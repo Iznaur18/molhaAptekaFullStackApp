@@ -361,3 +361,17 @@
   color: var(--iz-color-text-muted);
   cursor: default;
 }
+
+.product-details-modal__affiliate-share {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0.75rem 0 0.25rem;
+}
+
+.product-details-modal__affiliate-share-hint,
+.product-details-modal__affiliate-share-status {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--iz-color-text-muted, #6b7280);
+}

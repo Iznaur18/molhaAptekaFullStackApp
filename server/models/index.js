@@ -37,6 +37,7 @@ import { SellerPersonalCategoryCampaignModel } from "./SellerPersonalCategoryCam
 import StaffAuditLogModel from "./StaffAuditLogModel.js";
 import PassportVaultAccessLogModel from "./PassportVaultAccessLogModel.js";
 import ReferralLedgerEntryModel from "./ReferralLedgerEntryModel.js";
+import AffiliateLedgerEntryModel from "./AffiliateLedgerEntryModel.js";
 import { MoneyIdempotencyRecordModel } from "./MoneyIdempotencyRecordModel.js";
 
 export {
@@ -79,5 +80,6 @@ export {
   StaffAuditLogModel,
   PassportVaultAccessLogModel,
   ReferralLedgerEntryModel,
+  AffiliateLedgerEntryModel,
   MoneyIdempotencyRecordModel,
 };

@@ -78,7 +78,8 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: min(100%, var(--app-shell-max-width, 60rem));
+  max-width: var(--app-shell-max-width, 60rem);
   height: var(--checkout-sheet-height);
   max-height: var(--checkout-sheet-height);
   margin: 0;

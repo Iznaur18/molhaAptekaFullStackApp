@@ -79,6 +79,20 @@ const renderBadge = ({
     );
   }
 
+  if (item.kind === "affiliate") {
+    const tone = PRODUCT_DETAILS_BADGE_SOFT_COLORS.affiliate;
+    return (
+      <View
+        key={item.key}
+        style={[softBadgeChrome, { backgroundColor: tone.backgroundColor }]}
+        accessibilityRole="text"
+        accessibilityLabel={item.label}
+      >
+        <AppText style={[softBadgeText, { color: tone.color }]}>{item.label}</AppText>
+      </View>
+    );
+  }
+
   if (item.kind === "listingOrigin") {
     const tone = PRODUCT_DETAILS_BADGE_SOFT_COLORS.listingOrigin;
     return (

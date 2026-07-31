@@ -1,0 +1,76 @@
+.affiliate-listings-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.5rem 0 1.5rem;
+}
+
+.affiliate-listings-page_centered {
+  align-items: center;
+  text-align: center;
+  padding-top: 2rem;
+}
+
+.affiliate-listings-page__card {
+  border: 1px solid var(--iz-color-border, #e5e7eb);
+  border-radius: 12px;
+  padding: 1rem;
+  background: var(--iz-color-surface, #fff);
+}
+
+.affiliate-listings-page__title {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+}
+
+.affiliate-listings-page__value,
+.affiliate-listings-page__meta,
+.affiliate-listings-page__hint,
+.affiliate-listings-page__state {
+  margin: 0 0 0.5rem;
+  color: var(--iz-color-text-muted, #6b7280);
+  font-size: 0.95rem;
+}
+
+.affiliate-listings-page__state_error {
+  color: var(--iz-color-danger, #b91c1c);
+}
+
+.affiliate-listings-page__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0.75rem 0;
+  font-size: 0.9rem;
+}
+
+.affiliate-listings-page__input {
+  max-width: 12rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--iz-color-border, #d1d5db);
+  border-radius: 8px;
+}
+
+.affiliate-listings-page__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.affiliate-listings-page__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--iz-color-border, #e5e7eb);
+  font-size: 0.9rem;
+}
+
+.affiliate-listings-page__row-title {
+  flex: 1 1 100%;
+  font-weight: 600;
+  color: var(--iz-color-text, #111827);
+}

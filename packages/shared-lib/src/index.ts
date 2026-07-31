@@ -9,6 +9,22 @@ export {
   normalizeReferralCode,
 } from "./referralCode.js";
 export {
+  AFFILIATE_CODE_STORAGE_KEY,
+  AFFILIATE_QUERY_PARAM,
+  AFFILIATE_CLICK_TTL_DAYS,
+  normalizeAffiliateCode,
+} from "./affiliateCode.js";
+export {
+  AFFILIATE_MANAGE_DEFAULT_PERCENT,
+  AFFILIATE_PERCENT_MIN,
+  AFFILIATE_PERCENT_MAX,
+  buildAffiliateManageToggleBody,
+  isProductAffiliateConfigured,
+} from "./buildAffiliateManageToggleBody.js";
+export {
+  resolveAffiliateReferrerDisplayName,
+  resolveOrderLineAffiliateSellerLine,
+} from "./resolveOrderLineAffiliateSellerLine.js";export {
   PROFILE_ACCOUNT_SECTION_ORDER,
   PROFILE_SECTION_ADVERTISING,
   PROFILE_SECTION_ADMIN_ORDERS,
@@ -26,6 +42,7 @@ export {
   PROFILE_SECTION_INTRO_AD_MODERATION,
   PROFILE_SECTION_LOYALTY_POINTS,
   PROFILE_SECTION_PARTNER_PROGRAM,
+  PROFILE_SECTION_AFFILIATE_LISTINGS,
   PROFILE_SECTION_MY_ORDERS,
   PROFILE_SECTION_MY_PRODUCTS,
   PROFILE_SECTION_MY_SALES,

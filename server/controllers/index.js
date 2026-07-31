@@ -182,6 +182,9 @@ import {
   getMyReferralProgramController,
   convertPartnerBalanceController,
 } from "./User/referralControllers.js";
+import {
+  getMyAffiliateEarningsController,
+} from "./User/affiliateControllers.js";
 import { getMonthlyLoyaltyPointsAwardedController } from "./User/monthlyLoyaltyPointsControllers.js";
 import {
   followUserController,
@@ -364,6 +367,7 @@ export {
   adminCreditOwnLoyaltyPointsController,
   getMyReferralProgramController,
   convertPartnerBalanceController,
+  getMyAffiliateEarningsController,
   getMonthlyLoyaltyPointsAwardedController,
   followUserController,
   unfollowUserController,

@@ -111,6 +111,16 @@ export const PRODUCT_FIELD_REGISTRY = {
     editLabel: CREATE_PRODUCT_MODAL_UI.LABEL_LOYALTY_POINTS_PER_UNIT,
     editKind: "number",
   },
+  affiliateEnabled: {
+    labelRu: "Партнёрская услуга",
+    editLabel: CREATE_PRODUCT_MODAL_UI.LABEL_AFFILIATE_ENABLED,
+    editKind: "boolean",
+  },
+  affiliatePercent: {
+    labelRu: "Процент партнёру",
+    editLabel: CREATE_PRODUCT_MODAL_UI.LABEL_AFFILIATE_PERCENT,
+    editKind: "number",
+  },
   productCharacteristics: {
     labelRu: "Характеристики",
     editLabel: CREATE_PRODUCT_MODAL_UI.LABEL_CHARACTERISTICS,

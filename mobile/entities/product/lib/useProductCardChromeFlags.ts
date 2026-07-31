@@ -52,6 +52,11 @@ export const useProductCardChromeFlags = (
     const showDiscountBadge = discountPercent != null && discountPercent > 0;
     const showLoyaltyPointsBadge = shouldShowProductLoyaltyPointsBadge(product);
     const showRaffleBadge = !isModerationQueue && isProductRaffleParticipant(product);
+    const affiliatePercent = Math.floor(Number(product.affiliatePercent) || 0);
+    const showAffiliateBadge =
+      !isModerationQueue &&
+      product.affiliateEnabled === true &&
+      affiliatePercent > 0;
     const wholesaleBadgeLabel = formatProductWholesaleBadgeLabel(product);
     const showWholesaleBadge = !isModerationQueue && wholesaleBadgeLabel != null;
     const showRaffleParticipantChrome =
@@ -81,6 +86,8 @@ export const useProductCardChromeFlags = (
       showWholesaleBadge,
       wholesaleBadgeLabel,
       showRaffleBadge,
+      showAffiliateBadge,
+      affiliatePercent,
       showRaffleParticipantChrome,
     };
   }, [

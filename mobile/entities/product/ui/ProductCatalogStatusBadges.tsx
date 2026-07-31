@@ -75,6 +75,13 @@ export const ProductCatalogStatusBadges = ({
         variant: "raffle",
       });
     }
+    if (flags.showAffiliateBadge) {
+      badges.push({
+        key: "affiliate",
+        label: PRODUCT_CARD_UI.AFFILIATE_BADGE(flags.affiliatePercent),
+        variant: "affiliate",
+      });
+    }
     if (showAuctionBadge && flags.showAuctionBadge) {
       badges.push({
         key: "auction",

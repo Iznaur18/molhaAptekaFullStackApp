@@ -11,12 +11,18 @@ import { formatApiErrorMessage } from "@izibuy/shared-lib";
  *   deliveryAddressFlat?: string;
  *   paymentMethod: import('../model/constants.js').ORDER_PAYMENT_METHODS[number];
  *   priceOfferId?: string;
+ *   affiliateCode?: string;
  *   idempotencyKey: string;
  * }} payload
  */
 export async function createOrder(payload) {
   try {
-    const { data } = await apiClient.post("/order", payload);
+    const body = { ...payload };
+    const code = String(payload.affiliateCode ?? "").trim();
+    if (!code) {
+      delete body.affiliateCode;
+    }
+    const { data } = await apiClient.post("/order", body);
 
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);

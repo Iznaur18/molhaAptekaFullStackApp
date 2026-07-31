@@ -4,6 +4,7 @@ import { PRODUCT_PROMOTION_UI } from "../../../shared/config/appUiCopy.js";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
 import { InstallmentProgramModal } from "../../installment/ui/InstallmentProgramModal.jsx";
 import { WholesalePriceModal } from "./WholesalePriceModal.jsx";
+import { AffiliatePercentModal } from "./AffiliatePercentModal.jsx";
 import { calculateProductPromotionPointsCost } from "../lib/calculateProductPromotionPointsCost.js";
 import { ProductPromotionFormPanel } from "./product-promotion-modal/ProductPromotionFormPanel.jsx";
 import { ProductPromotionManageTab } from "./product-promotion-modal/ProductPromotionManageTab.jsx";
@@ -40,6 +41,10 @@ const PRODUCT_PROMOTION_MODAL_TITLE_ID = "product-promotion-modal-title";
  *     productId: string,
  *     productWholesaleEnabled: boolean,
  *   ) => void | Promise<void>;
+ *   onSetProductAffiliate?: (
+ *     productId: string,
+ *     affiliateEnabled: boolean,
+ *   ) => void | Promise<void>;
  *   onSetProductInstallment?: (
  *     productId: string,
  *     productInstallmentEnabled: boolean,
@@ -51,6 +56,7 @@ const PRODUCT_PROMOTION_MODAL_TITLE_ID = "product-promotion-modal-title";
  *   isAvailabilityTogglePending?: boolean;
  *   isAuctionTogglePending?: boolean;
  *   isWholesaleTogglePending?: boolean;
+ *   isAffiliateTogglePending?: boolean;
  *   isInstallmentTogglePending?: boolean;
  *   isDeletePending?: boolean;
  *   manageErrorMessage?: string;
@@ -81,6 +87,7 @@ export function ProductPromotionModal({
   onSetProductAvailability,
   onSetProductAuction,
   onSetProductWholesale,
+  onSetProductAffiliate,
   onSetProductInstallment,
   onWholesaleSaved,
   onInstallmentProgramSaved,
@@ -88,6 +95,7 @@ export function ProductPromotionModal({
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
   isWholesaleTogglePending = false,
+  isAffiliateTogglePending = false,
   isInstallmentTogglePending = false,
   isDeletePending = false,
   manageErrorMessage = "",
@@ -112,6 +120,7 @@ export function ProductPromotionModal({
   });
   const [isInstallmentProgramOpen, setIsInstallmentProgramOpen] = useState(false);
   const [isWholesaleOpen, setIsWholesaleOpen] = useState(false);
+  const [isAffiliateOpen, setIsAffiliateOpen] = useState(false);
   const defaultTier = tiers[0]?.tier ?? 1;
   const defaultDuration = durations[0]?.code ?? "";
   const [selectedTier, setSelectedTier] = useState(defaultTier);
@@ -123,6 +132,7 @@ export function ProductPromotionModal({
     if (!isOpen) {
       setIsInstallmentProgramOpen(false);
       setIsWholesaleOpen(false);
+      setIsAffiliateOpen(false);
     }
   }, [defaultDuration, defaultTier, isOpen]);
 
@@ -248,11 +258,13 @@ export function ProductPromotionModal({
             onSetAvailability={onSetProductAvailability}
             onSetAuction={onSetProductAuction}
             onSetWholesale={onSetProductWholesale}
+            onSetAffiliate={onSetProductAffiliate}
             onSetInstallment={onSetProductInstallment}
             onDelete={onDeleteProduct}
             isAvailabilityTogglePending={isAvailabilityTogglePending}
             isAuctionTogglePending={isAuctionTogglePending}
             isWholesaleTogglePending={isWholesaleTogglePending}
+            isAffiliateTogglePending={isAffiliateTogglePending}
             isInstallmentTogglePending={isInstallmentTogglePending}
             isDeletePending={isDeletePending}
             errorMessage={manageErrorMessage}
@@ -265,6 +277,7 @@ export function ProductPromotionModal({
             isSubmitting={isSubmitting}
             onOpenInstallmentProgram={() => setIsInstallmentProgramOpen(true)}
             onOpenWholesaleSettings={() => setIsWholesaleOpen(true)}
+            onOpenAffiliateSettings={() => setIsAffiliateOpen(true)}
           />
         )}
       </ProductModalShell>
@@ -284,6 +297,12 @@ export function ProductPromotionModal({
         isOpen={isWholesaleOpen}
         product={product}
         onClose={() => setIsWholesaleOpen(false)}
+        onSaved={onWholesaleSaved}
+      />
+      <AffiliatePercentModal
+        isOpen={isAffiliateOpen}
+        product={product}
+        onClose={() => setIsAffiliateOpen(false)}
         onSaved={onWholesaleSaved}
       />
     </>

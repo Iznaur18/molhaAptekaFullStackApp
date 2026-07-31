@@ -170,6 +170,12 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     fontSize: 12,
     color: theme.colors.success,
   },
+  itemAffiliate: {
+    marginTop: 4,
+    fontSize: 12,
+    color: theme.colors.success,
+    fontWeight: "600",
+  },
   itemStatus: {
     marginTop: 4,
     fontSize: 12,

@@ -320,6 +320,15 @@ const UserSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
+    /**
+     * Legacy: предоплаченный бюджет партнёрки.
+     * Новые выплаты списывают свободные баллы; остаток бюджета мигрирует в userLoyaltyPoints.
+     */
+    affiliateBudget: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
 
     // - - - Сессия / refresh rotation - - -
     authTokenVersion: {

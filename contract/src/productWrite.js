@@ -14,6 +14,10 @@ import {
   productPickupLonFieldSchema,
 } from "./productPickup.js";
 import { productWholesalePatchFieldsShape } from "./productWholesale.js";
+import {
+  assertAffiliatePatchPair,
+  productAffiliatePatchFieldsShape,
+} from "./productAffiliate.js";
 
 /** Синхрон с `server/constants/productConstants.js` (legacy slug). */
 export const PRODUCT_CATEGORY_VALUES = [
@@ -276,6 +280,7 @@ const patchFieldShape = {
     .optional(),
   productAuctionEnabled: z.coerce.boolean().optional(),
   ...productWholesalePatchFieldsShape,
+  ...productAffiliatePatchFieldsShape,
   loyaltyPointsPerUnit: z.coerce.number().int().min(0).optional(),
   productCharacteristics: z
     .array(productCharacteristicSchema)
@@ -323,7 +328,8 @@ export const patchMyProductBodySchema = z
     ) {
       assertPickupCoordsPair(body, ctx);
     }
-  });
+  })
+  .superRefine((body, ctx) => assertAffiliatePatchPair(body, ctx));
 
 export const productModerationFromApiSchema = productFromApiSchema.extend({
   productModerationStatus: z.enum(PRODUCT_MODERATION_STATUSES),

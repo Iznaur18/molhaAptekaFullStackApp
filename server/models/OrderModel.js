@@ -104,6 +104,37 @@ const OrderLineItemSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    /** Кто привёл покупателя по партнёрской ссылке объявления. */
+    affiliateReferrerUserId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    affiliateStatus: {
+      type: String,
+      enum: [
+        "none",
+        "pending",
+        "paid",
+        "skipped_no_program",
+        "skipped_antifraud",
+      ],
+      default: "none",
+    },
+    affiliateAmount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    affiliatePercentUsed: {
+      type: Number,
+      default: null,
+      min: 0,
+    },
+    affiliatePaidAt: {
+      type: Date,
+      default: null,
+    },
   },
   { _id: true },
 );

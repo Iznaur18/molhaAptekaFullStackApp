@@ -103,6 +103,11 @@ export function ProductCardStandardContent({ vm }) {
                 {PRODUCT_CARD_UI.RAFFLE_BADGE}
               </p>
             ) : null}
+            {vm.showAffiliateBadge ? (
+              <p className="product-card__affiliate-badge" role="status">
+                {PRODUCT_CARD_UI.AFFILIATE_BADGE(vm.affiliatePercent)}
+              </p>
+            ) : null}
             {vm.showAuctionBadge ? (
               <p className="product-card__auction-badge" role="status">
                 {PRODUCT_CARD_UI.AUCTION_BADGE}

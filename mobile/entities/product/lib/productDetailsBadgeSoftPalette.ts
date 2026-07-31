@@ -14,6 +14,7 @@ export const PRODUCT_DETAILS_BADGE_SOFT_COLORS = {
   promotionTop: { backgroundColor: "#f2eff7", color: "#6d28d9" },
   promotionBanner: { backgroundColor: "#fee2e2", color: "#b91c1c" },
   listingOrigin: { backgroundColor: "#e0f2fe", color: "#0369a1" },
+  affiliate: { backgroundColor: "#ecfdf5", color: "#047857" },
 } as const;
 
 type SoftBadgeTone = {
@@ -27,6 +28,8 @@ export const resolveProductDetailsStatusBadgeSoftTone = (
   switch (variant) {
     case "raffle":
       return PRODUCT_DETAILS_BADGE_SOFT_COLORS.raffle;
+    case "affiliate":
+      return PRODUCT_DETAILS_BADGE_SOFT_COLORS.affiliate;
     case "auction":
       return PRODUCT_DETAILS_BADGE_SOFT_COLORS.auction;
     case "installment":

@@ -30,6 +30,7 @@ import {
   adminCreditOwnLoyaltyPointsController,
   getMyReferralProgramController,
   convertPartnerBalanceController,
+  getMyAffiliateEarningsController,
   getMonthlyLoyaltyPointsAwardedController,
   getUserPhoneController,
 } from "../controllers/index.js";
@@ -201,6 +202,12 @@ router.post(
   checkAuthMW,
   convertPartnerBalanceValidation,
   convertPartnerBalanceController,
+);
+
+router.get(
+  "/me/affiliate/earnings",
+  checkAuthMW,
+  getMyAffiliateEarningsController,
 );
 
 router.get(

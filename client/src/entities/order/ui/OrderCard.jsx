@@ -28,6 +28,7 @@ import {
   resolveOrderLineItemProductName,
 } from "../lib/resolveOrderLineItemProductName.js";
 import { OrderCardLineItemThumb } from "./OrderCardLineItemThumb.jsx";
+import { resolveOrderLineAffiliateSellerLine } from "../lib/resolveOrderLineAffiliateSellerLine.js";
 import { BuyerPassportSharePanel } from "../../installment/ui/BuyerPassportSharePanel.jsx";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
@@ -215,12 +216,20 @@ function OrderCardLineItem({
   const confirmedAtText = item.confirmedAt ? formatIsoDateTime(item.confirmedAt) : "";
   const loyaltyPoints = Math.floor(Number(item.loyaltyPointsPerUnitAtOrder));
   const productName = resolveOrderLineItemProductName(item);
+  const affiliateSellerLine = resolveOrderLineAffiliateSellerLine({
+    item,
+    attentionRole,
+  });
   const showPrimary = !showSecondaryOnly;
   const showSecondary = !compact || showSecondaryOnly;
 
   if (showSecondaryOnly) {
     const hasSecondary =
-      itemsCount > 1 || loyaltyPoints > 0 || deliveredAtText || confirmedAtText;
+      itemsCount > 1 ||
+      loyaltyPoints > 0 ||
+      deliveredAtText ||
+      confirmedAtText ||
+      Boolean(affiliateSellerLine);
 
     if (!hasSecondary) {
       return null;
@@ -237,6 +246,14 @@ function OrderCardLineItem({
             {item.quantity > 1
               ? ` · всего ${Math.floor(Number(item.loyaltyPointsReservedTotal) || 0)}`
               : ""}
+          </span>
+        ) : null}
+        {affiliateSellerLine ? (
+          <span
+            className="order-card__item-affiliate"
+            aria-label={ORDER_CARD_UI.AFFILIATE_LINE_ARIA}
+          >
+            {affiliateSellerLine}
           </span>
         ) : null}
         {deliveredAtText ? (
@@ -295,6 +312,14 @@ function OrderCardLineItem({
                   : ""}
               </span>
             ) : null}
+            {affiliateSellerLine ? (
+              <span
+                className="order-card__item-affiliate"
+                aria-label={ORDER_CARD_UI.AFFILIATE_LINE_ARIA}
+              >
+                {affiliateSellerLine}
+              </span>
+            ) : null}
             <span className="order-card__item-status">
               {ORDER_CARD_UI.ITEM_STATUS_LABEL}:{" "}
               {resolveOrderStatusLabelRu(item.status, attentionRole)}
@@ -310,6 +335,14 @@ function OrderCardLineItem({
               </span>
             ) : null}
           </>
+        ) : null}
+        {compact && affiliateSellerLine ? (
+          <span
+            className="order-card__item-affiliate"
+            aria-label={ORDER_CARD_UI.AFFILIATE_LINE_ARIA}
+          >
+            {affiliateSellerLine}
+          </span>
         ) : null}
       </div>
       {hasItemActions || actionError ? (

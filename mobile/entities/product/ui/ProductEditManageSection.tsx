@@ -1,4 +1,4 @@
-import { isProductWholesaleConfigured } from "@izibuy/shared-lib";
+import { isProductAffiliateConfigured, isProductWholesaleConfigured } from "@izibuy/shared-lib";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -17,6 +17,7 @@ type ProductEditManageSectionProps = {
   onSetAvailability?: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
   onSetAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
   onSetWholesale?: (productId: string, productWholesaleEnabled: boolean) => void | Promise<void>;
+  onSetAffiliate?: (productId: string, affiliateEnabled: boolean) => void | Promise<void>;
   onSetInstallment?: (
     productId: string,
     productInstallmentEnabled: boolean,
@@ -25,6 +26,7 @@ type ProductEditManageSectionProps = {
   isAvailabilityTogglePending?: boolean;
   isAuctionTogglePending?: boolean;
   isWholesaleTogglePending?: boolean;
+  isAffiliateTogglePending?: boolean;
   isInstallmentTogglePending?: boolean;
   isDeletePending?: boolean;
   errorMessage?: string;
@@ -37,19 +39,30 @@ type ProductEditManageSectionProps = {
   onOpenInstallmentProgram?: () => void;
   canOpenInstallmentProgram?: boolean;
   onOpenWholesaleSettings?: () => void;
+  onOpenAffiliateSettings?: () => void;
   disabled?: boolean;
 };
+
+const resolveAffiliateEnabled = (product: CatalogProduct) => {
+  const percent = Math.floor(Number(product.affiliatePercent) || 0);
+  return product.affiliateEnabled === true && percent > 0;
+};
+
+const resolveAffiliatePercent = (product: CatalogProduct) =>
+  Math.floor(Number(product.affiliatePercent) || 0);
 
 export const ProductEditManageSection = ({
   product,
   onSetAvailability,
   onSetAuction,
   onSetWholesale,
+  onSetAffiliate,
   onSetInstallment,
   onDelete,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
   isWholesaleTogglePending = false,
+  isAffiliateTogglePending = false,
   isInstallmentTogglePending = false,
   isDeletePending = false,
   errorMessage = "",
@@ -62,6 +75,7 @@ export const ProductEditManageSection = ({
   onOpenInstallmentProgram,
   canOpenInstallmentProgram = true,
   onOpenWholesaleSettings,
+  onOpenAffiliateSettings,
   disabled = false,
 }: ProductEditManageSectionProps) => {
   const styles = useProductEditManageSectionStyles();
@@ -74,9 +88,14 @@ export const ProductEditManageSection = ({
   const isAuctionEnabled = product.productAuctionEnabled === true;
   const isInstallmentEnabled = product.productInstallmentEnabled === true;
   const isWholesaleEnabled = product.productWholesaleEnabled === true;
+  const isAffiliateEnabled = resolveAffiliateEnabled(product);
+  const affiliatePercent = resolveAffiliatePercent(product);
   const wholesaleConfigured = isProductWholesaleConfigured(product);
+  const affiliateConfigured = isProductAffiliateConfigured(product);
   const showWholesale =
     typeof onOpenWholesaleSettings === "function" || typeof onSetWholesale === "function";
+  const showAffiliate =
+    typeof onOpenAffiliateSettings === "function" || typeof onSetAffiliate === "function";
   const showRaffleToggle =
     sellerRaffleActive && typeof onToggleRaffleParticipation === "function";
   const showInstallmentButton =
@@ -95,6 +114,7 @@ export const ProductEditManageSection = ({
     isAvailabilityTogglePending ||
     isAuctionTogglePending ||
     isWholesaleTogglePending ||
+    isAffiliateTogglePending ||
     isInstallmentTogglePending ||
     isRaffleParticipationPending ||
     isDeletePending ||
@@ -151,6 +171,7 @@ export const ProductEditManageSection = ({
               isAvailabilityTogglePending ||
               isAuctionTogglePending ||
               isWholesaleTogglePending ||
+              isAffiliateTogglePending ||
               isDeletePending ||
               disabled
             }
@@ -171,6 +192,7 @@ export const ProductEditManageSection = ({
               isAvailabilityTogglePending ||
               isAuctionTogglePending ||
               isWholesaleTogglePending ||
+              isAffiliateTogglePending ||
               isInstallmentTogglePending ||
               isRaffleParticipationPending ||
               isDeletePending ||
@@ -216,6 +238,34 @@ export const ProductEditManageSection = ({
               }
               if (typeof onSetWholesale === "function") {
                 void onSetWholesale(String(product._id), next);
+              }
+              return undefined;
+            }}
+          />
+        ) : null}
+        {showAffiliate && canEdit ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_UI.MANAGE_AFFILIATE_TITLE}
+            description={
+              isAffiliateEnabled
+                ? CREATE_PRODUCT_UI.MANAGE_AFFILIATE_HINT_ON(affiliatePercent)
+                : CREATE_PRODUCT_UI.MANAGE_AFFILIATE_HINT
+            }
+            checked={isAffiliateEnabled}
+            disabled={actionsLocked}
+            pending={isAffiliateTogglePending}
+            pendingLabel={CREATE_PRODUCT_UI.AFFILIATE_TOGGLE_PENDING}
+            onPress={() => onOpenAffiliateSettings?.()}
+            onCheckedChange={(next) => {
+              if (product._id == null || actionsLocked) {
+                return { revert: true };
+              }
+              if (next && !affiliateConfigured) {
+                onOpenAffiliateSettings?.();
+                return { revert: true };
+              }
+              if (typeof onSetAffiliate === "function") {
+                void onSetAffiliate(String(product._id), next);
               }
               return undefined;
             }}

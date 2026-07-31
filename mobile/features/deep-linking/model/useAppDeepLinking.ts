@@ -3,6 +3,7 @@ import * as Linking from "expo-linking";
 import { useEffect } from "react";
 
 import { parseAppDeepLink } from "@/features/deep-linking/lib/parseAppDeepLink";
+import { captureAffiliateCodeFromUrl } from "@/shared/lib/affiliateCodeStorage";
 import { captureReferralCodeFromUrl } from "@/shared/lib/referralCodeStorage";
 
 const navigateToDeepLink = (
@@ -23,6 +24,7 @@ export const useAppDeepLinking = (): void => {
   useEffect(() => {
     const handleUrl = (url: string) => {
       void captureReferralCodeFromUrl(url);
+      void captureAffiliateCodeFromUrl(url);
       navigateToDeepLink(router, url);
     };
 

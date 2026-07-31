@@ -3,6 +3,7 @@ import { AppError } from "../../errors/AppError.js";
 import {
   ORDER_BUYER_PUBLIC_FIELDS,
   ORDER_ITEMS_POPULATE,
+  ORDER_AFFILIATE_REFERRER_POPULATE,
 } from "../order/orderQueries.js";
 import {
   normalizeOrderDocumentForRuntime,
@@ -22,6 +23,7 @@ export const getOrderItemByIndex = (order, itemIndex) =>
 export const populateOrderForResponse = async (order) => {
   await order.populate("userBuyerId", ORDER_BUYER_PUBLIC_FIELDS);
   await order.populate(ORDER_ITEMS_POPULATE);
+  await order.populate(ORDER_AFFILIATE_REFERRER_POPULATE);
   return order;
 };
 

@@ -16,6 +16,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { resolveProductImageUrls } from "@/entities/product/lib/resolveProductImageUrls";
 import { resolveProductPreviewVideoUrl } from "@/entities/product/lib/resolveProductPreviewVideoUrl";
 import { setProductInstallmentEnabled } from "@/entities/installment/lib/setProductInstallmentEnabled";
+import { buildAffiliateManageToggleBody } from "@izibuy/shared-lib";
 import {
   canSellerDeleteProduct,
   canSellerEditProduct,
@@ -97,6 +98,7 @@ export default function ProductDetailScreen() {
   const [isAvailabilityTogglePending, setIsAvailabilityTogglePending] = useState(false);
   const [isAuctionTogglePending, setIsAuctionTogglePending] = useState(false);
   const [isWholesaleTogglePending, setIsWholesaleTogglePending] = useState(false);
+  const [isAffiliateTogglePending, setIsAffiliateTogglePending] = useState(false);
   const [isInstallmentTogglePending, setIsInstallmentTogglePending] = useState(false);
   const [reportSuccessMessage, setReportSuccessMessage] = useState("");
   const [viewerCount, setViewerCount] = useState<number | null>(null);
@@ -422,6 +424,28 @@ export default function ProductDetailScreen() {
     }
   };
 
+  const handleSetProductAffiliate = async (
+    targetProductId: string,
+    affiliateEnabled: boolean,
+  ) => {
+    setIsAffiliateTogglePending(true);
+    setManageErrorMessage("");
+    try {
+      const body = buildAffiliateManageToggleBody(productRecord, affiliateEnabled);
+      const updated = await patchMutation.mutateAsync({
+        productId: targetProductId,
+        body,
+      });
+      syncPromotionProduct(updated as Record<string, unknown> & { _id: string });
+    } catch (error) {
+      setManageErrorMessage(
+        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+      );
+    } finally {
+      setIsAffiliateTogglePending(false);
+    }
+  };
+
   const handleWholesaleSaved = (updated: Record<string, unknown> & { _id: string }) => {
     syncPromotionProduct(updated);
   };
@@ -517,6 +541,9 @@ export default function ProductDetailScreen() {
                   onOpenAuctionTab={handleAuctionShortcut}
                   auctionActive={auctionUi.auctionActive}
                   canShowAddToCart={canShowAddToCart}
+                  onRequestLogin={() => {
+                    router.push("/(auth)/login");
+                  }}
                 />
               ) : null}
               {activeTab === "reviews" ? (
@@ -668,6 +695,7 @@ export default function ProductDetailScreen() {
         onSetProductAvailability={isOwnProduct ? handleSetMyProductAvailability : undefined}
         onSetProductAuction={isOwnProduct ? handleSetProductAuction : undefined}
         onSetProductWholesale={isOwnProduct ? handleSetProductWholesale : undefined}
+        onSetProductAffiliate={isOwnProduct ? handleSetProductAffiliate : undefined}
         onSetProductInstallment={isOwnProduct ? handleSetProductInstallment : undefined}
         onWholesaleSaved={isOwnProduct ? handleWholesaleSaved : undefined}
         onDeleteProduct={
@@ -692,6 +720,7 @@ export default function ProductDetailScreen() {
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
         isWholesaleTogglePending={isWholesaleTogglePending}
+        isAffiliateTogglePending={isAffiliateTogglePending}
         isInstallmentTogglePending={isInstallmentTogglePending}
         isDeletePending={deleteMutation.isPending}
         manageErrorMessage={manageErrorMessage}

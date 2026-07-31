@@ -49,6 +49,13 @@ export const createOrderBodySchema = z
       .default(""),
     paymentMethod: z.enum(ORDER_PAYMENT_METHODS),
     priceOfferId: mongoIdSchema.optional(),
+    /** Код шарера (`referralCode`) из `?aff=` — last-click attribution. */
+    affiliateCode: z
+      .string()
+      .trim()
+      .toUpperCase()
+      .max(32)
+      .optional(),
     idempotencyKey: z
       .string({ required_error: "Укажите idempotencyKey" })
       .trim()

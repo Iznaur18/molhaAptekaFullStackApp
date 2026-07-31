@@ -15,6 +15,7 @@ export type ProductDetailsBadgeItem = {
 } & (
   | { kind: "original" }
   | { kind: "raffle" }
+  | { kind: "affiliate" }
   | { kind: "listingOrigin"; iconName: ProductListingOriginIconName }
   | { kind: "priceMarket"; backgroundColor: string; color: string }
 );
@@ -57,6 +58,15 @@ export const buildProductDetailsBadgeItems = ({
       key: "raffle",
       kind: "raffle",
       label: PRODUCT_CARD_UI.RAFFLE_BADGE,
+    });
+  }
+
+  const affiliatePercent = Math.floor(Number(product.affiliatePercent) || 0);
+  if (product.affiliateEnabled === true && affiliatePercent > 0) {
+    items.push({
+      key: "affiliate",
+      kind: "affiliate",
+      label: PRODUCT_DETAILS_MODAL_UI.AFFILIATE_BADGE(affiliatePercent),
     });
   }
 

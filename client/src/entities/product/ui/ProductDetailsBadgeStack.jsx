@@ -52,6 +52,23 @@ export function ProductDetailsBadgeStack({ product }) {
               );
             }
 
+            if (item.kind === "affiliate") {
+              return (
+                <div
+                  key={item.key}
+                  className="product-details-modal__meta-info-chip product-details-modal__meta-info-chip--affiliate"
+                  role="status"
+                  style={{
+                    backgroundColor:
+                      PRODUCT_DETAILS_BADGE_SOFT_COLORS.affiliate.backgroundColor,
+                    color: PRODUCT_DETAILS_BADGE_SOFT_COLORS.affiliate.color,
+                  }}
+                >
+                  <span>{item.label}</span>
+                </div>
+              );
+            }
+
             if (item.kind === "listingOrigin") {
               const ListingOriginIcon = item.Icon;
               return (

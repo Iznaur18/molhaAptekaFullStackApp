@@ -23,6 +23,8 @@ export const CREATE_PRODUCT_INITIAL_FORM = {
   productIsAvailable: true,
   productStockQuantity: "1",
   loyaltyPointsPerUnit: "0",
+  affiliateEnabled: false,
+  affiliatePercent: "10",
   productCharacteristicRows: [],
   categoryDefaultCharacteristicKeys: [],
   productCharacteristicsSellerTouched: false,
@@ -74,6 +76,10 @@ export function createProductFormStateFromProduct(product) {
         ? String(Math.max(0, Math.floor(Number(product.productStockQuantity))))
         : "1",
     loyaltyPointsPerUnit: String(resolveProductLoyaltyPointsPerUnit(product)),
+    affiliateEnabled: product.affiliateEnabled === true,
+    affiliatePercent: String(
+      Math.max(0, Math.floor(Number(product.affiliatePercent) || 0)) || 10,
+    ),
     productCharacteristicRows: characteristicRowsFromApi(product.productCharacteristics),
     categoryDefaultCharacteristicKeys: [],
     productCharacteristicsSellerTouched: true,

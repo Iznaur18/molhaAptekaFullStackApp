@@ -252,12 +252,14 @@ export const MyProductsPage = () => {
         onSetProductAvailability={pageActions.handleSetMyProductAvailability}
         onSetProductAuction={pageActions.handleSetProductAuction}
         onSetProductWholesale={pageActions.handleSetProductWholesale}
+        onSetProductAffiliate={pageActions.handleSetProductAffiliate}
         onSetProductInstallment={pageActions.handleSetProductInstallment}
         onWholesaleSaved={pageActions.handleWholesaleSaved}
         onDeleteProduct={pageActions.handleDeleteProduct}
         isAvailabilityTogglePending={pageActions.isAvailabilityTogglePending}
         isAuctionTogglePending={pageActions.isAuctionTogglePending}
         isWholesaleTogglePending={pageActions.isWholesaleTogglePending}
+        isAffiliateTogglePending={pageActions.isAffiliateTogglePending}
         isInstallmentTogglePending={pageActions.isInstallmentTogglePending}
         isDeletePending={pageActions.isDeletePending}
         manageErrorMessage={pageActions.manageErrorMessage}

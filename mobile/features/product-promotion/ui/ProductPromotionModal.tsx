@@ -31,6 +31,7 @@ import { useProductPromotionModalTab } from "@/features/product-promotion/model/
 import { ProductPromotionManageTab } from "@/features/product-promotion/ui/ProductPromotionManageTab";
 import { InstallmentProgramModal } from "@/entities/installment/ui/InstallmentProgramModal";
 import { WholesalePriceModal } from "@/entities/product/ui/WholesalePriceModal";
+import { AffiliatePercentModal } from "@/entities/product/ui/AffiliatePercentModal";
 import { ProductPromotionModalTabs } from "@/features/product-promotion/ui/ProductPromotionModalTabs";
 import { PRODUCT_CARD_UI, PRODUCT_PROMOTION_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
@@ -72,6 +73,10 @@ type ProductPromotionModalProps = {
     productId: string,
     productWholesaleEnabled: boolean,
   ) => void | Promise<void>;
+  onSetProductAffiliate?: (
+    productId: string,
+    affiliateEnabled: boolean,
+  ) => void | Promise<void>;
   onSetProductInstallment?: (
     productId: string,
     productInstallmentEnabled: boolean,
@@ -80,6 +85,7 @@ type ProductPromotionModalProps = {
   isAvailabilityTogglePending?: boolean;
   isAuctionTogglePending?: boolean;
   isWholesaleTogglePending?: boolean;
+  isAffiliateTogglePending?: boolean;
   isInstallmentTogglePending?: boolean;
   isDeletePending?: boolean;
   manageErrorMessage?: string;
@@ -111,12 +117,14 @@ export const ProductPromotionModal = ({
   onSetProductAvailability,
   onSetProductAuction,
   onSetProductWholesale,
+  onSetProductAffiliate,
   onSetProductInstallment,
   onWholesaleSaved,
   onDeleteProduct,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
   isWholesaleTogglePending = false,
+  isAffiliateTogglePending = false,
   isInstallmentTogglePending = false,
   isDeletePending = false,
   manageErrorMessage = "",
@@ -149,12 +157,14 @@ export const ProductPromotionModal = ({
   const [selectedDurationCode, setSelectedDurationCode] = useState(defaultDuration);
   const [isInstallmentProgramOpen, setIsInstallmentProgramOpen] = useState(false);
   const [isWholesaleOpen, setIsWholesaleOpen] = useState(false);
+  const [isAffiliateOpen, setIsAffiliateOpen] = useState(false);
   const bodyScrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     if (!visible) {
       setIsInstallmentProgramOpen(false);
       setIsWholesaleOpen(false);
+      setIsAffiliateOpen(false);
       return;
     }
     setSelectedTier(defaultTier);
@@ -370,11 +380,13 @@ export const ProductPromotionModal = ({
         onSetAvailability={onSetProductAvailability}
         onSetAuction={onSetProductAuction}
         onSetWholesale={onSetProductWholesale}
+        onSetAffiliate={onSetProductAffiliate}
         onSetInstallment={onSetProductInstallment}
         onDelete={onDeleteProduct}
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
         isWholesaleTogglePending={isWholesaleTogglePending}
+        isAffiliateTogglePending={isAffiliateTogglePending}
         isInstallmentTogglePending={isInstallmentTogglePending}
         isDeletePending={isDeletePending}
         errorMessage={manageErrorMessage}
@@ -386,6 +398,7 @@ export const ProductPromotionModal = ({
         isRaffleParticipationPending={isRaffleParticipationPending}
         onOpenInstallmentProgram={() => setIsInstallmentProgramOpen(true)}
         onOpenWholesaleSettings={() => setIsWholesaleOpen(true)}
+        onOpenAffiliateSettings={() => setIsAffiliateOpen(true)}
         isSubmitting={isSubmitting}
       />
     );
@@ -500,6 +513,15 @@ export const ProductPromotionModal = ({
             visible
             product={product}
             onClose={() => setIsWholesaleOpen(false)}
+            onSaved={onWholesaleSaved}
+          />
+        ) : null}
+        {isAffiliateOpen ? (
+          <AffiliatePercentModal
+            embedded
+            visible
+            product={product}
+            onClose={() => setIsAffiliateOpen(false)}
             onSaved={onWholesaleSaved}
           />
         ) : null}

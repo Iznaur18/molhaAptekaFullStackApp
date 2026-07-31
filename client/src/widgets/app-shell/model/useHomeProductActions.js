@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
+import { buildAffiliateManageToggleBody } from "@izibuy/shared-lib";
 
 import { setProductInstallmentEnabled } from "../../../entities/installment/lib/setProductInstallmentEnabled.js";
 import { useEnsureProductPromotionTariffs } from "../../../entities/product/model/useEnsureProductPromotionTariffs.js";
@@ -33,6 +34,7 @@ export const useHomeProductActions = ({
   setTogglingAvailabilityProductId,
   setTogglingAuctionProductId,
   setTogglingWholesaleProductId,
+  setTogglingAffiliateProductId,
   setTogglingInstallmentProductId,
   setMyProductsCatalogError,
   setPromotionProduct,
@@ -270,6 +272,44 @@ export const useHomeProductActions = ({
     ],
   );
 
+  const handleSetProductAffiliate = useCallback(
+    async (productId, affiliateEnabled) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return;
+      }
+      setTogglingAffiliateProductId(normalizedProductId);
+      setProductDetailsAdminError("");
+      try {
+        const sourceProduct =
+          promotionProduct && String(promotionProduct._id) === normalizedProductId
+            ? promotionProduct
+            : null;
+        const body = buildAffiliateManageToggleBody(sourceProduct, affiliateEnabled);
+        const updated = await patchMutation.mutateAsync({
+          productId: normalizedProductId,
+          body,
+        });
+        syncCatalogProductState(updated);
+        syncProductEditModalState(updated);
+      } catch (e) {
+        setProductDetailsAdminError(
+          e instanceof Error ? e.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+      } finally {
+        setTogglingAffiliateProductId(null);
+      }
+    },
+    [
+      patchMutation,
+      promotionProduct,
+      setProductDetailsAdminError,
+      setTogglingAffiliateProductId,
+      syncCatalogProductState,
+      syncProductEditModalState,
+    ],
+  );
+
   const handleWholesaleSaved = useCallback(
     (product) => {
       syncCatalogProductState(product);
@@ -497,6 +537,7 @@ export const useHomeProductActions = ({
     handleSetMyProductAvailability,
     handleSetProductAuction,
     handleSetProductWholesale,
+    handleSetProductAffiliate,
     handleWholesaleSaved,
     handleSetProductInstallment,
     handleInstallmentProgramSaved,

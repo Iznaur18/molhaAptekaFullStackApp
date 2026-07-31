@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
+import { buildAffiliateManageToggleBody } from "@izibuy/shared-lib";
 
 import { setProductInstallmentEnabled } from "@/entities/installment/lib/setProductInstallmentEnabled";
 import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
@@ -31,6 +32,9 @@ export const useMyProductsPageActions = () => {
   );
   const [togglingAuctionProductId, setTogglingAuctionProductId] = useState<string | null>(null);
   const [togglingWholesaleProductId, setTogglingWholesaleProductId] = useState<string | null>(
+    null,
+  );
+  const [togglingAffiliateProductId, setTogglingAffiliateProductId] = useState<string | null>(
     null,
   );
   const [togglingInstallmentProductId, setTogglingInstallmentProductId] = useState<string | null>(
@@ -188,6 +192,37 @@ export const useMyProductsPageActions = () => {
     [patchMutation, syncPromotionProduct],
   );
 
+  const handleSetProductAffiliate = useCallback(
+    async (productId: string, affiliateEnabled: boolean) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return;
+      }
+
+      setTogglingAffiliateProductId(normalizedProductId);
+      setManageErrorMessage("");
+      try {
+        const sourceProduct =
+          promotionProduct && String(promotionProduct._id) === normalizedProductId
+            ? promotionProduct
+            : null;
+        const body = buildAffiliateManageToggleBody(sourceProduct, affiliateEnabled);
+        const updated = await patchMutation.mutateAsync({
+          productId: normalizedProductId,
+          body,
+        });
+        syncPromotionProduct(updated as MyProductsCatalogProduct);
+      } catch (error) {
+        setManageErrorMessage(
+          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+      } finally {
+        setTogglingAffiliateProductId(null);
+      }
+    },
+    [patchMutation, promotionProduct, syncPromotionProduct],
+  );
+
   const handleWholesaleSaved = useCallback(
     (updated: MyProductsCatalogProduct) => {
       syncPromotionProduct(updated);
@@ -276,6 +311,8 @@ export const useMyProductsPageActions = () => {
       promotionProductId != null && togglingAuctionProductId === promotionProductId,
     isWholesaleTogglePending:
       promotionProductId != null && togglingWholesaleProductId === promotionProductId,
+    isAffiliateTogglePending:
+      promotionProductId != null && togglingAffiliateProductId === promotionProductId,
     isInstallmentTogglePending:
       promotionProductId != null && togglingInstallmentProductId === promotionProductId,
     isDeletePending: deleteMutation.isPending,
@@ -286,6 +323,7 @@ export const useMyProductsPageActions = () => {
     handleSetMyProductAvailability,
     handleSetProductAuction,
     handleSetProductWholesale,
+    handleSetProductAffiliate,
     handleSetProductInstallment,
     handleWholesaleSaved,
     handleDeleteProduct,

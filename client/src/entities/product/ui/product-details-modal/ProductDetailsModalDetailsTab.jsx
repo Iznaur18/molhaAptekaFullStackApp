@@ -5,6 +5,7 @@ import { ProductDetailsBadgeStack } from "../ProductDetailsBadgeStack.jsx";
 import { ProductDetailsSellerPreview } from "../ProductDetailsSellerPreview.jsx";
 import { ProductMediaGalleryReadonly } from "../ProductMediaGalleryReadonly.jsx";
 import { ProductPriceDisplay } from "../ProductPriceDisplay.jsx";
+import { ProductAffiliateShareButton } from "./ProductAffiliateShareButton.jsx";
 import { ProductDetailsAuctionTeaser } from "./ProductDetailsAuctionTeaser.jsx";
 import { ProductDetailsContentSwitcher } from "./ProductDetailsContentSwitcher.jsx";
 import { ProductDetailsInstallmentTeaser } from "./ProductDetailsInstallmentTeaser.jsx";
@@ -89,6 +90,12 @@ export function ProductDetailsModalDetailsTab({
         {product.productName?.trim() || "Товар"}
       </h3>
       <ProductDetailsBadgeStack product={product} />
+      <ProductAffiliateShareButton
+        product={product}
+        isAuthorized={isAuthorized}
+        currentUserId={currentUserId}
+        onRequestLogin={onRequestLogin}
+      />
       {sellerId ||
       (productId && handleInstallmentShortcutClick) ||
       (auctionUi.auctionActive && handleAuctionShortcutClick) ? (

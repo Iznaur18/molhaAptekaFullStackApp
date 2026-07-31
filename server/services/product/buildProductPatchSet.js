@@ -38,6 +38,11 @@ import {
   EMPTY_PATCH_BODY_MESSAGE,
 } from "./patchMyProductConstants.js";
 import { applyWholesaleFields } from "./applyWholesaleFields.js";
+import {
+  AFFILIATE_PERCENT_MAX,
+  AFFILIATE_PERCENT_MIN,
+  AFFILIATE_PERCENT_REQUIRED_MESSAGE,
+} from "../../constants/affiliateConstants.js";
 
 const hasBodyField = (body, field) =>
   Object.prototype.hasOwnProperty.call(body, field);
@@ -284,6 +289,46 @@ const applyLoyaltyField = async (body, $set, existing, productId) => {
   }
 };
 
+const applyAffiliateFields = (body, $set, existing) => {
+  const hasEnabled = hasBodyField(body, "affiliateEnabled");
+  const hasPercent = hasBodyField(body, "affiliatePercent");
+  if (!hasEnabled && !hasPercent) {
+    return;
+  }
+
+  const nextEnabled = hasEnabled
+    ? body.affiliateEnabled === true
+    : existing.affiliateEnabled === true;
+  let nextPercent = hasPercent
+    ? Math.floor(Number(body.affiliatePercent) || 0)
+    : Math.floor(Number(existing.affiliatePercent) || 0);
+
+  if (!Number.isFinite(nextPercent) || nextPercent < 0) {
+    nextPercent = 0;
+  }
+  if (nextPercent > AFFILIATE_PERCENT_MAX) {
+    nextPercent = AFFILIATE_PERCENT_MAX;
+  }
+
+  if (nextEnabled && nextPercent < AFFILIATE_PERCENT_MIN) {
+    throw new AppError(400, AFFILIATE_PERCENT_REQUIRED_MESSAGE);
+  }
+
+  if (!nextEnabled) {
+    nextPercent = hasPercent ? nextPercent : 0;
+  }
+
+  if (hasEnabled) {
+    $set.affiliateEnabled = nextEnabled;
+  }
+  if (hasPercent || (hasEnabled && !nextEnabled)) {
+    $set.affiliatePercent = nextEnabled ? nextPercent : hasPercent ? nextPercent : 0;
+  }
+  if (hasEnabled && nextEnabled && !hasPercent) {
+    $set.affiliatePercent = nextPercent;
+  }
+};
+
 const applyImageFields = (body, $set) => {
   if (
     hasBodyField(body, "productImageUrls") ||
@@ -426,6 +471,7 @@ export async function buildProductPatchSet({ existing, body, isAdmin, productId 
   applyPickupFields(body, $set, existing);
   await applyCategoryFields(body, $set, existing);
   await applyLoyaltyField(body, $set, existing, productId);
+  applyAffiliateFields(body, $set, existing);
   applyImageFields(body, $set);
   await applyPreviewVideoFields(body, $set, existing);
   applyModerationAndAvailability(body, $set, existing, isAdmin);

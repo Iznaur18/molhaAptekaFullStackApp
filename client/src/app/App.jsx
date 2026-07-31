@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { BrowserRouter, Routes } from "react-router-dom";
+import { BrowserRouter, Routes, useLocation } from "react-router-dom";
 
 import { AppQueryProvider } from "../shared/api/AppQueryProvider.jsx";
 import { CartProvider } from "../entities/cart/model/CartContext.jsx";
@@ -7,14 +7,17 @@ import { WishlistProvider } from "../entities/wishlist/model/WishlistContext.jsx
 import { AppIntroProvider } from "../features/app-intro/model/AppIntroContext.jsx";
 import { AppIntroSplash } from "../features/app-intro/ui/AppIntroSplash.jsx";
 import { captureReferralCodeFromSearch } from "../shared/lib/referralCodeStorage.js";
+import { captureAffiliateCodeFromSearch } from "../shared/lib/affiliateCodeStorage.js";
 import { renderAppShellRoutes } from "./routes/appRoutes.jsx";
 
 import "./App.css";
 
-function CaptureReferralCode() {
+function CaptureAttributionCodes() {
+  const location = useLocation();
   useEffect(() => {
-    captureReferralCodeFromSearch();
-  }, []);
+    captureReferralCodeFromSearch(location.search);
+    captureAffiliateCodeFromSearch(location.search);
+  }, [location.search]);
   return null;
 }
 
@@ -22,7 +25,7 @@ function AppRoutes() {
   return (
     <AppIntroProvider>
       <BrowserRouter>
-        <CaptureReferralCode />
+        <CaptureAttributionCodes />
         <CartProvider>
           <WishlistProvider>
             <main className="app-main">
