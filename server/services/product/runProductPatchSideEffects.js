@@ -10,6 +10,7 @@ import { notifySellerAuctionToggledByAdmin } from "./productAuction.js";
 import { cancelProductPromotionsForProduct } from "./productPromotionHelpers.js";
 import { syncProductCatalogAfterStockChange } from "./productStock.js";
 import { refreshProductPriceMarketStatus } from "./refreshProductPriceMarketStatus.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 const MARKET_STATUS_PATCH_FIELDS = new Set([
   "productPrice",
@@ -79,7 +80,10 @@ export async function runProductPatchSideEffects({
     try {
       await refreshProductPriceMarketStatus(productId, { refreshPeers: true });
     } catch (error) {
-      console.error("refreshProductPriceMarketStatus after patch:", error);
+      logServerEvent("error", {
+        event: "refreshproductpricemarketstatus_after_patch",
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 }

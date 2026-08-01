@@ -2,10 +2,7 @@ import { ProductModel } from "../../models/index.js";
 import { PRODUCT_SELLER_PUBLIC_SELECT } from "../../constants/productSellerPublicFields.js";
 import { AppError } from "../../errors/AppError.js";
 import { isUserAdmin } from "../access/adminUserGuard.js";
-import {
-  hasProductOpenSales,
-  OPEN_SALES_BLOCK_MESSAGE,
-} from "./productOrderLocks.js";
+import { hasProductOpenSales, OPEN_SALES_BLOCK_MESSAGE } from "./productOrderLocks.js";
 import { applyProductSearchBlobToSet } from "./applyProductSearchBlobToProductWrite.js";
 
 import { buildProductPatchSet } from "./buildProductPatchSet.js";

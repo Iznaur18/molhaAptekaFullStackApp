@@ -92,7 +92,10 @@ async function loadAuctionProduct(productId) {
  * @param {number} absoluteIndex
  */
 function offerPriceAtIndex(catalogPrice, absoluteIndex) {
-  const base = Math.max(MIN_OFFER_PRICE, Math.floor(Number(catalogPrice)) || MIN_OFFER_PRICE);
+  const base = Math.max(
+    MIN_OFFER_PRICE,
+    Math.floor(Number(catalogPrice)) || MIN_OFFER_PRICE,
+  );
   const start = Math.max(MIN_OFFER_PRICE, Math.floor(base * DEFAULT_START_PRICE_RATIO));
   return start + absoluteIndex;
 }

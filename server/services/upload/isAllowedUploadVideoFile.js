@@ -26,9 +26,7 @@ export function normalizeUploadVideoMime(rawMime) {
  */
 export function isAllowedUploadVideoFile(file) {
   const mime = normalizeUploadVideoMime(file?.mimetype);
-  const extension = path
-    .extname(String(file?.originalname ?? ""))
-    .toLowerCase();
+  const extension = path.extname(String(file?.originalname ?? "")).toLowerCase();
 
   if (mime && mimeSet.has(mime)) {
     return true;

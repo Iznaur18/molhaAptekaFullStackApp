@@ -200,9 +200,10 @@ export const objectStorageHasUpload = async (filename) => {
     );
     return true;
   } catch (error) {
-    const err = /** @type {{ name?: string; Code?: string; $metadata?: { httpStatusCode?: number } }} */ (
-      error
-    );
+    const err =
+      /** @type {{ name?: string; Code?: string; $metadata?: { httpStatusCode?: number } }} */ (
+        error
+      );
     const missing =
       err?.name === "NotFound" ||
       err?.Code === "NotFound" ||

@@ -166,7 +166,7 @@ export function ReportProductModal({
         <div className="report-product-modal__actions">
           <button
             type="button"
-            className="report-product-modal__cancel"
+            className="app-btn app-btn--secondary report-product-modal__action"
             onClick={handleClose}
             disabled={isSubmitting}
           >
@@ -176,7 +176,7 @@ export function ReportProductModal({
             <button
               type="submit"
               form={FORM_ID}
-              className="report-product-modal__submit"
+              className="app-btn app-btn--primary report-product-modal__action"
               disabled={isSubmitting || reportText.trim().length === 0 || isOverLimit}
             >
               {isSubmitting

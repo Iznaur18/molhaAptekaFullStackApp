@@ -214,7 +214,6 @@
   overflow-x: scroll;
   overflow-y: visible;
   overscroll-behavior-x: contain;
-  -webkit-overflow-scrolling: touch;
   touch-action: pan-x pan-y;
   cursor: grab;
   scrollbar-width: none;

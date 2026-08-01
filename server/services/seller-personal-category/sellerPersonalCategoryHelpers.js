@@ -22,6 +22,7 @@ import {
 } from "../../models/index.js";
 import { createUserInAppNotification } from "../user/userInAppNotifications.js";
 import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 /**
  * @param {Record<string, unknown> | null | undefined} row
@@ -68,7 +69,10 @@ export const toSellerPersonalCategoryTilePayload = (row) => ({
  * @param {string} sellerId
  * @param {import('mongoose').ClientSession | null | undefined} [session]
  */
-export const assertNoOpenSellerPersonalCategoryCampaign = async (sellerId, session = null) => {
+export const assertNoOpenSellerPersonalCategoryCampaign = async (
+  sellerId,
+  session = null,
+) => {
   const query = SellerPersonalCategoryCampaignModel.findOne({
     sellerId,
     status: { $in: SELLER_PERSONAL_CATEGORY_OPEN_STATUSES },
@@ -200,7 +204,10 @@ export const activateSellerPersonalCategoryCampaign = async ({
         activeCampaignId: campaign._id,
       },
     },
-    withMongoSession({ upsert: true, returnDocument: "after", runValidators: true }, session),
+    withMongoSession(
+      { upsert: true, returnDocument: "after", runValidators: true },
+      session,
+    ),
   ).lean();
 
   campaign.personalCategoryId = category._id;
@@ -212,11 +219,7 @@ export const activateSellerPersonalCategoryCampaign = async ({
   campaign.reminderSentAt1Hour = null;
   await campaign.save(withMongoSession({}, session));
 
-  await linkSellerProductsToPersonalCategory(
-    campaign.sellerId,
-    category._id,
-    session,
-  );
+  await linkSellerProductsToPersonalCategory(campaign.sellerId, category._id, session);
 
   return campaign.toObject();
 };
@@ -318,7 +321,9 @@ const expireNextDueActiveSellerPersonalCategoryCampaign = async (session = null)
 /**
  * @param {import('mongoose').ClientSession | null | undefined} [session]
  */
-export const expireDueActiveSellerPersonalCategoryCampaigns = async (session = null) => {
+export const expireDueActiveSellerPersonalCategoryCampaigns = async (
+  session = null,
+) => {
   while (await expireNextDueActiveSellerPersonalCategoryCampaign(session)) {
     // drain all due campaigns
   }
@@ -329,8 +334,12 @@ export const expireDueActiveSellerPersonalCategoryCampaigns = async (session = n
  */
 const sendSellerPersonalCategoryReminders = async (session = null) => {
   const now = new Date();
-  const oneDayThreshold = new Date(now.getTime() + SELLER_PERSONAL_CATEGORY_REMINDER_1_DAY_MS);
-  const oneHourThreshold = new Date(now.getTime() + SELLER_PERSONAL_CATEGORY_REMINDER_1_HOUR_MS);
+  const oneDayThreshold = new Date(
+    now.getTime() + SELLER_PERSONAL_CATEGORY_REMINDER_1_DAY_MS,
+  );
+  const oneHourThreshold = new Date(
+    now.getTime() + SELLER_PERSONAL_CATEGORY_REMINDER_1_HOUR_MS,
+  );
 
   const dayCandidates = await SellerPersonalCategoryCampaignModel.find({
     status: SELLER_PERSONAL_CATEGORY_STATUS_ACTIVE,
@@ -390,6 +399,9 @@ export const processSellerPersonalCategoryCronTasks = async () => {
     });
     await sendSellerPersonalCategoryReminders();
   } catch (error) {
-    console.error("processSellerPersonalCategoryCronTasks error:", error);
+    logServerEvent("error", {
+      event: "processsellerpersonalcategorycrontasks",
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 };

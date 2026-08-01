@@ -1,10 +1,7 @@
 import { Worker } from "bullmq";
 
 import { getAppQueue } from "../queues/appQueue.js";
-import {
-  APP_QUEUE_NAME,
-  DEFAULT_QUEUE_PREFIX,
-} from "../queues/queueConstants.js";
+import { APP_QUEUE_NAME, DEFAULT_QUEUE_PREFIX } from "../queues/queueConstants.js";
 import { getBullMqRedisConnection } from "../queues/redisConnection.js";
 
 import { CRON_JOB_DEFINITIONS } from "./cronJobDefinitions.js";

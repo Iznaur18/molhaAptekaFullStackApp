@@ -4,7 +4,9 @@ import { adminCreditOwnLoyaltyPoints } from "../../services/loyalty/adminCreditO
 
 export const getMyLoyaltyPointsStatusController = async (req, res) => {
   const userId = String(req.userId);
-  const user = await UserModel.findById(userId).select("userLoyaltyPoints").lean();
+  const user = await UserModel.findById(userId)
+    .select("userLoyaltyPoints userLoyaltyPointsReserved")
+    .lean();
 
   if (!user) {
     return errorRes(res, 404, "Пользователь не найден");
@@ -12,6 +14,7 @@ export const getMyLoyaltyPointsStatusController = async (req, res) => {
 
   return successRes(res, {
     loyaltyPointsBalance: Number(user.userLoyaltyPoints) || 0,
+    loyaltyPointsReserved: Number(user.userLoyaltyPointsReserved) || 0,
   });
 };
 

@@ -22,10 +22,7 @@ await mongoose.connect(uri);
 
 const collection = PendingRegistrationModel.collection;
 const before = await collection.indexes();
-console.log(
-  "before:",
-  before.map((index) => index.name).join(", "),
-);
+console.log("before:", before.map((index) => index.name).join(", "));
 
 await collection.updateMany(
   { pendingTokenHash: { $exists: true } },
@@ -35,9 +32,6 @@ await collection.updateMany(
 await PendingRegistrationModel.syncIndexes();
 
 const after = await collection.indexes();
-console.log(
-  "after:",
-  after.map((index) => index.name).join(", "),
-);
+console.log("after:", after.map((index) => index.name).join(", "));
 
 await mongoose.disconnect();

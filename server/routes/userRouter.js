@@ -29,7 +29,6 @@ import {
   getMyLoyaltyPointsStatusController,
   adminCreditOwnLoyaltyPointsController,
   getMyReferralProgramController,
-  convertPartnerBalanceController,
   getMyAffiliateEarningsController,
   getMonthlyLoyaltyPointsAwardedController,
   getUserPhoneController,
@@ -60,7 +59,6 @@ import {
   resolveUserStoryReportsValidation,
   adminCreditLoyaltyPointsValidation,
   purchasePremiumValidation,
-  convertPartnerBalanceValidation,
 } from "../validations/index.js";
 
 const router = createAsyncRouter();
@@ -197,23 +195,10 @@ router.post(
 );
 
 router.get("/me/referral", checkAuthMW, getMyReferralProgramController);
-router.post(
-  "/me/referral/convert",
-  checkAuthMW,
-  convertPartnerBalanceValidation,
-  convertPartnerBalanceController,
-);
 
-router.get(
-  "/me/affiliate/earnings",
-  checkAuthMW,
-  getMyAffiliateEarningsController,
-);
+router.get("/me/affiliate/earnings", checkAuthMW, getMyAffiliateEarningsController);
 
-router.get(
-  "/loyalty-points/monthly-awarded",
-  getMonthlyLoyaltyPointsAwardedController,
-);
+router.get("/loyalty-points/monthly-awarded", getMonthlyLoyaltyPointsAwardedController);
 
 router.get(
   "/:userIdClient/phone",

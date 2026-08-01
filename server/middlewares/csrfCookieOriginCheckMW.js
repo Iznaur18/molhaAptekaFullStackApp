@@ -1,5 +1,6 @@
 import {
   AUTH_COOKIE_NAME,
+  REFRESH_COOKIE_NAME,
 } from "../constants/authCookieConstants.js";
 import { errorRes } from "../services/http/index.js";
 import { parseFrontendOrigins } from "../utils/resolveFrontendOrigin.js";
@@ -29,6 +30,17 @@ function resolveRequestOrigin(req) {
 }
 
 /**
+ * Cookie-сессия: access и/или refresh (после expiry access refresh ещё жив).
+ *
+ * @param {import('express').Request} req
+ */
+function hasCookieAuthSession(req) {
+  const accessCookie = req.cookies?.[AUTH_COOKIE_NAME];
+  const refreshCookie = req.cookies?.[REFRESH_COOKIE_NAME];
+  return Boolean(accessCookie || refreshCookie);
+}
+
+/**
  * CSRF для cookie-auth мутаций: Origin/Referer должен быть в FRONTEND_URL.
  * Bearer-only (mobile) — без cookie — пропускаем.
  *
@@ -45,8 +57,7 @@ export function csrfCookieOriginCheckMW(req, res, next) {
     return next();
   }
 
-  const accessCookie = req.cookies?.[AUTH_COOKIE_NAME];
-  if (!accessCookie) {
+  if (!hasCookieAuthSession(req)) {
     return next();
   }
 

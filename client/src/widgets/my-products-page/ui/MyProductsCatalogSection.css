@@ -9,6 +9,7 @@
   margin: 0;
   padding: 10px 12px;
   border-radius: 10px;
+  corner-shape: squircle;
   background: var(--iz-color-success-surface);
   color: var(--iz-color-success-text);
   font-size: 14px;
@@ -18,6 +19,7 @@
   margin: 0;
   padding: 10px 12px;
   border-radius: 10px;
+  corner-shape: squircle;
   background: var(--iz-color-danger-surface);
   color: var(--iz-color-danger);
   font-size: 14px;

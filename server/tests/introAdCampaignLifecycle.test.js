@@ -10,7 +10,11 @@ import {
   INTRO_AD_NOTIFICATION_KIND_EXPIRED,
   INTRO_AD_PRICE_POINTS,
 } from "../constants/introAdCampaignConstants.js";
-import { IntroAdCampaignModel, UserInAppNotificationModel, UserModel } from "../models/index.js";
+import {
+  IntroAdCampaignModel,
+  UserInAppNotificationModel,
+  UserModel,
+} from "../models/index.js";
 import {
   activateNextQueuedIntroAdCampaign,
   assertNoOpenIntroAdCampaignForAdvertiser,
@@ -203,6 +207,7 @@ test("partial unique index blocks second open campaign for advertiser", async ()
         videoMp4Url: "/uploads/b.mp4",
         amountPoints: INTRO_AD_PRICE_POINTS,
       }),
-    (error) => error && typeof error === "object" && "code" in error && error.code === 11000,
+    (error) =>
+      error && typeof error === "object" && "code" in error && error.code === 11000,
   );
 });

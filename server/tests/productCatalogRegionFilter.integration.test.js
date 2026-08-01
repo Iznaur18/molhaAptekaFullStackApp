@@ -48,7 +48,10 @@ after(async () => {
 const seedRegionCatalogFixture = async () => {
   await ensureProductCategoryTreeSeeded();
 
-  const { cookie: sellerCookie } = await registerUserAndGetCookie(request, "region-seller");
+  const { cookie: sellerCookie } = await registerUserAndGetCookie(
+    request,
+    "region-seller",
+  );
   await verifyUserEmail("int-region-seller@example.com");
 
   const moscowProduct = await createProductViaApi(request, sellerCookie, {
@@ -126,10 +129,7 @@ test("GET /product prioritizes Moscow then Spb over other regions", async () => 
 test("GET /product?regionCode= boosts selected region first", async () => {
   const { buyerCookie, productIds } = await seedRegionCatalogFixture();
 
-  const ids = await fetchCatalogProductIds(
-    buyerCookie,
-    "?regionCode=RU-CE&limit=100",
-  );
+  const ids = await fetchCatalogProductIds(buyerCookie, "?regionCode=RU-CE&limit=100");
   assert.equal(ids[0], productIds.chechnya);
   assert.ok(ids.includes(productIds.moscow));
   assert.ok(ids.includes(productIds.spb));

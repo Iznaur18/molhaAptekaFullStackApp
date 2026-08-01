@@ -20,7 +20,18 @@ export {
   AFFILIATE_PERCENT_MAX,
   buildAffiliateManageToggleBody,
   isProductAffiliateConfigured,
+  resolveAffiliateToggleSourceProduct,
 } from "./buildAffiliateManageToggleBody.js";
+export {
+  computeAffiliatePayoutAmount,
+  formatAffiliateEnableInsufficientLoyaltyMessage,
+  getAffiliateEnableAvailableLoyaltyPoints,
+  resolveAffiliateEnableLoyaltyGate,
+} from "./affiliateEnableLoyalty.js";
+export type {
+  AffiliateEnableLoyaltyGateFail,
+  AffiliateEnableLoyaltyGateOk,
+} from "./affiliateEnableLoyalty.js";
 export {
   resolveAffiliateReferrerDisplayName,
   resolveOrderLineAffiliateSellerLine,
@@ -88,6 +99,19 @@ export type {
   ProductManageTogglePaletteEntry,
   ProductManageToggleRowVariant,
 } from "./productManageToggleDisplay.js";
+export {
+  PRODUCT_BADGE_EXPLAIN_DESCRIPTION_MAX_LENGTH,
+  PRODUCT_BADGE_EXPLAIN_KEY_VALUES,
+  isProductBadgeExplainKey,
+  resolveListingOriginBadgeExplainKey,
+  resolvePriceMarketBadgeExplainKey,
+  resolveProductBadgeExplainContent,
+} from "./productBadgeExplain.js";
+export type {
+  ProductBadgeExplainAdminRow,
+  ProductBadgeExplainKey,
+  ProductBadgeExplainResolved,
+} from "./productBadgeExplain.js";
 export { RAFFLE_FEATURED_DESCRIPTION_PREVIEW_MAX_LINES } from "./raffleFeaturedBanner.js";
 export {
   RAFFLE_FEATURED_BANNER_CHROME,

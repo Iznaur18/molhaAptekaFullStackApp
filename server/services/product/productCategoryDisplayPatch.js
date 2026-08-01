@@ -49,7 +49,10 @@ const collectSlugCandidates = async (categoryId, categorySlug) => {
     if (typeof root.slug === "string" && root.slug.trim()) {
       slugs.add(root.slug.trim());
     }
-    if (typeof root.legacyProductCategory === "string" && root.legacyProductCategory.trim()) {
+    if (
+      typeof root.legacyProductCategory === "string" &&
+      root.legacyProductCategory.trim()
+    ) {
       slugs.add(root.legacyProductCategory.trim());
     }
   }
@@ -70,7 +73,9 @@ const pickPrimaryCategoryDisplay = (rows, categoryId) => {
   }
 
   if (categoryId) {
-    const byId = rows.find((row) => row.categoryId && String(row.categoryId) === categoryId);
+    const byId = rows.find(
+      (row) => row.categoryId && String(row.categoryId) === categoryId,
+    );
     if (byId) {
       return byId;
     }
@@ -91,7 +96,11 @@ const pickPrimaryCategoryDisplay = (rows, categoryId) => {
  * @param {string[]} slugCandidates
  * @param {import("mongoose").Types.ObjectId | null | undefined} exceptId
  */
-const deleteMatchingCategoryDisplays = async (categoryId, slugCandidates, exceptId = null) => {
+const deleteMatchingCategoryDisplays = async (
+  categoryId,
+  slugCandidates,
+  exceptId = null,
+) => {
   const orClauses = buildDisplayMatchOrClauses(categoryId, slugCandidates);
   if (orClauses.length === 0) {
     return;
@@ -129,15 +138,21 @@ export const resolveProductCategoryDisplayPatchTarget = async ({
   const normalizedCategoryId =
     typeof categoryId === "string" && categoryId.trim() ? categoryId.trim() : null;
   const normalizedCategorySlug =
-    typeof categorySlug === "string" && categorySlug.trim() ? categorySlug.trim() : null;
+    typeof categorySlug === "string" && categorySlug.trim()
+      ? categorySlug.trim()
+      : null;
 
   const { root, slugs: slugCandidates } = await collectSlugCandidates(
     normalizedCategoryId,
     normalizedCategorySlug,
   );
 
-  const resolvedCategoryId = normalizedCategoryId ?? (root?._id ? String(root._id) : null);
-  const matches = await findMatchingCategoryDisplays(resolvedCategoryId, slugCandidates);
+  const resolvedCategoryId =
+    normalizedCategoryId ?? (root?._id ? String(root._id) : null);
+  const matches = await findMatchingCategoryDisplays(
+    resolvedCategoryId,
+    slugCandidates,
+  );
   const existing = pickPrimaryCategoryDisplay(matches, resolvedCategoryId);
 
   return {
@@ -192,7 +207,9 @@ export const upsertProductCategoryDisplay = async ({
 
   const insertSlug =
     target.slugCandidates[0] ??
-    (typeof categorySlug === "string" && categorySlug.trim() ? categorySlug.trim() : null);
+    (typeof categorySlug === "string" && categorySlug.trim()
+      ? categorySlug.trim()
+      : null);
   if (!insertSlug) {
     throw new Error("Не удалось определить ключ display-категории");
   }

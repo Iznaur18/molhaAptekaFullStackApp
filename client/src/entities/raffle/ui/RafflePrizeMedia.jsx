@@ -90,6 +90,7 @@ export function RafflePrizeMedia({
           muted
           playsInline
           preload="metadata"
+          draggable={false}
         />
       );
     }
@@ -109,6 +110,7 @@ export function RafflePrizeMedia({
           muted={isMuted}
           playsInline
           preload="metadata"
+          draggable={false}
         />
         <button
           type="button"
@@ -136,6 +138,7 @@ export function RafflePrizeMedia({
       alt=""
       className={[className, imageClassName].filter(Boolean).join(" ")}
       loading="lazy"
+      draggable={false}
       style={{ objectPosition }}
     />
   );

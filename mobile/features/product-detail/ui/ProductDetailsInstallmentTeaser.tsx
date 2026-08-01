@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from "react-native";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import {
   resolveInstallmentPlanMonthlyAmountRub,
@@ -7,6 +8,7 @@ import {
 import { useProductInstallmentProgramQuery } from "@/entities/installment/model/useProductInstallmentProgramQuery";
 import { INSTALLMENT_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
 
 type ProductDetailsInstallmentTeaserProps = {
@@ -20,6 +22,7 @@ export const ProductDetailsInstallmentTeaser = ({
   installmentEnabled,
   onPress,
 }: ProductDetailsInstallmentTeaserProps) => {
+  const theme = useAppTheme();
   const styles = useProductDetailScreenStyles();
   const programQuery = useProductInstallmentProgramQuery(productId, installmentEnabled);
 
@@ -38,20 +41,29 @@ export const ProductDetailsInstallmentTeaser = ({
 
   return (
     <Pressable
-      style={styles.installmentTeaser}
+      style={({ pressed }) => [
+        styles.featureCard,
+        pressed ? { opacity: 0.92, borderColor: theme.colors.actionBorder } : null,
+      ]}
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={INSTALLMENT_UI.DETAILS_TEASER_ARIA}
     >
-      <View style={styles.installmentTeaserCopy}>
-        <Text style={styles.installmentTeaserTitle}>{INSTALLMENT_UI.DETAILS_TEASER_TITLE}</Text>
-        <Text style={styles.installmentTeaserMonthly}>
+      <View style={styles.featureCardIcon}>
+        <MaterialIcons name="credit-card" size={20} color={theme.colors.action} />
+      </View>
+      <View style={styles.featureCardText}>
+        <Text style={styles.featureCardTitle}>{INSTALLMENT_UI.DETAILS_TEASER_TITLE}</Text>
+        <Text style={styles.featureCardSubtitle}>
           {INSTALLMENT_UI.DETAILS_TEASER_FROM_MONTHLY(monthlyLabel)}
         </Text>
       </View>
-      <View style={styles.installmentTeaserGo}>
-        <Text style={styles.installmentTeaserGoText}>{INSTALLMENT_UI.DETAILS_TEASER_GO}</Text>
-      </View>
+      <MaterialIcons
+        name="chevron-right"
+        size={22}
+        color={theme.colors.action}
+        style={styles.featureCardChevron}
+      />
     </Pressable>
   );
 };

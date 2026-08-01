@@ -14,21 +14,14 @@ test("createAsyncRouter wraps only the last route handler", async () => {
     next();
   };
 
-  router.get(
-    "/ok",
-    middleware,
-    async (_req, res) => {
-      calls.push("handler");
-      res.status(200).json({ ok: true });
-    },
-  );
+  router.get("/ok", middleware, async (_req, res) => {
+    calls.push("handler");
+    res.status(200).json({ ok: true });
+  });
 
-  router.get(
-    "/fail",
-    async () => {
-      throw new Error("boom");
-    },
-  );
+  router.get("/fail", async () => {
+    throw new Error("boom");
+  });
 
   const okLayer = router.stack.find((layer) => layer.route?.path === "/ok");
   const failLayer = router.stack.find((layer) => layer.route?.path === "/fail");

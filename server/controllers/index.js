@@ -6,14 +6,12 @@ import {
   confirmRegistrationController,
   resendRegistrationCodeController,
 } from "./User/registerUserController.js";
-import {
-  loginUserController,
-  logoutUserController,
-  userGetProfileController,
-  userMeController,
-  userUpdateProfileController,
-  userDeleteProfileController,
-} from "./User/loginUserController.js";
+import { loginUserController } from "./User/loginUserController.js";
+import { logoutUserController } from "./User/logoutUserController.js";
+import { userMeController } from "./User/userMeController.js";
+import { userGetProfileController } from "./User/userGetProfileController.js";
+import { userUpdateProfileController } from "./User/userUpdateProfileController.js";
+import { userDeleteProfileController } from "./User/userDeleteProfileController.js";
 import { refreshAuthController } from "./User/refreshAuthController.js";
 import {
   resendEmailVerificationController,
@@ -57,6 +55,10 @@ import {
   getProductManageToggleDisplaysController,
   patchProductManageToggleDisplayController,
 } from "./Product/productManageToggleDisplayControllers.js";
+import {
+  getProductBadgeExplainsController,
+  patchProductBadgeExplainController,
+} from "./Product/productBadgeExplainControllers.js";
 import {
   getProductCategoryRootsController,
   getProductCategorySearchController,
@@ -177,14 +179,12 @@ import {
   getMyPremiumStatusController,
   purchasePremiumController,
 } from "./User/premiumControllers.js";
-import { getMyLoyaltyPointsStatusController, adminCreditOwnLoyaltyPointsController } from "./User/loyaltyPointsPurchaseControllers.js";
 import {
-  getMyReferralProgramController,
-  convertPartnerBalanceController,
-} from "./User/referralControllers.js";
-import {
-  getMyAffiliateEarningsController,
-} from "./User/affiliateControllers.js";
+  getMyLoyaltyPointsStatusController,
+  adminCreditOwnLoyaltyPointsController,
+} from "./User/loyaltyPointsPurchaseControllers.js";
+import { getMyReferralProgramController } from "./User/referralControllers.js";
+import { getMyAffiliateEarningsController } from "./User/affiliateControllers.js";
 import { getMonthlyLoyaltyPointsAwardedController } from "./User/monthlyLoyaltyPointsControllers.js";
 import {
   followUserController,
@@ -274,6 +274,8 @@ export {
   patchProductCatalogFeedTileDisplayController,
   getProductManageToggleDisplaysController,
   patchProductManageToggleDisplayController,
+  getProductBadgeExplainsController,
+  patchProductBadgeExplainController,
   getProductCategoryRootsController,
   getProductCategorySearchController,
   getProductCategoryChildrenController,
@@ -366,7 +368,6 @@ export {
   getMyLoyaltyPointsStatusController,
   adminCreditOwnLoyaltyPointsController,
   getMyReferralProgramController,
-  convertPartnerBalanceController,
   getMyAffiliateEarningsController,
   getMonthlyLoyaltyPointsAwardedController,
   followUserController,

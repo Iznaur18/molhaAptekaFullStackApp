@@ -1,39 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import {
-  CONVERT_PARTNER_BALANCE_AMOUNT_MAX,
-  convertPartnerBalanceBodySchema,
-} from "../src/partnerProgram.js";
-
-test("convertPartnerBalanceBodySchema: accepts amount with idempotencyKey", () => {
-  assert.deepEqual(
-    convertPartnerBalanceBodySchema.parse({
-      amount: 100,
-      idempotencyKey: "convert-1",
-    }),
-    {
-      amount: 100,
-      idempotencyKey: "convert-1",
-    },
-  );
-});
-
-test("convertPartnerBalanceBodySchema: requires idempotencyKey", () => {
-  assert.throws(() => convertPartnerBalanceBodySchema.parse({ amount: 50 }));
-});
-
-test("convertPartnerBalanceBodySchema: rejects invalid amount", () => {
-  assert.throws(() =>
-    convertPartnerBalanceBodySchema.parse({
-      amount: 0,
-      idempotencyKey: "x",
-    }),
-  );
-  assert.throws(() =>
-    convertPartnerBalanceBodySchema.parse({
-      amount: CONVERT_PARTNER_BALANCE_AMOUNT_MAX + 1,
-      idempotencyKey: "x",
-    }),
-  );
+test("partnerProgram convert schema removed from contract surface", async () => {
+  const contract = await import("../src/index.js");
+  assert.equal("convertPartnerBalanceBodySchema" in contract, false);
+  assert.equal("CONVERT_PARTNER_BALANCE_AMOUNT_MAX" in contract, false);
+  assert.equal("CONVERT_PARTNER_IDEMPOTENCY_KEY_MAX_LENGTH" in contract, false);
 });

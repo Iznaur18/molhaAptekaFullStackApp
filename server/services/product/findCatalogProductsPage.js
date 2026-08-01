@@ -1,4 +1,5 @@
 import { CATALOG_SEARCH_MODE_ATLAS } from "../../constants/productAtlasSearchConstants.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 import { isAtlasSearchUnavailableError } from "./isAtlasSearchUnavailableError.js";
 import {
@@ -51,10 +52,10 @@ export const findCatalogProductsPage = async (
       if (!isAtlasSearchUnavailableError(error)) {
         throw error;
       }
-      console.warn(
-        "[catalog-search] Atlas $search unavailable, falling back to regex:",
-        error instanceof Error ? error.message : error,
-      );
+      logServerEvent("warn", {
+        event: "catalog_search_atlas_unavailable_fallback_regex",
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 
@@ -80,10 +81,10 @@ export const countCatalogProducts = async (searchResult) => {
       if (!isAtlasSearchUnavailableError(error)) {
         throw error;
       }
-      console.warn(
-        "[catalog-search] Atlas count unavailable, falling back to regex:",
-        error instanceof Error ? error.message : error,
-      );
+      logServerEvent("warn", {
+        event: "catalog_count_atlas_unavailable_fallback_regex",
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 

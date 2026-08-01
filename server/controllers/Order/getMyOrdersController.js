@@ -1,9 +1,9 @@
-import { ORDER_STATUS_PENDING } from "../../constants/orderConstants.js";
 import { OrderModel } from "../../models/index.js";
 import { sanitizeOrderForBuyerApi } from "../../services/order/buyerPassportShare.js";
+import { fetchMyOrdersPageIds } from "../../services/order/fetchMyOrdersPageIds.js";
+import { orderRowsByIds } from "../../services/order/fetchMySalesOrderPageIds.js";
 import { syncOrderStatusFromItems } from "../../services/order/orderStatus.js";
 import { successRes } from "../../services/http/index.js";
-import { sortByPriorityStatusFirst } from "../../utils/sortByPriorityStatusFirst.js";
 
 import { ORDER_ITEMS_POPULATE } from "./orderQueries.js";
 
@@ -22,20 +22,13 @@ const parsePagination = (query) => {
 export const getMyOrdersController = async (req, res) => {
   const { page, limit, skip } = parsePagination(req.query);
 
-  const lightOrders = await OrderModel.find({ userBuyerId: req.userId })
-    .select("status createdAt items.status")
-    .sort({ createdAt: -1 })
-    .lean();
-
-  lightOrders.forEach((order) => syncOrderStatusFromItems(order));
-
-  const sortedLight = sortByPriorityStatusFirst(lightOrders, {
-    priorityStatus: ORDER_STATUS_PENDING,
+  const { orderIds, total } = await fetchMyOrdersPageIds({
+    buyerUserId: req.userId,
+    skip,
+    limit,
   });
-  const total = sortedLight.length;
-  const pageIds = sortedLight.slice(skip, skip + limit).map((order) => order._id);
 
-  if (pageIds.length === 0) {
+  if (orderIds.length === 0) {
     return successRes(res, {
       orders: [],
       pagination: {
@@ -48,15 +41,11 @@ export const getMyOrdersController = async (req, res) => {
     });
   }
 
-  const orders = await OrderModel.find({ _id: { $in: pageIds } })
+  const orders = await OrderModel.find({ _id: { $in: orderIds } })
     .populate(ORDER_ITEMS_POPULATE)
     .lean();
 
-  const byId = new Map(orders.map((order) => [String(order._id), order]));
-  const pageOrders = pageIds
-    .map((id) => byId.get(String(id)))
-    .filter(Boolean);
-
+  const pageOrders = orderRowsByIds(orderIds, orders);
   pageOrders.forEach((order) => syncOrderStatusFromItems(order));
 
   const sortedOrders = pageOrders.map((order) => sanitizeOrderForBuyerApi(order));

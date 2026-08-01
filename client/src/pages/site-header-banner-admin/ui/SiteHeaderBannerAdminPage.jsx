@@ -14,7 +14,9 @@ import { SITE_HEADER_BANNER_ADMIN_PAGE_UI } from "../../../shared/config/appUiCo
 import { ModalSectionTabs } from "../../../shared/ui/ModalSectionTabs/ModalSectionTabs.jsx";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
 import { ProductManageToggleDisplayAdminPage } from "../../product-manage-toggle-display-admin/ui/ProductManageToggleDisplayAdminPage.jsx";
+import { ProductBadgeExplainAdminPage } from "../../product-badge-explain-admin/ui/ProductBadgeExplainAdminPage.jsx";
 import {
+  SITE_HEADER_BANNER_ADMIN_TAB_BADGES,
   SITE_HEADER_BANNER_ADMIN_TAB_BUTTONS,
   SITE_HEADER_BANNER_ADMIN_TAB_GUEST,
   SITE_HEADER_BANNER_ADMIN_TAB_SLIDES,
@@ -28,6 +30,7 @@ const ADMIN_TABS = [
   { id: SITE_HEADER_BANNER_ADMIN_TAB_SLIDES, label: SITE_HEADER_BANNER_ADMIN_PAGE_UI.TAB_SLIDES },
   { id: SITE_HEADER_BANNER_ADMIN_TAB_BUTTONS, label: SITE_HEADER_BANNER_ADMIN_PAGE_UI.TAB_BUTTONS },
   { id: SITE_HEADER_BANNER_ADMIN_TAB_GUEST, label: SITE_HEADER_BANNER_ADMIN_PAGE_UI.TAB_GUEST },
+  { id: SITE_HEADER_BANNER_ADMIN_TAB_BADGES, label: SITE_HEADER_BANNER_ADMIN_PAGE_UI.TAB_BADGES },
 ];
 
 const resolveNextSelectedSlideId = (items, removedId, currentId) => {
@@ -77,8 +80,6 @@ export function SiteHeaderBannerAdminPage() {
     ? form.items.findIndex((item) => item.id === selectedSlide.id)
     : -1;
   const isSaving = patchMutation.isPending;
-  const showFormSave = activeTab === SITE_HEADER_BANNER_ADMIN_TAB_SLIDES
-    || activeTab === SITE_HEADER_BANNER_ADMIN_TAB_GUEST;
 
   const resetDraftState = () => {
     setActionError("");
@@ -172,6 +173,20 @@ export function SiteHeaderBannerAdminPage() {
         </div>
       ) : null}
 
+      {activeTab === SITE_HEADER_BANNER_ADMIN_TAB_BUTTONS ? (
+        <div className="site-header-banner-admin__tab-panel">
+          <ProductManageToggleDisplayAdminPage embedded />
+        </div>
+      ) : null}
+
+      {activeTab === SITE_HEADER_BANNER_ADMIN_TAB_BADGES ? (
+        <div className="site-header-banner-admin__tab-panel">
+          <ProductBadgeExplainAdminPage embedded />
+        </div>
+      ) : null}
+
+      {activeTab === SITE_HEADER_BANNER_ADMIN_TAB_SLIDES ||
+      activeTab === SITE_HEADER_BANNER_ADMIN_TAB_GUEST ? (
       <form className="site-header-banner-admin__form" onSubmit={handleSave}>
         {activeTab === SITE_HEADER_BANNER_ADMIN_TAB_SLIDES ? (
           <div className="site-header-banner-admin__tab-panel">
@@ -253,12 +268,6 @@ export function SiteHeaderBannerAdminPage() {
           </div>
         ) : null}
 
-        {activeTab === SITE_HEADER_BANNER_ADMIN_TAB_BUTTONS ? (
-          <div className="site-header-banner-admin__tab-panel">
-            <ProductManageToggleDisplayAdminPage embedded />
-          </div>
-        ) : null}
-
         {activeTab === SITE_HEADER_BANNER_ADMIN_TAB_GUEST ? (
           <div className="site-header-banner-admin__tab-panel">
             <div className="site-header-banner-admin__panel site-header-banner-admin__panel-section">
@@ -290,20 +299,19 @@ export function SiteHeaderBannerAdminPage() {
           </p>
         ) : null}
 
-        {showFormSave ? (
-          <div className="site-header-banner-admin__save-bar">
-            <button
-              type="submit"
-              className="site-header-banner-admin__btn site-header-banner-admin__btn_primary"
-              disabled={isSaving}
-            >
-              {isSaving
-                ? SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVING
-                : SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVE}
-            </button>
-          </div>
-        ) : null}
+        <div className="site-header-banner-admin__save-bar">
+          <button
+            type="submit"
+            className="site-header-banner-admin__btn site-header-banner-admin__btn_primary"
+            disabled={isSaving}
+          >
+            {isSaving
+              ? SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVING
+              : SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVE}
+          </button>
+        </div>
       </form>
+      ) : null}
     </section>
   );
 }

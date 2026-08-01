@@ -41,22 +41,14 @@ test("computeProductSoldQuantityDelta: shipped → delivered increments", () => 
 
 test("computeProductSoldQuantityDelta: delivered → confirmed is noop", () => {
   assert.equal(
-    computeProductSoldQuantityDelta(
-      ORDER_STATUS_DELIVERED,
-      ORDER_STATUS_CONFIRMED,
-      3,
-    ),
+    computeProductSoldQuantityDelta(ORDER_STATUS_DELIVERED, ORDER_STATUS_CONFIRMED, 3),
     0,
   );
 });
 
 test("computeProductSoldQuantityDelta: delivered → cancelled decrements", () => {
   assert.equal(
-    computeProductSoldQuantityDelta(
-      ORDER_STATUS_DELIVERED,
-      ORDER_STATUS_CANCELLED,
-      4,
-    ),
+    computeProductSoldQuantityDelta(ORDER_STATUS_DELIVERED, ORDER_STATUS_CANCELLED, 4),
     -4,
   );
 });

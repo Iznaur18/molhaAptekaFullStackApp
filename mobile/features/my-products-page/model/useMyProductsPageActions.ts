@@ -1,12 +1,17 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { buildAffiliateManageToggleBody } from "@izibuy/shared-lib";
+import {
+  buildAffiliateManageToggleBody,
+  resolveAffiliateEnableLoyaltyGate,
+  resolveAffiliateToggleSourceProduct,
+} from "@izibuy/shared-lib";
 
 import { setProductInstallmentEnabled } from "@/entities/installment/lib/setProductInstallmentEnabled";
 import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
 import { useRequestProductPromotionMutation } from "@/entities/product/model/useRequestProductPromotionMutation";
 import { useProductPromotionManageSupport } from "@/features/product-promotion/model/useProductPromotionManageSupport";
+import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
 import {
   API_CLIENT_UI,
   PRODUCT_PROMOTION_UI,
@@ -20,6 +25,7 @@ export const useMyProductsPageActions = () => {
   const queryClient = useQueryClient();
   const requestPromotionMutation = useRequestProductPromotionMutation();
   const { patchMutation, deleteMutation } = useMyProductMutations();
+  const loyaltyStatusQuery = useMyLoyaltyPointsStatusQuery(true);
 
   const [catalogNotice, setCatalogNotice] = useState("");
   const [catalogError, setCatalogError] = useState("");
@@ -193,7 +199,11 @@ export const useMyProductsPageActions = () => {
   );
 
   const handleSetProductAffiliate = useCallback(
-    async (productId: string, affiliateEnabled: boolean) => {
+    async (
+      productId: string,
+      affiliateEnabled: boolean,
+      productHint?: MyProductsCatalogProduct,
+    ) => {
       const normalizedProductId = String(productId ?? "").trim();
       if (!normalizedProductId) {
         return;
@@ -202,10 +212,22 @@ export const useMyProductsPageActions = () => {
       setTogglingAffiliateProductId(normalizedProductId);
       setManageErrorMessage("");
       try {
-        const sourceProduct =
-          promotionProduct && String(promotionProduct._id) === normalizedProductId
-            ? promotionProduct
-            : null;
+        const sourceProduct = resolveAffiliateToggleSourceProduct(normalizedProductId, [
+          productHint,
+          promotionProduct,
+        ]);
+        if (affiliateEnabled && sourceProduct?.affiliateEnabled !== true) {
+          const gate = resolveAffiliateEnableLoyaltyGate({
+            productPrice: sourceProduct?.productPrice,
+            affiliatePercent: sourceProduct?.affiliatePercent,
+            loyaltyPointsBalance: loyaltyStatusQuery.data?.loyaltyPointsBalance ?? 0,
+            loyaltyPointsReserved: loyaltyStatusQuery.data?.loyaltyPointsReserved ?? 0,
+          });
+          if (!gate.ok) {
+            setManageErrorMessage(gate.message);
+            return;
+          }
+        }
         const body = buildAffiliateManageToggleBody(sourceProduct, affiliateEnabled);
         const updated = await patchMutation.mutateAsync({
           productId: normalizedProductId,
@@ -220,7 +242,7 @@ export const useMyProductsPageActions = () => {
         setTogglingAffiliateProductId(null);
       }
     },
-    [patchMutation, promotionProduct, syncPromotionProduct],
+    [loyaltyStatusQuery.data, patchMutation, promotionProduct, syncPromotionProduct],
   );
 
   const handleWholesaleSaved = useCallback(

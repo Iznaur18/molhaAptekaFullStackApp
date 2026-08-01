@@ -66,10 +66,13 @@ describe("buildSellerItemsPendingFirstSort", () => {
 
 describe("orderRowsByIds", () => {
   it("сохраняет порядок id", () => {
-    const rows = orderRowsByIds(["b", "a"], [
-      { _id: "a", n: 1 },
-      { _id: "b", n: 2 },
-    ]);
+    const rows = orderRowsByIds(
+      ["b", "a"],
+      [
+        { _id: "a", n: 1 },
+        { _id: "b", n: 2 },
+      ],
+    );
     assert.deepEqual(
       rows.map((row) => row._id),
       ["b", "a"],

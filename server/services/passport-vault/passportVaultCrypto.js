@@ -108,10 +108,7 @@ export function openPassportStored(stored) {
   const ciphertext = Buffer.from(stored.ciphertext, "base64");
   const decipher = createDecipheriv(PASSPORT_VAULT_ALGORITHM, key, iv);
   decipher.setAuthTag(tag);
-  const decrypted = Buffer.concat([
-    decipher.update(ciphertext),
-    decipher.final(),
-  ]);
+  const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
   const parsed = JSON.parse(decrypted.toString("utf8"));
   if (!parsed || typeof parsed !== "object") {
     throw new Error("Некорректный payload паспорта после расшифровки");

@@ -16,9 +16,16 @@
   box-sizing: border-box;
   width: 100%;
   aspect-ratio: 1 / 1;
-  border-radius: 0.6rem;
+  border-radius: var(--product-media-hero-squircle-radius);
   overflow: hidden;
   background: var(--iz-color-surface-muted);
+}
+
+@supports (corner-shape: squircle) {
+  .product-media-gallery-readonly__hero {
+    border-radius: 2.75rem;
+    corner-shape: squircle;
+  }
 }
 
 .product-media-gallery-readonly__hero--multi {

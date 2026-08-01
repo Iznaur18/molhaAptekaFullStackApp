@@ -162,7 +162,11 @@ export async function markUserStoryViewed({ viewerUserId, storyId }) {
  *   reportText: unknown;
  * }} input
  */
-export async function submitUserStoryReport({ reporterId, storyId, reportText: rawText }) {
+export async function submitUserStoryReport({
+  reporterId,
+  storyId,
+  reportText: rawText,
+}) {
   const reportText = String(rawText ?? "").trim();
 
   const story = await UserStoryModel.findById(storyId)

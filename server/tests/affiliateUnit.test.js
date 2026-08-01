@@ -28,6 +28,17 @@ describe("affiliate loyalty funding copy", () => {
   });
 });
 
+describe("formatAffiliateEnableInsufficientLoyaltyMessage", () => {
+  it("matches product enable copy", async () => {
+    const { formatAffiliateEnableInsufficientLoyaltyMessage } =
+      await import("@izibuy/shared-lib");
+    assert.equal(
+      formatAffiliateEnableInsufficientLoyaltyMessage(100, 50),
+      "Недостаточно баллов для партнёрки. Нужно 100, свободно 50. Пополните баллы.",
+    );
+  });
+});
+
 describe("resolveOrderLineAffiliateAttribution", () => {
   it("sets pending for valid referrer", () => {
     assert.deepEqual(

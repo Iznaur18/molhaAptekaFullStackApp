@@ -4,11 +4,14 @@ import {
   ORDER_STATUS_CONFIRMED,
   ORDER_STATUS_DELIVERED,
 } from "../../constants/orderConstants.js";
-import { OrderModel } from "../../models/index.js";
+import { OrderModel, ProductModel } from "../../models/index.js";
 
 const SALE_COUNT_ITEM_STATUSES = [ORDER_STATUS_DELIVERED, ORDER_STATUS_CONFIRMED];
 
 /**
+ * Статистика продаж по sellerIds без full-collection $unwind:
+ * сначала товары продавцов → $match по productId → unwind только кандидатов.
+ *
  * @param {string[]} sellerIds
  * @returns {Promise<Record<string, { totalSalesAmount: number; totalSalesCount: number }>>}
  */
@@ -24,31 +27,46 @@ export const getSellerCommerceStatsBySellerIds = async (sellerIds) => {
   }
 
   const objectIds = ids.map((id) => new mongoose.Types.ObjectId(id));
+  const sellerProducts = await ProductModel.find({ productSeller: { $in: objectIds } })
+    .select("_id productSeller")
+    .lean();
+
+  if (sellerProducts.length === 0) {
+    return Object.fromEntries(
+      ids.map((id) => [id, { totalSalesAmount: 0, totalSalesCount: 0 }]),
+    );
+  }
+
+  const productIds = sellerProducts.map((product) => product._id);
+  const sellerByProductId = new Map(
+    sellerProducts.map((product) => [
+      String(product._id),
+      String(product.productSeller),
+    ]),
+  );
+
   const rows = await OrderModel.aggregate([
+    {
+      $match: {
+        items: {
+          $elemMatch: {
+            productId: { $in: productIds },
+            status: { $in: SALE_COUNT_ITEM_STATUSES },
+          },
+        },
+      },
+    },
     { $unwind: "$items" },
     {
       $match: {
+        "items.productId": { $in: productIds },
         "items.status": { $in: SALE_COUNT_ITEM_STATUSES },
-      },
-    },
-    {
-      $lookup: {
-        from: "products",
-        localField: "items.productId",
-        foreignField: "_id",
-        as: "productDoc",
-      },
-    },
-    { $unwind: "$productDoc" },
-    {
-      $match: {
-        "productDoc.productSeller": { $in: objectIds },
       },
     },
     {
       $group: {
         _id: {
-          sellerId: "$productDoc.productSeller",
+          productId: "$items.productId",
           orderId: "$_id",
         },
         orderAmount: {
@@ -58,21 +76,32 @@ export const getSellerCommerceStatsBySellerIds = async (sellerIds) => {
         },
       },
     },
-    {
-      $group: {
-        _id: "$_id.sellerId",
-        totalSalesAmount: { $sum: "$orderAmount" },
-        totalSalesCount: { $sum: 1 },
-      },
-    },
   ]);
 
+  /** @type {Record<string, { totalSalesAmount: number; orderIds: Set<string> }>} */
+  const acc = Object.fromEntries(
+    ids.map((id) => [id, { totalSalesAmount: 0, orderIds: new Set() }]),
+  );
+
+  for (const row of rows) {
+    const productId = String(row._id.productId ?? "");
+    const sellerId = sellerByProductId.get(productId);
+    if (!sellerId || !acc[sellerId]) {
+      continue;
+    }
+    const orderId = String(row._id.orderId ?? "");
+    acc[sellerId].totalSalesAmount += Number(row.orderAmount) || 0;
+    if (orderId) {
+      acc[sellerId].orderIds.add(orderId);
+    }
+  }
+
   return Object.fromEntries(
-    rows.map((row) => [
-      String(row._id),
+    Object.entries(acc).map(([sellerId, stats]) => [
+      sellerId,
       {
-        totalSalesAmount: Number(row.totalSalesAmount) || 0,
-        totalSalesCount: Number(row.totalSalesCount) || 0,
+        totalSalesAmount: stats.totalSalesAmount,
+        totalSalesCount: stats.orderIds.size,
       },
     ]),
   );

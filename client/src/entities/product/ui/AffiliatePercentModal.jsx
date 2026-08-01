@@ -4,6 +4,7 @@ import {
   AFFILIATE_MANAGE_DEFAULT_PERCENT,
   AFFILIATE_PERCENT_MIN,
   isProductAffiliateConfigured,
+  resolveAffiliateEnableLoyaltyGate,
 } from "@izibuy/shared-lib";
 
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
@@ -14,6 +15,7 @@ import {
 } from "../../../shared/lib/numericInput.js";
 import { useDialogFocusTrap } from "../../../shared/lib/useDialogFocusTrap.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
+import { useMyLoyaltyPointsStatusQuery } from "../../user/model/useMyLoyaltyPointsStatusQuery.js";
 import { useMyProductMutations } from "../model/useMyProductMutations.js";
 import { useWholesalePriceSheetAnimation } from "./useWholesalePriceSheetAnimation.js";
 
@@ -31,6 +33,7 @@ const TITLE_ID = "affiliate-percent-modal-title";
  */
 export function AffiliatePercentModal({ isOpen, product, onClose, onSaved }) {
   const { patchMutation } = useMyProductMutations();
+  const loyaltyStatusQuery = useMyLoyaltyPointsStatusQuery({ enabled: isOpen });
   const [percent, setPercent] = useState(String(AFFILIATE_MANAGE_DEFAULT_PERCENT));
   const [error, setError] = useState("");
   const panelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
@@ -92,6 +95,19 @@ export function AffiliatePercentModal({ isOpen, product, onClose, onSaved }) {
     ) {
       setError(CREATE_PRODUCT_MODAL_UI.AFFILIATE_MODAL_ERROR_REQUIRED);
       return;
+    }
+
+    if (product?.affiliateEnabled !== true) {
+      const gate = resolveAffiliateEnableLoyaltyGate({
+        productPrice: product?.productPrice,
+        affiliatePercent: nextPercent,
+        loyaltyPointsBalance: loyaltyStatusQuery.data?.loyaltyPointsBalance ?? 0,
+        loyaltyPointsReserved: loyaltyStatusQuery.data?.loyaltyPointsReserved ?? 0,
+      });
+      if (!gate.ok) {
+        setError(gate.message);
+        return;
+      }
     }
 
     try {

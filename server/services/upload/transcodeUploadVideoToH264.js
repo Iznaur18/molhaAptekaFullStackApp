@@ -85,11 +85,7 @@ function runFfmpegTranscode(inputPath, outputPath, options = {}) {
         resolve();
         return;
       }
-      reject(
-        new Error(
-          `ffmpeg завершился с кодом ${code}: ${stderr.slice(-800)}`,
-        ),
-      );
+      reject(new Error(`ffmpeg завершился с кодом ${code}: ${stderr.slice(-800)}`));
     });
   });
 }

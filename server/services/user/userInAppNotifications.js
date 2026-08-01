@@ -1,4 +1,5 @@
 import { UserInAppNotificationModel } from "../../models/index.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 import {
   buildExpoPushDataPayload,
   sendExpoPushToUser,
@@ -40,7 +41,10 @@ export const createUserInAppNotification = async ({
       notificationId: String(doc._id),
     }),
   }).catch((error) => {
-    console.error("createUserInAppNotification push error:", error);
+    logServerEvent("error", {
+      event: "createuserinappnotification_push",
+      error: error instanceof Error ? error.message : String(error),
+    });
   });
 };
 

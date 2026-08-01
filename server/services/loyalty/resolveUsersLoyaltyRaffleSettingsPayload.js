@@ -9,8 +9,7 @@ import {
  * @returns {{ description: string; goal: number; updatedAt: Date | null }}
  */
 export const resolveUsersLoyaltyRaffleSettingsPayload = (row) => {
-  const rawDescription =
-    row?.description == null ? "" : String(row.description).trim();
+  const rawDescription = row?.description == null ? "" : String(row.description).trim();
   const parsedGoal = Math.floor(Number(row?.goal));
   const goal =
     Number.isFinite(parsedGoal) &&
@@ -22,6 +21,7 @@ export const resolveUsersLoyaltyRaffleSettingsPayload = (row) => {
   return {
     description: rawDescription,
     goal,
-    updatedAt: row?.updatedAt instanceof Date ? row.updatedAt : row?.updatedAt ?? null,
+    updatedAt:
+      row?.updatedAt instanceof Date ? row.updatedAt : (row?.updatedAt ?? null),
   };
 };

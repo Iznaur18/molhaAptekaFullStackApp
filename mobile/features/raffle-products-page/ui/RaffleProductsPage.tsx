@@ -110,7 +110,16 @@ export const RaffleProductsPage = () => {
             <View style={styles.pageHeader}>
               <View style={styles.headerCard}>
                 {raffle ? (
-                  <View style={styles.media}>
+                  <View
+                    style={[
+                      styles.media,
+                      {
+                        width: productGrid.tileWidth,
+                        height: productGrid.tileWidth,
+                        borderRadius: 14,
+                      },
+                    ]}
+                  >
                     <RafflePrizeMedia
                       raffle={raffle}
                       showSoundToggle={false}
@@ -125,6 +134,11 @@ export const RaffleProductsPage = () => {
                   </Text>
                 </View>
               </View>
+
+              {typeof raffle?.description === "string" &&
+              raffle.description.trim() ? (
+                <Text style={styles.description}>{raffle.description.trim()}</Text>
+              ) : null}
 
               {progressUi ? (
                 <View

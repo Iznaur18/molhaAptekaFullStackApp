@@ -17,7 +17,11 @@ type ProductEditManageSectionProps = {
   onSetAvailability?: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
   onSetAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
   onSetWholesale?: (productId: string, productWholesaleEnabled: boolean) => void | Promise<void>;
-  onSetAffiliate?: (productId: string, affiliateEnabled: boolean) => void | Promise<void>;
+  onSetAffiliate?: (
+    productId: string,
+    affiliateEnabled: boolean,
+    product?: CatalogProduct,
+  ) => void | Promise<void>;
   onSetInstallment?: (
     productId: string,
     productInstallmentEnabled: boolean,
@@ -265,7 +269,7 @@ export const ProductEditManageSection = ({
                 return { revert: true };
               }
               if (typeof onSetAffiliate === "function") {
-                void onSetAffiliate(String(product._id), next);
+                void onSetAffiliate(String(product._id), next, product);
               }
               return undefined;
             }}

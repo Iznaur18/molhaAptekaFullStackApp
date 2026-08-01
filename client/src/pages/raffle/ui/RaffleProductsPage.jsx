@@ -88,6 +88,12 @@ export function RaffleProductsPage({
         </div>
       </header>
 
+      {raffle?.description?.trim() ? (
+        <p className="raffle-products-page__description">
+          {raffle.description.trim()}
+        </p>
+      ) : null}
+
       {progressUi ? (
         <section
           className="raffle-products-page__progress"

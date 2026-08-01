@@ -120,7 +120,10 @@ export async function createInstallmentContract({
   try {
     await assertOrderItemsWithinAvailableStock(items, buyerUserId);
   } catch (error) {
-    throw new AppError(400, error instanceof Error ? error.message : "Недостаточно товара");
+    throw new AppError(
+      400,
+      error instanceof Error ? error.message : "Недостаточно товара",
+    );
   }
 
   const firstPaymentRequiredNow = plan.firstPaymentRequiredNow !== false;

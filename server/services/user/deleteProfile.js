@@ -1,4 +1,5 @@
 import { AppError } from "../../errors/AppError.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 import { UserModel } from "../../models/index.js";
 
 import { assertProfileDeleteAllowed } from "./assertProfileDeleteAllowed.js";
@@ -17,9 +18,13 @@ export async function deleteProfile({ currentUserId, targetUserId }) {
     targetUserId,
   );
 
-  console.log(
-    `[DELETE PROFILE] User ${currentUserId} deleting profile ${targetUserId} (${targetUser.userName || "N/A"})${isSelfDelete ? " [self]" : ""}`,
-  );
+  logServerEvent("info", {
+    event: "delete_profile_start",
+    actorUserId: currentUserId,
+    targetUserId,
+    targetUserName: targetUser.userName || null,
+    isSelfDelete,
+  });
 
   await runProfileDeleteCascade(targetUserId);
 

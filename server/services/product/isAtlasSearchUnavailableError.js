@@ -8,7 +8,9 @@ export const isAtlasSearchUnavailableError = (error) => {
     return false;
   }
 
-  const message = String(/** @type {{ message?: string }} */ (error).message ?? "").toLowerCase();
+  const message = String(
+    /** @type {{ message?: string }} */ (error).message ?? "",
+  ).toLowerCase();
   const code = /** @type {{ code?: number }} */ (error).code;
 
   if (code === 31082 || code === 291 || code === 6047401) {

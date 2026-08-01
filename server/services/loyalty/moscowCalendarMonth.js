@@ -18,7 +18,9 @@ const getMoscowOffsetMs = (date) => {
   }).formatToParts(date);
 
   const map = Object.fromEntries(
-    parts.filter((part) => part.type !== "literal").map((part) => [part.type, part.value]),
+    parts
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value]),
   );
 
   const asUtc = Date.UTC(
@@ -42,7 +44,14 @@ const getMoscowOffsetMs = (date) => {
  * @param {number} second
  * @returns {Date}
  */
-export const moscowWallTimeToUtc = (year, month, day, hour = 0, minute = 0, second = 0) => {
+export const moscowWallTimeToUtc = (
+  year,
+  month,
+  day,
+  hour = 0,
+  minute = 0,
+  second = 0,
+) => {
   const utcGuess = Date.UTC(year, month - 1, day, hour, minute, second);
   const offset = getMoscowOffsetMs(new Date(utcGuess));
   return new Date(utcGuess - offset);
@@ -61,7 +70,9 @@ export const resolveMoscowCalendarMonthUtcRange = (referenceDate = new Date()) =
   }).formatToParts(referenceDate);
 
   const map = Object.fromEntries(
-    parts.filter((part) => part.type !== "literal").map((part) => [part.type, part.value]),
+    parts
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value]),
   );
 
   const year = Number(map.year);

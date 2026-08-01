@@ -13,7 +13,9 @@ test("moscowWallTimeToUtc: winter offset UTC+3", () => {
 });
 
 test("resolveMoscowCalendarMonthUtcRange: January 2024", () => {
-  const range = resolveMoscowCalendarMonthUtcRange(new Date("2024-01-15T12:00:00.000Z"));
+  const range = resolveMoscowCalendarMonthUtcRange(
+    new Date("2024-01-15T12:00:00.000Z"),
+  );
   assert.equal(range.year, 2024);
   assert.equal(range.month, 1);
   assert.equal(range.startUtc.toISOString(), "2023-12-31T21:00:00.000Z");

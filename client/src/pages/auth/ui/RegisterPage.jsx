@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ChevronLeft } from "lucide-react";
 
 import { useGuestProfileLoginMenuBannerImageQuery } from "../../../entities/site-header-banner/model/useGuestProfileLoginMenuBannerImageQuery.js";
 import { resendRegistrationCode } from "../../../entities/user/api/resendRegistrationCode.js";
@@ -25,6 +26,7 @@ import { clearPersistedReferralCode } from "../../../shared/lib/referralCodeStor
 import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { useStableAuthHeroHeight } from "../../../shared/lib/useStableAuthHeroHeight.js";
 import { AuthHeroBanner } from "../../../shared/ui/AuthHeroBanner/AuthHeroBanner.jsx";
+import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { PasswordInputField } from "../../../shared/ui/PasswordInputField/PasswordInputField.jsx";
 
 import "./AuthPage.css";
@@ -248,10 +250,11 @@ export function RegisterPage() {
           <button
             type="button"
             className="auth-page__back"
+            aria-label={AUTH_UI.BACK_BUTTON}
             onClick={handleBack}
             disabled={isPending}
           >
-            {AUTH_UI.BACK_BUTTON}
+            <AppIcon icon={ChevronLeft} size="md" strokeWidth={2.25} />
           </button>
           <AuthHeroBanner height={heroHeight} imageUrl={bannerImageUrl} />
           <div className="auth-page__body">
@@ -323,10 +326,11 @@ export function RegisterPage() {
         <button
           type="button"
           className="auth-page__back"
+          aria-label={AUTH_UI.BACK_BUTTON}
           onClick={handleBack}
           disabled={isPending}
         >
-          {AUTH_UI.BACK_BUTTON}
+          <AppIcon icon={ChevronLeft} size="md" strokeWidth={2.25} />
         </button>
 
         <AuthHeroBanner height={heroHeight} imageUrl={bannerImageUrl} />

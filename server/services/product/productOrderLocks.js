@@ -5,10 +5,9 @@ import {
 } from "../../constants/orderConstants.js";
 import { OrderModel } from "../../models/index.js";
 
-const SALE_CLOSED_ITEM_STATUSES = new Set([
-  ORDER_STATUS_CONFIRMED,
-  ORDER_STATUS_CANCELLED,
-]);
+const SALE_CLOSED_ITEM_STATUSES = [ORDER_STATUS_CONFIRMED, ORDER_STATUS_CANCELLED];
+
+const SALE_CLOSED_STATUS_SET = new Set(SALE_CLOSED_ITEM_STATUSES);
 
 const OPEN_SALES_BLOCK_MESSAGE =
   "Нельзя скрыть или удалить: есть заказы без подтверждения покупателем";
@@ -21,7 +20,7 @@ const isOpenSaleItemStatus = (status) => {
     typeof status === "string" && status.trim() !== ""
       ? status.trim()
       : ORDER_STATUS_PENDING;
-  return !SALE_CLOSED_ITEM_STATUSES.has(normalized);
+  return !SALE_CLOSED_STATUS_SET.has(normalized);
 };
 
 /**
@@ -45,7 +44,13 @@ export async function getProductIdsWithOpenSales(productIds) {
   if (uniqueIds.length === 0) return openIds;
 
   const orders = await OrderModel.find({
-    "items.productId": { $in: uniqueIds },
+    items: {
+      $elemMatch: {
+        productId: { $in: uniqueIds },
+        // missing/null status → open (как isOpenSaleItemStatus); $nin матчит отсутствие поля
+        status: { $nin: SALE_CLOSED_ITEM_STATUSES },
+      },
+    },
   })
     .select("items.productId items.status")
     .lean();

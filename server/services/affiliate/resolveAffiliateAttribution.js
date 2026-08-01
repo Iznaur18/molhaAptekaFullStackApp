@@ -15,9 +15,7 @@ export async function resolveAffiliateReferrerUserId(affiliateCode) {
     return null;
   }
 
-  const user = await UserModel.findOne({ referralCode: code })
-    .select("_id")
-    .lean();
+  const user = await UserModel.findOne({ referralCode: code }).select("_id").lean();
   return user?._id ? String(user._id) : null;
 }
 
@@ -43,10 +41,7 @@ export function resolveOrderLineAffiliateAttribution({
   if (affiliateEnabled !== true || Math.floor(Number(affiliatePercent) || 0) <= 0) {
     return { affiliateReferrerUserId: null, affiliateStatus: "none" };
   }
-  if (
-    referrerUserId === buyerUserId ||
-    referrerUserId === sellerUserId
-  ) {
+  if (referrerUserId === buyerUserId || referrerUserId === sellerUserId) {
     return { affiliateReferrerUserId: null, affiliateStatus: "none" };
   }
   return {

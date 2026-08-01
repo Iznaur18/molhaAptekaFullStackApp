@@ -7,7 +7,7 @@ import { formatApiErrorMessage } from "@izibuy/shared-lib";
  *   referralCode: string;
  *   inviteUrl: string;
  *   cashbackPercent: number;
- *   partnerBalance: number;
+ *   loyaltyPointsBalance: number;
  *   totalReferrals: number;
  *   totalReferralsSpend: number;
  *   totalCashbackEarned: number;
@@ -30,25 +30,5 @@ export async function fetchMyReferralProgram() {
     return data.data;
   } catch (error) {
     throw new Error(formatApiErrorMessage(error, "Не удалось загрузить партнёрскую программу"));
-  }
-}
-
-/**
- * @param {number} amount
- * @param {string} [idempotencyKey]
- */
-export async function convertPartnerBalance(amount, idempotencyKey) {
-  try {
-    const payload = { amount };
-    if (idempotencyKey) {
-      payload.idempotencyKey = idempotencyKey;
-    }
-    const { data } = await apiClient.post("/user/me/referral/convert", payload);
-    if (!data?.success || !data?.data) {
-      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
-    }
-    return data.data;
-  } catch (error) {
-    throw new Error(formatApiErrorMessage(error, "Не удалось конвертировать баланс"));
   }
 }

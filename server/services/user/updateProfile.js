@@ -1,4 +1,5 @@
 import { USER_DATA } from "../../constants/constants.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 import { AppError } from "../../errors/AppError.js";
 import { UserModel } from "../../models/index.js";
 import { buildUserProfileMongoUpdate } from "./buildUserProfileMongoUpdate.js";
@@ -54,18 +55,20 @@ export async function updateProfile({
     throw new AppError(400, EMPTY_PROFILE_UPDATE_MESSAGE);
   }
 
-  console.log(
-    `[UPDATE PROFILE] User ${currentUserId} updating profile ${targetUserId}. Fields: ${Object.keys(updateData).join(", ")}`,
-  );
+  logServerEvent("info", {
+    event: "update_profile",
+    actorUserId: currentUserId,
+    targetUserId,
+    fields: Object.keys(updateData),
+  });
 
   const selectFields =
     isCurrentUserStaff && !isCurrentUserOwner ? USER_DATA : allowedFields.join(" ");
 
-  const userDataUpdated = await UserModel.findByIdAndUpdate(
-    targetUserId,
-    mongoUpdate,
-    { returnDocument: "after", runValidators: true },
-  )
+  const userDataUpdated = await UserModel.findByIdAndUpdate(targetUserId, mongoUpdate, {
+    returnDocument: "after",
+    runValidators: true,
+  })
     .select(selectFields)
     .lean();
 

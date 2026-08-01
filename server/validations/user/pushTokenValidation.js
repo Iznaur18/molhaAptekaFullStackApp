@@ -5,6 +5,8 @@ import {
 
 import { validateBodyZod } from "../../middlewares/validateBodyZod.js";
 
-export const registerPushTokenValidation = [validateBodyZod(registerPushTokenBodySchema)];
+export const registerPushTokenValidation = [
+  validateBodyZod(registerPushTokenBodySchema),
+];
 
 export const removePushTokenValidation = [validateBodyZod(removePushTokenBodySchema)];

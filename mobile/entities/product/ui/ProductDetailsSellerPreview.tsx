@@ -82,21 +82,25 @@ export const ProductDetailsSellerPreview = ({ seller }: ProductDetailsSellerPrev
       key: "rating",
       label: USER_LIST_ROW_UI.RATING_LABEL,
       value: formatSearchRowRatingCompact(sellerObj.userRatingByVotes),
+      icon: "star" as const,
     },
     {
       key: "totalSales",
       label: USER_PROFILE_COPY.LABELS.totalSalesAmount,
       value: formatSearchRowTotalSales(sellerObj.totalSalesAmount),
+      icon: "credit-card" as const,
     },
     {
       key: "listed",
       label: PRODUCT_SELLER_PREVIEW_UI.LISTED_PRODUCTS_LABEL,
       value: listedProductsText,
+      icon: "package" as const,
     },
     {
       key: "followers",
       label: USER_LIST_ROW_UI.FOLLOWERS_LABEL,
       value: formatFollowersCount(sellerObj.followersCount),
+      icon: "users" as const,
     },
   ];
 
@@ -129,20 +133,23 @@ export const ProductDetailsSellerPreview = ({ seller }: ProductDetailsSellerPrev
             badgeSize={16}
           />
         </View>
-        <Feather name="chevron-right" size={20} color={theme.colors.textMuted} />
+        <Feather name="chevron-right" size={20} color={theme.colors.action} />
       </View>
-
-      <View style={styles.divider} />
 
       <View style={styles.metrics}>
         {metrics.map((row) => (
           <View key={row.key} style={styles.metric}>
-            <Text style={styles.metricValue} numberOfLines={1}>
-              {row.value}
-            </Text>
-            <Text style={styles.metricKey} numberOfLines={1}>
-              {row.label}
-            </Text>
+            <View style={styles.metricIcon}>
+              <Feather name={row.icon} size={14} color={theme.colors.action} />
+            </View>
+            <View style={styles.metricBody}>
+              <Text style={styles.metricValue} numberOfLines={1}>
+                {row.value}
+              </Text>
+              <Text style={styles.metricKey} numberOfLines={1}>
+                {row.label}
+              </Text>
+            </View>
           </View>
         ))}
       </View>

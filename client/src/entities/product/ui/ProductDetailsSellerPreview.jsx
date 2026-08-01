@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { ChevronRight } from "lucide-react";
+import {
+  ChevronRight,
+  Package,
+  Star,
+  Users,
+  Wallet,
+} from "lucide-react";
 
 import { formatSearchRowRatingCompact } from "../../user/lib/formatSearchRowRating.js";
 import { formatSearchRowTotalSales } from "../../user/lib/formatSearchRowTotalSales.js";
@@ -80,21 +86,25 @@ export function ProductDetailsSellerPreview({ seller, onOpenProfile }) {
       key: "rating",
       label: USER_LIST_ROW_UI.RATING_LABEL,
       value: ratingText,
+      icon: Star,
     },
     {
       key: "totalSales",
       label: USER_PROFILE_COPY.LABELS.totalSalesAmount,
       value: formatSearchRowTotalSales(sellerObj.totalSalesAmount),
+      icon: Wallet,
     },
     {
       key: "listed",
       label: PRODUCT_SELLER_PREVIEW_UI.LISTED_PRODUCTS_LABEL,
       value: listedProductsText,
+      icon: Package,
     },
     {
       key: "followers",
       label: USER_LIST_ROW_UI.FOLLOWERS_LABEL,
       value: formatFollowersCount(sellerObj.followersCount),
+      icon: Users,
     },
   ];
 
@@ -129,22 +139,25 @@ export function ProductDetailsSellerPreview({ seller, onOpenProfile }) {
         {canOpenProfile ? (
           <AppIcon
             icon={ChevronRight}
-            size="sm"
-            strokeWidth={2.15}
+            size="md"
+            strokeWidth={2.5}
             className="product-details-seller-preview__chevron"
           />
         ) : null}
       </span>
 
-      <span className="product-details-seller-preview__divider" aria-hidden />
-
       <dl className="product-details-seller-preview__metrics">
         {metrics.map((row) => (
           <div key={row.key} className="product-details-seller-preview__metric">
-            <dd className="product-details-seller-preview__metric-value">
-              {row.value}
-            </dd>
-            <dt className="product-details-seller-preview__metric-key">{row.label}</dt>
+            <span className="product-details-seller-preview__metric-icon" aria-hidden>
+              <AppIcon icon={row.icon} size="sm" strokeWidth={2.25} />
+            </span>
+            <div className="product-details-seller-preview__metric-body">
+              <dd className="product-details-seller-preview__metric-value">
+                {row.value}
+              </dd>
+              <dt className="product-details-seller-preview__metric-key">{row.label}</dt>
+            </div>
           </div>
         ))}
       </dl>

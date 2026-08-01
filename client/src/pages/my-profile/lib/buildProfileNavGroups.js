@@ -42,7 +42,6 @@ export function buildProfileNavGroups({
   canUsePremium,
   canUseLoyaltyPoints,
   canUsePartnerProgram,
-  canUseAffiliateListings,
   canUseAdvertising,
   canUseEditProfile,
   showEditOnBanner,
@@ -87,7 +86,6 @@ export function buildProfileNavGroups({
   onPremiumClick,
   onLoyaltyPointsClick,
   onPartnerProgramClick,
-  onAffiliateListingsClick,
   onAdvertisingClick,
   onEditProfileClick,
 }) {
@@ -229,16 +227,6 @@ export function buildProfileNavGroups({
                 tab: "partner-program",
                 label: MY_PROFILE_PAGE_UI.TAB_PARTNER_PROGRAM,
                 onClick: () => selectTab("partner-program", onPartnerProgramClick),
-              },
-            ]
-          : []),
-        ...(canUseAffiliateListings
-          ? [
-              {
-                tab: "affiliate-listings",
-                label: MY_PROFILE_PAGE_UI.TAB_AFFILIATE_LISTINGS,
-                onClick: () =>
-                  selectTab("affiliate-listings", onAffiliateListingsClick),
               },
             ]
           : []),

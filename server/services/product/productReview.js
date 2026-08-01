@@ -108,7 +108,10 @@ export async function getProductReviewSummary({ productId, viewerUserId }) {
   try {
     return await buildProductReviewSummary(viewerUserId, productId);
   } catch (error) {
-    if (error instanceof Error && error.message === PRODUCT_REVIEW_MESSAGES.PRODUCT_NOT_FOUND) {
+    if (
+      error instanceof Error &&
+      error.message === PRODUCT_REVIEW_MESSAGES.PRODUCT_NOT_FOUND
+    ) {
       throw new AppError(404, error.message);
     }
     throw error;

@@ -13,8 +13,11 @@ import { loadUsersLoyaltyRaffleSettings } from "./loadUsersLoyaltyRaffleSettings
  *   month: number;
  * }>}
  */
-export const getMonthlyLoyaltyPointsAwardedSummary = async (referenceDate = new Date()) => {
-  const { startUtc, endUtc, year, month } = resolveMoscowCalendarMonthUtcRange(referenceDate);
+export const getMonthlyLoyaltyPointsAwardedSummary = async (
+  referenceDate = new Date(),
+) => {
+  const { startUtc, endUtc, year, month } =
+    resolveMoscowCalendarMonthUtcRange(referenceDate);
   const settings = await loadUsersLoyaltyRaffleSettings();
 
   const rows = await OrderModel.aggregate([

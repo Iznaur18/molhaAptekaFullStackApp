@@ -10,4 +10,9 @@
   --product-image-modal-main-side: min(15rem, 42vw);
   /** Квадрат области превью в полноэкранном лайтбоксе. */
   --product-image-lightbox-viewport: min(70vmin, 26rem);
+  /**
+   * Hero media: iOS-like squircle (≈22% of side on 1:1).
+   * Prefer % over rem so radius scales with the image frame.
+   */
+  --product-media-hero-squircle-radius: 7%;
 }

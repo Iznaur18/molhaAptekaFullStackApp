@@ -12,8 +12,11 @@ import {
 } from "../../constants/emailVerificationConstants.js";
 import { EMAIL_VERIFICATION_SUBJECT } from "../../constants/smtpConstants.js";
 import { isSmtpConfigured, sendSmtpMail } from "../../utils/smtpMail.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
-const EMAIL_VERIFICATION_CODE_PATTERN = new RegExp(`^\\d{${EMAIL_VERIFICATION_CODE_LENGTH}}$`);
+const EMAIL_VERIFICATION_CODE_PATTERN = new RegExp(
+  `^\\d{${EMAIL_VERIFICATION_CODE_LENGTH}}$`,
+);
 
 /** Высокоэнтропийный токен ссылки: 32 байта hex (см. verifyEmailTokenQuerySchema). */
 const EMAIL_VERIFICATION_LINK_TOKEN_PATTERN = /^[a-f0-9]{64}$/i;
@@ -22,7 +25,12 @@ export const hashEmailVerificationSecret = (rawSecret) =>
   crypto.createHash("sha256").update(String(rawSecret)).digest("hex");
 
 export const generateEmailVerificationCode = () =>
-  String(crypto.randomInt(10 ** (EMAIL_VERIFICATION_CODE_LENGTH - 1), 10 ** EMAIL_VERIFICATION_CODE_LENGTH));
+  String(
+    crypto.randomInt(
+      10 ** (EMAIL_VERIFICATION_CODE_LENGTH - 1),
+      10 ** EMAIL_VERIFICATION_CODE_LENGTH,
+    ),
+  );
 
 /**
  * @param {import('mongoose').Types.ObjectId | string} userId
@@ -165,10 +173,12 @@ export const deliverEmailVerification = async ({ email, userName, code }) => {
     if (isProduction) {
       throw new Error("EMAIL_DELIVERY_UNAVAILABLE");
     }
-    console.info(
-      `[email-verify] Код для ${email}${userName ? ` (${userName})` : ""}:`,
+    logServerEvent("info", {
+      event: "email_verify_dev_code",
+      email,
+      userName: userName ?? null,
       code,
-    );
+    });
     return;
   }
 
@@ -181,13 +191,16 @@ export const deliverEmailVerification = async ({ email, userName, code }) => {
       text,
       html: `<p>${greeting}</p><p>Код подтверждения email:</p><p><strong>${code}</strong></p><p>Код действует 24 часа.</p>`,
     });
-    console.info(`[email-verify] Письмо с кодом отправлено на ${email}`);
+    logServerEvent("info", { event: "email_verify_sent", email });
   } catch (error) {
-    console.error("[email-verify] SMTP send error:", error);
+    logServerEvent("error", {
+      event: "smtp_send",
+      error: error instanceof Error ? error.message : String(error),
+    });
     if (isProduction) {
       throw new Error("EMAIL_DELIVERY_UNAVAILABLE");
     }
-    console.info(`[email-verify] Fallback код для ${email}:`, code);
+    logServerEvent("info", { event: "email_verify_fallback_code", email, code });
   }
 };
 

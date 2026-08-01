@@ -44,9 +44,7 @@ export {
   resolveProductStockQuantityForWrite,
   syncProductCatalogAfterStockChange,
 } from "./productStock.js";
-export {
-  buildProductCatalogSearchQuery,
-} from "./buildProductCatalogSearchQuery.js";
+export { buildProductCatalogSearchQuery } from "./buildProductCatalogSearchQuery.js";
 export {
   countProducts,
   findProductsPage,
@@ -58,22 +56,14 @@ export {
   resolveAcceptedOfferForOrder,
 } from "./productPriceOfferHelpers.js";
 export { closeProductAuction } from "./productAuction.js";
-export {
-  backfillProductCategoryIds,
-} from "./backfillProductCategoryIds.js";
-export {
-  computeProductCategoryNodePaths,
-} from "./computeProductCategoryNodePaths.js";
+export { backfillProductCategoryIds } from "./backfillProductCategoryIds.js";
+export { computeProductCategoryNodePaths } from "./computeProductCategoryNodePaths.js";
 export {
   ensureProductCategoryDisplayForSlug,
   ensureProductCategoryDisplaysForSlugs,
 } from "./ensureProductCategoryDisplayForSlug.js";
-export {
-  normalizeProductCategorySearchKeywords,
-} from "./normalizeProductCategorySearchKeywords.js";
-export {
-  normalizeProductCategoryDefaultCharacteristicKeys,
-} from "./normalizeProductCategoryDefaultCharacteristicKeys.js";
+export { normalizeProductCategorySearchKeywords } from "./normalizeProductCategorySearchKeywords.js";
+export { normalizeProductCategoryDefaultCharacteristicKeys } from "./normalizeProductCategoryDefaultCharacteristicKeys.js";
 export {
   cleanupProductCategoryDisplayForDeletedCategory,
   collectCategoryLegacySlugs,

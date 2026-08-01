@@ -53,30 +53,32 @@ export async function submitSiteHeaderBannerCampaign({ userId, body }) {
   const reservedAt = new Date();
 
   try {
-    const { campaign, loyaltyPointsBalance } = await runInTransaction(async (session) => {
-      await assertNoOpenSiteHeaderBannerCampaignForAdvertiser(userId, session);
+    const { campaign, loyaltyPointsBalance } = await runInTransaction(
+      async (session) => {
+        await assertNoOpenSiteHeaderBannerCampaignForAdvertiser(userId, session);
 
-      const loyaltyPointsBalance = await reserveLoyaltyPoints({
-        userId,
-        amount: SITE_HEADER_BANNER_CAMPAIGN_PRICE_POINTS,
-        session,
-      });
+        const loyaltyPointsBalance = await reserveLoyaltyPoints({
+          userId,
+          amount: SITE_HEADER_BANNER_CAMPAIGN_PRICE_POINTS,
+          session,
+        });
 
-      const [campaign] = await SiteHeaderBannerCampaignModel.create(
-        [
-          {
-            advertiserId: userId,
-            status: SITE_HEADER_BANNER_CAMPAIGN_STATUS_PENDING,
-            ...payload,
-            amountPoints: SITE_HEADER_BANNER_CAMPAIGN_PRICE_POINTS,
-            pointsReservedAt: reservedAt,
-          },
-        ],
-        withMongoSession({}, session),
-      );
+        const [campaign] = await SiteHeaderBannerCampaignModel.create(
+          [
+            {
+              advertiserId: userId,
+              status: SITE_HEADER_BANNER_CAMPAIGN_STATUS_PENDING,
+              ...payload,
+              amountPoints: SITE_HEADER_BANNER_CAMPAIGN_PRICE_POINTS,
+              pointsReservedAt: reservedAt,
+            },
+          ],
+          withMongoSession({}, session),
+        );
 
-      return { campaign, loyaltyPointsBalance };
-    });
+        return { campaign, loyaltyPointsBalance };
+      },
+    );
 
     return {
       message: "Заявка отправлена на модерацию. Баллы зарезервированы.",

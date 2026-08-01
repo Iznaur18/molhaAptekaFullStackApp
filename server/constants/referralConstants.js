@@ -14,8 +14,7 @@ export const REFERRAL_SOURCE_KIND_PREMIUM = "premium";
 export const REFERRAL_SOURCE_KIND_PRODUCT_PROMOTION = "product_promotion";
 export const REFERRAL_SOURCE_KIND_INTRO_AD = "intro_ad";
 export const REFERRAL_SOURCE_KIND_SITE_HEADER_BANNER = "site_header_banner";
-export const REFERRAL_SOURCE_KIND_SELLER_PERSONAL_CATEGORY =
-  "seller_personal_category";
+export const REFERRAL_SOURCE_KIND_SELLER_PERSONAL_CATEGORY = "seller_personal_category";
 export const REFERRAL_SOURCE_KIND_RAFFLE_CREATE_UNLOCK = "raffle_create_unlock";
 export const REFERRAL_SOURCE_KIND_CONVERSION = "conversion";
 
@@ -39,14 +38,13 @@ export const REFERRAL_LEDGER_ENTRY_TYPES = [
   REFERRAL_LEDGER_ENTRY_CONVERSION,
 ];
 
-export const IN_APP_NOTIFICATION_KIND_REFERRAL_CASHBACK =
-  "referral_cashback_credited";
+export const IN_APP_NOTIFICATION_KIND_REFERRAL_CASHBACK = "referral_cashback_credited";
 
 export const IN_APP_NOTIFICATION_MESSAGE_REFERRAL_CASHBACK = (amount) =>
-  `Партнёрский кэшбэк: +${amount} на партнёрский баланс`;
+  `Партнёрский кэшбэк: +${amount} баллов лояльности`;
 
 export const REFERRAL_QUERY_PARAM = "ref";
 
 export const REFERRAL_INVALID_CODE_MESSAGE = "Некорректный реферальный код";
 export const REFERRAL_INSUFFICIENT_BALANCE_MESSAGE =
-  "Недостаточно средств на партнёрском балансе";
+  "Недостаточно свободных баллов лояльности для отката партнёрского кэшбэка";

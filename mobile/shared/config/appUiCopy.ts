@@ -21,6 +21,7 @@ export const API_CLIENT_UI = {
   FETCH_CATEGORY_DISPLAYS_FALLBACK: "Не удалось загрузить категории",
   FETCH_CATALOG_FEED_DISPLAYS_FALLBACK: "Не удалось загрузить подборки каталога",
   FETCH_MANAGE_TOGGLE_DISPLAYS_FALLBACK: "Не удалось загрузить оформление кнопок",
+  FETCH_BADGE_EXPLAINS_FALLBACK: "Не удалось загрузить описания бейджей",
   PATCH_MANAGE_TOGGLE_DISPLAY_FALLBACK: "Не удалось сохранить оформление кнопки",
   PATCH_CATEGORY_DISPLAY_FALLBACK: "Не удалось сохранить категорию",
   PATCH_CATALOG_FEED_DISPLAY_FALLBACK: "Не удалось сохранить подборку",
@@ -373,7 +374,11 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   ORIGINAL_BADGE_ARIA: "Оригинальный товар",
   AFFILIATE_BADGE: (percent: number) => `Партнёрам ${percent}%`,
   AFFILIATE_SHARE: "Поделиться и заработать",
+  AFFILIATE_SHARE_TITLE: "Поделиться",
+  AFFILIATE_SHARE_SUBTITLE: (percent: number) => `Заработать ${percent}% с покупки`,
   AFFILIATE_SHARE_LOGIN: "Войдите, чтобы делиться",
+  AFFILIATE_SHARE_LOGIN_TITLE: "Войдите, чтобы делиться",
+  AFFILIATE_SHARE_LOGIN_SUBTITLE: "Зарабатывайте на рекомендациях",
   AFFILIATE_SHARE_COPIED: "Ссылка скопирована",
   AFFILIATE_SHARE_FAILED: "Не удалось скопировать ссылку",
   AFFILIATE_PERCENT_HINT:
@@ -499,6 +504,7 @@ export const PRODUCT_SELLER_PREVIEW_UI = {
   SECTION_LABEL: "Продавец",
   OPEN_PROFILE_ARIA: "Открыть профиль продавца",
   LISTED_PRODUCTS_LABEL: "Товаров в продаже",
+  PROFILE_CTA: "Смотреть профиль",
   PREMIUM_LABEL: "Премиум",
 } as const;
 
@@ -696,6 +702,9 @@ export const RAFFLE_FEATURED_CAROUSEL_UI = {
 
 export const RAFFLE_FEATURED_BANNER_UI = {
   BADGE: "Розыгрыш",
+  DETAILS_TEASER_TITLE: "Розыгрыш",
+  DETAILS_TEASER_SUBTITLE: "Забери главный приз",
+  DETAILS_TEASER_ARIA: "Открыть розыгрыш",
   PROGRESS: (progress: number, target: number) => `${progress} / ${target} продаж`,
   REMAINING: (left: number) => `Осталось ${left}`,
   STAT_GOAL: "Цель",
@@ -2052,29 +2061,21 @@ export const PARTNER_PROGRAM_PAGE_UI = {
   LOGIN_BUTTON: "Войти",
   LOADING: "Загрузка…",
   LOAD_ERROR: "Не удалось загрузить партнёрскую программу",
-  BALANCE_CAPTION: "Партнёрский баланс",
-  BALANCE_UNIT: "ед.",
   INFO: (percent: number) =>
-    `${percent}% от трат приглашённых на услуги платформы. Конвертация в баллы 1:1.`,
+    `${percent}% от трат приглашённых на услуги платформы. Кэшбэк сразу начисляется баллами лояльности.`,
   STATS_TITLE: "Сводка",
   STAT_REFERRALS: "Рефералы",
   STAT_SPEND: "Их траты",
   STAT_EARNED: "Ваш кэшбэк",
   INVITE_TITLE: "Ваша ссылка",
-  INVITE_HINT: "Отправьте друзьям — кэшбэк начисляется с их трат на услуги платформы.",
+  INVITE_HINT:
+    "Отправьте друзьям — кэшбэк с их трат на услуги платформы сразу падает на ваши баллы.",
   COPY_BUTTON: "Копировать",
   SHARE_BUTTON: "Поделиться",
   SHARE_COPIED: "Ссылка скопирована — вставьте в мессенджер",
   SHARE_FAILED: "Не удалось поделиться",
   COPIED: "Ссылка скопирована",
   COPY_FAILED: "Не удалось скопировать",
-  CONVERT_SECTION: "Конвертация в баллы",
-  CONVERT_LABEL: "Сумма",
-  CONVERT_HINT: "1 партнёрская единица = 1 балл лояльности. Вывод наличными недоступен.",
-  CONVERT_BUTTON: "Конвертировать",
-  CONVERT_PENDING: "Конвертируем…",
-  CONVERT_SUCCESS: "Готово: баланс конвертирован в баллы",
-  CONVERT_ERROR: "Не удалось конвертировать",
   LIST_TITLE: "Ваши рефералы",
   LIST_EMPTY: "Пока никого нет — поделитесь ссылкой",
   COL_DATE: "Регистрация",
@@ -2462,6 +2463,37 @@ export const PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN_UI = {
   SAVED: "Сохранено",
   SAVE_ERROR: "Не удалось сохранить",
   RESET_IMAGE: "Сбросить картинку",
+} as const;
+
+/** Описания бейджей в деталях товара (CMS + sheet). */
+export const PRODUCT_BADGE_EXPLAIN_UI = {
+  CLOSE: "Понятно",
+  ARIA_DIALOG: "Описание бейджа",
+  FALLBACK: {
+    original:
+      "Продавец отметил товар как оригинал. Это заявление продавца, а не проверка площадки.",
+    raffle:
+      "Товар участвует в розыгрыше продавца. Правила и приз смотрите в карточке розыгрыша на главной.",
+    affiliate:
+      "По этому товару доступна партнёрская комиссия. Процент указан на бейдже.",
+    listing_origin_own:
+      "Продавец указал, что продаёт собственную вещь, а не товар для перепродажи.",
+    listing_origin_resale:
+      "Продавец указал, что товар приобретён для перепродажи.",
+    listing_origin_manufacturer:
+      "Продавец указал, что является производителем этого товара.",
+    listing_origin_unspecified:
+      "Продавец не указал статус происхождения товара.",
+    price_market_above:
+      "По оценке продавца цена выше типичной рыночной стоимости.",
+    price_market_at:
+      "По оценке продавца цена соответствует рыночной стоимости.",
+    price_market_below:
+      "По оценке продавца цена ниже типичной рыночной стоимости.",
+    discount: "На товар действует скидка относительно старой цены.",
+    loyalty:
+      "За покупку можно получить баллы лояльности. Баллы даёт продавец; получает подтверждённый покупатель.",
+  },
 } as const;
 
 export const SITE_HEADER_BANNER_ADMIN_PAGE_UI = {

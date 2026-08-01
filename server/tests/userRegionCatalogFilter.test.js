@@ -65,10 +65,7 @@ describe("userRegionCatalogFilter", () => {
     const branches = stage.$addFields._regionSortPriority.$switch.branches;
     assert.equal(branches[0].then, 0);
     assert.equal(branches[0].case.$eq[1], "RU-MOW");
-    assert.equal(
-      branches[branches.length - 1].then,
-      CATALOG_REGION_SORT_EMPTY,
-    );
+    assert.equal(branches[branches.length - 1].then, CATALOG_REGION_SORT_EMPTY);
     assert.equal(
       stage.$addFields._regionSortPriority.$switch.default,
       CATALOG_REGION_SORT_OTHER,

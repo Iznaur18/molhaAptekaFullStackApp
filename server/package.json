@@ -50,7 +50,7 @@
     "ffmpeg-static": "^5.2.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.1.5",
+    "mongoose": "^9.9.1",
     "multer": "^2.0.2",
     "nodemailer": "^9.0.3",
     "rate-limit-redis": "^4.2.0",

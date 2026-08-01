@@ -36,10 +36,7 @@ import {
 } from "../affiliate/resolveAffiliateAttribution.js";
 
 const calculateTotalAmount = (items) =>
-  items.reduce(
-    (sum, item) => sum + (item.unitPriceAtOrder ?? 0) * item.quantity,
-    0,
-  );
+  items.reduce((sum, item) => sum + (item.unitPriceAtOrder ?? 0) * item.quantity, 0);
 
 /**
  * @param {Array<{ productId: unknown; quantity: number }>} items
@@ -223,10 +220,7 @@ export async function createOrder({
 
   if (priceOfferId) {
     if (items.length !== 1 || items[0].quantity !== 1) {
-      throw new AppError(
-        400,
-        "Заказ по предложению цены — одна позиция, количество 1",
-      );
+      throw new AppError(400, "Заказ по предложению цены — одна позиция, количество 1");
     }
 
     const productId = String(items[0].productId);
@@ -275,8 +269,7 @@ export async function createOrder({
     try {
       await assertOrderItemsWithinAvailableStock(items, userId);
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Нельзя оформить заказ";
+      const message = error instanceof Error ? error.message : "Нельзя оформить заказ";
       throw new AppError(400, message);
     }
 

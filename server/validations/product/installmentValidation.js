@@ -44,7 +44,9 @@ export const installmentSellerMessageValidation = [
   validateBodyZod(installmentSellerMessageBodySchema),
 ];
 
-export const installmentDisputeValidation = [validateBodyZod(installmentDisputeBodySchema)];
+export const installmentDisputeValidation = [
+  validateBodyZod(installmentDisputeBodySchema),
+];
 
 export const resolveInstallmentDisputeValidation = [
   validateBodyZod(resolveInstallmentDisputeBodySchema),
@@ -54,4 +56,6 @@ export const installmentDisputeIdParamValidation = [
   validateParamsZod(installmentDisputeIdParamsSchema),
 ];
 
-export const installmentCancelValidation = [validateBodyZod(installmentCancelBodySchema)];
+export const installmentCancelValidation = [
+  validateBodyZod(installmentCancelBodySchema),
+];

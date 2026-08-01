@@ -29,6 +29,7 @@ import { up as removeFurnitureFiguresCategoriesUp } from "./20260617-remove-furn
 import { up as approvePendingInstallmentProgramsUp } from "./20260714-approve-pending-installment-programs.js";
 import { up as backfillRegionCodesUp } from "./20260725-backfill-region-codes.js";
 import { up as curatedListRegionCodeUp } from "./20260728-curated-list-region-code.js";
+import { up as partnerBalanceToLoyaltyUp } from "./20260801-partner-balance-to-loyalty.js";
 
 export const MIGRATIONS = [
   {
@@ -173,7 +174,8 @@ export const MIGRATIONS = [
   },
   {
     id: "20260714-approve-pending-installment-programs",
-    description: "Auto-approve pending product installment programs (staff queue removed)",
+    description:
+      "Auto-approve pending product installment programs (staff queue removed)",
     up: approvePendingInstallmentProgramsUp,
   },
   {
@@ -185,5 +187,10 @@ export const MIGRATIONS = [
     id: "20260728-curated-list-region-code",
     description: "Backfill CuratedProductList.regionCode to Moscow (RU-MOW)",
     up: curatedListRegionCodeUp,
+  },
+  {
+    id: "20260801-partner-balance-to-loyalty",
+    description: "Migrate partnerBalance → userLoyaltyPoints 1:1",
+    up: partnerBalanceToLoyaltyUp,
   },
 ];

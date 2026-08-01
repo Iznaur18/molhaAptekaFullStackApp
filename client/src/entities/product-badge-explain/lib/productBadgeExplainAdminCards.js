@@ -1,0 +1,65 @@
+import {
+  PRODUCT_BADGE_EXPLAIN_ADMIN_UI,
+  PRODUCT_CARD_UI,
+  PRODUCT_DETAILS_MODAL_UI,
+  CREATE_PRODUCT_MODAL_UI,
+} from "../../../shared/config/appUiCopy.js";
+
+/** @type {readonly { badgeKey: string; title: string; hint: string }[]} */
+export const PRODUCT_BADGE_EXPLAIN_ADMIN_CARDS = [
+  {
+    badgeKey: "original",
+    title: PRODUCT_DETAILS_MODAL_UI.ORIGINAL_BADGE,
+    hint: PRODUCT_BADGE_EXPLAIN_ADMIN_UI.HINT_ORIGINAL,
+  },
+  {
+    badgeKey: "raffle",
+    title: PRODUCT_CARD_UI.RAFFLE_BADGE,
+    hint: PRODUCT_BADGE_EXPLAIN_ADMIN_UI.HINT_RAFFLE,
+  },
+  {
+    badgeKey: "affiliate",
+    title: PRODUCT_BADGE_EXPLAIN_ADMIN_UI.TITLE_AFFILIATE,
+    hint: PRODUCT_BADGE_EXPLAIN_ADMIN_UI.HINT_AFFILIATE,
+  },
+  {
+    badgeKey: "listing_origin_own",
+    title: CREATE_PRODUCT_MODAL_UI.LISTING_ORIGIN_OWN,
+    hint: PRODUCT_BADGE_EXPLAIN_ADMIN_UI.HINT_LISTING_ORIGIN,
+  },
+  {
+    badgeKey: "listing_origin_resale",
+    title: CREATE_PRODUCT_MODAL_UI.LISTING_ORIGIN_RESALE,
+    hint: PRODUCT_BADGE_EXPLAIN_ADMIN_UI.HINT_LISTING_ORIGIN,
+  },
+  {
+    badgeKey: "listing_origin_manufacturer",
+    title: CREATE_PRODUCT_MODAL_UI.LISTING_ORIGIN_MANUFACTURER,
+    hint: PRODUCT_BADGE_EXPLAIN_ADMIN_UI.HINT_LISTING_ORIGIN,
+  },
+  {
+    badgeKey: "price_market_above",
+    title: PRODUCT_DETAILS_MODAL_UI.PRICE_MARKET_STATUS_ABOVE,
+    hint: PRODUCT_BADGE_EXPLAIN_ADMIN_UI.HINT_PRICE_MARKET,
+  },
+  {
+    badgeKey: "price_market_at",
+    title: PRODUCT_DETAILS_MODAL_UI.PRICE_MARKET_STATUS_AT,
+    hint: PRODUCT_BADGE_EXPLAIN_ADMIN_UI.HINT_PRICE_MARKET,
+  },
+  {
+    badgeKey: "price_market_below",
+    title: PRODUCT_DETAILS_MODAL_UI.PRICE_MARKET_STATUS_BELOW,
+    hint: PRODUCT_BADGE_EXPLAIN_ADMIN_UI.HINT_PRICE_MARKET,
+  },
+  {
+    badgeKey: "discount",
+    title: PRODUCT_BADGE_EXPLAIN_ADMIN_UI.TITLE_DISCOUNT,
+    hint: PRODUCT_BADGE_EXPLAIN_ADMIN_UI.HINT_DISCOUNT,
+  },
+  {
+    badgeKey: "loyalty",
+    title: PRODUCT_BADGE_EXPLAIN_ADMIN_UI.TITLE_LOYALTY,
+    hint: PRODUCT_BADGE_EXPLAIN_ADMIN_UI.HINT_LOYALTY,
+  },
+];

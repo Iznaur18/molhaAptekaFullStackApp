@@ -200,7 +200,9 @@ test("auth mobile: tokens in JSON, bearer me, refresh by body", async () => {
   });
   assert.equal(session.email, "smoke-mobile@example.com");
   assert.ok(typeof session.accessToken === "string" && session.accessToken.length > 20);
-  assert.ok(typeof session.refreshToken === "string" && session.refreshToken.length > 20);
+  assert.ok(
+    typeof session.refreshToken === "string" && session.refreshToken.length > 20,
+  );
 
   const meData = await parseSuccessData(
     await request("/auth/me", {

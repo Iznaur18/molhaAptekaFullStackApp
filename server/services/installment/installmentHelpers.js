@@ -938,9 +938,7 @@ export const countInstallmentBuyerActionItems = async (buyerUserId) => {
 
   const orderIds = [
     ...new Set(
-      contracts
-        .map((row) => (row.orderId ? String(row.orderId) : ""))
-        .filter(Boolean),
+      contracts.map((row) => (row.orderId ? String(row.orderId) : "")).filter(Boolean),
     ),
   ];
   const orders =
@@ -953,9 +951,7 @@ export const countInstallmentBuyerActionItems = async (buyerUserId) => {
 
   let count = 0;
   for (const contract of contracts) {
-    const order = contract.orderId
-      ? orderById.get(String(contract.orderId))
-      : null;
+    const order = contract.orderId ? orderById.get(String(contract.orderId)) : null;
     if (!isInstallmentOrderAcceptedBySeller(order)) {
       continue;
     }
@@ -981,9 +977,7 @@ export const countInstallmentSellerActionItems = async (sellerUserId) => {
 
   const orderIds = [
     ...new Set(
-      contracts
-        .map((row) => (row.orderId ? String(row.orderId) : ""))
-        .filter(Boolean),
+      contracts.map((row) => (row.orderId ? String(row.orderId) : "")).filter(Boolean),
     ),
   ];
   const orders =
@@ -996,9 +990,7 @@ export const countInstallmentSellerActionItems = async (sellerUserId) => {
 
   let count = 0;
   for (const contract of contracts) {
-    const order = contract.orderId
-      ? orderById.get(String(contract.orderId))
-      : null;
+    const order = contract.orderId ? orderById.get(String(contract.orderId)) : null;
     if (!isInstallmentOrderAcceptedBySeller(order)) {
       continue;
     }

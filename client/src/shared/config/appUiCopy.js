@@ -178,6 +178,8 @@ export const API_CLIENT_UI = {
   PATCH_CATALOG_FEED_DISPLAY_FALLBACK: "Не удалось сохранить подборку",
   FETCH_MANAGE_TOGGLE_DISPLAYS_FALLBACK: "Не удалось загрузить оформление кнопок",
   PATCH_MANAGE_TOGGLE_DISPLAY_FALLBACK: "Не удалось сохранить оформление кнопки",
+  FETCH_BADGE_EXPLAINS_FALLBACK: "Не удалось загрузить описания бейджей",
+  PATCH_BADGE_EXPLAIN_FALLBACK: "Не удалось сохранить описание бейджа",
   PAUSE_RAFFLE_FALLBACK: "Не удалось снять розыгрыш с витрины",
   SET_RAFFLE_PARTICIPATION_FALLBACK: "Не удалось обновить участие в розыгрыше",
   FETCH_RAFFLES_QUEUE_FALLBACK: "Не удалось загрузить очередь розыгрышей",
@@ -1813,7 +1815,11 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   ORIGINAL_BADGE_ARIA: "Оригинальный товар",
   AFFILIATE_BADGE: (percent) => `Партнёрам ${percent}%`,
   AFFILIATE_SHARE: "Поделиться и заработать",
+  AFFILIATE_SHARE_TITLE: "Поделиться",
+  AFFILIATE_SHARE_SUBTITLE: (percent) => `Заработать ${percent}% с покупки`,
   AFFILIATE_SHARE_LOGIN: "Войдите, чтобы делиться",
+  AFFILIATE_SHARE_LOGIN_TITLE: "Войдите, чтобы делиться",
+  AFFILIATE_SHARE_LOGIN_SUBTITLE: "Зарабатывайте на рекомендациях",
   AFFILIATE_SHARE_COPIED: "Ссылка скопирована",
   AFFILIATE_SHARE_FAILED: "Не удалось скопировать ссылку",
   AFFILIATE_PERCENT_HINT:
@@ -1840,6 +1846,7 @@ export const PRODUCT_SELLER_PREVIEW_UI = {
   SECTION_LABEL: "Продавец",
   OPEN_PROFILE_ARIA: "Открыть профиль продавца",
   LISTED_PRODUCTS_LABEL: "Товаров в продаже",
+  PROFILE_CTA: "Смотреть профиль",
   PREMIUM_LABEL: "Премиум",
 };
 
@@ -2203,6 +2210,9 @@ export const RAFFLE_FEATURED_CAROUSEL_UI = {
 
 export const RAFFLE_FEATURED_BANNER_UI = {
   BADGE: "Розыгрыш",
+  DETAILS_TEASER_TITLE: "Розыгрыш",
+  DETAILS_TEASER_SUBTITLE: "Забери главный приз",
+  DETAILS_TEASER_ARIA: "Открыть розыгрыш",
   /** @param {number} progress @param {number} target */
   PROGRESS: (progress, target) => `${progress} / ${target} продаж`,
   REMAINING: (left) => `Осталось ${left}`,
@@ -2565,17 +2575,16 @@ export const PARTNER_PROGRAM_PAGE_UI = {
   LOGIN_BUTTON: "Войти",
   LOADING: "Загрузка…",
   LOAD_ERROR: "Не удалось загрузить партнёрскую программу",
-  BALANCE_CAPTION: "Партнёрский баланс",
-  BALANCE_UNIT: "ед.",
   /** @param {number} percent */
   INFO: (percent) =>
-    `${percent}% от трат приглашённых на услуги платформы. Конвертация в баллы 1:1.`,
+    `${percent}% от трат приглашённых на услуги платформы. Кэшбэк сразу начисляется баллами лояльности.`,
   STATS_TITLE: "Сводка",
   STAT_REFERRALS: "Рефералы",
   STAT_SPEND: "Их траты",
   STAT_EARNED: "Ваш кэшбэк",
   INVITE_TITLE: "Ваша ссылка",
-  INVITE_HINT: "Отправьте друзьям — кэшбэк начисляется с их трат на услуги платформы.",
+  INVITE_HINT:
+    "Отправьте друзьям — кэшбэк с их трат на услуги платформы сразу падает на ваши баллы.",
   COPY_BUTTON: "Копировать",
   SHARE_BUTTON: "Поделиться",
   COPIED: "Ссылка скопирована",
@@ -2583,13 +2592,6 @@ export const PARTNER_PROGRAM_PAGE_UI = {
   SHARE_COPIED: "Ссылка скопирована — вставьте в мессенджер",
   COPY_FAILED: "Не удалось скопировать",
   SHARE_FAILED: "Не удалось поделиться",
-  CONVERT_SECTION: "Конвертация в баллы",
-  CONVERT_LABEL: "Сумма",
-  CONVERT_HINT: "1 партнёрская единица = 1 балл лояльности. Вывод наличными недоступен.",
-  CONVERT_BUTTON: "Конвертировать",
-  CONVERT_PENDING: "Конвертируем…",
-  CONVERT_SUCCESS: "Готово: баланс конвертирован в баллы",
-  CONVERT_ERROR: "Не удалось конвертировать",
   LIST_TITLE: "Ваши рефералы",
   LIST_EMPTY: "Пока никого нет — поделитесь ссылкой",
   COL_NAME: "Ник",
@@ -3020,6 +3022,7 @@ export const SITE_HEADER_BANNER_ADMIN_PAGE_UI = {
   TAB_SLIDES: "Слайды",
   TAB_BUTTONS: "Кнопки",
   TAB_GUEST: "Профиль гостя",
+  TAB_BADGES: "Бейджи товара",
   SECTION_GLOBAL: "Общие настройки",
   SECTION_ITEMS: "Слайды",
   LABEL_ENABLED: "Показывать баннеры на главной",
@@ -3062,6 +3065,66 @@ export const PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN_UI = {
   SAVED: "Сохранено",
   SAVE_ERROR: "Не удалось сохранить",
   RESET_IMAGE: "Сбросить картинку",
+};
+
+/** Описания бейджей в деталях товара (CMS + sheet). */
+export const PRODUCT_BADGE_EXPLAIN_UI = {
+  CLOSE: "Понятно",
+  ARIA_DIALOG: "Описание бейджа",
+  FALLBACK: {
+    original:
+      "Продавец отметил товар как оригинал. Это заявление продавца, а не проверка площадки.",
+    raffle:
+      "Товар участвует в розыгрыше продавца. Правила и приз смотрите в карточке розыгрыша на главной.",
+    affiliate:
+      "По этому товару доступна партнёрская комиссия. Процент указан на бейдже.",
+    listing_origin_own:
+      "Продавец указал, что продаёт собственную вещь, а не товар для перепродажи.",
+    listing_origin_resale:
+      "Продавец указал, что товар приобретён для перепродажи.",
+    listing_origin_manufacturer:
+      "Продавец указал, что является производителем этого товара.",
+    listing_origin_unspecified:
+      "Продавец не указал статус происхождения товара.",
+    price_market_above:
+      "По оценке продавца цена выше типичной рыночной стоимости.",
+    price_market_at:
+      "По оценке продавца цена соответствует рыночной стоимости.",
+    price_market_below:
+      "По оценке продавца цена ниже типичной рыночной стоимости.",
+    discount: "На товар действует скидка относительно старой цены.",
+    loyalty:
+      "За покупку можно получить баллы лояльности. Баллы даёт продавец; получает подтверждённый покупатель.",
+  },
+};
+
+export const PRODUCT_BADGE_EXPLAIN_ADMIN_PAGE_UI = {
+  TITLE: "Бейджи товара",
+  HINT: "Картинка и текст для окна при нажатии на бейдж в деталях товара. Заголовок окна = текст бейджа на товаре.",
+  LOADING: "Загрузка…",
+  LOAD_ERROR: "Не удалось загрузить описания бейджей",
+};
+
+export const PRODUCT_BADGE_EXPLAIN_ADMIN_UI = {
+  LABEL_IMAGE: "Картинка в окне",
+  LABEL_DESCRIPTION: "Описание",
+  DESCRIPTION_PLACEHOLDER: "Текст для покупателя…",
+  SAVE: "Сохранить",
+  SAVING: "Сохранение…",
+  SAVED: "Сохранено",
+  SAVE_ERROR: "Не удалось сохранить",
+  RESET_IMAGE: "Сбросить картинку",
+  RESET_DESCRIPTION: "Сбросить текст",
+  TITLE_AFFILIATE: "Партнёрам",
+  TITLE_DISCOUNT: "Скидка",
+  TITLE_LOYALTY: "Баллы лояльности",
+  HINT_ORIGINAL: "Бейдж «Оригинал».",
+  HINT_RAFFLE: "Бейдж «Розыгрыш».",
+  HINT_AFFILIATE: "Бейдж «Партнёрам N%». Процент только в заголовке окна.",
+  HINT_LISTING_ORIGIN: "Статус происхождения товара.",
+  HINT_PRICE_MARKET: "Оценка цены относительно рынка.",
+  HINT_DISCOUNT: "Бейдж скидки у цены.",
+  HINT_LOYALTY: "Бейдж баллов у цены.",
 };
 
 /**

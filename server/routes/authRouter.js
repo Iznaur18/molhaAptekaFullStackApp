@@ -80,7 +80,12 @@ router.post(
 );
 router.post("/login", authRateLimiter, loginUserValidation, loginUserController);
 router.post("/logout", logoutUserController);
-router.post("/refresh", refreshAuthRateLimiter, refreshAuthValidation, refreshAuthController);
+router.post(
+  "/refresh",
+  refreshAuthRateLimiter,
+  refreshAuthValidation,
+  refreshAuthController,
+);
 router.get("/verify-email", verifyEmailTokenValidation, verifyEmailController);
 router.post(
   "/verify-email",

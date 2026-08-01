@@ -32,6 +32,7 @@ import {
 import { buildOrderStatusFromItems } from "./orderStatus.js";
 
 import { clearBuyerPassportShareOnOrder } from "./buyerPassportShare.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 import {
   assertSellerOwnsOrderItem,
   getPopulatedOrderItemOrThrow,
@@ -48,13 +49,25 @@ const runConfirmItemSideEffects = async (order, targetItem, productId) => {
   try {
     await syncProductCatalogAfterStockChange(productId);
   } catch (stockSyncError) {
-    console.error("syncProductCatalogAfterStockChange error:", stockSyncError);
+    logServerEvent("error", {
+      event: "syncproductcatalogafterstockchange",
+      error:
+        stockSyncError instanceof Error
+          ? stockSyncError.message
+          : String(stockSyncError),
+    });
   }
 
   try {
     await syncRaffleProgressForProductSale(productId);
   } catch (raffleSyncError) {
-    console.error("syncRaffleProgressForProductSale error:", raffleSyncError);
+    logServerEvent("error", {
+      event: "syncraffleprogressforproductsale",
+      error:
+        raffleSyncError instanceof Error
+          ? raffleSyncError.message
+          : String(raffleSyncError),
+    });
   }
 
   try {
@@ -63,12 +76,17 @@ const runConfirmItemSideEffects = async (order, targetItem, productId) => {
       return;
     }
 
-    const productDoc = typeof targetItem.productId === "object" ? targetItem.productId : null;
+    const productDoc =
+      typeof targetItem.productId === "object" ? targetItem.productId : null;
     if (productDoc?.productAuctionEnabled === true) {
       await closeProductAuction(productId, { markCompletedOnce: true });
     }
   } catch (finalizeError) {
-    console.error("finalizeOffersAfterOrderConfirmed error:", finalizeError);
+    logServerEvent("error", {
+      event: "finalizeoffersafterorderconfirmed",
+      error:
+        finalizeError instanceof Error ? finalizeError.message : String(finalizeError),
+    });
   }
 };
 
@@ -147,20 +165,14 @@ export async function markOrderItemCancelled({
   }
 
   if (targetItem.status !== ORDER_STATUS_PENDING) {
-    throw new AppError(
-      409,
-      'Позицию можно отменить только из статуса "В обработке"',
-    );
+    throw new AppError(409, 'Позицию можно отменить только из статуса "В обработке"');
   }
 
   // Рассрочный заказ: отмена buyer ИЛИ seller должна гасить и Order, и InstallmentContract.
   // Раньше seller-cancel через Order оставлял контракт pending/active → «призраки» в списках рассрочки.
   if (order.installmentContractId) {
-    const defaultReason = isBuyer
-      ? "Отменено покупателем"
-      : "Отменено продавцом";
-    const cancellationReason =
-      String(reason ?? defaultReason).trim() || defaultReason;
+    const defaultReason = isBuyer ? "Отменено покупателем" : "Отменено продавцом";
+    const cancellationReason = String(reason ?? defaultReason).trim() || defaultReason;
 
     await runInTransaction(async (session) => {
       const contract = await InstallmentContractModel.findById(
@@ -248,10 +260,7 @@ export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, use
   const targetItem = getPopulatedOrderItemOrThrow(order, itemIndex);
 
   if (targetItem.status !== ORDER_STATUS_DELIVERED) {
-    throw new AppError(
-      409,
-      'Подтверждение доступно только для статуса "Доставлен"',
-    );
+    throw new AppError(409, 'Подтверждение доступно только для статуса "Доставлен"');
   }
 
   if (targetItem.loyaltyPointsAwarded) {
@@ -326,7 +335,11 @@ export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, use
       await order.save({ session });
 
       if (productId) {
-        await decrementProductStockOnItemConfirmed(productId, targetItem.quantity, session);
+        await decrementProductStockOnItemConfirmed(
+          productId,
+          targetItem.quantity,
+          session,
+        );
       }
 
       return { earned, affiliateResult };
@@ -337,7 +350,10 @@ export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, use
     if (txError instanceof AppError) {
       throw txError;
     }
-    console.error("confirmOrderItemByBuyer transaction error:", txError);
+    logServerEvent("error", {
+      event: "confirmorderitembybuyer_transaction",
+      error: txError instanceof Error ? txError.message : String(txError),
+    });
     throw new AppError(
       409,
       "Не удалось начислить баллы: у продавца недостаточно замороженных баллов",

@@ -4,8 +4,7 @@
  * @param {{ isProduction?: boolean }} [options]
  */
 export function buildApiHelmetOptions(options = {}) {
-  const isProduction =
-    options.isProduction ?? process.env.NODE_ENV === "production";
+  const isProduction = options.isProduction ?? process.env.NODE_ENV === "production";
 
   return {
     contentSecurityPolicy: false,

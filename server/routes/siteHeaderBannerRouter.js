@@ -11,7 +11,12 @@ import { patchSiteHeaderBannerSettingsValidation } from "../validations/siteHead
 const router = createAsyncRouter();
 
 router.get("/", getSiteHeaderBannerSlidesController);
-router.get("/settings", checkAuthMW, checkProductModeratorMW, getSiteHeaderBannerSettingsController);
+router.get(
+  "/settings",
+  checkAuthMW,
+  checkProductModeratorMW,
+  getSiteHeaderBannerSettingsController,
+);
 router.patch(
   "/settings",
   checkAuthMW,

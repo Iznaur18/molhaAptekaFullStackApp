@@ -1,12 +1,12 @@
-import { RAFFLE_CREATE_PRICE_POINTS, RAFFLE_STATUS_PENDING_STAFF } from "../../constants/raffleConstants.js";
+import {
+  RAFFLE_CREATE_PRICE_POINTS,
+  RAFFLE_STATUS_PENDING_STAFF,
+} from "../../constants/raffleConstants.js";
 import { AppError } from "../../errors/AppError.js";
 import { RaffleModel } from "../../models/index.js";
 import { runInTransaction } from "../../utils/mongoTransaction.js";
 import { normalizeStoredUploadUrl } from "../upload/buildPublicUploadUrl.js";
-import {
-  assertSellerCanCreateRaffle,
-  toPublicRafflePayload,
-} from "./raffleHelpers.js";
+import { assertSellerCanCreateRaffle, toPublicRafflePayload } from "./raffleHelpers.js";
 import { normalizeRafflePrizeImageFocus } from "../user/profileImageFocus.js";
 import { normalizePrizeMediaType } from "./rafflePrizeMedia.js";
 import { consumeRaffleCreateUnlock } from "./raffleCreateAccess.js";
@@ -35,8 +35,12 @@ export async function createRaffle({ sellerId, body }) {
           title: String(body.title).trim(),
           description: String(body.description ?? "").trim(),
           prizeMediaType,
-          prizeImageUrl: normalizeStoredUploadUrl(String(body.prizeImageUrl ?? "").trim()),
-          prizeVideoUrl: normalizeStoredUploadUrl(String(body.prizeVideoUrl ?? "").trim()),
+          prizeImageUrl: normalizeStoredUploadUrl(
+            String(body.prizeImageUrl ?? "").trim(),
+          ),
+          prizeVideoUrl: normalizeStoredUploadUrl(
+            String(body.prizeVideoUrl ?? "").trim(),
+          ),
           prizeImageFocus: normalizeRafflePrizeImageFocus(body.prizeImageFocus),
           targetSales: Number(body.targetSales),
           instagramUrl: String(body.instagramUrl).trim(),

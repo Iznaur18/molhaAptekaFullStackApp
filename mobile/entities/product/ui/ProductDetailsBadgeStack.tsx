@@ -1,5 +1,5 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 
 import {
   buildProductDetailsBadgeItems,
@@ -17,6 +17,7 @@ import { AppText } from "@/shared/ui/AppText";
 
 type ProductDetailsBadgeStackProps = {
   product: Record<string, unknown>;
+  onBadgePress?: (item: ProductDetailsBadgeItem) => void;
 };
 
 const softBadgeChrome = {
@@ -37,14 +38,25 @@ const renderBadge = ({
   item,
   styles,
   theme,
+  onBadgePress,
 }: {
   item: ProductDetailsBadgeItem;
   styles: ReturnType<typeof useProductDetailScreenStyles>;
   theme: ReturnType<typeof useAppTheme>;
+  onBadgePress?: (item: ProductDetailsBadgeItem) => void;
 }) => {
+  const interactive = typeof onBadgePress === "function";
+  const Wrapper = interactive ? Pressable : View;
+  const wrapperProps = interactive
+    ? {
+        accessibilityRole: "button" as const,
+        onPress: () => onBadgePress?.(item),
+      }
+    : {};
+
   if (item.kind === "original") {
     return (
-      <View
+      <Wrapper
         key={item.key}
         style={[
           styles.metaInfoChip,
@@ -53,6 +65,7 @@ const renderBadge = ({
           softBadgeChrome,
         ]}
         accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.ORIGINAL_BADGE_ARIA}
+        {...wrapperProps}
       >
         <MaterialIcons name="check-circle" size={14} color={theme.colors.success} />
         <Text
@@ -61,42 +74,44 @@ const renderBadge = ({
         >
           {item.label}
         </Text>
-      </View>
+      </Wrapper>
     );
   }
 
   if (item.kind === "raffle") {
     const tone = PRODUCT_DETAILS_BADGE_SOFT_COLORS.raffle;
     return (
-      <View
+      <Wrapper
         key={item.key}
         style={[softBadgeChrome, { backgroundColor: tone.backgroundColor }]}
-        accessibilityRole="text"
+        accessibilityRole={interactive ? "button" : "text"}
         accessibilityLabel={item.label}
+        {...wrapperProps}
       >
         <AppText style={[softBadgeText, { color: tone.color }]}>{item.label}</AppText>
-      </View>
+      </Wrapper>
     );
   }
 
   if (item.kind === "affiliate") {
     const tone = PRODUCT_DETAILS_BADGE_SOFT_COLORS.affiliate;
     return (
-      <View
+      <Wrapper
         key={item.key}
         style={[softBadgeChrome, { backgroundColor: tone.backgroundColor }]}
-        accessibilityRole="text"
+        accessibilityRole={interactive ? "button" : "text"}
         accessibilityLabel={item.label}
+        {...wrapperProps}
       >
         <AppText style={[softBadgeText, { color: tone.color }]}>{item.label}</AppText>
-      </View>
+      </Wrapper>
     );
   }
 
   if (item.kind === "listingOrigin") {
     const tone = PRODUCT_DETAILS_BADGE_SOFT_COLORS.listingOrigin;
     return (
-      <View
+      <Wrapper
         key={item.key}
         style={[
           styles.metaInfoChip,
@@ -105,17 +120,18 @@ const renderBadge = ({
           { backgroundColor: tone.backgroundColor },
         ]}
         accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.LISTING_ORIGIN_SLOT_ARIA}
+        {...wrapperProps}
       >
         <MaterialIcons name={item.iconName} size={14} color={tone.color} />
         <Text style={[softBadgeText, { color: tone.color }]} numberOfLines={1}>
           {item.label}
         </Text>
-      </View>
+      </Wrapper>
     );
   }
 
   return (
-    <View
+    <Wrapper
       key={item.key}
       style={[
         styles.metaInfoChip,
@@ -124,16 +140,20 @@ const renderBadge = ({
         { backgroundColor: item.backgroundColor },
       ]}
       accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.PRICE_MARKET_STATUS_SLOT_ARIA}
+      {...wrapperProps}
     >
       <MaterialIcons name="sell" size={14} color={item.color} />
       <Text style={[softBadgeText, { color: item.color }]} numberOfLines={1}>
         {item.label}
       </Text>
-    </View>
+    </Wrapper>
   );
 };
 
-export const ProductDetailsBadgeStack = ({ product }: ProductDetailsBadgeStackProps) => {
+export const ProductDetailsBadgeStack = ({
+  product,
+  onBadgePress,
+}: ProductDetailsBadgeStackProps) => {
   const styles = useProductDetailScreenStyles();
   const theme = useAppTheme();
   const items = buildProductDetailsBadgeItems({ product });
@@ -147,7 +167,9 @@ export const ProductDetailsBadgeStack = ({ product }: ProductDetailsBadgeStackPr
         {...nestedHorizontalScrollProps}
         keyboardShouldPersistTaps="handled"
       >
-        {items.map((item) => renderBadge({ item, styles, theme }))}
+        {items.map((item) =>
+          renderBadge({ item, styles, theme, onBadgePress }),
+        )}
       </ScrollView>
     </View>
   );

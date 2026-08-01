@@ -9,6 +9,7 @@ import {
 } from "../../constants/referralConstants.js";
 import { resolveFrontendOrigin } from "../../utils/resolveFrontendOrigin.js";
 import { ensureUserReferralCode } from "./ensureUserReferralCode.js";
+import { migratePartnerBalanceToLoyaltyPoints } from "./migratePartnerBalanceToLoyaltyPoints.js";
 
 /**
  * @param {string} referralCode
@@ -25,8 +26,10 @@ export function buildReferralInviteUrl(referralCode) {
  * @param {string} userId
  */
 export async function getMyReferralProgram(userId) {
+  await migratePartnerBalanceToLoyaltyPoints(userId);
+
   const referralCode = await ensureUserReferralCode(userId);
-  const me = await UserModel.findById(userId).select("partnerBalance").lean();
+  const me = await UserModel.findById(userId).select("userLoyaltyPoints").lean();
   if (!me) {
     throw new Error("USER_NOT_FOUND");
   }
@@ -117,7 +120,7 @@ export async function getMyReferralProgram(userId) {
     referralCode,
     inviteUrl: buildReferralInviteUrl(referralCode),
     cashbackPercent: REFERRAL_CASHBACK_PERCENT,
-    partnerBalance: Number(me.partnerBalance) || 0,
+    loyaltyPointsBalance: Number(me.userLoyaltyPoints) || 0,
     totalReferrals: referralRows.length,
     totalReferralsSpend,
     totalCashbackEarned,

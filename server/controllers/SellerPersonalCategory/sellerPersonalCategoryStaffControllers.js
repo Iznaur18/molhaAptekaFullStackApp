@@ -9,7 +9,10 @@ import {
 } from "../../services/seller-personal-category/sellerPersonalCategoryStaff.js";
 import { successRes } from "../../services/http/index.js";
 
-export const getPendingSellerPersonalCategoryCampaignsCountController = async (req, res) => {
+export const getPendingSellerPersonalCategoryCampaignsCountController = async (
+  req,
+  res,
+) => {
   const result = await countPendingSellerPersonalCategoryCampaigns();
   return successRes(res, result);
 };
@@ -42,7 +45,10 @@ export const getManagedSellerPersonalCategoryCampaignsController = async (req, r
   return successRes(res, result);
 };
 
-export const cancelSellerPersonalCategoryCampaignByStaffController = async (req, res) => {
+export const cancelSellerPersonalCategoryCampaignByStaffController = async (
+  req,
+  res,
+) => {
   const result = await cancelSellerPersonalCategoryCampaignByStaff({
     staffUserId: req.userId,
     campaignId: req.params.campaignId,
@@ -51,7 +57,10 @@ export const cancelSellerPersonalCategoryCampaignByStaffController = async (req,
   return successRes(res, result);
 };
 
-export const deleteSellerPersonalCategoryCampaignByStaffController = async (req, res) => {
+export const deleteSellerPersonalCategoryCampaignByStaffController = async (
+  req,
+  res,
+) => {
   const result = await deleteSellerPersonalCategoryCampaignByStaff({
     campaignId: req.params.campaignId,
   });

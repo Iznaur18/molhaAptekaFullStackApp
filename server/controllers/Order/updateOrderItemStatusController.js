@@ -43,7 +43,8 @@ export const markOrderItemCancelledController = async (req, res) => {
   });
 };
 
-export const markOrderItemCancelledBySellerController = markOrderItemCancelledController;
+export const markOrderItemCancelledBySellerController =
+  markOrderItemCancelledController;
 
 /** `PATCH /order/:orderId/items/:itemIndex/shipped` — продавец помечает позицию как отправленную. */
 export const markOrderItemShippedBySellerController = async (req, res) => {

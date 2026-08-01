@@ -239,7 +239,7 @@ export function ProductDetailsPage() {
                 setIsReportModalOpen(true);
               }}
             >
-              <AppIcon icon={Flag} size="sm" strokeWidth={2.15} />
+              <AppIcon icon={Flag} size="lg" strokeWidth={2.1} />
             </button>
           ) : null
         }

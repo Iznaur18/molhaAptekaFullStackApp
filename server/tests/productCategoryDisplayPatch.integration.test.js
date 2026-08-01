@@ -115,7 +115,10 @@ test("PATCH /product/category-node-displays/:categoryId updates legacy slug disp
 
   await ensureProductCategoryDisplayForSlug("food");
 
-  const { cookie, user } = await registerUserAndGetCookie(request, "admin-food-display");
+  const { cookie, user } = await registerUserAndGetCookie(
+    request,
+    "admin-food-display",
+  );
   await verifyUserEmail("int-admin-food-display@example.com");
   await setUserRole(user._id, "admin");
 

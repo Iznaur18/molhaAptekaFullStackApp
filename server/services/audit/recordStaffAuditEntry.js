@@ -1,4 +1,5 @@
 import { StaffAuditLogModel } from "../../models/index.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 import { buildStaffAuditEntry } from "./buildStaffAuditEntry.js";
 
 /**
@@ -17,10 +18,10 @@ export async function recordStaffAuditEntry(input) {
   try {
     return await StaffAuditLogModel.create(entry);
   } catch (error) {
-    console.error(
-      "[staff-audit] не удалось записать запись аудита:",
-      error?.message ?? error,
-    );
+    logServerEvent("error", {
+      event: "staff_audit_write_failed",
+      error: error instanceof Error ? error.message : String(error),
+    });
     return null;
   }
 }

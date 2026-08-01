@@ -5,6 +5,7 @@ export const AFFILIATE_PERCENT_MIN = 1;
 export const AFFILIATE_PERCENT_MAX = 50;
 
 type AffiliatePercentSource = {
+  _id?: unknown;
   affiliatePercent?: unknown;
 } | null | undefined;
 
@@ -18,6 +19,25 @@ export function isProductAffiliateConfigured(
     percent >= AFFILIATE_PERCENT_MIN &&
     percent <= AFFILIATE_PERCENT_MAX
   );
+}
+
+/**
+ * Первый кандидат с matching `_id` (hint из UI → promotion → edit).
+ */
+export function resolveAffiliateToggleSourceProduct(
+  productId: string,
+  candidates: readonly AffiliatePercentSource[],
+): AffiliatePercentSource {
+  const normalized = String(productId ?? "").trim();
+  if (!normalized) {
+    return null;
+  }
+  for (const candidate of candidates) {
+    if (candidate && String(candidate._id ?? "") === normalized) {
+      return candidate;
+    }
+  }
+  return null;
 }
 
 /**

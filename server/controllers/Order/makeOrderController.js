@@ -24,8 +24,7 @@ export const makeOrderController = async (req, res) => {
       await order.populate("userBuyerId", ORDER_BUYER_PUBLIC_FIELDS);
       await order.populate(ORDER_ITEMS_POPULATE);
 
-      const plain =
-        typeof order.toObject === "function" ? order.toObject() : order;
+      const plain = typeof order.toObject === "function" ? order.toObject() : order;
 
       return {
         message: "Заказ успешно создан",

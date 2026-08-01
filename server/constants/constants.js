@@ -52,12 +52,13 @@ export const ALLOWED_FIELDS_FOR_MODERATOR = [
 /** Собственный профиль модератора (без блокировок, роли и начисления баллов себе). */
 export const ALLOWED_FIELDS_FOR_MODERATOR_SELF = [...ALLOWED_FIELDS_FOR_USER];
 
-/** Разрешённые поля для администратора */
+/** Разрешённые поля для администратора (чужой профиль; баллы — только admin, не moderator). */
 export const ALLOWED_FIELDS_FOR_ADMIN = [
   ...ALLOWED_FIELDS_FOR_MODERATOR,
   "userRole",
   "userDiscountPercent",
   "premiumExpiresAt",
+  "userLoyaltyPoints",
 ];
 
 /** Собственный профиль администратора (без смены роли, блокировок и self-loyalty). */

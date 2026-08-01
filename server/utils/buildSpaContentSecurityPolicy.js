@@ -76,8 +76,7 @@ export function buildSpaContentSecurityPolicy(options = {}) {
   connectSources.add(SENTRY_INGEST_HOST_PATTERN);
 
   const upgradeInsecure =
-    options.upgradeInsecureRequests ??
-    Boolean(frontendOrigin?.startsWith("https:"));
+    options.upgradeInsecureRequests ?? Boolean(frontendOrigin?.startsWith("https:"));
 
   const directives = [
     "default-src 'self'",

@@ -23,7 +23,6 @@ export type ProfileHubAccess = {
   canUsePremium: boolean;
   canUseLoyaltyPoints: boolean;
   canUsePartnerProgram: boolean;
-  canUseAffiliateListings: boolean;
   canUseAdvertising: boolean;
   canUseEditProfile: boolean;
   canUseCreateRaffle: boolean;
@@ -64,7 +63,6 @@ export const useProfileHubAccess = (): ProfileHubAccess => {
     canUsePremium: isProfileReady,
     canUseLoyaltyPoints: isProfileReady,
     canUsePartnerProgram: isProfileReady,
-    canUseAffiliateListings: isProfileReady,
     canUseAdvertising: isProfileReady,
     canUseEditProfile: isProfileReady,
     canUseCreateRaffle: isProfileReady && isUserDataConfirmed,
@@ -125,7 +123,7 @@ export const canAccessProfileSection = (
     premium: hubAccess.canUsePremium,
     "loyalty-points": hubAccess.canUseLoyaltyPoints,
     "partner-program": hubAccess.canUsePartnerProgram,
-    "affiliate-listings": hubAccess.canUseAffiliateListings,
+    "affiliate-listings": hubAccess.canUsePartnerProgram,
     advertising: hubAccess.canUseAdvertising,
     "edit-profile": hubAccess.canUseEditProfile,
     "create-raffle": hubAccess.canUseCreateRaffle,

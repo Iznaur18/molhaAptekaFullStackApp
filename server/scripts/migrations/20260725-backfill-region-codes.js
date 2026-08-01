@@ -8,11 +8,7 @@ import { DEFAULT_VIEWER_REGION_CODE } from "@molha/api-contract";
 export async function up({ db, isApply }) {
   const code = DEFAULT_VIEWER_REGION_CODE;
   const missingRegion = {
-    $or: [
-      { regionCode: { $exists: false } },
-      { regionCode: null },
-      { regionCode: "" },
-    ],
+    $or: [{ regionCode: { $exists: false } }, { regionCode: null }, { regionCode: "" }],
   };
   const missingProductRegion = {
     $or: [

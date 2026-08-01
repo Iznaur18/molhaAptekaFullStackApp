@@ -5,6 +5,7 @@ import { finalizeUploadedFile } from "../../services/upload/finalizeUploadedFile
 import { prepareUploadedVideoFile } from "../../services/upload/prepareUploadedVideoFile.js";
 import { resolveVideoUploadProfile } from "../../services/upload/resolveVideoUploadProfile.js";
 import { successRes, errorRes } from "../../services/http/index.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 /**
  * Оригинал не должен оставаться на диске, если перекодировка не удалась.
@@ -18,35 +19,41 @@ async function cleanupUploadedOriginal(file) {
 }
 
 export async function uploadVideoController(req, res) {
-if (!req.file) {
-      return errorRes(
-        res,
-        400,
-        "Файл не загружен или тип не разрешён (только MP4, WebM, MOV, HEVC)",
-      );
-    }
+  if (!req.file) {
+    return errorRes(
+      res,
+      400,
+      "Файл не загружен или тип не разрешён (только MP4, WebM, MOV, HEVC)",
+    );
+  }
 
-    try {
-      await prepareUploadedVideoFile(
-        req.file,
-        resolveVideoUploadProfile(req).transcodeOptions,
-      );
-    } catch (transcodeError) {
-      console.error("uploadVideoController transcode error:", transcodeError);
-      await cleanupUploadedOriginal(req.file);
-      return errorRes(
-        res,
-        400,
-        "Не удалось обработать видео. Загрузите MP4 (H.264) или короче 3 секунд",
-      );
-    }
-
-    const filename = await finalizeUploadedFile(req.file);
-    const url = buildPublicUploadUrl({ filename });
-
-    return successRes(res, {
-      url,
-      filename,
-      originalname: req.file.originalname,
+  try {
+    await prepareUploadedVideoFile(
+      req.file,
+      resolveVideoUploadProfile(req).transcodeOptions,
+    );
+  } catch (transcodeError) {
+    logServerEvent("error", {
+      event: "uploadvideocontroller_transcode",
+      error:
+        transcodeError instanceof Error
+          ? transcodeError.message
+          : String(transcodeError),
     });
+    await cleanupUploadedOriginal(req.file);
+    return errorRes(
+      res,
+      400,
+      "Не удалось обработать видео. Загрузите MP4 (H.264) или короче 3 секунд",
+    );
+  }
+
+  const filename = await finalizeUploadedFile(req.file);
+  const url = buildPublicUploadUrl({ filename });
+
+  return successRes(res, {
+    url,
+    filename,
+    originalname: req.file.originalname,
+  });
 }

@@ -286,7 +286,12 @@ export function HomeFeaturedRaffleModal({
       />
     ) : (
       <div
-        className="home-featured-raffle-modal__carousel"
+        className={[
+          "home-featured-raffle-modal__carousel",
+          isDragging ? "home-featured-raffle-modal__carousel--dragging" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}

@@ -9,20 +9,29 @@ import { userHasPurchasedProduct } from "../../services/user/userPurchasedProduc
  * `GET /product/:productId/catalog` — карточка товара как в каталоге.
  */
 export const getCatalogProductByIdController = async (req, res) => {
-const { productId } = req.params;
-    const viewerUserId = req.userId ? String(req.userId) : null;
+  const { productId } = req.params;
+  const viewerUserId = req.userId ? String(req.userId) : null;
 
-    const product = await findCatalogProductById(productId);
-    if (!product) {
+  const product = await findCatalogProductById(productId);
+  if (!product) {
+    return errorRes(res, 404, "Товар не найден");
+  }
+
+  const sellerId = String(product.productSeller?._id ?? product.productSeller ?? "");
+  const isSeller = viewerUserId != null && sellerId !== "" && sellerId === viewerUserId;
+  const isApproved = product.productModerationStatus === PRODUCT_MODERATION_APPROVED;
+
+  if (!isApproved && !isSeller) {
+    const purchased =
+      viewerUserId != null && (await userHasPurchasedProduct(viewerUserId, productId));
+    if (!purchased) {
       return errorRes(res, 404, "Товар не найден");
     }
+  }
 
-    const sellerId = String(product.productSeller?._id ?? product.productSeller ?? "");
-    const isSeller =
-      viewerUserId != null && sellerId !== "" && sellerId === viewerUserId;
-    const isApproved = product.productModerationStatus === PRODUCT_MODERATION_APPROVED;
-
-    if (!isApproved && !isSeller) {
+  if (!isSeller && isApproved) {
+    const hiddenSellerIds = await getHiddenSellerIds();
+    if (hiddenSellerIds.some((id) => String(id) === sellerId)) {
       const purchased =
         viewerUserId != null &&
         (await userHasPurchasedProduct(viewerUserId, productId));
@@ -30,22 +39,9 @@ const { productId } = req.params;
         return errorRes(res, 404, "Товар не найден");
       }
     }
+  }
 
-    if (!isSeller && isApproved) {
-      const hiddenSellerIds = await getHiddenSellerIds();
-      if (hiddenSellerIds.some((id) => String(id) === sellerId)) {
-        const purchased =
-          viewerUserId != null &&
-          (await userHasPurchasedProduct(viewerUserId, productId));
-        if (!purchased) {
-          return errorRes(res, 404, "Товар не найден");
-        }
-      }
-    }
-
-    return successRes(res, {
-      product: (
-        await attachProductAvailablePurchaseQuantity([product])
-      )[0],
-    });
+  return successRes(res, {
+    product: (await attachProductAvailablePurchaseQuantity([product]))[0],
+  });
 };

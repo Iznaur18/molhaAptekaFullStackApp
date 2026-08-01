@@ -25,7 +25,12 @@ const router = createAsyncRouter();
 
 router.get("/config", getIntroAdConfigController);
 router.get("/me", checkAuthMW, getMyIntroAdCampaignController);
-router.post("/", checkAuthMW, submitIntroAdCampaignValidation, submitIntroAdCampaignController);
+router.post(
+  "/",
+  checkAuthMW,
+  submitIntroAdCampaignValidation,
+  submitIntroAdCampaignController,
+);
 router.delete(
   "/:campaignId",
   checkAuthMW,

@@ -37,7 +37,6 @@ export function FeaturedRaffleModalCard({
   const hasManage = Boolean(
     manage && (manage.showEdit || manage.showDelete || manage.showPause),
   );
-  const description = raffle.description?.trim() ?? "";
   const instagramUrl = raffle.instagramUrl?.trim() ?? "";
 
   const handleOpenInstagram = () => {
@@ -143,11 +142,6 @@ export function FeaturedRaffleModalCard({
             <strong className="featured-raffle-modal-card__stat-value">{participantsCount}</strong>
           </div>
         </div>
-
-        <h3 className="featured-raffle-modal-card__title">{raffle.title}</h3>
-        {description.length > 0 ? (
-          <p className="featured-raffle-modal-card__description">{description}</p>
-        ) : null}
 
         {isCompleted ? (
           <div className="featured-raffle-modal-card__secondary">

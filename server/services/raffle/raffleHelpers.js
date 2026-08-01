@@ -9,7 +9,12 @@ import {
   SITE_RAFFLES_COMPLETED_VITRINE_MAX,
 } from "../../constants/raffleConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
-import { OrderModel, ProductModel, RaffleModel, UserModel } from "../../models/index.js";
+import {
+  OrderModel,
+  ProductModel,
+  RaffleModel,
+  UserModel,
+} from "../../models/index.js";
 import { createUserInAppNotification } from "../user/userInAppNotifications.js";
 import { notifyFollowersOfSellerRaffleCompleted } from "../user/userFollowHelpers.js";
 import { normalizeRafflePrizeImageFocus } from "../user/profileImageFocus.js";
@@ -19,6 +24,7 @@ import {
 } from "./rafflePrizeMedia.js";
 import { pickWeightedRaffleWinnerUserId } from "./pickWeightedRaffleWinner.js";
 import { getCompletedRaffleExpiryCutoff } from "./getCompletedRaffleExpiryCutoff.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 const RAFFLE_SALE_COUNT_ITEM_STATUSES = [ORDER_STATUS_CONFIRMED];
 const WINNER_FALLBACK_USER_NAME = "Пользователь";
@@ -197,7 +203,11 @@ export const recalculateRaffleSalesProgress = async (raffleId) => {
  * @param {number} [salesProgress]
  * @param {number} [participantsCount]
  */
-export const completeRaffleById = async (raffleId, salesProgress, participantsCount) => {
+export const completeRaffleById = async (
+  raffleId,
+  salesProgress,
+  participantsCount,
+) => {
   const raffle = await RaffleModel.findById(raffleId).lean();
   if (!raffle || raffle.status === RAFFLE_STATUS_COMPLETED) {
     return raffle;
@@ -263,7 +273,10 @@ export const completeRaffleById = async (raffleId, salesProgress, participantsCo
 
     await notifyFollowersOfSellerRaffleCompleted(raffle);
   } catch (error) {
-    console.error("completeRaffleById notifications error:", error);
+    logServerEvent("error", {
+      event: "completerafflebyid_notifications",
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 
   return completed;

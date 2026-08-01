@@ -22,19 +22,10 @@ test("resolveUploadFileExtension maps iPhone quicktime to mov", () => {
 });
 
 test("resolveUploadContentType fixes legacy quicktime extension", () => {
+  assert.equal(resolveUploadContentType("1730000000-abc.quicktime"), "video/quicktime");
+  assert.equal(resolveUploadContentType("1730000000-abc.mov"), "video/quicktime");
   assert.equal(
-    resolveUploadContentType("1730000000-abc.quicktime"),
-    "video/quicktime",
-  );
-  assert.equal(
-    resolveUploadContentType("1730000000-abc.mov"),
-    "video/quicktime",
-  );
-  assert.equal(
-    resolveUploadContentType(
-      "1730000000-abc.mov",
-      "application/octet-stream",
-    ),
+    resolveUploadContentType("1730000000-abc.mov", "application/octet-stream"),
     "video/quicktime",
   );
 });

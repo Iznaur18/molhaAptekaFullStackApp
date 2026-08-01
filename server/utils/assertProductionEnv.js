@@ -10,7 +10,10 @@ import { PASSPORT_VAULT_KEK_HEX_LENGTH } from "../constants/passportVaultConstan
 
 const PLACEHOLDER_JWT_SECRETS = new Set([
   "REPLACE_WITH_crypto_randomBytes_32_hex",
+  "REPLACE_WITH_different_crypto_randomBytes_32_hex",
   "smoke-test-jwt-secret-min-32-chars-long",
+  // Бывший пример из .env.production.example — нельзя деплоить как есть.
+  "FORN_vrevr_vtoppVR*%@!!rvmv_c22F44_42~~@~!c2!vr0_cwvrevrVC334r~!",
 ]);
 
 const MIN_JWT_SECRET_LENGTH = 32;
@@ -86,14 +89,18 @@ export const assertProductionEnv = () => {
     );
   }
   if (isProduction && accessSecret && refreshSecret && accessSecret === refreshSecret) {
-    warnings.push(
-      "JWT_ACCESS_SECRET и JWT_REFRESH_SECRET совпадают — лучше разные секреты",
-    );
+    errors.push("JWT_ACCESS_SECRET и JWT_REFRESH_SECRET не должны совпадать");
   }
   if (isProduction && (!accessSecret || !refreshSecret)) {
-    warnings.push(
-      "Задайте JWT_ACCESS_SECRET и JWT_REFRESH_SECRET (иначе используется JWT_SECRET для обоих)",
+    errors.push(
+      "Задайте JWT_ACCESS_SECRET и JWT_REFRESH_SECRET (отдельные секреты, не fallback на JWT_SECRET)",
     );
+  }
+  if (accessSecret && PLACEHOLDER_JWT_SECRETS.has(accessSecret)) {
+    errors.push("JWT_ACCESS_SECRET — placeholder, замените на случайную строку");
+  }
+  if (refreshSecret && PLACEHOLDER_JWT_SECRETS.has(refreshSecret)) {
+    errors.push("JWT_REFRESH_SECRET — placeholder, замените на случайную строку");
   }
 
   if (isBlank(process.env.MONGO_URI)) {

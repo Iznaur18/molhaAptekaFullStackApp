@@ -85,8 +85,4 @@ export {
   normalizeUserBackgroundFocus,
   normalizeRafflePrizeImageFocus,
 } from "./profileImageFocus.js";
-export {
-  assertAtMostWords,
-  assertMinWords,
-  countWords,
-} from "./maxWordsText.js";
+export { assertAtMostWords, assertMinWords, countWords } from "./maxWordsText.js";

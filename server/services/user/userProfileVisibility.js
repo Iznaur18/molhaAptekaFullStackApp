@@ -99,9 +99,7 @@ export function applyAdminVisibilityToUsersSearchQuery(usersQuery, ctx) {
   }
 
   const canFilterByRole =
-    Boolean(viewer) &&
-    isStaffRole(viewer.userRole) &&
-    !viewer.isBlockedUser;
+    Boolean(viewer) && isStaffRole(viewer.userRole) && !viewer.isBlockedUser;
 
   if (!canFilterByRole) {
     return;

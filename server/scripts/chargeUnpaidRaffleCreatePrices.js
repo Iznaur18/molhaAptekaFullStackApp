@@ -34,7 +34,9 @@ async function main() {
         });
       });
       charged += 1;
-      console.log(`charged raffle ${String(raffle._id)} seller ${String(raffle.sellerId)}`);
+      console.log(
+        `charged raffle ${String(raffle._id)} seller ${String(raffle.sellerId)}`,
+      );
     } catch (error) {
       failed += 1;
       console.error(

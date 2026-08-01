@@ -1,9 +1,7 @@
 import { INSTALLMENT_CONTRACT_STATUS_PENDING_FIRST_PAYMENT } from "../../constants/installmentConstants.js";
 import { InstallmentContractModel, OrderModel } from "../../models/index.js";
 import { sortByPriorityStatusFirst } from "../../utils/sortByPriorityStatusFirst.js";
-import {
-  attachSellerBuyerPassportShareToContracts,
-} from "../order/buyerPassportShare.js";
+import { attachSellerBuyerPassportShareToContracts } from "../order/buyerPassportShare.js";
 import {
   buildInstallmentContractPayloads,
   repairInstallmentPaymentStatusDrift,
@@ -63,9 +61,7 @@ export async function listInstallmentContracts({
 
   const orderIds = [
     ...new Set(
-      rows
-        .map((row) => (row.orderId ? String(row.orderId) : ""))
-        .filter(Boolean),
+      rows.map((row) => (row.orderId ? String(row.orderId) : "")).filter(Boolean),
     ),
   ];
   const orders =

@@ -3,10 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const SERVER_ROOT = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "..",
-);
+const SERVER_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 /** @type {string | null | undefined} */
 let cachedGitCommitSha;

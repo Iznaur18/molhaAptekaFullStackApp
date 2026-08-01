@@ -21,9 +21,8 @@ import {
 import { successRes } from "../../services/http/index.js";
 
 export const getFeaturedRaffleController = async (req, res) => {
-  const { resolveViewerRegionCodeForRequest } = await import(
-    "../../services/user/userRegionCatalogFilter.js"
-  );
+  const { resolveViewerRegionCodeForRequest } =
+    await import("../../services/user/userRegionCatalogFilter.js");
   const viewerRegionCode = await resolveViewerRegionCodeForRequest({
     userId: req.userId,
     queryRegionCode: req.query.regionCode,

@@ -50,7 +50,11 @@ const mapAcceptGateError = (error) => {
  *   offerPrice: unknown;
  * }} input
  */
-export async function submitProductPriceOffer({ buyerId, productId, offerPrice: rawPrice }) {
+export async function submitProductPriceOffer({
+  buyerId,
+  productId,
+  offerPrice: rawPrice,
+}) {
   let offerPrice;
   try {
     offerPrice = normalizeOfferPrice(rawPrice);
@@ -101,7 +105,11 @@ export async function submitProductPriceOffer({ buyerId, productId, offerPrice: 
  *   offerPrice: unknown;
  * }} input
  */
-export async function patchMyProductPriceOffer({ buyerId, productId, offerPrice: rawPrice }) {
+export async function patchMyProductPriceOffer({
+  buyerId,
+  productId,
+  offerPrice: rawPrice,
+}) {
   let offerPrice;
   try {
     offerPrice = normalizeOfferPrice(rawPrice);

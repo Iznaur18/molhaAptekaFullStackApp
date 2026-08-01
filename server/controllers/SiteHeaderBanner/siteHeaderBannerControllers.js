@@ -26,9 +26,8 @@ export const getSiteHeaderBannerSlidesController = async (req, res) => {
   }).lean();
 
   const settingsPayload = resolveSiteHeaderBannerSettingsPayload(row);
-  const { resolveViewerRegionCodeForRequest } = await import(
-    "../../services/user/userRegionCatalogFilter.js"
-  );
+  const { resolveViewerRegionCodeForRequest } =
+    await import("../../services/user/userRegionCatalogFilter.js");
   const viewerRegionCode = await resolveViewerRegionCodeForRequest({
     userId: req.userId,
     queryRegionCode: req.query.regionCode,

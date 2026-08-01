@@ -1,7 +1,4 @@
-import {
-  escapeRegExpForRuCity,
-  normalizeRuCityKey,
-} from "@molha/api-contract";
+import { escapeRegExpForRuCity, normalizeRuCityKey } from "@molha/api-contract";
 
 import { UserModel } from "../../models/index.js";
 import { resolveUserAddressCityNormalized } from "../product/ruCityNormalized.js";
@@ -11,10 +8,7 @@ import { resolveUserAddressCityNormalized } from "../product/ruCityNormalized.js
  */
 function buildLegacyProductSaleCityRegexMatch(cityKey) {
   const escaped = escapeRegExpForRuCity(cityKey);
-  const pattern = new RegExp(
-    `^(?:город\\s+|гор\\.?\\s+|г\\.?\\s+)?${escaped}$`,
-    "i",
-  );
+  const pattern = new RegExp(`^(?:город\\s+|гор\\.?\\s+|г\\.?\\s+)?${escaped}$`, "i");
 
   return {
     $and: [

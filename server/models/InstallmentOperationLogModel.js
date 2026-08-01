@@ -58,7 +58,4 @@ InstallmentOperationLogSchema.index({ sourceId: 1 }, { unique: true });
 InstallmentOperationLogSchema.index({ contractId: 1, createdAt: -1 });
 InstallmentOperationLogSchema.index({ actorUserId: 1, createdAt: -1 });
 
-export default mongoose.model(
-  "InstallmentOperationLog",
-  InstallmentOperationLogSchema,
-);
+export default mongoose.model("InstallmentOperationLog", InstallmentOperationLogSchema);

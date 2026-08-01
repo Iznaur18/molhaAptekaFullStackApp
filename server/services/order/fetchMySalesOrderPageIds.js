@@ -53,7 +53,5 @@ export async function fetchMySalesOrderPageIds({
  */
 export function orderRowsByIds(orderIds, rows) {
   const byId = new Map(rows.map((row) => [String(row._id), row]));
-  return orderIds
-    .map((id) => byId.get(String(id)))
-    .filter((row) => row != null);
+  return orderIds.map((id) => byId.get(String(id))).filter((row) => row != null);
 }

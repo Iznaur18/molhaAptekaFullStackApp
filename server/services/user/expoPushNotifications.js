@@ -5,6 +5,7 @@ import {
   EXPO_PUSH_TOKENS_MAX_PER_USER,
 } from "../../constants/expoPushConstants.js";
 import { UserModel } from "../../models/index.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 /** @type {Expo | null} */
 let expoClient = null;
@@ -56,7 +57,10 @@ export async function registerExpoPushTokenForUser(userId, token, platform) {
     platform: platform ?? "unknown",
     updatedAt: now,
   };
-  const nextTokens = [nextRow, ...withoutDuplicate].slice(0, EXPO_PUSH_TOKENS_MAX_PER_USER);
+  const nextTokens = [nextRow, ...withoutDuplicate].slice(
+    0,
+    EXPO_PUSH_TOKENS_MAX_PER_USER,
+  );
 
   user.expoPushTokens = nextTokens;
   await user.save({ validateBeforeSave: false });
@@ -150,7 +154,10 @@ export async function sendExpoPushToUser(userId, message) {
         }
       });
     } catch (error) {
-      console.error("sendExpoPushToUser chunk error:", error);
+      logServerEvent("error", {
+        event: "sendexpopushtouser_chunk",
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 

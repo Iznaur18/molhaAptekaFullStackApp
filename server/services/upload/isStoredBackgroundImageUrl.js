@@ -9,7 +9,5 @@ export function isStoredBackgroundImageUrl(value) {
     return false;
   }
   const normalized = normalizeStoredUploadUrl(raw);
-  return (
-    normalized.startsWith("/uploads/") || /^https?:\/\//i.test(normalized)
-  );
+  return normalized.startsWith("/uploads/") || /^https?:\/\//i.test(normalized);
 }

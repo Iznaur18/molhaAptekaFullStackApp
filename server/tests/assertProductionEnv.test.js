@@ -8,9 +8,7 @@ const VAULT_KEK = "a".repeat(64);
 
 const withEnv = (overrides, fn) => {
   const keys = Object.keys(overrides);
-  const previous = Object.fromEntries(
-    keys.map((key) => [key, process.env[key]]),
-  );
+  const previous = Object.fromEntries(keys.map((key) => [key, process.env[key]]));
   try {
     for (const [key, value] of Object.entries(overrides)) {
       if (value === undefined) {
@@ -98,6 +96,8 @@ test("assertProductionEnv: production принимает Atlas mongodb+srv с au
     {
       NODE_ENV: "production",
       JWT_SECRET: LONG_JWT,
+      JWT_ACCESS_SECRET: `${LONG_JWT}-access`,
+      JWT_REFRESH_SECRET: `${LONG_JWT}-refresh`,
       PASSPORT_VAULT_KEK: VAULT_KEK,
       MONGO_URI:
         "mongodb+srv://user:pass@cluster.mongodb.net/izibuy?retryWrites=true&w=majority",
@@ -109,13 +109,15 @@ test("assertProductionEnv: production принимает Atlas mongodb+srv с au
     () => {
       const result = assertProductionEnv();
       assert.equal(
-        result.errors.some(
-          (e) => e.includes("localhost") || e.includes("credentials"),
-        ),
+        result.errors.some((e) => e.includes("localhost") || e.includes("credentials")),
         false,
       );
       assert.equal(
         result.errors.some((e) => e.includes("PASSPORT_VAULT_KEK")),
+        false,
+      );
+      assert.equal(
+        result.errors.some((e) => e.includes("JWT_ACCESS_SECRET")),
         false,
       );
       assert.ok(result.warnings.some((w) => w.includes("SENTRY_DSN")));
@@ -141,6 +143,52 @@ test("assertProductionEnv: production требует PASSPORT_VAULT_KEK", () => 
       const result = assertProductionEnv();
       assert.equal(result.ok, false);
       assert.ok(result.errors.some((e) => e.includes("PASSPORT_VAULT_KEK")));
+    },
+  );
+});
+
+test("assertProductionEnv: режет JWT из старого production.example", () => {
+  withEnv(
+    {
+      NODE_ENV: "production",
+      JWT_SECRET: "FORN_vrevr_vtoppVR*%@!!rvmv_c22F44_42~~@~!c2!vr0_cwvrevrVC334r~!",
+      JWT_ACCESS_SECRET: `${LONG_JWT}-access`,
+      JWT_REFRESH_SECRET: `${LONG_JWT}-refresh`,
+      PASSPORT_VAULT_KEK: VAULT_KEK,
+      MONGO_URI:
+        "mongodb+srv://user:pass@cluster.mongodb.net/izibuy?retryWrites=true&w=majority",
+      FRONTEND_URL: "https://izibuy.ru",
+      SMTP_HOST: "smtp.example.com",
+      SMTP_USER: "u",
+      SMTP_PASS: "p",
+    },
+    () => {
+      const result = assertProductionEnv();
+      assert.equal(result.ok, false);
+      assert.ok(result.errors.some((e) => e.includes("placeholder")));
+    },
+  );
+});
+
+test("assertProductionEnv: production требует отдельные JWT access/refresh", () => {
+  withEnv(
+    {
+      NODE_ENV: "production",
+      JWT_SECRET: LONG_JWT,
+      JWT_ACCESS_SECRET: undefined,
+      JWT_REFRESH_SECRET: undefined,
+      PASSPORT_VAULT_KEK: VAULT_KEK,
+      MONGO_URI:
+        "mongodb+srv://user:pass@cluster.mongodb.net/izibuy?retryWrites=true&w=majority",
+      FRONTEND_URL: "https://izibuy.ru",
+      SMTP_HOST: "smtp.example.com",
+      SMTP_USER: "u",
+      SMTP_PASS: "p",
+    },
+    () => {
+      const result = assertProductionEnv();
+      assert.equal(result.ok, false);
+      assert.ok(result.errors.some((e) => e.includes("JWT_ACCESS_SECRET")));
     },
   );
 });

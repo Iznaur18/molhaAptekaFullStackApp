@@ -44,9 +44,7 @@ function pickStringField(cleaned, key) {
  */
 function pickStructuredFromCleaned(cleaned) {
   const city =
-    pickStringField(cleaned, "city") ??
-    pickStringField(cleaned, "settlement") ??
-    "";
+    pickStringField(cleaned, "city") ?? pickStringField(cleaned, "settlement") ?? "";
   const district =
     pickStringField(cleaned, "city_district") ?? pickStringField(cleaned, "area") ?? "";
   const street =

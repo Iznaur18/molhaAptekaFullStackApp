@@ -5,6 +5,7 @@
   box-sizing: border-box;
   padding: 12px;
   border-radius: 12px;
+  corner-shape: squircle;
   border: 1px solid var(--iz-color-border, #e5e7eb);
   background: var(--iz-color-surface);
 }
@@ -187,6 +188,7 @@
   margin: 0;
   padding: 8px 10px;
   border-radius: var(--iz-control-btn-radius, 10px);
+  corner-shape: squircle;
   font: inherit;
   font-size: 13px;
   font-weight: 600;
@@ -218,6 +220,7 @@
   width: 88px;
   height: 88px;
   border-radius: 10px;
+  corner-shape: squircle;
   overflow: hidden;
   background: var(--iz-color-surface-muted);
 }

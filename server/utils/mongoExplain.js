@@ -52,9 +52,10 @@ export function getWinningExecutionStages(explainResult) {
       if (!stage || typeof stage !== "object") {
         continue;
       }
-      const cursor = /** @type {{ $cursor?: { executionStats?: { executionStages?: unknown } } }} */ (
-        stage
-      ).$cursor;
+      const cursor =
+        /** @type {{ $cursor?: { executionStats?: { executionStages?: unknown } } }} */ (
+          stage
+        ).$cursor;
       const nested = cursor?.executionStats?.executionStages;
       if (nested) {
         return nested;

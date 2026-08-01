@@ -4,7 +4,8 @@ import { asyncHandler } from "../middlewares/errorHandlerMW.js";
 
 const HTTP_METHODS = ["get", "post", "put", "patch", "delete", "all"];
 
-const isErrorMiddleware = (handler) => typeof handler === "function" && handler.length === 4;
+const isErrorMiddleware = (handler) =>
+  typeof handler === "function" && handler.length === 4;
 
 const wrapRouteHandlers = (handlers) => {
   if (handlers.length === 0) {

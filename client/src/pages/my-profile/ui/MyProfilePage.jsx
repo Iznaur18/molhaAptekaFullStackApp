@@ -51,7 +51,6 @@ import "./MyProfilePage.css";
  * onPremiumClick?: () => void;
  * onLoyaltyPointsClick?: () => void;
  * onPartnerProgramClick?: () => void;
- * onAffiliateListingsClick?: () => void;
  * onAdvertisingClick?: () => void;
  * onIntroAdModerationClick?: () => void;
  * onSellerPersonalCategoryModerationClick?: () => void;
@@ -105,7 +104,6 @@ export function MyProfilePage({
   onPremiumClick,
   onLoyaltyPointsClick,
   onPartnerProgramClick,
-  onAffiliateListingsClick,
   onAdvertisingClick,
   onIntroAdModerationClick,
   onSellerPersonalCategoryModerationClick,
@@ -209,7 +207,6 @@ export function MyProfilePage({
     onPremiumClick,
     onLoyaltyPointsClick,
     onPartnerProgramClick,
-    onAffiliateListingsClick,
     onAdvertisingClick,
     onEditProfileClick,
   });

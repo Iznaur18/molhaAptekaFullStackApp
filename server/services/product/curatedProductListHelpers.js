@@ -97,9 +97,7 @@ export const normalizeCuratedProductListRegionCode = (rawRegionCode) => {
  */
 export const filterCuratedListsForViewerRegion = (lists, viewerRegionCode) => {
   const code = resolveViewerRegionCode(viewerRegionCode);
-  return lists.filter(
-    (list) => resolveViewerRegionCode(list.regionCode) === code,
-  );
+  return lists.filter((list) => resolveViewerRegionCode(list.regionCode) === code);
 };
 
 /**
@@ -171,7 +169,9 @@ export const autopurgeCuratedProductList = async (list, hiddenSellerIds) => {
  * @param {string[]} hiddenSellerIds
  */
 export const autopurgeCuratedProductLists = async (lists, hiddenSellerIds) => {
-  return Promise.all(lists.map((list) => autopurgeCuratedProductList(list, hiddenSellerIds)));
+  return Promise.all(
+    lists.map((list) => autopurgeCuratedProductList(list, hiddenSellerIds)),
+  );
 };
 
 /**
@@ -195,10 +195,15 @@ export const buildHomeCuratedListsResponse = async (
   hiddenSellerIds,
   options = {},
 ) => {
-  const regionLists = filterCuratedListsForViewerRegion(lists, options.viewerRegionCode);
+  const regionLists = filterCuratedListsForViewerRegion(
+    lists,
+    options.viewerRegionCode,
+  );
   const purgedLists = await autopurgeCuratedProductLists(regionLists, hiddenSellerIds);
   const allProductIds = [
-    ...new Set(purgedLists.flatMap((list) => (list.productIds ?? []).map((id) => String(id)))),
+    ...new Set(
+      purgedLists.flatMap((list) => (list.productIds ?? []).map((id) => String(id))),
+    ),
   ];
   const productsById = await fetchCatalogVisibleProductsByIds(
     allProductIds,
@@ -233,7 +238,9 @@ export const toCuratedProductListPayload = (list) => ({
   _id: String(list._id),
   title: String(list.title ?? ""),
   regionCode: normalizeCuratedProductListRegionCode(list.regionCode),
-  productIds: Array.isArray(list.productIds) ? list.productIds.map((id) => String(id)) : [],
+  productIds: Array.isArray(list.productIds)
+    ? list.productIds.map((id) => String(id))
+    : [],
   sortOrder: Number(list.sortOrder) || 0,
   createdAt: list.createdAt ?? null,
   updatedAt: list.updatedAt ?? null,
@@ -264,10 +271,15 @@ export const assertCuratedListProductCatalogVisible = async (productId) => {
  * @param {string} productId
  * @param {string | null | undefined} listRegionCode
  */
-export const assertCuratedListProductMatchesRegion = async (productId, listRegionCode) => {
+export const assertCuratedListProductMatchesRegion = async (
+  productId,
+  listRegionCode,
+) => {
   const product = await assertCuratedListProductCatalogVisible(productId);
   const listRegion = normalizeCuratedProductListRegionCode(listRegionCode);
-  const productRegion = normalizeCuratedProductListRegionCode(product.productRegionCode);
+  const productRegion = normalizeCuratedProductListRegionCode(
+    product.productRegionCode,
+  );
   if (productRegion !== listRegion) {
     throw new AppError(400, "Регион товара не совпадает с регионом подборки");
   }
@@ -294,7 +306,10 @@ export const reorderCuratedProductLists = async (orderedListIds) => {
 
   await Promise.all(
     uniqueIds.map((listId, index) =>
-      CuratedProductListModel.updateOne({ _id: listId }, { $set: { sortOrder: index } }),
+      CuratedProductListModel.updateOne(
+        { _id: listId },
+        { $set: { sortOrder: index } },
+      ),
     ),
   );
 };

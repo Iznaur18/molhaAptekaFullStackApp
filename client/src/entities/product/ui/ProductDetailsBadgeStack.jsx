@@ -9,10 +9,54 @@ import "./product-details-modal/ProductDetailsModalPrice.css";
 /**
  * @param {{
  *   product: import("../model/types.js").ProductFromApi;
+ *   onBadgePress?: (item: {
+ *     key: string;
+ *     label: string;
+ *     kind: string;
+ *     origin?: string | null;
+ *     priceMarketStatus?: string;
+ *   }) => void;
  * }} props
  */
-export function ProductDetailsBadgeStack({ product }) {
+export function ProductDetailsBadgeStack({ product, onBadgePress }) {
   const items = buildProductDetailsBadgeItems({ product });
+  const interactive = typeof onBadgePress === "function";
+
+  /**
+   * @param {{ key: string; label: string }} item
+   * @param {import("react").ReactNode} children
+   * @param {string} className
+   * @param {Record<string, string> | undefined} style
+   * @param {string | undefined} ariaLabel
+   */
+  const renderChip = (item, children, className, style, ariaLabel) => {
+    if (!interactive) {
+      return (
+        <div
+          key={item.key}
+          className={className}
+          role="status"
+          aria-label={ariaLabel}
+          style={style}
+        >
+          {children}
+        </div>
+      );
+    }
+
+    return (
+      <button
+        key={item.key}
+        type="button"
+        className={`${className} product-details-modal__meta-info-chip--pressable`}
+        aria-label={ariaLabel ?? item.label}
+        style={style}
+        onClick={() => onBadgePress(item)}
+      >
+        {children}
+      </button>
+    );
+  };
 
   return (
     <div className="product-details-modal__price-badge-row">
@@ -20,95 +64,87 @@ export function ProductDetailsBadgeStack({ product }) {
         <div className="product-details-modal__price-badge-row-track">
           {items.map((item) => {
             if (item.kind === "original") {
-              return (
-                <div
-                  key={item.key}
-                  className="product-details-modal__meta-info-chip product-details-modal__meta-info-chip--original"
-                  aria-label={PRODUCT_DETAILS_MODAL_UI.ORIGINAL_BADGE_ARIA}
-                >
+              return renderChip(
+                item,
+                <>
                   <CircleCheck
                     className="product-details-modal__meta-info-chip-icon"
                     size={14}
                     aria-hidden
                   />
                   <span>{item.label}</span>
-                </div>
+                </>,
+                "product-details-modal__meta-info-chip product-details-modal__meta-info-chip--original",
+                undefined,
+                PRODUCT_DETAILS_MODAL_UI.ORIGINAL_BADGE_ARIA,
               );
             }
 
             if (item.kind === "raffle") {
-              return (
-                <div
-                  key={item.key}
-                  className="product-details-modal__meta-info-chip product-details-modal__meta-info-chip--raffle"
-                  role="status"
-                  style={{
-                    backgroundColor: PRODUCT_DETAILS_BADGE_SOFT_COLORS.raffle.backgroundColor,
-                    color: PRODUCT_DETAILS_BADGE_SOFT_COLORS.raffle.color,
-                  }}
-                >
-                  <span>{item.label}</span>
-                </div>
+              return renderChip(
+                item,
+                <span>{item.label}</span>,
+                "product-details-modal__meta-info-chip product-details-modal__meta-info-chip--raffle",
+                {
+                  backgroundColor: PRODUCT_DETAILS_BADGE_SOFT_COLORS.raffle.backgroundColor,
+                  color: PRODUCT_DETAILS_BADGE_SOFT_COLORS.raffle.color,
+                },
+                item.label,
               );
             }
 
             if (item.kind === "affiliate") {
-              return (
-                <div
-                  key={item.key}
-                  className="product-details-modal__meta-info-chip product-details-modal__meta-info-chip--affiliate"
-                  role="status"
-                  style={{
-                    backgroundColor:
-                      PRODUCT_DETAILS_BADGE_SOFT_COLORS.affiliate.backgroundColor,
-                    color: PRODUCT_DETAILS_BADGE_SOFT_COLORS.affiliate.color,
-                  }}
-                >
-                  <span>{item.label}</span>
-                </div>
+              return renderChip(
+                item,
+                <span>{item.label}</span>,
+                "product-details-modal__meta-info-chip product-details-modal__meta-info-chip--affiliate",
+                {
+                  backgroundColor:
+                    PRODUCT_DETAILS_BADGE_SOFT_COLORS.affiliate.backgroundColor,
+                  color: PRODUCT_DETAILS_BADGE_SOFT_COLORS.affiliate.color,
+                },
+                item.label,
               );
             }
 
             if (item.kind === "listingOrigin") {
               const ListingOriginIcon = item.Icon;
-              return (
-                <div
-                  key={item.key}
-                  className="product-details-modal__meta-info-chip product-details-modal__meta-info-chip--listing-origin"
-                  aria-label={PRODUCT_DETAILS_MODAL_UI.LISTING_ORIGIN_SLOT_ARIA}
-                  style={{
-                    backgroundColor:
-                      PRODUCT_DETAILS_BADGE_SOFT_COLORS.listingOrigin.backgroundColor,
-                    color: PRODUCT_DETAILS_BADGE_SOFT_COLORS.listingOrigin.color,
-                  }}
-                >
+              return renderChip(
+                item,
+                <>
                   <ListingOriginIcon
                     className="product-details-modal__meta-info-chip-icon"
                     size={14}
                     aria-hidden
                   />
                   <span>{item.label}</span>
-                </div>
+                </>,
+                "product-details-modal__meta-info-chip product-details-modal__meta-info-chip--listing-origin",
+                {
+                  backgroundColor:
+                    PRODUCT_DETAILS_BADGE_SOFT_COLORS.listingOrigin.backgroundColor,
+                  color: PRODUCT_DETAILS_BADGE_SOFT_COLORS.listingOrigin.color,
+                },
+                PRODUCT_DETAILS_MODAL_UI.LISTING_ORIGIN_SLOT_ARIA,
               );
             }
 
-            return (
-              <div
-                key={item.key}
-                className="product-details-modal__meta-info-chip product-details-modal__meta-info-chip--price-status"
-                aria-label={PRODUCT_DETAILS_MODAL_UI.PRICE_MARKET_STATUS_SLOT_ARIA}
-                style={{
-                  backgroundColor: item.backgroundColor,
-                  color: item.color,
-                }}
-              >
+            return renderChip(
+              item,
+              <>
                 <Tag
                   className="product-details-modal__meta-info-chip-icon"
                   size={14}
                   aria-hidden
                 />
                 <span>{item.label}</span>
-              </div>
+              </>,
+              "product-details-modal__meta-info-chip product-details-modal__meta-info-chip--price-status",
+              {
+                backgroundColor: item.backgroundColor,
+                color: item.color,
+              },
+              PRODUCT_DETAILS_MODAL_UI.PRICE_MARKET_STATUS_SLOT_ARIA,
             );
           })}
         </div>

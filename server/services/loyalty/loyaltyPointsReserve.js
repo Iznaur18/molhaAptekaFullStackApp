@@ -3,6 +3,7 @@ import { UserModel } from "../../models/index.js";
 import { InsufficientLoyaltyPointsError } from "./loyaltyPointsSpend.js";
 import { withMongoSession } from "../../utils/mongoTransaction.js";
 import { getSellerLoyaltyPointsAvailable } from "./loyaltyPointsSeller.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 /**
  * @param {string} userId
@@ -207,7 +208,11 @@ export const releaseLoyaltyPointsBySellerTotals = async (totals, session = null)
         session,
       });
     } catch (releaseError) {
-      console.error("releaseLoyaltyPointsBySellerTotals error:", releaseError);
+      logServerEvent("error", {
+        event: "releaseloyaltypointsbysellertotals",
+        error:
+          releaseError instanceof Error ? releaseError.message : String(releaseError),
+      });
     }
   }
 };

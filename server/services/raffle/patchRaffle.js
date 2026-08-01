@@ -7,7 +7,10 @@ import {
 } from "../../constants/raffleConstants.js";
 import { AppError } from "../../errors/AppError.js";
 import { RaffleModel } from "../../models/index.js";
-import { recalculateRaffleSalesProgress, toPublicRafflePayload } from "./raffleHelpers.js";
+import {
+  recalculateRaffleSalesProgress,
+  toPublicRafflePayload,
+} from "./raffleHelpers.js";
 
 import {
   applyRaffleBodyPatch,

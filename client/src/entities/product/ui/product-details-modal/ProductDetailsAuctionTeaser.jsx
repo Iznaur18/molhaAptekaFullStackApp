@@ -1,7 +1,9 @@
+import { Gavel } from "lucide-react";
+
 import { useTopPriceOffersQuery } from "../../../product-price-offer/model/useTopPriceOffersQuery.js";
 import { PRODUCT_PRICE_OFFER_UI } from "../../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../../shared/lib/formatPriceRub.js";
-import { ProductDetailsTeaser } from "./ProductDetailsTeaser.jsx";
+import { ProductDetailsFeatureCard } from "./ProductDetailsFeatureCard.jsx";
 
 /**
  * @param {{
@@ -31,10 +33,10 @@ export function ProductDetailsAuctionTeaser({ productId, auctionActive, onPress 
       : PRODUCT_PRICE_OFFER_UI.DETAILS_TEASER_NO_OFFERS;
 
   return (
-    <ProductDetailsTeaser
+    <ProductDetailsFeatureCard
+      icon={Gavel}
       title={PRODUCT_PRICE_OFFER_UI.DETAILS_TEASER_TITLE}
       subtitle={subtitle}
-      goLabel={PRODUCT_PRICE_OFFER_UI.DETAILS_TEASER_GO}
       ariaLabel={PRODUCT_PRICE_OFFER_UI.DETAILS_TEASER_ARIA}
       onClick={onPress}
     />

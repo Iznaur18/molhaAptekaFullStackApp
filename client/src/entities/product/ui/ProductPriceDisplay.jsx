@@ -23,6 +23,8 @@ import "./ProductPriceDisplay.css";
  *   showLoyaltyBadge?: boolean;
  *   isAuthorized?: boolean;
  *   afterPriceSlot?: import("react").ReactNode;
+ *   onDiscountBadgePress?: (payload: { kind: "discount"; label: string }) => void;
+ *   onLoyaltyBadgePress?: (payload: { kind: "loyalty"; label: string }) => void;
  * }} props
  */
 export function ProductPriceDisplay({
@@ -34,6 +36,8 @@ export function ProductPriceDisplay({
   showLoyaltyBadge = false,
   isAuthorized = false,
   afterPriceSlot = null,
+  onDiscountBadgePress,
+  onLoyaltyBadgePress,
 }) {
   const discountPercent = resolveProductDiscountPercent(product);
   const hasDiscount = hasProductCatalogDiscount(product);
@@ -67,6 +71,7 @@ export function ProductPriceDisplay({
         <ProductDiscountBadge
           discountPercent={discountPercent}
           className="product-price-display__discount"
+          onPress={onDiscountBadgePress}
         />
       ) : null}
       {showLoyaltyBadge ? (
@@ -75,6 +80,7 @@ export function ProductPriceDisplay({
           isAuthorized={isAuthorized}
           variant="detail"
           className="product-price-display__loyalty"
+          onPress={onLoyaltyBadgePress}
         />
       ) : null}
       {afterPriceSlot}
@@ -87,12 +93,14 @@ export function ProductPriceDisplay({
  *   discountPercent: number | null | undefined;
  *   className?: string;
  *   variant?: "inline" | "overlay" | "banner" | "detail";
+ *   onPress?: (payload: { kind: "discount"; label: string }) => void;
  * }} props
  */
 export function ProductDiscountBadge({
   discountPercent,
   className = "",
   variant = "inline",
+  onPress,
 }) {
   if (discountPercent == null || discountPercent < 1) {
     return null;
@@ -109,10 +117,24 @@ export function ProductDiscountBadge({
     "product-discount-badge",
     variant === "overlay" ? "product-discount-badge--overlay" : "",
     variant === "banner" ? "product-discount-badge--banner" : "",
+    typeof onPress === "function" ? "product-discount-badge--pressable" : "",
     className,
   ]
     .filter(Boolean)
     .join(" ");
+
+  if (typeof onPress === "function") {
+    return (
+      <button
+        type="button"
+        className={rootClassName}
+        aria-label={ariaLabel}
+        onClick={() => onPress({ kind: "discount", label: badgeText })}
+      >
+        {badgeText}
+      </button>
+    );
+  }
 
   return (
     <span className={rootClassName} role="status" aria-label={ariaLabel}>

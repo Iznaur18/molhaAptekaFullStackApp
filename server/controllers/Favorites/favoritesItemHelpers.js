@@ -124,7 +124,7 @@ export async function populateWishlistProducts(items) {
   const ordered = sortedIds.map((id) => productById.get(id)).filter(Boolean);
   const withSeller = await attachProductSellerSnapshots(ordered);
   return attachProductAvailablePurchaseQuantity(withSeller);
-};
+}
 
 /**
  * @param {Record<string, number>} items
@@ -137,7 +137,7 @@ function reconcileWishlistItemsWithProducts(items, products) {
   );
   const ghostIds = Object.keys(items).filter((productId) => !productIds.has(productId));
   return { reconciled, ghostIds };
-};
+}
 
 /**
  * @param {unknown} userId
@@ -213,7 +213,10 @@ export async function syncWishlistForUser(userId, nextItems) {
  * @param {import('mongoose').Types.ObjectId} userObjectId
  * @param {import('mongoose').ClientSession | null} [session]
  */
-export async function deleteUserWishlistAndDecrementCounts(userObjectId, session = null) {
+export async function deleteUserWishlistAndDecrementCounts(
+  userObjectId,
+  session = null,
+) {
   const doc = await WishlistModel.findOne({ userId: userObjectId })
     .select("items")
     .session(session ?? undefined)

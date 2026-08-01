@@ -9,8 +9,7 @@ import { isProductWholesaleConfigured } from "@izibuy/shared-lib";
 
 import { AppError } from "../../errors/AppError.js";
 
-const hasBodyField = (body, field) =>
-  Object.prototype.hasOwnProperty.call(body, field);
+const hasBodyField = (body, field) => Object.prototype.hasOwnProperty.call(body, field);
 
 /**
  * @param {Record<string, unknown>} body

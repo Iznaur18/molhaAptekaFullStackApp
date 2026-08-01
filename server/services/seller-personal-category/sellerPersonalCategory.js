@@ -34,9 +34,7 @@ export async function getSellerPersonalCategoryConfig() {
   };
 }
 
-export async function getSellerPersonalCategoryCatalogTiles({
-  viewerRegionCode,
-} = {}) {
+export async function getSellerPersonalCategoryCatalogTiles({ viewerRegionCode } = {}) {
   const now = new Date();
   const regionCode = String(viewerRegionCode ?? "").trim();
   const rows = await SellerPersonalCategoryModel.find({
@@ -80,29 +78,31 @@ export async function submitSellerPersonalCategoryCampaign({ userId, body }) {
   const reservedAt = new Date();
 
   try {
-    const { campaign, loyaltyPointsBalance } = await runInTransaction(async (session) => {
-      await assertNoOpenSellerPersonalCategoryCampaign(userId, session);
+    const { campaign, loyaltyPointsBalance } = await runInTransaction(
+      async (session) => {
+        await assertNoOpenSellerPersonalCategoryCampaign(userId, session);
 
-      const loyaltyPointsBalance = await reserveLoyaltyPoints({
-        userId,
-        amount: payload.amountPoints,
-        session,
-      });
+        const loyaltyPointsBalance = await reserveLoyaltyPoints({
+          userId,
+          amount: payload.amountPoints,
+          session,
+        });
 
-      const [campaign] = await SellerPersonalCategoryCampaignModel.create(
-        [
-          {
-            sellerId: userId,
-            status: SELLER_PERSONAL_CATEGORY_STATUS_PENDING,
-            ...payload,
-            pointsReservedAt: reservedAt,
-          },
-        ],
-        withMongoSession({}, session),
-      );
+        const [campaign] = await SellerPersonalCategoryCampaignModel.create(
+          [
+            {
+              sellerId: userId,
+              status: SELLER_PERSONAL_CATEGORY_STATUS_PENDING,
+              ...payload,
+              pointsReservedAt: reservedAt,
+            },
+          ],
+          withMongoSession({}, session),
+        );
 
-      return { campaign, loyaltyPointsBalance };
-    });
+        return { campaign, loyaltyPointsBalance };
+      },
+    );
 
     return {
       message: "Заявка отправлена на модерацию. Баллы зарезервированы.",
@@ -136,7 +136,8 @@ export async function submitSellerPersonalCategoryCampaign({ userId, body }) {
  * }} input
  */
 export async function cancelMySellerPersonalCategoryCampaign({ userId, campaignId }) {
-  const campaign = await SellerPersonalCategoryCampaignModel.findById(campaignId).lean();
+  const campaign =
+    await SellerPersonalCategoryCampaignModel.findById(campaignId).lean();
   if (!campaign) {
     throw new AppError(404, "Заявка не найдена");
   }

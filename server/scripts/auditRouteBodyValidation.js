@@ -5,8 +5,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROUTES_DIR = path.join(__dirname, "../routes");
 
-const MUTATION_RE =
-  /router\.(post|put|patch)\(\s*[\r\n\s]*["'`]([^"'`]+)["'`]/g;
+const MUTATION_RE = /router\.(post|put|patch)\(\s*[\r\n\s]*["'`]([^"'`]+)["'`]/g;
 
 const VALIDATION_RE = /Validation|validateBodyZod|validateParamsZod/;
 

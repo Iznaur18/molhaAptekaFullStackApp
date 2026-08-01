@@ -58,7 +58,10 @@ test("assertNoOpenSellerPersonalCategoryCampaign rejects duplicate open campaign
 
 test("assertSellerPersonalCategoryImageUrlIsUploadedAsset rejects external urls", () => {
   assert.throws(
-    () => assertSellerPersonalCategoryImageUrlIsUploadedAsset("https://evil.example/tile.jpg"),
+    () =>
+      assertSellerPersonalCategoryImageUrlIsUploadedAsset(
+        "https://evil.example/tile.jpg",
+      ),
     /SELLER_PERSONAL_CATEGORY_IMAGE_URL_INVALID/,
   );
 
@@ -187,7 +190,9 @@ test("expireDueActiveSellerPersonalCategoryCampaigns is idempotent", async () =>
 
   assert.equal(notifications.length, 1);
 
-  const campaign = await SellerPersonalCategoryCampaignModel.findOne({ sellerId }).lean();
+  const campaign = await SellerPersonalCategoryCampaignModel.findOne({
+    sellerId,
+  }).lean();
   assert.equal(campaign?.status, "expired");
 });
 
@@ -217,7 +222,8 @@ test("partial unique index blocks second open campaign for seller", async () => 
         durationHours: 24,
         amountPoints: 1_000,
       }),
-    (error) => error && typeof error === "object" && "code" in error && error.code === 11000,
+    (error) =>
+      error && typeof error === "object" && "code" in error && error.code === 11000,
   );
 });
 
@@ -247,6 +253,9 @@ test("linkSellerProductsToPersonalCategory only links approved products", async 
   const approvedRow = await ProductModel.findById(approved._id).lean();
   const pendingRow = await ProductModel.findById(pending._id).lean();
 
-  assert.equal(String(approvedRow?.sellerPersonalCategoryId), String(personalCategoryId));
+  assert.equal(
+    String(approvedRow?.sellerPersonalCategoryId),
+    String(personalCategoryId),
+  );
   assert.equal(pendingRow?.sellerPersonalCategoryId ?? null, null);
 });

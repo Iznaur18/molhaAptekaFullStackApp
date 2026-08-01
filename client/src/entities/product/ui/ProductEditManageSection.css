@@ -21,6 +21,7 @@
   gap: 0.625rem;
   padding: 0.75rem 0.875rem;
   border-radius: 14px;
+  corner-shape: squircle;
   border: 1px solid color-mix(in srgb, var(--iz-color-warning) 33%, transparent);
   background: var(--iz-color-warning-surface);
 }
@@ -64,6 +65,7 @@
   padding: 0.75rem 0.875rem;
   border: 1px solid var(--iz-color-danger);
   border-radius: 12px;
+  corner-shape: squircle;
   background: color-mix(in srgb, var(--iz-color-danger) 8%, var(--iz-color-surface));
   color: var(--iz-color-danger);
   font: inherit;
@@ -117,6 +119,7 @@
   margin: 0;
   padding: 0.55rem 0.85rem;
   border-radius: 0.5rem;
+  corner-shape: squircle;
   font: inherit;
   font-size: 0.875rem;
   font-weight: 600;

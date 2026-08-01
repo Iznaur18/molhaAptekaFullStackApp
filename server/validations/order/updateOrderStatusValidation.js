@@ -1,7 +1,4 @@
-import {
-  orderIdParamsSchema,
-  updateOrderStatusBodySchema,
-} from "@molha/api-contract";
+import { orderIdParamsSchema, updateOrderStatusBodySchema } from "@molha/api-contract";
 
 import { validateBodyZod } from "../../middlewares/validateBodyZod.js";
 import { validateParamsZod } from "../../middlewares/validateParamsZod.js";

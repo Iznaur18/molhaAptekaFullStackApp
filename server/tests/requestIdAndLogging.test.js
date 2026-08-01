@@ -4,10 +4,7 @@ import { after, before, test } from "node:test";
 import { REQUEST_ID_HEADER } from "../constants/requestLogConstants.js";
 import { logServerEvent } from "../utils/logServerEvent.js";
 import { normalizeIncomingRequestId } from "../utils/normalizeIncomingRequestId.js";
-import {
-  startHttpTestServer,
-  stopHttpTestServer,
-} from "./helpers/httpTestApp.js";
+import { startHttpTestServer, stopHttpTestServer } from "./helpers/httpTestApp.js";
 import {
   connectMongoTestReplSet,
   disconnectMongoTestReplSet,
@@ -38,10 +35,7 @@ after(async () => {
 
 test("normalizeIncomingRequestId: valid and invalid", () => {
   assert.equal(normalizeIncomingRequestId("abc"), null);
-  assert.equal(
-    normalizeIncomingRequestId("client-req-01"),
-    "client-req-01",
-  );
+  assert.equal(normalizeIncomingRequestId("client-req-01"), "client-req-01");
   assert.equal(normalizeIncomingRequestId("bad id!"), null);
   assert.equal(normalizeIncomingRequestId("x".repeat(65)), null);
 });

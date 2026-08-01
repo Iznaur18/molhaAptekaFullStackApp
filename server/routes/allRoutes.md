@@ -161,6 +161,8 @@
 | PATCH | `/product/catalog-feed-displays/:tileKey` | 👑 | Правка плитки ленты |
 | GET | `/product/manage-toggle-displays` | 🔓 | Тумблеры управления товаром |
 | PATCH | `/product/manage-toggle-displays/:toggleKey` | 🛡 | Правка тумблера |
+| GET | `/product/badge-explains` | 🔓 | Описания бейджей деталей товара |
+| PATCH | `/product/badge-explains/:badgeKey` | 🛡 | Правка описания бейджа |
 | GET | `/product/curated-lists/home` | 🟡 | Подборки на главной |
 
 ### Admin — синонимы поиска, подборки, дерево категорий

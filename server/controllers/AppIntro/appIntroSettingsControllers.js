@@ -52,7 +52,8 @@ export const patchAppIntroSettingsController = async (req, res) => {
     update.videoMp4Url = nextVideoMp4Url;
     mediaChanged = true;
 
-    const previousVideoMp4Url = normalizeOptionalMediaUrl(existing?.videoMp4Url) ?? null;
+    const previousVideoMp4Url =
+      normalizeOptionalMediaUrl(existing?.videoMp4Url) ?? null;
     if (nextVideoMp4Url !== previousVideoMp4Url) {
       await cleanupReplacedAppIntroMedia(existing?.videoWebmUrl, null);
       update.videoWebmUrl = null;

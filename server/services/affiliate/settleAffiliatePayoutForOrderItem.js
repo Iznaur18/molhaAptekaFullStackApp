@@ -1,7 +1,4 @@
-import {
-  AffiliateLedgerEntryModel,
-  ProductModel,
-} from "../../models/index.js";
+import { AffiliateLedgerEntryModel, ProductModel } from "../../models/index.js";
 import {
   AFFILIATE_INSUFFICIENT_LOYALTY_MESSAGE,
   AFFILIATE_LEDGER_ENTRY_PAYOUT,
@@ -21,6 +18,7 @@ import {
   deductLoyaltyPoints,
   InsufficientLoyaltyPointsError,
 } from "../loyalty/loyaltyPointsSpend.js";
+import { insertLedgerEntryIdempotent } from "../ledger/insertLedgerEntryIdempotent.js";
 import { migrateAffiliateBudgetToLoyaltyPoints } from "./migrateAffiliateBudgetToLoyaltyPoints.js";
 
 /**
@@ -55,8 +53,7 @@ export async function settleAffiliatePayoutForOrderItem({
   }
 
   const sellerId = normalizeId(
-    targetItem.productId?.productSeller?._id ??
-      targetItem.productId?.productSeller,
+    targetItem.productId?.productSeller?._id ?? targetItem.productId?.productSeller,
   );
   if (!sellerId) {
     throw new AppError(400, "Продавец позиции не найден");
@@ -69,9 +66,7 @@ export async function settleAffiliatePayoutForOrderItem({
     return { paid: 0, skipped: true };
   }
 
-  const productId = normalizeId(
-    targetItem.productId?._id ?? targetItem.productId,
-  );
+  const productId = normalizeId(targetItem.productId?._id ?? targetItem.productId);
   const product = productId
     ? await ProductModel.findById(productId)
         .select("affiliateEnabled affiliatePercent")
@@ -123,6 +118,37 @@ export async function settleAffiliatePayoutForOrderItem({
 
   await migrateAffiliateBudgetToLoyaltyPoints(sellerId, session);
 
+  // Claim идемпотентности ДО движения денег. Порядок важен: раньше create
+  // ledger шёл ПОСЛЕ deduct/credit, и при гонке двух confirm за одну позицию
+  // проигравший ловил 11000 уже после сдвига баллов — спасал только откат
+  // транзакции, а наружу летел 500. Теперь unique-индекс {entryType, sourceId}
+  // проверяется первым: проигравший корректно скипается, не тронув баллы
+  // (симметрично creditReferralCashbackFromSpend).
+  const { created, existing: settled } = await insertLedgerEntryIdempotent({
+    model: AffiliateLedgerEntryModel,
+    session,
+    existingFilter: { entryType: AFFILIATE_LEDGER_ENTRY_PAYOUT, sourceId },
+    doc: {
+      sellerUserId: sellerId,
+      affiliateUserId: referrerUserId,
+      entryType: AFFILIATE_LEDGER_ENTRY_PAYOUT,
+      sourceId,
+      amount,
+      percentUsed: percent,
+      orderId,
+      orderItemId: itemId,
+    },
+  });
+
+  if (!created) {
+    // Уже выплачено параллельным confirm — идемпотентный скип без движения баллов.
+    targetItem.affiliateStatus = AFFILIATE_LINE_STATUS_PAID;
+    targetItem.affiliateAmount = Math.ceil(Number(settled?.amount) || amount);
+    targetItem.affiliatePercentUsed = percent;
+    targetItem.affiliatePaidAt = settled?.createdAt ?? new Date();
+    return { paid: targetItem.affiliateAmount, skipped: true };
+  }
+
   try {
     await deductLoyaltyPoints({
       userId: sellerId,
@@ -144,22 +170,6 @@ export async function settleAffiliatePayoutForOrderItem({
     amount,
     session,
   });
-
-  await AffiliateLedgerEntryModel.create(
-    [
-      {
-        sellerUserId: sellerId,
-        affiliateUserId: referrerUserId,
-        entryType: AFFILIATE_LEDGER_ENTRY_PAYOUT,
-        sourceId,
-        amount,
-        percentUsed: percent,
-        orderId,
-        orderItemId: itemId,
-      },
-    ],
-    { session },
-  );
 
   targetItem.affiliateStatus = AFFILIATE_LINE_STATUS_PAID;
   targetItem.affiliateAmount = amount;

@@ -36,11 +36,7 @@ const sellerLookupStages = () => [
  * @param {string | null} [buyerCity]
  * @param {string | null} [viewerRegionCode]
  */
-const sortStagesForAtlasCatalog = (
-  sort,
-  buyerCity = null,
-  viewerRegionCode = null,
-) => {
+const sortStagesForAtlasCatalog = (sort, buyerCity = null, viewerRegionCode = null) => {
   const stages = [];
   if (sort === PRODUCT_SORT_NEWEST) {
     stages.push(catalogPromotionSortBoostAddFieldsStage);

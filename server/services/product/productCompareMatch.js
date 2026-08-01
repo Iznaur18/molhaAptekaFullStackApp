@@ -34,8 +34,12 @@ export function tokenizeProductNameForCompare(name) {
  * @returns {string | null}
  */
 export function normalizeCharacteristicPairKey(key, value) {
-  const k = String(key ?? "").trim().toLowerCase();
-  const v = String(value ?? "").trim().toLowerCase();
+  const k = String(key ?? "")
+    .trim()
+    .toLowerCase();
+  const v = String(value ?? "")
+    .trim()
+    .toLowerCase();
   if (!k || !v) return null;
   return `${k}::${v}`;
 }
@@ -65,7 +69,10 @@ export function buildCharacteristicPairSet(characteristics) {
  * @param {unknown} candidateCharacteristics
  * @returns {number}
  */
-export function countMatchingCharacteristicPairs(sourcePairs, candidateCharacteristics) {
+export function countMatchingCharacteristicPairs(
+  sourcePairs,
+  candidateCharacteristics,
+) {
   if (!(sourcePairs instanceof Set) || sourcePairs.size === 0) return 0;
 
   const candidatePairs = buildCharacteristicPairSet(candidateCharacteristics);

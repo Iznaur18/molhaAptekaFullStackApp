@@ -32,8 +32,7 @@ export function logServerEvent(level, fields) {
 export function logServerHttpError(err, req) {
   const statusCode = resolveHttpErrorStatus(err);
   const level = statusCode >= 500 ? "error" : "warn";
-  const includeStack =
-    statusCode >= 500 || process.env.NODE_ENV !== "production";
+  const includeStack = statusCode >= 500 || process.env.NODE_ENV !== "production";
 
   /** @type {Record<string, unknown>} */
   const fields = {

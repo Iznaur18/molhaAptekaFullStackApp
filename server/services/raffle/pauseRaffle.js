@@ -1,4 +1,7 @@
-import { RAFFLE_STATUS_ACTIVE, RAFFLE_STATUS_PAUSED } from "../../constants/raffleConstants.js";
+import {
+  RAFFLE_STATUS_ACTIVE,
+  RAFFLE_STATUS_PAUSED,
+} from "../../constants/raffleConstants.js";
 import { AppError } from "../../errors/AppError.js";
 import {
   clearRaffleParticipationFromProducts,

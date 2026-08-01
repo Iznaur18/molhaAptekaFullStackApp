@@ -15,8 +15,8 @@ import { resolveProductAffiliateOffer } from "./resolveProductAffiliateOffer.js"
  *   | { kind: "original" }
  *   | { kind: "raffle" }
  *   | { kind: "affiliate" }
- *   | { kind: "listingOrigin"; Icon: import("react").ComponentType<{ className?: string; size?: number; "aria-hidden"?: boolean }> }
- *   | { kind: "priceMarket"; backgroundColor: string; color: string }
+ *   | { kind: "listingOrigin"; origin: string | null; Icon: import("react").ComponentType<{ className?: string; size?: number; "aria-hidden"?: boolean }> }
+ *   | { kind: "priceMarket"; priceMarketStatus: string; backgroundColor: string; color: string }
  * )} ProductDetailsBadgeItem
  */
 
@@ -78,6 +78,10 @@ export function buildProductDetailsBadgeItems({ product }) {
     kind: "listingOrigin",
     Icon: listingOrigin.Icon,
     label: listingOrigin.label,
+    origin:
+      typeof product.productListingOrigin === "string"
+        ? product.productListingOrigin
+        : null,
   });
 
   const priceMarket = resolveProductPriceMarketStatusPresentation(
@@ -88,6 +92,7 @@ export function buildProductDetailsBadgeItems({ product }) {
       key: "price-market",
       kind: "priceMarket",
       label: priceMarket.label,
+      priceMarketStatus: priceMarket.status,
       backgroundColor: priceMarket.backgroundColor,
       color: priceMarket.color,
     });

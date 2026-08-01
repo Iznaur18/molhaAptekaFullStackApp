@@ -15,9 +15,7 @@ import {
 export const refreshAuthController = async (req, res) => {
   const refreshToken = getRefreshTokenFromRequest(req);
   if (!refreshToken) {
-    return res
-      .status(401)
-      .json({ success: false, message: "Refresh token required" });
+    return res.status(401).json({ success: false, message: "Refresh token required" });
   }
 
   let decoded;

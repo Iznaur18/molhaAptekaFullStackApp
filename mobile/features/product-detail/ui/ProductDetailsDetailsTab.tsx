@@ -3,6 +3,12 @@ import { useState } from "react";
 import { Platform, Pressable, ScrollView, Text, View } from "react-native";
 
 import {
+  resolveProductDetailsBadgeExplainRequest,
+  type ProductBadgeExplainRequest,
+} from "@/entities/product-badge-explain/lib/resolveProductBadgeExplainSheet";
+import { useProductBadgeExplainsQuery } from "@/entities/product-badge-explain/model/useProductBadgeExplainsQuery";
+import { ProductBadgeExplainSheet } from "@/entities/product-badge-explain/ui/ProductBadgeExplainSheet";
+import {
   getProductFieldReadLayout,
   getProductFieldLabel,
   PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS,
@@ -17,6 +23,7 @@ import { ProductPriceDisplay } from "@/entities/product/ui/ProductPriceDisplay";
 import { UserProfileProductsList } from "@/entities/user/ui/UserProfileProductsList";
 import { ProductDetailsAuctionTeaser } from "@/features/product-detail/ui/ProductDetailsAuctionTeaser";
 import { ProductDetailsInstallmentTeaser } from "@/features/product-detail/ui/ProductDetailsInstallmentTeaser";
+import { ProductDetailsRaffleTeaser } from "@/features/product-detail/ui/ProductDetailsRaffleTeaser";
 import { ProductDetailsSaleTeaser } from "@/features/product-detail/ui/ProductDetailsSaleTeaser";
 import { ProductDetailsWholesaleOffer } from "@/features/product-detail/ui/ProductDetailsWholesaleOffer";
 import { ProductPickupDetailsPanel } from "@/features/product-detail/ui/ProductPickupDetailsPanel";
@@ -51,6 +58,24 @@ export const ProductDetailsDetailsTab = ({
   const productId = product._id != null ? String(product._id) : "";
   const installmentEnabled = product.productInstallmentEnabled === true;
   const [contentTab, setContentTab] = useState<ContentTabId>("description");
+  const [badgeExplain, setBadgeExplain] = useState<ProductBadgeExplainRequest | null>(
+    null,
+  );
+
+  useProductBadgeExplainsQuery({ enabled: true });
+
+  const openBadgeExplain = (item: {
+    kind: string;
+    label: string;
+    origin?: string | null;
+    priceMarketStatus?: string | null;
+  }) => {
+    const request = resolveProductDetailsBadgeExplainRequest(item);
+    if (!request) {
+      return;
+    }
+    setBadgeExplain(request);
+  };
 
   const bottomMetaFieldKeys = PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS.filter(
     (key) => getProductFieldReadLayout(key) === "meta",
@@ -94,29 +119,34 @@ export const ProductDetailsDetailsTab = ({
     <View style={styles.rowTop}>
       <View style={styles.spec}>
         <View style={styles.priceBlock}>
-          <ProductPriceDisplay product={product} showLabel={false} variant="detail" />
+          <ProductPriceDisplay
+            product={product}
+            showLabel={false}
+            variant="detail"
+            onDiscountBadgePress={openBadgeExplain}
+            onLoyaltyBadgePress={openBadgeExplain}
+          />
           <ProductDetailsWholesaleOffer
             product={product}
             canShowAddToCart={canShowAddToCart}
           />
           <Text style={styles.productName}>{name}</Text>
-          <ProductDetailsBadgeStack product={product} />
-          {typeof onRequestLogin === "function" ? (
-            <ProductAffiliateShareButton
-              product={product}
-              onRequestLogin={onRequestLogin}
-            />
-          ) : null}
-          {(sellerId ||
-            (productId && onOpenInstallmentTab) ||
-            (auctionActive && onOpenAuctionTab)) ? (
-            <View style={styles.detailSellerExtras}>
-              {sellerId ? (
-                <UserProfileProductsList
-                  targetUserId={sellerId}
-                  hideWhenEmpty
-                  heading={SELLER_PRODUCTS_PAGE_UI.TITLE}
-                  layout="horizontal"
+          <ProductDetailsBadgeStack product={product} onBadgePress={openBadgeExplain} />
+          <View style={styles.detailSellerExtras}>
+            {sellerId ? (
+              <UserProfileProductsList
+                targetUserId={sellerId}
+                hideWhenEmpty
+                heading={SELLER_PRODUCTS_PAGE_UI.TITLE}
+                layout="horizontal"
+              />
+            ) : null}
+            <View style={styles.featureCards}>
+              <ProductDetailsRaffleTeaser product={product} />
+              {typeof onRequestLogin === "function" ? (
+                <ProductAffiliateShareButton
+                  product={product}
+                  onRequestLogin={onRequestLogin}
                 />
               ) : null}
               {productId && onOpenInstallmentTab ? (
@@ -137,7 +167,7 @@ export const ProductDetailsDetailsTab = ({
                 <ProductDetailsSaleTeaser product={product} sellerId={sellerId} />
               ) : null}
             </View>
-          ) : null}
+          </View>
         </View>
       </View>
 
@@ -280,6 +310,14 @@ export const ProductDetailsDetailsTab = ({
           <ProductDetailFieldRows product={product} fieldKeys={bottomMetaFieldKeys} />
         </View>
       ) : null}
+
+      <ProductBadgeExplainSheet
+        visible={badgeExplain != null}
+        title={badgeExplain?.title ?? ""}
+        badgeKey={badgeExplain?.badgeKey ?? null}
+        fallbackKey={badgeExplain?.fallbackKey ?? "listing_origin_unspecified"}
+        onClose={() => setBadgeExplain(null)}
+      />
     </View>
   );
 };

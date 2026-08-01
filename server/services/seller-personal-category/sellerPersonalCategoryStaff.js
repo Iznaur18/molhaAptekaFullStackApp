@@ -81,8 +81,12 @@ export async function getPendingSellerPersonalCategoryCampaigns({ query }) {
  *   campaignId: string;
  * }} input
  */
-export async function approveSellerPersonalCategoryCampaign({ staffUserId, campaignId }) {
-  const campaign = await SellerPersonalCategoryCampaignModel.findById(campaignId).lean();
+export async function approveSellerPersonalCategoryCampaign({
+  staffUserId,
+  campaignId,
+}) {
+  const campaign =
+    await SellerPersonalCategoryCampaignModel.findById(campaignId).lean();
   if (!campaign) {
     throw new AppError(404, "Заявка не найдена");
   }
@@ -172,10 +176,14 @@ export async function approveSellerPersonalCategoryCampaign({ staffUserId, campa
  *   reason: unknown;
  * }} input
  */
-export async function rejectSellerPersonalCategoryCampaign({ campaignId, reason: rawReason }) {
+export async function rejectSellerPersonalCategoryCampaign({
+  campaignId,
+  reason: rawReason,
+}) {
   const reason = String(rawReason ?? "").trim() || null;
 
-  const campaign = await SellerPersonalCategoryCampaignModel.findById(campaignId).lean();
+  const campaign =
+    await SellerPersonalCategoryCampaignModel.findById(campaignId).lean();
   if (!campaign) {
     throw new AppError(404, "Заявка не найдена");
   }
@@ -212,7 +220,8 @@ export async function rejectSellerPersonalCategoryCampaign({ campaignId, reason:
 }
 
 const loadSellerPersonalCategoryCampaignOrThrow = async (campaignId) => {
-  const campaign = await SellerPersonalCategoryCampaignModel.findById(campaignId).lean();
+  const campaign =
+    await SellerPersonalCategoryCampaignModel.findById(campaignId).lean();
   if (!campaign) {
     throw new AppError(404, "Заявка не найдена");
   }
@@ -323,9 +332,7 @@ export async function cancelSellerPersonalCategoryCampaignByStaff({
  *   campaignId: string;
  * }} input
  */
-export async function deleteSellerPersonalCategoryCampaignByStaff({
-  campaignId,
-}) {
+export async function deleteSellerPersonalCategoryCampaignByStaff({ campaignId }) {
   const campaign = await loadSellerPersonalCategoryCampaignOrThrow(campaignId);
 
   if (campaign.status === SELLER_PERSONAL_CATEGORY_STATUS_PENDING) {
@@ -350,7 +357,10 @@ export async function deleteSellerPersonalCategoryCampaignByStaff({
   }
 
   if (campaign.status !== SELLER_PERSONAL_CATEGORY_STATUS_ACTIVE) {
-    throw new AppError(409, "Можно удалить только активную категорию или заявку на модерации");
+    throw new AppError(
+      409,
+      "Можно удалить только активную категорию или заявку на модерации",
+    );
   }
 
   const category = campaign.personalCategoryId

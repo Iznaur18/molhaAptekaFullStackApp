@@ -23,9 +23,7 @@ const SAMPLE_PASSPORT = {
 
 const withEnv = (overrides, fn) => {
   const keys = Object.keys(overrides);
-  const previous = Object.fromEntries(
-    keys.map((key) => [key, process.env[key]]),
-  );
+  const previous = Object.fromEntries(keys.map((key) => [key, process.env[key]]));
   try {
     for (const [key, value] of Object.entries(overrides)) {
       if (value === undefined) {
@@ -58,7 +56,10 @@ test("seal/open roundtrip with PASSPORT_VAULT_KEK", () => {
     assert.equal(opened.lastName, "Иванов");
     assert.equal(opened.series, "1234");
     assert.equal(opened.number, "567890");
-    assert.equal(opened.birthDate.toISOString(), SAMPLE_PASSPORT.birthDate.toISOString());
+    assert.equal(
+      opened.birthDate.toISOString(),
+      SAMPLE_PASSPORT.birthDate.toISOString(),
+    );
   });
 });
 

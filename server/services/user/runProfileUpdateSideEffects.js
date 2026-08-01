@@ -1,6 +1,7 @@
 import { rejectPendingDataConfirmationForUser } from "./userDataConfirmationHelpers.js";
 import { cancelIntroAdCampaignsForAdvertiser } from "../intro-ad/introAdCampaignHelpers.js";
 import { isPremiumActive, notifyPremiumRevokedByStaff } from "./premiumAccess.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 /**
  * @param {{
@@ -37,7 +38,10 @@ export async function runProfileUpdateBeforeSave({
       isCurrentUserStaff ? currentUserId : null,
     );
   } catch (rejectError) {
-    console.error("rejectPendingDataConfirmationForUser error:", rejectError);
+    logServerEvent("error", {
+      event: "rejectpendingdataconfirmationforuser",
+      error: rejectError instanceof Error ? rejectError.message : String(rejectError),
+    });
   }
 }
 
@@ -71,7 +75,10 @@ export async function runProfileUpdateAfterSave({
     try {
       await notifyPremiumRevokedByStaff(String(targetUserId));
     } catch (notifyError) {
-      console.error("notifyPremiumRevokedByStaff error:", notifyError);
+      logServerEvent("error", {
+        event: "notifypremiumrevokedbystaff",
+        error: notifyError instanceof Error ? notifyError.message : String(notifyError),
+      });
     }
   }
 
@@ -87,6 +94,12 @@ export async function runProfileUpdateAfterSave({
   try {
     await cancelIntroAdCampaignsForAdvertiser(String(targetUserId));
   } catch (introAdCancelError) {
-    console.error("cancelIntroAdCampaignsForAdvertiser error:", introAdCancelError);
+    logServerEvent("error", {
+      event: "cancelintroadcampaignsforadvertiser",
+      error:
+        introAdCancelError instanceof Error
+          ? introAdCancelError.message
+          : String(introAdCancelError),
+    });
   }
 }

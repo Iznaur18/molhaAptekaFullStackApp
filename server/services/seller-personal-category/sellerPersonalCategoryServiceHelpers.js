@@ -26,7 +26,10 @@ export const parseSellerPersonalCategorySubmitBody = (body) => {
   try {
     assertSellerPersonalCategoryImageUrlIsUploadedAsset(imageUrl);
   } catch (error) {
-    if (error instanceof Error && error.message === "SELLER_PERSONAL_CATEGORY_IMAGE_REQUIRED") {
+    if (
+      error instanceof Error &&
+      error.message === "SELLER_PERSONAL_CATEGORY_IMAGE_REQUIRED"
+    ) {
       throw new AppError(400, "Загрузите картинку категории");
     }
     if (

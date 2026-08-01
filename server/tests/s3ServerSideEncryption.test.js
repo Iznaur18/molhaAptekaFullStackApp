@@ -5,9 +5,7 @@ import { buildS3ServerSideEncryptionParams } from "../services/upload/buildS3Ser
 
 const withEnv = (overrides, fn) => {
   const keys = Object.keys(overrides);
-  const previous = Object.fromEntries(
-    keys.map((key) => [key, process.env[key]]),
-  );
+  const previous = Object.fromEntries(keys.map((key) => [key, process.env[key]]));
   try {
     for (const [key, value] of Object.entries(overrides)) {
       if (value === undefined) {

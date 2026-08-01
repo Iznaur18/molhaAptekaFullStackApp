@@ -1,10 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import {
-  SHIPPING_PROVIDER_CDEK,
-  SHIPPING_PROVIDERS,
-} from "@molha/api-contract";
+import { SHIPPING_PROVIDER_CDEK, SHIPPING_PROVIDERS } from "@molha/api-contract";
 
 import {
   getShippingProvider,
@@ -31,8 +28,7 @@ describe("shippingProviderRegistry", () => {
       (error) => error?.statusCode === 501,
     );
     await assert.rejects(
-      () =>
-        invokeShippingProvider(SHIPPING_PROVIDER_CDEK, "createShipment", {}),
+      () => invokeShippingProvider(SHIPPING_PROVIDER_CDEK, "createShipment", {}),
       (error) => error?.statusCode === 501,
     );
   });

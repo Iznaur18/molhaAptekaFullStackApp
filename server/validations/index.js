@@ -18,7 +18,6 @@ import { refreshAuthValidation } from "./user/refreshAuthValidation.js";
 import { verifyEmailTokenValidation } from "./user/verifyEmailTokenValidation.js";
 import { adminCreditLoyaltyPointsValidation } from "./user/adminCreditLoyaltyPointsValidation.js";
 import { purchasePremiumValidation } from "./user/purchasePremiumValidation.js";
-import { convertPartnerBalanceValidation } from "./user/referralValidation.js";
 import { makeProductValidation } from "./product/makeProductValidation.js";
 import { productIdParamValidation } from "./product/productIdParamValidation.js";
 import { productsSearchValidation } from "./product/productsSearchValidation.js";
@@ -98,6 +97,10 @@ import {
   productManageToggleKeyParamValidation,
   patchProductManageToggleDisplayValidation,
 } from "./product/productManageToggleDisplayValidation.js";
+import {
+  productBadgeExplainKeyParamValidation,
+  patchProductBadgeExplainValidation,
+} from "./product/productBadgeExplainValidation.js";
 import { patchAppIntroSettingsValidation } from "./appIntro/appIntroSettingsValidation.js";
 import {
   upsertProductInstallmentProgramValidation,
@@ -133,7 +136,6 @@ export {
   verifyEmailTokenValidation,
   adminCreditLoyaltyPointsValidation,
   purchasePremiumValidation,
-  convertPartnerBalanceValidation,
   registerPushTokenValidation,
   removePushTokenValidation,
   makeProductValidation,
@@ -192,6 +194,8 @@ export {
   patchProductCatalogFeedTileDisplayValidation,
   productManageToggleKeyParamValidation,
   patchProductManageToggleDisplayValidation,
+  productBadgeExplainKeyParamValidation,
+  patchProductBadgeExplainValidation,
   patchAppIntroSettingsValidation,
   upsertProductInstallmentProgramValidation,
   createInstallmentContractValidation,

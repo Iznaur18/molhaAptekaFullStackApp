@@ -16,8 +16,8 @@ export type ProductDetailsBadgeItem = {
   | { kind: "original" }
   | { kind: "raffle" }
   | { kind: "affiliate" }
-  | { kind: "listingOrigin"; iconName: ProductListingOriginIconName }
-  | { kind: "priceMarket"; backgroundColor: string; color: string }
+  | { kind: "listingOrigin"; origin: string | null; iconName: ProductListingOriginIconName }
+  | { kind: "priceMarket"; priceMarketStatus: string; backgroundColor: string; color: string }
 );
 
 type BuildProductDetailsBadgeItemsInput = {
@@ -78,6 +78,10 @@ export const buildProductDetailsBadgeItems = ({
     kind: "listingOrigin",
     iconName: listingOrigin.iconName,
     label: listingOrigin.label,
+    origin:
+      typeof product.productListingOrigin === "string"
+        ? product.productListingOrigin
+        : null,
   });
 
   const priceMarket = resolveProductPriceMarketStatusPresentation(
@@ -88,6 +92,7 @@ export const buildProductDetailsBadgeItems = ({
       key: "price-market",
       kind: "priceMarket",
       label: priceMarket.label,
+      priceMarketStatus: priceMarket.status,
       backgroundColor: priceMarket.backgroundColor,
       color: priceMarket.color,
     });

@@ -710,9 +710,6 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   media: {
-    width: 88,
-    height: 88,
-    borderRadius: 16,
     overflow: "hidden",
     backgroundColor: theme.colors.surfaceMuted,
   },
@@ -736,6 +733,12 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
     letterSpacing: -0.4,
     lineHeight: 24,
     color: theme.colors.text,
+  },
+  description: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: theme.colors.text,
+    opacity: 0.9,
   },
   progress: {
     gap: 10,

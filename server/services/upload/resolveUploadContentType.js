@@ -19,7 +19,10 @@ const EXTENSION_TO_CONTENT_TYPE = {
  * @param {string} [fallbackMime]
  */
 export function resolveUploadContentType(filename, fallbackMime = "") {
-  const extension = path.extname(String(filename ?? "")).toLowerCase().slice(1);
+  const extension = path
+    .extname(String(filename ?? ""))
+    .toLowerCase()
+    .slice(1);
   if (extension && EXTENSION_TO_CONTENT_TYPE[extension]) {
     return EXTENSION_TO_CONTENT_TYPE[extension];
   }

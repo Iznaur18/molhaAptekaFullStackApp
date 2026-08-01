@@ -4,6 +4,8 @@ import { AppError } from "../../errors/AppError.js";
 export const MONEY_IDEMPOTENCY_KEY_MAX_LENGTH = 64;
 export const MONEY_IDEMPOTENCY_KEY_REQUIRED_MESSAGE =
   "Укажите idempotencyKey для денежной операции";
+export const MONEY_IDEMPOTENCY_IN_PROGRESS_MESSAGE =
+  "Операция уже выполняется, повторите через секунду";
 
 /**
  * @param {unknown} raw
@@ -20,6 +22,26 @@ export function requireMoneyIdempotencyKey(raw) {
 }
 
 /**
+ * @param {string | null | undefined} resultJson
+ * @returns {Record<string, unknown> | null}
+ */
+function parseStoredResult(resultJson) {
+  if (!resultJson) {
+    return null;
+  }
+  try {
+    return {
+      ...JSON.parse(resultJson),
+      duplicate: true,
+    };
+  } catch {
+    return { duplicate: true };
+  }
+}
+
+/**
+ * Claim-first: unique insert до execute — иначе два гонщика оба мутируют деньги.
+ *
  * @param {{
  *   scope: string;
  *   actorUserId: string;
@@ -35,58 +57,39 @@ export async function runMoneyIdempotentMutation({
 }) {
   const key = requireMoneyIdempotencyKey(idempotencyKey);
   const actorId = String(actorUserId);
-
-  const existing = await MoneyIdempotencyRecordModel.findOne({
-    scope,
-    actorUserId: actorId,
-    key,
-  })
-    .select("resultJson")
-    .lean();
-
-  if (existing?.resultJson) {
-    try {
-      return {
-        ...JSON.parse(existing.resultJson),
-        duplicate: true,
-      };
-    } catch {
-      return { duplicate: true };
-    }
-  }
-
-  const result = await execute();
-  const { duplicate: _ignored, ...toStore } = result ?? {};
+  const filter = { scope, actorUserId: actorId, key };
 
   try {
     await MoneyIdempotencyRecordModel.create({
-      scope,
-      actorUserId: actorId,
-      key,
-      resultJson: JSON.stringify(toStore),
+      ...filter,
+      resultJson: null,
     });
   } catch (error) {
-    if (error?.code === 11000) {
-      const again = await MoneyIdempotencyRecordModel.findOne({
-        scope,
-        actorUserId: actorId,
-        key,
-      })
-        .select("resultJson")
-        .lean();
-      if (again?.resultJson) {
-        try {
-          return {
-            ...JSON.parse(again.resultJson),
-            duplicate: true,
-          };
-        } catch {
-          return { duplicate: true };
-        }
-      }
+    if (error?.code !== 11000) {
+      throw error;
     }
-    throw error;
+
+    const existing = await MoneyIdempotencyRecordModel.findOne(filter)
+      .select("resultJson")
+      .lean();
+
+    const replay = parseStoredResult(existing?.resultJson);
+    if (replay) {
+      return replay;
+    }
+
+    throw new AppError(409, MONEY_IDEMPOTENCY_IN_PROGRESS_MESSAGE);
   }
 
-  return result;
+  try {
+    const result = await execute();
+    const { duplicate: _ignored, ...toStore } = result ?? {};
+    await MoneyIdempotencyRecordModel.updateOne(filter, {
+      $set: { resultJson: JSON.stringify(toStore) },
+    });
+    return result;
+  } catch (error) {
+    await MoneyIdempotencyRecordModel.deleteOne(filter);
+    throw error;
+  }
 }

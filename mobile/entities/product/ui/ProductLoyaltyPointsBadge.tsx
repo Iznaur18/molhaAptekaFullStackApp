@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { resolveProductLoyaltyPointsPerUnit } from "@/entities/product/lib/resolveProductLoyaltyPointsPerUnit";
@@ -11,12 +11,14 @@ type ProductLoyaltyPointsBadgeProps = {
   product: Record<string, unknown>;
   isAuthorized?: boolean;
   variant?: "inline" | "overlay" | "detail";
+  onPress?: (payload: { kind: "loyalty"; label: string }) => void;
 };
 
 export const ProductLoyaltyPointsBadge = ({
   product,
   isAuthorized = false,
   variant = "inline",
+  onPress,
 }: ProductLoyaltyPointsBadgeProps) => {
   const styles = useProductLoyaltyPointsBadgeStyles();
   const { isUserDataConfirmed } = useUserAccess();
@@ -35,29 +37,39 @@ export const ProductLoyaltyPointsBadge = ({
           ? PRODUCT_CARD_UI.LOYALTY_POINTS_CONFIRMED(points)
           : PRODUCT_CARD_UI.LOYALTY_POINTS_UNCONFIRMED(points);
 
-  return (
-    <View
-      style={
-        variant === "overlay"
-          ? styles.badgeOverlay
-          : variant === "detail"
-            ? styles.detailBadge
-            : styles.badge
-      }
-    >
-      <AppText
-        style={
-          variant === "overlay"
-            ? styles.badgeOverlayText
-            : variant === "detail"
-              ? styles.detailBadgeText
-              : styles.badgeText
-        }
-        numberOfLines={1}
+  const containerStyle =
+    variant === "overlay"
+      ? styles.badgeOverlay
+      : variant === "detail"
+        ? styles.detailBadge
+        : styles.badge;
+  const textStyle =
+    variant === "overlay"
+      ? styles.badgeOverlayText
+      : variant === "detail"
+        ? styles.detailBadgeText
+        : styles.badgeText;
+
+  if (typeof onPress === "function") {
+    return (
+      <Pressable
+        style={containerStyle}
+        accessibilityRole="button"
+        accessibilityLabel={label}
+        onPress={() => onPress({ kind: "loyalty", label })}
       >
+        <AppText style={textStyle} numberOfLines={1}>
+          {label}
+        </AppText>
+      </Pressable>
+    );
+  }
+
+  return (
+    <View style={containerStyle}>
+      <AppText style={textStyle} numberOfLines={1}>
         {label}
       </AppText>
     </View>
   );
 };
-

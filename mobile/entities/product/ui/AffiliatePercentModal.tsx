@@ -2,6 +2,7 @@ import {
   AFFILIATE_MANAGE_DEFAULT_PERCENT,
   AFFILIATE_PERCENT_MIN,
   isProductAffiliateConfigured,
+  resolveAffiliateEnableLoyaltyGate,
 } from "@izibuy/shared-lib";
 import { useEffect, useState } from "react";
 import {
@@ -17,6 +18,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
+import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
 import { CREATE_PRODUCT_UI } from "@/shared/config";
 import { keepDigitsOnly } from "@/shared/lib/rubPriceInput";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
@@ -46,6 +48,7 @@ export const AffiliatePercentModal = ({
   const headerInsetTop = Math.max(insets.top, 16);
   const footerInsetBottom = Math.max(insets.bottom, 12);
   const { patchMutation } = useMyProductMutations();
+  const loyaltyStatusQuery = useMyLoyaltyPointsStatusQuery(visible);
 
   const [percent, setPercent] = useState(String(AFFILIATE_MANAGE_DEFAULT_PERCENT));
   const [error, setError] = useState("");
@@ -77,6 +80,19 @@ export const AffiliatePercentModal = ({
     ) {
       setError(CREATE_PRODUCT_UI.AFFILIATE_MODAL_ERROR_REQUIRED);
       return;
+    }
+
+    if (product?.affiliateEnabled !== true) {
+      const gate = resolveAffiliateEnableLoyaltyGate({
+        productPrice: product?.productPrice,
+        affiliatePercent: nextPercent,
+        loyaltyPointsBalance: loyaltyStatusQuery.data?.loyaltyPointsBalance ?? 0,
+        loyaltyPointsReserved: loyaltyStatusQuery.data?.loyaltyPointsReserved ?? 0,
+      });
+      if (!gate.ok) {
+        setError(gate.message);
+        return;
+      }
     }
 
     try {

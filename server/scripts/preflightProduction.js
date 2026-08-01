@@ -64,7 +64,9 @@ const main = async () => {
     await mongoose.disconnect();
   }
 
-  const uploadMode = isObjectStorageUploadEnabled() ? "s3 + CDN" : "disk (server/uploads)";
+  const uploadMode = isObjectStorageUploadEnabled()
+    ? "s3 + CDN"
+    : "disk (server/uploads)";
   console.log(`✓ Upload mode: ${uploadMode}`);
   console.log(`✓ FRONTEND_URL: ${process.env.FRONTEND_URL}`);
   console.log(
@@ -76,8 +78,12 @@ const main = async () => {
   console.log("\nФаза 0 checklist (ручное на VPS):");
   console.log("  [ ] SMTP проверен (npm run test:smtp) — server/docs/smtp-setup.md");
   console.log("  [ ] Sentry DSN server + client — server/docs/SENTRY.md");
-  console.log("  [ ] Mongo backup (Atlas Continuous / mongodump cron) — server/docs/RUNBOOK.md");
-  console.log("  [ ] Smoke: login → каталог → upload → заказ — server/docs/production-checklist.md");
+  console.log(
+    "  [ ] Mongo backup (Atlas Continuous / mongodump cron) — server/docs/RUNBOOK.md",
+  );
+  console.log(
+    "  [ ] Smoke: login → каталог → upload → заказ — server/docs/production-checklist.md",
+  );
 
   console.log("\nДальше на VPS: docs/deploy/DEPLOY.md, CSP → npm run csp:print");
 };

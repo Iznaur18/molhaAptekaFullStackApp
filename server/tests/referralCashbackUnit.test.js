@@ -4,7 +4,10 @@ import test from "node:test";
 import { REFERRAL_CASHBACK_PERCENT } from "../constants/referralConstants.js";
 import { computeReferralCashbackAmount } from "../services/referral/computeReferralCashbackAmount.js";
 import { generateReferralCode } from "../services/referral/generateReferralCode.js";
-import { REFERRAL_CODE_LENGTH, REFERRAL_CODE_PATTERN } from "../constants/referralConstants.js";
+import {
+  REFERRAL_CODE_LENGTH,
+  REFERRAL_CODE_PATTERN,
+} from "../constants/referralConstants.js";
 
 test("computeReferralCashbackAmount: 10% floor", () => {
   assert.equal(REFERRAL_CASHBACK_PERCENT, 10);

@@ -86,7 +86,8 @@ export function buildStaffAuditEntry({
     return null;
   }
 
-  const hasParams = params && typeof params === "object" && Object.keys(params).length > 0;
+  const hasParams =
+    params && typeof params === "object" && Object.keys(params).length > 0;
 
   return {
     actorUserId,

@@ -1,5 +1,6 @@
 import { RedisStore } from "rate-limit-redis";
 import { createClient } from "redis";
+import { logServerEvent } from "../utils/logServerEvent.js";
 
 /** @type {import('redis').RedisClientType | null} */
 let redisClient = null;
@@ -16,7 +17,10 @@ export async function initRateLimitRedisStore() {
   try {
     redisClient = createClient({ url });
     redisClient.on("error", (error) => {
-      console.error("[rate-limit] Redis error:", error.message);
+      logServerEvent("error", {
+        event: "rate_limit_redis_error",
+        error: error instanceof Error ? error.message : String(error),
+      });
     });
     await redisClient.connect();
 
@@ -25,13 +29,16 @@ export async function initRateLimitRedisStore() {
       sendCommand: (...args) => redisClient.sendCommand(args),
       prefix,
     });
-    console.log(`[rate-limit] Redis store enabled (prefix=${prefix})`);
+    logServerEvent("info", {
+      event: "rate_limit_redis_enabled",
+      prefix,
+    });
     return store;
   } catch (error) {
-    console.error(
-      "[rate-limit] Redis unavailable, using in-memory store:",
-      error instanceof Error ? error.message : error,
-    );
+    logServerEvent("warn", {
+      event: "rate_limit_redis_unavailable",
+      error: error instanceof Error ? error.message : String(error),
+    });
     redisClient = null;
     return null;
   }
@@ -48,7 +55,10 @@ export async function closeRateLimitRedisStore() {
   try {
     await redisClient.quit();
   } catch (error) {
-    console.error("[rate-limit] Redis quit error:", error);
+    logServerEvent("error", {
+      event: "redis_quit",
+      error: error instanceof Error ? error.message : String(error),
+    });
   } finally {
     redisClient = null;
   }

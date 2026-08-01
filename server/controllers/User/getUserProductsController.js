@@ -19,25 +19,25 @@ const parsePageLimit = (query) => {
 
 /** `GET /user/:userIdClient/products` — товары продавца в каталоге (публично, JWT опционален). */
 export const getUserProductsController = async (req, res) => {
-const targetUserId = req.params.userIdClient;
-    const targetUser = await UserModel.findById(targetUserId).lean();
+  const targetUserId = req.params.userIdClient;
+  const targetUser = await UserModel.findById(targetUserId).lean();
 
-    if (!targetUser) {
-      return errorRes(res, 404, "Пользователь не найден");
-    }
+  if (!targetUser) {
+    return errorRes(res, 404, "Пользователь не найден");
+  }
 
-    const viewer = await getOptionalViewerFromRequest(req);
-    const publicUser = sanitizeUserProfileForViewer(targetUser, {
-      viewer,
-      viewerId: req.userId ?? null,
-    });
+  const viewer = await getOptionalViewerFromRequest(req);
+  const publicUser = sanitizeUserProfileForViewer(targetUser, {
+    viewer,
+    viewerId: req.userId ?? null,
+  });
 
-    if (!publicUser) {
-      return errorRes(res, 404, "Пользователь не найден");
-    }
+  if (!publicUser) {
+    return errorRes(res, 404, "Пользователь не найден");
+  }
 
-    const { page, limit } = parsePageLimit(req.query);
-    const payload = await getSellerCatalogProductsPage(targetUserId, page, limit);
+  const { page, limit } = parsePageLimit(req.query);
+  const payload = await getSellerCatalogProductsPage(targetUserId, page, limit);
 
-    return successRes(res, payload);
+  return successRes(res, payload);
 };

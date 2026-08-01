@@ -58,10 +58,7 @@ const AffiliateLedgerEntrySchema = new mongoose.Schema(
   { timestamps: { createdAt: true, updatedAt: false } },
 );
 
-AffiliateLedgerEntrySchema.index(
-  { entryType: 1, sourceId: 1 },
-  { unique: true },
-);
+AffiliateLedgerEntrySchema.index({ entryType: 1, sourceId: 1 }, { unique: true });
 AffiliateLedgerEntrySchema.index({ affiliateUserId: 1, createdAt: -1 });
 AffiliateLedgerEntrySchema.index({ sellerUserId: 1, createdAt: -1 });
 

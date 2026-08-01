@@ -57,7 +57,10 @@ const seedCuratedFixture = async () => {
   await verifyUserEmail("int-curated-admin@example.com");
   await setUserRole(adminUser._id, "admin");
 
-  const { cookie: sellerCookie } = await registerUserAndGetCookie(request, "curated-seller");
+  const { cookie: sellerCookie } = await registerUserAndGetCookie(
+    request,
+    "curated-seller",
+  );
   await verifyUserEmail("int-curated-seller@example.com");
 
   const moscowProduct = await createProductViaApi(request, sellerCookie, {
@@ -114,35 +117,44 @@ test("curated lists: admin CRUD, duplicate reject, reorder requires full set", a
   const { adminCookie, productIds } = await seedCuratedFixture();
   const list = await createCuratedList(adminCookie, "Хиты");
 
-  const addResponse = await request(`/product/admin/curated-lists/${list._id}/products`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Cookie: adminCookie,
+  const addResponse = await request(
+    `/product/admin/curated-lists/${list._id}/products`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: adminCookie,
+      },
+      body: JSON.stringify({ productId: productIds.moscow }),
     },
-    body: JSON.stringify({ productId: productIds.moscow }),
-  });
+  );
   assert.equal(addResponse.status, 200);
 
-  const wrongRegionResponse = await request(`/product/admin/curated-lists/${list._id}/products`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Cookie: adminCookie,
+  const wrongRegionResponse = await request(
+    `/product/admin/curated-lists/${list._id}/products`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: adminCookie,
+      },
+      body: JSON.stringify({ productId: productIds.chechnya }),
     },
-    body: JSON.stringify({ productId: productIds.chechnya }),
-  });
+  );
   assert.equal(wrongRegionResponse.status, 400);
   assert.match(await parseErrorMessage(wrongRegionResponse), /регион/i);
 
-  const duplicateResponse = await request(`/product/admin/curated-lists/${list._id}/products`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Cookie: adminCookie,
+  const duplicateResponse = await request(
+    `/product/admin/curated-lists/${list._id}/products`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: adminCookie,
+      },
+      body: JSON.stringify({ productId: productIds.moscow }),
     },
-    body: JSON.stringify({ productId: productIds.moscow }),
-  });
+  );
   assert.equal(duplicateResponse.status, 409);
 
   const listTwo = await createCuratedList(adminCookie, "Новинки");
@@ -231,7 +243,9 @@ test("curated lists home: autopurge removes unavailable product ids", async () =
     }),
   );
 
-  await ProductModel.findByIdAndUpdate(productIds.chechnya, { productIsAvailable: false });
+  await ProductModel.findByIdAndUpdate(productIds.chechnya, {
+    productIsAvailable: false,
+  });
   await CuratedProductListModel.updateOne(
     { _id: list._id },
     { $set: { productIds: [productIds.moscow, productIds.chechnya] } },

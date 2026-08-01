@@ -205,9 +205,7 @@ export const guardOrderItemsStockInTransaction = async (
   session = null,
 ) => {
   if (session) {
-    const productObjectIds = [
-      ...new Set(items.map((item) => String(item.productId))),
-    ]
+    const productObjectIds = [...new Set(items.map((item) => String(item.productId)))]
       .filter((id) => mongoose.isValidObjectId(id))
       .map((id) => new mongoose.Types.ObjectId(id));
 

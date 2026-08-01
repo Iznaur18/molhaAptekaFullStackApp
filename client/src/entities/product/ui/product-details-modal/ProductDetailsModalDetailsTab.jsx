@@ -1,5 +1,10 @@
+import { useState } from "react";
+
 import { PRODUCT_DETAILS_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
 import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
+import { useProductBadgeExplainsQuery } from "../../../product-badge-explain/model/useProductBadgeExplainsQuery.js";
+import { resolveProductDetailsBadgeExplainRequest } from "../../../product-badge-explain/lib/resolveProductBadgeExplainSheet.js";
+import { ProductBadgeExplainSheet } from "../../../product-badge-explain/ui/ProductBadgeExplainSheet.jsx";
 import { getProductSellerId } from "../../lib/getProductSellerId.js";
 import { ProductDetailsBadgeStack } from "../ProductDetailsBadgeStack.jsx";
 import { ProductDetailsSellerPreview } from "../ProductDetailsSellerPreview.jsx";
@@ -10,6 +15,7 @@ import { ProductDetailsAuctionTeaser } from "./ProductDetailsAuctionTeaser.jsx";
 import { ProductDetailsContentSwitcher } from "./ProductDetailsContentSwitcher.jsx";
 import { ProductDetailsInstallmentTeaser } from "./ProductDetailsInstallmentTeaser.jsx";
 import { ProductDetailsModalPurchaseActions } from "./ProductDetailsModalPurchaseActions.jsx";
+import { ProductDetailsRaffleTeaser } from "./ProductDetailsRaffleTeaser.jsx";
 import { ProductDetailsSaleTeaser } from "./ProductDetailsSaleTeaser.jsx";
 import { ProductDetailsSellerProductsCarousel } from "./ProductDetailsSellerProductsCarousel.jsx";
 import { ProductDetailsWholesaleOffer } from "./ProductDetailsWholesaleOffer.jsx";
@@ -66,6 +72,20 @@ export function ProductDetailsModalDetailsTab({
     isOwnProduct,
   } = ctrl;
 
+  /** @type {[null | { title: string; badgeKey: import("@izibuy/shared-lib").ProductBadgeExplainKey | null; fallbackKey: string }, Function]} */
+  const [badgeExplain, setBadgeExplain] = useState(null);
+
+  // Prefetch CMS бейджей, пока открыты детали — sheet не стартует с пустым cache.
+  useProductBadgeExplainsQuery({ enabled: isOpen });
+
+  const openBadgeExplain = (item) => {
+    const request = resolveProductDetailsBadgeExplainRequest(item);
+    if (!request) {
+      return;
+    }
+    setBadgeExplain(request);
+  };
+
   const sellerId = getProductSellerId(product) ?? "";
   const productId = String(product._id);
   const installmentEnabled = product.productInstallmentEnabled === true;
@@ -79,6 +99,8 @@ export function ProductDetailsModalDetailsTab({
         showDiscountBadge
         showLoyaltyBadge
         isAuthorized={isAuthorized}
+        onDiscountBadgePress={openBadgeExplain}
+        onLoyaltyBadgePress={openBadgeExplain}
       />
       <ProductDetailsWholesaleOffer
         product={product}
@@ -89,23 +111,22 @@ export function ProductDetailsModalDetailsTab({
       <h3 id={productTitleId} className="product-details-modal__product-name">
         {product.productName?.trim() || "Товар"}
       </h3>
-      <ProductDetailsBadgeStack product={product} />
-      <ProductAffiliateShareButton
-        product={product}
-        isAuthorized={isAuthorized}
-        currentUserId={currentUserId}
-        onRequestLogin={onRequestLogin}
-      />
-      {sellerId ||
-      (productId && handleInstallmentShortcutClick) ||
-      (auctionUi.auctionActive && handleAuctionShortcutClick) ? (
-        <div className="product-details-modal__seller-extras">
-          {sellerId ? (
-            <ProductDetailsSellerProductsCarousel
-              sellerId={sellerId}
-              excludeProductId={productId}
-            />
-          ) : null}
+      <ProductDetailsBadgeStack product={product} onBadgePress={openBadgeExplain} />
+      <div className="product-details-modal__seller-extras">
+        {sellerId ? (
+          <ProductDetailsSellerProductsCarousel
+            sellerId={sellerId}
+            excludeProductId={productId}
+          />
+        ) : null}
+        <div className="product-details-modal__feature-cards">
+          <ProductDetailsRaffleTeaser product={product} />
+          <ProductAffiliateShareButton
+            product={product}
+            isAuthorized={isAuthorized}
+            currentUserId={currentUserId}
+            onRequestLogin={onRequestLogin}
+          />
           {productId ? (
             <ProductDetailsInstallmentTeaser
               productId={productId}
@@ -126,7 +147,7 @@ export function ProductDetailsModalDetailsTab({
             />
           ) : null}
         </div>
-      ) : null}
+      </div>
       {showInlinePurchaseActions ? (
         <ProductDetailsModalPurchaseActions
           productId={productId}
@@ -220,6 +241,13 @@ export function ProductDetailsModalDetailsTab({
       <>
         <div className="product-details-modal__spec">{priceBlock}</div>
         {detailsBelow}
+        <ProductBadgeExplainSheet
+          isOpen={badgeExplain != null}
+          title={badgeExplain?.title ?? ""}
+          badgeKey={badgeExplain?.badgeKey ?? null}
+          fallbackKey={badgeExplain?.fallbackKey ?? "listing_origin_unspecified"}
+          onClose={() => setBadgeExplain(null)}
+        />
       </>
     );
   }
@@ -231,6 +259,13 @@ export function ProductDetailsModalDetailsTab({
         <div className="product-details-modal__spec">{priceBlock}</div>
       </div>
       {detailsBelow}
+      <ProductBadgeExplainSheet
+        isOpen={badgeExplain != null}
+        title={badgeExplain?.title ?? ""}
+        badgeKey={badgeExplain?.badgeKey ?? null}
+        fallbackKey={badgeExplain?.fallbackKey ?? "listing_origin_unspecified"}
+        onClose={() => setBadgeExplain(null)}
+      />
     </>
   );
 }

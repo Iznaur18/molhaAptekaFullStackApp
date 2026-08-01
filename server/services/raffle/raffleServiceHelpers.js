@@ -5,10 +5,7 @@ import {
 } from "../../constants/raffleConstants.js";
 import { AppError } from "../../errors/AppError.js";
 import { RaffleModel, UserModel } from "../../models/index.js";
-import {
-  applyRafflePrizeImageFields,
-  toPublicRafflePayload,
-} from "./raffleHelpers.js";
+import { applyRafflePrizeImageFields, toPublicRafflePayload } from "./raffleHelpers.js";
 import { assertRafflePrizeMediaComplete } from "./rafflePrizeMedia.js";
 
 export const DEFAULT_RAFFLE_PAGE = 1;

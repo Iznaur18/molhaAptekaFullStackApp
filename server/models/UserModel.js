@@ -394,5 +394,4 @@ UserSchema.index(
 // Список рефералов партнёрки: filter by referrer + sort by registration date.
 UserSchema.index({ referredByUserId: 1, createdAt: -1 });
 
-
 export const UserModel = mongoose.model("User", UserSchema); // Модель пользователя для MongoDB

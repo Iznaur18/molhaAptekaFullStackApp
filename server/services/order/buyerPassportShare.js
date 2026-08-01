@@ -1,7 +1,5 @@
 import { ORDER_STATUS_CANCELLED } from "../../constants/orderConstants.js";
-import {
-  PASSPORT_VAULT_ACCESS_PURPOSE_INSTALLMENT_SNAPSHOT,
-} from "../../constants/passportVaultConstants.js";
+import { PASSPORT_VAULT_ACCESS_PURPOSE_INSTALLMENT_SNAPSHOT } from "../../constants/passportVaultConstants.js";
 import { USER_DATA_CONFIRMATION_STATUS_APPROVED } from "../../constants/userDataConfirmationConstants.js";
 import { UserDataConfirmationRequestModel } from "../../models/index.js";
 import {
@@ -35,7 +33,9 @@ export const isOrderCancelledForPassportShare = (order) => {
     return true;
   }
   const items = Array.isArray(order.items) ? order.items : [];
-  return items.length > 0 && items.every((item) => item?.status === ORDER_STATUS_CANCELLED);
+  return (
+    items.length > 0 && items.every((item) => item?.status === ORDER_STATUS_CANCELLED)
+  );
 };
 
 /**

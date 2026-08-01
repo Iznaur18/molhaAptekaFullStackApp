@@ -52,19 +52,12 @@
   margin-top: 12px;
 }
 
-.report-user-story-modal__button {
+/* Кнопки — единый app-btn (--primary / --secondary); тут только раскладка
+   и модальный размер (48px), как у остальных модальных экшенов. */
+.report-user-story-modal__action {
   flex: 1;
-  border: none;
-  border-radius: 999px;
-  padding: 10px 16px;
-  background: var(--iz-color-link);
-  color: var(--iz-color-on-contrast);
-  cursor: pointer;
-}
-
-.report-user-story-modal__button_secondary {
-  background: var(--iz-color-border);
-  color: var(--iz-color-text);
+  min-height: var(--iz-control-btn-modal-min-height);
+  padding-block: var(--iz-control-btn-modal-padding-y);
 }
 
 .report-user-story-modal__error {

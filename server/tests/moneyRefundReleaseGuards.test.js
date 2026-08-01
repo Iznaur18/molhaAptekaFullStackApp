@@ -13,10 +13,7 @@ test("refundLoyaltyPoints: amount <= 0 throws", async () => {
 });
 
 test("refundRubBalance: amount <= 0 throws", async () => {
-  await assert.rejects(
-    () => refundRubBalance({ userId: "x", amount: -1 }),
-    /больше 0/,
-  );
+  await assert.rejects(() => refundRubBalance({ userId: "x", amount: -1 }), /больше 0/);
 });
 
 test("releaseLoyaltyPointsReservation: amount <= 0 throws", async () => {

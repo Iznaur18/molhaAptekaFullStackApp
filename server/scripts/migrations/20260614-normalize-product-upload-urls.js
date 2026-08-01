@@ -16,7 +16,9 @@ export async function up({ db, isApply }) {
 
   for await (const doc of cursor) {
     const urls = Array.isArray(doc.productImageUrls) ? doc.productImageUrls : [];
-    const normalized = urls.map((raw) => normalizeStoredUploadUrl(String(raw ?? "").trim()));
+    const normalized = urls.map((raw) =>
+      normalizeStoredUploadUrl(String(raw ?? "").trim()),
+    );
     const changed = normalized.some((url, i) => url !== String(urls[i] ?? "").trim());
     if (changed) {
       toFix.push({ _id: doc._id, productImageUrls: normalized });

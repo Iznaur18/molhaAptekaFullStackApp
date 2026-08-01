@@ -96,11 +96,7 @@ import {
  * @param {Record<string, unknown>} payload
  * @param {{ includeMobileAuthClient?: boolean }} [options]
  */
-export const completeRegistrationFlow = async (
-  request,
-  payload,
-  options = {},
-) => {
+export const completeRegistrationFlow = async (request, payload, options = {}) => {
   const registerResponse = await request("/auth/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

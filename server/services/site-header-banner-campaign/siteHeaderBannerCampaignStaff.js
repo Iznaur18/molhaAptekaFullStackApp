@@ -112,7 +112,8 @@ export async function approveSiteHeaderBannerCampaign({ staffUserId, campaignId 
     const { saved, cashback } = await runInTransaction(async (session) => {
       await assertSiteHeaderBannerCampaignSlotAvailable(session);
 
-      const fresh = await SiteHeaderBannerCampaignModel.findById(campaignId).session(session);
+      const fresh =
+        await SiteHeaderBannerCampaignModel.findById(campaignId).session(session);
       if (!fresh || fresh.status !== SITE_HEADER_BANNER_CAMPAIGN_STATUS_PENDING) {
         throw new AppError(409, "Заявка уже обработана");
       }
@@ -136,7 +137,10 @@ export async function approveSiteHeaderBannerCampaign({ staffUserId, campaignId 
       fresh.approvedByUserId = staffUserId;
       await fresh.save(withMongoSession({}, session));
 
-      const activated = await activateSiteHeaderBannerCampaignRecord(fresh._id, session);
+      const activated = await activateSiteHeaderBannerCampaignRecord(
+        fresh._id,
+        session,
+      );
       return { saved: activated, cashback };
     });
 
@@ -157,7 +161,10 @@ export async function approveSiteHeaderBannerCampaign({ staffUserId, campaignId 
       campaign: saved ? toSiteHeaderBannerCampaignPayload(saved) : null,
     };
   } catch (error) {
-    if (error instanceof Error && error.message === "SITE_HEADER_BANNER_CAMPAIGN_SLOTS_FULL") {
+    if (
+      error instanceof Error &&
+      error.message === "SITE_HEADER_BANNER_CAMPAIGN_SLOTS_FULL"
+    ) {
       throw new AppError(409, "Все платные слоты заняты. Попробуйте позже.");
     }
     throw error;
@@ -216,7 +223,10 @@ export async function rejectSiteHeaderBannerCampaign({ campaignId, reason }) {
  *   campaignId: string;
  * }} input
  */
-export async function cancelSiteHeaderBannerCampaignByStaff({ staffUserId, campaignId }) {
+export async function cancelSiteHeaderBannerCampaignByStaff({
+  staffUserId,
+  campaignId,
+}) {
   const campaign = await SiteHeaderBannerCampaignModel.findById(campaignId).lean();
   if (!campaign) {
     throw new AppError(404, "Заявка не найдена");

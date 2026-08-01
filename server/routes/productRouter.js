@@ -30,6 +30,8 @@ import {
   patchProductCatalogFeedTileDisplayController,
   getProductManageToggleDisplaysController,
   patchProductManageToggleDisplayController,
+  getProductBadgeExplainsController,
+  patchProductBadgeExplainController,
   getCatalogProductByIdController,
   getComparableProductsController,
   deleteMyProductController,
@@ -141,6 +143,8 @@ import {
   patchProductCatalogFeedTileDisplayValidation,
   productManageToggleKeyParamValidation,
   patchProductManageToggleDisplayValidation,
+  productBadgeExplainKeyParamValidation,
+  patchProductBadgeExplainValidation,
   upsertProductInstallmentProgramValidation,
   createInstallmentContractValidation,
 } from "../validations/index.js";
@@ -148,12 +152,7 @@ import {
 const router = createAsyncRouter();
 
 router.post("/", checkAuthMW, makeProductValidation, postProductController);
-router.get(
-  "/",
-  productsSearchValidation,
-  checkOptionalAuthMW,
-  getProductsController,
-);
+router.get("/", productsSearchValidation, checkOptionalAuthMW, getProductsController);
 router.get("/category-displays", getProductCategoryDisplaysController);
 router.get("/categories/roots", getProductCategoryRootsController);
 router.get("/categories/search", getProductCategorySearchController);
@@ -309,10 +308,23 @@ router.patch(
   patchProductManageToggleDisplayValidation,
   patchProductManageToggleDisplayController,
 );
+router.get("/badge-explains", getProductBadgeExplainsController);
+router.patch(
+  "/badge-explains/:badgeKey",
+  checkAuthMW,
+  checkProductModeratorMW,
+  productBadgeExplainKeyParamValidation,
+  patchProductBadgeExplainValidation,
+  patchProductBadgeExplainController,
+);
 router.get("/my", checkAuthMW, productsSearchValidation, getMyProductsController);
 router.get("/raffles/featured", getFeaturedRaffleController);
 router.get("/raffles/my", checkAuthMW, getMyRaffleController);
-router.get("/raffles/create-advertising", checkAuthMW, getRaffleCreateAdvertisingController);
+router.get(
+  "/raffles/create-advertising",
+  checkAuthMW,
+  getRaffleCreateAdvertisingController,
+);
 router.post("/raffles/unlock-create", checkAuthMW, unlockRaffleCreateController);
 router.post("/raffles/cancel-create", checkAuthMW, cancelRaffleCreateController);
 router.get(

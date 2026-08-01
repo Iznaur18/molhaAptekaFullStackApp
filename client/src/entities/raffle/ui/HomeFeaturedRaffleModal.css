@@ -86,6 +86,24 @@
 .home-featured-raffle-modal__carousel {
   width: 100%;
   overflow: hidden;
+  /* Горизонтальный жест отдаём JS-драгу, вертикальный скролл — браузеру.
+     Без этого мобильный веб рвёт свайп через pointercancel. */
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.home-featured-raffle-modal__carousel--dragging {
+  cursor: grabbing;
+}
+
+/* Не даём браузеру утащить картинку/видео приза нативным drag-and-drop,
+   иначе на десктопе свайп мышью срывается. */
+.home-featured-raffle-modal__carousel img,
+.home-featured-raffle-modal__carousel video {
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 .home-featured-raffle-modal__track {

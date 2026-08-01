@@ -17,6 +17,7 @@ import {
 } from "../../services/upload/privateUploadPaths.js";
 import { isSafeUploadFilename } from "../../services/upload/parseUploadFilenameFromMediaUrl.js";
 import { UPLOADS_DIR } from "../../utils/uploadsDir.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 /**
  * Staff-only: `GET /upload/private/:filename`
@@ -66,7 +67,10 @@ export async function getPrivateUploadController(req, res) {
       if (error?.$metadata?.httpStatusCode === 404 || error?.name === "NoSuchKey") {
         return errorRes(res, 404, "Файл не найден");
       }
-      console.error("getPrivateUploadController s3 error:", error);
+      logServerEvent("error", {
+        event: "getprivateuploadcontroller_s3",
+        error: error instanceof Error ? error.message : String(error),
+      });
       return errorRes(res, 500, "Ошибка чтения файла");
     }
   }

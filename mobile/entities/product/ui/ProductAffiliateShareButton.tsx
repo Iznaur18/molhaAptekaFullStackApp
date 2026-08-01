@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Pressable, Share, Text, View } from "react-native";
 import { useQuery } from "@tanstack/react-query";
+import { Feather } from "@expo/vector-icons";
 import { AFFILIATE_QUERY_PARAM } from "@izibuy/shared-lib";
 import * as Clipboard from "expo-clipboard";
 
@@ -10,6 +11,7 @@ import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { fetchMyReferralProgram } from "@/entities/user/api/referralProgram";
 import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
 
 type ProductAffiliateShareButtonProps = {
   product: Record<string, unknown>;
@@ -21,6 +23,7 @@ export const ProductAffiliateShareButton = ({
   onRequestLogin,
 }: ProductAffiliateShareButtonProps) => {
   const theme = useAppTheme();
+  const styles = useProductDetailScreenStyles();
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
   const enabled = product.affiliateEnabled === true;
@@ -72,35 +75,52 @@ export const ProductAffiliateShareButton = ({
     }
   };
 
+  const title = isAuthorized
+    ? PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_TITLE
+    : PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_LOGIN_TITLE;
+  const subtitle = isAuthorized
+    ? PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_SUBTITLE(percent)
+    : PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_LOGIN_SUBTITLE;
+  const busy = isAuthorized && referralQuery.isLoading;
+
   return (
-    <View style={{ gap: 8, marginTop: 10 }}>
-      <Text style={{ fontSize: 13, color: theme.colors.textMuted }}>
-        {PRODUCT_DETAILS_MODAL_UI.AFFILIATE_PERCENT_HINT}
-      </Text>
+    <>
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={
+          isAuthorized
+            ? PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE
+            : PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_LOGIN
+        }
         onPress={() => {
           void handlePress();
         }}
-        disabled={isAuthorized && referralQuery.isLoading}
-        style={{
-          alignSelf: "flex-start",
-          paddingVertical: 10,
-          paddingHorizontal: 14,
-          borderRadius: 10,
-          backgroundColor: theme.colors.surfaceElevated,
-          borderWidth: 1,
-          borderColor: theme.colors.border,
-        }}
+        disabled={busy}
+        style={({ pressed }) => [
+          styles.featureCard,
+          {
+            opacity: busy ? 0.65 : pressed ? 0.92 : 1,
+            borderColor: pressed ? theme.colors.actionBorder : "transparent",
+          },
+        ]}
       >
-        <Text style={{ fontWeight: "700", color: theme.colors.text }}>
-          {isAuthorized
-            ? PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE
-            : PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_LOGIN}
-        </Text>
+        <View style={styles.featureCardIcon}>
+          <Feather name="share-2" size={20} color={theme.colors.action} />
+        </View>
+        <View style={styles.featureCardText}>
+          <Text style={styles.featureCardTitle}>{title}</Text>
+          <Text style={styles.featureCardSubtitle}>{subtitle}</Text>
+        </View>
+        <Feather
+          name="chevron-right"
+          size={22}
+          color={theme.colors.action}
+          style={styles.featureCardChevron}
+        />
       </Pressable>
       {status ? (
         <Text style={{ fontSize: 12, color: theme.colors.textMuted }}>{status}</Text>
       ) : null}
-    </View>
+    </>
   );
 };

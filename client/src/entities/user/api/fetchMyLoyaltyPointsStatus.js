@@ -2,7 +2,7 @@ import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
- * @returns {Promise<{ loyaltyPointsBalance: number }>}
+ * @returns {Promise<{ loyaltyPointsBalance: number; loyaltyPointsReserved: number }>}
  */
 export async function fetchMyLoyaltyPointsStatus() {
   try {
@@ -11,9 +11,13 @@ export async function fetchMyLoyaltyPointsStatus() {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
     const loyaltyPointsBalance = Number(data.data.loyaltyPointsBalance);
+    const loyaltyPointsReserved = Number(data.data.loyaltyPointsReserved);
     return {
       loyaltyPointsBalance: Number.isFinite(loyaltyPointsBalance)
         ? loyaltyPointsBalance
+        : 0,
+      loyaltyPointsReserved: Number.isFinite(loyaltyPointsReserved)
+        ? loyaltyPointsReserved
         : 0,
     };
   } catch (e) {

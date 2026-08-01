@@ -139,7 +139,8 @@ export function extractComparablePeerPrices(collected) {
     .filter((value) => Number.isFinite(value) && value > 0);
 
   return {
-    productPrice: Number.isFinite(productPrice) && productPrice > 0 ? productPrice : null,
+    productPrice:
+      Number.isFinite(productPrice) && productPrice > 0 ? productPrice : null,
     peerPrices,
   };
 }

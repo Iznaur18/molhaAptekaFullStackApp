@@ -221,8 +221,7 @@ export const resolveLegacySlugForDetachedProducts = async (doc) => {
  */
 export const detachProductsFromCategoryLeaf = async (doc) => {
   const legacySlug = await resolveLegacySlugForDetachedProducts(doc);
-  const categoryWrite =
-    await resolveProductCategoryWriteFromLegacySlugOnly(legacySlug);
+  const categoryWrite = await resolveProductCategoryWriteFromLegacySlugOnly(legacySlug);
   const products = await ProductModel.find({
     productCategoryId: doc._id,
   }).lean();

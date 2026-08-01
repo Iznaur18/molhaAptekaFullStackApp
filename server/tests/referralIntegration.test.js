@@ -7,10 +7,10 @@ import { ReferralLedgerEntryModel, UserModel } from "../models/index.js";
 import {
   attachReferralAttribution,
   computeReferralCashbackAmount,
-  convertPartnerBalanceToLoyalty,
   creditReferralCashbackFromSpend,
   ensureUserReferralCode,
   getMyReferralProgram,
+  migratePartnerBalanceToLoyaltyPoints,
   reverseReferralCashbackForSource,
 } from "../services/referral/index.js";
 import {
@@ -52,13 +52,14 @@ test("referral: multiple users may have null referralCode", async () => {
   assert.ok(count >= 2);
 });
 
-test("referral: attribution + credit + reverse", async () => {
+test("referral: attribution + credit loyalty + reverse", async () => {
   const referrer = await UserModel.create({
     email: "ref-owner@example.com",
     passwordHash: "x",
     userName: "refowner",
     userAvatarUrl: "https://example.com/a.png",
     userBackgroundUrl: "preset:mist",
+    userLoyaltyPoints: 0,
   });
   const code = await ensureUserReferralCode(String(referrer._id));
   assert.ok(code);
@@ -95,9 +96,10 @@ test("referral: attribution + credit + reverse", async () => {
   assert.equal(credit.amount, expected);
 
   const referrerAfter = await UserModel.findById(referrer._id)
-    .select("partnerBalance")
+    .select("userLoyaltyPoints partnerBalance")
     .lean();
-  assert.equal(Number(referrerAfter.partnerBalance), expected);
+  assert.equal(Number(referrerAfter.userLoyaltyPoints), expected);
+  assert.equal(Number(referrerAfter.partnerBalance) || 0, 0);
 
   const creditDup = await creditReferralCashbackFromSpend({
     spenderUserId: String(referred._id),
@@ -114,9 +116,9 @@ test("referral: attribution + credit + reverse", async () => {
   assert.equal(reversed.reversed, true);
 
   const referrerFinal = await UserModel.findById(referrer._id)
-    .select("partnerBalance")
+    .select("userLoyaltyPoints")
     .lean();
-  assert.equal(Number(referrerFinal.partnerBalance), 0);
+  assert.equal(Number(referrerFinal.userLoyaltyPoints), 0);
 
   const ledgerCount = await ReferralLedgerEntryModel.countDocuments({
     referrerUserId: referrer._id,
@@ -124,31 +126,31 @@ test("referral: attribution + credit + reverse", async () => {
   assert.equal(ledgerCount, 2);
 
   const dash = await getMyReferralProgram(String(referrer._id));
-  assert.equal(dash.partnerBalance, 0);
+  assert.equal(dash.loyaltyPointsBalance, 0);
   assert.equal(dash.totalReferralsSpend, 0);
   assert.equal(dash.totalCashbackEarned, 0);
 });
 
-test("referral: reverse fails when partner balance already converted", async () => {
+test("referral: reverse fails when free loyalty already spent", async () => {
   const referrer = await UserModel.create({
-    email: "ref-rev-convert@example.com",
+    email: "ref-rev-spent@example.com",
     passwordHash: "x",
-    userName: "refrevconvert",
+    userName: "refrevspent",
     userAvatarUrl: "https://example.com/a.png",
     userBackgroundUrl: "preset:mist",
-    partnerBalance: 0,
-    userLoyaltyPoints: 100,
+    userLoyaltyPoints: 0,
   });
   const referred = await UserModel.create({
-    email: "ref-rev-convert-buyer@example.com",
+    email: "ref-rev-spent-buyer@example.com",
     passwordHash: "x",
-    userName: "refrevconvertb",
+    userName: "refrevspentb",
     userAvatarUrl: "https://example.com/a.png",
     userBackgroundUrl: "preset:mist",
     referredByUserId: referrer._id,
   });
 
   const sourceId = `premium:${referred._id}:already-spent`;
+  const amount = computeReferralCashbackAmount(PREMIUM_PRICE_POINTS);
   await creditReferralCashbackFromSpend({
     spenderUserId: String(referred._id),
     pointsSpent: PREMIUM_PRICE_POINTS,
@@ -156,11 +158,7 @@ test("referral: reverse fails when partner balance already converted", async () 
     sourceId,
   });
 
-  await convertPartnerBalanceToLoyalty({
-    userId: String(referrer._id),
-    amount: computeReferralCashbackAmount(PREMIUM_PRICE_POINTS),
-    idempotencyKey: "spent-before-reverse",
-  });
+  await UserModel.updateOne({ _id: referrer._id }, { $set: { userLoyaltyPoints: 0 } });
 
   await assert.rejects(
     () =>
@@ -168,46 +166,36 @@ test("referral: reverse fails when partner balance already converted", async () 
         sourceKind: REFERRAL_SOURCE_KIND_PREMIUM,
         sourceId,
       }),
-    (error) => error?.name === "InsufficientPartnerBalanceForReversalError",
+    (error) =>
+      error?.name === "InsufficientPartnerBalanceForReversalError" &&
+      error.required === amount,
   );
 });
 
-test("referral: convert is idempotent by key", async () => {
-  const referrer = await UserModel.create({
-    email: "ref-convert@example.com",
+test("referral: migratePartnerBalanceToLoyaltyPoints is idempotent", async () => {
+  const user = await UserModel.create({
+    email: "ref-migrate@example.com",
     passwordHash: "x",
-    userName: "refconvert",
+    userName: "refmigrate",
     userAvatarUrl: "https://example.com/a.png",
     userBackgroundUrl: "preset:mist",
-    partnerBalance: 50,
+    partnerBalance: 71,
     userLoyaltyPoints: 10,
   });
 
-  const first = await convertPartnerBalanceToLoyalty({
-    userId: String(referrer._id),
-    amount: 20,
-    idempotencyKey: "client-retry-1",
-  });
-  assert.equal(first.converted, 20);
-  assert.equal(first.partnerBalance, 30);
-  assert.equal(first.loyaltyPointsBalance, 30);
+  const first = await migratePartnerBalanceToLoyaltyPoints(String(user._id));
+  assert.equal(first, 71);
+  const afterFirst = await UserModel.findById(user._id)
+    .select("partnerBalance userLoyaltyPoints")
+    .lean();
+  assert.equal(Number(afterFirst.partnerBalance) || 0, 0);
+  assert.equal(Number(afterFirst.userLoyaltyPoints), 81);
 
-  const second = await convertPartnerBalanceToLoyalty({
-    userId: String(referrer._id),
-    amount: 20,
-    idempotencyKey: "client-retry-1",
-  });
-  assert.equal(second.duplicate, true);
-  assert.equal(second.converted, 20);
-  assert.equal(second.partnerBalance, 30);
-  assert.equal(second.loyaltyPointsBalance, 30);
-
-  const third = await convertPartnerBalanceToLoyalty({
-    userId: String(referrer._id),
-    amount: 10,
-    idempotencyKey: "client-retry-2",
-  });
-  assert.equal(third.converted, 10);
-  assert.equal(third.partnerBalance, 20);
-  assert.equal(third.loyaltyPointsBalance, 40);
+  const second = await migratePartnerBalanceToLoyaltyPoints(String(user._id));
+  assert.equal(second, 0);
+  const afterSecond = await UserModel.findById(user._id)
+    .select("partnerBalance userLoyaltyPoints")
+    .lean();
+  assert.equal(Number(afterSecond.partnerBalance) || 0, 0);
+  assert.equal(Number(afterSecond.userLoyaltyPoints), 81);
 });

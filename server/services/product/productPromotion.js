@@ -329,7 +329,9 @@ export async function approveProductPromotion({ staffId, promotionId }) {
     throw new AppError(409, "У товара уже есть активное продвижение");
   }
 
-  const tierMeta = PRODUCT_PROMOTION_TIER_META.find((item) => item.tier === promotion.tier);
+  const tierMeta = PRODUCT_PROMOTION_TIER_META.find(
+    (item) => item.tier === promotion.tier,
+  );
   const promotionMessage = `Продвижение товара одобрено (${tierMeta?.title ?? `L${promotion.tier}`}, ${promotion.tariffTitle})`;
 
   promotion.approvedByUserId = staffId;

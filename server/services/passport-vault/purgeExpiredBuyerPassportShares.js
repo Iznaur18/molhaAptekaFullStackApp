@@ -1,6 +1,4 @@
-import {
-  BUYER_PASSPORT_SHARE_TTL_DAYS_DEFAULT,
-} from "../../constants/passportVaultConstants.js";
+import { BUYER_PASSPORT_SHARE_TTL_DAYS_DEFAULT } from "../../constants/passportVaultConstants.js";
 import { OrderModel } from "../../models/index.js";
 
 /**

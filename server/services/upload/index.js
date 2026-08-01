@@ -4,9 +4,7 @@ export {
 } from "./buildPublicUploadUrl.js";
 export { parseUploadFilenameFromMediaUrl } from "./parseUploadFilenameFromMediaUrl.js";
 export { deleteUploadFileByUrl } from "./deleteUploadFileByUrl.js";
-export {
-  resolveUploadFileExtension,
-} from "./resolveUploadFileExtension.js";
+export { resolveUploadFileExtension } from "./resolveUploadFileExtension.js";
 export { resolveUploadContentType } from "./resolveUploadContentType.js";
 export { finalizeUploadedFile } from "./finalizeUploadedFile.js";
 export { prepareUploadedVideoFile } from "./prepareUploadedVideoFile.js";

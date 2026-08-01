@@ -1,4 +1,5 @@
 import { deleteUploadFileByUrl } from "../upload/deleteUploadFileByUrl.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 const UPLOAD_ASSET_PATH_RE = /\/uploads\/[^?#]+/i;
 
@@ -17,7 +18,10 @@ export const isManagedSellerPersonalCategoryUploadUrl = (url) => {
  * @param {string | null | undefined} previousUrl
  * @param {string | null | undefined} nextUrl
  */
-export const cleanupReplacedSellerPersonalCategoryImage = async (previousUrl, nextUrl) => {
+export const cleanupReplacedSellerPersonalCategoryImage = async (
+  previousUrl,
+  nextUrl,
+) => {
   const prev = String(previousUrl ?? "").trim();
   const next = String(nextUrl ?? "").trim();
   if (!prev || prev === next || !isManagedSellerPersonalCategoryUploadUrl(prev)) {
@@ -26,6 +30,9 @@ export const cleanupReplacedSellerPersonalCategoryImage = async (previousUrl, ne
   try {
     await deleteUploadFileByUrl(prev);
   } catch (error) {
-    console.error("cleanupReplacedSellerPersonalCategoryImage error:", error);
+    logServerEvent("error", {
+      event: "cleanupreplacedsellerpersonalcategoryimage",
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 };

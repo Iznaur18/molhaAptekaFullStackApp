@@ -9,7 +9,6 @@ import {
   LazyInstallmentSalesPage,
   LazyLoyaltyPointsPage,
   LazyPartnerProgramPage,
-  LazyAffiliateListingsPage,
   LazyAdvertisingPage,
   LazyEditProfilePage,
   LazyIntroAdModerationPage,
@@ -110,18 +109,12 @@ export function renderProfileTabPanel(mainView, props) {
         />
       );
     case "partner-program":
+    case "affiliate-listings":
       return (
         <LazyPartnerProgramPage
           isAuthorized={isAuthorized}
           onRequestLogin={onRequestLogin}
           onLoyaltyPointsBalanceChange={onLoyaltyPointsBalanceChange}
-        />
-      );
-    case "affiliate-listings":
-      return (
-        <LazyAffiliateListingsPage
-          isAuthorized={isAuthorized}
-          onRequestLogin={onRequestLogin}
         />
       );
     case "advertising":

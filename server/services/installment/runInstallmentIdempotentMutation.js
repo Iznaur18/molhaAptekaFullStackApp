@@ -102,7 +102,8 @@ export async function runInstallmentIdempotentMutation({
         paymentIndex == null || !Number.isFinite(Number(paymentIndex))
           ? null
           : Number(paymentIndex),
-      idempotencyKey: clientKey || sourceId.slice(-INSTALLMENT_IDEMPOTENCY_KEY_MAX_LENGTH),
+      idempotencyKey:
+        clientKey || sourceId.slice(-INSTALLMENT_IDEMPOTENCY_KEY_MAX_LENGTH),
       sourceId,
       message: String(result?.message ?? successMessage),
     });

@@ -76,6 +76,17 @@
   overflow-wrap: anywhere;
 }
 
+.raffle-products-page__description {
+  margin: 0 0 0.75rem;
+  padding: 0 0.15rem;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--iz-color-text);
+  opacity: 0.9;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .raffle-products-page__progress {
   box-sizing: border-box;
   display: flex;

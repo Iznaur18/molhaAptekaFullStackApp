@@ -105,9 +105,7 @@ export async function markInstallmentPaymentPaid({
       if (!claimed) {
         const fresh = await loadInstallmentContractOrThrow(contractId);
         const freshPayment = findContractPayment(fresh, idx);
-        if (
-          freshPayment?.status === INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION
-        ) {
+        if (freshPayment?.status === INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION) {
           return {
             message: successMessage,
             contract: await buildInstallmentContractPayload(fresh),

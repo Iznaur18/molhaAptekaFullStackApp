@@ -16,10 +16,7 @@ import { normalizeUserBackgroundForSave } from "./userBackgroundValue.js";
 import { EMPTY_PROFILE_UPDATE_MESSAGE } from "./updateProfileConstants.js";
 
 const throwRuleError = (error, fallback, statusCode = 400) => {
-  throw new AppError(
-    statusCode,
-    error instanceof Error ? error.message : fallback,
-  );
+  throw new AppError(statusCode, error instanceof Error ? error.message : fallback);
 };
 
 const assertRoleChangeAllowed = async (
@@ -52,8 +49,7 @@ const assertPremiumChangeAllowed = (
   targetUserBeforeUpdate,
 ) => {
   const isPremiumFieldUpdate =
-    updateData.isPremiumUser !== undefined ||
-    updateData.premiumExpiresAt !== undefined;
+    updateData.isPremiumUser !== undefined || updateData.premiumExpiresAt !== undefined;
 
   if (!isPremiumFieldUpdate) {
     return;
@@ -111,10 +107,7 @@ const assertAdminProtectedFieldsAllowed = (
       targetRole: targetUserBeforeUpdate.userRole,
     })
   ) {
-    throw new AppError(
-      403,
-      "Модератор не может менять эти поля у администратора",
-    );
+    throw new AppError(403, "Модератор не может менять эти поля у администратора");
   }
 };
 
@@ -149,12 +142,8 @@ const applyPremiumAndBackgroundRules = (
   editorContext,
   targetUserBeforeUpdate,
 ) => {
-  const {
-    isCurrentUserOwner,
-    isCurrentUserAdmin,
-    isCurrentUserStaff,
-    editorRole,
-  } = editorContext;
+  const { isCurrentUserOwner, isCurrentUserAdmin, isCurrentUserStaff, editorRole } =
+    editorContext;
 
   const wasPremium = isPremiumActive(targetUserBeforeUpdate);
   const canResolvePremiumExpiry =
@@ -241,11 +230,7 @@ export async function assertProfileUpdateRules({
 
   assertPremiumChangeAllowed(updateData, editorContext, targetUserBeforeUpdate);
   assertLoyaltyChangeAllowed(updateData, editorContext);
-  assertAdminProtectedFieldsAllowed(
-    updateData,
-    editorContext,
-    targetUserBeforeUpdate,
-  );
+  assertAdminProtectedFieldsAllowed(updateData, editorContext, targetUserBeforeUpdate);
   await assertUniqueProfileFields(updateData, targetUserId);
 
   const premiumState = applyPremiumAndBackgroundRules(

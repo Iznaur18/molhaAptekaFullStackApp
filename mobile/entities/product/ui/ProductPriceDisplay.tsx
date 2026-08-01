@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { PRODUCT_CARD_UI } from "@/shared/config";
@@ -14,6 +14,10 @@ import {
 import { getProductFieldLabel } from "../lib/productFieldRegistry";
 import { ProductLoyaltyPointsBadge } from "./ProductLoyaltyPointsBadge";
 
+type BadgePressPayload =
+  | { kind: "discount"; label: string }
+  | { kind: "loyalty"; label: string };
+
 type ProductPriceDisplayProps = {
   product: {
     productPrice?: number | null;
@@ -25,6 +29,8 @@ type ProductPriceDisplayProps = {
   variant?: "card" | "inline" | "detail" | "banner" | "cart";
   /** После скидки, иначе сразу после текущей цены (detail). */
   afterPriceSlot?: ReactNode;
+  onDiscountBadgePress?: (payload: BadgePressPayload) => void;
+  onLoyaltyBadgePress?: (payload: BadgePressPayload) => void;
 };
 
 export const ProductPriceDisplay = ({
@@ -32,6 +38,8 @@ export const ProductPriceDisplay = ({
   showLabel = false,
   variant = "card",
   afterPriceSlot = null,
+  onDiscountBadgePress,
+  onLoyaltyBadgePress,
 }: ProductPriceDisplayProps) => {
   const styles = useProductPriceStyles();
   const isAuthorized = useIsAuthorized();
@@ -77,12 +85,19 @@ export const ProductPriceDisplay = ({
           {formatPriceRub(Math.floor(Number(product.productOldPrice)))}
         </AppText>
       ) : null}
-      {isDetail ? <ProductDiscountBadge product={product} variant="detail" /> : null}
+      {isDetail ? (
+        <ProductDiscountBadge
+          product={product}
+          variant="detail"
+          onPress={onDiscountBadgePress}
+        />
+      ) : null}
       {isDetail ? (
         <ProductLoyaltyPointsBadge
           product={product}
           variant="detail"
           isAuthorized={isAuthorized}
+          onPress={onLoyaltyBadgePress}
         />
       ) : null}
       {isDetail ? afterPriceSlot : null}
@@ -98,40 +113,55 @@ type ProductDiscountBadgeProps = {
     [key: string]: unknown;
   };
   variant?: "inline" | "overlay" | "detail" | "banner";
+  onPress?: (payload: { kind: "discount"; label: string }) => void;
 };
 
-export const ProductDiscountBadge = ({ product, variant = "inline" }: ProductDiscountBadgeProps) => {
+export const ProductDiscountBadge = ({
+  product,
+  variant = "inline",
+  onPress,
+}: ProductDiscountBadgeProps) => {
   const styles = useProductPriceStyles();
   const discountPercent = resolveProductDiscountPercent(product);
   if (discountPercent == null || discountPercent < 1) {
     return null;
   }
 
-  return (
-    <View
-      style={
-        variant === "overlay"
-          ? [styles.badgeOverlay]
-          : variant === "detail"
-            ? [styles.detailDiscountBadge]
-            : [
-                styles.badge,
-                variant === "banner" && styles.bannerDiscountBadge,
-              ]
-      }
-    >
-      <AppText
-        style={[
-          variant === "overlay"
-            ? styles.badgeOverlayText
-            : variant === "detail"
-              ? styles.detailDiscountText
-              : styles.badgeText,
-          variant === "banner" && styles.bannerDiscountText,
-        ]}
-        numberOfLines={1}
+  const label = PRODUCT_CARD_UI.DISCOUNT_BADGE(discountPercent);
+  const badgeStyle =
+    variant === "overlay"
+      ? [styles.badgeOverlay]
+      : variant === "detail"
+        ? [styles.detailDiscountBadge]
+        : [styles.badge, variant === "banner" && styles.bannerDiscountBadge];
+  const textStyle = [
+    variant === "overlay"
+      ? styles.badgeOverlayText
+      : variant === "detail"
+        ? styles.detailDiscountText
+        : styles.badgeText,
+    variant === "banner" && styles.bannerDiscountText,
+  ];
+
+  if (typeof onPress === "function") {
+    return (
+      <Pressable
+        style={badgeStyle}
+        accessibilityRole="button"
+        accessibilityLabel={label}
+        onPress={() => onPress({ kind: "discount", label })}
       >
-        {PRODUCT_CARD_UI.DISCOUNT_BADGE(discountPercent)}
+        <AppText style={textStyle} numberOfLines={1}>
+          {label}
+        </AppText>
+      </Pressable>
+    );
+  }
+
+  return (
+    <View style={badgeStyle}>
+      <AppText style={textStyle} numberOfLines={1}>
+        {label}
       </AppText>
     </View>
   );

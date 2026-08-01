@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { serializeUserForAuthResponse, buildAuthSessionData } from "../services/auth/issueAuthSession.js";
+import {
+  serializeUserForAuthResponse,
+  buildAuthSessionData,
+} from "../services/auth/issueAuthSession.js";
 import {
   isSafeUploadFilename,
   parseUploadFilenameFromMediaUrl,
@@ -55,7 +58,9 @@ test("web-dev auth session includes tokens with X-Auth-Client web-dev", () => {
     { _id: "aaaaaaaaaaaaaaaaaaaaaaaa", userName: "a", email: "a@b.c" },
     "access.token.value",
     "refresh.token.value",
-    { get: (name) => (String(name).toLowerCase() === "x-auth-client" ? "web-dev" : "") },
+    {
+      get: (name) => (String(name).toLowerCase() === "x-auth-client" ? "web-dev" : ""),
+    },
   );
   assert.equal(data.accessToken, "access.token.value");
   assert.equal(data.refreshToken, "refresh.token.value");

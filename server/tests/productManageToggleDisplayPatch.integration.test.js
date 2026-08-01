@@ -75,7 +75,9 @@ test("PATCH /product/manage-toggle-displays/:toggleKey upserts imageUrl for mode
   const getPayload = await parseSuccessData(getResponse);
   assert.equal(getPayload.displays.length, 1);
 
-  const row = await ProductManageToggleDisplayModel.findOne({ toggleKey: "auction" }).lean();
+  const row = await ProductManageToggleDisplayModel.findOne({
+    toggleKey: "auction",
+  }).lean();
   assert.equal(row?.imageUrl, "/uploads/test-auction-toggle.png");
 });
 

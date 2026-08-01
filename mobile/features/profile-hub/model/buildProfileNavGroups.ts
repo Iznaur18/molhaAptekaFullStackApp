@@ -238,14 +238,6 @@ export const buildProfileNavGroups = (
         },
       ];
     }
-    if (sectionId === "affiliate-listings" && access.canUseAffiliateListings) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_AFFILIATE_LISTINGS,
-        },
-      ];
-    }
     if (sectionId === "advertising" && access.canUseAdvertising) {
       return [
         {

@@ -13,7 +13,10 @@ import {
   PRODUCT_ATLAS_SEARCH_INDEX_NAME,
   PRODUCT_ATLAS_SEARCH_NAME_BOOST,
 } from "../constants/productAtlasSearchConstants.js";
-import { buildProductAtlasSearchCompound, buildProductAtlasSearchStage } from "../utils/buildProductAtlasSearchStage.js";
+import {
+  buildProductAtlasSearchCompound,
+  buildProductAtlasSearchStage,
+} from "../utils/buildProductAtlasSearchStage.js";
 import { buildProductCatalogSearchQuery } from "../utils/buildProductCatalogSearchQuery.js";
 import {
   getConfiguredCatalogSearchMode,
@@ -71,16 +74,19 @@ test("buildProductAtlasSearchCompound: text + category should clauses", () => {
   assert.equal(compound.minimumShouldMatch, 1);
   assert.equal(compound.should.length, 4);
 
-  const nameClause = /** @type {{ text: { path: string; score?: { boost: { value: number } } } }} */ (
-    compound.should[0]
-  );
+  const nameClause =
+    /** @type {{ text: { path: string; score?: { boost: { value: number } } } }} */ (
+      compound.should[0]
+    );
   assert.equal(nameClause.text.path, "productName");
   assert.equal(nameClause.text.score?.boost?.value, PRODUCT_ATLAS_SEARCH_NAME_BOOST);
 
   const blobClause = /** @type {{ text: { path: string } }} */ (compound.should[1]);
   assert.equal(blobClause.text.path, "productSearchBlob");
 
-  const slugClause = /** @type {{ in: { path: string; value: string[] } }} */ (compound.should[2]);
+  const slugClause = /** @type {{ in: { path: string; value: string[] } }} */ (
+    compound.should[2]
+  );
   assert.deepEqual(slugClause.in.value, ["automobiles"]);
 
   const idClause = /** @type {{ in: { path: string } }} */ (compound.should[3]);
@@ -99,7 +105,9 @@ test("buildProductAtlasSearchStage uses product_catalog index", () => {
 });
 
 test("buildProductCatalogSearchQuery: empty search → mode none", async () => {
-  const result = await buildProductCatalogSearchQuery("", { productModerationStatus: "approved" });
+  const result = await buildProductCatalogSearchQuery("", {
+    productModerationStatus: "approved",
+  });
 
   assert.equal(result.mode, CATALOG_SEARCH_MODE_NONE);
   assert.equal(result.atlasSearch, null);
@@ -132,9 +140,14 @@ test("buildProductCatalogSearchQuery: atlas mode when preferAtlas", async () => 
 
 test("isAtlasSearchUnavailableError detects $search failures", () => {
   assert.equal(
-    isAtlasSearchUnavailableError(new Error("$search stage is only allowed on MongoDB Atlas")),
+    isAtlasSearchUnavailableError(
+      new Error("$search stage is only allowed on MongoDB Atlas"),
+    ),
     true,
   );
-  assert.equal(isAtlasSearchUnavailableError(new Error("index product_catalog not found")), true);
+  assert.equal(
+    isAtlasSearchUnavailableError(new Error("index product_catalog not found")),
+    true,
+  );
   assert.equal(isAtlasSearchUnavailableError(new Error("validation failed")), false);
 });

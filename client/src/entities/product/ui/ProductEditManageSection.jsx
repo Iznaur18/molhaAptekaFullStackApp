@@ -17,7 +17,11 @@ import "./ProductEditManageSection.css";
  *   onSetAvailability?: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
  *   onSetAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
  *   onSetWholesale?: (productId: string, productWholesaleEnabled: boolean) => void | Promise<void>;
- *   onSetAffiliate?: (productId: string, affiliateEnabled: boolean) => void | Promise<void>;
+   *   onSetAffiliate?: (
+   *     productId: string,
+   *     affiliateEnabled: boolean,
+   *     product?: import("../model/types.js").ProductFromApi,
+   *   ) => void | Promise<void>;
  *   onDelete?: (productId: string) => void | Promise<void>;
  *   isAvailabilityTogglePending?: boolean;
  *   isAuctionTogglePending?: boolean;
@@ -264,7 +268,7 @@ export function ProductEditManageSection({
                 return { revert: true };
               }
               if (typeof onSetAffiliate === "function") {
-                void onSetAffiliate(String(product._id), next);
+                void onSetAffiliate(String(product._id), next, product);
               }
               return undefined;
             }}

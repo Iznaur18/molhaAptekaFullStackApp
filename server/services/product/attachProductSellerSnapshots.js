@@ -58,10 +58,16 @@ export const attachProductSellerSnapshots = async (products) => {
   ]);
 
   const followersBySellerId = Object.fromEntries(
-    sellersWithFollowers.map((seller) => [String(seller._id), seller.followersCount ?? 0]),
+    sellersWithFollowers.map((seller) => [
+      String(seller._id),
+      seller.followersCount ?? 0,
+    ]),
   );
   const totalSalesBySellerId = Object.fromEntries(
-    sellersWithSales.map((seller) => [String(seller._id), seller.totalSalesAmount ?? 0]),
+    sellersWithSales.map((seller) => [
+      String(seller._id),
+      seller.totalSalesAmount ?? 0,
+    ]),
   );
 
   return products.map((product) => {

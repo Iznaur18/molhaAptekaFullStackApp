@@ -1,4 +1,5 @@
 import PassportVaultAccessLogModel from "../../models/PassportVaultAccessLogModel.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 /**
  * @param {{
@@ -28,9 +29,9 @@ export async function recordPassportVaultAccess(params) {
       resourceId,
     });
   } catch (error) {
-    console.error(
-      "[passport-vault] access log failed:",
-      error instanceof Error ? error.message : error,
-    );
+    logServerEvent("error", {
+      event: "passport_vault_access_log_failed",
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 }

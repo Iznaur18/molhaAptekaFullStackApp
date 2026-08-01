@@ -41,4 +41,5 @@ export const INTRO_AD_NOTIFICATION_KIND_APPROVED = "intro_ad_approved";
 export const INTRO_AD_NOTIFICATION_KIND_REJECTED = "intro_ad_rejected";
 export const INTRO_AD_NOTIFICATION_KIND_ACTIVATED = "intro_ad_activated";
 export const INTRO_AD_NOTIFICATION_KIND_EXPIRED = "intro_ad_expired";
-export const INTRO_AD_NOTIFICATION_KIND_CANCELLED_BY_STAFF = "intro_ad_cancelled_by_staff";
+export const INTRO_AD_NOTIFICATION_KIND_CANCELLED_BY_STAFF =
+  "intro_ad_cancelled_by_staff";

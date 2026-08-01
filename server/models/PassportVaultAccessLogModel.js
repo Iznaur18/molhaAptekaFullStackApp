@@ -33,7 +33,4 @@ const PassportVaultAccessLogSchema = new mongoose.Schema(
 PassportVaultAccessLogSchema.index({ createdAt: -1 });
 PassportVaultAccessLogSchema.index({ purpose: 1, createdAt: -1 });
 
-export default mongoose.model(
-  "PassportVaultAccessLog",
-  PassportVaultAccessLogSchema,
-);
+export default mongoose.model("PassportVaultAccessLog", PassportVaultAccessLogSchema);

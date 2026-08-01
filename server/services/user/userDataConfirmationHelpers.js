@@ -12,9 +12,7 @@ import {
   USER_DATA_CONFIRMATION_STATUS_REJECTED,
 } from "../../constants/userDataConfirmationConstants.js";
 import { UserDataConfirmationRequestModel, UserModel } from "../../models/index.js";
-import {
-  PRIVATE_UPLOAD_API_PATH_PREFIX,
-} from "../../constants/privateUploadConstants.js";
+import { PRIVATE_UPLOAD_API_PATH_PREFIX } from "../../constants/privateUploadConstants.js";
 import { normalizeStoredUploadUrl } from "../upload/buildPublicUploadUrl.js";
 import { parsePrivateUploadFilenameFromUrl } from "../upload/privateUploadPaths.js";
 import { buildPrivateUploadApiUrl } from "../upload/privateUploadPaths.js";
@@ -45,7 +43,10 @@ export const normalizePassportSelfiePhotoUrl = (value) => {
 
   const url = normalizeStoredUploadUrl(raw);
   // Legacy публичные selfie до private-upload — ещё принимаем.
-  if (url.includes(UPLOAD_PATH_PREFIX) || url.includes(PRIVATE_UPLOAD_API_PATH_PREFIX)) {
+  if (
+    url.includes(UPLOAD_PATH_PREFIX) ||
+    url.includes(PRIVATE_UPLOAD_API_PATH_PREFIX)
+  ) {
     return url;
   }
   throw new Error("Загрузите фото с паспортом в руках");

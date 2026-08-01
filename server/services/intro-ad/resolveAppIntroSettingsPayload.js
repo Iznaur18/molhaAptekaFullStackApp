@@ -37,7 +37,9 @@ export const resolveAppIntroSettingsPayload = (row) => {
     minMs: Number(row?.minMs) > 0 ? Number(row.minMs) : APP_INTRO_MIN_MS_DEFAULT,
     maxMs: Number(row?.maxMs) > 0 ? Number(row.maxMs) : APP_INTRO_MAX_MS_DEFAULT,
     fadeOutMs:
-      Number(row?.fadeOutMs) > 0 ? Number(row.fadeOutMs) : APP_INTRO_FADE_OUT_MS_DEFAULT,
+      Number(row?.fadeOutMs) > 0
+        ? Number(row.fadeOutMs)
+        : APP_INTRO_FADE_OUT_MS_DEFAULT,
     prioritizePlatformIntro: row?.prioritizePlatformIntro === true,
     updatedAt: row?.updatedAt ?? null,
   };

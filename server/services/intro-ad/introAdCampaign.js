@@ -83,30 +83,32 @@ export async function submitIntroAdCampaign({ userId, body }) {
   const reservedAt = new Date();
 
   try {
-    const { campaign, loyaltyPointsBalance } = await runInTransaction(async (session) => {
-      await assertNoOpenIntroAdCampaignForAdvertiser(userId, session);
+    const { campaign, loyaltyPointsBalance } = await runInTransaction(
+      async (session) => {
+        await assertNoOpenIntroAdCampaignForAdvertiser(userId, session);
 
-      const loyaltyPointsBalance = await reserveLoyaltyPoints({
-        userId,
-        amount: INTRO_AD_PRICE_POINTS,
-        session,
-      });
+        const loyaltyPointsBalance = await reserveLoyaltyPoints({
+          userId,
+          amount: INTRO_AD_PRICE_POINTS,
+          session,
+        });
 
-      const [campaign] = await IntroAdCampaignModel.create(
-        [
-          {
-            advertiserId: userId,
-            status: INTRO_AD_CAMPAIGN_STATUS_PENDING,
-            ...media,
-            amountPoints: INTRO_AD_PRICE_POINTS,
-            pointsReservedAt: reservedAt,
-          },
-        ],
-        withMongoSession({}, session),
-      );
+        const [campaign] = await IntroAdCampaignModel.create(
+          [
+            {
+              advertiserId: userId,
+              status: INTRO_AD_CAMPAIGN_STATUS_PENDING,
+              ...media,
+              amountPoints: INTRO_AD_PRICE_POINTS,
+              pointsReservedAt: reservedAt,
+            },
+          ],
+          withMongoSession({}, session),
+        );
 
-      return { campaign, loyaltyPointsBalance };
-    });
+        return { campaign, loyaltyPointsBalance };
+      },
+    );
 
     return {
       message: "Заявка отправлена на модерацию. Баллы зарезервированы.",

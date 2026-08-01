@@ -37,13 +37,21 @@ export const computeProductSoldQuantityDelta = (
  * @param {number} delta
  * @param {import('mongoose').ClientSession | null} [session]
  */
-export const applyProductSoldQuantityDelta = async (productId, delta, session = null) => {
+export const applyProductSoldQuantityDelta = async (
+  productId,
+  delta,
+  session = null,
+) => {
   if (productId == null || delta === 0) {
     return;
   }
 
   const options = session ? { session } : {};
-  await ProductModel.updateOne({ _id: productId }, { $inc: { soldQuantity: delta } }, options);
+  await ProductModel.updateOne(
+    { _id: productId },
+    { $inc: { soldQuantity: delta } },
+    options,
+  );
 
   await ProductModel.updateOne(
     { _id: productId, soldQuantity: { $lt: 0 } },
@@ -68,11 +76,7 @@ export const applySoldQuantityDeltaForItemStatusChange = async ({
   quantity,
   session = null,
 }) => {
-  const delta = computeProductSoldQuantityDelta(
-    previousStatus,
-    nextStatus,
-    quantity,
-  );
+  const delta = computeProductSoldQuantityDelta(previousStatus, nextStatus, quantity);
   if (delta === 0) {
     return;
   }
@@ -133,9 +137,7 @@ export const rebuildAllProductSoldQuantities = async () => {
 export const getDenormSoldQuantityByProductIds = async (productIds) => {
   const ids = [
     ...new Set(
-      productIds
-        .map((id) => String(id))
-        .filter((id) => mongoose.isValidObjectId(id)),
+      productIds.map((id) => String(id)).filter((id) => mongoose.isValidObjectId(id)),
     ),
   ];
 

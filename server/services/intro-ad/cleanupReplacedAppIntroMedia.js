@@ -1,4 +1,5 @@
 import { deleteUploadFileByUrl } from "../upload/deleteUploadFileByUrl.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 const UPLOAD_ASSET_PATH_RE = /\/uploads\/[^?#]+/i;
 
@@ -26,6 +27,9 @@ export const cleanupReplacedAppIntroMedia = async (previousUrl, nextUrl) => {
   try {
     await deleteUploadFileByUrl(prev);
   } catch (error) {
-    console.error("cleanupReplacedAppIntroMedia error:", error);
+    logServerEvent("error", {
+      event: "cleanupreplacedappintromedia",
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 };

@@ -54,9 +54,7 @@ export async function getMyAffiliateEarnings(userId) {
 
   const orderIds = [
     ...new Set(
-      payouts
-        .map((row) => (row.orderId ? String(row.orderId) : ""))
-        .filter(Boolean),
+      payouts.map((row) => (row.orderId ? String(row.orderId) : "")).filter(Boolean),
     ),
   ];
 

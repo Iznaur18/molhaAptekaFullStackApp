@@ -106,104 +106,101 @@ const buildBuyerIdsBySearch = async (searchTerm) => {
 
 /** `GET /order/sales` — продажи текущего продавца (товары из его каталога в заказах покупателей). */
 export const getMySalesController = async (req, res) => {
-const sellerId = String(req.userId);
-    const { page, limit, skip } = parsePagination(req.query);
-    const { status, search, productIds } = req.query;
+  const sellerId = String(req.userId);
+  const { page, limit, skip } = parsePagination(req.query);
+  const { status, search, productIds } = req.query;
 
-    const sellerProducts = await ProductModel.find({ productSeller: sellerId })
-      .select("_id")
-      .lean();
-    const sellerProductIds = sellerProducts.map((product) => product._id);
+  const sellerProducts = await ProductModel.find({ productSeller: sellerId })
+    .select("_id")
+    .lean();
+  const sellerProductIds = sellerProducts.map((product) => product._id);
 
-    if (sellerProductIds.length === 0) {
-      return successRes(res, { orders: [], total: 0, page, limit });
-    }
+  if (sellerProductIds.length === 0) {
+    return successRes(res, { orders: [], total: 0, page, limit });
+  }
 
-    const filterResult = resolveProductIdsFilter(productIds, sellerProductIds);
-    if (!filterResult.ok) {
-      return errorRes(res, 400, filterResult.message);
-    }
+  const filterResult = resolveProductIdsFilter(productIds, sellerProductIds);
+  if (!filterResult.ok) {
+    return errorRes(res, 400, filterResult.message);
+  }
 
-    const { productIdSet, queryProductIds } = filterResult;
+  const { productIdSet, queryProductIds } = filterResult;
 
-    const buyerIds = await buildBuyerIdsBySearch(search);
-    if (search && buyerIds?.length === 0) {
-      return successRes(res, { orders: [], total: 0, page, limit });
-    }
+  const buyerIds = await buildBuyerIdsBySearch(search);
+  if (search && buyerIds?.length === 0) {
+    return successRes(res, { orders: [], total: 0, page, limit });
+  }
 
-    const query = {
-      "items.productId": { $in: queryProductIds },
-      ...(buyerIds ? { userBuyerId: { $in: buyerIds } } : {}),
-    };
-    const pendingFirst = !status;
-    const { orderIds, total } = await fetchMySalesOrderPageIds({
-      query,
-      sellerProductIds: queryProductIds,
-      pendingFirst,
-      skip,
-      limit,
-    });
+  const query = {
+    "items.productId": { $in: queryProductIds },
+    ...(buyerIds ? { userBuyerId: { $in: buyerIds } } : {}),
+  };
+  const pendingFirst = !status;
+  const { orderIds, total } = await fetchMySalesOrderPageIds({
+    query,
+    sellerProductIds: queryProductIds,
+    pendingFirst,
+    skip,
+    limit,
+  });
 
-    const rawOrdersUnordered =
-      orderIds.length === 0
-        ? []
-        : await OrderModel.find({ _id: { $in: orderIds } })
-            .populate("userBuyerId", ORDER_BUYER_PUBLIC_FIELDS)
-            .populate(ORDER_ITEMS_POPULATE)
-            .populate(ORDER_AFFILIATE_REFERRER_POPULATE)
-            .lean();
-    const rawOrders = orderRowsByIds(orderIds, rawOrdersUnordered);
+  const rawOrdersUnordered =
+    orderIds.length === 0
+      ? []
+      : await OrderModel.find({ _id: { $in: orderIds } })
+          .populate("userBuyerId", ORDER_BUYER_PUBLIC_FIELDS)
+          .populate(ORDER_ITEMS_POPULATE)
+          .populate(ORDER_AFFILIATE_REFERRER_POPULATE)
+          .lean();
+  const rawOrders = orderRowsByIds(orderIds, rawOrdersUnordered);
 
-    const orders = rawOrders
-      .map((order) => {
-        normalizeOrderItemsForRuntime(order.items);
-        const sellerItems = order.items
-          .map((item, itemIndex) => ({ ...item, itemIndex }))
-          .filter((item) => {
-            if (!item?.productId || typeof item.productId === "string") return false;
-            const itemProductIdStr = normalizeId(item.productId._id ?? item.productId);
-            if (productIdSet && !productIdSet.has(itemProductIdStr)) return false;
-            const itemSellerId = normalizeId(
-              item.productId.productSeller?._id ?? item.productId.productSeller,
-            );
-            const statusMatches = status ? item.status === status : true;
-            return itemSellerId === sellerId && statusMatches;
-          });
+  const orders = rawOrders
+    .map((order) => {
+      normalizeOrderItemsForRuntime(order.items);
+      const sellerItems = order.items
+        .map((item, itemIndex) => ({ ...item, itemIndex }))
+        .filter((item) => {
+          if (!item?.productId || typeof item.productId === "string") return false;
+          const itemProductIdStr = normalizeId(item.productId._id ?? item.productId);
+          if (productIdSet && !productIdSet.has(itemProductIdStr)) return false;
+          const itemSellerId = normalizeId(
+            item.productId.productSeller?._id ?? item.productId.productSeller,
+          );
+          const statusMatches = status ? item.status === status : true;
+          return itemSellerId === sellerId && statusMatches;
+        });
 
-        if (sellerItems.length === 0) return null;
+      if (sellerItems.length === 0) return null;
 
-        return {
-          ...order,
-          items: sellerItems,
-          totalAmount: calculateTotalAmount(sellerItems),
-          status: buildOrderStatusFromItems(sellerItems),
-        };
-      })
-      .filter(Boolean);
+      return {
+        ...order,
+        items: sellerItems,
+        totalAmount: calculateTotalAmount(sellerItems),
+        status: buildOrderStatusFromItems(sellerItems),
+      };
+    })
+    .filter(Boolean);
 
-    const contractIds = orders
-      .map((order) => order.installmentContractId)
-      .filter(Boolean);
-    const planSummaryByContractId =
-      await loadInstallmentPlanSummariesByIds(contractIds);
+  const contractIds = orders
+    .map((order) => order.installmentContractId)
+    .filter(Boolean);
+  const planSummaryByContractId = await loadInstallmentPlanSummariesByIds(contractIds);
 
-    const ordersWithInstallment = orders.map((order) => {
-      const contractId = order.installmentContractId
-        ? String(order.installmentContractId)
-        : null;
-      const installmentContract =
-        contractId != null ? (planSummaryByContractId[contractId] ?? null) : null;
+  const ordersWithInstallment = orders.map((order) => {
+    const contractId = order.installmentContractId
+      ? String(order.installmentContractId)
+      : null;
+    const installmentContract =
+      contractId != null ? (planSummaryByContractId[contractId] ?? null) : null;
 
-      const withPlan = installmentContract
-        ? { ...order, installmentContract }
-        : order;
-      return sanitizeOrderForSellerApi(withPlan);
-    });
+    const withPlan = installmentContract ? { ...order, installmentContract } : order;
+    return sanitizeOrderForSellerApi(withPlan);
+  });
 
-    return successRes(res, {
-      orders: ordersWithInstallment,
-      total,
-      page,
-      limit,
-    });
+  return successRes(res, {
+    orders: ordersWithInstallment,
+    total,
+    page,
+    limit,
+  });
 };

@@ -21,9 +21,7 @@ export function buildPrivateUploadApiUrl(filename) {
  * @returns {string | null}
  */
 export function parsePrivateUploadFilenameFromUrl(mediaUrl) {
-  const match = String(mediaUrl ?? "").match(
-    /\/upload\/private\/([^?#/]+)/i,
-  );
+  const match = String(mediaUrl ?? "").match(/\/upload\/private\/([^?#/]+)/i);
   const filename = match?.[1] ?? null;
   if (!filename || !isSafeUploadFilename(filename)) {
     return null;
@@ -69,10 +67,7 @@ export function resolvePrivateUploadDiskPath(filename) {
   }
   const privateDir = path.resolve(UPLOADS_DIR, PRIVATE_UPLOAD_SUBDIR);
   const filePath = path.resolve(privateDir, filename);
-  if (
-    !filePath.startsWith(`${privateDir}${path.sep}`) &&
-    filePath !== privateDir
-  ) {
+  if (!filePath.startsWith(`${privateDir}${path.sep}`) && filePath !== privateDir) {
     throw new Error("Некорректный путь");
   }
   return filePath;

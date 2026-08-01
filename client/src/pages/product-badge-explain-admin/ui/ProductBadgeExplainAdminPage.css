@@ -1,0 +1,43 @@
+.product-badge-explain-admin {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.product-badge-explain-admin__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.product-badge-explain-admin__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.product-badge-explain-admin__hint {
+  margin: 0;
+  color: var(--iz-color-muted);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.product-badge-explain-admin__hint_embedded {
+  margin-bottom: 0.25rem;
+}
+
+.product-badge-explain-admin__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.85rem;
+}
+
+.product-badge-explain-admin__status,
+.product-badge-explain-admin__error {
+  margin: 0;
+}
+
+.product-badge-explain-admin__error {
+  color: var(--iz-color-danger, #b42318);
+}

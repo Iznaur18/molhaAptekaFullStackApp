@@ -2,8 +2,7 @@
   width: 100%;
   overflow: hidden;
   background: var(--iz-color-surface-muted);
-  border-bottom-left-radius: 32px;
-  border-bottom-right-radius: 32px;
+  border-radius: 32px;
 }
 
 .auth-hero__image {

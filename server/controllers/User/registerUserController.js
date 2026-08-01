@@ -129,7 +129,9 @@ export const resendRegistrationCodeController = async (req, res) => {
     return errorRes(
       res,
       400,
-      resendError instanceof Error ? resendError.message : "Не удалось отправить письмо",
+      resendError instanceof Error
+        ? resendError.message
+        : "Не удалось отправить письмо",
     );
   }
 

@@ -51,7 +51,6 @@ import { getActiveProfileNavLabel } from "../lib/getActiveProfileNavLabel.js";
  *   onPremiumClick?: () => void;
  *   onLoyaltyPointsClick?: () => void;
  *   onPartnerProgramClick?: () => void;
- *   onAffiliateListingsClick?: () => void;
  *   onAdvertisingClick?: () => void;
  *   onEditProfileClick?: () => void;
  * }} params
@@ -102,7 +101,6 @@ export function useMyProfileNav({
   onPremiumClick,
   onLoyaltyPointsClick,
   onPartnerProgramClick,
-  onAffiliateListingsClick,
   onAdvertisingClick,
   onEditProfileClick,
 }) {
@@ -151,8 +149,6 @@ export function useMyProfileNav({
   const canUsePremium = isProfileReady && Boolean(onPremiumClick);
   const canUseLoyaltyPoints = isProfileReady && Boolean(onLoyaltyPointsClick);
   const canUsePartnerProgram = isProfileReady && Boolean(onPartnerProgramClick);
-  const canUseAffiliateListings =
-    isProfileReady && Boolean(onAffiliateListingsClick);
   const canUseAdvertising = isProfileReady && Boolean(onAdvertisingClick);
   const canUseProductModeration =
     !isRegularUser && isProfileReady && Boolean(onProductModerationClick);
@@ -202,7 +198,6 @@ export function useMyProfileNav({
         canUsePremium,
         canUseLoyaltyPoints,
         canUsePartnerProgram,
-        canUseAffiliateListings,
         canUseAdvertising,
         canUseEditProfile,
         showEditOnBanner,
@@ -247,7 +242,6 @@ export function useMyProfileNav({
         onPremiumClick,
         onLoyaltyPointsClick,
         onPartnerProgramClick,
-        onAffiliateListingsClick,
         onAdvertisingClick,
         onEditProfileClick,
       }),
@@ -267,7 +261,6 @@ export function useMyProfileNav({
       canUseInstallmentSales,
       canUseLoyaltyPoints,
       canUsePartnerProgram,
-      canUseAffiliateListings,
       canUseAdvertising,
       canUseMyOrders,
       canUseMyProducts,
@@ -296,7 +289,6 @@ export function useMyProfileNav({
       onInstallmentSalesClick,
       onLoyaltyPointsClick,
       onPartnerProgramClick,
-      onAffiliateListingsClick,
       onAdvertisingClick,
       onIntroAdModerationClick,
       onSellerPersonalCategoryModerationClick,

@@ -13,9 +13,7 @@ import {
 } from "../../constants/siteHeaderBannerCampaignConstants.js";
 import { SiteHeaderBannerCampaignModel } from "../../models/SiteHeaderBannerCampaignModel.js";
 import { createUserInAppNotification } from "../user/userInAppNotifications.js";
-import {
-  releaseLoyaltyPointsReservation,
-} from "../loyalty/loyaltyPointsReserve.js";
+import { releaseLoyaltyPointsReservation } from "../loyalty/loyaltyPointsReserve.js";
 import { refundLoyaltyPoints } from "../loyalty/loyaltyPointsSpend.js";
 import { reverseReferralCashbackForSource } from "../referral/reverseReferralCashbackForSource.js";
 import { REFERRAL_SOURCE_KIND_SITE_HEADER_BANNER } from "../../constants/referralConstants.js";
@@ -45,7 +43,9 @@ export const toSiteHeaderBannerCampaignPayload = (row) => ({
   linkPath: row.linkPath == null ? null : String(row.linkPath),
   backgroundColor: row.backgroundColor == null ? null : String(row.backgroundColor),
   regionCode: String(row.regionCode ?? "RU-MOW"),
-  amountPoints: Math.ceil(Number(row.amountPoints) || SITE_HEADER_BANNER_CAMPAIGN_PRICE_POINTS),
+  amountPoints: Math.ceil(
+    Number(row.amountPoints) || SITE_HEADER_BANNER_CAMPAIGN_PRICE_POINTS,
+  ),
   pointsReservedAt: toIsoDateString(row.pointsReservedAt),
   pointsChargedAt: toIsoDateString(row.pointsChargedAt),
   pointsReleasedAt: toIsoDateString(row.pointsReleasedAt),
@@ -95,7 +95,10 @@ export const assertNoOpenSiteHeaderBannerCampaignForAdvertiser = async (
   const existing = await SiteHeaderBannerCampaignModel.findOne({
     advertiserId,
     status: {
-      $in: [SITE_HEADER_BANNER_CAMPAIGN_STATUS_PENDING, SITE_HEADER_BANNER_CAMPAIGN_STATUS_ACTIVE],
+      $in: [
+        SITE_HEADER_BANNER_CAMPAIGN_STATUS_PENDING,
+        SITE_HEADER_BANNER_CAMPAIGN_STATUS_ACTIVE,
+      ],
     },
   })
     .select("_id")
@@ -111,7 +114,10 @@ export const assertNoOpenSiteHeaderBannerCampaignForAdvertiser = async (
  * @param {import('mongoose').Types.ObjectId | string} campaignId
  * @param {import('mongoose').ClientSession | null | undefined} session
  */
-export const activateSiteHeaderBannerCampaignRecord = async (campaignId, session = null) => {
+export const activateSiteHeaderBannerCampaignRecord = async (
+  campaignId,
+  session = null,
+) => {
   const now = new Date();
   const activeUntil = new Date(now.getTime() + SITE_HEADER_BANNER_CAMPAIGN_DURATION_MS);
 
@@ -255,7 +261,10 @@ export const cancelSiteHeaderBannerCampaignsForAdvertiser = async (advertiserId)
         });
       }
 
-      if (row.status === SITE_HEADER_BANNER_CAMPAIGN_STATUS_ACTIVE && row.pointsChargedAt) {
+      if (
+        row.status === SITE_HEADER_BANNER_CAMPAIGN_STATUS_ACTIVE &&
+        row.pointsChargedAt
+      ) {
         await refundLoyaltyPoints({
           userId: String(advertiserId),
           amount,

@@ -6,6 +6,7 @@ import { cancelIntroAdCampaignsForAdvertiser } from "../intro-ad/introAdCampaign
 import { cancelSiteHeaderBannerCampaignsForAdvertiser } from "../site-header-banner-campaign/siteHeaderBannerCampaignHelpers.js";
 
 import { PROFILE_DELETE_CASCADE_ERROR_MESSAGE } from "./updateProfileConstants.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 /**
  * @param {string} targetUserId
@@ -30,30 +31,50 @@ export async function runProfileDeleteCascade(targetUserId) {
     throw new AppError(statusCode, message);
   }
 
-  console.log(
-    `[DELETE PROFILE] Deleted ${cascadeSummary.deletedProductCount} products, updated ${cascadeSummary.updatedCarts} carts for user ${targetUserId}`,
-  );
+  logServerEvent("info", {
+    event: "delete_profile_cascade_products",
+    targetUserId,
+    deletedProductCount: cascadeSummary.deletedProductCount,
+    updatedCarts: cascadeSummary.updatedCarts,
+  });
 
   const deletedVotes = await UserVoteRatingModel.deleteMany({
     $or: [{ userVoter: targetUserId }, { userVoteTarget: targetUserId }],
   });
-  console.log(
-    `[DELETE PROFILE] Deleted ${deletedVotes.deletedCount} vote records for user ${targetUserId}`,
-  );
+  logServerEvent("info", {
+    event: "delete_profile_cascade_votes",
+    targetUserId,
+    deletedVotes: deletedVotes.deletedCount,
+  });
 
   await deleteAllFollowsForUser(targetUserId);
-  console.log(`[DELETE PROFILE] Deleted follow records for user ${targetUserId}`);
+  logServerEvent("info", {
+    event: "delete_profile_cascade_follows",
+    targetUserId,
+  });
 
   try {
     await cancelIntroAdCampaignsForAdvertiser(String(targetUserId));
   } catch (introAdCancelError) {
-    console.error("cancelIntroAdCampaignsForAdvertiser error:", introAdCancelError);
+    logServerEvent("error", {
+      event: "cancelintroadcampaignsforadvertiser",
+      error:
+        introAdCancelError instanceof Error
+          ? introAdCancelError.message
+          : String(introAdCancelError),
+    });
   }
 
   try {
     await cancelSiteHeaderBannerCampaignsForAdvertiser(String(targetUserId));
   } catch (bannerCancelError) {
-    console.error("cancelSiteHeaderBannerCampaignsForAdvertiser error:", bannerCancelError);
+    logServerEvent("error", {
+      event: "cancelsiteheaderbannercampaignsforadvertiser",
+      error:
+        bannerCancelError instanceof Error
+          ? bannerCancelError.message
+          : String(bannerCancelError),
+    });
   }
 
   return cascadeSummary;

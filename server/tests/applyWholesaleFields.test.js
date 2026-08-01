@@ -8,11 +8,10 @@ test("applyWholesaleFields rejects enable without config", () => {
   const $set = {};
   assert.throws(
     () =>
-      applyWholesaleFields(
-        { productWholesaleEnabled: true },
-        $set,
-        { productPrice: 1000, productWholesaleEnabled: false },
-      ),
+      applyWholesaleFields({ productWholesaleEnabled: true }, $set, {
+        productPrice: 1000,
+        productWholesaleEnabled: false,
+      }),
     (error) => error instanceof AppError && error.statusCode === 400,
   );
 });
@@ -30,16 +29,12 @@ test("applyWholesaleFields saves config while disabled", () => {
 
 test("applyWholesaleFields enables when config already set", () => {
   const $set = {};
-  applyWholesaleFields(
-    { productWholesaleEnabled: true },
-    $set,
-    {
-      productPrice: 1000,
-      productWholesaleEnabled: false,
-      productWholesaleMinQty: 5,
-      productWholesalePrice: 800,
-    },
-  );
+  applyWholesaleFields({ productWholesaleEnabled: true }, $set, {
+    productPrice: 1000,
+    productWholesaleEnabled: false,
+    productWholesaleMinQty: 5,
+    productWholesalePrice: 800,
+  });
   assert.equal($set.productWholesaleEnabled, true);
 });
 

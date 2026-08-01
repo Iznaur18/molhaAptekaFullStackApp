@@ -13,9 +13,8 @@ export const getSellerPersonalCategoryConfigController = async (req, res) => {
 };
 
 export const getSellerPersonalCategoryCatalogTilesController = async (req, res) => {
-  const { resolveViewerRegionCodeForRequest } = await import(
-    "../../services/user/userRegionCatalogFilter.js"
-  );
+  const { resolveViewerRegionCodeForRequest } =
+    await import("../../services/user/userRegionCatalogFilter.js");
   const viewerRegionCode = await resolveViewerRegionCodeForRequest({
     userId: req.userId,
     queryRegionCode: req.query.regionCode,
@@ -25,7 +24,9 @@ export const getSellerPersonalCategoryCatalogTilesController = async (req, res) 
 };
 
 export const getMySellerPersonalCategoryCampaignController = async (req, res) => {
-  const result = await getMySellerPersonalCategoryCampaign({ userId: String(req.userId) });
+  const result = await getMySellerPersonalCategoryCampaign({
+    userId: String(req.userId),
+  });
   return successRes(res, result);
 };
 

@@ -59,8 +59,7 @@ const emptyCatalogPage = (page, limit) => ({
  * }} input
  */
 export async function getCatalogProducts({ userId, query }) {
-  const includeHidden =
-    String(query.includeHidden).toLowerCase() === "true";
+  const includeHidden = String(query.includeHidden).toLowerCase() === "true";
   const cacheKey = buildCatalogProductsCacheKey({ userId, query });
 
   if (!includeHidden) {
@@ -89,7 +88,9 @@ async function loadCatalogProducts({ userId, query }) {
   const { page, limit, skip } = parsePagination(query);
   const category = categoryFromQuery(query);
   const categoryId = parseCategoryIdFromQuery(query.categoryId);
-  const sellerPersonalCategoryId = parseCategoryIdFromQuery(query.sellerPersonalCategoryId);
+  const sellerPersonalCategoryId = parseCategoryIdFromQuery(
+    query.sellerPersonalCategoryId,
+  );
   const premiumOnly = query.sort === PRODUCT_SORT_PREMIUM;
   const confirmedOnly = query.sort === PRODUCT_SORT_CONFIRMED;
   const reviewsOnly = query.sort === PRODUCT_SORT_REVIEWS;

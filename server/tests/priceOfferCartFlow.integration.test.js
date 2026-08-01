@@ -162,7 +162,8 @@ test("принятая ставка попадает в корзину поку�
 });
 
 test("покупатель может убрать принятый лот из корзины — ставка отменяется", async () => {
-  const { sellerCookie, buyerCookie, productId } = await seedAuctionScene("cart-remove");
+  const { sellerCookie, buyerCookie, productId } =
+    await seedAuctionScene("cart-remove");
 
   const offerId = await submitOffer(buyerCookie, productId, 555);
   await acceptOffer(sellerCookie, productId, offerId);

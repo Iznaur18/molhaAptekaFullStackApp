@@ -31,9 +31,7 @@ export async function getProductInstallmentProgram({ productId, userId }) {
     return { program: null };
   }
 
-  const product = await ProductModel.findById(productId)
-    .select("productSeller")
-    .lean();
+  const product = await ProductModel.findById(productId).select("productSeller").lean();
   const isOwner = userId != null && String(product?.productSeller) === String(userId);
   const isStaff = await isUserStaff(userId);
 

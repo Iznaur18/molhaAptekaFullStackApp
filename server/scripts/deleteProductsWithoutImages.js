@@ -74,7 +74,9 @@ async function removeProductIdsFromAllCarts(productIds) {
  * @param {{ productPreviewVideoUrl?: unknown }} product
  */
 async function cleanupDeletedProductRelations(productId, product) {
-  const previewVideoUrl = normalizeProductPreviewVideoUrl(product.productPreviewVideoUrl);
+  const previewVideoUrl = normalizeProductPreviewVideoUrl(
+    product.productPreviewVideoUrl,
+  );
   if (previewVideoUrl) {
     await deleteUploadFileByUrl(previewVideoUrl);
   }
@@ -83,10 +85,7 @@ async function cleanupDeletedProductRelations(productId, product) {
   await rejectAllPendingOffersForProduct(productId);
   await cancelProductPromotionsForProduct({
     productId,
-    statuses: [
-      PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
-      PRODUCT_PROMOTION_STATUS_ACTIVE,
-    ],
+    statuses: [PRODUCT_PROMOTION_STATUS_PENDING_STAFF, PRODUCT_PROMOTION_STATUS_ACTIVE],
   });
 
   const now = new Date();
@@ -142,7 +141,9 @@ async function main() {
     const verified = candidates.filter((product) => !productHasImages(product));
     const productIds = verified.map((product) => String(product._id));
     const openSalesIds = await getProductIdsWithOpenSales(productIds);
-    const deletable = verified.filter((product) => !openSalesIds.has(String(product._id)));
+    const deletable = verified.filter(
+      (product) => !openSalesIds.has(String(product._id)),
+    );
     const blocked = verified.filter((product) => openSalesIds.has(String(product._id)));
 
     console.log(`Найдено без картинок: ${verified.length}`);

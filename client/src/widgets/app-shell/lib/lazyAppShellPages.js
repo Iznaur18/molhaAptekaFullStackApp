@@ -145,11 +145,6 @@ export const LazyPartnerProgramPage = lazyNamedExport(
   "PartnerProgramPage",
 );
 
-export const LazyAffiliateListingsPage = lazyNamedExport(
-  () => import("../../../pages/affiliate-listings/ui/AffiliateListingsPage.jsx"),
-  "AffiliateListingsPage",
-);
-
 export const LazyAdvertisingPage = lazyNamedExport(
   () => import("../../../pages/advertising/ui/AdvertisingPage.jsx"),
   "AdvertisingPage",

@@ -6,13 +6,21 @@ import "./AffiliateListingsPage.css";
 /**
  * @param {{
  *   isAuthorized: boolean;
- *   onRequestLogin: () => void;
+ *   onRequestLogin?: () => void;
+ *   embedded?: boolean;
  * }} props
  */
-export function AffiliateListingsPage({ isAuthorized, onRequestLogin }) {
+export function AffiliateListingsPage({
+  isAuthorized,
+  onRequestLogin,
+  embedded = false,
+}) {
   const earningsQuery = useMyAffiliateEarningsQuery({ enabled: isAuthorized });
 
   if (!isAuthorized) {
+    if (embedded) {
+      return null;
+    }
     return (
       <section className="affiliate-listings-page affiliate-listings-page_centered">
         <p className="affiliate-listings-page__hint">
@@ -29,9 +37,13 @@ export function AffiliateListingsPage({ isAuthorized, onRequestLogin }) {
     );
   }
 
+  const rootClass = embedded
+    ? "affiliate-listings-page affiliate-listings-page--embedded"
+    : "affiliate-listings-page";
+
   if (earningsQuery.isLoading) {
     return (
-      <section className="affiliate-listings-page">
+      <section className={rootClass}>
         <p className="affiliate-listings-page__state">
           {AFFILIATE_LISTINGS_PAGE_UI.LOADING}
         </p>
@@ -41,7 +53,7 @@ export function AffiliateListingsPage({ isAuthorized, onRequestLogin }) {
 
   if (earningsQuery.isError) {
     return (
-      <section className="affiliate-listings-page">
+      <section className={rootClass}>
         <p
           className="affiliate-listings-page__state affiliate-listings-page__state_error"
           role="alert"
@@ -57,10 +69,7 @@ export function AffiliateListingsPage({ isAuthorized, onRequestLogin }) {
   const earnings = earningsQuery.data;
 
   return (
-    <section
-      className="affiliate-listings-page"
-      aria-label={AFFILIATE_LISTINGS_PAGE_UI.ARIA}
-    >
+    <section className={rootClass} aria-label={AFFILIATE_LISTINGS_PAGE_UI.ARIA}>
       <div className="affiliate-listings-page__card">
         <h3 className="affiliate-listings-page__title">
           {AFFILIATE_LISTINGS_PAGE_UI.EARNINGS_TITLE}

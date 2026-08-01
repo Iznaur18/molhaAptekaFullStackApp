@@ -129,7 +129,9 @@ async function main() {
   const productFilter = { _id: { $ne: keepOid } };
 
   try {
-    const keepProduct = await ProductModel.findById(keepOid).select("_id productName").lean();
+    const keepProduct = await ProductModel.findById(keepOid)
+      .select("_id productName")
+      .lean();
     if (!keepProduct) {
       throw new Error(`Товар ${KEEP_PRODUCT_ID} не найден — abort`);
     }
@@ -160,7 +162,9 @@ async function main() {
       ProductInstallmentProgramModel.countDocuments({ productId: { $ne: keepOid } }),
     ]);
 
-    console.log(isApply ? "MODE: APPLY" : "MODE: dry-run (без --apply ничего не удалится)");
+    console.log(
+      isApply ? "MODE: APPLY" : "MODE: dry-run (без --apply ничего не удалится)",
+    );
     console.log(`KEEP: ${keepProduct._id}  ${keepProduct.productName ?? ""}`);
     console.log(`Products to delete: ${productsToDelete}`);
     console.log(`Orders (все покупки/продажи): ${orderCount}`);
@@ -199,7 +203,9 @@ async function main() {
     console.log(
       `  reviews: ${(await ProductReviewModel.deleteMany(relatedFilter)).deletedCount}`,
     );
-    console.log(`  views: ${(await ProductViewModel.deleteMany(relatedFilter)).deletedCount}`);
+    console.log(
+      `  views: ${(await ProductViewModel.deleteMany(relatedFilter)).deletedCount}`,
+    );
     console.log(
       `  reports: ${(await ProductReportModel.deleteMany(relatedFilter)).deletedCount}`,
     );
@@ -215,8 +221,12 @@ async function main() {
 
     console.log("Чищу carts / wishlists / curated…");
     console.log(`  carts updated: ${await stripProductIdsFromCarts(doomedIds)}`);
-    console.log(`  wishlists updated: ${await stripProductIdsFromWishlists(doomedIds)}`);
-    console.log(`  curated lists updated: ${await stripProductIdsFromCuratedLists(doomedIds)}`);
+    console.log(
+      `  wishlists updated: ${await stripProductIdsFromWishlists(doomedIds)}`,
+    );
+    console.log(
+      `  curated lists updated: ${await stripProductIdsFromCuratedLists(doomedIds)}`,
+    );
 
     console.log("Удаляю preview-video файлы (best-effort)…");
     let videosRemoved = 0;
@@ -227,7 +237,10 @@ async function main() {
         await deleteUploadFileByUrl(url);
         videosRemoved += 1;
       } catch (error) {
-        console.warn(`  video skip ${product._id}:`, error instanceof Error ? error.message : error);
+        console.warn(
+          `  video skip ${product._id}:`,
+          error instanceof Error ? error.message : error,
+        );
       }
     }
     console.log(`  videos: ${videosRemoved}`);
@@ -248,7 +261,9 @@ async function main() {
 
     const remaining = await ProductModel.countDocuments({});
     const remainingOrders = await OrderModel.countDocuments({});
-    console.log(`\nГотово. Products left: ${remaining}; Orders left: ${remainingOrders}`);
+    console.log(
+      `\nГотово. Products left: ${remaining}; Orders left: ${remainingOrders}`,
+    );
   } finally {
     await mongoose.disconnect();
   }

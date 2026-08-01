@@ -1,9 +1,11 @@
 import { useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";
 import { isProductOnSale } from "@/entities/product/lib/isProductOnSale";
 import { PRODUCT_SALE_UI } from "@/shared/config";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
 
 type ProductDetailsSaleTeaserProps = {
@@ -15,6 +17,7 @@ export const ProductDetailsSaleTeaser = ({
   product,
   sellerId,
 }: ProductDetailsSaleTeaserProps) => {
+  const theme = useAppTheme();
   const styles = useProductDetailScreenStyles();
   const router = useRouter();
   const trimmedSellerId = sellerId.trim();
@@ -31,20 +34,29 @@ export const ProductDetailsSaleTeaser = ({
 
   return (
     <Pressable
-      style={styles.installmentTeaser}
+      style={({ pressed }) => [
+        styles.featureCard,
+        pressed ? { opacity: 0.92, borderColor: theme.colors.actionBorder } : null,
+      ]}
       onPress={handlePress}
       accessibilityRole="button"
       accessibilityLabel={PRODUCT_SALE_UI.DETAILS_TEASER_ARIA}
     >
-      <View style={styles.installmentTeaserCopy}>
-        <Text style={styles.installmentTeaserTitle}>{PRODUCT_SALE_UI.DETAILS_TEASER_TITLE}</Text>
-        <Text style={styles.installmentTeaserMonthly}>
+      <View style={styles.featureCardIcon}>
+        <MaterialIcons name="local-offer" size={20} color={theme.colors.action} />
+      </View>
+      <View style={styles.featureCardText}>
+        <Text style={styles.featureCardTitle}>{PRODUCT_SALE_UI.DETAILS_TEASER_TITLE}</Text>
+        <Text style={styles.featureCardSubtitle}>
           {PRODUCT_SALE_UI.DETAILS_TEASER_REMAINING(remainingCount)}
         </Text>
       </View>
-      <View style={styles.installmentTeaserGo}>
-        <Text style={styles.installmentTeaserGoText}>{PRODUCT_SALE_UI.DETAILS_TEASER_GO}</Text>
-      </View>
+      <MaterialIcons
+        name="chevron-right"
+        size={22}
+        color={theme.colors.action}
+        style={styles.featureCardChevron}
+      />
     </Pressable>
   );
 };

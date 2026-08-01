@@ -15,8 +15,9 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { resolveProductImageUrls } from "@/entities/product/lib/resolveProductImageUrls";
 import { resolveProductPreviewVideoUrl } from "@/entities/product/lib/resolveProductPreviewVideoUrl";
+import { getProductSellerId } from "@/entities/product/lib/getProductSellerId";
 import { setProductInstallmentEnabled } from "@/entities/installment/lib/setProductInstallmentEnabled";
-import { buildAffiliateManageToggleBody } from "@izibuy/shared-lib";
+import { buildAffiliateManageToggleBody, resolveAffiliateEnableLoyaltyGate } from "@izibuy/shared-lib";
 import {
   canSellerDeleteProduct,
   canSellerEditProduct,
@@ -104,12 +105,15 @@ export default function ProductDetailScreen() {
   const [viewerCount, setViewerCount] = useState<number | null>(null);
 
   const promotionTariffsQuery = useProductPromotionTariffsQuery(promotionModalVisible);
-  const loyaltyPointsQuery = useMyLoyaltyPointsStatusQuery(
-    promotionModalVisible && isAuthorized,
-  );
-
   const product = productQuery.data as Record<string, unknown> | undefined;
   const currentUserId = sessionQuery.data?.user?._id ?? null;
+  const isViewerOwnProduct =
+    Boolean(currentUserId) &&
+    getProductSellerId(product) != null &&
+    getProductSellerId(product) === String(currentUserId);
+  const loyaltyPointsQuery = useMyLoyaltyPointsStatusQuery(
+    isAuthorized && (promotionModalVisible || isViewerOwnProduct),
+  );
 
   const syncPromotionProduct = useCallback(
     (updated: Record<string, unknown> & { _id: string }) => {
@@ -431,6 +435,18 @@ export default function ProductDetailScreen() {
     setIsAffiliateTogglePending(true);
     setManageErrorMessage("");
     try {
+      if (affiliateEnabled && productRecord?.affiliateEnabled !== true) {
+        const gate = resolveAffiliateEnableLoyaltyGate({
+          productPrice: productRecord?.productPrice,
+          affiliatePercent: productRecord?.affiliatePercent,
+          loyaltyPointsBalance: loyaltyPointsQuery.data?.loyaltyPointsBalance ?? 0,
+          loyaltyPointsReserved: loyaltyPointsQuery.data?.loyaltyPointsReserved ?? 0,
+        });
+        if (!gate.ok) {
+          setManageErrorMessage(gate.message);
+          return;
+        }
+      }
       const body = buildAffiliateManageToggleBody(productRecord, affiliateEnabled);
       const updated = await patchMutation.mutateAsync({
         productId: targetProductId,

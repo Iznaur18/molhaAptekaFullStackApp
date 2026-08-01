@@ -1,5 +1,7 @@
 import ProductCategoryDisplayModel from "../models/ProductCategoryDisplayModel.js";
 import {
+  AffiliateLedgerEntryModel,
+  MoneyIdempotencyRecordModel,
   PendingRegistrationModel,
   ReferralLedgerEntryModel,
   UserModel,
@@ -32,4 +34,6 @@ export async function syncCriticalIndexes() {
   await syncModelIndexes(UserModel, "User");
   await syncModelIndexes(ReferralLedgerEntryModel, "ReferralLedgerEntry");
   await syncModelIndexes(PendingRegistrationModel, "PendingRegistration");
+  await syncModelIndexes(MoneyIdempotencyRecordModel, "MoneyIdempotencyRecord");
+  await syncModelIndexes(AffiliateLedgerEntryModel, "AffiliateLedgerEntry");
 }

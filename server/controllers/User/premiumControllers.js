@@ -12,29 +12,30 @@ import {
 } from "../../services/user/premiumAccess.js";
 import { InsufficientLoyaltyPointsError } from "../../services/loyalty/loyaltyPointsSpend.js";
 import { errorRes, successRes } from "../../services/http/index.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 export const getMyPremiumStatusController = async (req, res) => {
-const userId = String(req.userId);
-    await syncPremiumExpiryForUser(userId);
+  const userId = String(req.userId);
+  await syncPremiumExpiryForUser(userId);
 
-    const user = await UserModel.findById(userId)
-      .select("isPremiumUser premiumExpiresAt userLoyaltyPoints isBlockedUser")
-      .lean();
+  const user = await UserModel.findById(userId)
+    .select("isPremiumUser premiumExpiresAt userLoyaltyPoints isBlockedUser")
+    .lean();
 
-    if (!user) {
-      return errorRes(res, 404, "Пользователь не найден");
-    }
+  if (!user) {
+    return errorRes(res, 404, "Пользователь не найден");
+  }
 
-    const isActive = isPremiumActive(user);
-    const loyaltyPoints = Number(user.userLoyaltyPoints) || 0;
+  const isActive = isPremiumActive(user);
+  const loyaltyPoints = Number(user.userLoyaltyPoints) || 0;
 
-    return successRes(res, {
-      isActive,
-      premiumExpiresAt: user.premiumExpiresAt ?? null,
-      canPurchase: !isActive && user.isBlockedUser !== true,
-      pricePoints: PREMIUM_PRICE_POINTS,
-      loyaltyPointsBalance: loyaltyPoints,
-    });
+  return successRes(res, {
+    isActive,
+    premiumExpiresAt: user.premiumExpiresAt ?? null,
+    canPurchase: !isActive && user.isBlockedUser !== true,
+    pricePoints: PREMIUM_PRICE_POINTS,
+    loyaltyPointsBalance: loyaltyPoints,
+  });
 };
 
 export const purchasePremiumController = async (req, res) => {
@@ -75,7 +76,10 @@ export const purchasePremiumController = async (req, res) => {
         return errorRes(res, 400, error.message);
       }
     }
-    console.error("purchasePremiumController error:", error);
+    logServerEvent("error", {
+      event: "purchasepremiumcontroller",
+      error: error instanceof Error ? error.message : String(error),
+    });
     return errorRes(res, 500, "Ошибка при покупке премиума");
   }
 };

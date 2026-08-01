@@ -10,6 +10,7 @@ import {
 import { parseUploadFilenameFromMediaUrl } from "./parseUploadFilenameFromMediaUrl.js";
 import { parsePrivateUploadFilenameFromUrl } from "./privateUploadPaths.js";
 import { UPLOADS_DIR } from "./uploadsDir.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 /**
  * @param {string | null | undefined} mediaUrl
@@ -21,7 +22,10 @@ export async function deleteUploadFileByUrl(mediaUrl) {
       try {
         await deletePrivateUploadFromObjectStorage(privateFilename);
       } catch (error) {
-        console.error("deleteUploadFileByUrl private s3 error:", error);
+        logServerEvent("error", {
+          event: "deleteuploadfilebyurl_private_s3",
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
       return;
     }
@@ -35,7 +39,10 @@ export async function deleteUploadFileByUrl(mediaUrl) {
       await fs.unlink(filePath);
     } catch (error) {
       if (error?.code !== "ENOENT") {
-        console.error("deleteUploadFileByUrl private error:", error);
+        logServerEvent("error", {
+          event: "deleteuploadfilebyurl_private",
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
     }
     return;
@@ -50,7 +57,10 @@ export async function deleteUploadFileByUrl(mediaUrl) {
     try {
       await deleteUploadFromObjectStorage(filename);
     } catch (error) {
-      console.error("deleteUploadFileByUrl s3 error:", error);
+      logServerEvent("error", {
+        event: "deleteuploadfilebyurl_s3",
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
     return;
   }
@@ -67,7 +77,10 @@ export async function deleteUploadFileByUrl(mediaUrl) {
     await fs.unlink(filePath);
   } catch (error) {
     if (error?.code !== "ENOENT") {
-      console.error("deleteUploadFileByUrl error:", error);
+      logServerEvent("error", {
+        event: "deleteuploadfilebyurl",
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 }

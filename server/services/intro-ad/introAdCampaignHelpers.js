@@ -17,14 +17,12 @@ import {
   INTRO_AD_NOTIFICATION_KIND_EXPIRED,
   INTRO_AD_NOTIFICATION_KIND_REJECTED,
 } from "../../constants/introAdCampaignConstants.js";
-import {
-  IntroAdCampaignModel,
-  ProductModel,
-} from "../../models/index.js";
+import { IntroAdCampaignModel, ProductModel } from "../../models/index.js";
 import { buildSellerCatalogProductsQuery } from "../user/userSellerCatalogProducts.js";
 import { createUserInAppNotification } from "../user/userInAppNotifications.js";
 import { releaseLoyaltyPointsReservation } from "../loyalty/loyaltyPointsReserve.js";
 import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 /**
  * @param {Record<string, unknown> | null | undefined} row
@@ -78,7 +76,9 @@ export const toIntroAdPaidIntroPayload = (row, ctaType) => ({
  * @param {import('mongoose').Types.ObjectId | string} advertiserId
  */
 export const resolveIntroAdCtaType = async (advertiserId) => {
-  const count = await ProductModel.countDocuments(buildSellerCatalogProductsQuery(advertiserId));
+  const count = await ProductModel.countDocuments(
+    buildSellerCatalogProductsQuery(advertiserId),
+  );
   return count > 0 ? INTRO_AD_CTA_TYPE_SELLER_PRODUCTS : INTRO_AD_CTA_TYPE_PROFILE;
 };
 
@@ -303,7 +303,10 @@ export const processIntroAdCampaignCronTasks = async () => {
       await expireIntroAdCampaignsAndActivateQueue(session);
     });
   } catch (error) {
-    console.error("processIntroAdCampaignCronTasks error:", error);
+    logServerEvent("error", {
+      event: "processintroadcampaigncrontasks",
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 };
 
@@ -322,7 +325,10 @@ export const findOpenIntroAdCampaignForAdvertiser = async (userId) =>
  * @param {string} userId
  * @param {import('mongoose').ClientSession | null | undefined} [session]
  */
-export const assertNoOpenIntroAdCampaignForAdvertiser = async (userId, session = null) => {
+export const assertNoOpenIntroAdCampaignForAdvertiser = async (
+  userId,
+  session = null,
+) => {
   const query = IntroAdCampaignModel.findOne({
     advertiserId: userId,
     status: { $in: INTRO_AD_CAMPAIGN_OPEN_STATUSES },
@@ -448,7 +454,9 @@ export const cancelIntroAdCampaignsForAdvertiser = async (advertiserId) => {
             status: INTRO_AD_CAMPAIGN_STATUS_CANCELLED,
             cancelledAt: now,
             pointsReleasedAt:
-              row.status === INTRO_AD_CAMPAIGN_STATUS_PENDING ? now : row.pointsReleasedAt,
+              row.status === INTRO_AD_CAMPAIGN_STATUS_PENDING
+                ? now
+                : row.pointsReleasedAt,
           },
         },
         withMongoSession({}, session),

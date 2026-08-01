@@ -39,22 +39,13 @@ export const AFFILIATE_INSUFFICIENT_BUDGET_MESSAGE =
 export const AFFILIATE_PERCENT_REQUIRED_MESSAGE =
   "При включённой партнёрке укажите процент от 1 до 50";
 
-export const IN_APP_NOTIFICATION_KIND_AFFILIATE_PAYOUT =
-  "affiliate_payout_credited";
+export const IN_APP_NOTIFICATION_KIND_AFFILIATE_PAYOUT = "affiliate_payout_credited";
 
 /** @param {number} amount */
 export const IN_APP_NOTIFICATION_MESSAGE_AFFILIATE_PAYOUT = (amount) =>
   `Выплата за приведённого клиента: +${amount} баллов лояльности`;
 
-/**
- * @param {number} linePaidTotal
- * @param {number} percent
- */
-export function computeAffiliatePayoutAmount(linePaidTotal, percent) {
-  const paid = Math.floor(Number(linePaidTotal));
-  const pct = Math.floor(Number(percent));
-  if (!Number.isFinite(paid) || paid <= 0 || !Number.isFinite(pct) || pct <= 0) {
-    return 0;
-  }
-  return Math.floor((paid * pct) / 100);
-}
+export {
+  computeAffiliatePayoutAmount,
+  formatAffiliateEnableInsufficientLoyaltyMessage,
+} from "@izibuy/shared-lib";

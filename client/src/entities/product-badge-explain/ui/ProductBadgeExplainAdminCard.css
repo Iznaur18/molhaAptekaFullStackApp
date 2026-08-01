@@ -1,0 +1,104 @@
+.product-badge-explain-admin-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.75rem;
+  background: var(--iz-color-surface);
+}
+
+.product-badge-explain-admin-card__head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.product-badge-explain-admin-card__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--iz-color-ink);
+}
+
+.product-badge-explain-admin-card__hint {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--iz-color-muted);
+}
+
+.product-badge-explain-admin-card__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.product-badge-explain-admin-card__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.product-badge-explain-admin-card__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--iz-color-ink);
+}
+
+.product-badge-explain-admin-card__textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 6rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.5rem;
+  background: var(--iz-color-bg);
+  color: var(--iz-color-ink);
+  font: inherit;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+.product-badge-explain-admin-card__error {
+  margin: 0;
+  color: var(--iz-color-danger, #b42318);
+  font-size: 0.875rem;
+}
+
+.product-badge-explain-admin-card__notice {
+  margin: 0;
+  color: var(--iz-color-success, #027a48);
+  font-size: 0.875rem;
+}
+
+.product-badge-explain-admin-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.product-badge-explain-admin-card__btn {
+  appearance: none;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.9rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.product-badge-explain-admin-card__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.product-badge-explain-admin-card__btn_primary {
+  background: var(--iz-color-ink);
+  color: var(--iz-color-on-contrast, #fff);
+}
+
+.product-badge-explain-admin-card__btn_secondary {
+  background: transparent;
+  color: var(--iz-color-ink);
+  border: 1px solid var(--iz-color-border);
+}

@@ -16,13 +16,15 @@
   --iz-color-text-placeholder: #9ca3af;
   --iz-color-ink: #0f172a;
   /*
-   * Neutrals v3 — минимум оттенков:
-   * canvas (#f3f4f6) = bg / muted / elevated; pure white = surface / onContrast.
-   * Soft-status: одна lightness-полоса (~#ee–#f7), только лёгкий hue.
+   * Neutrals v4 — явная лесенка слоёв для чёткого зонирования (light):
+   * bg (canvas) < surface-muted (recessed) < surface-elevated (raised) < surface (white).
+   * Разные значения не дают элементам сливаться с фоном.
+   * Холодный серый с лёгким синим подтоном под бренд.
+   * Синхронно с packages/design-tokens/src/colors.ts (canonical v4).
    */
-  --iz-color-bg: #f3f4f6;
-  --iz-color-surface-muted: #f3f4f6;
-  --iz-color-surface-elevated: #f3f4f6;
+  --iz-color-bg: #e6eaf1;
+  --iz-color-surface-muted: #eef1f7;
+  --iz-color-surface-elevated: #f5f7fb;
   --iz-color-surface: #ffffff;
   --iz-color-on-contrast: #ffffff;
 
@@ -49,8 +51,8 @@
   --iz-color-info-deep: #1e40af;
 
   /* Borders & accent */
-  --iz-color-border: #e5e7eb;
-  --iz-color-border-strong: #d1d5db;
+  --iz-color-border: #d2d8e2;
+  --iz-color-border-strong: #b7c0cd;
   --iz-color-accent: #7c3aed;
   --iz-color-accent-soft: #f2eff7;
 

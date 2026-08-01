@@ -13,6 +13,7 @@ import {
 import { normalizePassportPayload } from "../../services/user/validatePassportPayload.js";
 import { sealPassportPlain } from "../../services/passport-vault/index.js";
 import { errorRes, successRes } from "../../services/http/index.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 /**
  * `POST /user/me/data-confirmation-request`
@@ -83,7 +84,10 @@ export const submitDataConfirmationRequestController = async (req, res) => {
     if (error?.code === 11000) {
       return errorRes(res, 409, USER_DATA_CONFIRMATION_ALREADY_PENDING_MESSAGE);
     }
-    console.error("submitDataConfirmationRequest error:", error);
+    logServerEvent("error", {
+      event: "submitdataconfirmationrequest",
+      error: error instanceof Error ? error.message : String(error),
+    });
     return errorRes(res, 500, "Ошибка при подаче заявки");
   }
 };
@@ -92,64 +96,64 @@ export const submitDataConfirmationRequestController = async (req, res) => {
  * `GET /user/me/data-confirmation-request`
  */
 export const getMyDataConfirmationRequestController = async (req, res) => {
-const userId = String(req.userId);
-    const user = await UserModel.findById(userId).select("isUserDataConfirmed").lean();
+  const userId = String(req.userId);
+  const user = await UserModel.findById(userId).select("isUserDataConfirmed").lean();
 
-    if (!user) {
-      return errorRes(res, 401, "Пользователь не найден");
-    }
+  if (!user) {
+    return errorRes(res, 401, "Пользователь не найден");
+  }
 
-    const request = await getLatestDataConfirmationRequestForUser(userId);
+  const request = await getLatestDataConfirmationRequestForUser(userId);
 
-    return successRes(res, {
-      isUserDataConfirmed: user.isUserDataConfirmed === true,
-      request,
-    });
+  return successRes(res, {
+    isUserDataConfirmed: user.isUserDataConfirmed === true,
+    request,
+  });
 };
 
 /**
  * `GET /user/data-confirmation-requests/pending`
  */
 export const getPendingDataConfirmationRequestsController = async (req, res) => {
-const { requests, totalPending } = await getPendingDataConfirmationRequests();
-    return successRes(res, { requests, totalPending });
+  const { requests, totalPending } = await getPendingDataConfirmationRequests();
+  return successRes(res, { requests, totalPending });
 };
 
 /**
  * `GET /user/data-confirmation-requests/pending/count`
  */
 export const getPendingDataConfirmationRequestsCountController = async (req, res) => {
-const totalPending = await UserDataConfirmationRequestModel.countDocuments({
-      status: USER_DATA_CONFIRMATION_STATUS_PENDING,
-    });
-    return successRes(res, { totalPending });
+  const totalPending = await UserDataConfirmationRequestModel.countDocuments({
+    status: USER_DATA_CONFIRMATION_STATUS_PENDING,
+  });
+  return successRes(res, { totalPending });
 };
 
 /**
  * `PATCH /user/data-confirmation-requests/:requestId/resolve`
  */
 export const resolveDataConfirmationRequestController = async (req, res) => {
-const staffUserId = req.userId;
-    const { requestId } = req.params;
-    const resolution = String(req.body?.resolution ?? "").trim();
-    const staffNote = String(req.body?.staffNote ?? "").trim();
+  const staffUserId = req.userId;
+  const { requestId } = req.params;
+  const resolution = String(req.body?.resolution ?? "").trim();
+  const staffNote = String(req.body?.staffNote ?? "").trim();
 
-    try {
-      const result = await resolveDataConfirmationRequest(
-        requestId,
-        staffUserId,
-        resolution,
-        staffNote,
-      );
-      return successRes(res, result);
-    } catch (e) {
-      const message = e instanceof Error ? e.message : "Не удалось рассмотреть заявку";
-      const status =
-        message === "Заявка не найдена"
-          ? 404
-          : message === "Заявка уже рассмотрена"
-            ? 409
-            : 400;
-      return errorRes(res, status, message);
-    }
+  try {
+    const result = await resolveDataConfirmationRequest(
+      requestId,
+      staffUserId,
+      resolution,
+      staffNote,
+    );
+    return successRes(res, result);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Не удалось рассмотреть заявку";
+    const status =
+      message === "Заявка не найдена"
+        ? 404
+        : message === "Заявка уже рассмотрена"
+          ? 409
+          : 400;
+    return errorRes(res, status, message);
+  }
 };

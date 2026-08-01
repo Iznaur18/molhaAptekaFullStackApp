@@ -250,7 +250,10 @@ test("markInstallmentPaymentPaid: writes audit log with key", async () => {
   });
 
   const after = await InstallmentContractModel.findById(contract._id).lean();
-  assert.equal(after.payments[0].status, INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION);
+  assert.equal(
+    after.payments[0].status,
+    INSTALLMENT_PAYMENT_STATUS_PENDING_CONFIRMATION,
+  );
 
   const logs = await InstallmentOperationLogModel.find({
     contractId: contract._id,

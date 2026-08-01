@@ -1,4 +1,5 @@
 import { ProductModel } from "../../models/index.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import {
   PRODUCT_PRICE_MARKET_STATUS_CRON_BATCH_SIZE,
@@ -109,7 +110,11 @@ export async function processProductPriceMarketStatusPeers(productIds) {
       });
       updated += 1;
     } catch (error) {
-      console.error("refreshProductPriceMarketStatus peer:", peerId, error);
+      logServerEvent("error", {
+        event: "refresh_product_price_market_status_peer",
+        peerId,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 

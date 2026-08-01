@@ -33,12 +33,10 @@ import { resolveProductCategoryWriteFromBody } from "./resolveProductCategoryWri
 import { resolveActiveSellerPersonalCategoryId } from "../seller-personal-category/sellerPersonalCategoryHelpers.js";
 import { applyProductSaleCityFields } from "./ruCityNormalized.js";
 import { resolveCreateProductPickupFields } from "./productPickup.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 const throwFieldError = (error, fallback) => {
-  throw new AppError(
-    400,
-    error instanceof Error ? error.message : fallback,
-  );
+  throw new AppError(400, error instanceof Error ? error.message : fallback);
 };
 
 const resolveCreatePrices = (body) => {
@@ -130,13 +128,19 @@ const notifyApprovedProductFollowers = async (productPayload) => {
   try {
     await notifyFollowersOfSellerNewCatalogProduct(productPayload);
   } catch (notifyError) {
-    console.error("notifyFollowersOfSellerNewCatalogProduct error:", notifyError);
+    logServerEvent("error", {
+      event: "notifyfollowersofsellernewcatalogproduct",
+      error: notifyError instanceof Error ? notifyError.message : String(notifyError),
+    });
   }
 
   try {
     await notifyFollowersOfSellerProductDiscount(productPayload, null);
   } catch (notifyError) {
-    console.error("notifyFollowersOfSellerProductDiscount error:", notifyError);
+    logServerEvent("error", {
+      event: "notifyfollowersofsellerproductdiscount",
+      error: notifyError instanceof Error ? notifyError.message : String(notifyError),
+    });
   }
 };
 
@@ -147,12 +151,8 @@ const notifyApprovedProductFollowers = async (productPayload) => {
  * }} input
  */
 export async function postProduct({ userId, body }) {
-  const {
-    productName,
-    productDescription,
-    productIsAvailable,
-    productAuctionEnabled,
-  } = body;
+  const { productName, productDescription, productIsAvailable, productAuctionEnabled } =
+    body;
 
   const { productPrice, productOldPrice } = resolveCreatePrices(body);
 
@@ -182,9 +182,12 @@ export async function postProduct({ userId, body }) {
   const loyaltyPointsPerUnit = await resolveCreateLoyaltyPoints(userId, body);
   const productCharacteristics = resolveCreateCharacteristics(body);
   const { productReturnEnabled, productReturnTerms } = resolveCreateReturnPolicy(body);
-  const productListingOrigin = normalizeProductListingOrigin(body.productListingOrigin, {
-    required: true,
-  });
+  const productListingOrigin = normalizeProductListingOrigin(
+    body.productListingOrigin,
+    {
+      required: true,
+    },
+  );
   const productIsOriginal = normalizeProductIsOriginal(body.productIsOriginal, {
     required: true,
   });
@@ -253,7 +256,10 @@ export async function postProduct({ userId, body }) {
       });
       productPayload = { ...productPayload, productPriceMarketStatus: marketStatus };
     } catch (error) {
-      console.error("refreshProductPriceMarketStatus after create:", error);
+      logServerEvent("error", {
+        event: "refreshproductpricemarketstatus_after_create",
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 

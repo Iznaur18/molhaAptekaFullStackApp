@@ -84,7 +84,11 @@ export async function getProductCategoryDisplaysController(_req, res) {
 export async function patchProductCategoryDisplayController(req, res) {
   const categorySlug = String(req.params.categorySlug ?? "").trim();
   const target = await resolveProductCategoryDisplayPatchTarget({ categorySlug });
-  const update = await buildCategoryDisplayUpdate(target.existing, req.body, req.userId);
+  const update = await buildCategoryDisplayUpdate(
+    target.existing,
+    req.body,
+    req.userId,
+  );
 
   const saved = await upsertProductCategoryDisplay({
     categorySlug,
@@ -107,7 +111,11 @@ export async function patchProductCategoryNodeDisplayController(req, res) {
   }
 
   const target = await resolveProductCategoryDisplayPatchTarget({ categoryId });
-  const update = await buildCategoryDisplayUpdate(target.existing, req.body, req.userId);
+  const update = await buildCategoryDisplayUpdate(
+    target.existing,
+    req.body,
+    req.userId,
+  );
 
   const saved = await upsertProductCategoryDisplay({
     categoryId,

@@ -103,9 +103,7 @@ export const assertInstallmentOrderAcceptedForPayments = async (contract) => {
     throw new AppError(409, INSTALLMENT_ORDER_NOT_ACCEPTED_BY_SELLER_MESSAGE);
   }
 
-  const order = await OrderModel.findById(orderId)
-    .select("status items.status")
-    .lean();
+  const order = await OrderModel.findById(orderId).select("status items.status").lean();
   if (!isInstallmentOrderAcceptedBySeller(order)) {
     throw new AppError(409, INSTALLMENT_ORDER_NOT_ACCEPTED_BY_SELLER_MESSAGE);
   }

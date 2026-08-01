@@ -9,16 +9,15 @@ export async function up({ db, isApply }) {
   const code = DEFAULT_VIEWER_REGION_CODE;
   const curatedLists = db.collection("curatedproductlists");
   const missingRegion = {
-    $or: [
-      { regionCode: { $exists: false } },
-      { regionCode: null },
-      { regionCode: "" },
-    ],
+    $or: [{ regionCode: { $exists: false } }, { regionCode: null }, { regionCode: "" }],
   };
 
   const matched = await curatedLists.countDocuments(missingRegion);
   if (!isApply) {
-    return { matched: { curatedLists: matched }, wouldMigrate: { curatedLists: matched } };
+    return {
+      matched: { curatedLists: matched },
+      wouldMigrate: { curatedLists: matched },
+    };
   }
 
   const result = await curatedLists.updateMany(missingRegion, {

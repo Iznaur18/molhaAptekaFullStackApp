@@ -70,6 +70,18 @@
   white-space: nowrap;
 }
 
+.product-discount-badge--pressable {
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.product-discount-badge--pressable:focus-visible {
+  outline: 2px solid var(--iz-color-ink);
+  outline-offset: 2px;
+}
+
 /* Ozon-overlay: паритет с mobile PRODUCT_CARD_IMAGE_BADGE_OVERLAY_LAYOUT */
 .product-discount-badge--overlay {
   box-shadow: none;

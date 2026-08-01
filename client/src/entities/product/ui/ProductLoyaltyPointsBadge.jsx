@@ -11,6 +11,7 @@ import "./ProductLoyaltyPointsBadge.css";
  *   isAuthorized?: boolean;
  *   variant?: "inline" | "overlay" | "detail";
  *   className?: string;
+ *   onPress?: (payload: { kind: "loyalty"; label: string }) => void;
  * }} props
  */
 export function ProductLoyaltyPointsBadge({
@@ -18,6 +19,7 @@ export function ProductLoyaltyPointsBadge({
   isAuthorized = false,
   variant = "inline",
   className: classNameProp = "",
+  onPress,
 }) {
   const { user } = useAuthSession();
   const isUserDataConfirmed = isAuthorized && user?.isUserDataConfirmed === true;
@@ -44,10 +46,24 @@ export function ProductLoyaltyPointsBadge({
     "product-loyalty-points-badge",
     variant === "overlay" ? "product-loyalty-points-badge--overlay" : "",
     variant === "detail" ? "product-loyalty-points-badge--detail" : "",
+    typeof onPress === "function" ? "product-loyalty-points-badge--pressable" : "",
     classNameProp,
   ]
     .filter(Boolean)
     .join(" ");
+
+  if (typeof onPress === "function") {
+    return (
+      <button
+        type="button"
+        className={className}
+        aria-label={label}
+        onClick={() => onPress({ kind: "loyalty", label })}
+      >
+        {label}
+      </button>
+    );
+  }
 
   return (
     <span className={className} title={PRODUCT_CARD_UI.LOYALTY_POINTS_TOOLTIP}>

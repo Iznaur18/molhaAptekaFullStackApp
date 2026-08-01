@@ -134,35 +134,12 @@
   margin-top: 20px;
 }
 
-.report-product-modal__cancel,
-.report-product-modal__submit {
+/* Кнопки — единый app-btn (--secondary / --primary); тут только раскладка
+   и модальный размер (48px), как у остальных модальных экшенов. */
+.report-product-modal__action {
   flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 48px;
-  padding: 14px var(--iz-space-4);
-  border-radius: var(--iz-radius-button);
-  font: inherit;
-  font-size: var(--iz-font-md);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* цвета cancel — cancelButton.css (danger + onContrast) */
-.report-product-modal__cancel {
-  border: var(--iz-border) solid var(--iz-color-danger);
-}
-
-.report-product-modal__submit {
-  border: none;
-  background: var(--iz-color-action);
-  color: var(--iz-color-on-contrast);
-}
-
-.report-product-modal__submit:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  min-height: var(--iz-control-btn-modal-min-height);
+  padding-block: var(--iz-control-btn-modal-padding-y);
 }
 
 @keyframes report-product-modal-backdrop-in {

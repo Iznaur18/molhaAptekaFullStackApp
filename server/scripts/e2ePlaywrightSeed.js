@@ -6,7 +6,11 @@ import {
   PRODUCT_MODERATION_APPROVED,
   PRODUCT_MODERATION_PENDING,
 } from "../constants/productModerationConstants.js";
-import { ProductModel, UserDataConfirmationRequestModel, UserModel } from "../models/index.js";
+import {
+  ProductModel,
+  UserDataConfirmationRequestModel,
+  UserModel,
+} from "../models/index.js";
 import { buildProductSearchBlobFromFields } from "../utils/buildProductSearchBlob.js";
 import { seedProductCategoryTree } from "../utils/seedProductCategoryTree.js";
 

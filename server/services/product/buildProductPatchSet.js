@@ -43,17 +43,14 @@ import {
   AFFILIATE_PERCENT_MIN,
   AFFILIATE_PERCENT_REQUIRED_MESSAGE,
 } from "../../constants/affiliateConstants.js";
+import { assertSellerCanEnableAffiliate } from "./assertSellerCanEnableAffiliate.js";
 
-const hasBodyField = (body, field) =>
-  Object.prototype.hasOwnProperty.call(body, field);
+const hasBodyField = (body, field) => Object.prototype.hasOwnProperty.call(body, field);
 
 const hasSetField = ($set, field) => Object.prototype.hasOwnProperty.call($set, field);
 
 const throwFieldError = (error, fallback) => {
-  throw new AppError(
-    400,
-    error instanceof Error ? error.message : fallback,
-  );
+  throw new AppError(400, error instanceof Error ? error.message : fallback);
 };
 
 const applyTextFields = (body, $set) => {
@@ -108,9 +105,12 @@ const applyListingOriginField = (body, $set) => {
   }
 
   try {
-    $set.productListingOrigin = normalizeProductListingOrigin(body.productListingOrigin, {
-      required: true,
-    });
+    $set.productListingOrigin = normalizeProductListingOrigin(
+      body.productListingOrigin,
+      {
+        required: true,
+      },
+    );
   } catch (error) {
     throwFieldError(error, "Некорректный статус товара");
   }
@@ -209,7 +209,9 @@ const applyPickupFields = (body, $set, existing) => {
 
   try {
     if (touchesAddress) {
-      $set.productPickupAddress = normalizeProductPickupAddress(body.productPickupAddress);
+      $set.productPickupAddress = normalizeProductPickupAddress(
+        body.productPickupAddress,
+      );
     }
 
     if (touchesLat || touchesLon) {
@@ -257,7 +259,10 @@ const applyPickupFields = (body, $set, existing) => {
 };
 
 const applyCategoryFields = async (body, $set, existing) => {
-  if (!hasBodyField(body, "productCategoryId") && !hasBodyField(body, "productCategory")) {
+  if (
+    !hasBodyField(body, "productCategoryId") &&
+    !hasBodyField(body, "productCategory")
+  ) {
     return;
   }
   try {
@@ -289,16 +294,15 @@ const applyLoyaltyField = async (body, $set, existing, productId) => {
   }
 };
 
-const applyAffiliateFields = (body, $set, existing) => {
+const applyAffiliateFields = async (body, $set, existing) => {
   const hasEnabled = hasBodyField(body, "affiliateEnabled");
   const hasPercent = hasBodyField(body, "affiliatePercent");
   if (!hasEnabled && !hasPercent) {
     return;
   }
 
-  const nextEnabled = hasEnabled
-    ? body.affiliateEnabled === true
-    : existing.affiliateEnabled === true;
+  const wasEnabled = existing.affiliateEnabled === true;
+  const nextEnabled = hasEnabled ? body.affiliateEnabled === true : wasEnabled;
   let nextPercent = hasPercent
     ? Math.floor(Number(body.affiliatePercent) || 0)
     : Math.floor(Number(existing.affiliatePercent) || 0);
@@ -318,6 +322,18 @@ const applyAffiliateFields = (body, $set, existing) => {
     nextPercent = hasPercent ? nextPercent : 0;
   }
 
+  // Только при включении (false→true). Уже включённые с дырой в балансе не трогаем.
+  if (nextEnabled && !wasEnabled) {
+    const productPrice = hasSetField($set, "productPrice")
+      ? $set.productPrice
+      : existing.productPrice;
+    await assertSellerCanEnableAffiliate({
+      sellerId: String(existing.productSeller),
+      productPrice,
+      affiliatePercent: nextPercent,
+    });
+  }
+
   if (hasEnabled) {
     $set.affiliateEnabled = nextEnabled;
   }
@@ -330,10 +346,7 @@ const applyAffiliateFields = (body, $set, existing) => {
 };
 
 const applyImageFields = (body, $set) => {
-  if (
-    hasBodyField(body, "productImageUrls") ||
-    hasBodyField(body, "productImageUrl")
-  ) {
+  if (hasBodyField(body, "productImageUrls") || hasBodyField(body, "productImageUrl")) {
     $set.productImageUrls = mergeProductImageUrlsFromBody(body);
   }
 };
@@ -388,8 +401,7 @@ const applyModerationAndAvailability = (body, $set, existing, isAdmin) => {
     // Pending: owner may edit content; status stays pending (no queue re-bump).
     // Approved/rejected content → re-submit to pending + hide from catalog.
     const resubmitForModeration =
-      touchesContent &&
-      existing.productModerationStatus !== PRODUCT_MODERATION_PENDING;
+      touchesContent && existing.productModerationStatus !== PRODUCT_MODERATION_PENDING;
 
     if (resubmitForModeration) {
       $set.productModerationStatus = PRODUCT_MODERATION_PENDING;
@@ -471,7 +483,7 @@ export async function buildProductPatchSet({ existing, body, isAdmin, productId 
   applyPickupFields(body, $set, existing);
   await applyCategoryFields(body, $set, existing);
   await applyLoyaltyField(body, $set, existing, productId);
-  applyAffiliateFields(body, $set, existing);
+  await applyAffiliateFields(body, $set, existing);
   applyImageFields(body, $set);
   await applyPreviewVideoFields(body, $set, existing);
   applyModerationAndAvailability(body, $set, existing, isAdmin);

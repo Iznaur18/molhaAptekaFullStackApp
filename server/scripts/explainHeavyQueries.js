@@ -23,7 +23,9 @@ async function printExplain(label, explainPromise) {
   const collscan = explainUsesCollectionScan(explain);
 
   console.log(`\n## ${label}`);
-  console.log(`IXSCAN: ${ixscan ? "yes" : "no"} | COLLSCAN: ${collscan ? "yes" : "no"}`);
+  console.log(
+    `IXSCAN: ${ixscan ? "yes" : "no"} | COLLSCAN: ${collscan ? "yes" : "no"}`,
+  );
   for (const stage of stages) {
     const index = stage.indexName ? ` (${stage.indexName})` : "";
     console.log(`  - ${stage.stage}${index}`);
@@ -106,8 +108,7 @@ const main = async () => {
     );
   }
 
-  const productId =
-    sampleProductId?.items?.[0]?.productId ?? sampleSeller?._id ?? null;
+  const productId = sampleProductId?.items?.[0]?.productId ?? sampleSeller?._id ?? null;
   if (productId) {
     await printExplain(
       "Orders: sales by items.productId",

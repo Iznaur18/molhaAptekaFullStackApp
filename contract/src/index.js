@@ -153,11 +153,6 @@ export {
   MONEY_IDEMPOTENCY_KEY_MAX_LENGTH as PURCHASE_PREMIUM_IDEMPOTENCY_KEY_MAX_LENGTH,
 } from "./purchasePremium.js";
 export {
-  convertPartnerBalanceBodySchema,
-  CONVERT_PARTNER_BALANCE_AMOUNT_MAX,
-  CONVERT_PARTNER_IDEMPOTENCY_KEY_MAX_LENGTH,
-} from "./partnerProgram.js";
-export {
   AFFILIATE_PERCENT_MIN,
   AFFILIATE_PERCENT_MAX,
   AFFILIATE_QUERY_PARAM,
@@ -202,6 +197,12 @@ export {
   adminManageToggleDisplayPatchBodySchema,
   productManageToggleKeyParamsSchema,
 } from "./productManageToggleDisplay.js";
+export {
+  PRODUCT_BADGE_EXPLAIN_KEY_VALUES,
+  PRODUCT_BADGE_EXPLAIN_DESCRIPTION_MAX_LENGTH,
+  adminProductBadgeExplainPatchBodySchema,
+  productBadgeExplainKeyParamsSchema,
+} from "./productBadgeExplain.js";
 export {
   upsertProductInstallmentProgramBodySchema,
   createInstallmentContractBodySchema,

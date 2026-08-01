@@ -99,7 +99,9 @@ export async function listPendingInstallmentDisputes() {
   const contractById = Object.fromEntries(
     contracts.map((contract) => [String(contract._id), contract]),
   );
-  const productIds = [...new Set(contracts.map((contract) => String(contract.productId)))];
+  const productIds = [
+    ...new Set(contracts.map((contract) => String(contract.productId))),
+  ];
   const userIds = [
     ...new Set(
       contracts.flatMap((contract) => [

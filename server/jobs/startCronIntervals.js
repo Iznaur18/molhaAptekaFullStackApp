@@ -25,9 +25,7 @@ const USER_STORY_CLEANUP_INTERVAL_MS = 15 * 60 * 1000;
 /** @returns {boolean} */
 export function startCronIntervals() {
   if (isBullMqEnabled()) {
-    console.log(
-      "[cron] skipped — BullMQ repeatable jobs on worker.js (REDIS_URL set)",
-    );
+    console.log("[cron] skipped — BullMQ repeatable jobs on worker.js (REDIS_URL set)");
     return false;
   }
 

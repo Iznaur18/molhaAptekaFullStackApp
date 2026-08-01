@@ -86,7 +86,9 @@ export const assertProductFulfillmentMethods = (pickupEnabled, deliveryEnabled) 
  */
 export const resolveCreateProductPickupFields = (body) => {
   try {
-    const productPickupAddress = normalizeProductPickupAddress(body?.productPickupAddress);
+    const productPickupAddress = normalizeProductPickupAddress(
+      body?.productPickupAddress,
+    );
     const coords = normalizeProductPickupCoords(
       body?.productPickupLat,
       body?.productPickupLon,

@@ -1,6 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { buildAffiliateManageToggleBody } from "@izibuy/shared-lib";
+import {
+  buildAffiliateManageToggleBody,
+  resolveAffiliateEnableLoyaltyGate,
+  resolveAffiliateToggleSourceProduct,
+} from "@izibuy/shared-lib";
 
 import { setProductInstallmentEnabled } from "../../../entities/installment/lib/setProductInstallmentEnabled.js";
 import { useEnsureProductPromotionTariffs } from "../../../entities/product/model/useEnsureProductPromotionTariffs.js";
@@ -42,6 +46,9 @@ export const useHomeProductActions = ({
   setPromotionModalError,
   setIsPromotionSubmitPending,
   promotionProduct,
+  productToEdit,
+  loyaltyPoints,
+  loyaltyPointsReserved,
   setLoyaltyPoints,
   refreshCatalogFeed,
   refreshRaffleSurfaces,
@@ -273,7 +280,7 @@ export const useHomeProductActions = ({
   );
 
   const handleSetProductAffiliate = useCallback(
-    async (productId, affiliateEnabled) => {
+    async (productId, affiliateEnabled, productHint) => {
       const normalizedProductId = String(productId ?? "").trim();
       if (!normalizedProductId) {
         return;
@@ -281,10 +288,24 @@ export const useHomeProductActions = ({
       setTogglingAffiliateProductId(normalizedProductId);
       setProductDetailsAdminError("");
       try {
-        const sourceProduct =
-          promotionProduct && String(promotionProduct._id) === normalizedProductId
-            ? promotionProduct
-            : null;
+        const sourceProduct = resolveAffiliateToggleSourceProduct(
+          normalizedProductId,
+          [productHint, promotionProduct, productToEdit],
+        );
+        if (affiliateEnabled && sourceProduct?.affiliateEnabled !== true) {
+          const percent = Math.floor(Number(sourceProduct?.affiliatePercent) || 0);
+          const price = Math.floor(Number(sourceProduct?.productPrice) || 0);
+          const gate = resolveAffiliateEnableLoyaltyGate({
+            productPrice: price,
+            affiliatePercent: percent,
+            loyaltyPointsBalance: loyaltyPoints,
+            loyaltyPointsReserved,
+          });
+          if (!gate.ok) {
+            setProductDetailsAdminError(gate.message);
+            return;
+          }
+        }
         const body = buildAffiliateManageToggleBody(sourceProduct, affiliateEnabled);
         const updated = await patchMutation.mutateAsync({
           productId: normalizedProductId,
@@ -301,7 +322,10 @@ export const useHomeProductActions = ({
       }
     },
     [
+      loyaltyPoints,
+      loyaltyPointsReserved,
       patchMutation,
+      productToEdit,
       promotionProduct,
       setProductDetailsAdminError,
       setTogglingAffiliateProductId,

@@ -29,7 +29,9 @@ export const getProductCategorySearchController = async (req, res) => {
   }
 
   const pattern = new RegExp(
-    escapeRegexSpecialCharsInUserInput(rawQuery.slice(0, CATEGORY_SEARCH_MAX_QUERY_LENGTH)),
+    escapeRegexSpecialCharsInUserInput(
+      rawQuery.slice(0, CATEGORY_SEARCH_MAX_QUERY_LENGTH),
+    ),
     "i",
   );
 

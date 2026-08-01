@@ -48,9 +48,7 @@ test("resolveSellerBuyerPassportShare returns null when order cancelled", () => 
     null,
   );
   assert.equal(
-    resolveSellerBuyerPassportShare(
-      sampleOrder({ items: [{ status: "cancelled" }] }),
-    ),
+    resolveSellerBuyerPassportShare(sampleOrder({ items: [{ status: "cancelled" }] })),
     null,
   );
 });

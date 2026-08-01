@@ -48,7 +48,6 @@ export const PROFILE_TAB_TO_MAIN_VIEW = {
   [PROFILE_TAB_PREMIUM]: "premium",
   [PROFILE_TAB_LOYALTY_POINTS]: "loyalty-points",
   [PROFILE_TAB_PARTNER_PROGRAM]: "partner-program",
-  [PROFILE_TAB_AFFILIATE_LISTINGS]: "affiliate-listings",
   [PROFILE_TAB_ADVERTISING]: "advertising",
   [PROFILE_TAB_EDIT_PROFILE]: "edit-profile",
   [PROFILE_TAB_ADMIN_ORDERS]: "admin-orders",
@@ -82,7 +81,11 @@ export function profileTabToMainView(tab) {
   if (tab === PROFILE_TAB_PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN) {
     return "site-header-banner-admin";
   }
-  return PROFILE_TAB_TO_MAIN_VIEW[normalizeProfileTab(tab)] ?? "my-profile";
+  const normalized = normalizeProfileTab(tab);
+  if (normalized === PROFILE_TAB_AFFILIATE_LISTINGS) {
+    return "partner-program";
+  }
+  return PROFILE_TAB_TO_MAIN_VIEW[normalized] ?? "my-profile";
 }
 
 /**

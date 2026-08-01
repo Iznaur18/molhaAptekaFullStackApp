@@ -105,7 +105,7 @@ export function ReportUserStoryModal({ isOpen, storyId, onClose }) {
           <div className="report-user-story-modal__actions">
             <button
               type="submit"
-              className="report-user-story-modal__button"
+              className="app-btn app-btn--primary report-user-story-modal__action"
               disabled={isSubmitting}
             >
               {isSubmitting
@@ -114,7 +114,7 @@ export function ReportUserStoryModal({ isOpen, storyId, onClose }) {
             </button>
             <button
               type="button"
-              className="report-user-story-modal__button report-user-story-modal__button_secondary"
+              className="app-btn app-btn--secondary report-user-story-modal__action"
               disabled={isSubmitting}
               onClick={handleClose}
             >

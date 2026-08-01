@@ -22,6 +22,7 @@ import {
 } from "../../utils/resolveProductCategoryWrite.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 import { refreshProductPriceMarketStatus } from "../../services/product/refreshProductPriceMarketStatus.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
@@ -35,175 +36,182 @@ const parsePagination = (query) => {
 
 /** `GET /product/moderation/pending` — очередь на модерацию (FIFO). */
 export const getPendingModerationProductsController = async (req, res) => {
-const { page, limit, skip } = parsePagination(req.query);
+  const { page, limit, skip } = parsePagination(req.query);
 
-    const filter = { productModerationStatus: PRODUCT_MODERATION_PENDING };
+  const filter = { productModerationStatus: PRODUCT_MODERATION_PENDING };
 
-    const [products, total] = await Promise.all([
-      ProductModel.find(filter)
-        .sort({ createdAt: 1 })
-        .skip(skip)
-        .limit(limit)
-        .populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT)
-        .lean(),
-      ProductModel.countDocuments(filter),
-    ]);
+  const [products, total] = await Promise.all([
+    ProductModel.find(filter)
+      .sort({ createdAt: 1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT)
+      .lean(),
+    ProductModel.countDocuments(filter),
+  ]);
 
-    const productsWithSeller = await attachProductSellerSnapshots(products);
+  const productsWithSeller = await attachProductSellerSnapshots(products);
 
-    return successRes(res, {
-      products: productsWithSeller,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit) || 0,
-    });
+  return successRes(res, {
+    products: productsWithSeller,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit) || 0,
+  });
 };
 
 /** `GET /product/moderation/pending/count` */
 export const getPendingModerationProductsCountController = async (req, res) => {
-const totalPending = await ProductModel.countDocuments({
-      productModerationStatus: PRODUCT_MODERATION_PENDING,
-    });
+  const totalPending = await ProductModel.countDocuments({
+    productModerationStatus: PRODUCT_MODERATION_PENDING,
+  });
 
-    return successRes(res, { totalPending });
+  return successRes(res, { totalPending });
 };
 
 /** `PATCH /product/:productId/moderation/approve` */
 export const approveProductModerationController = async (req, res) => {
-const { productId } = req.params;
+  const { productId } = req.params;
 
-    const product = await ProductModel.findById(productId);
-    if (!product) {
-      return errorRes(res, 404, "Товар не найден");
-    }
-    if (product.productModerationStatus !== PRODUCT_MODERATION_PENDING) {
-      return errorRes(res, 409, "Товар не ожидает модерации");
-    }
+  const product = await ProductModel.findById(productId);
+  if (!product) {
+    return errorRes(res, 404, "Товар не найден");
+  }
+  if (product.productModerationStatus !== PRODUCT_MODERATION_PENDING) {
+    return errorRes(res, 409, "Товар не ожидает модерации");
+  }
 
-    const previousApprovedDiscountPercent = product.productLastApprovedDiscountPercent;
+  const previousApprovedDiscountPercent = product.productLastApprovedDiscountPercent;
 
-    product.productModerationStatus = PRODUCT_MODERATION_APPROVED;
-    product.productModerationComment = "";
-    const stock = Math.max(0, Math.floor(Number(product.productStockQuantity) || 0));
-    product.productIsAvailable = stock > 0;
-    if (stock === 0) {
-      product.productStockQuantity = 0;
-    }
-    product.productLastApprovedDiscountPercent = computeProductDiscountPercent(
-      product.productOldPrice,
-      product.productPrice,
-    );
-    if (!product.productCategoryId && product.productCategory) {
-      const leafId = await resolveDefaultLeafIdForLegacyCategory(
-        product.productCategory,
-      );
-      if (leafId) {
-        try {
-          const categoryWrite = await resolveProductCategoryWriteFromId(leafId);
-          product.productCategoryId = categoryWrite.productCategoryId;
-          product.categoryPathIds = categoryWrite.categoryPathIds;
-          product.categoryBreadcrumbRu = categoryWrite.categoryBreadcrumbRu;
-          product.productCategory = categoryWrite.productCategory;
-        } catch {
-          /* keep legacy only */
-        }
-      }
-    }
-
-    let categorySearchExtras = {
-      categoryPathLabelRu: [],
-      categorySearchKeywords: [],
-    };
-    if (product.productCategoryId) {
+  product.productModerationStatus = PRODUCT_MODERATION_APPROVED;
+  product.productModerationComment = "";
+  const stock = Math.max(0, Math.floor(Number(product.productStockQuantity) || 0));
+  product.productIsAvailable = stock > 0;
+  if (stock === 0) {
+    product.productStockQuantity = 0;
+  }
+  product.productLastApprovedDiscountPercent = computeProductDiscountPercent(
+    product.productOldPrice,
+    product.productPrice,
+  );
+  if (!product.productCategoryId && product.productCategory) {
+    const leafId = await resolveDefaultLeafIdForLegacyCategory(product.productCategory);
+    if (leafId) {
       try {
-        const categoryWrite = await resolveProductCategoryWriteFromId(
-          product.productCategoryId,
-        );
-        categorySearchExtras = {
-          categoryPathLabelRu: categoryWrite.categoryPathLabelRu,
-          categorySearchKeywords: categoryWrite.categorySearchKeywords,
-        };
+        const categoryWrite = await resolveProductCategoryWriteFromId(leafId);
+        product.productCategoryId = categoryWrite.productCategoryId;
+        product.categoryPathIds = categoryWrite.categoryPathIds;
+        product.categoryBreadcrumbRu = categoryWrite.categoryBreadcrumbRu;
+        product.productCategory = categoryWrite.productCategory;
       } catch {
-        /* blob without node keywords */
+        /* keep legacy only */
       }
     }
+  }
 
-    product.productSearchBlob = buildProductSearchBlobFromFields({
-      productName: product.productName,
-      productDescription: product.productDescription,
-      productCharacteristics: product.productCharacteristics,
-      productCategory: product.productCategory,
-      categoryBreadcrumbRu: product.categoryBreadcrumbRu ?? "",
-      ...categorySearchExtras,
-    });
-
-    const sellerPersonalCategoryId = await resolveActiveSellerPersonalCategoryId(
-      product.productSeller,
-    );
-    if (sellerPersonalCategoryId) {
-      product.sellerPersonalCategoryId = sellerPersonalCategoryId;
-    }
-
-    await product.save();
-    await product.populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT);
-
-    let enriched = await attachProductSellerSnapshot(product.toObject());
-
+  let categorySearchExtras = {
+    categoryPathLabelRu: [],
+    categorySearchKeywords: [],
+  };
+  if (product.productCategoryId) {
     try {
-      const marketStatus = await refreshProductPriceMarketStatus(String(product._id), {
-        refreshPeers: true,
-      });
-      enriched = { ...enriched, productPriceMarketStatus: marketStatus };
-    } catch (marketError) {
-      console.error("refreshProductPriceMarketStatus after approve:", marketError);
-    }
-
-    try {
-      await notifyFollowersOfSellerNewCatalogProduct(enriched);
-    } catch (notifyError) {
-      console.error("notifyFollowersOfSellerNewCatalogProduct error:", notifyError);
-    }
-
-    try {
-      await notifyFollowersOfSellerProductDiscount(
-        enriched,
-        previousApprovedDiscountPercent,
+      const categoryWrite = await resolveProductCategoryWriteFromId(
+        product.productCategoryId,
       );
-    } catch (notifyError) {
-      console.error("notifyFollowersOfSellerProductDiscount error:", notifyError);
+      categorySearchExtras = {
+        categoryPathLabelRu: categoryWrite.categoryPathLabelRu,
+        categorySearchKeywords: categoryWrite.categorySearchKeywords,
+      };
+    } catch {
+      /* blob without node keywords */
     }
+  }
 
-    return successRes(res, {
-      message: "Товар одобрен и опубликован в каталоге",
-      product: enriched,
+  product.productSearchBlob = buildProductSearchBlobFromFields({
+    productName: product.productName,
+    productDescription: product.productDescription,
+    productCharacteristics: product.productCharacteristics,
+    productCategory: product.productCategory,
+    categoryBreadcrumbRu: product.categoryBreadcrumbRu ?? "",
+    ...categorySearchExtras,
+  });
+
+  const sellerPersonalCategoryId = await resolveActiveSellerPersonalCategoryId(
+    product.productSeller,
+  );
+  if (sellerPersonalCategoryId) {
+    product.sellerPersonalCategoryId = sellerPersonalCategoryId;
+  }
+
+  await product.save();
+  await product.populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT);
+
+  let enriched = await attachProductSellerSnapshot(product.toObject());
+
+  try {
+    const marketStatus = await refreshProductPriceMarketStatus(String(product._id), {
+      refreshPeers: true,
     });
+    enriched = { ...enriched, productPriceMarketStatus: marketStatus };
+  } catch (marketError) {
+    logServerEvent("error", {
+      event: "refreshproductpricemarketstatus_after_approve",
+      error: marketError instanceof Error ? marketError.message : String(marketError),
+    });
+  }
+
+  try {
+    await notifyFollowersOfSellerNewCatalogProduct(enriched);
+  } catch (notifyError) {
+    logServerEvent("error", {
+      event: "notifyfollowersofsellernewcatalogproduct",
+      error: notifyError instanceof Error ? notifyError.message : String(notifyError),
+    });
+  }
+
+  try {
+    await notifyFollowersOfSellerProductDiscount(
+      enriched,
+      previousApprovedDiscountPercent,
+    );
+  } catch (notifyError) {
+    logServerEvent("error", {
+      event: "notifyfollowersofsellerproductdiscount",
+      error: notifyError instanceof Error ? notifyError.message : String(notifyError),
+    });
+  }
+
+  return successRes(res, {
+    message: "Товар одобрен и опубликован в каталоге",
+    product: enriched,
+  });
 };
 
 /** `PATCH /product/:productId/moderation/reject` */
 export const rejectProductModerationController = async (req, res) => {
-const { productId } = req.params;
-    const commentRaw = req.body?.productModerationComment;
-    const comment = commentRaw == null ? "" : String(commentRaw).trim().slice(0, 2000);
+  const { productId } = req.params;
+  const commentRaw = req.body?.productModerationComment;
+  const comment = commentRaw == null ? "" : String(commentRaw).trim().slice(0, 2000);
 
-    const product = await ProductModel.findById(productId);
-    if (!product) {
-      return errorRes(res, 404, "Товар не найден");
-    }
-    if (product.productModerationStatus !== PRODUCT_MODERATION_PENDING) {
-      return errorRes(res, 409, "Товар не ожидает модерации");
-    }
+  const product = await ProductModel.findById(productId);
+  if (!product) {
+    return errorRes(res, 404, "Товар не найден");
+  }
+  if (product.productModerationStatus !== PRODUCT_MODERATION_PENDING) {
+    return errorRes(res, 409, "Товар не ожидает модерации");
+  }
 
-    product.productModerationStatus = PRODUCT_MODERATION_REJECTED;
-    product.productModerationComment = comment;
-    product.productIsAvailable = false;
-    await product.save();
-    await product.populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT);
+  product.productModerationStatus = PRODUCT_MODERATION_REJECTED;
+  product.productModerationComment = comment;
+  product.productIsAvailable = false;
+  await product.save();
+  await product.populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT);
 
-    const enriched = await attachProductSellerSnapshot(product.toObject());
+  const enriched = await attachProductSellerSnapshot(product.toObject());
 
-    return successRes(res, {
-      message: "Товар отклонён",
-      product: enriched,
-    });
+  return successRes(res, {
+    message: "Товар отклонён",
+    product: enriched,
+  });
 };

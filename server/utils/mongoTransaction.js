@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+import { logServerEvent } from "./logServerEvent.js";
+
 /** @type {boolean | null} null = ещё не проверяли */
 let mongoTransactionsEnabled = null;
 
@@ -62,9 +64,11 @@ export const runInTransaction = async (callback) => {
       process.env.NODE_ENV !== "production"
     ) {
       mongoTransactionsEnabled = false;
-      console.warn(
-        "[mongo] Replica set недоступен — операции без транзакции (только dev). Для prod: Atlas или rs0.",
-      );
+      logServerEvent("warn", {
+        event: "mongo_transactions_unsupported_dev_fallback",
+        detail:
+          "Replica set недоступен — операции без транзакции (только dev). Для prod: Atlas или rs0.",
+      });
       return callback(null);
     }
     throw error;

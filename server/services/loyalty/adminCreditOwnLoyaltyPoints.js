@@ -7,11 +7,7 @@ import { runMoneyIdempotentMutation } from "./runMoneyIdempotentMutation.js";
  * @param {{ userId: string; amount: number; idempotencyKey: string }} input
  * @returns {Promise<{ loyaltyPointsBalance: number; credited: number; duplicate?: boolean }>}
  */
-export async function adminCreditOwnLoyaltyPoints({
-  userId,
-  amount,
-  idempotencyKey,
-}) {
+export async function adminCreditOwnLoyaltyPoints({ userId, amount, idempotencyKey }) {
   const points = Math.floor(Number(amount));
   if (!Number.isFinite(points) || points <= 0) {
     throw new AppError(400, "Сумма начисления должна быть больше 0");

@@ -14,6 +14,18 @@
   cursor: help;
 }
 
+.product-loyalty-points-badge--pressable {
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.product-loyalty-points-badge--pressable:focus-visible {
+  outline: 2px solid var(--iz-color-ink);
+  outline-offset: 2px;
+}
+
 /* Ozon-overlay: accentSoft/accent — паритет с mobile resolveProductCardImageBadgeOverlay */
 .product-loyalty-points-badge--overlay {
   box-shadow: none;

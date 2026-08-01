@@ -16,9 +16,15 @@ const izColorsCanonical = {
   textSecondary: "#374151",
   textPlaceholder: "#9ca3af",
   ink: "#0f172a",
-  bg: "#f3f4f6",
-  surfaceMuted: "#f3f4f6",
-  surfaceElevated: "#f3f4f6",
+  /*
+   * Neutrals v4 — явная лесенка слоёв (light):
+   * bg (canvas) < surfaceMuted (recessed) < surfaceElevated (raised) < surface (white).
+   * Разные значения дают чёткое зонирование — элементы не сливаются с фоном.
+   * Холодный серый с лёгким синим подтоном под бренд (#284b7e / #1f6feb).
+   */
+  bg: "#e6eaf1",
+  surfaceMuted: "#eef1f7",
+  surfaceElevated: "#f5f7fb",
   surface: "#ffffff",
   onContrast: "#ffffff",
   primary: "#284b7e",
@@ -39,8 +45,8 @@ const izColorsCanonical = {
   info: "#0369a1",
   infoSoft: "#eef2f8",
   infoDeep: "#1e40af",
-  border: "#e5e7eb",
-  borderStrong: "#d1d5db",
+  border: "#d2d8e2",
+  borderStrong: "#b7c0cd",
   accent: "#7c3aed",
   accentSoft: "#f2eff7",
   overlay: "rgb(15 23 42 / 45%)",

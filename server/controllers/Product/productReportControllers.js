@@ -12,6 +12,7 @@ import {
   resolvePendingReportsForProduct,
 } from "../../services/product/productReportHelpers.js";
 import { errorRes, successRes } from "../../services/http/index.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 /**
  * `POST /product/:productId/report`
@@ -74,7 +75,10 @@ export const submitProductReportController = async (req, res) => {
     if (error?.code === 11000) {
       return errorRes(res, 409, PRODUCT_REPORT_ALREADY_MESSAGE);
     }
-    console.error("submitProductReportController error:", error);
+    logServerEvent("error", {
+      event: "submitproductreportcontroller",
+      error: error instanceof Error ? error.message : String(error),
+    });
     return errorRes(res, 500, "Ошибка при отправке жалобы");
   }
 };
@@ -83,77 +87,77 @@ export const submitProductReportController = async (req, res) => {
  * `GET /product/:productId/report/me`
  */
 export const getMyProductReportStatusController = async (req, res) => {
-const reporterId = String(req.userId);
-    const { productId } = req.params;
+  const reporterId = String(req.userId);
+  const { productId } = req.params;
 
-    const pending = await ProductReportModel.findOne({
-      productId,
-      reporterUserId: reporterId,
-      status: PRODUCT_REPORT_STATUS_PENDING,
-    })
-      .select("_id")
-      .lean();
+  const pending = await ProductReportModel.findOne({
+    productId,
+    reporterUserId: reporterId,
+    status: PRODUCT_REPORT_STATUS_PENDING,
+  })
+    .select("_id")
+    .lean();
 
-    return successRes(res, {
-      hasPendingReport: Boolean(pending),
-    });
+  return successRes(res, {
+    hasPendingReport: Boolean(pending),
+  });
 };
 
 /** `GET /product/reports/pending */
 export const getPendingProductReportsController = async (req, res) => {
-const { groups, totalReports } = await getPendingProductReportGroups();
+  const { groups, totalReports } = await getPendingProductReportGroups();
 
-    return successRes(res, {
-      groups,
-      totalReports,
-      totalGroups: groups.length,
-    });
+  return successRes(res, {
+    groups,
+    totalReports,
+    totalGroups: groups.length,
+  });
 };
 
 /** `GET /product/reports/pending/count */
 export const getPendingProductReportsCountController = async (req, res) => {
-const totalReports = await ProductReportModel.countDocuments({
-      status: PRODUCT_REPORT_STATUS_PENDING,
-    });
+  const totalReports = await ProductReportModel.countDocuments({
+    status: PRODUCT_REPORT_STATUS_PENDING,
+  });
 
-    return successRes(res, { totalReports });
+  return successRes(res, { totalReports });
 };
 
 /** `PATCH /product/reports/product/:productId/resolve */
 export const resolveProductReportsForProductController = async (req, res) => {
-const staffUserId = req.userId;
-    const { productId } = req.params;
-    const resolution = String(req.body?.resolution ?? "").trim();
-    const staffNote = String(req.body?.staffNote ?? "").trim();
+  const staffUserId = req.userId;
+  const { productId } = req.params;
+  const resolution = String(req.body?.resolution ?? "").trim();
+  const staffNote = String(req.body?.staffNote ?? "").trim();
 
-    if (staffNote.length === 0) {
-      return errorRes(res, 400, "Комментарий staff обязателен");
-    }
+  if (staffNote.length === 0) {
+    return errorRes(res, 400, "Комментарий staff обязателен");
+  }
 
-    try {
-      const result = await resolvePendingReportsForProduct(
-        productId,
-        staffUserId,
-        staffNote,
-        resolution,
-      );
+  try {
+    const result = await resolvePendingReportsForProduct(
+      productId,
+      staffUserId,
+      staffNote,
+      resolution,
+    );
 
-      return successRes(res, {
-        message: "Жалобы по товару обработаны",
-        resolvedCount: result.resolvedCount,
-      });
-    } catch (resolveError) {
-      if (resolveError instanceof Error) {
-        if (resolveError.message === "PRODUCT_NOT_FOUND") {
-          return errorRes(res, 404, "Товар не найден");
-        }
-        if (resolveError.message === "NO_PENDING_REPORTS") {
-          return errorRes(res, 409, "Нет необработанных жалоб по этому товару");
-        }
-        if (resolveError.message === "INVALID_RESOLUTION") {
-          return errorRes(res, 400, "Недопустимое действие");
-        }
+    return successRes(res, {
+      message: "Жалобы по товару обработаны",
+      resolvedCount: result.resolvedCount,
+    });
+  } catch (resolveError) {
+    if (resolveError instanceof Error) {
+      if (resolveError.message === "PRODUCT_NOT_FOUND") {
+        return errorRes(res, 404, "Товар не найден");
       }
-      throw resolveError;
+      if (resolveError.message === "NO_PENDING_REPORTS") {
+        return errorRes(res, 409, "Нет необработанных жалоб по этому товару");
+      }
+      if (resolveError.message === "INVALID_RESOLUTION") {
+        return errorRes(res, 400, "Недопустимое действие");
+      }
     }
+    throw resolveError;
+  }
 };

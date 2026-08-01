@@ -112,13 +112,7 @@ const OrderLineItemSchema = new mongoose.Schema(
     },
     affiliateStatus: {
       type: String,
-      enum: [
-        "none",
-        "pending",
-        "paid",
-        "skipped_no_program",
-        "skipped_antifraud",
-      ],
+      enum: ["none", "pending", "paid", "skipped_no_program", "skipped_antifraud"],
       default: "none",
     },
     affiliateAmount: {
@@ -187,8 +181,7 @@ const OrderSchema = new mongoose.Schema(
       type: String,
       default: null,
       validate: {
-        validator: (value) =>
-          value == null || SHIPPING_PROVIDERS.includes(value),
+        validator: (value) => value == null || SHIPPING_PROVIDERS.includes(value),
         message: "Неизвестный провайдер доставки",
       },
     },
@@ -196,8 +189,7 @@ const OrderSchema = new mongoose.Schema(
       type: String,
       default: null,
       validate: {
-        validator: (value) =>
-          value == null || SHIPPING_SERVICE_TYPES.includes(value),
+        validator: (value) => value == null || SHIPPING_SERVICE_TYPES.includes(value),
         message: "Неизвестный тип доставки",
       },
     },

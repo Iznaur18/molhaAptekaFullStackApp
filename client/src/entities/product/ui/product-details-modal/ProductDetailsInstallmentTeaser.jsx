@@ -1,3 +1,5 @@
+import { CreditCard } from "lucide-react";
+
 import {
   resolveInstallmentPlanMonthlyAmountRub,
   resolveLastInstallmentPlan,
@@ -5,7 +7,7 @@ import {
 import { useProductInstallmentProgramQuery } from "../../../installment/model/useProductInstallmentProgramQuery.js";
 import { INSTALLMENT_UI } from "../../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../../shared/lib/formatPriceRub.js";
-import { ProductDetailsTeaser } from "./ProductDetailsTeaser.jsx";
+import { ProductDetailsFeatureCard } from "./ProductDetailsFeatureCard.jsx";
 
 /**
  * @param {{
@@ -35,10 +37,12 @@ export function ProductDetailsInstallmentTeaser({
   }
 
   return (
-    <ProductDetailsTeaser
+    <ProductDetailsFeatureCard
+      icon={CreditCard}
       title={INSTALLMENT_UI.DETAILS_TEASER_TITLE}
-      subtitle={INSTALLMENT_UI.DETAILS_TEASER_FROM_MONTHLY(formatPriceRub(monthlyAmountRub))}
-      goLabel={INSTALLMENT_UI.DETAILS_TEASER_GO}
+      subtitle={INSTALLMENT_UI.DETAILS_TEASER_FROM_MONTHLY(
+        formatPriceRub(monthlyAmountRub),
+      )}
       ariaLabel={INSTALLMENT_UI.DETAILS_TEASER_ARIA}
       onClick={onPress}
     />

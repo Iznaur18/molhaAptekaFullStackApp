@@ -56,7 +56,9 @@ export async function getMyProducts({ userId, query }) {
   );
 
   if (reviewsOnly) {
-    myProductsBaseQuery.reviewCount = { $gte: PRODUCT_CATALOG_REVIEWS_MIN_REVIEW_COUNT };
+    myProductsBaseQuery.reviewCount = {
+      $gte: PRODUCT_CATALOG_REVIEWS_MIN_REVIEW_COUNT,
+    };
   }
 
   const { query: productsQuery, searchRank } = await buildProductCatalogSearchQuery(

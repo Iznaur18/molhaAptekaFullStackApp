@@ -13,9 +13,7 @@ import {
   refundLoyaltyPoints,
 } from "../loyalty/loyaltyPointsSpend.js";
 import { getSellerLoyaltyPointsAvailable } from "../loyalty/loyaltyPointsSeller.js";
-import {
-  creditReferralCashbackFromSpend,
-} from "../referral/creditReferralCashbackFromSpend.js";
+import { creditReferralCashbackFromSpend } from "../referral/creditReferralCashbackFromSpend.js";
 import { reverseReferralCashbackForSource } from "../referral/reverseReferralCashbackForSource.js";
 import { REFERRAL_SOURCE_KIND_RAFFLE_CREATE_UNLOCK } from "../../constants/referralConstants.js";
 
@@ -42,7 +40,9 @@ export const getRaffleCreateAdvertisingStatus = async (sellerId) => {
   const access = await assertSellerCanCreateRaffle(sellerId);
   const [user, activeRaffle] = await Promise.all([
     UserModel.findById(sellerId)
-      .select("userLoyaltyPoints userLoyaltyPointsReserved raffleCreateUnlockAt isUserDataConfirmed")
+      .select(
+        "userLoyaltyPoints userLoyaltyPointsReserved raffleCreateUnlockAt isUserDataConfirmed",
+      )
       .lean(),
     getSellerActiveRaffle(sellerId),
   ]);
@@ -228,8 +228,14 @@ export const restoreRaffleCreateUnlock = async ({ sellerId, session }) => {
   );
 };
 
-export const releaseRaffleCreatePriceIfNeeded = async ({ sellerId, raffle, session }) => {
-  const pricePoints = Math.ceil(Number(raffle.createPricePoints) || RAFFLE_CREATE_PRICE_POINTS);
+export const releaseRaffleCreatePriceIfNeeded = async ({
+  sellerId,
+  raffle,
+  session,
+}) => {
+  const pricePoints = Math.ceil(
+    Number(raffle.createPricePoints) || RAFFLE_CREATE_PRICE_POINTS,
+  );
   if (
     pricePoints <= 0 ||
     raffle.createPriceChargedAt != null ||
@@ -252,12 +258,18 @@ export const releaseRaffleCreatePriceIfNeeded = async ({ sellerId, raffle, sessi
  *   session?: import('mongoose').ClientSession;
  * }} input
  */
-export const chargeRaffleCreatePriceOnApproval = async ({ sellerId, raffle, session }) => {
+export const chargeRaffleCreatePriceOnApproval = async ({
+  sellerId,
+  raffle,
+  session,
+}) => {
   if (raffle.createPriceChargedAt != null || raffle.createPriceRefundedAt != null) {
     return { cashback: null };
   }
 
-  const pricePoints = Math.ceil(Number(raffle.createPricePoints) || RAFFLE_CREATE_PRICE_POINTS);
+  const pricePoints = Math.ceil(
+    Number(raffle.createPricePoints) || RAFFLE_CREATE_PRICE_POINTS,
+  );
   if (pricePoints <= 0) {
     return { cashback: null };
   }
@@ -303,7 +315,11 @@ export const chargeRaffleCreatePriceOnApproval = async ({ sellerId, raffle, sess
  *   session?: import('mongoose').ClientSession;
  * }} input
  */
-export const refundRaffleCreatePriceIfNeeded = async ({ sellerId, raffle, session }) => {
+export const refundRaffleCreatePriceIfNeeded = async ({
+  sellerId,
+  raffle,
+  session,
+}) => {
   const pricePoints = Math.ceil(Number(raffle.createPricePoints) || 0);
   if (pricePoints <= 0 || raffle.createPriceRefundedAt != null) {
     return;
@@ -317,7 +333,11 @@ export const refundRaffleCreatePriceIfNeeded = async ({ sellerId, raffle, sessio
       session,
     });
   } else {
-    await releaseLoyaltyPointsReservation({ userId: sellerId, amount: pricePoints, session });
+    await releaseLoyaltyPointsReservation({
+      userId: sellerId,
+      amount: pricePoints,
+      session,
+    });
   }
 
   await RaffleModel.updateOne(

@@ -1,7 +1,5 @@
 import { SITE_HEADER_BANNER_SETTINGS_DEFAULTS } from "../../constants/siteHeaderBannerConstants.js";
-import {
-  SITE_HEADER_BANNER_CAMPAIGN_STATUS_ACTIVE,
-} from "../../constants/siteHeaderBannerCampaignConstants.js";
+import { SITE_HEADER_BANNER_CAMPAIGN_STATUS_ACTIVE } from "../../constants/siteHeaderBannerCampaignConstants.js";
 import { SiteHeaderBannerCampaignModel } from "../../models/SiteHeaderBannerCampaignModel.js";
 
 /**

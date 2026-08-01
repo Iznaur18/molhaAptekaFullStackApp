@@ -53,7 +53,7 @@ export default [
     },
   },
   {
-    files: ["server/**/*.js", "contract/**/*.js"],
+    files: ["server/**/*.{js,mjs}", "contract/**/*.js"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
@@ -61,6 +61,28 @@ export default [
     },
     rules: {
       "no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+      // Бизнес-код и общие утилиты пишут через структурный logServerEvent
+      // (JSON в stdout/stderr + Sentry-контекст), а не голым console.
+      "no-console": "error",
+    },
+  },
+  {
+    // Разрешённые console: сам sink-логер, CLI-скрипты, тесты и
+    // инфраструктурные entrypoints (worker/cron/queue/db bootstrap),
+    // где stdout — это и есть операционный канал, а Sentry-контекста ещё нет.
+    files: [
+      "server/utils/logServerEvent.js",
+      "server/scripts/**/*.{js,mjs}",
+      "server/tests/**/*.js",
+      "server/jobs/**/*.js",
+      "server/queues/**/*.js",
+      "server/db/**/*.js",
+      "server/index.js",
+      "server/worker.js",
+      "server/instrument.js",
+    ],
+    rules: {
+      "no-console": "off",
     },
   },
 ];

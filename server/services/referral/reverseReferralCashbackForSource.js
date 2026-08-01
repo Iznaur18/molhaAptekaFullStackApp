@@ -3,6 +3,12 @@ import {
   REFERRAL_LEDGER_ENTRY_CREDIT,
   REFERRAL_LEDGER_ENTRY_REVERSAL,
 } from "../../constants/referralConstants.js";
+import {
+  creditLoyaltyPoints,
+  deductLoyaltyPoints,
+  InsufficientLoyaltyPointsError,
+} from "../loyalty/loyaltyPointsSpend.js";
+import { getSellerLoyaltyPointsAvailable } from "../loyalty/loyaltyPointsSeller.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
 export class InsufficientPartnerBalanceForReversalError extends Error {
@@ -12,7 +18,7 @@ export class InsufficientPartnerBalanceForReversalError extends Error {
    */
   constructor(required, available) {
     super(
-      "Нельзя откатить партнёрский кэшбэк: баланс уже конвертирован или недостаточен",
+      "Нельзя откатить партнёрский кэшбэк: недостаточно свободных баллов лояльности",
     );
     this.name = "InsufficientPartnerBalanceForReversalError";
     this.required = required;
@@ -21,8 +27,8 @@ export class InsufficientPartnerBalanceForReversalError extends Error {
 }
 
 /**
- * Откатывает партнёрский кэшбэк при refund баллов за ту же оплату.
- * Без clamp-to-0: если баланса нет (уже convert) — ошибка, ledger reversal не пишем.
+ * Откатывает партнёрский кэшбэк с баланса баллов при refund той же оплаты.
+ * Без clamp-to-0: если свободных баллов нет — ошибка, ledger reversal не пишем.
  *
  * @param {{
  *   sourceKind: string;
@@ -71,24 +77,27 @@ export async function reverseReferralCashbackForSource({
     return { reversed: false, duplicate: true };
   }
 
-  const deducted = await UserModel.findOneAndUpdate(
-    {
-      _id: credit.referrerUserId,
-      partnerBalance: { $gte: amount },
-    },
-    { $inc: { partnerBalance: -amount } },
-    { session: session ?? undefined, returnDocument: "after" },
-  );
-
-  if (!deducted) {
+  try {
+    await deductLoyaltyPoints({
+      userId: String(credit.referrerUserId),
+      amount,
+      session: session ?? undefined,
+    });
+  } catch (error) {
+    if (error instanceof InsufficientLoyaltyPointsError) {
+      throw new InsufficientPartnerBalanceForReversalError(
+        error.required,
+        error.available,
+      );
+    }
     const userLookup = UserModel.findById(credit.referrerUserId).select(
-      "partnerBalance",
+      "userLoyaltyPoints userLoyaltyPointsReserved",
     );
     if (session) {
       userLookup.session(session);
     }
     const user = await userLookup.lean();
-    const available = Number(user?.partnerBalance) || 0;
+    const available = getSellerLoyaltyPointsAvailable(user);
     throw new InsufficientPartnerBalanceForReversalError(amount, available);
   }
 
@@ -110,18 +119,18 @@ export async function reverseReferralCashbackForSource({
     );
   } catch (error) {
     if (error?.code === 11000) {
-      await UserModel.updateOne(
-        { _id: credit.referrerUserId },
-        { $inc: { partnerBalance: amount } },
-        { session: session ?? undefined },
-      );
+      await creditLoyaltyPoints({
+        userId: String(credit.referrerUserId),
+        amount,
+        session: session ?? undefined,
+      });
       return { reversed: false, duplicate: true };
     }
-    await UserModel.updateOne(
-      { _id: credit.referrerUserId },
-      { $inc: { partnerBalance: amount } },
-      { session: session ?? undefined },
-    );
+    await creditLoyaltyPoints({
+      userId: String(credit.referrerUserId),
+      amount,
+      session: session ?? undefined,
+    });
     throw error;
   }
 

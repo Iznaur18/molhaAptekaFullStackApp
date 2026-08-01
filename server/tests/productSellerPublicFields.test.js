@@ -19,10 +19,7 @@ test("PRODUCT_SELLER_PUBLIC_FIELD_NAMES excludes seller contact PII", () => {
   }
   assert.ok(PRODUCT_SELLER_PUBLIC_FIELD_NAMES.includes("_id"));
   assert.ok(PRODUCT_SELLER_PUBLIC_FIELD_NAMES.includes("userName"));
-  assert.equal(
-    PRODUCT_SELLER_PUBLIC_SELECT.includes("email"),
-    false,
-  );
+  assert.equal(PRODUCT_SELLER_PUBLIC_SELECT.includes("email"), false);
 });
 
 test("pickProductSellerPublicSnapshot drops contact fields even if present on seller", () => {

@@ -14,7 +14,6 @@ const formatFatalReason = (reason) => {
 export const registerProcessFatalHandlers = () => {
   process.on("unhandledRejection", (reason) => {
     const error = formatFatalReason(reason);
-    console.error("unhandledRejection:", error);
     logServerEvent("error", {
       event: "unhandledRejection",
       message: error.message,
@@ -23,12 +22,14 @@ export const registerProcessFatalHandlers = () => {
   });
 
   process.on("uncaughtException", (error) => {
-    console.error("uncaughtException:", error);
     logServerEvent("error", {
       event: "uncaughtException",
       message: error instanceof Error ? error.message : String(error),
     });
-    captureServerHttpError(error instanceof Error ? error : new Error(String(error)), null);
+    captureServerHttpError(
+      error instanceof Error ? error : new Error(String(error)),
+      null,
+    );
     process.exit(1);
   });
 };
