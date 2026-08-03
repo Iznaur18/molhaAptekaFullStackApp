@@ -104,6 +104,18 @@
   white-space: nowrap;
 }
 
+.product-details-modal__row--stat:has(.product-details-modal__value--multiline) {
+  align-items: flex-start;
+}
+
+.product-details-modal__row--stat .product-details-modal__value--multiline {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
+
 .product-details-modal__row--block {
   display: flex;
   flex-direction: column;

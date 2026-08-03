@@ -107,8 +107,10 @@ test("mobile product detail stat rows match web modal stats grid layout", () => 
   assert.match(keyStatBlock, /fontSize:\s*14/);
   assert.doesNotMatch(keyStatBlock, /textTransform:\s*"uppercase"/);
   assert.match(styles, /valueStat:[\s\S]*textAlign:\s*"right"/);
-  assert.match(fieldRows, /numberOfLines=\{isStatRow \? 1 : undefined\}/);
-  assert.match(registry, /productRegionCode:\s*"Регион продажи"/);
+  assert.match(fieldRows, /numberOfLines=\{clampStatValue \? 1 : undefined\}/);
+  assert.match(registry, /productPickupAddress:\s*CREATE_PRODUCT_UI\.LABEL_PICKUP_ADDRESS/);
+  assert.match(registry, /productPickupAddress/);
+  assert.match(registry, /isProductFieldMultilineRead[\s\S]*productPickupAddress/);
 });
 
 test("mobile product description panel matches web content-switcher chrome", () => {

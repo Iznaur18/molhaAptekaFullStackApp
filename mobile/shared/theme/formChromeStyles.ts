@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 import { CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT } from "@/entities/order/lib/checkoutPaymentMethodCardTheme";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
@@ -420,10 +420,11 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     minHeight: 44,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    borderRadius: theme.radius.input,
+    borderRadius: 20,
     backgroundColor: theme.colors.surface,
     paddingHorizontal: 8,
     paddingVertical: 10,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   fulfillmentOptionActive: {
     borderColor: theme.colors.action,

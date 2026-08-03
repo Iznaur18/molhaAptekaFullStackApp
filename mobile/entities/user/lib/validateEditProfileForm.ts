@@ -3,6 +3,7 @@ import {
   validateSocialLinkInput,
   isRuRegionCode,
 } from "@molha/api-contract";
+import { validateRuDeliveryAddressForm } from "@/entities/address/lib/validateRuDeliveryAddressForm";
 import {
   USER_NAME_MAX_LENGTH,
   USER_NAME_MIN_LENGTH,
@@ -38,6 +39,9 @@ export const validateEditProfileForm = (form: EditProfileFormState): string | nu
 
   const phoneError = validateRuPhoneField(form.userPhoneNumber);
   if (phoneError) return phoneError;
+
+  const addressError = validateRuDeliveryAddressForm(form.deliveryAddress);
+  if (addressError) return addressError;
 
   if (!isRuRegionCode(form.userRegionCode)) {
     return EDIT_PROFILE_UI.ERROR_REGION_REQUIRED;

@@ -15,6 +15,7 @@ const baseQuery = {
   auctionOnly: false,
   installmentOnly: false,
   saleOnly: false,
+  near: false,
 };
 
 describe("buildCatalogProductsLocation", () => {
@@ -34,5 +35,15 @@ describe("buildCatalogProductsLocation", () => {
     expect(buildCatalogBrowserLocation(baseQuery)).toBe(
       "/catalog?categoryId=64aaaaaaaaaaaaaaaaaaaaaa",
     );
+  });
+
+  it("includes near=true", () => {
+    expect(
+      buildCatalogProductsLocation({
+        ...baseQuery,
+        categoryId: null,
+        near: true,
+      }),
+    ).toBe("/catalog?near=true");
   });
 });

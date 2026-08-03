@@ -215,6 +215,7 @@ export function CheckoutForm({
                 type="button"
                 role="radio"
                 aria-checked={isPickup}
+                aria-disabled={!pickupSelectable || isDisabled || isSubmitting}
                 className={[
                   "checkout-form__fulfillment-option",
                   isPickup ? "checkout-form__fulfillment-option--active" : "",
@@ -224,25 +225,28 @@ export function CheckoutForm({
                 ]
                   .filter(Boolean)
                   .join(" ")}
-                disabled={!pickupSelectable || isDisabled || isSubmitting}
+                disabled={isDisabled || isSubmitting}
                 onClick={() => {
                   if (!pickupSelectable) {
+                    setLocalError(
+                      pickupOptionHint ||
+                        CHECKOUT_FORM_UI.FULFILLMENT_PICKUP_UNAVAILABLE,
+                    );
                     return;
                   }
+                  setLocalError("");
                   setFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
                 }}
               >
                 <span className="checkout-form__fulfillment-option-title">
                   {CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}
                 </span>
-                {pickupOptionHint ? (
-                  <span className="checkout-form__soon">{pickupOptionHint}</span>
-                ) : null}
               </button>
               <button
                 type="button"
                 role="radio"
                 aria-checked={!isPickup}
+                aria-disabled={!deliverySelectable || isDisabled || isSubmitting}
                 className={[
                   "checkout-form__fulfillment-option",
                   !isPickup ? "checkout-form__fulfillment-option--active" : "",
@@ -252,20 +256,22 @@ export function CheckoutForm({
                 ]
                   .filter(Boolean)
                   .join(" ")}
-                disabled={!deliverySelectable || isDisabled || isSubmitting}
+                disabled={isDisabled || isSubmitting}
                 onClick={() => {
                   if (!deliverySelectable) {
+                    setLocalError(
+                      deliveryOptionHint ||
+                        CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_UNAVAILABLE,
+                    );
                     return;
                   }
+                  setLocalError("");
                   setFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
                 }}
               >
                 <span className="checkout-form__fulfillment-option-title">
                   {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
                 </span>
-                {deliveryOptionHint ? (
-                  <span className="checkout-form__soon">{deliveryOptionHint}</span>
-                ) : null}
               </button>
             </div>
           </div>
@@ -302,7 +308,6 @@ export function CheckoutForm({
                     }))
                   }
                   disabled={isDisabled || isSubmitting}
-                  placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
                   autoComplete="address-line2"
                 />
               </label>

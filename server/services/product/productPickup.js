@@ -27,15 +27,39 @@ export const normalizeProductPickupAddress = (raw) => {
 };
 
 /**
+ * GeoJSON Point для 2dsphere ([lon, lat]).
+ * @param {number | null | undefined} lat
+ * @param {number | null | undefined} lon
+ * @returns {{ type: "Point"; coordinates: [number, number] } | null}
+ */
+export const buildProductPickupLocation = (lat, lon) => {
+  if (lat == null || lon == null) {
+    return null;
+  }
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+    return null;
+  }
+  return { type: "Point", coordinates: [lon, lat] };
+};
+
+/**
  * @param {unknown} latRaw
  * @param {unknown} lonRaw
- * @returns {{ productPickupLat: number | null; productPickupLon: number | null }}
+ * @returns {{
+ *   productPickupLat: number | null;
+ *   productPickupLon: number | null;
+ *   productPickupLocation: { type: "Point"; coordinates: [number, number] } | null;
+ * }}
  */
 export const normalizeProductPickupCoords = (latRaw, lonRaw) => {
   const latEmpty = latRaw == null || latRaw === "";
   const lonEmpty = lonRaw == null || lonRaw === "";
   if (latEmpty && lonEmpty) {
-    return { productPickupLat: null, productPickupLon: null };
+    return {
+      productPickupLat: null,
+      productPickupLon: null,
+      productPickupLocation: null,
+    };
   }
   if (latEmpty || lonEmpty) {
     throw new Error("Укажите и широту, и долготу точки самовывоза");
@@ -48,7 +72,11 @@ export const normalizeProductPickupCoords = (latRaw, lonRaw) => {
   if (!Number.isFinite(lon) || lon < -180 || lon > 180) {
     throw new Error("Некорректная долгота");
   }
-  return { productPickupLat: lat, productPickupLon: lon };
+  return {
+    productPickupLat: lat,
+    productPickupLon: lon,
+    productPickupLocation: buildProductPickupLocation(lat, lon),
+  };
 };
 
 /**

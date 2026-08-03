@@ -1,34 +1,120 @@
 .product-pickup-details-panel {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0.625rem;
+}
+
+.product-pickup-details-panel__method {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.875rem;
+  background: var(--iz-color-surface);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+button.product-pickup-details-panel__method {
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+button.product-pickup-details-panel__method:hover {
+  background: var(--iz-color-action-soft);
+  border-color: color-mix(in srgb, var(--iz-color-action) 28%, var(--iz-color-border));
+}
+
+button.product-pickup-details-panel__method:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--iz-color-accent-ring);
+}
+
+.product-pickup-details-panel__icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.75rem;
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-action);
+}
+
+.product-pickup-details-panel__text {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
 }
 
 .product-pickup-details-panel__title {
-  margin: 0;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--iz-color-ink);
 }
 
-.product-pickup-details-panel__address {
-  margin: 0;
-  font-size: 0.9375rem;
-  line-height: 1.4;
+.product-pickup-details-panel__subtitle {
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--iz-color-action);
+  overflow-wrap: anywhere;
 }
 
-.product-pickup-details-panel__route {
-  align-self: flex-start;
-  appearance: none;
-  border: 1px solid #2f6fed;
-  background: #2f6fed;
-  color: #fff;
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
+.product-pickup-details-panel__subtitle--muted {
+  color: var(--iz-color-text-muted);
 }
 
-.product-pickup-details-panel__route:hover {
-  filter: brightness(1.05);
+.product-pickup-details-panel__action {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 7.5rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 0.75rem;
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-action);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
+@media (max-width: 400px) {
+  .product-pickup-details-panel__method--action {
+    display: grid;
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+    grid-template-areas:
+      "icon text"
+      ". action";
+    column-gap: 0.875rem;
+    row-gap: 0.5rem;
+    align-items: start;
+  }
+
+  .product-pickup-details-panel__method--action .product-pickup-details-panel__icon {
+    grid-area: icon;
+  }
+
+  .product-pickup-details-panel__method--action .product-pickup-details-panel__text {
+    grid-area: text;
+  }
+
+  .product-pickup-details-panel__method--action .product-pickup-details-panel__action {
+    grid-area: action;
+    justify-self: start;
+    max-width: none;
+  }
 }

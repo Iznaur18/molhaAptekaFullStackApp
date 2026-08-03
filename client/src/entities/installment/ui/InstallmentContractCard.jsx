@@ -102,8 +102,8 @@ export function InstallmentContractCard({
     (payment) => payment.status === card.paymentStatuses.pendingConfirmation,
   );
 
-  const nextDuePreview = !isExpanded
-    ? role === "buyer" && card.nextPayablePayment
+  const nextDuePreview =
+    role === "buyer" && card.nextPayablePayment
       ? INSTALLMENT_UI.PAYMENTS_NEXT_DUE(
           formatPriceRub(card.nextPayablePayment.amountRub),
           new Date(card.nextPayablePayment.dueAt).toLocaleDateString("ru-RU"),
@@ -115,82 +115,10 @@ export function InstallmentContractCard({
               formatPriceRub(pendingConfirmationPayment.amountRub),
               new Date(pendingConfirmationPayment.dueAt).toLocaleDateString("ru-RU"),
             )
-          : null
-    : null;
+          : null;
 
-  return (
-    <article
-      className={[
-        "installment-contract-card",
-        compact ? "installment-contract-card--compact" : "",
-        card.isFullyPaid && "installment-contract-card_completed",
-        needsAttention && "installment-contract-card_attention",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-    >
-      <div className="installment-contract-card__header">
-        {collapsible ? (
-          <button
-            type="button"
-            className="installment-contract-card__header-toggle"
-            aria-expanded={isExpanded}
-            onClick={toggleExpanded}
-          >
-            {renderProductTitle(contract, onProductClick)}
-            <span
-              className={[
-                "installment-contract-card__chevron",
-                isExpanded ? "installment-contract-card__chevron_expanded" : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              aria-hidden="true"
-            >
-              ▸
-            </span>
-          </button>
-        ) : typeof onProductClick === "function" ? (
-          <button
-            type="button"
-            className="installment-contract-card__product-button"
-            onClick={() => onProductClick(String(contract.productId))}
-          >
-            {renderProductTitle(contract)}
-          </button>
-        ) : (
-          renderProductTitle(contract)
-        )}
-        {compact ? (
-          <span
-            className={[
-              "installment-contract-card__status-pill",
-              `installment-contract-card__status-pill_${contract.status}`,
-            ].join(" ")}
-          >
-            {card.statusLabel}
-          </span>
-        ) : null}
-        {contract.hasOverduePayment ? (
-          <p className="installment-contract-card__overdue" role="status">
-            {INSTALLMENT_UI.OVERDUE_BADGE}
-          </p>
-        ) : null}
-      </div>
-
-      {compact ? (
-        <InstallmentContractProgressBar
-          percent={card.paidPercent}
-          ariaLabel={`${INSTALLMENT_UI.CONTRACT_PAID}: ${card.paidPercent}%`}
-        />
-      ) : null}
-
-      {!isExpanded && nextDuePreview ? (
-        <p className="installment-contract-card__next-due">{nextDuePreview}</p>
-      ) : null}
-
-      {isExpanded ? (
-        <>
+  const expandedBody = (
+    <>
       {role === "buyer" ? (
         <InstallmentContractCounterparty
           label={INSTALLMENT_UI.SELLER_LABEL}
@@ -336,7 +264,7 @@ export function InstallmentContractCard({
               {!card.showDisputeForm ? (
                 <button
                   type="button"
-                  className="installment-contract-card__btn"
+                  className="installment-contract-card__btn installment-contract-card__btn_warning"
                   disabled={card.pendingKey != null}
                   onClick={() => card.setShowDisputeForm(true)}
                 >
@@ -352,7 +280,7 @@ export function InstallmentContractCard({
                   />
                   <button
                     type="button"
-                    className="installment-contract-card__btn installment-contract-card__btn_primary"
+                    className="installment-contract-card__btn installment-contract-card__btn_warning"
                     disabled={card.pendingKey != null}
                     onClick={card.handleOpenDispute}
                   >
@@ -366,8 +294,113 @@ export function InstallmentContractCard({
           ) : null}
         </div>
       ) : null}
-        </>
+    </>
+  );
+
+  return (
+    <article
+      className={[
+        "installment-contract-card",
+        compact ? "installment-contract-card--compact" : "",
+        collapsible ? "installment-contract-card--collapsible" : "",
+        card.isFullyPaid && "installment-contract-card_completed",
+        needsAttention && "installment-contract-card_attention",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <div className="installment-contract-card__header">
+        {collapsible ? (
+          <button
+            type="button"
+            className="installment-contract-card__header-toggle"
+            aria-expanded={isExpanded}
+            onClick={toggleExpanded}
+          >
+            {renderProductTitle(contract, onProductClick)}
+            <span
+              className={[
+                "installment-contract-card__chevron",
+                isExpanded ? "installment-contract-card__chevron_expanded" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              aria-hidden="true"
+            >
+              ▸
+            </span>
+          </button>
+        ) : typeof onProductClick === "function" ? (
+          <button
+            type="button"
+            className="installment-contract-card__product-button"
+            onClick={() => onProductClick(String(contract.productId))}
+          >
+            {renderProductTitle(contract)}
+          </button>
+        ) : (
+          renderProductTitle(contract)
+        )}
+        {compact ? (
+          <span
+            className={[
+              "installment-contract-card__status-pill",
+              `installment-contract-card__status-pill_${contract.status}`,
+            ].join(" ")}
+          >
+            {card.statusLabel}
+          </span>
+        ) : null}
+        {contract.hasOverduePayment ? (
+          <p className="installment-contract-card__overdue" role="status">
+            {INSTALLMENT_UI.OVERDUE_BADGE}
+          </p>
+        ) : null}
+      </div>
+
+      {compact ? (
+        <InstallmentContractProgressBar
+          percent={card.paidPercent}
+          ariaLabel={`${INSTALLMENT_UI.CONTRACT_PAID}: ${card.paidPercent}%`}
+        />
       ) : null}
+
+      {collapsible ? (
+        <div className="installment-contract-card__collapsible-region">
+          {nextDuePreview ? (
+          <div
+            className={[
+              "installment-contract-card__fold",
+              !isExpanded ? "installment-contract-card__fold_open" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            aria-hidden={isExpanded}
+            inert={isExpanded ? true : undefined}
+          >
+              <div className="installment-contract-card__fold-inner">
+                <p className="installment-contract-card__next-due">{nextDuePreview}</p>
+              </div>
+            </div>
+          ) : null}
+          <div
+            className={[
+              "installment-contract-card__fold",
+              isExpanded ? "installment-contract-card__fold_open" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            aria-hidden={!isExpanded}
+            inert={!isExpanded ? true : undefined}
+          >
+            <div className="installment-contract-card__fold-inner installment-contract-card__fold-inner_body">
+              {expandedBody}
+            </div>
+          </div>
+        </div>
+      ) : (
+        expandedBody
+      )}
     </article>
   );
 }

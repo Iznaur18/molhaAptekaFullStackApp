@@ -87,19 +87,22 @@ export const AddressSuggestInput = ({
       selectedFromSuggest: false,
       fiasId: "",
       geo: null,
+      regionCode: null,
       flat: "",
     });
   };
 
   const handlePickSuggestion = (suggestion: AddressSuggestionDto) => {
     const mapped = mapDadataSuggestion(suggestion);
+    const isHouse = mapped.fiasId.length > 0;
     patch({
       line: mapped.line,
       fiasId: mapped.fiasId,
       geo: mapped.geo,
-      selectedFromSuggest: true,
+      regionCode: mapped.regionCode,
+      selectedFromSuggest: isHouse,
     });
-    setDebouncedQuery("");
+    setDebouncedQuery(isHouse ? "" : mapped.line);
   };
 
   return (

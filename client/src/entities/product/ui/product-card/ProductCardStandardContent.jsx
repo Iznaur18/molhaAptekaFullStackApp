@@ -98,6 +98,11 @@ export function ProductCardStandardContent({ vm }) {
             {...vm.statusBadgesDragScrollProps}
           >
             <ProductCardStatusSlot vm={vm} />
+            {vm.nearDistanceLabel ? (
+              <p className="product-card__near-badge" role="status">
+                {vm.nearDistanceLabel}
+              </p>
+            ) : null}
             {vm.showRaffleBadge ? (
               <p className="product-card__raffle-badge" role="status">
                 {PRODUCT_CARD_UI.RAFFLE_BADGE}

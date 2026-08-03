@@ -54,15 +54,19 @@ describe("CheckoutForm", () => {
     });
   });
 
-  it("disables delivery when cart products do not support it", () => {
+  it("shows delivery hint on click when cart products do not support it", async () => {
+    const user = userEvent.setup();
     const { container } = renderWithProviders(<CheckoutForm {...baseProps} />);
 
-    expect(container.querySelector(".checkout-form__soon")?.textContent).toContain(
+    expect(container.querySelector(".checkout-form__soon")).toBeNull();
+    const deliveryChip = screen.getByRole("radio", {
+      name: CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY,
+    });
+    expect(deliveryChip).toHaveAttribute("aria-disabled", "true");
+    await user.click(deliveryChip);
+    expect(await screen.findByRole("alert")).toHaveTextContent(
       CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_UNAVAILABLE,
     );
-    expect(
-      screen.getByRole("radio", { name: new RegExp(CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY) }),
-    ).toBeDisabled();
   });
 
   it("enables delivery chip when deliveryAvailable", () => {
@@ -70,7 +74,7 @@ describe("CheckoutForm", () => {
 
     expect(
       screen.getByRole("radio", { name: CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY }),
-    ).not.toBeDisabled();
+    ).toHaveAttribute("aria-disabled", "false");
   });
 
   it("switches to delivery chip layout like mobile", async () => {

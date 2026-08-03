@@ -20,6 +20,7 @@ import { formatApiErrorMessage } from "@izibuy/shared-lib";
  *   auctionOnly?: boolean;
  *   installmentOnly?: boolean;
  *   saleOnly?: boolean;
+ *   near?: boolean;
  *   regionCode?: string;
  * }} [options]
  * @returns {Promise<{
@@ -40,6 +41,7 @@ export async function fetchCatalogProductsPage({
   auctionOnly = false,
   installmentOnly = false,
   saleOnly = false,
+  near = false,
   regionCode,
 } = {}) {
   try {
@@ -57,6 +59,7 @@ export async function fetchCatalogProductsPage({
         ...(auctionOnly ? { auctionOnly: "true" } : {}),
         ...(installmentOnly ? { installmentOnly: "true" } : {}),
         ...(saleOnly ? { saleOnly: "true" } : {}),
+        ...(near ? { near: "true" } : {}),
         ...(regionCode ? { regionCode } : {}),
       },
     });

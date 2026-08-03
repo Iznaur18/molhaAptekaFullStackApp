@@ -1,6 +1,5 @@
 import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
 
-import { IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED } from "../../product-category-tree/lib/isProductCategoryTreePickerEnabled.js";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { isRuRegionCode } from "@molha/api-contract";
 import {
@@ -153,11 +152,7 @@ export function prepareCreateProductSubmit({
     };
   }
 
-  if (IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED) {
-    if (!form.productCategoryId && !form.productCategory) {
-      return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_CATEGORY_LEAF };
-    }
-  } else if (!form.productCategoryId && !form.productCategory) {
+  if (!form.productCategoryId) {
     return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_CATEGORY_LEAF };
   }
 
@@ -166,9 +161,8 @@ export function prepareCreateProductSubmit({
       ? String(form.productCategoryId).trim()
       : "";
 
-  const productRegionCode = String(form.productRegionCode ?? "").trim();
-  if (!isRuRegionCode(productRegionCode)) {
-    return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_SALE_REGION_REQUIRED };
+  if (!productCategoryId) {
+    return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_CATEGORY_LEAF };
   }
 
   const productPickupAddress = String(form.productPickupAddress ?? "").trim();
@@ -180,11 +174,15 @@ export function prepareCreateProductSubmit({
   const pickupLonRaw = form.productPickupLon;
   const hasLat = pickupLatRaw != null && Number.isFinite(Number(pickupLatRaw));
   const hasLon = pickupLonRaw != null && Number.isFinite(Number(pickupLonRaw));
-  if (hasLat !== hasLon) {
+  if (!hasLat || !hasLon) {
     return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_PICKUP_COORDS };
   }
-  const productPickupLat = hasLat ? Number(pickupLatRaw) : null;
-  const productPickupLon = hasLon ? Number(pickupLonRaw) : null;
+  const productPickupLat = Number(pickupLatRaw);
+  const productPickupLon = Number(pickupLonRaw);
+  const productRegionCodeRaw = String(form.productRegionCode ?? "").trim();
+  const productRegionCode = isRuRegionCode(productRegionCodeRaw)
+    ? productRegionCodeRaw
+    : undefined;
 
   const productPickupEnabled = form.productPickupEnabled !== false;
   const productDeliveryEnabled = form.productDeliveryEnabled === true;
@@ -222,7 +220,7 @@ export function prepareCreateProductSubmit({
       productOldPrice,
       loyaltyPointsPerUnit,
       productCharacteristics,
-      productRegionCode,
+      ...(productRegionCode ? { productRegionCode } : {}),
       productPickupAddress,
       productPickupLat,
       productPickupLon,
@@ -232,10 +230,8 @@ export function prepareCreateProductSubmit({
       productReturnTerms,
     };
 
-    if (IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED && productCategoryId) {
+    if (productCategoryId) {
       patchBody.productCategoryId = productCategoryId;
-    } else {
-      patchBody.productCategory = form.productCategory;
     }
 
     if (showCatalogAvailabilityToggle) {
@@ -259,14 +255,12 @@ export function prepareCreateProductSubmit({
       productPreviewVideoUrl: previewVideoUrl || undefined,
       productPrice,
       productOldPrice,
-      ...(IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED && productCategoryId
-        ? { productCategoryId }
-        : { productCategory: form.productCategory }),
+      productCategoryId,
       productIsAvailable: form.productIsAvailable,
       productStockQuantity,
       loyaltyPointsPerUnit,
       productCharacteristics,
-      productRegionCode,
+      ...(productRegionCode ? { productRegionCode } : {}),
       productPickupAddress,
       productPickupLat,
       productPickupLon,

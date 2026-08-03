@@ -30,6 +30,8 @@ import { up as approvePendingInstallmentProgramsUp } from "./20260714-approve-pe
 import { up as backfillRegionCodesUp } from "./20260725-backfill-region-codes.js";
 import { up as curatedListRegionCodeUp } from "./20260728-curated-list-region-code.js";
 import { up as partnerBalanceToLoyaltyUp } from "./20260801-partner-balance-to-loyalty.js";
+import { up as productPickupLocationUp } from "./20260803-product-pickup-location.js";
+import { up as productRegionFromPickupGeoUp } from "./20260804-product-region-from-pickup-geo.js";
 
 export const MIGRATIONS = [
   {
@@ -192,5 +194,17 @@ export const MIGRATIONS = [
     id: "20260801-partner-balance-to-loyalty",
     description: "Migrate partnerBalance → userLoyaltyPoints 1:1",
     up: partnerBalanceToLoyaltyUp,
+  },
+  {
+    id: "20260803-product-pickup-location",
+    description:
+      "Backfill productPickupLocation GeoJSON Point + sparse 2dsphere index",
+    up: productPickupLocationUp,
+  },
+  {
+    id: "20260804-product-region-from-pickup-geo",
+    description:
+      "Derive productRegionCode from pickup lat/lon via DaData geolocate",
+    up: productRegionFromPickupGeoUp,
   },
 ];

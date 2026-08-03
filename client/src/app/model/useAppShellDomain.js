@@ -58,6 +58,7 @@ export function useAppShellDomain(
     isHomeCatalogMainView: shell.isHomeCatalogMainView,
     isCatalogBrowserMainViewActive: shell.isCatalogBrowserMainViewActive,
     isCatalogShellView: shell.isCatalogShellView,
+    authUser: shell.authUser,
     isAuthorized: shell.isAuthorized,
     setIsLoginModalOpen: shell.setIsLoginModalOpen,
     submittedProductSearchTerm: shell.submittedProductSearchTerm,
@@ -69,6 +70,7 @@ export function useAppShellDomain(
     initialCatalogQuery: shell.initialCatalogQuery,
     onCatalogError: shell.onCatalogError,
     viewerRegionCode: shell.viewerRegionCode,
+    isSessionReady: shell.isSessionReady,
   });
 
   const curatedProductListsState = useHomeCuratedProductLists({
@@ -82,6 +84,7 @@ export function useAppShellDomain(
     catalogAuctionOnly: catalogLoader.catalogAuctionOnly,
     catalogInstallmentOnly: catalogLoader.catalogInstallmentOnly,
     catalogSaleOnly: catalogLoader.catalogSaleOnly,
+    catalogNear: catalogLoader.catalogNear,
     viewerRegionCode: shell.viewerRegionCode,
   });
 

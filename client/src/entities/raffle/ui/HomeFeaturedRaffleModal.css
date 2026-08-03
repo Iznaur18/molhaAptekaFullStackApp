@@ -6,9 +6,9 @@
  */
 .home-featured-raffle-modal__backdrop {
   --raffle-modal-enter-ms: 420ms;
-  --raffle-modal-exit-ms: 220ms;
+  --raffle-modal-exit-ms: 420ms;
   --raffle-modal-enter-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
-  --raffle-modal-exit-ease: cubic-bezier(0.55, 0.055, 0.675, 1);
+  --raffle-modal-exit-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
   --raffle-modal-height: 80vh;
   --raffle-modal-height: 80dvh;
   /* Phone ≤640: edge-to-edge; ≥641: узкая колонка под квадрат приза */
@@ -86,15 +86,13 @@
 .home-featured-raffle-modal__carousel {
   width: 100%;
   overflow: hidden;
-  /* Горизонтальный жест отдаём JS-драгу, вертикальный скролл — браузеру.
+  /* Горизонтальный жест отдаём драгу Embla, вертикальный скролл — браузеру.
      Без этого мобильный веб рвёт свайп через pointercancel. */
   touch-action: pan-y;
   cursor: grab;
-  user-select: none;
-  -webkit-user-select: none;
 }
 
-.home-featured-raffle-modal__carousel--dragging {
+.home-featured-raffle-modal__carousel:active {
   cursor: grabbing;
 }
 
@@ -104,17 +102,21 @@
 .home-featured-raffle-modal__carousel video {
   -webkit-user-drag: none;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 .home-featured-raffle-modal__track {
   display: flex;
-  width: max-content;
-  gap: 12px;
+  /* Без gap/margin между 100%-слайдами — иначе Embla snap съезжает. */
+  align-items: stretch;
   will-change: transform;
+  backface-visibility: hidden;
 }
 
 .home-featured-raffle-modal__slide {
-  flex: 0 0 auto;
+  flex: 0 0 100%;
+  min-width: 0;
+  transform: translateZ(0);
 }
 
 .home-featured-raffle-modal__footer {

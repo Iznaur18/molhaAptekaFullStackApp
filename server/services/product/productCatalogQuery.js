@@ -1,5 +1,4 @@
 import {
-  PRODUCT_SORT_CITY,
   PRODUCT_SORT_NEWEST,
   PRODUCT_SORT_PURCHASES,
   PRODUCT_SORT_REVIEWS,
@@ -79,8 +78,7 @@ export const parseProductSortFromQuery = (query) => {
   if (
     raw === PRODUCT_SORT_VIEWS ||
     raw === PRODUCT_SORT_PURCHASES ||
-    raw === PRODUCT_SORT_REVIEWS ||
-    raw === PRODUCT_SORT_CITY
+    raw === PRODUCT_SORT_REVIEWS
   ) {
     return raw;
   }
@@ -107,34 +105,6 @@ const sellerLookupStages = () => [
     },
   },
 ];
-
-const sortStageForCatalog = (
-  sort,
-  searchRank,
-  buyerCity = null,
-  viewerRegionCode = null,
-) => {
-  const useSearchRank = Boolean(searchRank?.escapedRegexPattern);
-  const stages = [];
-
-  if (!useSearchRank && sort === PRODUCT_SORT_NEWEST) {
-    stages.push(catalogPromotionSortBoostAddFieldsStage);
-  }
-
-  const sortStage = buildCatalogPromotionSortStage(sort, {
-    useSearchRank,
-    searchScoreField: "_searchRank",
-    buyerCity,
-  });
-
-  if (Array.isArray(sortStage)) {
-    stages.push(...sortStage);
-  } else {
-    stages.push(sortStage);
-  }
-
-  return withCatalogRegionPrioritySort(stages, viewerRegionCode);
-};
 
 /**
  * @param {{ escapedRegexPattern: string; categorySlugs: string[] }} searchRank
@@ -172,12 +142,45 @@ const searchRankAddFieldsStage = (searchRank) => ({
 });
 
 /**
+ * Сортировка каталога (+ region priority, + search rank). Без $match / skip / limit.
+ *
+ * @param {string} sort
+ * @param {{ escapedRegexPattern: string; categorySlugs: string[] } | null} [searchRank]
+ * @param {string | null} [viewerRegionCode]
+ */
+export const buildCatalogSortPipeline = (
+  sort,
+  searchRank = null,
+  viewerRegionCode = null,
+) => {
+  const useSearchRank = Boolean(searchRank?.escapedRegexPattern);
+  const stages = [];
+
+  if (useSearchRank && searchRank?.escapedRegexPattern) {
+    stages.push(searchRankAddFieldsStage(searchRank));
+  }
+
+  if (!useSearchRank && sort === PRODUCT_SORT_NEWEST) {
+    stages.push(catalogPromotionSortBoostAddFieldsStage);
+  }
+
+  stages.push(
+    buildCatalogPromotionSortStage(sort, {
+      useSearchRank,
+      searchScoreField: "_searchRank",
+    }),
+  );
+
+  return withCatalogRegionPrioritySort(stages, viewerRegionCode);
+};
+
+/**
  * @param {Record<string, unknown>} productsQuery
  * @param {string} sort
  * @param {number} skip
  * @param {number} limit
  * @param {{ escapedRegexPattern: string; categorySlugs: string[] } | null} [searchRank]
- * @param {string | null} [buyerCity]
+ * @param {string | null} [_buyerCity]
  * @param {string | null} [viewerRegionCode]
  */
 export const findProductsPage = async (
@@ -186,17 +189,12 @@ export const findProductsPage = async (
   skip,
   limit,
   searchRank = null,
-  buyerCity = null,
+  _buyerCity = null,
   viewerRegionCode = null,
 ) => {
-  const rankStage = searchRank?.escapedRegexPattern
-    ? [searchRankAddFieldsStage(searchRank)]
-    : [];
-
-  const sortPipeline = sortStageForCatalog(
+  const sortPipeline = buildCatalogSortPipeline(
     sort,
     searchRank,
-    buyerCity,
     viewerRegionCode,
   );
 
@@ -204,7 +202,6 @@ export const findProductsPage = async (
 
   const products = await Product.aggregate([
     { $match: normalizeProductsQueryForAggregate(productsQuery) },
-    ...rankStage,
     ...sortPipeline,
     { $skip: skip },
     { $limit: limit },
@@ -213,6 +210,7 @@ export const findProductsPage = async (
       $project: {
         _searchRank: 0,
         _promotionSortTier: 0,
+        _promotionSortActivatedAt: 0,
         _citySortPriority: 0,
         _regionSortPriority: 0,
       },

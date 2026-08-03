@@ -13,21 +13,13 @@ import {
 } from "./birthDateInputMask";
 import { getUserBackgroundFocus } from "./profileImageFocus";
 import { normalizeRuPhoneInput } from "./ruPhone";
-import { EMPTY_STRUCTURED_ADDRESS, type EditProfileFormState } from "./mapUserToEditProfileForm";
+import { EMPTY_DELIVERY_ADDRESS, type EditProfileFormState } from "./mapUserToEditProfileForm";
 import { serializeUserBackground } from "./userBackgroundValue";
 
-const isAddressEmpty = (a: EditProfileFormState["structuredAddress"]) =>
-  !a.city && !a.district && !a.street && !a.house && !a.flat;
-
-const isAddressEqual = (
-  a: EditProfileFormState["structuredAddress"],
-  b: EditProfileFormState["structuredAddress"],
-) =>
-  a.city === b.city &&
-  a.district === b.district &&
-  a.street === b.street &&
-  a.house === b.house &&
-  a.flat === b.flat;
+const isDeliveryAddressEqual = (
+  a: EditProfileFormState["deliveryAddress"],
+  b: EditProfileFormState["deliveryAddress"],
+) => a.line.trim() === b.line.trim() && a.flat.trim() === b.flat.trim();
 
 export const buildPatchUserProfileBody = (
   form: EditProfileFormState,
@@ -56,21 +48,15 @@ export const buildPatchUserProfileBody = (
     body.userGender = form.userGender;
   }
 
-  const baseline = initial.structuredAddress ?? EMPTY_STRUCTURED_ADDRESS;
-  if (!isAddressEqual(form.structuredAddress, baseline)) {
-    if (isAddressEmpty(form.structuredAddress)) {
-      body.userAddressCity = null;
-      body.userAddressDistrict = null;
-      body.userAddressStreet = null;
-      body.userAddressHouse = null;
-      body.userAddressFlat = null;
+  const baseline = initial.deliveryAddress ?? EMPTY_DELIVERY_ADDRESS;
+  if (!isDeliveryAddressEqual(form.deliveryAddress, baseline)) {
+    const line = form.deliveryAddress.line.trim();
+    if (line === "") {
       body.userAddress = null;
+      body.userAddressFlat = null;
     } else {
-      body.userAddressCity = form.structuredAddress.city;
-      body.userAddressDistrict = form.structuredAddress.district || null;
-      body.userAddressStreet = form.structuredAddress.street;
-      body.userAddressHouse = form.structuredAddress.house;
-      body.userAddressFlat = form.structuredAddress.flat || null;
+      body.userAddress = line;
+      body.userAddressFlat = form.deliveryAddress.flat.trim() || null;
     }
   }
 

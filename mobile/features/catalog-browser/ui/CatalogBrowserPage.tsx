@@ -3,6 +3,8 @@ import { useMemo, useState } from "react";
 import { Alert, ScrollView, View } from "react-native";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
+import { userHasCatalogNearGeo } from "@/entities/product/lib/userHasCatalogNearGeo";
+import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { buildResolvedCatalogFeedTileDisplays } from "@/entities/product-category-display/lib/resolveCatalogFeedTileDisplay";
 import {
   buildResolvedProductCategoryDisplaysFromRoots,
@@ -46,6 +48,7 @@ export const CatalogBrowserPage = () => {
   };
   const { contentPaddingTop, centeredContentStyle } = useScreenLayout();
   const { isAdmin, isAuthorized } = useUserAccess();
+  const sessionQuery = useAuthSessionQuery();
   const { viewerRegionCode } = useViewerRegion();
 
   const categoryDisplaysQuery = useProductCategoryDisplaysQuery();
@@ -122,6 +125,25 @@ export const CatalogBrowserPage = () => {
         { text: "Войти", onPress: () => router.push("/(auth)/login") },
       ]);
       return;
+    }
+    if (query.near) {
+      if (!isAuthorized) {
+        Alert.alert(CATALOG_BROWSER_UI.LOGIN_FOR_NEAR, undefined, [
+          { text: "Отмена", style: "cancel" },
+          { text: "Войти", onPress: () => router.push("/(auth)/login") },
+        ]);
+        return;
+      }
+      if (!userHasCatalogNearGeo(sessionQuery.data?.user)) {
+        Alert.alert(CATALOG_BROWSER_UI.NEAR_ADDRESS_REQUIRED, undefined, [
+          { text: "Отмена", style: "cancel" },
+          {
+            text: CATALOG_BROWSER_UI.NEAR_ADDRESS_OPEN_PROFILE,
+            onPress: () => router.push("/profile/edit"),
+          },
+        ]);
+        return;
+      }
     }
 
     openCatalogWithFilters(query);

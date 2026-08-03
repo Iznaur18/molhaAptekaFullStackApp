@@ -1,5 +1,6 @@
 import { getRuRegionByCode } from "@molha/api-contract";
 
+import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config/appUiCopy";
 import { formatIsoDateTime, formatPriceRub } from "@/shared/lib";
 
 import { getProductSellerDisplayName } from "./getProductSellerDisplayName";
@@ -24,6 +25,10 @@ export const formatProductFieldForDisplay = (
     case "productCategory": {
       const slug = raw == null ? "" : String(raw);
       return PRODUCT_CATEGORY_LABEL_RU[slug] ?? (slug || EM_DASH);
+    }
+    case "productPickupAddress": {
+      const address = raw == null ? "" : String(raw).trim();
+      return address === "" ? PRODUCT_DETAILS_MODAL_UI.ADDRESS_EMPTY : address;
     }
     case "productRegionCode": {
       const code = raw == null ? "" : String(raw).trim();

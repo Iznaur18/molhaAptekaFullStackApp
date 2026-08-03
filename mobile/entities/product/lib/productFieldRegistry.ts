@@ -1,9 +1,11 @@
+import { CREATE_PRODUCT_UI } from "@/shared/config/appUiCopy";
+
 export type ProductFieldReadLayout = "price" | "stat" | "block" | "meta" | "default";
 
 const FIELD_LAYOUTS: Record<string, ProductFieldReadLayout> = {
   productPrice: "price",
   productCategory: "stat",
-  productRegionCode: "stat",
+  productPickupAddress: "stat",
   productStockQuantity: "stat",
   soldQuantity: "stat",
   uniqueViewerCount: "stat",
@@ -17,7 +19,7 @@ const FIELD_LAYOUTS: Record<string, ProductFieldReadLayout> = {
 export const PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS = [
   "productPrice",
   "productCategory",
-  "productRegionCode",
+  "productPickupAddress",
   "productStockQuantity",
   "soldQuantity",
   "uniqueViewerCount",
@@ -46,7 +48,7 @@ export const PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS_WITHOUT_PRICE =
 /** @deprecated use PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS without productPrice */
 export const PRODUCT_DETAILS_TOP_ROW_FIELD_KEYS = [
   "productCategory",
-  "productRegionCode",
+  "productPickupAddress",
   "productStockQuantity",
   "soldQuantity",
   "uniqueViewerCount",
@@ -56,12 +58,13 @@ export const PRODUCT_DETAILS_TOP_ROW_FIELD_KEYS = [
 export const getProductFieldReadLayout = (key: string): ProductFieldReadLayout =>
   FIELD_LAYOUTS[key] ?? "default";
 
-export const isProductFieldMultilineRead = (key: string): boolean => key === "productDescription";
+export const isProductFieldMultilineRead = (key: string): boolean =>
+  key === "productDescription" || key === "productPickupAddress";
 
 export const getProductFieldLabel = (key: string): string => {
   const labels: Record<string, string> = {
     productCategory: "Категория",
-    productRegionCode: "Регион продажи",
+    productPickupAddress: CREATE_PRODUCT_UI.LABEL_PICKUP_ADDRESS,
     productStockQuantity: "В наличии (шт.)",
     soldQuantity: "Продано",
     uniqueViewerCount: "Просмотры",

@@ -26,6 +26,7 @@ import "./create-product-sections/CreateProductSections.css";
  *     productPickupLon: number | null;
  *     productPickupEnabled: boolean;
  *     productDeliveryEnabled: boolean;
+ *     productRegionCode?: string | null;
  *   }) => void;
  * }} props
  */
@@ -181,6 +182,7 @@ export function ProductPickupLocationFields({
             productPickupAddress: next.line,
             productPickupLat: next.geo?.lat ?? null,
             productPickupLon: next.geo?.lon ?? null,
+            productRegionCode: next.regionCode ?? null,
           });
         }}
         disabled={disabled}
@@ -200,6 +202,7 @@ export function ProductPickupLocationFields({
           emit({
             productPickupLat: nextLat,
             productPickupLon: nextLon,
+            productRegionCode: null,
             ...(mappedAddress ? { productPickupAddress: mappedAddress } : {}),
           });
         }}

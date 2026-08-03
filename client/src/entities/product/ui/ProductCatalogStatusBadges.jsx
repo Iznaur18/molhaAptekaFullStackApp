@@ -1,3 +1,4 @@
+import { formatCatalogNearDistanceLabel } from "@molha/api-contract";
 import { formatProductWholesaleBadgeLabel } from "@izibuy/shared-lib";
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
 import {
@@ -51,6 +52,7 @@ export function ProductCatalogStatusBadges({
   );
 
   const purchaseLimit = getProductPurchaseLimit(product);
+  const nearDistanceLabel = formatCatalogNearDistanceLabel(product.distanceMeters);
   const statusSlotVm = {
     isMineMode,
     isModerationQueue,
@@ -73,6 +75,11 @@ export function ProductCatalogStatusBadges({
       aria-label={PRODUCT_CARD_UI.STATUS_BADGES_ARIA}
     >
       <ProductCardStatusSlot vm={statusSlotVm} />
+      {nearDistanceLabel ? (
+        <p className="product-card__near-badge" role="status">
+          {nearDistanceLabel}
+        </p>
+      ) : null}
       {flags.showRaffleBadge ? (
         <p className="product-card__raffle-badge" role="status">
           {PRODUCT_CARD_UI.RAFFLE_BADGE}

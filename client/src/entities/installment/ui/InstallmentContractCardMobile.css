@@ -92,6 +92,13 @@
     font-size: 0.88rem;
   }
 
+  .installment-contract-card--compact
+    .installment-contract-card__payment-actions
+    .installment-contract-card__btn {
+    width: auto;
+    flex: 1 1 0;
+  }
+
   .installment-contract-card--compact .installment-contract-card__dispute-form {
     width: 100%;
   }

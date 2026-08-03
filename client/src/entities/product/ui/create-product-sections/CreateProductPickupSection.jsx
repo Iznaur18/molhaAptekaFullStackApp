@@ -35,6 +35,9 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
             productPickupLon: next.productPickupLon,
             productPickupEnabled: next.productPickupEnabled !== false,
             productDeliveryEnabled: next.productDeliveryEnabled === true,
+            ...(next.productRegionCode
+              ? { productRegionCode: next.productRegionCode }
+              : {}),
           }));
         }}
       />

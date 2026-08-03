@@ -46,6 +46,9 @@ import {
   parsePagination,
   parseTruthyQueryFlag,
 } from "./productListQueryHelpers.js";
+import { resolveCatalogNearContext } from "./resolveCatalogNearContext.js";
+import { resolveOptionalViewerCatalogGeo } from "./resolveOptionalViewerCatalogGeo.js";
+import { attachCatalogDistanceMeters } from "./attachCatalogDistanceMeters.js";
 
 const emptyCatalogPage = (page, limit) => ({
   products: [],
@@ -60,7 +63,19 @@ const emptyCatalogPage = (page, limit) => ({
  */
 export async function getCatalogProducts({ userId, query }) {
   const includeHidden = String(query.includeHidden).toLowerCase() === "true";
-  const cacheKey = buildCatalogProductsCacheKey({ userId, query });
+  const nearEnabled = parseTruthyQueryFlag(query.near);
+  const nearContext = nearEnabled
+    ? await resolveCatalogNearContext(userId)
+    : null;
+  const viewerGeo =
+    nearContext ?? (await resolveOptionalViewerCatalogGeo(userId));
+  const cacheKey = buildCatalogProductsCacheKey({
+    userId,
+    query,
+    nearPoint: viewerGeo
+      ? `${viewerGeo.lat.toFixed(5)},${viewerGeo.lon.toFixed(5)}`
+      : null,
+  });
 
   if (!includeHidden) {
     const cached = getCachedCatalogProducts(cacheKey);
@@ -69,7 +84,12 @@ export async function getCatalogProducts({ userId, query }) {
     }
   }
 
-  const result = await loadCatalogProducts({ userId, query });
+  const result = await loadCatalogProducts({
+    userId,
+    query,
+    nearContext,
+    viewerGeo,
+  });
 
   if (!includeHidden) {
     setCachedCatalogProducts(cacheKey, result);
@@ -82,9 +102,16 @@ export async function getCatalogProducts({ userId, query }) {
  * @param {{
  *   userId?: string;
  *   query: Record<string, unknown>;
+ *   nearContext?: { lat: number; lon: number; maxDistanceMeters: number } | null;
+ *   viewerGeo?: { lat: number; lon: number } | null;
  * }} input
  */
-async function loadCatalogProducts({ userId, query }) {
+async function loadCatalogProducts({
+  userId,
+  query,
+  nearContext = null,
+  viewerGeo = null,
+}) {
   const { page, limit, skip } = parsePagination(query);
   const category = categoryFromQuery(query);
   const categoryId = parseCategoryIdFromQuery(query.categoryId);
@@ -99,10 +126,15 @@ async function loadCatalogProducts({ userId, query }) {
   const auctionOnly = parseTruthyQueryFlag(query.auctionOnly);
   const installmentOnly = parseTruthyQueryFlag(query.installmentOnly);
   const saleOnly = parseTruthyQueryFlag(query.saleOnly);
+  const nearEnabled = parseTruthyQueryFlag(query.near);
 
   if (followingOnly && !userId) {
     throw new AppError(401, USER_FOLLOW_FOLLOWING_ONLY_AUTH_MESSAGE);
   }
+
+  const resolvedNearContext = nearEnabled
+    ? nearContext ?? (await resolveCatalogNearContext(userId))
+    : null;
 
   const hiddenSellerIds = await getHiddenSellerIds();
   const isStaff = await isUserStaff(userId);
@@ -192,7 +224,7 @@ async function loadCatalogProducts({ userId, query }) {
   const catalogSearchResult = await buildProductCatalogSearchQuery(
     query.search,
     catalogBaseQuery,
-    { preferAtlas: isProductAtlasSearchEnabled() },
+    { preferAtlas: isProductAtlasSearchEnabled() && !nearEnabled },
   );
 
   if (followingOnly && catalogBaseQuery.productSeller?.$in?.length === 0) {
@@ -216,11 +248,18 @@ async function loadCatalogProducts({ userId, query }) {
       limit,
       catalogSortBuyerCity,
       viewerRegionCode,
+      resolvedNearContext,
     ),
-    countCatalogProducts(catalogSearchResult),
+    countCatalogProducts(catalogSearchResult, resolvedNearContext),
   ]);
 
   let productsPayload = await attachProductAvailablePurchaseQuantity(products);
+  if (!nearEnabled) {
+    productsPayload = attachCatalogDistanceMeters(
+      productsPayload,
+      viewerGeo ?? nearContext,
+    );
+  }
   if (isStaff) {
     const openSalesIds = await getProductIdsWithOpenSales(
       products.map((p) => String(p._id)),

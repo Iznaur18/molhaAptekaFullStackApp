@@ -30,6 +30,7 @@ export const useCatalogProductsInfiniteQuery = (
         auctionOnly: filters.auctionOnly,
         installmentOnly: filters.installmentOnly,
         saleOnly: filters.saleOnly,
+        near: filters.near,
         regionCode: filters.regionCode,
       }),
     initialPageParam: 1,

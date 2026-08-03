@@ -29,10 +29,7 @@ export const FEATURE_FLAGS = Object.freeze({
     "VITE_FF_CATALOG_BROWSER_SUBCATEGORY_FILTER",
     true,
   ),
-  productCategoryTreePicker: readBoolEnv(
-    "VITE_FF_PRODUCT_CATEGORY_TREE_PICKER",
-    true,
-  ),
+  productCategoryTreePicker: true,
   requireAddressFromDadataSuggest: readBoolEnv(
     "VITE_FF_REQUIRE_ADDRESS_FROM_DADATA_SUGGEST",
     false,

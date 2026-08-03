@@ -1095,6 +1095,9 @@ export const useProductDetailFieldStyles = createThemedStyles((theme) => ({
     paddingVertical: 3.2,
     minWidth: 0,
   },
+  rowStatMultiline: {
+    alignItems: "flex-start",
+  },
   rowBlock: {
     gap: 6.6,
     paddingVertical: 13.6,
@@ -1424,13 +1427,14 @@ export const useProductMediaGalleryStyles = createThemedStyles((theme) => ({
   thumb: {
     width: 56,
     height: 56,
-    borderRadius: theme.radius.sm,
+    borderRadius: 14,
     overflow: "hidden",
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surfaceMuted,
     alignItems: "center",
     justifyContent: "center",
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   thumbActive: {
     borderColor: theme.colors.nearBlack,
@@ -3017,9 +3021,6 @@ export const useCatalogBrowserTileStyles = createThemedStyles((theme) => ({
     borderWidth: 1,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surfaceElevated,
-  },
-  cardFeed: {
-    borderStyle: "dashed",
   },
   cardPending: {
     opacity: 0.55,

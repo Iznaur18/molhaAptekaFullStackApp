@@ -8,6 +8,7 @@ type HomeCatalogMainViewParams = {
   auctionOnly: boolean;
   installmentOnly: boolean;
   saleOnly: boolean;
+  near?: boolean;
 };
 
 export const isHomeCatalogMainView = ({
@@ -20,6 +21,7 @@ export const isHomeCatalogMainView = ({
   auctionOnly,
   installmentOnly,
   saleOnly,
+  near = false,
 }: HomeCatalogMainViewParams) =>
   !search &&
   !selectedRootSlug &&
@@ -29,4 +31,5 @@ export const isHomeCatalogMainView = ({
   !followingOnly &&
   !auctionOnly &&
   !installmentOnly &&
-  !saleOnly;
+  !saleOnly &&
+  !near;

@@ -541,7 +541,7 @@ const FEATURED_RAFFLE_MODAL_BACKDROP = "rgba(0, 0, 0, 0.62)";
 /** Паритет web HomeFeaturedRaffleModal bottom sheet. */
 export const FEATURED_RAFFLE_MODAL_ANIMATION = {
   enterMs: 420,
-  exitMs: 220,
+  exitMs: 420,
   heightRatio: 0.8,
   sheetRadius: 32,
 } as const;

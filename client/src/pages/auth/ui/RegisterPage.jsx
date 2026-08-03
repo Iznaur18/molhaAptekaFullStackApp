@@ -78,6 +78,11 @@ export function RegisterPage() {
     registerMutation.isPending ||
     confirmMutation.isPending;
 
+  const canSubmitRegister = isRegisterConsentComplete({
+    termsAccepted,
+    personalDataConsentAccepted,
+  });
+
   useEffect(() => {
     if (isSessionReady && isAuthorized) {
       navigate("/me", { replace: true });
@@ -435,7 +440,7 @@ export function RegisterPage() {
             <button
               type="submit"
               className="app-btn app-btn--primary auth-page__submit"
-              disabled={isPending}
+              disabled={isPending || !canSubmitRegister}
             >
               {isPending
                 ? REGISTER_MODAL_UI.SUBMIT_LOADING

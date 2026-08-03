@@ -83,6 +83,7 @@ export const useCatalogSubcategoryPicker = ({
         auctionOnly: false,
         installmentOnly: false,
         saleOnly: false,
+        near: false,
       });
       clearPickerTrail();
       setPickerLoadError(null);
@@ -118,6 +119,7 @@ export const useCatalogSubcategoryPicker = ({
           auctionOnly: false,
           installmentOnly: false,
           saleOnly: false,
+          near: false,
         });
         return;
       }

@@ -106,7 +106,7 @@
   padding: 9px var(--iz-control-field-padding-x);
   border: var(--iz-border-hairline) solid var(--iz-color-border);
   border-radius: var(--iz-radius-input);
-  background: var(--iz-color-surface-muted);
+  background: var(--iz-color-bg);
   color: var(--iz-color-text);
   font-size: var(--iz-font-md);
 }
@@ -125,7 +125,7 @@
   box-shadow: var(--iz-shadow-input-focus);
 }
 
-/* inputReadOnly: только приглушённый текст — фон уже surfaceMuted */
+/* inputReadOnly: приглушённый текст (фон уже bg) */
 .edit-profile-modal__input_readonly {
   color: var(--iz-color-text-muted);
 }
@@ -137,7 +137,7 @@
   padding: 9px var(--iz-control-field-padding-x);
   border: var(--iz-border-hairline) solid var(--iz-color-border);
   border-radius: var(--iz-radius-input);
-  background: var(--iz-color-surface-muted);
+  background: var(--iz-color-bg);
   color: var(--iz-color-text);
   font: inherit;
   font-size: var(--iz-font-md);

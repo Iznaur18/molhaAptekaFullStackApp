@@ -13,7 +13,7 @@
   padding: 0.75rem;
   border: 1px solid var(--iz-color-border);
   border-radius: 16px;
-  background: var(--iz-color-surface-muted);
+  background: var(--iz-color-surface);
 }
 
 .my-sales-page__toolbar-head {
@@ -120,6 +120,10 @@
 
 .my-sales-page__search {
   width: 100%;
+}
+
+.my-sales-page__search .search-input__field {
+  background: var(--iz-color-surface-muted);
 }
 
 .my-sales-page__list {

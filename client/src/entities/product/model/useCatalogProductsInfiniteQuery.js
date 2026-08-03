@@ -25,6 +25,7 @@ export function useCatalogProductsInfiniteQuery({
   catalogSort,
   myProductsModerationFilter,
   viewerRegionCode,
+  nearAllowed = true,
 }) {
   const catalogSentinelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
 
@@ -41,6 +42,7 @@ export function useCatalogProductsInfiniteQuery({
         catalogSort,
         myProductsModerationFilter,
         viewerRegionCode,
+        nearAllowed,
       }),
     [
       isMineMode,
@@ -53,6 +55,7 @@ export function useCatalogProductsInfiniteQuery({
       catalogSort,
       myProductsModerationFilter,
       viewerRegionCode,
+      nearAllowed,
     ],
   );
 
@@ -91,6 +94,7 @@ export function useCatalogProductsInfiniteQuery({
         auctionOnly: Boolean(listParams.auctionOnly),
         installmentOnly: Boolean(listParams.installmentOnly),
         saleOnly: Boolean(listParams.saleOnly),
+        near: Boolean(listParams.near),
         regionCode: listParams.regionCode || undefined,
       });
     },

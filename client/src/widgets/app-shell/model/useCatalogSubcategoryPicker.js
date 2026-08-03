@@ -94,6 +94,7 @@ export function useCatalogSubcategoryPicker({
         auctionOnly: false,
         installmentOnly: false,
         saleOnly: false,
+        near: false,
       };
       applyCatalogQueryState(nextQuery);
       setCategoryTreeLabel(null);
@@ -120,6 +121,7 @@ export function useCatalogSubcategoryPicker({
         auctionOnly: false,
         installmentOnly: false,
         saleOnly: false,
+        near: false,
       };
       applyCatalogQueryState(nextQuery);
       setCategoryTreeLabel(null);

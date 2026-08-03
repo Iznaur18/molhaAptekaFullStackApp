@@ -32,10 +32,6 @@
   );
 }
 
-.catalog-feed-tiles__card {
-  border-style: dashed;
-}
-
 .catalog-browser-landing__categories {
   margin-top: 1.15rem;
   padding-top: 0.35rem;

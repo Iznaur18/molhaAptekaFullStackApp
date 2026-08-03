@@ -14,6 +14,7 @@ export type FetchCatalogProductsPageOptions = {
   auctionOnly?: boolean;
   installmentOnly?: boolean;
   saleOnly?: boolean;
+  near?: boolean;
   regionCode?: string;
 };
 
@@ -29,6 +30,7 @@ export const fetchCatalogProductsPage = async ({
   auctionOnly,
   installmentOnly,
   saleOnly,
+  near,
   regionCode,
 }: FetchCatalogProductsPageOptions = {}) => {
   try {
@@ -47,6 +49,7 @@ export const fetchCatalogProductsPage = async ({
         ...(auctionOnly ? { auctionOnly: "true" } : {}),
         ...(installmentOnly ? { installmentOnly: "true" } : {}),
         ...(saleOnly ? { saleOnly: "true" } : {}),
+        ...(near ? { near: "true" } : {}),
         ...(regionCode?.trim() ? { regionCode: regionCode.trim() } : {}),
       },
     });

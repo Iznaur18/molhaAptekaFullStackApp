@@ -2,6 +2,7 @@ import {
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
+  CATALOG_FILTER_NEAR,
   CATALOG_FILTER_SALE_ONLY,
 } from "../../../entities/product/model/productConstants.js";
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
@@ -19,6 +20,7 @@ import {
  *   catalogAuctionOnly: boolean;
  *   catalogInstallmentOnly: boolean;
  *   catalogSaleOnly: boolean;
+ *   catalogNear: boolean;
  *   onProductCategorySelect: (
  *     category: import("../../../entities/product/model/types.js").ProductCategory | null,
  *   ) => void;
@@ -27,6 +29,7 @@ import {
  *   onCatalogAuctionOnlyToggle: () => void;
  *   onCatalogInstallmentOnlyToggle: () => void;
  *   onCatalogSaleOnlyToggle: () => void;
+ *   onCatalogNearToggle: () => void;
  * }} props
  */
 export function CatalogFilterDropdown({
@@ -37,12 +40,14 @@ export function CatalogFilterDropdown({
   catalogAuctionOnly,
   catalogInstallmentOnly,
   catalogSaleOnly,
+  catalogNear,
   onProductCategorySelect,
   onCatalogSortChange,
   onCatalogFollowingOnlyToggle,
   onCatalogAuctionOnlyToggle,
   onCatalogInstallmentOnlyToggle,
   onCatalogSaleOnlyToggle,
+  onCatalogNearToggle,
 }) {
   const listItems = buildCatalogFilterDropdownItems();
   const selectionState = {
@@ -52,6 +57,7 @@ export function CatalogFilterDropdown({
     catalogAuctionOnly,
     catalogInstallmentOnly,
     catalogSaleOnly,
+    catalogNear,
   };
 
   const handleItemClick = (item) => {
@@ -77,6 +83,10 @@ export function CatalogFilterDropdown({
     }
     if (item.value === CATALOG_FILTER_SALE_ONLY) {
       onCatalogSaleOnlyToggle();
+      return;
+    }
+    if (item.value === CATALOG_FILTER_NEAR) {
+      onCatalogNearToggle();
     }
   };
 

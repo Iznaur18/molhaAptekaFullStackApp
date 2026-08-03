@@ -354,6 +354,8 @@
 
 .my-profile-page__tab-content {
   margin-top: 0.5rem;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .my-profile-page__tab-content_lead {

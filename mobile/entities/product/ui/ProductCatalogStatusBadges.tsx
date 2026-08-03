@@ -1,3 +1,4 @@
+import { formatCatalogNearDistanceLabel } from "@molha/api-contract";
 import { ScrollView, View } from "react-native";
 
 import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCardChromeFlags";
@@ -66,6 +67,14 @@ export const ProductCatalogStatusBadges = ({
         key: "hidden",
         label: PRODUCT_CARD_UI.HIDDEN_FROM_CATALOG_BADGE,
         variant: "hidden",
+      });
+    }
+    const nearDistanceLabel = formatCatalogNearDistanceLabel(product.distanceMeters);
+    if (nearDistanceLabel) {
+      badges.push({
+        key: "near",
+        label: nearDistanceLabel,
+        variant: "near",
       });
     }
     if (flags.showRaffleBadge) {

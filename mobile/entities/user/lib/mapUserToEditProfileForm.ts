@@ -1,4 +1,6 @@
 import { USER_SOCIAL_LINK_FIELD_IDS, storedSocialUrlToInputValue, DEFAULT_VIEWER_REGION_CODE, isRuRegionCode } from "@molha/api-contract";
+import { addressValueFromUser } from "@/entities/address/lib/addressValueFromUser";
+import type { RuDeliveryAddressValue } from "@/entities/address/model/types";
 import { formatBirthDateForInput } from "@/entities/user/lib/birthDateInputMask";
 import { getUserBackgroundFocus } from "@/entities/user/lib/profileImageFocus";
 import type { ProfileImageFocus } from "@/entities/user/lib/profileImageFocus";
@@ -11,19 +13,11 @@ import {
 import { DEFAULT_USER_AVATAR_URL, USER_GENDER_NO_SELECTED } from "@/entities/user/model/constants";
 import { DEFAULT_USER_BACKGROUND_PRESET_ID } from "@/entities/user/model/userBackgroundPresets";
 
-export type StructuredAddress = {
-  city: string;
-  district: string;
-  street: string;
-  house: string;
-  flat: string;
-};
-
 export type EditProfileFormState = {
   userName: string;
   userBirthDate: string;
   userGender: "male" | "female" | "noSelected";
-  structuredAddress: StructuredAddress;
+  deliveryAddress: RuDeliveryAddressValue;
   userRegionCode: string;
   userPhoneNumber: string;
   userAvatarUrl: string;
@@ -41,6 +35,25 @@ export type EditProfileFormState = {
   socialWebsiteUrl: string;
 };
 
+export const EMPTY_DELIVERY_ADDRESS: RuDeliveryAddressValue = {
+  line: "",
+  flat: "",
+  fiasId: "",
+  geo: null,
+  regionCode: null,
+  selectedFromSuggest: false,
+};
+
+/** @deprecated alias — kept for transitional imports */
+export type StructuredAddress = {
+  city: string;
+  district: string;
+  street: string;
+  house: string;
+  flat: string;
+};
+
+/** @deprecated */
 export const EMPTY_STRUCTURED_ADDRESS: StructuredAddress = {
   city: "",
   district: "",
@@ -52,7 +65,6 @@ export const EMPTY_STRUCTURED_ADDRESS: StructuredAddress = {
 export const mapUserToEditProfileForm = (
   user: Record<string, unknown>,
 ): EditProfileFormState => {
-  const city = typeof user.userAddressCity === "string" ? user.userAddressCity.trim() : "";
   const stored = typeof user.userBackgroundUrl === "string" ? user.userBackgroundUrl : null;
   const bgFields = parseUserBackgroundFormFields(stored);
   const bgMode = resolveBackgroundModeFromUser(stored);
@@ -74,6 +86,10 @@ export const mapUserToEditProfileForm = (
     | "socialWebsiteUrl"
   >;
 
+  const deliveryAddress = addressValueFromUser(user);
+  deliveryAddress.flat =
+    typeof user.userAddressFlat === "string" ? user.userAddressFlat.trim() : "";
+
   return {
     userName: typeof user.userName === "string" ? user.userName : "",
     userBirthDate: formatBirthDateForInput(user.userBirthDate),
@@ -81,13 +97,7 @@ export const mapUserToEditProfileForm = (
       user.userGender === "male" || user.userGender === "female"
         ? user.userGender
         : USER_GENDER_NO_SELECTED,
-    structuredAddress: {
-      city,
-      district: typeof user.userAddressDistrict === "string" ? user.userAddressDistrict.trim() : "",
-      street: typeof user.userAddressStreet === "string" ? user.userAddressStreet.trim() : "",
-      house: typeof user.userAddressHouse === "string" ? user.userAddressHouse.trim() : "",
-      flat: typeof user.userAddressFlat === "string" ? user.userAddressFlat.trim() : "",
-    },
+    deliveryAddress,
     userRegionCode: isRuRegionCode(regionRaw) ? regionRaw : DEFAULT_VIEWER_REGION_CODE,
     userPhoneNumber:
       typeof user.userPhoneNumber === "string"

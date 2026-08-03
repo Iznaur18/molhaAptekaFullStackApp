@@ -12,14 +12,10 @@ export const PRODUCT_SORT_REVIEWS = "reviews";
 /** Минимум отзывов для ленты `sort=reviews`. */
 export const PRODUCT_CATALOG_REVIEWS_MIN_REVIEW_COUNT = 1;
 
-/** Каталог: сортировка по городу продажи (А→Я). */
-export const PRODUCT_SORT_CITY = "city";
-
 export const PRODUCT_SORT_VALUES = [
   PRODUCT_SORT_NEWEST,
   PRODUCT_SORT_VIEWS,
   PRODUCT_SORT_PURCHASES,
-  PRODUCT_SORT_CITY,
   PRODUCT_SORT_PREMIUM,
   PRODUCT_SORT_CONFIRMED,
   PRODUCT_SORT_REVIEWS,

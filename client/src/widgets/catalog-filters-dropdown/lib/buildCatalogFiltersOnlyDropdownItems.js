@@ -2,6 +2,7 @@ import {
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
+  CATALOG_FILTER_NEAR,
   CATALOG_FILTER_SALE_ONLY,
   CATALOG_SORT_OPTIONS,
   CATALOG_SORT_LABEL_RU,
@@ -54,6 +55,7 @@ export function buildCatalogFiltersOnlyDropdownItems() {
  *   catalogAuctionOnly: boolean;
  *   catalogInstallmentOnly: boolean;
  *   catalogSaleOnly: boolean;
+ *   catalogNear: boolean;
  * }} state
  */
 export function isCatalogFiltersDropdownItemSelected(item, state) {
@@ -71,6 +73,9 @@ export function isCatalogFiltersDropdownItemSelected(item, state) {
   }
   if (item.value === CATALOG_FILTER_SALE_ONLY) {
     return state.catalogSaleOnly;
+  }
+  if (item.value === CATALOG_FILTER_NEAR) {
+    return state.catalogNear;
   }
   return false;
 }

@@ -4,6 +4,8 @@ import { View } from "react-native";
 import { ProductCard } from "@/entities/product/ui/ProductCard";
 import { ProductCardBanner } from "@/entities/product/ui/ProductCardBanner";
 import { CatalogGridRowEnteringShell } from "@/features/catalog-grid/ui/CatalogGridRowEnteringShell";
+import { AppText } from "@/shared/ui/AppText";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 
 import type { CatalogGridRow } from "../lib/buildCatalogGridRows";
 import { catalogGridRowStyles } from "../lib/catalogGridLayout";
@@ -27,12 +29,28 @@ export const CatalogGridRowItem = memo(({
   disableEntering = false,
   highlightRaffleProduct = false,
 }: CatalogGridRowItemProps) => {
+  const theme = useAppTheme();
+
   if (!row) {
     return null;
   }
 
   const content =
-    row.kind === "tier3-banner" ? (
+    row.kind === "section-header" ? (
+      <AppText
+        style={{
+          marginTop: 16,
+          marginBottom: 8,
+          fontSize: 17,
+          fontWeight: "700",
+          lineHeight: 22,
+          color: theme.colors.ink,
+        }}
+        accessibilityRole="header"
+      >
+        {row.title}
+      </AppText>
+    ) : row.kind === "tier3-banner" ? (
       <ProductCardBanner product={row.product} />
     ) : (
       <View style={[catalogGridRowStyles.row, { gap }]}>

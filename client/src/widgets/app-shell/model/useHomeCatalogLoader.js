@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { useCatalogBrowserLanding } from "./useCatalogBrowserLanding.js";
 import { useCatalogFilterState } from "./useCatalogFilterState.js";
 import { useCatalogQuerySync } from "./useCatalogQuerySync.js";
+import { userHasCatalogNearGeo } from "../../../entities/product/lib/userHasCatalogNearGeo.js";
 import { useCatalogProductsInfiniteQuery } from "../../../entities/product/model/useCatalogProductsInfiniteQuery.js";
 import { useAppShellCompactLayout } from "../../../shared/lib/useAppShellCompactLayout.js";
 
@@ -17,7 +18,9 @@ export const useHomeCatalogLoader = ({
   isHomeCatalogMainView,
   isCatalogBrowserMainViewActive,
   isCatalogShellView,
+  authUser = null,
   isAuthorized,
+  isSessionReady = true,
   setIsLoginModalOpen,
   submittedProductSearchTerm,
   myProductsModerationFilter,
@@ -30,6 +33,8 @@ export const useHomeCatalogLoader = ({
   viewerRegionCode,
 }) => {
   const isCompactLayout = useAppShellCompactLayout();
+  const nearAllowed =
+    isSessionReady && isAuthorized && userHasCatalogNearGeo(authUser);
 
   const filters = useCatalogFilterState({
     location,
@@ -39,9 +44,12 @@ export const useHomeCatalogLoader = ({
     isCatalogShellView,
     submittedProductSearchTerm,
     initialCatalogQuery,
+    authUser,
     isAuthorized,
+    isSessionReady,
     setIsLoginModalOpen,
     setMyProductsModerationFilter,
+    navigate,
   });
 
   const browser = useCatalogBrowserLanding({
@@ -59,6 +67,7 @@ export const useHomeCatalogLoader = ({
     catalogAuctionOnly: filters.catalogAuctionOnly,
     catalogInstallmentOnly: filters.catalogInstallmentOnly,
     catalogSaleOnly: filters.catalogSaleOnly,
+    authUser,
     isAuthorized,
     setIsLoginModalOpen,
     applyCatalogQueryState: filters.applyCatalogQueryState,
@@ -83,6 +92,7 @@ export const useHomeCatalogLoader = ({
     catalogAuctionOnly: filters.catalogAuctionOnly,
     catalogInstallmentOnly: filters.catalogInstallmentOnly,
     catalogSaleOnly: filters.catalogSaleOnly,
+    catalogNear: filters.catalogNear,
     catalogQueryFromUrl: filters.catalogQueryFromUrl,
     setCatalogSort: filters.setCatalogSort,
     setSelectedProductCategory: filters.setSelectedProductCategory,
@@ -93,6 +103,7 @@ export const useHomeCatalogLoader = ({
     setCatalogAuctionOnly: filters.setCatalogAuctionOnly,
     setCatalogInstallmentOnly: filters.setCatalogInstallmentOnly,
     setCatalogSaleOnly: filters.setCatalogSaleOnly,
+    setCatalogNear: filters.setCatalogNear,
     categoryRootsRef: browser.categoryRootsRef,
   });
 
@@ -108,6 +119,7 @@ export const useHomeCatalogLoader = ({
     catalogSort: filters.catalogSort,
     myProductsModerationFilter,
     viewerRegionCode,
+    nearAllowed,
   });
 
   // Спиннер в поле поиска — про реальную загрузку отправленного запроса
@@ -134,6 +146,7 @@ export const useHomeCatalogLoader = ({
     catalogAuctionOnly: filters.catalogAuctionOnly,
     catalogInstallmentOnly: filters.catalogInstallmentOnly,
     catalogSaleOnly: filters.catalogSaleOnly,
+    catalogNear: filters.catalogNear,
     categoryRoots: browser.categoryRoots,
     categoryDisplays: browser.categoryDisplays,
     feedTileDisplays: browser.feedTileDisplays,
@@ -161,6 +174,7 @@ export const useHomeCatalogLoader = ({
     handleCatalogAuctionOnlyToggle: filters.handleCatalogAuctionOnlyToggle,
     handleCatalogSaleOnlyToggle: filters.handleCatalogSaleOnlyToggle,
     handleCatalogInstallmentOnlyToggle: filters.handleCatalogInstallmentOnlyToggle,
+    handleCatalogNearToggle: filters.handleCatalogNearToggle,
     handleRetryCatalogLoadMore: catalogQuery.handleRetryCatalogLoadMore,
     handleProductCategorySelect,
     handleNavigateToFullCatalogFromBreadcrumb:

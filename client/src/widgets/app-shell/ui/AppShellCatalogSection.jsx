@@ -57,6 +57,7 @@ import { MyProductsCatalogSection } from "../../my-products-page/ui/MyProductsCa
  *   catalogAuctionOnly: boolean;
  *   catalogInstallmentOnly: boolean;
  *   catalogSaleOnly: boolean;
+ *   catalogNear?: boolean;
  *   showFullWidthTier3Banners?: boolean;
  *   sellerRaffleActive: boolean;
  *   onToggleRaffleParticipation: (productId: string, participate: boolean) => void;
@@ -109,6 +110,7 @@ export function AppShellCatalogGridSection({
   catalogAuctionOnly,
   catalogInstallmentOnly,
   catalogSaleOnly,
+  catalogNear = false,
   showFullWidthTier3Banners = false,
   sellerRaffleActive,
   onToggleRaffleParticipation,
@@ -229,6 +231,7 @@ export function AppShellCatalogGridSection({
           catalogAuctionOnly={catalogAuctionOnly}
           catalogInstallmentOnly={catalogInstallmentOnly}
           catalogSaleOnly={catalogSaleOnly}
+          catalogNear={catalogNear}
           showFullWidthTier3Banners={showFullWidthTier3Banners}
           sellerRaffleActive={sellerRaffleActive}
           onToggleRaffleParticipation={onToggleRaffleParticipation}

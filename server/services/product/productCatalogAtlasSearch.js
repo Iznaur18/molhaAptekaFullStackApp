@@ -33,26 +33,20 @@ const sellerLookupStages = () => [
 
 /**
  * @param {string} sort
- * @param {string | null} [buyerCity]
  * @param {string | null} [viewerRegionCode]
  */
-const sortStagesForAtlasCatalog = (sort, buyerCity = null, viewerRegionCode = null) => {
+const sortStagesForAtlasCatalog = (sort, viewerRegionCode = null) => {
   const stages = [];
   if (sort === PRODUCT_SORT_NEWEST) {
     stages.push(catalogPromotionSortBoostAddFieldsStage);
   }
 
-  const sortStage = buildCatalogPromotionSortStage(sort, {
-    useSearchRank: true,
-    searchScoreField: "_searchScore",
-    buyerCity,
-  });
-
-  if (Array.isArray(sortStage)) {
-    stages.push(...sortStage);
-  } else {
-    stages.push(sortStage);
-  }
+  stages.push(
+    buildCatalogPromotionSortStage(sort, {
+      useSearchRank: true,
+      searchScoreField: "_searchScore",
+    }),
+  );
 
   return withCatalogRegionPrioritySort(stages, viewerRegionCode);
 };
@@ -62,7 +56,7 @@ const sortStagesForAtlasCatalog = (sort, buyerCity = null, viewerRegionCode = nu
  * @param {string} sort
  * @param {number} skip
  * @param {number} limit
- * @param {string | null} [buyerCity]
+ * @param {string | null} [_buyerCity]
  * @param {string | null} [viewerRegionCode]
  */
 export const findCatalogProductsPageAtlas = async (
@@ -70,7 +64,7 @@ export const findCatalogProductsPageAtlas = async (
   sort,
   skip,
   limit,
-  buyerCity = null,
+  _buyerCity = null,
   viewerRegionCode = null,
 ) => {
   if (!searchResult.atlasSearch) {
@@ -83,7 +77,7 @@ export const findCatalogProductsPageAtlas = async (
     buildProductAtlasSearchStage(searchResult.atlasSearch),
     { $addFields: { _searchScore: { $meta: "searchScore" } } },
     { $match: normalizeProductsQueryForAggregate(searchResult.baseQuery) },
-    ...sortStagesForAtlasCatalog(sort, buyerCity, viewerRegionCode),
+    ...sortStagesForAtlasCatalog(sort, viewerRegionCode),
     { $skip: skip },
     { $limit: limit },
     ...sellerLookupStages(),

@@ -48,6 +48,21 @@ describe("productPickup + order fulfillment", () => {
     assert.equal(parsed.success, true);
   });
 
+  it("rejects create without coords", () => {
+    const parsed = createProductBodySchema.safeParse({
+      productName: "Тестовый товар",
+      productDescription: "Описание товара достаточно длинное",
+      productImageUrls: ["/uploads/a.jpg"],
+      productPrice: 100,
+      productIsAvailable: true,
+      productListingOrigin: "own",
+      productIsOriginal: true,
+      productCategory: "electronics",
+      productPickupAddress: "Москва, Тверская 1",
+    });
+    assert.equal(parsed.success, false);
+  });
+
   it("rejects create when no fulfillment method selected", () => {
     const parsed = createProductBodySchema.safeParse({
       productName: "Тестовый товар",
@@ -60,6 +75,8 @@ describe("productPickup + order fulfillment", () => {
       productCategory: "electronics",
       productRegionCode: "RU-MOW",
       productPickupAddress: "Москва, Тверская 1",
+      productPickupLat: 55.75,
+      productPickupLon: 37.62,
       productPickupEnabled: false,
       productDeliveryEnabled: false,
     });

@@ -1,4 +1,12 @@
-import { PRODUCT_IMAGE_URLS_MAX, PRODUCT_NAME_MAX_LENGTH, DEFAULT_VIEWER_REGION_CODE, PRODUCT_PICKUP_ADDRESS_MIN_LENGTH, PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE, isRuRegionCode } from "@molha/api-contract";
+import {
+  DEFAULT_VIEWER_REGION_CODE,
+  getRuRegionByCode,
+  isRuRegionCode,
+  PRODUCT_IMAGE_URLS_MAX,
+  PRODUCT_NAME_MAX_LENGTH,
+  PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
+  PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
+} from "@molha/api-contract";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -39,7 +47,6 @@ import { useMyProductsInfiniteQuery } from "@/entities/product/model/useMyProduc
 import { ProductCharacteristicsEditor } from "@/entities/product/ui/ProductCharacteristicsEditor";
 import { ProductPickupLocationFields } from "@/entities/product/ui/ProductPickupLocationFields";
 import { ProductReturnTermsEditor } from "@/entities/product/ui/ProductReturnTermsEditor";
-import { RuRegionSelect } from "@/entities/region/ui/RuRegionSelect";
 import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
 import { CreateProductCategoryPicker } from "@/features/create-product/ui/CreateProductCategoryPicker";
 import { ProductPhotoGrid } from "@/features/image-upload/ui/ProductPhotoGrid";
@@ -245,16 +252,13 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
     if (!productCategoryId) {
       return CREATE_PRODUCT_UI.ERROR_CATEGORY;
     }
-    if (!isRuRegionCode(productRegionCode)) {
-      return CREATE_PRODUCT_UI.ERROR_SALE_REGION_REQUIRED;
-    }
     const pickupAddress = productPickupAddress.trim();
     if (pickupAddress.length < PRODUCT_PICKUP_ADDRESS_MIN_LENGTH) {
       return PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE;
     }
     const hasLat = productPickupLat != null && Number.isFinite(productPickupLat);
     const hasLon = productPickupLon != null && Number.isFinite(productPickupLon);
-    if (hasLat !== hasLon) {
+    if (!hasLat || !hasLon) {
       return CREATE_PRODUCT_UI.ERROR_PICKUP_COORDS;
     }
     if (productImageUrls.length === 0) {
@@ -317,7 +321,9 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
           productPrice: parseRubPriceInput(productPrice) ?? 0,
           productOldPrice: oldPriceRaw ? oldPrice : null,
           productCategoryId: productCategoryId ?? undefined,
-          productRegionCode: productRegionCode.trim(),
+          ...(isRuRegionCode(productRegionCode.trim())
+            ? { productRegionCode: productRegionCode.trim() }
+            : {}),
           productPickupAddress: productPickupAddress.trim(),
           productPickupLat: hasLat ? productPickupLat : null,
           productPickupLon: hasLon ? productPickupLon : null,
@@ -611,15 +617,11 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
               }}
             />
 
-            <RuRegionSelect
-              value={productRegionCode}
-              disabled={isBusy}
-              required
-              label={CREATE_PRODUCT_UI.LABEL_SALE_REGION}
-              onChange={setProductRegionCode}
-            />
             <Text style={[styles.hint, { color: theme.colors.textSecondary }]}>
-              {CREATE_PRODUCT_UI.HINT_SALE_REGION}
+              {CREATE_PRODUCT_UI.LABEL_SALE_REGION}
+              {": "}
+              {getRuRegionByCode(productRegionCode)?.name ||
+                CREATE_PRODUCT_UI.HINT_SALE_REGION_FROM_ADDRESS}
             </Text>
 
             <ProductPickupLocationFields
@@ -635,6 +637,9 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
                 setProductPickupLon(next.productPickupLon);
                 setProductPickupEnabled(next.productPickupEnabled !== false);
                 setProductDeliveryEnabled(next.productDeliveryEnabled === true);
+                if (next.productRegionCode) {
+                  setProductRegionCode(next.productRegionCode);
+                }
               }}
             />
           </View>

@@ -8,11 +8,76 @@ export const PRODUCT_CATALOG_SORT_VALUES = [
   "newest",
   "views",
   "purchases",
-  "city",
   "premium",
   "confirmed",
   "reviews",
 ];
+
+/** Каталог «Рядом» — радиус от адреса профиля (этап A). */
+export const PRODUCT_CATALOG_NEAR_RADIUS_KM = 30;
+export const PRODUCT_CATALOG_NEAR_RADIUS_METERS =
+  PRODUCT_CATALOG_NEAR_RADIUS_KM * 1000;
+export const PRODUCT_CATALOG_NEAR_AUTH_MESSAGE =
+  "Войдите, чтобы смотреть товары рядом";
+export const PRODUCT_CATALOG_NEAR_ADDRESS_REQUIRED_MESSAGE =
+  "Укажите адрес в профиле";
+
+export const PRODUCT_CATALOG_NEAR_REGION_SECTION_TITLE = "В вашем регионе";
+
+/**
+ * Подпись дистанции для каталога «Рядом».
+ * &lt;10 км → `~1.2 км` (1 знак, мин. 0.1); ≥10 → `~12 км`.
+ *
+ * @param {unknown} distanceMeters
+ * @returns {string | null}
+ */
+export function formatCatalogNearDistanceLabel(distanceMeters) {
+  if (distanceMeters == null || distanceMeters === "") {
+    return null;
+  }
+  const meters = Number(distanceMeters);
+  if (!Number.isFinite(meters) || meters < 0) {
+    return null;
+  }
+  const km = meters / 1000;
+  if (km < 10) {
+    const tenths = Math.max(1, Math.round(km * 10));
+    return `~${(tenths / 10).toFixed(1)} км`;
+  }
+  return `~${Math.round(km)} км`;
+}
+
+/**
+ * @template T
+ * @param {T[]} products
+ * @returns {{ withDistance: T[]; withoutDistance: T[] }}
+ */
+export function splitCatalogNearProducts(products) {
+  /** @type {T[]} */
+  const withDistance = [];
+  /** @type {T[]} */
+  const withoutDistance = [];
+  if (!Array.isArray(products)) {
+    return { withDistance, withoutDistance };
+  }
+  for (const product of products) {
+    const raw =
+      product && typeof product === "object"
+        ? /** @type {{ distanceMeters?: unknown }} */ (product).distanceMeters
+        : undefined;
+    if (raw == null || raw === "") {
+      withoutDistance.push(product);
+      continue;
+    }
+    const meters = Number(raw);
+    if (Number.isFinite(meters)) {
+      withDistance.push(product);
+    } else {
+      withoutDistance.push(product);
+    }
+  }
+  return { withDistance, withoutDistance };
+}
 
 /** Slug категории — синхрон с `server/constants/productConstants.js`. */
 export const PRODUCT_CATEGORY_SLUGS = [
@@ -88,6 +153,8 @@ export const catalogProductsQuerySchema = z.object({
   auctionOnly: optionalTruthyFlag,
   installmentOnly: optionalTruthyFlag,
   saleOnly: optionalTruthyFlag,
+  /** Товары рядом с адресом профиля (см. PRODUCT_CATALOG_NEAR_RADIUS_KM). */
+  near: optionalTruthyFlag,
   moderationStatus: z.enum(["pending", "rejected"]).optional(),
   regionCode: optionalRuRegionCodeFieldSchema,
 });

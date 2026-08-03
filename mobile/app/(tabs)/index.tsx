@@ -173,6 +173,7 @@ export default function CatalogScreen() {
         auctionOnly: pending.auctionOnly === true,
         installmentOnly: pending.installmentOnly === true,
         saleOnly: pending.saleOnly === true,
+        near: pending.near === true,
       });
     }, []),
   );
@@ -190,6 +191,7 @@ export default function CatalogScreen() {
       auctionOnly: feedFilters.auctionOnly || undefined,
       installmentOnly: feedFilters.installmentOnly || undefined,
       saleOnly: feedFilters.saleOnly || undefined,
+      near: feedFilters.near || undefined,
       regionCode: viewerRegionCode || undefined,
     }),
     [
@@ -225,6 +227,7 @@ export default function CatalogScreen() {
         auctionOnly: feedFilters.auctionOnly === true,
         installmentOnly: feedFilters.installmentOnly === true,
         saleOnly: feedFilters.saleOnly === true,
+        near: feedFilters.near === true,
       }),
     [submittedSearch, feedFilters, selectedRootSlug, selectedSubcategoryId, selectedSellerPersonalCategoryId],
   );
@@ -258,9 +261,14 @@ export default function CatalogScreen() {
         catalogAuctionOnly: feedFilters.auctionOnly === true,
         catalogInstallmentOnly: feedFilters.installmentOnly === true,
         catalogSaleOnly: feedFilters.saleOnly === true,
+        catalogNear: feedFilters.near === true,
       }),
     [submittedSearch, feedFilters, selectedRootSlug, selectedSubcategoryId, showHomeFeed],
   );
+
+  const catalogEmptyLabel = feedFilters.near
+    ? API_CLIENT_UI.CATALOG_EMPTY_NEAR
+    : API_CLIENT_UI.CATALOG_EMPTY;
 
   const homeFeedContentReady = useHomeFeedContentReady({
     enabled: showHomeFeed,
@@ -367,8 +375,14 @@ export default function CatalogScreen() {
     () =>
       buildCatalogGridRows(catalogQuery.products, productGrid.columns, {
         showFullWidthTier3Banners,
+        catalogNear: feedFilters.near === true,
       }),
-    [catalogQuery.products, productGrid.columns, showFullWidthTier3Banners],
+    [
+      catalogQuery.products,
+      feedFilters.near,
+      productGrid.columns,
+      showFullWidthTier3Banners,
+    ],
   );
 
   const homeFeedListRows = useMemo(
@@ -414,7 +428,7 @@ export default function CatalogScreen() {
       showCuratedLists={showCuratedProductLists}
       catalogBreadcrumbLabel={catalogBreadcrumbLabel}
       isCatalogEmpty={false}
-      emptyLabel={API_CLIENT_UI.CATALOG_EMPTY}
+      emptyLabel={catalogEmptyLabel}
       styles={styles}
     />
   );
@@ -426,12 +440,13 @@ export default function CatalogScreen() {
         showCuratedLists={showCuratedProductLists}
         catalogBreadcrumbLabel={catalogBreadcrumbLabel}
         isCatalogEmpty={catalogGridRows.length === 0}
-        emptyLabel={API_CLIENT_UI.CATALOG_EMPTY}
+        emptyLabel={catalogEmptyLabel}
         styles={styles}
       />
     ),
     [
       catalogBreadcrumbLabel,
+      catalogEmptyLabel,
       catalogGridRows.length,
       showCuratedProductLists,
       styles,
@@ -759,7 +774,7 @@ export default function CatalogScreen() {
           onEndReachedThreshold={0.4}
           ListEmptyComponent={
             <View style={styles.centered}>
-              <Text style={styles.empty}>{API_CLIENT_UI.CATALOG_EMPTY}</Text>
+              <Text style={styles.empty}>{catalogEmptyLabel}</Text>
             </View>
           }
           ListFooterComponent={

@@ -4,12 +4,12 @@ import { verifyRuDeliveryAddress } from "../utils/dadata/verifyRuDeliveryAddress
 import { errorRes } from "../services/http/index.js";
 import { validateRuDeliveryAddress } from "./validateRuDeliveryAddress.js";
 
+/** Только city/street/house/district — `userAddressFlat` приходит и с line-адресом. */
 const STRUCTURED_ADDRESS_FIELDS = [
   "userAddressCity",
   "userAddressDistrict",
   "userAddressStreet",
   "userAddressHouse",
-  "userAddressFlat",
 ];
 
 /**

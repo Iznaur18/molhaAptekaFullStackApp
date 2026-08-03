@@ -43,7 +43,8 @@
   padding-bottom: var(--iz-space-8);
   overflow: hidden;
   border: none;
-  border-radius: var(--iz-radius-md);
+  border-radius: 1.75rem;
+  corner-shape: squircle;
   background: var(--iz-color-surface);
   pointer-events: auto;
   animation: report-product-modal-sheet-in var(--report-product-enter-ms)

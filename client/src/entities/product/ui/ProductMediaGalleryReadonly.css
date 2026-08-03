@@ -150,10 +150,17 @@
   flex-shrink: 0;
   padding: 0;
   border: 2px solid transparent;
-  border-radius: 0.35rem;
+  border-radius: 22%;
   overflow: hidden;
   cursor: pointer;
   background: var(--iz-color-border);
+}
+
+@supports (corner-shape: squircle) {
+  .product-media-gallery-readonly__thumb {
+    border-radius: 28%;
+    corner-shape: squircle;
+  }
 }
 
 .product-media-gallery-readonly__thumb img {

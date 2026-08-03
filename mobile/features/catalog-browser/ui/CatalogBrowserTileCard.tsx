@@ -33,7 +33,7 @@ export const CatalogBrowserTileCard = ({
   columns,
   gap,
   contentWidth,
-  variant = "category",
+  variant: _variant = "category",
   disabled = false,
   pending = false,
   onPress,
@@ -43,18 +43,13 @@ export const CatalogBrowserTileCard = ({
   const styles = useCatalogBrowserTileStyles();
   const { theme } = useAppThemeSettings();
   const resolvedImageUrl = resolveCategoryDisplayTileImageUri(imageUrl, placeholderImageUrl);
-  const isFeedTile = variant === "feed";
   const widthStyle = resolveFlexGridItemWidthStyle({ contentWidth, columns, gap });
   const nativeHeightStyle = Platform.OS === "web" ? null : { height: tileWidth };
 
   return (
     <View style={[styles.wrap, widthStyle, nativeHeightStyle]}>
       <Pressable
-        style={[
-          styles.card,
-          isFeedTile && styles.cardFeed,
-          (disabled || pending) && styles.cardPending,
-        ]}
+        style={[styles.card, (disabled || pending) && styles.cardPending]}
         onPress={onPress}
         disabled={disabled || pending}
         accessibilityRole="button"

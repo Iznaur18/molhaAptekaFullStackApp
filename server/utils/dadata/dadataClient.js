@@ -2,7 +2,13 @@ import { DADATA_SUGGEST_COUNT } from "../../constants/dadataConstants.js";
 
 const SUGGEST_URL =
   "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address";
+const GEOLOCATE_URL =
+  "https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address";
 const CLEAN_URL = "https://cleaner.dadata.ru/api/v1/clean/address";
+
+export function isDadataSuggestConfigured() {
+  return Boolean(process.env.DADATA_API_KEY?.trim());
+}
 
 export function isDadataConfigured() {
   return Boolean(
@@ -46,6 +52,31 @@ export async function suggestRuAddresses(query) {
 
   if (!response.ok) {
     throw new Error(`DaData suggest: HTTP ${response.status}`);
+  }
+
+  const json = await response.json();
+  return Array.isArray(json?.suggestions) ? json.suggestions : [];
+}
+
+/**
+ * @param {number} lat
+ * @param {number} lon
+ * @returns {Promise<{ value: string; unrestricted_value: string; data: Record<string, unknown> }[]>}
+ */
+export async function geolocateRuAddresses(lat, lon) {
+  const response = await fetch(GEOLOCATE_URL, {
+    method: "POST",
+    headers: getSuggestHeaders(),
+    body: JSON.stringify({
+      lat,
+      lon,
+      count: 1,
+      radius_meters: 100,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`DaData geolocate: HTTP ${response.status}`);
   }
 
   const json = await response.json();

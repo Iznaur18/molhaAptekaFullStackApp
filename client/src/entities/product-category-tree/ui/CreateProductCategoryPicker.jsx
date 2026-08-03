@@ -1,8 +1,5 @@
 import { useState } from "react";
 
-import { CreateProductCategorySelect } from "../../product/ui/CreateProductCategorySelect.jsx";
-import { IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED } from "../lib/isProductCategoryTreePickerEnabled.js";
-import { PRODUCT_CATEGORY_ELECTRONICS } from "../../product/model/productConstants.js";
 import { buildCategoryBreadcrumbFromNode } from "../lib/buildCategoryBreadcrumbFromNode.js";
 import { useProductCategoryLevelQuery } from "../model/useProductCategoryLevelQuery.js";
 import { useProductCategoryRootsQuery } from "../model/useProductCategoryRootsQuery.js";
@@ -26,35 +23,7 @@ import "./CreateProductCategoryPicker.css";
  *   disabled?: boolean;
  * }} props
  */
-function LegacyProductCategoryPicker({ value, onChange, disabled = false }) {
-  return (
-    <CreateProductCategorySelect
-      value={value.productCategory ?? PRODUCT_CATEGORY_ELECTRONICS}
-      disabled={disabled}
-      onChange={(productCategory) =>
-        onChange({
-          productCategoryId: null,
-          categoryBreadcrumbRu: "",
-          productCategory,
-          defaultCharacteristicKeys: [],
-        })
-      }
-    />
-  );
-}
-
-/**
- * @param {{
- *   value: ProductCategoryFormValue;
- *   onChange: (next: ProductCategoryFormValue) => void;
- *   disabled?: boolean;
- * }} props
- */
 export function CreateProductCategoryPicker(props) {
-  if (!IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED) {
-    return <LegacyProductCategoryPicker {...props} />;
-  }
-
   return <ProductCategoryTreePicker {...props} />;
 }
 

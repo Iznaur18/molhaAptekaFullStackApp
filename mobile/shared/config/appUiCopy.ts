@@ -13,6 +13,7 @@ export const API_CLIENT_UI = {
   TIMEOUT_ERROR: "Превышено время ожидания ответа",
   API_URL_MISSING: "Не задан EXPO_PUBLIC_API_URL",
   CATALOG_EMPTY: "Товаров пока нет",
+  CATALOG_EMPTY_NEAR: "Нет товаров рядом с вашим адресом.",
   CATALOG_ERROR: "Ошибка загрузки каталога",
   FETCH_CART_FALLBACK: "Не удалось загрузить корзину",
   REPLACE_CART_FALLBACK: "Не удалось обновить корзину",
@@ -350,6 +351,7 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   SLIDER_REGION_ARIA: "Слайдер фотографий товара",
   DETAILS_SECTION_ARIA: "Описание и служебная информация о товаре",
   SALE_CITY_ALL: "Во всех городах",
+  ADDRESS_EMPTY: "Адрес не указан",
   CHARACTERISTICS_TITLE: "Характеристики",
   CHARACTERISTICS_SECTION_ARIA: "Характеристики товара",
   DESCRIPTION_SECTION_ARIA: "Описание товара",
@@ -378,7 +380,7 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   AFFILIATE_SHARE_SUBTITLE: (percent: number) => `Заработать ${percent}% с покупки`,
   AFFILIATE_SHARE_LOGIN: "Войдите, чтобы делиться",
   AFFILIATE_SHARE_LOGIN_TITLE: "Войдите, чтобы делиться",
-  AFFILIATE_SHARE_LOGIN_SUBTITLE: "Зарабатывайте на рекомендациях",
+  AFFILIATE_SHARE_LOGIN_SUBTITLE: "Заработай от продажи",
   AFFILIATE_SHARE_COPIED: "Ссылка скопирована",
   AFFILIATE_SHARE_FAILED: "Не удалось скопировать ссылку",
   AFFILIATE_PERCENT_HINT:
@@ -914,8 +916,8 @@ export const CHECKOUT_FORM_UI = {
   FULFILLMENT_PICKUP: "Самовывоз",
   FULFILLMENT_DELIVERY: "Доставка",
   FULFILLMENT_DELIVERY_SOON: "Скоро",
-  FULFILLMENT_DELIVERY_UNAVAILABLE: "недоступна для выбранных товаров",
-  FULFILLMENT_PICKUP_UNAVAILABLE: "недоступен для выбранных товаров",
+  FULFILLMENT_DELIVERY_UNAVAILABLE: "Доставка недоступна для выбранных товаров",
+  FULFILLMENT_PICKUP_UNAVAILABLE: "Самовывоз недоступен для выбранных товаров",
   PICKUP_ADDRESS_LABEL: "Адрес самовывоза",
   LABEL_DELIVERY_ADDRESS: "Адрес доставки",
   PLACEHOLDER_DELIVERY_ADDRESS: "Город, улица, дом",
@@ -950,7 +952,7 @@ export const PRODUCT_PICKUP_UI = {
   PICKUP_HINT: "Укажите адрес и отметьте точку на карте (или выберите из подсказок).",
   DELIVERY_CARRIERS_HINT:
     "Покупатель укажет адрес доставки. Службы СДЭК / Яндекс / Почта — позже; пока доставляете сами.",
-  ADDRESS_LABEL: "Адрес самовывоза",
+  ADDRESS_LABEL: "Адрес продажи",
   ADDRESS_LABEL_WAREHOUSE: "Адрес точки отправления",
   MAP_ARIA: "Карта точки самовывоза",
   MAP_KEY_MISSING:
@@ -959,10 +961,14 @@ export const PRODUCT_PICKUP_UI = {
   DETAILS_ROUTE: "Маршрут",
   DETAILS_OPEN_MAP: "Открыть на карте",
   DETAILS_NO_ADDRESS: "Адрес самовывоза не указан",
+  DETAILS_DELIVERY_HINT: "Адрес укажете при оформлении заказа",
 } as const;
 
 export const ADDRESS_DELIVERY_UI = {
-  LABEL_LINE: "Адрес доставки",
+  LABEL_LINE: "Адрес (город, улица, дом)",
+  PLACEHOLDER_LINE: "Начните вводить адрес",
+  HINT_LINE: "Выберите вариант из подсказок DaData",
+  LABEL_FLAT: "Квартира / офис",
   SUGGESTIONS_LOADING: "Загрузка подсказок…",
   NO_SUGGESTIONS: "Ничего не найдено",
 } as const;
@@ -1433,6 +1439,10 @@ export const CATALOG_BROWSER_UI = {
   LOADING: "Загрузка…",
   ERROR: "Не удалось загрузить каталог",
   LOGIN_FOR_FOLLOWING: "Войдите, чтобы смотреть товары продавцов из подписок",
+  LOGIN_FOR_NEAR: "Войдите, чтобы смотреть товары рядом",
+  NEAR_ADDRESS_REQUIRED: "Укажите адрес в профиле, чтобы смотреть товары рядом",
+  NEAR_ADDRESS_OPEN_PROFILE: "Указать адрес",
+  NEAR_REGION_SECTION: "В вашем регионе",
 } as const;
 
 export const PRODUCT_CATEGORY_DISPLAY_UI = {
@@ -1584,8 +1594,10 @@ export const CREATE_PRODUCT_UI = {
   REMOVE_CHARACTERISTIC: "Удалить характеристику",
   LABEL_CATEGORY: "Категория",
   LABEL_SALE_REGION: "Регион продажи",
+  LABEL_PICKUP_ADDRESS: "Адрес продажи",
   HINT_SALE_REGION: "Товар будет виден покупателям этого региона",
-  ERROR_SALE_REGION_REQUIRED: "Выберите регион продажи",
+  HINT_SALE_REGION_FROM_ADDRESS: "Определится из адреса продажи",
+  ERROR_SALE_REGION_REQUIRED: "Укажите адрес продажи с известным регионом",
   CATEGORY_PLACEHOLDER: "Выберите конечную подкатегорию",
   CATEGORY_FIELD_PLACEHOLDER: "Выбрать категорию",
   CATEGORY_SHEET_TITLE: "Категория",
@@ -1815,7 +1827,7 @@ export const SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI = {
     "Ваш баннер появится в карусели под шапкой на главной после модерации. Показ длится 7 дней. Одновременно доступно до 200 платных слотов.",
   STATUS_PENDING: "На модерации. Баллы зарезервированы.",
   STATUS_ACTIVE: "Показ активен.",
-  SUBMIT: "Отправить на модерацию",
+  SUBMIT: "Подтвердить",
   CANCEL: "Отменить заявку",
   PREVIEW: "Предпросмотр",
   OPEN_FORM: "Оформить баннер",
@@ -1860,7 +1872,7 @@ export const SELLER_PERSONAL_CATEGORY_PAGE_UI = {
   CANCEL_FALLBACK: "Не удалось отменить заявку",
   CANCEL_SUCCESS: "Заявка отменена",
   OPEN_FORM: "Купить личную категорию",
-  SUBMIT: "Отправить на модерацию",
+  SUBMIT: "Подтвердить",
   CANCEL: "Отменить заявку",
   LABEL_NAME: "Название категории",
   LABEL_IMAGE: "Картинка плитки",

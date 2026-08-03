@@ -10,6 +10,9 @@ import {
   MY_PRODUCTS_MODERATION_FILTER_ALL,
 } from "../../../entities/product/model/productConstants.js";
 import { parseCatalogQueryFromSearchParams } from "../../../entities/product/lib/catalogCatalogQuery.js";
+import { userHasCatalogNearGeo } from "../../../entities/product/lib/userHasCatalogNearGeo.js";
+import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { mainViewToPathname } from "../../../shared/lib/homeMainViewPaths.js";
 import {
   readInitialCatalogCategory,
   readInitialCatalogQuery,
@@ -26,9 +29,12 @@ export function useCatalogFilterState({
   isCatalogShellView,
   submittedProductSearchTerm,
   initialCatalogQuery,
+  authUser = null,
   isAuthorized,
+  isSessionReady = true,
   setIsLoginModalOpen,
   setMyProductsModerationFilter,
+  navigate,
 }) {
   const [selectedProductCategory, setSelectedProductCategory] = useState(() =>
     readInitialCatalogCategory(),
@@ -54,6 +60,9 @@ export function useCatalogFilterState({
   );
   const [catalogSaleOnly, setCatalogSaleOnly] = useState(
     () => initialCatalogQuery?.saleOnly ?? false,
+  );
+  const [catalogNear, setCatalogNear] = useState(
+    () => initialCatalogQuery?.near ?? false,
   );
 
   const catalogQueryFromUrl = useMemo(
@@ -100,6 +109,7 @@ export function useCatalogFilterState({
       const next = !prev;
       if (next) {
         setCatalogAuctionOnly(false);
+        setCatalogNear(false);
       }
       return next;
     });
@@ -110,6 +120,7 @@ export function useCatalogFilterState({
       const next = !prev;
       if (next) {
         setCatalogFollowingOnly(false);
+        setCatalogNear(false);
         setCatalogSort((currentSort) =>
           currentSort === CATALOG_SORT_VIEWS ? CATALOG_SORT_NEWEST : currentSort,
         );
@@ -119,12 +130,49 @@ export function useCatalogFilterState({
   }, []);
 
   const handleCatalogSaleOnlyToggle = useCallback(() => {
-    setCatalogSaleOnly((prev) => !prev);
+    setCatalogSaleOnly((prev) => {
+      const next = !prev;
+      if (next) {
+        setCatalogNear(false);
+      }
+      return next;
+    });
   }, []);
 
   const handleCatalogInstallmentOnlyToggle = useCallback(() => {
-    setCatalogInstallmentOnly((prev) => !prev);
+    setCatalogInstallmentOnly((prev) => {
+      const next = !prev;
+      if (next) {
+        setCatalogNear(false);
+      }
+      return next;
+    });
   }, []);
+
+  const handleCatalogNearToggle = useCallback(() => {
+    if (!isAuthorized) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+    if (catalogNear) {
+      setCatalogNear(false);
+      return;
+    }
+    if (!userHasCatalogNearGeo(authUser)) {
+      const openProfile = window.confirm(
+        `${HOME_PAGE_UI.NEAR_ADDRESS_REQUIRED}\n\n${HOME_PAGE_UI.NEAR_ADDRESS_REQUIRED_CONFIRM}`,
+      );
+      if (openProfile && typeof navigate === "function") {
+        navigate(mainViewToPathname("edit-profile"));
+      }
+      return;
+    }
+    setCatalogFollowingOnly(false);
+    setCatalogAuctionOnly(false);
+    setCatalogInstallmentOnly(false);
+    setCatalogSaleOnly(false);
+    setCatalogNear(true);
+  }, [authUser, catalogNear, isAuthorized, navigate, setIsLoginModalOpen]);
 
   const applyCatalogQueryState = useCallback(
     ({
@@ -136,6 +184,7 @@ export function useCatalogFilterState({
       auctionOnly,
       installmentOnly,
       saleOnly,
+      near = false,
     }) => {
       setCatalogSort(sort);
       setSelectedProductCategory(category);
@@ -148,6 +197,7 @@ export function useCatalogFilterState({
       setCatalogAuctionOnly(auctionOnly);
       setCatalogInstallmentOnly(installmentOnly);
       setCatalogSaleOnly(saleOnly);
+      setCatalogNear(near);
     },
     [],
   );
@@ -157,6 +207,15 @@ export function useCatalogFilterState({
       setMyProductsModerationFilter(MY_PRODUCTS_MODERATION_FILTER_ALL);
     }
   }, [isMineMode, setMyProductsModerationFilter]);
+
+  useEffect(() => {
+    if (!isSessionReady || !catalogNear) {
+      return;
+    }
+    if (!isAuthorized || !userHasCatalogNearGeo(authUser)) {
+      setCatalogNear(false);
+    }
+  }, [authUser, catalogNear, isAuthorized, isSessionReady]);
 
   useEffect(() => {
     if (
@@ -169,6 +228,7 @@ export function useCatalogFilterState({
 
   const resetCatalogFollowingOnLogout = useCallback(() => {
     setCatalogFollowingOnly(false);
+    setCatalogNear(false);
   }, []);
 
   return {
@@ -190,6 +250,8 @@ export function useCatalogFilterState({
     setCatalogInstallmentOnly,
     catalogSaleOnly,
     setCatalogSaleOnly,
+    catalogNear,
+    setCatalogNear,
     appliedProductSearchTerm,
     catalogQueryFromUrl,
     hasProductSearchQuery,
@@ -204,6 +266,7 @@ export function useCatalogFilterState({
     handleCatalogAuctionOnlyToggle,
     handleCatalogSaleOnlyToggle,
     handleCatalogInstallmentOnlyToggle,
+    handleCatalogNearToggle,
     applyCatalogQueryState,
     resetCatalogFollowingOnLogout,
   };

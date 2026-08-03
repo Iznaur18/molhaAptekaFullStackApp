@@ -114,7 +114,7 @@
   gap: 0.625rem;
   padding: 1rem;
   border: 1px solid var(--iz-color-border);
-  border-radius: 0.875rem;
+  border-radius: 1.125rem;
   background: var(--iz-color-surface);
 }
 
@@ -140,7 +140,7 @@
   padding: 0.75rem 0.875rem;
   border: 1px solid var(--iz-color-border);
   border-radius: 0.75rem;
-  background: var(--iz-color-surface);
+  background: var(--iz-color-surface-muted);
   color: var(--iz-color-text);
   font: inherit;
   font-size: 1.125rem;
@@ -206,7 +206,7 @@
   gap: 0.75rem;
   padding: 1rem;
   border: 1px solid var(--iz-color-border);
-  border-radius: 0.875rem;
+  border-radius: 1.125rem;
   background: var(--iz-color-surface);
 }
 

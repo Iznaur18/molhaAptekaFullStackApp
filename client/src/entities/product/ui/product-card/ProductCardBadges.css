@@ -49,7 +49,8 @@
   line-height: var(--product-card-overlay-badge-line-height, 12px);
 }
 
-.product-card__auction-badge {
+.product-card__auction-badge,
+.product-card__near-badge {
   margin: 0;
   padding: var(--product-card-overlay-badge-pad-y, 2px)
     var(--product-card-overlay-badge-pad-x, 10px);
@@ -237,6 +238,7 @@
 .product-card__status-badges-row > .product-card__hidden-badge,
 .product-card__status-badges-row > .product-card__status-slot,
 .product-card__status-badges-row > .product-card__auction-badge,
+.product-card__status-badges-row > .product-card__near-badge,
 .product-card__status-badges-row > .product-card__installment-badge,
 .product-card__status-badges-row > .product-card__wholesale-badge,
 .product-card__status-badges-row > .product-card__raffle-badge,

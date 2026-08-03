@@ -64,8 +64,15 @@
 }
 
 .create-raffle-modal__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
   border: 1px solid var(--iz-color-border);
-  border-radius: 8px;
+  border-radius: 999px;
   background: var(--iz-color-surface);
   color: var(--iz-color-text-secondary);
   font-size: 1.5rem;
@@ -109,6 +116,7 @@
   flex-direction: column;
   gap: 0.7rem;
   padding: 0.75rem;
+  background: var(--iz-color-surface-muted);
 }
 
 .create-raffle-modal__field {
@@ -146,8 +154,12 @@
   border: 1px solid var(--iz-color-border);
   border-radius: 8px;
   font: inherit;
-  background: var(--iz-color-surface-muted);
+  background: var(--iz-color-bg);
   color: inherit;
+}
+
+.create-raffle-modal__form textarea {
+  resize: none;
 }
 
 .create-raffle-modal__form input:focus,

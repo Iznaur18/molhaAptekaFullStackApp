@@ -1,7 +1,5 @@
 import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
-import { isRuRegionCode } from "@molha/api-contract";
 
-import { IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED } from "../../../entities/product-category-tree/lib/isProductCategoryTreePickerEnabled.js";
 import {
   parseProductPriceInput,
   validateProductOldPricePair,
@@ -68,17 +66,10 @@ export function validateCreateProductWizardStep(stepId, form, context) {
     }
 
     case "category": {
-      if (IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED) {
-        if (!form.productCategoryId && !form.productCategory) {
-          return CREATE_PRODUCT_MODAL_UI.ERROR_CATEGORY_LEAF;
-        }
-      } else if (!form.productCategory) {
+      if (!form.productCategoryId) {
         return CREATE_PRODUCT_MODAL_UI.ERROR_CATEGORY_LEAF;
       }
 
-      if (!isRuRegionCode(String(form.productRegionCode ?? "").trim())) {
-        return CREATE_PRODUCT_MODAL_UI.ERROR_SALE_REGION_REQUIRED;
-      }
       return null;
     }
 
@@ -91,7 +82,7 @@ export function validateCreateProductWizardStep(stepId, form, context) {
         form.productPickupLat != null && Number.isFinite(Number(form.productPickupLat));
       const hasLon =
         form.productPickupLon != null && Number.isFinite(Number(form.productPickupLon));
-      if (hasLat !== hasLon) {
+      if (!hasLat || !hasLon) {
         return CREATE_PRODUCT_MODAL_UI.ERROR_PICKUP_COORDS;
       }
       return null;

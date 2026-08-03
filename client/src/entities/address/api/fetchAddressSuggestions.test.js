@@ -11,11 +11,13 @@ vi.mock("../../../shared/api/index.js", () => ({
   },
 }));
 
-const { fetchAddressSuggestions } = await import("./fetchAddressSuggestions.js");
+const { fetchAddressSuggestions, resetAddressSuggestUnavailableForTests } =
+  await import("./fetchAddressSuggestions.js");
 
 describe("fetchAddressSuggestions", () => {
   beforeEach(() => {
     postMock.mockReset();
+    resetAddressSuggestUnavailableForTests();
   });
 
   it("posts query and returns suggestions", async () => {
@@ -44,5 +46,15 @@ describe("fetchAddressSuggestions", () => {
     });
 
     await expect(fetchAddressSuggestions("Москва")).rejects.toThrow("DaData недоступен");
+  });
+
+  it("returns empty list on 503 and stops further requests", async () => {
+    postMock.mockRejectedValue({
+      response: { status: 503, data: { message: "unavailable" } },
+    });
+
+    await expect(fetchAddressSuggestions("Москва")).resolves.toEqual([]);
+    await expect(fetchAddressSuggestions("СПб")).resolves.toEqual([]);
+    expect(postMock).toHaveBeenCalledTimes(1);
   });
 });

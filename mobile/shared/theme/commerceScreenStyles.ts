@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 import { ORDER_CARD_ITEM_THUMB_SIZE } from "@/entities/product/model/constants";
 import { CART_LINE_IMAGE_SIZE } from "@/shared/config/cartConstants";
@@ -204,10 +204,11 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
   actionButton: {
     paddingVertical: 5.1,
     paddingHorizontal: 11.5,
-    borderRadius: 7.2,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: theme.colors.action,
     backgroundColor: theme.colors.action,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   actionButtonCancel: {
     backgroundColor: theme.colors.danger,

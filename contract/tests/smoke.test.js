@@ -340,6 +340,13 @@ test("catalogFeedTileKeyParamsSchema accepts known tile key", () => {
   assert.equal(parsed.tileKey, "sort:newest");
 });
 
+test("catalogFeedTileKeyParamsSchema accepts near filter tile key", () => {
+  assert.equal(
+    catalogFeedTileKeyParamsSchema.parse({ tileKey: "filter:__near__" }).tileKey,
+    "filter:__near__",
+  );
+});
+
 test("catalogFeedTileKeyParamsSchema accepts installment filter tile key", () => {
   const parsed = catalogFeedTileKeyParamsSchema.parse({
     tileKey: "filter:__installment_only__",
@@ -445,11 +452,13 @@ test("catalogProductsQuerySchema coerces page/limit and flags", () => {
     limit: "20",
     followingOnly: "true",
     saleOnly: "false",
+    near: "true",
   });
   assert.equal(parsed.page, 2);
   assert.equal(parsed.limit, 20);
   assert.equal(parsed.followingOnly, true);
   assert.equal(parsed.saleOnly, false);
+  assert.equal(parsed.near, true);
 });
 
 test("catalogProductsQuerySchema rejects unknown category", () => {
@@ -524,6 +533,8 @@ test("createProductBodySchema accepts relative /uploads image urls", () => {
     productIsOriginal: true,
     productRegionCode: "RU-MOW",
     productPickupAddress: "Москва, Тверская 1",
+    productPickupLat: 55.75,
+    productPickupLon: 37.62,
   });
   assert.deepEqual(parsed.productImageUrls, ["/uploads/photo.webp"]);
   assert.equal(parsed.productRegionCode, "RU-MOW");

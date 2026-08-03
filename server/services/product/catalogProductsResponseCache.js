@@ -22,10 +22,16 @@ const stableSerializeQuery = (query) => {
 };
 
 /**
- * @param {{ userId?: string; query: Record<string, unknown> }} input
+ * @param {{
+ *   userId?: string;
+ *   query: Record<string, unknown>;
+ *   nearPoint?: string | null;
+ * }} input
  */
-export const buildCatalogProductsCacheKey = ({ userId, query }) =>
-  `${userId ?? "anon"}:${stableSerializeQuery(query)}`;
+export const buildCatalogProductsCacheKey = ({ userId, query, nearPoint = null }) => {
+  const nearPart = nearPoint ? `near@${nearPoint}:` : "";
+  return `${userId ?? "anon"}:${nearPart}${stableSerializeQuery(query)}`;
+};
 
 /**
  * @param {string} key

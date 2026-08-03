@@ -27,4 +27,13 @@ describe("isHomeCatalogFeedVisible", () => {
       }),
     ).toBe(false);
   });
+
+  it("false when near filter is active", () => {
+    expect(
+      isHomeCatalogFeedVisible({
+        isHomeCatalogMainView: true,
+        catalogNear: true,
+      }),
+    ).toBe(false);
+  });
 });

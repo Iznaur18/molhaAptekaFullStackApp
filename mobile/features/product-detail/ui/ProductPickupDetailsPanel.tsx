@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { PRODUCT_PICKUP_UI } from "@/shared/config";
 import { openYandexMapsRoute } from "@/shared/lib/openYandexMaps";
@@ -12,6 +13,8 @@ type ProductPickupDetailsPanelProps = {
 export const ProductPickupDetailsPanel = ({ product }: ProductPickupDetailsPanelProps) => {
   const styles = useProductDetailScreenStyles();
   const theme = useAppTheme();
+  const pickupOn = product.productPickupEnabled !== false;
+  const deliveryOn = product.productDeliveryEnabled === true;
   const address = String(product.productPickupAddress ?? "").trim();
   const lat =
     product.productPickupLat != null && Number.isFinite(Number(product.productPickupLat))
@@ -22,7 +25,11 @@ export const ProductPickupDetailsPanel = ({ product }: ProductPickupDetailsPanel
       ? Number(product.productPickupLon)
       : null;
 
-  if (!address) {
+  if (!pickupOn && !deliveryOn) {
+    return <Text style={styles.descriptionText}>{PRODUCT_PICKUP_UI.DETAILS_NO_ADDRESS}</Text>;
+  }
+
+  if (pickupOn && !address && !deliveryOn) {
     return <Text style={styles.descriptionText}>{PRODUCT_PICKUP_UI.DETAILS_NO_ADDRESS}</Text>;
   }
 
@@ -33,27 +40,68 @@ export const ProductPickupDetailsPanel = ({ product }: ProductPickupDetailsPanel
 
   return (
     <View style={panelStyles.wrap}>
-      <Text style={[panelStyles.title, { color: theme.colors.text }]}>
-        {PRODUCT_PICKUP_UI.DETAILS_TITLE}
-      </Text>
-      <Text style={styles.descriptionText}>{address}</Text>
-      <Pressable
-        accessibilityRole="button"
-        style={({ pressed }) => [
-          panelStyles.routeButton,
-          {
-            borderColor: theme.colors.actionBorder,
-            backgroundColor: pressed ? theme.colors.actionSoft : theme.colors.actionSurface,
-          },
-        ]}
-        onPress={() => {
-          void openYandexMapsRoute({ lat, lon, address });
-        }}
-      >
-        <Text style={[panelStyles.routeButtonText, { color: theme.colors.action }]}>
-          {routeLabel}
-        </Text>
-      </Pressable>
+      {pickupOn ? (
+        address ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`${PRODUCT_PICKUP_UI.DETAILS_TITLE}: ${routeLabel}`}
+            style={({ pressed }) => [
+              styles.featureCard,
+              panelStyles.pickupCard,
+              {
+                backgroundColor: pressed ? theme.colors.actionSoft : theme.colors.surface,
+                borderColor: pressed ? theme.colors.actionBorder : theme.colors.border,
+              },
+            ]}
+            onPress={() => {
+              void openYandexMapsRoute({ lat, lon, address });
+            }}
+          >
+            <View style={styles.featureCardIcon}>
+              <MaterialIcons name="place" size={20} color={theme.colors.action} />
+            </View>
+            <View style={styles.featureCardText}>
+              <Text style={styles.featureCardTitle}>{PRODUCT_PICKUP_UI.DETAILS_TITLE}</Text>
+              <Text style={styles.featureCardSubtitle}>{address}</Text>
+              <View
+                style={[
+                  panelStyles.action,
+                  { backgroundColor: theme.colors.surfaceMuted, alignSelf: "flex-start" },
+                ]}
+              >
+                <Text style={[panelStyles.actionText, { color: theme.colors.action }]}>
+                  {routeLabel}
+                </Text>
+              </View>
+            </View>
+          </Pressable>
+        ) : (
+          <View style={styles.featureCard}>
+            <View style={styles.featureCardIcon}>
+              <MaterialIcons name="place" size={20} color={theme.colors.action} />
+            </View>
+            <View style={styles.featureCardText}>
+              <Text style={styles.featureCardTitle}>{PRODUCT_PICKUP_UI.DETAILS_TITLE}</Text>
+              <Text style={[styles.featureCardSubtitle, { color: theme.colors.textMuted }]}>
+                {PRODUCT_PICKUP_UI.DETAILS_NO_ADDRESS}
+              </Text>
+            </View>
+          </View>
+        )
+      ) : null}
+      {deliveryOn ? (
+        <View style={styles.featureCard}>
+          <View style={styles.featureCardIcon}>
+            <MaterialIcons name="local-shipping" size={20} color={theme.colors.action} />
+          </View>
+          <View style={styles.featureCardText}>
+            <Text style={styles.featureCardTitle}>{PRODUCT_PICKUP_UI.FULFILLMENT_DELIVERY}</Text>
+            <Text style={[styles.featureCardSubtitle, { color: theme.colors.textMuted }]}>
+              {PRODUCT_PICKUP_UI.DETAILS_DELIVERY_HINT}
+            </Text>
+          </View>
+        </View>
+      ) : null}
     </View>
   );
 };
@@ -62,19 +110,22 @@ const panelStyles = StyleSheet.create({
   wrap: {
     gap: 10,
   },
-  title: {
-    fontSize: 15,
-    fontWeight: "700",
+  pickupCard: {
+    alignItems: "flex-start",
   },
-  routeButton: {
-    alignSelf: "flex-start",
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
+  action: {
+    marginTop: 6,
+    maxWidth: 160,
+    paddingVertical: 8,
+    paddingHorizontal: 11,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  routeButtonText: {
-    fontSize: 14,
+  actionText: {
+    fontSize: 12,
     fontWeight: "700",
+    lineHeight: 15,
+    textAlign: "center",
   },
 });

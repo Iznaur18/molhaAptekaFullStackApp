@@ -82,12 +82,18 @@ export const PRODUCT_FIELD_REGISTRY = {
     editKind: "text",
     detailsTop: true,
   },
+  productPickupAddress: {
+    labelRu: CREATE_PRODUCT_MODAL_UI.LABEL_PICKUP_ADDRESS,
+    editLabel: CREATE_PRODUCT_MODAL_UI.LABEL_PICKUP_ADDRESS,
+    readLayout: "stat",
+    multilineRead: true,
+    editKind: "text",
+    detailsTop: true,
+  },
   productRegionCode: {
     labelRu: CREATE_PRODUCT_MODAL_UI.LABEL_SALE_REGION,
     editLabel: CREATE_PRODUCT_MODAL_UI.LABEL_SALE_REGION,
-    readLayout: "stat",
     editKind: "region",
-    detailsTop: true,
   },
   productIsAvailable: {
     labelRu: "В наличии",
@@ -171,7 +177,7 @@ export const PRODUCT_FIELD_REGISTRY = {
 const DETAILS_TOP_ROW_ORDER = [
   "productPrice",
   "productCategory",
-  "productRegionCode",
+  "productPickupAddress",
   "productStockQuantity",
   "soldQuantity",
   "uniqueViewerCount",

@@ -34,7 +34,7 @@ export async function patchMyProduct({ userId, productId, body }) {
     throw new AppError(404, "Товар не найден или нет прав на изменение");
   }
 
-  const { $set, auctionEnabledChanged, nextAuctionEnabled } =
+  const { $set, $unset, auctionEnabledChanged, nextAuctionEnabled } =
     await buildProductPatchSet({
       existing,
       body,
@@ -44,9 +44,17 @@ export async function patchMyProduct({ userId, productId, body }) {
 
   applyProductSearchBlobToSet($set, existing);
 
+  const update = {};
+  if (Object.keys($set).length > 0) {
+    update.$set = $set;
+  }
+  if (Object.keys($unset).length > 0) {
+    update.$unset = $unset;
+  }
+
   const product = await ProductModel.findOneAndUpdate(
     ownerFilter,
-    { $set },
+    update,
     { returnDocument: "after", runValidators: true },
   )
     .populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT)

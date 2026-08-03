@@ -20,6 +20,7 @@ export type ProductPickupLocationValue = {
   productPickupLon: number | null;
   productPickupEnabled: boolean;
   productDeliveryEnabled: boolean;
+  productRegionCode?: string | null;
 };
 
 type ProductPickupLocationFieldsProps = {
@@ -151,6 +152,7 @@ export const ProductPickupLocationFields = ({
             productPickupAddress: next.line,
             productPickupLat: next.geo?.lat ?? null,
             productPickupLon: next.geo?.lon ?? null,
+            productRegionCode: next.regionCode ?? null,
           });
         }}
         disabled={disabled}

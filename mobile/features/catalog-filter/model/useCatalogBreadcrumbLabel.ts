@@ -81,6 +81,7 @@ export const useCatalogBreadcrumbLabel = ({
       auctionOnly: feedFilters.auctionOnly,
       installmentOnly: feedFilters.installmentOnly,
       saleOnly: feedFilters.saleOnly,
+      near: feedFilters.near,
     });
   }, [
     breadcrumbQuery.data,
@@ -90,6 +91,7 @@ export const useCatalogBreadcrumbLabel = ({
     feedFilters.auctionOnly,
     feedFilters.followingOnly,
     feedFilters.installmentOnly,
+    feedFilters.near,
     feedFilters.saleOnly,
     feedFilters.sort,
     personalTilesQuery.data,

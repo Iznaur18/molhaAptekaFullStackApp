@@ -15,9 +15,11 @@ import { IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED } from "../../../entities
 import { useProductCategoryBreadcrumbQuery } from "../../../entities/product-category-tree/model/useProductCategoryBreadcrumbQuery.js";
 import { useProductCategoryRootsQuery } from "../../../entities/product-category-tree/model/useProductCategoryRootsQuery.js";
 import { useSellerPersonalCategoryCatalogTilesQuery } from "../../../entities/seller-personal-category/model/useSellerPersonalCategoryCatalogTilesQuery.js";
+import { userHasCatalogNearGeo } from "../../../entities/product/lib/userHasCatalogNearGeo.js";
 import { CATALOG_SORT_NEWEST } from "../../../entities/product/model/productConstants.js";
-import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
+import { API_CLIENT_UI, HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { catalogMainViewToPathname } from "../../../shared/lib/catalogMainViewPaths.js";
+import { mainViewToPathname } from "../../../shared/lib/homeMainViewPaths.js";
 import { CATALOG_LANDING_QUERY } from "./catalogLoaderConstants.js";
 import { useCatalogSubcategoryPicker } from "./useCatalogSubcategoryPicker.js";
 
@@ -39,6 +41,7 @@ export function useCatalogBrowserLanding({
   catalogAuctionOnly,
   catalogInstallmentOnly,
   catalogSaleOnly,
+  authUser = null,
   isAuthorized,
   setIsLoginModalOpen,
   applyCatalogQueryState,
@@ -204,6 +207,7 @@ export function useCatalogBrowserLanding({
         auctionOnly: false,
         installmentOnly: false,
         saleOnly: false,
+        near: false,
       };
       applyCatalogQueryState(nextQuery);
       subcategoryPicker.clearPickerTrail();
@@ -224,6 +228,21 @@ export function useCatalogBrowserLanding({
         setIsLoginModalOpen(true);
         return;
       }
+      if (nextQuery.near) {
+        if (!isAuthorized) {
+          setIsLoginModalOpen(true);
+          return;
+        }
+        if (!userHasCatalogNearGeo(authUser)) {
+          const openProfile = window.confirm(
+            `${HOME_PAGE_UI.NEAR_ADDRESS_REQUIRED}\n\n${HOME_PAGE_UI.NEAR_ADDRESS_REQUIRED_CONFIRM}`,
+          );
+          if (openProfile) {
+            navigate(mainViewToPathname("edit-profile"));
+          }
+          return;
+        }
+      }
       applyCatalogQueryState(nextQuery);
       subcategoryPicker.clearPickerTrail();
       navigate(
@@ -235,6 +254,7 @@ export function useCatalogBrowserLanding({
     },
     [
       applyCatalogQueryState,
+      authUser,
       isAuthorized,
       isCompactLayout,
       navigate,

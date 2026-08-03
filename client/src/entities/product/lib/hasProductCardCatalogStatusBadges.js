@@ -31,6 +31,7 @@ export function shouldShowProductCardStatusSlot(vm) {
 export function hasProductCardCatalogStatusBadges(vm) {
   return (
     shouldShowProductCardStatusSlot(vm) ||
+    Boolean(vm.nearDistanceLabel) ||
     vm.showAuctionBadge ||
     vm.showInstallmentBadge ||
     vm.showWholesaleBadge ||

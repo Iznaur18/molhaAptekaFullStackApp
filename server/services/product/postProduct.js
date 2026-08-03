@@ -32,7 +32,12 @@ import { buildProductSearchBlobFromFields } from "./buildProductSearchBlob.js";
 import { resolveProductCategoryWriteFromBody } from "./resolveProductCategoryWrite.js";
 import { resolveActiveSellerPersonalCategoryId } from "../seller-personal-category/sellerPersonalCategoryHelpers.js";
 import { applyProductSaleCityFields } from "./ruCityNormalized.js";
-import { resolveCreateProductPickupFields } from "./productPickup.js";
+import {
+  assertProductFulfillmentMethods,
+  resolveProductDeliveryEnabledForWrite,
+  resolveProductPickupEnabledForWrite,
+} from "./productPickup.js";
+import { resolveProductSaleLocation } from "./resolveProductSaleLocation.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
 const throwFieldError = (error, fallback) => {
@@ -102,14 +107,6 @@ const resolveCreateSaleCity = (body) => {
   } catch (saleCityError) {
     throwFieldError(saleCityError, "Некорректный город продажи");
   }
-};
-
-const resolveCreateRegionCode = (body) => {
-  const code = String(body?.productRegionCode ?? "").trim();
-  if (!code) {
-    throwFieldError(new Error("required"), "Укажите регион продажи");
-  }
-  return code;
 };
 
 const resolvePreviewVideo = (body, productImageUrls) => {
@@ -209,8 +206,19 @@ export async function postProduct({ userId, body }) {
       : null;
 
   const { productSaleCity, productSaleCityNormalized } = resolveCreateSaleCity({});
-  const productRegionCode = resolveCreateRegionCode(body);
-  const pickupFields = resolveCreateProductPickupFields(body);
+  const saleLocation = await resolveProductSaleLocation({
+    address: body?.productPickupAddress,
+    lat: body?.productPickupLat,
+    lon: body?.productPickupLon,
+    fallbackRegionCode: body?.productRegionCode,
+  });
+  const productPickupEnabled = resolveProductPickupEnabledForWrite(
+    body?.productPickupEnabled,
+  );
+  const productDeliveryEnabled = resolveProductDeliveryEnabledForWrite(
+    body?.productDeliveryEnabled,
+  );
+  assertProductFulfillmentMethods(productPickupEnabled, productDeliveryEnabled);
 
   const product = await ProductModel.create({
     productName,
@@ -223,8 +231,13 @@ export async function postProduct({ userId, body }) {
     productSeller: userId,
     productSaleCity,
     productSaleCityNormalized,
-    productRegionCode,
-    ...pickupFields,
+    productRegionCode: saleLocation.productRegionCode,
+    productPickupAddress: saleLocation.productPickupAddress,
+    productPickupLat: saleLocation.productPickupLat,
+    productPickupLon: saleLocation.productPickupLon,
+    productPickupLocation: saleLocation.productPickupLocation,
+    productPickupEnabled,
+    productDeliveryEnabled,
     productCategory: categoryWrite.productCategory,
     productCategoryId: categoryWrite.productCategoryId,
     categoryPathIds: categoryWrite.categoryPathIds,

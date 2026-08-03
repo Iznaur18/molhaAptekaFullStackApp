@@ -28,6 +28,7 @@ export function useCatalogQuerySync({
   catalogAuctionOnly,
   catalogInstallmentOnly,
   catalogSaleOnly,
+  catalogNear,
   catalogQueryFromUrl,
   setCatalogSort,
   setSelectedProductCategory,
@@ -38,6 +39,7 @@ export function useCatalogQuerySync({
   setCatalogAuctionOnly,
   setCatalogInstallmentOnly,
   setCatalogSaleOnly,
+  setCatalogNear,
   categoryRootsRef,
 }) {
   useEffect(() => {
@@ -103,6 +105,7 @@ export function useCatalogQuerySync({
       prev === parsed.installmentOnly ? prev : parsed.installmentOnly,
     );
     setCatalogSaleOnly((prev) => (prev === parsed.saleOnly ? prev : parsed.saleOnly));
+    setCatalogNear((prev) => (prev === parsed.near ? prev : parsed.near));
   }, [
     location.search,
     catalogMainView,
@@ -111,6 +114,7 @@ export function useCatalogQuerySync({
     setCatalogFollowingOnly,
     setCatalogInstallmentOnly,
     setCatalogSaleOnly,
+    setCatalogNear,
     setCatalogSort,
     setCategoryTreeLabel,
     setSelectedCategoryId,
@@ -138,7 +142,8 @@ export function useCatalogQuerySync({
       !catalogFollowingOnly &&
       !catalogAuctionOnly &&
       !catalogInstallmentOnly &&
-      !catalogSaleOnly;
+      !catalogSaleOnly &&
+      !catalogNear;
     const omitDefaultSort =
       isDefaultNewestFeed && !isExplicitCatalogNewestFeedSearch(location.search);
     const queryPayload = {
@@ -150,6 +155,7 @@ export function useCatalogQuerySync({
       auctionOnly: catalogAuctionOnly,
       installmentOnly: catalogInstallmentOnly,
       saleOnly: catalogSaleOnly,
+      near: catalogNear,
     };
     const built =
       catalogMainView === "catalog-browser"
@@ -178,6 +184,7 @@ export function useCatalogQuerySync({
     catalogAuctionOnly,
     catalogInstallmentOnly,
     catalogSaleOnly,
+    catalogNear,
     navigate,
   ]);
 

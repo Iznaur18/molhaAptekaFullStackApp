@@ -124,14 +124,10 @@ export const PRODUCTS_FETCH_PAGE_LIMIT = 100;
 /** Размер страницы каталога на главной (клиент). */
 export const CATALOG_PAGE_SIZE = 24;
 
-/** Каталог: сортировка по городу продажи (А→Я). */
-export const PRODUCT_SORT_CITY = "city";
-
 /** Query `sort` для GET /product — совпадает с `server/constants/productCatalogSort.js`. */
 export const CATALOG_SORT_NEWEST = "newest";
 export const CATALOG_SORT_VIEWS = "views";
 export const CATALOG_SORT_PURCHASES = "purchases";
-export const CATALOG_SORT_CITY = "city";
 export const CATALOG_SORT_PREMIUM = "premium";
 export const CATALOG_SORT_CONFIRMED = "confirmed";
 export const CATALOG_SORT_REVIEWS = "reviews";
@@ -141,12 +137,12 @@ export const CATALOG_FILTER_FOLLOWING_ONLY = "__following_only__";
 export const CATALOG_FILTER_AUCTION_ONLY = "__auction_only__";
 export const CATALOG_FILTER_INSTALLMENT_ONLY = "__installment_only__";
 export const CATALOG_FILTER_SALE_ONLY = "__sale_only__";
+export const CATALOG_FILTER_NEAR = "__near__";
 
 export const CATALOG_SORT_OPTIONS = [
   CATALOG_SORT_NEWEST,
   CATALOG_SORT_VIEWS,
   CATALOG_SORT_PURCHASES,
-  CATALOG_SORT_CITY,
   CATALOG_SORT_PREMIUM,
   CATALOG_SORT_CONFIRMED,
 ];
@@ -160,6 +156,7 @@ export const CATALOG_SELECT_OPTIONS = [
 
 /** Переключатели фильтров публичного каталога (не query `sort`). */
 export const CATALOG_PUBLIC_FILTER_TOGGLE_KEYS = [
+  CATALOG_FILTER_NEAR,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
@@ -197,10 +194,10 @@ export const CATALOG_SORT_LABEL_RU = {
   [CATALOG_SORT_NEWEST]: "Новинки",
   [CATALOG_SORT_VIEWS]: "По просмотрам",
   [CATALOG_SORT_PURCHASES]: "Больше всего купили",
-  [CATALOG_SORT_CITY]: "По городу",
   [CATALOG_SORT_PREMIUM]: "Только премиум",
   [CATALOG_SORT_CONFIRMED]: "Подтверждённые продавцы",
   [CATALOG_SORT_REVIEWS]: "По отзывам",
+  [CATALOG_FILTER_NEAR]: "Рядом",
   [CATALOG_FILTER_FOLLOWING_ONLY]: "Только от подписок",
   [CATALOG_FILTER_AUCTION_ONLY]: "Только с аукционом",
   [CATALOG_FILTER_INSTALLMENT_ONLY]: "Только в рассрочку",

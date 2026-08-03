@@ -1,3 +1,4 @@
+import { formatCatalogNearDistanceLabel } from "@molha/api-contract";
 import { useId, useMemo } from "react";
 
 import { useHorizontalPointerDragScroll } from "../../../../shared/lib/useHorizontalPointerDragScroll.js";
@@ -99,12 +100,14 @@ export function useProductCardViewModel(props) {
   );
   const purchaseLimit = getProductPurchaseLimit(product);
   const sellerDisplayName = formatProductFieldForDisplay("productSeller", product);
+  const nearDistanceLabel = formatCatalogNearDistanceLabel(product.distanceMeters);
   const bodyClassName = isModerationQueue
     ? "product-card__body"
     : "product-card__details-surface";
 
   return {
     product,
+    nearDistanceLabel,
     onSellerNameClick,
     onDeleteProduct,
     onEditProduct,

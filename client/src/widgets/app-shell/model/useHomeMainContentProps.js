@@ -84,6 +84,7 @@ export const useHomeMainContentProps = () => {
     refreshPendingInstallmentDisputesCount,
     refreshRaffleSurfaces,
     refreshCatalogFeed,
+    invalidateAuthMe,
     handleInAppNotificationClick,
     handleNotificationsCleared,
     setLoyaltyPoints,
@@ -134,8 +135,16 @@ export const useHomeMainContentProps = () => {
       if (updatedUser.userLoyaltyPoints != null) {
         setLoyaltyPoints(Number(updatedUser.userLoyaltyPoints) || 0);
       }
+      void invalidateAuthMe();
+      void refreshCatalogFeed();
     },
-    [setIsPremiumUser, setLoyaltyPoints, setMyProfilePage],
+    [
+      invalidateAuthMe,
+      refreshCatalogFeed,
+      setIsPremiumUser,
+      setLoyaltyPoints,
+      setMyProfilePage,
+    ],
   );
 
   const onCreateRaffleClick = useMemo(() => {

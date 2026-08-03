@@ -9,6 +9,24 @@ body,
   touch-action: manipulation;
 }
 
+/* Смартфоны/планшеты: без long-press select/copy (инпуты — можно). */
+@media (hover: none) and (pointer: coarse) {
+  html {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  input,
+  textarea,
+  select,
+  [contenteditable="true"] {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+  }
+}
+
 :root {
   /*
    * Паритет с mobile content max-width:
@@ -77,4 +95,35 @@ body {
   width: 100%;
   max-width: 100%;
   min-width: 0;
+}
+
+/* Смартфон landscape: оверлей, пока OS не отдаёт orientation.lock (типично iOS Safari). */
+html.app-portrait-lock-active {
+  overflow: hidden !important;
+}
+
+html.app-portrait-lock-active body {
+  overflow: hidden !important;
+}
+
+html.app-portrait-lock-active #root {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+html.app-portrait-lock-active::before {
+  content: attr(data-portrait-lock-hint);
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 1.5rem;
+  background: var(--iz-color-bg, #fff);
+  color: var(--iz-color-text, #111);
+  font: 600 1.05rem/1.35 system-ui, sans-serif;
+  text-align: center;
+  pointer-events: auto;
 }

@@ -108,16 +108,6 @@ export function InstallmentContractCardPaymentRow({
         <span className="installment-contract-card__payment-actions">
           <button
             type="button"
-            className="installment-contract-card__btn installment-contract-card__btn_primary"
-            disabled={pendingKey != null}
-            onClick={() => onConfirmPayment(payment.paymentIndex)}
-          >
-            {pendingKey === `confirm:${payment.paymentIndex}`
-              ? INSTALLMENT_UI.ACTION_PENDING
-              : INSTALLMENT_UI.CONFIRM_PAYMENT}
-          </button>
-          <button
-            type="button"
             className="installment-contract-card__btn installment-contract-card__btn_danger"
             disabled={pendingKey != null}
             onClick={() => onRejectPayment(payment.paymentIndex)}
@@ -125,6 +115,16 @@ export function InstallmentContractCardPaymentRow({
             {pendingKey === `reject:${payment.paymentIndex}`
               ? INSTALLMENT_UI.ACTION_PENDING
               : INSTALLMENT_UI.REJECT_PAYMENT}
+          </button>
+          <button
+            type="button"
+            className="installment-contract-card__btn installment-contract-card__btn_primary"
+            disabled={pendingKey != null}
+            onClick={() => onConfirmPayment(payment.paymentIndex)}
+          >
+            {pendingKey === `confirm:${payment.paymentIndex}`
+              ? INSTALLMENT_UI.ACTION_PENDING
+              : INSTALLMENT_UI.CONFIRM_PAYMENT}
           </button>
         </span>
       ) : null}

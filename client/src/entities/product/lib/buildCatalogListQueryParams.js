@@ -14,6 +14,7 @@ export function buildCatalogListQueryParams({
   catalogSort,
   myProductsModerationFilter,
   viewerRegionCode = null,
+  nearAllowed = true,
 }) {
   const search = appliedProductSearchTerm.trim();
   const sellerPersonalCategoryId = isMineMode
@@ -40,6 +41,7 @@ export function buildCatalogListQueryParams({
     auctionOnly: catalogQueryFromUrl.auctionOnly ? true : null,
     installmentOnly: catalogQueryFromUrl.installmentOnly ? true : null,
     saleOnly: catalogQueryFromUrl.saleOnly ? true : null,
+    near: catalogQueryFromUrl.near && nearAllowed ? true : null,
     regionCode: isMineMode ? null : viewerRegionCode || null,
   };
 }

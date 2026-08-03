@@ -8,6 +8,7 @@ import { PRODUCT_MODERATION_STATUSES, productFromApiSchema } from "./productFrom
 import { storedMediaUrlOrEmptySchema, storedMediaUrlSchema } from "./storedMediaUrl.js";
 import {
   assertPickupCoordsPair,
+  assertPickupCoordsRequired,
   PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
   productPickupAddressFieldSchema,
   productPickupLatFieldSchema,
@@ -232,10 +233,11 @@ export const createProductBodySchema = z
       .array(productReturnTermSchema)
       .max(PRODUCT_RETURN_TERMS_MAX_ITEMS)
       .optional(),
-    productRegionCode: requiredRuRegionCodeFieldSchema,
+    /** Опционально: сервер пересчитает из адреса. Клиент может прислать preview. */
+    productRegionCode: requiredRuRegionCodeFieldSchema.optional(),
     productPickupAddress: productPickupAddressFieldSchema,
-    productPickupLat: productPickupLatFieldSchema.nullable().optional(),
-    productPickupLon: productPickupLonFieldSchema.nullable().optional(),
+    productPickupLat: productPickupLatFieldSchema,
+    productPickupLon: productPickupLonFieldSchema,
     productPickupEnabled: z.coerce.boolean().optional(),
     productDeliveryEnabled: z.coerce.boolean().optional(),
   })
@@ -243,7 +245,7 @@ export const createProductBodySchema = z
   .superRefine(assertCreateProductRequiresPhoto)
   .superRefine((body, ctx) => assertOldPricePair(body, ctx, true))
   .superRefine(assertReturnPolicy)
-  .superRefine((body, ctx) => assertPickupCoordsPair(body, ctx))
+  .superRefine((body, ctx) => assertPickupCoordsRequired(body, ctx))
   .superRefine((body, ctx) => {
     const pickupOn = body.productPickupEnabled !== false;
     const deliveryOn = body.productDeliveryEnabled === true;

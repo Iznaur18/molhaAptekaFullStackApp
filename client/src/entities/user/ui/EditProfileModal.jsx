@@ -1,7 +1,7 @@
 import { createPortal } from "react-dom";
 
 import { useEditProfileModal } from "../model/useEditProfileModal.js";
-import { AddressStructuredFields } from "../../address/ui/AddressStructuredFields.jsx";
+import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.jsx";
 import { RuRegionSelect } from "../../region/ui/RuRegionSelect.jsx";
 import {
   NOTES_ABOUT_USER_MAX_CHARS,
@@ -16,6 +16,8 @@ import {
   USER_ROLE_LABEL_RU,
 } from "../model/userConstants.js";
 import {
+  ADDRESS_DELIVERY_UI,
+  ADDRESS_STRUCTURED_UI,
   ADMIN_EDIT_USER_UI,
   EDIT_PROFILE_MODAL_UI,
   USER_DETAILS_MODAL_UI,
@@ -191,14 +193,41 @@ export function EditProfileModal({
                 {EDIT_PROFILE_MODAL_UI.HINT_REGION}
               </span>
             </label>
-            <AddressStructuredFields
-              value={form.structuredAddress}
-              onChange={(structuredAddress) =>
-                setForm((prev) => ({ ...prev, structuredAddress }))
+            <AddressDeliveryFields
+              value={form.deliveryAddress}
+              onChange={(deliveryAddress) =>
+                setForm((prev) => ({
+                  ...prev,
+                  deliveryAddress,
+                  ...(deliveryAddress.regionCode
+                    ? { userRegionCode: deliveryAddress.regionCode }
+                    : {}),
+                }))
               }
               disabled={isSubmitting}
-              inputClassName="edit-profile-modal__input"
+              lineInputClassName="edit-profile-modal__input"
+              labels={{ line: ADDRESS_STRUCTURED_UI.SECTION_LABEL }}
             />
+            <label className="edit-profile-modal__label">
+              {ADDRESS_DELIVERY_UI.LABEL_FLAT}
+              <input
+                type="text"
+                className="edit-profile-modal__input"
+                value={form.deliveryAddress.flat}
+                onChange={(event) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    deliveryAddress: {
+                      ...prev.deliveryAddress,
+                      flat: event.target.value,
+                    },
+                  }))
+                }
+                disabled={isSubmitting}
+                autoComplete="address-line2"
+                placeholder={ADDRESS_STRUCTURED_UI.PLACEHOLDER_FLAT}
+              />
+            </label>
             <label className="edit-profile-modal__label">
               {EDIT_PROFILE_MODAL_UI.LABEL_AVATAR_URL}
               <ImageUrlField

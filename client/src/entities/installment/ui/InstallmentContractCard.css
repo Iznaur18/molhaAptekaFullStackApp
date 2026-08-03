@@ -1,7 +1,8 @@
 .installment-contract-card {
+  --installment-card-stack-gap: 0.75rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--installment-card-stack-gap);
   padding: 1rem;
   border: 1px solid var(--iz-color-border);
   border-radius: 0.75rem;
@@ -45,7 +46,7 @@
   flex-shrink: 0;
   margin-left: auto;
   color: var(--iz-color-text-muted);
-  transition: transform 0.15s ease;
+  transition: transform 0.35s ease-in-out;
 }
 
 .installment-contract-card__chevron_expanded {
@@ -217,8 +218,8 @@
 }
 
 .installment-contract-card__payment_remaining {
-  border-color: var(--iz-color-border-strong);
-  background: var(--iz-color-surface-muted);
+  border-color: var(--iz-color-border);
+  background: color-mix(in srgb, var(--iz-color-ink) 10%, var(--iz-color-bg));
   color: var(--iz-color-text-secondary);
 }
 
@@ -282,9 +283,14 @@
 }
 
 .installment-contract-card__btn_danger {
-  border-color: var(--iz-color-danger-border);
-  background: var(--iz-color-surface);
-  color: var(--iz-color-danger);
+  border-color: var(--iz-color-danger);
+  background: var(--iz-color-danger);
+  color: var(--iz-color-on-contrast);
+}
+
+.installment-contract-card__btn_danger:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--iz-color-danger) 85%, var(--iz-color-ink));
+  background: color-mix(in srgb, var(--iz-color-danger) 85%, var(--iz-color-ink));
 }
 
 .installment-contract-card__btn_cancel {
@@ -296,6 +302,18 @@
 .installment-contract-card__btn_cancel:hover:not(:disabled) {
   border-color: var(--iz-color-danger);
   background: var(--iz-color-danger);
+}
+
+.installment-contract-card__btn_warning {
+  border-color: var(--iz-color-warning);
+  border-radius: 999px;
+  background: var(--iz-color-warning);
+  color: var(--iz-color-on-contrast);
+}
+
+.installment-contract-card__btn_warning:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--iz-color-warning) 85%, var(--iz-color-ink));
+  background: color-mix(in srgb, var(--iz-color-warning) 85%, var(--iz-color-ink));
 }
 
 .installment-contract-card__payment-actions {
@@ -313,27 +331,65 @@
 .installment-contract-card__dispute-form {
   display: flex;
   flex-direction: column;
+  flex: 1 1 100%;
   gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .installment-contract-card__textarea {
+  box-sizing: border-box;
   width: 100%;
   min-height: 4rem;
   padding: 0.5rem;
   border: 1px solid var(--iz-color-border-strong);
   border-radius: 0.4rem;
   font: inherit;
-  resize: vertical;
+  resize: none;
 }
 
 .installment-contract-card--compact {
-  gap: 0.45rem;
+  --installment-card-stack-gap: 0.45rem;
+  gap: var(--installment-card-stack-gap);
   padding: 0.6rem 0.7rem;
-  border-radius: 0.55rem;
+  border-radius: 1.25rem;
   border: 1px solid color-mix(in srgb, var(--iz-color-border) 65%, rgba(79, 70, 229, 0.35));
   border-left: 3px solid var(--iz-color-action);
   background: var(--iz-color-surface);
   box-shadow: none;
+}
+
+@supports (corner-shape: squircle) {
+  .installment-contract-card--compact {
+    corner-shape: squircle;
+  }
+}
+
+.installment-contract-card__collapsible-region {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.installment-contract-card__fold {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s ease-in-out;
+}
+
+.installment-contract-card__fold_open {
+  grid-template-rows: 1fr;
+}
+
+.installment-contract-card__fold-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.installment-contract-card__fold-inner_body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--installment-card-stack-gap);
 }
 
 .installment-contract-card--compact.installment-contract-card_completed {
@@ -452,30 +508,47 @@
 .installment-contract-card__payments-fold-summary {
   display: flex;
   align-items: center;
-  min-height: 2.25rem;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 1.75rem;
+  margin: 0;
   padding: 0.45rem 0.65rem;
+  border: none;
+  background: transparent;
+  font: inherit;
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--iz-color-text-secondary);
+  text-align: left;
   cursor: pointer;
-  list-style: none;
   user-select: none;
-}
-
-.installment-contract-card__payments-fold-summary::-webkit-details-marker {
-  display: none;
 }
 
 .installment-contract-card__payments-fold-summary::before {
   content: "▸";
   margin-right: 0.4rem;
   color: var(--iz-color-text-muted);
-  transition: transform 0.15s ease;
+  transition: transform 0.35s ease-in-out;
 }
 
-.installment-contract-card__payments-fold[open]
+.installment-contract-card__payments-fold_open
   .installment-contract-card__payments-fold-summary::before {
   transform: rotate(90deg);
+}
+
+.installment-contract-card__payments-fold-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s ease-in-out;
+}
+
+.installment-contract-card__payments-fold-panel_open {
+  grid-template-rows: 1fr;
+}
+
+.installment-contract-card__payments-fold-panel-inner {
+  min-height: 0;
+  overflow: hidden;
 }
 
 .installment-contract-card__payments-fold-body {
@@ -544,7 +617,15 @@
 }
 
 .installment-contract-card__payment_compact .installment-contract-card__payment-actions {
-  flex-direction: column;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.installment-contract-card__payment_compact
+  .installment-contract-card__payment-actions
+  .installment-contract-card__btn {
+  flex: 1 1 0;
+  width: auto;
 }
 
 @import "./InstallmentContractCardMobile.css";

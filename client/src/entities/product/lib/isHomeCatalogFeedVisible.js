@@ -12,6 +12,7 @@
  *   catalogAuctionOnly?: boolean;
  *   catalogInstallmentOnly?: boolean;
  *   catalogSaleOnly?: boolean;
+ *   catalogNear?: boolean;
  * }} params
  */
 export function isHomeCatalogFeedVisible({
@@ -24,6 +25,7 @@ export function isHomeCatalogFeedVisible({
   catalogAuctionOnly = false,
   catalogInstallmentOnly = false,
   catalogSaleOnly = false,
+  catalogNear = false,
 }) {
   return (
     isHomeCatalogMainView &&
@@ -34,6 +36,7 @@ export function isHomeCatalogFeedVisible({
     !catalogFollowingOnly &&
     !catalogAuctionOnly &&
     !catalogInstallmentOnly &&
-    !catalogSaleOnly
+    !catalogSaleOnly &&
+    !catalogNear
   );
 }

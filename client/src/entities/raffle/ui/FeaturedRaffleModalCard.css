@@ -61,6 +61,27 @@
   line-height: 0.6875rem;
 }
 
+.featured-raffle-modal-card__slide-count {
+  position: absolute;
+  left: 0.625rem;
+  bottom: 0.625rem;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.3125rem;
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  background: rgb(15 23 42 / 58%);
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+}
+
 .featured-raffle-modal-card__manage .raffle-manage-actions__btn {
   min-height: 1.5rem;
   padding: 0.25rem 0.5rem;

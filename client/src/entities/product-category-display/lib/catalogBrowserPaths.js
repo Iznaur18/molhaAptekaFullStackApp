@@ -11,6 +11,7 @@ import { mainViewToPathname } from "../../../shared/lib/homeMainViewPaths.js";
  *   auctionOnly: boolean;
  *   installmentOnly?: boolean;
  *   saleOnly: boolean;
+ *   near?: boolean;
  * }} query
  * @param {{ omitDefaultSort?: boolean; compact?: boolean }} [options]
  *   compact: ≤640 — выдача на `/` (как app); иначе `/catalog`.

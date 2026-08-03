@@ -6,7 +6,6 @@ import { buildPatchUserProfileBody } from "@/entities/user/lib/buildPatchUserPro
 import {
   mapUserToEditProfileForm,
   type EditProfileFormState,
-  type StructuredAddress,
 } from "@/entities/user/lib/mapUserToEditProfileForm";
 import { maskRuPhoneInput } from "@/entities/user/lib/ruPhone";
 import { validateEditProfileForm } from "@/entities/user/lib/validateEditProfileForm";
@@ -16,40 +15,20 @@ import {
   USER_GENDER_LABEL_RU,
   USER_GENDER_MALE,
   USER_GENDER_NO_SELECTED,
-  ADDRESS_CITY_MAX_LENGTH,
-  ADDRESS_DISTRICT_MAX_LENGTH,
-  ADDRESS_STREET_MAX_LENGTH,
-  ADDRESS_HOUSE_MAX_LENGTH,
-  ADDRESS_FLAT_MAX_LENGTH,
   NOTES_ABOUT_USER_MAX_CHARS,
 } from "@/entities/user/model/constants";
+import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
 import { RuRegionSelect } from "@/entities/region/ui/RuRegionSelect";
 import { ProfileAvatarUpload } from "@/features/image-upload/ui/ProfileAvatarUpload";
 import { ProfileBackgroundUpload } from "@/features/image-upload/ui/ProfileBackgroundUpload";
 import { DeleteAccountSection } from "@/features/profile-edit/ui/DeleteAccountSection";
 import { EditProfileSocialLinksFields } from "@/features/profile-edit/ui/EditProfileSocialLinksFields";
-import { ADDRESS_STRUCTURED_UI, EDIT_PROFILE_UI } from "@/shared/config";
+import { ADDRESS_DELIVERY_UI, ADDRESS_STRUCTURED_UI, EDIT_PROFILE_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useEditProfileFormStyles } from "@/shared/theme/editProfileFormStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 
 const GENDER_OPTIONS = [USER_GENDER_MALE, USER_GENDER_FEMALE, USER_GENDER_NO_SELECTED] as const;
-
-type AddressFieldConfig = {
-  key: keyof StructuredAddress;
-  label: string;
-  placeholder: string;
-  maxLength: number;
-  required: boolean;
-};
-
-const ADDRESS_FIELDS: Record<keyof StructuredAddress, AddressFieldConfig> = {
-  city: { key: "city", label: ADDRESS_STRUCTURED_UI.LABEL_CITY, placeholder: ADDRESS_STRUCTURED_UI.PLACEHOLDER_CITY, maxLength: ADDRESS_CITY_MAX_LENGTH, required: true },
-  district: { key: "district", label: ADDRESS_STRUCTURED_UI.LABEL_DISTRICT, placeholder: ADDRESS_STRUCTURED_UI.PLACEHOLDER_DISTRICT, maxLength: ADDRESS_DISTRICT_MAX_LENGTH, required: false },
-  street: { key: "street", label: ADDRESS_STRUCTURED_UI.LABEL_STREET, placeholder: ADDRESS_STRUCTURED_UI.PLACEHOLDER_STREET, maxLength: ADDRESS_STREET_MAX_LENGTH, required: true },
-  house: { key: "house", label: ADDRESS_STRUCTURED_UI.LABEL_HOUSE, placeholder: ADDRESS_STRUCTURED_UI.PLACEHOLDER_HOUSE, maxLength: ADDRESS_HOUSE_MAX_LENGTH, required: true },
-  flat: { key: "flat", label: ADDRESS_STRUCTURED_UI.LABEL_FLAT, placeholder: ADDRESS_STRUCTURED_UI.PLACEHOLDER_FLAT, maxLength: ADDRESS_FLAT_MAX_LENGTH, required: false },
-};
 
 type EditProfileFormProps = {
   user: Record<string, unknown> & { _id: string; email?: string };
@@ -71,15 +50,6 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
     value: EditProfileFormState[K],
   ) => {
     setForm((prev) => ({ ...prev, [key]: value }));
-    setErrorMessage("");
-    setSuccessMessage("");
-  };
-
-  const updateAddress = (key: keyof StructuredAddress, value: string) => {
-    setForm((prev) => ({
-      ...prev,
-      structuredAddress: { ...prev.structuredAddress, [key]: value },
-    }));
     setErrorMessage("");
     setSuccessMessage("");
   };
@@ -120,24 +90,6 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
       {required ? <Text style={styles.labelRequired}> *</Text> : null}
     </Text>
   );
-
-  const renderAddressField = (key: keyof StructuredAddress) => {
-    const field = ADDRESS_FIELDS[key];
-    return (
-      <View style={styles.field}>
-        {fieldLabel(field.label, field.required)}
-        <TextInput
-          style={styles.input}
-          value={form.structuredAddress[field.key]}
-          onChangeText={(value) => updateAddress(field.key, value)}
-          placeholder={field.placeholder}
-          placeholderTextColor={theme.colors.textMuted}
-          maxLength={field.maxLength}
-          editable={!isSubmitting}
-        />
-      </View>
-    );
-  };
 
   const section = (title: string, children: ReactNode) => (
     <View>
@@ -275,12 +227,38 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
       {section(
         ADDRESS_STRUCTURED_UI.SECTION_LABEL,
         <>
-          {renderAddressField("city")}
-          {renderAddressField("district")}
-          {renderAddressField("street")}
-          <View style={styles.row}>
-            <View style={styles.rowCol}>{renderAddressField("house")}</View>
-            <View style={styles.rowCol}>{renderAddressField("flat")}</View>
+          <AddressSuggestInput
+            value={form.deliveryAddress}
+            onChange={(deliveryAddress) => {
+              setForm((prev) => ({
+                ...prev,
+                deliveryAddress,
+                ...(deliveryAddress.regionCode
+                  ? { userRegionCode: deliveryAddress.regionCode }
+                  : {}),
+              }));
+              setErrorMessage("");
+              setSuccessMessage("");
+            }}
+            disabled={isSubmitting}
+            label={ADDRESS_DELIVERY_UI.LABEL_LINE}
+            placeholder={ADDRESS_DELIVERY_UI.PLACEHOLDER_LINE}
+          />
+          <View style={styles.field}>
+            {fieldLabel(ADDRESS_DELIVERY_UI.LABEL_FLAT)}
+            <TextInput
+              style={styles.input}
+              value={form.deliveryAddress.flat}
+              onChangeText={(value) =>
+                setForm((prev) => ({
+                  ...prev,
+                  deliveryAddress: { ...prev.deliveryAddress, flat: value },
+                }))
+              }
+              placeholder={ADDRESS_STRUCTURED_UI.PLACEHOLDER_FLAT}
+              placeholderTextColor={theme.colors.textMuted}
+              editable={!isSubmitting}
+            />
           </View>
         </>,
       )}

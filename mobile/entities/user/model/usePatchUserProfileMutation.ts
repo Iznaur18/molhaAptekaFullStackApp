@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { patchUserProfile } from "@/entities/user/api/patchUserProfile";
-import { authMeQueryKeys } from "@/shared/api";
+import { authMeQueryKeys, catalogQueryKeys } from "@/shared/api";
 
 export const usePatchUserProfileMutation = () => {
   const queryClient = useQueryClient();
@@ -22,6 +22,7 @@ export const usePatchUserProfileMutation = () => {
         return { ...old, user };
       });
       void queryClient.invalidateQueries({ queryKey: authMeQueryKeys.all });
+      void queryClient.invalidateQueries({ queryKey: catalogQueryKeys.all });
     },
   });
 };

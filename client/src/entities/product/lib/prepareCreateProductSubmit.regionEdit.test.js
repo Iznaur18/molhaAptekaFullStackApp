@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import { CREATE_PRODUCT_INITIAL_FORM } from "../../../entities/product/lib/createProductFormState.js";
 import { prepareCreateProductSubmit } from "../../../entities/product/lib/prepareCreateProductSubmit.js";
-import { IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED } from "../../product-category-tree/lib/isProductCategoryTreePickerEnabled.js";
 
 const sellerContext = {
   sellerPointsMaxPerUnit: 100,
@@ -20,7 +19,7 @@ const editForm = {
   productStockQuantity: "2",
   productImageRows: [{ id: "1", url: "https://cdn.example.com/product.jpg" }],
   productCategory: "home_garden",
-  productCategoryId: null,
+  productCategoryId: "507f1f77bcf86cd799439011",
   productRegionCode: "RU-CE",
   productPickupAddress: "Чебоксары, ул Ленина, д 1",
   productPickupLat: 56.14,
@@ -29,7 +28,7 @@ const editForm = {
 };
 
 describe("prepareCreateProductSubmit region edit", () => {
-  it("builds patchBody with region + underscore category that passes contract", () => {
+  it("builds patchBody with region + categoryId that passes contract", () => {
     const prepared = prepareCreateProductSubmit({
       form: editForm,
       isEdit: true,
@@ -43,17 +42,18 @@ describe("prepareCreateProductSubmit region edit", () => {
     }
 
     expect(prepared.patchBody?.productRegionCode).toBe("RU-CE");
-    expect(prepared.patchBody?.productCategory).toBe("home_garden");
+    expect(prepared.patchBody?.productCategoryId).toBe("507f1f77bcf86cd799439011");
+    expect(prepared.patchBody?.productCategory).toBeUndefined();
 
     const parsed = patchMyProductBodySchema.safeParse(prepared.patchBody);
     expect(parsed.success).toBe(true);
   });
 
-  it("uses productCategoryId only when tree picker is enabled", () => {
+  it("requires productCategoryId", () => {
     const prepared = prepareCreateProductSubmit({
       form: {
         ...editForm,
-        productCategoryId: "507f1f77bcf86cd799439011",
+        productCategoryId: null,
         productCategory: "home_garden",
       },
       isEdit: true,
@@ -61,17 +61,6 @@ describe("prepareCreateProductSubmit region edit", () => {
       ...sellerContext,
     });
 
-    expect(prepared.ok).toBe(true);
-    if (!prepared.ok) {
-      return;
-    }
-
-    if (IS_PRODUCT_CATEGORY_TREE_PICKER_ENABLED) {
-      expect(prepared.patchBody?.productCategoryId).toBe("507f1f77bcf86cd799439011");
-      expect(prepared.patchBody?.productCategory).toBeUndefined();
-    } else {
-      expect(prepared.patchBody?.productCategory).toBe("home_garden");
-      expect(prepared.patchBody?.productCategoryId).toBeUndefined();
-    }
+    expect(prepared.ok).toBe(false);
   });
 });

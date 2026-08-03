@@ -1,0 +1,9 @@
+{
+  "name": "iziBuy",
+  "short_name": "iziBuy",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff"
+}

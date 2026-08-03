@@ -1,4 +1,5 @@
 import { resolveOrderShippingTrackingUrl } from "@molha/api-contract";
+import { useState } from "react";
 
 import {
   ORDER_STATUS_PENDING,
@@ -296,10 +297,14 @@ function OrderCardLineItem({
             ) : (
               <span className="order-card__item-name">{productName}</span>
             )}
-            <span className="order-card__item-quantity">×{item.quantity}</span>
-            <span className="order-card__item-price">
-              {formatPriceRub(item.unitPriceAtOrder)}
-            </span>
+            {compact ? null : (
+              <>
+                <span className="order-card__item-quantity">×{item.quantity}</span>
+                <span className="order-card__item-price">
+                  {formatPriceRub(item.unitPriceAtOrder)}
+                </span>
+              </>
+            )}
           </div>
         ) : null}
         {showSecondary && !compact ? (
@@ -349,16 +354,6 @@ function OrderCardLineItem({
         <div className="order-card__item-actions-row">
           {canMarkShipped && (onMarkShipped || onCancelItem) ? (
             <>
-              {onMarkShipped ? (
-                <button
-                  type="button"
-                  className="order-card__item-action-button"
-                  onClick={() => onMarkShipped({ orderId, itemIndex })}
-                  disabled={isActionPending}
-                >
-                  {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_SHIPPED}
-                </button>
-              ) : null}
               {onCancelItem ? (
                 <button
                   type="button"
@@ -367,6 +362,16 @@ function OrderCardLineItem({
                   disabled={isActionPending}
                 >
                   {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_CANCEL}
+                </button>
+              ) : null}
+              {onMarkShipped ? (
+                <button
+                  type="button"
+                  className="order-card__item-action-button"
+                  onClick={() => onMarkShipped({ orderId, itemIndex })}
+                  disabled={isActionPending}
+                >
+                  {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_SHIPPED}
                 </button>
               ) : null}
             </>
@@ -444,6 +449,7 @@ export function OrderCard({
   onExpandedChange,
   attentionRole = "buyer",
 }) {
+  const [detailsExpanded, setDetailsExpanded] = useState(false);
   const isInstallmentOrder = Boolean(order.installmentContractId);
   const isAuctionOrder = Boolean(order.priceOfferId);
   const isExpanded = !collapsible || expanded;
@@ -451,11 +457,10 @@ export function OrderCard({
     attentionRole === "seller"
       ? orderNeedsSellerAttention(order)
       : orderNeedsBuyerAttention(order);
-  const collapsedPreview = !isExpanded
-    ? attentionRole === "seller"
+  const collapsedPreview =
+    attentionRole === "seller"
       ? resolveSellerOrderCollapsedPreview(order)
-      : resolveOrderCollapsedPreview(order)
-    : null;
+      : resolveOrderCollapsedPreview(order);
 
   const toggleExpanded = () => {
     onExpandedChange?.(!expanded);
@@ -475,11 +480,102 @@ export function OrderCard({
     attentionRole,
   };
 
+  const totalQuantity = order.items.reduce(
+    (sum, item) => sum + (Number(item.quantity) || 0),
+    0,
+  );
+
+  const expandedBody = (
+    <>
+      {compact ? null : (
+        <>
+          <OrderCardMeta
+            order={order}
+            showBuyer={showBuyer}
+            showSeller={showSeller}
+            onBuyerNameClick={onBuyerNameClick}
+            onSellerNameClick={onSellerNameClick}
+            isInstallmentOrder={isInstallmentOrder}
+          />
+          {showBuyer && order.buyerPassportShare ? (
+            <BuyerPassportSharePanel share={order.buyerPassportShare} />
+          ) : null}
+        </>
+      )}
+
+      <h3 className="order-card__items-heading">{ORDER_CARD_UI.ITEMS_HEADING}</h3>
+      <ul className="order-card__items" role="list">
+        {order.items.map((item, index) => (
+          <OrderCardLineItem
+            key={`${order._id}-${index}`}
+            item={item}
+            index={index}
+            {...lineItemProps}
+          />
+        ))}
+      </ul>
+
+      {compact ? (
+        <div
+          className={[
+            "order-card__details-fold",
+            detailsExpanded ? "order-card__details-fold_open" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          <button
+            type="button"
+            className="order-card__details-fold-summary"
+            aria-expanded={detailsExpanded}
+            onClick={() => setDetailsExpanded((value) => !value)}
+          >
+            {ORDER_CARD_UI.DETAILS_FOLD_SUMMARY}
+          </button>
+          <div
+            className={[
+              "order-card__details-fold-panel",
+              detailsExpanded ? "order-card__details-fold-panel_open" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
+            <div className="order-card__details-fold-panel-inner">
+              <div className="order-card__details-fold-body">
+                <OrderCardMeta
+                  order={order}
+                  showBuyer={showBuyer}
+                  showSeller={showSeller}
+                  onBuyerNameClick={onBuyerNameClick}
+                  onSellerNameClick={onSellerNameClick}
+                  isInstallmentOrder={isInstallmentOrder}
+                />
+                {showBuyer && order.buyerPassportShare ? (
+                  <BuyerPassportSharePanel share={order.buyerPassportShare} />
+                ) : null}
+                {order.items.map((item, index) => (
+                  <OrderCardLineItem
+                    key={`${order._id}-extras-${index}`}
+                    item={item}
+                    index={index}
+                    showSecondaryOnly
+                    {...lineItemProps}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
+
   return (
     <article
       className={[
         "order-card",
         compact ? "order-card--compact" : "",
+        collapsible ? "order-card--collapsible" : "",
         needsAttention ? "order-card_attention" : "",
       ]
         .filter(Boolean)
@@ -520,74 +616,50 @@ export function OrderCard({
             </button>
           ) : null}
         </div>
-        <span className="order-card__total">{formatPriceRub(order.totalAmount)}</span>
+        <div className="order-card__header-totals">
+          {compact && totalQuantity > 0 ? (
+            <span className="order-card__quantity">×{totalQuantity}</span>
+          ) : null}
+          <span className="order-card__total">{formatPriceRub(order.totalAmount)}</span>
+        </div>
       </header>
 
-      {collapsedPreview ? (
-        <p className="order-card__collapsed-preview">{collapsedPreview}</p>
-      ) : null}
-
-      {isExpanded ? (
-        <>
-          {compact ? null : (
-            <>
-              <OrderCardMeta
-                order={order}
-                showBuyer={showBuyer}
-                showSeller={showSeller}
-                onBuyerNameClick={onBuyerNameClick}
-                onSellerNameClick={onSellerNameClick}
-                isInstallmentOrder={isInstallmentOrder}
-              />
-              {showBuyer && order.buyerPassportShare ? (
-                <BuyerPassportSharePanel share={order.buyerPassportShare} />
-              ) : null}
-            </>
-          )}
-
-          <h3 className="order-card__items-heading">{ORDER_CARD_UI.ITEMS_HEADING}</h3>
-          <ul className="order-card__items" role="list">
-            {order.items.map((item, index) => (
-              <OrderCardLineItem
-                key={`${order._id}-${index}`}
-                item={item}
-                index={index}
-                {...lineItemProps}
-              />
-            ))}
-          </ul>
-
-          {compact ? (
-            <details className="order-card__details-fold">
-              <summary className="order-card__details-fold-summary">
-                {ORDER_CARD_UI.DETAILS_FOLD_SUMMARY}
-              </summary>
-              <div className="order-card__details-fold-body">
-                <OrderCardMeta
-                  order={order}
-                  showBuyer={showBuyer}
-                  showSeller={showSeller}
-                  onBuyerNameClick={onBuyerNameClick}
-                  onSellerNameClick={onSellerNameClick}
-                  isInstallmentOrder={isInstallmentOrder}
-                />
-                {showBuyer && order.buyerPassportShare ? (
-                  <BuyerPassportSharePanel share={order.buyerPassportShare} />
-                ) : null}
-                {order.items.map((item, index) => (
-                  <OrderCardLineItem
-                    key={`${order._id}-extras-${index}`}
-                    item={item}
-                    index={index}
-                    showSecondaryOnly
-                    {...lineItemProps}
-                  />
-                ))}
+      {collapsible ? (
+        <div className="order-card__collapsible-region">
+          {collapsedPreview ? (
+            <div
+              className={[
+                "order-card__fold",
+                !isExpanded ? "order-card__fold_open" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              aria-hidden={isExpanded}
+              inert={isExpanded ? true : undefined}
+            >
+              <div className="order-card__fold-inner">
+                <p className="order-card__collapsed-preview">{collapsedPreview}</p>
               </div>
-            </details>
+            </div>
           ) : null}
-        </>
-      ) : null}
+          <div
+            className={[
+              "order-card__fold",
+              isExpanded ? "order-card__fold_open" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            aria-hidden={!isExpanded}
+            inert={!isExpanded ? true : undefined}
+          >
+            <div className="order-card__fold-inner order-card__fold-inner_body">
+              {expandedBody}
+            </div>
+          </div>
+        </div>
+      ) : (
+        expandedBody
+      )}
 
       {statusSlot ? <footer className="order-card__footer">{statusSlot}</footer> : null}
     </article>

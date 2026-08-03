@@ -5,7 +5,6 @@ import { buildAdminPatchUserProfileBody } from "../lib/buildAdminPatchUserProfil
 import { buildPatchUserProfileBody } from "../lib/buildPatchUserProfileBody.js";
 import { isPremiumExpiresAtInputActive } from "../lib/computeStaffPremiumExpiry.js";
 import { willFormDisablePremium } from "../lib/willFormDisablePremium.js";
-import { addressStructuredValueFromUser } from "../../address/lib/addressStructuredValueFromUser.js";
 import { mapUserToEditProfileForm } from "../lib/mapUserToEditProfileForm.js";
 import { maskRuPhoneInput } from "../lib/ruPhone.js";
 import { keepDigitsOnly } from "../../../shared/lib/numericInput.js";
@@ -46,8 +45,8 @@ export function useEditProfileModal({
   const [form, setForm] = useState(() => mapUserToEditProfileForm({ _id: "" }));
   const [feedback, setFeedback] = useState({ kind: "idle", message: "" });
   const wasOpenRef = useRef(false);
-  const initialStructuredAddressRef = useRef(
-    /** @type {import('../../address/model/structuredTypes.js').RuStructuredDeliveryAddressValue | null} */ (
+  const initialDeliveryAddressRef = useRef(
+    /** @type {import('../../address/model/types.js').RuDeliveryAddressValue | null} */ (
       null
     ),
   );
@@ -60,8 +59,9 @@ export function useEditProfileModal({
       return undefined;
     }
 
-    setForm(mapUserToEditProfileForm(user));
-    initialStructuredAddressRef.current = addressStructuredValueFromUser(user);
+    const nextForm = mapUserToEditProfileForm(user);
+    setForm(nextForm);
+    initialDeliveryAddressRef.current = nextForm.deliveryAddress;
     setFeedback({ kind: "idle", message: "" });
     return undefined;
   }, [isOpen, user]);
@@ -151,7 +151,7 @@ export function useEditProfileModal({
     try {
       const profilePatchOptions = {
         initialPhoneNumber: user.userPhoneNumber,
-        initialStructuredAddress: initialStructuredAddressRef.current ?? undefined,
+        initialDeliveryAddress: initialDeliveryAddressRef.current ?? undefined,
       };
       const body = adminMode
         ? buildAdminPatchUserProfileBody(form, {

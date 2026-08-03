@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Share2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Check, Share2 } from "lucide-react";
 import { AFFILIATE_QUERY_PARAM } from "@izibuy/shared-lib";
 import { useQuery } from "@tanstack/react-query";
 
@@ -8,6 +8,8 @@ import { resolveProductAffiliateOffer } from "../../lib/resolveProductAffiliateO
 import { fetchMyReferralProgram } from "../../../user/api/referralProgram.js";
 import { getProductSellerId } from "../../lib/getProductSellerId.js";
 import { ProductDetailsFeatureCard } from "./ProductDetailsFeatureCard.jsx";
+
+const COPIED_ICON_MS = 1600;
 
 /**
  * @param {{
@@ -29,7 +31,16 @@ export function ProductAffiliateShareButton({
     currentUserId != null &&
     sellerId != null &&
     String(currentUserId) === String(sellerId);
-  const [status, setStatus] = useState("");
+  const [copied, setCopied] = useState(false);
+  const resetTimerRef = useRef(/** @type {ReturnType<typeof setTimeout> | null} */ (null));
+
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current != null) {
+        clearTimeout(resetTimerRef.current);
+      }
+    };
+  }, []);
 
   const referralQuery = useQuery({
     queryKey: ["user", "me", "referral", "for-affiliate-share"],
@@ -42,6 +53,17 @@ export function ProductAffiliateShareButton({
     return null;
   }
 
+  const flashCopied = () => {
+    setCopied(true);
+    if (resetTimerRef.current != null) {
+      clearTimeout(resetTimerRef.current);
+    }
+    resetTimerRef.current = setTimeout(() => {
+      setCopied(false);
+      resetTimerRef.current = null;
+    }, COPIED_ICON_MS);
+  };
+
   const handleClick = async () => {
     if (!isAuthorized) {
       onRequestLogin();
@@ -49,7 +71,6 @@ export function ProductAffiliateShareButton({
     }
     const code = String(referralQuery.data?.referralCode ?? "").trim();
     if (!code) {
-      setStatus(PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_FAILED);
       return;
     }
     const productId = String(product._id ?? "");
@@ -65,7 +86,7 @@ export function ProductAffiliateShareButton({
         document.execCommand("copy");
         area.remove();
       }
-      setStatus(PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_COPIED);
+      flashCopied();
       if (typeof navigator.share === "function") {
         try {
           await navigator.share({
@@ -77,7 +98,7 @@ export function ProductAffiliateShareButton({
         }
       }
     } catch {
-      setStatus(PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_FAILED);
+      // copy/share unavailable
     }
   };
 
@@ -92,22 +113,15 @@ export function ProductAffiliateShareButton({
     : PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_LOGIN;
 
   return (
-    <>
-      <ProductDetailsFeatureCard
-        icon={Share2}
-        title={title}
-        subtitle={subtitle}
-        ariaLabel={ariaLabel}
-        disabled={isAuthorized && referralQuery.isLoading}
-        onClick={() => {
-          void handleClick();
-        }}
-      />
-      {status ? (
-        <p className="product-details-modal__affiliate-share-status" role="status">
-          {status}
-        </p>
-      ) : null}
-    </>
+    <ProductDetailsFeatureCard
+      icon={copied ? Check : Share2}
+      title={title}
+      subtitle={subtitle}
+      ariaLabel={ariaLabel}
+      disabled={isAuthorized && referralQuery.isLoading}
+      onClick={() => {
+        void handleClick();
+      }}
+    />
   );
 }

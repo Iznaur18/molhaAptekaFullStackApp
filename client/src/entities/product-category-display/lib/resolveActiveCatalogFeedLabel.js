@@ -2,6 +2,7 @@ import {
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
+  CATALOG_FILTER_NEAR,
   CATALOG_FILTER_SALE_ONLY,
   CATALOG_SORT_LABEL_RU,
   CATALOG_SORT_NEWEST,
@@ -14,10 +15,14 @@ import {
  *   auctionOnly: boolean;
  *   installmentOnly: boolean;
  *   saleOnly: boolean;
+ *   near?: boolean;
  * }} query
  * @returns {string | null}
  */
 export function resolveActiveCatalogFeedLabel(query) {
+  if (query.near) {
+    return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_NEAR];
+  }
   if (query.followingOnly) {
     return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_FOLLOWING_ONLY];
   }

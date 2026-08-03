@@ -1,4 +1,5 @@
 import { OrderModel } from "../../models/index.js";
+import { loadInstallmentPlanSummariesByIds } from "../../services/installment/installmentHelpers.js";
 import { sanitizeOrderForBuyerApi } from "../../services/order/buyerPassportShare.js";
 import { fetchMyOrdersPageIds } from "../../services/order/fetchMyOrdersPageIds.js";
 import { orderRowsByIds } from "../../services/order/fetchMySalesOrderPageIds.js";
@@ -48,7 +49,20 @@ export const getMyOrdersController = async (req, res) => {
   const pageOrders = orderRowsByIds(orderIds, orders);
   pageOrders.forEach((order) => syncOrderStatusFromItems(order));
 
-  const sortedOrders = pageOrders.map((order) => sanitizeOrderForBuyerApi(order));
+  const contractIds = pageOrders
+    .map((order) => order.installmentContractId)
+    .filter(Boolean);
+  const planSummaryByContractId = await loadInstallmentPlanSummariesByIds(contractIds);
+
+  const sortedOrders = pageOrders.map((order) => {
+    const contractId = order.installmentContractId
+      ? String(order.installmentContractId)
+      : null;
+    const installmentContract =
+      contractId != null ? (planSummaryByContractId[contractId] ?? null) : null;
+    const withPlan = installmentContract ? { ...order, installmentContract } : order;
+    return sanitizeOrderForBuyerApi(withPlan);
+  });
 
   return successRes(res, {
     orders: sortedOrders,

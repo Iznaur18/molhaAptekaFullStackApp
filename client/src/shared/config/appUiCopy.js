@@ -13,6 +13,11 @@ export const COMMON_UI = {
   REQUIRED_FIELD_HINT: "Обязательно",
 };
 
+/** Блокировка landscape на смартфонах (web) */
+export const APP_PORTRAIT_LOCK_UI = {
+  HINT: "Поверните телефон вертикально",
+};
+
 /** Поле URL изображения с загрузкой файла (`POST /upload`) */
 export const IMAGE_URL_FIELD_UI = {
   UPLOAD_BUTTON: "Выбрать файл",
@@ -446,6 +451,7 @@ export const HOME_PAGE_UI = {
   NAV_TO_WISHLIST: "Мои желания",
   TITLE_NOTIFICATIONS: "Уведомления",
   FILTER_FOLLOWING_ONLY: "Только от подписок",
+  FILTER_NEAR: "Рядом",
   FILTER_AUCTION_ONLY: "Только с аукционом",
   FILTER_INSTALLMENT_ONLY: "Только в рассрочку",
   CATALOG_FILTERS_PANEL_ARIA: "Фильтры каталога",
@@ -454,7 +460,11 @@ export const HOME_PAGE_UI = {
   EMPTY_FOLLOWING_FILTER: "Нет товаров от ваших подписок с текущими фильтрами.",
   EMPTY_SALE_FILTER: "Нет товаров в распродаже от 35%.",
   EMPTY_INSTALLMENT_FILTER: "Нет товаров с рассрочкой с текущими фильтрами.",
+  EMPTY_NEAR_FILTER: "Нет товаров рядом с вашим адресом.",
   LOGIN_FOR_FOLLOWING_FILTER: "Войдите, чтобы включить фильтр «только от подписок».",
+  NEAR_ADDRESS_REQUIRED: "Укажите адрес в профиле, чтобы смотреть товары рядом",
+  NEAR_ADDRESS_REQUIRED_CONFIRM: "Открыть редактирование профиля?",
+  NEAR_REGION_SECTION: "В вашем регионе",
   NAV_TO_CART: "Корзина",
   NAV_TO_MY_ORDERS: "Мои покупки",
   NAV_TO_ADMIN_ORDERS: "Все заказы",
@@ -652,6 +662,7 @@ export const CART_AUCTION_UI = {
 
 /** Структурированный адрес (профиль) */
 export const ADDRESS_STRUCTURED_UI = {
+  SECTION_LABEL: "Адрес",
   FIELDSET_LEGEND: "Адрес",
   LABEL_CITY: "Город",
   LABEL_DISTRICT: "Район",
@@ -670,6 +681,7 @@ export const ADDRESS_DELIVERY_UI = {
   LABEL_LINE: "Адрес (город, улица, дом)",
   PLACEHOLDER_LINE: "Начните вводить и выберите из списка",
   HINT_LINE: "Выберите вариант из подсказок DaData",
+  LABEL_FLAT: "Квартира / офис",
   SUGGEST_LOADING: "Ищем адреса…",
   SUGGEST_ERROR: "Подсказки недоступны",
 };
@@ -681,13 +693,12 @@ export const CHECKOUT_FORM_UI = {
   FULFILLMENT_PICKUP: "Самовывоз",
   FULFILLMENT_DELIVERY: "Доставка",
   FULFILLMENT_DELIVERY_SOON: "Скоро",
-  FULFILLMENT_DELIVERY_UNAVAILABLE: "недоступна для выбранных товаров",
-  FULFILLMENT_PICKUP_UNAVAILABLE: "недоступен для выбранных товаров",
+  FULFILLMENT_DELIVERY_UNAVAILABLE: "Доставка недоступна для выбранных товаров",
+  FULFILLMENT_PICKUP_UNAVAILABLE: "Самовывоз недоступен для выбранных товаров",
   PICKUP_ADDRESS_LABEL: "Адрес самовывоза",
   LABEL_DELIVERY_ADDRESS: "Адрес доставки",
   PLACEHOLDER_DELIVERY_ADDRESS: "Город, улица, дом",
   LABEL_FLAT: "Квартира / офис",
-  PLACEHOLDER_FLAT: "Необязательно",
   LABEL_PAYMENT_METHOD: "Способ оплаты",
   PAYMENT_METHOD_CARD_SOON: "Скоро",
   LABEL_SHIPPING_PROVIDER: "Служба доставки",
@@ -718,15 +729,16 @@ export const PRODUCT_PICKUP_UI = {
   PICKUP_HINT: "Укажите адрес и отметьте точку на карте (или выберите из подсказок).",
   DELIVERY_CARRIERS_HINT:
     "Покупатель укажет адрес доставки. Службы СДЭК / Яндекс / Почта — позже; пока доставляете сами.",
-  ADDRESS_LABEL: "Адрес самовывоза",
+  ADDRESS_LABEL: "Адрес продажи",
   ADDRESS_LABEL_WAREHOUSE: "Адрес точки отправления",
-  MAP_ARIA: "Карта точки самовывоза",
+  MAP_ARIA: "Карта адреса продажи",
   MAP_KEY_MISSING:
     "Карта появится после добавления VITE_YANDEX_MAPS_API_KEY. Пока укажите адрес текстом или из подсказки.",
   DETAILS_TITLE: "Самовывоз",
   DETAILS_ROUTE: "Маршрут",
   DETAILS_OPEN_MAP: "Открыть на карте",
   DETAILS_NO_ADDRESS: "Адрес самовывоза не указан",
+  DETAILS_DELIVERY_HINT: "Адрес укажете при оформлении заказа",
 };
 
 /** Подписи карточки заказа (используется на Мои покупки и Все заказы) */
@@ -906,7 +918,7 @@ export const SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI = {
     "Ваш баннер появится в карусели под шапкой на главной после модерации. Показ длится 7 дней. Одновременно доступно до 200 платных слотов.",
   STATUS_PENDING: "На модерации. Баллы зарезервированы.",
   STATUS_ACTIVE: "Показ активен.",
-  SUBMIT: "Отправить на модерацию",
+  SUBMIT: "Подтвердить",
   CANCEL: "Отменить заявку",
   PREVIEW: "Предпросмотр",
   OPEN_FORM: "Оформить баннер",
@@ -980,7 +992,7 @@ export const SELLER_PERSONAL_CATEGORY_PAGE_UI = {
   CANCEL_FALLBACK: "Не удалось отменить заявку",
   CANCEL_SUCCESS: "Заявка отменена",
   OPEN_FORM: "Купить личную категорию",
-  SUBMIT: "Отправить на модерацию",
+  SUBMIT: "Подтвердить",
   CANCEL: "Отменить заявку",
   LABEL_NAME: "Название категории",
   LABEL_IMAGE: "Картинка плитки",
@@ -1560,8 +1572,9 @@ export const CREATE_PRODUCT_MODAL_UI = {
   LABEL_SALE_REGION: "Регион продажи",
   PLACEHOLDER_SALE_REGION: "Выберите регион",
   HINT_SALE_REGION: "Товар будет виден покупателям этого региона",
-  ERROR_SALE_REGION_REQUIRED: "Выберите регион продажи",
-  LABEL_PICKUP_ADDRESS: "Адрес самовывоза",
+  HINT_SALE_REGION_FROM_ADDRESS: "Определится из адреса продажи",
+  ERROR_SALE_REGION_REQUIRED: "Укажите адрес продажи с известным регионом",
+  LABEL_PICKUP_ADDRESS: "Адрес продажи",
   ERROR_PICKUP_COORDS: "Укажите точку на карте или выберите адрес из подсказки",
   ERROR_CATEGORY_LEAF: "Выберите конечную подкатегорию в дереве категорий",
   LABEL_AVAILABLE: "Товар в наличии",
@@ -1783,8 +1796,6 @@ export const PRODUCT_CATEGORY_TREE_UI = {
   LEAF_BADGE: "конечная",
   LOADING: "Загрузка категорий…",
   LOAD_ERROR: "Не удалось загрузить категории",
-  SWITCH_TO_LEGACY: "Общий список категорий",
-  SWITCH_TO_TREE: "Выбрать по подрубрикам",
   TRAIL_ARIA: "Путь по категориям",
   CATALOG_FILTER_OPEN: "Фильтр по подкатегориям",
   CATALOG_FILTER_HINT:
@@ -1815,18 +1826,17 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   ORIGINAL_BADGE_ARIA: "Оригинальный товар",
   AFFILIATE_BADGE: (percent) => `Партнёрам ${percent}%`,
   AFFILIATE_SHARE: "Поделиться и заработать",
-  AFFILIATE_SHARE_TITLE: "Поделиться",
+  AFFILIATE_SHARE_TITLE: "Поделиться ссылкой",
   AFFILIATE_SHARE_SUBTITLE: (percent) => `Заработать ${percent}% с покупки`,
   AFFILIATE_SHARE_LOGIN: "Войдите, чтобы делиться",
   AFFILIATE_SHARE_LOGIN_TITLE: "Войдите, чтобы делиться",
-  AFFILIATE_SHARE_LOGIN_SUBTITLE: "Зарабатывайте на рекомендациях",
-  AFFILIATE_SHARE_COPIED: "Ссылка скопирована",
-  AFFILIATE_SHARE_FAILED: "Не удалось скопировать ссылку",
+  AFFILIATE_SHARE_LOGIN_SUBTITLE: "Заработай от продажи",
   AFFILIATE_PERCENT_HINT:
     "Процент может измениться до покупки. Выплата — после подтверждения заказа.",
   CONTENT_SWITCHER_ARIA: "Описание и характеристики товара",
   DESCRIPTION_SECTION_ARIA: "Описание товара",
   SALE_CITY_ALL: "Во всех городах",
+  ADDRESS_EMPTY: "Адрес не указан",
   CHARACTERISTICS_TITLE: "Характеристики",
   CHARACTERISTICS_SECTION_ARIA: "Характеристики товара",
   RETURNS_TITLE: "Возврат",

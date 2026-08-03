@@ -2,6 +2,7 @@ import {
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
+  CATALOG_FILTER_NEAR,
   CATALOG_FILTER_SALE_ONLY,
   CATALOG_SORT_NEWEST,
 } from "@/entities/product-category-display/lib/catalogFeedTiles";
@@ -11,10 +12,10 @@ const CATALOG_SORT_LABEL_RU: Record<string, string> = {
   [CATALOG_SORT_NEWEST]: "Новинки",
   views: "По просмотрам",
   purchases: "Больше всего купили",
-  city: "По городу",
   premium: "Только премиум",
   confirmed: "Подтверждённые продавцы",
   reviews: "По отзывам",
+  [CATALOG_FILTER_NEAR]: "Рядом",
   [CATALOG_FILTER_FOLLOWING_ONLY]: "Только от подписок",
   [CATALOG_FILTER_AUCTION_ONLY]: "Только с аукционом",
   [CATALOG_FILTER_INSTALLMENT_ONLY]: "Только в рассрочку",
@@ -27,9 +28,13 @@ type CatalogFeedQuery = {
   auctionOnly?: boolean;
   installmentOnly?: boolean;
   saleOnly?: boolean;
+  near?: boolean;
 };
 
 export const resolveActiveCatalogFeedLabel = (query: CatalogFeedQuery): string | null => {
+  if (query.near) {
+    return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_NEAR];
+  }
   if (query.followingOnly) {
     return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_FOLLOWING_ONLY];
   }

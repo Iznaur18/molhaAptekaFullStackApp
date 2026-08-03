@@ -1,4 +1,8 @@
 import {
+  PRODUCT_CATALOG_NEAR_REGION_SECTION_TITLE,
+  splitCatalogNearProducts,
+} from "@molha/api-contract";
+import {
   interleaveCatalogTier3Banners,
   shouldShowProductTier3BannerFullWidth,
   type CatalogTier3Product,
@@ -8,14 +12,17 @@ export type CatalogGridProduct = CatalogTier3Product & { _id: string };
 
 export type CatalogGridRow =
   | { kind: "tier3-banner"; key: string; product: CatalogGridProduct }
-  | { kind: "product-cells"; key: string; products: CatalogGridProduct[] };
+  | { kind: "product-cells"; key: string; products: CatalogGridProduct[] }
+  | { kind: "section-header"; key: string; title: string };
 
 type BuildCatalogGridRowsOptions = {
   showFullWidthTier3Banners?: boolean;
   isMineMode?: boolean;
+  catalogNear?: boolean;
+  nearRegionSectionTitle?: string;
 };
 
-export const buildCatalogGridRows = (
+const buildCatalogGridRowsInternal = (
   products: CatalogGridProduct[],
   columnCount: number,
   { showFullWidthTier3Banners = false, isMineMode = false }: BuildCatalogGridRowsOptions = {},
@@ -71,4 +78,31 @@ export const buildCatalogGridRows = (
 
   flushBuffer();
   return rows;
+};
+
+export const buildCatalogGridRows = (
+  products: CatalogGridProduct[],
+  columnCount: number,
+  options: BuildCatalogGridRowsOptions = {},
+): CatalogGridRow[] => {
+  if (options.catalogNear && !options.isMineMode) {
+    const { withDistance, withoutDistance } = splitCatalogNearProducts(products);
+    const baseOptions = { ...options, catalogNear: false };
+    const nearRows = buildCatalogGridRowsInternal(withDistance, columnCount, baseOptions);
+    if (withoutDistance.length === 0) {
+      return nearRows;
+    }
+    return [
+      ...nearRows,
+      {
+        kind: "section-header",
+        key: "catalog-near-region",
+        title:
+          options.nearRegionSectionTitle ?? PRODUCT_CATALOG_NEAR_REGION_SECTION_TITLE,
+      },
+      ...buildCatalogGridRowsInternal(withoutDistance, columnCount, baseOptions),
+    ];
+  }
+
+  return buildCatalogGridRowsInternal(products, columnCount, options);
 };

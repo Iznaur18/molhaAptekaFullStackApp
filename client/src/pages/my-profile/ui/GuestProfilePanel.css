@@ -27,7 +27,9 @@ body:has(.guest-profile) #root {
 body:has(.guest-profile) .app-shell,
 body:has(.guest-profile) .app-shell.app-shell--header-v1,
 body:has(.guest-profile) .app-shell.app-shell--header-v2 {
-  padding-top: 0 !important;
+  padding: 0 !important;
+  margin: 0;
+  max-width: none;
   background: var(--iz-color-surface);
   min-height: 100dvh;
 }

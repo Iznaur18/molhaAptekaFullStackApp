@@ -3,7 +3,7 @@
   padding: 0.75rem;
   border: 1px solid var(--iz-color-border);
   border-radius: 10px;
-  background: var(--iz-color-surface-muted, var(--iz-color-surface));
+  background: var(--iz-color-bg);
 }
 
 .buyer-passport-share-panel__title {

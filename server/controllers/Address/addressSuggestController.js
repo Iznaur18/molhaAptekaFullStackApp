@@ -6,22 +6,24 @@ import {
 
 /** POST /address/suggest — подсказки DaData (до дома, РФ). */
 export const addressSuggestController = async (req, res) => {
+  const query = String(req.body.query ?? "").trim();
+
+  // Без ключей — пустой список (ручной ввод адреса остаётся доступен).
   if (!isDadataConfigured()) {
-    return errorRes(
-      res,
-      503,
-      "Подсказки адресов недоступны: задайте DADATA_API_KEY и DADATA_SECRET_KEY",
-    );
+    return successRes(res, { suggestions: [], configured: false });
   }
 
-  const query = String(req.body.query ?? "").trim();
-  const suggestions = await suggestRuAddresses(query);
-
-  return successRes(res, {
-    suggestions: suggestions.map((item) => ({
-      value: item.value,
-      unrestrictedValue: item.unrestricted_value,
-      data: item.data,
-    })),
-  });
+  try {
+    const suggestions = await suggestRuAddresses(query);
+    return successRes(res, {
+      configured: true,
+      suggestions: suggestions.map((item) => ({
+        value: item.value,
+        unrestrictedValue: item.unrestricted_value,
+        data: item.data,
+      })),
+    });
+  } catch {
+    return errorRes(res, 503, "Подсказки адресов временно недоступны");
+  }
 };

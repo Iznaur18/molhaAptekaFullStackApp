@@ -72,8 +72,8 @@ export function CreateProductReviewSection({
       label: CREATE_PRODUCT_MODAL_UI.LABEL_SALE_REGION,
       value:
         getRuRegionByCode(String(form.productRegionCode ?? "").trim())?.name ||
-        CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_EMPTY,
-      stepIndex: 3,
+        CREATE_PRODUCT_MODAL_UI.HINT_SALE_REGION_FROM_ADDRESS,
+      stepIndex: 4,
     },
     {
       label: CREATE_PRODUCT_MODAL_UI.LABEL_PICKUP_ADDRESS,

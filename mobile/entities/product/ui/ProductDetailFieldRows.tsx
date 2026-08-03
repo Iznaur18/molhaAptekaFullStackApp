@@ -60,6 +60,8 @@ export const ProductDetailFieldRows = ({
         ];
 
         const isStatRow = readLayout === "stat";
+        const isMultiline = isProductFieldMultilineRead(key);
+        const clampStatValue = isStatRow && !isMultiline;
         const displayValue = formatProductFieldForDisplay(key, product);
         const showIdCopy =
           key === PRODUCT_ID_FIELD_KEY &&
@@ -67,7 +69,10 @@ export const ProductDetailFieldRows = ({
           displayValue.length > 0;
 
         return (
-          <View key={key} style={rowStyle}>
+          <View
+            key={key}
+            style={[rowStyle, isStatRow && isMultiline ? styles.rowStatMultiline : null]}
+          >
             <Text
               style={labelStyle}
               numberOfLines={isStatRow ? 1 : undefined}
@@ -90,8 +95,8 @@ export const ProductDetailFieldRows = ({
             ) : (
               <Text
                 style={valueStyle}
-                numberOfLines={isStatRow ? 1 : undefined}
-                ellipsizeMode={isStatRow ? "tail" : undefined}
+                numberOfLines={clampStatValue ? 1 : undefined}
+                ellipsizeMode={clampStatValue ? "tail" : undefined}
               >
                 {displayValue}
               </Text>

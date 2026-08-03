@@ -19,6 +19,7 @@ const baseForm = {
   productImageRows: [createImageRow("/uploads/a.jpg")],
   productPrice: "1000",
   productCategory: "electronics",
+  productCategoryId: "507f1f77bcf86cd799439011",
   productRegionCode: "RU-MOW",
   productReturnEnabled: false,
   productPickupAddress: "Москва, Тверская улица, 1",
@@ -57,6 +58,17 @@ describe("prepareCreateProductSubmit pickup", () => {
     if (!result.ok) {
       expect(result.message).toBe(PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE);
     }
+  });
+
+  it("requires pickup coords", () => {
+    const result = prepareCreateProductSubmit({
+      form: { ...baseForm, productPickupLat: null, productPickupLon: null },
+      isEdit: false,
+      showCatalogAvailabilityToggle: true,
+      sellerPointsMaxPerUnit: 100,
+      sellerCatalogCommitted: 0,
+    });
+    expect(result.ok).toBe(false);
   });
 
   it("includes pickup fields in createBody", () => {

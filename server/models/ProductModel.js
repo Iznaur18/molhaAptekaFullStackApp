@@ -164,6 +164,16 @@ const ProductSchema = new Schema(
       min: -180,
       max: 180,
     },
+    /** GeoJSON Point [lon, lat] — для каталога «Рядом» ($geoNear / 2dsphere). */
+    productPickupLocation: {
+      type: {
+        type: String,
+        enum: ["Point"],
+      },
+      coordinates: {
+        type: [Number],
+      },
+    },
     /** Доставка продавцом. */
     productDeliveryEnabled: {
       type: Boolean,
@@ -329,6 +339,10 @@ const ProductSchema = new Schema(
 
 ProductSchema.index({ productSearchBlob: 1 });
 ProductSchema.index({ categoryPathIds: 1 });
+ProductSchema.index(
+  { productPickupLocation: "2dsphere" },
+  { name: "product_pickup_location_2dsphere", sparse: true },
+);
 
 /** GET /product — одобренные, в наличии, сортировка по дате / бусту. */
 ProductSchema.index(

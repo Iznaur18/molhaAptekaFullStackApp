@@ -5,7 +5,7 @@ import {
   isRuRegionCode,
 } from "@molha/api-contract";
 
-import { addressStructuredValueFromUser } from "../../address/lib/addressStructuredValueFromUser.js";
+import { addressValueFromUser } from "../../address/lib/addressValueFromUser.js";
 import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
 import { parseUserBackgroundFormFields } from "./userBackgroundValue.js";
 import { formatPremiumExpiresAtForInput } from "./formatPremiumExpiresAtForInput.js";
@@ -22,7 +22,7 @@ import {
  * @property {string} userName
  * @property {string} userBirthDate
  * @property {'male'|'female'|'noSelected'} userGender
- * @property {import('../../address/model/structuredTypes.js').RuStructuredDeliveryAddressValue} structuredAddress
+ * @property {import('../../address/model/types.js').RuDeliveryAddressValue} deliveryAddress
  * @property {string} userRegionCode
  * @property {string} userPhoneNumber
  * @property {string} userAvatarUrl
@@ -64,11 +64,15 @@ export function mapUserToEditProfileForm(user) {
     socialLinks[fieldId] = storedSocialUrlToInputValue(fieldId, user[fieldId]);
   }
 
+  const deliveryAddress = addressValueFromUser(user);
+  deliveryAddress.flat =
+    typeof user.userAddressFlat === "string" ? user.userAddressFlat.trim() : "";
+
   return {
     userName: user.userName ?? "",
     userBirthDate: birthInput,
     userGender: user.userGender ?? USER_GENDER_NO_SELECTED,
-    structuredAddress: addressStructuredValueFromUser(user),
+    deliveryAddress,
     userRegionCode: isRuRegionCode(String(user.userRegionCode ?? "").trim())
       ? String(user.userRegionCode).trim()
       : DEFAULT_VIEWER_REGION_CODE,

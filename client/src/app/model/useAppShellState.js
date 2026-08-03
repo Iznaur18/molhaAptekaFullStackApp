@@ -150,6 +150,7 @@ export function useAppShellState(location, navigate) {
     catalogAuctionOnly: catalogQueryFromUrl.auctionOnly,
     catalogInstallmentOnly: catalogQueryFromUrl.installmentOnly,
     catalogSaleOnly: catalogQueryFromUrl.saleOnly,
+    catalogNear: catalogQueryFromUrl.near,
   });
 
   const featuredContent = useHomeFeaturedContent({

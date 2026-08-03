@@ -15,6 +15,7 @@ import { useHomeCuratedProductListsQuery } from "../../../entities/curated-produ
  *   catalogAuctionOnly: boolean;
  *   catalogInstallmentOnly: boolean;
  *   catalogSaleOnly: boolean;
+ *   catalogNear?: boolean;
  *   viewerRegionCode: string;
  * }} params
  */
@@ -29,6 +30,7 @@ export function useHomeCuratedProductLists({
   catalogAuctionOnly,
   catalogInstallmentOnly,
   catalogSaleOnly,
+  catalogNear = false,
   viewerRegionCode,
 }) {
   const showCuratedProductLists = isHomeCuratedProductListsVisible({
@@ -42,6 +44,7 @@ export function useHomeCuratedProductLists({
     catalogAuctionOnly,
     catalogInstallmentOnly,
     catalogSaleOnly,
+    catalogNear,
   });
 
   const curatedListsQuery = useHomeCuratedProductListsQuery({

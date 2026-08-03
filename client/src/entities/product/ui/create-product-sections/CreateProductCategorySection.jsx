@@ -1,7 +1,6 @@
-import { DEFAULT_VIEWER_REGION_CODE } from "@molha/api-contract";
+import { getRuRegionByCode } from "@molha/api-contract";
 
 import { CreateProductCategoryPicker } from "../../../product-category-tree/ui/CreateProductCategoryPicker.jsx";
-import { RuRegionSelect } from "../../../region/ui/RuRegionSelect.jsx";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
 import { FormFieldLabel } from "../../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 
@@ -20,6 +19,9 @@ export function CreateProductCategorySection({
   isSubmitting,
   className = "",
 }) {
+  const regionName =
+    getRuRegionByCode(String(form.productRegionCode ?? "").trim())?.name ?? null;
+
   return (
     <div className={["create-product-section", className].filter(Boolean).join(" ")}>
       <CreateProductCategoryPicker
@@ -49,21 +51,11 @@ export function CreateProductCategorySection({
           }))
         }
       />
-      <label className="create-product-section__label">
+      <p className="create-product-section__hint">
         <FormFieldLabel>{CREATE_PRODUCT_MODAL_UI.LABEL_SALE_REGION}</FormFieldLabel>
-        <RuRegionSelect
-          className="create-product-section__input"
-          value={String(form.productRegionCode || DEFAULT_VIEWER_REGION_CODE)}
-          disabled={isSubmitting}
-          required
-          onChange={(productRegionCode) =>
-            setForm((prev) => ({ ...prev, productRegionCode }))
-          }
-        />
-        <span className="create-product-section__hint">
-          {CREATE_PRODUCT_MODAL_UI.HINT_SALE_REGION}
-        </span>
-      </label>
+        {": "}
+        {regionName || CREATE_PRODUCT_MODAL_UI.HINT_SALE_REGION_FROM_ADDRESS}
+      </p>
     </div>
   );
 }

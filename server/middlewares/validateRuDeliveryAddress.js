@@ -10,7 +10,11 @@ import { errorRes } from "../services/http/index.js";
  * }} [options]
  */
 export function validateRuDeliveryAddress(options = {}) {
-  const { lineField = "userAddress", lineRequired = false } = options;
+  const {
+    lineField = "userAddress",
+    flatField = "userAddressFlat",
+    lineRequired = false,
+  } = options;
 
   return async (req, res, next) => {
     try {
@@ -36,9 +40,13 @@ export function validateRuDeliveryAddress(options = {}) {
         return errorRes(res, 400, "Адрес доставки обязателен");
       }
 
+      const flatRaw = req.body[flatField];
+      const flat =
+        flatRaw === null || flatRaw === undefined ? "" : String(flatRaw).trim();
+
       const verified = await verifyRuDeliveryAddress({
         addressLine: line,
-        flat: "",
+        flat,
       });
       req.verifiedDeliveryAddress = verified;
       return next();

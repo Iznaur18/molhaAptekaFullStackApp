@@ -123,6 +123,18 @@
   gap: 0.5rem;
 }
 
+.partner-program-page__invite-actions .app-btn--secondary {
+  border-color: var(--iz-color-ink);
+  background: var(--iz-color-ink);
+  color: var(--iz-color-on-contrast);
+}
+
+.partner-program-page__invite-actions .app-btn--secondary:hover:not(:disabled) {
+  border-color: var(--iz-color-ink);
+  background: color-mix(in srgb, var(--iz-color-ink) 88%, white);
+  color: var(--iz-color-on-contrast);
+}
+
 .partner-program-page__field {
   display: flex;
   flex-direction: column;

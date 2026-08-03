@@ -12,6 +12,8 @@ import "./FeaturedRaffleModalCard.css";
  * @param {{
  *   raffle: import('../model/types.js').RaffleFromApi;
  *   visualSize: number;
+ *   slideIndex?: number;
+ *   slideCount?: number;
  *   manage?: {
  *     showEdit?: boolean;
  *     showDelete?: boolean;
@@ -27,6 +29,8 @@ import "./FeaturedRaffleModalCard.css";
 export function FeaturedRaffleModalCard({
   raffle,
   visualSize,
+  slideIndex = 0,
+  slideCount = 1,
   manage = null,
   isVideoActive = true,
 }) {
@@ -90,6 +94,12 @@ export function FeaturedRaffleModalCard({
             </div>
           ) : null}
         </div>
+
+        {slideCount > 1 ? (
+          <span className="featured-raffle-modal-card__slide-count" aria-hidden="true">
+            {slideIndex + 1}/{slideCount}
+          </span>
+        ) : null}
       </div>
 
       <div className="featured-raffle-modal-card__body">

@@ -16,6 +16,7 @@ describe("isPageScrollLockTextField", () => {
     tel.type = "tel";
     const area = document.createElement("textarea");
     const select = document.createElement("select");
+    document.body.append(text, number, tel, area, select);
 
     expect(isPageScrollLockTextField(text)).toBe(true);
     expect(isPageScrollLockTextField(number)).toBe(true);
@@ -31,12 +32,22 @@ describe("isPageScrollLockTextField", () => {
     button.type = "button";
     const file = document.createElement("input");
     file.type = "file";
+    document.body.append(checkbox, button, file);
 
     expect(isPageScrollLockTextField(checkbox)).toBe(false);
     expect(isPageScrollLockTextField(button)).toBe(false);
     expect(isPageScrollLockTextField(file)).toBe(false);
     expect(isPageScrollLockTextField(document.createElement("div"))).toBe(false);
     expect(isPageScrollLockTextField(null)).toBe(false);
+  });
+
+  it("skips disconnected text fields", () => {
+    const input = document.createElement("input");
+    input.type = "text";
+    document.body.appendChild(input);
+    expect(isPageScrollLockTextField(input)).toBe(true);
+    input.remove();
+    expect(isPageScrollLockTextField(input)).toBe(false);
   });
 });
 
@@ -123,6 +134,35 @@ describe("enableInputFocusPageScrollLock", () => {
     second.blur();
     await Promise.resolve();
     expect(document.body.style.overflow).toBe("");
+
+    dispose();
+  });
+
+  it("unlocks when focused login input is unmounted", async () => {
+    const { enableInputFocusPageScrollLock } = await import(
+      "./enableInputFocusPageScrollLock.js"
+    );
+    const dispose = enableInputFocusPageScrollLock();
+
+    const input = document.createElement("input");
+    input.type = "password";
+    document.body.appendChild(input);
+    input.focus();
+    expect(document.body.style.overflow).toBe("hidden");
+
+    // Simulate route change after login: focused field removed (jsdom may skip focusout).
+    input.remove();
+    document.dispatchEvent(new Event("touchstart", { bubbles: true }));
+
+    expect(document.body.style.overflow).toBe("");
+    expect(document.documentElement.style.overflow).toBe("");
+
+    const touchEvent = new Event("touchmove", {
+      bubbles: true,
+      cancelable: true,
+    });
+    document.dispatchEvent(touchEvent);
+    expect(touchEvent.defaultPrevented).toBe(false);
 
     dispose();
   });

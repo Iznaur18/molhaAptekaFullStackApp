@@ -6,6 +6,10 @@ import {
   countCatalogProductsAtlas,
   findCatalogProductsPageAtlas,
 } from "./productCatalogAtlasSearch.js";
+import {
+  countProductsNear,
+  findProductsPageNear,
+} from "./productCatalogNearQuery.js";
 import { countProducts, findProductsPage } from "./productCatalogQuery.js";
 
 /**
@@ -29,6 +33,7 @@ const regexSearchRankFromIntent = (searchResult) => {
  * @param {number} limit
  * @param {string | null} [buyerCity]
  * @param {string | null} [viewerRegionCode]
+ * @param {{ lat: number; lon: number; maxDistanceMeters: number } | null} [near]
  */
 export const findCatalogProductsPage = async (
   searchResult,
@@ -37,7 +42,23 @@ export const findCatalogProductsPage = async (
   limit,
   buyerCity = null,
   viewerRegionCode = null,
+  near = null,
 ) => {
+  const searchRank =
+    searchResult.searchRank ?? regexSearchRankFromIntent(searchResult);
+
+  if (near) {
+    return findProductsPageNear({
+      productsQuery: searchResult.query,
+      sort,
+      skip,
+      limit,
+      searchRank,
+      viewerRegionCode,
+      near,
+    });
+  }
+
   if (searchResult.mode === CATALOG_SEARCH_MODE_ATLAS && searchResult.atlasSearch) {
     try {
       return await findCatalogProductsPageAtlas(
@@ -64,7 +85,7 @@ export const findCatalogProductsPage = async (
     sort,
     skip,
     limit,
-    searchResult.searchRank ?? regexSearchRankFromIntent(searchResult),
+    searchRank,
     buyerCity,
     viewerRegionCode,
   );
@@ -72,8 +93,16 @@ export const findCatalogProductsPage = async (
 
 /**
  * @param {import('./buildProductCatalogSearchQuery.js').ProductCatalogSearchResult} searchResult
+ * @param {{ lat: number; lon: number; maxDistanceMeters: number } | null} [near]
  */
-export const countCatalogProducts = async (searchResult) => {
+export const countCatalogProducts = async (searchResult, near = null) => {
+  if (near) {
+    return countProductsNear({
+      productsQuery: searchResult.query,
+      near,
+    });
+  }
+
   if (searchResult.mode === CATALOG_SEARCH_MODE_ATLAS && searchResult.atlasSearch) {
     try {
       return await countCatalogProductsAtlas(searchResult);

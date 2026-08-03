@@ -2,6 +2,7 @@ import {
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
+  CATALOG_FILTER_NEAR,
   CATALOG_FILTER_SALE_ONLY,
   CATALOG_PUBLIC_FILTER_TOGGLE_KEYS,
   CATALOG_SORT_LABEL_RU,
@@ -34,7 +35,8 @@ import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
  *         | typeof CATALOG_FILTER_FOLLOWING_ONLY
  *         | typeof CATALOG_FILTER_AUCTION_ONLY
  *         | typeof CATALOG_FILTER_INSTALLMENT_ONLY
- *         | typeof CATALOG_FILTER_SALE_ONLY;
+ *         | typeof CATALOG_FILTER_SALE_ONLY
+ *         | typeof CATALOG_FILTER_NEAR;
  *       label: string;
  *     }
  * )} CatalogFilterDropdownItem
@@ -82,6 +84,7 @@ export function buildCatalogFilterDropdownItems() {
  *   catalogAuctionOnly: boolean;
  *   catalogInstallmentOnly: boolean;
  *   catalogSaleOnly: boolean;
+ *   catalogNear: boolean;
  * }} state
  */
 export function isCatalogFilterDropdownItemSelected(item, state) {
@@ -94,6 +97,7 @@ export function isCatalogFilterDropdownItemSelected(item, state) {
       !state.catalogAuctionOnly &&
       !state.catalogInstallmentOnly &&
       !state.catalogSaleOnly &&
+      !state.catalogNear &&
       state.catalogSort === item.value
     );
   }
@@ -105,6 +109,9 @@ export function isCatalogFilterDropdownItemSelected(item, state) {
   }
   if (item.value === CATALOG_FILTER_INSTALLMENT_ONLY) {
     return state.catalogInstallmentOnly;
+  }
+  if (item.value === CATALOG_FILTER_NEAR) {
+    return state.catalogNear;
   }
   return state.catalogAuctionOnly;
 }

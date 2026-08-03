@@ -3,6 +3,7 @@ export type RuDeliveryAddressValue = {
   flat: string;
   fiasId: string;
   geo: { lat: number; lon: number } | null;
+  regionCode?: string | null;
   selectedFromSuggest: boolean;
 };
 

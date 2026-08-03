@@ -78,6 +78,10 @@ export function formatProductFieldForDisplay(key, product) {
       const city = raw == null ? "" : String(raw).trim();
       return city === "" ? PRODUCT_DETAILS_MODAL_UI.SALE_CITY_ALL : city;
     }
+    case "productPickupAddress": {
+      const address = raw == null ? "" : String(raw).trim();
+      return address === "" ? PRODUCT_DETAILS_MODAL_UI.ADDRESS_EMPTY : address;
+    }
     case "productRegionCode": {
       const code = raw == null ? "" : String(raw).trim();
       if (!code) return COMMON_UI.EM_DASH;

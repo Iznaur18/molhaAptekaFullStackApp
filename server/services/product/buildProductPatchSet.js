@@ -21,17 +21,15 @@ import { resolveProductReturnWriteFromBody } from "./normalizeProductReturnTerms
 import { normalizeProductListingOrigin } from "./normalizeProductListingOrigin.js";
 import { normalizeProductIsOriginal } from "./normalizeProductIsOriginal.js";
 import { resolveProductCategoryWriteFromBody } from "./resolveProductCategoryWrite.js";
-import { isRuRegionCode } from "@molha/api-contract";
 import { normalizeProductSaleCity } from "./productSaleCity.js";
 import { resolveProductSaleCityNormalized } from "./ruCityNormalized.js";
 import { assertProductStockPatchAllowed } from "./productStock.js";
 import {
   assertProductFulfillmentMethods,
-  normalizeProductPickupAddress,
-  normalizeProductPickupCoords,
   resolveProductDeliveryEnabledForWrite,
   resolveProductPickupEnabledForWrite,
 } from "./productPickup.js";
+import { resolveProductSaleLocation } from "./resolveProductSaleLocation.js";
 
 import {
   CATALOG_VISIBILITY_BLOCK_MESSAGE,
@@ -179,18 +177,7 @@ const applySaleCityField = (body, $set) => {
   }
 };
 
-const applyRegionCodeField = (body, $set) => {
-  if (!hasBodyField(body, "productRegionCode")) {
-    return;
-  }
-  const code = String(body.productRegionCode ?? "").trim();
-  if (!isRuRegionCode(code)) {
-    throwFieldError(new Error("Укажите регион из списка"), "Укажите регион продажи");
-  }
-  $set.productRegionCode = code;
-};
-
-const applyPickupFields = (body, $set, existing) => {
+const applyPickupFields = async (body, $set, $unset, existing) => {
   const touchesAddress = hasBodyField(body, "productPickupAddress");
   const touchesLat = hasBodyField(body, "productPickupLat");
   const touchesLon = hasBodyField(body, "productPickupLon");
@@ -208,20 +195,6 @@ const applyPickupFields = (body, $set, existing) => {
   }
 
   try {
-    if (touchesAddress) {
-      $set.productPickupAddress = normalizeProductPickupAddress(
-        body.productPickupAddress,
-      );
-    }
-
-    if (touchesLat || touchesLon) {
-      const nextLat = touchesLat ? body.productPickupLat : existing.productPickupLat;
-      const nextLon = touchesLon ? body.productPickupLon : existing.productPickupLon;
-      const coords = normalizeProductPickupCoords(nextLat, nextLon);
-      $set.productPickupLat = coords.productPickupLat;
-      $set.productPickupLon = coords.productPickupLon;
-    }
-
     if (touchesDelivery) {
       $set.productDeliveryEnabled = resolveProductDeliveryEnabledForWrite(
         body.productDeliveryEnabled,
@@ -250,11 +223,56 @@ const applyPickupFields = (body, $set, existing) => {
     if (touchesDelivery || touchesPickupEnabled) {
       assertProductFulfillmentMethods(nextPickupEnabled, nextDeliveryEnabled);
     }
+
+    if (!touchesAddress && !touchesLat && !touchesLon) {
+      return;
+    }
+
+    const nextAddress = touchesAddress
+      ? body.productPickupAddress
+      : existing.productPickupAddress;
+    const nextLat = touchesLat ? body.productPickupLat : existing.productPickupLat;
+    const nextLon = touchesLon ? body.productPickupLon : existing.productPickupLon;
+
+    const prevAddress = String(existing.productPickupAddress ?? "").trim();
+    const prevLat = existing.productPickupLat;
+    const prevLon = existing.productPickupLon;
+    const sameLocation =
+      String(nextAddress ?? "").trim() === prevAddress &&
+      Number(nextLat) === Number(prevLat) &&
+      Number(nextLon) === Number(prevLon) &&
+      prevLat != null &&
+      prevLon != null;
+
+    if (sameLocation) {
+      return;
+    }
+
+    const saleLocation = await resolveProductSaleLocation({
+      address: nextAddress,
+      lat: nextLat,
+      lon: nextLon,
+      fallbackRegionCode: hasBodyField(body, "productRegionCode")
+        ? body.productRegionCode
+        : existing.productRegionCode,
+    });
+
+    $set.productPickupAddress = saleLocation.productPickupAddress;
+    $set.productPickupLat = saleLocation.productPickupLat;
+    $set.productPickupLon = saleLocation.productPickupLon;
+    $set.productRegionCode = saleLocation.productRegionCode;
+    if (saleLocation.productPickupLocation) {
+      $set.productPickupLocation = saleLocation.productPickupLocation;
+      delete $unset.productPickupLocation;
+    } else {
+      delete $set.productPickupLocation;
+      $unset.productPickupLocation = 1;
+    }
   } catch (error) {
     if (error instanceof AppError) {
       throw error;
     }
-    throwFieldError(error, "Некорректный адрес самовывоза");
+    throwFieldError(error, "Некорректный адрес продажи");
   }
 };
 
@@ -471,6 +489,7 @@ const applyAuctionField = (body, $set, existing) => {
  */
 export async function buildProductPatchSet({ existing, body, isAdmin, productId }) {
   const $set = {};
+  const $unset = {};
 
   applyTextFields(body, $set);
   applyCharacteristicsField(body, $set);
@@ -479,8 +498,7 @@ export async function buildProductPatchSet({ existing, body, isAdmin, productId 
   applyIsOriginalField(body, $set);
   applyPriceFields(body, $set, existing);
   applySaleCityField(body, $set);
-  applyRegionCodeField(body, $set);
-  applyPickupFields(body, $set, existing);
+  await applyPickupFields(body, $set, $unset, existing);
   await applyCategoryFields(body, $set, existing);
   await applyLoyaltyField(body, $set, existing, productId);
   await applyAffiliateFields(body, $set, existing);
@@ -492,9 +510,9 @@ export async function buildProductPatchSet({ existing, body, isAdmin, productId 
   const auctionState = applyAuctionField(body, $set, existing);
   applyWholesaleFields(body, $set, existing);
 
-  if (Object.keys($set).length === 0) {
+  if (Object.keys($set).length === 0 && Object.keys($unset).length === 0) {
     throw new AppError(400, EMPTY_PATCH_BODY_MESSAGE);
   }
 
-  return { $set, ...auctionState };
+  return { $set, $unset, ...auctionState };
 }

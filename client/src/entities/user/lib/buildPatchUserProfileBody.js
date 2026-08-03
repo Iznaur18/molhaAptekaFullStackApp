@@ -9,14 +9,14 @@ import { normalizeRuPhoneInput } from "./ruPhone.js";
 import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
 import { serializeUserBackgroundForForm } from "./userBackgroundValue.js";
 import { DEFAULT_USER_AVATAR_URL } from "../model/userConstants.js";
-import { appendStructuredAddressToPayload } from "../../address/lib/appendStructuredAddressToPayload.js";
-import { isStructuredAddressEqual } from "../../address/lib/isStructuredAddressEqual.js";
+import { appendRuAddressToPayload } from "../../address/lib/appendRuAddressToPayload.js";
+import { isDeliveryAddressEqual } from "../../address/lib/isDeliveryAddressEqual.js";
 
 /**
  * Тело `PATCH /user/:id` (только разрешённые пользователю поля).
  *
  * @param {import('./mapUserToEditProfileForm.js').EditProfileFormState} form
- * @param {{ backgroundMode?: 'preset' | 'image' | 'admin'; includePremium?: boolean; includeLoyaltyPoints?: boolean; initialPhoneNumber?: string | null; initialStructuredAddress?: import('../../address/model/structuredTypes.js').RuStructuredDeliveryAddressValue }} [options]
+ * @param {{ backgroundMode?: 'preset' | 'image' | 'admin'; includePremium?: boolean; includeLoyaltyPoints?: boolean; initialPhoneNumber?: string | null; initialDeliveryAddress?: import('../../address/model/types.js').RuDeliveryAddressValue }} [options]
  * @returns {Record<string, unknown>}
  */
 export function buildPatchUserProfileBody(form, options = {}) {
@@ -25,7 +25,7 @@ export function buildPatchUserProfileBody(form, options = {}) {
     includePremium = false,
     includeLoyaltyPoints = false,
     initialPhoneNumber = "",
-    initialStructuredAddress = null,
+    initialDeliveryAddress = null,
   } = options;
   const body = {};
 
@@ -60,15 +60,16 @@ export function buildPatchUserProfileBody(form, options = {}) {
 
   body.userGender = form.userGender;
 
-  const addressBaseline = initialStructuredAddress ?? {
-    city: "",
-    district: "",
-    street: "",
-    house: "",
+  const addressBaseline = initialDeliveryAddress ?? {
+    line: "",
     flat: "",
+    fiasId: "",
+    geo: null,
+    regionCode: null,
+    selectedFromSuggest: false,
   };
-  if (!isStructuredAddressEqual(form.structuredAddress, addressBaseline)) {
-    appendStructuredAddressToPayload(body, form.structuredAddress);
+  if (!isDeliveryAddressEqual(form.deliveryAddress, addressBaseline)) {
+    appendRuAddressToPayload(body, form.deliveryAddress);
   }
 
   const regionCode = String(form.userRegionCode ?? "").trim();

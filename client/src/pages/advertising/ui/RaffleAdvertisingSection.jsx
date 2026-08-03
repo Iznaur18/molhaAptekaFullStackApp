@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { Clock } from "lucide-react";
 
 import { useRaffleCreateAdvertisingQuery } from "../../../entities/raffle/model/useRaffleCreateAdvertisingQuery.js";
 import { useUnlockRaffleCreateMutation } from "../../../entities/raffle/model/useUnlockRaffleCreateMutation.js";
 import { RAFFLE_ADVERTISING_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { AppIcon } from "../../../shared/ui/icon/index.js";
 
 /**
  * @param {string | null | undefined} status
@@ -121,7 +123,16 @@ export function RaffleAdvertisingSection({
 
       {raffle ? (
         <div className={resolveStatusPanelClass(raffle.status)}>
-          <p>{resolveRaffleStatusLabel(raffle.status)}</p>
+          <div className="advertising-page__status-main">
+            <p className="advertising-page__status-text">
+              {resolveRaffleStatusLabel(raffle.status)}
+            </p>
+            {raffle.status === "pending_staff" ? (
+              <span className="advertising-page__status-icon" aria-hidden="true">
+                <AppIcon icon={Clock} size="sm" strokeWidth={2.15} />
+              </span>
+            ) : null}
+          </div>
         </div>
       ) : null}
 

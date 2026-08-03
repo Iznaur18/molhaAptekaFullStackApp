@@ -4,6 +4,7 @@
  * @property {string} flat
  * @property {string} [fiasId]
  * @property {{ lat: number; lon: number } | null} [geo]
+ * @property {string | null} [regionCode]
  * @property {boolean} selectedFromSuggest
  */
 

@@ -1,3 +1,5 @@
+import { resolveRuRegionCodeFromDadataData } from "@molha/api-contract";
+
 import {
   ADDRESS_FLAT_MAX_LENGTH,
   ADDRESS_LINE_MAX_LENGTH,
@@ -66,6 +68,7 @@ function pickStructuredFromCleaned(cleaned) {
  *   district: string;
  *   street: string;
  *   house: string;
+ *   regionCode: string | null;
  * }>}
  */
 export async function verifyRuDeliveryAddress({ addressLine, flat = "" }) {
@@ -92,32 +95,37 @@ export async function verifyRuDeliveryAddress({ addressLine, flat = "" }) {
       district: "",
       street: "",
       house: "",
+      regionCode: null,
     };
   }
 
   const cleaned = await cleanRuAddress(buildAddressQueryForClean(line, flatInput));
   const cleanedFlat = pickFlatFromCleaned(cleaned) ?? flatInput;
 
-  const qcComplete = Number(cleaned.qc_complete ?? 10);
-  if (Number.isNaN(qcComplete) || qcComplete > DADATA_QC_COMPLETE_MAX) {
-    throw new Error("Адрес неполный — выберите вариант из подсказок DaData");
-  }
-
-  const qcGeo = Number(cleaned.qc_geo ?? 10);
-  if (Number.isNaN(qcGeo) || qcGeo > DADATA_QC_GEO_MAX) {
-    throw new Error("Уточните адрес до дома (улица и номер дома)");
-  }
-
-  const fiasIdRaw = cleaned.house_fias_id ?? cleaned.fias_id;
+  // Clean часто даёт qc_complete=5 / qc_geo=2 даже при валидном house_fias_id (FIAS).
+  // Источник истины для «до дома» — house_fias_id, не мягкие qc-пороги suggest≠clean.
+  const fiasIdRaw = cleaned.house_fias_id;
   const fiasId = fiasIdRaw != null ? String(fiasIdRaw).trim() : "";
   if (!fiasId) {
+    const qcComplete = Number(cleaned.qc_complete ?? 10);
+    if (Number.isNaN(qcComplete) || qcComplete > DADATA_QC_COMPLETE_MAX) {
+      throw new Error("Адрес неполный — выберите вариант из подсказок DaData");
+    }
+    const qcGeo = Number(cleaned.qc_geo ?? 10);
+    if (Number.isNaN(qcGeo) || qcGeo > DADATA_QC_GEO_MAX) {
+      throw new Error("Уточните адрес до дома (улица и номер дома)");
+    }
     throw new Error("Не удалось определить дом по адресу");
   }
 
-  const displayAddress =
+  const resultLine =
     typeof cleaned.result === "string" && cleaned.result.trim() !== ""
       ? cleaned.result.trim()
-      : buildAddressQueryForClean(line, cleanedFlat);
+      : line;
+  const displayAddress =
+    resultLine.length > ADDRESS_LINE_MAX_LENGTH
+      ? resultLine.slice(0, ADDRESS_LINE_MAX_LENGTH)
+      : resultLine;
 
   const lat = Number(cleaned.geo_lat);
   const lon = Number(cleaned.geo_lon);
@@ -133,5 +141,6 @@ export async function verifyRuDeliveryAddress({ addressLine, flat = "" }) {
     district: structured.district,
     street: structured.street,
     house: structured.house,
+    regionCode: resolveRuRegionCodeFromDadataData(cleaned),
   };
 }

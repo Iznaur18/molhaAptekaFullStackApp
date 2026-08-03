@@ -20,7 +20,13 @@ export const ORDER_FULFILLMENT_METHODS = [
 export const PRODUCT_DELIVERY_FULFILLMENT_ENABLED = true;
 
 export const PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE =
-  "Укажите адрес самовывоза";
+  "Укажите адрес продажи";
+
+export const PRODUCT_PICKUP_COORDS_REQUIRED_MESSAGE =
+  "Укажите точку на карте или выберите адрес из подсказки";
+
+export const PRODUCT_SALE_REGION_FROM_ADDRESS_FAILED_MESSAGE =
+  "Не удалось определить регион по адресу — выберите другой адрес из подсказок";
 
 export const PRODUCT_DELIVERY_NOT_AVAILABLE_MESSAGE =
   "Доставка пока недоступна — выберите самовывоз";
@@ -127,6 +133,24 @@ export const assertPickupCoordsPair = (body, ctx, paths = {}) => {
   });
 };
 
+/** Create: lat/lon обязательны оба. */
+export const assertPickupCoordsRequired = (body, ctx, paths = {}) => {
+  const lat = body.productPickupLat;
+  const lon = body.productPickupLon;
+  const hasLat = lat != null && Number.isFinite(Number(lat));
+  const hasLon = lon != null && Number.isFinite(Number(lon));
+  if (hasLat && hasLon) {
+    return;
+  }
+  ctx.addIssue({
+    code: z.ZodIssueCode.custom,
+    path: !hasLat
+      ? paths.latPath ?? ["productPickupLat"]
+      : paths.lonPath ?? ["productPickupLon"],
+    message: PRODUCT_PICKUP_COORDS_REQUIRED_MESSAGE,
+  });
+};
+
 /** Поля самовывоза для create (адрес обязателен). */
 export const productPickupCreateFieldsSchema = z
   .object({
@@ -139,7 +163,7 @@ export const productPickupCreateFieldsSchema = z
     productDeliveryEnabled: z.coerce.boolean().optional(),
   })
   .superRefine((body, ctx) => {
-    assertPickupCoordsPair(body, ctx);
+    assertPickupCoordsRequired(body, ctx);
     const pickupOn = body.productPickupEnabled !== false;
     const deliveryOn = body.productDeliveryEnabled === true;
     if (!pickupOn && !deliveryOn) {

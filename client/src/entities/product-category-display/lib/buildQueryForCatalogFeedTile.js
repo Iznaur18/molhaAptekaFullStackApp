@@ -2,97 +2,68 @@ import {
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
+  CATALOG_FILTER_NEAR,
   CATALOG_FILTER_SALE_ONLY,
   CATALOG_SORT_NEWEST,
 } from "../../product/model/productConstants.js";
 
 /**
- * @param {import('./buildCatalogFeedTiles.js').CatalogFeedTile} tile
  * @returns {{
  *   sort: string;
  *   category: null;
+ *   categoryId: null;
+ *   sellerPersonalCategoryId: null;
  *   followingOnly: boolean;
  *   auctionOnly: boolean;
  *   installmentOnly: boolean;
  *   saleOnly: boolean;
+ *   near: boolean;
  * }}
+ */
+const baseFeedQuery = () => ({
+  sort: CATALOG_SORT_NEWEST,
+  category: null,
+  categoryId: null,
+  sellerPersonalCategoryId: null,
+  followingOnly: false,
+  auctionOnly: false,
+  installmentOnly: false,
+  saleOnly: false,
+  near: false,
+});
+
+/**
+ * @param {import('./buildCatalogFeedTiles.js').CatalogFeedTile} tile
  */
 export function buildQueryForCatalogFeedTile(tile) {
   if (tile.kind === "sort") {
     return {
+      ...baseFeedQuery(),
       sort: tile.value,
-      category: null,
-      categoryId: null,
-      sellerPersonalCategoryId: null,
-      followingOnly: false,
-      auctionOnly: false,
-      installmentOnly: false,
-      saleOnly: false,
     };
+  }
+
+  if (tile.value === CATALOG_FILTER_NEAR) {
+    return { ...baseFeedQuery(), near: true };
   }
 
   if (tile.value === CATALOG_FILTER_FOLLOWING_ONLY) {
-    return {
-      sort: CATALOG_SORT_NEWEST,
-      category: null,
-      categoryId: null,
-      sellerPersonalCategoryId: null,
-      followingOnly: true,
-      auctionOnly: false,
-      installmentOnly: false,
-      saleOnly: false,
-    };
+    return { ...baseFeedQuery(), followingOnly: true };
   }
 
   if (tile.value === CATALOG_FILTER_AUCTION_ONLY) {
-    return {
-      sort: CATALOG_SORT_NEWEST,
-      category: null,
-      categoryId: null,
-      sellerPersonalCategoryId: null,
-      followingOnly: false,
-      auctionOnly: true,
-      installmentOnly: false,
-      saleOnly: false,
-    };
+    return { ...baseFeedQuery(), auctionOnly: true };
   }
 
   if (tile.value === CATALOG_FILTER_INSTALLMENT_ONLY) {
-    return {
-      sort: CATALOG_SORT_NEWEST,
-      category: null,
-      categoryId: null,
-      sellerPersonalCategoryId: null,
-      followingOnly: false,
-      auctionOnly: false,
-      installmentOnly: true,
-      saleOnly: false,
-    };
+    return { ...baseFeedQuery(), installmentOnly: true };
   }
 
   if (tile.value === CATALOG_FILTER_SALE_ONLY) {
-    return {
-      sort: CATALOG_SORT_NEWEST,
-      category: null,
-      categoryId: null,
-      sellerPersonalCategoryId: null,
-      followingOnly: false,
-      auctionOnly: false,
-      installmentOnly: false,
-      saleOnly: true,
-    };
+    return { ...baseFeedQuery(), saleOnly: true };
   }
 
-  return {
-    sort: CATALOG_SORT_NEWEST,
-    category: null,
-    categoryId: null,
-    sellerPersonalCategoryId: null,
-    followingOnly: false,
-    auctionOnly: false,
-    installmentOnly: false,
-    saleOnly: false,
-  };
+  return baseFeedQuery();
 }
 
 /**
@@ -102,6 +73,7 @@ export function buildQueryForCatalogFeedTile(tile) {
  * @param {boolean} auctionOnly
  * @param {boolean} installmentOnly
  * @param {boolean} saleOnly
+ * @param {boolean} [near]
  */
 export function isCatalogFeedTileActive(
   tile,
@@ -110,6 +82,7 @@ export function isCatalogFeedTileActive(
   auctionOnly,
   installmentOnly,
   saleOnly,
+  near = false,
 ) {
   if (tile.kind === "sort") {
     return (
@@ -117,8 +90,13 @@ export function isCatalogFeedTileActive(
       !followingOnly &&
       !auctionOnly &&
       !installmentOnly &&
-      !saleOnly
+      !saleOnly &&
+      !near
     );
+  }
+
+  if (tile.value === CATALOG_FILTER_NEAR) {
+    return near;
   }
 
   if (tile.value === CATALOG_FILTER_FOLLOWING_ONLY) {

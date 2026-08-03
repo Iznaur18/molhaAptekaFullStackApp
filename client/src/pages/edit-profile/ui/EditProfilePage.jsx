@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import { useEditProfileModal } from "../../../entities/user/model/useEditProfileModal.js";
-import { AddressStructuredFields } from "../../../entities/address/ui/AddressStructuredFields.jsx";
+import { AddressDeliveryFields } from "../../../entities/address/ui/AddressDeliveryFields.jsx";
 import { RuRegionSelect } from "../../../entities/region/ui/RuRegionSelect.jsx";
 import {
   NOTES_ABOUT_USER_MAX_CHARS,
@@ -11,7 +11,12 @@ import {
   USER_GENDER_NO_SELECTED,
   USER_NAME_MAX_LENGTH,
 } from "../../../entities/user/model/userConstants.js";
-import { ADMIN_EDIT_USER_UI, EDIT_PROFILE_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  ADDRESS_DELIVERY_UI,
+  ADDRESS_STRUCTURED_UI,
+  ADMIN_EDIT_USER_UI,
+  EDIT_PROFILE_MODAL_UI,
+} from "../../../shared/config/appUiCopy.js";
 import { INTEGER_INPUT_FIELD_PROPS } from "../../../shared/lib/numericInput.js";
 import { ProfileAvatarUpload } from "../../../entities/user/ui/ProfileAvatarUpload.jsx";
 import { ProfileBackgroundUpload } from "../../../entities/user/ui/ProfileBackgroundUpload.jsx";
@@ -286,14 +291,41 @@ export function EditProfilePage({
                 {EDIT_PROFILE_MODAL_UI.HINT_REGION}
               </span>
             </label>
-            <AddressStructuredFields
-              value={form.structuredAddress}
-              onChange={(structuredAddress) =>
-                setForm((prev) => ({ ...prev, structuredAddress }))
+            <AddressDeliveryFields
+              value={form.deliveryAddress}
+              onChange={(deliveryAddress) =>
+                setForm((prev) => ({
+                  ...prev,
+                  deliveryAddress,
+                  ...(deliveryAddress.regionCode
+                    ? { userRegionCode: deliveryAddress.regionCode }
+                    : {}),
+                }))
               }
               disabled={isSubmitting}
-              inputClassName="edit-profile-modal__input"
+              lineInputClassName="edit-profile-modal__input"
+              labels={{ line: ADDRESS_STRUCTURED_UI.SECTION_LABEL }}
             />
+            <label className="edit-profile-modal__label">
+              {ADDRESS_DELIVERY_UI.LABEL_FLAT}
+              <input
+                type="text"
+                className="edit-profile-modal__input"
+                value={form.deliveryAddress.flat}
+                onChange={(event) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    deliveryAddress: {
+                      ...prev.deliveryAddress,
+                      flat: event.target.value,
+                    },
+                  }))
+                }
+                disabled={isSubmitting}
+                autoComplete="address-line2"
+                placeholder={ADDRESS_STRUCTURED_UI.PLACEHOLDER_FLAT}
+              />
+            </label>
           </FormSection>
 
           <FormSection title={EDIT_PROFILE_MODAL_UI.SECTION_NOTIFICATIONS}>

@@ -16,6 +16,7 @@ const EMPTY_VALUE = {
   flat: "",
   fiasId: "",
   geo: null,
+  regionCode: null,
   selectedFromSuggest: false,
 };
 
@@ -86,18 +87,22 @@ export function AddressDeliveryFields({
       selectedFromSuggest: false,
       fiasId: "",
       geo: null,
+      regionCode: null,
     });
   };
 
   const handlePickSuggestion = (suggestion) => {
     const mapped = mapDadataSuggestion(suggestion);
+    const isHouse = mapped.fiasId.length > 0;
     patch({
       line: mapped.line,
       fiasId: mapped.fiasId,
       geo: mapped.geo,
-      selectedFromSuggest: true,
+      regionCode: mapped.regionCode,
+      // Город/улица — уточнение запроса; финал только дом (house_fias_id).
+      selectedFromSuggest: isHouse,
     });
-    setDebouncedQuery("");
+    setDebouncedQuery(isHouse ? "" : mapped.line);
   };
 
   const showList =

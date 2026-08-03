@@ -18,10 +18,24 @@ describe("mapDadataSuggestion", () => {
       line: "г Москва, ул Ленина, д 1",
       fiasId: "abc-123",
       geo: { lat: 55.75, lon: 37.62 },
+      regionCode: null,
     });
   });
 
-  it("falls back to fias_id and null geo when coords invalid", () => {
+  it("maps region_iso_code to RU region", () => {
+    const result = mapDadataSuggestion({
+      value: "г Москва, ул Ленина, д 1",
+      data: {
+        house_fias_id: "abc-123",
+        geo_lat: "55.75",
+        geo_lon: "37.62",
+        region_iso_code: "RU-MOW",
+      },
+    });
+    expect(result.regionCode).toBe("RU-MOW");
+  });
+
+  it("не берёт street-level fias_id без house_fias_id", () => {
     const result = mapDadataSuggestion({
       value: "Адрес",
       data: {
@@ -31,7 +45,7 @@ describe("mapDadataSuggestion", () => {
       },
     });
 
-    expect(result.fiasId).toBe("fallback-fias");
+    expect(result.fiasId).toBe("");
     expect(result.geo).toBeNull();
   });
 });

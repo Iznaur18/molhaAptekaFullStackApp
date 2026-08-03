@@ -1,6 +1,52 @@
+import { useState } from "react";
+
 import { partitionInstallmentContractPayments } from "../lib/partitionInstallmentContractPayments.js";
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
 import { InstallmentContractCardPaymentRow } from "./InstallmentContractCardPaymentRow.jsx";
+
+/**
+ * @param {{
+ *   summary: string;
+ *   children: import("react").ReactNode;
+ * }} props
+ */
+function PaymentsFold({ summary, children }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div
+      className={[
+        "installment-contract-card__payments-fold",
+        open ? "installment-contract-card__payments-fold_open" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <button
+        type="button"
+        className="installment-contract-card__payments-fold-summary"
+        aria-expanded={open}
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {summary}
+      </button>
+      <div
+        className={[
+          "installment-contract-card__payments-fold-panel",
+          open ? "installment-contract-card__payments-fold-panel_open" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        aria-hidden={!open}
+        inert={!open ? true : undefined}
+      >
+        <div className="installment-contract-card__payments-fold-panel-inner">
+          <div className="installment-contract-card__payments-fold-body">{children}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /**
  * @param {{
@@ -87,25 +133,15 @@ export function InstallmentContractCardPayments({
       ) : null}
 
       {upcoming.length > 0 ? (
-        <details className="installment-contract-card__payments-fold">
-          <summary className="installment-contract-card__payments-fold-summary">
-            {INSTALLMENT_UI.PAYMENTS_UPCOMING_SUMMARY(upcoming.length)}
-          </summary>
-          <div className="installment-contract-card__payments-fold-body">
-            {upcoming.map(renderRow)}
-          </div>
-        </details>
+        <PaymentsFold summary={INSTALLMENT_UI.PAYMENTS_UPCOMING_SUMMARY(upcoming.length)}>
+          {upcoming.map(renderRow)}
+        </PaymentsFold>
       ) : null}
 
       {history.length > 0 ? (
-        <details className="installment-contract-card__payments-fold">
-          <summary className="installment-contract-card__payments-fold-summary">
-            {INSTALLMENT_UI.PAYMENTS_HISTORY_SUMMARY(history.length)}
-          </summary>
-          <div className="installment-contract-card__payments-fold-body">
-            {history.map(renderRow)}
-          </div>
-        </details>
+        <PaymentsFold summary={INSTALLMENT_UI.PAYMENTS_HISTORY_SUMMARY(history.length)}>
+          {history.map(renderRow)}
+        </PaymentsFold>
       ) : null}
 
       {focus.length === 0 && upcoming.length === 0 && history.length === 0 ? (

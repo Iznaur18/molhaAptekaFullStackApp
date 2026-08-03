@@ -77,6 +77,39 @@ export function resolveRuRegionCodeFromLabel(raw) {
 }
 
 /**
+ * DaData `data` / clean-строка → наш `RU-*`.
+ * Сначала `region_iso_code`, затем названия региона/города.
+ *
+ * @param {Record<string, unknown> | null | undefined} data
+ * @returns {string | null}
+ */
+export function resolveRuRegionCodeFromDadataData(data) {
+  if (data == null || typeof data !== "object") {
+    return null;
+  }
+
+  const isoRaw = String(data.region_iso_code ?? "").trim();
+  if (isRuRegionCode(isoRaw)) {
+    return isoRaw;
+  }
+  if (isoRaw !== "" && !isoRaw.startsWith("RU-")) {
+    const withPrefix = `RU-${isoRaw}`;
+    if (isRuRegionCode(withPrefix)) {
+      return withPrefix;
+    }
+  }
+
+  for (const key of ["region_with_type", "region", "city_with_type", "city"]) {
+    const fromLabel = resolveRuRegionCodeFromLabel(data[key]);
+    if (fromLabel) {
+      return fromLabel;
+    }
+  }
+
+  return null;
+}
+
+/**
  * Невалидный / пустой → дефолт Москва.
  *
  * @param {string | null | undefined} code

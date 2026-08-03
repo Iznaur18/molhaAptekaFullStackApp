@@ -13,6 +13,13 @@ export const userPublicProfileSchema = z
     isActiveUser: z.boolean().optional(),
     userLoyaltyPoints: z.number().optional(),
     userLoyaltyPointsReserved: z.number().optional(),
+    userAddressGeo: z
+      .object({
+        lat: z.number().optional(),
+        lon: z.number().optional(),
+      })
+      .nullable()
+      .optional(),
   })
   .passthrough();
 

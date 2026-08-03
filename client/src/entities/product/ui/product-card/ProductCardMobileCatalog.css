@@ -269,6 +269,9 @@
     > .product-card__auction-badge,
   .product-card:not(.product-card--banner-layout):not(.product-card--list)
     .product-card__status-badges-row
+    > .product-card__near-badge,
+  .product-card:not(.product-card--banner-layout):not(.product-card--list)
+    .product-card__status-badges-row
     > .product-card__installment-badge,
   .product-card:not(.product-card--banner-layout):not(.product-card--list)
     .product-card__status-badges-row

@@ -1,4 +1,5 @@
 import { useMemo, useRef } from "react";
+import { splitCatalogNearProducts } from "@molha/api-contract";
 
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { shouldShowProductTier3BannerFullWidth } from "../../../entities/product/lib/shouldShowProductTier3BannerFullWidth.js";
@@ -40,6 +41,7 @@ import { CatalogGridProductCard } from "./CatalogGridProductCard.jsx";
  *   catalogAuctionOnly?: boolean;
  *   catalogInstallmentOnly?: boolean;
  *   catalogSaleOnly?: boolean;
+ *   catalogNear?: boolean;
  *   showFullWidthTier3Banners?: boolean;
  *   highlightRaffleProducts?: boolean;
  *   sellerRaffleActive?: boolean;
@@ -83,6 +85,7 @@ export function HomeCatalogGrid({
   catalogAuctionOnly = false,
   catalogInstallmentOnly = false,
   catalogSaleOnly = false,
+  catalogNear = false,
   showFullWidthTier3Banners = false,
   highlightRaffleProducts = false,
   sellerRaffleActive = false,
@@ -108,8 +111,21 @@ export function HomeCatalogGrid({
     [isMineMode, products, showFullWidthTier3Banners],
   );
 
+  const nearSplit = useMemo(() => {
+    if (!catalogNear || isMineMode) {
+      return null;
+    }
+    return splitCatalogNearProducts(products);
+  }, [catalogNear, isMineMode, products]);
+
+  const hasNearRegionSection = Boolean(
+    nearSplit && nearSplit.withoutDistance.length > 0,
+  );
+
   const shouldVirtualize =
-    !hasTier3BannerInFeed && products.length > CATALOG_VIRTUALIZATION_MIN_ITEM_COUNT;
+    !hasTier3BannerInFeed &&
+    !hasNearRegionSection &&
+    products.length > CATALOG_VIRTUALIZATION_MIN_ITEM_COUNT;
   const shouldMeasureGridColumns = shouldVirtualize || shouldInterleaveTier3Banners;
   const gridColumnMeasureRef = shouldVirtualize ? virtualHostRef : gridMeasureRef;
   const columnCount = useCatalogGridColumnCount(
@@ -143,6 +159,13 @@ export function HomeCatalogGrid({
     virtualWindow.startIndex,
   ]);
 
+  const nearDisplaySplit = useMemo(() => {
+    if (!hasNearRegionSection) {
+      return null;
+    }
+    return splitCatalogNearProducts(displayProducts);
+  }, [displayProducts, hasNearRegionSection]);
+
   const cardProps = {
     products,
     isMineMode,
@@ -171,6 +194,9 @@ export function HomeCatalogGrid({
   const emptyMessage = (() => {
     if (products.length > 0) return "";
     if (hasQuery) return HOME_PAGE_UI.EMPTY_BY_QUERY;
+    if (!isMineMode && catalogNear) {
+      return HOME_PAGE_UI.EMPTY_NEAR_FILTER;
+    }
     if (!isMineMode && catalogSaleOnly) {
       return HOME_PAGE_UI.EMPTY_SALE_FILTER;
     }
@@ -244,6 +270,32 @@ export function HomeCatalogGrid({
                   aria-hidden
                 />
               ) : null}
+            </div>
+          ) : nearDisplaySplit ? (
+            <div ref={gridMeasureRef}>
+              {nearDisplaySplit.withDistance.length > 0 ? (
+                <div
+                  className="app-shell__grid"
+                  role="list"
+                  aria-label={HOME_PAGE_UI.CATALOG_PRODUCTS_LIST_ARIA}
+                >
+                  {nearDisplaySplit.withDistance.map((product) =>
+                    renderProductCard(product),
+                  )}
+                </div>
+              ) : null}
+              <h2 className="app-shell__catalog-near-region-title">
+                {HOME_PAGE_UI.NEAR_REGION_SECTION}
+              </h2>
+              <div
+                className="app-shell__grid"
+                role="list"
+                aria-label={HOME_PAGE_UI.NEAR_REGION_SECTION}
+              >
+                {nearDisplaySplit.withoutDistance.map((product) =>
+                  renderProductCard(product),
+                )}
+              </div>
             </div>
           ) : (
             <div

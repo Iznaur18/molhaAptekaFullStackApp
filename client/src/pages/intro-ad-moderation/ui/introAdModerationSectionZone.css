@@ -1,31 +1,31 @@
 .profile-queue-content-panel--zone-intro {
   border-top: 3px solid var(--iz-color-info);
   border-color: color-mix(in srgb, var(--iz-color-info) 24%, var(--iz-color-border));
-  background: color-mix(in srgb, var(--iz-color-info) 6%, var(--iz-color-surface-muted));
+  background: var(--iz-color-surface);
 }
 
 .profile-queue-content-panel--zone-banner {
   border-top: 3px solid var(--iz-color-danger);
   border-color: color-mix(in srgb, var(--iz-color-danger) 24%, var(--iz-color-border));
-  background: color-mix(in srgb, var(--iz-color-danger) 6%, var(--iz-color-surface-muted));
+  background: var(--iz-color-surface);
 }
 
 .profile-queue-content-panel--zone-personal {
   border-top: 3px solid var(--iz-color-action);
   border-color: color-mix(in srgb, var(--iz-color-action) 24%, var(--iz-color-border));
-  background: color-mix(in srgb, var(--iz-color-action) 6%, var(--iz-color-surface-muted));
+  background: var(--iz-color-surface);
 }
 
 .profile-queue-content-panel--zone-raffle {
   border-top: 3px solid var(--iz-color-accent);
   border-color: color-mix(in srgb, var(--iz-color-accent) 24%, var(--iz-color-border));
-  background: color-mix(in srgb, var(--iz-color-accent) 6%, var(--iz-color-surface-muted));
+  background: var(--iz-color-surface);
 }
 
 .profile-queue-content-panel--zone-users-raffle {
   border-top: 3px solid var(--iz-color-success);
   border-color: color-mix(in srgb, var(--iz-color-success) 24%, var(--iz-color-border));
-  background: color-mix(in srgb, var(--iz-color-success) 6%, var(--iz-color-surface-muted));
+  background: var(--iz-color-surface);
 }
 
 .intro-ad-moderation-overview__tile_intro {

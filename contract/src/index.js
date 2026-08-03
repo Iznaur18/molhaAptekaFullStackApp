@@ -114,6 +114,7 @@ export {
   normalizeRuRegionLabelKey,
   optionalRuRegionCodeFieldSchema,
   requiredRuRegionCodeFieldSchema,
+  resolveRuRegionCodeFromDadataData,
   resolveRuRegionCodeFromLabel,
   resolveViewerRegionCode,
   RU_REGIONS,
@@ -271,6 +272,13 @@ export {
 } from "./productWholesale.js";
 export {
   PRODUCT_CATALOG_SORT_VALUES,
+  PRODUCT_CATALOG_NEAR_RADIUS_KM,
+  PRODUCT_CATALOG_NEAR_RADIUS_METERS,
+  PRODUCT_CATALOG_NEAR_AUTH_MESSAGE,
+  PRODUCT_CATALOG_NEAR_ADDRESS_REQUIRED_MESSAGE,
+  PRODUCT_CATALOG_NEAR_REGION_SECTION_TITLE,
+  formatCatalogNearDistanceLabel,
+  splitCatalogNearProducts,
   catalogProductsQuerySchema,
   catalogProductsPageDataSchema,
 } from "./productCatalog.js";
@@ -282,6 +290,8 @@ export {
   ORDER_FULFILLMENT_METHODS,
   PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
   PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
+  PRODUCT_PICKUP_COORDS_REQUIRED_MESSAGE,
+  PRODUCT_SALE_REGION_FROM_ADDRESS_FAILED_MESSAGE,
   PRODUCT_DELIVERY_NOT_AVAILABLE_MESSAGE,
   PRODUCT_DELIVERY_NOT_ENABLED_FOR_ITEMS_MESSAGE,
   PRODUCT_PICKUP_MISSING_FOR_ORDER_MESSAGE,
@@ -294,6 +304,7 @@ export {
   productPickupPatchFieldsSchema,
   orderFulfillmentMethodSchema,
   assertPickupCoordsPair,
+  assertPickupCoordsRequired,
   CART_FULFILLMENT_SECTION_PICKUP,
   CART_FULFILLMENT_SECTION_DELIVERY,
   resolveCartLineFulfillmentSection,

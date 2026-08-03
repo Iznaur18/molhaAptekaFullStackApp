@@ -16,6 +16,7 @@ export type ProductStatusBadgeVariant =
   | "promotionTop"
   | "promotionBanner"
   | "auction"
+  | "near"
   | "installment"
   | "wholesale"
   | "raffle"
@@ -144,6 +145,7 @@ export const useProductStatusBadgeVariantStyles = (
     const promotionTop = fill(BC.promotionTopBg, BC.promotionTopText);
     const promotionBanner = fill(BC.promotionBannerBg, BC.promotionBannerText);
     const auction = fill(BC.auctionBg, BC.auctionText);
+    const near = fill(BC.auctionBg, BC.auctionText);
     const installment = fill(BC.installmentBg, BC.installmentText);
     const wholesale = fill(BC.wholesaleBg, BC.wholesaleText);
     const raffle = fill(BC.raffleBg, BC.raffleText);
@@ -186,6 +188,13 @@ export const useProductStatusBadgeVariantStyles = (
         BC.auctionBorder,
         auction.backgroundColor,
         auction.textColor,
+      ),
+      near: createBadge(
+        layout,
+        baseText,
+        BC.auctionBorder,
+        near.backgroundColor,
+        near.textColor,
       ),
       installment: createBadge(
         layout,

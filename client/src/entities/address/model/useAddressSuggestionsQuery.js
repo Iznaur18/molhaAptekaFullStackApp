@@ -16,5 +16,7 @@ export function useAddressSuggestionsQuery({ query, enabled = true }) {
     enabled: enabled && normalizedQuery.length > 0,
     queryFn: () => fetchAddressSuggestions(normalizedQuery),
     staleTime: ADDRESS_SUGGEST_STALE_TIME_MS,
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 }

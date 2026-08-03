@@ -1,4 +1,12 @@
-import { DEFAULT_VIEWER_REGION_CODE, isRuRegionCode, PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE, PRODUCT_IMAGE_URLS_MAX, PRODUCT_NAME_MAX_LENGTH, PRODUCT_PICKUP_ADDRESS_MIN_LENGTH, PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE, getRuRegionByCode } from "@molha/api-contract";
+import {
+  getRuRegionByCode,
+  isRuRegionCode,
+  PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
+  PRODUCT_IMAGE_URLS_MAX,
+  PRODUCT_NAME_MAX_LENGTH,
+  PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
+  PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
+} from "@molha/api-contract";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
@@ -31,7 +39,6 @@ import {
 } from "@/entities/product/lib/productListingOrigin";
 import { ProductListingOriginChips } from "@/entities/product/ui/ProductListingOriginChips";
 import { ProductPickupLocationFields } from "@/entities/product/ui/ProductPickupLocationFields";
-import { RuRegionSelect } from "@/entities/region/ui/RuRegionSelect";
 import { ProductPhotoGrid } from "@/features/image-upload/ui/ProductPhotoGrid";
 import { ProductPreviewVideoUploadField } from "@/features/image-upload/ui/ProductPreviewVideoUploadField";
 import { CreateProductCategoryPicker } from "@/features/create-product/ui/CreateProductCategoryPicker";
@@ -146,7 +153,7 @@ const INITIAL_FORM: WizardForm = {
   productCategoryId: null,
   productCategoryLabel: "",
   productCategory: DEFAULT_PRODUCT_CATEGORY,
-  productRegionCode: DEFAULT_VIEWER_REGION_CODE,
+  productRegionCode: "",
   productPickupAddress: "",
   productPickupLat: null,
   productPickupLon: null,
@@ -195,9 +202,6 @@ function validateStep(stepId: WizardStepId, form: WizardForm): string | null {
       if (!form.productCategoryId && !form.productCategory.trim()) {
         return CREATE_PRODUCT_UI.ERROR_CATEGORY;
       }
-      if (!isRuRegionCode(form.productRegionCode)) {
-        return CREATE_PRODUCT_UI.ERROR_SALE_REGION_REQUIRED;
-      }
       return null;
     }
     case "pickup": {
@@ -207,7 +211,7 @@ function validateStep(stepId: WizardStepId, form: WizardForm): string | null {
       }
       const hasLat = form.productPickupLat != null && Number.isFinite(form.productPickupLat);
       const hasLon = form.productPickupLon != null && Number.isFinite(form.productPickupLon);
-      if (hasLat !== hasLon) {
+      if (!hasLat || !hasLon) {
         return CREATE_PRODUCT_UI.ERROR_PICKUP_COORDS;
       }
       if (form.productPickupEnabled === false && form.productDeliveryEnabled !== true) {
@@ -357,7 +361,9 @@ export const CreateProductScreen = () => {
           : undefined,
         productImageUrls: form.imageUrls.filter(Boolean),
         productPreviewVideoUrl: form.productPreviewVideoUrl.trim() || undefined,
-        productRegionCode: form.productRegionCode.trim(),
+        ...(isRuRegionCode(form.productRegionCode.trim())
+          ? { productRegionCode: form.productRegionCode.trim() }
+          : {}),
         productPickupAddress: form.productPickupAddress.trim(),
         productPickupLat: form.productPickupLat,
         productPickupLon: form.productPickupLon,
@@ -914,18 +920,11 @@ function CategoryStep({ form, setForm, disabled, theme, styles }: StepProps) {
         }
       />
 
-      {/* Sale region */}
-      <RuRegionSelect
-        value={form.productRegionCode}
-        disabled={disabled}
-        required
-        label={CREATE_PRODUCT_UI.LABEL_SALE_REGION}
-        onChange={(productRegionCode) =>
-          setForm((prev) => ({ ...prev, productRegionCode }))
-        }
-      />
       <Text style={[styles.hint, { color: theme.colors.textSecondary }]}>
-        {CREATE_PRODUCT_UI.HINT_SALE_REGION}
+        {CREATE_PRODUCT_UI.LABEL_SALE_REGION}
+        {": "}
+        {getRuRegionByCode(form.productRegionCode)?.name ||
+          CREATE_PRODUCT_UI.HINT_SALE_REGION_FROM_ADDRESS}
       </Text>
     </View>
   );
@@ -959,6 +958,9 @@ function PickupStep({
             productPickupLon: next.productPickupLon,
             productPickupEnabled: next.productPickupEnabled !== false,
             productDeliveryEnabled: next.productDeliveryEnabled === true,
+            ...(next.productRegionCode
+              ? { productRegionCode: next.productRegionCode }
+              : {}),
           }));
         }}
       />

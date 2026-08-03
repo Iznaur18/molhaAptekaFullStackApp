@@ -266,6 +266,7 @@
 }
 
 .product-details-modal__price-badge-row .product-card__auction-badge,
+.product-details-modal__price-badge-row .product-card__near-badge,
 .product-details-modal__price-badge-row .product-card__installment-badge,
 .product-details-modal__price-badge-row .product-card__raffle-badge,
 .product-details-modal__price-badge-row .product-card__promotion-boost-badge,
@@ -279,7 +280,8 @@
   line-height: 1.2;
 }
 
-.product-details-modal__price-badge-row .product-card__auction-badge {
+.product-details-modal__price-badge-row .product-card__auction-badge,
+.product-details-modal__price-badge-row .product-card__near-badge {
   background: #dbeafe;
   color: #1d4ed8;
 }
@@ -327,6 +329,7 @@
 .product-details-modal__price-badge-row .product-card__promotion-badge_pending,
 .product-details-modal__price-badge-row .product-card__hidden-badge,
 .product-details-modal__price-badge-row .product-card__auction-badge,
+.product-details-modal__price-badge-row .product-card__near-badge,
 .product-details-modal__price-badge-row .product-card__installment-badge,
 .product-details-modal__price-badge-row .product-card__raffle-badge,
 .product-details-modal__price-badge-row .product-card__loyalty-overcommitted-badge,
@@ -394,10 +397,4 @@
   background: var(--iz-color-surface-elevated);
   color: var(--iz-color-text-muted);
   cursor: default;
-}
-
-.product-details-modal__affiliate-share-status {
-  margin: 0;
-  font-size: 0.85rem;
-  color: var(--iz-color-text-muted, #6b7280);
 }

@@ -21,5 +21,7 @@ export const useAddressSuggestionsQuery = ({
     queryFn: () => fetchAddressSuggestions(normalizedQuery),
     enabled: enabled && normalizedQuery.length > 0,
     staleTime: ADDRESS_SUGGEST_STALE_TIME_MS,
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 };

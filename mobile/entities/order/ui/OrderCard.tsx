@@ -1,14 +1,24 @@
 import { useState, type ReactNode } from "react";
 import {
+  LayoutAnimation,
   Linking,
+  Platform,
   Pressable,
   Text,
+  UIManager,
   View,
   type StyleProp,
   type ViewStyle,
 } from "react-native";
 import { resolveOrderShippingTrackingUrl } from "@molha/api-contract";
 import { resolveOrderLineAffiliateSellerLine } from "@izibuy/shared-lib";
+
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
 import { isOrderLineItemProductClickable } from "@/entities/order/lib/isOrderLineItemProductClickable";
@@ -473,17 +483,6 @@ export const OrderCard = ({
           <View style={styles.itemActionsRow}>
             {canMarkShipped && (onMarkShipped || onCancelItem) ? (
               <>
-                {onMarkShipped ? (
-                  <Pressable
-                    style={[styles.actionButton, isActionPending && styles.actionDisabled]}
-                    onPress={() => onMarkShipped({ orderId: order._id, itemIndex })}
-                    disabled={isActionPending}
-                  >
-                    <Text style={styles.actionButtonText}>
-                      {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_SHIPPED}
-                    </Text>
-                  </Pressable>
-                ) : null}
                 {onCancelItem ? (
                   <Pressable
                     style={[
@@ -496,6 +495,17 @@ export const OrderCard = ({
                   >
                     <Text style={[styles.actionButtonText, styles.actionButtonTextCancel]}>
                       {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_CANCEL}
+                    </Text>
+                  </Pressable>
+                ) : null}
+                {onMarkShipped ? (
+                  <Pressable
+                    style={[styles.actionButton, isActionPending && styles.actionDisabled]}
+                    onPress={() => onMarkShipped({ orderId: order._id, itemIndex })}
+                    disabled={isActionPending}
+                  >
+                    <Text style={styles.actionButtonText}>
+                      {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_SHIPPED}
                     </Text>
                   </Pressable>
                 ) : null}
@@ -514,17 +524,6 @@ export const OrderCard = ({
             ) : null}
             {canConfirm || (canCancel && !onMarkShipped) ? (
               <>
-                {canConfirm ? (
-                  <Pressable
-                    style={[styles.actionButton, isActionPending && styles.actionDisabled]}
-                    onPress={() => onConfirmDelivered?.({ orderId: order._id, itemIndex })}
-                    disabled={isActionPending}
-                  >
-                    <Text style={styles.actionButtonText}>
-                      {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_CONFIRM}
-                    </Text>
-                  </Pressable>
-                ) : null}
                 {canCancel ? (
                   <Pressable
                     style={[
@@ -537,6 +536,17 @@ export const OrderCard = ({
                   >
                     <Text style={[styles.actionButtonText, styles.actionButtonTextCancel]}>
                       {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_CANCEL}
+                    </Text>
+                  </Pressable>
+                ) : null}
+                {canConfirm ? (
+                  <Pressable
+                    style={[styles.actionButton, isActionPending && styles.actionDisabled]}
+                    onPress={() => onConfirmDelivered?.({ orderId: order._id, itemIndex })}
+                    disabled={isActionPending}
+                  >
+                    <Text style={styles.actionButtonText}>
+                      {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_CONFIRM}
                     </Text>
                   </Pressable>
                 ) : null}
@@ -611,9 +621,16 @@ export const OrderCard = ({
             <View style={styles.detailsFold}>
               <Pressable
                 accessibilityRole="button"
-                onPress={() => setDetailsExpanded((value) => !value)}
+                accessibilityState={{ expanded: detailsExpanded }}
+                onPress={() => {
+                  LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                  setDetailsExpanded((value) => !value);
+                }}
               >
-                <Text style={styles.detailsFoldSummary}>{ORDER_CARD_UI.DETAILS_FOLD_SUMMARY}</Text>
+                <Text style={styles.detailsFoldSummary}>
+                  {detailsExpanded ? "▾ " : "▸ "}
+                  {ORDER_CARD_UI.DETAILS_FOLD_SUMMARY}
+                </Text>
               </Pressable>
               {detailsExpanded ? (
                 <View style={styles.detailsFoldBody}>

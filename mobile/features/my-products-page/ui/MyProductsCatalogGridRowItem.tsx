@@ -38,6 +38,10 @@ export const MyProductsCatalogGridRowItem = ({
     );
   }
 
+  if (row.kind === "section-header") {
+    return null;
+  }
+
   return (
     <CatalogGridRowEnteringShell rowIndex={rowIndex}>
       <View style={[catalogGridRowStyles.row, { gap }]}>

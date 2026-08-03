@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   ORDER_FULFILLMENT_DELIVERY,
@@ -161,11 +161,20 @@ export const CheckoutForm = ({
         <Text style={checkoutStyles.fieldLabel}>{CHECKOUT_FORM_UI.LABEL_FULFILLMENT}</Text>
         <View style={checkoutStyles.fulfillmentRow}>
           <Pressable
-            disabled={!pickupSelectable || isDisabled || isSubmitting}
+            disabled={isDisabled || isSubmitting}
+            accessibilityState={{
+              disabled: !pickupSelectable || isDisabled || isSubmitting,
+              checked: isPickup,
+            }}
             onPress={() => {
               if (!pickupSelectable) {
+                Alert.alert(
+                  CHECKOUT_FORM_UI.FULFILLMENT_PICKUP,
+                  pickupOptionHint || CHECKOUT_FORM_UI.FULFILLMENT_PICKUP_UNAVAILABLE,
+                );
                 return;
               }
+              setLocalError("");
               setFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
             }}
             style={[
@@ -183,23 +192,23 @@ export const CheckoutForm = ({
             >
               {CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}
             </Text>
-            {pickupOptionHint ? (
-              <Text
-                style={[
-                  checkoutStyles.fulfillmentOptionHint,
-                  isPickup && checkoutStyles.fulfillmentOptionHintActive,
-                ]}
-              >
-                {pickupOptionHint}
-              </Text>
-            ) : null}
           </Pressable>
           <Pressable
-            disabled={!deliverySelectable || isDisabled || isSubmitting}
+            disabled={isDisabled || isSubmitting}
+            accessibilityState={{
+              disabled: !deliverySelectable || isDisabled || isSubmitting,
+              checked: !isPickup,
+            }}
             onPress={() => {
               if (!deliverySelectable) {
+                Alert.alert(
+                  CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY,
+                  deliveryOptionHint ||
+                    CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_UNAVAILABLE,
+                );
                 return;
               }
+              setLocalError("");
               setFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
             }}
             style={[
@@ -217,16 +226,6 @@ export const CheckoutForm = ({
             >
               {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
             </Text>
-            {deliveryOptionHint ? (
-              <Text
-                style={[
-                  checkoutStyles.fulfillmentOptionHint,
-                  !isPickup && checkoutStyles.fulfillmentOptionHintActive,
-                ]}
-              >
-                {deliveryOptionHint}
-              </Text>
-            ) : null}
           </Pressable>
         </View>
 
