@@ -58,7 +58,7 @@ export function ProductModerationDetailsFooter({
       <div className="product-moderation-details-footer__actions">
         <button
           type="button"
-          className="product-moderation-details-footer__btn product-moderation-details-footer__btn_approve"
+          className="app-btn app-btn--success"
           disabled={isBusy || isDeleteConfirmOpen}
           onClick={onApprove}
         >
@@ -68,7 +68,7 @@ export function ProductModerationDetailsFooter({
         </button>
         <button
           type="button"
-          className="product-moderation-details-footer__btn product-moderation-details-footer__btn_reject"
+          className="app-btn app-btn--outline"
           disabled={isBusy || isDeleteConfirmOpen}
           onClick={onReject}
         >
@@ -86,7 +86,7 @@ export function ProductModerationDetailsFooter({
               </p>
               <button
                 type="button"
-                className="product-moderation-details-footer__btn product-moderation-details-footer__btn_delete"
+                className="app-btn app-btn--danger"
                 disabled={isBusy}
                 onClick={() => {
                   setIsDeleteConfirmOpen(false);
@@ -97,7 +97,7 @@ export function ProductModerationDetailsFooter({
               </button>
               <button
                 type="button"
-                className="product-moderation-details-footer__btn product-moderation-details-footer__btn_reject"
+                className="app-btn app-btn--secondary"
                 disabled={isBusy}
                 onClick={() => setIsDeleteConfirmOpen(false)}
               >
@@ -107,7 +107,7 @@ export function ProductModerationDetailsFooter({
           ) : (
             <button
               type="button"
-              className="product-moderation-details-footer__btn product-moderation-details-footer__btn_delete"
+              className="app-btn app-btn--danger product-moderation-details-footer__btn--wide"
               disabled={isBusy}
               onClick={() => setIsDeleteConfirmOpen(true)}
             >

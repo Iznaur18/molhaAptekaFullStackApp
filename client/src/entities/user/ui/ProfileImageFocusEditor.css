@@ -36,11 +36,13 @@
   border-radius: 50%;
 }
 
-/* Пропорции баннера профиля: ширина × (4.5rem × 3) — как в UserDetailsModal */
+/* Паритет баннера профиля: высота = avatar-lead × 3 */
 .profile-image-focus-editor__frame_background {
   width: 100%;
-  aspect-ratio: 40 / 13.5;
-  border-radius: 10px;
+  height: calc(
+    var(--modal-avatar-lead-size, 4.5rem) * var(--modal-profile-banner-height-mult, 3)
+  );
+  border-radius: var(--modal-profile-banner-radius, 24px);
 }
 
 /* Паритет FeaturedRaffleModalCard visual: квадрат + radius 22 */

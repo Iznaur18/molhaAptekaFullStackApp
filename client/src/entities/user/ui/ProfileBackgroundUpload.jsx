@@ -3,9 +3,14 @@ import { useRef, useState } from "react";
 import { EDIT_PROFILE_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { UPLOAD_FILE_INPUT_ACCEPT } from "../../../shared/config/uploadConstants.js";
 import { prepareBrowserImageFileForUpload } from "../../../shared/lib/prepareBrowserImageFileForUpload.js";
+import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { validateUploadImageFile } from "../../../shared/lib/validateUploadImageFile.js";
 import { useUploadAssetMutations } from "../../../shared/model/useUploadAssetMutations.js";
-import { DEFAULT_USER_BACKGROUND_FOCUS } from "../lib/profileImageFocus.js";
+import {
+  DEFAULT_USER_BACKGROUND_FOCUS,
+  isHttpProfileImageUrl,
+} from "../lib/profileImageFocus.js";
+import { ProfileImageFocusEditor } from "./ProfileImageFocusEditor.jsx";
 import { UserBackgroundPresetPicker } from "./UserBackgroundPresetPicker.jsx";
 import { UserBackgroundPreview } from "./UserBackgroundPreview.jsx";
 
@@ -40,6 +45,12 @@ export function ProfileBackgroundUpload({
   const isBusy = uploadImageMutation.isPending;
   const isDisabled = disabled || isBusy;
   const showImageControls = mode === "image" || mode === "admin";
+  const focusImageUrl = (() => {
+    const url = resolveImageUrlForDisplay(imageUrl ?? "");
+    if (!isHttpProfileImageUrl(url)) return "";
+    if (mode === "image" || mode === "admin") return url;
+    return "";
+  })();
 
   const handlePick = () => {
     if (isDisabled) return;
@@ -82,14 +93,24 @@ export function ProfileBackgroundUpload({
         {EDIT_PROFILE_MODAL_UI.LABEL_BACKGROUND}
       </p>
 
-      <div className="profile-background-upload__preview">
-        <UserBackgroundPreview
-          presetId={presetId}
-          imageUrl={imageUrl}
-          mode={mode}
-          focus={focus}
+      {focusImageUrl && onFocusChange ? (
+        <ProfileImageFocusEditor
+          imageUrl={focusImageUrl}
+          variant="background"
+          value={focus}
+          onChange={onFocusChange}
+          disabled={isDisabled}
         />
-      </div>
+      ) : (
+        <div className="profile-background-upload__preview">
+          <UserBackgroundPreview
+            presetId={presetId}
+            imageUrl={imageUrl}
+            mode={mode}
+            focus={focus}
+          />
+        </div>
+      )}
 
       {mode === "preset" ? (
         <UserBackgroundPresetPicker

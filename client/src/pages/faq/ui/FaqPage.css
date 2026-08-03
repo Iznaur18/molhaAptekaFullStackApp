@@ -21,6 +21,28 @@
   color: var(--iz-color-text-muted);
 }
 
+.faq-page__sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--iz-space-5);
+}
+
+.faq-page__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--iz-space-2);
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.faq-page__section-title {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
 .faq-page__list {
   display: flex;
   flex-direction: column;

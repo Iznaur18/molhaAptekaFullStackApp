@@ -17,6 +17,17 @@ export const useFaqPageStyles = createThemedStyles((theme) => ({
     color: theme.colors.textMuted,
     marginBottom: theme.spacing[4],
   },
+  sections: {
+    gap: theme.spacing[5],
+  },
+  section: {
+    gap: theme.spacing[2],
+  },
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
   list: {
     gap: theme.spacing[2],
   },

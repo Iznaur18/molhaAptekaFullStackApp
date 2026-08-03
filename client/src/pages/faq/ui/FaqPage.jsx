@@ -3,7 +3,7 @@ import { useState } from "react";
 import { FAQ_UI } from "../../../shared/config/appUiCopy.js";
 import { AppIcon, ChevronDown, ChevronUp } from "../../../shared/ui/icon/index.js";
 import { LEGAL_CONTACT_EMAIL } from "../../legal/model/legalSharedConstants.js";
-import { FAQ_ITEMS, FAQ_UPDATED_AT } from "../model/faqContent.js";
+import { FAQ_SECTIONS, FAQ_UPDATED_AT } from "../model/faqContent.js";
 
 import "./FaqPage.css";
 
@@ -17,37 +17,54 @@ export function FaqPage() {
         {FAQ_UI.UPDATED_PREFIX} {FAQ_UPDATED_AT}
       </p>
 
-      <ul className="faq-page__list">
-        {FAQ_ITEMS.map((item) => {
-          const expanded = expandedId === item.id;
+      <div className="faq-page__sections">
+        {FAQ_SECTIONS.map((section) => (
+          <section
+            key={section.id}
+            className="faq-page__section"
+            aria-labelledby={`faq-section-${section.id}`}
+          >
+            <h2 id={`faq-section-${section.id}`} className="faq-page__section-title">
+              {section.title}
+            </h2>
+            <ul className="faq-page__list">
+              {section.items.map((item) => {
+                const expanded = expandedId === item.id;
 
-          return (
-            <li
-              key={item.id}
-              className={[
-                "faq-page__item",
-                expanded ? "faq-page__item--expanded" : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-            >
-              <button
-                type="button"
-                className="faq-page__question"
-                aria-expanded={expanded}
-                aria-label={FAQ_UI.QUESTION_ARIA(item.question)}
-                onClick={() =>
-                  setExpandedId((current) => (current === item.id ? null : item.id))
-                }
-              >
-                <span className="faq-page__question-text">{item.question}</span>
-                <AppIcon icon={expanded ? ChevronUp : ChevronDown} size={22} />
-              </button>
-              {expanded ? <p className="faq-page__answer">{item.answer}</p> : null}
-            </li>
-          );
-        })}
-      </ul>
+                return (
+                  <li
+                    key={item.id}
+                    className={[
+                      "faq-page__item",
+                      expanded ? "faq-page__item--expanded" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    <button
+                      type="button"
+                      className="faq-page__question"
+                      aria-expanded={expanded}
+                      aria-label={FAQ_UI.QUESTION_ARIA(item.question)}
+                      onClick={() =>
+                        setExpandedId((current) =>
+                          current === item.id ? null : item.id,
+                        )
+                      }
+                    >
+                      <span className="faq-page__question-text">{item.question}</span>
+                      <AppIcon icon={expanded ? ChevronUp : ChevronDown} size={22} />
+                    </button>
+                    {expanded ? (
+                      <p className="faq-page__answer">{item.answer}</p>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ))}
+      </div>
 
       <p className="faq-page__contact">
         {FAQ_UI.CONTACT_PREFIX}{" "}

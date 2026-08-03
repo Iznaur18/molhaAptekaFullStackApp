@@ -30,42 +30,24 @@
 }
 
 .product-moderation-details-footer__actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
 }
 
-.product-moderation-details-footer__btn {
-  border-radius: 0.5rem;
-  padding: 0.45rem 0.85rem;
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
+.product-moderation-details-footer__actions > .app-btn {
+  width: 100%;
 }
 
-.product-moderation-details-footer__btn_approve {
-  border: 1px solid var(--iz-color-success);
-  background: var(--iz-color-success);
-  color: var(--iz-color-on-contrast);
-}
-
-.product-moderation-details-footer__btn_reject {
-  border: 1px solid var(--iz-color-danger);
-  background: var(--iz-color-surface);
-  color: var(--iz-color-danger);
-}
-
-.product-moderation-details-footer__btn_delete {
-  border: 1px solid var(--iz-color-danger);
-  background: color-mix(in srgb, var(--iz-color-danger) 10%, var(--iz-color-surface));
-  color: var(--iz-color-danger);
+.product-moderation-details-footer__btn--wide,
+.product-moderation-details-footer__open-sales-hint,
+.product-moderation-details-footer__delete-confirm-question {
+  grid-column: 1 / -1;
 }
 
 .product-moderation-details-footer__open-sales-hint,
 .product-moderation-details-footer__delete-confirm-question {
   margin: 0;
-  flex: 1 1 100%;
   font-size: 0.84rem;
   line-height: 1.4;
   color: var(--iz-color-text-secondary);
@@ -73,9 +55,4 @@
 
 .product-moderation-details-footer__delete-confirm-question {
   color: var(--iz-color-text);
-}
-
-.product-moderation-details-footer__btn:disabled {
-  opacity: 0.65;
-  cursor: default;
 }

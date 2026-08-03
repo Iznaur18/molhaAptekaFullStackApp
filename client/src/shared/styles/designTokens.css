@@ -43,6 +43,8 @@
   --iz-color-warning: #d97706;
   --iz-color-warning-surface: #f7f3ea;
   --iz-color-warning-text: #92400e;
+  /* Premium chrome (avatar ring) — gold, not warning amber */
+  --iz-color-premium: #c9a227;
   --iz-color-danger: #c62828;
   --iz-color-danger-surface: #f7eeee;
   --iz-color-danger-text: #991b1b;

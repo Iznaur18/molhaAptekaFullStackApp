@@ -1,7 +1,7 @@
 import { ScrollView, Text, View } from "react-native";
 import { useCallback, useState } from "react";
 
-import { FAQ_ITEMS, FAQ_UPDATED_AT } from "@/features/faq/model/faqContent";
+import { FAQ_SECTIONS, FAQ_UPDATED_AT } from "@/features/faq/model/faqContent";
 import { FaqAccordionItem } from "@/features/faq/ui/FaqAccordionItem";
 import { LEGAL_CONTACT_EMAIL } from "@/features/legal/model/legalSharedConstants";
 import { FAQ_UI } from "@/shared/config";
@@ -22,14 +22,21 @@ export const FaqScreen = () => {
         {FAQ_UI.UPDATED_PREFIX} {FAQ_UPDATED_AT}
       </Text>
 
-      <View style={styles.list}>
-        {FAQ_ITEMS.map((item) => (
-          <FaqAccordionItem
-            key={item.id}
-            item={item}
-            expanded={expandedId === item.id}
-            onToggle={() => handleToggle(item.id)}
-          />
+      <View style={styles.sections}>
+        {FAQ_SECTIONS.map((section) => (
+          <View key={section.id} style={styles.section}>
+            <Text style={styles.sectionTitle}>{section.title}</Text>
+            <View style={styles.list}>
+              {section.items.map((item) => (
+                <FaqAccordionItem
+                  key={item.id}
+                  item={item}
+                  expanded={expandedId === item.id}
+                  onToggle={() => handleToggle(item.id)}
+                />
+              ))}
+            </View>
+          </View>
         ))}
       </View>
 

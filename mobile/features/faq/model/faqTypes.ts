@@ -3,3 +3,9 @@ export type FaqItem = {
   question: string;
   answer: string;
 };
+
+export type FaqSection = {
+  id: string;
+  title: string;
+  items: FaqItem[];
+};

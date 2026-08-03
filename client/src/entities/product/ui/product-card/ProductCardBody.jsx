@@ -64,6 +64,10 @@ export function ProductCardBody({ vm, detailsSurface }) {
               </div>
             ) : null}
           </div>
+        ) : vm.isModerationQueue ? (
+          <div className="product-card__list-content">
+            <ProductCardStandardContent vm={vm} />
+          </div>
         ) : (
           <ProductCardStandardContent vm={vm} />
         )}

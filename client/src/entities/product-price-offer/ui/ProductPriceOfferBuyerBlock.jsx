@@ -69,7 +69,10 @@ export function ProductPriceOfferBuyerBlock({
     submitMutation.isPending || patchMutation.isPending || cancelMutation.isPending;
   const isMobileNav = useAppShellCompactLayout();
   const pageDockHost = useProductDetailsPageDockHost();
-  const dockSubmit = pageDockHost !== undefined || isMobileNav;
+  // Page provider starts at `null` (slot not mounted). Treat only a real host as dock mode —
+  // otherwise tablet/desktop page hides the inline CTA while the dock never mounts (≥767).
+  const dockSubmit =
+    pageDockHost != null || (pageDockHost === undefined && isMobileNav);
   const confirmGate = useAccountRequirementModal();
 
   useEffect(() => {

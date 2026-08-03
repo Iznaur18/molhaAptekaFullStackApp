@@ -14,7 +14,11 @@
 }
 
 .profile-background-upload__preview .user-background-preview {
-  height: 7.5rem;
+  /* Паритет баннера профиля: avatar × 3 (UserDetailsModal / MyProfile) */
+  height: calc(
+    var(--modal-avatar-lead-size, 4.5rem) * var(--modal-profile-banner-height-mult, 3)
+  );
+  border-radius: var(--modal-profile-banner-radius, 24px);
 }
 
 .profile-background-upload__actions {

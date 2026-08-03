@@ -140,7 +140,7 @@ export function ProductReportGroupCard({
       <div className="product-report-group-card__actions">
         <button
           type="button"
-          className="product-report-group-card__action product-report-group-card__action_dismiss"
+          className="app-btn app-btn--secondary"
           disabled={isBusy}
           onClick={() => void handleResolve(PRODUCT_REPORT_RESOLUTION_DISMISS)}
         >
@@ -150,7 +150,7 @@ export function ProductReportGroupCard({
         </button>
         <button
           type="button"
-          className="product-report-group-card__action"
+          className="app-btn app-btn--outline"
           disabled={isBusy}
           onClick={() => void handleResolve(PRODUCT_REPORT_RESOLUTION_HIDE)}
         >
@@ -158,7 +158,7 @@ export function ProductReportGroupCard({
         </button>
         <button
           type="button"
-          className="product-report-group-card__action product-report-group-card__action_reject"
+          className="app-btn app-btn--danger"
           disabled={isBusy}
           onClick={() => void handleResolve(PRODUCT_REPORT_RESOLUTION_REJECT)}
         >

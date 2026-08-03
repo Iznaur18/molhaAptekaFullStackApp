@@ -1,8 +1,8 @@
 .user-premium-avatar {
   box-sizing: border-box;
-  border: 2px solid var(--iz-color-warning) !important;
+  border: 2px solid var(--iz-color-premium) !important;
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--iz-color-warning) 45%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--iz-color-premium) 45%, transparent),
     0 6px 18px var(--iz-shadow-card-hover);
 }
 
