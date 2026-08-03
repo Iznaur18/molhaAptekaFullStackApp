@@ -11,11 +11,13 @@
 
 .create-user-story-modal__backdrop {
   --create-story-enter-ms: 420ms;
-  --create-story-exit-ms: 220ms;
+  --create-story-exit-ms: 420ms;
   --create-story-enter-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
-  --create-story-exit-ease: cubic-bezier(0.55, 0.055, 0.675, 1);
+  --create-story-exit-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
   --create-story-height: 80vh;
-  --create-story-height: 80svh;
+  --create-story-height: 80dvh;
+  /* Phone ≤640: edge-to-edge; ≥641: узкая колонка как у розыгрыша */
+  --create-story-max-width: 100%;
   --create-story-radius: 2rem;
   --create-story-preview-max-height: 220px;
   --create-story-caption-height: 180px;
@@ -29,7 +31,7 @@
   inset: 0;
   height: auto;
   max-height: none;
-  z-index: 1400;
+  z-index: var(--iz-z-modal-shell, 1400);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -38,6 +40,12 @@
   overflow: visible;
   overscroll-behavior: none;
   touch-action: none;
+}
+
+@media (min-width: 641px) {
+  .create-user-story-modal__backdrop {
+    --create-story-max-width: min(26rem, 100%);
+  }
 }
 
 /*
@@ -85,7 +93,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 100%;
+  max-width: var(--create-story-max-width);
   height: var(--create-story-height);
   max-height: var(--create-story-height);
   margin: 0;
@@ -105,11 +113,6 @@
 .create-user-story-modal__backdrop--open .create-user-story-modal {
   transform: translate3d(0, 0, 0);
   transition: transform var(--create-story-enter-ms) var(--create-story-enter-ease);
-}
-
-.create-user-story-modal--settled {
-  transition: none !important;
-  will-change: auto !important;
 }
 
 .create-user-story-modal__body {

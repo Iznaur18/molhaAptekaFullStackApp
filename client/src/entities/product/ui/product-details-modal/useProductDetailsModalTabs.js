@@ -43,6 +43,12 @@ export function useProductDetailsModalTabs({
   const showReviewsTab =
     product?._id != null &&
     (product.productModerationStatus === PRODUCT_MODERATION_APPROVED || isSellerView);
+  const showQaTab =
+    product?._id != null &&
+    (isSellerView
+      ? true
+      : product.productQaEnabled === true &&
+        product.productModerationStatus === PRODUCT_MODERATION_APPROVED);
   const showSimilarTab = product?._id != null && similarFilters != null;
   const showCompareTab = product?._id != null;
   const showAuctionTab =
@@ -58,6 +64,7 @@ export function useProductDetailsModalTabs({
   const showProductDetailsTabs =
     showAuctionTab ||
     showReviewsTab ||
+    showQaTab ||
     showInstallmentTab ||
     showSimilarTab ||
     showCompareTab;
@@ -82,6 +89,16 @@ export function useProductDetailsModalTabs({
     product?.productInstallmentEnabled,
   ]);
 
+  const handleQaShortcutClick = useCallback(() => {
+    if (!showQaTab || isOwnProduct) return;
+    setDetailsTab("qa");
+  }, [isOwnProduct, showQaTab]);
+
+  const handleCompareShortcutClick = useCallback(() => {
+    if (!showCompareTab) return;
+    setDetailsTab("compare");
+  }, [showCompareTab]);
+
   useEffect(() => {
     setDetailsTab(initialDetailsTab);
     setTabPanelMinHeight(0);
@@ -93,6 +110,12 @@ export function useProductDetailsModalTabs({
     const showReviews =
       product._id != null &&
       (product.productModerationStatus === PRODUCT_MODERATION_APPROVED || isOwnProduct);
+    const showQa =
+      product._id != null &&
+      (isSellerView
+        ? true
+        : product.productQaEnabled === true &&
+          product.productModerationStatus === PRODUCT_MODERATION_APPROVED);
     const showSimilar = product._id != null && similarFilters != null;
     const showCompare = product._id != null;
     const showAuction =
@@ -105,6 +128,7 @@ export function useProductDetailsModalTabs({
         : product.productInstallmentEnabled === true || installmentUi.installmentActive);
 
     if (detailsTab === "reviews" && !showReviews) setDetailsTab("details");
+    if (detailsTab === "qa" && !showQa) setDetailsTab("details");
     if (detailsTab === "similar" && !showSimilar) setDetailsTab("details");
     if (detailsTab === "compare" && !showCompare) setDetailsTab("details");
     if (detailsTab === "auction" && !showAuction) setDetailsTab("details");
@@ -172,6 +196,7 @@ export function useProductDetailsModalTabs({
     auctionUi,
     installmentUi,
     showReviewsTab,
+    showQaTab,
     showSimilarTab,
     showCompareTab,
     showAuctionTab,
@@ -179,5 +204,7 @@ export function useProductDetailsModalTabs({
     showProductDetailsTabs,
     handleAuctionShortcutClick,
     handleInstallmentShortcutClick,
+    handleQaShortcutClick,
+    handleCompareShortcutClick,
   };
 }

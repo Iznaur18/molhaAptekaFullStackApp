@@ -64,6 +64,21 @@ export {
   productReviewsListQuerySchema,
 } from "./productReview.js";
 export {
+  PRODUCT_QUESTION_TEXT_MAX_LENGTH,
+  PRODUCT_ANSWER_TEXT_MAX_LENGTH,
+  PRODUCT_QUESTIONS_MAX_PER_PRODUCT,
+  PRODUCT_QUESTION_LIMIT_DEFAULT,
+  PRODUCT_QUESTION_LIMIT_MAX,
+  PRODUCT_QUESTION_STATUS_PENDING,
+  PRODUCT_QUESTION_STATUS_ANSWERED,
+  PRODUCT_QUESTION_STATUS_HIDDEN,
+  PRODUCT_QUESTION_STATUSES,
+  askProductQuestionBodySchema,
+  answerProductQuestionBodySchema,
+  productQuestionsListQuerySchema,
+  productQuestionIdParamsSchema,
+} from "./productQuestion.js";
+export {
   createRaffleBodySchema,
   patchRaffleBodySchema,
   rejectRaffleBodySchema,

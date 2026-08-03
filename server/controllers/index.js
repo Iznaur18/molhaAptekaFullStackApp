@@ -135,6 +135,14 @@ import {
   deleteMyProductReviewController,
 } from "./Product/productReviewControllers.js";
 import {
+  listProductQuestionsController,
+  getProductQuestionSummaryController,
+  askProductQuestionController,
+  answerProductQuestionController,
+  hideProductQuestionController,
+  deleteMyProductQuestionController,
+} from "./Product/productQuestionControllers.js";
+import {
   getProductPromotionTariffsController,
   requestProductPromotionController,
   getMyProductPromotionsController,
@@ -327,6 +335,12 @@ export {
   getIncomingPriceOffersPendingCountController,
   listProductReviewsController,
   getProductReviewSummaryController,
+  listProductQuestionsController,
+  getProductQuestionSummaryController,
+  askProductQuestionController,
+  answerProductQuestionController,
+  hideProductQuestionController,
+  deleteMyProductQuestionController,
   submitProductReviewController,
   patchMyProductReviewController,
   deleteMyProductReviewController,

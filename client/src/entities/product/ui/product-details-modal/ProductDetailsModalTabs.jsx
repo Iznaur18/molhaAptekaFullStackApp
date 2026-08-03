@@ -8,14 +8,16 @@ import { ModalSectionTabs } from "../../../../shared/ui/ModalSectionTabs/ModalSe
 
 /**
  * @param {{
- *   detailsTab: 'details' | 'auction' | 'reviews' | 'installment' | 'similar' | 'compare';
- *   setDetailsTab: (tab: 'details' | 'auction' | 'reviews' | 'installment' | 'similar' | 'compare') => void;
+ *   detailsTab: 'details' | 'auction' | 'reviews' | 'qa' | 'installment' | 'similar' | 'compare';
+ *   setDetailsTab: (tab: 'details' | 'auction' | 'reviews' | 'qa' | 'installment' | 'similar' | 'compare') => void;
  *   showAuctionTab: boolean;
  *   showInstallmentTab: boolean;
  *   showReviewsTab: boolean;
+ *   showQaTab: boolean;
  *   showSimilarTab: boolean;
  *   showCompareTab: boolean;
  *   reviewsTabLabel: string;
+ *   qaTabLabel: string;
  * }} props
  */
 export function ProductDetailsModalTabs({
@@ -24,15 +26,21 @@ export function ProductDetailsModalTabs({
   showAuctionTab,
   showInstallmentTab,
   showReviewsTab,
+  showQaTab,
   showSimilarTab,
   showCompareTab,
   reviewsTabLabel,
+  qaTabLabel,
 }) {
-  /** @type {Array<{ id: 'details' | 'auction' | 'reviews' | 'installment' | 'similar' | 'compare'; label: string }>} */
+  /** @type {Array<{ id: 'details' | 'auction' | 'reviews' | 'qa' | 'installment' | 'similar' | 'compare'; label: string }>} */
   const tabs = [{ id: "details", label: PRODUCT_PRICE_OFFER_UI.TAB_DETAILS }];
 
   if (showReviewsTab) {
     tabs.push({ id: "reviews", label: reviewsTabLabel });
+  }
+
+  if (showQaTab) {
+    tabs.push({ id: "qa", label: qaTabLabel });
   }
 
   if (showSimilarTab) {

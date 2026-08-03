@@ -60,6 +60,12 @@ import {
   submitProductReviewController,
   patchMyProductReviewController,
   deleteMyProductReviewController,
+  listProductQuestionsController,
+  getProductQuestionSummaryController,
+  askProductQuestionController,
+  answerProductQuestionController,
+  hideProductQuestionController,
+  deleteMyProductQuestionController,
   getProductPromotionTariffsController,
   requestProductPromotionController,
   getMyProductPromotionsController,
@@ -97,6 +103,7 @@ import {
   productReportRateLimiter,
   productPriceOfferRateLimiter,
   productReviewRateLimiter,
+  productQuestionRateLimiter,
   productCompareRateLimiter,
 } from "../middlewares/index.js";
 import {
@@ -113,6 +120,10 @@ import {
   submitProductReviewValidation,
   patchProductReviewValidation,
   productReviewsListValidation,
+  askProductQuestionValidation,
+  answerProductQuestionValidation,
+  productQuestionsListValidation,
+  productQuestionIdParamValidation,
   requestProductPromotionValidation,
   myProductPromotionsValidation,
   promotionIdParamValidation,
@@ -595,6 +606,46 @@ router.delete(
   checkAuthMW,
   productIdParamValidation,
   deleteMyProductReviewController,
+);
+router.get(
+  "/:productId/questions/summary",
+  productIdParamValidation,
+  checkOptionalAuthMW,
+  getProductQuestionSummaryController,
+);
+router.get(
+  "/:productId/questions",
+  productIdParamValidation,
+  productQuestionsListValidation,
+  checkOptionalAuthMW,
+  listProductQuestionsController,
+);
+router.post(
+  "/:productId/questions",
+  checkAuthMW,
+  productQuestionRateLimiter,
+  productIdParamValidation,
+  askProductQuestionValidation,
+  askProductQuestionController,
+);
+router.put(
+  "/:productId/questions/:questionId/answer",
+  checkAuthMW,
+  productQuestionIdParamValidation,
+  answerProductQuestionValidation,
+  answerProductQuestionController,
+);
+router.patch(
+  "/:productId/questions/:questionId/hide",
+  checkAuthMW,
+  productQuestionIdParamValidation,
+  hideProductQuestionController,
+);
+router.delete(
+  "/:productId/questions/:questionId",
+  checkAuthMW,
+  productQuestionIdParamValidation,
+  deleteMyProductQuestionController,
 );
 router.get(
   "/:productId/report/me",

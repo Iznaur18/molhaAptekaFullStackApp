@@ -58,6 +58,23 @@ export function ProductDetailsBadgeStack({ product, onBadgePress }) {
     );
   };
 
+  /**
+   * @param {{ key: string; label: string }} item
+   * @param {{ backgroundColor: string; color: string }} tone
+   * @param {string} [ariaLabel]
+   */
+  const renderSoftTextChip = (item, tone, ariaLabel) =>
+    renderChip(
+      item,
+      <span>{item.label}</span>,
+      "product-details-modal__meta-info-chip",
+      {
+        backgroundColor: tone.backgroundColor,
+        color: tone.color,
+      },
+      ariaLabel ?? item.label,
+    );
+
   return (
     <div className="product-details-modal__price-badge-row">
       <div className="product-details-modal__price-badge-row-scroll">
@@ -81,29 +98,41 @@ export function ProductDetailsBadgeStack({ product, onBadgePress }) {
             }
 
             if (item.kind === "raffle") {
-              return renderChip(
-                item,
-                <span>{item.label}</span>,
-                "product-details-modal__meta-info-chip product-details-modal__meta-info-chip--raffle",
-                {
-                  backgroundColor: PRODUCT_DETAILS_BADGE_SOFT_COLORS.raffle.backgroundColor,
-                  color: PRODUCT_DETAILS_BADGE_SOFT_COLORS.raffle.color,
-                },
-                item.label,
-              );
+              return renderSoftTextChip(item, PRODUCT_DETAILS_BADGE_SOFT_COLORS.raffle);
             }
 
             if (item.kind === "affiliate") {
-              return renderChip(
+              return renderSoftTextChip(
                 item,
-                <span>{item.label}</span>,
-                "product-details-modal__meta-info-chip product-details-modal__meta-info-chip--affiliate",
-                {
-                  backgroundColor:
-                    PRODUCT_DETAILS_BADGE_SOFT_COLORS.affiliate.backgroundColor,
-                  color: PRODUCT_DETAILS_BADGE_SOFT_COLORS.affiliate.color,
-                },
-                item.label,
+                PRODUCT_DETAILS_BADGE_SOFT_COLORS.affiliate,
+              );
+            }
+
+            if (item.kind === "auction") {
+              return renderSoftTextChip(
+                item,
+                PRODUCT_DETAILS_BADGE_SOFT_COLORS.auction,
+              );
+            }
+
+            if (item.kind === "installment") {
+              return renderSoftTextChip(
+                item,
+                PRODUCT_DETAILS_BADGE_SOFT_COLORS.installment,
+              );
+            }
+
+            if (item.kind === "wholesale") {
+              return renderSoftTextChip(
+                item,
+                PRODUCT_DETAILS_BADGE_SOFT_COLORS.wholesale,
+              );
+            }
+
+            if (item.kind === "nearDistance") {
+              return renderSoftTextChip(
+                item,
+                PRODUCT_DETAILS_BADGE_SOFT_COLORS.nearDistance,
               );
             }
 

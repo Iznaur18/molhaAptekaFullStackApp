@@ -16,6 +16,7 @@ import "./ProductEditManageSection.css";
  *   product: import("../model/types.js").ProductFromApi;
  *   onSetAvailability?: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
  *   onSetAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
+ *   onSetQa?: (productId: string, productQaEnabled: boolean) => void | Promise<void>;
  *   onSetWholesale?: (productId: string, productWholesaleEnabled: boolean) => void | Promise<void>;
    *   onSetAffiliate?: (
    *     productId: string,
@@ -25,6 +26,7 @@ import "./ProductEditManageSection.css";
  *   onDelete?: (productId: string) => void | Promise<void>;
  *   isAvailabilityTogglePending?: boolean;
  *   isAuctionTogglePending?: boolean;
+ *   isQaTogglePending?: boolean;
  *   isWholesaleTogglePending?: boolean;
  *   isAffiliateTogglePending?: boolean;
  *   isDeletePending?: boolean;
@@ -51,11 +53,13 @@ export function ProductEditManageSection({
   product,
   onSetAvailability,
   onSetAuction,
+  onSetQa,
   onSetWholesale,
   onSetAffiliate,
   onDelete,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
+  isQaTogglePending = false,
   isWholesaleTogglePending = false,
   isAffiliateTogglePending = false,
   isInstallmentTogglePending = false,
@@ -80,6 +84,8 @@ export function ProductEditManageSection({
   const showVisibility = typeof onSetAvailability === "function" && canToggleVisibility;
   const showAuctionToggle = typeof onSetAuction === "function" && canEdit;
   const isAuctionEnabled = product.productAuctionEnabled === true;
+  const showQaToggle = typeof onSetQa === "function" && canEdit;
+  const isQaEnabled = product.productQaEnabled === true;
   const isInstallmentEnabled = product.productInstallmentEnabled === true;
   const isWholesaleEnabled = product.productWholesaleEnabled === true;
   const affiliateOffer = resolveProductAffiliateOffer(product);
@@ -110,6 +116,7 @@ export function ProductEditManageSection({
     disabled ||
     isAvailabilityTogglePending ||
     isAuctionTogglePending ||
+    isQaTogglePending ||
     isWholesaleTogglePending ||
     isAffiliateTogglePending ||
     isInstallmentTogglePending ||
@@ -161,6 +168,22 @@ export function ProductEditManageSection({
                 return;
               }
               void onSetAuction(String(product._id), !isAuctionEnabled);
+            }}
+          />
+        ) : null}
+        {showQaToggle ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_MODAL_UI.MANAGE_QA_TITLE}
+            description={CREATE_PRODUCT_MODAL_UI.MANAGE_QA_HINT}
+            checked={isQaEnabled}
+            disabled={actionsLocked}
+            pending={isQaTogglePending}
+            pendingLabel={CREATE_PRODUCT_MODAL_UI.QA_TOGGLE_PENDING}
+            onCheckedChange={() => {
+              if (product._id == null || actionsLocked) {
+                return;
+              }
+              void onSetQa(String(product._id), !isQaEnabled);
             }}
           />
         ) : null}

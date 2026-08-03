@@ -101,6 +101,7 @@ export function useAppShellDomain(
     setDeletingProductId: shell.setDeletingProductId,
     setTogglingAvailabilityProductId: shell.setTogglingAvailabilityProductId,
     setTogglingAuctionProductId: shell.setTogglingAuctionProductId,
+    setTogglingQaProductId: shell.setTogglingQaProductId,
     setTogglingWholesaleProductId: shell.setTogglingWholesaleProductId,
     setTogglingAffiliateProductId: shell.setTogglingAffiliateProductId,
     setTogglingInstallmentProductId: shell.setTogglingInstallmentProductId,

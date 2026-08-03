@@ -152,12 +152,14 @@
   font: inherit;
   font-size: var(--iz-control-input-font);
   color: var(--iz-color-text);
+  background: var(--iz-color-surface-muted);
 }
 
 .installment-buyer-block__input:focus {
   border-color: var(--iz-color-action);
   outline: none;
   box-shadow: var(--iz-shadow-input-focus);
+  background: var(--iz-color-surface);
 }
 
 .installment-buyer-block__input:disabled {

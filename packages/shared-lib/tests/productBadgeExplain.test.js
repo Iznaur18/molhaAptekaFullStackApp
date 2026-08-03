@@ -11,6 +11,10 @@ import {
 test("isProductBadgeExplainKey accepts known keys", () => {
   assert.equal(isProductBadgeExplainKey("original"), true);
   assert.equal(isProductBadgeExplainKey("listing_origin_own"), true);
+  assert.equal(isProductBadgeExplainKey("auction"), true);
+  assert.equal(isProductBadgeExplainKey("installment"), true);
+  assert.equal(isProductBadgeExplainKey("wholesale"), true);
+  assert.equal(isProductBadgeExplainKey("near_distance"), true);
   assert.equal(isProductBadgeExplainKey("nope"), false);
 });
 

@@ -479,6 +479,13 @@ const applyAuctionField = (body, $set, existing) => {
   return { auctionEnabledChanged, nextAuctionEnabled };
 };
 
+const applyQaField = (body, $set) => {
+  if (!hasBodyField(body, "productQaEnabled")) {
+    return;
+  }
+  $set.productQaEnabled = Boolean(body.productQaEnabled);
+};
+
 /**
  * @param {{
  *   existing: import("mongoose").Document;
@@ -508,6 +515,7 @@ export async function buildProductPatchSet({ existing, body, isAdmin, productId 
   await applyStockField(body, $set, existing, productId);
 
   const auctionState = applyAuctionField(body, $set, existing);
+  applyQaField(body, $set);
   applyWholesaleFields(body, $set, existing);
 
   if (Object.keys($set).length === 0 && Object.keys($unset).length === 0) {

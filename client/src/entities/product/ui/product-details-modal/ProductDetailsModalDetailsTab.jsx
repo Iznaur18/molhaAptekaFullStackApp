@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 
 import { PRODUCT_DETAILS_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
 import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
@@ -12,9 +13,11 @@ import { ProductMediaGalleryReadonly } from "../ProductMediaGalleryReadonly.jsx"
 import { ProductPriceDisplay } from "../ProductPriceDisplay.jsx";
 import { ProductAffiliateShareButton } from "./ProductAffiliateShareButton.jsx";
 import { ProductDetailsAuctionTeaser } from "./ProductDetailsAuctionTeaser.jsx";
+import { ProductDetailsCompareTeaser } from "./ProductDetailsCompareTeaser.jsx";
 import { ProductDetailsContentSwitcher } from "./ProductDetailsContentSwitcher.jsx";
 import { ProductDetailsInstallmentTeaser } from "./ProductDetailsInstallmentTeaser.jsx";
 import { ProductDetailsModalPurchaseActions } from "./ProductDetailsModalPurchaseActions.jsx";
+import { ProductDetailsQaTeaser } from "./ProductDetailsQaTeaser.jsx";
 import { ProductDetailsRaffleTeaser } from "./ProductDetailsRaffleTeaser.jsx";
 import { ProductDetailsSaleTeaser } from "./ProductDetailsSaleTeaser.jsx";
 import { ProductDetailsSellerProductsCarousel } from "./ProductDetailsSellerProductsCarousel.jsx";
@@ -37,6 +40,9 @@ import { renderProductDetailsFieldRows } from "./renderProductDetailsFieldRows.j
  *   productTitleId?: string;
  *   embedMediaGallery?: boolean;
  *   showInlinePurchaseActions?: boolean;
+ *   fullWidthCommerceFold?: boolean;
+ *   splitRestHost?: HTMLElement | null;
+ *   showSplitRest?: boolean;
  *   ctrl: ReturnType<import('./useProductDetailsModalController.js').useProductDetailsModalController>;
  * }} props
  */
@@ -52,6 +58,9 @@ export function ProductDetailsModalDetailsTab({
   productTitleId,
   embedMediaGallery = true,
   showInlinePurchaseActions = false,
+  fullWidthCommerceFold = false,
+  splitRestHost = null,
+  showSplitRest = true,
   ctrl,
 }) {
   const {
@@ -69,7 +78,11 @@ export function ProductDetailsModalDetailsTab({
     purchaseLimit,
     handleAuctionShortcutClick,
     handleInstallmentShortcutClick,
+    handleQaShortcutClick,
+    handleCompareShortcutClick,
     isOwnProduct,
+    showQaTab,
+    showCompareTab,
   } = ctrl;
 
   /** @type {[null | { title: string; badgeKey: import("@izibuy/shared-lib").ProductBadgeExplainKey | null; fallbackKey: string }, Function]} */
@@ -90,27 +103,8 @@ export function ProductDetailsModalDetailsTab({
   const productId = String(product._id);
   const installmentEnabled = product.productInstallmentEnabled === true;
 
-  const priceBlock = showPriceBlock ? (
-    <div className="product-details-modal__price-block product-details-modal__price-block--inline-actions">
-      <ProductPriceDisplay
-        product={product}
-        showLabel={false}
-        className="product-details-modal__price-display"
-        showDiscountBadge
-        showLoyaltyBadge
-        isAuthorized={isAuthorized}
-        onDiscountBadgePress={openBadgeExplain}
-        onLoyaltyBadgePress={openBadgeExplain}
-      />
-      <ProductDetailsWholesaleOffer
-        product={product}
-        isAuthorized={isAuthorized}
-        onRequestLogin={onRequestLogin}
-        canShowAddToCart={canShowAddToCart}
-      />
-      <h3 id={productTitleId} className="product-details-modal__product-name">
-        {product.productName?.trim() || "Товар"}
-      </h3>
+  const commerceBody = showPriceBlock ? (
+    <>
       <ProductDetailsBadgeStack product={product} onBadgePress={openBadgeExplain} />
       <div className="product-details-modal__seller-extras">
         {sellerId ? (
@@ -120,6 +114,15 @@ export function ProductDetailsModalDetailsTab({
           />
         ) : null}
         <div className="product-details-modal__feature-cards">
+          <ProductDetailsQaTeaser
+            visible={showQaTab && !isOwnProduct}
+            onPress={handleQaShortcutClick}
+          />
+          <ProductDetailsCompareTeaser
+            productId={productId}
+            enabled={showCompareTab}
+            onPress={handleCompareShortcutClick}
+          />
           <ProductDetailsRaffleTeaser product={product} />
           <ProductAffiliateShareButton
             product={product}
@@ -148,6 +151,21 @@ export function ProductDetailsModalDetailsTab({
           ) : null}
         </div>
       </div>
+    </>
+  ) : null;
+
+  const priceBlock = showPriceBlock ? (
+    <div className="product-details-modal__price-block product-details-modal__price-block--inline-actions">
+      <ProductPriceDisplay
+        product={product}
+        showLabel={false}
+        className="product-details-modal__price-display"
+        showDiscountBadge
+        showLoyaltyBadge
+        isAuthorized={isAuthorized}
+        onDiscountBadgePress={openBadgeExplain}
+        onLoyaltyBadgePress={openBadgeExplain}
+      />
       {showInlinePurchaseActions ? (
         <ProductDetailsModalPurchaseActions
           productId={productId}
@@ -157,8 +175,23 @@ export function ProductDetailsModalDetailsTab({
           canShowAddToCart={canShowAddToCart}
         />
       ) : null}
+      <ProductDetailsWholesaleOffer
+        product={product}
+        isAuthorized={isAuthorized}
+        onRequestLogin={onRequestLogin}
+        canShowAddToCart={canShowAddToCart}
+      />
+      <h3 id={productTitleId} className="product-details-modal__product-name">
+        {product.productName?.trim() || "Товар"}
+      </h3>
+      {!fullWidthCommerceFold ? commerceBody : null}
     </div>
   ) : null;
+
+  const commerceFold =
+    showPriceBlock && fullWidthCommerceFold ? (
+      <div className="product-details-modal__commerce-fold">{commerceBody}</div>
+    ) : null;
 
   const mediaGallery = (
     <ProductMediaGalleryReadonly
@@ -193,7 +226,7 @@ export function ProductDetailsModalDetailsTab({
   );
 
   const detailsBelow = (
-    <>
+    <div className="product-details-modal__below-fold">
       {hasDetailsSection ? (
         <section
           className="product-details-modal__details"
@@ -233,14 +266,29 @@ export function ProductDetailsModalDetailsTab({
           {renderProductDetailsFieldRows(product, bottomMetaFieldKeys, fieldHandlers)}
         </dl>
       ) : null}
-    </>
+    </div>
   );
 
   if (!embedMediaGallery) {
+    const splitRest = (
+      <>
+        {commerceFold}
+        {detailsBelow}
+      </>
+    );
+    const portaledRest =
+      fullWidthCommerceFold && showSplitRest && splitRestHost
+        ? createPortal(splitRest, splitRestHost)
+        : null;
+    const inlineRest = fullWidthCommerceFold
+      ? null
+      : splitRest;
+
     return (
       <>
         <div className="product-details-modal__spec">{priceBlock}</div>
-        {detailsBelow}
+        {portaledRest}
+        {inlineRest}
         <ProductBadgeExplainSheet
           isOpen={badgeExplain != null}
           title={badgeExplain?.title ?? ""}

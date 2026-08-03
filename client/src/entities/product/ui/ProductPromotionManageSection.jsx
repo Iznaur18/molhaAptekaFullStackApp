@@ -9,8 +9,10 @@ import "./ProductPromotionManageSection.css";
  * @property {import("../model/types.js").ProductFromApi} product
  * @property {(productId: string, productIsAvailable: boolean) => void | Promise<void>} [onSetAvailability]
  * @property {(productId: string, productAuctionEnabled: boolean) => void | Promise<void>} [onSetAuction]
+ * @property {(productId: string, productQaEnabled: boolean) => void | Promise<void>} [onSetQa]
  * @property {boolean} [isAvailabilityTogglePending]
  * @property {boolean} [isAuctionTogglePending]
+ * @property {boolean} [isQaTogglePending]
  * @property {string} [errorMessage]
  * @property {boolean} [canEdit]
  * @property {boolean} [canToggleVisibility]
@@ -32,12 +34,14 @@ export function ProductPromotionManageSection({
   product,
   onSetAvailability,
   onSetAuction,
+  onSetQa,
   onSetWholesale,
   onSetAffiliate,
   onSetInstallment,
   onDelete,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
+  isQaTogglePending = false,
   isWholesaleTogglePending = false,
   isAffiliateTogglePending = false,
   isInstallmentTogglePending = false,
@@ -81,12 +85,14 @@ export function ProductPromotionManageSection({
         product={product}
         onSetAvailability={onSetAvailability}
         onSetAuction={onSetAuction}
+        onSetQa={onSetQa}
         onSetWholesale={onSetWholesale}
         onSetAffiliate={onSetAffiliate}
         onSetInstallment={onSetInstallment}
         onDelete={onDelete}
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
+        isQaTogglePending={isQaTogglePending}
         isWholesaleTogglePending={isWholesaleTogglePending}
         isAffiliateTogglePending={isAffiliateTogglePending}
         isInstallmentTogglePending={isInstallmentTogglePending}

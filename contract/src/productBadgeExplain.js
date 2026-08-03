@@ -15,6 +15,10 @@ export const PRODUCT_BADGE_EXPLAIN_KEY_VALUES = [
   "price_market_below",
   "discount",
   "loyalty",
+  "auction",
+  "installment",
+  "wholesale",
+  "near_distance",
 ];
 
 export const PRODUCT_BADGE_EXPLAIN_DESCRIPTION_MAX_LENGTH = 2000;

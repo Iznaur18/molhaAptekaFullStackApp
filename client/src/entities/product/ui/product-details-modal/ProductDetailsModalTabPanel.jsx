@@ -2,6 +2,7 @@ import { ProductDetailsModalAuctionTab } from "./ProductDetailsModalAuctionTab.j
 import { ProductDetailsModalCompareTab } from "./ProductDetailsModalCompareTab.jsx";
 import { ProductDetailsModalDetailsTab } from "./ProductDetailsModalDetailsTab.jsx";
 import { ProductDetailsModalInstallmentTab } from "./ProductDetailsModalInstallmentTab.jsx";
+import { ProductDetailsModalQaTab } from "./ProductDetailsModalQaTab.jsx";
 import { ProductDetailsModalReviewsTab } from "./ProductDetailsModalReviewsTab.jsx";
 import { ProductDetailsModalSimilarTab } from "./ProductDetailsModalSimilarTab.jsx";
 
@@ -21,6 +22,9 @@ import { ProductDetailsModalSimilarTab } from "./ProductDetailsModalSimilarTab.j
  *   productTitleId?: string;
  *   embedMediaGallery?: boolean;
  *   showInlinePurchaseActions?: boolean;
+ *   fullWidthCommerceFold?: boolean;
+ *   splitRestHost?: HTMLElement | null;
+ *   omitDetailsTab?: boolean;
  *   dockSubmit?: boolean;
  *   ctrl: ReturnType<import('./useProductDetailsModalController.js').useProductDetailsModalController>;
  * }} props
@@ -37,6 +41,9 @@ export function ProductDetailsModalTabPanel({
   productTitleId,
   embedMediaGallery = true,
   showInlinePurchaseActions = false,
+  fullWidthCommerceFold = false,
+  splitRestHost = null,
+  omitDetailsTab = false,
   dockSubmit = false,
   ctrl,
 }) {
@@ -52,6 +59,7 @@ export function ProductDetailsModalTabPanel({
     isInstallmentProgramLoading,
     topOffers,
     showReviewsTab,
+    showQaTab,
     showSimilarTab,
     showCompareTab,
     showAuctionTab,
@@ -82,6 +90,17 @@ export function ProductDetailsModalTabPanel({
         isOwnProduct={isOwnProduct}
         onRequestLogin={onRequestLogin}
         onStatsChange={handleReviewStatsChange}
+      />
+    );
+  }
+
+  if (detailsTab === "qa" && showQaTab) {
+    return (
+      <ProductDetailsModalQaTab
+        productId={productId}
+        isAuthorized={isAuthorized}
+        isOwnProduct={isOwnProduct}
+        onRequestLogin={onRequestLogin}
       />
     );
   }
@@ -149,20 +168,24 @@ export function ProductDetailsModalTabPanel({
 
   return (
     <>
-      <ProductDetailsModalDetailsTab
-        product={product}
-        isOpen={isOpen}
-        isAuthorized={isAuthorized}
-        isPremiumUser={isPremiumUser}
-        onRequestLogin={onRequestLogin}
-        onProductStatsUpdate={onProductStatsUpdate}
-        currentUserId={currentUserId}
-        mobileReportOverlay={embedMediaGallery ? mobileReportOverlay : null}
-        productTitleId={productTitleId}
-        embedMediaGallery={embedMediaGallery}
-        showInlinePurchaseActions={showInlinePurchaseActions}
-        ctrl={ctrl}
-      />
+      {omitDetailsTab ? null : (
+        <ProductDetailsModalDetailsTab
+          product={product}
+          isOpen={isOpen}
+          isAuthorized={isAuthorized}
+          isPremiumUser={isPremiumUser}
+          onRequestLogin={onRequestLogin}
+          onProductStatsUpdate={onProductStatsUpdate}
+          currentUserId={currentUserId}
+          mobileReportOverlay={embedMediaGallery ? mobileReportOverlay : null}
+          productTitleId={productTitleId}
+          embedMediaGallery={embedMediaGallery}
+          showInlinePurchaseActions={showInlinePurchaseActions}
+          fullWidthCommerceFold={fullWidthCommerceFold}
+          splitRestHost={splitRestHost}
+          ctrl={ctrl}
+        />
+      )}
       {isSellerView && auctionUi.showSellerArchive ? (
         <ProductDetailsModalAuctionTab
           productId={productId}

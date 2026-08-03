@@ -34,6 +34,38 @@ const softBadgeText = {
   fontWeight: "800" as const,
 };
 
+const renderSoftTextBadge = ({
+  item,
+  tone,
+  interactive,
+  onBadgePress,
+}: {
+  item: ProductDetailsBadgeItem;
+  tone: { backgroundColor: string; color: string };
+  interactive: boolean;
+  onBadgePress?: (item: ProductDetailsBadgeItem) => void;
+}) => {
+  const Wrapper = interactive ? Pressable : View;
+  const wrapperProps = interactive
+    ? {
+        accessibilityRole: "button" as const,
+        onPress: () => onBadgePress?.(item),
+      }
+    : {};
+
+  return (
+    <Wrapper
+      key={item.key}
+      style={[softBadgeChrome, { backgroundColor: tone.backgroundColor }]}
+      accessibilityRole={interactive ? "button" : "text"}
+      accessibilityLabel={item.label}
+      {...wrapperProps}
+    >
+      <AppText style={[softBadgeText, { color: tone.color }]}>{item.label}</AppText>
+    </Wrapper>
+  );
+};
+
 const renderBadge = ({
   item,
   styles,
@@ -79,33 +111,57 @@ const renderBadge = ({
   }
 
   if (item.kind === "raffle") {
-    const tone = PRODUCT_DETAILS_BADGE_SOFT_COLORS.raffle;
-    return (
-      <Wrapper
-        key={item.key}
-        style={[softBadgeChrome, { backgroundColor: tone.backgroundColor }]}
-        accessibilityRole={interactive ? "button" : "text"}
-        accessibilityLabel={item.label}
-        {...wrapperProps}
-      >
-        <AppText style={[softBadgeText, { color: tone.color }]}>{item.label}</AppText>
-      </Wrapper>
-    );
+    return renderSoftTextBadge({
+      item,
+      tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.raffle,
+      interactive,
+      onBadgePress,
+    });
   }
 
   if (item.kind === "affiliate") {
-    const tone = PRODUCT_DETAILS_BADGE_SOFT_COLORS.affiliate;
-    return (
-      <Wrapper
-        key={item.key}
-        style={[softBadgeChrome, { backgroundColor: tone.backgroundColor }]}
-        accessibilityRole={interactive ? "button" : "text"}
-        accessibilityLabel={item.label}
-        {...wrapperProps}
-      >
-        <AppText style={[softBadgeText, { color: tone.color }]}>{item.label}</AppText>
-      </Wrapper>
-    );
+    return renderSoftTextBadge({
+      item,
+      tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.affiliate,
+      interactive,
+      onBadgePress,
+    });
+  }
+
+  if (item.kind === "auction") {
+    return renderSoftTextBadge({
+      item,
+      tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.auction,
+      interactive,
+      onBadgePress,
+    });
+  }
+
+  if (item.kind === "installment") {
+    return renderSoftTextBadge({
+      item,
+      tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.installment,
+      interactive,
+      onBadgePress,
+    });
+  }
+
+  if (item.kind === "wholesale") {
+    return renderSoftTextBadge({
+      item,
+      tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.wholesale,
+      interactive,
+      onBadgePress,
+    });
+  }
+
+  if (item.kind === "nearDistance") {
+    return renderSoftTextBadge({
+      item,
+      tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.nearDistance,
+      interactive,
+      onBadgePress,
+    });
   }
 
   if (item.kind === "listingOrigin") {

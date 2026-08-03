@@ -15,7 +15,7 @@ import { filterProductDetailsVisibleFieldKeys } from "../../lib/isProductDetails
 import { resolveProductDetailsContentPanels } from "../../lib/resolveProductDetailsContentPanels.js";
 import { useAuthSession } from "../../../user/model/useAuthSession.js";
 import { getProductPurchaseLimit } from "../../lib/getProductPurchaseLimit.js";
-import { PRODUCT_REVIEW_UI } from "../../../../shared/config/appUiCopy.js";
+import { PRODUCT_QA_UI, PRODUCT_REVIEW_UI } from "../../../../shared/config/appUiCopy.js";
 import { useProductDetailsModalQueries } from "./useProductDetailsModalQueries.js";
 import { useProductDetailsModalTabs } from "./useProductDetailsModalTabs.js";
 
@@ -151,6 +151,8 @@ export function useProductDetailsModalController({
       ? PRODUCT_REVIEW_UI.TAB_REVIEWS_WITH_COUNT(reviewCount)
       : PRODUCT_REVIEW_UI.TAB_REVIEWS;
 
+  const qaTabLabel = PRODUCT_QA_UI.TAB;
+
   const showPriceBlock = topRowFieldKeys.includes("productPrice");
 
   return {
@@ -171,6 +173,7 @@ export function useProductDetailsModalController({
     canShowAddToCart,
     purchaseLimit,
     reviewsTabLabel,
+    qaTabLabel,
     onProfileActionBadgesChanged,
     ...queries,
     ...tabs,

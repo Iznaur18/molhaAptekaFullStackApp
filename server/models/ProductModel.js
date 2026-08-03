@@ -184,6 +184,17 @@ const ProductSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    /** Тумблер «Вопросы и ответы» на карточке товара. */
+    productQaEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    /** Кол-во активных (pending+answered) вопросов; страж лимита на товар. */
+    productQuestionCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
     productCategory: {
       type: String,
       required: true,

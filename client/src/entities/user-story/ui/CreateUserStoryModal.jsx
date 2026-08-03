@@ -11,7 +11,6 @@ import {
 import { validateUploadImageFile } from "../../../shared/lib/validateUploadImageFile.js";
 import { useUserStoryMutations } from "../model/useUserStoryMutations.js";
 import { useCreateUserStoryModalAnimation } from "../model/useCreateUserStoryModalAnimation.js";
-import { CREATE_USER_STORY_MODAL_ANIMATION } from "../model/createUserStoryModalAnimation.js";
 import { validateStoryVideoFile } from "../lib/validateStoryVideoFile.js";
 import {
   USER_STORY_CAPTION_MAX_CHARS,
@@ -35,7 +34,6 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
   const { uploadImageMutation, uploadVideoMutation } = useUploadAssetMutations();
   const previewUrlRef = useRef("");
   const dismissGuardUntilRef = useRef(0);
-  const sheetRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const [captionText, setCaptionText] = useState("");
   const [previewUrl, setPreviewUrl] = useState("");
   const [mediaType, setMediaType] = useState(
@@ -55,24 +53,6 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
   useEffect(() => {
     previewUrlRef.current = previewUrl;
   }, [previewUrl]);
-
-  useEffect(() => {
-    const sheet = sheetRef.current;
-    if (!sheet) {
-      return undefined;
-    }
-
-    if (!isVisible) {
-      sheet.classList.remove("create-user-story-modal--settled");
-      return undefined;
-    }
-
-    const timerId = window.setTimeout(() => {
-      sheet.classList.add("create-user-story-modal--settled");
-    }, CREATE_USER_STORY_MODAL_ANIMATION.enterMs);
-
-    return () => window.clearTimeout(timerId);
-  }, [isVisible]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -234,7 +214,6 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
       />
       <div className="create-user-story-modal__keyboard-bleed" aria-hidden="true" />
       <div
-        ref={sheetRef}
         className="create-user-story-modal"
         role="dialog"
         aria-modal="true"

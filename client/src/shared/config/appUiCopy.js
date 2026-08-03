@@ -160,6 +160,12 @@ export const API_CLIENT_UI = {
   SUBMIT_PRODUCT_REVIEW_FALLBACK: "Не удалось опубликовать отзыв",
   PATCH_PRODUCT_REVIEW_FALLBACK: "Не удалось обновить отзыв",
   DELETE_PRODUCT_REVIEW_FALLBACK: "Не удалось удалить отзыв",
+  FETCH_PRODUCT_QUESTIONS_FALLBACK: "Не удалось загрузить вопросы",
+  FETCH_PRODUCT_QUESTION_SUMMARY_FALLBACK: "Не удалось загрузить вопросы",
+  ASK_PRODUCT_QUESTION_FALLBACK: "Не удалось отправить вопрос",
+  ANSWER_PRODUCT_QUESTION_FALLBACK: "Не удалось отправить ответ",
+  DELETE_PRODUCT_QUESTION_FALLBACK: "Не удалось удалить вопрос",
+  HIDE_PRODUCT_QUESTION_FALLBACK: "Не удалось скрыть вопрос",
   FETCH_PRODUCT_PROMOTION_TARIFFS_FALLBACK: "Не удалось загрузить пакеты продвижения",
   REQUEST_PRODUCT_PROMOTION_FALLBACK: "Не удалось отправить заявку на продвижение",
   FETCH_MY_PRODUCT_PROMOTIONS_FALLBACK: "Не удалось загрузить продвижения",
@@ -223,6 +229,42 @@ export const PRODUCT_REVIEW_UI = {
   DELETE_CONFIRM: "Удалить отзыв?",
 };
 
+/** Вопросы и ответы к товару */
+export const PRODUCT_QA_UI = {
+  TAB: "Вопросы и ответы",
+  /** @param {number} count */
+  TAB_WITH_COUNT: (count) => `Вопросы и ответы (${count})`,
+  SECTION_TITLE: "Вопросы и ответы",
+  ASK_TITLE: "Задать вопрос продавцу",
+  ASK_PLACEHOLDER: "Ваш вопрос о товаре",
+  ASK_SUBMIT: "Отправить вопрос",
+  ANSWER_PLACEHOLDER: "Ваш ответ покупателю",
+  ANSWER_SUBMIT: "Ответить",
+  ANSWER_EDIT: "Изменить ответ",
+  ANSWER_SAVE: "Сохранить ответ",
+  ANSWER_CANCEL: "Отмена",
+  SELLER_ANSWER_LABEL: "Ответ продавца",
+  PENDING_BADGE: "Ждёт ответа",
+  PENDING_HINT: "Вопрос виден только вам и продавцу, пока продавец не ответит",
+  ANSWER_ACTION: "Ответить",
+  HIDE_ACTION: "Скрыть",
+  DELETE_ACTION: "Удалить",
+  DELETE_CONFIRM: "Удалить вопрос?",
+  EMPTY_STATE: "Вопросов пока нет. Будьте первым!",
+  EMPTY_STATE_SELLER: "Вопросов по товару пока нет",
+  LIMIT_REACHED: "Достигнут лимит вопросов по этому товару",
+  LOGIN_TO_ASK: "Войдите, чтобы задать вопрос",
+  LOADING: "Загрузка…",
+  LOAD_MORE: "Показать ещё",
+  /** @param {number} used @param {number} max */
+  SLOTS_LEFT: (used, max) => `${used} / ${max}`,
+  /** @param {number} current @param {number} max */
+  TEXT_CHARS_USED: (current, max) => `${current} / ${max}`,
+  DETAILS_TEASER_TITLE: "Написать продавцу",
+  DETAILS_TEASER_SUBTITLE: "Спросить о товаре",
+  DETAILS_TEASER_ARIA: "Открыть вкладку вопросов и ответов",
+};
+
 /** Предложения цены (аукцион) */
 export const PRODUCT_PRICE_OFFER_UI = {
   SECTION_TOP_TITLE: "Топ ставок",
@@ -279,6 +321,9 @@ export const PRODUCT_COMPARE_UI = {
   EMPTY: "Нет данных для сравнения",
   FETCH_FALLBACK: "Не удалось загрузить сравнение",
   RETRY: "Повторить",
+  DETAILS_TEASER_TITLE: "Сравнить товар",
+  DETAILS_TEASER_SUBTITLE: "С похожими предложениями",
+  DETAILS_TEASER_ARIA: "Открыть вкладку сравнения",
 };
 
 export const PRODUCT_SALE_UI = {
@@ -1584,6 +1629,8 @@ export const CREATE_PRODUCT_MODAL_UI = {
   MANAGE_SECTION_ARIA: "Дополнительные действия с товаром",
   MANAGE_AUCTION_TITLE: "Аукцион",
   MANAGE_AUCTION_HINT: "Покупатели смогут предлагать свою цену",
+  MANAGE_QA_TITLE: "Вопросы и ответы",
+  MANAGE_QA_HINT: "Покупатели смогут задавать вопросы о товаре",
   MANAGE_AUCTION_STATUS_ACTIVE: "(активен)",
   MANAGE_AUCTION_STATUS_INACTIVE: "(неактивен)",
   MANAGE_INSTALLMENT_TITLE: "Рассрочка",
@@ -1928,6 +1975,7 @@ export const PRODUCT_CARD_UI = {
   AUCTION_TOGGLE_ON: "Проводить аукцион (предложения цены)",
   AUCTION_TOGGLE_OFF: "Выключить аукцион",
   AUCTION_TOGGLE_PENDING: "Обновление…",
+  QA_TOGGLE_PENDING: "Обновление…",
   INSTALLMENT_BADGE: "Рассрочка",
   WHOLESALE_BADGE: "Опт",
   INSTALLMENT_SELL_BUTTON: "Продать в рассрочку",
@@ -3105,6 +3153,14 @@ export const PRODUCT_BADGE_EXPLAIN_UI = {
     discount: "На товар действует скидка относительно старой цены.",
     loyalty:
       "За покупку можно получить баллы лояльности. Баллы даёт продавец; получает подтверждённый покупатель.",
+    auction:
+      "Продавец принимает предложения цены по этому товару. Условия и ставки — во вкладке «Аукцион».",
+    installment:
+      "Товар можно купить в рассрочку у продавца. Условия и оформление — во вкладке «Рассрочка».",
+    wholesale:
+      "При покупке от указанного количества действует оптовая цена за единицу. Подробности — в блоке оптовой цены на этой странице.",
+    near_distance:
+      "Примерное расстояние до пункта самовывоза продавца относительно вашего местоположения. Точность зависит от геолокации.",
   },
 };
 
@@ -3135,6 +3191,14 @@ export const PRODUCT_BADGE_EXPLAIN_ADMIN_UI = {
   HINT_PRICE_MARKET: "Оценка цены относительно рынка.",
   HINT_DISCOUNT: "Бейдж скидки у цены.",
   HINT_LOYALTY: "Бейдж баллов у цены.",
+  HINT_AUCTION: "Бейдж «Аукцион» в деталях товара.",
+  HINT_INSTALLMENT: "Бейдж «Рассрочка» в деталях товара.",
+  HINT_WHOLESALE: "Бейдж «Оптовая цена» в деталях товара.",
+  HINT_NEAR_DISTANCE: "Бейдж расстояния «~км» в деталях товара.",
+  TITLE_AUCTION: "Аукцион",
+  TITLE_INSTALLMENT: "Рассрочка",
+  TITLE_WHOLESALE: "Оптовая цена",
+  TITLE_NEAR_DISTANCE: "Расстояние",
 };
 
 /**

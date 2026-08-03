@@ -1,4 +1,4 @@
-import { ProductModel } from "../../models/index.js";
+import { ProductModel, ProductQuestionModel } from "../../models/index.js";
 import { isUserAdmin } from "../../services/access/adminUserGuard.js";
 import {
   hasProductOpenSales,
@@ -49,6 +49,7 @@ export const deleteMyProductController = async (req, res) => {
       await deleteUploadFileByUrl(previewVideoUrl);
     }
     await dismissPendingReportsForProduct(productId);
+    await ProductQuestionModel.deleteMany({ productId });
     await rejectAllPendingOffersForProduct(productId);
     await cancelProductPromotionsForProduct({
       productId,

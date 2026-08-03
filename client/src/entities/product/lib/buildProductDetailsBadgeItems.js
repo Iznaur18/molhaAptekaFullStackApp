@@ -1,6 +1,14 @@
-import { PRODUCT_PRICE_MARKET_STATUS_UNKNOWN } from "@molha/api-contract";
+import {
+  formatCatalogNearDistanceLabel,
+  PRODUCT_PRICE_MARKET_STATUS_UNKNOWN,
+} from "@molha/api-contract";
+import { isProductWholesaleConfigured } from "@izibuy/shared-lib";
 
-import { PRODUCT_CARD_UI, PRODUCT_DETAILS_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  PRODUCT_CARD_UI,
+  PRODUCT_DETAILS_MODAL_UI,
+  PRODUCT_WHOLESALE_UI,
+} from "../../../shared/config/appUiCopy.js";
 import { isProductRaffleParticipant } from "../../raffle/lib/isProductRaffleParticipant.js";
 import { isProductOriginalBadgeVisible } from "./productIsOriginal.js";
 import { resolveProductListingOriginPresentation } from "./productListingOrigin.js";
@@ -15,6 +23,10 @@ import { resolveProductAffiliateOffer } from "./resolveProductAffiliateOffer.js"
  *   | { kind: "original" }
  *   | { kind: "raffle" }
  *   | { kind: "affiliate" }
+ *   | { kind: "auction" }
+ *   | { kind: "installment" }
+ *   | { kind: "wholesale" }
+ *   | { kind: "nearDistance" }
  *   | { kind: "listingOrigin"; origin: string | null; Icon: import("react").ComponentType<{ className?: string; size?: number; "aria-hidden"?: boolean }> }
  *   | { kind: "priceMarket"; priceMarketStatus: string; backgroundColor: string; color: string }
  * )} ProductDetailsBadgeItem
@@ -67,6 +79,42 @@ export function buildProductDetailsBadgeItems({ product }) {
       key: "affiliate",
       kind: "affiliate",
       label: PRODUCT_DETAILS_MODAL_UI.AFFILIATE_BADGE(affiliate.percent),
+    });
+  }
+
+  if (product.productAuctionEnabled === true) {
+    items.push({
+      key: "auction",
+      kind: "auction",
+      label: PRODUCT_CARD_UI.AUCTION_BADGE,
+    });
+  }
+
+  if (product.productInstallmentEnabled === true) {
+    items.push({
+      key: "installment",
+      kind: "installment",
+      label: PRODUCT_CARD_UI.INSTALLMENT_BADGE,
+    });
+  }
+
+  if (
+    product.productWholesaleEnabled === true &&
+    isProductWholesaleConfigured(product)
+  ) {
+    items.push({
+      key: "wholesale",
+      kind: "wholesale",
+      label: PRODUCT_WHOLESALE_UI.DETAILS_OFFER_KICKER,
+    });
+  }
+
+  const nearDistanceLabel = formatCatalogNearDistanceLabel(product.distanceMeters);
+  if (nearDistanceLabel) {
+    items.push({
+      key: "near-distance",
+      kind: "nearDistance",
+      label: nearDistanceLabel,
     });
   }
 

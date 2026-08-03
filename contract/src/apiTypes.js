@@ -27,6 +27,9 @@
  * @typedef {import('zod').infer<typeof import('./introAd.js').submitIntroAdCampaignDataSchema>} SubmitIntroAdCampaignDataContract
  * @typedef {import('zod').infer<typeof import('./appIntro.js').introAdPaidIntroSchema>} IntroAdPaidIntroContract
  * @typedef {import('zod').infer<typeof import('./appIntro.js').appIntroSettingsSchema>} AppIntroSettingsContract
+ * @typedef {import('zod').infer<typeof import('./productQuestion.js').askProductQuestionBodySchema>} AskProductQuestionBodyContract
+ * @typedef {import('zod').infer<typeof import('./productQuestion.js').answerProductQuestionBodySchema>} AnswerProductQuestionBodyContract
+ * @typedef {import('zod').infer<typeof import('./productQuestion.js').productQuestionsListQuerySchema>} ProductQuestionsListQueryContract
  */
 
 export {};

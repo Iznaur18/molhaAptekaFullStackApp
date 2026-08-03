@@ -37,6 +37,10 @@ const PRODUCT_PROMOTION_MODAL_TITLE_ID = "product-promotion-modal-title";
  *     productId: string,
  *     productAuctionEnabled: boolean,
  *   ) => void | Promise<void>;
+ *   onSetProductQa?: (
+ *     productId: string,
+ *     productQaEnabled: boolean,
+ *   ) => void | Promise<void>;
  *   onSetProductWholesale?: (
  *     productId: string,
  *     productWholesaleEnabled: boolean,
@@ -55,6 +59,7 @@ const PRODUCT_PROMOTION_MODAL_TITLE_ID = "product-promotion-modal-title";
  *   }) => void;
  *   isAvailabilityTogglePending?: boolean;
  *   isAuctionTogglePending?: boolean;
+ *   isQaTogglePending?: boolean;
  *   isWholesaleTogglePending?: boolean;
  *   isAffiliateTogglePending?: boolean;
  *   isInstallmentTogglePending?: boolean;
@@ -86,6 +91,7 @@ export function ProductPromotionModal({
   onSubmit,
   onSetProductAvailability,
   onSetProductAuction,
+  onSetProductQa,
   onSetProductWholesale,
   onSetProductAffiliate,
   onSetProductInstallment,
@@ -94,6 +100,7 @@ export function ProductPromotionModal({
   onDeleteProduct,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
+  isQaTogglePending = false,
   isWholesaleTogglePending = false,
   isAffiliateTogglePending = false,
   isInstallmentTogglePending = false,
@@ -257,12 +264,14 @@ export function ProductPromotionModal({
             product={product}
             onSetAvailability={onSetProductAvailability}
             onSetAuction={onSetProductAuction}
+            onSetQa={onSetProductQa}
             onSetWholesale={onSetProductWholesale}
             onSetAffiliate={onSetProductAffiliate}
             onSetInstallment={onSetProductInstallment}
             onDelete={onDeleteProduct}
             isAvailabilityTogglePending={isAvailabilityTogglePending}
             isAuctionTogglePending={isAuctionTogglePending}
+            isQaTogglePending={isQaTogglePending}
             isWholesaleTogglePending={isWholesaleTogglePending}
             isAffiliateTogglePending={isAffiliateTogglePending}
             isInstallmentTogglePending={isInstallmentTogglePending}

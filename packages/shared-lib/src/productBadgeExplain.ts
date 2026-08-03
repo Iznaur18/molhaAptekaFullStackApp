@@ -12,6 +12,10 @@ export const PRODUCT_BADGE_EXPLAIN_KEY_VALUES = [
   "price_market_below",
   "discount",
   "loyalty",
+  "auction",
+  "installment",
+  "wholesale",
+  "near_distance",
 ] as const;
 
 export type ProductBadgeExplainKey =

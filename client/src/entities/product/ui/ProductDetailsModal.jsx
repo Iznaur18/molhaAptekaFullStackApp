@@ -1,8 +1,11 @@
 import { useState } from "react";
 
+import { PRODUCT_DETAILS_PAGE_SPLIT_MIN_PX } from "../lib/productDetailsPageLayoutConstants.js";
 import { useAppShellCompactLayout } from "../../../shared/lib/useAppShellCompactLayout.js";
+import { useMaxWidthMediaQuery } from "../../../shared/lib/useMaxWidthMediaQuery.js";
 import { useSwipeRightToDismiss } from "../../../shared/lib/useSwipeRightToDismiss.js";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
+import { ProductDetailsModalDetailsTab } from "./product-details-modal/ProductDetailsModalDetailsTab.jsx";
 import { ProductDetailsModalPinnedGallery } from "./product-details-modal/ProductDetailsModalPinnedGallery.jsx";
 import { ProductDetailsModalPurchaseActions } from "./product-details-modal/ProductDetailsModalPurchaseActions.jsx";
 import { ProductDetailsModalTabPanel } from "./product-details-modal/ProductDetailsModalTabPanel.jsx";
@@ -75,11 +78,15 @@ export function ProductDetailsModal({
   });
 
   const isCompactLayout = useAppShellCompactLayout();
-  /** Page always uses app-like column + sticky dock (plan 1A). */
-  const isMobileNav = isPage || isCompactLayout;
+  /** Phone column; from 767px page uses gallery | info split. */
+  const isBelowPageSplit = useMaxWidthMediaQuery(PRODUCT_DETAILS_PAGE_SPLIT_MIN_PX - 1);
+  const isPageSplitLayout = isPage && !isBelowPageSplit;
+  const isMobileNav = isPage ? isBelowPageSplit : isCompactLayout;
   /** @type {[HTMLElement | null, import('react').Dispatch<import('react').SetStateAction<HTMLElement | null>>]} */
   const [pageDockHost, setPageDockHost] = useState(null);
-  /** Как в app: галерея сверху, табы под ней, контент ниже. */
+  /** @type {[HTMLElement | null, import('react').Dispatch<import('react').SetStateAction<HTMLElement | null>>]} */
+  const [pageSplitRestHost, setPageSplitRestHost] = useState(null);
+  /** Как в app: галерея сверху, табы под ней, контент ниже (только узкий page / compact modal). */
   const pinGalleryAboveTabs = isMobileNav;
 
   useSwipeRightToDismiss(isMobileNav ? ctrl.tabPanelRef : ctrl.modalBodyRef, {
@@ -131,22 +138,30 @@ export function ProductDetailsModal({
       {secondaryFooter}
     </div>
   ) : null;
-  const galleryReportOverlay = pinGalleryAboveTabs ? secondaryFooter : null;
+  const galleryReportOverlay =
+    pinGalleryAboveTabs || isPageSplitLayout ? secondaryFooter : null;
   const detailsReportOverlay =
-    !pinGalleryAboveTabs && isMobileNav && secondaryFooter && ctrl.detailsTab === "details"
+    !pinGalleryAboveTabs &&
+    !isPageSplitLayout &&
+    isMobileNav &&
+    secondaryFooter &&
+    ctrl.detailsTab === "details"
       ? secondaryFooter
       : null;
   const hasMobileInlineActions =
-    isMobileNav && adminFooter && ctrl.detailsTab === "details";
+    (isMobileNav || isPageSplitLayout) && adminFooter && ctrl.detailsTab === "details";
   const isAltDetailsTab =
     ctrl.detailsTab === "reviews" ||
+    ctrl.detailsTab === "qa" ||
     ctrl.detailsTab === "similar" ||
     ctrl.detailsTab === "compare" ||
     ctrl.detailsTab === "auction" ||
     ctrl.detailsTab === "installment";
   const tabPanelClassName = [
     "product-details-modal__tab-panel",
-    isMobileNav && isAltDetailsTab ? "product-details-modal__tab-panel--inset" : "",
+    (isMobileNav || isPageSplitLayout) && isAltDetailsTab
+      ? "product-details-modal__tab-panel--inset"
+      : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -159,9 +174,11 @@ export function ProductDetailsModal({
         showAuctionTab={ctrl.showAuctionTab}
         showInstallmentTab={ctrl.showInstallmentTab}
         showReviewsTab={ctrl.showReviewsTab}
+        showQaTab={ctrl.showQaTab}
         showSimilarTab={ctrl.showSimilarTab}
         showCompareTab={ctrl.showCompareTab}
         reviewsTabLabel={ctrl.reviewsTabLabel}
+        qaTabLabel={ctrl.qaTabLabel}
       />
     ) : null;
 
@@ -170,7 +187,10 @@ export function ProductDetailsModal({
       ref={ctrl.tabPanelRef}
       className={tabPanelClassName}
       style={
-        ctrl.showProductDetailsTabs && ctrl.tabPanelMinHeight > 0 && !isMobileNav
+        ctrl.showProductDetailsTabs &&
+        ctrl.tabPanelMinHeight > 0 &&
+        !isMobileNav &&
+        !isPageSplitLayout
           ? { minHeight: `${ctrl.tabPanelMinHeight}px` }
           : undefined
       }
@@ -185,39 +205,89 @@ export function ProductDetailsModal({
         currentUserId={currentUserId}
         mobileReportOverlay={detailsReportOverlay}
         productTitleId={isMobileNav ? undefined : "product-details-modal-title"}
-        embedMediaGallery={!pinGalleryAboveTabs}
+        embedMediaGallery={!pinGalleryAboveTabs && !isPageSplitLayout}
         showInlinePurchaseActions={!isMobileNav}
+        fullWidthCommerceFold={false}
+        splitRestHost={null}
+        omitDetailsTab={isPageSplitLayout}
         dockSubmit={isMobileNav}
         ctrl={ctrl}
       />
     </div>
   );
 
-  const body = pinGalleryAboveTabs ? (
-    <>
-      <ProductDetailsModalPinnedGallery
+  const pinnedGallery = (
+    <ProductDetailsModalPinnedGallery
+      product={product}
+      isOpen={isPage || isOpen}
+      isAuthorized={isAuthorized}
+      onRequestLogin={onRequestLogin}
+      onProductStatsUpdate={onProductStatsUpdate}
+      currentUserId={currentUserId}
+      reportOverlay={galleryReportOverlay}
+      ctrl={ctrl}
+    />
+  );
+
+  const adminInlineActions = hasMobileInlineActions ? (
+    <div className="product-details-modal__mobile-inline-actions">{adminFooter}</div>
+  ) : null;
+
+  const splitDetailsLead =
+    isPageSplitLayout && product ? (
+      <ProductDetailsModalDetailsTab
         product={product}
         isOpen={isPage || isOpen}
         isAuthorized={isAuthorized}
+        isPremiumUser={isPremiumUser}
         onRequestLogin={onRequestLogin}
         onProductStatsUpdate={onProductStatsUpdate}
         currentUserId={currentUserId}
-        reportOverlay={galleryReportOverlay}
+        productTitleId="product-details-modal-title"
+        embedMediaGallery={false}
+        showInlinePurchaseActions={!isMobileNav}
+        fullWidthCommerceFold
+        splitRestHost={pageSplitRestHost}
+        showSplitRest
         ctrl={ctrl}
       />
+    ) : null;
+
+  const body = isPageSplitLayout ? (
+    <>
+      <div className="product-details-page__wide-layout product-details-page__wide-layout--details">
+        <div className="product-details-page__wide-top">
+          <div className="product-details-page__wide-gallery">{pinnedGallery}</div>
+          <div className="product-details-page__wide-rail">{splitDetailsLead}</div>
+        </div>
+        {tabs ? (
+          <div className="product-details-page__wide-tabs">{tabs}</div>
+        ) : null}
+        <div
+          className="product-details-page__wide-rest"
+          ref={setPageSplitRestHost}
+          hidden={isAltDetailsTab}
+        />
+        {isAltDetailsTab ? (
+          <div className="product-details-page__wide-alt-panel">{tabPanel}</div>
+        ) : (
+          tabPanel
+        )}
+      </div>
+      {adminInlineActions}
+    </>
+  ) : pinGalleryAboveTabs ? (
+    <>
+      {pinnedGallery}
       {tabs}
       {tabPanel}
-      {hasMobileInlineActions ? (
-        <div className="product-details-modal__mobile-inline-actions">{adminFooter}</div>
-      ) : null}
+      {adminInlineActions}
     </>
   ) : (
     <>
       {tabs}
       {tabPanel}
-      {hasMobileInlineActions ? (
-        <div className="product-details-modal__mobile-inline-actions">{adminFooter}</div>
-      ) : null}
+      {adminInlineActions}
     </>
   );
 
@@ -229,6 +299,7 @@ export function ProductDetailsModal({
             "product-details-page",
             "product-details-modal",
             "product-details-modal--page",
+            isPageSplitLayout ? "product-details-modal--page-split" : "",
             showMobileDock ? "product-details-modal--mobile-dock-active" : "",
           ]
             .filter(Boolean)

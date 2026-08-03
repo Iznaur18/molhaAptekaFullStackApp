@@ -5,7 +5,12 @@ import {
   deleteUserWishlistAndDecrementCounts,
   removeProductIdsFromAllWishlists,
 } from "../../controllers/Favorites/favoritesItemHelpers.js";
-import { CartModel, ProductModel, ProductViewModel } from "../../models/index.js";
+import {
+  CartModel,
+  ProductModel,
+  ProductQuestionModel,
+  ProductViewModel,
+} from "../../models/index.js";
 import { getProductIdsWithOpenSales } from "../product/productOrderLocks.js";
 
 export const USER_DELETE_OPEN_SALES_MESSAGE =
@@ -70,6 +75,12 @@ export async function deleteSellerProductsAndRelatedData(sellerId) {
     const productObjectIds = products.map((row) => row._id);
 
     await ProductViewModel.deleteMany({
+      productId: { $in: productObjectIds },
+    });
+    // Вопросы на товарах продавца удаляем вместе с товарами. Вопросы, которые
+    // этот пользователь задавал на ЧУЖИХ товарах, сохраняем (автор → «Пользователь
+    // удалён» на сериализации).
+    await ProductQuestionModel.deleteMany({
       productId: { $in: productObjectIds },
     });
     await ProductModel.deleteMany({ productSeller: sellerObjectId });

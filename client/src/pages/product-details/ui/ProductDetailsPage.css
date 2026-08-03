@@ -1,6 +1,6 @@
 /**
- * Page presentation: always apply compact/mobile product-details chrome
- * (gallery column + sticky dock), including desktop widths.
+ * Page presentation: phone (<767) keeps compact gallery column + sticky dock.
+ * From 767px — gallery | info split (see `--page-split`).
  */
 .product-details-page {
   /* fixed inset — не 100dvh внутри 100vh: на iOS Safari иначе дыра под CTA */
@@ -295,6 +295,15 @@
   padding: 0;
 }
 
+.product-details-modal--page .product-details-modal__commerce-fold {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  padding-inline: var(--iz-space-4);
+}
+
 .product-details-modal--page .product-details-seller-products-carousel {
   width: 100%;
   max-width: 100%;
@@ -500,4 +509,145 @@ body:has(.product-details-page) .app-shell {
 
 .product-details-page__back:hover {
   filter: brightness(1.05);
+}
+
+/* ≥767: gallery | lead; tabs full width above badges; commerce/below full width */
+.product-details-modal--page-split .product-details-page__wide-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--product-details-modal-gap);
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--iz-space-4);
+  padding-bottom: 0;
+}
+
+.product-details-modal--page-split .product-details-page__wide-tabs {
+  width: 100%;
+  min-width: 0;
+}
+
+.product-details-modal--page-split
+  .product-details-page__wide-tabs
+  .product-details-modal__tabs {
+  margin: 0;
+  padding-inline: 0;
+}
+
+.product-details-modal--page-split .product-details-page__wide-top {
+  display: grid;
+  grid-template-columns: var(--product-image-modal-main-side) minmax(0, 1fr);
+  column-gap: calc(var(--product-details-modal-gap) * 1.35);
+  align-items: start;
+  width: 100%;
+  min-width: 0;
+}
+
+.product-details-modal--page-split .product-details-page__wide-gallery {
+  width: 100%;
+  min-width: 0;
+}
+
+.product-details-modal--page-split .product-details-page__wide-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+  /* Стабильная ширина колонки — не прыгает при смене вкладки. */
+  width: 100%;
+}
+
+.product-details-modal--page-split .product-details-modal__spec {
+  padding-inline: 0;
+  width: 100%;
+  min-width: 0;
+}
+
+.product-details-modal--page-split
+  .product-details-modal__price-block--inline-actions {
+  padding-top: 0;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.product-details-modal--page-split .product-details-page__wide-rest {
+  display: flex;
+  flex-direction: column;
+  gap: var(--product-details-modal-gap);
+  min-width: 0;
+  width: 100%;
+}
+
+.product-details-modal--page-split .product-details-page__wide-rest[hidden] {
+  display: none;
+}
+
+.product-details-modal--page-split
+  .product-details-page__wide-rest
+  .product-details-modal__commerce-fold {
+  display: flex;
+  flex-direction: column;
+  gap: var(--product-details-modal-gap);
+  min-width: 0;
+  padding-inline: 0;
+}
+
+.product-details-modal--page-split
+  .product-details-page__wide-rest
+  .product-details-modal__below-fold {
+  display: flex;
+  flex-direction: column;
+  gap: var(--product-details-modal-gap);
+  min-width: 0;
+}
+
+.product-details-modal--page-split .product-details-page__wide-alt-panel {
+  width: 100%;
+  min-width: 0;
+}
+
+.product-details-modal--page-split
+  .product-details-page__wide-alt-panel
+  .product-details-modal__tab-panel {
+  width: 100%;
+  min-width: 0;
+}
+
+.product-details-modal--page-split .product-media-gallery-readonly {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+}
+
+.product-details-modal--page-split .product-media-gallery-readonly__thumbs {
+  padding-inline: 0;
+}
+
+.product-details-modal--page-split
+  .product-details-modal__price-block--inline-actions
+  .product-details-modal__price-actions {
+  display: grid;
+}
+
+.product-details-modal--page-split .product-details-modal__details {
+  padding-inline: 0;
+}
+
+.product-details-modal--page-split .product-details-seller-preview {
+  width: 100%;
+  margin-inline: 0;
+}
+
+.product-details-modal--page-split .product-details-modal__stats-grid--standalone,
+.product-details-modal--page-split .product-details-modal__meta-grid {
+  margin-inline: 0;
+}
+
+.product-details-modal--page-split .product-details-modal__tab-panel--inset {
+  padding-inline: 0;
+}
+
+.product-details-modal--page-split .product-details-modal__mobile-inline-actions {
+  padding-inline: var(--iz-space-4);
 }

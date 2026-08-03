@@ -36,6 +36,12 @@ import {
   productReviewsListValidation,
 } from "./product/productReviewValidation.js";
 import {
+  askProductQuestionValidation,
+  answerProductQuestionValidation,
+  productQuestionsListValidation,
+  productQuestionIdParamValidation,
+} from "./product/productQuestionValidation.js";
+import {
   requestProductPromotionValidation,
   myProductPromotionsValidation,
   promotionIdParamValidation,
@@ -151,6 +157,10 @@ export {
   submitProductReviewValidation,
   patchProductReviewValidation,
   productReviewsListValidation,
+  askProductQuestionValidation,
+  answerProductQuestionValidation,
+  productQuestionsListValidation,
+  productQuestionIdParamValidation,
   requestProductPromotionValidation,
   myProductPromotionsValidation,
   promotionIdParamValidation,

@@ -45,6 +45,26 @@ export function resolveProductDetailsBadgeExplainRequest(item) {
   if (item.kind === "affiliate") {
     return { title: item.label, badgeKey: "affiliate", fallbackKey: "affiliate" };
   }
+  if (item.kind === "auction") {
+    return { title: item.label, badgeKey: "auction", fallbackKey: "auction" };
+  }
+  if (item.kind === "installment") {
+    return {
+      title: item.label,
+      badgeKey: "installment",
+      fallbackKey: "installment",
+    };
+  }
+  if (item.kind === "wholesale") {
+    return { title: item.label, badgeKey: "wholesale", fallbackKey: "wholesale" };
+  }
+  if (item.kind === "nearDistance") {
+    return {
+      title: item.label,
+      badgeKey: "near_distance",
+      fallbackKey: "near_distance",
+    };
+  }
   if (item.kind === "listingOrigin") {
     const badgeKey = resolveListingOriginBadgeExplainKey(item.origin);
     return {

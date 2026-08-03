@@ -12,6 +12,7 @@ export const productFromApiSchema = z
     productModerationStatus: z.enum(PRODUCT_MODERATION_STATUSES).nullish(),
     productModerationComment: z.string().nullish(),
     productIsAvailable: z.boolean().nullish(),
+    productQaEnabled: z.boolean().nullish(),
     soldQuantity: z.number().nullish(),
   })
   .passthrough();

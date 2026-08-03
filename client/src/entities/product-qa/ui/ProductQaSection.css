@@ -1,0 +1,324 @@
+/* Паритет со стилями блока отзывов (`product-reviews-section`). */
+.product-qa-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--iz-space-3);
+  scroll-margin-top: 0.75rem;
+}
+
+.product-qa-section--tab {
+  padding-top: var(--iz-space-2);
+}
+
+.product-qa-section__title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--iz-color-ink);
+}
+
+.product-qa-section__panel-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.product-qa-section__state,
+.product-qa-section__empty {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--iz-color-text-muted);
+}
+
+.product-qa-section__hint {
+  margin: 0;
+  padding: 0.5rem 0.625rem;
+  border-radius: var(--iz-radius-input);
+  background: var(--iz-color-surface-muted);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--iz-color-text-secondary);
+}
+
+.product-qa-section__login {
+  align-self: stretch;
+}
+
+.product-qa-section__composer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--iz-space-2);
+  padding: var(--iz-space-3);
+  border-radius: 1.25rem;
+  corner-shape: squircle;
+  background: var(--iz-color-surface-elevated);
+}
+
+/* Внутри композера форма без своей рамки/фона — как в блоке отзывов. */
+.product-qa-section__composer .product-qa-form {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.product-qa-section__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.product-qa-section__more {
+  align-self: center;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.5rem;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text-secondary);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.product-qa-section__more:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* --- Summary (продавцу) --- */
+.product-qa-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  color: var(--iz-color-text-secondary);
+}
+
+.product-qa-summary__slots {
+  font-weight: 600;
+  color: var(--iz-color-text);
+}
+
+.product-qa-summary__pending {
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--iz-color-warning, #d98a00) 16%, transparent);
+  color: var(--iz-color-warning, #d98a00);
+}
+
+/* --- Форма (композер вопроса / ответ продавца) --- */
+.product-qa-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--iz-space-2);
+  padding: 0.85rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: var(--iz-radius-button);
+  background: var(--iz-color-surface-elevated);
+}
+
+.product-qa-form__textarea {
+  box-sizing: border-box;
+  min-height: 80px;
+  padding: 10px;
+  border: 1px solid var(--iz-color-border);
+  border-radius: var(--iz-radius-input);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  resize: none;
+}
+
+.product-qa-form__textarea:disabled {
+  opacity: 0.6;
+}
+
+.product-qa-form__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.product-qa-form__counter {
+  font-size: 0.75rem;
+  color: var(--iz-color-text-muted);
+}
+
+.product-qa-form__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.product-qa-form__cancel {
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.5rem;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text-secondary);
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.product-qa-form__submit:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.product-qa-form__error {
+  margin: 0;
+  padding: 0.5rem 0.625rem;
+  border-radius: var(--iz-radius-input);
+  background: color-mix(in srgb, var(--iz-color-danger) 10%, transparent);
+  font-size: 0.8125rem;
+  color: var(--iz-color-danger);
+}
+
+/* --- Карточка вопроса (паритет с `product-review-item`) --- */
+.product-qa-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 1.25rem;
+  corner-shape: squircle;
+  background: var(--iz-color-surface-muted);
+}
+
+.product-qa-item__head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+
+.product-qa-item__author {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--iz-color-text);
+}
+
+.product-qa-item__date {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--iz-color-text-muted);
+}
+
+.product-qa-item__badge {
+  flex-shrink: 0;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--iz-color-warning, #d98a00) 16%, transparent);
+  color: var(--iz-color-warning, #d98a00);
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.product-qa-item__question {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--iz-color-text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.product-qa-item__answer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.15rem;
+  padding: 0.5rem 0.625rem;
+  border-radius: var(--iz-radius-input);
+  background: var(--iz-color-surface);
+  border-left: 3px solid var(--iz-color-accent, var(--iz-color-brand, #2f80ed));
+}
+
+.product-qa-item__answer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.product-qa-item__answer-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--iz-color-text-secondary);
+}
+
+.product-qa-item__answer-text {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--iz-color-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.product-qa-item__hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--iz-color-text-muted);
+}
+
+.product-qa-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.1rem;
+}
+
+.product-qa-item__confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.product-qa-item__confirm-text {
+  font-size: 0.8125rem;
+  color: var(--iz-color-text-secondary);
+}
+
+.product-qa-item__action {
+  padding: 0.3rem 0.65rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.5rem;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text-secondary);
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.product-qa-item__action:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.product-qa-item__action--danger {
+  color: var(--iz-color-danger);
+  border-color: color-mix(in srgb, var(--iz-color-danger) 40%, var(--iz-color-border));
+}
+
+.product-qa-item__answer-form {
+  margin-top: 0.35rem;
+}

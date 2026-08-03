@@ -221,6 +221,7 @@ export const createProductBodySchema = z
       .max(PRODUCT_STOCK_QUANTITY_MAX)
       .optional(),
     productAuctionEnabled: z.coerce.boolean().optional(),
+    productQaEnabled: z.coerce.boolean().optional(),
     loyaltyPointsPerUnit: z.coerce.number().int().min(0).optional(),
     productCharacteristics: z
       .array(productCharacteristicSchema)
@@ -281,6 +282,7 @@ const patchFieldShape = {
     .max(PRODUCT_STOCK_QUANTITY_MAX)
     .optional(),
   productAuctionEnabled: z.coerce.boolean().optional(),
+  productQaEnabled: z.coerce.boolean().optional(),
   ...productWholesalePatchFieldsShape,
   ...productAffiliatePatchFieldsShape,
   loyaltyPointsPerUnit: z.coerce.number().int().min(0).optional(),

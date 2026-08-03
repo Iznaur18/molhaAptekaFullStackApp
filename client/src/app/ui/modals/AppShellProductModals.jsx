@@ -32,6 +32,7 @@ export function AppShellProductModals({
   handleDeleteMyProduct,
   handleSetMyProductAvailability,
   handleSetProductAuction,
+  handleSetProductQa,
   handleSetProductWholesale,
   handleSetProductAffiliate,
   handleWholesaleSaved,
@@ -40,6 +41,7 @@ export function AppShellProductModals({
   deletingProductId,
   togglingAvailabilityProductId,
   togglingAuctionProductId,
+  togglingQaProductId,
   togglingWholesaleProductId,
   togglingAffiliateProductId,
   togglingInstallmentProductId,
@@ -99,6 +101,7 @@ export function AppShellProductModals({
         onSubmit={handleSubmitPromotionRequest}
         onSetProductAvailability={handleSetMyProductAvailability}
         onSetProductAuction={handleSetProductAuction}
+        onSetProductQa={handleSetProductQa}
         onSetProductWholesale={handleSetProductWholesale}
         onSetProductAffiliate={handleSetProductAffiliate}
         onSetProductInstallment={handleSetProductInstallment}
@@ -111,6 +114,10 @@ export function AppShellProductModals({
         isAuctionTogglePending={
           promotionProduct?._id != null &&
           togglingAuctionProductId === String(promotionProduct._id)
+        }
+        isQaTogglePending={
+          promotionProduct?._id != null &&
+          togglingQaProductId === String(promotionProduct._id)
         }
         isWholesaleTogglePending={
           promotionProduct?._id != null &&

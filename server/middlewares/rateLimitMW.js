@@ -6,6 +6,7 @@ import { USER_DATA_CONFIRMATION_RATE_LIMIT_PER_HOUR } from "../constants/userDat
 import { EMAIL_VERIFICATION_RESEND_RATE_LIMIT_PER_HOUR } from "../constants/emailVerificationConstants.js";
 import { PRICE_OFFER_RATE_LIMIT_PER_HOUR } from "../constants/productPriceOfferConstants.js";
 import { PRODUCT_REVIEW_RATE_LIMIT_PER_HOUR } from "../constants/productReviewConstants.js";
+import { PRODUCT_QUESTION_RATE_LIMIT_PER_HOUR } from "../constants/productQuestionConstants.js";
 import { PRODUCT_COMPARE_RATE_LIMIT_PER_15_MIN } from "../constants/productCompareConstants.js";
 import {
   ADDRESS_SUGGEST_RATE_LIMIT_PER_HOUR,
@@ -313,6 +314,20 @@ export function initRateLimitMiddlewares(store) {
     store,
   );
 
+  handlers.productQuestion = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      windowMs: 60 * 60 * 1000,
+      max: PRODUCT_QUESTION_RATE_LIMIT_PER_HOUR,
+      message: {
+        success: false,
+        message: "Слишком много вопросов. Попробуйте позже",
+      },
+      keyGenerator: rateLimitKeyByUserOrIp,
+    },
+    store,
+  );
+
   handlers.productCompare = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
@@ -436,6 +451,10 @@ export const emailVerificationResendRateLimiter = (req, res, next) =>
 /** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
 export const productReviewRateLimiter = (req, res, next) =>
   handlers.productReview(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const productQuestionRateLimiter = (req, res, next) =>
+  handlers.productQuestion(req, res, next);
 
 /** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
 export const productCompareRateLimiter = (req, res, next) =>

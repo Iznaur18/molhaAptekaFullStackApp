@@ -12,6 +12,7 @@ import UserDataConfirmationRequestModel from "./UserDataConfirmationRequestModel
 import ProductPriceOfferModel from "./ProductPriceOfferModel.js";
 import UserFollowModel from "./UserFollowModel.js";
 import ProductReviewModel from "./ProductReviewModel.js";
+import ProductQuestionModel from "./ProductQuestionModel.js";
 import ProductPromotionModel from "./ProductPromotionModel.js";
 import ProductPromotionTariffModel from "./ProductPromotionTariffModel.js";
 import RaffleModel from "./RaffleModel.js";
@@ -55,6 +56,7 @@ export {
   ProductPriceOfferModel,
   UserFollowModel,
   ProductReviewModel,
+  ProductQuestionModel,
   ProductPromotionModel,
   ProductPromotionTariffModel,
   RaffleModel,
