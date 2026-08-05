@@ -1,8 +1,11 @@
 /* Паритет со стилями блока отзывов (`product-reviews-section`). */
 .product-qa-section {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: var(--iz-space-3);
+  width: 100%;
+  min-width: 0;
   scroll-margin-top: 0.75rem;
 }
 
@@ -46,17 +49,21 @@
 }
 
 .product-qa-section__composer {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: var(--iz-space-2);
+  width: 100%;
+  min-width: 0;
   padding: var(--iz-space-3);
-  border-radius: 1.25rem;
-  corner-shape: squircle;
+  border-radius: var(--iz-radius-button);
   background: var(--iz-color-surface-elevated);
 }
 
 /* Внутри композера форма без своей рамки/фона — как в блоке отзывов. */
 .product-qa-section__composer .product-qa-form {
+  width: 100%;
+  min-width: 0;
   padding: 0;
   border: none;
   border-radius: 0;
@@ -67,9 +74,15 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.product-qa-section__list > li {
+  min-width: 0;
 }
 
 .product-qa-section__more {
@@ -113,9 +126,12 @@
 
 /* --- Форма (композер вопроса / ответ продавца) --- */
 .product-qa-form {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: var(--iz-space-2);
+  width: 100%;
+  min-width: 0;
   padding: 0.85rem;
   border: 1px solid var(--iz-color-border);
   border-radius: var(--iz-radius-button);
@@ -124,7 +140,12 @@
 
 .product-qa-form__textarea {
   box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: 80px;
+  margin: 0;
   padding: 10px;
   border: 1px solid var(--iz-color-border);
   border-radius: var(--iz-radius-input);
@@ -133,7 +154,7 @@
   font: inherit;
   font-size: 0.9375rem;
   line-height: 1.35;
-  resize: none;
+  resize: vertical;
 }
 
 .product-qa-form__textarea:disabled {
@@ -142,9 +163,12 @@
 
 .product-qa-form__footer {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .product-qa-form__counter {
@@ -156,6 +180,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .product-qa-form__cancel {
@@ -167,6 +192,11 @@
   font: inherit;
   font-size: 0.8125rem;
   cursor: pointer;
+}
+
+.product-qa-form__submit {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .product-qa-form__submit:disabled {
@@ -185,21 +215,31 @@
 
 /* --- Карточка вопроса (паритет с `product-review-item`) --- */
 .product-qa-item {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  width: 100%;
+  min-width: 0;
   padding: 0.75rem 0.875rem;
   border: 1px solid var(--iz-color-border);
   border-radius: 1.25rem;
-  corner-shape: squircle;
   background: var(--iz-color-surface-muted);
+}
+
+@supports (corner-shape: squircle) {
+  .product-qa-item {
+    corner-shape: squircle;
+  }
 }
 
 .product-qa-item__head {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.5rem;
   margin-bottom: 0.15rem;
+  min-width: 0;
 }
 
 .product-qa-item__author {
@@ -211,6 +251,13 @@
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--iz-color-text);
+}
+
+.product-qa-item__head-meta {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .product-qa-item__date {
@@ -246,7 +293,7 @@
   padding: 0.5rem 0.625rem;
   border-radius: var(--iz-radius-input);
   background: var(--iz-color-surface);
-  border-left: 3px solid var(--iz-color-accent, var(--iz-color-brand, #2f80ed));
+  border-left: 3px solid var(--iz-color-action);
 }
 
 .product-qa-item__answer-head {

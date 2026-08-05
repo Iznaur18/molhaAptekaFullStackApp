@@ -13,7 +13,12 @@ export {
   loginPhoneOtpConfirmBodySchema,
   phoneBindRequestBodySchema,
   phoneBindConfirmBodySchema,
+  emailBindRequestBodySchema,
+  emailBindConfirmBodySchema,
   registerPhoneBodySchema,
+  passwordResetRequestBodySchema,
+  passwordResetConfirmBodySchema,
+  passwordChangeBodySchema,
 } from "./authCredentials.js";
 export {
   offerIdParamsSchema,
@@ -195,6 +200,7 @@ export {
   resendRegistrationCodeBodySchema,
 } from "./registration.js";
 export { addressSuggestBodySchema } from "./addressSuggest.js";
+export { addressGeolocateBodySchema } from "./addressGeolocate.js";
 export { adminCatalogDisplayPatchBodySchema } from "./adminDisplay.js";
 export {
   adminCreditLoyaltyPointsBodySchema,

@@ -2,15 +2,18 @@ import { apiClient, parseAddressSuggestionsData } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
-/** После 503 не долбим /address/suggest на каждый keystroke. */
-let suggestUnavailable = false;
+import {
+  isAddressServiceUnavailable,
+  markAddressServiceUnavailable,
+  resetAddressServiceUnavailable,
+} from "./addressServiceAvailability";
 
 export const resetAddressSuggestUnavailableForTests = () => {
-  suggestUnavailable = false;
+  resetAddressServiceUnavailable();
 };
 
 export const fetchAddressSuggestions = async (query: string) => {
-  if (suggestUnavailable) {
+  if (isAddressServiceUnavailable()) {
     return [];
   }
 
@@ -28,7 +31,7 @@ export const fetchAddressSuggestions = async (query: string) => {
         ? Number((error.response as { status?: number }).status)
         : NaN;
     if (status === 503) {
-      suggestUnavailable = true;
+      markAddressServiceUnavailable();
       return [];
     }
     throw new Error(

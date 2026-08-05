@@ -10,7 +10,7 @@ import { mapProductReturnTermsToRows } from "./productReturnTermRows.js";
 export const CREATE_PRODUCT_INITIAL_FORM = {
   productName: "",
   productListingOrigin: null,
-  productIsOriginal: null,
+  productIsOriginal: false,
   productDescription: "",
   productImageRows: [createImageRow("")],
   productPreviewVideoUrl: "",

@@ -20,6 +20,7 @@ import {
 /**
  * @typedef {object} EditProfileFormState
  * @property {string} userName
+ * @property {string} email
  * @property {string} userBirthDate
  * @property {'male'|'female'|'noSelected'} userGender
  * @property {import('../../address/model/types.js').RuDeliveryAddressValue} deliveryAddress
@@ -70,6 +71,7 @@ export function mapUserToEditProfileForm(user) {
 
   return {
     userName: user.userName ?? "",
+    email: typeof user.email === "string" ? user.email.trim().toLowerCase() : "",
     userBirthDate: birthInput,
     userGender: user.userGender ?? USER_GENDER_NO_SELECTED,
     deliveryAddress,

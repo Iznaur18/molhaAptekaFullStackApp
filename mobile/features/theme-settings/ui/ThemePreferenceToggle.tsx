@@ -9,6 +9,7 @@ const OPTIONS: Array<{ value: ThemePreference; label: string }> = [
   { value: "system", label: THEME_SETTINGS_UI.SYSTEM },
   { value: "light", label: THEME_SETTINGS_UI.LIGHT },
   { value: "dark", label: THEME_SETTINGS_UI.DARK },
+  { value: "custom", label: THEME_SETTINGS_UI.CUSTOM },
 ];
 
 type ThemePreferenceToggleProps = {

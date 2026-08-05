@@ -101,6 +101,15 @@ export const useCartFulfillmentSectionStyles = createThemedStyles((theme) => ({
     color: theme.colors.text,
     textAlign: "right",
   },
+  deliveryFeeValue: {
+    flex: 1,
+    minWidth: 0,
+    fontSize: 13,
+    lineHeight: 16,
+    fontWeight: "500",
+    color: theme.colors.success,
+    textAlign: "right",
+  },
   totalValue: {
     flexShrink: 0,
     fontSize: 22,

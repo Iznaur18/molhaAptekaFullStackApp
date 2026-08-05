@@ -7,7 +7,6 @@ import {
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
-import { isYandexMapsApiKeyConfigured } from "@/entities/maps/lib/yandexMapsApiKey";
 import { PRODUCT_PICKUP_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useFormFieldStyles } from "@/shared/theme/formChromeStyles";
@@ -163,12 +162,6 @@ export const ProductPickupLocationFields = ({
         }
         maxLength={PRODUCT_PICKUP_ADDRESS_MAX_LENGTH}
       />
-
-      <Text style={fieldStyles.hint}>
-        {isYandexMapsApiKeyConfigured()
-          ? PRODUCT_PICKUP_UI.MAP_ARIA
-          : PRODUCT_PICKUP_UI.MAP_KEY_MISSING}
-      </Text>
     </View>
   );
 };

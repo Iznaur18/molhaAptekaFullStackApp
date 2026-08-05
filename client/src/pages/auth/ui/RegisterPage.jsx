@@ -31,6 +31,12 @@ import { AuthHeroBanner } from "../../../shared/ui/AuthHeroBanner/AuthHeroBanner
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { PasswordInputField } from "../../../shared/ui/PasswordInputField/PasswordInputField.jsx";
 
+import {
+  clearRegisterFormDraft,
+  persistRegisterFormDraft,
+  readRegisterFormDraft,
+} from "../lib/registerFormDraftStorage.js";
+
 import "./AuthPage.css";
 
 const REGISTER_CODE_LENGTH = 6;
@@ -51,14 +57,33 @@ const INITIAL_FORM = {
 const withInvalidFieldClass = (baseClass, fieldKey, invalidFields) =>
   invalidFields.has(fieldKey) ? `${baseClass} ${baseClass}--invalid` : baseClass;
 
+function createInitialRegisterState() {
+  const draft = readRegisterFormDraft();
+  if (!draft) {
+    return {
+      channel: /** @type {"email" | "phone"} */ ("email"),
+      form: INITIAL_FORM,
+      termsAccepted: false,
+      personalDataConsentAccepted: false,
+    };
+  }
+  return {
+    channel: draft.channel,
+    form: { ...INITIAL_FORM, ...draft.form },
+    termsAccepted: draft.termsAccepted,
+    personalDataConsentAccepted: draft.personalDataConsentAccepted,
+  };
+}
+
 export function RegisterPage() {
   const navigate = useNavigate();
   const heroHeight = useStableAuthHeroHeight();
   const { isAuthorized, isSessionReady } = useAuthSession();
   const registerMutation = useRegisterMutation();
   const confirmMutation = useConfirmRegistrationMutation();
-  const [channel, setChannel] = useState(/** @type {"email" | "phone"} */ ("email"));
-  const [form, setForm] = useState(INITIAL_FORM);
+  const [boot] = useState(createInitialRegisterState);
+  const [channel, setChannel] = useState(boot.channel);
+  const [form, setForm] = useState(boot.form);
   const [step, setStep] = useState(/** @type {"form" | "code"} */ ("form"));
   const [pendingRegistration, setPendingRegistration] = useState(
     /** @type {{ registrationId: string; email?: string; phoneNumber?: string; channel: "email" | "phone" } | null} */ (
@@ -70,9 +95,10 @@ export function RegisterPage() {
   const [invalidFields, setInvalidFields] = useState(
     /** @type {Set<string>} */ (() => new Set()),
   );
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [personalDataConsentAccepted, setPersonalDataConsentAccepted] =
-    useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(boot.termsAccepted);
+  const [personalDataConsentAccepted, setPersonalDataConsentAccepted] = useState(
+    boot.personalDataConsentAccepted,
+  );
   const [phoneRegisterLoading, setPhoneRegisterLoading] = useState(false);
 
   const bannerQuery = useGuestProfileLoginMenuBannerImageQuery();
@@ -93,9 +119,19 @@ export function RegisterPage() {
 
   useEffect(() => {
     if (isSessionReady && isAuthorized) {
+      clearRegisterFormDraft();
       navigate("/me", { replace: true });
     }
   }, [isAuthorized, isSessionReady, navigate]);
+
+  useEffect(() => {
+    persistRegisterFormDraft({
+      channel,
+      form,
+      termsAccepted,
+      personalDataConsentAccepted,
+    });
+  }, [channel, form, termsAccepted, personalDataConsentAccepted]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -239,6 +275,7 @@ export function RegisterPage() {
         code,
       });
       clearPersistedReferralCode();
+      clearRegisterFormDraft();
       setForm(INITIAL_FORM);
       setPendingRegistration(null);
       setCode("");

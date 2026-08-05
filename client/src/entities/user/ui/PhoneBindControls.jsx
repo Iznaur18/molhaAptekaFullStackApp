@@ -77,7 +77,7 @@ export function PhoneBindControls({
       setOtpSent(false);
       setStatus({ kind: "success", message: EDIT_PROFILE_MODAL_UI.PHONE_BIND_SUCCESS });
       await queryClient.invalidateQueries({ queryKey: authMeQueryKeys.all });
-      onVerified?.();
+      onVerified?.(phoneTrim);
     } catch (error) {
       setStatus({
         kind: "error",
@@ -88,20 +88,21 @@ export function PhoneBindControls({
 
   return (
     <div className="edit-profile-modal__phone-bind">
-      <span className="edit-profile-modal__hint">
+      <span className="edit-profile-modal__hint edit-profile-modal__hint_unverified">
         {EDIT_PROFILE_MODAL_UI.PHONE_NOT_VERIFIED}
       </span>
-      <button
-        type="button"
-        className="edit-profile-modal__secondary-btn"
-        onClick={() => void handleSend()}
-        disabled={disabled || isBusy}
-      >
-        {isBusy && !otpSent
-          ? EDIT_PROFILE_MODAL_UI.PHONE_SEND_CODE_LOADING
-          : EDIT_PROFILE_MODAL_UI.PHONE_SEND_CODE}
-      </button>
-      {otpSent ? (
+      {!otpSent ? (
+        <button
+          type="button"
+          className="edit-profile-modal__secondary-btn"
+          onClick={() => void handleSend()}
+          disabled={disabled || isBusy}
+        >
+          {isBusy
+            ? EDIT_PROFILE_MODAL_UI.PHONE_SEND_CODE_LOADING
+            : EDIT_PROFILE_MODAL_UI.PHONE_SEND_CODE}
+        </button>
+      ) : (
         <>
           <input
             className="edit-profile-modal__input"
@@ -127,10 +128,18 @@ export function PhoneBindControls({
               ? EDIT_PROFILE_MODAL_UI.PHONE_CONFIRM_LOADING
               : EDIT_PROFILE_MODAL_UI.PHONE_CONFIRM_CODE}
           </button>
+          <button
+            type="button"
+            className="edit-profile-modal__secondary-btn edit-profile-modal__secondary-btn--ghost"
+            onClick={() => void handleSend()}
+            disabled={disabled || isBusy}
+          >
+            {EDIT_PROFILE_MODAL_UI.PHONE_SEND_CODE}
+          </button>
         </>
-      ) : null}
+      )}
       {status.kind === "error" ? (
-        <span className="edit-profile-modal__hint" role="alert">
+        <span className="edit-profile-modal__hint edit-profile-modal__hint_error" role="alert">
           {status.message}
         </span>
       ) : null}

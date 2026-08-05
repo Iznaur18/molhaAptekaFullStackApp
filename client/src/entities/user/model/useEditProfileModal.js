@@ -44,12 +44,18 @@ export function useEditProfileModal({
   const { patchMutation } = useUserProfileMutations();
   const [form, setForm] = useState(() => mapUserToEditProfileForm({ _id: "" }));
   const [feedback, setFeedback] = useState({ kind: "idle", message: "" });
+  const [contactVerified, setContactVerified] = useState({
+    email: true,
+    phone: true,
+  });
   const wasOpenRef = useRef(false);
   const initialDeliveryAddressRef = useRef(
     /** @type {import('../../address/model/types.js').RuDeliveryAddressValue | null} */ (
       null
     ),
   );
+  const baselineEmailRef = useRef("");
+  const baselinePhoneRef = useRef("");
 
   useEffect(() => {
     const didOpen = isOpen && !wasOpenRef.current;
@@ -62,6 +68,12 @@ export function useEditProfileModal({
     const nextForm = mapUserToEditProfileForm(user);
     setForm(nextForm);
     initialDeliveryAddressRef.current = nextForm.deliveryAddress;
+    baselineEmailRef.current = nextForm.email;
+    baselinePhoneRef.current = nextForm.userPhoneNumber;
+    setContactVerified({
+      email: user.isEmailVerified === true,
+      phone: user.isPhoneVerified === true,
+    });
     setFeedback({ kind: "idle", message: "" });
     return undefined;
   }, [isOpen, user]);
@@ -108,6 +120,9 @@ export function useEditProfileModal({
     if (name === "userPhoneNumber" && typeof nextValue === "string") {
       nextValue = maskRuPhoneInput(nextValue);
     }
+    if (name === "email" && typeof nextValue === "string") {
+      nextValue = nextValue.trim().toLowerCase();
+    }
     if (
       (name === "userLoyaltyPoints" || name === "userDiscountPercent") &&
       typeof nextValue === "string"
@@ -115,6 +130,37 @@ export function useEditProfileModal({
       nextValue = keepDigitsOnly(nextValue);
     }
     setForm((prev) => ({ ...prev, [name]: nextValue }));
+    if (name === "email" && typeof nextValue === "string") {
+      const normalized = nextValue.trim().toLowerCase();
+      setContactVerified((prev) => ({
+        ...prev,
+        email:
+          normalized === baselineEmailRef.current && user?.isEmailVerified === true,
+      }));
+    }
+    if (name === "userPhoneNumber" && typeof nextValue === "string") {
+      setContactVerified((prev) => ({
+        ...prev,
+        phone:
+          nextValue === baselinePhoneRef.current && user?.isPhoneVerified === true,
+      }));
+    }
+  };
+
+  const handleEmailVerified = (verifiedEmail) => {
+    const normalized = String(verifiedEmail ?? "")
+      .trim()
+      .toLowerCase();
+    baselineEmailRef.current = normalized;
+    setForm((prev) => ({ ...prev, email: normalized }));
+    setContactVerified((prev) => ({ ...prev, email: true }));
+  };
+
+  const handlePhoneVerified = (verifiedPhone) => {
+    const nextPhone = String(verifiedPhone ?? form.userPhoneNumber ?? "").trim();
+    baselinePhoneRef.current = nextPhone;
+    setForm((prev) => ({ ...prev, userPhoneNumber: nextPhone }));
+    setContactVerified((prev) => ({ ...prev, phone: true }));
   };
 
   const handleClose = () => {
@@ -135,6 +181,31 @@ export function useEditProfileModal({
     if (clientError) {
       setFeedback({ kind: "error", message: clientError });
       return;
+    }
+
+    if (!adminMode) {
+      const emailTrim = String(form.email ?? "")
+        .trim()
+        .toLowerCase();
+      const phoneTrim = String(form.userPhoneNumber ?? "").trim();
+
+      if (!emailTrim && baselineEmailRef.current) {
+        setFeedback({ kind: "error", message: EDIT_PROFILE_MODAL_UI.EMAIL_CLEAR_FORBIDDEN });
+        return;
+      }
+      if (emailTrim !== baselineEmailRef.current && contactVerified.email !== true) {
+        setFeedback({ kind: "error", message: EDIT_PROFILE_MODAL_UI.EMAIL_CHANGE_PENDING });
+        return;
+      }
+
+      if (!phoneTrim && baselinePhoneRef.current) {
+        setFeedback({ kind: "error", message: EDIT_PROFILE_MODAL_UI.PHONE_CLEAR_FORBIDDEN });
+        return;
+      }
+      if (phoneTrim !== baselinePhoneRef.current && contactVerified.phone !== true) {
+        setFeedback({ kind: "error", message: EDIT_PROFILE_MODAL_UI.PHONE_CHANGE_PENDING });
+        return;
+      }
     }
 
     const premiumWillBeDisabled =
@@ -192,7 +263,12 @@ export function useEditProfileModal({
     avatarFocusImageUrl,
     backgroundFocusImageUrl,
     isSubmitting,
+    baselineEmail: baselineEmailRef.current,
+    baselinePhone: baselinePhoneRef.current,
+    contactVerified,
     handleChange,
+    handleEmailVerified,
+    handlePhoneVerified,
     handleClose,
     handleSubmit,
   };

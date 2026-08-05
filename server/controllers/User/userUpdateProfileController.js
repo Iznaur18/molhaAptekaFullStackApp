@@ -35,6 +35,7 @@ import {
   canStaffManageTargetUser,
   updateTouchesAdminProtectedFields,
 } from "../../services/access/premiumStaffAccess.js";
+import { PHONE_CHANGE_REQUIRES_OTP_MESSAGE } from "../../constants/phoneVerificationConstants.js";
 
 /** Обновление профиля пользователя. PATCH /user/:userId (требует Authorization: Bearer <token>) */
 export const userUpdateProfileController = async (req, res) => {
@@ -172,6 +173,11 @@ export const userUpdateProfileController = async (req, res) => {
       );
     }
 
+    // Владелец: телефон только через /auth/phone/bind/* (OTP). Staff — может PATCH.
+    if (isCurrentUserOwner && Object.prototype.hasOwnProperty.call(updateData, "userPhoneNumber")) {
+      return errorRes(res, 403, PHONE_CHANGE_REQUIRES_OTP_MESSAGE);
+    }
+
     if (updateData.userRole !== undefined) {
       if (!isCurrentUserAdmin) {
         return errorRes(res, 403, "Только администратор может менять роль");
@@ -193,7 +199,7 @@ export const userUpdateProfileController = async (req, res) => {
 
     const targetUserBeforeUpdate = await UserModel.findById(targetUserId)
       .select(
-        "isPremiumUser premiumExpiresAt userBackgroundUrl isUserDataConfirmed userRole isBlockedUser isActiveUser",
+        "isPremiumUser premiumExpiresAt userBackgroundUrl isUserDataConfirmed userRole isBlockedUser isActiveUser userPhoneNumber",
       )
       .lean();
 
@@ -274,6 +280,11 @@ export const userUpdateProfileController = async (req, res) => {
       if (nextPhone !== prevPhone) {
         updateData.isPhoneVerified = false;
       }
+    } else if (
+      Object.prototype.hasOwnProperty.call(updateData, "userPhoneNumber") &&
+      (updateData.userPhoneNumber === null || updateData.userPhoneNumber === "")
+    ) {
+      updateData.isPhoneVerified = false;
     }
 
     const wasPremium = isPremiumActive(targetUserBeforeUpdate);

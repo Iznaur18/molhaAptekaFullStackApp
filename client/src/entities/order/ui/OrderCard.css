@@ -159,13 +159,13 @@
 .order-card__counterparty-phone,
 .order-card__counterparty-phone-text {
   font-size: 0.9em;
-  color: var(--iz-color-text-secondary);
+  font-weight: 600;
+  color: var(--iz-color-action);
   text-decoration: none;
   white-space: nowrap;
 }
 
 .order-card__counterparty-phone:hover {
-  color: var(--iz-color-action);
   text-decoration: underline;
 }
 

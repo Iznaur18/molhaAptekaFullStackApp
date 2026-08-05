@@ -32,6 +32,7 @@ type CartFulfillmentSectionProps = {
   canCheckout: boolean;
   onCheckout: () => void;
   checkoutDisabled?: boolean;
+  showDeliveryFeeNote?: boolean;
 };
 
 export const CartFulfillmentSection = ({
@@ -46,6 +47,7 @@ export const CartFulfillmentSection = ({
   canCheckout,
   onCheckout,
   checkoutDisabled = false,
+  showDeliveryFeeNote = false,
 }: CartFulfillmentSectionProps) => {
   const styles = useCartFulfillmentSectionStyles();
   const router = useRouter();
@@ -118,6 +120,16 @@ export const CartFulfillmentSection = ({
                   {CART_PAGE_UI.DISCOUNT_AMOUNT(
                     formatPriceRub(summary.selectedWholesaleDiscount),
                   )}
+                </Text>
+              </View>
+            ) : null}
+            {showDeliveryFeeNote ? (
+              <View style={styles.totalRow}>
+                <Text style={styles.discountLabel}>
+                  {CART_PAGE_UI.DELIVERY_FEE_LABEL}
+                </Text>
+                <Text style={styles.deliveryFeeValue}>
+                  {CART_PAGE_UI.DELIVERY_FEE_VALUE}
                 </Text>
               </View>
             ) : null}

@@ -38,6 +38,7 @@ export const useHomeProductActions = ({
   setTogglingAvailabilityProductId,
   setTogglingAuctionProductId,
   setTogglingQaProductId,
+  setTogglingOriginalityProductId,
   setTogglingWholesaleProductId,
   setTogglingAffiliateProductId,
   setTogglingInstallmentProductId,
@@ -275,6 +276,38 @@ export const useHomeProductActions = ({
       patchMutation,
       setProductDetailsAdminError,
       setTogglingQaProductId,
+      syncCatalogProductState,
+      syncProductEditModalState,
+    ],
+  );
+
+  const handleSetProductOriginality = useCallback(
+    async (productId, isOriginal) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return;
+      }
+      setTogglingOriginalityProductId(normalizedProductId);
+      setMyProductsCatalogError("");
+      try {
+        const updated = await patchMutation.mutateAsync({
+          productId: normalizedProductId,
+          body: { productIsOriginal: isOriginal },
+        });
+        syncCatalogProductState(updated);
+        syncProductEditModalState(updated);
+      } catch (e) {
+        setMyProductsCatalogError(
+          e instanceof Error ? e.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+      } finally {
+        setTogglingOriginalityProductId(null);
+      }
+    },
+    [
+      patchMutation,
+      setMyProductsCatalogError,
+      setTogglingOriginalityProductId,
       syncCatalogProductState,
       syncProductEditModalState,
     ],
@@ -594,6 +627,7 @@ export const useHomeProductActions = ({
     handleSetMyProductAvailability,
     handleSetProductAuction,
     handleSetProductQa,
+    handleSetProductOriginality,
     handleSetProductWholesale,
     handleSetProductAffiliate,
     handleWholesaleSaved,

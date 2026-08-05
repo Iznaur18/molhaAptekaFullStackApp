@@ -117,8 +117,12 @@
 
 .create-product-section__textarea {
   min-height: 8rem;
+  max-height: 14rem;
   resize: vertical;
   line-height: 1.45;
+  /* Keep wheel/touch scrolling on the wizard body when content fits. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .create-product-section__desc-toolbar {

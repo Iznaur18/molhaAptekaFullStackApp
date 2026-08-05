@@ -28,6 +28,19 @@ test("profile nav tones: dark purple CTA soft is structural deep", () => {
   assert.equal(darkPurple.soft, "#405577");
 });
 
+test("profile nav tones: custom uses photo orange palette", () => {
+  assert.deepEqual(resolveProfileNavTonePalette("blue", "custom"), {
+    main: "#F25623",
+    soft: "#fde9e2",
+    strong: "#d53e0d",
+  });
+  assert.deepEqual(resolveProfileNavTonePalette("slate", "custom"), {
+    main: "#4D4D4D",
+    soft: "#DEDEDE",
+    strong: "#171717",
+  });
+});
+
 test("profile nav tones: moderation uses amber", () => {
   assert.equal(resolveProfileNavSectionTone(PROFILE_SECTION_PRODUCT_MODERATION), "amber");
 });

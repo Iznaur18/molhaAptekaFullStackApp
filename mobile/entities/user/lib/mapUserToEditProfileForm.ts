@@ -15,6 +15,7 @@ import { DEFAULT_USER_BACKGROUND_PRESET_ID } from "@/entities/user/model/userBac
 
 export type EditProfileFormState = {
   userName: string;
+  email: string;
   userBirthDate: string;
   userGender: "male" | "female" | "noSelected";
   deliveryAddress: RuDeliveryAddressValue;
@@ -92,6 +93,7 @@ export const mapUserToEditProfileForm = (
 
   return {
     userName: typeof user.userName === "string" ? user.userName : "",
+    email: typeof user.email === "string" ? user.email.trim().toLowerCase() : "",
     userBirthDate: formatBirthDateForInput(user.userBirthDate),
     userGender:
       user.userGender === "male" || user.userGender === "female"

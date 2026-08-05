@@ -55,20 +55,27 @@ export function ProductQuestionListItem({
     setIsAnswerOpen(false);
   };
 
+  const authorName =
+    typeof question.author?.userName === "string" && question.author.userName.trim()
+      ? question.author.userName.trim()
+      : "Пользователь";
+
   return (
     <article className="product-qa-item">
       <header className="product-qa-item__head">
-        <span className="product-qa-item__author">{question.author.userName}</span>
-        {question.createdAt ? (
-          <span className="product-qa-item__date">
-            {formatQaDate(question.createdAt)}
-          </span>
-        ) : null}
-        {isPending ? (
-          <span className="product-qa-item__badge" title={PRODUCT_QA_UI.PENDING_HINT}>
-            {PRODUCT_QA_UI.PENDING_BADGE}
-          </span>
-        ) : null}
+        <span className="product-qa-item__author">{authorName}</span>
+        <span className="product-qa-item__head-meta">
+          {question.createdAt ? (
+            <span className="product-qa-item__date">
+              {formatQaDate(question.createdAt)}
+            </span>
+          ) : null}
+          {isPending ? (
+            <span className="product-qa-item__badge" title={PRODUCT_QA_UI.PENDING_HINT}>
+              {PRODUCT_QA_UI.PENDING_BADGE}
+            </span>
+          ) : null}
+        </span>
       </header>
 
       <p className="product-qa-item__question">{question.text}</p>

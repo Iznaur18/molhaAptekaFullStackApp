@@ -19,6 +19,11 @@ import {
   loginPhoneOtpConfirmController,
   phoneBindRequestController,
   phoneBindConfirmController,
+  emailBindRequestController,
+  emailBindConfirmController,
+  passwordResetRequestController,
+  passwordResetConfirmController,
+  passwordChangeController,
 } from "../controllers/index.js";
 import { registerUserValidation, loginUserValidation } from "../validations/index.js";
 import {
@@ -28,6 +33,11 @@ import {
   loginPhoneOtpConfirmValidation,
   phoneBindRequestValidation,
   phoneBindConfirmValidation,
+  emailBindRequestValidation,
+  emailBindConfirmValidation,
+  passwordResetRequestValidation,
+  passwordResetConfirmValidation,
+  passwordChangeValidation,
 } from "../validations/user/phoneAuthValidation.js";
 import { verifyEmailWithCodeValidation } from "../validations/user/verifyEmailWithCodeValidation.js";
 import {
@@ -130,6 +140,39 @@ router.post(
   authRateLimiter,
   phoneBindConfirmValidation,
   phoneBindConfirmController,
+);
+router.post(
+  "/email/bind/request",
+  checkAuthMW,
+  emailVerificationResendRateLimiter,
+  emailBindRequestValidation,
+  emailBindRequestController,
+);
+router.post(
+  "/email/bind/confirm",
+  checkAuthMW,
+  authRateLimiter,
+  emailBindConfirmValidation,
+  emailBindConfirmController,
+);
+router.post(
+  "/password/reset/request",
+  emailVerificationResendRateLimiter,
+  passwordResetRequestValidation,
+  passwordResetRequestController,
+);
+router.post(
+  "/password/reset/confirm",
+  authRateLimiter,
+  passwordResetConfirmValidation,
+  passwordResetConfirmController,
+);
+router.post(
+  "/password/change",
+  checkAuthMW,
+  authRateLimiter,
+  passwordChangeValidation,
+  passwordChangeController,
 );
 router.post("/logout", logoutUserController);
 router.post(

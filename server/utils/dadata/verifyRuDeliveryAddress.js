@@ -58,6 +58,24 @@ function pickStructuredFromCleaned(cleaned) {
 }
 
 /**
+ * @param {string} line
+ * @param {string} flatInput
+ */
+function softAcceptVerifiedAddress(line, flatInput) {
+  return {
+    displayAddress: line,
+    flat: flatInput,
+    fiasId: "",
+    geo: null,
+    city: "",
+    district: "",
+    street: "",
+    house: "",
+    regionCode: null,
+  };
+}
+
+/**
  * @param {{ addressLine: string; flat?: string }} params
  * @returns {Promise<{
  *   displayAddress: string;
@@ -76,7 +94,7 @@ export async function verifyRuDeliveryAddress({ addressLine, flat = "" }) {
   const flatInput = String(flat ?? "").trim();
 
   if (line.length === 0) {
-    throw new Error("Укажите адрес из подсказок");
+    throw new Error("Укажите адрес доставки");
   }
   if (line.length > ADDRESS_LINE_MAX_LENGTH) {
     throw new Error(`Адрес не длиннее ${ADDRESS_LINE_MAX_LENGTH} символов`);
@@ -86,20 +104,17 @@ export async function verifyRuDeliveryAddress({ addressLine, flat = "" }) {
   }
 
   if (!isDadataConfigured()) {
-    return {
-      displayAddress: line,
-      flat: flatInput,
-      fiasId: "",
-      geo: null,
-      city: "",
-      district: "",
-      street: "",
-      house: "",
-      regionCode: null,
-    };
+    return softAcceptVerifiedAddress(line, flatInput);
   }
 
-  const cleaned = await cleanRuAddress(buildAddressQueryForClean(line, flatInput));
+  let cleaned;
+  try {
+    cleaned = await cleanRuAddress(buildAddressQueryForClean(line, flatInput));
+  } catch {
+    // DaData clean недоступен — не блокируем заказ, принимаем введённую строку.
+    return softAcceptVerifiedAddress(line, flatInput);
+  }
+
   const cleanedFlat = pickFlatFromCleaned(cleaned) ?? flatInput;
 
   // Clean часто даёт qc_complete=5 / qc_geo=2 даже при валидном house_fias_id (FIAS).

@@ -65,17 +65,17 @@ function isSystemDark() {
 
 /**
  * @param {ThemePreference} preference
- * @returns {"light" | "dark"}
+ * @returns {"light" | "dark" | "custom"}
  */
 function resolveScheme(preference) {
-  if (preference === "light" || preference === "dark") {
+  if (preference === "light" || preference === "dark" || preference === "custom") {
     return preference;
   }
   return isSystemDark() ? "dark" : "light";
 }
 
 /**
- * @param {"light" | "dark"} scheme
+ * @param {"light" | "dark" | "custom"} scheme
  */
 function applyThemeToRoot(scheme) {
   if (typeof document === "undefined") {
@@ -93,7 +93,8 @@ function applyThemeToRoot(scheme) {
   }
 
   document.documentElement.dataset.theme = scheme;
-  rootStyle.colorScheme = scheme;
+  // UA color-scheme only understands light|dark; custom is light-based.
+  rootStyle.colorScheme = scheme === "dark" ? "dark" : "light";
 
   const bg = theme.colors.bg;
   if (typeof bg === "string" && bg.trim()) {

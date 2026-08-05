@@ -25,17 +25,21 @@ type BuildCatalogSubcategoryPickerTilesParams = {
   parent: { id: string; labelRu: string };
   categories: ProductCategoryChildNode[];
   displays: ProductCategoryDisplayFromApi[];
+  includeViewAll?: boolean;
 };
 
 export const buildCatalogSubcategoryPickerTiles = ({
   parent,
   categories,
   displays,
+  includeViewAll = true,
 }: BuildCatalogSubcategoryPickerTilesParams): CatalogSubcategoryPickerTile[] => {
   const overridesById = mapCategoryDisplaysById(displays);
 
-  const tiles: CatalogSubcategoryPickerTile[] = [
-    {
+  const tiles: CatalogSubcategoryPickerTile[] = [];
+
+  if (includeViewAll) {
+    tiles.push({
       key: `view-all:${parent.id}`,
       kind: "view-all",
       categoryId: parent.id,
@@ -44,8 +48,8 @@ export const buildCatalogSubcategoryPickerTiles = ({
       isCustomLabel: false,
       isCustomImage: false,
       isEditable: false,
-    },
-  ];
+    });
+  }
 
   for (const node of categories) {
     const override = overridesById.get(node.id);

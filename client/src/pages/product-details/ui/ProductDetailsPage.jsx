@@ -13,16 +13,13 @@ import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetails
 import { productReportQueryKeys } from "../../../entities/product-report/model/productReportQueryKeys.js";
 import { useMyProductReportStatusQuery } from "../../../entities/product-report/model/useMyProductReportStatusQuery.js";
 import { ReportProductModal } from "../../../entities/product-report/ui/ReportProductModal.jsx";
-import {
-  API_CLIENT_UI,
-  MY_ORDERS_PAGE_UI,
-  PRODUCT_REPORT_MODAL_UI,
-} from "../../../shared/config/appUiCopy.js";
+import { API_CLIENT_UI, PRODUCT_REPORT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { resolveCatalogDetailsShowAddToCart } from "../../../widgets/app-shell/lib/resolveCatalogDetailsShowAddToCart.js";
 import { useAppShellStateContext } from "../../../widgets/app-shell/model/AppShellStateContext.jsx";
 
 import "./ProductDetailsPage.css";
+import { ProductDetailsPageSkeleton } from "./ProductDetailsPageSkeleton.jsx";
 
 function navigateBackOrHome(navigate) {
   if (typeof window !== "undefined" && window.history.length > 1) {
@@ -172,11 +169,7 @@ export function ProductDetailsPage() {
   }
 
   if (productQuery.isPending) {
-    return (
-      <p className="product-details-page__state" role="status">
-        {MY_ORDERS_PAGE_UI.PRODUCT_DETAILS_LOADING}
-      </p>
-    );
+    return <ProductDetailsPageSkeleton />;
   }
 
   if (productQuery.isError || !product) {

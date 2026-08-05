@@ -7,12 +7,8 @@ import {
 import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
 import { normalizeUploadUrlForStorage } from "@/shared/lib";
 
-import {
-  birthDateIsoDateToApiValue,
-  parseBirthDateInputToIsoDate,
-} from "./birthDateInputMask";
+import { birthDateIsoDateToApiValue, parseBirthDateInputToIsoDate } from "./birthDateInputMask";
 import { getUserBackgroundFocus } from "./profileImageFocus";
-import { normalizeRuPhoneInput } from "./ruPhone";
 import { EMPTY_DELIVERY_ADDRESS, type EditProfileFormState } from "./mapUserToEditProfileForm";
 import { serializeUserBackground } from "./userBackgroundValue";
 
@@ -67,13 +63,7 @@ export const buildPatchUserProfileBody = (
     body.userRegionCode = form.userRegionCode;
   }
 
-  const phoneRaw = form.userPhoneNumber.trim();
-  const initialPhone = initial.userPhoneNumber.trim();
-  if (phoneRaw !== "") {
-    body.userPhoneNumber = normalizeRuPhoneInput(phoneRaw);
-  } else if (initialPhone !== "") {
-    body.userPhoneNumber = null;
-  }
+  // Телефон владельца — только через /auth/phone/bind/* (не через PATCH).
 
   if (form.notificationsEnabled !== initial.notificationsEnabled) {
     body.notificationsEnabled = form.notificationsEnabled;

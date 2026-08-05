@@ -7,6 +7,8 @@ import {
 import { errorRes, successRes } from "../../services/http/index.js";
 import { enqueueSendEmailVerification } from "../../queues/enqueueSendEmailVerification.js";
 import {
+  confirmEmailBindForUser,
+  requestEmailBindForUser,
   verifyEmailByCodeForUser,
   verifyEmailByToken,
 } from "../../services/auth/emailVerification.js";
@@ -67,4 +69,39 @@ export const verifyEmailWithCodeController = async (req, res) => {
   }
 
   return successRes(res, { message: EMAIL_VERIFICATION_SUCCESS_MESSAGE });
+};
+
+/** `POST /auth/email/bind/request` (auth) */
+export const emailBindRequestController = async (req, res) => {
+  try {
+    const result = await requestEmailBindForUser(req.userId, req.body.email);
+    return successRes(res, {
+      email: result.email,
+      message: EMAIL_VERIFICATION_SENT_MESSAGE,
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Не удалось отправить письмо";
+    if (message === "EMAIL_DELIVERY_UNAVAILABLE" || message.startsWith("EMAIL_DELIVERY_UNAVAILABLE")) {
+      return errorRes(res, 503, "Не удалось отправить письмо. Попробуйте позже");
+    }
+    return errorRes(res, 400, message);
+  }
+};
+
+/** `POST /auth/email/bind/confirm` (auth) */
+export const emailBindConfirmController = async (req, res) => {
+  try {
+    const result = await confirmEmailBindForUser(req.userId, req.body.code);
+    return successRes(res, {
+      email: result.email,
+      message: EMAIL_VERIFICATION_SUCCESS_MESSAGE,
+    });
+  } catch (error) {
+    return errorRes(
+      res,
+      400,
+      error instanceof Error ? error.message : EMAIL_VERIFICATION_INVALID_CODE_MESSAGE,
+    );
+  }
 };

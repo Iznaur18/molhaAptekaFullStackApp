@@ -1,4 +1,5 @@
 import { IS_REQUIRE_ADDRESS_FROM_DADATA_SUGGEST_ENABLED } from "../../../shared/config/featureFlags.js";
+import { isAddressServiceUnavailable } from "../api/addressServiceAvailability.js";
 import { ADDRESS_LINE_MAX_LENGTH } from "../model/constants.js";
 
 /**
@@ -14,7 +15,11 @@ export function validateRuDeliveryAddressForm(value, options = {}) {
     return required ? "Укажите адрес доставки" : null;
   }
 
-  if (IS_REQUIRE_ADDRESS_FROM_DADATA_SUGGEST_ENABLED && !value.selectedFromSuggest) {
+  const requireSuggest =
+    IS_REQUIRE_ADDRESS_FROM_DADATA_SUGGEST_ENABLED &&
+    !isAddressServiceUnavailable();
+
+  if (requireSuggest && !value.selectedFromSuggest) {
     return "Выберите адрес из списка подсказок";
   }
 

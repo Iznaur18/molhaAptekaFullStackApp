@@ -23,6 +23,14 @@ export const useUsersPageStyles = createThemedStyles((theme) => ({
   listFlex: {
     flex: 1,
   },
+  stateWrap: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "stretch",
+    gap: 14,
+    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    marginTop: 24,
+  },
   state: {
     textAlign: "center",
     marginTop: 24,

@@ -27,9 +27,21 @@ export function isRegisterPath(pathname) {
 /**
  * @param {string} pathname
  */
+export function isForgotPasswordPath(pathname) {
+  return normalizePathname(pathname) === "/forgot-password";
+}
+
+/**
+ * @param {string} pathname
+ */
 export function isAuthPagePath(pathname) {
-  return isLoginPath(pathname) || isRegisterPath(pathname);
+  return (
+    isLoginPath(pathname) ||
+    isRegisterPath(pathname) ||
+    isForgotPasswordPath(pathname)
+  );
 }
 
 export const AUTH_LOGIN_PATH = "/login";
 export const AUTH_REGISTER_PATH = "/register";
+export const AUTH_FORGOT_PASSWORD_PATH = "/forgot-password";

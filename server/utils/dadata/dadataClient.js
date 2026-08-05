@@ -61,17 +61,23 @@ export async function suggestRuAddresses(query) {
 /**
  * @param {number} lat
  * @param {number} lon
+ * @param {{ count?: number; radiusMeters?: number }} [options]
  * @returns {Promise<{ value: string; unrestricted_value: string; data: Record<string, unknown> }[]>}
  */
-export async function geolocateRuAddresses(lat, lon) {
+export async function geolocateRuAddresses(lat, lon, options = {}) {
+  const count = Number.isFinite(options.count) ? Number(options.count) : 1;
+  const radiusMeters = Number.isFinite(options.radiusMeters)
+    ? Number(options.radiusMeters)
+    : 100;
+
   const response = await fetch(GEOLOCATE_URL, {
     method: "POST",
     headers: getSuggestHeaders(),
     body: JSON.stringify({
       lat,
       lon,
-      count: 1,
-      radius_meters: 100,
+      count: Math.max(1, Math.min(count, DADATA_SUGGEST_COUNT)),
+      radius_meters: Math.max(1, radiusMeters),
     }),
   });
 

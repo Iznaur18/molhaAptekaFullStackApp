@@ -169,31 +169,95 @@
   color: var(--iz-color-text-secondary);
 }
 
+.edit-profile-modal__hint_error {
+  margin-top: 0.15rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-danger) 35%, transparent);
+  background: color-mix(in srgb, var(--iz-color-danger) 12%, var(--iz-color-surface));
+  color: var(--iz-color-danger);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.edit-profile-modal__hint_unverified {
+  color: var(--iz-color-danger);
+  font-weight: 600;
+}
+
 .edit-profile-modal__phone-bind {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  align-items: stretch;
+  gap: 0.65rem;
+  margin-top: 0.65rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-action) 28%, var(--iz-color-border));
+  border-radius: var(--iz-control-btn-radius, 0.7rem);
+  background: color-mix(in srgb, var(--iz-color-action) 9%, var(--iz-color-surface));
+}
+
+.edit-profile-modal__phone-bind .edit-profile-modal__hint {
+  margin-top: 0;
+}
+
+.edit-profile-modal__phone-bind .edit-profile-modal__input {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
 }
 
 .edit-profile-modal__secondary-btn {
-  align-self: flex-start;
-  border: 1px solid var(--iz-color-border-strong);
-  border-radius: 0.5rem;
-  background: var(--iz-color-surface);
-  color: var(--iz-color-text);
-  padding: 0.4rem 0.75rem;
-  font-size: 0.875rem;
+  box-sizing: border-box;
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: var(--iz-control-btn-padding-y, 0.75rem) var(--iz-control-btn-padding-x, 1.25rem);
+  border: var(--iz-border, 1px) solid var(--iz-color-action);
+  border-radius: var(--iz-control-btn-radius, 0.7rem);
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
+  font: inherit;
+  font-size: var(--iz-control-btn-font, 0.9375rem);
+  font-weight: var(--iz-control-btn-weight, 600);
+  line-height: var(--iz-leading-base, 1.35);
   cursor: pointer;
+  transition:
+    background var(--iz-transition-base, 0.15s ease),
+    border-color var(--iz-transition-base, 0.15s ease),
+    opacity var(--iz-transition-base, 0.15s ease),
+    transform var(--iz-transition-press, 0.1s ease);
+}
+
+.edit-profile-modal__secondary-btn:hover:not(:disabled) {
+  border-color: var(--iz-color-action-hover);
+  background: var(--iz-color-action-hover);
+}
+
+.edit-profile-modal__secondary-btn:active:not(:disabled) {
+  transform: scale(var(--iz-state-pressed-scale, 0.96));
 }
 
 .edit-profile-modal__secondary-btn:disabled {
-  opacity: 0.7;
+  opacity: 0.55;
   cursor: default;
 }
-  font-size: 0.78rem;
-  line-height: 1.35;
-  color: var(--iz-color-text-muted);
+
+.edit-profile-modal__secondary-btn--ghost {
+  border-color: var(--iz-color-border);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+}
+
+.edit-profile-modal__secondary-btn--ghost:hover:not(:disabled) {
+  border-color: var(--iz-color-border-strong);
+  background: var(--iz-color-surface-elevated);
 }
 
 .edit-profile-modal__word-meter {
@@ -218,6 +282,27 @@
 
 .edit-profile-modal__feedback {
   min-height: 1.25rem;
+}
+
+.edit-profile-modal__password-change {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--iz-color-surface-muted);
+}
+
+.edit-profile-modal__feedback--error {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--iz-color-danger);
+}
+
+.edit-profile-modal__feedback--ok {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--iz-color-success-text);
 }
 
 .edit-profile-modal__message {

@@ -95,5 +95,6 @@ setupAuthSessionInterceptors(apiClient, {
   shouldHandleAuthSuccessResponse: (path) =>
     path.includes("/auth/login") ||
     path.includes("/auth/register") ||
-    path.includes("/auth/refresh"),
+    path.includes("/auth/refresh") ||
+    path.includes("/auth/password/change"),
 });

@@ -94,7 +94,7 @@
   padding: 12px 14px;
   border: 1px solid var(--iz-color-border-strong, #d1d5db);
   border-radius: var(--iz-control-btn-radius, 10px);
-  background: var(--iz-color-surface);
+  background: var(--iz-color-surface-muted, #f3f4f6);
   font: inherit;
   font-size: 15px;
   color: var(--iz-color-text);
@@ -121,6 +121,13 @@
   margin: 0;
   font-size: 14px;
   color: var(--iz-color-danger);
+}
+
+.auth-page__notice {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--iz-color-text-muted);
 }
 
 .auth-page__success {

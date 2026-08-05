@@ -56,11 +56,13 @@ describe("create product with productListingOrigin", () => {
     }
 
     expect(prepared.createBody?.productListingOrigin).toBe("own");
+    expect(prepared.createBody?.productIsOriginal).toBe(false);
 
     const parsed = createProductBodySchema.safeParse(prepared.createBody);
     expect(parsed.success).toBe(true);
     if (parsed.success) {
       expect(parsed.data.productListingOrigin).toBe("own");
+      expect(parsed.data.productIsOriginal).toBe(false);
     }
   });
 });

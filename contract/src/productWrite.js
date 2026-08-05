@@ -238,7 +238,7 @@ export const createProductBodySchema = z
       .max(PRODUCT_CHARACTERISTICS_MAX_ITEMS)
       .optional(),
     productListingOrigin: productListingOriginSchema,
-    productIsOriginal: z.coerce.boolean(),
+    productIsOriginal: z.coerce.boolean().optional().default(false),
     productReturnEnabled: z.coerce.boolean().optional(),
     productReturnTerms: z
       .array(productReturnTermSchema)

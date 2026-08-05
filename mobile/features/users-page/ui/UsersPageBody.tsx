@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { FlatList, Text, View } from "react-native";
+import { useRouter } from "expo-router";
 import { excludeUsersPodiumFromList, rankUsersForPodium } from "@izibuy/shared-lib";
 
 import type { UserSearchListItem } from "@/entities/user/api/fetchUsersSearchPage";
@@ -12,8 +13,18 @@ import { USERS_PAGE_UI } from "@/shared/config";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useUsersPageStyles } from "@/shared/theme/usersPageStyles";
 import { useUsersPagePodiumListStyles } from "@/shared/theme/usersPodiumStyles";
+import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
+
+const isAuthSessionMessage = (message: string) => {
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes("авторизован") ||
+    normalized.includes("токен") ||
+    normalized.includes("refresh token")
+  );
+};
 
 type UsersPageBodyProps = {
   phase: "loading" | "success" | "error";
@@ -38,6 +49,7 @@ export const UsersPageBody = ({
   isRefetching = false,
   canRefresh = true,
 }: UsersPageBodyProps) => {
+  const router = useRouter();
   const styles = useUsersPageStyles();
   const podiumListStyles = useUsersPagePodiumListStyles();
   const { contentPaddingBottom } = useScreenLayout();
@@ -98,6 +110,19 @@ export const UsersPageBody = ({
   }
 
   if (phase === "error") {
+    if (isAuthSessionMessage(error || "")) {
+      return (
+        <View style={[styles.stateWrap, { paddingBottom: contentPaddingBottom }]}>
+          <Text style={[styles.state, { marginTop: 0, paddingHorizontal: 0 }]}>
+            {USERS_PAGE_UI.LOGIN_HINT}
+          </Text>
+          <AppButton
+            label={USERS_PAGE_UI.LOGIN_BUTTON}
+            onPress={() => router.push("/(auth)/login")}
+          />
+        </View>
+      );
+    }
     return (
       <ScreenErrorState
         message={error || USERS_PAGE_UI.FETCH_FALLBACK}

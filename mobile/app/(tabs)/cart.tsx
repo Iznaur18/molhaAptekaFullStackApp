@@ -10,6 +10,7 @@ import {
   doProductsSupportSellerDelivery,
 } from "@molha/api-contract";
 
+import { buildCheckoutPickupLocations } from "@/entities/cart/lib/buildCheckoutPickupLocations";
 import { getCartLineExclusionReason } from "@/entities/cart/lib/getCartLineExclusionReason";
 import { groupCartLinesByFulfillment } from "@/entities/cart/lib/groupCartLinesByFulfillment";
 import { selectCartCheckoutSummary } from "@/entities/cart/lib/selectCartCheckoutSummary";
@@ -129,21 +130,14 @@ export default function CartScreen() {
 
   const canCheckoutActive = activeSummary.selectedLines.length > 0;
 
-  const pickupAddressSummary = useMemo(() => {
+  const pickupLocations = useMemo(() => {
     if (auctionCheckoutBid) {
       const product = (productsQuery.products ?? []).find(
         (item) => String(item._id) === String(auctionCheckoutBid.productId),
       );
-      return String(product?.productPickupAddress ?? "").trim();
+      return buildCheckoutPickupLocations([{ product }]);
     }
-    const addresses: string[] = [];
-    for (const line of activeSummary.selectedLines) {
-      const address = String(line.product?.productPickupAddress ?? "").trim();
-      if (address && !addresses.includes(address)) {
-        addresses.push(address);
-      }
-    }
-    return addresses.join("; ");
+    return buildCheckoutPickupLocations(activeSummary.selectedLines);
   }, [auctionCheckoutBid, activeSummary.selectedLines, productsQuery.products]);
 
   const deliveryAvailable = useMemo(() => {
@@ -381,6 +375,7 @@ export default function CartScreen() {
             canCheckout={deliverySummary.selectedLines.length > 0}
             onCheckout={() => openSectionCheckout(CART_FULFILLMENT_SECTION_DELIVERY)}
             checkoutDisabled={isUpdating}
+            showDeliveryFeeNote
           />
         </ScrollView>
       </View>
@@ -388,7 +383,7 @@ export default function CartScreen() {
       <CheckoutSheetModal
         visible={checkoutSection != null}
         defaultUser={sessionQuery.data?.user}
-        pickupAddressSummary={pickupAddressSummary}
+        pickupLocations={pickupLocations}
         deliveryAvailable={deliveryAvailable}
         pickupAvailable={pickupAvailable}
         isSubmitting={submitState.isSubmitting}
@@ -402,7 +397,7 @@ export default function CartScreen() {
       <CheckoutSheetModal
         visible={auctionCheckoutBid != null}
         defaultUser={sessionQuery.data?.user}
-        pickupAddressSummary={pickupAddressSummary}
+        pickupLocations={pickupLocations}
         deliveryAvailable={deliveryAvailable}
         pickupAvailable={pickupAvailable}
         isSubmitting={submitState.isSubmitting}

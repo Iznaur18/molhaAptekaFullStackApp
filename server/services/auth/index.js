@@ -27,3 +27,8 @@ export {
   sendEmailVerificationForUser,
 } from "./emailVerification.js";
 export { checkUserEmailVerified } from "./assertEmailVerified.js";
+export {
+  requestPasswordReset,
+  confirmPasswordReset,
+  changePasswordForUser,
+} from "./passwordReset.js";

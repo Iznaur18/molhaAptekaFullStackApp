@@ -4,6 +4,7 @@ import Animated from "react-native-reanimated";
 
 import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
+import type { CheckoutPickupLocation } from "@/entities/cart/lib/buildCheckoutPickupLocations";
 import { CheckoutForm } from "@/features/checkout/ui/CheckoutForm";
 import { CHECKOUT_FORM_UI, CART_PAGE_UI } from "@/shared/config";
 import { useAdminEditModalAnimation } from "@/shared/model/useAdminEditModalAnimation";
@@ -14,7 +15,7 @@ import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdr
 type CheckoutSheetModalProps = {
   visible: boolean;
   defaultUser?: Record<string, unknown> | null;
-  pickupAddressSummary?: string;
+  pickupLocations?: CheckoutPickupLocation[];
   deliveryAvailable?: boolean;
   pickupAvailable?: boolean;
   isSubmitting: boolean;
@@ -33,7 +34,7 @@ type CheckoutSheetModalProps = {
 export const CheckoutSheetModal = ({
   visible,
   defaultUser,
-  pickupAddressSummary = "",
+  pickupLocations = [],
   deliveryAvailable = false,
   pickupAvailable = true,
   isSubmitting,
@@ -89,7 +90,7 @@ export const CheckoutSheetModal = ({
             <CheckoutForm
               key={defaultUser?._id != null ? String(defaultUser._id) : "guest"}
               defaultUser={defaultUser}
-              pickupAddressSummary={pickupAddressSummary}
+              pickupLocations={pickupLocations}
               deliveryAvailable={deliveryAvailable}
               pickupAvailable={pickupAvailable}
               isSubmitting={isSubmitting}

@@ -271,10 +271,12 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
   counterpartyPhone: {
     fontSize: 12,
     color: theme.colors.link,
+    fontWeight: "600",
   },
   counterpartyPhoneText: {
     fontSize: 12,
     color: theme.colors.textSecondary,
+    fontWeight: "600",
   },
   detailsFold: {
     marginTop: theme.spacing[2],

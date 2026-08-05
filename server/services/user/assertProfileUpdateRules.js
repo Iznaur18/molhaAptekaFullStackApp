@@ -14,6 +14,7 @@ import {
 import { normalizeUserBackgroundForSave } from "./userBackgroundValue.js";
 
 import { EMPTY_PROFILE_UPDATE_MESSAGE } from "./updateProfileConstants.js";
+import { PHONE_CHANGE_REQUIRES_OTP_MESSAGE } from "../../constants/phoneVerificationConstants.js";
 
 const throwRuleError = (error, fallback, statusCode = 400) => {
   throw new AppError(statusCode, error instanceof Error ? error.message : fallback);
@@ -89,6 +90,16 @@ const assertLoyaltyChangeAllowed = (updateData, editorContext) => {
   }
   if (isCurrentUserOwner) {
     throw new AppError(403, "Нельзя менять свои баллы лояльности");
+  }
+};
+
+const assertOwnerPhoneChangeRequiresOtp = (updateData, editorContext) => {
+  const { isCurrentUserOwner } = editorContext;
+  if (
+    isCurrentUserOwner &&
+    Object.prototype.hasOwnProperty.call(updateData, "userPhoneNumber")
+  ) {
+    throw new AppError(403, PHONE_CHANGE_REQUIRES_OTP_MESSAGE);
   }
 };
 
@@ -217,6 +228,7 @@ export async function assertProfileUpdateRules({
 
   await assertRoleChangeAllowed(updateData, isCurrentUserAdmin, targetUserId);
   assertDiscountChangeAllowed(updateData, isCurrentUserAdmin);
+  assertOwnerPhoneChangeRequiresOtp(updateData, editorContext);
 
   const targetUserBeforeUpdate = await UserModel.findById(targetUserId)
     .select(

@@ -205,6 +205,13 @@ export default function LoginScreen() {
             />
             <Pressable
               style={styles.registerLink}
+              onPress={() => router.push("/(auth)/forgot-password")}
+              disabled={isLoading}
+            >
+              <Text style={styles.registerLinkText}>{AUTH_UI.FORGOT_PASSWORD_LINK}</Text>
+            </Pressable>
+            <Pressable
+              style={styles.registerLink}
               onPress={() => router.push("/(auth)/register")}
               disabled={isLoading}
             >

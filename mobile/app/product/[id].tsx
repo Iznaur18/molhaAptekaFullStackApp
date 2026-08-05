@@ -46,6 +46,7 @@ import {
   isProductSimilarScrollNearEnd,
   ProductSimilarTab,
 } from "@/features/product-detail/ui/ProductSimilarTab";
+import { ProductDetailsSkeleton } from "@/features/product-detail/ui/ProductDetailsSkeleton";
 import { ProductPromotionModal } from "@/features/product-promotion/ui/ProductPromotionModal";
 import { SquircleView } from "@/shared/ui/SquircleView";
 import { useProductPromotionManageSupport } from "@/features/product-promotion/model/useProductPromotionManageSupport";
@@ -64,7 +65,7 @@ import { useVisualViewportKeyboardBottomInset } from "@/shared/lib/useVisualView
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { PRODUCT_DETAIL_PURCHASE_DOCK_TOP_RADIUS, useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { AppButton } from "@/shared/ui/AppButton";
-import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
+import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
 export default function ProductDetailScreen() {
   const router = useRouter();
@@ -98,6 +99,7 @@ export default function ProductDetailScreen() {
   const [manageErrorMessage, setManageErrorMessage] = useState("");
   const [isAvailabilityTogglePending, setIsAvailabilityTogglePending] = useState(false);
   const [isAuctionTogglePending, setIsAuctionTogglePending] = useState(false);
+  const [isOriginalityTogglePending, setIsOriginalityTogglePending] = useState(false);
   const [isWholesaleTogglePending, setIsWholesaleTogglePending] = useState(false);
   const [isAffiliateTogglePending, setIsAffiliateTogglePending] = useState(false);
   const [isInstallmentTogglePending, setIsInstallmentTogglePending] = useState(false);
@@ -251,7 +253,7 @@ export default function ProductDetailScreen() {
   );
 
   if (productQuery.isPending) {
-    return <ScreenLoadingState />;
+    return <ProductDetailsSkeleton />;
   }
 
   if (productQuery.isError || !product) {
@@ -404,6 +406,27 @@ export default function ProductDetailScreen() {
       );
     } finally {
       setIsAuctionTogglePending(false);
+    }
+  };
+
+  const handleSetProductOriginality = async (
+    targetProductId: string,
+    isOriginal: boolean,
+  ) => {
+    setIsOriginalityTogglePending(true);
+    setManageErrorMessage("");
+    try {
+      const updated = await patchMutation.mutateAsync({
+        productId: targetProductId,
+        body: { productIsOriginal: isOriginal },
+      });
+      syncPromotionProduct(updated as Record<string, unknown> & { _id: string });
+    } catch (error) {
+      setManageErrorMessage(
+        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+      );
+    } finally {
+      setIsOriginalityTogglePending(false);
     }
   };
 
@@ -710,6 +733,7 @@ export default function ProductDetailScreen() {
         onSubmit={handleSubmitPromotion}
         onSetProductAvailability={isOwnProduct ? handleSetMyProductAvailability : undefined}
         onSetProductAuction={isOwnProduct ? handleSetProductAuction : undefined}
+        onSetProductOriginality={isOwnProduct ? handleSetProductOriginality : undefined}
         onSetProductWholesale={isOwnProduct ? handleSetProductWholesale : undefined}
         onSetProductAffiliate={isOwnProduct ? handleSetProductAffiliate : undefined}
         onSetProductInstallment={isOwnProduct ? handleSetProductInstallment : undefined}
@@ -735,6 +759,7 @@ export default function ProductDetailScreen() {
         }
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
+        isOriginalityTogglePending={isOriginalityTogglePending}
         isWholesaleTogglePending={isWholesaleTogglePending}
         isAffiliateTogglePending={isAffiliateTogglePending}
         isInstallmentTogglePending={isInstallmentTogglePending}

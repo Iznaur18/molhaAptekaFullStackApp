@@ -43,6 +43,7 @@ import {
 } from "@/entities/product/lib/productReturnTermRows";
 import {
   isProductListingOrigin,
+  PRODUCT_LISTING_ORIGIN_OPTIONS,
   type ProductListingOrigin,
 } from "@/entities/product/lib/productListingOrigin";
 import { ProductListingOriginChips } from "@/entities/product/ui/ProductListingOriginChips";
@@ -75,9 +76,9 @@ const STEP_COPY: Record<WizardStepId, { title: string; subtitle: string; label: 
     label: "О товаре",
   },
   originality: {
-    title: "Оригинал",
+    title: "Статус товара",
     subtitle: "",
-    label: "Оригинал",
+    label: "Статус",
   },
   media: {
     title: "Фото и видео",
@@ -118,7 +119,7 @@ type CharacteristicRow = { id: number; key: string; value: string };
 type WizardForm = {
   productName: string;
   productListingOrigin: ProductListingOrigin | null;
-  productIsOriginal: boolean | null;
+  productIsOriginal: boolean;
   productDescription: string;
   characteristicRows: CharacteristicRow[];
   imageUrls: string[];
@@ -147,7 +148,7 @@ const DEFAULT_PRODUCT_CATEGORY = "electronics";
 const INITIAL_FORM: WizardForm = {
   productName: "",
   productListingOrigin: null,
-  productIsOriginal: null,
+  productIsOriginal: false,
   productDescription: "",
   characteristicRows: [],
   imageUrls: [],
@@ -351,7 +352,7 @@ export const CreateProductScreen = () => {
       await createMutation.mutateAsync({
         productName: form.productName.trim(),
         productListingOrigin: form.productListingOrigin!,
-        productIsOriginal: form.productIsOriginal === true,
+        productIsOriginal: false,
         productDescription: form.productDescription.trim(),
         productPrice: price,
         productOldPrice: oldPrice ?? undefined,
@@ -814,68 +815,19 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
 // ─── OriginalityStep ──────────────────────────────────────────────────────────
 
 function OriginalityStep({ form, setForm, disabled, theme, styles }: StepProps) {
-  const yesSelected = form.productIsOriginal === true;
-  const noSelected = form.productIsOriginal === false;
-
   return (
     <View style={styles.section}>
+      <Text style={[styles.lead, { color: theme.colors.textSecondary }]}>
+        {CREATE_PRODUCT_UI.WIZARD_STEP_ORIGINALITY_SUBTITLE}
+      </Text>
       <ProductListingOriginChips
         value={form.productListingOrigin}
         onChange={(productListingOrigin) =>
           setForm((prev) => ({ ...prev, productListingOrigin }))
         }
         disabled={disabled}
+        showLabel={false}
       />
-
-      <Text style={[styles.lead, { color: theme.colors.textSecondary }]}>
-        {CREATE_PRODUCT_UI.WIZARD_STEP_ORIGINALITY_SUBTITLE}
-      </Text>
-      <Text style={[styles.lead, { color: theme.colors.textSecondary }]}>
-        {CREATE_PRODUCT_UI.ORIGINALITY_STATEMENT}
-      </Text>
-
-      <View style={styles.returnChoiceRow}>
-        <Pressable
-          disabled={disabled}
-          onPress={() => setForm((prev) => ({ ...prev, productIsOriginal: true }))}
-          style={[
-            styles.returnChoiceChip,
-            {
-              borderColor: yesSelected ? theme.colors.action : theme.colors.border,
-              backgroundColor: yesSelected ? theme.colors.action : theme.colors.surface,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.returnChoiceChipText,
-              { color: yesSelected ? theme.colors.onContrast : theme.colors.text },
-            ]}
-          >
-            {CREATE_PRODUCT_UI.ORIGINALITY_YES}
-          </Text>
-        </Pressable>
-        <Pressable
-          disabled={disabled}
-          onPress={() => setForm((prev) => ({ ...prev, productIsOriginal: false }))}
-          style={[
-            styles.returnChoiceChip,
-            {
-              borderColor: noSelected ? theme.colors.action : theme.colors.border,
-              backgroundColor: noSelected ? theme.colors.action : theme.colors.surface,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.returnChoiceChipText,
-              { color: noSelected ? theme.colors.onContrast : theme.colors.text },
-            ]}
-          >
-            {CREATE_PRODUCT_UI.ORIGINALITY_NO}
-          </Text>
-        </Pressable>
-      </View>
     </View>
   );
 }
@@ -1305,14 +1257,13 @@ function ReviewStep({
     { label: "Название", value: form.productName.trim() || "—", stepIndex: 0 },
     { label: "Описание", value: form.productDescription.trim() || "—", stepIndex: 0, multiline: true },
     {
-      label: CREATE_PRODUCT_UI.LABEL_ORIGINALITY,
-      value:
-        form.productIsOriginal === true
-          ? CREATE_PRODUCT_UI.ORIGINALITY_YES
-          : form.productIsOriginal === false
-            ? CREATE_PRODUCT_UI.ORIGINALITY_NO
-            : "—",
-      stepIndex: 1,
+      label: CREATE_PRODUCT_UI.LABEL_LISTING_ORIGIN,
+      value: isProductListingOrigin(form.productListingOrigin)
+        ? (PRODUCT_LISTING_ORIGIN_OPTIONS.find(
+            (option) => option.value === form.productListingOrigin,
+          )?.label ?? "—")
+        : "—",
+      stepIndex: 2,
     },
     {
       label: "Фото и видео",
@@ -1320,7 +1271,7 @@ function ReviewStep({
         imageCount > 0
           ? `${imageCount} фото${form.productPreviewVideoUrl.trim() ? " + видео" : ""}`
           : form.productPreviewVideoUrl.trim() ? "Только видео" : "Нет фото",
-      stepIndex: 2,
+      stepIndex: 3,
     },
     { label: "Категория", value: form.productCategoryLabel || "—", stepIndex: 3 },
     {

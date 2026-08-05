@@ -48,7 +48,7 @@ describe("fetchAddressSuggestions", () => {
     await expect(fetchAddressSuggestions("Москва")).rejects.toThrow("DaData недоступен");
   });
 
-  it("returns empty list on 503 and stops further requests", async () => {
+  it("returns empty list on 503 and stops further requests until reset/TTL", async () => {
     postMock.mockRejectedValue({
       response: { status: 503, data: { message: "unavailable" } },
     });
@@ -56,5 +56,12 @@ describe("fetchAddressSuggestions", () => {
     await expect(fetchAddressSuggestions("Москва")).resolves.toEqual([]);
     await expect(fetchAddressSuggestions("СПб")).resolves.toEqual([]);
     expect(postMock).toHaveBeenCalledTimes(1);
+
+    resetAddressSuggestUnavailableForTests();
+    postMock.mockResolvedValue({
+      data: { success: true, data: { suggestions: [] } },
+    });
+    await expect(fetchAddressSuggestions("Казань")).resolves.toEqual([]);
+    expect(postMock).toHaveBeenCalledTimes(2);
   });
 });

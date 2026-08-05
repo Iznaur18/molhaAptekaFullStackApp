@@ -26,6 +26,10 @@ export const PHONE_NOT_SET_MESSAGE = "Укажите номер телефона
 
 export const PHONE_TAKEN_MESSAGE = "Этот номер телефона уже занят";
 
+/** Владелец профиля: смена/очистка телефона только через `/auth/phone/bind/*`. */
+export const PHONE_CHANGE_REQUIRES_OTP_MESSAGE =
+  "Смена телефона доступна только после подтверждения SMS-кодом";
+
 export const SMS_DELIVERY_UNAVAILABLE_MESSAGE =
   "Не удалось отправить SMS. Попробуйте позже";
 

@@ -462,6 +462,47 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     lineHeight: 22,
     color: theme.colors.text,
   },
+  pickupAddressError: {
+    color: theme.colors.danger,
+  },
+  pickupHint: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.textMuted,
+    marginBottom: 4,
+  },
+  pickupList: {
+    gap: 10,
+  },
+  pickupItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+  },
+  pickupIndex: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    marginTop: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.action,
+  },
+  pickupIndexText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#fff",
+    lineHeight: 14,
+  },
+  pickupBody: {
+    flex: 1,
+    gap: 2,
+  },
+  pickupProducts: {
+    fontSize: 13,
+    lineHeight: 17,
+    color: theme.colors.link,
+  },
   legend: {
     fontSize: 14,
     fontWeight: "600",

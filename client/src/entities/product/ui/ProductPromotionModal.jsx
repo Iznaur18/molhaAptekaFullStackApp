@@ -41,6 +41,10 @@ const PRODUCT_PROMOTION_MODAL_TITLE_ID = "product-promotion-modal-title";
  *     productId: string,
  *     productQaEnabled: boolean,
  *   ) => void | Promise<void>;
+ *   onSetProductOriginality?: (
+ *     productId: string,
+ *     productIsOriginal: boolean,
+ *   ) => void | Promise<void>;
  *   onSetProductWholesale?: (
  *     productId: string,
  *     productWholesaleEnabled: boolean,
@@ -60,6 +64,7 @@ const PRODUCT_PROMOTION_MODAL_TITLE_ID = "product-promotion-modal-title";
  *   isAvailabilityTogglePending?: boolean;
  *   isAuctionTogglePending?: boolean;
  *   isQaTogglePending?: boolean;
+ *   isOriginalityTogglePending?: boolean;
  *   isWholesaleTogglePending?: boolean;
  *   isAffiliateTogglePending?: boolean;
  *   isInstallmentTogglePending?: boolean;
@@ -92,6 +97,7 @@ export function ProductPromotionModal({
   onSetProductAvailability,
   onSetProductAuction,
   onSetProductQa,
+  onSetProductOriginality,
   onSetProductWholesale,
   onSetProductAffiliate,
   onSetProductInstallment,
@@ -101,6 +107,7 @@ export function ProductPromotionModal({
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
   isQaTogglePending = false,
+  isOriginalityTogglePending = false,
   isWholesaleTogglePending = false,
   isAffiliateTogglePending = false,
   isInstallmentTogglePending = false,
@@ -120,6 +127,7 @@ export function ProductPromotionModal({
     product != null &&
     (typeof onSetProductAvailability === "function" ||
       typeof onSetProductAuction === "function" ||
+      typeof onSetProductOriginality === "function" ||
       typeof onDeleteProduct === "function");
   const { activeTabId, setActiveTabId, isPromotionTab } = useProductPromotionModalTab({
     isOpen,
@@ -265,6 +273,7 @@ export function ProductPromotionModal({
             onSetAvailability={onSetProductAvailability}
             onSetAuction={onSetProductAuction}
             onSetQa={onSetProductQa}
+            onSetOriginality={onSetProductOriginality}
             onSetWholesale={onSetProductWholesale}
             onSetAffiliate={onSetProductAffiliate}
             onSetInstallment={onSetProductInstallment}
@@ -272,6 +281,7 @@ export function ProductPromotionModal({
             isAvailabilityTogglePending={isAvailabilityTogglePending}
             isAuctionTogglePending={isAuctionTogglePending}
             isQaTogglePending={isQaTogglePending}
+            isOriginalityTogglePending={isOriginalityTogglePending}
             isWholesaleTogglePending={isWholesaleTogglePending}
             isAffiliateTogglePending={isAffiliateTogglePending}
             isInstallmentTogglePending={isInstallmentTogglePending}

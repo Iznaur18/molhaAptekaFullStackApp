@@ -8,6 +8,7 @@ import {
   doProductsSupportSellerDelivery,
 } from "@molha/api-contract";
 
+import { buildCheckoutPickupLocations } from "../../../entities/cart/lib/buildCheckoutPickupLocations.js";
 import { getCartLineExclusionReason } from "../../../entities/cart/lib/getCartLineExclusionReason.js";
 import { groupCartLinesByFulfillment } from "../../../entities/cart/lib/groupCartLinesByFulfillment.js";
 import { selectCartCheckoutSummary } from "../../../entities/cart/lib/selectCartCheckoutSummary.js";
@@ -161,21 +162,14 @@ export function CartPage({
   const isCheckoutSheetOpen =
     checkoutSection != null || auctionCheckoutBid != null;
 
-  const pickupAddressSummary = useMemo(() => {
+  const pickupLocations = useMemo(() => {
     if (auctionCheckoutBid) {
       const product = (productsQuery.data ?? []).find(
         (item) => String(item._id) === String(auctionCheckoutBid.productId),
       );
-      return String(product?.productPickupAddress ?? "").trim();
+      return buildCheckoutPickupLocations([{ product }]);
     }
-    const addresses = [];
-    for (const line of activeSummary.selectedLines) {
-      const address = String(line.product?.productPickupAddress ?? "").trim();
-      if (address && !addresses.includes(address)) {
-        addresses.push(address);
-      }
-    }
-    return addresses.join("; ");
+    return buildCheckoutPickupLocations(activeSummary.selectedLines);
   }, [auctionCheckoutBid, activeSummary.selectedLines, productsQuery.data]);
 
   const deliveryAvailable = useMemo(() => {
@@ -384,6 +378,7 @@ export function CartPage({
           onCheckout={() =>
             openSectionCheckout(CART_FULFILLMENT_SECTION_DELIVERY)
           }
+          showDeliveryFeeNote
         />
       </div>
 
@@ -391,7 +386,7 @@ export function CartPage({
         isOpen={isCheckoutSheetOpen}
         onClose={closeCheckoutSheet}
         defaultDeliveryAddress={defaultAddress}
-        pickupAddressSummary={pickupAddressSummary}
+        pickupLocations={pickupLocations}
         deliveryAvailable={deliveryAvailable}
         pickupAvailable={pickupAvailable}
         isSubmitting={submitState.isSubmitting}

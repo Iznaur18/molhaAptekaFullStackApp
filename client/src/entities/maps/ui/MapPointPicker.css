@@ -1,0 +1,49 @@
+.map-point-picker {
+  width: 100%;
+  height: 220px;
+  border-radius: 0.65rem;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--iz-color-ink) 6%, var(--iz-color-surface));
+  border: 1px solid color-mix(in srgb, var(--iz-color-border) 85%, transparent);
+  z-index: 0;
+}
+
+.map-point-picker--fullscreen {
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  border-radius: 0;
+  border: none;
+}
+
+.map-point-picker .leaflet-container {
+  width: 100%;
+  height: 100%;
+  font: inherit;
+  background: #e8f0ea;
+}
+
+.map-point-picker .leaflet-control-attribution {
+  font-size: 10px;
+  background: color-mix(in srgb, #fff 88%, transparent);
+  max-width: 60%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.map-point-picker__marker {
+  background: transparent;
+  border: none;
+}
+
+.map-point-picker__pin {
+  display: block;
+  width: 32px;
+  height: 40px;
+  filter: drop-shadow(0 2px 4px rgb(15 23 42 / 28%));
+}
+
+.map-point-picker__pin svg {
+  display: block;
+}

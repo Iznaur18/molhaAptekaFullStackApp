@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 
 import { CART_STORAGE_KEY } from "../../../entities/order/model/constants.js";
+import { clearAllDataConfirmationFormDrafts } from "../../../entities/user-data-confirmation/lib/dataConfirmationFormDraftStorage.js";
 import { useLogoutMutation } from "../../../entities/user/model/useLogoutMutation.js";
 import { EMPTY_MY_PROFILE_PAGE } from "../lib/catalogShellConstants.js";
 
@@ -26,6 +27,7 @@ export const useHomeLogout = ({
     } catch {
       // storage недоступен
     }
+    clearAllDataConfirmationFormDrafts();
     clearAuthSession();
     setMyProfilePage(EMPTY_MY_PROFILE_PAGE);
     clearInAppNotifications();

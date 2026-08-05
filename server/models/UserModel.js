@@ -64,6 +64,14 @@ const UserSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
+    /** Email, на который ушёл текущий код (привязка / смена). */
+    pendingEmail: {
+      type: String,
+      lowercase: true,
+      trim: true,
+      select: false,
+      default: null,
+    },
 
     isPhoneVerified: {
       type: Boolean,
@@ -87,6 +95,24 @@ const UserSchema = new mongoose.Schema(
       default: null,
     },
     phoneVerificationAttemptCount: {
+      type: Number,
+      select: false,
+      default: 0,
+      min: 0,
+    },
+
+    /** Challenge сброса пароля (forgot) — отдельно от email/phone bind. */
+    passwordResetTokenHash: {
+      type: String,
+      select: false,
+      default: null,
+    },
+    passwordResetExpiresAt: {
+      type: Date,
+      select: false,
+      default: null,
+    },
+    passwordResetAttemptCount: {
       type: Number,
       select: false,
       default: 0,

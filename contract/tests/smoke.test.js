@@ -6,6 +6,7 @@ import test from "node:test";
 
 import {
   addressSuggestBodySchema,
+  addressGeolocateBodySchema,
   authMeDataSchema,
   authSessionDataSchema,
   refreshAuthBodySchema,
@@ -317,6 +318,13 @@ test("resolveDataConfirmationBodySchema accepts approve resolution", () => {
 test("addressSuggestBodySchema requires query length", () => {
   const parsed = addressSuggestBodySchema.parse({ query: "Москва" });
   assert.equal(parsed.query, "Москва");
+});
+
+test("addressGeolocateBodySchema validates lat/lon", () => {
+  const parsed = addressGeolocateBodySchema.parse({ lat: 55.75, lon: 37.62 });
+  assert.equal(parsed.lat, 55.75);
+  assert.equal(parsed.lon, 37.62);
+  assert.throws(() => addressGeolocateBodySchema.parse({ lat: 91, lon: 0 }));
 });
 
 test("createProductCategoryAdminBodySchema validates slug", () => {

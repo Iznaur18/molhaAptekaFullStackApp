@@ -10,24 +10,32 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { buildCatalogSubcategoryPickerTiles } from "@/entities/product-category-display/lib/buildCatalogSubcategoryPickerTiles";
+import {
+  buildResolvedProductCategoryDisplaysFromRoots,
+  PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE,
+} from "@/entities/product-category-display/lib/resolveProductCategoryDisplay";
+import { useProductCategoryDisplaysQuery } from "@/entities/product-category-display/model/useProductCategoryDisplaysQuery";
 import { useProductCategoryChildrenQuery } from "@/entities/product-category-tree/model/useProductCategoryChildrenQuery";
 import { useProductCategoryRootsQuery } from "@/entities/product-category-tree/model/useProductCategoryRootsQuery";
 import {
   CATEGORY_SEARCH_MIN_QUERY_LENGTH,
   useProductCategorySearchQuery,
 } from "@/entities/product-category-tree/model/useProductCategorySearchQuery";
+import { useCatalogBrowserGridLayout } from "@/features/catalog-browser/lib/useCatalogBrowserGridLayout";
+import { CatalogBrowserTileCard } from "@/features/catalog-browser/ui/CatalogBrowserTileCard";
 import { CREATE_PRODUCT_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useCategoryPickerSheetStyles } from "@/shared/theme/categoryPickerSheetStyles";
 
 const SEARCH_DEBOUNCE_MS = 300;
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 type CategoryNode = {
   id: string;
   labelRu: string;
   isLeaf: boolean;
+  slug?: string;
+  legacyProductCategory?: string | null;
 };
 
 type TrailItem = {
@@ -41,18 +49,17 @@ export type CreateProductCategoryPickerProps = {
   onSelect: (categoryId: string, label: string) => void;
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 const normalizeNode = (raw: Record<string, unknown>): CategoryNode => ({
   id: String(raw.id ?? raw._id ?? ""),
   labelRu: String(raw.labelRu ?? raw.name ?? ""),
   isLeaf: raw.isLeaf === true,
+  slug: typeof raw.slug === "string" ? raw.slug : undefined,
+  legacyProductCategory:
+    typeof raw.legacyProductCategory === "string" ? raw.legacyProductCategory : null,
 });
 
 const buildFullPath = (pathLabelRu: string[], labelRu: string): string[] =>
   pathLabelRu[pathLabelRu.length - 1] === labelRu ? pathLabelRu : [...pathLabelRu, labelRu];
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export const CreateProductCategoryPicker = ({
   selectedCategoryId,
@@ -61,6 +68,7 @@ export const CreateProductCategoryPicker = ({
 }: CreateProductCategoryPickerProps) => {
   const theme = useAppTheme();
   const s = useCategoryPickerSheetStyles();
+  const gridLayout = useCatalogBrowserGridLayout();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [trail, setTrail] = useState<TrailItem[]>([]);
   const [searchInput, setSearchInput] = useState("");
@@ -78,6 +86,7 @@ export const CreateProductCategoryPicker = ({
 
   const rootsQuery = useProductCategoryRootsQuery(sheetOpen);
   const childrenQuery = useProductCategoryChildrenQuery(sheetOpen ? activeParentId : null);
+  const displaysQuery = useProductCategoryDisplaysQuery();
   const searchResultsQuery = useProductCategorySearchQuery(sheetOpen ? searchQuery : "");
 
   const options = useMemo<CategoryNode[]>(() => {
@@ -90,6 +99,47 @@ export const CreateProductCategoryPicker = ({
       (n) => normalizeNode(n as Record<string, unknown>),
     );
   }, [isRoot, rootsQuery.data, childrenQuery.data]);
+
+  const displays = displaysQuery.data ?? [];
+
+  const tiles = useMemo(() => {
+    if (isRoot) {
+      return buildResolvedProductCategoryDisplaysFromRoots(
+        options.map((node) => ({
+          id: node.id,
+          slug: node.slug ?? node.id,
+          labelRu: node.labelRu,
+          legacyProductCategory: node.legacyProductCategory ?? null,
+          isLeaf: node.isLeaf,
+        })),
+        displays,
+      ).map((item) => ({
+        key: item.categoryId ?? item.displaySlug,
+        categoryId: item.categoryId ?? "",
+        label: item.label,
+        imageUrl: item.imageUrl,
+      }));
+    }
+
+    const parent = trail[trail.length - 1];
+    if (!parent) {
+      return [];
+    }
+
+    return buildCatalogSubcategoryPickerTiles({
+      parent,
+      categories: options.map((node) => ({ id: node.id, labelRu: node.labelRu })),
+      displays,
+      includeViewAll: false,
+    });
+  }, [displays, isRoot, options, trail]);
+
+  const tileLayoutProps = {
+    tileWidth: gridLayout.tileWidth,
+    columns: gridLayout.columns,
+    gap: gridLayout.gap,
+    contentWidth: gridLayout.contentWidth,
+  };
 
   const isBrowseLoading = isRoot ? rootsQuery.isPending : childrenQuery.isPending;
   const browseError =
@@ -122,8 +172,14 @@ export const CreateProductCategoryPicker = ({
     setTrail((prev) => [...prev, { id: node.id, labelRu: node.labelRu }]);
   };
 
+  const handleTilePress = (categoryId: string) => {
+    const node = options.find((row) => row.id === categoryId);
+    if (node) {
+      handleBrowsePick(node);
+    }
+  };
+
   const handleCrumbPress = (index: number) => {
-    // index === -1 — корень «Все категории»
     setTrail((prev) => prev.slice(0, index + 1));
   };
 
@@ -134,7 +190,6 @@ export const CreateProductCategoryPicker = ({
         <Text style={{ color: theme.colors.danger }}>*</Text>
       </Text>
 
-      {/* Поле-селект: текущий выбор или плейсхолдер */}
       <Pressable
         style={({ pressed }) => [s.fieldBox, pressed && s.fieldBoxPressed]}
         onPress={openSheet}
@@ -159,7 +214,6 @@ export const CreateProductCategoryPicker = ({
         onRequestClose={closeSheet}
       >
         <SafeAreaView edges={["top", "bottom"]} style={s.sheetRoot}>
-          {/* Шапка */}
           <View style={s.sheetHeader}>
             <Text style={s.sheetTitle}>{CREATE_PRODUCT_UI.CATEGORY_SHEET_TITLE}</Text>
             <Pressable onPress={closeSheet} hitSlop={8}>
@@ -167,7 +221,6 @@ export const CreateProductCategoryPicker = ({
             </Pressable>
           </View>
 
-          {/* Поиск */}
           <View style={s.searchWrap}>
             <TextInput
               style={s.searchInput}
@@ -181,7 +234,6 @@ export const CreateProductCategoryPicker = ({
           </View>
 
           {isSearchMode ? (
-            /* ── Результаты поиска ── */
             searchResultsQuery.isPending ? (
               <View style={s.statusWrap}>
                 <ActivityIndicator size="small" color={theme.colors.textMuted} />
@@ -231,7 +283,6 @@ export const CreateProductCategoryPicker = ({
               </ScrollView>
             )
           ) : (
-            /* ── Навигация по дереву ── */
             <>
               <View style={s.crumbs}>
                 <Pressable
@@ -275,32 +326,21 @@ export const CreateProductCategoryPicker = ({
               ) : (
                 <ScrollView
                   style={s.list}
-                  contentContainerStyle={s.listContent}
+                  contentContainerStyle={[s.listContent, s.tilesContent]}
                   keyboardShouldPersistTaps="handled"
                 >
-                  {options.map((node, index) => (
-                    <Pressable
-                      key={node.id}
-                      style={({ pressed }) => [
-                        s.row,
-                        index === 0 && s.rowFirst,
-                        index === options.length - 1 && s.rowLast,
-                        pressed && s.rowPressed,
-                      ]}
-                      onPress={() => handleBrowsePick(node)}
-                    >
-                      <View style={s.rowTextWrap}>
-                        <Text style={s.rowLabel} numberOfLines={2}>
-                          {node.labelRu}
-                        </Text>
-                      </View>
-                      {node.isLeaf ? (
-                        <Text style={s.rowLeafMark}>✓</Text>
-                      ) : (
-                        <Text style={s.rowChevron}>›</Text>
-                      )}
-                    </Pressable>
-                  ))}
+                  <View style={[s.tilesGrid, { gap: gridLayout.gap }]}>
+                    {tiles.map((item) => (
+                      <CatalogBrowserTileCard
+                        key={item.key}
+                        label={item.label}
+                        imageUrl={item.imageUrl}
+                        placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
+                        {...tileLayoutProps}
+                        onPress={() => handleTilePress(item.categoryId)}
+                      />
+                    ))}
+                  </View>
                 </ScrollView>
               )}
             </>

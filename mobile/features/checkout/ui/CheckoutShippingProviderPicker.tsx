@@ -2,8 +2,9 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import {
   CHECKOUT_SHIPPING_PROVIDER_SELLER,
-  CHECKOUT_SHIPPING_SERVICE_OPTIONS,
+  hasCheckoutLiveCarrierProviders,
   listCheckoutShippingProviderOptions,
+  listCheckoutShippingServiceOptions,
   resolveCheckoutShippingProviderLabel,
   SHIPPING_SERVICE_COURIER,
   SHIPPING_SERVICE_PICKUP_POINT,
@@ -25,6 +26,9 @@ export const CheckoutShippingProviderPicker = ({
 }: CheckoutShippingProviderPickerProps) => {
   const theme = useAppTheme();
   const providerOptions = listCheckoutShippingProviderOptions();
+  const serviceOptions = listCheckoutShippingServiceOptions();
+  const showCarrierServices =
+    hasCheckoutLiveCarrierProviders() && serviceOptions.length > 0;
 
   return (
     <View style={styles.root}>
@@ -34,7 +38,6 @@ export const CheckoutShippingProviderPicker = ({
       <View style={styles.wrap} accessibilityRole="radiogroup">
         {providerOptions.map((option) => {
           const isSelected = option.id === CHECKOUT_SHIPPING_PROVIDER_SELLER;
-          const isLocked = !option.live;
           const label = resolveCheckoutShippingProviderLabel(option.id, {
             sellerLabel: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SELLER,
           });
@@ -42,30 +45,18 @@ export const CheckoutShippingProviderPicker = ({
           return (
             <Pressable
               key={option.id}
-              disabled={disabled || isLocked}
+              disabled={disabled}
               accessibilityRole="radio"
               accessibilityState={{
                 checked: isSelected,
-                disabled: disabled || isLocked,
+                disabled,
               }}
-              accessibilityLabel={
-                isLocked
-                  ? `${label} (${CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SOON})`
-                  : label
-              }
+              accessibilityLabel={label}
               style={[
                 styles.card,
                 {
-                  borderColor: isSelected
-                    ? theme.colors.action
-                    : isLocked
-                      ? theme.colors.border
-                      : theme.colors.actionSoft,
-                  backgroundColor: isSelected
-                    ? theme.colors.surface
-                    : isLocked
-                      ? theme.colors.surfaceMuted
-                      : theme.colors.actionSoft,
+                  borderColor: isSelected ? theme.colors.action : theme.colors.actionSoft,
+                  backgroundColor: isSelected ? theme.colors.surface : theme.colors.actionSoft,
                 },
               ]}
             >
@@ -73,57 +64,52 @@ export const CheckoutShippingProviderPicker = ({
                 style={[
                   styles.cardLabel,
                   {
-                    color: isLocked
-                      ? theme.colors.textMuted
-                      : isSelected
-                        ? theme.colors.text
-                        : theme.colors.action,
+                    color: isSelected ? theme.colors.text : theme.colors.action,
                   },
                 ]}
               >
                 {label}
-                {isLocked
-                  ? ` (${CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SOON})`
-                  : ""}
               </Text>
             </Pressable>
           );
         })}
       </View>
 
-      <Text
-        style={[
-          styles.legend,
-          styles.legendSub,
-          { color: theme.colors.textSecondary },
-        ]}
-      >
-        {CHECKOUT_FORM_UI.LABEL_SHIPPING_SERVICE}
-      </Text>
-      <View style={styles.row} accessibilityRole="radiogroup">
-        {CHECKOUT_SHIPPING_SERVICE_OPTIONS.map((option) => {
-          const label = SERVICE_LABEL[option.id] ?? option.id;
-          return (
-            <Pressable
-              key={option.id}
-              disabled
-              accessibilityRole="radio"
-              accessibilityState={{ checked: false, disabled: true }}
-              style={[
-                styles.chip,
-                {
-                  borderColor: theme.colors.border,
-                  backgroundColor: theme.colors.surfaceMuted,
-                },
-              ]}
-            >
-              <Text style={[styles.chipLabel, { color: theme.colors.textMuted }]}>
-                {label} ({CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SOON})
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
+      {showCarrierServices ? (
+        <>
+          <Text
+            style={[
+              styles.legend,
+              styles.legendSub,
+              { color: theme.colors.textSecondary },
+            ]}
+          >
+            {CHECKOUT_FORM_UI.LABEL_SHIPPING_SERVICE}
+          </Text>
+          <View style={styles.row} accessibilityRole="radiogroup">
+            {serviceOptions.map((option) => {
+              const label = SERVICE_LABEL[option.id] ?? option.id;
+              return (
+                <Pressable
+                  key={option.id}
+                  disabled={disabled}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: false, disabled }}
+                  style={[
+                    styles.chip,
+                    {
+                      borderColor: theme.colors.border,
+                      backgroundColor: theme.colors.surface,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.chipLabel, { color: theme.colors.text }]}>{label}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </>
+      ) : null}
 
       <Text style={[styles.hint, { color: theme.colors.textMuted }]}>
         {CHECKOUT_FORM_UI.SHIPPING_PROVIDER_HINT}

@@ -1,4 +1,5 @@
 import Feather from "@expo/vector-icons/Feather";
+import { isDimColorScheme } from "@izibuy/design-tokens";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { BlurView } from "expo-blur";
 import { usePathname, useRouter } from "expo-router";
@@ -124,16 +125,6 @@ const useTabBarStyles = createThemedStyles((theme) => ({
   liquidOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: withAlpha(theme.colors.onContrast, "24"),
-  },
-  liquidSheen: {
-    position: "absolute",
-    top: 1,
-    left: "12%",
-    right: "12%",
-    height: "42%",
-    borderRadius: MOBILE_BOTTOM_NAV_BORDER_RADIUS,
-    backgroundColor: withAlpha(theme.colors.onContrast, "3D"),
-    opacity: 0.55,
   },
   navRow: {
     zIndex: 1,
@@ -383,11 +374,10 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
           <View style={styles.navPill}>
             <BlurView
               intensity={Platform.OS === "web" ? 0 : 72}
-              tint={colorScheme === "dark" ? "dark" : "light"}
+              tint={isDimColorScheme(colorScheme) ? "dark" : "light"}
               style={styles.navBlur}
             >
               <View style={styles.liquidOverlay} pointerEvents="none" />
-              <View style={styles.liquidSheen} pointerEvents="none" />
               <View style={styles.navRow}>{items}</View>
             </BlurView>
           </View>

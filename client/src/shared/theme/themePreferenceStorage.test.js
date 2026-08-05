@@ -23,6 +23,8 @@ describe("themePreferenceStorage", () => {
     expect(loadThemePreference()).toBe("dark");
     saveThemePreference("light");
     expect(loadThemePreference()).toBe("light");
+    saveThemePreference("custom");
+    expect(loadThemePreference()).toBe("custom");
   });
 
   it("ignores invalid stored values", () => {

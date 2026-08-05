@@ -179,14 +179,72 @@
 .checkout-form__pickup {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.5rem;
+}
+
+.checkout-form__pickup-hint {
+  margin: 0;
+  font-size: var(--iz-font-sm, 0.8125rem);
+  line-height: 1.35;
+  color: var(--iz-color-text-muted);
+}
+
+.checkout-form__pickup-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.checkout-form__pickup-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin: 0;
+}
+
+.checkout-form__pickup-index {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-top: 0.1rem;
+  border-radius: 999px;
+  background: var(--iz-color-action, #1a6b4a);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: var(--iz-weight-semibold, 600);
+  line-height: 1;
+}
+
+.checkout-form__pickup-body {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.checkout-form__pickup-products {
+  margin: 0;
+  font-size: var(--iz-font-sm, 0.8125rem);
+  line-height: 1.3;
+  color: var(--iz-color-link);
 }
 
 .checkout-form__pickup-address {
   margin: 0;
   font-size: var(--iz-font-md);
-  line-height: 1.4;
+  line-height: 1.35;
   color: var(--iz-color-text);
+}
+
+.checkout-form__pickup-address_error {
+  color: var(--iz-color-danger);
 }
 
 .checkout-form__error {

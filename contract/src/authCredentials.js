@@ -50,6 +50,97 @@ export const phoneBindConfirmBodySchema = z.object({
     ),
 });
 
+export const emailBindRequestBodySchema = z.object({
+  email: z.string().trim().email("Неверный email"),
+});
+
+export const emailBindConfirmBodySchema = z.object({
+  code: z
+    .string()
+    .trim()
+    .regex(
+      new RegExp(`^\\d{${EMAIL_VERIFICATION_CODE_LENGTH}}$`),
+      `Код должен содержать ${EMAIL_VERIFICATION_CODE_LENGTH} цифр`,
+    ),
+});
+
+const passwordMinSchema = z.string().min(6, "Пароль должен быть не менее 6 символов");
+
+const otpCodeSchema = z
+  .string()
+  .trim()
+  .regex(
+    new RegExp(`^\\d{${EMAIL_VERIFICATION_CODE_LENGTH}}$`),
+    `Код должен содержать ${EMAIL_VERIFICATION_CODE_LENGTH} цифр`,
+  );
+
+const optionalResetEmailSchema = z.preprocess(
+  (value) => (value == null || value === "" ? undefined : value),
+  z.string().trim().email("Неверный email").optional(),
+);
+
+/**
+ * @param {{ email?: string; phoneNumber?: string }} data
+ * @param {z.RefinementCtx} ctx
+ */
+function refineExactlyOneContactChannel(data, ctx) {
+  const hasEmail = data.email != null && String(data.email).trim() !== "";
+  const hasPhone = data.phoneNumber != null && String(data.phoneNumber).trim() !== "";
+  if (hasEmail === hasPhone) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Укажите email или телефон",
+      path: hasEmail ? ["phoneNumber"] : ["email"],
+    });
+  }
+}
+
+export const passwordResetRequestBodySchema = z
+  .object({
+    email: optionalResetEmailSchema,
+    phoneNumber: ruPhoneOptionalFieldSchema,
+  })
+  .superRefine(refineExactlyOneContactChannel);
+
+export const passwordResetConfirmBodySchema = z
+  .object({
+    email: optionalResetEmailSchema,
+    phoneNumber: ruPhoneOptionalFieldSchema,
+    code: otpCodeSchema,
+    newPassword: passwordMinSchema,
+    newPasswordConfirm: z
+      .string({ required_error: "Повторите пароль" })
+      .min(1, "Повторите пароль"),
+  })
+  .superRefine((data, ctx) => {
+    refineExactlyOneContactChannel(data, ctx);
+    if (data.newPasswordConfirm !== data.newPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Пароли не совпадают",
+        path: ["newPasswordConfirm"],
+      });
+    }
+  });
+
+export const passwordChangeBodySchema = z
+  .object({
+    currentPassword: passwordMinSchema,
+    newPassword: passwordMinSchema,
+    newPasswordConfirm: z
+      .string({ required_error: "Повторите пароль" })
+      .min(1, "Повторите пароль"),
+  })
+  .superRefine((data, ctx) => {
+    if (data.newPasswordConfirm !== data.newPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Пароли не совпадают",
+        path: ["newPasswordConfirm"],
+      });
+    }
+  });
+
 export const registerBodySchema = z
   .object({
     email: z.string().email("Неверный email"),

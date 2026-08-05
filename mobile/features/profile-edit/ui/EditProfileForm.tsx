@@ -2,6 +2,8 @@ import { useMemo, useState, type ReactNode } from "react";
 import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
 
 import { confirmPhoneBind, requestPhoneBind } from "@/entities/session/api/phoneAuth";
+import { confirmEmailBind, requestEmailBind } from "@/entities/session/api/emailBind";
+import { changePassword } from "@/entities/session/api/passwordReset";
 import { maskBirthDateInput } from "@/entities/user/lib/birthDateInputMask";
 import { buildPatchUserProfileBody } from "@/entities/user/lib/buildPatchUserProfileBody";
 import {
@@ -29,15 +31,17 @@ import { keepDigitsOnly } from "@/shared/lib/rubPriceInput";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useEditProfileFormStyles } from "@/shared/theme/editProfileFormStyles";
 import { AppButton } from "@/shared/ui/AppButton";
+import { PasswordTextInput } from "@/shared/ui/PasswordTextInput";
 
 const GENDER_OPTIONS = [USER_GENDER_MALE, USER_GENDER_FEMALE, USER_GENDER_NO_SELECTED] as const;
-const PHONE_BIND_CODE_LENGTH = 6;
+const BIND_CODE_LENGTH = 6;
 
 type EditProfileFormProps = {
   user: Record<string, unknown> & {
     _id: string;
     email?: string;
     isPhoneVerified?: boolean;
+    isEmailVerified?: boolean;
   };
   onSaved?: () => void;
 };
@@ -54,6 +58,17 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
   const [phoneBindOtpSent, setPhoneBindOtpSent] = useState(false);
   const [phoneBindLoading, setPhoneBindLoading] = useState(false);
   const [phoneBindNotice, setPhoneBindNotice] = useState("");
+  const [phoneLocalVerified, setPhoneLocalVerified] = useState(user.isPhoneVerified === true);
+  const [emailBindCode, setEmailBindCode] = useState("");
+  const [emailBindOtpSent, setEmailBindOtpSent] = useState(false);
+  const [emailBindLoading, setEmailBindLoading] = useState(false);
+  const [emailBindNotice, setEmailBindNotice] = useState("");
+  const [emailLocalVerified, setEmailLocalVerified] = useState(user.isEmailVerified === true);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
+  const [passwordChangeLoading, setPasswordChangeLoading] = useState(false);
+  const [passwordChangeNotice, setPasswordChangeNotice] = useState("");
   const patchMutation = usePatchUserProfileMutation();
 
   const updateField = <K extends keyof EditProfileFormState>(
@@ -72,6 +87,25 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
       return;
     }
 
+    const emailTrim = form.email.trim().toLowerCase();
+    const phoneTrim = form.userPhoneNumber.trim();
+    if (!emailTrim && baselineForm.email.trim()) {
+      setErrorMessage(EDIT_PROFILE_UI.EMAIL_CLEAR_FORBIDDEN);
+      return;
+    }
+    if (emailTrim !== baselineForm.email.trim().toLowerCase() && !emailLocalVerified) {
+      setErrorMessage(EDIT_PROFILE_UI.EMAIL_CHANGE_PENDING);
+      return;
+    }
+    if (!phoneTrim && baselineForm.userPhoneNumber.trim()) {
+      setErrorMessage(EDIT_PROFILE_UI.PHONE_CLEAR_FORBIDDEN);
+      return;
+    }
+    if (phoneTrim !== baselineForm.userPhoneNumber.trim() && !phoneLocalVerified) {
+      setErrorMessage(EDIT_PROFILE_UI.PHONE_CHANGE_PENDING);
+      return;
+    }
+
     setErrorMessage("");
     try {
       const body = buildPatchUserProfileBody(form, baselineForm);
@@ -81,7 +115,13 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
       }
 
       const updatedUser = await patchMutation.mutateAsync({ userId: user._id, body });
-      const nextForm = mapUserToEditProfileForm(updatedUser);
+      const nextForm = mapUserToEditProfileForm({
+        ...updatedUser,
+        email: form.email,
+        userPhoneNumber: form.userPhoneNumber,
+        isEmailVerified: emailLocalVerified,
+        isPhoneVerified: phoneLocalVerified,
+      });
       setBaselineForm(nextForm);
       setForm(nextForm);
       setSuccessMessage(EDIT_PROFILE_UI.SAVED);
@@ -94,10 +134,14 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
 
   const isSubmitting = patchMutation.isPending;
   const notesChars = form.notesAboutUser.length;
-  const isPhoneVerified = user.isPhoneVerified === true;
+  const isPhoneVerified = user.isPhoneVerified === true || phoneLocalVerified;
   const showPhoneVerify =
     form.userPhoneNumber.trim() !== "" &&
     (!isPhoneVerified || form.userPhoneNumber !== baselineForm.userPhoneNumber);
+  const isEmailVerified = user.isEmailVerified === true || emailLocalVerified;
+  const showEmailVerify =
+    form.email.trim() !== "" &&
+    (!isEmailVerified || form.email.trim().toLowerCase() !== baselineForm.email.trim().toLowerCase());
 
   const handleRequestPhoneBind = async () => {
     setPhoneBindLoading(true);
@@ -118,7 +162,7 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
   };
 
   const handleConfirmPhoneBind = async () => {
-    if (phoneBindCode.length !== PHONE_BIND_CODE_LENGTH) {
+    if (phoneBindCode.length !== BIND_CODE_LENGTH) {
       setErrorMessage(EDIT_PROFILE_UI.PHONE_VERIFY_CODE_REQUIRED);
       return;
     }
@@ -133,12 +177,99 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
       setPhoneBindOtpSent(false);
       setPhoneBindNotice(EDIT_PROFILE_UI.PHONE_VERIFY_SUCCESS);
       setSuccessMessage(EDIT_PROFILE_UI.PHONE_VERIFY_SUCCESS);
+      setPhoneLocalVerified(true);
+      setBaselineForm((prev) => ({ ...prev, userPhoneNumber: form.userPhoneNumber }));
     } catch (error) {
       setErrorMessage(
         error instanceof Error ? error.message : EDIT_PROFILE_UI.PHONE_VERIFY_ERROR,
       );
     } finally {
       setPhoneBindLoading(false);
+    }
+  };
+
+  const handleRequestEmailBind = async () => {
+    setEmailBindLoading(true);
+    setEmailBindNotice("");
+    setErrorMessage("");
+
+    try {
+      await requestEmailBind({ email: form.email.trim().toLowerCase() });
+      setEmailBindOtpSent(true);
+      setEmailBindNotice(EDIT_PROFILE_UI.EMAIL_VERIFY_SENT);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : EDIT_PROFILE_UI.EMAIL_VERIFY_REQUEST_ERROR,
+      );
+    } finally {
+      setEmailBindLoading(false);
+    }
+  };
+
+  const handleConfirmEmailBind = async () => {
+    if (emailBindCode.length !== BIND_CODE_LENGTH) {
+      setErrorMessage(EDIT_PROFILE_UI.EMAIL_VERIFY_CODE_REQUIRED);
+      return;
+    }
+
+    setEmailBindLoading(true);
+    setEmailBindNotice("");
+    setErrorMessage("");
+
+    try {
+      const result = await confirmEmailBind({ code: emailBindCode });
+      const nextEmail = String(result.email ?? form.email)
+        .trim()
+        .toLowerCase();
+      setEmailBindCode("");
+      setEmailBindOtpSent(false);
+      setEmailBindNotice(EDIT_PROFILE_UI.EMAIL_VERIFY_SUCCESS);
+      setSuccessMessage(EDIT_PROFILE_UI.EMAIL_VERIFY_SUCCESS);
+      setEmailLocalVerified(true);
+      setForm((prev) => ({ ...prev, email: nextEmail }));
+      setBaselineForm((prev) => ({ ...prev, email: nextEmail }));
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : EDIT_PROFILE_UI.EMAIL_VERIFY_ERROR,
+      );
+    } finally {
+      setEmailBindLoading(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    setPasswordChangeNotice("");
+    setErrorMessage("");
+    if (newPassword.length < EDIT_PROFILE_UI.PASSWORD_MIN_LENGTH) {
+      setErrorMessage(EDIT_PROFILE_UI.PASSWORD_TOO_SHORT);
+      return;
+    }
+    if (newPassword !== newPasswordConfirm) {
+      setErrorMessage(EDIT_PROFILE_UI.PASSWORD_MISMATCH);
+      return;
+    }
+    setPasswordChangeLoading(true);
+    try {
+      const result = await changePassword({
+        currentPassword,
+        newPassword,
+        newPasswordConfirm,
+      });
+      setCurrentPassword("");
+      setNewPassword("");
+      setNewPasswordConfirm("");
+      const message =
+        typeof result.message === "string" && result.message
+          ? result.message
+          : EDIT_PROFILE_UI.PASSWORD_CHANGE_SUCCESS;
+      setPasswordChangeNotice(message);
+      setSuccessMessage(message);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : EDIT_PROFILE_UI.PASSWORD_CHANGE_ERROR,
+      );
+    } finally {
+      setPasswordChangeLoading(false);
     }
   };
 
@@ -197,10 +328,64 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
           <View style={styles.field}>
             {fieldLabel(EDIT_PROFILE_UI.LABEL_EMAIL)}
             <TextInput
-              style={[styles.input, styles.inputReadOnly]}
-              value={typeof user.email === "string" ? user.email : ""}
-              editable={false}
+              style={styles.input}
+              value={form.email}
+              onChangeText={(value) => {
+                updateField("email", value.trim().toLowerCase());
+                setEmailLocalVerified(false);
+                setEmailBindOtpSent(false);
+                setEmailBindCode("");
+                setEmailBindNotice("");
+              }}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
+              editable={!isSubmitting && !emailBindLoading}
+              placeholderTextColor={theme.colors.textMuted}
             />
+            {showEmailVerify ? (
+              <View style={{ gap: 8, marginTop: 4 }}>
+                {!emailBindOtpSent ? (
+                  <Pressable
+                    onPress={() => void handleRequestEmailBind()}
+                    disabled={isSubmitting || emailBindLoading}
+                  >
+                    <Text style={styles.hint}>
+                      {emailBindLoading
+                        ? EDIT_PROFILE_UI.EMAIL_VERIFY_SEND_LOADING
+                        : EDIT_PROFILE_UI.EMAIL_VERIFY_SEND}
+                    </Text>
+                  </Pressable>
+                ) : (
+                  <>
+                    <TextInput
+                      style={styles.input}
+                      value={emailBindCode}
+                      onChangeText={(value) =>
+                        setEmailBindCode(keepDigitsOnly(value).slice(0, BIND_CODE_LENGTH))
+                      }
+                      keyboardType="number-pad"
+                      textContentType="oneTimeCode"
+                      maxLength={BIND_CODE_LENGTH}
+                      placeholder={EDIT_PROFILE_UI.EMAIL_VERIFY_CODE_PLACEHOLDER}
+                      placeholderTextColor={theme.colors.textMuted}
+                      editable={!emailBindLoading}
+                    />
+                    <AppButton
+                      label={EDIT_PROFILE_UI.EMAIL_VERIFY_CONFIRM}
+                      variant="secondary"
+                      onPress={() => void handleConfirmEmailBind()}
+                      disabled={emailBindLoading}
+                    />
+                  </>
+                )}
+                {emailBindNotice ? (
+                  <Text style={[styles.feedback, styles.feedbackSuccess]}>{emailBindNotice}</Text>
+                ) : null}
+              </View>
+            ) : isEmailVerified ? (
+              <Text style={styles.hint}>{EDIT_PROFILE_UI.EMAIL_VERIFIED}</Text>
+            ) : null}
           </View>
           <View style={styles.field}>
             {fieldLabel(EDIT_PROFILE_UI.LABEL_USERNAME)}
@@ -214,6 +399,42 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
               placeholderTextColor={theme.colors.textMuted}
             />
             <Text style={styles.hint}>{EDIT_PROFILE_UI.USERNAME_HINT}</Text>
+          </View>
+          <View style={styles.field}>
+            {fieldLabel(EDIT_PROFILE_UI.SECTION_PASSWORD)}
+            <Text style={styles.label}>{EDIT_PROFILE_UI.LABEL_CURRENT_PASSWORD}</Text>
+            <PasswordTextInput
+              value={currentPassword}
+              onChangeText={setCurrentPassword}
+              textContentType="password"
+            />
+            <Text style={styles.label}>{EDIT_PROFILE_UI.LABEL_NEW_PASSWORD}</Text>
+            <PasswordTextInput
+              value={newPassword}
+              onChangeText={setNewPassword}
+              textContentType="newPassword"
+            />
+            <Text style={styles.label}>{EDIT_PROFILE_UI.LABEL_NEW_PASSWORD_CONFIRM}</Text>
+            <PasswordTextInput
+              value={newPasswordConfirm}
+              onChangeText={setNewPasswordConfirm}
+              textContentType="newPassword"
+            />
+            {passwordChangeNotice ? (
+              <Text style={[styles.feedback, styles.feedbackSuccess]}>
+                {passwordChangeNotice}
+              </Text>
+            ) : null}
+            <AppButton
+              label={
+                passwordChangeLoading
+                  ? EDIT_PROFILE_UI.PASSWORD_CHANGE_LOADING
+                  : EDIT_PROFILE_UI.PASSWORD_CHANGE_SUBMIT
+              }
+              variant="secondary"
+              onPress={() => void handleChangePassword()}
+              disabled={isSubmitting || passwordChangeLoading}
+            />
           </View>
         </>,
       )}
@@ -229,6 +450,7 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
               value={form.userPhoneNumber}
               onChangeText={(value) => {
                 updateField("userPhoneNumber", maskRuPhoneInput(value));
+                setPhoneLocalVerified(false);
                 setPhoneBindOtpSent(false);
                 setPhoneBindCode("");
                 setPhoneBindNotice("");
@@ -257,11 +479,11 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
                       style={styles.input}
                       value={phoneBindCode}
                       onChangeText={(value) =>
-                        setPhoneBindCode(keepDigitsOnly(value).slice(0, PHONE_BIND_CODE_LENGTH))
+                        setPhoneBindCode(keepDigitsOnly(value).slice(0, BIND_CODE_LENGTH))
                       }
                       keyboardType="number-pad"
                       textContentType="oneTimeCode"
-                      maxLength={PHONE_BIND_CODE_LENGTH}
+                      maxLength={BIND_CODE_LENGTH}
                       placeholder={EDIT_PROFILE_UI.PHONE_VERIFY_CODE_PLACEHOLDER}
                       placeholderTextColor={theme.colors.textMuted}
                       editable={!phoneBindLoading}

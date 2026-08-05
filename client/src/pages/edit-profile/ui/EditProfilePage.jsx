@@ -21,6 +21,9 @@ import { INTEGER_INPUT_FIELD_PROPS } from "../../../shared/lib/numericInput.js";
 import { ProfileAvatarUpload } from "../../../entities/user/ui/ProfileAvatarUpload.jsx";
 import { ProfileBackgroundUpload } from "../../../entities/user/ui/ProfileBackgroundUpload.jsx";
 import { EditProfileSocialLinksFields } from "../../../entities/user/ui/EditProfileSocialLinksFields.jsx";
+import { EmailBindControls } from "../../../entities/user/ui/EmailBindControls.jsx";
+import { PhoneBindControls } from "../../../entities/user/ui/PhoneBindControls.jsx";
+import { ChangePasswordControls } from "../../../entities/user/ui/ChangePasswordControls.jsx";
 
 import "../../../entities/user/ui/EditProfileModal.css";
 import "./EditProfilePage.css";
@@ -86,7 +89,12 @@ export function EditProfilePage({
     notesChars,
     backgroundMode,
     isSubmitting,
+    baselineEmail,
+    baselinePhone,
+    contactVerified,
     handleChange,
+    handleEmailVerified,
+    handlePhoneVerified,
     handleSubmit,
   } = useEditProfileModal({
     isOpen: Boolean(user),
@@ -201,11 +209,20 @@ export function EditProfilePage({
             <label className="edit-profile-modal__label">
               {EDIT_PROFILE_MODAL_UI.LABEL_EMAIL}
               <input
-                className="edit-profile-modal__input edit-profile-modal__input_readonly"
-                type="text"
-                readOnly
-                value={user.email ?? ""}
+                className="edit-profile-modal__input"
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
                 autoComplete="email"
+                disabled={isSubmitting}
+              />
+              <EmailBindControls
+                email={form.email}
+                isEmailVerified={user?.isEmailVerified === true || contactVerified.email}
+                baselineEmail={baselineEmail}
+                disabled={isSubmitting}
+                onVerified={handleEmailVerified}
               />
             </label>
             <label className="edit-profile-modal__label">
@@ -235,6 +252,7 @@ export function EditProfilePage({
                 />
               </label>
             ) : null}
+            <ChangePasswordControls disabled={isSubmitting} />
           </FormSection>
 
           <FormSection title={EDIT_PROFILE_MODAL_UI.SECTION_PERSONAL}>
@@ -249,6 +267,13 @@ export function EditProfilePage({
                 autoComplete="tel"
                 inputMode="tel"
                 placeholder="8 (912) 345-67-89"
+              />
+              <PhoneBindControls
+                phoneNumber={form.userPhoneNumber}
+                isPhoneVerified={user?.isPhoneVerified === true || contactVerified.phone}
+                baselinePhone={baselinePhone}
+                disabled={isSubmitting}
+                onVerified={handlePhoneVerified}
               />
             </label>
             <label className="edit-profile-modal__label">

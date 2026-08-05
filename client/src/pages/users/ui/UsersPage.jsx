@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   excludeUsersPodiumFromList,
   rankUsersForPodium,
@@ -9,6 +10,8 @@ import { useUsersMonthlyLoyaltyPointsQuery } from "../../../entities/user/model/
 import { useUsersSearchQuery } from "../../../entities/user/model/useUsersSearchQuery.js";
 import { UserListRow } from "../../../entities/user/ui/UserListRow.jsx";
 import { USER_SEARCH_INPUT_UI, USERS_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { AUTH_LOGIN_PATH } from "../../../shared/lib/authPaths.js";
+import { isAuthSessionError } from "../../../shared/lib/isAuthSessionError.js";
 import { SearchInput } from "../../../shared/ui/SearchInput/SearchInput.jsx";
 import { UsersMonthlyLoyaltyLoadBar } from "./UsersMonthlyLoyaltyLoadBar.jsx";
 import { UsersPodium } from "./UsersPodium.jsx";
@@ -82,6 +85,7 @@ function UsersPageBody({
   isSearchInputTooShort = false,
   onUserRowClick,
 }) {
+  const navigate = useNavigate();
   const showPodium = !hasActiveFilters && !isSearchInputTooShort;
   const monthlyLoyaltyQuery = useUsersMonthlyLoyaltyPointsQuery({
     enabled: showPodium,
@@ -101,6 +105,20 @@ function UsersPageBody({
   }
 
   if (phase === "error") {
+    if (isAuthSessionError(new Error(error))) {
+      return (
+        <div className="users-page__auth">
+          <p className="users-page__state">{USERS_PAGE_UI.LOGIN_HINT}</p>
+          <button
+            type="button"
+            className="app-btn app-btn--primary users-page__login"
+            onClick={() => navigate(AUTH_LOGIN_PATH)}
+          >
+            {USERS_PAGE_UI.LOGIN_BUTTON}
+          </button>
+        </div>
+      );
+    }
     return (
       <p className="users-page__state users-page__state_error" role="alert">
         {error}

@@ -1,11 +1,14 @@
 import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
-/** После 503 не долбим /address/suggest на каждый keystroke. */
-let suggestUnavailable = false;
+import {
+  isAddressServiceUnavailable,
+  markAddressServiceUnavailable,
+  resetAddressServiceUnavailable,
+} from "./addressServiceAvailability.js";
 
 export function resetAddressSuggestUnavailableForTests() {
-  suggestUnavailable = false;
+  resetAddressServiceUnavailable();
 }
 
 /**
@@ -13,7 +16,7 @@ export function resetAddressSuggestUnavailableForTests() {
  * @returns {Promise<import('../model/types.js').AddressSuggestionDto[]>}
  */
 export async function fetchAddressSuggestions(query) {
-  if (suggestUnavailable) {
+  if (isAddressServiceUnavailable()) {
     return [];
   }
 
@@ -28,7 +31,7 @@ export async function fetchAddressSuggestions(query) {
   } catch (e) {
     const status = e?.response?.status;
     if (status === 503) {
-      suggestUnavailable = true;
+      markAddressServiceUnavailable();
       return [];
     }
     const message =

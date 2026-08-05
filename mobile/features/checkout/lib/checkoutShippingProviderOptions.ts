@@ -13,14 +13,22 @@ export type CheckoutShippingProviderOption = {
   live: boolean;
 };
 
+/** Seller + only live carriers. Locked «скоро» stubs are not shown. */
 export function listCheckoutShippingProviderOptions(): CheckoutShippingProviderOption[] {
   return [
     { id: CHECKOUT_SHIPPING_PROVIDER_SELLER, live: true },
-    ...SHIPPING_PROVIDERS.map((id) => ({
+    ...SHIPPING_PROVIDERS.filter((id) => isShippingProviderLive(id)).map((id) => ({
       id,
-      live: isShippingProviderLive(id),
+      live: true,
     })),
   ];
+}
+
+/** Courier / pickup-point types only when a live carrier exists. */
+export function hasCheckoutLiveCarrierProviders(): boolean {
+  return listCheckoutShippingProviderOptions().some(
+    (option) => option.id !== CHECKOUT_SHIPPING_PROVIDER_SELLER && option.live,
+  );
 }
 
 export function resolveCheckoutShippingProviderLabel(
@@ -39,5 +47,9 @@ export const CHECKOUT_SHIPPING_SERVICE_OPTIONS = [
   { id: SHIPPING_SERVICE_COURIER, live: false },
   { id: SHIPPING_SERVICE_PICKUP_POINT, live: false },
 ] as const;
+
+export function listCheckoutShippingServiceOptions() {
+  return CHECKOUT_SHIPPING_SERVICE_OPTIONS.filter((option) => option.live);
+}
 
 export { SHIPPING_SERVICE_COURIER, SHIPPING_SERVICE_PICKUP_POINT };

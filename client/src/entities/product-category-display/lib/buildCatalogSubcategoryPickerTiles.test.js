@@ -70,4 +70,32 @@ describe("buildCatalogSubcategoryPickerTiles", () => {
       isCustomImage: true,
     });
   });
+
+  it("omits view-all when includeViewAll is false", () => {
+    const tiles = buildCatalogSubcategoryPickerTiles({
+      parent: { id: "root1", labelRu: "Электроника" },
+      categories: [
+        {
+          id: "child1",
+          slug: "phones",
+          labelRu: "Телефоны",
+          parentId: "root1",
+          depth: 1,
+          pathSlugs: ["electronics", "phones"],
+          pathLabelRu: ["Электроника", "Телефоны"],
+          isLeaf: true,
+          searchKeywords: [],
+        },
+      ],
+      displays: [],
+      includeViewAll: false,
+    });
+
+    expect(tiles).toHaveLength(1);
+    expect(tiles[0]).toMatchObject({
+      kind: "category",
+      categoryId: "child1",
+      label: "Телефоны",
+    });
+  });
 });

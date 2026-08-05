@@ -28,6 +28,14 @@ export const EMAIL_VERIFICATION_SENT_MESSAGE = "Письмо с подтверж
 
 export const EMAIL_VERIFICATION_SUCCESS_MESSAGE = "Email успешно подтверждён";
 
+export const EMAIL_NOT_SET_MESSAGE = "Укажите email";
+
+export const EMAIL_TAKEN_MESSAGE = "Этот email уже занят";
+
+/** Владелец профиля: смена email только через `/auth/email/bind/*`. */
+export const EMAIL_CHANGE_REQUIRES_OTP_MESSAGE =
+  "Смена email доступна только после подтверждения кодом из письма";
+
 /**
  * Срок жизни заявки на регистрацию до подтверждения email.
  * По истечении MongoDB удаляет заявку по TTL-индексу — данные

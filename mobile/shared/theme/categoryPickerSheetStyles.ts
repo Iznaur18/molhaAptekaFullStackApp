@@ -118,6 +118,13 @@ export const useCategoryPickerSheetStyles = createThemedStyles((theme) => ({
     paddingHorizontal: theme.spacing[4],
     paddingBottom: theme.spacing[8],
   },
+  tilesContent: {
+    paddingTop: theme.spacing[1],
+  },
+  tilesGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
   row: {
     flexDirection: "row",
     alignItems: "center",

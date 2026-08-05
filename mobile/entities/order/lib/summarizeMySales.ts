@@ -1,10 +1,11 @@
 import { isOrderInProgress } from "@/entities/order/lib/isOrderInProgress";
 import { orderNeedsSellerAttention } from "@/entities/order/lib/orderNeedsSellerAttention";
+import { resolveOrderActiveAmountRub } from "@/entities/order/lib/resolveOrderActiveAmountRub";
 
 type OrderRecord = {
   status?: string;
   totalAmount?: number;
-  items?: { status?: string }[];
+  items?: { status?: string; quantity?: number; unitPriceAtOrder?: number }[];
 };
 
 export const summarizeMySales = (orders: OrderRecord[]) => {
@@ -13,7 +14,7 @@ export const summarizeMySales = (orders: OrderRecord[]) => {
   let totalAmountRub = 0;
 
   for (const order of orders) {
-    totalAmountRub += Number(order.totalAmount) || 0;
+    totalAmountRub += resolveOrderActiveAmountRub(order);
 
     if (isOrderInProgress(order)) {
       inProgressCount += 1;

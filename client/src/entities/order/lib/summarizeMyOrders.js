@@ -1,5 +1,6 @@
 import { isOrderInProgress } from "./isOrderInProgress.js";
 import { orderNeedsBuyerAttention } from "./orderNeedsBuyerAttention.js";
+import { resolveOrderActiveAmountRub } from "./resolveOrderActiveAmountRub.js";
 
 /**
  * @param {import("../model/types.js").Order[]} orders
@@ -10,7 +11,7 @@ export function summarizeMyOrders(orders) {
   let totalAmountRub = 0;
 
   for (const order of orders) {
-    totalAmountRub += Number(order.totalAmount) || 0;
+    totalAmountRub += resolveOrderActiveAmountRub(order);
 
     if (isOrderInProgress(order)) {
       inProgressCount += 1;

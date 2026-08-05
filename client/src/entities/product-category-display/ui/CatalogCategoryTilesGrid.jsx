@@ -22,17 +22,19 @@ import "../ui/CatalogCategoriesGrid.css";
  *   onEditTileClick?: (item: CatalogCategoryTileItem) => void;
  *   getEditAriaLabel?: (item: CatalogCategoryTileItem) => string;
  *   pendingTileKey?: string | null;
+ *   disabled?: boolean;
  * }} props
  */
 export function CatalogCategoryTilesGrid({
   items,
   isAdmin = false,
+  disabled = false,
   onTileClick,
   onEditTileClick,
   getEditAriaLabel = (item) => PRODUCT_CATEGORY_DISPLAY_UI.EDIT_ARIA(item.label),
   pendingTileKey = null,
 }) {
-  const isInteractionLocked = Boolean(pendingTileKey);
+  const isInteractionLocked = Boolean(pendingTileKey) || disabled;
 
   return (
     <ul className="catalog-categories-grid__list">
@@ -72,6 +74,7 @@ export function CatalogCategoryTilesGrid({
                   type="button"
                   className="catalog-categories-grid__edit"
                   aria-label={getEditAriaLabel(item)}
+                  disabled={disabled}
                   onClick={(event) => {
                     event.stopPropagation();
                     onEditTileClick(item);

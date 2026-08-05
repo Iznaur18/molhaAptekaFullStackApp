@@ -1,4 +1,4 @@
-/** @typedef {"system" | "light" | "dark"} ThemePreference */
+/** @typedef {"system" | "light" | "dark" | "custom"} ThemePreference */
 
 const THEME_PREFERENCE_KEY = "app-theme-preference";
 
@@ -7,7 +7,12 @@ const THEME_PREFERENCE_KEY = "app-theme-preference";
  * @returns {value is ThemePreference}
  */
 function isThemePreference(value) {
-  return value === "system" || value === "light" || value === "dark";
+  return (
+    value === "system" ||
+    value === "light" ||
+    value === "dark" ||
+    value === "custom"
+  );
 }
 
 /**

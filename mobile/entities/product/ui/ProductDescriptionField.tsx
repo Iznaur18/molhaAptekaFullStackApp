@@ -120,6 +120,8 @@ export function ProductDescriptionField({
         }}
         selection={selection}
         multiline
+        // Parent ScrollView owns vertical scroll; nested multiline steals pan otherwise.
+        scrollEnabled={false}
         editable={!disabled}
         maxLength={maxLength}
         placeholder={placeholder}

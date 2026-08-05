@@ -23,10 +23,11 @@ import { useCheckoutFormStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 import { CheckoutPaymentMethodPicker } from "@/features/checkout/ui/CheckoutPaymentMethodPicker";
 import { CheckoutShippingProviderPicker } from "@/features/checkout/ui/CheckoutShippingProviderPicker";
+import type { CheckoutPickupLocation } from "@/entities/cart/lib/buildCheckoutPickupLocations";
 
 type CheckoutFormProps = {
   defaultUser?: Record<string, unknown> | null;
-  pickupAddressSummary?: string;
+  pickupLocations?: CheckoutPickupLocation[];
   deliveryAvailable?: boolean;
   pickupAvailable?: boolean;
   isSubmitting: boolean;
@@ -45,7 +46,7 @@ type CheckoutFormProps = {
 
 export const CheckoutForm = ({
   defaultUser,
-  pickupAddressSummary = "",
+  pickupLocations = [],
   deliveryAvailable = false,
   pickupAvailable = true,
   isSubmitting,
@@ -89,7 +90,20 @@ export const CheckoutForm = ({
   }, [deliverySelectable, pickupSelectable, fulfillmentMethod]);
 
   const isPickup = fulfillmentMethod === ORDER_FULFILLMENT_PICKUP;
-  const pickupReady = String(pickupAddressSummary ?? "").trim().length > 0;
+  const pickupPoints = useMemo(
+    () =>
+      (Array.isArray(pickupLocations) ? pickupLocations : [])
+        .map((item) => ({
+          address: String(item?.address ?? "").trim(),
+          productTitles: Array.isArray(item?.productTitles)
+            ? item.productTitles.map((title) => String(title ?? "").trim()).filter(Boolean)
+            : [],
+        }))
+        .filter((item) => item.address.length > 0),
+    [pickupLocations],
+  );
+  const pickupReady = pickupPoints.length > 0;
+  const showPickupTitles = pickupPoints.length > 1;
 
   const isAddressValid = useMemo(() => {
     if (isPickup) {
@@ -232,9 +246,37 @@ export const CheckoutForm = ({
         {isPickup ? (
           <View style={checkoutStyles.fieldGroup}>
             <Text style={checkoutStyles.fieldLabel}>{CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}</Text>
-            <Text style={checkoutStyles.pickupAddressText}>
-              {pickupReady ? pickupAddressSummary : CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED}
-            </Text>
+            {pickupReady ? (
+              <>
+                {pickupPoints.length > 1 ? (
+                  <Text style={checkoutStyles.pickupHint}>{CHECKOUT_FORM_UI.PICKUP_MULTI_HINT}</Text>
+                ) : null}
+                <View style={checkoutStyles.pickupList}>
+                  {pickupPoints.map((point, index) => (
+                    <View
+                      key={`${point.address}-${index}`}
+                      style={checkoutStyles.pickupItem}
+                    >
+                      <View style={checkoutStyles.pickupIndex}>
+                        <Text style={checkoutStyles.pickupIndexText}>{index + 1}</Text>
+                      </View>
+                      <View style={checkoutStyles.pickupBody}>
+                        {showPickupTitles && point.productTitles.length > 0 ? (
+                          <Text style={checkoutStyles.pickupProducts}>
+                            {point.productTitles.join(", ")}
+                          </Text>
+                        ) : null}
+                        <Text style={checkoutStyles.pickupAddressText}>{point.address}</Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              </>
+            ) : (
+              <Text style={[checkoutStyles.pickupAddressText, checkoutStyles.pickupAddressError]}>
+                {CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED}
+              </Text>
+            )}
           </View>
         ) : (
           <>

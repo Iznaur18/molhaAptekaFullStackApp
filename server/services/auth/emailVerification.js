@@ -9,6 +9,8 @@ import {
   EMAIL_VERIFICATION_INVALID_TOKEN_MESSAGE,
   EMAIL_VERIFICATION_MAX_ATTEMPTS,
   EMAIL_VERIFICATION_TOKEN_TTL_MS,
+  EMAIL_NOT_SET_MESSAGE,
+  EMAIL_TAKEN_MESSAGE,
 } from "../../constants/emailVerificationConstants.js";
 import { EMAIL_VERIFICATION_SUBJECT } from "../../constants/smtpConstants.js";
 import { isSmtpConfigured, sendSmtpMail } from "../../utils/smtpMail.js";
@@ -47,6 +49,34 @@ export const issueEmailVerificationCode = async (userId) => {
       emailVerificationExpiresAt: expiresAt,
       emailVerificationAttemptCount: 0,
     },
+    $unset: {
+      pendingEmail: "",
+    },
+  });
+
+  return rawCode;
+};
+
+/**
+ * Код для привязки/смены email (пишется в `pendingEmail`).
+ *
+ * @param {import('mongoose').Types.ObjectId | string} userId
+ * @param {string} email
+ * @returns {Promise<string>}
+ */
+export const issueEmailBindCode = async (userId, email) => {
+  const rawCode = generateEmailVerificationCode();
+  const tokenHash = hashEmailVerificationSecret(rawCode);
+  const expiresAt = new Date(Date.now() + EMAIL_VERIFICATION_TOKEN_TTL_MS);
+  const normalized = String(email).trim().toLowerCase();
+
+  await UserModel.findByIdAndUpdate(userId, {
+    $set: {
+      pendingEmail: normalized,
+      emailVerificationTokenHash: tokenHash,
+      emailVerificationExpiresAt: expiresAt,
+      emailVerificationAttemptCount: 0,
+    },
   });
 
   return rawCode;
@@ -60,6 +90,7 @@ export const clearEmailVerificationToken = async (userId) => {
     $unset: {
       emailVerificationTokenHash: "",
       emailVerificationExpiresAt: "",
+      pendingEmail: "",
     },
     $set: {
       emailVerificationAttemptCount: 0,
@@ -71,11 +102,22 @@ export const clearEmailVerificationToken = async (userId) => {
  * @param {import('mongoose').Types.ObjectId | string} userId
  */
 export const markUserEmailVerified = async (userId) => {
+  const user = await UserModel.findById(userId).select("+pendingEmail");
+  const pending = String(user?.pendingEmail ?? "")
+    .trim()
+    .toLowerCase();
+  /** @type {Record<string, unknown>} */
+  const $set = { isEmailVerified: true, emailVerificationAttemptCount: 0 };
+  if (pending) {
+    $set.email = pending;
+  }
+
   await UserModel.findByIdAndUpdate(userId, {
-    $set: { isEmailVerified: true, emailVerificationAttemptCount: 0 },
+    $set,
     $unset: {
       emailVerificationTokenHash: "",
       emailVerificationExpiresAt: "",
+      pendingEmail: "",
     },
   });
 };
@@ -228,3 +270,107 @@ export const sendEmailVerificationForUser = async (userId) => {
 
   return { email: user.email };
 };
+
+/**
+ * Запрос кода для привязки/смены email (auth).
+ *
+ * @param {import('mongoose').Types.ObjectId | string} userId
+ * @param {string} rawEmail
+ */
+export async function requestEmailBindForUser(userId, rawEmail) {
+  const email = String(rawEmail ?? "")
+    .trim()
+    .toLowerCase();
+  if (!email) {
+    throw new Error(EMAIL_NOT_SET_MESSAGE);
+  }
+
+  const user = await UserModel.findById(userId).select("email isEmailVerified userName");
+  if (!user) {
+    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+  }
+
+  const currentEmail = String(user.email ?? "")
+    .trim()
+    .toLowerCase();
+  if (user.isEmailVerified === true && currentEmail === email) {
+    throw new Error(EMAIL_VERIFICATION_ALREADY_VERIFIED_MESSAGE);
+  }
+
+  const taken = await UserModel.findOne({
+    email,
+    _id: { $ne: user._id },
+  }).select("_id");
+  if (taken) {
+    throw new Error(EMAIL_TAKEN_MESSAGE);
+  }
+
+  const code = await issueEmailBindCode(user._id, email);
+  try {
+    await deliverEmailVerification({
+      email,
+      userName: user.userName,
+      code,
+    });
+  } catch (error) {
+    await clearEmailVerificationToken(user._id);
+    throw error;
+  }
+
+  return { email };
+}
+
+/**
+ * Подтверждение привязки/смены email кодом.
+ *
+ * @param {import('mongoose').Types.ObjectId | string} userId
+ * @param {unknown} rawCode
+ */
+export async function confirmEmailBindForUser(userId, rawCode) {
+  const code = String(rawCode ?? "").trim();
+  if (!EMAIL_VERIFICATION_CODE_PATTERN.test(code)) {
+    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+  }
+
+  const user = await UserModel.findById(userId).select(
+    "+emailVerificationTokenHash +emailVerificationExpiresAt +emailVerificationAttemptCount +pendingEmail email",
+  );
+  if (!user) {
+    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+  }
+
+  if ((user.emailVerificationAttemptCount ?? 0) >= EMAIL_VERIFICATION_MAX_ATTEMPTS) {
+    throw new Error(EMAIL_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE);
+  }
+
+  const now = new Date();
+  if (!user.emailVerificationExpiresAt || user.emailVerificationExpiresAt <= now) {
+    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+  }
+
+  const pending = String(user.pendingEmail ?? "")
+    .trim()
+    .toLowerCase();
+  if (!pending) {
+    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+  }
+
+  if (user.emailVerificationTokenHash !== hashEmailVerificationSecret(code)) {
+    await UserModel.findByIdAndUpdate(userId, {
+      $inc: { emailVerificationAttemptCount: 1 },
+    });
+    throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
+  }
+
+  const taken = await UserModel.findOne({
+    email: pending,
+    _id: { $ne: user._id },
+  }).select("_id");
+  if (taken) {
+    await clearEmailVerificationToken(userId);
+    throw new Error(EMAIL_TAKEN_MESSAGE);
+  }
+
+  await markUserEmailVerified(userId);
+  return { email: pending };
+}

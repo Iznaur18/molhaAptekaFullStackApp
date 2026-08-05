@@ -13,7 +13,7 @@ vi.mock("../../../shared/config/featureFlags.js", () => ({
 
 const baseProps = {
   defaultDeliveryAddress: {},
-  pickupAddressSummary: "Москва, Тверская 1",
+  pickupLocations: [{ address: "Москва, Тверская 1", productTitles: ["Товар"] }],
   isSubmitting: false,
   submitError: "",
   submitSuccess: "",
@@ -22,13 +22,13 @@ const baseProps = {
 
 describe("CheckoutForm", () => {
   it("disables submit when pickup address missing", () => {
-    renderWithProviders(<CheckoutForm {...baseProps} pickupAddressSummary="" />);
+    renderWithProviders(<CheckoutForm {...baseProps} pickupLocations={[]} />);
 
     expect(screen.getByRole("button", { name: CHECKOUT_FORM_UI.SUBMIT_IDLE })).toBeDisabled();
   });
 
   it("shows pickup validation error on empty pickup submit", async () => {
-    renderWithProviders(<CheckoutForm {...baseProps} pickupAddressSummary="" />);
+    renderWithProviders(<CheckoutForm {...baseProps} pickupLocations={[]} />);
 
     const form = screen.getByRole("heading", { name: CHECKOUT_FORM_UI.HEADING }).closest("form");
     fireEvent.submit(form);
@@ -36,6 +36,24 @@ describe("CheckoutForm", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED,
     );
+  });
+
+  it("renders pickup points as a list", () => {
+    renderWithProviders(
+      <CheckoutForm
+        {...baseProps}
+        pickupLocations={[
+          { address: "Москва, Тверская 1", productTitles: ["Аспирин"] },
+          { address: "Грозный, ул. Кишиевой 56", productTitles: ["Витамин C"] },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText(CHECKOUT_FORM_UI.PICKUP_MULTI_HINT)).toBeInTheDocument();
+    expect(screen.getByText("Москва, Тверская 1")).toBeInTheDocument();
+    expect(screen.getByText("Грозный, ул. Кишиевой 56")).toBeInTheDocument();
+    expect(screen.getByText("Аспирин")).toBeInTheDocument();
+    expect(screen.getByText("Витамин C")).toBeInTheDocument();
   });
 
   it("submits pickup fulfillment when address present", async () => {

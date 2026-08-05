@@ -10,9 +10,11 @@ import "./ProductPromotionManageSection.css";
  * @property {(productId: string, productIsAvailable: boolean) => void | Promise<void>} [onSetAvailability]
  * @property {(productId: string, productAuctionEnabled: boolean) => void | Promise<void>} [onSetAuction]
  * @property {(productId: string, productQaEnabled: boolean) => void | Promise<void>} [onSetQa]
+ * @property {(productId: string, productIsOriginal: boolean) => void | Promise<void>} [onSetOriginality]
  * @property {boolean} [isAvailabilityTogglePending]
  * @property {boolean} [isAuctionTogglePending]
  * @property {boolean} [isQaTogglePending]
+ * @property {boolean} [isOriginalityTogglePending]
  * @property {string} [errorMessage]
  * @property {boolean} [canEdit]
  * @property {boolean} [canToggleVisibility]
@@ -35,6 +37,7 @@ export function ProductPromotionManageSection({
   onSetAvailability,
   onSetAuction,
   onSetQa,
+  onSetOriginality,
   onSetWholesale,
   onSetAffiliate,
   onSetInstallment,
@@ -42,6 +45,7 @@ export function ProductPromotionManageSection({
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
   isQaTogglePending = false,
+  isOriginalityTogglePending = false,
   isWholesaleTogglePending = false,
   isAffiliateTogglePending = false,
   isInstallmentTogglePending = false,
@@ -86,6 +90,7 @@ export function ProductPromotionManageSection({
         onSetAvailability={onSetAvailability}
         onSetAuction={onSetAuction}
         onSetQa={onSetQa}
+        onSetOriginality={onSetOriginality}
         onSetWholesale={onSetWholesale}
         onSetAffiliate={onSetAffiliate}
         onSetInstallment={onSetInstallment}
@@ -93,6 +98,7 @@ export function ProductPromotionManageSection({
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
         isQaTogglePending={isQaTogglePending}
+        isOriginalityTogglePending={isOriginalityTogglePending}
         isWholesaleTogglePending={isWholesaleTogglePending}
         isAffiliateTogglePending={isAffiliateTogglePending}
         isInstallmentTogglePending={isInstallmentTogglePending}

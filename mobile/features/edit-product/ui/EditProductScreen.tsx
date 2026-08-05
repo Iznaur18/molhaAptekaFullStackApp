@@ -111,7 +111,6 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
   const [productListingOrigin, setProductListingOrigin] = useState<ProductListingOrigin | null>(
     null,
   );
-  const [productIsOriginal, setProductIsOriginal] = useState(false);
   const [productDescription, setProductDescription] = useState("");
   const [productPrice, setProductPrice] = useState("");
   const [productOldPrice, setProductOldPrice] = useState("");
@@ -143,7 +142,6 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
     setProductListingOrigin(
       isProductListingOrigin(product.productListingOrigin) ? product.productListingOrigin : null,
     );
-    setProductIsOriginal(product.productIsOriginal === true);
     setProductDescription(String(product.productDescription ?? "").trim());
     setProductPrice(formatRubPriceInput(product.productPrice ?? ""));
     const oldPrice = product.productOldPrice;
@@ -317,7 +315,6 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
         body: {
           productName: productName.trim(),
           productListingOrigin: productListingOrigin!,
-          productIsOriginal,
           productDescription: productDescription.trim(),
           productPrice: parseRubPriceInput(productPrice) ?? 0,
           productOldPrice: oldPriceRaw ? oldPrice : null,
@@ -413,68 +410,6 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
               onChange={setProductListingOrigin}
               disabled={isBusy}
             />
-
-            <View style={styles.field}>
-              <Text style={styles.label}>{CREATE_PRODUCT_UI.ORIGINALITY_STATEMENT}</Text>
-              <View style={styles.returnChoiceRow}>
-                <Pressable
-                  disabled={isBusy}
-                  onPress={() => setProductIsOriginal(true)}
-                  style={[
-                    styles.returnChoiceChip,
-                    {
-                      borderColor: productIsOriginal
-                        ? theme.colors.action
-                        : theme.colors.border,
-                      backgroundColor: productIsOriginal
-                        ? theme.colors.action
-                        : theme.colors.surface,
-                    },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.returnChoiceChipText,
-                      {
-                        color: productIsOriginal
-                          ? theme.colors.onContrast
-                          : theme.colors.text,
-                      },
-                    ]}
-                  >
-                    {CREATE_PRODUCT_UI.ORIGINALITY_YES}
-                  </Text>
-                </Pressable>
-                <Pressable
-                  disabled={isBusy}
-                  onPress={() => setProductIsOriginal(false)}
-                  style={[
-                    styles.returnChoiceChip,
-                    {
-                      borderColor: !productIsOriginal
-                        ? theme.colors.action
-                        : theme.colors.border,
-                      backgroundColor: !productIsOriginal
-                        ? theme.colors.action
-                        : theme.colors.surface,
-                    },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.returnChoiceChipText,
-                      {
-                        color: !productIsOriginal
-                          ? theme.colors.onContrast
-                          : theme.colors.text,
-                      },
-                    ]}
-                  >
-                    {CREATE_PRODUCT_UI.ORIGINALITY_NO}
-                  </Text>
-                </Pressable>
-              </View>
-            </View>
 
             <View style={styles.field}>
               <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_DESCRIPTION}</Text>

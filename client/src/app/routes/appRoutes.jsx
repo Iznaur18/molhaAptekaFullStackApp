@@ -10,6 +10,7 @@ import { CatalogRoutePage } from "./CatalogRoutePage.jsx";
 import { FaqRoutePage } from "./FaqRoutePage.jsx";
 import { LegalRoutePage } from "./LegalRoutePage.jsx";
 import { LoginRoutePage } from "./LoginRoutePage.jsx";
+import { ForgotPasswordRoutePage } from "./ForgotPasswordRoutePage.jsx";
 import { MyProductsRoutePage } from "./MyProductsRoutePage.jsx";
 import { ProductRoutePage } from "./ProductRoutePage.jsx";
 import { RaffleProductsRoutePage } from "./RaffleProductsRoutePage.jsx";
@@ -49,6 +50,7 @@ export function renderAppShellRoutes() {
       <Route path="/faq" element={<FaqRoutePage />} />
       <Route path="/legal/:kind" element={<LegalRoutePage />} />
       <Route path="/login" element={<LoginRoutePage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordRoutePage />} />
       <Route path="/register" element={<RegisterRoutePage />} />
       <Route path="/my-products" element={<MyProductsRoutePage />} />
       {ACCOUNT_MAIN_VIEW_ROUTES.map((path) => (

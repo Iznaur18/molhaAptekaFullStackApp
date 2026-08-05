@@ -192,7 +192,7 @@ export const loginPhoneOtpConfirmController = async (req, res) => {
 /** POST /auth/phone/bind/request (auth) */
 export const phoneBindRequestController = async (req, res) => {
   try {
-    const result = await requestPhoneBindForUser(req.user._id, req.body.phoneNumber);
+    const result = await requestPhoneBindForUser(req.userId, req.body.phoneNumber);
     return successRes(res, {
       phoneNumber: result.phoneNumber,
       message: PHONE_VERIFICATION_SENT_MESSAGE,
@@ -209,7 +209,7 @@ export const phoneBindRequestController = async (req, res) => {
 /** POST /auth/phone/bind/confirm (auth) */
 export const phoneBindConfirmController = async (req, res) => {
   try {
-    const result = await confirmPhoneBindForUser(req.user._id, req.body.code);
+    const result = await confirmPhoneBindForUser(req.userId, req.body.code);
     return successRes(res, {
       phoneNumber: result.phoneNumber,
       message: PHONE_VERIFICATION_SUCCESS_MESSAGE,

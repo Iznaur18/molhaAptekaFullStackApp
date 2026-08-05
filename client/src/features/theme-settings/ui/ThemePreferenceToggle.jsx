@@ -15,6 +15,7 @@ const OPTIONS = [
   { value: /** @type {ThemePreference} */ ("system"), label: THEME_SETTINGS_UI.SYSTEM },
   { value: /** @type {ThemePreference} */ ("light"), label: THEME_SETTINGS_UI.LIGHT },
   { value: /** @type {ThemePreference} */ ("dark"), label: THEME_SETTINGS_UI.DARK },
+  { value: /** @type {ThemePreference} */ ("custom"), label: THEME_SETTINGS_UI.CUSTOM },
 ];
 
 export function ThemePreferenceToggle() {

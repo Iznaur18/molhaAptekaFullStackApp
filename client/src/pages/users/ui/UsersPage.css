@@ -44,3 +44,22 @@
 .users-page__state_error {
   color: var(--iz-color-danger);
 }
+
+.users-page__auth {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.85rem;
+  max-width: 22rem;
+  margin: 1.25rem auto 0;
+  padding: 0 0.25rem;
+  text-align: center;
+}
+
+.users-page__auth .users-page__state {
+  color: var(--iz-color-text-secondary);
+}
+
+.users-page__login {
+  width: 100%;
+}

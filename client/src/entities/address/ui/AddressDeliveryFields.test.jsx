@@ -13,6 +13,10 @@ vi.mock("../api/fetchAddressSuggestions.js", () => ({
   fetchAddressSuggestions: (...args) => fetchAddressSuggestionsMock(...args),
 }));
 
+vi.mock("../../maps/ui/MapPointPicker.jsx", () => ({
+  MapPointPicker: () => null,
+}));
+
 const { AddressDeliveryFields } = await import("./AddressDeliveryFields.jsx");
 
 const emptyValue = {

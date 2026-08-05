@@ -35,14 +35,14 @@ export const PROFILE_NAV_TONE_PALETTE_DARK: Record<ProfileNavToneId, ProfileNavT
   slate: { main: "#596F9A", soft: "#303147", strong: "#8589AC" },
 };
 
-/** Пользовательская тема: #502D55 #935073 #F6DBC0 #F8F4E9 (+ status accents). */
+/** Пользовательская тема: #171717 #F25623 #4D4D4D #DEDEDE (+ status accents). */
 export const PROFILE_NAV_TONE_PALETTE_CUSTOM: Record<ProfileNavToneId, ProfileNavTonePalette> = {
-  blue: { main: "#F6DBC0", soft: "#935073", strong: "#F8F4E9" },
-  green: { main: "#4ade80", soft: "#502D55", strong: "#86efac" },
-  amber: { main: "#fbbf24", soft: "#502D55", strong: "#fde68a" },
-  red: { main: "#f87171", soft: "#502D55", strong: "#fecaca" },
-  purple: { main: "#F6DBC0", soft: "#935073", strong: "#F8F4E9" },
-  slate: { main: "#F6DBC0", soft: "#502D55", strong: "#F8F4E9" },
+  blue: { main: "#F25623", soft: "#fde9e2", strong: "#d53e0d" },
+  green: { main: "#16a34a", soft: "#eef5f0", strong: "#047857" },
+  amber: { main: "#d97706", soft: "#f7f3ea", strong: "#92400e" },
+  red: { main: "#c62828", soft: "#f7eeee", strong: "#991b1b" },
+  purple: { main: "#F25623", soft: "#fde9e2", strong: "#d53e0d" },
+  slate: { main: "#4D4D4D", soft: "#DEDEDE", strong: "#171717" },
 };
 
 const PROFILE_NAV_SECTION_TONE_MAP = {

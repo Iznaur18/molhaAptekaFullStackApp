@@ -22,10 +22,17 @@ import { userUpdateProfileController } from "./User/userUpdateProfileController.
 import { userDeleteProfileController } from "./User/userDeleteProfileController.js";
 import { refreshAuthController } from "./User/refreshAuthController.js";
 import {
+  emailBindConfirmController,
+  emailBindRequestController,
   resendEmailVerificationController,
   verifyEmailController,
   verifyEmailWithCodeController,
 } from "./User/emailVerificationControllers.js";
+import {
+  passwordChangeController,
+  passwordResetConfirmController,
+  passwordResetRequestController,
+} from "./User/passwordResetControllers.js";
 import {
   userVoteRatingController,
   userGetRatingController,
@@ -267,6 +274,11 @@ export {
   verifyEmailController,
   resendEmailVerificationController,
   verifyEmailWithCodeController,
+  emailBindRequestController,
+  emailBindConfirmController,
+  passwordResetRequestController,
+  passwordResetConfirmController,
+  passwordChangeController,
   userVoteRatingController,
   userGetRatingController,
   getMyVoteForTargetController,

@@ -4,6 +4,11 @@ import {
   loginPhonePasswordBodySchema,
   phoneBindConfirmBodySchema,
   phoneBindRequestBodySchema,
+  emailBindConfirmBodySchema,
+  emailBindRequestBodySchema,
+  passwordChangeBodySchema,
+  passwordResetConfirmBodySchema,
+  passwordResetRequestBodySchema,
   registerPhoneBodySchema,
 } from "@molha/api-contract";
 
@@ -24,3 +29,13 @@ export const loginPhoneOtpConfirmValidation = validateBodyZod(loginPhoneOtpConfi
 export const phoneBindRequestValidation = validateBodyZod(phoneBindRequestBodySchema);
 
 export const phoneBindConfirmValidation = validateBodyZod(phoneBindConfirmBodySchema);
+
+export const emailBindRequestValidation = validateBodyZod(emailBindRequestBodySchema);
+
+export const emailBindConfirmValidation = validateBodyZod(emailBindConfirmBodySchema);
+
+export const passwordResetRequestValidation = validateBodyZod(passwordResetRequestBodySchema);
+
+export const passwordResetConfirmValidation = validateBodyZod(passwordResetConfirmBodySchema);
+
+export const passwordChangeValidation = validateBodyZod(passwordChangeBodySchema);

@@ -2,6 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { useSubmitDataConfirmationRequestMutation } from "../model/useSubmitDataConfirmationRequestMutation.js";
+import {
+  clearDataConfirmationFormDraft,
+  persistDataConfirmationFormDraft,
+  readDataConfirmationFormDraft,
+} from "../lib/dataConfirmationFormDraftStorage.js";
 import { emptyPassportForm } from "../lib/emptyPassportForm.js";
 import {
   maskPassportDateInput,
@@ -21,6 +26,7 @@ import {
   USER_DATA_CONFIRMATION_STATUS_PENDING,
   USER_DATA_CONFIRMATION_STATUS_REJECTED,
 } from "../model/constants.js";
+import { useAuthSession } from "../../user/model/useAuthSession.js";
 import { useUploadAssetMutations } from "../../../shared/model/useUploadAssetMutations.js";
 import {
   DATA_CONFIRMATION_MODAL_UI,
@@ -54,6 +60,7 @@ const STEP_TITLES = [
  * }} props
  */
 export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
+  const { currentUserId } = useAuthSession();
   const submitRequestMutation = useSubmitDataConfirmationRequestMutation();
   const { uploadImageMutation } = useUploadAssetMutations();
   const statusQuery = useMyDataConfirmationStatusQuery({ enabled: isOpen });
@@ -62,6 +69,7 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
   const [selfiePreviewUrl, setSelfiePreviewUrl] = useState("");
   const [error, setError] = useState("");
   const [step, setStep] = useState(PASSPORT_FORM_STEP_IDENTITY);
+  const [isDraftHydrated, setIsDraftHydrated] = useState(false);
   const isSubmitting =
     submitRequestMutation.isPending || uploadImageMutation.isPending;
   const selfieFileInputRef = useRef(/** @type {HTMLInputElement | null} */ (null));
@@ -97,13 +105,30 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
 
   useEffect(() => {
     if (!isOpen) {
+      setIsDraftHydrated(false);
       return;
     }
     setError("");
     setSelfieFile(null);
-    setForm(emptyPassportForm());
-    setStep(PASSPORT_FORM_STEP_IDENTITY);
-  }, [isOpen, statusQuery.dataUpdatedAt]);
+    const draft = currentUserId
+      ? readDataConfirmationFormDraft(currentUserId)
+      : null;
+    if (draft) {
+      setForm(draft.form);
+      setStep(draft.step);
+    } else {
+      setForm(emptyPassportForm());
+      setStep(PASSPORT_FORM_STEP_IDENTITY);
+    }
+    setIsDraftHydrated(true);
+  }, [isOpen, currentUserId]);
+
+  useEffect(() => {
+    if (!isOpen || !currentUserId || !isDraftHydrated) {
+      return;
+    }
+    persistDataConfirmationFormDraft(currentUserId, { form, step });
+  }, [isOpen, currentUserId, form, step, isDraftHydrated]);
 
   useScrollLock(isOpen, { strategy: "overflow" });
 
@@ -222,6 +247,7 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
         },
         passportSelfiePhotoUrl,
       });
+      clearDataConfirmationFormDraft(currentUserId);
       onSubmitted?.();
       onClose();
     } catch (e) {

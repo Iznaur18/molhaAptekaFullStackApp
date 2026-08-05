@@ -2,8 +2,13 @@ import { getRuRegionByCode } from "@molha/api-contract";
 
 import { urlsFromImageRows } from "../../lib/productImageRowHelpers.js";
 import { serializeProductReturnTermRows } from "../../lib/productReturnTermRows.js";
+import {
+  PRODUCT_LISTING_ORIGIN_OPTIONS,
+  isProductListingOrigin,
+} from "../../lib/productListingOrigin.js";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
 import { getProductFieldEditLabel } from "../../lib/productFieldRegistry.js";
+import { resolveCreateProductWizardStepIndex } from "../../../../features/create-product-wizard/lib/createProductWizardSteps.js";
 
 /**
  * @param {{
@@ -49,19 +54,18 @@ export function CreateProductReviewSection({
       multiline: true,
     },
     {
-      label: CREATE_PRODUCT_MODAL_UI.LABEL_ORIGINALITY,
-      value:
-        form.productIsOriginal === true
-          ? CREATE_PRODUCT_MODAL_UI.ORIGINALITY_YES
-          : form.productIsOriginal === false
-            ? CREATE_PRODUCT_MODAL_UI.ORIGINALITY_NO
-            : CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_EMPTY,
-      stepIndex: 1,
+      label: CREATE_PRODUCT_MODAL_UI.LABEL_LISTING_ORIGIN,
+      value: isProductListingOrigin(form.productListingOrigin)
+        ? (PRODUCT_LISTING_ORIGIN_OPTIONS.find(
+            (option) => option.value === form.productListingOrigin,
+          )?.label ?? CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_EMPTY)
+        : CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_EMPTY,
+      stepIndex: resolveCreateProductWizardStepIndex("originality"),
     },
     {
       label: CREATE_PRODUCT_MODAL_UI.SECTION_MEDIA,
       value: CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_MEDIA(imageCount, form.productPreviewVideoUrl),
-      stepIndex: 2,
+      stepIndex: resolveCreateProductWizardStepIndex("media"),
     },
     {
       label: CREATE_PRODUCT_MODAL_UI.LABEL_CATEGORY,

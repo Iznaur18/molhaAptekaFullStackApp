@@ -14,7 +14,7 @@ import "./CheckoutSheetModal.css";
  *   isOpen: boolean;
  *   onClose: () => void;
  *   defaultDeliveryAddress: Record<string, unknown>;
- *   pickupAddressSummary?: string;
+ *   pickupLocations?: Array<{ address: string; productTitles?: string[] }>;
  *   deliveryAvailable?: boolean;
  *   pickupAvailable?: boolean;
  *   isSubmitting: boolean;
@@ -33,7 +33,7 @@ export function CheckoutSheetModal({
   isOpen,
   onClose,
   defaultDeliveryAddress,
-  pickupAddressSummary = "",
+  pickupLocations = [],
   deliveryAvailable = false,
   pickupAvailable = true,
   isSubmitting,
@@ -112,7 +112,7 @@ export function CheckoutSheetModal({
         <div className="checkout-sheet-modal__body">
           <CheckoutForm
             defaultDeliveryAddress={defaultDeliveryAddress}
-            pickupAddressSummary={pickupAddressSummary}
+            pickupLocations={pickupLocations}
             deliveryAvailable={deliveryAvailable}
             pickupAvailable={pickupAvailable}
             isSubmitting={isSubmitting}

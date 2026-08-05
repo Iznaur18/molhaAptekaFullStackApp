@@ -37,6 +37,9 @@ export const useMyProductsPageActions = () => {
     null,
   );
   const [togglingAuctionProductId, setTogglingAuctionProductId] = useState<string | null>(null);
+  const [togglingOriginalityProductId, setTogglingOriginalityProductId] = useState<string | null>(
+    null,
+  );
   const [togglingWholesaleProductId, setTogglingWholesaleProductId] = useState<string | null>(
     null,
   );
@@ -167,6 +170,32 @@ export const useMyProductsPageActions = () => {
         );
       } finally {
         setTogglingAuctionProductId(null);
+      }
+    },
+    [patchMutation, syncPromotionProduct],
+  );
+
+  const handleSetProductOriginality = useCallback(
+    async (productId: string, isOriginal: boolean) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return;
+      }
+
+      setTogglingOriginalityProductId(normalizedProductId);
+      setManageErrorMessage("");
+      try {
+        const updated = await patchMutation.mutateAsync({
+          productId: normalizedProductId,
+          body: { productIsOriginal: isOriginal },
+        });
+        syncPromotionProduct(updated as MyProductsCatalogProduct);
+      } catch (error) {
+        setManageErrorMessage(
+          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+      } finally {
+        setTogglingOriginalityProductId(null);
       }
     },
     [patchMutation, syncPromotionProduct],
@@ -331,6 +360,8 @@ export const useMyProductsPageActions = () => {
       promotionProductId != null && togglingAvailabilityProductId === promotionProductId,
     isAuctionTogglePending:
       promotionProductId != null && togglingAuctionProductId === promotionProductId,
+    isOriginalityTogglePending:
+      promotionProductId != null && togglingOriginalityProductId === promotionProductId,
     isWholesaleTogglePending:
       promotionProductId != null && togglingWholesaleProductId === promotionProductId,
     isAffiliateTogglePending:
@@ -344,6 +375,7 @@ export const useMyProductsPageActions = () => {
     handleSubmitPromotion,
     handleSetMyProductAvailability,
     handleSetProductAuction,
+    handleSetProductOriginality,
     handleSetProductWholesale,
     handleSetProductAffiliate,
     handleSetProductInstallment,

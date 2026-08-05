@@ -17,6 +17,7 @@ import "./ProductEditManageSection.css";
  *   onSetAvailability?: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
  *   onSetAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
  *   onSetQa?: (productId: string, productQaEnabled: boolean) => void | Promise<void>;
+ *   onSetOriginality?: (productId: string, productIsOriginal: boolean) => void | Promise<void>;
  *   onSetWholesale?: (productId: string, productWholesaleEnabled: boolean) => void | Promise<void>;
    *   onSetAffiliate?: (
    *     productId: string,
@@ -27,6 +28,7 @@ import "./ProductEditManageSection.css";
  *   isAvailabilityTogglePending?: boolean;
  *   isAuctionTogglePending?: boolean;
  *   isQaTogglePending?: boolean;
+ *   isOriginalityTogglePending?: boolean;
  *   isWholesaleTogglePending?: boolean;
  *   isAffiliateTogglePending?: boolean;
  *   isDeletePending?: boolean;
@@ -54,12 +56,14 @@ export function ProductEditManageSection({
   onSetAvailability,
   onSetAuction,
   onSetQa,
+  onSetOriginality,
   onSetWholesale,
   onSetAffiliate,
   onDelete,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
   isQaTogglePending = false,
+  isOriginalityTogglePending = false,
   isWholesaleTogglePending = false,
   isAffiliateTogglePending = false,
   isInstallmentTogglePending = false,
@@ -86,6 +90,8 @@ export function ProductEditManageSection({
   const isAuctionEnabled = product.productAuctionEnabled === true;
   const showQaToggle = typeof onSetQa === "function" && canEdit;
   const isQaEnabled = product.productQaEnabled === true;
+  const showOriginality = typeof onSetOriginality === "function" && canEdit;
+  const isOriginal = product.productIsOriginal === true;
   const isInstallmentEnabled = product.productInstallmentEnabled === true;
   const isWholesaleEnabled = product.productWholesaleEnabled === true;
   const affiliateOffer = resolveProductAffiliateOffer(product);
@@ -117,6 +123,7 @@ export function ProductEditManageSection({
     isAvailabilityTogglePending ||
     isAuctionTogglePending ||
     isQaTogglePending ||
+    isOriginalityTogglePending ||
     isWholesaleTogglePending ||
     isAffiliateTogglePending ||
     isInstallmentTogglePending ||
@@ -155,6 +162,22 @@ export function ProductEditManageSection({
         </div>
       ) : null}
       <div className="product-edit-manage__toggles">
+        {showOriginality ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_MODAL_UI.LABEL_ORIGINALITY}
+            description={CREATE_PRODUCT_MODAL_UI.ORIGINALITY_STATEMENT}
+            checked={isOriginal}
+            disabled={actionsLocked}
+            pending={isOriginalityTogglePending}
+            pendingLabel={CREATE_PRODUCT_MODAL_UI.ORIGINALITY_TOGGLE_PENDING}
+            onCheckedChange={(next) => {
+              if (product._id == null || actionsLocked) {
+                return;
+              }
+              void onSetOriginality(String(product._id), next);
+            }}
+          />
+        ) : null}
         {showAuctionToggle ? (
           <ProductManageToggleRow
             title={CREATE_PRODUCT_MODAL_UI.MANAGE_AUCTION_TITLE}

@@ -24,7 +24,7 @@ export function resolveCreateProductWizardStepCopy(stepId) {
     case "category":
       return {
         title: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_CATEGORY_TITLE,
-        subtitle: "",
+        subtitle: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_CATEGORY_SUBTITLE,
         shortLabel: CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_LABEL_CATEGORY,
       };
     case "pickup":

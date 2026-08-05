@@ -47,21 +47,6 @@
   transform: translateX(-50%);
 }
 
-.mobile-bottom-nav::before {
-  content: "";
-  position: absolute;
-  inset: 1px 12% auto;
-  height: 42%;
-  border-radius: inherit;
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--iz-color-on-contrast) 48%, transparent),
-    transparent
-  );
-  pointer-events: none;
-  opacity: 0.55;
-}
-
 .mobile-bottom-nav__item {
   position: relative;
   z-index: 1;
@@ -153,10 +138,6 @@ body:has(.product-details-modal) .app-shell {
     background: color-mix(in srgb, var(--iz-color-on-contrast) 94%, transparent);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-  }
-
-  .mobile-bottom-nav::before {
-    display: none;
   }
 }
 

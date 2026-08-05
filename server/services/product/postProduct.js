@@ -190,9 +190,8 @@ export async function postProduct({ userId, body }) {
       required: true,
     },
   );
-  const productIsOriginal = normalizeProductIsOriginal(body.productIsOriginal, {
-    required: true,
-  });
+  const productIsOriginal =
+    normalizeProductIsOriginal(body.productIsOriginal, { required: false }) ?? false;
   const categoryWrite = await resolveCreateCategory(body);
 
   const productSearchBlob = buildProductSearchBlobFromFields({

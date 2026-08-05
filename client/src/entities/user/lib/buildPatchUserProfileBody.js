@@ -5,7 +5,6 @@ import {
   isRuRegionCode,
 } from "@molha/api-contract";
 import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
-import { normalizeRuPhoneInput } from "./ruPhone.js";
 import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
 import { serializeUserBackgroundForForm } from "./userBackgroundValue.js";
 import { DEFAULT_USER_AVATAR_URL } from "../model/userConstants.js";
@@ -77,13 +76,7 @@ export function buildPatchUserProfileBody(form, options = {}) {
     body.userRegionCode = regionCode;
   }
 
-  const phoneRaw = String(form.userPhoneNumber).trim();
-  const initialPhone = String(initialPhoneNumber ?? "").trim();
-  if (phoneRaw !== "") {
-    body.userPhoneNumber = normalizeRuPhoneInput(phoneRaw);
-  } else if (initialPhone !== "") {
-    body.userPhoneNumber = null;
-  }
+  // Телефон владельца — только через /auth/phone/bind/* (не через PATCH).
 
   const av = normalizeUploadUrlForStorage(String(form.userAvatarUrl).trim());
   body.userAvatarUrl = av === "" ? DEFAULT_USER_AVATAR_URL : av;

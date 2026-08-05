@@ -25,7 +25,7 @@ import "./CheckoutForm.css";
  *     userAddressFiasId?: string;
  *     userAddressGeo?: { lat?: number; lon?: number } | null;
  *   }>;
- *   pickupAddressSummary?: string;
+ *   pickupLocations?: Array<{ address: string; productTitles?: string[] }>;
  *   deliveryAvailable?: boolean;
  *   pickupAvailable?: boolean;
  *   isSubmitting: boolean;
@@ -45,7 +45,7 @@ import "./CheckoutForm.css";
  */
 export function CheckoutForm({
   defaultDeliveryAddress,
-  pickupAddressSummary = "",
+  pickupLocations = [],
   deliveryAvailable = false,
   pickupAvailable = true,
   isSubmitting,
@@ -88,7 +88,20 @@ export function CheckoutForm({
   }, [deliverySelectable, pickupSelectable, fulfillmentMethod]);
 
   const isPickup = fulfillmentMethod === ORDER_FULFILLMENT_PICKUP;
-  const pickupReady = String(pickupAddressSummary ?? "").trim().length > 0;
+  const pickupPoints = useMemo(
+    () =>
+      (Array.isArray(pickupLocations) ? pickupLocations : [])
+        .map((item) => ({
+          address: String(item?.address ?? "").trim(),
+          productTitles: Array.isArray(item?.productTitles)
+            ? item.productTitles.map((title) => String(title ?? "").trim()).filter(Boolean)
+            : [],
+        }))
+        .filter((item) => item.address.length > 0),
+    [pickupLocations],
+  );
+  const pickupReady = pickupPoints.length > 0;
+  const showPickupTitles = pickupPoints.length > 1;
 
   const isAddressValid = useMemo(() => {
     if (isPickup) {
@@ -279,9 +292,34 @@ export function CheckoutForm({
           {isPickup ? (
             <div className="checkout-form__pickup">
               <span className="checkout-form__label">{CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}</span>
-              <p className="checkout-form__pickup-address">
-                {pickupReady ? pickupAddressSummary : CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED}
-              </p>
+              {pickupReady ? (
+                <>
+                  {pickupPoints.length > 1 ? (
+                    <p className="checkout-form__pickup-hint">{CHECKOUT_FORM_UI.PICKUP_MULTI_HINT}</p>
+                  ) : null}
+                  <ol className="checkout-form__pickup-list">
+                    {pickupPoints.map((point, index) => (
+                      <li key={`${point.address}-${index}`} className="checkout-form__pickup-item">
+                        <span className="checkout-form__pickup-index" aria-hidden="true">
+                          {index + 1}
+                        </span>
+                        <div className="checkout-form__pickup-body">
+                          {showPickupTitles && point.productTitles.length > 0 ? (
+                            <p className="checkout-form__pickup-products">
+                              {point.productTitles.join(", ")}
+                            </p>
+                          ) : null}
+                          <p className="checkout-form__pickup-address">{point.address}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                </>
+              ) : (
+                <p className="checkout-form__pickup-address checkout-form__pickup-address_error">
+                  {CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED}
+                </p>
+              )}
             </div>
           ) : (
             <>
@@ -308,6 +346,7 @@ export function CheckoutForm({
                     }))
                   }
                   disabled={isDisabled || isSubmitting}
+                  placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
                   autoComplete="address-line2"
                 />
               </label>

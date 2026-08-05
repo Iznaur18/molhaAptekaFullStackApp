@@ -1,3 +1,4 @@
+import { normalizeRuPhoneInput } from "./ruPhone.js";
 import { buildPatchUserProfileBody } from "./buildPatchUserProfileBody.js";
 import {
   USER_ROLE_ADMIN,
@@ -20,6 +21,14 @@ export function buildAdminPatchUserProfileBody(form, options = {}) {
     initialPhoneNumber,
     initialDeliveryAddress,
   });
+
+  const phoneRaw = String(form.userPhoneNumber).trim();
+  const initialPhone = String(initialPhoneNumber ?? "").trim();
+  if (phoneRaw !== "") {
+    body.userPhoneNumber = normalizeRuPhoneInput(phoneRaw);
+  } else if (initialPhone !== "") {
+    body.userPhoneNumber = null;
+  }
 
   const role = form.userRole;
   if (ALLOWED_ROLES.includes(role)) {

@@ -1,5 +1,10 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
+import { buildCatalogSubcategoryPickerTiles } from "../../product-category-display/lib/buildCatalogSubcategoryPickerTiles.js";
+import { buildResolvedProductCategoryDisplaysFromRoots } from "../../product-category-display/lib/resolveProductCategoryDisplay.js";
+import { useProductCategoryDisplaysQuery } from "../../product-category-display/model/useProductCategoryDisplaysQuery.js";
+import { CatalogCategoryTilesGrid } from "../../product-category-display/ui/CatalogCategoryTilesGrid.jsx";
+import { CatalogCategoryTilesGridSkeleton } from "../../product-category-display/ui/CatalogCategoryTilesGridSkeleton.jsx";
 import { buildCategoryBreadcrumbFromNode } from "../lib/buildCategoryBreadcrumbFromNode.js";
 import { useProductCategoryLevelQuery } from "../model/useProductCategoryLevelQuery.js";
 import { useProductCategoryRootsQuery } from "../model/useProductCategoryRootsQuery.js";
@@ -49,12 +54,16 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
     parentId: activeParentId,
     enabled: treeBrowserActive,
   });
+  const displaysQuery = useProductCategoryDisplaysQuery({
+    enabled: treeBrowserActive,
+  });
 
   const hasTree =
     initRootsQuery.isLoading || initRootsQuery.isFetching
       ? null
       : (initRootsQuery.data?.length ?? 0) > 0;
   const options = levelQuery.categories;
+  const displays = displaysQuery.data ?? [];
   const loading = levelQuery.isLoading;
   const loadError =
     initRootsQuery.error instanceof Error
@@ -64,6 +73,29 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
         : initRootsQuery.isError || levelQuery.isError
           ? PRODUCT_CATEGORY_TREE_UI.LOAD_ERROR
           : "";
+
+  const tiles = useMemo(() => {
+    if (activeParentId == null) {
+      return buildResolvedProductCategoryDisplaysFromRoots(options, displays).map((item) => ({
+        key: item.categoryId ?? item.displaySlug,
+        label: item.label,
+        imageUrl: item.imageUrl,
+        categoryId: item.categoryId ?? undefined,
+      }));
+    }
+
+    const parent = trail[trail.length - 1];
+    if (!parent) {
+      return [];
+    }
+
+    return buildCatalogSubcategoryPickerTiles({
+      parent,
+      categories: options,
+      displays,
+      includeViewAll: false,
+    });
+  }, [activeParentId, displays, options, trail]);
 
   const resolveLegacySlug = (node, nextTrail) => {
     if (
@@ -103,6 +135,16 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
         legacyProductCategory: node.legacyProductCategory ?? null,
       },
     ]);
+  };
+
+  const handleTileClick = (item) => {
+    if (disabled || !item.categoryId) {
+      return;
+    }
+    const node = options.find((row) => row.id === item.categoryId);
+    if (node) {
+      handlePick(node);
+    }
   };
 
   const handleBack = () => {
@@ -179,44 +221,21 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
           {loadError}
         </p>
       ) : null}
-      <ul
-        className="create-product-category-picker__menu"
-        role="listbox"
-        aria-label={stepTitle}
-      >
+      <div className="create-product-category-picker__grid" aria-label={stepTitle}>
         {loading ? (
-          <li className="create-product-category-picker__loading">
-            {PRODUCT_CATEGORY_TREE_UI.LOADING}
-          </li>
+          <CatalogCategoryTilesGridSkeleton />
         ) : options.length === 0 ? (
-          <li className="create-product-category-picker__loading">
+          <p className="create-product-category-picker__hint">
             {PRODUCT_CATEGORY_TREE_UI.EMPTY_LEVEL}
-          </li>
+          </p>
         ) : (
-          options.map((node) => (
-            <li key={node.id} role="presentation">
-              <button
-                type="button"
-                role="option"
-                className="create-product-category-picker__option"
-                disabled={disabled}
-                onClick={() => handlePick(node)}
-              >
-                <span>{node.labelRu}</span>
-                {node.isLeaf ? (
-                  <span className="create-product-category-picker__leaf-badge">
-                    {PRODUCT_CATEGORY_TREE_UI.LEAF_BADGE}
-                  </span>
-                ) : (
-                  <span className="create-product-category-picker__chevron" aria-hidden>
-                    ›
-                  </span>
-                )}
-              </button>
-            </li>
-          ))
+          <CatalogCategoryTilesGrid
+            items={tiles}
+            disabled={disabled}
+            onTileClick={handleTileClick}
+          />
         )}
-      </ul>
+      </div>
       {trail.length > 0 ? (
         <div className="create-product-category-picker__actions">
           <button

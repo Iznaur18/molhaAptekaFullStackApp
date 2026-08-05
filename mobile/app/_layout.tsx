@@ -1,6 +1,7 @@
 import { Sentry } from "@/shared/lib/initMobileSentry";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { isDimColorScheme } from "@izibuy/design-tokens";
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack, usePathname } from "expo-router";
@@ -71,7 +72,7 @@ function RootLayoutNav() {
     return () => clearTimeout(timer);
   }, []);
   const navigationTheme =
-    colorScheme === "dark"
+    isDimColorScheme(colorScheme)
       ? {
           ...DarkTheme,
           colors: {

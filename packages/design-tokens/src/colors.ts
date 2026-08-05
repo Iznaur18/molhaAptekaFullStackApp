@@ -187,3 +187,71 @@ export const izColorsDark = {
   ...izColorsDarkCanonical,
   ...izColorsDarkCompat,
 } as const;
+
+/**
+ * Пользовательская палитра (бренд-фото):
+ * #171717 / #F25623 / #4D4D4D / #DEDEDE.
+ * Светлая логика: canvas #DEDEDE, карточки белее; interactive → orange.
+ * Status (success/warning/danger/info) — как в light.
+ */
+const CUSTOM_BLACK = "#171717";
+const CUSTOM_ORANGE = "#F25623";
+const CUSTOM_DARK_GRAY = "#4D4D4D";
+const CUSTOM_LIGHT_GRAY = "#DEDEDE";
+
+const izColorsCustomCanonical = {
+  text: CUSTOM_BLACK,
+  textMuted: CUSTOM_DARK_GRAY,
+  textSecondary: CUSTOM_DARK_GRAY,
+  textPlaceholder: "#8a8a8a",
+  ink: CUSTOM_BLACK,
+  bg: CUSTOM_LIGHT_GRAY,
+  surfaceMuted: "#e8e8e8",
+  surfaceElevated: "#f4f4f4",
+  surface: "#ffffff",
+  onContrast: "#ffffff",
+  primary: CUSTOM_ORANGE,
+  action: CUSTOM_ORANGE,
+  actionHover: shiftLightness(CUSTOM_ORANGE, -0.1),
+  actionSoft: setLightness(CUSTOM_ORANGE, 0.94),
+  actionBorder: setLightness(CUSTOM_ORANGE, 0.82),
+  link: CUSTOM_ORANGE,
+  success: izColorsCanonical.success,
+  successSurface: izColorsCanonical.successSurface,
+  successText: izColorsCanonical.successText,
+  warning: izColorsCanonical.warning,
+  warningSurface: izColorsCanonical.warningSurface,
+  warningText: izColorsCanonical.warningText,
+  danger: izColorsCanonical.danger,
+  dangerSurface: izColorsCanonical.dangerSurface,
+  dangerText: izColorsCanonical.dangerText,
+  info: izColorsCanonical.info,
+  infoSoft: izColorsCanonical.infoSoft,
+  infoDeep: izColorsCanonical.infoDeep,
+  border: "#c4c4c4",
+  borderStrong: "#a0a0a0",
+  accent: CUSTOM_ORANGE,
+  accentSoft: setLightness(CUSTOM_ORANGE, 0.94),
+  overlay: toRgbCss(CUSTOM_BLACK, 0.45),
+  overlayStrong: toRgbCss(CUSTOM_BLACK, 0.72),
+  overlaySubtle: toRgbCss(CUSTOM_BLACK, 0.08),
+  focusRing: toRgbCss(CUSTOM_ORANGE, 0.22),
+} as const;
+
+const izColorsCustomCompat = {
+  nearBlack: izColorsCustomCanonical.ink,
+  primaryBright: izColorsCustomCanonical.action,
+  actionSurface: izColorsCustomCanonical.actionSoft,
+  infoNavy: izColorsCustomCanonical.infoDeep,
+  premium: "#c9a227",
+  star: izColorsCustomCanonical.warning,
+  starMuted: izColorsCustomCanonical.borderStrong,
+  raffleSurface: izColorsCustomCanonical.warningSurface,
+  raffleBorder: izColorsCustomCanonical.warning,
+  warningBorder: izColorsCustomCanonical.warning,
+} as const;
+
+export const izColorsCustom = {
+  ...izColorsCustomCanonical,
+  ...izColorsCustomCompat,
+} as const;

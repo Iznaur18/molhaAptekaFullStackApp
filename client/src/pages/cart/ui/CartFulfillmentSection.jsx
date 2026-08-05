@@ -30,6 +30,7 @@ import "./CartFulfillmentSection.css";
  *   };
  *   canCheckout: boolean;
  *   onCheckout: () => void;
+ *   showDeliveryFeeNote?: boolean;
  * }} props
  */
 export function CartFulfillmentSection({
@@ -44,6 +45,7 @@ export function CartFulfillmentSection({
   summary,
   canCheckout,
   onCheckout,
+  showDeliveryFeeNote = false,
 }) {
   if (lines.length === 0) {
     return null;
@@ -125,6 +127,16 @@ export function CartFulfillmentSection({
                   {CART_PAGE_UI.DISCOUNT_AMOUNT(
                     formatPriceRub(summary.selectedWholesaleDiscount),
                   )}
+                </span>
+              </div>
+            ) : null}
+            {showDeliveryFeeNote ? (
+              <div className="cart-page__dock-total-row cart-page__dock-total-row--meta">
+                <span className="cart-page__discount-label">
+                  {CART_PAGE_UI.DELIVERY_FEE_LABEL}
+                </span>
+                <span className="cart-page__delivery-fee-value">
+                  {CART_PAGE_UI.DELIVERY_FEE_VALUE}
                 </span>
               </div>
             ) : null}

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
-import { LOGIN_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { LOGIN_MODAL_UI, AUTH_UI } from "../../../shared/config/appUiCopy.js";
+import { AUTH_FORGOT_PASSWORD_PATH } from "../../../shared/lib/authPaths.js";
 import { isAuthSessionError } from "../../../shared/lib/isAuthSessionError.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 import { PasswordInputField } from "../../../shared/ui/PasswordInputField/PasswordInputField.jsx";
@@ -29,6 +31,7 @@ const LOGIN_MODAL_TITLE_ID = "login-modal-title";
  * }} props
  */
 export function LoginModal({ isOpen, onClose, onSuccess, onRegisterClick }) {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [channel, setChannel] = useState(/** @type {"email" | "phone"} */ ("email"));
   const [email, setEmail] = useState("");
@@ -205,6 +208,18 @@ export function LoginModal({ isOpen, onClose, onSuccess, onRegisterClick }) {
           {loginMutation.isPending
             ? LOGIN_MODAL_UI.SUBMIT_LOADING
             : LOGIN_MODAL_UI.SUBMIT_IDLE}
+        </button>
+        <button
+          type="button"
+          className="login-modal__register"
+          disabled={isLoading}
+          onClick={() => {
+            resetForm();
+            onClose();
+            navigate(AUTH_FORGOT_PASSWORD_PATH);
+          }}
+        >
+          {AUTH_UI.FORGOT_PASSWORD_LINK}
         </button>
         {typeof onRegisterClick === "function" ? (
           <button

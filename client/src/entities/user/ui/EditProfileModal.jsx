@@ -31,7 +31,9 @@ import { UserBackgroundPresetPicker } from "./UserBackgroundPresetPicker.jsx";
 import { UserBackgroundPreview } from "./UserBackgroundPreview.jsx";
 import { AdminPremiumStaffControl } from "./AdminPremiumStaffControl.jsx";
 import { EditProfileSocialLinksFields } from "./EditProfileSocialLinksFields.jsx";
+import { EmailBindControls } from "./EmailBindControls.jsx";
 import { PhoneBindControls } from "./PhoneBindControls.jsx";
+import { ChangePasswordControls } from "./ChangePasswordControls.jsx";
 
 import "./EditProfileModal.css";
 
@@ -71,7 +73,12 @@ export function EditProfileModal({
     avatarFocusImageUrl,
     backgroundFocusImageUrl,
     isSubmitting,
+    baselineEmail,
+    baselinePhone,
+    contactVerified,
     handleChange,
+    handleEmailVerified,
+    handlePhoneVerified,
     handleClose,
     handleSubmit,
   } = useEditProfileModal({
@@ -116,13 +123,34 @@ export function EditProfileModal({
           <div className="edit-profile-modal__scroll">
             <label className="edit-profile-modal__label">
               {EDIT_PROFILE_MODAL_UI.LABEL_EMAIL}
-              <input
-                className="edit-profile-modal__input edit-profile-modal__input_readonly"
-                type="text"
-                readOnly
-                value={user.email ?? ""}
-                autoComplete="email"
-              />
+              {adminMode ? (
+                <input
+                  className="edit-profile-modal__input edit-profile-modal__input_readonly"
+                  type="text"
+                  readOnly
+                  value={user.email ?? ""}
+                  autoComplete="email"
+                />
+              ) : (
+                <>
+                  <input
+                    className="edit-profile-modal__input"
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    autoComplete="email"
+                    disabled={isSubmitting}
+                  />
+                  <EmailBindControls
+                    email={form.email}
+                    isEmailVerified={user?.isEmailVerified === true || contactVerified.email}
+                    baselineEmail={baselineEmail}
+                    disabled={isSubmitting}
+                    onVerified={handleEmailVerified}
+                  />
+                </>
+              )}
             </label>
             <label className="edit-profile-modal__label">
               {EDIT_PROFILE_MODAL_UI.LABEL_USERNAME}
@@ -156,12 +184,14 @@ export function EditProfileModal({
               {!adminMode ? (
                 <PhoneBindControls
                   phoneNumber={form.userPhoneNumber}
-                  isPhoneVerified={user?.isPhoneVerified === true}
-                  baselinePhone={user?.userPhoneNumber ?? ""}
+                  isPhoneVerified={user?.isPhoneVerified === true || contactVerified.phone}
+                  baselinePhone={baselinePhone}
                   disabled={isSubmitting}
+                  onVerified={handlePhoneVerified}
                 />
               ) : null}
             </label>
+            {!adminMode ? <ChangePasswordControls disabled={isSubmitting} /> : null}
             <label className="edit-profile-modal__label">
               {EDIT_PROFILE_MODAL_UI.LABEL_BIRTH}
               <input

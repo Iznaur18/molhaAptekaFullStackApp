@@ -23,15 +23,23 @@ import { PRODUCT_CATEGORY_DISPLAY_UI } from "../../../shared/config/appUiCopy.js
  *   parent: { id: string; labelRu: string };
  *   categories: import('../../product-category-tree/model/types.js').ProductCategoryNode[];
  *   displays: import('../model/types.js').ProductCategoryDisplayFromApi[];
+ *   includeViewAll?: boolean;
  * }} params
  * @returns {CatalogSubcategoryPickerTile[]}
  */
-export function buildCatalogSubcategoryPickerTiles({ parent, categories, displays }) {
+export function buildCatalogSubcategoryPickerTiles({
+  parent,
+  categories,
+  displays,
+  includeViewAll = true,
+}) {
   const overridesById = mapCategoryDisplaysById(displays);
 
   /** @type {CatalogSubcategoryPickerTile[]} */
-  const tiles = [
-    {
+  const tiles = [];
+
+  if (includeViewAll) {
+    tiles.push({
       key: `view-all:${parent.id}`,
       kind: "view-all",
       categoryId: parent.id,
@@ -40,8 +48,8 @@ export function buildCatalogSubcategoryPickerTiles({ parent, categories, display
       isCustomLabel: false,
       isCustomImage: false,
       isEditable: false,
-    },
-  ];
+    });
+  }
 
   for (const node of categories) {
     const override = overridesById.get(node.id);

@@ -6,6 +6,7 @@ type ProductPromotionManageTabProps = {
   product: CatalogProduct;
   onSetAvailability?: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
   onSetAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
+  onSetOriginality?: (productId: string, productIsOriginal: boolean) => void | Promise<void>;
   onSetWholesale?: (productId: string, productWholesaleEnabled: boolean) => void | Promise<void>;
   onSetAffiliate?: (productId: string, affiliateEnabled: boolean) => void | Promise<void>;
   onSetInstallment?: (
@@ -15,6 +16,7 @@ type ProductPromotionManageTabProps = {
   onDelete?: (productId: string) => void | Promise<void>;
   isAvailabilityTogglePending?: boolean;
   isAuctionTogglePending?: boolean;
+  isOriginalityTogglePending?: boolean;
   isWholesaleTogglePending?: boolean;
   isAffiliateTogglePending?: boolean;
   isInstallmentTogglePending?: boolean;

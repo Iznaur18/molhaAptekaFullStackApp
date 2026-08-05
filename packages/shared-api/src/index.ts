@@ -17,7 +17,13 @@ import {
 } from "@molha/api-contract";
 import type { z } from "zod";
 
-const AUTH_REFRESH_SKIP_PATHS = ["/auth/refresh", "/auth/login", "/auth/register", "/auth/logout"];
+const AUTH_REFRESH_SKIP_PATHS = [
+  "/auth/refresh",
+  "/auth/login",
+  "/auth/register",
+  "/auth/logout",
+  "/auth/password/reset",
+];
 
 export const toContractClientError = (
   error: unknown,

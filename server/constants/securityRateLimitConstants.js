@@ -1,4 +1,4 @@
-/** POST /address/suggest — DaData proxy, на пользователя или IP. */
+/** POST /address/suggest|geolocate — DaData proxy, на пользователя или IP. */
 export const ADDRESS_SUGGEST_RATE_LIMIT_PER_HOUR = 120;
 
 /** GET /user/search — на пользователя или IP. */

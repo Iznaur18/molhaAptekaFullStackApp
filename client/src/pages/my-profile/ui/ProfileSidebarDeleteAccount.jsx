@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { AdminDeleteUserConfirmModal } from "../../../entities/user/ui/AdminDeleteUserConfirmModal.jsx";
 import { CART_STORAGE_KEY } from "../../../entities/order/model/constants.js";
+import { clearDataConfirmationFormDraft } from "../../../entities/user-data-confirmation/lib/dataConfirmationFormDraftStorage.js";
 import { DELETE_ACCOUNT_UI } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { PROFILE_NAV_ITEM_META } from "../lib/profileNavItemMeta.js";
@@ -29,6 +30,7 @@ export function ProfileSidebarDeleteAccount({ user }) {
     } catch {
       // storage недоступен
     }
+    clearDataConfirmationFormDraft(user._id);
     window.location.assign("/");
   };
 

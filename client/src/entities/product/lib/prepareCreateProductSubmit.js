@@ -212,7 +212,6 @@ export function prepareCreateProductSubmit({
     const patchBody = {
       productName: String(form.productName).trim(),
       productListingOrigin: form.productListingOrigin,
-      productIsOriginal: form.productIsOriginal === true,
       productDescription: String(form.productDescription).trim(),
       productImageUrls: urls,
       productPreviewVideoUrl: previewVideoUrl,
@@ -249,7 +248,7 @@ export function prepareCreateProductSubmit({
     createBody: {
       productName: form.productName,
       productListingOrigin: form.productListingOrigin,
-      productIsOriginal: form.productIsOriginal === true,
+      productIsOriginal: false,
       productDescription: form.productDescription,
       productImageUrls: urls,
       productPreviewVideoUrl: previewVideoUrl || undefined,

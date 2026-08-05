@@ -1,8 +1,9 @@
 import {
   listCheckoutShippingProviderOptions,
+  listCheckoutShippingServiceOptions,
+  hasCheckoutLiveCarrierProviders,
   resolveCheckoutShippingProviderLabel,
   CHECKOUT_SHIPPING_PROVIDER_SELLER,
-  CHECKOUT_SHIPPING_SERVICE_OPTIONS,
   SHIPPING_SERVICE_COURIER,
   SHIPPING_SERVICE_PICKUP_POINT,
 } from "../lib/checkoutShippingProviderOptions.js";
@@ -16,13 +17,15 @@ const SERVICE_LABEL = {
 };
 
 /**
- * Дизайн-каркас служб доставки. Сейчас live только «Продавцом»;
- * СДЭК / Яндекс / Почта и типы ПВЗ/курьер — disabled «Скоро».
+ * Службы доставки в чекауте.
+ * Live сейчас только «Продавцом»; перевозчики и типы выдачи — после подключения ключей.
  *
  * @param {{ disabled?: boolean }} props
  */
 export function CheckoutShippingProviderPicker({ disabled = false }) {
   const providerOptions = listCheckoutShippingProviderOptions();
+  const serviceOptions = listCheckoutShippingServiceOptions();
+  const showCarrierServices = hasCheckoutLiveCarrierProviders() && serviceOptions.length > 0;
 
   return (
     <div className="checkout-shipping-provider-picker">
@@ -36,17 +39,13 @@ export function CheckoutShippingProviderPicker({ disabled = false }) {
       >
         {providerOptions.map((option) => {
           const isSelected = option.id === CHECKOUT_SHIPPING_PROVIDER_SELLER;
-          const isLocked = !option.live;
           const label = resolveCheckoutShippingProviderLabel(option.id, {
             sellerLabel: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SELLER,
           });
           const className = [
             "checkout-shipping-provider-picker__card",
             isSelected ? "checkout-shipping-provider-picker__card--selected" : "",
-            isLocked ? "checkout-shipping-provider-picker__card--locked" : "",
-            !isLocked && !isSelected
-              ? "checkout-shipping-provider-picker__card--idle"
-              : "",
+            !isSelected ? "checkout-shipping-provider-picker__card--idle" : "",
           ]
             .filter(Boolean)
             .join(" ");
@@ -58,56 +57,43 @@ export function CheckoutShippingProviderPicker({ disabled = false }) {
               className={className}
               role="radio"
               aria-checked={isSelected}
-              aria-disabled={isLocked || disabled}
-              disabled={disabled || isLocked}
-              title={
-                isLocked ? CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SOON : undefined
-              }
+              aria-disabled={disabled}
+              disabled={disabled}
             >
-              <span className="checkout-shipping-provider-picker__label">
-                {label}
-                {isLocked ? (
-                  <span className="checkout-shipping-provider-picker__soon">
-                    {" "}
-                    ({CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SOON})
-                  </span>
-                ) : null}
-              </span>
+              <span className="checkout-shipping-provider-picker__label">{label}</span>
             </button>
           );
         })}
       </div>
 
-      <div className="checkout-shipping-provider-picker__legend checkout-shipping-provider-picker__legend--sub">
-        {CHECKOUT_FORM_UI.LABEL_SHIPPING_SERVICE}
-      </div>
-      <div
-        className="checkout-shipping-provider-picker__row"
-        role="radiogroup"
-        aria-label={CHECKOUT_FORM_UI.LABEL_SHIPPING_SERVICE}
-      >
-        {CHECKOUT_SHIPPING_SERVICE_OPTIONS.map((option) => {
-          const label = SERVICE_LABEL[option.id] ?? option.id;
-          return (
-            <button
-              key={option.id}
-              type="button"
-              className="checkout-shipping-provider-picker__chip checkout-shipping-provider-picker__chip--locked"
-              role="radio"
-              aria-checked={false}
-              aria-disabled
-              disabled
-              title={CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SOON}
-            >
-              {label}
-              <span className="checkout-shipping-provider-picker__soon">
-                {" "}
-                ({CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SOON})
-              </span>
-            </button>
-          );
-        })}
-      </div>
+      {showCarrierServices ? (
+        <>
+          <div className="checkout-shipping-provider-picker__legend checkout-shipping-provider-picker__legend--sub">
+            {CHECKOUT_FORM_UI.LABEL_SHIPPING_SERVICE}
+          </div>
+          <div
+            className="checkout-shipping-provider-picker__row"
+            role="radiogroup"
+            aria-label={CHECKOUT_FORM_UI.LABEL_SHIPPING_SERVICE}
+          >
+            {serviceOptions.map((option) => {
+              const label = SERVICE_LABEL[option.id] ?? option.id;
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  className="checkout-shipping-provider-picker__chip"
+                  role="radio"
+                  aria-checked={false}
+                  disabled={disabled}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      ) : null}
 
       <p className="checkout-shipping-provider-picker__hint">
         {CHECKOUT_FORM_UI.SHIPPING_PROVIDER_HINT}

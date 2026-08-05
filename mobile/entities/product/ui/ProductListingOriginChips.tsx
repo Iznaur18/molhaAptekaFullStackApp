@@ -11,6 +11,8 @@ type ProductListingOriginChipsProps = {
   value: ProductListingOrigin | null;
   onChange: (next: ProductListingOrigin) => void;
   disabled?: boolean;
+  /** When false, omit the field label (wizard step already shows the title). */
+  showLabel?: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -18,16 +20,19 @@ export const ProductListingOriginChips = ({
   value,
   onChange,
   disabled = false,
+  showLabel = true,
   style,
 }: ProductListingOriginChipsProps) => {
   const theme = useAppTheme();
 
   return (
     <View style={style} accessibilityLabel={CREATE_PRODUCT_UI.LABEL_LISTING_ORIGIN}>
-      <Text style={{ color: theme.colors.text, fontSize: 15, fontWeight: "600", marginBottom: 8 }}>
-        {CREATE_PRODUCT_UI.LABEL_LISTING_ORIGIN}{" "}
-        <Text style={{ color: theme.colors.danger }}>*</Text>
-      </Text>
+      {showLabel ? (
+        <Text style={{ color: theme.colors.text, fontSize: 15, fontWeight: "600", marginBottom: 8 }}>
+          {CREATE_PRODUCT_UI.LABEL_LISTING_ORIGIN}{" "}
+          <Text style={{ color: theme.colors.danger }}>*</Text>
+        </Text>
+      ) : null}
       <View style={{ gap: 10 }}>
         {PRODUCT_LISTING_ORIGIN_OPTIONS.map((option) => {
           const selected = value === option.value;

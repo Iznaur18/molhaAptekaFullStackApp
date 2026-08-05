@@ -19,7 +19,7 @@ import {
   AUTH_UI,
   LOGIN_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
-import { AUTH_REGISTER_PATH } from "../../../shared/lib/authPaths.js";
+import { AUTH_REGISTER_PATH, AUTH_FORGOT_PASSWORD_PATH } from "../../../shared/lib/authPaths.js";
 import { isAuthSessionError } from "../../../shared/lib/isAuthSessionError.js";
 import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { useStableAuthHeroHeight } from "../../../shared/lib/useStableAuthHeroHeight.js";
@@ -210,6 +210,15 @@ export function LoginPage() {
               {loginMutation.isPending
                 ? LOGIN_MODAL_UI.SUBMIT_LOADING
                 : AUTH_UI.LOGIN_BUTTON}
+            </button>
+
+            <button
+              type="button"
+              className="auth-page__link"
+              disabled={isPending}
+              onClick={() => navigate(AUTH_FORGOT_PASSWORD_PATH)}
+            >
+              {AUTH_UI.FORGOT_PASSWORD_LINK}
             </button>
 
             <button

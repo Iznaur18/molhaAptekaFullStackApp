@@ -5,7 +5,6 @@ import {
 } from "@molha/api-contract";
 
 import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.jsx";
-import { YandexMapPointPicker } from "../../maps/ui/YandexMapPointPicker.jsx";
 import { PRODUCT_PICKUP_UI } from "../../../shared/config/appUiCopy.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 
@@ -191,20 +190,6 @@ export function ProductPickupLocationFields({
           line: pickupEnabled
             ? PRODUCT_PICKUP_UI.ADDRESS_LABEL
             : PRODUCT_PICKUP_UI.ADDRESS_LABEL_WAREHOUSE,
-        }}
-      />
-
-      <YandexMapPointPicker
-        lat={lat}
-        lon={lon}
-        disabled={disabled}
-        onPointChange={({ lat: nextLat, lon: nextLon, address: mappedAddress }) => {
-          emit({
-            productPickupLat: nextLat,
-            productPickupLon: nextLon,
-            productRegionCode: null,
-            ...(mappedAddress ? { productPickupAddress: mappedAddress } : {}),
-          });
         }}
       />
     </div>

@@ -69,6 +69,10 @@ type ProductPromotionModalProps = {
     productId: string,
     productAuctionEnabled: boolean,
   ) => void | Promise<void>;
+  onSetProductOriginality?: (
+    productId: string,
+    productIsOriginal: boolean,
+  ) => void | Promise<void>;
   onSetProductWholesale?: (
     productId: string,
     productWholesaleEnabled: boolean,
@@ -84,6 +88,7 @@ type ProductPromotionModalProps = {
   onWholesaleSaved?: (product: CatalogProduct) => void;
   isAvailabilityTogglePending?: boolean;
   isAuctionTogglePending?: boolean;
+  isOriginalityTogglePending?: boolean;
   isWholesaleTogglePending?: boolean;
   isAffiliateTogglePending?: boolean;
   isInstallmentTogglePending?: boolean;
@@ -116,6 +121,7 @@ export const ProductPromotionModal = ({
   onSubmit,
   onSetProductAvailability,
   onSetProductAuction,
+  onSetProductOriginality,
   onSetProductWholesale,
   onSetProductAffiliate,
   onSetProductInstallment,
@@ -123,6 +129,7 @@ export const ProductPromotionModal = ({
   onDeleteProduct,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
+  isOriginalityTogglePending = false,
   isWholesaleTogglePending = false,
   isAffiliateTogglePending = false,
   isInstallmentTogglePending = false,
@@ -145,6 +152,7 @@ export const ProductPromotionModal = ({
     product != null &&
     (typeof onSetProductAvailability === "function" ||
       typeof onSetProductAuction === "function" ||
+      typeof onSetProductOriginality === "function" ||
       typeof onDeleteProduct === "function");
   const { activeTabId, setActiveTabId, isPromotionTab } = useProductPromotionModalTab({
     visible,
@@ -379,12 +387,14 @@ export const ProductPromotionModal = ({
         product={product}
         onSetAvailability={onSetProductAvailability}
         onSetAuction={onSetProductAuction}
+        onSetOriginality={onSetProductOriginality}
         onSetWholesale={onSetProductWholesale}
         onSetAffiliate={onSetProductAffiliate}
         onSetInstallment={onSetProductInstallment}
         onDelete={onDeleteProduct}
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
+        isOriginalityTogglePending={isOriginalityTogglePending}
         isWholesaleTogglePending={isWholesaleTogglePending}
         isAffiliateTogglePending={isAffiliateTogglePending}
         isInstallmentTogglePending={isInstallmentTogglePending}
