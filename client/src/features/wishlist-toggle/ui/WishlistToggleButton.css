@@ -26,13 +26,24 @@
 
 /* Размер иконки задаёт AppIcon (size="lg" = 20px), как в мобиле. */
 
-/* card: только заливка surface поверх изображения товара */
+/* card: полупрозрачный surface поверх фото товара */
 .wishlist-toggle--card {
   position: absolute;
   top: 6px;
   right: 6px;
   z-index: 3;
-  background: var(--iz-color-surface);
+  background: color-mix(in srgb, var(--iz-color-surface) 55%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.wishlist-toggle--card:hover:not(:disabled):not(.wishlist-toggle--active) {
+  background: color-mix(in srgb, var(--iz-color-surface) 78%, transparent);
+}
+
+.wishlist-toggle--card.wishlist-toggle--active {
+  background: color-mix(in srgb, var(--iz-color-danger) 72%, transparent);
+  color: var(--iz-color-on-contrast);
 }
 
 /* detailHeroInline: фиксированный размер + мягкая тень */

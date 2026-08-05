@@ -11,6 +11,7 @@ export const PROFILE_TAB_LOYALTY_POINTS = "loyalty-points";
 export const PROFILE_TAB_PARTNER_PROGRAM = "partner-program";
 export const PROFILE_TAB_AFFILIATE_LISTINGS = "affiliate-listings";
 export const PROFILE_TAB_ADVERTISING = "advertising";
+export const PROFILE_TAB_ONEC_INTEGRATION = "onec-integration";
 export const PROFILE_TAB_EDIT_PROFILE = "edit-profile";
 export const PROFILE_TAB_ADMIN_ORDERS = "admin-orders";
 export const PROFILE_TAB_STAFF_AUDIT_LOG_ADMIN = "staff-audit-log-admin";
@@ -59,6 +60,7 @@ export const PROFILE_TAB_VALUES = [
   PROFILE_TAB_PARTNER_PROGRAM,
   PROFILE_TAB_AFFILIATE_LISTINGS,
   PROFILE_TAB_ADVERTISING,
+  PROFILE_TAB_ONEC_INTEGRATION,
   PROFILE_TAB_EDIT_PROFILE,
   PROFILE_TAB_ADMIN_ORDERS,
   PROFILE_TAB_STAFF_AUDIT_LOG_ADMIN,

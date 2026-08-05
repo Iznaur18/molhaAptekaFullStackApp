@@ -1,5 +1,5 @@
-/** Минимальный процент скидки для фильтра «Распродажа» (floor). */
-export const PRODUCT_SALE_FILTER_MIN_DISCOUNT_PERCENT = 35;
+/** SSOT: `contract/src/productSale.js`. */
+export { PRODUCT_SALE_FILTER_MIN_DISCOUNT_PERCENT } from "@molha/api-contract";
 
 export const IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_PRODUCT_DISCOUNT =
   "followed_seller_product_discount";

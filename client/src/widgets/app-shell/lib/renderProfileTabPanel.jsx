@@ -10,6 +10,7 @@ import {
   LazyLoyaltyPointsPage,
   LazyPartnerProgramPage,
   LazyAdvertisingPage,
+  LazyOneCIntegrationPage,
   LazyEditProfilePage,
   LazyIntroAdModerationPage,
   LazySellerPersonalCategoryModerationPage,
@@ -123,6 +124,13 @@ export function renderProfileTabPanel(mainView, props) {
           isAuthorized={isAuthorized}
           onRequestLogin={onRequestLogin}
           onOpenCreateRaffle={() => setRaffleModal({ mode: "create" })}
+        />
+      );
+    case "onec-integration":
+      return (
+        <LazyOneCIntegrationPage
+          isAuthorized={isAuthorized}
+          onRequestLogin={onRequestLogin}
         />
       );
     case "edit-profile":

@@ -167,6 +167,8 @@ export function useAppShellDomain(
     isAuthorized: shell.isAuthorized,
     isSessionReady: shell.isSessionReady,
     isEmailVerified: shell.isEmailVerified,
+    currentUserEmail: shell.currentUserEmail,
+    isPhoneVerified: shell.isPhoneVerified,
     handleLogout,
   });
 

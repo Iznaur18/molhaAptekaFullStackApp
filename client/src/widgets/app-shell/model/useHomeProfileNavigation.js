@@ -16,6 +16,7 @@ import {
   PROFILE_TAB_LOYALTY_POINTS,
   PROFILE_TAB_PARTNER_PROGRAM,
   PROFILE_TAB_ADVERTISING,
+  PROFILE_TAB_ONEC_INTEGRATION,
   PROFILE_TAB_EDIT_PROFILE,
   PROFILE_TAB_MY_ORDERS,
   PROFILE_TAB_MY_PRODUCTS,
@@ -160,6 +161,10 @@ export const useHomeProfileNavigation = ({
     navigateFromProfileTab(PROFILE_TAB_ADVERTISING);
   }, [navigateFromProfileTab]);
 
+  const handleOneCIntegrationFromProfile = useCallback(() => {
+    navigateFromProfileTab(PROFILE_TAB_ONEC_INTEGRATION);
+  }, [navigateFromProfileTab]);
+
   const handleEditProfileFromProfile = useCallback(() => {
     navigateFromProfileTab(PROFILE_TAB_EDIT_PROFILE);
   }, [navigateFromProfileTab]);
@@ -234,6 +239,8 @@ export const useHomeProfileNavigation = ({
     handlePartnerProgramFromProfile,
 
     handleAdvertisingFromProfile,
+
+    handleOneCIntegrationFromProfile,
 
     handleEditProfileFromProfile,
 

@@ -150,6 +150,11 @@ export const LazyAdvertisingPage = lazyNamedExport(
   "AdvertisingPage",
 );
 
+export const LazyOneCIntegrationPage = lazyNamedExport(
+  () => import("../../../pages/onec-integration/ui/OneCIntegrationPage.jsx"),
+  "OneCIntegrationPage",
+);
+
 export const LazyEditProfilePage = lazyNamedExport(
   () => import("../../../pages/edit-profile/ui/EditProfilePage.jsx"),
   "EditProfilePage",

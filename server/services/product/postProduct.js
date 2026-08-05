@@ -39,6 +39,7 @@ import {
 } from "./productPickup.js";
 import { resolveProductSaleLocation } from "./resolveProductSaleLocation.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
+import { assertSellerManualProductCreateAllowed } from "../onec/assertSellerManualProductCreateAllowed.js";
 
 const throwFieldError = (error, fallback) => {
   throw new AppError(400, error instanceof Error ? error.message : fallback);
@@ -159,6 +160,10 @@ export async function postProduct({ userId, body }) {
   }
 
   const isAdmin = await isUserAdmin(userId);
+  if (!isAdmin) {
+    await assertSellerManualProductCreateAllowed(String(userId));
+  }
+
   if (!isAdmin) {
     const limitCheck = await assertSellerCanCreateProduct(userId, user);
     if (!limitCheck.ok) {

@@ -3,10 +3,12 @@ import { useState } from "react";
 import { useRegisterMutation } from "../model/useRegisterMutation.js";
 import { useConfirmRegistrationMutation } from "../model/useConfirmRegistrationMutation.js";
 import { resendRegistrationCode } from "../api/resendRegistrationCode.js";
+import { registerUserByPhone } from "../api/registerUserByPhone.js";
 import { buildRegisterUserPayload } from "../lib/buildRegisterUserPayload.js";
 import { getRegisterEmptyRequiredFieldKeys } from "../lib/getRegisterEmptyRequiredFieldKeys.js";
 import { validatePasswordConfirm } from "../lib/validatePasswordConfirm.js";
 import { validateUserNameField } from "../lib/validateUserName.js";
+import { maskRuPhoneInput } from "../lib/ruPhone.js";
 import { LOGIN_MODAL_UI, REGISTER_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { isAuthSessionError } from "../../../shared/lib/isAuthSessionError.js";
 import { keepDigitsOnly } from "../../../shared/lib/numericInput.js";
@@ -22,6 +24,7 @@ const REGISTER_CODE_LENGTH = 6;
 
 const INITIAL_FORM = {
   email: "",
+  phoneNumber: "",
   password: "",
   passwordConfirm: "",
   userName: "",
@@ -36,10 +39,6 @@ const withInvalidFieldClass = (baseClass, fieldKey, invalidFields) =>
   invalidFields.has(fieldKey) ? `${baseClass} ${baseClass}--invalid` : baseClass;
 
 /**
- * Регистрация в два шага: форма → код из письма. Аккаунт создаётся на
- * сервере только после подтверждения кода; закрытие модалки на шаге кода
- * ничего не оставляет в базе (заявка удалится по TTL).
- *
  * @param {{
  *   isOpen: boolean;
  *   onClose: () => void;
@@ -47,24 +46,31 @@ const withInvalidFieldClass = (baseClass, fieldKey, invalidFields) =>
  * }} props
  */
 export function RegisterModal({ isOpen, onClose, onSuccess }) {
+  const [channel, setChannel] = useState(/** @type {"email" | "phone"} */ ("email"));
   const [form, setForm] = useState(INITIAL_FORM);
   const registerMutation = useRegisterMutation();
   const confirmMutation = useConfirmRegistrationMutation();
   const [step, setStep] = useState(/** @type {"form" | "code"} */ ("form"));
   const [pendingRegistration, setPendingRegistration] = useState(
-    /** @type {{ registrationId: string; email: string } | null} */ (null),
+    /** @type {{ registrationId: string; email?: string; phoneNumber?: string; channel: "email" | "phone" } | null} */ (
+      null
+    ),
   );
   const [code, setCode] = useState("");
   const [status, setStatus] = useState({ kind: "idle", message: "" });
   const [invalidFields, setInvalidFields] = useState(
     /** @type {Set<string>} */ (() => new Set()),
   );
+  const [phoneRegisterLoading, setPhoneRegisterLoading] = useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     let nextValue = value;
     if (name === "userName" && typeof nextValue === "string") {
       nextValue = nextValue.toLowerCase().replace(/[^a-z0-9]/g, "");
+    }
+    if (name === "phoneNumber") {
+      nextValue = maskRuPhoneInput(nextValue);
     }
     setForm((prev) => ({ ...prev, [name]: nextValue }));
     setInvalidFields((prev) => {
@@ -78,7 +84,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const emptyRequired = getRegisterEmptyRequiredFieldKeys(form);
+    const emptyRequired = getRegisterEmptyRequiredFieldKeys({ ...form, channel });
     if (emptyRequired.length > 0) {
       setInvalidFields(new Set(emptyRequired));
       setStatus({
@@ -106,9 +112,23 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
     setStatus({ kind: "loading", message: "" });
 
     try {
-      const payload = buildRegisterUserPayload(form);
-      const pending = await registerMutation.mutateAsync(payload);
-      setPendingRegistration(pending);
+      const payload = buildRegisterUserPayload(form, channel);
+      if (channel === "phone") {
+        setPhoneRegisterLoading(true);
+        const pending = await registerUserByPhone(payload);
+        setPendingRegistration({
+          registrationId: pending.registrationId,
+          phoneNumber: pending.phoneNumber,
+          channel: "phone",
+        });
+      } else {
+        const pending = await registerMutation.mutateAsync(payload);
+        setPendingRegistration({
+          registrationId: pending.registrationId,
+          email: pending.email,
+          channel: "email",
+        });
+      }
       setCode("");
       setStep("code");
       setInvalidFields(new Set());
@@ -121,6 +141,8 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
             ? error.message
             : REGISTER_MODAL_UI.ERROR_GENERIC;
       setStatus({ kind: "error", message });
+    } finally {
+      setPhoneRegisterLoading(false);
     }
   };
 
@@ -134,8 +156,14 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
 
     if (!pendingRegistration) return;
 
+    const isPhone = pendingRegistration.channel === "phone";
     if (code.length !== REGISTER_CODE_LENGTH) {
-      setStatus({ kind: "error", message: REGISTER_MODAL_UI.CODE_REQUIRED });
+      setStatus({
+        kind: "error",
+        message: isPhone
+          ? REGISTER_MODAL_UI.CODE_REQUIRED_SMS
+          : REGISTER_MODAL_UI.CODE_REQUIRED,
+      });
       return;
     }
 
@@ -174,7 +202,14 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
         registrationId: pendingRegistration.registrationId,
       });
       setCode("");
-      setStatus({ kind: "success", message: message || REGISTER_MODAL_UI.RESENT });
+      setStatus({
+        kind: "success",
+        message:
+          message ||
+          (pendingRegistration.channel === "phone"
+            ? REGISTER_MODAL_UI.RESENT_SMS
+            : REGISTER_MODAL_UI.RESENT),
+      });
     } catch (error) {
       setStatus({
         kind: "error",
@@ -201,9 +236,16 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
     onClose();
   };
 
-  const isLoading = status.kind === "loading";
-  const displayEmail =
-    pendingRegistration?.email || form.email || REGISTER_MODAL_UI.CODE_STEP_EMAIL_FALLBACK;
+  const isLoading =
+    status.kind === "loading" || registerMutation.isPending || phoneRegisterLoading;
+  const isPhonePending = pendingRegistration?.channel === "phone";
+  const displayTarget = isPhonePending
+    ? pendingRegistration?.phoneNumber ||
+      form.phoneNumber ||
+      REGISTER_MODAL_UI.CODE_STEP_PHONE_FALLBACK
+    : pendingRegistration?.email ||
+      form.email ||
+      REGISTER_MODAL_UI.CODE_STEP_EMAIL_FALLBACK;
 
   const feedback = (
     <div className="register-modal__feedback" aria-live="polite">
@@ -237,10 +279,16 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
         <form className="register-modal__body" onSubmit={handleConfirm} noValidate>
           <div className="register-modal__scroll">
             <p className="register-modal__code-text">
-              {REGISTER_MODAL_UI.CODE_STEP_TEXT(displayEmail)}
+              {isPhonePending
+                ? REGISTER_MODAL_UI.CODE_STEP_PHONE_TEXT(displayTarget)
+                : REGISTER_MODAL_UI.CODE_STEP_TEXT(displayTarget)}
             </p>
             <label className="register-modal__label">
-              <FormFieldLabel required>{REGISTER_MODAL_UI.LABEL_CODE}</FormFieldLabel>
+              <FormFieldLabel required>
+                {isPhonePending
+                  ? REGISTER_MODAL_UI.LABEL_CODE_SMS
+                  : REGISTER_MODAL_UI.LABEL_CODE}
+              </FormFieldLabel>
               <input
                 className="register-modal__input"
                 type="text"
@@ -277,36 +325,92 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
             <button type="submit" className="register-modal__submit" disabled={isLoading}>
               {isLoading
                 ? REGISTER_MODAL_UI.CONFIRM_LOADING
-                : REGISTER_MODAL_UI.CONFIRM_IDLE}
+                : isPhonePending
+                  ? REGISTER_MODAL_UI.CONFIRM_IDLE_SMS
+                  : REGISTER_MODAL_UI.CONFIRM_IDLE}
             </button>
           </div>
         </form>
       ) : (
         <form className="register-modal__body" onSubmit={handleSubmit} noValidate>
           <div className="register-modal__scroll">
-            <label
-              className={withInvalidFieldClass(
-                "register-modal__label",
-                "email",
-                invalidFields,
-              )}
-            >
-              <FormFieldLabel required>{REGISTER_MODAL_UI.LABEL_EMAIL}</FormFieldLabel>
-              <input
+            <div className="register-modal__channel" role="group" aria-label="Способ регистрации">
+              <button
+                type="button"
+                className={
+                  channel === "email"
+                    ? "register-modal__channel-btn register-modal__channel-btn--active"
+                    : "register-modal__channel-btn"
+                }
+                onClick={() => setChannel("email")}
+                disabled={isLoading}
+              >
+                {REGISTER_MODAL_UI.CHANNEL_EMAIL}
+              </button>
+              <button
+                type="button"
+                className={
+                  channel === "phone"
+                    ? "register-modal__channel-btn register-modal__channel-btn--active"
+                    : "register-modal__channel-btn"
+                }
+                onClick={() => setChannel("phone")}
+                disabled={isLoading}
+              >
+                {REGISTER_MODAL_UI.CHANNEL_PHONE}
+              </button>
+            </div>
+
+            {channel === "email" ? (
+              <label
                 className={withInvalidFieldClass(
-                  "register-modal__input",
+                  "register-modal__label",
                   "email",
                   invalidFields,
                 )}
-                type="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                aria-required="true"
-                aria-invalid={invalidFields.has("email")}
-                autoComplete="email"
-              />
-            </label>
+              >
+                <FormFieldLabel required>{REGISTER_MODAL_UI.LABEL_EMAIL}</FormFieldLabel>
+                <input
+                  className={withInvalidFieldClass(
+                    "register-modal__input",
+                    "email",
+                    invalidFields,
+                  )}
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  aria-required="true"
+                  aria-invalid={invalidFields.has("email")}
+                  autoComplete="email"
+                />
+              </label>
+            ) : (
+              <label
+                className={withInvalidFieldClass(
+                  "register-modal__label",
+                  "phoneNumber",
+                  invalidFields,
+                )}
+              >
+                <FormFieldLabel required>{REGISTER_MODAL_UI.LABEL_PHONE}</FormFieldLabel>
+                <input
+                  className={withInvalidFieldClass(
+                    "register-modal__input",
+                    "phoneNumber",
+                    invalidFields,
+                  )}
+                  type="tel"
+                  name="phoneNumber"
+                  value={form.phoneNumber}
+                  onChange={handleChange}
+                  aria-required="true"
+                  aria-invalid={invalidFields.has("phoneNumber")}
+                  autoComplete="tel"
+                  placeholder="8 (912) 345-67-89"
+                />
+              </label>
+            )}
             <label
               className={withInvalidFieldClass(
                 "register-modal__label",

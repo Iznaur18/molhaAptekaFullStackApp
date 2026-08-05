@@ -38,6 +38,7 @@ export {
 } from "./resolveOrderLineAffiliateSellerLine.js";export {
   PROFILE_ACCOUNT_SECTION_ORDER,
   PROFILE_SECTION_ADVERTISING,
+  PROFILE_SECTION_ONEC_INTEGRATION,
   PROFILE_SECTION_ADMIN_ORDERS,
   PROFILE_SECTION_APP_INTRO_ADMIN,
   PROFILE_SECTION_AUCTION,
@@ -175,6 +176,15 @@ export type {
   ProductCharacteristicLike,
   ProductDetailsContentLike,
 } from "./productDetailsContent.js";
+export {
+  formatProductDescriptionPlainText,
+  parseProductDescriptionBlocks,
+  toggleProductDescriptionH1,
+} from "./productDescriptionMarkup.js";
+export type {
+  ProductDescriptionBlock,
+  ToggleProductDescriptionH1Result,
+} from "./productDescriptionMarkup.js";
 export {
   PRODUCT_WHOLESALE_MIN_QTY_MIN,
   formatProductWholesaleBadgeLabel,

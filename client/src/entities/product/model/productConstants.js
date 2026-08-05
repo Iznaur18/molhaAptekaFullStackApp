@@ -1,21 +1,18 @@
-/** Совпадает с `server/constants/productConstants.js`. */
-export const PRODUCT_IMAGE_URLS_MAX = 5;
+/** SSOT: `contract/src/productWrite.js`. */
+export {
+  PRODUCT_IMAGE_URLS_MAX,
+  PRODUCT_NAME_MIN_LENGTH,
+  PRODUCT_NAME_MAX_LENGTH,
+  PRODUCT_DESCRIPTION_MIN_CHARS,
+  PRODUCT_DESCRIPTION_MAX_CHARS,
+  PRODUCT_PRICE_RUB_MAX,
+  SELLER_PRODUCTS_LIMIT_REGULAR,
+  SELLER_PRODUCTS_LIMIT_PREMIUM,
+  SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE,
+} from "@molha/api-contract";
 
 /** Максимальная длительность превью-видео на карточке товара (сек). */
 export const PRODUCT_PREVIEW_VIDEO_MAX_DURATION_SEC = 3;
-
-export const SELLER_PRODUCTS_LIMIT_REGULAR = 50;
-export const SELLER_PRODUCTS_LIMIT_PREMIUM = 100;
-export const SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE = `Достигнут лимит товаров: ${SELLER_PRODUCTS_LIMIT_REGULAR} для обычных пользователей, ${SELLER_PRODUCTS_LIMIT_PREMIUM} для премиум.`;
-
-export const PRODUCT_NAME_MIN_LENGTH = 3;
-export const PRODUCT_NAME_MAX_LENGTH = 100;
-
-export const PRODUCT_DESCRIPTION_MAX_CHARS = 2000;
-export const PRODUCT_DESCRIPTION_MIN_CHARS = 10;
-
-/** Максимум цены товара / предложения (9 цифр, ₽). Совпадает с server/constants/productConstants.js */
-export const PRODUCT_PRICE_RUB_MAX = 999_999_999;
 
 export const PRODUCT_PRICE_RUB_MAX_ERROR_MESSAGE =
   "Цена не может превышать 999 999 999 ₽";

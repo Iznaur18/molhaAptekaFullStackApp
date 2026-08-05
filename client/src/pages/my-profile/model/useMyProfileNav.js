@@ -52,6 +52,7 @@ import { getActiveProfileNavLabel } from "../lib/getActiveProfileNavLabel.js";
  *   onLoyaltyPointsClick?: () => void;
  *   onPartnerProgramClick?: () => void;
  *   onAdvertisingClick?: () => void;
+ *   onOneCIntegrationClick?: () => void;
  *   onEditProfileClick?: () => void;
  * }} params
  */
@@ -102,6 +103,7 @@ export function useMyProfileNav({
   onLoyaltyPointsClick,
   onPartnerProgramClick,
   onAdvertisingClick,
+  onOneCIntegrationClick,
   onEditProfileClick,
 }) {
   const isRegularUser = user?.userRole === USER_ROLE_USER;
@@ -150,6 +152,7 @@ export function useMyProfileNav({
   const canUseLoyaltyPoints = isProfileReady && Boolean(onLoyaltyPointsClick);
   const canUsePartnerProgram = isProfileReady && Boolean(onPartnerProgramClick);
   const canUseAdvertising = isProfileReady && Boolean(onAdvertisingClick);
+  const canUseOneCIntegration = isProfileReady && Boolean(onOneCIntegrationClick);
   const canUseProductModeration =
     !isRegularUser && isProfileReady && Boolean(onProductModerationClick);
   const canUseProductReports =
@@ -199,6 +202,7 @@ export function useMyProfileNav({
         canUseLoyaltyPoints,
         canUsePartnerProgram,
         canUseAdvertising,
+        canUseOneCIntegration,
         canUseEditProfile,
         showEditOnBanner,
         pendingMySalesActionCount,
@@ -243,6 +247,7 @@ export function useMyProfileNav({
         onLoyaltyPointsClick,
         onPartnerProgramClick,
         onAdvertisingClick,
+        onOneCIntegrationClick,
         onEditProfileClick,
       }),
     [
@@ -262,6 +267,7 @@ export function useMyProfileNav({
       canUseLoyaltyPoints,
       canUsePartnerProgram,
       canUseAdvertising,
+      canUseOneCIntegration,
       canUseMyOrders,
       canUseMyProducts,
       canUseMySales,
@@ -290,6 +296,7 @@ export function useMyProfileNav({
       onLoyaltyPointsClick,
       onPartnerProgramClick,
       onAdvertisingClick,
+      onOneCIntegrationClick,
       onIntroAdModerationClick,
       onSellerPersonalCategoryModerationClick,
       onMyOrdersClick,

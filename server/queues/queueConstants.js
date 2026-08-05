@@ -19,3 +19,4 @@ export const JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_CRON =
   "processProductPriceMarketStatusCronTasks";
 export const JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_PEERS =
   "processProductPriceMarketStatusPeers";
+export const JOB_PROCESS_ONEC_SYNC_CRON = "processOneCSyncCronTasks";

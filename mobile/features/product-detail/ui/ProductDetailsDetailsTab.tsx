@@ -15,6 +15,7 @@ import {
 } from "@/entities/product/lib/productFieldRegistry";
 import { getProductSellerId } from "@/entities/product/lib/getProductSellerId";
 import { ProductCharacteristicsDetails } from "@/entities/product/ui/ProductCharacteristicsDetails";
+import { ProductDescriptionContent } from "@/entities/product/ui/ProductDescriptionContent";
 import { ProductDetailFieldRows } from "@/entities/product/ui/ProductDetailFieldRows";
 import { ProductDetailsBadgeStack } from "@/entities/product/ui/ProductDetailsBadgeStack";
 import { ProductAffiliateShareButton } from "@/entities/product/ui/ProductAffiliateShareButton";
@@ -262,7 +263,10 @@ export const ProductDetailsDetailsTab = ({
           accessibilityLabel={panelAriaLabel}
         >
           {showDescription ? (
-            <Text style={styles.descriptionText}>{descriptionText}</Text>
+            <ProductDescriptionContent
+              text={descriptionText}
+              paragraphStyle={styles.descriptionText}
+            />
           ) : null}
 
           {showCharacteristics ? (

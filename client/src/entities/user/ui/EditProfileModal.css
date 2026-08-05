@@ -162,6 +162,35 @@
 }
 
 .edit-profile-modal__hint {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--iz-color-text-secondary);
+}
+
+.edit-profile-modal__phone-bind {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.edit-profile-modal__secondary-btn {
+  align-self: flex-start;
+  border: 1px solid var(--iz-color-border-strong);
+  border-radius: 0.5rem;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  padding: 0.4rem 0.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.edit-profile-modal__secondary-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
   font-size: 0.78rem;
   line-height: 1.35;
   color: var(--iz-color-text-muted);

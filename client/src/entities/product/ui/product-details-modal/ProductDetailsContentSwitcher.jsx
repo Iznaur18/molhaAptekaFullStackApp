@@ -5,6 +5,7 @@ import { ModalSectionTabs } from "../../../../shared/ui/ModalSectionTabs/ModalSe
 import { getProductFieldLabel } from "../../lib/productFieldRegistry.js";
 import { PRODUCT_DETAILS_CONTENT_PANEL } from "../../lib/productDetailsContentPanelConstants.js";
 import { ProductCharacteristicsDetails } from "../ProductCharacteristicsDetails.jsx";
+import { ProductDescriptionContent } from "../ProductDescriptionContent.jsx";
 import { ProductPickupDetailsPanel } from "./ProductPickupDetailsPanel.jsx";
 import { useProductDetailsContentPanel } from "./useProductDetailsContentPanel.js";
 
@@ -91,7 +92,10 @@ export function ProductDetailsContentSwitcher({ product, contentPanels }) {
         aria-label={panelAriaLabel}
       >
         {showDescription ? (
-          <p className="product-details-content-switcher__description">{descriptionText}</p>
+          <ProductDescriptionContent
+            text={descriptionText}
+            className="product-details-content-switcher__description"
+          />
         ) : null}
         {showCharacteristics ? (
           <ProductCharacteristicsDetails

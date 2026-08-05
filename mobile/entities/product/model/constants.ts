@@ -1,4 +1,5 @@
-export const PRODUCT_IMAGE_URLS_MAX = 5;
+/** SSOT: `contract/src/productWrite.js`. */
+export { PRODUCT_IMAGE_URLS_MAX } from "@molha/api-contract";
 
 /** Inline SVG — parity with web `PRODUCT_IMAGE_PLACEHOLDER_URL`. */
 export const PRODUCT_IMAGE_PLACEHOLDER_URL =

@@ -4,6 +4,7 @@ import { INTRO_AD_CRON_INTERVAL_MS } from "../constants/introAdCampaignConstants
 import { PREMIUM_CRON_INTERVAL_MS } from "../constants/premiumConstants.js";
 import { PRODUCT_PROMOTION_CRON_INTERVAL_MS } from "../constants/productPromotionConstants.js";
 import { PRODUCT_PRICE_MARKET_STATUS_CRON_INTERVAL_MS } from "../constants/productPriceMarketStatusConstants.js";
+import { ONEC_SYNC_INTERVAL_MS } from "../constants/onecConstants.js";
 import { SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS } from "../constants/sellerPersonalCategoryConstants.js";
 import { SITE_HEADER_BANNER_CAMPAIGN_CRON_INTERVAL_MS } from "../constants/siteHeaderBannerCampaignConstants.js";
 import {
@@ -11,6 +12,7 @@ import {
   JOB_EXPIRE_STALE_USER_STORIES,
   JOB_PROCESS_INSTALLMENT_CRON,
   JOB_PROCESS_INTRO_AD_CRON,
+  JOB_PROCESS_ONEC_SYNC_CRON,
   JOB_PROCESS_PREMIUM_CRON,
   JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_CRON,
   JOB_PROCESS_SELLER_PERSONAL_CATEGORY_CRON,
@@ -45,5 +47,9 @@ export const CRON_JOB_DEFINITIONS = [
   {
     name: JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_CRON,
     intervalMs: PRODUCT_PRICE_MARKET_STATUS_CRON_INTERVAL_MS,
+  },
+  {
+    name: JOB_PROCESS_ONEC_SYNC_CRON,
+    intervalMs: ONEC_SYNC_INTERVAL_MS,
   },
 ];

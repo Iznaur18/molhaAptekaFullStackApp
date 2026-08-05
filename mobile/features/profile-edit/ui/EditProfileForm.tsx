@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
 
+import { confirmPhoneBind, requestPhoneBind } from "@/entities/session/api/phoneAuth";
 import { maskBirthDateInput } from "@/entities/user/lib/birthDateInputMask";
 import { buildPatchUserProfileBody } from "@/entities/user/lib/buildPatchUserProfileBody";
 import {
@@ -23,15 +24,21 @@ import { ProfileAvatarUpload } from "@/features/image-upload/ui/ProfileAvatarUpl
 import { ProfileBackgroundUpload } from "@/features/image-upload/ui/ProfileBackgroundUpload";
 import { DeleteAccountSection } from "@/features/profile-edit/ui/DeleteAccountSection";
 import { EditProfileSocialLinksFields } from "@/features/profile-edit/ui/EditProfileSocialLinksFields";
-import { ADDRESS_DELIVERY_UI, ADDRESS_STRUCTURED_UI, EDIT_PROFILE_UI } from "@/shared/config";
+import { ADDRESS_DELIVERY_UI, ADDRESS_STRUCTURED_UI, AUTH_UI, EDIT_PROFILE_UI } from "@/shared/config";
+import { keepDigitsOnly } from "@/shared/lib/rubPriceInput";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useEditProfileFormStyles } from "@/shared/theme/editProfileFormStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 
 const GENDER_OPTIONS = [USER_GENDER_MALE, USER_GENDER_FEMALE, USER_GENDER_NO_SELECTED] as const;
+const PHONE_BIND_CODE_LENGTH = 6;
 
 type EditProfileFormProps = {
-  user: Record<string, unknown> & { _id: string; email?: string };
+  user: Record<string, unknown> & {
+    _id: string;
+    email?: string;
+    isPhoneVerified?: boolean;
+  };
   onSaved?: () => void;
 };
 
@@ -43,6 +50,10 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
   const [form, setForm] = useState<EditProfileFormState>(initialForm);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [phoneBindCode, setPhoneBindCode] = useState("");
+  const [phoneBindOtpSent, setPhoneBindOtpSent] = useState(false);
+  const [phoneBindLoading, setPhoneBindLoading] = useState(false);
+  const [phoneBindNotice, setPhoneBindNotice] = useState("");
   const patchMutation = usePatchUserProfileMutation();
 
   const updateField = <K extends keyof EditProfileFormState>(
@@ -83,6 +94,53 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
 
   const isSubmitting = patchMutation.isPending;
   const notesChars = form.notesAboutUser.length;
+  const isPhoneVerified = user.isPhoneVerified === true;
+  const showPhoneVerify =
+    form.userPhoneNumber.trim() !== "" &&
+    (!isPhoneVerified || form.userPhoneNumber !== baselineForm.userPhoneNumber);
+
+  const handleRequestPhoneBind = async () => {
+    setPhoneBindLoading(true);
+    setPhoneBindNotice("");
+    setErrorMessage("");
+
+    try {
+      await requestPhoneBind({ phoneNumber: form.userPhoneNumber.trim() });
+      setPhoneBindOtpSent(true);
+      setPhoneBindNotice(EDIT_PROFILE_UI.PHONE_VERIFY_SENT);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : EDIT_PROFILE_UI.PHONE_VERIFY_REQUEST_ERROR,
+      );
+    } finally {
+      setPhoneBindLoading(false);
+    }
+  };
+
+  const handleConfirmPhoneBind = async () => {
+    if (phoneBindCode.length !== PHONE_BIND_CODE_LENGTH) {
+      setErrorMessage(EDIT_PROFILE_UI.PHONE_VERIFY_CODE_REQUIRED);
+      return;
+    }
+
+    setPhoneBindLoading(true);
+    setPhoneBindNotice("");
+    setErrorMessage("");
+
+    try {
+      await confirmPhoneBind({ code: phoneBindCode });
+      setPhoneBindCode("");
+      setPhoneBindOtpSent(false);
+      setPhoneBindNotice(EDIT_PROFILE_UI.PHONE_VERIFY_SUCCESS);
+      setSuccessMessage(EDIT_PROFILE_UI.PHONE_VERIFY_SUCCESS);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : EDIT_PROFILE_UI.PHONE_VERIFY_ERROR,
+      );
+    } finally {
+      setPhoneBindLoading(false);
+    }
+  };
 
   const fieldLabel = (label: string, required?: boolean) => (
     <Text style={styles.label}>
@@ -169,12 +227,58 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
             <TextInput
               style={styles.input}
               value={form.userPhoneNumber}
-              onChangeText={(value) => updateField("userPhoneNumber", maskRuPhoneInput(value))}
+              onChangeText={(value) => {
+                updateField("userPhoneNumber", maskRuPhoneInput(value));
+                setPhoneBindOtpSent(false);
+                setPhoneBindCode("");
+                setPhoneBindNotice("");
+              }}
               keyboardType="phone-pad"
-              editable={!isSubmitting}
-              placeholder="8 (912) 345-67-89"
+              editable={!isSubmitting && !phoneBindLoading}
+              placeholder={AUTH_UI.PHONE_PLACEHOLDER}
               placeholderTextColor={theme.colors.textMuted}
             />
+            {showPhoneVerify ? (
+              <View style={{ gap: 8, marginTop: 4 }}>
+                {!phoneBindOtpSent ? (
+                  <Pressable
+                    onPress={() => void handleRequestPhoneBind()}
+                    disabled={isSubmitting || phoneBindLoading}
+                  >
+                    <Text style={styles.hint}>
+                      {phoneBindLoading
+                        ? EDIT_PROFILE_UI.PHONE_VERIFY_SEND_LOADING
+                        : EDIT_PROFILE_UI.PHONE_VERIFY_SEND}
+                    </Text>
+                  </Pressable>
+                ) : (
+                  <>
+                    <TextInput
+                      style={styles.input}
+                      value={phoneBindCode}
+                      onChangeText={(value) =>
+                        setPhoneBindCode(keepDigitsOnly(value).slice(0, PHONE_BIND_CODE_LENGTH))
+                      }
+                      keyboardType="number-pad"
+                      textContentType="oneTimeCode"
+                      maxLength={PHONE_BIND_CODE_LENGTH}
+                      placeholder={EDIT_PROFILE_UI.PHONE_VERIFY_CODE_PLACEHOLDER}
+                      placeholderTextColor={theme.colors.textMuted}
+                      editable={!phoneBindLoading}
+                    />
+                    <AppButton
+                      label={EDIT_PROFILE_UI.PHONE_VERIFY_BUTTON}
+                      variant="secondary"
+                      onPress={() => void handleConfirmPhoneBind()}
+                      disabled={phoneBindLoading}
+                    />
+                  </>
+                )}
+                {phoneBindNotice ? (
+                  <Text style={[styles.feedback, styles.feedbackSuccess]}>{phoneBindNotice}</Text>
+                ) : null}
+              </View>
+            ) : null}
           </View>
           <View style={styles.field}>
             {fieldLabel(EDIT_PROFILE_UI.LABEL_BIRTH_DATE)}

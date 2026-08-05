@@ -67,14 +67,16 @@
   padding: 0;
   border: none;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--iz-color-surface) 88%, transparent);
+  background: color-mix(in srgb, var(--iz-color-surface) 55%, transparent);
   color: var(--iz-color-text);
-  box-shadow: 0 1px 4px color-mix(in srgb, var(--iz-color-ink) 14%, transparent);
+  box-shadow: none;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   cursor: pointer;
 }
 
 .product-media-gallery-readonly__back-btn:hover {
-  background: var(--iz-color-surface);
+  background: color-mix(in srgb, var(--iz-color-surface) 78%, transparent);
 }
 
 .product-media-gallery-readonly__back-btn:focus-visible {
@@ -96,11 +98,37 @@
   position: static;
   top: auto;
   right: auto;
+  background: color-mix(in srgb, var(--iz-color-surface) 55%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.product-media-gallery-readonly__hero-actions
+  .wishlist-toggle--card:hover:not(:disabled):not(.wishlist-toggle--active) {
+  background: color-mix(in srgb, var(--iz-color-surface) 78%, transparent);
+}
+
+.product-media-gallery-readonly__hero-actions
+  .wishlist-toggle--card.wishlist-toggle--active {
+  background: color-mix(in srgb, var(--iz-color-danger) 72%, transparent);
+  color: var(--iz-color-on-contrast);
 }
 
 .product-media-gallery-readonly__report-slot {
   display: inline-flex;
   align-items: center;
+}
+
+.product-media-gallery-readonly__report-slot
+  .product-details-modal__footer-btn--report {
+  background: color-mix(in srgb, var(--iz-color-surface) 55%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.product-media-gallery-readonly__report-slot
+  .product-details-modal__footer-btn--report:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--iz-color-surface) 78%, transparent);
 }
 
 .product-media-gallery-readonly__report-slot > * {
@@ -138,9 +166,28 @@
 }
 
 .product-media-gallery-readonly__thumbs {
+  box-sizing: border-box;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
   gap: 0.4rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  touch-action: pan-x pan-y;
+}
+
+.product-media-gallery-readonly__thumbs::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+  background: transparent;
 }
 
 .product-media-gallery-readonly__thumb {

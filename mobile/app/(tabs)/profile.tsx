@@ -48,7 +48,10 @@ export default function ProfileScreen() {
 
   const user = sessionQuery.data?.user;
   const isLoggedIn = Boolean(user);
-  const needsEmailVerification = isLoggedIn && user?.isEmailVerified === false;
+  const needsEmailVerification =
+    isLoggedIn &&
+    Boolean(String(user?.email ?? "").trim()) &&
+    user?.isEmailVerified !== true;
   const isSessionLoading = sessionQuery.isPending && sessionQuery.data === undefined;
 
   const guestProfileLoginMenuBannerImageQuery = useGuestProfileLoginMenuBannerImageQuery({

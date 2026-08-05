@@ -269,6 +269,11 @@ export const userUpdateProfileController = async (req, res) => {
           "Пользователь с таким номером телефона уже существует",
         );
       }
+      const prevPhone = String(targetUserBeforeUpdate.userPhoneNumber ?? "").trim();
+      const nextPhone = String(updateData.userPhoneNumber).trim();
+      if (nextPhone !== prevPhone) {
+        updateData.isPhoneVerified = false;
+      }
     }
 
     const wasPremium = isPremiumActive(targetUserBeforeUpdate);

@@ -23,6 +23,8 @@
     "sync-uploads:s3": "node scripts/syncUploadsToObjectStorage.js",
     "sync-uploads:s3:apply": "node scripts/syncUploadsToObjectStorage.js --apply",
     "test:smtp": "node scripts/testSmtp.js",
+    "onec:mock": "node scripts/onecMockServer.mjs",
+    "onec:e2e-smoke": "node scripts/onecE2eSmoke.mjs",
     "audit:routes": "node scripts/auditRouteBodyValidation.js",
     "create-admin": "node scripts/createAdmin.js",
     "seed:product-reviews": "node scripts/seedProductReviews.js",

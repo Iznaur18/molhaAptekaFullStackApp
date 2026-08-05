@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 
 import { useGuestProfileLoginMenuBannerImageQuery } from "../../../entities/site-header-banner/model/useGuestProfileLoginMenuBannerImageQuery.js";
+import { registerUserByPhone } from "../../../entities/user/api/registerUserByPhone.js";
 import { resendRegistrationCode } from "../../../entities/user/api/resendRegistrationCode.js";
 import { buildRegisterUserPayload } from "../../../entities/user/lib/buildRegisterUserPayload.js";
 import { getRegisterEmptyRequiredFieldKeys } from "../../../entities/user/lib/getRegisterEmptyRequiredFieldKeys.js";
+import { maskRuPhoneInput } from "../../../entities/user/lib/ruPhone.js";
 import { validatePasswordConfirm } from "../../../entities/user/lib/validatePasswordConfirm.js";
 import { validateUserNameField } from "../../../entities/user/lib/validateUserName.js";
 import { useAuthSession } from "../../../entities/user/model/useAuthSession.js";
@@ -35,6 +37,7 @@ const REGISTER_CODE_LENGTH = 6;
 
 const INITIAL_FORM = {
   email: "",
+  phoneNumber: "",
   password: "",
   passwordConfirm: "",
   userName: "",
@@ -54,10 +57,13 @@ export function RegisterPage() {
   const { isAuthorized, isSessionReady } = useAuthSession();
   const registerMutation = useRegisterMutation();
   const confirmMutation = useConfirmRegistrationMutation();
+  const [channel, setChannel] = useState(/** @type {"email" | "phone"} */ ("email"));
   const [form, setForm] = useState(INITIAL_FORM);
   const [step, setStep] = useState(/** @type {"form" | "code"} */ ("form"));
   const [pendingRegistration, setPendingRegistration] = useState(
-    /** @type {{ registrationId: string; email: string } | null} */ (null),
+    /** @type {{ registrationId: string; email?: string; phoneNumber?: string; channel: "email" | "phone" } | null} */ (
+      null
+    ),
   );
   const [code, setCode] = useState("");
   const [status, setStatus] = useState({ kind: "idle", message: "" });
@@ -67,6 +73,7 @@ export function RegisterPage() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [personalDataConsentAccepted, setPersonalDataConsentAccepted] =
     useState(false);
+  const [phoneRegisterLoading, setPhoneRegisterLoading] = useState(false);
 
   const bannerQuery = useGuestProfileLoginMenuBannerImageQuery();
   const bannerImageUrl = bannerQuery.data
@@ -76,7 +83,8 @@ export function RegisterPage() {
   const isPending =
     status.kind === "loading" ||
     registerMutation.isPending ||
-    confirmMutation.isPending;
+    confirmMutation.isPending ||
+    phoneRegisterLoading;
 
   const canSubmitRegister = isRegisterConsentComplete({
     termsAccepted,
@@ -94,6 +102,9 @@ export function RegisterPage() {
     let nextValue = value;
     if (name === "userName" && typeof nextValue === "string") {
       nextValue = nextValue.toLowerCase().replace(/[^a-z0-9]/g, "");
+    }
+    if (name === "phoneNumber") {
+      nextValue = maskRuPhoneInput(nextValue);
     }
     setForm((prev) => ({ ...prev, [name]: nextValue }));
     setInvalidFields((prev) => {
@@ -135,7 +146,7 @@ export function RegisterPage() {
       return;
     }
 
-    const emptyRequired = getRegisterEmptyRequiredFieldKeys(form);
+    const emptyRequired = getRegisterEmptyRequiredFieldKeys({ ...form, channel });
     if (emptyRequired.length > 0) {
       setInvalidFields(new Set(emptyRequired));
       setStatus({
@@ -166,9 +177,23 @@ export function RegisterPage() {
     setStatus({ kind: "loading", message: "" });
 
     try {
-      const payload = buildRegisterUserPayload(form);
-      const pending = await registerMutation.mutateAsync(payload);
-      setPendingRegistration(pending);
+      const payload = buildRegisterUserPayload(form, channel);
+      if (channel === "phone") {
+        setPhoneRegisterLoading(true);
+        const pending = await registerUserByPhone(payload);
+        setPendingRegistration({
+          registrationId: pending.registrationId,
+          phoneNumber: pending.phoneNumber,
+          channel: "phone",
+        });
+      } else {
+        const pending = await registerMutation.mutateAsync(payload);
+        setPendingRegistration({
+          registrationId: pending.registrationId,
+          email: pending.email,
+          channel: "email",
+        });
+      }
       setCode("");
       setStep("code");
       setInvalidFields(new Set());
@@ -181,6 +206,8 @@ export function RegisterPage() {
             ? error.message
             : API_CLIENT_UI.REGISTER_FALLBACK;
       setStatus({ kind: "error", message });
+    } finally {
+      setPhoneRegisterLoading(false);
     }
   };
 
@@ -193,8 +220,14 @@ export function RegisterPage() {
     event.preventDefault();
     if (!pendingRegistration) return;
 
+    const isPhone = pendingRegistration.channel === "phone";
     if (code.length !== REGISTER_CODE_LENGTH) {
-      setStatus({ kind: "error", message: AUTH_UI.REGISTER_CODE_REQUIRED });
+      setStatus({
+        kind: "error",
+        message: isPhone
+          ? REGISTER_MODAL_UI.CODE_REQUIRED_SMS
+          : REGISTER_MODAL_UI.CODE_REQUIRED,
+      });
       return;
     }
 
@@ -235,7 +268,11 @@ export function RegisterPage() {
       setCode("");
       setStatus({
         kind: "success",
-        message: message || REGISTER_MODAL_UI.RESENT,
+        message:
+          message ||
+          (pendingRegistration.channel === "phone"
+            ? REGISTER_MODAL_UI.RESENT_SMS
+            : REGISTER_MODAL_UI.RESENT),
       });
     } catch (error) {
       setStatus({
@@ -247,6 +284,15 @@ export function RegisterPage() {
       });
     }
   };
+
+  const isPhonePending = pendingRegistration?.channel === "phone";
+  const displayTarget = isPhonePending
+    ? pendingRegistration?.phoneNumber ||
+      form.phoneNumber ||
+      REGISTER_MODAL_UI.CODE_STEP_PHONE_FALLBACK
+    : pendingRegistration?.email ||
+      form.email ||
+      REGISTER_MODAL_UI.CODE_STEP_EMAIL_FALLBACK;
 
   if (step === "code" && pendingRegistration) {
     return (
@@ -263,20 +309,30 @@ export function RegisterPage() {
           </button>
           <AuthHeroBanner height={heroHeight} imageUrl={bannerImageUrl} />
           <div className="auth-page__body">
-            <h1 className="auth-page__title">{AUTH_UI.REGISTER_CODE_TITLE}</h1>
+            <h1 className="auth-page__title">
+              {isPhonePending
+                ? REGISTER_MODAL_UI.CONFIRM_IDLE_SMS
+                : AUTH_UI.REGISTER_CODE_TITLE}
+            </h1>
             <p className="auth-page__subtitle">
-              {AUTH_UI.REGISTER_CODE_SUBTITLE(pendingRegistration.email)}
+              {isPhonePending
+                ? REGISTER_MODAL_UI.CODE_STEP_PHONE_TEXT(displayTarget)
+                : REGISTER_MODAL_UI.CODE_STEP_TEXT(displayTarget)}
             </p>
             <form className="auth-page__form" onSubmit={handleConfirm}>
               <label className="auth-page__field">
-                <span className="auth-page__label">{AUTH_UI.REGISTER_CODE_LABEL}</span>
+                <span className="auth-page__label">
+                  {isPhonePending
+                    ? REGISTER_MODAL_UI.LABEL_CODE_SMS
+                    : REGISTER_MODAL_UI.LABEL_CODE}
+                </span>
                 <input
                   className="auth-page__input"
                   inputMode="numeric"
                   autoComplete="one-time-code"
                   value={code}
                   onChange={handleCodeChange}
-                  placeholder={AUTH_UI.REGISTER_CODE_PLACEHOLDER}
+                  placeholder={REGISTER_MODAL_UI.CODE_PLACEHOLDER}
                   maxLength={REGISTER_CODE_LENGTH}
                   required
                 />
@@ -296,7 +352,9 @@ export function RegisterPage() {
               >
                 {isPending
                   ? REGISTER_MODAL_UI.CONFIRM_LOADING
-                  : AUTH_UI.REGISTER_CODE_CONFIRM_BUTTON}
+                  : isPhonePending
+                    ? REGISTER_MODAL_UI.CONFIRM_IDLE_SMS
+                    : REGISTER_MODAL_UI.CONFIRM_IDLE}
               </button>
               <button
                 type="button"
@@ -304,7 +362,7 @@ export function RegisterPage() {
                 disabled={isPending}
                 onClick={handleResend}
               >
-                {AUTH_UI.REGISTER_CODE_RESEND_BUTTON}
+                {REGISTER_MODAL_UI.RESEND_BUTTON}
               </button>
               <button
                 type="button"
@@ -316,7 +374,7 @@ export function RegisterPage() {
                   setStatus({ kind: "idle", message: "" });
                 }}
               >
-                {AUTH_UI.REGISTER_CODE_BACK_BUTTON}
+                {REGISTER_MODAL_UI.BACK_TO_FORM}
               </button>
             </form>
           </div>
@@ -345,23 +403,70 @@ export function RegisterPage() {
           <p className="auth-page__subtitle">{AUTH_UI.REGISTER_SUBTITLE}</p>
 
           <form className="auth-page__form" onSubmit={handleSubmit}>
-            <label className="auth-page__field">
-              <span className="auth-page__label">{AUTH_UI.EMAIL_LABEL}</span>
-              <input
-                className={withInvalidFieldClass(
-                  "auth-page__input",
-                  "email",
-                  invalidFields,
-                )}
-                type="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                required
-                autoComplete="email"
-                placeholder={AUTH_UI.EMAIL_PLACEHOLDER}
-              />
-            </label>
+            <div className="auth-page__channel" role="group" aria-label="Способ регистрации">
+              <button
+                type="button"
+                className={
+                  channel === "email"
+                    ? "auth-page__channel-btn auth-page__channel-btn--active"
+                    : "auth-page__channel-btn"
+                }
+                onClick={() => setChannel("email")}
+                disabled={isPending}
+              >
+                {REGISTER_MODAL_UI.CHANNEL_EMAIL}
+              </button>
+              <button
+                type="button"
+                className={
+                  channel === "phone"
+                    ? "auth-page__channel-btn auth-page__channel-btn--active"
+                    : "auth-page__channel-btn"
+                }
+                onClick={() => setChannel("phone")}
+                disabled={isPending}
+              >
+                {REGISTER_MODAL_UI.CHANNEL_PHONE}
+              </button>
+            </div>
+
+            {channel === "email" ? (
+              <label className="auth-page__field">
+                <span className="auth-page__label">{AUTH_UI.EMAIL_LABEL}</span>
+                <input
+                  className={withInvalidFieldClass(
+                    "auth-page__input",
+                    "email",
+                    invalidFields,
+                  )}
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  required
+                  autoComplete="email"
+                  placeholder={AUTH_UI.EMAIL_PLACEHOLDER}
+                />
+              </label>
+            ) : (
+              <label className="auth-page__field">
+                <span className="auth-page__label">{REGISTER_MODAL_UI.LABEL_PHONE}</span>
+                <input
+                  className={withInvalidFieldClass(
+                    "auth-page__input",
+                    "phoneNumber",
+                    invalidFields,
+                  )}
+                  type="tel"
+                  name="phoneNumber"
+                  value={form.phoneNumber}
+                  onChange={handleChange}
+                  required
+                  autoComplete="tel"
+                  placeholder="8 (912) 345-67-89"
+                />
+              </label>
+            )}
 
             <label className="auth-page__field">
               <span className="auth-page__label">{AUTH_UI.USER_NAME_LABEL}</span>

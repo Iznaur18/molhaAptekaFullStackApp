@@ -1,27 +1,31 @@
-/** CMS-слоты описаний бейджей деталей товара. Синхрон с `@molha/api-contract`. */
+/** CMS-слоты описаний бейджей деталей товара. SSOT: `@molha/api-contract`. */
 
-export const PRODUCT_BADGE_EXPLAIN_KEY_VALUES = [
-  "original",
-  "raffle",
-  "affiliate",
-  "listing_origin_own",
-  "listing_origin_resale",
-  "listing_origin_manufacturer",
-  "price_market_above",
-  "price_market_at",
-  "price_market_below",
-  "discount",
-  "loyalty",
-  "auction",
-  "installment",
-  "wholesale",
-  "near_distance",
-] as const;
+import {
+  PRODUCT_BADGE_EXPLAIN_KEY_VALUES,
+  PRODUCT_BADGE_EXPLAIN_DESCRIPTION_MAX_LENGTH,
+} from "@molha/api-contract";
+
+export {
+  PRODUCT_BADGE_EXPLAIN_KEY_VALUES,
+  PRODUCT_BADGE_EXPLAIN_DESCRIPTION_MAX_LENGTH,
+};
 
 export type ProductBadgeExplainKey =
-  (typeof PRODUCT_BADGE_EXPLAIN_KEY_VALUES)[number];
-
-export const PRODUCT_BADGE_EXPLAIN_DESCRIPTION_MAX_LENGTH = 2000;
+  | "original"
+  | "raffle"
+  | "affiliate"
+  | "listing_origin_own"
+  | "listing_origin_resale"
+  | "listing_origin_manufacturer"
+  | "price_market_above"
+  | "price_market_at"
+  | "price_market_below"
+  | "discount"
+  | "loyalty"
+  | "auction"
+  | "installment"
+  | "wholesale"
+  | "near_distance";
 
 export type ProductBadgeExplainAdminRow = {
   badgeKey: ProductBadgeExplainKey;

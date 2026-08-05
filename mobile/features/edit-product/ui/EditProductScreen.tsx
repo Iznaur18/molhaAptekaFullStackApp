@@ -2,10 +2,14 @@ import {
   DEFAULT_VIEWER_REGION_CODE,
   getRuRegionByCode,
   isRuRegionCode,
+  PRODUCT_DESCRIPTION_MIN_CHARS,
   PRODUCT_IMAGE_URLS_MAX,
   PRODUCT_NAME_MAX_LENGTH,
   PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
   PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
+  PRODUCT_PRICE_RUB_MAX,
+  PRODUCT_STOCK_QUANTITY_MAX,
+  PRODUCT_STOCK_QUANTITY_MIN,
 } from "@molha/api-contract";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
@@ -45,6 +49,7 @@ import { useCatalogProductQuery } from "@/entities/product/model/useCatalogProdu
 import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
 import { useMyProductsInfiniteQuery } from "@/entities/product/model/useMyProductsInfiniteQuery";
 import { ProductCharacteristicsEditor } from "@/entities/product/ui/ProductCharacteristicsEditor";
+import { ProductDescriptionField } from "@/entities/product/ui/ProductDescriptionField";
 import { ProductPickupLocationFields } from "@/entities/product/ui/ProductPickupLocationFields";
 import { ProductReturnTermsEditor } from "@/entities/product/ui/ProductReturnTermsEditor";
 import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
@@ -62,10 +67,6 @@ import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductEditorScreenStyles } from "@/shared/theme/sellerFlowStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
-const PRODUCT_DESCRIPTION_MIN_CHARS = 10;
-const PRODUCT_STOCK_QUANTITY_MIN = 1;
-const PRODUCT_STOCK_QUANTITY_MAX = 9999;
-const PRODUCT_PRICE_RUB_MAX = 999_999_999;
 const LOYALTY_POINTS_MAX_LENGTH = 8;
 
 const resolveReturnPolicyPrefill = (
@@ -477,13 +478,11 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
 
             <View style={styles.field}>
               <Text style={styles.label}>{CREATE_PRODUCT_UI.LABEL_DESCRIPTION}</Text>
-              <TextInput
-                style={[styles.input, styles.textArea]}
+              <ProductDescriptionField
                 value={productDescription}
                 onChangeText={setProductDescription}
-                multiline
-                editable={!isBusy}
-                placeholderTextColor={theme.colors.textMuted}
+                disabled={isBusy}
+                inputStyle={[styles.input, styles.textArea]}
               />
             </View>
 

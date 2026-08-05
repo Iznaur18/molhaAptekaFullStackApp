@@ -7,6 +7,7 @@ import {
   resendPendingRegistrationCode,
 } from "../../services/auth/pendingRegistration.js";
 import { EMAIL_VERIFICATION_SENT_MESSAGE } from "../../constants/emailVerificationConstants.js";
+import { PHONE_VERIFICATION_SENT_MESSAGE } from "../../constants/phoneVerificationConstants.js";
 import { DEFAULT_AVATAR_URL } from "../../constants/constants.js";
 import {
   formatUserBackgroundPresetValue,
@@ -123,17 +124,21 @@ export const confirmRegistrationController = async (req, res) => {
 export const resendRegistrationCodeController = async (req, res) => {
   const { registrationId } = req.body;
 
+  let result;
   try {
-    await resendPendingRegistrationCode(registrationId);
+    result = await resendPendingRegistrationCode(registrationId);
   } catch (resendError) {
-    return errorRes(
-      res,
-      400,
-      resendError instanceof Error
-        ? resendError.message
-        : "Не удалось отправить письмо",
-    );
+    const message =
+      resendError instanceof Error ? resendError.message : "Не удалось отправить код";
+    if (message === "SMS_DELIVERY_UNAVAILABLE") {
+      return errorRes(res, 503, "Не удалось отправить SMS. Попробуйте позже");
+    }
+    return errorRes(res, 400, message);
   }
 
-  return successRes(res, { message: EMAIL_VERIFICATION_SENT_MESSAGE });
+  const isPhone = Boolean(result?.phoneNumber);
+  return successRes(res, {
+    message: isPhone ? PHONE_VERIFICATION_SENT_MESSAGE : EMAIL_VERIFICATION_SENT_MESSAGE,
+    ...(isPhone ? { phoneNumber: result.phoneNumber } : { email: result.email }),
+  });
 };

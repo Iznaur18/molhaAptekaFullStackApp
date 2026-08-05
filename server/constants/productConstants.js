@@ -1,63 +1,16 @@
-/** Максимум URL изображений на один товар (схема, валидация, бизнес-логика). */
-export const PRODUCT_IMAGE_URLS_MAX = 5;
-
-/** Лимит товаров продавца (не премиум). */
-export const SELLER_PRODUCTS_LIMIT_REGULAR = 50;
-
-/** Лимит товаров продавца (премиум). */
-export const SELLER_PRODUCTS_LIMIT_PREMIUM = 100;
-
-/** Ответ при попытке создать товар сверх лимита. */
-export const SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE = `Достигнут лимит товаров: ${SELLER_PRODUCTS_LIMIT_REGULAR} для обычных пользователей, ${SELLER_PRODUCTS_LIMIT_PREMIUM} для премиум.`;
-
-/** Минимум символов в названии товара. */
-export const PRODUCT_NAME_MIN_LENGTH = 3;
-
-/** Максимум символов в названии товара. */
-export const PRODUCT_NAME_MAX_LENGTH = 100;
-
-/** Максимум символов в описании товара (валидация POST/PATCH /product). */
-export const PRODUCT_DESCRIPTION_MAX_CHARS = 2000;
-
-/** Минимум символов в описании товара. */
-export const PRODUCT_DESCRIPTION_MIN_CHARS = 10;
-
-/** Максимум цены товара / предложения цены (9 цифр, ₽). Совпадает с клиентом. */
-export const PRODUCT_PRICE_RUB_MAX = 999_999_999;
+/** SSOT: `contract/src/productWrite.js`. */
+export {
+  PRODUCT_IMAGE_URLS_MAX,
+  PRODUCT_NAME_MIN_LENGTH,
+  PRODUCT_NAME_MAX_LENGTH,
+  PRODUCT_DESCRIPTION_MIN_CHARS,
+  PRODUCT_DESCRIPTION_MAX_CHARS,
+  PRODUCT_PRICE_RUB_MAX,
+  PRODUCT_CATEGORY_VALUES,
+  SELLER_PRODUCTS_LIMIT_REGULAR,
+  SELLER_PRODUCTS_LIMIT_PREMIUM,
+  SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE,
+} from "@molha/api-contract";
 
 export const PRODUCT_PRICE_RUB_MAX_ERROR_MESSAGE =
   "Цена не может превышать 999 999 999 ₽";
-
-/**
- * Slug категории товара. Совпадает с клиентом `client/.../productConstants.js`.
- * `food` — устаревшее значение enum до расширения списка (может остаться в БД).
- */
-export const PRODUCT_CATEGORY_VALUES = [
-  "grocery",
-  "electronics",
-  "clothing",
-  "footwear",
-  "home_garden",
-  "kids",
-  "beauty_health",
-  "appliances",
-  "sport_leisure",
-  "construction",
-  "pharmacy",
-  "pets",
-  "books",
-  "tourism_outdoors",
-  "auto_parts",
-  "hobby_crafts",
-  "accessories",
-  "jewelry",
-  "music_video",
-  "stationery",
-  "antiques",
-  "digital",
-  "household_care",
-  "games",
-  "automobiles",
-  "travel_services",
-  "food",
-];

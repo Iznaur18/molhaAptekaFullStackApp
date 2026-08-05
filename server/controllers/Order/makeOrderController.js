@@ -1,6 +1,8 @@
 import { createOrder } from "../../services/order/createOrder.js";
 import { runMoneyIdempotentMutation } from "../../services/loyalty/runMoneyIdempotentMutation.js";
 import { successRes } from "../../services/http/index.js";
+import { enqueueOneCOrderPushesForOrder } from "../../services/onec/index.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 import { ORDER_BUYER_PUBLIC_FIELDS, ORDER_ITEMS_POPULATE } from "./orderQueries.js";
 
@@ -20,6 +22,16 @@ export const makeOrderController = async (req, res) => {
         verifiedDeliveryAddress: req.verifiedDeliveryAddress,
         affiliateCode: req.body.affiliateCode,
       });
+
+      try {
+        await enqueueOneCOrderPushesForOrder(order);
+      } catch (error) {
+        logServerEvent("error", {
+          event: "onec_order_enqueue_failed",
+          orderId: String(order?._id ?? ""),
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
 
       await order.populate("userBuyerId", ORDER_BUYER_PUBLIC_FIELDS);
       await order.populate(ORDER_ITEMS_POPULATE);

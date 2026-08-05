@@ -20,7 +20,7 @@ import {
   productAffiliatePatchFieldsShape,
 } from "./productAffiliate.js";
 
-/** Синхрон с `server/constants/productConstants.js` (legacy slug). */
+/** SSOT category slug list — client/mobile/server re-export отсюда. */
 export const PRODUCT_CATEGORY_VALUES = [
   "grocery",
   "electronics",
@@ -51,7 +51,8 @@ export const PRODUCT_CATEGORY_VALUES = [
   "food",
 ];
 
-export const PRODUCT_IMAGE_URLS_MAX = 5;
+/** SSOT product-write лимитов — client/mobile/server re-export отсюда. */
+export const PRODUCT_IMAGE_URLS_MAX = 10;
 export const PRODUCT_IMAGE_REQUIRED_MESSAGE =
   "Добавьте хотя бы одно фото товара";
 export const PRODUCT_NAME_MIN_LENGTH = 3;
@@ -62,7 +63,16 @@ export const PRODUCT_PRICE_RUB_MAX = 999_999_999;
 export const PRODUCT_STOCK_QUANTITY_MIN = 1;
 export const PRODUCT_STOCK_QUANTITY_MAX = 9999;
 export const PRODUCT_CHARACTERISTICS_MAX_ITEMS = 10;
+export const PRODUCT_CHARACTERISTIC_KEY_MAX_CHARS = 50;
+export const PRODUCT_CHARACTERISTIC_VALUE_MAX_CHARS = 200;
 export const PRODUCT_RETURN_TERMS_MAX_ITEMS = 5;
+export const PRODUCT_RETURN_TERM_KEY_MAX_CHARS = 50;
+export const PRODUCT_RETURN_TERM_VALUE_MAX_CHARS = 200;
+
+/** Лимит активных товаров продавца. */
+export const SELLER_PRODUCTS_LIMIT_REGULAR = 50;
+export const SELLER_PRODUCTS_LIMIT_PREMIUM = 100;
+export const SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE = `Достигнут лимит товаров: ${SELLER_PRODUCTS_LIMIT_REGULAR} для обычных пользователей, ${SELLER_PRODUCTS_LIMIT_PREMIUM} для премиум.`;
 
 export const PRODUCT_LISTING_ORIGIN_OWN = "own";
 export const PRODUCT_LISTING_ORIGIN_RESALE = "resale";
@@ -110,13 +120,13 @@ const productImageUrlsSchema = z
   .optional();
 
 const productCharacteristicSchema = z.object({
-  key: z.string().trim().min(1).max(50),
-  value: z.string().trim().min(1).max(200),
+  key: z.string().trim().min(1).max(PRODUCT_CHARACTERISTIC_KEY_MAX_CHARS),
+  value: z.string().trim().min(1).max(PRODUCT_CHARACTERISTIC_VALUE_MAX_CHARS),
 });
 
 const productReturnTermSchema = z.object({
-  key: z.string().trim().min(1).max(50),
-  value: z.string().trim().min(1).max(200),
+  key: z.string().trim().min(1).max(PRODUCT_RETURN_TERM_KEY_MAX_CHARS),
+  value: z.string().trim().min(1).max(PRODUCT_RETURN_TERM_VALUE_MAX_CHARS),
 });
 
 const assertReturnPolicy = (body, ctx) => {

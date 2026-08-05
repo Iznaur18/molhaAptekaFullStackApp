@@ -13,8 +13,22 @@ import {
   verifyEmailController,
   resendEmailVerificationController,
   verifyEmailWithCodeController,
+  registerPhoneUserController,
+  loginPhonePasswordController,
+  loginPhoneOtpRequestController,
+  loginPhoneOtpConfirmController,
+  phoneBindRequestController,
+  phoneBindConfirmController,
 } from "../controllers/index.js";
 import { registerUserValidation, loginUserValidation } from "../validations/index.js";
+import {
+  registerPhoneUserValidation,
+  loginPhonePasswordValidation,
+  loginPhoneOtpRequestValidation,
+  loginPhoneOtpConfirmValidation,
+  phoneBindRequestValidation,
+  phoneBindConfirmValidation,
+} from "../validations/user/phoneAuthValidation.js";
 import { verifyEmailWithCodeValidation } from "../validations/user/verifyEmailWithCodeValidation.js";
 import {
   confirmRegistrationValidation,
@@ -67,6 +81,12 @@ router.post(
   registerUserController,
 );
 router.post(
+  "/register/phone",
+  registerAuthRateLimiter,
+  registerPhoneUserValidation,
+  registerPhoneUserController,
+);
+router.post(
   "/register/confirm",
   registerAuthRateLimiter,
   confirmRegistrationValidation,
@@ -79,6 +99,38 @@ router.post(
   resendRegistrationCodeController,
 );
 router.post("/login", authRateLimiter, loginUserValidation, loginUserController);
+router.post(
+  "/login/phone",
+  authRateLimiter,
+  loginPhonePasswordValidation,
+  loginPhonePasswordController,
+);
+router.post(
+  "/login/phone/otp/request",
+  emailVerificationResendRateLimiter,
+  loginPhoneOtpRequestValidation,
+  loginPhoneOtpRequestController,
+);
+router.post(
+  "/login/phone/otp/confirm",
+  authRateLimiter,
+  loginPhoneOtpConfirmValidation,
+  loginPhoneOtpConfirmController,
+);
+router.post(
+  "/phone/bind/request",
+  checkAuthMW,
+  emailVerificationResendRateLimiter,
+  phoneBindRequestValidation,
+  phoneBindRequestController,
+);
+router.post(
+  "/phone/bind/confirm",
+  checkAuthMW,
+  authRateLimiter,
+  phoneBindConfirmValidation,
+  phoneBindConfirmController,
+);
 router.post("/logout", logoutUserController);
 router.post(
   "/refresh",

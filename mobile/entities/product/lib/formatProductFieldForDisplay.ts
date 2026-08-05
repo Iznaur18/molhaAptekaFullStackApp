@@ -1,3 +1,4 @@
+import { formatProductDescriptionPlainText } from "@izibuy/shared-lib";
 import { getRuRegionByCode } from "@molha/api-contract";
 
 import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config/appUiCopy";
@@ -16,8 +17,11 @@ export const formatProductFieldForDisplay = (
   const raw = product[key];
 
   switch (key) {
-    case "productDescription":
-      return raw == null || raw === "" ? EM_DASH : String(raw);
+    case "productDescription": {
+      if (raw == null || raw === "") return EM_DASH;
+      const plain = formatProductDescriptionPlainText(String(raw));
+      return plain || EM_DASH;
+    }
     case "productPrice":
       return typeof raw === "number" ? formatPriceRub(raw) : EM_DASH;
     case "productSeller":

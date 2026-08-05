@@ -1,4 +1,9 @@
 import { Pressable, Text, TextInput, View } from "react-native";
+import {
+  PRODUCT_CHARACTERISTIC_KEY_MAX_CHARS,
+  PRODUCT_CHARACTERISTIC_VALUE_MAX_CHARS,
+  PRODUCT_CHARACTERISTICS_MAX_ITEMS,
+} from "@molha/api-contract";
 
 import {
   createProductCharacteristicRow,
@@ -7,8 +12,6 @@ import {
 import { CREATE_PRODUCT_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductEditorScreenStyles } from "@/shared/theme/sellerFlowStyles";
-
-const PRODUCT_CHARACTERISTICS_MAX_ITEMS = 10;
 
 type ProductCharacteristicsEditorProps = {
   rows: ProductCharacteristicRow[];
@@ -67,7 +70,7 @@ export const ProductCharacteristicsEditor = ({
             editable={!disabled}
             placeholder={CREATE_PRODUCT_UI.CHARACTERISTIC_KEY_PLACEHOLDER}
             placeholderTextColor={theme.colors.textMuted}
-            maxLength={50}
+            maxLength={PRODUCT_CHARACTERISTIC_KEY_MAX_CHARS}
           />
           <TextInput
             style={[
@@ -84,7 +87,7 @@ export const ProductCharacteristicsEditor = ({
             editable={!disabled}
             placeholder={CREATE_PRODUCT_UI.CHARACTERISTIC_VALUE_PLACEHOLDER}
             placeholderTextColor={theme.colors.textMuted}
-            maxLength={200}
+            maxLength={PRODUCT_CHARACTERISTIC_VALUE_MAX_CHARS}
           />
           <Pressable
             style={[styles.charRemoveBtn, { borderColor: theme.colors.border }]}

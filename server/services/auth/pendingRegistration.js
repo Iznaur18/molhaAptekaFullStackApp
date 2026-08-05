@@ -13,6 +13,11 @@ import {
   generateEmailVerificationCode,
   hashEmailVerificationSecret,
 } from "./emailVerification.js";
+import { deliverPhoneVerificationSms } from "./phoneVerification.js";
+import {
+  PHONE_VERIFICATION_TOKEN_TTL_MS,
+  SMS_DELIVERY_UNAVAILABLE_MESSAGE,
+} from "../../constants/phoneVerificationConstants.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 import { attachReferralAttribution } from "../referral/attachReferralAttribution.js";
 import { ensureUserReferralCode } from "../referral/ensureUserReferralCode.js";
@@ -27,7 +32,10 @@ const PENDING_CODE_PATTERN = new RegExp(`^\\d{${EMAIL_VERIFICATION_CODE_LENGTH}}
  * @param {{ email: string; userName: string; userPhoneNumber?: string | null }} params
  */
 function buildTakenConditions({ email, userName, userPhoneNumber }) {
-  const orConditions = [{ email }, { userName }];
+  const orConditions = [{ userName }];
+  if (email != null && email !== "") {
+    orConditions.push({ email });
+  }
   if (userPhoneNumber != null && userPhoneNumber !== "") {
     orConditions.push({ userPhoneNumber });
   }
@@ -83,6 +91,7 @@ export async function createPendingRegistration(fields) {
     {
       $set: {
         ...fields,
+        channel: "email",
         email,
         referralCode,
         codeHash,
@@ -99,10 +108,76 @@ export async function createPendingRegistration(fields) {
 }
 
 /**
- * Повторно отправляет код по существующей заявке.
+ * Заявка на регистрацию по телефону + SMS-код.
+ *
+ * @param {{
+ *   userPhoneNumber: string;
+ *   passwordHash: string;
+ *   userName: string;
+ *   userAvatarUrl: string;
+ *   userBackgroundUrl: string;
+ *   userBirthDate?: Date | null;
+ *   userGender?: string | null;
+ *   notificationsEnabled?: boolean | null;
+ *   userAddress?: string;
+ *   userAddressFlat?: string;
+ *   userAddressFiasId?: string;
+ *   userAddressGeo?: { lat: number; lon: number } | null;
+ *   referralCode?: string | null;
+ * }} fields
+ * @returns {Promise<{ registrationId: string; phoneNumber: string }>}
+ */
+export async function createPendingPhoneRegistration(fields) {
+  const userPhoneNumber = String(fields.userPhoneNumber).trim();
+
+  const exists = await UserModel.findOne({
+    $or: buildTakenConditions({
+      email: null,
+      userName: fields.userName,
+      userPhoneNumber,
+    }),
+  }).select("_id");
+  if (exists) {
+    throw new Error(PENDING_REGISTRATION_TAKEN_MESSAGE);
+  }
+
+  const code = generateEmailVerificationCode();
+  const codeHash = hashEmailVerificationSecret(code);
+  const expiresAt = new Date(Date.now() + PHONE_VERIFICATION_TOKEN_TTL_MS);
+
+  const referralCodeRaw = String(fields.referralCode ?? "")
+    .trim()
+    .toUpperCase();
+  const referralCode = referralCodeRaw || null;
+
+  const pending = await PendingRegistrationModel.findOneAndUpdate(
+    { userPhoneNumber },
+    {
+      $set: {
+        ...fields,
+        channel: "phone",
+        userPhoneNumber,
+        email: undefined,
+        referralCode,
+        codeHash,
+        codeAttemptCount: 0,
+        expiresAt,
+      },
+      $unset: { email: "" },
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true },
+  );
+
+  await deliverPhoneVerificationSms({ phoneNumber: userPhoneNumber, code });
+
+  return { registrationId: String(pending._id), phoneNumber: userPhoneNumber };
+}
+
+/**
+ * Повторно отправляет код по существующей заявке (email или SMS).
  *
  * @param {string} registrationId
- * @returns {Promise<{ email: string }>}
+ * @returns {Promise<{ email?: string; phoneNumber?: string }>}
  */
 export async function resendPendingRegistrationCode(registrationId) {
   const pending = await PendingRegistrationModel.findById(registrationId);
@@ -110,11 +185,37 @@ export async function resendPendingRegistrationCode(registrationId) {
     throw new Error(PENDING_REGISTRATION_NOT_FOUND_MESSAGE);
   }
 
+  const isPhoneChannel =
+    pending.channel === "phone" ||
+    (!pending.email &&
+      pending.userPhoneNumber != null &&
+      pending.userPhoneNumber !== "");
+
   const code = generateEmailVerificationCode();
   pending.codeHash = hashEmailVerificationSecret(code);
   pending.codeAttemptCount = 0;
-  pending.expiresAt = new Date(Date.now() + PENDING_REGISTRATION_TTL_MS);
+  pending.expiresAt = new Date(
+    Date.now() +
+      (isPhoneChannel ? PHONE_VERIFICATION_TOKEN_TTL_MS : PENDING_REGISTRATION_TTL_MS),
+  );
   await pending.save();
+
+  if (isPhoneChannel) {
+    const phoneNumber = String(pending.userPhoneNumber).trim();
+    try {
+      await deliverPhoneVerificationSms({ phoneNumber, code });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (
+        message === SMS_DELIVERY_UNAVAILABLE_MESSAGE ||
+        message === "SMS_DELIVERY_UNAVAILABLE"
+      ) {
+        throw new Error("SMS_DELIVERY_UNAVAILABLE");
+      }
+      throw error;
+    }
+    return { phoneNumber };
+  }
 
   await deliverEmailVerification({
     email: pending.email,
@@ -126,7 +227,7 @@ export async function resendPendingRegistrationCode(registrationId) {
 }
 
 /**
- * Проверяет код и только здесь создаёт настоящий аккаунт (email уже подтверждён).
+ * Проверяет код и только здесь создаёт настоящий аккаунт.
  *
  * @param {string} registrationId
  * @param {unknown} rawCode
@@ -166,17 +267,26 @@ export async function confirmPendingRegistration(registrationId, rawCode) {
     throw new Error(PENDING_REGISTRATION_TAKEN_MESSAGE);
   }
 
+  const isPhoneChannel =
+    pending.channel === "phone" ||
+    (!pending.email &&
+      pending.userPhoneNumber != null &&
+      pending.userPhoneNumber !== "");
+
+  const phone =
+    pending.userPhoneNumber != null && pending.userPhoneNumber !== ""
+      ? pending.userPhoneNumber
+      : undefined;
+
   const doc = new UserModel({
-    email: pending.email,
+    ...(pending.email ? { email: pending.email } : {}),
     passwordHash: pending.passwordHash,
     userName: pending.userName,
-    userPhoneNumber:
-      pending.userPhoneNumber != null && pending.userPhoneNumber !== ""
-        ? pending.userPhoneNumber
-        : undefined,
+    ...(phone ? { userPhoneNumber: phone } : {}),
     userAvatarUrl: pending.userAvatarUrl,
     userBackgroundUrl: pending.userBackgroundUrl,
-    isEmailVerified: true,
+    isEmailVerified: !isPhoneChannel && Boolean(pending.email),
+    isPhoneVerified: Boolean(isPhoneChannel && phone),
     ...(pending.userBirthDate ? { userBirthDate: pending.userBirthDate } : {}),
     ...(pending.userGender ? { userGender: pending.userGender } : {}),
     ...(typeof pending.notificationsEnabled === "boolean"

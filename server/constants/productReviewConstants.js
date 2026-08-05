@@ -6,14 +6,16 @@ export const PRODUCT_REVIEW_STATUSES = [
   PRODUCT_REVIEW_STATUS_HIDDEN,
 ];
 
-export const PRODUCT_REVIEW_RATING_MIN = 1;
-export const PRODUCT_REVIEW_RATING_MAX = 5;
-
-export const PRODUCT_REVIEW_TEXT_MAX_LENGTH = 1000;
+/** SSOT: `contract/src/productReview.js`. */
+export {
+  PRODUCT_REVIEW_RATING_MIN,
+  PRODUCT_REVIEW_RATING_MAX,
+  PRODUCT_REVIEW_TEXT_MAX_LENGTH,
+  PRODUCT_REVIEW_LIMIT_DEFAULT,
+  PRODUCT_REVIEW_LIMIT_MAX,
+} from "@molha/api-contract";
 
 export const PRODUCT_REVIEW_PAGE_DEFAULT = 1;
-export const PRODUCT_REVIEW_LIMIT_DEFAULT = 20;
-export const PRODUCT_REVIEW_LIMIT_MAX = 50;
 
 /** Окно редактирования и удаления своего отзыва. */
 export const PRODUCT_REVIEW_EDIT_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;

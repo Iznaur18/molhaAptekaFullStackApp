@@ -6,6 +6,7 @@ export const userPublicProfileSchema = z
     userName: z.string().optional(),
     email: z.string().optional(),
     isEmailVerified: z.boolean().optional(),
+    isPhoneVerified: z.boolean().optional(),
     userRole: z.enum(["user", "admin", "moderator"]).optional(),
     isPremiumUser: z.boolean().optional(),
     isUserDataConfirmed: z.boolean().optional(),

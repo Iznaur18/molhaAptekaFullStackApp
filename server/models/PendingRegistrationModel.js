@@ -2,23 +2,29 @@ import mongoose from "mongoose";
 import { ADDRESS_LINE_MAX_LENGTH } from "../constants/dadataConstants.js";
 
 /**
- * Заявка на регистрацию до подтверждения email.
+ * Заявка на регистрацию до подтверждения email или SMS.
  *
  * Аккаунт в `UserModel` создаётся только в `confirmPendingRegistration`;
  * брошенные заявки удаляет MongoDB по TTL-индексу `expiresAt`.
  * Уникальность email/userName/телефона заявка НЕ резервирует — проверка
- * идёт по реальным пользователям при создании и при подтверждении,
- * поэтому занять ник без подтверждения почты нельзя.
+ * идёт по реальным пользователям при создании и при подтверждении.
+ * Канал: `email` (upsert по email) или `phone` (upsert по телефону).
  */
 const PendingRegistrationSchema = new mongoose.Schema(
   {
+    channel: {
+      type: String,
+      enum: ["email", "phone"],
+      default: "email",
+    },
     email: {
       type: String,
-      required: true,
+      required: false,
       lowercase: true,
       trim: true,
       // одна активная заявка на email: повторная регистрация заменяет старую
       unique: true,
+      sparse: true,
     },
     passwordHash: {
       type: String,
@@ -34,6 +40,9 @@ const PendingRegistrationSchema = new mongoose.Schema(
       type: String,
       trim: true,
       default: null,
+      // phone-канал: одна активная заявка на номер
+      unique: true,
+      sparse: true,
     },
     userAvatarUrl: {
       type: String,

@@ -1,5 +1,6 @@
 import { resolveProfileNavSectionTone } from "@izibuy/shared-lib";
 import {
+  Database,
   Clapperboard,
   ClipboardCheck,
   CreditCard,
@@ -52,6 +53,7 @@ export const PROFILE_NAV_ITEM_META = {
   "partner-program": { icon: Users },
   "affiliate-listings": { icon: Users },
   advertising: { icon: Megaphone },
+  "onec-integration": { icon: Database },
   "edit-profile": { icon: Pencil },
   "create-raffle": { icon: Gift },
   "product-moderation": { icon: ClipboardCheck },

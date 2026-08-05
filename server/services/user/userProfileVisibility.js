@@ -69,8 +69,17 @@ export function sanitizeUserProfileForViewer(user, ctx) {
   const viewerId = ctx.viewerId ? String(ctx.viewerId) : "";
   const isSelf = viewerId && viewerId === String(user._id ?? "");
 
+  const stripOneCSecrets = (raw) => {
+    if (!raw?.oneCIntegration || typeof raw.oneCIntegration !== "object") {
+      return raw;
+    }
+    const integration = { ...raw.oneCIntegration };
+    delete integration.apiKeySealed;
+    return { ...raw, oneCIntegration: integration };
+  };
+
   if (privileged || isSelf) {
-    return { ...user };
+    return stripOneCSecrets({ ...user });
   }
 
   const hasPhoneNumber = Boolean(String(user.userPhoneNumber ?? "").trim());
@@ -78,6 +87,7 @@ export function sanitizeUserProfileForViewer(user, ctx) {
   delete out.userRole;
   delete out.isActiveUser;
   delete out.isBlockedUser;
+  delete out.oneCIntegration;
   delete out.userDiscountPercent;
   delete out.notesAboutUser;
   if (hasPhoneNumber) {

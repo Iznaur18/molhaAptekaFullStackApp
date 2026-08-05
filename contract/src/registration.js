@@ -13,6 +13,15 @@ export const pendingRegistrationDataSchema = z.object({
   email: z.string().email(),
 });
 
+/**
+ * Ответ `POST /auth/register/phone`.
+ */
+export const pendingPhoneRegistrationDataSchema = z.object({
+  pendingRegistration: z.literal(true),
+  registrationId: mongoIdSchema,
+  phoneNumber: z.string().regex(/^\+79\d{9}$/),
+});
+
 /** Body `POST /auth/register/confirm`. */
 export const confirmRegistrationBodySchema = z.object({
   registrationId: mongoIdSchema,

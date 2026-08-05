@@ -230,6 +230,32 @@ export const ruPhoneOptionalFieldSchema = z
     }
   });
 
+/** Обязательный РФ-мобильный номер → E.164 `+79…`. */
+export const ruPhoneRequiredFieldSchema = z
+  .string({ required_error: "Номер телефона обязателен" })
+  .trim()
+  .min(1, "Номер телефона обязателен")
+  .transform((raw, ctx) => {
+    try {
+      const normalized = normalizeRuPhoneInput(raw);
+      if (!normalized || !RU_PHONE_E164_REGEX.test(normalized)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "Номер РФ: +7 9XX XXX XX XX (можно 8…, 9XXXXXXXXX или с пробелами/скобками)",
+        });
+        return z.NEVER;
+      }
+      return normalized;
+    } catch (error) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: error instanceof Error ? error.message : "Неверный номер телефона",
+      });
+      return z.NEVER;
+    }
+  });
+
 export const userGenderFieldSchema = z.enum(USER_GENDER_VALUES).optional();
 
 export const userBackgroundPresetFieldSchema = z

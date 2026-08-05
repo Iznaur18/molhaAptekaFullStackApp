@@ -91,15 +91,41 @@
     left: 0.65rem;
     width: 2.5rem;
     height: 2.5rem;
-    background: color-mix(in srgb, var(--iz-color-surface) 92%, transparent);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: color-mix(in srgb, var(--iz-color-surface) 55%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: none;
+  }
+
+  .product-details-modal .product-media-gallery-readonly__back-btn:hover {
+    background: color-mix(in srgb, var(--iz-color-surface) 78%, transparent);
   }
 
   .product-details-modal .product-media-gallery-readonly__hero-actions {
     top: 0.65rem;
     right: 0.65rem;
     gap: 0.5rem;
+  }
+
+  .product-details-modal
+    .product-media-gallery-readonly__hero-actions
+    .wishlist-toggle--card {
+    background: color-mix(in srgb, var(--iz-color-surface) 55%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  .product-details-modal
+    .product-media-gallery-readonly__hero-actions
+    .wishlist-toggle--card:hover:not(:disabled):not(.wishlist-toggle--active) {
+    background: color-mix(in srgb, var(--iz-color-surface) 78%, transparent);
+  }
+
+  .product-details-modal
+    .product-media-gallery-readonly__hero-actions
+    .wishlist-toggle--card.wishlist-toggle--active {
+    background: color-mix(in srgb, var(--iz-color-danger) 72%, transparent);
+    color: var(--iz-color-on-contrast);
   }
 
   .product-details-modal .product-media-gallery-readonly__report-slot {
@@ -127,9 +153,9 @@
     overflow: hidden;
     border: none;
     border-radius: 20px;
-    background: var(--iz-color-surface);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    background: color-mix(in srgb, var(--iz-color-surface) 55%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     color: var(--iz-color-text);
     font-size: 0;
     line-height: 0;
@@ -151,7 +177,7 @@
     .product-media-gallery-readonly__report-slot
     .product-details-modal__footer-btn--report:hover:not(:disabled) {
     border: none;
-    background: var(--iz-color-surface);
+    background: color-mix(in srgb, var(--iz-color-surface) 78%, transparent);
     color: var(--iz-color-text);
   }
 

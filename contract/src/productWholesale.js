@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** Синхрон с `@izibuy/shared-lib` productWholesale и `PRODUCT_PRICE_RUB_MAX`. */
+/** Синхрон с `PRODUCT_PRICE_RUB_MAX` (productWrite). */
 export const PRODUCT_WHOLESALE_MIN_QTY_MIN = 2;
 export const PRODUCT_WHOLESALE_MIN_QTY_MAX = 9999;
 export const PRODUCT_WHOLESALE_PRICE_RUB_MAX = 999_999_999;

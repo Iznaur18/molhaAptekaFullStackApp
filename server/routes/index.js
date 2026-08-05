@@ -27,6 +27,7 @@ import { siteHeaderBannerCampaignRouter } from "./siteHeaderBannerCampaignRouter
 import { introAdRouter } from "./introAdRouter.js";
 import { sellerPersonalCategoryRouter } from "./sellerPersonalCategoryRouter.js";
 import { auditRouter } from "./auditRouter.js";
+import onecRouter from "./onecRouter.js";
 
 export {
   uploadRouter,
@@ -47,4 +48,5 @@ export {
   introAdRouter,
   sellerPersonalCategoryRouter,
   auditRouter,
+  onecRouter,
 };

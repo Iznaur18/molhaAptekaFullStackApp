@@ -61,6 +61,7 @@ const PROFILE_NAV_SECTION_TONE_MAP = {
   "partner-program": "green",
   "affiliate-listings": "green",
   advertising: "amber",
+  "onec-integration": "blue",
   "edit-profile": "slate",
   "create-raffle": "purple",
   "product-moderation": "amber",

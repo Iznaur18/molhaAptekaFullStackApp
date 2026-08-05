@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { PRODUCT_REPORT_TEXT_MAX_CHARS } from "./productReport.js";
+
 /** Синхрон с `server/constants/userStoryConstants.js`. */
 export const USER_STORY_MEDIA_TYPES = ["image", "video"];
 export const USER_STORY_CAPTION_MAX_CHARS = 150;
@@ -12,8 +14,7 @@ export const USER_STORY_REPORT_RESOLUTION_VALUES = [
   USER_STORY_REPORT_RESOLUTION_HIDE,
 ];
 
-/** Синхрон с `server/constants/productReportConstants.js`. */
-export const PRODUCT_REPORT_TEXT_MAX_CHARS = 1000;
+export { PRODUCT_REPORT_TEXT_MAX_CHARS };
 
 export const USER_STORY_STAFF_NOTE_MAX_CHARS = 2000;
 

@@ -9,6 +9,7 @@ import {
   JOB_PURGE_EXPIRED_BUYER_PASSPORT_SHARES,
   JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_CRON,
   JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_PEERS,
+  JOB_PROCESS_ONEC_SYNC_CRON,
   JOB_SEND_EMAIL_VERIFICATION,
 } from "../queues/queueConstants.js";
 import { sendEmailVerificationForUser } from "../services/auth/emailVerification.js";
@@ -23,6 +24,7 @@ import {
   processProductPriceMarketStatusCronTasks,
   processProductPriceMarketStatusPeers,
 } from "../services/product/refreshProductPriceMarketStatus.js";
+import { processOneCCronTasks } from "../services/onec/index.js";
 import { expireStaleUserStories } from "../utils/userStoryHelpers.js";
 
 /**
@@ -52,6 +54,8 @@ export async function processAppQueueJob(job) {
       return processProductPriceMarketStatusCronTasks();
     case JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_PEERS:
       return processProductPriceMarketStatusPeers(job.data.productIds);
+    case JOB_PROCESS_ONEC_SYNC_CRON:
+      return processOneCCronTasks();
     default:
       throw new Error(`Unknown BullMQ job: ${job.name}`);
   }

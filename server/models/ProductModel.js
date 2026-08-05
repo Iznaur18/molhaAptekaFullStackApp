@@ -126,6 +126,26 @@ const ProductSchema = new Schema(
       ref: "User",
       required: true,
     },
+    /** GUID номенклатуры в 1С (источник истины при интеграции). */
+    product1cGuid: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: 64,
+    },
+    /** Артикул / код номенклатуры (опционально). */
+    productArticle: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 64,
+    },
+    /** Товар создан/ведётся из обмена с 1С. */
+    productFromOneC: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
     productSaleCity: {
       type: String,
       trim: true,
@@ -389,6 +409,18 @@ ProductSchema.index(
 ProductSchema.index(
   { productSeller: 1, productModerationStatus: 1, createdAt: -1 },
   { name: "seller_moderation_created" },
+);
+
+/** Маппинг номенклатуры 1С ↔ Product (уникален в рамках продавца). */
+ProductSchema.index(
+  { productSeller: 1, product1cGuid: 1 },
+  {
+    unique: true,
+    name: "seller_onec_guid_unique",
+    partialFilterExpression: {
+      product1cGuid: { $type: "string" },
+    },
+  },
 );
 
 /** Каталог sort=purchases — без $lookup orders. */

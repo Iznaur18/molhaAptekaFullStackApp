@@ -1,11 +1,19 @@
 import {
   getRuRegionByCode,
   isRuRegionCode,
+  PRODUCT_CHARACTERISTIC_KEY_MAX_CHARS,
+  PRODUCT_CHARACTERISTIC_VALUE_MAX_CHARS,
+  PRODUCT_CHARACTERISTICS_MAX_ITEMS,
+  PRODUCT_DESCRIPTION_MAX_CHARS,
+  PRODUCT_DESCRIPTION_MIN_CHARS,
   PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
   PRODUCT_IMAGE_URLS_MAX,
   PRODUCT_NAME_MAX_LENGTH,
   PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
   PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
+  PRODUCT_PRICE_RUB_MAX,
+  PRODUCT_STOCK_QUANTITY_MAX,
+  PRODUCT_STOCK_QUANTITY_MIN,
 } from "@molha/api-contract";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -39,6 +47,7 @@ import {
 } from "@/entities/product/lib/productListingOrigin";
 import { ProductListingOriginChips } from "@/entities/product/ui/ProductListingOriginChips";
 import { ProductPickupLocationFields } from "@/entities/product/ui/ProductPickupLocationFields";
+import { ProductDescriptionField } from "@/entities/product/ui/ProductDescriptionField";
 import { ProductPhotoGrid } from "@/features/image-upload/ui/ProductPhotoGrid";
 import { ProductPreviewVideoUploadField } from "@/features/image-upload/ui/ProductPreviewVideoUploadField";
 import { CreateProductCategoryPicker } from "@/features/create-product/ui/CreateProductCategoryPicker";
@@ -54,14 +63,7 @@ import { resolveWizardFooterPaddingBottom } from "@/shared/theme/screenContentLa
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-// These mirror client/src/entities/product/model/productConstants.js
-const PRODUCT_DESCRIPTION_MIN_CHARS = 10;
-const PRODUCT_DESCRIPTION_MAX_CHARS = 2000;
-const PRODUCT_STOCK_QUANTITY_MIN = 1;
-const PRODUCT_STOCK_QUANTITY_MAX = 9999;
-const PRODUCT_PRICE_RUB_MAX = 999_999_999;
 const LOYALTY_POINTS_MAX_LENGTH = 8;
-const CHARACTERISTICS_MAX = 10;
 
 const WIZARD_STEPS = ["category", "basic", "originality", "media", "pickup", "commerce", "returns", "review"] as const;
 type WizardStepId = (typeof WIZARD_STEPS)[number];
@@ -669,7 +671,7 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
   const overLimit = descLen > PRODUCT_DESCRIPTION_MAX_CHARS;
 
   const addCharRow = () => {
-    if (form.characteristicRows.length >= CHARACTERISTICS_MAX) return;
+    if (form.characteristicRows.length >= PRODUCT_CHARACTERISTICS_MAX_ITEMS) return;
     setForm((prev) => ({
       ...prev,
       characteristicRows: [
@@ -722,17 +724,21 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
           Описание{" "}
           <Text style={{ color: theme.colors.danger }}>*</Text>
         </Text>
-        <TextInput
-          {...textInputFocusScrollProps}
-          style={[styles.input, styles.textarea, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+        <ProductDescriptionField
           value={form.productDescription}
           onChangeText={(text) => setForm((prev) => ({ ...prev, productDescription: text }))}
+          disabled={disabled}
           maxLength={PRODUCT_DESCRIPTION_MAX_CHARS}
-          editable={!disabled}
-          multiline
           placeholder="Состояние, комплектация, особенности…"
-          placeholderTextColor={theme.colors.textMuted}
-          textAlignVertical="top"
+          inputStyle={[
+            styles.input,
+            styles.textarea,
+            {
+              color: theme.colors.text,
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+            },
+          ]}
         />
         {/* Char meter — mirrors .create-product-section__char-meter */}
         <Text style={[styles.charMeter, { color: overLimit ? theme.colors.danger : theme.colors.textSecondary }]}>
@@ -762,7 +768,7 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
               editable={!disabled}
               placeholder="Свойство"
               placeholderTextColor={theme.colors.textMuted}
-              maxLength={50}
+              maxLength={PRODUCT_CHARACTERISTIC_KEY_MAX_CHARS}
             />
             <TextInput
               {...textInputFocusScrollProps}
@@ -772,7 +778,7 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
               editable={!disabled}
               placeholder="Значение"
               placeholderTextColor={theme.colors.textMuted}
-              maxLength={200}
+              maxLength={PRODUCT_CHARACTERISTIC_VALUE_MAX_CHARS}
             />
             <Pressable
               style={[styles.charRemoveBtn, { borderColor: theme.colors.border }]}
@@ -783,7 +789,7 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
             </Pressable>
           </View>
         ))}
-        {form.characteristicRows.length < CHARACTERISTICS_MAX ? (
+        {form.characteristicRows.length < PRODUCT_CHARACTERISTICS_MAX_ITEMS ? (
           <Pressable
             style={({ pressed }) => [
               styles.charAddButton,

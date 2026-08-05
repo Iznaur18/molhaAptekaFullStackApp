@@ -65,6 +65,34 @@ const UserSchema = new mongoose.Schema(
       min: 0,
     },
 
+    isPhoneVerified: {
+      type: Boolean,
+      default: false,
+    },
+    /** Номер, на который ушёл текущий SMS-код (привязка / login OTP). */
+    pendingPhoneNumber: {
+      type: String,
+      trim: true,
+      select: false,
+      default: null,
+    },
+    phoneVerificationTokenHash: {
+      type: String,
+      select: false,
+      default: null,
+    },
+    phoneVerificationExpiresAt: {
+      type: Date,
+      select: false,
+      default: null,
+    },
+    phoneVerificationAttemptCount: {
+      type: Number,
+      select: false,
+      default: 0,
+      min: 0,
+    },
+
     // - - - Информация о пользователе - - -
     userBirthDate: {
       // дата рождения
@@ -359,6 +387,47 @@ const UserSchema = new mongoose.Schema(
         default: 0,
       },
     },
+
+    /**
+     * Интеграция с 1С (per-seller). API-ключ хранится зашифрованным (apiKeySealed).
+     * Контракт: docs/onec-http-contract.md
+     */
+    oneCIntegration: {
+      enabled: {
+        type: Boolean,
+        default: false,
+      },
+      baseUrl: {
+        type: String,
+        default: "",
+        trim: true,
+        maxlength: 500,
+      },
+      /** AES-GCM blob или legacy plain string — не отдаём в публичные GET /user */
+      apiKeySealed: {
+        type: mongoose.Schema.Types.Mixed,
+        default: null,
+      },
+      lastSyncAt: {
+        type: Date,
+        default: null,
+      },
+      lastSyncStatus: {
+        type: String,
+        enum: ["idle", "success", "error"],
+        default: "idle",
+      },
+      lastSyncError: {
+        type: String,
+        default: "",
+        trim: true,
+        maxlength: 2000,
+      },
+      lastSyncSummary: {
+        type: mongoose.Schema.Types.Mixed,
+        default: null,
+      },
+    },
   },
   {
     timestamps: true, // createdAt, updatedAt
@@ -393,5 +462,10 @@ UserSchema.index(
 
 // Список рефералов партнёрки: filter by referrer + sort by registration date.
 UserSchema.index({ referredByUserId: 1, createdAt: -1 });
+
+UserSchema.index(
+  { "oneCIntegration.enabled": 1 },
+  { name: "onec_integration_enabled" },
+);
 
 export const UserModel = mongoose.model("User", UserSchema); // Модель пользователя для MongoDB

@@ -1,8 +1,4 @@
-import { getRuRegionByCode } from "@molha/api-contract";
-
 import { CreateProductCategoryPicker } from "../../../product-category-tree/ui/CreateProductCategoryPicker.jsx";
-import { CREATE_PRODUCT_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
-import { FormFieldLabel } from "../../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 
 /**
  * @param {{
@@ -19,9 +15,6 @@ export function CreateProductCategorySection({
   isSubmitting,
   className = "",
 }) {
-  const regionName =
-    getRuRegionByCode(String(form.productRegionCode ?? "").trim())?.name ?? null;
-
   return (
     <div className={["create-product-section", className].filter(Boolean).join(" ")}>
       <CreateProductCategoryPicker
@@ -51,11 +44,6 @@ export function CreateProductCategorySection({
           }))
         }
       />
-      <p className="create-product-section__hint">
-        <FormFieldLabel>{CREATE_PRODUCT_MODAL_UI.LABEL_SALE_REGION}</FormFieldLabel>
-        {": "}
-        {regionName || CREATE_PRODUCT_MODAL_UI.HINT_SALE_REGION_FROM_ADDRESS}
-      </p>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import type { RegisterPayload } from "../api/registerUser";
+import type { RegisterPhonePayload } from "../api/phoneAuth";
 import { readPersistedReferralCode } from "@/shared/lib/referralCodeStorage";
 
 const DEFAULT_BACKGROUND_PRESET_ID = "mist";
@@ -11,12 +12,18 @@ export type RegisterFormValues = {
   userName: string;
 };
 
-export const buildRegisterPayload = async (
-  form: RegisterFormValues,
-): Promise<RegisterPayload> => {
+export type RegisterPhoneFormValues = {
+  phoneNumber: string;
+  password: string;
+  passwordConfirm: string;
+  userName: string;
+};
+
+const buildRegisterBasePayload = async (
+  form: Pick<RegisterFormValues, "password" | "passwordConfirm" | "userName">,
+) => {
   const referralCode = await readPersistedReferralCode();
   return {
-    email: form.email.trim(),
     password: form.password,
     passwordConfirm: form.passwordConfirm,
     userName: form.userName.trim().toLowerCase(),
@@ -24,5 +31,25 @@ export const buildRegisterPayload = async (
     userGender: DEFAULT_USER_GENDER,
     notificationsEnabled: true,
     ...(referralCode ? { referralCode } : {}),
+  };
+};
+
+export const buildRegisterPayload = async (
+  form: RegisterFormValues,
+): Promise<RegisterPayload> => {
+  const base = await buildRegisterBasePayload(form);
+  return {
+    ...base,
+    email: form.email.trim(),
+  };
+};
+
+export const buildRegisterPhonePayload = async (
+  form: RegisterPhoneFormValues,
+): Promise<RegisterPhonePayload> => {
+  const base = await buildRegisterBasePayload(form);
+  return {
+    ...base,
+    phoneNumber: form.phoneNumber.trim(),
   };
 };

@@ -31,6 +31,7 @@ import { UserBackgroundPresetPicker } from "./UserBackgroundPresetPicker.jsx";
 import { UserBackgroundPreview } from "./UserBackgroundPreview.jsx";
 import { AdminPremiumStaffControl } from "./AdminPremiumStaffControl.jsx";
 import { EditProfileSocialLinksFields } from "./EditProfileSocialLinksFields.jsx";
+import { PhoneBindControls } from "./PhoneBindControls.jsx";
 
 import "./EditProfileModal.css";
 
@@ -152,6 +153,14 @@ export function EditProfileModal({
                 inputMode="tel"
                 placeholder="8 (912) 345-67-89"
               />
+              {!adminMode ? (
+                <PhoneBindControls
+                  phoneNumber={form.userPhoneNumber}
+                  isPhoneVerified={user?.isPhoneVerified === true}
+                  baselinePhone={user?.userPhoneNumber ?? ""}
+                  disabled={isSubmitting}
+                />
+              ) : null}
             </label>
             <label className="edit-profile-modal__label">
               {EDIT_PROFILE_MODAL_UI.LABEL_BIRTH}

@@ -22,6 +22,7 @@ import {
   introAdRouter,
   sellerPersonalCategoryRouter,
   auditRouter,
+  onecRouter,
 } from "./routes/index.js";
 import {
   generalRateLimiter,
@@ -104,6 +105,7 @@ export const createApp = () => {
   app.use("/intro-ad", introAdRouter);
   app.use("/seller-personal-category", sellerPersonalCategoryRouter);
   app.use("/audit", auditRouter);
+  app.use("/onec", onecRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

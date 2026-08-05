@@ -1,3 +1,6 @@
+import { useRef } from "react";
+import { toggleProductDescriptionH1 } from "@izibuy/shared-lib";
+
 import {
   PRODUCT_NAME_MAX_LENGTH,
   PRODUCT_NAME_MIN_LENGTH,
@@ -27,6 +30,30 @@ export function CreateProductBasicSection({
   descriptionChars,
   className = "",
 }) {
+  const descriptionRef = useRef(/** @type {HTMLTextAreaElement | null} */ (null));
+
+  const applyDescriptionH1 = () => {
+    const el = descriptionRef.current;
+    if (!el || isSubmitting) {
+      return;
+    }
+    const start = el.selectionStart ?? 0;
+    const end = el.selectionEnd ?? 0;
+    const result = toggleProductDescriptionH1(String(form.productDescription ?? ""), start, end);
+    setForm((prev) => ({
+      ...prev,
+      productDescription: result.value,
+    }));
+    requestAnimationFrame(() => {
+      const next = descriptionRef.current;
+      if (!next) {
+        return;
+      }
+      next.focus();
+      next.setSelectionRange(result.selectionStart, result.selectionEnd);
+    });
+  };
+
   return (
     <div className={["create-product-section", className].filter(Boolean).join(" ")}>
       <label className="create-product-section__label">
@@ -45,9 +72,21 @@ export function CreateProductBasicSection({
         />
       </label>
 
-      <label className="create-product-section__label">
+      <div className="create-product-section__label">
         <FormFieldLabel required>{getProductFieldEditLabel("productDescription")}</FormFieldLabel>
+        <div className="create-product-section__desc-toolbar" role="toolbar" aria-label={CREATE_PRODUCT_MODAL_UI.DESCRIPTION_TOOLBAR_ARIA}>
+          <button
+            type="button"
+            className="create-product-section__desc-toolbar-btn"
+            onClick={applyDescriptionH1}
+            disabled={isSubmitting}
+            title={CREATE_PRODUCT_MODAL_UI.DESCRIPTION_H1_HINT}
+          >
+            {CREATE_PRODUCT_MODAL_UI.DESCRIPTION_H1}
+          </button>
+        </div>
         <textarea
+          ref={descriptionRef}
           className="create-product-section__textarea"
           name="productDescription"
           value={String(form.productDescription ?? "")}
@@ -67,7 +106,7 @@ export function CreateProductBasicSection({
         >
           {CREATE_PRODUCT_MODAL_UI.CHARS_USED(descriptionChars, PRODUCT_DESCRIPTION_MAX_CHARS)}
         </span>
-      </label>
+      </div>
       <ProductCharacteristicsEditor
         rows={form.productCharacteristicRows}
         onRowsChange={(productCharacteristicRows) =>

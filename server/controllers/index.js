@@ -7,6 +7,14 @@ import {
   resendRegistrationCodeController,
 } from "./User/registerUserController.js";
 import { loginUserController } from "./User/loginUserController.js";
+import {
+  registerPhoneUserController,
+  loginPhonePasswordController,
+  loginPhoneOtpRequestController,
+  loginPhoneOtpConfirmController,
+  phoneBindRequestController,
+  phoneBindConfirmController,
+} from "./User/phoneAuthControllers.js";
 import { logoutUserController } from "./User/logoutUserController.js";
 import { userMeController } from "./User/userMeController.js";
 import { userGetProfileController } from "./User/userGetProfileController.js";
@@ -248,6 +256,12 @@ export {
   confirmRegistrationController,
   resendRegistrationCodeController,
   loginUserController,
+  registerPhoneUserController,
+  loginPhonePasswordController,
+  loginPhoneOtpRequestController,
+  loginPhoneOtpConfirmController,
+  phoneBindRequestController,
+  phoneBindConfirmController,
   logoutUserController,
   refreshAuthController,
   verifyEmailController,

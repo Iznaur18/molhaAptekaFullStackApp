@@ -1,3 +1,4 @@
+import { formatProductDescriptionPlainText } from "@izibuy/shared-lib";
 import { getRuRegionByCode } from "@molha/api-contract";
 
 import { COMMON_UI, FORMAT_BOOLEAN_RU, PRODUCT_DETAILS_MODAL_UI } from "../../../shared/config/appUiCopy.js";
@@ -51,8 +52,11 @@ export function formatProductFieldForDisplay(key, product) {
   switch (key) {
     case "_id":
       return raw == null ? COMMON_UI.EM_DASH : String(raw);
-    case "productDescription":
-      return raw == null || raw === "" ? COMMON_UI.EM_DASH : String(raw);
+    case "productDescription": {
+      if (raw == null || raw === "") return COMMON_UI.EM_DASH;
+      const plain = formatProductDescriptionPlainText(String(raw));
+      return plain || COMMON_UI.EM_DASH;
+    }
     case "productImageUrls": {
       const urls = resolveProductImageUrls(product);
       if (urls.length === 0) return COMMON_UI.EM_DASH;

@@ -6,17 +6,17 @@ import { readPersistedReferralCode } from "../../../shared/lib/referralCodeStora
 
 /**
  * @param {{
- *   email: string;
+ *   email?: string;
+ *   phoneNumber?: string;
  *   password: string;
  *   passwordConfirm: string;
  *   userName: string;
  * }} form
- * @returns {import('../model/types.js').RegisterUserPayload}
+ * @param {"email" | "phone"} [channel]
  */
-export function buildRegisterUserPayload(form) {
+export function buildRegisterUserPayload(form, channel = "email") {
   const referralCode = readPersistedReferralCode();
-  return {
-    email: form.email.trim(),
+  const base = {
     password: form.password,
     passwordConfirm: form.passwordConfirm,
     userName: String(form.userName).trim().toLowerCase(),
@@ -24,5 +24,15 @@ export function buildRegisterUserPayload(form) {
     userGender: USER_GENDER_NO_SELECTED,
     notificationsEnabled: true,
     ...(referralCode ? { referralCode } : {}),
+  };
+  if (channel === "phone") {
+    return {
+      ...base,
+      phoneNumber: String(form.phoneNumber ?? "").trim(),
+    };
+  }
+  return {
+    ...base,
+    email: String(form.email ?? "").trim(),
   };
 }

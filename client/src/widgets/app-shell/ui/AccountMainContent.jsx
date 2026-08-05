@@ -74,6 +74,7 @@ export function AccountMainContent({
   handleLoyaltyPointsFromProfile,
   handlePartnerProgramFromProfile,
   handleAdvertisingFromProfile,
+  handleOneCIntegrationFromProfile,
   handleIntroAdModerationFromProfile,
   handleSellerPersonalCategoryModerationFromProfile,
   handleSubscriptionsFromProfile,
@@ -206,6 +207,9 @@ export function AccountMainContent({
         onLoyaltyPointsClick={isAuthorized ? handleLoyaltyPointsFromProfile : undefined}
         onPartnerProgramClick={isAuthorized ? handlePartnerProgramFromProfile : undefined}
         onAdvertisingClick={isAuthorized ? handleAdvertisingFromProfile : undefined}
+        onOneCIntegrationClick={
+          isAuthorized ? handleOneCIntegrationFromProfile : undefined
+        }
         onIntroAdModerationClick={
           canModerateProducts ? handleIntroAdModerationFromProfile : undefined
         }

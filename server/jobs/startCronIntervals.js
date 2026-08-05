@@ -1,4 +1,4 @@
-import { BUYER_PASSPORT_SHARE_PURGE_CRON_INTERVAL_MS } from "../constants/passportVaultConstants.js";
+import { ONEC_SYNC_INTERVAL_MS } from "../constants/onecConstants.js";
 import { INSTALLMENT_CRON_INTERVAL_MS } from "../constants/installmentConstants.js";
 import { INTRO_AD_CRON_INTERVAL_MS } from "../constants/introAdCampaignConstants.js";
 import { PREMIUM_CRON_INTERVAL_MS } from "../constants/premiumConstants.js";
@@ -6,6 +6,7 @@ import { PRODUCT_PROMOTION_CRON_INTERVAL_MS } from "../constants/productPromotio
 import { SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS } from "../constants/sellerPersonalCategoryConstants.js";
 import { SITE_HEADER_BANNER_CAMPAIGN_CRON_INTERVAL_MS } from "../constants/siteHeaderBannerCampaignConstants.js";
 import { PRODUCT_PRICE_MARKET_STATUS_CRON_INTERVAL_MS } from "../constants/productPriceMarketStatusConstants.js";
+import { BUYER_PASSPORT_SHARE_PURGE_CRON_INTERVAL_MS } from "../constants/passportVaultConstants.js";
 import { expireStaleUserStories } from "../utils/userStoryHelpers.js";
 import { processInstallmentCronTasks } from "../utils/installmentHelpers.js";
 import { processPremiumCronTasks } from "../utils/premiumAccess.js";
@@ -15,6 +16,7 @@ import { processSellerPersonalCategoryCronTasks } from "../services/seller-perso
 import { processSiteHeaderBannerCampaignCronTasks } from "../services/site-header-banner-campaign/siteHeaderBannerCampaignHelpers.js";
 import { purgeExpiredBuyerPassportShares } from "../services/passport-vault/index.js";
 import { processProductPriceMarketStatusCronTasks } from "../services/product/refreshProductPriceMarketStatus.js";
+import { processOneCCronTasks } from "../services/onec/index.js";
 
 import { isBullMqEnabled } from "../queues/bullMqEnabled.js";
 
@@ -91,6 +93,12 @@ export function startCronIntervals() {
       console.error("processProductPriceMarketStatusCronTasks error:", error);
     });
   }, PRODUCT_PRICE_MARKET_STATUS_CRON_INTERVAL_MS);
+
+  setInterval(() => {
+    void processOneCCronTasks().catch((error) => {
+      console.error("processOneCCronTasks error:", error);
+    });
+  }, ONEC_SYNC_INTERVAL_MS);
 
   return true;
 }

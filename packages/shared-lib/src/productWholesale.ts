@@ -1,6 +1,7 @@
 import { formatPriceRub } from "./formatPriceRub.js";
+import { PRODUCT_WHOLESALE_MIN_QTY_MIN } from "@molha/api-contract";
 
-export const PRODUCT_WHOLESALE_MIN_QTY_MIN = 2;
+export { PRODUCT_WHOLESALE_MIN_QTY_MIN };
 
 export type ProductWholesaleLike = {
   productPrice?: number | null;

@@ -43,6 +43,7 @@ export function buildProfileNavGroups({
   canUseLoyaltyPoints,
   canUsePartnerProgram,
   canUseAdvertising,
+  canUseOneCIntegration,
   canUseEditProfile,
   showEditOnBanner,
   pendingMySalesActionCount,
@@ -87,6 +88,7 @@ export function buildProfileNavGroups({
   onLoyaltyPointsClick,
   onPartnerProgramClick,
   onAdvertisingClick,
+  onOneCIntegrationClick,
   onEditProfileClick,
 }) {
   /** @param {string} tab @param {() => void} [action] */
@@ -236,6 +238,15 @@ export function buildProfileNavGroups({
                 tab: "advertising",
                 label: MY_PROFILE_PAGE_UI.TAB_ADVERTISING,
                 onClick: () => selectTab("advertising", onAdvertisingClick),
+              },
+            ]
+          : []),
+        ...(canUseOneCIntegration
+          ? [
+              {
+                tab: "onec-integration",
+                label: MY_PROFILE_PAGE_UI.TAB_ONEC_INTEGRATION,
+                onClick: () => selectTab("onec-integration", onOneCIntegrationClick),
               },
             ]
           : []),

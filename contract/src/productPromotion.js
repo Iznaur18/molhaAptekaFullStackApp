@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** Синхрон с `server/constants/productPromotionConstants.js`. */
+/** SSOT продвижения товара — client/mobile/server re-export отсюда. */
 export const PRODUCT_PROMOTION_STATUS_PENDING_STAFF = "pending_staff";
 export const PRODUCT_PROMOTION_STATUS_ACTIVE = "active";
 export const PRODUCT_PROMOTION_STATUS_EXPIRED = "expired";
@@ -25,7 +25,32 @@ export const PRODUCT_PROMOTION_TIERS = [
   PRODUCT_PROMOTION_TIER_BANNER,
 ];
 
+/** Доля от productPrice: L1 0.2%, L2 0.4%, L3 1%. */
+export const PRODUCT_PROMOTION_TIER_RATES = {
+  [PRODUCT_PROMOTION_TIER_GOLD]: 0.002,
+  [PRODUCT_PROMOTION_TIER_TOP]: 0.004,
+  [PRODUCT_PROMOTION_TIER_BANNER]: 0.01,
+};
+
 export const PRODUCT_PROMOTION_DURATION_CODES = ["24h", "7d", "30d"];
+
+export const PRODUCT_PROMOTION_DURATION_OPTIONS = [
+  { code: "24h", durationHours: 24, durationMult: 1 },
+  { code: "7d", durationHours: 24 * 7, durationMult: 6 },
+  { code: "30d", durationHours: 24 * 30, durationMult: 23 },
+];
+
+export const PRODUCT_PROMOTION_DURATION_MULT = Object.fromEntries(
+  PRODUCT_PROMOTION_DURATION_OPTIONS.map((item) => [item.code, item.durationMult]),
+);
+
+/**
+ * @param {string} code
+ */
+export const findProductPromotionDuration = (code) =>
+  PRODUCT_PROMOTION_DURATION_OPTIONS.find((item) => item.code === code) ?? null;
+
+export const PRODUCT_PROMOTION_REJECT_COMMENT_MAX_CHARS = 500;
 
 export const requestProductPromotionBodySchema = z.object({
   tier: z.coerce
@@ -53,8 +78,6 @@ export const requestProductPromotionBodySchema = z.object({
 export const myProductPromotionsQuerySchema = z.object({
   status: z.enum(PRODUCT_PROMOTION_STATUSES).optional(),
 });
-
-const PRODUCT_PROMOTION_REJECT_COMMENT_MAX_CHARS = 500;
 
 export const rejectProductPromotionBodySchema = z.object({
   comment: z

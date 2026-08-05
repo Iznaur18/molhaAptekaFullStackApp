@@ -1,14 +1,18 @@
 import { rublesToLoyaltyPoints } from "../../../shared/config/loyaltyPointsConstants.js";
+import {
+  PRODUCT_PROMOTION_TIER_GOLD,
+  PRODUCT_PROMOTION_TIER_TOP,
+  PRODUCT_PROMOTION_TIER_BANNER,
+  PRODUCT_PROMOTION_TIER_RATES,
+  PRODUCT_PROMOTION_DURATION_MULT,
+} from "@molha/api-contract";
 
-export const PRODUCT_PROMOTION_TIER_GOLD = 1;
-export const PRODUCT_PROMOTION_TIER_TOP = 2;
-export const PRODUCT_PROMOTION_TIER_BANNER = 3;
-
-/** @type {Record<number, number>} */
-export const PRODUCT_PROMOTION_TIER_RATES = {
-  [PRODUCT_PROMOTION_TIER_GOLD]: 0.002,
-  [PRODUCT_PROMOTION_TIER_TOP]: 0.004,
-  [PRODUCT_PROMOTION_TIER_BANNER]: 0.01,
+export {
+  PRODUCT_PROMOTION_TIER_GOLD,
+  PRODUCT_PROMOTION_TIER_TOP,
+  PRODUCT_PROMOTION_TIER_BANNER,
+  PRODUCT_PROMOTION_TIER_RATES,
+  PRODUCT_PROMOTION_DURATION_MULT,
 };
 
 /** @type {Record<number, string>} */
@@ -16,13 +20,6 @@ export const PRODUCT_PROMOTION_TIER_LABELS = {
   [PRODUCT_PROMOTION_TIER_GOLD]: "Золото",
   [PRODUCT_PROMOTION_TIER_TOP]: "Топ",
   [PRODUCT_PROMOTION_TIER_BANNER]: "Баннер",
-};
-
-/** @type {Record<string, number>} */
-export const PRODUCT_PROMOTION_DURATION_MULT = {
-  "24h": 1,
-  "7d": 6,
-  "30d": 23,
 };
 
 /**

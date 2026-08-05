@@ -56,13 +56,11 @@
 
 .product-details-content-switcher__description {
   margin: 0;
-  font-size: 14.4px;
-  font-weight: 500;
-  line-height: 21.6px;
-  color: var(--iz-color-text);
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+}
+
+.product-details-content-switcher__description.product-description-content,
+.product-details-content-switcher .product-description-content {
+  margin: 0;
 }
 
 .product-details-content-switcher .product-characteristics-details {
