@@ -1,6 +1,7 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createTestQueryClient } from "../../../test/createTestQueryClient.js";
@@ -17,7 +18,9 @@ function renderUsersPage() {
   const queryClient = createTestQueryClient();
   return render(
     <QueryClientProvider client={queryClient}>
-      <UsersPage />
+      <MemoryRouter>
+        <UsersPage />
+      </MemoryRouter>
     </QueryClientProvider>,
   );
 }

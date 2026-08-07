@@ -1,0 +1,38 @@
+.inline-error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin: 0 0 0.75rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-danger) 28%, transparent);
+  border-radius: 0.65rem;
+  background: var(
+    --iz-color-danger-surface,
+    color-mix(in srgb, var(--iz-color-danger) 10%, var(--iz-color-surface, #fff))
+  );
+  color: var(--iz-color-danger-text, var(--iz-color-danger));
+}
+
+.inline-error-banner__mark {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-top: 0.05rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--iz-color-danger) 18%, transparent);
+  color: var(--iz-color-danger);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.inline-error-banner__text {
+  margin: 0;
+  flex: 1 1 auto;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: inherit;
+}

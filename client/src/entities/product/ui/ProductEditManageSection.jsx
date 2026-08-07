@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { isProductAffiliateConfigured, isProductWholesaleConfigured } from "@izibuy/shared-lib";
+import { isProductAffiliateConfigured, isProductWholesaleConfigured, isProductRentalConfigured } from "@izibuy/shared-lib";
 
 import { isProductRaffleParticipant } from "../../raffle/lib/isProductRaffleParticipant.js";
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
@@ -19,17 +19,19 @@ import "./ProductEditManageSection.css";
  *   onSetQa?: (productId: string, productQaEnabled: boolean) => void | Promise<void>;
  *   onSetOriginality?: (productId: string, productIsOriginal: boolean) => void | Promise<void>;
  *   onSetWholesale?: (productId: string, productWholesaleEnabled: boolean) => void | Promise<void>;
-   *   onSetAffiliate?: (
-   *     productId: string,
-   *     affiliateEnabled: boolean,
-   *     product?: import("../model/types.js").ProductFromApi,
-   *   ) => void | Promise<void>;
+ *   onSetRental?: (productId: string, productRentalEnabled: boolean) => void | Promise<void>;
+ *   onSetAffiliate?: (
+ *     productId: string,
+ *     affiliateEnabled: boolean,
+ *     product?: import("../model/types.js").ProductFromApi,
+ *   ) => void | Promise<void>;
  *   onDelete?: (productId: string) => void | Promise<void>;
  *   isAvailabilityTogglePending?: boolean;
  *   isAuctionTogglePending?: boolean;
  *   isQaTogglePending?: boolean;
  *   isOriginalityTogglePending?: boolean;
  *   isWholesaleTogglePending?: boolean;
+ *   isRentalTogglePending?: boolean;
  *   isAffiliateTogglePending?: boolean;
  *   isDeletePending?: boolean;
  *   errorMessage?: string;
@@ -48,6 +50,7 @@ import "./ProductEditManageSection.css";
  *   isInstallmentTogglePending?: boolean;
  *   canOpenInstallmentProgram?: boolean;
  *   onOpenWholesaleSettings?: () => void;
+ *   onOpenRentalSettings?: () => void;
  *   onOpenAffiliateSettings?: () => void;
  * }} props
  */
@@ -58,6 +61,7 @@ export function ProductEditManageSection({
   onSetQa,
   onSetOriginality,
   onSetWholesale,
+  onSetRental,
   onSetAffiliate,
   onDelete,
   isAvailabilityTogglePending = false,
@@ -65,6 +69,7 @@ export function ProductEditManageSection({
   isQaTogglePending = false,
   isOriginalityTogglePending = false,
   isWholesaleTogglePending = false,
+  isRentalTogglePending = false,
   isAffiliateTogglePending = false,
   isInstallmentTogglePending = false,
   isDeletePending = false,
@@ -80,6 +85,7 @@ export function ProductEditManageSection({
   onSetInstallment,
   canOpenInstallmentProgram = true,
   onOpenWholesaleSettings,
+  onOpenRentalSettings,
   onOpenAffiliateSettings,
 }) {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -94,10 +100,12 @@ export function ProductEditManageSection({
   const isOriginal = product.productIsOriginal === true;
   const isInstallmentEnabled = product.productInstallmentEnabled === true;
   const isWholesaleEnabled = product.productWholesaleEnabled === true;
+  const isRentalEnabled = product.productRentalEnabled === true;
   const affiliateOffer = resolveProductAffiliateOffer(product);
   const isAffiliateEnabled = affiliateOffer.enabled;
   const affiliateConfigured = isProductAffiliateConfigured(product);
   const wholesaleConfigured = isProductWholesaleConfigured(product);
+  const rentalConfigured = isProductRentalConfigured(product);
   const showRaffleToggle =
     sellerRaffleActive && typeof onToggleRaffleParticipation === "function";
   const showInstallmentButton =
@@ -106,6 +114,9 @@ export function ProductEditManageSection({
   const showWholesale =
     typeof onOpenWholesaleSettings === "function" ||
     typeof onSetWholesale === "function";
+  const showRental =
+    typeof onOpenRentalSettings === "function" ||
+    typeof onSetRental === "function";
   const showAffiliate =
     typeof onOpenAffiliateSettings === "function" ||
     typeof onSetAffiliate === "function";
@@ -125,6 +136,7 @@ export function ProductEditManageSection({
     isQaTogglePending ||
     isOriginalityTogglePending ||
     isWholesaleTogglePending ||
+    isRentalTogglePending ||
     isAffiliateTogglePending ||
     isInstallmentTogglePending ||
     isRaffleParticipationPending ||
@@ -287,6 +299,30 @@ export function ProductEditManageSection({
               }
               if (typeof onSetWholesale === "function") {
                 void onSetWholesale(String(product._id), next);
+              }
+              return undefined;
+            }}
+          />
+        ) : null}
+        {showRental ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_MODAL_UI.MANAGE_RENTAL_TITLE}
+            description={CREATE_PRODUCT_MODAL_UI.MANAGE_RENTAL_HINT}
+            checked={isRentalEnabled}
+            disabled={actionsLocked}
+            pending={isRentalTogglePending}
+            pendingLabel={CREATE_PRODUCT_MODAL_UI.RENTAL_TOGGLE_PENDING}
+            onPress={() => onOpenRentalSettings?.()}
+            onCheckedChange={(next) => {
+              if (product._id == null || actionsLocked) {
+                return { revert: true };
+              }
+              if (next && !rentalConfigured) {
+                onOpenRentalSettings?.();
+                return { revert: true };
+              }
+              if (typeof onSetRental === "function") {
+                void onSetRental(String(product._id), next);
               }
               return undefined;
             }}

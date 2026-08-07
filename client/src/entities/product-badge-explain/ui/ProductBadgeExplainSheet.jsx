@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { PRODUCT_BADGE_EXPLAIN_UI } from "../../../shared/config/appUiCopy.js";
@@ -6,6 +6,11 @@ import { getTopModalFocusLayer } from "../../../shared/lib/modalFocusStack.js";
 import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { useDialogFocusTrap } from "../../../shared/lib/useDialogFocusTrap.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
+import {
+  formatRuPhoneDisplayOrEmpty,
+  toRuPhoneTelHref,
+} from "../../user/lib/ruPhone.js";
+import { fetchUserPhone } from "../../user/api/fetchUserPhone.js";
 import { useWholesalePriceSheetAnimation } from "../../product/ui/useWholesalePriceSheetAnimation.js";
 import { resolveProductBadgeExplainSheetContent } from "../lib/resolveProductBadgeExplainSheet.js";
 import { useProductBadgeExplainByKeyMap } from "../model/useProductBadgeExplainByKeyMap.js";
@@ -20,6 +25,7 @@ const TITLE_ID = "product-badge-explain-sheet-title";
  *   title: string;
  *   badgeKey: import("@izibuy/shared-lib").ProductBadgeExplainKey | null;
  *   fallbackKey: string;
+ *   contactSellerUserId?: string | null;
  *   onClose: () => void;
  * }} props
  */
@@ -28,14 +34,23 @@ export function ProductBadgeExplainSheet({
   title,
   badgeKey,
   fallbackKey,
+  contactSellerUserId = null,
   onClose,
 }) {
   const panelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
-  const closeButtonRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
+  const closeButtonRef = useRef(/** @type {HTMLElement | null} */ (null));
   const { mounted, isVisible } = useWholesalePriceSheetAnimation(isOpen);
-  // Грузим CMS всегда при маунте sheet-дерева; не ждать только open —
-  // иначе первый кадр всегда fallback.
   const adminByKey = useProductBadgeExplainByKeyMap({ enabled: true });
+
+  const sellerId =
+    typeof contactSellerUserId === "string" ? contactSellerUserId.trim() : "";
+  const contactMode = sellerId.length > 0;
+
+  const [revealedPhone, setRevealedPhone] = useState(
+    /** @type {string | null} */ (null),
+  );
+  const [contactPending, setContactPending] = useState(false);
+  const [contactError, setContactError] = useState("");
 
   const content = resolveProductBadgeExplainSheetContent({
     badgeKey,
@@ -46,6 +61,20 @@ export function ProductBadgeExplainSheet({
   const imageSrc = content.imageUrl
     ? resolveUploadedImageUrl(content.imageUrl)
     : null;
+
+  useEffect(() => {
+    if (!isOpen) {
+      setRevealedPhone(null);
+      setContactPending(false);
+      setContactError("");
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    setRevealedPhone(null);
+    setContactPending(false);
+    setContactError("");
+  }, [sellerId, badgeKey]);
 
   useScrollLock(mounted);
   useDialogFocusTrap(panelRef, {
@@ -75,9 +104,34 @@ export function ProductBadgeExplainSheet({
     return () => document.removeEventListener("keydown", onKeyDown, true);
   }, [isOpen, onClose]);
 
+  const handleContact = async () => {
+    if (!sellerId || contactPending) {
+      return;
+    }
+    setContactPending(true);
+    setContactError("");
+    try {
+      const phone = await fetchUserPhone(sellerId);
+      setRevealedPhone(phone);
+    } catch (error) {
+      setContactError(
+        error instanceof Error
+          ? error.message
+          : PRODUCT_BADGE_EXPLAIN_UI.CONTACT_ERROR,
+      );
+    } finally {
+      setContactPending(false);
+    }
+  };
+
   if (!mounted) {
     return null;
   }
+
+  const phoneHref = revealedPhone ? toRuPhoneTelHref(revealedPhone) : null;
+  const phoneDisplay = revealedPhone
+    ? formatRuPhoneDisplayOrEmpty(revealedPhone)
+    : "";
 
   return createPortal(
     <div
@@ -116,17 +170,50 @@ export function ProductBadgeExplainSheet({
           <h2 id={TITLE_ID} className="product-badge-explain-sheet__title">
             {title}
           </h2>
-          <p className="product-badge-explain-sheet__description">{content.description}</p>
+          <p className="product-badge-explain-sheet__description">
+            {content.description}
+          </p>
         </div>
         <footer className="product-badge-explain-sheet__footer">
-          <button
-            ref={closeButtonRef}
-            type="button"
-            className="product-badge-explain-sheet__close"
-            onClick={onClose}
-          >
-            {PRODUCT_BADGE_EXPLAIN_UI.CLOSE}
-          </button>
+          {contactMode && phoneHref && phoneDisplay ? (
+            <a
+              ref={closeButtonRef}
+              className="product-badge-explain-sheet__close product-badge-explain-sheet__close--phone"
+              href={phoneHref}
+            >
+              {phoneDisplay}
+            </a>
+          ) : contactMode ? (
+            <>
+              <button
+                ref={closeButtonRef}
+                type="button"
+                className="product-badge-explain-sheet__close"
+                disabled={contactPending}
+                onClick={() => {
+                  void handleContact();
+                }}
+              >
+                {contactPending
+                  ? PRODUCT_BADGE_EXPLAIN_UI.CONTACT_PENDING
+                  : PRODUCT_BADGE_EXPLAIN_UI.CONTACT}
+              </button>
+              {contactError ? (
+                <p className="product-badge-explain-sheet__error" role="alert">
+                  {contactError}
+                </p>
+              ) : null}
+            </>
+          ) : (
+            <button
+              ref={closeButtonRef}
+              type="button"
+              className="product-badge-explain-sheet__close"
+              onClick={onClose}
+            >
+              {PRODUCT_BADGE_EXPLAIN_UI.CLOSE}
+            </button>
+          )}
         </footer>
       </div>
     </div>,

@@ -1,9 +1,9 @@
-import { BadgeHelp, CircleHelp, Newspaper, Users } from "../../../shared/ui/icon/index.js";
+import { BadgeHelp, Bell, Newspaper, Users } from "../../../shared/ui/icon/index.js";
 import { HEADER_USERS_BUTTON_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
- * @typedef {"users" | "terms" | "faq" | "placeholder-3"} HeaderUsersMenuItemKey
- * @typedef {"users" | "terms" | "faq"} HeaderUsersMenuItemAction
+ * @typedef {"users" | "terms" | "faq" | "notifications"} HeaderUsersMenuItemKey
+ * @typedef {"users" | "terms" | "faq" | "notifications"} HeaderUsersMenuItemAction
  *
  * @typedef {{
  *   key: HeaderUsersMenuItemKey;
@@ -35,9 +35,10 @@ export function buildHeaderUsersMenuItems() {
       action: "faq",
     },
     {
-      key: "placeholder-3",
-      icon: CircleHelp,
-      accessibilityLabel: HEADER_USERS_BUTTON_UI.MENU_ITEM_PLACEHOLDER_ARIA(3),
+      key: "notifications",
+      icon: Bell,
+      accessibilityLabel: HEADER_USERS_BUTTON_UI.MENU_ITEM_NOTIFICATIONS_ARIA,
+      action: "notifications",
     },
   ];
 }

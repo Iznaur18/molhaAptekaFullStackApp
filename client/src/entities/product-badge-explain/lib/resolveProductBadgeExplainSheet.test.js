@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { resolveProductDetailsBadgeExplainRequest } from "./resolveProductBadgeExplainSheet.js";
 
 describe("resolveProductDetailsBadgeExplainRequest", () => {
-  it("maps auction / installment / wholesale / nearDistance", () => {
+  it("maps auction / installment / wholesale / rental / nearDistance", () => {
     expect(resolveProductDetailsBadgeExplainRequest({ kind: "auction", label: "Аукцион" })).toEqual({
       title: "Аукцион",
       badgeKey: "auction",
@@ -22,6 +22,13 @@ describe("resolveProductDetailsBadgeExplainRequest", () => {
       title: "Оптовая цена",
       badgeKey: "wholesale",
       fallbackKey: "wholesale",
+    });
+    expect(
+      resolveProductDetailsBadgeExplainRequest({ kind: "rental", label: "Аренда" }),
+    ).toEqual({
+      title: "Аренда",
+      badgeKey: "rental",
+      fallbackKey: "rental",
     });
     expect(
       resolveProductDetailsBadgeExplainRequest({ kind: "nearDistance", label: "~1.2 км" }),

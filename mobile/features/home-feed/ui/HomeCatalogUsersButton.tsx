@@ -20,6 +20,8 @@ export const HomeCatalogUsersButton = ({
   const isUsersActive = pathname === USERS_ROUTE || pathname.startsWith(`${USERS_ROUTE}/`);
   const isTermsActive = pathname === "/legal/terms";
   const isFaqActive = pathname === "/faq";
+  const isNotificationsActive =
+    pathname === "/notifications" || pathname.startsWith("/notifications/");
 
   const handleToggleMenu = useCallback(() => {
     setMenuOpen((current) => !current);
@@ -42,7 +44,15 @@ export const HomeCatalogUsersButton = ({
       open={menuOpen}
       items={menuItems}
       activeItemKey={
-        isUsersActive ? "users" : isTermsActive ? "terms" : isFaqActive ? "faq" : null
+        isUsersActive
+          ? "users"
+          : isTermsActive
+            ? "terms"
+            : isFaqActive
+              ? "faq"
+              : isNotificationsActive
+                ? "notifications"
+                : null
       }
       embeddedInForegroundSheet={embeddedInForegroundSheet}
       onToggle={handleToggleMenu}

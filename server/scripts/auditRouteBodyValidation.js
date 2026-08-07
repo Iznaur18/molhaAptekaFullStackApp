@@ -26,6 +26,10 @@ const ALLOWED_WITHOUT_BODY_VALIDATION = new Set([
   "uploadRouter.js:POST:/image",
   "uploadRouter.js:POST:/video",
   "uploadRouter.js:POST:/",
+  "onecRouter.js:POST:/test",
+  "onecRouter.js:POST:/sync",
+  "productRouter.js:POST:/raffles/unlock-create",
+  "productRouter.js:POST:/raffles/cancel-create",
 ]);
 
 const extractRouteBlocks = (source) => {

@@ -329,6 +329,7 @@ export const hasActiveAcceptedOffer = async (productId) => {
   const row = await ProductPriceOfferModel.findOne({
     productId,
     status: PRICE_OFFER_STATUS_ACCEPTED,
+    orderId: null,
   }).lean();
   return Boolean(row);
 };

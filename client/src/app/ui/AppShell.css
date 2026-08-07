@@ -381,11 +381,30 @@
 }
 
 .app-shell__state_error {
-  color: var(--iz-color-danger);
+  margin: 0 0 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-danger) 22%, var(--iz-color-border));
+  background: var(
+    --iz-color-danger-surface,
+    color-mix(in srgb, var(--iz-color-danger) 10%, var(--iz-color-surface, #fff))
+  );
+  color: var(--iz-color-danger-text, var(--iz-color-danger));
+  font-size: 0.95rem;
+  line-height: 1.4;
+  font-weight: 500;
 }
 
 .app-shell__state_notice {
-  color: var(--iz-color-success);
+  margin: 0 0 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-success) 22%, var(--iz-color-border));
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  font-weight: 500;
 }
 
 .app-shell__grid-virtual-host {
@@ -423,9 +442,17 @@
 .app-shell__catalog-more_error {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 0.5rem;
   margin-top: 0.75rem;
+}
+
+.app-shell__catalog-more_error .inline-error-banner {
+  margin-bottom: 0;
+}
+
+.app-shell__catalog-more_error .app-shell__catalog-retry {
+  align-self: center;
 }
 
 .app-shell__catalog-retry {

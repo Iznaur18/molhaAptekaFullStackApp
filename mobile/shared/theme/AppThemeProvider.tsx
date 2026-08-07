@@ -8,7 +8,6 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { useColorScheme as useSystemColorScheme } from "react-native";
 
 import {
   loadThemePreference,
@@ -25,23 +24,15 @@ type AppThemeContextValue = {
 
 const AppThemeContext = createContext<AppThemeContextValue | null>(null);
 
-const resolveColorScheme = (
-  preference: ThemePreference,
-  systemScheme: ColorScheme,
-): ColorScheme => {
-  if (preference === "system") {
-    return systemScheme;
-  }
-  return preference;
-};
+const resolveColorScheme = (preference: ThemePreference): ColorScheme =>
+  preference === "light" ? "light" : "custom";
 
 type AppThemeProviderProps = {
   children: ReactNode;
 };
 
 export const AppThemeProvider = ({ children }: AppThemeProviderProps) => {
-  const systemScheme = useSystemColorScheme() === "dark" ? "dark" : "light";
-  const [preference, setPreferenceState] = useState<ThemePreference>("system");
+  const [preference, setPreferenceState] = useState<ThemePreference>("custom");
 
   useEffect(() => {
     void loadThemePreference().then((stored) => {
@@ -54,7 +45,7 @@ export const AppThemeProvider = ({ children }: AppThemeProviderProps) => {
     void saveThemePreference(next);
   }, []);
 
-  const colorScheme = resolveColorScheme(preference, systemScheme);
+  const colorScheme = resolveColorScheme(preference);
   const theme = useMemo(() => resolveIzTheme(colorScheme), [colorScheme]);
 
   const value = useMemo(
@@ -73,7 +64,7 @@ export const AppThemeProvider = ({ children }: AppThemeProviderProps) => {
 export const useAppTheme = (): IzTheme => {
   const context = useContext(AppThemeContext);
   if (!context) {
-    return resolveIzTheme("light");
+    return resolveIzTheme("custom");
   }
   return context.theme;
 };

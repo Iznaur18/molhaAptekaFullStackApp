@@ -132,11 +132,14 @@ export const ProductAuctionTab = ({
     }
   }, [myOffer?._id, myOffer?.offerPrice, myOfferQuery.isPending, myOfferQueryEnabled]);
 
+  const hasLinkedOrder =
+    myOffer?.orderId != null && String(myOffer.orderId).trim() !== "";
+
   const showForm =
     !isOwnProduct &&
     isAuthorized &&
     isUserDataConfirmed &&
-    myOffer?.status !== PRICE_OFFER_STATUS_ACCEPTED;
+    !(myOffer?.status === PRICE_OFFER_STATUS_ACCEPTED && !hasLinkedOrder);
 
   const offerSubmitLabel = isBusy
     ? PRODUCT_PRICE_OFFER_UI.SUBMIT_LOADING
@@ -205,8 +208,6 @@ export const ProductAuctionTab = ({
   }
 
   const offers = offersQuery.data ?? [];
-  const hasLinkedOrder =
-    myOffer?.orderId != null && String(myOffer.orderId).trim() !== "";
   const showGoToCartButton =
     myOffer?.status === PRICE_OFFER_STATUS_ACCEPTED && !hasLinkedOrder;
 

@@ -155,6 +155,15 @@ const renderBadge = ({
     });
   }
 
+  if (item.kind === "rental") {
+    return renderSoftTextBadge({
+      item,
+      tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.rental,
+      interactive,
+      onBadgePress,
+    });
+  }
+
   if (item.kind === "nearDistance") {
     return renderSoftTextBadge({
       item,

@@ -22,7 +22,10 @@ import {
   buildOrderLineLoyaltySnapshot,
   reserveLoyaltyPointsForNewOrder,
 } from "./orderLoyaltyPoints.js";
-import { resolveAcceptedOfferForOrder } from "../product/productPriceOfferHelpers.js";
+import {
+  finalizeOffersAfterOrderConfirmed,
+  resolveAcceptedOfferForOrder,
+} from "../product/productPriceOfferHelpers.js";
 import {
   assertOrderItemsWithinAvailableStock,
   guardOrderItemsStockInTransaction,
@@ -30,6 +33,7 @@ import {
 import { resolveProductUnitPrice } from "@izibuy/shared-lib";
 
 import { buildOrderStatusFromItems } from "./orderStatus.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 import {
   resolveAffiliateReferrerUserId,
   resolveOrderLineAffiliateAttribution,
@@ -313,11 +317,11 @@ export async function createOrder({
   }));
 
   try {
-    return await runInTransaction(async (session) => {
+    const created = await runInTransaction(async (session) => {
       await guardOrderItemsStockInTransaction(items, userId, session);
       await reserveLoyaltyPointsForNewOrder(itemsForReserve, session);
 
-      const [created] = await OrderModel.create(
+      const [createdOrder] = await OrderModel.create(
         [
           {
             userBuyerId: userId,
@@ -338,12 +342,12 @@ export async function createOrder({
       if (linkedPriceOfferId) {
         await ProductPriceOfferModel.findByIdAndUpdate(
           linkedPriceOfferId,
-          { $set: { orderId: created._id } },
+          { $set: { orderId: createdOrder._id } },
           withMongoSession({}, session),
         );
       }
 
-      const isUserUpdated = await appendOrderToBuyList(userId, created._id, session);
+      const isUserUpdated = await appendOrderToBuyList(userId, createdOrder._id, session);
       if (!isUserUpdated) {
         throw new AppError(404, "Пользователь не найден");
       }
@@ -354,8 +358,25 @@ export async function createOrder({
         withMongoSession({ upsert: true }, session),
       );
 
-      return created;
+      return createdOrder;
     });
+
+    if (linkedPriceOfferId) {
+      const productId = String(items[0].productId);
+      try {
+        await finalizeOffersAfterOrderConfirmed(productId, linkedPriceOfferId);
+      } catch (finalizeError) {
+        logServerEvent("error", {
+          event: "finalizeoffersafterordercreate",
+          error:
+            finalizeError instanceof Error
+              ? finalizeError.message
+              : String(finalizeError),
+        });
+      }
+    }
+
+    return created;
   } catch (txError) {
     if (txError instanceof AppError) {
       throw txError;

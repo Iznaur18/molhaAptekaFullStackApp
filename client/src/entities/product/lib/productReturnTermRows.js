@@ -1,9 +1,15 @@
 /** SSOT: `contract/src/productWrite.js`. */
-export {
+import {
   PRODUCT_RETURN_TERMS_MAX_ITEMS,
   PRODUCT_RETURN_TERM_KEY_MAX_CHARS as PRODUCT_RETURN_TERM_KEY_MAX,
   PRODUCT_RETURN_TERM_VALUE_MAX_CHARS as PRODUCT_RETURN_TERM_VALUE_MAX,
 } from "@molha/api-contract";
+
+export {
+  PRODUCT_RETURN_TERMS_MAX_ITEMS,
+  PRODUCT_RETURN_TERM_KEY_MAX,
+  PRODUCT_RETURN_TERM_VALUE_MAX,
+};
 
 let nextReturnTermRowId = 1;
 

@@ -50,7 +50,7 @@ export function InstallmentBuyerBlock({
   const pageDockHost = useProductDetailsPageDockHost();
   const dockSubmit = dockSubmitProp ?? isCompactLayout;
   const [selectedPlanId, setSelectedPlanId] = useState(program.plans[0]?._id ?? "");
-  const [quantity, setQuantity] = useState(1);
+  const [quantityRaw, setQuantityRaw] = useState("1");
   const [deliveryAddress, setDeliveryAddress] = useState(() =>
     addressValueFromUser(defaultDeliveryAddress),
   );
@@ -77,7 +77,7 @@ export function InstallmentBuyerBlock({
     );
   }, [productPrice, selectedPlan]);
 
-  const qty = Math.max(1, quantity);
+  const qty = Math.max(1, Math.floor(Number(quantityRaw)) || 1);
   const baseTotalRub = (priceSummary?.productPriceRub ?? 0) * qty;
   const markupTotalRub = (priceSummary?.markupRub ?? 0) * qty;
   const monthlyTotal =
@@ -88,6 +88,15 @@ export function InstallmentBuyerBlock({
   useEffect(() => {
     setSelectedPlanId(program.plans[0]?._id ?? "");
   }, [program.plans]);
+
+  const normalizeQuantityRaw = () => {
+    let next = Math.max(1, Math.floor(Number(quantityRaw)) || 1);
+    if (purchaseLimit > 0) {
+      next = Math.min(next, purchaseLimit);
+    }
+    setQuantityRaw(String(next));
+    return next;
+  };
 
   const validateCheckoutForm = () => {
     if (!isAuthorized) {
@@ -110,6 +119,17 @@ export function InstallmentBuyerBlock({
       setError(INSTALLMENT_UI.SELECT_PLAN);
       return false;
     }
+    if (purchaseLimit <= 0) {
+      setError(INSTALLMENT_UI.QUANTITY_EXCEEDS_STOCK(0));
+      return false;
+    }
+    const parsedQty = Math.max(1, Math.floor(Number(quantityRaw)) || 1);
+    if (parsedQty > purchaseLimit) {
+      setQuantityRaw(String(purchaseLimit));
+      setError(INSTALLMENT_UI.QUANTITY_EXCEEDS_STOCK(purchaseLimit));
+      return false;
+    }
+    setQuantityRaw(String(parsedQty));
     return true;
   };
 
@@ -126,12 +146,18 @@ export function InstallmentBuyerBlock({
   const handleConsentConfirm = async () => {
     setError("");
     setSuccess("");
+    const nextQty = normalizeQuantityRaw();
+    if (purchaseLimit <= 0 || nextQty > purchaseLimit) {
+      setIsConsentOpen(false);
+      setError(INSTALLMENT_UI.QUANTITY_EXCEEDS_STOCK(Math.max(0, purchaseLimit)));
+      return;
+    }
     try {
       await createContractMutation.mutateAsync({
         productId: String(product._id),
         body: {
           planId: String(selectedPlanId),
-          quantity: qty,
+          quantity: nextQty,
           deliveryAddress: deliveryAddress.line.trim(),
           deliveryAddressFlat: deliveryAddress.flat.trim() || undefined,
           paymentMethod,
@@ -258,16 +284,28 @@ export function InstallmentBuyerBlock({
             {INSTALLMENT_UI.QUANTITY_LABEL}
           </span>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            autoComplete="off"
             className="installment-buyer-block__input"
-            min={1}
-            max={purchaseLimit}
-            value={quantity}
-            onChange={(event) =>
-              setQuantity(Math.max(1, Number(event.target.value) || 1))
-            }
+            value={quantityRaw}
+            onChange={(event) => {
+              const next = event.target.value;
+              if (next === "" || /^\d+$/.test(next)) {
+                setQuantityRaw(next);
+              }
+            }}
+            onBlur={() => {
+              normalizeQuantityRaw();
+            }}
             disabled={isSubmitting}
           />
+          {purchaseLimit > 0 ? (
+            <span className="installment-buyer-block__qty-hint">
+              {INSTALLMENT_UI.QUANTITY_AVAILABLE(purchaseLimit)}
+            </span>
+          ) : null}
         </label>
 
         {selectedPlan != null ? (

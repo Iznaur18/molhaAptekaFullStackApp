@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { bidNeedsAttention, offerNeedsAttention } from "../../../entities/product-price-offer/lib/auctionDashboardAttention.js";
 import { filterAuctionDashboard } from "../../../entities/product-price-offer/lib/filterAuctionDashboard.js";
 import { summarizeAuctionDashboard } from "../../../entities/product-price-offer/lib/summarizeAuctionDashboard.js";
 import {
@@ -40,7 +39,6 @@ export function AuctionPage({
 }) {
   const [viewFilter, setViewFilter] = useState("");
   const [attentionOnly, setAttentionOnly] = useState(false);
-  const [expandedIds, setExpandedIds] = useState(() => new Set());
 
   const bidsQuery = useMyPriceOfferBidsQuery({ enabled: isAuthorized });
   const offersQuery = useIncomingPriceOffersQuery({ enabled: isAuthorized });
@@ -92,42 +90,6 @@ export function AuctionPage({
     }
   }, [isAuthorized, onRequestLogin]);
 
-  useEffect(() => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      allBuyerBids.filter(bidNeedsAttention).forEach((bid) => next.add(`bid:${bid._id}`));
-      allSellerOffers
-        .filter(offerNeedsAttention)
-        .forEach((offer) => next.add(`offer:${offer._id}`));
-      return next;
-    });
-  }, [allBuyerBids, allSellerOffers]);
-
-  const toggleExpanded = useCallback((rowId) => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(rowId)) {
-        next.delete(rowId);
-      } else {
-        next.add(rowId);
-      }
-      return next;
-    });
-  }, []);
-
-  const expandAll = useCallback(() => {
-    setExpandedIds(
-      new Set([
-        ...buyerBids.map((bid) => `bid:${bid._id}`),
-        ...sellerOffers.map((offer) => `offer:${offer._id}`),
-      ]),
-    );
-  }, [buyerBids, sellerOffers]);
-
-  const collapseAll = useCallback(() => {
-    setExpandedIds(new Set());
-  }, []);
-
   const handleBuyerFilterClick = useCallback(() => {
     setViewFilter(AUCTION_VIEW_FILTER_BUYER);
     setAttentionOnly(false);
@@ -154,19 +116,9 @@ export function AuctionPage({
     />
   );
 
-  const listActions =
-    totalVisible > 0 ? (
-      <div className="auction-page__list-actions">
-        <button type="button" className="auction-page__list-action" onClick={expandAll}>
-          {AUCTION_PAGE_UI.EXPAND_ALL}
-        </button>
-        <button type="button" className="auction-page__list-action" onClick={collapseAll}>
-          {AUCTION_PAGE_UI.COLLAPSE_ALL}
-        </button>
-        {attentionOnly ? (
-          <p className="auction-page__filter-hint">{AUCTION_PAGE_UI.ATTENTION_FILTER_HINT}</p>
-        ) : null}
-      </div>
+  const attentionFilterHint =
+    totalVisible > 0 && attentionOnly ? (
+      <p className="auction-page__filter-hint">{AUCTION_PAGE_UI.ATTENTION_FILTER_HINT}</p>
     ) : null;
 
   const toolbar = (
@@ -222,7 +174,7 @@ export function AuctionPage({
     <div className="auction-page">
       {toolbar}
       {overview}
-      {listActions}
+      {attentionFilterHint}
 
       {!showBuyerSection && !showSellerSection ? (
         <p className="auction-page__state">{emptyMessage}</p>
@@ -231,22 +183,16 @@ export function AuctionPage({
           {showBuyerSection ? (
             <AuctionPageSection title={AUCTION_PAGE_UI.BUYER_SECTION_TITLE} count={buyerBids.length}>
               <ul className="auction-dashboard__list" role="list">
-                {buyerBids.map((bid) => {
-                  const rowId = `bid:${bid._id}`;
-                  return (
-                    <li key={bid._id} role="listitem">
-                      <AuctionBuyerBidRow
-                        bid={bid}
-                        collapsible
-                        expanded={expandedIds.has(rowId)}
-                        onExpandedChange={() => toggleExpanded(rowId)}
-                        isUserDataConfirmed={isUserDataConfirmed}
-                        onProductClick={onProductClick}
-                        onChanged={reload}
-                      />
-                    </li>
-                  );
-                })}
+                {buyerBids.map((bid) => (
+                  <li key={bid._id} role="listitem">
+                    <AuctionBuyerBidRow
+                      bid={bid}
+                      isUserDataConfirmed={isUserDataConfirmed}
+                      onProductClick={onProductClick}
+                      onChanged={reload}
+                    />
+                  </li>
+                ))}
               </ul>
             </AuctionPageSection>
           ) : null}
@@ -257,22 +203,16 @@ export function AuctionPage({
               count={sellerOffers.length}
             >
               <ul className="auction-dashboard__list" role="list">
-                {sellerOffers.map((offer) => {
-                  const rowId = `offer:${offer._id}`;
-                  return (
-                    <li key={offer._id} role="listitem">
-                      <AuctionSellerOfferRow
-                        offer={offer}
-                        collapsible
-                        expanded={expandedIds.has(rowId)}
-                        onExpandedChange={() => toggleExpanded(rowId)}
-                        onProductClick={onProductClick}
-                        onBuyerClick={onBuyerClick}
-                        onChanged={reload}
-                      />
-                    </li>
-                  );
-                })}
+                {sellerOffers.map((offer) => (
+                  <li key={offer._id} role="listitem">
+                    <AuctionSellerOfferRow
+                      offer={offer}
+                      onProductClick={onProductClick}
+                      onBuyerClick={onBuyerClick}
+                      onChanged={reload}
+                    />
+                  </li>
+                ))}
               </ul>
             </AuctionPageSection>
           ) : null}

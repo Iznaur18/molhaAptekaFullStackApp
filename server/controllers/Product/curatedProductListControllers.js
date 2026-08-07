@@ -4,6 +4,7 @@ import { getHiddenSellerIds } from "../../services/access/adminUserGuard.js";
 import {
   assertCuratedListProductMatchesRegion,
   buildAdminCuratedListsResponse,
+  buildCuratedListProductPreview,
   buildHomeCuratedListsResponse,
   normalizeCuratedProductListRegionCode,
   normalizeCuratedProductListTitle,
@@ -38,6 +39,13 @@ export async function listCuratedProductListsAdminController(_req, res) {
   const lists = await CuratedProductListModel.find().sort(sortCuratedLists).lean();
   const curatedLists = await buildAdminCuratedListsResponse(lists, hiddenSellerIds);
   successRes(res, { lists: curatedLists });
+}
+
+/** GET /product/admin/curated-lists/product-preview/:productId */
+export async function previewCuratedListProductAdminController(req, res) {
+  const productId = String(req.params.productId ?? "").trim();
+  const preview = await buildCuratedListProductPreview(productId);
+  successRes(res, { preview });
 }
 
 /** POST /product/admin/curated-lists */

@@ -20,6 +20,7 @@ import {
   deleteProductSearchSynonymAdminController,
   getHomeCuratedProductListsController,
   listCuratedProductListsAdminController,
+  previewCuratedListProductAdminController,
   createCuratedProductListAdminController,
   reorderCuratedProductListsAdminController,
   patchCuratedProductListAdminController,
@@ -144,6 +145,7 @@ import {
   patchProductSearchSynonymValidation,
   curatedProductListIdParamValidation,
   curatedProductListProductIdParamValidation,
+  curatedProductPreviewParamValidation,
   createCuratedProductListValidation,
   patchCuratedProductListValidation,
   reorderCuratedProductListsValidation,
@@ -215,6 +217,13 @@ router.get(
   checkAuthMW,
   checkAdminMW,
   listCuratedProductListsAdminController,
+);
+router.get(
+  "/admin/curated-lists/product-preview/:productId",
+  checkAuthMW,
+  checkAdminMW,
+  curatedProductPreviewParamValidation,
+  previewCuratedListProductAdminController,
 );
 router.post(
   "/admin/curated-lists",

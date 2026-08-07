@@ -4,6 +4,7 @@ import { PRODUCT_PROMOTION_UI } from "../../../shared/config/appUiCopy.js";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
 import { InstallmentProgramModal } from "../../installment/ui/InstallmentProgramModal.jsx";
 import { WholesalePriceModal } from "./WholesalePriceModal.jsx";
+import { ProductRentalManageModal } from "./ProductRentalManageModal.jsx";
 import { AffiliatePercentModal } from "./AffiliatePercentModal.jsx";
 import { calculateProductPromotionPointsCost } from "../lib/calculateProductPromotionPointsCost.js";
 import { ProductPromotionFormPanel } from "./product-promotion-modal/ProductPromotionFormPanel.jsx";
@@ -49,6 +50,10 @@ const PRODUCT_PROMOTION_MODAL_TITLE_ID = "product-promotion-modal-title";
  *     productId: string,
  *     productWholesaleEnabled: boolean,
  *   ) => void | Promise<void>;
+ *   onSetProductRental?: (
+ *     productId: string,
+ *     productRentalEnabled: boolean,
+ *   ) => void | Promise<void>;
  *   onSetProductAffiliate?: (
  *     productId: string,
  *     affiliateEnabled: boolean,
@@ -66,6 +71,7 @@ const PRODUCT_PROMOTION_MODAL_TITLE_ID = "product-promotion-modal-title";
  *   isQaTogglePending?: boolean;
  *   isOriginalityTogglePending?: boolean;
  *   isWholesaleTogglePending?: boolean;
+ *   isRentalTogglePending?: boolean;
  *   isAffiliateTogglePending?: boolean;
  *   isInstallmentTogglePending?: boolean;
  *   isDeletePending?: boolean;
@@ -99,6 +105,7 @@ export function ProductPromotionModal({
   onSetProductQa,
   onSetProductOriginality,
   onSetProductWholesale,
+  onSetProductRental,
   onSetProductAffiliate,
   onSetProductInstallment,
   onWholesaleSaved,
@@ -109,6 +116,7 @@ export function ProductPromotionModal({
   isQaTogglePending = false,
   isOriginalityTogglePending = false,
   isWholesaleTogglePending = false,
+  isRentalTogglePending = false,
   isAffiliateTogglePending = false,
   isInstallmentTogglePending = false,
   isDeletePending = false,
@@ -135,6 +143,7 @@ export function ProductPromotionModal({
   });
   const [isInstallmentProgramOpen, setIsInstallmentProgramOpen] = useState(false);
   const [isWholesaleOpen, setIsWholesaleOpen] = useState(false);
+  const [isRentalOpen, setIsRentalOpen] = useState(false);
   const [isAffiliateOpen, setIsAffiliateOpen] = useState(false);
   const defaultTier = tiers[0]?.tier ?? 1;
   const defaultDuration = durations[0]?.code ?? "";
@@ -147,6 +156,7 @@ export function ProductPromotionModal({
     if (!isOpen) {
       setIsInstallmentProgramOpen(false);
       setIsWholesaleOpen(false);
+      setIsRentalOpen(false);
       setIsAffiliateOpen(false);
     }
   }, [defaultDuration, defaultTier, isOpen]);
@@ -275,6 +285,7 @@ export function ProductPromotionModal({
             onSetQa={onSetProductQa}
             onSetOriginality={onSetProductOriginality}
             onSetWholesale={onSetProductWholesale}
+            onSetRental={onSetProductRental}
             onSetAffiliate={onSetProductAffiliate}
             onSetInstallment={onSetProductInstallment}
             onDelete={onDeleteProduct}
@@ -283,6 +294,7 @@ export function ProductPromotionModal({
             isQaTogglePending={isQaTogglePending}
             isOriginalityTogglePending={isOriginalityTogglePending}
             isWholesaleTogglePending={isWholesaleTogglePending}
+            isRentalTogglePending={isRentalTogglePending}
             isAffiliateTogglePending={isAffiliateTogglePending}
             isInstallmentTogglePending={isInstallmentTogglePending}
             isDeletePending={isDeletePending}
@@ -296,6 +308,7 @@ export function ProductPromotionModal({
             isSubmitting={isSubmitting}
             onOpenInstallmentProgram={() => setIsInstallmentProgramOpen(true)}
             onOpenWholesaleSettings={() => setIsWholesaleOpen(true)}
+            onOpenRentalSettings={() => setIsRentalOpen(true)}
             onOpenAffiliateSettings={() => setIsAffiliateOpen(true)}
           />
         )}
@@ -316,6 +329,12 @@ export function ProductPromotionModal({
         isOpen={isWholesaleOpen}
         product={product}
         onClose={() => setIsWholesaleOpen(false)}
+        onSaved={onWholesaleSaved}
+      />
+      <ProductRentalManageModal
+        isOpen={isRentalOpen}
+        product={product}
+        onClose={() => setIsRentalOpen(false)}
         onSaved={onWholesaleSaved}
       />
       <AffiliatePercentModal

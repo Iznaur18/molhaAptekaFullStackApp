@@ -276,9 +276,3 @@
 .create-product-review__edit:hover {
   background: color-mix(in srgb, var(--iz-color-action) 10%, transparent);
 }
-
-@container app-viewport (min-width: 1024px) {
-  .create-product-section__price-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}

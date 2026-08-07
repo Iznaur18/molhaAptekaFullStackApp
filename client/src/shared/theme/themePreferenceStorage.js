@@ -1,4 +1,4 @@
-/** @typedef {"system" | "light" | "dark" | "custom"} ThemePreference */
+/** @typedef {"light" | "custom"} ThemePreference */
 
 const THEME_PREFERENCE_KEY = "app-theme-preference";
 
@@ -7,12 +7,7 @@ const THEME_PREFERENCE_KEY = "app-theme-preference";
  * @returns {value is ThemePreference}
  */
 function isThemePreference(value) {
-  return (
-    value === "system" ||
-    value === "light" ||
-    value === "dark" ||
-    value === "custom"
-  );
+  return value === "light" || value === "custom";
 }
 
 /**
@@ -24,10 +19,15 @@ export function loadThemePreference() {
     if (isThemePreference(raw)) {
       return raw;
     }
+    // Legacy: system / dark → custom
+    if (raw === "system" || raw === "dark") {
+      saveThemePreference("custom");
+      return "custom";
+    }
   } catch {
     // storage недоступен
   }
-  return "system";
+  return "custom";
 }
 
 /**

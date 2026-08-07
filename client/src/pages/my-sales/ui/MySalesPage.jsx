@@ -1,12 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { filterMySales } from "../../../entities/order/lib/filterMySales.js";
-import {
-  buildAttentionOrderIdsKey,
-  mergeExpandedIdsFromKey,
-} from "../../../entities/order/lib/expandedOrderIds.js";
-import { orderNeedsSellerAttention } from "../../../entities/order/lib/orderNeedsSellerAttention.js";
 import { summarizeMySales } from "../../../entities/order/lib/summarizeMySales.js";
 import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "../../../entities/order/model/myOrdersListFilters.js";
 import { orderQueryKeys } from "../../../entities/order/model/orderQueryKeys.js";
@@ -54,7 +49,6 @@ export function MySalesPage({
 }) {
   const [statusFilter, setStatusFilter] = useState("");
   const [attentionOnly, setAttentionOnly] = useState(false);
-  const [expandedIds, setExpandedIds] = useState(() => new Set());
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebouncedValue(
     searchTerm,
@@ -99,10 +93,6 @@ export function MySalesPage({
     () => filterMySales(serverOrders, { statusFilter, attentionOnly }),
     [serverOrders, statusFilter, attentionOnly],
   );
-  const attentionOrderIdsKey = useMemo(
-    () => buildAttentionOrderIdsKey(allOrders, orderNeedsSellerAttention),
-    [allOrders],
-  );
 
   const totalServer = serverOrders.length;
   const totalVisible = filteredOrders.length;
@@ -130,30 +120,6 @@ export function MySalesPage({
   }, [salesQuery, overviewQuery, onQueueChanged]);
 
   useRefetchOnVisible(reloadSales, phase === "success");
-
-  useEffect(() => {
-    setExpandedIds((prev) => mergeExpandedIdsFromKey(prev, attentionOrderIdsKey));
-  }, [attentionOrderIdsKey]);
-
-  const toggleExpanded = useCallback((orderId) => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(orderId)) {
-        next.delete(orderId);
-      } else {
-        next.add(orderId);
-      }
-      return next;
-    });
-  }, []);
-
-  const expandAll = useCallback(() => {
-    setExpandedIds(new Set(filteredOrders.map((order) => String(order._id))));
-  }, [filteredOrders]);
-
-  const collapseAll = useCallback(() => {
-    setExpandedIds(new Set());
-  }, []);
 
   const handleInProgressFilterClick = useCallback(() => {
     setStatusFilter(MY_ORDERS_LIST_FILTER_IN_PROGRESS);
@@ -328,19 +294,9 @@ export function MySalesPage({
     />
   );
 
-  const listActions =
-    totalVisible > 0 ? (
-      <div className="my-sales-page__list-actions">
-        <button type="button" className="my-sales-page__list-action" onClick={expandAll}>
-          {MY_SALES_PAGE_UI.EXPAND_ALL}
-        </button>
-        <button type="button" className="my-sales-page__list-action" onClick={collapseAll}>
-          {MY_SALES_PAGE_UI.COLLAPSE_ALL}
-        </button>
-        {attentionOnly ? (
-          <p className="my-sales-page__filter-hint">{MY_SALES_PAGE_UI.ATTENTION_FILTER_HINT}</p>
-        ) : null}
-      </div>
+  const attentionFilterHint =
+    totalVisible > 0 && attentionOnly ? (
+      <p className="my-sales-page__filter-hint">{MY_SALES_PAGE_UI.ATTENTION_FILTER_HINT}</p>
     ) : null;
 
   const toolbar = (
@@ -390,34 +346,28 @@ export function MySalesPage({
     <div className="my-sales-page">
       {toolbar}
       {overview}
-      {listActions}
+      {attentionFilterHint}
       {totalVisible === 0 ? (
         <p className="my-sales-page__state">{emptyMessage}</p>
       ) : (
         <ul className="my-sales-page__list" role="list">
-          {filteredOrders.map((order) => {
-            const orderId = String(order._id);
-            return (
-              <li key={order._id} className="my-sales-page__item" role="listitem">
-                <OrderCard
-                  order={order}
-                  compact
-                  collapsible
-                  expanded={expandedIds.has(orderId)}
-                  onExpandedChange={() => toggleExpanded(orderId)}
-                  attentionRole="seller"
-                  showBuyer
-                  onBuyerNameClick={onSellerNameClick}
-                  onProductClick={openCatalogProductFromOrderLine}
-                  onMarkShipped={handleMarkShipped}
-                  onMarkDelivered={handleMarkDelivered}
-                  onCancelItem={handleCancelItem}
-                  pendingActionKey={pendingActionKey}
-                  itemActionErrors={itemActionErrors}
-                />
-              </li>
-            );
-          })}
+          {filteredOrders.map((order) => (
+            <li key={order._id} className="my-sales-page__item" role="listitem">
+              <OrderCard
+                order={order}
+                compact
+                attentionRole="seller"
+                showBuyer
+                onBuyerNameClick={onSellerNameClick}
+                onProductClick={openCatalogProductFromOrderLine}
+                onMarkShipped={handleMarkShipped}
+                onMarkDelivered={handleMarkDelivered}
+                onCancelItem={handleCancelItem}
+                pendingActionKey={pendingActionKey}
+                itemActionErrors={itemActionErrors}
+              />
+            </li>
+          ))}
         </ul>
       )}
     </div>

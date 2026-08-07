@@ -31,6 +31,7 @@ import { useProductPromotionModalTab } from "@/features/product-promotion/model/
 import { ProductPromotionManageTab } from "@/features/product-promotion/ui/ProductPromotionManageTab";
 import { InstallmentProgramModal } from "@/entities/installment/ui/InstallmentProgramModal";
 import { WholesalePriceModal } from "@/entities/product/ui/WholesalePriceModal";
+import { ProductRentalManageModal } from "@/entities/product/ui/ProductRentalManageModal";
 import { AffiliatePercentModal } from "@/entities/product/ui/AffiliatePercentModal";
 import { ProductPromotionModalTabs } from "@/features/product-promotion/ui/ProductPromotionModalTabs";
 import { PRODUCT_CARD_UI, PRODUCT_PROMOTION_UI } from "@/shared/config";
@@ -77,6 +78,10 @@ type ProductPromotionModalProps = {
     productId: string,
     productWholesaleEnabled: boolean,
   ) => void | Promise<void>;
+  onSetProductRental?: (
+    productId: string,
+    productRentalEnabled: boolean,
+  ) => void | Promise<void>;
   onSetProductAffiliate?: (
     productId: string,
     affiliateEnabled: boolean,
@@ -90,6 +95,7 @@ type ProductPromotionModalProps = {
   isAuctionTogglePending?: boolean;
   isOriginalityTogglePending?: boolean;
   isWholesaleTogglePending?: boolean;
+  isRentalTogglePending?: boolean;
   isAffiliateTogglePending?: boolean;
   isInstallmentTogglePending?: boolean;
   isDeletePending?: boolean;
@@ -123,6 +129,7 @@ export const ProductPromotionModal = ({
   onSetProductAuction,
   onSetProductOriginality,
   onSetProductWholesale,
+  onSetProductRental,
   onSetProductAffiliate,
   onSetProductInstallment,
   onWholesaleSaved,
@@ -131,6 +138,7 @@ export const ProductPromotionModal = ({
   isAuctionTogglePending = false,
   isOriginalityTogglePending = false,
   isWholesaleTogglePending = false,
+  isRentalTogglePending = false,
   isAffiliateTogglePending = false,
   isInstallmentTogglePending = false,
   isDeletePending = false,
@@ -165,6 +173,7 @@ export const ProductPromotionModal = ({
   const [selectedDurationCode, setSelectedDurationCode] = useState(defaultDuration);
   const [isInstallmentProgramOpen, setIsInstallmentProgramOpen] = useState(false);
   const [isWholesaleOpen, setIsWholesaleOpen] = useState(false);
+  const [isRentalOpen, setIsRentalOpen] = useState(false);
   const [isAffiliateOpen, setIsAffiliateOpen] = useState(false);
   const bodyScrollRef = useRef<ScrollView>(null);
 
@@ -172,6 +181,7 @@ export const ProductPromotionModal = ({
     if (!visible) {
       setIsInstallmentProgramOpen(false);
       setIsWholesaleOpen(false);
+      setIsRentalOpen(false);
       setIsAffiliateOpen(false);
       return;
     }
@@ -389,6 +399,7 @@ export const ProductPromotionModal = ({
         onSetAuction={onSetProductAuction}
         onSetOriginality={onSetProductOriginality}
         onSetWholesale={onSetProductWholesale}
+        onSetRental={onSetProductRental}
         onSetAffiliate={onSetProductAffiliate}
         onSetInstallment={onSetProductInstallment}
         onDelete={onDeleteProduct}
@@ -396,6 +407,7 @@ export const ProductPromotionModal = ({
         isAuctionTogglePending={isAuctionTogglePending}
         isOriginalityTogglePending={isOriginalityTogglePending}
         isWholesaleTogglePending={isWholesaleTogglePending}
+        isRentalTogglePending={isRentalTogglePending}
         isAffiliateTogglePending={isAffiliateTogglePending}
         isInstallmentTogglePending={isInstallmentTogglePending}
         isDeletePending={isDeletePending}
@@ -408,6 +420,7 @@ export const ProductPromotionModal = ({
         isRaffleParticipationPending={isRaffleParticipationPending}
         onOpenInstallmentProgram={() => setIsInstallmentProgramOpen(true)}
         onOpenWholesaleSettings={() => setIsWholesaleOpen(true)}
+        onOpenRentalSettings={() => setIsRentalOpen(true)}
         onOpenAffiliateSettings={() => setIsAffiliateOpen(true)}
         isSubmitting={isSubmitting}
       />
@@ -523,6 +536,15 @@ export const ProductPromotionModal = ({
             visible
             product={product}
             onClose={() => setIsWholesaleOpen(false)}
+            onSaved={onWholesaleSaved}
+          />
+        ) : null}
+        {isRentalOpen ? (
+          <ProductRentalManageModal
+            embedded
+            visible
+            product={product}
+            onClose={() => setIsRentalOpen(false)}
             onSaved={onWholesaleSaved}
           />
         ) : null}

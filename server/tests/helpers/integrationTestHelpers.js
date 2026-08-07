@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
 
 import { ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY } from "../../constants/orderConstants.js";
 import { SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE } from "../../constants/productConstants.js";
@@ -210,6 +211,17 @@ export const setUserRole = async (userId, role) => {
 };
 
 /**
+ * @param {string} userId
+ * @param {number} points
+ */
+export const grantLoyaltyPoints = async (userId, points) => {
+  await UserModel.findByIdAndUpdate(userId, {
+    userLoyaltyPoints: points,
+    userLoyaltyPointsReserved: 0,
+  });
+};
+
+/**
  * @param {(path: string, init?: RequestInit) => Promise<Response>} request
  * @param {string} cookie
  * @param {Record<string, unknown>} [payloadOverrides]
@@ -253,6 +265,7 @@ export const buildOrderBody = (productId, quantity = 1) => ({
   deliveryAddress: "Москва, Тверская 1",
   deliveryAddressFlat: "1",
   paymentMethod: ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
+  idempotencyKey: randomUUID(),
 });
 
 export { SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE };

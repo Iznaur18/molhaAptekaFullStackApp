@@ -4,7 +4,7 @@ import { formatApiErrorMessage } from "@/shared/lib";
 
 export const resendEmailVerification = async () => {
   try {
-    const { data } = await apiClient.post("/auth/resend-verification");
+    const { data } = await apiClient.post("/auth/resend-verification", {});
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

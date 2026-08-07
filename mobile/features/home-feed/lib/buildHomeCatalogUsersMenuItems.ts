@@ -5,9 +5,13 @@ import { HEADER_USERS_BUTTON_UI } from "@/shared/config";
 
 type MaterialIconName = ComponentProps<typeof MaterialIcons>["name"];
 
-export type HomeCatalogUsersMenuItemKey = "users" | "terms" | "faq" | "placeholder-3";
+export type HomeCatalogUsersMenuItemKey = "users" | "terms" | "faq" | "notifications";
 
-export type HomeCatalogUsersMenuItemHref = "/users" | "/legal/terms" | "/faq";
+export type HomeCatalogUsersMenuItemHref =
+  | "/users"
+  | "/legal/terms"
+  | "/faq"
+  | "/notifications";
 
 export type HomeCatalogUsersMenuItem = {
   key: HomeCatalogUsersMenuItemKey;
@@ -36,8 +40,9 @@ export const buildHomeCatalogUsersMenuItems = (): HomeCatalogUsersMenuItem[] => 
     href: "/faq",
   },
   {
-    key: "placeholder-3",
-    icon: "help-outline",
-    accessibilityLabel: HEADER_USERS_BUTTON_UI.MENU_ITEM_PLACEHOLDER_ARIA(3),
+    key: "notifications",
+    icon: "notifications",
+    accessibilityLabel: HEADER_USERS_BUTTON_UI.MENU_ITEM_NOTIFICATIONS_ARIA,
+    href: "/notifications",
   },
 ];

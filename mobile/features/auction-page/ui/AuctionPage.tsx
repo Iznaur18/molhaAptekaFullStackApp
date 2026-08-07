@@ -1,7 +1,7 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
@@ -9,10 +9,6 @@ import type {
   IncomingPriceOffer,
   MyPriceOfferBid,
 } from "@/entities/product-price-offer/api/incomingPriceOffersApi";
-import {
-  bidNeedsAttention,
-  offerNeedsAttention,
-} from "@/entities/product-price-offer/lib/auctionDashboardAttention";
 import { filterAuctionDashboard } from "@/entities/product-price-offer/lib/filterAuctionDashboard";
 import { summarizeAuctionDashboard } from "@/entities/product-price-offer/lib/summarizeAuctionDashboard";
 import {
@@ -33,7 +29,6 @@ import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMob
 import { staffBadgeQueryKeys } from "@/shared/api";
 import { AUCTION_PAGE_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
-import { mergeExpandedRowIds } from "@/shared/lib/mergeExpandedRowIds";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAuctionPageStyles } from "@/shared/theme/auctionPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
@@ -58,7 +53,6 @@ export const AuctionPage = () => {
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [viewFilter, setViewFilter] = useState("");
   const [attentionOnly, setAttentionOnly] = useState(false);
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
 
   const isUserDataConfirmed = sessionQuery.data?.user?.isUserDataConfirmed === true;
 
@@ -95,26 +89,6 @@ export const AuctionPage = () => {
     }, [isAuthorized, bidsQuery.refetch, offersQuery.refetch]),
   );
 
-  useEffect(() => {
-    if (bidsQuery.data == null && offersQuery.data == null) {
-      return;
-    }
-
-    const attentionIds: string[] = [];
-    (bidsQuery.data ?? EMPTY_BUYER_BIDS)
-      .filter(bidNeedsAttention)
-      .forEach((bid) => {
-        attentionIds.push(`bid:${bid._id}`);
-      });
-    (offersQuery.data ?? EMPTY_SELLER_OFFERS)
-      .filter(offerNeedsAttention)
-      .forEach((offer) => {
-        attentionIds.push(`offer:${offer._id}`);
-      });
-
-    setExpandedIds((prev) => mergeExpandedRowIds(prev, attentionIds));
-  }, [bidsQuery.data, offersQuery.data]);
-
   const invalidateAuctionQueues = useCallback(async () => {
     await queryClient.invalidateQueries({
       queryKey: [...staffBadgeQueryKeys.all, "user-actions"],
@@ -139,31 +113,6 @@ export const AuctionPage = () => {
     },
     [router],
   );
-
-  const toggleExpanded = useCallback((rowId: string) => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(rowId)) {
-        next.delete(rowId);
-      } else {
-        next.add(rowId);
-      }
-      return next;
-    });
-  }, []);
-
-  const expandAll = useCallback(() => {
-    setExpandedIds(
-      new Set([
-        ...buyerBids.map((bid) => `bid:${bid._id}`),
-        ...sellerOffers.map((offer) => `offer:${offer._id}`),
-      ]),
-    );
-  }, [buyerBids, sellerOffers]);
-
-  const collapseAll = useCallback(() => {
-    setExpandedIds(new Set());
-  }, []);
 
   const handleBuyerFilterClick = useCallback(() => {
     setViewFilter(AUCTION_VIEW_FILTER_BUYER);
@@ -237,18 +186,8 @@ export const AuctionPage = () => {
         onSellerFilterClick={handleSellerFilterClick}
         onAttentionFilterChange={setAttentionOnly}
       />
-      {totalVisible > 0 ? (
-        <View style={styles.listActions}>
-          <Pressable style={styles.listAction} onPress={expandAll}>
-            <Text style={styles.listActionText}>{AUCTION_PAGE_UI.EXPAND_ALL}</Text>
-          </Pressable>
-          <Pressable style={styles.listAction} onPress={collapseAll}>
-            <Text style={styles.listActionText}>{AUCTION_PAGE_UI.COLLAPSE_ALL}</Text>
-          </Pressable>
-          {attentionOnly ? (
-            <Text style={styles.filterHint}>{AUCTION_PAGE_UI.ATTENTION_FILTER_HINT}</Text>
-          ) : null}
-        </View>
+      {totalVisible > 0 && attentionOnly ? (
+        <Text style={styles.filterHint}>{AUCTION_PAGE_UI.ATTENTION_FILTER_HINT}</Text>
       ) : null}
       {totalVisible === 0 ? (
         <Text style={styles.emptyState} accessibilityRole="text">
@@ -309,13 +248,9 @@ export const AuctionPage = () => {
           }
 
           if (item.kind === "bid") {
-            const rowId = `bid:${item.bid._id}`;
             return (
               <AuctionBuyerBidRow
                 bid={item.bid}
-                collapsible
-                expanded={expandedIds.has(rowId)}
-                onExpandedChange={() => toggleExpanded(rowId)}
                 isUserDataConfirmed={isUserDataConfirmed}
                 onProductClick={handleProductClick}
                 onChanged={() => {
@@ -325,13 +260,9 @@ export const AuctionPage = () => {
             );
           }
 
-          const rowId = `offer:${item.offer._id}`;
           return (
             <AuctionSellerOfferRow
               offer={item.offer}
-              collapsible
-              expanded={expandedIds.has(rowId)}
-              onExpandedChange={() => toggleExpanded(rowId)}
               onProductClick={handleProductClick}
               onBuyerClick={handleBuyerClick}
               onChanged={() => {

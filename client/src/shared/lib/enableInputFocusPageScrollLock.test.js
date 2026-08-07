@@ -1,6 +1,9 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
-import { isPageScrollLockTextField } from "./enableInputFocusPageScrollLock.js";
+import {
+  enableInputFocusPageScrollLock,
+  isPageScrollLockTextField,
+} from "./enableInputFocusPageScrollLock.js";
 
 describe("isPageScrollLockTextField", () => {
   afterEach(() => {
@@ -56,103 +59,15 @@ describe("enableInputFocusPageScrollLock", () => {
     document.body.replaceChildren();
     document.body.style.overflow = "";
     document.documentElement.style.overflow = "";
-    vi.resetModules();
   });
 
-  it("locks body overflow while text input is focused", async () => {
-    const { enableInputFocusPageScrollLock } = await import(
-      "./enableInputFocusPageScrollLock.js"
-    );
-    const dispose = enableInputFocusPageScrollLock();
-
-    const input = document.createElement("input");
-    input.type = "text";
-    document.body.appendChild(input);
-
-    input.focus();
-    expect(document.body.style.overflow).toBe("hidden");
-    expect(document.documentElement.style.overflow).toBe("hidden");
-
-    input.blur();
-    await Promise.resolve();
-    expect(document.body.style.overflow).toBe("");
-    expect(document.documentElement.style.overflow).toBe("");
-
-    dispose();
-  });
-
-  it("prevents touchmove while text input is focused", async () => {
-    const { enableInputFocusPageScrollLock } = await import(
-      "./enableInputFocusPageScrollLock.js"
-    );
+  it("does not lock scroll while text input is focused", () => {
     const dispose = enableInputFocusPageScrollLock();
 
     const input = document.createElement("input");
     input.type = "text";
     document.body.appendChild(input);
     input.focus();
-
-    const touchEvent = new Event("touchmove", {
-      bubbles: true,
-      cancelable: true,
-    });
-    const prevented = !document.dispatchEvent(touchEvent) || touchEvent.defaultPrevented;
-    expect(prevented).toBe(true);
-
-    input.blur();
-    await Promise.resolve();
-
-    const afterBlur = new Event("touchmove", {
-      bubbles: true,
-      cancelable: true,
-    });
-    document.dispatchEvent(afterBlur);
-    expect(afterBlur.defaultPrevented).toBe(false);
-
-    dispose();
-  });
-
-  it("keeps lock when focus moves between text fields", async () => {
-    const { enableInputFocusPageScrollLock } = await import(
-      "./enableInputFocusPageScrollLock.js"
-    );
-    const dispose = enableInputFocusPageScrollLock();
-
-    const first = document.createElement("input");
-    first.type = "text";
-    const second = document.createElement("input");
-    second.type = "text";
-    document.body.append(first, second);
-
-    first.focus();
-    expect(document.body.style.overflow).toBe("hidden");
-
-    second.focus();
-    await Promise.resolve();
-    expect(document.body.style.overflow).toBe("hidden");
-
-    second.blur();
-    await Promise.resolve();
-    expect(document.body.style.overflow).toBe("");
-
-    dispose();
-  });
-
-  it("unlocks when focused login input is unmounted", async () => {
-    const { enableInputFocusPageScrollLock } = await import(
-      "./enableInputFocusPageScrollLock.js"
-    );
-    const dispose = enableInputFocusPageScrollLock();
-
-    const input = document.createElement("input");
-    input.type = "password";
-    document.body.appendChild(input);
-    input.focus();
-    expect(document.body.style.overflow).toBe("hidden");
-
-    // Simulate route change after login: focused field removed (jsdom may skip focusout).
-    input.remove();
-    document.dispatchEvent(new Event("touchstart", { bubbles: true }));
 
     expect(document.body.style.overflow).toBe("");
     expect(document.documentElement.style.overflow).toBe("");

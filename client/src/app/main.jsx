@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 
 import { isClientSentryEnabled } from "../shared/lib/clientSentryEnv.js";
 import { disableDocumentPinchZoom } from "../shared/lib/disableDocumentPinchZoom.js";
-import { enableInputFocusPageScrollLock } from "../shared/lib/enableInputFocusPageScrollLock.js";
+import { enableAndroidFocusFieldScroll } from "../shared/lib/enableAndroidFocusFieldScroll.js";
 import { enablePortraitOrientationLock } from "../shared/lib/enablePortraitOrientationLock.js";
 import { initRuntimeDesignTokens } from "../shared/theme/runtimeDesignTokens.js";
 import "../index.css";
@@ -17,7 +17,7 @@ if (isClientSentryEnabled()) {
 
 initRuntimeDesignTokens();
 disableDocumentPinchZoom();
-enableInputFocusPageScrollLock();
+enableAndroidFocusFieldScroll();
 enablePortraitOrientationLock();
 
 createRoot(document.getElementById("root")).render(

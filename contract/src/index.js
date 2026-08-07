@@ -249,10 +249,13 @@ export {
   CURATED_PRODUCT_LIST_TITLE_MAX_LENGTH,
   curatedProductListIdParamsSchema,
   curatedProductListItemParamsSchema,
+  curatedProductPreviewParamsSchema,
   createCuratedProductListBodySchema,
   patchCuratedProductListBodySchema,
   reorderCuratedProductListsBodySchema,
   addCuratedProductListItemBodySchema,
+  formatCuratedRegionLabel,
+  formatCuratedProductRegionMismatchMessage,
 } from "./curatedProductList.js";
 export { catalogFeedTileKeyParamsSchema } from "./catalogFeedTile.js";
 export {
@@ -348,6 +351,19 @@ export {
   productWholesalePriceFieldSchema,
   productWholesalePatchFieldsShape,
 } from "./productWholesale.js";
+export {
+  PRODUCT_RENTAL_PRICE_RUB_MAX,
+  PRODUCT_RENTAL_PRICE_UNIT_HOUR,
+  PRODUCT_RENTAL_PRICE_UNIT_DAY,
+  PRODUCT_RENTAL_PRICE_UNIT_VALUES,
+  PRODUCT_RENTAL_PRICE_UNIT_DEFAULT,
+  PRODUCT_RENTAL_CONFIG_REQUIRED_MESSAGE,
+  PRODUCT_RENTAL_PRICE_REQUIRED_MESSAGE,
+  PRODUCT_RENTAL_UNIT_INVALID_MESSAGE,
+  productRentalPriceUnitSchema,
+  productRentalPriceRubFieldSchema,
+  productRentalPatchFieldsShape,
+} from "./productRental.js";
 export {
   PRODUCT_CATALOG_SORT_VALUES,
   PRODUCT_CATALOG_NEAR_RADIUS_KM,

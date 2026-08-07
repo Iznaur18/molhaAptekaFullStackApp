@@ -96,6 +96,7 @@ import { listStaffAuditLogController } from "./Audit/staffAuditControllers.js";
 import {
   getHomeCuratedProductListsController,
   listCuratedProductListsAdminController,
+  previewCuratedListProductAdminController,
   createCuratedProductListAdminController,
   reorderCuratedProductListsAdminController,
   patchCuratedProductListAdminController,
@@ -324,6 +325,7 @@ export {
   deleteProductSearchSynonymAdminController,
   getHomeCuratedProductListsController,
   listCuratedProductListsAdminController,
+  previewCuratedListProductAdminController,
   createCuratedProductListAdminController,
   reorderCuratedProductListsAdminController,
   patchCuratedProductListAdminController,

@@ -7,6 +7,8 @@ import {
   PROFILE_MANAGEMENT_SECTION_ORDER,
   PROFILE_SECTION_CREATE_RAFFLE,
   PROFILE_SECTION_PRODUCT_MODERATION,
+  PROFILE_SECTION_RAFFLES,
+  PROFILE_SECTION_SELLER_PERSONAL_CATEGORY_MODERATION,
   PROFILE_SECTION_WEB_PATH,
   PROFILE_STAFF_IN_APP_SECTION_IDS,
   PROFILE_STAFF_SECTION_ORDER,
@@ -18,7 +20,7 @@ const PROFILE_STAFF_AND_MANAGEMENT_SECTION_ORDER = [
   ...PROFILE_MANAGEMENT_SECTION_ORDER,
 ];
 
-test("profile staff: all staff sections open in-app on mobile", () => {
+test("profile staff: in-app staff/management sections open in-app on mobile", () => {
   for (const sectionId of PROFILE_STAFF_AND_MANAGEMENT_SECTION_ORDER) {
     assert.ok(
       isProfileStaffInAppSection(sectionId),
@@ -35,26 +37,38 @@ test("profile staff: all staff sections open in-app on mobile", () => {
     PROFILE_STAFF_IN_APP_SECTION_IDS.length,
     PROFILE_STAFF_AND_MANAGEMENT_SECTION_ORDER.length,
   );
-  assert.deepEqual(PROFILE_STAFF_WEB_ONLY_SECTION_IDS, []);
 });
 
 test("profile staff web paths: web-only staff sections have SPA path", () => {
-  const expectedWebOnly = PROFILE_STAFF_AND_MANAGEMENT_SECTION_ORDER.filter(
-    (sectionId) => !PROFILE_STAFF_IN_APP_SECTION_IDS.includes(sectionId),
-  );
-  const missing = expectedWebOnly.filter(
-    (sectionId) => !(sectionId in PROFILE_SECTION_WEB_PATH),
+  // G.1: staff sections without an in-app screen fall back to the web SPA.
+  // Web-only = entries in PROFILE_SECTION_WEB_PATH that are not in the in-app order.
+  const inAppIds = new Set(PROFILE_STAFF_AND_MANAGEMENT_SECTION_ORDER);
+  const expectedWebOnly = Object.keys(PROFILE_SECTION_WEB_PATH).filter(
+    (sectionId) => !inAppIds.has(sectionId),
   );
 
+  // Locks the intended web-only inventory: catches a section accidentally
+  // dropped from (or added to) the in-app order arrays.
   assert.deepEqual(
-    missing,
-    [],
-    `missing PROFILE_SECTION_WEB_PATH for: ${missing.join(", ")}`,
+    [...PROFILE_STAFF_WEB_ONLY_SECTION_IDS].sort(),
+    [
+      PROFILE_SECTION_RAFFLES,
+      PROFILE_SECTION_SELLER_PERSONAL_CATEGORY_MODERATION,
+    ].sort(),
   );
-  assert.equal(
-    PROFILE_STAFF_WEB_ONLY_SECTION_IDS.length,
-    expectedWebOnly.length,
+  assert.deepEqual(
+    [...PROFILE_STAFF_WEB_ONLY_SECTION_IDS].sort(),
+    [...expectedWebOnly].sort(),
   );
+
+  for (const sectionId of PROFILE_STAFF_WEB_ONLY_SECTION_IDS) {
+    assert.ok(
+      sectionId in PROFILE_SECTION_WEB_PATH,
+      `missing PROFILE_SECTION_WEB_PATH for: ${sectionId}`,
+    );
+    assert.equal(isProfileStaffInAppSection(sectionId), false);
+    assert.equal(isProfileStaffWebOnlySection(sectionId), true);
+  }
 });
 
 test("profile staff web paths: product-moderation stays in-app", () => {

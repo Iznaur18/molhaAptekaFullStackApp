@@ -40,6 +40,7 @@ export const useHomeProductActions = ({
   setTogglingQaProductId,
   setTogglingOriginalityProductId,
   setTogglingWholesaleProductId,
+  setTogglingRentalProductId,
   setTogglingAffiliateProductId,
   setTogglingInstallmentProductId,
   setMyProductsCatalogError,
@@ -345,6 +346,38 @@ export const useHomeProductActions = ({
     ],
   );
 
+  const handleSetProductRental = useCallback(
+    async (productId, rentalEnabled) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return;
+      }
+      setTogglingRentalProductId(normalizedProductId);
+      setProductDetailsAdminError("");
+      try {
+        const updated = await patchMutation.mutateAsync({
+          productId: normalizedProductId,
+          body: { productRentalEnabled: rentalEnabled },
+        });
+        syncCatalogProductState(updated);
+        syncProductEditModalState(updated);
+      } catch (e) {
+        setProductDetailsAdminError(
+          e instanceof Error ? e.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+      } finally {
+        setTogglingRentalProductId(null);
+      }
+    },
+    [
+      patchMutation,
+      setProductDetailsAdminError,
+      setTogglingRentalProductId,
+      syncCatalogProductState,
+      syncProductEditModalState,
+    ],
+  );
+
   const handleSetProductAffiliate = useCallback(
     async (productId, affiliateEnabled, productHint) => {
       const normalizedProductId = String(productId ?? "").trim();
@@ -560,6 +593,7 @@ export const useHomeProductActions = ({
         setMyProductsCatalogNotice(message ?? "Продвижение активировано.");
         void refreshCatalogFeed();
         handleClosePromotionModal();
+        goToMainView("my-products");
       } catch (e) {
         setPromotionModalError(
           e instanceof Error
@@ -571,6 +605,7 @@ export const useHomeProductActions = ({
       }
     },
     [
+      goToMainView,
       handleClosePromotionModal,
       promotionProduct,
       refreshCatalogFeed,
@@ -629,6 +664,7 @@ export const useHomeProductActions = ({
     handleSetProductQa,
     handleSetProductOriginality,
     handleSetProductWholesale,
+    handleSetProductRental,
     handleSetProductAffiliate,
     handleWholesaleSaved,
     handleSetProductInstallment,

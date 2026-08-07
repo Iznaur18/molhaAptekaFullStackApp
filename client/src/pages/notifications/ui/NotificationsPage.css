@@ -33,12 +33,6 @@
   cursor: not-allowed;
 }
 
-.notifications-page__error {
-  margin: 0 0 0.75rem;
-  color: var(--iz-color-danger);
-  font-size: 0.875rem;
-}
-
 .notifications-page__empty {
   margin: 0;
   color: var(--iz-color-text-muted);

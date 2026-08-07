@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { after, afterEach, before, test } from "node:test";
 
 import { ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY } from "../constants/orderConstants.js";
+import { RAFFLE_CREATE_PRICE_POINTS } from "../constants/raffleConstants.js";
 import { startHttpTestServer, stopHttpTestServer } from "./helpers/httpTestApp.js";
 import {
   approveProductViaApi,
@@ -9,6 +10,7 @@ import {
   createProductViaApi,
   enablePremiumUser,
   ensureProductCategoryTreeSeeded,
+  grantLoyaltyPoints,
   parseSuccessData,
   registerUserAndGetCookie,
   setUserRole,
@@ -32,6 +34,7 @@ const buildRaffleBody = () => ({
   prizeImageUrl: "https://example.com/prize.jpg",
   targetSales: 10,
   instagramUrl: "https://www.instagram.com/example/",
+  regionCode: "RU-MOW",
 });
 
 const buildInstallmentProgramBody = () => ({
@@ -182,6 +185,14 @@ test("raffle smoke: featured → create → approve → my", async () => {
   assert.equal(blocked.status, 403);
 
   await confirmUserData(seller._id);
+
+  // Создание розыгрыша платное: продавец резервирует баллы через /raffles/unlock-create.
+  await grantLoyaltyPoints(seller._id, RAFFLE_CREATE_PRICE_POINTS);
+  const unlockResponse = await request("/product/raffles/unlock-create", {
+    method: "POST",
+    headers: { Cookie: sellerCookie },
+  });
+  assert.equal(unlockResponse.status, 200);
 
   const createResponse = await request("/product/raffles", {
     method: "POST",

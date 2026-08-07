@@ -139,6 +139,11 @@
   max-width: 8rem;
 }
 
+.installment-buyer-block__qty-hint {
+  font-size: 0.78rem;
+  color: var(--iz-color-text-muted);
+}
+
 .installment-buyer-block__field {
   display: flex;
   flex-direction: column;

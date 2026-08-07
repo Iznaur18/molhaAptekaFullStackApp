@@ -119,5 +119,8 @@ test("HomeCatalogUsersButton opens stretch menu from circle", () => {
   assert.match(items, /href: "\/faq"/);
   assert.match(items, /icon: "quiz"/);
   assert.match(items, /MENU_ITEM_FAQ_ARIA/);
-  assert.match(items, /help-outline/);
+  assert.match(items, /key: "notifications"/);
+  assert.match(items, /href: "\/notifications"/);
+  assert.match(items, /icon: "notifications"/);
+  assert.match(items, /MENU_ITEM_NOTIFICATIONS_ARIA/);
 });

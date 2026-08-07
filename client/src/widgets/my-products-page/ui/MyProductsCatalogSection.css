@@ -15,16 +15,6 @@
   font-size: 14px;
 }
 
-.my-products-catalog-section__error {
-  margin: 0;
-  padding: 10px 12px;
-  border-radius: 10px;
-  corner-shape: squircle;
-  background: var(--iz-color-danger-surface);
-  color: var(--iz-color-danger);
-  font-size: 14px;
-}
-
 .my-products-catalog-section__empty {
   display: flex;
   flex-direction: column;
@@ -71,6 +61,14 @@
 .my-products-catalog-section__load-more-error {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 8px;
+}
+
+.my-products-catalog-section__load-more-error .inline-error-banner {
+  margin-bottom: 0;
+}
+
+.my-products-catalog-section__load-more-error .app-btn {
+  align-self: center;
 }

@@ -1,4 +1,5 @@
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { InlineErrorBanner } from "../../../shared/ui/InlineErrorBanner/InlineErrorBanner.jsx";
 import { isSellerProductLoyaltyPointsOvercommitted } from "../../../entities/product/lib/isSellerProductLoyaltyPointsOvercommitted.js";
 import { MyProductCatalogCard } from "../../../entities/product/ui/MyProductCatalogCard.jsx";
 import { CatalogGridSkeleton } from "../../catalog-product-grid/ui/CatalogGridSkeleton.jsx";
@@ -59,11 +60,7 @@ export function MyProductsCatalogSection({
     catalogStatus.kind === "loading" && products.length === 0;
 
   if (catalogStatus.kind === "error") {
-    return (
-      <p className="app-shell__state app-shell__state_error" role="alert">
-        {catalogStatus.message}
-      </p>
-    );
+    return <InlineErrorBanner>{catalogStatus.message}</InlineErrorBanner>;
   }
 
   if (isCatalogInitialLoading) {
@@ -90,9 +87,7 @@ export function MyProductsCatalogSection({
         </p>
       ) : null}
       {myProductsCatalogError ? (
-        <p className="my-products-catalog-section__error" role="alert">
-          {myProductsCatalogError}
-        </p>
+        <InlineErrorBanner>{myProductsCatalogError}</InlineErrorBanner>
       ) : null}
 
       {products.length === 0 ? (
@@ -150,7 +145,7 @@ export function MyProductsCatalogSection({
 
       {catalogLoadMoreError ? (
         <div className="my-products-catalog-section__load-more-error">
-          <p role="alert">{catalogLoadMoreError}</p>
+          <InlineErrorBanner>{catalogLoadMoreError}</InlineErrorBanner>
           <button type="button" className="app-btn app-btn--ghost" onClick={onRetryCatalogLoadMore}>
             {HOME_PAGE_UI.CATALOG_LOAD_MORE_RETRY}
           </button>

@@ -52,6 +52,7 @@ describe("validateEditProductWizardStep", () => {
           productStockQuantity: "2",
           productImageRows: [{ id: "1", url: "/uploads/product.jpg" }],
           productCategory: "home_garden",
+          productCategoryId: "507f1f77bcf86cd799439011",
           productRegionCode: "RU-CE",
           productReturnEnabled: false,
           productPickupAddress: "Москва, Тверская улица, 1",

@@ -1,2 +1,7 @@
 /** SSOT: `contract/src/productReport.js`. */
-export { PRODUCT_REPORT_TEXT_MAX_CHARS } from "@molha/api-contract";
+export {
+  PRODUCT_REPORT_TEXT_MAX_CHARS,
+  PRODUCT_REPORT_RESOLUTION_DISMISS,
+  PRODUCT_REPORT_RESOLUTION_HIDE,
+  PRODUCT_REPORT_RESOLUTION_REJECT,
+} from "@molha/api-contract";

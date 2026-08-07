@@ -130,6 +130,20 @@ test("curated lists: admin CRUD, duplicate reject, reorder requires full set", a
   );
   assert.equal(addResponse.status, 200);
 
+  const previewResponse = await request(
+    `/product/admin/curated-lists/product-preview/${productIds.moscow}`,
+    {
+      method: "GET",
+      headers: { Cookie: adminCookie },
+    },
+  );
+  assert.equal(previewResponse.status, 200);
+  const previewData = await parseSuccessData(previewResponse);
+  assert.equal(previewData.preview.productId, productIds.moscow);
+  assert.equal(previewData.preview.productRegionCode, "RU-MOW");
+  assert.equal(previewData.preview.catalogVisible, true);
+  assert.ok(String(previewData.preview.regionLabel ?? "").length > 0);
+
   const wrongRegionResponse = await request(
     `/product/admin/curated-lists/${list._id}/products`,
     {
@@ -142,7 +156,10 @@ test("curated lists: admin CRUD, duplicate reject, reorder requires full set", a
     },
   );
   assert.equal(wrongRegionResponse.status, 400);
-  assert.match(await parseErrorMessage(wrongRegionResponse), /регион/i);
+  assert.match(
+    await parseErrorMessage(wrongRegionResponse),
+    /Регион товара \(.+\) не совпадает с регионом подборки \(.+\)/,
+  );
 
   const duplicateResponse = await request(
     `/product/admin/curated-lists/${list._id}/products`,

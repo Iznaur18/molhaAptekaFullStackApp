@@ -360,8 +360,6 @@ export const AUCTION_PAGE_UI = {
   OVERVIEW_BUYER_BIDS: "Мои ставки",
   OVERVIEW_INCOMING: "Входящие",
   OVERVIEW_ATTENTION: "Нужно действие",
-  EXPAND_ALL: "Развернуть все",
-  COLLAPSE_ALL: "Свернуть все",
   REFRESH: "Обновить",
   ATTENTION_FILTER_HINT: "Показаны ставки, где нужно ваше действие",
   /** @param {string} price */
@@ -611,6 +609,7 @@ export const HEADER_USERS_BUTTON_UI = {
   MENU_ITEM_USERS_ARIA: "Пользователи",
   MENU_ITEM_TERMS_ARIA: "Пользовательское соглашение",
   MENU_ITEM_FAQ_ARIA: "Частые вопросы",
+  MENU_ITEM_NOTIFICATIONS_ARIA: "Уведомления",
   MENU_ITEM_PLACEHOLDER_ARIA: (index) => `Пункт ${index} (скоро)`,
 };
 
@@ -844,8 +843,6 @@ export const MY_ORDERS_PAGE_UI = {
   OVERVIEW_IN_PROGRESS: "В работе",
   OVERVIEW_ATTENTION: "Нужно действие",
   OVERVIEW_TOTAL: "Сумма покупок",
-  EXPAND_ALL: "Развернуть все",
-  COLLAPSE_ALL: "Свернуть все",
   REFRESH: "Обновить",
   ATTENTION_FILTER_HINT: "Показаны заказы, где нужно ваше действие",
   COLLAPSED_CONFIRM: "Подтвердите получение",
@@ -1381,14 +1378,10 @@ export const MY_SALES_PAGE_UI = {
   OVERVIEW_IN_PROGRESS: "В работе",
   OVERVIEW_ATTENTION: "Нужно действие",
   OVERVIEW_TOTAL: "Сумма продаж",
-  EXPAND_ALL: "Развернуть все",
-  COLLAPSE_ALL: "Свернуть все",
   REFRESH: "Обновить",
   ATTENTION_FILTER_HINT: "Показаны продажи, где нужно отметить отправку или доставку",
   COLLAPSED_SHIP: "Отметьте отправку",
   COLLAPSED_DELIVER: "Отметьте доставку",
-  /** @param {boolean} expanded */
-  EXPAND_TOGGLE: (expanded) => (expanded ? "Свернуть" : "Развернуть"),
   LOADING: "Загрузка продаж…",
   EMPTY: "У вас пока нет продаж.",
   EMPTY_BY_FILTER: "По выбранному статусу продаж нет.",
@@ -1671,6 +1664,21 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WHOLESALE_MODAL_ERROR_MIN_QTY: "Минимум 2 шт.",
   WHOLESALE_MODAL_ERROR_PRICE: "Оптовая цена должна быть меньше обычной",
   WHOLESALE_TOGGLE_PENDING: "Обновляем опт…",
+  MANAGE_RENTAL_TITLE: "Аренда / Прокат",
+  MANAGE_RENTAL_HINT: "Покупатели увидят, что товар можно взять в аренду",
+  MANAGE_RENTAL_PENDING: "Сохраняем аренду…",
+  RENTAL_TOGGLE_PENDING: "Обновляем аренду…",
+  RENTAL_MODAL_TITLE: "Аренда / Прокат",
+  RENTAL_MODAL_HINT: "Укажите цену аренды и единицу. Дальше настройки добавим отдельно.",
+  RENTAL_MODAL_PRICE_LABEL: "Цена аренды, ₽",
+  RENTAL_MODAL_UNIT_LABEL: "Единица цены",
+  RENTAL_MODAL_UNIT_DAY: "Сутки",
+  RENTAL_MODAL_UNIT_DAY_HINT: "₽ / день",
+  RENTAL_MODAL_UNIT_HOUR: "Час",
+  RENTAL_MODAL_UNIT_HOUR_HINT: "₽ / час",
+  RENTAL_MODAL_SAVE: "Сохранить",
+  RENTAL_MODAL_CLOSE: "Закрыть",
+  RENTAL_MODAL_ERROR_REQUIRED: "Укажите цену аренды и единицу",
   MANAGE_AFFILIATE_TITLE: "Партнёрская услуга",
   MANAGE_AFFILIATE_HINT:
     "Пользователи делятся ссылкой и получают % с покупки",
@@ -2005,6 +2013,17 @@ export const PRODUCT_CARD_UI = {
   INSTALLMENT_SELL_BUTTON: "Продать в рассрочку",
 };
 
+/** Аренда (бейдж / feature-card деталей) */
+export const PRODUCT_RENTAL_UI = {
+  DETAILS_BADGE: "Аренда",
+  DETAILS_TEASER_TITLE: "Аренда",
+  /** @param {string} priceLabel */
+  DETAILS_TEASER_PRICE_DAY: (priceLabel) => `${priceLabel} / сутки`,
+  /** @param {string} priceLabel */
+  DETAILS_TEASER_PRICE_HOUR: (priceLabel) => `${priceLabel} / час`,
+  DETAILS_TEASER_ARIA: "Подробнее об аренде",
+};
+
 /** Оптовая цена (карточка / детали) */
 export const PRODUCT_WHOLESALE_UI = {
   DETAILS_OFFER_KICKER: "Оптовая цена",
@@ -2045,6 +2064,10 @@ export const INSTALLMENT_UI = {
   PLANS_LABEL: "План рассрочки",
   FIRST_PAYMENT_LATER: "первый платёж позже",
   QUANTITY_LABEL: "Количество",
+  /** @param {number} max */
+  QUANTITY_AVAILABLE: (max) => `Доступно: ${max}`,
+  /** @param {number} max */
+  QUANTITY_EXCEEDS_STOCK: (max) => `В наличии только ${max} шт.`,
   MONTHLY_LABEL: "Ежемесячно",
   TOTAL_LABEL: "Итого по договору",
   PAYMENT_METHOD_LABEL: "Способ оплаты",
@@ -3027,6 +3050,11 @@ export const POPULAR_PRODUCTS_ADMIN_PAGE_UI = {
   EMPTY_LIST: "В списке пока нет товаров",
   MOVE_UP_ARIA: "Поднять список",
   MOVE_DOWN_ARIA: "Опустить список",
+  PREVIEW_LOADING: "Загрузка товара…",
+  PREVIEW_NAME_LABEL: "Товар",
+  PREVIEW_REGION_LABEL: "Регион товара",
+  PREVIEW_NOT_VISIBLE: "Товар недоступен в каталоге — добавить нельзя",
+  PREVIEW_OK: "Можно добавить в эту подборку",
 };
 
 /** Админка: журнал действий сотрудников (audit log) */
@@ -3235,6 +3263,9 @@ export const PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN_UI = {
 /** Описания бейджей в деталях товара (CMS + sheet). */
 export const PRODUCT_BADGE_EXPLAIN_UI = {
   CLOSE: "Понятно",
+  CONTACT: "Связаться",
+  CONTACT_PENDING: "Загрузка…",
+  CONTACT_ERROR: "Не удалось показать номер",
   ARIA_DIALOG: "Описание бейджа",
   FALLBACK: {
     original:
@@ -3266,6 +3297,8 @@ export const PRODUCT_BADGE_EXPLAIN_UI = {
       "Товар можно купить в рассрочку у продавца. Условия и оформление — во вкладке «Рассрочка».",
     wholesale:
       "При покупке от указанного количества действует оптовая цена за единицу. Подробности — в блоке оптовой цены на этой странице.",
+    rental:
+      "Товар можно взять в аренду у продавца. Цена и единица (сутки или час) задаются продавцом. Условия выдачи и возврата уточняйте у продавца.",
     near_distance:
       "Примерное расстояние до пункта самовывоза продавца относительно вашего местоположения. Точность зависит от геолокации.",
   },
@@ -3301,10 +3334,12 @@ export const PRODUCT_BADGE_EXPLAIN_ADMIN_UI = {
   HINT_AUCTION: "Бейдж «Аукцион» в деталях товара.",
   HINT_INSTALLMENT: "Бейдж «Рассрочка» в деталях товара.",
   HINT_WHOLESALE: "Бейдж «Оптовая цена» в деталях товара.",
+  HINT_RENTAL: "Бейдж «Аренда» в деталях товара.",
   HINT_NEAR_DISTANCE: "Бейдж расстояния «~км» в деталях товара.",
   TITLE_AUCTION: "Аукцион",
   TITLE_INSTALLMENT: "Рассрочка",
   TITLE_WHOLESALE: "Оптовая цена",
+  TITLE_RENTAL: "Аренда",
   TITLE_NEAR_DISTANCE: "Расстояние",
 };
 

@@ -24,6 +24,7 @@ export const usePopularProductsAdminPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
+  const [newRegionCode, setNewRegionCode] = useState(DEFAULT_VIEWER_REGION_CODE);
   const [actionError, setActionError] = useState("");
   const [pendingListId, setPendingListId] = useState<string | null>(null);
 
@@ -55,6 +56,9 @@ export const usePopularProductsAdminPage = () => {
     return lists.filter(
       (list) =>
         list.title.toLowerCase().includes(query) ||
+        String(list.regionCode ?? "")
+          .toLowerCase()
+          .includes(query) ||
         list.productIds.some((productId) => productId.toLowerCase().includes(query)),
     );
   }, [lists, searchQuery]);
@@ -90,14 +94,19 @@ export const usePopularProductsAdminPage = () => {
       setActionError(POPULAR_PRODUCTS_ADMIN_PAGE_UI.TITLE_REQUIRED);
       return;
     }
+    if (!newRegionCode) {
+      setActionError(POPULAR_PRODUCTS_ADMIN_PAGE_UI.REGION_REQUIRED);
+      return;
+    }
 
     try {
       const created = await createMutation.mutateAsync({
         title,
-        regionCode: DEFAULT_VIEWER_REGION_CODE,
+        regionCode: newRegionCode,
       });
       updateListsCache((rows) => [...rows, created]);
       setNewTitle("");
+      setNewRegionCode(DEFAULT_VIEWER_REGION_CODE);
       setIsCreateOpen(false);
       await invalidateCuratedProductLists(queryClient);
     } catch (error) {
@@ -105,7 +114,7 @@ export const usePopularProductsAdminPage = () => {
         error instanceof Error ? error.message : POPULAR_PRODUCTS_ADMIN_PAGE_UI.CREATE_ERROR,
       );
     }
-  }, [createMutation, newTitle, queryClient, updateListsCache]);
+  }, [createMutation, newRegionCode, newTitle, queryClient, updateListsCache]);
 
   const handleMoveList = useCallback(
     async (listId: string, direction: "up" | "down") => {
@@ -159,13 +168,16 @@ export const usePopularProductsAdminPage = () => {
     [deleteMutation, queryClient, updateListsCache],
   );
 
-  const handleSaveTitle = useCallback(
-    async (listId: string, title: string) => {
+  const handleSaveList = useCallback(
+    async (listId: string, payload: { title: string; regionCode: string }) => {
       setPendingListId(listId);
       try {
         const updated = await patchMutation.mutateAsync({
           listId,
-          body: { title: title.trim() },
+          body: {
+            title: payload.title.trim(),
+            regionCode: payload.regionCode,
+          },
         });
         updateListsCache((rows) => rows.map((list) => (list._id === listId ? updated : list)));
         await invalidateCuratedProductLists(queryClient);
@@ -204,8 +216,7 @@ export const usePopularProductsAdminPage = () => {
     [queryClient, removeItemMutation, updateListsCache],
   );
 
-  const displayError =
-    phase === "error" ? queryError : actionError;
+  const displayError = phase === "error" ? queryError : actionError;
 
   return {
     lists,
@@ -218,6 +229,8 @@ export const usePopularProductsAdminPage = () => {
     setIsCreateOpen,
     newTitle,
     setNewTitle,
+    newRegionCode,
+    setNewRegionCode,
     displayError,
     pendingListId,
     isBusy,
@@ -225,7 +238,7 @@ export const usePopularProductsAdminPage = () => {
     handleCreateList,
     handleMoveList,
     handleDeleteList,
-    handleSaveTitle,
+    handleSaveList,
     handleAddProduct,
     handleRemoveProduct,
     reloadLists,

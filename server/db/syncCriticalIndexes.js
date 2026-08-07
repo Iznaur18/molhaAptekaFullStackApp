@@ -3,6 +3,7 @@ import {
   AffiliateLedgerEntryModel,
   MoneyIdempotencyRecordModel,
   PendingRegistrationModel,
+  ProductPriceOfferModel,
   ReferralLedgerEntryModel,
   UserModel,
 } from "../models/index.js";
@@ -36,4 +37,5 @@ export async function syncCriticalIndexes() {
   await syncModelIndexes(PendingRegistrationModel, "PendingRegistration");
   await syncModelIndexes(MoneyIdempotencyRecordModel, "MoneyIdempotencyRecord");
   await syncModelIndexes(AffiliateLedgerEntryModel, "AffiliateLedgerEntry");
+  await syncModelIndexes(ProductPriceOfferModel, "ProductPriceOffer");
 }

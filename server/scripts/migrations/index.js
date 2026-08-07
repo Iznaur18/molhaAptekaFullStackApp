@@ -32,6 +32,8 @@ import { up as curatedListRegionCodeUp } from "./20260728-curated-list-region-co
 import { up as partnerBalanceToLoyaltyUp } from "./20260801-partner-balance-to-loyalty.js";
 import { up as productPickupLocationUp } from "./20260803-product-pickup-location.js";
 import { up as productRegionFromPickupGeoUp } from "./20260804-product-region-from-pickup-geo.js";
+import { up as productRentalManageUp } from "./20260806-product-rental-manage.js";
+import { up as priceOfferAcceptedAwaitingPaymentIndexUp } from "./20260808-price-offer-accepted-awaiting-payment-index.js";
 
 export const MIGRATIONS = [
   {
@@ -206,5 +208,17 @@ export const MIGRATIONS = [
     description:
       "Derive productRegionCode from pickup lat/lon via DaData geolocate",
     up: productRegionFromPickupGeoUp,
+  },
+  {
+    id: "20260806-product-rental-manage",
+    description:
+      "Backfill productRentalEnabled / productRentalPriceRub / productRentalPriceUnit",
+    up: productRentalManageUp,
+  },
+  {
+    id: "20260808-price-offer-accepted-awaiting-payment-index",
+    description:
+      "Partial unique accepted price-offer only while orderId is null (awaiting payment)",
+    up: priceOfferAcceptedAwaitingPaymentIndexUp,
   },
 ];

@@ -132,7 +132,7 @@ export function ProductPriceOfferBuyerBlock({
     !isOwnProduct &&
     isAuthorized &&
     isUserDataConfirmed &&
-    myOffer?.status !== PRICE_OFFER_STATUS_ACCEPTED;
+    !(myOffer?.status === PRICE_OFFER_STATUS_ACCEPTED && !hasLinkedOrder);
 
   const handleGoToCart = () => {
     onCloseModal?.();

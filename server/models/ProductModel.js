@@ -348,6 +348,21 @@ const ProductSchema = new Schema(
       default: null,
       min: 1,
     },
+    /** Аренда / прокат: тумблер в управлении (продажа не блокируется). */
+    productRentalEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    productRentalPriceRub: {
+      type: Number,
+      default: null,
+      min: 1,
+    },
+    productRentalPriceUnit: {
+      type: String,
+      enum: ["hour", "day"],
+      default: "day",
+    },
     loyaltyPointsPerUnit: {
       type: Number,
       default: 0,

@@ -3,6 +3,7 @@ import {
   createCuratedProductListBodySchema,
   curatedProductListIdParamsSchema,
   curatedProductListItemParamsSchema,
+  curatedProductPreviewParamsSchema,
   patchCuratedProductListBodySchema,
   reorderCuratedProductListsBodySchema,
 } from "@molha/api-contract";
@@ -16,6 +17,10 @@ export const curatedProductListIdParamValidation = [
 
 export const curatedProductListProductIdParamValidation = [
   validateParamsZod(curatedProductListItemParamsSchema),
+];
+
+export const curatedProductPreviewParamValidation = [
+  validateParamsZod(curatedProductPreviewParamsSchema),
 ];
 
 export const createCuratedProductListValidation = [

@@ -43,6 +43,7 @@ export const useMyProductsPageActions = () => {
   const [togglingWholesaleProductId, setTogglingWholesaleProductId] = useState<string | null>(
     null,
   );
+  const [togglingRentalProductId, setTogglingRentalProductId] = useState<string | null>(null);
   const [togglingAffiliateProductId, setTogglingAffiliateProductId] = useState<string | null>(
     null,
   );
@@ -227,6 +228,32 @@ export const useMyProductsPageActions = () => {
     [patchMutation, syncPromotionProduct],
   );
 
+  const handleSetProductRental = useCallback(
+    async (productId: string, rentalEnabled: boolean) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return;
+      }
+
+      setTogglingRentalProductId(normalizedProductId);
+      setManageErrorMessage("");
+      try {
+        const updated = await patchMutation.mutateAsync({
+          productId: normalizedProductId,
+          body: { productRentalEnabled: rentalEnabled },
+        });
+        syncPromotionProduct(updated as MyProductsCatalogProduct);
+      } catch (error) {
+        setManageErrorMessage(
+          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+      } finally {
+        setTogglingRentalProductId(null);
+      }
+    },
+    [patchMutation, syncPromotionProduct],
+  );
+
   const handleSetProductAffiliate = useCallback(
     async (
       productId: string,
@@ -364,6 +391,8 @@ export const useMyProductsPageActions = () => {
       promotionProductId != null && togglingOriginalityProductId === promotionProductId,
     isWholesaleTogglePending:
       promotionProductId != null && togglingWholesaleProductId === promotionProductId,
+    isRentalTogglePending:
+      promotionProductId != null && togglingRentalProductId === promotionProductId,
     isAffiliateTogglePending:
       promotionProductId != null && togglingAffiliateProductId === promotionProductId,
     isInstallmentTogglePending:
@@ -377,6 +406,7 @@ export const useMyProductsPageActions = () => {
     handleSetProductAuction,
     handleSetProductOriginality,
     handleSetProductWholesale,
+    handleSetProductRental,
     handleSetProductAffiliate,
     handleSetProductInstallment,
     handleWholesaleSaved,

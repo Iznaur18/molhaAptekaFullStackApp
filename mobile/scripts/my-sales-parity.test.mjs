@@ -20,15 +20,14 @@ test("my sales page mirrors web toolbar, search and seller order card", () => {
   assert.match(page, /MySalesPageOverview/);
   assert.match(page, /filterMySales/);
   assert.match(page, /summarizeMySales/);
-  assert.match(page, /expandedIds/);
-  assert.match(page, /EXPAND_ALL/);
+  assert.doesNotMatch(page, /EXPAND_ALL/);
+  assert.doesNotMatch(page, /collapsible/);
   assert.match(page, /COUNT_FILTERED/);
   assert.match(page, /ListHeaderComponent/);
   assert.match(page, /useDebouncedValue/);
   assert.match(page, /normalizeTotalSalesCount/);
   assert.match(page, /contentPaddingBottom/);
   assert.match(page, /compact/);
-  assert.match(page, /collapsible/);
   assert.match(page, /attentionRole="seller"/);
   assert.match(page, /showBuyer/);
   assert.match(page, /onBuyerNameClick/);
@@ -36,6 +35,7 @@ test("my sales page mirrors web toolbar, search and seller order card", () => {
   assert.match(page, /ORDER_CARD_UI\.CANCEL_CONFIRM/);
   assert.match(page, /salesActionCount/);
   assert.match(page, /EMPTY_BY_SEARCH/);
+  assert.match(page, /ATTENTION_FILTER_HINT/);
 
   assert.match(toolbar, /MY_SALES_PAGE_UI\.TITLE/);
   assert.match(toolbar, /summaryCountLabel/);
@@ -69,10 +69,13 @@ test("my sales query passes status and search filters", () => {
 
 test("my sales page ui copy matches web sales dashboard", () => {
   const copy = readMobileFile("shared/config/appUiCopy.ts");
+  const salesUi = copy.match(/export const MY_SALES_PAGE_UI = \{[\s\S]*?\n\} as const;/);
 
-  assert.match(copy, /TITLE: "Мои продажи"/);
-  assert.match(copy, /COUNT_FILTERED:/);
-  assert.match(copy, /EXPAND_ALL: "Развернуть все"/);
-  assert.match(copy, /OVERVIEW_ATTENTION: "Нужно действие"/);
-  assert.match(copy, /COLLAPSED_SHIP: "Отметьте отправку"/);
+  assert.ok(salesUi);
+  assert.match(salesUi[0], /TITLE: "Мои продажи"/);
+  assert.match(salesUi[0], /COUNT_FILTERED:/);
+  assert.doesNotMatch(salesUi[0], /EXPAND_ALL/);
+  assert.doesNotMatch(salesUi[0], /COLLAPSE_ALL/);
+  assert.match(salesUi[0], /OVERVIEW_ATTENTION: "Нужно действие"/);
+  assert.match(salesUi[0], /COLLAPSED_SHIP: "Отметьте отправку"/);
 });

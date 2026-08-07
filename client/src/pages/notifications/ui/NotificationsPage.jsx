@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { formatApiErrorMessage } from "@izibuy/shared-lib";
 
 import { useMarkInAppNotificationsReadMutation } from "../../../entities/user/model/useMarkInAppNotificationsReadMutation.js";
 import {
   API_CLIENT_UI,
   NOTIFICATIONS_PAGE_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { InlineErrorBanner } from "../../../shared/ui/InlineErrorBanner/InlineErrorBanner.jsx";
 
 import "./NotificationsPage.css";
 
@@ -29,7 +31,7 @@ export function NotificationsPage({ notifications, onNotificationClick, onCleare
       onCleared();
     } catch (e) {
       setClearError(
-        e instanceof Error ? e.message : API_CLIENT_UI.MARK_NOTIFICATIONS_READ_FALLBACK,
+        formatApiErrorMessage(e, API_CLIENT_UI.MARK_NOTIFICATIONS_READ_FALLBACK),
       );
     }
   };
@@ -49,11 +51,7 @@ export function NotificationsPage({ notifications, onNotificationClick, onCleare
             : NOTIFICATIONS_PAGE_UI.CLEAR}
         </button>
       </div>
-      {clearError ? (
-        <p className="notifications-page__error" role="alert">
-          {clearError}
-        </p>
-      ) : null}
+      {clearError ? <InlineErrorBanner>{clearError}</InlineErrorBanner> : null}
       {notifications.length === 0 ? (
         <p className="notifications-page__empty">{NOTIFICATIONS_PAGE_UI.EMPTY}</p>
       ) : (

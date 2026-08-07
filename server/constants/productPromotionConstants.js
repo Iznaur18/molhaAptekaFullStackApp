@@ -12,7 +12,6 @@ import {
   PRODUCT_PROMOTION_TIERS,
   PRODUCT_PROMOTION_TIER_RATES,
   PRODUCT_PROMOTION_DURATION_OPTIONS as PRODUCT_PROMOTION_DURATION_BASE,
-  findProductPromotionDuration,
 } from "@molha/api-contract";
 
 export {
@@ -27,7 +26,6 @@ export {
   PRODUCT_PROMOTION_TIER_BANNER,
   PRODUCT_PROMOTION_TIERS,
   PRODUCT_PROMOTION_TIER_RATES,
-  findProductPromotionDuration,
 };
 
 export const PRODUCT_PROMOTION_TIER_META = [
@@ -60,6 +58,13 @@ export const PRODUCT_PROMOTION_DURATION_OPTIONS = PRODUCT_PROMOTION_DURATION_BAS
     title: DURATION_TITLE_RU[item.code] ?? item.code,
   }),
 );
+
+/**
+ * Local finder — includes RU `title` required by ProductPromotionModel.
+ * @param {string} code
+ */
+export const findProductPromotionDuration = (code) =>
+  PRODUCT_PROMOTION_DURATION_OPTIONS.find((item) => item.code === code) ?? null;
 
 export const PRODUCT_PROMOTION_REMINDER_HOURS = 1;
 

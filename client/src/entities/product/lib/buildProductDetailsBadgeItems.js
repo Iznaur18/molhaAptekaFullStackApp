@@ -2,11 +2,12 @@ import {
   formatCatalogNearDistanceLabel,
   PRODUCT_PRICE_MARKET_STATUS_UNKNOWN,
 } from "@molha/api-contract";
-import { isProductWholesaleConfigured } from "@izibuy/shared-lib";
+import { isProductRentalConfigured, isProductWholesaleConfigured } from "@izibuy/shared-lib";
 
 import {
   PRODUCT_CARD_UI,
   PRODUCT_DETAILS_MODAL_UI,
+  PRODUCT_RENTAL_UI,
   PRODUCT_WHOLESALE_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { isProductRaffleParticipant } from "../../raffle/lib/isProductRaffleParticipant.js";
@@ -26,6 +27,7 @@ import { resolveProductAffiliateOffer } from "./resolveProductAffiliateOffer.js"
  *   | { kind: "auction" }
  *   | { kind: "installment" }
  *   | { kind: "wholesale" }
+ *   | { kind: "rental" }
  *   | { kind: "nearDistance" }
  *   | { kind: "listingOrigin"; origin: string | null; Icon: import("react").ComponentType<{ className?: string; size?: number; "aria-hidden"?: boolean }> }
  *   | { kind: "priceMarket"; priceMarketStatus: string; backgroundColor: string; color: string }
@@ -106,6 +108,17 @@ export function buildProductDetailsBadgeItems({ product }) {
       key: "wholesale",
       kind: "wholesale",
       label: PRODUCT_WHOLESALE_UI.DETAILS_OFFER_KICKER,
+    });
+  }
+
+  if (
+    product.productRentalEnabled === true &&
+    isProductRentalConfigured(product)
+  ) {
+    items.push({
+      key: "rental",
+      kind: "rental",
+      label: PRODUCT_RENTAL_UI.DETAILS_BADGE,
     });
   }
 

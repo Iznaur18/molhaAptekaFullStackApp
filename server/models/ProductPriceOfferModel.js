@@ -62,11 +62,17 @@ ProductPriceOfferSchema.index(
     partialFilterExpression: { status: PRICE_OFFER_STATUS_PENDING },
   },
 );
+// Один «ожидает оплаты» на товар. После линка orderId слот свободен
+// (иначе re-open аукциона вечно ловит E11000 / 409).
 ProductPriceOfferSchema.index(
   { productId: 1 },
   {
+    name: "uniq_product_accepted_awaiting_payment",
     unique: true,
-    partialFilterExpression: { status: PRICE_OFFER_STATUS_ACCEPTED },
+    partialFilterExpression: {
+      status: PRICE_OFFER_STATUS_ACCEPTED,
+      orderId: null,
+    },
   },
 );
 

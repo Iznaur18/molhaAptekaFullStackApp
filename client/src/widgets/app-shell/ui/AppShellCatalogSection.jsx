@@ -8,6 +8,7 @@ import { CatalogBrowserBreadcrumb } from "../../../entities/product-category-dis
 import { CatalogBrowserLanding } from "../../../entities/product-category-display/ui/CatalogBrowserLanding.jsx";
 import { CatalogSubcategoryPicker } from "../../../entities/product-category-display/ui/CatalogSubcategoryPicker.jsx";
 import { buildRafflePath } from "../../../shared/lib/rafflePaths.js";
+import { InlineErrorBanner } from "../../../shared/ui/InlineErrorBanner/InlineErrorBanner.jsx";
 
 import { CatalogGridSkeleton } from "../../catalog-product-grid/ui/CatalogGridSkeleton.jsx";
 import { HomeCatalogGrid } from "../../catalog-product-grid/ui/HomeCatalogGrid.jsx";
@@ -155,11 +156,7 @@ export function AppShellCatalogGridSection({
     catalogStatus.kind === "loading" && products.length === 0;
 
   if (catalogStatus.kind === "error") {
-    return (
-      <p className="app-shell__state app-shell__state_error" role="alert">
-        {catalogStatus.message}
-      </p>
-    );
+    return <InlineErrorBanner>{catalogStatus.message}</InlineErrorBanner>;
   }
 
   return (

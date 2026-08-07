@@ -80,7 +80,7 @@ export function AppShellHeader({
   onProductSearchSubmit,
   onPlaceProductClick,
   onMyProfileClick,
-  onNotificationsClick: _onNotificationsClick,
+  onNotificationsClick,
   unreadNotificationsCount = 0,
   onLoginClick,
   onRegisterClick: _onRegisterClick,
@@ -177,7 +177,9 @@ export function AppShellHeader({
                 </div>
                 <HeaderNavActions
                   isUsersNavActive={isUsersNavActive}
+                  isNotificationsNavActive={mainView === "notifications"}
                   onSetMainView={onSetMainView}
+                  onNotificationsClick={onNotificationsClick}
                   showViewerRegionPicker={showViewerRegionPicker}
                   viewerRegionCode={viewerRegionCode}
                   onViewerRegionChange={onViewerRegionChange}
@@ -212,7 +214,9 @@ export function AppShellHeader({
  * Topbar actions: region + stretch menu (единый chrome).
  * @param {{
  *   isUsersNavActive: boolean;
+ *   isNotificationsNavActive?: boolean;
  *   onSetMainView: (view: import('../../shared/lib/homeMainViewPaths.js').HomeMainView) => void;
+ *   onNotificationsClick: () => void;
  *   showViewerRegionPicker?: boolean;
  *   viewerRegionCode?: string;
  *   onViewerRegionChange?: (code: string) => void;
@@ -220,7 +224,9 @@ export function AppShellHeader({
  */
 function HeaderNavActions({
   isUsersNavActive,
+  isNotificationsNavActive = false,
   onSetMainView,
+  onNotificationsClick,
   showViewerRegionPicker = false,
   viewerRegionCode = "",
   onViewerRegionChange,
@@ -235,7 +241,9 @@ function HeaderNavActions({
       ? "terms"
       : isFaqNavActive
         ? "faq"
-        : null;
+        : isNotificationsNavActive
+          ? "notifications"
+          : null;
 
   const handleStretchItemAction = (action) => {
     if (action === "users") {
@@ -248,6 +256,10 @@ function HeaderNavActions({
     }
     if (action === "faq") {
       navigate("/faq");
+      return;
+    }
+    if (action === "notifications") {
+      onNotificationsClick();
     }
   };
 

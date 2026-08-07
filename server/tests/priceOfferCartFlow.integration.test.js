@@ -111,6 +111,8 @@ const fetchMyBids = async (buyerCookie) => {
 
 before(async () => {
   await connectMongoTestReplSet();
+  const { ProductPriceOfferModel } = await import("../models/index.js");
+  await ProductPriceOfferModel.syncIndexes();
   const testServer = await startHttpTestServer();
   server = testServer.server;
   request = testServer.request;
@@ -159,6 +161,92 @@ test("принятая ставка попадает в корзину поку�
   assert.equal(String(sale.priceOfferId), offerId);
 
   assert.deepEqual(await fetchMyBids(buyerCookie), []);
+});
+
+test("после заказа по ставке можно снова принять предложение на re-open аукционе", async () => {
+  const { sellerCookie, buyerCookie, productId } =
+    await seedAuctionScene("reopen-accept");
+
+  const firstOfferId = await submitOffer(buyerCookie, productId, 700);
+  await acceptOffer(sellerCookie, productId, firstOfferId);
+
+  await parseSuccessData(
+    await request("/order", {
+      method: "POST",
+      headers: jsonHeaders(buyerCookie),
+      body: JSON.stringify({
+        ...buildOrderBody(productId),
+        priceOfferId: firstOfferId,
+      }),
+    }),
+  );
+
+  const { ProductModel } = await import("../models/index.js");
+  await ProductModel.findByIdAndUpdate(productId, {
+    $set: { productAuctionEnabled: true },
+  });
+
+  const { cookie: buyer2Cookie, user: buyer2 } = await registerUserAndGetCookie(
+    request,
+    "reopen-accept-buyer2",
+  );
+  await confirmUserData(buyer2._id);
+  await verifyUserEmail(buyer2.email);
+
+  const secondOfferId = await submitOffer(buyer2Cookie, productId, 800);
+  await acceptOffer(sellerCookie, productId, secondOfferId);
+
+  const bids = await fetchMyBids(buyer2Cookie);
+  assert.equal(bids.length, 1);
+  assert.equal(bids[0].status, "accepted");
+  assert.equal(bids[0].offerPrice, 800);
+});
+
+test("тот же покупатель может снова ставить после заказа и re-open аукциона", async () => {
+  const { sellerCookie, buyerCookie, productId } =
+    await seedAuctionScene("reopen-same-buyer");
+
+  const firstOfferId = await submitOffer(buyerCookie, productId, 650);
+  await acceptOffer(sellerCookie, productId, firstOfferId);
+
+  await parseSuccessData(
+    await request("/order", {
+      method: "POST",
+      headers: jsonHeaders(buyerCookie),
+      body: JSON.stringify({
+        ...buildOrderBody(productId),
+        priceOfferId: firstOfferId,
+      }),
+    }),
+  );
+
+  const meAfterOrder = await parseSuccessData(
+    await request(`/product/${productId}/price-offers/me`, {
+      headers: { Cookie: buyerCookie },
+    }),
+  );
+  assert.equal(meAfterOrder.offer, null);
+
+  const { ProductModel } = await import("../models/index.js");
+  await ProductModel.findByIdAndUpdate(productId, {
+    $set: { productAuctionEnabled: true },
+  });
+
+  const secondOfferId = await submitOffer(buyerCookie, productId, 900);
+  assert.notEqual(secondOfferId, firstOfferId);
+
+  const meAfterRebid = await parseSuccessData(
+    await request(`/product/${productId}/price-offers/me`, {
+      headers: { Cookie: buyerCookie },
+    }),
+  );
+  assert.equal(meAfterRebid.offer.status, "pending");
+  assert.equal(meAfterRebid.offer.offerPrice, 900);
+
+  await acceptOffer(sellerCookie, productId, secondOfferId);
+  const bids = await fetchMyBids(buyerCookie);
+  assert.equal(bids.length, 1);
+  assert.equal(bids[0].offerPrice, 900);
 });
 
 test("покупатель может убрать принятый лот из корзины — ставка отменяется", async () => {

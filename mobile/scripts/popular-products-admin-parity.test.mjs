@@ -27,6 +27,11 @@ test("popular products admin page mirrors web admin panel shell", () => {
   assert.match(hook, /curatedProductListAdminQueryKeys/);
   assert.match(hook, /invalidateCuratedProductLists/);
   assert.match(hook, /REORDER_ERROR/);
+  assert.match(hook, /newRegionCode/);
+  assert.match(hook, /regionCode: newRegionCode/);
+  assert.match(hook, /handleSaveList/);
+  assert.match(page, /RuRegionSelect/);
+  assert.match(page, /LIST_REGION_LABEL/);
 });
 
 test("curated product list admin card mirrors web reorder and product rows", () => {
@@ -36,6 +41,9 @@ test("curated product list admin card mirrors web reorder and product rows", () 
   assert.match(card, /MOVE_DOWN_ARIA/);
   assert.match(card, /PRODUCT_ID_PLACEHOLDER/);
   assert.match(card, /useAdminPanelStyles/);
+  assert.match(card, /RuRegionSelect/);
+  assert.match(card, /onSaveList/);
+  assert.match(card, /LIST_REGION_LABEL/);
   assert.doesNotMatch(card, /staffAdminStyles/);
 });
 
@@ -45,4 +53,6 @@ test("popular products admin ui copy matches web page", () => {
   assert.match(copy, /TITLE: "Популярные товары"/);
   assert.match(copy, /REORDER_ERROR: "Не удалось изменить порядок"/);
   assert.match(copy, /PRODUCT_ID_PLACEHOLDER: "MongoDB ObjectId товара"/);
+  assert.match(copy, /LIST_REGION_LABEL: "Регион показа"/);
+  assert.match(copy, /REGION_REQUIRED: "Укажите регион"/);
 });

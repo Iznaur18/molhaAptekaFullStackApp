@@ -250,7 +250,11 @@ async function loadCatalogProducts({
       viewerRegionCode,
       resolvedNearContext,
     ),
-    countCatalogProducts(catalogSearchResult, resolvedNearContext),
+    countCatalogProducts(
+      catalogSearchResult,
+      resolvedNearContext,
+      viewerRegionCode,
+    ),
   ]);
 
   let productsPayload = await attachProductAvailablePurchaseQuantity(products);

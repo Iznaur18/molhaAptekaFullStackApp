@@ -36,6 +36,7 @@ import {
   EMPTY_PATCH_BODY_MESSAGE,
 } from "./patchMyProductConstants.js";
 import { applyWholesaleFields } from "./applyWholesaleFields.js";
+import { applyRentalFields } from "./applyRentalFields.js";
 import {
   AFFILIATE_PERCENT_MAX,
   AFFILIATE_PERCENT_MIN,
@@ -517,6 +518,7 @@ export async function buildProductPatchSet({ existing, body, isAdmin, productId 
   const auctionState = applyAuctionField(body, $set, existing);
   applyQaField(body, $set);
   applyWholesaleFields(body, $set, existing);
+  applyRentalFields(body, $set, existing);
 
   if (Object.keys($set).length === 0 && Object.keys($unset).length === 0) {
     throw new AppError(400, EMPTY_PATCH_BODY_MESSAGE);

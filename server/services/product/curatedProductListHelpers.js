@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
-import { resolveViewerRegionCode } from "@molha/api-contract";
+import {
+  formatCuratedProductRegionMismatchMessage,
+  formatCuratedRegionLabel,
+  resolveViewerRegionCode,
+} from "@molha/api-contract";
 
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { AppError } from "../../errors/AppError.js";
@@ -281,9 +285,44 @@ export const assertCuratedListProductMatchesRegion = async (
     product.productRegionCode,
   );
   if (productRegion !== listRegion) {
-    throw new AppError(400, "Регион товара не совпадает с регионом подборки");
+    throw new AppError(
+      400,
+      formatCuratedProductRegionMismatchMessage(productRegion, listRegion),
+    );
   }
   return product;
+};
+
+/**
+ * Превью товара для админки популярных (без обязательной catalog-visible).
+ *
+ * @param {string} productId
+ */
+export const buildCuratedListProductPreview = async (productId) => {
+  if (!mongoose.isValidObjectId(productId)) {
+    throw new AppError(400, "Некорректный productId");
+  }
+
+  const product = await ProductModel.findById(productId)
+    .select("productName productRegionCode productModerationStatus productIsAvailable productStockQuantity productSeller")
+    .lean();
+  if (!product) {
+    throw new AppError(404, "Товар не найден");
+  }
+
+  const hiddenSellerIds = await getHiddenSellerIds();
+  const catalogVisible = isProductCatalogVisible(product, hiddenSellerIds);
+  const productRegionCode = normalizeCuratedProductListRegionCode(
+    product.productRegionCode,
+  );
+
+  return {
+    productId: String(product._id),
+    productName: String(product.productName ?? "").trim() || "Без названия",
+    productRegionCode,
+    regionLabel: formatCuratedRegionLabel(productRegionCode),
+    catalogVisible,
+  };
 };
 
 /**

@@ -1,6 +1,8 @@
 import type { ProductBadgeExplainKey } from "@izibuy/shared-lib";
+import { useEffect, useState } from "react";
 import {
   Image,
+  Linking,
   Modal,
   Platform,
   Pressable,
@@ -11,6 +13,11 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { fetchUserPhone } from "@/entities/user/api/fetchUserPhone";
+import {
+  formatRuPhoneDisplayOrEmpty,
+  toRuPhoneTelHref,
+} from "@/entities/user/lib/ruPhone";
 import { PRODUCT_BADGE_EXPLAIN_UI } from "@/shared/config";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
@@ -33,6 +40,7 @@ type ProductBadgeExplainSheetProps = {
   title: string;
   badgeKey: ProductBadgeExplainKey | null;
   fallbackKey: string;
+  contactSellerUserId?: string | null;
   onClose: () => void;
 };
 
@@ -91,6 +99,7 @@ const useStyles = createThemedStyles((theme) => ({
     paddingTop: 10,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: theme.colors.border,
+    gap: 8,
   },
   closeButton: {
     width: "100%",
@@ -99,10 +108,19 @@ const useStyles = createThemedStyles((theme) => ({
     alignItems: "center" as const,
     backgroundColor: theme.colors.ink,
   },
+  closeButtonDisabled: {
+    opacity: 0.55,
+  },
   closeButtonText: {
     fontSize: 16,
     fontWeight: "700" as const,
     color: theme.colors.onContrast,
+  },
+  error: {
+    fontSize: 13,
+    lineHeight: 18,
+    textAlign: "center" as const,
+    color: theme.colors.dangerText,
   },
 }));
 
@@ -111,21 +129,69 @@ export const ProductBadgeExplainSheet = ({
   title,
   badgeKey,
   fallbackKey,
+  contactSellerUserId = null,
   onClose,
 }: ProductBadgeExplainSheetProps) => {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
   const adminByKey = useProductBadgeExplainByKeyMap({ enabled: visible });
 
+  const sellerId =
+    typeof contactSellerUserId === "string" ? contactSellerUserId.trim() : "";
+  const contactMode = sellerId.length > 0;
+
+  const [revealedPhone, setRevealedPhone] = useState<string | null>(null);
+  const [contactPending, setContactPending] = useState(false);
+  const [contactError, setContactError] = useState("");
+
   const content = resolveProductBadgeExplainSheetContent({
     badgeKey,
     fallbackKey,
-    adminRow: badgeKey ? adminByKey.get(badgeKey) ?? null : null,
+    adminRow: badgeKey ? (adminByKey.get(badgeKey) ?? null) : null,
   });
 
   const imageSrc = content.imageUrl
     ? resolveUploadedMediaUrl(content.imageUrl)
     : null;
+
+  useEffect(() => {
+    if (!visible) {
+      setRevealedPhone(null);
+      setContactPending(false);
+      setContactError("");
+    }
+  }, [visible]);
+
+  useEffect(() => {
+    setRevealedPhone(null);
+    setContactPending(false);
+    setContactError("");
+  }, [sellerId, badgeKey]);
+
+  const handleContact = async () => {
+    if (!sellerId || contactPending) {
+      return;
+    }
+    setContactPending(true);
+    setContactError("");
+    try {
+      const phone = await fetchUserPhone(sellerId);
+      setRevealedPhone(phone);
+    } catch (error) {
+      setContactError(
+        error instanceof Error
+          ? error.message
+          : PRODUCT_BADGE_EXPLAIN_UI.CONTACT_ERROR,
+      );
+    } finally {
+      setContactPending(false);
+    }
+  };
+
+  const phoneHref = revealedPhone ? toRuPhoneTelHref(revealedPhone) : null;
+  const phoneDisplay = revealedPhone
+    ? formatRuPhoneDisplayOrEmpty(revealedPhone)
+    : "";
 
   return (
     <Modal
@@ -161,13 +227,53 @@ export const ProductBadgeExplainSheet = ({
               </View>
             </ScrollView>
             <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 12) }]}>
-              <Pressable
-                style={styles.closeButton}
-                accessibilityRole="button"
-                onPress={onClose}
-              >
-                <Text style={styles.closeButtonText}>{PRODUCT_BADGE_EXPLAIN_UI.CLOSE}</Text>
-              </Pressable>
+              {contactMode && phoneHref && phoneDisplay ? (
+                <Pressable
+                  style={styles.closeButton}
+                  accessibilityRole="link"
+                  accessibilityLabel={phoneDisplay}
+                  onPress={() => {
+                    void Linking.openURL(phoneHref).catch(() => undefined);
+                  }}
+                >
+                  <Text style={styles.closeButtonText}>{phoneDisplay}</Text>
+                </Pressable>
+              ) : contactMode ? (
+                <>
+                  <Pressable
+                    style={[
+                      styles.closeButton,
+                      contactPending ? styles.closeButtonDisabled : null,
+                    ]}
+                    accessibilityRole="button"
+                    disabled={contactPending}
+                    onPress={() => {
+                      void handleContact();
+                    }}
+                  >
+                    <Text style={styles.closeButtonText}>
+                      {contactPending
+                        ? PRODUCT_BADGE_EXPLAIN_UI.CONTACT_PENDING
+                        : PRODUCT_BADGE_EXPLAIN_UI.CONTACT}
+                    </Text>
+                  </Pressable>
+                  {contactError ? (
+                    <Text style={styles.error} accessibilityRole="alert">
+                      {contactError}
+                    </Text>
+                  ) : null}
+                </>
+              ) : (
+                <Pressable
+                  style={styles.closeButton}
+                  accessibilityRole="button"
+                  onPress={onClose}
+                >
+                  <Text style={styles.closeButtonText}>
+                    {PRODUCT_BADGE_EXPLAIN_UI.CLOSE}
+                  </Text>
+                </Pressable>
+              )}
             </View>
           </SquircleView>
         </View>

@@ -25,10 +25,11 @@ import { UserProfileProductsList } from "@/entities/user/ui/UserProfileProductsL
 import { ProductDetailsAuctionTeaser } from "@/features/product-detail/ui/ProductDetailsAuctionTeaser";
 import { ProductDetailsInstallmentTeaser } from "@/features/product-detail/ui/ProductDetailsInstallmentTeaser";
 import { ProductDetailsRaffleTeaser } from "@/features/product-detail/ui/ProductDetailsRaffleTeaser";
+import { ProductDetailsRentalTeaser } from "@/features/product-detail/ui/ProductDetailsRentalTeaser";
 import { ProductDetailsSaleTeaser } from "@/features/product-detail/ui/ProductDetailsSaleTeaser";
 import { ProductDetailsWholesaleOffer } from "@/features/product-detail/ui/ProductDetailsWholesaleOffer";
 import { ProductPickupDetailsPanel } from "@/features/product-detail/ui/ProductPickupDetailsPanel";
-import { PRODUCT_DETAILS_MODAL_UI, SELLER_PRODUCTS_PAGE_UI } from "@/shared/config";
+import { PRODUCT_DETAILS_MODAL_UI, PRODUCT_RENTAL_UI, SELLER_PRODUCTS_PAGE_UI } from "@/shared/config";
 import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
 
@@ -144,6 +145,15 @@ export const ProductDetailsDetailsTab = ({
             ) : null}
             <View style={styles.featureCards}>
               <ProductDetailsRaffleTeaser product={product} />
+              <ProductDetailsRentalTeaser
+                product={product}
+                onPress={() =>
+                  openBadgeExplain({
+                    kind: "rental",
+                    label: PRODUCT_RENTAL_UI.DETAILS_BADGE,
+                  })
+                }
+              />
               {typeof onRequestLogin === "function" ? (
                 <ProductAffiliateShareButton
                   product={product}
@@ -320,6 +330,9 @@ export const ProductDetailsDetailsTab = ({
         title={badgeExplain?.title ?? ""}
         badgeKey={badgeExplain?.badgeKey ?? null}
         fallbackKey={badgeExplain?.fallbackKey ?? "listing_origin_unspecified"}
+        contactSellerUserId={
+          badgeExplain?.badgeKey === "rental" ? sellerId || null : null
+        }
         onClose={() => setBadgeExplain(null)}
       />
     </View>

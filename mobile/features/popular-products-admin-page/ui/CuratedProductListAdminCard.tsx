@@ -1,7 +1,9 @@
 import { useCallback, useState } from "react";
+import { DEFAULT_VIEWER_REGION_CODE } from "@molha/api-contract";
 import { Pressable, Text, TextInput, View } from "react-native";
 
 import type { CuratedListAdminRow } from "@/entities/curated-product-list/api/curatedProductListAdminApi";
+import { RuRegionSelect } from "@/entities/region/ui/RuRegionSelect";
 import { POPULAR_PRODUCTS_ADMIN_PAGE_UI } from "@/shared/config";
 import { useAdminPanelStyles } from "@/shared/theme/adminPanelStyles";
 
@@ -13,7 +15,7 @@ type CuratedProductListAdminCardProps = {
   onMoveUp: () => void;
   onMoveDown: () => void;
   onDeleteList: () => void;
-  onSaveTitle: (title: string) => Promise<void>;
+  onSaveList: (payload: { title: string; regionCode: string }) => Promise<void>;
   onAddProduct: (productId: string) => Promise<void>;
   onRemoveProduct: (productId: string) => Promise<void>;
 };
@@ -26,25 +28,32 @@ export const CuratedProductListAdminCard = ({
   onMoveUp,
   onMoveDown,
   onDeleteList,
-  onSaveTitle,
+  onSaveList,
   onAddProduct,
   onRemoveProduct,
 }: CuratedProductListAdminCardProps) => {
   const styles = useAdminPanelStyles();
   const [titleDraft, setTitleDraft] = useState(list.title);
+  const [regionDraft, setRegionDraft] = useState(
+    list.regionCode || DEFAULT_VIEWER_REGION_CODE,
+  );
   const [productIdDraft, setProductIdDraft] = useState("");
   const [localError, setLocalError] = useState("");
 
-  const handleSaveTitle = useCallback(async () => {
+  const handleSaveList = useCallback(async () => {
     setLocalError("");
+    if (!regionDraft) {
+      setLocalError(POPULAR_PRODUCTS_ADMIN_PAGE_UI.REGION_REQUIRED);
+      return;
+    }
     try {
-      await onSaveTitle(titleDraft);
+      await onSaveList({ title: titleDraft, regionCode: regionDraft });
     } catch (error) {
       setLocalError(
         error instanceof Error ? error.message : POPULAR_PRODUCTS_ADMIN_PAGE_UI.SAVE_ERROR,
       );
     }
-  }, [onSaveTitle, titleDraft]);
+  }, [onSaveList, regionDraft, titleDraft]);
 
   const handleAddProduct = useCallback(async () => {
     setLocalError("");
@@ -116,10 +125,20 @@ export const CuratedProductListAdminCard = ({
             editable={!isBusy}
           />
         </View>
+        <RuRegionSelect
+          value={regionDraft}
+          onChange={setRegionDraft}
+          disabled={isBusy}
+          label={POPULAR_PRODUCTS_ADMIN_PAGE_UI.LIST_REGION_LABEL}
+          required
+        />
         <Pressable
-          style={[styles.secondaryButton, (isBusy || titleDraft.trim() === "") && styles.primaryButtonDisabled]}
-          onPress={() => void handleSaveTitle()}
-          disabled={isBusy || titleDraft.trim() === ""}
+          style={[
+            styles.secondaryButton,
+            (isBusy || titleDraft.trim() === "" || !regionDraft) && styles.primaryButtonDisabled,
+          ]}
+          onPress={() => void handleSaveList()}
+          disabled={isBusy || titleDraft.trim() === "" || !regionDraft}
         >
           <Text style={styles.secondaryButtonText}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.SAVE_TITLE}</Text>
         </Pressable>

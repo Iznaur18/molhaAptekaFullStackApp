@@ -14,6 +14,7 @@ test("isProductBadgeExplainKey accepts known keys", () => {
   assert.equal(isProductBadgeExplainKey("auction"), true);
   assert.equal(isProductBadgeExplainKey("installment"), true);
   assert.equal(isProductBadgeExplainKey("wholesale"), true);
+  assert.equal(isProductBadgeExplainKey("rental"), true);
   assert.equal(isProductBadgeExplainKey("near_distance"), true);
   assert.equal(isProductBadgeExplainKey("nope"), false);
 });

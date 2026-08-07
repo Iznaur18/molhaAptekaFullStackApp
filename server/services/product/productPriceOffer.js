@@ -182,12 +182,15 @@ export async function cancelMyProductPriceOffer({ buyerId, productId }) {
 export async function getMyProductPriceOffer({ buyerId, productId }) {
   await releaseExpiredAcceptedOffers(productId);
 
+  // Только живое участие: pending / accepted без заказа.
+  // accepted+orderId — прошлый выигрыш; после re-open аукциона можно ставить снова.
   const offer = await ProductPriceOfferModel.findOne({
     productId,
     buyerUserId: buyerId,
     status: {
       $in: [PRICE_OFFER_STATUS_PENDING, PRICE_OFFER_STATUS_ACCEPTED],
     },
+    orderId: null,
   })
     .sort({ updatedAt: -1 })
     .lean();

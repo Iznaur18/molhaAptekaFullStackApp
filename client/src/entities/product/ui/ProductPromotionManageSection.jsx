@@ -39,6 +39,7 @@ export function ProductPromotionManageSection({
   onSetQa,
   onSetOriginality,
   onSetWholesale,
+  onSetRental,
   onSetAffiliate,
   onSetInstallment,
   onDelete,
@@ -47,6 +48,7 @@ export function ProductPromotionManageSection({
   isQaTogglePending = false,
   isOriginalityTogglePending = false,
   isWholesaleTogglePending = false,
+  isRentalTogglePending = false,
   isAffiliateTogglePending = false,
   isInstallmentTogglePending = false,
   isDeletePending = false,
@@ -60,6 +62,7 @@ export function ProductPromotionManageSection({
   isSubmitting = false,
   onOpenInstallmentProgram,
   onOpenWholesaleSettings,
+  onOpenRentalSettings,
   onOpenAffiliateSettings,
   embeddedInTab = false,
 }) {
@@ -92,6 +95,7 @@ export function ProductPromotionManageSection({
         onSetQa={onSetQa}
         onSetOriginality={onSetOriginality}
         onSetWholesale={onSetWholesale}
+        onSetRental={onSetRental}
         onSetAffiliate={onSetAffiliate}
         onSetInstallment={onSetInstallment}
         onDelete={onDelete}
@@ -100,6 +104,7 @@ export function ProductPromotionManageSection({
         isQaTogglePending={isQaTogglePending}
         isOriginalityTogglePending={isOriginalityTogglePending}
         isWholesaleTogglePending={isWholesaleTogglePending}
+        isRentalTogglePending={isRentalTogglePending}
         isAffiliateTogglePending={isAffiliateTogglePending}
         isInstallmentTogglePending={isInstallmentTogglePending}
         isDeletePending={isDeletePending}
@@ -113,6 +118,7 @@ export function ProductPromotionManageSection({
         disabled={isSubmitting}
         onOpenInstallmentProgram={onOpenInstallmentProgram}
         onOpenWholesaleSettings={onOpenWholesaleSettings}
+        onOpenRentalSettings={onOpenRentalSettings}
         onOpenAffiliateSettings={onOpenAffiliateSettings}
         canOpenInstallmentProgram={
           (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===

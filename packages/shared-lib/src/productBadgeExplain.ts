@@ -25,6 +25,7 @@ export type ProductBadgeExplainKey =
   | "auction"
   | "installment"
   | "wholesale"
+  | "rental"
   | "near_distance";
 
 export type ProductBadgeExplainAdminRow = {

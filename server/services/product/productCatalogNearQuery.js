@@ -1,5 +1,6 @@
 import { getCatalogProductModel } from "../../db/mongoReadConnection.js";
 
+import { buildProductRegionMatch } from "../user/userRegionCatalogFilter.js";
 import { attachProductSellerSnapshots } from "./attachProductSellerSnapshots.js";
 import {
   buildCatalogSortPipeline,
@@ -7,6 +8,9 @@ import {
 } from "./productCatalogQuery.js";
 
 const EARTH_RADIUS_METERS = 6_378_100;
+
+/** Match, который не находит документов (пустой второй бакет). */
+const IMPOSSIBLE_MATCH = Object.freeze({ _id: { $exists: false } });
 
 /**
  * Самовывоз включён (default true у старых документов).
@@ -17,21 +21,30 @@ const pickupEligibleMatch = () => ({
 });
 
 /**
- * Нет GeoJSON-точки — второй бакет «Рядом».
+ * Второй бакет «Рядом»: нет GeoJSON-точки + тот же регион зрителя.
  * @param {Record<string, unknown>} baseQuery
+ * @param {string | null | undefined} viewerRegionCode
  */
-export const buildNearNoLocationMatch = (baseQuery) => ({
-  $and: [
-    baseQuery,
-    pickupEligibleMatch(),
-    {
-      $or: [
-        { productPickupLocation: { $exists: false } },
-        { productPickupLocation: null },
-      ],
-    },
-  ],
-});
+export const buildNearNoLocationMatch = (baseQuery, viewerRegionCode = null) => {
+  const code = String(viewerRegionCode ?? "").trim();
+  if (!code) {
+    return { $and: [baseQuery, IMPOSSIBLE_MATCH] };
+  }
+
+  return {
+    $and: [
+      baseQuery,
+      pickupEligibleMatch(),
+      buildProductRegionMatch(code),
+      {
+        $or: [
+          { productPickupLocation: { $exists: false } },
+          { productPickupLocation: null },
+        ],
+      },
+    ],
+  };
+};
 
 /**
  * База для $geoNear.query (точка обязана быть у документа для индекса).
@@ -43,16 +56,20 @@ export const buildNearGeoQuery = (baseQuery) => ({
 });
 
 /**
+ * Distance-first: `_nearBucket` → `_distanceMeters` → остальной catalog sort.
  * @param {Record<string, unknown>[]} sortPipeline
  */
 const withNearBucketSort = (sortPipeline) =>
   sortPipeline.map((stage) => {
     if (stage && typeof stage === "object" && stage.$sort) {
+      const restSort = { ...stage.$sort };
+      delete restSort._nearBucket;
+      delete restSort._distanceMeters;
       return {
         $sort: {
           _nearBucket: 1,
           _distanceMeters: 1,
-          ...stage.$sort,
+          ...restSort,
         },
       };
     }
@@ -82,7 +99,7 @@ export const findProductsPageNear = async ({
   const Product = getCatalogProductModel();
   const base = normalizeProductsQueryForAggregate(productsQuery);
   const geoQuery = buildNearGeoQuery(base);
-  const noLocationMatch = buildNearNoLocationMatch(base);
+  const noLocationMatch = buildNearNoLocationMatch(base, viewerRegionCode);
   const sortPipeline = withNearBucketSort(
     buildCatalogSortPipeline(sort, searchRank, viewerRegionCode),
   );
@@ -157,13 +174,18 @@ export const findProductsPageNear = async ({
  * @param {{
  *   productsQuery: Record<string, unknown>;
  *   near: { lat: number; lon: number; maxDistanceMeters: number };
+ *   viewerRegionCode?: string | null;
  * }} input
  */
-export const countProductsNear = async ({ productsQuery, near }) => {
+export const countProductsNear = async ({
+  productsQuery,
+  near,
+  viewerRegionCode = null,
+}) => {
   const Product = getCatalogProductModel();
   const base = normalizeProductsQueryForAggregate(productsQuery);
   const geoQuery = buildNearGeoQuery(base);
-  const noLocationMatch = buildNearNoLocationMatch(base);
+  const noLocationMatch = buildNearNoLocationMatch(base, viewerRegionCode);
   const radiusRadians = near.maxDistanceMeters / EARTH_RADIUS_METERS;
 
   const [nearbyTotal, noLocationTotal] = await Promise.all([

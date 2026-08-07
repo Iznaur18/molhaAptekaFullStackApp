@@ -2,6 +2,7 @@ import { useMemo, useRef } from "react";
 import { splitCatalogNearProducts } from "@molha/api-contract";
 
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { InlineErrorBanner } from "../../../shared/ui/InlineErrorBanner/InlineErrorBanner.jsx";
 import { shouldShowProductTier3BannerFullWidth } from "../../../entities/product/lib/shouldShowProductTier3BannerFullWidth.js";
 import { CATALOG_VIRTUALIZATION_MIN_ITEM_COUNT } from "../lib/catalogGridVirtualizationConstants.js";
 import { interleaveCatalogTier3Banners } from "../lib/interleaveCatalogTier3Banners.js";
@@ -240,9 +241,7 @@ export function HomeCatalogGrid({
         </p>
       ) : null}
       {myProductsCatalogError ? (
-        <p className="app-shell__state app-shell__state_error" role="alert">
-          {myProductsCatalogError}
-        </p>
+        <InlineErrorBanner>{myProductsCatalogError}</InlineErrorBanner>
       ) : null}
       {products.length === 0 ? (
         <p className="app-shell__state">{emptyMessage}</p>
@@ -314,9 +313,9 @@ export function HomeCatalogGrid({
           ) : null}
           {catalogLoadMoreError ? (
             <div className="app-shell__catalog-more app-shell__catalog-more_error">
-              <p className="app-shell__state app-shell__state_error" role="alert">
+              <InlineErrorBanner>
                 {HOME_PAGE_UI.CATALOG_LOAD_MORE_FAIL}: {catalogLoadMoreError}
-              </p>
+              </InlineErrorBanner>
               <button
                 type="button"
                 className="app-shell__catalog-retry"

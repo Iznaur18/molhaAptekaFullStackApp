@@ -35,7 +35,28 @@ export type {
 export {
   resolveAffiliateReferrerDisplayName,
   resolveOrderLineAffiliateSellerLine,
-} from "./resolveOrderLineAffiliateSellerLine.js";export {
+} from "./resolveOrderLineAffiliateSellerLine.js";
+export {
+  ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_CONFIRMED,
+  ORDER_STATUS_DELIVERED,
+  ORDER_STATUS_PENDING,
+  ORDER_STATUS_SHIPPED,
+  buildOrderStatusFromItems,
+  calculateOrderItemsTotalAmount,
+} from "./orderStatus.js";
+export {
+  MY_ORDER_UNKNOWN_SELLER_ID,
+  projectMyOrderSellerBlocks,
+  projectMyOrdersSellerBlocks,
+  resolveOrderLineSellerId,
+} from "./projectMyOrderSellerBlocks.js";
+export type {
+  MyOrderSellerBlock,
+  MyOrderSellerBlockOrderLine,
+  MyOrderSellerBlockSource,
+} from "./projectMyOrderSellerBlocks.js";
+export {
   PROFILE_ACCOUNT_SECTION_ORDER,
   PROFILE_SECTION_ADVERTISING,
   PROFILE_SECTION_ONEC_INTEGRATION,
@@ -197,6 +218,17 @@ export type {
   ProductWholesaleOffer,
   ResolveProductUnitPriceInput,
 } from "./productWholesale.js";
+export {
+  PRODUCT_RENTAL_PRICE_UNIT_DAY,
+  PRODUCT_RENTAL_PRICE_UNIT_HOUR,
+  PRODUCT_RENTAL_PRICE_UNIT_VALUES,
+  isProductRentalConfigured,
+  isProductRentalPriceUnit,
+} from "./productRental.js";
+export type {
+  ProductRentalLike,
+  ProductRentalPriceUnit,
+} from "./productRental.js";
 export {
   buildUsersPodiumPlaceById,
   excludeUsersPodiumFromList,

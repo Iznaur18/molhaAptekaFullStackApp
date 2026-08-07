@@ -110,6 +110,7 @@ export {
   autopurgeCuratedProductLists,
   buildAdminCuratedListsResponse,
   buildCatalogVisibleProductFilter,
+  buildCuratedListProductPreview,
   buildHomeCuratedListsResponse,
   filterCuratedListsForViewerRegion,
   isProductCatalogVisible,

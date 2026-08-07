@@ -2,11 +2,15 @@ import {
   formatCatalogNearDistanceLabel,
   PRODUCT_PRICE_MARKET_STATUS_UNKNOWN,
 } from "@molha/api-contract";
-import { isProductWholesaleConfigured } from "@izibuy/shared-lib";
+import {
+  isProductRentalConfigured,
+  isProductWholesaleConfigured,
+} from "@izibuy/shared-lib";
 
 import {
   PRODUCT_CARD_UI,
   PRODUCT_DETAILS_MODAL_UI,
+  PRODUCT_RENTAL_UI,
   PRODUCT_WHOLESALE_UI,
 } from "@/shared/config";
 
@@ -27,6 +31,7 @@ export type ProductDetailsBadgeItem = {
   | { kind: "auction" }
   | { kind: "installment" }
   | { kind: "wholesale" }
+  | { kind: "rental" }
   | { kind: "nearDistance" }
   | { kind: "listingOrigin"; origin: string | null; iconName: ProductListingOriginIconName }
   | { kind: "priceMarket"; priceMarketStatus: string; backgroundColor: string; color: string }
@@ -106,6 +111,17 @@ export const buildProductDetailsBadgeItems = ({
       key: "wholesale",
       kind: "wholesale",
       label: PRODUCT_WHOLESALE_UI.DETAILS_OFFER_KICKER,
+    });
+  }
+
+  if (
+    product.productRentalEnabled === true &&
+    isProductRentalConfigured(product)
+  ) {
+    items.push({
+      key: "rental",
+      kind: "rental",
+      label: PRODUCT_RENTAL_UI.DETAILS_BADGE,
     });
   }
 

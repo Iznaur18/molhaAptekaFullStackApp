@@ -91,7 +91,14 @@ export const NotificationsPage = () => {
         </Pressable>
       </View>
 
-      {clearError ? <Text style={styles.error}>{clearError}</Text> : null}
+      {clearError ? (
+        <View style={styles.errorBanner} accessibilityRole="alert">
+          <Text style={styles.errorBannerMark} accessibilityElementsHidden>
+            !
+          </Text>
+          <Text style={styles.errorBannerText}>{clearError}</Text>
+        </View>
+      ) : null}
 
       {notifications.length === 0 ? (
         <View style={styles.emptyWrap}>

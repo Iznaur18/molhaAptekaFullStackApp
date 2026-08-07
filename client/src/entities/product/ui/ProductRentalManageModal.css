@@ -1,0 +1,93 @@
+.rental-manage-modal__unit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  min-inline-size: 0;
+}
+
+.rental-manage-modal__unit > legend {
+  padding: 0;
+  float: none;
+}
+
+.rental-manage-modal__unit-track {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: calc(var(--iz-radius-control, 10px) + 2px);
+  background: var(--iz-color-surface-muted);
+  border: 1px solid var(--iz-color-border);
+}
+
+.rental-manage-modal__unit-option {
+  position: relative;
+  display: block;
+  margin: 0;
+  cursor: pointer;
+}
+
+.rental-manage-modal__unit-option:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.rental-manage-modal__unit-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.rental-manage-modal__unit-face {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  min-height: 3rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--iz-radius-control, 10px);
+  color: var(--iz-color-text-muted);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.rental-manage-modal__unit-face-sub {
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.rental-manage-modal__unit-option:has(.rental-manage-modal__unit-input:checked)
+  .rental-manage-modal__unit-face {
+  background: var(--iz-color-surface);
+  color: var(--iz-color-ink, var(--iz-color-text));
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--iz-color-ink) 10%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--iz-color-action) 35%, transparent);
+}
+
+.rental-manage-modal__unit-option:has(.rental-manage-modal__unit-input:focus-visible)
+  .rental-manage-modal__unit-face {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rental-manage-modal__unit-face {
+    transition: none;
+  }
+}

@@ -1,12 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { filterMyOrders } from "../../../entities/order/lib/filterMyOrders.js";
-import {
-  buildAttentionOrderIdsKey,
-  mergeExpandedIdsFromKey,
-} from "../../../entities/order/lib/expandedOrderIds.js";
-import { orderNeedsBuyerAttention } from "../../../entities/order/lib/orderNeedsBuyerAttention.js";
+import { orderMatchesMyOrdersFilters } from "../../../entities/order/lib/filterMyOrders.js";
+import { projectMyOrdersSellerBlocks } from "../../../entities/order/lib/projectMyOrdersSellerBlocks.js";
 import { summarizeMyOrders } from "../../../entities/order/lib/summarizeMyOrders.js";
 import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "../../../entities/order/model/myOrdersListFilters.js";
 import { orderQueryKeys } from "../../../entities/order/model/orderQueryKeys.js";
@@ -48,23 +44,31 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
   const allOrders = ordersQuery.data ?? EMPTY_ORDERS;
   const [statusFilter, setStatusFilter] = useState("");
   const [attentionOnly, setAttentionOnly] = useState(false);
-  const [expandedIds, setExpandedIds] = useState(() => new Set());
   const [pendingActionKey, setPendingActionKey] = useState(null);
   const [itemActionErrors, setItemActionErrors] = useState({});
   const [loyaltyFlash, setLoyaltyFlash] = useState("");
 
-  const summary = useMemo(() => summarizeMyOrders(allOrders), [allOrders]);
-  const attentionOrderIdsKey = useMemo(
-    () => buildAttentionOrderIdsKey(allOrders, orderNeedsBuyerAttention),
+  const sellerBlocks = useMemo(
+    () => projectMyOrdersSellerBlocks(allOrders),
     [allOrders],
   );
-  const filteredOrders = useMemo(
-    () => filterMyOrders(allOrders, { status: statusFilter, attentionOnly }),
-    [allOrders, statusFilter, attentionOnly],
+  const summary = useMemo(
+    () => summarizeMyOrders(sellerBlocks.map((block) => block.order)),
+    [sellerBlocks],
+  );
+  const filteredBlocks = useMemo(
+    () =>
+      sellerBlocks.filter((block) =>
+        orderMatchesMyOrdersFilters(block.order, {
+          status: statusFilter,
+          attentionOnly,
+        }),
+      ),
+    [sellerBlocks, statusFilter, attentionOnly],
   );
 
-  const totalAll = allOrders.length;
-  const totalVisible = filteredOrders.length;
+  const totalAll = sellerBlocks.length;
+  const totalVisible = filteredBlocks.length;
   const hasFilters = Boolean(statusFilter) || attentionOnly;
   const summaryCountLabel = hasFilters
     ? MY_ORDERS_PAGE_UI.COUNT_FILTERED(totalVisible, totalAll)
@@ -95,30 +99,6 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
     const timerId = window.setTimeout(() => setLoyaltyFlash(""), 4000);
     return () => window.clearTimeout(timerId);
   }, [loyaltyFlash]);
-
-  useEffect(() => {
-    setExpandedIds((prev) => mergeExpandedIdsFromKey(prev, attentionOrderIdsKey));
-  }, [attentionOrderIdsKey]);
-
-  const toggleExpanded = useCallback((orderId) => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(orderId)) {
-        next.delete(orderId);
-      } else {
-        next.add(orderId);
-      }
-      return next;
-    });
-  }, []);
-
-  const expandAll = useCallback(() => {
-    setExpandedIds(new Set(filteredOrders.map((order) => String(order._id))));
-  }, [filteredOrders]);
-
-  const collapseAll = useCallback(() => {
-    setExpandedIds(new Set());
-  }, []);
 
   const handleInProgressFilterClick = useCallback(() => {
     setStatusFilter(MY_ORDERS_LIST_FILTER_IN_PROGRESS);
@@ -235,19 +215,9 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
     />
   );
 
-  const listActions =
-    totalVisible > 0 ? (
-      <div className="my-orders-page__list-actions">
-        <button type="button" className="my-orders-page__list-action" onClick={expandAll}>
-          {MY_ORDERS_PAGE_UI.EXPAND_ALL}
-        </button>
-        <button type="button" className="my-orders-page__list-action" onClick={collapseAll}>
-          {MY_ORDERS_PAGE_UI.COLLAPSE_ALL}
-        </button>
-        {attentionOnly ? (
-          <p className="my-orders-page__filter-hint">{MY_ORDERS_PAGE_UI.ATTENTION_FILTER_HINT}</p>
-        ) : null}
-      </div>
+  const attentionFilterHint =
+    totalVisible > 0 && attentionOnly ? (
+      <p className="my-orders-page__filter-hint">{MY_ORDERS_PAGE_UI.ATTENTION_FILTER_HINT}</p>
     ) : null;
 
   const toolbar = (
@@ -293,7 +263,7 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
     <div className="my-orders-page">
       {toolbar}
       {overview}
-      {listActions}
+      {attentionFilterHint}
       {loyaltyFlash ? (
         <p className="my-orders-page__loyalty-flash" role="status">
           {loyaltyFlash}
@@ -303,27 +273,21 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
         <p className="my-orders-page__state">{emptyMessage}</p>
       ) : (
         <ul className="my-orders-page__list" role="list">
-          {filteredOrders.map((order) => {
-            const orderId = String(order._id);
-            return (
-              <li key={order._id} className="my-orders-page__item" role="listitem">
-                <OrderCard
-                  order={order}
-                  compact
-                  collapsible
-                  expanded={expandedIds.has(orderId)}
-                  onExpandedChange={() => toggleExpanded(orderId)}
-                  showSeller
-                  onSellerNameClick={onSellerNameClick}
-                  onProductClick={openCatalogProductFromOrderLine}
-                  onConfirmDelivered={handleConfirmDelivered}
-                  onCancelItem={handleCancelItem}
-                  pendingActionKey={pendingActionKey}
-                  itemActionErrors={itemActionErrors}
-                />
-              </li>
-            );
-          })}
+          {filteredBlocks.map((block) => (
+            <li key={block.blockKey} className="my-orders-page__item" role="listitem">
+              <OrderCard
+                order={block.order}
+                compact
+                showSeller
+                onSellerNameClick={onSellerNameClick}
+                onProductClick={openCatalogProductFromOrderLine}
+                onConfirmDelivered={handleConfirmDelivered}
+                onCancelItem={handleCancelItem}
+                pendingActionKey={pendingActionKey}
+                itemActionErrors={itemActionErrors}
+              />
+            </li>
+          ))}
         </ul>
       )}
     </div>

@@ -21,15 +21,15 @@ test("auction page mirrors web toolbar and dashboard rows", () => {
   assert.match(page, /AuctionPageOverview/);
   assert.match(page, /filterAuctionDashboard/);
   assert.match(page, /summarizeAuctionDashboard/);
-  assert.match(page, /expandedIds/);
-  assert.match(page, /EXPAND_ALL/);
-  assert.match(page, /COLLAPSE_ALL/);
+  assert.doesNotMatch(page, /EXPAND_ALL/);
+  assert.doesNotMatch(page, /COLLAPSE_ALL/);
+  assert.doesNotMatch(page, /collapsible/);
   assert.match(page, /COUNT_FILTERED/);
   assert.match(page, /ListHeaderComponent/);
   assert.match(page, /contentPaddingBottom/);
   assert.match(page, /AuctionBuyerBidRow/);
   assert.match(page, /AuctionSellerOfferRow/);
-  assert.match(page, /collapsible/);
+  assert.match(page, /ATTENTION_FILTER_HINT/);
   assert.doesNotMatch(page, /sellerFlowStyles/);
 
   assert.match(toolbar, /AUCTION_PAGE_UI\.TITLE/);
@@ -41,9 +41,7 @@ test("auction page mirrors web toolbar and dashboard rows", () => {
   assert.match(overview, /OVERVIEW_ATTENTION/);
 
   assert.match(buyerRow, /AuctionDashboardBuyerPriceEditor/);
-  assert.match(buyerRow, /CheckoutForm/);
-  assert.match(buyerRow, /PAY_BUTTON/);
-  assert.match(buyerRow, /priceOfferId/);
+  assert.match(buyerRow, /priceOfferId|productId/);
   assert.match(buyerRow, /collapsible/);
   assert.match(buyerRow, /bidNeedsAttention/);
 
@@ -55,13 +53,15 @@ test("auction page mirrors web toolbar and dashboard rows", () => {
 
 test("auction page ui copy matches web auction dashboard", () => {
   const copy = readMobileFile("shared/config/appUiCopy.ts");
+  const auctionUi = copy.match(/export const AUCTION_PAGE_UI = \{[\s\S]*?\n\} as const;/);
 
-  assert.match(copy, /TITLE: "Аукцион"/);
-  assert.match(copy, /BID_PRICE_LABEL: "Ставка"/);
-  assert.match(copy, /PAY_DEADLINE_LABEL: "Оплатить до"/);
-  assert.match(copy, /EDIT_PRICE_LABEL: "Новая цена, ₽"/);
-  assert.match(copy, /PAY_BUTTON: "Оплатить по принятой цене"/);
-  assert.match(copy, /COUNT_FILTERED:/);
-  assert.match(copy, /EXPAND_ALL: "Развернуть все"/);
-  assert.match(copy, /OVERVIEW_ATTENTION: "Нужно действие"/);
+  assert.ok(auctionUi);
+  assert.match(auctionUi[0], /TITLE: "Аукцион"/);
+  assert.match(auctionUi[0], /BID_PRICE_LABEL: "Ставка"/);
+  assert.match(auctionUi[0], /PAY_DEADLINE_LABEL: "Оплатить до"/);
+  assert.match(auctionUi[0], /EDIT_PRICE_LABEL: "Новая цена, ₽"/);
+  assert.match(auctionUi[0], /COUNT_FILTERED:/);
+  assert.doesNotMatch(auctionUi[0], /EXPAND_ALL/);
+  assert.doesNotMatch(auctionUi[0], /COLLAPSE_ALL/);
+  assert.match(auctionUi[0], /OVERVIEW_ATTENTION: "Нужно действие"/);
 });

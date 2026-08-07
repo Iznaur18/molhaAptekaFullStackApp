@@ -55,6 +55,9 @@ export const resolveProductDetailsBadgeExplainRequest = (item: {
   if (item.kind === "wholesale") {
     return { title: item.label, badgeKey: "wholesale", fallbackKey: "wholesale" };
   }
+  if (item.kind === "rental") {
+    return { title: item.label, badgeKey: "rental", fallbackKey: "rental" };
+  }
   if (item.kind === "nearDistance") {
     return {
       title: item.label,

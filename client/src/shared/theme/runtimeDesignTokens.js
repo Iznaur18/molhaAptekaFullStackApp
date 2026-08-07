@@ -47,35 +47,21 @@ const COLOR_VAR_MAP = {
 };
 
 /** @type {ThemePreference} */
-let themePreference = "system";
+let themePreference = "custom";
 
 /** @type {Set<(preference: ThemePreference) => void>} */
 const preferenceListeners = new Set();
 
 /**
- * @returns {boolean}
- */
-function isSystemDark() {
-  return (
-    typeof window !== "undefined" &&
-    typeof window.matchMedia === "function" &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches
-  );
-}
-
-/**
  * @param {ThemePreference} preference
- * @returns {"light" | "dark" | "custom"}
+ * @returns {"light" | "custom"}
  */
 function resolveScheme(preference) {
-  if (preference === "light" || preference === "dark" || preference === "custom") {
-    return preference;
-  }
-  return isSystemDark() ? "dark" : "light";
+  return preference === "light" ? "light" : "custom";
 }
 
 /**
- * @param {"light" | "dark" | "custom"} scheme
+ * @param {"light" | "custom"} scheme
  */
 function applyThemeToRoot(scheme) {
   if (typeof document === "undefined") {
@@ -94,7 +80,7 @@ function applyThemeToRoot(scheme) {
 
   document.documentElement.dataset.theme = scheme;
   // UA color-scheme only understands light|dark; custom is light-based.
-  rootStyle.colorScheme = scheme === "dark" ? "dark" : "light";
+  rootStyle.colorScheme = "light";
 
   const bg = theme.colors.bg;
   if (typeof bg === "string" && bg.trim()) {
@@ -141,17 +127,10 @@ export function subscribeThemePreference(listener) {
 }
 
 export const initRuntimeDesignTokens = () => {
-  if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+  if (typeof window === "undefined") {
     return;
   }
 
   themePreference = loadThemePreference();
   applyCurrentTheme();
-
-  const media = window.matchMedia("(prefers-color-scheme: dark)");
-  media.addEventListener("change", () => {
-    if (themePreference === "system") {
-      applyCurrentTheme();
-    }
-  });
 };

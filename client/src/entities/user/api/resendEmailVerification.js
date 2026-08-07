@@ -4,7 +4,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 /** `POST /auth/resend-verification` */
 export async function resendEmailVerification() {
   try {
-    const { data } = await apiClient.post("/auth/resend-verification");
+    const { data } = await apiClient.post("/auth/resend-verification", {});
 
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);

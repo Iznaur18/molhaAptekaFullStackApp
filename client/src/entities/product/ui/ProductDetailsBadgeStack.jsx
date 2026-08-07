@@ -129,6 +129,13 @@ export function ProductDetailsBadgeStack({ product, onBadgePress }) {
               );
             }
 
+            if (item.kind === "rental") {
+              return renderSoftTextChip(
+                item,
+                PRODUCT_DETAILS_BADGE_SOFT_COLORS.rental,
+              );
+            }
+
             if (item.kind === "nearDistance") {
               return renderSoftTextChip(
                 item,

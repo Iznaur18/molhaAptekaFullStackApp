@@ -8,12 +8,8 @@ import { Alert, FlatList, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
-import { filterMyOrders } from "@/entities/order/lib/filterMyOrders";
-import {
-  buildAttentionOrderIdsKey,
-  mergeExpandedIdsFromKey,
-} from "@/entities/order/lib/expandedOrderIds";
-import { orderNeedsBuyerAttention } from "@/entities/order/lib/orderNeedsBuyerAttention";
+import { orderMatchesMyOrdersFilters } from "@/entities/order/lib/filterMyOrders";
+import { projectMyOrdersSellerBlocks } from "@/entities/order/lib/projectMyOrdersSellerBlocks";
 import { resolveOrderLineProductId } from "@/entities/order/lib/resolveOrderLineProductId";
 import { summarizeMyOrders } from "@/entities/order/lib/summarizeMyOrders";
 import {
@@ -58,24 +54,32 @@ export const MyOrdersPage = () => {
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [statusFilter, setStatusFilter] = useState("");
   const [attentionOnly, setAttentionOnly] = useState(false);
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
   const [pendingActionKey, setPendingActionKey] = useState<string | null>(null);
   const [itemActionErrors, setItemActionErrors] = useState<Record<string, string>>({});
   const [loyaltyFlash, setLoyaltyFlash] = useState("");
 
   const allOrders = ordersQuery.data ?? EMPTY_ORDERS;
-  const summary = useMemo(() => summarizeMyOrders(allOrders), [allOrders]);
-  const filteredOrders = useMemo(
-    () => filterMyOrders(allOrders, { status: statusFilter, attentionOnly }),
-    [allOrders, statusFilter, attentionOnly],
-  );
-  const attentionOrderIdsKey = useMemo(
-    () => buildAttentionOrderIdsKey(allOrders, orderNeedsBuyerAttention),
+  const sellerBlocks = useMemo(
+    () => projectMyOrdersSellerBlocks(allOrders),
     [allOrders],
   );
+  const summary = useMemo(
+    () => summarizeMyOrders(sellerBlocks.map((block) => block.order)),
+    [sellerBlocks],
+  );
+  const filteredBlocks = useMemo(
+    () =>
+      sellerBlocks.filter((block) =>
+        orderMatchesMyOrdersFilters(block.order, {
+          status: statusFilter,
+          attentionOnly,
+        }),
+      ),
+    [sellerBlocks, statusFilter, attentionOnly],
+  );
 
-  const totalAll = allOrders.length;
-  const totalVisible = filteredOrders.length;
+  const totalAll = sellerBlocks.length;
+  const totalVisible = filteredBlocks.length;
   const hasFilters = Boolean(statusFilter) || attentionOnly;
   const summaryCountLabel = hasFilters
     ? MY_ORDERS_PAGE_UI.COUNT_FILTERED(totalVisible, totalAll)
@@ -97,10 +101,6 @@ export const MyOrdersPage = () => {
     }, [isAuthorized, ordersQuery.refetch]),
   );
 
-  useEffect(() => {
-    setExpandedIds((prev) => mergeExpandedIdsFromKey(prev, attentionOrderIdsKey));
-  }, [attentionOrderIdsKey]);
-
   const patchOrders = useCallback(
     (updater: (orders: OrderRecord[]) => OrderRecord[]) => {
       queryClient.setQueryData(orderQueryKeys.my(), (old) => {
@@ -121,26 +121,6 @@ export const MyOrdersPage = () => {
     await ordersQuery.refetch();
     await invalidateOrderQueues();
   }, [ordersQuery, invalidateOrderQueues]);
-
-  const toggleExpanded = useCallback((orderId: string) => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(orderId)) {
-        next.delete(orderId);
-      } else {
-        next.add(orderId);
-      }
-      return next;
-    });
-  }, []);
-
-  const expandAll = useCallback(() => {
-    setExpandedIds(new Set(filteredOrders.map((order) => String(order._id))));
-  }, [filteredOrders]);
-
-  const collapseAll = useCallback(() => {
-    setExpandedIds(new Set());
-  }, []);
 
   const handleInProgressFilterClick = useCallback(() => {
     setStatusFilter(MY_ORDERS_LIST_FILTER_IN_PROGRESS);
@@ -305,18 +285,8 @@ export const MyOrdersPage = () => {
         onInProgressFilterClick={handleInProgressFilterClick}
         onAttentionFilterChange={setAttentionOnly}
       />
-      {totalVisible > 0 ? (
-        <View style={styles.listActions}>
-          <Pressable style={styles.listAction} onPress={expandAll}>
-            <Text style={styles.listActionText}>{MY_ORDERS_PAGE_UI.EXPAND_ALL}</Text>
-          </Pressable>
-          <Pressable style={styles.listAction} onPress={collapseAll}>
-            <Text style={styles.listActionText}>{MY_ORDERS_PAGE_UI.COLLAPSE_ALL}</Text>
-          </Pressable>
-          {attentionOnly ? (
-            <Text style={styles.filterHint}>{MY_ORDERS_PAGE_UI.ATTENTION_FILTER_HINT}</Text>
-          ) : null}
-        </View>
+      {totalVisible > 0 && attentionOnly ? (
+        <Text style={styles.filterHint}>{MY_ORDERS_PAGE_UI.ATTENTION_FILTER_HINT}</Text>
       ) : null}
       {loyaltyFlash ? (
         <Text style={styles.loyaltyFlash} accessibilityRole="text">
@@ -362,8 +332,8 @@ export const MyOrdersPage = () => {
     <>
       <FlatList
         style={[styles.container, styles.listFlex, centeredContentStyle]}
-        data={filteredOrders}
-        keyExtractor={(order) => order._id}
+        data={filteredBlocks}
+        keyExtractor={(block) => block.blockKey}
         contentContainerStyle={[styles.list, { paddingBottom: contentPaddingBottom }]}
         refreshControl={
           <ThemedRefreshControl
@@ -374,26 +344,20 @@ export const MyOrdersPage = () => {
           />
         }
         ListHeaderComponent={listHeader}
-        renderItem={({ item }) => {
-          const orderId = String(item._id);
-          return (
-            <OrderCard
-              order={item}
-              style={styles.orderCardInList}
-              compact
-              collapsible
-              expanded={expandedIds.has(orderId)}
-              onExpandedChange={() => toggleExpanded(orderId)}
-              showSeller
-              onSellerNameClick={handleSellerNameClick}
-              onProductClick={handleProductClick}
-              onConfirmDelivered={handleConfirmDelivered}
-              onCancelItem={handleCancelItem}
-              pendingActionKey={pendingActionKey}
-              itemActionErrors={itemActionErrors}
-            />
-          );
-        }}
+        renderItem={({ item: block }) => (
+          <OrderCard
+            order={block.order}
+            style={styles.orderCardInList}
+            compact
+            showSeller
+            onSellerNameClick={handleSellerNameClick}
+            onProductClick={handleProductClick}
+            onConfirmDelivered={handleConfirmDelivered}
+            onCancelItem={handleCancelItem}
+            pendingActionKey={pendingActionKey}
+            itemActionErrors={itemActionErrors}
+          />
+        )}
       />
 
       <ProfileMobileNavSheet

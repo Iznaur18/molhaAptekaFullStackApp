@@ -1,6 +1,8 @@
 import { useCallback, useState } from "react";
 import { DEFAULT_VIEWER_REGION_CODE } from "@molha/api-contract";
 
+import { resolveCuratedAddProductBlockReason } from "../../../entities/curated-product-list/lib/resolveCuratedAddProductBlockReason.js";
+import { useCuratedListProductAddPreview } from "../../../entities/curated-product-list/model/useCuratedListProductAddPreview.js";
 import { RuRegionSelect } from "../../../entities/region/ui/RuRegionSelect.jsx";
 import { POPULAR_PRODUCTS_ADMIN_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
@@ -38,6 +40,22 @@ export function CuratedProductListAdminCard({
   );
   const [productIdDraft, setProductIdDraft] = useState("");
   const [localError, setLocalError] = useState("");
+  const {
+    preview,
+    isLoading: isPreviewLoading,
+    error: previewError,
+  } = useCuratedListProductAddPreview(productIdDraft);
+
+  const listRegionCode = list.regionCode || DEFAULT_VIEWER_REGION_CODE;
+  const regionBlockReason = resolveCuratedAddProductBlockReason({
+    preview,
+    listRegionCode,
+  });
+  const canAddProduct =
+    Boolean(preview) &&
+    !isPreviewLoading &&
+    !previewError &&
+    regionBlockReason == null;
 
   const handleSaveList = useCallback(async () => {
     setLocalError("");
@@ -59,6 +77,16 @@ export function CuratedProductListAdminCard({
       setLocalError(POPULAR_PRODUCTS_ADMIN_PAGE_UI.PRODUCT_ID_REQUIRED);
       return;
     }
+    if (!canAddProduct) {
+      if (typeof regionBlockReason === "string" && regionBlockReason !== "catalog") {
+        setLocalError(regionBlockReason);
+      } else if (regionBlockReason === "catalog") {
+        setLocalError(POPULAR_PRODUCTS_ADMIN_PAGE_UI.PREVIEW_NOT_VISIBLE);
+      } else if (previewError) {
+        setLocalError(previewError);
+      }
+      return;
+    }
 
     try {
       await onAddProduct(productId);
@@ -66,7 +94,13 @@ export function CuratedProductListAdminCard({
     } catch (e) {
       setLocalError(e instanceof Error ? e.message : POPULAR_PRODUCTS_ADMIN_PAGE_UI.ADD_ITEM_ERROR);
     }
-  }, [onAddProduct, productIdDraft]);
+  }, [
+    canAddProduct,
+    onAddProduct,
+    previewError,
+    productIdDraft,
+    regionBlockReason,
+  ]);
 
   const handleRemoveProduct = useCallback(
     async (productId) => {
@@ -158,11 +192,60 @@ export function CuratedProductListAdminCard({
           type="button"
           className="app-btn app-btn--primary"
           onClick={() => void handleAddProduct()}
-          disabled={isBusy}
+          disabled={isBusy || !canAddProduct}
         >
           {POPULAR_PRODUCTS_ADMIN_PAGE_UI.ADD_PRODUCT}
         </button>
       </div>
+
+      {isPreviewLoading ? (
+        <p className="curated-list-admin-card__preview curated-list-admin-card__preview--muted">
+          {POPULAR_PRODUCTS_ADMIN_PAGE_UI.PREVIEW_LOADING}
+        </p>
+      ) : null}
+
+      {previewError ? (
+        <p className="curated-list-admin-card__error" role="alert">
+          {previewError}
+        </p>
+      ) : null}
+
+      {preview && !isPreviewLoading ? (
+        <div
+          className={[
+            "curated-list-admin-card__preview",
+            regionBlockReason ? "curated-list-admin-card__preview--warn" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          <p className="curated-list-admin-card__preview-row">
+            <span className="curated-list-admin-card__preview-label">
+              {POPULAR_PRODUCTS_ADMIN_PAGE_UI.PREVIEW_NAME_LABEL}
+            </span>
+            <span>{preview.productName}</span>
+          </p>
+          <p className="curated-list-admin-card__preview-row">
+            <span className="curated-list-admin-card__preview-label">
+              {POPULAR_PRODUCTS_ADMIN_PAGE_UI.PREVIEW_REGION_LABEL}
+            </span>
+            <span>{preview.regionLabel}</span>
+          </p>
+          {regionBlockReason === "catalog" ? (
+            <p className="curated-list-admin-card__preview-status" role="status">
+              {POPULAR_PRODUCTS_ADMIN_PAGE_UI.PREVIEW_NOT_VISIBLE}
+            </p>
+          ) : typeof regionBlockReason === "string" ? (
+            <p className="curated-list-admin-card__preview-status" role="status">
+              {regionBlockReason}
+            </p>
+          ) : (
+            <p className="curated-list-admin-card__preview-status curated-list-admin-card__preview-status--ok">
+              {POPULAR_PRODUCTS_ADMIN_PAGE_UI.PREVIEW_OK}
+            </p>
+          )}
+        </div>
+      ) : null}
 
       {localError ? (
         <p className="curated-list-admin-card__error" role="alert">

@@ -2,18 +2,13 @@ import { orderFromApiSchema } from "@molha/api-contract";
 import { useFocusEffect } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { z } from "zod";
 import { Alert, FlatList, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
 import { filterMySales } from "@/entities/order/lib/filterMySales";
-import {
-  buildAttentionOrderIdsKey,
-  mergeExpandedIdsFromKey,
-} from "@/entities/order/lib/expandedOrderIds";
-import { orderNeedsSellerAttention } from "@/entities/order/lib/orderNeedsSellerAttention";
 import { resolveOrderLineProductId } from "@/entities/order/lib/resolveOrderLineProductId";
 import { summarizeMySales } from "@/entities/order/lib/summarizeMySales";
 import {
@@ -60,7 +55,6 @@ export const MySalesPage = () => {
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [statusFilter, setStatusFilter] = useState("");
   const [attentionOnly, setAttentionOnly] = useState(false);
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebouncedValue(searchTerm, MY_SALES_PAGE_UI.SEARCH_DEBOUNCE_MS);
   const isSearchPending = searchTerm !== debouncedSearchTerm;
@@ -99,10 +93,6 @@ export const MySalesPage = () => {
     () => filterMySales(serverOrders, { statusFilter, attentionOnly }),
     [serverOrders, statusFilter, attentionOnly],
   );
-  const attentionOrderIdsKey = useMemo(
-    () => buildAttentionOrderIdsKey(allOrders, orderNeedsSellerAttention),
-    [allOrders],
-  );
 
   const totalServer = serverOrders.length;
   const totalVisible = filteredOrders.length;
@@ -122,10 +112,6 @@ export const MySalesPage = () => {
     }, [isAuthorized, salesQuery.refetch, overviewQuery.refetch]),
   );
 
-  useEffect(() => {
-    setExpandedIds((prev) => mergeExpandedIdsFromKey(prev, attentionOrderIdsKey));
-  }, [attentionOrderIdsKey]);
-
   const invalidateSalesQueues = useCallback(async () => {
     await queryClient.invalidateQueries({ queryKey: orderQueryKeys.salesActionCount() });
   }, [queryClient]);
@@ -134,26 +120,6 @@ export const MySalesPage = () => {
     await Promise.all([salesQuery.refetch(), overviewQuery.refetch()]);
     await invalidateSalesQueues();
   }, [salesQuery, overviewQuery, invalidateSalesQueues]);
-
-  const toggleExpanded = useCallback((orderId: string) => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(orderId)) {
-        next.delete(orderId);
-      } else {
-        next.add(orderId);
-      }
-      return next;
-    });
-  }, []);
-
-  const expandAll = useCallback(() => {
-    setExpandedIds(new Set(filteredOrders.map((order) => String(order._id))));
-  }, [filteredOrders]);
-
-  const collapseAll = useCallback(() => {
-    setExpandedIds(new Set());
-  }, []);
 
   const handleInProgressFilterClick = useCallback(() => {
     setStatusFilter(MY_ORDERS_LIST_FILTER_IN_PROGRESS);
@@ -330,18 +296,8 @@ export const MySalesPage = () => {
         onInProgressFilterClick={handleInProgressFilterClick}
         onAttentionFilterChange={setAttentionOnly}
       />
-      {totalVisible > 0 ? (
-        <View style={styles.listActions}>
-          <Pressable style={styles.listAction} onPress={expandAll}>
-            <Text style={styles.listActionText}>{MY_SALES_PAGE_UI.EXPAND_ALL}</Text>
-          </Pressable>
-          <Pressable style={styles.listAction} onPress={collapseAll}>
-            <Text style={styles.listActionText}>{MY_SALES_PAGE_UI.COLLAPSE_ALL}</Text>
-          </Pressable>
-          {attentionOnly ? (
-            <Text style={styles.filterHint}>{MY_SALES_PAGE_UI.ATTENTION_FILTER_HINT}</Text>
-          ) : null}
-        </View>
+      {totalVisible > 0 && attentionOnly ? (
+        <Text style={styles.filterHint}>{MY_SALES_PAGE_UI.ATTENTION_FILTER_HINT}</Text>
       ) : null}
       {totalVisible === 0 ? (
         <Text style={styles.emptyState} accessibilityRole="text">
@@ -391,28 +347,22 @@ export const MySalesPage = () => {
           />
         }
         ListHeaderComponent={listHeader}
-        renderItem={({ item }) => {
-          const orderId = String(item._id);
-          return (
-            <OrderCard
-              order={item}
-              style={styles.orderCardInList}
-              compact
-              collapsible
-              expanded={expandedIds.has(orderId)}
-              onExpandedChange={() => toggleExpanded(orderId)}
-              attentionRole="seller"
-              showBuyer
-              onBuyerNameClick={handleBuyerNameClick}
-              onProductClick={handleProductClick}
-              onMarkShipped={handleMarkShipped}
-              onMarkDelivered={handleMarkDelivered}
-              onCancelItem={handleCancelItem}
-              pendingActionKey={pendingActionKey}
-              itemActionErrors={itemActionErrors}
-            />
-          );
-        }}
+        renderItem={({ item }) => (
+          <OrderCard
+            order={item}
+            style={styles.orderCardInList}
+            compact
+            attentionRole="seller"
+            showBuyer
+            onBuyerNameClick={handleBuyerNameClick}
+            onProductClick={handleProductClick}
+            onMarkShipped={handleMarkShipped}
+            onMarkDelivered={handleMarkDelivered}
+            onCancelItem={handleCancelItem}
+            pendingActionKey={pendingActionKey}
+            itemActionErrors={itemActionErrors}
+          />
+        )}
       />
 
       <ProfileMobileNavSheet

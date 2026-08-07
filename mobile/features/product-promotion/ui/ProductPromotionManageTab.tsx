@@ -8,6 +8,7 @@ type ProductPromotionManageTabProps = {
   onSetAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
   onSetOriginality?: (productId: string, productIsOriginal: boolean) => void | Promise<void>;
   onSetWholesale?: (productId: string, productWholesaleEnabled: boolean) => void | Promise<void>;
+  onSetRental?: (productId: string, productRentalEnabled: boolean) => void | Promise<void>;
   onSetAffiliate?: (productId: string, affiliateEnabled: boolean) => void | Promise<void>;
   onSetInstallment?: (
     productId: string,
@@ -18,6 +19,7 @@ type ProductPromotionManageTabProps = {
   isAuctionTogglePending?: boolean;
   isOriginalityTogglePending?: boolean;
   isWholesaleTogglePending?: boolean;
+  isRentalTogglePending?: boolean;
   isAffiliateTogglePending?: boolean;
   isInstallmentTogglePending?: boolean;
   isDeletePending?: boolean;
@@ -30,6 +32,7 @@ type ProductPromotionManageTabProps = {
   isRaffleParticipationPending?: boolean;
   onOpenInstallmentProgram?: () => void;
   onOpenWholesaleSettings?: () => void;
+  onOpenRentalSettings?: () => void;
   onOpenAffiliateSettings?: () => void;
   isSubmitting?: boolean;
 };

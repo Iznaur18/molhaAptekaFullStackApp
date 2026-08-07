@@ -1,7 +1,11 @@
 import { z } from "zod";
 
 import { mongoIdSchema } from "./mongoId.js";
-import { requiredRuRegionCodeFieldSchema } from "./ruRegions.js";
+import {
+  getRuRegionByCode,
+  requiredRuRegionCodeFieldSchema,
+  resolveViewerRegionCode,
+} from "./ruRegions.js";
 
 export const CURATED_PRODUCT_LIST_TITLE_MAX_LENGTH = 60;
 
@@ -17,6 +21,10 @@ export const curatedProductListIdParamsSchema = z.object({
 
 export const curatedProductListItemParamsSchema = z.object({
   listId: mongoIdSchema,
+  productId: mongoIdSchema,
+});
+
+export const curatedProductPreviewParamsSchema = z.object({
   productId: mongoIdSchema,
 });
 
@@ -37,3 +45,24 @@ export const reorderCuratedProductListsBodySchema = z.object({
 export const addCuratedProductListItemBodySchema = z.object({
   productId: mongoIdSchema,
 });
+
+/**
+ * @param {string | null | undefined} regionCode
+ */
+export function formatCuratedRegionLabel(regionCode) {
+  const code = resolveViewerRegionCode(regionCode);
+  return getRuRegionByCode(code)?.name ?? code;
+}
+
+/**
+ * @param {string | null | undefined} productRegionCode
+ * @param {string | null | undefined} listRegionCode
+ */
+export function formatCuratedProductRegionMismatchMessage(
+  productRegionCode,
+  listRegionCode,
+) {
+  const productLabel = formatCuratedRegionLabel(productRegionCode);
+  const listLabel = formatCuratedRegionLabel(listRegionCode);
+  return `Регион товара (${productLabel}) не совпадает с регионом подборки (${listLabel})`;
+}

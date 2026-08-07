@@ -208,7 +208,7 @@ async function requestProductPromotionOnce({
     });
 
     return {
-      message: "Продвижение активировано. Баллы списаны.",
+      message: "Продвижение запущено — баллы списаны с баланса.",
       promotion: toPromotionPayload(promotion.toObject()),
       loyaltyPointsBalance: loyaltyPointsBalance ?? null,
     };

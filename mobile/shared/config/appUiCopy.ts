@@ -489,6 +489,15 @@ export const PRODUCT_CARD_UI = {
     "Удаление недоступно: по товару есть незавершённые продажи или активные заказы.",
 } as const;
 
+/** Аренда (бейдж / feature-card деталей) */
+export const PRODUCT_RENTAL_UI = {
+  DETAILS_BADGE: "Аренда",
+  DETAILS_TEASER_TITLE: "Аренда",
+  DETAILS_TEASER_PRICE_DAY: (priceLabel: string) => `${priceLabel} / сутки`,
+  DETAILS_TEASER_PRICE_HOUR: (priceLabel: string) => `${priceLabel} / час`,
+  DETAILS_TEASER_ARIA: "Подробнее об аренде",
+} as const;
+
 /** Оптовая цена (карточка / детали) */
 export const PRODUCT_WHOLESALE_UI = {
   DETAILS_OFFER_KICKER: "Оптовая цена",
@@ -536,7 +545,7 @@ export const PRODUCT_PROMOTION_UI = {
   SUBMIT_PENDING: "Отправка…",
   CLOSE: "Закрыть",
   CANCEL: "Отмена",
-  SUCCESS_DEFAULT: "Продвижение активировано.",
+  SUCCESS_DEFAULT: "Продвижение запущено — баллы списаны с баланса.",
   LOADING_TARIFFS: "Загрузка тарифов…",
   TAB_PROMOTION: "Продвижение",
   TAB_MANAGE: "Управление",
@@ -629,8 +638,6 @@ export const AUCTION_PAGE_UI = {
   OVERVIEW_BUYER_BIDS: "Мои ставки",
   OVERVIEW_INCOMING: "Входящие",
   OVERVIEW_ATTENTION: "Нужно действие",
-  EXPAND_ALL: "Развернуть все",
-  COLLAPSE_ALL: "Свернуть все",
   REFRESH: "Обновить",
   ATTENTION_FILTER_HINT: "Показаны ставки, где нужно ваше действие",
   COLLAPSED_BUYER_PAY: (price: string) => `В корзине: ${price}`,
@@ -707,6 +714,7 @@ export const HEADER_USERS_BUTTON_UI = {
   MENU_ITEM_USERS_ARIA: "Пользователи",
   MENU_ITEM_TERMS_ARIA: "Пользовательское соглашение",
   MENU_ITEM_FAQ_ARIA: "Частые вопросы",
+  MENU_ITEM_NOTIFICATIONS_ARIA: "Уведомления",
   MENU_ITEM_PLACEHOLDER_ARIA: (index: number) => `Пункт ${index} (скоро)`,
 } as const;
 
@@ -808,6 +816,8 @@ export const INSTALLMENT_UI = {
   PLANS_LABEL: "План рассрочки",
   FIRST_PAYMENT_LATER: "первый платёж позже",
   QUANTITY_LABEL: "Количество",
+  QUANTITY_AVAILABLE: (max: number) => `Доступно: ${max}`,
+  QUANTITY_EXCEEDS_STOCK: (max: number) => `В наличии только ${max} шт.`,
   MONTHLY_LABEL: "Ежемесячно",
   BUYER_PRODUCT_PRICE_LABEL: "Цена товара",
   BUYER_MARKUP_LABEL: "Переплата",
@@ -1092,8 +1102,6 @@ export const MY_ORDERS_PAGE_UI = {
   OVERVIEW_IN_PROGRESS: "В работе",
   OVERVIEW_ATTENTION: "Нужно действие",
   OVERVIEW_TOTAL: "Сумма покупок",
-  EXPAND_ALL: "Развернуть все",
-  COLLAPSE_ALL: "Свернуть все",
   REFRESH: "Обновить",
   ATTENTION_FILTER_HINT: "Показаны заказы, где нужно ваше действие",
   COLLAPSED_CONFIRM: "Подтвердите получение",
@@ -1647,13 +1655,10 @@ export const MY_SALES_PAGE_UI = {
   OVERVIEW_IN_PROGRESS: "В работе",
   OVERVIEW_ATTENTION: "Нужно действие",
   OVERVIEW_TOTAL: "Сумма продаж",
-  EXPAND_ALL: "Развернуть все",
-  COLLAPSE_ALL: "Свернуть все",
   REFRESH: "Обновить",
   ATTENTION_FILTER_HINT: "Показаны продажи, где нужно отметить отправку или доставку",
   COLLAPSED_SHIP: "Отметьте отправку",
   COLLAPSED_DELIVER: "Отметьте доставку",
-  EXPAND_TOGGLE: (expanded: boolean) => (expanded ? "Свернуть" : "Развернуть"),
   LOADING: "Загрузка продаж…",
   EMPTY: "У вас пока нет продаж.",
   EMPTY_BY_FILTER: "По выбранному статусу продаж нет.",
@@ -1791,6 +1796,21 @@ export const CREATE_PRODUCT_UI = {
   WHOLESALE_MODAL_ERROR_MIN_QTY: "Минимум 2 шт.",
   WHOLESALE_MODAL_ERROR_PRICE: "Оптовая цена должна быть меньше обычной",
   WHOLESALE_TOGGLE_PENDING: "Обновляем опт…",
+  MANAGE_RENTAL_TITLE: "Аренда / Прокат",
+  MANAGE_RENTAL_HINT: "Покупатели увидят, что товар можно взять в аренду",
+  MANAGE_RENTAL_PENDING: "Сохраняем аренду…",
+  RENTAL_TOGGLE_PENDING: "Обновляем аренду…",
+  RENTAL_MODAL_TITLE: "Аренда / Прокат",
+  RENTAL_MODAL_HINT: "Укажите цену аренды и единицу. Дальше настройки добавим отдельно.",
+  RENTAL_MODAL_PRICE_LABEL: "Цена аренды, ₽",
+  RENTAL_MODAL_UNIT_LABEL: "Единица цены",
+  RENTAL_MODAL_UNIT_DAY: "Сутки",
+  RENTAL_MODAL_UNIT_DAY_HINT: "₽ / день",
+  RENTAL_MODAL_UNIT_HOUR: "Час",
+  RENTAL_MODAL_UNIT_HOUR_HINT: "₽ / час",
+  RENTAL_MODAL_SAVE: "Сохранить",
+  RENTAL_MODAL_CLOSE: "Закрыть",
+  RENTAL_MODAL_ERROR_REQUIRED: "Укажите цену аренды и единицу",
   MANAGE_AFFILIATE_TITLE: "Партнёрская услуга",
   MANAGE_AFFILIATE_HINT:
     "Пользователи делятся ссылкой и получают % с покупки",
@@ -2589,6 +2609,9 @@ export const PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN_UI = {
 /** Описания бейджей в деталях товара (CMS + sheet). */
 export const PRODUCT_BADGE_EXPLAIN_UI = {
   CLOSE: "Понятно",
+  CONTACT: "Связаться",
+  CONTACT_PENDING: "Загрузка…",
+  CONTACT_ERROR: "Не удалось показать номер",
   ARIA_DIALOG: "Описание бейджа",
   FALLBACK: {
     original:
@@ -2620,6 +2643,8 @@ export const PRODUCT_BADGE_EXPLAIN_UI = {
       "Товар можно купить в рассрочку у продавца. Условия и оформление — во вкладке «Рассрочка».",
     wholesale:
       "При покупке от указанного количества действует оптовая цена за единицу. Подробности — в блоке оптовой цены на этой странице.",
+    rental:
+      "Товар можно взять в аренду у продавца. Цена и единица (сутки или час) задаются продавцом. Условия выдачи и возврата уточняйте у продавца.",
     near_distance:
       "Примерное расстояние до пункта самовывоза продавца относительно вашего местоположения. Точность зависит от геолокации.",
   },
@@ -2675,22 +2700,24 @@ export const THEME_SETTINGS_UI = {
 
 export const POPULAR_PRODUCTS_ADMIN_PAGE_UI = {
   TITLE: "Популярные товары",
-  HINT: "Списки с заголовком и productId. На главной — только одобренные и доступные товары; недоступные удаляются автоматически.",
+  HINT: "Списки с заголовком, регионом и productId. На главной подборка видна только в своём регионе; товары должны быть того же региона.",
   SEARCH_PLACEHOLDER: "Заголовок или productId…",
   LOADING: "Загрузка…",
   EMPTY: "Списков нет — создайте первый",
   LOAD_ERROR: "Не удалось загрузить списки",
   CREATE_ERROR: "Не удалось создать список",
-  SAVE_ERROR: "Не удалось сохранить заголовок",
+  SAVE_ERROR: "Не удалось сохранить",
   DELETE_ERROR: "Не удалось удалить список",
   REORDER_ERROR: "Не удалось изменить порядок",
   ADD_ITEM_ERROR: "Не удалось добавить товар",
   REMOVE_ITEM_ERROR: "Не удалось удалить товар",
   CREATE_HEADING: "Новый список",
   LIST_TITLE_LABEL: "Заголовок на главной",
+  LIST_REGION_LABEL: "Регион показа",
+  REGION_REQUIRED: "Укажите регион",
   TITLE_REQUIRED: "Укажите заголовок",
   CREATE_LIST: "Создать список",
-  SAVE_TITLE: "Сохранить заголовок",
+  SAVE_TITLE: "Сохранить",
   PRODUCT_ID_LABEL: "productId",
   PRODUCT_ID_PLACEHOLDER: "MongoDB ObjectId товара",
   PRODUCT_ID_REQUIRED: "Укажите productId",

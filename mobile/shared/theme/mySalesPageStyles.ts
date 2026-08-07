@@ -198,27 +198,7 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
   overviewValueAttention: {
     color: theme.colors.warningText,
   },
-  listActions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6,
-    alignItems: "center",
-  },
-  listAction: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 999,
-    paddingVertical: 3.5,
-    paddingHorizontal: 8.8,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
-  },
-  listActionText: {
-    fontSize: 13.1,
-    fontWeight: "600",
-    color: theme.colors.textSecondary,
-  },
   filterHint: {
-    flexBasis: "100%",
     fontSize: 13.1,
     color: theme.colors.textMuted,
   },

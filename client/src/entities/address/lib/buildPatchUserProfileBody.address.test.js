@@ -31,7 +31,8 @@ describe("buildPatchUserProfileBody", () => {
     });
 
     expect(body.userAddress).toBeUndefined();
-    expect(body.userPhoneNumber).toBe("+79001234567");
+    // Телефон владельца идёт через /auth/phone/bind/*, а не через PATCH.
+    expect(body.userPhoneNumber).toBeUndefined();
   });
 
   it("шлёт null для address, если адрес очищен", () => {

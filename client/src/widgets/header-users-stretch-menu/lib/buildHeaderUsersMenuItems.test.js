@@ -10,11 +10,11 @@ describe("buildHeaderUsersMenuItems", () => {
       "users",
       "terms",
       "faq",
-      "placeholder-3",
+      "notifications",
     ]);
     expect(items[0]?.action).toBe("users");
     expect(items[1]?.action).toBe("terms");
     expect(items[2]?.action).toBe("faq");
-    expect(items[3]?.action).toBeUndefined();
+    expect(items[3]?.action).toBe("notifications");
   });
 });

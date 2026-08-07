@@ -15,6 +15,7 @@ import {
   productPickupLonFieldSchema,
 } from "./productPickup.js";
 import { productWholesalePatchFieldsShape } from "./productWholesale.js";
+import { productRentalPatchFieldsShape } from "./productRental.js";
 import {
   assertAffiliatePatchPair,
   productAffiliatePatchFieldsShape,
@@ -294,6 +295,7 @@ const patchFieldShape = {
   productAuctionEnabled: z.coerce.boolean().optional(),
   productQaEnabled: z.coerce.boolean().optional(),
   ...productWholesalePatchFieldsShape,
+  ...productRentalPatchFieldsShape,
   ...productAffiliatePatchFieldsShape,
   loyaltyPointsPerUnit: z.coerce.number().int().min(0).optional(),
   productCharacteristics: z

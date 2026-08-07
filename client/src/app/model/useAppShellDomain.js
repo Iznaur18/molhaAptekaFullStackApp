@@ -104,6 +104,7 @@ export function useAppShellDomain(
     setTogglingQaProductId: shell.setTogglingQaProductId,
     setTogglingOriginalityProductId: shell.setTogglingOriginalityProductId,
     setTogglingWholesaleProductId: shell.setTogglingWholesaleProductId,
+    setTogglingRentalProductId: shell.setTogglingRentalProductId,
     setTogglingAffiliateProductId: shell.setTogglingAffiliateProductId,
     setTogglingInstallmentProductId: shell.setTogglingInstallmentProductId,
     setMyProductsCatalogError: shell.setMyProductsCatalogError,

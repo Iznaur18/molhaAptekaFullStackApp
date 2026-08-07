@@ -18,19 +18,22 @@ test("my orders page mirrors web toolbar and compact buyer order card", () => {
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /MyOrdersPageToolbar/);
   assert.match(page, /MyOrdersPageOverview/);
-  assert.match(page, /filterMyOrders/);
+  assert.match(page, /projectMyOrdersSellerBlocks/);
+  assert.match(page, /orderMatchesMyOrdersFilters/);
+  assert.match(page, /filterMyOrders|orderMatchesMyOrdersFilters/);
   assert.match(page, /summarizeMyOrders/);
-  assert.match(page, /expandedIds/);
-  assert.match(page, /EXPAND_ALL/);
+  assert.match(page, /blockKey/);
+  assert.doesNotMatch(page, /EXPAND_ALL/);
+  assert.doesNotMatch(page, /collapsible/);
   assert.match(page, /COUNT_FILTERED/);
   assert.match(page, /ListHeaderComponent/);
   assert.match(page, /contentPaddingBottom/);
   assert.match(page, /compact/);
-  assert.match(page, /collapsible/);
   assert.match(page, /onProductClick/);
   assert.match(page, /onConfirmDelivered/);
   assert.match(page, /loyaltyFlash/);
   assert.match(page, /myActionCount/);
+  assert.match(page, /ATTENTION_FILTER_HINT/);
   assert.doesNotMatch(page, /useOrdersScreenStyles/);
 
   assert.match(toolbar, /MY_ORDERS_PAGE_UI\.TITLE/);
@@ -48,11 +51,14 @@ test("my orders page mirrors web toolbar and compact buyer order card", () => {
 
 test("my orders page ui copy matches web purchases wording", () => {
   const copy = readMobileFile("shared/config/appUiCopy.ts");
+  const ordersUi = copy.match(/export const MY_ORDERS_PAGE_UI = \{[\s\S]*?\n\} as const;/);
 
-  assert.match(copy, /TITLE: "Мои покупки"/);
-  assert.match(copy, /EMPTY: "У вас пока нет покупок\."/);
-  assert.match(copy, /LOADING: "Загрузка покупок…"/);
-  assert.match(copy, /COUNT_FILTERED:/);
-  assert.match(copy, /EXPAND_ALL: "Развернуть все"/);
-  assert.match(copy, /OVERVIEW_ATTENTION: "Нужно действие"/);
+  assert.ok(ordersUi);
+  assert.match(ordersUi[0], /TITLE: "Мои покупки"/);
+  assert.match(ordersUi[0], /EMPTY: "У вас пока нет покупок\."/);
+  assert.match(ordersUi[0], /LOADING: "Загрузка покупок…"/);
+  assert.match(ordersUi[0], /COUNT_FILTERED:/);
+  assert.doesNotMatch(ordersUi[0], /EXPAND_ALL/);
+  assert.doesNotMatch(ordersUi[0], /COLLAPSE_ALL/);
+  assert.match(ordersUi[0], /OVERVIEW_ATTENTION: "Нужно действие"/);
 });

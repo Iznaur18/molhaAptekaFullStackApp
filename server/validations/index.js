@@ -90,6 +90,7 @@ import {
 import {
   curatedProductListIdParamValidation,
   curatedProductListProductIdParamValidation,
+  curatedProductPreviewParamValidation,
   createCuratedProductListValidation,
   patchCuratedProductListValidation,
   reorderCuratedProductListsValidation,
@@ -196,6 +197,7 @@ export {
   patchProductSearchSynonymValidation,
   curatedProductListIdParamValidation,
   curatedProductListProductIdParamValidation,
+  curatedProductPreviewParamValidation,
   createCuratedProductListValidation,
   patchCuratedProductListValidation,
   reorderCuratedProductListsValidation,

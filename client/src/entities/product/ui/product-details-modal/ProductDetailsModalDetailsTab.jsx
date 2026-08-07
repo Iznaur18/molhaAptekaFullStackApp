@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 
-import { PRODUCT_DETAILS_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
+import {
+  PRODUCT_DETAILS_MODAL_UI,
+  PRODUCT_RENTAL_UI,
+} from "../../../../shared/config/appUiCopy.js";
 import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
 import { useProductBadgeExplainsQuery } from "../../../product-badge-explain/model/useProductBadgeExplainsQuery.js";
 import { resolveProductDetailsBadgeExplainRequest } from "../../../product-badge-explain/lib/resolveProductBadgeExplainSheet.js";
@@ -19,6 +22,7 @@ import { ProductDetailsInstallmentTeaser } from "./ProductDetailsInstallmentTeas
 import { ProductDetailsModalPurchaseActions } from "./ProductDetailsModalPurchaseActions.jsx";
 import { ProductDetailsQaTeaser } from "./ProductDetailsQaTeaser.jsx";
 import { ProductDetailsRaffleTeaser } from "./ProductDetailsRaffleTeaser.jsx";
+import { ProductDetailsRentalTeaser } from "./ProductDetailsRentalTeaser.jsx";
 import { ProductDetailsSaleTeaser } from "./ProductDetailsSaleTeaser.jsx";
 import { ProductDetailsSellerProductsCarousel } from "./ProductDetailsSellerProductsCarousel.jsx";
 import { ProductDetailsWholesaleOffer } from "./ProductDetailsWholesaleOffer.jsx";
@@ -124,6 +128,16 @@ export function ProductDetailsModalDetailsTab({
             onPress={handleCompareShortcutClick}
           />
           <ProductDetailsRaffleTeaser product={product} />
+          <ProductDetailsRentalTeaser
+            product={product}
+            onPress={() =>
+              openBadgeExplain({
+                key: "rental",
+                kind: "rental",
+                label: PRODUCT_RENTAL_UI.DETAILS_BADGE,
+              })
+            }
+          />
           <ProductAffiliateShareButton
             product={product}
             isAuthorized={isAuthorized}
@@ -294,6 +308,9 @@ export function ProductDetailsModalDetailsTab({
           title={badgeExplain?.title ?? ""}
           badgeKey={badgeExplain?.badgeKey ?? null}
           fallbackKey={badgeExplain?.fallbackKey ?? "listing_origin_unspecified"}
+          contactSellerUserId={
+            badgeExplain?.badgeKey === "rental" ? sellerId || null : null
+          }
           onClose={() => setBadgeExplain(null)}
         />
       </>
@@ -312,6 +329,9 @@ export function ProductDetailsModalDetailsTab({
         title={badgeExplain?.title ?? ""}
         badgeKey={badgeExplain?.badgeKey ?? null}
         fallbackKey={badgeExplain?.fallbackKey ?? "listing_origin_unspecified"}
+        contactSellerUserId={
+          badgeExplain?.badgeKey === "rental" ? sellerId || null : null
+        }
         onClose={() => setBadgeExplain(null)}
       />
     </>

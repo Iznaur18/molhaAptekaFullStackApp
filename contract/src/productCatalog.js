@@ -13,7 +13,11 @@ export const PRODUCT_CATALOG_SORT_VALUES = [
   "reviews",
 ];
 
-/** Каталог «Рядом» — радиус от адреса профиля (этап A). */
+/**
+ * Каталог «Рядом» (этап A):
+ * 1) самовывоз + `productPickupLocation` в радиусе от `userAddressGeo`;
+ * 2) секция «В вашем регионе» — самовывоз без точки + `productRegionCode` зрителя.
+ */
 export const PRODUCT_CATALOG_NEAR_RADIUS_KM = 30;
 export const PRODUCT_CATALOG_NEAR_RADIUS_METERS =
   PRODUCT_CATALOG_NEAR_RADIUS_KM * 1000;

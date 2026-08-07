@@ -141,9 +141,26 @@
   cursor: pointer;
   background: var(--iz-color-ink);
   color: var(--iz-color-on-contrast, #fff);
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
+  display: block;
+}
+
+.product-badge-explain-sheet__close:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .product-badge-explain-sheet__close:focus-visible {
   outline: 2px solid var(--iz-color-ink);
   outline-offset: 2px;
+}
+
+.product-badge-explain-sheet__error {
+  margin: 0.55rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  color: var(--iz-color-danger-text, #b42318);
+  text-align: center;
 }

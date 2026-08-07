@@ -78,3 +78,49 @@
   font-size: 0.8125rem;
   word-break: break-all;
 }
+
+.curated-list-admin-card__preview {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--iz-color-border, #e5e7eb);
+  background: var(--iz-color-surface-muted, #f9fafb);
+  font-size: 0.875rem;
+}
+
+.curated-list-admin-card__preview--warn {
+  border-color: color-mix(in srgb, var(--iz-color-danger, #b91c1c) 35%, transparent);
+  background: color-mix(in srgb, var(--iz-color-danger, #b91c1c) 8%, transparent);
+}
+
+.curated-list-admin-card__preview--muted {
+  margin: 0;
+  color: var(--iz-color-text-secondary);
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+.curated-list-admin-card__preview-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin: 0;
+}
+
+.curated-list-admin-card__preview-label {
+  color: var(--iz-color-text-secondary);
+  min-width: 7rem;
+}
+
+.curated-list-admin-card__preview-status {
+  margin: 2px 0 0;
+  font-weight: 600;
+}
+
+.curated-list-admin-card__preview-status--ok {
+  color: var(--iz-color-success, #15803d);
+  font-weight: 500;
+}

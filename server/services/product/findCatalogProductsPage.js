@@ -94,12 +94,18 @@ export const findCatalogProductsPage = async (
 /**
  * @param {import('./buildProductCatalogSearchQuery.js').ProductCatalogSearchResult} searchResult
  * @param {{ lat: number; lon: number; maxDistanceMeters: number } | null} [near]
+ * @param {string | null} [viewerRegionCode]
  */
-export const countCatalogProducts = async (searchResult, near = null) => {
+export const countCatalogProducts = async (
+  searchResult,
+  near = null,
+  viewerRegionCode = null,
+) => {
   if (near) {
     return countProductsNear({
       productsQuery: searchResult.query,
       near,
+      viewerRegionCode,
     });
   }
 

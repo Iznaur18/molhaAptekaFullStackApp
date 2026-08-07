@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { Alert, FlatList, Pressable, Text, TextInput, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
+import { RuRegionSelect } from "@/entities/region/ui/RuRegionSelect";
 import { CuratedProductListAdminCard } from "@/features/popular-products-admin-page/ui/CuratedProductListAdminCard";
 import { usePopularProductsAdminPage } from "@/features/popular-products-admin-page/model/usePopularProductsAdminPage";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
@@ -31,6 +32,8 @@ export const PopularProductsAdminPage = () => {
     setIsCreateOpen,
     newTitle,
     setNewTitle,
+    newRegionCode,
+    setNewRegionCode,
     displayError,
     pendingListId,
     isBusy,
@@ -38,7 +41,7 @@ export const PopularProductsAdminPage = () => {
     handleCreateList,
     handleMoveList,
     handleDeleteList,
-    handleSaveTitle,
+    handleSaveList,
     handleAddProduct,
     handleRemoveProduct,
     reloadLists,
@@ -80,13 +83,20 @@ export const PopularProductsAdminPage = () => {
           editable={!isBusy}
         />
       </View>
+      <RuRegionSelect
+        value={newRegionCode}
+        onChange={setNewRegionCode}
+        disabled={isBusy}
+        label={POPULAR_PRODUCTS_ADMIN_PAGE_UI.LIST_REGION_LABEL}
+        required
+      />
       <View style={styles.createActions}>
         <Pressable
           style={[
             styles.primaryButton,
-            (isBusy || newTitle.trim() === "") && styles.primaryButtonDisabled,
+            (isBusy || newTitle.trim() === "" || !newRegionCode) && styles.primaryButtonDisabled,
           ]}
-          disabled={isBusy || newTitle.trim() === ""}
+          disabled={isBusy || newTitle.trim() === "" || !newRegionCode}
           onPress={() => void handleCreateList()}
         >
           <Text style={styles.primaryButtonText}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.CREATE_LIST}</Text>
@@ -193,7 +203,7 @@ export const PopularProductsAdminPage = () => {
               onMoveUp={() => void handleMoveList(item._id, "up")}
               onMoveDown={() => void handleMoveList(item._id, "down")}
               onDeleteList={() => confirmDeleteList(item._id)}
-              onSaveTitle={(title) => handleSaveTitle(item._id, title)}
+              onSaveList={(payload) => handleSaveList(item._id, payload)}
               onAddProduct={(productId) => handleAddProduct(item._id, productId)}
               onRemoveProduct={(productId) => handleRemoveProduct(item._id, productId)}
             />
