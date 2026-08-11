@@ -21,6 +21,10 @@ import {
   GENERAL_RATE_LIMIT_WINDOW_MS,
   USER_PHONE_REVEAL_RATE_LIMIT_PER_HOUR,
 } from "../constants/rateLimitConstants.js";
+import {
+  logSecurityEvent,
+  securityRequestFields,
+} from "../services/auth/logSecurityEvent.js";
 
 /** @type {Record<string, import('express').RequestHandler>} */
 const handlers = {};
@@ -47,11 +51,31 @@ const RATE_LIMIT_DEFAULTS = {
 };
 
 /**
- * @param {import('express-rate-limit').Options} options
+ * @param {import('express-rate-limit').Options & { limiterName?: string }} options
  * @param {import('express-rate-limit').Store | undefined} store
  */
 function buildLimiter(options, store) {
-  return rateLimit(store ? { ...options, store } : options);
+  const limiterName = options.limiterName ?? "unnamed";
+  const { limiterName: _ignored, ...rest } = options;
+
+  const withHandler = {
+    ...rest,
+    handler: (req, res, _next, opts) => {
+      logSecurityEvent("warn", "rate_limit_hit", {
+        ...securityRequestFields(req),
+        limiter: limiterName,
+      });
+      const statusCode = opts.statusCode ?? 429;
+      const message = opts.message;
+      if (message != null && typeof message === "object") {
+        res.status(statusCode).json(message);
+        return;
+      }
+      res.status(statusCode).send(message);
+    },
+  };
+
+  return rateLimit(store ? { ...withHandler, store } : withHandler);
 }
 
 /**
@@ -61,6 +85,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.general = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "general",
       windowMs: GENERAL_RATE_LIMIT_WINDOW_MS,
       max: GENERAL_RATE_LIMIT_MAX,
       skip: shouldSkipGeneralRateLimit,
@@ -77,6 +102,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.auth = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "auth",
       windowMs: 15 * 60 * 1000,
       max: 55,
       message: {
@@ -91,6 +117,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.registerAuth = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "register_auth",
       windowMs: 15 * 60 * 1000,
       max: 20,
       message: {
@@ -111,6 +138,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.refreshAuth = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "refresh_auth",
       windowMs: 15 * 60 * 1000,
       max: 120,
       message: {

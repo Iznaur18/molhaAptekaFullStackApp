@@ -19,6 +19,7 @@ import {
   InsufficientLoyaltyPointsError,
 } from "../loyalty/loyaltyPointsSpend.js";
 import { insertLedgerEntryIdempotent } from "../ledger/insertLedgerEntryIdempotent.js";
+import { logMoneyEvent } from "../loyalty/logMoneyEvent.js";
 import { migrateAffiliateBudgetToLoyaltyPoints } from "./migrateAffiliateBudgetToLoyaltyPoints.js";
 
 /**
@@ -175,6 +176,16 @@ export async function settleAffiliatePayoutForOrderItem({
   targetItem.affiliateAmount = amount;
   targetItem.affiliatePercentUsed = percent;
   targetItem.affiliatePaidAt = new Date();
+
+  logMoneyEvent("info", "affiliate_payout", {
+    userId: String(sellerId),
+    referrerUserId: String(referrerUserId),
+    orderId,
+    orderItemId: itemId,
+    amount,
+    currency: "LP",
+    ledgerKey: sourceId,
+  });
 
   return {
     paid: amount,

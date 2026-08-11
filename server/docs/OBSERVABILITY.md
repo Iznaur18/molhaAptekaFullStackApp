@@ -111,3 +111,32 @@ CORS: `exposedHeaders: ['X-Request-Id']` — браузер может проч�
 - [x] Client/mobile: прокидка `X-Request-Id` (`@izibuy/shared-api` + Sentry breadcrumb на auth/money/5xx)
 - [x] Access-логи успешных запросов (`http.access`, `ACCESS_LOG_SAMPLE_RATE`)
 - [x] Ship journald → Loki/Yandex (док + Alloy example: `docs/deploy/LOGGING-CENTRAL.md`)
+- [x] Money events v1 (`money.*` на loyalty/order/premium/affiliate + idempotent wrapper)
+- [x] Security events v1 (`security.*` login/OTP/refresh/logout/rate-limit)
+
+## Money events (`money.*`)
+
+Граница: primitives + idempotent wrapper + order create / premium / affiliate payout.
+
+| Event | Когда |
+| ----- | ----- |
+| `money.idempotent_ok` / `_replay` / `_failed` | `runMoneyIdempotentMutation` |
+| `money.loyalty_reserve` / `_release` / `_settle` / `_deduct` / `_credit` / `_refund` | LP движение |
+| `money.rub_deduct` / `money.rub_refund` | RUB баланс |
+| `money.order_created` / `money.order_create_failed` | создание заказа |
+| `money.premium_purchased` | покупка премиума |
+| `money.affiliate_payout` | выплата шареру |
+
+Поля: `userId`, `amount?`, `currency?` (`LP`\|`RUB`), `orderId?`, `idempotencyKey?`, `ledgerKey?`. Без email/phone.
+
+## Security events (`security.*`)
+
+| Event | Когда |
+| ----- | ----- |
+| `security.login_ok` / `login_failed` | email/phone password + OTP success path |
+| `security.otp_login_failed` | неверный/expired OTP, blocked, attempts |
+| `security.refresh_ok` / `refresh_failed` | refresh token |
+| `security.logout` | выход (cookie clear + bump) |
+| `security.rate_limit_hit` | express-rate-limit 429 |
+
+Поля: `requestId`, `ip`, `path`, `method`, `reason?`, `methodKind?`, `userId?`, `limiter?`. **Без** email/phone в payload.

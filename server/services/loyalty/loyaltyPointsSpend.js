@@ -1,6 +1,7 @@
 import { UserModel } from "../../models/index.js";
 
 import { getSellerLoyaltyPointsAvailable } from "./loyaltyPointsSeller.js";
+import { logMoneyEvent, logMoneyFailure } from "./logMoneyEvent.js";
 
 export class InsufficientLoyaltyPointsError extends Error {
   /**
@@ -25,39 +26,52 @@ export const deductLoyaltyPoints = async ({ userId, amount, session }) => {
     throw new Error("Сумма списания должна быть больше 0");
   }
 
-  const updated = await UserModel.findOneAndUpdate(
-    {
-      _id: userId,
-      $expr: {
-        $gte: [
-          {
-            $subtract: [
-              "$userLoyaltyPoints",
-              { $ifNull: ["$userLoyaltyPointsReserved", 0] },
-            ],
-          },
-          normalizedAmount,
-        ],
+  try {
+    const updated = await UserModel.findOneAndUpdate(
+      {
+        _id: userId,
+        $expr: {
+          $gte: [
+            {
+              $subtract: [
+                "$userLoyaltyPoints",
+                { $ifNull: ["$userLoyaltyPointsReserved", 0] },
+              ],
+            },
+            normalizedAmount,
+          ],
+        },
       },
-    },
-    { $inc: { userLoyaltyPoints: -normalizedAmount } },
-    { returnDocument: "after", session: session ?? undefined },
-  ).lean();
+      { $inc: { userLoyaltyPoints: -normalizedAmount } },
+      { returnDocument: "after", session: session ?? undefined },
+    ).lean();
 
-  if (!updated) {
-    const user = await UserModel.findById(userId)
-      .select("userLoyaltyPoints userLoyaltyPointsReserved")
-      .lean();
-    const available = getSellerLoyaltyPointsAvailable(user);
-    throw new InsufficientLoyaltyPointsError(normalizedAmount, available);
+    if (!updated) {
+      const user = await UserModel.findById(userId)
+        .select("userLoyaltyPoints userLoyaltyPointsReserved")
+        .lean();
+      const available = getSellerLoyaltyPointsAvailable(user);
+      throw new InsufficientLoyaltyPointsError(normalizedAmount, available);
+    }
+
+    const balance = Number(updated.userLoyaltyPoints) || 0;
+    logMoneyEvent("info", "loyalty_deduct", {
+      userId: String(userId),
+      amount: normalizedAmount,
+      currency: "LP",
+      balanceAfter: balance,
+    });
+    return balance;
+  } catch (error) {
+    logMoneyFailure(
+      "loyalty_deduct",
+      { userId: String(userId), amount: normalizedAmount, currency: "LP" },
+      error,
+    );
+    throw error;
   }
-
-  return Number(updated.userLoyaltyPoints) || 0;
 };
 
-/**
- * @param {{ userId: string; amount: number; session?: import('mongoose').ClientSession }} params
- */
 /**
  * @param {{ userId: string; amount: number; session?: import('mongoose').ClientSession }} params
  * @returns {Promise<number>}
@@ -68,17 +82,33 @@ export const creditLoyaltyPoints = async ({ userId, amount, session }) => {
     throw new Error("Сумма начисления должна быть больше 0");
   }
 
-  const updated = await UserModel.findOneAndUpdate(
-    { _id: userId },
-    { $inc: { userLoyaltyPoints: normalizedAmount } },
-    { returnDocument: "after", session: session ?? undefined },
-  ).lean();
+  try {
+    const updated = await UserModel.findOneAndUpdate(
+      { _id: userId },
+      { $inc: { userLoyaltyPoints: normalizedAmount } },
+      { returnDocument: "after", session: session ?? undefined },
+    ).lean();
 
-  if (!updated) {
-    throw new Error("USER_NOT_FOUND");
+    if (!updated) {
+      throw new Error("USER_NOT_FOUND");
+    }
+
+    const balance = Number(updated.userLoyaltyPoints) || 0;
+    logMoneyEvent("info", "loyalty_credit", {
+      userId: String(userId),
+      amount: normalizedAmount,
+      currency: "LP",
+      balanceAfter: balance,
+    });
+    return balance;
+  } catch (error) {
+    logMoneyFailure(
+      "loyalty_credit",
+      { userId: String(userId), amount: normalizedAmount, currency: "LP" },
+      error,
+    );
+    throw error;
   }
-
-  return Number(updated.userLoyaltyPoints) || 0;
 };
 
 export const refundLoyaltyPoints = async ({ userId, amount, session }) => {
@@ -87,13 +117,28 @@ export const refundLoyaltyPoints = async ({ userId, amount, session }) => {
     throw new Error("Сумма возврата баллов должна быть больше 0");
   }
 
-  const result = await UserModel.updateOne(
-    { _id: userId },
-    { $inc: { userLoyaltyPoints: normalizedAmount } },
-    { session: session ?? undefined },
-  );
+  try {
+    const result = await UserModel.updateOne(
+      { _id: userId },
+      { $inc: { userLoyaltyPoints: normalizedAmount } },
+      { session: session ?? undefined },
+    );
 
-  if (result.matchedCount === 0) {
-    throw new Error("USER_NOT_FOUND");
+    if (result.matchedCount === 0) {
+      throw new Error("USER_NOT_FOUND");
+    }
+
+    logMoneyEvent("info", "loyalty_refund", {
+      userId: String(userId),
+      amount: normalizedAmount,
+      currency: "LP",
+    });
+  } catch (error) {
+    logMoneyFailure(
+      "loyalty_refund",
+      { userId: String(userId), amount: normalizedAmount, currency: "LP" },
+      error,
+    );
+    throw error;
   }
 };

@@ -17,6 +17,7 @@ import {
   InsufficientLoyaltyPointsError,
 } from "../loyalty/loyaltyPointsSpend.js";
 import { runMoneyIdempotentMutation } from "../loyalty/runMoneyIdempotentMutation.js";
+import { logMoneyEvent } from "../loyalty/logMoneyEvent.js";
 import {
   creditReferralCashbackFromSpend,
   notifyReferralCashbackCredited,
@@ -217,6 +218,15 @@ async function purchasePremiumSubscriptionOnce(userId) {
         spenderUserId: userId,
       });
     }
+    logMoneyEvent("info", "premium_purchased", {
+      userId: String(userId),
+      amount: PREMIUM_PRICE_POINTS,
+      currency: "LP",
+      premiumExpiresAt:
+        result.premiumExpiresAt instanceof Date
+          ? result.premiumExpiresAt.toISOString()
+          : String(result.premiumExpiresAt),
+    });
     return {
       loyaltyPointsBalance: result.loyaltyPointsBalance,
       premiumExpiresAt: result.premiumExpiresAt,

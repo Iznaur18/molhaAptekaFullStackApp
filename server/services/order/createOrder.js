@@ -34,6 +34,7 @@ import { resolveProductUnitPrice } from "@izibuy/shared-lib";
 
 import { buildOrderStatusFromItems } from "./orderStatus.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
+import { logMoneyEvent, logMoneyFailure } from "../loyalty/logMoneyEvent.js";
 import {
   resolveAffiliateReferrerUserId,
   resolveOrderLineAffiliateAttribution,
@@ -367,7 +368,8 @@ export async function createOrder({
         await finalizeOffersAfterOrderConfirmed(productId, linkedPriceOfferId);
       } catch (finalizeError) {
         logServerEvent("error", {
-          event: "finalizeoffersafterordercreate",
+          event: "money.order_finalize_offers_failed",
+          orderId: String(created._id),
           error:
             finalizeError instanceof Error
               ? finalizeError.message
@@ -376,8 +378,28 @@ export async function createOrder({
       }
     }
 
+    logMoneyEvent("info", "order_created", {
+      userId: String(userId),
+      orderId: String(created._id),
+      paymentMethod,
+      itemCount: Array.isArray(items) ? items.length : 0,
+    });
+
     return created;
   } catch (txError) {
+    if (!(txError instanceof AppError)) {
+      logMoneyFailure(
+        "order_create",
+        { userId: String(userId), paymentMethod },
+        txError,
+      );
+    } else if (txError.statusCode >= 500) {
+      logMoneyFailure(
+        "order_create",
+        { userId: String(userId), paymentMethod },
+        txError,
+      );
+    }
     if (txError instanceof AppError) {
       throw txError;
     }

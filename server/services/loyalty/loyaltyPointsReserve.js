@@ -3,7 +3,8 @@ import { UserModel } from "../../models/index.js";
 import { InsufficientLoyaltyPointsError } from "./loyaltyPointsSpend.js";
 import { withMongoSession } from "../../utils/mongoTransaction.js";
 import { getSellerLoyaltyPointsAvailable } from "./loyaltyPointsSeller.js";
-import { logServerEvent } from "../../utils/logServerEvent.js";
+import { logMoneyEvent, logMoneyFailure } from "./logMoneyEvent.js";
+import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 
 /**
  * @param {string} userId
@@ -17,34 +18,50 @@ export const reserveLoyaltyPoints = async ({ userId, amount, session = null }) =
     return 0;
   }
 
-  const updated = await UserModel.findOneAndUpdate(
-    {
-      _id: userId,
-      $expr: {
-        $gte: [
-          {
-            $subtract: [
-              "$userLoyaltyPoints",
-              { $ifNull: ["$userLoyaltyPointsReserved", 0] },
-            ],
-          },
-          normalizedAmount,
-        ],
+  try {
+    const updated = await UserModel.findOneAndUpdate(
+      {
+        _id: userId,
+        $expr: {
+          $gte: [
+            {
+              $subtract: [
+                "$userLoyaltyPoints",
+                { $ifNull: ["$userLoyaltyPointsReserved", 0] },
+              ],
+            },
+            normalizedAmount,
+          ],
+        },
       },
-    },
-    { $inc: { userLoyaltyPointsReserved: normalizedAmount } },
-    withMongoSession({ returnDocument: "after" }, session),
-  ).lean();
+      { $inc: { userLoyaltyPointsReserved: normalizedAmount } },
+      withMongoSession({ returnDocument: "after" }, session),
+    ).lean();
 
-  if (!updated) {
-    const user = await UserModel.findById(userId)
-      .select("userLoyaltyPoints userLoyaltyPointsReserved")
-      .lean();
-    const available = getSellerLoyaltyPointsAvailable(user);
-    throw new InsufficientLoyaltyPointsError(normalizedAmount, available);
+    if (!updated) {
+      const user = await UserModel.findById(userId)
+        .select("userLoyaltyPoints userLoyaltyPointsReserved")
+        .lean();
+      const available = getSellerLoyaltyPointsAvailable(user);
+      throw new InsufficientLoyaltyPointsError(normalizedAmount, available);
+    }
+
+    const balance = Number(updated.userLoyaltyPoints) || 0;
+    logMoneyEvent("info", "loyalty_reserve", {
+      userId: String(userId),
+      amount: normalizedAmount,
+      currency: "LP",
+      balanceAfter: balance,
+    });
+    return balance;
+  } catch (error) {
+    logMoneyFailure(
+      "loyalty_reserve",
+      { userId: String(userId), amount: normalizedAmount, currency: "LP" },
+      error,
+    );
+    throw error;
   }
-
-  return Number(updated.userLoyaltyPoints) || 0;
 };
 
 /**
@@ -62,17 +79,32 @@ export const releaseLoyaltyPointsReservation = async ({
     throw new Error("Сумма снятия резерва должна быть больше 0");
   }
 
-  const result = await UserModel.updateOne(
-    {
-      _id: userId,
-      userLoyaltyPointsReserved: { $gte: normalizedAmount },
-    },
-    { $inc: { userLoyaltyPointsReserved: -normalizedAmount } },
-    withMongoSession({}, session),
-  );
+  try {
+    const result = await UserModel.updateOne(
+      {
+        _id: userId,
+        userLoyaltyPointsReserved: { $gte: normalizedAmount },
+      },
+      { $inc: { userLoyaltyPointsReserved: -normalizedAmount } },
+      withMongoSession({}, session),
+    );
 
-  if (result.matchedCount === 0) {
-    throw new Error("LOYALTY_RESERVE_RELEASE_FAILED");
+    if (result.matchedCount === 0) {
+      throw new Error("LOYALTY_RESERVE_RELEASE_FAILED");
+    }
+
+    logMoneyEvent("info", "loyalty_release", {
+      userId: String(userId),
+      amount: normalizedAmount,
+      currency: "LP",
+    });
+  } catch (error) {
+    logMoneyFailure(
+      "loyalty_release",
+      { userId: String(userId), amount: normalizedAmount, currency: "LP" },
+      error,
+    );
+    throw error;
   }
 };
 
@@ -90,34 +122,50 @@ export const chargeReservedLoyaltyPoints = async ({
     throw new Error("Сумма списания должна быть больше 0");
   }
 
-  const updated = await UserModel.findOneAndUpdate(
-    {
-      _id: userId,
-      userLoyaltyPoints: { $gte: normalizedAmount },
-      userLoyaltyPointsReserved: { $gte: normalizedAmount },
-    },
-    {
-      $inc: {
-        userLoyaltyPoints: -normalizedAmount,
-        userLoyaltyPointsReserved: -normalizedAmount,
+  try {
+    const updated = await UserModel.findOneAndUpdate(
+      {
+        _id: userId,
+        userLoyaltyPoints: { $gte: normalizedAmount },
+        userLoyaltyPointsReserved: { $gte: normalizedAmount },
       },
-    },
-    withMongoSession({ returnDocument: "after" }, session),
-  ).lean();
+      {
+        $inc: {
+          userLoyaltyPoints: -normalizedAmount,
+          userLoyaltyPointsReserved: -normalizedAmount,
+        },
+      },
+      withMongoSession({ returnDocument: "after" }, session),
+    ).lean();
 
-  if (!updated) {
-    const userLookup = UserModel.findById(userId).select(
-      "userLoyaltyPoints userLoyaltyPointsReserved",
-    );
-    if (session) {
-      userLookup.session(session);
+    if (!updated) {
+      const userLookup = UserModel.findById(userId).select(
+        "userLoyaltyPoints userLoyaltyPointsReserved",
+      );
+      if (session) {
+        userLookup.session(session);
+      }
+      const user = await userLookup.lean();
+      const available = getSellerLoyaltyPointsAvailable(user);
+      throw new InsufficientLoyaltyPointsError(normalizedAmount, available);
     }
-    const user = await userLookup.lean();
-    const available = getSellerLoyaltyPointsAvailable(user);
-    throw new InsufficientLoyaltyPointsError(normalizedAmount, available);
-  }
 
-  return Number(updated.userLoyaltyPoints) || 0;
+    const balance = Number(updated.userLoyaltyPoints) || 0;
+    logMoneyEvent("info", "loyalty_charge_reserved", {
+      userId: String(userId),
+      amount: normalizedAmount,
+      currency: "LP",
+      balanceAfter: balance,
+    });
+    return balance;
+  } catch (error) {
+    logMoneyFailure(
+      "loyalty_charge_reserved",
+      { userId: String(userId), amount: normalizedAmount, currency: "LP" },
+      error,
+    );
+    throw error;
+  }
 };
 
 /**
@@ -134,38 +182,59 @@ export const settleLoyaltyPointsReservation = async ({
     return;
   }
 
-  const sellerUpdated = await UserModel.findOneAndUpdate(
-    {
-      _id: sellerId,
-      userLoyaltyPoints: { $gte: normalizedAmount },
-      userLoyaltyPointsReserved: { $gte: normalizedAmount },
-    },
-    {
-      $inc: {
-        userLoyaltyPoints: -normalizedAmount,
-        userLoyaltyPointsReserved: -normalizedAmount,
+  try {
+    const sellerUpdated = await UserModel.findOneAndUpdate(
+      {
+        _id: sellerId,
+        userLoyaltyPoints: { $gte: normalizedAmount },
+        userLoyaltyPointsReserved: { $gte: normalizedAmount },
       },
-    },
-    withMongoSession({ returnDocument: "after" }, session),
-  ).lean();
+      {
+        $inc: {
+          userLoyaltyPoints: -normalizedAmount,
+          userLoyaltyPointsReserved: -normalizedAmount,
+        },
+      },
+      withMongoSession({ returnDocument: "after" }, session),
+    ).lean();
 
-  if (!sellerUpdated) {
-    const sellerLookup = UserModel.findById(sellerId).select(
-      "userLoyaltyPoints userLoyaltyPointsReserved",
-    );
-    if (session) {
-      sellerLookup.session(session);
+    if (!sellerUpdated) {
+      const sellerLookup = UserModel.findById(sellerId).select(
+        "userLoyaltyPoints userLoyaltyPointsReserved",
+      );
+      if (session) {
+        sellerLookup.session(session);
+      }
+      const user = await sellerLookup.lean();
+      const available = getSellerLoyaltyPointsAvailable(user);
+      throw new InsufficientLoyaltyPointsError(normalizedAmount, available);
     }
-    const user = await sellerLookup.lean();
-    const available = getSellerLoyaltyPointsAvailable(user);
-    throw new InsufficientLoyaltyPointsError(normalizedAmount, available);
-  }
 
-  await UserModel.updateOne(
-    { _id: buyerId },
-    { $inc: { userLoyaltyPoints: normalizedAmount } },
-    withMongoSession({}, session),
-  );
+    await UserModel.updateOne(
+      { _id: buyerId },
+      { $inc: { userLoyaltyPoints: normalizedAmount } },
+      withMongoSession({}, session),
+    );
+
+    logMoneyEvent("info", "loyalty_settle", {
+      userId: String(sellerId),
+      buyerId: String(buyerId),
+      amount: normalizedAmount,
+      currency: "LP",
+    });
+  } catch (error) {
+    logMoneyFailure(
+      "loyalty_settle",
+      {
+        userId: String(sellerId),
+        buyerId: String(buyerId),
+        amount: normalizedAmount,
+        currency: "LP",
+      },
+      error,
+    );
+    throw error;
+  }
 };
 
 /**
@@ -209,9 +278,10 @@ export const releaseLoyaltyPointsBySellerTotals = async (totals, session = null)
       });
     } catch (releaseError) {
       logServerEvent("error", {
-        event: "releaseloyaltypointsbysellertotals",
-        error:
-          releaseError instanceof Error ? releaseError.message : String(releaseError),
+        event: "money.loyalty_release_batch_failed",
+        userId: String(row.sellerId),
+        amount: row.amount,
+        ...formatLogError(releaseError),
       });
     }
   }

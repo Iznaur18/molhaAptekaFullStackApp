@@ -24,7 +24,11 @@ import {
   getDefaultUserBackgroundStoredValue,
   isUserBackgroundPresetId,
 } from "../../constants/userBackgroundPresets.js";
-import { logServerEvent } from "../../utils/logServerEvent.js";
+import {
+  logSecurityEvent,
+  logSecurityFailure,
+  securityRequestFields,
+} from "../../services/auth/logSecurityEvent.js";
 
 function pickUrlOrDefault(value, defaultUrl) {
   if (value == null || String(value).trim() === "") return defaultUrl;
@@ -129,26 +133,46 @@ export const loginPhonePasswordController = async (req, res) => {
     const isValidPassword = await bcrypt.compare(password, passwordHashToCompare);
 
     if (!user || !isValidPassword) {
+      logSecurityEvent("warn", "login_failed", {
+        ...securityRequestFields(req),
+        methodKind: "phone_password",
+        reason: "invalid_credentials",
+      });
       return errorRes(res, 400, PHONE_LOGIN_INVALID_MESSAGE);
     }
 
     if (user.isBlockedUser) {
+      logSecurityEvent("warn", "login_failed", {
+        ...securityRequestFields(req),
+        methodKind: "phone_password",
+        reason: "blocked",
+        userId: String(user._id),
+      });
       return errorRes(res, 403, "Аккаунт заблокирован");
     }
 
     if (user.isActiveUser === false) {
+      logSecurityEvent("warn", "login_failed", {
+        ...securityRequestFields(req),
+        methodKind: "phone_password",
+        reason: "disabled",
+        userId: String(user._id),
+      });
       return errorRes(res, 403, "Аккаунт отключён администратором");
     }
 
     user.userLastLoginAt = new Date();
     await user.save({ validateBeforeSave: false });
 
+    logSecurityEvent("info", "login_ok", {
+      ...securityRequestFields(req),
+      methodKind: "phone_password",
+      userId: String(user._id),
+    });
+
     return sendUserWithToken(user, res, req);
   } catch (error) {
-    logServerEvent("error", {
-      event: "unhandled_error",
-      error: error instanceof Error ? error.message : String(error),
-    });
+    logSecurityFailure("login", securityRequestFields(req), error);
     return errorRes(res, 500, "Ошибка при входе");
   }
 };
@@ -180,11 +204,30 @@ export const loginPhoneOtpConfirmController = async (req, res) => {
     user = await confirmPhoneLoginOtp(phoneNumber, code);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Не удалось войти";
+    const reason =
+      message === "Аккаунт заблокирован"
+        ? "blocked"
+        : message.includes("отключён")
+          ? "disabled"
+          : message.includes("попыток")
+            ? "attempts_exceeded"
+            : "invalid_otp";
+    logSecurityEvent("warn", "otp_login_failed", {
+      ...securityRequestFields(req),
+      methodKind: "phone_otp",
+      reason,
+    });
     if (message === "Аккаунт заблокирован" || message.includes("отключён")) {
       return errorRes(res, 403, message);
     }
     return errorRes(res, 400, message);
   }
+
+  logSecurityEvent("info", "login_ok", {
+    ...securityRequestFields(req),
+    methodKind: "phone_otp",
+    userId: String(user._id),
+  });
 
   return sendUserWithToken(user, res, req);
 };

@@ -1,5 +1,6 @@
 import { MoneyIdempotencyRecordModel } from "../../models/MoneyIdempotencyRecordModel.js";
 import { AppError } from "../../errors/AppError.js";
+import { logMoneyEvent, logMoneyFailure } from "./logMoneyEvent.js";
 
 export const MONEY_IDEMPOTENCY_KEY_MAX_LENGTH = 64;
 export const MONEY_IDEMPOTENCY_KEY_REQUIRED_MESSAGE =
@@ -75,6 +76,11 @@ export async function runMoneyIdempotentMutation({
 
     const replay = parseStoredResult(existing?.resultJson);
     if (replay) {
+      logMoneyEvent("info", "idempotent_replay", {
+        scope,
+        userId: actorId,
+        idempotencyKey: key,
+      });
       return replay;
     }
 
@@ -87,9 +93,19 @@ export async function runMoneyIdempotentMutation({
     await MoneyIdempotencyRecordModel.updateOne(filter, {
       $set: { resultJson: JSON.stringify(toStore) },
     });
+    logMoneyEvent("info", "idempotent_ok", {
+      scope,
+      userId: actorId,
+      idempotencyKey: key,
+    });
     return result;
   } catch (error) {
     await MoneyIdempotencyRecordModel.deleteOne(filter);
+    logMoneyFailure(
+      "idempotent",
+      { scope, userId: actorId, idempotencyKey: key },
+      error,
+    );
     throw error;
   }
 }
