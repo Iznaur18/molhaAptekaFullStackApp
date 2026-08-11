@@ -1,0 +1,90 @@
+// Grafana Alloy — ship izibuy systemd journals → Loki.
+// Установка: docs/deploy/LOGGING-CENTRAL.md
+//
+// Секреты через EnvironmentFile (/etc/alloy/loki.env):
+//   LOKI_URL=https://logs-prod-XXX.grafana.net/loki/api/v1/push
+//   LOKI_USERNAME=...
+//   LOKI_PASSWORD=...
+
+logging {
+  level  = "warn"
+  format = "logfmt"
+}
+
+loki.write "default" {
+  endpoint {
+    url = sys.env("LOKI_URL")
+
+    basic_auth {
+      username = sys.env("LOKI_USERNAME")
+      password = sys.env("LOKI_PASSWORD")
+    }
+  }
+}
+
+// API
+loki.source.journal "izibuy_api" {
+  matches        = "_SYSTEMD_UNIT=izibuy-api.service"
+  max_age        = "12h"
+  relabel_rules  = loki.relabel.izibuy_api.rules
+  forward_to     = [loki.process.izibuy.receiver]
+}
+
+loki.relabel "izibuy_api" {
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+  rule {
+    target_label = "app"
+    replacement  = "izibuy"
+  }
+  rule {
+    target_label = "service"
+    replacement  = "api"
+  }
+}
+
+// Worker
+loki.source.journal "izibuy_worker" {
+  matches        = "_SYSTEMD_UNIT=izibuy-worker.service"
+  max_age        = "12h"
+  relabel_rules  = loki.relabel.izibuy_worker.rules
+  forward_to     = [loki.process.izibuy.receiver]
+}
+
+loki.relabel "izibuy_worker" {
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+  rule {
+    target_label = "app"
+    replacement  = "izibuy"
+  }
+  rule {
+    target_label = "service"
+    replacement  = "worker"
+  }
+}
+
+// JSON от logServerEvent лежит в MESSAGE journald.
+loki.process "izibuy" {
+  stage.json {
+    expressions = {
+      level     = "level",
+      event     = "event",
+      requestId = "requestId",
+    }
+  }
+
+  stage.labels {
+    values = {
+      level = "",
+      event = "",
+    }
+  }
+
+  // Не раздувать index labels: requestId только в JSON-теле (фильтр | json).
+  forward_to = [loki.write.default.receiver]
+}

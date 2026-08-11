@@ -1,6 +1,8 @@
 import {
   createJsonApiClient,
   createRefreshSessionQueue,
+  getRequestIdFromAxiosError,
+  isCorrelationWorthyApiFailure,
   setupAuthSessionInterceptors,
   type AuthAwareRequestConfig,
 } from "@izibuy/shared-api";
@@ -11,6 +13,7 @@ import {
   API_CLIENT_UI,
   API_REQUEST_TIMEOUT_MS,
 } from "@/shared/config";
+import { isMobileSentryEnabled, Sentry } from "@/shared/lib/initMobileSentry";
 
 import {
   clearAuthTokens,
@@ -72,3 +75,34 @@ setupAuthSessionInterceptors(apiClient, {
   },
   onRefreshFailure: clearAuthTokens,
 });
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const requestId = getRequestIdFromAxiosError(error);
+    const status =
+      error && typeof error === "object" && "response" in error
+        ? (error as { response?: { status?: number } }).response?.status
+        : undefined;
+    const url =
+      error && typeof error === "object" && "config" in error
+        ? String((error as { config?: { url?: string } }).config?.url ?? "")
+        : "";
+
+    if (
+      requestId &&
+      isMobileSentryEnabled() &&
+      isCorrelationWorthyApiFailure(url, status) &&
+      typeof Sentry.addBreadcrumb === "function"
+    ) {
+      Sentry.addBreadcrumb({
+        category: "api",
+        message: `API ${status ?? "network"} ${url || "request"}`,
+        level: typeof status === "number" && status >= 500 ? "error" : "warning",
+        data: { requestId, status: status ?? null, url: url || null },
+      });
+    }
+
+    return Promise.reject(error);
+  },
+);

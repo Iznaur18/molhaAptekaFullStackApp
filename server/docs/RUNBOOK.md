@@ -10,7 +10,7 @@
 | -------- | -------- |
 | Сайт 502/504 | `sudo systemctl status izibuy-api`, `journalctl -u izibuy-api -n 100` |
 | API жив? | `curl -sS https://ДОМЕН/health \| jq` → `status`, `mongo`, `gitCommit` |
-| Ошибка у пользователя | `requestId` из ответа API → `journalctl … \| jq 'select(.requestId=="…")'` |
+| Ошибка у пользователя | `requestId` из ответа API → `journalctl … \| jq 'select(.requestId=="…")'` или Loki LogQL (см. `docs/deploy/LOGGING-CENTRAL.md`) |
 | 5xx в Sentry | Issues по `release` = `gitCommit` из `/health` |
 
 ---
@@ -170,4 +170,5 @@ du -sh /var/www/izibuy/server/uploads
 - systemd: `docs/deploy/systemd-izibuy.service.example`
 - Sentry: `server/docs/SENTRY.md`
 - Наблюдаемость: `server/docs/OBSERVABILITY.md`
+- Центральные логи: `docs/deploy/LOGGING-CENTRAL.md`
 - Object storage: `server/docs/MEDIA-OBJECT-STORAGE.md`

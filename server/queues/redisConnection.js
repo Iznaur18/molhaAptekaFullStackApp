@@ -1,6 +1,7 @@
 import IORedis from "ioredis";
 
 import { isBullMqEnabled } from "./bullMqEnabled.js";
+import { formatLogError, logServerEvent } from "../utils/logServerEvent.js";
 
 /** @type {import('ioredis').default | null} */
 let sharedConnection = null;
@@ -17,7 +18,10 @@ export function getBullMqRedisConnection() {
       maxRetriesPerRequest: null,
     });
     sharedConnection.on("error", (error) => {
-      console.error("[bullmq] Redis error:", error.message);
+      logServerEvent("error", {
+        event: "bullmq.redis_error",
+        ...formatLogError(error),
+      });
     });
   }
 
@@ -32,7 +36,10 @@ export async function closeBullMqRedisConnection() {
   try {
     await sharedConnection.quit();
   } catch (error) {
-    console.error("[bullmq] Redis quit error:", error);
+    logServerEvent("error", {
+      event: "bullmq.redis_quit_failed",
+      ...formatLogError(error),
+    });
   } finally {
     sharedConnection = null;
   }

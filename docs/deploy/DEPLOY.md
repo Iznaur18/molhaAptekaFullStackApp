@@ -6,6 +6,7 @@
 | -------- | ----- |
 | Этот файл | первый выклад |
 | [`../ROADMAP-SCALING.md`](../ROADMAP-SCALING.md) | фазы роста, Redis, worker, staging |
+| [`LOGGING-CENTRAL.md`](LOGGING-CENTRAL.md) | journald → Loki / Grafana Cloud / Yandex Logging |
 | [`PROD-S3-CDN.md`](PROD-S3-CDN.md) | медиа на R2 вместо диска |
 | [`CERTBOT-SSL.md`](CERTBOT-SSL.md) | Let's Encrypt / продление / troubleshooting |
 | [`../../server/docs/production-checklist.md`](../../server/docs/production-checklist.md) | smoke после деплоя |
@@ -121,7 +122,7 @@ sudo systemctl start izibuy-worker
 sudo systemctl status izibuy-worker
 ```
 
-Логи/heartbeat: `journalctl -u izibuy-worker -f` (строки `[worker] heartbeat …`).
+Логи/heartbeat: `journalctl -u izibuy-worker -f` (JSON `event=worker.heartbeat`).
 
 **Координация cron (обязательно, если запускаешь worker):** на API задай
 `CRON_LEADER=false` в `server/.env` (или не задавай — в prod дефолт «не запускать

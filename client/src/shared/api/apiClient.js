@@ -1,10 +1,13 @@
 import {
   createJsonApiClient,
   createRefreshSessionQueue,
+  getRequestIdFromAxiosError,
+  isCorrelationWorthyApiFailure,
   setupAuthSessionInterceptors,
 } from "@izibuy/shared-api";
 
 import { API_BASE_URL } from "../config/apiBaseUrl.js";
+import { isClientSentryEnabled } from "../lib/clientSentryEnv.js";
 import { applyDevAuthTokensFromResponse } from "./applyDevAuthTokensFromResponse.js";
 import {
   clearAuthTokens,
@@ -98,3 +101,27 @@ setupAuthSessionInterceptors(apiClient, {
     path.includes("/auth/refresh") ||
     path.includes("/auth/password/change"),
 });
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const requestId = getRequestIdFromAxiosError(error);
+    const status = error?.response?.status;
+    const url = String(error?.config?.url ?? "");
+    if (
+      requestId &&
+      isClientSentryEnabled() &&
+      isCorrelationWorthyApiFailure(url, status)
+    ) {
+      void import("@sentry/react").then((Sentry) => {
+        Sentry.addBreadcrumb({
+          category: "api",
+          message: `API ${status ?? "network"} ${url || "request"}`,
+          level: typeof status === "number" && status >= 500 ? "error" : "warning",
+          data: { requestId, status: status ?? null, url: url || null },
+        });
+      });
+    }
+    return Promise.reject(error);
+  },
+);

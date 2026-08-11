@@ -15,17 +15,24 @@ import { connectMongoRead, closeMongoRead } from "./db/mongoReadConnection.js";
 import { syncCriticalIndexes } from "./db/syncCriticalIndexes.js";
 import { startCronIntervals } from "./jobs/startCronIntervals.js";
 import { isBullMqEnabled } from "./queues/bullMqEnabled.js";
+import { formatLogError, logServerEvent } from "./utils/logServerEvent.js";
 
 if (!isObjectStorageUploadEnabled()) {
   ensureUploadsDir();
 }
 
 if (!process.env.JWT_SECRET) {
-  console.error("JWT_SECRET не задан в .env");
+  logServerEvent("fatal", {
+    event: "api.env_invalid",
+    message: "JWT_SECRET не задан в .env",
+  });
   process.exit(1);
 }
 if (!process.env.MONGO_URI) {
-  console.error("MONGO_URI не задан в .env");
+  logServerEvent("fatal", {
+    event: "api.env_invalid",
+    message: "MONGO_URI не задан в .env",
+  });
   process.exit(1);
 }
 
@@ -34,18 +41,26 @@ const isProduction = process.env.NODE_ENV === "production";
 if (isProduction) {
   const { ok, errors, warnings } = assertProductionEnv();
   for (const message of warnings) {
-    console.warn(`[prod-env] ${message}`);
+    logServerEvent("warn", {
+      event: "api.prod_env_warning",
+      message,
+    });
   }
   if (!ok) {
     for (const message of errors) {
-      console.error(`[prod-env] ${message}`);
+      logServerEvent("error", {
+        event: "api.prod_env_invalid",
+        message,
+      });
     }
     process.exit(1);
   }
 } else if (!process.env.FRONTEND_URL) {
-  console.warn(
-    "FRONTEND_URL не задан — CORS разрешён для всех origin (только для dev)",
-  );
+  logServerEvent("warn", {
+    event: "api.cors_open_dev",
+    message:
+      "FRONTEND_URL не задан — CORS разрешён для всех origin (только для dev)",
+  });
 }
 
 const app = createApp();
@@ -70,11 +85,17 @@ async function shutdown(signal) {
     return;
   }
   isShuttingDown = true;
-  console.log(`[shutdown] получен ${signal}, завершаемся…`);
+  logServerEvent("info", {
+    event: "api.shutdown_started",
+    signal,
+  });
 
   // Подстраховка: если дренаж завис (keep-alive и т.п.) — принудительный выход.
   const forceTimer = setTimeout(() => {
-    console.error("[shutdown] таймаут дренажа — принудительный выход");
+    logServerEvent("fatal", {
+      event: "api.shutdown_force_exit",
+      message: "таймаут дренажа — принудительный выход",
+    });
     process.exit(1);
   }, SHUTDOWN_FORCE_EXIT_MS);
   forceTimer.unref();
@@ -88,11 +109,14 @@ async function shutdown(signal) {
       closeMongoRead(),
       closeRateLimitRedisStore(),
     ]);
-    console.log("[shutdown] соединения закрыты, выходим");
+    logServerEvent("info", { event: "api.shutdown_complete" });
     clearTimeout(forceTimer);
     process.exit(0);
   } catch (error) {
-    console.error("[shutdown] ошибка:", error);
+    logServerEvent("fatal", {
+      event: "api.shutdown_failed",
+      ...formatLogError(error),
+    });
     process.exit(1);
   }
 }
@@ -103,7 +127,7 @@ async function start() {
     initRateLimitMiddlewares(rateLimitStore ?? undefined);
 
     await mongoose.connect(process.env.MONGO_URI);
-    console.log("Connected to MongoDB");
+    logServerEvent("info", { event: "api.mongo_connected" });
 
     await syncCriticalIndexes();
 
@@ -111,25 +135,34 @@ async function start() {
 
     const cronStarted = startCronIntervals();
     if (isProduction && !cronStarted && !isBullMqEnabled()) {
-      console.warn(
-        "[cron] ВНИМАНИЕ: scheduled-задачи (завершение розыгрышей, дедлайны рассрочки, " +
-          "истечение промо/баннеров/премиума, чистка сторис) НЕ запущены на этом процессе. " +
-          "Убедитесь, что ровно один процесс их выполняет: запустите worker.js или задайте CRON_LEADER=true.",
-      );
+      logServerEvent("warn", {
+        event: "api.cron_not_running",
+        message:
+          "scheduled-задачи НЕ запущены на этом процессе — нужен worker.js или CRON_LEADER=true",
+      });
     }
 
     httpServer = app.listen(PORT, () => {
-      console.log(`Сервер успешно запущен на ${PORT}.`);
+      logServerEvent("info", {
+        event: "api.listening",
+        port: Number(PORT),
+      });
     });
     httpServer.on("error", (err) => {
-      console.error("Ошибка запуска сервера:", err);
+      logServerEvent("fatal", {
+        event: "api.listen_failed",
+        ...formatLogError(err),
+      });
       process.exit(1);
     });
 
     process.on("SIGTERM", () => void shutdown("SIGTERM"));
     process.on("SIGINT", () => void shutdown("SIGINT"));
   } catch (err) {
-    console.error("Ошибка подключения к MongoDB:", err);
+    logServerEvent("fatal", {
+      event: "api.startup_failed",
+      ...formatLogError(err),
+    });
     process.exit(1);
   }
 }

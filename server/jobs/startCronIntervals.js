@@ -1,3 +1,7 @@
+import { formatLogError, logServerEvent } from "../utils/logServerEvent.js";
+
+import { isBullMqEnabled } from "../queues/bullMqEnabled.js";
+
 import { ONEC_SYNC_INTERVAL_MS } from "../constants/onecConstants.js";
 import { INSTALLMENT_CRON_INTERVAL_MS } from "../constants/installmentConstants.js";
 import { INTRO_AD_CRON_INTERVAL_MS } from "../constants/introAdCampaignConstants.js";
@@ -18,87 +22,88 @@ import { purgeExpiredBuyerPassportShares } from "../services/passport-vault/inde
 import { processProductPriceMarketStatusCronTasks } from "../services/product/refreshProductPriceMarketStatus.js";
 import { processOneCCronTasks } from "../services/onec/index.js";
 
-import { isBullMqEnabled } from "../queues/bullMqEnabled.js";
-
 import { shouldRunCronOnThisProcess } from "./shouldRunCronOnThisProcess.js";
 
 const USER_STORY_CLEANUP_INTERVAL_MS = 15 * 60 * 1000;
 
+/**
+ * @param {string} job
+ * @param {() => Promise<unknown>} run
+ */
+function scheduleCronJob(job, intervalMs, run) {
+  setInterval(() => {
+    void run().catch((error) => {
+      logServerEvent("error", {
+        event: "cron.job_failed",
+        job,
+        ...formatLogError(error),
+      });
+    });
+  }, intervalMs);
+}
+
 /** @returns {boolean} */
 export function startCronIntervals() {
   if (isBullMqEnabled()) {
-    console.log("[cron] skipped — BullMQ repeatable jobs on worker.js (REDIS_URL set)");
+    logServerEvent("info", {
+      event: "cron.skipped",
+      reason: "bullmq_enabled",
+    });
     return false;
   }
 
   if (!shouldRunCronOnThisProcess()) {
-    console.log(
-      "[cron] skipped on this process (set CRON_LEADER=true on leader or run worker.js)",
-    );
+    logServerEvent("info", {
+      event: "cron.skipped",
+      reason: "not_cron_leader",
+    });
     return false;
   }
 
-  console.log("[cron] starting scheduled jobs");
+  logServerEvent("info", { event: "cron.started" });
 
-  setInterval(() => {
-    void expireStaleUserStories().catch((error) => {
-      console.error("expireStaleUserStories error:", error);
-    });
-  }, USER_STORY_CLEANUP_INTERVAL_MS);
-
-  setInterval(() => {
-    void processInstallmentCronTasks().catch((error) => {
-      console.error("processInstallmentCronTasks error:", error);
-    });
-  }, INSTALLMENT_CRON_INTERVAL_MS);
-
-  setInterval(() => {
-    void processPremiumCronTasks().catch((error) => {
-      console.error("processPremiumCronTasks error:", error);
-    });
-  }, PREMIUM_CRON_INTERVAL_MS);
-
-  setInterval(() => {
-    void expireProductPromotionsAndSendNotifications().catch((error) => {
-      console.error("expireProductPromotionsAndSendNotifications error:", error);
-    });
-  }, PRODUCT_PROMOTION_CRON_INTERVAL_MS);
-
-  setInterval(() => {
-    void processIntroAdCampaignCronTasks().catch((error) => {
-      console.error("processIntroAdCampaignCronTasks error:", error);
-    });
-  }, INTRO_AD_CRON_INTERVAL_MS);
-
-  setInterval(() => {
-    void processSellerPersonalCategoryCronTasks().catch((error) => {
-      console.error("processSellerPersonalCategoryCronTasks error:", error);
-    });
-  }, SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS);
-
-  setInterval(() => {
-    void processSiteHeaderBannerCampaignCronTasks().catch((error) => {
-      console.error("processSiteHeaderBannerCampaignCronTasks error:", error);
-    });
-  }, SITE_HEADER_BANNER_CAMPAIGN_CRON_INTERVAL_MS);
-
-  setInterval(() => {
-    void purgeExpiredBuyerPassportShares().catch((error) => {
-      console.error("purgeExpiredBuyerPassportShares error:", error);
-    });
-  }, BUYER_PASSPORT_SHARE_PURGE_CRON_INTERVAL_MS);
-
-  setInterval(() => {
-    void processProductPriceMarketStatusCronTasks().catch((error) => {
-      console.error("processProductPriceMarketStatusCronTasks error:", error);
-    });
-  }, PRODUCT_PRICE_MARKET_STATUS_CRON_INTERVAL_MS);
-
-  setInterval(() => {
-    void processOneCCronTasks().catch((error) => {
-      console.error("processOneCCronTasks error:", error);
-    });
-  }, ONEC_SYNC_INTERVAL_MS);
+  scheduleCronJob("expire_stale_user_stories", USER_STORY_CLEANUP_INTERVAL_MS, expireStaleUserStories);
+  scheduleCronJob(
+    "process_installment_cron_tasks",
+    INSTALLMENT_CRON_INTERVAL_MS,
+    processInstallmentCronTasks,
+  );
+  scheduleCronJob(
+    "process_premium_cron_tasks",
+    PREMIUM_CRON_INTERVAL_MS,
+    processPremiumCronTasks,
+  );
+  scheduleCronJob(
+    "expire_product_promotions",
+    PRODUCT_PROMOTION_CRON_INTERVAL_MS,
+    expireProductPromotionsAndSendNotifications,
+  );
+  scheduleCronJob(
+    "process_intro_ad_campaign_cron_tasks",
+    INTRO_AD_CRON_INTERVAL_MS,
+    processIntroAdCampaignCronTasks,
+  );
+  scheduleCronJob(
+    "process_seller_personal_category_cron_tasks",
+    SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS,
+    processSellerPersonalCategoryCronTasks,
+  );
+  scheduleCronJob(
+    "process_site_header_banner_campaign_cron_tasks",
+    SITE_HEADER_BANNER_CAMPAIGN_CRON_INTERVAL_MS,
+    processSiteHeaderBannerCampaignCronTasks,
+  );
+  scheduleCronJob(
+    "purge_expired_buyer_passport_shares",
+    BUYER_PASSPORT_SHARE_PURGE_CRON_INTERVAL_MS,
+    purgeExpiredBuyerPassportShares,
+  );
+  scheduleCronJob(
+    "process_product_price_market_status_cron_tasks",
+    PRODUCT_PRICE_MARKET_STATUS_CRON_INTERVAL_MS,
+    processProductPriceMarketStatusCronTasks,
+  );
+  scheduleCronJob("process_onec_cron_tasks", ONEC_SYNC_INTERVAL_MS, processOneCCronTasks);
 
   return true;
 }

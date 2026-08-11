@@ -29,6 +29,7 @@ import {
   errorHandler,
   notFoundHandler,
   requestIdMW,
+  accessLogMW,
   csrfCookieOriginCheckMW,
   auditStaffActionMW,
 } from "./middlewares/index.js";
@@ -45,6 +46,7 @@ export const createApp = () => {
 
   app.set("trust proxy", 1);
   app.use(requestIdMW);
+  app.use(accessLogMW);
   app.use(express.json({ limit: API_JSON_BODY_LIMIT }));
   app.use(cookieParser());
   app.use(resolveApiCorsMiddleware(isProduction));

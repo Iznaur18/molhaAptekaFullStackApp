@@ -1,5 +1,5 @@
 import { captureServerHttpError } from "./captureServerHttpError.js";
-import { logServerEvent } from "./logServerEvent.js";
+import { formatLogError, logServerEvent } from "./logServerEvent.js";
 
 const formatFatalReason = (reason) => {
   if (reason instanceof Error) {
@@ -15,16 +15,18 @@ export const registerProcessFatalHandlers = () => {
   process.on("unhandledRejection", (reason) => {
     const error = formatFatalReason(reason);
     logServerEvent("error", {
-      event: "unhandledRejection",
-      message: error.message,
+      event: "process.unhandled_rejection",
+      ...formatLogError(error),
     });
     captureServerHttpError(error, null);
   });
 
   process.on("uncaughtException", (error) => {
-    logServerEvent("error", {
-      event: "uncaughtException",
-      message: error instanceof Error ? error.message : String(error),
+    logServerEvent("fatal", {
+      event: "process.uncaught_exception",
+      ...formatLogError(
+        error instanceof Error ? error : new Error(String(error)),
+      ),
     });
     captureServerHttpError(
       error instanceof Error ? error : new Error(String(error)),

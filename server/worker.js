@@ -7,6 +7,7 @@ import { startCronIntervals } from "./jobs/startCronIntervals.js";
 import { isBullMqEnabled } from "./queues/bullMqEnabled.js";
 import { closeAppQueue } from "./queues/appQueue.js";
 import { closeBullMqRedisConnection } from "./queues/redisConnection.js";
+import { formatLogError, logServerEvent } from "./utils/logServerEvent.js";
 
 process.env.CRON_LEADER = "true";
 
@@ -19,7 +20,10 @@ const WORKER_HEARTBEAT_MS = Math.max(
 let heartbeatTimer = null;
 
 if (!process.env.MONGO_URI) {
-  console.error("MONGO_URI не задан в .env");
+  logServerEvent("fatal", {
+    event: "worker.env_invalid",
+    message: "MONGO_URI не задан в .env",
+  });
   process.exit(1);
 }
 
@@ -37,30 +41,42 @@ async function shutdown() {
 async function start() {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    console.log("Worker connected to MongoDB");
+    logServerEvent("info", { event: "worker.mongo_connected" });
 
     if (isBullMqEnabled()) {
       await startBullMqWorkers();
     } else {
       const started = startCronIntervals();
       if (!started) {
-        console.error("Worker failed to start cron intervals");
+        logServerEvent("fatal", {
+          event: "worker.cron_start_failed",
+          message: "Worker failed to start cron intervals",
+        });
         process.exit(1);
       }
     }
 
     const mode = isBullMqEnabled() ? "bullmq" : "cron-intervals";
-    console.log(`Worker running (no HTTP server) — mode=${mode}`);
+    logServerEvent("info", {
+      event: "worker.running",
+      mode,
+    });
 
     heartbeatTimer = setInterval(() => {
       const mem = Math.round(process.memoryUsage().rss / 1024 / 1024);
-      console.log(
-        `[worker] heartbeat mode=${mode} uptime=${Math.round(process.uptime())}s rss=${mem}MB`,
-      );
+      logServerEvent("info", {
+        event: "worker.heartbeat",
+        mode,
+        uptimeSec: Math.round(process.uptime()),
+        rssMb: mem,
+      });
     }, WORKER_HEARTBEAT_MS);
     heartbeatTimer.unref();
   } catch (error) {
-    console.error("Worker startup error:", error);
+    logServerEvent("fatal", {
+      event: "worker.startup_failed",
+      ...formatLogError(error),
+    });
     process.exit(1);
   }
 }

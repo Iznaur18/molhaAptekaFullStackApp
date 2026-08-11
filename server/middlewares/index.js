@@ -38,10 +38,12 @@ import {
   AppError,
 } from "./errorHandlerMW.js";
 import { requestIdMW } from "./requestIdMW.js";
+import { accessLogMW } from "./accessLogMW.js";
 import { auditStaffActionMW } from "./auditStaffActionMW.js";
 
 export {
   requestIdMW,
+  accessLogMW,
   auditStaffActionMW,
   uploadMW,
   uploadVideoMW,

@@ -17,6 +17,23 @@ import {
 } from "@molha/api-contract";
 import type { z } from "zod";
 
+import {
+  generateClientRequestId,
+  getRequestIdFromAxiosError,
+  REQUEST_ID_HEADER,
+} from "./requestId.js";
+
+export {
+  generateClientRequestId,
+  getRequestIdFromAxiosError,
+  isCorrelationWorthyApiFailure,
+  normalizeClientRequestId,
+  readHeaderIgnoreCase,
+  REQUEST_ID_HEADER,
+  REQUEST_ID_MAX_LENGTH,
+  REQUEST_ID_MIN_LENGTH,
+} from "./requestId.js";
+
 const AUTH_REFRESH_SKIP_PATHS = [
   "/auth/refresh",
   "/auth/login",
@@ -116,6 +133,7 @@ export const createRefreshSessionQueue = <T>(refreshFn: () => Promise<T>) => {
 export type AuthAwareRequestConfig = InternalAxiosRequestConfig & {
   _authRefreshAttempted?: boolean;
   _skipAuthRefresh?: boolean;
+  _requestId?: string;
 };
 
 type SetupAuthSessionInterceptorsOptions = {
@@ -130,6 +148,31 @@ type SetupAuthSessionInterceptorsOptions = {
   onRefreshFailure?: () => void | Promise<void>;
 };
 
+const attachOutboundRequestId = (config: InternalAxiosRequestConfig) => {
+  const typed = config as AuthAwareRequestConfig;
+  const existingHeader =
+    typeof config.headers?.get === "function"
+      ? config.headers.get(REQUEST_ID_HEADER)
+      : null;
+  const existing =
+    typed._requestId ||
+    (typeof existingHeader === "string" ? existingHeader : null) ||
+    (typeof config.headers === "object" && config.headers
+      ? (config.headers as Record<string, unknown>)[REQUEST_ID_HEADER]
+      : null);
+
+  const requestId =
+    (typeof existing === "string" && existing.trim()) || generateClientRequestId();
+
+  typed._requestId = requestId;
+  if (config.headers && typeof config.headers.set === "function") {
+    config.headers.set(REQUEST_ID_HEADER, requestId);
+  } else {
+    config.headers = config.headers ?? {};
+    (config.headers as Record<string, string>)[REQUEST_ID_HEADER] = requestId;
+  }
+};
+
 export const createJsonApiClient = (options: {
   baseURL?: string;
   timeoutMs?: number;
@@ -137,7 +180,7 @@ export const createJsonApiClient = (options: {
 }): AxiosInstance => {
   const { baseURL, timeoutMs, withCredentials } = options;
 
-  return axios.create({
+  const apiClient = axios.create({
     baseURL: baseURL || undefined,
     headers: {
       "Content-Type": "application/json",
@@ -145,6 +188,24 @@ export const createJsonApiClient = (options: {
     ...(typeof timeoutMs === "number" ? { timeout: timeoutMs } : {}),
     ...(withCredentials ? { withCredentials: true } : {}),
   });
+
+  apiClient.interceptors.request.use((config) => {
+    attachOutboundRequestId(config);
+    return config;
+  });
+
+  apiClient.interceptors.response.use(
+    (response) => response,
+    (error: AxiosError & { requestId?: string }) => {
+      const requestId = getRequestIdFromAxiosError(error);
+      if (requestId) {
+        error.requestId = requestId;
+      }
+      return Promise.reject(error);
+    },
+  );
+
+  return apiClient;
 };
 
 export const setupAuthSessionInterceptors = (

@@ -3,6 +3,7 @@ import { Worker } from "bullmq";
 import { getAppQueue } from "../queues/appQueue.js";
 import { APP_QUEUE_NAME, DEFAULT_QUEUE_PREFIX } from "../queues/queueConstants.js";
 import { getBullMqRedisConnection } from "../queues/redisConnection.js";
+import { formatLogError, logServerEvent } from "../utils/logServerEvent.js";
 
 import { CRON_JOB_DEFINITIONS } from "./cronJobDefinitions.js";
 import { processAppQueueJob } from "./processAppQueueJob.js";
@@ -35,11 +36,15 @@ export async function startBullMqWorkers() {
         },
       );
     }
-    console.log(
-      `[bullmq] registered ${CRON_JOB_DEFINITIONS.length} repeatable cron jobs`,
-    );
+    logServerEvent("info", {
+      event: "bullmq.cron_registered",
+      count: CRON_JOB_DEFINITIONS.length,
+    });
   } else {
-    console.log("[bullmq] cron schedulers skipped on this process");
+    logServerEvent("info", {
+      event: "bullmq.cron_skipped",
+      reason: "not_cron_leader",
+    });
   }
 
   appWorker = new Worker(APP_QUEUE_NAME, processAppQueueJob, {
@@ -49,10 +54,15 @@ export async function startBullMqWorkers() {
   });
 
   appWorker.on("failed", (job, error) => {
-    console.error(`[bullmq] job ${job?.name ?? "unknown"} failed:`, error);
+    logServerEvent("error", {
+      event: "bullmq.job_failed",
+      jobId: job?.id ?? null,
+      job: job?.name ?? "unknown",
+      ...formatLogError(error),
+    });
   });
 
-  console.log("[bullmq] worker started");
+  logServerEvent("info", { event: "bullmq.worker_started" });
   return appWorker;
 }
 
@@ -64,7 +74,10 @@ export async function closeBullMqWorkers() {
   try {
     await appWorker.close();
   } catch (error) {
-    console.error("[bullmq] worker close error:", error);
+    logServerEvent("error", {
+      event: "bullmq.worker_close_failed",
+      ...formatLogError(error),
+    });
   } finally {
     appWorker = null;
   }

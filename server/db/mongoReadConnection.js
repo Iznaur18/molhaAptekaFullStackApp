@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 import ProductModel, { ProductSchema } from "../models/ProductModel.js";
+import { formatLogError, logServerEvent } from "../utils/logServerEvent.js";
 
 /** @type {import("mongoose").Connection | null} */
 let readConnection = null;
@@ -36,7 +37,10 @@ export async function connectMongoRead() {
 
   readConnection = mongoose.createConnection(uri);
   readConnection.on("error", (error) => {
-    console.error("[mongo-read] connection error:", error);
+    logServerEvent("error", {
+      event: "mongo.read_connection_error",
+      ...formatLogError(error),
+    });
   });
 
   await readConnection.asPromise();
@@ -44,7 +48,7 @@ export async function connectMongoRead() {
   catalogProductReadModel =
     readConnection.models.Product ?? readConnection.model("Product", ProductSchema);
 
-  console.log("[mongo-read] catalog reads routed to MONGO_URI_READ");
+  logServerEvent("info", { event: "mongo.read_connected" });
   return true;
 }
 

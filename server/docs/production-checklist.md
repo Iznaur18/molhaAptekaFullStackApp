@@ -147,8 +147,36 @@ Nodemailer включён: при заданных `SMTP_*` письмо ухо�
 - [ ] Uptime ping на `/health` каждые 1–5 мин
 - [ ] Алерт при `mongo: disconnected` или status ≠ ok
 - [x] Sentry (опционально, `docs/SENTRY.md`) + runbook (`docs/RUNBOOK.md`)
-- [x] Request ID + JSON-логи ошибок (`docs/OBSERVABILITY.md`)
-- [ ] `journalctl -u izibuy-api -f` или pm2 logs (фильтр по `requestId`)
+- [x] Request ID + JSON-логи + access (`docs/OBSERVABILITY.md`)
+- [x] Центральные логи — док/пример Alloy (`docs/deploy/LOGGING-CENTRAL.md`)
+
+### 7a. Smoke логов на VPS (перед/после релиза)
+
+Env (`server/.env`):
+
+```env
+GIT_COMMIT_SHA=<sha деплоя>
+ACCESS_LOG_SAMPLE_RATE=0.1
+SENTRY_DSN=…          # если уже есть проект
+```
+
+Проверки:
+
+```bash
+# JSON из API
+sudo journalctl -u izibuy-api -n 20 -o cat | head
+sudo journalctl -u izibuy-api -n 200 -o cat | jq -c 'select(.event=="http.access")' | tail -5
+sudo journalctl -u izibuy-worker -n 50 -o cat | jq -c 'select(.event=="worker.heartbeat")' | tail -3
+
+# корреляция: взять requestId из ответа 404/ошибки
+curl -sS -D- https://izibuy.ru/api/no-such-route-xyz -o /tmp/body.json
+# заголовок X-Request-Id + поле requestId в JSON →
+sudo journalctl -u izibuy-api -n 500 -o cat | jq -c 'select(.requestId=="<id>")'
+
+# Sentry (если DSN): release = GIT_COMMIT_SHA, tag requestId на 5xx
+```
+
+Опционально после стабилизации: Alloy → Loki (`LOGGING-CENTRAL.md`). Не блокер первого релиза.
 
 ---
 

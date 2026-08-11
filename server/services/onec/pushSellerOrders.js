@@ -13,6 +13,7 @@ import {
   OrderModel,
   ProductModel,
 } from "../../models/index.js";
+import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { postOneCCustomerOrder } from "./onecHttpClient.js";
 import { resolveSellerOneCCredentials } from "./onecSettings.js";
 
@@ -76,7 +77,11 @@ export async function enqueueOneCOrderPushesForOrder(order) {
     } catch (error) {
       // duplicate key — уже есть
       if (error?.code !== 11000) {
-        console.error("[onec] enqueue order push failed:", error);
+        logServerEvent("error", {
+          event: "onec.order_push_enqueue_failed",
+          orderId: String(orderId),
+          ...formatLogError(error),
+        });
       }
     }
   }

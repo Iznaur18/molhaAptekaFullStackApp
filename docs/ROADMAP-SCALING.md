@@ -220,10 +220,9 @@ Worker (systemd) ──► CRON_LEADER=true, BullMQ consumer
 
 **Наблюдаемость**
 
-- [ ] Централизованные логи (Loki / Yandex Logging / Grafana Cloud)
+- [x] Централизованные логи (док: [`deploy/LOGGING-CENTRAL.md`](deploy/LOGGING-CENTRAL.md), Alloy example) — включить агент на VPS
 - [ ] Метрики: RPS, p95 latency, Mongo connections, Redis memory
-- [ ] Единый structured JSON (`logServerEvent`), без `console.log` на boot
-
+- [x] Единый structured JSON (`logServerEvent`) на runtime-путях (api/worker/cron)
 **Mobile**
 
 - [ ] EAS build в CI

@@ -14,4 +14,7 @@ export const Sentry = {
   ): ComponentType<P> {
     return Component;
   },
+  addBreadcrumb(_breadcrumb?: unknown): void {
+    // no-op without DSN
+  },
 };

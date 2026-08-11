@@ -6,6 +6,7 @@ import {
   ONEC_SYNC_STATUS_SUCCESS,
 } from "../../constants/onecConstants.js";
 import { OneCExchangeLogModel, UserModel } from "../../models/index.js";
+import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { pushPendingSellerOrders } from "./pushSellerOrders.js";
 import { syncSellerNomenclature } from "./syncSellerNomenclature.js";
 
@@ -92,10 +93,11 @@ export async function processOneCCronTasks() {
       ok += 1;
     } catch (error) {
       failed += 1;
-      console.error(
-        `[onec] cron sync failed for seller ${seller._id}:`,
-        error instanceof Error ? error.message : error,
-      );
+      logServerEvent("error", {
+        event: "onec.cron_seller_sync_failed",
+        sellerId: String(seller._id),
+        ...formatLogError(error),
+      });
     }
   }
 

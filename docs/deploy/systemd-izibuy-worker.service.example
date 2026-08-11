@@ -17,7 +17,7 @@
 #   sudo systemctl enable izibuy-worker
 #   sudo systemctl start izibuy-worker
 #   sudo systemctl status izibuy-worker
-#   journalctl -u izibuy-worker -f      # логи/heartbeat
+#   journalctl -u izibuy-worker -f      # JSON-логи / event=worker.heartbeat
 #
 # Тот же env-файл, что у API: /var/www/izibuy/server/.env (chmod 600)
 
