@@ -512,6 +512,8 @@ export const PRODUCT_PROMO_CODE_UI = {
   ACTIVATE_PENDING: "Проверяем…",
   LOGIN_REQUIRED: "Войдите, чтобы активировать промокод",
   ALREADY_APPLIED: "На этот товар уже применён промокод",
+  APPLIED_LABEL: "Промокод активен",
+  APPLIED_PERCENT: (percent: number) => `−${percent}%`,
   APPLIED: (percent: number) => `Промокод активен: −${percent}%`,
   MODAL_TITLE: "Промокоды товара",
   MODAL_LEAD:

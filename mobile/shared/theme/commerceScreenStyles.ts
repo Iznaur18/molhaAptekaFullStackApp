@@ -431,6 +431,25 @@ export const useCartLineItemStyles = createThemedStyles((theme) => ({
     /** Место под чекбокс выбора в правом верхнем углу карточки. */
     paddingRight: 28,
   },
+  unitPriceRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "baseline",
+    gap: 8,
+  },
+  unitPrice: {
+    fontSize: 18,
+    fontWeight: "700",
+    lineHeight: 22,
+    color: theme.colors.text,
+  },
+  unitPriceOld: {
+    fontSize: 14,
+    fontWeight: "500",
+    lineHeight: 18,
+    color: theme.colors.textMuted,
+    textDecorationLine: "line-through",
+  },
   selectCheckbox: {
     position: "absolute",
     top: 12,

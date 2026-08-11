@@ -164,7 +164,17 @@ export function ProductPromoCodeActivateSheet({
         <div className="wholesale-price-modal__body">
           <p className="wholesale-price-modal__hint">{PRODUCT_PROMO_CODE_UI.SHEET_LEAD}</p>
           {applied ? (
-            <p role="status">{PRODUCT_PROMO_CODE_UI.APPLIED(applied.discountPercent)}</p>
+            <div
+              className="wholesale-price-modal__promo-applied"
+              role="status"
+            >
+              <span className="wholesale-price-modal__promo-applied-label">
+                {PRODUCT_PROMO_CODE_UI.APPLIED_LABEL}
+              </span>
+              <span className="wholesale-price-modal__promo-applied-percent">
+                {PRODUCT_PROMO_CODE_UI.APPLIED_PERCENT(applied.discountPercent)}
+              </span>
+            </div>
           ) : (
             <label className="wholesale-price-modal__field">
               {PRODUCT_PROMO_CODE_UI.CODE_LABEL}
@@ -183,7 +193,14 @@ export function ProductPromoCodeActivateSheet({
               {error}
             </p>
           ) : null}
-          {success ? <p role="status">{success}</p> : null}
+          {success ? (
+            <div
+              className="wholesale-price-modal__promo-applied"
+              role="status"
+            >
+              {success}
+            </div>
+          ) : null}
         </div>
         <footer className="wholesale-price-modal__footer">
           {!applied ? (

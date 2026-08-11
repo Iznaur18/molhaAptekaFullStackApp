@@ -39,7 +39,11 @@ import {
   resolveAffiliateReferrerUserId,
   resolveOrderLineAffiliateAttribution,
 } from "../affiliate/resolveAffiliateAttribution.js";
-import { listAppliedProductPromosForUser } from "../product/productPromoCode.js";
+import {
+  collectOrderedProductIdsWithPromo,
+  consumeProductPromoActivationsForUser,
+  listAppliedProductPromosForUser,
+} from "../product/productPromoCode.js";
 
 const calculateTotalAmount = (items) =>
   items.reduce((sum, item) => sum + (item.unitPriceAtOrder ?? 0) * item.quantity, 0);
@@ -381,6 +385,15 @@ export async function createOrder({
         { $set: { items: {} } },
         withMongoSession({ upsert: true }, session),
       );
+
+      const promoProductIds = collectOrderedProductIdsWithPromo(itemsWithPrice);
+      if (promoProductIds.length > 0) {
+        await consumeProductPromoActivationsForUser({
+          userId: String(userId),
+          productIds: promoProductIds,
+          session,
+        });
+      }
 
       return createdOrder;
     });

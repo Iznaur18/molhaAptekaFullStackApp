@@ -110,9 +110,49 @@ export const ProductPromoCodeActivateSheet = ({
             {PRODUCT_PROMO_CODE_UI.SHEET_LEAD}
           </Text>
           {applied ? (
-            <Text style={{ color: theme.colors.text }}>
-              {PRODUCT_PROMO_CODE_UI.APPLIED(applied.discountPercent)}
-            </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                paddingHorizontal: 14,
+                paddingVertical: 12,
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: `${theme.colors.success}48`,
+                backgroundColor: theme.colors.successSurface,
+              }}
+            >
+              <Text
+                style={{
+                  flex: 1,
+                  color: theme.colors.successText,
+                  fontSize: 15,
+                  fontWeight: "600",
+                }}
+              >
+                {PRODUCT_PROMO_CODE_UI.APPLIED_LABEL}
+              </Text>
+              <View
+                style={{
+                  paddingHorizontal: 10,
+                  paddingVertical: 6,
+                  borderRadius: 999,
+                  backgroundColor: theme.colors.success,
+                }}
+              >
+                <Text
+                  style={{
+                    color: theme.colors.onContrast,
+                    fontSize: 16,
+                    fontWeight: "800",
+                  }}
+                >
+                  {PRODUCT_PROMO_CODE_UI.APPLIED_PERCENT(applied.discountPercent)}
+                </Text>
+              </View>
+            </View>
           ) : (
             <TextInput
               value={code}

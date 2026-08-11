@@ -61,6 +61,8 @@ export function CartPage({
     queryKey: productPromoCodeQueryKeys.appliedMine(),
     queryFn: fetchMyAppliedProductPromos,
     enabled: isAuthorized,
+    staleTime: 0,
+    refetchOnMount: "always",
   });
   const { user } = useAuthSession();
 

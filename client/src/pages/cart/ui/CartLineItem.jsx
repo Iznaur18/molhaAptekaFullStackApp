@@ -5,11 +5,11 @@ import { getCartLineStockHint } from "../../../entities/cart/lib/getCartLineStoc
 import { getProductPurchaseLimit } from "../../../entities/product/lib/getProductPurchaseLimit.js";
 import { resolveProductImageUrl } from "../../../entities/product/lib/resolveProductImageUrl.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
-import { ProductPriceDisplay } from "../../../entities/product/ui/ProductPriceDisplay.jsx";
 import { CART_PAGE_UI, COMMON_UI, PRODUCT_PROMO_CODE_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { AppIcon, Trash2 } from "../../../shared/ui/icon/index.js";
 
+import "../../../entities/product/ui/ProductPriceDisplay.css";
 import "./CartLineItem.css";
 
 /** Паритет mobile `CART_LINE_IMAGE_SIZE`. */
@@ -33,6 +33,13 @@ export function CartLineItem({
   const [imageFailed, setImageFailed] = useState(false);
   const product = line.product;
   const heading = product?.productName?.trim() || COMMON_UI.EM_DASH;
+  const retailPrice = Math.floor(Number(product?.productPrice)) || 0;
+  const unitPrice = Math.floor(Number(line.unitPrice)) || 0;
+  const showRetailStrike =
+    retailPrice > unitPrice &&
+    (line.isPromoApplied === true || line.isWholesaleApplied === true);
+  const unitPriceText = formatPriceRub(unitPrice);
+  const retailPriceText = formatPriceRub(retailPrice);
   const lineTotalText = formatPriceRub(line.lineTotal);
   const purchaseLimit = getProductPurchaseLimit(product);
   const stockHint = getCartLineStockHint(purchaseLimit, line.quantity);
@@ -103,9 +110,19 @@ export function CartLineItem({
           )}
 
           <div className="cart-line__info">
-            {product ? (
-              <ProductPriceDisplay product={product} showLabel={false} variant="cart" />
-            ) : null}
+            <p
+              className="product-price-display product-price-display--cart"
+              aria-label={
+                showRetailStrike
+                  ? `Цена ${unitPriceText}, было ${retailPriceText}`
+                  : `Цена ${unitPriceText}`
+              }
+            >
+              <span className="product-price-display__current">{unitPriceText}</span>
+              {showRetailStrike ? (
+                <span className="product-price-display__old">{retailPriceText}</span>
+              ) : null}
+            </p>
             {line.isWholesaleApplied ? (
               <p className="cart-line__wholesale-badge" role="status">
                 {CART_PAGE_UI.WHOLESALE_LINE_BADGE}

@@ -1,4 +1,4 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
@@ -24,6 +24,7 @@ import { CartFulfillmentSection } from "@/entities/cart/ui/CartFulfillmentSectio
 import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import { useCreateOrderMutation } from "@/entities/order/model/useCreateOrderMutation";
+import { fetchMyAppliedProductPromos } from "@/entities/product-promo-code/api/productPromoCodeApi";
 import type { MyPriceOfferBid } from "@/entities/product-price-offer/api/incomingPriceOffersApi";
 import { useMyAcceptedBidsQuery } from "@/entities/product-price-offer/model/useMyAcceptedBidsQuery";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
@@ -71,12 +72,24 @@ export default function CartScreen() {
   const productIds = useMemo(() => Object.keys(cartQuery.data ?? {}), [cartQuery.data]);
   const productsQuery = useCartProductsQuery(productIds);
   const acceptedBidsQuery = useMyAcceptedBidsQuery(isAuthorized);
+  const appliedPromosQuery = useQuery({
+    queryKey: ["product-promo-code", "applied-mine"],
+    queryFn: fetchMyAppliedProductPromos,
+    enabled: isAuthorized,
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
   const auctionBids = useMemo(() => acceptedBidsQuery.data ?? [], [acceptedBidsQuery.data]);
   const currentUserId = sessionQuery.data?.user?._id;
 
   const { lines } = useMemo(
-    () => selectCartLines(cartQuery.data ?? {}, productsQuery.products),
-    [cartQuery.data, productsQuery.products],
+    () =>
+      selectCartLines(
+        cartQuery.data ?? {},
+        productsQuery.products,
+        appliedPromosQuery.data?.appliedPromos ?? [],
+      ),
+    [cartQuery.data, productsQuery.products, appliedPromosQuery.data],
   );
 
   const visibleLines = useMemo(
