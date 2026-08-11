@@ -23,9 +23,9 @@ test("premium page mirrors web plan panel and purchase flow", () => {
   assert.match(page, /activeSectionId="premium"/);
   assert.doesNotMatch(page, /accountFeatureStyles/);
 
-  assert.match(styles, /planTitle/);
-  assert.match(styles, /planPrice/);
-  assert.match(styles, /submitText/);
+  assert.match(styles, /heroValue/);
+  assert.match(styles, /heroCaption/);
+  assert.match(styles, /submitButton/);
   assert.match(styles, /active/);
 });
 

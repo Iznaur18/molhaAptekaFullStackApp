@@ -41,6 +41,10 @@ export function buildCatalogListQueryParams({
     auctionOnly: catalogQueryFromUrl.auctionOnly ? true : null,
     installmentOnly: catalogQueryFromUrl.installmentOnly ? true : null,
     saleOnly: catalogQueryFromUrl.saleOnly ? true : null,
+    rentalOnly: catalogQueryFromUrl.rentalOnly ? true : null,
+    affiliateOnly: catalogQueryFromUrl.affiliateOnly ? true : null,
+    wholesaleOnly: catalogQueryFromUrl.wholesaleOnly ? true : null,
+    originalOnly: catalogQueryFromUrl.originalOnly ? true : null,
     near: catalogQueryFromUrl.near && nearAllowed ? true : null,
     regionCode: isMineMode ? null : viewerRegionCode || null,
   };

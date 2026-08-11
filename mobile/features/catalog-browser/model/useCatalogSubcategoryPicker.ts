@@ -83,6 +83,10 @@ export const useCatalogSubcategoryPicker = ({
         auctionOnly: false,
         installmentOnly: false,
         saleOnly: false,
+        rentalOnly: false,
+        affiliateOnly: false,
+        wholesaleOnly: false,
+        originalOnly: false,
         near: false,
       });
       clearPickerTrail();
@@ -119,6 +123,10 @@ export const useCatalogSubcategoryPicker = ({
           auctionOnly: false,
           installmentOnly: false,
           saleOnly: false,
+          rentalOnly: false,
+          affiliateOnly: false,
+          wholesaleOnly: false,
+          originalOnly: false,
           near: false,
         });
         return;

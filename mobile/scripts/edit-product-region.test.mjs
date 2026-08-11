@@ -11,9 +11,10 @@ const editScreen = readFileSync(
 );
 
 describe("edit product region parity", () => {
-  it("wires productRegionCode in edit screen", () => {
-    assert.match(editScreen, /RuRegionSelect/);
+  it("wires productRegionCode from pickup address in edit screen", () => {
     assert.match(editScreen, /productRegionCode/);
-    assert.match(editScreen, /ERROR_SALE_REGION_REQUIRED/);
+    assert.match(editScreen, /getRuRegionByCode/);
+    assert.match(editScreen, /HINT_SALE_REGION_FROM_ADDRESS/);
+    assert.match(editScreen, /ProductPickupLocationFields/);
   });
 });

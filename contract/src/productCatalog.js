@@ -157,6 +157,10 @@ export const catalogProductsQuerySchema = z.object({
   auctionOnly: optionalTruthyFlag,
   installmentOnly: optionalTruthyFlag,
   saleOnly: optionalTruthyFlag,
+  rentalOnly: optionalTruthyFlag,
+  affiliateOnly: optionalTruthyFlag,
+  wholesaleOnly: optionalTruthyFlag,
+  originalOnly: optionalTruthyFlag,
   /** Товары рядом с адресом профиля (см. PRODUCT_CATALOG_NEAR_RADIUS_KM). */
   near: optionalTruthyFlag,
   moderationStatus: z.enum(["pending", "rejected"]).optional(),

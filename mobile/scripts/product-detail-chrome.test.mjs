@@ -145,13 +145,13 @@ test("mobile product characteristics row matches web key-value layout", () => {
   const valueBlock = charStylesBlock.match(/value:\s*\{([^}]*)\}/)?.[1] ?? "";
 
   assert.match(webCss, /flex-direction:\s*row/);
-  assert.match(webCss, /justify-content:\s*space-between/);
+  assert.match(webCss, /product-characteristics-details__row/);
   assert.match(component, /styles\.key/);
   assert.match(component, /styles\.value/);
   assert.match(rowBlock, /flexDirection:\s*"row"/);
-  assert.match(rowBlock, /justifyContent:\s*"space-between"/);
-  assert.match(valueBlock, /textAlign:\s*"right"/);
-  assert.match(valueBlock, /maxWidth:\s*"55%"/);
+  assert.match(rowBlock, /alignItems:\s*"baseline"/);
+  assert.match(valueBlock, /textAlign:\s*"left"/);
+  assert.match(charStylesBlock, /flex:\s*3/);
 });
 
 test("mobile seller preview matches web product-details-seller-preview chrome", () => {
@@ -160,12 +160,11 @@ test("mobile seller preview matches web product-details-seller-preview chrome", 
   const sellerStylesBlock =
     styles.match(/export const useProductDetailsSellerPreviewStyles[\s\S]*?}\)\);/)?.[0] ?? "";
 
-  assert.match(sellerStylesBlock, /backgroundColor:\s*theme\.colors\.actionSurface/);
-  assert.match(sellerStylesBlock, /borderColor:\s*`\$\{theme\.colors\.link\}29`/);
+  assert.match(sellerStylesBlock, /backgroundColor:\s*theme\.colors\.surfaceMuted/);
   assert.match(sellerStylesBlock, /rootPressed:/);
   assert.match(preview, /pressed && styles\.rootPressed/);
-  assert.match(sellerStylesBlock, /width:\s*"50%"/);
-  assert.match(sellerStylesBlock, /margin:\s*-6/);
+  assert.match(sellerStylesBlock, /width:\s*"48%"/);
+  assert.match(sellerStylesBlock, /backgroundColor:\s*theme\.colors\.actionSoft/);
 });
 
 test("mobile premium display name aligns from start like web user-premium-name", () => {
@@ -260,8 +259,8 @@ test("mobile installment tab matches web buyer hint and docked submit", () => {
   const webCss = readFile(CLIENT_ROOT, "src/entities/installment/ui/InstallmentBuyerBlock.css");
 
   assert.match(webCss, /installment-buyer-block__hint/);
-  assert.match(webCss, /--iz-color-action-soft/);
-  assert.match(webCss, /--iz-color-info-deep/);
+  assert.match(webCss, /--iz-color-surface-muted/);
+  assert.match(webCss, /--iz-color-text-secondary/);
   assert.match(styles, /installmentBuyerHint/);
   assert.match(styles, /actionSoft/);
   assert.match(styles, /infoNavy/);

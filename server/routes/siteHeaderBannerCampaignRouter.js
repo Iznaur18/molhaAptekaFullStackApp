@@ -14,7 +14,7 @@ import {
   getPendingSiteHeaderBannerCampaignsCountController,
   rejectSiteHeaderBannerCampaignController,
 } from "../controllers/SiteHeaderBannerCampaign/siteHeaderBannerCampaignStaffControllers.js";
-import { checkAuthMW, checkProductModeratorMW } from "../middlewares/index.js";
+import { checkAuthMW, checkProductModeratorMW, advertisingSubmitRateLimiter } from "../middlewares/index.js";
 import {
   rejectSiteHeaderBannerCampaignValidation,
   siteHeaderBannerCampaignIdParamValidation,
@@ -28,6 +28,7 @@ router.get("/me", checkAuthMW, getMySiteHeaderBannerCampaignController);
 router.post(
   "/",
   checkAuthMW,
+  advertisingSubmitRateLimiter,
   submitSiteHeaderBannerCampaignValidation,
   submitSiteHeaderBannerCampaignController,
 );

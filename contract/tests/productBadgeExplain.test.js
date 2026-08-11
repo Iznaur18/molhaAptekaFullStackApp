@@ -24,5 +24,5 @@ test("adminProductBadgeExplainPatchBodySchema accepts description + imageUrl", (
     description: "Текст",
   });
   assert.equal(parsed.description, "Текст");
-  assert.equal(PRODUCT_BADGE_EXPLAIN_KEY_VALUES.length, 16);
+  assert.equal(PRODUCT_BADGE_EXPLAIN_KEY_VALUES.length, 17);
 });

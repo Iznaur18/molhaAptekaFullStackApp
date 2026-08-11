@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   CART_FULFILLMENT_SECTION_DELIVERY,
   CART_FULFILLMENT_SECTION_PICKUP,
@@ -18,6 +18,8 @@ import { useCartSelection } from "../../../entities/cart/model/useCartSelection.
 import { useCreateOrderMutation } from "../../../entities/order/model/useCreateOrderMutation.js";
 import { useAllProductsQuery } from "../../../entities/product/model/useAllProductsQuery.js";
 import { navigateToProductDetails } from "../../../entities/product/lib/navigateToProductDetails.js";
+import { fetchMyAppliedProductPromos } from "../../../entities/product-promo-code/api/productPromoCodeApi.js";
+import { productPromoCodeQueryKeys } from "../../../entities/product-promo-code/model/productPromoCodeQueryKeys.js";
 import { invalidatePriceOfferQueries } from "../../../entities/product-price-offer/lib/priceOfferQueryCache.js";
 import { useMyAcceptedBidsQuery } from "../../../entities/product-price-offer/model/useMyAcceptedBidsQuery.js";
 import { useAuthSession } from "../../../entities/user/model/useAuthSession.js";
@@ -55,6 +57,11 @@ export function CartPage({
   const createOrderMutation = useCreateOrderMutation();
   const productsQuery = useAllProductsQuery();
   const acceptedBidsQuery = useMyAcceptedBidsQuery({ enabled: isAuthorized });
+  const appliedPromosQuery = useQuery({
+    queryKey: productPromoCodeQueryKeys.appliedMine(),
+    queryFn: fetchMyAppliedProductPromos,
+    enabled: isAuthorized,
+  });
   const { user } = useAuthSession();
 
   const auctionBids = acceptedBidsQuery.data ?? [];
@@ -103,8 +110,13 @@ export function CartPage({
   );
 
   const { lines } = useMemo(
-    () => selectCartLines(items, productsQuery.data ?? []),
-    [items, productsQuery.data],
+    () =>
+      selectCartLines(
+        items,
+        productsQuery.data ?? [],
+        appliedPromosQuery.data?.appliedPromos ?? [],
+      ),
+    [items, productsQuery.data, appliedPromosQuery.data],
   );
 
   const visibleLines = useMemo(

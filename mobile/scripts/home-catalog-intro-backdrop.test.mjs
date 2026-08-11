@@ -90,7 +90,8 @@ test("home feed index enables bounce for pull-to-refresh", () => {
   assert.match(index, /isPullRefreshing/);
   assert.match(scrollProps, /bounces: true/);
   assert.match(scrollProps, /alwaysBounceVertical: true/);
-  assert.match(invalidate, /siteHeaderBannerQueryKeys\.slides/);
+  assert.match(invalidate, /siteHeaderBannerQueryKeys\.all/);
+  assert.match(invalidate, /\.\.\.siteHeaderBannerQueryKeys\.all, "slides"/);
 });
 
 test("home feed index still mounts HomeCatalogPrimaryBackdrop", () => {

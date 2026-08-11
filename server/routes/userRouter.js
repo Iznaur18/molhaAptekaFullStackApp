@@ -44,6 +44,7 @@ import {
   userStoryReportRateLimiter,
   userSearchRateLimiter,
   userPhoneRevealRateLimiter,
+  moneyMutationRateLimiter,
 } from "../middlewares/index.js";
 import {
   userIdParamValidation,
@@ -176,6 +177,7 @@ router.get("/me/premium/status", checkAuthMW, getMyPremiumStatusController);
 router.post(
   "/me/premium/purchase",
   checkAuthMW,
+  moneyMutationRateLimiter,
   purchasePremiumValidation,
   purchasePremiumController,
 );

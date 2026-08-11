@@ -271,11 +271,13 @@ export const getSellerPriceOffers = async (productId, sellerUserId) => {
     return [];
   }
 
+  // accepted+orderId — уже оплачено/в архиве; иначе после re-open висят как «Ожидает оплаты».
   const rows = await ProductPriceOfferModel.find({
     productId,
     status: {
       $in: [PRICE_OFFER_STATUS_PENDING, PRICE_OFFER_STATUS_ACCEPTED],
     },
+    orderId: null,
   })
     .sort({ offerPrice: -1, createdAt: 1 })
     .populate("buyerUserId", BUYER_PUBLIC_SELECT)

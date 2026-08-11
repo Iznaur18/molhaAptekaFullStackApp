@@ -580,6 +580,7 @@ export default function ProductDetailScreen() {
                   onOpenAuctionTab={handleAuctionShortcut}
                   auctionActive={auctionUi.auctionActive}
                   canShowAddToCart={canShowAddToCart}
+                  isAuthorized={isAuthorized}
                   onRequestLogin={() => {
                     router.push("/(auth)/login");
                   }}

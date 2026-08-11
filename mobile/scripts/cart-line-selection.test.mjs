@@ -36,19 +36,23 @@ test("cart line renders a selection checkbox in the card corner", () => {
 test("checkout orders only the selected lines and keeps the rest in the cart", () => {
   const cartScreen = readMobileFile("app/(tabs)/cart.tsx");
 
-  assert.match(cartScreen, /items: checkoutSummary\.selectedLines\.map/);
+  assert.match(cartScreen, /items: activeSummary\.selectedLines\.map/);
   assert.match(cartScreen, /await removeItems\(orderedProductIds\)/);
-  assert.doesNotMatch(cartScreen, /items: checkoutSummary\.purchasableLines\.map/);
+  assert.doesNotMatch(cartScreen, /items: activeSummary\.purchasableLines\.map/);
 });
 
-test("select-all row sits above the list and shows a mixed state when partially selected", () => {
+test("select-all row sits in each fulfillment section and shows a mixed state when partially selected", () => {
   const cartScreen = readMobileFile("app/(tabs)/cart.tsx");
+  const fulfillment = readMobileFile("entities/cart/ui/CartFulfillmentSection.tsx");
   const selectAllRow = readMobileFile("entities/cart/ui/CartSelectAllRow.tsx");
 
-  assert.match(cartScreen, /<CartSelectAllRow/);
-  assert.match(cartScreen, /ListHeaderComponent=\{[\s\S]*?CartSelectAllRow[\s\S]*?\}/);
+  assert.match(cartScreen, /<CartFulfillmentSection/);
+  assert.match(fulfillment, /<CartSelectAllRow/);
   assert.match(selectAllRow, /isIndeterminate = !areAllSelected && selectedCount > 0/);
-  assert.match(selectAllRow, /accessibilityState=\{\{ checked: isIndeterminate \? "mixed" : areAllSelected \}\}/);
+  assert.match(
+    selectAllRow,
+    /accessibilityState=\{\{ checked: isIndeterminate \? "mixed" : areAllSelected \}\}/,
+  );
 });
 
 test("toggleAll selects everything unless everything is already selected", () => {
@@ -59,12 +63,14 @@ test("toggleAll selects everything unless everything is already selected", () =>
     selection,
     /setDeselectedIds\(\(prev\) => \(prev\.size === 0 \? new Set\(purchasableIdSet\) : EMPTY_DESELECTION\)\)/,
   );
+  assert.match(selection, /toggleAllIn/);
 });
 
 test("cart totals follow the selection", () => {
   const cartScreen = readMobileFile("app/(tabs)/cart.tsx");
+  const fulfillment = readMobileFile("entities/cart/ui/CartFulfillmentSection.tsx");
 
-  assert.match(cartScreen, /canCheckout = checkoutSummary\.selectedLines\.length > 0/);
-  assert.match(cartScreen, /formatPriceRub\(checkoutSummary\.selectedTotal\)/);
+  assert.match(cartScreen, /canCheckoutActive = activeSummary\.selectedLines\.length > 0/);
+  assert.match(fulfillment, /formatPriceRub\(summary\.selectedTotal\)/);
   assert.doesNotMatch(cartScreen, /displayTotal/);
 });

@@ -151,6 +151,10 @@ export function useAppShellState(location, navigate) {
     catalogAuctionOnly: catalogQueryFromUrl.auctionOnly,
     catalogInstallmentOnly: catalogQueryFromUrl.installmentOnly,
     catalogSaleOnly: catalogQueryFromUrl.saleOnly,
+    catalogRentalOnly: catalogQueryFromUrl.rentalOnly,
+    catalogAffiliateOnly: catalogQueryFromUrl.affiliateOnly,
+    catalogWholesaleOnly: catalogQueryFromUrl.wholesaleOnly,
+    catalogOriginalOnly: catalogQueryFromUrl.originalOnly,
     catalogNear: catalogQueryFromUrl.near,
   });
 

@@ -16,13 +16,13 @@ test("advertising page mirrors web hub chrome and balance bar", () => {
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /ProfileMobileNavSheet/);
   assert.match(page, /contentPaddingBottom/);
-  assert.match(page, /balanceBar/);
+  assert.match(page, /heroCard/);
   assert.match(page, /PAGE_LEAD/);
   assert.match(page, /activeSectionId="advertising"/);
   assert.match(page, /TAB_ADVERTISING/);
   assert.doesNotMatch(page, /sellerFlowStyles/);
 
-  assert.match(styles, /balanceBar/);
+  assert.match(styles, /heroCard/);
   assert.match(styles, /cardIntro/);
   assert.match(styles, /cardCategory/);
 });
@@ -53,7 +53,7 @@ test("advertising ui copy matches web page", () => {
   const copy = readMobileFile("shared/config/appUiCopy.ts");
 
   assert.match(copy, /PAGE_ARIA: "Реклама в intro"/);
-  assert.match(copy, /intro-ролик при входе/);
+  assert.match(copy, /intro-ролик/);
   assert.match(copy, /Все одобренные товары попадают/);
   assert.match(copy, /RAFFLE_ADVERTISING_PAGE_UI/);
 });

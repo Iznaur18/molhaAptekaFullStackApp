@@ -32,6 +32,6 @@ test("installment sales page mirrors web toolbar and compact seller contract car
 test("installment sales page ui copy matches web sales toolbar", () => {
   const copy = readMobileFile("shared/config/appUiCopy.ts");
 
-  assert.match(copy, /SALES_PAGE_TITLE: "Продажи в рассрочку"/);
+  assert.match(copy, /SALES_PAGE_TITLE: "Продажи - Рассрочка"/);
   assert.match(copy, /SALES_PAGE_EMPTY: "Продаж в рассрочку пока нет\."/);
 });

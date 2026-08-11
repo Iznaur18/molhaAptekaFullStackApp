@@ -113,6 +113,10 @@ export function SellerPersonalCategoryAdvertisingSection({
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!labelRu.trim()) {
+      setActionError(SELLER_PERSONAL_CATEGORY_PAGE_UI.ERROR_NAME_REQUIRED);
+      return;
+    }
     if (!isRuRegionCode(regionCode)) {
       setActionError(SELLER_PERSONAL_CATEGORY_PAGE_UI.ERROR_REGION_REQUIRED);
       return;

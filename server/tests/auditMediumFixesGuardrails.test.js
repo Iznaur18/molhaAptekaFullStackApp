@@ -31,6 +31,48 @@ test("userStoryReport does not skipSuccessfulRequests", () => {
   assert.doesNotMatch(block, /skipSuccessfulRequests:\s*true/);
 });
 
+test("authRateLimiter keys by email when present", () => {
+  const source = readFileSync(path.join(root, "middlewares/rateLimitMW.js"), "utf8");
+  assert.match(source, /rateLimitKeyByAuthIdentityOrIp/);
+  assert.match(source, /auth:\$\{ip\}:\$\{email\}/);
+});
+
+test("gap mutators have dedicated rate limiters wired", () => {
+  const mw = readFileSync(path.join(root, "middlewares/rateLimitMW.js"), "utf8");
+  assert.match(mw, /handlers\.advertisingSubmit/);
+  assert.match(mw, /handlers\.moneyMutation/);
+  assert.match(mw, /handlers\.productCreate/);
+  assert.match(mw, /handlers\.installmentAction/);
+  assert.match(mw, /handlers\.catalogList/);
+
+  const intro = readFileSync(path.join(root, "routes/introAdRouter.js"), "utf8");
+  assert.match(intro, /advertisingSubmitRateLimiter/);
+
+  const header = readFileSync(
+    path.join(root, "routes/siteHeaderBannerCampaignRouter.js"),
+    "utf8",
+  );
+  assert.match(header, /advertisingSubmitRateLimiter/);
+
+  const personal = readFileSync(
+    path.join(root, "routes/sellerPersonalCategoryRouter.js"),
+    "utf8",
+  );
+  assert.match(personal, /advertisingSubmitRateLimiter/);
+
+  const product = readFileSync(path.join(root, "routes/productRouter.js"), "utf8");
+  assert.match(product, /productCreateRateLimiter/);
+  assert.match(product, /catalogListRateLimiter/);
+  assert.match(product, /moneyMutationRateLimiter/);
+  assert.match(product, /installmentActionRateLimiter/);
+
+  const user = readFileSync(path.join(root, "routes/userRouter.js"), "utf8");
+  assert.match(user, /moneyMutationRateLimiter/);
+
+  const installment = readFileSync(path.join(root, "routes/installmentRouter.js"), "utf8");
+  assert.match(installment, /installmentActionRateLimiter/);
+});
+
 test("createApp /health returns status only", () => {
   const source = readFileSync(path.join(root, "createApp.js"), "utf8");
   assert.match(source, /json\(\{ status: health\.status \}\)/);

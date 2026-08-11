@@ -1,9 +1,13 @@
 import {
+  CATALOG_FILTER_AFFILIATE_ONLY,
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
   CATALOG_FILTER_NEAR,
+  CATALOG_FILTER_ORIGINAL_ONLY,
+  CATALOG_FILTER_RENTAL_ONLY,
   CATALOG_FILTER_SALE_ONLY,
+  CATALOG_FILTER_WHOLESALE_ONLY,
   CATALOG_SORT_NEWEST,
 } from "@/entities/product-category-display/lib/catalogFeedTiles";
 
@@ -20,6 +24,10 @@ const CATALOG_SORT_LABEL_RU: Record<string, string> = {
   [CATALOG_FILTER_AUCTION_ONLY]: "Только с аукционом",
   [CATALOG_FILTER_INSTALLMENT_ONLY]: "Только в рассрочку",
   [CATALOG_FILTER_SALE_ONLY]: "Распродажа",
+  [CATALOG_FILTER_RENTAL_ONLY]: "Прокат и аренда",
+  [CATALOG_FILTER_AFFILIATE_ONLY]: "Партнерская программа",
+  [CATALOG_FILTER_WHOLESALE_ONLY]: "Оптовая цена",
+  [CATALOG_FILTER_ORIGINAL_ONLY]: "Только оригинал",
 };
 
 type CatalogFeedQuery = {
@@ -28,6 +36,10 @@ type CatalogFeedQuery = {
   auctionOnly?: boolean;
   installmentOnly?: boolean;
   saleOnly?: boolean;
+  rentalOnly?: boolean;
+  affiliateOnly?: boolean;
+  wholesaleOnly?: boolean;
+  originalOnly?: boolean;
   near?: boolean;
 };
 
@@ -46,6 +58,18 @@ export const resolveActiveCatalogFeedLabel = (query: CatalogFeedQuery): string |
   }
   if (query.saleOnly) {
     return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_SALE_ONLY];
+  }
+  if (query.rentalOnly) {
+    return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_RENTAL_ONLY];
+  }
+  if (query.affiliateOnly) {
+    return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_AFFILIATE_ONLY];
+  }
+  if (query.wholesaleOnly) {
+    return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_WHOLESALE_ONLY];
+  }
+  if (query.originalOnly) {
+    return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_ORIGINAL_ONLY];
   }
   if (query.sort === CATALOG_SORT_NEWEST) {
     return CATALOG_SORT_LABEL_RU[CATALOG_SORT_NEWEST];

@@ -13,6 +13,10 @@ export type CatalogListFilters = {
   auctionOnly?: boolean;
   installmentOnly?: boolean;
   saleOnly?: boolean;
+  rentalOnly?: boolean;
+  affiliateOnly?: boolean;
+  wholesaleOnly?: boolean;
+  originalOnly?: boolean;
   near?: boolean;
   regionCode?: string;
 };
@@ -28,6 +32,10 @@ export const buildCatalogListQueryKey = (filters: CatalogListFilters) => ({
   auctionOnly: filters.auctionOnly === true ? true : undefined,
   installmentOnly: filters.installmentOnly === true ? true : undefined,
   saleOnly: filters.saleOnly === true ? true : undefined,
+  rentalOnly: filters.rentalOnly === true ? true : undefined,
+  affiliateOnly: filters.affiliateOnly === true ? true : undefined,
+  wholesaleOnly: filters.wholesaleOnly === true ? true : undefined,
+  originalOnly: filters.originalOnly === true ? true : undefined,
   near: filters.near === true ? true : undefined,
   regionCode: filters.regionCode?.trim() || undefined,
 });

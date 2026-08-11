@@ -11,6 +11,7 @@ import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationCo
 import { UserFollowModel, UserModel } from "../../models/index.js";
 import { createUserInAppNotification } from "../user/userInAppNotifications.js";
 import { enrichProductWithAuctionFields } from "./productAuction.js";
+import { enrichProductWithPromoCodeFields } from "./productPromoCode.js";
 
 /**
  * @param {number} price
@@ -109,7 +110,9 @@ export const enrichProductWithDiscountFields = (product) => {
  * @param {Record<string, unknown>} product
  */
 export const enrichProductApiFields = (product) =>
-  enrichProductWithDiscountFields(enrichProductWithAuctionFields(product));
+  enrichProductWithPromoCodeFields(
+    enrichProductWithDiscountFields(enrichProductWithAuctionFields(product)),
+  );
 
 export const buildProductSaleOnlyMatch = () => ({
   productOldPrice: { $type: "number", $gt: 0 },

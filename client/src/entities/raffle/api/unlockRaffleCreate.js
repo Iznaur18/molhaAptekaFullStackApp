@@ -1,3 +1,5 @@
+import { formatApiErrorMessage } from "@izibuy/shared-lib";
+
 import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
@@ -16,10 +18,8 @@ export async function unlockRaffleCreate() {
     }
     return data.data;
   } catch (error) {
-    const message =
-      error?.response?.data?.message ??
-      error?.message ??
-      API_CLIENT_UI.UNLOCK_RAFFLE_CREATE_FALLBACK;
-    throw new Error(message);
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.UNLOCK_RAFFLE_CREATE_FALLBACK),
+    );
   }
 }

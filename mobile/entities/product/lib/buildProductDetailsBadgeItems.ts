@@ -10,6 +10,7 @@ import {
 import {
   PRODUCT_CARD_UI,
   PRODUCT_DETAILS_MODAL_UI,
+  PRODUCT_PROMO_CODE_UI,
   PRODUCT_RENTAL_UI,
   PRODUCT_WHOLESALE_UI,
 } from "@/shared/config";
@@ -32,6 +33,7 @@ export type ProductDetailsBadgeItem = {
   | { kind: "installment" }
   | { kind: "wholesale" }
   | { kind: "rental" }
+  | { kind: "promo" }
   | { kind: "nearDistance" }
   | { kind: "listingOrigin"; origin: string | null; iconName: ProductListingOriginIconName }
   | { kind: "priceMarket"; priceMarketStatus: string; backgroundColor: string; color: string }
@@ -122,6 +124,14 @@ export const buildProductDetailsBadgeItems = ({
       key: "rental",
       kind: "rental",
       label: PRODUCT_RENTAL_UI.DETAILS_BADGE,
+    });
+  }
+
+  if (product.productHasActivePromoCodes === true) {
+    items.push({
+      key: "promo",
+      kind: "promo",
+      label: PRODUCT_PROMO_CODE_UI.DETAILS_BADGE,
     });
   }
 

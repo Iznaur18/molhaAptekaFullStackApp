@@ -134,6 +134,10 @@ export const CATALOG_FILTER_FOLLOWING_ONLY = "__following_only__";
 export const CATALOG_FILTER_AUCTION_ONLY = "__auction_only__";
 export const CATALOG_FILTER_INSTALLMENT_ONLY = "__installment_only__";
 export const CATALOG_FILTER_SALE_ONLY = "__sale_only__";
+export const CATALOG_FILTER_RENTAL_ONLY = "__rental_only__";
+export const CATALOG_FILTER_AFFILIATE_ONLY = "__affiliate_only__";
+export const CATALOG_FILTER_WHOLESALE_ONLY = "__wholesale_only__";
+export const CATALOG_FILTER_ORIGINAL_ONLY = "__original_only__";
 export const CATALOG_FILTER_NEAR = "__near__";
 
 export const CATALOG_SORT_OPTIONS = [
@@ -158,6 +162,10 @@ export const CATALOG_PUBLIC_FILTER_TOGGLE_KEYS = [
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
   CATALOG_FILTER_SALE_ONLY,
+  CATALOG_FILTER_RENTAL_ONLY,
+  CATALOG_FILTER_AFFILIATE_ONLY,
+  CATALOG_FILTER_WHOLESALE_ONLY,
+  CATALOG_FILTER_ORIGINAL_ONLY,
 ];
 
 /** Сортировки в «Мои товары» (без фильтра только премиум). */
@@ -199,6 +207,10 @@ export const CATALOG_SORT_LABEL_RU = {
   [CATALOG_FILTER_AUCTION_ONLY]: "Только с аукционом",
   [CATALOG_FILTER_INSTALLMENT_ONLY]: "Только в рассрочку",
   [CATALOG_FILTER_SALE_ONLY]: "Распродажа",
+  [CATALOG_FILTER_RENTAL_ONLY]: "Прокат и аренда",
+  [CATALOG_FILTER_AFFILIATE_ONLY]: "Партнерская программа",
+  [CATALOG_FILTER_WHOLESALE_ONLY]: "Оптовая цена",
+  [CATALOG_FILTER_ORIGINAL_ONLY]: "Только оригинал",
 };
 
 export {

@@ -11,6 +11,10 @@ import { mainViewToPathname } from "../../../shared/lib/homeMainViewPaths.js";
  *   auctionOnly: boolean;
  *   installmentOnly?: boolean;
  *   saleOnly: boolean;
+ *   rentalOnly?: boolean;
+ *   affiliateOnly?: boolean;
+ *   wholesaleOnly?: boolean;
+ *   originalOnly?: boolean;
  *   near?: boolean;
  * }} query
  * @param {{ omitDefaultSort?: boolean; compact?: boolean }} [options]

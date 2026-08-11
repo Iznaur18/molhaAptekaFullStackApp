@@ -12,6 +12,8 @@ import {
   submitSellerPersonalCategoryCampaignDataSchema,
 } from "@molha/api-contract";
 
+import { formatApiErrorMessage } from "@izibuy/shared-lib";
+
 import { apiClient } from "../../../shared/api/index.js";
 import { parseApiContractData } from "../../../shared/api/parseApiContract.js";
 import {
@@ -33,11 +35,9 @@ export async function submitSellerPersonalCategoryCampaign(body) {
       loyaltyPointsBalance: parsed.loyaltyPointsBalance ?? null,
     };
   } catch (e) {
-    const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      SELLER_PERSONAL_CATEGORY_PAGE_UI.SUBMIT_FALLBACK;
-    throw new Error(message);
+    throw new Error(
+      formatApiErrorMessage(e, SELLER_PERSONAL_CATEGORY_PAGE_UI.SUBMIT_FALLBACK),
+    );
   }
 }
 
@@ -53,11 +53,9 @@ export async function cancelSellerPersonalCategoryCampaign(campaignId) {
     );
     return { message: parsed.message };
   } catch (e) {
-    const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      SELLER_PERSONAL_CATEGORY_PAGE_UI.CANCEL_FALLBACK;
-    throw new Error(message);
+    throw new Error(
+      formatApiErrorMessage(e, SELLER_PERSONAL_CATEGORY_PAGE_UI.CANCEL_FALLBACK),
+    );
   }
 }
 
@@ -66,11 +64,9 @@ export async function fetchMySellerPersonalCategoryCampaign() {
     const { data } = await apiClient.get("/seller-personal-category/me");
     return parseApiContractData(data, mySellerPersonalCategoryCampaignDataSchema);
   } catch (e) {
-    const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      SELLER_PERSONAL_CATEGORY_PAGE_UI.FETCH_FALLBACK;
-    throw new Error(message);
+    throw new Error(
+      formatApiErrorMessage(e, SELLER_PERSONAL_CATEGORY_PAGE_UI.FETCH_FALLBACK),
+    );
   }
 }
 
@@ -81,11 +77,9 @@ export async function fetchSellerPersonalCategoryCatalogTiles({ regionCode } = {
     });
     return parseApiContractData(data, sellerPersonalCategoryCatalogTilesDataSchema);
   } catch (e) {
-    const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      SELLER_PERSONAL_CATEGORY_PAGE_UI.FETCH_TILES_FALLBACK;
-    throw new Error(message);
+    throw new Error(
+      formatApiErrorMessage(e, SELLER_PERSONAL_CATEGORY_PAGE_UI.FETCH_TILES_FALLBACK),
+    );
   }
 }
 
@@ -100,11 +94,9 @@ export async function fetchPendingSellerPersonalCategoryCampaignsCount() {
     );
     return parsed.count;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.FETCH_FALLBACK;
-    throw new Error(message);
+    throw new Error(
+      formatApiErrorMessage(e, SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.FETCH_FALLBACK),
+    );
   }
 }
 
@@ -120,11 +112,9 @@ export async function fetchPendingSellerPersonalCategoryCampaigns(limit = 50) {
     );
     return parsed.campaigns;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.FETCH_FALLBACK;
-    throw new Error(message);
+    throw new Error(
+      formatApiErrorMessage(e, SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.FETCH_FALLBACK),
+    );
   }
 }
 
@@ -142,11 +132,9 @@ export async function approveSellerPersonalCategoryCampaign(campaignId) {
     );
     return parsed.message;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.APPROVE_FALLBACK;
-    throw new Error(message);
+    throw new Error(
+      formatApiErrorMessage(e, SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.APPROVE_FALLBACK),
+    );
   }
 }
 
@@ -166,11 +154,9 @@ export async function rejectSellerPersonalCategoryCampaign(campaignId, reason = 
     );
     return parsed.message;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.REJECT_FALLBACK;
-    throw new Error(message);
+    throw new Error(
+      formatApiErrorMessage(e, SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.REJECT_FALLBACK),
+    );
   }
 }
 
@@ -183,11 +169,12 @@ export async function fetchManagedSellerPersonalCategoryCampaigns() {
     );
     return parsed.campaigns;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.MANAGED_FETCH_FALLBACK;
-    throw new Error(message);
+    throw new Error(
+      formatApiErrorMessage(
+        e,
+        SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.MANAGED_FETCH_FALLBACK,
+      ),
+    );
   }
 }
 
@@ -205,11 +192,12 @@ export async function cancelSellerPersonalCategoryCampaignByStaff(campaignId) {
     );
     return parsed.message;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.STAFF_UNPUBLISH_FALLBACK;
-    throw new Error(message);
+    throw new Error(
+      formatApiErrorMessage(
+        e,
+        SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.STAFF_UNPUBLISH_FALLBACK,
+      ),
+    );
   }
 }
 
@@ -227,10 +215,11 @@ export async function deleteSellerPersonalCategoryCampaignByStaff(campaignId) {
     );
     return parsed.message;
   } catch (e) {
-    const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.STAFF_DELETE_FALLBACK;
-    throw new Error(message);
+    throw new Error(
+      formatApiErrorMessage(
+        e,
+        SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.STAFF_DELETE_FALLBACK,
+      ),
+    );
   }
 }

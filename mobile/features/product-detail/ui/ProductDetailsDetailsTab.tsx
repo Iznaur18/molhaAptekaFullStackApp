@@ -26,6 +26,8 @@ import { ProductDetailsAuctionTeaser } from "@/features/product-detail/ui/Produc
 import { ProductDetailsInstallmentTeaser } from "@/features/product-detail/ui/ProductDetailsInstallmentTeaser";
 import { ProductDetailsRaffleTeaser } from "@/features/product-detail/ui/ProductDetailsRaffleTeaser";
 import { ProductDetailsRentalTeaser } from "@/features/product-detail/ui/ProductDetailsRentalTeaser";
+import { ProductDetailsPromoTeaser } from "@/features/product-detail/ui/ProductDetailsPromoTeaser";
+import { ProductPromoCodeActivateSheet } from "@/features/product-detail/ui/ProductPromoCodeActivateSheet";
 import { ProductDetailsSaleTeaser } from "@/features/product-detail/ui/ProductDetailsSaleTeaser";
 import { ProductDetailsWholesaleOffer } from "@/features/product-detail/ui/ProductDetailsWholesaleOffer";
 import { ProductPickupDetailsPanel } from "@/features/product-detail/ui/ProductPickupDetailsPanel";
@@ -42,6 +44,7 @@ type ProductDetailsDetailsTabProps = {
   onOpenAuctionTab?: () => void;
   auctionActive?: boolean;
   canShowAddToCart?: boolean;
+  isAuthorized?: boolean;
   onRequestLogin?: () => void;
 };
 
@@ -52,6 +55,7 @@ export const ProductDetailsDetailsTab = ({
   onOpenAuctionTab,
   auctionActive = false,
   canShowAddToCart = true,
+  isAuthorized = false,
   onRequestLogin,
 }: ProductDetailsDetailsTabProps) => {
   const styles = useProductDetailScreenStyles();
@@ -63,6 +67,7 @@ export const ProductDetailsDetailsTab = ({
   const [badgeExplain, setBadgeExplain] = useState<ProductBadgeExplainRequest | null>(
     null,
   );
+  const [isPromoSheetOpen, setIsPromoSheetOpen] = useState(false);
 
   useProductBadgeExplainsQuery({ enabled: true });
 
@@ -145,6 +150,10 @@ export const ProductDetailsDetailsTab = ({
             ) : null}
             <View style={styles.featureCards}>
               <ProductDetailsRaffleTeaser product={product} />
+              <ProductDetailsPromoTeaser
+                product={product}
+                onPress={() => setIsPromoSheetOpen(true)}
+              />
               <ProductDetailsRentalTeaser
                 product={product}
                 onPress={() =>
@@ -335,6 +344,15 @@ export const ProductDetailsDetailsTab = ({
         }
         onClose={() => setBadgeExplain(null)}
       />
+      {productId ? (
+        <ProductPromoCodeActivateSheet
+          isOpen={isPromoSheetOpen}
+          productId={productId}
+          isAuthorized={isAuthorized}
+          onRequestLogin={onRequestLogin}
+          onClose={() => setIsPromoSheetOpen(false)}
+        />
+      ) : null}
     </View>
   );
 };

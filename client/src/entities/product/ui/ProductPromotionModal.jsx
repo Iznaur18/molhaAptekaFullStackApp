@@ -4,6 +4,7 @@ import { PRODUCT_PROMOTION_UI } from "../../../shared/config/appUiCopy.js";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
 import { InstallmentProgramModal } from "../../installment/ui/InstallmentProgramModal.jsx";
 import { WholesalePriceModal } from "./WholesalePriceModal.jsx";
+import { ProductPromoCodesModal } from "./ProductPromoCodesModal.jsx";
 import { ProductRentalManageModal } from "./ProductRentalManageModal.jsx";
 import { AffiliatePercentModal } from "./AffiliatePercentModal.jsx";
 import { calculateProductPromotionPointsCost } from "../lib/calculateProductPromotionPointsCost.js";
@@ -145,6 +146,7 @@ export function ProductPromotionModal({
   const [isWholesaleOpen, setIsWholesaleOpen] = useState(false);
   const [isRentalOpen, setIsRentalOpen] = useState(false);
   const [isAffiliateOpen, setIsAffiliateOpen] = useState(false);
+  const [isPromoCodesOpen, setIsPromoCodesOpen] = useState(false);
   const defaultTier = tiers[0]?.tier ?? 1;
   const defaultDuration = durations[0]?.code ?? "";
   const [selectedTier, setSelectedTier] = useState(defaultTier);
@@ -158,6 +160,7 @@ export function ProductPromotionModal({
       setIsWholesaleOpen(false);
       setIsRentalOpen(false);
       setIsAffiliateOpen(false);
+      setIsPromoCodesOpen(false);
     }
   }, [defaultDuration, defaultTier, isOpen]);
 
@@ -310,6 +313,7 @@ export function ProductPromotionModal({
             onOpenWholesaleSettings={() => setIsWholesaleOpen(true)}
             onOpenRentalSettings={() => setIsRentalOpen(true)}
             onOpenAffiliateSettings={() => setIsAffiliateOpen(true)}
+            onOpenPromoCodesSettings={() => setIsPromoCodesOpen(true)}
           />
         )}
       </ProductModalShell>
@@ -342,6 +346,19 @@ export function ProductPromotionModal({
         product={product}
         onClose={() => setIsAffiliateOpen(false)}
         onSaved={onWholesaleSaved}
+      />
+      <ProductPromoCodesModal
+        isOpen={isPromoCodesOpen}
+        product={product}
+        onClose={() => setIsPromoCodesOpen(false)}
+        onSaved={(payload) => {
+          if (product && typeof onWholesaleSaved === "function") {
+            onWholesaleSaved({
+              ...product,
+              productHasActivePromoCodes: payload.productHasActivePromoCodes,
+            });
+          }
+        }}
       />
     </>
   );

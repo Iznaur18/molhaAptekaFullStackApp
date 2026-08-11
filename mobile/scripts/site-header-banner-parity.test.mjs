@@ -32,9 +32,9 @@ test("site header banner admin page mirrors web form and hub chrome", () => {
   assert.match(page, /LABEL_ENABLED/);
   assert.match(page, /SiteHeaderBannerCarousel/);
   assert.match(page, /resolvePreviewSiteHeaderBannerSlidesFromForm/);
-  assert.match(page, /styles\.panel/);
+  assert.match(page, /styles\.panelSection/);
   assert.match(page, /styles\.slideZone/);
-  assert.match(page, /styles\.controlPanel/);
+  assert.match(page, /styles\.toolbar/);
   assert.doesNotMatch(page, /styles\.slideDivider/);
   assert.match(page, /ImageUrlUploadField/);
   assert.match(page, /LABEL_IMAGE_ALT/);
@@ -42,14 +42,14 @@ test("site header banner admin page mirrors web form and hub chrome", () => {
   assert.match(webPage, /SiteHeaderBannerCarousel/);
   assert.match(webPage, /site-header-banner-admin__toolbar/);
   assert.match(webPage, /site-header-banner-admin__panel/);
-  assert.match(webPage, /site-header-banner-admin__slide-zone/);
+  assert.match(webPage, /site-header-banner-admin__slides-layout/);
   assert.doesNotMatch(webPage, /site-header-banner-admin__slide-divider/);
   assert.doesNotMatch(webPage, /site-header-banner-admin__slides-stack/);
   assert.match(page, /styles\.slideTitle/);
   assert.doesNotMatch(webPage, /site-header-banner-admin__legend/);
-  assert.match(webPage, /type="color"/);
+  assert.match(webPage, /SiteHeaderBannerAdminSlideEditor/);
   assert.doesNotMatch(webPage, /site-header-banner-admin__workspace/);
-  assert.doesNotMatch(webPage, /site-header-banner-admin__save-bar/);
+  assert.match(webPage, /site-header-banner-admin__save-bar/);
 
   assert.match(hook, /validateSiteHeaderBannerAdminForm/);
   assert.match(hook, /buildPatchSiteHeaderBannerSettingsBody/);
@@ -57,6 +57,7 @@ test("site header banner admin page mirrors web form and hub chrome", () => {
 
 test("home catalog feed renders banner in scrollable list header", () => {
   const catalogScreen = readMobileFile("app/(tabs)/index.tsx");
+  const listHeader = readMobileFile("features/home-feed/ui/HomeFeedListHeader.tsx");
   const bannerRow = readMobileFile(
     "features/home-feed/ui/HomeCatalogSiteHeaderBannerRow.tsx",
   );
@@ -64,10 +65,10 @@ test("home catalog feed renders banner in scrollable list header", () => {
   const slot = readMobileFile("features/home-feed/ui/SiteHeaderBannerSlot.tsx");
   const carousel = readMobileFile("entities/site-header-banner/ui/SiteHeaderBannerCarousel.tsx");
 
-  assert.match(catalogScreen, /HomeCatalogSiteHeaderBannerRow/);
+  assert.match(catalogScreen, /HomeFeedListHeader/);
   assert.match(catalogScreen, /ListHeaderComponent=\{listHeader\}/);
   assert.match(
-    catalogScreen,
+    listHeader,
     /showHomeFeed \? <HomeCatalogSiteHeaderBannerRow visible=\{showHomeFeed\} \/>/,
   );
   assert.doesNotMatch(searchRow, /SiteHeaderBannerSlot/);
@@ -95,12 +96,11 @@ test("web header renders carousel after glass header panel", () => {
 
   assert.match(header, /app-shell__header-panel/);
   assert.match(header, /SiteHeaderBannerCarousel/);
-  assert.match(header, /showSiteHeaderBannerOnViewport/);
-  assert.match(header, /isMobileNav/);
+  assert.match(header, /showSiteHeaderBanner/);
   assert.match(header, /siteHeaderBannerSlides/);
   assert.match(
     header,
-    /app-shell__header-panel[\s\S]*<\/div>\s*\n\s*\{siteHeaderBannerSlides\.length > 0/,
+    /app-shell__header-panel[\s\S]*siteHeaderBannerSlides\.length > 0/,
   );
   assert.match(shellCss, /\.app-shell--header-v1 \.app-shell__header-panel/);
   const headerV1Rule =
@@ -134,5 +134,5 @@ test("shared staff section and api routes exist", () => {
   assert.match(router, /checkProductModeratorMW/);
   assert.match(contract, /SITE_HEADER_BANNER_HEIGHT_PX = 180/);
   assert.match(contract, /SITE_HEADER_BANNER_CAROUSEL_SLIDE_GAP_PX = 8/);
-  assert.match(contract, /SITE_HEADER_BANNER_CAROUSEL_PEEK_PX = 13/);
+  assert.match(contract, /SITE_HEADER_BANNER_CAROUSEL_PEEK_PX = 28/);
 });

@@ -22,6 +22,7 @@ import {
   PRODUCT_MODERATION_APPROVED,
   PRODUCT_MODERATION_STATUSES,
 } from "../constants/productModerationConstants.js";
+import { ProductPromoCodeSchema } from "./ProductPromoCodeSubschema.js";
 
 const Schema = mongoose.Schema;
 
@@ -378,6 +379,16 @@ const ProductSchema = new Schema(
       default: 0,
       min: 0,
       max: 50,
+    },
+    /** Промокоды продавца на товар (коды не отдаём в публичный API). */
+    productPromoCodes: {
+      type: [ProductPromoCodeSchema],
+      default: [],
+    },
+    productHasActivePromoCodes: {
+      type: Boolean,
+      default: false,
+      index: true,
     },
   },
   { timestamps: true },

@@ -20,7 +20,7 @@ test("register screen requires legal consent before submit", () => {
   assert.match(registerScreen, /RegisterLegalConsentFields/);
   assert.match(registerScreen, /isRegisterConsentComplete/);
   assert.match(registerScreen, /REGISTER_CONSENT_REQUIRED/);
-  assert.match(registerScreen, /disabled=\{registerMutation\.isPending \|\| !isConsentComplete\}/);
+  assert.match(registerScreen, /disabled=\{isFormBusy \|\| !isConsentComplete\}/);
   assert.match(consentFields, /accessibilityRole="checkbox"/);
   assert.match(consentFields, /\/legal\/terms/);
   assert.match(consentFields, /\/legal\/listing/);

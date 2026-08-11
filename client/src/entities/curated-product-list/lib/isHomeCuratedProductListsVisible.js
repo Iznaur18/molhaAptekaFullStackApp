@@ -9,6 +9,10 @@
  *   catalogAuctionOnly: boolean;
  *   catalogInstallmentOnly: boolean;
  *   catalogSaleOnly: boolean;
+ *   catalogRentalOnly?: boolean;
+ *   catalogAffiliateOnly?: boolean;
+ *   catalogWholesaleOnly?: boolean;
+ *   catalogOriginalOnly?: boolean;
  *   catalogNear?: boolean;
  * }} params
  */
@@ -23,6 +27,10 @@ export function isHomeCuratedProductListsVisible({
   catalogAuctionOnly,
   catalogInstallmentOnly,
   catalogSaleOnly,
+  catalogRentalOnly = false,
+  catalogAffiliateOnly = false,
+  catalogWholesaleOnly = false,
+  catalogOriginalOnly = false,
   catalogNear = false,
 }) {
   return (
@@ -36,6 +44,10 @@ export function isHomeCuratedProductListsVisible({
     !catalogAuctionOnly &&
     !catalogInstallmentOnly &&
     !catalogSaleOnly &&
+    !catalogRentalOnly &&
+    !catalogAffiliateOnly &&
+    !catalogWholesaleOnly &&
+    !catalogOriginalOnly &&
     !catalogNear
   );
 }

@@ -32,8 +32,12 @@ test("commerce cards use CommerceCardExpandToggle instead of chevron glyph", () 
   assert.match(toggleStyles, /fontSize: 11/);
   assert.doesNotMatch(toggle, /▸/);
 
-  for (const source of [orderCard, buyerBid, sellerOffer, installmentCard]) {
+  for (const source of [buyerBid, sellerOffer, installmentCard]) {
     assert.match(source, /CommerceCardExpandToggle/);
     assert.doesNotMatch(source, /▸/);
   }
+
+  // OrderCard: main expand uses CommerceCardExpandToggle; details fold keeps ▸ (web parity).
+  assert.match(orderCard, /CommerceCardExpandToggle/);
+  assert.match(orderCard, /DETAILS_FOLD_SUMMARY/);
 });

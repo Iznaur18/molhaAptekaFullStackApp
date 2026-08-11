@@ -133,7 +133,8 @@ export const useHomeHeaderProps = () => {
       pendingDataConfirmationCount,
       onMyProfileClick: handleMyProfileClick,
       onNotificationsClick: handleNotificationsClick,
-      unreadNotificationsCount: inAppNotificationsCount,
+      unreadNotificationsCount:
+        mainView === "notifications" ? 0 : inAppNotificationsCount,
       onLoginClick: handleLoginClick,
       onRegisterClick: handleRegisterClick,
       onNavigateToFullCatalogFromBreadcrumb: handleMobileHomeClick,

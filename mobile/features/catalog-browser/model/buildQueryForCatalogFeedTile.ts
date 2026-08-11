@@ -1,10 +1,14 @@
 import type { CatalogListFilters } from "@/entities/product/model/catalogListFilters";
 import {
+  CATALOG_FILTER_AFFILIATE_ONLY,
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
   CATALOG_FILTER_NEAR,
+  CATALOG_FILTER_ORIGINAL_ONLY,
+  CATALOG_FILTER_RENTAL_ONLY,
   CATALOG_FILTER_SALE_ONLY,
+  CATALOG_FILTER_WHOLESALE_ONLY,
   CATALOG_SORT_NEWEST,
   type CatalogFeedTile,
 } from "@/entities/product-category-display/lib/catalogFeedTiles";
@@ -13,7 +17,16 @@ export const buildQueryForCatalogFeedTile = (
   tile: CatalogFeedTile,
 ): Pick<
   CatalogListFilters,
-  "sort" | "followingOnly" | "auctionOnly" | "installmentOnly" | "saleOnly" | "near"
+  | "sort"
+  | "followingOnly"
+  | "auctionOnly"
+  | "installmentOnly"
+  | "saleOnly"
+  | "rentalOnly"
+  | "affiliateOnly"
+  | "wholesaleOnly"
+  | "originalOnly"
+  | "near"
 > => {
   if (tile.kind === "sort") {
     return {
@@ -22,6 +35,10 @@ export const buildQueryForCatalogFeedTile = (
       auctionOnly: false,
       installmentOnly: false,
       saleOnly: false,
+      rentalOnly: false,
+      affiliateOnly: false,
+      wholesaleOnly: false,
+      originalOnly: false,
       near: false,
     };
   }
@@ -32,6 +49,10 @@ export const buildQueryForCatalogFeedTile = (
     auctionOnly: false,
     installmentOnly: false,
     saleOnly: false,
+    rentalOnly: false,
+    affiliateOnly: false,
+    wholesaleOnly: false,
+    originalOnly: false,
     near: false,
   };
 
@@ -49,6 +70,18 @@ export const buildQueryForCatalogFeedTile = (
   }
   if (tile.value === CATALOG_FILTER_SALE_ONLY) {
     return { ...base, saleOnly: true };
+  }
+  if (tile.value === CATALOG_FILTER_RENTAL_ONLY) {
+    return { ...base, rentalOnly: true };
+  }
+  if (tile.value === CATALOG_FILTER_AFFILIATE_ONLY) {
+    return { ...base, affiliateOnly: true };
+  }
+  if (tile.value === CATALOG_FILTER_WHOLESALE_ONLY) {
+    return { ...base, wholesaleOnly: true };
+  }
+  if (tile.value === CATALOG_FILTER_ORIGINAL_ONLY) {
+    return { ...base, originalOnly: true };
   }
 
   return base;

@@ -158,6 +158,14 @@ export function ProductPriceOfferSellerTab({ productId, onOpenBuyer, onChanged }
                 <div className="product-price-offer__seller-actions">
                   <button
                     type="button"
+                    className="product-price-offer__btn product-price-offer__btn--reject"
+                    disabled={isRowBusy}
+                    onClick={() => void handleReject(String(row._id))}
+                  >
+                    {PRODUCT_PRICE_OFFER_UI.ACTION_REJECT}
+                  </button>
+                  <button
+                    type="button"
                     className="product-price-offer__btn product-price-offer__btn--primary"
                     disabled={isRowBusy}
                     onClick={() => void handleAccept(String(row._id))}
@@ -165,14 +173,6 @@ export function ProductPriceOfferSellerTab({ productId, onOpenBuyer, onChanged }
                     {isRowBusy
                       ? PRODUCT_PRICE_OFFER_UI.ACTION_PENDING
                       : PRODUCT_PRICE_OFFER_UI.ACTION_ACCEPT}
-                  </button>
-                  <button
-                    type="button"
-                    className="product-price-offer__btn product-price-offer__btn--reject"
-                    disabled={isRowBusy}
-                    onClick={() => void handleReject(String(row._id))}
-                  >
-                    {PRODUCT_PRICE_OFFER_UI.ACTION_REJECT}
                   </button>
                 </div>
               ) : null}

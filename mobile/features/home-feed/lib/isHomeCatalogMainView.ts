@@ -8,6 +8,10 @@ type HomeCatalogMainViewParams = {
   auctionOnly: boolean;
   installmentOnly: boolean;
   saleOnly: boolean;
+  rentalOnly: boolean;
+  affiliateOnly: boolean;
+  wholesaleOnly: boolean;
+  originalOnly: boolean;
   near?: boolean;
 };
 
@@ -21,6 +25,10 @@ export const isHomeCatalogMainView = ({
   auctionOnly,
   installmentOnly,
   saleOnly,
+  rentalOnly,
+  affiliateOnly,
+  wholesaleOnly,
+  originalOnly,
   near = false,
 }: HomeCatalogMainViewParams) =>
   !search &&
@@ -32,4 +40,8 @@ export const isHomeCatalogMainView = ({
   !auctionOnly &&
   !installmentOnly &&
   !saleOnly &&
+  !rentalOnly &&
+  !affiliateOnly &&
+  !wholesaleOnly &&
+  !originalOnly &&
   !near;

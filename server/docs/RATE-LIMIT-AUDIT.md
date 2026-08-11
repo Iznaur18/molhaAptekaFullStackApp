@@ -1,89 +1,75 @@
-# Аудит rate limit: auth / upload / order
+# Аудит rate limit
 
-Дата: 2026-06. Реализация: `express-rate-limit` v7, `server/middlewares/rateLimitMW.js`, глобально `createApp.js` → `generalRateLimiter`. `trust proxy: 1` для корректного IP за nginx.
+Дата: 2026-08. Реализация: `express-rate-limit` v7, `server/middlewares/rateLimitMW.js`, глобально `createApp.js` → `generalRateLimiter`. `trust proxy: 1` для корректного IP за nginx.
 
 ## Сводка
 
-| Зона | Статус до аудита | После аудита |
-|------|------------------|--------------|
-| **Auth** login/register | ✅ `authRateLimiter` (IP, 55/15m, skip success) | без изменений |
-| **Auth** refresh | ✅ `refreshAuthRateLimiter` (IP, 120/15m) | без изменений |
-| **Auth** resend email | ✅ per `userId` | без изменений |
-| **Auth** logout / verify-email | ⚠️ только `generalRateLimiter` | задокументировано (низкий приоритет) |
-| **Upload** image/video | ⚠️ IP до `checkAuthMW`, комментарии ≠ `max` | ✅ per `userId`, auth перед лимитом |
-| **Order** POST create | ❌ нет dedicated | ✅ `orderCreateRateLimiter` per `userId` |
-| **Order** PATCH items | ❌ нет dedicated | ✅ `orderItemActionRateLimiter` per `userId` |
-| **Order** GET / admin | ⚠️ только general | ок для чтения; спам — general 10k/15m |
+| Зона | Статус |
+|------|--------|
+| **Auth** login/register/OTP/resend | ✅ dedicated + login key `ip+email` |
+| **Upload** | ✅ per `userId`, 110/h |
+| **Order** create / item actions | ✅ |
+| **Reviews / Q&A / reports / stories / price offers / votes / address / user-search / phone-reveal / data-confirm** | ✅ |
+| **Advertising** submit (intro / header / personal category) | ✅ 5/h `userId` |
+| **Money** unlock-raffle / premium / promotion request | ✅ 10/h `userId` |
+| **Product** create | ✅ 30/h |
+| **Installment** create + mutators | ✅ 60/h |
+| **Catalog** `GET /product/` | ✅ 300/15m IP |
+| **Auth** logout / GET verify-email | ⚠️ только general (низкий приоритет) |
+| **nginx** `limit_req` | ❌ нет |
 
 ## Auth (`/auth`)
 
 | Метод | Путь | Лимитер | Ключ | Лимит |
 |-------|------|---------|------|-------|
-| POST | `/register` | `authRateLimiter` | IP (default) | 55 / 15 мин, успех не считается |
-| POST | `/login` | `authRateLimiter` | IP | то же |
+| POST | `/register`, `/register/phone`, `/register/confirm` | `registerAuthRateLimiter` | `ip+email` | 20 / 15 мин |
+| POST | `/login`, phone login/confirm, bind confirm, password reset confirm, password change | `authRateLimiter` | `ip+email` если email в body, иначе IP | 55 / 15 мин, успех не считается |
 | POST | `/refresh` | `refreshAuthRateLimiter` | IP | 120 / 15 мин |
-| POST | `/resend-verification` | `emailVerificationResendRateLimiter` | `userId` | см. `emailVerificationConstants` |
+| POST | OTP/resend/reset request | `emailVerificationResendRateLimiter` | `userId\|ip` | 5 / час |
 | POST | `/logout` | — | — | только general |
-| GET | `/verify-email` | — | — | токен в query; brute — низкая вероятность при длинном токене |
-| GET/PATCH | `/me`, … | — | — | JWT + general |
+| GET | `/verify-email` | — | — | токен в query |
 
-**Риски (приняты v1):** logout/verify без отдельного лимита; брут пароля ограничен IP (NAT — общий счётчик офиса). **v2:** лимит по `email` из body на login/register, Redis store за несколькими инстансами.
-
-## Upload (`/upload`)
+## Advertising / money / product / installment / catalog
 
 | Метод | Путь | Лимитер | Ключ | Лимит |
 |-------|------|---------|------|-------|
-| POST | `/` (image) | `uploadRateLimiter` | `userId` (после auth) | 110 / час |
-| POST | `/video` | `uploadRateLimiter` | `userId` | 110 / час |
+| POST | `/intro-ad`, `/site-header-banner-campaign`, `/seller-personal-category` | `advertisingSubmitRateLimiter` | `userId\|ip` | 5 / час (общий bucket) |
+| POST | `/product/raffles/unlock-create`, `/user/me/premium/purchase`, `/product/:id/promotions/request` | `moneyMutationRateLimiter` | `userId\|ip` | 10 / час (общий bucket) |
+| POST | `/product` | `productCreateRateLimiter` | `userId\|ip` | 30 / час |
+| POST/PATCH | installment create + payment/dispute/message | `installmentActionRateLimiter` | `userId\|ip` | 60 / час |
+| GET | `/product/` | `catalogListRateLimiter` | IP | 300 / 15 мин |
 
-**Было:** `uploadRateLimiter` → `checkAuthMW` → ключ только IP.  
-**Стало:** `checkAuthMW` → `uploadRateLimiter` → multer.
-
-nginx: `client_max_body_size 6m`, отдельного `limit_req` нет — только Express.
-
-## Order (`/order`)
-
-| Метод | Путь | Лимитер | Ключ | Лимит |
-|-------|------|---------|------|-------|
-| POST | `/` | `orderCreateRateLimiter` | `userId` | 30 / час (`ORDER_CREATE_RATE_LIMIT_PER_HOUR`) |
-| PATCH | `/:orderId/items/:itemIndex/*` | `orderItemActionRateLimiter` | `userId` | 120 / 15 мин |
-| PATCH | `/:orderId/status` | — | admin + general | staff |
-| GET | `/*` | — | — | general |
-
-Бизнес-логика `makeOrderController`: транзакция, сток, email verified — **не** заменяет rate limit.
+Константы: `server/constants/securityRateLimitConstants.js`.
 
 ## Глобальный слой
 
 ```text
-requestId → json → cors → helmet → generalRateLimiter (10_000 / 15 min / IP) → routers
+requestId → json → cors → helmet → generalRateLimiter (5_000 / 15 min / IP prod) → routers
 ```
 
-Специализированные лимитеры **дополнительно** считают свои окна (двойной учёт на одном запросе — ожидаемо).
+`/health` и `/uploads*` не считаются в general.
 
 ## Инфра
 
 | Слой | Rate limit |
 |------|------------|
-| Express | ✅ см. выше |
-| nginx (`docs/deploy/nginx-izibuy.conf.example`) | ❌ нет `limit_req_zone` |
-| Mongo / app-level throttle на заказы | ❌ |
+| Express | ✅ |
+| nginx | ❌ нет `limit_req_zone` |
+| Redis store | ✅ при `REDIS_URL`; иначе in-memory per process |
 
-**Prod:** при `REDIS_URL` — общий store `rate-limit-redis` (`server/utils/rateLimitRedisStore.js`); без Redis — in-memory (один процесс). `/health` → `rateLimitStore: redis|memory`.
+## Клиент 429
 
-## Расхождения в коде (исправлено)
-
-- Комментарии «10 загрузок / 10 голосов» при `max: 110` в `rateLimitMW.js` — комментарии приведены к факту или к константам.
+`formatApiErrorMessage` (`packages/shared-lib`) предпочитает `response.data.message`, иначе статусный fallback «Слишком много запросов…».
 
 ## Чеклист prod
 
 - [ ] `trust proxy` + nginx передаёт `X-Forwarded-For`
-- [ ] При 429 клиент показывает `message` из JSON
-- [ ] Мониторинг доли 429 на `/auth/login`, `/upload`, `POST /order`
-- [ ] v2: Redis store, nginx `limit_req` на `/auth/` и `/upload`
+- [ ] `REDIS_URL` на multi-instance
+- [ ] Мониторинг 429: `/auth/login`, advertising submit, money mutation, `GET /product/`
+- [ ] v2: nginx `limit_req` на `/auth/` и `/upload`
 
 ## Связанные файлы
 
 - `server/middlewares/rateLimitMW.js`
-- `server/routes/authRouter.js`, `uploadRouter.js`, `orderRouter.js`
-- `server/constants/orderRateLimitConstants.js`
-- `server/docs/production-checklist.md`
+- `server/constants/securityRateLimitConstants.js`, `rateLimitConstants.js`, `orderRateLimitConstants.js`
+- `server/routes/authRouter.js`, `introAdRouter.js`, `siteHeaderBannerCampaignRouter.js`, `sellerPersonalCategoryRouter.js`, `productRouter.js`, `userRouter.js`, `installmentRouter.js`, `uploadRouter.js`, `orderRouter.js`

@@ -460,12 +460,20 @@ test("catalogProductsQuerySchema coerces page/limit and flags", () => {
     limit: "20",
     followingOnly: "true",
     saleOnly: "false",
+    rentalOnly: "true",
+    affiliateOnly: "false",
+    wholesaleOnly: "true",
+    originalOnly: "false",
     near: "true",
   });
   assert.equal(parsed.page, 2);
   assert.equal(parsed.limit, 20);
   assert.equal(parsed.followingOnly, true);
   assert.equal(parsed.saleOnly, false);
+  assert.equal(parsed.rentalOnly, true);
+  assert.equal(parsed.affiliateOnly, false);
+  assert.equal(parsed.wholesaleOnly, true);
+  assert.equal(parsed.originalOnly, false);
   assert.equal(parsed.near, true);
 });
 

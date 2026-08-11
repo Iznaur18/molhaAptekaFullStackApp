@@ -52,6 +52,18 @@ const OrderLineItemSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
+    promoCodeAtOrder: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: 32,
+    },
+    promoDiscountPercentAtOrder: {
+      type: Number,
+      default: null,
+      min: 1,
+      max: 99,
+    },
     productNameAtOrder: {
       type: String,
       required: true,

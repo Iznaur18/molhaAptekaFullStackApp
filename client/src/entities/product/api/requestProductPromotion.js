@@ -1,3 +1,5 @@
+import { formatApiErrorMessage } from "@izibuy/shared-lib";
+
 import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
@@ -21,10 +23,8 @@ export async function requestProductPromotion(productId, body) {
       message: typeof data.data.message === "string" ? data.data.message : null,
     };
   } catch (e) {
-    const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      API_CLIENT_UI.REQUEST_PRODUCT_PROMOTION_FALLBACK;
-    throw new Error(message);
+    throw new Error(
+      formatApiErrorMessage(e, API_CLIENT_UI.REQUEST_PRODUCT_PROMOTION_FALLBACK),
+    );
   }
 }

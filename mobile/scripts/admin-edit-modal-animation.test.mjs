@@ -25,6 +25,7 @@ assert.match(shellSource, /pointerEvents={dismissDisabled \? "none" : "auto"}/);
 assert.match(categoryModalSource, /useSyncAdminEditFormOnOpen/);
 assert.match(categoryModalSource, /onInteractionBusyChange/);
 assert.match(categoryModalSource, /onDismissed/);
-assert.match(categoryModalSource, /categorySlug: resolved\.displaySlug/);
+assert.match(categoryModalSource, /activeCategorySlug/);
+assert.match(categoryModalSource, /mutateAsync\(\{\s*resolved,/);
 
 console.log("admin-edit-modal-animation.test.mjs: ok");

@@ -6,7 +6,7 @@ import { getProductPurchaseLimit } from "../../../entities/product/lib/getProduc
 import { resolveProductImageUrl } from "../../../entities/product/lib/resolveProductImageUrl.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
 import { ProductPriceDisplay } from "../../../entities/product/ui/ProductPriceDisplay.jsx";
-import { CART_PAGE_UI, COMMON_UI } from "../../../shared/config/appUiCopy.js";
+import { CART_PAGE_UI, COMMON_UI, PRODUCT_PROMO_CODE_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { AppIcon, Trash2 } from "../../../shared/ui/icon/index.js";
 
@@ -109,6 +109,14 @@ export function CartLineItem({
             {line.isWholesaleApplied ? (
               <p className="cart-line__wholesale-badge" role="status">
                 {CART_PAGE_UI.WHOLESALE_LINE_BADGE}
+              </p>
+            ) : null}
+            {line.isPromoApplied ? (
+              <p className="cart-line__wholesale-badge" role="status">
+                {PRODUCT_PROMO_CODE_UI.CART_PROMO_LABEL}
+                {line.promoDiscountPercent != null
+                  ? ` ${PRODUCT_PROMO_CODE_UI.CART_PROMO_PERCENT(line.promoDiscountPercent)}`
+                  : ""}
               </p>
             ) : null}
             {stockHint ? <p className="cart-line__stock-hint">{stockHint}</p> : null}

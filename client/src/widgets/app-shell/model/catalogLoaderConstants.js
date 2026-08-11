@@ -10,5 +10,9 @@ export const CATALOG_LANDING_QUERY = {
   auctionOnly: false,
   installmentOnly: false,
   saleOnly: false,
+  rentalOnly: false,
+  affiliateOnly: false,
+  wholesaleOnly: false,
+  originalOnly: false,
   near: false,
 };

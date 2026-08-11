@@ -58,6 +58,10 @@ export const PersonalCategoryAdvertisingSection = ({
   const showTariffQuote = !hasOpenCampaign || showForm;
 
   const handleSubmit = async () => {
+    if (!labelRu.trim()) {
+      setActionError(SELLER_PERSONAL_CATEGORY_PAGE_UI.ERROR_NAME_REQUIRED);
+      return;
+    }
     if (!isRuRegionCode(regionCode)) {
       setActionError(SELLER_PERSONAL_CATEGORY_PAGE_UI.ERROR_REGION_REQUIRED);
       return;

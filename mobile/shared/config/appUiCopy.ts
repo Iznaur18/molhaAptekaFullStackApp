@@ -498,6 +498,44 @@ export const PRODUCT_RENTAL_UI = {
   DETAILS_TEASER_ARIA: "Подробнее об аренде",
 } as const;
 
+/** Промокоды продавца на товар */
+export const PRODUCT_PROMO_CODE_UI = {
+  DETAILS_BADGE: "Промокод",
+  DETAILS_TEASER_TITLE: "Промокод",
+  DETAILS_TEASER_SUBTITLE: "Введите код и получите скидку",
+  DETAILS_TEASER_ARIA: "Открыть ввод промокода",
+  SHEET_TITLE: "Промокод",
+  SHEET_LEAD: "Введите код продавца. Скидка применится к этому товару.",
+  CODE_LABEL: "Промокод",
+  CODE_PLACEHOLDER: "например SUMMER20",
+  ACTIVATE: "Активировать",
+  ACTIVATE_PENDING: "Проверяем…",
+  LOGIN_REQUIRED: "Войдите, чтобы активировать промокод",
+  ALREADY_APPLIED: "На этот товар уже применён промокод",
+  APPLIED: (percent: number) => `Промокод активен: −${percent}%`,
+  MODAL_TITLE: "Промокоды товара",
+  MODAL_LEAD:
+    "До 10 активных кодов. Скидка только в процентах. Лимит активаций — от 1 до 1000.",
+  CARD_TITLE: (n: number) => `Промокод ${n}`,
+  ADD: "Добавить промокод",
+  SAVE: "Сохранить",
+  SAVE_PENDING: "Сохранение…",
+  CLOSE: "Закрыть",
+  FIELD_CODE: "Код",
+  FIELD_PERCENT: "Скидка, %",
+  FIELD_MAX: "Макс. активаций",
+  FIELD_USED: "Использовано",
+  FIELD_ENABLED: "Активен",
+  REMOVE: "Удалить",
+  EMPTY: "Пока нет промокодов",
+  MAX_ACTIVE: "Уже 10 активных промокодов",
+  CART_PROMO_LABEL: "Промокод",
+  CART_PROMO_PERCENT: (percent: number) => `−${percent}%`,
+  FETCH_FALLBACK: "Не удалось загрузить промокоды",
+  SAVE_FALLBACK: "Не удалось сохранить промокоды",
+  ACTIVATE_FALLBACK: "Не удалось активировать промокод",
+} as const;
+
 /** Оптовая цена (карточка / детали) */
 export const PRODUCT_WHOLESALE_UI = {
   DETAILS_OFFER_KICKER: "Оптовая цена",
@@ -1937,10 +1975,12 @@ export const INTRO_AD_PAGE_UI = {
   OPEN_FORM: "Оформить рекламу",
   VIDEO_DURATION_HINT:
     "Максимум 10 секунд: более длинный ролик автоматически обрежется при загрузке. Исходный файл — до 100 МБ.",
-  ERROR_FALLBACK_TITLE_REQUIRED: "Укажите заголовок заглушки",
-  ERROR_FALLBACK_TITLE_TOO_LONG: "Заголовок заглушки слишком длинный",
-  ERROR_FALLBACK_HINT_REQUIRED: "Укажите подзаголовок заглушки",
-  ERROR_FALLBACK_HINT_TOO_LONG: "Подзаголовок заглушки слишком длинный",
+  LABEL_FALLBACK_TITLE: "Заголовок на экране",
+  LABEL_FALLBACK_HINT: "Подзаголовок на экране",
+  ERROR_FALLBACK_TITLE_REQUIRED: "Укажите заголовок на экране",
+  ERROR_FALLBACK_TITLE_TOO_LONG: "Заголовок слишком длинный",
+  ERROR_FALLBACK_HINT_REQUIRED: "Укажите подзаголовок на экране",
+  ERROR_FALLBACK_HINT_TOO_LONG: "Подзаголовок слишком длинный",
   ERROR_VIDEO_REQUIRED: "Загрузите MP4-ролик",
 } as const;
 
@@ -2007,6 +2047,7 @@ export const SELLER_PERSONAL_CATEGORY_PAGE_UI = {
   LABEL_IMAGE: "Картинка плитки",
   LABEL_REGION: "Регион показа",
   HINT_REGION: "Плитка появится в каталоге только у покупателей этого региона.",
+  ERROR_NAME_REQUIRED: "Укажите название категории",
   ERROR_REGION_REQUIRED: "Выберите регион показа",
   LABEL_DURATION: "Срок",
   /** @param {number} balance */
@@ -2645,6 +2686,8 @@ export const PRODUCT_BADGE_EXPLAIN_UI = {
       "При покупке от указанного количества действует оптовая цена за единицу. Подробности — в блоке оптовой цены на этой странице.",
     rental:
       "Товар можно взять в аренду у продавца. Цена и единица (сутки или час) задаются продавцом. Условия выдачи и возврата уточняйте у продавца.",
+    promo:
+      "Продавец задал промокоды на этот товар. Введите код в блоке «Промокод», чтобы получить скидку в процентах.",
     near_distance:
       "Примерное расстояние до пункта самовывоза продавца относительно вашего местоположения. Точность зависит от геолокации.",
   },

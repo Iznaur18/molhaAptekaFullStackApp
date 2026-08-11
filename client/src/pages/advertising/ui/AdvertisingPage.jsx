@@ -21,7 +21,7 @@ import { IntroVideoUploadField } from "../../../shared/ui/IntroVideoUploadField/
 import {
   buildSubmitIntroAdCampaignBody,
   formToIntroAdPreviewSettings,
-  validateAppIntroAdminForm,
+  validateIntroAdForm,
 } from "../../../entities/intro-ad/lib/index.js";
 
 import { IS_INTRO_AD_ADVERTISING_ENABLED } from "../model/isIntroAdAdvertisingEnabled.js";
@@ -129,13 +129,9 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
   };
 
   const handlePreview = () => {
-    const validationError = validateAppIntroAdminForm(form);
+    const validationError = validateIntroAdForm(form);
     if (validationError) {
       setActionError(validationError);
-      return;
-    }
-    if (!String(form.videoMp4Url ?? "").trim()) {
-      setActionError("Загрузите MP4-ролик");
       return;
     }
     previewIntro(formToIntroAdPreviewSettings(buildSubmitIntroAdCampaignBody(form)));
@@ -143,13 +139,9 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const validationError = validateAppIntroAdminForm(form);
+    const validationError = validateIntroAdForm(form);
     if (validationError) {
       setActionError(validationError);
-      return;
-    }
-    if (!String(form.videoMp4Url ?? "").trim()) {
-      setActionError("Загрузите MP4-ролик");
       return;
     }
 
@@ -317,7 +309,7 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
                   onChange={(value) => updateField("posterUrl", value)}
                 />
                 <label className="advertising-page__field">
-                  Заголовок заглушки
+                  {INTRO_AD_PAGE_UI.LABEL_FALLBACK_TITLE}
                   <input
                     className="advertising-page__input"
                     value={form.fallbackTitle}
@@ -325,7 +317,7 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
                   />
                 </label>
                 <label className="advertising-page__field">
-                  Подсказка заглушки
+                  {INTRO_AD_PAGE_UI.LABEL_FALLBACK_HINT}
                   <input
                     className="advertising-page__input"
                     value={form.fallbackHint}

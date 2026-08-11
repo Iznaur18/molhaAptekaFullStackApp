@@ -63,6 +63,18 @@ paths:
         - in: query
           name: saleOnly
           schema: { type: boolean }
+        - in: query
+          name: rentalOnly
+          schema: { type: boolean }
+        - in: query
+          name: affiliateOnly
+          schema: { type: boolean }
+        - in: query
+          name: wholesaleOnly
+          schema: { type: boolean }
+        - in: query
+          name: originalOnly
+          schema: { type: boolean }
       responses:
         "200":
           description: OK

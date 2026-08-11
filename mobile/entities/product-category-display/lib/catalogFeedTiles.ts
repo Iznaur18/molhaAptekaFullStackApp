@@ -19,6 +19,10 @@ export const CATALOG_FILTER_FOLLOWING_ONLY = "__following_only__";
 export const CATALOG_FILTER_AUCTION_ONLY = "__auction_only__";
 export const CATALOG_FILTER_INSTALLMENT_ONLY = "__installment_only__";
 export const CATALOG_FILTER_SALE_ONLY = "__sale_only__";
+export const CATALOG_FILTER_RENTAL_ONLY = "__rental_only__";
+export const CATALOG_FILTER_AFFILIATE_ONLY = "__affiliate_only__";
+export const CATALOG_FILTER_WHOLESALE_ONLY = "__wholesale_only__";
+export const CATALOG_FILTER_ORIGINAL_ONLY = "__original_only__";
 
 export const CATALOG_FEED_TILES: CatalogFeedTile[] = [
   { key: "sort:newest", kind: "sort", value: CATALOG_SORT_NEWEST, label: "Новинки" },
@@ -56,5 +60,29 @@ export const CATALOG_FEED_TILES: CatalogFeedTile[] = [
     kind: "filter",
     value: CATALOG_FILTER_SALE_ONLY,
     label: "Скидки",
+  },
+  {
+    key: `filter:${CATALOG_FILTER_RENTAL_ONLY}`,
+    kind: "filter",
+    value: CATALOG_FILTER_RENTAL_ONLY,
+    label: "Прокат и аренда",
+  },
+  {
+    key: `filter:${CATALOG_FILTER_AFFILIATE_ONLY}`,
+    kind: "filter",
+    value: CATALOG_FILTER_AFFILIATE_ONLY,
+    label: "Партнерская программа",
+  },
+  {
+    key: `filter:${CATALOG_FILTER_WHOLESALE_ONLY}`,
+    kind: "filter",
+    value: CATALOG_FILTER_WHOLESALE_ONLY,
+    label: "Оптовая цена",
+  },
+  {
+    key: `filter:${CATALOG_FILTER_ORIGINAL_ONLY}`,
+    kind: "filter",
+    value: CATALOG_FILTER_ORIGINAL_ONLY,
+    label: "Только оригинал",
   },
 ];

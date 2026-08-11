@@ -1,9 +1,13 @@
 import {
+  CATALOG_FILTER_AFFILIATE_ONLY,
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
   CATALOG_FILTER_NEAR,
+  CATALOG_FILTER_ORIGINAL_ONLY,
+  CATALOG_FILTER_RENTAL_ONLY,
   CATALOG_FILTER_SALE_ONLY,
+  CATALOG_FILTER_WHOLESALE_ONLY,
 } from "../../../entities/product/model/productConstants.js";
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import {
@@ -19,12 +23,20 @@ import {
  *   catalogAuctionOnly: boolean;
  *   catalogInstallmentOnly: boolean;
  *   catalogSaleOnly: boolean;
+ *   catalogRentalOnly: boolean;
+ *   catalogAffiliateOnly: boolean;
+ *   catalogWholesaleOnly: boolean;
+ *   catalogOriginalOnly: boolean;
  *   catalogNear: boolean;
  *   onCatalogSortChange: (sort: string) => void;
  *   onCatalogFollowingOnlyToggle: () => void;
  *   onCatalogAuctionOnlyToggle: () => void;
  *   onCatalogInstallmentOnlyToggle: () => void;
  *   onCatalogSaleOnlyToggle: () => void;
+ *   onCatalogRentalOnlyToggle: () => void;
+ *   onCatalogAffiliateOnlyToggle: () => void;
+ *   onCatalogWholesaleOnlyToggle: () => void;
+ *   onCatalogOriginalOnlyToggle: () => void;
  *   onCatalogNearToggle: () => void;
  * }} props
  */
@@ -35,12 +47,20 @@ export function CatalogFiltersDropdown({
   catalogAuctionOnly,
   catalogInstallmentOnly,
   catalogSaleOnly,
+  catalogRentalOnly,
+  catalogAffiliateOnly,
+  catalogWholesaleOnly,
+  catalogOriginalOnly,
   catalogNear,
   onCatalogSortChange,
   onCatalogFollowingOnlyToggle,
   onCatalogAuctionOnlyToggle,
   onCatalogInstallmentOnlyToggle,
   onCatalogSaleOnlyToggle,
+  onCatalogRentalOnlyToggle,
+  onCatalogAffiliateOnlyToggle,
+  onCatalogWholesaleOnlyToggle,
+  onCatalogOriginalOnlyToggle,
   onCatalogNearToggle,
 }) {
   const listItems = buildCatalogFiltersOnlyDropdownItems();
@@ -50,6 +70,10 @@ export function CatalogFiltersDropdown({
     catalogAuctionOnly,
     catalogInstallmentOnly,
     catalogSaleOnly,
+    catalogRentalOnly,
+    catalogAffiliateOnly,
+    catalogWholesaleOnly,
+    catalogOriginalOnly,
     catalogNear,
   };
 
@@ -72,6 +96,22 @@ export function CatalogFiltersDropdown({
     }
     if (item.value === CATALOG_FILTER_SALE_ONLY) {
       onCatalogSaleOnlyToggle();
+      return;
+    }
+    if (item.value === CATALOG_FILTER_RENTAL_ONLY) {
+      onCatalogRentalOnlyToggle();
+      return;
+    }
+    if (item.value === CATALOG_FILTER_AFFILIATE_ONLY) {
+      onCatalogAffiliateOnlyToggle();
+      return;
+    }
+    if (item.value === CATALOG_FILTER_WHOLESALE_ONLY) {
+      onCatalogWholesaleOnlyToggle();
+      return;
+    }
+    if (item.value === CATALOG_FILTER_ORIGINAL_ONLY) {
+      onCatalogOriginalOnlyToggle();
       return;
     }
     if (item.value === CATALOG_FILTER_NEAR) {

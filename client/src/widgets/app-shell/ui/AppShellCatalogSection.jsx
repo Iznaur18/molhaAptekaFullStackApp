@@ -58,6 +58,10 @@ import { MyProductsCatalogSection } from "../../my-products-page/ui/MyProductsCa
  *   catalogAuctionOnly: boolean;
  *   catalogInstallmentOnly: boolean;
  *   catalogSaleOnly: boolean;
+ *   catalogRentalOnly?: boolean;
+ *   catalogAffiliateOnly?: boolean;
+ *   catalogWholesaleOnly?: boolean;
+ *   catalogOriginalOnly?: boolean;
  *   catalogNear?: boolean;
  *   showFullWidthTier3Banners?: boolean;
  *   sellerRaffleActive: boolean;
@@ -111,6 +115,10 @@ export function AppShellCatalogGridSection({
   catalogAuctionOnly,
   catalogInstallmentOnly,
   catalogSaleOnly,
+  catalogRentalOnly = false,
+  catalogAffiliateOnly = false,
+  catalogWholesaleOnly = false,
+  catalogOriginalOnly = false,
   catalogNear = false,
   showFullWidthTier3Banners = false,
   sellerRaffleActive,
@@ -228,6 +236,10 @@ export function AppShellCatalogGridSection({
           catalogAuctionOnly={catalogAuctionOnly}
           catalogInstallmentOnly={catalogInstallmentOnly}
           catalogSaleOnly={catalogSaleOnly}
+          catalogRentalOnly={catalogRentalOnly}
+          catalogAffiliateOnly={catalogAffiliateOnly}
+          catalogWholesaleOnly={catalogWholesaleOnly}
+          catalogOriginalOnly={catalogOriginalOnly}
           catalogNear={catalogNear}
           showFullWidthTier3Banners={showFullWidthTier3Banners}
           sellerRaffleActive={sellerRaffleActive}

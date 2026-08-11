@@ -14,12 +14,14 @@ import { ProductDetailsBadgeStack } from "../ProductDetailsBadgeStack.jsx";
 import { ProductDetailsSellerPreview } from "../ProductDetailsSellerPreview.jsx";
 import { ProductMediaGalleryReadonly } from "../ProductMediaGalleryReadonly.jsx";
 import { ProductPriceDisplay } from "../ProductPriceDisplay.jsx";
+import { ProductPromoCodeActivateSheet } from "../ProductPromoCodeActivateSheet.jsx";
 import { ProductAffiliateShareButton } from "./ProductAffiliateShareButton.jsx";
 import { ProductDetailsAuctionTeaser } from "./ProductDetailsAuctionTeaser.jsx";
 import { ProductDetailsCompareTeaser } from "./ProductDetailsCompareTeaser.jsx";
 import { ProductDetailsContentSwitcher } from "./ProductDetailsContentSwitcher.jsx";
 import { ProductDetailsInstallmentTeaser } from "./ProductDetailsInstallmentTeaser.jsx";
 import { ProductDetailsModalPurchaseActions } from "./ProductDetailsModalPurchaseActions.jsx";
+import { ProductDetailsPromoTeaser } from "./ProductDetailsPromoTeaser.jsx";
 import { ProductDetailsQaTeaser } from "./ProductDetailsQaTeaser.jsx";
 import { ProductDetailsRaffleTeaser } from "./ProductDetailsRaffleTeaser.jsx";
 import { ProductDetailsRentalTeaser } from "./ProductDetailsRentalTeaser.jsx";
@@ -91,6 +93,7 @@ export function ProductDetailsModalDetailsTab({
 
   /** @type {[null | { title: string; badgeKey: import("@izibuy/shared-lib").ProductBadgeExplainKey | null; fallbackKey: string }, Function]} */
   const [badgeExplain, setBadgeExplain] = useState(null);
+  const [isPromoSheetOpen, setIsPromoSheetOpen] = useState(false);
 
   // Prefetch CMS бейджей, пока открыты детали — sheet не стартует с пустым cache.
   useProductBadgeExplainsQuery({ enabled: isOpen });
@@ -128,6 +131,10 @@ export function ProductDetailsModalDetailsTab({
             onPress={handleCompareShortcutClick}
           />
           <ProductDetailsRaffleTeaser product={product} />
+          <ProductDetailsPromoTeaser
+            product={product}
+            onPress={() => setIsPromoSheetOpen(true)}
+          />
           <ProductDetailsRentalTeaser
             product={product}
             onPress={() =>
@@ -313,6 +320,13 @@ export function ProductDetailsModalDetailsTab({
           }
           onClose={() => setBadgeExplain(null)}
         />
+        <ProductPromoCodeActivateSheet
+          isOpen={isPromoSheetOpen}
+          productId={productId}
+          isAuthorized={isAuthorized}
+          onRequestLogin={onRequestLogin}
+          onClose={() => setIsPromoSheetOpen(false)}
+        />
       </>
     );
   }
@@ -333,6 +347,13 @@ export function ProductDetailsModalDetailsTab({
           badgeExplain?.badgeKey === "rental" ? sellerId || null : null
         }
         onClose={() => setBadgeExplain(null)}
+      />
+      <ProductPromoCodeActivateSheet
+        isOpen={isPromoSheetOpen}
+        productId={productId}
+        isAuthorized={isAuthorized}
+        onRequestLogin={onRequestLogin}
+        onClose={() => setIsPromoSheetOpen(false)}
       />
     </>
   );

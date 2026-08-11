@@ -126,6 +126,10 @@ async function loadCatalogProducts({
   const auctionOnly = parseTruthyQueryFlag(query.auctionOnly);
   const installmentOnly = parseTruthyQueryFlag(query.installmentOnly);
   const saleOnly = parseTruthyQueryFlag(query.saleOnly);
+  const rentalOnly = parseTruthyQueryFlag(query.rentalOnly);
+  const affiliateOnly = parseTruthyQueryFlag(query.affiliateOnly);
+  const wholesaleOnly = parseTruthyQueryFlag(query.wholesaleOnly);
+  const originalOnly = parseTruthyQueryFlag(query.originalOnly);
   const nearEnabled = parseTruthyQueryFlag(query.near);
 
   if (followingOnly && !userId) {
@@ -176,6 +180,18 @@ async function loadCatalogProducts({
   }
   if (saleOnly) {
     Object.assign(catalogBaseQuery, buildProductSaleOnlyMatch());
+  }
+  if (rentalOnly) {
+    catalogBaseQuery.productRentalEnabled = true;
+  }
+  if (affiliateOnly) {
+    catalogBaseQuery.affiliateEnabled = true;
+  }
+  if (wholesaleOnly) {
+    catalogBaseQuery.productWholesaleEnabled = true;
+  }
+  if (originalOnly) {
+    catalogBaseQuery.productIsOriginal = true;
   }
   if (reviewsOnly) {
     catalogBaseQuery.reviewCount = { $gte: PRODUCT_CATALOG_REVIEWS_MIN_REVIEW_COUNT };

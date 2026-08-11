@@ -20,6 +20,10 @@ import { formatApiErrorMessage } from "@izibuy/shared-lib";
  *   auctionOnly?: boolean;
  *   installmentOnly?: boolean;
  *   saleOnly?: boolean;
+ *   rentalOnly?: boolean;
+ *   affiliateOnly?: boolean;
+ *   wholesaleOnly?: boolean;
+ *   originalOnly?: boolean;
  *   near?: boolean;
  *   regionCode?: string;
  * }} [options]
@@ -41,6 +45,10 @@ export async function fetchCatalogProductsPage({
   auctionOnly = false,
   installmentOnly = false,
   saleOnly = false,
+  rentalOnly = false,
+  affiliateOnly = false,
+  wholesaleOnly = false,
+  originalOnly = false,
   near = false,
   regionCode,
 } = {}) {
@@ -59,6 +67,10 @@ export async function fetchCatalogProductsPage({
         ...(auctionOnly ? { auctionOnly: "true" } : {}),
         ...(installmentOnly ? { installmentOnly: "true" } : {}),
         ...(saleOnly ? { saleOnly: "true" } : {}),
+        ...(rentalOnly ? { rentalOnly: "true" } : {}),
+        ...(affiliateOnly ? { affiliateOnly: "true" } : {}),
+        ...(wholesaleOnly ? { wholesaleOnly: "true" } : {}),
+        ...(originalOnly ? { originalOnly: "true" } : {}),
         ...(near ? { near: "true" } : {}),
         ...(regionCode ? { regionCode } : {}),
       },

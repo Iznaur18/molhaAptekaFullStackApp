@@ -30,7 +30,7 @@ import {
   assertOrderItemsWithinAvailableStock,
   guardOrderItemsStockInTransaction,
 } from "../product/productStock.js";
-import { resolveProductUnitPrice } from "@izibuy/shared-lib";
+import { resolveProductUnitPriceWithPromo } from "@izibuy/shared-lib";
 
 import { buildOrderStatusFromItems } from "./orderStatus.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
@@ -39,6 +39,7 @@ import {
   resolveAffiliateReferrerUserId,
   resolveOrderLineAffiliateAttribution,
 } from "../affiliate/resolveAffiliateAttribution.js";
+import { listAppliedProductPromosForUser } from "../product/productPromoCode.js";
 
 const calculateTotalAmount = (items) =>
   items.reduce((sum, item) => sum + (item.unitPriceAtOrder ?? 0) * item.quantity, 0);
@@ -56,16 +57,19 @@ const calculateTotalAmount = (items) =>
  *   affiliatePercent: number;
  * }>} productById
  * @param {{ referrerUserId: string | null; buyerUserId: string }} affiliateCtx
+ * @param {Record<string, { code: string; discountPercent: number }>} promoByProductId
  */
-const buildItemsWithPriceSnapshot = (items, productById, affiliateCtx) =>
+const buildItemsWithPriceSnapshot = (items, productById, affiliateCtx, promoByProductId = {}) =>
   items.map((item) => {
     const snapshot = productById[String(item.productId)];
-    const unitPrice = resolveProductUnitPrice({
+    const promo = promoByProductId[String(item.productId)] ?? null;
+    const unitPrice = resolveProductUnitPriceWithPromo({
       productPrice: snapshot.price,
       productWholesaleEnabled: snapshot.wholesaleEnabled === true,
       productWholesaleMinQty: snapshot.wholesaleMinQty,
       productWholesalePrice: snapshot.wholesalePrice,
       quantity: item.quantity,
+      promoDiscountPercent: promo?.discountPercent ?? null,
     });
     const loyalty = buildOrderLineLoyaltySnapshot({
       loyaltyPointsPerUnit: snapshot.loyaltyPointsPerUnit,
@@ -84,6 +88,8 @@ const buildItemsWithPriceSnapshot = (items, productById, affiliateCtx) =>
       quantity: item.quantity,
       unitPriceAtOrder: unitPrice,
       productNameAtOrder: snapshot.name,
+      promoCodeAtOrder: promo?.code ?? null,
+      promoDiscountPercentAtOrder: promo?.discountPercent ?? null,
       ...loyalty,
       ...affiliate,
     };
@@ -303,10 +309,27 @@ export async function createOrder({
   }
 
   const referrerUserId = await resolveAffiliateReferrerUserId(affiliateCode);
-  const itemsWithPrice = buildItemsWithPriceSnapshot(items, productById, {
-    referrerUserId,
-    buyerUserId: String(userId),
+  const appliedPromos = await listAppliedProductPromosForUser({
+    userId: String(userId),
+    productIds: uniqueProductIds,
   });
+  /** @type {Record<string, { code: string; discountPercent: number }>} */
+  const promoByProductId = {};
+  for (const row of appliedPromos) {
+    promoByProductId[row.productId] = {
+      code: row.code,
+      discountPercent: row.discountPercent,
+    };
+  }
+  const itemsWithPrice = buildItemsWithPriceSnapshot(
+    items,
+    productById,
+    {
+      referrerUserId,
+      buyerUserId: String(userId),
+    },
+    promoByProductId,
+  );
   const totalAmount = calculateTotalAmount(itemsWithPrice);
   const status = buildOrderStatusFromItems(itemsWithPrice);
 

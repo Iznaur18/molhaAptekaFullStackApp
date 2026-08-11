@@ -74,6 +74,10 @@ import {
   getPendingProductPromotionsCountController,
   approveProductPromotionController,
   rejectProductPromotionController,
+  listProductPromoCodesController,
+  replaceProductPromoCodesController,
+  activateProductPromoCodeController,
+  listMyAppliedProductPromosController,
   getFeaturedRaffleController,
   getRaffleByIdController,
   getRaffleProductsController,
@@ -106,6 +110,10 @@ import {
   productReviewRateLimiter,
   productQuestionRateLimiter,
   productCompareRateLimiter,
+  productCreateRateLimiter,
+  catalogListRateLimiter,
+  moneyMutationRateLimiter,
+  installmentActionRateLimiter,
 } from "../middlewares/index.js";
 import {
   makeProductValidation,
@@ -129,6 +137,8 @@ import {
   myProductPromotionsValidation,
   promotionIdParamValidation,
   rejectProductPromotionValidation,
+  replaceProductPromoCodesValidation,
+  activateProductPromoCodeValidation,
   createRaffleValidation,
   patchRaffleValidation,
   raffleIdParamValidation,
@@ -164,8 +174,20 @@ import {
 
 const router = createAsyncRouter();
 
-router.post("/", checkAuthMW, makeProductValidation, postProductController);
-router.get("/", productsSearchValidation, checkOptionalAuthMW, getProductsController);
+router.post(
+  "/",
+  checkAuthMW,
+  productCreateRateLimiter,
+  makeProductValidation,
+  postProductController,
+);
+router.get(
+  "/",
+  catalogListRateLimiter,
+  productsSearchValidation,
+  checkOptionalAuthMW,
+  getProductsController,
+);
 router.get("/category-displays", getProductCategoryDisplaysController);
 router.get("/categories/roots", getProductCategoryRootsController);
 router.get("/categories/search", getProductCategorySearchController);
@@ -345,7 +367,12 @@ router.get(
   checkAuthMW,
   getRaffleCreateAdvertisingController,
 );
-router.post("/raffles/unlock-create", checkAuthMW, unlockRaffleCreateController);
+router.post(
+  "/raffles/unlock-create",
+  checkAuthMW,
+  moneyMutationRateLimiter,
+  unlockRaffleCreateController,
+);
 router.post("/raffles/cancel-create", checkAuthMW, cancelRaffleCreateController);
 router.get(
   "/raffles/pending/count",
@@ -454,9 +481,35 @@ router.get(
 router.post(
   "/:productId/promotions/request",
   checkAuthMW,
+  moneyMutationRateLimiter,
   productIdParamValidation,
   requestProductPromotionValidation,
   requestProductPromotionController,
+);
+router.get(
+  "/promo-activations/me",
+  checkAuthMW,
+  listMyAppliedProductPromosController,
+);
+router.get(
+  "/:productId/promo-codes",
+  checkAuthMW,
+  productIdParamValidation,
+  listProductPromoCodesController,
+);
+router.put(
+  "/:productId/promo-codes",
+  checkAuthMW,
+  productIdParamValidation,
+  replaceProductPromoCodesValidation,
+  replaceProductPromoCodesController,
+);
+router.post(
+  "/:productId/promo-codes/activate",
+  checkAuthMW,
+  productIdParamValidation,
+  activateProductPromoCodeValidation,
+  activateProductPromoCodeController,
 );
 router.get(
   "/moderation/pending/count",
@@ -507,6 +560,7 @@ router.put(
 router.post(
   "/:productId/installment-contracts",
   checkAuthMW,
+  installmentActionRateLimiter,
   productIdParamValidation,
   createInstallmentContractValidation,
   createInstallmentContractController,

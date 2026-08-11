@@ -6,6 +6,7 @@ import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 import { buildFeaturedRaffleProgress } from "@/entities/raffle/lib/buildFeaturedRaffleProgressLabel";
 import { useRaffleByIdQuery } from "@/entities/raffle/model/useRaffleByIdQuery";
 import { useRaffleProductsQuery } from "@/entities/raffle/model/useRaffleProductsQuery";
+import { FeaturedRaffleWinnerCard } from "@/entities/raffle/ui/FeaturedRaffleWinnerCard";
 import { RafflePrizeMedia } from "@/entities/raffle/ui/RafflePrizeMedia";
 import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGridRows";
 import { resolveCatalogGridListContentStyle } from "@/features/catalog-grid/lib/catalogGridLayout";
@@ -159,6 +160,10 @@ export const RaffleProductsPage = () => {
                       ]}
                     />
                   </View>
+
+                  {progressUi.isCompleted && raffle?.winner?._id ? (
+                    <FeaturedRaffleWinnerCard winner={raffle.winner} />
+                  ) : null}
 
                   <View style={styles.stats}>
                     <View style={[styles.stat, styles.statAccent]}>

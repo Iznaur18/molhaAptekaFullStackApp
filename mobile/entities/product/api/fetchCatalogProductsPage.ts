@@ -14,6 +14,10 @@ export type FetchCatalogProductsPageOptions = {
   auctionOnly?: boolean;
   installmentOnly?: boolean;
   saleOnly?: boolean;
+  rentalOnly?: boolean;
+  affiliateOnly?: boolean;
+  wholesaleOnly?: boolean;
+  originalOnly?: boolean;
   near?: boolean;
   regionCode?: string;
 };
@@ -30,6 +34,10 @@ export const fetchCatalogProductsPage = async ({
   auctionOnly,
   installmentOnly,
   saleOnly,
+  rentalOnly,
+  affiliateOnly,
+  wholesaleOnly,
+  originalOnly,
   near,
   regionCode,
 }: FetchCatalogProductsPageOptions = {}) => {
@@ -49,6 +57,10 @@ export const fetchCatalogProductsPage = async ({
         ...(auctionOnly ? { auctionOnly: "true" } : {}),
         ...(installmentOnly ? { installmentOnly: "true" } : {}),
         ...(saleOnly ? { saleOnly: "true" } : {}),
+        ...(rentalOnly ? { rentalOnly: "true" } : {}),
+        ...(affiliateOnly ? { affiliateOnly: "true" } : {}),
+        ...(wholesaleOnly ? { wholesaleOnly: "true" } : {}),
+        ...(originalOnly ? { originalOnly: "true" } : {}),
         ...(near ? { near: "true" } : {}),
         ...(regionCode?.trim() ? { regionCode: regionCode.trim() } : {}),
       },

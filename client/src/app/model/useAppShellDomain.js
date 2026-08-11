@@ -84,6 +84,10 @@ export function useAppShellDomain(
     catalogAuctionOnly: catalogLoader.catalogAuctionOnly,
     catalogInstallmentOnly: catalogLoader.catalogInstallmentOnly,
     catalogSaleOnly: catalogLoader.catalogSaleOnly,
+    catalogRentalOnly: catalogLoader.catalogRentalOnly,
+    catalogAffiliateOnly: catalogLoader.catalogAffiliateOnly,
+    catalogWholesaleOnly: catalogLoader.catalogWholesaleOnly,
+    catalogOriginalOnly: catalogLoader.catalogOriginalOnly,
     catalogNear: catalogLoader.catalogNear,
     viewerRegionCode: shell.viewerRegionCode,
   });

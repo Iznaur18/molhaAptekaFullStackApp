@@ -25,9 +25,9 @@ test("loyalty points page mirrors web balance and purchase panel", () => {
   assert.doesNotMatch(page, /accountFeatureStyles/);
 
   assert.match(styles, /purchase:/);
-  assert.match(styles, /#1e40af/);
-  assert.match(styles, /#bfdbfe/);
-  assert.match(styles, /buy:/);
+  assert.match(styles, /theme\.colors\.primary/);
+  assert.match(styles, /theme\.colors\.actionSoft/);
+  assert.match(styles, /buyButton:/);
 });
 
 test("loyalty points ui copy matches web page", () => {

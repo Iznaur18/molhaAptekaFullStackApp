@@ -22,10 +22,10 @@ test("sales shipped status and action copy is Принять", () => {
   const salesToolbar = read("features/my-sales-page/ui/MySalesPageToolbar.tsx");
 
   assert.match(mobileConstants, /SALES_ORDER_STATUS_LABEL_RU/);
-  assert.match(mobileConstants, /\[ORDER_STATUS_SHIPPED\]: "Принять"/);
+  assert.match(mobileConstants, /\[ORDER_STATUS_SHIPPED\]: "Принят"/);
   assert.match(mobileConstants, /\[ORDER_STATUS_SHIPPED\]: "Отправлен"/);
   assert.match(clientConstants, /SALES_ORDER_STATUS_LABEL_RU/);
-  assert.match(clientConstants, /\[ORDER_STATUS_SHIPPED\]: "Принять"/);
+  assert.match(clientConstants, /\[ORDER_STATUS_SHIPPED\]: "Принят"/);
   assert.match(mobileCopy, /ACTION_SHIPPED: "Принять"/);
   assert.match(clientCopy, /ACTION_SHIPPED: "Принять"/);
   assert.doesNotMatch(mobileCopy, /ACTION_SHIPPED: "Отправлен"/);

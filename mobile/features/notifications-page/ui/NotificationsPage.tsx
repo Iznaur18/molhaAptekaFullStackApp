@@ -1,5 +1,6 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
@@ -10,7 +11,6 @@ import {
   type InAppNotification,
 } from "@/entities/notification/model/useInAppNotifications";
 import { useMarkInAppNotificationsReadMutation } from "@/entities/notification/model/useMarkInAppNotificationsReadMutation";
-import { useMarkInAppNotificationsReadOnView } from "@/entities/notification/model/useMarkInAppNotificationsReadOnView";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { API_CLIENT_UI, AUTH_UI, NOTIFICATIONS_PAGE_UI } from "@/shared/config";
@@ -33,11 +33,44 @@ export const NotificationsPage = () => {
   const styles = useNotificationsPageStyles();
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
-  const notifications = useInAppNotifications();
+  const liveNotifications = useInAppNotifications();
   const markReadMutation = useMarkInAppNotificationsReadMutation();
   const [clearError, setClearError] = useState("");
+  const [sessionItems, setSessionItems] = useState<InAppNotification[]>([]);
+  const liveRef = useRef(liveNotifications);
+  const leaveMarkTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  liveRef.current = liveNotifications;
 
-  useMarkInAppNotificationsReadOnView(isAuthorized);
+  useFocusEffect(
+    useCallback(() => {
+      if (leaveMarkTimerRef.current != null) {
+        clearTimeout(leaveMarkTimerRef.current);
+        leaveMarkTimerRef.current = null;
+      }
+
+      const seed = liveRef.current;
+      if (seed.length > 0) {
+        setSessionItems(seed);
+      }
+
+      return () => {
+        leaveMarkTimerRef.current = setTimeout(() => {
+          leaveMarkTimerRef.current = null;
+          const shouldMark = seed.length > 0 || liveRef.current.length > 0;
+          setSessionItems([]);
+          if (!shouldMark) {
+            return;
+          }
+          void markReadMutation.mutateAsync().catch(() => {
+            void sessionQuery.refetch();
+          });
+        }, 400);
+      };
+    }, [markReadMutation, sessionQuery]),
+  );
+
+  const notifications =
+    sessionItems.length > 0 ? sessionItems : liveNotifications;
 
   const handleRefresh = useCallback(async () => {
     await sessionQuery.refetch();
@@ -51,6 +84,7 @@ export const NotificationsPage = () => {
     try {
       setClearError("");
       await markReadMutation.mutateAsync();
+      setSessionItems([]);
     } catch (error) {
       setClearError(
         formatApiErrorMessage(error, API_CLIENT_UI.MARK_NOTIFICATIONS_READ_FALLBACK),

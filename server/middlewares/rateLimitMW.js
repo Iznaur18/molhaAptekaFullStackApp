@@ -10,6 +10,11 @@ import { PRODUCT_QUESTION_RATE_LIMIT_PER_HOUR } from "../constants/productQuesti
 import { PRODUCT_COMPARE_RATE_LIMIT_PER_15_MIN } from "../constants/productCompareConstants.js";
 import {
   ADDRESS_SUGGEST_RATE_LIMIT_PER_HOUR,
+  ADVERTISING_SUBMIT_RATE_LIMIT_PER_HOUR,
+  CATALOG_LIST_RATE_LIMIT_PER_15_MIN,
+  INSTALLMENT_ACTION_RATE_LIMIT_PER_HOUR,
+  MONEY_MUTATION_RATE_LIMIT_PER_HOUR,
+  PRODUCT_CREATE_RATE_LIMIT_PER_HOUR,
   USER_SEARCH_RATE_LIMIT_PER_15_MIN,
 } from "../constants/securityRateLimitConstants.js";
 import {
@@ -32,6 +37,18 @@ const handlers = {};
 /** @param {import('express').Request} req */
 function rateLimitKeyByUserOrIp(req) {
   return String(req.userId ?? req.ip ?? "unknown");
+}
+
+/** @param {import('express').Request} req */
+function rateLimitKeyByAuthIdentityOrIp(req) {
+  const ip = String(req.ip ?? req.socket?.remoteAddress ?? "unknown");
+  const email = String(req.body?.email ?? "")
+    .trim()
+    .toLowerCase();
+  if (email) {
+    return `auth:${ip}:${email}`;
+  }
+  return `auth:${ip}`;
 }
 
 /** @param {import('express').Request} req */
@@ -110,6 +127,8 @@ export function initRateLimitMiddlewares(store) {
         message: "Слишком много попыток входа. Попробуйте через 15 минут",
       },
       skipSuccessfulRequests: true,
+      keyGenerator: rateLimitKeyByAuthIdentityOrIp,
+      validate: { ip: false, trustProxy: false, xForwardedForHeader: false },
     },
     store,
   );
@@ -411,6 +430,82 @@ export function initRateLimitMiddlewares(store) {
     },
     store,
   );
+
+  handlers.advertisingSubmit = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      limiterName: "advertising_submit",
+      windowMs: 60 * 60 * 1000,
+      max: ADVERTISING_SUBMIT_RATE_LIMIT_PER_HOUR,
+      message: {
+        success: false,
+        message: "Слишком много заявок на рекламу. Попробуйте позже",
+      },
+      keyGenerator: rateLimitKeyByUserOrIp,
+    },
+    store,
+  );
+
+  handlers.moneyMutation = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      limiterName: "money_mutation",
+      windowMs: 60 * 60 * 1000,
+      max: MONEY_MUTATION_RATE_LIMIT_PER_HOUR,
+      message: {
+        success: false,
+        message: "Слишком много операций с баллами. Попробуйте позже",
+      },
+      keyGenerator: rateLimitKeyByUserOrIp,
+    },
+    store,
+  );
+
+  handlers.productCreate = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      limiterName: "product_create",
+      windowMs: 60 * 60 * 1000,
+      max: PRODUCT_CREATE_RATE_LIMIT_PER_HOUR,
+      message: {
+        success: false,
+        message: "Слишком много созданий товаров. Попробуйте позже",
+      },
+      keyGenerator: rateLimitKeyByUserOrIp,
+    },
+    store,
+  );
+
+  handlers.installmentAction = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      limiterName: "installment_action",
+      windowMs: 60 * 60 * 1000,
+      max: INSTALLMENT_ACTION_RATE_LIMIT_PER_HOUR,
+      message: {
+        success: false,
+        message: "Слишком много действий по рассрочке. Попробуйте позже",
+      },
+      keyGenerator: rateLimitKeyByUserOrIp,
+    },
+    store,
+  );
+
+  handlers.catalogList = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      limiterName: "catalog_list",
+      windowMs: 15 * 60 * 1000,
+      max: CATALOG_LIST_RATE_LIMIT_PER_15_MIN,
+      message: {
+        success: false,
+        message: "Слишком много запросов каталога. Попробуйте позже",
+      },
+      keyGenerator: generalRateLimitKey,
+      validate: { ip: false, trustProxy: false, xForwardedForHeader: false },
+    },
+    store,
+  );
 }
 
 /** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
@@ -499,5 +594,25 @@ export const userSearchRateLimiter = (req, res, next) =>
 /** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
 export const userPhoneRevealRateLimiter = (req, res, next) =>
   handlers.userPhoneReveal(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const advertisingSubmitRateLimiter = (req, res, next) =>
+  handlers.advertisingSubmit(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const moneyMutationRateLimiter = (req, res, next) =>
+  handlers.moneyMutation(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const productCreateRateLimiter = (req, res, next) =>
+  handlers.productCreate(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const installmentActionRateLimiter = (req, res, next) =>
+  handlers.installmentAction(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const catalogListRateLimiter = (req, res, next) =>
+  handlers.catalogList(req, res, next);
 
 initRateLimitMiddlewares();

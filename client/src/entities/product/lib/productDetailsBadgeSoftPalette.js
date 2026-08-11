@@ -12,5 +12,6 @@ export const PRODUCT_DETAILS_BADGE_SOFT_COLORS = {
   affiliate: { backgroundColor: "#ecfdf5", color: "#047857" },
   wholesale: { backgroundColor: "#e0e7ff", color: "#3730a3" },
   rental: { backgroundColor: "#fef9c3", color: "#854d0e" },
+  promo: { backgroundColor: "#fce7f3", color: "#9d174d" },
   nearDistance: { backgroundColor: "#f1f5f9", color: "#334155" },
 };

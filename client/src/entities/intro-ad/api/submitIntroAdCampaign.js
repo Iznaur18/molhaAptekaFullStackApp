@@ -3,6 +3,7 @@ import {
   submitIntroAdCampaignBodySchema,
   submitIntroAdCampaignDataSchema,
 } from "@molha/api-contract";
+import { formatApiErrorMessage } from "@izibuy/shared-lib";
 
 import { apiClient } from "../../../shared/api/index.js";
 import { parseApiContractData } from "../../../shared/api/parseApiContract.js";
@@ -22,9 +23,7 @@ export async function submitIntroAdCampaign(body) {
       loyaltyPointsBalance: parsed.loyaltyPointsBalance ?? null,
     };
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? INTRO_AD_PAGE_UI.SUBMIT_FALLBACK;
-    throw new Error(message);
+    throw new Error(formatApiErrorMessage(e, INTRO_AD_PAGE_UI.SUBMIT_FALLBACK));
   }
 }
 
@@ -39,9 +38,7 @@ export async function cancelIntroAdCampaign(campaignId) {
       message: parsed.message,
     };
   } catch (e) {
-    const message =
-      e?.response?.data?.message ?? e?.message ?? INTRO_AD_PAGE_UI.CANCEL_FALLBACK;
-    throw new Error(message);
+    throw new Error(formatApiErrorMessage(e, INTRO_AD_PAGE_UI.CANCEL_FALLBACK));
   }
 }
 

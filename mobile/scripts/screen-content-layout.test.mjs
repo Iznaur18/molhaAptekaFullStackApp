@@ -73,10 +73,9 @@ test("mobile bottom nav uses floating liquid-glass pill (web parity)", () => {
   assert.match(tabBar, /resolveMobileBottomNavPaddingBottom/);
   assert.match(tabBar, /MOBILE_BOTTOM_NAV_PADDING_VERTICAL/);
   assert.match(tabBar, /liquidOverlay/);
-  assert.match(tabBar, /liquidSheen/);
   assert.match(tabBar, /resolveContentMaxWidth/);
   assert.match(tabBar, /pointerEvents: "box-none"/);
-  assert.match(tabsLayout, /safeAreaInsets:\s*\{\s*bottom:\s*0\s*\}/);
+  assert.match(tabsLayout, /tabBarStyle:\s*\{[\s\S]*bottom:\s*0/);
   assert.match(tabsLayout, /position:\s*"absolute"/);
   assert.match(tabsLayout, /height:\s*0/);
   assert.match(tabBar, /position:\s*"absolute"/);

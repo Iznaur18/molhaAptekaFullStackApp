@@ -28,6 +28,10 @@ export function useCatalogQuerySync({
   catalogAuctionOnly,
   catalogInstallmentOnly,
   catalogSaleOnly,
+  catalogRentalOnly,
+  catalogAffiliateOnly,
+  catalogWholesaleOnly,
+  catalogOriginalOnly,
   catalogNear,
   catalogQueryFromUrl,
   setCatalogSort,
@@ -39,6 +43,10 @@ export function useCatalogQuerySync({
   setCatalogAuctionOnly,
   setCatalogInstallmentOnly,
   setCatalogSaleOnly,
+  setCatalogRentalOnly,
+  setCatalogAffiliateOnly,
+  setCatalogWholesaleOnly,
+  setCatalogOriginalOnly,
   setCatalogNear,
   categoryRootsRef,
 }) {
@@ -105,6 +113,18 @@ export function useCatalogQuerySync({
       prev === parsed.installmentOnly ? prev : parsed.installmentOnly,
     );
     setCatalogSaleOnly((prev) => (prev === parsed.saleOnly ? prev : parsed.saleOnly));
+    setCatalogRentalOnly((prev) =>
+      prev === parsed.rentalOnly ? prev : parsed.rentalOnly,
+    );
+    setCatalogAffiliateOnly((prev) =>
+      prev === parsed.affiliateOnly ? prev : parsed.affiliateOnly,
+    );
+    setCatalogWholesaleOnly((prev) =>
+      prev === parsed.wholesaleOnly ? prev : parsed.wholesaleOnly,
+    );
+    setCatalogOriginalOnly((prev) =>
+      prev === parsed.originalOnly ? prev : parsed.originalOnly,
+    );
     setCatalogNear((prev) => (prev === parsed.near ? prev : parsed.near));
   }, [
     location.search,
@@ -114,6 +134,10 @@ export function useCatalogQuerySync({
     setCatalogFollowingOnly,
     setCatalogInstallmentOnly,
     setCatalogSaleOnly,
+    setCatalogRentalOnly,
+    setCatalogAffiliateOnly,
+    setCatalogWholesaleOnly,
+    setCatalogOriginalOnly,
     setCatalogNear,
     setCatalogSort,
     setCategoryTreeLabel,
@@ -143,6 +167,10 @@ export function useCatalogQuerySync({
       !catalogAuctionOnly &&
       !catalogInstallmentOnly &&
       !catalogSaleOnly &&
+      !catalogRentalOnly &&
+      !catalogAffiliateOnly &&
+      !catalogWholesaleOnly &&
+      !catalogOriginalOnly &&
       !catalogNear;
     const omitDefaultSort =
       isDefaultNewestFeed && !isExplicitCatalogNewestFeedSearch(location.search);
@@ -155,6 +183,10 @@ export function useCatalogQuerySync({
       auctionOnly: catalogAuctionOnly,
       installmentOnly: catalogInstallmentOnly,
       saleOnly: catalogSaleOnly,
+      rentalOnly: catalogRentalOnly,
+      affiliateOnly: catalogAffiliateOnly,
+      wholesaleOnly: catalogWholesaleOnly,
+      originalOnly: catalogOriginalOnly,
       near: catalogNear,
     };
     const built =
@@ -184,6 +216,10 @@ export function useCatalogQuerySync({
     catalogAuctionOnly,
     catalogInstallmentOnly,
     catalogSaleOnly,
+    catalogRentalOnly,
+    catalogAffiliateOnly,
+    catalogWholesaleOnly,
+    catalogOriginalOnly,
     catalogNear,
     navigate,
   ]);

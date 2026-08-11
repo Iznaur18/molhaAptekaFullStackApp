@@ -34,7 +34,7 @@ test("passport confirmation wizard has 3 steps with per-step validation", () => 
   assert.match(mobileStep, /PASSPORT_FORM_STEP_PASSPORT = 1/);
   assert.match(mobileStep, /PASSPORT_FORM_STEP_SELFIE = 2/);
   assert.match(clientStep, /PASSPORT_FORM_STEP_SELFIE = 2/);
-  assert.match(mobileModal, /KeyboardAvoidingView/);
+  assert.match(mobileModal, /ScrollView/);
   assert.match(mobileModal, /validatePassportFormStep/);
   assert.match(mobileModal, /passportInput/);
   assert.match(mobileModal, /STEP_PASSPORT/);

@@ -186,6 +186,25 @@ test("после заказа по ставке можно снова приня
     $set: { productAuctionEnabled: true },
   });
 
+  const sellerListAfterPaid = await parseSuccessData(
+    await request(`/product/${productId}/price-offers`, {
+      headers: { Cookie: sellerCookie },
+    }),
+  );
+  assert.deepEqual(
+    sellerListAfterPaid.offers,
+    [],
+    "оплаченные ставки не должны висеть в активном списке продавца",
+  );
+
+  const archiveAfterPaid = await parseSuccessData(
+    await request(`/product/${productId}/price-offers/archive`, {
+      headers: { Cookie: sellerCookie },
+    }),
+  );
+  assert.equal(archiveAfterPaid.offers.length, 1);
+  assert.equal(String(archiveAfterPaid.offers[0]._id), firstOfferId);
+
   const { cookie: buyer2Cookie, user: buyer2 } = await registerUserAndGetCookie(
     request,
     "reopen-accept-buyer2",
@@ -195,6 +214,15 @@ test("после заказа по ставке можно снова приня
 
   const secondOfferId = await submitOffer(buyer2Cookie, productId, 800);
   await acceptOffer(sellerCookie, productId, secondOfferId);
+
+  const sellerListAfterAccept = await parseSuccessData(
+    await request(`/product/${productId}/price-offers`, {
+      headers: { Cookie: sellerCookie },
+    }),
+  );
+  assert.equal(sellerListAfterAccept.offers.length, 1);
+  assert.equal(String(sellerListAfterAccept.offers[0]._id), secondOfferId);
+  assert.equal(sellerListAfterAccept.offers[0].status, "accepted");
 
   const bids = await fetchMyBids(buyer2Cookie);
   assert.equal(bids.length, 1);

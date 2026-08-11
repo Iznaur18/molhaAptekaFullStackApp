@@ -15,6 +15,10 @@ import { useHomeCuratedProductListsQuery } from "../../../entities/curated-produ
  *   catalogAuctionOnly: boolean;
  *   catalogInstallmentOnly: boolean;
  *   catalogSaleOnly: boolean;
+ *   catalogRentalOnly?: boolean;
+ *   catalogAffiliateOnly?: boolean;
+ *   catalogWholesaleOnly?: boolean;
+ *   catalogOriginalOnly?: boolean;
  *   catalogNear?: boolean;
  *   viewerRegionCode: string;
  * }} params
@@ -30,6 +34,10 @@ export function useHomeCuratedProductLists({
   catalogAuctionOnly,
   catalogInstallmentOnly,
   catalogSaleOnly,
+  catalogRentalOnly = false,
+  catalogAffiliateOnly = false,
+  catalogWholesaleOnly = false,
+  catalogOriginalOnly = false,
   catalogNear = false,
   viewerRegionCode,
 }) {
@@ -44,6 +52,10 @@ export function useHomeCuratedProductLists({
     catalogAuctionOnly,
     catalogInstallmentOnly,
     catalogSaleOnly,
+    catalogRentalOnly,
+    catalogAffiliateOnly,
+    catalogWholesaleOnly,
+    catalogOriginalOnly,
     catalogNear,
   });
 

@@ -87,6 +87,7 @@ export function ProductEditManageSection({
   onOpenWholesaleSettings,
   onOpenRentalSettings,
   onOpenAffiliateSettings,
+  onOpenPromoCodesSettings,
 }) {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const isListedForOthers = product.productIsAvailable !== false;
@@ -120,6 +121,7 @@ export function ProductEditManageSection({
   const showAffiliate =
     typeof onOpenAffiliateSettings === "function" ||
     typeof onSetAffiliate === "function";
+  const showPromoCodes = typeof onOpenPromoCodesSettings === "function" && canEdit;
   const showDelete = canDelete && typeof onDelete === "function";
   const isRaffleParticipant = isProductRaffleParticipant(product);
   const canOpenInstallment =
@@ -325,6 +327,21 @@ export function ProductEditManageSection({
                 void onSetRental(String(product._id), next);
               }
               return undefined;
+            }}
+          />
+        ) : null}
+        {showPromoCodes ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_MODAL_UI.MANAGE_PROMO_CODES_TITLE}
+            description={CREATE_PRODUCT_MODAL_UI.MANAGE_PROMO_CODES_HINT}
+            checked={product.productHasActivePromoCodes === true}
+            disabled={actionsLocked}
+            pending={false}
+            pendingLabel={CREATE_PRODUCT_MODAL_UI.MANAGE_PROMO_CODES_PENDING}
+            onPress={() => onOpenPromoCodesSettings?.()}
+            onCheckedChange={() => {
+              onOpenPromoCodesSettings?.();
+              return { revert: true };
             }}
           />
         ) : null}

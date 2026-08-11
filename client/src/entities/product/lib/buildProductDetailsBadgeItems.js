@@ -7,6 +7,7 @@ import { isProductRentalConfigured, isProductWholesaleConfigured } from "@izibuy
 import {
   PRODUCT_CARD_UI,
   PRODUCT_DETAILS_MODAL_UI,
+  PRODUCT_PROMO_CODE_UI,
   PRODUCT_RENTAL_UI,
   PRODUCT_WHOLESALE_UI,
 } from "../../../shared/config/appUiCopy.js";
@@ -28,6 +29,7 @@ import { resolveProductAffiliateOffer } from "./resolveProductAffiliateOffer.js"
  *   | { kind: "installment" }
  *   | { kind: "wholesale" }
  *   | { kind: "rental" }
+ *   | { kind: "promo" }
  *   | { kind: "nearDistance" }
  *   | { kind: "listingOrigin"; origin: string | null; Icon: import("react").ComponentType<{ className?: string; size?: number; "aria-hidden"?: boolean }> }
  *   | { kind: "priceMarket"; priceMarketStatus: string; backgroundColor: string; color: string }
@@ -119,6 +121,14 @@ export function buildProductDetailsBadgeItems({ product }) {
       key: "rental",
       kind: "rental",
       label: PRODUCT_RENTAL_UI.DETAILS_BADGE,
+    });
+  }
+
+  if (product.productHasActivePromoCodes === true) {
+    items.push({
+      key: "promo",
+      kind: "promo",
+      label: PRODUCT_PROMO_CODE_UI.DETAILS_BADGE,
     });
   }
 

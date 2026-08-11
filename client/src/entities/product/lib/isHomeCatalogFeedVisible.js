@@ -12,6 +12,10 @@
  *   catalogAuctionOnly?: boolean;
  *   catalogInstallmentOnly?: boolean;
  *   catalogSaleOnly?: boolean;
+ *   catalogRentalOnly?: boolean;
+ *   catalogAffiliateOnly?: boolean;
+ *   catalogWholesaleOnly?: boolean;
+ *   catalogOriginalOnly?: boolean;
  *   catalogNear?: boolean;
  * }} params
  */
@@ -25,6 +29,10 @@ export function isHomeCatalogFeedVisible({
   catalogAuctionOnly = false,
   catalogInstallmentOnly = false,
   catalogSaleOnly = false,
+  catalogRentalOnly = false,
+  catalogAffiliateOnly = false,
+  catalogWholesaleOnly = false,
+  catalogOriginalOnly = false,
   catalogNear = false,
 }) {
   return (
@@ -37,6 +45,10 @@ export function isHomeCatalogFeedVisible({
     !catalogAuctionOnly &&
     !catalogInstallmentOnly &&
     !catalogSaleOnly &&
+    !catalogRentalOnly &&
+    !catalogAffiliateOnly &&
+    !catalogWholesaleOnly &&
+    !catalogOriginalOnly &&
     !catalogNear
   );
 }

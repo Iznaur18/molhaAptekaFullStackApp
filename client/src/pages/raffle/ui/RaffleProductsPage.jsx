@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { buildFeaturedRaffleProgress } from "../../../entities/raffle/lib/buildFeaturedRaffleProgressLabel.js";
 import { useRaffleByIdQuery } from "../../../entities/raffle/model/useRaffleByIdQuery.js";
 import { useRaffleProductsQuery } from "../../../entities/raffle/model/useRaffleProductsQuery.js";
+import { FeaturedRaffleWinnerCard } from "../../../entities/raffle/ui/FeaturedRaffleWinnerCard.jsx";
 import { RafflePrizeMedia } from "../../../entities/raffle/ui/RafflePrizeMedia.jsx";
 import { HomeCatalogGrid } from "../../../widgets/catalog-product-grid/ui/HomeCatalogGrid.jsx";
 import {
@@ -125,6 +126,10 @@ export function RaffleProductsPage({
               style={{ width: `${progressUi.percent}%` }}
             />
           </div>
+
+          {progressUi.isCompleted && raffle?.winner?._id ? (
+            <FeaturedRaffleWinnerCard winner={raffle.winner} />
+          ) : null}
 
           <div className="raffle-products-page__stats">
             <div className="raffle-products-page__stat raffle-products-page__stat_accent">

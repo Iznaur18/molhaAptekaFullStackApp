@@ -2,7 +2,16 @@ import type { CatalogListFilters } from "@/entities/product/model/catalogListFil
 
 export type HomeCatalogFeedFiltersState = Pick<
   CatalogListFilters,
-  "sort" | "followingOnly" | "auctionOnly" | "installmentOnly" | "saleOnly" | "near"
+  | "sort"
+  | "followingOnly"
+  | "auctionOnly"
+  | "installmentOnly"
+  | "saleOnly"
+  | "rentalOnly"
+  | "affiliateOnly"
+  | "wholesaleOnly"
+  | "originalOnly"
+  | "near"
 >;
 
 export const EMPTY_HOME_CATALOG_FEED_FILTERS: HomeCatalogFeedFiltersState = {
@@ -11,5 +20,9 @@ export const EMPTY_HOME_CATALOG_FEED_FILTERS: HomeCatalogFeedFiltersState = {
   auctionOnly: false,
   installmentOnly: false,
   saleOnly: false,
+  rentalOnly: false,
+  affiliateOnly: false,
+  wholesaleOnly: false,
+  originalOnly: false,
   near: false,
 };

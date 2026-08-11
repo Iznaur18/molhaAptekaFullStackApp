@@ -12,6 +12,10 @@ const baseParams = {
   catalogAuctionOnly: false,
   catalogInstallmentOnly: false,
   catalogSaleOnly: false,
+  catalogRentalOnly: false,
+  catalogAffiliateOnly: false,
+  catalogWholesaleOnly: false,
+  catalogOriginalOnly: false,
   catalogNear: false,
 };
 

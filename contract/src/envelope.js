@@ -37,11 +37,11 @@ export function parseApiSuccess(payload, dataSchema) {
  */
 export function formatZodFieldError(error, fallback = "Некорректные данные") {
   const issue = error.issues[0];
-  if (!issue) {
+  if (!issue?.message?.trim()) {
     return fallback;
   }
-  const path = issue.path.length > 0 ? `${String(issue.path[0])}: ` : "";
-  return `${path}${issue.message}`;
+  // Только RU message из схемы — без path вроде `labelRu:` (это не для юзера).
+  return String(issue.message).trim();
 }
 
 /** @param {import('zod').ZodError} error */

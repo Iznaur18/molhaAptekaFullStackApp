@@ -42,6 +42,7 @@ import AffiliateLedgerEntryModel from "./AffiliateLedgerEntryModel.js";
 import { MoneyIdempotencyRecordModel } from "./MoneyIdempotencyRecordModel.js";
 import OneCExchangeLogModel from "./OneCExchangeLogModel.js";
 import OneCOrderPushModel from "./OneCOrderPushModel.js";
+import ProductPromoActivationModel from "./ProductPromoActivationModel.js";
 
 export {
   UserModel,
@@ -88,4 +89,5 @@ export {
   MoneyIdempotencyRecordModel,
   OneCExchangeLogModel,
   OneCOrderPushModel,
+  ProductPromoActivationModel,
 };

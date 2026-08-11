@@ -184,7 +184,7 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
               disabled={isSubmitting}
             />
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Заголовок заглушки</Text>
+              <Text style={styles.fieldLabel}>{INTRO_AD_PAGE_UI.LABEL_FALLBACK_TITLE}</Text>
               <TextInput
                 style={styles.input}
                 value={form.fallbackTitle}
@@ -192,7 +192,7 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
               />
             </View>
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Подсказка заглушки</Text>
+              <Text style={styles.fieldLabel}>{INTRO_AD_PAGE_UI.LABEL_FALLBACK_HINT}</Text>
               <TextInput
                 style={styles.input}
                 value={form.fallbackHint}

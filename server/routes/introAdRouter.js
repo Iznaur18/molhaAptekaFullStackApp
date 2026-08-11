@@ -14,7 +14,7 @@ import {
   getPendingIntroAdCampaignsCountController,
   rejectIntroAdCampaignController,
 } from "../controllers/IntroAd/introAdCampaignStaffControllers.js";
-import { checkAuthMW, checkProductModeratorMW } from "../middlewares/index.js";
+import { checkAuthMW, checkProductModeratorMW, advertisingSubmitRateLimiter } from "../middlewares/index.js";
 import {
   introAdCampaignIdParamValidation,
   rejectIntroAdCampaignValidation,
@@ -28,6 +28,7 @@ router.get("/me", checkAuthMW, getMyIntroAdCampaignController);
 router.post(
   "/",
   checkAuthMW,
+  advertisingSubmitRateLimiter,
   submitIntroAdCampaignValidation,
   submitIntroAdCampaignController,
 );

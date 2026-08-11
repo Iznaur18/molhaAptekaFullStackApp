@@ -1,4 +1,7 @@
-export { formatApiErrorMessage } from "./formatApiErrorMessage.js";
+export {
+  extractZodIssueUserMessage,
+  formatApiErrorMessage,
+} from "./formatApiErrorMessage.js";
 export { formatIsoDateTime } from "./formatIsoDateTime.js";
 export { formatPriceRub } from "./formatPriceRub.js";
 export { normalizeUploadUrlForStorage } from "./normalizeUploadUrlForStorage.js";
@@ -218,6 +221,12 @@ export type {
   ProductWholesaleOffer,
   ResolveProductUnitPriceInput,
 } from "./productWholesale.js";
+export {
+  applyPromoPercentToRetailPrice,
+  resolveProductUnitPriceWithPromo,
+  resolveProductPromoLineSavings,
+} from "./productPromoCode.js";
+export type { ProductPromoLike } from "./productPromoCode.js";
 export {
   PRODUCT_RENTAL_PRICE_UNIT_DAY,
   PRODUCT_RENTAL_PRICE_UNIT_HOUR,

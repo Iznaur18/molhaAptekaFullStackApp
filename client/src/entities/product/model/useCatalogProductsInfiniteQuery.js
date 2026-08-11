@@ -94,6 +94,10 @@ export function useCatalogProductsInfiniteQuery({
         auctionOnly: Boolean(listParams.auctionOnly),
         installmentOnly: Boolean(listParams.installmentOnly),
         saleOnly: Boolean(listParams.saleOnly),
+        rentalOnly: Boolean(listParams.rentalOnly),
+        affiliateOnly: Boolean(listParams.affiliateOnly),
+        wholesaleOnly: Boolean(listParams.wholesaleOnly),
+        originalOnly: Boolean(listParams.originalOnly),
         near: Boolean(listParams.near),
         regionCode: listParams.regionCode || undefined,
       });

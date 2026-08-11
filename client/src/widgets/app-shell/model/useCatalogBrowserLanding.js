@@ -41,6 +41,10 @@ export function useCatalogBrowserLanding({
   catalogAuctionOnly,
   catalogInstallmentOnly,
   catalogSaleOnly,
+  catalogRentalOnly,
+  catalogAffiliateOnly,
+  catalogWholesaleOnly,
+  catalogOriginalOnly,
   authUser = null,
   isAuthorized,
   setIsLoginModalOpen,
@@ -207,6 +211,10 @@ export function useCatalogBrowserLanding({
         auctionOnly: false,
         installmentOnly: false,
         saleOnly: false,
+        rentalOnly: false,
+        affiliateOnly: false,
+        wholesaleOnly: false,
+        originalOnly: false,
         near: false,
       };
       applyCatalogQueryState(nextQuery);

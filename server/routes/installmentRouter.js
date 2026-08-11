@@ -19,7 +19,7 @@ import {
   getPendingInstallmentDisputesCountController,
   resolveInstallmentDisputeController,
 } from "../controllers/index.js";
-import { checkAuthMW, checkProductModeratorMW } from "../middlewares/index.js";
+import { checkAuthMW, checkProductModeratorMW, installmentActionRateLimiter } from "../middlewares/index.js";
 import {
   installmentContractIdParamValidation,
   installmentPaymentIndexParamValidation,
@@ -61,6 +61,7 @@ router.get(
 router.patch(
   "/contracts/:contractId/payments/:paymentIndex/mark-paid",
   checkAuthMW,
+  installmentActionRateLimiter,
   installmentPaymentIndexParamValidation,
   installmentIdempotencyBodyValidation,
   markInstallmentPaymentPaidController,
@@ -68,6 +69,7 @@ router.patch(
 router.patch(
   "/contracts/:contractId/payments/:paymentIndex/confirm",
   checkAuthMW,
+  installmentActionRateLimiter,
   installmentPaymentIndexParamValidation,
   installmentIdempotencyBodyValidation,
   confirmInstallmentPaymentController,
@@ -75,6 +77,7 @@ router.patch(
 router.patch(
   "/contracts/:contractId/payments/:paymentIndex/reject",
   checkAuthMW,
+  installmentActionRateLimiter,
   installmentPaymentIndexParamValidation,
   installmentIdempotencyBodyValidation,
   rejectInstallmentPaymentController,
@@ -82,6 +85,7 @@ router.patch(
 router.patch(
   "/contracts/:contractId/pay-early",
   checkAuthMW,
+  installmentActionRateLimiter,
   installmentContractIdParamValidation,
   installmentIdempotencyBodyValidation,
   markInstallmentEarlyPayoffController,
@@ -89,6 +93,7 @@ router.patch(
 router.patch(
   "/contracts/:contractId/pay-early/cancel",
   checkAuthMW,
+  installmentActionRateLimiter,
   installmentContractIdParamValidation,
   installmentIdempotencyBodyValidation,
   cancelInstallmentEarlyPayoffController,
@@ -96,6 +101,7 @@ router.patch(
 router.patch(
   "/contracts/:contractId/pay-early/reject",
   checkAuthMW,
+  installmentActionRateLimiter,
   installmentContractIdParamValidation,
   installmentIdempotencyBodyValidation,
   rejectInstallmentEarlyPayoffController,
@@ -103,6 +109,7 @@ router.patch(
 router.patch(
   "/contracts/:contractId/pay-early/confirm",
   checkAuthMW,
+  installmentActionRateLimiter,
   installmentContractIdParamValidation,
   installmentIdempotencyBodyValidation,
   confirmInstallmentEarlyPayoffController,
@@ -110,6 +117,7 @@ router.patch(
 router.patch(
   "/contracts/:contractId/cancel",
   checkAuthMW,
+  installmentActionRateLimiter,
   installmentContractIdParamValidation,
   installmentCancelValidation,
   cancelInstallmentContractController,
@@ -117,6 +125,7 @@ router.patch(
 router.post(
   "/contracts/:contractId/message",
   checkAuthMW,
+  installmentActionRateLimiter,
   installmentContractIdParamValidation,
   installmentSellerMessageValidation,
   sendInstallmentSellerMessageController,
@@ -124,6 +133,7 @@ router.post(
 router.post(
   "/contracts/:contractId/dispute",
   checkAuthMW,
+  installmentActionRateLimiter,
   installmentContractIdParamValidation,
   installmentDisputeValidation,
   openInstallmentDisputeController,

@@ -48,6 +48,10 @@ import {
   rejectProductPromotionValidation,
 } from "./product/productPromotionValidation.js";
 import {
+  replaceProductPromoCodesValidation,
+  activateProductPromoCodeValidation,
+} from "./product/productPromoCodeValidation.js";
+import {
   createRaffleValidation,
   patchRaffleValidation,
   raffleIdParamValidation,
@@ -166,6 +170,8 @@ export {
   myProductPromotionsValidation,
   promotionIdParamValidation,
   rejectProductPromotionValidation,
+  replaceProductPromoCodesValidation,
+  activateProductPromoCodeValidation,
   createRaffleValidation,
   patchRaffleValidation,
   raffleIdParamValidation,

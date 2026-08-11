@@ -35,10 +35,10 @@ test("site-header-banner-campaign moderation in intro-ad-moderation", () => {
 
 test("site-header-banner-campaign API routes wired", () => {
   const createApp = readRepoFile("server/createApp.js");
-  const viteConfig = readRepoFile("client/vite.config.js");
+  const proxyPrefixes = readRepoFile("client/src/shared/lib/devApiProxy.js");
 
   assert.match(createApp, /site-header-banner-campaign/);
-  assert.match(viteConfig, /\/site-header-banner-campaign/);
+  assert.match(proxyPrefixes, /\/site-header-banner-campaign/);
 });
 
 test("paid slides merged in public banner API", () => {
@@ -63,19 +63,21 @@ test("site-header-banner-campaign moderation preview", () => {
   assert.match(webSection, /campaignToSiteHeaderBannerPreviewSlides/);
   assert.match(webSection, /SiteHeaderBannerCarousel/);
 });
-test("vite proxy routes site-header-banner-campaign before site-header-banner", () => {
-  const viteConfig = readRepoFile("client/vite.config.js");
 
-  const campaignIndex = viteConfig.indexOf('"/site-header-banner-campaign"');
-  const bannerIndex = viteConfig.indexOf('"/site-header-banner"');
+test("vite proxy routes site-header-banner-campaign before site-header-banner", () => {
+  const proxyPrefixes = readRepoFile("client/src/shared/lib/devApiProxy.js");
+
+  const campaignIndex = proxyPrefixes.indexOf('"/site-header-banner-campaign"');
+  const bannerIndex = proxyPrefixes.indexOf('"/site-header-banner"');
   assert.ok(campaignIndex >= 0 && bannerIndex >= 0);
   assert.ok(
     campaignIndex < bannerIndex,
     "site-header-banner-campaign must be listed before site-header-banner in DEV_API_PROXY_PREFIXES",
   );
-  assert.match(viteConfig, /prefix === "\/site-header-banner"/);
-  assert.match(viteConfig, /site-header-banner\(\?:\\\/\|\$\)/);
+  assert.match(proxyPrefixes, /prefix === "\/site-header-banner"/);
+  assert.match(proxyPrefixes, /site-header-banner\(\?:\\\/\|\$\)/);
 });
+
 test("external banner links supported", () => {
   const webCarousel = readRepoFile("client/src/entities/site-header-banner/ui/SiteHeaderBannerCarousel.jsx");
   const mobileCarousel = readMobileFile("entities/site-header-banner/ui/SiteHeaderBannerCarousel.tsx");

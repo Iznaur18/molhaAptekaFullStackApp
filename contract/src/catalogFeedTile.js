@@ -13,6 +13,10 @@ export const CATALOG_FEED_TILE_KEY_VALUES = [
   "filter:__auction_only__",
   "filter:__installment_only__",
   "filter:__sale_only__",
+  "filter:__rental_only__",
+  "filter:__affiliate_only__",
+  "filter:__wholesale_only__",
+  "filter:__original_only__",
 ];
 
 export const catalogFeedTileKeyParamsSchema = z.object({

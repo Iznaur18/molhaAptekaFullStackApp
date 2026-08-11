@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { formatApiErrorMessage } from "@izibuy/shared-lib";
+import {
+  extractZodIssueUserMessage,
+  formatApiErrorMessage,
+} from "@izibuy/shared-lib";
 
 test("prefers server body message", () => {
   assert.equal(
@@ -10,6 +13,49 @@ test("prefers server body message", () => {
       message: "Request failed with status code 400",
     }),
     "Уже прочитано",
+  );
+});
+
+test("extracts RU message from ZodError issues JSON", () => {
+  const zodMessage = JSON.stringify([
+    {
+      code: "too_small",
+      minimum: 1,
+      type: "string",
+      inclusive: true,
+      exact: false,
+      message: "Укажите название категории",
+      path: ["labelRu"],
+    },
+  ]);
+  assert.equal(extractZodIssueUserMessage(zodMessage), "Укажите название категории");
+  assert.equal(
+    formatApiErrorMessage(new Error(zodMessage), "fallback"),
+    "Укажите название категории",
+  );
+  assert.equal(
+    formatApiErrorMessage(
+      { name: "ZodError", message: zodMessage, issues: JSON.parse(zodMessage) },
+      "fallback",
+    ),
+    "Укажите название категории",
+  );
+});
+
+test("sanitizes zod JSON when it arrives as API body message", () => {
+  const zodMessage = JSON.stringify([
+    {
+      code: "too_small",
+      message: "Укажите название категории",
+      path: ["labelRu"],
+    },
+  ]);
+  assert.equal(
+    formatApiErrorMessage({
+      response: { status: 400, data: { message: zodMessage } },
+      message: "Request failed with status code 400",
+    }),
+    "Укажите название категории",
   );
 });
 
@@ -51,8 +97,18 @@ test("maps common client statuses", () => {
     "Слишком много запросов. Подождите немного",
   );
   assert.equal(
+    formatApiErrorMessage({
+      response: {
+        status: 429,
+        data: { message: "Слишком много заявок на рекламу. Попробуйте позже" },
+      },
+      message: "Request failed with status code 429",
+    }),
+    "Слишком много заявок на рекламу. Попробуйте позже",
+  );
+  assert.equal(
     formatApiErrorMessage({ response: { status: 400 }, message: "Request failed with status code 400" }),
-    "Некорректный запрос",
+    "Проверьте заполненные поля и попробуйте снова",
   );
 });
 

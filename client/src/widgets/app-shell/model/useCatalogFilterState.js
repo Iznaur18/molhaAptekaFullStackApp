@@ -61,6 +61,18 @@ export function useCatalogFilterState({
   const [catalogSaleOnly, setCatalogSaleOnly] = useState(
     () => initialCatalogQuery?.saleOnly ?? false,
   );
+  const [catalogRentalOnly, setCatalogRentalOnly] = useState(
+    () => initialCatalogQuery?.rentalOnly ?? false,
+  );
+  const [catalogAffiliateOnly, setCatalogAffiliateOnly] = useState(
+    () => initialCatalogQuery?.affiliateOnly ?? false,
+  );
+  const [catalogWholesaleOnly, setCatalogWholesaleOnly] = useState(
+    () => initialCatalogQuery?.wholesaleOnly ?? false,
+  );
+  const [catalogOriginalOnly, setCatalogOriginalOnly] = useState(
+    () => initialCatalogQuery?.originalOnly ?? false,
+  );
   const [catalogNear, setCatalogNear] = useState(
     () => initialCatalogQuery?.near ?? false,
   );
@@ -149,6 +161,46 @@ export function useCatalogFilterState({
     });
   }, []);
 
+  const handleCatalogRentalOnlyToggle = useCallback(() => {
+    setCatalogRentalOnly((prev) => {
+      const next = !prev;
+      if (next) {
+        setCatalogNear(false);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleCatalogAffiliateOnlyToggle = useCallback(() => {
+    setCatalogAffiliateOnly((prev) => {
+      const next = !prev;
+      if (next) {
+        setCatalogNear(false);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleCatalogWholesaleOnlyToggle = useCallback(() => {
+    setCatalogWholesaleOnly((prev) => {
+      const next = !prev;
+      if (next) {
+        setCatalogNear(false);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleCatalogOriginalOnlyToggle = useCallback(() => {
+    setCatalogOriginalOnly((prev) => {
+      const next = !prev;
+      if (next) {
+        setCatalogNear(false);
+      }
+      return next;
+    });
+  }, []);
+
   const handleCatalogNearToggle = useCallback(() => {
     if (!isAuthorized) {
       setIsLoginModalOpen(true);
@@ -171,6 +223,10 @@ export function useCatalogFilterState({
     setCatalogAuctionOnly(false);
     setCatalogInstallmentOnly(false);
     setCatalogSaleOnly(false);
+    setCatalogRentalOnly(false);
+    setCatalogAffiliateOnly(false);
+    setCatalogWholesaleOnly(false);
+    setCatalogOriginalOnly(false);
     setCatalogNear(true);
   }, [authUser, catalogNear, isAuthorized, navigate, setIsLoginModalOpen]);
 
@@ -184,6 +240,10 @@ export function useCatalogFilterState({
       auctionOnly,
       installmentOnly,
       saleOnly,
+      rentalOnly = false,
+      affiliateOnly = false,
+      wholesaleOnly = false,
+      originalOnly = false,
       near = false,
     }) => {
       setCatalogSort(sort);
@@ -197,6 +257,10 @@ export function useCatalogFilterState({
       setCatalogAuctionOnly(auctionOnly);
       setCatalogInstallmentOnly(installmentOnly);
       setCatalogSaleOnly(saleOnly);
+      setCatalogRentalOnly(rentalOnly);
+      setCatalogAffiliateOnly(affiliateOnly);
+      setCatalogWholesaleOnly(wholesaleOnly);
+      setCatalogOriginalOnly(originalOnly);
       setCatalogNear(near);
     },
     [],
@@ -250,6 +314,14 @@ export function useCatalogFilterState({
     setCatalogInstallmentOnly,
     catalogSaleOnly,
     setCatalogSaleOnly,
+    catalogRentalOnly,
+    setCatalogRentalOnly,
+    catalogAffiliateOnly,
+    setCatalogAffiliateOnly,
+    catalogWholesaleOnly,
+    setCatalogWholesaleOnly,
+    catalogOriginalOnly,
+    setCatalogOriginalOnly,
     catalogNear,
     setCatalogNear,
     appliedProductSearchTerm,
@@ -266,6 +338,10 @@ export function useCatalogFilterState({
     handleCatalogAuctionOnlyToggle,
     handleCatalogSaleOnlyToggle,
     handleCatalogInstallmentOnlyToggle,
+    handleCatalogRentalOnlyToggle,
+    handleCatalogAffiliateOnlyToggle,
+    handleCatalogWholesaleOnlyToggle,
+    handleCatalogOriginalOnlyToggle,
     handleCatalogNearToggle,
     applyCatalogQueryState,
     resetCatalogFollowingOnLogout,

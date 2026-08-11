@@ -41,6 +41,10 @@ describe("buildCatalogListQueryParams", () => {
       auctionOnly: true,
       installmentOnly: null,
       saleOnly: null,
+      rentalOnly: null,
+      affiliateOnly: null,
+      wholesaleOnly: null,
+      originalOnly: null,
       near: null,
       regionCode: "RU-CE",
     });
@@ -67,6 +71,10 @@ describe("buildCatalogListQueryParams", () => {
       auctionOnly: null,
       installmentOnly: null,
       saleOnly: null,
+      rentalOnly: null,
+      affiliateOnly: null,
+      wholesaleOnly: null,
+      originalOnly: null,
       near: null,
       regionCode: null,
     });

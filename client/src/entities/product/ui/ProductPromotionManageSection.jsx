@@ -64,6 +64,7 @@ export function ProductPromotionManageSection({
   onOpenWholesaleSettings,
   onOpenRentalSettings,
   onOpenAffiliateSettings,
+  onOpenPromoCodesSettings,
   embeddedInTab = false,
 }) {
   const sectionClassName = [
@@ -120,6 +121,7 @@ export function ProductPromotionManageSection({
         onOpenWholesaleSettings={onOpenWholesaleSettings}
         onOpenRentalSettings={onOpenRentalSettings}
         onOpenAffiliateSettings={onOpenAffiliateSettings}
+        onOpenPromoCodesSettings={onOpenPromoCodesSettings}
         canOpenInstallmentProgram={
           (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===
           PRODUCT_MODERATION_APPROVED

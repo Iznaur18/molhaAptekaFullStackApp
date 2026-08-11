@@ -168,6 +168,12 @@ import {
   rejectProductPromotionController,
 } from "./Product/productPromotionControllers.js";
 import {
+  listProductPromoCodesController,
+  replaceProductPromoCodesController,
+  activateProductPromoCodeController,
+  listMyAppliedProductPromosController,
+} from "./Product/productPromoCodeControllers.js";
+import {
   getFeaturedRaffleController,
   getRaffleByIdController,
   getRaffleProductsController,
@@ -379,6 +385,10 @@ export {
   getPendingProductPromotionsCountController,
   approveProductPromotionController,
   rejectProductPromotionController,
+  listProductPromoCodesController,
+  replaceProductPromoCodesController,
+  activateProductPromoCodeController,
+  listMyAppliedProductPromosController,
   getFeaturedRaffleController,
   getRaffleByIdController,
   getRaffleProductsController,

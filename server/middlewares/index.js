@@ -29,6 +29,11 @@ import {
   addressSuggestRateLimiter,
   userSearchRateLimiter,
   userPhoneRevealRateLimiter,
+  advertisingSubmitRateLimiter,
+  moneyMutationRateLimiter,
+  productCreateRateLimiter,
+  installmentActionRateLimiter,
+  catalogListRateLimiter,
 } from "./rateLimitMW.js";
 import { csrfCookieOriginCheckMW } from "./csrfCookieOriginCheckMW.js";
 import {
@@ -77,6 +82,11 @@ export {
   addressSuggestRateLimiter,
   userSearchRateLimiter,
   userPhoneRevealRateLimiter,
+  advertisingSubmitRateLimiter,
+  moneyMutationRateLimiter,
+  productCreateRateLimiter,
+  installmentActionRateLimiter,
+  catalogListRateLimiter,
   errorHandler,
   notFoundHandler,
   asyncHandler,

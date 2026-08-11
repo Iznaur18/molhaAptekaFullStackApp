@@ -12,9 +12,9 @@ const readMobileFile = (relativePath) =>
 test("promotion frame palette mirrors web tier accents", () => {
   const palette = readMobileFile("entities/product/lib/productCardPromotionFramePalette.ts");
 
-  assert.match(palette, /rgba\(217, 119, 6, 0\.68\)/);
-  assert.match(palette, /rgba\(124, 58, 237, 0\.78\)/);
-  assert.match(palette, /rgba\(220, 38, 38, 0\.72\)/);
+  assert.match(palette, /resolveProductCardPromotionCompactFrame/);
+  assert.match(palette, /resolveProductCardPromotionBannerInnerFrame/);
+  assert.match(palette, /PRODUCT_CARD_PROMOTION_TIER\.GOLD/);
   assert.match(palette, /PRODUCT_CARD_PROMOTION_BANNER_INNER_FRAME/);
 });
 
@@ -24,5 +24,5 @@ test("ProductCard applies compact promotion gradient frame", () => {
 
   assert.match(card, /showPromotionChrome/);
   assert.match(card, /variant="compact"/);
-  assert.match(background, /PRODUCT_CARD_PROMOTION_COMPACT_FRAME/);
+  assert.match(background, /resolveProductCardPromotionCompactFrame/);
 });

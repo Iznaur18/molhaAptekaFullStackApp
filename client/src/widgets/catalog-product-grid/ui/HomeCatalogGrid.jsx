@@ -42,6 +42,10 @@ import { CatalogGridProductCard } from "./CatalogGridProductCard.jsx";
  *   catalogAuctionOnly?: boolean;
  *   catalogInstallmentOnly?: boolean;
  *   catalogSaleOnly?: boolean;
+ *   catalogRentalOnly?: boolean;
+ *   catalogAffiliateOnly?: boolean;
+ *   catalogWholesaleOnly?: boolean;
+ *   catalogOriginalOnly?: boolean;
  *   catalogNear?: boolean;
  *   showFullWidthTier3Banners?: boolean;
  *   highlightRaffleProducts?: boolean;
@@ -86,6 +90,10 @@ export function HomeCatalogGrid({
   catalogAuctionOnly = false,
   catalogInstallmentOnly = false,
   catalogSaleOnly = false,
+  catalogRentalOnly = false,
+  catalogAffiliateOnly = false,
+  catalogWholesaleOnly = false,
+  catalogOriginalOnly = false,
   catalogNear = false,
   showFullWidthTier3Banners = false,
   highlightRaffleProducts = false,
@@ -200,6 +208,18 @@ export function HomeCatalogGrid({
     }
     if (!isMineMode && catalogSaleOnly) {
       return HOME_PAGE_UI.EMPTY_SALE_FILTER;
+    }
+    if (!isMineMode && catalogRentalOnly) {
+      return HOME_PAGE_UI.EMPTY_RENTAL_FILTER;
+    }
+    if (!isMineMode && catalogAffiliateOnly) {
+      return HOME_PAGE_UI.EMPTY_AFFILIATE_FILTER;
+    }
+    if (!isMineMode && catalogWholesaleOnly) {
+      return HOME_PAGE_UI.EMPTY_WHOLESALE_FILTER;
+    }
+    if (!isMineMode && catalogOriginalOnly) {
+      return HOME_PAGE_UI.EMPTY_ORIGINAL_FILTER;
     }
     if (!isMineMode && catalogInstallmentOnly) {
       return HOME_PAGE_UI.EMPTY_INSTALLMENT_FILTER;

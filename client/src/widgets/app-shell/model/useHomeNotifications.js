@@ -10,9 +10,12 @@ import {
 } from "../../../entities/user-follow/model/constants.js";
 import { useInAppNotificationsPoll } from "../lib/useInAppNotificationsPoll.js";
 
-/** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
+/** @typedef {import('../../../entities/product-report/model/types.js').UserInAppNotification} UserInAppNotification */
 
 /**
+ * Mark-as-read on leave (not on enter): list stays visible while the page is open.
+ * Enter-mark + cache clear was wiping the UI before/while render.
+ *
  * @param {object} params
  */
 export const useHomeNotifications = ({
@@ -28,7 +31,7 @@ export const useHomeNotifications = ({
   const navigate = useNavigate();
   const { mutate: markNotificationsRead } = useMarkInAppNotificationsReadMutation();
   const isNotificationsView = mainView === "notifications" && isAuthorized;
-  const markedReadRef = useRef(false);
+  const wasNotificationsViewRef = useRef(false);
 
   const refreshInAppNotifications = useCallback(async () => {
     if (!isAuthorized) {
@@ -43,34 +46,25 @@ export const useHomeNotifications = ({
   });
 
   useEffect(() => {
-    markedReadRef.current = false;
-  }, [isNotificationsView]);
-
-  useEffect(() => {
-    if (!isNotificationsView || inAppNotifications.length === 0 || markedReadRef.current) {
+    if (isNotificationsView) {
+      wasNotificationsViewRef.current = true;
       return undefined;
     }
 
-    markedReadRef.current = true;
+    if (!wasNotificationsViewRef.current) {
+      return undefined;
+    }
+    wasNotificationsViewRef.current = false;
 
     markNotificationsRead(undefined, {
-      onSuccess: () => {
-        patchAuthMeNotifications([]);
-        void invalidateAuthMe();
-      },
       onError: () => {
-        markedReadRef.current = false;
+        // Keep unread in cache; poll / next authMe will refresh badge.
+        void invalidateAuthMe();
       },
     });
 
     return undefined;
-  }, [
-    inAppNotifications.length,
-    invalidateAuthMe,
-    isNotificationsView,
-    markNotificationsRead,
-    patchAuthMeNotifications,
-  ]);
+  }, [invalidateAuthMe, isNotificationsView, markNotificationsRead]);
 
   const handleNotificationsClick = useCallback(() => {
     if (!isAuthorized) {
@@ -89,7 +83,7 @@ export const useHomeNotifications = ({
   }, [patchAuthMeNotifications]);
 
   /**
-   * @param {import('../../../entities/product-report/model/types.js').UserInAppNotification} item
+   * @param {UserInAppNotification} item
    */
   const handleInAppNotificationClick = useCallback(
     (item) => {
@@ -102,6 +96,10 @@ export const useHomeNotifications = ({
           item.kind === IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_PRODUCT_DISCOUNT) &&
         item.productId
       ) {
+        navigateToProductDetails(navigate, item.productId);
+        return;
+      }
+      if (item.productId) {
         navigateToProductDetails(navigate, item.productId);
       }
     },

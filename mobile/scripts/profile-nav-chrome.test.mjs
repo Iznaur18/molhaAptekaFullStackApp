@@ -28,11 +28,11 @@ const buildProfileNavItemPresentation = (tone, { isActive, isCta }) => {
   };
 };
 
-test("profile nav tones: overview is indigo", () => {
-  assert.equal(resolveProfileNavSectionTone(PROFILE_SECTION_OVERVIEW), "indigo");
+test("profile nav tones: overview is blue", () => {
+  assert.equal(resolveProfileNavSectionTone(PROFILE_SECTION_OVERVIEW), "blue");
 });
 
-test("profile nav presentation: active overview uses indigo accent", () => {
+test("profile nav presentation: active overview uses blue accent", () => {
   const tone = resolveProfileNavSectionTone(PROFILE_SECTION_OVERVIEW);
   const palette = resolveProfileNavTonePalette(tone);
   const presentation = buildProfileNavItemPresentation(tone, {

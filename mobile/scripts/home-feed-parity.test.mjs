@@ -15,8 +15,11 @@ test("curated lists visibility mirrors web gate", () => {
   );
 
   assert.match(source, /isHomeCatalogMainView/);
-  assert.match(source, /showHiddenCatalogProducts/);
   assert.match(source, /catalogSaleOnly/);
+  assert.match(source, /catalogRentalOnly/);
+  assert.match(source, /catalogAffiliateOnly/);
+  assert.match(source, /catalogWholesaleOnly/);
+  assert.match(source, /catalogOriginalOnly/);
 });
 
 test("curated home layout uses web card gap", () => {

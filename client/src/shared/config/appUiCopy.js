@@ -502,6 +502,10 @@ export const HOME_PAGE_UI = {
   CATALOG_FILTERS_SECTION_LABEL: "Фильтры",
   EMPTY_FOLLOWING_FILTER: "Нет товаров от ваших подписок с текущими фильтрами.",
   EMPTY_SALE_FILTER: "Нет товаров в распродаже от 35%.",
+  EMPTY_RENTAL_FILTER: "Нет товаров в прокате и аренде.",
+  EMPTY_AFFILIATE_FILTER: "Нет товаров с партнёрской программой.",
+  EMPTY_WHOLESALE_FILTER: "Нет товаров с оптовой ценой.",
+  EMPTY_ORIGINAL_FILTER: "Нет оригинальных товаров.",
   EMPTY_INSTALLMENT_FILTER: "Нет товаров с рассрочкой с текущими фильтрами.",
   EMPTY_NEAR_FILTER: "Нет товаров рядом с вашим адресом.",
   LOGIN_FOR_FOLLOWING_FILTER: "Войдите, чтобы включить фильтр «только от подписок».",
@@ -636,6 +640,14 @@ export const LEGAL_UI = {
   OFFER_TAB: "Оферта",
   UPDATED_PREFIX: "Обновлено:",
   CONTACT_PREFIX: "Контакты:",
+};
+
+/** Уведомление о cookie (web, первый визит) */
+export const COOKIE_NOTICE_UI = {
+  TITLE: "Файлы cookie",
+  ACCEPT: "Понятно",
+  PRIVACY_LINK: "Политика конфиденциальности",
+  ARIA_DIALOG: "Уведомление о файлах cookie",
 };
 
 /** Страница «Корзина» */
@@ -957,10 +969,21 @@ export const INTRO_AD_PAGE_UI = {
   PREVIEW: "Предпросмотр",
   OPEN_FORM: "Оформить рекламу",
   SECTION_TIMING: "Тайминги показа",
+  LABEL_FALLBACK_TITLE: "Заголовок на экране",
+  LABEL_FALLBACK_HINT: "Подзаголовок на экране",
   LABEL_MIN_MS: "Минимум показа, мс",
   LABEL_MAX_MS: "Максимум показа, мс",
   LABEL_FADE_MS: "Fade-out, мс",
   TIMING_HINT: "Необязательно — по умолчанию как у платформенного intro.",
+  ERROR_FALLBACK_TITLE_REQUIRED: "Укажите заголовок на экране",
+  ERROR_FALLBACK_TITLE_TOO_LONG: "Заголовок слишком длинный",
+  ERROR_FALLBACK_HINT_REQUIRED: "Укажите подзаголовок на экране",
+  ERROR_FALLBACK_HINT_TOO_LONG: "Подзаголовок слишком длинный",
+  ERROR_VIDEO_REQUIRED: "Загрузите MP4-ролик",
+  ERROR_MIN_MS: "Минимальное время показа вне допустимого диапазона",
+  ERROR_MAX_MS: "Максимальное время показа вне допустимого диапазона",
+  ERROR_MAX_LT_MIN: "Максимум показа не может быть меньше минимума",
+  ERROR_FADE_MS: "Время исчезновения вне допустимого диапазона",
 };
 
 /** Покупка баннера в шапке (вкладка «Реклама») */
@@ -1056,6 +1079,7 @@ export const SELLER_PERSONAL_CATEGORY_PAGE_UI = {
   LABEL_IMAGE: "Картинка плитки",
   LABEL_REGION: "Регион показа",
   HINT_REGION: "Плитка появится в каталоге только у покупателей этого региона.",
+  ERROR_NAME_REQUIRED: "Укажите название категории",
   ERROR_REGION_REQUIRED: "Выберите регион показа",
   LABEL_DURATION: "Срок",
   /** @param {number} balance */
@@ -1667,6 +1691,9 @@ export const CREATE_PRODUCT_MODAL_UI = {
   MANAGE_RENTAL_TITLE: "Аренда / Прокат",
   MANAGE_RENTAL_HINT: "Покупатели увидят, что товар можно взять в аренду",
   MANAGE_RENTAL_PENDING: "Сохраняем аренду…",
+  MANAGE_PROMO_CODES_TITLE: "Промокоды",
+  MANAGE_PROMO_CODES_HINT: "До 10 активных кодов со скидкой в процентах",
+  MANAGE_PROMO_CODES_PENDING: "Сохраняем промокоды…",
   RENTAL_TOGGLE_PENDING: "Обновляем аренду…",
   RENTAL_MODAL_TITLE: "Аренда / Прокат",
   RENTAL_MODAL_HINT: "Укажите цену аренды и единицу. Дальше настройки добавим отдельно.",
@@ -2022,6 +2049,46 @@ export const PRODUCT_RENTAL_UI = {
   /** @param {string} priceLabel */
   DETAILS_TEASER_PRICE_HOUR: (priceLabel) => `${priceLabel} / час`,
   DETAILS_TEASER_ARIA: "Подробнее об аренде",
+};
+
+/** Промокоды продавца на товар */
+export const PRODUCT_PROMO_CODE_UI = {
+  DETAILS_BADGE: "Промокод",
+  DETAILS_TEASER_TITLE: "Промокод",
+  DETAILS_TEASER_SUBTITLE: "Введите код и получите скидку",
+  DETAILS_TEASER_ARIA: "Открыть ввод промокода",
+  SHEET_TITLE: "Промокод",
+  SHEET_LEAD: "Введите код продавца. Скидка применится к этому товару.",
+  CODE_LABEL: "Промокод",
+  CODE_PLACEHOLDER: "например SUMMER20",
+  ACTIVATE: "Активировать",
+  ACTIVATE_PENDING: "Проверяем…",
+  LOGIN_REQUIRED: "Войдите, чтобы активировать промокод",
+  ALREADY_APPLIED: "На этот товар уже применён промокод",
+  /** @param {number} percent */
+  APPLIED: (percent) => `Промокод активен: −${percent}%`,
+  MODAL_TITLE: "Промокоды товара",
+  MODAL_LEAD: "До 10 активных кодов. Скидка только в процентах. Лимит активаций — от 1 до 1000.",
+  /** @param {number} n */
+  CARD_TITLE: (n) => `Промокод ${n}`,
+  ADD: "Добавить промокод",
+  SAVE: "Сохранить",
+  SAVE_PENDING: "Сохранение…",
+  CLOSE: "Закрыть",
+  FIELD_CODE: "Код",
+  FIELD_PERCENT: "Скидка, %",
+  FIELD_MAX: "Макс. активаций",
+  FIELD_USED: "Использовано",
+  FIELD_ENABLED: "Активен",
+  REMOVE: "Удалить",
+  EMPTY: "Пока нет промокодов",
+  MAX_ACTIVE: "Уже 10 активных промокодов",
+  CART_PROMO_LABEL: "Промокод",
+  /** @param {number} percent */
+  CART_PROMO_PERCENT: (percent) => `−${percent}%`,
+  FETCH_FALLBACK: "Не удалось загрузить промокоды",
+  SAVE_FALLBACK: "Не удалось сохранить промокоды",
+  ACTIVATE_FALLBACK: "Не удалось активировать промокод",
 };
 
 /** Оптовая цена (карточка / детали) */
@@ -3299,6 +3366,8 @@ export const PRODUCT_BADGE_EXPLAIN_UI = {
       "При покупке от указанного количества действует оптовая цена за единицу. Подробности — в блоке оптовой цены на этой странице.",
     rental:
       "Товар можно взять в аренду у продавца. Цена и единица (сутки или час) задаются продавцом. Условия выдачи и возврата уточняйте у продавца.",
+    promo:
+      "Продавец задал промокоды на этот товар. Введите код в блоке «Промокод», чтобы получить скидку в процентах.",
     near_distance:
       "Примерное расстояние до пункта самовывоза продавца относительно вашего местоположения. Точность зависит от геолокации.",
   },
@@ -3335,11 +3404,13 @@ export const PRODUCT_BADGE_EXPLAIN_ADMIN_UI = {
   HINT_INSTALLMENT: "Бейдж «Рассрочка» в деталях товара.",
   HINT_WHOLESALE: "Бейдж «Оптовая цена» в деталях товара.",
   HINT_RENTAL: "Бейдж «Аренда» в деталях товара.",
+  HINT_PROMO: "Бейдж «Промокод» в деталях товара.",
   HINT_NEAR_DISTANCE: "Бейдж расстояния «~км» в деталях товара.",
   TITLE_AUCTION: "Аукцион",
   TITLE_INSTALLMENT: "Рассрочка",
   TITLE_WHOLESALE: "Оптовая цена",
   TITLE_RENTAL: "Аренда",
+  TITLE_PROMO: "Промокод",
   TITLE_NEAR_DISTANCE: "Расстояние",
 };
 

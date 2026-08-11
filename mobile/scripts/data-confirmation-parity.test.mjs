@@ -23,11 +23,11 @@ test("data confirmation page mirrors web plan panel and status blocks", () => {
   assert.match(page, /data-confirmation/);
   assert.doesNotMatch(page, /formChromeStyles/);
 
-  assert.match(styles, /planTitle/);
+  assert.match(styles, /heroTitle/);
   assert.match(styles, /statusOk/);
   assert.match(styles, /statusPending/);
   assert.match(styles, /statusRejected/);
-  assert.match(styles, /submitText/);
+  assert.match(styles, /submitButton/);
 });
 
 test("data confirmation ui copy matches web profile page", () => {

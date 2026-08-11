@@ -94,6 +94,10 @@ export function useCatalogSubcategoryPicker({
         auctionOnly: false,
         installmentOnly: false,
         saleOnly: false,
+        rentalOnly: false,
+        affiliateOnly: false,
+        wholesaleOnly: false,
+        originalOnly: false,
         near: false,
       };
       applyCatalogQueryState(nextQuery);
@@ -121,6 +125,10 @@ export function useCatalogSubcategoryPicker({
         auctionOnly: false,
         installmentOnly: false,
         saleOnly: false,
+        rentalOnly: false,
+        affiliateOnly: false,
+        wholesaleOnly: false,
+        originalOnly: false,
         near: false,
       };
       applyCatalogQueryState(nextQuery);

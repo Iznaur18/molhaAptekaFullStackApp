@@ -1,9 +1,13 @@
 import {
+  CATALOG_FILTER_AFFILIATE_ONLY,
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
   CATALOG_FILTER_NEAR,
+  CATALOG_FILTER_ORIGINAL_ONLY,
+  CATALOG_FILTER_RENTAL_ONLY,
   CATALOG_FILTER_SALE_ONLY,
+  CATALOG_FILTER_WHOLESALE_ONLY,
   CATALOG_SORT_NEWEST,
 } from "../../product/model/productConstants.js";
 
@@ -17,6 +21,10 @@ import {
  *   auctionOnly: boolean;
  *   installmentOnly: boolean;
  *   saleOnly: boolean;
+ *   rentalOnly: boolean;
+ *   affiliateOnly: boolean;
+ *   wholesaleOnly: boolean;
+ *   originalOnly: boolean;
  *   near: boolean;
  * }}
  */
@@ -29,6 +37,10 @@ const baseFeedQuery = () => ({
   auctionOnly: false,
   installmentOnly: false,
   saleOnly: false,
+  rentalOnly: false,
+  affiliateOnly: false,
+  wholesaleOnly: false,
+  originalOnly: false,
   near: false,
 });
 
@@ -63,6 +75,22 @@ export function buildQueryForCatalogFeedTile(tile) {
     return { ...baseFeedQuery(), saleOnly: true };
   }
 
+  if (tile.value === CATALOG_FILTER_RENTAL_ONLY) {
+    return { ...baseFeedQuery(), rentalOnly: true };
+  }
+
+  if (tile.value === CATALOG_FILTER_AFFILIATE_ONLY) {
+    return { ...baseFeedQuery(), affiliateOnly: true };
+  }
+
+  if (tile.value === CATALOG_FILTER_WHOLESALE_ONLY) {
+    return { ...baseFeedQuery(), wholesaleOnly: true };
+  }
+
+  if (tile.value === CATALOG_FILTER_ORIGINAL_ONLY) {
+    return { ...baseFeedQuery(), originalOnly: true };
+  }
+
   return baseFeedQuery();
 }
 
@@ -74,6 +102,10 @@ export function buildQueryForCatalogFeedTile(tile) {
  * @param {boolean} installmentOnly
  * @param {boolean} saleOnly
  * @param {boolean} [near]
+ * @param {boolean} [rentalOnly]
+ * @param {boolean} [affiliateOnly]
+ * @param {boolean} [wholesaleOnly]
+ * @param {boolean} [originalOnly]
  */
 export function isCatalogFeedTileActive(
   tile,
@@ -83,6 +115,10 @@ export function isCatalogFeedTileActive(
   installmentOnly,
   saleOnly,
   near = false,
+  rentalOnly = false,
+  affiliateOnly = false,
+  wholesaleOnly = false,
+  originalOnly = false,
 ) {
   if (tile.kind === "sort") {
     return (
@@ -91,6 +127,10 @@ export function isCatalogFeedTileActive(
       !auctionOnly &&
       !installmentOnly &&
       !saleOnly &&
+      !rentalOnly &&
+      !affiliateOnly &&
+      !wholesaleOnly &&
+      !originalOnly &&
       !near
     );
   }
@@ -113,6 +153,22 @@ export function isCatalogFeedTileActive(
 
   if (tile.value === CATALOG_FILTER_SALE_ONLY) {
     return saleOnly;
+  }
+
+  if (tile.value === CATALOG_FILTER_RENTAL_ONLY) {
+    return rentalOnly;
+  }
+
+  if (tile.value === CATALOG_FILTER_AFFILIATE_ONLY) {
+    return affiliateOnly;
+  }
+
+  if (tile.value === CATALOG_FILTER_WHOLESALE_ONLY) {
+    return wholesaleOnly;
+  }
+
+  if (tile.value === CATALOG_FILTER_ORIGINAL_ONLY) {
+    return originalOnly;
   }
 
   return false;
