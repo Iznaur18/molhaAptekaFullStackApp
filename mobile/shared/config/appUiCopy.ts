@@ -303,6 +303,7 @@ export const CART_PAGE_UI = {
   PAYABLE_LABEL: "К оплате",
   PRICE_LABEL: "Цена",
   DISCOUNT_LABEL: "Скидка",
+  PROMO_DISCOUNT_LABEL: "Промокод",
   WHOLESALE_DISCOUNT_LABEL: "Оптовая скидка",
   DELIVERY_FEE_LABEL: "Доставка",
   DELIVERY_FEE_VALUE: "Индивидуальная плата при получении",
@@ -570,6 +571,8 @@ export const PRODUCT_PROMOTION_UI = {
   BALANCE_POINTS: (balance: number) => `${balance} баллов`,
   PAYMENT_HINT_POINTS:
     "Оплата только баллами. Списание сразу, продвижение включается автоматически.",
+  REGION_BOOST_HINT:
+    "Буст и Баннер поднимают карточку в регионе продажи. ТОП — абсолютный верх выдачи во всех регионах. Оформление карточки видно везде.",
   TIER_LABEL: "Уровень продвижения",
   TIER_RATE_HINT: (percent: string) => `${percent}% от цены товара`,
   DURATION_LABEL: "Срок",

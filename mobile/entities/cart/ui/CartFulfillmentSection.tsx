@@ -13,6 +13,7 @@ type CartCheckoutSummary = {
   selectedTotal: number;
   selectedListTotal: number;
   selectedDiscount: number;
+  selectedPromoDiscount: number;
   selectedWholesaleDiscount: number;
   fullTotal: number;
   hasPartialSelection: boolean;
@@ -93,7 +94,7 @@ export const CartFulfillmentSection = ({
                 {CART_PAGE_UI.ITEMS_COUNT(selectedItemsCount)}
               </Text>
             </View>
-            {summary.selectedDiscount > 0 ? (
+            {summary.selectedDiscount > 0 || summary.selectedPromoDiscount > 0 ? (
               <View style={styles.totalRow}>
                 <Text style={styles.totalLabel}>{CART_PAGE_UI.PRICE_LABEL}</Text>
                 <Text style={styles.listPrice} numberOfLines={1}>
@@ -107,6 +108,18 @@ export const CartFulfillmentSection = ({
                 <Text style={styles.discountValue} numberOfLines={1}>
                   {CART_PAGE_UI.DISCOUNT_AMOUNT(
                     formatPriceRub(summary.selectedDiscount),
+                  )}
+                </Text>
+              </View>
+            ) : null}
+            {summary.selectedPromoDiscount > 0 ? (
+              <View style={styles.totalRow}>
+                <Text style={styles.discountLabel}>
+                  {CART_PAGE_UI.PROMO_DISCOUNT_LABEL}
+                </Text>
+                <Text style={styles.discountValue} numberOfLines={1}>
+                  {CART_PAGE_UI.DISCOUNT_AMOUNT(
+                    formatPriceRub(summary.selectedPromoDiscount),
                   )}
                 </Text>
               </View>

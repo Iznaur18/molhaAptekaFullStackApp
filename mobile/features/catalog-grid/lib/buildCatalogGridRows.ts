@@ -20,12 +20,16 @@ type BuildCatalogGridRowsOptions = {
   isMineMode?: boolean;
   catalogNear?: boolean;
   nearRegionSectionTitle?: string;
+  viewerRegionCode?: string | null;
 };
 
 const buildCatalogGridRowsInternal = (
   products: CatalogGridProduct[],
   columnCount: number,
-  { showFullWidthTier3Banners = false, isMineMode = false }: BuildCatalogGridRowsOptions = {},
+  {
+    showFullWidthTier3Banners = false,
+    isMineMode = false,
+  }: BuildCatalogGridRowsOptions = {},
 ): CatalogGridRow[] => {
   const shouldInterleave = showFullWidthTier3Banners && !isMineMode;
   const displayProducts = interleaveCatalogTier3Banners(products, columnCount, {

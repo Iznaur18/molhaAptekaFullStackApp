@@ -157,6 +157,8 @@ export const findProductsPageNear = async ({
       $project: {
         productSellerArr: 0,
         _searchRank: 0,
+        _promotionGlobalTop: 0,
+        _promotionGlobalTopActivatedAt: 0,
         _promotionSortTier: 0,
         _promotionSortActivatedAt: 0,
         _citySortPriority: 0,

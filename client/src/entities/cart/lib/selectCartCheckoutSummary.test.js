@@ -210,4 +210,32 @@ describe("selectCartCheckoutSummary", () => {
     expect(summary.selectedWholesaleDiscount).toBe(1000);
     expect(summary.selectedTotal).toBe(4000);
   });
+
+  it("sums promo discount for selected lines", () => {
+    const lines = [
+      {
+        productId: "a",
+        quantity: 2,
+        unitPrice: 800,
+        lineTotal: 1600,
+        isMissing: false,
+        isWholesaleApplied: false,
+        wholesaleSavings: 0,
+        isPromoApplied: true,
+        promoDiscountPercent: 20,
+        promoCode: "SALE20",
+        product: {
+          productIsAvailable: true,
+          productSellerId: "s1",
+          productPickupAddress: "Москва, Тверская 1",
+          productPrice: 1000,
+        },
+      },
+    ];
+
+    const summary = selectCartCheckoutSummary(lines, "buyer");
+    expect(summary.selectedPromoDiscount).toBe(400);
+    expect(summary.selectedDiscount).toBe(0);
+    expect(summary.selectedTotal).toBe(1600);
+  });
 });

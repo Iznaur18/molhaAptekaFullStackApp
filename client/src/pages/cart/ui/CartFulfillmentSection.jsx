@@ -22,6 +22,7 @@ import "./CartFulfillmentSection.css";
  *     selectedTotal: number;
  *     selectedListTotal: number;
  *     selectedDiscount: number;
+ *     selectedPromoDiscount: number;
  *     selectedWholesaleDiscount: number;
  *     fullTotal: number;
  *     hasPartialSelection: boolean;
@@ -96,7 +97,7 @@ export function CartFulfillmentSection({
                 {CART_PAGE_UI.ITEMS_COUNT(selectedItemsCount)}
               </span>
             </div>
-            {summary.selectedDiscount > 0 ? (
+            {summary.selectedDiscount > 0 || summary.selectedPromoDiscount > 0 ? (
               <div className="cart-page__dock-total-row cart-page__dock-total-row--meta">
                 <span className="cart-page__total-label">
                   {CART_PAGE_UI.PRICE_LABEL}
@@ -114,6 +115,18 @@ export function CartFulfillmentSection({
                 <span className="cart-page__discount-value">
                   {CART_PAGE_UI.DISCOUNT_AMOUNT(
                     formatPriceRub(summary.selectedDiscount),
+                  )}
+                </span>
+              </div>
+            ) : null}
+            {summary.selectedPromoDiscount > 0 ? (
+              <div className="cart-page__dock-total-row cart-page__dock-total-row--discount">
+                <span className="cart-page__discount-label">
+                  {CART_PAGE_UI.PROMO_DISCOUNT_LABEL}
+                </span>
+                <span className="cart-page__discount-value">
+                  {CART_PAGE_UI.DISCOUNT_AMOUNT(
+                    formatPriceRub(summary.selectedPromoDiscount),
                   )}
                 </span>
               </div>

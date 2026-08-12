@@ -25,9 +25,14 @@ export function ChangePasswordControls({ disabled = false }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    event.stopPropagation();
     setLocalError("");
     setSuccess("");
 
+    if (!currentPassword.trim()) {
+      setLocalError(EDIT_PROFILE_MODAL_UI.PASSWORD_CURRENT_REQUIRED);
+      return;
+    }
     if (newPassword.length < EDIT_PROFILE_MODAL_UI.PASSWORD_MIN_LENGTH) {
       setLocalError(EDIT_PROFILE_MODAL_UI.PASSWORD_TOO_SHORT);
       return;
@@ -56,8 +61,22 @@ export function ChangePasswordControls({ disabled = false }) {
     }
   };
 
+  const handleFieldsKeyDown = (event) => {
+    if (event.key !== "Enter") {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    if (!isBusy) {
+      void handleSubmit(event);
+    }
+  };
+
   return (
-    <form className="edit-profile-modal__password-change" onSubmit={handleSubmit}>
+    <div
+      className="edit-profile-modal__password-change"
+      onKeyDown={handleFieldsKeyDown}
+    >
       <p className="edit-profile-modal__hint">
         {EDIT_PROFILE_MODAL_UI.SECTION_PASSWORD}
       </p>
@@ -68,7 +87,6 @@ export function ChangePasswordControls({ disabled = false }) {
           name="currentPassword"
           value={currentPassword}
           onChange={(e) => setCurrentPassword(e.target.value)}
-          required
           minLength={EDIT_PROFILE_MODAL_UI.PASSWORD_MIN_LENGTH}
           autoComplete="current-password"
           disabled={isBusy}
@@ -83,7 +101,6 @@ export function ChangePasswordControls({ disabled = false }) {
           name="newPassword"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
-          required
           minLength={EDIT_PROFILE_MODAL_UI.PASSWORD_MIN_LENGTH}
           autoComplete="new-password"
           disabled={isBusy}
@@ -98,7 +115,6 @@ export function ChangePasswordControls({ disabled = false }) {
           name="newPasswordConfirm"
           value={newPasswordConfirm}
           onChange={(e) => setNewPasswordConfirm(e.target.value)}
-          required
           minLength={EDIT_PROFILE_MODAL_UI.PASSWORD_MIN_LENGTH}
           autoComplete="new-password"
           disabled={isBusy}
@@ -117,14 +133,15 @@ export function ChangePasswordControls({ disabled = false }) {
         </p>
       ) : null}
       <button
-        type="submit"
+        type="button"
         className="app-btn app-btn--secondary"
         disabled={isBusy}
+        onClick={handleSubmit}
       >
         {mutation.isPending
           ? EDIT_PROFILE_MODAL_UI.PASSWORD_CHANGE_LOADING
           : EDIT_PROFILE_MODAL_UI.PASSWORD_CHANGE_SUBMIT}
       </button>
-    </form>
+    </div>
   );
 }

@@ -42,6 +42,8 @@ export function useProductCardChromeFlags(props, currentUserId) {
     isMineMode,
     isModerationQueue,
   });
+  // Бейдж/рамка — везде при активном промо. Поднятие в sort и full-width L3 —
+  // только в регионе продажи (viewerRegionCode на сетке/сервере).
   const showPromotionChrome =
     highlightCatalogPromotion &&
     !isMineMode &&
@@ -153,4 +155,4 @@ export function useProductCardChromeFlags(props, currentUserId) {
     cardClassName,
     frameClassName,
   };
-}
+};

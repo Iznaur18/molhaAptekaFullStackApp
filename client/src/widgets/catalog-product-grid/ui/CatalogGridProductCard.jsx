@@ -21,6 +21,7 @@ import { ProductCard } from "../../../entities/product/ui/ProductCard.jsx";
  *   currentUserId: string | null;
  *   onRequestLoginAddToCart: () => void;
  *   promotionFullWidth?: boolean;
+ *   viewerRegionCode?: string | null;
  *   highlightRaffleProducts: boolean;
  *   sellerRaffleActive: boolean;
  *   onToggleRaffleParticipation?: (
@@ -51,6 +52,7 @@ export function CatalogGridProductCard({
   currentUserId,
   onRequestLoginAddToCart,
   promotionFullWidth = false,
+  viewerRegionCode = null,
   highlightRaffleProducts,
   sellerRaffleActive,
   onToggleRaffleParticipation,
@@ -86,6 +88,7 @@ export function CatalogGridProductCard({
         isMineMode={isMineMode}
         highlightCatalogPromotion={!isMineMode}
         promotionFullWidth={promotionFullWidth}
+        viewerRegionCode={viewerRegionCode}
         highlightRaffleProduct={highlightRaffleProducts}
         sellerRaffleActive={isMineMode ? sellerRaffleActive : false}
         onToggleRaffleParticipation={isMineMode ? onToggleRaffleParticipation : undefined}

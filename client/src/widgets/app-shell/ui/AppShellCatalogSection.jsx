@@ -64,6 +64,7 @@ import { MyProductsCatalogSection } from "../../my-products-page/ui/MyProductsCa
  *   catalogOriginalOnly?: boolean;
  *   catalogNear?: boolean;
  *   showFullWidthTier3Banners?: boolean;
+ *   viewerRegionCode?: string | null;
  *   sellerRaffleActive: boolean;
  *   onToggleRaffleParticipation: (productId: string, participate: boolean) => void;
  *   raffleParticipationPendingProductId: string | null;
@@ -121,6 +122,7 @@ export function AppShellCatalogGridSection({
   catalogOriginalOnly = false,
   catalogNear = false,
   showFullWidthTier3Banners = false,
+  viewerRegionCode = null,
   sellerRaffleActive,
   onToggleRaffleParticipation,
   raffleParticipationPendingProductId,
@@ -242,6 +244,7 @@ export function AppShellCatalogGridSection({
           catalogOriginalOnly={catalogOriginalOnly}
           catalogNear={catalogNear}
           showFullWidthTier3Banners={showFullWidthTier3Banners}
+          viewerRegionCode={viewerRegionCode}
           sellerRaffleActive={sellerRaffleActive}
           onToggleRaffleParticipation={onToggleRaffleParticipation}
           raffleParticipationPendingProductId={raffleParticipationPendingProductId}

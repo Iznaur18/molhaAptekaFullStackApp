@@ -4,6 +4,7 @@ import { splitCatalogNearProducts } from "@molha/api-contract";
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { InlineErrorBanner } from "../../../shared/ui/InlineErrorBanner/InlineErrorBanner.jsx";
 import { shouldShowProductTier3BannerFullWidth } from "../../../entities/product/lib/shouldShowProductTier3BannerFullWidth.js";
+import { resolveClientViewerRegionCode } from "../../../entities/region/lib/viewerRegion.js";
 import { CATALOG_VIRTUALIZATION_MIN_ITEM_COUNT } from "../lib/catalogGridVirtualizationConstants.js";
 import { interleaveCatalogTier3Banners } from "../lib/interleaveCatalogTier3Banners.js";
 import { useCatalogGridColumnCount } from "../model/useCatalogGridColumnCount.js";
@@ -48,6 +49,7 @@ import { CatalogGridProductCard } from "./CatalogGridProductCard.jsx";
  *   catalogOriginalOnly?: boolean;
  *   catalogNear?: boolean;
  *   showFullWidthTier3Banners?: boolean;
+ *   viewerRegionCode?: string | null;
  *   highlightRaffleProducts?: boolean;
  *   sellerRaffleActive?: boolean;
  *   onToggleRaffleParticipation?: (
@@ -96,6 +98,7 @@ export function HomeCatalogGrid({
   catalogOriginalOnly = false,
   catalogNear = false,
   showFullWidthTier3Banners = false,
+  viewerRegionCode = null,
   highlightRaffleProducts = false,
   sellerRaffleActive = false,
   onToggleRaffleParticipation,
@@ -103,6 +106,10 @@ export function HomeCatalogGrid({
   sellerLoyaltyPointsBalance = 0,
   sellerLoyaltyPointsReserved = 0,
 }) {
+  const resolvedViewerRegionCode =
+    typeof viewerRegionCode === "string" && viewerRegionCode.trim()
+      ? viewerRegionCode.trim()
+      : resolveClientViewerRegionCode(null);
   const virtualHostRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const virtualGridRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const gridMeasureRef = useRef(/** @type {HTMLDivElement | null} */ (null));
@@ -198,6 +205,7 @@ export function HomeCatalogGrid({
     raffleParticipationPendingProductId,
     sellerLoyaltyPointsBalance,
     sellerLoyaltyPointsReserved,
+    viewerRegionCode: resolvedViewerRegionCode,
   };
 
   const emptyMessage = (() => {

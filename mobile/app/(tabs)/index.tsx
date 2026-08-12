@@ -392,12 +392,14 @@ export default function CatalogScreen() {
       buildCatalogGridRows(catalogQuery.products, productGrid.columns, {
         showFullWidthTier3Banners,
         catalogNear: feedFilters.near === true,
+        viewerRegionCode,
       }),
     [
       catalogQuery.products,
       feedFilters.near,
       productGrid.columns,
       showFullWidthTier3Banners,
+      viewerRegionCode,
     ],
   );
 

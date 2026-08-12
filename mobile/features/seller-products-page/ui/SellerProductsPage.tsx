@@ -17,6 +17,7 @@ import { resolveCatalogGridListContentStyle } from "@/features/catalog-grid/lib/
 import { CatalogGridRowItem } from "@/features/catalog-grid/ui/CatalogGridRowItem";
 import { CatalogAnimatedFlatList } from "@/features/catalog-grid/ui/CatalogAnimatedFlatList";
 import { CatalogScrollAnimationProvider } from "@/features/catalog-grid/model/CatalogScrollAnimationContext";
+import { useViewerRegion } from "@/entities/region/model/ViewerRegionProvider";
 import { SELLER_PRODUCTS_PAGE_UI, USER_LIST_ROW_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
@@ -35,6 +36,7 @@ export const SellerProductsPage = () => {
 
   const sessionQuery = useAuthSessionQuery();
   const isAuthorized = useIsAuthorized();
+  const { viewerRegionCode } = useViewerRegion();
   const currentUserId =
     sessionQuery.data?.user?._id != null ? String(sessionQuery.data.user._id) : null;
   const isSessionReady = !sessionQuery.isPending;
@@ -79,8 +81,9 @@ export const SellerProductsPage = () => {
     () =>
       buildCatalogGridRows(catalogQuery.products, productGrid.columns, {
         showFullWidthTier3Banners: true,
+        viewerRegionCode,
       }),
-    [catalogQuery.products, productGrid.columns],
+    [catalogQuery.products, productGrid.columns, viewerRegionCode],
   );
 
   if (!sellerId) {

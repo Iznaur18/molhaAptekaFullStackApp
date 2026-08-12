@@ -5,6 +5,7 @@ import { selectPurchasableCartLines } from "./selectPurchasableCartLines.js";
 import {
   sumCartLinesCatalogDiscount,
   sumCartLinesCatalogListTotal,
+  sumCartLinesPromoDiscount,
   sumCartLinesWholesaleDiscount,
 } from "./sumCartLinesCatalogDiscount.js";
 
@@ -18,6 +19,7 @@ const EMPTY_DESELECTION = new Set();
  *   selectedTotal: number;
  *   selectedListTotal: number;
  *   selectedDiscount: number;
+ *   selectedPromoDiscount: number;
  *   selectedWholesaleDiscount: number;
  *   fullTotal: number;
  *   hasPartialSelection: boolean;
@@ -105,6 +107,7 @@ export function selectCartCheckoutSummary(
     selectedTotal: sumLineTotals(selectedLines),
     selectedListTotal: sumCartLinesCatalogListTotal(selectedLines),
     selectedDiscount: sumCartLinesCatalogDiscount(selectedLines),
+    selectedPromoDiscount: sumCartLinesPromoDiscount(selectedLines),
     selectedWholesaleDiscount: sumCartLinesWholesaleDiscount(selectedLines),
     fullTotal: sumLineTotals(lines),
     hasPartialSelection: selectedLines.length < lines.length,

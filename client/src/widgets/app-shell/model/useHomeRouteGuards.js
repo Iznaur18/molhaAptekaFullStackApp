@@ -10,6 +10,7 @@ import { isInfoPagePath } from "../../../shared/lib/infoPagePaths.js";
 import { isRaffleProductsPath } from "../../../shared/lib/rafflePaths.js";
 import { isSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
 import { isUserProfileSpaPath } from "../../../shared/lib/userProfilePaths.js";
+import { IS_ONEC_INTEGRATION_ENABLED } from "../../../pages/onec-integration/model/isOneCIntegrationEnabled.js";
 
 /**
  * @param {object} params
@@ -56,6 +57,13 @@ export const useHomeRouteGuards = ({
 
     return undefined;
   }, [location.pathname, navigate]);
+
+  useEffect(() => {
+    if (IS_ONEC_INTEGRATION_ENABLED || mainView !== "onec-integration") {
+      return;
+    }
+    goToMainView("my-profile");
+  }, [mainView, goToMainView]);
 
   useEffect(() => {
     if (!isSessionReady || !isRoleRestrictedMainView(mainView)) {

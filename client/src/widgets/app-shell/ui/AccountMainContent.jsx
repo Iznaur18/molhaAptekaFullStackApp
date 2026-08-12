@@ -1,6 +1,7 @@
 import { AUTH_UI, HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { isRoleRestrictedMainView } from "../../../shared/lib/homeMainViewPaths.js";
 import { isStaffMainViewAllowed } from "../../../shared/lib/staffMainViews.js";
+import { IS_ONEC_INTEGRATION_ENABLED } from "../../../pages/onec-integration/model/isOneCIntegrationEnabled.js";
 import {
   LazyMyProfilePage,
   LazyNotificationsPage,
@@ -208,7 +209,9 @@ export function AccountMainContent({
         onPartnerProgramClick={isAuthorized ? handlePartnerProgramFromProfile : undefined}
         onAdvertisingClick={isAuthorized ? handleAdvertisingFromProfile : undefined}
         onOneCIntegrationClick={
-          isAuthorized ? handleOneCIntegrationFromProfile : undefined
+          IS_ONEC_INTEGRATION_ENABLED && isAuthorized
+            ? handleOneCIntegrationFromProfile
+            : undefined
         }
         onIntroAdModerationClick={
           canModerateProducts ? handleIntroAdModerationFromProfile : undefined

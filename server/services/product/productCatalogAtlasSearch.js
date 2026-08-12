@@ -7,7 +7,7 @@ import { buildProductAtlasSearchStage } from "./buildProductAtlasSearchStage.js"
 import { normalizeProductsQueryForAggregate } from "./productCatalogQuery.js";
 import {
   buildCatalogPromotionSortStage,
-  catalogPromotionSortBoostAddFieldsStage,
+  buildCatalogPromotionSortBoostAddFieldsStage,
 } from "./productCatalogPromotionSort.js";
 
 const sellerLookupStages = () => [
@@ -38,7 +38,7 @@ const sellerLookupStages = () => [
 const sortStagesForAtlasCatalog = (sort, viewerRegionCode = null) => {
   const stages = [];
   if (sort === PRODUCT_SORT_NEWEST) {
-    stages.push(catalogPromotionSortBoostAddFieldsStage);
+    stages.push(buildCatalogPromotionSortBoostAddFieldsStage(viewerRegionCode));
   }
 
   stages.push(
@@ -84,7 +84,10 @@ export const findCatalogProductsPageAtlas = async (
     {
       $project: {
         _searchScore: 0,
+        _promotionGlobalTop: 0,
+        _promotionGlobalTopActivatedAt: 0,
         _promotionSortTier: 0,
+        _promotionSortActivatedAt: 0,
         _citySortPriority: 0,
         _regionSortPriority: 0,
       },

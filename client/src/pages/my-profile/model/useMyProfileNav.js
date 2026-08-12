@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import { USER_ROLE_USER } from "../../../entities/user/model/userConstants.js";
+import { IS_ONEC_INTEGRATION_ENABLED } from "../../onec-integration/model/isOneCIntegrationEnabled.js";
 import { buildProfileNavGroups } from "../lib/buildProfileNavGroups.js";
 import { getActiveProfileNavLabel } from "../lib/getActiveProfileNavLabel.js";
 
@@ -152,7 +153,10 @@ export function useMyProfileNav({
   const canUseLoyaltyPoints = isProfileReady && Boolean(onLoyaltyPointsClick);
   const canUsePartnerProgram = isProfileReady && Boolean(onPartnerProgramClick);
   const canUseAdvertising = isProfileReady && Boolean(onAdvertisingClick);
-  const canUseOneCIntegration = isProfileReady && Boolean(onOneCIntegrationClick);
+  const canUseOneCIntegration =
+    IS_ONEC_INTEGRATION_ENABLED &&
+    isProfileReady &&
+    Boolean(onOneCIntegrationClick);
   const canUseProductModeration =
     !isRegularUser && isProfileReady && Boolean(onProductModerationClick);
   const canUseProductReports =

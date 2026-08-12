@@ -59,6 +59,7 @@ export const useHomeCatalogGridProps = () => {
     showCuratedProductLists,
     curatedListsQuery,
     handlePlaceProductClick,
+    viewerRegionCode,
   } = ctx;
 
   const isCuratedProductListsLoading =
@@ -113,6 +114,7 @@ export const useHomeCatalogGridProps = () => {
       catalogOriginalOnly,
       catalogNear,
       showFullWidthTier3Banners: Boolean(showHomeCatalogFeed) && !isMineMode,
+      viewerRegionCode,
       sellerRaffleActive,
       raffleParticipationPendingProductId,
       homeCuratedProductLists,
@@ -174,6 +176,7 @@ export const useHomeCatalogGridProps = () => {
       isCuratedProductListsLoading,
       isUserDataConfirmed,
       handlePlaceProductClick,
+      viewerRegionCode,
     ],
   );
 };

@@ -26,6 +26,7 @@ import "./ProductCard.css";
  * @param {boolean} [isMineMode]
  * @param {boolean} [highlightCatalogPromotion]
  * @param {boolean} [promotionFullWidth]
+ * @param {string | null} [viewerRegionCode]
  * @param {boolean} [highlightRaffleProduct]
  * @param {boolean} [isLoyaltyPointsOvercommitted]
  * @param {boolean} [isModerationQueue]

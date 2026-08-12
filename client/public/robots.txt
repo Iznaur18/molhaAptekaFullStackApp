@@ -1,0 +1,24 @@
+# iziBuy — правила для поисковых роботов
+# Пускаем ботов на публичный контент, закрываем личные/служебные страницы.
+
+User-agent: *
+Allow: /
+
+# Личный кабинет, авторизация, корзина — индексировать незачем
+Disallow: /basket
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /my-products
+Disallow: /user-list
+Disallow: /users
+
+# Служебные/API-пути (nginx проксирует их в Express)
+Disallow: /auth/
+Disallow: /cart/
+Disallow: /order/
+Disallow: /vote/
+Disallow: /address/
+Disallow: /upload
+
+Sitemap: https://izibuy.ru/sitemap.xml

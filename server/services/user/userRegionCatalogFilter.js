@@ -99,7 +99,8 @@ export function buildCatalogRegionSortPriorityStage(viewerRegionCode) {
 }
 
 /**
- * Вставляет region-priority stage и ключ `_regionSortPriority` первым в каждый `$sort`.
+ * Вставляет region-priority stage и ключ `_regionSortPriority` в каждый `$sort`.
+ * `_promotionGlobalTop*` остаётся выше региона (ТОП — абсолютный топ).
  *
  * @param {Record<string, unknown> | Record<string, unknown>[]} sortStages
  * @param {string | null | undefined} viewerRegionCode
@@ -116,10 +117,24 @@ export function withCatalogRegionPrioritySort(sortStages, viewerRegionCode) {
     regionStage,
     ...list.map((stage) => {
       if (stage && typeof stage === "object" && stage.$sort) {
+        const sortSpec = /** @type {Record<string, unknown>} */ ({
+          ...stage.$sort,
+        });
+        const globalTop = sortSpec._promotionGlobalTop;
+        const globalTopActivatedAt = sortSpec._promotionGlobalTopActivatedAt;
+        delete sortSpec._promotionGlobalTop;
+        delete sortSpec._promotionGlobalTopActivatedAt;
+
         return {
           $sort: {
+            ...(globalTop !== undefined
+              ? { _promotionGlobalTop: globalTop }
+              : {}),
+            ...(globalTopActivatedAt !== undefined
+              ? { _promotionGlobalTopActivatedAt: globalTopActivatedAt }
+              : {}),
             _regionSortPriority: 1,
-            ...stage.$sort,
+            ...sortSpec,
           },
         };
       }

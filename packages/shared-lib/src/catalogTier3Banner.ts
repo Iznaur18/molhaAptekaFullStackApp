@@ -8,6 +8,7 @@ export type CatalogTier3Product = {
   catalogPromotionTier?: number | null;
   catalogPromotionExpiresAt?: string | null;
   catalogPromotionActivatedAt?: string | null;
+  productRegionCode?: string | null;
 };
 
 export const isCatalogPromotionActive = (
@@ -20,6 +21,22 @@ export const isCatalogPromotionActive = (
   return new Date(raw).getTime() > Date.now();
 };
 
+/**
+ * Региональное поднятие (sort): регион зрителя = регион продажи товара.
+ */
+export const isProductPromotionVisibleInViewerRegion = (
+  product: CatalogTier3Product | null | undefined,
+  viewerRegionCode: string | null | undefined,
+): boolean => {
+  const productCode =
+    typeof product?.productRegionCode === "string"
+      ? product.productRegionCode.trim()
+      : "";
+  const viewerCode =
+    typeof viewerRegionCode === "string" ? viewerRegionCode.trim() : "";
+  return Boolean(productCode && viewerCode && productCode === viewerCode);
+};
+
 export const isProductTier3BannerPromotion = (
   product: CatalogTier3Product | null | undefined,
 ): boolean =>
@@ -28,7 +45,14 @@ export const isProductTier3BannerPromotion = (
 
 export const shouldShowProductTier3BannerFullWidth = (
   product: CatalogTier3Product | null | undefined,
-  { isMineMode = false, showFullWidthTier3Banners = false } = {},
+  {
+    isMineMode = false,
+    showFullWidthTier3Banners = false,
+  }: {
+    isMineMode?: boolean;
+    showFullWidthTier3Banners?: boolean;
+    viewerRegionCode?: string | null;
+  } = {},
 ): boolean => {
   if (!isProductTier3BannerPromotion(product)) {
     return false;
@@ -51,7 +75,7 @@ const compareTier3BannerActivationOrder = (a: CatalogTier3Product, b: CatalogTie
 export const interleaveCatalogTier3Banners = <T extends CatalogTier3Product>(
   products: T[],
   columnCount: number,
-  { enabled = false } = {},
+  { enabled = false }: { enabled?: boolean; viewerRegionCode?: string | null } = {},
 ): T[] => {
   if (!enabled || products.length === 0) {
     return products;

@@ -28,6 +28,7 @@ import {
   LazySubscriptionsPage,
   LazyWishlistPage,
 } from "./lazyAppShellPages.js";
+import { IS_ONEC_INTEGRATION_ENABLED } from "../../../pages/onec-integration/model/isOneCIntegrationEnabled.js";
 
 /**
  * Контент вкладки профиля (без оболочки MyProfilePage).
@@ -127,6 +128,9 @@ export function renderProfileTabPanel(mainView, props) {
         />
       );
     case "onec-integration":
+      if (!IS_ONEC_INTEGRATION_ENABLED) {
+        return null;
+      }
       return (
         <LazyOneCIntegrationPage
           isAuthorized={isAuthorized}

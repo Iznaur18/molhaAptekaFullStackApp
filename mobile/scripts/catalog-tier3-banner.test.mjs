@@ -16,11 +16,12 @@ const readMobileFile = (relativePath) =>
 
 const futureExpiry = () => new Date(Date.now() + 86_400_000).toISOString();
 
-const tier3Product = (id) => ({
+const tier3Product = (id, region = "RU-MOW") => ({
   _id: id,
   catalogPromotionTier: 3,
   catalogPromotionExpiresAt: futureExpiry(),
   catalogPromotionActivatedAt: "2026-01-01T00:00:00.000Z",
+  productRegionCode: region,
 });
 
 const regularProduct = (id) => ({ _id: id });
@@ -38,9 +39,13 @@ test("interleave + full-width gate matches web catalog feed", () => {
     tier3Product("b1"),
   ];
 
-  const interleaved = interleaveCatalogTier3Banners(products, 2, { enabled: true });
+  const interleaved = interleaveCatalogTier3Banners(products, 2, {
+    enabled: true,
+  });
   const banner = interleaved.find((item) =>
-    shouldShowProductTier3BannerFullWidth(item, { showFullWidthTier3Banners: true }),
+    shouldShowProductTier3BannerFullWidth(item, {
+      showFullWidthTier3Banners: true,
+    }),
   );
 
   assert.equal(banner?._id, "b1");

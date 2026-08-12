@@ -6,6 +6,7 @@ import { selectPurchasableCartLines } from "./selectPurchasableCartLines";
 import {
   sumCartLinesCatalogDiscount,
   sumCartLinesCatalogListTotal,
+  sumCartLinesPromoDiscount,
   sumCartLinesWholesaleDiscount,
 } from "./sumCartLinesCatalogDiscount";
 
@@ -16,6 +17,7 @@ export type CartCheckoutSummary = {
   selectedTotal: number;
   selectedListTotal: number;
   selectedDiscount: number;
+  selectedPromoDiscount: number;
   selectedWholesaleDiscount: number;
   fullTotal: number;
   /** Итог к оформлению меньше итога по корзине: часть строк исключена или не выбрана. */
@@ -84,6 +86,7 @@ export const selectCartCheckoutSummary = (
     selectedTotal: sumLineTotals(selectedLines),
     selectedListTotal: sumCartLinesCatalogListTotal(selectedLines),
     selectedDiscount: sumCartLinesCatalogDiscount(selectedLines),
+    selectedPromoDiscount: sumCartLinesPromoDiscount(selectedLines),
     selectedWholesaleDiscount: sumCartLinesWholesaleDiscount(selectedLines),
     fullTotal: sumLineTotals(lines),
     hasPartialSelection: selectedLines.length < lines.length,

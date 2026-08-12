@@ -266,6 +266,7 @@ export const ProductPromotionModal = ({
             </Text>
           </View>
           <Text style={styles.hint}>{PRODUCT_PROMOTION_UI.PAYMENT_HINT_POINTS}</Text>
+          <Text style={styles.hint}>{PRODUCT_PROMOTION_UI.REGION_BOOST_HINT}</Text>
         </View>
 
         <View>

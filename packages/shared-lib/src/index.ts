@@ -186,6 +186,7 @@ export {
   CATALOG_TIER3_BANNER_ROW_INTERVAL,
   interleaveCatalogTier3Banners,
   isCatalogPromotionActive,
+  isProductPromotionVisibleInViewerRegion,
   isProductTier3BannerPromotion,
   PRODUCT_PROMOTION_TIER_BANNER,
   shouldShowProductTier3BannerFullWidth,

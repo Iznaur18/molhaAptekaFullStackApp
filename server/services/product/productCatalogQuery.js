@@ -10,7 +10,7 @@ import mongoose from "mongoose";
 import { attachProductSellerSnapshots } from "./attachProductSellerSnapshots.js";
 import {
   buildCatalogPromotionSortStage,
-  catalogPromotionSortBoostAddFieldsStage,
+  buildCatalogPromotionSortBoostAddFieldsStage,
 } from "./productCatalogPromotionSort.js";
 import { withCatalogRegionPrioritySort } from "../user/userRegionCatalogFilter.js";
 
@@ -160,8 +160,10 @@ export const buildCatalogSortPipeline = (
     stages.push(searchRankAddFieldsStage(searchRank));
   }
 
-  if (!useSearchRank && sort === PRODUCT_SORT_NEWEST) {
-    stages.push(catalogPromotionSortBoostAddFieldsStage);
+  if (sort === PRODUCT_SORT_NEWEST) {
+    stages.push(
+      buildCatalogPromotionSortBoostAddFieldsStage(viewerRegionCode),
+    );
   }
 
   stages.push(
@@ -209,6 +211,8 @@ export const findProductsPage = async (
     {
       $project: {
         _searchRank: 0,
+        _promotionGlobalTop: 0,
+        _promotionGlobalTopActivatedAt: 0,
         _promotionSortTier: 0,
         _promotionSortActivatedAt: 0,
         _citySortPriority: 0,

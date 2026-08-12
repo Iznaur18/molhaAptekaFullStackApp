@@ -72,6 +72,27 @@ describe("userRegionCatalogFilter", () => {
     );
   });
 
+  it("withCatalogRegionPrioritySort keeps global TOP above region", () => {
+    const stages = withCatalogRegionPrioritySort(
+      {
+        $sort: {
+          _promotionGlobalTop: -1,
+          _promotionGlobalTopActivatedAt: -1,
+          createdAt: -1,
+        },
+      },
+      "RU-SPE",
+    );
+    assert.equal(stages.length, 2);
+    assert.ok(stages[0].$addFields._regionSortPriority);
+    assert.deepEqual(stages[1].$sort, {
+      _promotionGlobalTop: -1,
+      _promotionGlobalTopActivatedAt: -1,
+      _regionSortPriority: 1,
+      createdAt: -1,
+    });
+  });
+
   it("withCatalogRegionPrioritySort prepends key to $sort", () => {
     const stages = withCatalogRegionPrioritySort(
       { $sort: { createdAt: -1 } },

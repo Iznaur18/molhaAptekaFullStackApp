@@ -659,6 +659,7 @@ export const CART_PAGE_UI = {
   PAYABLE_LABEL: "К оплате",
   PRICE_LABEL: "Цена",
   DISCOUNT_LABEL: "Скидка",
+  PROMO_DISCOUNT_LABEL: "Промокод",
   WHOLESALE_DISCOUNT_LABEL: "Оптовая скидка",
   DELIVERY_FEE_LABEL: "Доставка",
   DELIVERY_FEE_VALUE: "Индивидуальная плата при получении",
@@ -2516,6 +2517,8 @@ export const PRODUCT_PROMOTION_UI = {
   BALANCE_POINTS: (balance) => `${balance} баллов`,
   PAYMENT_HINT_POINTS:
     "Оплата только баллами. Списание сразу, продвижение включается автоматически.",
+  REGION_BOOST_HINT:
+    "Буст и Баннер поднимают карточку в регионе продажи. ТОП — абсолютный верх выдачи во всех регионах. Оформление карточки видно везде.",
   TIER_LABEL: "Уровень продвижения",
   /** @param {string} percent */
   TIER_RATE_HINT: (percent) => `${percent}% от цены товара`,
@@ -2979,6 +2982,7 @@ export const EDIT_PROFILE_MODAL_UI = {
   PASSWORD_MIN_LENGTH: 6,
   PASSWORD_TOO_SHORT: "Пароль должен быть не менее 6 символов",
   PASSWORD_MISMATCH: "Пароли не совпадают",
+  PASSWORD_CURRENT_REQUIRED: "Введите текущий пароль",
   PASSWORD_CHANGE_SUBMIT: "Сменить пароль",
   PASSWORD_CHANGE_LOADING: "Сохранение…",
   PASSWORD_CHANGE_SUCCESS: "Пароль успешно изменён",
