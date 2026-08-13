@@ -252,7 +252,16 @@ export const SiteHeaderBannerCarousel = ({
       if (!linkPath) {
         return;
       }
-      const trimmed = linkPath.trim();
+      let trimmed = linkPath.trim();
+      if (!trimmed) {
+        return;
+      }
+      if (
+        !/^https?:\/\//i.test(trimmed) &&
+        /^(?:www\.)?[a-z0-9][a-z0-9.-]*\.[a-z]{2,}(?:[/:?#].*)?$/i.test(trimmed)
+      ) {
+        trimmed = `https://${trimmed}`;
+      }
       if (/^https?:\/\//i.test(trimmed)) {
         void Linking.openURL(trimmed);
         return;

@@ -141,9 +141,9 @@ export const useSubscriptionUserRowStyles = createThemedStyles((theme) => ({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 10,
     width: "100%",
-    paddingVertical: 8,
+    paddingVertical: 10,
     paddingHorizontal: 12,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
@@ -166,13 +166,48 @@ export const useSubscriptionUserRowStyles = createThemedStyles((theme) => ({
     height: 44,
     flexShrink: 0,
   },
-  nameWrap: {
+  body: {
     flex: 1,
+    minWidth: 0,
+    gap: 3,
+  },
+  nameWrap: {
     minWidth: 0,
   },
   nameText: {
     fontSize: 15.68,
     fontWeight: "600",
     color: theme.colors.text,
+  },
+  metrics: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 0,
+  },
+  metric: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: 4,
+    maxWidth: "100%",
+  },
+  metricLabel: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: theme.colors.textMuted,
+  },
+  metricValue: {
+    fontSize: 12.5,
+    fontWeight: "700",
+    color: theme.colors.text,
+    fontVariant: ["tabular-nums"],
+  },
+  metricSep: {
+    width: 3,
+    height: 3,
+    borderRadius: 999,
+    marginHorizontal: 7,
+    backgroundColor: theme.colors.textMuted,
+    opacity: 0.55,
   },
 }));

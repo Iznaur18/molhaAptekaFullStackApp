@@ -1,11 +1,11 @@
 {
-  "name": "iziBuy",
-  "short_name": "iziBuy",
+  "name": "Torgum",
+  "short_name": "Torgum",
   "display": "standalone",
   "orientation": "portrait",
   "start_url": "/",
   "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "theme_color": "#f25623",
   "icons": [
     {
       "src": "/icon-192.png",

@@ -25,7 +25,7 @@ test("story viewer modal is fullscreen with web-like frame", () => {
 
   assert.match(source, /presentationStyle="fullScreen"/);
   assert.match(source, /computeUserStoryFrameSize/);
-  assert.match(source, /contentFit="cover"/);
+  assert.match(source, /contentFit="contain"/);
   assert.match(source, /styles\.edgePrev/);
   assert.match(source, /styles\.edgeNext/);
   assert.match(source, /pointerEvents="none"/);

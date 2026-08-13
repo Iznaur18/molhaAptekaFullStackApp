@@ -1,3 +1,5 @@
+import { LEGAL_CONTACT_EMAIL } from "../../../pages/legal/model/legalSharedConstants.js";
+
 export const LEGAL_OPERATOR_PLACEHOLDER =
   "Гужаев Рамзан Ризванович, 201400232973, Чеченская Республика, город Грозный";
 
@@ -10,4 +12,4 @@ export const REGISTRATION_PERSONAL_DATA_CONSENT_PURPOSES =
 export const REGISTRATION_PERSONAL_DATA_CONSENT_OPERATOR = `Оператор: ${LEGAL_OPERATOR_PLACEHOLDER}.`;
 
 export const REGISTRATION_PERSONAL_DATA_CONSENT_WITHDRAWAL =
-  "Согласие действует до его отзыва. Отозвать согласие можно, обратившись на support@izibuy.ru с email аккаунта. Подробности — в Политике конфиденциальности.";
+  `Согласие действует до его отзыва. Отозвать согласие можно, обратившись на ${LEGAL_CONTACT_EMAIL} с email аккаунта. Подробности — в Политике конфиденциальности.`;

@@ -5,11 +5,11 @@ import sharp from "sharp";
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const MOBILE_ROOT = path.resolve(SCRIPT_DIR, "..");
-const LOGO_PATH = path.resolve(MOBILE_ROOT, "../client/public/logo-izibuy.png");
+const LOGO_PATH = path.resolve(MOBILE_ROOT, "../client/public/logo-torgum.png");
 const OUT_DIR = path.resolve(MOBILE_ROOT, "assets/images");
 
 const ICON_SIZE = 1024;
-const BRAND_BACKGROUND = "#E6F4FE";
+const BRAND_BACKGROUND = "#F25623";
 const FAVICON_SIZE = 48;
 
 const createSquarePng = async ({

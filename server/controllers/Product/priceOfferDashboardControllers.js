@@ -1,5 +1,4 @@
 import {
-  countIncomingPendingPriceOffersForSeller,
   countAuctionTabActionItems,
   getIncomingPriceOffersForSeller,
   getMyPriceOfferBids,

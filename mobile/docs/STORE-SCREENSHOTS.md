@@ -65,7 +65,7 @@ STORE_SCREENSHOT_API_URL=http://127.0.0.1:4444
 - `store-assets/listing/google-play-ru.txt`
 - `store-assets/listing/app-store-ru.txt`
 
-Замени `https://ВАШ-ДОМЕН` и `support@izibuy.ru` перед публикацией.
+Замени `https://ВАШ-ДОМЕН` и `iznaur.guzhaev@mail.ru` перед публикацией.
 
 ## Чеклист перед загрузкой
 

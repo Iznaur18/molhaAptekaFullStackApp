@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
+import { formatSearchRowRatingCompact } from "../../../entities/user/lib/formatSearchRowRating.js";
 import {
   formatProfileImageObjectPosition,
   getUserAvatarFocus,
@@ -27,6 +28,19 @@ export function SubscriptionUserRow({ user, onRowClick }) {
   const isPremium = Boolean(user.isPremiumUser);
   const isUserDataConfirmed = user.isUserDataConfirmed === true;
 
+  const ratingText = useMemo(
+    () => formatSearchRowRatingCompact(user.userRatingByVotes),
+    [user.userRatingByVotes],
+  );
+  const followersText = useMemo(() => {
+    const n = Number(user.followersCount);
+    return Number.isFinite(n) ? String(Math.max(0, Math.floor(n))) : "0";
+  }, [user.followersCount]);
+  const loyaltyPointsText = useMemo(() => {
+    const n = Number(user.userLoyaltyPoints);
+    return Number.isFinite(n) ? String(Math.max(0, Math.floor(n))) : "0";
+  }, [user.userLoyaltyPoints]);
+
   const handleClick = () => {
     onRowClick?.(user._id);
   };
@@ -42,13 +56,52 @@ export function SubscriptionUserRow({ user, onRowClick }) {
         decoding="async"
         onError={() => setImgFailed(true)}
       />
-      <UserPremiumDisplayName
-        name={displayName}
-        isPremium={isPremium}
-        isUserDataConfirmed={isUserDataConfirmed}
-        className="subscription-user-row__name"
-        textClassName="subscription-user-row__name-text"
-      />
+      <span className="subscription-user-row__body">
+        <UserPremiumDisplayName
+          name={displayName}
+          isPremium={isPremium}
+          isUserDataConfirmed={isUserDataConfirmed}
+          className="subscription-user-row__name"
+          textClassName="subscription-user-row__name-text"
+        />
+        <span className="subscription-user-row__metrics">
+          <span
+            className="subscription-user-row__metric"
+            title={USER_LIST_ROW_UI.RATING_TITLE}
+          >
+            <span className="subscription-user-row__metric-label">
+              {USER_LIST_ROW_UI.RATING_SCORE_LABEL}
+            </span>
+            <span className="subscription-user-row__metric-value">
+              {ratingText}
+            </span>
+          </span>
+          <span className="subscription-user-row__metric-sep" aria-hidden="true" />
+          <span
+            className="subscription-user-row__metric"
+            aria-label={`${USER_LIST_ROW_UI.FOLLOWERS_LABEL} ${followersText}`}
+          >
+            <span className="subscription-user-row__metric-label">
+              {USER_LIST_ROW_UI.FOLLOWERS_LABEL}
+            </span>
+            <span className="subscription-user-row__metric-value">
+              {followersText}
+            </span>
+          </span>
+          <span className="subscription-user-row__metric-sep" aria-hidden="true" />
+          <span
+            className="subscription-user-row__metric"
+            aria-label={`${USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL} ${loyaltyPointsText}`}
+          >
+            <span className="subscription-user-row__metric-label">
+              {USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL}
+            </span>
+            <span className="subscription-user-row__metric-value">
+              {loyaltyPointsText}
+            </span>
+          </span>
+        </span>
+      </span>
     </button>
   );
 }

@@ -8,6 +8,7 @@ import {
 } from "../../../entities/user/lib/profileImageFocus.js";
 import { resolveUserProfileBackgroundFromUser } from "../../../entities/user/lib/userBackgroundValue.js";
 import { pickUserProfilePhotoUrl } from "../../../entities/user/lib/pickUserProfilePhotoUrl.js";
+import { scheduleOpenAfterPaint } from "../../../shared/lib/scheduleOpenAfterPaint.js";
 import { useMaxWidthMediaQuery } from "../../../shared/lib/useMaxWidthMediaQuery.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import {
@@ -38,6 +39,7 @@ export function useMyProfilePageUi({
 }) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isMobileNavMounted, setIsMobileNavMounted] = useState(false);
+  const [isMobileNavVisible, setIsMobileNavVisible] = useState(false);
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
   const [backgroundLoadFailed, setBackgroundLoadFailed] = useState(false);
 
@@ -118,12 +120,12 @@ export function useMyProfilePageUi({
     if (!isDrawerLayout) {
       setIsMobileNavOpen(false);
       setIsMobileNavMounted(false);
+      setIsMobileNavVisible(false);
     }
   }, [isDrawerLayout]);
 
-  // Один источник правды — isMobileNavOpen. Монтируем сразу при открытии;
-  // при закрытии держим оверлей в DOM до конца exit-анимации, затем размонтируем.
-  // Появление/уход рисует CSS-анимация по data-state — без rAF-флипа visible.
+  // Mount closed → paint → --open (иначе на ПК enter схлопывается).
+  // При закрытии держим DOM до конца exit.
   useEffect(() => {
     if (!isDrawerLayout) {
       return undefined;
@@ -134,6 +136,8 @@ export function useMyProfilePageUi({
       return undefined;
     }
 
+    setIsMobileNavVisible(false);
+
     if (!isMobileNavMounted) {
       return undefined;
     }
@@ -142,6 +146,13 @@ export function useMyProfilePageUi({
       setIsMobileNavMounted(false);
     }, MY_PROFILE_MOBILE_NAV_EXIT_MS);
     return () => window.clearTimeout(timeoutId);
+  }, [isDrawerLayout, isMobileNavOpen, isMobileNavMounted]);
+
+  useEffect(() => {
+    if (!isDrawerLayout || !isMobileNavOpen || !isMobileNavMounted) {
+      return undefined;
+    }
+    return scheduleOpenAfterPaint(setIsMobileNavVisible);
   }, [isDrawerLayout, isMobileNavOpen, isMobileNavMounted]);
 
   useEffect(() => {
@@ -182,6 +193,7 @@ export function useMyProfilePageUi({
     isDrawerLayout,
     isMobileNavOpen,
     isMobileNavMounted,
+    isMobileNavVisible,
     closeMobileNav,
     openMobileNav,
     avatarLoadFailed,

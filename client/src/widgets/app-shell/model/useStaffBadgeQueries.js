@@ -18,7 +18,6 @@ import { fetchPendingDataConfirmationCount } from "../../../entities/user-data-c
 import { fetchPendingProductPromotionsCount } from "../../../entities/product-promotion/api/fetchPendingProductPromotionsCount.js";
 import { fetchPendingRafflesCount } from "../../../entities/raffle/api/fetchPendingRafflesCount.js";
 import { introAdQueryKeys } from "../../../entities/intro-ad/model/introAdQueryKeys.js";
-import { sellerPersonalCategoryQueryKeys } from "../../../entities/seller-personal-category/model/sellerPersonalCategoryQueryKeys.js";
 import { STAFF_BADGE_STALE_TIME_MS } from "../../../shared/api/queryClient.js";
 import {
   resolveDataConfirmationStaffBadgeCount,

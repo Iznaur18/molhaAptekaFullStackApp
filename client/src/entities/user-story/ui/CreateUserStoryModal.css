@@ -311,14 +311,6 @@
 @media (prefers-reduced-motion: reduce) {
   .create-user-story-modal__scrim,
   .create-user-story-modal {
-    transition: none;
-  }
-
-  .create-user-story-modal {
-    transform: none;
-  }
-
-  .create-user-story-modal__scrim {
-    opacity: 1;
+    transition-duration: 100ms;
   }
 }

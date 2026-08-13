@@ -186,14 +186,6 @@
 @media (prefers-reduced-motion: reduce) {
   .viewer-region-picker-sheet__scrim,
   .viewer-region-picker-sheet {
-    transition: none;
-  }
-
-  .viewer-region-picker-sheet {
-    transform: none;
-  }
-
-  .viewer-region-picker-sheet__scrim {
-    opacity: 1;
+    transition-duration: 90ms;
   }
 }

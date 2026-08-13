@@ -6,12 +6,12 @@ import sharp from "sharp";
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const MOBILE_ROOT = path.resolve(SCRIPT_DIR, "..");
-const LOGO_PATH = path.resolve(MOBILE_ROOT, "../client/public/logo-izibuy.png");
+const LOGO_PATH = path.resolve(MOBILE_ROOT, "../client/public/logo-torgum.png");
 const OUT_DIR = path.resolve(MOBILE_ROOT, "store-assets/google-play");
 
 const WIDTH = 1024;
 const HEIGHT = 500;
-const BRAND_BACKGROUND = "#E6F4FE";
+const BRAND_BACKGROUND = "#F25623";
 
 const textOverlaySvg = `
 <svg width="${WIDTH}" height="${HEIGHT}" xmlns="http://www.w3.org/2000/svg">
@@ -22,7 +22,7 @@ const textOverlaySvg = `
     Каталог · Корзина · Доставка
   </text>
   <text x="400" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="20" fill="#666666">
-    iziBuy — маркетплейс
+    Torgum — маркетплейс
   </text>
 </svg>
 `;

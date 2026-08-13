@@ -46,8 +46,15 @@ export const PRODUCT_CATEGORY_TRAVEL_SERVICES = "travel_services";
 /** Устаревший slug (до расширения списка). */
 export const PRODUCT_CATEGORY_FOOD = "food";
 
-/** Порядок — для фильтра и формы создания товара. */
-export const PRODUCT_CATEGORIES = [
+/**
+ * TEMP: flat hardcoded category list off — UI/admin pickers use tree/API only.
+ * Labels (`PRODUCT_CATEGORY_LABEL_RU`) stay for legacy display.
+ * Flip to `true` to restore dropdown/admin flat options.
+ */
+export const IS_HARDCODED_PRODUCT_CATEGORIES_ENABLED = false;
+
+/** Полный legacy-список (тип / отображение slug’ов; UI-список — через флаг). */
+export const PRODUCT_CATEGORIES_HARDCODED = [
   PRODUCT_CATEGORY_GROCERY,
   PRODUCT_CATEGORY_ELECTRONICS,
   PRODUCT_CATEGORY_CLOTHING,
@@ -76,6 +83,11 @@ export const PRODUCT_CATEGORIES = [
   PRODUCT_CATEGORY_TRAVEL_SERVICES,
   PRODUCT_CATEGORY_FOOD,
 ];
+
+/** Порядок — для фильтра и admin legacy-picker’ов. */
+export const PRODUCT_CATEGORIES = IS_HARDCODED_PRODUCT_CATEGORIES_ENABLED
+  ? PRODUCT_CATEGORIES_HARDCODED
+  : [];
 
 /** Inline SVG — без сети, мгновенно в <img>. */
 export const PRODUCT_IMAGE_PLACEHOLDER_URL =

@@ -85,4 +85,26 @@ export default [
       "no-console": "off",
     },
   },
+  {
+    // Node CLI / build-скрипты (ESM, .mjs): process/console/node-globals —
+    // рабочие инструменты, а stdout здесь и есть операционный канал.
+    // Клиентский react-блок ловит только .{js,jsx}, поэтому .mjs без globals.
+    files: ["scripts/**/*.{js,mjs}", "client/scripts/**/*.{js,mjs}"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: globals.node,
+    },
+    rules: {
+      "no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+    },
+  },
+  {
+    // Playwright e2e-хелперы: `use` — это фикстура теста, а не React-хук,
+    // поэтому react-hooks-правило здесь даёт ложное срабатывание.
+    files: ["client/e2e/**/*.js"],
+    rules: {
+      "react-hooks/rules-of-hooks": "off",
+    },
+  },
 ];

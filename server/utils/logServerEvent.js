@@ -1,3 +1,4 @@
+import { formatPrettyServerLogLine, resolveLogFormat } from "./logFormat.js";
 import { resolveHttpErrorStatus } from "./resolveHttpErrorStatus.js";
 import { scrubLogFieldsPii } from "./scrubLogFieldsPii.js";
 
@@ -25,9 +26,27 @@ export function formatLogError(error) {
 }
 
 /**
- * Одна JSON-строка в stdout/stderr (для journald / Loki / CloudWatch).
+ * @param {'debug' | 'info' | 'warn' | 'error' | 'fatal'} level
+ * @param {string} line
+ */
+const writeLogLine = (level, line) => {
+  if (STDERR_LEVELS.has(level)) {
+    console.error(line);
+    return;
+  }
+  if (level === "warn") {
+    console.warn(line);
+    return;
+  }
+  console.log(line);
+};
+
+/**
+ * Одна строка в stdout/stderr.
+ * - production / test / `LOG_FORMAT=json` → JSON (journald / Loki)
+ * - development / `LOG_FORMAT=pretty` → читаемый текст в терминале
  *
- * Контракт полей:
+ * Контракт полей (JSON):
  * - `event` (обязательно): `namespace.snake_case` (например `cron.job_failed`)
  * - корреляция: `requestId` | `jobId` | `workerId` (хотя бы одно на request/job path)
  * - `level` / `time` добавляются здесь
@@ -38,22 +57,24 @@ export function formatLogError(error) {
 export function logServerEvent(level, fields) {
   const { event, ...rest } = fields;
   const scrubbed = scrubLogFieldsPii(rest);
-  const line = JSON.stringify({
-    level,
-    time: new Date().toISOString(),
-    event,
-    ...scrubbed,
-  });
+  const payload = { event, ...scrubbed };
 
-  if (STDERR_LEVELS.has(level)) {
-    console.error(line);
+  if (resolveLogFormat() === "pretty") {
+    writeLogLine(level, formatPrettyServerLogLine(level, payload));
+    if (typeof scrubbed.stack === "string" && scrubbed.stack.trim()) {
+      writeLogLine(level, scrubbed.stack);
+    }
     return;
   }
-  if (level === "warn") {
-    console.warn(line);
-    return;
-  }
-  console.log(line);
+
+  writeLogLine(
+    level,
+    JSON.stringify({
+      level,
+      time: new Date().toISOString(),
+      ...payload,
+    }),
+  );
 }
 
 /**

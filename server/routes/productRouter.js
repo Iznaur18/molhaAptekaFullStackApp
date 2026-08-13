@@ -145,7 +145,6 @@ import {
   rejectRaffleValidation,
   raffleProductsValidation,
   setProductRaffleParticipationValidation,
-  productCategorySlugParamValidation,
   productCategoryIdParamValidation,
   createProductCategoryAdminValidation,
   deleteProductCategoryAdminValidation,

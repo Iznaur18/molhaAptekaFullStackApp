@@ -1,6 +1,5 @@
 import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
-import { INSTALLMENT_SALES_LIST_FILTER_IN_PROGRESS } from "../model/constants.js";
 
 import "./InstallmentPaymentsOverview.css";
 

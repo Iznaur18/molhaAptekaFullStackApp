@@ -2,10 +2,13 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { REGION_UI } from "../../../shared/config/appUiCopy.js";
+import { useEnterExitMountAnimation } from "../../../shared/lib/useEnterExitMountAnimation.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { filterRuRegionsByQuery } from "../lib/filterRuRegionsByQuery.js";
 
 import "./ViewerRegionPickerSheet.css";
+
+const VIEWER_REGION_SHEET_EXIT_MS = 260;
 
 /**
  * @param {{
@@ -27,27 +30,20 @@ export function ViewerRegionPickerSheet({
   const sheetId = id || generatedId;
   const titleId = `${sheetId}-title`;
   const searchRef = useRef(/** @type {HTMLInputElement | null} */ (null));
-  const [mounted, setMounted] = useState(false);
-  const [visible, setVisible] = useState(false);
+  const { mounted, isVisible: visible } = useEnterExitMountAnimation(isOpen, {
+    exitMs: VIEWER_REGION_SHEET_EXIT_MS,
+  });
   const [query, setQuery] = useState("");
 
   useScrollLock(mounted);
 
   useEffect(() => {
-    if (isOpen) {
-      setMounted(true);
-      setQuery("");
-      const frame = requestAnimationFrame(() => setVisible(true));
-      return () => cancelAnimationFrame(frame);
-    }
-
-    setVisible(false);
-    if (!mounted) {
+    if (!isOpen) {
       return undefined;
     }
-    const timeoutId = window.setTimeout(() => setMounted(false), 260);
-    return () => window.clearTimeout(timeoutId);
-  }, [isOpen, mounted]);
+    setQuery("");
+    return undefined;
+  }, [isOpen]);
 
   useEffect(() => {
     if (!visible) {

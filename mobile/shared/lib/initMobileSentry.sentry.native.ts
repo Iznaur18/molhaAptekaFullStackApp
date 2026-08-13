@@ -58,7 +58,7 @@ const setAppVersionContext = (): void => {
 
   Sentry.addBreadcrumb({
     category: "app",
-    message: `iziBuy mobile ${appVersion}${buildNumber ? ` (${buildNumber})` : ""}`,
+    message: `Torgum mobile ${appVersion}${buildNumber ? ` (${buildNumber})` : ""}`,
     level: "info",
   });
 };

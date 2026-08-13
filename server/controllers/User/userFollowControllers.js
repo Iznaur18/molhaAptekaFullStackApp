@@ -4,7 +4,6 @@ import {
   USER_FOLLOW_TARGET_NOT_FOUND_MESSAGE,
 } from "../../constants/userFollowConstants.js";
 import {
-  attachFollowFieldsToPublicProfile,
   followUser,
   listUserFollowRelations,
   unfollowUser,

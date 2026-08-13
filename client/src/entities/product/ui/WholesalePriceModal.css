@@ -327,14 +327,6 @@
 @media (prefers-reduced-motion: reduce) {
   .wholesale-price-modal__scrim,
   .wholesale-price-modal__panel {
-    transition: none;
-  }
-
-  .wholesale-price-modal__panel {
-    transform: none;
-  }
-
-  .wholesale-price-modal__scrim {
-    opacity: 1;
+    transition-duration: 90ms;
   }
 }

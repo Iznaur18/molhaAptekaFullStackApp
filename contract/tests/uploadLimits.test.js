@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
-  INTRO_UPLOAD_VIDEO_MAX_BYTES,
   STORY_UPLOAD_VIDEO_MAX_BYTES,
   STORY_UPLOAD_VIDEO_MAX_MB,
   UPLOAD_IMAGE_COMPRESS_MAX_DIMENSION,

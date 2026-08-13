@@ -12,10 +12,7 @@ import {
 } from "../../constants/premiumConstants.js";
 import { REFERRAL_SOURCE_KIND_PREMIUM } from "../../constants/referralConstants.js";
 import { runInTransaction } from "../../utils/mongoTransaction.js";
-import {
-  deductLoyaltyPoints,
-  InsufficientLoyaltyPointsError,
-} from "../loyalty/loyaltyPointsSpend.js";
+import { deductLoyaltyPoints } from "../loyalty/loyaltyPointsSpend.js";
 import { runMoneyIdempotentMutation } from "../loyalty/runMoneyIdempotentMutation.js";
 import { logMoneyEvent } from "../loyalty/logMoneyEvent.js";
 import {

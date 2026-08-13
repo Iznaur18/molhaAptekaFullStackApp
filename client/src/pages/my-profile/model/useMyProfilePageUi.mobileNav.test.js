@@ -15,7 +15,7 @@ vi.mock("../../../shared/lib/useScrollLock.js", () => ({
 
 describe("useMyProfilePageUi mobile nav", () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "requestAnimationFrame", "cancelAnimationFrame"] });
     vi.mocked(useScrollLock).mockClear();
   });
 
@@ -23,7 +23,7 @@ describe("useMyProfilePageUi mobile nav", () => {
     vi.useRealTimers();
   });
 
-  it("unmounts drawer overlay after close exit animation", () => {
+  it("mounts closed, then becomes visible after paint; unmounts after close exit", () => {
     const { result } = renderHook(() =>
       useMyProfilePageUi({
         user: { _id: "u1", userRole: "user" },
@@ -35,23 +35,33 @@ describe("useMyProfilePageUi mobile nav", () => {
     );
 
     expect(result.current.isMobileNavMounted).toBe(false);
+    expect(result.current.isMobileNavVisible).toBe(false);
     expect(useScrollLock).toHaveBeenCalledWith(false, { strategy: "overflow" });
 
     act(() => {
       result.current.openMobileNav();
     });
 
-    // Открытие монтирует оверлей сразу — без промежуточного visible-кадра.
     expect(result.current.isMobileNavOpen).toBe(true);
     expect(result.current.isMobileNavMounted).toBe(true);
+    expect(result.current.isMobileNavVisible).toBe(false);
     expect(useScrollLock).toHaveBeenCalledWith(true, { strategy: "overflow" });
+
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
+
+    expect(result.current.isMobileNavVisible).toBe(true);
 
     act(() => {
       result.current.closeMobileNav();
     });
 
-    // Оверлей остаётся в DOM до конца exit-анимации.
     expect(result.current.isMobileNavOpen).toBe(false);
+    expect(result.current.isMobileNavVisible).toBe(false);
     expect(result.current.isMobileNavMounted).toBe(true);
 
     act(() => {

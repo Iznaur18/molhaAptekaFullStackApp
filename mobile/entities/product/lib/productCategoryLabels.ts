@@ -26,8 +26,13 @@ export const PRODUCT_CATEGORY_AUTOMOBILES = "automobiles";
 export const PRODUCT_CATEGORY_TRAVEL_SERVICES = "travel_services";
 export const PRODUCT_CATEGORY_FOOD = "food";
 
-/** Порядок — для сетки `/catalog` (синхрон с web `PRODUCT_CATEGORIES`). */
-export const PRODUCT_CATEGORIES = [
+/**
+ * TEMP: flat hardcoded category list off — UI/admin pickers use tree/API only.
+ * Labels stay for legacy display. Sync with web `productConstants.js`.
+ */
+export const IS_HARDCODED_PRODUCT_CATEGORIES_ENABLED = false;
+
+export const PRODUCT_CATEGORIES_HARDCODED = [
   PRODUCT_CATEGORY_GROCERY,
   PRODUCT_CATEGORY_ELECTRONICS,
   PRODUCT_CATEGORY_CLOTHING,
@@ -56,6 +61,10 @@ export const PRODUCT_CATEGORIES = [
   PRODUCT_CATEGORY_TRAVEL_SERVICES,
   PRODUCT_CATEGORY_FOOD,
 ] as const;
+
+/** Порядок — для сетки `/catalog` / admin legacy-picker’ов (синхрон с web). */
+export const PRODUCT_CATEGORIES: readonly (typeof PRODUCT_CATEGORIES_HARDCODED)[number][] =
+  IS_HARDCODED_PRODUCT_CATEGORIES_ENABLED ? [...PRODUCT_CATEGORIES_HARDCODED] : [];
 
 export const PRODUCT_CATEGORY_LABEL_RU: Record<string, string> = {
   grocery: "Продукты питания",

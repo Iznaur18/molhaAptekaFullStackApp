@@ -60,8 +60,6 @@ const PATH_TO_VIEW = new Map(
 /** Старые закладки; на Express :4444 по-прежнему 404. */
 const LEGACY_PATH_TO_VIEW = new Map([
   ["/users", "users"],
-  ["/moderation-seller-categories", "intro-ad-moderation"],
-  ["/staff-raffles", "intro-ad-moderation"],
   ["/product-manage-toggle-display-admin", "site-header-banner-admin"],
   ["/affiliate-listings", "partner-program"],
 ]);

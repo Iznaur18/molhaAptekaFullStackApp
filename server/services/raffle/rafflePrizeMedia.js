@@ -1,6 +1,5 @@
 import {
   RAFFLE_PRIZE_MEDIA_TYPE_IMAGE,
-  RAFFLE_PRIZE_MEDIA_TYPE_VIDEO,
   RAFFLE_PRIZE_MEDIA_TYPES,
 } from "../../constants/raffleConstants.js";
 import { normalizeStoredUploadUrl } from "../upload/buildPublicUploadUrl.js";

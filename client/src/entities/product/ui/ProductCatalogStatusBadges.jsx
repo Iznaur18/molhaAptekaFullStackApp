@@ -1,5 +1,4 @@
 import { formatCatalogNearDistanceLabel } from "@molha/api-contract";
-import { formatProductWholesaleBadgeLabel } from "@izibuy/shared-lib";
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
 import {
   getProductPromotionTierLabel,

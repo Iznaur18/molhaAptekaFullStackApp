@@ -555,6 +555,8 @@
   --my-profile-mobile-nav-exit-ms: 280ms;
   --my-profile-mobile-nav-enter-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --my-profile-mobile-nav-exit-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* tablet/desktop drawer: слева; phone переопределяет в @container ≤640 */
+  --my-profile-nav-hidden-x: calc(-100% - 0.75rem);
 
   position: fixed;
   inset: 0;
@@ -652,76 +654,68 @@
   overscroll-behavior: none;
   touch-action: none;
   -webkit-tap-highlight-color: transparent;
+  transition: opacity var(--my-profile-mobile-nav-exit-ms)
+    var(--my-profile-mobile-nav-exit-ease);
 }
 
-/* Появление/уход рисуют keyframes по data-state портала. Один флаг isMobileNavOpen
-   управляет и enter, и exit — без промежуточного visible-состояния и rAF-флипа. */
-@keyframes my-profile-nav-scrim-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+/* Drawer styles на portal (вне @container): иначе portaled sheet не анимируется стабильно. */
+.my-profile-page__mobile-nav-portal .my-profile-page__sidebar-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  width: var(--my-profile-mobile-nav-width);
+  max-width: var(--my-profile-mobile-nav-width);
+  padding: 0.65rem 0.45rem 0.65rem 0.65rem;
+  border-radius: 0 2rem 2rem 0;
+  corner-shape: squircle;
+  background: var(--iz-color-surface);
+  box-shadow: 12px 0 32px color-mix(in srgb, var(--iz-color-ink) 18%, transparent);
+  transform: translate3d(var(--my-profile-nav-hidden-x), 0, 0);
+  transition: transform var(--my-profile-mobile-nav-exit-ms)
+    var(--my-profile-mobile-nav-exit-ease);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  pointer-events: none;
+  will-change: transform;
 }
 
-@keyframes my-profile-nav-scrim-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
+.my-profile-page__mobile-nav-portal .my-profile-page__sidebar {
+  min-height: 100%;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
-@keyframes my-profile-nav-drawer-in {
-  from {
-    transform: translateX(var(--my-profile-nav-hidden-x, 0));
-  }
-  to {
-    transform: translateX(0);
-  }
+.my-profile-page__mobile-nav-portal--open {
+  pointer-events: auto;
 }
 
-@keyframes my-profile-nav-drawer-out {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(var(--my-profile-nav-hidden-x, 0));
-  }
-}
-
-.my-profile-page__mobile-nav-portal[data-state="open"] .my-profile-page__mobile-nav-backdrop {
+.my-profile-page__mobile-nav-portal--open .my-profile-page__mobile-nav-backdrop {
   opacity: 1;
   pointer-events: auto;
-  animation: my-profile-nav-scrim-in var(--my-profile-mobile-nav-enter-ms) ease both;
+  transition: opacity var(--my-profile-mobile-nav-enter-ms)
+    var(--my-profile-mobile-nav-enter-ease);
 }
 
-.my-profile-page__mobile-nav-portal[data-state="closing"] .my-profile-page__mobile-nav-backdrop {
-  opacity: 0;
-  pointer-events: none;
-  animation: my-profile-nav-scrim-out var(--my-profile-mobile-nav-exit-ms) ease both;
-}
-
-.my-profile-page__mobile-nav-portal[data-state="open"] .my-profile-page__sidebar-wrap {
-  transform: translateX(0);
+.my-profile-page__mobile-nav-portal--open .my-profile-page__sidebar-wrap {
+  transform: translate3d(0, 0, 0);
   pointer-events: auto;
-  animation: my-profile-nav-drawer-in var(--my-profile-mobile-nav-enter-ms)
-    var(--my-profile-mobile-nav-enter-ease) both;
-}
-
-.my-profile-page__mobile-nav-portal[data-state="closing"] .my-profile-page__sidebar-wrap {
-  transform: translateX(var(--my-profile-nav-hidden-x, 0));
-  pointer-events: none;
-  animation: my-profile-nav-drawer-out var(--my-profile-mobile-nav-exit-ms)
-    var(--my-profile-mobile-nav-exit-ease) both;
+  transition: transform var(--my-profile-mobile-nav-enter-ms)
+    var(--my-profile-mobile-nav-enter-ease);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .my-profile-page__mobile-nav-portal[data-state] .my-profile-page__mobile-nav-backdrop,
-  .my-profile-page__mobile-nav-portal[data-state] .my-profile-page__sidebar-wrap {
-    animation: none;
+  .my-profile-page__mobile-nav-portal .my-profile-page__mobile-nav-backdrop,
+  .my-profile-page__mobile-nav-portal .my-profile-page__sidebar-wrap {
+    transition-duration: 100ms;
   }
 }
 
@@ -752,36 +746,9 @@
     display: block;
   }
 
-  .my-profile-page__sidebar-wrap {
-    /* стартовая позиция за левым краем; direction задаёт data-state-анимация */
+  .my-profile-page__mobile-nav-portal .my-profile-page__sidebar-wrap {
+    /* tablet: слева; phone override ниже */
     --my-profile-nav-hidden-x: calc(-100% - 0.75rem);
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    z-index: 1;
-    flex: 0 0 auto;
-    width: var(--my-profile-mobile-nav-width);
-    max-width: var(--my-profile-mobile-nav-width);
-    padding: 0.65rem 0.45rem 0.65rem 0.65rem;
-    border-radius: 0 2rem 2rem 0;
-    corner-shape: squircle;
-    background: var(--iz-color-surface);
-    box-shadow: 12px 0 32px color-mix(in srgb, var(--iz-color-ink) 18%, transparent);
-    transform: translateX(var(--my-profile-nav-hidden-x));
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-    pointer-events: none;
-  }
-
-  .my-profile-page__sidebar {
-    min-height: 100%;
-    border: none;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
   }
 }
 
@@ -836,21 +803,17 @@
     display: inline-flex;
   }
 
-  .my-profile-page__sidebar-wrap {
+  .my-profile-page__mobile-nav-portal .my-profile-page__sidebar-wrap {
     /* телефон: sheet выезжает справа — стартовая позиция за правым краем */
     --my-profile-nav-hidden-x: calc(100% + 0.75rem);
     left: auto;
     right: 0;
-    top: 0;
-    bottom: 0;
     width: min(18rem, 88vw);
     max-width: min(18rem, 88vw);
     padding: 0.75rem 0.65rem 0.75rem 0.75rem;
     border-radius: 2rem 0 0 2rem;
-    corner-shape: squircle;
-    background: var(--iz-color-surface);
     box-shadow: -12px 0 32px color-mix(in srgb, var(--iz-color-ink) 18%, transparent);
-    transform: translateX(var(--my-profile-nav-hidden-x));
+    transform: translate3d(var(--my-profile-nav-hidden-x), 0, 0);
   }
 
   .my-profile-page__body .user-details-modal__banner {

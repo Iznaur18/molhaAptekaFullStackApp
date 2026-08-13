@@ -1,5 +1,4 @@
 import {
-  MY_PRODUCTS_MODERATION_FILTER_VALUES,
   PRODUCT_MODERATION_APPROVED,
 } from "../../constants/productModerationConstants.js";
 import {

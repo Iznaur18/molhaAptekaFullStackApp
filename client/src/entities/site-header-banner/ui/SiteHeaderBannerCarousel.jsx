@@ -9,13 +9,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { SITE_HEADER_BANNER_UI } from "../../../shared/config/appUiCopy.js";
-import { openSiteHeaderBannerLink } from "../../../shared/lib/openSiteHeaderBannerLink.js";
+import {
+  isExternalHttpUrl,
+  openSiteHeaderBannerLink,
+  resolveSiteHeaderBannerHref,
+} from "../../../shared/lib/openSiteHeaderBannerLink.js";
 import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
 
 import "./SiteHeaderBannerCarousel.css";
 
 /** За этим порогом жест считается свайпом, а не кликом по слайду. */
-const CLICK_MOVE_TOLERANCE_PX = 10;
+const CLICK_MOVE_TOLERANCE_PX = 16;
 /**
  * Слайды уже виджета (peek с обеих сторон), поэтому для бесшовного loop Embla
  * нужны копии соседей слева и справа. Тайлим оригинал до этого минимума, а
@@ -98,16 +102,40 @@ export function SiteHeaderBannerCarousel({ slides }) {
     [emblaApi],
   );
 
+  /**
+   * @param {MouseEvent | import('react').MouseEvent} event
+   * @param {string | null | undefined} linkPath
+   */
   const handleSlideActivate = (event, linkPath) => {
-    if (!linkPath) {
+    const href = resolveSiteHeaderBannerHref(linkPath);
+    if (!href) {
       return;
     }
+
+    if (
+      hasCarousel &&
+      emblaApi &&
+      typeof emblaApi.clickAllowed === "function" &&
+      !emblaApi.clickAllowed()
+    ) {
+      event.preventDefault();
+      return;
+    }
+
     const movedX = Math.abs(event.clientX - pointerDownRef.current.x);
     const movedY = Math.abs(event.clientY - pointerDownRef.current.y);
     if (movedX > CLICK_MOVE_TOLERANCE_PX || movedY > CLICK_MOVE_TOLERANCE_PX) {
+      event.preventDefault();
       return;
     }
-    const resolved = openSiteHeaderBannerLink(linkPath);
+
+    if (isExternalHttpUrl(href)) {
+      // target=_blank на <a> — native; preventDefault не нужен
+      return;
+    }
+
+    event.preventDefault();
+    const resolved = openSiteHeaderBannerLink(href);
     if (resolved) {
       navigate(resolved);
     }
@@ -124,7 +152,9 @@ export function SiteHeaderBannerCarousel({ slides }) {
    */
   const renderSlide = (slide, key, isActive, { fullWidth = false } = {}) => {
     const imageSrc = resolveImageUrlForDisplay(slide.imageUrl);
-    const isInteractive = Boolean(slide.linkPath);
+    const href = resolveSiteHeaderBannerHref(slide.linkPath);
+    const isInteractive = Boolean(href);
+    const isExternal = Boolean(href && isExternalHttpUrl(href));
     const slideStyle = slide.backgroundColor
       ? { backgroundColor: slide.backgroundColor }
       : undefined;
@@ -153,16 +183,18 @@ export function SiteHeaderBannerCarousel({ slides }) {
         aria-hidden={!isActive}
       >
         {isInteractive ? (
-          <button
-            type="button"
+          <a
             className="site-header-banner-carousel__link"
+            href={href}
+            target={isExternal ? "_blank" : undefined}
+            rel={isExternal ? "noopener noreferrer" : undefined}
             onPointerDownCapture={(event) => {
               pointerDownRef.current = { x: event.clientX, y: event.clientY };
             }}
             onClick={(event) => handleSlideActivate(event, slide.linkPath)}
           >
             {content}
-          </button>
+          </a>
         ) : (
           <div className="site-header-banner-carousel__static">{content}</div>
         )}

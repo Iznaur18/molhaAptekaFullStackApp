@@ -6,7 +6,6 @@ import {
   PRODUCT_REPORT_TEXT_MAX_CHARS,
 } from "../../constants/productReportConstants.js";
 import {
-  dismissPendingReportsForProduct,
   getPendingProductReportGroups,
   notifySellerAboutProductReport,
   resolvePendingReportsForProduct,

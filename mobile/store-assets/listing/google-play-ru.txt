@@ -29,7 +29,7 @@ iziBuy — приложение для покупателей маркетпле
 маркетплейс, покупки, доставка, каталог, заказ
 
 ## Контактный email
-support@izibuy.ru
+iznaur.guzhaev@mail.ru
 
 ## Privacy Policy URL
 https://izibuy.ru/privacy.html

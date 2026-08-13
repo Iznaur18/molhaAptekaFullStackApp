@@ -247,15 +247,9 @@ export function renderProfileTabPanel(mainView, props) {
       );
     case "seller-personal-category-moderation":
       return (
-        <LazyIntroAdModerationPage
-          onQueueChanged={() => {
-            refreshPendingIntroAdModerationCount?.();
-            void refreshPendingRafflesCount?.();
-            void refreshRaffleSurfaces?.();
-            void refreshCatalogFeed?.();
-          }}
-          onEditRaffle={(raffle) =>
-            setRaffleModal({ mode: "edit", raffle, useStaffApi: true })
+        <LazySellerPersonalCategoryModerationPage
+          refreshPendingSellerPersonalCategoryModerationCount={
+            refreshPendingSellerPersonalCategoryModerationCount
           }
         />
       );
@@ -269,9 +263,8 @@ export function renderProfileTabPanel(mainView, props) {
       );
     case "staff-raffles":
       return (
-        <LazyIntroAdModerationPage
+        <LazyRafflesStaffPage
           onQueueChanged={() => {
-            refreshPendingIntroAdModerationCount?.();
             void refreshPendingRafflesCount?.();
             void refreshRaffleSurfaces?.();
             void refreshCatalogFeed?.();

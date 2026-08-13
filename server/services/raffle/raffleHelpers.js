@@ -4,7 +4,6 @@ import { ORDER_STATUS_CONFIRMED } from "../../constants/orderConstants.js";
 import {
   RAFFLE_STATUS_ACTIVE,
   RAFFLE_STATUS_COMPLETED,
-  RAFFLE_STATUS_PAUSED,
   SITE_RAFFLES_ACTIVE_VITRINE_MAX,
   SITE_RAFFLES_COMPLETED_VITRINE_MAX,
 } from "../../constants/raffleConstants.js";

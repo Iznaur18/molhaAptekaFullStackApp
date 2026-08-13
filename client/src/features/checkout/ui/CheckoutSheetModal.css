@@ -156,14 +156,6 @@
 @media (prefers-reduced-motion: reduce) {
   .checkout-sheet-modal__scrim,
   .checkout-sheet-modal__panel {
-    transition: none;
-  }
-
-  .checkout-sheet-modal__panel {
-    transform: none;
-  }
-
-  .checkout-sheet-modal__scrim {
-    opacity: 1;
+    transition-duration: 90ms;
   }
 }

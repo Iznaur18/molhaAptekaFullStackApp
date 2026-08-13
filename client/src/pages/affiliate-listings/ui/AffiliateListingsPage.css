@@ -79,3 +79,8 @@
   font-weight: 600;
   color: var(--iz-color-text, #111827);
 }
+
+.affiliate-listings-page__row-amount {
+  color: var(--iz-color-action, #1f6feb);
+  font-weight: 600;
+}

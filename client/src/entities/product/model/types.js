@@ -1,5 +1,5 @@
 /**
- * @typedef {import('./productConstants.js').PRODUCT_CATEGORIES[number]} ProductCategory
+ * @typedef {import('./productConstants.js').PRODUCT_CATEGORIES_HARDCODED[number]} ProductCategory
  */
 
 /**

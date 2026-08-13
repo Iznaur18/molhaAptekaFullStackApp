@@ -19,7 +19,7 @@ if (!isSmtpConfigured()) {
 try {
   await sendSmtpMail({
     to: recipient,
-    subject: "Izibuy — тест SMTP",
+    subject: "Torgum — тест SMTP",
     text: "Если вы видите это письмо, SMTP настроен правильно.",
     html: "<p>Если вы видите это письмо, <strong>SMTP настроен правильно</strong>.</p>",
   });

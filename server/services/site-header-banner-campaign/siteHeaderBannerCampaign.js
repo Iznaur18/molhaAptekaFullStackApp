@@ -69,6 +69,8 @@ export async function submitSiteHeaderBannerCampaign({ userId, body }) {
               advertiserId: userId,
               status: SITE_HEADER_BANNER_CAMPAIGN_STATUS_PENDING,
               ...payload,
+              // Пустая ссылка → витрина рекламодателя (иначе клик по баннеру мёртвый).
+              linkPath: payload.linkPath || `/seller/${userId}`,
               amountPoints: SITE_HEADER_BANNER_CAMPAIGN_PRICE_POINTS,
               pointsReservedAt: reservedAt,
             },

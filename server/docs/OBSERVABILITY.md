@@ -29,6 +29,14 @@ Middleware `accessLogMW` (сразу после `requestIdMW`).
 | `latencyMs` | до `res.finish` |
 | `sampled` | `true` если попал по sample rate; `false` для status ≥ 400 (всегда) |
 
+Env `LOG_FORMAT=json|pretty`:
+
+| Значение | Поведение |
+| -------- | --------- |
+| unset | `development` → pretty (читаемые строки в терминале), иначе json |
+| `json` | одна JSON-строка (prod / journald) |
+| `pretty` | `GET /auth/me → 304  (10ms)` и т.п. |
+
 Env `ACCESS_LOG_SAMPLE_RATE` (0..1):
 
 | Значение | Поведение |

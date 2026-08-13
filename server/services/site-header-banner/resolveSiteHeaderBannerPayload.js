@@ -59,6 +59,24 @@ export const resolvePublicSiteHeaderBannerSlides = (row) => {
 };
 
 /**
+ * Платный баннер без явной ссылки ведёт на витрину рекламодателя.
+ * @param {{ linkPath?: unknown; advertiserId?: unknown }} row
+ * @returns {string | null}
+ */
+export const resolvePaidSiteHeaderBannerCampaignLinkPath = (row) => {
+  const raw =
+    row.linkPath == null || String(row.linkPath).trim() === ""
+      ? null
+      : String(row.linkPath).trim();
+  if (raw) {
+    return raw;
+  }
+  const advertiserId =
+    row.advertiserId == null ? "" : String(row.advertiserId).trim();
+  return advertiserId ? `/seller/${advertiserId}` : null;
+};
+
+/**
  * @returns {Promise<Array<{
  *   id: string;
  *   imageUrl: string;
@@ -86,10 +104,7 @@ export const resolveActivePaidSiteHeaderBannerCampaignSlides = async (
       id: `paid:${String(row._id)}`,
       imageUrl: String(row.imageUrl).trim(),
       imageAlt: String(row.imageAlt ?? "").trim() || "Баннер",
-      linkPath:
-        row.linkPath == null || String(row.linkPath).trim() === ""
-          ? null
-          : String(row.linkPath).trim(),
+      linkPath: resolvePaidSiteHeaderBannerCampaignLinkPath(row),
       backgroundColor:
         row.backgroundColor == null || String(row.backgroundColor).trim() === ""
           ? null

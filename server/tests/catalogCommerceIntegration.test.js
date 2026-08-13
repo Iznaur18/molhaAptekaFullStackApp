@@ -7,7 +7,6 @@ import { ProductModel } from "../models/index.js";
 import { startHttpTestServer, stopHttpTestServer } from "./helpers/httpTestApp.js";
 import {
   approveProductViaApi,
-  assertProductCreateOk,
   buildOrderBody,
   buildTestProductPayload,
   createProductViaApi,
@@ -109,27 +108,23 @@ test("commerce: PUT /cart → POST /order (approved product)", async () => {
 test("seller limit: POST /product сверх лимита → 403", async () => {
   await seedCatalogFixture();
 
-  const { cookie: sellerCookie } = await registerUserAndGetCookie(
+  const { cookie: sellerCookie, user: seller } = await registerUserAndGetCookie(
     request,
     "seller-limit",
   );
   await verifyUserEmail("int-seller-limit@example.com");
 
-  for (let i = 0; i < SELLER_PRODUCTS_LIMIT_REGULAR; i += 1) {
-    const response = await request("/product", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: sellerCookie,
-      },
-      body: JSON.stringify(
-        buildTestProductPayload({
-          productName: `Limit Product ${i + 1}`,
-        }),
-      ),
-    });
-    assertProductCreateOk(response.status);
-  }
+  // Засеваем товары до лимита напрямую в БД: часовой rate limit на POST /product
+  // (30/час) сработал бы раньше лимита продавца (50) и не дал бы проверить именно
+  // бизнес-правило лимита. Прямой insert проверяет счётчик countSellerProducts.
+  await ProductModel.insertMany(
+    Array.from({ length: SELLER_PRODUCTS_LIMIT_REGULAR }, (_unused, i) => ({
+      productName: `Limit Product ${i + 1}`,
+      productPrice: 100,
+      productCategory: "electronics",
+      productSeller: seller._id,
+    })),
+  );
 
   const blocked = await request("/product", {
     method: "POST",

@@ -2,6 +2,10 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { HEADER_USERS_BUTTON_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  prefersReducedMotion,
+  scheduleOpenAfterPaint,
+} from "../../../shared/lib/scheduleOpenAfterPaint.js";
 import { AppIcon, LayoutGrid } from "../../../shared/ui/icon/index.js";
 import { buildHeaderUsersMenuItems } from "../lib/buildHeaderUsersMenuItems.js";
 import {
@@ -45,12 +49,17 @@ export function HeaderUsersStretchMenu({ activeItemKey = null, onItemAction }) {
   };
 
   useEffect(() => {
+    if (!isOpen || !portalVisible) {
+      return undefined;
+    }
+
+    return scheduleOpenAfterPaint(setIsExpanded);
+  }, [isOpen, portalVisible]);
+
+  useEffect(() => {
     if (isOpen) {
       setPortalVisible(true);
-      const frame = requestAnimationFrame(() => {
-        setIsExpanded(true);
-      });
-      return () => cancelAnimationFrame(frame);
+      return undefined;
     }
 
     setIsExpanded(false);
@@ -58,10 +67,14 @@ export function HeaderUsersStretchMenu({ activeItemKey = null, onItemAction }) {
       return undefined;
     }
 
+    const waitMs = prefersReducedMotion()
+      ? Math.min(HEADER_USERS_STRETCH_ANIM_MS, 100)
+      : HEADER_USERS_STRETCH_ANIM_MS;
+
     const timeoutId = window.setTimeout(() => {
       setPortalVisible(false);
       setPortalAnchor(null);
-    }, HEADER_USERS_STRETCH_ANIM_MS);
+    }, waitMs);
 
     return () => window.clearTimeout(timeoutId);
   }, [isOpen, portalVisible]);

@@ -97,7 +97,7 @@ export function AffiliateListingsPage({
                     {row.productName}
                   </span>
                 ) : null}
-                <span>
+                <span className="affiliate-listings-page__row-amount">
                   {AFFILIATE_LISTINGS_PAGE_UI.EARNINGS_AMOUNT}: {row.amount}
                 </span>
                 <span>

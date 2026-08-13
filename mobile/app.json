@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "iziBuy",
+    "name": "Torgum",
     "slug": "izibuy",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -36,7 +36,7 @@
         }
       ],
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#F25623",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -64,14 +64,14 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "iziBuy нужен доступ к фото для загрузки аватара"
+          "photosPermission": "Torgum нужен доступ к фото для загрузки аватара"
         }
       ],
       [
         "expo-notifications",
         {
           "icon": "./assets/images/icon.png",
-          "color": "#E6F4FE"
+          "color": "#F25623"
         }
       ]
     ],

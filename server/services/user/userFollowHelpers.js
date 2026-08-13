@@ -15,7 +15,7 @@ import { createUserInAppNotification } from "./userInAppNotifications.js";
 import { getHiddenSellerIds } from "../access/adminUserGuard.js";
 
 const USER_LIST_SELECT =
-  "userName userAvatarUrl userAvatarFocus isPremiumUser isUserDataConfirmed userRatingByVotes";
+  "userName userAvatarUrl userAvatarFocus isPremiumUser isUserDataConfirmed userRatingByVotes userLoyaltyPoints";
 
 /**
  * @param {string} followerId
@@ -171,13 +171,15 @@ export async function listUserFollowRelations({
     UserFollowModel.countDocuments(filter),
   ]);
 
-  const users = rows
-    .map((row) => (role === "followers" ? row.followerId : row.followingId))
-    .filter(Boolean)
-    .map((user) => ({
-      ...user,
-      _id: String(user._id),
-    }));
+  const users = await attachFollowersCountToUsers(
+    rows
+      .map((row) => (role === "followers" ? row.followerId : row.followingId))
+      .filter(Boolean)
+      .map((user) => ({
+        ...user,
+        _id: String(user._id),
+      })),
+  );
 
   return {
     users,

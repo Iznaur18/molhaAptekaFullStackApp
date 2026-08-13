@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
 import {
-  ORDER_STATUS_CANCELLED,
   ORDER_STATUS_CONFIRMED,
   ORDER_STATUS_DELIVERED,
   ORDER_STATUS_PENDING,

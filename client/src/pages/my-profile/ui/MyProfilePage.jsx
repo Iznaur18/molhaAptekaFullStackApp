@@ -150,6 +150,7 @@ export function MyProfilePage({
     isDrawerLayout,
     isMobileNavOpen,
     isMobileNavMounted,
+    isMobileNavVisible,
     closeMobileNav,
     openMobileNav,
     avatarLoadFailed,
@@ -241,15 +242,19 @@ export function MyProfilePage({
           ? isMobileNavMounted
             ? createPortal(
                 <div
-                  className="my-profile-page__mobile-nav-portal"
+                  className={[
+                    "my-profile-page__mobile-nav-portal",
+                    isMobileNavVisible && "my-profile-page__mobile-nav-portal--open",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                   role="presentation"
-                  data-state={isMobileNavOpen ? "open" : "closing"}
                 >
                   <button
                     type="button"
                     className="my-profile-page__mobile-nav-backdrop"
                     aria-label={MY_PROFILE_PAGE_UI.MOBILE_NAV_CLOSE_ARIA}
-                    tabIndex={isMobileNavOpen ? 0 : -1}
+                    tabIndex={isMobileNavVisible ? 0 : -1}
                     onClick={closeMobileNav}
                   />
                   <div className="my-profile-page__sidebar-wrap">

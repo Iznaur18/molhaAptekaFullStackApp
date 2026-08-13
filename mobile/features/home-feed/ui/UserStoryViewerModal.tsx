@@ -333,7 +333,7 @@ export const UserStoryViewerModal = ({
                     <Image
                       source={{ uri: underlayImageUrl }}
                       style={[styles.media, styles.mediaUnderlay]}
-                      contentFit="cover"
+                      contentFit="contain"
                     />
                   ) : null}
                   {activeStory.mediaType === USER_STORY_MEDIA_TYPE_VIDEO ? (
@@ -355,7 +355,7 @@ export const UserStoryViewerModal = ({
                         styles.mediaActive,
                         isMediaLoading && styles.mediaHidden,
                       ]}
-                      contentFit="cover"
+                      contentFit="contain"
                       transition={340}
                       onLoad={() => setIsMediaLoading(false)}
                       onError={() => {

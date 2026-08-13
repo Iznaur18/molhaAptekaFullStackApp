@@ -168,7 +168,7 @@
 @media (prefers-reduced-motion: reduce) {
   .header-users-stretch__shell,
   .header-users-stretch__items {
-    transition: none;
+    transition-duration: 90ms;
   }
 
   .header-users-stretch__shell {

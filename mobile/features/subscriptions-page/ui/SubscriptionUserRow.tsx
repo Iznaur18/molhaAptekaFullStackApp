@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { Pressable, View } from "react-native";
+import { useMemo, useState } from "react";
+import { Pressable, Text, View } from "react-native";
 
+import { formatSearchRowRatingCompact } from "@/entities/user/lib/formatSearchRowRating";
 import { getUserAvatarFocus } from "@/entities/user/lib/profileImageFocus";
 import { pickUserProfilePhotoUrl } from "@/entities/user/lib/pickUserProfilePhotoUrl";
 import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
@@ -19,6 +20,9 @@ type SubscriptionUserRowProps = {
     userName?: string;
     isPremiumUser?: boolean;
     isUserDataConfirmed?: boolean;
+    userRatingByVotes?: { countVotes?: number; totalRating?: number };
+    followersCount?: number;
+    userLoyaltyPoints?: number;
   };
   onRowClick: (userId: string) => void;
 };
@@ -30,6 +34,19 @@ export const SubscriptionUserRow = ({ user, onRowClick }: SubscriptionUserRowPro
   const picked = pickUserProfilePhotoUrl(user);
   const uri = !imgFailed && picked ? picked : DEFAULT_USER_AVATAR_URL;
   const displayName = user.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
+
+  const ratingText = useMemo(
+    () => formatSearchRowRatingCompact(user.userRatingByVotes),
+    [user.userRatingByVotes],
+  );
+  const followersText = useMemo(() => {
+    const value = Number(user.followersCount);
+    return Number.isFinite(value) ? String(Math.max(0, Math.floor(value))) : "0";
+  }, [user.followersCount]);
+  const loyaltyPointsText = useMemo(() => {
+    const value = Number(user.userLoyaltyPoints);
+    return Number.isFinite(value) ? String(Math.max(0, Math.floor(value))) : "0";
+  }, [user.userLoyaltyPoints]);
 
   return (
     <Pressable
@@ -50,14 +67,32 @@ export const SubscriptionUserRow = ({ user, onRowClick }: SubscriptionUserRowPro
           onError={() => setImgFailed(true)}
           style={styles.avatar}
         />
-        <View style={styles.nameWrap}>
-          <UserPremiumDisplayName
-            name={displayName}
-            isPremium={user.isPremiumUser === true}
-            isUserDataConfirmed={user.isUserDataConfirmed === true}
-            badgeSize={16}
-            textStyle={styles.nameText}
-          />
+        <View style={styles.body}>
+          <View style={styles.nameWrap}>
+            <UserPremiumDisplayName
+              name={displayName}
+              isPremium={user.isPremiumUser === true}
+              isUserDataConfirmed={user.isUserDataConfirmed === true}
+              badgeSize={16}
+              textStyle={styles.nameText}
+            />
+          </View>
+          <View style={styles.metrics}>
+            <View style={styles.metric}>
+              <Text style={styles.metricLabel}>{USER_LIST_ROW_UI.RATING_SCORE_LABEL}</Text>
+              <Text style={styles.metricValue}>{ratingText}</Text>
+            </View>
+            <View style={styles.metricSep} />
+            <View style={styles.metric}>
+              <Text style={styles.metricLabel}>{USER_LIST_ROW_UI.FOLLOWERS_LABEL}</Text>
+              <Text style={styles.metricValue}>{followersText}</Text>
+            </View>
+            <View style={styles.metricSep} />
+            <View style={styles.metric}>
+              <Text style={styles.metricLabel}>{USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL}</Text>
+              <Text style={styles.metricValue}>{loyaltyPointsText}</Text>
+            </View>
+          </View>
         </View>
       </SquircleView>
     </Pressable>
