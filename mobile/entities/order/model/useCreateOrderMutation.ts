@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { createClientIdempotencyKey } from "@/shared/lib/createClientIdempotencyKey";
 import { readPersistedAffiliateCode } from "@/shared/lib/affiliateCodeStorage";
+import { loyaltyPointsQueryKeys } from "@/shared/api";
 
 import { createOrder, type CreateOrderPayload } from "../api/createOrder";
 
@@ -25,6 +26,7 @@ export const useCreateOrderMutation = () => {
       });
     },
     onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.all });
       void queryClient.invalidateQueries({ queryKey: appliedMineKey });
       queryClient.removeQueries({ queryKey: appliedMineKey });
     },

@@ -20,7 +20,7 @@ EXPO_PUBLIC_WEB_APP_URL=http://127.0.0.1:5173
 ## Prod
 
 ```bash
-EXPO_PUBLIC_WEB_APP_URL=https://izibuy.ru
+EXPO_PUBLIC_WEB_APP_URL=https://torgum.ru
 ```
 
 ## Для разработчиков

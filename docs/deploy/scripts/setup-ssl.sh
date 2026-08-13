@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Получение/проверка Let's Encrypt SSL для izibuy.ru через certbot + nginx.
+# Получение/проверка Let's Encrypt SSL для torgum.ru через certbot + nginx.
 # Запуск на VPS: ./docs/deploy/scripts/setup-ssl.sh [email]
 set -euo pipefail
 
-PRIMARY_DOMAIN="${IZIBUY_DOMAIN:-izibuy.ru}"
+PRIMARY_DOMAIN="${TORGUM_DOMAIN:-torgum.ru}"
 WWW_DOMAIN="www.${PRIMARY_DOMAIN}"
 CERTBOT_EMAIL="${1:-}"
 NGINX_SITE="/etc/nginx/sites-available/izibuy"

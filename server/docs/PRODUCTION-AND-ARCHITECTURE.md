@@ -106,7 +106,7 @@ molhaAptekaFullStackApp/
 
 Сервер (`server/utils/buildPublicUploadUrl.js`):
 
-- если задан **`PUBLIC_UPLOAD_BASE_URL`** → полный URL: `https://izibuy.ru/uploads/xxx.mp4`
+- если задан **`PUBLIC_UPLOAD_BASE_URL`** → полный URL: `https://torgum.ru/uploads/xxx.mp4`
 - иначе → **относительный** путь: `/uploads/xxx.mp4`
 
 Клиент (`client/src/shared/lib/resolveUploadedImageUrl.js`) для путей с `/` подставляет **`window.location.origin`** (origin **фронта**).
@@ -117,7 +117,7 @@ molhaAptekaFullStackApp/
 | ------------------------------------------------------------- | ------------------------------- | ------------------------ |
 | Dev + Vite proxy                                              | `/uploads/...`                  | proxy → Express ✅       |
 | Prod, фронт и API **раздельно**, без `PUBLIC_UPLOAD_BASE_URL` | origin **фронта**/uploads/...   | CDN статики → **404** ❌ |
-| **Вариант A:** один домен + nginx                             | `https://izibuy.ru/uploads/...` | nginx → Express ✅       |
+| **Вариант A:** один домен + nginx                             | `https://torgum.ru/uploads/...` | nginx → Express ✅       |
 
 ### 5.4. Persistent storage
 
@@ -132,9 +132,9 @@ molhaAptekaFullStackApp/
 ### Вариант A — один VPS + nginx ⭐ рекомендуется
 
 ```
-https://izibuy.ru/           → nginx → client/dist (статика SPA)
-https://izibuy.ru/auth/...   → nginx → proxy → Node :4444
-https://izibuy.ru/uploads/   → nginx → proxy → Node
+https://torgum.ru/           → nginx → client/dist (статика SPA)
+https://torgum.ru/auth/...   → nginx → proxy → Node :4444
+https://torgum.ru/uploads/   → nginx → proxy → Node
 ```
 
 **Плюсы:** один origin; `/uploads` без сюрпризов; быстрая статика; минимум CORS.
@@ -145,8 +145,8 @@ https://izibuy.ru/uploads/   → nginx → proxy → Node
 MONGO_URI=mongodb+srv://...
 JWT_SECRET=<длинная случайная строка>
 NODE_ENV=production
-FRONTEND_URL=https://izibuy.ru
-PUBLIC_UPLOAD_BASE_URL=https://izibuy.ru
+FRONTEND_URL=https://torgum.ru
+PUBLIC_UPLOAD_BASE_URL=https://torgum.ru
 PORT=4444
 DADATA_API_KEY=...
 DADATA_SECRET_KEY=...
@@ -162,11 +162,11 @@ DADATA_SECRET_KEY=...
 
 ```env
 # client/.env при build
-VITE_API_URL=https://api.izibuy.ru
+VITE_API_URL=https://api.torgum.ru
 
 # server/.env
-FRONTEND_URL=https://app.izibuy.ru
-PUBLIC_UPLOAD_BASE_URL=https://api.izibuy.ru
+FRONTEND_URL=https://app.torgum.ru
+PUBLIC_UPLOAD_BASE_URL=https://api.torgum.ru
 ```
 
 **Плюсы:** CDN для JS/CSS. **Минусы:** два origin, обязательны CORS и `PUBLIC_UPLOAD_BASE_URL`.
@@ -242,7 +242,7 @@ sudo ln -s /etc/nginx/sites-available/izibuy /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-SSL: `certbot --nginx -d izibuy.ru -d www.izibuy.ru`
+SSL: `certbot --nginx -d torgum.ru -d www.torgum.ru`
 
 ---
 

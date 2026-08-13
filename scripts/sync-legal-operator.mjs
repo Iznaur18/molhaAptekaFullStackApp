@@ -61,6 +61,7 @@ const syncStoreListings = async (config) => {
     const filePath = path.join(listingDir, fileName);
     let text = await fs.readFile(filePath, "utf8");
     text = text.replaceAll("https://ВАШ-ДОМЕН", config.siteUrl.replace(/\/$/, ""));
+    text = text.replaceAll("support@torgum.ru", config.contactEmail);
     text = text.replaceAll("support@izibuy.ru", config.contactEmail);
     text = text.replaceAll("iznaur.guzhaev@mail.ru", config.contactEmail);
     await fs.writeFile(filePath, text, "utf8");

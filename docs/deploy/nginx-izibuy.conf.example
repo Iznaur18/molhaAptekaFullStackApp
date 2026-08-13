@@ -6,13 +6,13 @@
 #    - root → каталог client/dist после npm run build
 #    - upstream → Express на 127.0.0.1:4444
 # 3. SSL (на VPS): docs/deploy/CERTBOT-SSL.md
-#    ./docs/deploy/scripts/setup-ssl.sh admin@izibuy.ru
-#    или: sudo certbot --nginx -d izibuy.ru -d www.izibuy.ru --redirect
+#    ./docs/deploy/scripts/setup-ssl.sh admin@torgum.ru
+#    или: sudo certbot --nginx -d torgum.ru -d www.torgum.ru --redirect
 #
 # server/.env для этого варианта:
-#   FRONTEND_URL=https://izibuy.ru
-#   PUBLIC_UPLOAD_BASE_URL=https://izibuy.ru   # disk
-#   UPLOAD_STORAGE=s3 + PUBLIC_UPLOAD_BASE_URL=https://cdn.izibuy.ru → см. PROD-S3-CDN.md
+#   FRONTEND_URL=https://torgum.ru
+#   PUBLIC_UPLOAD_BASE_URL=https://torgum.ru   # disk
+#   UPLOAD_STORAGE=s3 + PUBLIC_UPLOAD_BASE_URL=https://cdn.torgum.ru → см. PROD-S3-CDN.md
 #   PORT=4444
 #
 # client: собирать БЕЗ VITE_API_URL (запросы на тот же origin)
@@ -26,14 +26,14 @@ upstream izibuy_api {
 # server {
 #     listen 80;
 #     listen [::]:80;
-#     server_name izibuy.ru www.izibuy.ru;
-#     return 301 https://izibuy.ru$request_uri;
+#     server_name torgum.ru www.torgum.ru;
+#     return 301 https://torgum.ru$request_uri;
 # }
 
 server {
     listen 80;
     listen [::]:80;
-    server_name izibuy.ru www.izibuy.ru;
+    server_name torgum.ru www.torgum.ru;
 
     # Certbot (HTTP-01) — не удаляй до получения сертификата
     location ^~ /.well-known/acme-challenge/ {
@@ -215,10 +215,10 @@ server {
 
     # --- SPA (React Router) ---
     # CSP: cd server && node scripts/printSpaCspHeader.js  (из production .env)
-    # См. server/docs/CSP-HELMET.md — для S3 подставится https://cdn.izibuy.ru в img-src/media-src
+    # См. server/docs/CSP-HELMET.md — для S3 подставится https://cdn.torgum.ru в img-src/media-src
 
     location / {
-        add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: https://cdn.izibuy.ru; media-src 'self' blob: https: https://cdn.izibuy.ru; font-src 'self' data:; connect-src 'self' https://*.ingest.sentry.io; frame-ancestors 'self'; form-action 'self'; upgrade-insecure-requests;" always;
+        add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: https://cdn.torgum.ru; media-src 'self' blob: https: https://cdn.torgum.ru; font-src 'self' data:; connect-src 'self' https://*.ingest.sentry.io; frame-ancestors 'self'; form-action 'self'; upgrade-insecure-requests;" always;
         # Доп. security-заголовки (defense-in-depth к CSP).
         add_header X-Content-Type-Options "nosniff" always;
         add_header Referrer-Policy "strict-origin-when-cross-origin" always;

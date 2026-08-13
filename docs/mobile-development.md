@@ -129,7 +129,7 @@ Web: `resolveUploadedImageUrl` подставляет `window.location.origin` �
 Обязательно до релиза в сторы:
 
 ```env
-PUBLIC_UPLOAD_BASE_URL=https://cdn.izibuy.ru
+PUBLIC_UPLOAD_BASE_URL=https://cdn.torgum.ru
 # либо UPLOAD_STORAGE=s3 + CDN — см. server/docs/MEDIA-OBJECT-STORAGE.md
 ```
 
@@ -562,7 +562,7 @@ npx eas submit --platform ios
 
 ### MP-5 — Polish
 
-- [x] Deep links: `izibuy://` + `https://izibuy.ru` (`parseAppDeepLink`, `useAppDeepLinking`, intent filters)
+- [x] Deep links: `izibuy://` + `https://torgum.ru` (`parseAppDeepLink`, `useAppDeepLinking`, intent filters)
 - [x] In-app notifications poll (`useInAppNotificationsPoll`, 30s) + routing по kind
 - [x] Тёмная тема: `izColorsDark`, `ThemePreferenceToggle` (system/light/dark), nav/tab bar theming
 - [x] Remote push: `expo-notifications` + `PUT/DELETE /auth/me/push-token` + Expo Push API при `createUserInAppNotification`
@@ -643,7 +643,7 @@ npx eas submit --platform ios
 | `/raffle/:id` | `/raffle/[id]` | **full** | — |
 | Stories viewer | `HomeFeedHeader` + `UserStoryViewerModal` | **full** | create, delete own, video (WF-5.1 ✅) |
 | Story report (user) | `ReportUserStoryModal` в viewer | **full** | submit report (WF-5.2 ✅) |
-| Deep link `izibuy://` / `https://izibuy.ru` | `parseAppDeepLink` | **full** | product, raffle, seller, user, users (WF-7.1 ✅) |
+| Deep link `izibuy://` / `https://torgum.ru` | `parseAppDeepLink` | **full** | product, raffle, seller, user, users (WF-7.1 ✅) |
 | `/(auth)/login` | `/(auth)/login` | **full** | — |
 | `/(auth)/register` | `/(auth)/register` | **full** | parity с web register |
 | `/profile/edit` | `/profile/edit` | **full** | — |
@@ -802,7 +802,7 @@ Samsung cold-open deep links:
 | `izibuy://seller/<userId>` | `/seller/<userId>` |
 | `izibuy://user/<userId>` | `/user/<userId>` |
 | `izibuy://users` / `izibuy://user-list` | `/users` |
-| `https://izibuy.ru/product/<id>` | `/product/<id>` |
+| `https://torgum.ru/product/<id>` | `/product/<id>` |
 | `izibuy://hub/wishlist` | `/hub/wishlist` |
 | `izibuy://orders` | `/orders` |
 

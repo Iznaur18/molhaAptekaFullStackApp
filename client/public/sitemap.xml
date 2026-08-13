@@ -7,32 +7,32 @@
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://izibuy.ru/</loc>
+    <loc>https://torgum.ru/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://izibuy.ru/faq</loc>
+    <loc>https://torgum.ru/faq</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://izibuy.ru/legal/terms</loc>
+    <loc>https://torgum.ru/legal/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://izibuy.ru/legal/privacy</loc>
+    <loc>https://torgum.ru/legal/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://izibuy.ru/legal/offer</loc>
+    <loc>https://torgum.ru/legal/offer</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://izibuy.ru/legal/listing</loc>
+    <loc>https://torgum.ru/legal/listing</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

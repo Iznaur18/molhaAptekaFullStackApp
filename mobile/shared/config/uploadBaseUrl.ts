@@ -4,7 +4,7 @@ const trimTrailingSlash = (url: string) => url.replace(/\/$/, "");
 
 /**
  * CDN или API origin для `/uploads/...`.
- * Prod: EXPO_PUBLIC_UPLOAD_BASE_URL=https://cdn.izibuy.ru
+ * Prod: EXPO_PUBLIC_UPLOAD_BASE_URL=https://cdn.torgum.ru
  */
 export const UPLOAD_BASE_URL = (() => {
   const fromEnv = process.env.EXPO_PUBLIC_UPLOAD_BASE_URL?.trim();

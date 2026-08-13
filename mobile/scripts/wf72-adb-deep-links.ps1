@@ -9,14 +9,14 @@ param(
 )
 
 $links = @(
-  "izibuy://product/$ProductId",
-  "izibuy://raffle/$RaffleId",
-  "izibuy://seller/$SellerId",
-  "izibuy://user/$UserId",
-  "izibuy://users",
-  "izibuy://hub/wishlist",
-  "izibuy://orders",
-  "https://izibuy.ru/product/$ProductId"
+  "torgum://product/$ProductId",
+  "torgum://raffle/$RaffleId",
+  "torgum://seller/$SellerId",
+  "torgum://user/$UserId",
+  "torgum://users",
+  "torgum://hub/wishlist",
+  "torgum://orders",
+  "https://torgum.ru/product/$ProductId"
 )
 
 foreach ($uri in $links) {

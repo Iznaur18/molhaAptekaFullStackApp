@@ -102,33 +102,41 @@ const parseAppDeepLink = (url) => {
   try {
     const parsed = new URL(url);
     const scheme = parsed.protocol.replace(":", "");
-    if (scheme === "izibuy") {
+    if (scheme === "torgum" || scheme === "izibuy") {
       const hostPath = parsed.hostname
         ? `/${parsed.hostname}${parsed.pathname}`
         : parsed.pathname;
       return matchNamedRoute(normalizePath(hostPath));
     }
     const host = parsed.hostname.toLowerCase();
-    if (host === "izibuy.ru" || host === "www.izibuy.ru") {
+    if (
+      host === "torgum.ru" ||
+      host === "www.torgum.ru" ||
+      host === "izibuy.ru" ||
+      host === "www.izibuy.ru"
+    ) {
       return matchNamedRoute(normalizePath(parsed.pathname));
     }
   } catch {
-    const normalized = normalizePath(url.replace(/^izibuy:\/\//i, "/"));
+    const normalized = normalizePath(
+      url.replace(/^(?:torgum|izibuy):\/\//i, "/"),
+    );
     return matchNamedRoute(normalized);
   }
   return null;
 };
 
 const DEEP_LINK_CASES = [
+  ["torgum://product/abc123", "/product/abc123"],
+  ["torgum://raffle/raffle1", "/raffle/raffle1"],
+  ["torgum://seller/user42", "/seller/user42"],
+  ["torgum://user/user42", "/user/user42"],
+  ["torgum://users", "/users"],
+  ["torgum://user-list", "/users"],
+  ["https://torgum.ru/product/abc123", "/product/abc123"],
+  ["torgum://hub/wishlist", "/hub/wishlist"],
+  ["torgum://orders", "/orders"],
   ["izibuy://product/abc123", "/product/abc123"],
-  ["izibuy://raffle/raffle1", "/raffle/raffle1"],
-  ["izibuy://seller/user42", "/seller/user42"],
-  ["izibuy://user/user42", "/user/user42"],
-  ["izibuy://users", "/users"],
-  ["izibuy://user-list", "/users"],
-  ["https://izibuy.ru/product/abc123", "/product/abc123"],
-  ["izibuy://hub/wishlist", "/hub/wishlist"],
-  ["izibuy://orders", "/orders"],
 ];
 
 const UPLOAD_SOURCE_CHECKS = [
@@ -441,9 +449,9 @@ const STORY_MEDIA_DEV_REWRITE_CASES = [
     "http://192.168.1.10:4444/uploads/story.jpg",
   ],
   [
-    "https://cdn.izibuy.ru/uploads/story.jpg",
+    "https://cdn.torgum.ru/uploads/story.jpg",
     "http://192.168.1.10:4444",
-    "https://cdn.izibuy.ru/uploads/story.jpg",
+    "https://cdn.torgum.ru/uploads/story.jpg",
   ],
 ];
 

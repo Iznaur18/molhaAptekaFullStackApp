@@ -58,7 +58,7 @@ test("assertProductionEnv: production режет localhost compose URI", () => {
       JWT_SECRET: LONG_JWT,
       PASSPORT_VAULT_KEK: VAULT_KEK,
       MONGO_URI: "mongodb://127.0.0.1:27017/molhaApteka?replicaSet=rs0",
-      FRONTEND_URL: "https://izibuy.ru",
+      FRONTEND_URL: "https://torgum.ru",
       SMTP_HOST: "smtp.example.com",
       SMTP_USER: "u",
       SMTP_PASS: "p",
@@ -78,7 +78,7 @@ test("assertProductionEnv: production режет URI без credentials", () => 
       JWT_SECRET: LONG_JWT,
       PASSPORT_VAULT_KEK: VAULT_KEK,
       MONGO_URI: "mongodb://db.internal:27017/izibuy?replicaSet=rs0",
-      FRONTEND_URL: "https://izibuy.ru",
+      FRONTEND_URL: "https://torgum.ru",
       SMTP_HOST: "smtp.example.com",
       SMTP_USER: "u",
       SMTP_PASS: "p",
@@ -101,7 +101,7 @@ test("assertProductionEnv: production принимает Atlas mongodb+srv с au
       PASSPORT_VAULT_KEK: VAULT_KEK,
       MONGO_URI:
         "mongodb+srv://user:pass@cluster.mongodb.net/izibuy?retryWrites=true&w=majority",
-      FRONTEND_URL: "https://izibuy.ru",
+      FRONTEND_URL: "https://torgum.ru",
       SMTP_HOST: "smtp.example.com",
       SMTP_USER: "u",
       SMTP_PASS: "p",
@@ -134,7 +134,7 @@ test("assertProductionEnv: production требует PASSPORT_VAULT_KEK", () => 
       PASSPORT_VAULT_KEK: undefined,
       MONGO_URI:
         "mongodb+srv://user:pass@cluster.mongodb.net/izibuy?retryWrites=true&w=majority",
-      FRONTEND_URL: "https://izibuy.ru",
+      FRONTEND_URL: "https://torgum.ru",
       SMTP_HOST: "smtp.example.com",
       SMTP_USER: "u",
       SMTP_PASS: "p",
@@ -157,7 +157,7 @@ test("assertProductionEnv: режет JWT из старого production.example
       PASSPORT_VAULT_KEK: VAULT_KEK,
       MONGO_URI:
         "mongodb+srv://user:pass@cluster.mongodb.net/izibuy?retryWrites=true&w=majority",
-      FRONTEND_URL: "https://izibuy.ru",
+      FRONTEND_URL: "https://torgum.ru",
       SMTP_HOST: "smtp.example.com",
       SMTP_USER: "u",
       SMTP_PASS: "p",
@@ -180,7 +180,7 @@ test("assertProductionEnv: production требует отдельные JWT acce
       PASSPORT_VAULT_KEK: VAULT_KEK,
       MONGO_URI:
         "mongodb+srv://user:pass@cluster.mongodb.net/izibuy?retryWrites=true&w=majority",
-      FRONTEND_URL: "https://izibuy.ru",
+      FRONTEND_URL: "https://torgum.ru",
       SMTP_HOST: "smtp.example.com",
       SMTP_USER: "u",
       SMTP_PASS: "p",

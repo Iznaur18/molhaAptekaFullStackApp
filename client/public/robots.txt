@@ -21,4 +21,4 @@ Disallow: /vote/
 Disallow: /address/
 Disallow: /upload
 
-Sitemap: https://izibuy.ru/sitemap.xml
+Sitemap: https://torgum.ru/sitemap.xml

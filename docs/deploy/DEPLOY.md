@@ -1,6 +1,6 @@
 # Первый production-деплой (VPS + nginx)
 
-Линейный сценарий для **варианта A**: один домен `https://izibuy.ru` → SPA + API + uploads.
+Линейный сценарий для **варианта A**: один домен `https://torgum.ru` → SPA + API + uploads.
 
 | Документ | Когда |
 | -------- | ----- |
@@ -149,7 +149,7 @@ sudo systemctl reload nginx
 
 # SSL (Let's Encrypt, бесплатно) — подробно: docs/deploy/CERTBOT-SSL.md
 chmod +x /var/www/izibuy/docs/deploy/scripts/setup-ssl.sh
-/var/www/izibuy/docs/deploy/scripts/setup-ssl.sh admin@izibuy.ru
+/var/www/izibuy/docs/deploy/scripts/setup-ssl.sh admin@torgum.ru
 ```
 
 ---
@@ -166,7 +166,7 @@ npm run create-admin -- admin@yourdomain.ru 'StrongPassword123!' AdminName
 ## 7. Smoke (5 минут)
 
 ```bash
-curl -sS https://izibuy.ru/health
+curl -sS https://torgum.ru/health
 ```
 
 В браузере:
@@ -191,7 +191,7 @@ sudo systemctl restart izibuy-api
 # Если запущен worker (Redis/BullMQ или cron-leader) — рестартни и его:
 sudo systemctl restart izibuy-worker   # пропусти, если юнита нет
 sudo nginx -t && sudo systemctl reload nginx
-curl -sS https://izibuy.ru/health
+curl -sS https://torgum.ru/health
 ```
 
 Откат: `server/docs/RUNBOOK.md` §3.

@@ -5,15 +5,20 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "izibuy",
+    "scheme": "torgum",
     "userInterfaceStyle": "automatic",
     "linking": {
-      "prefixes": ["izibuy://", "https://izibuy.ru", "https://www.izibuy.ru"]
+      "prefixes": [
+        "torgum://",
+        "izibuy://",
+        "https://torgum.ru",
+        "https://www.torgum.ru"
+      ]
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "ru.izibuy.app",
-      "associatedDomains": ["applinks:izibuy.ru", "applinks:www.izibuy.ru"],
+      "associatedDomains": ["applinks:torgum.ru", "applinks:www.torgum.ru"],
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsLocalNetworking": true
@@ -29,8 +34,8 @@
           "action": "VIEW",
           "autoVerify": true,
           "data": [
-            { "scheme": "https", "host": "izibuy.ru", "pathPrefix": "/" },
-            { "scheme": "https", "host": "www.izibuy.ru", "pathPrefix": "/" }
+            { "scheme": "https", "host": "torgum.ru", "pathPrefix": "/" },
+            { "scheme": "https", "host": "www.torgum.ru", "pathPrefix": "/" }
           ],
           "category": ["BROWSABLE", "DEFAULT"]
         }

@@ -14,7 +14,7 @@
 ## Cloudflare R2 (рекомендуется)
 
 1. Бакет + API token (Object Read & Write).
-2. Custom domain → `https://cdn.izibuy.ru` (CDN).
+2. Custom domain → `https://cdn.torgum.ru` (CDN).
 3. `.env` на API:
 
 ```env
@@ -25,8 +25,8 @@ S3_SECRET_ACCESS_KEY=...
 S3_REGION=auto
 S3_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com
 S3_FORCE_PATH_STYLE=true
-PUBLIC_UPLOAD_BASE_URL=https://cdn.izibuy.ru
-FRONTEND_URL=https://izibuy.ru
+PUBLIC_UPLOAD_BASE_URL=https://cdn.torgum.ru
+FRONTEND_URL=https://torgum.ru
 ```
 
 4. Публичный доступ: R2 public bucket или custom domain.

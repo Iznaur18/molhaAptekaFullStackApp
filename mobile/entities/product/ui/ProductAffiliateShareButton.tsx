@@ -10,6 +10,7 @@ import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuer
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { fetchMyReferralProgram } from "@/entities/user/api/referralProgram";
 import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
+import { WEB_APP_BASE_URL } from "@/shared/config/webAppBaseUrl";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
 
@@ -61,7 +62,8 @@ export const ProductAffiliateShareButton = ({
       setStatus(PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_FAILED);
       return;
     }
-    const url = `https://izibuy.ru/product/${encodeURIComponent(productId)}?${AFFILIATE_QUERY_PARAM}=${encodeURIComponent(code)}`;
+    const origin = WEB_APP_BASE_URL.replace(/\/$/, "");
+    const url = `${origin}/product/${encodeURIComponent(productId)}?${AFFILIATE_QUERY_PARAM}=${encodeURIComponent(code)}`;
     try {
       await Clipboard.setStringAsync(url);
       setStatus(PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_COPIED);

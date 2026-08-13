@@ -8,13 +8,13 @@
 2. **Отдельный** бакет `izibuy-media-private` (→ `S3_PRIVATE_BUCKET`) для PII
    (селфи паспорта) — **без custom domain, без публичного доступа**. См. §1a.
 3. API token: Object Read & Write (на оба бакета).
-4. **Custom domain** только на публичном бакете: `cdn.izibuy.ru` → публичный HTTPS.
+4. **Custom domain** только на публичном бакете: `cdn.torgum.ru` → публичный HTTPS.
 5. CORS на публичном бакете (если браузер грузит напрямую с CDN):
 
 ```json
 [
   {
-    "AllowedOrigins": ["https://izibuy.ru"],
+    "AllowedOrigins": ["https://torgum.ru"],
     "AllowedMethods": ["GET", "HEAD"],
     "AllowedHeaders": ["*"],
     "MaxAgeSeconds": 3600
@@ -26,7 +26,7 @@
 
 Селфи паспорта пишутся с ключом `uploads/private/<file>`. Публичные медиа —
 `uploads/<file>`. Если оба лежат в **одном** бакете за CDN, приватный объект
-доступен по прямой ссылке `https://cdn.izibuy.ru/uploads/private/<file>` —
+доступен по прямой ссылке `https://cdn.torgum.ru/uploads/private/<file>` —
 **в обход auth+ACL приложения** (custom domain R2 публикует весь бакет). Это
 утечка ПДн.
 
@@ -54,17 +54,17 @@ S3_SECRET_ACCESS_KEY=...
 S3_REGION=auto
 S3_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com
 S3_FORCE_PATH_STYLE=true
-PUBLIC_UPLOAD_BASE_URL=https://cdn.izibuy.ru
-FRONTEND_URL=https://izibuy.ru
+PUBLIC_UPLOAD_BASE_URL=https://cdn.torgum.ru
+FRONTEND_URL=https://torgum.ru
 ```
 
-`PUBLIC_UPLOAD_BASE_URL` — **origin CDN**, не API. Новые upload в БД: `https://cdn.izibuy.ru/uploads/<file>`.
+`PUBLIC_UPLOAD_BASE_URL` — **origin CDN**, не API. Новые upload в БД: `https://cdn.torgum.ru/uploads/<file>`.
 
 Проверка:
 
 ```bash
 cd server && npm run validate:prod
-curl -sS https://izibuy.ru/health | jq .uploadStorage
+curl -sS https://torgum.ru/health | jq .uploadStorage
 # "s3"
 ```
 
@@ -85,7 +85,7 @@ npm run sync-uploads:s3:apply
 - **Новые медиа** отдаёт CDN — блок `/uploads/` на nginx **не обязателен** для них.
 - **Legacy** `/uploads/...` на старом домене: оставить proxy на API или alias на диск до полной миграции БД.
 
-Клиент: полные CDN URL **не** переписываются на `izibuy.ru` (`resolveUploadedImageUrlForBrowser`).
+Клиент: полные CDN URL **не** переписываются на `torgum.ru` (`resolveUploadedImageUrlForBrowser`).
 
 ## 5. Smoke после cutover
 
@@ -94,7 +94,7 @@ npm run sync-uploads:s3:apply
 3. Карточка каталога показывает картинку.
 4. Удаление товара/смена фото — объект в бакете удаляется (`deleteUploadFileByUrl`).
 5. **PII-проверка:** оформить рассрочку (загружается селфи паспорта), затем
-   попробовать открыть `https://cdn.izibuy.ru/uploads/private/<любое>` в инкогнито
+   попробовать открыть `https://cdn.torgum.ru/uploads/private/<любое>` в инкогнито
    → должно быть **403/404** (приватного бакета нет за CDN). А `GET /upload/private/<file>`
    без авторизации → **401/403**, со staff-токеном → **200**.
 
@@ -102,7 +102,7 @@ npm run sync-uploads:s3:apply
 
 ```env
 UPLOAD_STORAGE=disk
-PUBLIC_UPLOAD_BASE_URL=https://izibuy.ru
+PUBLIC_UPLOAD_BASE_URL=https://torgum.ru
 ```
 
 Перезапуск API. Файлы на диске должны остаться (не удалять после sync без бэкапа).

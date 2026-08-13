@@ -16,5 +16,5 @@ test("ALLOWED_FIELDS_FOR_ADMIN allows absolute userLoyaltyPoints for others", ()
 });
 
 test("parseFrontendOrigins strips trailing slash (CSRF/CORS parity)", () => {
-  assert.deepEqual(parseFrontendOrigins("https://izibuy.ru/"), ["https://izibuy.ru"]);
+  assert.deepEqual(parseFrontendOrigins("https://torgum.ru/"), ["https://torgum.ru"]);
 });

@@ -10,27 +10,27 @@ describe("resolveUploadedImageUrlForBrowser", () => {
   it("CDN URL не подменяется на origin SPA", () => {
     assert.equal(
       resolveUploadedImageUrlForBrowser(
-        "https://cdn.izibuy.ru/uploads/photo.webp",
-        "https://izibuy.ru",
+        "https://cdn.torgum.ru/uploads/photo.webp",
+        "https://torgum.ru",
       ),
-      "https://cdn.izibuy.ru/uploads/photo.webp",
+      "https://cdn.torgum.ru/uploads/photo.webp",
     );
   });
 
   it("same-origin absolute → path на origin", () => {
     assert.equal(
       resolveUploadedImageUrlForBrowser(
-        "https://izibuy.ru/uploads/legacy.jpg",
-        "https://izibuy.ru",
+        "https://torgum.ru/uploads/legacy.jpg",
+        "https://torgum.ru",
       ),
-      "https://izibuy.ru/uploads/legacy.jpg",
+      "https://torgum.ru/uploads/legacy.jpg",
     );
   });
 
   it("relative /uploads", () => {
     assert.equal(
-      resolveUploadedImageUrlForBrowser("/uploads/x.png", "https://izibuy.ru"),
-      "https://izibuy.ru/uploads/x.png",
+      resolveUploadedImageUrlForBrowser("/uploads/x.png", "https://torgum.ru"),
+      "https://torgum.ru/uploads/x.png",
     );
   });
 

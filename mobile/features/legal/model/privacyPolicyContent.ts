@@ -4,7 +4,7 @@ import {
   LEGAL_OPERATOR_PLACEHOLDER,
 } from "@/features/legal/model/legalSharedConstants";
 
-export const PRIVACY_POLICY_UPDATED_AT = "11 августа 2026";
+export const PRIVACY_POLICY_UPDATED_AT = "13 июня 2026";
 
 export const PRIVACY_POLICY_OPERATOR_PLACEHOLDER = LEGAL_OPERATOR_PLACEHOLDER;
 
