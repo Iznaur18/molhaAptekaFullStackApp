@@ -20,7 +20,7 @@ flowchart LR
 | 4. Заказ | `/(tabs)/cart` checkout → `/orders` | `createOrder` (`POST /order`) → `router.replace("/orders")` |
 | 5. Профиль | `/(tabs)/profile`, `/profile/edit` | `useAuthSessionQuery` → `fetchAuthMe` (`GET /auth/me`) |
 
-Deep link на товар: `izibuy://product/<id>` → `/product/[id]` (см. `parseAppDeepLink`).
+Deep link на товар: `torgum://product/<id>` → `/product/[id]` (см. `parseAppDeepLink`).
 
 ## DoD на каждый экран
 

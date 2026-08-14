@@ -51,11 +51,13 @@ test("assertProductionEnv: dev допускает compose URI без auth", () =
   );
 });
 
-test("assertProductionEnv: production режет localhost compose URI", () => {
+test("assertProductionEnv: production режет localhost compose URI без auth", () => {
   withEnv(
     {
       NODE_ENV: "production",
       JWT_SECRET: LONG_JWT,
+      JWT_ACCESS_SECRET: `${LONG_JWT}-access`,
+      JWT_REFRESH_SECRET: `${LONG_JWT}-refresh`,
       PASSPORT_VAULT_KEK: VAULT_KEK,
       MONGO_URI: "mongodb://127.0.0.1:27017/molhaApteka?replicaSet=rs0",
       FRONTEND_URL: "https://torgum.ru",
@@ -67,6 +69,32 @@ test("assertProductionEnv: production режет localhost compose URI", () => {
       const result = assertProductionEnv();
       assert.equal(result.ok, false);
       assert.ok(result.errors.some((e) => e.includes("localhost")));
+    },
+  );
+});
+
+test("assertProductionEnv: production принимает same-VPS localhost с auth+rs0", () => {
+  withEnv(
+    {
+      NODE_ENV: "production",
+      JWT_SECRET: LONG_JWT,
+      JWT_ACCESS_SECRET: `${LONG_JWT}-access`,
+      JWT_REFRESH_SECRET: `${LONG_JWT}-refresh`,
+      PASSPORT_VAULT_KEK: VAULT_KEK,
+      MONGO_URI:
+        "mongodb://torgum:secret@127.0.0.1:27017/torgum?replicaSet=rs0&authSource=admin",
+      FRONTEND_URL: "https://torgum.ru",
+      SMTP_HOST: "smtp.example.com",
+      SMTP_USER: "u",
+      SMTP_PASS: "p",
+    },
+    () => {
+      const result = assertProductionEnv();
+      assert.equal(
+        result.errors.some((e) => e.includes("localhost") || e.includes("credentials")),
+        false,
+      );
+      assert.ok(result.warnings.some((w) => w.includes("same-VPS")));
     },
   );
 });

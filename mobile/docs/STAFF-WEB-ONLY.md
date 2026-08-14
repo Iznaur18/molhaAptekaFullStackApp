@@ -5,7 +5,7 @@
 ## Поведение
 
 - Пункты staff в профиле → `Linking.openURL` на web (`EXPO_PUBLIC_WEB_APP_URL` + путь из `@izibuy/shared-lib` / `PROFILE_SECTION_WEB_PATH`).
-- Deep link `izibuy://hub/<staff-section>` → краткий redirect в браузер, назад в таб «Профиль».
+- Deep link `torgum://hub/<staff-section>` → краткий redirect в браузер, назад в таб «Профиль».
 - Buyer-path (каталог, корзина, заказы, seller my-products) — in-app как раньше.
 
 ## Dev

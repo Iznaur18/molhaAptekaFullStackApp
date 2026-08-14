@@ -51,6 +51,22 @@ const mongoUriLooksLikeLocalhost = (mongoUri) =>
 const mongoUriHasCredentials = (mongoUri) =>
   /^mongodb(\+srv)?:\/\/[^/@]+@/.test(String(mongoUri ?? ""));
 
+/** replicaSet= в query — нужен для транзакций заказов/баллов. */
+const mongoUriHasReplicaSet = (mongoUri) =>
+  /[?&]replicaSet=/.test(String(mongoUri ?? ""));
+
+/**
+ * Same-VPS prod: mongodb://user:pass@127.0.0.1:27017/db?replicaSet=rs0&authSource=admin
+ * Режем только «голый» localhost без auth (docker-compose из корня репо).
+ * @param {string | undefined} mongoUri
+ */
+const mongoUriIsUnsafeLocalhostProd = (mongoUri) => {
+  if (!mongoUriLooksLikeLocalhost(mongoUri)) {
+    return false;
+  }
+  return !(mongoUriHasCredentials(mongoUri) && mongoUriHasReplicaSet(mongoUri));
+};
+
 /**
  * Проверка env перед production-деплоем.
  * @returns {{ ok: boolean; errors: string[]; warnings: string[] }}
@@ -107,18 +123,35 @@ export const assertProductionEnv = () => {
     errors.push("MONGO_URI не задан");
   } else if (mongoUriLooksLikeStandaloneDev(process.env.MONGO_URI)) {
     warnings.push(
-      "MONGO_URI указывает на локальный standalone MongoDB — транзакции заказов/баллов требуют replica set (Atlas или rs0)",
+      "MONGO_URI указывает на локальный standalone MongoDB — транзакции заказов/баллов требуют replica set (rs0 на VPS, см. docs/deploy/DEPLOY.md)",
     );
   }
 
   if (isProduction && !isBlank(process.env.MONGO_URI)) {
-    if (mongoUriLooksLikeLocalhost(process.env.MONGO_URI)) {
+    if (mongoUriIsUnsafeLocalhostProd(process.env.MONGO_URI)) {
       errors.push(
-        "MONGO_URI указывает на localhost — корневой docker-compose.yml только для dev; в production нужен Atlas (mongodb+srv) или удалённый mongod",
+        "MONGO_URI на localhost без auth+replicaSet — для prod на VPS: mongodb://USER:PASS@127.0.0.1:27017/torgum?replicaSet=rs0&authSource=admin (см. docs/deploy/DEPLOY.md); голый compose URI запрещён",
       );
     } else if (!mongoUriHasCredentials(process.env.MONGO_URI)) {
       errors.push(
-        "MONGO_URI без credentials (user:password@) — в production обязателен auth (Atlas или свой mongod с пользователем)",
+        "MONGO_URI без credentials (user:password@) — в production обязателен auth (свой mongod на VPS или managed DB)",
+      );
+    } else if (
+      !String(process.env.MONGO_URI).startsWith("mongodb+srv://") &&
+      !mongoUriHasReplicaSet(process.env.MONGO_URI)
+    ) {
+      errors.push(
+        "MONGO_URI без replicaSet= — транзакции заказов/баллов требуют rs0 (см. docs/deploy/DEPLOY.md)",
+      );
+    }
+
+    if (
+      mongoUriLooksLikeLocalhost(process.env.MONGO_URI) &&
+      mongoUriHasCredentials(process.env.MONGO_URI) &&
+      mongoUriHasReplicaSet(process.env.MONGO_URI)
+    ) {
+      warnings.push(
+        "MONGO_URI на 127.0.0.1 (same-VPS) — ок для старта; бэкапы mongodump и bindIp только localhost (DEPLOY.md §1, §9)",
       );
     }
   }

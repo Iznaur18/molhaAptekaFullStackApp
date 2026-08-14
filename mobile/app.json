@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Torgum",
-    "slug": "izibuy",
+    "slug": "torgum",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,14 +10,13 @@
     "linking": {
       "prefixes": [
         "torgum://",
-        "izibuy://",
         "https://torgum.ru",
         "https://www.torgum.ru"
       ]
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "ru.izibuy.app",
+      "bundleIdentifier": "ru.torgum.app",
       "associatedDomains": ["applinks:torgum.ru", "applinks:www.torgum.ru"],
       "infoPlist": {
         "NSAppTransportSecurity": {
@@ -26,7 +25,7 @@
       }
     },
     "android": {
-      "package": "ru.izibuy.app",
+      "package": "ru.torgum.app",
       "screenOrientation": "portrait",
       "usesCleartextTraffic": true,
       "intentFilters": [

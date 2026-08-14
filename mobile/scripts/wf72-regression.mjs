@@ -871,7 +871,7 @@ const run = () => {
   console.log("PASS — static WF-7.2");
   console.log("API smoke: npm run smoke:buyer-path (G.3, needs server + e2e seed)");
   console.log("Manual: Samsung smoke → docs/mobile-development.md § WF-7.2");
-  console.log("  adb shell am start -a android.intent.action.VIEW -d \"izibuy://product/<id>\"");
+  console.log("  adb shell am start -a android.intent.action.VIEW -d \"torgum://product/<id>\"");
 };
 
 run();
