@@ -113,7 +113,7 @@ apiClient.interceptors.response.use(
       isClientSentryEnabled() &&
       isCorrelationWorthyApiFailure(url, status)
     ) {
-      void import("@sentry/react").then((Sentry) => {
+      void import("../lib/sentryClient.js").then((Sentry) => {
         Sentry.addBreadcrumb({
           category: "api",
           message: `API ${status ?? "network"} ${url || "request"}`,

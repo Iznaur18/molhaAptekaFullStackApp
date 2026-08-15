@@ -8,7 +8,7 @@ export async function initClientSentry() {
     return false;
   }
 
-  const Sentry = await import("@sentry/react");
+  const Sentry = await import("./sentryClient.js");
 
   const tracesSampleRate = Number(import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE ?? "0.1");
   const release = import.meta.env.VITE_GIT_COMMIT_SHA?.trim() || undefined;
