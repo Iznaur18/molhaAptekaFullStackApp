@@ -1,6 +1,6 @@
 # iziBuy Mobile — шпаргалка запуска
 
-> Полный roadmap: [`docs/mobile-development.md`](../docs/mobile-development.md)  
+> Полный roadmap: [`docs/clients/mobile-development.md`](../docs/clients/mobile-development.md)  
 > Samsung / adb: [`docs/SAMSUNG-ANDROID-DEV.md`](docs/SAMSUNG-ANDROID-DEV.md)
 
 ## Перед каждым сеансом

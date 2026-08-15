@@ -416,7 +416,7 @@ const UserSchema = new mongoose.Schema(
 
     /**
      * Интеграция с 1С (per-seller). API-ключ хранится зашифрованным (apiKeySealed).
-     * Контракт: docs/onec-http-contract.md
+     * Контракт: docs/product/onec-http-contract.md
      */
     oneCIntegration: {
       enabled: {

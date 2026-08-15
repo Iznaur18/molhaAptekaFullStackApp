@@ -73,4 +73,4 @@ Env (опционально):
 - Seller create/edit (secondary)
 - Stories, raffles, auction/installment tabs (расширения карточки)
 
-См. также: [`docs/client-mobile-consolidation-audit.md`](../../docs/client-mobile-consolidation-audit.md) §6, [`docs/mobile-development.md`](../../docs/mobile-development.md) § WF-7.2.
+См. также: [`docs/quality/client-mobile-consolidation-audit.md`](../../docs/quality/client-mobile-consolidation-audit.md) §6, [`docs/clients/mobile-development.md`](../../docs/clients/mobile-development.md) § WF-7.2.

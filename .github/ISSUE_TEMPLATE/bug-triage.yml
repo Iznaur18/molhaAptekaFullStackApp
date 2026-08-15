@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Выберите **одну** метку triage. Подробнее: [`docs/bug-triage-labels.md`](../../docs/bug-triage-labels.md)
+        Выберите **одну** метку triage. Подробнее: [`docs/quality/bug-triage-labels.md`](../../docs/quality/bug-triage-labels.md)
 
   - type: dropdown
     id: triage_label

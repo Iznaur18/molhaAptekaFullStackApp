@@ -5,7 +5,7 @@
 | Гайд | Назначение |
 | ---- | ---------- |
 | [`../../docs/deploy/DEPLOY.md`](../../docs/deploy/DEPLOY.md) | **первый деплой** по шагам |
-| [`../../docs/ROADMAP-SCALING.md`](../../docs/ROADMAP-SCALING.md) | фазы роста, Redis, worker, compliance |
+| [`../../docs/architecture/ROADMAP-SCALING.md`](../../docs/architecture/ROADMAP-SCALING.md) | фазы роста, Redis, worker, compliance |
 | [`PRODUCTION-AND-ARCHITECTURE.md`](PRODUCTION-AND-ARCHITECTURE.md) | архитектура, варианты A/B |
 | [`../../docs/deploy/PROD-S3-CDN.md`](../../docs/deploy/PROD-S3-CDN.md) | медиа на R2 |
 

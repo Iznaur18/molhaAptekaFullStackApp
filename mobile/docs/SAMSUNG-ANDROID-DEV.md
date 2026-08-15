@@ -100,7 +100,7 @@ npm run start:dev
 
 ## Smoke на Samsung (чеклист)
 
-Полный регресс по матрице web parity: `docs/mobile-development.md` § **WF-7.2**.
+Полный регресс по матрице web parity: `docs/clients/mobile-development.md` § **WF-7.2**.
 
 **На ПК перед Samsung:**
 

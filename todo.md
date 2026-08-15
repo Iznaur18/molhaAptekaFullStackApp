@@ -10,8 +10,9 @@
 
 # Todo (оперативный)
 
-Стратегия и backlog **R-1…R-10**: [`docs/ROADMAP-SCALING.md`](docs/ROADMAP-SCALING.md)  
-Сейчас: **фаза 0** — «Запуск в бою» ([roadmap § Фаза 0](docs/ROADMAP-SCALING.md#фаза-0--запуск-в-бою))
+Стратегия и backlog **R-1…R-10**: [`docs/architecture/ROADMAP-SCALING.md`](docs/architecture/ROADMAP-SCALING.md)  
+Сейчас: **фаза 0** — «Запуск в бою» ([roadmap § Фаза 0](docs/architecture/ROADMAP-SCALING.md#фаза-0--запуск-в-бою))  
+Оглавление доков: [`docs/README.md`](docs/README.md)
 
 ---
 
@@ -53,7 +54,7 @@
 
 ## Фаза 1 — следующий блок (после фазы 0)
 
-Не начинать, пока фаза 0 не закрыта. План: [roadmap §8](docs/ROADMAP-SCALING.md#8-план-на-ближайшие-2-4-недели-фаза-0--1)
+Не начинать, пока фаза 0 не закрыта. План: [roadmap §8](docs/architecture/ROADMAP-SCALING.md#8-план-на-ближайшие-2-4-недели-фаза-0--1)
 
 | # | Задача | Backlog |
 | - | ------ | ------- |
@@ -62,4 +63,4 @@
 | 3 | Client unit tests в CI | R-1 |
 | 4 | Staging env + deploy doc | R-3 |
 
-Полный чеклист фазы 1: [roadmap § Фаза 1](docs/ROADMAP-SCALING.md#фаза-1--рост-и-доверие)
+Полный чеклист фазы 1: [roadmap § Фаза 1](docs/architecture/ROADMAP-SCALING.md#фаза-1--рост-и-доверие)

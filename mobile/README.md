@@ -2,7 +2,7 @@
 
 Expo + React Native. API — `../server/`, контракты — `@molha/api-contract`.
 
-Roadmap: [`docs/mobile-development.md`](../docs/mobile-development.md) · Buyer path (G.3): [`docs/BUYER-CRITICAL-PATH.md`](docs/BUYER-CRITICAL-PATH.md) · Staff → web (G.1): [`docs/STAFF-WEB-ONLY.md`](docs/STAFF-WEB-ONLY.md)
+Roadmap: [`docs/clients/mobile-development.md`](../docs/clients/mobile-development.md) · Buyer path (G.3): [`docs/BUYER-CRITICAL-PATH.md`](docs/BUYER-CRITICAL-PATH.md) · Staff → web (G.1): [`docs/STAFF-WEB-ONLY.md`](docs/STAFF-WEB-ONLY.md)
 
 ## Требования
 
@@ -112,7 +112,7 @@ npm run smoke:buyer-path     # API smoke (server + e2e seed)
 | Shared UI | `shared/ui/StaffModerationActions.tsx`, `shared/theme/staffQueueStyles.ts` | кнопки очередей |
 | Entities | `entities/*/…Staff*.ts`, `*Moderation*.ts`, `*Admin*.ts` | API + mutations для таблиц выше |
 
-**Активная разработка mobile:** buyer/seller trade (`my-products`, `create-product`, корзина, заказы, каталог, профиль) — см. §6 audit [`docs/client-mobile-consolidation-audit.md`](../docs/client-mobile-consolidation-audit.md).
+**Активная разработка mobile:** buyer/seller trade (`my-products`, `create-product`, корзина, заказы, каталог, профиль) — см. §6 audit [`docs/quality/client-mobile-consolidation-audit.md`](../docs/quality/client-mobile-consolidation-audit.md).
 
 ## Скрипты
 

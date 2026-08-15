@@ -7,7 +7,7 @@
 | Документ | Когда |
 | -------- | ----- |
 | Этот файл | первый выклад |
-| [`../ROADMAP-SCALING.md`](../ROADMAP-SCALING.md) | фазы роста, Redis, worker, staging |
+| [`../architecture/ROADMAP-SCALING.md`](../architecture/ROADMAP-SCALING.md) | фазы роста, Redis, worker, staging |
 | [`LOGGING-CENTRAL.md`](LOGGING-CENTRAL.md) | journald → Loki / Grafana Cloud / Yandex Logging |
 | [`PROD-S3-CDN.md`](PROD-S3-CDN.md) | медиа на S3/R2 вместо диска |
 | [`CERTBOT-SSL.md`](CERTBOT-SSL.md) | Let's Encrypt / продление / troubleshooting |

@@ -214,7 +214,7 @@ SPA остаётся на CDN/nginx; API можно на меньших инст
 
 ## 7. Связанные документы
 
-- [`../../docs/ROADMAP-SCALING.md`](../../docs/ROADMAP-SCALING.md) — фазы 0–3, чеклисты, backlog R-*
+- [`../../docs/architecture/ROADMAP-SCALING.md`](../../docs/architecture/ROADMAP-SCALING.md) — фазы 0–3, чеклисты, backlog R-*
 - [`PRODUCTION-AND-ARCHITECTURE.md`](PRODUCTION-AND-ARCHITECTURE.md)
 - [`MONGO-INDEXES-AUDIT.md`](MONGO-INDEXES-AUDIT.md)
 - [`RATE-LIMIT-AUDIT.md`](RATE-LIMIT-AUDIT.md)

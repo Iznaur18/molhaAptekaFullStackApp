@@ -6,7 +6,8 @@
 
 - nginx: [`docs/deploy/nginx-izibuy.conf.example`](../../docs/deploy/nginx-izibuy.conf.example)
 - **деплой:** [`docs/deploy/DEPLOY.md`](../../docs/deploy/DEPLOY.md)
-- **roadmap масштабирования:** [`docs/ROADMAP-SCALING.md`](../../docs/ROADMAP-SCALING.md)
+- **roadmap масштабирования:** [`docs/architecture/ROADMAP-SCALING.md`](../../docs/architecture/ROADMAP-SCALING.md)
+- **оглавление доков:** [`docs/README.md`](../../docs/README.md)
 - runbook (бэкап, restore, rollback): [`server/docs/RUNBOOK.md`](RUNBOOK.md)
 - Sentry: [`server/docs/SENTRY.md`](SENTRY.md)
 - горизонталь (очередь, read replicas): [`server/docs/HORIZONTAL-SCALING.md`](HORIZONTAL-SCALING.md)

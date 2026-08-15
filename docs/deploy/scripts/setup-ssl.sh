@@ -6,7 +6,7 @@ set -euo pipefail
 PRIMARY_DOMAIN="${GITORG_DOMAIN:-gitorg.ru}"
 WWW_DOMAIN="www.${PRIMARY_DOMAIN}"
 CERTBOT_EMAIL="${1:-}"
-NGINX_SITE="/etc/nginx/sites-available/izibuy"
+NGINX_SITE="/etc/nginx/sites-available/gitorg"
 HEALTH_PATH="/health"
 
 log() {
