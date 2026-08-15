@@ -23,7 +23,9 @@ const createSmtpTransport = () => {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
-    ...(port === 587 ? { requireTLS: true } : {}),
+    // Для портов без неявного TLS (587, 2525, …) требуем STARTTLS — иначе
+    // nodemailer может уйти в открытый текст, если сервер не форсит апгрейд.
+    ...(secure ? {} : { requireTLS: true }),
     tls: { rejectUnauthorized },
   });
 };
