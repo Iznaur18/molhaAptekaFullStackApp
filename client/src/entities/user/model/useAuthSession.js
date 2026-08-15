@@ -39,7 +39,9 @@ export function useAuthSession() {
     queryKey: authMeQueryKeys.all,
     queryFn: fetchCurrentUserProfile,
     enabled: fetchAllowed,
-    retry: false,
+    // Транзиентные ошибки /auth/me (сеть, 5xx, 304, отменённый на старте запрос)
+    // не должны рушить сессию — даём паре повторов восстановиться.
+    retry: 1,
     staleTime: AUTH_ME_STALE_TIME_MS,
     refetchOnMount: "always",
   });
@@ -49,12 +51,11 @@ export function useAuthSession() {
   const isAuthorized = Boolean(user);
   const isSessionReady = isAuthReady;
 
-  useEffect(() => {
-    if (!query.isError || user) {
-      return;
-    }
-    void clearDeadAuthSession();
-  }, [query.isError, user]);
+  // ВАЖНО: не разлогиниваем на ошибке запроса /auth/me. Настоящий отказ
+  // авторизации (401) fetchCurrentUserProfile отдаёт как `user: null` (гость)
+  // без throw; сюда (`query.isError`) попадают только НЕфатальные ошибки —
+  // на них нельзя звать clearDeadAuthSession (POST /auth/logout гасил бы живую
+  // httpOnly-cookie и выкидывал пользователя после перезагрузки).
 
   useEffect(() => subscribeAuthSessionDead(() => clearAuthMeCache(queryClient)), [queryClient]);
 

@@ -8,6 +8,9 @@ import { getUnreadInAppNotificationsForUser } from "../../services/user/userInAp
 
 /** Получение данных текущего пользователя. GET /auth/me (JWT в httpOnly cookie) */
 export const userMeController = async (req, res) => {
+  // Состояние авторизации нельзя кэшировать: с ETag браузер при перезагрузке
+  // делает условный запрос и получает 304, который axios трактует как ошибку.
+  res.set("Cache-Control", "no-store");
   const userIdClient = req.userId;
 
   if (!userIdClient) {
