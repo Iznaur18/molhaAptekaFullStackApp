@@ -1,0 +1,168 @@
+// Автосгенерировано из appUiCopy.js: домен «cart-checkout».
+// Реэкспортируется через ../appUiCopy.js — импортируй оттуда, как раньше.
+
+import { pluralizeRu } from "../../lib/pluralizeRu.js";
+
+/** Страница «Корзина» */
+export const CART_PAGE_UI = {
+  TITLE: "Корзина",
+  EMPTY: "Корзина пуста.",
+  LOADING: "Загрузка корзины…",
+  TOTAL_LABEL: "Итого",
+  PAYABLE_LABEL: "К оплате",
+  PRICE_LABEL: "Цена",
+  DISCOUNT_LABEL: "Скидка",
+  PROMO_DISCOUNT_LABEL: "Промокод",
+  WHOLESALE_DISCOUNT_LABEL: "Оптовая скидка",
+  DELIVERY_FEE_LABEL: "Доставка",
+  DELIVERY_FEE_VALUE: "Индивидуальная плата при получении",
+  WHOLESALE_LINE_BADGE: "Опт",
+  /** @param {string} formatted */
+  DISCOUNT_AMOUNT: (formatted) => `−${formatted}`,
+  PURCHASABLE_TOTAL_LABEL: "К оформлению",
+  FULL_TOTAL_HINT: "Итого в корзине",
+  ITEMS_UNIT_FORMS: ["товар", "товара", "товаров"],
+  /** @param {number} count */
+  ITEMS_COUNT: (count) =>
+    `${count} ${pluralizeRu(count, CART_PAGE_UI.ITEMS_UNIT_FORMS)}`,
+  REMOVE_LINE_ARIA: "Удалить из корзины",
+  SELECT_LINE_ARIA: "Выбрать товар для оформления",
+  SELECT_ALL: "Выбрать все",
+  /** @param {number} selected @param {number} total */
+  SELECTED_COUNT: (selected, total) => `Выбрано ${selected} из ${total}`,
+  CLEAR_ALL: "Очистить корзину",
+  GO_TO_CATALOG: "Перейти в каталог",
+  AUTH_REQUIRED: "Войдите, чтобы оформить заказ.",
+  AUTH_LOGIN: "Войти",
+  PRODUCT_DELETED_OR_HIDDEN: "Товар недоступен",
+  CHECKOUT_BLOCKED_NO_PURCHASABLE: "Нет позиций для оформления",
+  CHECKOUT_BLOCKED_NOTHING_SELECTED: "Выберите товары для оформления",
+  CHECKOUT_BLOCKED_ALL_UNAVAILABLE: "Все товары недоступны",
+  CHECKOUT_BLOCKED_OWN_PRODUCTS_ONLY: "Нельзя оформить заказ на свои товары",
+  CHECKOUT_BLOCKED_MISSING_PICKUP:
+    "У товаров нет адреса самовывоза — оформить заказ нельзя",
+  SECTION_PICKUP: "Самовывоз",
+  SECTION_DELIVERY: "Доставка",
+  SECTION_FULFILLMENT_HINT: "Оформляется отдельным заказом",
+  /** @param {number} left */
+  STOCK_REMAINING: (left) => `Осталось ${left} шт`,
+  STOCK_QUANTITY_LIMITED: "Количество ограничено",
+  CHECKOUT_OPEN: "Оформить заказ",
+  CHECKOUT_SHEET_CLOSE: "Закрыть",
+  CHECKOUT_LEGAL_HINT_PREFIX: "Нажимая на кнопку, вы соглашаетесь с ",
+  CHECKOUT_LEGAL_PRIVACY_LINK: "Условиями обработки персональных данных",
+  CHECKOUT_LEGAL_HINT_MIDDLE: ", а также с ",
+  CHECKOUT_LEGAL_OFFER_LINK: "Условиями продажи",
+};
+
+/** Секция выигранных аукционных лотов в корзине */
+export const CART_AUCTION_UI = {
+  SECTION_TITLE: "Выигранные лоты",
+  SECTION_HINT: "Каждый лот оформляется отдельным заказом",
+  BADGE: "Аукцион",
+  PRICE_LABEL: "Принятая цена",
+  DEADLINE_LABEL: "Оплатить до",
+  CHECKOUT: "Оформить",
+  CHECKOUT_CANCEL: "Свернуть оформление",
+  REMOVE: "Убрать",
+  REMOVE_CONFIRM:
+    "Убрать лот из корзины? Ставка будет отменена, продавец сможет принять предложение другого покупателя.",
+  REMOVE_PENDING: "Убираем…",
+  ORDER_PLACED: "Заказ по принятой цене оформлен",
+  ERROR_GENERIC: "Не удалось выполнить действие",
+};
+
+/** Структурированный адрес (профиль) */
+export const ADDRESS_STRUCTURED_UI = {
+  SECTION_LABEL: "Адрес",
+  FIELDSET_LEGEND: "Адрес",
+  LABEL_CITY: "Город",
+  LABEL_DISTRICT: "Район",
+  LABEL_STREET: "Улица",
+  LABEL_HOUSE: "Дом",
+  LABEL_FLAT: "Квартира",
+  PLACEHOLDER_CITY: "Москва",
+  PLACEHOLDER_DISTRICT: "Необязательно",
+  PLACEHOLDER_STREET: "ул. Примерная",
+  PLACEHOLDER_HOUSE: "12",
+  PLACEHOLDER_FLAT: "Необязательно",
+};
+
+/** DaData: адрес до дома */
+export const ADDRESS_DELIVERY_UI = {
+  LABEL_LINE: "Адрес (город, улица, дом)",
+  PLACEHOLDER_LINE: "Начните вводить и выберите из списка",
+  HINT_LINE: "Выберите вариант из подсказок DaData",
+  LABEL_FLAT: "Квартира / офис",
+  SUGGEST_LOADING: "Ищем адреса…",
+  SUGGEST_ERROR: "Подсказки недоступны",
+  CLEAR_LINE_ARIA: "Очистить адрес",
+  SERVICE_UNAVAILABLE:
+    "Подсказки адреса временно недоступны — можно ввести адрес вручную или указать на карте",
+  SERVICE_RETRY: "Повторить",
+  MAP_ARIA: "Карта: укажите точку адреса",
+  MAP_PICK_HINT: "Или укажите точку на карте",
+  MAP_OPEN: "Указать на карте",
+  MAP_DONE: "Готово",
+  MAP_GEOLOCATE_LOADING: "Определяем адрес…",
+  MAP_GEOLOCATE_NO_HOUSE:
+    "Дом по точке не найден — адрес подставлен, уточните из списка при необходимости",
+  MAP_GEOLOCATE_EMPTY:
+    "Не удалось определить адрес — сдвиньте точку или введите вручную",
+  MAP_GEOLOCATE_ERROR: "Не удалось определить адрес по карте",
+};
+
+/** Форма оформления заказа */
+export const CHECKOUT_FORM_UI = {
+  HEADING: "Оформление заказа",
+  LABEL_FULFILLMENT: "Способ получения",
+  FULFILLMENT_PICKUP: "Самовывоз",
+  FULFILLMENT_DELIVERY: "Доставка",
+  FULFILLMENT_DELIVERY_SOON: "Скоро",
+  FULFILLMENT_DELIVERY_UNAVAILABLE: "Доставка недоступна для выбранных товаров",
+  FULFILLMENT_PICKUP_UNAVAILABLE: "Самовывоз недоступен для выбранных товаров",
+  PICKUP_ADDRESS_LABEL: "Где забрать",
+  PICKUP_MULTI_HINT: "Несколько точек — каждый товар по своему адресу",
+  LABEL_DELIVERY_ADDRESS: "Адрес доставки",
+  PLACEHOLDER_DELIVERY_ADDRESS: "Город, улица, дом",
+  LABEL_FLAT: "Комментарий",
+  PLACEHOLDER_FLAT: "подъезд, этаж, кв",
+  LABEL_PAYMENT_METHOD: "Способ оплаты",
+  PAYMENT_METHOD_CARD_SOON: "Скоро",
+  LABEL_SHIPPING_PROVIDER: "Служба доставки",
+  SHIPPING_PROVIDER_SELLER: "Продавцом",
+  SHIPPING_PROVIDER_SOON: "Скоро",
+  LABEL_SHIPPING_SERVICE: "Тип доставки",
+  SHIPPING_SERVICE_COURIER: "Курьер",
+  SHIPPING_SERVICE_PICKUP_POINT: "Пункт выдачи",
+  SHIPPING_PROVIDER_HINT:
+    "Сейчас товар доставляет продавец. СДЭК, Яндекс Доставка и Почта России появятся позже.",
+  SUBMIT_IDLE: "Оформить заказ",
+  SUBMIT_LOADING: "Оформляем…",
+  SUCCESS: "Заказ успешно оформлен",
+  ERROR_GENERIC: "Не удалось оформить заказ",
+  ERROR_PICKUP_REQUIRED: "У товара нет адреса самовывоза — оформить заказ нельзя",
+  ADDRESS_MAX_LENGTH: 30,
+};
+
+export const PRODUCT_PICKUP_UI = {
+  FULFILLMENT_LEGEND: "Какие способы получения поддерживаете",
+  FULFILLMENT_PICKUP: "Самовывоз",
+  FULFILLMENT_DELIVERY: "Доставка продавцом",
+  CARRIERS_LEGEND: "Службы доставки (скоро)",
+  SOON_BADGE: " · скоро",
+  METHODS_REQUIRED_HINT: "Можно выбрать несколько. Хотя бы один способ обязателен.",
+  METHODS_BOTH_HINT:
+    "Покупатель выберет самовывоз или доставку. Адрес ниже — точка самовывоза / отправления.",
+  PICKUP_HINT: "Укажите адрес и отметьте точку на карте (или выберите из подсказок).",
+  DELIVERY_CARRIERS_HINT:
+    "Покупатель укажет адрес доставки. Службы СДЭК / Яндекс / Почта — позже; пока доставляете сами.",
+  ADDRESS_LABEL: "Адрес продажи",
+  ADDRESS_LABEL_WAREHOUSE: "Адрес точки отправления",
+  MAP_ARIA: "Карта адреса продажи",
+  DETAILS_TITLE: "Самовывоз",
+  DETAILS_ROUTE: "Маршрут",
+  DETAILS_OPEN_MAP: "Открыть на карте",
+  DETAILS_NO_ADDRESS: "Адрес самовывоза не указан",
+  DETAILS_DELIVERY_HINT: "Адрес укажете при оформлении заказа",
+};
