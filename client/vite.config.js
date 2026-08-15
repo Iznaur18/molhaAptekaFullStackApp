@@ -118,7 +118,8 @@ export default defineConfig({
       }),
   ].filter(Boolean),
   build: {
-    sourcemap: "hidden",
+    // Do not ship .map to VPS dist (upload to Sentry separately if needed).
+    sourcemap: false,
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -128,13 +129,32 @@ export default defineConfig({
           if (id.includes("@sentry")) {
             return "vendor-sentry";
           }
-          if (id.includes("@tanstack/react-query")) {
+          if (id.includes("leaflet") || id.includes("react-leaflet")) {
+            return "vendor-leaflet";
+          }
+          if (id.includes("embla-carousel")) {
+            return "vendor-embla";
+          }
+          if (id.includes("zod")) {
+            return "vendor-zod";
+          }
+          if (
+            id.includes("@tanstack/react-query") ||
+            id.includes("@tanstack/query-core")
+          ) {
             return "vendor-query";
           }
           if (id.includes("react-router")) {
             return "vendor-router";
           }
-          if (id.includes("react-dom") || id.includes("/react/")) {
+          if (
+            id.includes("node_modules/react-dom") ||
+            id.includes("node_modules\\react-dom") ||
+            id.includes("node_modules/react/") ||
+            id.includes("node_modules\\react\\") ||
+            id.includes("node_modules/scheduler") ||
+            id.includes("node_modules\\scheduler")
+          ) {
             return "vendor-react";
           }
           if (id.includes("axios")) {

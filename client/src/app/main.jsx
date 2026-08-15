@@ -10,9 +10,16 @@ import "../index.css";
 import App from "./App.jsx";
 
 if (isClientSentryEnabled()) {
-  void import("../shared/lib/initClientSentry.js").then(({ initClientSentry }) =>
-    initClientSentry(),
-  );
+  const bootSentry = () => {
+    void import("../shared/lib/initClientSentry.js").then(({ initClientSentry }) =>
+      initClientSentry(),
+    );
+  };
+  if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+    window.requestIdleCallback(bootSentry, { timeout: 4000 });
+  } else {
+    window.setTimeout(bootSentry, 2500);
+  }
 }
 
 initRuntimeDesignTokens();

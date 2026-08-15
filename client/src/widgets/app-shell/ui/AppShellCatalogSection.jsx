@@ -1,9 +1,8 @@
+import { lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { HomeCuratedProductListsSection } from "../../../entities/curated-product-list/ui/HomeCuratedProductListsSection.jsx";
 import { CuratedProductListCarouselSkeleton } from "../../../entities/curated-product-list/ui/CuratedProductListCarouselSkeleton.jsx";
-import { RaffleFeaturedHomeSection } from "../../../entities/raffle/ui/RaffleFeaturedHomeSection.jsx";
-import { UserStoriesStrip } from "../../../entities/user-story/ui/UserStoriesStrip.jsx";
 import { CatalogBrowserBreadcrumb } from "../../../entities/product-category-display/ui/CatalogBrowserBreadcrumb.jsx";
 import { CatalogBrowserLanding } from "../../../entities/product-category-display/ui/CatalogBrowserLanding.jsx";
 import { CatalogSubcategoryPicker } from "../../../entities/product-category-display/ui/CatalogSubcategoryPicker.jsx";
@@ -12,8 +11,22 @@ import { InlineErrorBanner } from "../../../shared/ui/InlineErrorBanner/InlineEr
 
 import { CatalogGridSkeleton } from "../../catalog-product-grid/ui/CatalogGridSkeleton.jsx";
 import { HomeCatalogGrid } from "../../catalog-product-grid/ui/HomeCatalogGrid.jsx";
-import { MyProductsCatalogSection } from "../../my-products-page/ui/MyProductsCatalogSection.jsx";
 
+const LazyRaffleFeaturedHomeSection = lazy(() =>
+  import("../../../entities/raffle/ui/RaffleFeaturedHomeSection.jsx").then(
+    (module) => ({ default: module.RaffleFeaturedHomeSection }),
+  ),
+);
+const LazyUserStoriesStrip = lazy(() =>
+  import("../../../entities/user-story/ui/UserStoriesStrip.jsx").then(
+    (module) => ({ default: module.UserStoriesStrip }),
+  ),
+);
+const LazyMyProductsCatalogSection = lazy(() =>
+  import("../../my-products-page/ui/MyProductsCatalogSection.jsx").then(
+    (module) => ({ default: module.MyProductsCatalogSection }),
+  ),
+);
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
 
 /**
@@ -136,29 +149,31 @@ export function AppShellCatalogGridSection({
 
   if (isMineMode) {
     return (
-      <MyProductsCatalogSection
-        catalogStatus={catalogStatus}
-        products={products}
-        isAuthorized={isAuthorized}
-        isUserDataConfirmed={isUserDataConfirmed}
-        deletingProductId={deletingProductId}
-        onEditMyProduct={onEditMyProduct}
-        onPromoteMyProduct={onPromoteMyProduct}
-        myProductsCatalogError={myProductsCatalogError}
-        myProductsCatalogNotice={myProductsCatalogNotice}
-        onOpenProductDetails={onOpenProductDetails}
-        togglingAvailabilityProductId={togglingAvailabilityProductId}
-        togglingAuctionProductId={togglingAuctionProductId}
-        catalogSentinelRef={catalogSentinelRef}
-        catalogHasMore={catalogHasMore}
-        isCatalogLoadingMore={isCatalogLoadingMore}
-        catalogLoadMoreError={catalogLoadMoreError}
-        onRetryCatalogLoadMore={onRetryCatalogLoadMore}
-        myProductsModerationFilter={myProductsModerationFilter}
-        sellerLoyaltyPointsBalance={sellerLoyaltyPointsBalance}
-        sellerLoyaltyPointsReserved={sellerLoyaltyPointsReserved}
-        onPlaceProductClick={onPlaceProductClick}
-      />
+      <Suspense fallback={<CatalogGridSkeleton />}>
+        <LazyMyProductsCatalogSection
+          catalogStatus={catalogStatus}
+          products={products}
+          isAuthorized={isAuthorized}
+          isUserDataConfirmed={isUserDataConfirmed}
+          deletingProductId={deletingProductId}
+          onEditMyProduct={onEditMyProduct}
+          onPromoteMyProduct={onPromoteMyProduct}
+          myProductsCatalogError={myProductsCatalogError}
+          myProductsCatalogNotice={myProductsCatalogNotice}
+          onOpenProductDetails={onOpenProductDetails}
+          togglingAvailabilityProductId={togglingAvailabilityProductId}
+          togglingAuctionProductId={togglingAuctionProductId}
+          catalogSentinelRef={catalogSentinelRef}
+          catalogHasMore={catalogHasMore}
+          isCatalogLoadingMore={isCatalogLoadingMore}
+          catalogLoadMoreError={catalogLoadMoreError}
+          onRetryCatalogLoadMore={onRetryCatalogLoadMore}
+          myProductsModerationFilter={myProductsModerationFilter}
+          sellerLoyaltyPointsBalance={sellerLoyaltyPointsBalance}
+          sellerLoyaltyPointsReserved={sellerLoyaltyPointsReserved}
+          onPlaceProductClick={onPlaceProductClick}
+        />
+      </Suspense>
     );
   }
 
@@ -172,23 +187,27 @@ export function AppShellCatalogGridSection({
   return (
     <>
       {isHomeCatalogMainView && featuredRaffles.length > 0 ? (
-        <RaffleFeaturedHomeSection
-          raffles={featuredRaffles}
-          onOpenProducts={(raffleId) => navigate(buildRafflePath(raffleId))}
-          getManage={getFeaturedRaffleManage}
-        />
+        <Suspense fallback={null}>
+          <LazyRaffleFeaturedHomeSection
+            raffles={featuredRaffles}
+            onOpenProducts={(raffleId) => navigate(buildRafflePath(raffleId))}
+            getManage={getFeaturedRaffleManage}
+          />
+        </Suspense>
       ) : null}
       {isHomeCatalogMainView ? (
-        <UserStoriesStrip
-          rings={userStoriesFeed.rings}
-          canPublish={userStoriesFeed.canPublish}
-          showStrip={userStoriesFeed.showStrip}
-          isAuthorized={isAuthorized}
-          currentUserId={currentUserId}
-          onRefresh={onUserStoriesRefresh}
-          onOpenProfile={onSellerNameClick}
-          onRequestLogin={onRequestLoginAddToCart}
-        />
+        <Suspense fallback={null}>
+          <LazyUserStoriesStrip
+            rings={userStoriesFeed.rings}
+            canPublish={userStoriesFeed.canPublish}
+            showStrip={userStoriesFeed.showStrip}
+            isAuthorized={isAuthorized}
+            currentUserId={currentUserId}
+            onRefresh={onUserStoriesRefresh}
+            onOpenProfile={onSellerNameClick}
+            onRequestLogin={onRequestLoginAddToCart}
+          />
+        </Suspense>
       ) : null}
       {showCuratedProductLists && homeCuratedProductLists.length > 0 ? (
         <HomeCuratedProductListsSection

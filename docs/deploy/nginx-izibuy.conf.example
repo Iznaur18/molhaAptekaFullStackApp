@@ -206,6 +206,11 @@ server {
         access_log off;
     }
 
+    # Sourcemaps не отдаём с прода
+    location ~* \.map$ {
+        return 404;
+    }
+
     # intro и прочие файлы из public/
     location /intro/ {
         try_files $uri =404;

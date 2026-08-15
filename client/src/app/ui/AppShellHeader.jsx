@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef } from "react";
 
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -16,7 +16,6 @@ import {
 import { MobileBottomNav } from "../../widgets/mobile-bottom-nav/ui/MobileBottomNav.jsx";
 import { useScrollLock } from "../../shared/lib/useScrollLock.js";
 import { SearchInput } from "../../shared/ui/SearchInput/SearchInput.jsx";
-import { SiteHeaderBannerCarousel } from "../../entities/site-header-banner/ui/SiteHeaderBannerCarousel.jsx";
 import { useSiteHeaderBannerSlidesQuery } from "../../entities/site-header-banner/model/useSiteHeaderBannerSlidesQuery.js";
 import { ViewerRegionSelect } from "../../entities/region/ui/ViewerRegionSelect.jsx";
 import {
@@ -24,6 +23,11 @@ import {
   parseLegalKindFromPathname,
 } from "../../shared/lib/infoPagePaths.js";
 
+const LazySiteHeaderBannerCarousel = lazy(() =>
+  import("../../entities/site-header-banner/ui/SiteHeaderBannerCarousel.jsx").then(
+    (module) => ({ default: module.SiteHeaderBannerCarousel }),
+  ),
+);
 /**
  * Единый topbar для всех ширин веба (mobile chrome: search + region + stretch).
  *
@@ -188,7 +192,9 @@ export function AppShellHeader({
             </div>
           )}
           {siteHeaderBannerSlides.length > 0 ? (
-            <SiteHeaderBannerCarousel slides={siteHeaderBannerSlides} />
+            <Suspense fallback={null}>
+              <LazySiteHeaderBannerCarousel slides={siteHeaderBannerSlides} />
+            </Suspense>
           ) : null}
         </header>
       ) : null}
