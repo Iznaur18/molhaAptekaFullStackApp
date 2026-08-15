@@ -65,6 +65,9 @@ if (isProduction) {
 
 const app = createApp();
 const PORT = process.env.PORT ?? 4444;
+// Слушаем только loopback: наружу API идёт исключительно через nginx-прокси.
+// Переопределяется через HOST (напр. HOST=0.0.0.0) при необходимости.
+const HOST = process.env.HOST ?? "127.0.0.1";
 
 /** Мягкое время на дренаж соединений перед принудительным выходом. */
 const SHUTDOWN_FORCE_EXIT_MS = 10_000;
@@ -142,10 +145,11 @@ async function start() {
       });
     }
 
-    httpServer = app.listen(PORT, () => {
+    httpServer = app.listen(PORT, HOST, () => {
       logServerEvent("info", {
         event: "api.listening",
         port: Number(PORT),
+        host: HOST,
       });
     });
     httpServer.on("error", (err) => {
