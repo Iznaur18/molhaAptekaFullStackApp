@@ -30,6 +30,8 @@ Nginx конфиг:   /etc/nginx/sites-available/gitorg
 | `gitorg-worker` | фоновые задачи (письма и т.п.) |
 | `nginx` | HTTPS, раздаёт фронт, проксирует API |
 | `mongod` | база данных |
+| `ufw` | фаервол: наружу только 22/80/443 (см. §15) |
+| `fail2ban` | бан IP за перебор паролей SSH (см. §15) |
 
 ---
 
@@ -330,6 +332,81 @@ mongodump --uri='ВСТАВЬ_MONGO_URI_ИЗ_ENV' --out=/var/backups/gitorg-mong
 - Не `systemctl stop mongod` «на всякий случай».
 - Не править прод-код в nano вместо git (потеряешь при следующем pull).
 - Не путать ПК и SSH: `cd /var/www/gitorg` только после `ssh`.
+
+---
+
+## 15. Безопасность сервера (базовый хардненинг)
+
+Настроено 2026-08-15. Эти правки живут **на сервере, не в git** — при переустановке VPS повтори их.
+
+### Фаервол (ufw)
+
+Пускаем только SSH/HTTP/HTTPS, остальное закрыто:
+
+```bash
+ufw status verbose        # проверить
+```
+
+Ожидаемо: `Status: active`, разрешены `22/tcp`, `80/tcp`, `443/tcp`, `Default: deny (incoming)`.
+
+Если ставишь с нуля — **сначала разреши 22, потом enable** (иначе отрежешь себе SSH):
+
+```bash
+apt-get install -y ufw
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow 22/tcp && ufw allow 80/tcp && ufw allow 443/tcp
+ufw --force enable
+```
+
+### Защита от перебора паролей (fail2ban)
+
+```bash
+systemctl is-active fail2ban          # active
+fail2ban-client status sshd           # забаненные IP, счётчики
+```
+
+Конфиг `/etc/fail2ban/jail.local`: jail `sshd`, `backend=auto` + `logpath=/var/log/auth.log`
+(**не** `backend=systemd` — на этом сервере нет модуля `python3-systemd`), бан 1ч после 5 попыток.
+
+### SSH — только по ключу
+
+Вход по паролю выключен, root — только по ключу. Настройки в `/etc/ssh/sshd_config.d/00-hardening.conf`:
+
+```
+PermitRootLogin prohibit-password
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+```
+
+> Имя файла `00-` важно: `Include` в главном `sshd_config` идёт раньше строк `...yes`, а в sshd **побеждает первое** значение. После правок: `sshd -t` (проверка синтаксиса) → `systemctl reload ssh` → **проверь вход новым окном до закрытия текущего**.
+
+Проверка эффективных значений:
+
+```bash
+sshd -T | grep -Ei 'permitrootlogin|passwordauthentication'
+```
+
+### API слушает только localhost
+
+`server/index.js` биндит API на `127.0.0.1` (через `HOST`, по умолчанию loopback). Наружу API идёт **только** через nginx-прокси. Проверка — порт 4444 должен быть на `127.0.0.1`, не на `0.0.0.0`/`*`:
+
+```bash
+ss -tlnp | grep 4444        # ждём 127.0.0.1:4444
+```
+
+Снаружи 4444 должен быть закрыт (проверять с ПК, не с сервера).
+
+### nginx — скрыта версия, усилен gzip
+
+- `server_tokens off;` в `/etc/nginx/nginx.conf` — в ответах `Server: nginx` без версии.
+- В `/etc/nginx/sites-available/gitorg` подняты `gzip_comp_level 6`, `gzip_vary on`, расширены `gzip_types` (шрифты/wasm). Бэкапы конфига — рядом: `gitorg.bak.*`.
+
+После правок nginx: `nginx -t && systemctl reload nginx`.
+
+### Не сделано (на будущее)
+
+- **brotli** — пакета в репах Ubuntu 22.04 нет; компилировать nginx из исходников на живом проде не стали. gzip6 покрывает ~95% выгоды.
 
 ---
 
