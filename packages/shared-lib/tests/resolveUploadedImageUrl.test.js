@@ -10,27 +10,27 @@ describe("resolveUploadedImageUrlForBrowser", () => {
   it("CDN URL не подменяется на origin SPA", () => {
     assert.equal(
       resolveUploadedImageUrlForBrowser(
-        "https://cdn.torgum.ru/uploads/photo.webp",
-        "https://torgum.ru",
+        "https://cdn.gitorg.ru/uploads/photo.webp",
+        "https://gitorg.ru",
       ),
-      "https://cdn.torgum.ru/uploads/photo.webp",
+      "https://cdn.gitorg.ru/uploads/photo.webp",
     );
   });
 
   it("same-origin absolute → path на origin", () => {
     assert.equal(
       resolveUploadedImageUrlForBrowser(
-        "https://torgum.ru/uploads/legacy.jpg",
-        "https://torgum.ru",
+        "https://gitorg.ru/uploads/legacy.jpg",
+        "https://gitorg.ru",
       ),
-      "https://torgum.ru/uploads/legacy.jpg",
+      "https://gitorg.ru/uploads/legacy.jpg",
     );
   });
 
   it("relative /uploads", () => {
     assert.equal(
-      resolveUploadedImageUrlForBrowser("/uploads/x.png", "https://torgum.ru"),
-      "https://torgum.ru/uploads/x.png",
+      resolveUploadedImageUrlForBrowser("/uploads/x.png", "https://gitorg.ru"),
+      "https://gitorg.ru/uploads/x.png",
     );
   });
 

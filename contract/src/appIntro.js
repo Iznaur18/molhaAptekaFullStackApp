@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /** Синхрон с `server/constants/appIntroSettingsConstants.js`. */
-export const APP_INTRO_FALLBACK_TITLE_DEFAULT = "Torgum";
+export const APP_INTRO_FALLBACK_TITLE_DEFAULT = "Gitorg";
 export const APP_INTRO_FALLBACK_HINT_DEFAULT = "Добро пожаловать";
 export const APP_INTRO_MIN_MS_DEFAULT = 2000;
 export const APP_INTRO_MAX_MS_DEFAULT = 8000;

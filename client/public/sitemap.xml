@@ -7,32 +7,32 @@
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://torgum.ru/</loc>
+    <loc>https://gitorg.ru/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://torgum.ru/faq</loc>
+    <loc>https://gitorg.ru/faq</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://torgum.ru/legal/terms</loc>
+    <loc>https://gitorg.ru/legal/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://torgum.ru/legal/privacy</loc>
+    <loc>https://gitorg.ru/legal/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://torgum.ru/legal/offer</loc>
+    <loc>https://gitorg.ru/legal/offer</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://torgum.ru/legal/listing</loc>
+    <loc>https://gitorg.ru/legal/listing</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

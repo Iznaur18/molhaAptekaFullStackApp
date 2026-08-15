@@ -69,7 +69,7 @@ const requestNativePushToken = async (): Promise<string | null> => {
 
   if (Platform.OS === "android") {
     await notifications.setNotificationChannelAsync("default", {
-      name: "Torgum",
+      name: "Gitorg",
       importance: notifications.AndroidImportance.DEFAULT,
     });
   }

@@ -1,4 +1,4 @@
-# Torgum — правила для поисковых роботов
+# Gitorg — правила для поисковых роботов
 # Пускаем ботов на публичный контент, закрываем личные/служебные страницы.
 
 User-agent: *
@@ -21,4 +21,4 @@ Disallow: /vote/
 Disallow: /address/
 Disallow: /upload
 
-Sitemap: https://torgum.ru/sitemap.xml
+Sitemap: https://gitorg.ru/sitemap.xml

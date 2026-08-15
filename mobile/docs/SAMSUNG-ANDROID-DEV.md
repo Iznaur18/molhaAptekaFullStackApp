@@ -123,7 +123,7 @@ Deep links cold-open на устройстве:
 - [ ] Профиль → **аватар** (галерея Samsung)
 - [ ] Мои заказы → confirm / cancel
 - [ ] «Пожаловаться» на товар
-- [ ] Deep link `torgum://product/<id>` (cold open)
+- [ ] Deep link `gitorg://product/<id>` (cold open)
 - [ ] Stories: create (premium) + viewer + report
 
 Баги фиксируем под Samsung; web — регрессия.

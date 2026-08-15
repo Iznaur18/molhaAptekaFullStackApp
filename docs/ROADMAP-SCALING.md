@@ -148,7 +148,7 @@ Worker (systemd) ──► CRON_LEADER=true, BullMQ consumer
 
 **Staging**
 
-- [ ] `staging.torgum.ru` (или отдельный VPS)
+- [ ] `staging.gitorg.ru` (или отдельный VPS)
 - [ ] Отдельная БД Atlas, отдельные секреты
 - [ ] Деплой staging перед prod на критичных релизах
 
@@ -263,8 +263,8 @@ NODE_ENV=production
 PORT=4444
 JWT_SECRET=<64 hex>
 MONGO_URI=mongodb+srv://...
-FRONTEND_URL=https://torgum.ru
-PUBLIC_UPLOAD_BASE_URL=https://torgum.ru
+FRONTEND_URL=https://gitorg.ru
+PUBLIC_UPLOAD_BASE_URL=https://gitorg.ru
 # UPLOAD_STORAGE=disk  # или s3 сразу
 SENTRY_DSN=
 ```
@@ -274,7 +274,7 @@ SENTRY_DSN=
 ```env
 REDIS_URL=redis://...
 UPLOAD_STORAGE=s3
-PUBLIC_UPLOAD_BASE_URL=https://cdn.torgum.ru
+PUBLIC_UPLOAD_BASE_URL=https://cdn.gitorg.ru
 S3_BUCKET=...
 S3_ACCESS_KEY_ID=...
 S3_SECRET_ACCESS_KEY=...

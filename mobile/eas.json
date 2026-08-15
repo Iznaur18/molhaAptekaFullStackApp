@@ -44,8 +44,8 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://api.torgum.ru",
-        "EXPO_PUBLIC_UPLOAD_BASE_URL": "https://cdn.torgum.ru"
+        "EXPO_PUBLIC_API_URL": "https://api.gitorg.ru",
+        "EXPO_PUBLIC_UPLOAD_BASE_URL": "https://cdn.gitorg.ru"
       }
     }
   },

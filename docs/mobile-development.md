@@ -20,7 +20,7 @@
 | Навигация | Expo Router (tabs template) |
 | Язык | TypeScript |
 | Workspaces | `file:../contract`, npm workspaces — позже |
-| Bundle ID | `ru.torgum.app` |
+| Bundle ID | `ru.gitorg.app` |
 | Display name | iziBuy |
 | Dev API | `EXPO_PUBLIC_API_URL` → LAN `http://192.168.x.x:4444` |
 | Нативный тест v1 | **Samsung Android** (EAS APK или `expo run:android --device`) |
@@ -129,7 +129,7 @@ Web: `resolveUploadedImageUrl` подставляет `window.location.origin` �
 Обязательно до релиза в сторы:
 
 ```env
-PUBLIC_UPLOAD_BASE_URL=https://cdn.torgum.ru
+PUBLIC_UPLOAD_BASE_URL=https://cdn.gitorg.ru
 # либо UPLOAD_STORAGE=s3 + CDN — см. server/docs/MEDIA-OBJECT-STORAGE.md
 ```
 
@@ -238,7 +238,7 @@ v2 — по приоритету продукта после релиза MVP.
 
 - Apple Developer — $99/год
 - Google Play Console — $25 разово
-- Bundle ID: `ru.torgum.app`
+- Bundle ID: `ru.gitorg.app`
 
 ### EAS
 
@@ -406,7 +406,7 @@ npx eas submit --platform ios
 
 - [ ] Apple Developer Account ($99/год)
 - [ ] Google Play Console ($25)
-- [x] Bundle ID / Application ID — `ru.torgum.app` (в `app.json`, EAS — фаза 5)
+- [x] Bundle ID / Application ID — `ru.gitorg.app` (в `app.json`, EAS — фаза 5)
 - [x] `eas.json`: профили development, preview, production
 - [x] `expo-dev-client` + npm-скрипты EAS (`build:dev:android`, …)
 - [ ] EAS Build: первый прогон (`eas login` → `build:configure` → `npm run build:dev:android`)
@@ -438,7 +438,7 @@ npx eas submit --platform ios
 
 ### Навигация и рост
 
-- [ ] Deep links: `torgum://product/:id`, Universal Links (iOS) + App Links (Android)
+- [ ] Deep links: `gitorg://product/:id`, Universal Links (iOS) + App Links (Android)
 - [ ] Файлы на сервере/CDN: `apple-app-site-association`, `.well-known/assetlinks.json`
 - [ ] Push-уведомления: FCM + APNs, server-side очередь (новый заказ, статус заказа)
 - [ ] `expo-notifications` + permissions
@@ -562,7 +562,7 @@ npx eas submit --platform ios
 
 ### MP-5 — Polish
 
-- [x] Deep links: `torgum://` + `https://torgum.ru` (`parseAppDeepLink`, `useAppDeepLinking`, intent filters)
+- [x] Deep links: `gitorg://` + `https://gitorg.ru` (`parseAppDeepLink`, `useAppDeepLinking`, intent filters)
 - [x] In-app notifications poll (`useInAppNotificationsPoll`, 30s) + routing по kind
 - [x] Тёмная тема: `izColorsDark`, `ThemePreferenceToggle` (system/light/dark), nav/tab bar theming
 - [x] Remote push: `expo-notifications` + `PUT/DELETE /auth/me/push-token` + Expo Push API при `createUserInAppNotification`
@@ -643,7 +643,7 @@ npx eas submit --platform ios
 | `/raffle/:id` | `/raffle/[id]` | **full** | — |
 | Stories viewer | `HomeFeedHeader` + `UserStoryViewerModal` | **full** | create, delete own, video (WF-5.1 ✅) |
 | Story report (user) | `ReportUserStoryModal` в viewer | **full** | submit report (WF-5.2 ✅) |
-| Deep link `torgum://` / `https://torgum.ru` | `parseAppDeepLink` | **full** | product, raffle, seller, user, users (WF-7.1 ✅) |
+| Deep link `gitorg://` / `https://gitorg.ru` | `parseAppDeepLink` | **full** | product, raffle, seller, user, users (WF-7.1 ✅) |
 | `/(auth)/login` | `/(auth)/login` | **full** | — |
 | `/(auth)/register` | `/(auth)/register` | **full** | parity с web register |
 | `/profile/edit` | `/profile/edit` | **full** | — |
@@ -797,14 +797,14 @@ Samsung cold-open deep links:
 
 | URL | Ожидание |
 |-----|----------|
-| `torgum://product/<id>` | `/product/<id>` |
-| `torgum://raffle/<id>` | `/raffle/<id>` |
-| `torgum://seller/<userId>` | `/seller/<userId>` |
-| `torgum://user/<userId>` | `/user/<userId>` |
-| `torgum://users` / `torgum://user-list` | `/users` |
-| `https://torgum.ru/product/<id>` | `/product/<id>` |
-| `torgum://hub/wishlist` | `/hub/wishlist` |
-| `torgum://orders` | `/orders` |
+| `gitorg://product/<id>` | `/product/<id>` |
+| `gitorg://raffle/<id>` | `/raffle/<id>` |
+| `gitorg://seller/<userId>` | `/seller/<userId>` |
+| `gitorg://user/<userId>` | `/user/<userId>` |
+| `gitorg://users` / `gitorg://user-list` | `/users` |
+| `https://gitorg.ru/product/<id>` | `/product/<id>` |
+| `gitorg://hub/wishlist` | `/hub/wishlist` |
+| `gitorg://orders` | `/orders` |
 
 #### Samsung smoke (натив)
 

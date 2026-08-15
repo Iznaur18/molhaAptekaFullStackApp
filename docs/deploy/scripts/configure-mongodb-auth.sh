@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Create torgum DB user, enable auth+keyFile for single-node rs0.
+# Create gitorg DB user, enable auth+keyFile for single-node rs0.
 # Prints MONGO_URI at the end — save it into server/.env
 set -euo pipefail
 
 CONF=/etc/mongod.conf
 KEYFILE=/etc/mongo-keyfile
-USER_NAME=torgum
-DB_NAME=torgum
+USER_NAME=gitorg
+DB_NAME=gitorg
 
 if [[ ! -f "$CONF" ]]; then
   echo "Missing $CONF"

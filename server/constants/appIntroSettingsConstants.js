@@ -1,6 +1,6 @@
 export const APP_INTRO_SETTINGS_KEY = "default";
 
-export const APP_INTRO_FALLBACK_TITLE_DEFAULT = "Torgum";
+export const APP_INTRO_FALLBACK_TITLE_DEFAULT = "Gitorg";
 export const APP_INTRO_FALLBACK_HINT_DEFAULT = "Добро пожаловать";
 
 export const APP_INTRO_MIN_MS_DEFAULT = 2000;

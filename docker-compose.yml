@@ -5,13 +5,13 @@
 services:
   mongo:
     image: mongo:7
-    container_name: torgum-mongo
+    container_name: gitorg-mongo
     command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
     ports:
       - "27017:27017"
     volumes:
-      - torgum_mongo_data:/data/db
+      - gitorg_mongo_data:/data/db
     restart: unless-stopped
 
 volumes:
-  torgum_mongo_data:
+  gitorg_mongo_data:

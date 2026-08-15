@@ -38,8 +38,8 @@ node scripts/printSpaCspHeader.js
 
 | Деплой | `img-src` / `media-src` |
 |--------|-------------------------|
-| Вариант A: `https://torgum.ru` = SPA и uploads | `'self'` + `https:` (внешние фото в карточках) |
-| S3 + CDN: `https://cdn.torgum.ru` | явно `https://cdn.torgum.ru` + `https:` |
+| Вариант A: `https://gitorg.ru` = SPA и uploads | `'self'` + `https:` (внешние фото в карточках) |
+| S3 + CDN: `https://cdn.gitorg.ru` | явно `https://cdn.gitorg.ru` + `https:` |
 
 Клиент **не** переписывает CDN URL (`resolveUploadedImageUrl.js`).
 

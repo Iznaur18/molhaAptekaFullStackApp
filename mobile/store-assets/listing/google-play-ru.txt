@@ -20,7 +20,7 @@ iziBuy — приложение для покупателей маркетпле
 
 Оплата в приложении — выбор способа при заказе (без привязки банковских карт в MVP).
 
-Политика конфиденциальности: https://torgum.ru/privacy.html
+Политика конфиденциальности: https://gitorg.ru/privacy.html
 
 ## Категория
 Покупки
@@ -32,4 +32,4 @@ iziBuy — приложение для покупателей маркетпле
 iznaur.guzhaev@mail.ru
 
 ## Privacy Policy URL
-https://torgum.ru/privacy.html
+https://gitorg.ru/privacy.html

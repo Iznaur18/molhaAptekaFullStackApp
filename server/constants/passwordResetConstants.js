@@ -26,4 +26,4 @@ export const PASSWORD_CHANGE_INVALID_CURRENT_MESSAGE = "Неверный тек�
 export const PASSWORD_CHANGE_NO_PASSWORD_MESSAGE =
   "У аккаунта нет пароля. Задайте новый через восстановление";
 
-export const PASSWORD_RESET_EMAIL_SUBJECT = "Сброс пароля — Torgum";
+export const PASSWORD_RESET_EMAIL_SUBJECT = "Сброс пароля — Gitorg";

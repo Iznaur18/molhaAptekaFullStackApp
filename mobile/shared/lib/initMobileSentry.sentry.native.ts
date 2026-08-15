@@ -58,7 +58,7 @@ const setAppVersionContext = (): void => {
 
   Sentry.addBreadcrumb({
     category: "app",
-    message: `Torgum mobile ${appVersion}${buildNumber ? ` (${buildNumber})` : ""}`,
+    message: `Gitorg mobile ${appVersion}${buildNumber ? ` (${buildNumber})` : ""}`,
     level: "info",
   });
 };

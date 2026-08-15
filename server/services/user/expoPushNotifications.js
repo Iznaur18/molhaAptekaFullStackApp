@@ -134,7 +134,7 @@ export async function sendExpoPushToUser(userId, message) {
     tokens.map((to) => ({
       to,
       sound: "default",
-      title: message.title ?? "Torgum",
+      title: message.title ?? "Gitorg",
       body: message.body,
       data: message.data ?? {},
     })),

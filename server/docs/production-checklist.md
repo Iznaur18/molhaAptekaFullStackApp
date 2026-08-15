@@ -169,7 +169,7 @@ sudo journalctl -u izibuy-api -n 200 -o cat | jq -c 'select(.event=="http.access
 sudo journalctl -u izibuy-worker -n 50 -o cat | jq -c 'select(.event=="worker.heartbeat")' | tail -3
 
 # корреляция: взять requestId из ответа 404/ошибки
-curl -sS -D- https://torgum.ru/api/no-such-route-xyz -o /tmp/body.json
+curl -sS -D- https://gitorg.ru/api/no-such-route-xyz -o /tmp/body.json
 # заголовок X-Request-Id + поле requestId в JSON →
 sudo journalctl -u izibuy-api -n 500 -o cat | jq -c 'select(.requestId=="<id>")'
 

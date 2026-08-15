@@ -130,7 +130,7 @@ export const assertProductionEnv = () => {
   if (isProduction && !isBlank(process.env.MONGO_URI)) {
     if (mongoUriIsUnsafeLocalhostProd(process.env.MONGO_URI)) {
       errors.push(
-        "MONGO_URI на localhost без auth+replicaSet — для prod на VPS: mongodb://USER:PASS@127.0.0.1:27017/torgum?replicaSet=rs0&authSource=admin (см. docs/deploy/DEPLOY.md); голый compose URI запрещён",
+        "MONGO_URI на localhost без auth+replicaSet — для prod на VPS: mongodb://USER:PASS@127.0.0.1:27017/gitorg?replicaSet=rs0&authSource=admin (см. docs/deploy/DEPLOY.md); голый compose URI запрещён",
       );
     } else if (!mongoUriHasCredentials(process.env.MONGO_URI)) {
       errors.push(

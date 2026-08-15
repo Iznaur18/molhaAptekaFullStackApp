@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 import sys
 
-path = Path(sys.argv[1] if len(sys.argv) > 1 else "/var/www/torgum/server/.env")
+path = Path(sys.argv[1] if len(sys.argv) > 1 else "/var/www/gitorg/server/.env")
 t = path.read_text()
 a = chr(64)
 old = "gimer8yandex.ru"

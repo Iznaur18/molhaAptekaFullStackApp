@@ -27,7 +27,7 @@ test("csrfCookieOriginCheckMW: refresh-only cookie requires Origin", async () =>
   const previousEnv = process.env.NODE_ENV;
   const previousFrontend = process.env.FRONTEND_URL;
   process.env.NODE_ENV = "development";
-  process.env.FRONTEND_URL = "https://torgum.ru";
+  process.env.FRONTEND_URL = "https://gitorg.ru";
 
   try {
     /** @type {{ statusCode?: number; body?: unknown }} */
@@ -64,7 +64,7 @@ test("csrfCookieOriginCheckMW: refresh-only cookie requires Origin", async () =>
       method: "POST",
       cookies: { [AUTH_COOKIE_NAME]: "access", [REFRESH_COOKIE_NAME]: "refresh" },
       get(name) {
-        if (name === "origin") return "https://torgum.ru";
+        if (name === "origin") return "https://gitorg.ru";
         return undefined;
       },
     };

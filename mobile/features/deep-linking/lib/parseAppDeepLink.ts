@@ -78,7 +78,7 @@ export const parseAppDeepLink = (url: string): string | null => {
   try {
     const parsed = new URL(url);
     const scheme = parsed.protocol.replace(":", "");
-    if (scheme === "torgum" || scheme === "izibuy") {
+    if (scheme === "gitorg" || scheme === "izibuy") {
       const hostPath = parsed.hostname
         ? `/${parsed.hostname}${parsed.pathname}`
         : parsed.pathname;
@@ -87,8 +87,8 @@ export const parseAppDeepLink = (url: string): string | null => {
 
     const host = parsed.hostname.toLowerCase();
     if (
-      host === "torgum.ru" ||
-      host === "www.torgum.ru" ||
+      host === "gitorg.ru" ||
+      host === "www.gitorg.ru" ||
       host === "izibuy.ru" ||
       host === "www.izibuy.ru"
     ) {
@@ -96,7 +96,7 @@ export const parseAppDeepLink = (url: string): string | null => {
     }
   } catch {
     const normalized = normalizePath(
-      url.replace(/^(?:torgum|izibuy):\/\//i, "/"),
+      url.replace(/^(?:gitorg|izibuy):\/\//i, "/"),
     );
     return matchNamedRoute(normalized);
   }

@@ -1,6 +1,6 @@
 # SSL через Certbot (Let's Encrypt, бесплатно)
 
-Бесплатный TLS для **варианта A**: `torgum.ru` + `www.torgum.ru` на VPS с nginx.
+Бесплатный TLS для **варианта A**: `gitorg.ru` + `www.gitorg.ru` на VPS с nginx.
 
 | Документ | Когда |
 | -------- | ----- |
@@ -12,11 +12,11 @@
 ## 0. Предусловия
 
 - [ ] VPS (Ubuntu 22.04+), порты **80** и **443** открыты в firewall / security group
-- [ ] A-запись `torgum.ru` → IP VPS (и при необходимости `www`)
+- [ ] A-запись `gitorg.ru` → IP VPS (и при необходимости `www`)
 - [ ] nginx установлен, сайт отвечает по HTTP:
 
 ```bash
-curl -sI http://torgum.ru/health
+curl -sI http://gitorg.ru/health
 # ожидаем HTTP/1.1 200 (или 301 после SSL)
 ```
 
@@ -56,7 +56,7 @@ certbot --version
 ```bash
 cd /var/www/izibuy
 chmod +x docs/deploy/scripts/setup-ssl.sh
-./docs/deploy/scripts/setup-ssl.sh admin@torgum.ru
+./docs/deploy/scripts/setup-ssl.sh admin@gitorg.ru
 ```
 
 Скрипт: проверка DNS → `certbot --nginx` → тест renewal → `curl` по HTTPS.
@@ -65,9 +65,9 @@ chmod +x docs/deploy/scripts/setup-ssl.sh
 
 ```bash
 sudo certbot --nginx \
-  -d torgum.ru \
-  -d www.torgum.ru \
-  --email admin@torgum.ru \
+  -d gitorg.ru \
+  -d www.gitorg.ru \
+  --email admin@gitorg.ru \
   --agree-tos \
   --no-eff-email \
   --redirect
@@ -92,8 +92,8 @@ sudo certbot --nginx \
 
 ```nginx
 listen 443 ssl;
-ssl_certificate /etc/letsencrypt/live/torgum.ru/fullchain.pem;
-ssl_certificate_key /etc/letsencrypt/live/torgum.ru/privkey.pem;
+ssl_certificate /etc/letsencrypt/live/gitorg.ru/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/gitorg.ru/privkey.pem;
 include /etc/letsencrypt/options-ssl-nginx.conf;
 ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 ```
@@ -133,8 +133,8 @@ sudo nginx -t && sudo systemctl reload nginx
 ## 5. Проверка после SSL
 
 ```bash
-curl -sS https://torgum.ru/health
-curl -sSI https://torgum.ru | head -5
+curl -sS https://gitorg.ru/health
+curl -sSI https://gitorg.ru | head -5
 ```
 
 В браузере: замок HTTPS, редирект `http://` → `https://`.
@@ -142,8 +142,8 @@ curl -sSI https://torgum.ru | head -5
 В `server/.env` должны быть **https** URL:
 
 ```env
-FRONTEND_URL=https://torgum.ru
-PUBLIC_UPLOAD_BASE_URL=https://torgum.ru
+FRONTEND_URL=https://gitorg.ru
+PUBLIC_UPLOAD_BASE_URL=https://gitorg.ru
 ```
 
 Перезапуск API после смены env:
@@ -167,7 +167,7 @@ sudo ufw allow 'Nginx Full'
 ### `DNS problem: NXDOMAIN` / wrong IP
 
 ```bash
-dig +short torgum.ru A
+dig +short gitorg.ru A
 curl -s ifconfig.me   # IP VPS — должны совпасть
 ```
 
@@ -175,7 +175,7 @@ curl -s ifconfig.me   # IP VPS — должны совпасть
 
 ### `404` на ACME challenge
 
-- Убедись, что `server_name torgum.ru www.torgum.ru` в активном `server` на `:80`
+- Убедись, что `server_name gitorg.ru www.gitorg.ru` в активном `server` на `:80`
 - Нет ли другого `default_server` на 80: `sudo nginx -T | grep -A2 'listen 80'`
 - `sudo nginx -t` без ошибок
 
@@ -183,7 +183,7 @@ curl -s ifconfig.me   # IP VPS — должны совпасть
 
 ```bash
 sudo nginx -t
-sudo certbot delete --cert-name torgum.ru   # крайний случай
+sudo certbot delete --cert-name gitorg.ru   # крайний случай
 # восстанови конфиг из example, reload, снова certbot --nginx
 ```
 
@@ -198,11 +198,11 @@ sudo certbot renew --dry-run -v
 
 ---
 
-## 7. CDN / S3 (вариант с `cdn.torgum.ru`)
+## 7. CDN / S3 (вариант с `cdn.gitorg.ru`)
 
-Для **API-домена** `torgum.ru` — этот гайд.
+Для **API-домена** `gitorg.ru` — этот гайд.
 
-Отдельный сертификат на `cdn.torgum.ru` обычно выдаёт **Cloudflare** (proxy) или R2 custom domain — не certbot на этом VPS. См. [`PROD-S3-CDN.md`](PROD-S3-CDN.md).
+Отдельный сертификат на `cdn.gitorg.ru` обычно выдаёт **Cloudflare** (proxy) или R2 custom domain — не certbot на этом VPS. См. [`PROD-S3-CDN.md`](PROD-S3-CDN.md).
 
 ---
 
@@ -211,7 +211,7 @@ sudo certbot renew --dry-run -v
 Certbot ставится **на VPS**, не на Windows-ПК. Локально можно только проверить DNS:
 
 ```powershell
-nslookup torgum.ru
+nslookup gitorg.ru
 ```
 
 Дальше — SSH на VPS и шаги §1–§5.

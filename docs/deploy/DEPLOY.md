@@ -1,6 +1,6 @@
 # Первый production-деплой (Selectel VPS + nginx + Mongo на том же сервере)
 
-Линейный сценарий для **варианта A**: один домен `https://torgum.ru` → SPA + API + uploads + **MongoDB replica set на VPS**.
+Линейный сценарий для **варианта A**: один домен `https://gitorg.ru` → SPA + API + uploads + **MongoDB replica set на VPS**.
 
 **Без MongoDB Atlas.** База крутится в РФ на твоём Selectel-сервере (удобнее при ограничениях на зарубежные SaaS и для 152‑ФЗ).
 
@@ -18,7 +18,7 @@
 
 ## Зачем Mongo «replica set» на одном VPS
 
-Заказы и баллы в Torgum идут через **транзакции Mongo**. Они работают только если у `mongod` включён **replica set** (`rs0`), даже если член всего один (тот же сервер).
+Заказы и баллы в Gitorg идут через **транзакции Mongo**. Они работают только если у `mongod` включён **replica set** (`rs0`), даже если член всего один (тот же сервер).
 
 - Корневой `docker-compose.yml` в репо — **только local/dev** (без пароля). На VPS **не** использовать.
 - Atlas **не нужен**. Опционально позже, если сам захочешь.
@@ -29,7 +29,7 @@
 
 - VPS Selectel: Ubuntu **22.04 LTS**, публичный IP, SSH-ключ
 - Рекомендуемый смоук: **2 GB RAM** (`flavor 1012`) или спокойнее **4 GB** (`1013`); диск **20–40 GB**
-- Домен `torgum.ru` → A-запись на IP VPS (и при желании `www`)
+- Домен `gitorg.ru` → A-запись на IP VPS (и при желании `www`)
 - SMTP (регистрация / verify email) — иначе часть сценариев заказа не пройти
 - Репозиторий на GitHub (ветка `main`)
 
@@ -104,11 +104,11 @@ mongosh --eval 'rs.status().ok'
 mongosh --eval '
 use admin
 db.createUser({
-  user: "torgum",
+  user: "gitorg",
   pwd: "CHANGE_ME",
   roles: [
-    { role: "readWrite", db: "torgum" },
-    { role: "dbAdmin", db: "torgum" },
+    { role: "readWrite", db: "gitorg" },
+    { role: "dbAdmin", db: "gitorg" },
     { role: "clusterMonitor", db: "admin" }
   ]
 })
@@ -138,13 +138,13 @@ sudo systemctl restart mongod
 Проверка входа:
 
 ```bash
-mongosh "mongodb://torgum:CHANGE_ME@127.0.0.1:27017/torgum?replicaSet=rs0&authSource=admin" --eval 'db.runCommand({ ping: 1 })'
+mongosh "mongodb://gitorg:CHANGE_ME@127.0.0.1:27017/gitorg?replicaSet=rs0&authSource=admin" --eval 'db.runCommand({ ping: 1 })'
 ```
 
 **URI для `server/.env` (пароль URL-encode, если есть спецсимволы):**
 
 ```env
-MONGO_URI=mongodb://torgum:CHANGE_ME@127.0.0.1:27017/torgum?replicaSet=rs0&authSource=admin
+MONGO_URI=mongodb://gitorg:CHANGE_ME@127.0.0.1:27017/gitorg?replicaSet=rs0&authSource=admin
 ```
 
 Localhost **разрешён** в production только если есть **логин/пароль** и **`replicaSet=`**. Голый `mongodb://127.0.0.1:27017/...` без auth — запрещён (`preflight:prod` упадёт).
@@ -158,9 +158,9 @@ sudo apt install -y nginx certbot python3-certbot-nginx
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
 
-sudo mkdir -p /var/www/torgum
-sudo chown -R $USER:$USER /var/www/torgum
-cd /var/www/torgum
+sudo mkdir -p /var/www/gitorg
+sudo chown -R $USER:$USER /var/www/gitorg
+cd /var/www/gitorg
 git clone https://github.com/Iznaur18/molhaAptekaFullStackApp.git .
 # или: git clone <url> . && git checkout main
 ```
@@ -170,7 +170,7 @@ git clone https://github.com/Iznaur18/molhaAptekaFullStackApp.git .
 ## 3. Env
 
 ```bash
-cd /var/www/torgum/server
+cd /var/www/gitorg/server
 cp .env.production.example .env
 chmod 600 .env
 nano .env
@@ -183,8 +183,8 @@ nano .env
 | `JWT_SECRET` / `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | три **разных** строки ≥32 символов |
 | `PASSPORT_VAULT_KEK` | 64 hex (`openssl rand -hex 32`) |
 | `MONGO_URI` | URI из §1.5 |
-| `FRONTEND_URL` | `https://torgum.ru` |
-| `PUBLIC_UPLOAD_BASE_URL` | `https://torgum.ru` |
+| `FRONTEND_URL` | `https://gitorg.ru` |
+| `PUBLIC_UPLOAD_BASE_URL` | `https://gitorg.ru` |
 | `SMTP_HOST` / `SMTP_USER` / `SMTP_PASS` | свой SMTP |
 
 Секреты:
@@ -197,7 +197,7 @@ openssl rand -hex 32
 Проверка:
 
 ```bash
-cd /var/www/torgum/server
+cd /var/www/gitorg/server
 npm ci
 npm run preflight:prod
 # жди ✓ Mongo + replica set; без ошибок localhost/credentials
@@ -208,13 +208,13 @@ npm run preflight:prod
 ## 4. Сборка и миграции
 
 ```bash
-cd /var/www/torgum/contract && npm ci
-cd /var/www/torgum/server && npm ci && npm run migrate:apply
+cd /var/www/gitorg/contract && npm ci
+cd /var/www/gitorg/server && npm ci && npm run migrate:apply
 
-mkdir -p /var/www/torgum/server/uploads
+mkdir -p /var/www/gitorg/server/uploads
 # uploads/ не удалять при git pull
 
-cd /var/www/torgum/client && npm ci
+cd /var/www/gitorg/client && npm ci
 # Вариант A: НЕ задавай VITE_API_URL
 npm run build
 ```
@@ -226,12 +226,12 @@ npm run build
 ## 5. systemd (API)
 
 Пример в репо: `docs/deploy/systemd-izibuy.service.example` (имя файла старое).  
-Скопируй и поправь пути на `/var/www/torgum`:
+Скопируй и поправь пути на `/var/www/gitorg`:
 
 ```bash
-sudo tee /etc/systemd/system/torgum-api.service >/dev/null <<'EOF'
+sudo tee /etc/systemd/system/gitorg-api.service >/dev/null <<'EOF'
 [Unit]
-Description=Torgum Express API
+Description=Gitorg Express API
 After=network.target mongod.service
 Requires=mongod.service
 
@@ -239,8 +239,8 @@ Requires=mongod.service
 Type=simple
 User=www-data
 Group=www-data
-WorkingDirectory=/var/www/torgum/server
-EnvironmentFile=/var/www/torgum/server/.env
+WorkingDirectory=/var/www/gitorg/server
+EnvironmentFile=/var/www/gitorg/server/.env
 Environment=NODE_ENV=production
 ExecStart=/usr/bin/node index.js
 Restart=on-failure
@@ -251,14 +251,14 @@ LimitNOFILE=65535
 WantedBy=multi-user.target
 EOF
 
-sudo chown -R www-data:www-data /var/www/torgum/server/uploads
+sudo chown -R www-data:www-data /var/www/gitorg/server/uploads
 sudo systemctl daemon-reload
-sudo systemctl enable torgum-api
-sudo systemctl start torgum-api
-sudo systemctl status torgum-api
+sudo systemctl enable gitorg-api
+sudo systemctl start gitorg-api
+sudo systemctl status gitorg-api
 ```
 
-Логи: `journalctl -u torgum-api -f`
+Логи: `journalctl -u gitorg-api -f`
 
 Если API не читает `.env` из‑за прав: `chmod 640 server/.env` и пользователь `www-data` в группе владельца файла, либо временно запускай unit от своего `$USER` (поменяй `User=`).
 
@@ -269,17 +269,17 @@ sudo systemctl status torgum-api
 Нужен для cron (розыгрыши, рассрочка, промо). На смоуке можно отложить, но API тогда предупредит, что scheduled-задачи нигде не идут.
 
 ```bash
-sudo tee /etc/systemd/system/torgum-worker.service >/dev/null <<'EOF'
+sudo tee /etc/systemd/system/gitorg-worker.service >/dev/null <<'EOF'
 [Unit]
-Description=Torgum worker
-After=network.target mongod.service torgum-api.service
+Description=Gitorg worker
+After=network.target mongod.service gitorg-api.service
 
 [Service]
 Type=simple
 User=www-data
 Group=www-data
-WorkingDirectory=/var/www/torgum/server
-EnvironmentFile=/var/www/torgum/server/.env
+WorkingDirectory=/var/www/gitorg/server
+EnvironmentFile=/var/www/gitorg/server/.env
 Environment=NODE_ENV=production
 ExecStart=/usr/bin/node worker.js
 Restart=on-failure
@@ -290,8 +290,8 @@ WantedBy=multi-user.target
 EOF
 
 sudo systemctl daemon-reload
-sudo systemctl enable torgum-worker
-sudo systemctl start torgum-worker
+sudo systemctl enable gitorg-worker
+sudo systemctl start gitorg-worker
 ```
 
 В `server/.env` для API: `CRON_LEADER=false` (worker сам включает leader).  
@@ -303,21 +303,21 @@ sudo systemctl start torgum-worker
 
 ```bash
 sudo mkdir -p /var/www/certbot
-sudo cp /var/www/torgum/docs/deploy/nginx-izibuy.conf.example \
-  /etc/nginx/sites-available/torgum
+sudo cp /var/www/gitorg/docs/deploy/nginx-izibuy.conf.example \
+  /etc/nginx/sites-available/gitorg
 ```
 
-В конфиге замени пути `/var/www/izibuy` → `/var/www/torgum` и `server_name` на `torgum.ru www.torgum.ru` (в актуальном example уже `torgum.ru`).
+В конфиге замени пути `/var/www/izibuy` → `/var/www/gitorg` и `server_name` на `gitorg.ru www.gitorg.ru` (в актуальном example уже `gitorg.ru`).
 
 ```bash
-sudo ln -sf /etc/nginx/sites-available/torgum /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/gitorg /etc/nginx/sites-enabled/
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
 sudo systemctl reload nginx
 
-chmod +x /var/www/torgum/docs/deploy/scripts/setup-ssl.sh
+chmod +x /var/www/gitorg/docs/deploy/scripts/setup-ssl.sh
 # DNS A уже должен смотреть на этот IP
-/var/www/torgum/docs/deploy/scripts/setup-ssl.sh admin@torgum.ru
+/var/www/gitorg/docs/deploy/scripts/setup-ssl.sh admin@gitorg.ru
 ```
 
 Подробнее: [`CERTBOT-SSL.md`](CERTBOT-SSL.md).
@@ -327,8 +327,8 @@ chmod +x /var/www/torgum/docs/deploy/scripts/setup-ssl.sh
 ## 7. Первый админ
 
 ```bash
-cd /var/www/torgum/server
-npm run create-admin -- admin@torgum.ru 'StrongPassword123!' AdminName
+cd /var/www/gitorg/server
+npm run create-admin -- admin@gitorg.ru 'StrongPassword123!' AdminName
 ```
 
 ---
@@ -336,7 +336,7 @@ npm run create-admin -- admin@torgum.ru 'StrongPassword123!' AdminName
 ## 8. Smoke (5 минут)
 
 ```bash
-curl -sS https://torgum.ru/health
+curl -sS https://gitorg.ru/health
 # mongo: ок, uploadStorage, uptimeSec
 ```
 
@@ -354,14 +354,14 @@ curl -sS https://torgum.ru/health
 ## 9. Обновление (каждый релиз)
 
 ```bash
-cd /var/www/torgum && git pull
+cd /var/www/gitorg && git pull
 cd contract && npm ci
 cd ../server && npm ci && npm run migrate:apply
 cd ../client && npm ci && npm run build
-sudo systemctl restart torgum-api
-sudo systemctl restart torgum-worker   # если юнит есть
+sudo systemctl restart gitorg-api
+sudo systemctl restart gitorg-worker   # если юнит есть
 sudo nginx -t && sudo systemctl reload nginx
-curl -sS https://torgum.ru/health
+curl -sS https://gitorg.ru/health
 ```
 
 Откат: `server/docs/RUNBOOK.md`.
@@ -370,7 +370,7 @@ curl -sS https://torgum.ru/health
 
 ```bash
 # пример
-mongodump --uri="mongodb://torgum:CHANGE_ME@127.0.0.1:27017/torgum?replicaSet=rs0&authSource=admin" --out=/var/backups/torgum-mongo/$(date +%F)
+mongodump --uri="mongodb://gitorg:CHANGE_ME@127.0.0.1:27017/gitorg?replicaSet=rs0&authSource=admin" --out=/var/backups/gitorg-mongo/$(date +%F)
 ```
 
 Кладёжь бэкапов лучше вне единственного диска приложения (или копируй offsite).
@@ -389,7 +389,7 @@ mongodump --uri="mongodb://torgum:CHANGE_ME@127.0.0.1:27017/torgum?replicaSet=rs
 cd client
 npm ci
 npm run build
-# залить папку dist на VPS → /var/www/torgum/client/dist
+# залить папку dist на VPS → /var/www/gitorg/client/dist
 ```
 
 Env на VPS всё равно свой; `preflight:prod` гоняй **на сервере**, где живой `MONGO_URI` на `127.0.0.1`.
@@ -399,9 +399,9 @@ Env на VPS всё равно свой; `preflight:prod` гоняй **на се
 ## Шпаргалка «что где»
 
 ```
-Интернет → nginx :443 (torgum.ru)
+Интернет → nginx :443 (gitorg.ru)
               ├─ /           → client/dist (SPA)
-              ├─ /auth,/api… → Node :4444 (torgum-api)
+              ├─ /auth,/api… → Node :4444 (gitorg-api)
               └─ /uploads    → disk (или позже S3)
 
 Node API / worker → MongoDB 127.0.0.1:27017 (rs0 + auth)

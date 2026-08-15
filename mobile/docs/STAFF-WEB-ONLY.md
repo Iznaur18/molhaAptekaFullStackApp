@@ -5,7 +5,7 @@
 ## Поведение
 
 - Пункты staff в профиле → `Linking.openURL` на web (`EXPO_PUBLIC_WEB_APP_URL` + путь из `@izibuy/shared-lib` / `PROFILE_SECTION_WEB_PATH`).
-- Deep link `torgum://hub/<staff-section>` → краткий redirect в браузер, назад в таб «Профиль».
+- Deep link `gitorg://hub/<staff-section>` → краткий redirect в браузер, назад в таб «Профиль».
 - Buyer-path (каталог, корзина, заказы, seller my-products) — in-app как раньше.
 
 ## Dev
@@ -20,7 +20,7 @@ EXPO_PUBLIC_WEB_APP_URL=http://127.0.0.1:5173
 ## Prod
 
 ```bash
-EXPO_PUBLIC_WEB_APP_URL=https://torgum.ru
+EXPO_PUBLIC_WEB_APP_URL=https://gitorg.ru
 ```
 
 ## Для разработчиков
