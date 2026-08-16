@@ -24,11 +24,17 @@ function clearAuthSessionCookies(res) {
  * @param {{ isBlockedUser?: boolean; isActiveUser?: boolean }} user
  */
 function rejectInactiveAccount(res, user) {
-  clearAuthSessionCookies(res);
+  // Чистим сессию ТОЛЬКО когда реально отклоняем (блокировка/отключение).
+  // Раньше clearAuthSessionCookies стоял безусловно в начале — и гасил куки
+  // у любого валидного активного пользователя на КАЖДОМ авторизованном
+  // запросе: первый ответ приходил с данными, но кука стиралась → следующий
+  // запрос уже гость → «выкидывает после входа».
   if (user.isBlockedUser) {
+    clearAuthSessionCookies(res);
     return errorRes(res, 403, BLOCKED_ACCOUNT_MESSAGE);
   }
   if (user.isActiveUser === false) {
+    clearAuthSessionCookies(res);
     return errorRes(res, 403, DISABLED_ACCOUNT_MESSAGE);
   }
   return null;
