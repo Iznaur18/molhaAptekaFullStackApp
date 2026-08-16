@@ -804,7 +804,8 @@
   }
 
   .my-profile-page__mobile-nav-portal .my-profile-page__sidebar-wrap {
-    /* телефон: sheet выезжает справа — стартовая позиция за правым краем */
+    /* телефон: sheet справа; transform только через --my-profile-nav-hidden-x
+       (не дублировать transform — иначе бьёт specificity/--open и sheet не выезжает) */
     --my-profile-nav-hidden-x: calc(100% + 0.75rem);
     left: auto;
     right: 0;
@@ -813,7 +814,10 @@
     padding: 0.75rem 0.65rem 0.75rem 0.75rem;
     border-radius: 2rem 0 0 2rem;
     box-shadow: -12px 0 32px color-mix(in srgb, var(--iz-color-ink) 18%, transparent);
-    transform: translate3d(var(--my-profile-nav-hidden-x), 0, 0);
+  }
+
+  .my-profile-page__mobile-nav-portal--open .my-profile-page__sidebar-wrap {
+    transform: translate3d(0, 0, 0);
   }
 
   .my-profile-page__body .user-details-modal__banner {
