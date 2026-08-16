@@ -117,6 +117,8 @@ export const shouldSkipAuthRefreshByUrl = (url?: string): boolean => {
   return AUTH_REFRESH_SKIP_PATHS.some((skipPath) => path.includes(skipPath));
 };
 
+export { isDefinitiveAuthRefreshFailure } from "./isDefinitiveAuthRefreshFailure.js";
+
 export const createRefreshSessionQueue = <T>(refreshFn: () => Promise<T>) => {
   let refreshSessionPromise: Promise<T> | null = null;
 
@@ -145,7 +147,7 @@ type SetupAuthSessionInterceptorsOptions = {
   onRequest?: (config: InternalAxiosRequestConfig) => void | Promise<void>;
   onAuthSuccessResponse?: (response: AxiosResponse) => void | Promise<void>;
   shouldHandleAuthSuccessResponse?: (path: string) => boolean;
-  onRefreshFailure?: () => void | Promise<void>;
+  onRefreshFailure?: (refreshError?: unknown) => void | Promise<void>;
 };
 
 const attachOutboundRequestId = (config: InternalAxiosRequestConfig) => {
@@ -271,11 +273,13 @@ export const setupAuthSessionInterceptors = (
       try {
         await refreshSession();
         return apiClient(originalRequest);
-      } catch {
+      } catch (refreshError) {
         if (onRefreshFailure) {
-          await onRefreshFailure();
+          await onRefreshFailure(refreshError);
         }
-        return Promise.reject(error);
+        // Prefer refresh error so callers don't treat a transient refresh failure
+        // as a definitive 401 from the original request (which would false-logout).
+        return Promise.reject(refreshError);
       }
     },
   );

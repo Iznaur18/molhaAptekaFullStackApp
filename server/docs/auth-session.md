@@ -4,7 +4,7 @@
 
 1. `POST /auth/login` или `POST /auth/register` → JSON `{ success, data }`, два httpOnly cookie:
    - `access_token` (1 ч)
-   - `refresh_token` (30 д)
+   - `refresh_token` (365 д)
 2. Клиент: `axios` с `withCredentials: true` — cookie отправляется автоматически.
 3. `GET /auth/me` — без cookie **200** и `user: null`; с валидным access JWT — профиль. Просроченный access — **401**, клиент делает refresh.
 4. При **401** на `/auth/me` клиент один раз вызывает `POST /auth/refresh` и повторяет запрос.
@@ -37,7 +37,7 @@ Mobile **не использует cookies**. Те же эндпоинты, но
 | Cookie          | TTL  | typ в JWT |
 | --------------- | ---- | --------- |
 | `access_token`  | 1 ч  | `access`  |
-| `refresh_token` | 30 д | `refresh` |
+| `refresh_token` | 365 д | `refresh` |
 
 Общие параметры: httpOnly, path `/`, Secure в production (или при `COOKIE_CROSS_SITE=true`).
 
@@ -74,4 +74,4 @@ Native HTTP-клиенты (React Native) **не отправляют browser CO
 
 ## Legacy токены
 
-Access JWT без поля `typ` принимается `checkAuthMW` (обратная совместимость до истечения старых 30d cookie).
+Access JWT без поля `typ` принимается `checkAuthMW` (обратная совместимость до истечения старых cookie).

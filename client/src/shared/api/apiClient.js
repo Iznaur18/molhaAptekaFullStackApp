@@ -3,6 +3,7 @@ import {
   createRefreshSessionQueue,
   getRequestIdFromAxiosError,
   isCorrelationWorthyApiFailure,
+  isDefinitiveAuthRefreshFailure,
   setupAuthSessionInterceptors,
 } from "@izibuy/shared-api";
 
@@ -76,9 +77,10 @@ const refreshAuthSession = createRefreshSessionQueue(async () => {
     applyDevAuthTokensFromResponse(response);
     resetAuthSessionState();
   } catch (error) {
-    markAuthSessionDead();
-    clearAuthTokens();
-    emitAuthSessionDead();
+    // Сеть / 5xx — не гасим cookie; следующий запрос снова попробует refresh.
+    if (isDefinitiveAuthRefreshFailure(error) || isMissingAuthTokenError(error)) {
+      await clearDeadAuthSession();
+    }
     throw error;
   }
 });

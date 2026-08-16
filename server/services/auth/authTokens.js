@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 
+import { REFRESH_TOKEN_TTL_DAYS } from "../../constants/authCookieConstants.js";
+
 export const TOKEN_TYPE_ACCESS = "access";
 export const TOKEN_TYPE_REFRESH = "refresh";
 
@@ -48,7 +50,7 @@ export const signRefreshToken = (userId, authTokenVersion = 0) =>
     { _id: userId, typ: TOKEN_TYPE_REFRESH, tv: authTokenVersion },
     resolveJwtRefreshSecret(),
     {
-      expiresIn: "30d",
+      expiresIn: `${REFRESH_TOKEN_TTL_DAYS}d`,
       algorithm: "HS256",
     },
   );

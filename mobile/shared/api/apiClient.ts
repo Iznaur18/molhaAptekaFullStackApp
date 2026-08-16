@@ -3,6 +3,7 @@ import {
   createRefreshSessionQueue,
   getRequestIdFromAxiosError,
   isCorrelationWorthyApiFailure,
+  isDefinitiveAuthRefreshFailure,
   setupAuthSessionInterceptors,
   type AuthAwareRequestConfig,
 } from "@izibuy/shared-api";
@@ -73,7 +74,12 @@ setupAuthSessionInterceptors(apiClient, {
       config.headers["X-Auth-Client"] = "mobile";
     }
   },
-  onRefreshFailure: clearAuthTokens,
+  onRefreshFailure: async (refreshError) => {
+    // Сеть / 5xx — не чистим SecureStore; иначе ложный logout после краткого сбоя API.
+    if (isDefinitiveAuthRefreshFailure(refreshError)) {
+      await clearAuthTokens();
+    }
+  },
 });
 
 apiClient.interceptors.response.use(

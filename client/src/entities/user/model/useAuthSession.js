@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { fetchCurrentUserProfile } from "../api/fetchCurrentUserProfile.js";
 import { isPremiumActive } from "../lib/isPremiumActive.js";
@@ -44,10 +44,13 @@ export function useAuthSession() {
     retry: 1,
     staleTime: AUTH_ME_STALE_TIME_MS,
     refetchOnMount: "always",
+    // При сетевом сбое refresh оставляем последнего известного user (не «гость»).
+    placeholderData: keepPreviousData,
   });
 
-  const user = query.isSuccess ? (query.data?.user ?? null) : null;
-  const isAuthReady = query.isFetched || !fetchAllowed;
+  // Не через isSuccess: иначе transient error → user=null и ложный UI-logout.
+  const user = query.data?.user ?? null;
+  const isAuthReady = query.isFetched || !fetchAllowed || query.isPlaceholderData;
   const isAuthorized = Boolean(user);
   const isSessionReady = isAuthReady;
 

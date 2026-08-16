@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { authMeQueryKeys, getAccessToken } from "@/shared/api";
 import { AUTH_ME_STALE_TIME_MS } from "@/shared/config";
@@ -17,5 +17,6 @@ export const useAuthSessionQuery = () => {
     },
     staleTime: AUTH_ME_STALE_TIME_MS,
     retry: false,
+    placeholderData: keepPreviousData,
   });
 };
