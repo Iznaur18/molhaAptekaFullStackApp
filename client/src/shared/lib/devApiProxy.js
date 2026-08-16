@@ -22,6 +22,7 @@ export const DEV_API_PROXY_PREFIXES = [
   "/intro-ad",
   "/seller-personal-category",
   "/audit",
+  "/onec",
   "/health",
   "/uploads",
   "/upload",
