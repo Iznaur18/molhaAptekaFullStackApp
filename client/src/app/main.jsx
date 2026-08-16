@@ -1,3 +1,5 @@
+import "./__errorBeacon.js"; // [TEMP DIAG] ловит ошибки старта на мобильных — удалить после
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 

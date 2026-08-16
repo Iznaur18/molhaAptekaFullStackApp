@@ -79,6 +79,17 @@ const DEV_SERVER_HOST = "127.0.0.1";
 
 ## `server/.env` (опционально)
 
-Для LAN **не обязательно** задавать `FRONTEND_URL` — без него CORS открыт для всех.
+CORS в non-prod открыт для всех. CSRF: если `FRONTEND_URL` задан только как
+`http://127.0.0.1:5173`, запросы с `http://192.168.x.x:5173` раньше давали
+**403 «Запрос отклонён (origin)»** на `/cart`, `/view` и т.п.
 
-Если задавал `FRONTEND_URL=http://192.168.x.x:5173` — удали строку или верни `http://127.0.0.1:5173`.
+Сейчас в **non-prod** CSRF дополнительно пускает loopback + private LAN
+(`isDevTrustedBrowserOrigin`). Достаточно перезапустить API.
+
+Явно в allowlist тоже можно:
+
+```env
+FRONTEND_URL=http://127.0.0.1:5173,http://192.168.1.96:5173
+```
+
+После смены URL в браузере — logout → login на том же адресе.

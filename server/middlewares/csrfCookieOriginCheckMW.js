@@ -3,6 +3,7 @@ import {
   REFRESH_COOKIE_NAME,
 } from "../constants/authCookieConstants.js";
 import { errorRes } from "../services/http/index.js";
+import { isDevTrustedBrowserOrigin } from "../utils/isDevTrustedBrowserOrigin.js";
 import { parseFrontendOrigins } from "../utils/resolveFrontendOrigin.js";
 
 const UNSAFE_HTTP_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
@@ -42,6 +43,7 @@ function hasCookieAuthSession(req) {
 
 /**
  * CSRF для cookie-auth мутаций: Origin/Referer должен быть в FRONTEND_URL.
+ * Non-prod: дополнительно loopback + private LAN (Vite с телефона по 192.168.x.x).
  * Bearer-only (mobile) — без cookie — пропускаем.
  *
  * @param {import('express').Request} req
@@ -61,18 +63,28 @@ export function csrfCookieOriginCheckMW(req, res, next) {
     return next();
   }
 
+  const isProduction = process.env.NODE_ENV === "production";
   const allowedOrigins = parseFrontendOrigins(process.env.FRONTEND_URL);
   if (allowedOrigins.length === 0) {
-    if (process.env.NODE_ENV === "production") {
+    if (isProduction) {
       return errorRes(res, 403, "Запрос отклонён (origin)");
     }
     return next();
   }
 
   const requestOrigin = resolveRequestOrigin(req);
-  if (!requestOrigin || !allowedOrigins.includes(requestOrigin)) {
+  if (!requestOrigin) {
     return errorRes(res, 403, "Запрос отклонён (origin)");
   }
 
-  return next();
+  if (allowedOrigins.includes(requestOrigin)) {
+    return next();
+  }
+
+  // FRONTEND_URL часто только 127.0.0.1:5173 — LAN IP иначе ловит 403 на /cart, /view.
+  if (!isProduction && isDevTrustedBrowserOrigin(requestOrigin)) {
+    return next();
+  }
+
+  return errorRes(res, 403, "Запрос отклонён (origin)");
 }

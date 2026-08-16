@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "**/__errorBeacon.js"
   ],
   "scripts": {
     "dev": "vite",
