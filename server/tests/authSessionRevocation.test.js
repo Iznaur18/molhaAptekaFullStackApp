@@ -89,6 +89,30 @@ test("logout отзывает access-токен, а не только refresh", 
   assert.equal(after.status, 401, "access-токен должен быть отозван вместе с сессией");
 });
 
+test("валидный активный пользователь: /auth/me НЕ стирает cookie сессии", async () => {
+  // Регрессия: rejectInactiveAccount чистил cookie безусловно (до проверки
+  // блокировки), поэтому КАЖДЫЙ авторизованный запрос гасил сессию активного
+  // юзера — «выкидывало сразу после входа».
+  const { payload } = await registerRaw("keepcookie");
+  const { cookie } = await loginRaw(payload);
+
+  const res = await request("/auth/me", { headers: { Cookie: cookie } });
+  assert.equal(res.status, 200);
+  assert.ok((await parseSuccessData(res)).user, "должен вернуть пользователя");
+
+  const setCookies = res.headers.getSetCookie?.() ?? [];
+  const clears = setCookies.filter(
+    (c) =>
+      /^(access_token|refresh_token)=;/.test(c) ||
+      /expires=Thu, 01 Jan 1970/i.test(c),
+  );
+  assert.deepEqual(
+    clears,
+    [],
+    `/auth/me не должен стирать cookie у активного юзера, получено: ${JSON.stringify(setCookies)}`,
+  );
+});
+
 test("refresh работает после повторного логина (authTokenVersion не теряется)", async () => {
   const { payload } = await registerRaw("relogin");
 
