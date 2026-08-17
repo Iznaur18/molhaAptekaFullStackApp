@@ -353,6 +353,8 @@ export const PRODUCT_CATEGORY_TREE_UI = {
   LEAF_BADGE: "конечная",
   LOADING: "Загрузка категорий…",
   LOAD_ERROR: "Не удалось загрузить категории",
+  EMPTY_TREE:
+    "Категории пока не добавлены. Можно опубликовать товар без категории.",
   TRAIL_ARIA: "Путь по категориям",
   CATALOG_FILTER_OPEN: "Фильтр по подкатегориям",
   CATALOG_FILTER_HINT:

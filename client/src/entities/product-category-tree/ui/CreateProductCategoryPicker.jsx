@@ -167,8 +167,8 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
 
   if (!hasTree) {
     return (
-      <p className="create-product-category-picker__error" role="alert">
-        {loadError || PRODUCT_CATEGORY_TREE_UI.LOAD_ERROR}
+      <p className="create-product-category-picker__hint">
+        {loadError || PRODUCT_CATEGORY_TREE_UI.EMPTY_TREE}
       </p>
     );
   }

@@ -1,10 +1,20 @@
 import ProductCategoryModel from "../../models/ProductCategoryModel.js";
 import { PRODUCT_CATEGORY_VALUES } from "../../constants/productConstants.js";
+import { UNCATEGORIZED_PRODUCT_CATEGORY_SLUG } from "../../constants/productCategoryTreeConstants.js";
 
 export const PRODUCT_CATEGORY_BREADCRUMB_SEPARATOR = " › ";
 
 /** @deprecated TEMP: снова включить маппинг legacy → лист дерева */
 const REQUIRE_LEGACY_CATEGORY_TREE_LEAF = false;
+
+const uncategorizedProductCategoryWrite = () => ({
+  productCategoryId: null,
+  categoryPathIds: [],
+  categoryBreadcrumbRu: "",
+  productCategory: UNCATEGORIZED_PRODUCT_CATEGORY_SLUG,
+  categorySearchKeywords: [],
+  categoryPathLabelRu: [],
+});
 
 /**
  * @param {import('mongoose').Types.ObjectId | string} categoryId
@@ -163,12 +173,20 @@ export const resolveProductCategoryWriteFromLegacySlugOnly = async (legacySlug) 
 export const resolveProductCategoryWriteFromBody = async (body) => {
   const rawId = body?.productCategoryId;
   if (rawId != null && String(rawId).trim() !== "") {
-    return resolveProductCategoryWriteFromId(String(rawId).trim());
+    const categoryId = String(rawId).trim();
+    const category = await ProductCategoryModel.findById(categoryId)
+      .select("_id isLeaf")
+      .lean();
+    if (!category) {
+      // Удалённый seed / устаревший id в форме — не блокируем публикацию.
+      return uncategorizedProductCategoryWrite();
+    }
+    return resolveProductCategoryWriteFromId(categoryId);
   }
 
   const legacy = body?.productCategory;
   if (legacy == null || String(legacy).trim() === "") {
-    throw new Error("Укажите productCategoryId или productCategory");
+    return uncategorizedProductCategoryWrite();
   }
 
   const legacySlug = String(legacy).trim();

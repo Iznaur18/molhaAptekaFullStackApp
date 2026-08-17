@@ -158,19 +158,6 @@ const legacyCategorySchema = z
     "Некорректный slug категории",
   );
 
-const assertCategoryIdOrLegacy = (body, ctx) => {
-  const hasId =
-    body.productCategoryId != null && String(body.productCategoryId).trim() !== "";
-  const hasLegacy =
-    body.productCategory != null && String(body.productCategory).trim() !== "";
-  if (!hasId && !hasLegacy) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Укажите productCategoryId (лист дерева) или productCategory",
-    });
-  }
-};
-
 const assertCreateProductRequiresPhoto = (body, ctx) => {
   const fromArray = Array.isArray(body.productImageUrls)
     ? body.productImageUrls.filter((url) => String(url ?? "").trim().length > 0)
@@ -253,7 +240,6 @@ export const createProductBodySchema = z
     productPickupEnabled: z.coerce.boolean().optional(),
     productDeliveryEnabled: z.coerce.boolean().optional(),
   })
-  .superRefine(assertCategoryIdOrLegacy)
   .superRefine(assertCreateProductRequiresPhoto)
   .superRefine((body, ctx) => assertOldPricePair(body, ctx, true))
   .superRefine(assertReturnPolicy)

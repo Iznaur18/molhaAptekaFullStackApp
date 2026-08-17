@@ -321,7 +321,11 @@ export const CreateProductCategoryPicker = ({
                 </View>
               ) : options.length === 0 ? (
                 <View style={s.statusWrap}>
-                  <Text style={s.statusText}>{CREATE_PRODUCT_UI.CATEGORY_EMPTY_LEVEL}</Text>
+                  <Text style={s.statusText}>
+                    {isRoot
+                      ? CREATE_PRODUCT_UI.CATEGORY_EMPTY_TREE
+                      : CREATE_PRODUCT_UI.CATEGORY_EMPTY_LEVEL}
+                  </Text>
                 </View>
               ) : (
                 <ScrollView

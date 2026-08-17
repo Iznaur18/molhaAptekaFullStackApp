@@ -1768,6 +1768,8 @@ export const CREATE_PRODUCT_UI = {
   CATEGORY_SEARCH_LOADING: "Ищем…",
   CATEGORY_ROOT_CRUMB: "Все категории",
   CATEGORY_EMPTY_LEVEL: "Подкатегории не найдены",
+  CATEGORY_EMPTY_TREE:
+    "Категории пока не добавлены. Можно опубликовать товар без категории.",
   LABEL_AVAILABLE: "Товар в наличии",
   LABEL_STOCK: "Количество, шт.",
   LABEL_LOYALTY_POINTS_PER_UNIT: "Баллов за 1 шт. покупателю",

@@ -587,19 +587,22 @@ test("createProductBodySchema requires at least one product image", () => {
   });
 });
 
-test("createProductBodySchema requires category id or legacy slug", () => {
-  assert.throws(() => {
-    createProductBodySchema.parse({
-      productName: "Test product name",
-      productDescription: "Description long enough for validation",
-      productPrice: 100,
-      productIsAvailable: true,
-      productImageUrls: ["/uploads/photo.webp"],
-      productListingOrigin: "own",
-      productIsOriginal: true,
-      productRegionCode: "RU-MOW",
-    });
+test("createProductBodySchema allows create without category while tree is empty", () => {
+  const parsed = createProductBodySchema.parse({
+    productName: "Test product name",
+    productDescription: "Description long enough for validation",
+    productPrice: 100,
+    productIsAvailable: true,
+    productImageUrls: ["/uploads/photo.webp"],
+    productListingOrigin: "own",
+    productIsOriginal: true,
+    productRegionCode: "RU-MOW",
+    productPickupAddress: "Москва, Тверская 1",
+    productPickupLat: 55.75,
+    productPickupLon: 37.62,
   });
+  assert.equal(parsed.productCategoryId, undefined);
+  assert.equal(parsed.productCategory, undefined);
 });
 
 test("parseApiSuccess validates create product response with moderation", () => {

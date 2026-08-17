@@ -49,7 +49,7 @@ describe("prepareCreateProductSubmit region edit", () => {
     expect(parsed.success).toBe(true);
   });
 
-  it("requires productCategoryId", () => {
+  it("allows edit without productCategoryId", () => {
     const prepared = prepareCreateProductSubmit({
       form: {
         ...editForm,
@@ -61,6 +61,10 @@ describe("prepareCreateProductSubmit region edit", () => {
       ...sellerContext,
     });
 
-    expect(prepared.ok).toBe(false);
+    expect(prepared.ok).toBe(true);
+    if (!prepared.ok) {
+      return;
+    }
+    expect(prepared.patchBody?.productCategoryId).toBeUndefined();
   });
 });

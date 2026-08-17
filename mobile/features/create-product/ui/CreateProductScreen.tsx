@@ -201,10 +201,6 @@ function validateStep(stepId: WizardStepId, form: WizardForm): string | null {
       return null;
     }
     case "category": {
-      // Mirror web: require either tree categoryId OR legacy productCategory
-      if (!form.productCategoryId && !form.productCategory.trim()) {
-        return CREATE_PRODUCT_UI.ERROR_CATEGORY;
-      }
       return null;
     }
     case "pickup": {

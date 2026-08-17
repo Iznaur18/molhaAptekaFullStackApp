@@ -66,10 +66,6 @@ export function validateCreateProductWizardStep(stepId, form, context) {
     }
 
     case "category": {
-      if (!form.productCategoryId) {
-        return CREATE_PRODUCT_MODAL_UI.ERROR_CATEGORY_LEAF;
-      }
-
       return null;
     }
 

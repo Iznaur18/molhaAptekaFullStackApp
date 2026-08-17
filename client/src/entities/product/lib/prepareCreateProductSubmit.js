@@ -152,18 +152,10 @@ export function prepareCreateProductSubmit({
     };
   }
 
-  if (!form.productCategoryId) {
-    return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_CATEGORY_LEAF };
-  }
-
   const productCategoryId =
     form.productCategoryId != null && String(form.productCategoryId).trim() !== ""
       ? String(form.productCategoryId).trim()
       : "";
-
-  if (!productCategoryId) {
-    return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_CATEGORY_LEAF };
-  }
 
   const productPickupAddress = String(form.productPickupAddress ?? "").trim();
   if (productPickupAddress.length < PRODUCT_PICKUP_ADDRESS_MIN_LENGTH) {
@@ -254,7 +246,7 @@ export function prepareCreateProductSubmit({
       productPreviewVideoUrl: previewVideoUrl || undefined,
       productPrice,
       productOldPrice,
-      productCategoryId,
+      ...(productCategoryId ? { productCategoryId } : {}),
       productIsAvailable: form.productIsAvailable,
       productStockQuantity,
       loyaltyPointsPerUnit,

@@ -248,9 +248,6 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
         return CREATE_PRODUCT_UI.ERROR_PRICE_MAX;
       }
     }
-    if (!productCategoryId) {
-      return CREATE_PRODUCT_UI.ERROR_CATEGORY;
-    }
     const pickupAddress = productPickupAddress.trim();
     if (pickupAddress.length < PRODUCT_PICKUP_ADDRESS_MIN_LENGTH) {
       return PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE;

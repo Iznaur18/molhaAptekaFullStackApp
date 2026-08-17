@@ -137,7 +137,7 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    location /order/ {
+    location /order {
         proxy_pass http://izibuy_api;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
@@ -160,7 +160,8 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    location /product/ {
+    # POST /product (создание) — без trailing slash, иначе SPA index.html
+    location /product {
         proxy_pass http://izibuy_api;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
