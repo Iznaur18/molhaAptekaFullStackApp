@@ -15,7 +15,7 @@ import { PRODUCT_CATEGORY_VALUES } from "./productConstants.js";
  */
 
 /** @type {ProductCategoryRootSeedNode[]} */
-export const PRODUCT_CATEGORY_ROOTS_SEED = PRODUCT_CATEGORY_VALUES.map(
+export const PRODUCT_CATEGORY_ROOTS_SEED_HARDCODED = PRODUCT_CATEGORY_VALUES.map(
   (slug, index) => ({
     slug,
     labelRu: PRODUCT_CATEGORY_LABEL_RU[slug] ?? slug,
@@ -25,3 +25,11 @@ export const PRODUCT_CATEGORY_ROOTS_SEED = PRODUCT_CATEGORY_VALUES.map(
     sortOrder: (index + 1) * 10,
   }),
 );
+
+/**
+ * Прод / migrate: пусто — каталог наполняет админ.
+ * Тесты: `seedHardcodedProductCategoryTree()`.
+ */
+export const PRODUCT_CATEGORY_ROOTS_SEED = [
+  // ...PRODUCT_CATEGORY_ROOTS_SEED_HARDCODED,
+];

@@ -12,7 +12,7 @@ import {
   UserModel,
 } from "../models/index.js";
 import { buildProductSearchBlobFromFields } from "../utils/buildProductSearchBlob.js";
-import { seedProductCategoryTree } from "../utils/seedProductCategoryTree.js";
+import { seedHardcodedProductCategoryTree } from "../utils/seedProductCategoryTree.js";
 
 export const E2E_PLAYWRIGHT = {
   buyerEmail: "e2e-buyer@example.com",
@@ -128,7 +128,7 @@ async function main() {
 
   await mongoose.connect(process.env.MONGO_URI);
   try {
-    await seedProductCategoryTree();
+    await seedHardcodedProductCategoryTree();
 
     const seller = await upsertVerifiedUser({
       email: E2E_PLAYWRIGHT.sellerEmail,

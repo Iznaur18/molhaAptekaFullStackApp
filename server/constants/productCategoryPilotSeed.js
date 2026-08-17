@@ -14,7 +14,7 @@
  */
 
 /** @type {ProductCategorySeedNode[]} */
-export const PRODUCT_CATEGORY_PILOT_SEED = [
+export const PRODUCT_CATEGORY_PILOT_SEED_HARDCODED = [
   {
     slug: "electronics-phones",
     labelRu: "Телефоны",
@@ -47,4 +47,9 @@ export const PRODUCT_CATEGORY_PILOT_SEED = [
     searchKeywords: ["кнопочный", "раскладушка"],
     sortOrder: 20,
   },
+];
+
+/** Прод / migrate: пусто — пилот не показываем пользователям. */
+export const PRODUCT_CATEGORY_PILOT_SEED = [
+  // ...PRODUCT_CATEGORY_PILOT_SEED_HARDCODED,
 ];

@@ -10,7 +10,7 @@ import {
   UserModel,
 } from "../../models/index.js";
 import { hashEmailVerificationSecret } from "../../services/auth/emailVerification.js";
-import { seedProductCategoryTree } from "../../utils/seedProductCategoryTree.js";
+import { seedHardcodedProductCategoryTree } from "../../utils/seedProductCategoryTree.js";
 import { buildCookieHeader } from "./httpTestApp.js";
 
 /** Фиксированный код для confirm в интеграционных тестах (хеш пишется в PendingRegistration). */
@@ -18,7 +18,7 @@ export const TEST_REGISTRATION_CODE = "424242";
 
 /** Идемпотентный seed пилотного дерева (нужен для POST /product с legacy productCategory). */
 export const ensureProductCategoryTreeSeeded = async () => {
-  await seedProductCategoryTree();
+  await seedHardcodedProductCategoryTree();
 };
 
 /**

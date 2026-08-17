@@ -73,7 +73,7 @@ export {
   syncParentLeafFlagAfterChildDelete,
 } from "./productCategoryDeleteHelpers.js";
 export { rebuildProductCategorySubtreePaths } from "./rebuildProductCategorySubtreePaths.js";
-export { seedProductCategoryTree } from "./seedProductCategoryTree.js";
+export { seedProductCategoryTree, seedHardcodedProductCategoryTree } from "./seedProductCategoryTree.js";
 export { syncProductsDenormForCategorySubtree } from "./syncProductsDenormForCategorySubtree.js";
 export {
   toProductCategoryBreadcrumbPayload,

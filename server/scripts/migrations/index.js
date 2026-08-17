@@ -33,6 +33,7 @@ import { up as partnerBalanceToLoyaltyUp } from "./20260801-partner-balance-to-l
 import { up as productPickupLocationUp } from "./20260803-product-pickup-location.js";
 import { up as productRegionFromPickupGeoUp } from "./20260804-product-region-from-pickup-geo.js";
 import { up as productRentalManageUp } from "./20260806-product-rental-manage.js";
+import { up as hideHardcodedProductCategoriesUp } from "./20260817-hide-hardcoded-product-categories.js";
 import { up as priceOfferAcceptedAwaitingPaymentIndexUp } from "./20260808-price-offer-accepted-awaiting-payment-index.js";
 
 export const MIGRATIONS = [
@@ -220,5 +221,11 @@ export const MIGRATIONS = [
     description:
       "Partial unique accepted price-offer only while orderId is null (awaiting payment)",
     up: priceOfferAcceptedAwaitingPaymentIndexUp,
+  },
+  {
+    id: "20260817-hide-hardcoded-product-categories",
+    description:
+      "Remove seeded catalog categories so users only see admin-created tree",
+    up: hideHardcodedProductCategoriesUp,
   },
 ];
