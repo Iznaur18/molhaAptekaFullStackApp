@@ -94,6 +94,7 @@ export function useAppShellDomain(
 
   const productActions = useHomeProductActions({
     goToMainView: shell.goToMainView,
+    navigate,
     setMyProductsCatalogNotice: shell.setMyProductsCatalogNotice,
     isAtSellerProductsLimit: shell.isAtSellerProductsLimit,
     setIsSellerProductsLimitModalOpen: shell.setIsSellerProductsLimitModalOpen,

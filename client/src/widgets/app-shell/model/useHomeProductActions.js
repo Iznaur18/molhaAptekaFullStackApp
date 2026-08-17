@@ -15,6 +15,8 @@ import {
   patchProductInAllCatalogCaches,
   prependProductToAllCatalogCaches,
 } from "../../../entities/product/lib/catalogProductsQueryCache.js";
+import { navigateToProductDetails } from "../../../entities/product/lib/navigateToProductDetails.js";
+import { catalogQueryKeys } from "../../../entities/product/model/catalogQueryKeys.js";
 import { useRaffleMutations } from "../../../entities/raffle/model/useRaffleMutations.js";
 import { PRODUCT_MODERATION_PENDING } from "../../../entities/product/model/productModerationConstants.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
@@ -26,6 +28,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  */
 export const useHomeProductActions = ({
   goToMainView,
+  navigate,
   setMyProductsCatalogNotice,
   isAtSellerProductsLimit,
   setIsSellerProductsLimitModalOpen,
@@ -127,17 +130,24 @@ export const useHomeProductActions = ({
 
   const handleCreateProductSuccess = useCallback(
     (product) => {
-      goToMainView("my-products");
       setMyProductsCatalogNotice(
         product.productModerationStatus === PRODUCT_MODERATION_PENDING
           ? API_CLIENT_UI.CREATE_PRODUCT_PENDING_HINT
           : "",
       );
       prependProductToAllCatalogCaches(queryClient, product);
+      const productId = product?._id != null ? String(product._id) : "";
+      if (productId) {
+        queryClient.setQueryData(catalogQueryKeys.byId(productId), product);
+        navigateToProductDetails(navigate, product);
+      } else {
+        goToMainView("my-products");
+      }
       void refreshCatalogFeed();
     },
     [
       goToMainView,
+      navigate,
       queryClient,
       refreshCatalogFeed,
       setMyProductsCatalogNotice,

@@ -168,11 +168,11 @@ export function ProductDetailsPage() {
     );
   }
 
-  if (productQuery.isPending) {
+  if (productQuery.isPending && !product) {
     return <ProductDetailsPageSkeleton />;
   }
 
-  if (productQuery.isError || !product) {
+  if (!product) {
     return (
       <div className="product-details-page product-details-page--state">
         <div className="product-details-page__state-wrap">

@@ -87,7 +87,7 @@ export function MyProductCatalogCard({
   });
 
   return (
-    <article className="my-product-compact-card">
+    <article className="my-product-compact-card" onClick={onOpenProduct}>
       <div className="my-product-compact-card__top">
         <ProductCompactCardMediaThumb
           product={product}
@@ -164,6 +164,8 @@ export function MyProductCatalogCard({
           <div
             className="my-product-compact-card__toolbar"
             aria-label={PRODUCT_CARD_UI.FOOTER_ACTIONS_ARIA}
+            onClick={(event) => event.stopPropagation()}
+            onKeyDown={(event) => event.stopPropagation()}
           >
             {showPromote ? (
               <button

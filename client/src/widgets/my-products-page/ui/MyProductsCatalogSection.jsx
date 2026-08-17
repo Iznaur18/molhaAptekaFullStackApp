@@ -59,7 +59,7 @@ export function MyProductsCatalogSection({
   const isCatalogInitialLoading =
     catalogStatus.kind === "loading" && products.length === 0;
 
-  if (catalogStatus.kind === "error") {
+  if (catalogStatus.kind === "error" && products.length === 0) {
     return <InlineErrorBanner>{catalogStatus.message}</InlineErrorBanner>;
   }
 
@@ -85,6 +85,9 @@ export function MyProductsCatalogSection({
         <p className="my-products-catalog-section__notice" role="status">
           {myProductsCatalogNotice}
         </p>
+      ) : null}
+      {catalogStatus.kind === "error" && catalogStatus.message ? (
+        <InlineErrorBanner>{catalogStatus.message}</InlineErrorBanner>
       ) : null}
       {myProductsCatalogError ? (
         <InlineErrorBanner>{myProductsCatalogError}</InlineErrorBanner>

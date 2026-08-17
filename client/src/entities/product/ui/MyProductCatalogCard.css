@@ -8,6 +8,7 @@
   corner-shape: squircle;
   border: 1px solid var(--iz-color-border, #e5e7eb);
   background: var(--iz-color-surface);
+  cursor: pointer;
 }
 
 .my-product-compact-card__top {
