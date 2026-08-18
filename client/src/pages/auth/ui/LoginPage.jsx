@@ -10,7 +10,10 @@ import {
 } from "../../../entities/user/api/fetchCurrentUserProfile.js";
 import { loginUser } from "../../../entities/user/api/loginUser.js";
 import { loginUserByPhonePassword } from "../../../entities/user/api/phoneAuth.js";
-import { hydrateAuthMeCache } from "../../../entities/user/lib/authMeQueryCache.js";
+import {
+  cancelAuthMeQuery,
+  hydrateAuthMeCache,
+} from "../../../entities/user/lib/authMeQueryCache.js";
 import { maskRuPhoneInput } from "../../../entities/user/lib/ruPhone.js";
 import { useAuthSession } from "../../../entities/user/model/useAuthSession.js";
 import { resetAuthSessionState } from "../../../shared/api/apiClient.js";
@@ -48,7 +51,7 @@ export function LoginPage() {
   const loginMutation = useMutation({
     onMutate: async () => {
       resetAuthSessionState();
-      await queryClient.cancelQueries();
+      await cancelAuthMeQuery(queryClient);
     },
     mutationFn: async () => {
       if (channel === "email") {

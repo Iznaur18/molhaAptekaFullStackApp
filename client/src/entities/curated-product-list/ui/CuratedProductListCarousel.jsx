@@ -24,30 +24,32 @@ export function CuratedProductListCarousel({ title, products, onOpenProduct }) {
   }
 
   return (
-    <section
-      className="curated-product-list-carousel"
-      aria-label={title}
-      style={{
-        "--curated-visible-cards": String(CURATED_PRODUCT_LIST_HOME_VISIBLE_CARD_MAX),
-        "--curated-card-gap": `${CURATED_PRODUCT_LIST_HOME_CARD_GAP_PX}px`,
-        "--curated-card-min-width": `${CURATED_PRODUCT_LIST_HOME_CARD_MIN_WIDTH_PX}px`,
-        "--curated-card-max-width": `${CURATED_PRODUCT_LIST_HOME_CARD_MAX_WIDTH_PX}px`,
-      }}
-    >
+    <>
       <h2 className="curated-product-list-carousel__title">{title}</h2>
-      <div
-        ref={scrollRef}
-        className="curated-product-list-carousel__scroll"
-        {...dragScrollProps}
+      <section
+        className="curated-product-list-carousel"
+        aria-label={title}
+        style={{
+          "--curated-visible-cards": String(CURATED_PRODUCT_LIST_HOME_VISIBLE_CARD_MAX),
+          "--curated-card-gap": `${CURATED_PRODUCT_LIST_HOME_CARD_GAP_PX}px`,
+          "--curated-card-min-width": `${CURATED_PRODUCT_LIST_HOME_CARD_MIN_WIDTH_PX}px`,
+          "--curated-card-max-width": `${CURATED_PRODUCT_LIST_HOME_CARD_MAX_WIDTH_PX}px`,
+        }}
       >
-        {products.map((product) => (
-          <CuratedProductCompactCard
-            key={product._id}
-            product={product}
-            onOpen={onOpenProduct}
-          />
-        ))}
-      </div>
-    </section>
+        <div
+          ref={scrollRef}
+          className="curated-product-list-carousel__scroll"
+          {...dragScrollProps}
+        >
+          {products.map((product) => (
+            <CuratedProductCompactCard
+              key={product._id}
+              product={product}
+              onOpen={onOpenProduct}
+            />
+          ))}
+        </div>
+      </section>
+    </>
   );
 }

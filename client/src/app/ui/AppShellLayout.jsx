@@ -1,9 +1,10 @@
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
 import { CartServerSync } from "../../entities/cart/ui/CartServerSync.jsx";
 import { WishlistServerSync } from "../../entities/wishlist/ui/WishlistServerSync.jsx";
 import { EmailVerificationNotice } from "../../entities/user/ui/EmailVerificationNotice.jsx";
+import { lazyNamedExport } from "../../shared/lib/lazyNamedExport.js";
 import { getAppShellVariantClass } from "../lib/appShellVariant.js";
 import { buildAppShellRouteKey } from "../lib/buildAppShellRouteKey.js";
 import { useAppShell } from "../model/AppShellContext.jsx";
@@ -13,10 +14,9 @@ import { AppShellRouteSuspense } from "./AppShellRouteSuspense.jsx";
 
 import "./AppShell.css";
 
-const LazyAppShellModalsLayer = lazy(() =>
-  import("./AppShellModalsLayer.jsx").then((module) => ({
-    default: module.AppShellModalsLayer,
-  })),
+const LazyAppShellModalsLayer = lazyNamedExport(
+  () => import("./AppShellModalsLayer.jsx"),
+  "AppShellModalsLayer",
 );
 
 /** Главный экран каталога `/` — единственное место с панелью шапки. */

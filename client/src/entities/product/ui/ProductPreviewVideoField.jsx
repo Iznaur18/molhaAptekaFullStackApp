@@ -25,6 +25,7 @@ export function ProductPreviewVideoField({ value, onChange, disabled = false }) 
         onChange={onChange}
         disabled={disabled}
         validateFile={validateProductPreviewVideoFile}
+        purpose="product-preview"
       />
       <p className="product-preview-video-field__hint">
         {PRODUCT_PREVIEW_VIDEO_UI.HINT}

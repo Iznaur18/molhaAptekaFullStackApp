@@ -1,5 +1,11 @@
 .page-chunk-fallback {
-  margin: 1rem 0;
+  box-sizing: border-box;
+  min-height: 40vh;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
   text-align: center;
   color: color-mix(in srgb, var(--iz-color-text) 70%, transparent);
 }

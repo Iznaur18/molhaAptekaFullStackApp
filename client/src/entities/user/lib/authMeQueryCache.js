@@ -41,3 +41,12 @@ export const hydrateAuthMeCache = (queryClient, data) => {
 export const clearAuthMeCache = (queryClient) => {
   patchAuthMeQueryState(queryClient, null);
 };
+
+/**
+ * Не cancelQueries() без фильтра: иначе in-flight каталог/профиль
+ * без данных зависает в pending → белый экран до reload вкладки.
+ *
+ * @param {import('@tanstack/react-query').QueryClient} queryClient
+ */
+export const cancelAuthMeQuery = (queryClient) =>
+  queryClient.cancelQueries(AUTH_ME_QUERY_FILTER);

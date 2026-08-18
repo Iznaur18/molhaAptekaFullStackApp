@@ -8,6 +8,13 @@ export const COMMON_UI = {
   REQUIRED_FIELD_HINT: "Обязательно",
 };
 
+/** Белый экран / падение чанка после деплоя */
+export const APP_RUNTIME_UI = {
+  CRASH_TITLE: "Страница не открылась",
+  CRASH_TEXT: "Обновите сайт — это не удаляет вход в аккаунт.",
+  CRASH_RELOAD: "Обновить",
+};
+
 /** Блокировка landscape на смартфонах (web) */
 export const APP_PORTRAIT_LOCK_UI = {
   HINT: "Поверните телефон вертикально",
@@ -64,8 +71,8 @@ export const VIDEO_URL_FIELD_UI = {
 
 /** Превью-видео на карточке товара (до 3 с, loop в каталоге). */
 export const PRODUCT_PREVIEW_VIDEO_UI = {
-  LABEL: "Превью-видео (до 3 с, необязательно)",
-  HINT: "MP4, WebM или MOV с iPhone — не длиннее 3 секунд. Сервер конвертирует в MP4 для всех браузеров. Нужно хотя бы одно фото товара.",
+  LABEL: "Превью-видео (необязательно)",
+  HINT: "MP4, WebM или MOV с iPhone. Длинное видео сервер сам обрежет до 3 секунд и сожмёт в MP4 для всех браузеров. Нужно хотя бы одно фото товара.",
   CLEAR_BUTTON: "Убрать видео",
   ERROR_DURATION: "Видео не длиннее 3 секунд",
   ERROR_READ: "Не удалось прочитать видео",

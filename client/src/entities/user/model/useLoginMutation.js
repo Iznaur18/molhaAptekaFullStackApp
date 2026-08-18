@@ -6,7 +6,7 @@ import {
 } from "../api/fetchCurrentUserProfile.js";
 import { loginUser } from "../api/loginUser.js";
 import { resetAuthSessionState } from "../../../shared/api/apiClient.js";
-import { hydrateAuthMeCache } from "../lib/authMeQueryCache.js";
+import { cancelAuthMeQuery, hydrateAuthMeCache } from "../lib/authMeQueryCache.js";
 
 export function useLoginMutation() {
   const queryClient = useQueryClient();
@@ -14,7 +14,7 @@ export function useLoginMutation() {
   return useMutation({
     onMutate: async () => {
       resetAuthSessionState();
-      await queryClient.cancelQueries();
+      await cancelAuthMeQuery(queryClient);
     },
     mutationFn: async (credentials) => {
       await loginUser(credentials);

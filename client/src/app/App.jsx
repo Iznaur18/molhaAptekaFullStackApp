@@ -9,12 +9,16 @@ import { AppIntroSplash } from "../features/app-intro/ui/AppIntroSplash.jsx";
 import { CookieNoticeHost } from "../features/legal/ui/CookieNoticeHost.jsx";
 import { captureReferralCodeFromSearch } from "../shared/lib/referralCodeStorage.js";
 import { captureAffiliateCodeFromSearch } from "../shared/lib/affiliateCodeStorage.js";
+import { clearStaleChunkReloadFlag } from "../shared/lib/reloadOnceOnStaleChunk.js";
+import { useReleaseStaleBodyScroll } from "../shared/lib/useReleaseStaleBodyScroll.js";
+import { AppErrorBoundary } from "../shared/ui/AppErrorBoundary/AppErrorBoundary.jsx";
 import { renderAppShellRoutes } from "./routes/appRoutes.jsx";
 
 import "./App.css";
 
 function CaptureAttributionCodes() {
   const location = useLocation();
+  useReleaseStaleBodyScroll();
   useEffect(() => {
     captureReferralCodeFromSearch(location.search);
     captureAffiliateCodeFromSearch(location.search);
@@ -23,21 +27,27 @@ function CaptureAttributionCodes() {
 }
 
 function AppRoutes() {
+  useEffect(() => {
+    clearStaleChunkReloadFlag();
+  }, []);
+
   return (
-    <AppIntroProvider>
-      <BrowserRouter>
-        <CaptureAttributionCodes />
-        <CartProvider>
-          <WishlistProvider>
-            <main className="app-main">
-              <Routes>{renderAppShellRoutes()}</Routes>
-            </main>
-            <CookieNoticeHost />
-            <AppIntroSplash />
-          </WishlistProvider>
-        </CartProvider>
-      </BrowserRouter>
-    </AppIntroProvider>
+    <AppErrorBoundary>
+      <AppIntroProvider>
+        <BrowserRouter>
+          <CaptureAttributionCodes />
+          <CartProvider>
+            <WishlistProvider>
+              <main className="app-main">
+                <Routes>{renderAppShellRoutes()}</Routes>
+              </main>
+              <CookieNoticeHost />
+              <AppIntroSplash />
+            </WishlistProvider>
+          </CartProvider>
+        </BrowserRouter>
+      </AppIntroProvider>
+    </AppErrorBoundary>
   );
 }
 

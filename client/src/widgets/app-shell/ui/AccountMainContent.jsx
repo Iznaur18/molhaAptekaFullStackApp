@@ -1,4 +1,7 @@
+import { Navigate } from "react-router-dom";
+
 import { AUTH_UI, HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { AUTH_LOGIN_PATH } from "../../../shared/lib/authPaths.js";
 import { isRoleRestrictedMainView } from "../../../shared/lib/homeMainViewPaths.js";
 import { isStaffMainViewAllowed } from "../../../shared/lib/staffMainViews.js";
 import { IS_ONEC_INTEGRATION_ENABLED } from "../../../pages/onec-integration/model/isOneCIntegrationEnabled.js";
@@ -112,7 +115,7 @@ export function AccountMainContent({
       isSessionReady &&
       !isStaffMainViewAllowed(mainView, { isAdmin, canModerateProducts })
     ) {
-      return null;
+      return <Navigate to="/" replace />;
     }
 
     const profileTabPanelProps = {
@@ -257,7 +260,7 @@ export function AccountMainContent({
 
   if (mainView === "notifications") {
     if (!isAuthorized) {
-      return null;
+      return <Navigate to={AUTH_LOGIN_PATH} replace />;
     }
     return (
       <LazyNotificationsPage
@@ -268,5 +271,5 @@ export function AccountMainContent({
     );
   }
 
-  return null;
+  return <Navigate to="/" replace />;
 }

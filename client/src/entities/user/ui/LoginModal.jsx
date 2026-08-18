@@ -14,7 +14,7 @@ import {
   fetchCurrentUserProfile,
 } from "../api/fetchCurrentUserProfile.js";
 import { loginUser } from "../api/loginUser.js";
-import { hydrateAuthMeCache } from "../lib/authMeQueryCache.js";
+import { cancelAuthMeQuery, hydrateAuthMeCache } from "../lib/authMeQueryCache.js";
 import { maskRuPhoneInput } from "../lib/ruPhone.js";
 import { resetAuthSessionState } from "../../../shared/api/apiClient.js";
 
@@ -42,7 +42,7 @@ export function LoginModal({ isOpen, onClose, onSuccess, onRegisterClick }) {
   const loginMutation = useMutation({
     onMutate: async () => {
       resetAuthSessionState();
-      await queryClient.cancelQueries();
+      await cancelAuthMeQuery(queryClient);
     },
     mutationFn: async () => {
       if (channel === "email") {

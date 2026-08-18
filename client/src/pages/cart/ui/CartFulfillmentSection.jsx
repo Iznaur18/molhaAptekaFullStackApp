@@ -61,9 +61,6 @@ export function CartFulfillmentSection({
     <section className="cart-fulfillment">
       <header className="cart-fulfillment__header">
         <h2 className="cart-fulfillment__title">{title}</h2>
-        <p className="cart-fulfillment__hint">
-          {CART_PAGE_UI.SECTION_FULFILLMENT_HINT}
-        </p>
       </header>
 
       <CartSelectAllRow

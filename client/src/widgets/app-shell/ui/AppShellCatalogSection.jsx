@@ -6,6 +6,7 @@ import { CuratedProductListCarouselSkeleton } from "../../../entities/curated-pr
 import { CatalogBrowserBreadcrumb } from "../../../entities/product-category-display/ui/CatalogBrowserBreadcrumb.jsx";
 import { CatalogBrowserLanding } from "../../../entities/product-category-display/ui/CatalogBrowserLanding.jsx";
 import { CatalogSubcategoryPicker } from "../../../entities/product-category-display/ui/CatalogSubcategoryPicker.jsx";
+import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { buildRafflePath } from "../../../shared/lib/rafflePaths.js";
 import { InlineErrorBanner } from "../../../shared/ui/InlineErrorBanner/InlineErrorBanner.jsx";
 
@@ -216,6 +217,11 @@ export function AppShellCatalogGridSection({
         />
       ) : showCuratedProductLists && isCuratedProductListsLoading ? (
         <CuratedProductListCarouselSkeleton />
+      ) : null}
+      {isHomeCatalogMainView ? (
+        <h2 className="home-feed-section-title">
+          {HOME_PAGE_UI.CATALOG_HOME_SECTION}
+        </h2>
       ) : null}
       {isCatalogInitialLoading ? (
         <CatalogGridSkeleton />

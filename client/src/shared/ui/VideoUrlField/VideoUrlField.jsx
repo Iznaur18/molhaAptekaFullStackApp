@@ -15,6 +15,7 @@ import "../ImageUrlField/ImageUrlField.css";
  *   canUpload?: boolean;
  *   required?: boolean;
  *   validateFile?: (file: File) => Promise<string | null> | string | null;
+ *   purpose?: 'intro' | 'story' | 'product-preview';
  * }} props
  */
 export function VideoUrlField({
@@ -24,6 +25,7 @@ export function VideoUrlField({
   canUpload = true,
   required = false,
   validateFile = validateUploadVideoFile,
+  purpose,
 }) {
   const { uploadVideoMutation } = useUploadAssetMutations();
   const fileInputRef = useRef(null);
@@ -52,7 +54,11 @@ export function VideoUrlField({
 
     setUploadError("");
     try {
-      const url = await uploadVideoMutation.mutateAsync(file);
+      // С `purpose` сервер включает профиль пережатия (обрезка по длине +
+      // компрессия). Без него ушёл бы generic-профиль с лимитом 5 МБ.
+      const url = await uploadVideoMutation.mutateAsync(
+        purpose ? { file, purpose } : file,
+      );
       onChange(url);
     } catch (error) {
       const message =

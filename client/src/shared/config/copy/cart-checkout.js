@@ -43,7 +43,6 @@ export const CART_PAGE_UI = {
     "У товаров нет адреса самовывоза — оформить заказ нельзя",
   SECTION_PICKUP: "Самовывоз",
   SECTION_DELIVERY: "Доставка",
-  SECTION_FULFILLMENT_HINT: "Оформляется отдельным заказом",
   /** @param {number} left */
   STOCK_REMAINING: (left) => `Осталось ${left} шт`,
   STOCK_QUANTITY_LIMITED: "Количество ограничено",

@@ -45,6 +45,7 @@ export const HOME_PAGE_UI = {
   LOGO_ALT: "Gitorg",
   BREADCRUMB_HOME: "Главная",
   NAV_TO_HOME: "Главная",
+  CATALOG_HOME_SECTION: "Главная",
   TITLE_USERS: "Пользователи",
   TITLE_CART: "Корзина",
   TITLE_MY_ORDERS: "Мои покупки",

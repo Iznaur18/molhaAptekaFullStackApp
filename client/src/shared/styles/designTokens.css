@@ -4,6 +4,7 @@
  */
 :root {
   --iz-font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --iz-font-display: Intro, var(--iz-font-family);
   --iz-line-height: 1.5;
   --iz-font-weight: 400;
 

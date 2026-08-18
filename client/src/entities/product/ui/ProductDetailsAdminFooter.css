@@ -1,3 +1,53 @@
+.product-details-admin-footer {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  width: 100%;
+}
+
+.product-details-admin-footer .product-details-modal__footer-btn {
+  min-height: 2.75rem;
+  padding: 0.72rem 1rem;
+  border-radius: 1rem;
+  corner-shape: squircle;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--iz-color-ink) 10%, transparent);
+}
+
+.product-details-admin-footer .product-details-modal__footer-btn--promote {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--iz-color-action) 30%, transparent);
+}
+
+.product-details-admin-footer .product-details-modal__footer-btn--promote:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--iz-color-action) 88%, black);
+  background: color-mix(in srgb, var(--iz-color-action) 92%, black);
+}
+
+.product-details-admin-footer .product-details-modal__footer-btn--edit {
+  border-color: color-mix(in srgb, var(--iz-color-border-strong) 85%, transparent);
+  background: color-mix(in srgb, var(--iz-color-surface) 92%, var(--iz-color-surface-muted));
+  color: var(--iz-color-text);
+}
+
+.product-details-admin-footer .product-details-modal__footer-btn--edit:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--iz-color-action) 35%, var(--iz-color-border-strong));
+  background: color-mix(in srgb, var(--iz-color-surface-muted) 88%, white);
+}
+
+.product-details-admin-footer .product-details-modal__footer-btn--delete {
+  flex-basis: 100%;
+  border-color: color-mix(in srgb, var(--iz-color-danger) 42%, var(--iz-color-border));
+  background: color-mix(in srgb, var(--iz-color-danger) 8%, var(--iz-color-surface));
+  color: color-mix(in srgb, var(--iz-color-danger) 82%, var(--iz-color-text));
+}
+
+.product-details-admin-footer .product-details-modal__footer-btn--delete:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--iz-color-danger) 14%, var(--iz-color-surface));
+}
+
 .product-details-admin-footer__error {
   margin: 0;
   flex: 1 1 100%;

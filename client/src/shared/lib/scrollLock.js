@@ -121,3 +121,40 @@ export function lockBodyScrollOverflowOnly() {
     }
   };
 }
+
+function isStuckBodyLockStyle(body) {
+  return body.style.position === "fixed" || body.style.overflow === "hidden";
+}
+
+/**
+ * Сбрасывает залипший lock: модалка/drawer размонтировались без cleanup
+ * (ошибка рендера, смена роута) → body `position:fixed` + контент уехал за viewport
+ * = белый «замёрзший» экран до полной перезагрузки.
+ */
+export function releaseStaleBodyScrollIfIdle() {
+  if (typeof document === "undefined") {
+    return;
+  }
+
+  const hasModal = Boolean(document.querySelector('[aria-modal="true"]'));
+  if (hasModal) {
+    return;
+  }
+
+  const body = document.body;
+  const leakedCounter = lockCount > 0 || overflowOnlyLockCount > 0;
+  if (!leakedCounter && !isStuckBodyLockStyle(body)) {
+    return;
+  }
+
+  lockCount = 0;
+  overflowOnlyLockCount = 0;
+  body.style.overflow = "";
+  body.style.position = "";
+  body.style.top = "";
+  body.style.left = "";
+  body.style.right = "";
+  body.style.width = "";
+  body.style.paddingRight = "";
+  document.documentElement.style.overflow = "";
+}

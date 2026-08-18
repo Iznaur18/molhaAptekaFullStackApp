@@ -1,68 +1,23 @@
-import { validateUploadVideoFile } from "../../../shared/lib/validateUploadVideoFile.js";
+import { STORY_UPLOAD_VIDEO_MAX_BYTES } from "../../../shared/config/uploadConstants.js";
+import { VIDEO_URL_FIELD_UI } from "../../../shared/config/appUiCopy.js";
+import { buildUploadVideoSizeError } from "../../../shared/lib/formatUploadBytesAsMb.js";
 import { isAllowedUploadVideoFile } from "../../../shared/lib/isAllowedUploadVideoFile.js";
-import { PRODUCT_PREVIEW_VIDEO_UI } from "../../../shared/config/appUiCopy.js";
-import { PRODUCT_PREVIEW_VIDEO_MAX_DURATION_SEC } from "../model/productConstants.js";
-
-const DURATION_TOLERANCE_SEC = 0.25;
-const METADATA_READ_TIMEOUT_MS = 10_000;
 
 /**
+ * Превью товара: проверяем только тип и щедрый лимит ИСХОДНИКА (как intro/story
+ * — 100 МБ). Длительность НЕ отклоняем: загрузка идёт с `purpose=product-preview`,
+ * и сервер сам обрезает до 3 сек и пережимает (H.264, пик 2 Мбит). Оригинал на
+ * диске не хранится — итоговый файл заведомо укладывается в лимит.
+ *
  * @param {File} file
- * @returns {Promise<string | null>}
+ * @returns {string | null}
  */
-export async function validateProductPreviewVideoFile(file) {
-  const baseError = validateUploadVideoFile(file);
-  if (baseError) return baseError;
-
-  try {
-    const metadata = await readVideoMetadata(file);
-    if (
-      metadata.duration >
-      PRODUCT_PREVIEW_VIDEO_MAX_DURATION_SEC + DURATION_TOLERANCE_SEC
-    ) {
-      return PRODUCT_PREVIEW_VIDEO_UI.ERROR_DURATION;
-    }
-    return null;
-  } catch {
-    if (isAllowedUploadVideoFile(file)) {
-      return null;
-    }
-    return PRODUCT_PREVIEW_VIDEO_UI.ERROR_READ;
+export function validateProductPreviewVideoFile(file) {
+  if (!isAllowedUploadVideoFile(file)) {
+    return VIDEO_URL_FIELD_UI.ERROR_TYPE;
   }
-}
-
-/**
- * @param {File} file
- */
-function readVideoMetadata(file) {
-  return new Promise((resolve, reject) => {
-    const video = document.createElement("video");
-    const objectUrl = URL.createObjectURL(file);
-    let settled = false;
-
-    const settle = (handler, value) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timeoutId);
-      URL.revokeObjectURL(objectUrl);
-      handler(value);
-    };
-
-    const timeoutId = setTimeout(() => {
-      settle(reject, new Error("video metadata timeout"));
-    }, METADATA_READ_TIMEOUT_MS);
-
-    video.playsInline = true;
-    video.muted = true;
-    video.preload = "metadata";
-    video.onloadedmetadata = () => {
-      settle(resolve, {
-        duration: Number(video.duration) || 0,
-      });
-    };
-    video.onerror = () => {
-      settle(reject, new Error("video metadata"));
-    };
-    video.src = objectUrl;
-  });
+  if (file.size > STORY_UPLOAD_VIDEO_MAX_BYTES) {
+    return buildUploadVideoSizeError(file.size, STORY_UPLOAD_VIDEO_MAX_BYTES);
+  }
+  return null;
 }

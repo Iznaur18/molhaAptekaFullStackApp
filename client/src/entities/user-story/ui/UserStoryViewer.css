@@ -36,7 +36,6 @@
   overflow: hidden;
   overscroll-behavior: none;
   touch-action: none;
-  border-radius: 16px;
   background: var(--iz-color-ink);
   box-shadow: 0 8px 32px var(--iz-color-overlay-strong);
 }
