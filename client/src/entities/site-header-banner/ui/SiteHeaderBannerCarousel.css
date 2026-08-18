@@ -1,19 +1,18 @@
 .site-header-banner-carousel {
   /* Паритет с mobile SITE_HEADER_BANNER_HEIGHT_PX / radius 22 */
-  --site-header-banner-height: 11.25rem; /* 180px */
+  --site-header-banner-height: 220px;
   --site-header-banner-radius: 22px;
-  --site-header-banner-peek: 18px;
-  --site-header-banner-gap: 8px;
   position: relative;
   display: block;
   width: 100%;
-  /* gap до/после — у родителя (header gap / HOME_FEED_SECTION_GAP = 8) */
+  max-width: 100%;
   margin: 0;
 }
 
 .site-header-banner-carousel__viewport {
   position: relative;
   overflow: hidden;
+  border-radius: var(--site-header-banner-radius);
   touch-action: pan-y;
 }
 
@@ -21,24 +20,20 @@
   display: flex;
   align-items: stretch;
   will-change: transform;
-  /* backface + 3d transform держат анимацию Embla на GPU-слое → без дёрганья */
   backface-visibility: hidden;
   touch-action: pan-y;
 }
 
 .site-header-banner-carousel__slide {
   position: relative;
-  flex: 0 0 calc(100% - var(--site-header-banner-peek) * 2);
+  box-sizing: border-box;
+  flex: 0 0 100%;
+  width: 100%;
   min-width: 0;
   min-height: var(--site-header-banner-height);
-  /* Зазор между слайдами — через симметричный margin, а НЕ gap: при loop Embla
-     переносит крайние слайды transform'ом, и CSS gap на стыке теряется (слайды
-     слипаются). margin едет вместе со слайдом → зазор сохраняется на шве петли.
-     Симметрия (по gap/2 с каждой стороны) держит карточку по центру и не
-     искажает базу 100%, как это делал бы отрицательный margin у дорожки. */
-  margin-inline: calc(var(--site-header-banner-gap) / 2);
+  margin: 0;
   overflow: hidden;
-  border-radius: var(--site-header-banner-radius);
+  border-radius: 0;
   transform: translateZ(0);
 }
 
@@ -120,7 +115,12 @@
   width: 100%;
   max-width: 100%;
   margin-inline: 0;
+  border-radius: 0;
+}
+
+.site-header-banner-carousel_single {
   border-radius: var(--site-header-banner-radius);
+  overflow: hidden;
 }
 
 .site-header-banner-carousel_single .site-header-banner-carousel__link,
@@ -128,6 +128,19 @@
 .site-header-banner-carousel_single .site-header-banner-carousel__image {
   width: 100%;
   max-width: 100%;
+}
+
+/* 767–1023 */
+@media (min-width: 767px) and (max-width: 1023px) {
+  .site-header-banner-carousel {
+    --site-header-banner-height: 260px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .site-header-banner-carousel {
+    --site-header-banner-height: 300px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

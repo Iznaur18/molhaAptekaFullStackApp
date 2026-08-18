@@ -6,6 +6,7 @@ import {
   WEB_CONTENT_MAX_WIDTH_LARGE_PX,
   WEB_CONTENT_MAX_WIDTH_MEDIUM_TABLET_PX,
   WEB_CONTENT_MAX_WIDTH_SMALL_TABLET_PX,
+  WEB_CONTENT_MAX_WIDTH_WIDE_PX,
 } from "./appShellLayoutConstants.js";
 import { resolveAppViewportWidth } from "./resolveAppViewportWidth.js";
 
@@ -21,7 +22,9 @@ describe("resolveWebContentMaxWidth", () => {
     expect(resolveWebContentMaxWidth(768)).toBe(WEB_CONTENT_MAX_WIDTH_MEDIUM_TABLET_PX);
     expect(resolveWebContentMaxWidth(1000)).toBe(WEB_CONTENT_MAX_WIDTH_MEDIUM_TABLET_PX);
     expect(resolveWebContentMaxWidth(1024)).toBe(WEB_CONTENT_MAX_WIDTH_LARGE_PX);
-    expect(resolveWebContentMaxWidth(1920)).toBe(WEB_CONTENT_MAX_WIDTH_LARGE_PX);
+    expect(resolveWebContentMaxWidth(1279)).toBe(WEB_CONTENT_MAX_WIDTH_LARGE_PX);
+    expect(resolveWebContentMaxWidth(1280)).toBe(WEB_CONTENT_MAX_WIDTH_WIDE_PX);
+    expect(resolveWebContentMaxWidth(1920)).toBe(WEB_CONTENT_MAX_WIDTH_WIDE_PX);
   });
 });
 

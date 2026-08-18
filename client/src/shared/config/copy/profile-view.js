@@ -56,17 +56,24 @@ export const USER_FOLLOW_BUTTON_UI = {
 export const USER_VOTE_RATING_UI = {
   COLLAPSE_SUMMARY: "Оценить пользователя",
   TITLE: "Оценка",
+  OUT_OF_MAX: "из 10",
+  VOTES_FORMS: ["оценка", "оценки", "оценок"],
   CURRENT_AGGREGATE: "Сейчас в профиле",
-  RANGE_LABEL: "Ваша оценка",
+  RANGE_LABEL: "Ваш голос",
+  SCALE_LOW: "Плохо",
+  SCALE_HIGH: "Отлично",
   SUBMIT: "Отправить оценку",
   SUBMIT_LOADING: "Отправка…",
   ALREADY_RATED: "Вы уже оценили пользователя",
+  ALREADY_RATED_TITLE: "Спасибо за оценку",
+  YOUR_SCORE: (score) => `Ваша оценка: ${score}`,
   LOGIN_HINT: "Войдите, чтобы поставить оценку.",
   LOGIN_BUTTON: "Войти",
   SELF_HINT: "Нельзя оценить свой профиль.",
   ME_LOADING: "Загрузка…",
   MY_VOTE_RESOLVING: "Проверяем вашу оценку…",
   SUCCESS: "Оценка сохранена",
+  SUCCESS_CHECKMARK: "✓",
   SUCCESS_FLASH_MS: 2800,
 };
 
@@ -101,6 +108,7 @@ export const USER_PROFILE_PURCHASES_UI = {
 /** Блок товаров продавца в чужом профиле (авторизованный зритель). */
 export const USER_PROFILE_PRODUCTS_UI = {
   HEADING: "Список товаров",
+  GO: "Перейти",
   LOADING: "Загрузка товаров…",
   EMPTY: "Товаров нет",
   SHOW_MORE: "Показать ещё",

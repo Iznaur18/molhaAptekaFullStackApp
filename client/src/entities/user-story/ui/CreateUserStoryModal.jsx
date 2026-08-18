@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useUploadAssetMutations } from "../../../shared/model/useUploadAssetMutations.js";
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
+import { useRegisterBlockingOverlay } from "../../../shared/lib/useBlockingOverlayOccupancy.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import {
   UPLOAD_FILE_INPUT_ACCEPT,
@@ -49,6 +50,7 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
     createMutation.isPending;
 
   useScrollLock(mounted);
+  useRegisterBlockingOverlay(mounted);
 
   useEffect(() => {
     previewUrlRef.current = previewUrl;

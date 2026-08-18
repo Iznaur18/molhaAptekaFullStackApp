@@ -15,6 +15,7 @@ import {
 } from "../../shared/lib/homeMainViewPaths.js";
 import { MobileBottomNav } from "../../widgets/mobile-bottom-nav/ui/MobileBottomNav.jsx";
 import { useScrollLock } from "../../shared/lib/useScrollLock.js";
+import { useRegisterBlockingOverlay } from "../../shared/lib/useBlockingOverlayOccupancy.js";
 import { SearchInput } from "../../shared/ui/SearchInput/SearchInput.jsx";
 import { useSiteHeaderBannerSlidesQuery } from "../../entities/site-header-banner/model/useSiteHeaderBannerSlidesQuery.js";
 import { ViewerRegionSelect } from "../../entities/region/ui/ViewerRegionSelect.jsx";
@@ -119,6 +120,7 @@ export function AppShellHeader({
   }, [isProductCategoryListOpen, onCloseProductCategoryFilter]);
 
   useScrollLock(isProductCategoryListOpen);
+  useRegisterBlockingOverlay(isProductCategoryListOpen);
 
   const isCatalogHeaderView = isCatalogHeaderMainView(mainView);
   const isUsersNavActive = mainView === "users";

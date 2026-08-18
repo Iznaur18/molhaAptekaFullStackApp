@@ -472,6 +472,7 @@ export const PRODUCT_CARD_UI = {
   RATING_LINE: (rating: number, count: number) => `★ ${rating.toFixed(1)} (${count})`,
   PROMOTION_BUTTON: "Управление",
   EDIT_PRODUCT: "Изменить",
+  COPY_PRODUCT_ARIA: "Копировать товар",
   FOOTER_ACTIONS_ARIA: "Действия с товаром",
   PREVIEW_FIELDS_ARIA: "Краткая информация о товаре",
   PROMOTED_TIER_UNTIL: (tierLabel: string, until: string) =>
@@ -1457,6 +1458,7 @@ export const USER_DETAILS_PAGE_UI = {
 export const USER_PROFILE_PRODUCTS_UI = {
   HEADING: "Список товаров",
   VIEW_ALL: "Все товары",
+  GO: "Перейти",
   LOADING: "Загрузка товаров…",
   EMPTY: "Товаров нет",
   SHOW_MORE: "Показать ещё",
@@ -2701,7 +2703,14 @@ export const PRODUCT_BADGE_EXPLAIN_UI = {
       "Продавец задал промокоды на этот товар. Введите код в блоке «Промокод», чтобы получить скидку в процентах.",
     near_distance:
       "Примерное расстояние до пункта самовывоза продавца относительно вашего местоположения. Точность зависит от геолокации.",
+    profile_address:
+      "Укажите адрес в профиле — так проще находить товары рядом и оформлять доставку.",
   },
+} as const;
+
+export const ADDRESS_PROMPT_UI = {
+  TITLE: "Добавьте адрес",
+  CTA: "Указать адрес",
 } as const;
 
 export const SITE_HEADER_BANNER_ADMIN_PAGE_UI = {

@@ -17,6 +17,7 @@ import type { HomeCatalogUsersMenuItem } from "@/features/home-feed/lib/buildHom
 import { useHomeCatalogUsersStretchMenuAnimation } from "@/features/home-feed/model/useHomeCatalogUsersStretchMenuAnimation";
 import { HEADER_USERS_BUTTON_UI } from "@/shared/config";
 import { resolveHomeCatalogUsersMenuPortalStyle } from "@/shared/lib/homeCatalogHeaderLayout";
+import { useRegisterBlockingOverlay } from "@/shared/lib/useBlockingOverlayOccupancy";
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 import { useHomeCatalogHeaderStyles } from "@/shared/theme/homeCatalogHeaderStyles";
 
@@ -50,6 +51,7 @@ export const HomeCatalogUsersStretchMenu = ({
     closedBorderColor: theme.colors.border,
     openBorderColor: theme.colors.border,
   });
+  useRegisterBlockingOverlay(portalVisible);
 
   const measureAnchor = useCallback(() => {
     anchorRef.current?.measureInWindow((x, y, width, height) => {

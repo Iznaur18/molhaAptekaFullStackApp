@@ -1,8 +1,3 @@
-import {
-  SITE_HEADER_BANNER_CAROUSEL_PEEK_PX,
-  SITE_HEADER_BANNER_CAROUSEL_SLIDE_GAP_PX,
-  SITE_HEADER_BANNER_HEIGHT_PX,
-} from "@molha/api-contract";
 import Autoplay from "embla-carousel-autoplay";
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -21,9 +16,8 @@ import "./SiteHeaderBannerCarousel.css";
 /** За этим порогом жест считается свайпом, а не кликом по слайду. */
 const CLICK_MOVE_TOLERANCE_PX = 16;
 /**
- * Слайды уже виджета (peek с обеих сторон), поэтому для бесшовного loop Embla
- * нужны копии соседей слева и справа. Тайлим оригинал до этого минимума, а
- * точки/активность маппим по модулю исходного количества слайдов.
+ * Для бесшовного loop Embla нужны копии соседей. Тайлим оригинал до этого
+ * минимума, а точки/активность маппим по модулю исходного количества слайдов.
  */
 const MIN_LOOP_SLIDES = 5;
 
@@ -68,7 +62,7 @@ export function SiteHeaderBannerCarousel({ slides }) {
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
       loop: true,
-      align: "center",
+      align: "start",
       duration: 50,
       skipSnaps: false,
     },
@@ -210,9 +204,6 @@ export function SiteHeaderBannerCarousel({ slides }) {
       <section
         className="site-header-banner-carousel site-header-banner-carousel_single"
         aria-label={SITE_HEADER_BANNER_UI.CAROUSEL_ARIA}
-        style={{
-          "--site-header-banner-height": `${SITE_HEADER_BANNER_HEIGHT_PX}px`,
-        }}
       >
         {renderSlide(slides[0], slides[0].id, true, { fullWidth: true })}
       </section>
@@ -224,11 +215,6 @@ export function SiteHeaderBannerCarousel({ slides }) {
       className="site-header-banner-carousel"
       aria-roledescription="carousel"
       aria-label={SITE_HEADER_BANNER_UI.CAROUSEL_ARIA}
-      style={{
-        "--site-header-banner-height": `${SITE_HEADER_BANNER_HEIGHT_PX}px`,
-        "--site-header-banner-peek": `${SITE_HEADER_BANNER_CAROUSEL_PEEK_PX}px`,
-        "--site-header-banner-gap": `${SITE_HEADER_BANNER_CAROUSEL_SLIDE_GAP_PX}px`,
-      }}
     >
       <div className="site-header-banner-carousel__viewport" ref={emblaRef}>
         <div className="site-header-banner-carousel__track">

@@ -27,7 +27,8 @@ test("my products page uses catalog toolbar, grid and seller card footer", () =>
   assert.doesNotMatch(page, /styles\.createButton/);
   assert.match(page, /buildCatalogGridRows/);
   assert.match(page, /MyProductsCatalogGridRowItem/);
-  assert.match(page, /usePlaceProductPress/);
+  assert.match(page, /handleCopyProductPress/);
+  assert.match(page, /SellerProductsLimitModal/);
   assert.match(tabBar, /SellerProductsLimitModal/);
   assert.match(tabBar, /usePlaceProductPress/);
   assert.match(page, /sellerRaffleActive/);
@@ -43,6 +44,7 @@ test("my products page uses catalog toolbar, grid and seller card footer", () =>
 
   assert.match(gridRow, /MyProductCatalogCard/);
   assert.match(gridRow, /onEditProduct/);
+  assert.match(gridRow, /onCopyProduct/);
   assert.match(gridRow, /onPromoteProduct/);
   assert.doesNotMatch(gridRow, /layout="catalog-grid"/);
 
@@ -50,6 +52,7 @@ test("my products page uses catalog toolbar, grid and seller card footer", () =>
   assert.match(page, /resolveColumns: \(\) => 1/);
 
   const myProductCard = readMobileFile("entities/product/ui/MyProductCatalogCard.tsx");
+  assert.match(myProductCard, /onCopyProduct/);
   assert.match(myProductCard, /ProductCardSellerToolbar/);
   assert.match(myProductCard, /variant="compact"/);
   assert.match(myProductCard, /getProductModerationBadgeLabel/);
@@ -66,7 +69,14 @@ test("my products page uses catalog toolbar, grid and seller card footer", () =>
 
   assert.match(sellerToolbar, /PROMOTION_BUTTON/);
   assert.match(sellerToolbar, /EDIT_PRODUCT/);
+  assert.match(sellerToolbar, /COPY_PRODUCT_ARIA/);
   assert.match(sellerToolbar, /variant\?: "default" \| "compact"/);
+
+  const createScreen = readMobileFile("features/create-product/ui/CreateProductScreen.tsx");
+  assert.match(createScreen, /useFocusEffect/);
+  assert.match(createScreen, /peekCreateProductLaunch/);
+  assert.match(createScreen, /getCreateProductLaunchSeq/);
+  assert.match(createScreen, /createProductWizardFormFromCopiedProduct/);
 });
 
 test("my products infinite query passes sort and moderation filters", () => {

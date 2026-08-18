@@ -88,7 +88,7 @@
   .app-shell__cell--tier3-full-width > .product-card-premium-frame,
   .product-card-promotion-frame--full-width {
     height: auto;
-    min-height: 14rem;
+    min-height: 260px;
     max-height: none;
     overflow: visible;
   }

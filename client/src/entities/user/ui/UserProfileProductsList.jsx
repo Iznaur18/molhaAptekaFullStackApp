@@ -115,12 +115,15 @@ export function UserProfileProductsList({
           onClick={onViewAllProducts}
         >
           <span>{USER_PROFILE_PRODUCTS_UI.HEADING}</span>
-          <ChevronRight
-            className="user-profile-purchases__heading-chevron"
-            size={16}
-            strokeWidth={2.5}
-            aria-hidden
-          />
+          <span className="user-profile-purchases__heading-go">
+            {USER_PROFILE_PRODUCTS_UI.GO}
+            <ChevronRight
+              className="user-profile-purchases__heading-chevron"
+              size={16}
+              strokeWidth={2.5}
+              aria-hidden
+            />
+          </span>
         </button>
       ) : (
         <h3 className="user-profile-purchases__heading">

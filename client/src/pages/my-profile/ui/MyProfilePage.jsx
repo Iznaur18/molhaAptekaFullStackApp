@@ -146,6 +146,7 @@ export function MyProfilePage({
     showProfileBanner,
     showEditOnBanner,
     isMyProductsTab,
+    isProductModerationTab,
     isFullWidthCatalogTab,
     isDrawerLayout,
     isMobileNavOpen,
@@ -233,6 +234,7 @@ export function MyProfilePage({
         "my-profile-page",
         isFullWidthCatalogTab ? "my-profile-page--catalog-grid-tab" : "",
         isMyProductsTab ? "my-profile-page--my-products" : "",
+        isProductModerationTab ? "my-profile-page--product-moderation" : "",
       ]
         .filter(Boolean)
         .join(" ")}

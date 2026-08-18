@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 
 import { ACCOUNT_REQUIREMENT_MODAL_UI } from "@/shared/config";
+import { useRegisterBlockingOverlay } from "@/shared/lib/useBlockingOverlayOccupancy";
 import { useAccountRequirementModalStyles } from "@/shared/theme/modalChromeStyles";
 
 export type AccountRequirement = "premium" | "data-confirmation";
@@ -35,6 +36,7 @@ export const AccountRequirementModal = ({
 }: AccountRequirementModalProps) => {
   const router = useRouter();
   const styles = useAccountRequirementModalStyles();
+  useRegisterBlockingOverlay(visible);
   const meta = REQUIREMENT_META[requirement];
   const copy = ACCOUNT_REQUIREMENT_MODAL_UI[requirement];
 

@@ -367,6 +367,9 @@ export const PRODUCT_BADGE_EXPLAIN_ADMIN_UI = {
   TITLE_RENTAL: "Аренда",
   TITLE_PROMO: "Промокод",
   TITLE_NEAR_DISTANCE: "Расстояние",
+  TITLE_PROFILE_ADDRESS: "Адрес в профиле",
+  HINT_PROFILE_ADDRESS:
+    "Подсказка без адреса: картинка и текст окна, которое появляется на главной.",
 };
 
 /**

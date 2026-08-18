@@ -6,6 +6,7 @@ import { useProductModerationMutations } from "../../../entities/product/model/u
 import { moderationQueryKeys } from "../../../entities/product/model/moderationQueryKeys.js";
 import { usePendingModerationProductsQuery } from "../../../entities/product/model/usePendingModerationProductsQuery.js";
 import { ProductCard } from "../../../entities/product/ui/ProductCard.jsx";
+import { ProductModerationCreateDetailsModal } from "../../../entities/product/ui/ProductModerationCreateDetailsModal.jsx";
 import {
   API_CLIENT_UI,
   PRODUCT_MODERATION_PAGE_UI,
@@ -39,8 +40,11 @@ export function ProductModerationPage({
   const [cardErrors, setCardErrors] = useState(
     /** @type {Record<string, string>} */ ({}),
   );
+  const [openProductId, setOpenProductId] = useState(/** @type {string | null} */ (null));
 
   const products = queueQuery.data?.products ?? [];
+  const openProduct =
+    products.find((product) => String(product._id) === openProductId) ?? null;
   const phase = queueQuery.isPending
     ? "loading"
     : queueQuery.isError && products.length === 0
@@ -135,6 +139,22 @@ export function ProductModerationPage({
     }
   };
 
+  const getModerationActions = (product) => {
+    const id = String(product._id);
+    return {
+      rejectComment: rejectComments[id] ?? "",
+      onRejectCommentChange: (value) =>
+        setRejectComments((prev) => ({ ...prev, [id]: value })),
+      onApprove: () => void handleApprove(id),
+      onReject: () => void handleReject(id),
+      onDelete: isAdmin ? () => void handleDelete(id) : undefined,
+      canDelete: isAdmin,
+      hasOpenSales: product.hasOpenSales === true,
+      isBusy: pendingProductId === id,
+      errorMessage: cardErrors[id] ?? "",
+    };
+  };
+
   if (phase === "loading") {
     return (
       <p className="product-moderation-page__state">
@@ -179,31 +199,26 @@ export function ProductModerationPage({
       >
         {products.map((product) => {
           const id = String(product._id);
-          const isBusy = pendingProductId === id;
 
           return (
             <div key={id} className="product-moderation-page__item" role="listitem">
               <ProductCard
                 product={product}
                 onSellerNameClick={onSellerNameClick}
+                onOpenDetails={() => setOpenProductId(id)}
                 isModerationQueue
-                moderationActions={{
-                  rejectComment: rejectComments[id] ?? "",
-                  onRejectCommentChange: (value) =>
-                    setRejectComments((prev) => ({ ...prev, [id]: value })),
-                  onApprove: () => void handleApprove(id),
-                  onReject: () => void handleReject(id),
-                  onDelete: isAdmin ? () => void handleDelete(id) : undefined,
-                  canDelete: isAdmin,
-                  hasOpenSales: product.hasOpenSales === true,
-                  isBusy,
-                  errorMessage: cardErrors[id] ?? "",
-                }}
+                moderationActions={getModerationActions(product)}
               />
             </div>
           );
         })}
       </div>
+      <ProductModerationCreateDetailsModal
+        product={openProduct}
+        isOpen={openProduct != null}
+        onClose={() => setOpenProductId(null)}
+        onSellerNameClick={onSellerNameClick}
+      />
     </div>
   );
 }

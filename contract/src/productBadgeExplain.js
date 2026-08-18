@@ -3,7 +3,7 @@ import { z } from "zod";
 import { ADMIN_DISPLAY_IMAGE_URL_MAX_LENGTH } from "./adminDisplay.js";
 
 /** SSOT ключей CMS-бейджей — shared-lib/server re-export отсюда. */
-/** @type {readonly ["original", "raffle", "affiliate", "listing_origin_own", "listing_origin_resale", "listing_origin_manufacturer", "price_market_above", "price_market_at", "price_market_below", "discount", "loyalty", "auction", "installment", "wholesale", "rental", "near_distance", "promo"]} */
+/** @type {readonly ["original", "raffle", "affiliate", "listing_origin_own", "listing_origin_resale", "listing_origin_manufacturer", "price_market_above", "price_market_at", "price_market_below", "discount", "loyalty", "auction", "installment", "wholesale", "rental", "near_distance", "promo", "profile_address"]} */
 export const PRODUCT_BADGE_EXPLAIN_KEY_VALUES = Object.freeze([
   "original",
   "raffle",
@@ -22,6 +22,7 @@ export const PRODUCT_BADGE_EXPLAIN_KEY_VALUES = Object.freeze([
   "rental",
   "near_distance",
   "promo",
+  "profile_address",
 ]);
 
 export const PRODUCT_BADGE_EXPLAIN_DESCRIPTION_MAX_LENGTH = 2000;

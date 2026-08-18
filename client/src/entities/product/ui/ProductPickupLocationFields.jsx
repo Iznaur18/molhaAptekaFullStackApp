@@ -19,6 +19,7 @@ import "./create-product-sections/CreateProductSections.css";
  *   pickupEnabled?: boolean;
  *   deliveryEnabled: boolean;
  *   disabled?: boolean;
+ *   selectedFromSuggest?: boolean;
  *   onChange: (next: {
  *     productPickupAddress: string;
  *     productPickupLat: number | null;
@@ -26,6 +27,7 @@ import "./create-product-sections/CreateProductSections.css";
  *     productPickupEnabled: boolean;
  *     productDeliveryEnabled: boolean;
  *     productRegionCode?: string | null;
+ *     productPickupSelectedFromSuggest?: boolean;
  *   }) => void;
  * }} props
  */
@@ -36,6 +38,7 @@ export function ProductPickupLocationFields({
   pickupEnabled = true,
   deliveryEnabled,
   disabled = false,
+  selectedFromSuggest = false,
   onChange,
 }) {
   const emit = (patch) => {
@@ -45,6 +48,7 @@ export function ProductPickupLocationFields({
       productPickupLon: lon,
       productPickupEnabled: pickupEnabled,
       productDeliveryEnabled: deliveryEnabled,
+      productPickupSelectedFromSuggest: selectedFromSuggest,
       ...patch,
     });
   };
@@ -131,7 +135,9 @@ export function ProductPickupLocationFields({
           />
           <span className="product-pickup-location-fields__check-label">
             {PRODUCT_PICKUP_UI.FULFILLMENT_DELIVERY}
-            {!PRODUCT_DELIVERY_FULFILLMENT_ENABLED ? PRODUCT_PICKUP_UI.SOON_BADGE : null}
+            {!PRODUCT_DELIVERY_FULFILLMENT_ENABLED
+              ? PRODUCT_PICKUP_UI.SOON_BADGE
+              : null}
           </span>
         </label>
       </div>
@@ -175,6 +181,7 @@ export function ProductPickupLocationFields({
           flat: "",
           fiasId: "",
           geo: lat != null && lon != null ? { lat, lon } : null,
+          selectedFromSuggest,
         }}
         onChange={(next) => {
           emit({
@@ -182,6 +189,7 @@ export function ProductPickupLocationFields({
             productPickupLat: next.geo?.lat ?? null,
             productPickupLon: next.geo?.lon ?? null,
             productRegionCode: next.regionCode ?? null,
+            productPickupSelectedFromSuggest: next.selectedFromSuggest === true,
           });
         }}
         disabled={disabled}

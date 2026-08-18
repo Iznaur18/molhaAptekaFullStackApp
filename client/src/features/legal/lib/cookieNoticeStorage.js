@@ -1,4 +1,7 @@
-import { COOKIE_NOTICE_ACCEPTED_STORAGE_KEY } from "../model/cookieNoticeConstants.js";
+import {
+  COOKIE_NOTICE_ACCEPTED_EVENT,
+  COOKIE_NOTICE_ACCEPTED_STORAGE_KEY,
+} from "../model/cookieNoticeConstants.js";
 
 export function hasAcceptedCookieNotice() {
   try {
@@ -13,5 +16,8 @@ export function markCookieNoticeAccepted() {
     localStorage.setItem(COOKIE_NOTICE_ACCEPTED_STORAGE_KEY, "1");
   } catch {
     // storage недоступен (private mode / запрет) — UI останется до перезагрузки
+  }
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(COOKIE_NOTICE_ACCEPTED_EVENT));
   }
 }

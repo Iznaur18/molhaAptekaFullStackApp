@@ -27,6 +27,8 @@ const TITLE_ID = "product-badge-explain-sheet-title";
  *   fallbackKey: string;
  *   contactSellerUserId?: string | null;
  *   onClose: () => void;
+ *   primaryActionLabel?: string | null;
+ *   onPrimaryAction?: () => void;
  * }} props
  */
 export function ProductBadgeExplainSheet({
@@ -36,6 +38,8 @@ export function ProductBadgeExplainSheet({
   fallbackKey,
   contactSellerUserId = null,
   onClose,
+  primaryActionLabel = null,
+  onPrimaryAction,
 }) {
   const panelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const closeButtonRef = useRef(/** @type {HTMLElement | null} */ (null));
@@ -80,6 +84,7 @@ export function ProductBadgeExplainSheet({
   useDialogFocusTrap(panelRef, {
     active: isOpen && isVisible,
     initialFocusRef: closeButtonRef,
+    countsAsBlockingOverlay: !onPrimaryAction,
   });
 
   useEffect(() => {
@@ -204,6 +209,15 @@ export function ProductBadgeExplainSheet({
                 </p>
               ) : null}
             </>
+          ) : onPrimaryAction ? (
+            <button
+              ref={closeButtonRef}
+              type="button"
+              className="product-badge-explain-sheet__close"
+              onClick={onPrimaryAction}
+            >
+              {primaryActionLabel || PRODUCT_BADGE_EXPLAIN_UI.CLOSE}
+            </button>
           ) : (
             <button
               ref={closeButtonRef}

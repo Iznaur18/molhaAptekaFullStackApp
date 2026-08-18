@@ -374,15 +374,19 @@
   margin-inline: var(--my-profile-shell-content-gutter, 0);
 }
 
-/* Compact «Мои товары»: без edge-bleed сетки каталога, padding как в app (16px). */
-.my-profile-page--my-products.my-profile-page--catalog-grid-tab {
+/* Compact list tabs: без edge-bleed сетки каталога, padding как в app (16px). */
+.my-profile-page--catalog-grid-tab:is(
+  .my-profile-page--my-products,
+  .my-profile-page--product-moderation
+) {
   --my-profile-shell-content-gutter: 0;
   margin-inline: 0;
   width: 100%;
 }
 
 .my-profile-page--my-products .my-products-catalog-toolbar,
-.my-profile-page--my-products .my-profile-page__catalog-shell {
+.my-profile-page--my-products .my-profile-page__catalog-shell,
+.my-profile-page--product-moderation .my-profile-page__catalog-shell {
   width: 100%;
   margin-inline: 0;
 }
@@ -411,7 +415,10 @@
     );
   }
 
-  .my-profile-page--my-products.my-profile-page--catalog-grid-tab {
+  .my-profile-page--catalog-grid-tab:is(
+    .my-profile-page--my-products,
+    .my-profile-page--product-moderation
+  ) {
     --my-profile-shell-content-gutter: 0;
     margin-inline: 0;
     width: 100%;
@@ -438,7 +445,10 @@
     );
   }
 
-  .my-profile-page--my-products.my-profile-page--catalog-grid-tab {
+  .my-profile-page--catalog-grid-tab:is(
+    .my-profile-page--my-products,
+    .my-profile-page--product-moderation
+  ) {
     --my-profile-shell-content-gutter: 0;
     margin-inline: 0;
     width: 100%;
@@ -736,7 +746,10 @@
     margin-inline: var(--my-profile-shell-content-gutter, 0);
   }
 
-  .my-profile-page--my-products.my-profile-page--catalog-grid-tab
+  .my-profile-page--catalog-grid-tab:is(
+      .my-profile-page--my-products,
+      .my-profile-page--product-moderation
+    )
     .my-profile-page__mobile-nav-toggle {
     width: 100%;
     margin-inline: 0;
@@ -762,7 +775,7 @@
     gap: 0.75rem;
     padding: 0.75rem 0.875rem;
     border: 2px solid var(--iz-color-action-hover);
-    border-radius: 1rem;
+    border-radius: 20px;
     background: var(--iz-color-action);
     color: var(--iz-color-on-contrast);
     box-shadow:

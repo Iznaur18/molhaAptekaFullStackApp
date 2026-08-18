@@ -6,6 +6,7 @@ import { getSellerProductsLimit } from "@/entities/product/lib/sellerProductsLim
 import { useMyProductsTotalQuery } from "@/entities/product/model/useMyProductsTotalQuery";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
+import { setProductCopyDraft } from "@/features/create-product/model/productCopyDraftStore";
 
 export const usePlaceProductPress = () => {
   const router = useRouter();
@@ -37,8 +38,25 @@ export const usePlaceProductPress = () => {
       setLimitModalVisible(true);
       return;
     }
+    setProductCopyDraft(null);
     router.push("/create-product");
   }, [isAtSellerProductsLimit, isAuthorized, router]);
+
+  const handleCopyProductPress = useCallback(
+    (product: Record<string, unknown>) => {
+      if (!isAuthorized) {
+        router.push("/(auth)/login");
+        return;
+      }
+      if (isAtSellerProductsLimit) {
+        setLimitModalVisible(true);
+        return;
+      }
+      setProductCopyDraft(product);
+      router.push("/create-product");
+    },
+    [isAtSellerProductsLimit, isAuthorized, router],
+  );
 
   const closeLimitModal = useCallback(() => {
     setLimitModalVisible(false);
@@ -46,6 +64,7 @@ export const usePlaceProductPress = () => {
 
   return {
     handlePlaceProductPress,
+    handleCopyProductPress,
     limitModalVisible,
     closeLimitModal,
     sellerProductsLimit,

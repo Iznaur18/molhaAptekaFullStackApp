@@ -49,6 +49,7 @@ type AddressSuggestInputProps = {
   labelStyle?: StyleProp<TextStyle>;
   inputStyle?: StyleProp<TextStyle>;
   showMap?: boolean;
+  autoFocus?: boolean;
 };
 
 export const AddressSuggestInput = ({
@@ -62,6 +63,7 @@ export const AddressSuggestInput = ({
   labelStyle,
   inputStyle,
   showMap = true,
+  autoFocus = false,
 }: AddressSuggestInputProps) => {
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
@@ -236,6 +238,7 @@ export const AddressSuggestInput = ({
           placeholderTextColor={theme.colors.textMuted}
           editable={!disabled}
           autoCorrect={false}
+          autoFocus={autoFocus}
           maxLength={maxLength}
           {...textInputFocusScrollProps}
         />

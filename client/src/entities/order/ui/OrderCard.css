@@ -8,7 +8,7 @@
   gap: var(--order-card-stack-gap);
   padding: 1rem;
   border: 1px solid var(--iz-color-border);
-  border-radius: 0.6rem;
+  border-radius: 20px;
   background: var(--iz-color-surface);
 }
 
@@ -333,20 +333,13 @@
   margin: 0;
   padding: 0.32rem 0.72rem;
   border: 1px solid var(--iz-color-action);
-  border-radius: 0.85rem;
+  border-radius: 14px;
   background: var(--iz-color-action);
   color: var(--iz-color-on-contrast);
   font: inherit;
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-}
-
-@supports (corner-shape: squircle) {
-  .order-card__item-action-button {
-    border-radius: 1rem;
-    corner-shape: squircle;
-  }
 }
 
 .order-card__item-action-button:hover:not(:disabled) {
@@ -391,16 +384,10 @@
   --order-card-stack-gap: 0.5rem;
   gap: var(--order-card-stack-gap);
   padding: 0.875rem;
-  border-radius: 1.25rem;
+  border-radius: 20px;
   border: 1px solid var(--iz-color-border);
   background: var(--iz-color-surface);
   box-shadow: none;
-}
-
-@supports (corner-shape: squircle) {
-  .order-card--compact {
-    corner-shape: squircle;
-  }
 }
 
 .order-card__collapsible-region {
@@ -538,19 +525,12 @@
 
 .order-card--compact .order-card__item-action-button {
   padding: 0.28rem 0.65rem;
-  border-radius: 0.8rem;
-}
-
-@supports (corner-shape: squircle) {
-  .order-card--compact .order-card__item-action-button {
-    border-radius: 0.95rem;
-    corner-shape: squircle;
-  }
+  border-radius: 14px;
 }
 
 .order-card__details-fold {
   border: 1px solid var(--iz-color-border);
-  border-radius: 0.55rem;
+  border-radius: 14px;
   background: var(--iz-color-surface-muted);
   overflow: hidden;
 }

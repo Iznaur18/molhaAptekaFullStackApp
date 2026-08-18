@@ -50,6 +50,7 @@ const LazyMyProductsCatalogSection = lazy(() =>
  *   deletingProductId: string | null;
  *   onDeleteMyProduct: (productId: string) => void;
  *   onEditMyProduct: (product: ProductFromApi) => void;
+ *   onCopyMyProduct: (product: ProductFromApi) => void;
  *   onPromoteMyProduct: (product: ProductFromApi) => void;
  *   myProductsCatalogError: string;
  *   myProductsCatalogNotice: string;
@@ -108,6 +109,7 @@ export function AppShellCatalogGridSection({
   deletingProductId,
   onDeleteMyProduct,
   onEditMyProduct,
+  onCopyMyProduct,
   onPromoteMyProduct,
   myProductsCatalogError,
   myProductsCatalogNotice,
@@ -158,6 +160,7 @@ export function AppShellCatalogGridSection({
           isUserDataConfirmed={isUserDataConfirmed}
           deletingProductId={deletingProductId}
           onEditMyProduct={onEditMyProduct}
+          onCopyMyProduct={onCopyMyProduct}
           onPromoteMyProduct={onPromoteMyProduct}
           myProductsCatalogError={myProductsCatalogError}
           myProductsCatalogNotice={myProductsCatalogNotice}

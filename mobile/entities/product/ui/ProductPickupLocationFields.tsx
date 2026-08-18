@@ -20,6 +20,7 @@ export type ProductPickupLocationValue = {
   productPickupEnabled: boolean;
   productDeliveryEnabled: boolean;
   productRegionCode?: string | null;
+  productPickupSelectedFromSuggest?: boolean;
 };
 
 type ProductPickupLocationFieldsProps = {
@@ -29,6 +30,7 @@ type ProductPickupLocationFieldsProps = {
   pickupEnabled?: boolean;
   deliveryEnabled?: boolean;
   disabled?: boolean;
+  selectedFromSuggest?: boolean;
   onChange: (next: ProductPickupLocationValue) => void;
 };
 
@@ -36,12 +38,13 @@ const toAddressValue = (
   address: string,
   lat: number | null,
   lon: number | null,
+  selectedFromSuggest: boolean,
 ): RuDeliveryAddressValue => ({
   line: address,
   flat: "",
   fiasId: "",
   geo: lat != null && lon != null ? { lat, lon } : null,
-  selectedFromSuggest: false,
+  selectedFromSuggest,
 });
 
 export const ProductPickupLocationFields = ({
@@ -51,6 +54,7 @@ export const ProductPickupLocationFields = ({
   pickupEnabled = true,
   deliveryEnabled = false,
   disabled = false,
+  selectedFromSuggest = false,
   onChange,
 }: ProductPickupLocationFieldsProps) => {
   const theme = useAppTheme();
@@ -63,6 +67,7 @@ export const ProductPickupLocationFields = ({
       productPickupLon: lon,
       productPickupEnabled: pickupEnabled,
       productDeliveryEnabled: deliveryEnabled,
+      productPickupSelectedFromSuggest: selectedFromSuggest,
       ...patch,
     });
   };
@@ -98,7 +103,9 @@ export const ProductPickupLocationFields = ({
 
   return (
     <View style={styles.wrap}>
-      <Text style={fieldStyles.labelStrong}>{PRODUCT_PICKUP_UI.FULFILLMENT_LEGEND}</Text>
+      <Text style={fieldStyles.labelStrong}>
+        {PRODUCT_PICKUP_UI.FULFILLMENT_LEGEND}
+      </Text>
 
       <View style={styles.methods}>
         <MethodCheckRow
@@ -145,13 +152,14 @@ export const ProductPickupLocationFields = ({
       <Text style={fieldStyles.hint}>{methodsHint}</Text>
 
       <AddressSuggestInput
-        value={toAddressValue(address, lat, lon)}
+        value={toAddressValue(address, lat, lon, selectedFromSuggest)}
         onChange={(next) => {
           emit({
             productPickupAddress: next.line,
             productPickupLat: next.geo?.lat ?? null,
             productPickupLon: next.geo?.lon ?? null,
             productRegionCode: next.regionCode ?? null,
+            productPickupSelectedFromSuggest: next.selectedFromSuggest === true,
           });
         }}
         disabled={disabled}
@@ -203,7 +211,9 @@ function MethodCheckRow({
           },
         ]}
       >
-        {checked ? <Text style={[styles.tick, { color: theme.colors.onContrast }]}>✓</Text> : null}
+        {checked ? (
+          <Text style={[styles.tick, { color: theme.colors.onContrast }]}>✓</Text>
+        ) : null}
       </View>
       <Text
         style={[

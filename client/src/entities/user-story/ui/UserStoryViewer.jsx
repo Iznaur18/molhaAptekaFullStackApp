@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { USER_STORY_UI } from "../../../shared/config/appUiCopy.js";
+import { useRegisterBlockingOverlay } from "../../../shared/lib/useBlockingOverlayOccupancy.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { useUserStoryMutations } from "../model/useUserStoryMutations.js";
 import {
@@ -58,6 +59,7 @@ export function UserStoryViewer({
   const [pendingIndex, setPendingIndex] = useState(/** @type {number | null} */ (null));
 
   useScrollLock(isOpen);
+  useRegisterBlockingOverlay(isOpen);
 
   const authorId = String(author._id);
   const isOwn = currentUserId != null && authorId === String(currentUserId);

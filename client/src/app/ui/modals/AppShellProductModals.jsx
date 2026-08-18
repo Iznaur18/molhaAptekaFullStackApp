@@ -22,6 +22,8 @@ export function AppShellProductModals({
   isCreateProductModalOpen,
   setIsCreateProductModalOpen,
   handleCreateProductSuccess,
+  productToCopy = null,
+  setProductToCopy = () => {},
   loyaltyPoints,
   loyaltyPointsReserved,
   isMineMode,
@@ -77,11 +79,15 @@ export function AppShellProductModals({
       />
       <CreateProductModal
         isOpen={isCreateProductModalOpen}
-        onClose={() => setIsCreateProductModalOpen(false)}
+        onClose={() => {
+          setIsCreateProductModalOpen(false);
+          setProductToCopy(null);
+        }}
         onSuccess={handleCreateProductSuccess}
         sellerLoyaltyPointsBalance={loyaltyPoints}
         sellerLoyaltyPointsReserved={loyaltyPointsReserved}
         sellerProducts={isMineMode ? products : []}
+        productToCopy={productToCopy}
       />
       <CreateProductModal
         isOpen={productToEdit != null}

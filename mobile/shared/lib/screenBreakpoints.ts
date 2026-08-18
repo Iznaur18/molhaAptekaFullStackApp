@@ -16,6 +16,8 @@ export const SCREEN_TABLET_MIN_WIDTH = SCREEN_SMALL_TABLET_MIN_WIDTH;
 export const SCREEN_CONTENT_MAX_WIDTH_SMALL_TABLET = 520;
 export const SCREEN_CONTENT_MAX_WIDTH_MEDIUM_TABLET = 720;
 export const SCREEN_CONTENT_MAX_WIDTH_LARGE_TABLET = 960;
+/** ≥1280: 960 × 1.25, паритет с web `--app-shell-max-width` */
+export const SCREEN_CONTENT_MAX_WIDTH_WIDE = 1200;
 
 /** @deprecated используйте SCREEN_CONTENT_MAX_WIDTH_SMALL_TABLET */
 export const SCREEN_CONTENT_MAX_WIDTH_TABLET = SCREEN_CONTENT_MAX_WIDTH_SMALL_TABLET;
@@ -114,6 +116,9 @@ export const resolveScreenWidthTier = (width: number): ScreenWidthTier => {
 };
 
 export const resolveContentMaxWidth = (width: number): number | undefined => {
+  if (width >= SCREEN_PRODUCT_GRID_4_COL_MIN_WIDTH) {
+    return SCREEN_CONTENT_MAX_WIDTH_WIDE;
+  }
   const tier = resolveScreenWidthTier(width);
   if (tier === "tablet-large") {
     return SCREEN_CONTENT_MAX_WIDTH_LARGE_TABLET;

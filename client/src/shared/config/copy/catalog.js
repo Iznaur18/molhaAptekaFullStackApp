@@ -210,6 +210,7 @@ export const PRODUCT_CARD_UI = {
   MANAGE_PRODUCT_TOGGLE: "Редактировать",
   MANAGE_PRODUCT_COLLAPSE: "Свернуть",
   EDIT_PRODUCT: "Изменить",
+  COPY_PRODUCT_ARIA: "Копировать товар",
   PROMOTION_BUTTON: "Управление",
   DELETE_PRODUCT: "Удалить товар",
   DELETE_PRODUCT_PENDING: "Удаление…",

@@ -292,7 +292,7 @@ export function AddressDeliveryFields({
       : null;
 
   return (
-    <div className="address-delivery-fields">
+    <div className="address-delivery-fields" id="edit-profile-address">
       <label className="address-delivery-fields__line-wrap" ref={wrapRef}>
         <span className="address-delivery-fields__label">{lineLabel}</span>
         <div className="address-delivery-fields__input-row">

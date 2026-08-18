@@ -27,6 +27,7 @@ import { USER_STORY_UI } from "@/shared/config";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useStoryViewerModalStyles } from "@/shared/theme/modalChromeStyles";
+import { useRegisterBlockingOverlay } from "@/shared/lib/useBlockingOverlayOccupancy";
 import { ProductPreviewVideo } from "@/shared/ui/ProductPreviewVideo";
 
 type UserStoryViewerModalProps = {
@@ -52,6 +53,7 @@ export const UserStoryViewerModal = ({
 }: UserStoryViewerModalProps) => {
   const router = useRouter();
   const styles = useStoryViewerModalStyles();
+  useRegisterBlockingOverlay(visible);
   const theme = useAppTheme();
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const frameSize = computeUserStoryFrameSize(windowWidth, windowHeight);

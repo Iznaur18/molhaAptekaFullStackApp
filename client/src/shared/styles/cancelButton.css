@@ -75,7 +75,7 @@
   align-self: flex-start;
   margin: 0;
   padding: var(--iz-control-btn-padding-y) var(--iz-control-btn-padding-x);
-  border-radius: var(--iz-control-btn-radius);
+  border-radius: 14px;
   font: inherit;
   font-size: var(--iz-control-btn-font);
   font-weight: var(--iz-control-btn-weight);

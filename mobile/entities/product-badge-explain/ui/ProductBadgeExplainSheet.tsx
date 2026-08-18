@@ -20,6 +20,7 @@ import {
 } from "@/entities/user/lib/ruPhone";
 import { PRODUCT_BADGE_EXPLAIN_UI } from "@/shared/config";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
+import { useRegisterBlockingOverlay } from "@/shared/lib/useBlockingOverlayOccupancy";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { SquircleView } from "@/shared/ui/SquircleView";
 
@@ -42,6 +43,8 @@ type ProductBadgeExplainSheetProps = {
   fallbackKey: string;
   contactSellerUserId?: string | null;
   onClose: () => void;
+  primaryActionLabel?: string | null;
+  onPrimaryAction?: () => void;
 };
 
 const useStyles = createThemedStyles((theme) => ({
@@ -131,10 +134,13 @@ export const ProductBadgeExplainSheet = ({
   fallbackKey,
   contactSellerUserId = null,
   onClose,
+  primaryActionLabel = null,
+  onPrimaryAction,
 }: ProductBadgeExplainSheetProps) => {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
   const adminByKey = useProductBadgeExplainByKeyMap({ enabled: visible });
+  useRegisterBlockingOverlay(visible && !onPrimaryAction);
 
   const sellerId =
     typeof contactSellerUserId === "string" ? contactSellerUserId.trim() : "";
@@ -263,6 +269,16 @@ export const ProductBadgeExplainSheet = ({
                     </Text>
                   ) : null}
                 </>
+              ) : onPrimaryAction ? (
+                <Pressable
+                  style={styles.closeButton}
+                  accessibilityRole="button"
+                  onPress={onPrimaryAction}
+                >
+                  <Text style={styles.closeButtonText}>
+                    {primaryActionLabel || PRODUCT_BADGE_EXPLAIN_UI.CLOSE}
+                  </Text>
+                </Pressable>
               ) : (
                 <Pressable
                   style={styles.closeButton}

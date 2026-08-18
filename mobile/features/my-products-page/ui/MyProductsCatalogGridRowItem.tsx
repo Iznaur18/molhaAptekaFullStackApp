@@ -16,6 +16,7 @@ type MyProductsCatalogGridRowItemProps = {
   tileWidth: number;
   rowIndex?: number;
   onEditProduct: (product: MyProductsCatalogProduct) => void;
+  onCopyProduct: (product: MyProductsCatalogProduct) => void;
   onPromoteProduct: (product: MyProductsCatalogProduct) => void;
   resolveLoyaltyOvercommitted: (product: MyProductsCatalogProduct) => boolean;
 };
@@ -27,6 +28,7 @@ export const MyProductsCatalogGridRowItem = ({
   tileWidth,
   rowIndex = 0,
   onEditProduct,
+  onCopyProduct,
   onPromoteProduct,
   resolveLoyaltyOvercommitted,
 }: MyProductsCatalogGridRowItemProps) => {
@@ -51,6 +53,7 @@ export const MyProductsCatalogGridRowItem = ({
               product={product}
               isLoyaltyPointsOvercommitted={resolveLoyaltyOvercommitted(product)}
               onEditProduct={() => onEditProduct(product)}
+              onCopyProduct={() => onCopyProduct(product)}
               onPromoteProduct={() => onPromoteProduct(product)}
             />
           </View>

@@ -10,6 +10,7 @@
 .curated-product-compact-card {
   --curated-card-image-bg: var(--iz-color-surface-elevated);
   --curated-card-price-bg: var(--iz-color-action);
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -51,7 +52,9 @@
 }
 
 .curated-product-compact-card__price-wrap {
+  box-sizing: border-box;
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   width: 100%;
   min-height: 32px;

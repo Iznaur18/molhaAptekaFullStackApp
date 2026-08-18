@@ -37,6 +37,7 @@ import { useUploadVideoMutation } from "@/entities/upload/model/useUploadVideoMu
 import { pickGalleryImageAsset } from "@/features/image-upload/lib/pickGalleryImageAsset";
 import { pickVideoAsset } from "@/features/image-upload/lib/pickVideoAsset";
 import { USER_STORY_UI } from "@/shared/config";
+import { useRegisterBlockingOverlay } from "@/shared/lib/useBlockingOverlayOccupancy";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import {
   CREATE_STORY_MODAL_ANIMATION,
@@ -80,6 +81,7 @@ export const CreateUserStoryModal = ({
   const dismissGuardUntilRef = useRef(0);
 
   const [modalVisible, setModalVisible] = useState(visible);
+  useRegisterBlockingOverlay(modalVisible);
   const [captionText, setCaptionText] = useState("");
   const [mediaType, setMediaType] = useState<UserStoryMediaType | null>(null);
   const [imageFile, setImageFile] = useState<UploadImageFilePayload | null>(null);

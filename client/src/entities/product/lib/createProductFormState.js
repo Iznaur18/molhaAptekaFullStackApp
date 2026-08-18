@@ -32,6 +32,7 @@ export const CREATE_PRODUCT_INITIAL_FORM = {
   productPickupAddress: "",
   productPickupLat: null,
   productPickupLon: null,
+  productPickupSelectedFromSuggest: false,
   productPickupEnabled: true,
   productDeliveryEnabled: false,
   productReturnEnabled: null,
@@ -75,20 +76,26 @@ export function createProductFormStateFromProduct(product) {
     affiliatePercent: String(
       Math.max(0, Math.floor(Number(product.affiliatePercent) || 0)) || 10,
     ),
-    productCharacteristicRows: characteristicRowsFromApi(product.productCharacteristics),
+    productCharacteristicRows: characteristicRowsFromApi(
+      product.productCharacteristics,
+    ),
     categoryDefaultCharacteristicKeys: [],
     productCharacteristicsSellerTouched: true,
     productCharacteristicsAutoAppliedForCategoryId: null,
     productRegionCode: product.productRegionCode?.trim() || "RU-MOW",
     productPickupAddress: String(product.productPickupAddress ?? "").trim(),
     productPickupLat:
-      product.productPickupLat != null && Number.isFinite(Number(product.productPickupLat))
+      product.productPickupLat != null &&
+      Number.isFinite(Number(product.productPickupLat))
         ? Number(product.productPickupLat)
         : null,
     productPickupLon:
-      product.productPickupLon != null && Number.isFinite(Number(product.productPickupLon))
+      product.productPickupLon != null &&
+      Number.isFinite(Number(product.productPickupLon))
         ? Number(product.productPickupLon)
         : null,
+    productPickupSelectedFromSuggest:
+      String(product.productPickupAddress ?? "").trim().length > 0,
     productPickupEnabled: product.productPickupEnabled !== false,
     productDeliveryEnabled: product.productDeliveryEnabled === true,
     productReturnEnabled: product.productReturnEnabled === true,
@@ -96,5 +103,23 @@ export function createProductFormStateFromProduct(product) {
       product.productReturnEnabled === true
         ? mapProductReturnTermsToRows(product.productReturnTerms)
         : [],
+  };
+}
+
+/**
+ * Префилл визарда создания из существующего товара.
+ * Без полей «Управление»: партнёрка выкл., объявление снова видимое.
+ *
+ * @param {import('../model/types.js').ProductFromApi} product
+ */
+export function createProductFormStateFromCopiedProduct(product) {
+  const copied = createProductFormStateFromProduct(product);
+  const stockRaw = Number.parseInt(String(product.productStockQuantity ?? ""), 10);
+  return {
+    ...copied,
+    affiliateEnabled: false,
+    affiliatePercent: CREATE_PRODUCT_INITIAL_FORM.affiliatePercent,
+    productIsAvailable: true,
+    productStockQuantity: Number.isFinite(stockRaw) && stockRaw > 0 ? String(stockRaw) : "1",
   };
 }

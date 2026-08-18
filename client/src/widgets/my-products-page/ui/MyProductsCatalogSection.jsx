@@ -16,6 +16,7 @@ import "./MyProductsCatalogSection.css";
  *   isUserDataConfirmed?: boolean;
  *   deletingProductId: string | null;
  *   onEditMyProduct: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
+ *   onCopyMyProduct: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
  *   onPromoteMyProduct: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
  *   myProductsCatalogError: string;
  *   myProductsCatalogNotice?: string;
@@ -40,6 +41,7 @@ export function MyProductsCatalogSection({
   isUserDataConfirmed = false,
   deletingProductId,
   onEditMyProduct,
+  onCopyMyProduct,
   onPromoteMyProduct,
   myProductsCatalogError,
   myProductsCatalogNotice = "",
@@ -119,6 +121,7 @@ export function MyProductsCatalogSection({
                   isLoyaltyPointsOvercommitted={resolveLoyaltyOvercommitted(product)}
                   onOpenProduct={() => onOpenProductDetails(product)}
                   onEditProduct={() => onEditMyProduct(product)}
+                  onCopyProduct={() => onCopyMyProduct(product)}
                   onPromoteProduct={() => onPromoteMyProduct(product)}
                   isDeletePending={deletingProductId === productId}
                   isAvailabilityTogglePending={

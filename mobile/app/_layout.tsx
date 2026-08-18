@@ -10,6 +10,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import "react-native-reanimated";
 
+import { AddressPromptHost } from "@/features/address-prompt/ui/AddressPromptHost";
 import { createAppQueryClient } from "@/shared/api";
 import { FAQ_UI, LEGAL_UI } from "@/shared/config";
 import {
@@ -117,6 +118,7 @@ function RootLayoutNav() {
         <Stack.Screen name="legal/offer" options={{ title: LEGAL_UI.OFFER_TITLE }} />
         <Stack.Screen name="faq" options={{ title: FAQ_UI.TITLE }} />
       </Stack>
+      <AddressPromptHost />
     </ThemeProvider>
   );
 }

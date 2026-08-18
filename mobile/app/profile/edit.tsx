@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Text, View } from "react-native";
 
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
@@ -11,6 +11,10 @@ import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export default function EditProfileScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ focus?: string | string[] }>();
+  const focusRaw = params.focus;
+  const focusAddress =
+    (Array.isArray(focusRaw) ? focusRaw[0] : focusRaw) === "address";
   const styles = useAuthGateStyles();
   const sessionQuery = useAuthSessionQuery();
   const user = sessionQuery.data?.user;
@@ -42,6 +46,10 @@ export default function EditProfileScreen() {
   }
 
   return (
-    <EditProfileForm user={user} onSaved={() => router.replace("/(tabs)/profile")} />
+    <EditProfileForm
+      user={user}
+      focusAddress={focusAddress}
+      onSaved={() => router.replace("/(tabs)/profile")}
+    />
   );
 }

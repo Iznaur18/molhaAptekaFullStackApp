@@ -15,17 +15,20 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
       <ProductPickupLocationFields
         address={String(form.productPickupAddress ?? "")}
         lat={
-          form.productPickupLat != null && Number.isFinite(Number(form.productPickupLat))
+          form.productPickupLat != null &&
+          Number.isFinite(Number(form.productPickupLat))
             ? Number(form.productPickupLat)
             : null
         }
         lon={
-          form.productPickupLon != null && Number.isFinite(Number(form.productPickupLon))
+          form.productPickupLon != null &&
+          Number.isFinite(Number(form.productPickupLon))
             ? Number(form.productPickupLon)
             : null
         }
         pickupEnabled={form.productPickupEnabled !== false}
         deliveryEnabled={form.productDeliveryEnabled === true}
+        selectedFromSuggest={form.productPickupSelectedFromSuggest === true}
         disabled={isSubmitting}
         onChange={(next) => {
           setForm((prev) => ({
@@ -35,6 +38,8 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
             productPickupLon: next.productPickupLon,
             productPickupEnabled: next.productPickupEnabled !== false,
             productDeliveryEnabled: next.productDeliveryEnabled === true,
+            productPickupSelectedFromSuggest:
+              next.productPickupSelectedFromSuggest === true,
             ...(next.productRegionCode
               ? { productRegionCode: next.productRegionCode }
               : {}),

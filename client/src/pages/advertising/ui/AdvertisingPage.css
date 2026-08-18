@@ -35,7 +35,7 @@
   align-items: flex-start;
   gap: 0.875rem;
   padding: 1.25rem;
-  border-radius: 1.125rem;
+  border-radius: 20px;
   background: var(--iz-color-info-deep);
   color: var(--iz-color-on-contrast);
 }
@@ -113,7 +113,7 @@
   gap: 0.85rem;
   padding: 1rem;
   border: 1px solid var(--iz-color-border);
-  border-radius: 0.875rem;
+  border-radius: 20px;
   background: var(--iz-color-surface);
   box-shadow: none;
 }
@@ -199,7 +199,7 @@
   min-width: 0;
   padding: 0.4rem 0.5rem;
   border: 1px solid var(--iz-color-border);
-  border-radius: 0.5rem;
+  border-radius: 14px;
   background: var(--iz-color-surface-elevated);
 }
 
@@ -231,7 +231,7 @@
   display: grid;
   gap: 0.35rem;
   padding: 0.4rem 0.65rem;
-  border-radius: 0.625rem;
+  border-radius: 14px;
   border: 1px solid var(--iz-color-border);
   background: var(--iz-color-surface-elevated);
 }
@@ -287,7 +287,7 @@
   gap: 0.85rem;
   padding: 0.85rem;
   border: 1px dashed var(--iz-color-border);
-  border-radius: 0.75rem;
+  border-radius: 16px;
   background: var(--iz-color-surface-elevated);
 }
 
@@ -309,7 +309,7 @@
 
 .advertising-page__feedback {
   padding: 0.55rem 0.7rem;
-  border-radius: 0.5rem;
+  border-radius: 14px;
   border: 1px solid var(--iz-color-success-surface);
   background: var(--iz-color-success-surface);
   color: var(--iz-color-success-text);
@@ -353,7 +353,7 @@
   box-sizing: border-box;
   padding: 0.5rem 0.65rem;
   border: 1px solid var(--iz-color-border);
-  border-radius: 0.625rem;
+  border-radius: 14px;
   background: var(--iz-color-surface);
   font: inherit;
   font-weight: 400;
@@ -376,7 +376,7 @@
   margin: 0;
   padding: 0.6rem 0.65rem;
   border: 1px solid var(--iz-color-border);
-  border-radius: 0.625rem;
+  border-radius: 14px;
   background: var(--iz-color-surface);
   cursor: pointer;
   transition: border-color 0.15s ease;
@@ -417,6 +417,7 @@
   flex: 1 1 0;
   width: auto;
   box-sizing: border-box;
+  border-radius: 14px;
 }
 
 .advertising-page__timing {
@@ -469,7 +470,7 @@
   height: 2.75rem;
   padding: 0.15rem;
   border: 1px solid var(--iz-color-border);
-  border-radius: 0.625rem;
+  border-radius: 14px;
   background: var(--iz-color-surface);
   cursor: pointer;
 }
@@ -483,7 +484,7 @@
 .advertising-page__preview {
   overflow: hidden;
   border: 1px solid var(--iz-color-border);
-  border-radius: 0.75rem;
+  border-radius: 16px;
   background: var(--iz-color-surface-elevated);
 }
 

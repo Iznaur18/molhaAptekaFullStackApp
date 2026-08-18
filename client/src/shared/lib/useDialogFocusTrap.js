@@ -7,14 +7,20 @@ import {
   pushModalFocusLayer,
 } from "./modalFocusStack.js";
 
+import { acquireBlockingOverlay } from "./blockingOverlayOccupancy.js";
+
 /**
  * @param {import('react').RefObject<HTMLElement | null>} containerRef
  * @param {{
  *   active: boolean;
  *   initialFocusRef?: import('react').RefObject<HTMLElement | null>;
+ *   countsAsBlockingOverlay?: boolean;
  * }} options
  */
-export function useDialogFocusTrap(containerRef, { active, initialFocusRef = null }) {
+export function useDialogFocusTrap(
+  containerRef,
+  { active, initialFocusRef = null, countsAsBlockingOverlay = true },
+) {
   const layerId = useId();
 
   useEffect(() => {
@@ -31,6 +37,9 @@ export function useDialogFocusTrap(containerRef, { active, initialFocusRef = nul
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
     pushModalFocusLayer(layerId, container, previousFocus);
+    const releaseBlockingOverlay = countsAsBlockingOverlay
+      ? acquireBlockingOverlay()
+      : null;
 
     const focusWithoutScroll = (element) => {
       element.focus({ preventScroll: true });
@@ -89,6 +98,7 @@ export function useDialogFocusTrap(containerRef, { active, initialFocusRef = nul
     return () => {
       cancelAnimationFrame(focusFrame);
       document.removeEventListener("keydown", onKeyDown, true);
+      releaseBlockingOverlay?.();
 
       const removed = popModalFocusLayer(layerId);
       const restoreTarget = removed?.previousFocus;
@@ -96,5 +106,5 @@ export function useDialogFocusTrap(containerRef, { active, initialFocusRef = nul
         focusWithoutScroll(restoreTarget);
       }
     };
-  }, [active, containerRef, initialFocusRef, layerId]);
+  }, [active, containerRef, countsAsBlockingOverlay, initialFocusRef, layerId]);
 }

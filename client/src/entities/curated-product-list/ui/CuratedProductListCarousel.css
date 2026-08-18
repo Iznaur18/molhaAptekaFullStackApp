@@ -8,10 +8,14 @@
  */
 .curated-product-list-carousel {
   box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   margin: 0 0 var(--iz-space-2);
-  padding: 8px 12px;
+  padding: 12px 0;
   border-radius: var(--iz-radius-card-lg);
   background: var(--iz-color-surface);
+  overflow: hidden;
 }
 
 .curated-product-list-carousel__title {
@@ -32,19 +36,26 @@
   --curated-card-gap: 12px;
   --curated-card-min-width: 86px;
   --curated-card-max-width: 168px;
-  display: flex;
-  gap: var(--curated-card-gap);
+  --curated-scroll-pad-x: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
-  padding: 4px 4px 8px;
+  overflow-y: hidden;
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-x pan-y;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  container-type: inline-size;
 }
 
 .curated-product-list-carousel__scroll::-webkit-scrollbar {
   display: none;
+  width: 0;
+  height: 0;
+  background: transparent;
 }
 
 .curated-product-list-carousel__scroll.is-drag-scrolling,
@@ -53,20 +64,34 @@
   cursor: grabbing;
 }
 
-@container app-viewport (min-width: 768px) {
-  .curated-product-list-carousel__scroll {
-    padding-bottom: 4px;
-  }
+.curated-product-list-carousel__track {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: var(--curated-card-gap);
+  width: max-content;
+  min-width: 100%;
+  margin: 0;
+  padding: 0 var(--curated-scroll-pad-x);
+  list-style: none;
 }
 
-.curated-product-list-carousel__scroll > .curated-product-compact-card {
-  flex: 0 0
-    clamp(
-      var(--curated-card-min-width),
-      calc(
-        (100% - (var(--curated-visible-cards) - 1) * var(--curated-card-gap)) /
-          var(--curated-visible-cards)
-      ),
-      var(--curated-card-max-width)
-    );
+.curated-product-list-carousel__item {
+  flex: 0 0 auto;
+  width: clamp(
+    var(--curated-card-min-width),
+    calc(
+      (
+          100cqi - 2 * var(--curated-scroll-pad-x) -
+            (var(--curated-visible-cards) - 1) * var(--curated-card-gap)
+        ) / var(--curated-visible-cards)
+    ),
+    var(--curated-card-max-width)
+  );
+}
+
+.curated-product-list-carousel__item > .curated-product-compact-card {
+  width: 100%;
 }

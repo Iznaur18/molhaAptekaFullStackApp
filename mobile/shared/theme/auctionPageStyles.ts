@@ -11,13 +11,13 @@ const LIST_GAP = 4;
 const SECTION_GAP = 4;
 const ROW_GAP = 8;
 const ROW_PADDING = 8;
-const ROW_RADIUS = 12;
+const ROW_RADIUS = 20;
 const VIEW_CHIP_GAP = 6;
 const VIEW_CHIP_PADDING_VERTICAL = 4;
 const VIEW_CHIP_PADDING_HORIZONTAL = 8;
 const OVERVIEW_TILE_RADIUS = 16;
 const THUMB_SIZE = 52;
-const THUMB_RADIUS = 7.2;
+const THUMB_RADIUS = 14;
 
 export const useAuctionPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -341,7 +341,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     gap: 8,
     paddingVertical: 7.2,
     paddingHorizontal: 8.8,
-    borderRadius: 8.8,
+    borderRadius: 14,
     backgroundColor: theme.colors.surfaceMuted,
   },
   priceLabel: {
@@ -373,7 +373,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     alignItems: "stretch",
     overflow: "hidden",
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 10.4,
+    borderRadius: 14,
     borderColor: theme.colors.borderStrong,
     backgroundColor: theme.colors.surfaceMuted,
   },
@@ -411,7 +411,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     alignSelf: "flex-start",
     paddingVertical: 5,
     paddingHorizontal: 10,
-    borderRadius: 7,
+    borderRadius: 14,
     backgroundColor: theme.colors.danger,
   },
   editorCancelText: {
@@ -432,7 +432,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
     paddingVertical: 8.8,
     paddingHorizontal: 10.4,
-    borderRadius: 10.4,
+    borderRadius: 14,
     borderWidth: StyleSheet.hairlineWidth,
   },
   decisionBtnAccept: {
@@ -461,7 +461,7 @@ export const useAuctionDashboardRowStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
     paddingVertical: 10.4,
     paddingHorizontal: 13.6,
-    borderRadius: 11.2,
+    borderRadius: 14,
     backgroundColor: theme.colors.action,
   },
   ctaText: {

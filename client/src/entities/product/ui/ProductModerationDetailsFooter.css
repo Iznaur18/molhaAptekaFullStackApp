@@ -22,7 +22,7 @@
   box-sizing: border-box;
   width: 100%;
   border: 1px solid var(--iz-color-border-strong);
-  border-radius: 0.5rem;
+  border-radius: 14px;
   padding: 0.5rem 0.625rem;
   font: inherit;
   font-size: 0.9375rem;
@@ -37,6 +37,7 @@
 
 .product-moderation-details-footer__actions > .app-btn {
   width: 100%;
+  border-radius: 14px;
 }
 
 .product-moderation-details-footer__btn--wide,

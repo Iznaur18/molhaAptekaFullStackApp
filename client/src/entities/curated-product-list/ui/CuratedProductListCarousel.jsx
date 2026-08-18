@@ -41,13 +41,16 @@ export function CuratedProductListCarousel({ title, products, onOpenProduct }) {
           className="curated-product-list-carousel__scroll"
           {...dragScrollProps}
         >
-          {products.map((product) => (
-            <CuratedProductCompactCard
-              key={product._id}
-              product={product}
-              onOpen={onOpenProduct}
-            />
-          ))}
+          <ul className="curated-product-list-carousel__track" role="list">
+            {products.map((product) => (
+              <li key={product._id} className="curated-product-list-carousel__item">
+                <CuratedProductCompactCard
+                  product={product}
+                  onOpen={onOpenProduct}
+                />
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
     </>

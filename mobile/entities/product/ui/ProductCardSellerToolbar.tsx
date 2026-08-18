@@ -1,12 +1,15 @@
+import { Feather } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
 
 import { isProductPromoteButtonDisabled } from "@/entities/product/lib/isProductPromoteButtonDisabled";
 import { PRODUCT_CARD_UI } from "@/shared/config";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductCardSellerToolbarStyles } from "@/shared/theme/catalogProductStyles";
 
 type ProductCardSellerToolbarProps = {
   onPromote?: () => void;
   onEdit?: () => void;
+  onCopy?: () => void;
   canEdit?: boolean;
   isDeletePending?: boolean;
   isAvailabilityTogglePending?: boolean;
@@ -17,6 +20,7 @@ type ProductCardSellerToolbarProps = {
 export const ProductCardSellerToolbar = ({
   onPromote,
   onEdit,
+  onCopy,
   canEdit = true,
   isDeletePending = false,
   isAvailabilityTogglePending = false,
@@ -24,6 +28,7 @@ export const ProductCardSellerToolbar = ({
   variant = "default",
 }: ProductCardSellerToolbarProps) => {
   const styles = useProductCardSellerToolbarStyles();
+  const theme = useAppTheme();
   const isCompact = variant === "compact";
   const promoteDisabled = isProductPromoteButtonDisabled({
     isDeletePending,
@@ -32,8 +37,9 @@ export const ProductCardSellerToolbar = ({
   });
   const showPromote = typeof onPromote === "function";
   const showEdit = typeof onEdit === "function" && canEdit;
+  const showCopy = typeof onCopy === "function";
 
-  if (!showPromote && !showEdit) {
+  if (!showPromote && !showEdit && !showCopy) {
     return null;
   }
 
@@ -70,6 +76,17 @@ export const ProductCardSellerToolbar = ({
           <Text style={styles.editButtonText} numberOfLines={1}>
             {PRODUCT_CARD_UI.EDIT_PRODUCT}
           </Text>
+        </Pressable>
+      ) : null}
+      {showCopy ? (
+        <Pressable
+          style={[styles.copyButton, isDeletePending && styles.buttonDisabled]}
+          disabled={isDeletePending}
+          onPress={onCopy}
+          accessibilityRole="button"
+          accessibilityLabel={PRODUCT_CARD_UI.COPY_PRODUCT_ARIA}
+        >
+          <Feather name="copy" size={16} color={theme.colors.text} />
         </Pressable>
       ) : null}
     </View>

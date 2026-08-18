@@ -1,9 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   CREATE_PRODUCT_INITIAL_FORM,
+  createProductFormStateFromCopiedProduct,
   createProductFormStateFromProduct,
 } from "../lib/createProductFormState.js";
+import { createProductPickupFieldsFromUser } from "../lib/createProductPickupFieldsFromUser.js";
+import { useAuthSession } from "../../user/model/useAuthSession.js";
 import { resolveCreateProductDiscountPreview } from "../lib/prepareCreateProductSubmit.js";
 import { resolveSellerMaxLoyaltyPointsPerUnit } from "../lib/resolveSellerMaxLoyaltyPointsPerUnit.js";
 import {
@@ -19,6 +22,7 @@ import { useCreateProductSubmit } from "./useCreateProductSubmit.js";
  *   onSuccess?: (product: import('./types.js').ProductFromApi) => void;
  *   mode?: 'create' | 'edit';
  *   productToEdit?: import('./types.js').ProductFromApi | null;
+ *   productToCopy?: import('./types.js').ProductFromApi | null;
  *   sellerLoyaltyPointsBalance?: number;
  *   sellerLoyaltyPointsReserved?: number;
  *   sellerProducts?: import('./types.js').ProductFromApi[];
@@ -30,12 +34,15 @@ export function useCreateProductForm({
   onSuccess,
   mode = "create",
   productToEdit = null,
+  productToCopy = null,
   sellerLoyaltyPointsBalance = 0,
   sellerLoyaltyPointsReserved = 0,
   sellerProducts = [],
 }) {
+  const { user } = useAuthSession();
   const [form, setForm] = useState(CREATE_PRODUCT_INITIAL_FORM);
   const [status, setStatus] = useState({ kind: "idle", message: "" });
+  const profilePickupSeededRef = useRef(false);
 
   const isEdit = mode === "edit";
   const showCatalogAvailabilityToggle = !isEdit;
@@ -83,15 +90,36 @@ export function useCreateProductForm({
 
   useEffect(() => {
     if (!isOpen) {
+      profilePickupSeededRef.current = false;
       return;
     }
     if (isEdit && productToEdit) {
+      profilePickupSeededRef.current = true;
       setForm(createProductFormStateFromProduct(productToEdit));
+    } else if (productToCopy) {
+      profilePickupSeededRef.current = true;
+      setForm(createProductFormStateFromCopiedProduct(productToCopy));
     } else {
-      setForm(CREATE_PRODUCT_INITIAL_FORM);
+      setForm({
+        ...CREATE_PRODUCT_INITIAL_FORM,
+        ...createProductPickupFieldsFromUser(user),
+      });
+      profilePickupSeededRef.current = Boolean(user);
     }
     setStatus({ kind: "idle", message: "" });
-  }, [isOpen, isEdit, productToEdit?._id]);
+    // user намеренно не в deps: рефетч профиля не должен сбрасывать черновик.
+  }, [isOpen, isEdit, productToEdit?._id, productToCopy?._id]);
+
+  useEffect(() => {
+    if (!isOpen || isEdit || productToCopy || profilePickupSeededRef.current || !user) {
+      return;
+    }
+    setForm((prev) => ({
+      ...prev,
+      ...createProductPickupFieldsFromUser(user),
+    }));
+    profilePickupSeededRef.current = true;
+  }, [isOpen, isEdit, productToCopy, user]);
 
   const descriptionChars = useMemo(
     () => String(form.productDescription ?? "").length,

@@ -47,14 +47,23 @@ export function ProductCardStandardContent({ vm }) {
 
   return (
     <>
-      <h2 id={vm.headingId} className="product-card__heading">
+      <h2
+        id={vm.headingId}
+        className={
+          vm.isModerationQueue
+            ? "product-card__heading product-card__heading--sr-only"
+            : "product-card__heading"
+        }
+      >
         {vm.heading}
       </h2>
-      <ProductPriceDisplay
-        product={vm.product}
-        className="product-card__price"
-        showLabel={false}
-      />
+      {!vm.isModerationQueue ? (
+        <ProductPriceDisplay
+          product={vm.product}
+          className="product-card__price"
+          showLabel={false}
+        />
+      ) : null}
       {!vm.isModerationQueue ? (
         <div className="product-card__meta-strip">
           <p

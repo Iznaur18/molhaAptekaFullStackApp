@@ -5,7 +5,7 @@ import { CART_LINE_IMAGE_SIZE } from "@/shared/config/cartConstants";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { semanticColors } from "@/shared/theme/semanticColors";
 
-const ORDER_CARD_RADIUS = 12;
+const ORDER_CARD_RADIUS = 20;
 const ORDER_CARD_HEADER_BADGE_FONT_SIZE = 10.24;
 const ORDER_CARD_HEADER_BADGE_PADDING_H = 8.32;
 const ORDER_CARD_HEADER_BADGE_PADDING_V = 3.2;
@@ -92,7 +92,7 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
   itemBlock: {
     paddingVertical: 6,
     paddingHorizontal: 8,
-    borderRadius: 6,
+    borderRadius: 14,
     backgroundColor: theme.colors.surfaceMuted,
   },
   itemBlockCompact: {

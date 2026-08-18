@@ -36,6 +36,7 @@ type MyProductCatalogCardProps = {
   };
   isLoyaltyPointsOvercommitted?: boolean;
   onEditProduct?: () => void;
+  onCopyProduct?: () => void;
   onPromoteProduct?: () => void;
 };
 
@@ -43,6 +44,7 @@ export const MyProductCatalogCard = ({
   product,
   isLoyaltyPointsOvercommitted = false,
   onEditProduct,
+  onCopyProduct,
   onPromoteProduct,
 }: MyProductCatalogCardProps) => {
   const router = useRouter();
@@ -192,6 +194,7 @@ export const MyProductCatalogCard = ({
       <ProductCardSellerToolbar
         onPromote={onPromoteProduct}
         onEdit={onEditProduct}
+        onCopy={onCopyProduct}
         canEdit={canSellerEditProduct(product)}
         variant="compact"
       />

@@ -18,6 +18,7 @@ import Animated, {
 
 import { useEmailVerificationMutations } from "@/entities/session/model/useEmailVerificationMutations";
 import { EMAIL_VERIFICATION_UI } from "@/shared/config";
+import { useRegisterBlockingOverlay } from "@/shared/lib/useBlockingOverlayOccupancy";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import {
   EMAIL_VERIFY_MODAL_CORNER_RADIUS,
@@ -52,6 +53,7 @@ export const EmailVerificationModal = ({
   const fieldStyles = useFormFieldStyles();
   const { verifyMutation, resendMutation } = useEmailVerificationMutations();
   const [modalVisible, setModalVisible] = useState(visible);
+  useRegisterBlockingOverlay(modalVisible);
   const [code, setCode] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");

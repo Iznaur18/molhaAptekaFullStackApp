@@ -17,12 +17,12 @@ export function useProductCardDetailsSurface({ vm }) {
   const handleDetailsSurfaceKeyDown = useCallback(
     /** @param {import('react').KeyboardEvent<HTMLDivElement>} event */
     (event) => {
-      if (vm.isModerationQueue || vm.onOpenDetails == null) return;
+      if (vm.onOpenDetails == null) return;
       if (event.key !== "Enter" && event.key !== " ") return;
       event.preventDefault();
       vm.onOpenDetails(vm.product);
     },
-    [vm.isModerationQueue, vm.onOpenDetails, vm.product],
+    [vm.onOpenDetails, vm.product],
   );
 
   const stopCardDetailsActivation = useCallback(

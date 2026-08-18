@@ -31,7 +31,7 @@ body,
 :root {
   /*
    * Паритет с mobile content max-width:
-   * phone — 100vw; ≥600 → 520; ≥768 → 720; ≥1024 → 960.
+   * phone — 100vw; ≥600 → 520; ≥768 → 720; ≥1024 → 960; ≥1280 → 1200.
    */
   --app-shell-max-width: 100%;
   --app-viewport-effective-width: 100vw;
@@ -65,6 +65,12 @@ body,
 @media (min-width: 1024px) {
   :root {
     --app-shell-max-width: 60rem; /* 960px */
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --app-shell-max-width: 75rem; /* 1200px = 960 × 1.25 */
   }
 }
 

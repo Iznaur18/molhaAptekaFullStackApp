@@ -2,6 +2,7 @@ import { Modal, Pressable, Text, View } from "react-native";
 
 import { SELLER_PRODUCTS_LIMIT_PREMIUM } from "@/entities/product/model/productConstants";
 import { SELLER_PRODUCTS_LIMIT_MODAL_UI } from "@/shared/config";
+import { useRegisterBlockingOverlay } from "@/shared/lib/useBlockingOverlayOccupancy";
 import { useSellerProductsLimitModalStyles } from "@/shared/theme/modalChromeStyles";
 
 type SellerProductsLimitModalProps = {
@@ -18,6 +19,7 @@ export const SellerProductsLimitModal = ({
   limit,
 }: SellerProductsLimitModalProps) => {
   const styles = useSellerProductsLimitModalStyles();
+  useRegisterBlockingOverlay(visible && limit != null);
 
   if (limit == null) {
     return null;

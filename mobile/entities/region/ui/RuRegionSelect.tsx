@@ -12,6 +12,7 @@ import { getRuRegionByCode } from "@molha/api-contract";
 
 import { filterRuRegionsByQuery } from "@/entities/region/lib/filterRuRegionsByQuery";
 import { REGION_UI } from "@/shared/config";
+import { useRegisterBlockingOverlay } from "@/shared/lib/useBlockingOverlayOccupancy";
 import { useCategoryPickerSheetStyles } from "@/shared/theme/categoryPickerSheetStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
@@ -78,6 +79,7 @@ export function RuRegionSelect({
   const sheetStyles = useCategoryPickerSheetStyles();
   const styles = useRegionSelectStyles();
   const [open, setOpen] = useState(false);
+  useRegisterBlockingOverlay(open);
   const [query, setQuery] = useState("");
 
   const selectedLabel = getRuRegionByCode(value)?.name ?? "";

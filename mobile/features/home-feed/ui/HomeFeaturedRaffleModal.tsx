@@ -18,6 +18,7 @@ import type { FeaturedRaffleManage, RaffleFromApi } from "@/entities/raffle/mode
 import { FeaturedRaffleModalCard } from "@/entities/raffle/ui/FeaturedRaffleModalCard";
 import { HOME_FEED_UI, RAFFLE_FEATURED_BANNER_UI, RAFFLE_FEATURED_CAROUSEL_UI } from "@/shared/config";
 import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
+import { useRegisterBlockingOverlay } from "@/shared/lib/useBlockingOverlayOccupancy";
 import { resolveDialogAccessibilityProps } from "@/shared/lib/resolveDialogAccessibilityProps";
 import { useAdminEditModalAnimation } from "@/shared/model/useAdminEditModalAnimation";
 import {
@@ -106,6 +107,7 @@ export const HomeFeaturedRaffleModal = ({
       enterMs: FEATURED_RAFFLE_MODAL_ANIMATION.enterMs,
       exitMs: FEATURED_RAFFLE_MODAL_ANIMATION.exitMs,
     });
+  useRegisterBlockingOverlay(modalVisible);
 
   const cardWidth = Math.max(0, windowWidth);
   const dialogHeight = Math.round(windowHeight * FEATURED_RAFFLE_MODAL_ANIMATION.heightRatio);

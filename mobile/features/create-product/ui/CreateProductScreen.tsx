@@ -15,8 +15,9 @@ import {
   PRODUCT_STOCK_QUANTITY_MAX,
   PRODUCT_STOCK_QUANTITY_MIN,
 } from "@molha/api-contract";
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -31,7 +32,10 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useCreateProductMutation } from "@/entities/product/model/useCreateProductMutation";
+import { createProductPickupFieldsFromUser } from "@/entities/product/lib/createProductPickupFieldsFromUser";
+import { createProductWizardFormFromCopiedProduct } from "@/entities/product/lib/createProductWizardFormFromCopiedProduct";
 import { validateProductName } from "@/entities/product/lib/validateProductName";
+import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import {
   createProductReturnTermRow,
   PRODUCT_RETURN_TERM_KEY_MAX,
@@ -52,11 +56,12 @@ import { ProductDescriptionField } from "@/entities/product/ui/ProductDescriptio
 import { ProductPhotoGrid } from "@/features/image-upload/ui/ProductPhotoGrid";
 import { ProductPreviewVideoUploadField } from "@/features/image-upload/ui/ProductPreviewVideoUploadField";
 import { CreateProductCategoryPicker } from "@/features/create-product/ui/CreateProductCategoryPicker";
-import { CREATE_PRODUCT_UI } from "@/shared/config";
 import {
-  formatRubPriceInput,
-  parseRubPriceInput,
-} from "@/shared/lib/rubPriceInput";
+  getCreateProductLaunchSeq,
+  peekCreateProductLaunch,
+} from "@/features/create-product/model/productCopyDraftStore";
+import { CREATE_PRODUCT_UI } from "@/shared/config";
+import { formatRubPriceInput, parseRubPriceInput } from "@/shared/lib/rubPriceInput";
 import { textInputFocusScrollProps } from "@/shared/lib/scrollTextInputIntoViewOnFocus";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
@@ -66,10 +71,22 @@ import { resolveWizardFooterPaddingBottom } from "@/shared/theme/screenContentLa
 
 const LOYALTY_POINTS_MAX_LENGTH = 8;
 
-const WIZARD_STEPS = ["category", "basic", "originality", "media", "pickup", "commerce", "returns", "review"] as const;
+const WIZARD_STEPS = [
+  "category",
+  "basic",
+  "originality",
+  "media",
+  "pickup",
+  "commerce",
+  "returns",
+  "review",
+] as const;
 type WizardStepId = (typeof WIZARD_STEPS)[number];
 
-const STEP_COPY: Record<WizardStepId, { title: string; subtitle: string; label: string }> = {
+const STEP_COPY: Record<
+  WizardStepId,
+  { title: string; subtitle: string; label: string }
+> = {
   basic: {
     title: "О товаре",
     subtitle: "Название и описание — первое, что видит покупатель",
@@ -131,6 +148,7 @@ type WizardForm = {
   productPickupAddress: string;
   productPickupLat: number | null;
   productPickupLon: number | null;
+  productPickupSelectedFromSuggest: boolean;
   productPickupEnabled: boolean;
   productDeliveryEnabled: boolean;
   productPrice: string;
@@ -160,6 +178,7 @@ const INITIAL_FORM: WizardForm = {
   productPickupAddress: "",
   productPickupLat: null,
   productPickupLon: null,
+  productPickupSelectedFromSuggest: false,
   productPickupEnabled: true,
   productDeliveryEnabled: false,
   productPrice: "",
@@ -208,8 +227,10 @@ function validateStep(stepId: WizardStepId, form: WizardForm): string | null {
       if (address.length < PRODUCT_PICKUP_ADDRESS_MIN_LENGTH) {
         return PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE;
       }
-      const hasLat = form.productPickupLat != null && Number.isFinite(form.productPickupLat);
-      const hasLon = form.productPickupLon != null && Number.isFinite(form.productPickupLon);
+      const hasLat =
+        form.productPickupLat != null && Number.isFinite(form.productPickupLat);
+      const hasLon =
+        form.productPickupLon != null && Number.isFinite(form.productPickupLon);
       if (!hasLat || !hasLon) {
         return CREATE_PRODUCT_UI.ERROR_PICKUP_COORDS;
       }
@@ -297,11 +318,64 @@ export const CreateProductScreen = () => {
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
   const createMutation = useCreateProductMutation();
-
-  const [form, setForm] = useState<WizardForm>(INITIAL_FORM);
+  const sessionQuery = useAuthSessionQuery();
+  const user = sessionQuery.data?.user ?? null;
+  const initialLaunch = peekCreateProductLaunch();
+  const [form, setForm] = useState<WizardForm>(() =>
+    initialLaunch?.kind === "copy"
+      ? createProductWizardFormFromCopiedProduct(initialLaunch.product)
+      : {
+          ...INITIAL_FORM,
+          ...createProductPickupFieldsFromUser(user),
+        },
+  );
   const [stepIndex, setStepIndex] = useState(0);
   const [stepError, setStepError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const profilePickupSeededRef = useRef(
+    Boolean(user) || initialLaunch?.kind === "copy",
+  );
+  const appliedLaunchSeqRef = useRef(
+    initialLaunch ? getCreateProductLaunchSeq() : 0,
+  );
+
+  const applyCreateProductLaunch = useCallback(() => {
+    const launch = peekCreateProductLaunch();
+    const seq = getCreateProductLaunchSeq();
+    if (!launch || appliedLaunchSeqRef.current === seq) {
+      return;
+    }
+    appliedLaunchSeqRef.current = seq;
+    if (launch.kind === "copy") {
+      setForm(createProductWizardFormFromCopiedProduct(launch.product));
+      profilePickupSeededRef.current = true;
+    } else {
+      setForm({
+        ...INITIAL_FORM,
+        ...createProductPickupFieldsFromUser(user),
+      });
+      profilePickupSeededRef.current = Boolean(user);
+    }
+    setStepIndex(0);
+    setStepError("");
+  }, [user]);
+
+  useFocusEffect(
+    useCallback(() => {
+      applyCreateProductLaunch();
+    }, [applyCreateProductLaunch]),
+  );
+
+  useEffect(() => {
+    if (profilePickupSeededRef.current || !user) {
+      return;
+    }
+    setForm((prev) => ({
+      ...prev,
+      ...createProductPickupFieldsFromUser(user),
+    }));
+    profilePickupSeededRef.current = true;
+  }, [user]);
 
   const stepId = WIZARD_STEPS[stepIndex];
   const isFirstStep = stepIndex === 0;
@@ -310,7 +384,10 @@ export const CreateProductScreen = () => {
 
   const goNext = useCallback(() => {
     const error = validateStep(stepId, form);
-    if (error) { setStepError(error); return; }
+    if (error) {
+      setStepError(error);
+      return;
+    }
     setStepError("");
     // Абсолютный индекс вместо функционального апдейта: два тапа до
     // ре-рендера валидируют и двигают один и тот же шаг, а не проскакивают два.
@@ -337,7 +414,10 @@ export const CreateProductScreen = () => {
 
   const handleSubmit = async () => {
     const error = validateStep("review", form);
-    if (error) { setStepError(error); return; }
+    if (error) {
+      setStepError(error);
+      return;
+    }
     setStepError("");
     setIsSubmitting(true);
     try {
@@ -353,7 +433,9 @@ export const CreateProductScreen = () => {
         productPrice: price,
         productOldPrice: oldPrice ?? undefined,
         productCategoryId: form.productCategoryId ?? undefined,
-        productCategory: !form.productCategoryId ? form.productCategory || undefined : undefined,
+        productCategory: !form.productCategoryId
+          ? form.productCategory || undefined
+          : undefined,
         productIsAvailable: form.productIsAvailable,
         productStockQuantity: form.productIsAvailable
           ? Math.floor(Number(form.productStockQuantity))
@@ -368,7 +450,8 @@ export const CreateProductScreen = () => {
         productPickupLon: form.productPickupLon,
         productPickupEnabled: form.productPickupEnabled !== false,
         productDeliveryEnabled: form.productDeliveryEnabled === true,
-        loyaltyPointsPerUnit: Number.isFinite(loyalty) && loyalty > 0 ? loyalty : undefined,
+        loyaltyPointsPerUnit:
+          Number.isFinite(loyalty) && loyalty > 0 ? loyalty : undefined,
         productCharacteristics: form.characteristicRows
           .filter((r) => r.key.trim() && r.value.trim())
           .map((r) => ({ key: r.key.trim(), value: r.value.trim() })),
@@ -388,7 +471,11 @@ export const CreateProductScreen = () => {
   };
 
   const handlePrimaryPress = () => {
-    if (isLastStep) { void handleSubmit(); } else { goNext(); }
+    if (isLastStep) {
+      void handleSubmit();
+    } else {
+      goNext();
+    }
   };
 
   return (
@@ -404,11 +491,7 @@ export const CreateProductScreen = () => {
         automaticallyAdjustsScrollIndicatorInsets
       >
         {/* Progress card — mirrors .product-wizard-progress */}
-        <WizardProgress
-          steps={WIZARD_STEPS}
-          stepIndex={stepIndex}
-          theme={theme}
-        />
+        <WizardProgress steps={WIZARD_STEPS} stepIndex={stepIndex} theme={theme} />
 
         {/* Step headline — mirrors .product-wizard-step-headline */}
         <View style={styles.stepHeadline}>
@@ -422,25 +505,61 @@ export const CreateProductScreen = () => {
 
         {/* Step content */}
         {stepId === "basic" && (
-          <BasicStep form={form} setForm={setForm} disabled={isSubmitting} theme={theme} styles={styles} />
+          <BasicStep
+            form={form}
+            setForm={setForm}
+            disabled={isSubmitting}
+            theme={theme}
+            styles={styles}
+          />
         )}
         {stepId === "originality" && (
-          <OriginalityStep form={form} setForm={setForm} disabled={isSubmitting} theme={theme} styles={styles} />
+          <OriginalityStep
+            form={form}
+            setForm={setForm}
+            disabled={isSubmitting}
+            theme={theme}
+            styles={styles}
+          />
         )}
         {stepId === "media" && (
-          <MediaStep form={form} setForm={setForm} disabled={isSubmitting} theme={theme} styles={styles} />
+          <MediaStep
+            form={form}
+            setForm={setForm}
+            disabled={isSubmitting}
+            theme={theme}
+            styles={styles}
+          />
         )}
         {stepId === "category" && (
-          <CategoryStep form={form} setForm={setForm} disabled={isSubmitting} theme={theme} styles={styles} />
+          <CategoryStep
+            form={form}
+            setForm={setForm}
+            disabled={isSubmitting}
+            theme={theme}
+            styles={styles}
+          />
         )}
         {stepId === "pickup" && (
           <PickupStep form={form} setForm={setForm} disabled={isSubmitting} />
         )}
         {stepId === "commerce" && (
-          <CommerceStep form={form} setForm={setForm} disabled={isSubmitting} theme={theme} styles={styles} />
+          <CommerceStep
+            form={form}
+            setForm={setForm}
+            disabled={isSubmitting}
+            theme={theme}
+            styles={styles}
+          />
         )}
         {stepId === "returns" && (
-          <ReturnsStep form={form} setForm={setForm} disabled={isSubmitting} theme={theme} styles={styles} />
+          <ReturnsStep
+            form={form}
+            setForm={setForm}
+            disabled={isSubmitting}
+            theme={theme}
+            styles={styles}
+          />
         )}
         {stepId === "review" && (
           <ReviewStep form={form} onEditStep={goToStep} theme={theme} styles={styles} />
@@ -448,13 +567,15 @@ export const CreateProductScreen = () => {
 
         {/* Error message — mirrors .create-product-wizard__error */}
         {stepError ? (
-          <View style={[
-            styles.errorBox,
-            {
-              borderColor: theme.colors.danger + "59", // 35% opacity
-              backgroundColor: theme.colors.surface,
-            },
-          ]}>
+          <View
+            style={[
+              styles.errorBox,
+              {
+                borderColor: theme.colors.danger + "59", // 35% opacity
+                backgroundColor: theme.colors.surface,
+              },
+            ]}
+          >
             <Text style={[styles.errorText, { color: theme.colors.danger }]}>
               {stepError}
             </Text>
@@ -464,71 +585,83 @@ export const CreateProductScreen = () => {
         <View style={styles.footerSpacer} />
 
         {/* ── Footer — scrolls with content (not pinned above keyboard) ── */}
-        <View style={[
-          styles.footer,
-          {
-            borderTopColor: theme.colors.border + "cc", // 80%
-            backgroundColor: theme.colors.surfaceMuted,
-            paddingBottom: resolveWizardFooterPaddingBottom(insets.bottom, screenWidth),
-          },
-        ]}>
-        {!isFirstStep ? (
-          <Pressable
-            style={({ pressed }) => [
-              styles.backButton,
-              { borderColor: theme.colors.border + "d9", backgroundColor: theme.colors.surface },
-              pressed && styles.buttonPressed,
-              isSubmitting && styles.buttonDisabled,
-            ]}
-            onPress={goBack}
-            disabled={isSubmitting}
-          >
-            <Text style={[styles.backButtonText, { color: theme.colors.textSecondary }]}>
-              Назад
-            </Text>
-          </Pressable>
-        ) : (
-          <Pressable
-            style={({ pressed }) => [
-              styles.backButton,
-              {
-                borderColor: theme.colors.danger + "59",
-                backgroundColor: theme.colors.surface,
-              },
-              pressed && styles.buttonPressed,
-              isSubmitting && styles.buttonDisabled,
-            ]}
-            onPress={handleCancel}
-            disabled={isSubmitting}
-          >
-            <Text style={[styles.backButtonText, { color: theme.colors.danger }]}>
-              {CREATE_PRODUCT_UI.CANCEL}
-            </Text>
-          </Pressable>
-        )}
-
-        <Pressable
-          style={({ pressed }) => [
-            styles.primaryButton,
+        <View
+          style={[
+            styles.footer,
             {
-              backgroundColor: theme.colors.action,
-              borderColor: theme.colors.action,
-              shadowColor: theme.colors.action,
+              borderTopColor: theme.colors.border + "cc", // 80%
+              backgroundColor: theme.colors.surfaceMuted,
+              paddingBottom: resolveWizardFooterPaddingBottom(
+                insets.bottom,
+                screenWidth,
+              ),
             },
-            pressed && !isSubmitting && styles.buttonPressedElevated,
-            isSubmitting && styles.buttonDisabled,
           ]}
-          onPress={handlePrimaryPress}
-          disabled={isSubmitting}
         >
-          {isSubmitting ? (
-            <ActivityIndicator color={theme.colors.onContrast} />
+          {!isFirstStep ? (
+            <Pressable
+              style={({ pressed }) => [
+                styles.backButton,
+                {
+                  borderColor: theme.colors.border + "d9",
+                  backgroundColor: theme.colors.surface,
+                },
+                pressed && styles.buttonPressed,
+                isSubmitting && styles.buttonDisabled,
+              ]}
+              onPress={goBack}
+              disabled={isSubmitting}
+            >
+              <Text
+                style={[styles.backButtonText, { color: theme.colors.textSecondary }]}
+              >
+                Назад
+              </Text>
+            </Pressable>
           ) : (
-            <Text style={[styles.primaryButtonText, { color: theme.colors.onContrast }]}>
-              {isLastStep ? "Отправить на проверку" : "Далее"}
-            </Text>
+            <Pressable
+              style={({ pressed }) => [
+                styles.backButton,
+                {
+                  borderColor: theme.colors.danger + "59",
+                  backgroundColor: theme.colors.surface,
+                },
+                pressed && styles.buttonPressed,
+                isSubmitting && styles.buttonDisabled,
+              ]}
+              onPress={handleCancel}
+              disabled={isSubmitting}
+            >
+              <Text style={[styles.backButtonText, { color: theme.colors.danger }]}>
+                {CREATE_PRODUCT_UI.CANCEL}
+              </Text>
+            </Pressable>
           )}
-        </Pressable>
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.primaryButton,
+              {
+                backgroundColor: theme.colors.action,
+                borderColor: theme.colors.action,
+                shadowColor: theme.colors.action,
+              },
+              pressed && !isSubmitting && styles.buttonPressedElevated,
+              isSubmitting && styles.buttonDisabled,
+            ]}
+            onPress={handlePrimaryPress}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <ActivityIndicator color={theme.colors.onContrast} />
+            ) : (
+              <Text
+                style={[styles.primaryButtonText, { color: theme.colors.onContrast }]}
+              >
+                {isLastStep ? "Отправить на проверку" : "Далее"}
+              </Text>
+            )}
+          </Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -548,13 +681,15 @@ function WizardProgress({
   theme: ReturnType<typeof useAppTheme>;
 }) {
   return (
-    <View style={[
-      progressStyles.card,
-      {
-        backgroundColor: theme.colors.actionSurface,
-        borderColor: theme.colors.action + "1f", // 12% opacity
-      },
-    ]}>
+    <View
+      style={[
+        progressStyles.card,
+        {
+          backgroundColor: theme.colors.actionSurface,
+          borderColor: theme.colors.action + "1f", // 12% opacity
+        },
+      ]}
+    >
       {/* "Шаг X из Y" caption */}
       <Text style={[progressStyles.caption, { color: theme.colors.primaryBright }]}>
         {`ШАГ ${stepIndex + 1} ИЗ ${steps.length}`}
@@ -570,33 +705,41 @@ function WizardProgress({
           return (
             <View key={id} style={[progressStyles.stepCol, { opacity }]}>
               {/* Circle with number */}
-              <View style={[
-                progressStyles.circle,
-                isActive && {
-                  backgroundColor: theme.colors.action,
-                  borderColor: theme.colors.action,
-                },
-                isComplete && {
-                  backgroundColor: theme.colors.success + "24", // 14%
-                  borderColor: theme.colors.success,
-                },
-                !isActive && !isComplete && {
-                  backgroundColor: theme.colors.surface,
-                  borderColor: theme.colors.border + "cc",
-                },
-              ]}>
-                <Text style={[
-                  progressStyles.circleText,
-                  isActive && { color: theme.colors.onContrast },
-                  isComplete && { color: theme.colors.success },
-                  !isActive && !isComplete && { color: theme.colors.textSecondary },
-                ]}>
+              <View
+                style={[
+                  progressStyles.circle,
+                  isActive && {
+                    backgroundColor: theme.colors.action,
+                    borderColor: theme.colors.action,
+                  },
+                  isComplete && {
+                    backgroundColor: theme.colors.success + "24", // 14%
+                    borderColor: theme.colors.success,
+                  },
+                  !isActive &&
+                    !isComplete && {
+                      backgroundColor: theme.colors.surface,
+                      borderColor: theme.colors.border + "cc",
+                    },
+                ]}
+              >
+                <Text
+                  style={[
+                    progressStyles.circleText,
+                    isActive && { color: theme.colors.onContrast },
+                    isComplete && { color: theme.colors.success },
+                    !isActive && !isComplete && { color: theme.colors.textSecondary },
+                  ]}
+                >
                   {isComplete ? "✓" : String(i + 1)}
                 </Text>
               </View>
               {/* Step label */}
               <Text
-                style={[progressStyles.stepLabel, { color: theme.colors.textSecondary }]}
+                style={[
+                  progressStyles.stepLabel,
+                  { color: theme.colors.textSecondary },
+                ]}
                 numberOfLines={1}
               >
                 {STEP_COPY[id].label}
@@ -699,12 +842,18 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
       {/* Name field */}
       <View style={styles.fieldLabel}>
         <Text style={[styles.label, { color: theme.colors.text }]}>
-          Название{" "}
-          <Text style={{ color: theme.colors.danger }}>*</Text>
+          Название <Text style={{ color: theme.colors.danger }}>*</Text>
         </Text>
         <TextInput
           {...textInputFocusScrollProps}
-          style={[styles.input, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+          style={[
+            styles.input,
+            {
+              color: theme.colors.text,
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+            },
+          ]}
           value={form.productName}
           onChangeText={(text) => setForm((prev) => ({ ...prev, productName: text }))}
           maxLength={PRODUCT_NAME_MAX_LENGTH}
@@ -718,12 +867,13 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
       {/* Description field */}
       <View style={styles.fieldLabel}>
         <Text style={[styles.label, { color: theme.colors.text }]}>
-          Описание{" "}
-          <Text style={{ color: theme.colors.danger }}>*</Text>
+          Описание <Text style={{ color: theme.colors.danger }}>*</Text>
         </Text>
         <ProductDescriptionField
           value={form.productDescription}
-          onChangeText={(text) => setForm((prev) => ({ ...prev, productDescription: text }))}
+          onChangeText={(text) =>
+            setForm((prev) => ({ ...prev, productDescription: text }))
+          }
           disabled={disabled}
           maxLength={PRODUCT_DESCRIPTION_MAX_CHARS}
           placeholder="Состояние, комплектация, особенности…"
@@ -738,7 +888,12 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
           ]}
         />
         {/* Char meter — mirrors .create-product-section__char-meter */}
-        <Text style={[styles.charMeter, { color: overLimit ? theme.colors.danger : theme.colors.textSecondary }]}>
+        <Text
+          style={[
+            styles.charMeter,
+            { color: overLimit ? theme.colors.danger : theme.colors.textSecondary },
+          ]}
+        >
           {`Символов: ${descLen} / ${PRODUCT_DESCRIPTION_MAX_CHARS}`}
         </Text>
       </View>
@@ -759,7 +914,14 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
           >
             <TextInput
               {...textInputFocusScrollProps}
-              style={[styles.charInput, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+              style={[
+                styles.charInput,
+                {
+                  color: theme.colors.text,
+                  backgroundColor: theme.colors.surface,
+                  borderColor: theme.colors.border,
+                },
+              ]}
               value={row.key}
               onChangeText={(text) => updateCharRow(row.id, "key", text)}
               editable={!disabled}
@@ -769,7 +931,15 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
             />
             <TextInput
               {...textInputFocusScrollProps}
-              style={[styles.charInput, styles.charInputValue, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+              style={[
+                styles.charInput,
+                styles.charInputValue,
+                {
+                  color: theme.colors.text,
+                  backgroundColor: theme.colors.surface,
+                  borderColor: theme.colors.border,
+                },
+              ]}
               value={row.value}
               onChangeText={(text) => updateCharRow(row.id, "value", text)}
               editable={!disabled}
@@ -782,7 +952,9 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
               onPress={() => removeCharRow(row.id)}
               disabled={disabled}
             >
-              <Text style={[styles.charRemoveText, { color: theme.colors.danger }]}>✕</Text>
+              <Text style={[styles.charRemoveText, { color: theme.colors.danger }]}>
+                ✕
+              </Text>
             </Pressable>
           </View>
         ))}
@@ -792,7 +964,9 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
               styles.charAddButton,
               {
                 borderColor: pressed ? theme.colors.action : theme.colors.actionBorder,
-                backgroundColor: pressed ? theme.colors.actionSoft : theme.colors.actionSurface,
+                backgroundColor: pressed
+                  ? theme.colors.actionSoft
+                  : theme.colors.actionSurface,
               },
             ]}
             onPress={addCharRow}
@@ -903,6 +1077,7 @@ function PickupStep({
         lon={form.productPickupLon}
         pickupEnabled={form.productPickupEnabled !== false}
         deliveryEnabled={form.productDeliveryEnabled === true}
+        selectedFromSuggest={form.productPickupSelectedFromSuggest}
         disabled={disabled}
         onChange={(next) => {
           setForm((prev) => ({
@@ -912,6 +1087,8 @@ function PickupStep({
             productPickupLon: next.productPickupLon,
             productPickupEnabled: next.productPickupEnabled !== false,
             productDeliveryEnabled: next.productDeliveryEnabled === true,
+            productPickupSelectedFromSuggest:
+              next.productPickupSelectedFromSuggest === true,
             ...(next.productRegionCode
               ? { productRegionCode: next.productRegionCode }
               : {}),
@@ -938,12 +1115,19 @@ function CommerceStep({ form, setForm, disabled, theme, styles }: StepProps) {
       <View style={styles.priceGrid}>
         <View style={[styles.fieldLabel, styles.priceCol]}>
           <Text style={[styles.label, { color: theme.colors.text }]}>
-            Цена, ₽{" "}
-            <Text style={{ color: theme.colors.danger }}>*</Text>
+            Цена, ₽ <Text style={{ color: theme.colors.danger }}>*</Text>
           </Text>
           <TextInput
             {...textInputFocusScrollProps}
-            style={[styles.input, styles.priceInput, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+            style={[
+              styles.input,
+              styles.priceInput,
+              {
+                color: theme.colors.text,
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+              },
+            ]}
             value={form.productPrice}
             onChangeText={(text) =>
               setForm((prev) => ({ ...prev, productPrice: formatRubPriceInput(text) }))
@@ -955,13 +1139,26 @@ function CommerceStep({ form, setForm, disabled, theme, styles }: StepProps) {
           />
         </View>
         <View style={[styles.fieldLabel, styles.priceCol]}>
-          <Text style={[styles.label, { color: theme.colors.text }]}>Старая цена, ₽</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>
+            Старая цена, ₽
+          </Text>
           <TextInput
             {...textInputFocusScrollProps}
-            style={[styles.input, styles.priceInput, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+            style={[
+              styles.input,
+              styles.priceInput,
+              {
+                color: theme.colors.text,
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+              },
+            ]}
             value={form.productOldPrice}
             onChangeText={(text) =>
-              setForm((prev) => ({ ...prev, productOldPrice: formatRubPriceInput(text) }))
+              setForm((prev) => ({
+                ...prev,
+                productOldPrice: formatRubPriceInput(text),
+              }))
             }
             editable={!disabled}
             keyboardType="number-pad"
@@ -973,7 +1170,12 @@ function CommerceStep({ form, setForm, disabled, theme, styles }: StepProps) {
 
       {/* Discount preview — mirrors .create-product-section__discount-preview */}
       {discountPercent != null ? (
-        <View style={[styles.discountPreview, { backgroundColor: theme.colors.success + "1f" }]}>
+        <View
+          style={[
+            styles.discountPreview,
+            { backgroundColor: theme.colors.success + "1f" },
+          ]}
+        >
           <Text style={[styles.discountPreviewText, { color: theme.colors.success }]}>
             {`Скидка: −${discountPercent}%`}
           </Text>
@@ -989,7 +1191,9 @@ function CommerceStep({ form, setForm, disabled, theme, styles }: StepProps) {
               ...prev,
               productIsAvailable: checked,
               productStockQuantity:
-                checked && !prev.productStockQuantity.trim() ? "1" : prev.productStockQuantity,
+                checked && !prev.productStockQuantity.trim()
+                  ? "1"
+                  : prev.productStockQuantity,
             }))
           }
           disabled={disabled}
@@ -1005,12 +1209,18 @@ function CommerceStep({ form, setForm, disabled, theme, styles }: StepProps) {
       {form.productIsAvailable ? (
         <View style={styles.fieldLabel}>
           <Text style={[styles.label, { color: theme.colors.text }]}>
-            Количество, шт.{" "}
-            <Text style={{ color: theme.colors.danger }}>*</Text>
+            Количество, шт. <Text style={{ color: theme.colors.danger }}>*</Text>
           </Text>
           <TextInput
             {...textInputFocusScrollProps}
-            style={[styles.input, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+            style={[
+              styles.input,
+              {
+                color: theme.colors.text,
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+              },
+            ]}
             value={form.productStockQuantity}
             onChangeText={(text) =>
               setForm((prev) => ({ ...prev, productStockQuantity: keepDigits(text) }))
@@ -1029,7 +1239,14 @@ function CommerceStep({ form, setForm, disabled, theme, styles }: StepProps) {
         </Text>
         <TextInput
           {...textInputFocusScrollProps}
-          style={[styles.input, { color: theme.colors.text, backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+          style={[
+            styles.input,
+            {
+              color: theme.colors.text,
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+            },
+          ]}
           value={form.loyaltyPointsPerUnit}
           onChangeText={(text) =>
             setForm((prev) => ({ ...prev, loyaltyPointsPerUnit: keepDigits(text) }))
@@ -1083,8 +1300,7 @@ function ReturnsStep({ form, setForm, disabled, theme, styles }: StepProps) {
   return (
     <View style={styles.section}>
       <Text style={[styles.label, { color: theme.colors.text }]}>
-        Возврат{" "}
-        <Text style={{ color: theme.colors.danger }}>*</Text>
+        Возврат <Text style={{ color: theme.colors.danger }}>*</Text>
       </Text>
       <Text style={[styles.lead, { color: theme.colors.textSecondary }]}>
         {CREATE_PRODUCT_UI.WIZARD_STEP_RETURNS_SUBTITLE}
@@ -1204,7 +1420,9 @@ function ReturnsStep({ form, setForm, disabled, theme, styles }: StepProps) {
                 onPress={() => removeReturnRow(row.id)}
                 disabled={disabled}
               >
-                <Text style={[styles.charRemoveText, { color: theme.colors.danger }]}>✕</Text>
+                <Text style={[styles.charRemoveText, { color: theme.colors.danger }]}>
+                  ✕
+                </Text>
               </Pressable>
             </View>
           ))}
@@ -1213,7 +1431,9 @@ function ReturnsStep({ form, setForm, disabled, theme, styles }: StepProps) {
               style={({ pressed }) => [
                 styles.charAddButton,
                 {
-                  borderColor: pressed ? theme.colors.action : theme.colors.actionBorder,
+                  borderColor: pressed
+                    ? theme.colors.action
+                    : theme.colors.actionBorder,
                   backgroundColor: pressed
                     ? theme.colors.actionSoft
                     : theme.colors.actionSurface,
@@ -1249,9 +1469,19 @@ function ReviewStep({
   const imageCount = form.imageUrls.filter(Boolean).length;
   const discountPercent = computeDiscount(form.productPrice, form.productOldPrice);
 
-  const rows: Array<{ label: string; value: string; stepIndex: number; multiline?: boolean }> = [
+  const rows: Array<{
+    label: string;
+    value: string;
+    stepIndex: number;
+    multiline?: boolean;
+  }> = [
     { label: "Название", value: form.productName.trim() || "—", stepIndex: 0 },
-    { label: "Описание", value: form.productDescription.trim() || "—", stepIndex: 0, multiline: true },
+    {
+      label: "Описание",
+      value: form.productDescription.trim() || "—",
+      stepIndex: 0,
+      multiline: true,
+    },
     {
       label: CREATE_PRODUCT_UI.LABEL_LISTING_ORIGIN,
       value: isProductListingOrigin(form.productListingOrigin)
@@ -1266,14 +1496,18 @@ function ReviewStep({
       value:
         imageCount > 0
           ? `${imageCount} фото${form.productPreviewVideoUrl.trim() ? " + видео" : ""}`
-          : form.productPreviewVideoUrl.trim() ? "Только видео" : "Нет фото",
+          : form.productPreviewVideoUrl.trim()
+            ? "Только видео"
+            : "Нет фото",
       stepIndex: 3,
     },
     { label: "Категория", value: form.productCategoryLabel || "—", stepIndex: 3 },
     {
       label: CREATE_PRODUCT_UI.LABEL_SALE_REGION,
       value:
-        getRuRegionByCode(form.productRegionCode)?.name || form.productRegionCode || "—",
+        getRuRegionByCode(form.productRegionCode)?.name ||
+        form.productRegionCode ||
+        "—",
       stepIndex: 3,
     },
     {

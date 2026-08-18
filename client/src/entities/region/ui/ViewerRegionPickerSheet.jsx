@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 
 import { REGION_UI } from "../../../shared/config/appUiCopy.js";
 import { useEnterExitMountAnimation } from "../../../shared/lib/useEnterExitMountAnimation.js";
+import { useRegisterBlockingOverlay } from "../../../shared/lib/useBlockingOverlayOccupancy.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { filterRuRegionsByQuery } from "../lib/filterRuRegionsByQuery.js";
 
@@ -36,6 +37,7 @@ export function ViewerRegionPickerSheet({
   const [query, setQuery] = useState("");
 
   useScrollLock(mounted);
+  useRegisterBlockingOverlay(mounted);
 
   useEffect(() => {
     if (!isOpen) {

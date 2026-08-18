@@ -30,15 +30,19 @@ export function CuratedProductListCarouselSkeleton() {
         <span className="curated-product-list-carousel-skeleton__title-line" />
       </h2>
       <div className="curated-product-list-carousel__scroll">
-        {Array.from(
-          { length: CURATED_PRODUCT_LIST_HOME_VISIBLE_CARD_MAX },
-          (_, index) => (
-            <div key={index} className="curated-product-compact-card">
-              <span className="curated-product-compact-card__image-wrap curated-product-list-carousel-skeleton__shimmer" />
-              <span className="curated-product-compact-card__price-wrap curated-product-list-carousel-skeleton__price" />
-            </div>
-          ),
-        )}
+        <ul className="curated-product-list-carousel__track" role="list">
+          {Array.from(
+            { length: CURATED_PRODUCT_LIST_HOME_VISIBLE_CARD_MAX },
+            (_, index) => (
+              <li key={index} className="curated-product-list-carousel__item">
+                <div className="curated-product-compact-card">
+                  <span className="curated-product-compact-card__image-wrap curated-product-list-carousel-skeleton__shimmer" />
+                  <span className="curated-product-compact-card__price-wrap curated-product-list-carousel-skeleton__price" />
+                </div>
+              </li>
+            ),
+          )}
+        </ul>
       </div>
     </section>
   );

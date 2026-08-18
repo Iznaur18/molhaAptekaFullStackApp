@@ -61,7 +61,7 @@ export function useProductCardViewModel(props) {
   const fallbackHeadingId = useId();
   const heading = product.productName?.trim() || PRODUCT_CARD_UI.DEFAULT_TITLE;
   const headingId = resolveProductCardHeadingId(product._id) ?? fallbackHeadingId;
-  const isDetailsSurfaceInteractive = !isModerationQueue && onOpenDetails != null;
+  const isDetailsSurfaceInteractive = onOpenDetails != null;
 
   const media = useProductCardMediaState(product);
   const chrome = useProductCardChromeFlags(props, currentUserId);
@@ -101,9 +101,9 @@ export function useProductCardViewModel(props) {
   const purchaseLimit = getProductPurchaseLimit(product);
   const sellerDisplayName = formatProductFieldForDisplay("productSeller", product);
   const nearDistanceLabel = formatCatalogNearDistanceLabel(product.distanceMeters);
-  const bodyClassName = isModerationQueue
-    ? "product-card__body"
-    : "product-card__details-surface";
+  const bodyClassName = isDetailsSurfaceInteractive
+    ? "product-card__details-surface"
+    : "product-card__body";
 
   return {
     product,

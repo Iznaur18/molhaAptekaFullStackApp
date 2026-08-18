@@ -15,6 +15,7 @@ import {
   isFullWidthCatalogProfileTab,
   PROFILE_TAB_MY_PRODUCTS,
   PROFILE_TAB_OVERVIEW,
+  PROFILE_TAB_PRODUCT_MODERATION,
 } from "../../../widgets/app-shell/lib/profileTabs.js";
 import {
   MY_PROFILE_DRAWER_LAYOUT_MAX_PX,
@@ -64,6 +65,7 @@ export function useMyProfilePageUi({
   );
 
   const isMyProductsTab = activeTab === PROFILE_TAB_MY_PRODUCTS;
+  const isProductModerationTab = activeTab === PROFILE_TAB_PRODUCT_MODERATION;
   const isFullWidthCatalogTab = isFullWidthCatalogProfileTab(activeTab);
   const canShowBackground =
     Boolean(profileBackground) &&
@@ -189,6 +191,7 @@ export function useMyProfilePageUi({
     showProfileBanner,
     showEditOnBanner,
     isMyProductsTab,
+    isProductModerationTab,
     isFullWidthCatalogTab,
     isDrawerLayout,
     isMobileNavOpen,

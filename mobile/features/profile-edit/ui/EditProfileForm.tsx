@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
 
 import { confirmPhoneBind, requestPhoneBind } from "@/entities/session/api/phoneAuth";
@@ -44,9 +44,10 @@ type EditProfileFormProps = {
     isEmailVerified?: boolean;
   };
   onSaved?: () => void;
+  focusAddress?: boolean;
 };
 
-export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
+export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditProfileFormProps) => {
   const theme = useAppTheme();
   const styles = useEditProfileFormStyles();
   const initialForm = useMemo(() => mapUserToEditProfileForm(user), [user]);
@@ -70,6 +71,21 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
   const [passwordChangeLoading, setPasswordChangeLoading] = useState(false);
   const [passwordChangeNotice, setPasswordChangeNotice] = useState("");
   const patchMutation = usePatchUserProfileMutation();
+  const scrollRef = useRef<ScrollView>(null);
+  const addressOffsetRef = useRef(0);
+
+  useEffect(() => {
+    if (!focusAddress) {
+      return undefined;
+    }
+    const timer = setTimeout(() => {
+      scrollRef.current?.scrollTo({
+        y: Math.max(0, addressOffsetRef.current - 24),
+        animated: true,
+      });
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [focusAddress]);
 
   const updateField = <K extends keyof EditProfileFormState>(
     key: K,
@@ -280,8 +296,12 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
     </Text>
   );
 
-  const section = (title: string, children: ReactNode) => (
-    <View>
+  const section = (
+    title: string,
+    children: ReactNode,
+    onLayout?: (event: { nativeEvent: { layout: { y: number } } }) => void,
+  ) => (
+    <View onLayout={onLayout}>
       <View style={styles.sectionHeader}>
         <View style={styles.sectionAccent} />
         <Text style={styles.sectionTitle}>{title}</Text>
@@ -292,6 +312,7 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
 
   return (
     <ScrollView
+      ref={scrollRef}
       style={styles.scrollView}
       contentContainerStyle={styles.scroll}
       keyboardShouldPersistTaps="handled"
@@ -554,6 +575,7 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
         ADDRESS_STRUCTURED_UI.SECTION_LABEL,
         <>
           <AddressSuggestInput
+            autoFocus={focusAddress}
             value={form.deliveryAddress}
             onChange={(deliveryAddress) => {
               setForm((prev) => ({
@@ -587,6 +609,9 @@ export const EditProfileForm = ({ user, onSaved }: EditProfileFormProps) => {
             />
           </View>
         </>,
+        (event) => {
+          addressOffsetRef.current = event.nativeEvent.layout.y;
+        },
       )}
 
       {/* Зона: уведомления */}

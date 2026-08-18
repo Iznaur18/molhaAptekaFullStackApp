@@ -100,6 +100,7 @@ export function useAppShellDomain(
     setIsSellerProductsLimitModalOpen: shell.setIsSellerProductsLimitModalOpen,
     setIsCreateProductModalOpen: shell.setIsCreateProductModalOpen,
     setProductToEdit: shell.setProductToEdit,
+    setProductToCopy: shell.setProductToCopy,
     setProductDetailsAdminError: shell.setProductDetailsAdminError,
     isMineMode: catalogLoader.isMineMode,
     selectedProductCategory: catalogLoader.selectedProductCategory,
@@ -130,6 +131,7 @@ export function useAppShellDomain(
   const catalogProductDetailsState = useHomeCatalogProductDetails({
     onBeforeOpenDetails: () => {
       shell.setProductToEdit(null);
+      shell.setProductToCopy(null);
       shell.setIsCreateProductModalOpen(false);
     },
   });

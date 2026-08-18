@@ -274,3 +274,10 @@ export function formatUserProfileRatingVotesLabel(raw) {
 
   return `голосов ${countVotes}`;
 }
+
+export const ADDRESS_PROMPT_UI = {
+  TITLE: "Добавьте адрес",
+  CTA: "Указать адрес",
+  FALLBACK_DESCRIPTION:
+    "Укажите адрес в профиле — так проще находить товары рядом и оформлять доставку.",
+};

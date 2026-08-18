@@ -46,6 +46,9 @@ export function useShellUiState() {
     useState(false);
   /** @type {[ProductFromApi | null, import('react').Dispatch<import('react').SetStateAction<ProductFromApi | null>>]} */
   const [productToEdit, setProductToEdit] = useState(null);
+  const [productToCopy, setProductToCopy] = useState(
+    /** @type {ProductFromApi | null} */ (null),
+  );
   const [productDetailsAdminError, setProductDetailsAdminError] = useState("");
   const [raffleParticipationPendingProductId, setRaffleParticipationPendingProductId] =
     useState(null);
@@ -136,6 +139,8 @@ export function useShellUiState() {
     setIsSellerProductsLimitModalOpen,
     productToEdit,
     setProductToEdit,
+    productToCopy,
+    setProductToCopy,
     productDetailsAdminError,
     setProductDetailsAdminError,
     raffleParticipationPendingProductId,

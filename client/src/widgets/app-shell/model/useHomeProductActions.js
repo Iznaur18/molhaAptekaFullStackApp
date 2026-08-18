@@ -34,6 +34,7 @@ export const useHomeProductActions = ({
   setIsSellerProductsLimitModalOpen,
   setIsCreateProductModalOpen,
   setProductToEdit,
+  setProductToCopy,
   setProductDetailsAdminError,
   isMineMode,
   selectedProductCategory,
@@ -160,26 +161,52 @@ export const useHomeProductActions = ({
       return;
     }
     setProductToEdit(null);
+    setProductToCopy(null);
     setIsCreateProductModalOpen(true);
   }, [
     isAtSellerProductsLimit,
     setIsCreateProductModalOpen,
     setIsSellerProductsLimitModalOpen,
+    setProductToCopy,
     setProductToEdit,
   ]);
+
+  const handleCopyMyProduct = useCallback(
+    (product) => {
+      if (!product) {
+        return;
+      }
+      if (isAtSellerProductsLimit) {
+        setIsSellerProductsLimitModalOpen(true);
+        return;
+      }
+      setProductToEdit(null);
+      setProductToCopy(product);
+      setIsCreateProductModalOpen(true);
+    },
+    [
+      isAtSellerProductsLimit,
+      setIsCreateProductModalOpen,
+      setIsSellerProductsLimitModalOpen,
+      setProductToCopy,
+      setProductToEdit,
+    ],
+  );
 
   const handleOpenEditMyProduct = useCallback(
     (product) => {
       setIsCreateProductModalOpen(false);
+      setProductToCopy(null);
       setProductToEdit(product);
     },
-    [setIsCreateProductModalOpen, setProductToEdit],
+    [setIsCreateProductModalOpen, setProductToCopy, setProductToEdit],
   );
 
   const handleCloseEditProductModal = useCallback(() => {
     setIsCreateProductModalOpen(false);
+    setProductToCopy(null);
     setProductToEdit(null);
-  }, [setIsCreateProductModalOpen, setProductToEdit]);
+  }, [setIsCreateProductModalOpen, setProductToCopy, setProductToEdit]);
 
   const handleEditProductSuccess = useCallback(
     (product) => {
@@ -665,6 +692,7 @@ export const useHomeProductActions = ({
   return {
     handleCreateProductSuccess,
     handlePlaceProductClick,
+    handleCopyMyProduct,
     handleOpenEditMyProduct,
     handleCloseEditProductModal,
     handleEditProductSuccess,

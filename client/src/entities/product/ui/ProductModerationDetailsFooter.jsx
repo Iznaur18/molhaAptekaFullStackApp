@@ -48,7 +48,7 @@ export function ProductModerationDetailsFooter({
         {PRODUCT_MODERATION_PAGE_UI.REJECT_COMMENT_LABEL}
         <textarea
           className="product-moderation-details-footer__reject-input"
-          rows={3}
+          rows={2}
           value={rejectComment}
           disabled={isBusy || isDeleteConfirmOpen}
           placeholder={PRODUCT_MODERATION_PAGE_UI.REJECT_COMMENT_PLACEHOLDER}
@@ -56,24 +56,6 @@ export function ProductModerationDetailsFooter({
         />
       </label>
       <div className="product-moderation-details-footer__actions">
-        <button
-          type="button"
-          className="app-btn app-btn--success"
-          disabled={isBusy || isDeleteConfirmOpen}
-          onClick={onApprove}
-        >
-          {isBusy
-            ? PRODUCT_MODERATION_PAGE_UI.ACTION_PENDING
-            : PRODUCT_MODERATION_PAGE_UI.APPROVE}
-        </button>
-        <button
-          type="button"
-          className="app-btn app-btn--outline"
-          disabled={isBusy || isDeleteConfirmOpen}
-          onClick={onReject}
-        >
-          {PRODUCT_MODERATION_PAGE_UI.REJECT}
-        </button>
         {canDelete && typeof onDelete === "function" ? (
           hasOpenSales ? (
             <p className="product-moderation-details-footer__open-sales-hint">
@@ -107,7 +89,7 @@ export function ProductModerationDetailsFooter({
           ) : (
             <button
               type="button"
-              className="app-btn app-btn--danger product-moderation-details-footer__btn--wide"
+              className="app-btn app-btn--danger"
               disabled={isBusy}
               onClick={() => setIsDeleteConfirmOpen(true)}
             >
@@ -115,6 +97,29 @@ export function ProductModerationDetailsFooter({
             </button>
           )
         ) : null}
+        <button
+          type="button"
+          className="app-btn app-btn--outline"
+          disabled={isBusy || isDeleteConfirmOpen}
+          onClick={onReject}
+        >
+          {PRODUCT_MODERATION_PAGE_UI.REJECT}
+        </button>
+        <button
+          type="button"
+          className={[
+            "app-btn app-btn--success",
+            canDelete ? "product-moderation-details-footer__btn--wide" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          disabled={isBusy || isDeleteConfirmOpen}
+          onClick={onApprove}
+        >
+          {isBusy
+            ? PRODUCT_MODERATION_PAGE_UI.ACTION_PENDING
+            : PRODUCT_MODERATION_PAGE_UI.APPROVE}
+        </button>
       </div>
     </div>
   );

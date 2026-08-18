@@ -30,6 +30,7 @@ const CREATE_PRODUCT_WIZARD_FORM_ID = "create-product-wizard-form";
  *   sellerLoyaltyPointsBalance?: number;
  *   sellerLoyaltyPointsReserved?: number;
  *   sellerProducts?: import('../../../entities/product/model/types.js').ProductFromApi[];
+ *   productToCopy?: import('../../../entities/product/model/types.js').ProductFromApi | null;
  * }} props
  */
 export function CreateProductWizard({
@@ -39,6 +40,7 @@ export function CreateProductWizard({
   sellerLoyaltyPointsBalance = 0,
   sellerLoyaltyPointsReserved = 0,
   sellerProducts = [],
+  productToCopy = null,
 }) {
   const {
     form,
@@ -59,6 +61,7 @@ export function CreateProductWizard({
     onClose,
     onSuccess,
     mode: "create",
+    productToCopy,
     sellerLoyaltyPointsBalance,
     sellerLoyaltyPointsReserved,
     sellerProducts,

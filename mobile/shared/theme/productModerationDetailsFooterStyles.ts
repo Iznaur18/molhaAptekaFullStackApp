@@ -65,6 +65,15 @@ export const useProductModerationDetailsFooterStyles = createThemedStyles((theme
     flex: 1,
     alignItems: "center",
   },
+  approveButtonWide: {
+    alignItems: "center",
+    alignSelf: "stretch",
+    width: "100%",
+  },
+  rowButton: {
+    flex: 1,
+    alignItems: "center",
+  },
   rejectButtonCompact: {
     flex: 1,
     alignItems: "center",

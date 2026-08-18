@@ -56,6 +56,14 @@
   text-decoration: none;
 }
 
+.user-profile-purchases__heading-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  font-weight: 400;
+}
+
 .user-profile-purchases__heading-chevron {
   flex-shrink: 0;
   color: var(--iz-color-on-contrast);

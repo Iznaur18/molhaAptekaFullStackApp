@@ -9,7 +9,8 @@
   margin: 0;
   padding: 0.85rem;
   border: 1px solid color-mix(in srgb, var(--iz-color-text) 10%, var(--iz-color-border));
-  border-radius: 14px;
+  border-radius: 20px;
+  overflow: hidden;
   background: color-mix(in srgb, var(--iz-color-on-contrast) 92%, transparent);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -199,7 +200,7 @@
   .user-list-row {
     padding: 0.5rem 0.45rem;
     gap: 0.4rem;
-    border-radius: 10px;
+    border-radius: 20px;
   }
 
   .user-list-row__head {

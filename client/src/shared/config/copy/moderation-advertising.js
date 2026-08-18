@@ -248,6 +248,21 @@ export const PRODUCT_MODERATION_PAGE_UI = {
   CREATED_LABEL: "Создан",
   REJECTION_COMMENT_PREFIX: "Комментарий модератора:",
   PRODUCTS_LIST_ARIA: "Очередь товаров на модерации",
+  DETAILS_TITLE: "Данные создания",
+  DETAILS_ARIA: "Полные данные создания товара",
+  SECTION_FACTS: "Параметры объявления",
+  SECTION_MEDIA: "Фото и видео",
+  VIDEO_LABEL: "Превью-видео",
+  COORDS_LABEL: "Координаты",
+  COORDS_EMPTY: "Не указаны",
+  /** @param {number} lat @param {number} lon */
+  COORDS_VALUE: (lat, lon) => `${lat}, ${lon}`,
+  OPEN_MAP: "Открыть на карте",
+  EMPTY_DESCRIPTION: "Описание не заполнено",
+  EMPTY_CHARACTERISTICS: "Характеристики не указаны",
+  SELLER_PREMIUM_LABEL: "Премиум",
+  SELLER_CONFIRMED_LABEL: "Подтверждённые данные",
+  SELLER_REGISTERED_LABEL: "На сайте с",
   /** @param {number} n */
   TAB_BADGE: (n) => (n > 99 ? "99+" : String(n)),
 };

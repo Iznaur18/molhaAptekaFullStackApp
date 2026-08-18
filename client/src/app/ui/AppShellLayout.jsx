@@ -11,6 +11,7 @@ import { useAppShell } from "../model/AppShellContext.jsx";
 
 import { AppShellHeader } from "./AppShellHeader.jsx";
 import { AppShellRouteSuspense } from "./AppShellRouteSuspense.jsx";
+import { AddressPromptHost } from "../../features/address-prompt/ui/AddressPromptHost.jsx";
 
 import "./AppShell.css";
 
@@ -62,6 +63,7 @@ export function AppShellLayout() {
       <Suspense fallback={null}>
         <LazyAppShellModalsLayer {...modalsLayerProps} />
       </Suspense>
+      <AddressPromptHost />
     </div>
   );
 }

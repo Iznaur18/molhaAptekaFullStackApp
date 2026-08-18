@@ -8,6 +8,7 @@ import { EditProductModal } from "./EditProductModal.jsx";
  *   onSuccess?: (product: import('../model/types.js').ProductFromApi) => void;
  *   mode?: 'create' | 'edit';
  *   productToEdit?: import('../model/types.js').ProductFromApi | null;
+ *   productToCopy?: import('../model/types.js').ProductFromApi | null;
  *   sellerLoyaltyPointsBalance?: number;
  *   sellerLoyaltyPointsReserved?: number;
  *   sellerProducts?: import('../model/types.js').ProductFromApi[];

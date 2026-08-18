@@ -211,11 +211,7 @@ const MODEL_FIELD_ORDER = [
 
 const CARD_PREVIEW_ORDER = ["productPrice", "productSeller"];
 
-const CARD_MODERATION_PREVIEW_ORDER = [
-  "productPrice",
-  "productSeller",
-  "createdAt",
-];
+const CARD_MODERATION_PREVIEW_ORDER = ["createdAt"];
 
 /** @type {Record<string, string>} */
 export const PRODUCT_FIELD_LABEL_RU = Object.fromEntries(

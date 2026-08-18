@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 
 import { useEditProfileModal } from "../../../entities/user/model/useEditProfileModal.js";
 import { AddressDeliveryFields } from "../../../entities/address/ui/AddressDeliveryFields.jsx";
@@ -18,6 +19,7 @@ import {
   EDIT_PROFILE_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { INTEGER_INPUT_FIELD_PROPS } from "../../../shared/lib/numericInput.js";
+import { EDIT_PROFILE_ADDRESS_ELEMENT_ID } from "../../../features/address-prompt/model/addressPromptConstants.js";
 import { ProfileAvatarUpload } from "../../../entities/user/ui/ProfileAvatarUpload.jsx";
 import { ProfileBackgroundUpload } from "../../../entities/user/ui/ProfileBackgroundUpload.jsx";
 import { EditProfileSocialLinksFields } from "../../../entities/user/ui/EditProfileSocialLinksFields.jsx";
@@ -105,6 +107,25 @@ export function EditProfilePage({
     variant: "page",
   });
   const pageRef = useRef(/** @type {HTMLElement | null} */ (null));
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!user || location.hash !== "#address") {
+      return undefined;
+    }
+    const timer = window.setTimeout(() => {
+      const root = document.getElementById(EDIT_PROFILE_ADDRESS_ELEMENT_ID);
+      if (!root) {
+        return;
+      }
+      root.scrollIntoView({ behavior: "smooth", block: "center" });
+      const input = root.querySelector("input");
+      if (input instanceof HTMLInputElement) {
+        input.focus();
+      }
+    }, 150);
+    return () => window.clearTimeout(timer);
+  }, [location.hash, user]);
 
   useEffect(() => {
     const page = pageRef.current;

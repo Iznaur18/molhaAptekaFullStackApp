@@ -11,6 +11,7 @@ import {
 } from "@/entities/product/lib/getProductModerationUi";
 import { getSellerProductsLimit } from "@/entities/product/lib/sellerProductsLimit";
 import { isSellerProductLoyaltyPointsOvercommitted } from "@/entities/product/lib/isSellerProductLoyaltyPointsOvercommitted";
+import { SellerProductsLimitModal } from "@/entities/product/ui/SellerProductsLimitModal";
 import {
   CATALOG_SORT_NEWEST,
   type MyProductsCatalogSort,
@@ -218,6 +219,7 @@ export const MyProductsPage = () => {
             tileWidth={productGrid.tileWidth}
             rowIndex={index}
             onEditProduct={pageActions.handleEditProduct}
+            onCopyProduct={placeProduct.handleCopyProductPress}
             onPromoteProduct={pageActions.handlePromoteProduct}
             resolveLoyaltyOvercommitted={resolveLoyaltyOvercommitted}
           />
@@ -281,6 +283,13 @@ export const MyProductsPage = () => {
         onToggleRaffleParticipation={pageActions.handleToggleRaffleParticipation}
         isRaffleParticipationPending={pageActions.isRaffleParticipationPending}
         onInstallmentProgramSaved={pageActions.handleInstallmentProgramSaved}
+      />
+
+      <SellerProductsLimitModal
+        visible={placeProduct.limitModalVisible}
+        onClose={placeProduct.closeLimitModal}
+        isPremiumUser={placeProduct.isPremiumUser}
+        limit={placeProduct.sellerProductsLimit}
       />
     </>
   );

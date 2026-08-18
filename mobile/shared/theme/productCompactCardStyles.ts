@@ -4,7 +4,7 @@ import { resolveProductCardBadgeColors } from "@/entities/product/lib/productCar
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const THUMB_SIZE = 88;
-const THUMB_RADIUS = 10;
+const THUMB_RADIUS = 16;
 
 export const useProductCompactCardStyles = createThemedStyles((theme) => {
   const BC = resolveProductCardBadgeColors(theme.colors);
@@ -12,7 +12,7 @@ export const useProductCompactCardStyles = createThemedStyles((theme) => {
   card: {
     gap: 10,
     padding: 12,
-    borderRadius: 12,
+    borderRadius: 20,
     backgroundColor: theme.colors.surface,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,

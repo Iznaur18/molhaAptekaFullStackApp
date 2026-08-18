@@ -235,17 +235,22 @@
 .installment-queue-card__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3rem;
+  gap: 8px;
 }
 
 .installment-queue-card__btn {
+  box-sizing: border-box;
+  flex: 1 1 9rem;
+  min-height: 40px;
   margin: 0;
-  padding: 0.28rem 0.65rem;
+  padding: 10px 14px;
   border: 1px solid var(--iz-color-border-strong);
-  border-radius: 0.4rem;
+  border-radius: 14px;
   background: var(--iz-color-surface);
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
   cursor: pointer;
 }
 
@@ -270,6 +275,12 @@
   border-color: var(--iz-color-danger);
   background: var(--iz-color-surface);
   color: var(--iz-color-danger);
+}
+
+.installment-queue-card__btn.installment-queue-card__btn_cancel {
+  border-color: var(--iz-color-danger);
+  background: var(--iz-color-danger);
+  color: var(--iz-color-on-contrast, #fff);
 }
 
 @import "./InstallmentPageLayoutMobile.css";

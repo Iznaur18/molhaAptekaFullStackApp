@@ -1,8 +1,11 @@
+import { Copy } from "lucide-react";
+
 import {
   CURATED_PRODUCT_COMPACT_CARD_UI,
   PRODUCT_CARD_UI,
   PRODUCT_MODERATION_PAGE_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { AppIcon } from "../../../shared/ui/icon/AppIcon.jsx";
 import { formatProductReviewRatingLine } from "../../product-review/lib/formatProductReviewRatingLine.js";
 import {
   hasProductCatalogDiscount,
@@ -34,6 +37,7 @@ import "./MyProductCatalogCard.css";
  *   isUserDataConfirmed?: boolean;
  *   onOpenProduct?: () => void;
  *   onEditProduct?: () => void;
+ *   onCopyProduct?: () => void;
  *   onPromoteProduct?: () => void;
  *   isDeletePending?: boolean;
  *   isAvailabilityTogglePending?: boolean;
@@ -47,6 +51,7 @@ export function MyProductCatalogCard({
   isUserDataConfirmed = false,
   onOpenProduct,
   onEditProduct,
+  onCopyProduct,
   onPromoteProduct,
   isDeletePending = false,
   isAvailabilityTogglePending = false,
@@ -80,6 +85,7 @@ export function MyProductCatalogCard({
   const canEdit = canSellerEditProduct(product);
   const showPromote = typeof onPromoteProduct === "function";
   const showEdit = typeof onEditProduct === "function" && canEdit;
+  const showCopy = typeof onCopyProduct === "function";
   const promoteDisabled = isProductPromoteButtonDisabled({
     isDeletePending,
     isAvailabilityTogglePending,
@@ -158,7 +164,7 @@ export function MyProductCatalogCard({
         </p>
       ) : null}
 
-      {showPromote || showEdit ? (
+      {showPromote || showEdit || showCopy ? (
         <>
           <div className="my-product-compact-card__divider" />
           <div
@@ -185,6 +191,17 @@ export function MyProductCatalogCard({
                 onClick={onEditProduct}
               >
                 {PRODUCT_CARD_UI.EDIT_PRODUCT}
+              </button>
+            ) : null}
+            {showCopy ? (
+              <button
+                type="button"
+                className="my-product-compact-card__copy"
+                disabled={isDeletePending}
+                onClick={onCopyProduct}
+                aria-label={PRODUCT_CARD_UI.COPY_PRODUCT_ARIA}
+              >
+                <AppIcon icon={Copy} size="sm" />
               </button>
             ) : null}
           </div>
