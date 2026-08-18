@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 
-import { validateUploadVideoFile } from "../../../shared/lib/validateUploadVideoFile.js";
+import { validateProductPreviewVideoFile } from "../../../entities/product/lib/validateProductPreviewVideoFile.js";
 import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { useUploadAssetMutations } from "../../../shared/model/useUploadAssetMutations.js";
 import { UPLOAD_VIDEO_FILE_INPUT_ACCEPT } from "../../../shared/config/uploadConstants.js";
@@ -47,7 +47,7 @@ export function CreateProductWizardMediaVideoCard({ value, onChange, disabled = 
       return;
     }
 
-    const validationError = validateUploadVideoFile(file);
+    const validationError = validateProductPreviewVideoFile(file);
     if (validationError) {
       setErrorMessage(validationError);
       return;
