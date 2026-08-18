@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import { PASSPORT_SELFIE_UPLOAD_PURPOSE } from "../../constants/privateUploadConstants.js";
 import { buildPublicUploadUrl } from "../../services/upload/buildPublicUploadUrl.js";
 import { finalizeUploadedFile } from "../../services/upload/finalizeUploadedFile.js";
+import { compressUploadedImageFile } from "../../services/upload/compressUploadedImageFile.js";
 import { assertUploadedImageMagic } from "../../services/upload/assertUploadedImageMagic.js";
 import {
   buildPrivateUploadApiUrl,
@@ -13,6 +14,7 @@ import {
   persistPrivateUploadToObjectStorage,
 } from "../../services/upload/objectStorageUpload.js";
 import { successRes, errorRes } from "../../services/http/index.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 /**
  * @param {import('express').Request} req
@@ -71,6 +73,20 @@ export async function uploadController(req, res) {
       filename,
       originalname: req.file.originalname,
       private: true,
+    });
+  }
+
+  // Даунскейл + WebP до сохранения. Оптимизация не критична для успеха
+  // загрузки: при сбое sharp логируем и сохраняем оригинал как есть.
+  try {
+    await compressUploadedImageFile(req.file);
+  } catch (compressError) {
+    logServerEvent("warn", {
+      event: "uploadcontroller_compress",
+      error:
+        compressError instanceof Error
+          ? compressError.message
+          : String(compressError),
     });
   }
 
