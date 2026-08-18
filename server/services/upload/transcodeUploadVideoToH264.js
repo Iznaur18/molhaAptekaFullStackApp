@@ -26,7 +26,14 @@ function resolveFfmpegBinaryPath() {
 /**
  * @param {string} inputPath
  * @param {string} outputPath
- * @param {{ maxDurationSec?: number | null, maxVideoBitrateMbit?: number | null }} [options]
+ * @param {{
+ *   maxDurationSec?: number | null,
+ *   maxVideoBitrateMbit?: number | null,
+ *   maxWidthPx?: number | null,
+ *   crf?: number | null,
+ *   dropAudio?: boolean,
+ *   preset?: string | null,
+ * }} [options]
  */
 function runFfmpegTranscode(inputPath, outputPath, options = {}) {
   return new Promise((resolve, reject) => {
@@ -47,11 +54,36 @@ function runFfmpegTranscode(inputPath, outputPath, options = {}) {
           ]
         : [];
 
+    // CRF-режим (при заданном crf) жмёт по целевому качеству, а не по битрейту;
+    // maxrate/bufsize выше остаётся страховкой на «тяжёлых» кадрах.
+    const crf = Number(options.crf);
+    const crfArgs =
+      Number.isFinite(crf) && crf >= 0 && crf <= 51 ? ["-crf", String(crf)] : [];
+
+    // Медленный пресет даёт меньший размер при том же качестве; для 3-сек
+    // превью время кодирования незначимо. Для длинных story/intro пресет не
+    // задаём (дефолтный medium).
+    const preset = String(options.preset ?? "").trim();
+    const presetArgs = preset ? ["-preset", preset] : [];
+
+    const maxWidthPx = Number(options.maxWidthPx);
+    const scaleWidth =
+      Number.isFinite(maxWidthPx) && maxWidthPx > 0
+        ? Math.floor(maxWidthPx)
+        : FFMPEG_MAX_WIDTH_PX;
+
+    // Превью товара проигрывается всегда muted+loop — звук выкидываем.
+    const audioArgs = options.dropAudio
+      ? ["-an"]
+      : ["-c:a", "aac", "-b:a", FFMPEG_AUDIO_BITRATE];
+
     const args = [
       "-y",
       "-i",
       inputPath,
       ...trimArgs,
+      ...presetArgs,
+      ...crfArgs,
       ...bitrateArgs,
       "-c:v",
       "libx264",
@@ -61,12 +93,9 @@ function runFfmpegTranscode(inputPath, outputPath, options = {}) {
       "yuv420p",
       "-movflags",
       "+faststart",
-      "-c:a",
-      "aac",
-      "-b:a",
-      FFMPEG_AUDIO_BITRATE,
+      ...audioArgs,
       "-vf",
-      `scale='min(${FFMPEG_MAX_WIDTH_PX},iw)':-2`,
+      `scale='min(${scaleWidth},iw)':-2`,
       outputPath,
     ];
 
@@ -115,7 +144,14 @@ async function safeUnlink(filePath) {
  * при `options.maxVideoBitrateMbit` ограничивает пиковый видеобитрейт.
  *
  * @param {import('express').Multer.File} file
- * @param {{ maxDurationSec?: number | null, maxVideoBitrateMbit?: number | null }} [options]
+ * @param {{
+ *   maxDurationSec?: number | null,
+ *   maxVideoBitrateMbit?: number | null,
+ *   maxWidthPx?: number | null,
+ *   crf?: number | null,
+ *   dropAudio?: boolean,
+ *   preset?: string | null,
+ * }} [options]
  * @returns {Promise<Buffer>}
  */
 export async function transcodeUploadVideoToH264(file, options = {}) {

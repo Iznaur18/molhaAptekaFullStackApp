@@ -8,8 +8,10 @@ import {
   APP_INTRO_VIDEO_MAX_DURATION_SEC,
 } from "../../constants/appIntroSettingsConstants.js";
 import {
+  PRODUCT_PREVIEW_VIDEO_CRF,
   PRODUCT_PREVIEW_VIDEO_MAX_BITRATE_MBIT,
   PRODUCT_PREVIEW_VIDEO_MAX_DURATION_SEC,
+  PRODUCT_PREVIEW_VIDEO_MAX_WIDTH_PX,
 } from "../../constants/productPreviewVideoConstants.js";
 import {
   USER_STORY_VIDEO_MAX_BITRATE_MBIT,
@@ -53,6 +55,10 @@ export function resolveVideoUploadProfile(req) {
       transcodeOptions: {
         maxDurationSec: PRODUCT_PREVIEW_VIDEO_MAX_DURATION_SEC,
         maxVideoBitrateMbit: PRODUCT_PREVIEW_VIDEO_MAX_BITRATE_MBIT,
+        maxWidthPx: PRODUCT_PREVIEW_VIDEO_MAX_WIDTH_PX,
+        crf: PRODUCT_PREVIEW_VIDEO_CRF,
+        dropAudio: true,
+        preset: "slower",
       },
     };
   }
