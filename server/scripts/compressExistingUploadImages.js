@@ -27,6 +27,15 @@ import { compressImageToWebp } from "../services/upload/compressImageBuffer.js";
 import { UPLOADS_DIR } from "../services/upload/uploadsDir.js";
 
 const CONVERTIBLE_EXT = new Set([".jpg", ".jpeg", ".png"]);
+
+/**
+ * Аудит-логи — исторические снимки request-body («что именно сабмитил стафф»).
+ * Их НЕ переписываем: это исказило бы историю аудита. Как следствие, старые
+ * записи могут ссылаться на удалённый оригинал (битое превью) — приемлемо для
+ * внутренних логов. Файлы, на которые ссылаются ТОЛЬКО аудит-логи, тоже не
+ * конвертируем (иначе оригинал удалился бы, а ссылка в логе осталась бы битой).
+ */
+const EXCLUDED_COLLECTIONS = new Set(["staffauditlogs"]);
 const isApply = process.argv.includes("--apply");
 
 /**
@@ -157,7 +166,10 @@ async function main() {
 
   try {
     // 2. Все упомянутые в БД имена файлов uploads.
-    const collections = await mongoose.connection.db.collections();
+    const allCollections = await mongoose.connection.db.collections();
+    const collections = allCollections.filter(
+      (collection) => !EXCLUDED_COLLECTIONS.has(collection.collectionName),
+    );
     const referenced = new Set();
     for (const collection of collections) {
       const cursor = collection.find({}, { readPreference: "primary" });
