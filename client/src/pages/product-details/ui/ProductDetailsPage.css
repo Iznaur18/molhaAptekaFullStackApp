@@ -26,13 +26,23 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 0;
   padding: 0;
   gap: 0;
-  overflow-x: clip;
+  overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior-x: none;
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
+}
+
+.product-details-page__body > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .product-details-modal--page .product-details-modal__tabs {
@@ -49,7 +59,7 @@
   min-width: 0;
   min-height: 0;
   max-width: 100%;
-  overflow-x: clip;
+  overflow-x: hidden;
   overflow-y: visible;
   display: block;
 }
@@ -126,7 +136,7 @@
   max-width: 100%;
   min-width: 0;
   padding: 0 var(--iz-space-4) 0;
-  overflow-x: clip;
+  overflow-x: hidden;
 }
 
 .product-details-modal--page .product-media-gallery-readonly__back-btn {
@@ -227,7 +237,7 @@
   border: none;
   border-radius: 0;
   background: transparent;
-  overflow-x: clip;
+  overflow-x: hidden;
 }
 
 .product-details-modal--page .product-details-modal__product-name {
@@ -539,6 +549,8 @@ body:has(.product-details-page) .app-shell {
   gap: var(--product-details-modal-gap);
   box-sizing: border-box;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   padding: var(--iz-space-4);
   padding-bottom: 0;
 }
@@ -557,10 +569,11 @@ body:has(.product-details-page) .app-shell {
 
 .product-details-modal--page-split .product-details-page__wide-top {
   display: grid;
-  grid-template-columns: var(--product-image-modal-main-side) minmax(0, 1fr);
+  grid-template-columns: minmax(0, var(--product-image-modal-main-side)) minmax(0, 1fr);
   column-gap: calc(var(--product-details-modal-gap) * 1.35);
   align-items: start;
   width: 100%;
+  max-width: 100%;
   min-width: 0;
 }
 

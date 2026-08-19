@@ -18,6 +18,7 @@ import "../../../entities/product/ui/create-product-sections/CreateProductSectio
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { useCreateProductWizard } from "../model/useCreateProductWizard.js";
+import { AppIcon, Save } from "../../../shared/ui/icon/index.js";
 import { ProductWizardProgress } from "../../../shared/ui/ProductWizardProgress/ProductWizardProgress.jsx";
 import { ProductWizardStepHeadline } from "../../../shared/ui/ProductWizardProgress/ProductWizardStepHeadline.jsx";
 import { resolveCreateProductWizardStepCopy } from "../lib/resolveCreateProductWizardStepCopy.js";
@@ -168,7 +169,14 @@ export function CreateProductWizard({
       footerClassName="create-product-wizard__footer"
       footer={
         <div className="create-product-wizard__footer-stack">
-          <div className="create-product-wizard__footer-actions">
+          <div
+            className={[
+              "create-product-wizard__footer-actions",
+              canSaveDraft ? "create-product-wizard__footer-actions--with-draft" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
             {!wizard.isFirstStep ? (
               <button
                 type="button"
@@ -200,17 +208,19 @@ export function CreateProductWizard({
                   ? CREATE_PRODUCT_MODAL_UI.WIZARD_SUBMIT
                   : CREATE_PRODUCT_MODAL_UI.WIZARD_NEXT}
             </button>
+            {canSaveDraft ? (
+              <button
+                type="button"
+                className="create-product-wizard__draft-save"
+                onClick={handleSaveDraftAndExit}
+                disabled={isSubmitting}
+                aria-label={CREATE_PRODUCT_MODAL_UI.DRAFT_SAVE_EXIT}
+                title={CREATE_PRODUCT_MODAL_UI.DRAFT_SAVE_EXIT}
+              >
+                <AppIcon icon={Save} size="md" />
+              </button>
+            ) : null}
           </div>
-          {canSaveDraft ? (
-            <button
-              type="button"
-              className="create-product-wizard__draft-save"
-              onClick={handleSaveDraftAndExit}
-              disabled={isSubmitting}
-            >
-              {CREATE_PRODUCT_MODAL_UI.DRAFT_SAVE_EXIT}
-            </button>
-          ) : null}
         </div>
       }
     >

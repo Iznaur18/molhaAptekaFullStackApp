@@ -16,6 +16,7 @@ export {
   Newspaper,
   Pencil,
   Plus,
+  Save,
   Search,
   ShoppingCart,
   SlidersHorizontal,
