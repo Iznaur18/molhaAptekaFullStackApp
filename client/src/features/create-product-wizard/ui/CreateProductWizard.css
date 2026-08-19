@@ -108,10 +108,81 @@
   padding-bottom: max(var(--iz-space-4), env(safe-area-inset-bottom, 0px));
 }
 
+.create-product-wizard__footer-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .create-product-wizard__footer-actions {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
   gap: 0.65rem;
+}
+
+.create-product-wizard__draft-save {
+  align-self: center;
+  min-height: 2.25rem;
+  padding: 0.35rem 0.9rem;
+  border: none;
+  border-radius: 0.6rem;
+  background: transparent;
+  color: var(--iz-color-action);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.create-product-wizard__draft-save:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--iz-color-action-soft) 35%, transparent);
+}
+
+.create-product-wizard__draft-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.create-product-wizard__draft-banner {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-action-soft) 55%, var(--iz-color-border));
+  border-radius: 0.6rem;
+  background: color-mix(in srgb, var(--iz-color-action-soft) 22%, var(--iz-color-surface));
+  color: var(--iz-color-text-secondary);
+  font-size: 0.85rem;
+}
+
+.create-product-wizard__draft-banner-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.create-product-wizard__draft-banner-discard {
+  flex-shrink: 0;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-border) 85%, transparent);
+  border-radius: 0.5rem;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-action);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.create-product-wizard__draft-banner-discard:hover:not(:disabled) {
+  background: var(--iz-color-surface-elevated);
+}
+
+.create-product-wizard__draft-banner-discard:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .create-product-wizard__back,

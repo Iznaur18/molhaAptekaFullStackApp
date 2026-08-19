@@ -321,6 +321,11 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WIZARD_BACK: "Назад",
   WIZARD_NEXT: "Далее",
   WIZARD_SUBMIT: "Отправить на проверку",
+  DRAFT_SAVE_EXIT: "Сохранить черновик и выйти",
+  DRAFT_RESTORED_ARIA: "Восстановленный черновик",
+  DRAFT_RESTORED_HINT:
+    "Восстановили незаконченный товар — можно продолжить с того же места.",
+  DRAFT_RESTORED_DISCARD: "Начать заново",
   WIZARD_PROGRESS_ARIA: "Шаги размещения товара",
   /** @param {number} current @param {number} total */
   WIZARD_STEP_OF: (current, total) => `Шаг ${current} из ${total}`,

@@ -1,6 +1,10 @@
 import { useEffect } from "react";
 
 import { useCreateProductForm } from "../../../entities/product/model/useCreateProductForm.js";
+import {
+  isCreateProductFormDraftMeaningful,
+  persistCreateProductFormDraft,
+} from "../../../entities/product/lib/createProductFormDraftStorage.js";
 import { resolveCategoryDefaultCharacteristicRowsPatch } from "../../../entities/product/lib/resolveCategoryDefaultCharacteristicRowsPatch.js";
 import { CreateProductBasicSection } from "../../../entities/product/ui/create-product-sections/CreateProductBasicSection.jsx";
 import { CreateProductOriginalitySection } from "../../../entities/product/ui/create-product-sections/CreateProductOriginalitySection.jsx";
@@ -56,6 +60,9 @@ export function CreateProductWizard({
     discountPreviewPercent,
     handleChange,
     handleAvailableChange,
+    draftEnabled,
+    draftRestored,
+    discardDraft,
   } = useCreateProductForm({
     isOpen,
     onClose,
@@ -72,7 +79,17 @@ export function CreateProductWizard({
     form,
     sellerPointsMaxPerUnit,
     sellerCatalogCommitted: sellerLoyaltyBudget.catalogCommitted,
+    draftEnabled,
   });
+
+  // Автосохранение черновика: продавец не потеряет введённое, если из-за
+  // ошибки сервера или случайного ухода со страницы окно закроется.
+  useEffect(() => {
+    if (!isOpen || !draftEnabled) {
+      return;
+    }
+    persistCreateProductFormDraft({ form, stepIndex: wizard.stepIndex });
+  }, [isOpen, draftEnabled, form, wizard.stepIndex]);
 
   useEffect(() => {
     if (!isOpen || wizard.stepId !== "basic") {
@@ -108,6 +125,18 @@ export function CreateProductWizard({
     wizard.goBack();
   };
 
+  const handleSaveDraftAndExit = () => {
+    persistCreateProductFormDraft({ form, stepIndex: wizard.stepIndex });
+    handleClose();
+  };
+
+  const handleDiscardDraft = () => {
+    discardDraft();
+    wizard.goToStep(0);
+  };
+
+  const canSaveDraft = draftEnabled && isCreateProductFormDraftMeaningful(form);
+
   const sectionProps = {
     form,
     setForm,
@@ -138,38 +167,50 @@ export function CreateProductWizard({
       bodyClassName="create-product-wizard__body"
       footerClassName="create-product-wizard__footer"
       footer={
-        <div className="create-product-wizard__footer-actions">
-          {!wizard.isFirstStep ? (
+        <div className="create-product-wizard__footer-stack">
+          <div className="create-product-wizard__footer-actions">
+            {!wizard.isFirstStep ? (
+              <button
+                type="button"
+                className="create-product-wizard__back"
+                onClick={handleBack}
+                disabled={isSubmitting}
+              >
+                {CREATE_PRODUCT_MODAL_UI.WIZARD_BACK}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="create-product-wizard__back create-product-wizard__back_placeholder"
+                disabled
+                aria-hidden="true"
+              >
+                {CREATE_PRODUCT_MODAL_UI.WIZARD_BACK}
+              </button>
+            )}
             <button
-              type="button"
-              className="create-product-wizard__back"
-              onClick={handleBack}
+              type="submit"
+              form={CREATE_PRODUCT_WIZARD_FORM_ID}
+              className="create-product-wizard__primary"
               disabled={isSubmitting}
             >
-              {CREATE_PRODUCT_MODAL_UI.WIZARD_BACK}
+              {isSubmitting
+                ? CREATE_PRODUCT_MODAL_UI.SUBMIT_LOADING
+                : wizard.isLastStep
+                  ? CREATE_PRODUCT_MODAL_UI.WIZARD_SUBMIT
+                  : CREATE_PRODUCT_MODAL_UI.WIZARD_NEXT}
             </button>
-          ) : (
+          </div>
+          {canSaveDraft ? (
             <button
               type="button"
-              className="create-product-wizard__back create-product-wizard__back_placeholder"
-              disabled
-              aria-hidden="true"
+              className="create-product-wizard__draft-save"
+              onClick={handleSaveDraftAndExit}
+              disabled={isSubmitting}
             >
-              {CREATE_PRODUCT_MODAL_UI.WIZARD_BACK}
+              {CREATE_PRODUCT_MODAL_UI.DRAFT_SAVE_EXIT}
             </button>
-          )}
-          <button
-            type="submit"
-            form={CREATE_PRODUCT_WIZARD_FORM_ID}
-            className="create-product-wizard__primary"
-            disabled={isSubmitting}
-          >
-            {isSubmitting
-              ? CREATE_PRODUCT_MODAL_UI.SUBMIT_LOADING
-              : wizard.isLastStep
-                ? CREATE_PRODUCT_MODAL_UI.WIZARD_SUBMIT
-                : CREATE_PRODUCT_MODAL_UI.WIZARD_NEXT}
-          </button>
+          ) : null}
         </div>
       }
     >
@@ -178,6 +219,25 @@ export function CreateProductWizard({
         stepIndex={wizard.stepIndex}
         resolveStepCopy={resolveCreateProductWizardStepCopy}
       />
+      {draftRestored ? (
+        <div
+          className="create-product-wizard__draft-banner"
+          role="status"
+          aria-label={CREATE_PRODUCT_MODAL_UI.DRAFT_RESTORED_ARIA}
+        >
+          <span className="create-product-wizard__draft-banner-text">
+            {CREATE_PRODUCT_MODAL_UI.DRAFT_RESTORED_HINT}
+          </span>
+          <button
+            type="button"
+            className="create-product-wizard__draft-banner-discard"
+            onClick={handleDiscardDraft}
+            disabled={isSubmitting}
+          >
+            {CREATE_PRODUCT_MODAL_UI.DRAFT_RESTORED_DISCARD}
+          </button>
+        </div>
+      ) : null}
       <form
         id={CREATE_PRODUCT_WIZARD_FORM_ID}
         className="create-product-wizard__form"

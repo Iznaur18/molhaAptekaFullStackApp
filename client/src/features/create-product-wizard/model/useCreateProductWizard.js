@@ -5,6 +5,7 @@ import {
   CREATE_PRODUCT_WIZARD_STEP_IDS,
   resolveCreateProductWizardStepId,
 } from "../lib/createProductWizardSteps.js";
+import { readCreateProductFormDraft } from "../../../entities/product/lib/createProductFormDraftStorage.js";
 import { validateCreateProductWizardStep } from "../lib/validateCreateProductWizardStep.js";
 
 /**
@@ -13,6 +14,7 @@ import { validateCreateProductWizardStep } from "../lib/validateCreateProductWiz
  *   form: Record<string, unknown>;
  *   sellerPointsMaxPerUnit: number;
  *   sellerCatalogCommitted: number;
+ *   draftEnabled?: boolean;
  * }} params
  */
 export function useCreateProductWizard({
@@ -20,6 +22,7 @@ export function useCreateProductWizard({
   form,
   sellerPointsMaxPerUnit,
   sellerCatalogCommitted,
+  draftEnabled = false,
 }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [stepError, setStepError] = useState("");
@@ -37,8 +40,17 @@ export function useCreateProductWizard({
     if (!isOpen) {
       setStepIndex(0);
       setStepError("");
+      return;
     }
-  }, [isOpen]);
+    // Возобновляем создание с того шага, на котором продавец прервался.
+    const draft = draftEnabled ? readCreateProductFormDraft() : null;
+    setStepIndex(
+      draft
+        ? Math.max(0, Math.min(draft.stepIndex, CREATE_PRODUCT_WIZARD_STEP_COUNT - 1))
+        : 0,
+    );
+    setStepError("");
+  }, [isOpen, draftEnabled]);
 
   const validateCurrentStep = useCallback(() => {
     const message = validateCreateProductWizardStep(stepId, form, validationContext);
