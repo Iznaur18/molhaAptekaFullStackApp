@@ -2,13 +2,33 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
+  ACCESS_TOKEN_MAX_AGE_MS,
   AUTH_COOKIE_NAME,
+  REFRESH_COOKIE_MAX_AGE_MS,
   REFRESH_COOKIE_NAME,
 } from "../constants/authCookieConstants.js";
 import {
   getAuthTokenFromRequest,
   getRefreshTokenFromRequest,
 } from "../utils/authCookie.js";
+
+describe("access cookie transport lifetime", () => {
+  // Регрессия «выкидывает после ~часа отсутствия»: access-cookie должна жить
+  // столько же, сколько refresh. Иначе после >1ч простоя /auth/me приходит без
+  // токена → 200 «гость», а клиент делает refresh только на 401 (см.
+  // authCookieConstants.js и packages/shared-api).
+  it("access cookie maxAge matches refresh cookie maxAge", () => {
+    assert.equal(ACCESS_TOKEN_MAX_AGE_MS, REFRESH_COOKIE_MAX_AGE_MS);
+  });
+
+  it("access cookie clearly outlives the 1h access JWT", () => {
+    const oneHourMs = 60 * 60 * 1000;
+    assert.ok(
+      ACCESS_TOKEN_MAX_AGE_MS > oneHourMs,
+      `access cookie maxAge (${ACCESS_TOKEN_MAX_AGE_MS}) must exceed 1h`,
+    );
+  });
+});
 
 describe("getRefreshTokenFromRequest", () => {
   it("prefers body refreshToken over stale cookie", () => {
