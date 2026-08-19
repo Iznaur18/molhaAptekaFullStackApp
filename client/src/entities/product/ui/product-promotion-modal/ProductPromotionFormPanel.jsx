@@ -126,7 +126,6 @@ export function ProductPromotionFormPanel({
                   className="product-promotion-modal__visually-hidden"
                 />
                 <span className="product-promotion-modal__tier-badge">{badgeLabel}</span>
-                <span className="product-promotion-modal__tier-title">{tier.title}</span>
                 {ratePercent ? (
                   <span className="product-promotion-modal__tier-rate">
                     {PRODUCT_PROMOTION_UI.TIER_RATE_HINT(ratePercent)}

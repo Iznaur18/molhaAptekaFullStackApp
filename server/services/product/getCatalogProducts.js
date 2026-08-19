@@ -61,6 +61,9 @@ const emptyCatalogPage = (page, limit) => ({
  * }} input
  */
 export async function getCatalogProducts({ userId, query }) {
+  const { expireProductFlashSales } = await import("./productFlashSaleExpiry.js");
+  await expireProductFlashSales();
+
   const includeHidden = String(query.includeHidden).toLowerCase() === "true";
   const nearEnabled = parseTruthyQueryFlag(query.near);
   const nearContext = nearEnabled
@@ -130,6 +133,7 @@ async function loadCatalogProducts({
   const wholesaleOnly = parseTruthyQueryFlag(query.wholesaleOnly);
   const originalOnly = parseTruthyQueryFlag(query.originalOnly);
   const nearEnabled = parseTruthyQueryFlag(query.near);
+  const flashSaleOnly = parseTruthyQueryFlag(query.flashSaleOnly);
 
   if (followingOnly && !userId) {
     throw new AppError(401, USER_FOLLOW_FOLLOWING_ONLY_AUTH_MESSAGE);
@@ -191,6 +195,12 @@ async function loadCatalogProducts({
   }
   if (originalOnly) {
     catalogBaseQuery.productIsOriginal = true;
+  }
+  if (flashSaleOnly) {
+    const { buildProductFlashSaleActiveCatalogMatch } = await import(
+      "./productFlashSaleExpiry.js"
+    );
+    Object.assign(catalogBaseQuery, buildProductFlashSaleActiveCatalogMatch());
   }
   if (reviewsOnly) {
     catalogBaseQuery.reviewCount = { $gte: PRODUCT_CATALOG_REVIEWS_MIN_REVIEW_COUNT };

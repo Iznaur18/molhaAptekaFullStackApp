@@ -13,4 +13,8 @@ export const productCategoryTreeQueryKeys = {
    * @param {string} parentId
    */
   children: (parentId) => [...productCategoryTreeQueryKeys.all, "children", parentId],
+  /**
+   * @param {string} query
+   */
+  search: (query) => [...productCategoryTreeQueryKeys.all, "search", query],
 };

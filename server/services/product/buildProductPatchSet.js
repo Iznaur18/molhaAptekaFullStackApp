@@ -36,7 +36,9 @@ import {
   EMPTY_PATCH_BODY_MESSAGE,
 } from "./patchMyProductConstants.js";
 import { applyWholesaleFields } from "./applyWholesaleFields.js";
+import { applyFlashSaleFields } from "./applyFlashSaleFields.js";
 import { applyRentalFields } from "./applyRentalFields.js";
+import { PRODUCT_FLASH_SALE_ACTIVE_PRICE_LOCKED_MESSAGE } from "@molha/api-contract";
 import {
   AFFILIATE_PERCENT_MAX,
   AFFILIATE_PERCENT_MIN,
@@ -130,6 +132,20 @@ const applyIsOriginalField = (body, $set) => {
 };
 
 const applyPriceFields = (body, $set, existing) => {
+  const touchesFlashSale =
+    hasBodyField(body, "productFlashSaleEnabled") ||
+    hasBodyField(body, "productFlashSalePrice") ||
+    hasBodyField(body, "productFlashSaleDurationValue") ||
+    hasBodyField(body, "productFlashSaleDurationUnit");
+
+  if (
+    existing.productFlashSaleEnabled === true &&
+    !touchesFlashSale &&
+    (hasBodyField(body, "productPrice") || hasBodyField(body, "productOldPrice"))
+  ) {
+    throw new AppError(400, PRODUCT_FLASH_SALE_ACTIVE_PRICE_LOCKED_MESSAGE);
+  }
+
   if (hasBodyField(body, "productPrice")) {
     try {
       $set.productPrice = normalizeProductPriceRub(body.productPrice);
@@ -519,10 +535,11 @@ export async function buildProductPatchSet({ existing, body, isAdmin, productId 
   applyQaField(body, $set);
   applyWholesaleFields(body, $set, existing);
   applyRentalFields(body, $set, existing);
+  const flashSaleState = applyFlashSaleFields(body, $set, $unset, existing);
 
   if (Object.keys($set).length === 0 && Object.keys($unset).length === 0) {
     throw new AppError(400, EMPTY_PATCH_BODY_MESSAGE);
   }
 
-  return { $set, $unset, ...auctionState };
+  return { $set, $unset, ...auctionState, ...flashSaleState };
 }

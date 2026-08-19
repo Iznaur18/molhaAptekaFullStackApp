@@ -81,6 +81,13 @@ button.cart-line__image-wrap:hover {
   color: var(--iz-color-action);
 }
 
+.cart-line__price-warning {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  color: #c2410c;
+}
+
 .cart-line__name,
 .cart-line__name-button {
   margin: 0;

@@ -10,9 +10,12 @@ export function RaffleProductsRoutePage() {
   const {
     isAuthorized,
     currentUserId,
+    canModerateProducts,
     onRequestLogin,
     onSellerNameClick,
     onOpenProductDetails,
+    setRaffleModal,
+    refreshRaffleSurfaces,
   } = mainContentProps;
 
   if (!raffleId) {
@@ -24,9 +27,12 @@ export function RaffleProductsRoutePage() {
       raffleId={raffleId}
       isAuthorized={isAuthorized}
       currentUserId={currentUserId}
+      canModerateProducts={canModerateProducts}
       onRequestLoginAddToCart={onRequestLogin}
       onSellerNameClick={onSellerNameClick}
       onOpenProductDetails={onOpenProductDetails}
+      setRaffleModal={setRaffleModal}
+      refreshRaffleSurfaces={refreshRaffleSurfaces}
     />
   );
 }

@@ -104,7 +104,23 @@ import {
   addCuratedProductListItemAdminController,
   removeCuratedProductListItemAdminController,
 } from "./Product/curatedProductListControllers.js";
+import {
+  getHomeCuratedCategoryListsController,
+  listCuratedCategoryListsAdminController,
+  previewCuratedCategoryListItemAdminController,
+  createCuratedCategoryListAdminController,
+  reorderCuratedCategoryListsAdminController,
+  patchCuratedCategoryListAdminController,
+  deleteCuratedCategoryListAdminController,
+  addCuratedCategoryListItemAdminController,
+  removeCuratedCategoryListItemAdminController,
+} from "./Product/curatedCategoryListControllers.js";
 import { postProductController } from "./Product/postProductController.js";
+import {
+  downloadProductBulkImportTemplateController,
+  getProductBulkImportJobStatusController,
+  submitProductBulkImportController,
+} from "./Product/productBulkImportControllers.js";
 import {
   getProductsController,
   getMyProductsController,
@@ -338,7 +354,19 @@ export {
   deleteCuratedProductListAdminController,
   addCuratedProductListItemAdminController,
   removeCuratedProductListItemAdminController,
+  getHomeCuratedCategoryListsController,
+  listCuratedCategoryListsAdminController,
+  previewCuratedCategoryListItemAdminController,
+  createCuratedCategoryListAdminController,
+  reorderCuratedCategoryListsAdminController,
+  patchCuratedCategoryListAdminController,
+  deleteCuratedCategoryListAdminController,
+  addCuratedCategoryListItemAdminController,
+  removeCuratedCategoryListItemAdminController,
   postProductController,
+  downloadProductBulkImportTemplateController,
+  submitProductBulkImportController,
+  getProductBulkImportJobStatusController,
   getProductsController,
   getMyProductsController,
   getCatalogProductByIdController,

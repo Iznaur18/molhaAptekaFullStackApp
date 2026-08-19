@@ -5,7 +5,7 @@ import { getCartLineStockHint } from "../../../entities/cart/lib/getCartLineStoc
 import { getProductPurchaseLimit } from "../../../entities/product/lib/getProductPurchaseLimit.js";
 import { resolveProductImageUrl } from "../../../entities/product/lib/resolveProductImageUrl.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
-import { CART_PAGE_UI, COMMON_UI, PRODUCT_PROMO_CODE_UI } from "../../../shared/config/appUiCopy.js";
+import { CART_PAGE_UI, COMMON_UI, PRODUCT_FLASH_SALE_UI, PRODUCT_PROMO_CODE_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { AppIcon, Trash2 } from "../../../shared/ui/icon/index.js";
 
@@ -134,6 +134,11 @@ export function CartLineItem({
                 {line.promoDiscountPercent != null
                   ? ` ${PRODUCT_PROMO_CODE_UI.CART_PROMO_PERCENT(line.promoDiscountPercent)}`
                   : ""}
+              </p>
+            ) : null}
+            {line.priceIncreasedSinceAdd ? (
+              <p className="cart-line__price-warning" role="status">
+                {PRODUCT_FLASH_SALE_UI.CART_PRICE_CHANGED_WARNING}
               </p>
             ) : null}
             {stockHint ? <p className="cart-line__stock-hint">{stockHint}</p> : null}

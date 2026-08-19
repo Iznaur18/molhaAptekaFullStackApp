@@ -101,6 +101,7 @@ export const useHomeCatalogLoader = ({
     catalogWholesaleOnly: filters.catalogWholesaleOnly,
     catalogOriginalOnly: filters.catalogOriginalOnly,
     catalogNear: filters.catalogNear,
+    catalogFlashSaleOnly: filters.catalogFlashSaleOnly,
     catalogQueryFromUrl: filters.catalogQueryFromUrl,
     setCatalogSort: filters.setCatalogSort,
     setSelectedProductCategory: filters.setSelectedProductCategory,
@@ -116,6 +117,7 @@ export const useHomeCatalogLoader = ({
     setCatalogWholesaleOnly: filters.setCatalogWholesaleOnly,
     setCatalogOriginalOnly: filters.setCatalogOriginalOnly,
     setCatalogNear: filters.setCatalogNear,
+    setCatalogFlashSaleOnly: filters.setCatalogFlashSaleOnly,
     categoryRootsRef: browser.categoryRootsRef,
   });
 
@@ -163,6 +165,7 @@ export const useHomeCatalogLoader = ({
     catalogWholesaleOnly: filters.catalogWholesaleOnly,
     catalogOriginalOnly: filters.catalogOriginalOnly,
     catalogNear: filters.catalogNear,
+    catalogFlashSaleOnly: filters.catalogFlashSaleOnly,
     categoryRoots: browser.categoryRoots,
     categoryDisplays: browser.categoryDisplays,
     feedTileDisplays: browser.feedTileDisplays,
@@ -182,6 +185,8 @@ export const useHomeCatalogLoader = ({
     selectedCategoryId: filters.selectedCategoryId,
     sellerPersonalCategoryId: filters.sellerPersonalCategoryId,
     categoryTreeLabel: filters.categoryTreeLabel,
+    setCategoryTreeLabel: filters.setCategoryTreeLabel,
+    applyCatalogQueryState: filters.applyCatalogQueryState,
     isCatalogBrowserLanding: filters.isCatalogBrowserLanding,
     isCatalogBrowserProductsView: filters.isCatalogBrowserProductsView,
     isCatalogProductsView: filters.isCatalogProductsView,

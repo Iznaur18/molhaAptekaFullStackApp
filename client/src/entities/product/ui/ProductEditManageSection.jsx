@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { isProductAffiliateConfigured, isProductWholesaleConfigured, isProductRentalConfigured } from "@izibuy/shared-lib";
 
 import { isProductRaffleParticipant } from "../../raffle/lib/isProductRaffleParticipant.js";
-import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
-import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { hasProductManualCatalogDiscount } from "../lib/hasProductManualCatalogDiscount.js";
+import { PRODUCT_CARD_UI, CREATE_PRODUCT_MODAL_UI, PRODUCT_FLASH_SALE_UI } from "../../../shared/config/appUiCopy.js";
 import { PRODUCT_MODERATION_APPROVED } from "../model/productModerationConstants.js";
 import { resolveProductAffiliateOffer } from "../lib/resolveProductAffiliateOffer.js";
 
@@ -52,6 +52,9 @@ import "./ProductEditManageSection.css";
  *   onOpenWholesaleSettings?: () => void;
  *   onOpenRentalSettings?: () => void;
  *   onOpenAffiliateSettings?: () => void;
+ *   onOpenFlashSaleSettings?: () => void;
+ *   onSetFlashSale?: (productId: string, productFlashSaleEnabled: boolean) => void | Promise<void>;
+ *   isFlashSaleTogglePending?: boolean;
  * }} props
  */
 export function ProductEditManageSection({
@@ -88,6 +91,9 @@ export function ProductEditManageSection({
   onOpenRentalSettings,
   onOpenAffiliateSettings,
   onOpenPromoCodesSettings,
+  onOpenFlashSaleSettings,
+  onSetFlashSale,
+  isFlashSaleTogglePending = false,
 }) {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const isListedForOthers = product.productIsAvailable !== false;
@@ -122,6 +128,11 @@ export function ProductEditManageSection({
     typeof onOpenAffiliateSettings === "function" ||
     typeof onSetAffiliate === "function";
   const showPromoCodes = typeof onOpenPromoCodesSettings === "function" && canEdit;
+  const showFlashSale =
+    typeof onOpenFlashSaleSettings === "function" || typeof onSetFlashSale === "function";
+  const isFlashSaleEnabled = product.productFlashSaleEnabled === true;
+  const flashSaleBlockedByAuction = product.productAuctionEnabled === true;
+  const flashSaleBlockedByManualDiscount = hasProductManualCatalogDiscount(product);
   const showDelete = canDelete && typeof onDelete === "function";
   const isRaffleParticipant = isProductRaffleParticipant(product);
   const canOpenInstallment =
@@ -141,6 +152,7 @@ export function ProductEditManageSection({
     isRentalTogglePending ||
     isAffiliateTogglePending ||
     isInstallmentTogglePending ||
+    isFlashSaleTogglePending ||
     isRaffleParticipationPending ||
     isDeletePending ||
     isDeleteConfirmOpen ||
@@ -330,6 +342,47 @@ export function ProductEditManageSection({
             }}
           />
         ) : null}
+        {showFlashSale ? (
+          <ProductManageToggleRow
+            key={`flash-sale-${String(product._id)}-${isFlashSaleEnabled ? "on" : "off"}`}
+            title={PRODUCT_FLASH_SALE_UI.MANAGE_TITLE}
+            description={
+              flashSaleBlockedByAuction
+                ? PRODUCT_FLASH_SALE_UI.MANAGE_HINT +
+                  " (отключите аукцион)"
+                : flashSaleBlockedByManualDiscount
+                  ? PRODUCT_FLASH_SALE_UI.MANAGE_HINT +
+                    " (уберите ручную скидку)"
+                  : PRODUCT_FLASH_SALE_UI.MANAGE_HINT
+            }
+            checked={isFlashSaleEnabled}
+            disabled={
+              actionsLocked || flashSaleBlockedByAuction || flashSaleBlockedByManualDiscount
+            }
+            pending={isFlashSaleTogglePending}
+            pendingLabel={PRODUCT_FLASH_SALE_UI.TOGGLE_PENDING}
+            onPress={() => onOpenFlashSaleSettings?.()}
+            onCheckedChange={(next) => {
+              if (product._id == null || actionsLocked) {
+                return { revert: true };
+              }
+              if (
+                next &&
+                (flashSaleBlockedByAuction || flashSaleBlockedByManualDiscount)
+              ) {
+                return { revert: true };
+              }
+              if (next) {
+                onOpenFlashSaleSettings?.();
+                return { revert: true };
+              }
+              if (typeof onSetFlashSale === "function") {
+                void onSetFlashSale(String(product._id), false);
+              }
+              return undefined;
+            }}
+          />
+        ) : null}
         {showPromoCodes ? (
           <ProductManageToggleRow
             title={CREATE_PRODUCT_MODAL_UI.MANAGE_PROMO_CODES_TITLE}
@@ -408,6 +461,13 @@ export function ProductEditManageSection({
               <div className="product-edit-manage__delete-confirm-actions">
                 <button
                   type="button"
+                  className="product-edit-manage__delete-confirm-cancel"
+                  onClick={() => setIsDeleteConfirmOpen(false)}
+                >
+                  {PRODUCT_CARD_UI.DELETE_CONFIRM_CANCEL}
+                </button>
+                <button
+                  type="button"
                   className="product-edit-manage__delete-confirm-yes"
                   onClick={() => {
                     if (product._id == null) {
@@ -418,13 +478,6 @@ export function ProductEditManageSection({
                   }}
                 >
                   {PRODUCT_CARD_UI.DELETE_CONFIRM_YES}
-                </button>
-                <button
-                  type="button"
-                  className="product-edit-manage__delete-confirm-cancel"
-                  onClick={() => setIsDeleteConfirmOpen(false)}
-                >
-                  {PRODUCT_CARD_UI.DELETE_CONFIRM_CANCEL}
                 </button>
               </div>
             </div>

@@ -35,6 +35,7 @@ export function hasProductCardCatalogStatusBadges(vm) {
     vm.showAuctionBadge ||
     vm.showInstallmentBadge ||
     vm.showWholesaleBadge ||
+    vm.showFlashSaleBadge ||
     vm.showRaffleBadge ||
     vm.showAffiliateBadge
   );

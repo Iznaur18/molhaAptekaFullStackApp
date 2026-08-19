@@ -1,9 +1,9 @@
 import {
   CATALOG_FILTER_AFFILIATE_ONLY,
   CATALOG_FILTER_AUCTION_ONLY,
+  CATALOG_FILTER_FLASH_SALE_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
-  CATALOG_FILTER_NEAR,
   CATALOG_FILTER_ORIGINAL_ONLY,
   CATALOG_FILTER_RENTAL_ONLY,
   CATALOG_FILTER_SALE_ONLY,
@@ -26,6 +26,7 @@ import {
  *   wholesaleOnly: boolean;
  *   originalOnly: boolean;
  *   near: boolean;
+ *   flashSaleOnly: boolean;
  * }}
  */
 const baseFeedQuery = () => ({
@@ -42,6 +43,7 @@ const baseFeedQuery = () => ({
   wholesaleOnly: false,
   originalOnly: false,
   near: false,
+  flashSaleOnly: false,
 });
 
 /**
@@ -55,8 +57,8 @@ export function buildQueryForCatalogFeedTile(tile) {
     };
   }
 
-  if (tile.value === CATALOG_FILTER_NEAR) {
-    return { ...baseFeedQuery(), near: true };
+  if (tile.value === CATALOG_FILTER_FLASH_SALE_ONLY) {
+    return { ...baseFeedQuery(), flashSaleOnly: true };
   }
 
   if (tile.value === CATALOG_FILTER_FOLLOWING_ONLY) {
@@ -106,6 +108,7 @@ export function buildQueryForCatalogFeedTile(tile) {
  * @param {boolean} [affiliateOnly]
  * @param {boolean} [wholesaleOnly]
  * @param {boolean} [originalOnly]
+ * @param {boolean} [flashSaleOnly]
  */
 export function isCatalogFeedTileActive(
   tile,
@@ -119,6 +122,7 @@ export function isCatalogFeedTileActive(
   affiliateOnly = false,
   wholesaleOnly = false,
   originalOnly = false,
+  flashSaleOnly = false,
 ) {
   if (tile.kind === "sort") {
     return (
@@ -131,12 +135,13 @@ export function isCatalogFeedTileActive(
       !affiliateOnly &&
       !wholesaleOnly &&
       !originalOnly &&
-      !near
+      !near &&
+      !flashSaleOnly
     );
   }
 
-  if (tile.value === CATALOG_FILTER_NEAR) {
-    return near;
+  if (tile.value === CATALOG_FILTER_FLASH_SALE_ONLY) {
+    return flashSaleOnly;
   }
 
   if (tile.value === CATALOG_FILTER_FOLLOWING_ONLY) {

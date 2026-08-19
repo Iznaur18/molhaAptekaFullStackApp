@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
 import { invalidateCuratedProductLists } from "../../entities/curated-product-list/lib/curatedProductListQueryCache.js";
+import { invalidateCuratedCategoryLists } from "../../entities/curated-category-list/lib/curatedCategoryListQueryCache.js";
 import { invalidateCatalogProducts } from "../../entities/product/lib/catalogProductsQueryCache.js";
 import { invalidateMyProductsTotal } from "../../entities/product/lib/myProductsTotalQueryCache.js";
 import { useHomeCatalogLoader } from "../../widgets/app-shell/model/useHomeCatalogLoader.js";
@@ -12,6 +13,8 @@ import { useHomeMyProfileSession } from "../../widgets/app-shell/model/useHomeMy
 import { useHomeNotifications } from "../../widgets/app-shell/model/useHomeNotifications.js";
 import { useHomeProductActions } from "../../widgets/app-shell/model/useHomeProductActions.js";
 import { useHomeCuratedProductLists } from "../../widgets/app-shell/model/useHomeCuratedProductLists.js";
+import { useHomeCuratedCategoryLists } from "../../widgets/app-shell/model/useHomeCuratedCategoryLists.js";
+import { useHomeCuratedCategoryClick } from "../../widgets/app-shell/model/useHomeCuratedCategoryClick.js";
 import { useHomeProfileNavigation } from "../../widgets/app-shell/model/useHomeProfileNavigation.js";
 
 /**
@@ -37,6 +40,7 @@ export function useAppShellDomain(
       invalidateCatalogProducts(queryClient),
       invalidateMyProductsTotal(queryClient),
       invalidateCuratedProductLists(queryClient),
+      invalidateCuratedCategoryLists(queryClient),
     ]);
     await refreshFeaturedRaffle();
     handleUserStoriesRefresh();
@@ -89,7 +93,34 @@ export function useAppShellDomain(
     catalogWholesaleOnly: catalogLoader.catalogWholesaleOnly,
     catalogOriginalOnly: catalogLoader.catalogOriginalOnly,
     catalogNear: catalogLoader.catalogNear,
+    catalogFlashSaleOnly: catalogLoader.catalogFlashSaleOnly,
     viewerRegionCode: shell.viewerRegionCode,
+  });
+
+  const curatedCategoryListsState = useHomeCuratedCategoryLists({
+    isHomeCatalogMainView: shell.showHomeCatalogFeed ?? shell.isHomeCatalogMainView,
+    isMineMode: catalogLoader.isMineMode,
+    selectedProductCategory: catalogLoader.selectedProductCategory,
+    selectedCategoryId: catalogLoader.selectedCategoryId,
+    sellerPersonalCategoryId: catalogLoader.sellerPersonalCategoryId,
+    hasProductSearchQuery: catalogLoader.hasProductSearchQuery,
+    catalogFollowingOnly: catalogLoader.catalogFollowingOnly,
+    catalogAuctionOnly: catalogLoader.catalogAuctionOnly,
+    catalogInstallmentOnly: catalogLoader.catalogInstallmentOnly,
+    catalogSaleOnly: catalogLoader.catalogSaleOnly,
+    catalogRentalOnly: catalogLoader.catalogRentalOnly,
+    catalogAffiliateOnly: catalogLoader.catalogAffiliateOnly,
+    catalogWholesaleOnly: catalogLoader.catalogWholesaleOnly,
+    catalogOriginalOnly: catalogLoader.catalogOriginalOnly,
+    catalogNear: catalogLoader.catalogNear,
+    catalogFlashSaleOnly: catalogLoader.catalogFlashSaleOnly,
+    viewerRegionCode: shell.viewerRegionCode,
+  });
+
+  const handleHomeCuratedCategoryClick = useHomeCuratedCategoryClick({
+    applyCatalogQueryState: catalogLoader.applyCatalogQueryState,
+    navigate,
+    setCategoryTreeLabel: catalogLoader.setCategoryTreeLabel,
   });
 
   const productActions = useHomeProductActions({
@@ -110,6 +141,7 @@ export function useAppShellDomain(
     setTogglingQaProductId: shell.setTogglingQaProductId,
     setTogglingOriginalityProductId: shell.setTogglingOriginalityProductId,
     setTogglingWholesaleProductId: shell.setTogglingWholesaleProductId,
+    setTogglingFlashSaleProductId: shell.setTogglingFlashSaleProductId,
     setTogglingRentalProductId: shell.setTogglingRentalProductId,
     setTogglingAffiliateProductId: shell.setTogglingAffiliateProductId,
     setTogglingInstallmentProductId: shell.setTogglingInstallmentProductId,
@@ -185,6 +217,8 @@ export function useAppShellDomain(
     ...profileNavigation,
     ...catalogLoader,
     ...curatedProductListsState,
+    ...curatedCategoryListsState,
+    handleHomeCuratedCategoryClick,
     ...productActions,
     ...catalogProductDetailsState,
     ...notifications,

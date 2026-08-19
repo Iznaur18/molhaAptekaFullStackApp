@@ -30,6 +30,7 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
         deliveryEnabled={form.productDeliveryEnabled === true}
         selectedFromSuggest={form.productPickupSelectedFromSuggest === true}
         disabled={isSubmitting}
+        addressLineDisplayOnly
         onChange={(next) => {
           setForm((prev) => ({
             ...prev,

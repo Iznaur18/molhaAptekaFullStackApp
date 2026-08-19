@@ -36,6 +36,7 @@ const MAP_GEOLOCATE_DEBOUNCE_MS = 350;
  *   value: import('../model/types.js').RuDeliveryAddressValue;
  *   onChange: (next: import('../model/types.js').RuDeliveryAddressValue) => void;
  *   disabled?: boolean;
+ *   displayOnly?: boolean;
  *   lineInputClassName?: string;
  *   labels?: { line?: string };
  *   showMap?: boolean;
@@ -45,6 +46,7 @@ export function AddressDeliveryFields({
   value,
   onChange,
   disabled = false,
+  displayOnly = false,
   lineInputClassName = "",
   labels = {},
   showMap = true,
@@ -52,11 +54,13 @@ export function AddressDeliveryFields({
   const listId = useId();
   const mapTitleId = useId();
   const wrapRef = useRef(null);
+  const mapInputRef = useRef(null);
   const valueRef = useRef(value);
   valueRef.current = value;
   const geolocateSeqRef = useRef(0);
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [mapOpen, setMapOpen] = useState(false);
+  const [mapSuggestPanelOpen, setMapSuggestPanelOpen] = useState(true);
   const [serviceDown, setServiceDown] = useState(() => isAddressServiceUnavailable());
   const [mapStatus, setMapStatus] = useState(
     /** @type {'idle' | 'loading' | 'error'} */ ("idle"),
@@ -77,6 +81,9 @@ export function AddressDeliveryFields({
   }, []);
 
   useEffect(() => {
+    if (mapOpen) {
+      return undefined;
+    }
     const onDocClick = (event) => {
       if (!wrapRef.current?.contains(event.target)) {
         setDebouncedQuery("");
@@ -84,12 +91,13 @@ export function AddressDeliveryFields({
     };
     document.addEventListener("mousedown", onDocClick);
     return () => document.removeEventListener("mousedown", onDocClick);
-  }, []);
+  }, [mapOpen]);
 
   useEffect(() => {
     if (!mapOpen) {
       return undefined;
     }
+    setMapSuggestPanelOpen(true);
     const onKeyDown = (event) => {
       if (event.key === "Escape") {
         setMapOpen(false);
@@ -98,9 +106,13 @@ export function AddressDeliveryFields({
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     document.addEventListener("keydown", onKeyDown);
+    const focusTimer = window.setTimeout(() => {
+      mapInputRef.current?.focus({ preventScroll: true });
+    }, 40);
     return () => {
       document.body.style.overflow = prevOverflow;
       document.removeEventListener("keydown", onKeyDown);
+      window.clearTimeout(focusTimer);
     };
   }, [mapOpen]);
 
@@ -124,12 +136,23 @@ export function AddressDeliveryFields({
     enabled: suggestEnabled && debouncedQuery.length >= ADDRESS_SUGGEST_MIN_QUERY_LENGTH,
   });
   const suggestions = suggestEnabled ? (suggestionsQuery.data ?? []) : [];
+  const isSuggestFetching = suggestionsQuery.fetchStatus === "fetching";
+  const showMapSuggestEmpty =
+    mapOpen &&
+    !serviceDown &&
+    debouncedQuery.length >= ADDRESS_SUGGEST_MIN_QUERY_LENGTH &&
+    !isSuggestFetching &&
+    !suggestionsQuery.isError &&
+    suggestions.length === 0;
 
   const patch = (patchValue) => {
     onChange({ ...EMPTY_VALUE, ...valueRef.current, ...patchValue, flat: "" });
   };
 
   const handleLineChange = (event) => {
+    if (mapOpen) {
+      setMapSuggestPanelOpen(true);
+    }
     setMapError(null);
     setMapStatus("idle");
     patch({
@@ -155,6 +178,9 @@ export function AddressDeliveryFields({
       selectedFromSuggest: isHouse,
     });
     setDebouncedQuery(isHouse ? "" : mapped.line);
+    if (mapOpen) {
+      setMapSuggestPanelOpen(!isHouse);
+    }
   };
 
   const handleMapPointChange = ({ lat, lon }) => {
@@ -162,6 +188,7 @@ export function AddressDeliveryFields({
       return;
     }
 
+    setMapSuggestPanelOpen(false);
     const seq = ++geolocateSeqRef.current;
     patch({
       geo: { lat, lon },
@@ -232,9 +259,21 @@ export function AddressDeliveryFields({
 
   const showList =
     !disabled &&
+    !displayOnly &&
     suggestions.length > 0 &&
     !value.selectedFromSuggest &&
     value.line.trim().length >= ADDRESS_SUGGEST_MIN_QUERY_LENGTH;
+
+  const showMapSearchList =
+    mapOpen &&
+    mapSuggestPanelOpen &&
+    !disabled &&
+    suggestions.length > 0 &&
+    !value.selectedFromSuggest &&
+    value.line.trim().length >= ADDRESS_SUGGEST_MIN_QUERY_LENGTH;
+
+  const showMapSuggestPanelNotes =
+    mapOpen && mapSuggestPanelOpen && debouncedQuery.length >= ADDRESS_SUGGEST_MIN_QUERY_LENGTH;
 
   const mapLat = value.geo?.lat ?? null;
   const mapLon = value.geo?.lon ?? null;
@@ -262,29 +301,91 @@ export function AddressDeliveryFields({
               />
             </div>
             <div className="address-delivery-fields__map-fullscreen-overlay">
-              {mapStatus === "loading" ? (
-                <p className="address-delivery-fields__hint" role="status">
-                  {ADDRESS_DELIVERY_UI.MAP_GEOLOCATE_LOADING}
-                </p>
-              ) : null}
-              {mapError ? (
-                <p
-                  className="address-delivery-fields__hint address-delivery-fields__hint_error"
-                  role="alert"
+              <div className="address-delivery-fields__map-fullscreen-top">
+                <div
+                  className="address-delivery-fields__map-fullscreen-search"
+                  onClick={() => {
+                    setMapSuggestPanelOpen(true);
+                    mapInputRef.current?.focus({ preventScroll: true });
+                  }}
                 >
-                  {mapError}
-                </p>
-              ) : null}
-              {value.line ? (
-                <p className="address-delivery-fields__map-fullscreen-selected">{value.line}</p>
-              ) : null}
-              <button
-                type="button"
-                className="address-delivery-fields__map-fullscreen-done"
-                onClick={() => setMapOpen(false)}
-              >
-                {ADDRESS_DELIVERY_UI.MAP_DONE}
-              </button>
+                  <input
+                    ref={mapInputRef}
+                    type="search"
+                    className="address-delivery-fields__map-fullscreen-input"
+                    value={value.line}
+                    onChange={handleLineChange}
+                    onFocus={() => setMapSuggestPanelOpen(true)}
+                    disabled={disabled}
+                    maxLength={ADDRESS_LINE_MAX_LENGTH}
+                    placeholder={ADDRESS_DELIVERY_UI.PLACEHOLDER_LINE}
+                    autoComplete="off"
+                    enterKeyHint="search"
+                    aria-label={lineLabel}
+                    aria-expanded={showMapSearchList}
+                    aria-controls={`${listId}-map`}
+                  />
+                </div>
+                {showMapSearchList ? (
+                  <ul
+                    className="address-delivery-fields__map-fullscreen-suggestions"
+                    id={`${listId}-map`}
+                    role="listbox"
+                  >
+                    {suggestions.map((item) => (
+                      <li key={item.unrestrictedValue ?? item.value} role="option">
+                        <button
+                          type="button"
+                          className="address-delivery-fields__map-fullscreen-suggestion"
+                          onClick={() => handlePickSuggestion(item)}
+                        >
+                          {item.value}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                {showMapSuggestPanelNotes && isSuggestFetching ? (
+                  <p className="address-delivery-fields__map-fullscreen-note" role="status">
+                    {ADDRESS_DELIVERY_UI.SUGGEST_LOADING}
+                  </p>
+                ) : null}
+                {showMapSuggestPanelNotes && suggestionsQuery.isError ? (
+                  <p
+                    className="address-delivery-fields__map-fullscreen-note address-delivery-fields__hint_error"
+                    role="alert"
+                  >
+                    {ADDRESS_DELIVERY_UI.SUGGEST_ERROR}
+                  </p>
+                ) : null}
+                {showMapSuggestPanelNotes && showMapSuggestEmpty ? (
+                  <p className="address-delivery-fields__map-fullscreen-note">
+                    {ADDRESS_DELIVERY_UI.SUGGEST_EMPTY}
+                  </p>
+                ) : null}
+              </div>
+              <div className="address-delivery-fields__map-fullscreen-bottom">
+                {mapStatus === "loading" ? (
+                  <p className="address-delivery-fields__hint" role="status">
+                    {ADDRESS_DELIVERY_UI.MAP_GEOLOCATE_LOADING}
+                  </p>
+                ) : null}
+                {mapError ? (
+                  <p
+                    className="address-delivery-fields__hint address-delivery-fields__hint_error"
+                    role="alert"
+                  >
+                    {mapError}
+                  </p>
+                ) : null}
+                <button
+                  type="button"
+                  className="address-delivery-fields__map-fullscreen-done"
+                  onClick={() => setMapOpen(false)}
+                >
+                  {ADDRESS_DELIVERY_UI.MAP_DONE}
+                </button>
+              </div>
             </div>
           </div>,
           document.body,
@@ -300,16 +401,17 @@ export function AddressDeliveryFields({
             type="text"
             className={lineInputClassName}
             value={value.line}
-            onChange={handleLineChange}
+            onChange={displayOnly ? undefined : handleLineChange}
             disabled={disabled}
+            readOnly={displayOnly}
             maxLength={ADDRESS_LINE_MAX_LENGTH}
             placeholder={ADDRESS_DELIVERY_UI.PLACEHOLDER_LINE}
             autoComplete="off"
             role="combobox"
             aria-expanded={showList}
-            aria-controls={listId}
+            aria-controls={displayOnly ? undefined : listId}
           />
-          {value.line && !disabled ? (
+          {value.line && !disabled && !displayOnly ? (
             <button
               type="button"
               className="address-delivery-fields__clear"

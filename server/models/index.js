@@ -43,6 +43,7 @@ import { MoneyIdempotencyRecordModel } from "./MoneyIdempotencyRecordModel.js";
 import OneCExchangeLogModel from "./OneCExchangeLogModel.js";
 import OneCOrderPushModel from "./OneCOrderPushModel.js";
 import ProductPromoActivationModel from "./ProductPromoActivationModel.js";
+import ProductBulkImportJobModel from "./ProductBulkImportJobModel.js";
 
 export {
   UserModel,
@@ -90,4 +91,5 @@ export {
   OneCExchangeLogModel,
   OneCOrderPushModel,
   ProductPromoActivationModel,
+  ProductBulkImportJobModel,
 };

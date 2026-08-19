@@ -46,6 +46,29 @@
   pointer-events: auto;
 }
 
+@container app-viewport (min-width: 641px) {
+  .create-raffle-modal__backdrop {
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+  }
+
+  .create-raffle-modal {
+    width: min(34rem, 100%);
+    max-width: 34rem;
+    height: auto;
+    max-height: min(88vh, 100%);
+    padding: 1.25rem 1.25rem 1.35rem;
+    border-radius: 1.25rem;
+    border: 1px solid color-mix(in srgb, var(--iz-color-border) 88%, transparent);
+    box-shadow: var(--iz-shadow-modal);
+  }
+
+  .create-raffle-modal__form {
+    min-height: 0;
+  }
+}
+
 .create-raffle-modal__header {
   display: flex;
   align-items: center;

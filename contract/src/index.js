@@ -257,6 +257,20 @@ export {
   formatCuratedRegionLabel,
   formatCuratedProductRegionMismatchMessage,
 } from "./curatedProductList.js";
+export {
+  CURATED_CATEGORY_LIST_TITLE_MAX_LENGTH,
+  CURATED_CATEGORY_ITEM_KINDS,
+  curatedCategoryListIdParamsSchema,
+  curatedCategoryListItemParamsSchema,
+  curatedCategoryItemPreviewQuerySchema,
+  createCuratedCategoryListBodySchema,
+  patchCuratedCategoryListBodySchema,
+  reorderCuratedCategoryListsBodySchema,
+  addCuratedCategoryListItemBodySchema,
+  formatCuratedCategoryRegionMismatchMessage,
+  buildCuratedCategoryItemKey,
+  parseCuratedCategoryItemKey,
+} from "./curatedCategoryList.js";
 export { catalogFeedTileKeyParamsSchema } from "./catalogFeedTile.js";
 export {
   PRODUCT_MANAGE_TOGGLE_KEY_VALUES,
@@ -364,6 +378,14 @@ export {
   productWriteDataSchema,
 } from "./productWrite.js";
 export {
+  PRODUCT_BULK_IMPORT_JOB_STATUSES,
+  productBulkImportValidationErrorSchema,
+  productBulkImportValidationFailedDataSchema,
+  productBulkImportSubmitDataSchema,
+  productBulkImportJobStatusDataSchema,
+  productBulkImportJobIdParamsSchema,
+} from "./productBulkImport.js";
+export {
   PRODUCT_WHOLESALE_MIN_QTY_MIN,
   PRODUCT_WHOLESALE_MIN_QTY_MAX,
   PRODUCT_WHOLESALE_PRICE_RUB_MAX,
@@ -374,6 +396,25 @@ export {
   productWholesalePriceFieldSchema,
   productWholesalePatchFieldsShape,
 } from "./productWholesale.js";
+export {
+  PRODUCT_FLASH_SALE_MAX_DISCOUNT_PERCENT,
+  PRODUCT_FLASH_SALE_DURATION_MIN_MINUTES,
+  PRODUCT_FLASH_SALE_DURATION_MAX_MINUTES,
+  PRODUCT_FLASH_SALE_DURATION_UNITS,
+  PRODUCT_FLASH_SALE_AUCTION_BLOCKED_MESSAGE,
+  PRODUCT_FLASH_SALE_MANUAL_DISCOUNT_BLOCKED_MESSAGE,
+  PRODUCT_FLASH_SALE_PRICE_REQUIRED_MESSAGE,
+  PRODUCT_FLASH_SALE_PRICE_TOO_HIGH_MESSAGE,
+  PRODUCT_FLASH_SALE_MAX_DISCOUNT_MESSAGE,
+  PRODUCT_FLASH_SALE_DURATION_REQUIRED_MESSAGE,
+  PRODUCT_FLASH_SALE_DURATION_RANGE_MESSAGE,
+  PRODUCT_FLASH_SALE_CONFIG_REQUIRED_MESSAGE,
+  PRODUCT_FLASH_SALE_ACTIVE_PRICE_LOCKED_MESSAGE,
+  resolveProductFlashSaleDurationMinutes,
+  isProductFlashSaleActiveAt,
+  productFlashSaleDurationUnitSchema,
+  productFlashSalePatchFieldsShape,
+} from "./productFlashSale.js";
 export {
   PRODUCT_RENTAL_PRICE_RUB_MAX,
   PRODUCT_RENTAL_PRICE_UNIT_HOUR,

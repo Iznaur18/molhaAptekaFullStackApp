@@ -13,9 +13,16 @@
   min-width: 0;
   margin: 0 0 var(--iz-space-2);
   padding: 12px 0;
-  border-radius: var(--iz-radius-card-lg);
+  border-radius: 1.6rem;
   background: var(--iz-color-surface);
   overflow: hidden;
+}
+
+@supports (corner-shape: squircle) {
+  .curated-product-list-carousel {
+    border-radius: 1.75rem;
+    corner-shape: squircle;
+  }
 }
 
 .curated-product-list-carousel__title {

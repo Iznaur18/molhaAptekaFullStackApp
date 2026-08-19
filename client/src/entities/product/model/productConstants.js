@@ -151,6 +151,7 @@ export const CATALOG_FILTER_AFFILIATE_ONLY = "__affiliate_only__";
 export const CATALOG_FILTER_WHOLESALE_ONLY = "__wholesale_only__";
 export const CATALOG_FILTER_ORIGINAL_ONLY = "__original_only__";
 export const CATALOG_FILTER_NEAR = "__near__";
+export const CATALOG_FILTER_FLASH_SALE_ONLY = "__flash_sale_only__";
 
 export const CATALOG_SORT_OPTIONS = [
   CATALOG_SORT_NEWEST,
@@ -215,6 +216,7 @@ export const CATALOG_SORT_LABEL_RU = {
   [CATALOG_SORT_CONFIRMED]: "Подтверждённые продавцы",
   [CATALOG_SORT_REVIEWS]: "По отзывам",
   [CATALOG_FILTER_NEAR]: "Рядом",
+  [CATALOG_FILTER_FLASH_SALE_ONLY]: "Горящие скидки",
   [CATALOG_FILTER_FOLLOWING_ONLY]: "Только от подписок",
   [CATALOG_FILTER_AUCTION_ONLY]: "Только с аукционом",
   [CATALOG_FILTER_INSTALLMENT_ONLY]: "Только в рассрочку",

@@ -348,10 +348,11 @@ test("catalogFeedTileKeyParamsSchema accepts known tile key", () => {
   assert.equal(parsed.tileKey, "sort:newest");
 });
 
-test("catalogFeedTileKeyParamsSchema accepts near filter tile key", () => {
+test("catalogFeedTileKeyParamsSchema accepts flash sale filter tile key", () => {
   assert.equal(
-    catalogFeedTileKeyParamsSchema.parse({ tileKey: "filter:__near__" }).tileKey,
-    "filter:__near__",
+    catalogFeedTileKeyParamsSchema.parse({ tileKey: "filter:__flash_sale_only__" })
+      .tileKey,
+    "filter:__flash_sale_only__",
   );
 });
 
@@ -465,6 +466,7 @@ test("catalogProductsQuerySchema coerces page/limit and flags", () => {
     wholesaleOnly: "true",
     originalOnly: "false",
     near: "true",
+    flashSaleOnly: "true",
   });
   assert.equal(parsed.page, 2);
   assert.equal(parsed.limit, 20);
@@ -475,6 +477,7 @@ test("catalogProductsQuerySchema coerces page/limit and flags", () => {
   assert.equal(parsed.wholesaleOnly, true);
   assert.equal(parsed.originalOnly, false);
   assert.equal(parsed.near, true);
+  assert.equal(parsed.flashSaleOnly, true);
 });
 
 test("catalogProductsQuerySchema rejects unknown category", () => {

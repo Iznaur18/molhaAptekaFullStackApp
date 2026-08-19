@@ -6,7 +6,7 @@ export const CATALOG_FEED_TILE_KEY_VALUES = [
   "sort:reviews",
   "sort:premium",
   "sort:confirmed",
-  "filter:__near__",
+  "filter:__flash_sale_only__",
   "filter:__following_only__",
   "filter:__auction_only__",
   "filter:__installment_only__",

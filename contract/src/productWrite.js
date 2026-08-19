@@ -20,6 +20,7 @@ import {
   assertAffiliatePatchPair,
   productAffiliatePatchFieldsShape,
 } from "./productAffiliate.js";
+import { productFlashSalePatchFieldsShape } from "./productFlashSale.js";
 
 /** SSOT category slug list — client/mobile/server re-export отсюда. */
 export const PRODUCT_CATEGORY_VALUES = [
@@ -239,6 +240,7 @@ export const createProductBodySchema = z
     productPickupLon: productPickupLonFieldSchema,
     productPickupEnabled: z.coerce.boolean().optional(),
     productDeliveryEnabled: z.coerce.boolean().optional(),
+    productArticle: z.string().trim().max(64).optional(),
   })
   .superRefine(assertCreateProductRequiresPhoto)
   .superRefine((body, ctx) => assertOldPricePair(body, ctx, true))
@@ -283,6 +285,7 @@ const patchFieldShape = {
   ...productWholesalePatchFieldsShape,
   ...productRentalPatchFieldsShape,
   ...productAffiliatePatchFieldsShape,
+  ...productFlashSalePatchFieldsShape,
   loyaltyPointsPerUnit: z.coerce.number().int().min(0).optional(),
   productCharacteristics: z
     .array(productCharacteristicSchema)
@@ -333,10 +336,12 @@ export const patchMyProductBodySchema = z
   })
   .superRefine((body, ctx) => assertAffiliatePatchPair(body, ctx));
 
-export const productModerationFromApiSchema = productFromApiSchema.extend({
-  productModerationStatus: z.enum(PRODUCT_MODERATION_STATUSES),
-  productModerationComment: z.string().nullish(),
-});
+export const productModerationFromApiSchema = productFromApiSchema
+  .extend({
+    productModerationStatus: z.enum(PRODUCT_MODERATION_STATUSES),
+    productModerationComment: z.string().nullish(),
+  })
+  .passthrough();
 
 /** `data` ответа `POST /product` и `PATCH /product/:id`. */
 export const productWriteDataSchema = z.object({

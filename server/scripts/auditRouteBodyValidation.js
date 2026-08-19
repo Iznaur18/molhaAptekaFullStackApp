@@ -26,6 +26,7 @@ const ALLOWED_WITHOUT_BODY_VALIDATION = new Set([
   "uploadRouter.js:POST:/image",
   "uploadRouter.js:POST:/video",
   "uploadRouter.js:POST:/",
+  "productRouter.js:POST:/bulk-import",
   "onecRouter.js:POST:/test",
   "onecRouter.js:POST:/sync",
   "productRouter.js:POST:/raffles/unlock-create",

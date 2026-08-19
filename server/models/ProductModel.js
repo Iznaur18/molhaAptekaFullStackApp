@@ -116,6 +116,28 @@ const ProductSchema = new Schema(
       default: null,
       min: 0,
     },
+    productFlashSaleEnabled: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    productFlashSaleEndsAt: {
+      type: Date,
+      default: null,
+      index: true,
+    },
+    /** Исходная длительность горящей скидки в минутах — для UI-прогресса. */
+    productFlashSaleDurationMinutes: {
+      type: Number,
+      default: null,
+      min: 1,
+    },
+    /** Базовая цена до горящей скидки — для восстановления по истечении. */
+    productFlashSaleBasePrice: {
+      type: Number,
+      default: null,
+      min: 0,
+    },
     productLastApprovedDiscountPercent: {
       type: Number,
       default: null,

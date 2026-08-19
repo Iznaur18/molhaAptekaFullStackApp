@@ -25,6 +25,7 @@ import { formatApiErrorMessage } from "@izibuy/shared-lib";
  *   wholesaleOnly?: boolean;
  *   originalOnly?: boolean;
  *   near?: boolean;
+ *   flashSaleOnly?: boolean;
  *   regionCode?: string;
  * }} [options]
  * @returns {Promise<{
@@ -50,6 +51,7 @@ export async function fetchCatalogProductsPage({
   wholesaleOnly = false,
   originalOnly = false,
   near = false,
+  flashSaleOnly = false,
   regionCode,
 } = {}) {
   try {
@@ -72,6 +74,7 @@ export async function fetchCatalogProductsPage({
         ...(wholesaleOnly ? { wholesaleOnly: "true" } : {}),
         ...(originalOnly ? { originalOnly: "true" } : {}),
         ...(near ? { near: "true" } : {}),
+        ...(flashSaleOnly ? { flashSaleOnly: "true" } : {}),
         ...(regionCode ? { regionCode } : {}),
       },
     });

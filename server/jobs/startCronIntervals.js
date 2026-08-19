@@ -7,6 +7,7 @@ import { INSTALLMENT_CRON_INTERVAL_MS } from "../constants/installmentConstants.
 import { INTRO_AD_CRON_INTERVAL_MS } from "../constants/introAdCampaignConstants.js";
 import { PREMIUM_CRON_INTERVAL_MS } from "../constants/premiumConstants.js";
 import { PRODUCT_PROMOTION_CRON_INTERVAL_MS } from "../constants/productPromotionConstants.js";
+import { PRODUCT_FLASH_SALE_CRON_INTERVAL_MS } from "../constants/productFlashSaleConstants.js";
 import { SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS } from "../constants/sellerPersonalCategoryConstants.js";
 import { SITE_HEADER_BANNER_CAMPAIGN_CRON_INTERVAL_MS } from "../constants/siteHeaderBannerCampaignConstants.js";
 import { PRODUCT_PRICE_MARKET_STATUS_CRON_INTERVAL_MS } from "../constants/productPriceMarketStatusConstants.js";
@@ -15,6 +16,7 @@ import { expireStaleUserStories } from "../utils/userStoryHelpers.js";
 import { processInstallmentCronTasks } from "../utils/installmentHelpers.js";
 import { processPremiumCronTasks } from "../utils/premiumAccess.js";
 import { expireProductPromotionsAndSendNotifications } from "../utils/productPromotionHelpers.js";
+import { expireProductFlashSales } from "../services/product/productFlashSaleExpiry.js";
 import { processIntroAdCampaignCronTasks } from "../services/intro-ad/introAdCampaignHelpers.js";
 import { processSellerPersonalCategoryCronTasks } from "../services/seller-personal-category/sellerPersonalCategoryHelpers.js";
 import { processSiteHeaderBannerCampaignCronTasks } from "../services/site-header-banner-campaign/siteHeaderBannerCampaignHelpers.js";
@@ -77,6 +79,11 @@ export function startCronIntervals() {
     "expire_product_promotions",
     PRODUCT_PROMOTION_CRON_INTERVAL_MS,
     expireProductPromotionsAndSendNotifications,
+  );
+  scheduleCronJob(
+    "expire_product_flash_sales",
+    PRODUCT_FLASH_SALE_CRON_INTERVAL_MS,
+    expireProductFlashSales,
   );
   scheduleCronJob(
     "process_intro_ad_campaign_cron_tasks",

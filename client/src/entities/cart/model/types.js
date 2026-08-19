@@ -7,7 +7,8 @@
 /**
  * @typedef {object} CartContextValue
  * @property {CartItemsByProductId} items
- * @property {(productId: string, quantity?: number) => void} addItem
+ * @property {Record<string, number>} priceSnapshots
+ * @property {(productId: string, quantity?: number, unitPriceSnapshot?: number) => void} addItem
  * @property {(productId: string, quantity: number) => void} setItemQuantity
  * @property {(productId: string) => void} removeItem
  * @property {(productIds: string[]) => void} removeItems

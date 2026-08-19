@@ -3,12 +3,14 @@ import { INSTALLMENT_CRON_INTERVAL_MS } from "../constants/installmentConstants.
 import { INTRO_AD_CRON_INTERVAL_MS } from "../constants/introAdCampaignConstants.js";
 import { PREMIUM_CRON_INTERVAL_MS } from "../constants/premiumConstants.js";
 import { PRODUCT_PROMOTION_CRON_INTERVAL_MS } from "../constants/productPromotionConstants.js";
+import { PRODUCT_FLASH_SALE_CRON_INTERVAL_MS } from "../constants/productFlashSaleConstants.js";
 import { PRODUCT_PRICE_MARKET_STATUS_CRON_INTERVAL_MS } from "../constants/productPriceMarketStatusConstants.js";
 import { ONEC_SYNC_INTERVAL_MS } from "../constants/onecConstants.js";
 import { SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS } from "../constants/sellerPersonalCategoryConstants.js";
 import { SITE_HEADER_BANNER_CAMPAIGN_CRON_INTERVAL_MS } from "../constants/siteHeaderBannerCampaignConstants.js";
 import {
   JOB_EXPIRE_PRODUCT_PROMOTIONS,
+  JOB_EXPIRE_PRODUCT_FLASH_SALES,
   JOB_EXPIRE_STALE_USER_STORIES,
   JOB_PROCESS_INSTALLMENT_CRON,
   JOB_PROCESS_INTRO_AD_CRON,
@@ -30,6 +32,10 @@ export const CRON_JOB_DEFINITIONS = [
   {
     name: JOB_EXPIRE_PRODUCT_PROMOTIONS,
     intervalMs: PRODUCT_PROMOTION_CRON_INTERVAL_MS,
+  },
+  {
+    name: JOB_EXPIRE_PRODUCT_FLASH_SALES,
+    intervalMs: PRODUCT_FLASH_SALE_CRON_INTERVAL_MS,
   },
   { name: JOB_PROCESS_INTRO_AD_CRON, intervalMs: INTRO_AD_CRON_INTERVAL_MS },
   {

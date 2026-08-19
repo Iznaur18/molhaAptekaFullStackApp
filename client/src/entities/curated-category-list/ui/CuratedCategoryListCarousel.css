@@ -1,0 +1,83 @@
+.curated-category-list-carousel {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0 0 var(--iz-space-2);
+  padding: 12px 0;
+  border-radius: 1.8rem;
+  background: var(--iz-color-surface);
+  overflow: hidden;
+}
+
+@supports (corner-shape: squircle) {
+  .curated-category-list-carousel {
+    border-radius: 1.75rem;
+    corner-shape: squircle;
+  }
+}
+
+.curated-category-list-carousel__title {
+  margin: 1.2rem 0 0.4rem;
+  padding: 0 0.15rem 0 16px;
+  font-size: clamp(1.08rem, 1rem + 0.35vw, 1.28rem);
+  font-family: var(--iz-font-display);
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--iz-color-text);
+}
+
+.curated-category-list-carousel__scroll {
+  --curated-visible-cards: 5;
+  --curated-card-gap: 12px;
+  --curated-card-min-width: 172px;
+  --curated-card-max-width: 336px;
+  --curated-scroll-pad-x: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  container-type: inline-size;
+}
+
+.curated-category-list-carousel__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.curated-category-list-carousel__track {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: var(--curated-card-gap);
+  width: max-content;
+  min-width: 100%;
+  margin: 0;
+  padding: 0 var(--curated-scroll-pad-x);
+  list-style: none;
+}
+
+.curated-category-list-carousel__item {
+  flex: 0 0 auto;
+  width: clamp(
+    var(--curated-card-min-width),
+    calc(
+      (
+          100cqi - 2 * var(--curated-scroll-pad-x) -
+            (var(--curated-visible-cards) - 1) * var(--curated-card-gap)
+        ) / var(--curated-visible-cards)
+    ),
+    var(--curated-card-max-width)
+  );
+}

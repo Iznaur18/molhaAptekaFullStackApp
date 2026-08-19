@@ -109,16 +109,18 @@
 }
 
 .product-edit-manage__delete-confirm-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .product-edit-manage__delete-confirm-yes,
 .product-edit-manage__delete-confirm-cancel {
   margin: 0;
   padding: 0.55rem 0.85rem;
-  border-radius: 0.5rem;
+  width: 100%;
+  border-radius: 1rem;
   corner-shape: squircle;
   font: inherit;
   font-size: 0.875rem;

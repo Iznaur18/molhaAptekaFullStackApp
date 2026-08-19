@@ -46,6 +46,7 @@ export function MapPointPicker({
   onPointChange,
 }) {
   const mapHostId = useId().replace(/:/g, "");
+  const hostRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const mapRef = useRef(/** @type {L.Map | null} */ (null));
   const markerRef = useRef(/** @type {L.Marker | null} */ (null));
   const onPointChangeRef = useRef(onPointChange);
@@ -56,7 +57,7 @@ export function MapPointPicker({
       return undefined;
     }
 
-    const host = document.getElementById(mapHostId);
+    const host = hostRef.current;
     if (!host) {
       return undefined;
     }
@@ -78,7 +79,6 @@ export function MapPointPicker({
     L.tileLayer(MAP_TILE_URL, {
       attribution: MAP_TILE_ATTRIBUTION,
       maxZoom: 19,
-      subdomains: "abcd",
     }).addTo(map);
 
     const marker = L.marker(center, {
@@ -103,15 +103,24 @@ export function MapPointPicker({
       emitPoint(marker.getLatLng());
     });
 
-    requestAnimationFrame(() => {
+    const invalidateMapSize = () => {
       map.invalidateSize();
-    });
-    const resizeTimer = window.setTimeout(() => {
-      map.invalidateSize();
-    }, 80);
+    };
+    requestAnimationFrame(invalidateMapSize);
+    const resizeTimerShort = window.setTimeout(invalidateMapSize, 80);
+    const resizeTimerLong = window.setTimeout(invalidateMapSize, 240);
+    const observer =
+      typeof ResizeObserver === "function"
+        ? new ResizeObserver(() => {
+            invalidateMapSize();
+          })
+        : null;
+    observer?.observe(host);
 
     return () => {
-      window.clearTimeout(resizeTimer);
+      observer?.disconnect();
+      window.clearTimeout(resizeTimerShort);
+      window.clearTimeout(resizeTimerLong);
       map.remove();
       mapRef.current = null;
       markerRef.current = null;
@@ -134,12 +143,14 @@ export function MapPointPicker({
     }
     const next = L.latLng(lat, lon);
     marker.setLatLng(next);
+    map.invalidateSize();
     map.setView(next, Math.max(map.getZoom(), 15), { animate: true });
   }, [lat, lon]);
 
   return (
     <div
       id={mapHostId}
+      ref={hostRef}
       className={["map-point-picker", className].filter(Boolean).join(" ")}
       aria-label={ariaLabel}
       aria-disabled={disabled || undefined}

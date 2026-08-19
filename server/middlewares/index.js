@@ -1,4 +1,5 @@
 import { uploadMW } from "./uploadMW.js";
+import { uploadExcelMW } from "./uploadExcelMW.js";
 import { uploadVideoMW } from "./uploadVideoMW.js";
 import { checkAuthMW, checkAuthMeMW } from "./checkAuthMW.js";
 import { checkOptionalAuthMW } from "./checkOptionalAuthMW.js";
@@ -32,6 +33,7 @@ import {
   advertisingSubmitRateLimiter,
   moneyMutationRateLimiter,
   productCreateRateLimiter,
+  productBulkImportRateLimiter,
   installmentActionRateLimiter,
   catalogListRateLimiter,
 } from "./rateLimitMW.js";
@@ -51,6 +53,7 @@ export {
   accessLogMW,
   auditStaffActionMW,
   uploadMW,
+  uploadExcelMW,
   uploadVideoMW,
   checkAuthMW,
   checkAuthMeMW,
@@ -85,6 +88,7 @@ export {
   advertisingSubmitRateLimiter,
   moneyMutationRateLimiter,
   productCreateRateLimiter,
+  productBulkImportRateLimiter,
   installmentActionRateLimiter,
   catalogListRateLimiter,
   errorHandler,

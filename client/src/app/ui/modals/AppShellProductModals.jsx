@@ -37,6 +37,7 @@ export function AppShellProductModals({
   handleSetProductQa,
   handleSetProductOriginality,
   handleSetProductWholesale,
+  handleSetProductFlashSale,
   handleSetProductRental,
   handleSetProductAffiliate,
   handleWholesaleSaved,
@@ -48,6 +49,7 @@ export function AppShellProductModals({
   togglingQaProductId,
   togglingOriginalityProductId,
   togglingWholesaleProductId,
+  togglingFlashSaleProductId,
   togglingRentalProductId,
   togglingAffiliateProductId,
   togglingInstallmentProductId,
@@ -114,6 +116,7 @@ export function AppShellProductModals({
         onSetProductQa={handleSetProductQa}
         onSetProductOriginality={handleSetProductOriginality}
         onSetProductWholesale={handleSetProductWholesale}
+        onSetProductFlashSale={handleSetProductFlashSale}
         onSetProductRental={handleSetProductRental}
         onSetProductAffiliate={handleSetProductAffiliate}
         onSetProductInstallment={handleSetProductInstallment}
@@ -138,6 +141,10 @@ export function AppShellProductModals({
         isWholesaleTogglePending={
           promotionProduct?._id != null &&
           togglingWholesaleProductId === String(promotionProduct._id)
+        }
+        isFlashSaleTogglePending={
+          promotionProduct?._id != null &&
+          togglingFlashSaleProductId === String(promotionProduct._id)
         }
         isRentalTogglePending={
           promotionProduct?._id != null &&

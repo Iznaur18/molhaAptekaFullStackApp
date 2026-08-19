@@ -76,6 +76,9 @@ export function useCatalogFilterState({
   const [catalogNear, setCatalogNear] = useState(
     () => initialCatalogQuery?.near ?? false,
   );
+  const [catalogFlashSaleOnly, setCatalogFlashSaleOnly] = useState(
+    () => initialCatalogQuery?.flashSaleOnly ?? false,
+  );
 
   const catalogQueryFromUrl = useMemo(
     () => parseCatalogQueryFromSearchParams(new URLSearchParams(location.search)),
@@ -122,6 +125,7 @@ export function useCatalogFilterState({
       if (next) {
         setCatalogAuctionOnly(false);
         setCatalogNear(false);
+        setCatalogFlashSaleOnly(false);
       }
       return next;
     });
@@ -133,6 +137,7 @@ export function useCatalogFilterState({
       if (next) {
         setCatalogFollowingOnly(false);
         setCatalogNear(false);
+        setCatalogFlashSaleOnly(false);
         setCatalogSort((currentSort) =>
           currentSort === CATALOG_SORT_VIEWS ? CATALOG_SORT_NEWEST : currentSort,
         );
@@ -146,6 +151,7 @@ export function useCatalogFilterState({
       const next = !prev;
       if (next) {
         setCatalogNear(false);
+        setCatalogFlashSaleOnly(false);
       }
       return next;
     });
@@ -156,6 +162,7 @@ export function useCatalogFilterState({
       const next = !prev;
       if (next) {
         setCatalogNear(false);
+        setCatalogFlashSaleOnly(false);
       }
       return next;
     });
@@ -166,6 +173,7 @@ export function useCatalogFilterState({
       const next = !prev;
       if (next) {
         setCatalogNear(false);
+        setCatalogFlashSaleOnly(false);
       }
       return next;
     });
@@ -176,6 +184,7 @@ export function useCatalogFilterState({
       const next = !prev;
       if (next) {
         setCatalogNear(false);
+        setCatalogFlashSaleOnly(false);
       }
       return next;
     });
@@ -186,6 +195,7 @@ export function useCatalogFilterState({
       const next = !prev;
       if (next) {
         setCatalogNear(false);
+        setCatalogFlashSaleOnly(false);
       }
       return next;
     });
@@ -196,6 +206,7 @@ export function useCatalogFilterState({
       const next = !prev;
       if (next) {
         setCatalogNear(false);
+        setCatalogFlashSaleOnly(false);
       }
       return next;
     });
@@ -227,6 +238,7 @@ export function useCatalogFilterState({
     setCatalogAffiliateOnly(false);
     setCatalogWholesaleOnly(false);
     setCatalogOriginalOnly(false);
+    setCatalogFlashSaleOnly(false);
     setCatalogNear(true);
   }, [authUser, catalogNear, isAuthorized, navigate, setIsLoginModalOpen]);
 
@@ -245,6 +257,7 @@ export function useCatalogFilterState({
       wholesaleOnly = false,
       originalOnly = false,
       near = false,
+      flashSaleOnly = false,
     }) => {
       setCatalogSort(sort);
       setSelectedProductCategory(category);
@@ -262,6 +275,7 @@ export function useCatalogFilterState({
       setCatalogWholesaleOnly(wholesaleOnly);
       setCatalogOriginalOnly(originalOnly);
       setCatalogNear(near);
+      setCatalogFlashSaleOnly(flashSaleOnly);
     },
     [],
   );
@@ -293,6 +307,7 @@ export function useCatalogFilterState({
   const resetCatalogFollowingOnLogout = useCallback(() => {
     setCatalogFollowingOnly(false);
     setCatalogNear(false);
+    setCatalogFlashSaleOnly(false);
   }, []);
 
   return {
@@ -324,6 +339,8 @@ export function useCatalogFilterState({
     setCatalogOriginalOnly,
     catalogNear,
     setCatalogNear,
+    catalogFlashSaleOnly,
+    setCatalogFlashSaleOnly,
     appliedProductSearchTerm,
     catalogQueryFromUrl,
     hasProductSearchQuery,

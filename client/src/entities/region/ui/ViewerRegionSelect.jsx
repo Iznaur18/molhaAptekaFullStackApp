@@ -35,6 +35,7 @@ export function ViewerRegionSelect({
         ariaControls={open ? sheetId : undefined}
         isActive={open}
         disabled={disabled}
+        className="header-circle-button--cta"
         onClick={() => {
           if (!disabled) {
             setOpen(true);

@@ -49,7 +49,7 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_ADMIN_ORDERS: "Все заказы",
   TAB_STAFF_AUDIT_LOG_ADMIN: "Журнал действий",
   TAB_SEARCH_SYNONYMS_ADMIN: "Синонимы поиска",
-  TAB_POPULAR_PRODUCTS_ADMIN: "Популярные товары",
+  TAB_POPULAR_PRODUCTS_ADMIN: "Специальный блок",
   TAB_CATEGORY_TREE_ADMIN: "Категории",
   TAB_APP_INTRO_ADMIN: "Intro-ролик",
   TAB_SITE_HEADER_BANNER_ADMIN: "Картинки",

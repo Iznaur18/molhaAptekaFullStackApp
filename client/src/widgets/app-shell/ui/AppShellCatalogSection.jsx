@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 import { HomeCuratedProductListsSection } from "../../../entities/curated-product-list/ui/HomeCuratedProductListsSection.jsx";
 import { CuratedProductListCarouselSkeleton } from "../../../entities/curated-product-list/ui/CuratedProductListCarouselSkeleton.jsx";
+import { HomeCuratedCategoryListsSection } from "../../../entities/curated-category-list/ui/HomeCuratedCategoryListsSection.jsx";
+import { CuratedCategoryListCarouselSkeleton } from "../../../entities/curated-category-list/ui/CuratedCategoryListCarouselSkeleton.jsx";
 import { CatalogBrowserBreadcrumb } from "../../../entities/product-category-display/ui/CatalogBrowserBreadcrumb.jsx";
 import { CatalogBrowserLanding } from "../../../entities/product-category-display/ui/CatalogBrowserLanding.jsx";
 import { CatalogSubcategoryPicker } from "../../../entities/product-category-display/ui/CatalogSubcategoryPicker.jsx";
@@ -86,6 +88,10 @@ const LazyMyProductsCatalogSection = lazy(() =>
  *   homeCuratedProductLists: import('../../../entities/curated-product-list/model/types.js').HomeCuratedProductListFromApi[];
  *   showCuratedProductLists: boolean;
  *   isCuratedProductListsLoading: boolean;
+ *   homeCuratedCategoryLists: import('../../../entities/curated-category-list/model/types.js').HomeCuratedCategoryListFromApi[];
+ *   showCuratedCategoryLists: boolean;
+ *   isCuratedCategoryListsLoading: boolean;
+ *   onOpenCuratedCategory: (category: import('../../../entities/curated-category-list/model/types.js').HomeCuratedCategoryFromApi) => void;
  *   isUserDataConfirmed?: boolean;
  *   onPlaceProductClick?: () => void;
  * }} props
@@ -145,6 +151,10 @@ export function AppShellCatalogGridSection({
   homeCuratedProductLists,
   showCuratedProductLists,
   isCuratedProductListsLoading = false,
+  homeCuratedCategoryLists = [],
+  showCuratedCategoryLists = false,
+  isCuratedCategoryListsLoading = false,
+  onOpenCuratedCategory,
   isUserDataConfirmed = false,
   onPlaceProductClick,
 }) {
@@ -220,6 +230,14 @@ export function AppShellCatalogGridSection({
         />
       ) : showCuratedProductLists && isCuratedProductListsLoading ? (
         <CuratedProductListCarouselSkeleton />
+      ) : null}
+      {showCuratedCategoryLists && homeCuratedCategoryLists.length > 0 ? (
+        <HomeCuratedCategoryListsSection
+          lists={homeCuratedCategoryLists}
+          onOpenCategory={onOpenCuratedCategory}
+        />
+      ) : showCuratedCategoryLists && isCuratedCategoryListsLoading ? (
+        <CuratedCategoryListCarouselSkeleton />
       ) : null}
       {isHomeCatalogMainView ? (
         <h2 className="home-feed-section-title">

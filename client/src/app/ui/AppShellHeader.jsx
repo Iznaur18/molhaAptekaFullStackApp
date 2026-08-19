@@ -284,6 +284,7 @@ function HeaderNavActions({
         />
       ) : null}
       <HeaderUsersStretchMenu
+        variant="cta"
         activeItemKey={stretchActiveItemKey}
         onItemAction={handleStretchItemAction}
       />

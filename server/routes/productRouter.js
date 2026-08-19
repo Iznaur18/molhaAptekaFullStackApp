@@ -27,6 +27,15 @@ import {
   deleteCuratedProductListAdminController,
   addCuratedProductListItemAdminController,
   removeCuratedProductListItemAdminController,
+  getHomeCuratedCategoryListsController,
+  listCuratedCategoryListsAdminController,
+  previewCuratedCategoryListItemAdminController,
+  createCuratedCategoryListAdminController,
+  reorderCuratedCategoryListsAdminController,
+  patchCuratedCategoryListAdminController,
+  deleteCuratedCategoryListAdminController,
+  addCuratedCategoryListItemAdminController,
+  removeCuratedCategoryListItemAdminController,
   getProductCatalogFeedTileDisplaysController,
   patchProductCatalogFeedTileDisplayController,
   getProductManageToggleDisplaysController,
@@ -99,6 +108,9 @@ import {
   getProductInstallmentProgramController,
   upsertProductInstallmentProgramController,
   createInstallmentContractController,
+  downloadProductBulkImportTemplateController,
+  getProductBulkImportJobStatusController,
+  submitProductBulkImportController,
 } from "../controllers/index.js";
 import {
   checkAuthMW,
@@ -111,10 +123,12 @@ import {
   productQuestionRateLimiter,
   productCompareRateLimiter,
   productCreateRateLimiter,
+  productBulkImportRateLimiter,
   catalogListRateLimiter,
   moneyMutationRateLimiter,
   installmentActionRateLimiter,
 } from "../middlewares/index.js";
+import { uploadExcelMW } from "../middlewares/uploadExcelMW.js";
 import {
   makeProductValidation,
   productIdParamValidation,
@@ -159,6 +173,13 @@ import {
   patchCuratedProductListValidation,
   reorderCuratedProductListsValidation,
   addCuratedProductListItemValidation,
+  curatedCategoryListIdParamValidation,
+  curatedCategoryListItemParamValidation,
+  curatedCategoryItemPreviewQueryValidation,
+  createCuratedCategoryListValidation,
+  patchCuratedCategoryListValidation,
+  reorderCuratedCategoryListsValidation,
+  addCuratedCategoryListItemValidation,
   patchProductCategoryDisplayValidation,
   patchProductCategoryNodeDisplayValidation,
   catalogFeedTileKeyParamValidation,
@@ -169,6 +190,7 @@ import {
   patchProductBadgeExplainValidation,
   upsertProductInstallmentProgramValidation,
   createInstallmentContractValidation,
+  productBulkImportJobIdParamValidation,
 } from "../validations/index.js";
 
 const router = createAsyncRouter();
@@ -179,6 +201,24 @@ router.post(
   productCreateRateLimiter,
   makeProductValidation,
   postProductController,
+);
+router.get(
+  "/bulk-import/template",
+  checkAuthMW,
+  downloadProductBulkImportTemplateController,
+);
+router.post(
+  "/bulk-import",
+  checkAuthMW,
+  productBulkImportRateLimiter,
+  uploadExcelMW.single("file"),
+  submitProductBulkImportController,
+);
+router.get(
+  "/bulk-import/:jobId",
+  checkAuthMW,
+  productBulkImportJobIdParamValidation,
+  getProductBulkImportJobStatusController,
 );
 router.get(
   "/",
@@ -287,6 +327,66 @@ router.delete(
   checkAdminMW,
   curatedProductListProductIdParamValidation,
   removeCuratedProductListItemAdminController,
+);
+router.get(
+  "/curated-category-lists/home",
+  checkOptionalAuthMW,
+  getHomeCuratedCategoryListsController,
+);
+router.get(
+  "/admin/curated-category-lists",
+  checkAuthMW,
+  checkAdminMW,
+  listCuratedCategoryListsAdminController,
+);
+router.get(
+  "/admin/curated-category-lists/item-preview",
+  checkAuthMW,
+  checkAdminMW,
+  curatedCategoryItemPreviewQueryValidation,
+  previewCuratedCategoryListItemAdminController,
+);
+router.post(
+  "/admin/curated-category-lists",
+  checkAuthMW,
+  checkAdminMW,
+  createCuratedCategoryListValidation,
+  createCuratedCategoryListAdminController,
+);
+router.patch(
+  "/admin/curated-category-lists/reorder",
+  checkAuthMW,
+  checkAdminMW,
+  reorderCuratedCategoryListsValidation,
+  reorderCuratedCategoryListsAdminController,
+);
+router.patch(
+  "/admin/curated-category-lists/:listId",
+  checkAuthMW,
+  checkAdminMW,
+  patchCuratedCategoryListValidation,
+  patchCuratedCategoryListAdminController,
+);
+router.delete(
+  "/admin/curated-category-lists/:listId",
+  checkAuthMW,
+  checkAdminMW,
+  curatedCategoryListIdParamValidation,
+  deleteCuratedCategoryListAdminController,
+);
+router.post(
+  "/admin/curated-category-lists/:listId/items",
+  checkAuthMW,
+  checkAdminMW,
+  addCuratedCategoryListItemValidation,
+  addCuratedCategoryListItemAdminController,
+);
+router.delete(
+  "/admin/curated-category-lists/:listId/items/:itemKey",
+  checkAuthMW,
+  checkAdminMW,
+  curatedCategoryListItemParamValidation,
+  removeCuratedCategoryListItemAdminController,
 );
 router.get(
   "/admin/categories",

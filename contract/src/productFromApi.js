@@ -9,10 +9,15 @@ export const productFromApiSchema = z
     _id: z.coerce.string().min(1),
     productName: z.string().nullish(),
     productPrice: z.number().nullish(),
+    productOldPrice: z.number().nullish(),
     productModerationStatus: z.enum(PRODUCT_MODERATION_STATUSES).nullish(),
     productModerationComment: z.string().nullish(),
     productIsAvailable: z.boolean().nullish(),
     productQaEnabled: z.boolean().nullish(),
     soldQuantity: z.number().nullish(),
+    productFlashSaleEnabled: z.boolean().nullish(),
+    productFlashSaleEndsAt: z.union([z.string(), z.date()]).nullish(),
+    productFlashSaleBasePrice: z.number().nullish(),
+    productFlashSaleDurationMinutes: z.number().int().min(1).nullish(),
   })
   .passthrough();

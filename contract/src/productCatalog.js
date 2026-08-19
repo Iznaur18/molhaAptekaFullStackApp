@@ -163,6 +163,8 @@ export const catalogProductsQuerySchema = z.object({
   originalOnly: optionalTruthyFlag,
   /** Товары рядом с адресом профиля (см. PRODUCT_CATALOG_NEAR_RADIUS_KM). */
   near: optionalTruthyFlag,
+  /** Только активные горящие скидки. */
+  flashSaleOnly: optionalTruthyFlag,
   moderationStatus: z.enum(["pending", "rejected"]).optional(),
   regionCode: optionalRuRegionCodeFieldSchema,
 });

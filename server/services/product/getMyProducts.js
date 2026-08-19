@@ -38,6 +38,9 @@ const moderationStatusFromQuery = (query) => {
  * }} input
  */
 export async function getMyProducts({ userId, query }) {
+  const { expireProductFlashSales } = await import("./productFlashSaleExpiry.js");
+  await expireProductFlashSales();
+
   const { page, limit, skip } = parsePagination(query);
   const category = categoryFromQuery(query);
   const reviewsOnly = query.sort === PRODUCT_SORT_REVIEWS;

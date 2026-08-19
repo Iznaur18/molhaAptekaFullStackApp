@@ -12,6 +12,7 @@ import { UserFollowModel, UserModel } from "../../models/index.js";
 import { createUserInAppNotification } from "../user/userInAppNotifications.js";
 import { enrichProductWithAuctionFields } from "./productAuction.js";
 import { enrichProductWithPromoCodeFields } from "./productPromoCode.js";
+import { normalizeExpiredFlashSaleProductFields } from "./productFlashSaleExpiry.js";
 
 /**
  * @param {number} price
@@ -111,7 +112,9 @@ export const enrichProductWithDiscountFields = (product) => {
  */
 export const enrichProductApiFields = (product) =>
   enrichProductWithPromoCodeFields(
-    enrichProductWithDiscountFields(enrichProductWithAuctionFields(product)),
+    enrichProductWithDiscountFields(
+      enrichProductWithAuctionFields(normalizeExpiredFlashSaleProductFields(product)),
+    ),
   );
 
 export const buildProductSaleOnlyMatch = () => ({

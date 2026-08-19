@@ -1,4 +1,5 @@
 import { catalogQueryKeys } from "../model/catalogQueryKeys.js";
+import { allProductsQueryKeys } from "../model/allProductsQueryKeys.js";
 
 /** @typedef {import('../model/types.js').ProductFromApi} ProductFromApi */
 
@@ -147,5 +148,8 @@ export function prependProductToAllCatalogCaches(queryClient, product) {
  * @param {import('@tanstack/react-query').QueryClient} queryClient
  */
 export function invalidateCatalogProducts(queryClient) {
-  return queryClient.invalidateQueries({ queryKey: catalogQueryKeys.all });
+  return Promise.all([
+    queryClient.invalidateQueries({ queryKey: catalogQueryKeys.all }),
+    queryClient.invalidateQueries({ queryKey: allProductsQueryKeys.all }),
+  ]);
 }

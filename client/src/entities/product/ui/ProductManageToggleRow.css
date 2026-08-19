@@ -9,7 +9,7 @@
   margin: 0;
   padding: 0.625rem 0.875rem;
   border: 1px solid var(--iz-color-action-border);
-  border-radius: 12px;
+  border-radius: 16px;
   corner-shape: squircle;
   background: var(--iz-color-action-soft);
   color: var(--iz-color-action);
@@ -43,7 +43,7 @@
 .product-manage-toggle-row_pending {
   justify-content: center;
   min-height: 3.25rem;
-  border-radius: 12px;
+  border-radius: 16px;
   corner-shape: squircle;
   border: 1px solid var(--iz-color-action-border);
   background: var(--iz-color-action-soft);

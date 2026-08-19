@@ -14,6 +14,7 @@
  *   catalogWholesaleOnly?: boolean;
  *   catalogOriginalOnly?: boolean;
  *   catalogNear?: boolean;
+ *   catalogFlashSaleOnly?: boolean;
  * }} params
  */
 export function isHomeCuratedProductListsVisible({
@@ -32,6 +33,7 @@ export function isHomeCuratedProductListsVisible({
   catalogWholesaleOnly = false,
   catalogOriginalOnly = false,
   catalogNear = false,
+  catalogFlashSaleOnly = false,
 }) {
   return (
     isHomeCatalogMainView &&
@@ -48,6 +50,7 @@ export function isHomeCuratedProductListsVisible({
     !catalogAffiliateOnly &&
     !catalogWholesaleOnly &&
     !catalogOriginalOnly &&
-    !catalogNear
+    !catalogNear &&
+    !catalogFlashSaleOnly
   );
 }

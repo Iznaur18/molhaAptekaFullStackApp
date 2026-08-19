@@ -324,6 +324,16 @@
   cursor: not-allowed;
 }
 
+.wholesale-price-modal__field-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.wholesale-price-modal__field--half {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .wholesale-price-modal__scrim,
   .wholesale-price-modal__panel {

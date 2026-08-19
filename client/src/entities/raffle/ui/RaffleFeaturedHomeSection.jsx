@@ -1,7 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 
 import { RAFFLE_FEATURED_CAROUSEL_UI } from "../../../shared/config/appUiCopy.js";
-import { HomeFeaturedRaffleModal } from "./HomeFeaturedRaffleModal.jsx";
 
 import "./RaffleFeaturedHomeSection.css";
 
@@ -12,38 +11,15 @@ import "./RaffleFeaturedHomeSection.css";
  *   getManage?: (raffle: import('../model/types.js').RaffleFromApi) => object | null;
  * }} props
  */
+// eslint-disable-next-line no-unused-vars -- getManage зарезервирован: контролы управления розыгрышем пока не рендерятся в этой секции (см. useHomeFeaturedContent.getFeaturedRaffleManage)
 export function RaffleFeaturedHomeSection({ raffles, onOpenProducts, getManage }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const openModal = useCallback(() => {
-    setIsModalOpen(true);
-  }, []);
-
-  const closeModal = useCallback(() => {
-    setIsModalOpen(false);
-  }, []);
-
-  const wrapManage = useCallback(
-    (raffle) => {
-      const manage = getManage?.(raffle) ?? null;
-      if (!manage) {
-        return null;
-      }
-
-      return {
-        ...manage,
-        onEdit: () => {
-          closeModal();
-          manage.onEdit?.();
-        },
-        onDelete: () => {
-          closeModal();
-          manage.onDelete?.();
-        },
-      };
-    },
-    [closeModal, getManage],
-  );
+  const openFirstRaffleProducts = useCallback(() => {
+    const firstId = Array.isArray(raffles) ? raffles[0]?._id : null;
+    if (!firstId) {
+      return;
+    }
+    onOpenProducts(String(firstId));
+  }, [onOpenProducts, raffles]);
 
   if (!Array.isArray(raffles) || raffles.length === 0) {
     return null;
@@ -57,20 +33,12 @@ export function RaffleFeaturedHomeSection({ raffles, onOpenProducts, getManage }
       <button
         type="button"
         className="raffle-featured-home-section__reveal"
-        onClick={openModal}
+        onClick={openFirstRaffleProducts}
       >
         <span className="raffle-featured-home-section__reveal-label">
           {RAFFLE_FEATURED_CAROUSEL_UI.SHOW}
         </span>
       </button>
-
-      <HomeFeaturedRaffleModal
-        visible={isModalOpen}
-        raffles={raffles}
-        onClose={closeModal}
-        onOpenProducts={onOpenProducts}
-        getManage={wrapManage}
-      />
     </section>
   );
 }

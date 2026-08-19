@@ -205,19 +205,13 @@
 
 .address-delivery-fields__map-fullscreen-overlay {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   z-index: 500;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.85rem 1rem calc(0.85rem + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(
-    to top,
-    color-mix(in srgb, var(--iz-color-surface, #fff) 96%, transparent) 55%,
-    transparent
-  );
+  justify-content: space-between;
+  padding: calc(0.85rem + env(safe-area-inset-top, 0px)) 1rem
+    calc(0.85rem + env(safe-area-inset-bottom, 0px));
   pointer-events: none;
 }
 
@@ -225,7 +219,64 @@
   pointer-events: auto;
 }
 
-.address-delivery-fields__map-fullscreen-selected {
+.address-delivery-fields__map-fullscreen-top {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.address-delivery-fields__map-fullscreen-search {
+  padding: 0.75rem;
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--iz-color-surface, #fff) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--iz-color-border) 70%, transparent);
+  box-shadow: 0 4px 16px rgb(15 23 42 / 10%);
+  cursor: text;
+}
+
+.address-delivery-fields__map-fullscreen-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--iz-color-ink);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.address-delivery-fields__map-fullscreen-input:focus {
+  outline: none;
+}
+
+.address-delivery-fields__map-fullscreen-suggestions {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: min(16rem, 42vh);
+  overflow-y: auto;
+  border: 1px solid color-mix(in srgb, var(--iz-color-border) 70%, transparent);
+  border-radius: 0.85rem;
+  background: color-mix(in srgb, var(--iz-color-surface, #fff) 96%, transparent);
+  box-shadow: 0 4px 16px rgb(15 23 42 / 10%);
+}
+
+.address-delivery-fields__map-fullscreen-suggestion {
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  color: var(--iz-color-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.address-delivery-fields__map-fullscreen-suggestion:hover,
+.address-delivery-fields__map-fullscreen-suggestion:focus-visible {
+  background: var(--color-surface-muted, var(--iz-color-surface-muted));
+}
+
+.address-delivery-fields__map-fullscreen-note {
   margin: 0;
   padding: 0.65rem 0.85rem;
   border-radius: 0.65rem;
@@ -233,8 +284,12 @@
   border: 1px solid color-mix(in srgb, var(--iz-color-border) 70%, transparent);
   font-size: 0.875rem;
   line-height: 1.35;
-  color: var(--iz-color-ink);
-  box-shadow: 0 4px 16px rgb(15 23 42 / 10%);
+}
+
+.address-delivery-fields__map-fullscreen-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .address-delivery-fields__map-fullscreen-done {

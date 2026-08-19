@@ -9,6 +9,7 @@ import { AddToCartButton } from "../../../../features/cart-add/ui/AddToCartButto
  *   onRequestLogin: () => void;
  *   purchaseLimit?: number;
  *   canShowAddToCart: boolean;
+ *   unitPriceSnapshot?: number;
  *   className?: string;
  * }} props
  */
@@ -18,6 +19,7 @@ export function ProductDetailsModalPurchaseActions({
   onRequestLogin,
   purchaseLimit,
   canShowAddToCart,
+  unitPriceSnapshot,
   className = "",
 }) {
   if (!canShowAddToCart) {
@@ -36,6 +38,7 @@ export function ProductDetailsModalPurchaseActions({
           isAuthorized={isAuthorized}
           onRequestLogin={onRequestLogin}
           maxQuantity={purchaseLimit}
+          unitPriceSnapshot={unitPriceSnapshot}
           variant="detail"
         />
       </div>

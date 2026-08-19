@@ -1,0 +1,197 @@
+.product-flash-sale-countdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.125rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-warning) 28%, var(--iz-color-border));
+  border-radius: 1rem;
+  background: var(--iz-color-warning-surface);
+}
+
+.product-flash-sale-countdown--urgent {
+  border-color: color-mix(in srgb, var(--iz-color-danger) 32%, var(--iz-color-border));
+  background: var(--iz-color-danger-surface);
+}
+
+.product-flash-sale-countdown__lead {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.product-flash-sale-countdown__icon {
+  --flash-sale-border-active: var(--iz-color-warning);
+  --flash-sale-border-track: color-mix(
+    in srgb,
+    var(--iz-color-warning) 22%,
+    var(--iz-color-border)
+  );
+
+  position: relative;
+  isolation: isolate;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 2.625rem;
+  height: 2.625rem;
+  border-radius: 0.675rem;
+  background: color-mix(in srgb, var(--iz-color-warning) 16%, var(--iz-color-surface));
+  color: var(--iz-color-warning);
+}
+
+.product-flash-sale-countdown__icon-border {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.product-flash-sale-countdown__icon-border-progress {
+  fill: none;
+  stroke: var(--flash-sale-border-active);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: rotate(-90deg);
+  transition: stroke-dashoffset 0.85s linear;
+}
+
+.product-flash-sale-countdown__icon--static-border::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--flash-sale-border-track);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.product-flash-sale-countdown__icon svg:last-child {
+  grid-area: 1 / 1;
+  position: relative;
+  z-index: 1;
+  fill: currentColor;
+  stroke: none;
+}
+
+.product-flash-sale-countdown--urgent .product-flash-sale-countdown__icon {
+  --flash-sale-border-active: var(--iz-color-danger);
+  --flash-sale-border-track: color-mix(
+    in srgb,
+    var(--iz-color-danger) 22%,
+    var(--iz-color-border)
+  );
+  background: color-mix(in srgb, var(--iz-color-danger) 16%, var(--iz-color-surface));
+  color: var(--iz-color-danger);
+}
+
+.product-flash-sale-countdown__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.product-flash-sale-countdown__title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.product-flash-sale-countdown__title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--iz-color-warning-text);
+}
+
+.product-flash-sale-countdown--urgent .product-flash-sale-countdown__title {
+  color: var(--iz-color-danger-text);
+}
+
+.product-flash-sale-countdown__discount {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background: var(--iz-color-warning);
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+}
+
+.product-flash-sale-countdown--urgent .product-flash-sale-countdown__discount {
+  background: var(--iz-color-danger);
+}
+
+.product-flash-sale-countdown__caption {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: color-mix(in srgb, var(--iz-color-warning-text) 72%, var(--iz-color-text-muted));
+}
+
+.product-flash-sale-countdown--urgent .product-flash-sale-countdown__caption {
+  color: color-mix(in srgb, var(--iz-color-danger-text) 72%, var(--iz-color-text-muted));
+}
+
+.product-flash-sale-countdown__timer {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.product-flash-sale-countdown__unit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  padding: 0.22rem 0.35rem;
+  border-radius: 0.375rem;
+  background: color-mix(in srgb, var(--iz-color-surface) 88%, var(--iz-color-warning-surface));
+  color: var(--iz-color-warning-text);
+  font-size: 0.9375rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.product-flash-sale-countdown--urgent .product-flash-sale-countdown__unit {
+  background: color-mix(in srgb, var(--iz-color-surface) 88%, var(--iz-color-danger-surface));
+  color: var(--iz-color-danger-text);
+}
+
+.product-flash-sale-countdown__sep {
+  flex-shrink: 0;
+  color: color-mix(in srgb, var(--iz-color-warning-text) 45%, transparent);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1;
+  user-select: none;
+}
+
+.product-flash-sale-countdown--urgent .product-flash-sale-countdown__sep {
+  color: color-mix(in srgb, var(--iz-color-danger-text) 45%, transparent);
+}
+
+.product-flash-sale-countdown__expired {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--iz-color-danger-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-flash-sale-countdown__icon-border-progress {
+    transition: none;
+  }
+}

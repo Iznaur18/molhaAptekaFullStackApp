@@ -59,12 +59,18 @@ export const useHomeCatalogGridProps = () => {
     homeCuratedProductLists,
     showCuratedProductLists,
     curatedListsQuery,
+    homeCuratedCategoryLists,
+    showCuratedCategoryLists,
+    curatedCategoryListsQuery,
+    handleHomeCuratedCategoryClick,
     handlePlaceProductClick,
     viewerRegionCode,
   } = ctx;
 
   const isCuratedProductListsLoading =
     showCuratedProductLists && curatedListsQuery.isPending;
+  const isCuratedCategoryListsLoading =
+    showCuratedCategoryLists && curatedCategoryListsQuery.isPending;
   const isUserDataConfirmed = authUser?.isUserDataConfirmed === true;
 
   return useMemo(
@@ -122,6 +128,10 @@ export const useHomeCatalogGridProps = () => {
       homeCuratedProductLists,
       showCuratedProductLists,
       isCuratedProductListsLoading,
+      homeCuratedCategoryLists,
+      showCuratedCategoryLists,
+      isCuratedCategoryListsLoading,
+      onOpenCuratedCategory: handleHomeCuratedCategoryClick,
       isUserDataConfirmed,
       onPlaceProductClick: handlePlaceProductClick,
     }),
@@ -177,6 +187,10 @@ export const useHomeCatalogGridProps = () => {
       homeCuratedProductLists,
       showCuratedProductLists,
       isCuratedProductListsLoading,
+      homeCuratedCategoryLists,
+      showCuratedCategoryLists,
+      isCuratedCategoryListsLoading,
+      handleHomeCuratedCategoryClick,
       isUserDataConfirmed,
       handlePlaceProductClick,
       viewerRegionCode,

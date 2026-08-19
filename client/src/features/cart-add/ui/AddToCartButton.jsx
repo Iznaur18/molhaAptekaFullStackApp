@@ -17,6 +17,7 @@ import "./AddToCartButton.css";
  *   isAuthorized: boolean;
  *   onRequestLogin: () => void;
  *   maxQuantity?: number;
+ *   unitPriceSnapshot?: number;
  *   variant?: 'default' | 'detail';
  * }} props
  */
@@ -25,6 +26,7 @@ export function AddToCartButton({
   isAuthorized,
   onRequestLogin,
   maxQuantity,
+  unitPriceSnapshot,
   variant = "default",
 }) {
   const navigate = useNavigate();
@@ -60,7 +62,7 @@ export function AddToCartButton({
         className="add-to-cart"
         onClick={() => {
           if (purchaseLimit != null && purchaseLimit < 1) return;
-          addItem(productId, 1);
+          addItem(productId, 1, unitPriceSnapshot);
         }}
         disabled={purchaseLimit != null && purchaseLimit < 1}
       >

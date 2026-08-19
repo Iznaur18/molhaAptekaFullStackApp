@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { createPortal } from "react-dom";
 
 import {
@@ -19,6 +20,8 @@ import { ProductAffiliateShareButton } from "./ProductAffiliateShareButton.jsx";
 import { ProductDetailsAuctionTeaser } from "./ProductDetailsAuctionTeaser.jsx";
 import { ProductDetailsCompareTeaser } from "./ProductDetailsCompareTeaser.jsx";
 import { ProductDetailsContentSwitcher } from "./ProductDetailsContentSwitcher.jsx";
+import { ProductDetailsFlashSaleCountdown } from "./ProductDetailsFlashSaleCountdown.jsx";
+import { invalidateCatalogProducts } from "../../lib/catalogProductsQueryCache.js";
 import { ProductDetailsInstallmentTeaser } from "./ProductDetailsInstallmentTeaser.jsx";
 import { ProductDetailsModalPurchaseActions } from "./ProductDetailsModalPurchaseActions.jsx";
 import { ProductDetailsPromoTeaser } from "./ProductDetailsPromoTeaser.jsx";
@@ -106,9 +109,15 @@ export function ProductDetailsModalDetailsTab({
     setBadgeExplain(request);
   };
 
+  const queryClient = useQueryClient();
   const sellerId = getProductSellerId(product) ?? "";
   const productId = String(product._id);
   const installmentEnabled = product.productInstallmentEnabled === true;
+  const unitPriceSnapshot = Math.floor(Number(product.productPrice)) || 0;
+
+  const handleFlashSaleExpired = () => {
+    void invalidateCatalogProducts(queryClient);
+  };
 
   const commerceBody = showPriceBlock ? (
     <>
@@ -187,6 +196,10 @@ export function ProductDetailsModalDetailsTab({
         onDiscountBadgePress={openBadgeExplain}
         onLoyaltyBadgePress={openBadgeExplain}
       />
+      <ProductDetailsFlashSaleCountdown
+        product={product}
+        onExpired={handleFlashSaleExpired}
+      />
       {showInlinePurchaseActions ? (
         <ProductDetailsModalPurchaseActions
           productId={productId}
@@ -194,6 +207,7 @@ export function ProductDetailsModalDetailsTab({
           onRequestLogin={onRequestLogin}
           purchaseLimit={purchaseLimit}
           canShowAddToCart={canShowAddToCart}
+          unitPriceSnapshot={unitPriceSnapshot}
         />
       ) : null}
       <ProductDetailsWholesaleOffer

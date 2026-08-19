@@ -15,6 +15,7 @@ import { selectCartCheckoutSummary } from "../../../entities/cart/lib/selectCart
 import { selectCartLines } from "../../../entities/cart/lib/selectCartLines.js";
 import { useCart } from "../../../entities/cart/model/useCart.js";
 import { useCartSelection } from "../../../entities/cart/model/useCartSelection.js";
+import { useCartFlashSalePriceTick } from "../../../entities/cart/model/useCartFlashSalePriceTick.js";
 import { useCreateOrderMutation } from "../../../entities/order/model/useCreateOrderMutation.js";
 import { useAllProductsQuery } from "../../../entities/product/model/useAllProductsQuery.js";
 import { navigateToProductDetails } from "../../../entities/product/lib/navigateToProductDetails.js";
@@ -51,11 +52,12 @@ export function CartPage({
   onGoToCatalog,
   onCheckoutSuccess,
 }) {
-  const { items, clearCart, removeItems } = useCart();
+  const { items, clearCart, removeItems, priceSnapshots } = useCart();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const createOrderMutation = useCreateOrderMutation();
   const productsQuery = useAllProductsQuery();
+  const cartPriceNowMs = useCartFlashSalePriceTick(items, productsQuery.data ?? []);
   const acceptedBidsQuery = useMyAcceptedBidsQuery({ enabled: isAuthorized });
   const appliedPromosQuery = useQuery({
     queryKey: productPromoCodeQueryKeys.appliedMine(),
@@ -117,8 +119,10 @@ export function CartPage({
         items,
         productsQuery.data ?? [],
         appliedPromosQuery.data?.appliedPromos ?? [],
+        priceSnapshots,
+        cartPriceNowMs,
       ),
-    [items, productsQuery.data, appliedPromosQuery.data],
+    [items, productsQuery.data, appliedPromosQuery.data, priceSnapshots, cartPriceNowMs],
   );
 
   const visibleLines = useMemo(

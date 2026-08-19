@@ -2,9 +2,9 @@
   position: relative;
   box-sizing: border-box;
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.9rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.35rem;
   margin: 0 0 0.75rem;
   padding: 0.75rem;
   overflow: hidden;
@@ -23,16 +23,121 @@
     );
 }
 
+.raffle-products-page__hero {
+  position: relative;
+}
+
+.raffle-products-page__header_desktop {
+  display: none;
+}
+
+.raffle-products-page__summary-layout {
+  display: block;
+}
+
 .raffle-products-page__media {
   position: relative;
-  flex: 0 0 auto;
   box-sizing: border-box;
-  width: 5.5rem;
-  height: 5.5rem;
-  border-radius: 1rem;
+  width: 100%;
+  height: 300px;
+  aspect-ratio: auto;
+  container-type: inline-size;
+  container-name: raffle-media;
+  margin: 0 0 0.75rem;
+  flex: 0 0 auto;
+  border-radius: 22px;
   overflow: hidden;
   background: var(--iz-color-surface-muted);
   box-shadow: 0 1px 0 color-mix(in srgb, var(--iz-color-ink) 6%, transparent);
+}
+
+@container app-viewport (min-width: 900px) {
+  .raffle-products-page__summary-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.9rem;
+    align-items: start;
+  }
+
+  .raffle-products-page__summary-side {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .raffle-products-page__media {
+    height: 342px;
+    aspect-ratio: auto;
+    margin-bottom: 0.5rem;
+  }
+
+  .raffle-products-page__header {
+    margin-bottom: 0;
+    padding: 0.5rem;
+  }
+
+  .raffle-products-page__header_mobile {
+    display: none;
+  }
+
+  .raffle-products-page__header_desktop {
+    display: flex;
+    margin-top: 0;
+    padding: 0.8rem 0.9rem;
+  }
+
+  .raffle-products-page__header_desktop .raffle-products-page__manage {
+    display: none;
+  }
+
+  .raffle-products-page__progress {
+    margin: 0;
+    padding: 0.65rem 0.7rem;
+    gap: 0.45rem;
+  }
+
+  .raffle-products-page__stats {
+    gap: 0.35rem;
+  }
+
+  .raffle-products-page__stat {
+    padding: 0.45rem 0.35rem;
+  }
+
+  .raffle-products-page__description_desktop-hidden {
+    display: none;
+  }
+
+  .raffle-products-page__manage-desktop {
+    display: block !important;
+    margin: 0 0 0.85rem;
+  }
+
+  .raffle-products-page__header-description {
+    display: -webkit-box;
+    margin: 0.35rem 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    color: var(--iz-color-text);
+    opacity: 0.9;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .raffle-products-page__summary-description-desktop {
+    display: block !important;
+    margin: 0.55rem 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    color: var(--iz-color-text);
+    opacity: 0.9;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
 }
 
 .raffle-products-page__media:empty {
@@ -46,13 +151,19 @@
   object-fit: cover;
 }
 
+.raffle-products-page__media .raffle-prize-media__video-fg {
+  object-fit: cover !important;
+}
+
+.raffle-products-page__media img.raffle-products-page__media-el {
+  object-fit: cover;
+}
+
 .raffle-products-page__copy {
   display: flex;
-  flex: 1 1 auto;
   flex-direction: column;
   gap: 0.35rem;
   min-width: 0;
-  padding-right: 0.25rem;
 }
 
 .raffle-products-page__eyebrow {
@@ -85,6 +196,26 @@
   opacity: 0.9;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+.raffle-products-page__header-description {
+  display: none;
+}
+
+.raffle-products-page__summary-description-desktop {
+  display: none;
+}
+
+.raffle-products-page__manage {
+  position: relative;
+  z-index: 4; /* поверх swipe-overlay */
+  margin-top: 0.35rem;
+}
+
+.raffle-products-page__manage-desktop {
+  display: none;
+  position: relative;
+  z-index: 4; /* поверх swipe-overlay */
 }
 
 .raffle-products-page__progress {
@@ -179,4 +310,99 @@
 
 .raffle-products-page__state_error {
   color: var(--iz-color-danger);
+}
+
+.raffle-products-page__content-anim {
+  animation: raffle-products-page-slide-forward 220ms ease;
+}
+
+.raffle-products-page__products-block {
+  margin-top: 10px;
+}
+
+.raffle-products-page__content-anim_backward {
+  animation-name: raffle-products-page-slide-backward;
+}
+
+.raffle-products-page__swipe-overlay {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 2;
+  opacity: 0.001; /* оставляем невидимым, но делаем render/drag стабильнее */
+  pointer-events: auto;
+  touch-action: pan-y;
+  border-radius: inherit;
+}
+
+.raffle-products-page__swipe-track {
+  height: 100%;
+  display: flex;
+  will-change: transform;
+  backface-visibility: hidden;
+  touch-action: pan-y;
+  align-items: stretch;
+}
+
+.raffle-products-page__swipe-slide {
+  flex: 0 0 100%;
+  min-width: 100%;
+  height: 100%;
+  min-height: 100%;
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(0);
+}
+
+.raffle-products-page__swipe-dots {
+  position: absolute;
+  left: 50%;
+  bottom: 0.75rem;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--iz-color-overlay-strong) 42%, transparent);
+  backdrop-filter: blur(6px);
+  pointer-events: auto;
+}
+
+.raffle-products-page__swipe-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--iz-color-on-contrast) 55%, transparent);
+  cursor: pointer;
+}
+
+.raffle-products-page__swipe-dot_active {
+  background: var(--iz-color-on-contrast);
+}
+
+@keyframes raffle-products-page-slide-forward {
+  from {
+    opacity: 0;
+    transform: translateX(0.8rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes raffle-products-page-slide-backward {
+  from {
+    opacity: 0;
+    transform: translateX(-0.8rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }

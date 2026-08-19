@@ -3,6 +3,7 @@ import {
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
+  CATALOG_FILTER_FLASH_SALE_ONLY,
   CATALOG_FILTER_NEAR,
   CATALOG_FILTER_ORIGINAL_ONLY,
   CATALOG_FILTER_RENTAL_ONLY,
@@ -24,10 +25,14 @@ import {
  *   wholesaleOnly?: boolean;
  *   originalOnly?: boolean;
  *   near?: boolean;
+ *   flashSaleOnly?: boolean;
  * }} query
  * @returns {string | null}
  */
 export function resolveActiveCatalogFeedLabel(query) {
+  if (query.flashSaleOnly) {
+    return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_FLASH_SALE_ONLY];
+  }
   if (query.near) {
     return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_NEAR];
   }

@@ -15,6 +15,9 @@ import { shouldShowProductLoyaltyPointsBadge } from "../../lib/shouldShowProduct
 import { isCurrentUserProductSeller } from "../../lib/isCurrentUserProductSeller.js";
 import { formatProductWholesaleBadgeLabel } from "@izibuy/shared-lib";
 
+import { PRODUCT_FLASH_SALE_UI } from "../../../../shared/config/appUiCopy.js";
+import { isProductFlashSaleActive } from "../../lib/isProductFlashSaleActive.js";
+
 /**
  * @param {Parameters<import('../ProductCard.jsx').ProductCard>[0]} props
  * @param {string} currentUserId
@@ -69,6 +72,11 @@ export function useProductCardChromeFlags(props, currentUserId) {
     ? formatProductWholesaleBadgeLabel(product)
     : null;
   const showWholesaleBadge = wholesaleBadgeLabel != null;
+  const showFlashSaleBadge =
+    !isModerationQueue && isProductFlashSaleActive(product);
+  const flashSaleBadgeLabel = showFlashSaleBadge
+    ? PRODUCT_FLASH_SALE_UI.CATALOG_BADGE(discountPercent)
+    : null;
   const showBannerLayout =
     promotionFullWidth &&
     isPromotionActive &&
@@ -144,6 +152,8 @@ export function useProductCardChromeFlags(props, currentUserId) {
     affiliatePercent,
     showWholesaleBadge,
     wholesaleBadgeLabel,
+    showFlashSaleBadge,
+    flashSaleBadgeLabel,
     showBannerLayout,
     showImageOverlayBadges,
     showWishlistToggle,

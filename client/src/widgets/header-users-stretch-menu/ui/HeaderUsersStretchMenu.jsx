@@ -23,9 +23,14 @@ const OPEN_HEIGHT_PX = resolveHeaderUsersStretchMenuHeight(MENU_ITEMS.length);
  * @param {{
  *   activeItemKey?: import("../lib/buildHeaderUsersMenuItems.js").HeaderUsersMenuItemKey | null;
  *   onItemAction: (action: import("../lib/buildHeaderUsersMenuItems.js").HeaderUsersMenuItemAction) => void;
+ *   variant?: "default" | "cta";
  * }} props
  */
-export function HeaderUsersStretchMenu({ activeItemKey = null, onItemAction }) {
+export function HeaderUsersStretchMenu({
+  activeItemKey = null,
+  onItemAction,
+  variant = "default",
+}) {
   const menuId = useId();
   const anchorRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const [isOpen, setIsOpen] = useState(false);
@@ -133,6 +138,7 @@ export function HeaderUsersStretchMenu({ activeItemKey = null, onItemAction }) {
 
   const shellClassName = [
     "header-users-stretch__shell",
+    variant === "cta" && "header-users-stretch__shell--cta",
     isExpanded && "header-users-stretch__shell--open",
   ]
     .filter(Boolean)

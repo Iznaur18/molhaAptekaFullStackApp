@@ -79,6 +79,11 @@ export function ProductCatalogStatusBadges({
           {nearDistanceLabel}
         </p>
       ) : null}
+      {flags.showFlashSaleBadge && flags.flashSaleBadgeLabel ? (
+        <p className="product-card__flash-sale-badge" role="status">
+          {flags.flashSaleBadgeLabel}
+        </p>
+      ) : null}
       {flags.showRaffleBadge ? (
         <p className="product-card__raffle-badge" role="status">
           {PRODUCT_CARD_UI.RAFFLE_BADGE}

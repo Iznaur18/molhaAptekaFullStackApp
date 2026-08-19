@@ -15,6 +15,9 @@ export const MONEY_MUTATION_RATE_LIMIT_PER_HOUR = 10;
 /** POST /product — создание карточки продавцом. */
 export const PRODUCT_CREATE_RATE_LIMIT_PER_HOUR = 30;
 
+/** POST /product/bulk-import — загрузка Excel. */
+export const PRODUCT_BULK_IMPORT_RATE_LIMIT_PER_HOUR = 10;
+
 /**
  * Installment: create contract + payment/dispute/message mutators.
  */

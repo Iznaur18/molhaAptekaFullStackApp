@@ -110,6 +110,28 @@
   padding-bottom: max(0.85rem, env(safe-area-inset-bottom, 0px));
 }
 
+.create-product-wizard__bulk-import-entry {
+  display: flex;
+  justify-content: flex-end;
+  padding-inline: 0.25rem;
+}
+
+.create-product-wizard__bulk-import-button {
+  border: none;
+  background: transparent;
+  color: var(--iz-color-action);
+  font: inherit;
+  font-size: 0.875rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.create-product-wizard__bulk-import-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .create-product-wizard__footer-stack {
   display: flex;
   flex-direction: column;

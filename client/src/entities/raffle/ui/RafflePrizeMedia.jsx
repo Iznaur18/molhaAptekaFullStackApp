@@ -29,6 +29,7 @@ export function RafflePrizeMedia({
   autoplayVideo = true,
   showSoundToggle = false,
   isVideoActive = true,
+  blurVideoBackground = false,
 }) {
   const videoRef = useRef(/** @type {HTMLVideoElement | null} */ (null));
   const [isMuted, setIsMuted] = useState(true);
@@ -101,9 +102,27 @@ export function RafflePrizeMedia({
           .filter(Boolean)
           .join(" ")}
       >
+        {blurVideoBackground ? (
+          <video
+            className="raffle-prize-media raffle-prize-media_video raffle-prize-media__video-bg"
+            src={videoSrc}
+            autoPlay={shouldPlay}
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            draggable={false}
+            aria-hidden="true"
+          />
+        ) : null}
         <video
           ref={videoRef}
-          className="raffle-prize-media raffle-prize-media_video"
+          className={[
+            "raffle-prize-media raffle-prize-media_video raffle-prize-media__video-fg",
+            videoClassNames,
+          ]
+            .filter(Boolean)
+            .join(" ")}
           src={videoSrc}
           autoPlay={shouldPlay}
           loop
@@ -133,13 +152,31 @@ export function RafflePrizeMedia({
   }
 
   return (
-    <img
-      src={imageSrc}
-      alt=""
-      className={[className, imageClassName].filter(Boolean).join(" ")}
-      loading="lazy"
-      draggable={false}
-      style={{ objectPosition }}
-    />
+    <div
+      className={["raffle-prize-media__image-wrap", className]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <img
+        src={imageSrc}
+        alt=""
+        className="raffle-prize-media raffle-prize-media__image-bg"
+        loading="lazy"
+        draggable={false}
+        style={{ objectPosition }}
+        aria-hidden="true"
+      />
+      <img
+        src={imageSrc}
+        alt=""
+        className={["raffle-prize-media raffle-prize-media__image-fg", imageClassName, className]
+          .filter(Boolean)
+          .join(" ")}
+        loading="lazy"
+        draggable={false}
+        style={{ objectPosition }}
+      />
+    </div>
   );
 }
+

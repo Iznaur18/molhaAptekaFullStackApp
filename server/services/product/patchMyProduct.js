@@ -1,9 +1,14 @@
 import { ProductModel } from "../../models/index.js";
 import { PRODUCT_SELLER_PUBLIC_SELECT } from "../../constants/productSellerPublicFields.js";
+import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { AppError } from "../../errors/AppError.js";
 import { isUserAdmin } from "../access/adminUserGuard.js";
 import { hasProductOpenSales, OPEN_SALES_BLOCK_MESSAGE } from "./productOrderLocks.js";
 import { applyProductSearchBlobToSet } from "./applyProductSearchBlobToProductWrite.js";
+import {
+  computeProductDiscountPercent,
+  notifyFollowersOfSellerProductDiscount,
+} from "./productDiscount.js";
 
 import { buildProductPatchSet } from "./buildProductPatchSet.js";
 import {
@@ -34,7 +39,7 @@ export async function patchMyProduct({ userId, productId, body }) {
     throw new AppError(404, "Товар не найден или нет прав на изменение");
   }
 
-  const { $set, $unset, auctionEnabledChanged, nextAuctionEnabled } =
+  const { $set, $unset, auctionEnabledChanged, nextAuctionEnabled, flashSaleNowEnabled } =
     await buildProductPatchSet({
       existing,
       body,
@@ -73,6 +78,21 @@ export async function patchMyProduct({ userId, productId, body }) {
     auctionEnabledChanged,
     nextAuctionEnabled,
   });
+
+  if (flashSaleNowEnabled && product.productModerationStatus === PRODUCT_MODERATION_APPROVED) {
+    const previousPercent =
+      existing.productFlashSaleEnabled === true
+        ? computeProductDiscountPercent(
+            existing.productFlashSaleBasePrice,
+            existing.productPrice,
+          )
+        : computeProductDiscountPercent(existing.productOldPrice, existing.productPrice);
+    try {
+      await notifyFollowersOfSellerProductDiscount(product, previousPercent);
+    } catch {
+      /* не блокируем patch */
+    }
+  }
 
   return loadProductWithSellerSnapshot(productId);
 }

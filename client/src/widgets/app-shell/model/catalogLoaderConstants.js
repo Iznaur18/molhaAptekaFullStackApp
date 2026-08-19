@@ -15,4 +15,5 @@ export const CATALOG_LANDING_QUERY = {
   wholesaleOnly: false,
   originalOnly: false,
   near: false,
+  flashSaleOnly: false,
 };

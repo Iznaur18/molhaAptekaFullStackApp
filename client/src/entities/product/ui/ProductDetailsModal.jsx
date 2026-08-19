@@ -128,6 +128,7 @@ export function ProductDetailsModal({
       onRequestLogin={onRequestLogin}
       purchaseLimit={ctrl.purchaseLimit}
       canShowAddToCart={ctrl.canShowAddToCart}
+      unitPriceSnapshot={Math.floor(Number(product.productPrice)) || 0}
       className="product-details-modal__price-actions--mobile-dock"
     />
   ) : null;

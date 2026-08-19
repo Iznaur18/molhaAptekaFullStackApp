@@ -1,0 +1,14 @@
+@import "./CuratedProductListAdminCard.css";
+
+.curated-list-admin-card__add {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.curated-list-admin-card__selected {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--iz-color-text-secondary);
+}

@@ -99,6 +99,7 @@ export function useCatalogProductsInfiniteQuery({
         wholesaleOnly: Boolean(listParams.wholesaleOnly),
         originalOnly: Boolean(listParams.originalOnly),
         near: Boolean(listParams.near),
+        flashSaleOnly: Boolean(listParams.flashSaleOnly),
         regionCode: listParams.regionCode || undefined,
       });
     },

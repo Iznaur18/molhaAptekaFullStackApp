@@ -3,6 +3,8 @@ import {
   resolveProductWholesaleOffer,
 } from "@izibuy/shared-lib";
 
+import { normalizeStaleFlashSaleProduct } from "../../product/lib/isProductFlashSaleActive.js";
+
 /**
  * @typedef {object} CartLine
  * @property {string} productId
@@ -16,14 +18,24 @@ import {
  * @property {number | null} promoDiscountPercent
  * @property {string | null} promoCode
  * @property {boolean} isPromoApplied
+ * @property {number | null} unitPriceSnapshot
+ * @property {boolean} priceIncreasedSinceAdd
  */
 
 /**
  * @param {import('../model/types.js').CartItemsByProductId} cartItems
  * @param {import('../../product/model/types.js').ProductFromApi[]} products
  * @param {Record<string, { code?: string; discountPercent?: number }> | Map<string, { code?: string; discountPercent?: number }> | Array<{ productId: string; code?: string; discountPercent?: number }>} [appliedPromos]
+ * @param {Record<string, number>} [priceSnapshots]
+ * @param {number} [nowMs]
  */
-export const selectCartLines = (cartItems, products, appliedPromos = {}) => {
+export const selectCartLines = (
+  cartItems,
+  products,
+  appliedPromos = {},
+  priceSnapshots = {},
+  nowMs = Date.now(),
+) => {
   const productById = new Map(products.map((p) => [String(p._id), p]));
   /** @type {Map<string, { code?: string; discountPercent?: number }>} */
   const promoByProductId = new Map();
@@ -42,7 +54,9 @@ export const selectCartLines = (cartItems, products, appliedPromos = {}) => {
   }
 
   const lines = Object.entries(cartItems).map(([productId, quantity]) => {
-    const product = productById.get(productId) ?? null;
+    const rawProduct = productById.get(productId) ?? null;
+    const product =
+      rawProduct != null ? normalizeStaleFlashSaleProduct(rawProduct, nowMs) : null;
     const qty = Math.floor(Number(quantity)) || 0;
     const promo = promoByProductId.get(productId) ?? null;
     const promoDiscountPercent =
@@ -64,6 +78,13 @@ export const selectCartLines = (cartItems, products, appliedPromos = {}) => {
       promoDiscountPercent != null &&
       promoDiscountPercent >= 1 &&
       promoDiscountPercent <= 99;
+    const unitPriceSnapshotRaw = priceSnapshots[productId];
+    const unitPriceSnapshot =
+      unitPriceSnapshotRaw == null
+        ? null
+        : Math.floor(Number(unitPriceSnapshotRaw)) || null;
+    const priceIncreasedSinceAdd =
+      unitPriceSnapshot != null && unitPrice > unitPriceSnapshot;
     return {
       productId,
       quantity: qty,
@@ -76,6 +97,8 @@ export const selectCartLines = (cartItems, products, appliedPromos = {}) => {
       promoDiscountPercent: isPromoApplied ? promoDiscountPercent : null,
       promoCode: isPromoApplied ? String(promo?.code ?? "") : null,
       isPromoApplied,
+      unitPriceSnapshot,
+      priceIncreasedSinceAdd,
     };
   });
 

@@ -44,6 +44,7 @@ export const useHomeProductActions = ({
   setTogglingQaProductId,
   setTogglingOriginalityProductId,
   setTogglingWholesaleProductId,
+  setTogglingFlashSaleProductId,
   setTogglingRentalProductId,
   setTogglingAffiliateProductId,
   setTogglingInstallmentProductId,
@@ -383,6 +384,60 @@ export const useHomeProductActions = ({
     ],
   );
 
+  const handleSetProductFlashSale = useCallback(
+    async (productId, flashSaleEnabled) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return;
+      }
+      setTogglingFlashSaleProductId(normalizedProductId);
+      setProductDetailsAdminError("");
+      try {
+        const updated = await patchMutation.mutateAsync({
+          productId: normalizedProductId,
+          body: { productFlashSaleEnabled: flashSaleEnabled },
+        });
+        syncCatalogProductState({
+          ...updated,
+          productFlashSaleEnabled: flashSaleEnabled,
+          ...(flashSaleEnabled
+            ? {}
+            : {
+                productFlashSaleEndsAt: null,
+                productFlashSaleBasePrice: null,
+                productFlashSaleDurationMinutes: null,
+                productOldPrice: null,
+              }),
+        });
+        syncProductEditModalState({
+          ...updated,
+          productFlashSaleEnabled: flashSaleEnabled,
+          ...(flashSaleEnabled
+            ? {}
+            : {
+                productFlashSaleEndsAt: null,
+                productFlashSaleBasePrice: null,
+                productFlashSaleDurationMinutes: null,
+                productOldPrice: null,
+              }),
+        });
+      } catch (e) {
+        setProductDetailsAdminError(
+          e instanceof Error ? e.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+      } finally {
+        setTogglingFlashSaleProductId(null);
+      }
+    },
+    [
+      patchMutation,
+      setProductDetailsAdminError,
+      setTogglingFlashSaleProductId,
+      syncCatalogProductState,
+      syncProductEditModalState,
+    ],
+  );
+
   const handleSetProductRental = useCallback(
     async (productId, rentalEnabled) => {
       const normalizedProductId = String(productId ?? "").trim();
@@ -702,6 +757,7 @@ export const useHomeProductActions = ({
     handleSetProductQa,
     handleSetProductOriginality,
     handleSetProductWholesale,
+    handleSetProductFlashSale,
     handleSetProductRental,
     handleSetProductAffiliate,
     handleWholesaleSaved,

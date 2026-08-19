@@ -15,13 +15,20 @@
   flex-direction: column;
   gap: 0;
   border: var(--iz-border) solid var(--iz-color-border);
-  border-radius: var(--iz-radius-card-lg);
+  border-radius: 1rem;
   background: transparent;
   padding: 0;
   overflow: hidden;
   cursor: pointer;
   text-align: left;
   color: inherit;
+}
+
+@supports (corner-shape: squircle) {
+  .curated-product-compact-card {
+    border-radius: 1.375rem;
+    corner-shape: squircle;
+  }
 }
 
 .curated-product-compact-card__image-wrap {

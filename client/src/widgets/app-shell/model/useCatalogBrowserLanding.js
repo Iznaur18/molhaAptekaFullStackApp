@@ -216,6 +216,7 @@ export function useCatalogBrowserLanding({
         wholesaleOnly: false,
         originalOnly: false,
         near: false,
+        flashSaleOnly: false,
       };
       applyCatalogQueryState(nextQuery);
       subcategoryPicker.clearPickerTrail();

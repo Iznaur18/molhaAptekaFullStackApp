@@ -20,6 +20,7 @@ import { useHomeCuratedProductListsQuery } from "../../../entities/curated-produ
  *   catalogWholesaleOnly?: boolean;
  *   catalogOriginalOnly?: boolean;
  *   catalogNear?: boolean;
+ *   catalogFlashSaleOnly?: boolean;
  *   viewerRegionCode: string;
  * }} params
  */
@@ -39,6 +40,7 @@ export function useHomeCuratedProductLists({
   catalogWholesaleOnly = false,
   catalogOriginalOnly = false,
   catalogNear = false,
+  catalogFlashSaleOnly = false,
   viewerRegionCode,
 }) {
   const showCuratedProductLists = isHomeCuratedProductListsVisible({
@@ -57,6 +59,7 @@ export function useHomeCuratedProductLists({
     catalogWholesaleOnly,
     catalogOriginalOnly,
     catalogNear,
+    catalogFlashSaleOnly,
   });
 
   const curatedListsQuery = useHomeCuratedProductListsQuery({

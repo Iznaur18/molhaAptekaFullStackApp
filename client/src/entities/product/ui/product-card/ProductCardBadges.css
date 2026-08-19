@@ -148,6 +148,21 @@
   line-height: var(--product-card-overlay-badge-line-height, 12px);
 }
 
+.product-card__flash-sale-badge {
+  margin: 0;
+  padding: var(--product-card-overlay-badge-pad-y, 2px)
+    var(--product-card-overlay-badge-pad-x, 10px);
+  width: fit-content;
+  border-radius: var(--product-card-overlay-badge-radius, 6px);
+  border: none;
+  background: #fff3e8;
+  color: #c2410c;
+  font-size: var(--product-card-overlay-badge-font-size, 10px);
+  font-weight: 800;
+  line-height: var(--product-card-overlay-badge-line-height, 12px);
+  white-space: nowrap;
+}
+
 .product-card__affiliate-badge {
   margin: 0.2rem 0 0;
   padding: var(--product-card-overlay-badge-pad-y, 2px)
@@ -241,6 +256,7 @@
 .product-card__status-badges-row > .product-card__near-badge,
 .product-card__status-badges-row > .product-card__installment-badge,
 .product-card__status-badges-row > .product-card__wholesale-badge,
+.product-card__status-badges-row > .product-card__flash-sale-badge,
 .product-card__status-badges-row > .product-card__raffle-badge,
 .product-card__status-badges-row > .product-card__affiliate-badge,
 .product-card__status-badges-row > .product-card__status-badge-placeholder,

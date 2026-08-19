@@ -67,6 +67,24 @@
   z-index: var(--iz-z-toast, 1100);
 }
 
+.header-users-stretch__shell--cta:not(.header-users-stretch__shell--open) {
+  border-color: transparent;
+  background: var(--iz-gradient-header-btn);
+  box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--iz-color-action) 65%, transparent);
+}
+
+.header-users-stretch__shell--cta .header-users-stretch__toggle {
+  color: var(--iz-color-on-contrast);
+}
+
+.header-users-stretch__shell--cta.header-users-stretch__shell--open
+  .header-users-stretch__toggle-circle {
+  border-color: transparent;
+  background: var(--iz-gradient-header-btn);
+  color: var(--iz-color-on-contrast);
+  box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--iz-color-action) 65%, transparent);
+}
+
 .header-users-stretch__toggle {
   display: inline-flex;
   align-items: center;

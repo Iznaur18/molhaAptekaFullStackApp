@@ -146,9 +146,16 @@ const notifyApprovedProductFollowers = async (productPayload) => {
  * @param {{
  *   userId: string;
  *   body: Record<string, unknown>;
+ *   productArticle?: string;
+ *   skipSellerLimitCheck?: boolean;
  * }} input
  */
-export async function postProduct({ userId, body }) {
+export async function postProduct({
+  userId,
+  body,
+  productArticle: productArticleOverride,
+  skipSellerLimitCheck = false,
+}) {
   const { productName, productDescription, productIsAvailable, productAuctionEnabled } =
     body;
 
@@ -164,7 +171,7 @@ export async function postProduct({ userId, body }) {
     await assertSellerManualProductCreateAllowed(String(userId));
   }
 
-  if (!isAdmin) {
+  if (!isAdmin && !skipSellerLimitCheck) {
     const limitCheck = await assertSellerCanCreateProduct(userId, user);
     if (!limitCheck.ok) {
       throw new AppError(403, limitCheck.message);
@@ -224,6 +231,11 @@ export async function postProduct({ userId, body }) {
   );
   assertProductFulfillmentMethods(productPickupEnabled, productDeliveryEnabled);
 
+  const productArticleRaw =
+    productArticleOverride ??
+    (typeof body?.productArticle === "string" ? body.productArticle : "");
+  const productArticle = String(productArticleRaw ?? "").trim().slice(0, 64);
+
   const product = await ProductModel.create({
     productName,
     productDescription,
@@ -260,6 +272,7 @@ export async function postProduct({ userId, body }) {
     productPriceMarketStatus: PRODUCT_PRICE_MARKET_STATUS_DEFAULT,
     productReturnEnabled,
     productReturnTerms,
+    ...(productArticle ? { productArticle } : {}),
   });
 
   await product.populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT);

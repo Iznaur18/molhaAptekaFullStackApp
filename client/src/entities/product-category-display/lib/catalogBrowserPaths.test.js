@@ -20,6 +20,7 @@ const baseQuery = {
   wholesaleOnly: false,
   originalOnly: false,
   near: false,
+  flashSaleOnly: false,
 };
 
 describe("buildCatalogProductsLocation", () => {

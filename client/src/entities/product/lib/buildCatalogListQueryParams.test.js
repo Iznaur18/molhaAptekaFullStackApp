@@ -46,6 +46,7 @@ describe("buildCatalogListQueryParams", () => {
       wholesaleOnly: null,
       originalOnly: null,
       near: null,
+      flashSaleOnly: null,
       regionCode: "RU-CE",
     });
   });
@@ -76,6 +77,7 @@ describe("buildCatalogListQueryParams", () => {
       wholesaleOnly: null,
       originalOnly: null,
       near: null,
+      flashSaleOnly: null,
       regionCode: null,
     });
   });
@@ -103,6 +105,18 @@ describe("buildCatalogListQueryParams", () => {
     });
 
     expect(params.near).toBe(null);
+  });
+
+  it("passes flashSaleOnly from URL", () => {
+    const params = buildCatalogListQueryParams({
+      ...baseInput,
+      catalogQueryFromUrl: {
+        sort: "newest",
+        flashSaleOnly: true,
+      },
+    });
+
+    expect(params.flashSaleOnly).toBe(true);
   });
 
   it("uses categoryId instead of slug when tree id is active", () => {

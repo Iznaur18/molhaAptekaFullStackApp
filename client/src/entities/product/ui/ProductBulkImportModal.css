@@ -1,0 +1,119 @@
+.product-bulk-import-modal__panel {
+  max-width: min(34rem, 100%);
+}
+
+.product-bulk-import-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--iz-space-3);
+  padding: var(--iz-space-4);
+}
+
+.product-bulk-import-modal__hint {
+  margin: 0;
+  color: var(--iz-color-muted);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+
+.product-bulk-import-modal__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--iz-space-2);
+}
+
+@media (min-width: 22rem) {
+  .product-bulk-import-modal__actions {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .product-bulk-import-modal__actions > * {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
+.product-bulk-import-modal__actions .create-product-wizard__primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+}
+
+.product-bulk-import-modal__file-name {
+  margin: 0;
+  padding: var(--iz-space-2) var(--iz-space-3);
+  border-radius: var(--iz-radius-button, 0.6rem);
+  background: color-mix(in srgb, var(--iz-color-surface-muted) 70%, transparent);
+  font-size: 0.875rem;
+  color: var(--iz-color-ink);
+  word-break: break-all;
+}
+
+.product-bulk-import-modal__progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.product-bulk-import-modal__progress-bar {
+  width: 100%;
+  height: 0.5rem;
+  appearance: none;
+  border: none;
+  border-radius: 999px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--iz-color-action-soft) 35%, transparent);
+}
+
+.product-bulk-import-modal__progress-bar::-webkit-progress-bar {
+  background: color-mix(in srgb, var(--iz-color-action-soft) 35%, transparent);
+}
+
+.product-bulk-import-modal__progress-bar::-webkit-progress-value {
+  background: var(--iz-color-action);
+}
+
+.product-bulk-import-modal__progress-bar::-moz-progress-bar {
+  background: var(--iz-color-action);
+}
+
+.product-bulk-import-modal__progress-label {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.product-bulk-import-modal__success {
+  margin: 0;
+  color: var(--iz-color-success, #15803d);
+}
+
+.product-bulk-import-modal__errors {
+  margin: 0;
+  padding-left: 1.1rem;
+  max-height: 12rem;
+  overflow: auto;
+}
+
+.product-bulk-import-modal__errors li + li {
+  margin-top: 0.35rem;
+}
+
+.product-bulk-import-modal__error {
+  margin: 0;
+  color: var(--iz-color-danger);
+}
+
+.product-bulk-import-modal__footer-wrap {
+  padding-top: var(--iz-space-2);
+}
+
+.product-bulk-import-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--iz-space-2);
+  width: 100%;
+}

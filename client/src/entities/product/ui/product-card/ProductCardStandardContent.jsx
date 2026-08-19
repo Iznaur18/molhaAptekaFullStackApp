@@ -112,6 +112,11 @@ export function ProductCardStandardContent({ vm }) {
                 {vm.nearDistanceLabel}
               </p>
             ) : null}
+            {vm.showFlashSaleBadge && vm.flashSaleBadgeLabel ? (
+              <p className="product-card__flash-sale-badge" role="status">
+                {vm.flashSaleBadgeLabel}
+              </p>
+            ) : null}
             {vm.showRaffleBadge ? (
               <p className="product-card__raffle-badge" role="status">
                 {PRODUCT_CARD_UI.RAFFLE_BADGE}

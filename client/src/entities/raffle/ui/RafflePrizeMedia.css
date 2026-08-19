@@ -10,9 +10,48 @@
   background: var(--iz-color-ink);
 }
 
+.raffle-prize-media__video-bg {
+  object-fit: cover;
+  filter: blur(22px);
+  transform: scale(1.08);
+  pointer-events: none;
+}
+
+.raffle-prize-media__video-fg {
+  object-fit: cover;
+  background: transparent; /* чтобы "поля" от object-fit не закрашивались и просвечивал blurred bg */
+}
+
 .raffle-prize-media__video-wrap {
   position: relative;
   overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.raffle-prize-media__image-wrap {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.raffle-prize-media__image-wrap .raffle-prize-media {
+  position: absolute;
+  inset: 0;
+}
+
+.raffle-prize-media__image-bg {
+  object-fit: cover;
+  filter: blur(22px);
+  transform: scale(1.08);
+  pointer-events: none;
+}
+
+.raffle-prize-media__image-fg {
+  object-fit: cover;
+  background: transparent;
+  z-index: 1;
 }
 
 .raffle-prize-media__video-wrap .raffle-prize-media {
@@ -24,7 +63,7 @@
   position: absolute;
   right: 0.45rem;
   bottom: 0.45rem;
-  z-index: 2;
+  z-index: 5; /* поверх swipe-overlay на RaffleProductsPage */
   display: inline-flex;
   align-items: center;
   justify-content: center;

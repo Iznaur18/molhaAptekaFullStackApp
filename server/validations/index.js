@@ -19,6 +19,7 @@ import { verifyEmailTokenValidation } from "./user/verifyEmailTokenValidation.js
 import { adminCreditLoyaltyPointsValidation } from "./user/adminCreditLoyaltyPointsValidation.js";
 import { purchasePremiumValidation } from "./user/purchasePremiumValidation.js";
 import { makeProductValidation } from "./product/makeProductValidation.js";
+import { productBulkImportJobIdParamValidation } from "./product/productBulkImportValidation.js";
 import { productIdParamValidation } from "./product/productIdParamValidation.js";
 import { productsSearchValidation } from "./product/productsSearchValidation.js";
 import { patchMyProductValidation } from "./product/patchMyProductValidation.js";
@@ -101,6 +102,15 @@ import {
   addCuratedProductListItemValidation,
 } from "./product/curatedProductListValidation.js";
 import {
+  curatedCategoryListIdParamValidation,
+  curatedCategoryListItemParamValidation,
+  curatedCategoryItemPreviewQueryValidation,
+  createCuratedCategoryListValidation,
+  patchCuratedCategoryListValidation,
+  reorderCuratedCategoryListsValidation,
+  addCuratedCategoryListItemValidation,
+} from "./product/curatedCategoryListValidation.js";
+import {
   catalogFeedTileKeyParamValidation,
   patchProductCatalogFeedTileDisplayValidation,
 } from "./product/productCatalogFeedTileDisplayValidation.js";
@@ -150,6 +160,7 @@ export {
   registerPushTokenValidation,
   removePushTokenValidation,
   makeProductValidation,
+  productBulkImportJobIdParamValidation,
   productIdParamValidation,
   productsSearchValidation,
   patchMyProductValidation,
@@ -208,6 +219,13 @@ export {
   patchCuratedProductListValidation,
   reorderCuratedProductListsValidation,
   addCuratedProductListItemValidation,
+  curatedCategoryListIdParamValidation,
+  curatedCategoryListItemParamValidation,
+  curatedCategoryItemPreviewQueryValidation,
+  createCuratedCategoryListValidation,
+  patchCuratedCategoryListValidation,
+  reorderCuratedCategoryListsValidation,
+  addCuratedCategoryListItemValidation,
   catalogFeedTileKeyParamValidation,
   patchProductCatalogFeedTileDisplayValidation,
   productManageToggleKeyParamValidation,

@@ -31,3 +31,28 @@
   flex-direction: column;
   gap: 16px;
 }
+
+.popular-products-admin__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+.popular-products-admin__tab {
+  padding: 8px 14px;
+  border: 1px solid var(--iz-color-border, #e5e7eb);
+  border-radius: 999px;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text-secondary);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.popular-products-admin__tab_active {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+  font-weight: 600;
+}

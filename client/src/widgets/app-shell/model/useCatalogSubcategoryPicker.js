@@ -99,6 +99,7 @@ export function useCatalogSubcategoryPicker({
         wholesaleOnly: false,
         originalOnly: false,
         near: false,
+        flashSaleOnly: false,
       };
       applyCatalogQueryState(nextQuery);
       setCategoryTreeLabel(null);
@@ -130,6 +131,7 @@ export function useCatalogSubcategoryPicker({
         wholesaleOnly: false,
         originalOnly: false,
         near: false,
+        flashSaleOnly: false,
       };
       applyCatalogQueryState(nextQuery);
       setCategoryTreeLabel(null);

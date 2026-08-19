@@ -1,4 +1,4 @@
-import { createContext, useCallback, useMemo, useReducer, useRef } from "react";
+import { createContext, useCallback, useMemo, useReducer, useRef, useState } from "react";
 
 import { useReplaceMyCartMutation } from "./useReplaceMyCartMutation.js";
 import {
@@ -18,12 +18,27 @@ const sumQuantities = (items) =>
 
 export function CartProvider({ children }) {
   const [items, dispatch] = useReducer(cartReducer, {});
+  const [priceSnapshots, setPriceSnapshots] = useState(
+    /** @type {Record<string, number>} */ ({}),
+  );
   const itemsRef = useRef(items);
   itemsRef.current = items;
   const replaceCartMutation = useReplaceMyCartMutation();
 
-  const addItem = useCallback((productId, quantity = 1) => {
+  const addItem = useCallback((productId, quantity = 1, unitPriceSnapshot) => {
     dispatch({ type: CART_ACTION_ADD, productId, quantity });
+    if (unitPriceSnapshot == null) {
+      return;
+    }
+    const snapshot = Math.floor(Number(unitPriceSnapshot));
+    if (!Number.isFinite(snapshot) || snapshot < 0) {
+      return;
+    }
+    setPriceSnapshots((prev) =>
+      Object.prototype.hasOwnProperty.call(prev, productId)
+        ? prev
+        : { ...prev, [productId]: snapshot },
+    );
   }, []);
 
   const setItemQuantity = useCallback((productId, quantity) => {
@@ -32,6 +47,14 @@ export function CartProvider({ children }) {
 
   const removeItem = useCallback((productId) => {
     dispatch({ type: CART_ACTION_REMOVE, productId });
+    setPriceSnapshots((prev) => {
+      if (!Object.prototype.hasOwnProperty.call(prev, productId)) {
+        return prev;
+      }
+      const next = { ...prev };
+      delete next[productId];
+      return next;
+    });
   }, []);
 
   const removeItems = useCallback((productIds) => {
@@ -44,10 +67,18 @@ export function CartProvider({ children }) {
       delete next[productId];
     }
     dispatch({ type: CART_ACTION_HYDRATE, payload: next });
+    setPriceSnapshots((prev) => {
+      const snapshots = { ...prev };
+      for (const productId of idSet) {
+        delete snapshots[productId];
+      }
+      return snapshots;
+    });
   }, []);
 
   const clearCart = useCallback(() => {
     dispatch({ type: CART_ACTION_CLEAR });
+    setPriceSnapshots({});
   }, []);
 
   const hydrateCart = useCallback(
@@ -72,6 +103,7 @@ export function CartProvider({ children }) {
   const value = useMemo(
     () => ({
       items,
+      priceSnapshots,
       addItem,
       setItemQuantity,
       removeItem,
@@ -83,6 +115,7 @@ export function CartProvider({ children }) {
     }),
     [
       items,
+      priceSnapshots,
       addItem,
       setItemQuantity,
       removeItem,

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { useCreateProductForm } from "../../../entities/product/model/useCreateProductForm.js";
 import {
@@ -22,6 +22,7 @@ import { AppIcon, Save } from "../../../shared/ui/icon/index.js";
 import { ProductWizardProgress } from "../../../shared/ui/ProductWizardProgress/ProductWizardProgress.jsx";
 import { ProductWizardStepHeadline } from "../../../shared/ui/ProductWizardProgress/ProductWizardStepHeadline.jsx";
 import { resolveCreateProductWizardStepCopy } from "../lib/resolveCreateProductWizardStepCopy.js";
+import { ProductBulkImportModal } from "../../../entities/product/ui/ProductBulkImportModal.jsx";
 
 import "./CreateProductWizard.css";
 
@@ -47,6 +48,7 @@ export function CreateProductWizard({
   sellerProducts = [],
   productToCopy = null,
 }) {
+  const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
   const {
     form,
     setForm,
@@ -248,6 +250,18 @@ export function CreateProductWizard({
           </button>
         </div>
       ) : null}
+      {wizard.isFirstStep ? (
+        <div className="create-product-wizard__bulk-import-entry">
+          <button
+            type="button"
+            className="create-product-wizard__bulk-import-button"
+            onClick={() => setIsBulkImportOpen(true)}
+            disabled={isSubmitting}
+          >
+            {CREATE_PRODUCT_MODAL_UI.BULK_IMPORT_OPEN}
+          </button>
+        </div>
+      ) : null}
       <form
         id={CREATE_PRODUCT_WIZARD_FORM_ID}
         className="create-product-wizard__form"
@@ -296,6 +310,14 @@ export function CreateProductWizard({
           </p>
         ) : null}
       </form>
+      <ProductBulkImportModal
+        isOpen={isBulkImportOpen}
+        onClose={() => setIsBulkImportOpen(false)}
+        onCompleted={() => {
+          setIsBulkImportOpen(false);
+          handleClose();
+        }}
+      />
     </ProductModalShell>
   );
 }

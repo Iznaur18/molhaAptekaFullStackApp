@@ -15,6 +15,7 @@ import {
   INSTALLMENT_ACTION_RATE_LIMIT_PER_HOUR,
   MONEY_MUTATION_RATE_LIMIT_PER_HOUR,
   PRODUCT_CREATE_RATE_LIMIT_PER_HOUR,
+  PRODUCT_BULK_IMPORT_RATE_LIMIT_PER_HOUR,
   USER_SEARCH_RATE_LIMIT_PER_15_MIN,
 } from "../constants/securityRateLimitConstants.js";
 import {
@@ -476,6 +477,21 @@ export function initRateLimitMiddlewares(store) {
     store,
   );
 
+  handlers.productBulkImport = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      limiterName: "product_bulk_import",
+      windowMs: 60 * 60 * 1000,
+      max: PRODUCT_BULK_IMPORT_RATE_LIMIT_PER_HOUR,
+      message: {
+        success: false,
+        message: "Слишком много импортов из Excel. Попробуйте позже",
+      },
+      keyGenerator: rateLimitKeyByUserOrIp,
+    },
+    store,
+  );
+
   handlers.installmentAction = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
@@ -606,6 +622,10 @@ export const moneyMutationRateLimiter = (req, res, next) =>
 /** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
 export const productCreateRateLimiter = (req, res, next) =>
   handlers.productCreate(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const productBulkImportRateLimiter = (req, res, next) =>
+  handlers.productBulkImport(req, res, next);
 
 /** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
 export const installmentActionRateLimiter = (req, res, next) =>

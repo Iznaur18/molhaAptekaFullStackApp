@@ -95,6 +95,7 @@ export const ADDRESS_DELIVERY_UI = {
   LABEL_FLAT: "Квартира / офис",
   SUGGEST_LOADING: "Ищем адреса…",
   SUGGEST_ERROR: "Подсказки недоступны",
+  SUGGEST_EMPTY: "Адрес не найден — уточните запрос",
   CLEAR_LINE_ARIA: "Очистить адрес",
   SERVICE_UNAVAILABLE:
     "Подсказки адреса временно недоступны — можно ввести адрес вручную или указать на карте",

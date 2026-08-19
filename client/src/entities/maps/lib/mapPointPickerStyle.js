@@ -1,9 +1,8 @@
-/** Carto Voyager — светлая карта с мягкими цветами (парки/вода). */
-export const MAP_TILE_URL =
-  "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+/** OpenStreetMap Standard — базовая схема без внешнего CARTO CDN. */
+export const MAP_TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 
 export const MAP_TILE_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
 /** Синхрон с design-tokens `action`. */
 export const MAP_PIN_COLOR = "#1f6feb";

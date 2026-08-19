@@ -33,6 +33,7 @@ export function useCatalogQuerySync({
   catalogWholesaleOnly,
   catalogOriginalOnly,
   catalogNear,
+  catalogFlashSaleOnly,
   catalogQueryFromUrl,
   setCatalogSort,
   setSelectedProductCategory,
@@ -48,30 +49,9 @@ export function useCatalogQuerySync({
   setCatalogWholesaleOnly,
   setCatalogOriginalOnly,
   setCatalogNear,
+  setCatalogFlashSaleOnly,
   categoryRootsRef,
 }) {
-  useEffect(() => {
-    if (catalogMainView !== "catalog" || isCompactLayout) {
-      return;
-    }
-    const parsed = parseCatalogQueryFromSearchParams(
-      new URLSearchParams(location.search),
-    );
-    const hasScopedProductFilters =
-      Boolean(parsed.category) ||
-      Boolean(parsed.categoryId) ||
-      Boolean(parsed.sellerPersonalCategoryId);
-    if (!hasScopedProductFilters) {
-      return;
-    }
-    const built = buildCatalogBrowserSearchParams(parsed);
-    const search = built.toString();
-    navigate(
-      `${catalogMainViewToPathname("catalog-browser")}${search ? `?${search}` : ""}`,
-      { replace: true },
-    );
-  }, [catalogMainView, isCompactLayout, location.search, navigate]);
-
   useEffect(() => {
     if (catalogMainView !== "catalog" && catalogMainView !== "catalog-browser") {
       return;
@@ -80,8 +60,7 @@ export function useCatalogQuerySync({
       new URLSearchParams(location.search),
     );
     setCatalogSort((prev) => (prev === parsed.sort ? prev : parsed.sort));
-    const applyScopedFilters =
-      catalogMainView === "catalog-browser" || isCompactLayout;
+    const applyScopedFilters = catalogMainView === "catalog-browser" || catalogMainView === "catalog";
     if (applyScopedFilters) {
       setSelectedProductCategory((prev) =>
         prev === parsed.category ? prev : parsed.category,
@@ -126,6 +105,9 @@ export function useCatalogQuerySync({
       prev === parsed.originalOnly ? prev : parsed.originalOnly,
     );
     setCatalogNear((prev) => (prev === parsed.near ? prev : parsed.near));
+    setCatalogFlashSaleOnly((prev) =>
+      prev === parsed.flashSaleOnly ? prev : parsed.flashSaleOnly,
+    );
   }, [
     location.search,
     catalogMainView,
@@ -139,6 +121,7 @@ export function useCatalogQuerySync({
     setCatalogWholesaleOnly,
     setCatalogOriginalOnly,
     setCatalogNear,
+    setCatalogFlashSaleOnly,
     setCatalogSort,
     setCategoryTreeLabel,
     setSelectedCategoryId,
@@ -150,9 +133,8 @@ export function useCatalogQuerySync({
     if (catalogMainView !== "catalog" && catalogMainView !== "catalog-browser") {
       return;
     }
-    const scopedOnHome = catalogMainView === "catalog" && isCompactLayout;
     const writeScopedFilters =
-      catalogMainView === "catalog-browser" || scopedOnHome;
+      catalogMainView === "catalog-browser" || catalogMainView === "catalog";
     const nextCategory = writeScopedFilters ? selectedProductCategory : null;
     const nextCategoryId = writeScopedFilters ? selectedCategoryId : null;
     const nextSellerPersonalCategoryId = writeScopedFilters
@@ -171,7 +153,8 @@ export function useCatalogQuerySync({
       !catalogAffiliateOnly &&
       !catalogWholesaleOnly &&
       !catalogOriginalOnly &&
-      !catalogNear;
+      !catalogNear &&
+      !catalogFlashSaleOnly;
     const omitDefaultSort =
       isDefaultNewestFeed && !isExplicitCatalogNewestFeedSearch(location.search);
     const queryPayload = {
@@ -188,6 +171,7 @@ export function useCatalogQuerySync({
       wholesaleOnly: catalogWholesaleOnly,
       originalOnly: catalogOriginalOnly,
       near: catalogNear,
+      flashSaleOnly: catalogFlashSaleOnly,
     };
     const built =
       catalogMainView === "catalog-browser"
@@ -221,11 +205,12 @@ export function useCatalogQuerySync({
     catalogWholesaleOnly,
     catalogOriginalOnly,
     catalogNear,
+    catalogFlashSaleOnly,
     navigate,
   ]);
 
   useEffect(() => {
-    if (catalogMainView !== "catalog-browser" && !(catalogMainView === "catalog" && isCompactLayout)) {
+    if (catalogMainView !== "catalog-browser" && catalogMainView !== "catalog") {
       return;
     }
     const parsed = catalogQueryFromUrl;

@@ -20,6 +20,7 @@ import "./create-product-sections/CreateProductSections.css";
  *   deliveryEnabled: boolean;
  *   disabled?: boolean;
  *   selectedFromSuggest?: boolean;
+ *   addressLineDisplayOnly?: boolean;
  *   onChange: (next: {
  *     productPickupAddress: string;
  *     productPickupLat: number | null;
@@ -39,6 +40,7 @@ export function ProductPickupLocationFields({
   deliveryEnabled,
   disabled = false,
   selectedFromSuggest = false,
+  addressLineDisplayOnly = false,
   onChange,
 }) {
   const emit = (patch) => {
@@ -193,6 +195,7 @@ export function ProductPickupLocationFields({
           });
         }}
         disabled={disabled}
+        displayOnly={addressLineDisplayOnly}
         lineInputClassName="create-product-section__input"
         labels={{
           line: pickupEnabled

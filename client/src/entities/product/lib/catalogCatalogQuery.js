@@ -17,6 +17,7 @@ export const CATALOG_QUERY_PARAM_AFFILIATE_ONLY = "affiliateOnly";
 export const CATALOG_QUERY_PARAM_WHOLESALE_ONLY = "wholesaleOnly";
 export const CATALOG_QUERY_PARAM_ORIGINAL_ONLY = "originalOnly";
 export const CATALOG_QUERY_PARAM_NEAR = "near";
+export const CATALOG_QUERY_PARAM_FLASH_SALE_ONLY = "flashSaleOnly";
 export const CATALOG_QUERY_PARAM_SELLER_PERSONAL_CATEGORY_ID =
   "sellerPersonalCategoryId";
 
@@ -75,6 +76,8 @@ export function parseCatalogQueryFromSearchParams(searchParams) {
   const originalOnly =
     searchParams.get(CATALOG_QUERY_PARAM_ORIGINAL_ONLY) === "true";
   const near = searchParams.get(CATALOG_QUERY_PARAM_NEAR) === "true";
+  const flashSaleOnly =
+    searchParams.get(CATALOG_QUERY_PARAM_FLASH_SALE_ONLY) === "true";
 
   const categoryId = parseCatalogCategoryId(
     searchParams.get(CATALOG_QUERY_PARAM_CATEGORY_ID),
@@ -97,6 +100,7 @@ export function parseCatalogQueryFromSearchParams(searchParams) {
     wholesaleOnly,
     originalOnly,
     near,
+    flashSaleOnly,
   };
 }
 
@@ -131,6 +135,7 @@ export function buildCatalogSearchParams({
   wholesaleOnly,
   originalOnly,
   near,
+  flashSaleOnly,
 }) {
   const params = new URLSearchParams();
 
@@ -174,6 +179,9 @@ export function buildCatalogSearchParams({
   if (near) {
     params.set(CATALOG_QUERY_PARAM_NEAR, "true");
   }
+  if (flashSaleOnly) {
+    params.set(CATALOG_QUERY_PARAM_FLASH_SALE_ONLY, "true");
+  }
 
   return params;
 }
@@ -215,6 +223,7 @@ export function buildCatalogBrowserSearchParams(
     wholesaleOnly,
     originalOnly,
     near,
+    flashSaleOnly,
   },
   { omitDefaultSort = true } = {},
 ) {
@@ -260,6 +269,9 @@ export function buildCatalogBrowserSearchParams(
   }
   if (near) {
     params.set(CATALOG_QUERY_PARAM_NEAR, "true");
+  }
+  if (flashSaleOnly) {
+    params.set(CATALOG_QUERY_PARAM_FLASH_SALE_ONLY, "true");
   }
 
   return params;
