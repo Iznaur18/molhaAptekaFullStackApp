@@ -1,4 +1,8 @@
+import { useEffect, useRef, useState } from "react";
+
 import { ProductPreviewVideoPlayer } from "./ProductPreviewVideoPlayer.jsx";
+
+import "./ProductMediaSlideContent.css";
 
 /**
  * @param {{
@@ -7,6 +11,7 @@ import { ProductPreviewVideoPlayer } from "./ProductPreviewVideoPlayer.jsx";
  *   onVideoFailed?: () => void;
  *   imageClassName?: string;
  *   onImageError?: () => void;
+ *   loading?: 'lazy' | 'eager';
  * }} props
  */
 export function ProductMediaSlideContent({
@@ -15,7 +20,22 @@ export function ProductMediaSlideContent({
   onVideoFailed,
   imageClassName = "",
   onImageError,
+  loading = "lazy",
 }) {
+  const imgRef = useRef(/** @type {HTMLImageElement | null} */ (null));
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsLoaded(false);
+  }, [slide?.url]);
+
+  useEffect(() => {
+    const img = imgRef.current;
+    if (img != null && img.complete && img.naturalWidth > 0) {
+      setIsLoaded(true);
+    }
+  }, [slide?.url]);
+
   if (slide == null) {
     return null;
   }
@@ -32,12 +52,22 @@ export function ProductMediaSlideContent({
 
   return (
     <img
-      className={imageClassName}
+      ref={imgRef}
+      className={[
+        imageClassName,
+        "product-media-slide-content__image",
+        isLoaded ? "product-media-slide-content__image--loaded" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       src={slide.url}
       alt=""
-      loading="lazy"
+      loading={loading}
       decoding="async"
       draggable={false}
+      onLoad={() => {
+        setIsLoaded(true);
+      }}
       onError={onImageError}
     />
   );

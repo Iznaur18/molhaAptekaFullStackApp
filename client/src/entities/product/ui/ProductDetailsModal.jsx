@@ -41,6 +41,7 @@ import "./ProductDetailsModal.css";
  *   isPremiumUser?: boolean;
  *   onProfileActionBadgesChanged?: () => void;
  *   presentation?: 'modal' | 'page';
+ *   isPageClosing?: boolean;
  * }} props
  */
 export function ProductDetailsModal({
@@ -60,6 +61,7 @@ export function ProductDetailsModal({
   isPremiumUser = false,
   onProfileActionBadgesChanged,
   presentation = "modal",
+  isPageClosing = false,
 }) {
   const isPage = presentation === "page";
   const ctrl = useProductDetailsModalController({
@@ -302,6 +304,7 @@ export function ProductDetailsModal({
             "product-details-modal--page",
             isPageSplitLayout ? "product-details-modal--page-split" : "",
             showMobileDock ? "product-details-modal--mobile-dock-active" : "",
+            isPageClosing ? "product-details-page--closing" : "",
           ]
             .filter(Boolean)
             .join(" ")}

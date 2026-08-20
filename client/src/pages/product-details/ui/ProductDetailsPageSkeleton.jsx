@@ -6,11 +6,19 @@ import "./ProductDetailsPageSkeleton.css";
 
 /**
  * Плейсхолдер полноэкранных деталей товара (паритет с layout page / page-split).
+ *
+ * @param {{ isClosing?: boolean }} [props]
  */
-export function ProductDetailsPageSkeleton() {
+export function ProductDetailsPageSkeleton({ isClosing = false } = {}) {
   return (
     <div
-      className="product-details-page product-details-page-skeleton"
+      className={[
+        "product-details-page",
+        "product-details-page-skeleton",
+        isClosing ? "product-details-page--closing" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       role="status"
       aria-label={MY_ORDERS_PAGE_UI.PRODUCT_DETAILS_LOADING}
     >

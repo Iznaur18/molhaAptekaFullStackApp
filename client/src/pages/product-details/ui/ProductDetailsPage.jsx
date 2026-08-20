@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Flag } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { canSellerDeleteProduct, canSellerEditProduct } from "../../../entities/product/lib/getProductModerationUi.js";
@@ -14,6 +14,7 @@ import { productReportQueryKeys } from "../../../entities/product-report/model/p
 import { useMyProductReportStatusQuery } from "../../../entities/product-report/model/useMyProductReportStatusQuery.js";
 import { ReportProductModal } from "../../../entities/product-report/ui/ReportProductModal.jsx";
 import { API_CLIENT_UI, PRODUCT_REPORT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { prefersReducedMotion } from "../../../shared/lib/scheduleOpenAfterPaint.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { resolveCatalogDetailsShowAddToCart } from "../../../widgets/app-shell/lib/resolveCatalogDetailsShowAddToCart.js";
@@ -21,6 +22,9 @@ import { useAppShellStateContext } from "../../../widgets/app-shell/model/AppShe
 
 import "./ProductDetailsPage.css";
 import { ProductDetailsPageSkeleton } from "./ProductDetailsPageSkeleton.jsx";
+
+/** Паритет с `--product-details-page-exit-ms`. */
+const PRODUCT_DETAILS_PAGE_EXIT_MS = 180;
 
 function navigateBackOrHome(navigate) {
   if (typeof window !== "undefined" && window.history.length > 1) {
@@ -41,6 +45,8 @@ export function ProductDetailsPage() {
   const shell = useAppShellStateContext();
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [productPatch, setProductPatch] = useState(/** @type {Record<string, unknown>} */ ({}));
+  const [isClosing, setIsClosing] = useState(false);
+  const isClosingRef = useRef(false);
 
   const productQuery = useCatalogProductByIdQuery({
     productId,
@@ -92,8 +98,28 @@ export function ProductDetailsPage() {
   );
 
   const handleClose = useCallback(() => {
-    navigateBackOrHome(navigate);
+    if (isClosingRef.current) {
+      return;
+    }
+    if (prefersReducedMotion()) {
+      navigateBackOrHome(navigate);
+      return;
+    }
+    isClosingRef.current = true;
+    setIsClosing(true);
   }, [navigate]);
+
+  useEffect(() => {
+    if (!isClosing) {
+      return undefined;
+    }
+    const timeoutId = window.setTimeout(() => {
+      navigateBackOrHome(navigate);
+    }, PRODUCT_DETAILS_PAGE_EXIT_MS);
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [isClosing, navigate]);
 
   const handleSellerNameClick = useCallback(
     (userId) => {
@@ -153,9 +179,9 @@ export function ProductDetailsPage() {
     }
     const ok = await shell.handleDeleteMyProduct(String(product._id));
     if (ok) {
-      navigateBackOrHome(navigate);
+      handleClose();
     }
-  }, [navigate, product, shell]);
+  }, [handleClose, product, shell]);
 
   const isOwnProduct = Boolean(
     product && shell.currentUserId && isCurrentUserProductSeller(product, shell.currentUserId),
@@ -172,12 +198,20 @@ export function ProductDetailsPage() {
   }
 
   if (productQuery.isPending && !product) {
-    return <ProductDetailsPageSkeleton />;
+    return <ProductDetailsPageSkeleton isClosing={isClosing} />;
   }
 
   if (!product) {
     return (
-      <div className="product-details-page product-details-page--state">
+      <div
+        className={[
+          "product-details-page",
+          "product-details-page--state",
+          isClosing ? "product-details-page--closing" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
         <div className="product-details-page__state-wrap">
           <p className="product-details-page__state product-details-page__state_error" role="alert">
             {productQuery.error instanceof Error
@@ -197,6 +231,7 @@ export function ProductDetailsPage() {
       <ProductDetailsModal
         presentation="page"
         isOpen
+        isPageClosing={isClosing}
         product={product}
         onClose={handleClose}
         onSellerNameClick={handleSellerNameClick}

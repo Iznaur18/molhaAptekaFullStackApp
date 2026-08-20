@@ -1,0 +1,15 @@
+.product-media-slide-content__image {
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
+}
+
+.product-media-slide-content__image--loaded {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-media-slide-content__image {
+    opacity: 1;
+    transition: none;
+  }
+}

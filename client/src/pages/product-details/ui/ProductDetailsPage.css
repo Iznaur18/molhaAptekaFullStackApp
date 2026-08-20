@@ -3,6 +3,9 @@
  * From 767px — gallery | info split (see `--page-split`).
  */
 .product-details-page {
+  --product-details-page-enter-ms: 220ms;
+  --product-details-page-exit-ms: 180ms;
+
   /* fixed inset — не 100dvh внутри 100vh: на iOS Safari иначе дыра под CTA */
   position: fixed;
   inset: 0;
@@ -20,6 +23,54 @@
   overscroll-behavior-x: none;
   overscroll-behavior-y: none;
   background: var(--iz-color-surface);
+  animation: product-details-page-enter var(--product-details-page-enter-ms) ease-out both;
+}
+
+.product-details-page--closing {
+  pointer-events: none;
+  animation: product-details-page-exit var(--product-details-page-exit-ms) ease-in both;
+}
+
+@keyframes product-details-page-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes product-details-page-exit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-details-page,
+  .product-details-page--closing {
+    animation: none;
+  }
+}
+
+/* ≥600px колонка уже уже viewport — скругление, иначе «окно» с острыми углами */
+@media (min-width: 600px) {
+  .product-details-page {
+    border-radius: 1.75rem;
+  }
+
+  @supports (corner-shape: squircle) {
+    .product-details-page {
+      corner-shape: squircle;
+    }
+  }
 }
 
 .product-details-page__body {
@@ -469,6 +520,14 @@ body:has(.product-details-page) .app-shell {
   max-width: none;
   background: var(--iz-color-surface);
   min-height: 0;
+}
+
+/* Desktop: gutters `--iz-color-bg`, чтобы скругление колонки было видно */
+@media (min-width: 600px) {
+  body:has(.product-details-page),
+  body:has(.product-details-page) .app-shell {
+    background: var(--iz-color-bg);
+  }
 }
 
 .product-details-page--state {

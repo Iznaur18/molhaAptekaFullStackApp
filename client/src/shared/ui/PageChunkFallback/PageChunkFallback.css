@@ -9,4 +9,13 @@
   text-align: center;
   color: color-mix(in srgb, var(--iz-color-text) 70%, transparent);
   background: var(--iz-color-surface);
+  border: 1px solid var(--iz-color-border);
+  border-radius: 1.75rem;
+  overflow: hidden;
+}
+
+@supports (corner-shape: squircle) {
+  .page-chunk-fallback {
+    corner-shape: squircle;
+  }
 }

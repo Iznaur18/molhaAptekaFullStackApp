@@ -92,6 +92,7 @@ export function ProductMediaGalleryReadonly({
         <ProductMediaSlideContent
           slide={slide}
           playVideoWhenVisible={false}
+          loading="eager"
           imageClassName="product-media-gallery-readonly__image product-media-gallery-readonly__image--fill-hero"
           onVideoFailed={() => setPreviewVideoFailed(true)}
         />
