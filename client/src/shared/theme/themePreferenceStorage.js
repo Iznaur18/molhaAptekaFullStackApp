@@ -1,4 +1,4 @@
-/** @typedef {"light" | "custom"} ThemePreference */
+/** @typedef {"light" | "dark" | "custom"} ThemePreference */
 
 const THEME_PREFERENCE_KEY = "app-theme-preference";
 
@@ -7,7 +7,7 @@ const THEME_PREFERENCE_KEY = "app-theme-preference";
  * @returns {value is ThemePreference}
  */
 function isThemePreference(value) {
-  return value === "light" || value === "custom";
+  return value === "light" || value === "dark" || value === "custom";
 }
 
 /**
@@ -19,15 +19,17 @@ export function loadThemePreference() {
     if (isThemePreference(raw)) {
       return raw;
     }
-    // Legacy: system / dark → custom
-    if (raw === "system" || raw === "dark") {
-      saveThemePreference("custom");
-      return "custom";
+    // Legacy: system → dark (старый инвертированный «dark» больше не
+    // существует; "dark" теперь — валидная ручная палитра и тема по умолчанию).
+    if (raw === "system") {
+      saveThemePreference("dark");
+      return "dark";
     }
   } catch {
     // storage недоступен
   }
-  return "custom";
+  // Тёмная — тема по умолчанию для новых пользователей.
+  return "dark";
 }
 
 /**

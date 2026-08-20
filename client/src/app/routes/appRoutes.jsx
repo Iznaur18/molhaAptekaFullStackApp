@@ -5,7 +5,9 @@ import { lazyNamedExport } from "../../shared/lib/lazyNamedExport.js";
 
 import { AppShellRoot } from "../ui/AppShellRoot.jsx";
 
-import { CatalogRoutePage } from "./CatalogRoutePage.jsx";
+import { CatalogProductShellLayout } from "./CatalogProductShellLayout.jsx";
+import { EmptyRoutePage } from "./EmptyRoutePage.jsx";
+import { ProductRoutePage } from "./ProductRoutePage.jsx";
 
 /** Home `/` stays sync; everything else is a separate chunk. */
 const LazyCartRoutePage = lazyNamedExport(
@@ -19,10 +21,6 @@ const LazySellerProductsRoutePage = lazyNamedExport(
 const LazyRaffleProductsRoutePage = lazyNamedExport(
   () => import("./RaffleProductsRoutePage.jsx"),
   "RaffleProductsRoutePage",
-);
-const LazyProductRoutePage = lazyNamedExport(
-  () => import("./ProductRoutePage.jsx"),
-  "ProductRoutePage",
 );
 const LazyUserRoutePage = lazyNamedExport(
   () => import("./UserRoutePage.jsx"),
@@ -81,9 +79,11 @@ export function renderAppShellRoutes() {
       />
       <Route path="/seller/:userId" element={<LazySellerProductsRoutePage />} />
       <Route path="/raffle/:raffleId" element={<LazyRaffleProductsRoutePage />} />
-      <Route path="/" element={<CatalogRoutePage />} />
-      <Route path="/catalog" element={<CatalogRoutePage />} />
-      <Route path="/product/:productId" element={<LazyProductRoutePage />} />
+      <Route element={<CatalogProductShellLayout />}>
+        <Route path="/" element={<EmptyRoutePage />} />
+        <Route path="/catalog" element={<EmptyRoutePage />} />
+        <Route path="/product/:productId" element={<ProductRoutePage />} />
+      </Route>
       <Route path="/user/:userId" element={<LazyUserRoutePage />} />
 
       <Route path="/faq" element={<LazyFaqRoutePage />} />

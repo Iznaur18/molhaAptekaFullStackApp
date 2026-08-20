@@ -5,6 +5,7 @@ import { useProductCategoryDisplayMutations } from "../model/useProductCategoryD
 import { resolveProductCategoryNodeDisplay, mapCategoryDisplaysById } from "../lib/resolveProductCategoryNodeDisplay.js";
 import { PRODUCT_CATEGORY_DISPLAY_UI } from "../../../shared/config/appUiCopy.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
+import { normalizeUploadUrlForStorage } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
@@ -88,14 +89,15 @@ export function EditProductCategoryNodeDisplayModal({
       setErrorMessage("");
 
       const trimmedLabel = label.trim();
-      const trimmedImage = imageUrl.trim();
+      const trimmedImage =
+        normalizeUploadUrlForStorage(imageUrl.trim()) || null;
       const { display } = await patchCategoryNodeMutation.mutateAsync({
         categoryId,
         body: {
           customLabel: trimmedLabel || null,
-          imageUrl: trimmedImage || null,
+          imageUrl: trimmedImage,
           resetCustomLabel: trimmedLabel === "" && resolved?.isCustomLabel,
-          resetImageUrl: trimmedImage === "" && resolved?.isCustomImage,
+          resetImageUrl: !trimmedImage && resolved?.isCustomImage,
         },
       });
 

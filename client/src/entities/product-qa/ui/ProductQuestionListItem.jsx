@@ -102,16 +102,6 @@ export function ProductQuestionListItem({
 
       {(canAnswer || canHide || canDelete) && !isAnswerOpen ? (
         <div className="product-qa-item__actions">
-          {canAnswer ? (
-            <button
-              type="button"
-              className="product-qa-item__action"
-              disabled={isActionPending}
-              onClick={() => setIsAnswerOpen(true)}
-            >
-              {answer ? PRODUCT_QA_UI.ANSWER_EDIT : PRODUCT_QA_UI.ANSWER_ACTION}
-            </button>
-          ) : null}
           {canHide ? (
             <button
               type="button"
@@ -158,6 +148,16 @@ export function ProductQuestionListItem({
                 {PRODUCT_QA_UI.DELETE_ACTION}
               </button>
             )
+          ) : null}
+          {canAnswer ? (
+            <button
+              type="button"
+              className="product-qa-item__action product-qa-item__action--primary"
+              disabled={isActionPending}
+              onClick={() => setIsAnswerOpen(true)}
+            >
+              {answer ? PRODUCT_QA_UI.ANSWER_EDIT : PRODUCT_QA_UI.ANSWER_ACTION}
+            </button>
           ) : null}
         </div>
       ) : null}

@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { CATALOG_SORT_NEWEST } from "../../../entities/product/model/productConstants.js";
 import { buildCatalogSearchParams } from "../../../entities/product/lib/catalogCatalogQuery.js";
 import { catalogMainViewToPathname } from "../../../shared/lib/catalogMainViewPaths.js";
+import { buildSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
 
 /**
  * @param {{
@@ -18,6 +19,14 @@ export function useHomeCuratedCategoryClick({
 }) {
   return useCallback(
     (category) => {
+      if (category.kind === "personal") {
+        const sellerId = category.sellerId?.trim();
+        if (sellerId) {
+          navigate(buildSellerProductsPath(sellerId));
+          return;
+        }
+      }
+
       const nextQuery = {
         sort: CATALOG_SORT_NEWEST,
         category: null,

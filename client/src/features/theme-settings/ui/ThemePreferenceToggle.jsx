@@ -13,6 +13,7 @@ import "./ThemePreferenceToggle.css";
 
 const OPTIONS = [
   { value: /** @type {ThemePreference} */ ("light"), label: THEME_SETTINGS_UI.LIGHT },
+  { value: /** @type {ThemePreference} */ ("dark"), label: THEME_SETTINGS_UI.DARK },
   { value: /** @type {ThemePreference} */ ("custom"), label: THEME_SETTINGS_UI.CUSTOM },
 ];
 
@@ -24,7 +25,11 @@ export function ThemePreferenceToggle() {
   return (
     <div className="theme-preference-toggle">
       <p className="theme-preference-toggle__label">{THEME_SETTINGS_UI.LABEL}</p>
-      <div className="theme-preference-toggle__row" role="group" aria-label={THEME_SETTINGS_UI.LABEL}>
+      <div
+        className="theme-preference-toggle__row"
+        role="group"
+        aria-label={THEME_SETTINGS_UI.LABEL}
+      >
         {OPTIONS.map((option) => {
           const isActive = preference === option.value;
           return (

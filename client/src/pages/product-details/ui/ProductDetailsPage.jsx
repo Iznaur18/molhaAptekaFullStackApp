@@ -14,6 +14,7 @@ import { productReportQueryKeys } from "../../../entities/product-report/model/p
 import { useMyProductReportStatusQuery } from "../../../entities/product-report/model/useMyProductReportStatusQuery.js";
 import { ReportProductModal } from "../../../entities/product-report/ui/ReportProductModal.jsx";
 import { API_CLIENT_UI, PRODUCT_REPORT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { resolveCatalogDetailsShowAddToCart } from "../../../widgets/app-shell/lib/resolveCatalogDetailsShowAddToCart.js";
 import { useAppShellStateContext } from "../../../widgets/app-shell/model/AppShellStateContext.jsx";
@@ -45,6 +46,8 @@ export function ProductDetailsPage() {
     productId,
     enabled: Boolean(productId),
   });
+
+  useScrollLock(Boolean(productId));
 
   const product =
     productQuery.data != null ? { ...productQuery.data, ...productPatch } : null;

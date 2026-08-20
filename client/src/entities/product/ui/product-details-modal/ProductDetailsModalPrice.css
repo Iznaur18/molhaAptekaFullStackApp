@@ -313,13 +313,73 @@
   color: #b91c1c;
 }
 
-.product-details-modal__price-badge-row .product-details-modal__meta-info-chip--listing-origin {
+.product-details-modal__price-badge-row
+  .product-details-modal__meta-info-chip--listing-origin {
   background: #e0f2fe;
   color: #0369a1;
 }
 
 .product-details-modal__price-badge-row .product-catalog-status-badges {
   display: contents;
+}
+
+/* Тёмная тема: захардкоженные светлые тинты бейджей → тёмные статус-токены */
+:root[data-theme="dark"] .product-details-modal__price-display .product-discount-badge,
+:root[data-theme="dark"]
+  .product-details-modal__price-badge-row
+  .product-discount-badge,
+:root[data-theme="dark"]
+  .product-details-modal__price-badge-row
+  .product-card__promotion-banner-badge {
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger-text);
+}
+
+:root[data-theme="dark"]
+  .product-details-modal__price-display
+  .product-loyalty-points-badge--detail,
+:root[data-theme="dark"]
+  .product-details-modal__price-badge-row
+  .product-loyalty-points-badge,
+:root[data-theme="dark"]
+  .product-details-modal__price-badge-row
+  .product-card__promotion-boost-badge {
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
+}
+
+:root[data-theme="dark"]
+  .product-details-modal__price-badge-row
+  .product-card__installment-badge {
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
+}
+
+:root[data-theme="dark"] .product-details-modal__meta-info-chip--listing-origin,
+:root[data-theme="dark"]
+  .product-details-modal__price-badge-row
+  .product-card__auction-badge,
+:root[data-theme="dark"]
+  .product-details-modal__price-badge-row
+  .product-card__near-badge {
+  background: var(--iz-color-info-soft);
+  color: var(--iz-color-info);
+}
+
+:root[data-theme="dark"] .product-details-modal__meta-info-chip--raffle,
+:root[data-theme="dark"]
+  .product-details-modal__price-badge-row
+  .product-card__raffle-badge,
+:root[data-theme="dark"]
+  .product-details-modal__price-badge-row
+  .product-card__promotion-top-badge {
+  background: var(--iz-color-accent-soft);
+  color: var(--iz-color-accent);
+}
+
+:root[data-theme="dark"] .product-details-modal__meta-info-chip--price-status {
+  background: var(--iz-color-surface-elevated);
+  color: var(--iz-color-text);
 }
 
 .product-details-modal__price-badge-row .product-card__promotion-boost-badge,

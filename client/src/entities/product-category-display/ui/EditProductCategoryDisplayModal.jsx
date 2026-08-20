@@ -5,6 +5,7 @@ import { buildResolvedProductCategoryDisplaysFromRoots } from "../lib/resolvePro
 import { patchResolvedProductCategoryDisplay } from "../lib/patchResolvedProductCategoryDisplay.js";
 import { PRODUCT_CATEGORY_DISPLAY_UI } from "../../../shared/config/appUiCopy.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
+import { normalizeUploadUrlForStorage } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
 import { ModalCloseIcon } from "../../../shared/ui/icon/index.js";
 
@@ -85,13 +86,14 @@ export function EditProductCategoryDisplayModal({
       setErrorMessage("");
 
       const trimmedLabel = label.trim();
-      const trimmedImage = imageUrl.trim();
+      const trimmedImage =
+        normalizeUploadUrlForStorage(imageUrl.trim()) || null;
       setIsSaving(true);
       const display = await patchResolvedProductCategoryDisplay(resolved, {
         customLabel: trimmedLabel || null,
-        imageUrl: trimmedImage || null,
+        imageUrl: trimmedImage,
         resetCustomLabel: trimmedLabel === "" && resolved.isCustomLabel,
-        resetImageUrl: trimmedImage === "" && resolved.isCustomImage,
+        resetImageUrl: !trimmedImage && resolved.isCustomImage,
       });
 
       onSaved(display);

@@ -1,9 +1,6 @@
 import { resolveIzTheme } from "@izibuy/design-tokens";
 
-import {
-  loadThemePreference,
-  saveThemePreference,
-} from "./themePreferenceStorage.js";
+import { loadThemePreference, saveThemePreference } from "./themePreferenceStorage.js";
 
 /** @typedef {import('./themePreferenceStorage.js').ThemePreference} ThemePreference */
 
@@ -46,22 +43,28 @@ const COLOR_VAR_MAP = {
   focusRing: "--iz-color-focus-ring",
 };
 
-/** @type {ThemePreference} */
-let themePreference = "custom";
+/** @type {ThemePreference} — тёмная тема по умолчанию (до чтения localStorage) */
+let themePreference = "dark";
 
 /** @type {Set<(preference: ThemePreference) => void>} */
 const preferenceListeners = new Set();
 
 /**
  * @param {ThemePreference} preference
- * @returns {"light" | "custom"}
+ * @returns {"light" | "dark" | "custom"}
  */
 function resolveScheme(preference) {
-  return preference === "light" ? "light" : "custom";
+  if (preference === "light") {
+    return "light";
+  }
+  if (preference === "dark") {
+    return "dark";
+  }
+  return "custom";
 }
 
 /**
- * @param {"light" | "custom"} scheme
+ * @param {"light" | "dark" | "custom"} scheme
  */
 function applyThemeToRoot(scheme) {
   if (typeof document === "undefined") {
@@ -79,8 +82,8 @@ function applyThemeToRoot(scheme) {
   }
 
   document.documentElement.dataset.theme = scheme;
-  // UA color-scheme only understands light|dark; custom is light-based.
-  rootStyle.colorScheme = "light";
+  // UA color-scheme drives native controls/scrollbars. custom is light-based.
+  rootStyle.colorScheme = scheme === "dark" ? "dark" : "light";
 
   const bg = theme.colors.bg;
   if (typeof bg === "string" && bg.trim()) {

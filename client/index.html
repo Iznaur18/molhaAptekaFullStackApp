@@ -9,7 +9,36 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <meta name="theme-color" content="#f25623" />
+    <meta name="theme-color" content="#0c0e12" />
+    <script>
+      // Пред-пейнт темы: убирает вспышку светлого до загрузки бандла.
+      // Тёмная — тема по умолчанию (см. themePreferenceStorage.loadThemePreference).
+      (function () {
+        try {
+          var p = localStorage.getItem("app-theme-preference");
+          var scheme = p === "light" ? "light" : p === "custom" ? "custom" : "dark";
+          var bg =
+            scheme === "light"
+              ? "#e6eaf1"
+              : scheme === "custom"
+                ? "#DEDEDE"
+                : "#0c0e12";
+          var fg =
+            scheme === "light"
+              ? "#111827"
+              : scheme === "custom"
+                ? "#171717"
+                : "#f2f4f8";
+          var d = document.documentElement;
+          d.dataset.theme = scheme;
+          d.style.background = bg;
+          d.style.color = fg;
+          d.style.colorScheme = scheme === "dark" ? "dark" : "light";
+          var m = document.querySelector('meta[name="theme-color"]');
+          if (m) m.setAttribute("content", bg);
+        } catch (e) {}
+      })();
+    </script>
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no, interactive-widget=overlays-content"

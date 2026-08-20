@@ -35,7 +35,6 @@ export function CuratedCategoryCompactCard({ category, onOpen }) {
           onError={() => setFailed(true)}
         />
       </span>
-      <span className="curated-category-compact-card__label">{category.label}</span>
     </button>
   );
 }

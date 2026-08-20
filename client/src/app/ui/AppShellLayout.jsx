@@ -1,10 +1,11 @@
-import { Suspense } from "react";
+import { Suspense, useRef } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
 import { CartServerSync } from "../../entities/cart/ui/CartServerSync.jsx";
 import { WishlistServerSync } from "../../entities/wishlist/ui/WishlistServerSync.jsx";
 import { EmailVerificationNotice } from "../../entities/user/ui/EmailVerificationNotice.jsx";
 import { lazyNamedExport } from "../../shared/lib/lazyNamedExport.js";
+import { isProductDetailsPath } from "../../shared/lib/productDetailsPaths.js";
 import { getAppShellVariantClass } from "../lib/appShellVariant.js";
 import { buildAppShellRouteKey } from "../lib/buildAppShellRouteKey.js";
 import { useAppShell } from "../model/AppShellContext.jsx";
@@ -37,7 +38,15 @@ export function AppShellLayout() {
     modalsLayerProps,
   } = useAppShell();
 
-  const showAppShellHeader = isHomeCatalogPathname(location.pathname);
+  const pathWantsHeader = isHomeCatalogPathname(location.pathname);
+  const isProductDetails = isProductDetailsPath(location.pathname);
+  const frozenHeaderVisibleRef = useRef(pathWantsHeader);
+  if (!isProductDetails) {
+    frozenHeaderVisibleRef.current = pathWantsHeader;
+  }
+  const showAppShellHeader = isProductDetails
+    ? frozenHeaderVisibleRef.current
+    : pathWantsHeader;
 
   return (
     <div className={`app-shell ${getAppShellVariantClass()}`}>

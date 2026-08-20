@@ -1,4 +1,4 @@
-export { DARK_THEME_HARD_BLUE_KEYS, izColors, izColorsCustom, izColorsDark } from "./colors";
+export { izColors, izColorsCustom, izColorsDark } from "./colors";
 export {
   PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
   resolveProductMediaDisplayHeight,

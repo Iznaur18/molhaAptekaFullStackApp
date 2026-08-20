@@ -1,95 +1,58 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import {
-  DARK_THEME_HARD_BLUE_KEYS,
-  izColors,
-  izColorsDark,
-} from "../src/colors.ts";
-import {
-  mirrorLightness,
-  parseHexColor,
-  rgbToHsl,
-  setLightness,
-} from "../src/invertColorLightness.ts";
+import { izColors, izColorsDark } from "../src/colors.ts";
+import { parseHexColor, rgbToHsl } from "../src/invertColorLightness.ts";
+import { resolveIzTheme } from "../src/index.ts";
 
-const MIRRORED_NEUTRAL_KEYS = [
-  "text",
-  "textMuted",
-  "textSecondary",
-  "textPlaceholder",
-  "ink",
-  "bg",
-  "border",
-  "borderStrong",
-];
+const lightnessOf = (hex) => rgbToHsl(parseHexColor(hex)).l;
 
-test("mirrorLightness flips white to black and back", () => {
-  assert.equal(mirrorLightness("#ffffff"), "#000000");
-  assert.equal(mirrorLightness("#000000"), "#ffffff");
+test("dark palette is hand-crafted, not a mirror of light", () => {
+  // Холст near-black и явно темнее светлого фона.
+  assert.equal(izColorsDark.bg, "#0c0e12");
+  assert.ok(lightnessOf(izColorsDark.bg) < 0.1);
+  assert.ok(lightnessOf(izColorsDark.bg) < lightnessOf(izColors.bg));
+  // Текст светлый на тёмном фоне.
+  assert.ok(lightnessOf(izColorsDark.text) > 0.85);
 });
 
-test("mirrorLightness keeps hue for tinted neutrals", () => {
-  const light = rgbToHsl(parseHexColor("#e5eef2"));
-  const dark = rgbToHsl(parseHexColor(mirrorLightness("#e5eef2")));
-  assert.ok(Math.abs(light.h - dark.h) < 1);
-  assert.ok(Math.abs(light.s - dark.s) < 0.02);
-  assert.ok(Math.abs(light.l + dark.l - 1) < 0.02);
+test("dark surfaces step up above the canvas (bg < muted < elevated < surface)", () => {
+  const bg = lightnessOf(izColorsDark.bg);
+  const muted = lightnessOf(izColorsDark.surfaceMuted);
+  const elevated = lightnessOf(izColorsDark.surfaceElevated);
+  const surface = lightnessOf(izColorsDark.surface);
+  assert.ok(bg < muted, "bg < surfaceMuted");
+  assert.ok(muted < elevated, "surfaceMuted < surfaceElevated");
+  assert.ok(elevated < surface, "surfaceElevated < surface");
 });
 
-test("dark neutrals differ from light and match lightness mirror", () => {
-  for (const key of MIRRORED_NEUTRAL_KEYS) {
-    assert.notEqual(izColorsDark[key], izColors[key], key);
-    assert.equal(izColorsDark[key], mirrorLightness(izColors[key]), key);
+test("interactive is monochrome silver (no blue), readable as text on dark", () => {
+  assert.equal(izColorsDark.action, "#d7dbe2");
+  assert.equal(izColorsDark.link, "#d7dbe2");
+  // action используется и как текст (цена/ссылки) — должен быть светлым.
+  assert.ok(lightnessOf(izColorsDark.action) > 0.7);
+  assert.ok(lightnessOf(izColorsDark.primary) > 0.7);
+  // onContrast тёмный: текст на серебряной кнопке читаем.
+  assert.ok(lightnessOf(izColorsDark.onContrast) < 0.1);
+  // Никакого синего перекоса: канал B не доминирует над R в акценте.
+  const [r, , b] = izColorsDark.action
+    .match(/[0-9a-f]{2}/g)
+    .map((h) => parseInt(h, 16));
+  assert.ok(Math.abs(r - b) < 24, "action близок к нейтральному, не синий");
+});
+
+test("status text/solids are lighter than in light for dark legibility", () => {
+  for (const key of ["success", "danger", "successText", "dangerText", "warningText"]) {
+    assert.ok(lightnessOf(izColorsDark[key]) > lightnessOf(izColors[key]), key);
   }
 });
 
-test("dark surfaces stay lighter than bg after elevation fix", () => {
-  const bgL = rgbToHsl(parseHexColor(izColorsDark.bg)).l;
-  for (const key of ["surface", "surfaceMuted", "surfaceElevated"]) {
-    assert.notEqual(izColorsDark[key], izColors[key], key);
-    assert.ok(rgbToHsl(parseHexColor(izColorsDark[key])).l > bgL, key);
-  }
+test("premium keeps the warm gold crest accent", () => {
+  assert.equal(izColorsDark.premium, "#e0c35a");
 });
 
-test("hard blue tokens are identical in dark", () => {
-  for (const key of DARK_THEME_HARD_BLUE_KEYS) {
-    assert.equal(izColorsDark[key], izColors[key], key);
-  }
-  assert.equal(izColorsDark.onContrast, izColors.onContrast);
-  assert.equal(izColorsDark.accent, izColors.accent);
-});
-
-test("soft blues keep hue but are darkened for dark surfaces", () => {
-  const softKeys = ["actionSoft", "actionBorder", "infoSoft"];
-  for (const key of softKeys) {
-    const lightHsl = rgbToHsl(parseHexColor(izColors[key]));
-    const darkHsl = rgbToHsl(parseHexColor(izColorsDark[key]));
-    assert.notEqual(izColorsDark[key], izColors[key], key);
-    assert.ok(Math.abs(lightHsl.h - darkHsl.h) < 2, key);
-    assert.ok(darkHsl.l < 0.4, key);
-  }
-  assert.equal(izColorsDark.actionSoft, setLightness(izColors.actionSoft, 0.18));
-  assert.equal(izColorsDark.actionBorder, setLightness(izColors.actionBorder, 0.32));
-  assert.equal(izColorsDark.infoSoft, setLightness(izColors.infoSoft, 0.18));
-});
-
-test("status surfaces are mirrored; solids are brightened", () => {
-  assert.equal(izColorsDark.successSurface, mirrorLightness(izColors.successSurface));
-  assert.equal(izColorsDark.warningSurface, mirrorLightness(izColors.warningSurface));
-  assert.equal(izColorsDark.dangerSurface, mirrorLightness(izColors.dangerSurface));
-  assert.equal(izColorsDark.accentSoft, mirrorLightness(izColors.accentSoft));
-
-  assert.ok(
-    rgbToHsl(parseHexColor(izColorsDark.success)).l >
-      rgbToHsl(parseHexColor(izColors.success)).l,
-  );
-  assert.ok(
-    rgbToHsl(parseHexColor(izColorsDark.dangerText)).l >
-      rgbToHsl(parseHexColor(izColors.dangerText)).l,
-  );
-});
-
-test("focusRing keeps action blue channels", () => {
-  assert.match(izColorsDark.focusRing, /^rgb\(31 111 235 \/ 22%\)$/);
+test("resolveIzTheme('dark') returns the hand-crafted dark palette", () => {
+  assert.equal(resolveIzTheme("dark").colors.bg, "#0c0e12");
+  assert.notEqual(resolveIzTheme("dark").colors.bg, resolveIzTheme("light").colors.bg);
+  assert.notEqual(resolveIzTheme("dark").colors.bg, resolveIzTheme("custom").colors.bg);
 });

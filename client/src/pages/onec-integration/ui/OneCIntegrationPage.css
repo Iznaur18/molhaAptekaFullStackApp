@@ -158,6 +158,17 @@
   font-weight: 600;
 }
 
+/* Тёмная тема: светлые тинты лог-бейджей → тёмные статус-токены */
+:root[data-theme="dark"] .onec-page__log-badge_ok {
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
+}
+
+:root[data-theme="dark"] .onec-page__log-badge_err {
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger-text);
+}
+
 .onec-page__log-msg {
   color: var(--color-text-muted, #444);
 }

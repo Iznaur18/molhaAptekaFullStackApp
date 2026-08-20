@@ -125,6 +125,7 @@ const resolvePersonalCategoryFields = (row, listRegionCode, options = {}) => {
       typeof row.imageUrl === "string" && row.imageUrl.trim()
         ? row.imageUrl.trim()
         : null,
+    sellerId: row.sellerId != null ? String(row.sellerId) : null,
   };
 };
 

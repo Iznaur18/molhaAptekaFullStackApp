@@ -8,4 +8,5 @@
   padding: 1.5rem;
   text-align: center;
   color: color-mix(in srgb, var(--iz-color-text) 70%, transparent);
+  background: var(--iz-color-surface);
 }

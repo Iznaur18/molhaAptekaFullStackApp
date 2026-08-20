@@ -13,5 +13,7 @@ export function useCatalogProductByIdQuery({ productId, enabled = true }) {
     queryKey: catalogQueryKeys.byId(id),
     enabled: enabled && Boolean(id),
     queryFn: () => fetchCatalogProductById(id),
+    // Seed из карточки каталога — сразу полный UI без skeleton.
+    staleTime: 30_000,
   });
 }

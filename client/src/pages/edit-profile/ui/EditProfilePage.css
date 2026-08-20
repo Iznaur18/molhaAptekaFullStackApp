@@ -5,7 +5,7 @@
   width: 100%;
   max-width: 44rem;
   min-width: 0;
-  background: #fff;
+  background: var(--iz-color-surface);
 }
 
 /*
@@ -22,7 +22,7 @@ body:has(.edit-profile-page) .my-profile-page__layout,
 body:has(.edit-profile-page) .my-profile-page__main,
 body:has(.edit-profile-page) .my-profile-page__body,
 body:has(.edit-profile-page) .my-profile-page__tab-content {
-  background: #fff;
+  background: var(--iz-color-surface);
 }
 
 .edit-profile-page_centered {
@@ -169,7 +169,7 @@ body:has(.edit-profile-page) .my-profile-page__tab-content {
   gap: 0.75rem;
   margin: 0 -0.25rem;
   padding: 0.875rem 0.25rem calc(0.875rem + env(safe-area-inset-bottom, 0));
-  background: #fff;
+  background: var(--iz-color-surface);
   border-top: 1px solid var(--iz-color-border);
 }
 

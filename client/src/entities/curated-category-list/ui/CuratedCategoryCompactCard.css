@@ -1,7 +1,5 @@
 .curated-category-compact-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
+  display: block;
   width: 100%;
   min-width: 0;
   margin: 0;
@@ -9,7 +7,6 @@
   border: none;
   background: transparent;
   cursor: pointer;
-  text-align: left;
 }
 
 .curated-category-compact-card__image-wrap {
@@ -44,16 +41,4 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
-}
-
-.curated-category-compact-card__label {
-  display: block;
-  overflow: hidden;
-  padding: 0 0.125rem;
-  color: var(--iz-color-ink);
-  font-size: 0.625rem;
-  font-weight: 600;
-  line-height: 0.75rem;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }

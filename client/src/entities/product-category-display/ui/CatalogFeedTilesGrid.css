@@ -10,12 +10,17 @@
   align-items: center;
   gap: 0.55rem;
   margin: 0.65rem 0 0.95rem;
+  font-family: var(--iz-font-display);
   font-size: 1.375rem;
   font-weight: 800;
   letter-spacing: -0.035em;
   line-height: 1.15;
   color: var(--iz-color-ink);
   text-wrap: balance;
+}
+
+.catalog-browser-landing__categories-title {
+  font-size: clamp(1.08rem, 1rem + 0.35vw, 1.28rem);
 }
 
 .catalog-feed-tiles__title::before,

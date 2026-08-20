@@ -24,6 +24,7 @@
  * @property {string} label
  * @property {string | null} imageUrl
  * @property {string | null} [categorySlug]
+ * @property {string | null} [sellerId]
  */
 
 /**

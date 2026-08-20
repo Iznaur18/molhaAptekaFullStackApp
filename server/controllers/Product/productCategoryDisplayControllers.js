@@ -6,6 +6,7 @@ import {
 } from "../../services/product/productCategoryDisplayPatch.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 import ProductCategoryDisplayModel from "../../models/ProductCategoryDisplayModel.js";
+import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
 
 /**
  * @param {import('mongoose').Document | Record<string, unknown> | null | undefined} row
@@ -56,10 +57,11 @@ const buildCategoryDisplayUpdate = async (existing, body, userId) => {
     }
     update.imageUrl = null;
   } else if (imageUrl !== undefined) {
-    const nextUrl =
+    const raw =
       imageUrl == null || String(imageUrl).trim() === ""
         ? null
         : String(imageUrl).trim();
+    const nextUrl = raw ? normalizeUploadUrlForStorage(raw) || null : null;
     if (existing?.imageUrl && nextUrl && existing.imageUrl !== nextUrl) {
       await deleteUploadFileByUrl(existing.imageUrl);
     }

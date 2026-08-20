@@ -1,0 +1,6 @@
+/* Каталог под /product/:id остаётся в потоке (scrollY), но невидим и inert. */
+.catalog-product-shell__catalog--dormant {
+  visibility: hidden;
+  pointer-events: none;
+  content-visibility: hidden;
+}

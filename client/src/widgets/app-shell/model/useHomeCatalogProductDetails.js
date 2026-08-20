@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { patchProductInAllCatalogCaches } from "../../../entities/product/lib/catalogProductsQueryCache.js";
 import { navigateToProductDetails } from "../../../entities/product/lib/navigateToProductDetails.js";
+import { catalogQueryKeys } from "../../../entities/product/model/catalogQueryKeys.js";
 
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
 
@@ -17,13 +18,22 @@ export const useHomeCatalogProductDetails = ({ onBeforeOpenDetails }) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  /** @param {string} productId @param {ProductFromApi | null | undefined} [_seedProduct] */
+  /** @param {string} productId @param {ProductFromApi | null | undefined} [seedProduct] */
   const openCatalogProductDetails = useCallback(
-    (productId, _seedProduct = null) => {
+    (productId, seedProduct = null) => {
       onBeforeOpenDetails?.();
-      navigateToProductDetails(navigate, productId);
+      const id = String(productId ?? "").trim();
+      if (
+        id &&
+        seedProduct != null &&
+        typeof seedProduct === "object" &&
+        String(seedProduct._id) === id
+      ) {
+        queryClient.setQueryData(catalogQueryKeys.byId(id), seedProduct);
+      }
+      navigateToProductDetails(navigate, id);
     },
-    [navigate, onBeforeOpenDetails],
+    [navigate, onBeforeOpenDetails, queryClient],
   );
 
   /** @param {string} productId */

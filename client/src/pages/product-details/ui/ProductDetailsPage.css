@@ -629,6 +629,23 @@ body:has(.product-details-page) .app-shell {
 
 .product-details-modal--page-split
   .product-details-page__wide-rest
+  .product-details-modal__feature-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  align-items: stretch;
+  gap: 10px;
+}
+
+.product-details-modal--page-split
+  .product-details-page__wide-rest
+  .product-details-modal__feature-cards
+  > .product-details-feature-card {
+  width: 100%;
+  min-width: 0;
+}
+
+.product-details-modal--page-split
+  .product-details-page__wide-rest
   .product-details-modal__below-fold {
   display: flex;
   flex-direction: column;

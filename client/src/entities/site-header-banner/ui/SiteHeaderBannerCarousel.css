@@ -52,6 +52,12 @@
   pointer-events: none;
 }
 
+/* Тёмная тема: бейдж-плашка над баннером — тёмное стекло + светлый текст */
+:root[data-theme="dark"] .site-header-banner-carousel__ad-badge {
+  background: rgb(18 21 27 / 62%);
+  color: var(--iz-color-text);
+}
+
 .site-header-banner-carousel__link,
 .site-header-banner-carousel__static {
   display: block;
@@ -99,7 +105,9 @@
   background: rgb(255 255 255 / 40%);
   cursor: pointer;
   pointer-events: auto;
-  transition: background 0.3s ease, width 0.3s ease;
+  transition:
+    background 0.3s ease,
+    width 0.3s ease;
 }
 
 .site-header-banner-carousel__dot_active {

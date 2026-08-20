@@ -61,6 +61,11 @@
   line-height: 0.6875rem;
 }
 
+:root[data-theme="dark"] .featured-raffle-modal-card__badge {
+  background: rgb(18 21 27 / 62%);
+  color: var(--iz-color-text);
+}
+
 .featured-raffle-modal-card__slide-count {
   position: absolute;
   left: 0.625rem;

@@ -177,6 +177,22 @@
   line-height: var(--product-card-overlay-badge-line-height, 12px);
 }
 
+/* Тёмная тема: захардкоженные светлые тинты → тёмные статус-токены */
+:root[data-theme="dark"] .product-card__raffle-badge {
+  background: var(--iz-color-accent-soft);
+  color: var(--iz-color-accent);
+}
+
+:root[data-theme="dark"] .product-card__flash-sale-badge {
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
+}
+
+:root[data-theme="dark"] .product-card__affiliate-badge {
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
+}
+
 .product-card__status-badge-placeholder {
   margin: 0;
   padding: var(--product-card-overlay-badge-pad-y, 2px)

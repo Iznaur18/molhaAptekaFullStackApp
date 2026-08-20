@@ -23,6 +23,10 @@
   background: #e8f0ea;
 }
 
+:root[data-theme="dark"] .map-point-picker .leaflet-container {
+  background: var(--iz-color-surface-muted);
+}
+
 .map-point-picker .leaflet-control-attribution {
   font-size: 10px;
   background: color-mix(in srgb, #fff 88%, transparent);

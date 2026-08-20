@@ -2,6 +2,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { productCategoryDisplayQueryKeys } from "../../../entities/product-category-display/model/productCategoryDisplayQueryKeys.js";
+import { mergeProductCategoryDisplayIntoList } from "../../../entities/product-category-display/lib/mergeProductCategoryDisplayIntoList.js";
+import { invalidateAllProductCategoryDisplayQueries } from "../../../entities/product-category-display/lib/productCategoryDisplayQueryCache.js";
 import { useProductCatalogFeedTileDisplaysQuery } from "../../../entities/product-category-display/model/useProductCatalogFeedTileDisplaysQuery.js";
 import { useProductCategoryDisplaysQuery } from "../../../entities/product-category-display/model/useProductCategoryDisplaysQuery.js";
 import {
@@ -16,10 +18,10 @@ import { useProductCategoryBreadcrumbQuery } from "../../../entities/product-cat
 import { useProductCategoryRootsQuery } from "../../../entities/product-category-tree/model/useProductCategoryRootsQuery.js";
 import { useSellerPersonalCategoryCatalogTilesQuery } from "../../../entities/seller-personal-category/model/useSellerPersonalCategoryCatalogTilesQuery.js";
 import { userHasCatalogNearGeo } from "../../../entities/product/lib/userHasCatalogNearGeo.js";
-import { CATALOG_SORT_NEWEST } from "../../../entities/product/model/productConstants.js";
 import { API_CLIENT_UI, HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { catalogMainViewToPathname } from "../../../shared/lib/catalogMainViewPaths.js";
 import { mainViewToPathname } from "../../../shared/lib/homeMainViewPaths.js";
+import { buildSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
 import { CATALOG_LANDING_QUERY } from "./catalogLoaderConstants.js";
 import { useCatalogSubcategoryPicker } from "./useCatalogSubcategoryPicker.js";
 
@@ -199,35 +201,14 @@ export function useCatalogBrowserLanding({
 
   const handleSellerPersonalCategoryTileClick = useCallback(
     (tile) => {
-      if (!tile._id) {
+      const sellerId = tile.sellerId?.trim();
+      if (!sellerId) {
         return;
       }
-      const nextQuery = {
-        sort: CATALOG_SORT_NEWEST,
-        category: null,
-        categoryId: null,
-        sellerPersonalCategoryId: tile._id,
-        followingOnly: false,
-        auctionOnly: false,
-        installmentOnly: false,
-        saleOnly: false,
-        rentalOnly: false,
-        affiliateOnly: false,
-        wholesaleOnly: false,
-        originalOnly: false,
-        near: false,
-        flashSaleOnly: false,
-      };
-      applyCatalogQueryState(nextQuery);
       subcategoryPicker.clearPickerTrail();
-      navigate(buildCatalogProductsLocation(nextQuery, { compact: isCompactLayout }));
+      navigate(buildSellerProductsPath(sellerId));
     },
-    [
-      applyCatalogQueryState,
-      isCompactLayout,
-      navigate,
-      subcategoryPicker.clearPickerTrail,
-    ],
+    [navigate, subcategoryPicker.clearPickerTrail],
   );
 
   const handleCatalogFeedTileClick = useCallback(
@@ -277,12 +258,11 @@ export function useCatalogBrowserLanding({
     (display) => {
       queryClient.setQueryData(productCategoryDisplayQueryKeys.categories(), (old) => {
         const displays = old?.displays ?? [];
-        const next = displays.filter(
-          (row) =>
-            row.categorySlug !== display.categorySlug && row.categoryId !== display.categoryId,
-        );
-        return { displays: [...next, display] };
+        return {
+          displays: mergeProductCategoryDisplayIntoList(displays, display),
+        };
       });
+      void invalidateAllProductCategoryDisplayQueries(queryClient);
     },
     [queryClient],
   );

@@ -366,6 +366,18 @@
   border-color: color-mix(in srgb, var(--iz-color-danger) 40%, var(--iz-color-border));
 }
 
+.product-qa-item__action--primary {
+  margin-left: auto;
+  border-color: transparent;
+  background: var(--iz-gradient-header-btn, var(--iz-color-action));
+  color: var(--iz-color-on-contrast);
+  font-weight: 600;
+}
+
+.product-qa-item__action--primary:hover:not(:disabled) {
+  filter: brightness(1.07);
+}
+
 .product-qa-item__answer-form {
   margin-top: 0.35rem;
 }
