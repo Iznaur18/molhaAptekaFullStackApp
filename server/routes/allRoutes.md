@@ -52,6 +52,9 @@
 | PATCH | `/auth/me/in-app-notifications/read` | 🔑 | Отметить in-app уведомления прочитанными |
 | PUT | `/auth/me/push-token` | 🔑 | Регистрация Expo push-токена |
 | DELETE | `/auth/me/push-token` | 🔑 | Удаление push-токена |
+| GET | `/auth/me/web-push/vapid-public-key` | 🔑 | Публичный VAPID для Web Push |
+| PUT | `/auth/me/web-push-subscription` | 🔑 | Регистрация браузерной PushSubscription |
+| DELETE | `/auth/me/web-push-subscription` | 🔑 | Удаление Web Push подписки |
 
 ## User — `/user`
 

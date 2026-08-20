@@ -224,6 +224,25 @@ export const STAFF_AUDIT_LOG_ADMIN_PAGE_UI = {
   NEXT: "Вперёд",
 };
 
+/** Админка: рассылка уведомлений всем пользователям */
+export const STAFF_BROADCAST_NOTIFICATIONS_ADMIN_PAGE_UI = {
+  TITLE: "Уведомления",
+  HINT: "Сообщение получат все активные незаблокированные пользователи (в приложении и системным push, если включён).",
+  COUNT_LOADING: "Считаем получателей…",
+  COUNT_ERROR: "Не удалось посчитать получателей",
+  COUNT: (n) => `Получателей: ${n}`,
+  TITLE_LABEL: "Заголовок",
+  TITLE_PLACEHOLDER: "Например: Обновление сервиса",
+  MESSAGE_LABEL: "Текст",
+  MESSAGE_PLACEHOLDER: "Текст уведомления…",
+  VALIDATION_REQUIRED: "Заполните заголовок и текст",
+  CONFIRM: (n) => `Отправить уведомление ${n} пользователям?`,
+  SEND: "Отправить всем",
+  SENDING: "Отправка…",
+  SUCCESS: (n) => `Отправлено: ${n}`,
+  SEND_ERROR: "Не удалось отправить уведомление",
+};
+
 /** Админка: синонимы умного поиска */
 export const SEARCH_SYNONYMS_ADMIN_PAGE_UI = {
   TITLE: "Синонимы поиска",

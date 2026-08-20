@@ -30,6 +30,7 @@ export function buildProfileNavGroups({
   canUseInstallmentDisputes,
   canUseAdminOrders,
   canUseStaffAuditLogAdmin,
+  canUseBroadcastNotificationsAdmin,
   canUseSearchSynonymsAdmin,
   canUseCategoryTreeAdmin,
   canUseAppIntroAdmin,
@@ -377,6 +378,15 @@ export function buildProfileNavGroups({
             label: MY_PROFILE_PAGE_UI.TAB_STAFF_AUDIT_LOG_ADMIN,
             // Без prefetch-колбэка: страница read-only и грузит данные сама.
             onClick: () => selectTab("staff-audit-log-admin"),
+          },
+        ]
+      : []),
+    ...(canUseBroadcastNotificationsAdmin
+      ? [
+          {
+            tab: "broadcast-notifications-admin",
+            label: MY_PROFILE_PAGE_UI.TAB_BROADCAST_NOTIFICATIONS_ADMIN,
+            onClick: () => selectTab("broadcast-notifications-admin"),
           },
         ]
       : []),

@@ -21,6 +21,7 @@ import {
   LazyProductReportsPage,
   LazyRafflesStaffPage,
   LazyStaffAuditLogAdminPage,
+  LazyStaffBroadcastNotificationsAdminPage,
   LazySearchSynonymsAdminPage,
   LazyAppIntroAdminPage,
   LazySiteHeaderBannerAdminPage,
@@ -213,6 +214,8 @@ export function renderProfileTabPanel(mainView, props) {
       return <LazyAdminOrdersPage />;
     case "staff-audit-log-admin":
       return <LazyStaffAuditLogAdminPage />;
+    case "broadcast-notifications-admin":
+      return <LazyStaffBroadcastNotificationsAdminPage />;
     case "search-synonyms-admin":
       return <LazySearchSynonymsAdminPage />;
     case "category-tree-admin":

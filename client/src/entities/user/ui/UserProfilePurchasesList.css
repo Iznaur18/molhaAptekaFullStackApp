@@ -36,6 +36,19 @@
   text-align: left;
 }
 
+:root[data-theme="dark"] .user-profile-purchases-section > .user-profile-purchases__heading,
+:root[data-theme="dark"]
+  .user-profile-purchases-section
+  > .user-profile-purchases__heading_action {
+  border-color: var(--iz-color-border-strong);
+  background: var(--iz-color-surface-elevated);
+  color: #ffffff;
+}
+
+:root[data-theme="dark"] .user-profile-purchases__heading-chevron {
+  color: #ffffff;
+}
+
 .user-profile-purchases-section > .user-profile-purchases__heading_action {
   display: flex;
   align-items: center;

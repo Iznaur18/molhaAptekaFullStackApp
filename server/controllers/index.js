@@ -215,6 +215,15 @@ import {
   removePushTokenController,
 } from "./User/pushTokenControllers.js";
 import {
+  getWebPushVapidPublicKeyController,
+  registerWebPushSubscriptionController,
+  removeWebPushSubscriptionController,
+} from "./User/webPushSubscriptionControllers.js";
+import {
+  getStaffBroadcastRecipientsCountController,
+  postStaffBroadcastNotificationController,
+} from "./User/staffBroadcastNotificationControllers.js";
+import {
   submitDataConfirmationRequestController,
   getMyDataConfirmationRequestController,
   getPendingDataConfirmationRequestsController,
@@ -438,6 +447,11 @@ export {
   markInAppNotificationsReadController,
   registerPushTokenController,
   removePushTokenController,
+  getWebPushVapidPublicKeyController,
+  registerWebPushSubscriptionController,
+  removeWebPushSubscriptionController,
+  getStaffBroadcastRecipientsCountController,
+  postStaffBroadcastNotificationController,
   submitDataConfirmationRequestController,
   getMyDataConfirmationRequestController,
   getPendingDataConfirmationRequestsController,

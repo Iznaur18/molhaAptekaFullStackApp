@@ -4,6 +4,7 @@ import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.j
 import { isPremiumActive } from "../../../entities/user/lib/isPremiumActive.js";
 import { USER_ROLE_USER } from "../../../entities/user/model/userConstants.js";
 import { ThemePreferenceToggle } from "../../../features/theme-settings/ui/ThemePreferenceToggle.jsx";
+import { WebPushSettingsToggle } from "../../../features/web-push/ui/WebPushSettingsToggle.jsx";
 import {
   AUTH_UI,
   MY_PROFILE_PAGE_UI,
@@ -404,6 +405,7 @@ export function MyProfilePage({
                   <UserProfileInfoPanel rows={rows} />
                   <div className="my-profile-page__overview-footer">
                     <ThemePreferenceToggle />
+                    <WebPushSettingsToggle isAuthorized={Boolean(isProfileReady)} />
                   </div>
                 </>
               ) : null}

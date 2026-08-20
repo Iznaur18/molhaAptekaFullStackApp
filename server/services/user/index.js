@@ -80,6 +80,14 @@ export {
   removeExpoPushTokenForUser,
 } from "./expoPushNotifications.js";
 export {
+  getWebPushVapidPublicKey,
+  isWebPushConfigured,
+  registerWebPushSubscriptionForUser,
+  removeWebPushSubscriptionForUser,
+  sendWebPushToUser,
+  buildWebPushClickPath,
+} from "./webPushNotifications.js";
+export {
   normalizeProfileImageFocus,
   normalizeUserAvatarFocus,
   normalizeUserBackgroundFocus,

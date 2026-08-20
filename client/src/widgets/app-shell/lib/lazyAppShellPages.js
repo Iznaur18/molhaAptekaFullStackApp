@@ -60,6 +60,14 @@ export const LazyStaffAuditLogAdminPage = lazyNamedExport(
   "StaffAuditLogAdminPage",
 );
 
+export const LazyStaffBroadcastNotificationsAdminPage = lazyNamedExport(
+  () =>
+    import(
+      "../../../pages/staff-broadcast-notifications-admin/ui/StaffBroadcastNotificationsAdminPage.jsx"
+    ),
+  "StaffBroadcastNotificationsAdminPage",
+);
+
 export const LazySearchSynonymsAdminPage = lazyNamedExport(
   () => import("../../../pages/search-synonyms-admin/ui/SearchSynonymsAdminPage.jsx"),
   "SearchSynonymsAdminPage",

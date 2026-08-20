@@ -24,6 +24,10 @@
   color: var(--iz-color-ink);
 }
 
+:root[data-theme="dark"] .cart-fulfillment__title {
+  color: var(--iz-color-text);
+}
+
 .cart-fulfillment__title::before {
   content: "";
   flex-shrink: 0;

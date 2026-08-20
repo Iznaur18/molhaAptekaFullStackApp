@@ -22,6 +22,7 @@ import {
   introAdRouter,
   sellerPersonalCategoryRouter,
   auditRouter,
+  staffRouter,
   onecRouter,
 } from "./routes/index.js";
 import {
@@ -107,6 +108,7 @@ export const createApp = () => {
   app.use("/intro-ad", introAdRouter);
   app.use("/seller-personal-category", sellerPersonalCategoryRouter);
   app.use("/audit", auditRouter);
+  app.use("/staff", staffRouter);
   app.use("/onec", onecRouter);
 
   app.use(notFoundHandler);

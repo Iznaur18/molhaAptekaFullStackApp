@@ -158,6 +158,12 @@
   font-weight: 700;
 }
 
+:root[data-theme="dark"] .cart-page__payable-label,
+:root[data-theme="dark"] .cart-page__total-value,
+:root[data-theme="dark"] .cart-page__list-price {
+  color: var(--iz-color-text);
+}
+
 .cart-page__discount-value {
   flex-shrink: 0;
   font-size: 0.8125rem;

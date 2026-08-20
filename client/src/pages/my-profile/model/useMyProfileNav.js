@@ -126,6 +126,8 @@ export function useMyProfileNav({
   // Read-only журнал аудита: без prefetch-колбэка, гейт только по роли admin.
   const canUseStaffAuditLogAdmin =
     !isRegularUser && isProfileReady && user?.userRole === "admin";
+  const canUseBroadcastNotificationsAdmin =
+    !isRegularUser && isProfileReady && user?.userRole === "admin";
   const canUseSearchSynonymsAdmin =
     !isRegularUser &&
     isProfileReady &&
@@ -193,6 +195,7 @@ export function useMyProfileNav({
         canUseInstallmentDisputes,
         canUseAdminOrders,
         canUseStaffAuditLogAdmin,
+        canUseBroadcastNotificationsAdmin,
         canUseSearchSynonymsAdmin,
         canUseCategoryTreeAdmin,
         canUseAppIntroAdmin,
@@ -281,6 +284,7 @@ export function useMyProfileNav({
       canUseProductPromotions,
       canUseRaffles,
       canUseStaffAuditLogAdmin,
+      canUseBroadcastNotificationsAdmin,
       canUseSearchSynonymsAdmin,
       canUseSubscriptions,
       canUseWishlist,

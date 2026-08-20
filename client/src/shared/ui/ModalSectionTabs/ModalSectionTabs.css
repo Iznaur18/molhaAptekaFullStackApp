@@ -59,3 +59,12 @@
   background: var(--iz-color-action);
   color: var(--iz-color-on-contrast);
 }
+
+:root[data-theme="dark"] .modal-section-tabs__tab:not(.modal-section-tabs__tab_active) {
+  color: var(--iz-color-text-secondary);
+}
+
+:root[data-theme="dark"] .modal-section-tabs__tab_active,
+:root[data-theme="dark"] .modal-section-tabs__tab_active:hover {
+  color: var(--iz-color-on-contrast);
+}

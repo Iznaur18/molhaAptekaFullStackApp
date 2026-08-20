@@ -4,6 +4,10 @@ import {
   buildExpoPushDataPayload,
   sendExpoPushToUser,
 } from "./expoPushNotifications.js";
+import {
+  buildWebPushClickPath,
+  sendWebPushToUser,
+} from "./webPushNotifications.js";
 
 const NOTIFICATION_LIST_LIMIT = 50;
 
@@ -31,18 +35,36 @@ export const createUserInAppNotification = async ({
     actorUserId: actorUserId ?? null,
   });
 
+  const pushData = buildExpoPushDataPayload({
+    kind,
+    message,
+    productId: productId ? String(productId) : null,
+    actorUserId: actorUserId ? String(actorUserId) : null,
+    notificationId: String(doc._id),
+  });
+
   void sendExpoPushToUser(String(userId), {
     body: message,
-    data: buildExpoPushDataPayload({
+    data: pushData,
+  }).catch((error) => {
+    logServerEvent("error", {
+      event: "createuserinappnotification_push",
+      error: error instanceof Error ? error.message : String(error),
+    });
+  });
+
+  void sendWebPushToUser(String(userId), {
+    body: message,
+    url: buildWebPushClickPath({
       kind,
-      message,
       productId: productId ? String(productId) : null,
       actorUserId: actorUserId ? String(actorUserId) : null,
       notificationId: String(doc._id),
     }),
+    data: pushData,
   }).catch((error) => {
     logServerEvent("error", {
-      event: "createuserinappnotification_push",
+      event: "createuserinappnotification_web_push",
       error: error instanceof Error ? error.message : String(error),
     });
   });

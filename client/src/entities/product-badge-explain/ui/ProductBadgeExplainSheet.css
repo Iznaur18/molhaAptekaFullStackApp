@@ -147,6 +147,11 @@
   display: block;
 }
 
+:root[data-theme="dark"] .product-badge-explain-sheet__close {
+  background: #ffffff;
+  color: var(--iz-color-on-contrast);
+}
+
 .product-badge-explain-sheet__close:disabled {
   opacity: 0.55;
   cursor: not-allowed;
@@ -155,6 +160,10 @@
 .product-badge-explain-sheet__close:focus-visible {
   outline: 2px solid var(--iz-color-ink);
   outline-offset: 2px;
+}
+
+:root[data-theme="dark"] .product-badge-explain-sheet__close:focus-visible {
+  outline-color: #ffffff;
 }
 
 .product-badge-explain-sheet__error {

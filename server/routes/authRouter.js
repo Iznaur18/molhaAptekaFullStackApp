@@ -10,6 +10,9 @@ import {
   markInAppNotificationsReadController,
   registerPushTokenController,
   removePushTokenController,
+  getWebPushVapidPublicKeyController,
+  registerWebPushSubscriptionController,
+  removeWebPushSubscriptionController,
   verifyEmailController,
   resendEmailVerificationController,
   verifyEmailWithCodeController,
@@ -50,6 +53,10 @@ import {
   registerPushTokenValidation,
   removePushTokenValidation,
 } from "../validations/user/pushTokenValidation.js";
+import {
+  registerWebPushSubscriptionValidation,
+  removeWebPushSubscriptionValidation,
+} from "../validations/user/webPushSubscriptionValidation.js";
 import { emptyBodyValidation } from "../validations/common/emptyBodyValidation.js";
 import {
   checkAuthMW,
@@ -81,6 +88,19 @@ router.delete(
   checkAuthMW,
   removePushTokenValidation,
   removePushTokenController,
+);
+router.get("/me/web-push/vapid-public-key", checkAuthMW, getWebPushVapidPublicKeyController);
+router.put(
+  "/me/web-push-subscription",
+  checkAuthMW,
+  registerWebPushSubscriptionValidation,
+  registerWebPushSubscriptionController,
+);
+router.delete(
+  "/me/web-push-subscription",
+  checkAuthMW,
+  removeWebPushSubscriptionValidation,
+  removeWebPushSubscriptionController,
 );
 
 // Rate limiting для авторизации (защита от брутфорса / email bombing)

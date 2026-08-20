@@ -80,6 +80,11 @@
   color: var(--iz-color-ink);
 }
 
+:root[data-theme="dark"] .product-details-seller-preview__name,
+:root[data-theme="dark"] .product-details-seller-preview__name-text {
+  color: var(--iz-color-text);
+}
+
 .product-details-seller-preview__name-text {
   word-break: break-word;
 }
@@ -142,4 +147,8 @@
   color: var(--iz-color-ink);
   line-height: 1.25;
   word-break: break-word;
+}
+
+:root[data-theme="dark"] .product-details-seller-preview__metric-value {
+  color: var(--iz-color-text);
 }

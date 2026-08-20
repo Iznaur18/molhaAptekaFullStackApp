@@ -48,6 +48,7 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_BADGE: (count) => (count > 99 ? "99+" : String(count)),
   TAB_ADMIN_ORDERS: "Все заказы",
   TAB_STAFF_AUDIT_LOG_ADMIN: "Журнал действий",
+  TAB_BROADCAST_NOTIFICATIONS_ADMIN: "Уведомления",
   TAB_SEARCH_SYNONYMS_ADMIN: "Синонимы поиска",
   TAB_POPULAR_PRODUCTS_ADMIN: "Специальный блок",
   TAB_CATEGORY_TREE_ADMIN: "Категории",
@@ -89,6 +90,18 @@ export const THEME_SETTINGS_UI = {
   LIGHT: "Светлая",
   DARK: "Тёмная",
   CUSTOM: "Пользовательский",
+};
+
+export const WEB_PUSH_SETTINGS_UI = {
+  LABEL: "Push на устройство",
+  ENABLE: "Включить",
+  DISABLE: "Выключить",
+  ENABLED: "Включены",
+  DISABLED: "Выключены",
+  UNSUPPORTED: "Браузер не поддерживает системные push",
+  IOS_HINT: "На iPhone: «Поделиться» → «На экран Домой», затем включите здесь",
+  PENDING: "Секунду…",
+  ERROR_PERMISSION: "Разрешите уведомления в настройках браузера",
 };
 
 /** Редактирование своего профиля (`PATCH /user/:id`) — страница и админ-модалка */
