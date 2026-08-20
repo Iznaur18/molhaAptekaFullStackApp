@@ -142,9 +142,18 @@ export function MapPointPicker({
       return;
     }
     const next = L.latLng(lat, lon);
+    const current = marker.getLatLng();
+    if (
+      Math.abs(current.lat - next.lat) < 1e-7 &&
+      Math.abs(current.lng - next.lng) < 1e-7
+    ) {
+      return;
+    }
     marker.setLatLng(next);
     map.invalidateSize();
-    map.setView(next, Math.max(map.getZoom(), 15), { animate: true });
+    if (!map.getBounds().pad(-0.2).contains(next)) {
+      map.panTo(next, { animate: true });
+    }
   }, [lat, lon]);
 
   return (

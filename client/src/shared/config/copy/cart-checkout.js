@@ -146,10 +146,10 @@ export const CHECKOUT_FORM_UI = {
 };
 
 export const PRODUCT_PICKUP_UI = {
-  FULFILLMENT_LEGEND: "Какие способы получения поддерживаете",
+  FULFILLMENT_LEGEND: "Выберите способ получения",
   FULFILLMENT_PICKUP: "Самовывоз",
   FULFILLMENT_DELIVERY: "Доставка продавцом",
-  CARRIERS_LEGEND: "Службы доставки (скоро)",
+  CARRIERS_LEGEND: "Выберите способ доставки",
   SOON_BADGE: " · скоро",
   METHODS_REQUIRED_HINT: "Можно выбрать несколько. Хотя бы один способ обязателен.",
   METHODS_BOTH_HINT:

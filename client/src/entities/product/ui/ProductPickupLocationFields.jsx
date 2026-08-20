@@ -77,15 +77,35 @@ export function ProductPickupLocationFields({
     emit({ productDeliveryEnabled: !deliveryEnabled });
   };
 
-  const methodsHint =
-    pickupEnabled && deliveryEnabled
-      ? PRODUCT_PICKUP_UI.METHODS_BOTH_HINT
-      : deliveryEnabled
-        ? PRODUCT_PICKUP_UI.DELIVERY_CARRIERS_HINT
-        : PRODUCT_PICKUP_UI.PICKUP_HINT;
-
   return (
     <div className="product-pickup-location-fields">
+      <AddressDeliveryFields
+        value={{
+          line: address,
+          flat: "",
+          fiasId: "",
+          geo: lat != null && lon != null ? { lat, lon } : null,
+          selectedFromSuggest,
+        }}
+        onChange={(next) => {
+          emit({
+            productPickupAddress: next.line,
+            productPickupLat: next.geo?.lat ?? null,
+            productPickupLon: next.geo?.lon ?? null,
+            productRegionCode: next.regionCode ?? null,
+            productPickupSelectedFromSuggest: next.selectedFromSuggest === true,
+          });
+        }}
+        disabled={disabled}
+        displayOnly={addressLineDisplayOnly}
+        lineInputClassName="create-product-section__input"
+        labels={{
+          line: pickupEnabled
+            ? PRODUCT_PICKUP_UI.ADDRESS_LABEL
+            : PRODUCT_PICKUP_UI.ADDRESS_LABEL_WAREHOUSE,
+        }}
+      />
+
       <p className="product-pickup-location-fields__legend">
         <FormFieldLabel>{PRODUCT_PICKUP_UI.FULFILLMENT_LEGEND}</FormFieldLabel>
       </p>
@@ -175,34 +195,6 @@ export function ProductPickupLocationFields({
       <p className="product-pickup-location-fields__hint">
         {PRODUCT_PICKUP_UI.METHODS_REQUIRED_HINT}
       </p>
-      <p className="product-pickup-location-fields__hint">{methodsHint}</p>
-
-      <AddressDeliveryFields
-        value={{
-          line: address,
-          flat: "",
-          fiasId: "",
-          geo: lat != null && lon != null ? { lat, lon } : null,
-          selectedFromSuggest,
-        }}
-        onChange={(next) => {
-          emit({
-            productPickupAddress: next.line,
-            productPickupLat: next.geo?.lat ?? null,
-            productPickupLon: next.geo?.lon ?? null,
-            productRegionCode: next.regionCode ?? null,
-            productPickupSelectedFromSuggest: next.selectedFromSuggest === true,
-          });
-        }}
-        disabled={disabled}
-        displayOnly={addressLineDisplayOnly}
-        lineInputClassName="create-product-section__input"
-        labels={{
-          line: pickupEnabled
-            ? PRODUCT_PICKUP_UI.ADDRESS_LABEL
-            : PRODUCT_PICKUP_UI.ADDRESS_LABEL_WAREHOUSE,
-        }}
-      />
     </div>
   );
 }

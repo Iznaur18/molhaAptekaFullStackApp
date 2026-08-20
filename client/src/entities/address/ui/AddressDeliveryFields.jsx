@@ -17,6 +17,7 @@ import {
 import { useAddressSuggestionsQuery } from "../model/useAddressSuggestionsQuery.js";
 import { MapPointPicker } from "../../maps/ui/MapPointPicker.jsx";
 import { ADDRESS_DELIVERY_UI } from "../../../shared/config/appUiCopy.js";
+import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 
 import "./AddressDeliveryFields.css";
 
@@ -221,7 +222,8 @@ export function AddressDeliveryFields({
           patch({
             line: mapped.line,
             fiasId: mapped.fiasId,
-            geo: mapped.geo ?? { lat, lon },
+            // Keep the user-chosen pin; DaData house centroid often differs.
+            geo: { lat, lon },
             regionCode: mapped.regionCode,
             selectedFromSuggest: pick.isHouse,
           });
@@ -392,14 +394,47 @@ export function AddressDeliveryFields({
         )
       : null;
 
+  const mapOpensFromLine = displayOnly && showMap;
+  const openMapFromLine = () => {
+    if (!mapOpensFromLine || disabled) {
+      return;
+    }
+    setMapOpen(true);
+  };
+
+  const showMapStatusHints =
+    showMap && !mapOpen && (mapStatus === "loading" || Boolean(mapError));
+  const mapStatusHints = showMapStatusHints ? (
+    <>
+      {mapStatus === "loading" ? (
+        <p className="address-delivery-fields__hint" role="status">
+          {ADDRESS_DELIVERY_UI.MAP_GEOLOCATE_LOADING}
+        </p>
+      ) : null}
+      {mapError ? (
+        <p
+          className="address-delivery-fields__hint address-delivery-fields__hint_error"
+          role="alert"
+        >
+          {mapError}
+        </p>
+      ) : null}
+    </>
+  ) : null;
+
   return (
     <div className="address-delivery-fields" id="edit-profile-address">
       <label className="address-delivery-fields__line-wrap" ref={wrapRef}>
-        <span className="address-delivery-fields__label">{lineLabel}</span>
+        <FormFieldLabel>{lineLabel}</FormFieldLabel>
         <div className="address-delivery-fields__input-row">
           <input
             type="text"
-            className={lineInputClassName}
+            className={[
+              lineInputClassName,
+              mapOpensFromLine ? "address-delivery-fields__line_map-trigger" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
             value={value.line}
             onChange={displayOnly ? undefined : handleLineChange}
             disabled={disabled}
@@ -407,9 +442,26 @@ export function AddressDeliveryFields({
             maxLength={ADDRESS_LINE_MAX_LENGTH}
             placeholder={ADDRESS_DELIVERY_UI.PLACEHOLDER_LINE}
             autoComplete="off"
-            role="combobox"
-            aria-expanded={showList}
+            role={mapOpensFromLine ? "button" : "combobox"}
+            aria-expanded={mapOpensFromLine ? undefined : showList}
             aria-controls={displayOnly ? undefined : listId}
+            aria-haspopup={mapOpensFromLine ? "dialog" : undefined}
+            aria-label={
+              mapOpensFromLine
+                ? `${lineLabel}. ${ADDRESS_DELIVERY_UI.MAP_OPEN}`
+                : undefined
+            }
+            onClick={openMapFromLine}
+            onKeyDown={
+              mapOpensFromLine
+                ? (event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      openMapFromLine();
+                    }
+                  }
+                : undefined
+            }
           />
           {value.line && !disabled && !displayOnly ? (
             <button
@@ -479,7 +531,7 @@ export function AddressDeliveryFields({
         </div>
       ) : null}
 
-      {showMap ? (
+      {showMap && !displayOnly ? (
         <div className="address-delivery-fields__map">
           <p className="address-delivery-fields__hint">
             {ADDRESS_DELIVERY_UI.MAP_PICK_HINT}
@@ -492,20 +544,12 @@ export function AddressDeliveryFields({
           >
             {ADDRESS_DELIVERY_UI.MAP_OPEN}
           </button>
-          {mapStatus === "loading" && !mapOpen ? (
-            <p className="address-delivery-fields__hint" role="status">
-              {ADDRESS_DELIVERY_UI.MAP_GEOLOCATE_LOADING}
-            </p>
-          ) : null}
-          {mapError && !mapOpen ? (
-            <p
-              className="address-delivery-fields__hint address-delivery-fields__hint_error"
-              role="alert"
-            >
-              {mapError}
-            </p>
-          ) : null}
+          {mapStatusHints}
         </div>
+      ) : null}
+
+      {showMap && displayOnly && mapStatusHints ? (
+        <div className="address-delivery-fields__map">{mapStatusHints}</div>
       ) : null}
 
       {mapFullscreen}

@@ -31,6 +31,7 @@ type ProductPickupLocationFieldsProps = {
   deliveryEnabled?: boolean;
   disabled?: boolean;
   selectedFromSuggest?: boolean;
+  addressLineDisplayOnly?: boolean;
   onChange: (next: ProductPickupLocationValue) => void;
 };
 
@@ -55,6 +56,7 @@ export const ProductPickupLocationFields = ({
   deliveryEnabled = false,
   disabled = false,
   selectedFromSuggest = false,
+  addressLineDisplayOnly = false,
   onChange,
 }: ProductPickupLocationFieldsProps) => {
   const theme = useAppTheme();
@@ -94,15 +96,29 @@ export const ProductPickupLocationFields = ({
     emit({ productDeliveryEnabled: !deliveryEnabled });
   };
 
-  const methodsHint =
-    pickupEnabled && deliveryEnabled
-      ? PRODUCT_PICKUP_UI.METHODS_BOTH_HINT
-      : deliveryEnabled
-        ? PRODUCT_PICKUP_UI.DELIVERY_CARRIERS_HINT
-        : PRODUCT_PICKUP_UI.PICKUP_HINT;
-
   return (
     <View style={styles.wrap}>
+      <AddressSuggestInput
+        value={toAddressValue(address, lat, lon, selectedFromSuggest)}
+        onChange={(next) => {
+          emit({
+            productPickupAddress: next.line,
+            productPickupLat: next.geo?.lat ?? null,
+            productPickupLon: next.geo?.lon ?? null,
+            productRegionCode: next.regionCode ?? null,
+            productPickupSelectedFromSuggest: next.selectedFromSuggest === true,
+          });
+        }}
+        disabled={disabled}
+        displayOnly={addressLineDisplayOnly}
+        label={
+          pickupEnabled
+            ? PRODUCT_PICKUP_UI.ADDRESS_LABEL
+            : PRODUCT_PICKUP_UI.ADDRESS_LABEL_WAREHOUSE
+        }
+        maxLength={PRODUCT_PICKUP_ADDRESS_MAX_LENGTH}
+      />
+
       <Text style={fieldStyles.labelStrong}>
         {PRODUCT_PICKUP_UI.FULFILLMENT_LEGEND}
       </Text>
@@ -149,27 +165,6 @@ export const ProductPickupLocationFields = ({
       </View>
 
       <Text style={fieldStyles.hint}>{PRODUCT_PICKUP_UI.METHODS_REQUIRED_HINT}</Text>
-      <Text style={fieldStyles.hint}>{methodsHint}</Text>
-
-      <AddressSuggestInput
-        value={toAddressValue(address, lat, lon, selectedFromSuggest)}
-        onChange={(next) => {
-          emit({
-            productPickupAddress: next.line,
-            productPickupLat: next.geo?.lat ?? null,
-            productPickupLon: next.geo?.lon ?? null,
-            productRegionCode: next.regionCode ?? null,
-            productPickupSelectedFromSuggest: next.selectedFromSuggest === true,
-          });
-        }}
-        disabled={disabled}
-        label={
-          pickupEnabled
-            ? PRODUCT_PICKUP_UI.ADDRESS_LABEL
-            : PRODUCT_PICKUP_UI.ADDRESS_LABEL_WAREHOUSE
-        }
-        maxLength={PRODUCT_PICKUP_ADDRESS_MAX_LENGTH}
-      />
     </View>
   );
 };

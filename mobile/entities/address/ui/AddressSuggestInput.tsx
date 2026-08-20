@@ -42,6 +42,7 @@ type AddressSuggestInputProps = {
   value: RuDeliveryAddressValue;
   onChange: (next: RuDeliveryAddressValue) => void;
   disabled?: boolean;
+  displayOnly?: boolean;
   placeholder?: string;
   label?: string;
   maxLength?: number;
@@ -56,6 +57,7 @@ export const AddressSuggestInput = ({
   value,
   onChange,
   disabled = false,
+  displayOnly = false,
   placeholder,
   label,
   maxLength,
@@ -199,7 +201,8 @@ export const AddressSuggestInput = ({
           patch({
             line: mapped.line,
             fiasId: mapped.fiasId,
-            geo: mapped.geo ?? { lat, lon },
+            // Keep the user-chosen pin; DaData house centroid often differs.
+            geo: { lat, lon },
             regionCode: mapped.regionCode,
             selectedFromSuggest: pick.isHouse,
           });
@@ -219,6 +222,17 @@ export const AddressSuggestInput = ({
     }, MAP_GEOLOCATE_DEBOUNCE_MS);
   };
 
+  const mapOpensFromLine = displayOnly && showMap;
+  const openMapFromLine = () => {
+    if (!mapOpensFromLine || disabled) {
+      return;
+    }
+    setMapOpen(true);
+  };
+
+  const showMapStatusHints =
+    showMap && !mapOpen && (mapStatus === "loading" || Boolean(mapError));
+
   return (
     <View style={[suggestStyles.wrap, containerStyle]}>
       <Text style={[fieldStyles.labelStrong, labelStyle]}>
@@ -230,19 +244,28 @@ export const AddressSuggestInput = ({
             fieldStyles.input,
             fieldStyles.inputCompact,
             inputStyle,
-            value.line && !disabled ? styles.inputWithClear : null,
+            value.line && !disabled && !displayOnly ? styles.inputWithClear : null,
           ]}
           value={value.line}
-          onChangeText={handleLineChange}
+          onChangeText={displayOnly ? undefined : handleLineChange}
           placeholder={placeholder}
           placeholderTextColor={theme.colors.textMuted}
-          editable={!disabled}
+          editable={!disabled && !displayOnly}
           autoCorrect={false}
           autoFocus={autoFocus}
           maxLength={maxLength}
-          {...textInputFocusScrollProps}
+          caretHidden={displayOnly}
+          showSoftInputOnFocus={!displayOnly}
+          accessibilityRole={mapOpensFromLine ? "button" : undefined}
+          accessibilityLabel={
+            mapOpensFromLine
+              ? `${label ?? ADDRESS_DELIVERY_UI.LABEL_LINE}. ${ADDRESS_DELIVERY_UI.MAP_OPEN}`
+              : undefined
+          }
+          onPressIn={mapOpensFromLine ? openMapFromLine : undefined}
+          {...(displayOnly ? {} : textInputFocusScrollProps)}
         />
-        {value.line && !disabled ? (
+        {value.line && !disabled && !displayOnly ? (
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={ADDRESS_DELIVERY_UI.CLEAR_LINE_ARIA}
@@ -305,11 +328,11 @@ export const AddressSuggestInput = ({
         </View>
       ) : null}
 
-      {suggestEnabled && suggestionsQuery.isPending ? (
+      {!displayOnly && suggestEnabled && suggestionsQuery.isPending ? (
         <ActivityIndicator style={suggestStyles.loader} color={theme.colors.action} />
       ) : null}
 
-      {suggestEnabled && suggestions.length > 0 ? (
+      {!displayOnly && suggestEnabled && suggestions.length > 0 ? (
         <ScrollView
           style={suggestStyles.suggestions}
           keyboardShouldPersistTaps="handled"
@@ -327,14 +350,15 @@ export const AddressSuggestInput = ({
         </ScrollView>
       ) : null}
 
-      {suggestEnabled &&
+      {!displayOnly &&
+      suggestEnabled &&
       !suggestionsQuery.isPending &&
       activeQuery.length >= ADDRESS_SUGGEST_MIN_QUERY_LENGTH &&
       suggestions.length === 0 ? (
         <Text style={fieldStyles.hint}>{ADDRESS_DELIVERY_UI.NO_SUGGESTIONS}</Text>
       ) : null}
 
-      {showMap ? (
+      {showMap && !displayOnly ? (
         <View style={styles.mapBlock}>
           <Text style={fieldStyles.hint}>{ADDRESS_DELIVERY_UI.MAP_PICK_HINT}</Text>
           <Pressable
@@ -353,6 +377,21 @@ export const AddressSuggestInput = ({
               {ADDRESS_DELIVERY_UI.MAP_OPEN}
             </Text>
           </Pressable>
+          {showMapStatusHints ? (
+            <>
+              {mapStatus === "loading" ? (
+                <Text style={fieldStyles.hint}>{ADDRESS_DELIVERY_UI.MAP_GEOLOCATE_LOADING}</Text>
+              ) : null}
+              {mapError ? (
+                <Text style={[fieldStyles.hint, { color: theme.colors.danger }]}>{mapError}</Text>
+              ) : null}
+            </>
+          ) : null}
+        </View>
+      ) : null}
+
+      {showMap && displayOnly && showMapStatusHints ? (
+        <View style={styles.mapBlock}>
           {mapStatus === "loading" ? (
             <Text style={fieldStyles.hint}>{ADDRESS_DELIVERY_UI.MAP_GEOLOCATE_LOADING}</Text>
           ) : null}

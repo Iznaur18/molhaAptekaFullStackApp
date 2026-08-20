@@ -12,7 +12,7 @@
   margin: 0;
 }
 
-.address-delivery-fields__label {
+.address-delivery-fields .form-field-label {
   padding: 0;
   font-size: var(--iz-font-base);
   font-weight: var(--iz-weight-semibold);
@@ -143,6 +143,10 @@
 .address-delivery-fields__service-retry:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.address-delivery-fields__line_map-trigger {
+  cursor: pointer;
 }
 
 .address-delivery-fields__map {

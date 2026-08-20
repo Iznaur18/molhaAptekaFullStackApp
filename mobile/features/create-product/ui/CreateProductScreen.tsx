@@ -1079,6 +1079,7 @@ function PickupStep({
         deliveryEnabled={form.productDeliveryEnabled === true}
         selectedFromSuggest={form.productPickupSelectedFromSuggest}
         disabled={disabled}
+        addressLineDisplayOnly
         onChange={(next) => {
           setForm((prev) => ({
             ...prev,
