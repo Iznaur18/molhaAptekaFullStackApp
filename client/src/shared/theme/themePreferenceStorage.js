@@ -11,6 +11,21 @@ function isThemePreference(value) {
 }
 
 /**
+ * OS dark → dark, иначе пользовательская (custom).
+ * @returns {ThemePreference}
+ */
+export function resolveThemePreferenceFromSystem() {
+  try {
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      return "dark";
+    }
+  } catch {
+    // matchMedia недоступен
+  }
+  return "custom";
+}
+
+/**
  * @returns {ThemePreference}
  */
 export function loadThemePreference() {
@@ -19,17 +34,14 @@ export function loadThemePreference() {
     if (isThemePreference(raw)) {
       return raw;
     }
-    // Legacy: system → dark (старый инвертированный «dark» больше не
-    // существует; "dark" теперь — валидная ручная палитра и тема по умолчанию).
+    // Legacy "system" — следовать OS, не записывать жёсткий dark.
     if (raw === "system") {
-      saveThemePreference("dark");
-      return "dark";
+      return resolveThemePreferenceFromSystem();
     }
   } catch {
     // storage недоступен
   }
-  // Тёмная — тема по умолчанию для новых пользователей.
-  return "dark";
+  return resolveThemePreferenceFromSystem();
 }
 
 /**

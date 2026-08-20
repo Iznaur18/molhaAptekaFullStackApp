@@ -11,12 +11,17 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#0c0e12" />
     <script>
-      // Пред-пейнт темы: убирает вспышку светлого до загрузки бандла.
-      // Тёмная — тема по умолчанию (см. themePreferenceStorage.loadThemePreference).
+      // Пред-пейнт темы: убирает вспышку до бандла.
+      // Нет сохранённого выбора → OS dark → dark, иначе custom.
       (function () {
         try {
           var p = localStorage.getItem("app-theme-preference");
-          var scheme = p === "light" ? "light" : p === "custom" ? "custom" : "dark";
+          var scheme =
+            p === "light" || p === "dark" || p === "custom"
+              ? p
+              : window.matchMedia("(prefers-color-scheme: dark)").matches
+                ? "dark"
+                : "custom";
           var bg =
             scheme === "light"
               ? "#e6eaf1"

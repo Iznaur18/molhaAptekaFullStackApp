@@ -1,6 +1,10 @@
 import { resolveIzTheme } from "@izibuy/design-tokens";
 
-import { loadThemePreference, saveThemePreference } from "./themePreferenceStorage.js";
+import {
+  loadThemePreference,
+  resolveThemePreferenceFromSystem,
+  saveThemePreference,
+} from "./themePreferenceStorage.js";
 
 /** @typedef {import('./themePreferenceStorage.js').ThemePreference} ThemePreference */
 
@@ -43,8 +47,9 @@ const COLOR_VAR_MAP = {
   focusRing: "--iz-color-focus-ring",
 };
 
-/** @type {ThemePreference} — тёмная тема по умолчанию (до чтения localStorage) */
-let themePreference = "dark";
+/** @type {ThemePreference} — до init: по OS (dark → dark, иначе custom) */
+let themePreference =
+  typeof window !== "undefined" ? resolveThemePreferenceFromSystem() : "custom";
 
 /** @type {Set<(preference: ThemePreference) => void>} */
 const preferenceListeners = new Set();

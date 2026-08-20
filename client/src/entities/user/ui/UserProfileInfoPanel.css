@@ -38,6 +38,10 @@
   background: var(--iz-color-ink);
 }
 
+:root[data-theme="dark"] .user-profile-info__section-title {
+  color: #ffffff;
+}
+
 .user-profile-info__details {
   margin: 0;
 }

@@ -7,6 +7,7 @@ import type { ThemePreference } from "@/shared/theme/themePreferenceStorage";
 
 const OPTIONS: Array<{ value: ThemePreference; label: string }> = [
   { value: "light", label: THEME_SETTINGS_UI.LIGHT },
+  { value: "dark", label: THEME_SETTINGS_UI.DARK },
   { value: "custom", label: THEME_SETTINGS_UI.CUSTOM },
 ];
 

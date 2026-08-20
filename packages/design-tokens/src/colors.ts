@@ -66,7 +66,8 @@ const izColorsDarkCanonical = {
   textMuted: "#9aa1ad",
   textSecondary: "#c7cdd8",
   textPlaceholder: "#6b7280",
-  ink: "#f7f9fc",
+  /* Тёмный ink: scrim/тени sheet’ов (color-mix ink), не светлый glow */
+  ink: DARK_CANVAS,
   bg: DARK_CANVAS,
   surfaceMuted: "#14171d",
   surfaceElevated: "#1b1f27",

@@ -11,6 +11,7 @@ import {
 
 import {
   loadThemePreference,
+  resolveThemePreferenceFromSystem,
   saveThemePreference,
   type ThemePreference,
 } from "@/shared/theme/themePreferenceStorage";
@@ -24,15 +25,24 @@ type AppThemeContextValue = {
 
 const AppThemeContext = createContext<AppThemeContextValue | null>(null);
 
-const resolveColorScheme = (preference: ThemePreference): ColorScheme =>
-  preference === "light" ? "light" : "custom";
+const resolveColorScheme = (preference: ThemePreference): ColorScheme => {
+  if (preference === "light") {
+    return "light";
+  }
+  if (preference === "dark") {
+    return "dark";
+  }
+  return "custom";
+};
 
 type AppThemeProviderProps = {
   children: ReactNode;
 };
 
 export const AppThemeProvider = ({ children }: AppThemeProviderProps) => {
-  const [preference, setPreferenceState] = useState<ThemePreference>("custom");
+  const [preference, setPreferenceState] = useState<ThemePreference>(
+    resolveThemePreferenceFromSystem,
+  );
 
   useEffect(() => {
     void loadThemePreference().then((stored) => {
@@ -64,7 +74,7 @@ export const AppThemeProvider = ({ children }: AppThemeProviderProps) => {
 export const useAppTheme = (): IzTheme => {
   const context = useContext(AppThemeContext);
   if (!context) {
-    return resolveIzTheme("custom");
+    return resolveIzTheme(resolveColorScheme(resolveThemePreferenceFromSystem()));
   }
   return context.theme;
 };
