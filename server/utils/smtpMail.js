@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 
 import { SMTP_DEFAULT_PORT } from "../constants/smtpConstants.js";
+import { resolveSmtpSecure } from "./resolveSmtpSecure.js";
 
 /**
  * @returns {boolean}
@@ -10,7 +11,7 @@ export const isSmtpConfigured = () =>
 
 const createSmtpTransport = () => {
   const port = Number(process.env.SMTP_PORT) || SMTP_DEFAULT_PORT;
-  const secure = port === 465;
+  const secure = resolveSmtpSecure(port);
   const rejectUnauthorized =
     String(process.env.SMTP_TLS_REJECT_UNAUTHORIZED ?? "true").toLowerCase() !==
     "false";
@@ -23,7 +24,7 @@ const createSmtpTransport = () => {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
-    // Для портов без неявного TLS (587, 2525, …) требуем STARTTLS — иначе
+    // Для портов без неявного TLS (587, 1126, 2525, …) требуем STARTTLS — иначе
     // nodemailer может уйти в открытый текст, если сервер не форсит апгрейд.
     ...(secure ? {} : { requireTLS: true }),
     tls: { rejectUnauthorized },

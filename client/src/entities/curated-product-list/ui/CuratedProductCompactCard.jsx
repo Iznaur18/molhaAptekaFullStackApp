@@ -22,7 +22,12 @@ export function CuratedProductCompactCard({ product, onOpen }) {
 
   return (
     <article className="curated-product-compact-card">
-      <div className="curated-product-compact-card__image-wrap">
+      <button
+        type="button"
+        className="curated-product-compact-card__image-wrap"
+        onClick={() => onOpen(product)}
+        aria-label={CURATED_PRODUCT_COMPACT_CARD_UI.OPEN_ARIA(product.productName)}
+      >
         <img
           className="curated-product-compact-card__image"
           src={imageUrl}
@@ -32,7 +37,7 @@ export function CuratedProductCompactCard({ product, onOpen }) {
           draggable={false}
           onError={() => setFailed(true)}
         />
-      </div>
+      </button>
       <button
         type="button"
         className="curated-product-compact-card__price-wrap"

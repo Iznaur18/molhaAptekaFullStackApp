@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const LOGO_PATH = path.join(ROOT, "client/public/logo-torgum.png");
+const LOGO_PATH = path.join(ROOT, "client/public/logo-gitorg.png");
 const OUT_PATH = path.join(ROOT, "client/public/intro/intro-poster.jpg");
 
 const WIDTH = 1920;

@@ -58,8 +58,35 @@ export function UserStoryViewer({
   const [incomingRevealed, setIncomingRevealed] = useState(false);
   const [pendingIndex, setPendingIndex] = useState(/** @type {number | null} */ (null));
 
-  useScrollLock(isOpen);
+  // overflow-only: body position:fixed на iOS оставляет полосы в safe-area
+  useScrollLock(isOpen, { strategy: "overflow" });
   useRegisterBlockingOverlay(isOpen);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    let themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    const previousThemeColor = themeColorMeta?.getAttribute("content") ?? null;
+    if (!themeColorMeta) {
+      themeColorMeta = document.createElement("meta");
+      themeColorMeta.setAttribute("name", "theme-color");
+      document.head.appendChild(themeColorMeta);
+    }
+    themeColorMeta.setAttribute("content", "#000000");
+
+    return () => {
+      if (!themeColorMeta) {
+        return;
+      }
+      if (previousThemeColor == null) {
+        themeColorMeta.remove();
+      } else {
+        themeColorMeta.setAttribute("content", previousThemeColor);
+      }
+    };
+  }, [isOpen]);
 
   const authorId = String(author._id);
   const isOwn = currentUserId != null && authorId === String(currentUserId);

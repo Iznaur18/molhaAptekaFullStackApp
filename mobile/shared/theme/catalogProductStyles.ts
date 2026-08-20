@@ -1272,7 +1272,7 @@ export const useProductDetailsSellerPreviewStyles = createThemedStyles((theme) =
     paddingVertical: 10,
     paddingHorizontal: 11,
     borderRadius: 12,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.bg,
   },
   metricIcon: {
     width: 30,
@@ -1681,7 +1681,7 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
     paddingVertical: 12,
     paddingHorizontal: 14,
     borderRadius: 14,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.bg,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
   },

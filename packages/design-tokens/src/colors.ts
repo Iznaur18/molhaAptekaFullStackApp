@@ -70,7 +70,7 @@ const izColorsDarkCanonical = {
   bg: DARK_CANVAS,
   surfaceMuted: "#14171d",
   surfaceElevated: "#1b1f27",
-  surface: "#222732",
+  surface: "#1B1E24",
   onContrast: "#12151b",
   primary: "#dfe3ea",
   action: DARK_SILVER,

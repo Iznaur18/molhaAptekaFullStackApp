@@ -102,7 +102,7 @@ const parseAppDeepLink = (url) => {
   try {
     const parsed = new URL(url);
     const scheme = parsed.protocol.replace(":", "");
-    if (scheme === "torgum" || scheme === "izibuy") {
+    if (scheme === "gitorg" || scheme === "izibuy") {
       const hostPath = parsed.hostname
         ? `/${parsed.hostname}${parsed.pathname}`
         : parsed.pathname;
@@ -110,8 +110,8 @@ const parseAppDeepLink = (url) => {
     }
     const host = parsed.hostname.toLowerCase();
     if (
-      host === "torgum.ru" ||
-      host === "www.torgum.ru" ||
+      host === "gitorg.ru" ||
+      host === "www.gitorg.ru" ||
       host === "izibuy.ru" ||
       host === "www.izibuy.ru"
     ) {
@@ -119,7 +119,7 @@ const parseAppDeepLink = (url) => {
     }
   } catch {
     const normalized = normalizePath(
-      url.replace(/^(?:torgum|izibuy):\/\//i, "/"),
+      url.replace(/^(?:gitorg|izibuy):\/\//i, "/"),
     );
     return matchNamedRoute(normalized);
   }
@@ -127,15 +127,15 @@ const parseAppDeepLink = (url) => {
 };
 
 const DEEP_LINK_CASES = [
-  ["torgum://product/abc123", "/product/abc123"],
-  ["torgum://raffle/raffle1", "/raffle/raffle1"],
-  ["torgum://seller/user42", "/seller/user42"],
-  ["torgum://user/user42", "/user/user42"],
-  ["torgum://users", "/users"],
-  ["torgum://user-list", "/users"],
-  ["https://torgum.ru/product/abc123", "/product/abc123"],
-  ["torgum://hub/wishlist", "/hub/wishlist"],
-  ["torgum://orders", "/orders"],
+  ["gitorg://product/abc123", "/product/abc123"],
+  ["gitorg://raffle/raffle1", "/raffle/raffle1"],
+  ["gitorg://seller/user42", "/seller/user42"],
+  ["gitorg://user/user42", "/user/user42"],
+  ["gitorg://users", "/users"],
+  ["gitorg://user-list", "/users"],
+  ["https://gitorg.ru/product/abc123", "/product/abc123"],
+  ["gitorg://hub/wishlist", "/hub/wishlist"],
+  ["gitorg://orders", "/orders"],
   ["izibuy://product/abc123", "/product/abc123"],
 ];
 
@@ -449,9 +449,9 @@ const STORY_MEDIA_DEV_REWRITE_CASES = [
     "http://192.168.1.10:4444/uploads/story.jpg",
   ],
   [
-    "https://cdn.torgum.ru/uploads/story.jpg",
+    "https://cdn.gitorg.ru/uploads/story.jpg",
     "http://192.168.1.10:4444",
-    "https://cdn.torgum.ru/uploads/story.jpg",
+    "https://cdn.gitorg.ru/uploads/story.jpg",
   ],
 ];
 
@@ -871,7 +871,7 @@ const run = () => {
   console.log("PASS — static WF-7.2");
   console.log("API smoke: npm run smoke:buyer-path (G.3, needs server + e2e seed)");
   console.log("Manual: Samsung smoke → docs/mobile-development.md § WF-7.2");
-  console.log("  adb shell am start -a android.intent.action.VIEW -d \"torgum://product/<id>\"");
+  console.log("  adb shell am start -a android.intent.action.VIEW -d \"gitorg://product/<id>\"");
 };
 
 run();

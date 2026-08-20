@@ -509,8 +509,17 @@ body:has(.product-details-page) .mobile-bottom-nav {
   display: none;
 }
 
-body:has(.product-details-page) {
+/* Единый surface на весь viewport — иначе gutters (html/body/app-main)
+ * остаются --iz-color-bg (#0c0e12 dark) и бьются с колонкой (#1B1E24). */
+html:has(.product-details-page),
+body:has(.product-details-page),
+body:has(.product-details-page) #root,
+body:has(.product-details-page) .app-main,
+body:has(.product-details-page) .app-shell {
   background: var(--iz-color-surface);
+}
+
+body:has(.product-details-page) {
   overflow: hidden;
   overscroll-behavior-x: none;
 }
@@ -518,16 +527,7 @@ body:has(.product-details-page) {
 body:has(.product-details-page) .app-shell {
   padding: 0;
   max-width: none;
-  background: var(--iz-color-surface);
   min-height: 0;
-}
-
-/* Desktop: gutters `--iz-color-bg`, чтобы скругление колонки было видно */
-@media (min-width: 600px) {
-  body:has(.product-details-page),
-  body:has(.product-details-page) .app-shell {
-    background: var(--iz-color-bg);
-  }
 }
 
 .product-details-page--state {

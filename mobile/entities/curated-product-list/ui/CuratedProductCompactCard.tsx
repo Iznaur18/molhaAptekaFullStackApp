@@ -31,13 +31,18 @@ export const CuratedProductCompactCard = ({ product, width }: CuratedProductComp
 
   return (
     <View style={[styles.card, { width }]}>
-      <View style={styles.imageWrap}>
+      <Pressable
+        style={styles.imageWrap}
+        onPress={handleOpen}
+        accessibilityRole="button"
+        accessibilityLabel={CURATED_PRODUCT_COMPACT_CARD_UI.OPEN_ARIA(productName)}
+      >
         {imageUrl ? (
           <Image source={{ uri: imageUrl }} style={styles.image} contentFit="cover" />
         ) : (
           <Text style={styles.imageFallback}>{CURATED_PRODUCT_COMPACT_CARD_UI.NO_IMAGE}</Text>
         )}
-      </View>
+      </Pressable>
       <Pressable
         style={styles.priceWrap}
         onPress={handleOpen}

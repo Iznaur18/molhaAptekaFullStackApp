@@ -2,9 +2,9 @@
 //
 //   node scripts/generate-web-icons.mjs [path/to/source.png]
 //
-// По умолчанию исходник — client/public/logo-torgum-source.png (1024×1024, PNG).
+// По умолчанию исходник — client/public/logo-gitorg-source.png (1024×1024, PNG).
 // Скрипт кладёт в client/public/:
-//   logo-torgum.png            — логотип для шапки/шаринга (нормализованный исходник)
+//   logo-gitorg.png            — логотип для шапки/шаринга (нормализованный исходник)
 //   favicon-16.png / -32.png   — favicon PNG
 //   favicon.ico                — ICO (16/32/48, PNG-полезная нагрузка)
 //   apple-touch-icon.png (180) — iOS home screen (непрозрачный фон)
@@ -13,7 +13,7 @@
 //   og-image.png (1200×630)    — превью ссылки (Open Graph / Twitter)
 //
 // Фон для непрозрачных иконок берётся как доминирующий цвет исходника (фирменный
-// оранжевый Torgum), так что скруглённые/прозрачные углы исходника заполняются им.
+// оранжевый Gitorg), так что скруглённые/прозрачные углы исходника заполняются им.
 
 import { Buffer } from "node:buffer";
 import path from "node:path";
@@ -26,7 +26,7 @@ const ROOT = path.resolve(SCRIPT_DIR, "..");
 const PUBLIC_DIR = path.join(ROOT, "client", "public");
 const SOURCE = process.argv[2]
   ? path.resolve(process.cwd(), process.argv[2])
-  : path.join(PUBLIC_DIR, "logo-torgum-source.png");
+  : path.join(PUBLIC_DIR, "logo-gitorg-source.png");
 
 const out = (name) => path.join(PUBLIC_DIR, name);
 
@@ -99,7 +99,7 @@ async function main() {
   await sharp(SOURCE)
     .resize({ width: 1024, height: 1024, fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
     .png()
-    .toFile(out("logo-torgum.png"));
+    .toFile(out("logo-gitorg.png"));
 
   // favicon PNG (прозрачный фон допустим).
   for (const size of [16, 32]) {
@@ -133,7 +133,7 @@ async function main() {
     .png()
     .toFile(out("og-image.png"));
 
-  console.log("done: logo-torgum.png, favicon-16/32.png, favicon.ico, apple-touch-icon.png, icon-192/512.png, maskable-512.png, og-image.png");
+  console.log("done: logo-gitorg.png, favicon-16/32.png, favicon.ico, apple-touch-icon.png, icon-192/512.png, maskable-512.png, og-image.png");
 }
 
 main().catch((error) => {
