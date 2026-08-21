@@ -103,10 +103,20 @@ export function useUserDetailsPage() {
 
   const handleRated = useCallback(
     (snapshot) => {
-      queryClient.setQueryData(userProfileQueryKeys.byId(userId), snapshot);
-      setProfileSnapshot(snapshot);
+      if (!snapshot || typeof snapshot !== "object") {
+        return;
+      }
+      // Сервер отвечает на оценку урезанным пользователем (только рейтинг + идентификация),
+      // поэтому сливаем в существующий профиль, а не затираем его целиком.
+      queryClient.setQueryData(userProfileQueryKeys.byId(userId), (old) =>
+        old && typeof old === "object" ? { ...old, ...snapshot } : snapshot,
+      );
+      setProfileSnapshot((prev) => {
+        const base = prev ?? profileQuery.data ?? null;
+        return base ? { ...base, ...snapshot } : snapshot;
+      });
     },
-    [queryClient, userId],
+    [profileQuery.data, queryClient, userId],
   );
 
   const handleViewAllSellerProducts = useCallback(() => {
