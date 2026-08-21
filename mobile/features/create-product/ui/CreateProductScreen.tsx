@@ -69,7 +69,6 @@ import { resolveWizardFooterPaddingBottom } from "@/shared/theme/screenContentLa
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const LOYALTY_POINTS_MAX_LENGTH = 8;
 
 const WIZARD_STEPS = [
   "category",
@@ -185,7 +184,7 @@ const INITIAL_FORM: WizardForm = {
   productOldPrice: "",
   productIsAvailable: true,
   productStockQuantity: "1",
-  loyaltyPointsPerUnit: "",
+  loyaltyPointsPerUnit: "0",
   productReturnEnabled: null,
   returnTermRows: [],
 };
@@ -423,7 +422,6 @@ export const CreateProductScreen = () => {
     try {
       const price = parseRubPriceInput(form.productPrice) ?? 0;
       const oldPrice = parseRubPriceInput(form.productOldPrice);
-      const loyalty = Math.floor(Number(form.loyaltyPointsPerUnit));
 
       await createMutation.mutateAsync({
         productName: form.productName.trim(),
@@ -450,8 +448,6 @@ export const CreateProductScreen = () => {
         productPickupLon: form.productPickupLon,
         productPickupEnabled: form.productPickupEnabled !== false,
         productDeliveryEnabled: form.productDeliveryEnabled === true,
-        loyaltyPointsPerUnit:
-          Number.isFinite(loyalty) && loyalty > 0 ? loyalty : undefined,
         productCharacteristics: form.characteristicRows
           .filter((r) => r.key.trim() && r.value.trim())
           .map((r) => ({ key: r.key.trim(), value: r.value.trim() })),
@@ -1232,36 +1228,6 @@ function CommerceStep({ form, setForm, disabled, theme, styles }: StepProps) {
           />
         </View>
       ) : null}
-
-      {/* Loyalty points */}
-      <View style={styles.fieldLabel}>
-        <Text style={[styles.label, { color: theme.colors.text }]}>
-          Бонусные баллы за шт.
-        </Text>
-        <TextInput
-          {...textInputFocusScrollProps}
-          style={[
-            styles.input,
-            {
-              color: theme.colors.text,
-              backgroundColor: theme.colors.surface,
-              borderColor: theme.colors.border,
-            },
-          ]}
-          value={form.loyaltyPointsPerUnit}
-          onChangeText={(text) =>
-            setForm((prev) => ({ ...prev, loyaltyPointsPerUnit: keepDigits(text) }))
-          }
-          editable={!disabled}
-          keyboardType="number-pad"
-          maxLength={LOYALTY_POINTS_MAX_LENGTH}
-          placeholder="0"
-          placeholderTextColor={theme.colors.textMuted}
-        />
-        <Text style={[styles.hint, { color: theme.colors.textSecondary }]}>
-          Начисляются подтверждённому покупателю после подтверждения получения
-        </Text>
-      </View>
     </View>
   );
 }

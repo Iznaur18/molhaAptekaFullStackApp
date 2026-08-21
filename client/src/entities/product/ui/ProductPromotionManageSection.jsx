@@ -64,10 +64,16 @@ export function ProductPromotionManageSection({
   onOpenWholesaleSettings,
   onOpenRentalSettings,
   onOpenAffiliateSettings,
+  onOpenLoyaltySettings,
+  onOpenBuyNFreeSettings,
   onOpenPromoCodesSettings,
   onOpenFlashSaleSettings,
   onSetFlashSale,
+  onSetLoyaltyPoints,
+  onSetBuyNFree,
   isFlashSaleTogglePending = false,
+  isLoyaltyTogglePending = false,
+  isBuyNFreeTogglePending = false,
   embeddedInTab = false,
 }) {
   const sectionClassName = [
@@ -124,10 +130,16 @@ export function ProductPromotionManageSection({
         onOpenWholesaleSettings={onOpenWholesaleSettings}
         onOpenRentalSettings={onOpenRentalSettings}
         onOpenAffiliateSettings={onOpenAffiliateSettings}
+        onOpenLoyaltySettings={onOpenLoyaltySettings}
+        onOpenBuyNFreeSettings={onOpenBuyNFreeSettings}
         onOpenPromoCodesSettings={onOpenPromoCodesSettings}
         onOpenFlashSaleSettings={onOpenFlashSaleSettings}
         onSetFlashSale={onSetFlashSale}
+        onSetLoyaltyPoints={onSetLoyaltyPoints}
+        onSetBuyNFree={onSetBuyNFree}
         isFlashSaleTogglePending={isFlashSaleTogglePending}
+        isLoyaltyTogglePending={isLoyaltyTogglePending}
+        isBuyNFreeTogglePending={isBuyNFreeTogglePending}
         canOpenInstallmentProgram={
           (product.productModerationStatus ?? PRODUCT_MODERATION_APPROVED) ===
           PRODUCT_MODERATION_APPROVED

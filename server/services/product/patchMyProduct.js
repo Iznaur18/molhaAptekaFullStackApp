@@ -11,6 +11,7 @@ import {
 } from "./productDiscount.js";
 
 import { buildProductPatchSet } from "./buildProductPatchSet.js";
+import { resetBuyNFreeProgressForProduct } from "./applyBuyNFreeFields.js";
 import {
   loadProductWithSellerSnapshot,
   runProductPatchSideEffects,
@@ -39,8 +40,14 @@ export async function patchMyProduct({ userId, productId, body }) {
     throw new AppError(404, "Товар не найден или нет прав на изменение");
   }
 
-  const { $set, $unset, auctionEnabledChanged, nextAuctionEnabled, flashSaleNowEnabled } =
-    await buildProductPatchSet({
+  const {
+    $set,
+    $unset,
+    auctionEnabledChanged,
+    nextAuctionEnabled,
+    flashSaleNowEnabled,
+    shouldResetBuyNFreeProgress,
+  } = await buildProductPatchSet({
       existing,
       body,
       isAdmin,
@@ -67,6 +74,10 @@ export async function patchMyProduct({ userId, productId, body }) {
 
   if (!product) {
     throw new AppError(404, "Товар не найден или нет прав на изменение");
+  }
+
+  if (shouldResetBuyNFreeProgress) {
+    await resetBuyNFreeProgressForProduct(productId);
   }
 
   await runProductPatchSideEffects({

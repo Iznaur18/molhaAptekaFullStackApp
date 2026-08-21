@@ -327,6 +327,7 @@ export function CheckoutForm({
                 value={deliveryAddress}
                 onChange={setDeliveryAddress}
                 disabled={isDisabled || isSubmitting}
+                displayOnly
                 lineInputClassName="checkout-form__input"
                 labels={{
                   line: CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS,

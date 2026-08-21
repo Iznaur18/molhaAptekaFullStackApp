@@ -7,6 +7,7 @@ import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_CONFIRMED,
   ORDER_STATUS_DELIVERED,
+  ORDER_STATUS_PENDING,
 } from "../../constants/orderConstants.js";
 import { syncRaffleProgressForProductSale } from "../../services/raffle/raffleHelpers.js";
 import { applySoldQuantityDeltaForItemStatusChange } from "../../services/product/productSoldQuantityDenorm.js";
@@ -24,6 +25,11 @@ import {
   normalizeOrderDocumentForRuntime,
   normalizeOrderItemsForRuntime,
 } from "../../services/order/orderStatus.js";
+import {
+  releaseBuyNFreeRedemptionClaim,
+  rollbackBuyNFreeProgressOnCancel,
+} from "../../services/product/productBuyNFreeProgress.js";
+import { normalizeId } from "../../services/order/orderItemStatusHelpers.js";
 
 /** `PATCH /order/:orderId/status` — смена статуса заказа (только админ). */
 export const updateOrderStatusController = async (req, res) => {
@@ -89,6 +95,8 @@ export const updateOrderStatusController = async (req, res) => {
 
   if (status === ORDER_STATUS_CANCELLED) {
     await runInTransaction(async (session) => {
+      const buyerId = normalizeId(order.userBuyerId?._id ?? order.userBuyerId);
+
       for (const item of order.items) {
         if (item.status !== ORDER_STATUS_CANCELLED) {
           markOrderLineLoyaltyReserveReleased(item);
@@ -99,13 +107,40 @@ export const updateOrderStatusController = async (req, res) => {
         if (item.status === ORDER_STATUS_CANCELLED || item.productId == null) {
           continue;
         }
+        const previousStatus = item.status;
         await applySoldQuantityDeltaForItemStatusChange({
           productId: item.productId,
-          previousStatus: item.status,
+          previousStatus,
           nextStatus: ORDER_STATUS_CANCELLED,
           quantity: item.quantity,
           session,
         });
+
+        const productId = normalizeId(item.productId?._id ?? item.productId);
+        const freeUnits = Math.floor(Number(item.buyNFreeUnitsAtOrder) || 0);
+        if (previousStatus === ORDER_STATUS_PENDING && freeUnits > 0 && buyerId && productId) {
+          await releaseBuyNFreeRedemptionClaim({
+            buyerId,
+            productId,
+            orderId: order._id,
+            session,
+          });
+        }
+        if (
+          previousStatus === ORDER_STATUS_CONFIRMED &&
+          item.buyNFreeProgressApplied === true &&
+          buyerId &&
+          productId
+        ) {
+          await rollbackBuyNFreeProgressOnCancel({
+            buyerId,
+            productId,
+            action: item.buyNFreeProgressAction,
+            countBefore: item.buyNFreeProgressCountBefore,
+            session,
+          });
+          item.buyNFreeProgressApplied = false;
+        }
       }
 
       order.items.forEach((item) => {

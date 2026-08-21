@@ -30,6 +30,7 @@ import { CatalogAnimatedFlatList } from "@/features/catalog-grid/ui/CatalogAnima
 import { MyProductsCatalogToolbar } from "@/features/my-products-catalog-toolbar/ui/MyProductsCatalogToolbar";
 import { useMyProductsPageActions } from "@/features/my-products-page/model/useMyProductsPageActions";
 import { MyProductsCatalogGridRowItem } from "@/features/my-products-page/ui/MyProductsCatalogGridRowItem";
+import { MyProductsShelvesPanel } from "@/features/my-products-page/ui/MyProductsShelvesPanel";
 import { usePlaceProductPress } from "@/features/place-product/model/usePlaceProductPress";
 import { ProductPromotionModal } from "@/features/product-promotion/ui/ProductPromotionModal";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
@@ -159,6 +160,8 @@ export const MyProductsPage = () => {
               onPress={() => setNavSheetVisible(true)}
             />
 
+            <MyProductsShelvesPanel />
+
             <MyProductsCatalogToolbar
               catalogSort={catalogSort}
               onCatalogSortChange={(value) => setCatalogSort(value as MyProductsCatalogSort)}
@@ -255,8 +258,10 @@ export const MyProductsPage = () => {
         onSetProductAuction={pageActions.handleSetProductAuction}
         onSetProductOriginality={pageActions.handleSetProductOriginality}
         onSetProductWholesale={pageActions.handleSetProductWholesale}
+        onSetProductBuyNFree={pageActions.handleSetProductBuyNFree}
         onSetProductRental={pageActions.handleSetProductRental}
         onSetProductAffiliate={pageActions.handleSetProductAffiliate}
+        onSetProductLoyaltyPoints={pageActions.handleSetProductLoyaltyPoints}
         onSetProductInstallment={pageActions.handleSetProductInstallment}
         onWholesaleSaved={pageActions.handleWholesaleSaved}
         onDeleteProduct={pageActions.handleDeleteProduct}
@@ -264,8 +269,10 @@ export const MyProductsPage = () => {
         isAuctionTogglePending={pageActions.isAuctionTogglePending}
         isOriginalityTogglePending={pageActions.isOriginalityTogglePending}
         isWholesaleTogglePending={pageActions.isWholesaleTogglePending}
+        isBuyNFreeTogglePending={pageActions.isBuyNFreeTogglePending}
         isRentalTogglePending={pageActions.isRentalTogglePending}
         isAffiliateTogglePending={pageActions.isAffiliateTogglePending}
+        isLoyaltyTogglePending={pageActions.isLoyaltyTogglePending}
         isInstallmentTogglePending={pageActions.isInstallmentTogglePending}
         isDeletePending={pageActions.isDeletePending}
         manageErrorMessage={pageActions.manageErrorMessage}

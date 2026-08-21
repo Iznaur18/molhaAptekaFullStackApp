@@ -43,18 +43,27 @@ export function buildOrderStatusFromItems(
 
 /**
  * Сумма позиций (как в getMySales / createOrder).
+ * Учитывает `buyNFreeUnitsAtOrder` (бесплатные шт. в цикле «Бесплатно от N»).
  */
 export function calculateOrderItemsTotalAmount(
-  items: Array<{ quantity?: number; unitPriceAtOrder?: number }> | null | undefined,
+  items: Array<{
+    quantity?: number;
+    unitPriceAtOrder?: number;
+    buyNFreeUnitsAtOrder?: number;
+  }> | null | undefined,
 ): number {
   if (!Array.isArray(items) || items.length === 0) {
     return 0;
   }
   let sum = 0;
   for (const item of items) {
-    const quantity = Number(item?.quantity) || 0;
-    const unitPrice = Number(item?.unitPriceAtOrder) || 0;
-    sum += quantity * unitPrice;
+    const quantity = Math.max(0, Math.floor(Number(item?.quantity) || 0));
+    const freeUnits = Math.min(
+      quantity,
+      Math.max(0, Math.floor(Number(item?.buyNFreeUnitsAtOrder) || 0)),
+    );
+    const unitPrice = Math.max(0, Math.floor(Number(item?.unitPriceAtOrder) || 0));
+    sum += unitPrice * (quantity - freeUnits);
   }
   return sum;
 }

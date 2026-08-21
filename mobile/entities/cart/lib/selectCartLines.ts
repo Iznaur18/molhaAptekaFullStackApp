@@ -1,4 +1,6 @@
 import {
+  resolveBuyNFreeFreeUnitsForCart,
+  resolveBuyNFreeLineTotal,
   resolveProductUnitPriceWithPromo,
   resolveProductWholesaleOffer,
 } from "@izibuy/shared-lib";
@@ -17,12 +19,19 @@ type CatalogProduct = {
   productWholesaleEnabled?: boolean | null;
   productWholesaleMinQty?: number | null;
   productWholesalePrice?: number | null;
+  productBuyNFreeEnabled?: boolean | null;
+  productBuyNFreeThreshold?: number | null;
 };
 
 export type AppliedPromo = {
   productId: string;
   code?: string;
   discountPercent?: number;
+};
+
+export type BuyNFreeProgressRow = {
+  completedPaidOrderCount?: number;
+  freeClaimPending?: boolean;
 };
 
 export type CartLine = {
@@ -37,17 +46,32 @@ export type CartLine = {
   promoDiscountPercent: number | null;
   promoCode: string | null;
   isPromoApplied: boolean;
+  buyNFreeUnits: number;
 };
 
 export const selectCartLines = (
   cartItems: CartItemsByProductId,
   products: CatalogProduct[],
   appliedPromos: AppliedPromo[] = [],
+  buyNFreeProgressByProductId:
+    | Record<string, BuyNFreeProgressRow>
+    | Map<string, BuyNFreeProgressRow> = {},
 ): { lines: CartLine[]; total: number } => {
   const productById = new Map(products.map((product) => [String(product._id), product]));
   const promoByProductId = new Map(
     appliedPromos.map((row) => [String(row.productId), row]),
   );
+
+  const progressByProductId = new Map<string, BuyNFreeProgressRow>();
+  if (buyNFreeProgressByProductId instanceof Map) {
+    for (const [productId, row] of buyNFreeProgressByProductId.entries()) {
+      progressByProductId.set(String(productId), row);
+    }
+  } else if (buyNFreeProgressByProductId && typeof buyNFreeProgressByProductId === "object") {
+    for (const [productId, row] of Object.entries(buyNFreeProgressByProductId)) {
+      progressByProductId.set(String(productId), row);
+    }
+  }
 
   const lines = Object.entries(cartItems).map(([productId, quantity]) => {
     const product = productById.get(productId) ?? null;
@@ -63,6 +87,13 @@ export const selectCartLines = (
       quantity: qty,
       promoDiscountPercent,
     });
+    const progress = progressByProductId.get(productId) ?? null;
+    const buyNFreeUnits = resolveBuyNFreeFreeUnitsForCart({
+      product,
+      completedPaidOrderCount: progress?.completedPaidOrderCount,
+      freeClaimPending: progress?.freeClaimPending,
+      quantity: qty,
+    });
     const offer = resolveProductWholesaleOffer(product);
     const isWholesaleApplied = offer != null && qty >= offer.minQty;
     const wholesaleSavings = isWholesaleApplied
@@ -77,13 +108,18 @@ export const selectCartLines = (
       quantity: qty,
       product,
       unitPrice,
-      lineTotal: unitPrice * qty,
+      lineTotal: resolveBuyNFreeLineTotal({
+        unitPrice,
+        quantity: qty,
+        freeUnits: buyNFreeUnits,
+      }),
       isMissing: product == null,
       isWholesaleApplied,
       wholesaleSavings,
       promoDiscountPercent: isPromoApplied ? promoDiscountPercent : null,
       promoCode: isPromoApplied ? String(promo?.code ?? "") : null,
       isPromoApplied,
+      buyNFreeUnits,
     };
   });
 

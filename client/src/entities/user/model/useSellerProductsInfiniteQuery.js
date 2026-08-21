@@ -11,13 +11,18 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 import { useInfiniteScrollSentinel } from "../../../shared/lib/useInfiniteScrollSentinel.js";
 
 /**
- * @param {{ sellerId: string; enabled: boolean }} params
+ * @param {{ sellerId: string; enabled: boolean; shelfId?: string | null }} params
  */
-export function useSellerProductsInfiniteQuery({ sellerId, enabled }) {
+export function useSellerProductsInfiniteQuery({
+  sellerId,
+  enabled,
+  shelfId = null,
+}) {
   const sentinelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
+  const shelfKey = shelfId != null ? String(shelfId).trim() : "";
 
   const query = useInfiniteQuery({
-    queryKey: sellerProductsQueryKeys.list(sellerId),
+    queryKey: sellerProductsQueryKeys.list(sellerId, shelfKey || null),
     enabled: enabled && Boolean(sellerId),
     initialPageParam: 1,
     retry: 1,
@@ -26,6 +31,7 @@ export function useSellerProductsInfiniteQuery({ sellerId, enabled }) {
       return fetchUserProducts(sellerId, {
         page,
         limit: USER_PROFILE_PRODUCTS_API_LIMIT_MAX,
+        shelfId: shelfKey || null,
       });
     },
     getNextPageParam: (lastPage) => {

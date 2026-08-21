@@ -141,3 +141,20 @@
   outline: 2px solid var(--iz-color-ink);
   outline-offset: 2px;
 }
+
+:root[data-theme="dark"] .cookie-notice-sheet__privacy-link {
+  color: #ffffff;
+}
+
+:root[data-theme="dark"] .cookie-notice-sheet__privacy-link:focus-visible {
+  outline-color: #ffffff;
+}
+
+:root[data-theme="dark"] .cookie-notice-sheet__accept {
+  background: #ffffff;
+  color: #12151b;
+}
+
+:root[data-theme="dark"] .cookie-notice-sheet__accept:focus-visible {
+  outline-color: #ffffff;
+}

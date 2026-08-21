@@ -33,6 +33,8 @@ import { InstallmentProgramModal } from "@/entities/installment/ui/InstallmentPr
 import { WholesalePriceModal } from "@/entities/product/ui/WholesalePriceModal";
 import { ProductRentalManageModal } from "@/entities/product/ui/ProductRentalManageModal";
 import { AffiliatePercentModal } from "@/entities/product/ui/AffiliatePercentModal";
+import { ProductLoyaltyPointsModal } from "@/entities/product/ui/ProductLoyaltyPointsModal";
+import { ProductBuyNFreeModal } from "@/entities/product/ui/ProductBuyNFreeModal";
 import { ProductPromotionModalTabs } from "@/features/product-promotion/ui/ProductPromotionModalTabs";
 import { PRODUCT_CARD_UI, PRODUCT_PROMOTION_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
@@ -78,6 +80,10 @@ type ProductPromotionModalProps = {
     productId: string,
     productWholesaleEnabled: boolean,
   ) => void | Promise<void>;
+  onSetProductBuyNFree?: (
+    productId: string,
+    productBuyNFreeEnabled: boolean,
+  ) => void | Promise<void>;
   onSetProductRental?: (
     productId: string,
     productRentalEnabled: boolean,
@@ -85,6 +91,10 @@ type ProductPromotionModalProps = {
   onSetProductAffiliate?: (
     productId: string,
     affiliateEnabled: boolean,
+  ) => void | Promise<void>;
+  onSetProductLoyaltyPoints?: (
+    productId: string,
+    loyaltyPointsPerUnit: number,
   ) => void | Promise<void>;
   onSetProductInstallment?: (
     productId: string,
@@ -95,8 +105,10 @@ type ProductPromotionModalProps = {
   isAuctionTogglePending?: boolean;
   isOriginalityTogglePending?: boolean;
   isWholesaleTogglePending?: boolean;
+  isBuyNFreeTogglePending?: boolean;
   isRentalTogglePending?: boolean;
   isAffiliateTogglePending?: boolean;
+  isLoyaltyTogglePending?: boolean;
   isInstallmentTogglePending?: boolean;
   isDeletePending?: boolean;
   manageErrorMessage?: string;
@@ -129,8 +141,10 @@ export const ProductPromotionModal = ({
   onSetProductAuction,
   onSetProductOriginality,
   onSetProductWholesale,
+  onSetProductBuyNFree,
   onSetProductRental,
   onSetProductAffiliate,
+  onSetProductLoyaltyPoints,
   onSetProductInstallment,
   onWholesaleSaved,
   onDeleteProduct,
@@ -138,8 +152,10 @@ export const ProductPromotionModal = ({
   isAuctionTogglePending = false,
   isOriginalityTogglePending = false,
   isWholesaleTogglePending = false,
+  isBuyNFreeTogglePending = false,
   isRentalTogglePending = false,
   isAffiliateTogglePending = false,
+  isLoyaltyTogglePending = false,
   isInstallmentTogglePending = false,
   isDeletePending = false,
   manageErrorMessage = "",
@@ -173,16 +189,20 @@ export const ProductPromotionModal = ({
   const [selectedDurationCode, setSelectedDurationCode] = useState(defaultDuration);
   const [isInstallmentProgramOpen, setIsInstallmentProgramOpen] = useState(false);
   const [isWholesaleOpen, setIsWholesaleOpen] = useState(false);
+  const [isBuyNFreeOpen, setIsBuyNFreeOpen] = useState(false);
   const [isRentalOpen, setIsRentalOpen] = useState(false);
   const [isAffiliateOpen, setIsAffiliateOpen] = useState(false);
+  const [isLoyaltyOpen, setIsLoyaltyOpen] = useState(false);
   const bodyScrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     if (!visible) {
       setIsInstallmentProgramOpen(false);
       setIsWholesaleOpen(false);
+      setIsBuyNFreeOpen(false);
       setIsRentalOpen(false);
       setIsAffiliateOpen(false);
+      setIsLoyaltyOpen(false);
       return;
     }
     setSelectedTier(defaultTier);
@@ -400,16 +420,20 @@ export const ProductPromotionModal = ({
         onSetAuction={onSetProductAuction}
         onSetOriginality={onSetProductOriginality}
         onSetWholesale={onSetProductWholesale}
+        onSetBuyNFree={onSetProductBuyNFree}
         onSetRental={onSetProductRental}
         onSetAffiliate={onSetProductAffiliate}
+        onSetLoyaltyPoints={onSetProductLoyaltyPoints}
         onSetInstallment={onSetProductInstallment}
         onDelete={onDeleteProduct}
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
         isOriginalityTogglePending={isOriginalityTogglePending}
         isWholesaleTogglePending={isWholesaleTogglePending}
+        isBuyNFreeTogglePending={isBuyNFreeTogglePending}
         isRentalTogglePending={isRentalTogglePending}
         isAffiliateTogglePending={isAffiliateTogglePending}
+        isLoyaltyTogglePending={isLoyaltyTogglePending}
         isInstallmentTogglePending={isInstallmentTogglePending}
         isDeletePending={isDeletePending}
         errorMessage={manageErrorMessage}
@@ -421,8 +445,10 @@ export const ProductPromotionModal = ({
         isRaffleParticipationPending={isRaffleParticipationPending}
         onOpenInstallmentProgram={() => setIsInstallmentProgramOpen(true)}
         onOpenWholesaleSettings={() => setIsWholesaleOpen(true)}
+        onOpenBuyNFreeSettings={() => setIsBuyNFreeOpen(true)}
         onOpenRentalSettings={() => setIsRentalOpen(true)}
         onOpenAffiliateSettings={() => setIsAffiliateOpen(true)}
+        onOpenLoyaltySettings={() => setIsLoyaltyOpen(true)}
         isSubmitting={isSubmitting}
       />
     );
@@ -540,6 +566,15 @@ export const ProductPromotionModal = ({
             onSaved={onWholesaleSaved}
           />
         ) : null}
+        {isBuyNFreeOpen ? (
+          <ProductBuyNFreeModal
+            embedded
+            visible
+            product={product}
+            onClose={() => setIsBuyNFreeOpen(false)}
+            onSaved={onWholesaleSaved}
+          />
+        ) : null}
         {isRentalOpen ? (
           <ProductRentalManageModal
             embedded
@@ -555,6 +590,15 @@ export const ProductPromotionModal = ({
             visible
             product={product}
             onClose={() => setIsAffiliateOpen(false)}
+            onSaved={onWholesaleSaved}
+          />
+        ) : null}
+        {isLoyaltyOpen ? (
+          <ProductLoyaltyPointsModal
+            embedded
+            visible
+            product={product}
+            onClose={() => setIsLoyaltyOpen(false)}
             onSaved={onWholesaleSaved}
           />
         ) : null}

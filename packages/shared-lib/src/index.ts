@@ -223,6 +223,17 @@ export type {
   ResolveProductUnitPriceInput,
 } from "./productWholesale.js";
 export {
+  PRODUCT_BUY_N_FREE_THRESHOLD_MAX,
+  PRODUCT_BUY_N_FREE_THRESHOLD_MIN,
+  isBuyNFreeEligible,
+  isProductBuyNFreeActive,
+  isProductBuyNFreeConfigured,
+  resolveBuyNFreeFreeUnitsForCart,
+  resolveBuyNFreeLineTotal,
+  resolveBuyNFreePaidQuantity,
+} from "./productBuyNFree.js";
+export type { ProductBuyNFreeLike } from "./productBuyNFree.js";
+export {
   applyPromoPercentToRetailPrice,
   resolveProductUnitPriceWithPromo,
   resolveProductPromoLineSavings,

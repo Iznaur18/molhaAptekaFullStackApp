@@ -12,15 +12,25 @@ export const USER_SELLER_PRODUCTS_PAGE_SIZE_MAX = 20;
 
 /**
  * @param {import('mongoose').Types.ObjectId | string} sellerId
+ * @param {{ shelfId?: string | null }} [opts]
  */
-export const buildSellerCatalogProductsQuery = (sellerId) => ({
-  productSeller:
-    typeof sellerId === "string" && ObjectId.isValid(sellerId)
-      ? new ObjectId(sellerId)
-      : sellerId,
-  productModerationStatus: PRODUCT_MODERATION_APPROVED,
-  productIsAvailable: { $ne: false },
-});
+export const buildSellerCatalogProductsQuery = (sellerId, opts = {}) => {
+  const query = {
+    productSeller:
+      typeof sellerId === "string" && ObjectId.isValid(sellerId)
+        ? new ObjectId(sellerId)
+        : sellerId,
+    productModerationStatus: PRODUCT_MODERATION_APPROVED,
+    productIsAvailable: { $ne: false },
+  };
+
+  const shelfId = opts.shelfId != null ? String(opts.shelfId).trim() : "";
+  if (shelfId && ObjectId.isValid(shelfId)) {
+    query.sellerShelfId = new ObjectId(shelfId);
+  }
+
+  return query;
+};
 
 /**
  * @param {Record<string, unknown>} product
@@ -39,9 +49,10 @@ export const mapProductToProfileThumbItem = (product) => ({
  * @param {import('mongoose').Types.ObjectId | string} sellerId
  * @param {number} page
  * @param {number} limit
+ * @param {{ shelfId?: string | null }} [opts]
  */
-export const getSellerCatalogProductsPage = async (sellerId, page, limit) => {
-  const productsQuery = buildSellerCatalogProductsQuery(sellerId);
+export const getSellerCatalogProductsPage = async (sellerId, page, limit, opts = {}) => {
+  const productsQuery = buildSellerCatalogProductsQuery(sellerId, opts);
   const skip = (page - 1) * limit;
 
   const [products, total] = await Promise.all([

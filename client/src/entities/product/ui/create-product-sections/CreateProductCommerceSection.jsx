@@ -11,9 +11,6 @@ import { FormFieldLabel } from "../../../../shared/ui/FormFieldLabel/FormFieldLa
  *   handleChange: import('react').ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
  *   handleAvailableChange: import('react').ChangeEventHandler<HTMLInputElement>;
  *   discountPreviewPercent: number | null;
- *   loyaltyFieldDisabled: boolean;
- *   sellerLoyaltyBudget: { available: number; catalogCommitted: number };
- *   sellerPointsMaxPerUnit: number;
  *   showCatalogAvailabilityToggle?: boolean;
  *   isEdit?: boolean;
  *   className?: string;
@@ -25,9 +22,6 @@ export function CreateProductCommerceSection({
   handleChange,
   handleAvailableChange,
   discountPreviewPercent,
-  loyaltyFieldDisabled,
-  sellerLoyaltyBudget,
-  sellerPointsMaxPerUnit,
   showCatalogAvailabilityToggle = true,
   isEdit = false,
   className = "",
@@ -95,27 +89,6 @@ export function CreateProductCommerceSection({
           />
         </label>
       ) : null}
-      <label className="create-product-section__label">
-        <FormFieldLabel>{getProductFieldEditLabel("loyaltyPointsPerUnit")}</FormFieldLabel>
-        <input
-          {...INTEGER_INPUT_FIELD_PROPS}
-          className="create-product-section__input"
-          name="loyaltyPointsPerUnit"
-          value={String(form.loyaltyPointsPerUnit ?? "")}
-          onChange={handleChange}
-          disabled={isSubmitting || loyaltyFieldDisabled}
-          maxLength={8}
-        />
-        <p className="create-product-section__hint">
-          {loyaltyFieldDisabled
-            ? CREATE_PRODUCT_MODAL_UI.HINT_LOYALTY_POINTS_ZERO_BALANCE
-            : CREATE_PRODUCT_MODAL_UI.HINT_LOYALTY_POINTS_PER_UNIT(
-                sellerLoyaltyBudget.available,
-                sellerLoyaltyBudget.catalogCommitted,
-                sellerPointsMaxPerUnit,
-              )}
-        </p>
-      </label>
     </div>
   );
 }

@@ -10,15 +10,21 @@ import {
 type FetchUserProductsParams = {
   page?: number;
   limit?: number;
+  shelfId?: string | null;
 };
 
 export const fetchUserProducts = async (userId: string, params: FetchUserProductsParams = {}) => {
   try {
     const page = params.page ?? 1;
     const limit = params.limit ?? USER_PROFILE_PRODUCTS_PAGE_SIZE;
+    const shelfId = params.shelfId != null ? String(params.shelfId).trim() : "";
 
     const { data } = await apiClient.get(`/user/${encodeURIComponent(userId)}/products`, {
-      params: { page, limit },
+      params: {
+        page,
+        limit,
+        ...(shelfId ? { shelfId } : {}),
+      },
     });
 
     return parseUserSellerProductsPageData(data);

@@ -240,6 +240,10 @@
   color: var(--iz-color-ink);
 }
 
+:root[data-theme="dark"] .installment-program-modal__plan-total-main {
+  color: #ffffff;
+}
+
 .installment-program-modal__checkbox {
   display: flex;
   align-items: center;

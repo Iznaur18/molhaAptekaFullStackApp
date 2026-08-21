@@ -19,6 +19,7 @@ describe("shouldProxyToApi", () => {
 
   it("lists users-loyalty-raffle among proxy prefixes", () => {
     expect(DEV_API_PROXY_PREFIXES).toContain("/users-loyalty-raffle");
+    expect(DEV_API_PROXY_PREFIXES).toContain("/seller-shelf");
     expect(DEV_API_PROXY_PREFIXES.indexOf("/uploads")).toBeLessThan(
       DEV_API_PROXY_PREFIXES.indexOf("/upload"),
     );

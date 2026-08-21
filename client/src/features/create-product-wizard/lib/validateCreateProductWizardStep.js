@@ -26,13 +26,10 @@ import { CREATE_PRODUCT_WIZARD_STEP_IDS } from "./createProductWizardSteps.js";
 /**
  * @param {string} stepId
  * @param {Record<string, unknown>} form
- * @param {{
- *   sellerPointsMaxPerUnit: number;
- *   sellerCatalogCommitted: number;
- * }} context
+ * @param {Record<string, unknown>} [context]
  * @returns {string | null}
  */
-export function validateCreateProductWizardStep(stepId, form, context) {
+export function validateCreateProductWizardStep(stepId, form, context = {}) {
   switch (stepId) {
     case "basic": {
       const nameError = validateProductName(form.productName);
@@ -119,16 +116,6 @@ export function validateCreateProductWizardStep(stepId, form, context) {
         }
       }
 
-      const loyaltyParsed = Math.floor(Number(form.loyaltyPointsPerUnit));
-      const loyaltyPointsPerUnit =
-        Number.isFinite(loyaltyParsed) && loyaltyParsed >= 0 ? loyaltyParsed : 0;
-      if (loyaltyPointsPerUnit > context.sellerPointsMaxPerUnit) {
-        return CREATE_PRODUCT_MODAL_UI.ERROR_LOYALTY_POINTS_MAX(
-          context.sellerPointsMaxPerUnit,
-          context.sellerCatalogCommitted,
-        );
-      }
-
       return null;
     }
 
@@ -149,8 +136,6 @@ export function validateCreateProductWizardStep(stepId, form, context) {
         form,
         isEdit: false,
         showCatalogAvailabilityToggle: true,
-        sellerPointsMaxPerUnit: context.sellerPointsMaxPerUnit,
-        sellerCatalogCommitted: context.sellerCatalogCommitted,
       });
       return prepared.ok ? null : prepared.message;
     }

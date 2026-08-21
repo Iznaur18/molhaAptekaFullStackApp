@@ -10,8 +10,6 @@ import { useMyProductMutations } from "./useMyProductMutations.js";
  *   isEdit: boolean;
  *   productToEdit?: import("./types.js").ProductFromApi | null;
  *   showCatalogAvailabilityToggle: boolean;
- *   sellerPointsMaxPerUnit: number;
- *   sellerCatalogCommitted: number;
  *   onSuccess?: (product: import("./types.js").ProductFromApi) => void;
  *   onClose: () => void;
  *   setStatus: (status: { kind: "idle" | "loading" | "error"; message: string }) => void;
@@ -22,8 +20,6 @@ export function useCreateProductSubmit({
   isEdit,
   productToEdit,
   showCatalogAvailabilityToggle,
-  sellerPointsMaxPerUnit,
-  sellerCatalogCommitted,
   onSuccess,
   onClose,
   setStatus,
@@ -40,8 +36,6 @@ export function useCreateProductSubmit({
           form,
           isEdit,
           showCatalogAvailabilityToggle,
-          sellerPointsMaxPerUnit,
-          sellerCatalogCommitted,
         });
 
         if (!prepared.ok) {
@@ -83,8 +77,6 @@ export function useCreateProductSubmit({
       isEdit,
       productToEdit,
       showCatalogAvailabilityToggle,
-      sellerPointsMaxPerUnit,
-      sellerCatalogCommitted,
       onSuccess,
       onClose,
       setStatus,

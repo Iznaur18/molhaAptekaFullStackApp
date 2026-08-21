@@ -4,23 +4,17 @@ import { validateCreateProductWizardStep } from "../../create-product-wizard/lib
 /**
  * @param {string} stepId
  * @param {Record<string, unknown>} form
- * @param {{
- *   sellerPointsMaxPerUnit: number;
- *   sellerCatalogCommitted: number;
- * }} context
  * @returns {string | null}
  */
-export function validateEditProductWizardStep(stepId, form, context) {
+export function validateEditProductWizardStep(stepId, form) {
   if (stepId === "review") {
     const prepared = prepareCreateProductSubmit({
       form,
       isEdit: true,
       showCatalogAvailabilityToggle: false,
-      sellerPointsMaxPerUnit: context.sellerPointsMaxPerUnit,
-      sellerCatalogCommitted: context.sellerCatalogCommitted,
     });
     return prepared.ok ? null : prepared.message;
   }
 
-  return validateCreateProductWizardStep(stepId, form, context);
+  return validateCreateProductWizardStep(stepId, form);
 }

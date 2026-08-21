@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 
 import { ProductMediaGallery } from "@/entities/product/ui/ProductMediaGallery";
+import { ProductShareLinkButton } from "@/entities/product/ui/ProductShareLinkButton";
 import { WishlistToggleButton } from "@/features/wishlist-toggle/ui/WishlistToggleButton";
 import { PRODUCT_REPORT_UI } from "@/shared/config";
 import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
@@ -37,8 +38,8 @@ export const ProductDetailMediaSection = ({
       imageUrls={imageUrls}
       onBack={() => router.back()}
       heroOverlay={
-        !isOwnProduct ? (
-          <View style={styles.heroActions}>
+        <View style={styles.heroActions}>
+          {!isOwnProduct ? (
             <Pressable
               style={[styles.detailReportButton, reportDisabled && styles.detailReportButtonDisabled]}
               onPress={onReportPress}
@@ -51,13 +52,16 @@ export const ProductDetailMediaSection = ({
             >
               <MaterialIcons name="flag" size={20} color={semanticColors.danger} />
             </Pressable>
+          ) : null}
+          <ProductShareLinkButton product={product} />
+          {!isOwnProduct ? (
             <WishlistToggleButton
               productId={productId}
               product={product}
               variant="detailHeroInline"
             />
-          </View>
-        ) : null
+          ) : null}
+        </View>
       }
     />
   );

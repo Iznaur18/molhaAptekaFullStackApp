@@ -408,6 +408,15 @@ export {
   productWholesalePatchFieldsShape,
 } from "./productWholesale.js";
 export {
+  PRODUCT_BUY_N_FREE_THRESHOLD_MIN,
+  PRODUCT_BUY_N_FREE_THRESHOLD_MAX,
+  PRODUCT_BUY_N_FREE_CONFIG_REQUIRED_MESSAGE,
+  PRODUCT_BUY_N_FREE_THRESHOLD_MESSAGE,
+  productBuyNFreeThresholdFieldSchema,
+  productBuyNFreePatchFieldsShape,
+  productBuyNFreeProgressDataSchema,
+} from "./productBuyNFree.js";
+export {
   PRODUCT_FLASH_SALE_MAX_DISCOUNT_PERCENT,
   PRODUCT_FLASH_SALE_DURATION_MIN_MINUTES,
   PRODUCT_FLASH_SALE_DURATION_MAX_MINUTES,
@@ -512,6 +521,18 @@ export {
   userSellerProductThumbItemSchema,
   userSellerProductsPageDataSchema,
 } from "./userSellerProducts.js";
+export {
+  SELLER_SHELF_NAME_MAX_CHARS,
+  SELLER_SHELF_MAX_PER_SELLER,
+  sellerShelfIdParamsSchema,
+  sellerShelfSellerIdParamsSchema,
+  createSellerShelfBodySchema,
+  patchSellerShelfBodySchema,
+  reorderSellerShelvesBodySchema,
+  setSellerShelfProductsBodySchema,
+  sellerShelfSchema,
+  sellerShelfListDataSchema,
+} from "./sellerShelf.js";
 export {
   CART_MAX_DISTINCT_PRODUCTS,
   cartItemsRecordSchema,

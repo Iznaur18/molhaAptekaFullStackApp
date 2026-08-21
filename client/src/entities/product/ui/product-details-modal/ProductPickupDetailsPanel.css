@@ -64,6 +64,10 @@ button.product-pickup-details-panel__method:focus-visible {
   color: var(--iz-color-ink);
 }
 
+:root[data-theme="dark"] .product-pickup-details-panel__title {
+  color: #ffffff;
+}
+
 .product-pickup-details-panel__subtitle {
   font-size: 0.82rem;
   font-weight: 500;

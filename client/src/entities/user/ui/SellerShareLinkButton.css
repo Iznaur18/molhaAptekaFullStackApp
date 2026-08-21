@@ -1,0 +1,67 @@
+.seller-share-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 6px;
+  border: none;
+  border-radius: 20px;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    color var(--iz-transition-base),
+    background var(--iz-transition-base),
+    border-color var(--iz-transition-base),
+    transform var(--iz-transition-press),
+    opacity var(--iz-transition-base),
+    filter var(--iz-transition-base);
+}
+
+.seller-share-link:active {
+  transform: scale(var(--iz-state-pressed-scale));
+}
+
+.seller-share-link--banner {
+  position: absolute;
+  top: var(--modal-banner-avatar-inset, 0.75rem);
+  right: var(--modal-banner-avatar-inset, 0.75rem);
+  z-index: 2;
+  color: #ffffff;
+}
+
+.seller-share-link--banner:hover {
+  opacity: 0.88;
+}
+
+/* Паритет с .user-follow-button__btn_following на seller page */
+.seller-share-link--meta {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 2.125rem;
+  height: 2.125rem;
+  padding: 0;
+  border-radius: var(--iz-radius-button, 10px);
+  border: 1px solid var(--color-accent, var(--iz-color-link));
+  background: transparent;
+  color: var(--color-accent, var(--iz-color-link));
+}
+
+.seller-share-link--meta:hover {
+  filter: brightness(1.05);
+}
+
+.seller-share-link--copied:not(.seller-share-link--banner) {
+  color: var(--iz-color-success);
+  border-color: var(--iz-color-success);
+}
+
+.seller-share-link--banner.seller-share-link--copied {
+  color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seller-share-link:active {
+    transform: none;
+    opacity: var(--iz-state-pressed-opacity);
+  }
+}

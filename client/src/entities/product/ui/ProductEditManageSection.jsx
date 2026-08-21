@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 
-import { isProductAffiliateConfigured, isProductWholesaleConfigured, isProductRentalConfigured } from "@izibuy/shared-lib";
+import { isProductAffiliateConfigured, isProductWholesaleConfigured, isProductRentalConfigured, isProductBuyNFreeConfigured } from "@izibuy/shared-lib";
 
 import { isProductRaffleParticipant } from "../../raffle/lib/isProductRaffleParticipant.js";
 import { hasProductManualCatalogDiscount } from "../lib/hasProductManualCatalogDiscount.js";
 import { PRODUCT_CARD_UI, CREATE_PRODUCT_MODAL_UI, PRODUCT_FLASH_SALE_UI } from "../../../shared/config/appUiCopy.js";
 import { PRODUCT_MODERATION_APPROVED } from "../model/productModerationConstants.js";
 import { resolveProductAffiliateOffer } from "../lib/resolveProductAffiliateOffer.js";
+import { resolveProductLoyaltyPointsPerUnit } from "../lib/resolveProductLoyaltyPointsPerUnit.js";
 
 import { ProductManageToggleRow } from "./ProductManageToggleRow.jsx";
 import "./ProductEditManageSection.css";
@@ -52,9 +53,15 @@ import "./ProductEditManageSection.css";
  *   onOpenWholesaleSettings?: () => void;
  *   onOpenRentalSettings?: () => void;
  *   onOpenAffiliateSettings?: () => void;
+ *   onOpenLoyaltySettings?: () => void;
+ *   onOpenBuyNFreeSettings?: () => void;
  *   onOpenFlashSaleSettings?: () => void;
  *   onSetFlashSale?: (productId: string, productFlashSaleEnabled: boolean) => void | Promise<void>;
  *   isFlashSaleTogglePending?: boolean;
+ *   onSetLoyaltyPoints?: (productId: string, loyaltyPointsPerUnit: number) => void | Promise<void>;
+ *   isLoyaltyTogglePending?: boolean;
+ *   onSetBuyNFree?: (productId: string, productBuyNFreeEnabled: boolean) => void | Promise<void>;
+ *   isBuyNFreeTogglePending?: boolean;
  * }} props
  */
 export function ProductEditManageSection({
@@ -94,6 +101,12 @@ export function ProductEditManageSection({
   onOpenFlashSaleSettings,
   onSetFlashSale,
   isFlashSaleTogglePending = false,
+  onOpenLoyaltySettings,
+  onSetLoyaltyPoints,
+  isLoyaltyTogglePending = false,
+  onOpenBuyNFreeSettings,
+  onSetBuyNFree,
+  isBuyNFreeTogglePending = false,
 }) {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const isListedForOthers = product.productIsAvailable !== false;
@@ -112,6 +125,9 @@ export function ProductEditManageSection({
   const isAffiliateEnabled = affiliateOffer.enabled;
   const affiliateConfigured = isProductAffiliateConfigured(product);
   const wholesaleConfigured = isProductWholesaleConfigured(product);
+  const buyNFreeConfigured = isProductBuyNFreeConfigured(product);
+  const isBuyNFreeEnabled = product.productBuyNFreeEnabled === true;
+  const buyNFreeThreshold = Math.floor(Number(product.productBuyNFreeThreshold) || 0);
   const rentalConfigured = isProductRentalConfigured(product);
   const showRaffleToggle =
     sellerRaffleActive && typeof onToggleRaffleParticipation === "function";
@@ -121,12 +137,20 @@ export function ProductEditManageSection({
   const showWholesale =
     typeof onOpenWholesaleSettings === "function" ||
     typeof onSetWholesale === "function";
+  const showBuyNFree =
+    typeof onOpenBuyNFreeSettings === "function" ||
+    typeof onSetBuyNFree === "function";
   const showRental =
     typeof onOpenRentalSettings === "function" ||
     typeof onSetRental === "function";
   const showAffiliate =
     typeof onOpenAffiliateSettings === "function" ||
     typeof onSetAffiliate === "function";
+  const showLoyalty =
+    typeof onOpenLoyaltySettings === "function" ||
+    typeof onSetLoyaltyPoints === "function";
+  const loyaltyPointsPerUnit = resolveProductLoyaltyPointsPerUnit(product);
+  const isLoyaltyEnabled = loyaltyPointsPerUnit > 0;
   const showPromoCodes = typeof onOpenPromoCodesSettings === "function" && canEdit;
   const showFlashSale =
     typeof onOpenFlashSaleSettings === "function" || typeof onSetFlashSale === "function";
@@ -149,8 +173,10 @@ export function ProductEditManageSection({
     isQaTogglePending ||
     isOriginalityTogglePending ||
     isWholesaleTogglePending ||
+    isBuyNFreeTogglePending ||
     isRentalTogglePending ||
     isAffiliateTogglePending ||
+    isLoyaltyTogglePending ||
     isInstallmentTogglePending ||
     isFlashSaleTogglePending ||
     isRaffleParticipationPending ||
@@ -318,6 +344,34 @@ export function ProductEditManageSection({
             }}
           />
         ) : null}
+        {showBuyNFree && canEdit ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_MODAL_UI.MANAGE_BUY_N_FREE_TITLE}
+            description={
+              isBuyNFreeEnabled && buyNFreeThreshold >= 2
+                ? CREATE_PRODUCT_MODAL_UI.MANAGE_BUY_N_FREE_HINT_ON(buyNFreeThreshold)
+                : CREATE_PRODUCT_MODAL_UI.MANAGE_BUY_N_FREE_HINT
+            }
+            checked={isBuyNFreeEnabled}
+            disabled={actionsLocked}
+            pending={isBuyNFreeTogglePending}
+            pendingLabel={CREATE_PRODUCT_MODAL_UI.BUY_N_FREE_TOGGLE_PENDING}
+            onPress={() => onOpenBuyNFreeSettings?.()}
+            onCheckedChange={(next) => {
+              if (product._id == null || actionsLocked) {
+                return { revert: true };
+              }
+              if (next && !buyNFreeConfigured) {
+                onOpenBuyNFreeSettings?.();
+                return { revert: true };
+              }
+              if (typeof onSetBuyNFree === "function") {
+                void onSetBuyNFree(String(product._id), next);
+              }
+              return undefined;
+            }}
+          />
+        ) : null}
         {showRental ? (
           <ProductManageToggleRow
             title={CREATE_PRODUCT_MODAL_UI.MANAGE_RENTAL_TITLE}
@@ -395,6 +449,34 @@ export function ProductEditManageSection({
             onCheckedChange={() => {
               onOpenPromoCodesSettings?.();
               return { revert: true };
+            }}
+          />
+        ) : null}
+        {showLoyalty && canEdit ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_MODAL_UI.MANAGE_LOYALTY_TITLE}
+            description={
+              isLoyaltyEnabled
+                ? CREATE_PRODUCT_MODAL_UI.MANAGE_LOYALTY_HINT_ON(loyaltyPointsPerUnit)
+                : CREATE_PRODUCT_MODAL_UI.MANAGE_LOYALTY_HINT
+            }
+            checked={isLoyaltyEnabled}
+            disabled={actionsLocked}
+            pending={isLoyaltyTogglePending}
+            pendingLabel={CREATE_PRODUCT_MODAL_UI.LOYALTY_TOGGLE_PENDING}
+            onPress={() => onOpenLoyaltySettings?.()}
+            onCheckedChange={(next) => {
+              if (product._id == null || actionsLocked) {
+                return { revert: true };
+              }
+              if (next) {
+                onOpenLoyaltySettings?.();
+                return { revert: true };
+              }
+              if (typeof onSetLoyaltyPoints === "function") {
+                void onSetLoyaltyPoints(String(product._id), 0);
+              }
+              return undefined;
             }}
           />
         ) : null}

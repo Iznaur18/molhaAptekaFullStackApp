@@ -1,20 +1,24 @@
 import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
 
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
+import { SellerShareLinkButton } from "../../../entities/user/ui/SellerShareLinkButton.jsx";
 import { isPremiumActive } from "../../../entities/user/lib/isPremiumActive.js";
 import { USER_ROLE_USER } from "../../../entities/user/model/userConstants.js";
 import { ThemePreferenceToggle } from "../../../features/theme-settings/ui/ThemePreferenceToggle.jsx";
 import { WebPushSettingsToggle } from "../../../features/web-push/ui/WebPushSettingsToggle.jsx";
 import {
   AUTH_UI,
+  HEADER_NOTIFICATIONS_BUTTON_UI,
   MY_PROFILE_PAGE_UI,
   USER_DETAILS_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { PROFILE_TAB_OVERVIEW } from "../../../widgets/app-shell/lib/profileTabs.js";
 import { MyProductsCatalogToolbar } from "../../../widgets/my-products-catalog-toolbar/ui/MyProductsCatalogToolbar.jsx";
+import { MyProductsShelvesPanel } from "../../../entities/seller-shelf/ui/MyProductsShelvesPanel.jsx";
 import { useMyProfileNav } from "../model/useMyProfileNav.js";
 import { useMyProfilePageUi } from "../model/useMyProfilePageUi.js";
-import { AppIcon, ChevronDown, Menu, Pencil } from "../../../shared/ui/icon/index.js";
+import { AppIcon, Bell, ChevronDown, Menu, Pencil } from "../../../shared/ui/icon/index.js";
 import { UserProfileInfoPanel } from "../../../entities/user/ui/UserProfileInfoPanel.jsx";
 import { GuestProfilePanel } from "./GuestProfilePanel.jsx";
 import { ProfileSidebar } from "./ProfileSidebar.jsx";
@@ -130,6 +134,7 @@ export function MyProfilePage({
   tabContent = null,
   myProductsCatalogToolbarProps = null,
 }) {
+  const navigate = useNavigate();
   const isGuestProfile =
     !user && !isLoading && !errorMessage && activeTab === PROFILE_TAB_OVERVIEW;
   const isGuestOtherTab = !user && !isLoading && !errorMessage && !isGuestProfile;
@@ -312,7 +317,10 @@ export function MyProfilePage({
           {isFullWidthCatalogTab ? (
             <>
               {isMyProductsTab && myProductsCatalogToolbarProps ? (
-                <MyProductsCatalogToolbar {...myProductsCatalogToolbarProps} />
+                <>
+                  <MyProductsShelvesPanel />
+                  <MyProductsCatalogToolbar {...myProductsCatalogToolbarProps} />
+                </>
               ) : null}
               <div className="my-profile-page__catalog-shell">
                 {isLoading ? (
@@ -386,15 +394,34 @@ export function MyProfilePage({
                         />
                       ) : null}
                       {showEditOnBanner ? (
-                        <button
-                          type="button"
-                          className="my-profile-page__banner-edit"
-                          aria-label={MY_PROFILE_PAGE_UI.EDIT_PROFILE}
-                          onClick={() => onEditProfileClick?.()}
-                        >
-                          <AppIcon icon={Pencil} size="sm" strokeWidth={2.25} />
-                        </button>
+                        <div className="my-profile-page__banner-actions">
+                          <button
+                            type="button"
+                            className="my-profile-page__banner-edit"
+                            aria-label={MY_PROFILE_PAGE_UI.EDIT_PROFILE}
+                            onClick={() => onEditProfileClick?.()}
+                          >
+                            <AppIcon icon={Pencil} size="sm" strokeWidth={2.25} />
+                          </button>
+                        </div>
                       ) : null}
+                    </div>
+                  ) : null}
+                  {user?._id ? (
+                    <div className="my-profile-page__share-row">
+                      <button
+                        type="button"
+                        className="my-profile-page__notifications-btn"
+                        aria-label={HEADER_NOTIFICATIONS_BUTTON_UI.ARIA}
+                        onClick={() => navigate("/notifications")}
+                      >
+                        <AppIcon icon={Bell} size="lg" strokeWidth={2.1} />
+                      </button>
+                      <SellerShareLinkButton
+                        sellerId={String(user._id)}
+                        sellerName={String(user.userName ?? "").trim()}
+                        variant="meta"
+                      />
                     </div>
                   ) : null}
                   {tabContent ? (

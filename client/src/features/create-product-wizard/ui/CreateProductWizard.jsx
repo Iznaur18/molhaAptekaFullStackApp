@@ -33,9 +33,6 @@ const CREATE_PRODUCT_WIZARD_FORM_ID = "create-product-wizard-form";
  *   isOpen: boolean;
  *   onClose: () => void;
  *   onSuccess?: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
- *   sellerLoyaltyPointsBalance?: number;
- *   sellerLoyaltyPointsReserved?: number;
- *   sellerProducts?: import('../../../entities/product/model/types.js').ProductFromApi[];
  *   productToCopy?: import('../../../entities/product/model/types.js').ProductFromApi | null;
  * }} props
  */
@@ -43,9 +40,6 @@ export function CreateProductWizard({
   isOpen,
   onClose,
   onSuccess,
-  sellerLoyaltyPointsBalance = 0,
-  sellerLoyaltyPointsReserved = 0,
-  sellerProducts = [],
   productToCopy = null,
 }) {
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
@@ -53,9 +47,6 @@ export function CreateProductWizard({
     form,
     setForm,
     status,
-    sellerLoyaltyBudget,
-    sellerPointsMaxPerUnit,
-    loyaltyFieldDisabled,
     isSubmitting,
     handleClose,
     handleSubmit,
@@ -72,16 +63,11 @@ export function CreateProductWizard({
     onSuccess,
     mode: "create",
     productToCopy,
-    sellerLoyaltyPointsBalance,
-    sellerLoyaltyPointsReserved,
-    sellerProducts,
   });
 
   const wizard = useCreateProductWizard({
     isOpen,
     form,
-    sellerPointsMaxPerUnit,
-    sellerCatalogCommitted: sellerLoyaltyBudget.catalogCommitted,
     draftEnabled,
   });
 
@@ -148,9 +134,6 @@ export function CreateProductWizard({
     descriptionChars,
     handleAvailableChange,
     discountPreviewPercent,
-    loyaltyFieldDisabled,
-    sellerLoyaltyBudget,
-    sellerPointsMaxPerUnit,
   };
 
   const stepCopy = resolveCreateProductWizardStepCopy(wizard.stepId);

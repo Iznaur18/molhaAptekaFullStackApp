@@ -12,7 +12,6 @@ import {
 import { createProductPickupFieldsFromUser } from "../lib/createProductPickupFieldsFromUser.js";
 import { useAuthSession } from "../../user/model/useAuthSession.js";
 import { resolveCreateProductDiscountPreview } from "../lib/prepareCreateProductSubmit.js";
-import { resolveSellerMaxLoyaltyPointsPerUnit } from "../lib/resolveSellerMaxLoyaltyPointsPerUnit.js";
 import {
   formatRubPriceInput,
   keepDigitsOnly,
@@ -27,9 +26,6 @@ import { useCreateProductSubmit } from "./useCreateProductSubmit.js";
  *   mode?: 'create' | 'edit';
  *   productToEdit?: import('./types.js').ProductFromApi | null;
  *   productToCopy?: import('./types.js').ProductFromApi | null;
- *   sellerLoyaltyPointsBalance?: number;
- *   sellerLoyaltyPointsReserved?: number;
- *   sellerProducts?: import('./types.js').ProductFromApi[];
  * }} params
  */
 export function useCreateProductForm({
@@ -39,9 +35,6 @@ export function useCreateProductForm({
   mode = "create",
   productToEdit = null,
   productToCopy = null,
-  sellerLoyaltyPointsBalance = 0,
-  sellerLoyaltyPointsReserved = 0,
-  sellerProducts = [],
 }) {
   const { user } = useAuthSession();
   const [form, setForm] = useState(CREATE_PRODUCT_INITIAL_FORM);
@@ -54,28 +47,6 @@ export function useCreateProductForm({
   // Черновики ведём только для «чистого» создания: при редактировании и
   // копировании форма префилится из существующего товара — черновику там не место.
   const draftEnabled = !isEdit && !productToCopy;
-
-  const editingProductId =
-    isEdit && productToEdit?._id != null ? String(productToEdit._id) : null;
-
-  const sellerLoyaltyBudget = useMemo(
-    () =>
-      resolveSellerMaxLoyaltyPointsPerUnit({
-        loyaltyPointsBalance: sellerLoyaltyPointsBalance,
-        loyaltyPointsReserved: sellerLoyaltyPointsReserved,
-        sellerProducts,
-        editingProductId,
-      }),
-    [
-      sellerLoyaltyPointsBalance,
-      sellerLoyaltyPointsReserved,
-      sellerProducts,
-      editingProductId,
-    ],
-  );
-
-  const sellerPointsMaxPerUnit = sellerLoyaltyBudget.maxPerUnit;
-  const loyaltyFieldDisabled = sellerPointsMaxPerUnit <= 0;
 
   const handleClose = () => {
     setStatus({ kind: "idle", message: "" });
@@ -98,8 +69,6 @@ export function useCreateProductForm({
     isEdit,
     productToEdit,
     showCatalogAvailabilityToggle,
-    sellerPointsMaxPerUnit,
-    sellerCatalogCommitted: sellerLoyaltyBudget.catalogCommitted,
     onSuccess: handleCreateSuccess,
     onClose: handleClose,
     setStatus,
@@ -165,8 +134,7 @@ export function useCreateProductForm({
   const handleChange = (event) => {
     const { name, value } = event.target;
     const isPriceField = name === "productPrice" || name === "productOldPrice";
-    const isIntegerField =
-      name === "productStockQuantity" || name === "loyaltyPointsPerUnit";
+    const isIntegerField = name === "productStockQuantity";
     let nextValue = value;
     if (isPriceField) {
       nextValue = formatRubPriceInput(value);
@@ -205,9 +173,6 @@ export function useCreateProductForm({
     status,
     isEdit,
     showCatalogAvailabilityToggle,
-    sellerLoyaltyBudget,
-    sellerPointsMaxPerUnit,
-    loyaltyFieldDisabled,
     isSubmitting,
     handleClose,
     handleSubmit,

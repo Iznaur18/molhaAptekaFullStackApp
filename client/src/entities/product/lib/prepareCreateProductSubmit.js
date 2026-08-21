@@ -32,8 +32,6 @@ import { PRODUCT_STOCK_QUANTITY_MAX, PRODUCT_STOCK_QUANTITY_MIN } from "../model
  *   form: Record<string, unknown>;
  *   isEdit: boolean;
  *   showCatalogAvailabilityToggle: boolean;
- *   sellerPointsMaxPerUnit: number;
- *   sellerCatalogCommitted: number;
  * }} PrepareCreateProductSubmitInput
  */
 
@@ -45,8 +43,6 @@ export function prepareCreateProductSubmit({
   form,
   isEdit,
   showCatalogAvailabilityToggle,
-  sellerPointsMaxPerUnit,
-  sellerCatalogCommitted,
 }) {
   const productPrice = parseProductPriceInput(form.productPrice);
   if (productPrice == null) {
@@ -139,19 +135,6 @@ export function prepareCreateProductSubmit({
     productStockQuantity = stockParsed;
   }
 
-  const loyaltyParsed = Math.floor(Number(form.loyaltyPointsPerUnit));
-  const loyaltyPointsPerUnit =
-    Number.isFinite(loyaltyParsed) && loyaltyParsed >= 0 ? loyaltyParsed : 0;
-  if (loyaltyPointsPerUnit > sellerPointsMaxPerUnit) {
-    return {
-      ok: false,
-      message: CREATE_PRODUCT_MODAL_UI.ERROR_LOYALTY_POINTS_MAX(
-        sellerPointsMaxPerUnit,
-        sellerCatalogCommitted,
-      ),
-    };
-  }
-
   const productCategoryId =
     form.productCategoryId != null && String(form.productCategoryId).trim() !== ""
       ? String(form.productCategoryId).trim()
@@ -209,7 +192,6 @@ export function prepareCreateProductSubmit({
       productPreviewVideoUrl: previewVideoUrl,
       productPrice,
       productOldPrice,
-      loyaltyPointsPerUnit,
       productCharacteristics,
       ...(productRegionCode ? { productRegionCode } : {}),
       productPickupAddress,
@@ -249,7 +231,7 @@ export function prepareCreateProductSubmit({
       ...(productCategoryId ? { productCategoryId } : {}),
       productIsAvailable: form.productIsAvailable,
       productStockQuantity,
-      loyaltyPointsPerUnit,
+      loyaltyPointsPerUnit: 0,
       productCharacteristics,
       ...(productRegionCode ? { productRegionCode } : {}),
       productPickupAddress,

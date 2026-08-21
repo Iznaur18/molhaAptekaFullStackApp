@@ -27,9 +27,6 @@ const EDIT_PRODUCT_WIZARD_FORM_ID = "edit-product-wizard-form";
  *   isOpen: boolean;
  *   onClose: () => void;
  *   onSuccess?: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
- *   sellerLoyaltyPointsBalance?: number;
- *   sellerLoyaltyPointsReserved?: number;
- *   sellerProducts?: import('../../../entities/product/model/types.js').ProductFromApi[];
  *   productToEdit?: import('../../../entities/product/model/types.js').ProductFromApi | null;
  * }} props
  */
@@ -37,9 +34,6 @@ export function EditProductWizard({
   isOpen,
   onClose,
   onSuccess,
-  sellerLoyaltyPointsBalance = 0,
-  sellerLoyaltyPointsReserved = 0,
-  sellerProducts = [],
   productToEdit = null,
 }) {
   const {
@@ -47,9 +41,6 @@ export function EditProductWizard({
     setForm,
     status,
     showCatalogAvailabilityToggle,
-    sellerLoyaltyBudget,
-    sellerPointsMaxPerUnit,
-    loyaltyFieldDisabled,
     isSubmitting,
     handleClose,
     handleSubmit,
@@ -63,16 +54,11 @@ export function EditProductWizard({
     onSuccess,
     mode: "edit",
     productToEdit,
-    sellerLoyaltyPointsBalance,
-    sellerLoyaltyPointsReserved,
-    sellerProducts,
   });
 
   const wizard = useEditProductWizard({
     isOpen,
     form,
-    sellerPointsMaxPerUnit,
-    sellerCatalogCommitted: sellerLoyaltyBudget.catalogCommitted,
   });
 
   if (!isOpen) {
@@ -110,9 +96,6 @@ export function EditProductWizard({
     descriptionChars,
     handleAvailableChange,
     discountPreviewPercent,
-    loyaltyFieldDisabled,
-    sellerLoyaltyBudget,
-    sellerPointsMaxPerUnit,
   };
 
   const stepCopy = resolveEditProductWizardStepCopy(wizard.stepId);

@@ -46,6 +46,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  min-width: 0;
+  max-width: 100%;
   padding: 1rem;
   border: 1px solid var(--iz-color-border);
   border-radius: 1.125rem;
@@ -135,6 +137,15 @@
   color: var(--iz-color-on-contrast);
 }
 
+:root[data-theme="dark"] .partner-program-page__invite-actions .app-btn--secondary,
+:root[data-theme="dark"]
+  .partner-program-page__invite-actions
+  .app-btn--secondary:hover:not(:disabled) {
+  border-color: #ffffff;
+  background: var(--iz-color-surface-elevated);
+  color: #ffffff;
+}
+
 .partner-program-page__field {
   display: flex;
   flex-direction: column;
@@ -205,6 +216,12 @@
   border-bottom: 1px solid var(--iz-color-border);
   font-size: 0.875rem;
   color: var(--iz-color-text);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.partner-program-page__row > * {
+  min-width: 0;
 }
 
 .partner-program-page__row:last-child {
@@ -228,17 +245,22 @@
 }
 
 .partner-program-page__row-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-variant-numeric: tabular-nums;
   color: var(--iz-color-text-secondary);
 }
 
 @media (max-width: 640px) {
   .partner-program-page__stats {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .partner-program-page__row {
-    grid-template-columns: 1fr 1fr;
+    /* 1fr = minmax(auto,1fr) → длинные userName/числа раздувают страницу по X
+       и ломают fixed .mobile-bottom-nav */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .partner-program-page__row-head {

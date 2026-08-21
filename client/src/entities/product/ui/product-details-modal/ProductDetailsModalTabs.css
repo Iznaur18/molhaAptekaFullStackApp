@@ -41,3 +41,8 @@
   color: var(--iz-color-text);
   font-weight: 700;
 }
+
+:root[data-theme="dark"] .product-details-modal__tabs .modal-section-tabs__tab_active,
+:root[data-theme="dark"] .product-details-modal__tabs .modal-section-tabs__tab_active:hover {
+  color: #ffffff;
+}

@@ -5,16 +5,18 @@
   --app-shell-mobile-bottom-nav-height: 3.1rem;
   --app-shell-mobile-bottom-nav-float-offset: 0.625rem;
   --app-shell-content-inline-padding: var(--iz-space-4);
+  /* одинаковый «воздух» сверху и снизу (снизу — сверх clearance под bottom nav) */
+  --app-shell-block-padding-y: var(--iz-space-6);
 
   box-sizing: border-box;
   width: 100%;
   max-width: var(--app-shell-max-width, 60rem);
   margin: 0 auto;
-  padding: var(--iz-space-6) var(--app-shell-content-inline-padding)
+  padding: var(--app-shell-block-padding-y) var(--app-shell-content-inline-padding)
     calc(
       var(--app-shell-mobile-bottom-nav-height) +
         var(--app-shell-mobile-bottom-nav-float-offset) + env(safe-area-inset-bottom, 0px) +
-        1rem
+        var(--app-shell-block-padding-y)
     );
 }
 
@@ -630,12 +632,9 @@
 
 /* ——— Вариант 2: плавающая «стеклянная» панель-остров, ghost-кнопки, CTA «+» ——— */
 .app-shell--header-v2 {
-  /* зазор сверху = sticky-смещению панели, чтобы не было скачка при скролле */
-  padding-top: 0.5rem;
-}
-
-.app-shell--header-v2:has(.app-shell__header--no-panel) {
-  padding-top: 0;
+  /* зазор сверху = sticky-смещению панели, чтобы не было скачка при скролле;
+     тот же gutter уходит в padding-bottom (сверх clearance под nav). */
+  --app-shell-block-padding-y: 0.5rem;
 }
 
 .app-shell--header-v2 .app-shell__header--no-panel {

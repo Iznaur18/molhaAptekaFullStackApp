@@ -1,5 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Image } from "expo-image";
 import { Pressable, View } from "react-native";
 
@@ -24,12 +24,14 @@ type ProfileOverviewBannerProps = {
   user: Record<string, unknown>;
   showEditButton?: boolean;
   onEditPress?: () => void;
+  bannerAction?: ReactNode;
 };
 
 export const ProfileOverviewBanner = ({
   user,
   showEditButton = false,
   onEditPress,
+  bannerAction = null,
 }: ProfileOverviewBannerProps) => {
   const theme = useAppTheme();
   const styles = useProfileOverviewBannerStyles();
@@ -105,14 +107,19 @@ export const ProfileOverviewBanner = ({
           />
         ) : null}
 
-        {showEditButton && onEditPress ? (
-          <Pressable
-            style={styles.editButton}
-            onPress={onEditPress}
-            accessibilityLabel={MY_PROFILE_PAGE_UI.EDIT_PROFILE}
-          >
-            <Feather name="edit-2" size={16} color={theme.colors.text} />
-          </Pressable>
+        {bannerAction || (showEditButton && onEditPress) ? (
+          <View style={styles.bannerActions}>
+            {bannerAction}
+            {showEditButton && onEditPress ? (
+              <Pressable
+                style={styles.editButton}
+                onPress={onEditPress}
+                accessibilityLabel={MY_PROFILE_PAGE_UI.EDIT_PROFILE}
+              >
+                <Feather name="edit-2" size={16} color={theme.colors.text} />
+              </Pressable>
+            ) : null}
+          </View>
         ) : null}
       </SquircleView>
     </View>

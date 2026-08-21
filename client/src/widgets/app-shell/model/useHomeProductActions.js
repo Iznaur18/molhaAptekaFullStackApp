@@ -47,6 +47,8 @@ export const useHomeProductActions = ({
   setTogglingFlashSaleProductId,
   setTogglingRentalProductId,
   setTogglingAffiliateProductId,
+  setTogglingLoyaltyProductId,
+  setTogglingBuyNFreeProductId,
   setTogglingInstallmentProductId,
   setMyProductsCatalogError,
   setPromotionProduct,
@@ -384,6 +386,38 @@ export const useHomeProductActions = ({
     ],
   );
 
+  const handleSetProductBuyNFree = useCallback(
+    async (productId, buyNFreeEnabled) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return;
+      }
+      setTogglingBuyNFreeProductId(normalizedProductId);
+      setProductDetailsAdminError("");
+      try {
+        const updated = await patchMutation.mutateAsync({
+          productId: normalizedProductId,
+          body: { productBuyNFreeEnabled: buyNFreeEnabled },
+        });
+        syncCatalogProductState(updated);
+        syncProductEditModalState(updated);
+      } catch (e) {
+        setProductDetailsAdminError(
+          e instanceof Error ? e.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+      } finally {
+        setTogglingBuyNFreeProductId(null);
+      }
+    },
+    [
+      patchMutation,
+      setProductDetailsAdminError,
+      setTogglingBuyNFreeProductId,
+      syncCatalogProductState,
+      syncProductEditModalState,
+    ],
+  );
+
   const handleSetProductFlashSale = useCallback(
     async (productId, flashSaleEnabled) => {
       const normalizedProductId = String(productId ?? "").trim();
@@ -520,6 +554,39 @@ export const useHomeProductActions = ({
       promotionProduct,
       setProductDetailsAdminError,
       setTogglingAffiliateProductId,
+      syncCatalogProductState,
+      syncProductEditModalState,
+    ],
+  );
+
+  const handleSetProductLoyaltyPoints = useCallback(
+    async (productId, loyaltyPointsPerUnit) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return;
+      }
+      const nextPoints = Math.max(0, Math.floor(Number(loyaltyPointsPerUnit)) || 0);
+      setTogglingLoyaltyProductId(normalizedProductId);
+      setProductDetailsAdminError("");
+      try {
+        const updated = await patchMutation.mutateAsync({
+          productId: normalizedProductId,
+          body: { loyaltyPointsPerUnit: nextPoints },
+        });
+        syncCatalogProductState(updated);
+        syncProductEditModalState(updated);
+      } catch (e) {
+        setProductDetailsAdminError(
+          e instanceof Error ? e.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+      } finally {
+        setTogglingLoyaltyProductId(null);
+      }
+    },
+    [
+      patchMutation,
+      setProductDetailsAdminError,
+      setTogglingLoyaltyProductId,
       syncCatalogProductState,
       syncProductEditModalState,
     ],
@@ -757,9 +824,11 @@ export const useHomeProductActions = ({
     handleSetProductQa,
     handleSetProductOriginality,
     handleSetProductWholesale,
+    handleSetProductBuyNFree,
     handleSetProductFlashSale,
     handleSetProductRental,
     handleSetProductAffiliate,
+    handleSetProductLoyaltyPoints,
     handleWholesaleSaved,
     handleSetProductInstallment,
     handleInstallmentProgramSaved,

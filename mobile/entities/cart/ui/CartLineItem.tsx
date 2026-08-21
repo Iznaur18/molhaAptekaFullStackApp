@@ -9,6 +9,7 @@ import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurcha
 import {
   CART_LINE_CARD_BORDER_RADIUS,
   CART_PAGE_UI,
+  PRODUCT_BUY_N_FREE_UI,
   PRODUCT_PROMO_CODE_UI,
 } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
@@ -42,6 +43,13 @@ export const CartLineItem = ({ line, selected, onToggleSelected }: CartLineItemP
   const showRetailStrike =
     retailPrice > unitPrice &&
     (line.isPromoApplied === true || line.isWholesaleApplied === true);
+  const unitPriceText = formatPriceRub(unitPrice);
+  const buyNFreeUnits = Math.floor(Number(line.buyNFreeUnits) || 0);
+  const paidQty = Math.max(0, line.quantity - buyNFreeUnits);
+  const buyNFreeHint =
+    buyNFreeUnits > 0
+      ? PRODUCT_BUY_N_FREE_UI.CART_LINE_HINT(paidQty, unitPriceText)
+      : null;
 
   const handleDecrease = () => {
     if (line.quantity <= 1) {
@@ -108,6 +116,9 @@ export const CartLineItem = ({ line, selected, onToggleSelected }: CartLineItemP
                   ? ` ${PRODUCT_PROMO_CODE_UI.CART_PROMO_PERCENT(line.promoDiscountPercent)}`
                   : ""}
               </Text>
+            ) : null}
+            {buyNFreeHint ? (
+              <Text style={styles.wholesaleBadge}>{buyNFreeHint}</Text>
             ) : null}
             {stockHint ? <Text style={styles.stockHint}>{stockHint}</Text> : null}
             {product ? (

@@ -93,6 +93,10 @@
   color: var(--iz-color-ink);
 }
 
+:root[data-theme="dark"] .product-promotion-modal__balance-value {
+  color: #ffffff;
+}
+
 .product-promotion-modal__hint {
   margin: 0;
   font-size: 0.84rem;

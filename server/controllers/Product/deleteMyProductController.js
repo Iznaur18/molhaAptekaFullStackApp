@@ -16,6 +16,7 @@ import {
   PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
 } from "../../constants/productPromotionConstants.js";
 import { cancelProductPromotionsForProduct } from "../../utils/productPromotionHelpers.js";
+import { resetBuyNFreeProgressForProduct } from "../../services/product/applyBuyNFreeFields.js";
 import { deleteUploadFileByUrl } from "../../services/upload/deleteUploadFileByUrl.js";
 import { normalizeProductPreviewVideoUrl } from "../../utils/productPreviewVideo.js";
 import { removeProductIdsFromAllWishlists } from "../Favorites/favoritesItemHelpers.js";
@@ -58,6 +59,7 @@ export const deleteMyProductController = async (req, res) => {
         PRODUCT_PROMOTION_STATUS_ACTIVE,
       ],
     });
+    await resetBuyNFreeProgressForProduct(productId);
     const now = new Date();
     await ProductPriceOfferModel.updateMany(
       { productId, status: PRICE_OFFER_STATUS_ACCEPTED },

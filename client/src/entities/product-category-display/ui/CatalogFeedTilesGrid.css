@@ -19,6 +19,11 @@
   text-wrap: balance;
 }
 
+:root[data-theme="dark"] .catalog-feed-tiles__title,
+:root[data-theme="dark"] .catalog-browser-landing__categories-title {
+  color: #ffffff;
+}
+
 .catalog-browser-landing__categories-title {
   font-size: clamp(1.08rem, 1rem + 0.35vw, 1.28rem);
 }

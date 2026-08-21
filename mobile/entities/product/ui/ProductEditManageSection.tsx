@@ -1,9 +1,15 @@
-import { isProductAffiliateConfigured, isProductWholesaleConfigured, isProductRentalConfigured } from "@izibuy/shared-lib";
+import {
+  isProductAffiliateConfigured,
+  isProductBuyNFreeConfigured,
+  isProductWholesaleConfigured,
+  isProductRentalConfigured,
+} from "@izibuy/shared-lib";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { isProductRaffleParticipant } from "@/entities/raffle/lib/isProductRaffleParticipant";
+import { resolveProductLoyaltyPointsPerUnit } from "@/entities/product/lib/resolveProductLoyaltyPointsPerUnit";
 import { ProductManageToggleRow } from "@/entities/product/ui/ProductManageToggleRow";
 import { PRODUCT_MODERATION_APPROVED } from "@/entities/product/model/productModerationConstants";
 import { CREATE_PRODUCT_UI, PRODUCT_CARD_UI } from "@/shared/config";
@@ -18,11 +24,16 @@ type ProductEditManageSectionProps = {
   onSetAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
   onSetOriginality?: (productId: string, productIsOriginal: boolean) => void | Promise<void>;
   onSetWholesale?: (productId: string, productWholesaleEnabled: boolean) => void | Promise<void>;
+  onSetBuyNFree?: (productId: string, productBuyNFreeEnabled: boolean) => void | Promise<void>;
   onSetRental?: (productId: string, productRentalEnabled: boolean) => void | Promise<void>;
   onSetAffiliate?: (
     productId: string,
     affiliateEnabled: boolean,
     product?: CatalogProduct,
+  ) => void | Promise<void>;
+  onSetLoyaltyPoints?: (
+    productId: string,
+    loyaltyPointsPerUnit: number,
   ) => void | Promise<void>;
   onSetInstallment?: (
     productId: string,
@@ -33,8 +44,10 @@ type ProductEditManageSectionProps = {
   isAuctionTogglePending?: boolean;
   isOriginalityTogglePending?: boolean;
   isWholesaleTogglePending?: boolean;
+  isBuyNFreeTogglePending?: boolean;
   isRentalTogglePending?: boolean;
   isAffiliateTogglePending?: boolean;
+  isLoyaltyTogglePending?: boolean;
   isInstallmentTogglePending?: boolean;
   isDeletePending?: boolean;
   errorMessage?: string;
@@ -47,8 +60,10 @@ type ProductEditManageSectionProps = {
   onOpenInstallmentProgram?: () => void;
   canOpenInstallmentProgram?: boolean;
   onOpenWholesaleSettings?: () => void;
+  onOpenBuyNFreeSettings?: () => void;
   onOpenRentalSettings?: () => void;
   onOpenAffiliateSettings?: () => void;
+  onOpenLoyaltySettings?: () => void;
   disabled?: boolean;
 };
 
@@ -66,16 +81,20 @@ export const ProductEditManageSection = ({
   onSetAuction,
   onSetOriginality,
   onSetWholesale,
+  onSetBuyNFree,
   onSetRental,
   onSetAffiliate,
+  onSetLoyaltyPoints,
   onSetInstallment,
   onDelete,
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
   isOriginalityTogglePending = false,
   isWholesaleTogglePending = false,
+  isBuyNFreeTogglePending = false,
   isRentalTogglePending = false,
   isAffiliateTogglePending = false,
+  isLoyaltyTogglePending = false,
   isInstallmentTogglePending = false,
   isDeletePending = false,
   errorMessage = "",
@@ -88,8 +107,10 @@ export const ProductEditManageSection = ({
   onOpenInstallmentProgram,
   canOpenInstallmentProgram = true,
   onOpenWholesaleSettings,
+  onOpenBuyNFreeSettings,
   onOpenRentalSettings,
   onOpenAffiliateSettings,
+  onOpenLoyaltySettings,
   disabled = false,
 }: ProductEditManageSectionProps) => {
   const styles = useProductEditManageSectionStyles();
@@ -104,18 +125,33 @@ export const ProductEditManageSection = ({
   const isOriginal = product.productIsOriginal === true;
   const isInstallmentEnabled = product.productInstallmentEnabled === true;
   const isWholesaleEnabled = product.productWholesaleEnabled === true;
+  const isBuyNFreeEnabled = product.productBuyNFreeEnabled === true;
+  const buyNFreeThreshold = Math.floor(Number(product.productBuyNFreeThreshold) || 0);
   const isRentalEnabled = product.productRentalEnabled === true;
   const isAffiliateEnabled = resolveAffiliateEnabled(product);
   const affiliatePercent = resolveAffiliatePercent(product);
-  const wholesaleConfigured = isProductWholesaleConfigured(product);
-  const rentalConfigured = isProductRentalConfigured(product);
+  const loyaltyPointsPerUnit = resolveProductLoyaltyPointsPerUnit(product);
+  const isLoyaltyEnabled = loyaltyPointsPerUnit > 0;
+  const wholesaleConfigured = isProductWholesaleConfigured(
+    product as Parameters<typeof isProductWholesaleConfigured>[0],
+  );
+  const buyNFreeConfigured = isProductBuyNFreeConfigured(
+    product as Parameters<typeof isProductBuyNFreeConfigured>[0],
+  );
+  const rentalConfigured = isProductRentalConfigured(
+    product as Parameters<typeof isProductRentalConfigured>[0],
+  );
   const affiliateConfigured = isProductAffiliateConfigured(product);
   const showWholesale =
     typeof onOpenWholesaleSettings === "function" || typeof onSetWholesale === "function";
+  const showBuyNFree =
+    typeof onOpenBuyNFreeSettings === "function" || typeof onSetBuyNFree === "function";
   const showRental =
     typeof onOpenRentalSettings === "function" || typeof onSetRental === "function";
   const showAffiliate =
     typeof onOpenAffiliateSettings === "function" || typeof onSetAffiliate === "function";
+  const showLoyalty =
+    typeof onOpenLoyaltySettings === "function" || typeof onSetLoyaltyPoints === "function";
   const showRaffleToggle =
     sellerRaffleActive && typeof onToggleRaffleParticipation === "function";
   const showInstallmentButton =
@@ -135,8 +171,10 @@ export const ProductEditManageSection = ({
     isAuctionTogglePending ||
     isOriginalityTogglePending ||
     isWholesaleTogglePending ||
+    isBuyNFreeTogglePending ||
     isRentalTogglePending ||
     isAffiliateTogglePending ||
+    isLoyaltyTogglePending ||
     isInstallmentTogglePending ||
     isRaffleParticipationPending ||
     isDeletePending ||
@@ -210,6 +248,7 @@ export const ProductEditManageSection = ({
               isAuctionTogglePending ||
               isWholesaleTogglePending ||
               isAffiliateTogglePending ||
+              isLoyaltyTogglePending ||
               isDeletePending ||
               disabled
             }
@@ -231,6 +270,7 @@ export const ProductEditManageSection = ({
               isAuctionTogglePending ||
               isWholesaleTogglePending ||
               isAffiliateTogglePending ||
+              isLoyaltyTogglePending ||
               isInstallmentTogglePending ||
               isRaffleParticipationPending ||
               isDeletePending ||
@@ -281,6 +321,34 @@ export const ProductEditManageSection = ({
             }}
           />
         ) : null}
+        {showBuyNFree && canEdit ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_UI.MANAGE_BUY_N_FREE_TITLE}
+            description={
+              isBuyNFreeEnabled && buyNFreeThreshold >= 2
+                ? CREATE_PRODUCT_UI.MANAGE_BUY_N_FREE_HINT_ON(buyNFreeThreshold)
+                : CREATE_PRODUCT_UI.MANAGE_BUY_N_FREE_HINT
+            }
+            checked={isBuyNFreeEnabled}
+            disabled={actionsLocked}
+            pending={isBuyNFreeTogglePending}
+            pendingLabel={CREATE_PRODUCT_UI.BUY_N_FREE_TOGGLE_PENDING}
+            onPress={() => onOpenBuyNFreeSettings?.()}
+            onCheckedChange={(next) => {
+              if (product._id == null || actionsLocked) {
+                return { revert: true };
+              }
+              if (next && !buyNFreeConfigured) {
+                onOpenBuyNFreeSettings?.();
+                return { revert: true };
+              }
+              if (typeof onSetBuyNFree === "function") {
+                void onSetBuyNFree(String(product._id), next);
+              }
+              return undefined;
+            }}
+          />
+        ) : null}
         {showRental ? (
           <ProductManageToggleRow
             title={CREATE_PRODUCT_UI.MANAGE_RENTAL_TITLE}
@@ -300,6 +368,34 @@ export const ProductEditManageSection = ({
               }
               if (typeof onSetRental === "function") {
                 void onSetRental(String(product._id), next);
+              }
+              return undefined;
+            }}
+          />
+        ) : null}
+        {showLoyalty && canEdit ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_UI.MANAGE_LOYALTY_TITLE}
+            description={
+              isLoyaltyEnabled
+                ? CREATE_PRODUCT_UI.MANAGE_LOYALTY_HINT_ON(loyaltyPointsPerUnit)
+                : CREATE_PRODUCT_UI.MANAGE_LOYALTY_HINT
+            }
+            checked={isLoyaltyEnabled}
+            disabled={actionsLocked}
+            pending={isLoyaltyTogglePending}
+            pendingLabel={CREATE_PRODUCT_UI.LOYALTY_TOGGLE_PENDING}
+            onPress={() => onOpenLoyaltySettings?.()}
+            onCheckedChange={(next) => {
+              if (product._id == null || actionsLocked) {
+                return { revert: true };
+              }
+              if (next) {
+                onOpenLoyaltySettings?.();
+                return { revert: true };
+              }
+              if (typeof onSetLoyaltyPoints === "function") {
+                void onSetLoyaltyPoints(String(product._id), 0);
               }
               return undefined;
             }}

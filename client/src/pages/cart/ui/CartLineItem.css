@@ -229,3 +229,10 @@ button.cart-line__image-wrap:hover {
   color: var(--iz-color-text);
   white-space: nowrap;
 }
+
+.cart-line__buy-n-free-hint {
+  margin: 8px 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  color: var(--iz-color-text-secondary, #5c6570);
+}

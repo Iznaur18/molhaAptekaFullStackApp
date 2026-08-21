@@ -1,9 +1,9 @@
-import { BadgeHelp, Bell, Newspaper, Users } from "../../../shared/ui/icon/index.js";
+import { BadgeHelp, Newspaper, Users } from "../../../shared/ui/icon/index.js";
 import { HEADER_USERS_BUTTON_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
- * @typedef {"users" | "terms" | "faq" | "notifications"} HeaderUsersMenuItemKey
- * @typedef {"users" | "terms" | "faq" | "notifications"} HeaderUsersMenuItemAction
+ * @typedef {"users" | "terms" | "faq"} HeaderUsersMenuItemKey
+ * @typedef {"users" | "terms" | "faq"} HeaderUsersMenuItemAction
  *
  * @typedef {{
  *   key: HeaderUsersMenuItemKey;
@@ -33,12 +33,6 @@ export function buildHeaderUsersMenuItems() {
       icon: BadgeHelp,
       accessibilityLabel: HEADER_USERS_BUTTON_UI.MENU_ITEM_FAQ_ARIA,
       action: "faq",
-    },
-    {
-      key: "notifications",
-      icon: Bell,
-      accessibilityLabel: HEADER_USERS_BUTTON_UI.MENU_ITEM_NOTIFICATIONS_ARIA,
-      action: "notifications",
     },
   ];
 }

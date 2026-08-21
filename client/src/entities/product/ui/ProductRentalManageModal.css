@@ -80,6 +80,13 @@
     0 0 0 1px color-mix(in srgb, var(--iz-color-action) 35%, transparent);
 }
 
+:root[data-theme="dark"]
+  .rental-manage-modal__unit-option:has(.rental-manage-modal__unit-input:checked)
+  .rental-manage-modal__unit-face,
+:root[data-theme="dark"] .rental-manage-modal__unit-face-sub {
+  color: #ffffff;
+}
+
 .rental-manage-modal__unit-option:has(.rental-manage-modal__unit-input:focus-visible)
   .rental-manage-modal__unit-face {
   outline: 2px solid var(--iz-color-action);

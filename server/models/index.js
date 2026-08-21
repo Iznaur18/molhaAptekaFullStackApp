@@ -35,6 +35,8 @@ import { SiteHeaderBannerCampaignModel } from "./SiteHeaderBannerCampaignModel.j
 import { IntroAdCampaignModel } from "./IntroAdCampaignModel.js";
 import { SellerPersonalCategoryModel } from "./SellerPersonalCategoryModel.js";
 import { SellerPersonalCategoryCampaignModel } from "./SellerPersonalCategoryCampaignModel.js";
+import { SellerShelfModel } from "./SellerShelfModel.js";
+import ProductBuyNFreeProgressModel from "./ProductBuyNFreeProgressModel.js";
 import StaffAuditLogModel from "./StaffAuditLogModel.js";
 import PassportVaultAccessLogModel from "./PassportVaultAccessLogModel.js";
 import ReferralLedgerEntryModel from "./ReferralLedgerEntryModel.js";
@@ -83,6 +85,8 @@ export {
   IntroAdCampaignModel,
   SellerPersonalCategoryModel,
   SellerPersonalCategoryCampaignModel,
+  SellerShelfModel,
+  ProductBuyNFreeProgressModel,
   StaffAuditLogModel,
   PassportVaultAccessLogModel,
   ReferralLedgerEntryModel,

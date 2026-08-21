@@ -17,6 +17,7 @@ import { ProductMediaGalleryReadonly } from "../ProductMediaGalleryReadonly.jsx"
 import { ProductPriceDisplay } from "../ProductPriceDisplay.jsx";
 import { ProductPromoCodeActivateSheet } from "../ProductPromoCodeActivateSheet.jsx";
 import { ProductAffiliateShareButton } from "./ProductAffiliateShareButton.jsx";
+import { ProductShareLinkButton } from "./ProductShareLinkButton.jsx";
 import { ProductDetailsAuctionTeaser } from "./ProductDetailsAuctionTeaser.jsx";
 import { ProductDetailsCompareTeaser } from "./ProductDetailsCompareTeaser.jsx";
 import { ProductDetailsContentSwitcher } from "./ProductDetailsContentSwitcher.jsx";
@@ -31,6 +32,7 @@ import { ProductDetailsRentalTeaser } from "./ProductDetailsRentalTeaser.jsx";
 import { ProductDetailsSaleTeaser } from "./ProductDetailsSaleTeaser.jsx";
 import { ProductDetailsSellerProductsCarousel } from "./ProductDetailsSellerProductsCarousel.jsx";
 import { ProductDetailsWholesaleOffer } from "./ProductDetailsWholesaleOffer.jsx";
+import { ProductDetailsBuyNFreeOffer } from "./ProductDetailsBuyNFreeOffer.jsx";
 import { renderProductDetailsFieldRows } from "./renderProductDetailsFieldRows.jsx";
 
 /**
@@ -216,6 +218,11 @@ export function ProductDetailsModalDetailsTab({
         onRequestLogin={onRequestLogin}
         canShowAddToCart={canShowAddToCart}
       />
+      <ProductDetailsBuyNFreeOffer
+        product={product}
+        isAuthorized={isAuthorized}
+        onRequestLogin={onRequestLogin}
+      />
       <h3 id={productTitleId} className="product-details-modal__product-name">
         {product.productName?.trim() || "Товар"}
       </h3>
@@ -236,26 +243,25 @@ export function ProductDetailsModalDetailsTab({
       resetToken={product._id}
       onBack={fieldHandlers.onClose}
       heroOverlay={
-        !isOwnProduct || mobileReportOverlay ? (
-          <div className="product-media-gallery-readonly__hero-actions">
-            {mobileReportOverlay ? (
-              <div className="product-media-gallery-readonly__report-slot">
-                {mobileReportOverlay}
-              </div>
-            ) : null}
-            {!isOwnProduct ? (
-              <WishlistToggleButton
-                productId={productId}
-                product={product}
-                isAuthorized={isAuthorized}
-                onRequestLogin={onRequestLogin}
-                currentUserId={currentUserId}
-                onProductStatsUpdate={onProductStatsUpdate}
-                variant="card"
-              />
-            ) : null}
-          </div>
-        ) : null
+        <div className="product-media-gallery-readonly__hero-actions">
+          {mobileReportOverlay ? (
+            <div className="product-media-gallery-readonly__report-slot">
+              {mobileReportOverlay}
+            </div>
+          ) : null}
+          <ProductShareLinkButton product={product} />
+          {!isOwnProduct ? (
+            <WishlistToggleButton
+              productId={productId}
+              product={product}
+              isAuthorized={isAuthorized}
+              onRequestLogin={onRequestLogin}
+              currentUserId={currentUserId}
+              onProductStatsUpdate={onProductStatsUpdate}
+              variant="card"
+            />
+          ) : null}
+        </div>
       }
     />
   );

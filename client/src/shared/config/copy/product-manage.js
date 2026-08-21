@@ -1,6 +1,8 @@
 // Автосгенерировано из appUiCopy.js: домен «product-manage».
 // Реэкспортируется через ../appUiCopy.js — импортируй оттуда, как раньше.
 
+import { pluralizeRu } from "../../lib/pluralizeRu.js";
+
 export const SELLER_PRODUCTS_PAGE_UI = {
   TITLE: "Товары продавца",
   BACK_ARIA: "Назад",
@@ -9,8 +11,44 @@ export const SELLER_PRODUCTS_PAGE_UI = {
   LOGIN_BUTTON: "Войти",
   FETCH_PROFILE_FALLBACK: "Не удалось загрузить профиль продавца",
   EMPTY: "У продавца пока нет товаров в каталоге.",
+  SHARE_LINK_ARIA: "Ссылка",
+  SHARE_LINK_COPIED_ARIA: "Ссылка скопирована",
   /** @param {string} userName */
   TITLE_FOR: (userName) => `Товары ${userName}`,
+  SHELF_FILTER_ARIA: "Полки продавца",
+  SHELF_FILTER_ALL: "Все",
+};
+
+export const SELLER_SHELF_UI = {
+  TITLE: "Полки",
+  HINT: "Группируйте товары для фильтров на витрине. До 10 полок.",
+  CREATE_PLACEHOLDER: "Название полки",
+  CREATE: "Создать",
+  CREATE_PENDING: "Создаём…",
+  RENAME: "Переименовать",
+  SAVE_NAME: "Сохранить",
+  DELETE: "Удалить",
+  DELETE_CONFIRM: "Удалить полку? Товары останутся без полки.",
+  MOVE_UP_ARIA: "Выше",
+  MOVE_DOWN_ARIA: "Ниже",
+  ASSIGN: "Товары",
+  ASSIGN_TITLE: (name) => `Полка «${name}»`,
+  ASSIGN_SAVE: "Сохранить",
+  ASSIGN_PENDING: "Сохраняем…",
+  ASSIGN_EMPTY: "Нет товаров для назначения.",
+  LOADING: "Загрузка полок…",
+  LOAD_ERROR: "Не удалось загрузить полки",
+  EMPTY: "Полок пока нет — создайте первую.",
+  /** @param {number} count */
+  PRODUCT_COUNT: (count) => `${count}`,
+  NAME_TOO_LONG: "Максимум 30 символов",
+  LIMIT_REACHED: "Достигнут лимит 10 полок",
+  /** @param {boolean} expanded */
+  EXPAND_TOGGLE: (expanded) => (expanded ? "Свернуть" : "Развернуть"),
+  SHELF_UNIT_FORMS: /** @type {const} */ (["полка", "полки", "полок"]),
+  /** @param {number} count */
+  COLLAPSED_COUNT: (count) =>
+    `${count} ${pluralizeRu(count, SELLER_SHELF_UI.SHELF_UNIT_FORMS)}`,
 };
 
 export const PRODUCT_PROMOTIONS_STAFF_PAGE_UI = {

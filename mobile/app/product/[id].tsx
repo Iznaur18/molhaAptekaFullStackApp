@@ -101,7 +101,9 @@ export default function ProductDetailScreen() {
   const [isAuctionTogglePending, setIsAuctionTogglePending] = useState(false);
   const [isOriginalityTogglePending, setIsOriginalityTogglePending] = useState(false);
   const [isWholesaleTogglePending, setIsWholesaleTogglePending] = useState(false);
+  const [isBuyNFreeTogglePending, setIsBuyNFreeTogglePending] = useState(false);
   const [isAffiliateTogglePending, setIsAffiliateTogglePending] = useState(false);
+  const [isLoyaltyTogglePending, setIsLoyaltyTogglePending] = useState(false);
   const [isInstallmentTogglePending, setIsInstallmentTogglePending] = useState(false);
   const [reportSuccessMessage, setReportSuccessMessage] = useState("");
   const [viewerCount, setViewerCount] = useState<number | null>(null);
@@ -451,6 +453,27 @@ export default function ProductDetailScreen() {
     }
   };
 
+  const handleSetProductBuyNFree = async (
+    targetProductId: string,
+    buyNFreeEnabled: boolean,
+  ) => {
+    setIsBuyNFreeTogglePending(true);
+    setManageErrorMessage("");
+    try {
+      const updated = await patchMutation.mutateAsync({
+        productId: targetProductId,
+        body: { productBuyNFreeEnabled: buyNFreeEnabled },
+      });
+      syncPromotionProduct(updated as Record<string, unknown> & { _id: string });
+    } catch (error) {
+      setManageErrorMessage(
+        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+      );
+    } finally {
+      setIsBuyNFreeTogglePending(false);
+    }
+  };
+
   const handleSetProductAffiliate = async (
     targetProductId: string,
     affiliateEnabled: boolean,
@@ -482,6 +505,28 @@ export default function ProductDetailScreen() {
       );
     } finally {
       setIsAffiliateTogglePending(false);
+    }
+  };
+
+  const handleSetProductLoyaltyPoints = async (
+    targetProductId: string,
+    loyaltyPointsPerUnit: number,
+  ) => {
+    const nextPoints = Math.max(0, Math.floor(Number(loyaltyPointsPerUnit)) || 0);
+    setIsLoyaltyTogglePending(true);
+    setManageErrorMessage("");
+    try {
+      const updated = await patchMutation.mutateAsync({
+        productId: targetProductId,
+        body: { loyaltyPointsPerUnit: nextPoints },
+      });
+      syncPromotionProduct(updated as Record<string, unknown> & { _id: string });
+    } catch (error) {
+      setManageErrorMessage(
+        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+      );
+    } finally {
+      setIsLoyaltyTogglePending(false);
     }
   };
 
@@ -736,7 +781,9 @@ export default function ProductDetailScreen() {
         onSetProductAuction={isOwnProduct ? handleSetProductAuction : undefined}
         onSetProductOriginality={isOwnProduct ? handleSetProductOriginality : undefined}
         onSetProductWholesale={isOwnProduct ? handleSetProductWholesale : undefined}
+        onSetProductBuyNFree={isOwnProduct ? handleSetProductBuyNFree : undefined}
         onSetProductAffiliate={isOwnProduct ? handleSetProductAffiliate : undefined}
+        onSetProductLoyaltyPoints={isOwnProduct ? handleSetProductLoyaltyPoints : undefined}
         onSetProductInstallment={isOwnProduct ? handleSetProductInstallment : undefined}
         onWholesaleSaved={isOwnProduct ? handleWholesaleSaved : undefined}
         onDeleteProduct={
@@ -762,7 +809,9 @@ export default function ProductDetailScreen() {
         isAuctionTogglePending={isAuctionTogglePending}
         isOriginalityTogglePending={isOriginalityTogglePending}
         isWholesaleTogglePending={isWholesaleTogglePending}
+        isBuyNFreeTogglePending={isBuyNFreeTogglePending}
         isAffiliateTogglePending={isAffiliateTogglePending}
+        isLoyaltyTogglePending={isLoyaltyTogglePending}
         isInstallmentTogglePending={isInstallmentTogglePending}
         isDeletePending={deleteMutation.isPending}
         manageErrorMessage={manageErrorMessage}

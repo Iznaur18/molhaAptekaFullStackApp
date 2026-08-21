@@ -104,7 +104,7 @@ body {
   min-width: 0;
 }
 
-/* Смартфон landscape: оверлей, пока OS не отдаёт orientation.lock (типично iOS Safari). */
+/* Touch landscape: оверлей, пока OS не отдаёт orientation.lock (типично iOS Safari). */
 html.app-portrait-lock-active {
   overflow: hidden !important;
 }

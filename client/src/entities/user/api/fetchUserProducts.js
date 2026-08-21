@@ -11,16 +11,24 @@ export const USER_PROFILE_PRODUCTS_API_LIMIT_MAX = 20;
  * `GET /user/:userId/products` — товары продавца в каталоге (JWT опционален).
  *
  * @param {string} userId
- * @param {{ page?: number; limit?: number }} [params]
+ * @param {{ page?: number; limit?: number; shelfId?: string | null }} [params]
  */
 export async function fetchUserProducts(userId, params = {}) {
   try {
     const page = params.page ?? 1;
     const limit = params.limit ?? USER_PROFILE_PRODUCTS_PAGE_SIZE;
+    const shelfId =
+      params.shelfId != null ? String(params.shelfId).trim() : "";
 
     const { data } = await apiClient.get(
       `/user/${encodeURIComponent(userId)}/products`,
-      { params: { page, limit } },
+      {
+        params: {
+          page,
+          limit,
+          ...(shelfId ? { shelfId } : {}),
+        },
+      },
     );
 
     const parsed = parseUserSellerProductsPageData(data);

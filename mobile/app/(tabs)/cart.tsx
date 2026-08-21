@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
@@ -9,6 +9,7 @@ import {
   doProductsSupportPickup,
   doProductsSupportSellerDelivery,
 } from "@molha/api-contract";
+import { isProductBuyNFreeActive } from "@izibuy/shared-lib";
 
 import { buildCheckoutPickupLocations } from "@/entities/cart/lib/buildCheckoutPickupLocations";
 import { getCartLineExclusionReason } from "@/entities/cart/lib/getCartLineExclusionReason";
@@ -24,6 +25,7 @@ import { CartFulfillmentSection } from "@/entities/cart/ui/CartFulfillmentSectio
 import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import { useCreateOrderMutation } from "@/entities/order/model/useCreateOrderMutation";
+import { fetchMyProductBuyNFreeProgress } from "@/entities/product/api/fetchMyProductBuyNFreeProgress";
 import { fetchMyAppliedProductPromos } from "@/entities/product-promo-code/api/productPromoCodeApi";
 import type { MyPriceOfferBid } from "@/entities/product-price-offer/api/incomingPriceOffersApi";
 import { useMyAcceptedBidsQuery } from "@/entities/product-price-offer/model/useMyAcceptedBidsQuery";
@@ -82,14 +84,53 @@ export default function CartScreen() {
   const auctionBids = useMemo(() => acceptedBidsQuery.data ?? [], [acceptedBidsQuery.data]);
   const currentUserId = sessionQuery.data?.user?._id;
 
+  const buyNFreeProductIds = useMemo(() => {
+    const items = cartQuery.data ?? {};
+    return productsQuery.products
+      .filter((product) => {
+        const active = isProductBuyNFreeActive(
+          product as Parameters<typeof isProductBuyNFreeActive>[0],
+        );
+        return active && items[String(product._id)];
+      })
+      .map((product) => String(product._id));
+  }, [cartQuery.data, productsQuery.products]);
+
+  const buyNFreeProgressQueries = useQueries({
+    queries: buyNFreeProductIds.map((productId) => ({
+      queryKey: ["product-buy-n-free-progress", productId],
+      queryFn: () => fetchMyProductBuyNFreeProgress(productId),
+      enabled: isAuthorized && productId.length > 0,
+      staleTime: 15_000,
+    })),
+  });
+
+  const buyNFreeProgressByProductId = useMemo(() => {
+    const map: Record<
+      string,
+      { completedPaidOrderCount?: number; freeClaimPending?: boolean }
+    > = {};
+    buyNFreeProductIds.forEach((productId, index) => {
+      const data = buyNFreeProgressQueries[index]?.data;
+      if (data) {
+        map[productId] = {
+          completedPaidOrderCount: data.completedPaidOrderCount,
+          freeClaimPending: data.freeClaimPending,
+        };
+      }
+    });
+    return map;
+  }, [buyNFreeProductIds, buyNFreeProgressQueries]);
+
   const { lines } = useMemo(
     () =>
       selectCartLines(
         cartQuery.data ?? {},
         productsQuery.products,
         appliedPromosQuery.data?.appliedPromos ?? [],
+        buyNFreeProgressByProductId,
       ),
-    [cartQuery.data, productsQuery.products, appliedPromosQuery.data],
+    [cartQuery.data, productsQuery.products, appliedPromosQuery.data, buyNFreeProgressByProductId],
   );
 
   const visibleLines = useMemo(

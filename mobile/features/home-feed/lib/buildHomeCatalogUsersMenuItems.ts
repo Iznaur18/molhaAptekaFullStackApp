@@ -5,13 +5,9 @@ import { HEADER_USERS_BUTTON_UI } from "@/shared/config";
 
 type MaterialIconName = ComponentProps<typeof MaterialIcons>["name"];
 
-export type HomeCatalogUsersMenuItemKey = "users" | "terms" | "faq" | "notifications";
+export type HomeCatalogUsersMenuItemKey = "users" | "terms" | "faq";
 
-export type HomeCatalogUsersMenuItemHref =
-  | "/users"
-  | "/legal/terms"
-  | "/faq"
-  | "/notifications";
+export type HomeCatalogUsersMenuItemHref = "/users" | "/legal/terms" | "/faq";
 
 export type HomeCatalogUsersMenuItem = {
   key: HomeCatalogUsersMenuItemKey;
@@ -38,11 +34,5 @@ export const buildHomeCatalogUsersMenuItems = (): HomeCatalogUsersMenuItem[] => 
     icon: "quiz",
     accessibilityLabel: HEADER_USERS_BUTTON_UI.MENU_ITEM_FAQ_ARIA,
     href: "/faq",
-  },
-  {
-    key: "notifications",
-    icon: "notifications",
-    accessibilityLabel: HEADER_USERS_BUTTON_UI.MENU_ITEM_NOTIFICATIONS_ARIA,
-    href: "/notifications",
   },
 ];

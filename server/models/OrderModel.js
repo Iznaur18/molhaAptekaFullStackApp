@@ -141,6 +141,27 @@ const OrderLineItemSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    /** Бесплатные шт. по акции «Бесплатно от N» (0|1). */
+    buyNFreeUnitsAtOrder: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 1,
+    },
+    buyNFreeProgressApplied: {
+      type: Boolean,
+      default: false,
+    },
+    buyNFreeProgressAction: {
+      type: String,
+      enum: ["increment", "reset"],
+      default: null,
+    },
+    buyNFreeProgressCountBefore: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   { _id: true },
 );

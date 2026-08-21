@@ -15,6 +15,10 @@
   word-break: break-word;
 }
 
+:root[data-theme="dark"] .product-description-content__h1 {
+  color: #fff;
+}
+
 .product-description-content__p {
   margin: 0;
   font-size: 14.4px;

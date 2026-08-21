@@ -3,7 +3,6 @@ import { createImageRow, imageRowsFromUrls } from "./productImageRowHelpers.js";
 import { resolveProductImageUrls } from "./resolveProductImageUrls.js";
 import { characteristicRowsFromApi } from "./characteristicRowsFromApi.js";
 import { formatIntegerGroupRu } from "../../../shared/lib/numericInput.js";
-import { resolveProductLoyaltyPointsPerUnit } from "./resolveProductLoyaltyPointsPerUnit.js";
 import { isProductListingOrigin } from "./productListingOrigin.js";
 import { mapProductReturnTermsToRows } from "./productReturnTermRows.js";
 
@@ -71,7 +70,7 @@ export function createProductFormStateFromProduct(product) {
       product.productIsAvailable !== false && product.productStockQuantity != null
         ? String(Math.max(0, Math.floor(Number(product.productStockQuantity))))
         : "1",
-    loyaltyPointsPerUnit: String(resolveProductLoyaltyPointsPerUnit(product)),
+    loyaltyPointsPerUnit: "0",
     affiliateEnabled: product.affiliateEnabled === true,
     affiliatePercent: String(
       Math.max(0, Math.floor(Number(product.affiliatePercent) || 0)) || 10,
@@ -117,6 +116,7 @@ export function createProductFormStateFromCopiedProduct(product) {
   const stockRaw = Number.parseInt(String(product.productStockQuantity ?? ""), 10);
   return {
     ...copied,
+    loyaltyPointsPerUnit: "0",
     affiliateEnabled: false,
     affiliatePercent: CREATE_PRODUCT_INITIAL_FORM.affiliatePercent,
     productIsAvailable: true,

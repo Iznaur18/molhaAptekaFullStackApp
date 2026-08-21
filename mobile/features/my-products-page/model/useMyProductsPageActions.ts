@@ -43,10 +43,12 @@ export const useMyProductsPageActions = () => {
   const [togglingWholesaleProductId, setTogglingWholesaleProductId] = useState<string | null>(
     null,
   );
+  const [togglingBuyNFreeProductId, setTogglingBuyNFreeProductId] = useState<string | null>(null);
   const [togglingRentalProductId, setTogglingRentalProductId] = useState<string | null>(null);
   const [togglingAffiliateProductId, setTogglingAffiliateProductId] = useState<string | null>(
     null,
   );
+  const [togglingLoyaltyProductId, setTogglingLoyaltyProductId] = useState<string | null>(null);
   const [togglingInstallmentProductId, setTogglingInstallmentProductId] = useState<string | null>(
     null,
   );
@@ -228,6 +230,32 @@ export const useMyProductsPageActions = () => {
     [patchMutation, syncPromotionProduct],
   );
 
+  const handleSetProductBuyNFree = useCallback(
+    async (productId: string, buyNFreeEnabled: boolean) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return;
+      }
+
+      setTogglingBuyNFreeProductId(normalizedProductId);
+      setManageErrorMessage("");
+      try {
+        const updated = await patchMutation.mutateAsync({
+          productId: normalizedProductId,
+          body: { productBuyNFreeEnabled: buyNFreeEnabled },
+        });
+        syncPromotionProduct(updated as MyProductsCatalogProduct);
+      } catch (error) {
+        setManageErrorMessage(
+          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+      } finally {
+        setTogglingBuyNFreeProductId(null);
+      }
+    },
+    [patchMutation, syncPromotionProduct],
+  );
+
   const handleSetProductRental = useCallback(
     async (productId: string, rentalEnabled: boolean) => {
       const normalizedProductId = String(productId ?? "").trim();
@@ -299,6 +327,32 @@ export const useMyProductsPageActions = () => {
       }
     },
     [loyaltyStatusQuery.data, patchMutation, promotionProduct, syncPromotionProduct],
+  );
+
+  const handleSetProductLoyaltyPoints = useCallback(
+    async (productId: string, loyaltyPointsPerUnit: number) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return;
+      }
+      const nextPoints = Math.max(0, Math.floor(Number(loyaltyPointsPerUnit)) || 0);
+      setTogglingLoyaltyProductId(normalizedProductId);
+      setManageErrorMessage("");
+      try {
+        const updated = await patchMutation.mutateAsync({
+          productId: normalizedProductId,
+          body: { loyaltyPointsPerUnit: nextPoints },
+        });
+        syncPromotionProduct(updated as MyProductsCatalogProduct);
+      } catch (error) {
+        setManageErrorMessage(
+          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+      } finally {
+        setTogglingLoyaltyProductId(null);
+      }
+    },
+    [patchMutation, syncPromotionProduct],
   );
 
   const handleWholesaleSaved = useCallback(
@@ -391,10 +445,14 @@ export const useMyProductsPageActions = () => {
       promotionProductId != null && togglingOriginalityProductId === promotionProductId,
     isWholesaleTogglePending:
       promotionProductId != null && togglingWholesaleProductId === promotionProductId,
+    isBuyNFreeTogglePending:
+      promotionProductId != null && togglingBuyNFreeProductId === promotionProductId,
     isRentalTogglePending:
       promotionProductId != null && togglingRentalProductId === promotionProductId,
     isAffiliateTogglePending:
       promotionProductId != null && togglingAffiliateProductId === promotionProductId,
+    isLoyaltyTogglePending:
+      promotionProductId != null && togglingLoyaltyProductId === promotionProductId,
     isInstallmentTogglePending:
       promotionProductId != null && togglingInstallmentProductId === promotionProductId,
     isDeletePending: deleteMutation.isPending,
@@ -406,8 +464,10 @@ export const useMyProductsPageActions = () => {
     handleSetProductAuction,
     handleSetProductOriginality,
     handleSetProductWholesale,
+    handleSetProductBuyNFree,
     handleSetProductRental,
     handleSetProductAffiliate,
+    handleSetProductLoyaltyPoints,
     handleSetProductInstallment,
     handleWholesaleSaved,
     handleDeleteProduct,

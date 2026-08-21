@@ -252,6 +252,14 @@
   line-height: 1.35;
 }
 
+:root[data-theme="dark"] .address-delivery-fields__map-fullscreen-input {
+  color: #ffffff;
+}
+
+:root[data-theme="dark"] .address-delivery-fields__map-fullscreen-input::placeholder {
+  color: color-mix(in srgb, #ffffff 55%, transparent);
+}
+
 .address-delivery-fields__map-fullscreen-input:focus {
   outline: none;
 }

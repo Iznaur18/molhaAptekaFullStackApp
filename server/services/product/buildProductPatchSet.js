@@ -36,6 +36,7 @@ import {
   EMPTY_PATCH_BODY_MESSAGE,
 } from "./patchMyProductConstants.js";
 import { applyWholesaleFields } from "./applyWholesaleFields.js";
+import { applyBuyNFreeFields } from "./applyBuyNFreeFields.js";
 import { applyFlashSaleFields } from "./applyFlashSaleFields.js";
 import { applyRentalFields } from "./applyRentalFields.js";
 import { PRODUCT_FLASH_SALE_ACTIVE_PRICE_LOCKED_MESSAGE } from "@molha/api-contract";
@@ -534,12 +535,25 @@ export async function buildProductPatchSet({ existing, body, isAdmin, productId 
   const auctionState = applyAuctionField(body, $set, existing);
   applyQaField(body, $set);
   applyWholesaleFields(body, $set, existing);
+  const buyNFreeState = applyBuyNFreeFields(body, $set, existing);
   applyRentalFields(body, $set, existing);
   const flashSaleState = applyFlashSaleFields(body, $set, $unset, existing);
+
+  const availabilityBecameHidden =
+    hasSetField($set, "productIsAvailable") &&
+    $set.productIsAvailable === false &&
+    existing.productIsAvailable !== false;
 
   if (Object.keys($set).length === 0 && Object.keys($unset).length === 0) {
     throw new AppError(400, EMPTY_PATCH_BODY_MESSAGE);
   }
 
-  return { $set, $unset, ...auctionState, ...flashSaleState };
+  return {
+    $set,
+    $unset,
+    ...auctionState,
+    ...flashSaleState,
+    shouldResetBuyNFreeProgress:
+      buyNFreeState.shouldResetProgress === true || availabilityBecameHidden,
+  };
 }

@@ -1,4 +1,8 @@
-import { ORDER_STATUS_CANCELLED } from "../../constants/orderConstants.js";
+import {
+  ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_CONFIRMED,
+  ORDER_STATUS_PENDING,
+} from "../../constants/orderConstants.js";
 import { OrderModel } from "../../models/index.js";
 import { applySoldQuantityDeltaForItemStatusChange } from "../product/productSoldQuantityDenorm.js";
 import { clearBuyerPassportShareOnOrder } from "./buyerPassportShare.js";
@@ -12,6 +16,11 @@ import {
   markOrderLineLoyaltyReserveReleased,
   releaseUnawardedLoyaltyReservesForOrder,
 } from "./orderLoyaltyPoints.js";
+import {
+  releaseBuyNFreeRedemptionClaim,
+  rollbackBuyNFreeProgressOnCancel,
+} from "../product/productBuyNFreeProgress.js";
+import { normalizeId, resolveProductIdFromItem } from "./orderItemStatusHelpers.js";
 
 /**
  * Отменяет связанный заказ рассрочки и снимает не начисленный резерв баллов продавца.
@@ -36,11 +45,13 @@ export const cancelLinkedOrderForInstallmentContract = async (
   normalizeOrderDocumentForRuntime(order);
   normalizeOrderItemsForRuntime(order.items);
 
+  const buyerId = normalizeId(order.userBuyerId?._id ?? order.userBuyerId);
   const releaseLines = [];
   for (const item of order.items) {
     if (item.status === ORDER_STATUS_CANCELLED) {
       continue;
     }
+    const previousStatus = item.status;
     if (!item.loyaltyPointsAwarded && !item.loyaltyPointsReserveReleased) {
       releaseLines.push({
         ...(item.toObject?.() ?? item),
@@ -51,11 +62,36 @@ export const cancelLinkedOrderForInstallmentContract = async (
     if (item.productId != null) {
       await applySoldQuantityDeltaForItemStatusChange({
         productId: item.productId,
-        previousStatus: item.status,
+        previousStatus,
         nextStatus: ORDER_STATUS_CANCELLED,
         quantity: item.quantity,
         session,
       });
+    }
+    const productId = resolveProductIdFromItem(item.productId);
+    const freeUnits = Math.floor(Number(item.buyNFreeUnitsAtOrder) || 0);
+    if (previousStatus === ORDER_STATUS_PENDING && freeUnits > 0 && buyerId && productId) {
+      await releaseBuyNFreeRedemptionClaim({
+        buyerId,
+        productId,
+        orderId: order._id,
+        session,
+      });
+    }
+    if (
+      previousStatus === ORDER_STATUS_CONFIRMED &&
+      item.buyNFreeProgressApplied === true &&
+      buyerId &&
+      productId
+    ) {
+      await rollbackBuyNFreeProgressOnCancel({
+        buyerId,
+        productId,
+        action: item.buyNFreeProgressAction,
+        countBefore: item.buyNFreeProgressCountBefore,
+        session,
+      });
+      item.buyNFreeProgressApplied = false;
     }
     item.status = ORDER_STATUS_CANCELLED;
   }

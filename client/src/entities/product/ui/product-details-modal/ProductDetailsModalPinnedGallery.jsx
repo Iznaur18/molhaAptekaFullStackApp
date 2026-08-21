@@ -1,5 +1,6 @@
 import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
 import { ProductMediaGalleryReadonly } from "../ProductMediaGalleryReadonly.jsx";
+import { ProductShareLinkButton } from "./ProductShareLinkButton.jsx";
 
 /**
  * Галерея над табами — паритет с mobile product detail screen.
@@ -38,24 +39,23 @@ export function ProductDetailsModalPinnedGallery({
       resetToken={product._id}
       onBack={fieldHandlers.onClose}
       heroOverlay={
-        !isOwnProduct || reportOverlay ? (
-          <div className="product-media-gallery-readonly__hero-actions">
-            {reportOverlay ? (
-              <div className="product-media-gallery-readonly__report-slot">{reportOverlay}</div>
-            ) : null}
-            {!isOwnProduct ? (
-              <WishlistToggleButton
-                productId={String(product._id)}
-                product={product}
-                isAuthorized={isAuthorized}
-                onRequestLogin={onRequestLogin}
-                currentUserId={currentUserId}
-                onProductStatsUpdate={onProductStatsUpdate}
-                variant="card"
-              />
-            ) : null}
-          </div>
-        ) : null
+        <div className="product-media-gallery-readonly__hero-actions">
+          {reportOverlay ? (
+            <div className="product-media-gallery-readonly__report-slot">{reportOverlay}</div>
+          ) : null}
+          <ProductShareLinkButton product={product} />
+          {!isOwnProduct ? (
+            <WishlistToggleButton
+              productId={String(product._id)}
+              product={product}
+              isAuthorized={isAuthorized}
+              onRequestLogin={onRequestLogin}
+              currentUserId={currentUserId}
+              onProductStatsUpdate={onProductStatsUpdate}
+              variant="card"
+            />
+          ) : null}
+        </div>
       }
     />
   );

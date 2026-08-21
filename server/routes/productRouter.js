@@ -65,6 +65,7 @@ import {
   acceptProductPriceOfferController,
   rejectProductPriceOfferController,
   getSellerProductPriceOfferArchiveController,
+  getMyProductBuyNFreeProgressController,
   listProductReviewsController,
   getProductReviewSummaryController,
   submitProductReviewController,
@@ -668,6 +669,12 @@ router.get(
   "/:productId/price-offers/top",
   productIdParamValidation,
   getTopProductPriceOffersController,
+);
+router.get(
+  "/:productId/buy-n-free/me",
+  checkAuthMW,
+  productIdParamValidation,
+  getMyProductBuyNFreeProgressController,
 );
 router.get(
   "/:productId/price-offers/me",

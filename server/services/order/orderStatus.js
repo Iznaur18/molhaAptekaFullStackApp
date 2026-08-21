@@ -25,6 +25,10 @@ const ITEM_RUNTIME_DEFAULTS = Object.freeze({
   affiliateAmount: 0,
   affiliatePercentUsed: null,
   affiliatePaidAt: null,
+  buyNFreeUnitsAtOrder: 0,
+  buyNFreeProgressApplied: false,
+  buyNFreeProgressAction: null,
+  buyNFreeProgressCountBefore: 0,
 });
 
 /** Подкладывает обязательные поля адреса для заказов, созданных до `deliveryAddressFlat`. */

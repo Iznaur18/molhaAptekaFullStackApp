@@ -37,9 +37,11 @@ export function AppShellProductModals({
   handleSetProductQa,
   handleSetProductOriginality,
   handleSetProductWholesale,
+  handleSetProductBuyNFree,
   handleSetProductFlashSale,
   handleSetProductRental,
   handleSetProductAffiliate,
+  handleSetProductLoyaltyPoints,
   handleWholesaleSaved,
   handleSetProductInstallment,
   handleInstallmentProgramSaved,
@@ -49,9 +51,11 @@ export function AppShellProductModals({
   togglingQaProductId,
   togglingOriginalityProductId,
   togglingWholesaleProductId,
+  togglingBuyNFreeProductId,
   togglingFlashSaleProductId,
   togglingRentalProductId,
   togglingAffiliateProductId,
+  togglingLoyaltyProductId,
   togglingInstallmentProductId,
   myProductsCatalogError,
   productDetailsAdminError,
@@ -116,9 +120,11 @@ export function AppShellProductModals({
         onSetProductQa={handleSetProductQa}
         onSetProductOriginality={handleSetProductOriginality}
         onSetProductWholesale={handleSetProductWholesale}
+        onSetProductBuyNFree={handleSetProductBuyNFree}
         onSetProductFlashSale={handleSetProductFlashSale}
         onSetProductRental={handleSetProductRental}
         onSetProductAffiliate={handleSetProductAffiliate}
+        onSetProductLoyaltyPoints={handleSetProductLoyaltyPoints}
         onSetProductInstallment={handleSetProductInstallment}
         onWholesaleSaved={handleWholesaleSaved}
         onInstallmentProgramSaved={handleInstallmentProgramSaved}
@@ -142,6 +148,10 @@ export function AppShellProductModals({
           promotionProduct?._id != null &&
           togglingWholesaleProductId === String(promotionProduct._id)
         }
+        isBuyNFreeTogglePending={
+          promotionProduct?._id != null &&
+          togglingBuyNFreeProductId === String(promotionProduct._id)
+        }
         isFlashSaleTogglePending={
           promotionProduct?._id != null &&
           togglingFlashSaleProductId === String(promotionProduct._id)
@@ -153,6 +163,10 @@ export function AppShellProductModals({
         isAffiliateTogglePending={
           promotionProduct?._id != null &&
           togglingAffiliateProductId === String(promotionProduct._id)
+        }
+        isLoyaltyTogglePending={
+          promotionProduct?._id != null &&
+          togglingLoyaltyProductId === String(promotionProduct._id)
         }
         isInstallmentTogglePending={
           promotionProduct?._id != null &&

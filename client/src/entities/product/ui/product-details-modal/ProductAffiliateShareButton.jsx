@@ -4,6 +4,7 @@ import { AFFILIATE_QUERY_PARAM } from "@izibuy/shared-lib";
 import { useQuery } from "@tanstack/react-query";
 
 import { PRODUCT_DETAILS_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
+import { copyAndShareUrl } from "../../../../shared/lib/shareOrCopyUrl.js";
 import { resolveProductAffiliateOffer } from "../../lib/resolveProductAffiliateOffer.js";
 import { fetchMyReferralProgram } from "../../../user/api/referralProgram.js";
 import { getProductSellerId } from "../../lib/getProductSellerId.js";
@@ -64,7 +65,7 @@ export function ProductAffiliateShareButton({
     }, COPIED_ICON_MS);
   };
 
-  const handleClick = async () => {
+  const handleClick = () => {
     if (!isAuthorized) {
       onRequestLogin();
       return;
@@ -75,31 +76,20 @@ export function ProductAffiliateShareButton({
     }
     const productId = String(product._id ?? "");
     const url = `${window.location.origin}/product/${encodeURIComponent(productId)}?${AFFILIATE_QUERY_PARAM}=${encodeURIComponent(code)}`;
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(url);
-      } else {
-        const area = document.createElement("textarea");
-        area.value = url;
-        document.body.appendChild(area);
-        area.select();
-        document.execCommand("copy");
-        area.remove();
-      }
-      flashCopied();
-      if (typeof navigator.share === "function") {
-        try {
-          await navigator.share({
-            title: String(product.productName ?? ""),
-            url,
-          });
-        } catch {
-          // user cancelled share — copy already done
+    const title = String(product.productName ?? "").trim();
+    void copyAndShareUrl({
+      title: title || undefined,
+      text: url,
+      url,
+    })
+      .then((result) => {
+        if (result === "copied" || result === "shared") {
+          flashCopied();
         }
-      }
-    } catch {
-      // copy/share unavailable
-    }
+      })
+      .catch((error) => {
+        console.error("Affiliate share failed", error);
+      });
   };
 
   const title = isAuthorized

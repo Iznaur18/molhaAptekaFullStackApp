@@ -392,11 +392,11 @@
 }
 
 .my-profile-page--my-products .my-products-catalog-section {
-  gap: 12px;
+  gap: 0.75rem;
 }
 
 .my-profile-page--my-products .my-products-catalog-section__list {
-  gap: 10px;
+  gap: 0.75rem;
 }
 
 @container app-viewport (max-width: 1023px) {
@@ -481,11 +481,20 @@
   border-radius: var(--modal-profile-banner-radius);
 }
 
-.my-profile-page__banner-edit {
+.my-profile-page__banner-actions {
   position: absolute;
   top: var(--modal-banner-avatar-inset);
   right: var(--modal-banner-avatar-inset);
   z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.my-profile-page__banner-edit {
+  position: static;
+  top: auto;
+  right: auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -502,6 +511,47 @@
 
 .my-profile-page__banner-edit:hover {
   background: var(--iz-color-surface);
+}
+
+.my-profile-page__share-row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--iz-space-1);
+  margin: 0.5rem 0 0;
+  width: 100%;
+}
+
+.my-profile-page__share-row > .my-profile-page__notifications-btn,
+.my-profile-page__share-row > .seller-share-link--meta {
+  flex: 1 1 50%;
+  width: auto;
+  min-width: 0;
+  height: 2.125rem;
+}
+
+.my-profile-page__notifications-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--iz-radius-button, 10px);
+  border: 1px solid var(--color-accent, var(--iz-color-link));
+  background: transparent;
+  color: var(--color-accent, var(--iz-color-link));
+  cursor: pointer;
+  transition:
+    filter var(--iz-transition-base),
+    transform var(--iz-transition-press);
+}
+
+.my-profile-page__notifications-btn:hover {
+  filter: brightness(1.05);
+}
+
+.my-profile-page__notifications-btn:active {
+  transform: scale(var(--iz-state-pressed-scale));
 }
 
 .my-profile-page__logout-trigger {

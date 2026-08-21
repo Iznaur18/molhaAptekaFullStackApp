@@ -30,7 +30,7 @@ import {
   assertOrderItemsWithinAvailableStock,
   guardOrderItemsStockInTransaction,
 } from "../product/productStock.js";
-import { resolveProductUnitPriceWithPromo } from "@izibuy/shared-lib";
+import { resolveProductUnitPriceWithPromo, resolveBuyNFreeLineTotal, isProductBuyNFreeActive } from "@izibuy/shared-lib";
 
 import { buildOrderStatusFromItems } from "./orderStatus.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
@@ -44,9 +44,19 @@ import {
   consumeProductPromoActivationsForUser,
   listAppliedProductPromosForUser,
 } from "../product/productPromoCode.js";
+import { claimBuyNFreeRedemption } from "../product/productBuyNFreeProgress.js";
 
 const calculateTotalAmount = (items) =>
-  items.reduce((sum, item) => sum + (item.unitPriceAtOrder ?? 0) * item.quantity, 0);
+  items.reduce(
+    (sum, item) =>
+      sum +
+      resolveBuyNFreeLineTotal({
+        unitPrice: item.unitPriceAtOrder ?? 0,
+        quantity: item.quantity,
+        freeUnits: item.buyNFreeUnitsAtOrder ?? 0,
+      }),
+    0,
+  );
 
 /**
  * @param {Array<{ productId: unknown; quantity: number }>} items
@@ -59,11 +69,20 @@ const calculateTotalAmount = (items) =>
  *   deliveryEnabled: boolean;
  *   affiliateEnabled: boolean;
  *   affiliatePercent: number;
+ *   buyNFreeEnabled?: boolean;
+ *   buyNFreeThreshold?: number | null;
  * }>} productById
  * @param {{ referrerUserId: string | null; buyerUserId: string }} affiliateCtx
  * @param {Record<string, { code: string; discountPercent: number }>} promoByProductId
+ * @param {Record<string, number>} freeUnitsByProductId
  */
-const buildItemsWithPriceSnapshot = (items, productById, affiliateCtx, promoByProductId = {}) =>
+const buildItemsWithPriceSnapshot = (
+  items,
+  productById,
+  affiliateCtx,
+  promoByProductId = {},
+  freeUnitsByProductId = {},
+) =>
   items.map((item) => {
     const snapshot = productById[String(item.productId)];
     const promo = promoByProductId[String(item.productId)] ?? null;
@@ -75,9 +94,14 @@ const buildItemsWithPriceSnapshot = (items, productById, affiliateCtx, promoByPr
       quantity: item.quantity,
       promoDiscountPercent: promo?.discountPercent ?? null,
     });
+    const freeUnitsRaw = Math.floor(
+      Number(freeUnitsByProductId[String(item.productId)] ?? 0) || 0,
+    );
+    const freeUnits = Math.min(Math.max(0, freeUnitsRaw), 1, item.quantity);
+    const paidQuantity = Math.max(0, item.quantity - freeUnits);
     const loyalty = buildOrderLineLoyaltySnapshot({
       loyaltyPointsPerUnit: snapshot.loyaltyPointsPerUnit,
-      quantity: item.quantity,
+      quantity: paidQuantity,
     });
     const affiliate = resolveOrderLineAffiliateAttribution({
       referrerUserId: affiliateCtx.referrerUserId,
@@ -91,6 +115,10 @@ const buildItemsWithPriceSnapshot = (items, productById, affiliateCtx, promoByPr
       productId: item.productId,
       quantity: item.quantity,
       unitPriceAtOrder: unitPrice,
+      buyNFreeUnitsAtOrder: freeUnits,
+      buyNFreeProgressApplied: false,
+      buyNFreeProgressAction: null,
+      buyNFreeProgressCountBefore: 0,
       productNameAtOrder: snapshot.name,
       promoCodeAtOrder: promo?.code ?? null,
       promoDiscountPercentAtOrder: promo?.discountPercent ?? null,
@@ -110,11 +138,11 @@ const fetchAvailableProductsForOrder = async (productIds) => {
     productStockQuantity: { $gt: 0 },
   })
     .select(
-      "_id productPrice productName loyaltyPointsPerUnit productSeller productPickupAddress productPickupEnabled productDeliveryEnabled productWholesaleEnabled productWholesaleMinQty productWholesalePrice affiliateEnabled affiliatePercent",
+      "_id productPrice productName loyaltyPointsPerUnit productSeller productPickupAddress productPickupEnabled productDeliveryEnabled productWholesaleEnabled productWholesaleMinQty productWholesalePrice affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
     )
     .lean();
 
-  /** @type {Record<string, { price: number; name: string; loyaltyPointsPerUnit: number; sellerId: string; pickupAddress: string; pickupEnabled: boolean; deliveryEnabled: boolean; wholesaleEnabled: boolean; wholesaleMinQty: number | null; wholesalePrice: number | null; affiliateEnabled: boolean; affiliatePercent: number }>} */
+  /** @type {Record<string, { price: number; name: string; loyaltyPointsPerUnit: number; sellerId: string; pickupAddress: string; pickupEnabled: boolean; deliveryEnabled: boolean; wholesaleEnabled: boolean; wholesaleMinQty: number | null; wholesalePrice: number | null; affiliateEnabled: boolean; affiliatePercent: number; buyNFreeEnabled: boolean; buyNFreeThreshold: number | null }>} */
   const byId = {};
   for (const product of products) {
     const id = String(product._id);
@@ -134,6 +162,8 @@ const fetchAvailableProductsForOrder = async (productIds) => {
       wholesalePrice: product.productWholesalePrice ?? null,
       affiliateEnabled: product.affiliateEnabled === true,
       affiliatePercent: Math.floor(Number(product.affiliatePercent) || 0),
+      buyNFreeEnabled: product.productBuyNFreeEnabled === true,
+      buyNFreeThreshold: product.productBuyNFreeThreshold ?? null,
     };
   }
   return byId;
@@ -249,7 +279,7 @@ export async function createOrder({
       );
       const product = await ProductModel.findById(productId)
         .select(
-          "loyaltyPointsPerUnit productSeller productPickupAddress productPickupEnabled productDeliveryEnabled affiliateEnabled affiliatePercent",
+          "loyaltyPointsPerUnit productSeller productPickupAddress productPickupEnabled productDeliveryEnabled affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
         )
         .lean();
       if (!product) {
@@ -270,6 +300,8 @@ export async function createOrder({
         wholesalePrice: null,
         affiliateEnabled: product.affiliateEnabled === true,
         affiliatePercent: Math.floor(Number(product.affiliatePercent) || 0),
+        buyNFreeEnabled: product.productBuyNFreeEnabled === true,
+        buyNFreeThreshold: product.productBuyNFreeThreshold ?? null,
       };
       linkedPriceOfferId = priceOfferId;
     } catch (error) {
@@ -325,42 +357,77 @@ export async function createOrder({
       discountPercent: row.discountPercent,
     };
   }
-  const itemsWithPrice = buildItemsWithPriceSnapshot(
-    items,
-    productById,
-    {
-      referrerUserId,
-      buyerUserId: String(userId),
-    },
-    promoByProductId,
-  );
-  const totalAmount = calculateTotalAmount(itemsWithPrice);
-  const status = buildOrderStatusFromItems(itemsWithPrice);
-
-  const itemsForReserve = itemsWithPrice.map((line, index) => ({
-    ...line,
-    productId: {
-      productSeller: productById[String(items[index].productId)]?.sellerId,
-    },
-  }));
 
   try {
     const created = await runInTransaction(async (session) => {
       await guardOrderItemsStockInTransaction(items, userId, session);
-      await reserveLoyaltyPointsForNewOrder(itemsForReserve, session);
+
+      const orderId = new mongoose.Types.ObjectId();
+      /** @type {Record<string, number>} */
+      const freeUnitsByProductId = {};
+      for (const item of items) {
+        const productId = String(item.productId);
+        if (freeUnitsByProductId[productId] != null) {
+          continue;
+        }
+        const snapshot = productById[productId];
+        if (
+          !isProductBuyNFreeActive({
+            productBuyNFreeEnabled: snapshot?.buyNFreeEnabled === true,
+            productBuyNFreeThreshold: snapshot?.buyNFreeThreshold,
+          })
+        ) {
+          continue;
+        }
+        const qty = Math.floor(Number(item.quantity) || 0);
+        if (qty < 1) {
+          continue;
+        }
+        const claimed = await claimBuyNFreeRedemption({
+          buyerId: userId,
+          productId,
+          threshold: snapshot.buyNFreeThreshold,
+          orderId,
+          session,
+        });
+        if (claimed) {
+          freeUnitsByProductId[productId] = 1;
+        }
+      }
+
+      const pricedItems = buildItemsWithPriceSnapshot(
+        items,
+        productById,
+        {
+          referrerUserId,
+          buyerUserId: String(userId),
+        },
+        promoByProductId,
+        freeUnitsByProductId,
+      );
+      const totalAmount = calculateTotalAmount(pricedItems);
+      const orderStatus = buildOrderStatusFromItems(pricedItems);
+      const reserveLines = pricedItems.map((line, index) => ({
+        ...line,
+        productId: {
+          productSeller: productById[String(items[index].productId)]?.sellerId,
+        },
+      }));
+      await reserveLoyaltyPointsForNewOrder(reserveLines, session);
 
       const [createdOrder] = await OrderModel.create(
         [
           {
+            _id: orderId,
             userBuyerId: userId,
-            items: itemsWithPrice,
+            items: pricedItems,
             totalAmount,
             deliveryAddress: addressForOrder.displayAddress,
             deliveryAddressFlat: addressForOrder.flat ?? "",
             deliveryAddressFiasId: addressForOrder.fiasId ?? "",
             fulfillmentMethod: resolvedFulfillment,
             paymentMethod,
-            status,
+            status: orderStatus,
             priceOfferId: linkedPriceOfferId,
           },
         ],
@@ -386,7 +453,7 @@ export async function createOrder({
         withMongoSession({ upsert: true }, session),
       );
 
-      const promoProductIds = collectOrderedProductIdsWithPromo(itemsWithPrice);
+      const promoProductIds = collectOrderedProductIdsWithPromo(pricedItems);
       if (promoProductIds.length > 0) {
         await consumeProductPromoActivationsForUser({
           userId: String(userId),

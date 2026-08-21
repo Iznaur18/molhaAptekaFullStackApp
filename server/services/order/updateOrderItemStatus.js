@@ -29,6 +29,11 @@ import {
   decrementProductStockOnItemConfirmed,
   syncProductCatalogAfterStockChange,
 } from "../product/productStock.js";
+import {
+  applyBuyNFreeProgressOnConfirm,
+  releaseBuyNFreeRedemptionClaim,
+  rollbackBuyNFreeProgressOnCancel,
+} from "../product/productBuyNFreeProgress.js";
 import { buildOrderStatusFromItems } from "./orderStatus.js";
 
 import { clearBuyerPassportShareOnOrder } from "./buyerPassportShare.js";
@@ -198,6 +203,7 @@ export async function markOrderItemCancelled({
       ...(targetItem.toObject?.() ?? targetItem),
       productId: targetItem.productId,
     };
+    const productIdForRelease = resolveProductIdFromItem(targetItem.productId);
 
     await runInTransaction(async (session) => {
       targetItem.status = ORDER_STATUS_CANCELLED;
@@ -208,6 +214,15 @@ export async function markOrderItemCancelled({
       }
       await order.save({ session });
       await releaseUnawardedLoyaltyReservesForOrder([releaseLine], session);
+      const freeUnits = Math.floor(Number(targetItem.buyNFreeUnitsAtOrder) || 0);
+      if (freeUnits > 0 && productIdForRelease) {
+        await releaseBuyNFreeRedemptionClaim({
+          buyerId,
+          productId: productIdForRelease,
+          orderId,
+          session,
+        });
+      }
     });
   }
 
@@ -327,6 +342,21 @@ export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, use
         buyerId,
         session,
       });
+
+      if (productId && targetItem.buyNFreeProgressApplied !== true) {
+        const progressResult = await applyBuyNFreeProgressOnConfirm({
+          buyerId,
+          productId,
+          quantity: targetItem.quantity,
+          freeUnits: targetItem.buyNFreeUnitsAtOrder ?? 0,
+          session,
+        });
+        if (progressResult.applied) {
+          targetItem.buyNFreeProgressApplied = true;
+          targetItem.buyNFreeProgressAction = progressResult.action;
+          targetItem.buyNFreeProgressCountBefore = progressResult.countBefore;
+        }
+      }
 
       targetItem.status = ORDER_STATUS_CONFIRMED;
       targetItem.confirmedAt = new Date();

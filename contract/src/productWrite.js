@@ -14,6 +14,7 @@ import {
   productPickupLatFieldSchema,
   productPickupLonFieldSchema,
 } from "./productPickup.js";
+import { productBuyNFreePatchFieldsShape } from "./productBuyNFree.js";
 import { productWholesalePatchFieldsShape } from "./productWholesale.js";
 import { productRentalPatchFieldsShape } from "./productRental.js";
 import {
@@ -283,6 +284,7 @@ const patchFieldShape = {
   productAuctionEnabled: z.coerce.boolean().optional(),
   productQaEnabled: z.coerce.boolean().optional(),
   ...productWholesalePatchFieldsShape,
+  ...productBuyNFreePatchFieldsShape,
   ...productRentalPatchFieldsShape,
   ...productAffiliatePatchFieldsShape,
   ...productFlashSalePatchFieldsShape,

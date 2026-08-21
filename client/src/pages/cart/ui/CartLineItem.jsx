@@ -5,7 +5,7 @@ import { getCartLineStockHint } from "../../../entities/cart/lib/getCartLineStoc
 import { getProductPurchaseLimit } from "../../../entities/product/lib/getProductPurchaseLimit.js";
 import { resolveProductImageUrl } from "../../../entities/product/lib/resolveProductImageUrl.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
-import { CART_PAGE_UI, COMMON_UI, PRODUCT_FLASH_SALE_UI, PRODUCT_PROMO_CODE_UI } from "../../../shared/config/appUiCopy.js";
+import { CART_PAGE_UI, COMMON_UI, PRODUCT_BUY_N_FREE_UI, PRODUCT_FLASH_SALE_UI, PRODUCT_PROMO_CODE_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { AppIcon, Trash2 } from "../../../shared/ui/icon/index.js";
 
@@ -41,6 +41,12 @@ export function CartLineItem({
   const unitPriceText = formatPriceRub(unitPrice);
   const retailPriceText = formatPriceRub(retailPrice);
   const lineTotalText = formatPriceRub(line.lineTotal);
+  const buyNFreeUnits = Math.floor(Number(line.buyNFreeUnits) || 0);
+  const paidQty = Math.max(0, line.quantity - buyNFreeUnits);
+  const buyNFreeHint =
+    buyNFreeUnits > 0
+      ? PRODUCT_BUY_N_FREE_UI.CART_LINE_HINT(paidQty, unitPriceText)
+      : null;
   const purchaseLimit = getProductPurchaseLimit(product);
   const stockHint = getCartLineStockHint(purchaseLimit, line.quantity);
   const resolvedImage = resolveProductImageUrl(product);
@@ -189,6 +195,9 @@ export function CartLineItem({
 
           <span className="cart-line__total">{lineTotalText}</span>
         </div>
+        {buyNFreeHint ? (
+          <p className="cart-line__buy-n-free-hint">{buyNFreeHint}</p>
+        ) : null}
       </div>
 
       <button

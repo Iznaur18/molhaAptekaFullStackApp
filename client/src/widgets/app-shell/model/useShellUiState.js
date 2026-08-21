@@ -41,6 +41,8 @@ export function useShellUiState() {
   const [togglingFlashSaleProductId, setTogglingFlashSaleProductId] = useState(null);
   const [togglingRentalProductId, setTogglingRentalProductId] = useState(null);
   const [togglingAffiliateProductId, setTogglingAffiliateProductId] = useState(null);
+  const [togglingLoyaltyProductId, setTogglingLoyaltyProductId] = useState(null);
+  const [togglingBuyNFreeProductId, setTogglingBuyNFreeProductId] = useState(null);
   const [togglingInstallmentProductId, setTogglingInstallmentProductId] = useState(null);
   const [isCreateProductModalOpen, setIsCreateProductModalOpen] = useState(false);
   const [isSellerProductsLimitModalOpen, setIsSellerProductsLimitModalOpen] =
@@ -134,6 +136,10 @@ export function useShellUiState() {
     setTogglingRentalProductId,
     togglingAffiliateProductId,
     setTogglingAffiliateProductId,
+    togglingLoyaltyProductId,
+    setTogglingLoyaltyProductId,
+    togglingBuyNFreeProductId,
+    setTogglingBuyNFreeProductId,
     togglingInstallmentProductId,
     setTogglingInstallmentProductId,
     isCreateProductModalOpen,

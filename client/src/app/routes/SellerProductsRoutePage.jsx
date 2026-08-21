@@ -6,7 +6,7 @@ import { useAppShell } from "../model/AppShellContext.jsx";
 /** Каталог товаров продавца — `/seller/:userId`. */
 export function SellerProductsRoutePage() {
   const { userId } = useParams();
-  const { mainContentProps, goToMainView } = useAppShell();
+  const { mainContentProps } = useAppShell();
   const {
     isAuthorized,
     isSessionReady,
@@ -30,7 +30,6 @@ export function SellerProductsRoutePage() {
       onRequestLoginAddToCart={onRequestLogin}
       onSellerNameClick={onSellerNameClick}
       onOpenProductDetails={onOpenProductDetails}
-      onGoToMyProducts={() => goToMainView("my-products")}
     />
   );
 }

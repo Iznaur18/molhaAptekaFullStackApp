@@ -15,6 +15,8 @@ import { resolveUserProfileBackgroundFromUser } from "../../../entities/user/lib
 import { UserFollowButton } from "../../../entities/user-follow/ui/UserFollowButton.jsx";
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
 import { UserPremiumDisplayName } from "../../../entities/user/ui/UserPremiumDisplayName.jsx";
+import { SellerShareLinkButton } from "../../../entities/user/ui/SellerShareLinkButton.jsx";
+import { usePublicSellerShelvesQuery } from "../../../entities/seller-shelf/model/usePublicSellerShelvesQuery.js";
 import { HomeCatalogGrid } from "../../../widgets/catalog-product-grid/ui/HomeCatalogGrid.jsx";
 import { useSellerProductsCatalog } from "../model/useSellerProductsCatalog.js";
 import {
@@ -46,7 +48,6 @@ function navigateBackOrHome(navigate) {
  *   onOpenProductDetails: (
  *     product: import('../../../entities/product/model/types.js').ProductFromApi,
  *   ) => void;
- *   onGoToMyProducts: () => void;
  * }} props
  */
 export function SellerProductsPage({
@@ -58,15 +59,19 @@ export function SellerProductsPage({
   onRequestLoginAddToCart,
   onSellerNameClick,
   onOpenProductDetails,
-  onGoToMyProducts,
 }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
   const [backgroundLoadFailed, setBackgroundLoadFailed] = useState(false);
+  const [selectedShelfId, setSelectedShelfId] = useState(/** @type {string | null} */ (null));
 
   const catalogEnabled = isSessionReady;
   const profileQuery = useUserProfileQuery({ userId: sellerId, enabled: catalogEnabled });
+  const shelvesQuery = usePublicSellerShelvesQuery({
+    sellerId,
+    enabled: catalogEnabled,
+  });
   const seller = profileQuery.data ?? null;
   const profilePhase = !catalogEnabled
     ? "idle"
@@ -89,13 +94,15 @@ export function SellerProductsPage({
     loadMoreError,
     sentinelRef,
     retryLoadMore,
-  } = useSellerProductsCatalog({ sellerId, enabled: catalogEnabled });
+  } = useSellerProductsCatalog({
+    sellerId,
+    enabled: catalogEnabled,
+    shelfId: selectedShelfId,
+  });
 
   useEffect(() => {
-    if (currentUserId != null && String(sellerId) === String(currentUserId)) {
-      onGoToMyProducts();
-    }
-  }, [currentUserId, onGoToMyProducts, sellerId]);
+    setSelectedShelfId(null);
+  }, [sellerId]);
 
   useEffect(() => {
     setAvatarLoadFailed(false);
@@ -225,6 +232,13 @@ export function SellerProductsPage({
                   onError={() => setAvatarLoadFailed(true)}
                 />
               ) : null}
+              {isSelf ? (
+                <SellerShareLinkButton
+                  sellerId={sellerId}
+                  sellerName={displayName}
+                  variant="banner"
+                />
+              ) : null}
             </div>
           ) : null}
 
@@ -236,17 +250,73 @@ export function SellerProductsPage({
                 isUserDataConfirmed={Boolean(seller.isUserDataConfirmed)}
               />
             </div>
-            {!isSelf ? (
-              <UserFollowButton
-                targetUserId={String(seller._id)}
-                isFollowing={seller.isFollowing === true}
-                isAuthorized={isAuthorized}
-                isSelf={false}
-                onRequestLogin={onRequestLogin}
-                onFollowChange={handleFollowChange}
+            {isSelf && !showProfileBanner ? (
+              <SellerShareLinkButton
+                sellerId={sellerId}
+                sellerName={displayName}
+                variant="meta"
               />
             ) : null}
+            {!isSelf ? (
+              <div className="seller-products-page__seller-actions">
+                <SellerShareLinkButton
+                  sellerId={sellerId}
+                  sellerName={displayName}
+                  variant="meta"
+                />
+                <UserFollowButton
+                  targetUserId={String(seller._id)}
+                  isFollowing={seller.isFollowing === true}
+                  isAuthorized={isAuthorized}
+                  isSelf={false}
+                  onRequestLogin={onRequestLogin}
+                  onFollowChange={handleFollowChange}
+                />
+              </div>
+            ) : null}
           </div>
+
+          {(shelvesQuery.data?.shelves?.length ?? 0) > 0 ? (
+            <div
+              className="seller-products-page__shelves"
+              role="toolbar"
+              aria-label={SELLER_PRODUCTS_PAGE_UI.SHELF_FILTER_ARIA}
+            >
+              <button
+                type="button"
+                className={[
+                  "seller-products-page__shelf-chip",
+                  selectedShelfId == null
+                    ? "seller-products-page__shelf-chip--active"
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                aria-pressed={selectedShelfId == null}
+                onClick={() => setSelectedShelfId(null)}
+              >
+                {SELLER_PRODUCTS_PAGE_UI.SHELF_FILTER_ALL}
+              </button>
+              {(shelvesQuery.data?.shelves ?? []).map((shelf) => (
+                <button
+                  key={shelf._id}
+                  type="button"
+                  className={[
+                    "seller-products-page__shelf-chip",
+                    selectedShelfId === shelf._id
+                      ? "seller-products-page__shelf-chip--active"
+                      : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  aria-pressed={selectedShelfId === shelf._id}
+                  onClick={() => setSelectedShelfId(shelf._id)}
+                >
+                  {shelf.name}
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
       ) : null}
 

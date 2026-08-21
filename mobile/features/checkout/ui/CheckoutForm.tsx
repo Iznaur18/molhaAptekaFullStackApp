@@ -284,6 +284,7 @@ export const CheckoutForm = ({
               value={deliveryAddress}
               onChange={setDeliveryAddress}
               disabled={isDisabled || isSubmitting}
+              displayOnly
               placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_DELIVERY_ADDRESS}
               label={CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS}
               containerStyle={checkoutStyles.fieldGroup}

@@ -30,6 +30,7 @@ import { ProductDetailsPromoTeaser } from "@/features/product-detail/ui/ProductD
 import { ProductPromoCodeActivateSheet } from "@/features/product-detail/ui/ProductPromoCodeActivateSheet";
 import { ProductDetailsSaleTeaser } from "@/features/product-detail/ui/ProductDetailsSaleTeaser";
 import { ProductDetailsWholesaleOffer } from "@/features/product-detail/ui/ProductDetailsWholesaleOffer";
+import { ProductDetailsBuyNFreeOffer } from "@/features/product-detail/ui/ProductDetailsBuyNFreeOffer";
 import { ProductPickupDetailsPanel } from "@/features/product-detail/ui/ProductPickupDetailsPanel";
 import { PRODUCT_DETAILS_MODAL_UI, PRODUCT_RENTAL_UI, SELLER_PRODUCTS_PAGE_UI } from "@/shared/config";
 import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
@@ -136,6 +137,11 @@ export const ProductDetailsDetailsTab = ({
           <ProductDetailsWholesaleOffer
             product={product}
             canShowAddToCart={canShowAddToCart}
+          />
+          <ProductDetailsBuyNFreeOffer
+            product={product}
+            isAuthorized={isAuthorized}
+            onRequestLogin={onRequestLogin}
           />
           <Text style={styles.productName}>{name}</Text>
           <ProductDetailsBadgeStack product={product} onBadgePress={openBadgeExplain} />

@@ -1,0 +1,191 @@
+.my-products-shelves {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0.85rem 0.9rem;
+  border-radius: 1rem;
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-action-soft);
+}
+
+.my-products-shelves__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  flex-shrink: 0;
+}
+
+.my-products-shelves__toggle:focus-visible {
+  outline: 2px solid var(--iz-color-action, #2563eb);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+.my-products-shelves__toggle-main {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  gap: 0.65rem;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.my-products-shelves__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--iz-color-text);
+  flex-shrink: 0;
+}
+
+.my-products-shelves__collapsed-count {
+  font-size: 0.8125rem;
+  color: var(--iz-color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  max-width: 0;
+  transition: none;
+}
+
+.my-products-shelves_collapsed .my-products-shelves__collapsed-count {
+  opacity: 1;
+  max-width: 12rem;
+}
+
+.my-products-shelves__toggle-action {
+  flex: 0 0 auto;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--iz-color-action, #2563eb);
+  white-space: nowrap;
+}
+
+.my-products-shelves__fold {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s ease-in-out;
+}
+
+.my-products-shelves__fold_open {
+  grid-template-rows: 1fr;
+}
+
+.my-products-shelves__fold-inner {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding-top: 0.65rem;
+}
+
+.my-products-shelves__hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--iz-color-text-muted);
+}
+
+.my-products-shelves__create,
+.my-products-shelves__rename {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.my-products-shelves__input {
+  flex: 1 1 10rem;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--iz-radius-input, 8px);
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  font: inherit;
+}
+
+.my-products-shelves__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.my-products-shelves__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.75rem;
+  background: var(--iz-color-surface);
+  border: 1px solid var(--iz-color-border);
+}
+
+.my-products-shelves__item-main {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.my-products-shelves__name {
+  font-weight: 600;
+  color: var(--iz-color-text);
+}
+
+.my-products-shelves__count {
+  font-size: 0.8125rem;
+  color: var(--iz-color-text-muted);
+}
+
+.my-products-shelves__item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.my-products-shelves__state {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--iz-color-text-muted);
+}
+
+.my-products-shelves__state_error,
+.my-products-shelves__limit {
+  color: var(--iz-color-danger);
+}
+
+.my-products-shelves__assign-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.my-products-shelves__assign-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding: 0.35rem 0 0.35rem 0.75rem;
+  cursor: pointer;
+}

@@ -89,8 +89,12 @@ export async function settleAffiliatePayoutForOrderItem({
   }
 
   const qty = Math.ceil(Number(targetItem.quantity) || 0);
+  const freeUnits = Math.min(
+    qty,
+    Math.max(0, Math.floor(Number(targetItem.buyNFreeUnitsAtOrder) || 0)),
+  );
   const unit = Math.floor(Number(targetItem.unitPriceAtOrder) || 0);
-  const linePaid = unit * qty;
+  const linePaid = unit * Math.max(0, qty - freeUnits);
   const amount = computeAffiliatePayoutAmount(linePaid, percent);
 
   if (amount <= 0) {

@@ -21,6 +21,7 @@ export const DEV_API_PROXY_PREFIXES = [
   "/site-header-banner",
   "/intro-ad",
   "/seller-personal-category",
+  "/seller-shelf",
   "/audit",
   "/staff",
   "/onec",

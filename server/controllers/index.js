@@ -154,6 +154,7 @@ import {
   rejectProductPriceOfferController,
   getSellerProductPriceOfferArchiveController,
 } from "./Product/productPriceOfferControllers.js";
+import { getMyProductBuyNFreeProgressController } from "./Product/productBuyNFreeControllers.js";
 import {
   getIncomingPriceOffersController,
   getIncomingPriceOffersPendingCountController,
@@ -396,6 +397,7 @@ export {
   patchMyProductPriceOfferController,
   cancelMyProductPriceOfferController,
   getMyProductPriceOfferController,
+  getMyProductBuyNFreeProgressController,
   getTopProductPriceOffersController,
   getSellerProductPriceOffersController,
   acceptProductPriceOfferController,

@@ -159,6 +159,28 @@ export const useProfileOverviewSectionStyles = createThemedStyles((theme) => ({
   root: {
     gap: theme.spacing[4],
   },
+  shareRow: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    gap: 4,
+    marginTop: -theme.spacing[2],
+    width: "100%",
+  },
+  notificationsBtn: {
+    flex: 1,
+    height: 34,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: theme.radius.button,
+    borderWidth: 1,
+    borderColor: theme.colors.action,
+    backgroundColor: "transparent",
+  },
+  shareHalfBtn: {
+    flex: 1,
+    width: "auto" as const,
+    alignSelf: "stretch",
+  },
   raffleSection: {
     marginBottom: theme.spacing[1],
   },
@@ -202,10 +224,6 @@ export const useProfileOverviewBannerStyles = createThemedStyles((theme) => ({
     height: "100%",
   },
   editButton: {
-    position: "absolute",
-    top: 12,
-    right: 12,
-    zIndex: 2,
     width: 36,
     height: 36,
     borderRadius: 8,
@@ -214,6 +232,15 @@ export const useProfileOverviewBannerStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
     alignItems: "center",
     justifyContent: "center",
+  },
+  bannerActions: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    zIndex: 3,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
 }));
 

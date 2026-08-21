@@ -684,6 +684,12 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
     minWidth: 0,
     justifyContent: "center",
   },
+  sellerMetaActions: {
+    flexDirection: "row",
+    flexShrink: 0,
+    alignItems: "center",
+    gap: 4,
+  },
   sellerName: {
     fontSize: 16,
     fontWeight: "600",

@@ -1,12 +1,13 @@
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   CART_FULFILLMENT_SECTION_DELIVERY,
   CART_FULFILLMENT_SECTION_PICKUP,
   doProductsSupportPickup,
   doProductsSupportSellerDelivery,
 } from "@molha/api-contract";
+import { isProductBuyNFreeActive } from "@izibuy/shared-lib";
 
 import { buildCheckoutPickupLocations } from "../../../entities/cart/lib/buildCheckoutPickupLocations.js";
 import { getCartLineExclusionReason } from "../../../entities/cart/lib/getCartLineExclusionReason.js";
@@ -19,6 +20,7 @@ import { useCartFlashSalePriceTick } from "../../../entities/cart/model/useCartF
 import { useCreateOrderMutation } from "../../../entities/order/model/useCreateOrderMutation.js";
 import { useAllProductsQuery } from "../../../entities/product/model/useAllProductsQuery.js";
 import { navigateToProductDetails } from "../../../entities/product/lib/navigateToProductDetails.js";
+import { fetchMyProductBuyNFreeProgress } from "../../../entities/product/api/fetchMyProductBuyNFreeProgress.js";
 import { fetchMyAppliedProductPromos } from "../../../entities/product-promo-code/api/productPromoCodeApi.js";
 import { productPromoCodeQueryKeys } from "../../../entities/product-promo-code/model/productPromoCodeQueryKeys.js";
 import { invalidatePriceOfferQueries } from "../../../entities/product-price-offer/lib/priceOfferQueryCache.js";
@@ -113,6 +115,37 @@ export function CartPage({
     [navigate],
   );
 
+  const buyNFreeProductIds = useMemo(() => {
+    const products = productsQuery.data ?? [];
+    return products
+      .filter((product) => isProductBuyNFreeActive(product) && items[String(product._id)])
+      .map((product) => String(product._id));
+  }, [items, productsQuery.data]);
+
+  const buyNFreeProgressQueries = useQueries({
+    queries: buyNFreeProductIds.map((productId) => ({
+      queryKey: ["product-buy-n-free-progress", productId],
+      queryFn: () => fetchMyProductBuyNFreeProgress(productId),
+      enabled: isAuthorized && productId.length > 0,
+      staleTime: 15_000,
+    })),
+  });
+
+  const buyNFreeProgressByProductId = useMemo(() => {
+    /** @type {Record<string, { completedPaidOrderCount?: number; freeClaimPending?: boolean }>} */
+    const map = {};
+    buyNFreeProductIds.forEach((productId, index) => {
+      const data = buyNFreeProgressQueries[index]?.data;
+      if (data) {
+        map[productId] = {
+          completedPaidOrderCount: data.completedPaidOrderCount,
+          freeClaimPending: data.freeClaimPending,
+        };
+      }
+    });
+    return map;
+  }, [buyNFreeProductIds, buyNFreeProgressQueries]);
+
   const { lines } = useMemo(
     () =>
       selectCartLines(
@@ -121,8 +154,16 @@ export function CartPage({
         appliedPromosQuery.data?.appliedPromos ?? [],
         priceSnapshots,
         cartPriceNowMs,
+        buyNFreeProgressByProductId,
       ),
-    [items, productsQuery.data, appliedPromosQuery.data, priceSnapshots, cartPriceNowMs],
+    [
+      items,
+      productsQuery.data,
+      appliedPromosQuery.data,
+      priceSnapshots,
+      cartPriceNowMs,
+      buyNFreeProgressByProductId,
+    ],
   );
 
   const visibleLines = useMemo(

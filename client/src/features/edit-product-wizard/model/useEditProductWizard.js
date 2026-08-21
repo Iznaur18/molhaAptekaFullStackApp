@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
   EDIT_PRODUCT_WIZARD_STEP_COUNT,
@@ -11,28 +11,14 @@ import { validateEditProductWizardStep } from "../lib/validateEditProductWizardS
  * @param {{
  *   isOpen: boolean;
  *   form: Record<string, unknown>;
- *   sellerPointsMaxPerUnit: number;
- *   sellerCatalogCommitted: number;
  * }} params
  */
-export function useEditProductWizard({
-  isOpen,
-  form,
-  sellerPointsMaxPerUnit,
-  sellerCatalogCommitted,
-}) {
+export function useEditProductWizard({ isOpen, form }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [stepError, setStepError] = useState("");
 
   const stepIds = EDIT_PRODUCT_WIZARD_STEP_IDS;
   const stepId = resolveEditProductWizardStepId(stepIndex);
-  const validationContext = useMemo(
-    () => ({
-      sellerPointsMaxPerUnit,
-      sellerCatalogCommitted,
-    }),
-    [sellerCatalogCommitted, sellerPointsMaxPerUnit],
-  );
 
   useEffect(() => {
     if (!isOpen) {
@@ -42,10 +28,10 @@ export function useEditProductWizard({
   }, [isOpen]);
 
   const validateCurrentStep = useCallback(() => {
-    const message = validateEditProductWizardStep(stepId, form, validationContext);
+    const message = validateEditProductWizardStep(stepId, form);
     setStepError(message ?? "");
     return message == null;
-  }, [form, stepId, validationContext]);
+  }, [form, stepId]);
 
   const goNext = useCallback(() => {
     if (!validateCurrentStep()) {

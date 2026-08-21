@@ -12,8 +12,8 @@ describe("resolveHeaderUsersStretchMenuHeight", () => {
     );
   });
 
-  it("matches mobile formula for 4 items", () => {
-    // 44 + 12 + 4*44 + 3*8 + 8 = 264
-    expect(resolveHeaderUsersStretchMenuHeight(4)).toBe(264);
+  it("matches mobile formula for 3 items", () => {
+    // 44 + 12 + 3*44 + 2*8 + 8 = 212
+    expect(resolveHeaderUsersStretchMenuHeight(3)).toBe(212);
   });
 });

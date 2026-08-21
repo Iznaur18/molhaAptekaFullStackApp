@@ -13,14 +13,17 @@ import { sellerProductsQueryKeys } from "./sellerProductsQueryKeys";
 type UseSellerProductsInfiniteQueryOptions = {
   sellerId: string;
   enabled: boolean;
+  shelfId?: string | null;
 };
 
 export const useSellerProductsInfiniteQuery = ({
   sellerId,
   enabled,
+  shelfId = null,
 }: UseSellerProductsInfiniteQueryOptions) => {
+  const shelfKey = shelfId != null ? String(shelfId).trim() : "";
   const query = useInfiniteQuery({
-    queryKey: sellerProductsQueryKeys.list(sellerId),
+    queryKey: sellerProductsQueryKeys.list(sellerId, shelfKey || null),
     enabled: enabled && Boolean(sellerId),
     initialPageParam: 1,
     retry: 1,
@@ -29,6 +32,7 @@ export const useSellerProductsInfiniteQuery = ({
       return fetchUserProducts(sellerId, {
         page,
         limit: USER_PROFILE_PRODUCTS_API_LIMIT_MAX,
+        shelfId: shelfKey || null,
       });
     },
     getNextPageParam: (lastPage) => {

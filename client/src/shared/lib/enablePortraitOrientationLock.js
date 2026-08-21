@@ -1,29 +1,20 @@
 import { APP_PORTRAIT_LOCK_UI } from "../config/appUiCopy.js";
 
 /**
- * Portrait-only на смартфонах (web).
+ * Portrait-only на всех touch-устройствах (web): телефоны и планшеты.
  * `screen.orientation.lock` — где браузер даёт (Chrome Android / installed PWA).
  * iOS Safari lock не даёт → CSS-оверлей на landscape.
+ * Десктоп (мышь / трекпад) не блокируем — мониторы landscape по умолчанию.
  */
 
 const PORTRAIT_LOCK_TYPES = /** @type {const} */ (["portrait", "portrait-primary"]);
 
-function isPhoneLikeViewport() {
-  if (typeof window === "undefined") {
+function isTouchDeviceViewport() {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
     return false;
   }
 
-  const coarse =
-    typeof window.matchMedia === "function" &&
-    window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-  if (!coarse) {
-    return false;
-  }
-
-  // Landscape phone: короткая сторона ≈ ширина портрета (≤560).
-  // iPad landscape height обычно ≥600–768 — не трогаем.
-  const shortSide = Math.min(window.innerWidth, window.innerHeight);
-  return shortSide <= 560;
+  return window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 }
 
 /**
@@ -52,7 +43,7 @@ function syncPortraitLockClass() {
   }
 
   const shouldBlock =
-    isPhoneLikeViewport() &&
+    isTouchDeviceViewport() &&
     typeof window.matchMedia === "function" &&
     window.matchMedia("(orientation: landscape)").matches;
 
@@ -73,7 +64,7 @@ export function enablePortraitOrientationLock() {
 
   const run = () => {
     syncPortraitLockClass();
-    if (isPhoneLikeViewport()) {
+    if (isTouchDeviceViewport()) {
       void tryLockPortrait();
     }
   };

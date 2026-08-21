@@ -8,6 +8,8 @@ import { ProductFlashSaleModal } from "./ProductFlashSaleModal.jsx";
 import { ProductPromoCodesModal } from "./ProductPromoCodesModal.jsx";
 import { ProductRentalManageModal } from "./ProductRentalManageModal.jsx";
 import { AffiliatePercentModal } from "./AffiliatePercentModal.jsx";
+import { ProductLoyaltyPointsModal } from "./ProductLoyaltyPointsModal.jsx";
+import { ProductBuyNFreeModal } from "./ProductBuyNFreeModal.jsx";
 import { calculateProductPromotionPointsCost } from "../lib/calculateProductPromotionPointsCost.js";
 import { ProductPromotionFormPanel } from "./product-promotion-modal/ProductPromotionFormPanel.jsx";
 import { ProductPromotionManageTab } from "./product-promotion-modal/ProductPromotionManageTab.jsx";
@@ -64,6 +66,10 @@ const PRODUCT_PROMOTION_MODAL_TITLE_ID = "product-promotion-modal-title";
  *     productId: string,
  *     affiliateEnabled: boolean,
  *   ) => void | Promise<void>;
+ *   onSetProductLoyaltyPoints?: (
+ *     productId: string,
+ *     loyaltyPointsPerUnit: number,
+ *   ) => void | Promise<void>;
  *   onSetProductInstallment?: (
  *     productId: string,
  *     productInstallmentEnabled: boolean,
@@ -80,6 +86,7 @@ const PRODUCT_PROMOTION_MODAL_TITLE_ID = "product-promotion-modal-title";
  *   isFlashSaleTogglePending?: boolean;
  *   isRentalTogglePending?: boolean;
  *   isAffiliateTogglePending?: boolean;
+ *   isLoyaltyTogglePending?: boolean;
  *   isInstallmentTogglePending?: boolean;
  *   isDeletePending?: boolean;
  *   manageErrorMessage?: string;
@@ -115,6 +122,8 @@ export function ProductPromotionModal({
   onSetProductFlashSale,
   onSetProductRental,
   onSetProductAffiliate,
+  onSetProductLoyaltyPoints,
+  onSetProductBuyNFree,
   onSetProductInstallment,
   onWholesaleSaved,
   onInstallmentProgramSaved,
@@ -127,6 +136,8 @@ export function ProductPromotionModal({
   isFlashSaleTogglePending = false,
   isRentalTogglePending = false,
   isAffiliateTogglePending = false,
+  isLoyaltyTogglePending = false,
+  isBuyNFreeTogglePending = false,
   isInstallmentTogglePending = false,
   isDeletePending = false,
   manageErrorMessage = "",
@@ -155,6 +166,8 @@ export function ProductPromotionModal({
   const [isFlashSaleOpen, setIsFlashSaleOpen] = useState(false);
   const [isRentalOpen, setIsRentalOpen] = useState(false);
   const [isAffiliateOpen, setIsAffiliateOpen] = useState(false);
+  const [isLoyaltyOpen, setIsLoyaltyOpen] = useState(false);
+  const [isBuyNFreeOpen, setIsBuyNFreeOpen] = useState(false);
   const [isPromoCodesOpen, setIsPromoCodesOpen] = useState(false);
   const defaultTier = tiers[0]?.tier ?? 1;
   const defaultDuration = durations[0]?.code ?? "";
@@ -169,6 +182,8 @@ export function ProductPromotionModal({
       setIsWholesaleOpen(false);
       setIsRentalOpen(false);
       setIsAffiliateOpen(false);
+      setIsLoyaltyOpen(false);
+      setIsBuyNFreeOpen(false);
       setIsPromoCodesOpen(false);
     }
   }, [defaultDuration, defaultTier, isOpen]);
@@ -301,6 +316,8 @@ export function ProductPromotionModal({
             isFlashSaleTogglePending={isFlashSaleTogglePending}
             onSetRental={onSetProductRental}
             onSetAffiliate={onSetProductAffiliate}
+            onSetLoyaltyPoints={onSetProductLoyaltyPoints}
+            onSetBuyNFree={onSetProductBuyNFree}
             onSetInstallment={onSetProductInstallment}
             onDelete={onDeleteProduct}
             isAvailabilityTogglePending={isAvailabilityTogglePending}
@@ -310,6 +327,8 @@ export function ProductPromotionModal({
             isWholesaleTogglePending={isWholesaleTogglePending}
             isRentalTogglePending={isRentalTogglePending}
             isAffiliateTogglePending={isAffiliateTogglePending}
+            isLoyaltyTogglePending={isLoyaltyTogglePending}
+            isBuyNFreeTogglePending={isBuyNFreeTogglePending}
             isInstallmentTogglePending={isInstallmentTogglePending}
             isDeletePending={isDeletePending}
             errorMessage={manageErrorMessage}
@@ -325,6 +344,8 @@ export function ProductPromotionModal({
             onOpenFlashSaleSettings={() => setIsFlashSaleOpen(true)}
             onOpenRentalSettings={() => setIsRentalOpen(true)}
             onOpenAffiliateSettings={() => setIsAffiliateOpen(true)}
+            onOpenLoyaltySettings={() => setIsLoyaltyOpen(true)}
+            onOpenBuyNFreeSettings={() => setIsBuyNFreeOpen(true)}
             onOpenPromoCodesSettings={() => setIsPromoCodesOpen(true)}
           />
         )}
@@ -363,6 +384,18 @@ export function ProductPromotionModal({
         isOpen={isAffiliateOpen}
         product={product}
         onClose={() => setIsAffiliateOpen(false)}
+        onSaved={onWholesaleSaved}
+      />
+      <ProductLoyaltyPointsModal
+        isOpen={isLoyaltyOpen}
+        product={product}
+        onClose={() => setIsLoyaltyOpen(false)}
+        onSaved={onWholesaleSaved}
+      />
+      <ProductBuyNFreeModal
+        isOpen={isBuyNFreeOpen}
+        product={product}
+        onClose={() => setIsBuyNFreeOpen(false)}
         onSaved={onWholesaleSaved}
       />
       <ProductPromoCodesModal

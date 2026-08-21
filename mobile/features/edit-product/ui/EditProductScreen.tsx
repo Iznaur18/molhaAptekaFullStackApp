@@ -42,17 +42,13 @@ import {
 } from "@/entities/product/lib/productListingOrigin";
 import { ProductListingOriginChips } from "@/entities/product/ui/ProductListingOriginChips";
 import { resolveProductImageUrls } from "@/entities/product/lib/resolveProductImageUrls";
-import { resolveProductLoyaltyPointsPerUnit } from "@/entities/product/lib/resolveProductLoyaltyPointsPerUnit";
-import { resolveSellerMaxLoyaltyPointsPerUnit } from "@/entities/product/lib/resolveSellerMaxLoyaltyPointsPerUnit";
 import { validateProductName } from "@/entities/product/lib/validateProductName";
 import { useCatalogProductQuery } from "@/entities/product/model/useCatalogProductQuery";
 import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
-import { useMyProductsInfiniteQuery } from "@/entities/product/model/useMyProductsInfiniteQuery";
 import { ProductCharacteristicsEditor } from "@/entities/product/ui/ProductCharacteristicsEditor";
 import { ProductDescriptionField } from "@/entities/product/ui/ProductDescriptionField";
 import { ProductPickupLocationFields } from "@/entities/product/ui/ProductPickupLocationFields";
 import { ProductReturnTermsEditor } from "@/entities/product/ui/ProductReturnTermsEditor";
-import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
 import { CreateProductCategoryPicker } from "@/features/create-product/ui/CreateProductCategoryPicker";
 import { ProductPhotoGrid } from "@/features/image-upload/ui/ProductPhotoGrid";
 import { API_CLIENT_UI, CREATE_PRODUCT_UI, PRODUCT_REPORT_UI } from "@/shared/config";
@@ -67,8 +63,6 @@ import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductEditorScreenStyles } from "@/shared/theme/sellerFlowStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
-const LOYALTY_POINTS_MAX_LENGTH = 8;
-
 const resolveReturnPolicyPrefill = (
   product: Record<string, unknown>,
 ): { enabled: boolean; rows: ProductReturnTermRow[] } => {
@@ -82,8 +76,6 @@ const resolveReturnPolicyPrefill = (
     rows: rows.length > 0 ? rows : [createProductReturnTermRow()],
   };
 };
-
-const keepDigits = (value: string) => keepDigitsOnly(value);
 
 type EditProductScreenProps = {
   productId: string;
@@ -104,10 +96,6 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
   const styles = useProductEditorScreenStyles();
   const productQuery = useCatalogProductQuery(productId);
   const { patchMutation, deleteMutation } = useMyProductMutations();
-  const loyaltyPointsQuery = useMyLoyaltyPointsStatusQuery(Boolean(productId));
-  const sellerProductsQuery = useMyProductsInfiniteQuery({
-    enabled: Boolean(productId),
-  });
 
   const [productName, setProductName] = useState("");
   const [productListingOrigin, setProductListingOrigin] =
@@ -117,7 +105,6 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
   const [productOldPrice, setProductOldPrice] = useState("");
   const [productIsAvailable, setProductIsAvailable] = useState(true);
   const [productStockQuantity, setProductStockQuantity] = useState("1");
-  const [loyaltyPointsPerUnit, setLoyaltyPointsPerUnit] = useState("0");
   const [productCategoryId, setProductCategoryId] = useState<string | null>(null);
   const [productCategoryLabel, setProductCategoryLabel] = useState("");
   const [productRegionCode, setProductRegionCode] = useState(
@@ -159,7 +146,6 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
     );
     setProductIsAvailable(product.productIsAvailable !== false);
     setProductStockQuantity(String(product.productStockQuantity ?? 1));
-    setLoyaltyPointsPerUnit(String(resolveProductLoyaltyPointsPerUnit(product)));
     const categoryId = product.productCategoryId;
     if (typeof categoryId === "string" && categoryId.trim()) {
       setProductCategoryId(categoryId);
@@ -192,36 +178,6 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
     setReturnTermRows(returnPrefill.rows);
     setIsInitialized(true);
   }, [isInitialized, productQuery.data]);
-
-  useEffect(() => {
-    if (!sellerProductsQuery.hasNextPage || sellerProductsQuery.isFetchingNextPage) {
-      return;
-    }
-    void sellerProductsQuery.fetchNextPage();
-  }, [
-    sellerProductsQuery.data,
-    sellerProductsQuery.fetchNextPage,
-    sellerProductsQuery.hasNextPage,
-    sellerProductsQuery.isFetchingNextPage,
-  ]);
-
-  const loyaltyBudget = useMemo(
-    () =>
-      resolveSellerMaxLoyaltyPointsPerUnit({
-        loyaltyPointsBalance: loyaltyPointsQuery.data?.loyaltyPointsBalance ?? 0,
-        loyaltyPointsReserved: loyaltyPointsQuery.data?.loyaltyPointsReserved ?? 0,
-        sellerProducts: sellerProductsQuery.products,
-        editingProductId: productId,
-      }),
-    [
-      loyaltyPointsQuery.data?.loyaltyPointsBalance,
-      loyaltyPointsQuery.data?.loyaltyPointsReserved,
-      productId,
-      sellerProductsQuery.products,
-    ],
-  );
-
-  const loyaltyFieldDisabled = loyaltyBudget.maxPerUnit <= 0;
 
   const discountPercent = useMemo(() => {
     const price = parseRubPriceInput(productPrice);
@@ -283,16 +239,6 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
         return CREATE_PRODUCT_UI.ERROR_STOCK;
       }
     }
-    const loyaltyParsed = Math.floor(Number(loyaltyPointsPerUnit));
-    if (!Number.isFinite(loyaltyParsed) || loyaltyParsed < 0) {
-      return CREATE_PRODUCT_UI.ERROR_LOYALTY_POINTS;
-    }
-    if (loyaltyParsed > loyaltyBudget.maxPerUnit) {
-      return CREATE_PRODUCT_UI.ERROR_LOYALTY_POINTS_MAX(
-        loyaltyBudget.maxPerUnit,
-        loyaltyBudget.catalogCommitted,
-      );
-    }
     if (productReturnEnabled) {
       const returnError = validateProductReturnTermRows(returnTermRows);
       if (returnError) {
@@ -344,7 +290,6 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
           productImageUrls,
           productCharacteristics:
             serializeProductCharacteristicRows(characteristicRows),
-          loyaltyPointsPerUnit: Math.floor(Number(loyaltyPointsPerUnit)) || 0,
           productReturnEnabled,
           productReturnTerms: productReturnEnabled
             ? serializeProductReturnTermRows(returnTermRows)
@@ -628,31 +573,6 @@ export const EditProductScreen = ({ productId }: EditProductScreenProps) => {
                 />
               </View>
             ) : null}
-
-            <View style={styles.field}>
-              <Text style={styles.label}>
-                {CREATE_PRODUCT_UI.LABEL_LOYALTY_POINTS_PER_UNIT}
-              </Text>
-              <TextInput
-                style={styles.input}
-                value={loyaltyPointsPerUnit}
-                onChangeText={(text) => setLoyaltyPointsPerUnit(keepDigits(text))}
-                keyboardType="number-pad"
-                editable={!isBusy && !loyaltyFieldDisabled}
-                maxLength={LOYALTY_POINTS_MAX_LENGTH}
-                placeholder="0"
-                placeholderTextColor={theme.colors.textMuted}
-              />
-              <Text style={styles.hint}>
-                {loyaltyFieldDisabled
-                  ? CREATE_PRODUCT_UI.HINT_LOYALTY_POINTS_ZERO_BALANCE
-                  : CREATE_PRODUCT_UI.HINT_LOYALTY_POINTS_PER_UNIT(
-                      loyaltyBudget.available,
-                      loyaltyBudget.catalogCommitted,
-                      loyaltyBudget.maxPerUnit,
-                    )}
-              </Text>
-            </View>
           </View>
 
           <View style={[styles.zoneBlock, styles.zoneMedia]}>

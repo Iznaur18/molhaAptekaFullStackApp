@@ -1,4 +1,6 @@
 import {
+  resolveBuyNFreeFreeUnitsForCart,
+  resolveBuyNFreeLineTotal,
   resolveProductUnitPriceWithPromo,
   resolveProductWholesaleOffer,
 } from "@izibuy/shared-lib";
@@ -20,6 +22,7 @@ import { normalizeStaleFlashSaleProduct } from "../../product/lib/isProductFlash
  * @property {boolean} isPromoApplied
  * @property {number | null} unitPriceSnapshot
  * @property {boolean} priceIncreasedSinceAdd
+ * @property {number} buyNFreeUnits
  */
 
 /**
@@ -28,6 +31,7 @@ import { normalizeStaleFlashSaleProduct } from "../../product/lib/isProductFlash
  * @param {Record<string, { code?: string; discountPercent?: number }> | Map<string, { code?: string; discountPercent?: number }> | Array<{ productId: string; code?: string; discountPercent?: number }>} [appliedPromos]
  * @param {Record<string, number>} [priceSnapshots]
  * @param {number} [nowMs]
+ * @param {Record<string, { completedPaidOrderCount?: number; freeClaimPending?: boolean }> | Map<string, { completedPaidOrderCount?: number; freeClaimPending?: boolean }>} [buyNFreeProgressByProductId]
  */
 export const selectCartLines = (
   cartItems,
@@ -35,6 +39,7 @@ export const selectCartLines = (
   appliedPromos = {},
   priceSnapshots = {},
   nowMs = Date.now(),
+  buyNFreeProgressByProductId = {},
 ) => {
   const productById = new Map(products.map((p) => [String(p._id), p]));
   /** @type {Map<string, { code?: string; discountPercent?: number }>} */
@@ -53,6 +58,21 @@ export const selectCartLines = (
     }
   }
 
+  /** @type {Map<string, { completedPaidOrderCount?: number; freeClaimPending?: boolean }>} */
+  const progressByProductId = new Map();
+  if (buyNFreeProgressByProductId instanceof Map) {
+    for (const [productId, row] of buyNFreeProgressByProductId.entries()) {
+      progressByProductId.set(String(productId), row);
+    }
+  } else if (
+    buyNFreeProgressByProductId &&
+    typeof buyNFreeProgressByProductId === "object"
+  ) {
+    for (const [productId, row] of Object.entries(buyNFreeProgressByProductId)) {
+      progressByProductId.set(String(productId), row);
+    }
+  }
+
   const lines = Object.entries(cartItems).map(([productId, quantity]) => {
     const rawProduct = productById.get(productId) ?? null;
     const product =
@@ -68,6 +88,13 @@ export const selectCartLines = (
       productWholesalePrice: product?.productWholesalePrice,
       quantity: qty,
       promoDiscountPercent,
+    });
+    const progress = progressByProductId.get(productId) ?? null;
+    const buyNFreeUnits = resolveBuyNFreeFreeUnitsForCart({
+      product,
+      completedPaidOrderCount: progress?.completedPaidOrderCount,
+      freeClaimPending: progress?.freeClaimPending,
+      quantity: qty,
     });
     const offer = resolveProductWholesaleOffer(product);
     const isWholesaleApplied = offer != null && qty >= offer.minQty;
@@ -90,7 +117,11 @@ export const selectCartLines = (
       quantity: qty,
       product,
       unitPrice,
-      lineTotal: unitPrice * qty,
+      lineTotal: resolveBuyNFreeLineTotal({
+        unitPrice,
+        quantity: qty,
+        freeUnits: buyNFreeUnits,
+      }),
       isMissing: product == null,
       isWholesaleApplied,
       wholesaleSavings,
@@ -99,6 +130,7 @@ export const selectCartLines = (
       isPromoApplied,
       unitPriceSnapshot,
       priceIncreasedSinceAdd,
+      buyNFreeUnits,
     };
   });
 

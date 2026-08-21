@@ -21,6 +21,7 @@ import {
   siteHeaderBannerCampaignRouter,
   introAdRouter,
   sellerPersonalCategoryRouter,
+  sellerShelfRouter,
   auditRouter,
   staffRouter,
   onecRouter,
@@ -107,6 +108,7 @@ export const createApp = () => {
   app.use("/site-header-banner-campaign", siteHeaderBannerCampaignRouter);
   app.use("/intro-ad", introAdRouter);
   app.use("/seller-personal-category", sellerPersonalCategoryRouter);
+  app.use("/seller-shelf", sellerShelfRouter);
   app.use("/audit", auditRouter);
   app.use("/staff", staffRouter);
   app.use("/onec", onecRouter);

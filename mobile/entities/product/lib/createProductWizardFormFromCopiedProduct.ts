@@ -11,7 +11,6 @@ import {
   type ProductListingOrigin,
 } from "@/entities/product/lib/productListingOrigin";
 import { resolveProductImageUrls } from "@/entities/product/lib/resolveProductImageUrls";
-import { resolveProductLoyaltyPointsPerUnit } from "@/entities/product/lib/resolveProductLoyaltyPointsPerUnit";
 import { formatRubPriceInput } from "@/shared/lib/rubPriceInput";
 
 export type CopiedProductWizardForm = {
@@ -106,7 +105,7 @@ export const createProductWizardFormFromCopiedProduct = (
         : "",
     productIsAvailable: true,
     productStockQuantity: Number.isFinite(stockRaw) && stockRaw > 0 ? String(stockRaw) : "1",
-    loyaltyPointsPerUnit: String(resolveProductLoyaltyPointsPerUnit(product)),
+    loyaltyPointsPerUnit: "0",
     productReturnEnabled: returnPrefill.enabled,
     returnTermRows: returnPrefill.rows,
   };

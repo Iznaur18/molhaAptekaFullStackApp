@@ -1,0 +1,9 @@
+.product-media-gallery-readonly__hero-actions .product-share-link-toggle {
+  position: static;
+  top: auto;
+  right: auto;
+}
+
+.product-share-link-toggle--copied {
+  color: var(--iz-color-success);
+}

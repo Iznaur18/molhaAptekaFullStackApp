@@ -186,6 +186,13 @@
   font-size: 1rem;
 }
 
+:root[data-theme="dark"] .wholesale-price-modal__label,
+:root[data-theme="dark"] .wholesale-price-modal__input,
+:root[data-theme="dark"] .wholesale-price-modal__promo-card-title,
+:root[data-theme="dark"] .wholesale-price-modal__promo-enabled {
+  color: #ffffff;
+}
+
 .wholesale-price-modal__input:focus {
   outline: 2px solid var(--iz-color-action);
   outline-offset: 1px;

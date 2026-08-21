@@ -187,6 +187,10 @@
   overflow-wrap: anywhere;
 }
 
+:root[data-theme="dark"] .raffle-products-page__title {
+  color: #fff;
+}
+
 .raffle-products-page__description {
   margin: 0 0 0.75rem;
   padding: 0 0.15rem;
@@ -304,6 +308,11 @@
   color: var(--iz-color-accent, var(--iz-color-action));
 }
 
+:root[data-theme="dark"] .raffle-products-page__stat-value,
+:root[data-theme="dark"] .raffle-products-page__stat_accent .raffle-products-page__stat-value {
+  color: #fff;
+}
+
 .raffle-products-page__state {
   margin: 0;
 }
@@ -375,12 +384,12 @@
   padding: 0;
   border: none;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--iz-color-on-contrast) 55%, transparent);
+  background: color-mix(in srgb, #fff 55%, transparent);
   cursor: pointer;
 }
 
 .raffle-products-page__swipe-dot_active {
-  background: var(--iz-color-on-contrast);
+  background: #fff;
 }
 
 @keyframes raffle-products-page-slide-forward {

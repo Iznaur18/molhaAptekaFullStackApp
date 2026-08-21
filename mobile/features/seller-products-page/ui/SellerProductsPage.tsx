@@ -1,15 +1,18 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
+import { fetchPublicSellerShelves } from "@/entities/seller-shelf/api/sellerShelfApi";
+import { sellerShelfQueryKeys } from "@/entities/seller-shelf/model/sellerShelfQueryKeys";
 import { userProfileQueryKeys } from "@/entities/user/model/userProfileQueryKeys";
 import { useSellerProductsInfiniteQuery } from "@/entities/user/model/useSellerProductsInfiniteQuery";
 import { useUserProfileQuery } from "@/entities/user/model/useUserProfileQuery";
 import { ProfileOverviewBanner } from "@/entities/user/ui/ProfileOverviewBanner";
+import { SellerShareLinkButton } from "@/entities/user/ui/SellerShareLinkButton";
 import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
 import { UserFollowButton } from "@/features/user-follow/ui/UserFollowButton";
 import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGridRows";
@@ -22,6 +25,7 @@ import { SELLER_PRODUCTS_PAGE_UI, USER_LIST_ROW_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useSellerProductsPageStyles } from "@/shared/theme/sellerFlowStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
@@ -41,23 +45,32 @@ export const SellerProductsPage = () => {
     sessionQuery.data?.user?._id != null ? String(sessionQuery.data.user._id) : null;
   const isSessionReady = !sessionQuery.isPending;
 
+  const theme = useAppTheme();
+  const [selectedShelfId, setSelectedShelfId] = useState<string | null>(null);
+
   const profileQuery = useUserProfileQuery({
     userId: sellerId,
+    enabled: isSessionReady && sellerId.length > 0,
+  });
+  const shelvesQuery = useQuery({
+    queryKey: sellerShelfQueryKeys.publicBySeller(sellerId),
+    queryFn: () => fetchPublicSellerShelves(sellerId),
     enabled: isSessionReady && sellerId.length > 0,
   });
   const catalogQuery = useSellerProductsInfiniteQuery({
     sellerId,
     enabled: isSessionReady && sellerId.length > 0,
+    shelfId: selectedShelfId,
   });
+
+  useEffect(() => {
+    setSelectedShelfId(null);
+  }, [sellerId]);
 
   const seller = profileQuery.data as Record<string, unknown> | undefined;
   const isSelf = currentUserId != null && sellerId === currentUserId;
-
-  useEffect(() => {
-    if (isSelf && sellerId.length > 0) {
-      router.replace("/hub/my-products");
-    }
-  }, [isSelf, router, sellerId]);
+  const displayName =
+    String(seller?.userName ?? "").trim() || USER_LIST_ROW_UI.MISSING_NAME;
 
   const handleFollowChange = useCallback(
     (patch: { isFollowing: boolean }) => {
@@ -165,26 +178,107 @@ export const SellerProductsPage = () => {
         }
         ListHeaderComponent={
           <View style={styles.header}>
-            {seller ? <ProfileOverviewBanner user={seller} /> : null}
+            {seller ? (
+              <ProfileOverviewBanner
+                user={seller}
+                bannerAction={
+                  isSelf ? (
+                    <SellerShareLinkButton
+                      sellerId={sellerId}
+                      sellerName={displayName}
+                      variant="banner"
+                    />
+                  ) : null
+                }
+              />
+            ) : null}
             {seller ? (
               <View style={styles.sellerMetaZone}>
                 <View style={styles.sellerMetaName}>
                   <UserPremiumDisplayName
-                    name={String(seller.userName ?? "").trim() || USER_LIST_ROW_UI.MISSING_NAME}
+                    name={displayName}
                     isPremium={seller.isPremiumUser === true}
                     isUserDataConfirmed={seller.isUserDataConfirmed === true}
                     textStyle={styles.sellerName}
                   />
                 </View>
-                <UserFollowButton
-                  targetUserId={sellerId}
-                  isFollowing={isFollowing}
-                  isAuthorized={isAuthorized}
-                  isSelf={isSelf}
-                  layout="inline"
-                  onFollowChange={handleFollowChange}
-                />
+                {!isSelf ? (
+                  <View style={styles.sellerMetaActions}>
+                    <SellerShareLinkButton
+                      sellerId={sellerId}
+                      sellerName={displayName}
+                      variant="meta"
+                    />
+                    <UserFollowButton
+                      targetUserId={sellerId}
+                      isFollowing={isFollowing}
+                      isAuthorized={isAuthorized}
+                      isSelf={isSelf}
+                      layout="inline"
+                      onFollowChange={handleFollowChange}
+                    />
+                  </View>
+                ) : null}
               </View>
+            ) : null}
+            {(shelvesQuery.data?.shelves?.length ?? 0) > 0 ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ gap: 8, paddingVertical: 4 }}
+                accessibilityLabel={SELLER_PRODUCTS_PAGE_UI.SHELF_FILTER_ARIA}
+              >
+                <Pressable
+                  onPress={() => setSelectedShelfId(null)}
+                  style={{
+                    paddingHorizontal: 14,
+                    paddingVertical: 8,
+                    borderRadius: 999,
+                    borderWidth: 1,
+                    borderColor: theme.colors.action,
+                    backgroundColor:
+                      selectedShelfId == null ? theme.colors.action : "transparent",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontWeight: "600",
+                      color:
+                        selectedShelfId == null
+                          ? theme.colors.onContrast
+                          : theme.colors.action,
+                    }}
+                  >
+                    {SELLER_PRODUCTS_PAGE_UI.SHELF_FILTER_ALL}
+                  </Text>
+                </Pressable>
+                {(shelvesQuery.data?.shelves ?? []).map((shelf) => {
+                  const active = selectedShelfId === shelf._id;
+                  return (
+                    <Pressable
+                      key={shelf._id}
+                      onPress={() => setSelectedShelfId(shelf._id)}
+                      style={{
+                        paddingHorizontal: 14,
+                        paddingVertical: 8,
+                        borderRadius: 999,
+                        borderWidth: 1,
+                        borderColor: theme.colors.action,
+                        backgroundColor: active ? theme.colors.action : "transparent",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontWeight: "600",
+                          color: active ? theme.colors.onContrast : theme.colors.action,
+                        }}
+                      >
+                        {shelf.name}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
             ) : null}
           </View>
         }

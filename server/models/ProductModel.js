@@ -256,6 +256,13 @@ const ProductSchema = new Schema(
       default: null,
       index: true,
     },
+    /** Полка витрины продавца (свои разделы на /seller/:id). */
+    sellerShelfId: {
+      type: Schema.Types.ObjectId,
+      ref: "SellerShelf",
+      default: null,
+      index: true,
+    },
     categoryPathIds: {
       type: [Schema.Types.ObjectId],
       default: [],
@@ -370,6 +377,17 @@ const ProductSchema = new Schema(
       type: Number,
       default: null,
       min: 1,
+    },
+    /** «Бесплатно от N»: N завершённых платных заказов → 1 шт. бесплатно. */
+    productBuyNFreeEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    productBuyNFreeThreshold: {
+      type: Number,
+      default: null,
+      min: 2,
+      max: 10,
     },
     /** Аренда / прокат: тумблер в управлении (продажа не блокируется). */
     productRentalEnabled: {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
   CREATE_PRODUCT_WIZARD_STEP_COUNT,
@@ -12,29 +12,14 @@ import { validateCreateProductWizardStep } from "../lib/validateCreateProductWiz
  * @param {{
  *   isOpen: boolean;
  *   form: Record<string, unknown>;
- *   sellerPointsMaxPerUnit: number;
- *   sellerCatalogCommitted: number;
  *   draftEnabled?: boolean;
  * }} params
  */
-export function useCreateProductWizard({
-  isOpen,
-  form,
-  sellerPointsMaxPerUnit,
-  sellerCatalogCommitted,
-  draftEnabled = false,
-}) {
+export function useCreateProductWizard({ isOpen, form, draftEnabled = false }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [stepError, setStepError] = useState("");
 
   const stepId = resolveCreateProductWizardStepId(stepIndex);
-  const validationContext = useMemo(
-    () => ({
-      sellerPointsMaxPerUnit,
-      sellerCatalogCommitted,
-    }),
-    [sellerCatalogCommitted, sellerPointsMaxPerUnit],
-  );
 
   useEffect(() => {
     if (!isOpen) {
@@ -53,10 +38,10 @@ export function useCreateProductWizard({
   }, [isOpen, draftEnabled]);
 
   const validateCurrentStep = useCallback(() => {
-    const message = validateCreateProductWizardStep(stepId, form, validationContext);
+    const message = validateCreateProductWizardStep(stepId, form);
     setStepError(message ?? "");
     return message == null;
-  }, [form, stepId, validationContext]);
+  }, [form, stepId]);
 
   const goNext = useCallback(() => {
     if (!validateCurrentStep()) {

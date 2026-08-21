@@ -421,6 +421,12 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   ORIGINAL_BADGE: "Оригинал",
   ORIGINAL_BADGE_ARIA: "Оригинальный товар",
   AFFILIATE_BADGE: (percent: number) => `Партнёрам ${percent}%`,
+  SHARE_PRODUCT: "Поделиться товаром",
+  SHARE_LINK_ARIA: "Ссылка",
+  SHARE_PRODUCT_TITLE: "Поделиться товаром",
+  SHARE_PRODUCT_SUBTITLE: "Отправить ссылку на товар",
+  SHARE_PRODUCT_COPIED_TITLE: "Ссылка скопирована",
+  SHARE_PRODUCT_COPIED_SUBTITLE: "Отправьте её кому угодно",
   AFFILIATE_SHARE: "Поделиться и заработать",
   AFFILIATE_SHARE_TITLE: "Поделиться",
   AFFILIATE_SHARE_SUBTITLE: (percent: number) => `Заработать ${percent}% с покупки`,
@@ -556,6 +562,40 @@ export const PRODUCT_WHOLESALE_UI = {
   DETAILS_OFFER_GO: "Купить оптом",
   DETAILS_OFFER_GO_ARIA: "Добавить в корзину по оптовой цене",
   DETAILS_OFFER_ARIA: "Доступна оптовая цена",
+} as const;
+
+/** «Бесплатно от N» (детали / корзина). Счётчик — завершённые заказы, не штуки. */
+const buyNFreeOrdersWord = (n: number): string => {
+  const abs = Math.abs(Math.floor(Number(n) || 0)) % 100;
+  const n1 = abs % 10;
+  if (abs > 10 && abs < 20) return "заказов";
+  if (n1 > 1 && n1 < 5) return "заказа";
+  if (n1 === 1) return "заказ";
+  return "заказов";
+};
+
+export const PRODUCT_BUY_N_FREE_UI = {
+  DETAILS_KICKER: "Акция продавца",
+  DETAILS_TITLE: (n: number) => `${n} ${buyNFreeOrdersWord(n)} → 1 бесплатно`,
+  DETAILS_GUEST: (n: number) =>
+    `Соберите ${n} ${buyNFreeOrdersWord(n)} с этим товаром — следующая 1 шт. будет за 0 ₽`,
+  DETAILS_PROGRESS: (bought: number, n: number) =>
+    `${bought} из ${n} ${buyNFreeOrdersWord(n)}`,
+  DETAILS_REMAINING: (left: number) => {
+    if (left === 1) return "Остался 1 заказ";
+    return `Осталось ${left} ${buyNFreeOrdersWord(left)}`;
+  },
+  DETAILS_READY: "Подарок готов — добавьте в корзину",
+  DETAILS_READY_BADGE: "0 ₽",
+  DETAILS_PENDING_CLAIM: "Подарок уже в заказе",
+  DETAILS_STAMP_DONE: "Готово",
+  DETAILS_STAMP_NEXT: "Сейчас",
+  DETAILS_STAMP_GIFT: "Подарок",
+  DETAILS_ARIA: "Акция «Бесплатно от N»",
+  DETAILS_LOGIN: "Войти",
+  CART_FREE_UNIT: "1 шт. бесплатно",
+  CART_LINE_HINT: (paidQty: number, unitLabel: string) =>
+    paidQty > 0 ? `${paidQty} шт. × ${unitLabel} + 1 бесплатно` : "1 шт. бесплатно",
 } as const;
 
 export const USER_PREMIUM_UI = {
@@ -1481,8 +1521,33 @@ export const SELLER_PRODUCTS_PAGE_UI = {
   LOGIN_BUTTON: "Войти",
   FETCH_PROFILE_FALLBACK: "Не удалось загрузить профиль продавца",
   EMPTY: "У продавца пока нет товаров в каталоге.",
+  SHARE_LINK_ARIA: "Ссылка",
+  SHARE_LINK_COPIED_ARIA: "Ссылка скопирована",
+  SHELF_FILTER_ARIA: "Полки продавца",
+  SHELF_FILTER_ALL: "Все",
   /** @param userName seller display name */
   TITLE_FOR: (userName: string) => `Товары ${userName}`,
+} as const;
+
+export const SELLER_SHELF_UI = {
+  TITLE: "Полки",
+  HINT: "Группируйте товары для фильтров на витрине. До 10 полок.",
+  CREATE_PLACEHOLDER: "Название полки",
+  CREATE: "Создать",
+  ASSIGN: "Товары",
+  DELETE: "Удалить",
+  DELETE_CONFIRM: "Удалить полку? Товары останутся без полки.",
+  MOVE_UP: "↑",
+  MOVE_DOWN: "↓",
+  LOADING: "Загрузка полок…",
+  EMPTY: "Полок пока нет — создайте первую.",
+  LIMIT_REACHED: "Достигнут лимит 10 полок",
+  ASSIGN_SAVE: "Сохранить",
+  ASSIGN_TITLE: (name: string) => `Полка «${name}»`,
+  EXPAND_TOGGLE: (expanded: boolean) => (expanded ? "Свернуть" : "Развернуть"),
+  SHELF_UNIT_FORMS: ["полка", "полки", "полок"] as const,
+  COLLAPSED_COUNT: (count: number) =>
+    `${count} ${pluralizeRu(count, SELLER_SHELF_UI.SHELF_UNIT_FORMS)}`,
 } as const;
 
 export const USER_VOTE_RATING_UI = {
@@ -1878,6 +1943,31 @@ export const CREATE_PRODUCT_UI = {
     "Держите на балансе достаточно свободных баллов — иначе покупатель не сможет подтвердить заказ с партнёрской выплатой.",
   AFFILIATE_MODAL_ERROR_REQUIRED: "Укажите процент от 1 до 50",
   AFFILIATE_MODAL_PENDING: "Сохраняем…",
+  MANAGE_LOYALTY_TITLE: "Баллы покупателю",
+  MANAGE_LOYALTY_HINT: "Сколько баллов получит покупатель за 1 шт. при подтверждении",
+  MANAGE_LOYALTY_HINT_ON: (points: number) =>
+    `Сейчас ${points} за шт. Списание при подтверждении покупки`,
+  LOYALTY_TOGGLE_PENDING: "Обновляем баллы…",
+  LOYALTY_MODAL_TITLE: "Баллы покупателю",
+  LOYALTY_MODAL_POINTS_LABEL: "Баллов за 1 шт. покупателю",
+  LOYALTY_MODAL_SAVE: "Сохранить",
+  LOYALTY_MODAL_CLOSE: "Закрыть",
+  LOYALTY_MODAL_PENDING: "Сохраняем…",
+  LOYALTY_MODAL_ERROR_REQUIRED: "Укажите целое число ≥ 0",
+  MANAGE_BUY_N_FREE_TITLE: "Бесплатно от N",
+  MANAGE_BUY_N_FREE_HINT:
+    "После N завершённых заказов покупатель получит 1 шт. бесплатно",
+  MANAGE_BUY_N_FREE_HINT_ON: (n: number) =>
+    `Сейчас от ${n} заказов. Следующая 1 шт. бесплатно`,
+  BUY_N_FREE_TOGGLE_PENDING: "Обновляем «Бесплатно от N»…",
+  BUY_N_FREE_MODAL_TITLE: "Бесплатно от N",
+  BUY_N_FREE_MODAL_HINT:
+    "Укажите, через сколько завершённых заказов с этим товаром покупатель получит 1 шт. бесплатно. Считаются заказы, не количество штук.",
+  BUY_N_FREE_MODAL_THRESHOLD_LABEL: "Заказов до бесплатной",
+  BUY_N_FREE_MODAL_SAVE: "Сохранить",
+  BUY_N_FREE_MODAL_CLOSE: "Закрыть",
+  BUY_N_FREE_MODAL_ERROR_REQUIRED: "Укажите число от 2 до 10",
+  BUY_N_FREE_MODAL_PENDING: "Сохраняем…",
   MANAGE_VISIBILITY_TITLE_VISIBLE: "Виден в каталоге",
   MANAGE_VISIBILITY_TITLE_HIDDEN: "Скрыт от покупателей",
   MANAGE_VISIBILITY_STATUS_VISIBLE: "(виден)",

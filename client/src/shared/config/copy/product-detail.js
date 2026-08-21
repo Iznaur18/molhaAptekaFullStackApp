@@ -125,6 +125,12 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   ORIGINAL_BADGE: "Оригинал",
   ORIGINAL_BADGE_ARIA: "Оригинальный товар",
   AFFILIATE_BADGE: (percent) => `Партнёрам ${percent}%`,
+  SHARE_PRODUCT: "Поделиться товаром",
+  SHARE_LINK_ARIA: "Ссылка",
+  SHARE_PRODUCT_TITLE: "Поделиться товаром",
+  SHARE_PRODUCT_SUBTITLE: "Отправить ссылку на товар",
+  SHARE_PRODUCT_COPIED_TITLE: "Ссылка скопирована",
+  SHARE_PRODUCT_COPIED_SUBTITLE: "Отправьте её кому угодно",
   AFFILIATE_SHARE: "Поделиться и заработать",
   AFFILIATE_SHARE_TITLE: "Поделиться ссылкой",
   AFFILIATE_SHARE_SUBTITLE: (percent) => `Заработать ${percent}% с покупки`,
@@ -214,6 +220,40 @@ export const PRODUCT_WHOLESALE_UI = {
   DETAILS_OFFER_GO: "Купить оптом",
   DETAILS_OFFER_GO_ARIA: "Добавить в корзину по оптовой цене",
   DETAILS_OFFER_ARIA: "Доступна оптовая цена",
+};
+
+/** «Бесплатно от N» (детали / корзина). Счётчик — завершённые заказы, не штуки. */
+const buyNFreeOrdersWord = (n) => {
+  const abs = Math.abs(Math.floor(Number(n) || 0)) % 100;
+  const n1 = abs % 10;
+  if (abs > 10 && abs < 20) return "заказов";
+  if (n1 > 1 && n1 < 5) return "заказа";
+  if (n1 === 1) return "заказ";
+  return "заказов";
+};
+
+export const PRODUCT_BUY_N_FREE_UI = {
+  DETAILS_KICKER: "Акция продавца",
+  DETAILS_TITLE: (n) => `${n} ${buyNFreeOrdersWord(n)} → 1 бесплатно`,
+  DETAILS_GUEST: (n) =>
+    `Соберите ${n} ${buyNFreeOrdersWord(n)} с этим товаром — следующая 1 шт. будет за 0 ₽`,
+  DETAILS_PROGRESS: (bought, n) =>
+    `${bought} из ${n} ${buyNFreeOrdersWord(n)}`,
+  DETAILS_REMAINING: (left) => {
+    if (left === 1) return "Остался 1 заказ";
+    return `Осталось ${left} ${buyNFreeOrdersWord(left)}`;
+  },
+  DETAILS_READY: "Подарок готов — добавьте в корзину",
+  DETAILS_READY_BADGE: "0 ₽",
+  DETAILS_PENDING_CLAIM: "Подарок уже в заказе",
+  DETAILS_STAMP_DONE: "Готово",
+  DETAILS_STAMP_NEXT: "Сейчас",
+  DETAILS_STAMP_GIFT: "Подарок",
+  DETAILS_LOGIN: "Войти",
+  DETAILS_ARIA: "Акция «Бесплатно от N»",
+  CART_FREE_UNIT: "1 шт. бесплатно",
+  CART_LINE_HINT: (paidQty, unitLabel) =>
+    paidQty > 0 ? `${paidQty} шт. × ${unitLabel} + 1 бесплатно` : "1 шт. бесплатно",
 };
 
 /** Описания бейджей в деталях товара (CMS + sheet). */
