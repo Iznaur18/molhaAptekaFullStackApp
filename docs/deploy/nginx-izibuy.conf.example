@@ -22,6 +22,12 @@ upstream izibuy_api {
     keepalive 32;
 }
 
+# Crawler’ы для Open Graph (WhatsApp/Telegram/VK/…) → API HTML, не SPA.
+map $http_user_agent $is_og_bot {
+    default 0;
+    ~*(facebookexternalhit|Facebot|Twitterbot|LinkedInBot|WhatsApp|TelegramBot|Slackbot|Discordbot|SkypeUriPreview|vkShare|VKRobot|Pinterest|redditbot|Embedly|Quora\ Link\ Preview|Showyoubot|outbrain|Googlebot|bingbot|YandexBot|DuckDuckBot|Baiduspider|Applebot|SemrushBot|developers\.google\.com/\+/web/snippet) 1;
+}
+
 # Редирект HTTP → HTTPS (раскомментируй после certbot или настрой вручную)
 # server {
 #     listen 80;
@@ -146,12 +152,25 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # SPA document: /product/:mongoId — люди (Accept: text/html) → index.html;
-    # иначе (crawler для Open Graph) → API, где контроллер по User-Agent отдаёт OG.
-    location ~ "^/product/[a-f\d]{24}$" {
-        if ($http_accept ~* ^text/html) {
-            rewrite ^ /index.html last;
+    # SPA document: /product/:mongoId — люди → index.html; crawler → API (OG).
+    location ~ "^/product/[a-fA-F\d]{24}$" {
+        error_page 418 = @gitorg_api_proxy;
+        error_page 419 = @product_spa;
+
+        if ($is_og_bot = 1) {
+            return 418;
         }
+        if ($http_accept ~* ^text/html) {
+            return 419;
+        }
+        return 418;
+    }
+
+    location @product_spa {
+        rewrite ^ /index.html last;
+    }
+
+    location @gitorg_api_proxy {
         proxy_pass http://izibuy_api;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
@@ -170,18 +189,13 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # Витрина /seller/:id — люди (Accept: text/html) → index.html;
-    # иначе (crawler) → API (OG). Зеркало product-блока.
-    location ~ "^/seller/[a-f\d]{24}$" {
-        if ($http_accept ~* ^text/html) {
-            rewrite ^ /index.html last;
+    # Витрина /seller/:id — crawler → API (OG); люди → SPA.
+    location ~ "^/seller/[a-fA-F\d]{24}$" {
+        error_page 418 = @gitorg_api_proxy;
+        if ($is_og_bot = 1) {
+            return 418;
         }
-        proxy_pass http://izibuy_api;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        rewrite ^ /index.html last;
     }
 
     location /address/ {
