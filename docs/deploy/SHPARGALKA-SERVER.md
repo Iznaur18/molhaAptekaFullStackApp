@@ -370,37 +370,37 @@ chmod 644 /etc/cron.d/gitorg-mongo-backup
 
 ### Offsite-копия в S3 (Selectel) — шифрованная
 
-Чтобы бэкап пережил отказ диска VPS, свежий дамп шифруется и заливается в Selectel Object Storage.
+Чтобы бэкап пережил отказ диска VPS, свежий дамп шифруется и заливается в Selectel Object Storage. **Настроено и проверено 2026-08-21** (бакет `gitorg-backups`, регион `ru-6`, round-trip восстановления пройден).
 
 | Что | Где |
 |---|---|
 | Скрипт выгрузки | `/usr/local/bin/gitorg-backup-offsite.sh` (gpg-AES256 → rclone → S3) |
 | Ключ шифрования | `/root/.gitorg-backup-pass` (root-only) — **БЕЗ него дамп не расшифровать** |
-| Настройки | `/etc/gitorg-backup.conf` (`REMOTE`, `BUCKET`, `REMOTE_KEEP=30`) |
-| rclone remote | `selectel` (в `/root/.config/rclone/rclone.conf`) |
+| Настройки | `/etc/gitorg-backup.conf` (`REMOTE=selectel`, `BUCKET=gitorg-backups`, `REMOTE_KEEP=30`) |
+| rclone remote | `selectel` → `s3.ru-6.storage.selcloud.ru` (в `/root/.config/rclone/rclone.conf`) |
+| Бакет | `gitorg-backups` (Москва / ru-6, приватный), объекты в `mongo/` |
 | Запуск | тем же cron `03:30` сразу после локального дампа |
 
 Скрипт **best-effort**: если `BUCKET`/rclone не настроены — он молча пропускает, локальный бэкап при этом идёт как обычно.
 
-**Первичная настройка (одноразово, нужны ключи из панели Selectel):**
+**Первичная настройка (одноразово, нужны ключи из панели Selectel) — уже выполнена, шаги на случай переустановки VPS:**
 
-1. В панели Selectel: создать бакет (контейнер) Object Storage + **S3-ключ** (access key + secret). Запомнить endpoint и регион.
-2. Прописать rclone remote (ключи вставляешь ты, значения не логируются):
+1. В панели Selectel → **Продукты → S3**: создать приватный бакет (напр. `gitorg-backups`) + **S3-ключ** (вкладка «Личные» = ключ «Мне», тогда не нужна отдельная политика доступа). Endpoint/регион показаны у бакета.
+2. Прописать rclone remote (ключи вставляешь ты — **замени плейсхолдеры на реальные значения**, иначе rclone запишет их дословно):
 
    ```bash
-   rclone config create selectel s3 \
-     provider Other \
+   rclone config create selectel s3 provider Other \
      access_key_id ТВОЙ_ACCESS_KEY \
      secret_access_key ТВОЙ_SECRET_KEY \
-     endpoint https://s3.storage.selcloud.ru \
-     region ru-1 acl private
+     endpoint https://s3.ru-6.storage.selcloud.ru \
+     region ru-6 acl private
    ```
 
-   (endpoint/регион сверь со своим в панели — бывают региональные, напр. `https://s3.ru-1.storage.selcloud.ru`.)
+   (endpoint/регион — как в панели у бакета; у нас `ru-6`. Проверить: `rclone config show selectel`.)
 3. Указать бакет:
 
    ```bash
-   sed -i 's/^BUCKET=.*/BUCKET=ИМЯ_БАКЕТА/' /etc/gitorg-backup.conf
+   sed -i 's/^BUCKET=.*/BUCKET=gitorg-backups/' /etc/gitorg-backup.conf
    ```
 4. **Сохранить ключ шифрования в менеджер паролей** (иначе offsite-копии бесполезны):
 
