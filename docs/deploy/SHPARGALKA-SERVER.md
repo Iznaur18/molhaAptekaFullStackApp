@@ -368,7 +368,62 @@ printf '%s\n' \
 chmod 644 /etc/cron.d/gitorg-mongo-backup
 ```
 
-> **На будущее:** архивы лежат на том же диске VPS. Для защиты от отказа диска копируй их ещё куда-то (S3/другой сервер).
+### Offsite-копия в S3 (Selectel) — шифрованная
+
+Чтобы бэкап пережил отказ диска VPS, свежий дамп шифруется и заливается в Selectel Object Storage.
+
+| Что | Где |
+|---|---|
+| Скрипт выгрузки | `/usr/local/bin/gitorg-backup-offsite.sh` (gpg-AES256 → rclone → S3) |
+| Ключ шифрования | `/root/.gitorg-backup-pass` (root-only) — **БЕЗ него дамп не расшифровать** |
+| Настройки | `/etc/gitorg-backup.conf` (`REMOTE`, `BUCKET`, `REMOTE_KEEP=30`) |
+| rclone remote | `selectel` (в `/root/.config/rclone/rclone.conf`) |
+| Запуск | тем же cron `03:30` сразу после локального дампа |
+
+Скрипт **best-effort**: если `BUCKET`/rclone не настроены — он молча пропускает, локальный бэкап при этом идёт как обычно.
+
+**Первичная настройка (одноразово, нужны ключи из панели Selectel):**
+
+1. В панели Selectel: создать бакет (контейнер) Object Storage + **S3-ключ** (access key + secret). Запомнить endpoint и регион.
+2. Прописать rclone remote (ключи вставляешь ты, значения не логируются):
+
+   ```bash
+   rclone config create selectel s3 \
+     provider Other \
+     access_key_id ТВОЙ_ACCESS_KEY \
+     secret_access_key ТВОЙ_SECRET_KEY \
+     endpoint https://s3.storage.selcloud.ru \
+     region ru-1 acl private
+   ```
+
+   (endpoint/регион сверь со своим в панели — бывают региональные, напр. `https://s3.ru-1.storage.selcloud.ru`.)
+3. Указать бакет:
+
+   ```bash
+   sed -i 's/^BUCKET=.*/BUCKET=ИМЯ_БАКЕТА/' /etc/gitorg-backup.conf
+   ```
+4. **Сохранить ключ шифрования в менеджер паролей** (иначе offsite-копии бесполезны):
+
+   ```bash
+   cat /root/.gitorg-backup-pass
+   ```
+5. Проверить:
+
+   ```bash
+   /usr/local/bin/gitorg-mongo-backup.sh && /usr/local/bin/gitorg-backup-offsite.sh
+   rclone ls selectel:ИМЯ_БАКЕТА/mongo/
+   ```
+
+**Восстановление из offsite:**
+
+```bash
+cd /var/www/gitorg/server
+rclone copy selectel:ИМЯ_БАКЕТА/mongo/gitorg-ДАТА.archive.gz.gpg /tmp/
+gpg --batch --pinentry-mode loopback --passphrase-file /root/.gitorg-backup-pass \
+    -d -o /tmp/restore.archive.gz /tmp/gitorg-ДАТА.archive.gz.gpg
+MONGO_URI="$(grep -E '^MONGO_URI=' .env | cut -d= -f2- | tr -d '"'"'"'"')"
+mongorestore --uri="$MONGO_URI" --gzip --drop --archive=/tmp/restore.archive.gz
+```
 
 ---
 
