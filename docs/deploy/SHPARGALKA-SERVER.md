@@ -298,18 +298,77 @@ git pull origin main
 
 ---
 
-## 11. Бэкап Mongo (хотя бы раз в неделю)
+## 11. Бэкап Mongo (настроен автоматически)
 
-URI бери **из** `/var/www/gitorg/server/.env` (`MONGO_URI`), не выдумывай.
+**С 2026-08-21 бэкап идёт сам** — вручную ничего запускать не надо.
 
-Пример (подставь свой URI):
+| Что | Где |
+|---|---|
+| Скрипт | `/usr/local/bin/gitorg-mongo-backup.sh` |
+| Расписание | cron `/etc/cron.d/gitorg-mongo-backup` — каждый день **03:30** |
+| Куда пишет | `/var/backups/gitorg-mongo/gitorg-ДАТА.archive.gz` (доступ только root) |
+| Хранит | последние **7** архивов (старые удаляются сами) |
+| Лог | `/var/log/gitorg-mongo-backup.log` |
+
+`MONGO_URI` скрипт читает **из** `/var/www/gitorg/server/.env` — руками URI подставлять не нужно.
+
+Проверить, что бэкапы идут:
 
 ```bash
-sudo mkdir -p /var/backups/gitorg-mongo
-mongodump --uri='ВСТАВЬ_MONGO_URI_ИЗ_ENV' --out=/var/backups/gitorg-mongo/$(date +%F)
+ls -lh /var/backups/gitorg-mongo/          # свежие архивы
+tail /var/log/gitorg-mongo-backup.log      # лог последних запусков
 ```
 
-Желательно копировать бэкап ещё куда-то вне одного диска VPS.
+Сделать бэкап прямо сейчас (например, перед рискованным изменением):
+
+```bash
+/usr/local/bin/gitorg-mongo-backup.sh
+```
+
+### Восстановление из бэкапа
+
+⚠️ `--drop` удалит текущие коллекции и зальёт их из архива. Делай осознанно (лучше сняв свежий бэкап перед этим).
+
+```bash
+cd /var/www/gitorg/server
+MONGO_URI="$(grep -E '^MONGO_URI=' .env | cut -d= -f2- | tr -d '"'"'"'"')"
+mongorestore --uri="$MONGO_URI" --gzip --drop \
+  --archive=/var/backups/gitorg-mongo/ВЫБЕРИ-АРХИВ.archive.gz
+```
+
+### Пересоздать бэкап на новом VPS (скрипт НЕ в git)
+
+Скрипт и cron живут только на сервере. При переустановке VPS создай заново:
+
+```bash
+cat > /usr/local/bin/gitorg-mongo-backup.sh <<'SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+umask 077
+ENV_FILE=/var/www/gitorg/server/.env
+BACKUP_ROOT=/var/backups/gitorg-mongo
+KEEP=7
+MONGO_URI="$(grep -E '^MONGO_URI=' "$ENV_FILE" | head -1 | cut -d= -f2-)"
+MONGO_URI="${MONGO_URI%\"}"; MONGO_URI="${MONGO_URI#\"}"
+MONGO_URI="${MONGO_URI%\'}"; MONGO_URI="${MONGO_URI#\'}"
+[ -n "$MONGO_URI" ] || { echo "MONGO_URI empty in $ENV_FILE" >&2; exit 1; }
+mkdir -p "$BACKUP_ROOT"
+STAMP="$(date +%F_%H%M%S)"
+ARCHIVE="$BACKUP_ROOT/gitorg-$STAMP.archive.gz"
+mongodump --uri="$MONGO_URI" --gzip --archive="$ARCHIVE" --quiet
+ls -1t "$BACKUP_ROOT"/gitorg-*.archive.gz 2>/dev/null | tail -n +$((KEEP+1)) | xargs -r rm -f
+echo "backup ok: $ARCHIVE"
+SCRIPT
+chmod 750 /usr/local/bin/gitorg-mongo-backup.sh
+
+printf '%s\n' \
+  '# Ежедневный бэкап Mongo для Gitorg' \
+  '30 3 * * * root /usr/local/bin/gitorg-mongo-backup.sh >> /var/log/gitorg-mongo-backup.log 2>&1' \
+  > /etc/cron.d/gitorg-mongo-backup
+chmod 644 /etc/cron.d/gitorg-mongo-backup
+```
+
+> **На будущее:** архивы лежат на том же диске VPS. Для защиты от отказа диска копируй их ещё куда-то (S3/другой сервер).
 
 ---
 
