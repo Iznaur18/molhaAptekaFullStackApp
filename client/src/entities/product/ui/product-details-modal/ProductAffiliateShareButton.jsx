@@ -79,7 +79,6 @@ export function ProductAffiliateShareButton({
     const title = String(product.productName ?? "").trim();
     void copyAndShareUrl({
       title: title || undefined,
-      text: url,
       url,
     })
       .then((result) => {

@@ -68,13 +68,17 @@ const devApiProxy = Object.fromEntries(
       bypass(req) {
         const pathname = (req.url ?? "").split("?")[0];
         const accept = req.headers.accept;
+        const userAgent = req.headers["user-agent"];
         if (prefix === "/user" && shouldServeUserProfileAsSpa(pathname, accept)) {
           return "/index.html";
         }
-        if (prefix === "/product" && shouldServeProductDetailsAsSpa(pathname, accept)) {
+        if (
+          prefix === "/product" &&
+          shouldServeProductDetailsAsSpa(pathname, accept, userAgent)
+        ) {
           return "/index.html";
         }
-        if (!shouldProxyToApi(prefix, pathname, accept)) {
+        if (!shouldProxyToApi(prefix, pathname, accept, userAgent)) {
           return "/index.html";
         }
       },

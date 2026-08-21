@@ -14,6 +14,8 @@ type CachedProductImageProps = {
   blurhash?: string | null;
   /** Приоритет загрузки: для первого экрана — "high". */
   priority?: "low" | "normal" | "high";
+  /** Размытие самого изображения (фон letterbox). */
+  blurRadius?: number;
 };
 
 export const CachedProductImage = ({
@@ -23,6 +25,7 @@ export const CachedProductImage = ({
   contentFit = "cover",
   blurhash,
   priority = "normal",
+  blurRadius,
 }: CachedProductImageProps) => {
   const styles = useCachedProductImageStyles();
 
@@ -48,6 +51,7 @@ export const CachedProductImage = ({
       // переиспользовании ячеек списка (виртуализация / FlashList).
       recyclingKey={uri}
       transition={200}
+      {...(typeof blurRadius === "number" ? { blurRadius } : null)}
     />
   );
 };

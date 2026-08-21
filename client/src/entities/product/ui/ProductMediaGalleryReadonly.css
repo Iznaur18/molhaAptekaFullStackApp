@@ -161,7 +161,7 @@
 
 .product-media-gallery-readonly__image {
   display: block;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
 }
 

@@ -39,8 +39,9 @@ const SHEET_CORNER_RADII = {
 type ProductBadgeExplainSheetProps = {
   visible: boolean;
   title: string;
-  badgeKey: ProductBadgeExplainKey | null;
-  fallbackKey: string;
+  badgeKey?: ProductBadgeExplainKey | null;
+  fallbackKey?: string;
+  description?: string | null;
   contactSellerUserId?: string | null;
   onClose: () => void;
   primaryActionLabel?: string | null;
@@ -130,8 +131,9 @@ const useStyles = createThemedStyles((theme) => ({
 export const ProductBadgeExplainSheet = ({
   visible,
   title,
-  badgeKey,
-  fallbackKey,
+  badgeKey = null,
+  fallbackKey = "listing_origin_unspecified",
+  description = null,
   contactSellerUserId = null,
   onClose,
   primaryActionLabel = null,
@@ -139,7 +141,12 @@ export const ProductBadgeExplainSheet = ({
 }: ProductBadgeExplainSheetProps) => {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
-  const adminByKey = useProductBadgeExplainByKeyMap({ enabled: visible });
+  const descriptionOverride =
+    typeof description === "string" ? description.trim() : "";
+  const hasDescriptionOverride = descriptionOverride.length > 0;
+  const adminByKey = useProductBadgeExplainByKeyMap({
+    enabled: visible && !hasDescriptionOverride,
+  });
   useRegisterBlockingOverlay(visible && !onPrimaryAction);
 
   const sellerId =
@@ -150,11 +157,14 @@ export const ProductBadgeExplainSheet = ({
   const [contactPending, setContactPending] = useState(false);
   const [contactError, setContactError] = useState("");
 
-  const content = resolveProductBadgeExplainSheetContent({
+  const resolvedContent = resolveProductBadgeExplainSheetContent({
     badgeKey,
     fallbackKey,
     adminRow: badgeKey ? (adminByKey.get(badgeKey) ?? null) : null,
   });
+  const content = hasDescriptionOverride
+    ? { description: descriptionOverride, imageUrl: null }
+    : resolvedContent;
 
   const imageSrc = content.imageUrl
     ? resolveUploadedMediaUrl(content.imageUrl)

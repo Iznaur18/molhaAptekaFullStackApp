@@ -62,7 +62,6 @@ export function SellerShareLinkButton({
 
     void copyAndShareUrl({
       title: title || undefined,
-      text: url,
       url,
     })
       .then((result) => {

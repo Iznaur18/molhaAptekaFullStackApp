@@ -93,6 +93,7 @@ export function ProductMediaGalleryReadonly({
           slide={slide}
           playVideoWhenVisible={false}
           loading="eager"
+          blurBackdrop
           imageClassName="product-media-gallery-readonly__image product-media-gallery-readonly__image--fill-hero"
           onVideoFailed={() => setPreviewVideoFailed(true)}
         />

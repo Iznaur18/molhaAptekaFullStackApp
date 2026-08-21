@@ -68,7 +68,7 @@ export const ProductAffiliateShareButton = ({
       await Clipboard.setStringAsync(url);
       setStatus(PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_COPIED);
       try {
-        await Share.share({ message: url, url });
+        await Share.share({ message: url });
       } catch {
         // cancelled
       }

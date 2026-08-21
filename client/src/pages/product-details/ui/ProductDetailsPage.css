@@ -177,7 +177,7 @@
 }
 
 .product-details-modal--page .product-media-gallery-readonly__image--fill-hero {
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
 }
 

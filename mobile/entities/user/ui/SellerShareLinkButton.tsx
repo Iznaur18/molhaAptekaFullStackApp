@@ -89,7 +89,6 @@ export const SellerShareLinkButton = ({
     try {
       await Share.share({
         message: url,
-        url,
         title: String(sellerName ?? "").trim() || undefined,
       });
     } catch (error) {

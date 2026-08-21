@@ -41,6 +41,10 @@ import { API_JSON_BODY_LIMIT } from "./constants/securityRateLimitConstants.js";
 import { resolveApiCorsMiddleware } from "./utils/resolveApiCorsMiddleware.js";
 import { resolveUploadContentType } from "./utils/resolveUploadContentType.js";
 import { UPLOADS_DIR } from "./utils/uploadsDir.js";
+import {
+  productLinkPreviewController,
+  sellerLinkPreviewController,
+} from "./controllers/LinkPreview/linkPreviewControllers.js";
 
 export const createApp = () => {
   const app = express();
@@ -90,6 +94,10 @@ export const createApp = () => {
   // Сквозной аудит staff-мутаций: слушатель на finish, пишет только если запрос
   // прошёл staff-гейт (req.staffAudit). Ставится до роутеров.
   app.use(auditStaffActionMW);
+
+  // Open Graph для crawler’ов (WhatsApp/Telegram/…) — до API-роутеров.
+  app.get("/product/:productId", productLinkPreviewController);
+  app.get("/seller/:sellerId", sellerLinkPreviewController);
 
   app.use("/upload", uploadRouter);
   app.use("/auth", authRouter);

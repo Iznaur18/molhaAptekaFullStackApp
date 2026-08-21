@@ -7,6 +7,7 @@
  */
 
 import { isHtmlDocumentAccept } from "./userProfilePaths.js";
+import { isLinkPreviewBotUserAgent } from "@izibuy/shared-lib";
 
 /** Только 24 hex — как `mongoIdSchema` в `@molha/api-contract`. */
 const PRODUCT_DETAILS_PATH_RE = /^\/product\/([a-f\d]{24})$/i;
@@ -30,10 +31,15 @@ export function isProductDetailsPath(pathname) {
 
 /**
  * Document navigation → SPA; API client → proxy (как `shouldServeUserProfileAsSpa`).
+ * Crawler UA → не SPA (нужен OG HTML с API).
  * @param {string} pathname
  * @param {string | undefined} acceptHeader
+ * @param {string | undefined} [userAgent]
  */
-export function shouldServeProductDetailsAsSpa(pathname, acceptHeader) {
+export function shouldServeProductDetailsAsSpa(pathname, acceptHeader, userAgent) {
+  if (isLinkPreviewBotUserAgent(userAgent)) {
+    return false;
+  }
   return isProductDetailsPath(pathname) && isHtmlDocumentAccept(acceptHeader);
 }
 
@@ -42,15 +48,16 @@ export function shouldServeProductDetailsAsSpa(pathname, acceptHeader) {
  * Без Accept — всегда API (XHR/axios), чтобы PATCH `/product/:id` не ловил SPA.
  * @param {string} pathname
  * @param {string | undefined} [acceptHeader]
+ * @param {string | undefined} [userAgent]
  */
-export function shouldProxyProductPathToApi(pathname, acceptHeader) {
+export function shouldProxyProductPathToApi(pathname, acceptHeader, userAgent) {
   if (pathname === "/product") {
     return true;
   }
   if (!pathname.startsWith("/product/")) {
     return false;
   }
-  if (shouldServeProductDetailsAsSpa(pathname, acceptHeader)) {
+  if (shouldServeProductDetailsAsSpa(pathname, acceptHeader, userAgent)) {
     return false;
   }
   return true;

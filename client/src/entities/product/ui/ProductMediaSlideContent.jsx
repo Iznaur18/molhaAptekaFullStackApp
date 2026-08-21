@@ -12,6 +12,7 @@ import "./ProductMediaSlideContent.css";
  *   imageClassName?: string;
  *   onImageError?: () => void;
  *   loading?: 'lazy' | 'eager';
+ *   blurBackdrop?: boolean;
  * }} props
  */
 export function ProductMediaSlideContent({
@@ -21,6 +22,7 @@ export function ProductMediaSlideContent({
   imageClassName = "",
   onImageError,
   loading = "lazy",
+  blurBackdrop = false,
 }) {
   const imgRef = useRef(/** @type {HTMLImageElement | null} */ (null));
   const [isLoaded, setIsLoaded] = useState(false);
@@ -50,7 +52,7 @@ export function ProductMediaSlideContent({
     );
   }
 
-  return (
+  const image = (
     <img
       ref={imgRef}
       className={[
@@ -70,5 +72,29 @@ export function ProductMediaSlideContent({
       }}
       onError={onImageError}
     />
+  );
+
+  if (!blurBackdrop) {
+    return image;
+  }
+
+  return (
+    <div className="product-media-slide-content product-media-slide-content--blur-backdrop">
+      <img
+        className={[
+          "product-media-slide-content__blur",
+          isLoaded ? "product-media-slide-content__blur--loaded" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        src={slide.url}
+        alt=""
+        aria-hidden="true"
+        loading={loading}
+        decoding="async"
+        draggable={false}
+      />
+      {image}
+    </div>
   );
 }

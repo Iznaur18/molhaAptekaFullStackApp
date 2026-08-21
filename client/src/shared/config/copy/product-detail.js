@@ -251,6 +251,10 @@ export const PRODUCT_BUY_N_FREE_UI = {
   DETAILS_STAMP_GIFT: "Подарок",
   DETAILS_LOGIN: "Войти",
   DETAILS_ARIA: "Акция «Бесплатно от N»",
+  DETAILS_INFO_ARIA: "Как работает акция",
+  DETAILS_EXPLAIN_TITLE: "Как работает акция",
+  DETAILS_EXPLAIN: (n) =>
+    `Сделайте ${n} ${buyNFreeOrdersWord(n)} с этим товаром — следующая 1 шт. будет за 0 ₽. Считаются завершённые заказы, а не количество штук. Прогресс сохраняется в вашем аккаунте.`,
   CART_FREE_UNIT: "1 шт. бесплатно",
   CART_LINE_HINT: (paidQty, unitLabel) =>
     paidQty > 0 ? `${paidQty} шт. × ${unitLabel} + 1 бесплатно` : "1 шт. бесплатно",

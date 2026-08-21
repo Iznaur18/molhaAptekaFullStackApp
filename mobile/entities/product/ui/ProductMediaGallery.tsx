@@ -109,6 +109,7 @@ export const ProductMediaGallery = ({
             <ProductMediaSlideContent
               slide={mediaSlides[index] ?? null}
               imageStyle={styles.media}
+              blurBackdrop={isDetail}
               onVideoFailed={() => setPreviewVideoFailed(true)}
             />
           )}

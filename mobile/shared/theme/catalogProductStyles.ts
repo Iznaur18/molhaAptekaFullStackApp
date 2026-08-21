@@ -1674,6 +1674,7 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
     ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   buyNFreeCard: {
+    position: "relative" as const,
     marginTop: 0,
     gap: 12,
     paddingHorizontal: 14,
@@ -1688,10 +1689,23 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
     backgroundColor: "rgba(31, 122, 77, 0.12)",
     borderColor: "rgba(31, 122, 77, 0.4)",
   },
+  buyNFreeInfo: {
+    position: "absolute" as const,
+    top: 10,
+    right: 10,
+    zIndex: 1,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
+    backgroundColor: theme.colors.surface,
+  },
   buyNFreeHead: {
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 12,
+    paddingRight: 36,
   },
   buyNFreeCopy: {
     flex: 1,

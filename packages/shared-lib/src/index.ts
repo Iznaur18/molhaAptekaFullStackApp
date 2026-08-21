@@ -4,6 +4,7 @@ export {
 } from "./formatApiErrorMessage.js";
 export { formatIsoDateTime } from "./formatIsoDateTime.js";
 export { formatPriceRub } from "./formatPriceRub.js";
+export { isLinkPreviewBotUserAgent } from "./isLinkPreviewBotUserAgent.js";
 export { normalizeUploadUrlForStorage } from "./normalizeUploadUrlForStorage.js";
 export { resolveUploadedImageUrlForBrowser } from "./resolveUploadedImageUrlForBrowser.js";
 export {

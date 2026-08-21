@@ -76,7 +76,7 @@ export const ProductShareLinkButton = ({
       console.error("Product share clipboard failed", error);
     }
     try {
-      await Share.share({ message: url, url });
+      await Share.share({ message: url });
     } catch (error) {
       if (!(error instanceof Error && /cancel/i.test(error.message))) {
         console.error("Product share sheet failed", error);

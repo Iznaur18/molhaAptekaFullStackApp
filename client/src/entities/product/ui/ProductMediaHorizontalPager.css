@@ -49,6 +49,12 @@
   object-position: center;
 }
 
+.product-media-horizontal-pager__slide
+  .product-media-slide-content--blur-backdrop
+  .product-media-gallery-readonly__image--fill-hero {
+  object-fit: contain;
+}
+
 .product-media-horizontal-pager__slide .product-preview-video {
   position: absolute;
   inset: 0;

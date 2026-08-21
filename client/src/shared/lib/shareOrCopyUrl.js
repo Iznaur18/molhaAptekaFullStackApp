@@ -42,12 +42,13 @@ export async function copyAndShareUrl({ title, text, url }) {
     throw new Error("Share url is empty");
   }
 
-  const shareText =
-    text != null && String(text).trim() !== "" ? String(text) : shareUrl;
+  // Не класть один и тот же URL в text и url — Windows/Chrome Share склеивает в «url url».
+  const rawText = text != null ? String(text).trim() : "";
+  const shareText = rawText && rawText !== shareUrl ? rawText : "";
   /** @type {ShareData} */
   const fullData = {
     ...(title ? { title: String(title) } : {}),
-    text: shareText,
+    ...(shareText ? { text: shareText } : {}),
     url: shareUrl,
   };
 
@@ -58,7 +59,7 @@ export async function copyAndShareUrl({ title, text, url }) {
     /** @type {ShareData} */
     let payload = fullData;
     if (typeof navigator.canShare === "function" && !navigator.canShare(fullData)) {
-      payload = { text: shareText };
+      payload = { text: shareText || shareUrl };
       if (!navigator.canShare(payload)) {
         payload = fullData;
       }

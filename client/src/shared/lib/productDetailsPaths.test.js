@@ -31,6 +31,9 @@ describe("productDetailsPaths", () => {
       shouldServeProductDetailsAsSpa(DETAILS_PATH, "application/json, text/plain, */*"),
     ).toBe(false);
     expect(shouldServeProductDetailsAsSpa("/product/my", "text/html")).toBe(false);
+    expect(
+      shouldServeProductDetailsAsSpa(DETAILS_PATH, "text/html", "WhatsApp/2.0"),
+    ).toBe(false);
   });
 
   it("shouldProxyProductPathToApi: XHR to /product/:id goes to API", () => {
@@ -40,6 +43,9 @@ describe("productDetailsPaths", () => {
       shouldProxyProductPathToApi(DETAILS_PATH, "application/json, text/plain, */*"),
     ).toBe(true);
     expect(shouldProxyProductPathToApi(DETAILS_PATH, "text/html")).toBe(false);
+    expect(
+      shouldProxyProductPathToApi(DETAILS_PATH, "text/html", "WhatsApp/2.0"),
+    ).toBe(true);
     expect(shouldProxyProductPathToApi(`${DETAILS_PATH}/catalog`)).toBe(true);
     expect(shouldProxyProductPathToApi("/product/my")).toBe(true);
     expect(shouldProxyProductPathToApi("/product/categories/roots")).toBe(true);

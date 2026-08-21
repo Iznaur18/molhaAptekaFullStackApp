@@ -20,8 +20,23 @@ describe("shouldProxyToApi", () => {
   it("lists users-loyalty-raffle among proxy prefixes", () => {
     expect(DEV_API_PROXY_PREFIXES).toContain("/users-loyalty-raffle");
     expect(DEV_API_PROXY_PREFIXES).toContain("/seller-shelf");
+    expect(DEV_API_PROXY_PREFIXES).toContain("/seller");
+    expect(DEV_API_PROXY_PREFIXES.indexOf("/seller-shelf")).toBeLessThan(
+      DEV_API_PROXY_PREFIXES.indexOf("/seller"),
+    );
     expect(DEV_API_PROXY_PREFIXES.indexOf("/uploads")).toBeLessThan(
       DEV_API_PROXY_PREFIXES.indexOf("/upload"),
     );
+  });
+
+  it("proxies /seller/:id only for link-preview bots", () => {
+    const path = "/seller/6a871e02e4b218aa47757078";
+    expect(shouldProxyToApi("/seller", path, "text/html")).toBe(false);
+    expect(shouldProxyToApi("/seller", path, "text/html", "WhatsApp/2.0")).toBe(
+      true,
+    );
+    expect(
+      shouldProxyToApi("/seller", "/seller-shelf/me", "text/html", "WhatsApp/2.0"),
+    ).toBe(false);
   });
 });

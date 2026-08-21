@@ -57,7 +57,6 @@ export function ProductShareLinkButton({ product }) {
     // хелпера синхронно зовёт navigator.share.
     void copyAndShareUrl({
       title: title || undefined,
-      text: url,
       url,
     })
       .then((result) => {

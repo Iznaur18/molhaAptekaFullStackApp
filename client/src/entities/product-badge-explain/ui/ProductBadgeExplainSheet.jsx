@@ -23,8 +23,9 @@ const TITLE_ID = "product-badge-explain-sheet-title";
  * @param {{
  *   isOpen: boolean;
  *   title: string;
- *   badgeKey: import("@izibuy/shared-lib").ProductBadgeExplainKey | null;
- *   fallbackKey: string;
+ *   badgeKey?: import("@izibuy/shared-lib").ProductBadgeExplainKey | null;
+ *   fallbackKey?: string;
+ *   description?: string | null;
  *   contactSellerUserId?: string | null;
  *   onClose: () => void;
  *   primaryActionLabel?: string | null;
@@ -34,8 +35,9 @@ const TITLE_ID = "product-badge-explain-sheet-title";
 export function ProductBadgeExplainSheet({
   isOpen,
   title,
-  badgeKey,
-  fallbackKey,
+  badgeKey = null,
+  fallbackKey = "listing_origin_unspecified",
+  description = null,
   contactSellerUserId = null,
   onClose,
   primaryActionLabel = null,
@@ -44,7 +46,12 @@ export function ProductBadgeExplainSheet({
   const panelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const closeButtonRef = useRef(/** @type {HTMLElement | null} */ (null));
   const { mounted, isVisible } = useWholesalePriceSheetAnimation(isOpen);
-  const adminByKey = useProductBadgeExplainByKeyMap({ enabled: true });
+  const descriptionOverride =
+    typeof description === "string" ? description.trim() : "";
+  const hasDescriptionOverride = descriptionOverride.length > 0;
+  const adminByKey = useProductBadgeExplainByKeyMap({
+    enabled: !hasDescriptionOverride,
+  });
 
   const sellerId =
     typeof contactSellerUserId === "string" ? contactSellerUserId.trim() : "";
@@ -56,11 +63,14 @@ export function ProductBadgeExplainSheet({
   const [contactPending, setContactPending] = useState(false);
   const [contactError, setContactError] = useState("");
 
-  const content = resolveProductBadgeExplainSheetContent({
+  const resolvedContent = resolveProductBadgeExplainSheetContent({
     badgeKey,
     fallbackKey,
     adminRow: badgeKey ? adminByKey.get(badgeKey) ?? null : null,
   });
+  const content = hasDescriptionOverride
+    ? { description: descriptionOverride, imageUrl: null }
+    : resolvedContent;
 
   const imageSrc = content.imageUrl
     ? resolveUploadedImageUrl(content.imageUrl)

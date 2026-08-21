@@ -7,8 +7,47 @@
   opacity: 1;
 }
 
+.product-media-slide-content--blur-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--iz-color-surface-muted, var(--iz-color-border));
+}
+
+.product-media-slide-content__blur {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: blur(28px) saturate(1.05);
+  transform: scale(1.16);
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
+  pointer-events: none;
+  user-select: none;
+}
+
+.product-media-slide-content__blur--loaded {
+  opacity: 1;
+}
+
+.product-media-slide-content--blur-backdrop .product-media-slide-content__image {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .product-media-slide-content__image {
+  .product-media-slide-content__image,
+  .product-media-slide-content__blur {
     opacity: 1;
     transition: none;
   }
