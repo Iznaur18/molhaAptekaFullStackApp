@@ -198,7 +198,7 @@
 .installment-buyer-block__total-value {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--iz-color-ink);
+  color: var(--iz-color-text);
 }
 
 .installment-buyer-block__section {
