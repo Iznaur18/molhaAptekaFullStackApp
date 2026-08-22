@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { CATALOG_SEARCH_QUERY_MAX_LENGTH } from "@molha/api-contract";
 
 /** @typedef {import('../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
 
@@ -85,8 +86,10 @@ export function useShellUiState() {
    * @param {string} next
    */
   const setProductSearchTerm = useCallback((next) => {
-    setProductSearchTermState(next);
-    if (next.trim() === "") {
+    const capped =
+      typeof next === "string" ? next.slice(0, CATALOG_SEARCH_QUERY_MAX_LENGTH) : next;
+    setProductSearchTermState(capped);
+    if (String(capped).trim() === "") {
       setSubmittedProductSearchTerm("");
     }
   }, []);

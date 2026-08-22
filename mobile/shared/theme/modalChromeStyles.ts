@@ -1378,7 +1378,8 @@ export const useInstallmentPassportShareConsentModalStyles = createThemedStyles(
     backgroundColor: theme.colors.nearBlack,
   },
   confirmButtonText: {
-    color: theme.colors.onContrast,
+    /* Dark: onContrast тёмный (для серебряных action-кнопок) — на ink-кнопке нужен белый. */
+    color: theme.colors.onContrast === "#12151b" ? "#ffffff" : theme.colors.onContrast,
     fontWeight: "600",
     fontSize: 14,
     textAlign: "center",

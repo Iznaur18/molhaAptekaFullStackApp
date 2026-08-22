@@ -16,7 +16,7 @@ export const AUTH_UI = {
   SHOW_PASSWORD_ARIA: "Показать пароль",
   HIDE_PASSWORD_ARIA: "Скрыть пароль",
   USER_NAME_LABEL: "Имя пользователя",
-  USER_NAME_PLACEHOLDER: "username",
+  USER_NAME_PLACEHOLDER: "user.name",
   LOGIN_BUTTON: "Войти",
   REGISTER_BUTTON: "Зарегистрироваться",
   LOGOUT_BUTTON: "Выйти",
@@ -118,7 +118,7 @@ export const REGISTER_MODAL_UI = {
   HIDE_PASSWORD_ARIA: "Скрыть пароль",
   LABEL_USERNAME: "Никнейм",
   USERNAME_HINT:
-    "Только a–z и 0–9, без пробелов, 3–30 символов (как одно слово в нижнем регистре).",
+    "a–z, 0–9, точка и подчёркивание; точка не с краёв и не подряд (..); 3–30 символов, нижний регистр.",
   SUBMIT_IDLE: "Зарегистрироваться",
   SUBMIT_LOADING: "Регистрация…",
   ERROR_GENERIC: "Ошибка при регистрации",

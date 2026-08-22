@@ -12,6 +12,7 @@ import {
   CATALOG_QUERY_PARAM_SALE_ONLY,
   CATALOG_QUERY_PARAM_SELLER_PERSONAL_CATEGORY_ID,
   CATALOG_QUERY_PARAM_SORT,
+  CATALOG_QUERY_PARAM_BUY_N_FREE_ONLY,
   CATALOG_QUERY_PARAM_WHOLESALE_ONLY,
 } from "../../product/lib/catalogCatalogQuery.js";
 import { CATALOG_SORT_NEWEST } from "../../product/model/productConstants.js";
@@ -38,6 +39,7 @@ export function isCatalogBrowserLandingSearch(search, hasProductSearchQuery) {
     !params.has(CATALOG_QUERY_PARAM_RENTAL_ONLY) &&
     !params.has(CATALOG_QUERY_PARAM_AFFILIATE_ONLY) &&
     !params.has(CATALOG_QUERY_PARAM_WHOLESALE_ONLY) &&
+    !params.has(CATALOG_QUERY_PARAM_BUY_N_FREE_ONLY) &&
     !params.has(CATALOG_QUERY_PARAM_ORIGINAL_ONLY) &&
     !params.has(CATALOG_QUERY_PARAM_NEAR) &&
     !params.has(CATALOG_QUERY_PARAM_FLASH_SALE_ONLY)
@@ -67,6 +69,7 @@ export function isExplicitCatalogNewestFeedSearch(search) {
     !params.has(CATALOG_QUERY_PARAM_RENTAL_ONLY) &&
     !params.has(CATALOG_QUERY_PARAM_AFFILIATE_ONLY) &&
     !params.has(CATALOG_QUERY_PARAM_WHOLESALE_ONLY) &&
+    !params.has(CATALOG_QUERY_PARAM_BUY_N_FREE_ONLY) &&
     !params.has(CATALOG_QUERY_PARAM_ORIGINAL_ONLY) &&
     !params.has(CATALOG_QUERY_PARAM_NEAR) &&
     !params.has(CATALOG_QUERY_PARAM_FLASH_SALE_ONLY)

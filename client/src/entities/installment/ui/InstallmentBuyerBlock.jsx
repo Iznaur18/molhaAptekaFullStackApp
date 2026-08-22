@@ -1,14 +1,18 @@
 import { useEffect, useId, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import {
+  doProductsSupportPickup,
+  doProductsSupportSellerDelivery,
+} from "@molha/api-contract";
 
-import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.jsx";
-import { addressValueFromUser } from "../../address/lib/addressValueFromUser.js";
-import { validateRuDeliveryAddressForm } from "../../address/lib/validateRuDeliveryAddressForm.js";
+import { buildCheckoutPickupLocations } from "../../cart/lib/buildCheckoutPickupLocations.js";
 import { ORDER_PAYMENT_METHOD_DEFAULT } from "../../order/model/constants.js";
-import { CheckoutPaymentMethodPicker } from "../../../features/checkout/ui/CheckoutPaymentMethodPicker.jsx";
+import { useAuthSession } from "../../user/model/useAuthSession.js";
+import { CheckoutSheetModal } from "../../../features/checkout/ui/CheckoutSheetModal.jsx";
 import { useInstallmentMutations } from "../model/useInstallmentMutations.js";
 import { resolveInstallmentPlanPriceSummary } from "../lib/resolveInstallmentPlanPriceSummary.js";
-import { INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
+import { resolveInstallmentDeliveryFromSheet } from "../lib/resolveInstallmentDeliveryFromSheet.js";
+import { CHECKOUT_FORM_UI, INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { useAppShellCompactLayout } from "../../../shared/lib/useAppShellCompactLayout.js";
 import { useProductDetailsPageDockHost } from "../../../shared/lib/productDetailsPageDockHostContext.js";
@@ -24,11 +28,6 @@ import "./InstallmentBuyerBlockMobile.css";
  *   program: import("../model/types.js").InstallmentProgramFromApi;
  *   isAuthorized: boolean;
  *   isUserDataConfirmed: boolean;
- *   defaultDeliveryAddress?: Partial<{
- *     userAddress?: string;
- *     userAddressFlat?: string;
- *     userAddressFiasId?: string;
- *   }>;
  *   dockSubmit?: boolean;
  *   onSuccess?: () => void;
  *   onRequestLogin?: () => void;
@@ -39,26 +38,29 @@ export function InstallmentBuyerBlock({
   program,
   isAuthorized,
   isUserDataConfirmed,
-  defaultDeliveryAddress = {},
   dockSubmit: dockSubmitProp,
   onSuccess,
   onRequestLogin,
 }) {
   const { createContractMutation } = useInstallmentMutations();
+  const { user: authUser } = useAuthSession();
   const formId = useId();
   const isCompactLayout = useAppShellCompactLayout();
   const pageDockHost = useProductDetailsPageDockHost();
   const dockSubmit = dockSubmitProp ?? isCompactLayout;
   const [selectedPlanId, setSelectedPlanId] = useState(program.plans[0]?._id ?? "");
   const [quantityRaw, setQuantityRaw] = useState("1");
-  const [deliveryAddress, setDeliveryAddress] = useState(() =>
-    addressValueFromUser(defaultDeliveryAddress),
-  );
-  const [paymentMethod, setPaymentMethod] = useState(ORDER_PAYMENT_METHOD_DEFAULT);
   const isSubmitting = createContractMutation.isPending;
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isCheckoutSheetOpen, setIsCheckoutSheetOpen] = useState(false);
   const [isConsentOpen, setIsConsentOpen] = useState(false);
+  const [pendingCheckout, setPendingCheckout] = useState(
+    /** @type {null | { deliveryAddress: string; deliveryAddressFlat: string; paymentMethod: string }} */ (
+      null
+    ),
+  );
+  const [sheetSubmitError, setSheetSubmitError] = useState("");
 
   const purchaseLimit = getProductPurchaseLimit(product);
   const selectedPlan = program.plans.find(
@@ -85,6 +87,31 @@ export function InstallmentBuyerBlock({
   const contractTotal =
     selectedPlan != null ? monthlyTotal * selectedPlan.monthsCount : 0;
 
+  const pickupLocations = useMemo(
+    () => buildCheckoutPickupLocations([{ product }]),
+    [product],
+  );
+  const pickupAvailable = useMemo(
+    () => doProductsSupportPickup([product]),
+    [product],
+  );
+  const deliveryAvailable = useMemo(
+    () => doProductsSupportSellerDelivery([product]),
+    [product],
+  );
+
+  const defaultDeliveryAddress = useMemo(() => {
+    if (!isAuthorized || !authUser) {
+      return {};
+    }
+    return {
+      userAddress: authUser.userAddress,
+      userAddressFlat: authUser.userAddressFlat,
+      userAddressFiasId: authUser.userAddressFiasId,
+      userAddressGeo: authUser.userAddressGeo,
+    };
+  }, [authUser, isAuthorized]);
+
   useEffect(() => {
     setSelectedPlanId(program.plans[0]?._id ?? "");
   }, [program.plans]);
@@ -98,21 +125,13 @@ export function InstallmentBuyerBlock({
     return next;
   };
 
-  const validateCheckoutForm = () => {
+  const validatePlanAndQuantity = () => {
     if (!isAuthorized) {
       onRequestLogin?.();
       return false;
     }
     if (!isUserDataConfirmed) {
       setError(INSTALLMENT_UI.BUYER_REQUIRES_CONFIRMED);
-      return false;
-    }
-
-    const addressError = validateRuDeliveryAddressForm(deliveryAddress, {
-      required: true,
-    });
-    if (addressError) {
-      setError(addressError);
       return false;
     }
     if (!selectedPlanId) {
@@ -133,19 +152,45 @@ export function InstallmentBuyerBlock({
     return true;
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const openCheckoutSheet = () => {
     setError("");
     setSuccess("");
-    if (!validateCheckoutForm()) {
+    setSheetSubmitError("");
+    if (!validatePlanAndQuantity()) {
       return;
     }
+    setIsCheckoutSheetOpen(true);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    openCheckoutSheet();
+  };
+
+  const handleCheckoutSheetSubmit = (sheetPayload) => {
+    const resolved = resolveInstallmentDeliveryFromSheet(sheetPayload, product);
+    if (!resolved.deliveryAddress) {
+      setSheetSubmitError(CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED);
+      return;
+    }
+    setPendingCheckout({
+      deliveryAddress: resolved.deliveryAddress,
+      deliveryAddressFlat: resolved.deliveryAddressFlat,
+      paymentMethod: resolved.paymentMethod || ORDER_PAYMENT_METHOD_DEFAULT,
+    });
+    setSheetSubmitError("");
+    setIsCheckoutSheetOpen(false);
     setIsConsentOpen(true);
   };
 
   const handleConsentConfirm = async () => {
     setError("");
     setSuccess("");
+    if (pendingCheckout == null) {
+      setIsConsentOpen(false);
+      setError(INSTALLMENT_UI.ERROR_GENERIC);
+      return;
+    }
     const nextQty = normalizeQuantityRaw();
     if (purchaseLimit <= 0 || nextQty > purchaseLimit) {
       setIsConsentOpen(false);
@@ -158,13 +203,14 @@ export function InstallmentBuyerBlock({
         body: {
           planId: String(selectedPlanId),
           quantity: nextQty,
-          deliveryAddress: deliveryAddress.line.trim(),
-          deliveryAddressFlat: deliveryAddress.flat.trim() || undefined,
-          paymentMethod,
+          deliveryAddress: pendingCheckout.deliveryAddress,
+          deliveryAddressFlat: pendingCheckout.deliveryAddressFlat || undefined,
+          paymentMethod: pendingCheckout.paymentMethod,
           passportShareConsent: true,
         },
       });
       setIsConsentOpen(false);
+      setPendingCheckout(null);
       setSuccess(INSTALLMENT_UI.CONTRACT_SUCCESS);
       onSuccess?.();
     } catch (e) {
@@ -188,10 +234,11 @@ export function InstallmentBuyerBlock({
 
   const renderSubmitButton = (linkedToForm) => (
     <button
-      type="submit"
+      type={linkedToForm ? "submit" : "button"}
       className="installment-buyer-block__submit"
       form={linkedToForm ? formId : undefined}
       disabled={isSubmitDisabled}
+      onClick={linkedToForm ? undefined : openCheckoutSheet}
     >
       {submitLabel}
     </button>
@@ -345,24 +392,6 @@ export function InstallmentBuyerBlock({
           </div>
         ) : null}
 
-        <div className="installment-buyer-block__section">
-          <div className="installment-buyer-block__address">
-            <AddressDeliveryFields
-              value={deliveryAddress}
-              onChange={setDeliveryAddress}
-              disabled={isSubmitting}
-              lineInputClassName="installment-buyer-block__input"
-            />
-          </div>
-
-          <CheckoutPaymentMethodPicker
-            value={paymentMethod}
-            onChange={setPaymentMethod}
-            disabled={isSubmitting}
-            legend={INSTALLMENT_UI.PAYMENT_METHOD_LABEL}
-          />
-        </div>
-
         {error ? (
           <p className="installment-buyer-block__error" role="alert">
             {error}
@@ -377,10 +406,31 @@ export function InstallmentBuyerBlock({
         {!dockSubmit ? renderSubmitButton(false) : null}
       </form>
       {dockedSubmit}
+
+      <CheckoutSheetModal
+        isOpen={isCheckoutSheetOpen}
+        onClose={() => {
+          setIsCheckoutSheetOpen(false);
+          setSheetSubmitError("");
+        }}
+        defaultDeliveryAddress={defaultDeliveryAddress}
+        pickupLocations={pickupLocations}
+        deliveryAvailable={deliveryAvailable}
+        pickupAvailable={pickupAvailable}
+        isSubmitting={false}
+        submitError={sheetSubmitError}
+        submitSuccess=""
+        isDisabled={isSubmitDisabled}
+        onSubmit={handleCheckoutSheetSubmit}
+      />
+
       <InstallmentPassportShareConsentModal
         isOpen={isConsentOpen}
         isConfirming={isSubmitting}
-        onClose={() => setIsConsentOpen(false)}
+        onClose={() => {
+          setIsConsentOpen(false);
+          setPendingCheckout(null);
+        }}
         onConfirm={() => {
           void handleConsentConfirm();
         }}

@@ -97,6 +97,7 @@ export function useCatalogProductsInfiniteQuery({
         rentalOnly: Boolean(listParams.rentalOnly),
         affiliateOnly: Boolean(listParams.affiliateOnly),
         wholesaleOnly: Boolean(listParams.wholesaleOnly),
+        buyNFreeOnly: Boolean(listParams.buyNFreeOnly),
         originalOnly: Boolean(listParams.originalOnly),
         near: Boolean(listParams.near),
         flashSaleOnly: Boolean(listParams.flashSaleOnly),

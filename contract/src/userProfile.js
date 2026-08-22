@@ -10,6 +10,7 @@ import {
   ADDRESS_LINE_MAX_LENGTH,
   USER_BACKGROUND_PRESET_IDS,
   USER_GENDER_VALUES,
+  assertUserNameFormat,
   normalizeRuPhoneInput,
   normalizeUserNameInput,
   RU_PHONE_E164_REGEX,
@@ -85,28 +86,12 @@ const clearableUserNameSchema = clearableOptionalString
   })
   .superRefine((value, ctx) => {
     if (value === undefined || value === null) return;
-    const USER_NAME_MIN_LENGTH = 3;
-    const USER_NAME_MAX_LENGTH = 30;
-    const USER_NAME_REGEX = /^[a-z0-9]+$/;
-    if (value.length < USER_NAME_MIN_LENGTH) {
+    try {
+      assertUserNameFormat(value);
+    } catch (error) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Никнейм не короче ${USER_NAME_MIN_LENGTH} символов`,
-      });
-      return;
-    }
-    if (value.length > USER_NAME_MAX_LENGTH) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Никнейм не длиннее ${USER_NAME_MAX_LENGTH} символов`,
-      });
-      return;
-    }
-    if (!USER_NAME_REGEX.test(value)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message:
-          "Никнейм: только строчные латинские буквы (a–z) и цифры (0–9), без пробелов и других символов",
+        message: error instanceof Error ? error.message : "Неверный никнейм",
       });
     }
   });

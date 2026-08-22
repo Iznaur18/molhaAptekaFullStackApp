@@ -11,6 +11,7 @@ type HomeCatalogMainViewParams = {
   rentalOnly: boolean;
   affiliateOnly: boolean;
   wholesaleOnly: boolean;
+  buyNFreeOnly: boolean;
   originalOnly: boolean;
   near?: boolean;
 };
@@ -28,6 +29,7 @@ export const isHomeCatalogMainView = ({
   rentalOnly,
   affiliateOnly,
   wholesaleOnly,
+  buyNFreeOnly,
   originalOnly,
   near = false,
 }: HomeCatalogMainViewParams) =>
@@ -43,5 +45,6 @@ export const isHomeCatalogMainView = ({
   !rentalOnly &&
   !affiliateOnly &&
   !wholesaleOnly &&
+  !buyNFreeOnly &&
   !originalOnly &&
   !near;

@@ -121,7 +121,7 @@ export const EDIT_PROFILE_MODAL_UI = {
   LABEL_EMAIL: "Email",
   LABEL_USERNAME: "Никнейм",
   USERNAME_HINT:
-    "Только a–z и 0–9, без пробелов, 3–30 символов. Пусто — не менять ник.",
+    "a–z, 0–9, . и _; точка не с краёв и не подряд (..); 3–30 символов. Пусто — не менять ник.",
   LABEL_PHONE: "Телефон",
   PHONE_NOT_VERIFIED: "Номер не подтверждён",
   PHONE_VERIFIED: "Номер подтверждён",

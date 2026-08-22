@@ -1,6 +1,7 @@
 import {
   CATALOG_FILTER_AFFILIATE_ONLY,
   CATALOG_FILTER_AUCTION_ONLY,
+  CATALOG_FILTER_BUY_N_FREE_ONLY,
   CATALOG_FILTER_FLASH_SALE_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
@@ -9,6 +10,7 @@ import {
   CATALOG_FILTER_SALE_ONLY,
   CATALOG_FILTER_WHOLESALE_ONLY,
   CATALOG_SORT_NEWEST,
+  CATALOG_SORT_PURCHASES,
 } from "../../product/model/productConstants.js";
 
 /**
@@ -24,6 +26,7 @@ import {
  *   rentalOnly: boolean;
  *   affiliateOnly: boolean;
  *   wholesaleOnly: boolean;
+ *   buyNFreeOnly: boolean;
  *   originalOnly: boolean;
  *   near: boolean;
  *   flashSaleOnly: boolean;
@@ -41,6 +44,7 @@ const baseFeedQuery = () => ({
   rentalOnly: false,
   affiliateOnly: false,
   wholesaleOnly: false,
+  buyNFreeOnly: false,
   originalOnly: false,
   near: false,
   flashSaleOnly: false,
@@ -89,6 +93,14 @@ export function buildQueryForCatalogFeedTile(tile) {
     return { ...baseFeedQuery(), wholesaleOnly: true };
   }
 
+  if (tile.value === CATALOG_FILTER_BUY_N_FREE_ONLY) {
+    return {
+      ...baseFeedQuery(),
+      buyNFreeOnly: true,
+      sort: CATALOG_SORT_PURCHASES,
+    };
+  }
+
   if (tile.value === CATALOG_FILTER_ORIGINAL_ONLY) {
     return { ...baseFeedQuery(), originalOnly: true };
   }
@@ -107,6 +119,7 @@ export function buildQueryForCatalogFeedTile(tile) {
  * @param {boolean} [rentalOnly]
  * @param {boolean} [affiliateOnly]
  * @param {boolean} [wholesaleOnly]
+ * @param {boolean} [buyNFreeOnly]
  * @param {boolean} [originalOnly]
  * @param {boolean} [flashSaleOnly]
  */
@@ -121,6 +134,7 @@ export function isCatalogFeedTileActive(
   rentalOnly = false,
   affiliateOnly = false,
   wholesaleOnly = false,
+  buyNFreeOnly = false,
   originalOnly = false,
   flashSaleOnly = false,
 ) {
@@ -134,6 +148,7 @@ export function isCatalogFeedTileActive(
       !rentalOnly &&
       !affiliateOnly &&
       !wholesaleOnly &&
+      !buyNFreeOnly &&
       !originalOnly &&
       !near &&
       !flashSaleOnly
@@ -170,6 +185,10 @@ export function isCatalogFeedTileActive(
 
   if (tile.value === CATALOG_FILTER_WHOLESALE_ONLY) {
     return wholesaleOnly;
+  }
+
+  if (tile.value === CATALOG_FILTER_BUY_N_FREE_ONLY) {
+    return buyNFreeOnly;
   }
 
   if (tile.value === CATALOG_FILTER_ORIGINAL_ONLY) {

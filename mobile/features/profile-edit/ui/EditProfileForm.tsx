@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
+import { sanitizeUserNameInputLive } from "@molha/api-contract";
 
 import { confirmPhoneBind, requestPhoneBind } from "@/entities/session/api/phoneAuth";
 import { confirmEmailBind, requestEmailBind } from "@/entities/session/api/emailBind";
@@ -413,7 +414,7 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
             <TextInput
               style={styles.input}
               value={form.userName}
-              onChangeText={(value) => updateField("userName", value)}
+              onChangeText={(value) => updateField("userName", sanitizeUserNameInputLive(value))}
               autoCapitalize="none"
               autoCorrect={false}
               editable={!isSubmitting}

@@ -20,6 +20,7 @@ import "./SearchInput.css";
  *   pendingAriaLabel: string;
  *   isPending?: boolean;
  *   showLeadingIcon?: boolean;
+ *   maxLength?: number;
  * }} props
  */
 export function SearchInput({
@@ -32,6 +33,7 @@ export function SearchInput({
   pendingAriaLabel,
   isPending = false,
   showLeadingIcon = false,
+  maxLength,
 }) {
   const handleChange = (event) => onChange(event.target.value);
   const handleClear = () => onChange("");
@@ -73,6 +75,7 @@ export function SearchInput({
         autoComplete="off"
         spellCheck={false}
         enterKeyHint="search"
+        maxLength={maxLength}
       />
       {showClearButton ? (
         <button

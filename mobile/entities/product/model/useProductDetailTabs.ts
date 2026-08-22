@@ -11,6 +11,7 @@ import { PRODUCT_MODERATION_APPROVED } from "@/entities/product/model/productMod
 import {
   INSTALLMENT_UI,
   PRODUCT_PRICE_OFFER_UI,
+  PRODUCT_QA_UI,
   PRODUCT_REVIEW_UI,
   PRODUCT_SIMILAR_UI,
 } from "@/shared/config";
@@ -18,6 +19,7 @@ import {
 export type ProductDetailTabId =
   | "details"
   | "reviews"
+  | "qa"
   | "similar"
   | "auction"
   | "installment";
@@ -38,6 +40,12 @@ export const useProductDetailTabs = ({ product, currentUserId }: UseProductDetai
   const showReviewsTab =
     product?._id != null &&
     (product.productModerationStatus === PRODUCT_MODERATION_APPROVED || isOwnProduct);
+  const showQaTab =
+    product?._id != null &&
+    (isOwnProduct
+      ? true
+      : product.productQaEnabled === true &&
+        product.productModerationStatus === PRODUCT_MODERATION_APPROVED);
   const showSimilarTab = product?._id != null && similarFilters != null;
   const showAuctionTab =
     product?._id != null &&
@@ -46,7 +54,11 @@ export const useProductDetailTabs = ({ product, currentUserId }: UseProductDetai
     product?._id != null &&
     (isOwnProduct ? installmentActive : installmentActive);
   const showTabs =
-    showReviewsTab || showSimilarTab || showAuctionTab || showInstallmentTab;
+    showReviewsTab ||
+    showQaTab ||
+    showSimilarTab ||
+    showAuctionTab ||
+    showInstallmentTab;
 
   const reviewCount = Number(product?.reviewCount) || 0;
   const reviewsTabLabel =
@@ -60,6 +72,9 @@ export const useProductDetailTabs = ({ product, currentUserId }: UseProductDetai
     ];
     if (showReviewsTab) {
       items.push({ id: "reviews", label: reviewsTabLabel });
+    }
+    if (showQaTab) {
+      items.push({ id: "qa", label: PRODUCT_QA_UI.TAB });
     }
     if (showSimilarTab) {
       items.push({ id: "similar", label: PRODUCT_SIMILAR_UI.TAB });
@@ -75,6 +90,7 @@ export const useProductDetailTabs = ({ product, currentUserId }: UseProductDetai
     reviewsTabLabel,
     showAuctionTab,
     showInstallmentTab,
+    showQaTab,
     showReviewsTab,
     showSimilarTab,
   ]);

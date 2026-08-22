@@ -1,6 +1,7 @@
 import {
   CATALOG_FILTER_AFFILIATE_ONLY,
   CATALOG_FILTER_AUCTION_ONLY,
+  CATALOG_FILTER_BUY_N_FREE_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
   CATALOG_FILTER_NEAR,
@@ -27,6 +28,7 @@ const CATALOG_SORT_LABEL_RU: Record<string, string> = {
   [CATALOG_FILTER_RENTAL_ONLY]: "Прокат и аренда",
   [CATALOG_FILTER_AFFILIATE_ONLY]: "Партнерская программа",
   [CATALOG_FILTER_WHOLESALE_ONLY]: "Оптовая цена",
+  [CATALOG_FILTER_BUY_N_FREE_ONLY]: "Бесплатно от",
   [CATALOG_FILTER_ORIGINAL_ONLY]: "Только оригинал",
 };
 
@@ -39,6 +41,7 @@ type CatalogFeedQuery = {
   rentalOnly?: boolean;
   affiliateOnly?: boolean;
   wholesaleOnly?: boolean;
+  buyNFreeOnly?: boolean;
   originalOnly?: boolean;
   near?: boolean;
 };
@@ -67,6 +70,9 @@ export const resolveActiveCatalogFeedLabel = (query: CatalogFeedQuery): string |
   }
   if (query.wholesaleOnly) {
     return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_WHOLESALE_ONLY];
+  }
+  if (query.buyNFreeOnly) {
+    return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_BUY_N_FREE_ONLY];
   }
   if (query.originalOnly) {
     return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_ORIGINAL_ONLY];

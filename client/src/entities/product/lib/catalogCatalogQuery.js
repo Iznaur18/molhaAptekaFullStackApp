@@ -15,6 +15,7 @@ export const CATALOG_QUERY_PARAM_SALE_ONLY = "saleOnly";
 export const CATALOG_QUERY_PARAM_RENTAL_ONLY = "rentalOnly";
 export const CATALOG_QUERY_PARAM_AFFILIATE_ONLY = "affiliateOnly";
 export const CATALOG_QUERY_PARAM_WHOLESALE_ONLY = "wholesaleOnly";
+export const CATALOG_QUERY_PARAM_BUY_N_FREE_ONLY = "buyNFreeOnly";
 export const CATALOG_QUERY_PARAM_ORIGINAL_ONLY = "originalOnly";
 export const CATALOG_QUERY_PARAM_NEAR = "near";
 export const CATALOG_QUERY_PARAM_FLASH_SALE_ONLY = "flashSaleOnly";
@@ -73,6 +74,8 @@ export function parseCatalogQueryFromSearchParams(searchParams) {
     searchParams.get(CATALOG_QUERY_PARAM_AFFILIATE_ONLY) === "true";
   const wholesaleOnly =
     searchParams.get(CATALOG_QUERY_PARAM_WHOLESALE_ONLY) === "true";
+  const buyNFreeOnly =
+    searchParams.get(CATALOG_QUERY_PARAM_BUY_N_FREE_ONLY) === "true";
   const originalOnly =
     searchParams.get(CATALOG_QUERY_PARAM_ORIGINAL_ONLY) === "true";
   const near = searchParams.get(CATALOG_QUERY_PARAM_NEAR) === "true";
@@ -98,6 +101,7 @@ export function parseCatalogQueryFromSearchParams(searchParams) {
     rentalOnly,
     affiliateOnly,
     wholesaleOnly,
+    buyNFreeOnly,
     originalOnly,
     near,
     flashSaleOnly,
@@ -117,6 +121,7 @@ export function parseCatalogQueryFromSearchParams(searchParams) {
  *   rentalOnly: boolean;
  *   affiliateOnly: boolean;
  *   wholesaleOnly: boolean;
+ *   buyNFreeOnly: boolean;
  *   originalOnly: boolean;
  *   near: boolean;
  * }}
@@ -133,6 +138,7 @@ export function buildCatalogSearchParams({
   rentalOnly,
   affiliateOnly,
   wholesaleOnly,
+  buyNFreeOnly,
   originalOnly,
   near,
   flashSaleOnly,
@@ -173,6 +179,9 @@ export function buildCatalogSearchParams({
   if (wholesaleOnly) {
     params.set(CATALOG_QUERY_PARAM_WHOLESALE_ONLY, "true");
   }
+  if (buyNFreeOnly) {
+    params.set(CATALOG_QUERY_PARAM_BUY_N_FREE_ONLY, "true");
+  }
   if (originalOnly) {
     params.set(CATALOG_QUERY_PARAM_ORIGINAL_ONLY, "true");
   }
@@ -203,6 +212,7 @@ export function buildCatalogSearchParams({
  *   rentalOnly: boolean;
  *   affiliateOnly: boolean;
  *   wholesaleOnly: boolean;
+ *   buyNFreeOnly: boolean;
  *   originalOnly: boolean;
  *   near: boolean;
  * }} query
@@ -221,6 +231,7 @@ export function buildCatalogBrowserSearchParams(
     rentalOnly,
     affiliateOnly,
     wholesaleOnly,
+    buyNFreeOnly,
     originalOnly,
     near,
     flashSaleOnly,
@@ -263,6 +274,9 @@ export function buildCatalogBrowserSearchParams(
   }
   if (wholesaleOnly) {
     params.set(CATALOG_QUERY_PARAM_WHOLESALE_ONLY, "true");
+  }
+  if (buyNFreeOnly) {
+    params.set(CATALOG_QUERY_PARAM_BUY_N_FREE_ONLY, "true");
   }
   if (originalOnly) {
     params.set(CATALOG_QUERY_PARAM_ORIGINAL_ONLY, "true");

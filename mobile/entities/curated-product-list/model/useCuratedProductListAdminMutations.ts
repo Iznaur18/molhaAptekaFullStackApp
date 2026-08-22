@@ -15,8 +15,13 @@ export const useCuratedProductListAdminMutations = () => {
   });
 
   const patchMutation = useMutation({
-    mutationFn: ({ listId, body }: { listId: string; body: { title?: string } }) =>
-      patchCuratedProductListAdmin(listId, body),
+    mutationFn: ({
+      listId,
+      body,
+    }: {
+      listId: string;
+      body: { title?: string; regionCode?: string };
+    }) => patchCuratedProductListAdmin(listId, body),
   });
 
   const deleteMutation = useMutation({

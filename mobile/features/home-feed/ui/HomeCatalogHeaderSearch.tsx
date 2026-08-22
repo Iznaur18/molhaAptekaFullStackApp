@@ -1,5 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { TextInput, View } from "react-native";
+import { CATALOG_SEARCH_QUERY_MAX_LENGTH } from "@molha/api-contract";
 
 import { CATALOG_FILTER_UI } from "@/shared/config";
 import { HOME_CATALOG_HEADER_SEARCH_ICON_SIZE } from "@/shared/lib/homeCatalogHeaderLayout";
@@ -39,6 +40,7 @@ export const HomeCatalogHeaderSearch = ({
         placeholderTextColor={theme.colors.textMuted}
         autoCorrect={false}
         clearButtonMode="while-editing"
+        maxLength={CATALOG_SEARCH_QUERY_MAX_LENGTH}
         accessibilityLabel={CATALOG_FILTER_UI.SEARCH_PLACEHOLDER}
       />
     </View>

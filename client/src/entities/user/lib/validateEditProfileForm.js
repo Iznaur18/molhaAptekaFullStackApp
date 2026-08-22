@@ -7,20 +7,16 @@ import {
   USER_GENDER_FEMALE,
   USER_GENDER_MALE,
   USER_GENDER_NO_SELECTED,
-  USER_NAME_MAX_LENGTH,
-  USER_NAME_MIN_LENGTH,
   USER_ROLE_ADMIN,
   USER_ROLE_MODERATOR,
   USER_ROLE_USER,
 } from "../model/userConstants.js";
 import { isUserBackgroundPresetId } from "../model/userBackgroundPresets.js";
-import { isRuRegionCode } from "@molha/api-contract";
+import { assertUserNameFormat, isRuRegionCode } from "@molha/api-contract";
 import { EDIT_PROFILE_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 
 const DISCOUNT_MIN = 0;
 const DISCOUNT_MAX = 100;
-
-const USER_NAME_PATTERN = /^[a-z0-9]+$/;
 
 /**
  * @param {import('./mapUserToEditProfileForm.js').EditProfileFormState} form
@@ -35,11 +31,10 @@ export function validateEditProfileForm(form, options = {}) {
   } = options;
   const name = String(form.userName).trim().toLowerCase();
   if (name.length > 0) {
-    if (name.length < USER_NAME_MIN_LENGTH || name.length > USER_NAME_MAX_LENGTH) {
-      return `Никнейм: от ${USER_NAME_MIN_LENGTH} до ${USER_NAME_MAX_LENGTH} символов`;
-    }
-    if (!USER_NAME_PATTERN.test(name)) {
-      return "Никнейм: только a–z и 0–9, без пробелов";
+    try {
+      assertUserNameFormat(name);
+    } catch (error) {
+      return error instanceof Error ? error.message : "Неверный никнейм";
     }
   }
 

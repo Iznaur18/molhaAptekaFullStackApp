@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
+import { sanitizeUserNameInputLive } from "@molha/api-contract";
 
 import { useGuestProfileLoginMenuBannerImageQuery } from "../../../entities/site-header-banner/model/useGuestProfileLoginMenuBannerImageQuery.js";
 import { registerUserByPhone } from "../../../entities/user/api/registerUserByPhone.js";
@@ -137,7 +138,7 @@ export function RegisterPage() {
     const { name, value } = event.target;
     let nextValue = value;
     if (name === "userName" && typeof nextValue === "string") {
-      nextValue = nextValue.toLowerCase().replace(/[^a-z0-9]/g, "");
+      nextValue = sanitizeUserNameInputLive(nextValue);
     }
     if (name === "phoneNumber") {
       nextValue = maskRuPhoneInput(nextValue);

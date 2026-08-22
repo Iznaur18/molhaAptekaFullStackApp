@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { sanitizeUserNameInputLive } from "@molha/api-contract";
 
 import { useRegisterMutation } from "../model/useRegisterMutation.js";
 import { useConfirmRegistrationMutation } from "../model/useConfirmRegistrationMutation.js";
@@ -67,7 +68,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
     const { name, value } = event.target;
     let nextValue = value;
     if (name === "userName" && typeof nextValue === "string") {
-      nextValue = nextValue.toLowerCase().replace(/[^a-z0-9]/g, "");
+      nextValue = sanitizeUserNameInputLive(nextValue);
     }
     if (name === "phoneNumber") {
       nextValue = maskRuPhoneInput(nextValue);
@@ -484,7 +485,7 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
                 minLength={REGISTER_MODAL_UI.USERNAME_MIN_LENGTH}
                 maxLength={REGISTER_MODAL_UI.USERNAME_MAX_LENGTH}
                 title={REGISTER_MODAL_UI.USERNAME_HINT}
-                placeholder="nickname123"
+                placeholder="user.name"
                 autoComplete="username"
               />
               <span className="register-modal__hint">

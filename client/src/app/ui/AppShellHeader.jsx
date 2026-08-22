@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef } from "react";
 
 import { useNavigate, useLocation } from "react-router-dom";
+import { CATALOG_SEARCH_QUERY_MAX_LENGTH } from "@molha/api-contract";
 
 import { HeaderUsersStretchMenu } from "../../widgets/header-users-stretch-menu/ui/HeaderUsersStretchMenu.jsx";
 import {
@@ -177,6 +178,7 @@ export function AppShellHeader({
                         pendingAriaLabel={PRODUCT_SEARCH_INPUT_UI.PENDING_ARIA}
                         isPending={isProductSearchPending}
                         showLeadingIcon
+                        maxLength={CATALOG_SEARCH_QUERY_MAX_LENGTH}
                       />
                     )}
                   </div>

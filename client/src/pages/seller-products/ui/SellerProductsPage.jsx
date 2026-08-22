@@ -15,11 +15,13 @@ import { resolveUserProfileBackgroundFromUser } from "../../../entities/user/lib
 import { UserFollowButton } from "../../../entities/user-follow/ui/UserFollowButton.jsx";
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
 import { UserPremiumDisplayName } from "../../../entities/user/ui/UserPremiumDisplayName.jsx";
+import { SellerProfileQuickStats } from "../../../entities/user/ui/SellerProfileQuickStats.jsx";
 import { SellerShareLinkButton } from "../../../entities/user/ui/SellerShareLinkButton.jsx";
 import { usePublicSellerShelvesQuery } from "../../../entities/seller-shelf/model/usePublicSellerShelvesQuery.js";
 import { HomeCatalogGrid } from "../../../widgets/catalog-product-grid/ui/HomeCatalogGrid.jsx";
 import { useSellerProductsCatalog } from "../model/useSellerProductsCatalog.js";
 import {
+  PRODUCT_CARD_UI,
   SELLER_PRODUCTS_PAGE_UI,
   USER_LIST_ROW_UI,
 } from "../../../shared/config/appUiCopy.js";
@@ -138,6 +140,10 @@ export function SellerProductsPage({
     [queryClient, sellerId],
   );
 
+  const handleSellerProfileClick = useCallback(() => {
+    onSellerNameClick?.(sellerId);
+  }, [onSellerNameClick, sellerId]);
+
   if (!isSessionReady) {
     return (
       <p className="seller-products-page__state">{SELLER_PRODUCTS_PAGE_UI.LOADING}</p>
@@ -242,14 +248,25 @@ export function SellerProductsPage({
             </div>
           ) : null}
 
+          <SellerProfileQuickStats
+            seller={seller}
+            userId={sellerId}
+            hidePhoneUntilReveal={!isSelf}
+          />
+
           <div className="seller-products-page__seller-meta">
-            <div className="seller-products-page__seller-name">
+            <button
+              type="button"
+              className="seller-products-page__seller-name"
+              aria-label={PRODUCT_CARD_UI.SELLER_PROFILE_ARIA(displayName)}
+              onClick={handleSellerProfileClick}
+            >
               <UserPremiumDisplayName
                 name={displayName}
                 isPremium={Boolean(seller.isPremiumUser)}
                 isUserDataConfirmed={Boolean(seller.isUserDataConfirmed)}
               />
-            </div>
+            </button>
             {isSelf && !showProfileBanner ? (
               <SellerShareLinkButton
                 sellerId={sellerId}

@@ -3,6 +3,7 @@ import {
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
+  CATALOG_FILTER_BUY_N_FREE_ONLY,
   CATALOG_FILTER_FLASH_SALE_ONLY,
   CATALOG_FILTER_NEAR,
   CATALOG_FILTER_ORIGINAL_ONLY,
@@ -23,6 +24,7 @@ import {
  *   rentalOnly?: boolean;
  *   affiliateOnly?: boolean;
  *   wholesaleOnly?: boolean;
+ *   buyNFreeOnly?: boolean;
  *   originalOnly?: boolean;
  *   near?: boolean;
  *   flashSaleOnly?: boolean;
@@ -56,6 +58,9 @@ export function resolveActiveCatalogFeedLabel(query) {
   }
   if (query.wholesaleOnly) {
     return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_WHOLESALE_ONLY];
+  }
+  if (query.buyNFreeOnly) {
+    return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_BUY_N_FREE_ONLY];
   }
   if (query.originalOnly) {
     return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_ORIGINAL_ONLY];

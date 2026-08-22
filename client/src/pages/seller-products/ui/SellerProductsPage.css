@@ -103,10 +103,26 @@
   flex: 1 1 auto;
   min-width: 0;
   margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.3;
   color: var(--iz-color-text);
+  text-align: start;
+  cursor: pointer;
+}
+
+.seller-products-page__seller-name:hover {
+  color: var(--iz-color-action);
+}
+
+.seller-products-page__seller-name:focus-visible {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 2px;
+  border-radius: var(--iz-radius-sm, 6px);
 }
 
 .seller-products-page__seller-meta .user-follow-button {

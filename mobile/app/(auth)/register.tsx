@@ -1,3 +1,4 @@
+import { sanitizeUserNameInputLive } from "@molha/api-contract";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
@@ -103,7 +104,7 @@ export default function RegisterScreen() {
   }, [pendingRegistration, router]);
 
   const handleUserNameChange = (value: string) => {
-    setUserName(value.toLowerCase().replace(/[^a-z0-9]/g, ""));
+    setUserName(sanitizeUserNameInputLive(value));
   };
 
   const handleSubmit = async () => {

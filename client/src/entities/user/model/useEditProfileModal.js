@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { sanitizeUserNameInputLive } from "@molha/api-contract";
 
 import { useUserProfileMutations } from "./useUserProfileMutations.js";
 import { buildAdminPatchUserProfileBody } from "../lib/buildAdminPatchUserProfileBody.js";
@@ -115,7 +116,7 @@ export function useEditProfileModal({
     const { name, value, type, checked } = event.target;
     let nextValue = type === "checkbox" ? checked : value;
     if (name === "userName" && typeof nextValue === "string") {
-      nextValue = nextValue.toLowerCase().replace(/[^a-z0-9]/g, "");
+      nextValue = sanitizeUserNameInputLive(nextValue);
     }
     if (name === "userPhoneNumber" && typeof nextValue === "string") {
       nextValue = maskRuPhoneInput(nextValue);

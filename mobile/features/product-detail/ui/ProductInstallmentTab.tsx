@@ -1,21 +1,24 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
+import {
+  ORDER_FULFILLMENT_PICKUP,
+  doProductsSupportPickup,
+  doProductsSupportSellerDelivery,
+} from "@molha/api-contract";
 
-import { addressValueFromUser } from "@/entities/address/lib/addressValueFromUser";
-import { validateRuDeliveryAddressForm } from "@/entities/address/lib/validateRuDeliveryAddressForm";
-import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
-import type { RuDeliveryAddressValue } from "@/entities/address/model/types";
+import { buildCheckoutPickupLocations } from "@/entities/cart/lib/buildCheckoutPickupLocations";
 import type { InstallmentPlan } from "@/entities/installment/api/installmentApi";
 import { resolveInstallmentPlanPriceSummary } from "@/entities/installment/lib/resolveInstallmentPlanPriceSummary";
 import { useInstallmentMutations } from "@/entities/installment/model/useInstallmentMutations";
 import { useProductInstallmentProgramQuery } from "@/entities/installment/model/useProductInstallmentProgramQuery";
+import { InstallmentPassportShareConsentModal } from "@/entities/installment/ui/InstallmentPassportShareConsentModal";
 import {
-  ORDER_PAYMENT_METHOD_CARD_PREPAID,
+  ORDER_PAYMENT_METHOD_DEFAULT,
   type OrderPaymentMethod,
 } from "@/entities/order/model/constants";
-import { CheckoutPaymentMethodPicker } from "@/features/checkout/ui/CheckoutPaymentMethodPicker";
-import { InstallmentPassportShareConsentModal } from "@/entities/installment/ui/InstallmentPassportShareConsentModal";
-import { INSTALLMENT_UI, PRODUCT_UI } from "@/shared/config";
+import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
+import { CheckoutSheetModal } from "@/features/checkout/ui/CheckoutSheetModal";
+import { CHECKOUT_FORM_UI, INSTALLMENT_UI, PRODUCT_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
 import { textInputFocusScrollProps } from "@/shared/lib/scrollTextInputIntoViewOnFocus";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
@@ -28,8 +31,17 @@ export type ProductInstallmentDockFooter = {
   label: string;
 };
 
+type ProductForInstallmentCheckout = {
+  _id?: string;
+  productName?: string | null;
+  productPickupAddress?: string | null;
+  productPickupEnabled?: boolean | null;
+  productDeliveryEnabled?: boolean | null;
+};
+
 type ProductInstallmentTabProps = {
   productId: string;
+  product?: ProductForInstallmentCheckout | null;
   productPrice?: number;
   installmentEnabled: boolean;
   isAuthorized: boolean;
@@ -40,11 +52,41 @@ type ProductInstallmentTabProps = {
   onDockFooterChange?: (footer: ProductInstallmentDockFooter | null) => void;
 };
 
+type PendingCheckout = {
+  deliveryAddress: string;
+  deliveryAddressFlat: string;
+  paymentMethod: OrderPaymentMethod;
+};
+
 const resolvePlanTotal = (plan: InstallmentPlan) =>
   (plan.monthsCount ?? 0) * (plan.monthlyAmountRub ?? 0);
 
+const resolveInstallmentDeliveryFromSheet = (
+  sheetPayload: {
+    fulfillmentMethod: OrderFulfillmentMethod;
+    deliveryAddress: string;
+    deliveryAddressFlat: string;
+    paymentMethod: OrderPaymentMethod;
+  },
+  product: ProductForInstallmentCheckout | null | undefined,
+): PendingCheckout => {
+  if (sheetPayload.fulfillmentMethod === ORDER_FULFILLMENT_PICKUP) {
+    return {
+      deliveryAddress: String(product?.productPickupAddress ?? "").trim(),
+      deliveryAddressFlat: "",
+      paymentMethod: sheetPayload.paymentMethod,
+    };
+  }
+  return {
+    deliveryAddress: String(sheetPayload.deliveryAddress ?? "").trim(),
+    deliveryAddressFlat: String(sheetPayload.deliveryAddressFlat ?? "").trim(),
+    paymentMethod: sheetPayload.paymentMethod,
+  };
+};
+
 export const ProductInstallmentTab = ({
   productId,
+  product = null,
   productPrice = 0,
   installmentEnabled,
   isAuthorized,
@@ -62,17 +104,32 @@ export const ProductInstallmentTab = ({
     createContractMutation;
   const [selectedPlanId, setSelectedPlanId] = useState("");
   const [quantity, setQuantity] = useState("1");
-  const [deliveryAddress, setDeliveryAddress] = useState<RuDeliveryAddressValue>(() =>
-    addressValueFromUser(defaultUser),
-  );
-  const [paymentMethod, setPaymentMethod] = useState<OrderPaymentMethod>(
-    ORDER_PAYMENT_METHOD_CARD_PREPAID,
-  );
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [isCheckoutSheetOpen, setIsCheckoutSheetOpen] = useState(false);
   const [isConsentOpen, setIsConsentOpen] = useState(false);
+  const [pendingCheckout, setPendingCheckout] = useState<PendingCheckout | null>(null);
+  const [sheetSubmitError, setSheetSubmitError] = useState("");
 
-  const validateCheckoutForm = useCallback(() => {
+  const productForCheckout = useMemo(
+    () => product ?? { _id: productId },
+    [product, productId],
+  );
+
+  const pickupLocations = useMemo(
+    () => buildCheckoutPickupLocations([{ product: productForCheckout }]),
+    [productForCheckout],
+  );
+  const pickupAvailable = useMemo(
+    () => doProductsSupportPickup([productForCheckout]),
+    [productForCheckout],
+  );
+  const deliveryAvailable = useMemo(
+    () => doProductsSupportSellerDelivery([productForCheckout]),
+    [productForCheckout],
+  );
+
+  const validatePlanAndQuantity = useCallback(() => {
     if (!isAuthorized) {
       setErrorMessage(INSTALLMENT_UI.BUYER_REQUIRES_CONFIRMED);
       return false;
@@ -85,18 +142,50 @@ export const ProductInstallmentTab = ({
       setErrorMessage(INSTALLMENT_UI.SELECT_PLAN);
       return false;
     }
-
-    const addressError = validateRuDeliveryAddressForm(deliveryAddress, { required: true });
-    if (addressError) {
-      setErrorMessage(addressError);
-      return false;
-    }
     return true;
-  }, [deliveryAddress, isAuthorized, isUserDataConfirmed, selectedPlanId]);
+  }, [isAuthorized, isUserDataConfirmed, selectedPlanId]);
+
+  const openCheckoutSheet = useCallback(() => {
+    setErrorMessage("");
+    setSuccessMessage("");
+    setSheetSubmitError("");
+    if (!validatePlanAndQuantity()) {
+      return;
+    }
+    setIsCheckoutSheetOpen(true);
+  }, [validatePlanAndQuantity]);
+
+  const handleCheckoutSheetSubmit = useCallback(
+    (sheetPayload: {
+      fulfillmentMethod: OrderFulfillmentMethod;
+      deliveryAddress: string;
+      deliveryAddressFlat: string;
+      paymentMethod: OrderPaymentMethod;
+    }) => {
+      const resolved = resolveInstallmentDeliveryFromSheet(sheetPayload, productForCheckout);
+      if (!resolved.deliveryAddress) {
+        setSheetSubmitError(CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED);
+        return;
+      }
+      setPendingCheckout({
+        ...resolved,
+        paymentMethod: resolved.paymentMethod || ORDER_PAYMENT_METHOD_DEFAULT,
+      });
+      setSheetSubmitError("");
+      setIsCheckoutSheetOpen(false);
+      setIsConsentOpen(true);
+    },
+    [productForCheckout],
+  );
 
   const handleConsentConfirm = useCallback(async () => {
     setErrorMessage("");
     setSuccessMessage("");
+    if (pendingCheckout == null) {
+      setIsConsentOpen(false);
+      setErrorMessage(INSTALLMENT_UI.ERROR_GENERIC);
+      return;
+    }
     const qty = Math.max(1, Number.parseInt(quantity, 10) || 1);
 
     try {
@@ -105,13 +194,14 @@ export const ProductInstallmentTab = ({
         body: {
           planId: selectedPlanId,
           quantity: qty,
-          deliveryAddress: deliveryAddress.line.trim(),
-          deliveryAddressFlat: deliveryAddress.flat.trim() || undefined,
-          paymentMethod,
+          deliveryAddress: pendingCheckout.deliveryAddress,
+          deliveryAddressFlat: pendingCheckout.deliveryAddressFlat || undefined,
+          paymentMethod: pendingCheckout.paymentMethod,
           passportShareConsent: true,
         },
       });
       setIsConsentOpen(false);
+      setPendingCheckout(null);
       setSuccessMessage(INSTALLMENT_UI.CONTRACT_SUCCESS);
     } catch (error) {
       setIsConsentOpen(false);
@@ -119,24 +209,14 @@ export const ProductInstallmentTab = ({
     }
   }, [
     createInstallmentContract,
-    deliveryAddress,
-    paymentMethod,
+    pendingCheckout,
     productId,
     quantity,
     selectedPlanId,
   ]);
 
-  const handleSubmit = useCallback(() => {
-    setErrorMessage("");
-    setSuccessMessage("");
-    if (!validateCheckoutForm()) {
-      return;
-    }
-    setIsConsentOpen(true);
-  }, [validateCheckoutForm]);
-
-  const handleSubmitRef = useRef(handleSubmit);
-  handleSubmitRef.current = handleSubmit;
+  const openCheckoutSheetRef = useRef(openCheckoutSheet);
+  openCheckoutSheetRef.current = openCheckoutSheet;
 
   const program = programQuery.data;
   const plans = program?.plans ?? [];
@@ -186,7 +266,7 @@ export const ProductInstallmentTab = ({
 
     onDockFooterChange({
       onSubmit: () => {
-        void handleSubmitRef.current();
+        openCheckoutSheetRef.current();
       },
       disabled: isSubmitDisabled,
       label: dockLabel,
@@ -288,27 +368,43 @@ export const ProductInstallmentTab = ({
         </View>
       ) : null}
 
-      <View style={styles.addressSection}>
-        <AddressSuggestInput
-          value={deliveryAddress}
-          onChange={setDeliveryAddress}
-          disabled={isCreateContractPending}
-        />
-
-        <CheckoutPaymentMethodPicker
-          value={paymentMethod}
-          onChange={setPaymentMethod}
-          disabled={isCreateContractPending}
-        />
-      </View>
-
       {successMessage ? <Text style={styles.success}>{successMessage}</Text> : null}
       {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+
+      {!dockSubmit ? (
+        <Pressable
+          style={[styles.planCard, isSubmitDisabled && { opacity: 0.5 }]}
+          disabled={isSubmitDisabled}
+          onPress={openCheckoutSheet}
+        >
+          <Text style={styles.planTitle}>{dockLabel}</Text>
+        </Pressable>
+      ) : null}
+
+      <CheckoutSheetModal
+        visible={isCheckoutSheetOpen}
+        defaultUser={defaultUser}
+        pickupLocations={pickupLocations}
+        deliveryAvailable={deliveryAvailable}
+        pickupAvailable={pickupAvailable}
+        isSubmitting={false}
+        submitError={sheetSubmitError}
+        submitSuccess=""
+        isDisabled={isSubmitDisabled}
+        onClose={() => {
+          setIsCheckoutSheetOpen(false);
+          setSheetSubmitError("");
+        }}
+        onSubmit={handleCheckoutSheetSubmit}
+      />
 
       <InstallmentPassportShareConsentModal
         visible={isConsentOpen}
         isConfirming={isCreateContractPending}
-        onClose={() => setIsConsentOpen(false)}
+        onClose={() => {
+          setIsConsentOpen(false);
+          setPendingCheckout(null);
+        }}
         onConfirm={() => {
           void handleConsentConfirm();
         }}

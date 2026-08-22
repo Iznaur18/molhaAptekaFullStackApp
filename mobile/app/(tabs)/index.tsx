@@ -10,6 +10,7 @@ import {
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
+import { useRouter } from "expo-router";
 import { useFocusEffect, useIsFocused, useNavigation, useScrollToTop } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -29,7 +30,9 @@ import { CatalogAnimatedFlatList } from "@/features/catalog-grid/ui/CatalogAnima
 import { CatalogScrollAnimationProvider } from "@/features/catalog-grid/model/CatalogScrollAnimationContext";
 import { useCatalogBreadcrumbLabel } from "@/features/catalog-filter/model/useCatalogBreadcrumbLabel";
 import { consumePendingCatalogFilters } from "@/features/catalog-browser/model/pendingCatalogFilters";
+import type { HomeCuratedCategory } from "@/entities/curated-category-list/api/fetchHomeCuratedCategoryLists";
 import { isHomeCuratedProductListsVisible } from "@/entities/curated-product-list/lib/isHomeCuratedProductListsVisible";
+import { CATALOG_SORT_NEWEST } from "@/entities/product/model/productConstants";
 import { isHomeCatalogMainView } from "@/features/home-feed/lib/isHomeCatalogMainView";
 import {
   buildHomeCatalogFeedListRows,
@@ -57,6 +60,7 @@ import { HomeCatalogPrimaryBackdrop } from "@/features/home-feed/ui/HomeCatalogP
 import { HomeCatalogSearchRow } from "@/features/home-feed/ui/HomeCatalogSearchRow";
 import { HomeCatalogStickySearchShell } from "@/features/home-feed/ui/HomeCatalogStickySearchShell";
 import { API_CLIENT_UI, CATALOG_SEARCH_MIN_LENGTH } from "@/shared/config";
+import { CATALOG_SEARCH_QUERY_MAX_LENGTH } from "@molha/api-contract";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { setCatalogCategoryView } from "@/shared/lib/catalogCategoryViewStore";
 import {
@@ -102,6 +106,7 @@ export default function CatalogScreen() {
   const { centeredContentStyle, contentPaddingBottom, contentMaxWidth } = useScreenLayout();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const router = useRouter();
   const isFocused = useIsFocused();
   const appActive = useAppActive();
   // Уход в фон → чистим in-memory кеш картинок, освобождая RAM на слабых
@@ -143,8 +148,9 @@ export default function CatalogScreen() {
   // Набор текста сам по себе ничего не ищет: запрос уходит только по «Найти» на
   // клавиатуре. Пустое поле — не поиск, а отмена: каталог возвращается сразу.
   const handleSearchInputChange = useCallback((next: string) => {
-    setSearchInput(next);
-    if (next.trim() === "") {
+    const capped = next.slice(0, CATALOG_SEARCH_QUERY_MAX_LENGTH);
+    setSearchInput(capped);
+    if (capped.trim() === "") {
       setSubmittedSearch("");
     }
   }, []);
@@ -176,6 +182,7 @@ export default function CatalogScreen() {
         rentalOnly: pending.rentalOnly === true,
         affiliateOnly: pending.affiliateOnly === true,
         wholesaleOnly: pending.wholesaleOnly === true,
+        buyNFreeOnly: pending.buyNFreeOnly === true,
         originalOnly: pending.originalOnly === true,
         near: pending.near === true,
       });
@@ -198,6 +205,7 @@ export default function CatalogScreen() {
       rentalOnly: feedFilters.rentalOnly || undefined,
       affiliateOnly: feedFilters.affiliateOnly || undefined,
       wholesaleOnly: feedFilters.wholesaleOnly || undefined,
+      buyNFreeOnly: feedFilters.buyNFreeOnly || undefined,
       originalOnly: feedFilters.originalOnly || undefined,
       near: feedFilters.near || undefined,
       regionCode: viewerRegionCode || undefined,
@@ -238,6 +246,7 @@ export default function CatalogScreen() {
         rentalOnly: feedFilters.rentalOnly === true,
         affiliateOnly: feedFilters.affiliateOnly === true,
         wholesaleOnly: feedFilters.wholesaleOnly === true,
+        buyNFreeOnly: feedFilters.buyNFreeOnly === true,
         originalOnly: feedFilters.originalOnly === true,
         near: feedFilters.near === true,
       }),
@@ -276,6 +285,7 @@ export default function CatalogScreen() {
         catalogRentalOnly: feedFilters.rentalOnly === true,
         catalogAffiliateOnly: feedFilters.affiliateOnly === true,
         catalogWholesaleOnly: feedFilters.wholesaleOnly === true,
+        catalogBuyNFreeOnly: feedFilters.buyNFreeOnly === true,
         catalogOriginalOnly: feedFilters.originalOnly === true,
         catalogNear: feedFilters.near === true,
       }),
@@ -355,6 +365,29 @@ export default function CatalogScreen() {
     setSelectedSellerPersonalCategoryId(null);
     setFeedFilters(EMPTY_FEED_FILTERS);
   }, []);
+
+  /**
+   * Клик по кураторской подборке категорий (паритет с web
+   * `useHomeCuratedCategoryClick`): personal-категория продавца → страница
+   * продавца; иначе — фильтр каталога по категории (дерево/персональная).
+   */
+  const handleOpenCuratedCategory = useCallback(
+    (category: HomeCuratedCategory) => {
+      if (category.kind === "personal" && category.sellerId?.trim()) {
+        router.push(`/seller/${category.sellerId.trim()}`);
+        return;
+      }
+      setSearchInput("");
+      setSubmittedSearch("");
+      setSelectedRootSlug(null);
+      setSelectedSubcategoryId(category.kind === "tree" ? category.refId : null);
+      setSelectedSellerPersonalCategoryId(
+        category.kind === "personal" ? category.refId : null,
+      );
+      setFeedFilters({ ...EMPTY_FEED_FILTERS, sort: CATALOG_SORT_NEWEST });
+    },
+    [router],
+  );
 
   // Пока на вкладке index открыта категория/фильтр, нижний навбар подсвечивает
   // «Каталог», а не «Домой» (флаг читает MobileBottomTabBar).
@@ -448,6 +481,7 @@ export default function CatalogScreen() {
       isCatalogEmpty={false}
       emptyLabel={catalogEmptyLabel}
       styles={styles}
+      onOpenCuratedCategory={handleOpenCuratedCategory}
     />
   );
 
@@ -460,12 +494,14 @@ export default function CatalogScreen() {
         isCatalogEmpty={catalogGridRows.length === 0}
         emptyLabel={catalogEmptyLabel}
         styles={styles}
+        onOpenCuratedCategory={handleOpenCuratedCategory}
       />
     ),
     [
       catalogBreadcrumbLabel,
       catalogEmptyLabel,
       catalogGridRows.length,
+      handleOpenCuratedCategory,
       showCuratedProductLists,
       styles,
     ],

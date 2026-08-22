@@ -41,6 +41,7 @@ import { ProductDetailTabBar } from "@/features/product-detail/ui/ProductDetailT
 import { ProductDetailsDetailsTab } from "@/features/product-detail/ui/ProductDetailsDetailsTab";
 import { ProductAuctionTab, type ProductAuctionDockFooter } from "@/features/product-detail/ui/ProductAuctionTab";
 import { ProductInstallmentTab, type ProductInstallmentDockFooter } from "@/features/product-detail/ui/ProductInstallmentTab";
+import { ProductQaTab } from "@/features/product-detail/ui/ProductQaTab";
 import { ProductReviewsTab } from "@/features/product-detail/ui/ProductReviewsTab";
 import {
   isProductSimilarScrollNearEnd,
@@ -292,6 +293,7 @@ export default function ProductDetailScreen() {
   const showAuctionDock = activeTab === "auction" && auctionDock != null;
   const isAltTab =
     activeTab === "reviews" ||
+    activeTab === "qa" ||
     activeTab === "similar" ||
     activeTab === "auction" ||
     activeTab === "installment";
@@ -639,6 +641,13 @@ export default function ProductDetailScreen() {
                   isOwnProduct={isOwnProduct}
                 />
               ) : null}
+              {activeTab === "qa" ? (
+                <ProductQaTab
+                  productId={productId}
+                  isAuthorized={isAuthorized}
+                  isOwnProduct={isOwnProduct}
+                />
+              ) : null}
               {activeTab === "auction" ? (
                 <ProductAuctionTab
                   productId={productId}
@@ -653,6 +662,7 @@ export default function ProductDetailScreen() {
               {activeTab === "installment" ? (
                 <ProductInstallmentTab
                   productId={productId}
+                  product={productRecord}
                   productPrice={productPrice}
                   installmentEnabled={productRecord.productInstallmentEnabled === true}
                   isAuthorized={isAuthorized}

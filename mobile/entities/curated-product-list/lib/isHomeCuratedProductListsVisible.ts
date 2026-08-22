@@ -12,6 +12,7 @@ export type HomeCuratedProductListsVisibilityParams = {
   catalogRentalOnly: boolean;
   catalogAffiliateOnly: boolean;
   catalogWholesaleOnly: boolean;
+  catalogBuyNFreeOnly: boolean;
   catalogOriginalOnly: boolean;
   catalogNear?: boolean;
 };
@@ -29,6 +30,7 @@ export const isHomeCuratedProductListsVisible = ({
   catalogRentalOnly,
   catalogAffiliateOnly,
   catalogWholesaleOnly,
+  catalogBuyNFreeOnly,
   catalogOriginalOnly,
   catalogNear = false,
 }: HomeCuratedProductListsVisibilityParams): boolean =>
@@ -44,5 +46,6 @@ export const isHomeCuratedProductListsVisible = ({
   !catalogRentalOnly &&
   !catalogAffiliateOnly &&
   !catalogWholesaleOnly &&
+  !catalogBuyNFreeOnly &&
   !catalogOriginalOnly &&
   !catalogNear;

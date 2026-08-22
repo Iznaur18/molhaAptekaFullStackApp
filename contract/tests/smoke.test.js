@@ -11,6 +11,7 @@ import {
   authSessionDataSchema,
   refreshAuthBodySchema,
   catalogProductsQuerySchema,
+  CATALOG_SEARCH_QUERY_MAX_LENGTH,
   catalogFeedTileKeyParamsSchema,
   productManageToggleKeyParamsSchema,
   adminManageToggleDisplayPatchBodySchema,
@@ -344,8 +345,10 @@ test("createProductSearchSynonymBodySchema validates categories", () => {
 });
 
 test("catalogFeedTileKeyParamsSchema accepts known tile key", () => {
-  const parsed = catalogFeedTileKeyParamsSchema.parse({ tileKey: "sort:newest" });
-  assert.equal(parsed.tileKey, "sort:newest");
+  const parsed = catalogFeedTileKeyParamsSchema.parse({
+    tileKey: "filter:__buy_n_free_only__",
+  });
+  assert.equal(parsed.tileKey, "filter:__buy_n_free_only__");
 });
 
 test("catalogFeedTileKeyParamsSchema accepts flash sale filter tile key", () => {
@@ -464,6 +467,7 @@ test("catalogProductsQuerySchema coerces page/limit and flags", () => {
     rentalOnly: "true",
     affiliateOnly: "false",
     wholesaleOnly: "true",
+    buyNFreeOnly: "true",
     originalOnly: "false",
     near: "true",
     flashSaleOnly: "true",
@@ -474,7 +478,9 @@ test("catalogProductsQuerySchema coerces page/limit and flags", () => {
   assert.equal(parsed.saleOnly, false);
   assert.equal(parsed.rentalOnly, true);
   assert.equal(parsed.affiliateOnly, false);
+
   assert.equal(parsed.wholesaleOnly, true);
+  assert.equal(parsed.buyNFreeOnly, true);
   assert.equal(parsed.originalOnly, false);
   assert.equal(parsed.near, true);
   assert.equal(parsed.flashSaleOnly, true);
@@ -483,6 +489,16 @@ test("catalogProductsQuerySchema coerces page/limit and flags", () => {
 test("catalogProductsQuerySchema rejects unknown category", () => {
   assert.throws(() => {
     catalogProductsQuerySchema.parse({ productCategory: "unknown_slug" });
+  });
+});
+
+test("catalogProductsQuerySchema accepts search up to CATALOG_SEARCH_QUERY_MAX_LENGTH", () => {
+  const ok = "a".repeat(CATALOG_SEARCH_QUERY_MAX_LENGTH);
+  assert.equal(catalogProductsQuerySchema.parse({ search: ok }).search, ok);
+  assert.throws(() => {
+    catalogProductsQuerySchema.parse({
+      search: "a".repeat(CATALOG_SEARCH_QUERY_MAX_LENGTH + 1),
+    });
   });
 });
 

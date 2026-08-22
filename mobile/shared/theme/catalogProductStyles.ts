@@ -2509,6 +2509,79 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
     color: theme.colors.textSecondary,
     lineHeight: 20,
   },
+  qaSummary: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing[2],
+  },
+  qaHeadMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing[2],
+    flexShrink: 0,
+  },
+  qaBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 999,
+    backgroundColor: theme.colors.actionSoft,
+  },
+  qaBadgeText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: theme.colors.action,
+  },
+  qaQuestion: {
+    fontSize: 14.4,
+    fontWeight: "500",
+    color: theme.colors.text,
+    lineHeight: 20,
+  },
+  qaAnswer: {
+    gap: 2,
+    paddingLeft: theme.spacing[3],
+    borderLeftWidth: 2,
+    borderLeftColor: theme.colors.actionBorder,
+  },
+  qaAnswerHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: theme.spacing[2],
+  },
+  qaAnswerLabel: {
+    fontSize: 12.5,
+    fontWeight: "700",
+    color: theme.colors.action,
+  },
+  qaAction: {
+    paddingVertical: 4,
+  },
+  qaActionText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+  },
+  qaActionDangerText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: theme.colors.danger,
+  },
+  qaActionPrimaryText: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: theme.colors.action,
+  },
+  qaComposer: {
+    gap: theme.spacing[2],
+  },
+  qaComposerFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: theme.spacing[2],
+    flexWrap: "wrap",
+  },
   success: {
     fontSize: 13,
     color: theme.colors.success,
@@ -2956,6 +3029,30 @@ export const useCuratedProductCompactCardStyles = createThemedStyles((theme) => 
     lineHeight: 19,
     color: C.priceText,
   },
+  };
+});
+
+export const useCuratedCategoryCompactCardStyles = createThemedStyles((theme) => {
+  const C = resolveCuratedCompactCardColors(theme.colors);
+  return {
+    card: {
+      borderWidth: 1,
+      borderColor: C.border,
+      borderRadius: 16,
+      overflow: "hidden",
+      backgroundColor: "transparent",
+    },
+    imageWrap: {
+      aspectRatio: 2,
+      backgroundColor: C.imageBg,
+      alignItems: "center",
+      justifyContent: "center",
+      overflow: "hidden",
+    },
+    image: {
+      width: "100%",
+      height: "100%",
+    },
   };
 });
 

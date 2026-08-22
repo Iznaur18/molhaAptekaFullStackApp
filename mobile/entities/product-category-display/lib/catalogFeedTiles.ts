@@ -22,10 +22,16 @@ export const CATALOG_FILTER_SALE_ONLY = "__sale_only__";
 export const CATALOG_FILTER_RENTAL_ONLY = "__rental_only__";
 export const CATALOG_FILTER_AFFILIATE_ONLY = "__affiliate_only__";
 export const CATALOG_FILTER_WHOLESALE_ONLY = "__wholesale_only__";
+export const CATALOG_FILTER_BUY_N_FREE_ONLY = "__buy_n_free_only__";
 export const CATALOG_FILTER_ORIGINAL_ONLY = "__original_only__";
 
 export const CATALOG_FEED_TILES: CatalogFeedTile[] = [
-  { key: "sort:newest", kind: "sort", value: CATALOG_SORT_NEWEST, label: "Новинки" },
+  {
+    key: "filter:__buy_n_free_only__",
+    kind: "filter",
+    value: CATALOG_FILTER_BUY_N_FREE_ONLY,
+    label: "Бесплатно от",
+  },
   { key: "sort:views", kind: "sort", value: CATALOG_SORT_VIEWS, label: "Популярные" },
   { key: "sort:purchases", kind: "sort", value: CATALOG_SORT_PURCHASES, label: "Покупают" },
   { key: "sort:reviews", kind: "sort", value: CATALOG_SORT_REVIEWS, label: "По отзывам" },

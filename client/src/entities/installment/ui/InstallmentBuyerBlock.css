@@ -201,20 +201,6 @@
   color: var(--iz-color-text);
 }
 
-.installment-buyer-block__section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 0;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-}
-
-.installment-buyer-block__address .address-delivery-fields {
-  gap: 0.55rem;
-}
-
 .installment-buyer-block__error {
   margin: 0;
   padding: 0.55rem 0.65rem;

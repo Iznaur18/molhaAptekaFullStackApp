@@ -17,6 +17,7 @@ const PLACEHOLDER_SCOPE_KEYS: Array<keyof CatalogListQueryKeyParams> = [
   "rentalOnly",
   "affiliateOnly",
   "wholesaleOnly",
+  "buyNFreeOnly",
   "originalOnly",
   "near",
   "regionCode",

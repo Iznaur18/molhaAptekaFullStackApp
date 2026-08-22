@@ -154,6 +154,7 @@ export function useAppShellState(location, navigate) {
     catalogRentalOnly: catalogQueryFromUrl.rentalOnly,
     catalogAffiliateOnly: catalogQueryFromUrl.affiliateOnly,
     catalogWholesaleOnly: catalogQueryFromUrl.wholesaleOnly,
+    catalogBuyNFreeOnly: catalogQueryFromUrl.buyNFreeOnly,
     catalogOriginalOnly: catalogQueryFromUrl.originalOnly,
     catalogNear: catalogQueryFromUrl.near,
     catalogFlashSaleOnly: catalogQueryFromUrl.flashSaleOnly,

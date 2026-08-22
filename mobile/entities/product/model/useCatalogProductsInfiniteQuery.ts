@@ -33,6 +33,7 @@ export const useCatalogProductsInfiniteQuery = (
         rentalOnly: filters.rentalOnly,
         affiliateOnly: filters.affiliateOnly,
         wholesaleOnly: filters.wholesaleOnly,
+        buyNFreeOnly: filters.buyNFreeOnly,
         originalOnly: filters.originalOnly,
         near: filters.near,
         regionCode: filters.regionCode,

@@ -70,6 +70,9 @@ export function useCatalogFilterState({
   const [catalogWholesaleOnly, setCatalogWholesaleOnly] = useState(
     () => initialCatalogQuery?.wholesaleOnly ?? false,
   );
+  const [catalogBuyNFreeOnly, setCatalogBuyNFreeOnly] = useState(
+    () => initialCatalogQuery?.buyNFreeOnly ?? false,
+  );
   const [catalogOriginalOnly, setCatalogOriginalOnly] = useState(
     () => initialCatalogQuery?.originalOnly ?? false,
   );
@@ -237,6 +240,7 @@ export function useCatalogFilterState({
     setCatalogRentalOnly(false);
     setCatalogAffiliateOnly(false);
     setCatalogWholesaleOnly(false);
+    setCatalogBuyNFreeOnly(false);
     setCatalogOriginalOnly(false);
     setCatalogFlashSaleOnly(false);
     setCatalogNear(true);
@@ -255,6 +259,7 @@ export function useCatalogFilterState({
       rentalOnly = false,
       affiliateOnly = false,
       wholesaleOnly = false,
+      buyNFreeOnly = false,
       originalOnly = false,
       near = false,
       flashSaleOnly = false,
@@ -273,6 +278,7 @@ export function useCatalogFilterState({
       setCatalogRentalOnly(rentalOnly);
       setCatalogAffiliateOnly(affiliateOnly);
       setCatalogWholesaleOnly(wholesaleOnly);
+      setCatalogBuyNFreeOnly(buyNFreeOnly);
       setCatalogOriginalOnly(originalOnly);
       setCatalogNear(near);
       setCatalogFlashSaleOnly(flashSaleOnly);
@@ -335,6 +341,8 @@ export function useCatalogFilterState({
     setCatalogAffiliateOnly,
     catalogWholesaleOnly,
     setCatalogWholesaleOnly,
+    catalogBuyNFreeOnly,
+    setCatalogBuyNFreeOnly,
     catalogOriginalOnly,
     setCatalogOriginalOnly,
     catalogNear,

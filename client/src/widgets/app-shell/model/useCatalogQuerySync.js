@@ -31,6 +31,7 @@ export function useCatalogQuerySync({
   catalogRentalOnly,
   catalogAffiliateOnly,
   catalogWholesaleOnly,
+  catalogBuyNFreeOnly,
   catalogOriginalOnly,
   catalogNear,
   catalogFlashSaleOnly,
@@ -47,6 +48,7 @@ export function useCatalogQuerySync({
   setCatalogRentalOnly,
   setCatalogAffiliateOnly,
   setCatalogWholesaleOnly,
+  setCatalogBuyNFreeOnly,
   setCatalogOriginalOnly,
   setCatalogNear,
   setCatalogFlashSaleOnly,
@@ -101,6 +103,9 @@ export function useCatalogQuerySync({
     setCatalogWholesaleOnly((prev) =>
       prev === parsed.wholesaleOnly ? prev : parsed.wholesaleOnly,
     );
+    setCatalogBuyNFreeOnly((prev) =>
+      prev === parsed.buyNFreeOnly ? prev : parsed.buyNFreeOnly,
+    );
     setCatalogOriginalOnly((prev) =>
       prev === parsed.originalOnly ? prev : parsed.originalOnly,
     );
@@ -119,6 +124,7 @@ export function useCatalogQuerySync({
     setCatalogRentalOnly,
     setCatalogAffiliateOnly,
     setCatalogWholesaleOnly,
+    setCatalogBuyNFreeOnly,
     setCatalogOriginalOnly,
     setCatalogNear,
     setCatalogFlashSaleOnly,
@@ -152,6 +158,7 @@ export function useCatalogQuerySync({
       !catalogRentalOnly &&
       !catalogAffiliateOnly &&
       !catalogWholesaleOnly &&
+      !catalogBuyNFreeOnly &&
       !catalogOriginalOnly &&
       !catalogNear &&
       !catalogFlashSaleOnly;
@@ -169,6 +176,7 @@ export function useCatalogQuerySync({
       rentalOnly: catalogRentalOnly,
       affiliateOnly: catalogAffiliateOnly,
       wholesaleOnly: catalogWholesaleOnly,
+      buyNFreeOnly: catalogBuyNFreeOnly,
       originalOnly: catalogOriginalOnly,
       near: catalogNear,
       flashSaleOnly: catalogFlashSaleOnly,
@@ -203,6 +211,7 @@ export function useCatalogQuerySync({
     catalogRentalOnly,
     catalogAffiliateOnly,
     catalogWholesaleOnly,
+    catalogBuyNFreeOnly,
     catalogOriginalOnly,
     catalogNear,
     catalogFlashSaleOnly,

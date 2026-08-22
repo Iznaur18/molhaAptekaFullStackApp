@@ -17,6 +17,7 @@ export type FetchCatalogProductsPageOptions = {
   rentalOnly?: boolean;
   affiliateOnly?: boolean;
   wholesaleOnly?: boolean;
+  buyNFreeOnly?: boolean;
   originalOnly?: boolean;
   near?: boolean;
   regionCode?: string;
@@ -37,6 +38,7 @@ export const fetchCatalogProductsPage = async ({
   rentalOnly,
   affiliateOnly,
   wholesaleOnly,
+  buyNFreeOnly,
   originalOnly,
   near,
   regionCode,
@@ -60,6 +62,7 @@ export const fetchCatalogProductsPage = async ({
         ...(rentalOnly ? { rentalOnly: "true" } : {}),
         ...(affiliateOnly ? { affiliateOnly: "true" } : {}),
         ...(wholesaleOnly ? { wholesaleOnly: "true" } : {}),
+        ...(buyNFreeOnly ? { buyNFreeOnly: "true" } : {}),
         ...(originalOnly ? { originalOnly: "true" } : {}),
         ...(near ? { near: "true" } : {}),
         ...(regionCode?.trim() ? { regionCode: regionCode.trim() } : {}),

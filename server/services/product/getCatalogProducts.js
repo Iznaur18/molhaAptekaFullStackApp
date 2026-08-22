@@ -1,4 +1,8 @@
 import {
+  PRODUCT_BUY_N_FREE_THRESHOLD_MAX,
+  PRODUCT_BUY_N_FREE_THRESHOLD_MIN,
+} from "@molha/api-contract";
+import {
   PRODUCT_MODERATION_APPROVED,
 } from "../../constants/productModerationConstants.js";
 import {
@@ -131,6 +135,7 @@ async function loadCatalogProducts({
   const rentalOnly = parseTruthyQueryFlag(query.rentalOnly);
   const affiliateOnly = parseTruthyQueryFlag(query.affiliateOnly);
   const wholesaleOnly = parseTruthyQueryFlag(query.wholesaleOnly);
+  const buyNFreeOnly = parseTruthyQueryFlag(query.buyNFreeOnly);
   const originalOnly = parseTruthyQueryFlag(query.originalOnly);
   const nearEnabled = parseTruthyQueryFlag(query.near);
   const flashSaleOnly = parseTruthyQueryFlag(query.flashSaleOnly);
@@ -192,6 +197,13 @@ async function loadCatalogProducts({
   }
   if (wholesaleOnly) {
     catalogBaseQuery.productWholesaleEnabled = true;
+  }
+  if (buyNFreeOnly) {
+    catalogBaseQuery.productBuyNFreeEnabled = true;
+    catalogBaseQuery.productBuyNFreeThreshold = {
+      $gte: PRODUCT_BUY_N_FREE_THRESHOLD_MIN,
+      $lte: PRODUCT_BUY_N_FREE_THRESHOLD_MAX,
+    };
   }
   if (originalOnly) {
     catalogBaseQuery.productIsOriginal = true;

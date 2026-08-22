@@ -2,6 +2,7 @@ import type { CatalogListFilters } from "@/entities/product/model/catalogListFil
 import {
   CATALOG_FILTER_AFFILIATE_ONLY,
   CATALOG_FILTER_AUCTION_ONLY,
+  CATALOG_FILTER_BUY_N_FREE_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
   CATALOG_FILTER_NEAR,
@@ -10,6 +11,7 @@ import {
   CATALOG_FILTER_SALE_ONLY,
   CATALOG_FILTER_WHOLESALE_ONLY,
   CATALOG_SORT_NEWEST,
+  CATALOG_SORT_PURCHASES,
   type CatalogFeedTile,
 } from "@/entities/product-category-display/lib/catalogFeedTiles";
 
@@ -25,6 +27,7 @@ export const buildQueryForCatalogFeedTile = (
   | "rentalOnly"
   | "affiliateOnly"
   | "wholesaleOnly"
+  | "buyNFreeOnly"
   | "originalOnly"
   | "near"
 > => {
@@ -38,6 +41,7 @@ export const buildQueryForCatalogFeedTile = (
       rentalOnly: false,
       affiliateOnly: false,
       wholesaleOnly: false,
+      buyNFreeOnly: false,
       originalOnly: false,
       near: false,
     };
@@ -52,6 +56,7 @@ export const buildQueryForCatalogFeedTile = (
     rentalOnly: false,
     affiliateOnly: false,
     wholesaleOnly: false,
+    buyNFreeOnly: false,
     originalOnly: false,
     near: false,
   };
@@ -79,6 +84,13 @@ export const buildQueryForCatalogFeedTile = (
   }
   if (tile.value === CATALOG_FILTER_WHOLESALE_ONLY) {
     return { ...base, wholesaleOnly: true };
+  }
+  if (tile.value === CATALOG_FILTER_BUY_N_FREE_ONLY) {
+    return {
+      ...base,
+      buyNFreeOnly: true,
+      sort: CATALOG_SORT_PURCHASES as CatalogListFilters["sort"],
+    };
   }
   if (tile.value === CATALOG_FILTER_ORIGINAL_ONLY) {
     return { ...base, originalOnly: true };

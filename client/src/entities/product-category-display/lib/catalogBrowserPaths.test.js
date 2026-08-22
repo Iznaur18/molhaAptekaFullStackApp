@@ -18,6 +18,7 @@ const baseQuery = {
   rentalOnly: false,
   affiliateOnly: false,
   wholesaleOnly: false,
+  buyNFreeOnly: false,
   originalOnly: false,
   near: false,
   flashSaleOnly: false,

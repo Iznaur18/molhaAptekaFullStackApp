@@ -3,7 +3,10 @@ import { z } from "zod";
 /** Синхрон с `server/validations/user/userNameRules.js`. */
 export const USER_NAME_MIN_LENGTH = 3;
 export const USER_NAME_MAX_LENGTH = 30;
-const USER_NAME_REGEX = /^[a-z0-9]+$/;
+const USER_NAME_CHAR_REGEX = /^[a-z0-9._]+$/;
+const USER_NAME_HAS_ALNUM = /[a-z0-9]/;
+export const USER_NAME_FORMAT_ERROR =
+  "Никнейм: a–z, 0–9, точка и подчёркивание; точка не в начале/конце и не подряд (..); нужна хотя бы одна буква или цифра";
 
 /** Синхрон с `server/validations/user/ruPhoneRules.js`. */
 export const RU_PHONE_E164_REGEX = /^\+79\d{9}$/;
@@ -173,19 +176,37 @@ export function normalizeUserNameInput(raw) {
 }
 
 /**
- * @param {string} normalized
+ * Live input sanitize: lower case + только a–z 0–9 `.` `_`.
+ * @param {unknown} raw
+ * @returns {string}
  */
-function assertUserNameFormat(normalized) {
+export function sanitizeUserNameInputLive(raw) {
+  return String(raw ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9._]/g, "");
+}
+
+/**
+ * @param {string} normalized — уже trim + lowerCase
+ */
+export function assertUserNameFormat(normalized) {
+  if (typeof normalized !== "string") {
+    throw new Error("Никнейм должен быть строкой");
+  }
   if (normalized.length < USER_NAME_MIN_LENGTH) {
     throw new Error(`Никнейм не короче ${USER_NAME_MIN_LENGTH} символов`);
   }
   if (normalized.length > USER_NAME_MAX_LENGTH) {
     throw new Error(`Никнейм не длиннее ${USER_NAME_MAX_LENGTH} символов`);
   }
-  if (!USER_NAME_REGEX.test(normalized)) {
-    throw new Error(
-      "Никнейм: только строчные латинские буквы (a–z) и цифры (0–9), без пробелов и других символов",
-    );
+  if (
+    !USER_NAME_CHAR_REGEX.test(normalized) ||
+    normalized.startsWith(".") ||
+    normalized.endsWith(".") ||
+    normalized.includes("..") ||
+    !USER_NAME_HAS_ALNUM.test(normalized)
+  ) {
+    throw new Error(USER_NAME_FORMAT_ERROR);
   }
 }
 

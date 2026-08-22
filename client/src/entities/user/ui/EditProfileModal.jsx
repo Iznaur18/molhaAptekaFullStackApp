@@ -162,7 +162,7 @@ export function EditProfileModal({
                 onChange={handleChange}
                 maxLength={USER_NAME_MAX_LENGTH}
                 title={EDIT_PROFILE_MODAL_UI.USERNAME_HINT}
-                placeholder="nickname123"
+                placeholder="user.name"
                 autoComplete="username"
               />
               <span className="edit-profile-modal__hint">
@@ -244,6 +244,7 @@ export function EditProfileModal({
                 }))
               }
               disabled={isSubmitting}
+              displayOnly
               lineInputClassName="edit-profile-modal__input"
               labels={{ line: ADDRESS_STRUCTURED_UI.SECTION_LABEL }}
             />

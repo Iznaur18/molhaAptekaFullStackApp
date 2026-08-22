@@ -121,7 +121,7 @@ export function EditProfilePage({
       root.scrollIntoView({ behavior: "smooth", block: "center" });
       const input = root.querySelector("input");
       if (input instanceof HTMLInputElement) {
-        input.focus();
+        input.click();
       }
     }, 150);
     return () => window.clearTimeout(timer);
@@ -256,7 +256,7 @@ export function EditProfilePage({
                 onChange={handleChange}
                 maxLength={USER_NAME_MAX_LENGTH}
                 title={EDIT_PROFILE_MODAL_UI.USERNAME_HINT}
-                placeholder="nickname123"
+                placeholder="user.name"
                 autoComplete="username"
               />
               <span className="edit-profile-modal__hint">{EDIT_PROFILE_MODAL_UI.USERNAME_HINT}</span>
@@ -349,6 +349,7 @@ export function EditProfilePage({
                 }))
               }
               disabled={isSubmitting}
+              displayOnly
               lineInputClassName="edit-profile-modal__input"
               labels={{ line: ADDRESS_STRUCTURED_UI.SECTION_LABEL }}
             />

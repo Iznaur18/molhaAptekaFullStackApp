@@ -2,7 +2,7 @@ import { z } from "zod";
 
 /** Синхрон с `server/constants/catalogFeedTileConstants.js`. */
 export const CATALOG_FEED_TILE_KEY_VALUES = [
-  "sort:newest",
+  "filter:__buy_n_free_only__",
   "sort:views",
   "sort:purchases",
   "sort:reviews",

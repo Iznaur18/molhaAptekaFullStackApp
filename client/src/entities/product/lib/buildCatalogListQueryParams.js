@@ -44,6 +44,7 @@ export function buildCatalogListQueryParams({
     rentalOnly: catalogQueryFromUrl.rentalOnly ? true : null,
     affiliateOnly: catalogQueryFromUrl.affiliateOnly ? true : null,
     wholesaleOnly: catalogQueryFromUrl.wholesaleOnly ? true : null,
+    buyNFreeOnly: catalogQueryFromUrl.buyNFreeOnly ? true : null,
     originalOnly: catalogQueryFromUrl.originalOnly ? true : null,
     near: catalogQueryFromUrl.near && nearAllowed ? true : null,
     flashSaleOnly: catalogQueryFromUrl.flashSaleOnly ? true : null,

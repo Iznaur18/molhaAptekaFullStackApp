@@ -16,6 +16,7 @@ export type CatalogListFilters = {
   rentalOnly?: boolean;
   affiliateOnly?: boolean;
   wholesaleOnly?: boolean;
+  buyNFreeOnly?: boolean;
   originalOnly?: boolean;
   near?: boolean;
   regionCode?: string;
@@ -35,6 +36,7 @@ export const buildCatalogListQueryKey = (filters: CatalogListFilters) => ({
   rentalOnly: filters.rentalOnly === true ? true : undefined,
   affiliateOnly: filters.affiliateOnly === true ? true : undefined,
   wholesaleOnly: filters.wholesaleOnly === true ? true : undefined,
+  buyNFreeOnly: filters.buyNFreeOnly === true ? true : undefined,
   originalOnly: filters.originalOnly === true ? true : undefined,
   near: filters.near === true ? true : undefined,
   regionCode: filters.regionCode?.trim() || undefined,

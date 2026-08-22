@@ -1,0 +1,134 @@
+.seller-profile-quick-stats {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.seller-profile-quick-stats__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.78fr) minmax(0, 0.78fr) minmax(0, 1.44fr);
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.seller-profile-quick-stats__item {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  min-width: 0;
+  min-height: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 1.25rem;
+  background: var(--iz-color-action-soft);
+  text-align: center;
+}
+
+.seller-profile-quick-stats__item_phone {
+  padding: 12px 14px;
+}
+
+.seller-profile-quick-stats__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.seller-profile-quick-stats__value {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--iz-color-ink);
+  word-break: break-word;
+}
+
+.seller-profile-quick-stats__item_phone .seller-profile-quick-stats__value {
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+:root[data-theme="dark"] .seller-profile-quick-stats__value {
+  color: var(--iz-color-text);
+}
+
+.seller-profile-quick-stats__label {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--iz-color-text-muted);
+}
+
+.seller-profile-quick-stats__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.seller-profile-quick-stats__link:hover {
+  color: var(--iz-color-action);
+  text-decoration: underline;
+}
+
+.seller-profile-quick-stats__reveal-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.seller-profile-quick-stats__reveal {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--iz-color-action);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.25;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.seller-profile-quick-stats__reveal:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.seller-profile-quick-stats__reveal-error {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--iz-color-danger);
+}
+
+@media (max-width: 420px) {
+  .seller-profile-quick-stats__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .seller-profile-quick-stats__item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 0;
+    padding: 12px 14px;
+    text-align: start;
+  }
+
+  .seller-profile-quick-stats__item_phone .seller-profile-quick-stats__value {
+    font-size: 0.9375rem;
+  }
+
+  .seller-profile-quick-stats__reveal-wrap {
+    align-items: flex-start;
+  }
+}

@@ -23,6 +23,7 @@ import { formatApiErrorMessage } from "@izibuy/shared-lib";
  *   rentalOnly?: boolean;
  *   affiliateOnly?: boolean;
  *   wholesaleOnly?: boolean;
+ *   buyNFreeOnly?: boolean;
  *   originalOnly?: boolean;
  *   near?: boolean;
  *   flashSaleOnly?: boolean;
@@ -49,6 +50,7 @@ export async function fetchCatalogProductsPage({
   rentalOnly = false,
   affiliateOnly = false,
   wholesaleOnly = false,
+  buyNFreeOnly = false,
   originalOnly = false,
   near = false,
   flashSaleOnly = false,
@@ -72,6 +74,7 @@ export async function fetchCatalogProductsPage({
         ...(rentalOnly ? { rentalOnly: "true" } : {}),
         ...(affiliateOnly ? { affiliateOnly: "true" } : {}),
         ...(wholesaleOnly ? { wholesaleOnly: "true" } : {}),
+        ...(buyNFreeOnly ? { buyNFreeOnly: "true" } : {}),
         ...(originalOnly ? { originalOnly: "true" } : {}),
         ...(near ? { near: "true" } : {}),
         ...(flashSaleOnly ? { flashSaleOnly: "true" } : {}),

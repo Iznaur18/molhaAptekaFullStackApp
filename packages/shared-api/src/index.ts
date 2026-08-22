@@ -21,7 +21,7 @@ import {
   generateClientRequestId,
   getRequestIdFromAxiosError,
   REQUEST_ID_HEADER,
-} from "./requestId.js";
+} from "./requestId";
 
 export {
   generateClientRequestId,
@@ -32,7 +32,7 @@ export {
   REQUEST_ID_HEADER,
   REQUEST_ID_MAX_LENGTH,
   REQUEST_ID_MIN_LENGTH,
-} from "./requestId.js";
+} from "./requestId";
 
 const AUTH_REFRESH_SKIP_PATHS = [
   "/auth/refresh",
@@ -117,7 +117,7 @@ export const shouldSkipAuthRefreshByUrl = (url?: string): boolean => {
   return AUTH_REFRESH_SKIP_PATHS.some((skipPath) => path.includes(skipPath));
 };
 
-export { isDefinitiveAuthRefreshFailure } from "./isDefinitiveAuthRefreshFailure.js";
+export { isDefinitiveAuthRefreshFailure } from "./isDefinitiveAuthRefreshFailure";
 
 export const createRefreshSessionQueue = <T>(refreshFn: () => Promise<T>) => {
   let refreshSessionPromise: Promise<T> | null = null;

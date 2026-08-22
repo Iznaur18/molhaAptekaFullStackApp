@@ -13,6 +13,7 @@ export const CATALOG_LANDING_QUERY = {
   rentalOnly: false,
   affiliateOnly: false,
   wholesaleOnly: false,
+  buyNFreeOnly: false,
   originalOnly: false,
   near: false,
   flashSaleOnly: false,

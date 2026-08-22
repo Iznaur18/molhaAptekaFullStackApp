@@ -28,6 +28,9 @@ export const PRODUCT_CATALOG_NEAR_ADDRESS_REQUIRED_MESSAGE =
 
 export const PRODUCT_CATALOG_NEAR_REGION_SECTION_TITLE = "В вашем регионе";
 
+/** Макс. длина `search` в каталоге (header / API / mobile). */
+export const CATALOG_SEARCH_QUERY_MAX_LENGTH = 200;
+
 /**
  * Подпись дистанции для каталога «Рядом».
  * &lt;10 км → `~1.2 км` (1 знак, мин. 0.1); ≥10 → `~12 км`.
@@ -132,8 +135,8 @@ const optionalTrimmedString = z.preprocess((value) => {
 /** Query `GET /product`, `GET /product/my` (после express query parser). */
 export const catalogProductsQuerySchema = z.object({
   search: optionalTrimmedString.refine(
-    (value) => value === undefined || value.length <= 50,
-    { message: "search не более 50 символов" },
+    (value) => value === undefined || value.length <= CATALOG_SEARCH_QUERY_MAX_LENGTH,
+    { message: `search не более ${CATALOG_SEARCH_QUERY_MAX_LENGTH} символов` },
   ),
   page: z.coerce.number().int().min(1).optional().default(1),
   limit: z.coerce.number().int().min(1).max(100).optional().default(10),
@@ -160,6 +163,7 @@ export const catalogProductsQuerySchema = z.object({
   rentalOnly: optionalTruthyFlag,
   affiliateOnly: optionalTruthyFlag,
   wholesaleOnly: optionalTruthyFlag,
+  buyNFreeOnly: optionalTruthyFlag,
   originalOnly: optionalTruthyFlag,
   /** Товары рядом с адресом профиля (см. PRODUCT_CATALOG_NEAR_RADIUS_KM). */
   near: optionalTruthyFlag,
