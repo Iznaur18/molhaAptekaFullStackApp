@@ -24,7 +24,11 @@ describe("EDIT_PRODUCT_WIZARD_STEP_IDS", () => {
 describe("validateEditProductWizardStep", () => {
   it("reuses create validation for form steps", () => {
     expect(
-      validateEditProductWizardStep("basic", CREATE_PRODUCT_INITIAL_FORM, validationContext),
+      validateEditProductWizardStep(
+        "basic",
+        CREATE_PRODUCT_INITIAL_FORM,
+        validationContext,
+      ),
     ).toBe(validateProductName(""));
   });
 
@@ -55,6 +59,19 @@ describe("validateEditProductWizardStep", () => {
           productCategoryId: "507f1f77bcf86cd799439011",
           productRegionCode: "RU-CE",
           productReturnEnabled: false,
+          // Форма правки сидится через productPickupLocationsFromApiProduct:
+          // даже у legacy-товара с одним адресом это массив из одной точки.
+          productPickupLocations: [
+            {
+              id: "legacy-default",
+              label: "",
+              address: "Москва, Тверская улица, 1",
+              lat: 55.75,
+              lon: 37.62,
+              isDefault: true,
+              selectedFromSuggest: true,
+            },
+          ],
           productPickupAddress: "Москва, Тверская улица, 1",
           productPickupLat: 55.75,
           productPickupLon: 37.62,

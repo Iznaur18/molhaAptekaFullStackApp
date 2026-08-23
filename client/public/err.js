@@ -12,13 +12,19 @@
         label +
         "&e=" +
         encodeURIComponent(String(msg).slice(0, 600));
-    } catch (e) {}
+    } catch (_e) {
+      /* маячок best-effort: если Image/encodeURIComponent упали — молчим,
+         диагностика не должна ломать загрузку страницы */
+    }
   }
   window.addEventListener(
     "error",
     function (e) {
       if (e && e.target && e.target !== window && (e.target.src || e.target.href)) {
-        send("res", (e.target.tagName || "") + " " + (e.target.src || e.target.href || ""));
+        send(
+          "res",
+          (e.target.tagName || "") + " " + (e.target.src || e.target.href || ""),
+        );
       } else {
         send(
           "err",
@@ -30,11 +36,11 @@
             ":" +
             (e.colno || "") +
             " :: " +
-            ((e.error && e.error.stack) || "").slice(0, 350)
+            ((e.error && e.error.stack) || "").slice(0, 350),
         );
       }
     },
-    true
+    true,
   );
   window.addEventListener("unhandledrejection", function (e) {
     var r = e && e.reason;

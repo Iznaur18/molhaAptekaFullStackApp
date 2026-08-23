@@ -2,7 +2,10 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { izColors } from "../packages/design-tokens/src/colors.ts";
+import {
+  IZ_COLOR_COMPAT_KEYS,
+  izColors,
+} from "../packages/design-tokens/src/colors.ts";
 import { izRadius } from "../packages/design-tokens/src/radius.ts";
 import { izSpacing } from "../packages/design-tokens/src/spacing.ts";
 
@@ -19,7 +22,8 @@ for (const match of cssContent.matchAll(/(--iz-[a-z0-9-]+)\s*:\s*([^;]+);/gim)) 
   cssVars.set(varName, rawValue);
 }
 
-const camelToKebab = (value) => value.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`);
+const camelToKebab = (value) =>
+  value.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`);
 
 const normalizeHex = (value) => String(value).trim().toLowerCase();
 
@@ -43,17 +47,32 @@ const parseCssLengthToPx = (value) => {
 /** @type {string[]} */
 const violations = [];
 
+const compatColorKeys = new Set(IZ_COLOR_COMPAT_KEYS);
+
+/** CSS-значение, которое нельзя сверить с литералом токена (производное). */
+const isDerivedCssValue = (value) =>
+  /^(color-mix|var|calc|rgb|hsl|oklch)\s*\(/i.test(String(value).trim());
+
 for (const [tokenKey, tokenValue] of Object.entries(izColors)) {
   const varName = `--iz-color-${camelToKebab(tokenKey)}`;
   const cssValue = cssVars.get(varName);
+  const isCompat = compatColorKeys.has(tokenKey);
+
   if (!cssValue) {
-    violations.push(`missing color var ${varName}`);
+    // compat-алиасы в web CSS не обязаны существовать: их либо не используют,
+    // либо используют как `var(--alias, var(--canonical))`.
+    if (!isCompat) {
+      violations.push(`missing color var ${varName}`);
+    }
+    continue;
+  }
+  // Производные значения (color-mix от канонического токена) сверять с
+  // литералом нельзя — это не рассинхрон, а осознанная деривация в CSS.
+  if (isCompat && isDerivedCssValue(cssValue)) {
     continue;
   }
   if (normalizeHex(cssValue) !== normalizeHex(tokenValue)) {
-    violations.push(
-      `color mismatch ${varName}: css=${cssValue} tokens=${tokenValue}`,
-    );
+    violations.push(`color mismatch ${varName}: css=${cssValue} tokens=${tokenValue}`);
   }
 }
 

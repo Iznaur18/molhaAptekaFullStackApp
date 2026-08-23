@@ -70,7 +70,12 @@ const izColorsDarkCanonical = {
   ink: DARK_CANVAS,
   bg: DARK_CANVAS,
   surfaceMuted: "#14171d",
-  surfaceElevated: "#1b1f27",
+  /*
+   * Лесенка dark обязана совпадать со светлой: bg < surfaceMuted <
+   * surfaceElevated < surface. Прежний #1b1f27 был СВЕТЛЕЕ surface (#1B1E24)
+   * и ломал порядок слоёв — приподнятая поверхность светилась ярче «белой».
+   */
+  surfaceElevated: "#191d24",
   surface: "#1B1E24",
   onContrast: "#12151b",
   primary: "#dfe3ea",
@@ -127,6 +132,14 @@ const izColorsDarkCompat = {
   raffleBorder: izColorsDarkCanonical.warning,
   warningBorder: izColorsDarkCanonical.warning,
 } as const;
+
+/**
+ * Ключи из compat-слоя: это алиасы на канонические токены для RN-потребителей.
+ * В `client/src/shared/styles/designTokens.css` они переменными не дублируются
+ * (в CSS используются либо канонические имена, либо `var(alias, var(canonical))`),
+ * поэтому parity-скрипт проверяет их только при наличии.
+ */
+export const IZ_COLOR_COMPAT_KEYS = Object.keys(izColorsCompat);
 
 export const izColors = {
   ...izColorsCanonical,

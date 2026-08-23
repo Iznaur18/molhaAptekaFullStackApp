@@ -13,7 +13,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "verify:design-tokens": "node scripts/verify-design-tokens-parity.mjs",
+    "verify:design-tokens": "tsx scripts/verify-design-tokens-parity.mjs",
     "verify:profile-sections": "npm run build --workspace=@izibuy/shared-lib && node scripts/verify-profile-sections-parity.mjs",
     "test:contract": "npm test --prefix contract",
     "test:shared-lib": "npm test --workspace=@izibuy/shared-lib",
