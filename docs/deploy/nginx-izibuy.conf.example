@@ -58,6 +58,14 @@ server {
 
     # --- Раздача загрузок через Express (или alias на server/uploads, см. ниже) ---
 
+    # Приватные медиа (селфи паспорта) наружу не отдаются НИКОГДА — только
+    # `GET /upload/private/:filename` с проверкой прав. Второй эшелон к гварду
+    # в server/createApp.js: nginx нормализует URI до сравнения, поэтому здесь
+    # ловятся и `//private/`, и обычный `/private/`.
+    location ~* ^/uploads/+private/ {
+        return 404;
+    }
+
     location /uploads/ {
         proxy_pass http://izibuy_api;
         proxy_http_version 1.1;
@@ -370,7 +378,13 @@ server {
 }
 
 # --- Опционально: отдавать /uploads напрямую с диска (быстрее, без Node) ---
-# Замени блок location /uploads/ выше на:
+# Замени блок location /uploads/ выше на код ниже. Блок `location ~* ^/uploads/+private/`
+# при этом ОБЯЗАТЕЛЕН и должен остаться: с alias'ом Express уже не участвует,
+# и его гвард приватных файлов не отработает.
+#
+# location ~* ^/uploads/+private/ {
+#     return 404;
+# }
 #
 # location /uploads/ {
 #     alias /var/www/izibuy/server/uploads/;

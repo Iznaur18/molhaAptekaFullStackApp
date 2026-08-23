@@ -4,31 +4,10 @@ import {
 } from "../constants/authCookieConstants.js";
 import { errorRes } from "../services/http/index.js";
 import { isDevTrustedBrowserOrigin } from "../utils/isDevTrustedBrowserOrigin.js";
+import { resolveRequestBrowserOrigin } from "../utils/resolveRequestBrowserOrigin.js";
 import { parseFrontendOrigins } from "../utils/resolveFrontendOrigin.js";
 
 const UNSAFE_HTTP_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
-
-/**
- * @param {import('express').Request} req
- * @returns {string | null}
- */
-function resolveRequestOrigin(req) {
-  const origin = req.get("origin");
-  if (origin) {
-    return origin;
-  }
-
-  const referer = req.get("referer");
-  if (!referer) {
-    return null;
-  }
-
-  try {
-    return new URL(referer).origin;
-  } catch {
-    return null;
-  }
-}
 
 /**
  * Cookie-сессия: access и/или refresh (после expiry access refresh ещё жив).
@@ -72,7 +51,7 @@ export function csrfCookieOriginCheckMW(req, res, next) {
     return next();
   }
 
-  const requestOrigin = resolveRequestOrigin(req);
+  const requestOrigin = resolveRequestBrowserOrigin(req);
   if (!requestOrigin) {
     return errorRes(res, 403, "Запрос отклонён (origin)");
   }

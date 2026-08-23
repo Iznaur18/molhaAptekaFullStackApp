@@ -40,6 +40,7 @@ import { buildHealthPayload } from "./utils/buildHealthPayload.js";
 import { API_JSON_BODY_LIMIT } from "./constants/securityRateLimitConstants.js";
 import { resolveApiCorsMiddleware } from "./utils/resolveApiCorsMiddleware.js";
 import { resolveUploadContentType } from "./utils/resolveUploadContentType.js";
+import { resolveUploadsRequestPathPrivacy } from "./utils/resolveUploadsRequestPathPrivacy.js";
 import { UPLOADS_DIR } from "./utils/uploadsDir.js";
 import {
   productLinkPreviewController,
@@ -71,8 +72,11 @@ export const createApp = () => {
   // Локальные файлы (UPLOAD_STORAGE=disk) и legacy после миграции на S3/CDN.
   // `/uploads/private/*` закрыт — только `GET /upload/private/:filename` (staff).
   app.use("/uploads", (req, res, next) => {
-    const requestPath = String(req.path ?? "").replaceAll("\\", "/");
-    if (requestPath === "/private" || requestPath.startsWith("/private/")) {
+    const { malformed, isPrivate } = resolveUploadsRequestPathPrivacy(req.path);
+    if (malformed) {
+      return res.status(400).end();
+    }
+    if (isPrivate) {
       return res.status(404).end();
     }
     return next();
