@@ -1,19 +1,15 @@
-import { addressValueFromUser } from "../../address/lib/addressValueFromUser.js";
-
 /**
- * @param {Partial<{
- *   userAddress?: string;
- *   userAddressFlat?: string;
- *   userAddressFiasId?: string;
- *   userAddressGeo?: { lat?: number; lon?: number } | null;
- * }> | null | undefined} user
+ * Pickup locations are chosen explicitly on the pickup wizard step.
+ * Do not prefill from profile — avoids saving unselected profile addresses.
+ *
+ * @param {Partial<import('../../user/model/types.js').UserPublicProfile>} _user
  */
-export function createProductPickupFieldsFromUser(user) {
-  const address = addressValueFromUser(user ?? {});
+export function createProductPickupFieldsFromUser(_user) {
   return {
-    productPickupAddress: address.line,
-    productPickupLat: address.geo?.lat ?? null,
-    productPickupLon: address.geo?.lon ?? null,
-    productPickupSelectedFromSuggest: address.selectedFromSuggest === true,
+    productPickupLocations: [],
+    productPickupAddress: "",
+    productPickupLat: null,
+    productPickupLon: null,
+    productPickupSelectedFromSuggest: false,
   };
 }

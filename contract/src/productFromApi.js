@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { productOutOfStockLabelFieldSchema } from "./productOutOfStockLabel.js";
+
 /** Синхрон с `server/constants/productModerationConstants.js`. */
 export const PRODUCT_MODERATION_STATUSES = ["pending", "approved", "rejected"];
 
@@ -13,6 +15,8 @@ export const productFromApiSchema = z
     productModerationStatus: z.enum(PRODUCT_MODERATION_STATUSES).nullish(),
     productModerationComment: z.string().nullish(),
     productIsAvailable: z.boolean().nullish(),
+    productOutOfStock: z.boolean().nullish(),
+    productOutOfStockLabel: productOutOfStockLabelFieldSchema.nullish(),
     productQaEnabled: z.boolean().nullish(),
     soldQuantity: z.number().nullish(),
     productFlashSaleEnabled: z.boolean().nullish(),

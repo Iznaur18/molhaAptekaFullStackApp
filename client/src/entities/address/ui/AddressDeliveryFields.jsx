@@ -41,6 +41,11 @@ const MAP_GEOLOCATE_DEBOUNCE_MS = 350;
  *   lineInputClassName?: string;
  *   labels?: { line?: string };
  *   showMap?: boolean;
+ *   hideMapOpenButton?: boolean;
+ *   lineOpensMap?: boolean;
+ *   mapOpen?: boolean;
+ *   onMapOpenChange?: (open: boolean) => void;
+ *   rootId?: string;
  * }} props
  */
 export function AddressDeliveryFields({
@@ -51,6 +56,11 @@ export function AddressDeliveryFields({
   lineInputClassName = "",
   labels = {},
   showMap = true,
+  hideMapOpenButton = false,
+  lineOpensMap = false,
+  mapOpen: mapOpenProp,
+  onMapOpenChange,
+  rootId = "edit-profile-address",
 }) {
   const listId = useId();
   const mapTitleId = useId();
@@ -60,7 +70,15 @@ export function AddressDeliveryFields({
   valueRef.current = value;
   const geolocateSeqRef = useRef(0);
   const [debouncedQuery, setDebouncedQuery] = useState("");
-  const [mapOpen, setMapOpen] = useState(false);
+  const [internalMapOpen, setInternalMapOpen] = useState(false);
+  const mapOpen = mapOpenProp ?? internalMapOpen;
+  const setMapOpen = (next) => {
+    if (onMapOpenChange) {
+      onMapOpenChange(next);
+      return;
+    }
+    setInternalMapOpen(next);
+  };
   const [mapSuggestPanelOpen, setMapSuggestPanelOpen] = useState(true);
   const [serviceDown, setServiceDown] = useState(() => isAddressServiceUnavailable());
   const [mapStatus, setMapStatus] = useState(
@@ -395,11 +413,14 @@ export function AddressDeliveryFields({
       : null;
 
   const mapOpensFromLine = displayOnly && showMap;
+  const lineMapTrigger = lineOpensMap && showMap;
   const openMapFromLine = () => {
-    if (!mapOpensFromLine || disabled) {
+    if (disabled) {
       return;
     }
-    setMapOpen(true);
+    if (mapOpensFromLine || lineMapTrigger) {
+      setMapOpen(true);
+    }
   };
 
   const showMapStatusHints =
@@ -423,7 +444,7 @@ export function AddressDeliveryFields({
   ) : null;
 
   return (
-    <div className="address-delivery-fields" id="edit-profile-address">
+    <div className="address-delivery-fields" id={rootId}>
       <label className="address-delivery-fields__line-wrap" ref={wrapRef}>
         <FormFieldLabel>{lineLabel}</FormFieldLabel>
         <div className="address-delivery-fields__input-row">
@@ -431,7 +452,9 @@ export function AddressDeliveryFields({
             type="text"
             className={[
               lineInputClassName,
-              mapOpensFromLine ? "address-delivery-fields__line_map-trigger" : "",
+              mapOpensFromLine || lineMapTrigger
+                ? "address-delivery-fields__line_map-trigger"
+                : "",
             ]
               .filter(Boolean)
               .join(" ")}
@@ -531,7 +554,7 @@ export function AddressDeliveryFields({
         </div>
       ) : null}
 
-      {showMap && !displayOnly ? (
+      {showMap && !displayOnly && !hideMapOpenButton ? (
         <div className="address-delivery-fields__map">
           <p className="address-delivery-fields__hint">
             {ADDRESS_DELIVERY_UI.MAP_PICK_HINT}

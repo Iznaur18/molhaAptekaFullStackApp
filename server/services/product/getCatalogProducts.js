@@ -219,7 +219,10 @@ async function loadCatalogProducts({
   }
   if (!includeHiddenStaff) {
     catalogBaseQuery.productIsAvailable = { $ne: false };
-    catalogBaseQuery.productStockQuantity = { $gt: 0 };
+    catalogBaseQuery.$and = [
+      ...(Array.isArray(catalogBaseQuery.$and) ? catalogBaseQuery.$and : []),
+      { $or: [{ productOutOfStock: true }, { productStockQuantity: { $gt: 0 } }] },
+    ];
   }
 
   const viewerRegionCode = await resolveViewerRegionCodeForRequest({

@@ -21,6 +21,17 @@ const editForm = {
   productCategory: "home_garden",
   productCategoryId: "507f1f77bcf86cd799439011",
   productRegionCode: "RU-CE",
+  productPickupLocations: [
+    {
+      id: "loc-1",
+      label: "",
+      address: "Чебоксары, ул Ленина, д 1",
+      lat: 56.14,
+      lon: 47.25,
+      isDefault: true,
+      selectedFromSuggest: true,
+    },
+  ],
   productPickupAddress: "Чебоксары, ул Ленина, д 1",
   productPickupLat: 56.14,
   productPickupLon: 47.25,

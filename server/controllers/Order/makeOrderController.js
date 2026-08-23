@@ -19,6 +19,7 @@ export const makeOrderController = async (req, res) => {
         paymentMethod: req.body.paymentMethod,
         priceOfferId: req.body.priceOfferId,
         fulfillmentMethod: req.body.fulfillmentMethod,
+        pickupSelections: req.body.pickupSelections,
         verifiedDeliveryAddress: req.verifiedDeliveryAddress,
         affiliateCode: req.body.affiliateCode,
       });

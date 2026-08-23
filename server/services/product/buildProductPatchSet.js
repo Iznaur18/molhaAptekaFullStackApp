@@ -20,6 +20,8 @@ import { normalizeProductCharacteristics } from "./normalizeProductCharacteristi
 import { resolveProductReturnWriteFromBody } from "./normalizeProductReturnTerms.js";
 import { normalizeProductListingOrigin } from "./normalizeProductListingOrigin.js";
 import { normalizeProductIsOriginal } from "./normalizeProductIsOriginal.js";
+import { normalizeProductOutOfStock } from "./normalizeProductOutOfStock.js";
+import { normalizeProductOutOfStockLabel } from "./normalizeProductOutOfStockLabel.js";
 import { resolveProductCategoryWriteFromBody } from "./resolveProductCategoryWrite.js";
 import { normalizeProductSaleCity } from "./productSaleCity.js";
 import { resolveProductSaleCityNormalized } from "./ruCityNormalized.js";
@@ -29,7 +31,7 @@ import {
   resolveProductDeliveryEnabledForWrite,
   resolveProductPickupEnabledForWrite,
 } from "./productPickup.js";
-import { resolveProductSaleLocation } from "./resolveProductSaleLocation.js";
+import { resolveProductPickupWriteFields } from "./productPickupLocations.js";
 
 import {
   CATALOG_VISIBILITY_BLOCK_MESSAGE,
@@ -132,6 +134,36 @@ const applyIsOriginalField = (body, $set) => {
   }
 };
 
+const applyOutOfStockField = (body, $set) => {
+  if (!hasBodyField(body, "productOutOfStock")) {
+    return;
+  }
+
+  try {
+    const normalized = normalizeProductOutOfStock(body.productOutOfStock);
+    if (normalized !== undefined) {
+      $set.productOutOfStock = normalized;
+    }
+  } catch (error) {
+    throwFieldError(error, "Некорректный признак «Нет в наличии»");
+  }
+};
+
+const applyOutOfStockLabelField = (body, $set) => {
+  if (!hasBodyField(body, "productOutOfStockLabel")) {
+    return;
+  }
+
+  try {
+    const normalized = normalizeProductOutOfStockLabel(body.productOutOfStockLabel);
+    if (normalized !== undefined) {
+      $set.productOutOfStockLabel = normalized;
+    }
+  } catch (error) {
+    throwFieldError(error, "Некорректная надпись для карточки «нет в наличии»");
+  }
+};
+
 const applyPriceFields = (body, $set, existing) => {
   const touchesFlashSale =
     hasBodyField(body, "productFlashSaleEnabled") ||
@@ -196,6 +228,7 @@ const applySaleCityField = (body, $set) => {
 };
 
 const applyPickupFields = async (body, $set, $unset, existing) => {
+  const touchesLocations = hasBodyField(body, "productPickupLocations");
   const touchesAddress = hasBodyField(body, "productPickupAddress");
   const touchesLat = hasBodyField(body, "productPickupLat");
   const touchesLon = hasBodyField(body, "productPickupLon");
@@ -203,6 +236,7 @@ const applyPickupFields = async (body, $set, $unset, existing) => {
   const touchesPickupEnabled = hasBodyField(body, "productPickupEnabled");
 
   if (
+    !touchesLocations &&
     !touchesAddress &&
     !touchesLat &&
     !touchesLon &&
@@ -242,45 +276,52 @@ const applyPickupFields = async (body, $set, $unset, existing) => {
       assertProductFulfillmentMethods(nextPickupEnabled, nextDeliveryEnabled);
     }
 
-    if (!touchesAddress && !touchesLat && !touchesLon) {
+    if (!touchesLocations && !touchesAddress && !touchesLat && !touchesLon) {
       return;
     }
 
-    const nextAddress = touchesAddress
-      ? body.productPickupAddress
-      : existing.productPickupAddress;
-    const nextLat = touchesLat ? body.productPickupLat : existing.productPickupLat;
-    const nextLon = touchesLon ? body.productPickupLon : existing.productPickupLon;
+    const writeBody = touchesLocations
+      ? body
+      : {
+          productPickupAddress: touchesAddress
+            ? body.productPickupAddress
+            : existing.productPickupAddress,
+          productPickupLat: touchesLat ? body.productPickupLat : existing.productPickupLat,
+          productPickupLon: touchesLon ? body.productPickupLon : existing.productPickupLon,
+          productRegionCode: hasBodyField(body, "productRegionCode")
+            ? body.productRegionCode
+            : existing.productRegionCode,
+        };
 
-    const prevAddress = String(existing.productPickupAddress ?? "").trim();
-    const prevLat = existing.productPickupLat;
-    const prevLon = existing.productPickupLon;
-    const sameLocation =
-      String(nextAddress ?? "").trim() === prevAddress &&
-      Number(nextLat) === Number(prevLat) &&
-      Number(nextLon) === Number(prevLon) &&
-      prevLat != null &&
-      prevLon != null;
+    if (!touchesLocations) {
+      const prevAddress = String(existing.productPickupAddress ?? "").trim();
+      const prevLat = existing.productPickupLat;
+      const prevLon = existing.productPickupLon;
+      const sameLocation =
+        String(writeBody.productPickupAddress ?? "").trim() === prevAddress &&
+        Number(writeBody.productPickupLat) === Number(prevLat) &&
+        Number(writeBody.productPickupLon) === Number(prevLon) &&
+        prevLat != null &&
+        prevLon != null;
 
-    if (sameLocation) {
-      return;
+      if (sameLocation) {
+        return;
+      }
     }
 
-    const saleLocation = await resolveProductSaleLocation({
-      address: nextAddress,
-      lat: nextLat,
-      lon: nextLon,
+    const salePickup = await resolveProductPickupWriteFields(writeBody, {
       fallbackRegionCode: hasBodyField(body, "productRegionCode")
         ? body.productRegionCode
         : existing.productRegionCode,
     });
 
-    $set.productPickupAddress = saleLocation.productPickupAddress;
-    $set.productPickupLat = saleLocation.productPickupLat;
-    $set.productPickupLon = saleLocation.productPickupLon;
-    $set.productRegionCode = saleLocation.productRegionCode;
-    if (saleLocation.productPickupLocation) {
-      $set.productPickupLocation = saleLocation.productPickupLocation;
+    $set.productPickupLocations = salePickup.productPickupLocations;
+    $set.productPickupAddress = salePickup.productPickupAddress;
+    $set.productPickupLat = salePickup.productPickupLat;
+    $set.productPickupLon = salePickup.productPickupLon;
+    $set.productRegionCode = salePickup.productRegionCode;
+    if (salePickup.productPickupLocation) {
+      $set.productPickupLocation = salePickup.productPickupLocation;
       delete $unset.productPickupLocation;
     } else {
       delete $set.productPickupLocation;
@@ -521,6 +562,8 @@ export async function buildProductPatchSet({ existing, body, isAdmin, productId 
   applyReturnPolicyFields(body, $set, existing);
   applyListingOriginField(body, $set);
   applyIsOriginalField(body, $set);
+  applyOutOfStockField(body, $set);
+  applyOutOfStockLabelField(body, $set);
   applyPriceFields(body, $set, existing);
   applySaleCityField(body, $set);
   await applyPickupFields(body, $set, $unset, existing);

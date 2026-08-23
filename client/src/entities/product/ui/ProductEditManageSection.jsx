@@ -19,6 +19,7 @@ import "./ProductEditManageSection.css";
  *   onSetAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
  *   onSetQa?: (productId: string, productQaEnabled: boolean) => void | Promise<void>;
  *   onSetOriginality?: (productId: string, productIsOriginal: boolean) => void | Promise<void>;
+ *   onSetOutOfStock?: (productId: string, productOutOfStock: boolean) => void | Promise<void>;
  *   onSetWholesale?: (productId: string, productWholesaleEnabled: boolean) => void | Promise<void>;
  *   onSetRental?: (productId: string, productRentalEnabled: boolean) => void | Promise<void>;
  *   onSetAffiliate?: (
@@ -31,6 +32,7 @@ import "./ProductEditManageSection.css";
  *   isAuctionTogglePending?: boolean;
  *   isQaTogglePending?: boolean;
  *   isOriginalityTogglePending?: boolean;
+ *   isOutOfStockTogglePending?: boolean;
  *   isWholesaleTogglePending?: boolean;
  *   isRentalTogglePending?: boolean;
  *   isAffiliateTogglePending?: boolean;
@@ -53,7 +55,7 @@ import "./ProductEditManageSection.css";
  *   onOpenWholesaleSettings?: () => void;
  *   onOpenRentalSettings?: () => void;
  *   onOpenAffiliateSettings?: () => void;
- *   onOpenLoyaltySettings?: () => void;
+ *   onOpenOutOfStockSettings?: () => void;
  *   onOpenBuyNFreeSettings?: () => void;
  *   onOpenFlashSaleSettings?: () => void;
  *   onSetFlashSale?: (productId: string, productFlashSaleEnabled: boolean) => void | Promise<void>;
@@ -70,6 +72,7 @@ export function ProductEditManageSection({
   onSetAuction,
   onSetQa,
   onSetOriginality,
+  onSetOutOfStock,
   onSetWholesale,
   onSetRental,
   onSetAffiliate,
@@ -78,6 +81,7 @@ export function ProductEditManageSection({
   isAuctionTogglePending = false,
   isQaTogglePending = false,
   isOriginalityTogglePending = false,
+  isOutOfStockTogglePending = false,
   isWholesaleTogglePending = false,
   isRentalTogglePending = false,
   isAffiliateTogglePending = false,
@@ -102,6 +106,7 @@ export function ProductEditManageSection({
   onSetFlashSale,
   isFlashSaleTogglePending = false,
   onOpenLoyaltySettings,
+  onOpenOutOfStockSettings,
   onSetLoyaltyPoints,
   isLoyaltyTogglePending = false,
   onOpenBuyNFreeSettings,
@@ -118,6 +123,8 @@ export function ProductEditManageSection({
   const isQaEnabled = product.productQaEnabled === true;
   const showOriginality = typeof onSetOriginality === "function" && canEdit;
   const isOriginal = product.productIsOriginal === true;
+  const isOutOfStock = product.productOutOfStock === true;
+  const showOutOfStockToggle = typeof onSetOutOfStock === "function" && canEdit;
   const isInstallmentEnabled = product.productInstallmentEnabled === true;
   const isWholesaleEnabled = product.productWholesaleEnabled === true;
   const isRentalEnabled = product.productRentalEnabled === true;
@@ -172,6 +179,7 @@ export function ProductEditManageSection({
     isAuctionTogglePending ||
     isQaTogglePending ||
     isOriginalityTogglePending ||
+    isOutOfStockTogglePending ||
     isWholesaleTogglePending ||
     isBuyNFreeTogglePending ||
     isRentalTogglePending ||
@@ -525,6 +533,23 @@ export function ProductEditManageSection({
                 return;
               }
               void onSetAvailability(String(product._id), !isListedForOthers);
+            }}
+          />
+        ) : null}
+        {showOutOfStockToggle ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_MODAL_UI.MANAGE_OUT_OF_STOCK_TITLE}
+            description={CREATE_PRODUCT_MODAL_UI.MANAGE_OUT_OF_STOCK_HINT}
+            checked={isOutOfStock}
+            disabled={actionsLocked}
+            pending={isOutOfStockTogglePending}
+            pendingLabel={PRODUCT_CARD_UI.OUT_OF_STOCK_TOGGLE_PENDING}
+            onPress={() => onOpenOutOfStockSettings?.()}
+            onCheckedChange={(next) => {
+              if (product._id == null || actionsLocked) {
+                return;
+              }
+              void onSetOutOfStock(String(product._id), next);
             }}
           />
         ) : null}

@@ -291,6 +291,7 @@ export const ADMIN_EDIT_USER_UI = {
 
 export const ADD_TO_CART_UI = {
   ADD: "В корзину",
+  OUT_OF_STOCK: "Нет в наличии",
   GO_TO_CART: "Перейти в корзину",
   LOGIN_TO_ADD: "Войти, чтобы купить",
   ADD_FAILED: "Не удалось добавить в корзину",
@@ -471,6 +472,9 @@ export const PRODUCT_CARD_UI = {
   RAFFLE_BADGE: "Розыгрыш",
   AFFILIATE_BADGE: (percent: number) => `Партнёрам ${percent}%`,
   HIDDEN_FROM_CATALOG_BADGE: "Скрыт от покупателей",
+  OUT_OF_STOCK_OVERLAY: "Нет в наличии",
+  OUT_OF_STOCK_OVERLAY_COMING_SOON: "Скоро поступление",
+  OUT_OF_STOCK_TOGGLE_PENDING: "Сохраняем…",
   LOYALTY_POINTS_CONFIRMED: (points: number) => `+${points} баллов`,
   LOYALTY_POINTS_UNCONFIRMED: (points: number) => `+${points} баллов`,
   LOYALTY_POINTS_GUEST: (points: number) => `+${points} баллов`,
@@ -1164,6 +1168,18 @@ export const ADDRESS_DELIVERY_UI = {
   MAP_GEOLOCATE_EMPTY:
     "Не удалось определить адрес — сдвиньте точку или введите вручную",
   MAP_GEOLOCATE_ERROR: "Не удалось определить адрес по карте",
+} as const;
+
+export const USER_SAVED_ADDRESSES_UI = {
+  SECTION_LABEL: "Сохранённые адреса",
+  LABEL_DEFAULT: "По умолчанию",
+  MOBILE_READ_ONLY_HINT: "Список только для просмотра",
+  MOBILE_MANAGE_ON_WEB: "Добавление и удаление адресов — в профиле на сайте",
+  MOBILE_DEFAULT_EDIT_HINT: "Ниже можно изменить адрес по умолчанию для доставки",
+  FORMAT_LINE: (line: string, flat: string) => {
+    const trimmedFlat = String(flat ?? "").trim();
+    return trimmedFlat ? `${line}, кв ${trimmedFlat}` : line;
+  },
 } as const;
 
 export const CATALOG_FILTER_UI = {
@@ -2015,6 +2031,16 @@ export const CREATE_PRODUCT_UI = {
   MANAGE_VISIBILITY_STATUS_HIDDEN: "(не виден)",
   MANAGE_VISIBILITY_HINT_VISIBLE: "Товар доступен для просмотра и покупки",
   MANAGE_VISIBILITY_HINT_HIDDEN: "Только вы видите товар в личном кабинете",
+  MANAGE_OUT_OF_STOCK_TITLE: "Нет в наличии",
+  MANAGE_OUT_OF_STOCK_HINT:
+    "Товар временно отсутствует, карточка останется в каталоге, но будет серого цвета. Пользователи будут в курсе, что товар скоро появится в наличии",
+  OUT_OF_STOCK_LABEL_MODAL_TITLE: "Надпись на карточке",
+  OUT_OF_STOCK_LABEL_MODAL_HINT: "Выберите текст, который увидят покупатели на серой карточке",
+  OUT_OF_STOCK_LABEL_OPTION_OUT_OF_STOCK: "Нет в наличии",
+  OUT_OF_STOCK_LABEL_OPTION_COMING_SOON: "Скоро поступление",
+  OUT_OF_STOCK_LABEL_MODAL_SAVE: "Сохранить",
+  OUT_OF_STOCK_LABEL_MODAL_CLOSE: "Закрыть",
+  OUT_OF_STOCK_LABEL_MODAL_PENDING: "Сохраняем…",
   MANAGE_DELETE_TITLE: "Удалить товар",
   MANAGE_DELETE_HINT: "Безвозвратно уберёт товар из каталога",
 } as const;

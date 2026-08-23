@@ -109,7 +109,7 @@ export function ProductDetailsModal({
     isMobileNav &&
     ctrl.detailsTab === "details" &&
     ctrl.showPriceBlock &&
-    ctrl.canShowAddToCart;
+    (ctrl.canShowAddToCart || ctrl.showOutOfStockPurchaseButton);
   const showMobileInstallmentDock =
     isMobileNav &&
     ctrl.detailsTab === "installment" &&
@@ -130,6 +130,8 @@ export function ProductDetailsModal({
       onRequestLogin={onRequestLogin}
       purchaseLimit={ctrl.purchaseLimit}
       canShowAddToCart={ctrl.canShowAddToCart}
+      showOutOfStockPurchaseButton={ctrl.showOutOfStockPurchaseButton}
+      outOfStockPurchaseLabel={ctrl.outOfStockPurchaseLabel}
       unitPriceSnapshot={Math.floor(Number(product.productPrice)) || 0}
       className="product-details-modal__price-actions--mobile-dock"
     />

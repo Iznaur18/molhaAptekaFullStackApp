@@ -209,4 +209,29 @@ export const useEditProfileFormStyles = createThemedStyles((theme) => ({
   dangerActionItem: {
     flex: 1,
   },
+
+  savedAddressCard: {
+    gap: 4,
+    paddingHorizontal: theme.spacing[3],
+    paddingVertical: theme.spacing[3],
+    borderRadius: theme.radius.input,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  savedAddressBadge: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: theme.colors.action,
+  },
+  savedAddressLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.text,
+  },
+  savedAddressLine: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: theme.colors.textSecondary,
+  },
 }));

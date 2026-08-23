@@ -86,6 +86,8 @@ export function ProductDetailsModalDetailsTab({
     contentPanels,
     hasDetailsSection,
     canShowAddToCart,
+    showOutOfStockPurchaseButton,
+    outOfStockPurchaseLabel,
     purchaseLimit,
     handleAuctionShortcutClick,
     handleInstallmentShortcutClick,
@@ -209,6 +211,8 @@ export function ProductDetailsModalDetailsTab({
           onRequestLogin={onRequestLogin}
           purchaseLimit={purchaseLimit}
           canShowAddToCart={canShowAddToCart}
+          showOutOfStockPurchaseButton={showOutOfStockPurchaseButton}
+          outOfStockPurchaseLabel={outOfStockPurchaseLabel}
           unitPriceSnapshot={unitPriceSnapshot}
         />
       ) : null}

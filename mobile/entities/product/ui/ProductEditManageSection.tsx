@@ -23,6 +23,7 @@ type ProductEditManageSectionProps = {
   onSetAvailability?: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
   onSetAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
   onSetOriginality?: (productId: string, productIsOriginal: boolean) => void | Promise<void>;
+  onSetOutOfStock?: (productId: string, productOutOfStock: boolean) => void | Promise<void>;
   onSetWholesale?: (productId: string, productWholesaleEnabled: boolean) => void | Promise<void>;
   onSetBuyNFree?: (productId: string, productBuyNFreeEnabled: boolean) => void | Promise<void>;
   onSetRental?: (productId: string, productRentalEnabled: boolean) => void | Promise<void>;
@@ -43,6 +44,7 @@ type ProductEditManageSectionProps = {
   isAvailabilityTogglePending?: boolean;
   isAuctionTogglePending?: boolean;
   isOriginalityTogglePending?: boolean;
+  isOutOfStockTogglePending?: boolean;
   isWholesaleTogglePending?: boolean;
   isBuyNFreeTogglePending?: boolean;
   isRentalTogglePending?: boolean;
@@ -64,6 +66,7 @@ type ProductEditManageSectionProps = {
   onOpenRentalSettings?: () => void;
   onOpenAffiliateSettings?: () => void;
   onOpenLoyaltySettings?: () => void;
+  onOpenOutOfStockSettings?: () => void;
   disabled?: boolean;
 };
 
@@ -80,6 +83,7 @@ export const ProductEditManageSection = ({
   onSetAvailability,
   onSetAuction,
   onSetOriginality,
+  onSetOutOfStock,
   onSetWholesale,
   onSetBuyNFree,
   onSetRental,
@@ -90,6 +94,7 @@ export const ProductEditManageSection = ({
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
   isOriginalityTogglePending = false,
+  isOutOfStockTogglePending = false,
   isWholesaleTogglePending = false,
   isBuyNFreeTogglePending = false,
   isRentalTogglePending = false,
@@ -111,6 +116,7 @@ export const ProductEditManageSection = ({
   onOpenRentalSettings,
   onOpenAffiliateSettings,
   onOpenLoyaltySettings,
+  onOpenOutOfStockSettings,
   disabled = false,
 }: ProductEditManageSectionProps) => {
   const styles = useProductEditManageSectionStyles();
@@ -123,6 +129,8 @@ export const ProductEditManageSection = ({
   const isAuctionEnabled = product.productAuctionEnabled === true;
   const showOriginality = typeof onSetOriginality === "function" && canEdit;
   const isOriginal = product.productIsOriginal === true;
+  const isOutOfStock = product.productOutOfStock === true;
+  const showOutOfStockToggle = typeof onSetOutOfStock === "function" && canEdit;
   const isInstallmentEnabled = product.productInstallmentEnabled === true;
   const isWholesaleEnabled = product.productWholesaleEnabled === true;
   const isBuyNFreeEnabled = product.productBuyNFreeEnabled === true;
@@ -170,6 +178,7 @@ export const ProductEditManageSection = ({
     isAvailabilityTogglePending ||
     isAuctionTogglePending ||
     isOriginalityTogglePending ||
+    isOutOfStockTogglePending ||
     isWholesaleTogglePending ||
     isBuyNFreeTogglePending ||
     isRentalTogglePending ||
@@ -446,6 +455,23 @@ export const ProductEditManageSection = ({
                 return;
               }
               void onSetAvailability(String(product._id), !isListedForOthers);
+            }}
+          />
+        ) : null}
+        {showOutOfStockToggle ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_UI.MANAGE_OUT_OF_STOCK_TITLE}
+            description={CREATE_PRODUCT_UI.MANAGE_OUT_OF_STOCK_HINT}
+            checked={isOutOfStock}
+            disabled={actionsLocked}
+            pending={isOutOfStockTogglePending}
+            pendingLabel={PRODUCT_CARD_UI.OUT_OF_STOCK_TOGGLE_PENDING}
+            onPress={() => onOpenOutOfStockSettings?.()}
+            onCheckedChange={(next) => {
+              if (product._id == null || actionsLocked) {
+                return;
+              }
+              void onSetOutOfStock(String(product._id), next);
             }}
           />
         ) : null}

@@ -31,6 +31,7 @@ import {
   guardOrderItemsStockInTransaction,
 } from "../product/productStock.js";
 import { resolveProductUnitPriceWithPromo, resolveBuyNFreeLineTotal, isProductBuyNFreeActive } from "@izibuy/shared-lib";
+import { resolveSelectedProductPickupLocation } from "../product/productPickupLocations.js";
 
 import { buildOrderStatusFromItems } from "./orderStatus.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
@@ -82,6 +83,7 @@ const buildItemsWithPriceSnapshot = (
   affiliateCtx,
   promoByProductId = {},
   freeUnitsByProductId = {},
+  pickupByProductId = null,
 ) =>
   items.map((item) => {
     const snapshot = productById[String(item.productId)];
@@ -110,6 +112,7 @@ const buildItemsWithPriceSnapshot = (
       affiliateEnabled: snapshot.affiliateEnabled === true,
       affiliatePercent: snapshot.affiliatePercent,
     });
+    const pickup = pickupByProductId?.[String(item.productId)] ?? null;
 
     return {
       productId: item.productId,
@@ -122,6 +125,10 @@ const buildItemsWithPriceSnapshot = (
       productNameAtOrder: snapshot.name,
       promoCodeAtOrder: promo?.code ?? null,
       promoDiscountPercentAtOrder: promo?.discountPercent ?? null,
+      pickupLocationIdAtOrder: pickup?.id ?? null,
+      pickupAddressAtOrder: pickup?.address ?? null,
+      pickupLatAtOrder: pickup?.lat ?? null,
+      pickupLonAtOrder: pickup?.lon ?? null,
       ...loyalty,
       ...affiliate,
     };
@@ -135,14 +142,15 @@ const fetchAvailableProductsForOrder = async (productIds) => {
     _id: { $in: productIds },
     productModerationStatus: PRODUCT_MODERATION_APPROVED,
     productIsAvailable: { $ne: false },
+    productOutOfStock: { $ne: true },
     productStockQuantity: { $gt: 0 },
   })
     .select(
-      "_id productPrice productName loyaltyPointsPerUnit productSeller productPickupAddress productPickupEnabled productDeliveryEnabled productWholesaleEnabled productWholesaleMinQty productWholesalePrice affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
+      "_id productPrice productName loyaltyPointsPerUnit productSeller productPickupAddress productPickupLat productPickupLon productPickupLocations productPickupEnabled productDeliveryEnabled productWholesaleEnabled productWholesaleMinQty productWholesalePrice affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
     )
     .lean();
 
-  /** @type {Record<string, { price: number; name: string; loyaltyPointsPerUnit: number; sellerId: string; pickupAddress: string; pickupEnabled: boolean; deliveryEnabled: boolean; wholesaleEnabled: boolean; wholesaleMinQty: number | null; wholesalePrice: number | null; affiliateEnabled: boolean; affiliatePercent: number; buyNFreeEnabled: boolean; buyNFreeThreshold: number | null }>} */
+  /** @type {Record<string, object>} */
   const byId = {};
   for (const product of products) {
     const id = String(product._id);
@@ -155,6 +163,10 @@ const fetchAvailableProductsForOrder = async (productIds) => {
       ),
       sellerId: String(product.productSeller),
       pickupAddress: String(product.productPickupAddress ?? "").trim(),
+      productPickupAddress: product.productPickupAddress,
+      productPickupLat: product.productPickupLat,
+      productPickupLon: product.productPickupLon,
+      productPickupLocations: product.productPickupLocations,
       pickupEnabled: product.productPickupEnabled !== false,
       deliveryEnabled: product.productDeliveryEnabled === true,
       wholesaleEnabled: product.productWholesaleEnabled === true,
@@ -194,24 +206,52 @@ const assertProductsSupportPickup = (productById, productIds) => {
 };
 
 /**
- * @param {Record<string, { pickupAddress: string }>} productById
+ * @param {Record<string, object>} productById
  * @param {string[]} productIds
+ * @param {Array<{ productId?: unknown; pickupLocationId?: string }> | null | undefined} pickupSelections
  */
-const resolvePickupDeliveryAddress = (productById, productIds) => {
+const resolvePickupSelectionsByProductId = (productById, productIds, pickupSelections) => {
+  /** @type {Map<string, string>} */
+  const selectedIdByProduct = new Map();
+  for (const row of Array.isArray(pickupSelections) ? pickupSelections : []) {
+    const productId = String(row?.productId ?? "").trim();
+    const locationId = String(row?.pickupLocationId ?? "").trim();
+    if (productId && locationId) {
+      selectedIdByProduct.set(productId, locationId);
+    }
+  }
+
+  /** @type {Record<string, { id: string; address: string; lat: number | null; lon: number | null }>} */
+  const pickupByProductId = {};
   const addresses = [];
+
   for (const id of productIds) {
-    const address = productById[id]?.pickupAddress ?? "";
+    const selected = resolveSelectedProductPickupLocation(
+      productById[id],
+      selectedIdByProduct.get(id) ?? null,
+    );
+    const address = String(selected.address ?? "").trim();
     if (!address) {
       throw new AppError(400, PRODUCT_PICKUP_MISSING_FOR_ORDER_MESSAGE);
     }
+    pickupByProductId[id] = {
+      id: selected.id,
+      address,
+      lat: selected.lat,
+      lon: selected.lon,
+    };
     if (!addresses.includes(address)) {
       addresses.push(address);
     }
   }
+
   return {
-    displayAddress: addresses.join("; "),
-    flat: "",
-    fiasId: "",
+    pickupByProductId,
+    addressForOrder: {
+      displayAddress: addresses.join("; "),
+      flat: "",
+      fiasId: "",
+    },
   };
 };
 
@@ -235,6 +275,7 @@ const appendOrderToBuyList = async (userId, orderId, session) => {
  *   paymentMethod: string;
  *   priceOfferId?: string | null;
  *   fulfillmentMethod?: string;
+ *   pickupSelections?: Array<{ productId: unknown; pickupLocationId: string }> | null;
  *   verifiedDeliveryAddress?: {
  *     displayAddress: string;
  *     flat?: string;
@@ -249,6 +290,7 @@ export async function createOrder({
   paymentMethod,
   priceOfferId,
   fulfillmentMethod = ORDER_FULFILLMENT_PICKUP,
+  pickupSelections = [],
   verifiedDeliveryAddress = null,
   affiliateCode = null,
 }) {
@@ -279,7 +321,7 @@ export async function createOrder({
       );
       const product = await ProductModel.findById(productId)
         .select(
-          "loyaltyPointsPerUnit productSeller productPickupAddress productPickupEnabled productDeliveryEnabled affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
+          "loyaltyPointsPerUnit productSeller productPickupAddress productPickupLat productPickupLon productPickupLocations productPickupEnabled productDeliveryEnabled affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
         )
         .lean();
       if (!product) {
@@ -293,6 +335,10 @@ export async function createOrder({
         ),
         sellerId: String(product.productSeller),
         pickupAddress: String(product.productPickupAddress ?? "").trim(),
+        productPickupAddress: product.productPickupAddress,
+        productPickupLat: product.productPickupLat,
+        productPickupLon: product.productPickupLon,
+        productPickupLocations: product.productPickupLocations,
         pickupEnabled: product.productPickupEnabled !== false,
         deliveryEnabled: product.productDeliveryEnabled === true,
         wholesaleEnabled: false,
@@ -335,10 +381,19 @@ export async function createOrder({
     assertProductsSupportPickup(productById, uniqueProductIds);
   }
 
-  const addressForOrder =
-    resolvedFulfillment === ORDER_FULFILLMENT_PICKUP
-      ? resolvePickupDeliveryAddress(productById, uniqueProductIds)
-      : verifiedDeliveryAddress;
+  /** @type {Record<string, { id: string; address: string; lat: number | null; lon: number | null }> | null} */
+  let pickupByProductId = null;
+  let addressForOrder = verifiedDeliveryAddress;
+
+  if (resolvedFulfillment === ORDER_FULFILLMENT_PICKUP) {
+    const resolvedPickup = resolvePickupSelectionsByProductId(
+      productById,
+      uniqueProductIds,
+      pickupSelections,
+    );
+    pickupByProductId = resolvedPickup.pickupByProductId;
+    addressForOrder = resolvedPickup.addressForOrder;
+  }
 
   if (!addressForOrder?.displayAddress) {
     throw new AppError(400, "Адрес доставки обязателен");
@@ -404,6 +459,7 @@ export async function createOrder({
         },
         promoByProductId,
         freeUnitsByProductId,
+        resolvedFulfillment === ORDER_FULFILLMENT_PICKUP ? pickupByProductId : null,
       );
       const totalAmount = calculateTotalAmount(pricedItems);
       const orderStatus = buildOrderStatusFromItems(pricedItems);

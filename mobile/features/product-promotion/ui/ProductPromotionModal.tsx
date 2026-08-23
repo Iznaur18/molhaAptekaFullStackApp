@@ -35,6 +35,7 @@ import { ProductRentalManageModal } from "@/entities/product/ui/ProductRentalMan
 import { AffiliatePercentModal } from "@/entities/product/ui/AffiliatePercentModal";
 import { ProductLoyaltyPointsModal } from "@/entities/product/ui/ProductLoyaltyPointsModal";
 import { ProductBuyNFreeModal } from "@/entities/product/ui/ProductBuyNFreeModal";
+import { ProductOutOfStockLabelModal } from "@/entities/product/ui/ProductOutOfStockLabelModal";
 import { ProductPromotionModalTabs } from "@/features/product-promotion/ui/ProductPromotionModalTabs";
 import { PRODUCT_CARD_UI, PRODUCT_PROMOTION_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
@@ -76,6 +77,10 @@ type ProductPromotionModalProps = {
     productId: string,
     productIsOriginal: boolean,
   ) => void | Promise<void>;
+  onSetProductOutOfStock?: (
+    productId: string,
+    productOutOfStock: boolean,
+  ) => void | Promise<void>;
   onSetProductWholesale?: (
     productId: string,
     productWholesaleEnabled: boolean,
@@ -104,6 +109,7 @@ type ProductPromotionModalProps = {
   isAvailabilityTogglePending?: boolean;
   isAuctionTogglePending?: boolean;
   isOriginalityTogglePending?: boolean;
+  isOutOfStockTogglePending?: boolean;
   isWholesaleTogglePending?: boolean;
   isBuyNFreeTogglePending?: boolean;
   isRentalTogglePending?: boolean;
@@ -140,6 +146,7 @@ export const ProductPromotionModal = ({
   onSetProductAvailability,
   onSetProductAuction,
   onSetProductOriginality,
+  onSetProductOutOfStock,
   onSetProductWholesale,
   onSetProductBuyNFree,
   onSetProductRental,
@@ -151,6 +158,7 @@ export const ProductPromotionModal = ({
   isAvailabilityTogglePending = false,
   isAuctionTogglePending = false,
   isOriginalityTogglePending = false,
+  isOutOfStockTogglePending = false,
   isWholesaleTogglePending = false,
   isBuyNFreeTogglePending = false,
   isRentalTogglePending = false,
@@ -177,6 +185,7 @@ export const ProductPromotionModal = ({
     (typeof onSetProductAvailability === "function" ||
       typeof onSetProductAuction === "function" ||
       typeof onSetProductOriginality === "function" ||
+      typeof onSetProductOutOfStock === "function" ||
       typeof onDeleteProduct === "function");
   const { activeTabId, setActiveTabId, isPromotionTab } = useProductPromotionModalTab({
     visible,
@@ -190,6 +199,7 @@ export const ProductPromotionModal = ({
   const [isInstallmentProgramOpen, setIsInstallmentProgramOpen] = useState(false);
   const [isWholesaleOpen, setIsWholesaleOpen] = useState(false);
   const [isBuyNFreeOpen, setIsBuyNFreeOpen] = useState(false);
+  const [isOutOfStockLabelOpen, setIsOutOfStockLabelOpen] = useState(false);
   const [isRentalOpen, setIsRentalOpen] = useState(false);
   const [isAffiliateOpen, setIsAffiliateOpen] = useState(false);
   const [isLoyaltyOpen, setIsLoyaltyOpen] = useState(false);
@@ -200,6 +210,7 @@ export const ProductPromotionModal = ({
       setIsInstallmentProgramOpen(false);
       setIsWholesaleOpen(false);
       setIsBuyNFreeOpen(false);
+      setIsOutOfStockLabelOpen(false);
       setIsRentalOpen(false);
       setIsAffiliateOpen(false);
       setIsLoyaltyOpen(false);
@@ -419,6 +430,7 @@ export const ProductPromotionModal = ({
         onSetAvailability={onSetProductAvailability}
         onSetAuction={onSetProductAuction}
         onSetOriginality={onSetProductOriginality}
+        onSetOutOfStock={onSetProductOutOfStock}
         onSetWholesale={onSetProductWholesale}
         onSetBuyNFree={onSetProductBuyNFree}
         onSetRental={onSetProductRental}
@@ -429,6 +441,7 @@ export const ProductPromotionModal = ({
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
         isOriginalityTogglePending={isOriginalityTogglePending}
+        isOutOfStockTogglePending={isOutOfStockTogglePending}
         isWholesaleTogglePending={isWholesaleTogglePending}
         isBuyNFreeTogglePending={isBuyNFreeTogglePending}
         isRentalTogglePending={isRentalTogglePending}
@@ -446,6 +459,7 @@ export const ProductPromotionModal = ({
         onOpenInstallmentProgram={() => setIsInstallmentProgramOpen(true)}
         onOpenWholesaleSettings={() => setIsWholesaleOpen(true)}
         onOpenBuyNFreeSettings={() => setIsBuyNFreeOpen(true)}
+        onOpenOutOfStockSettings={() => setIsOutOfStockLabelOpen(true)}
         onOpenRentalSettings={() => setIsRentalOpen(true)}
         onOpenAffiliateSettings={() => setIsAffiliateOpen(true)}
         onOpenLoyaltySettings={() => setIsLoyaltyOpen(true)}
@@ -572,6 +586,15 @@ export const ProductPromotionModal = ({
             visible
             product={product}
             onClose={() => setIsBuyNFreeOpen(false)}
+            onSaved={onWholesaleSaved}
+          />
+        ) : null}
+        {isOutOfStockLabelOpen ? (
+          <ProductOutOfStockLabelModal
+            embedded
+            visible
+            product={product}
+            onClose={() => setIsOutOfStockLabelOpen(false)}
             onSaved={onWholesaleSaved}
           />
         ) : null}

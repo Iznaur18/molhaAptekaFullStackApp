@@ -4,9 +4,12 @@ import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { isRuRegionCode } from "@molha/api-contract";
 import {
   PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
-  PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
-  PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
 } from "@molha/api-contract";
+import {
+  legacyPickupFieldsFromLocations,
+  serializeProductPickupLocationsForApi,
+  validateProductPickupLocationsForm,
+} from "./productPickupLocationsForm.js";
 import {
   computeProductDiscountPercent,
   parseProductPriceInput,
@@ -140,20 +143,20 @@ export function prepareCreateProductSubmit({
       ? String(form.productCategoryId).trim()
       : "";
 
-  const productPickupAddress = String(form.productPickupAddress ?? "").trim();
-  if (productPickupAddress.length < PRODUCT_PICKUP_ADDRESS_MIN_LENGTH) {
-    return { ok: false, message: PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE };
+  const productPickupLocationsRaw = Array.isArray(form.productPickupLocations)
+    ? form.productPickupLocations
+    : [];
+  const locationsError = validateProductPickupLocationsForm(productPickupLocationsRaw);
+  if (locationsError) {
+    return { ok: false, message: locationsError };
   }
-
-  const pickupLatRaw = form.productPickupLat;
-  const pickupLonRaw = form.productPickupLon;
-  const hasLat = pickupLatRaw != null && Number.isFinite(Number(pickupLatRaw));
-  const hasLon = pickupLonRaw != null && Number.isFinite(Number(pickupLonRaw));
-  if (!hasLat || !hasLon) {
-    return { ok: false, message: CREATE_PRODUCT_MODAL_UI.ERROR_PICKUP_COORDS };
-  }
-  const productPickupLat = Number(pickupLatRaw);
-  const productPickupLon = Number(pickupLonRaw);
+  const productPickupLocations = serializeProductPickupLocationsForApi(
+    productPickupLocationsRaw,
+  );
+  const legacyPickup = legacyPickupFieldsFromLocations(productPickupLocationsRaw);
+  const productPickupAddress = legacyPickup.productPickupAddress;
+  const productPickupLat = legacyPickup.productPickupLat;
+  const productPickupLon = legacyPickup.productPickupLon;
   const productRegionCodeRaw = String(form.productRegionCode ?? "").trim();
   const productRegionCode = isRuRegionCode(productRegionCodeRaw)
     ? productRegionCodeRaw
@@ -183,6 +186,15 @@ export function prepareCreateProductSubmit({
     );
   }
 
+  const pickupLocationFields =
+    productPickupLocations.length > 0
+      ? { productPickupLocations }
+      : {
+          productPickupAddress,
+          productPickupLat,
+          productPickupLon,
+        };
+
   if (isEdit) {
     const patchBody = {
       productName: String(form.productName).trim(),
@@ -194,9 +206,7 @@ export function prepareCreateProductSubmit({
       productOldPrice,
       productCharacteristics,
       ...(productRegionCode ? { productRegionCode } : {}),
-      productPickupAddress,
-      productPickupLat,
-      productPickupLon,
+      ...pickupLocationFields,
       productPickupEnabled,
       productDeliveryEnabled,
       productReturnEnabled,
@@ -234,9 +244,7 @@ export function prepareCreateProductSubmit({
       loyaltyPointsPerUnit: 0,
       productCharacteristics,
       ...(productRegionCode ? { productRegionCode } : {}),
-      productPickupAddress,
-      productPickupLat,
-      productPickupLon,
+      ...pickupLocationFields,
       productPickupEnabled,
       productDeliveryEnabled,
       productReturnEnabled,

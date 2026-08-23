@@ -18,6 +18,7 @@ import {
 import { optionalRuRegionCodeFieldSchema } from "./ruRegions.js";
 import { isStoredMediaUrl } from "./storedMediaUrl.js";
 import { userSocialLinksBodyShape } from "./userSocialLinks.js";
+import { userAddressesPatchFieldSchema, USER_ADDRESS_PATCH_CONFLICT_MESSAGE } from "./userAddresses.js";
 
 /** Синхрон с `server/constants/profileImageFocusConstants.js`. */
 export const PROFILE_IMAGE_FOCUS_MIN = 0;
@@ -207,6 +208,7 @@ export const updateProfileBodySchema = z.object({
   userAddressDistrict: userAddressDistrictFieldSchema,
   userAddressStreet: userAddressStreetFieldSchema,
   userAddressHouse: userAddressHouseFieldSchema,
+  userAddresses: userAddressesPatchFieldSchema.optional(),
   userRegionCode: optionalRuRegionCodeFieldSchema,
   notificationsEnabled: clearableBooleanSchema,
   userRole: z.union([z.enum(USER_ROLE_VALUES), z.null()]).optional(),
@@ -242,4 +244,23 @@ export const updateProfileBodySchema = z.object({
       `Слишком длинный текст`,
     ),
   ...userSocialLinksBodyShape,
+}).superRefine((body, ctx) => {
+  if (body.userAddresses === undefined) {
+    return;
+  }
+
+  const hasLegacyAddress =
+    body.userAddress !== undefined ||
+    body.userAddressFlat !== undefined ||
+    body.userAddressCity !== undefined ||
+    body.userAddressDistrict !== undefined ||
+    body.userAddressStreet !== undefined ||
+    body.userAddressHouse !== undefined;
+
+  if (hasLegacyAddress) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: USER_ADDRESS_PATCH_CONFLICT_MESSAGE,
+    });
+  }
 });

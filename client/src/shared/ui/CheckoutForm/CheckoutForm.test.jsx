@@ -11,9 +11,26 @@ vi.mock("../../../shared/config/featureFlags.js", () => ({
   IS_REQUIRE_ADDRESS_FROM_DADATA_SUGGEST_ENABLED: false,
 }));
 
+const singlePickupGroup = [
+  {
+    productId: "p1",
+    productTitle: "Товар",
+    locations: [
+      {
+        id: "legacy-default",
+        label: "",
+        address: "Москва, Тверская 1",
+        lat: 55.75,
+        lon: 37.62,
+        isDefault: true,
+      },
+    ],
+  },
+];
+
 const baseProps = {
   defaultDeliveryAddress: {},
-  pickupLocations: [{ address: "Москва, Тверская 1", productTitles: ["Товар"] }],
+  pickupLocations: singlePickupGroup,
   isSubmitting: false,
   submitError: "",
   submitSuccess: "",
@@ -38,18 +55,41 @@ describe("CheckoutForm", () => {
     );
   });
 
-  it("renders pickup points as a list", () => {
+  it("renders pickup points per product", () => {
     renderWithProviders(
       <CheckoutForm
         {...baseProps}
         pickupLocations={[
-          { address: "Москва, Тверская 1", productTitles: ["Аспирин"] },
-          { address: "Грозный, ул. Кишиевой 56", productTitles: ["Витамин C"] },
+          {
+            productId: "p1",
+            productTitle: "Аспирин",
+            locations: [
+              {
+                id: "a",
+                address: "Москва, Тверская 1",
+                lat: 1,
+                lon: 2,
+                isDefault: true,
+              },
+            ],
+          },
+          {
+            productId: "p2",
+            productTitle: "Витамин C",
+            locations: [
+              {
+                id: "b",
+                address: "Грозный, ул. Кишиевой 56",
+                lat: 3,
+                lon: 4,
+                isDefault: true,
+              },
+            ],
+          },
         ]}
       />,
     );
 
-    expect(screen.getByText(CHECKOUT_FORM_UI.PICKUP_MULTI_HINT)).toBeInTheDocument();
     expect(screen.getByText("Москва, Тверская 1")).toBeInTheDocument();
     expect(screen.getByText("Грозный, ул. Кишиевой 56")).toBeInTheDocument();
     expect(screen.getByText("Аспирин")).toBeInTheDocument();
@@ -69,6 +109,7 @@ describe("CheckoutForm", () => {
       deliveryAddress: "",
       deliveryAddressFlat: "",
       paymentMethod: ORDER_PAYMENT_METHOD_DEFAULT,
+      pickupSelections: [{ productId: "p1", pickupLocationId: "legacy-default" }],
     });
   });
 

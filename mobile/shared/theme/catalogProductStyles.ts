@@ -320,6 +320,9 @@ export const useProductCardStyles = createThemedStyles((theme) => {
     minHeight: undefined,
     maxHeight: undefined,
   },
+  cardOutOfStock: {
+    opacity: 0.72,
+  },
   imageWrapCatalogGrid: {
     aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
   },
@@ -743,6 +746,26 @@ export const useProductCardMediaStyles = createThemedStyles((theme) => ({
     fontWeight: "700",
     textAlign: "center",
     paddingHorizontal: 12,
+  },
+}));
+
+export const useProductCardOutOfStockOverlayStyles = createThemedStyles((theme) => ({
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(148, 163, 184, 0.42)",
+    zIndex: 4,
+  },
+  label: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: theme.colors.surface,
+    color: theme.colors.textMuted,
+    fontSize: 13,
+    fontWeight: "700",
+    textAlign: "center",
   },
 }));
 

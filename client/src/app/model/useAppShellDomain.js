@@ -142,6 +142,7 @@ export function useAppShellDomain(
     setTogglingAuctionProductId: shell.setTogglingAuctionProductId,
     setTogglingQaProductId: shell.setTogglingQaProductId,
     setTogglingOriginalityProductId: shell.setTogglingOriginalityProductId,
+    setTogglingOutOfStockProductId: shell.setTogglingOutOfStockProductId,
     setTogglingWholesaleProductId: shell.setTogglingWholesaleProductId,
     setTogglingBuyNFreeProductId: shell.setTogglingBuyNFreeProductId,
     setTogglingFlashSaleProductId: shell.setTogglingFlashSaleProductId,

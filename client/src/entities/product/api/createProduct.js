@@ -55,15 +55,21 @@ export async function createProduct(body) {
     if (saleRegion) {
       payload.productRegionCode = saleRegion;
     }
-    const pickupAddress = body.productPickupAddress?.trim();
-    if (pickupAddress) {
-      payload.productPickupAddress = pickupAddress;
-    }
-    if (body.productPickupLat != null && Number.isFinite(Number(body.productPickupLat))) {
-      payload.productPickupLat = Number(body.productPickupLat);
-    }
-    if (body.productPickupLon != null && Number.isFinite(Number(body.productPickupLon))) {
-      payload.productPickupLon = Number(body.productPickupLon);
+    const pickupLocations =
+      Array.isArray(body.productPickupLocations) ? body.productPickupLocations : [];
+    if (pickupLocations.length > 0) {
+      payload.productPickupLocations = pickupLocations;
+    } else {
+      const pickupAddress = body.productPickupAddress?.trim();
+      if (pickupAddress) {
+        payload.productPickupAddress = pickupAddress;
+      }
+      if (body.productPickupLat != null && Number.isFinite(Number(body.productPickupLat))) {
+        payload.productPickupLat = Number(body.productPickupLat);
+      }
+      if (body.productPickupLon != null && Number.isFinite(Number(body.productPickupLon))) {
+        payload.productPickupLon = Number(body.productPickupLon);
+      }
     }
     payload.productDeliveryEnabled = body.productDeliveryEnabled === true;
     payload.productPickupEnabled = body.productPickupEnabled !== false;

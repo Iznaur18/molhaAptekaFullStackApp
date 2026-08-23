@@ -25,6 +25,19 @@ export const STOCK_RESERVATION_ITEM_STATUSES = [
   ORDER_STATUS_DELIVERED,
 ];
 
+/** В каталоге: есть сток или временно «нет в наличии» (серая карточка). */
+export const CATALOG_STOCK_OR_OUT_OF_STOCK_VISIBLE_MATCH = {
+  $or: [{ productOutOfStock: true }, { productStockQuantity: { $gt: 0 } }],
+};
+
+/** @param {{ productOutOfStock?: boolean | null; productStockQuantity?: number | null } | null | undefined} product */
+export const isProductTemporarilyOutOfStock = (product) =>
+  product?.productOutOfStock === true;
+
+/** @param {{ productOutOfStock?: boolean | null; productStockQuantity?: number | null } | null | undefined} product */
+export const isProductCatalogStockVisible = (product) =>
+  isProductTemporarilyOutOfStock(product) || Number(product?.productStockQuantity) > 0;
+
 /**
  * @param {unknown} raw
  * @returns {number | null}
@@ -149,6 +162,7 @@ export const assertOrderItemsWithinAvailableStock = async (
     _id: { $in: productIds },
     productModerationStatus: PRODUCT_MODERATION_APPROVED,
     productIsAvailable: { $ne: false },
+    productOutOfStock: { $ne: true },
     productStockQuantity: { $gt: 0 },
   }).select("_id productStockQuantity productSeller");
   if (session) {

@@ -40,6 +40,9 @@ export const useMyProductsPageActions = () => {
   const [togglingOriginalityProductId, setTogglingOriginalityProductId] = useState<string | null>(
     null,
   );
+  const [togglingOutOfStockProductId, setTogglingOutOfStockProductId] = useState<string | null>(
+    null,
+  );
   const [togglingWholesaleProductId, setTogglingWholesaleProductId] = useState<string | null>(
     null,
   );
@@ -199,6 +202,32 @@ export const useMyProductsPageActions = () => {
         );
       } finally {
         setTogglingOriginalityProductId(null);
+      }
+    },
+    [patchMutation, syncPromotionProduct],
+  );
+
+  const handleSetProductOutOfStock = useCallback(
+    async (productId: string, outOfStock: boolean) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return;
+      }
+
+      setTogglingOutOfStockProductId(normalizedProductId);
+      setManageErrorMessage("");
+      try {
+        const updated = await patchMutation.mutateAsync({
+          productId: normalizedProductId,
+          body: { productOutOfStock: outOfStock },
+        });
+        syncPromotionProduct(updated as MyProductsCatalogProduct);
+      } catch (error) {
+        setManageErrorMessage(
+          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+      } finally {
+        setTogglingOutOfStockProductId(null);
       }
     },
     [patchMutation, syncPromotionProduct],
@@ -443,6 +472,8 @@ export const useMyProductsPageActions = () => {
       promotionProductId != null && togglingAuctionProductId === promotionProductId,
     isOriginalityTogglePending:
       promotionProductId != null && togglingOriginalityProductId === promotionProductId,
+    isOutOfStockTogglePending:
+      promotionProductId != null && togglingOutOfStockProductId === promotionProductId,
     isWholesaleTogglePending:
       promotionProductId != null && togglingWholesaleProductId === promotionProductId,
     isBuyNFreeTogglePending:
@@ -463,6 +494,7 @@ export const useMyProductsPageActions = () => {
     handleSetMyProductAvailability,
     handleSetProductAuction,
     handleSetProductOriginality,
+    handleSetProductOutOfStock,
     handleSetProductWholesale,
     handleSetProductBuyNFree,
     handleSetProductRental,

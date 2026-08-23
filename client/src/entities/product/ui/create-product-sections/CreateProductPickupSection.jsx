@@ -1,3 +1,10 @@
+import { useMemo } from "react";
+
+import { userSavedAddressesFromUser } from "../../../address/lib/userSavedAddressesFromUser.js";
+import { useAuthSession } from "../../../user/model/useAuthSession.js";
+import {
+  legacyPickupFieldsFromLocations,
+} from "../../lib/productPickupLocationsForm.js";
 import { ProductPickupLocationFields } from "../ProductPickupLocationFields.jsx";
 
 import "./CreateProductSections.css";
@@ -10,37 +17,35 @@ import "./CreateProductSections.css";
  * }} props
  */
 export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
+  const { user } = useAuthSession();
+  const savedAddresses = useMemo(
+    () => (user ? userSavedAddressesFromUser(user) : []),
+    [user],
+  );
+
+  const locations = Array.isArray(form.productPickupLocations)
+    ? form.productPickupLocations
+    : [];
+
   return (
     <div className="create-product-section">
       <ProductPickupLocationFields
-        address={String(form.productPickupAddress ?? "")}
-        lat={
-          form.productPickupLat != null &&
-          Number.isFinite(Number(form.productPickupLat))
-            ? Number(form.productPickupLat)
-            : null
-        }
-        lon={
-          form.productPickupLon != null &&
-          Number.isFinite(Number(form.productPickupLon))
-            ? Number(form.productPickupLon)
-            : null
-        }
+        locations={locations}
         pickupEnabled={form.productPickupEnabled !== false}
         deliveryEnabled={form.productDeliveryEnabled === true}
-        selectedFromSuggest={form.productPickupSelectedFromSuggest === true}
         disabled={isSubmitting}
-        addressLineDisplayOnly
+        savedAddresses={savedAddresses}
         onChange={(next) => {
+          const nextLocations = Array.isArray(next.productPickupLocations)
+            ? next.productPickupLocations
+            : [];
+          const legacy = legacyPickupFieldsFromLocations(nextLocations);
           setForm((prev) => ({
             ...prev,
-            productPickupAddress: next.productPickupAddress,
-            productPickupLat: next.productPickupLat,
-            productPickupLon: next.productPickupLon,
+            productPickupLocations: nextLocations,
+            ...legacy,
             productPickupEnabled: next.productPickupEnabled !== false,
             productDeliveryEnabled: next.productDeliveryEnabled === true,
-            productPickupSelectedFromSuggest:
-              next.productPickupSelectedFromSuggest === true,
             ...(next.productRegionCode
               ? { productRegionCode: next.productRegionCode }
               : {}),

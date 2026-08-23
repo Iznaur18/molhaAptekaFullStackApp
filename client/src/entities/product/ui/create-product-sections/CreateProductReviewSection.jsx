@@ -81,7 +81,21 @@ export function CreateProductReviewSection({
     },
     {
       label: CREATE_PRODUCT_MODAL_UI.LABEL_PICKUP_ADDRESS,
-      value: String(form.productPickupAddress ?? "").trim() || CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_EMPTY,
+      value: (() => {
+        const locations = Array.isArray(form.productPickupLocations)
+          ? form.productPickupLocations
+          : [];
+        if (locations.length > 0) {
+          return locations
+            .map((item) => String(item?.address ?? "").trim())
+            .filter(Boolean)
+            .join("; ");
+        }
+        return (
+          String(form.productPickupAddress ?? "").trim() ||
+          CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_EMPTY
+        );
+      })(),
       stepIndex: 4,
     },
     {

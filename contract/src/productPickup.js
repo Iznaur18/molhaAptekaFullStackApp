@@ -62,7 +62,13 @@ export function resolveCartLineFulfillmentSection(product) {
 
 /**
  * Все товары поддерживают самовывоз (по умолчанию true для старых документов).
- * @param {Array<{ productPickupEnabled?: boolean | null; productPickupAddress?: string | null } | null | undefined>} products
+ * @param {Array<{
+ *   productPickupEnabled?: boolean | null;
+ *   productPickupAddress?: string | null;
+ *   productPickupLocations?: unknown;
+ *   productPickupLat?: number | null;
+ *   productPickupLon?: number | null;
+ * } | null | undefined>} products
  * @returns {boolean}
  */
 export function doProductsSupportPickup(products) {
@@ -72,6 +78,12 @@ export function doProductsSupportPickup(products) {
   return products.every((product) => {
     if (product?.productPickupEnabled === false) {
       return false;
+    }
+    const locations = Array.isArray(product?.productPickupLocations)
+      ? product.productPickupLocations
+      : [];
+    if (locations.some((item) => String(item?.address ?? "").trim().length > 0)) {
+      return true;
     }
     return String(product?.productPickupAddress ?? "").trim().length > 0;
   });

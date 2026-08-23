@@ -13,6 +13,7 @@ import { getHiddenSellerIds } from "../access/adminUserGuard.js";
 import { attachProductSellerSnapshots } from "./attachProductSellerSnapshots.js";
 import { enrichProductApiFields } from "./productDiscount.js";
 import { buildProductRegionMatch } from "../user/userRegionCatalogFilter.js";
+import { isProductCatalogStockVisible } from "./productStock.js";
 
 /**
  * @param {string[]} hiddenSellerIds
@@ -21,7 +22,7 @@ export const buildCatalogVisibleProductFilter = (hiddenSellerIds) => {
   const filter = {
     productModerationStatus: PRODUCT_MODERATION_APPROVED,
     productIsAvailable: { $ne: false },
-    productStockQuantity: { $gt: 0 },
+    $or: [{ productOutOfStock: true }, { productStockQuantity: { $gt: 0 } }],
   };
 
   if (hiddenSellerIds.length > 0) {
@@ -63,7 +64,7 @@ export const isProductCatalogVisible = (product, hiddenSellerIds) => {
     return false;
   }
 
-  if (!(Number(product.productStockQuantity) > 0)) {
+  if (!isProductCatalogStockVisible(product)) {
     return false;
   }
 

@@ -116,6 +116,30 @@ const OrderLineItemSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    pickupLocationIdAtOrder: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: 64,
+    },
+    pickupAddressAtOrder: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: 100,
+    },
+    pickupLatAtOrder: {
+      type: Number,
+      default: null,
+      min: -90,
+      max: 90,
+    },
+    pickupLonAtOrder: {
+      type: Number,
+      default: null,
+      min: -180,
+      max: 180,
+    },
     /** Кто привёл покупателя по партнёрской ссылке объявления. */
     affiliateReferrerUserId: {
       type: mongoose.Schema.Types.ObjectId,

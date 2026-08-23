@@ -72,6 +72,15 @@ const ProductSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    productOutOfStock: {
+      type: Boolean,
+      default: false,
+    },
+    productOutOfStockLabel: {
+      type: String,
+      enum: ["out_of_stock", "coming_soon"],
+      default: "out_of_stock",
+    },
     productReturnEnabled: {
       type: Boolean,
       default: false,
@@ -188,7 +197,7 @@ const ProductSchema = new Schema(
       default: "",
       index: true,
     },
-    /** Адрес точки самовывоза (текст). */
+    /** Адрес точки самовывоза (текст). Sync из default в productPickupLocations. */
     productPickupAddress: {
       type: String,
       trim: true,
@@ -207,7 +216,7 @@ const ProductSchema = new Schema(
       min: -180,
       max: 180,
     },
-    /** GeoJSON Point [lon, lat] — для каталога «Рядом» ($geoNear / 2dsphere). */
+    /** GeoJSON Point [lon, lat] — для каталога «Рядом» ($geoNear / 2dsphere). Default-точка. */
     productPickupLocation: {
       type: {
         type: String,
@@ -216,6 +225,23 @@ const ProductSchema = new Schema(
       coordinates: {
         type: [Number],
       },
+    },
+    /**
+     * Точки самовывоза / отправления (покупатель выбирает при checkout).
+     * Legacy scalars синхронизируются с isDefault.
+     */
+    productPickupLocations: {
+      type: [
+        {
+          id: { type: String, required: true, trim: true, maxlength: 64 },
+          label: { type: String, trim: true, default: "", maxlength: 30 },
+          address: { type: String, required: true, trim: true, maxlength: 100 },
+          lat: { type: Number, required: true, min: -90, max: 90 },
+          lon: { type: Number, required: true, min: -180, max: 180 },
+          isDefault: { type: Boolean, default: false },
+        },
+      ],
+      default: [],
     },
     /** Доставка продавцом. */
     productDeliveryEnabled: {

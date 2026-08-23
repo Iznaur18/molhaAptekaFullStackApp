@@ -1,0 +1,29 @@
+.product-card--out-of-stock {
+  filter: grayscale(1);
+  opacity: 0.72;
+}
+
+.product-card__out-of-stock-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  background: color-mix(in srgb, var(--iz-color-surface) 55%, transparent);
+  pointer-events: none;
+}
+
+.product-card__out-of-stock-overlay-label {
+  margin: 0;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--iz-color-surface) 88%, transparent);
+  color: var(--iz-color-text-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}

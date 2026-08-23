@@ -28,6 +28,10 @@ export function validateRuStructuredDeliveryAddress() {
 
   return async (req, res, next) => {
     try {
+      if (req.body.userAddresses !== undefined) {
+        return next();
+      }
+
       const hasStructured = STRUCTURED_ADDRESS_FIELDS.some(
         (field) => req.body[field] !== undefined,
       );

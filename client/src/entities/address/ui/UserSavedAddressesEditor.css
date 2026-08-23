@@ -1,0 +1,128 @@
+.user-saved-addresses {
+  display: grid;
+  gap: 12px;
+}
+
+.user-saved-addresses__empty {
+  margin: 0;
+  color: var(--color-text-muted, #667085);
+  font-size: 0.9375rem;
+}
+
+.user-saved-addresses__list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.user-saved-addresses__card {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border, #e4e7ec);
+  border-radius: 12px;
+  background: var(--color-surface, #fff);
+}
+
+.user-saved-addresses__default {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--color-text-muted, #667085);
+}
+
+.user-saved-addresses__label {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.user-saved-addresses__line {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.user-saved-addresses__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.user-saved-addresses__action {
+  border: 0;
+  background: transparent;
+  color: var(--color-primary, #2563eb);
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+}
+
+.user-saved-addresses__action_danger {
+  color: var(--color-danger, #dc2626);
+}
+
+.user-saved-addresses__action:disabled,
+.user-saved-addresses__add:disabled,
+.user-saved-addresses__save:disabled,
+.user-saved-addresses__cancel:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.user-saved-addresses__editor {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px dashed var(--color-border, #e4e7ec);
+  border-radius: 12px;
+}
+
+.user-saved-addresses__field {
+  display: grid;
+  gap: 6px;
+}
+
+.user-saved-addresses__error {
+  margin: 0;
+  color: var(--color-danger, #dc2626);
+  font-size: 0.875rem;
+}
+
+.user-saved-addresses__editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.user-saved-addresses__save,
+.user-saved-addresses__cancel,
+.user-saved-addresses__add {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.user-saved-addresses__save,
+.user-saved-addresses__add {
+  background: var(--color-primary, #2563eb);
+  color: #fff;
+}
+
+.user-saved-addresses__cancel {
+  background: var(--color-surface-muted, #f2f4f7);
+  color: inherit;
+}
+
+.user-saved-addresses__add {
+  justify-self: start;
+}
+
+.user-saved-addresses .address-delivery-fields {
+  gap: 8px;
+}

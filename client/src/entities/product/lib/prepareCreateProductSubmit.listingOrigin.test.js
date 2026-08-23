@@ -22,6 +22,17 @@ const validForm = {
   productCategoryId: "507f1f77bcf86cd799439011",
   productRegionCode: "RU-MOW",
   productReturnEnabled: false,
+  productPickupLocations: [
+    {
+      id: "loc-1",
+      label: "",
+      address: "Москва, Тверская улица, 1",
+      lat: 55.75,
+      lon: 37.62,
+      isDefault: true,
+      selectedFromSuggest: true,
+    },
+  ],
   productPickupAddress: "Москва, Тверская улица, 1",
   productPickupLat: 55.75,
   productPickupLon: 37.62,

@@ -67,16 +67,22 @@ export function validateCreateProductWizardStep(stepId, form, context = {}) {
     }
 
     case "pickup": {
-      const address = String(form.productPickupAddress ?? "").trim();
-      if (address.length < PRODUCT_PICKUP_ADDRESS_MIN_LENGTH) {
+      const locations = Array.isArray(form.productPickupLocations)
+        ? form.productPickupLocations
+        : [];
+      if (locations.length === 0) {
         return PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE;
       }
-      const hasLat =
-        form.productPickupLat != null && Number.isFinite(Number(form.productPickupLat));
-      const hasLon =
-        form.productPickupLon != null && Number.isFinite(Number(form.productPickupLon));
-      if (!hasLat || !hasLon) {
-        return CREATE_PRODUCT_MODAL_UI.ERROR_PICKUP_COORDS;
+      for (const item of locations) {
+        const address = String(item?.address ?? "").trim();
+        if (address.length < PRODUCT_PICKUP_ADDRESS_MIN_LENGTH) {
+          return PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE;
+        }
+        const hasLat = item?.lat != null && Number.isFinite(Number(item.lat));
+        const hasLon = item?.lon != null && Number.isFinite(Number(item.lon));
+        if (!hasLat || !hasLon) {
+          return CREATE_PRODUCT_MODAL_UI.ERROR_PICKUP_COORDS;
+        }
       }
       return null;
     }

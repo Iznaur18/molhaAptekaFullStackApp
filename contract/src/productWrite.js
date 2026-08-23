@@ -8,12 +8,15 @@ import { PRODUCT_MODERATION_STATUSES, productFromApiSchema } from "./productFrom
 import { storedMediaUrlOrEmptySchema, storedMediaUrlSchema } from "./storedMediaUrl.js";
 import {
   assertPickupCoordsPair,
-  assertPickupCoordsRequired,
   PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
   productPickupAddressFieldSchema,
   productPickupLatFieldSchema,
   productPickupLonFieldSchema,
 } from "./productPickup.js";
+import {
+  assertCreateProductPickupLocationsOrLegacy,
+  productPickupLocationsFieldSchema,
+} from "./productPickupLocations.js";
 import { productBuyNFreePatchFieldsShape } from "./productBuyNFree.js";
 import { productWholesalePatchFieldsShape } from "./productWholesale.js";
 import { productRentalPatchFieldsShape } from "./productRental.js";
@@ -22,6 +25,7 @@ import {
   productAffiliatePatchFieldsShape,
 } from "./productAffiliate.js";
 import { productFlashSalePatchFieldsShape } from "./productFlashSale.js";
+import { productOutOfStockLabelFieldSchema } from "./productOutOfStockLabel.js";
 
 /** SSOT category slug list — client/mobile/server re-export отсюда. */
 export const PRODUCT_CATEGORY_VALUES = [
@@ -229,6 +233,8 @@ export const createProductBodySchema = z
       .optional(),
     productListingOrigin: productListingOriginSchema,
     productIsOriginal: z.coerce.boolean().optional().default(false),
+    productOutOfStock: z.coerce.boolean().optional().default(false),
+    productOutOfStockLabel: productOutOfStockLabelFieldSchema.optional().default("out_of_stock"),
     productReturnEnabled: z.coerce.boolean().optional(),
     productReturnTerms: z
       .array(productReturnTermSchema)
@@ -236,9 +242,11 @@ export const createProductBodySchema = z
       .optional(),
     /** Опционально: сервер пересчитает из адреса. Клиент может прислать preview. */
     productRegionCode: requiredRuRegionCodeFieldSchema.optional(),
-    productPickupAddress: productPickupAddressFieldSchema,
-    productPickupLat: productPickupLatFieldSchema,
-    productPickupLon: productPickupLonFieldSchema,
+    /** Предпочтительно: несколько точек; иначе legacy single address. */
+    productPickupLocations: productPickupLocationsFieldSchema.optional(),
+    productPickupAddress: productPickupAddressFieldSchema.optional(),
+    productPickupLat: productPickupLatFieldSchema.nullable().optional(),
+    productPickupLon: productPickupLonFieldSchema.nullable().optional(),
     productPickupEnabled: z.coerce.boolean().optional(),
     productDeliveryEnabled: z.coerce.boolean().optional(),
     productArticle: z.string().trim().max(64).optional(),
@@ -246,7 +254,7 @@ export const createProductBodySchema = z
   .superRefine(assertCreateProductRequiresPhoto)
   .superRefine((body, ctx) => assertOldPricePair(body, ctx, true))
   .superRefine(assertReturnPolicy)
-  .superRefine((body, ctx) => assertPickupCoordsRequired(body, ctx))
+  .superRefine(assertCreateProductPickupLocationsOrLegacy)
   .superRefine((body, ctx) => {
     const pickupOn = body.productPickupEnabled !== false;
     const deliveryOn = body.productDeliveryEnabled === true;
@@ -295,12 +303,15 @@ const patchFieldShape = {
     .optional(),
   productListingOrigin: productListingOriginSchema.optional(),
   productIsOriginal: z.coerce.boolean().optional(),
+  productOutOfStock: z.coerce.boolean().optional(),
+  productOutOfStockLabel: productOutOfStockLabelFieldSchema.optional(),
   productReturnEnabled: z.coerce.boolean().optional(),
   productReturnTerms: z
     .array(productReturnTermSchema)
     .max(PRODUCT_RETURN_TERMS_MAX_ITEMS)
     .optional(),
   productRegionCode: requiredRuRegionCodeFieldSchema.optional(),
+  productPickupLocations: productPickupLocationsFieldSchema.optional(),
   productPickupAddress: productPickupAddressFieldSchema.optional(),
   productPickupLat: productPickupLatFieldSchema.nullable().optional(),
   productPickupLon: productPickupLonFieldSchema.nullable().optional(),

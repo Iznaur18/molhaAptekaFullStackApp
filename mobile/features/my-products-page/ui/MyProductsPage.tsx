@@ -257,6 +257,7 @@ export const MyProductsPage = () => {
         onSetProductAvailability={pageActions.handleSetMyProductAvailability}
         onSetProductAuction={pageActions.handleSetProductAuction}
         onSetProductOriginality={pageActions.handleSetProductOriginality}
+        onSetProductOutOfStock={pageActions.handleSetProductOutOfStock}
         onSetProductWholesale={pageActions.handleSetProductWholesale}
         onSetProductBuyNFree={pageActions.handleSetProductBuyNFree}
         onSetProductRental={pageActions.handleSetProductRental}
@@ -268,6 +269,7 @@ export const MyProductsPage = () => {
         isAvailabilityTogglePending={pageActions.isAvailabilityTogglePending}
         isAuctionTogglePending={pageActions.isAuctionTogglePending}
         isOriginalityTogglePending={pageActions.isOriginalityTogglePending}
+        isOutOfStockTogglePending={pageActions.isOutOfStockTogglePending}
         isWholesaleTogglePending={pageActions.isWholesaleTogglePending}
         isBuyNFreeTogglePending={pageActions.isBuyNFreeTogglePending}
         isRentalTogglePending={pageActions.isRentalTogglePending}

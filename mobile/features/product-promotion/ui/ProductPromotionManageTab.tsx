@@ -16,6 +16,8 @@ type ProductPromotionManageTabProps = {
 
   onSetOriginality?: (productId: string, productIsOriginal: boolean) => void | Promise<void>;
 
+  onSetOutOfStock?: (productId: string, productOutOfStock: boolean) => void | Promise<void>;
+
   onSetWholesale?: (productId: string, productWholesaleEnabled: boolean) => void | Promise<void>;
 
   onSetBuyNFree?: (productId: string, productBuyNFreeEnabled: boolean) => void | Promise<void>;
@@ -47,6 +49,8 @@ type ProductPromotionManageTabProps = {
   isAuctionTogglePending?: boolean;
 
   isOriginalityTogglePending?: boolean;
+
+  isOutOfStockTogglePending?: boolean;
 
   isWholesaleTogglePending?: boolean;
 
@@ -81,6 +85,8 @@ type ProductPromotionManageTabProps = {
   onOpenWholesaleSettings?: () => void;
 
   onOpenBuyNFreeSettings?: () => void;
+
+  onOpenOutOfStockSettings?: () => void;
 
   onOpenRentalSettings?: () => void;
 

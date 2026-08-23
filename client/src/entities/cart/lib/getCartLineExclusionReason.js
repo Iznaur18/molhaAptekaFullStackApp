@@ -18,6 +18,10 @@ export function getCartLineExclusionReason(line, currentUserId) {
     return "unavailable";
   }
 
+  if (line.product?.productOutOfStock === true) {
+    return "unavailable";
+  }
+
   if (isCurrentUserProductSeller(line.product, currentUserId)) {
     return "own_product";
   }

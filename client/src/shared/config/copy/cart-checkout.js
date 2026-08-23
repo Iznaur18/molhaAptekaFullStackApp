@@ -112,6 +112,33 @@ export const ADDRESS_DELIVERY_UI = {
   MAP_GEOLOCATE_ERROR: "Не удалось определить адрес по карте",
 };
 
+/** Сохранённые адреса пользователя в профиле */
+export const USER_SAVED_ADDRESSES_UI = {
+  SECTION_LABEL: "Адреса",
+  LABEL_DEFAULT: "По умолчанию",
+  LABEL_NAME: "Метка",
+  PLACEHOLDER_NAME: "Дом, работа…",
+  ADD: "Добавить адрес",
+  EDIT: "Изменить",
+  REMOVE: "Удалить",
+  SAVE: "Сохранить адрес",
+  CANCEL: "Отмена",
+  EMPTY: "Адреса не добавлены",
+  /** @param {number} max */
+  ERROR_MAX_COUNT: (max) => `Не больше ${max} адресов`,
+  ERROR_DEFAULT_REQUIRED: "Укажите адрес по умолчанию",
+  ERROR_DUPLICATE: "Такой адрес уже добавлен",
+  /** @param {number} max */
+  ERROR_LABEL_MAX: (max) => `Метка не длиннее ${max} символов`,
+  REMOVE_CONFIRM: "Удалить этот адрес?",
+  ERROR_DRAFT_OPEN: "Сохраните или отмените редактирование адреса",
+  /** @param {string} line @param {string} flat */
+  FORMAT_LINE: (line, flat) => {
+    const trimmedFlat = String(flat ?? "").trim();
+    return trimmedFlat ? `${line}, кв ${trimmedFlat}` : line;
+  },
+};
+
 /** Форма оформления заказа */
 export const CHECKOUT_FORM_UI = {
   HEADING: "Оформление заказа",
@@ -124,6 +151,8 @@ export const CHECKOUT_FORM_UI = {
   PICKUP_ADDRESS_LABEL: "Где забрать",
   PICKUP_MULTI_HINT: "Несколько точек — каждый товар по своему адресу",
   LABEL_DELIVERY_ADDRESS: "Адрес доставки",
+  LABEL_SAVED_ADDRESSES: "Сохранённые адреса",
+  SAVED_ADDRESS_OTHER: "Указать другой на карте",
   PLACEHOLDER_DELIVERY_ADDRESS: "Город, улица, дом",
   LABEL_FLAT: "Комментарий",
   PLACEHOLDER_FLAT: "подъезд, этаж, кв",
@@ -159,6 +188,22 @@ export const PRODUCT_PICKUP_UI = {
     "Покупатель укажет адрес доставки. Службы СДЭК / Яндекс / Почта — позже; пока доставляете сами.",
   ADDRESS_LABEL: "Адрес продажи",
   ADDRESS_LABEL_WAREHOUSE: "Адрес точки отправления",
+  SAVED_ADDRESSES_LABEL: "Ваши адреса",
+  SAVED_ADDRESS_OTHER: "Указать другой на карте",
+  LOCATIONS_SECTION_LABEL: "Точки самовывоза / отправления",
+  LOCATIONS_EMPTY: "Добавьте хотя бы одну точку",
+  LOCATION_DEFAULT: "По умолчанию",
+  LOCATION_LABEL: "Метка",
+  LOCATION_LABEL_PLACEHOLDER: "Склад, точка выдачи…",
+  ADD_LOCATION: "Добавить точку на карте",
+  ADD_FROM_SAVED: "Добавить из моих адресов",
+  SAVED_ADDRESS_ADDED: "Добавлено",
+  SAVED_ADDRESS_NO_GEO: "Укажите точку на карте",
+  PICKUP_MULTI_HINT:
+    "При самовывозе можно выбрать до 5 точек — покупатель выберет, откуда забрать заказ.",
+  SAVE_LOCATION: "Сохранить точку",
+  REMOVE_LOCATION_CONFIRM: "Удалить эту точку?",
+  CHECKOUT_PICK_LOCATION: "Где забрать",
   MAP_ARIA: "Карта адреса продажи",
   DETAILS_TITLE: "Самовывоз",
   DETAILS_ROUTE: "Маршрут",

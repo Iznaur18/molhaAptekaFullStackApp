@@ -1,4 +1,4 @@
-import { validateRuDeliveryAddressForm } from "../../address/lib/validateRuDeliveryAddressForm.js";
+import { validateUserSavedAddressesForm } from "../../address/lib/validateUserSavedAddressesForm.js";
 import { isStoredUploadOrHttpImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { validateSocialLinksInForm } from "./buildPatchUserProfileBody.js";
 import { validateRuPhoneField } from "./ruPhone.js";
@@ -41,7 +41,7 @@ export function validateEditProfileForm(form, options = {}) {
   const phoneError = validateRuPhoneField(form.userPhoneNumber);
   if (phoneError) return phoneError;
 
-  const addressError = validateRuDeliveryAddressForm(form.deliveryAddress);
+  const addressError = validateUserSavedAddressesForm(form.savedAddresses);
   if (addressError) return addressError;
 
   if (!isRuRegionCode(form.userRegionCode)) {

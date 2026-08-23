@@ -1,4 +1,8 @@
 import mongoose from "mongoose";
+import {
+  USER_SAVED_ADDRESS_LABEL_MAX_LENGTH,
+  USER_SAVED_ADDRESS_ID_MAX_LENGTH,
+} from "@molha/api-contract";
 import { ADDRESS_LINE_MAX_LENGTH } from "../constants/dadataConstants.js";
 import { DEFAULT_AVATAR_URL, DEFAULT_BACKGROUND_URL } from "../constants/constants.js";
 import {
@@ -21,6 +25,69 @@ const profileImageFocusSchema = new mongoose.Schema(
       default: DEFAULT_USER_AVATAR_FOCUS.y,
       min: PROFILE_IMAGE_FOCUS_MIN,
       max: PROFILE_IMAGE_FOCUS_MAX,
+    },
+  },
+  { _id: false },
+);
+
+const userSavedAddressSchema = new mongoose.Schema(
+  {
+    id: {
+      type: String,
+      trim: true,
+      required: true,
+      maxlength: USER_SAVED_ADDRESS_ID_MAX_LENGTH,
+    },
+    label: {
+      type: String,
+      trim: true,
+      default: "",
+      maxlength: USER_SAVED_ADDRESS_LABEL_MAX_LENGTH,
+    },
+    line: {
+      type: String,
+      trim: true,
+      default: "",
+      maxlength: ADDRESS_LINE_MAX_LENGTH,
+    },
+    flat: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    city: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    district: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    street: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    house: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    fiasId: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    geo: {
+      lat: { type: Number },
+      lon: { type: Number },
+      _id: false,
+    },
+    isDefault: {
+      type: Boolean,
+      default: false,
     },
   },
   { _id: false },
@@ -196,6 +263,10 @@ const UserSchema = new mongoose.Schema(
       },
       _id: false,
       default: null,
+    },
+    userAddresses: {
+      type: [userSavedAddressSchema],
+      default: [],
     },
     userName: {
       // ник пользователя

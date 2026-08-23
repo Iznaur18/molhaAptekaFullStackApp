@@ -22,12 +22,13 @@ import {
   NOTES_ABOUT_USER_MAX_CHARS,
 } from "@/entities/user/model/constants";
 import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
+import { UserSavedAddressesReadOnlyList } from "@/entities/address/ui/UserSavedAddressesReadOnlyList";
 import { RuRegionSelect } from "@/entities/region/ui/RuRegionSelect";
 import { ProfileAvatarUpload } from "@/features/image-upload/ui/ProfileAvatarUpload";
 import { ProfileBackgroundUpload } from "@/features/image-upload/ui/ProfileBackgroundUpload";
 import { DeleteAccountSection } from "@/features/profile-edit/ui/DeleteAccountSection";
 import { EditProfileSocialLinksFields } from "@/features/profile-edit/ui/EditProfileSocialLinksFields";
-import { ADDRESS_DELIVERY_UI, ADDRESS_STRUCTURED_UI, AUTH_UI, EDIT_PROFILE_UI } from "@/shared/config";
+import { ADDRESS_DELIVERY_UI, ADDRESS_STRUCTURED_UI, AUTH_UI, EDIT_PROFILE_UI, USER_SAVED_ADDRESSES_UI } from "@/shared/config";
 import { keepDigitsOnly } from "@/shared/lib/rubPriceInput";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useEditProfileFormStyles } from "@/shared/theme/editProfileFormStyles";
@@ -575,6 +576,10 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
       {section(
         ADDRESS_STRUCTURED_UI.SECTION_LABEL,
         <>
+          <UserSavedAddressesReadOnlyList user={user} />
+          <Text style={styles.hint}>
+            {USER_SAVED_ADDRESSES_UI.MOBILE_DEFAULT_EDIT_HINT}
+          </Text>
           <AddressSuggestInput
             autoFocus={focusAddress}
             value={form.deliveryAddress}

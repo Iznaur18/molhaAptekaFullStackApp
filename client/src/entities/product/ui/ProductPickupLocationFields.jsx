@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
   SHIPPING_PROVIDER_LABEL_RU,
@@ -5,57 +6,427 @@ import {
 } from "@molha/api-contract";
 
 import { AddressDeliveryFields } from "../../address/ui/AddressDeliveryFields.jsx";
+import {
+  createPickupLocationFromSaved,
+  ensureSingleDefaultProductPickupLocation,
+  findCustomPickupLocations,
+  hasValidPickupGeo,
+  isSavedAddressInPickupLocations,
+  areProductPickupLocationListsEqual,
+  pickupAddressValueFromLocation,
+  pruneProductPickupLocationsToSelection,
+  PRODUCT_PICKUP_LOCATIONS_MAX,
+  removePickupLocationByAddressLine,
+  resolvePickupGeoForSavedAddress,
+  savedAddressPickupLine,
+  selectedProfileAddressIdsFromLocations,
+} from "../lib/productPickupLocationsForm.js";
 import { PRODUCT_PICKUP_UI } from "../../../shared/config/appUiCopy.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
+import { USER_SAVED_ADDRESSES_UI } from "../../../shared/config/appUiCopy.js";
 
+import "../../address/ui/SavedAddressPicker.css";
 import "./ProductPickupLocationFields.css";
 import "./create-product-sections/CreateProductSections.css";
 
+const EMPTY_INLINE_ADDRESS = {
+  line: "",
+  flat: "",
+  fiasId: "",
+  geo: null,
+  regionCode: null,
+  selectedFromSuggest: false,
+};
+
+/**
+ * @param {Array<{ id?: string }>} profileAddresses
+ * @param {Set<string>} selectedProfileIds
+ */
+function buildSelectedProfileIdSet(profileAddresses, selectedProfileIds) {
+  return new Set(
+    profileAddresses
+      .map((item) => String(item.id ?? ""))
+      .filter((id) => id && selectedProfileIds.has(id)),
+  );
+}
+
 /**
  * @param {{
- *   address: string;
- *   lat: number | null;
- *   lon: number | null;
+ *   locations: import('../lib/productPickupLocationsForm.js').ProductPickupLocationFormValue[];
  *   pickupEnabled?: boolean;
  *   deliveryEnabled: boolean;
  *   disabled?: boolean;
- *   selectedFromSuggest?: boolean;
- *   addressLineDisplayOnly?: boolean;
+ *   savedAddresses?: Array<{
+ *     id: string;
+ *     label?: string;
+ *     line: string;
+ *     flat?: string;
+ *     geo?: { lat: number; lon: number } | null;
+ *     isDefault?: boolean;
+ *   }>;
  *   onChange: (next: {
- *     productPickupAddress: string;
- *     productPickupLat: number | null;
- *     productPickupLon: number | null;
+ *     productPickupLocations: import('../lib/productPickupLocationsForm.js').ProductPickupLocationFormValue[];
  *     productPickupEnabled: boolean;
  *     productDeliveryEnabled: boolean;
  *     productRegionCode?: string | null;
- *     productPickupSelectedFromSuggest?: boolean;
  *   }) => void;
  * }} props
  */
 export function ProductPickupLocationFields({
-  address,
-  lat,
-  lon,
+  locations = [],
   pickupEnabled = true,
   deliveryEnabled,
   disabled = false,
-  selectedFromSuggest = false,
-  addressLineDisplayOnly = false,
+  savedAddresses = [],
   onChange,
 }) {
+  const list = useMemo(
+    () => (Array.isArray(locations) ? locations : []),
+    [locations],
+  );
+
+  const profileAddresses = useMemo(
+    () => (Array.isArray(savedAddresses) ? savedAddresses : []),
+    [savedAddresses],
+  );
+
+  const [selectedProfileIds, setSelectedProfileIds] = useState(() =>
+    new Set(selectedProfileAddressIdsFromLocations(profileAddresses, list)),
+  );
+  const [confirmedCustomLocationIds, setConfirmedCustomLocationIds] = useState(
+    () => new Set(),
+  );
+  const [customModeActive, setCustomModeActive] = useState(false);
+  const [inlineAddressDraft, setInlineAddressDraft] = useState(EMPTY_INLINE_ADDRESS);
+
+  const listRef = useRef(list);
+  listRef.current = list;
+
+  const multiSelectEnabled = pickupEnabled;
+  const maxLocations = multiSelectEnabled ? PRODUCT_PICKUP_LOCATIONS_MAX : 1;
+  const canAddMoreLocations = list.length < maxLocations;
+  const showAddressSection = pickupEnabled || deliveryEnabled;
+
+  const customLocations = useMemo(
+    () => findCustomPickupLocations(list, profileAddresses),
+    [list, profileAddresses],
+  );
+
+  const selectedProfileIdsRef = useRef(selectedProfileIds);
+  selectedProfileIdsRef.current = selectedProfileIds;
+
+  const confirmedCustomLocationIdsRef = useRef(confirmedCustomLocationIds);
+  confirmedCustomLocationIdsRef.current = confirmedCustomLocationIds;
+
   const emit = (patch) => {
     onChange({
-      productPickupAddress: address,
-      productPickupLat: lat,
-      productPickupLon: lon,
+      productPickupLocations: list,
       productPickupEnabled: pickupEnabled,
       productDeliveryEnabled: deliveryEnabled,
-      productPickupSelectedFromSuggest: selectedFromSuggest,
       ...patch,
     });
   };
 
+  /**
+   * @param {ProductPickupLocationFormValue[]} nextList
+   * @param {string | null} [regionCode]
+   * @param {Set<string>} [profileIdsForPrune]
+   * @param {Set<string>} [customIdsForPrune]
+   */
+  const commitLocations = (
+    nextList,
+    regionCode = null,
+    profileIdsForPrune = selectedProfileIdsRef.current,
+    customIdsForPrune = confirmedCustomLocationIdsRef.current,
+  ) => {
+    const pruned = pruneProductPickupLocationsToSelection(
+      nextList,
+      profileAddresses,
+      profileIdsForPrune,
+      customIdsForPrune,
+    );
+    emit({
+      productPickupLocations: ensureSingleDefaultProductPickupLocation(pruned),
+      ...(regionCode ? { productRegionCode: regionCode } : {}),
+    });
+  };
+
+  const didInitialPruneRef = useRef(false);
+
+  useEffect(() => {
+    if (disabled || didInitialPruneRef.current) {
+      return;
+    }
+    didInitialPruneRef.current = true;
+
+    const initialSelected = new Set(
+      selectedProfileAddressIdsFromLocations(profileAddresses, list),
+    );
+    setSelectedProfileIds(initialSelected);
+
+    const pruned = pruneProductPickupLocationsToSelection(
+      list,
+      profileAddresses,
+      initialSelected,
+      confirmedCustomLocationIdsRef.current,
+    );
+    if (!areProductPickupLocationListsEqual(list, pruned)) {
+      commitLocations(pruned, null, initialSelected);
+    }
+  }, [disabled, profileAddresses, list]);
+
+  useEffect(() => {
+    const latestCustom = customLocations[customLocations.length - 1] ?? null;
+    if (latestCustom && customModeActive) {
+      setInlineAddressDraft(pickupAddressValueFromLocation(latestCustom));
+    }
+  }, [customLocations, customModeActive]);
+
+  const showInlineAddressField = customModeActive;
+
+  /**
+   * @param {ProductPickupLocationFormValue[]} baseList
+   */
+  const normalizeForSingleSelect = (baseList) => {
+    if (multiSelectEnabled || baseList.length <= 1) {
+      return baseList;
+    }
+    return baseList.slice(-1);
+  };
+
+  /**
+   * @param {ProductPickupLocationFormValue[]} baseList
+   */
+  const withoutProfileLocations = (baseList) =>
+    baseList.filter(
+      (item) =>
+        !profileAddresses.some((profileItem) =>
+          isSavedAddressInPickupLocations(profileItem, [item]),
+        ),
+    );
+
+  const withoutCustomLocations = (baseList) =>
+    baseList.filter(
+      (item) =>
+        !customLocations.some(
+          (custom) =>
+            String(custom.address ?? "").trim().toLowerCase() ===
+            String(item.address ?? "").trim().toLowerCase(),
+        ),
+    );
+
+  const closeCustomMode = () => {
+    setCustomModeActive(false);
+    setInlineAddressDraft(EMPTY_INLINE_ADDRESS);
+    const nextList = withoutCustomLocations(list);
+    const nextCustomIds = new Set(
+      [...confirmedCustomLocationIdsRef.current].filter((id) =>
+        nextList.some((item) => String(item.id ?? "") === id),
+      ),
+    );
+    setConfirmedCustomLocationIds(nextCustomIds);
+    commitLocations(nextList, null, selectedProfileIdsRef.current, nextCustomIds);
+  };
+
+  /**
+   * @param {(typeof profileAddresses)[number]} saved
+   */
+  const enrichSavedAddressGeo = (saved) => {
+    const addressKey = savedAddressPickupLine(saved).toLowerCase();
+    const currentLocation = listRef.current.find(
+      (item) => String(item?.address ?? "").trim().toLowerCase() === addressKey,
+    );
+    if (
+      currentLocation &&
+      hasValidPickupGeo({ lat: currentLocation.lat, lon: currentLocation.lon })
+    ) {
+      return;
+    }
+
+    void resolvePickupGeoForSavedAddress(saved).then((geo) => {
+      if (!geo) {
+        return;
+      }
+
+      const currentList = listRef.current;
+      const hasTarget = currentList.some(
+        (item) => String(item?.address ?? "").trim().toLowerCase() === addressKey,
+      );
+      if (!hasTarget) {
+        return;
+      }
+
+      commitLocations(
+        ensureSingleDefaultProductPickupLocation(
+          currentList.map((item) =>
+            String(item?.address ?? "").trim().toLowerCase() === addressKey
+              ? { ...item, lat: geo.lat, lon: geo.lon }
+              : item,
+          ),
+        ),
+      );
+    });
+  };
+
+  useEffect(() => {
+    profileAddresses.forEach((saved) => {
+      if (!isSavedAddressInPickupLocations(saved, list)) {
+        return;
+      }
+      const line = savedAddressPickupLine(saved).toLowerCase();
+      const location = list.find(
+        (item) => String(item?.address ?? "").trim().toLowerCase() === line,
+      );
+      if (!location || hasValidPickupGeo({ lat: location.lat, lon: location.lon })) {
+        return;
+      }
+      enrichSavedAddressGeo(saved);
+    });
+  }, [list, profileAddresses]);
+
+  /**
+   * @param {typeof EMPTY_INLINE_ADDRESS} next
+   */
+  const tryCommitCustomAddress = (next) => {
+    const line = String(next.line ?? "").trim();
+    if (!line || !hasValidPickupGeo(next.geo)) {
+      return;
+    }
+
+    const baseList = [
+      ...list.filter(
+        (item) =>
+          !customLocations.some(
+            (custom) =>
+              String(custom.address ?? "").trim().toLowerCase() ===
+              String(item.address ?? "").trim().toLowerCase(),
+          ),
+      ),
+    ];
+
+    const nextList = normalizeForSingleSelect([
+      ...baseList,
+      {
+        ...createPickupLocationFromSaved({ line, geo: next.geo }),
+        address: line,
+        isDefault: baseList.length === 0,
+        selectedFromSuggest: next.selectedFromSuggest === true,
+      },
+    ]);
+
+    if (nextList.length > maxLocations) {
+      return;
+    }
+
+    const customLocation = nextList[nextList.length - 1];
+    const nextCustomIds = new Set(confirmedCustomLocationIdsRef.current);
+    if (customLocation?.id) {
+      nextCustomIds.add(String(customLocation.id));
+    }
+    setConfirmedCustomLocationIds(nextCustomIds);
+
+    commitLocations(
+      nextList,
+      next.regionCode ?? null,
+      selectedProfileIdsRef.current,
+      nextCustomIds,
+    );
+    setInlineAddressDraft(next);
+  };
+
+  /**
+   * @param {(typeof profileAddresses)[number]} saved
+   */
+  const toggleSavedAddress = (saved) => {
+    if (disabled) {
+      return;
+    }
+
+    const savedId = String(saved.id ?? "");
+    const isSelected = selectedProfileIds.has(savedId);
+
+    setCustomModeActive(false);
+    setInlineAddressDraft(EMPTY_INLINE_ADDRESS);
+
+    if (isSelected) {
+      const nextSelectedIds = new Set(selectedProfileIds);
+      nextSelectedIds.delete(savedId);
+      setSelectedProfileIds(nextSelectedIds);
+      commitLocations(
+        removePickupLocationByAddressLine(list, savedAddressPickupLine(saved)),
+        null,
+        nextSelectedIds,
+      );
+      return;
+    }
+
+    if (multiSelectEnabled && !canAddMoreLocations) {
+      return;
+    }
+
+    if (isSavedAddressInPickupLocations(saved, list)) {
+      return;
+    }
+
+    // Pickup: multi-select profile addresses. Delivery-only warehouse: single profile point.
+    const baseList = multiSelectEnabled ? list : withoutProfileLocations(list);
+    const nextSelectedIds = multiSelectEnabled
+      ? new Set(selectedProfileIds).add(savedId)
+      : new Set([savedId]);
+    setSelectedProfileIds(nextSelectedIds);
+
+    commitLocations(
+      normalizeForSingleSelect([
+        ...baseList,
+        {
+          ...createPickupLocationFromSaved(saved),
+          isDefault: baseList.length === 0,
+        },
+      ]),
+      null,
+      nextSelectedIds,
+    );
+
+    enrichSavedAddressGeo(saved);
+  };
+
+  const startCustomMode = () => {
+    if (disabled) {
+      return;
+    }
+
+    if (customModeActive) {
+      closeCustomMode();
+      return;
+    }
+
+    setCustomModeActive(true);
+
+    if (!multiSelectEnabled) {
+      setSelectedProfileIds(new Set());
+      commitLocations(customLocations);
+      setInlineAddressDraft(
+        customLocations[0]
+          ? pickupAddressValueFromLocation(customLocations[0])
+          : EMPTY_INLINE_ADDRESS,
+      );
+    } else if (customLocations[0]) {
+      setInlineAddressDraft(pickupAddressValueFromLocation(customLocations[0]));
+    } else {
+      setInlineAddressDraft(EMPTY_INLINE_ADDRESS);
+    }
+  };
+
+  /**
+   * @param {typeof EMPTY_INLINE_ADDRESS} next
+   */
+  const handleInlineAddressChange = (next) => {
+    setInlineAddressDraft(next);
+    tryCommitCustomAddress(next);
+  };
+
   const deliverySelectable = PRODUCT_DELIVERY_FULFILLMENT_ENABLED && !disabled;
+  const selectedProfileIdSet = buildSelectedProfileIdSet(profileAddresses, selectedProfileIds);
 
   const togglePickup = () => {
     if (disabled) {
@@ -79,32 +450,122 @@ export function ProductPickupLocationFields({
 
   return (
     <div className="product-pickup-location-fields">
-      <AddressDeliveryFields
-        value={{
-          line: address,
-          flat: "",
-          fiasId: "",
-          geo: lat != null && lon != null ? { lat, lon } : null,
-          selectedFromSuggest,
-        }}
-        onChange={(next) => {
-          emit({
-            productPickupAddress: next.line,
-            productPickupLat: next.geo?.lat ?? null,
-            productPickupLon: next.geo?.lon ?? null,
-            productRegionCode: next.regionCode ?? null,
-            productPickupSelectedFromSuggest: next.selectedFromSuggest === true,
-          });
-        }}
-        disabled={disabled}
-        displayOnly={addressLineDisplayOnly}
-        lineInputClassName="create-product-section__input"
-        labels={{
-          line: pickupEnabled
-            ? PRODUCT_PICKUP_UI.ADDRESS_LABEL
-            : PRODUCT_PICKUP_UI.ADDRESS_LABEL_WAREHOUSE,
-        }}
-      />
+      {showAddressSection && profileAddresses.length > 0 ? (
+        <div className="saved-address-picker">
+          <span className="saved-address-picker__label">
+            {PRODUCT_PICKUP_UI.SAVED_ADDRESSES_LABEL}
+          </span>
+          <div
+            className="saved-address-picker__list"
+            role="group"
+            aria-label={PRODUCT_PICKUP_UI.SAVED_ADDRESSES_LABEL}
+          >
+            {profileAddresses.map((item) => {
+              const selected = selectedProfileIdSet.has(String(item.id ?? ""));
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="checkbox"
+                  aria-checked={selected}
+                  className={[
+                    "saved-address-picker__option",
+                    "saved-address-picker__option_with-checkbox",
+                    selected ? "saved-address-picker__option_active" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  disabled={
+                    disabled ||
+                    (!selected && !canAddMoreLocations && multiSelectEnabled)
+                  }
+                  onClick={() => toggleSavedAddress(item)}
+                >
+                  <input
+                    type="checkbox"
+                    className="saved-address-picker__option-checkbox"
+                    checked={selected}
+                    readOnly
+                    tabIndex={-1}
+                    aria-hidden="true"
+                  />
+                  <span className="saved-address-picker__option-body">
+                    {item.label ? (
+                      <span className="saved-address-picker__option-label">{item.label}</span>
+                    ) : null}
+                    <span className="saved-address-picker__option-line">
+                      {USER_SAVED_ADDRESSES_UI.FORMAT_LINE(item.line, item.flat ?? "")}
+                    </span>
+                    {item.isDefault ? (
+                      <span className="saved-address-picker__option-badge">
+                        {USER_SAVED_ADDRESSES_UI.LABEL_DEFAULT}
+                      </span>
+                    ) : null}
+                  </span>
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              role="checkbox"
+              aria-checked={customModeActive}
+              className={[
+                "saved-address-picker__option",
+                "saved-address-picker__option_with-checkbox",
+                "product-pickup-location-fields__saved-option_custom",
+                customModeActive ? "saved-address-picker__option_active" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              disabled={disabled}
+              onClick={startCustomMode}
+            >
+              <input
+                type="checkbox"
+                className="saved-address-picker__option-checkbox"
+                checked={customModeActive}
+                readOnly
+                tabIndex={-1}
+                aria-hidden="true"
+              />
+              <span className="saved-address-picker__option-body">
+                <span className="saved-address-picker__option-line">
+                  {PRODUCT_PICKUP_UI.SAVED_ADDRESS_OTHER}
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {showInlineAddressField ? (
+        <AddressDeliveryFields
+          value={inlineAddressDraft}
+          onChange={handleInlineAddressChange}
+          disabled={disabled}
+          hideMapOpenButton
+          showMap
+          lineOpensMap
+          lineInputClassName="create-product-section__input"
+          labels={{
+            line: pickupEnabled
+              ? PRODUCT_PICKUP_UI.ADDRESS_LABEL
+              : PRODUCT_PICKUP_UI.ADDRESS_LABEL_WAREHOUSE,
+          }}
+          rootId="create-product-pickup-inline-map"
+        />
+      ) : null}
+
+      {!profileAddresses.length && canAddMoreLocations ? (
+        <button
+          type="button"
+          className="product-pickup-location-fields__add"
+          disabled={disabled}
+          onClick={startCustomMode}
+        >
+          {PRODUCT_PICKUP_UI.ADD_LOCATION}
+        </button>
+      ) : null}
 
       <p className="product-pickup-location-fields__legend">
         <FormFieldLabel>{PRODUCT_PICKUP_UI.FULFILLMENT_LEGEND}</FormFieldLabel>
@@ -193,7 +654,9 @@ export function ProductPickupLocationFields({
       </div>
 
       <p className="product-pickup-location-fields__hint">
-        {PRODUCT_PICKUP_UI.METHODS_REQUIRED_HINT}
+        {multiSelectEnabled
+          ? PRODUCT_PICKUP_UI.PICKUP_MULTI_HINT
+          : PRODUCT_PICKUP_UI.METHODS_REQUIRED_HINT}
       </p>
     </div>
   );

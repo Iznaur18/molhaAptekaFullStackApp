@@ -8,6 +8,7 @@ import {
 import { buildCheckoutPickupLocations } from "../../cart/lib/buildCheckoutPickupLocations.js";
 import { ORDER_PAYMENT_METHOD_DEFAULT } from "../../order/model/constants.js";
 import { useAuthSession } from "../../user/model/useAuthSession.js";
+import { userSavedAddressesFromUser } from "../../address/lib/userSavedAddressesFromUser.js";
 import { CheckoutSheetModal } from "../../../features/checkout/ui/CheckoutSheetModal.jsx";
 import { useInstallmentMutations } from "../model/useInstallmentMutations.js";
 import { resolveInstallmentPlanPriceSummary } from "../lib/resolveInstallmentPlanPriceSummary.js";
@@ -110,6 +111,13 @@ export function InstallmentBuyerBlock({
       userAddressFiasId: authUser.userAddressFiasId,
       userAddressGeo: authUser.userAddressGeo,
     };
+  }, [authUser, isAuthorized]);
+
+  const savedDeliveryAddresses = useMemo(() => {
+    if (!isAuthorized || !authUser) {
+      return [];
+    }
+    return userSavedAddressesFromUser(authUser);
   }, [authUser, isAuthorized]);
 
   useEffect(() => {
@@ -414,6 +422,7 @@ export function InstallmentBuyerBlock({
           setSheetSubmitError("");
         }}
         defaultDeliveryAddress={defaultDeliveryAddress}
+        savedDeliveryAddresses={savedDeliveryAddresses}
         pickupLocations={pickupLocations}
         deliveryAvailable={deliveryAvailable}
         pickupAvailable={pickupAvailable}

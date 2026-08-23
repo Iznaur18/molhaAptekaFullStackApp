@@ -10,7 +10,7 @@ import { mapUserToEditProfileForm } from "../lib/mapUserToEditProfileForm.js";
 import { maskRuPhoneInput } from "../lib/ruPhone.js";
 import { keepDigitsOnly } from "../../../shared/lib/numericInput.js";
 import { validateEditProfileForm } from "../lib/validateEditProfileForm.js";
-import { ADMIN_EDIT_USER_UI, EDIT_PROFILE_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { ADMIN_EDIT_USER_UI, EDIT_PROFILE_MODAL_UI, USER_SAVED_ADDRESSES_UI } from "../../../shared/config/appUiCopy.js";
 import { isHttpProfileImageUrl } from "../lib/profileImageFocus.js";
 import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
@@ -45,14 +45,15 @@ export function useEditProfileModal({
   const { patchMutation } = useUserProfileMutations();
   const [form, setForm] = useState(() => mapUserToEditProfileForm({ _id: "" }));
   const [feedback, setFeedback] = useState({ kind: "idle", message: "" });
+  const [addressEditorOpen, setAddressEditorOpen] = useState(false);
   const [contactVerified, setContactVerified] = useState({
     email: true,
     phone: true,
   });
   const wasOpenRef = useRef(false);
-  const initialDeliveryAddressRef = useRef(
-    /** @type {import('../../address/model/types.js').RuDeliveryAddressValue | null} */ (
-      null
+  const initialSavedAddressesRef = useRef(
+    /** @type {import('../../address/model/userSavedAddressTypes.js').UserSavedAddressFormValue[]} */ (
+      []
     ),
   );
   const baselineEmailRef = useRef("");
@@ -68,7 +69,7 @@ export function useEditProfileModal({
 
     const nextForm = mapUserToEditProfileForm(user);
     setForm(nextForm);
-    initialDeliveryAddressRef.current = nextForm.deliveryAddress;
+    initialSavedAddressesRef.current = nextForm.savedAddresses;
     baselineEmailRef.current = nextForm.email;
     baselinePhoneRef.current = nextForm.userPhoneNumber;
     setContactVerified({
@@ -76,6 +77,7 @@ export function useEditProfileModal({
       phone: user.isPhoneVerified === true,
     });
     setFeedback({ kind: "idle", message: "" });
+    setAddressEditorOpen(false);
     return undefined;
   }, [isOpen, user]);
 
@@ -173,6 +175,11 @@ export function useEditProfileModal({
     event.preventDefault();
     if (!user?._id) return;
 
+    if (addressEditorOpen) {
+      setFeedback({ kind: "error", message: USER_SAVED_ADDRESSES_UI.ERROR_DRAFT_OPEN });
+      return;
+    }
+
     const canEditLoyaltyPoints = adminMode || allowStaffLoyaltyEdit;
     const clientError = validateEditProfileForm(form, {
       includeAdmin: adminMode,
@@ -223,7 +230,7 @@ export function useEditProfileModal({
     try {
       const profilePatchOptions = {
         initialPhoneNumber: user.userPhoneNumber,
-        initialDeliveryAddress: initialDeliveryAddressRef.current ?? undefined,
+        initialSavedAddresses: initialSavedAddressesRef.current,
       };
       const body = adminMode
         ? buildAdminPatchUserProfileBody(form, {
@@ -272,5 +279,6 @@ export function useEditProfileModal({
     handlePhoneVerified,
     handleClose,
     handleSubmit,
+    setAddressEditorOpen,
   };
 }

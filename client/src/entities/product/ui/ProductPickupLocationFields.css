@@ -18,6 +18,21 @@
   color: var(--iz-color-text-secondary);
 }
 
+.product-pickup-location-fields__saved-option_custom {
+  border-style: dashed;
+  background: var(--iz-color-surface-muted, #f3f4f6);
+}
+
+.product-pickup-location-fields__add {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--iz-color-action, #2563eb);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .product-pickup-location-fields__methods {
   display: flex;
   flex-direction: column;
@@ -39,9 +54,6 @@
   background: var(--iz-color-surface-muted, #f3f4f6);
   color: var(--iz-color-text);
   cursor: pointer;
-  transition:
-    border-color 0.15s ease,
-    background-color 0.15s ease;
 }
 
 .product-pickup-location-fields__check_on {

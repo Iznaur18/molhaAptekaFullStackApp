@@ -11,10 +11,12 @@ import "./ProductPromotionManageSection.css";
  * @property {(productId: string, productAuctionEnabled: boolean) => void | Promise<void>} [onSetAuction]
  * @property {(productId: string, productQaEnabled: boolean) => void | Promise<void>} [onSetQa]
  * @property {(productId: string, productIsOriginal: boolean) => void | Promise<void>} [onSetOriginality]
+ * @property {(productId: string, productOutOfStock: boolean) => void | Promise<void>} [onSetOutOfStock]
  * @property {boolean} [isAvailabilityTogglePending]
  * @property {boolean} [isAuctionTogglePending]
  * @property {boolean} [isQaTogglePending]
  * @property {boolean} [isOriginalityTogglePending]
+ * @property {boolean} [isOutOfStockTogglePending]
  * @property {string} [errorMessage]
  * @property {boolean} [canEdit]
  * @property {boolean} [canToggleVisibility]
@@ -26,6 +28,7 @@ import "./ProductPromotionManageSection.css";
  * @property {boolean} [isRaffleParticipationPending]
  * @property {boolean} [isSubmitting]
  * @property {() => void} [onOpenInstallmentProgram]
+ * @property {() => void} [onOpenOutOfStockSettings]
  * @property {boolean} [embeddedInTab]
  */
 
@@ -38,6 +41,7 @@ export function ProductPromotionManageSection({
   onSetAuction,
   onSetQa,
   onSetOriginality,
+  onSetOutOfStock,
   onSetWholesale,
   onSetRental,
   onSetAffiliate,
@@ -47,6 +51,7 @@ export function ProductPromotionManageSection({
   isAuctionTogglePending = false,
   isQaTogglePending = false,
   isOriginalityTogglePending = false,
+  isOutOfStockTogglePending = false,
   isWholesaleTogglePending = false,
   isRentalTogglePending = false,
   isAffiliateTogglePending = false,
@@ -67,6 +72,7 @@ export function ProductPromotionManageSection({
   onOpenLoyaltySettings,
   onOpenBuyNFreeSettings,
   onOpenPromoCodesSettings,
+  onOpenOutOfStockSettings,
   onOpenFlashSaleSettings,
   onSetFlashSale,
   onSetLoyaltyPoints,
@@ -104,6 +110,7 @@ export function ProductPromotionManageSection({
         onSetAuction={onSetAuction}
         onSetQa={onSetQa}
         onSetOriginality={onSetOriginality}
+        onSetOutOfStock={onSetOutOfStock}
         onSetWholesale={onSetWholesale}
         onSetRental={onSetRental}
         onSetAffiliate={onSetAffiliate}
@@ -113,6 +120,7 @@ export function ProductPromotionManageSection({
         isAuctionTogglePending={isAuctionTogglePending}
         isQaTogglePending={isQaTogglePending}
         isOriginalityTogglePending={isOriginalityTogglePending}
+        isOutOfStockTogglePending={isOutOfStockTogglePending}
         isWholesaleTogglePending={isWholesaleTogglePending}
         isRentalTogglePending={isRentalTogglePending}
         isAffiliateTogglePending={isAffiliateTogglePending}
@@ -133,6 +141,7 @@ export function ProductPromotionManageSection({
         onOpenLoyaltySettings={onOpenLoyaltySettings}
         onOpenBuyNFreeSettings={onOpenBuyNFreeSettings}
         onOpenPromoCodesSettings={onOpenPromoCodesSettings}
+        onOpenOutOfStockSettings={onOpenOutOfStockSettings}
         onOpenFlashSaleSettings={onOpenFlashSaleSettings}
         onSetFlashSale={onSetFlashSale}
         onSetLoyaltyPoints={onSetLoyaltyPoints}

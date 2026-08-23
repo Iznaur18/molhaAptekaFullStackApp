@@ -3,12 +3,23 @@ import { describe, expect, it } from "vitest";
 import {
   PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
   PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
-  PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
 } from "@molha/api-contract";
 
 import { CREATE_PRODUCT_INITIAL_FORM } from "./createProductFormState.js";
 import { createImageRow } from "./productImageRowHelpers.js";
 import { prepareCreateProductSubmit } from "./prepareCreateProductSubmit.js";
+
+const pickupLocations = [
+  {
+    id: "loc-1",
+    label: "",
+    address: "Москва, Тверская улица, 1",
+    lat: 55.75,
+    lon: 37.62,
+    isDefault: true,
+    selectedFromSuggest: true,
+  },
+];
 
 const baseForm = {
   ...CREATE_PRODUCT_INITIAL_FORM,
@@ -22,24 +33,26 @@ const baseForm = {
   productCategoryId: "507f1f77bcf86cd799439011",
   productRegionCode: "RU-MOW",
   productReturnEnabled: false,
+  productPickupLocations: pickupLocations,
   productPickupAddress: "Москва, Тверская улица, 1",
   productPickupLat: 55.75,
   productPickupLon: 37.62,
 };
 
 describe("prepareCreateProductSubmit pickup", () => {
-  it("requires pickup address", () => {
+  it("requires pickup locations", () => {
     const result = prepareCreateProductSubmit({
-      form: { ...baseForm, productPickupAddress: "" },
+      form: {
+        ...baseForm,
+        productPickupLocations: [],
+        productPickupAddress: "",
+      },
       isEdit: false,
       showCatalogAvailabilityToggle: true,
       sellerPointsMaxPerUnit: 100,
       sellerCatalogCommitted: 0,
     });
     expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.message).toBe(PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE);
-    }
   });
 
   it("rejects when no fulfillment method selected", () => {
@@ -62,7 +75,16 @@ describe("prepareCreateProductSubmit pickup", () => {
 
   it("requires pickup coords", () => {
     const result = prepareCreateProductSubmit({
-      form: { ...baseForm, productPickupLat: null, productPickupLon: null },
+      form: {
+        ...baseForm,
+        productPickupLocations: [
+          {
+            ...pickupLocations[0],
+            lat: null,
+            lon: null,
+          },
+        ],
+      },
       isEdit: false,
       showCatalogAvailabilityToggle: true,
       sellerPointsMaxPerUnit: 100,
@@ -81,11 +103,13 @@ describe("prepareCreateProductSubmit pickup", () => {
     });
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.createBody?.productPickupAddress.length).toBeGreaterThanOrEqual(
+      expect(result.createBody?.productPickupLocations).toHaveLength(1);
+      expect(result.createBody?.productPickupLocations?.[0]?.address.length).toBeGreaterThanOrEqual(
         PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
       );
-      expect(result.createBody?.productPickupLat).toBe(55.75);
-      expect(result.createBody?.productPickupLon).toBe(37.62);
+      expect(result.createBody?.productPickupLocations?.[0]?.lat).toBe(55.75);
+      expect(result.createBody?.productPickupLocations?.[0]?.lon).toBe(37.62);
+      expect(result.createBody?.productPickupAddress).toBeUndefined();
       expect(result.createBody?.productPickupEnabled).toBe(true);
       expect(result.createBody?.productDeliveryEnabled).toBe(false);
     }

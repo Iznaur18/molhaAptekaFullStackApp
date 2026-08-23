@@ -101,6 +101,7 @@ export default function ProductDetailScreen() {
   const [isAvailabilityTogglePending, setIsAvailabilityTogglePending] = useState(false);
   const [isAuctionTogglePending, setIsAuctionTogglePending] = useState(false);
   const [isOriginalityTogglePending, setIsOriginalityTogglePending] = useState(false);
+  const [isOutOfStockTogglePending, setIsOutOfStockTogglePending] = useState(false);
   const [isWholesaleTogglePending, setIsWholesaleTogglePending] = useState(false);
   const [isBuyNFreeTogglePending, setIsBuyNFreeTogglePending] = useState(false);
   const [isAffiliateTogglePending, setIsAffiliateTogglePending] = useState(false);
@@ -284,11 +285,15 @@ export default function ProductDetailScreen() {
   const loyaltyPointsBalance = loyaltyPointsQuery.data?.loyaltyPointsBalance ?? 0;
   const productPrice = Number(productRecord.productPrice) || 0;
   const purchaseLimit = getProductPurchaseLimit(productRecord);
-  const canShowAddToCart = !isOwnProduct && isAvailable && purchaseLimit > 0;
+  const isProductOutOfStock = productRecord.productOutOfStock === true;
+  const canShowAddToCart =
+    !isOwnProduct && isAvailable && purchaseLimit > 0 && !isProductOutOfStock;
+  const showOutOfStockPurchaseButton = !isOwnProduct && isProductOutOfStock;
   const showManageActions = (isOwnProduct || isAdmin) && activeTab === "details";
   const hasOpenSalesLocked = productRecord.hasOpenSales === true;
   const showMobilePurchaseDock =
-    activeTab === "details" && (canShowAddToCart || auctionUi.auctionActive || installmentActive);
+    activeTab === "details" &&
+    (canShowAddToCart || showOutOfStockPurchaseButton || auctionUi.auctionActive || installmentActive);
   const showInstallmentDock = activeTab === "installment" && installmentDock != null;
   const showAuctionDock = activeTab === "auction" && auctionDock != null;
   const isAltTab =
@@ -431,6 +436,27 @@ export default function ProductDetailScreen() {
       );
     } finally {
       setIsOriginalityTogglePending(false);
+    }
+  };
+
+  const handleSetProductOutOfStock = async (
+    targetProductId: string,
+    outOfStock: boolean,
+  ) => {
+    setIsOutOfStockTogglePending(true);
+    setManageErrorMessage("");
+    try {
+      const updated = await patchMutation.mutateAsync({
+        productId: targetProductId,
+        body: { productOutOfStock: outOfStock },
+      });
+      syncPromotionProduct(updated as Record<string, unknown> & { _id: string });
+    } catch (error) {
+      setManageErrorMessage(
+        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+      );
+    } finally {
+      setIsOutOfStockTogglePending(false);
     }
   };
 
@@ -729,6 +755,7 @@ export default function ProductDetailScreen() {
               productId={productId}
               product={productRecord}
               canShowAddToCart={canShowAddToCart}
+              showOutOfStockPurchaseButton={showOutOfStockPurchaseButton}
               variant="dock"
             />
           </SquircleView>
@@ -790,6 +817,7 @@ export default function ProductDetailScreen() {
         onSetProductAvailability={isOwnProduct ? handleSetMyProductAvailability : undefined}
         onSetProductAuction={isOwnProduct ? handleSetProductAuction : undefined}
         onSetProductOriginality={isOwnProduct ? handleSetProductOriginality : undefined}
+        onSetProductOutOfStock={isOwnProduct ? handleSetProductOutOfStock : undefined}
         onSetProductWholesale={isOwnProduct ? handleSetProductWholesale : undefined}
         onSetProductBuyNFree={isOwnProduct ? handleSetProductBuyNFree : undefined}
         onSetProductAffiliate={isOwnProduct ? handleSetProductAffiliate : undefined}
@@ -818,6 +846,7 @@ export default function ProductDetailScreen() {
         isAvailabilityTogglePending={isAvailabilityTogglePending}
         isAuctionTogglePending={isAuctionTogglePending}
         isOriginalityTogglePending={isOriginalityTogglePending}
+        isOutOfStockTogglePending={isOutOfStockTogglePending}
         isWholesaleTogglePending={isWholesaleTogglePending}
         isBuyNFreeTogglePending={isBuyNFreeTogglePending}
         isAffiliateTogglePending={isAffiliateTogglePending}

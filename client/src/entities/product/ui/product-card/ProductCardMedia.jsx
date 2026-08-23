@@ -2,6 +2,7 @@ import { useCallback, useRef } from "react";
 
 import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
 import { PRODUCT_CARD_UI, PRODUCT_MODERATION_PAGE_UI } from "../../../../shared/config/appUiCopy.js";
+import { resolveProductOutOfStockOverlayLabel } from "../../lib/resolveProductOutOfStockOverlayLabel.js";
 import { ProductMediaHorizontalPager } from "../ProductMediaHorizontalPager.jsx";
 import { ProductMediaSlideContent } from "../ProductMediaSlideContent.jsx";
 import { ProductDiscountBadge } from "../ProductPriceDisplay.jsx";
@@ -118,6 +119,13 @@ export function ProductCardMedia({ vm }) {
       {vm.showModerationPendingOverlay ? (
         <span className="product-card__moderation-pending-overlay" role="status">
           {PRODUCT_MODERATION_PAGE_UI.BADGE_PENDING}
+        </span>
+      ) : null}
+      {vm.showOutOfStockChrome ? (
+        <span className="product-card__out-of-stock-overlay" role="status">
+          <span className="product-card__out-of-stock-overlay-label">
+            {resolveProductOutOfStockOverlayLabel(vm.product)}
+          </span>
         </span>
       ) : null}
       {vm.showImageOverlayBadges ? (

@@ -8,14 +8,14 @@ import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
 import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
 import { serializeUserBackgroundForForm } from "./userBackgroundValue.js";
 import { DEFAULT_USER_AVATAR_URL } from "../model/userConstants.js";
-import { appendRuAddressToPayload } from "../../address/lib/appendRuAddressToPayload.js";
-import { isDeliveryAddressEqual } from "../../address/lib/isDeliveryAddressEqual.js";
+import { appendUserAddressesToPayload } from "../../address/lib/appendUserAddressesToPayload.js";
+import { isUserSavedAddressesEqual } from "../../address/lib/isUserSavedAddressesEqual.js";
 
 /**
  * Тело `PATCH /user/:id` (только разрешённые пользователю поля).
  *
  * @param {import('./mapUserToEditProfileForm.js').EditProfileFormState} form
- * @param {{ backgroundMode?: 'preset' | 'image' | 'admin'; includePremium?: boolean; includeLoyaltyPoints?: boolean; initialPhoneNumber?: string | null; initialDeliveryAddress?: import('../../address/model/types.js').RuDeliveryAddressValue }} [options]
+ * @param {{ backgroundMode?: 'preset' | 'image' | 'admin'; includePremium?: boolean; includeLoyaltyPoints?: boolean; initialPhoneNumber?: string | null; initialSavedAddresses?: import('../../address/model/userSavedAddressTypes.js').UserSavedAddressFormValue[] }} [options]
  * @returns {Record<string, unknown>}
  */
 export function buildPatchUserProfileBody(form, options = {}) {
@@ -24,7 +24,7 @@ export function buildPatchUserProfileBody(form, options = {}) {
     includePremium = false,
     includeLoyaltyPoints = false,
     initialPhoneNumber = "",
-    initialDeliveryAddress = null,
+    initialSavedAddresses = [],
   } = options;
   const body = {};
 
@@ -59,16 +59,9 @@ export function buildPatchUserProfileBody(form, options = {}) {
 
   body.userGender = form.userGender;
 
-  const addressBaseline = initialDeliveryAddress ?? {
-    line: "",
-    flat: "",
-    fiasId: "",
-    geo: null,
-    regionCode: null,
-    selectedFromSuggest: false,
-  };
-  if (!isDeliveryAddressEqual(form.deliveryAddress, addressBaseline)) {
-    appendRuAddressToPayload(body, form.deliveryAddress);
+  const addressBaseline = Array.isArray(initialSavedAddresses) ? initialSavedAddresses : [];
+  if (!isUserSavedAddressesEqual(form.savedAddresses, addressBaseline)) {
+    appendUserAddressesToPayload(body, form.savedAddresses);
   }
 
   const regionCode = String(form.userRegionCode ?? "").trim();

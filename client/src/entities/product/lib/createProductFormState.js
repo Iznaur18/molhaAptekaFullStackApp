@@ -5,6 +5,10 @@ import { characteristicRowsFromApi } from "./characteristicRowsFromApi.js";
 import { formatIntegerGroupRu } from "../../../shared/lib/numericInput.js";
 import { isProductListingOrigin } from "./productListingOrigin.js";
 import { mapProductReturnTermsToRows } from "./productReturnTermRows.js";
+import {
+  legacyPickupFieldsFromLocations,
+  productPickupLocationsFromApiProduct,
+} from "./productPickupLocationsForm.js";
 
 export const CREATE_PRODUCT_INITIAL_FORM = {
   productName: "",
@@ -28,6 +32,7 @@ export const CREATE_PRODUCT_INITIAL_FORM = {
   productCharacteristicsSellerTouched: false,
   productCharacteristicsAutoAppliedForCategoryId: null,
   productRegionCode: "",
+  productPickupLocations: [],
   productPickupAddress: "",
   productPickupLat: null,
   productPickupLon: null,
@@ -82,19 +87,13 @@ export function createProductFormStateFromProduct(product) {
     productCharacteristicsSellerTouched: true,
     productCharacteristicsAutoAppliedForCategoryId: null,
     productRegionCode: product.productRegionCode?.trim() || "RU-MOW",
-    productPickupAddress: String(product.productPickupAddress ?? "").trim(),
-    productPickupLat:
-      product.productPickupLat != null &&
-      Number.isFinite(Number(product.productPickupLat))
-        ? Number(product.productPickupLat)
-        : null,
-    productPickupLon:
-      product.productPickupLon != null &&
-      Number.isFinite(Number(product.productPickupLon))
-        ? Number(product.productPickupLon)
-        : null,
-    productPickupSelectedFromSuggest:
-      String(product.productPickupAddress ?? "").trim().length > 0,
+    ...(() => {
+      const productPickupLocations = productPickupLocationsFromApiProduct(product);
+      return {
+        productPickupLocations,
+        ...legacyPickupFieldsFromLocations(productPickupLocations),
+      };
+    })(),
     productPickupEnabled: product.productPickupEnabled !== false,
     productDeliveryEnabled: product.productDeliveryEnabled === true,
     productReturnEnabled: product.productReturnEnabled === true,

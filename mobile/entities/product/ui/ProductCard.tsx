@@ -28,6 +28,8 @@ import { ProductMediaSlideContent } from "@/entities/product/ui/ProductMediaSlid
 import { useProductCardMediaStyles } from "@/shared/theme/catalogProductStyles";
 import { ProductCardBanner } from "@/entities/product/ui/ProductCardBanner";
 import { ProductCardModerationPendingOverlay } from "@/entities/product/ui/ProductCardModerationPendingOverlay";
+import { isProductOutOfStock } from "@/entities/product/lib/isProductOutOfStock";
+import { ProductCardOutOfStockOverlay } from "@/entities/product/ui/ProductCardOutOfStockOverlay";
 import { ProductCardModerationPreviewFields } from "@/entities/product/ui/ProductCardModerationPreviewFields";
 import {
   ProductModerationDetailsFooter,
@@ -166,6 +168,7 @@ export const ProductCard = memo(({
     isMineMode,
     isModerationQueue,
   });
+  const showOutOfStockOverlay = !isModerationQueue && isProductOutOfStock(product);
   const showModerationBadge =
     (isMineMode || isModerationQueue) &&
     !showModerationPendingOverlay &&
@@ -183,6 +186,7 @@ export const ProductCard = memo(({
         styles.card,
         isCatalogGrid && styles.cardCatalogGrid,
         isCatalogGrid && isModerationQueue && styles.cardCatalogGridModerationQueue,
+        showOutOfStockOverlay && styles.cardOutOfStock,
         promotionFrameStyle,
         raffleParticipantFrameStyle,
       ]}
@@ -221,6 +225,7 @@ export const ProductCard = memo(({
         />
 
         {showModerationPendingOverlay ? <ProductCardModerationPendingOverlay /> : null}
+        {showOutOfStockOverlay ? <ProductCardOutOfStockOverlay product={product} /> : null}
 
         {showPromotionFrame && flags.promotionFrameTier ? (
           <ProductCardPromotionCornerFlag tier={flags.promotionFrameTier} />

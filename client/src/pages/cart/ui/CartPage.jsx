@@ -26,6 +26,7 @@ import { productPromoCodeQueryKeys } from "../../../entities/product-promo-code/
 import { invalidatePriceOfferQueries } from "../../../entities/product-price-offer/lib/priceOfferQueryCache.js";
 import { useMyAcceptedBidsQuery } from "../../../entities/product-price-offer/model/useMyAcceptedBidsQuery.js";
 import { useAuthSession } from "../../../entities/user/model/useAuthSession.js";
+import { userSavedAddressesFromUser } from "../../../entities/address/lib/userSavedAddressesFromUser.js";
 import { CheckoutSheetModal } from "../../../features/checkout/ui/CheckoutSheetModal.jsx";
 import {
   CART_AUCTION_UI,
@@ -91,6 +92,13 @@ export function CartPage({
       userAddressFiasId: user.userAddressFiasId,
       userAddressGeo: user.userAddressGeo,
     };
+  }, [isAuthorized, user]);
+
+  const savedDeliveryAddresses = useMemo(() => {
+    if (!isAuthorized || !user) {
+      return [];
+    }
+    return userSavedAddressesFromUser(user);
   }, [isAuthorized, user]);
 
   /** @type {"pickup" | "delivery" | null} */
@@ -278,6 +286,7 @@ export function CartPage({
     deliveryAddress,
     deliveryAddressFlat,
     paymentMethod,
+    pickupSelections,
   }) => {
     setSubmitState({ isSubmitting: true, error: "", success: "" });
 
@@ -290,6 +299,7 @@ export function CartPage({
           deliveryAddress,
           deliveryAddressFlat,
           paymentMethod,
+          pickupSelections,
         });
         setAuctionCheckoutBid(null);
         setSubmitState({
@@ -323,6 +333,7 @@ export function CartPage({
         deliveryAddress,
         deliveryAddressFlat,
         paymentMethod,
+        pickupSelections,
       });
       removeItems(orderedProductIds);
       setCheckoutSection(null);
@@ -445,6 +456,7 @@ export function CartPage({
         isOpen={isCheckoutSheetOpen}
         onClose={closeCheckoutSheet}
         defaultDeliveryAddress={defaultAddress}
+        savedDeliveryAddresses={savedDeliveryAddresses}
         pickupLocations={pickupLocations}
         deliveryAvailable={deliveryAvailable}
         pickupAvailable={pickupAvailable}

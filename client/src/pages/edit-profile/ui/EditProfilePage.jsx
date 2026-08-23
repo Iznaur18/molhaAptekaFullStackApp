@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 
 import { useEditProfileModal } from "../../../entities/user/model/useEditProfileModal.js";
-import { AddressDeliveryFields } from "../../../entities/address/ui/AddressDeliveryFields.jsx";
+import { UserSavedAddressesEditor } from "../../../entities/address/ui/UserSavedAddressesEditor.jsx";
 import { RuRegionSelect } from "../../../entities/region/ui/RuRegionSelect.jsx";
 import {
   NOTES_ABOUT_USER_MAX_CHARS,
@@ -13,8 +13,6 @@ import {
   USER_NAME_MAX_LENGTH,
 } from "../../../entities/user/model/userConstants.js";
 import {
-  ADDRESS_DELIVERY_UI,
-  ADDRESS_STRUCTURED_UI,
   ADMIN_EDIT_USER_UI,
   EDIT_PROFILE_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
@@ -98,6 +96,7 @@ export function EditProfilePage({
     handleEmailVerified,
     handlePhoneVerified,
     handleSubmit,
+    setAddressEditorOpen,
   } = useEditProfileModal({
     isOpen: Boolean(user),
     onClose: onCancel,
@@ -119,9 +118,9 @@ export function EditProfilePage({
         return;
       }
       root.scrollIntoView({ behavior: "smooth", block: "center" });
-      const input = root.querySelector("input");
-      if (input instanceof HTMLInputElement) {
-        input.click();
+      const addButton = root.querySelector(".user-saved-addresses__add");
+      if (addButton instanceof HTMLButtonElement) {
+        addButton.click();
       }
     }, 150);
     return () => window.clearTimeout(timer);
@@ -337,42 +336,26 @@ export function EditProfilePage({
                 {EDIT_PROFILE_MODAL_UI.HINT_REGION}
               </span>
             </label>
-            <AddressDeliveryFields
-              value={form.deliveryAddress}
-              onChange={(deliveryAddress) =>
-                setForm((prev) => ({
-                  ...prev,
-                  deliveryAddress,
-                  ...(deliveryAddress.regionCode
-                    ? { userRegionCode: deliveryAddress.regionCode }
-                    : {}),
-                }))
+            <UserSavedAddressesEditor
+              value={form.savedAddresses}
+              onChange={(savedAddresses) =>
+                setForm((prev) => {
+                  const defaultAddress =
+                    savedAddresses.find((item) => item.isDefault) ?? null;
+                  return {
+                    ...prev,
+                    savedAddresses,
+                    ...(defaultAddress?.regionCode
+                      ? { userRegionCode: defaultAddress.regionCode }
+                      : {}),
+                  };
+                })
               }
               disabled={isSubmitting}
-              displayOnly
               lineInputClassName="edit-profile-modal__input"
-              labels={{ line: ADDRESS_STRUCTURED_UI.SECTION_LABEL }}
+              elementId={EDIT_PROFILE_ADDRESS_ELEMENT_ID}
+              onEditingChange={setAddressEditorOpen}
             />
-            <label className="edit-profile-modal__label">
-              {ADDRESS_DELIVERY_UI.LABEL_FLAT}
-              <input
-                type="text"
-                className="edit-profile-modal__input"
-                value={form.deliveryAddress.flat}
-                onChange={(event) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    deliveryAddress: {
-                      ...prev.deliveryAddress,
-                      flat: event.target.value,
-                    },
-                  }))
-                }
-                disabled={isSubmitting}
-                autoComplete="address-line2"
-                placeholder={ADDRESS_STRUCTURED_UI.PLACEHOLDER_FLAT}
-              />
-            </label>
           </FormSection>
 
           <FormSection title={EDIT_PROFILE_MODAL_UI.SECTION_NOTIFICATIONS}>

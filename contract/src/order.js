@@ -6,6 +6,7 @@ import {
   ORDER_FULFILLMENT_PICKUP,
   orderFulfillmentMethodSchema,
 } from "./productPickup.js";
+import { PRODUCT_PICKUP_LOCATION_ID_MAX_LENGTH } from "./productPickupLocations.js";
 
 /** Синхрон с `server/constants/orderConstants.js`. */
 export const ORDER_PAYMENT_METHODS = ["cashOnDelivery", "cardPrepaid"];
@@ -28,6 +29,15 @@ const orderLineItemInputSchema = z.object({
   quantity: z.coerce.number().int().min(ORDER_LINE_ITEM_QUANTITY_MIN).max(999),
 });
 
+const orderPickupSelectionSchema = z.object({
+  productId: mongoIdSchema,
+  pickupLocationId: z
+    .string()
+    .trim()
+    .min(1)
+    .max(PRODUCT_PICKUP_LOCATION_ID_MAX_LENGTH),
+});
+
 /** Тело `POST /order` (структура; DaData — отдельно на сервере для delivery). */
 export const createOrderBodySchema = z
   .object({
@@ -47,6 +57,12 @@ export const createOrderBodySchema = z
       .max(ORDER_DELIVERY_FLAT_MAX_LENGTH)
       .optional()
       .default(""),
+    /** Выбор точки самовывоза на товар (при ≥2 точках у товара). */
+    pickupSelections: z
+      .array(orderPickupSelectionSchema)
+      .max(ORDER_ITEMS_MAX)
+      .optional()
+      .default([]),
     paymentMethod: z.enum(ORDER_PAYMENT_METHODS),
     priceOfferId: mongoIdSchema.optional(),
     /** Код шарера (`referralCode`) из `?aff=` — last-click attribution. */

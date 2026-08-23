@@ -37,7 +37,7 @@ import {
   resolveProductDeliveryEnabledForWrite,
   resolveProductPickupEnabledForWrite,
 } from "./productPickup.js";
-import { resolveProductSaleLocation } from "./resolveProductSaleLocation.js";
+import { resolveProductPickupWriteFields } from "./productPickupLocations.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 import { assertSellerManualProductCreateAllowed } from "../onec/assertSellerManualProductCreateAllowed.js";
 
@@ -217,10 +217,7 @@ export async function postProduct({
       : null;
 
   const { productSaleCity, productSaleCityNormalized } = resolveCreateSaleCity({});
-  const saleLocation = await resolveProductSaleLocation({
-    address: body?.productPickupAddress,
-    lat: body?.productPickupLat,
-    lon: body?.productPickupLon,
+  const salePickup = await resolveProductPickupWriteFields(body ?? {}, {
     fallbackRegionCode: body?.productRegionCode,
   });
   const productPickupEnabled = resolveProductPickupEnabledForWrite(
@@ -247,11 +244,12 @@ export async function postProduct({
     productSeller: userId,
     productSaleCity,
     productSaleCityNormalized,
-    productRegionCode: saleLocation.productRegionCode,
-    productPickupAddress: saleLocation.productPickupAddress,
-    productPickupLat: saleLocation.productPickupLat,
-    productPickupLon: saleLocation.productPickupLon,
-    productPickupLocation: saleLocation.productPickupLocation,
+    productRegionCode: salePickup.productRegionCode,
+    productPickupAddress: salePickup.productPickupAddress,
+    productPickupLat: salePickup.productPickupLat,
+    productPickupLon: salePickup.productPickupLon,
+    productPickupLocation: salePickup.productPickupLocation,
+    productPickupLocations: salePickup.productPickupLocations,
     productPickupEnabled,
     productDeliveryEnabled,
     productCategory: categoryWrite.productCategory,

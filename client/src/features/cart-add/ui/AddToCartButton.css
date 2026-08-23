@@ -33,6 +33,14 @@
   background: color-mix(in srgb, var(--iz-color-success) 85%, var(--iz-color-ink));
 }
 
+.add-to-cart--out-of-stock,
+.add-to-cart--out-of-stock:hover {
+  border-color: var(--iz-color-border);
+  background: var(--iz-color-muted-surface, var(--iz-color-surface-muted));
+  color: var(--iz-color-text-muted);
+  cursor: not-allowed;
+}
+
 .add-to-cart__stepper {
   display: inline-flex;
   align-items: center;

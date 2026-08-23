@@ -20,6 +20,8 @@ import {
   normalizeUserBackgroundFocus,
 } from "../../services/user/profileImageFocus.js";
 import { buildUserProfileMongoUpdate } from "../../services/user/buildUserProfileMongoUpdate.js";
+import { applyVerifiedUserAddressesUpdate } from "../../services/user/applyVerifiedUserAddressesUpdate.js";
+import { buildLegacyVerifiedUserAddresses } from "../../services/user/buildLegacyVerifiedUserAddresses.js";
 import { resolveUserAddressCityNormalized } from "../../services/product/ruCityNormalized.js";
 import { normalizeStoredUploadUrl } from "../../services/upload/buildPublicUploadUrl.js";
 import { rejectPendingDataConfirmationForUser } from "../../services/user/userDataConfirmationHelpers.js";
@@ -74,6 +76,9 @@ export const userUpdateProfileController = async (req, res) => {
 
     // 3. Сбор и конвертация данных для обновления (валидация форматов и типов выполняется в middleware updateProfileValidation)
     for (const field of allowedFields) {
+      if (field === "userAddresses") {
+        continue;
+      }
       if (req.body[field] !== undefined) {
         // если поле есть в запросе и не undefined, то добавляем его в updateData
         const value = req.body[field]; // значение поля из запроса (уже валидировано в middleware)
@@ -133,30 +138,23 @@ export const userUpdateProfileController = async (req, res) => {
       }
     }
 
-    if (req.verifiedDeliveryAddress !== undefined) {
+    if (req.verifiedUserAddresses !== undefined) {
+      applyVerifiedUserAddressesUpdate(updateData, req.verifiedUserAddresses);
+    } else if (req.verifiedDeliveryAddress !== undefined) {
       if (req.verifiedDeliveryAddress === null) {
-        updateData.userAddress = null;
-        updateData.userAddressFlat = null;
-        updateData.userAddressCity = null;
-        updateData.userAddressDistrict = null;
-        updateData.userAddressStreet = null;
-        updateData.userAddressHouse = null;
-        updateData.userAddressFiasId = null;
-        updateData.userAddressGeo = null;
-        updateData.userAddressCityNormalized = "";
+        applyVerifiedUserAddressesUpdate(updateData, []);
       } else {
-        const verified = req.verifiedDeliveryAddress;
-        updateData.userAddress = verified.displayAddress;
-        updateData.userAddressFlat = verified.flat;
-        updateData.userAddressCity = verified.city ?? "";
-        updateData.userAddressDistrict = verified.district ?? "";
-        updateData.userAddressStreet = verified.street ?? "";
-        updateData.userAddressHouse = verified.house ?? "";
-        updateData.userAddressFiasId = verified.fiasId;
-        updateData.userAddressGeo = verified.geo;
-        updateData.userAddressCityNormalized = resolveUserAddressCityNormalized(
-          updateData.userAddressCity,
+        const existingUser = await UserModel.findById(targetUserId)
+          .select("userAddresses")
+          .lean();
+        const existingAddresses = Array.isArray(existingUser?.userAddresses)
+          ? existingUser.userAddresses
+          : [];
+        const nextAddresses = buildLegacyVerifiedUserAddresses(
+          existingAddresses,
+          req.verifiedDeliveryAddress,
         );
+        applyVerifiedUserAddressesUpdate(updateData, nextAddresses);
       }
     } else if (Object.prototype.hasOwnProperty.call(updateData, "userAddressCity")) {
       updateData.userAddressCityNormalized = resolveUserAddressCityNormalized(

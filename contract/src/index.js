@@ -144,6 +144,17 @@ export {
 } from "./raffle.js";
 export { updateProfileBodySchema } from "./userProfile.js";
 export {
+  USER_SAVED_ADDRESSES_MAX,
+  USER_SAVED_ADDRESS_LABEL_MAX_LENGTH,
+  USER_SAVED_ADDRESS_ID_MAX_LENGTH,
+  userSavedAddressDuplicateKey,
+  userSavedAddressPatchItemSchema,
+  userAddressesPatchFieldSchema,
+  userSavedAddressesFromProfile,
+  ensureSingleDefaultUserSavedAddress,
+  USER_ADDRESS_PATCH_CONFLICT_MESSAGE,
+} from "./userAddresses.js";
+export {
   USER_SOCIAL_LINK_FIELDS,
   USER_SOCIAL_LINK_FIELD_IDS,
   USER_SOCIAL_LINK_URL_MAX_LENGTH,
@@ -357,6 +368,14 @@ export { mongoIdSchema } from "./mongoId.js";
 export { paginationSchema } from "./pagination.js";
 export { PRODUCT_MODERATION_STATUSES, productFromApiSchema } from "./productFromApi.js";
 export {
+  PRODUCT_OUT_OF_STOCK_LABEL_COMING_SOON,
+  PRODUCT_OUT_OF_STOCK_LABEL_DEFAULT,
+  PRODUCT_OUT_OF_STOCK_LABEL_OUT_OF_STOCK,
+  PRODUCT_OUT_OF_STOCK_LABEL_VALUES,
+  normalizeProductOutOfStockLabel,
+  productOutOfStockLabelFieldSchema,
+} from "./productOutOfStockLabel.js";
+export {
   PRODUCT_CATEGORY_VALUES,
   PRODUCT_IMAGE_URLS_MAX,
   PRODUCT_IMAGE_REQUIRED_MESSAGE,
@@ -493,6 +512,22 @@ export {
   doProductsSupportPickup,
   doProductsSupportSellerDelivery,
 } from "./productPickup.js";
+export {
+  PRODUCT_PICKUP_LOCATIONS_MAX,
+  PRODUCT_PICKUP_LOCATION_LABEL_MAX_LENGTH,
+  PRODUCT_PICKUP_LOCATION_ID_MAX_LENGTH,
+  PRODUCT_PICKUP_LOCATIONS_REQUIRED_MESSAGE,
+  PRODUCT_PICKUP_LOCATION_DEFAULT_REQUIRED_MESSAGE,
+  PRODUCT_PICKUP_SELECTION_INVALID_MESSAGE,
+  productPickupLocationItemSchema,
+  productPickupLocationsFieldSchema,
+  productPickupLocationDuplicateKey,
+  ensureSingleDefaultProductPickupLocation,
+  productPickupLocationsFromProduct,
+  syncLegacyPickupFieldsFromLocations,
+  assertCreateProductPickupLocationsOrLegacy,
+  assertProductWriteFulfillmentMethods,
+} from "./productPickupLocations.js";
 export {
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_YANDEX_DELIVERY,

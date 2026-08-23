@@ -38,6 +38,7 @@ export function useShellUiState() {
   const [togglingAuctionProductId, setTogglingAuctionProductId] = useState(null);
   const [togglingQaProductId, setTogglingQaProductId] = useState(null);
   const [togglingOriginalityProductId, setTogglingOriginalityProductId] = useState(null);
+  const [togglingOutOfStockProductId, setTogglingOutOfStockProductId] = useState(null);
   const [togglingWholesaleProductId, setTogglingWholesaleProductId] = useState(null);
   const [togglingFlashSaleProductId, setTogglingFlashSaleProductId] = useState(null);
   const [togglingRentalProductId, setTogglingRentalProductId] = useState(null);
@@ -131,6 +132,8 @@ export function useShellUiState() {
     setTogglingQaProductId,
     togglingOriginalityProductId,
     setTogglingOriginalityProductId,
+    togglingOutOfStockProductId,
+    setTogglingOutOfStockProductId,
     togglingWholesaleProductId,
     setTogglingWholesaleProductId,
     togglingFlashSaleProductId,

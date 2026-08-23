@@ -43,6 +43,7 @@ export const useHomeProductActions = ({
   setTogglingAuctionProductId,
   setTogglingQaProductId,
   setTogglingOriginalityProductId,
+  setTogglingOutOfStockProductId,
   setTogglingWholesaleProductId,
   setTogglingFlashSaleProductId,
   setTogglingRentalProductId,
@@ -349,6 +350,38 @@ export const useHomeProductActions = ({
       patchMutation,
       setMyProductsCatalogError,
       setTogglingOriginalityProductId,
+      syncCatalogProductState,
+      syncProductEditModalState,
+    ],
+  );
+
+  const handleSetProductOutOfStock = useCallback(
+    async (productId, outOfStock) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return;
+      }
+      setTogglingOutOfStockProductId(normalizedProductId);
+      setMyProductsCatalogError("");
+      try {
+        const updated = await patchMutation.mutateAsync({
+          productId: normalizedProductId,
+          body: { productOutOfStock: outOfStock },
+        });
+        syncCatalogProductState(updated);
+        syncProductEditModalState(updated);
+      } catch (e) {
+        setMyProductsCatalogError(
+          e instanceof Error ? e.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+      } finally {
+        setTogglingOutOfStockProductId(null);
+      }
+    },
+    [
+      patchMutation,
+      setMyProductsCatalogError,
+      setTogglingOutOfStockProductId,
       syncCatalogProductState,
       syncProductEditModalState,
     ],
@@ -823,6 +856,7 @@ export const useHomeProductActions = ({
     handleSetProductAuction,
     handleSetProductQa,
     handleSetProductOriginality,
+    handleSetProductOutOfStock,
     handleSetProductWholesale,
     handleSetProductBuyNFree,
     handleSetProductFlashSale,

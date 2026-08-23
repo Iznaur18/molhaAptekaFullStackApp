@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import { SHOW_ADD_TO_CART_ON_CATALOG_CARD } from "../../lib/catalogCardPurchasePolicy.js";
+import { isProductOutOfStock } from "../../lib/isProductOutOfStock.js";
 import { isProductRaffleParticipant } from "../../../raffle/lib/isProductRaffleParticipant.js";
 import { resolveAuctionUiState } from "../../lib/resolveAuctionUiState.js";
 import { shouldShowPremiumProductCardChrome } from "../../lib/isPremiumSellerProduct.js";
@@ -86,6 +87,8 @@ export function useProductCardChromeFlags(props, currentUserId) {
   const showWishlistToggle = !isMineMode && !isModerationQueue;
   const showRaffleParticipantChrome =
     (highlightRaffleProduct || showRaffleBadge) && !isMineMode && !isModerationQueue;
+  const showOutOfStockChrome =
+    !isModerationQueue && isProductOutOfStock(product);
 
   const showAddToCartButton =
     SHOW_ADD_TO_CART_ON_CATALOG_CARD &&
@@ -106,13 +109,14 @@ export function useProductCardChromeFlags(props, currentUserId) {
     () =>
       [
         "product-card",
+        showOutOfStockChrome ? "product-card--out-of-stock" : "",
         showRaffleParticipantChrome ? "product-card--raffle-participant" : "",
         showBannerLayout ? "product-card--banner-layout" : "",
         isModerationQueue ? "product-card--list" : "",
       ]
         .filter(Boolean)
         .join(" "),
-    [isModerationQueue, showBannerLayout, showRaffleParticipantChrome],
+    [isModerationQueue, showBannerLayout, showOutOfStockChrome, showRaffleParticipantChrome],
   );
 
   const frameClassName = useMemo(
@@ -162,6 +166,7 @@ export function useProductCardChromeFlags(props, currentUserId) {
     showBannerActions,
     showPromotionChrome,
     showPremiumChrome,
+    showOutOfStockChrome,
     cardClassName,
     frameClassName,
   };

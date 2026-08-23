@@ -1,15 +1,33 @@
 import { describe, expect, it } from "vitest";
 
-import { isDeliveryAddressEqual } from "./isDeliveryAddressEqual.js";
+import { isUserSavedAddressEqual } from "./isUserSavedAddressesEqual.js";
 import { buildPatchUserProfileBody } from "../../user/lib/buildPatchUserProfileBody.js";
 import { mapUserToEditProfileForm } from "../../user/lib/mapUserToEditProfileForm.js";
 
-describe("isDeliveryAddressEqual", () => {
+describe("isUserSavedAddressEqual", () => {
   it("игнорирует пробелы", () => {
     expect(
-      isDeliveryAddressEqual(
-        { line: " Москва, ул A, 1 ", flat: "5", fiasId: "", geo: null, selectedFromSuggest: true },
-        { line: "Москва, ул A, 1", flat: "5", fiasId: "", geo: null, selectedFromSuggest: true },
+      isUserSavedAddressEqual(
+        {
+          id: "a1",
+          label: "",
+          line: " Москва, ул A, 1 ",
+          flat: "5",
+          fiasId: "",
+          geo: null,
+          selectedFromSuggest: true,
+          isDefault: true,
+        },
+        {
+          id: "a1",
+          label: "",
+          line: "Москва, ул A, 1",
+          flat: "5",
+          fiasId: "",
+          geo: null,
+          selectedFromSuggest: true,
+          isDefault: true,
+        },
       ),
     ).toBe(true);
   });
@@ -26,40 +44,81 @@ describe("buildPatchUserProfileBody", () => {
     form.userPhoneNumber = "+79001234567";
 
     const body = buildPatchUserProfileBody(form, {
-      initialDeliveryAddress: form.deliveryAddress,
+      initialSavedAddresses: form.savedAddresses,
       initialPhoneNumber: "",
     });
 
-    expect(body.userAddress).toBeUndefined();
-    // Телефон владельца идёт через /auth/phone/bind/*, а не через PATCH.
+    expect(body.userAddresses).toBeUndefined();
     expect(body.userPhoneNumber).toBeUndefined();
   });
 
-  it("шлёт null для address, если адрес очищен", () => {
-    const initial = {
-      line: "г Москва, ул Ленина, д 1",
-      flat: "5",
-      fiasId: "",
-      geo: null,
-      selectedFromSuggest: true,
-    };
+  it("шлёт пустой массив address, если адреса удалены", () => {
+    const initial = [
+      {
+        id: "a1",
+        label: "",
+        line: "г Москва, ул Ленина, д 1",
+        flat: "5",
+        fiasId: "",
+        geo: null,
+        selectedFromSuggest: true,
+        isDefault: true,
+      },
+    ];
     const form = mapUserToEditProfileForm({
       _id: "1",
       userAddress: "г Москва, ул Ленина, д 1",
       userAddressFlat: "5",
     });
-    form.deliveryAddress = {
-      line: "",
-      flat: "",
-      fiasId: "",
-      geo: null,
-      selectedFromSuggest: false,
-    };
+    form.savedAddresses = [];
 
-    const body = buildPatchUserProfileBody(form, { initialDeliveryAddress: initial });
+    const body = buildPatchUserProfileBody(form, { initialSavedAddresses: initial });
 
-    expect(body.userAddress).toBeNull();
-    expect(body.userAddressFlat).toBeNull();
+    expect(body.userAddresses).toEqual([]);
+  });
+
+  it("шлёт flat как пустую строку, не null", () => {
+    const form = mapUserToEditProfileForm({
+      _id: "1",
+      userAddress: "г Москва, ул Ленина, д 1",
+    });
+    form.savedAddresses = [
+      ...form.savedAddresses,
+      {
+        id: "addr-new",
+        label: "Дача",
+        line: "г Москва, ул Пушкина, д 2",
+        flat: "",
+        fiasId: "",
+        geo: { lat: 55.75, lon: 37.62 },
+        selectedFromSuggest: true,
+        isDefault: false,
+      },
+    ];
+
+    const body = buildPatchUserProfileBody(form, {
+      initialSavedAddresses: mapUserToEditProfileForm({
+        _id: "1",
+        userAddress: "г Москва, ул Ленина, д 1",
+      }).savedAddresses,
+    });
+
+    expect(body.userAddresses).toEqual([
+      {
+        id: expect.any(String),
+        label: null,
+        line: "г Москва, ул Ленина, д 1",
+        flat: "",
+        isDefault: true,
+      },
+      {
+        id: "addr-new",
+        label: "Дача",
+        line: "г Москва, ул Пушкина, д 2",
+        flat: "",
+        isDefault: false,
+      },
+    ]);
   });
 
   it("шлёт ник соцсети, а не готовый https URL", () => {
@@ -69,7 +128,7 @@ describe("buildPatchUserProfileBody", () => {
     form.userPhoneNumber = "";
 
     const body = buildPatchUserProfileBody(form, {
-      initialDeliveryAddress: form.deliveryAddress,
+      initialSavedAddresses: form.savedAddresses,
       initialPhoneNumber: "",
     });
 

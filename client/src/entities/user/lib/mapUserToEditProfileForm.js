@@ -5,7 +5,7 @@ import {
   isRuRegionCode,
 } from "@molha/api-contract";
 
-import { addressValueFromUser } from "../../address/lib/addressValueFromUser.js";
+import { userSavedAddressesFromUser } from "../../address/lib/userSavedAddressesFromUser.js";
 import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
 import { parseUserBackgroundFormFields } from "./userBackgroundValue.js";
 import { formatPremiumExpiresAtForInput } from "./formatPremiumExpiresAtForInput.js";
@@ -23,7 +23,7 @@ import {
  * @property {string} email
  * @property {string} userBirthDate
  * @property {'male'|'female'|'noSelected'} userGender
- * @property {import('../../address/model/types.js').RuDeliveryAddressValue} deliveryAddress
+ * @property {import('../../address/model/userSavedAddressTypes.js').UserSavedAddressFormValue[]} savedAddresses
  * @property {string} userRegionCode
  * @property {string} userPhoneNumber
  * @property {string} userAvatarUrl
@@ -65,16 +65,14 @@ export function mapUserToEditProfileForm(user) {
     socialLinks[fieldId] = storedSocialUrlToInputValue(fieldId, user[fieldId]);
   }
 
-  const deliveryAddress = addressValueFromUser(user);
-  deliveryAddress.flat =
-    typeof user.userAddressFlat === "string" ? user.userAddressFlat.trim() : "";
+  const savedAddresses = userSavedAddressesFromUser(user);
 
   return {
     userName: user.userName ?? "",
     email: typeof user.email === "string" ? user.email.trim().toLowerCase() : "",
     userBirthDate: birthInput,
     userGender: user.userGender ?? USER_GENDER_NO_SELECTED,
-    deliveryAddress,
+    savedAddresses,
     userRegionCode: isRuRegionCode(String(user.userRegionCode ?? "").trim())
       ? String(user.userRegionCode).trim()
       : DEFAULT_VIEWER_REGION_CODE,

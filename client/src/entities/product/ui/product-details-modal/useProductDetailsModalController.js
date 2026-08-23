@@ -15,6 +15,7 @@ import { filterProductDetailsVisibleFieldKeys } from "../../lib/isProductDetails
 import { resolveProductDetailsContentPanels } from "../../lib/resolveProductDetailsContentPanels.js";
 import { useAuthSession } from "../../../user/model/useAuthSession.js";
 import { getProductPurchaseLimit } from "../../lib/getProductPurchaseLimit.js";
+import { resolveProductOutOfStockOverlayLabel } from "../../lib/resolveProductOutOfStockOverlayLabel.js";
 import { PRODUCT_QA_UI, PRODUCT_REVIEW_UI } from "../../../../shared/config/appUiCopy.js";
 import { useProductDetailsModalQueries } from "./useProductDetailsModalQueries.js";
 import { useProductDetailsModalTabs } from "./useProductDetailsModalTabs.js";
@@ -142,8 +143,18 @@ export function useProductDetailsModalController({
     );
   }, [bottomMetaFieldKeys, contentPanels, product]);
   const purchaseLimit = product ? getProductPurchaseLimit(product) : 0;
+  const isProductOutOfStock = product?.productOutOfStock === true;
   const canShowAddToCart =
-    showAddToCart && product?._id != null && !tabs.isOwnProduct && purchaseLimit > 0;
+    showAddToCart &&
+    product?._id != null &&
+    !tabs.isOwnProduct &&
+    purchaseLimit > 0 &&
+    !isProductOutOfStock;
+  const showOutOfStockPurchaseButton =
+    showAddToCart && product?._id != null && !tabs.isOwnProduct && isProductOutOfStock;
+  const outOfStockPurchaseLabel = product
+    ? resolveProductOutOfStockOverlayLabel(product)
+    : "";
 
   const reviewCount = Number(product?.reviewCount) || 0;
   const reviewsTabLabel =
@@ -171,6 +182,8 @@ export function useProductDetailsModalController({
     contentPanels,
     hasDetailsSection,
     canShowAddToCart,
+    showOutOfStockPurchaseButton,
+    outOfStockPurchaseLabel,
     purchaseLimit,
     reviewsTabLabel,
     qaTabLabel,

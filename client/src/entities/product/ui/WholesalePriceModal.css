@@ -341,6 +341,27 @@
   min-width: 0;
 }
 
+.wholesale-price-modal__field fieldset {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.wholesale-price-modal__radio {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  color: var(--iz-color-text);
+  cursor: pointer;
+}
+
+.wholesale-price-modal__radio input {
+  margin: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .wholesale-price-modal__scrim,
   .wholesale-price-modal__panel {

@@ -8,14 +8,28 @@ import {
 } from "@molha/api-contract";
 
 import { AddressDeliveryFields } from "../../../entities/address/ui/AddressDeliveryFields.jsx";
+import { CheckoutSavedAddressPicker } from "../../../features/checkout/ui/CheckoutSavedAddressPicker.jsx";
 import { CheckoutPaymentMethodPicker } from "../../../features/checkout/ui/CheckoutPaymentMethodPicker.jsx";
 import { CheckoutShippingProviderPicker } from "../../../features/checkout/ui/CheckoutShippingProviderPicker.jsx";
 import { addressValueFromUser } from "../../../entities/address/lib/addressValueFromUser.js";
+import {
+  CHECKOUT_SAVED_ADDRESS_CUSTOM_ID,
+  deliveryAddressFromSaved,
+  matchCheckoutSavedAddressId,
+  resolveInitialCheckoutSavedAddressId,
+} from "../../../entities/address/lib/deliveryAddressFromSaved.js";
 import { validateRuDeliveryAddressForm } from "../../../entities/address/lib/validateRuDeliveryAddressForm.js";
 import { ORDER_PAYMENT_METHOD_DEFAULT } from "../../../entities/order/model/constants.js";
-import { CHECKOUT_FORM_UI } from "../../config/appUiCopy.js";
+import {
+  resolveInitialPickupSelections,
+  buildPickupSelectionsPayload,
+} from "../../../entities/cart/lib/buildCheckoutPickupLocations.js";
+import { CHECKOUT_FORM_UI, PRODUCT_PICKUP_UI } from "../../config/appUiCopy.js";
 
 import "./CheckoutForm.css";
+
+const EMPTY_PICKUP_LOCATIONS = [];
+const EMPTY_SAVED_DELIVERY_ADDRESSES = [];
 
 /**
  * @param {{
@@ -25,7 +39,25 @@ import "./CheckoutForm.css";
  *     userAddressFiasId?: string;
  *     userAddressGeo?: { lat?: number; lon?: number } | null;
  *   }>;
- *   pickupLocations?: Array<{ address: string; productTitles?: string[] }>;
+ *   savedDeliveryAddresses?: Array<{
+ *     id: string;
+ *     label?: string;
+ *     line: string;
+ *     flat?: string;
+ *     fiasId?: string;
+ *     geo?: { lat: number; lon: number } | null;
+ *     isDefault?: boolean;
+ *   }>;
+ *   pickupLocations?: Array<{
+ *     productId: string;
+ *     productTitle: string;
+ *     locations: Array<{
+ *       id: string;
+ *       label?: string;
+ *       address: string;
+ *       isDefault?: boolean;
+ *     }>;
+ *   }>;
  *   deliveryAvailable?: boolean;
  *   pickupAvailable?: boolean;
  *   isSubmitting: boolean;
@@ -36,6 +68,7 @@ import "./CheckoutForm.css";
  *     deliveryAddress: string;
  *     deliveryAddressFlat: string;
  *     paymentMethod: string;
+ *     pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
  *   }) => void | Promise<void>;
  *   isDisabled?: boolean;
  *   dockSubmit?: boolean;
@@ -45,7 +78,8 @@ import "./CheckoutForm.css";
  */
 export function CheckoutForm({
   defaultDeliveryAddress,
-  pickupLocations = [],
+  savedDeliveryAddresses = EMPTY_SAVED_DELIVERY_ADDRESSES,
+  pickupLocations = EMPTY_PICKUP_LOCATIONS,
   deliveryAvailable = false,
   pickupAvailable = true,
   isSubmitting,
@@ -59,9 +93,24 @@ export function CheckoutForm({
 }) {
   const formId = useId();
   const [fulfillmentMethod, setFulfillmentMethod] = useState(ORDER_FULFILLMENT_PICKUP);
-  const [deliveryAddress, setDeliveryAddress] = useState(() =>
-    addressValueFromUser(defaultDeliveryAddress),
+  const savedAddresses = useMemo(
+    () => (Array.isArray(savedDeliveryAddresses) ? savedDeliveryAddresses : []),
+    [savedDeliveryAddresses],
   );
+
+  const [selectedSavedAddressId, setSelectedSavedAddressId] = useState(() =>
+    resolveInitialCheckoutSavedAddressId(savedAddresses),
+  );
+  const [deliveryAddress, setDeliveryAddress] = useState(() => {
+    const initialId = resolveInitialCheckoutSavedAddressId(savedAddresses);
+    if (initialId !== CHECKOUT_SAVED_ADDRESS_CUSTOM_ID) {
+      const item = savedAddresses.find((address) => address.id === initialId);
+      if (item) {
+        return deliveryAddressFromSaved(item);
+      }
+    }
+    return addressValueFromUser(defaultDeliveryAddress);
+  });
   const [paymentMethod, setPaymentMethod] = useState(ORDER_PAYMENT_METHOD_DEFAULT);
   const [localError, setLocalError] = useState("");
 
@@ -70,8 +119,44 @@ export function CheckoutForm({
   const pickupSelectable = pickupAvailable;
 
   useEffect(() => {
+    const initialId = resolveInitialCheckoutSavedAddressId(savedAddresses);
+    setSelectedSavedAddressId(initialId);
+    if (initialId !== CHECKOUT_SAVED_ADDRESS_CUSTOM_ID) {
+      const item = savedAddresses.find((address) => address.id === initialId);
+      if (item) {
+        setDeliveryAddress(deliveryAddressFromSaved(item));
+        return;
+      }
+    }
     setDeliveryAddress(addressValueFromUser(defaultDeliveryAddress));
-  }, [defaultDeliveryAddress]);
+  }, [defaultDeliveryAddress, savedAddresses]);
+
+  const handleSavedAddressSelect = (nextId) => {
+    setSelectedSavedAddressId(nextId);
+    if (nextId === CHECKOUT_SAVED_ADDRESS_CUSTOM_ID) {
+      setDeliveryAddress({
+        line: "",
+        flat: "",
+        fiasId: "",
+        geo: null,
+        regionCode: null,
+        selectedFromSuggest: false,
+      });
+      return;
+    }
+
+    const item = savedAddresses.find((address) => address.id === nextId);
+    if (item) {
+      setDeliveryAddress(deliveryAddressFromSaved(item));
+    }
+  };
+
+  const handleDeliveryAddressChange = (nextAddress) => {
+    setDeliveryAddress(nextAddress);
+    setSelectedSavedAddressId(
+      matchCheckoutSavedAddressId(nextAddress, savedAddresses),
+    );
+  };
 
   useEffect(() => {
     if (!deliverySelectable && fulfillmentMethod === ORDER_FULFILLMENT_DELIVERY) {
@@ -88,20 +173,31 @@ export function CheckoutForm({
   }, [deliverySelectable, pickupSelectable, fulfillmentMethod]);
 
   const isPickup = fulfillmentMethod === ORDER_FULFILLMENT_PICKUP;
-  const pickupPoints = useMemo(
-    () =>
-      (Array.isArray(pickupLocations) ? pickupLocations : [])
-        .map((item) => ({
-          address: String(item?.address ?? "").trim(),
-          productTitles: Array.isArray(item?.productTitles)
-            ? item.productTitles.map((title) => String(title ?? "").trim()).filter(Boolean)
-            : [],
-        }))
-        .filter((item) => item.address.length > 0),
+  const pickupGroups = useMemo(
+    () => (Array.isArray(pickupLocations) ? pickupLocations : []),
     [pickupLocations],
   );
-  const pickupReady = pickupPoints.length > 0;
-  const showPickupTitles = pickupPoints.length > 1;
+  const [selectedPickupByProductId, setSelectedPickupByProductId] = useState(() =>
+    resolveInitialPickupSelections(pickupGroups),
+  );
+
+  const pickupGroupsKey = useMemo(
+    () =>
+      pickupGroups
+        .map(
+          (group) =>
+            `${group.productId}:${group.locations.map((item) => item.id).join(",")}`,
+        )
+        .join("|"),
+    [pickupGroups],
+  );
+
+  useEffect(() => {
+    setSelectedPickupByProductId(resolveInitialPickupSelections(pickupGroups));
+  }, [pickupGroups, pickupGroupsKey]);
+
+  const pickupReady = pickupGroups.length > 0;
+  const showPickupTitles = pickupGroups.length > 1;
 
   const isAddressValid = useMemo(() => {
     if (isPickup) {
@@ -138,6 +234,7 @@ export function CheckoutForm({
         deliveryAddress: "",
         deliveryAddressFlat: "",
         paymentMethod,
+        pickupSelections: buildPickupSelectionsPayload(selectedPickupByProductId),
       });
       return;
     }
@@ -293,28 +390,80 @@ export function CheckoutForm({
             <div className="checkout-form__pickup">
               <span className="checkout-form__label">{CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}</span>
               {pickupReady ? (
-                <>
-                  {pickupPoints.length > 1 ? (
-                    <p className="checkout-form__pickup-hint">{CHECKOUT_FORM_UI.PICKUP_MULTI_HINT}</p>
-                  ) : null}
-                  <ol className="checkout-form__pickup-list">
-                    {pickupPoints.map((point, index) => (
-                      <li key={`${point.address}-${index}`} className="checkout-form__pickup-item">
-                        <span className="checkout-form__pickup-index" aria-hidden="true">
-                          {index + 1}
-                        </span>
-                        <div className="checkout-form__pickup-body">
-                          {showPickupTitles && point.productTitles.length > 0 ? (
-                            <p className="checkout-form__pickup-products">
-                              {point.productTitles.join(", ")}
-                            </p>
-                          ) : null}
-                          <p className="checkout-form__pickup-address">{point.address}</p>
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
-                </>
+                <div className="checkout-form__pickup-groups">
+                  {pickupGroups.map((group) => {
+                    const needsSelect = group.locations.length >= 2;
+                    const selectedId =
+                      selectedPickupByProductId[group.productId] ??
+                      group.locations.find((item) => item.isDefault)?.id ??
+                      group.locations[0]?.id;
+
+                    return (
+                      <div
+                        key={group.productId}
+                        className="checkout-form__pickup-group"
+                      >
+                        {showPickupTitles && group.productTitle ? (
+                          <p className="checkout-form__pickup-products">
+                            {group.productTitle}
+                          </p>
+                        ) : null}
+                        {needsSelect ? (
+                          <>
+                            <span className="checkout-form__pickup-select-label">
+                              {PRODUCT_PICKUP_UI.CHECKOUT_PICK_LOCATION}
+                            </span>
+                            <div
+                              className="checkout-form__pickup-options"
+                              role="radiogroup"
+                              aria-label={PRODUCT_PICKUP_UI.CHECKOUT_PICK_LOCATION}
+                            >
+                              {group.locations.map((location) => {
+                                const active = selectedId === location.id;
+                                return (
+                                  <button
+                                    key={location.id}
+                                    type="button"
+                                    role="radio"
+                                    aria-checked={active}
+                                    disabled={isDisabled || isSubmitting}
+                                    className={[
+                                      "checkout-form__pickup-option",
+                                      active
+                                        ? "checkout-form__pickup-option--active"
+                                        : "",
+                                    ]
+                                      .filter(Boolean)
+                                      .join(" ")}
+                                    onClick={() =>
+                                      setSelectedPickupByProductId((prev) => ({
+                                        ...prev,
+                                        [group.productId]: location.id,
+                                      }))
+                                    }
+                                  >
+                                    {location.label ? (
+                                      <span className="checkout-form__pickup-option-label">
+                                        {location.label}
+                                      </span>
+                                    ) : null}
+                                    <span className="checkout-form__pickup-address">
+                                      {location.address}
+                                    </span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </>
+                        ) : (
+                          <p className="checkout-form__pickup-address">
+                            {group.locations[0]?.address}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               ) : (
                 <p className="checkout-form__pickup-address checkout-form__pickup-address_error">
                   {CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED}
@@ -323,9 +472,16 @@ export function CheckoutForm({
             </div>
           ) : (
             <>
+              <CheckoutSavedAddressPicker
+                addresses={savedAddresses}
+                selectedId={selectedSavedAddressId}
+                onSelect={handleSavedAddressSelect}
+                disabled={isDisabled || isSubmitting}
+              />
+
               <AddressDeliveryFields
                 value={deliveryAddress}
-                onChange={setDeliveryAddress}
+                onChange={handleDeliveryAddressChange}
                 disabled={isDisabled || isSubmitting}
                 displayOnly
                 lineInputClassName="checkout-form__input"
@@ -341,10 +497,10 @@ export function CheckoutForm({
                   className="checkout-form__input"
                   value={deliveryAddress.flat}
                   onChange={(event) =>
-                    setDeliveryAddress((prev) => ({
-                      ...prev,
+                    handleDeliveryAddressChange({
+                      ...deliveryAddress,
                       flat: event.target.value,
-                    }))
+                    })
                   }
                   disabled={isDisabled || isSubmitting}
                   placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
