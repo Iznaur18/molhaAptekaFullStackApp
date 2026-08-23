@@ -18,6 +18,7 @@ import {
 import { useMySiteHeaderBannerCampaignQuery } from "../../../entities/site-header-banner-campaign/model/useMySiteHeaderBannerCampaignQuery.js";
 import { siteHeaderBannerCampaignQueryKeys } from "../../../entities/site-header-banner-campaign/model/siteHeaderBannerCampaignQueryKeys.js";
 import { loyaltyPointsQueryKeys } from "../../../entities/user/model/loyaltyPointsQueryKeys.js";
+import { invalidateLoyaltyPointsBalances } from "../../../entities/user/lib/loyaltyPointsQueryCache.js";
 import { SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
 import { RuRegionSelect } from "../../../entities/region/ui/RuRegionSelect.jsx";
@@ -99,7 +100,7 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
         queryClient.invalidateQueries({
           queryKey: siteHeaderBannerCampaignQueryKeys.myCampaign(),
         }),
-        queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.all }),
+        invalidateLoyaltyPointsBalances(queryClient),
       ]);
       setShowForm(false);
       setShowPreview(false);
@@ -114,7 +115,7 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
         queryClient.invalidateQueries({
           queryKey: siteHeaderBannerCampaignQueryKeys.myCampaign(),
         }),
-        queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.all }),
+        invalidateLoyaltyPointsBalances(queryClient),
       ]);
       setFeedback(SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.CANCEL_SUCCESS);
     },
@@ -175,7 +176,9 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
         <h2 className="advertising-page__card-title">
           {SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.CARD_TITLE}
         </h2>
-        <p className="advertising-page__state">{SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.LOADING}</p>
+        <p className="advertising-page__state">
+          {SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.LOADING}
+        </p>
       </article>
     );
   }
@@ -186,7 +189,10 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
         <h2 className="advertising-page__card-title">
           {SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.CARD_TITLE}
         </h2>
-        <p className="advertising-page__state advertising-page__state_error" role="alert">
+        <p
+          className="advertising-page__state advertising-page__state_error"
+          role="alert"
+        >
           {campaignQuery.error instanceof Error
             ? campaignQuery.error.message
             : SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.FETCH_FALLBACK}
@@ -204,7 +210,9 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
         <span className="advertising-page__card-badge">{DURATION_BADGE}</span>
       </div>
 
-      <p className="advertising-page__lead">{SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.DESCRIPTION}</p>
+      <p className="advertising-page__lead">
+        {SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.DESCRIPTION}
+      </p>
 
       <div className="advertising-page__meta">
         <div className="advertising-page__meta-item">
@@ -297,7 +305,9 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
                 <input
                   className="advertising-page__input"
                   value={form.backgroundColor}
-                  onChange={(event) => updateField("backgroundColor", event.target.value)}
+                  onChange={(event) =>
+                    updateField("backgroundColor", event.target.value)
+                  }
                   placeholder="#RRGGBB"
                 />
               </div>

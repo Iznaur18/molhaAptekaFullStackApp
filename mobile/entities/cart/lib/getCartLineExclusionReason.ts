@@ -1,4 +1,5 @@
 import { isCurrentUserProductSeller } from "@/entities/product/lib/isCurrentUserProductSeller";
+import { productPickupLocationsFromProduct } from "@molha/api-contract";
 
 import type { CartLine } from "./selectCartLines";
 
@@ -30,8 +31,10 @@ export function getCartLineExclusionReason(
 
   const pickupOn = line.product?.productPickupEnabled !== false;
   if (pickupOn) {
-    const pickup = String(line.product?.productPickupAddress ?? "").trim();
-    if (!pickup) {
+    const locations = productPickupLocationsFromProduct(line.product).filter(
+      (item) => String(item.address ?? "").trim().length > 0,
+    );
+    if (locations.length === 0) {
       return "missing_pickup";
     }
   }

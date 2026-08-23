@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { loyaltyPointsQueryKeys } from "../../../entities/user/model/loyaltyPointsQueryKeys.js";
+import { invalidateLoyaltyPointsBalances } from "../../../entities/user/lib/loyaltyPointsQueryCache.js";
 import { cancelRaffleCreate } from "../api/cancelRaffleCreate.js";
 import { raffleQueryKeys } from "./raffleQueryKeys.js";
 
@@ -16,8 +17,10 @@ export function useCancelRaffleCreateMutation() {
         });
       }
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: raffleQueryKeys.createAdvertising() }),
-        queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.all }),
+        queryClient.invalidateQueries({
+          queryKey: raffleQueryKeys.createAdvertising(),
+        }),
+        invalidateLoyaltyPointsBalances(queryClient),
       ]);
     },
   });

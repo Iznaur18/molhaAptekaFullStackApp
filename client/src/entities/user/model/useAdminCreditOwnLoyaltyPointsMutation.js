@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { createClientIdempotencyKey } from "../../../shared/lib/createClientIdempotencyKey.js";
 import { adminCreditOwnLoyaltyPoints } from "../api/adminCreditOwnLoyaltyPoints.js";
-import { invalidateLoyaltyPointsStatus } from "../lib/loyaltyPointsQueryCache.js";
+import { invalidateLoyaltyPointsBalances } from "../lib/loyaltyPointsQueryCache.js";
 import { loyaltyPointsQueryKeys } from "./loyaltyPointsQueryKeys.js";
 
 /**
@@ -10,9 +10,7 @@ import { loyaltyPointsQueryKeys } from "./loyaltyPointsQueryKeys.js";
  *   onBalanceChange?: (balance: number) => void;
  * }} [options]
  */
-export function useAdminCreditOwnLoyaltyPointsMutation({
-  onBalanceChange,
-} = {}) {
+export function useAdminCreditOwnLoyaltyPointsMutation({ onBalanceChange } = {}) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -25,7 +23,7 @@ export function useAdminCreditOwnLoyaltyPointsMutation({
       queryClient.setQueryData(loyaltyPointsQueryKeys.all, {
         loyaltyPointsBalance: result.loyaltyPointsBalance,
       });
-      void invalidateLoyaltyPointsStatus(queryClient);
+      void invalidateLoyaltyPointsBalances(queryClient);
       onBalanceChange?.(result.loyaltyPointsBalance);
     },
   });

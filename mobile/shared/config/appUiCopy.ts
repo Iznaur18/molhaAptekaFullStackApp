@@ -1104,6 +1104,7 @@ export const CHECKOUT_FORM_UI = {
   FULFILLMENT_PICKUP_UNAVAILABLE: "Самовывоз недоступен для выбранных товаров",
   PICKUP_ADDRESS_LABEL: "Где забрать",
   PICKUP_MULTI_HINT: "Несколько точек — каждый товар по своему адресу",
+  CHECKOUT_PICK_LOCATION: "Выберите точку",
   LABEL_DELIVERY_ADDRESS: "Адрес доставки",
   PLACEHOLDER_DELIVERY_ADDRESS: "Город, улица, дом",
   LABEL_FLAT: "Комментарий",

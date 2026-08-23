@@ -111,3 +111,36 @@ export function buildLegacyVerifiedUserAddresses(existingAddresses, verified) {
 
   return [mapLegacyVerifiedDeliveryAddress(verified)];
 }
+
+/**
+ * Legacy PATCH `userAddress: null` — при нескольких адресах убираем только default,
+ * остальные сохраняем. Полная очистка только если адрес был один или списка не было.
+ *
+ * @param {Array<Record<string, unknown>>} existingAddresses
+ */
+export function buildLegacyClearUserAddresses(existingAddresses) {
+  const stored = existingAddresses.map(mapStoredUserSavedAddressItem).filter((item) => item.line);
+
+  if (stored.length <= 1) {
+    return [];
+  }
+
+  const defaultIndex = Math.max(
+    0,
+    stored.findIndex((item) => item.isDefault),
+  );
+  const remaining = stored.filter((_, index) => index !== defaultIndex);
+
+  if (remaining.length === 0) {
+    return [];
+  }
+
+  if (remaining.some((item) => item.isDefault)) {
+    return remaining;
+  }
+
+  return remaining.map((item, index) => ({
+    ...item,
+    isDefault: index === 0,
+  }));
+}

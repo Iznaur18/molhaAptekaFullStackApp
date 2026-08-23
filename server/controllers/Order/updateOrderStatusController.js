@@ -1,4 +1,5 @@
 import { OrderModel } from "../../models/index.js";
+import { AppError } from "../../errors/AppError.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 import { runInTransaction } from "../../utils/mongoTransaction.js";
 
@@ -7,7 +8,6 @@ import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_CONFIRMED,
   ORDER_STATUS_DELIVERED,
-  ORDER_STATUS_PENDING,
 } from "../../constants/orderConstants.js";
 import { syncRaffleProgressForProductSale } from "../../services/raffle/raffleHelpers.js";
 import { applySoldQuantityDeltaForItemStatusChange } from "../../services/product/productSoldQuantityDenorm.js";
@@ -31,6 +31,25 @@ import {
 } from "../../services/product/productBuyNFreeProgress.js";
 import { normalizeId } from "../../services/order/orderItemStatusHelpers.js";
 
+const runBestEffortRaffleSync = async (productIds) => {
+  for (const productId of productIds) {
+    if (!productId) {
+      continue;
+    }
+    try {
+      await syncRaffleProgressForProductSale(productId);
+    } catch (raffleSyncError) {
+      logServerEvent("error", {
+        event: "syncraffleprogressforproductsale",
+        error:
+          raffleSyncError instanceof Error
+            ? raffleSyncError.message
+            : String(raffleSyncError),
+      });
+    }
+  }
+};
+
 /** `PATCH /order/:orderId/status` — смена статуса заказа (только админ). */
 export const updateOrderStatusController = async (req, res) => {
   const { orderId } = req.params;
@@ -46,6 +65,8 @@ export const updateOrderStatusController = async (req, res) => {
   const now = new Date();
   /** @type {{ productId: import('mongoose').Types.ObjectId; quantity: number }[]} */
   const itemsPendingConfirmStock = [];
+  /** @type {string[]} */
+  const confirmedProductIdsBeforeCancel = [];
 
   for (const item of order.items) {
     const previousStatus = item.status;
@@ -53,36 +74,15 @@ export const updateOrderStatusController = async (req, res) => {
     if (productId == null) {
       continue;
     }
+
     if (
       status === ORDER_STATUS_CANCELLED &&
-      previousStatus !== ORDER_STATUS_CANCELLED
+      previousStatus === ORDER_STATUS_CONFIRMED
     ) {
-      try {
-        await restoreProductStockOnItemCancelled(
-          productId,
-          item.quantity,
-          previousStatus,
-        );
-      } catch (stockError) {
-        logServerEvent("error", {
-          event: "restoreproductstockonitemcancelled",
-          error: stockError instanceof Error ? stockError.message : String(stockError),
-        });
-      }
-      if (previousStatus === ORDER_STATUS_CONFIRMED) {
-        try {
-          await syncRaffleProgressForProductSale(productId);
-        } catch (raffleSyncError) {
-          logServerEvent("error", {
-            event: "syncraffleprogressforproductsale",
-            error:
-              raffleSyncError instanceof Error
-                ? raffleSyncError.message
-                : String(raffleSyncError),
-          });
-        }
-      }
-    } else if (
+      confirmedProductIdsBeforeCancel.push(String(normalizeId(productId)));
+    }
+
+    if (
       status === ORDER_STATUS_CONFIRMED &&
       previousStatus !== ORDER_STATUS_CONFIRMED
     ) {
@@ -95,13 +95,9 @@ export const updateOrderStatusController = async (req, res) => {
 
   if (status === ORDER_STATUS_CANCELLED) {
     await runInTransaction(async (session) => {
-      // Заказ читаем внутри транзакции: withTransaction повторяет колбэк при
-      // WriteConflict, а mongoose после первого (откатившегося) save() считает
-      // документ чистым — на ретрае мутации документа, загруженного снаружи,
-      // молча не сохранялись, и заказ оставался в прежнем статусе.
       const txnOrder = await OrderModel.findById(orderId).session(session);
       if (!txnOrder) {
-        throw new Error("ORDER_NOT_FOUND");
+        throw new AppError(404, "Заказ не найден");
       }
       normalizeOrderDocumentForRuntime(txnOrder);
       normalizeOrderItemsForRuntime(txnOrder.items);
@@ -118,7 +114,19 @@ export const updateOrderStatusController = async (req, res) => {
         if (item.status === ORDER_STATUS_CANCELLED || item.productId == null) {
           continue;
         }
+
         const previousStatus = item.status;
+        const productId = normalizeId(item.productId?._id ?? item.productId);
+
+        if (previousStatus !== ORDER_STATUS_CANCELLED) {
+          await restoreProductStockOnItemCancelled(
+            productId,
+            item.quantity,
+            previousStatus,
+            session,
+          );
+        }
+
         await applySoldQuantityDeltaForItemStatusChange({
           productId: item.productId,
           previousStatus,
@@ -127,7 +135,6 @@ export const updateOrderStatusController = async (req, res) => {
           session,
         });
 
-        const productId = normalizeId(item.productId?._id ?? item.productId);
         const freeUnits = Math.floor(Number(item.buyNFreeUnitsAtOrder) || 0);
         if (
           previousStatus === ORDER_STATUS_PENDING &&
@@ -173,26 +180,25 @@ export const updateOrderStatusController = async (req, res) => {
       await txnOrder.populate(ORDER_ITEMS_POPULATE);
       await releaseUnawardedLoyaltyReservesForOrder(txnOrder.items, session);
     });
+
+    await runBestEffortRaffleSync(confirmedProductIdsBeforeCancel);
   } else {
     for (const item of order.items) {
       if (item.productId == null || item.status === status) {
         continue;
       }
-      try {
-        await applySoldQuantityDeltaForItemStatusChange({
-          productId: item.productId,
-          previousStatus: item.status,
-          nextStatus: status,
-          quantity: item.quantity,
-        });
-      } catch (soldQuantityError) {
-        logServerEvent("error", {
-          event: "applysoldquantitydeltaforitemstatuschange",
-          error:
-            soldQuantityError instanceof Error
-              ? soldQuantityError.message
-              : String(soldQuantityError),
-        });
+
+      await applySoldQuantityDeltaForItemStatusChange({
+        productId: item.productId,
+        previousStatus: item.status,
+        nextStatus: status,
+        quantity: item.quantity,
+      });
+    }
+
+    if (status === ORDER_STATUS_CONFIRMED) {
+      for (const { productId, quantity } of itemsPendingConfirmStock) {
+        await decrementProductStockOnItemConfirmed(productId, quantity);
       }
     }
 
@@ -213,32 +219,14 @@ export const updateOrderStatusController = async (req, res) => {
     });
     order.status = status;
     await order.save();
-  }
 
-  for (const { productId, quantity } of itemsPendingConfirmStock) {
-    try {
-      await syncRaffleProgressForProductSale(productId);
-    } catch (raffleSyncError) {
-      logServerEvent("error", {
-        event: "syncraffleprogressforproductsale",
-        error:
-          raffleSyncError instanceof Error
-            ? raffleSyncError.message
-            : String(raffleSyncError),
-      });
-    }
-    try {
-      await decrementProductStockOnItemConfirmed(productId, quantity);
-    } catch (stockError) {
-      logServerEvent("error", {
-        event: "decrementproductstockonitemconfirmed",
-        error: stockError instanceof Error ? stockError.message : String(stockError),
-      });
+    if (status === ORDER_STATUS_CONFIRMED) {
+      await runBestEffortRaffleSync(
+        itemsPendingConfirmStock.map(({ productId }) => String(normalizeId(productId))),
+      );
     }
   }
 
-  // Ветка отмены пишет через собственный документ внутри транзакции, поэтому
-  // ответ собираем из перечитанного заказа, а не из устаревшего в памяти.
   const responseOrder = (await OrderModel.findById(orderId)) ?? order;
   await responseOrder.populate("userBuyerId", ORDER_BUYER_PUBLIC_FIELDS);
   await responseOrder.populate(ORDER_ITEMS_POPULATE);

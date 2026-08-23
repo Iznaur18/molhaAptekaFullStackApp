@@ -21,7 +21,10 @@ import {
 } from "../../services/user/profileImageFocus.js";
 import { buildUserProfileMongoUpdate } from "../../services/user/buildUserProfileMongoUpdate.js";
 import { applyVerifiedUserAddressesUpdate } from "../../services/user/applyVerifiedUserAddressesUpdate.js";
-import { buildLegacyVerifiedUserAddresses } from "../../services/user/buildLegacyVerifiedUserAddresses.js";
+import {
+  buildLegacyClearUserAddresses,
+  buildLegacyVerifiedUserAddresses,
+} from "../../services/user/buildLegacyVerifiedUserAddresses.js";
 import { resolveUserAddressCityNormalized } from "../../services/product/ruCityNormalized.js";
 import { normalizeStoredUploadUrl } from "../../services/upload/buildPublicUploadUrl.js";
 import { rejectPendingDataConfirmationForUser } from "../../services/user/userDataConfirmationHelpers.js";
@@ -141,15 +144,19 @@ export const userUpdateProfileController = async (req, res) => {
     if (req.verifiedUserAddresses !== undefined) {
       applyVerifiedUserAddressesUpdate(updateData, req.verifiedUserAddresses);
     } else if (req.verifiedDeliveryAddress !== undefined) {
+      const existingUser = await UserModel.findById(targetUserId)
+        .select("userAddresses")
+        .lean();
+      const existingAddresses = Array.isArray(existingUser?.userAddresses)
+        ? existingUser.userAddresses
+        : [];
+
       if (req.verifiedDeliveryAddress === null) {
-        applyVerifiedUserAddressesUpdate(updateData, []);
+        applyVerifiedUserAddressesUpdate(
+          updateData,
+          buildLegacyClearUserAddresses(existingAddresses),
+        );
       } else {
-        const existingUser = await UserModel.findById(targetUserId)
-          .select("userAddresses")
-          .lean();
-        const existingAddresses = Array.isArray(existingUser?.userAddresses)
-          ? existingUser.userAddresses
-          : [];
         const nextAddresses = buildLegacyVerifiedUserAddresses(
           existingAddresses,
           req.verifiedDeliveryAddress,

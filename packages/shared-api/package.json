@@ -9,7 +9,8 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@molha/api-contract": "file:../../contract",
     "axios": "^1.15.2",
-    "@molha/api-contract": "file:../../contract"
+    "zod": "^3.25.76"
   }
 }

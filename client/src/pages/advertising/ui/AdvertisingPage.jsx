@@ -10,6 +10,7 @@ import { introAdQueryKeys } from "../../../entities/intro-ad/model/introAdQueryK
 import { useMyIntroAdCampaignQuery } from "../../../entities/intro-ad/model/useMyIntroAdCampaignQuery.js";
 import { useMyLoyaltyPointsStatusQuery } from "../../../entities/user/model/useMyLoyaltyPointsStatusQuery.js";
 import { loyaltyPointsQueryKeys } from "../../../entities/user/model/loyaltyPointsQueryKeys.js";
+import { invalidateLoyaltyPointsBalances } from "../../../entities/user/lib/loyaltyPointsQueryCache.js";
 import { useAppIntro } from "../../../features/app-intro/model/AppIntroContext.jsx";
 import {
   ADVERTISING_PAGE_UI,
@@ -33,8 +34,18 @@ import "./AdvertisingPage.css";
 
 function ZapIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"
+      />
     </svg>
   );
 }
@@ -96,7 +107,7 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
       }
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: introAdQueryKeys.myCampaign() }),
-        queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.all }),
+        invalidateLoyaltyPointsBalances(queryClient),
       ]);
       setShowForm(false);
       setFeedback(INTRO_AD_PAGE_UI.SUBMIT_SUCCESS);
@@ -108,7 +119,7 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: introAdQueryKeys.myCampaign() }),
-        queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.all }),
+        invalidateLoyaltyPointsBalances(queryClient),
       ]);
       setFeedback(INTRO_AD_PAGE_UI.CANCEL_SUCCESS);
     },
@@ -117,8 +128,7 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
   const campaign = campaignQuery.data?.campaign ?? null;
   const pricePoints = campaignQuery.data?.pricePoints ?? 6_000;
   const loyaltyBalance = loyaltyQuery.data?.loyaltyPointsBalance ?? 0;
-  const canCancel =
-    campaign?.status === "pending" || campaign?.status === "queued";
+  const canCancel = campaign?.status === "pending" || campaign?.status === "queued";
   const hasOpenCampaign = Boolean(campaign);
   const isSubmitting = submitMutation.isPending || cancelMutation.isPending;
 
@@ -197,7 +207,10 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
   if (campaignQuery.isError) {
     return (
       <section className="advertising-page">
-        <p className="advertising-page__state advertising-page__state_error" role="alert">
+        <p
+          className="advertising-page__state advertising-page__state_error"
+          role="alert"
+        >
           {campaignQuery.error instanceof Error
             ? campaignQuery.error.message
             : INTRO_AD_PAGE_UI.FETCH_FALLBACK}
@@ -213,7 +226,9 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
         aria-label={`${ADVERTISING_PAGE_UI.HERO_CAPTION}: ${ADVERTISING_PAGE_UI.BALANCE(loyaltyBalance)}`}
       >
         <div className="advertising-page__hero-text">
-          <p className="advertising-page__hero-caption">{ADVERTISING_PAGE_UI.HERO_CAPTION}</p>
+          <p className="advertising-page__hero-caption">
+            {ADVERTISING_PAGE_UI.HERO_CAPTION}
+          </p>
           <p className="advertising-page__hero-row">
             <span className="advertising-page__hero-value">{loyaltyBalance}</span>
             <span className="advertising-page__hero-unit">
@@ -234,7 +249,9 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
             aria-disabled="true"
           >
             <div className="advertising-page__card-head">
-              <h2 className="advertising-page__card-title">{INTRO_AD_PAGE_UI.CARD_TITLE}</h2>
+              <h2 className="advertising-page__card-title">
+                {INTRO_AD_PAGE_UI.CARD_TITLE}
+              </h2>
               <span className="advertising-page__card-badge advertising-page__card-badge_disabled">
                 {INTRO_AD_PAGE_UI.TEMPORARILY_UNAVAILABLE}
               </span>
@@ -245,163 +262,173 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
           </article>
         ) : (
           <article className="advertising-page__card advertising-page__card_intro">
-          <div className="advertising-page__card-head">
-            <h2 className="advertising-page__card-title">{INTRO_AD_PAGE_UI.CARD_TITLE}</h2>
-            <span className="advertising-page__card-badge">3 дня</span>
-          </div>
-
-          <p className="advertising-page__lead">{INTRO_AD_PAGE_UI.DESCRIPTION}</p>
-
-          <div className="advertising-page__meta">
-            <div className="advertising-page__meta-item">
-              <span className="advertising-page__meta-label">Стоимость</span>
-              <span className="advertising-page__meta-value">{pricePoints} баллов</span>
+            <div className="advertising-page__card-head">
+              <h2 className="advertising-page__card-title">
+                {INTRO_AD_PAGE_UI.CARD_TITLE}
+              </h2>
+              <span className="advertising-page__card-badge">3 дня</span>
             </div>
-            <div className="advertising-page__meta-item">
-              <span className="advertising-page__meta-label">Срок</span>
-              <span className="advertising-page__meta-value">3 дня</span>
+
+            <p className="advertising-page__lead">{INTRO_AD_PAGE_UI.DESCRIPTION}</p>
+
+            <div className="advertising-page__meta">
+              <div className="advertising-page__meta-item">
+                <span className="advertising-page__meta-label">Стоимость</span>
+                <span className="advertising-page__meta-value">
+                  {pricePoints} баллов
+                </span>
+              </div>
+              <div className="advertising-page__meta-item">
+                <span className="advertising-page__meta-label">Срок</span>
+                <span className="advertising-page__meta-value">3 дня</span>
+              </div>
             </div>
-          </div>
 
-          {campaign ? (
-            <div className={resolveStatusPanelClass(campaign.status)}>
-              <p className="advertising-page__status-text">
-                {resolveCampaignStatusLabel(campaign.status)}
-              </p>
-              {canCancel ? (
-                <button
-                  type="button"
-                  className="app-btn app-btn--cancel"
-                  onClick={handleCancel}
-                  disabled={isSubmitting}
-                >
-                  {INTRO_AD_PAGE_UI.CANCEL}
-                </button>
-              ) : null}
-            </div>
-          ) : null}
-
-          {!hasOpenCampaign && !showForm ? (
-            <button
-              type="button"
-              className="app-btn app-btn--primary"
-              onClick={() => setShowForm(true)}
-            >
-              {INTRO_AD_PAGE_UI.OPEN_FORM}
-            </button>
-          ) : null}
-
-          {!hasOpenCampaign && showForm ? (
-            <div className="advertising-page__panel">
-              <p className="advertising-page__panel-title">Заявка на intro</p>
-              <form className="advertising-page__form" onSubmit={handleSubmit}>
-                <label className="advertising-page__field">
-                  Видео
-                  <IntroVideoUploadField
-                    value={form.videoMp4Url}
-                    onChange={(value) => updateField("videoMp4Url", value)}
-                    disabled={isSubmitting}
-                  />
-                </label>
-                <ImageUrlField
-                  label="Poster"
-                  value={form.posterUrl}
-                  onChange={(value) => updateField("posterUrl", value)}
-                />
-                <label className="advertising-page__field">
-                  {INTRO_AD_PAGE_UI.LABEL_FALLBACK_TITLE}
-                  <input
-                    className="advertising-page__input"
-                    value={form.fallbackTitle}
-                    onChange={(event) => updateField("fallbackTitle", event.target.value)}
-                  />
-                </label>
-                <label className="advertising-page__field">
-                  {INTRO_AD_PAGE_UI.LABEL_FALLBACK_HINT}
-                  <input
-                    className="advertising-page__input"
-                    value={form.fallbackHint}
-                    onChange={(event) => updateField("fallbackHint", event.target.value)}
-                  />
-                </label>
-                <fieldset className="advertising-page__timing">
-                  <legend className="advertising-page__timing-legend">
-                    {INTRO_AD_PAGE_UI.SECTION_TIMING}
-                  </legend>
-                  <p className="advertising-page__timing-hint">
-                    {INTRO_AD_PAGE_UI.TIMING_HINT}
-                  </p>
-                  <div className="advertising-page__timing-grid">
-                    <label className="advertising-page__field">
-                      {INTRO_AD_PAGE_UI.LABEL_MIN_MS}
-                      <input
-                        className="advertising-page__input"
-                        type="number"
-                        min={500}
-                        max={30000}
-                        step={100}
-                        value={form.minMs}
-                        onChange={(event) => updateField("minMs", event.target.value)}
-                      />
-                    </label>
-                    <label className="advertising-page__field">
-                      {INTRO_AD_PAGE_UI.LABEL_MAX_MS}
-                      <input
-                        className="advertising-page__input"
-                        type="number"
-                        min={1000}
-                        max={60000}
-                        step={100}
-                        value={form.maxMs}
-                        onChange={(event) => updateField("maxMs", event.target.value)}
-                      />
-                    </label>
-                    <label className="advertising-page__field">
-                      {INTRO_AD_PAGE_UI.LABEL_FADE_MS}
-                      <input
-                        className="advertising-page__input"
-                        type="number"
-                        min={100}
-                        max={2000}
-                        step={50}
-                        value={form.fadeOutMs}
-                        onChange={(event) => updateField("fadeOutMs", event.target.value)}
-                      />
-                    </label>
-                  </div>
-                </fieldset>
-                {actionError ? (
-                  <p className="advertising-page__error" role="alert">
-                    {actionError}
-                  </p>
-                ) : null}
-                <div className="advertising-page__actions">
+            {campaign ? (
+              <div className={resolveStatusPanelClass(campaign.status)}>
+                <p className="advertising-page__status-text">
+                  {resolveCampaignStatusLabel(campaign.status)}
+                </p>
+                {canCancel ? (
                   <button
                     type="button"
-                    className="app-btn app-btn--secondary"
-                    onClick={handlePreview}
+                    className="app-btn app-btn--cancel"
+                    onClick={handleCancel}
                     disabled={isSubmitting}
                   >
-                    {INTRO_AD_PAGE_UI.PREVIEW}
+                    {INTRO_AD_PAGE_UI.CANCEL}
                   </button>
-                  <button
-                    type="submit"
-                    className="app-btn app-btn--primary"
-                    disabled={isSubmitting || loyaltyBalance < pricePoints}
-                  >
-                    {INTRO_AD_PAGE_UI.SUBMIT}
-                  </button>
-                </div>
-              </form>
-            </div>
-          ) : null}
+                ) : null}
+              </div>
+            ) : null}
 
-          {feedback ? (
-            <p className="advertising-page__feedback" role="status">
-              {feedback}
-            </p>
-          ) : null}
-        </article>
+            {!hasOpenCampaign && !showForm ? (
+              <button
+                type="button"
+                className="app-btn app-btn--primary"
+                onClick={() => setShowForm(true)}
+              >
+                {INTRO_AD_PAGE_UI.OPEN_FORM}
+              </button>
+            ) : null}
+
+            {!hasOpenCampaign && showForm ? (
+              <div className="advertising-page__panel">
+                <p className="advertising-page__panel-title">Заявка на intro</p>
+                <form className="advertising-page__form" onSubmit={handleSubmit}>
+                  <label className="advertising-page__field">
+                    Видео
+                    <IntroVideoUploadField
+                      value={form.videoMp4Url}
+                      onChange={(value) => updateField("videoMp4Url", value)}
+                      disabled={isSubmitting}
+                    />
+                  </label>
+                  <ImageUrlField
+                    label="Poster"
+                    value={form.posterUrl}
+                    onChange={(value) => updateField("posterUrl", value)}
+                  />
+                  <label className="advertising-page__field">
+                    {INTRO_AD_PAGE_UI.LABEL_FALLBACK_TITLE}
+                    <input
+                      className="advertising-page__input"
+                      value={form.fallbackTitle}
+                      onChange={(event) =>
+                        updateField("fallbackTitle", event.target.value)
+                      }
+                    />
+                  </label>
+                  <label className="advertising-page__field">
+                    {INTRO_AD_PAGE_UI.LABEL_FALLBACK_HINT}
+                    <input
+                      className="advertising-page__input"
+                      value={form.fallbackHint}
+                      onChange={(event) =>
+                        updateField("fallbackHint", event.target.value)
+                      }
+                    />
+                  </label>
+                  <fieldset className="advertising-page__timing">
+                    <legend className="advertising-page__timing-legend">
+                      {INTRO_AD_PAGE_UI.SECTION_TIMING}
+                    </legend>
+                    <p className="advertising-page__timing-hint">
+                      {INTRO_AD_PAGE_UI.TIMING_HINT}
+                    </p>
+                    <div className="advertising-page__timing-grid">
+                      <label className="advertising-page__field">
+                        {INTRO_AD_PAGE_UI.LABEL_MIN_MS}
+                        <input
+                          className="advertising-page__input"
+                          type="number"
+                          min={500}
+                          max={30000}
+                          step={100}
+                          value={form.minMs}
+                          onChange={(event) => updateField("minMs", event.target.value)}
+                        />
+                      </label>
+                      <label className="advertising-page__field">
+                        {INTRO_AD_PAGE_UI.LABEL_MAX_MS}
+                        <input
+                          className="advertising-page__input"
+                          type="number"
+                          min={1000}
+                          max={60000}
+                          step={100}
+                          value={form.maxMs}
+                          onChange={(event) => updateField("maxMs", event.target.value)}
+                        />
+                      </label>
+                      <label className="advertising-page__field">
+                        {INTRO_AD_PAGE_UI.LABEL_FADE_MS}
+                        <input
+                          className="advertising-page__input"
+                          type="number"
+                          min={100}
+                          max={2000}
+                          step={50}
+                          value={form.fadeOutMs}
+                          onChange={(event) =>
+                            updateField("fadeOutMs", event.target.value)
+                          }
+                        />
+                      </label>
+                    </div>
+                  </fieldset>
+                  {actionError ? (
+                    <p className="advertising-page__error" role="alert">
+                      {actionError}
+                    </p>
+                  ) : null}
+                  <div className="advertising-page__actions">
+                    <button
+                      type="button"
+                      className="app-btn app-btn--secondary"
+                      onClick={handlePreview}
+                      disabled={isSubmitting}
+                    >
+                      {INTRO_AD_PAGE_UI.PREVIEW}
+                    </button>
+                    <button
+                      type="submit"
+                      className="app-btn app-btn--primary"
+                      disabled={isSubmitting || loyaltyBalance < pricePoints}
+                    >
+                      {INTRO_AD_PAGE_UI.SUBMIT}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            ) : null}
+
+            {feedback ? (
+              <p className="advertising-page__feedback" role="status">
+                {feedback}
+              </p>
+            ) : null}
+          </article>
         )}
 
         <SellerPersonalCategoryAdvertisingSection

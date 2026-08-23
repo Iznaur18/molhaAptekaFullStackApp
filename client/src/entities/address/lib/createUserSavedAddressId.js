@@ -3,7 +3,19 @@
  */
 export function createUserSavedAddressId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-    return crypto.randomUUID();
+    try {
+      return crypto.randomUUID();
+    } catch {
+      // insecure context (LAN HTTP)
+    }
   }
-  return `addr_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+
+  const randomPart =
+    typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function"
+      ? Array.from(crypto.getRandomValues(new Uint8Array(8)), (byte) =>
+          byte.toString(16).padStart(2, "0"),
+        ).join("")
+      : Math.random().toString(36).slice(2, 10);
+
+  return `addr_${Date.now().toString(36)}_${randomPart}`;
 }

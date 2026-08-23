@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { invalidateAllProductCategoryDisplayQueries } from "../../../entities/product-category-display/lib/productCategoryDisplayQueryCache.js";
 import { invalidateDataConfirmationStatus } from "../../../entities/user-data-confirmation/lib/dataConfirmationQueryCache.js";
 import { invalidatePendingDataConfirmationRequests } from "../../../entities/user-data-confirmation/lib/pendingDataConfirmationQueryCache.js";
-import { invalidateLoyaltyPointsStatus } from "../../../entities/user/lib/loyaltyPointsQueryCache.js";
+import { invalidateLoyaltyPointsBalances } from "../../../entities/user/lib/loyaltyPointsQueryCache.js";
 import { invalidatePremiumStatus } from "../../../entities/user/lib/premiumQueryCache.js";
 import { invalidateUsersSearch } from "../../../entities/user/lib/usersSearchQueryCache.js";
 import { syncUserProfileActionCaches } from "../lib/staffBadgeQueryCache.js";
@@ -23,7 +23,7 @@ export function useHomeQueryRefreshers() {
   const refreshPremiumAndLoyaltyStatus = useCallback(async () => {
     await Promise.all([
       invalidatePremiumStatus(queryClient),
-      invalidateLoyaltyPointsStatus(queryClient),
+      invalidateLoyaltyPointsBalances(queryClient),
     ]);
   }, [queryClient]);
 

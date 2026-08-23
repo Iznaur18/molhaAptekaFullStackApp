@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
+  buildLegacyClearUserAddresses,
   buildLegacyVerifiedUserAddresses,
   mapStoredUserSavedAddressItem,
 } from "../services/user/buildLegacyVerifiedUserAddresses.js";
@@ -60,5 +61,26 @@ describe("buildLegacyVerifiedUserAddresses", () => {
     });
     assert.equal(mapped.id, "legacy-default");
     assert.equal(mapped.line, "A");
+  });
+
+  it("clear legacy removes only default when multiple stored", () => {
+    const existing = [
+      { id: "home", label: "Дом", line: "Домашний", flat: "1", isDefault: true },
+      { id: "work", label: "Работа", line: "Офис", flat: "5", isDefault: false },
+    ];
+
+    const next = buildLegacyClearUserAddresses(existing);
+
+    assert.equal(next.length, 1);
+    assert.equal(next[0].id, "work");
+    assert.equal(next[0].line, "Офис");
+    assert.equal(next[0].isDefault, true);
+  });
+
+  it("clear legacy wipes all when single address", () => {
+    const next = buildLegacyClearUserAddresses([
+      { id: "home", line: "Домашний", isDefault: true },
+    ]);
+    assert.deepEqual(next, []);
   });
 });

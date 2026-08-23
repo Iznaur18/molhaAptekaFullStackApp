@@ -338,6 +338,7 @@ export const restoreProductStockOnItemCancelled = async (
   productId,
   quantity,
   previousItemStatus,
+  session = null,
 ) => {
   const qty = Math.max(0, Math.floor(Number(quantity)) || 0);
   if (qty === 0) {
@@ -345,9 +346,11 @@ export const restoreProductStockOnItemCancelled = async (
   }
 
   if (previousItemStatus === ORDER_STATUS_CONFIRMED) {
-    await ProductModel.findByIdAndUpdate(productId, {
-      $inc: { productStockQuantity: qty },
-    });
+    await ProductModel.findByIdAndUpdate(
+      productId,
+      { $inc: { productStockQuantity: qty } },
+      session ? { session } : {},
+    );
   }
 };
 

@@ -21,6 +21,7 @@ export type CreateOrderPayload = {
   paymentMethod: OrderPaymentMethod;
   priceOfferId?: string;
   affiliateCode?: string;
+  pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
   idempotencyKey: string;
 };
 

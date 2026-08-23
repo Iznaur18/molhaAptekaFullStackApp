@@ -4,7 +4,7 @@ import Animated from "react-native-reanimated";
 
 import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
-import type { CheckoutPickupLocation } from "@/entities/cart/lib/buildCheckoutPickupLocations";
+import type { CheckoutProductPickupGroup } from "@/entities/cart/lib/buildCheckoutPickupLocations";
 import { CheckoutForm } from "@/features/checkout/ui/CheckoutForm";
 import { CHECKOUT_FORM_UI, CART_PAGE_UI } from "@/shared/config";
 import { useAdminEditModalAnimation } from "@/shared/model/useAdminEditModalAnimation";
@@ -15,7 +15,7 @@ import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdr
 type CheckoutSheetModalProps = {
   visible: boolean;
   defaultUser?: Record<string, unknown> | null;
-  pickupLocations?: CheckoutPickupLocation[];
+  pickupGroups?: CheckoutProductPickupGroup[];
   deliveryAvailable?: boolean;
   pickupAvailable?: boolean;
   isSubmitting: boolean;
@@ -28,13 +28,14 @@ type CheckoutSheetModalProps = {
     deliveryAddress: string;
     deliveryAddressFlat: string;
     paymentMethod: OrderPaymentMethod;
+    pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
   }) => void | Promise<void>;
 };
 
 export const CheckoutSheetModal = ({
   visible,
   defaultUser,
-  pickupLocations = [],
+  pickupGroups = [],
   deliveryAvailable = false,
   pickupAvailable = true,
   isSubmitting,
@@ -90,7 +91,7 @@ export const CheckoutSheetModal = ({
             <CheckoutForm
               key={defaultUser?._id != null ? String(defaultUser._id) : "guest"}
               defaultUser={defaultUser}
-              pickupLocations={pickupLocations}
+              pickupGroups={pickupGroups}
               deliveryAvailable={deliveryAvailable}
               pickupAvailable={pickupAvailable}
               isSubmitting={isSubmitting}

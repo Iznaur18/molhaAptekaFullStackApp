@@ -530,11 +530,20 @@ export async function createOrder({
         throw new AppError(404, "Пользователь не найден");
       }
 
-      await CartModel.findOneAndUpdate(
-        { userId: new mongoose.Types.ObjectId(String(userId)) },
-        { $set: { items: {} } },
-        withMongoSession({ upsert: true }, session),
+      const cartUnset = Object.fromEntries(
+        pricedItems.map((item) => [
+          `items.${String(item.productId?._id ?? item.productId)}`,
+          "",
+        ]),
       );
+
+      if (Object.keys(cartUnset).length > 0) {
+        await CartModel.findOneAndUpdate(
+          { userId: new mongoose.Types.ObjectId(String(userId)) },
+          { $unset: cartUnset },
+          withMongoSession({ upsert: true }, session),
+        );
+      }
 
       const promoProductIds = collectOrderedProductIdsWithPromo(pricedItems);
       if (promoProductIds.length > 0) {

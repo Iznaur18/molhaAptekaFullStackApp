@@ -83,38 +83,44 @@ export async function resolveProductPickupWriteFields(body, options = {}) {
   }
 
   const locations = normalizeProductPickupLocationsInput(locationsInput);
-  const legacy = syncLegacyPickupFieldsFromLocations(locations);
+  const fallbackRegionCode = options.fallbackRegionCode ?? body?.productRegionCode;
 
-  const saleLocation = await resolveProductSaleLocation({
-    address: legacy.productPickupAddress,
-    lat: legacy.productPickupLat,
-    lon: legacy.productPickupLon,
-    fallbackRegionCode: options.fallbackRegionCode ?? body?.productRegionCode,
-  });
-
-  const productPickupLocations = locations.map((item) => {
-    if (item.isDefault) {
+  const verifiedLocations = await Promise.all(
+    locations.map(async (item) => {
+      const saleLocation = await resolveProductSaleLocation({
+        address: item.address,
+        lat: item.lat,
+        lon: item.lon,
+        fallbackRegionCode,
+      });
       return {
         ...item,
         address: saleLocation.productPickupAddress,
         lat: saleLocation.productPickupLat ?? item.lat,
         lon: saleLocation.productPickupLon ?? item.lon,
       };
-    }
-    return item;
+    }),
+  );
+
+  const synced = syncLegacyPickupFieldsFromLocations(verifiedLocations);
+  const defaultLocation =
+    verifiedLocations.find((item) => item.isDefault) ?? verifiedLocations[0];
+  const defaultSaleLocation = await resolveProductSaleLocation({
+    address: synced.productPickupAddress,
+    lat: synced.productPickupLat,
+    lon: synced.productPickupLon,
+    fallbackRegionCode,
   });
 
-  const synced = syncLegacyPickupFieldsFromLocations(productPickupLocations);
-
   return {
-    productPickupLocations,
+    productPickupLocations: verifiedLocations,
     productPickupAddress: synced.productPickupAddress,
     productPickupLat: synced.productPickupLat,
     productPickupLon: synced.productPickupLon,
     productPickupLocation:
-      saleLocation.productPickupLocation ??
+      defaultSaleLocation.productPickupLocation ??
       buildProductPickupLocation(synced.productPickupLat, synced.productPickupLon),
-    productRegionCode: saleLocation.productRegionCode,
+    productRegionCode: defaultSaleLocation.productRegionCode,
   };
 }
 

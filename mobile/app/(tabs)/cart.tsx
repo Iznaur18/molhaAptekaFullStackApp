@@ -11,7 +11,7 @@ import {
 } from "@molha/api-contract";
 import { isProductBuyNFreeActive } from "@izibuy/shared-lib";
 
-import { buildCheckoutPickupLocations } from "@/entities/cart/lib/buildCheckoutPickupLocations";
+import { buildCheckoutPickupGroups } from "@/entities/cart/lib/buildCheckoutPickupLocations";
 import { getCartLineExclusionReason } from "@/entities/cart/lib/getCartLineExclusionReason";
 import { groupCartLinesByFulfillment } from "@/entities/cart/lib/groupCartLinesByFulfillment";
 import { selectCartCheckoutSummary } from "@/entities/cart/lib/selectCartCheckoutSummary";
@@ -184,14 +184,14 @@ export default function CartScreen() {
 
   const canCheckoutActive = activeSummary.selectedLines.length > 0;
 
-  const pickupLocations = useMemo(() => {
+  const pickupGroups = useMemo(() => {
     if (auctionCheckoutBid) {
       const product = (productsQuery.products ?? []).find(
         (item) => String(item._id) === String(auctionCheckoutBid.productId),
       );
-      return buildCheckoutPickupLocations([{ product }]);
+      return buildCheckoutPickupGroups([{ product }]);
     }
-    return buildCheckoutPickupLocations(activeSummary.selectedLines);
+    return buildCheckoutPickupGroups(activeSummary.selectedLines);
   }, [auctionCheckoutBid, activeSummary.selectedLines, productsQuery.products]);
 
   const deliveryAvailable = useMemo(() => {
@@ -246,6 +246,7 @@ export default function CartScreen() {
     deliveryAddress: string;
     deliveryAddressFlat: string;
     paymentMethod: OrderPaymentMethod;
+    pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
   }) => {
     if (!auctionCheckoutBid) {
       return;
@@ -259,6 +260,7 @@ export default function CartScreen() {
         deliveryAddress: payload.deliveryAddress,
         deliveryAddressFlat: payload.deliveryAddressFlat,
         paymentMethod: payload.paymentMethod,
+        pickupSelections: payload.pickupSelections,
       });
       setAuctionCheckoutBid(null);
       setSubmitState({ isSubmitting: false, error: "", success: CART_AUCTION_UI.ORDER_PLACED });
@@ -282,6 +284,7 @@ export default function CartScreen() {
     deliveryAddress: string;
     deliveryAddressFlat: string;
     paymentMethod: OrderPaymentMethod;
+    pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
   }) => {
     setSubmitState({ isSubmitting: true, error: "", success: "" });
     const orderedProductIds = activeSummary.selectedLines.map((line) => line.productId);
@@ -295,6 +298,7 @@ export default function CartScreen() {
         deliveryAddress: payload.deliveryAddress,
         deliveryAddressFlat: payload.deliveryAddressFlat,
         paymentMethod: payload.paymentMethod,
+        pickupSelections: payload.pickupSelections,
       });
       await removeItems(orderedProductIds);
       setCheckoutSection(null);
@@ -437,7 +441,7 @@ export default function CartScreen() {
       <CheckoutSheetModal
         visible={checkoutSection != null}
         defaultUser={sessionQuery.data?.user}
-        pickupLocations={pickupLocations}
+        pickupGroups={pickupGroups}
         deliveryAvailable={deliveryAvailable}
         pickupAvailable={pickupAvailable}
         isSubmitting={submitState.isSubmitting}
@@ -451,7 +455,7 @@ export default function CartScreen() {
       <CheckoutSheetModal
         visible={auctionCheckoutBid != null}
         defaultUser={sessionQuery.data?.user}
-        pickupLocations={pickupLocations}
+        pickupGroups={pickupGroups}
         deliveryAvailable={deliveryAvailable}
         pickupAvailable={pickupAvailable}
         isSubmitting={submitState.isSubmitting}

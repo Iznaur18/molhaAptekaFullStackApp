@@ -1,4 +1,6 @@
 import ProductCategoryDisplayModel from "../models/ProductCategoryDisplayModel.js";
+import { IntroAdCampaignModel } from "../models/IntroAdCampaignModel.js";
+import { SiteHeaderBannerCampaignModel } from "../models/SiteHeaderBannerCampaignModel.js";
 import {
   AffiliateLedgerEntryModel,
   MoneyIdempotencyRecordModel,
@@ -11,8 +13,13 @@ import { logServerEvent } from "../utils/logServerEvent.js";
 
 /**
  * Пересоздаёт индексы моделей, у которых в схеме менялись ОПЦИИ индексов,
- * или которые критичны для идемпотентности денег (prod: autoIndex=false).
+ * или которые критичны для идемпотентности денег.
  * Также снимает stale unique (пример: pendingTokenHash_1 → E11000 на null).
+ *
+ * `autoIndex` мы НЕ выключаем (mongoose создаёт индексы сам) — иначе на
+ * свежей проде не появились бы partial-unique индексы рекламных кампаний,
+ * а на них держится защита от двойного резерва баллов. Этот список —
+ * явная страховка для денежных моделей, а не замена autoIndex.
  */
 async function syncModelIndexes(model, modelName) {
   try {
@@ -38,4 +45,8 @@ export async function syncCriticalIndexes() {
   await syncModelIndexes(MoneyIdempotencyRecordModel, "MoneyIdempotencyRecord");
   await syncModelIndexes(AffiliateLedgerEntryModel, "AffiliateLedgerEntry");
   await syncModelIndexes(ProductPriceOfferModel, "ProductPriceOffer");
+  // Partial-unique по advertiserId: не даёт завести вторую открытую кампанию
+  // и, как следствие, зарезервировать баллы дважды.
+  await syncModelIndexes(IntroAdCampaignModel, "IntroAdCampaign");
+  await syncModelIndexes(SiteHeaderBannerCampaignModel, "SiteHeaderBannerCampaign");
 }

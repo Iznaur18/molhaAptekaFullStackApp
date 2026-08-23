@@ -47,7 +47,9 @@ function parseStoredResult(resultJson) {
  *   scope: string;
  *   actorUserId: string;
  *   idempotencyKey: unknown;
- *   execute: () => Promise<Record<string, unknown>>;
+ *   execute: (ctx: {
+ *     storePartial: (partial: Record<string, unknown>) => Promise<void>;
+ *   }) => Promise<Record<string, unknown>>;
  * }} input
  */
 export async function runMoneyIdempotentMutation({
@@ -87,8 +89,20 @@ export async function runMoneyIdempotentMutation({
     throw new AppError(409, MONEY_IDEMPOTENCY_IN_PROGRESS_MESSAGE);
   }
 
+  const storePartial = async (partial) => {
+    const { duplicate: _ignored, ...toStore } = partial ?? {};
+    await MoneyIdempotencyRecordModel.updateOne(filter, {
+      $set: { resultJson: JSON.stringify(toStore) },
+    });
+    logMoneyEvent("info", "idempotent_partial", {
+      scope,
+      userId: actorId,
+      idempotencyKey: key,
+    });
+  };
+
   try {
-    const result = await execute();
+    const result = await execute({ storePartial });
     const { duplicate: _ignored, ...toStore } = result ?? {};
     await MoneyIdempotencyRecordModel.updateOne(filter, {
       $set: { resultJson: JSON.stringify(toStore) },
@@ -100,7 +114,12 @@ export async function runMoneyIdempotentMutation({
     });
     return result;
   } catch (error) {
-    await MoneyIdempotencyRecordModel.deleteOne(filter);
+    const existing = await MoneyIdempotencyRecordModel.findOne(filter)
+      .select("resultJson")
+      .lean();
+    if (!existing?.resultJson) {
+      await MoneyIdempotencyRecordModel.deleteOne(filter);
+    }
     logMoneyFailure(
       "idempotent",
       { scope, userId: actorId, idempotencyKey: key },

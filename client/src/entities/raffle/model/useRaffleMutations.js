@@ -9,7 +9,7 @@ import { patchRaffleByStaff } from "../api/patchRaffleByStaff.js";
 import { pauseMyRaffle } from "../api/pauseMyRaffle.js";
 import { rejectRaffle } from "../api/rejectRaffle.js";
 import { setProductRaffleParticipation } from "../api/setProductRaffleParticipation.js";
-import { loyaltyPointsQueryKeys } from "../../../entities/user/model/loyaltyPointsQueryKeys.js";
+import { invalidateLoyaltyPointsBalances } from "../../../entities/user/lib/loyaltyPointsQueryCache.js";
 import {
   invalidateAllRaffleQueries,
   invalidateMyRaffle,
@@ -47,8 +47,10 @@ export function useRaffleMutations() {
     mutationFn: deleteMyRaffle,
     onSuccess: () => {
       void invalidateMyRaffle(queryClient);
-      void queryClient.invalidateQueries({ queryKey: raffleQueryKeys.createAdvertising() });
-      void queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.all });
+      void queryClient.invalidateQueries({
+        queryKey: raffleQueryKeys.createAdvertising(),
+      });
+      void invalidateLoyaltyPointsBalances(queryClient);
       invalidateRaffles();
     },
   });

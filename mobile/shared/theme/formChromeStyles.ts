@@ -503,6 +503,35 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     lineHeight: 17,
     color: theme.colors.link,
   },
+  pickupGroup: {
+    gap: 8,
+    marginBottom: 12,
+  },
+  pickupSelectLabel: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.textMuted,
+  },
+  pickupOptions: {
+    gap: 8,
+  },
+  pickupOption: {
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radii.md,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 2,
+  },
+  pickupOptionActive: {
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.actionSoft,
+  },
+  pickupOptionLabel: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+  },
   legend: {
     fontSize: 14,
     fontWeight: "600",

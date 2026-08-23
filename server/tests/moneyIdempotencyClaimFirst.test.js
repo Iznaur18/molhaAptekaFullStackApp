@@ -166,3 +166,39 @@ test("claim-first: execute failure releases claim for retry", async () => {
   assert.equal(executions, 2);
   assert.deepEqual(recovered, { credited: 5 });
 });
+
+test("claim-first: side-effect persisted before post-step failure replays without re-execute", async () => {
+  const scope = "test_order_partial";
+  const actorUserId = actorId();
+  const idempotencyKey = "key-partial-order";
+  let executions = 0;
+
+  await assert.rejects(
+    () =>
+      runMoneyIdempotentMutation({
+        scope,
+        actorUserId,
+        idempotencyKey,
+        execute: async ({ storePartial }) => {
+          executions += 1;
+          await storePartial({ orderId: "order-partial-1" });
+          throw new Error("POPULATE_FAILED");
+        },
+      }),
+    (error) => error instanceof Error && error.message === "POPULATE_FAILED",
+  );
+
+  const replay = await runMoneyIdempotentMutation({
+    scope,
+    actorUserId,
+    idempotencyKey,
+    execute: async () => {
+      executions += 1;
+      return { orderId: "order-partial-2" };
+    },
+  });
+
+  assert.equal(executions, 1);
+  assert.equal(replay.duplicate, true);
+  assert.equal(replay.orderId, "order-partial-1");
+});

@@ -10,24 +10,28 @@ import {
 
 import { addressValueFromUser } from "@/entities/address/lib/addressValueFromUser";
 import { validateRuDeliveryAddressForm } from "@/entities/address/lib/validateRuDeliveryAddressForm";
-import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
 import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import {
   ORDER_PAYMENT_METHOD_DEFAULT,
   type OrderPaymentMethod,
 } from "@/entities/order/model/constants";
 import type { RuDeliveryAddressValue } from "@/entities/address/model/types";
+import {
+  buildPickupSelectionsPayload,
+  resolveInitialPickupSelections,
+  type CheckoutProductPickupGroup,
+} from "@/entities/cart/lib/buildCheckoutPickupLocations";
 import { CHECKOUT_FORM_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useCheckoutFormStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 import { CheckoutPaymentMethodPicker } from "@/features/checkout/ui/CheckoutPaymentMethodPicker";
 import { CheckoutShippingProviderPicker } from "@/features/checkout/ui/CheckoutShippingProviderPicker";
-import type { CheckoutPickupLocation } from "@/entities/cart/lib/buildCheckoutPickupLocations";
+import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
 
 type CheckoutFormProps = {
   defaultUser?: Record<string, unknown> | null;
-  pickupLocations?: CheckoutPickupLocation[];
+  pickupGroups?: CheckoutProductPickupGroup[];
   deliveryAvailable?: boolean;
   pickupAvailable?: boolean;
   isSubmitting: boolean;
@@ -41,12 +45,13 @@ type CheckoutFormProps = {
     deliveryAddress: string;
     deliveryAddressFlat: string;
     paymentMethod: OrderPaymentMethod;
+    pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
   }) => void | Promise<void>;
 };
 
 export const CheckoutForm = ({
   defaultUser,
-  pickupLocations = [],
+  pickupGroups = [],
   deliveryAvailable = false,
   pickupAvailable = true,
   isSubmitting,
@@ -70,6 +75,13 @@ export const CheckoutForm = ({
     ORDER_PAYMENT_METHOD_DEFAULT,
   );
   const [localError, setLocalError] = useState("");
+  const [selectedPickupByProductId, setSelectedPickupByProductId] = useState<
+    Record<string, string>
+  >(() => resolveInitialPickupSelections(pickupGroups));
+
+  useEffect(() => {
+    setSelectedPickupByProductId(resolveInitialPickupSelections(pickupGroups));
+  }, [pickupGroups]);
 
   const deliverySelectable =
     PRODUCT_DELIVERY_FULFILLMENT_ENABLED && deliveryAvailable;
@@ -90,20 +102,8 @@ export const CheckoutForm = ({
   }, [deliverySelectable, pickupSelectable, fulfillmentMethod]);
 
   const isPickup = fulfillmentMethod === ORDER_FULFILLMENT_PICKUP;
-  const pickupPoints = useMemo(
-    () =>
-      (Array.isArray(pickupLocations) ? pickupLocations : [])
-        .map((item) => ({
-          address: String(item?.address ?? "").trim(),
-          productTitles: Array.isArray(item?.productTitles)
-            ? item.productTitles.map((title) => String(title ?? "").trim()).filter(Boolean)
-            : [],
-        }))
-        .filter((item) => item.address.length > 0),
-    [pickupLocations],
-  );
-  const pickupReady = pickupPoints.length > 0;
-  const showPickupTitles = pickupPoints.length > 1;
+  const pickupReady = pickupGroups.length > 0;
+  const showPickupTitles = pickupGroups.length > 1;
 
   const isAddressValid = useMemo(() => {
     if (isPickup) {
@@ -137,6 +137,7 @@ export const CheckoutForm = ({
         deliveryAddress: "",
         deliveryAddressFlat: "",
         paymentMethod,
+        pickupSelections: buildPickupSelectionsPayload(selectedPickupByProductId),
       });
       return;
     }
@@ -248,28 +249,68 @@ export const CheckoutForm = ({
             <Text style={checkoutStyles.fieldLabel}>{CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}</Text>
             {pickupReady ? (
               <>
-                {pickupPoints.length > 1 ? (
+                {pickupGroups.length > 1 ? (
                   <Text style={checkoutStyles.pickupHint}>{CHECKOUT_FORM_UI.PICKUP_MULTI_HINT}</Text>
                 ) : null}
                 <View style={checkoutStyles.pickupList}>
-                  {pickupPoints.map((point, index) => (
-                    <View
-                      key={`${point.address}-${index}`}
-                      style={checkoutStyles.pickupItem}
-                    >
-                      <View style={checkoutStyles.pickupIndex}>
-                        <Text style={checkoutStyles.pickupIndexText}>{index + 1}</Text>
-                      </View>
-                      <View style={checkoutStyles.pickupBody}>
-                        {showPickupTitles && point.productTitles.length > 0 ? (
-                          <Text style={checkoutStyles.pickupProducts}>
-                            {point.productTitles.join(", ")}
-                          </Text>
+                  {pickupGroups.map((group) => {
+                    const needsSelect = group.locations.length >= 2;
+                    const selectedId =
+                      selectedPickupByProductId[group.productId] ??
+                      group.locations.find((item) => item.isDefault)?.id ??
+                      group.locations[0]?.id;
+
+                    return (
+                      <View key={group.productId} style={checkoutStyles.pickupGroup}>
+                        {showPickupTitles && group.productTitle ? (
+                          <Text style={checkoutStyles.pickupProducts}>{group.productTitle}</Text>
                         ) : null}
-                        <Text style={checkoutStyles.pickupAddressText}>{point.address}</Text>
+                        {needsSelect ? (
+                          <>
+                            <Text style={checkoutStyles.pickupSelectLabel}>
+                              {CHECKOUT_FORM_UI.CHECKOUT_PICK_LOCATION}
+                            </Text>
+                            <View style={checkoutStyles.pickupOptions}>
+                              {group.locations.map((location) => {
+                                const active = selectedId === location.id;
+                                return (
+                                  <Pressable
+                                    key={location.id}
+                                    disabled={isDisabled || isSubmitting}
+                                    accessibilityRole="radio"
+                                    accessibilityState={{ checked: active }}
+                                    onPress={() =>
+                                      setSelectedPickupByProductId((prev) => ({
+                                        ...prev,
+                                        [group.productId]: location.id,
+                                      }))
+                                    }
+                                    style={[
+                                      checkoutStyles.pickupOption,
+                                      active && checkoutStyles.pickupOptionActive,
+                                    ]}
+                                  >
+                                    {location.label ? (
+                                      <Text style={checkoutStyles.pickupOptionLabel}>
+                                        {location.label}
+                                      </Text>
+                                    ) : null}
+                                    <Text style={checkoutStyles.pickupAddressText}>
+                                      {location.address}
+                                    </Text>
+                                  </Pressable>
+                                );
+                              })}
+                            </View>
+                          </>
+                        ) : (
+                          <Text style={checkoutStyles.pickupAddressText}>
+                            {group.locations[0]?.address}
+                          </Text>
+                        )}
                       </View>
-                    </View>
-                  ))}
+                    );
+                  })}
                 </View>
               </>
             ) : (

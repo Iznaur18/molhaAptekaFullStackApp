@@ -10,6 +10,7 @@ import { useMySellerPersonalCategoryCampaignQuery } from "../../../entities/sell
 import { sellerPersonalCategoryQueryKeys } from "../../../entities/seller-personal-category/model/sellerPersonalCategoryQueryKeys.js";
 import { RuRegionSelect } from "../../../entities/region/ui/RuRegionSelect.jsx";
 import { loyaltyPointsQueryKeys } from "../../../entities/user/model/loyaltyPointsQueryKeys.js";
+import { invalidateLoyaltyPointsBalances } from "../../../entities/user/lib/loyaltyPointsQueryCache.js";
 import { SELLER_PERSONAL_CATEGORY_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { ImageUrlField } from "../../../shared/ui/ImageUrlField/ImageUrlField.jsx";
 
@@ -84,7 +85,7 @@ export function SellerPersonalCategoryAdvertisingSection({
         queryClient.invalidateQueries({
           queryKey: [...sellerPersonalCategoryQueryKeys.all, "catalog-tiles"],
         }),
-        queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.all }),
+        invalidateLoyaltyPointsBalances(queryClient),
       ]);
       setShowForm(false);
       setFeedback(SELLER_PERSONAL_CATEGORY_PAGE_UI.SUBMIT_SUCCESS);
@@ -98,7 +99,7 @@ export function SellerPersonalCategoryAdvertisingSection({
         queryClient.invalidateQueries({
           queryKey: sellerPersonalCategoryQueryKeys.myCampaign(),
         }),
-        queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.all }),
+        invalidateLoyaltyPointsBalances(queryClient),
       ]);
       setFeedback(SELLER_PERSONAL_CATEGORY_PAGE_UI.CANCEL_SUCCESS);
     },
@@ -166,7 +167,9 @@ export function SellerPersonalCategoryAdvertisingSection({
         <h2 className="advertising-page__card-title">
           {SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_TITLE}
         </h2>
-        <p className="advertising-page__state">{SELLER_PERSONAL_CATEGORY_PAGE_UI.LOADING}</p>
+        <p className="advertising-page__state">
+          {SELLER_PERSONAL_CATEGORY_PAGE_UI.LOADING}
+        </p>
       </article>
     );
   }
@@ -197,7 +200,9 @@ export function SellerPersonalCategoryAdvertisingSection({
         ) : null}
       </div>
 
-      <p className="advertising-page__lead">{SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_LEAD}</p>
+      <p className="advertising-page__lead">
+        {SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_LEAD}
+      </p>
 
       {showTariffQuote && selectedDuration ? (
         <div className="advertising-page__meta">
@@ -207,7 +212,9 @@ export function SellerPersonalCategoryAdvertisingSection({
           </div>
           <div className="advertising-page__meta-item">
             <span className="advertising-page__meta-label">Срок</span>
-            <span className="advertising-page__meta-value">{selectedDuration.title}</span>
+            <span className="advertising-page__meta-value">
+              {selectedDuration.title}
+            </span>
           </div>
         </div>
       ) : null}
@@ -219,7 +226,9 @@ export function SellerPersonalCategoryAdvertisingSection({
           </p>
           {isActiveCampaign ? (
             <p className="advertising-page__status-text">
-              {SELLER_PERSONAL_CATEGORY_PAGE_UI.STATUS_ACTIVE_UNTIL(campaign.activeUntil)}
+              {SELLER_PERSONAL_CATEGORY_PAGE_UI.STATUS_ACTIVE_UNTIL(
+                campaign.activeUntil,
+              )}
             </p>
           ) : null}
           {canCancel ? (

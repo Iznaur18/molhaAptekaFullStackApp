@@ -172,8 +172,10 @@ export function initRateLimitMiddlewares(store) {
   handlers.updateProfile = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "update_profile",
       windowMs: 60 * 60 * 1000,
       max: 120,
+      keyGenerator: rateLimitKeyByUserOrIp,
       message: {
         success: false,
         message: "Слишком много обновлений профиля. Попробуйте позже",
@@ -185,6 +187,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.vote = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "vote",
       windowMs: 60 * 60 * 1000,
       max: 110,
       message: {
@@ -198,6 +201,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.upload = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "upload",
       windowMs: 60 * 60 * 1000,
       max: 110,
       message: {
@@ -212,6 +216,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.orderCreate = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "order_create",
       windowMs: 60 * 60 * 1000,
       max: ORDER_CREATE_RATE_LIMIT_PER_HOUR,
       message: {
@@ -226,6 +231,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.orderItemAction = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "order_item_action",
       windowMs: 15 * 60 * 1000,
       max: ORDER_ITEM_ACTION_RATE_LIMIT_PER_15_MIN,
       message: {
@@ -240,6 +246,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.cartReplace = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "cart_replace",
       windowMs: 15 * 60 * 1000,
       max: 400,
       message: {
@@ -253,6 +260,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.favoritesReplace = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "favorites_replace",
       windowMs: 15 * 60 * 1000,
       max: 400,
       keyGenerator: rateLimitKeyByUserOrIp,
@@ -267,6 +275,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.productReport = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "product_report",
       windowMs: 60 * 60 * 1000,
       max: PRODUCT_REPORT_RATE_LIMIT_PER_HOUR,
       message: {
@@ -281,6 +290,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.userStoryReport = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "user_story_report",
       windowMs: 60 * 60 * 1000,
       max: USER_STORY_RATE_LIMIT_PER_HOUR,
       message: {
@@ -295,6 +305,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.userStoryCreate = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "user_story_create",
       windowMs: 60 * 60 * 1000,
       max: 30,
       message: {
@@ -309,6 +320,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.productPriceOffer = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "product_price_offer",
       windowMs: 60 * 60 * 1000,
       max: PRICE_OFFER_RATE_LIMIT_PER_HOUR,
       message: {
@@ -323,6 +335,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.userDataConfirmation = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "user_data_confirmation",
       windowMs: 60 * 60 * 1000,
       max: USER_DATA_CONFIRMATION_RATE_LIMIT_PER_HOUR,
       message: {
@@ -337,6 +350,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.emailVerificationResend = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "email_verification_resend",
       windowMs: 60 * 60 * 1000,
       max: EMAIL_VERIFICATION_RESEND_RATE_LIMIT_PER_HOUR,
       message: {
@@ -351,6 +365,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.productReview = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "product_review",
       windowMs: 60 * 60 * 1000,
       max: PRODUCT_REVIEW_RATE_LIMIT_PER_HOUR,
       message: {
@@ -365,6 +380,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.productQuestion = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "product_question",
       windowMs: 60 * 60 * 1000,
       max: PRODUCT_QUESTION_RATE_LIMIT_PER_HOUR,
       message: {
@@ -379,6 +395,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.productCompare = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "product_compare",
       windowMs: 15 * 60 * 1000,
       max: PRODUCT_COMPARE_RATE_LIMIT_PER_15_MIN,
       message: {
@@ -393,6 +410,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.addressSuggest = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "address_suggest",
       windowMs: 60 * 60 * 1000,
       max: ADDRESS_SUGGEST_RATE_LIMIT_PER_HOUR,
       message: {
@@ -407,6 +425,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.userSearch = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "user_search",
       windowMs: 15 * 60 * 1000,
       max: USER_SEARCH_RATE_LIMIT_PER_15_MIN,
       message: {
@@ -421,6 +440,7 @@ export function initRateLimitMiddlewares(store) {
   handlers.userPhoneReveal = buildLimiter(
     {
       ...RATE_LIMIT_DEFAULTS,
+      limiterName: "user_phone_reveal",
       windowMs: 60 * 60 * 1000,
       max: USER_PHONE_REVEAL_RATE_LIMIT_PER_HOUR,
       message: {
