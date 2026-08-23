@@ -30,7 +30,11 @@ import {
   assertOrderItemsWithinAvailableStock,
   guardOrderItemsStockInTransaction,
 } from "../product/productStock.js";
-import { resolveProductUnitPriceWithPromo, resolveBuyNFreeLineTotal, isProductBuyNFreeActive } from "@izibuy/shared-lib";
+import {
+  resolveProductUnitPriceWithPromo,
+  resolveBuyNFreeLineTotal,
+  isProductBuyNFreeActive,
+} from "@izibuy/shared-lib";
 import { resolveSelectedProductPickupLocation } from "../product/productPickupLocations.js";
 
 import { buildOrderStatusFromItems } from "./orderStatus.js";
@@ -84,10 +88,19 @@ const buildItemsWithPriceSnapshot = (
   promoByProductId = {},
   freeUnitsByProductId = {},
   pickupByProductId = null,
-) =>
-  items.map((item) => {
-    const snapshot = productById[String(item.productId)];
-    const promo = promoByProductId[String(item.productId)] ?? null;
+) => {
+  /**
+   * Бесплатные единицы — РАСХОДУЕМЫЙ бюджет на товар, а не флаг на строку.
+   * Раньше каждая строка читала мапу заново, и заказ с двумя строками одного
+   * productId получал две бесплатные единицы на один claim (totalAmount = 0).
+   * @type {Record<string, number>}
+   */
+  const freeUnitsBudget = { ...freeUnitsByProductId };
+
+  return items.map((item) => {
+    const productKey = String(item.productId);
+    const snapshot = productById[productKey];
+    const promo = promoByProductId[productKey] ?? null;
     const unitPrice = resolveProductUnitPriceWithPromo({
       productPrice: snapshot.price,
       productWholesaleEnabled: snapshot.wholesaleEnabled === true,
@@ -96,10 +109,12 @@ const buildItemsWithPriceSnapshot = (
       quantity: item.quantity,
       promoDiscountPercent: promo?.discountPercent ?? null,
     });
-    const freeUnitsRaw = Math.floor(
-      Number(freeUnitsByProductId[String(item.productId)] ?? 0) || 0,
+    const availableFreeUnits = Math.max(
+      0,
+      Math.floor(Number(freeUnitsBudget[productKey] ?? 0) || 0),
     );
-    const freeUnits = Math.min(Math.max(0, freeUnitsRaw), 1, item.quantity);
+    const freeUnits = Math.min(availableFreeUnits, 1, item.quantity);
+    freeUnitsBudget[productKey] = availableFreeUnits - freeUnits;
     const paidQuantity = Math.max(0, item.quantity - freeUnits);
     const loyalty = buildOrderLineLoyaltySnapshot({
       loyaltyPointsPerUnit: snapshot.loyaltyPointsPerUnit,
@@ -112,7 +127,7 @@ const buildItemsWithPriceSnapshot = (
       affiliateEnabled: snapshot.affiliateEnabled === true,
       affiliatePercent: snapshot.affiliatePercent,
     });
-    const pickup = pickupByProductId?.[String(item.productId)] ?? null;
+    const pickup = pickupByProductId?.[productKey] ?? null;
 
     return {
       productId: item.productId,
@@ -133,6 +148,7 @@ const buildItemsWithPriceSnapshot = (
       ...affiliate,
     };
   });
+};
 
 /**
  * @param {string[]} productIds
@@ -210,7 +226,11 @@ const assertProductsSupportPickup = (productById, productIds) => {
  * @param {string[]} productIds
  * @param {Array<{ productId?: unknown; pickupLocationId?: string }> | null | undefined} pickupSelections
  */
-const resolvePickupSelectionsByProductId = (productById, productIds, pickupSelections) => {
+const resolvePickupSelectionsByProductId = (
+  productById,
+  productIds,
+  pickupSelections,
+) => {
   /** @type {Map<string, string>} */
   const selectedIdByProduct = new Map();
   for (const row of Array.isArray(pickupSelections) ? pickupSelections : []) {
@@ -420,11 +440,14 @@ export async function createOrder({
       const orderId = new mongoose.Types.ObjectId();
       /** @type {Record<string, number>} */
       const freeUnitsByProductId = {};
+      /** Claim на товар пробуем ровно один раз, даже если строк с ним несколько. */
+      const claimAttemptedProductIds = new Set();
       for (const item of items) {
         const productId = String(item.productId);
-        if (freeUnitsByProductId[productId] != null) {
+        if (claimAttemptedProductIds.has(productId)) {
           continue;
         }
+        claimAttemptedProductIds.add(productId);
         const snapshot = productById[productId];
         if (
           !isProductBuyNFreeActive({
@@ -498,7 +521,11 @@ export async function createOrder({
         );
       }
 
-      const isUserUpdated = await appendOrderToBuyList(userId, createdOrder._id, session);
+      const isUserUpdated = await appendOrderToBuyList(
+        userId,
+        createdOrder._id,
+        session,
+      );
       if (!isUserUpdated) {
         throw new AppError(404, "Пользователь не найден");
       }

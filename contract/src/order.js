@@ -1,7 +1,11 @@
 import { z } from "zod";
 
 import { mongoIdSchema } from "./mongoId.js";
-import { optionalLimitQuery, optionalPageQuery, optionalTrimmedString } from "./queryHelpers.js";
+import {
+  optionalLimitQuery,
+  optionalPageQuery,
+  optionalTrimmedString,
+} from "./queryHelpers.js";
 import {
   ORDER_FULFILLMENT_PICKUP,
   orderFulfillmentMethodSchema,
@@ -31,11 +35,7 @@ const orderLineItemInputSchema = z.object({
 
 const orderPickupSelectionSchema = z.object({
   productId: mongoIdSchema,
-  pickupLocationId: z
-    .string()
-    .trim()
-    .min(1)
-    .max(PRODUCT_PICKUP_LOCATION_ID_MAX_LENGTH),
+  pickupLocationId: z.string().trim().min(1).max(PRODUCT_PICKUP_LOCATION_ID_MAX_LENGTH),
 });
 
 /** Тело `POST /order` (структура; DaData — отдельно на сервере для delivery). */
@@ -66,12 +66,7 @@ export const createOrderBodySchema = z
     paymentMethod: z.enum(ORDER_PAYMENT_METHODS),
     priceOfferId: mongoIdSchema.optional(),
     /** Код шарера (`referralCode`) из `?aff=` — last-click attribution. */
-    affiliateCode: z
-      .string()
-      .trim()
-      .toUpperCase()
-      .max(32)
-      .optional(),
+    affiliateCode: z.string().trim().toUpperCase().max(32).optional(),
     idempotencyKey: z
       .string({ required_error: "Укажите idempotencyKey" })
       .trim()
@@ -79,6 +74,37 @@ export const createOrderBodySchema = z
       .max(64),
   })
   .superRefine((body, ctx) => {
+    // Одна строка на товар. Дубликаты productId ломали снапшот buy-N-free
+    // (одна claim'ленная бесплатная единица применялась к каждой строке),
+    // а также размывали оптовые пороги. Клиенты всегда шлют корзину,
+    // сгруппированную по productId.
+    const seenProductIds = new Set();
+    for (const [index, item] of body.items.entries()) {
+      const productId = String(item.productId);
+      if (seenProductIds.has(productId)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["items", index, "productId"],
+          message:
+            "Товар указан в заказе дважды — объедините количество в одну позицию",
+        });
+      }
+      seenProductIds.add(productId);
+    }
+
+    const seenPickupProductIds = new Set();
+    for (const [index, row] of (body.pickupSelections ?? []).entries()) {
+      const productId = String(row.productId);
+      if (seenPickupProductIds.has(productId)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["pickupSelections", index, "productId"],
+          message: "Для товара указано несколько точек самовывоза",
+        });
+      }
+      seenPickupProductIds.add(productId);
+    }
+
     if (body.fulfillmentMethod === "delivery") {
       const line = String(body.deliveryAddress ?? "").trim();
       if (!line) {
@@ -188,7 +214,8 @@ export const getMySalesQuerySchema = z.object({
   ),
   productIds: optionalTrimmedString
     .refine(
-      (value) => value === undefined || value.length <= MY_SALES_PRODUCT_IDS_QUERY_MAX_LENGTH,
+      (value) =>
+        value === undefined || value.length <= MY_SALES_PRODUCT_IDS_QUERY_MAX_LENGTH,
       `productIds не длиннее ${MY_SALES_PRODUCT_IDS_QUERY_MAX_LENGTH} символов`,
     )
     .superRefine((value, ctx) => {

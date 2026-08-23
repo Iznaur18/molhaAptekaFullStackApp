@@ -1,7 +1,7 @@
 import { RAFFLE_CREATE_PRICE_POINTS } from "../../constants/raffleConstants.js";
 import { AppError } from "../../errors/AppError.js";
 import { RaffleModel, UserModel } from "../../models/index.js";
-import { runInTransaction } from "../../utils/mongoTransaction.js";
+import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
 import {
   chargeReservedLoyaltyPoints,
   releaseLoyaltyPointsReservation,
@@ -157,30 +157,49 @@ export const unlockRaffleCreate = async ({ sellerId }) => {
   }
 
   try {
-    const loyaltyPointsBalance = await runInTransaction(async (session) => {
+    const outcome = await runInTransaction(async (session) => {
       await reserveLoyaltyPoints({
         userId: sellerId,
         amount: RAFFLE_CREATE_PRICE_POINTS,
         session,
       });
 
-      await UserModel.updateOne(
-        { _id: sellerId },
+      // Условный $set — точка сериализации. Раньше здесь был безусловный
+      // updateOne, а проверка hasRaffleCreateUnlock читалась ВНЕ транзакции:
+      // два параллельных запроса оба проходили read-check и резервировали
+      // баллы дважды, а cancel освобождал только один раз → баллы навсегда
+      // зависали в userLoyaltyPointsReserved.
+      const claimed = await UserModel.findOneAndUpdate(
+        { _id: sellerId, raffleCreateUnlockAt: { $not: { $type: "date" } } },
         { $set: { raffleCreateUnlockAt: new Date() } },
-        { session },
-      );
+        withMongoSession({ returnDocument: "after" }, session),
+      ).lean();
 
-      return getSellerLoyaltyPointsAvailable(
-        await UserModel.findById(sellerId)
-          .select("userLoyaltyPoints userLoyaltyPointsReserved")
-          .session(session)
-          .lean(),
-      );
+      if (!claimed) {
+        // Конкурент оплатил разблокировку первым — наш резерв лишний.
+        await releaseLoyaltyPointsReservation({
+          userId: sellerId,
+          amount: RAFFLE_CREATE_PRICE_POINTS,
+          session,
+        });
+      }
+
+      const reloaded = await UserModel.findById(sellerId)
+        .select("userLoyaltyPoints userLoyaltyPointsReserved")
+        .session(session)
+        .lean();
+
+      return {
+        claimed: Boolean(claimed),
+        loyaltyPointsBalance: getSellerLoyaltyPointsAvailable(reloaded),
+      };
     });
 
     return {
-      message: "Баллы зарезервированы. Заполните розыгрыш.",
-      loyaltyPointsBalance,
+      message: outcome.claimed
+        ? "Баллы зарезервированы. Заполните розыгрыш."
+        : "Доступ к созданию розыгрыша уже оплачен",
+      loyaltyPointsBalance: outcome.loyaltyPointsBalance,
       hasPaidUnlock: true,
     };
   } catch (error) {
