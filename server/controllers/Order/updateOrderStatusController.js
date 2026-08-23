@@ -8,6 +8,7 @@ import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_CONFIRMED,
   ORDER_STATUS_DELIVERED,
+  ORDER_STATUS_PENDING,
 } from "../../constants/orderConstants.js";
 import { syncRaffleProgressForProductSale } from "../../services/raffle/raffleHelpers.js";
 import { applySoldQuantityDeltaForItemStatusChange } from "../../services/product/productSoldQuantityDenorm.js";
