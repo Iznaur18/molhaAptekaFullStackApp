@@ -50,11 +50,7 @@ export function WishlistServerSync({ isAuthorized }) {
       lastAckedItemsRef.current = {};
       clearWishlist();
       queryClient.removeQueries({ queryKey: wishlistQueryKeys.my() });
-      return undefined;
     }
-
-    setRemoteReady(false);
-    return undefined;
   }, [clearWishlist, isAuthorized, queryClient]);
 
   useEffect(() => {
@@ -63,10 +59,27 @@ export function WishlistServerSync({ isAuthorized }) {
     }
 
     if (favoritesQuery.isSuccess && favoritesQuery.data) {
-      hydrateWishlist(favoritesQuery.data.items);
-      lastAckedItemsRef.current = favoritesQuery.data.items;
-      syncProductWishlistCountsFromServer(queryClient, favoritesQuery.data.products);
-      setRemoteReady(true);
+      const remoteItems = favoritesQuery.data.items;
+      const hasPendingLocalChanges =
+        packItems(itemsRef.current) !== packItems(lastAckedItemsRef.current);
+
+      if (!remoteReady) {
+        hydrateWishlist(remoteItems);
+        lastAckedItemsRef.current = remoteItems;
+        syncProductWishlistCountsFromServer(queryClient, favoritesQuery.data.products);
+        setRemoteReady(true);
+        return undefined;
+      }
+
+      if (
+        !hasPendingLocalChanges &&
+        packItems(remoteItems) !== packItems(lastAckedItemsRef.current)
+      ) {
+        hydrateWishlist(remoteItems);
+        lastAckedItemsRef.current = remoteItems;
+        syncProductWishlistCountsFromServer(queryClient, favoritesQuery.data.products);
+      }
+
       return undefined;
     }
 
@@ -86,6 +99,7 @@ export function WishlistServerSync({ isAuthorized }) {
     hydrateWishlist,
     isAuthorized,
     queryClient,
+    remoteReady,
   ]);
 
   useEffect(() => {

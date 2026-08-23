@@ -51,6 +51,9 @@ export function buildWebPushClickPath(params) {
   if (kind === "product_price_offer_seller" || kind === "price_offer_seller") {
     return `/auction`;
   }
+  if (kind === "seller_new_order") {
+    return `/my-sales`;
+  }
   if (kind.includes("premium")) {
     return `/premium`;
   }

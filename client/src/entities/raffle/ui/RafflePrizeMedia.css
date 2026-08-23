@@ -73,7 +73,7 @@
   border: none;
   border-radius: 999px;
   background: var(--iz-color-overlay-strong);
-  color: var(--iz-color-on-contrast);
+  color: #ffffff;
   cursor: pointer;
   backdrop-filter: blur(4px);
 }

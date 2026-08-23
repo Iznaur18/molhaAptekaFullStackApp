@@ -228,6 +228,17 @@
   color: var(--iz-color-on-contrast);
 }
 
+:root[data-theme="dark"]
+  .product-details-modal--page
+  .product-media-gallery-readonly__hero-actions
+  .wishlist-toggle--card,
+:root[data-theme="dark"]
+  .product-details-modal--page
+  .product-media-gallery-readonly__hero-actions
+  .wishlist-toggle--card.wishlist-toggle--active {
+  color: #ffffff;
+}
+
 .product-details-modal--page .product-media-gallery-readonly__report-slot {
   display: flex;
 }

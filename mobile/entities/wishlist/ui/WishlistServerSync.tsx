@@ -42,11 +42,24 @@ export const WishlistServerSync = () => {
 
     if (favoritesQuery.isSuccess && favoritesQuery.data) {
       const remoteItems = favoritesQuery.data.items;
-      if (packItems(itemsRef.current) !== packItems(remoteItems)) {
+      const hasPendingLocalChanges =
+        packItems(itemsRef.current) !== packItems(lastAckedItemsRef.current);
+
+      if (!remoteReady) {
         hydrateWishlist(remoteItems);
+        lastAckedItemsRef.current = remoteItems;
+        setRemoteReady(true);
+        return;
       }
-      lastAckedItemsRef.current = remoteItems;
-      setRemoteReady((ready) => (ready ? ready : true));
+
+      if (
+        !hasPendingLocalChanges &&
+        packItems(remoteItems) !== packItems(lastAckedItemsRef.current)
+      ) {
+        hydrateWishlist(remoteItems);
+        lastAckedItemsRef.current = remoteItems;
+      }
+
       return;
     }
 
@@ -59,6 +72,7 @@ export const WishlistServerSync = () => {
     favoritesQuery.isSuccess,
     hydrateWishlist,
     isAuthorized,
+    remoteReady,
   ]);
 
   useEffect(() => {

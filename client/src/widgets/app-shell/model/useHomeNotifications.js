@@ -8,6 +8,7 @@ import {
   IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_PRODUCT_DISCOUNT,
   IN_APP_NOTIFICATION_KIND_NEW_FOLLOWER,
 } from "../../../entities/user-follow/model/constants.js";
+import { IN_APP_NOTIFICATION_KIND_SELLER_NEW_ORDER } from "../../../entities/order/model/constants.js";
 import { useInAppNotificationsPoll } from "../lib/useInAppNotificationsPoll.js";
 
 /** @typedef {import('../../../entities/product-report/model/types.js').UserInAppNotification} UserInAppNotification */
@@ -91,6 +92,10 @@ export const useHomeNotifications = ({
         handleSellerNameClick(item.actorUserId);
         return;
       }
+      if (item.kind === IN_APP_NOTIFICATION_KIND_SELLER_NEW_ORDER) {
+        goToMainView("my-sales");
+        return;
+      }
       if (
         (item.kind === IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_NEW_PRODUCT ||
           item.kind === IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_PRODUCT_DISCOUNT) &&
@@ -103,7 +108,7 @@ export const useHomeNotifications = ({
         navigateToProductDetails(navigate, item.productId);
       }
     },
-    [handleSellerNameClick, navigate],
+    [goToMainView, handleSellerNameClick, navigate],
   );
 
   const notificationsPageItems = isNotificationsView ? inAppNotifications : [];

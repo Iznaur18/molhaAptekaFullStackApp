@@ -192,19 +192,19 @@ export function UserSavedAddressesEditor({
               <div className="user-saved-addresses__actions">
                 <button
                   type="button"
-                  className="user-saved-addresses__action"
-                  disabled={disabled}
-                  onClick={() => startEdit(item.id)}
-                >
-                  {USER_SAVED_ADDRESSES_UI.EDIT}
-                </button>
-                <button
-                  type="button"
                   className="user-saved-addresses__action user-saved-addresses__action_danger"
                   disabled={disabled}
                   onClick={() => removeAddress(item.id)}
                 >
                   {USER_SAVED_ADDRESSES_UI.REMOVE}
+                </button>
+                <button
+                  type="button"
+                  className="user-saved-addresses__action user-saved-addresses__action_edit"
+                  disabled={disabled}
+                  onClick={() => startEdit(item.id)}
+                >
+                  {USER_SAVED_ADDRESSES_UI.EDIT}
                 </button>
               </div>
             </li>

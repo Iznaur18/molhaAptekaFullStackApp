@@ -13,7 +13,7 @@
   overscroll-behavior: none;
   touch-action: none;
   background: #000;
-  color: var(--iz-color-on-contrast);
+  color: #ffffff;
 }
 
 .user-story-viewer__stage {
@@ -51,7 +51,7 @@
   z-index: 5;
   border: none;
   background: var(--iz-color-overlay-strong);
-  color: var(--iz-color-on-contrast);
+  color: #ffffff;
   width: 40px;
   height: 40px;
   border-radius: 999px;
@@ -203,7 +203,7 @@
   width: 36px;
   height: 36px;
   border: 3px solid var(--iz-color-overlay-white-muted);
-  border-top-color: var(--iz-color-on-contrast);
+  border-top-color: #ffffff;
   border-radius: 50%;
   animation: user-story-viewer-spin 0.7s linear infinite;
 }
@@ -224,7 +224,7 @@
   padding: 10px 12px;
   border-radius: 8px;
   background: var(--iz-color-overlay-strong);
-  color: var(--iz-color-on-contrast);
+  color: #ffffff;
   font-size: 0.95rem;
   line-height: 1.35;
   text-align: center;
@@ -275,7 +275,7 @@
   border-radius: 999px;
   padding: 10px 16px;
   background: var(--iz-color-overlay-white-subtle);
-  color: var(--iz-color-on-contrast);
+  color: #ffffff;
   cursor: pointer;
 }
 

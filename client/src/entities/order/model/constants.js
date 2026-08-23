@@ -55,3 +55,5 @@ export const SALES_ORDER_STATUS_LABEL_RU = {
 export const ORDER_LINE_ITEM_QUANTITY_MIN = 1;
 
 export const CART_STORAGE_KEY = "rassro:cart";
+
+export const IN_APP_NOTIFICATION_KIND_SELLER_NEW_ORDER = "seller_new_order";

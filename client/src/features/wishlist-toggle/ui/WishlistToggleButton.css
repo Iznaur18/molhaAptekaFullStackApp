@@ -46,6 +46,12 @@
   color: var(--iz-color-on-contrast);
 }
 
+:root[data-theme="dark"] .wishlist-toggle--card,
+:root[data-theme="dark"] .wishlist-toggle--card.wishlist-toggle--active,
+:root[data-theme="dark"] .wishlist-toggle--active {
+  color: #ffffff;
+}
+
 /* detailHeroInline: фиксированный размер + мягкая тень */
 .wishlist-toggle--inline {
   box-sizing: border-box;

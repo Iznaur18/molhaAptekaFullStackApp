@@ -39,6 +39,7 @@ import { resolveSelectedProductPickupLocation } from "../product/productPickupLo
 
 import { buildOrderStatusFromItems } from "./orderStatus.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
+import { notifySellersAboutNewOrder } from "./notifySellersAboutNewOrder.js";
 import { logMoneyEvent, logMoneyFailure } from "../loyalty/logMoneyEvent.js";
 import {
   resolveAffiliateReferrerUserId,
@@ -578,6 +579,19 @@ export async function createOrder({
       orderId: String(created._id),
       paymentMethod,
       itemCount: Array.isArray(items) ? items.length : 0,
+    });
+
+    void notifySellersAboutNewOrder({
+      order: created,
+      buyerUserId: String(userId),
+      productById,
+    }).catch((notifyError) => {
+      logServerEvent("error", {
+        event: "order_notify_sellers_failed",
+        orderId: String(created._id),
+        error:
+          notifyError instanceof Error ? notifyError.message : String(notifyError),
+      });
     });
 
     return created;

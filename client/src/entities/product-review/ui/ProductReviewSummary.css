@@ -32,6 +32,10 @@
   color: var(--iz-color-ink);
 }
 
+:root[data-theme="dark"] .product-review-summary__score {
+  color: #ffffff;
+}
+
 .product-review-summary__meta {
   display: flex;
   flex-direction: column;

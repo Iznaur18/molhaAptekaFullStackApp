@@ -30,3 +30,7 @@ export const ORDER_SCHEMA_VERSION = 3;
 
 /** Подпись позиции заказа, если товар удалён и снимка названия нет. */
 export const ORDER_LINE_ITEM_DELETED_PRODUCT_NAME = "Товар удалён";
+
+/** In-app / push: новый заказ на товар продавца. */
+export const IN_APP_NOTIFICATION_KIND_SELLER_NEW_ORDER = "seller_new_order";
+export const IN_APP_NOTIFICATION_MESSAGE_SELLER_NEW_ORDER = "Новый заказ на ваш товар";

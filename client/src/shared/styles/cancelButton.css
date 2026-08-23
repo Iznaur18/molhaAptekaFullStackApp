@@ -25,6 +25,21 @@
     transform var(--iz-transition-press);
 }
 
+:root[data-theme="dark"] .app-btn--cancel,
+:root[data-theme="dark"] .iz-cancel-btn,
+:root[data-theme="dark"] .product-card__delete-confirm-cancel,
+:root[data-theme="dark"] .my-profile-page__logout-cancel,
+:root[data-theme="dark"] .order-card__item-action-button_cancel,
+:root[data-theme="dark"] .report-product-modal__cancel,
+:root[data-theme="dark"] .edit-profile-modal__cancel,
+:root[data-theme="dark"] .product-reviews-section__cancel-edit,
+:root[data-theme="dark"] .admin-delete-user__btn_secondary,
+:root[data-theme="dark"] .product-price-offer__btn--cancel,
+:root[data-theme="dark"] .auction-dashboard-row__editor-cancel,
+:root[data-theme="dark"] .installment-queue-card__btn_cancel {
+  color: #ffffff;
+}
+
 .app-btn--cancel:hover:not(:disabled),
 .iz-cancel-btn:hover:not(:disabled),
 .product-card__delete-confirm-cancel:hover:not(:disabled),

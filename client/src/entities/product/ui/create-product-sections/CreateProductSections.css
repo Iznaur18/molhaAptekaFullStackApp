@@ -157,6 +157,14 @@
   cursor: not-allowed;
 }
 
+:root[data-theme="dark"] .create-product-section__desc-toolbar-btn {
+  color: var(--iz-color-text);
+}
+
+:root[data-theme="dark"] .create-product-section__desc-toolbar-btn:hover:not(:disabled) {
+  border-color: var(--iz-color-border-strong);
+}
+
 .create-product-section__char-meter {
   font-size: 0.78rem;
   color: var(--iz-color-text-secondary);

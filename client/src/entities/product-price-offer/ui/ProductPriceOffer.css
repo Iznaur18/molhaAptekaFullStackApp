@@ -19,6 +19,10 @@
   color: var(--iz-color-ink);
 }
 
+:root[data-theme="dark"] .product-price-offer__page-title {
+  color: #ffffff;
+}
+
 .product-price-offer__section-label {
   margin: 0;
   font-size: 0.8125rem;
@@ -79,6 +83,10 @@
   font-weight: 700;
   color: var(--iz-color-ink);
   white-space: nowrap;
+}
+
+:root[data-theme="dark"] .product-price-offer__top-price {
+  color: #ffffff;
 }
 
 .product-price-offer__buyer-link {
@@ -298,6 +306,10 @@
   font-weight: 700;
   color: var(--iz-color-ink);
   white-space: nowrap;
+}
+
+:root[data-theme="dark"] .product-price-offer__seller-price {
+  color: #ffffff;
 }
 
 .product-price-offer__seller-meta {

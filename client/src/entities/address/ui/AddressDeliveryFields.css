@@ -292,6 +292,10 @@
   background: var(--color-surface-muted, var(--iz-color-surface-muted));
 }
 
+:root[data-theme="dark"] .address-delivery-fields__map-fullscreen-suggestion {
+  color: #ffffff;
+}
+
 .address-delivery-fields__map-fullscreen-note {
   margin: 0;
   padding: 0.65rem 0.85rem;

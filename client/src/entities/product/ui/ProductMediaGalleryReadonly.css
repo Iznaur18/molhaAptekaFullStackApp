@@ -114,6 +114,18 @@
   color: var(--iz-color-on-contrast);
 }
 
+:root[data-theme="dark"]
+  .product-media-gallery-readonly__hero-actions
+  .wishlist-toggle--card {
+  color: #ffffff;
+}
+
+:root[data-theme="dark"]
+  .product-media-gallery-readonly__hero-actions
+  .wishlist-toggle--card.wishlist-toggle--active {
+  color: #ffffff;
+}
+
 .product-media-gallery-readonly__report-slot {
   display: inline-flex;
   align-items: center;
@@ -150,6 +162,10 @@
   color: var(--iz-color-on-contrast);
   background: var(--iz-color-overlay);
   pointer-events: none;
+}
+
+:root[data-theme="dark"] .product-media-gallery-readonly__slider-counter {
+  color: #ffffff;
 }
 
 .product-media-gallery-readonly__image--fill-hero {

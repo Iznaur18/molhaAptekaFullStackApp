@@ -16,6 +16,7 @@ export const IN_APP_NOTIFICATION_KIND_PREMIUM_EXPIRED = "premium_expired";
 export const IN_APP_NOTIFICATION_KIND_PREMIUM_REVOKED_BY_STAFF = "premium_revoked_by_staff";
 
 export const IN_APP_NOTIFICATION_KIND_PRICE_OFFER_SELLER = "price_offer_seller";
+export const IN_APP_NOTIFICATION_KIND_SELLER_NEW_ORDER = "seller_new_order";
 
 export const IN_APP_NOTIFICATION_KIND_INSTALLMENT_NEW_FOR_SELLER =
   "installment_new_for_seller";

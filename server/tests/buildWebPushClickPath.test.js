@@ -20,6 +20,13 @@ test("buildWebPushClickPath: follower → subscriptions", () => {
   );
 });
 
+test("buildWebPushClickPath: seller new order → my-sales", () => {
+  assert.equal(
+    buildWebPushClickPath({ kind: "seller_new_order" }),
+    "/my-sales",
+  );
+});
+
 test("buildWebPushClickPath: fallback notifications", () => {
   assert.equal(buildWebPushClickPath({ kind: "unknown_kind" }), "/notifications");
 });

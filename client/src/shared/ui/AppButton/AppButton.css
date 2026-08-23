@@ -86,6 +86,11 @@ button:not([class]):hover:not(:disabled) {
   color: var(--iz-color-on-contrast);
 }
 
+:root[data-theme="dark"] .app-btn--cancel,
+:root[data-theme="dark"] .app-btn--danger {
+  color: #ffffff;
+}
+
 .app-btn--cancel:hover:not(:disabled),
 .app-btn--danger:hover:not(:disabled) {
   border-color: color-mix(in srgb, var(--iz-color-danger) 85%, var(--iz-color-ink));
@@ -120,6 +125,10 @@ button:not([class]):hover:not(:disabled) {
   border-color: var(--iz-color-ink);
   background: var(--iz-color-ink);
   color: var(--iz-color-on-contrast);
+}
+
+:root[data-theme="dark"] .app-btn--contrast {
+  color: #ffffff;
 }
 
 .app-btn--contrast:hover:not(:disabled) {
