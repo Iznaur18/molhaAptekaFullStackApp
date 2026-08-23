@@ -38,17 +38,24 @@ export async function approveRaffle({ staffId, raffleId }) {
 
   try {
     const { cashback } = await runInTransaction(async (session) => {
+      // Документ читаем внутри транзакции — на ретрае после WriteConflict
+      // mongoose уже считает внешний документ чистым и save() ничего не пишет.
+      const txnRaffle = await loadRaffleOrThrow(raffleId, session);
+      if (txnRaffle.status !== RAFFLE_STATUS_PENDING_STAFF) {
+        throw new AppError(409, "Розыгрыш уже обработан");
+      }
+
       const chargeResult = await chargeRaffleCreatePriceOnApproval({
-        sellerId: String(raffle.sellerId),
-        raffle: raffle.toObject(),
+        sellerId: String(txnRaffle.sellerId),
+        raffle: txnRaffle.toObject(),
         session,
       });
 
-      raffle.status = RAFFLE_STATUS_ACTIVE;
-      raffle.approvedByUserId = staffId;
-      raffle.approvedAt = new Date();
-      raffle.moderationComment = "";
-      await raffle.save({ session });
+      txnRaffle.status = RAFFLE_STATUS_ACTIVE;
+      txnRaffle.approvedByUserId = staffId;
+      txnRaffle.approvedAt = new Date();
+      txnRaffle.moderationComment = "";
+      await txnRaffle.save({ session });
       return chargeResult;
     });
 
@@ -69,9 +76,11 @@ export async function approveRaffle({ staffId, raffleId }) {
     throw error;
   }
 
+  const approved = await loadRaffleOrThrow(raffleId);
+
   return {
     message: "Розыгрыш одобрен",
-    raffle: toPublicRafflePayload(raffle.toObject()),
+    raffle: toPublicRafflePayload(approved.toObject()),
   };
 }
 
@@ -89,20 +98,32 @@ export async function rejectRaffle({ raffleId, comment }) {
   }
 
   await runInTransaction(async (session) => {
-    raffle.status = RAFFLE_STATUS_REJECTED;
-    raffle.rejectedAt = new Date();
-    raffle.moderationComment = String(comment ?? "").trim();
-    await raffle.save({ session });
+    // См. approveRaffle: документ обязан читаться внутри транзакции, иначе
+    // ретрай после WriteConflict молча теряет мутации.
+    const txnRaffle = await loadRaffleOrThrow(raffleId, session);
+    if (txnRaffle.status === RAFFLE_STATUS_REJECTED) {
+      return;
+    }
+    if (txnRaffle.status !== RAFFLE_STATUS_PENDING_STAFF) {
+      throw new AppError(409, "Розыгрыш уже обработан");
+    }
+
+    txnRaffle.status = RAFFLE_STATUS_REJECTED;
+    txnRaffle.rejectedAt = new Date();
+    txnRaffle.moderationComment = String(comment ?? "").trim();
+    await txnRaffle.save({ session });
     await refundRaffleCreatePriceIfNeeded({
-      sellerId: String(raffle.sellerId),
-      raffle: raffle.toObject(),
+      sellerId: String(txnRaffle.sellerId),
+      raffle: txnRaffle.toObject(),
       session,
     });
   });
   await clearRaffleParticipationFromProducts(raffle._id);
 
+  const rejected = await loadRaffleOrThrow(raffleId);
+
   return {
     message: "Розыгрыш отклонён",
-    raffle: toPublicRafflePayload(raffle.toObject(), { includePrivateFields: true }),
+    raffle: toPublicRafflePayload(rejected.toObject(), { includePrivateFields: true }),
   };
 }

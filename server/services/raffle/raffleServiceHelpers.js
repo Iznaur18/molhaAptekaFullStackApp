@@ -55,8 +55,21 @@ export const mapVitrineRaffles = async (rows) =>
 /**
  * @param {string} raffleId
  */
-export const loadRaffleOrThrow = async (raffleId) => {
-  const raffle = await RaffleModel.findById(raffleId);
+/**
+ * `session` обязателен, если документ мутируется внутри транзакции:
+ * `withTransaction` ретраит колбэк при WriteConflict, а mongoose после
+ * `save()` считает документ чистым — повторный проход по документу,
+ * загруженному снаружи, не запишет ничего.
+ *
+ * @param {string} raffleId
+ * @param {import('mongoose').ClientSession | null} [session]
+ */
+export const loadRaffleOrThrow = async (raffleId, session = null) => {
+  const query = RaffleModel.findById(raffleId);
+  if (session) {
+    query.session(session);
+  }
+  const raffle = await query;
   if (!raffle) {
     throw new AppError(404, "Розыгрыш не найден");
   }

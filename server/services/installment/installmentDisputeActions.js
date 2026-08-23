@@ -181,56 +181,82 @@ export async function resolveInstallmentDispute({
   }
 
   await runInTransaction(async (session) => {
+    // Оба документа читаем внутри транзакции: на ретрае после WriteConflict
+    // mongoose считает документы, загруженные снаружи, чистыми, и повторный
+    // save() не пишет ничего — спор «закрывался» только в ответе API.
+    const txnDispute =
+      await InstallmentDisputeModel.findById(disputeId).session(session);
+    if (!txnDispute) {
+      throw new AppError(404, "Спор не найден");
+    }
+    if (txnDispute.status !== INSTALLMENT_DISPUTE_STATUS_OPEN) {
+      throw new AppError(409, "Спор уже закрыт");
+    }
+
+    const txnContract = await InstallmentContractModel.findById(
+      txnDispute.contractId,
+    ).session(session);
+    if (!txnContract) {
+      throw new AppError(404, "Контракт не найден");
+    }
+
     if (action === "cancel") {
-      contract.status = INSTALLMENT_CONTRACT_STATUS_CANCELLED;
-      contract.cancelledAt = new Date();
-      contract.cancelledByUserId = userId;
-      contract.cancellationReason = resolutionNote ?? "";
-      await contract.save({ session });
-      await cancelLinkedOrderForInstallmentContract(contract.orderId, session);
+      txnContract.status = INSTALLMENT_CONTRACT_STATUS_CANCELLED;
+      txnContract.cancelledAt = new Date();
+      txnContract.cancelledByUserId = userId;
+      txnContract.cancellationReason = resolutionNote ?? "";
+      await txnContract.save({ session });
+      await cancelLinkedOrderForInstallmentContract(txnContract.orderId, session);
     } else if (action === "close") {
-      contract.status = INSTALLMENT_CONTRACT_STATUS_COMPLETED;
-      contract.completedAt = new Date();
-      contract.nextPaymentDueAt = null;
-      contract.hasOverduePayment = false;
-      await contract.save({ session });
+      txnContract.status = INSTALLMENT_CONTRACT_STATUS_COMPLETED;
+      txnContract.completedAt = new Date();
+      txnContract.nextPaymentDueAt = null;
+      txnContract.hasOverduePayment = false;
+      await txnContract.save({ session });
     } else if (action === "partial_refund") {
       const amount = Math.floor(Number(partialRefundRub));
       if (!Number.isFinite(amount) || amount <= 0) {
         throw new AppError(400, "Укажите сумму частичного возврата");
       }
 
-      contract.totalAmountRub = Math.max(
-        contract.paidAmountRub,
-        (Number(contract.totalAmountRub) || 0) - amount,
+      txnContract.totalAmountRub = Math.max(
+        txnContract.paidAmountRub,
+        (Number(txnContract.totalAmountRub) || 0) - amount,
       );
-      resolveContractStatusAfterPayment(contract);
-      await contract.save({ session });
+      resolveContractStatusAfterPayment(txnContract);
+      await txnContract.save({ session });
     } else if (action === "adjust_schedule") {
-      const nextDue = contract.payments.find(
+      const nextDue = txnContract.payments.find(
         (payment) => payment.status !== INSTALLMENT_PAYMENT_STATUS_PAID,
       );
       if (nextDue) {
         nextDue.dueAt = new Date(nextDue.dueAt.getTime() + 30 * 24 * 60 * 60 * 1000);
       }
-      recomputeContractOverdueFlags(contract);
-      await contract.save({ session });
+      recomputeContractOverdueFlags(txnContract);
+      await txnContract.save({ session });
     }
 
-    dispute.status = INSTALLMENT_DISPUTE_STATUS_RESOLVED;
-    dispute.resolutionNote = String(resolutionNote ?? "").trim();
-    dispute.resolvedByUserId = userId;
-    dispute.resolvedAt = new Date();
-    await dispute.save({ session });
+    txnDispute.status = INSTALLMENT_DISPUTE_STATUS_RESOLVED;
+    txnDispute.resolutionNote = String(resolutionNote ?? "").trim();
+    txnDispute.resolvedByUserId = userId;
+    txnDispute.resolvedAt = new Date();
+    await txnDispute.save({ session });
   });
+
+  // Ответ строим из перечитанных документов: те, что загружены до транзакции,
+  // мутаций не получили.
+  const resolvedDispute =
+    (await InstallmentDisputeModel.findById(disputeId).lean()) ?? dispute;
+  const resolvedContract =
+    (await InstallmentContractModel.findById(dispute.contractId)) ?? contract;
 
   return {
     message: "Спор рассмотрен",
     dispute: {
-      _id: String(dispute._id),
-      status: dispute.status,
-      resolutionNote: dispute.resolutionNote,
+      _id: String(resolvedDispute._id),
+      status: resolvedDispute.status,
+      resolutionNote: resolvedDispute.resolutionNote,
     },
-    contract: await buildInstallmentContractPayload(contract),
+    contract: await buildInstallmentContractPayload(resolvedContract),
   };
 }

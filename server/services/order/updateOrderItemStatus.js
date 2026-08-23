@@ -40,6 +40,7 @@ import { clearBuyerPassportShareOnOrder } from "./buyerPassportShare.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 import {
   assertSellerOwnsOrderItem,
+  getOrderItemByIndex,
   getPopulatedOrderItemOrThrow,
   loadOrderWithItems,
   normalizeId,
@@ -199,22 +200,38 @@ export async function markOrderItemCancelled({
       await cancelLinkedOrderForInstallmentContract(order._id, session);
     });
   } else {
-    const releaseLine = {
-      ...(targetItem.toObject?.() ?? targetItem),
-      productId: targetItem.productId,
-    };
-    const productIdForRelease = resolveProductIdFromItem(targetItem.productId);
-
     await runInTransaction(async (session) => {
-      targetItem.status = ORDER_STATUS_CANCELLED;
-      markOrderLineLoyaltyReserveReleased(targetItem);
-      order.status = buildOrderStatusFromItems(order.items);
-      if (order.status === ORDER_STATUS_CANCELLED) {
-        clearBuyerPassportShareOnOrder(order);
+      // Перечитываем внутри транзакции — см. loadOrderWithItems: на ретрае
+      // после WriteConflict мутации документа, загруженного снаружи, молча
+      // теряются, и позиция оставалась "pending" при успешном ответе.
+      const txnOrder = await loadOrderWithItems(orderId, session);
+      const txnItem = getPopulatedOrderItemOrThrow(txnOrder, itemIndex);
+
+      if (txnItem.status === ORDER_STATUS_CANCELLED) {
+        return;
       }
-      await order.save({ session });
+      if (txnItem.status !== ORDER_STATUS_PENDING) {
+        throw new AppError(
+          409,
+          'Позицию можно отменить только из статуса "В обработке"',
+        );
+      }
+
+      const releaseLine = {
+        ...(txnItem.toObject?.() ?? txnItem),
+        productId: txnItem.productId,
+      };
+      const productIdForRelease = resolveProductIdFromItem(txnItem.productId);
+
+      txnItem.status = ORDER_STATUS_CANCELLED;
+      markOrderLineLoyaltyReserveReleased(txnItem);
+      txnOrder.status = buildOrderStatusFromItems(txnOrder.items);
+      if (txnOrder.status === ORDER_STATUS_CANCELLED) {
+        clearBuyerPassportShareOnOrder(txnOrder);
+      }
+      await txnOrder.save({ session });
       await releaseUnawardedLoyaltyReservesForOrder([releaseLine], session);
-      const freeUnits = Math.floor(Number(targetItem.buyNFreeUnitsAtOrder) || 0);
+      const freeUnits = Math.floor(Number(txnItem.buyNFreeUnitsAtOrder) || 0);
       if (freeUnits > 0 && productIdForRelease) {
         await releaseBuyNFreeRedemptionClaim({
           buyerId,
@@ -266,22 +283,22 @@ export async function markOrderItemShippedBySeller({ orderId, itemIndex, sellerI
  * }} input
  */
 export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, userId }) {
-  const order = await loadOrderWithItems(orderId);
+  const preview = await loadOrderWithItems(orderId);
 
-  if (normalizeId(order.userBuyerId) !== buyerId) {
+  if (normalizeId(preview.userBuyerId) !== buyerId) {
     throw new AppError(403, "Подтверждать доставку может только покупатель");
   }
 
-  const targetItem = getPopulatedOrderItemOrThrow(order, itemIndex);
+  const previewItem = getPopulatedOrderItemOrThrow(preview, itemIndex);
 
-  if (targetItem.status !== ORDER_STATUS_DELIVERED) {
+  if (previewItem.status !== ORDER_STATUS_DELIVERED) {
     throw new AppError(409, 'Подтверждение доступно только для статуса "Доставлен"');
   }
 
-  if (targetItem.loyaltyPointsAwarded) {
+  if (previewItem.loyaltyPointsAwarded) {
     return {
-      order: await populateOrderForResponse(order),
-      pointsEarned: Number(targetItem.loyaltyPointsEarned) || 0,
+      order: await populateOrderForResponse(preview),
+      pointsEarned: Number(previewItem.loyaltyPointsEarned) || 0,
     };
   }
 
@@ -290,18 +307,48 @@ export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, use
     .lean();
   const isUserDataConfirmed = buyer?.isUserDataConfirmed === true;
 
-  const itemSellerId = normalizeId(
-    targetItem.productId?.productSeller?._id ?? targetItem.productId?.productSeller,
-  );
-  const reservedTotal = Math.ceil(Number(targetItem.loyaltyPointsReservedTotal) || 0);
-  const productId = resolveProductIdFromItem(targetItem.productId);
-
   let pointsEarned = 0;
   /** @type {{ paid: number; referrerUserId?: string; deferNotification?: boolean } | null} */
   let affiliatePayout = null;
+  /** @type {unknown} */
+  let productId = null;
 
   try {
     const txnResult = await runInTransaction(async (session) => {
+      // Документ и всё производное от него читаем ВНУТРИ транзакции: при
+      // WriteConflict `withTransaction` повторяет этот колбэк, а mongoose
+      // после первого (откатившегося) `save()` считает документ чистым —
+      // на ретрае повторные присваивания тех же значений не помечаются
+      // dirty и `save()` не пишет ничего. Позиция молча оставалась
+      // "delivered", баллы и affiliate-выплата не проводились, но наружу
+      // уходил успешный ответ.
+      const order = await loadOrderWithItems(orderId, session);
+      const targetItem = getPopulatedOrderItemOrThrow(order, itemIndex);
+
+      if (targetItem.loyaltyPointsAwarded) {
+        return {
+          alreadyAwarded: true,
+          earned: Number(targetItem.loyaltyPointsEarned) || 0,
+          affiliateResult: null,
+          productId: resolveProductIdFromItem(targetItem.productId),
+        };
+      }
+
+      if (targetItem.status !== ORDER_STATUS_DELIVERED) {
+        throw new AppError(
+          409,
+          'Подтверждение доступно только для статуса "Доставлен"',
+        );
+      }
+
+      const itemSellerId = normalizeId(
+        targetItem.productId?.productSeller?._id ?? targetItem.productId?.productSeller,
+      );
+      const reservedTotal = Math.ceil(
+        Number(targetItem.loyaltyPointsReservedTotal) || 0,
+      );
+      const itemProductId = resolveProductIdFromItem(targetItem.productId);
+
       const earned = prepareLoyaltyPointsForConfirmedOrderItem({
         order,
         itemIndex,
@@ -343,10 +390,10 @@ export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, use
         session,
       });
 
-      if (productId && targetItem.buyNFreeProgressApplied !== true) {
+      if (itemProductId && targetItem.buyNFreeProgressApplied !== true) {
         const progressResult = await applyBuyNFreeProgressOnConfirm({
           buyerId,
-          productId,
+          productId: itemProductId,
           quantity: targetItem.quantity,
           freeUnits: targetItem.buyNFreeUnitsAtOrder ?? 0,
           session,
@@ -364,18 +411,19 @@ export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, use
       order.status = buildOrderStatusFromItems(order.items);
       await order.save({ session });
 
-      if (productId) {
+      if (itemProductId) {
         await decrementProductStockOnItemConfirmed(
-          productId,
+          itemProductId,
           targetItem.quantity,
           session,
         );
       }
 
-      return { earned, affiliateResult };
+      return { earned, affiliateResult, productId: itemProductId };
     });
     pointsEarned = txnResult.earned;
     affiliatePayout = txnResult.affiliateResult;
+    productId = txnResult.productId;
   } catch (txError) {
     if (txError instanceof AppError) {
       throw txError;
@@ -403,8 +451,12 @@ export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, use
     });
   }
 
-  await runConfirmItemSideEffects(order, targetItem, productId);
-  await populateOrderForResponse(order);
+  // Ответ строим из перечитанного заказа, а не из документа, загруженного до
+  // транзакции: раньше клиенту уходило состояние из памяти, которое могло
+  // разойтись с БД.
+  const updatedOrder = await reloadOrderWithItems(orderId);
+  const updatedItem = getOrderItemByIndex(updatedOrder, itemIndex);
+  await runConfirmItemSideEffects(updatedOrder, updatedItem ?? {}, productId);
 
-  return { order, pointsEarned };
+  return { order: updatedOrder, pointsEarned };
 }

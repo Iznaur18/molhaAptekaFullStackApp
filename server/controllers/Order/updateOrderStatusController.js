@@ -95,15 +95,26 @@ export const updateOrderStatusController = async (req, res) => {
 
   if (status === ORDER_STATUS_CANCELLED) {
     await runInTransaction(async (session) => {
-      const buyerId = normalizeId(order.userBuyerId?._id ?? order.userBuyerId);
+      // Заказ читаем внутри транзакции: withTransaction повторяет колбэк при
+      // WriteConflict, а mongoose после первого (откатившегося) save() считает
+      // документ чистым — на ретрае мутации документа, загруженного снаружи,
+      // молча не сохранялись, и заказ оставался в прежнем статусе.
+      const txnOrder = await OrderModel.findById(orderId).session(session);
+      if (!txnOrder) {
+        throw new Error("ORDER_NOT_FOUND");
+      }
+      normalizeOrderDocumentForRuntime(txnOrder);
+      normalizeOrderItemsForRuntime(txnOrder.items);
 
-      for (const item of order.items) {
+      const buyerId = normalizeId(txnOrder.userBuyerId?._id ?? txnOrder.userBuyerId);
+
+      for (const item of txnOrder.items) {
         if (item.status !== ORDER_STATUS_CANCELLED) {
           markOrderLineLoyaltyReserveReleased(item);
         }
       }
 
-      for (const item of order.items) {
+      for (const item of txnOrder.items) {
         if (item.status === ORDER_STATUS_CANCELLED || item.productId == null) {
           continue;
         }
@@ -118,11 +129,16 @@ export const updateOrderStatusController = async (req, res) => {
 
         const productId = normalizeId(item.productId?._id ?? item.productId);
         const freeUnits = Math.floor(Number(item.buyNFreeUnitsAtOrder) || 0);
-        if (previousStatus === ORDER_STATUS_PENDING && freeUnits > 0 && buyerId && productId) {
+        if (
+          previousStatus === ORDER_STATUS_PENDING &&
+          freeUnits > 0 &&
+          buyerId &&
+          productId
+        ) {
           await releaseBuyNFreeRedemptionClaim({
             buyerId,
             productId,
-            orderId: order._id,
+            orderId: txnOrder._id,
             session,
           });
         }
@@ -143,19 +159,19 @@ export const updateOrderStatusController = async (req, res) => {
         }
       }
 
-      order.items.forEach((item) => {
+      txnOrder.items.forEach((item) => {
         item.status = status;
         item.deliveredAt = null;
         item.deliveredBy = null;
         item.confirmedAt = null;
         item.confirmedBy = null;
       });
-      order.status = status;
-      clearBuyerPassportShareOnOrder(order);
-      await order.save({ session });
+      txnOrder.status = status;
+      clearBuyerPassportShareOnOrder(txnOrder);
+      await txnOrder.save({ session });
 
-      await order.populate(ORDER_ITEMS_POPULATE);
-      await releaseUnawardedLoyaltyReservesForOrder(order.items, session);
+      await txnOrder.populate(ORDER_ITEMS_POPULATE);
+      await releaseUnawardedLoyaltyReservesForOrder(txnOrder.items, session);
     });
   } else {
     for (const item of order.items) {
@@ -221,8 +237,11 @@ export const updateOrderStatusController = async (req, res) => {
     }
   }
 
-  await order.populate("userBuyerId", ORDER_BUYER_PUBLIC_FIELDS);
-  await order.populate(ORDER_ITEMS_POPULATE);
+  // Ветка отмены пишет через собственный документ внутри транзакции, поэтому
+  // ответ собираем из перечитанного заказа, а не из устаревшего в памяти.
+  const responseOrder = (await OrderModel.findById(orderId)) ?? order;
+  await responseOrder.populate("userBuyerId", ORDER_BUYER_PUBLIC_FIELDS);
+  await responseOrder.populate(ORDER_ITEMS_POPULATE);
 
-  return successRes(res, { order });
+  return successRes(res, { order: responseOrder });
 };

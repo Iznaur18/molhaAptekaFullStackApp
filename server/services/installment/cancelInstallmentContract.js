@@ -38,16 +38,34 @@ export async function cancelInstallmentContract({ userId, contractId, reason = "
   }
 
   await runInTransaction(async (session) => {
-    contract.status = INSTALLMENT_CONTRACT_STATUS_CANCELLED;
-    contract.cancelledAt = new Date();
-    contract.cancelledByUserId = userId;
-    contract.cancellationReason = String(reason ?? "").trim();
-    await contract.save({ session });
-    await cancelLinkedOrderForInstallmentContract(contract.orderId, session);
+    // Документ читаем внутри транзакции: withTransaction повторяет колбэк при
+    // WriteConflict, а mongoose после первого (откатившегося) save() считает
+    // документ чистым — повторный проход по документу, загруженному снаружи,
+    // молча не записывал ничего.
+    const txnContract =
+      await InstallmentContractModel.findById(contractId).session(session);
+    if (!txnContract) {
+      throw new AppError(404, "Контракт не найден");
+    }
+    if (txnContract.status === INSTALLMENT_CONTRACT_STATUS_CANCELLED) {
+      return;
+    }
+    if (txnContract.status === INSTALLMENT_CONTRACT_STATUS_COMPLETED) {
+      throw new AppError(409, "Контракт уже закрыт");
+    }
+
+    txnContract.status = INSTALLMENT_CONTRACT_STATUS_CANCELLED;
+    txnContract.cancelledAt = new Date();
+    txnContract.cancelledByUserId = userId;
+    txnContract.cancellationReason = String(reason ?? "").trim();
+    await txnContract.save({ session });
+    await cancelLinkedOrderForInstallmentContract(txnContract.orderId, session);
   });
+
+  const cancelled = await InstallmentContractModel.findById(contractId);
 
   return {
     message: "Контракт отменён",
-    contract: await buildInstallmentContractPayload(contract),
+    contract: await buildInstallmentContractPayload(cancelled ?? contract),
   };
 }

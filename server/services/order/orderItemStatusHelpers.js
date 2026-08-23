@@ -28,10 +28,21 @@ export const populateOrderForResponse = async (order) => {
 };
 
 /**
+ * `session` обязателен, когда документ мутируется внутри транзакции:
+ * `withTransaction` ретраит колбэк при WriteConflict, а mongoose после
+ * `save()` считает документ чистым — повторный проход по документу,
+ * загруженному СНАРУЖИ, не запишет ничего (мутации теряются молча).
+ * Значит документ надо перечитывать на каждой попытке.
+ *
  * @param {string} orderId
+ * @param {import('mongoose').ClientSession | null} [session]
  */
-export const loadOrderWithItems = async (orderId) => {
-  const order = await OrderModel.findById(orderId).populate(ORDER_ITEMS_POPULATE);
+export const loadOrderWithItems = async (orderId, session = null) => {
+  const query = OrderModel.findById(orderId).populate(ORDER_ITEMS_POPULATE);
+  if (session) {
+    query.session(session);
+  }
+  const order = await query;
   if (!order) {
     throw new AppError(404, "Заказ не найден");
   }
