@@ -12,8 +12,8 @@
 
 .raffle-prize-media__video-bg {
   object-fit: cover;
-  filter: blur(22px);
-  transform: scale(1.08);
+  filter: blur(28px) saturate(1.05);
+  transform: scale(1.16);
   pointer-events: none;
 }
 
@@ -43,8 +43,8 @@
 
 .raffle-prize-media__image-bg {
   object-fit: cover;
-  filter: blur(22px);
-  transform: scale(1.08);
+  filter: blur(28px) saturate(1.05);
+  transform: scale(1.16);
   pointer-events: none;
 }
 

@@ -154,14 +154,25 @@ export function SiteHeaderBannerCarousel({ slides }) {
       : undefined;
 
     const content = (
-      <img
-        className="site-header-banner-carousel__image"
-        src={imageSrc}
-        alt={slide.imageAlt}
-        loading={isActive ? "eager" : "lazy"}
-        decoding="async"
-        draggable={false}
-      />
+      <div className="site-header-banner-carousel__media">
+        <img
+          className="site-header-banner-carousel__image-bg"
+          src={imageSrc}
+          alt=""
+          aria-hidden="true"
+          loading={isActive ? "eager" : "lazy"}
+          decoding="async"
+          draggable={false}
+        />
+        <img
+          className="site-header-banner-carousel__image"
+          src={imageSrc}
+          alt={slide.imageAlt}
+          loading={isActive ? "eager" : "lazy"}
+          decoding="async"
+          draggable={false}
+        />
+      </div>
     );
 
     return (

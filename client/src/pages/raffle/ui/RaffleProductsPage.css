@@ -148,15 +148,30 @@
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center center;
+}
+
+.raffle-products-page__media .raffle-prize-media__image-wrap {
+  height: 100%;
+}
+
+.raffle-products-page__media .raffle-prize-media__video-wrap {
+  height: 100%;
+}
+
+.raffle-products-page__media .raffle-prize-media__image-fg,
+.raffle-products-page__media img.raffle-products-page__media-el {
+  object-fit: contain;
+  object-position: center center;
 }
 
 .raffle-products-page__media .raffle-prize-media__video-fg {
-  object-fit: cover !important;
-}
-
-.raffle-products-page__media img.raffle-products-page__media-el {
-  object-fit: cover;
+  position: relative;
+  z-index: 1;
+  object-fit: contain !important;
+  object-position: center center !important;
+  background: transparent;
 }
 
 .raffle-products-page__copy {

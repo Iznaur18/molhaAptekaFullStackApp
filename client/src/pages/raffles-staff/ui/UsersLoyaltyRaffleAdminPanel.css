@@ -12,6 +12,12 @@
   color: var(--iz-color-ink);
 }
 
+:root[data-theme="dark"] .users-loyalty-raffle-admin__title,
+:root[data-theme="dark"] .users-loyalty-raffle-admin__input,
+:root[data-theme="dark"] .users-loyalty-raffle-admin__textarea {
+  color: #ffffff;
+}
+
 .users-loyalty-raffle-admin__label {
   font-size: 0.8125rem;
   font-weight: 600;

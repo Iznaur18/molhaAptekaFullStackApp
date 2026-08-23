@@ -143,6 +143,11 @@ button:not([class]):hover:not(:disabled) {
   color: var(--iz-color-ink);
 }
 
+:root[data-theme="dark"] .app-btn--outline {
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
 .app-btn--outline:hover:not(:disabled) {
   background: var(--iz-color-surface-muted);
 }
