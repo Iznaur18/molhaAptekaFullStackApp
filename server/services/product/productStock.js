@@ -89,6 +89,12 @@ export const getReservedQuantityByProductIds = async (productIds, session = null
 
   const objectIds = ids.map((id) => new mongoose.Types.ObjectId(id));
   const aggregation = OrderModel.aggregate([
+    // Предварительный $match ДО $unwind — обязателен. Оптимизатор не умеет
+    // переносить $match через $unwind по разворачиваемому полю, поэтому без
+    // этой стадии пайплайн шёл COLLSCAN'ом по всей коллекции заказов на
+    // каждой странице каталога и на каждом создании заказа.
+    // Индекс: items_productId_created.
+    { $match: { "items.productId": { $in: objectIds } } },
     { $unwind: "$items" },
     {
       $match: {
