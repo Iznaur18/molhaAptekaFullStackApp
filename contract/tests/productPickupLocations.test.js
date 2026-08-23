@@ -89,3 +89,39 @@ test("ensureSingleDefaultProductPickupLocation caps default to one", () => {
   assert.equal(next.filter((item) => item.isDefault).length, 1);
   assert.equal(PRODUCT_PICKUP_LOCATIONS_MAX, 5);
 });
+
+test("точка без координат не превращается в 0,0 (Гвинейский залив)", () => {
+  const [legacy] = productPickupLocationsFromProduct({
+    productPickupAddress: "Москва, Тверская улица, 1",
+    productPickupLat: null,
+    productPickupLon: undefined,
+  });
+  assert.equal(legacy.lat, null);
+  assert.equal(legacy.lon, null);
+
+  const stored = productPickupLocationsFromProduct({
+    productPickupLocations: [
+      {
+        id: "p1",
+        address: "Москва, Тверская улица, 1",
+        lat: null,
+        lon: "",
+        isDefault: true,
+      },
+      { id: "p2", address: "Москва, Варшавское шоссе, 10", lat: 55.66, lon: 37.61 },
+    ],
+  });
+  assert.equal(stored[0].lat, null);
+  assert.equal(stored[0].lon, null);
+  assert.equal(stored[1].lat, 55.66);
+});
+
+test("нулевые координаты остаются нулями, если они заданы явно", () => {
+  const [point] = productPickupLocationsFromProduct({
+    productPickupAddress: "Точка на экваторе",
+    productPickupLat: 0,
+    productPickupLon: 0,
+  });
+  assert.equal(point.lat, 0);
+  assert.equal(point.lon, 0);
+});

@@ -3,6 +3,7 @@ import {
   PRODUCT_PICKUP_LOCATIONS_REQUIRED_MESSAGE,
   PRODUCT_PICKUP_SELECTION_INVALID_MESSAGE,
   ensureSingleDefaultProductPickupLocation,
+  productPickupLocationDuplicateKey,
   productPickupLocationsFromProduct,
   syncLegacyPickupFieldsFromLocations,
 } from "@molha/api-contract";
@@ -115,6 +116,83 @@ export async function resolveProductPickupWriteFields(body, options = {}) {
       buildProductPickupLocation(synced.productPickupLat, synced.productPickupLon),
     productRegionCode: saleLocation.productRegionCode,
   };
+}
+
+/**
+ * `Number(null)` === 0 — без явной проверки на пустое значение отсутствующая
+ * координата превращается в валидный ноль (Гвинейский залив).
+ *
+ * @param {unknown} raw
+ * @returns {number | null}
+ */
+function toPickupCoord(raw) {
+  if (raw === null || raw === undefined || raw === "") {
+    return null;
+  }
+  const value = Number(raw);
+  return Number.isFinite(value) ? value : null;
+}
+
+/**
+ * Legacy-клиент (мобилка) шлёт только `productPickupAddress/Lat/Lon` и ничего
+ * не знает про мультиточки. Безусловная пересборка массива из одного адреса
+ * стирала все остальные точки продавца, заведённые в вебе. Здесь правим
+ * ТОЛЬКО точку по умолчанию, остальные сохраняем как есть.
+ *
+ * @param {unknown} existingProduct товар из БД
+ * @param {{ address?: unknown; lat?: unknown; lon?: unknown }} legacyPickup
+ * @returns {Array<Record<string, unknown>> | null} null — сливать нечего,
+ *   обычный legacy-путь (0 или 1 точка).
+ */
+export function mergeLegacyPickupIntoExistingLocations(existingProduct, legacyPickup) {
+  const stored = productPickupLocationsFromProduct(existingProduct);
+  if (stored.length < 2) {
+    return null;
+  }
+
+  const address = String(legacyPickup?.address ?? "").trim();
+  if (!address) {
+    return null;
+  }
+
+  const lat = toPickupCoord(legacyPickup?.lat);
+  const lon = toPickupCoord(legacyPickup?.lon);
+  const defaultIndex = Math.max(
+    0,
+    stored.findIndex((item) => item.isDefault),
+  );
+
+  const merged = stored.map((item, index) =>
+    index === defaultIndex
+      ? {
+          ...item,
+          address,
+          lat: lat ?? item.lat,
+          lon: lon ?? item.lon,
+        }
+      : item,
+  );
+
+  // Новый адрес точки по умолчанию мог совпасть с другой точкой — две
+  // одинаковые точки бессмысленны и не пройдут валидацию, схлопываем.
+  const defaultKey = productPickupLocationDuplicateKey(address);
+  const deduped = merged.filter(
+    (item, index) =>
+      index === defaultIndex ||
+      productPickupLocationDuplicateKey(item.address) !== defaultKey,
+  );
+
+  // Точка без координат не пройдёт normalizeProductPickupLocationsInput и
+  // уронила бы весь патч в 400. Такие точки невосстановимы — выкидываем,
+  // но если после этого мультиточек не осталось, отдаём обычный legacy-путь.
+  const usable = deduped.filter(
+    (item) => toPickupCoord(item.lat) != null && toPickupCoord(item.lon) != null,
+  );
+  if (usable.length < 2 || !usable.some((item) => item.isDefault)) {
+    return null;
+  }
+
+  return usable;
 }
 
 /**

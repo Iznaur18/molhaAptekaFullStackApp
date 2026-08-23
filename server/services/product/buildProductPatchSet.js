@@ -31,7 +31,10 @@ import {
   resolveProductDeliveryEnabledForWrite,
   resolveProductPickupEnabledForWrite,
 } from "./productPickup.js";
-import { resolveProductPickupWriteFields } from "./productPickupLocations.js";
+import {
+  mergeLegacyPickupIntoExistingLocations,
+  resolveProductPickupWriteFields,
+} from "./productPickupLocations.js";
 
 import {
   CATALOG_VISIBILITY_BLOCK_MESSAGE,
@@ -286,8 +289,12 @@ const applyPickupFields = async (body, $set, $unset, existing) => {
           productPickupAddress: touchesAddress
             ? body.productPickupAddress
             : existing.productPickupAddress,
-          productPickupLat: touchesLat ? body.productPickupLat : existing.productPickupLat,
-          productPickupLon: touchesLon ? body.productPickupLon : existing.productPickupLon,
+          productPickupLat: touchesLat
+            ? body.productPickupLat
+            : existing.productPickupLat,
+          productPickupLon: touchesLon
+            ? body.productPickupLon
+            : existing.productPickupLon,
           productRegionCode: hasBodyField(body, "productRegionCode")
             ? body.productRegionCode
             : existing.productRegionCode,
@@ -306,6 +313,18 @@ const applyPickupFields = async (body, $set, $unset, existing) => {
 
       if (sameLocation) {
         return;
+      }
+
+      // Legacy-клиент (мобилка) правит адрес, не зная про мультиточки:
+      // без слияния resolveProductPickupWriteFields пересобрал бы массив из
+      // одного адреса и молча стёр остальные точки продавца.
+      const mergedLocations = mergeLegacyPickupIntoExistingLocations(existing, {
+        address: writeBody.productPickupAddress,
+        lat: writeBody.productPickupLat,
+        lon: writeBody.productPickupLon,
+      });
+      if (mergedLocations) {
+        writeBody.productPickupLocations = mergedLocations;
       }
     }
 

@@ -52,9 +52,7 @@ export const productPickupLocationItemSchema = z.object({
       if (value === undefined || value === null || value === "") {
         return "";
       }
-      return String(value)
-        .trim()
-        .slice(0, PRODUCT_PICKUP_LOCATION_LABEL_MAX_LENGTH);
+      return String(value).trim().slice(0, PRODUCT_PICKUP_LOCATION_LABEL_MAX_LENGTH);
     }),
   address: productPickupAddressFieldSchema,
   lat: productPickupLatFieldSchema,
@@ -126,20 +124,35 @@ export function ensureSingleDefaultProductPickupLocation(items) {
 }
 
 /**
+ * `Number(null)` и `Number("")` дают 0 — без явной проверки на пустое значение
+ * точка без координат читалась как валидная точка 0,0 (Гвинейский залив):
+ * такие координаты попадали в снапшот заказа (`pickupLatAtOrder`) и в форму
+ * правки товара как «настоящие».
+ *
+ * @param {unknown} raw
+ * @returns {number | null}
+ */
+function toStoredCoord(raw) {
+  if (raw === null || raw === undefined || raw === "") {
+    return null;
+  }
+  const value = Number(raw);
+  return Number.isFinite(value) ? value : null;
+}
+
+/**
  * @param {unknown} item
  */
 function normalizeStoredProductPickupLocation(item) {
   const address = String(item?.address ?? item?.line ?? "").trim();
-  const lat = Number(item?.lat);
-  const lon = Number(item?.lon);
   return {
     id: String(item?.id ?? "").trim() || "legacy-default",
     label: String(item?.label ?? "")
       .trim()
       .slice(0, PRODUCT_PICKUP_LOCATION_LABEL_MAX_LENGTH),
     address,
-    lat: Number.isFinite(lat) ? lat : null,
-    lon: Number.isFinite(lon) ? lon : null,
+    lat: toStoredCoord(item?.lat),
+    lon: toStoredCoord(item?.lon),
     isDefault: item?.isDefault === true,
   };
 }
@@ -176,16 +189,13 @@ export function productPickupLocationsFromProduct(product) {
     return [];
   }
 
-  const lat = Number(product?.productPickupLat);
-  const lon = Number(product?.productPickupLon);
-
   return [
     {
       id: "legacy-default",
       label: "",
       address,
-      lat: Number.isFinite(lat) ? lat : null,
-      lon: Number.isFinite(lon) ? lon : null,
+      lat: toStoredCoord(product?.productPickupLat),
+      lon: toStoredCoord(product?.productPickupLon),
       isDefault: true,
     },
   ];
@@ -276,7 +286,4 @@ export function assertProductWriteFulfillmentMethods(body, ctx) {
   }
 }
 
-export {
-  assertPickupCoordsPair,
-  PRODUCT_PICKUP_COORDS_REQUIRED_MESSAGE,
-};
+export { assertPickupCoordsPair, PRODUCT_PICKUP_COORDS_REQUIRED_MESSAGE };
