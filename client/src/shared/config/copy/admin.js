@@ -204,7 +204,7 @@ export const ADMIN_ANALYTICS_PAGE_UI = {
   EXPORT_SHA256: (hash) => `SHA-256: ${hash}`,
   PLAUSIBLE_OPEN: "Открыть Plausible",
   PLAUSIBLE_HINT:
-    "Внешний traffic (Plausible). Задайте VITE_PLAUSIBLE_DOMAIN (+ optional VITE_PLAUSIBLE_SHARED_URL).",
+    "Внешний traffic (Plausible). Задайте VITE_PLAUSIBLE_SCRIPT_SRC (pa-….js из кабинета) или DOMAIN + SHARED_URL.",
   RECONCILE: "Сверить integrity",
   RECONCILE_LOADING: "Сверка…",
   RECONCILE_ERROR: "Не удалось запустить сверку",

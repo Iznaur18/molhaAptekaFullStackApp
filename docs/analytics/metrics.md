@@ -47,13 +47,19 @@ CSV строится из тех же агрегатов, что overview. В о
 
 | App | Env | Назначение |
 |-----|-----|------------|
-| Web | `VITE_PLAUSIBLE_DOMAIN` | domain сайта в Plausible |
-| Web | `VITE_PLAUSIBLE_SCRIPT_SRC` | optional script URL (default cloud) |
+| Web | `VITE_PLAUSIBLE_SCRIPT_SRC` | URL из кабинета (`pa-….js` или classic `script.js`) — **основной способ** |
+| Web | `VITE_PLAUSIBLE_DOMAIN` | legacy / mobile sync; для `pa-….js` не обязателен |
 | Web | `VITE_PLAUSIBLE_SHARED_URL` | optional shared dashboard link в `/admin-analytics` |
-| Mobile | `EXPO_PUBLIC_PLAUSIBLE_DOMAIN` | тот же domain |
+| Mobile | `EXPO_PUBLIC_PLAUSIBLE_DOMAIN` | domain сайта (Events API) |
 | Mobile | `EXPO_PUBLIC_PLAUSIBLE_URL_BASE` | origin для URL pageview |
 | Mobile | `EXPO_PUBLIC_PLAUSIBLE_API_HOST` | Events API host (default `https://plausible.io`) |
 
-Без `*_PLAUSIBLE_DOMAIN` интеграция **выключена**.
+Web без `SCRIPT_SRC` и без `DOMAIN` — **выключено**. Mobile без `EXPO_PUBLIC_PLAUSIBLE_DOMAIN` — **выключено**.
+
+Пример web (`client/.env`):
+
+```
+VITE_PLAUSIBLE_SCRIPT_SRC=https://plausible.io/js/pa-bpk-uLbAhfVhsvkpa1DW3.js
+```
 
 Доказательство третьим лицам: shared link в Plausible (read-only) + сверка с `/admin-analytics` (регистрации/заказы).
