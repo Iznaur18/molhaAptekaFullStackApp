@@ -1,4 +1,4 @@
-import { Pressable, View } from "react-native";
+import { StyleSheet } from "react-native";
 
 import { SITE_HEADER_BANNER_LAYOUT } from "@/shared/lib/siteHeaderBannerLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
@@ -24,15 +24,23 @@ export const useSiteHeaderBannerCarouselStyles = createThemedStyles((theme) => (
     width: "100%",
     minHeight: SITE_HEADER_BANNER_LAYOUT.height,
     overflow: "hidden",
-    borderRadius: SITE_HEADER_BANNER_LAYOUT.radius,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   pressable: {
     width: "100%",
     minHeight: SITE_HEADER_BANNER_LAYOUT.height,
   },
+  media: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: "hidden",
+  },
+  imageBg: {
+    ...StyleSheet.absoluteFillObject,
+    transform: [{ scale: SITE_HEADER_BANNER_LAYOUT.imageBlurScale }],
+  },
   image: {
-    width: "100%",
-    height: SITE_HEADER_BANNER_LAYOUT.height,
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 1,
   },
   dots: {
     position: "absolute",
@@ -52,6 +60,7 @@ export const useSiteHeaderBannerCarouselStyles = createThemedStyles((theme) => (
     backgroundColor: `${theme.colors.onContrast}66`,
   },
   dotActive: {
+    width: SITE_HEADER_BANNER_LAYOUT.dotActiveWidth,
     backgroundColor: theme.colors.onContrast,
   },
   adBadge: {

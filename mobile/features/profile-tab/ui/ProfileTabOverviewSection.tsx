@@ -69,7 +69,9 @@ export const ProfileTabOverviewSection = ({ onEditPress }: ProfileTabOverviewSec
         </View>
       ) : null}
 
-      <UserProfileInfoPanel rows={profileRows} />
+      <View style={styles.infoPanel}>
+        <UserProfileInfoPanel rows={profileRows} />
+      </View>
     </View>
   );
 };

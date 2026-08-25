@@ -53,8 +53,13 @@ test("address prompt host, CTA focus and CMS fallback are wired", () => {
   assert.match(copy, /profile_address:/);
   const limitModal = readMobileFile("entities/product/ui/SellerProductsLimitModal.tsx");
   const regionSelect = readMobileFile("entities/region/ui/RuRegionSelect.tsx");
+  const regionSheet = readMobileFile("entities/region/ui/RuRegionPickerSheet.tsx");
   assert.match(limitModal, /useRegisterBlockingOverlay/);
-  assert.match(regionSelect, /useRegisterBlockingOverlay/);
+  assert.match(regionSheet, /useRegisterBlockingOverlay/);
+  assert.match(regionSheet, /transparent/);
+  assert.match(regionSheet, /useAdminEditModalAnimation/);
+  assert.match(regionSheet, /SHEET_DESKTOP_MAX_WIDTH_PX|416/);
+  assert.match(regionSelect, /RuRegionPickerSheet/);
   assert.match(host, /useBlockingOverlayCount/);
   assert.match(host, /resolveAddressPromptUserId/);
   assert.match(cardsHint, /onPrimaryAction/);

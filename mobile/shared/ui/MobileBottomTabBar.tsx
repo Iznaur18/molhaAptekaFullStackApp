@@ -194,7 +194,7 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
 
   const cartBadge = cartCount > 0 ? formatBadge(cartCount) : null;
   const profileBadge =
-    unreadNotifications > 0 ? formatBadge(unreadNotifications) : null;
+    isAuthorized && unreadNotifications > 0 ? formatBadge(unreadNotifications) : null;
   const placeProduct = usePlaceProductPress();
   const { replayIntro } = useAppIntro();
   const introHoldTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -240,6 +240,12 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
   const handlePress = (routeName: string) => {
     if (routeName === PLACE_PRODUCT_ROUTE) {
       placeProduct.handlePlaceProductPress();
+      return;
+    }
+
+    // Паритет web MobileBottomNav: гость → /login, не экран профиля.
+    if (routeName === "profile" && !isAuthorized) {
+      router.push("/(auth)/login");
       return;
     }
 

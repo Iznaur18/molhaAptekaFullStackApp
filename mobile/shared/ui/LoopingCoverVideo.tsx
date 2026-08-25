@@ -8,6 +8,7 @@ type LoopingCoverVideoProps = {
   loop?: boolean;
   isMuted?: boolean;
   isPlaying?: boolean;
+  contentFit?: "cover" | "contain";
   onPlaybackFailed?: () => void;
   onReady?: () => void;
   onEnded?: () => void;
@@ -19,6 +20,7 @@ export const LoopingCoverVideo = ({
   loop = true,
   isMuted = true,
   isPlaying = true,
+  contentFit = "cover",
   onPlaybackFailed,
   onReady,
   onEnded,
@@ -71,7 +73,7 @@ export const LoopingCoverVideo = ({
     <VideoView
       player={player}
       style={[styles.video, style]}
-      contentFit="cover"
+      contentFit={contentFit}
       nativeControls={false}
       allowsPictureInPicture={false}
       pointerEvents="none"

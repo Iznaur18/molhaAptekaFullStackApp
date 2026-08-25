@@ -1,6 +1,7 @@
 import { Platform, StyleSheet } from "react-native";
 
 import { CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT } from "@/entities/order/lib/checkoutPaymentMethodCardTheme";
+import { AUTH_PAGE_LAYOUT as A } from "@/shared/lib/authPageLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
@@ -8,7 +9,7 @@ export const MODAL_BACKDROP_SCRIM = "rgba(0,0,0,0.45)";
 
 export const EMAIL_VERIFY_MODAL_CORNER_RADIUS = 36;
 
-export const PASSWORD_TOGGLE_ICON_SIZE = 22;
+export const PASSWORD_TOGGLE_ICON_SIZE = A.passwordToggleSize;
 
 /** Высота checkout bottom sheet, % viewport (было 88%, −20% → 70). */
 export const CHECKOUT_SHEET_HEIGHT_PERCENT = 60;
@@ -111,14 +112,19 @@ export const useLoginScreenStyles = createThemedStyles((theme) => ({
   },
   scrollContent: {
     flexGrow: 1,
+    alignItems: "center",
     backgroundColor: theme.colors.surface,
-    paddingBottom: theme.spacing[8],
+  },
+  column: {
+    width: "100%",
+    maxWidth: A.columnMaxWidth,
+    flexGrow: 1,
+    backgroundColor: theme.colors.surface,
   },
   hero: {
     width: "100%",
     backgroundColor: theme.colors.surfaceMuted,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
+    borderRadius: A.heroRadius,
     overflow: "hidden",
   },
   heroImage: {
@@ -131,56 +137,57 @@ export const useLoginScreenStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surfaceMuted,
   },
   body: {
-    paddingHorizontal: theme.spacing[6],
-    paddingTop: theme.spacing[6],
-    gap: theme.spacing[2],
+    width: "100%",
+    paddingHorizontal: A.bodyPaddingX,
+    paddingTop: A.bodyPaddingTop,
+    gap: A.bodyGap,
   },
   title: {
-    fontSize: 26,
+    fontSize: A.titleFontSize,
     fontWeight: "700",
     color: theme.colors.text,
     textAlign: "center",
   },
   subtitle: {
-    fontSize: 15,
-    lineHeight: 20,
+    fontSize: A.subtitleFontSize,
+    lineHeight: A.subtitleLineHeight,
     color: theme.colors.textMuted,
     textAlign: "center",
-    marginBottom: theme.spacing[2],
+    marginBottom: A.subtitleMarginBottom,
   },
   form: {
-    gap: theme.spacing[4],
+    gap: A.formGap,
   },
   backButtonOverlay: {
     position: "absolute",
     zIndex: 10,
-    paddingVertical: theme.spacing[2],
-    paddingHorizontal: theme.spacing[3],
-    borderRadius: theme.radius.button,
-    backgroundColor: "rgba(255, 255, 255, 0.92)",
+    width: A.backSize,
+    height: A.backSize,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: A.backRadius,
+    backgroundColor: "rgba(255, 255, 255, 0.14)",
   },
-  backButtonOverlayText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: theme.colors.link,
+  backButtonOverlayDisabled: {
+    opacity: 0.55,
   },
   field: {
-    gap: 6,
+    gap: A.fieldGap,
   },
   label: {
-    fontSize: 13,
+    fontSize: A.labelFontSize,
     fontWeight: "600",
     color: theme.colors.textSecondary,
-    marginLeft: theme.spacing[1],
+    marginLeft: 4,
   },
   input: {
     borderWidth: 1,
     borderColor: theme.colors.borderStrong,
-    borderRadius: theme.radius.button,
-    paddingHorizontal: theme.spacing[4],
-    paddingVertical: 14,
-    fontSize: 16,
-    backgroundColor: theme.colors.surface,
+    borderRadius: A.inputRadius,
+    paddingHorizontal: A.inputPaddingX,
+    paddingVertical: A.inputPaddingY,
+    fontSize: A.inputFontSize,
+    backgroundColor: theme.colors.surfaceMuted,
     color: theme.colors.text,
   },
   passwordWrap: {
@@ -188,8 +195,8 @@ export const useLoginScreenStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
     borderWidth: 1,
     borderColor: theme.colors.borderStrong,
-    borderRadius: theme.radius.button,
-    backgroundColor: theme.colors.surface,
+    borderRadius: A.inputRadius,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   passwordWrapFocused: {
     borderColor: theme.colors.action,
@@ -197,16 +204,16 @@ export const useLoginScreenStyles = createThemedStyles((theme) => ({
   passwordInput: {
     width: "100%",
     borderWidth: 0,
-    paddingLeft: theme.spacing[4],
+    paddingLeft: A.inputPaddingX,
     paddingRight: 48,
-    paddingVertical: 14,
-    fontSize: 16,
+    paddingVertical: A.inputPaddingY,
+    fontSize: A.inputFontSize,
     color: theme.colors.text,
     backgroundColor: "transparent",
   },
   passwordToggle: {
     position: "absolute",
-    right: 4,
+    right: 6,
     top: 0,
     bottom: 0,
     width: 40,
@@ -216,30 +223,63 @@ export const useLoginScreenStyles = createThemedStyles((theme) => ({
   },
   inputFocused: {
     borderColor: theme.colors.action,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  channelRow: {
+    flexDirection: "row",
+    gap: A.channelGap,
+  },
+  channelBtn: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: A.channelBtnPaddingY,
+    paddingHorizontal: A.channelBtnPaddingX,
+    borderWidth: 1,
+    borderColor: theme.colors.borderStrong,
+    borderRadius: A.channelBtnRadius,
     backgroundColor: theme.colors.surface,
-    shadowColor: theme.colors.action,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.14,
-    shadowRadius: 8,
-    elevation: 2,
+  },
+  channelBtnActive: {
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.action,
+  },
+  channelBtnDisabled: {
+    opacity: 0.7,
+  },
+  channelBtnPressed: {
+    opacity: 0.88,
+    transform: [{ scale: 0.98 }],
+  },
+  channelBtnLabel: {
+    fontSize: A.channelBtnFontSize,
+    fontWeight: "500",
+    color: theme.colors.text,
+  },
+  channelBtnLabelActive: {
+    color: theme.colors.onContrast,
   },
   error: {
+    margin: 0,
     color: theme.colors.danger,
-    fontSize: 14,
-    textAlign: "center",
+    fontSize: A.errorFontSize,
   },
   submitButton: {
     width: "100%",
-    marginTop: theme.spacing[2],
   },
   registerLink: {
     alignSelf: "center",
-    paddingVertical: theme.spacing[2],
+    paddingVertical: 0,
+  },
+  registerLinkDisabled: {
+    opacity: 0.55,
   },
   registerLinkText: {
-    fontSize: 15,
+    fontSize: A.linkFontSize,
     fontWeight: "600",
     color: theme.colors.link,
+    textDecorationLine: "underline",
+    textDecorationColor: theme.colors.link,
   },
   consentBlock: {
     gap: theme.spacing[3],

@@ -79,12 +79,24 @@ test("home catalog feed renders banner in scrollable list header", () => {
   assert.doesNotMatch(bannerRow, /marginHorizontal: -/);
   assert.match(slot, /useSiteHeaderBannerSlidesQuery/);
   assert.match(carousel, /resolveSiteHeaderBannerCarouselMetrics/);
-  assert.match(carousel, /snapToInterval/);
-  assert.match(carousel, /paddingHorizontal/);
+  assert.match(carousel, /pagingEnabled/);
+  assert.match(carousel, /contentFit="contain"/);
+  assert.match(carousel, /blurRadius=\{SITE_HEADER_BANNER_LAYOUT\.imageBlurRadius\}/);
   assert.match(carousel, /buildLoopSlideItems|loop-tail-|loop-head-/);
   assert.match(carousel, /resolveSiteHeaderBannerCarouselLoopJumpTarget/);
   assert.match(carousel, /AUTOPLAY_MS/);
   assert.match(carousel, /resolveSiteHeaderBannerMobileRoute/);
+
+  const metrics = readMobileFile("shared/lib/siteHeaderBannerCarouselLayout.ts");
+  assert.match(metrics, /slideWidth: viewportWidth/);
+  assert.match(metrics, /stride: viewportWidth/);
+  assert.doesNotMatch(metrics, /SITE_HEADER_BANNER_CAROUSEL_PEEK_PX/);
+
+  const webCss = readRepoFile(
+    "client/src/entities/site-header-banner/ui/SiteHeaderBannerCarousel.css",
+  );
+  assert.match(webCss, /object-fit:\s*contain/);
+  assert.match(webCss, /filter:\s*blur\(28px\)/);
 });
 
 test("web header renders carousel after glass header panel", () => {
@@ -132,7 +144,32 @@ test("shared staff section and api routes exist", () => {
   assert.match(staffMainViews, /site-header-banner-admin/);
   assert.match(router, /getSiteHeaderBannerSlidesController/);
   assert.match(router, /checkProductModeratorMW/);
-  assert.match(contract, /SITE_HEADER_BANNER_HEIGHT_PX = 180/);
+  assert.match(contract, /SITE_HEADER_BANNER_HEIGHT_PX = 220/);
+  assert.match(contract, /SITE_HEADER_BANNER_HEIGHT_DESKTOP_PX = 300/);
+  assert.match(contract, /resolveSiteHeaderBannerHeightPx/);
   assert.match(contract, /SITE_HEADER_BANNER_CAROUSEL_SLIDE_GAP_PX = 8/);
   assert.match(contract, /SITE_HEADER_BANNER_CAROUSEL_PEEK_PX = 28/);
+
+  const carousel = readMobileFile("entities/site-header-banner/ui/SiteHeaderBannerCarousel.tsx");
+  assert.match(carousel, /resolveSiteHeaderBannerHeightPx/);
+  assert.match(carousel, /useWindowDimensions/);
+
+  const webCss = readRepoFile(
+    "client/src/entities/site-header-banner/ui/SiteHeaderBannerCarousel.css",
+  );
+  assert.match(webCss, /--site-header-banner-height: 220px/);
+  assert.match(webCss, /--site-header-banner-height: 260px/);
+  assert.match(webCss, /--site-header-banner-height: 300px/);
+});
+
+test("resolveSiteHeaderBannerHeightPx matches web breakpoints", async () => {
+  const { resolveSiteHeaderBannerHeightPx } = await import("@molha/api-contract");
+
+  assert.equal(resolveSiteHeaderBannerHeightPx(0), 220);
+  assert.equal(resolveSiteHeaderBannerHeightPx(390), 220);
+  assert.equal(resolveSiteHeaderBannerHeightPx(766), 220);
+  assert.equal(resolveSiteHeaderBannerHeightPx(767), 260);
+  assert.equal(resolveSiteHeaderBannerHeightPx(1023), 260);
+  assert.equal(resolveSiteHeaderBannerHeightPx(1024), 300);
+  assert.equal(resolveSiteHeaderBannerHeightPx(1440), 300);
 });

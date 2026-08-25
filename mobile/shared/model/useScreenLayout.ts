@@ -2,10 +2,8 @@ import { useMemo } from "react";
 import { useWindowDimensions, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import {
-  resolveScreenContentPaddingBottom,
-  resolveScreenContentPaddingHorizontal,
-} from "@/shared/theme/screenContentLayout";
+import { resolveAppShellMaxWidthStyle } from "@/shared/lib/appShellLayout";
+import { resolveViewportLayoutWidth } from "@/shared/lib/resolveViewportLayoutWidth";
 import {
   resolveContentMaxWidth,
   resolveIsLargeTabletScreen,
@@ -18,6 +16,10 @@ import {
   resolveScreenWidthTier,
   type ScreenWidthTier,
 } from "@/shared/lib/screenBreakpoints";
+import {
+  resolveScreenContentPaddingBottom,
+  resolveScreenContentPaddingHorizontal,
+} from "@/shared/theme/screenContentLayout";
 
 export type ScreenLayout = {
   width: number;
@@ -43,22 +45,21 @@ export const useScreenLayout = (): ScreenLayout => {
   const safeAreaInsets = useSafeAreaInsets();
 
   return useMemo(() => {
-    const widthTier = resolveScreenWidthTier(width);
-    const isNarrow = resolveIsNarrowScreen(width);
-    const isTablet = resolveIsTabletScreen(width);
-    const isSmallTablet = resolveIsSmallTabletScreen(width);
-    const isMediumTablet = resolveIsMediumTabletScreen(width);
-    const isLargeTablet = resolveIsLargeTabletScreen(width);
-    const layoutWidth = resolveLayoutContentWidth(width);
-    const contentMaxWidth = resolveContentMaxWidth(width);
-    const profileContentMaxWidth = resolveProfileContentMaxWidth(width);
+    const viewportWidth = resolveViewportLayoutWidth(width);
+    const widthTier = resolveScreenWidthTier(viewportWidth);
+    const isNarrow = resolveIsNarrowScreen(viewportWidth);
+    const isTablet = resolveIsTabletScreen(viewportWidth);
+    const isSmallTablet = resolveIsSmallTabletScreen(viewportWidth);
+    const isMediumTablet = resolveIsMediumTabletScreen(viewportWidth);
+    const isLargeTablet = resolveIsLargeTabletScreen(viewportWidth);
+    const layoutWidth = resolveLayoutContentWidth(viewportWidth);
+    const contentMaxWidth = resolveContentMaxWidth(viewportWidth);
+    const profileContentMaxWidth = resolveProfileContentMaxWidth(viewportWidth);
     const contentPaddingHorizontal = resolveScreenContentPaddingHorizontal(safeAreaInsets);
     const contentPaddingTop = safeAreaInsets.top;
     const contentPaddingBottom = resolveScreenContentPaddingBottom(safeAreaInsets.bottom);
 
-    const centeredContentStyle: ViewStyle = contentMaxWidth
-      ? { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" }
-      : { width: "100%" };
+    const centeredContentStyle = resolveAppShellMaxWidthStyle(width);
 
     const profileContentStyle: ViewStyle = {
       width: "100%",
@@ -67,7 +68,7 @@ export const useScreenLayout = (): ScreenLayout => {
     };
 
     return {
-      width,
+      width: viewportWidth,
       height,
       layoutWidth,
       widthTier,
@@ -84,5 +85,12 @@ export const useScreenLayout = (): ScreenLayout => {
       centeredContentStyle,
       profileContentStyle,
     };
-  }, [height, safeAreaInsets.bottom, safeAreaInsets.left, safeAreaInsets.right, safeAreaInsets.top, width]);
+  }, [
+    height,
+    safeAreaInsets.bottom,
+    safeAreaInsets.left,
+    safeAreaInsets.right,
+    safeAreaInsets.top,
+    width,
+  ]);
 };

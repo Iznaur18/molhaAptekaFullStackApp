@@ -46,9 +46,9 @@ export const HomeCatalogUsersStretchMenu = ({
   const { portalVisible, shellAnimatedStyle, itemsAnimatedStyle } = useHomeCatalogUsersStretchMenuAnimation({
     open,
     itemCount: items.length,
-    closedBackgroundColor: theme.colors.surface,
+    closedBackgroundColor: theme.colors.action,
     openBackgroundColor: theme.colors.surface,
-    closedBorderColor: theme.colors.border,
+    closedBorderColor: "transparent",
     openBorderColor: theme.colors.border,
   });
   useRegisterBlockingOverlay(portalVisible);
@@ -72,6 +72,7 @@ export const HomeCatalogUsersStretchMenu = ({
   }, [measureAnchor, portalVisible]);
 
   const isMenuExpanded = open || portalVisible;
+  const toggleIconColor = theme.colors.onContrast;
 
   const handleToggle = useCallback(() => {
     if (open) {
@@ -103,10 +104,10 @@ export const HomeCatalogUsersStretchMenu = ({
       >
         {isMenuExpanded ? (
           <View style={styles.usersStretchIconCircle}>
-            <MaterialIcons name="grid-view" size={22} color={theme.colors.textSecondary} />
+            <MaterialIcons name="grid-view" size={22} color={toggleIconColor} />
           </View>
         ) : (
-          <MaterialIcons name="grid-view" size={22} color={theme.colors.textSecondary} />
+          <MaterialIcons name="grid-view" size={22} color={toggleIconColor} />
         )}
       </Pressable>
 

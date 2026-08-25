@@ -25,20 +25,38 @@ type SquircleViewProps = Omit<ViewProps, "style"> & {
   shadowStyle?: StyleProp<ViewStyle>;
 };
 
+/** Web CSS `corner-shape: squircle` — паритет client `@supports (corner-shape: squircle)`. */
+const WEB_SQUIRCLE_CORNER_STYLE =
+  Platform.OS === "web"
+    ? ({
+        // RNW прокидывает неизвестные ключи в DOM style.
+        cornerShape: "squircle",
+      } as ViewStyle)
+    : null;
+
+const IOS_CONTINUOUS_CURVE_STYLE =
+  Platform.OS === "ios" ? ({ borderCurve: "continuous" } as const) : null;
+
 const resolveCornerRadii = (
   radius: number | undefined,
   cornerRadii: SquircleCornerRadii | undefined,
 ): SquircleCornerRadii => {
+  // Web + corner-shape: базовый radius как в CSS. Native: +12% под визуальный squircle.
+  const resolveRadius =
+    Platform.OS === "web"
+      ? (value: number) => value
+      : resolveSquircleRadius;
+
   if (cornerRadii) {
     return {
-      topLeft: resolveSquircleRadius(cornerRadii.topLeft),
-      topRight: resolveSquircleRadius(cornerRadii.topRight),
-      bottomLeft: resolveSquircleRadius(cornerRadii.bottomLeft),
-      bottomRight: resolveSquircleRadius(cornerRadii.bottomRight),
+      topLeft: resolveRadius(cornerRadii.topLeft),
+      topRight: resolveRadius(cornerRadii.topRight),
+      bottomLeft: resolveRadius(cornerRadii.bottomLeft),
+      bottomRight: resolveRadius(cornerRadii.bottomRight),
     };
   }
 
-  const uniformRadius = resolveSquircleRadius(radius ?? 0);
+  const uniformRadius = resolveRadius(radius ?? 0);
   return {
     topLeft: uniformRadius,
     topRight: uniformRadius,
@@ -52,7 +70,8 @@ const buildOuterRadiusStyle = (corners: SquircleCornerRadii): ViewStyle => ({
   borderTopRightRadius: corners.topRight,
   borderBottomLeftRadius: corners.bottomLeft,
   borderBottomRightRadius: corners.bottomRight,
-  ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+  ...IOS_CONTINUOUS_CURVE_STYLE,
+  ...WEB_SQUIRCLE_CORNER_STYLE,
 });
 
 const buildClipStyle = (corners: SquircleCornerRadii): ViewStyle => ({
@@ -61,11 +80,13 @@ const buildClipStyle = (corners: SquircleCornerRadii): ViewStyle => ({
   borderBottomLeftRadius: corners.bottomLeft,
   borderBottomRightRadius: corners.bottomRight,
   overflow: "hidden",
-  ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+  ...IOS_CONTINUOUS_CURVE_STYLE,
+  ...WEB_SQUIRCLE_CORNER_STYLE,
 });
 
 /**
  * Скруглённый контейнер. На всех платформах — borderRadius + overflow.
+ * Web: `corner-shape: squircle`. iOS: `borderCurve: continuous`.
  * outerStyle всегда на отдельном слое: на Android overflow+absolute на одном View
  * ломает клип углов (особенно планшеты).
  */

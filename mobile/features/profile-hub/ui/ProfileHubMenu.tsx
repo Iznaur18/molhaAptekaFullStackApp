@@ -22,7 +22,7 @@ type ProfileHubMenuProps = {
   activeSectionId?: ProfileSectionId;
   onOverviewPress?: () => void;
   onNavigate?: () => void;
-  variant?: "inline" | "sheet";
+  variant?: "inline" | "sheet" | "sidebar";
 };
 
 export const ProfileHubMenu = ({
@@ -68,9 +68,16 @@ export const ProfileHubMenu = ({
     return null;
   }
 
+  const isChromeVariant = variant === "sheet" || variant === "sidebar";
+
   return (
     <View
-      style={[styles.root, profileContentStyle, variant === "sheet" && styles.rootSheet]}
+      style={[
+        styles.root,
+        !isChromeVariant && profileContentStyle,
+        variant === "sheet" && styles.rootSheet,
+        variant === "sidebar" && styles.rootSidebar,
+      ]}
       accessibilityLabel={MY_PROFILE_PAGE_UI.NAV_ARIA}
     >
       <Text style={styles.heading}>{MY_PROFILE_PAGE_UI.TAB_TITLE}</Text>

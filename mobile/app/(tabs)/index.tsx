@@ -58,7 +58,6 @@ import { HomeFeedListHeader } from "@/features/home-feed/ui/HomeFeedListHeader";
 import { HomeCatalogFeedSheetCap } from "@/features/home-feed/ui/HomeCatalogFeedSheetCap";
 import { HomeCatalogPrimaryBackdrop } from "@/features/home-feed/ui/HomeCatalogPrimaryBackdrop";
 import { HomeCatalogSearchRow } from "@/features/home-feed/ui/HomeCatalogSearchRow";
-import { HomeCatalogStickySearchShell } from "@/features/home-feed/ui/HomeCatalogStickySearchShell";
 import { API_CLIENT_UI, CATALOG_SEARCH_MIN_LENGTH } from "@/shared/config";
 import { CATALOG_SEARCH_QUERY_MAX_LENGTH } from "@molha/api-contract";
 import { formatApiErrorMessage } from "@/shared/lib";
@@ -67,7 +66,7 @@ import {
   HOME_CATALOG_FOREGROUND_SHEET_CAP_HEIGHT,
   resolveHomeCatalogPrimaryBackdropHeight,
 } from "@/shared/lib/homeCatalogBackdropLayout";
-import { resolveHomeCatalogOverlayContentInsetTop } from "@/shared/lib/homeCatalogHeaderLayout";
+import { HOME_CATALOG_HEADER_STICKY_TOP_OFFSET } from "@/shared/lib/homeCatalogHeaderLayout";
 import {
   resetHomeCatalogTabBarReveal,
   setHomeCatalogTabBarProgressDriven,
@@ -103,7 +102,8 @@ export default function CatalogScreen() {
   const styles = useFeedScreenStyles();
   const queryClient = useQueryClient();
   const productGrid = useProductGridLayout();
-  const { centeredContentStyle, contentPaddingBottom, contentMaxWidth } = useScreenLayout();
+  const { centeredContentStyle, contentPaddingBottom, contentPaddingHorizontal } =
+    useScreenLayout();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const router = useRouter();
@@ -515,40 +515,36 @@ export default function CatalogScreen() {
     <View style={styles.homeFeedSheetFiller} />
   );
 
-  const homeFeedOverlayInsetTop = useMemo(
-    () => resolveHomeCatalogOverlayContentInsetTop(insets.top),
-    [insets.top],
-  );
+  /** Safe-area + web sticky top gap; шапка в потоке списка (не absolute overlay). */
+  const homeFeedScrollTopInset = insets.top + HOME_CATALOG_HEADER_STICKY_TOP_OFFSET;
 
   const homeFeedContentContainerStyle = useMemo(
     (): ViewStyle[] => [
       styles.homeFeedListContent,
       {
-        paddingTop: homeFeedOverlayInsetTop,
+        paddingTop: homeFeedScrollTopInset,
         paddingBottom: contentPaddingBottom,
+        paddingHorizontal: contentPaddingHorizontal,
         minHeight: windowHeight,
         flexGrow: 1,
       },
     ],
     [
       contentPaddingBottom,
-      homeFeedOverlayInsetTop,
+      contentPaddingHorizontal,
+      homeFeedScrollTopInset,
       styles.homeFeedListContent,
       windowHeight,
     ],
   );
 
-  // На планшетах ограничиваем ширину контента и центрируем его, оставляя фон
-  // сцены/шторки во всю ширину. Плитки и баннер розыгрыша считаются под
-  // contentMaxWidth (см. useProductGridLayout / useRaffleFeaturedSlideLayout) —
-  // без этого они расползаются по полной ширине окна. На телефонах
-  // contentMaxWidth === undefined, ограничение не применяется.
-  const homeFeedCenteredWidthStyle = useMemo(
-    (): ViewStyle | null =>
-      contentMaxWidth != null
-        ? { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" }
-        : null,
-    [contentMaxWidth],
+  // Колонка как web `.app-shell` (max-width). Padding — в contentContainer.
+  const homeFeedShellStyle = centeredContentStyle;
+
+  const homeFeedSearchListHeader = (
+    <View style={styles.homeFeedSearchHeader}>
+      <HomeCatalogEmbeddedSearchRow />
+    </View>
   );
 
   const renderHomeFeedRow = useCallback(
@@ -648,23 +644,25 @@ export default function CatalogScreen() {
           {IS_HOME_FEED_INTRO_BACKDROP_ENABLED ? <HomeCatalogPrimaryBackdrop /> : null}
           <View style={[styles.homeFeedPendingSheet, styles.homeFeedForeground]}>
             <HomeCatalogFeedSheetCap />
-            <View
-              style={[
-                styles.homeFeedInsetContent,
-                homeFeedCenteredWidthStyle,
-                { paddingTop: homeFeedOverlayInsetTop },
-              ]}
-            >
-              {listHeader}
-              <CatalogGridSkeleton
-                columns={productGrid.columns}
-                tileWidth={productGrid.tileWidth}
-                gap={productGrid.gap}
-              />
+            <View style={[styles.flex, homeFeedShellStyle]}>
+              <View
+                style={[
+                  styles.homeFeedInsetContent,
+                  {
+                    paddingTop: homeFeedScrollTopInset,
+                    paddingHorizontal: contentPaddingHorizontal,
+                  },
+                ]}
+              >
+                {searchRow}
+                {listHeader}
+                <CatalogGridSkeleton
+                  columns={productGrid.columns}
+                  tileWidth={productGrid.tileWidth}
+                  gap={productGrid.gap}
+                />
+              </View>
             </View>
-            <HomeCatalogStickySearchShell>
-              {searchRow}
-            </HomeCatalogStickySearchShell>
           </View>
         </View>,
       );
@@ -698,22 +696,24 @@ export default function CatalogScreen() {
           {IS_HOME_FEED_INTRO_BACKDROP_ENABLED ? <HomeCatalogPrimaryBackdrop /> : null}
           <View style={[styles.homeFeedPendingSheet, styles.homeFeedForeground]}>
             <HomeCatalogFeedSheetCap />
-            <View
-              style={[
-                styles.homeFeedInsetContent,
-                homeFeedCenteredWidthStyle,
-                { paddingTop: homeFeedOverlayInsetTop },
-              ]}
-            >
-              {listHeader}
-              <ScreenErrorState
-                message={formatApiErrorMessage(catalogQuery.error, API_CLIENT_UI.CATALOG_ERROR)}
-                onRetry={() => catalogQuery.refetch()}
-              />
+            <View style={[styles.flex, homeFeedShellStyle]}>
+              <View
+                style={[
+                  styles.homeFeedInsetContent,
+                  {
+                    paddingTop: homeFeedScrollTopInset,
+                    paddingHorizontal: contentPaddingHorizontal,
+                  },
+                ]}
+              >
+                {searchRow}
+                {listHeader}
+                <ScreenErrorState
+                  message={formatApiErrorMessage(catalogQuery.error, API_CLIENT_UI.CATALOG_ERROR)}
+                  onRetry={() => catalogQuery.refetch()}
+                />
+              </View>
             </View>
-            <HomeCatalogStickySearchShell>
-              {searchRow}
-            </HomeCatalogStickySearchShell>
           </View>
         </View>,
       );
@@ -756,7 +756,7 @@ export default function CatalogScreen() {
                   </View>
                 ) : null}
                 <Animated.View style={[styles.homeFeedSheet, introTransition.sheetStyle]}>
-                  <View style={styles.flex}>
+                  <View style={[styles.flex, homeFeedShellStyle]}>
                     <GestureDetector gesture={introTransition.nativeGesture}>
                       <CatalogAnimatedFlatList<HomeCatalogFeedListRow>
                         ref={catalogListRef as Ref<Animated.FlatList<HomeCatalogFeedListRow>>}
@@ -765,14 +765,12 @@ export default function CatalogScreen() {
                         keyExtractor={(item) => item.key}
                         numColumns={1}
                         trackCatalogScroll={false}
+                        ListHeaderComponent={homeFeedSearchListHeader}
                         renderItem={renderHomeFeedRow}
                         onViewableItemsChanged={rowVisibility.onViewableItemsChanged}
                         viewabilityConfig={rowVisibility.viewabilityConfig}
                         contentContainerStyle={homeFeedContentContainerStyle}
-                        style={[
-                          resolveHomeCatalogFeedListStyle(styles.flex, styles.homeFeedList),
-                          homeFeedCenteredWidthStyle,
-                        ]}
+                        style={resolveHomeCatalogFeedListStyle(styles.flex, styles.homeFeedList)}
                         scrollEnabled={introTransition.scrollEnabled}
                         {...homeCatalogFeedListScrollProps}
                         {...homeCatalogFeedListPerformanceProps}
@@ -793,9 +791,6 @@ export default function CatalogScreen() {
                         }
                       />
                     </GestureDetector>
-                    <HomeCatalogStickySearchShell>
-                      <HomeCatalogEmbeddedSearchRow />
-                    </HomeCatalogStickySearchShell>
                   </View>
                 </Animated.View>
               </View>

@@ -34,27 +34,28 @@ export const HomeCuratedListsSection = ({ lists }: HomeCuratedListsSectionProps)
   return (
     <View style={styles.section} accessibilityLabel={HOME_FEED_UI.CURATED_SECTION_ARIA}>
       {lists.map((list) => (
-        <SquircleView
-          key={list._id}
-          radius={CURATED_PRODUCT_LIST_HOME_SECTION_BORDER_RADIUS}
-          style={styles.listBlock}
-        >
+        <View key={list._id} style={styles.listGroup}>
           <Text style={styles.title}>{list.title}</Text>
-          <ScrollView
-            horizontal
-            {...nestedHorizontalScrollProps}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.row}
+          <SquircleView
+            radius={CURATED_PRODUCT_LIST_HOME_SECTION_BORDER_RADIUS}
+            style={styles.listBlock}
           >
-            {list.products.map((product) => (
-              <CuratedProductCompactCard
-                key={product._id}
-                product={product}
-                width={compactCardWidth}
-              />
-            ))}
-          </ScrollView>
-        </SquircleView>
+            <ScrollView
+              horizontal
+              {...nestedHorizontalScrollProps}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.row}
+            >
+              {list.products.map((product) => (
+                <CuratedProductCompactCard
+                  key={product._id}
+                  product={product}
+                  width={compactCardWidth}
+                />
+              ))}
+            </ScrollView>
+          </SquircleView>
+        </View>
       ))}
     </View>
   );

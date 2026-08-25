@@ -5,6 +5,14 @@
   border: 1px solid var(--iz-color-border);
   border-radius: 20px;
   background-color: var(--iz-color-surface);
+  overflow: hidden;
+}
+
+@supports (corner-shape: squircle) {
+  .user-stories-strip {
+    border-radius: 20px;
+    corner-shape: squircle;
+  }
 }
 
 .user-stories-strip__title {

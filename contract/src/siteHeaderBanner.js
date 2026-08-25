@@ -1,7 +1,29 @@
 import { z } from "zod";
 
 export const SITE_HEADER_BANNER_SETTINGS_KEY = "default";
-export const SITE_HEADER_BANNER_HEIGHT_PX = 180;
+/** Phone / default — паритет web `--site-header-banner-height`. */
+export const SITE_HEADER_BANNER_HEIGHT_PX = 220;
+/** Tablet `min-width: 767px`. */
+export const SITE_HEADER_BANNER_HEIGHT_TABLET_PX = 260;
+/** Desktop `min-width: 1024px`. */
+export const SITE_HEADER_BANNER_HEIGHT_DESKTOP_PX = 300;
+export const SITE_HEADER_BANNER_HEIGHT_TABLET_MIN_WIDTH_PX = 767;
+export const SITE_HEADER_BANNER_HEIGHT_DESKTOP_MIN_WIDTH_PX = 1024;
+
+/** Высота баннера по ширине окна (как web media queries). */
+export const resolveSiteHeaderBannerHeightPx = (viewportWidth) => {
+  if (!Number.isFinite(viewportWidth) || viewportWidth <= 0) {
+    return SITE_HEADER_BANNER_HEIGHT_PX;
+  }
+  if (viewportWidth >= SITE_HEADER_BANNER_HEIGHT_DESKTOP_MIN_WIDTH_PX) {
+    return SITE_HEADER_BANNER_HEIGHT_DESKTOP_PX;
+  }
+  if (viewportWidth >= SITE_HEADER_BANNER_HEIGHT_TABLET_MIN_WIDTH_PX) {
+    return SITE_HEADER_BANNER_HEIGHT_TABLET_PX;
+  }
+  return SITE_HEADER_BANNER_HEIGHT_PX;
+};
+
 export const SITE_HEADER_BANNER_CAROUSEL_PEEK_PX = 28;
 export const SITE_HEADER_BANNER_CAROUSEL_SLIDE_GAP_PX = 8;
 export const SITE_HEADER_BANNER_AUTOPLAY_MS = 5000;

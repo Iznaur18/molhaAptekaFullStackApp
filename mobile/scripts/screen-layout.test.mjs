@@ -12,6 +12,7 @@ const SCREEN_PRODUCT_GRID_4_COL_MIN_WIDTH = 1280;
 const SCREEN_CONTENT_MAX_WIDTH_SMALL_TABLET = 520;
 const SCREEN_CONTENT_MAX_WIDTH_MEDIUM_TABLET = 720;
 const SCREEN_CONTENT_MAX_WIDTH_LARGE_TABLET = 960;
+const SCREEN_CONTENT_MAX_WIDTH_WIDE = 1200;
 const PROFILE_CONTENT_MAX_WIDTH_PHONE = 420;
 const PROFILE_CONTENT_MAX_WIDTH_SMALL_TABLET = 560;
 const PROFILE_CONTENT_MAX_WIDTH_MEDIUM_TABLET = 640;
@@ -53,6 +54,9 @@ const resolveScreenWidthTier = (width) => {
 };
 
 const resolveContentMaxWidth = (width) => {
+  if (width >= SCREEN_PRODUCT_GRID_4_COL_MIN_WIDTH) {
+    return SCREEN_CONTENT_MAX_WIDTH_WIDE;
+  }
   const tier = resolveScreenWidthTier(width);
   if (tier === "tablet-large") return SCREEN_CONTENT_MAX_WIDTH_LARGE_TABLET;
   if (tier === "tablet-medium") return SCREEN_CONTENT_MAX_WIDTH_MEDIUM_TABLET;
@@ -101,11 +105,13 @@ test("width tiers for layout chrome unchanged", () => {
   assert.equal(resolveScreenWidthTier(1024), "tablet-large");
 });
 
-test("resolveContentMaxWidth: four ascending tiers", () => {
+test("resolveContentMaxWidth: four ascending tiers + wide", () => {
   assert.equal(resolveContentMaxWidth(390), undefined);
   assert.equal(resolveContentMaxWidth(600), SCREEN_CONTENT_MAX_WIDTH_SMALL_TABLET);
   assert.equal(resolveContentMaxWidth(768), SCREEN_CONTENT_MAX_WIDTH_MEDIUM_TABLET);
   assert.equal(resolveContentMaxWidth(1024), SCREEN_CONTENT_MAX_WIDTH_LARGE_TABLET);
+  assert.equal(resolveContentMaxWidth(1279), SCREEN_CONTENT_MAX_WIDTH_LARGE_TABLET);
+  assert.equal(resolveContentMaxWidth(1280), SCREEN_CONTENT_MAX_WIDTH_WIDE);
 });
 
 test("resolveProfileContentMaxWidth: four ascending tiers", () => {

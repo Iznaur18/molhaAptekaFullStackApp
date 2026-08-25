@@ -27,7 +27,13 @@ test("catalog screen uses breadcrumb instead of category chips", () => {
   assert.match(breadcrumb, /accessibilityRole="header"/);
   assert.match(styles, /title:/);
   assert.match(styles, /paddingTop: 16/);
+  assert.match(styles, /HOME_FEED_DISPLAY_TITLE/);
   assert.match(webCss, /catalog-categories-browser__breadcrumb/);
+
+  const display = readFile(MOBILE_ROOT, "shared/theme/displayTypography.ts");
+  assert.match(display, /DISPLAY_FONT_FAMILY = "Intro"/);
+  const layout = readFile(MOBILE_ROOT, "app/_layout.tsx");
+  assert.match(layout, /IntroDemo-BlackCAPS\.otf/);
 });
 
 test("catalog breadcrumb label resolves feed sort like web", () => {

@@ -1,11 +1,15 @@
 import { Platform, StyleSheet } from "react-native";
 
+import {
+  GUEST_PROFILE_LAYOUT as G,
+  MY_PROFILE_LAYOUT_GAP,
+  MY_PROFILE_SHELL_PAD_X,
+  MY_PROFILE_SIDEBAR_WIDTH,
+  PROFILE_OVERVIEW_LAYOUT as O,
+} from "@/shared/lib/guestProfileLayout";
 import { PROFILE_CONTENT_MAX_WIDTH_PHONE } from "@/shared/lib/screenBreakpoints";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import {
-  SCREEN_CONTENT_PADDING_BOTTOM,
-  SCREEN_CONTENT_PADDING_HORIZONTAL,
-} from "@/shared/theme/screenContentLayout";
+import { SCREEN_CONTENT_PADDING_BOTTOM, SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
 /** @deprecated используйте resolveProfileContentMaxWidth / useScreenLayout */
 export const PROFILE_CONTENT_MAX_WIDTH = PROFILE_CONTENT_MAX_WIDTH_PHONE;
@@ -16,36 +20,69 @@ export const PROFILE_BANNER_HEIGHT = PROFILE_AVATAR_SIZE * 3;
 export const PROFILE_CARD_SQUIRCLE_RADIUS = 24;
 /** Паритет с teaser/wholesale chrome на экране товара. */
 export const PRODUCT_DETAIL_SECTION_RADIUS = 20;
-const GUEST_BODY_PADDING_TOP = 0;
-const GUEST_BODY_MARGIN_TOP = 36;
-const GUEST_BODY_MARGIN_BOTTOM = 36;
 
 export const useProfileScreenStyles = createThemedStyles((theme) => ({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.bg,
   },
+  pageLayout: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    width: "100%",
+    gap: MY_PROFILE_LAYOUT_GAP,
+    backgroundColor: theme.colors.bg,
+  },
+  pageScrollContent: {
+    flexGrow: 1,
+    width: "100%",
+  },
+  shellPad: {
+    paddingHorizontal: MY_PROFILE_SHELL_PAD_X,
+  },
+  sidebarWrap: {
+    width: MY_PROFILE_SIDEBAR_WIDTH,
+    flexShrink: 0,
+    alignSelf: "stretch",
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 14,
+    backgroundColor: theme.colors.surface,
+    overflow: "hidden",
+  },
+  sidebarInner: {
+    paddingTop: 16,
+    paddingBottom: 12,
+    paddingHorizontal: 8,
+    gap: 8,
+  },
+  mainColumn: {
+    flex: 1,
+    minWidth: 0,
+    backgroundColor: theme.colors.bg,
+  },
   guestSafeArea: {
     flex: 1,
     backgroundColor: theme.colors.surface,
   },
-  guestScrollBlock: {
-    flex: 1,
-    width: "100%",
-    backgroundColor: theme.colors.surface,
-  },
   guestScrollContent: {
     flexGrow: 1,
+    alignItems: "center",
+    backgroundColor: theme.colors.surface,
+  },
+  guestColumn: {
     width: "100%",
+    maxWidth: G.columnMaxWidth,
+    flexGrow: 1,
     backgroundColor: theme.colors.surface,
   },
   scrollContent: {
     flexGrow: 1,
     width: "100%",
     alignSelf: "stretch",
-    paddingTop: 12,
+    paddingTop: O.scrollPaddingTop,
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
-    gap: theme.spacing[3],
+    gap: O.mainGap,
     backgroundColor: theme.colors.bg,
   },
   bodyCard: {
@@ -62,24 +99,10 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
     shadowOffset: { width: 0, height: 1 },
     elevation: 1,
   },
-  guestContent: {
-    flex: 1,
-    width: "100%",
-    alignItems: "stretch",
-    backgroundColor: theme.colors.surface,
-  },
-  guestInner: {
-    alignSelf: "stretch",
-    width: "100%",
-    borderRadius: 32,
-    backgroundColor: theme.colors.surface,
-    overflow: "hidden",
-  },
   guestHero: {
     width: "100%",
     backgroundColor: theme.colors.surfaceMuted,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
+    borderRadius: G.heroRadius,
     overflow: "hidden",
   },
   guestHeroImage: {
@@ -90,27 +113,24 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
     width: "100%",
     height: "100%",
     backgroundColor: theme.colors.surfaceMuted,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
   },
   guestBody: {
     alignItems: "center",
-    justifyContent: "center",
-    gap: theme.spacing[4],
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    paddingTop: GUEST_BODY_PADDING_TOP,
-    marginTop: GUEST_BODY_MARGIN_TOP,
-    marginBottom: GUEST_BODY_MARGIN_BOTTOM,
-    paddingBottom: 0,
+    width: "100%",
+    gap: G.bodyGap,
+    paddingHorizontal: G.bodyPadX,
+    marginTop: G.bodyMarginY,
+    marginBottom: G.bodyMarginY,
   },
   title: {
-    fontSize: 24,
+    fontSize: G.titleFontSize,
     fontWeight: "700",
     color: theme.colors.text,
     textAlign: "center",
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: G.subtitleFontSize,
+    lineHeight: Math.round(G.subtitleFontSize * 1.35),
     textAlign: "center",
     color: theme.colors.textMuted,
   },
@@ -134,7 +154,7 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
   actions: {
     marginTop: 0,
     width: "100%",
-    gap: theme.spacing[3],
+    gap: G.bodyGap,
   },
   actionButton: {
     width: "100%",
@@ -146,29 +166,33 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
   },
   legalLink: {
     marginTop: 0,
-    paddingVertical: theme.spacing[2],
+    paddingVertical: G.legalPaddingY,
   },
   legalLinkText: {
-    fontSize: 14,
+    fontSize: G.legalFontSize,
     textDecorationLine: "underline",
     color: theme.colors.link,
+  },
+  overviewFooter: {
+    marginTop: O.footerMarginTop,
+    gap: O.footerGap,
   },
 }));
 
 export const useProfileOverviewSectionStyles = createThemedStyles((theme) => ({
   root: {
-    gap: theme.spacing[4],
+    gap: 0,
   },
   shareRow: {
     flexDirection: "row",
     alignItems: "stretch",
-    gap: 4,
-    marginTop: -theme.spacing[2],
+    gap: O.shareRowGap,
+    marginTop: O.shareRowMarginTop,
     width: "100%",
   },
   notificationsBtn: {
     flex: 1,
-    height: 34,
+    height: O.notificationsBtnHeight,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: theme.radius.button,
@@ -180,6 +204,9 @@ export const useProfileOverviewSectionStyles = createThemedStyles((theme) => ({
     flex: 1,
     width: "auto" as const,
     alignSelf: "stretch",
+  },
+  infoPanel: {
+    marginTop: O.infoMarginTop,
   },
   raffleSection: {
     marginBottom: theme.spacing[1],
@@ -245,13 +272,13 @@ export const useProfileOverviewBannerStyles = createThemedStyles((theme) => ({
 }));
 
 const PROFILE_MOBILE_NAV_TOGGLE = {
-  borderWidth: 2,
-  borderRadius: 16,
-  iconSize: 36,
-  iconRadius: 10,
-  iconBorderWidth: 2,
-  paddingVertical: 12,
-  paddingHorizontal: 14,
+  borderWidth: O.sectionToggleBorderWidth,
+  borderRadius: O.sectionToggleRadius,
+  iconSize: O.sectionToggleIconSize,
+  iconRadius: O.sectionToggleIconRadius,
+  iconBorderWidth: O.sectionToggleBorderWidth,
+  paddingVertical: O.sectionTogglePaddingY,
+  paddingHorizontal: O.sectionTogglePaddingX,
   shadowOpacity: 0.18,
   shadowRadius: 14,
   shadowOffsetY: 4,
@@ -282,12 +309,24 @@ export const useProfileMobileNavToggleStyles = createThemedStyles((theme) => ({
     borderColor: theme.colors.actionHover,
     backgroundColor: theme.colors.action,
   },
+  rootTablet: {
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
   shadow: {
     shadowColor: theme.colors.action,
     shadowOpacity: PROFILE_MOBILE_NAV_TOGGLE.shadowOpacity,
     shadowRadius: PROFILE_MOBILE_NAV_TOGGLE.shadowRadius,
     shadowOffset: { width: 0, height: PROFILE_MOBILE_NAV_TOGGLE.shadowOffsetY },
     elevation: PROFILE_MOBILE_NAV_TOGGLE.elevation,
+  },
+  shadowTablet: {
+    shadowColor: theme.colors.nearBlack,
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
   iconWrap: {
     width: PROFILE_MOBILE_NAV_TOGGLE.iconSize,
@@ -298,6 +337,10 @@ export const useProfileMobileNavToggleStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: theme.colors.surface,
+  },
+  iconWrapTablet: {
+    backgroundColor: theme.colors.actionSoft,
+    borderWidth: 0,
   },
   textWrap: {
     flex: 1,
@@ -311,10 +354,17 @@ export const useProfileMobileNavToggleStyles = createThemedStyles((theme) => ({
     letterSpacing: PROFILE_MOBILE_NAV_TOGGLE.letterSpacing,
     color: theme.colors.onContrast,
   },
+  captionTablet: {
+    color: theme.colors.action,
+  },
   label: {
     fontSize: PROFILE_MOBILE_NAV_TOGGLE.labelSize,
     fontWeight: "700",
     color: theme.colors.onContrast,
+  },
+  labelTablet: {
+    color: theme.colors.primary,
+    fontSize: 15,
   },
 }));
 
@@ -344,6 +394,13 @@ export const useProfileMobileNavSheetStyles = createThemedStyles((theme) => ({
     shadowRadius: 32,
     shadowOffset: { width: -12, height: 0 },
     elevation: 12,
+  },
+  sheetFromLeft: {
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderTopRightRadius: 16,
+    borderBottomRightRadius: 16,
+    shadowOffset: { width: 12, height: 0 },
   },
   sheetContent: {
     padding: theme.spacing[4],
@@ -386,6 +443,11 @@ export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
   rootSheet: {
     marginTop: 0,
     maxWidth: undefined,
+  },
+  rootSidebar: {
+    marginTop: 0,
+    maxWidth: undefined,
+    gap: 6,
   },
   heading: {
     fontSize: 18,

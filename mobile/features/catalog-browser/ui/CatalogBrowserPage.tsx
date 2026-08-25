@@ -218,6 +218,7 @@ export const CatalogBrowserPage = () => {
             title={PRODUCT_CATEGORY_DISPLAY_UI.FEED_SECTION_TITLE}
             accessibilityLabel={PRODUCT_CATEGORY_DISPLAY_UI.FEED_GRID_ARIA}
             gap={gridLayout.gap}
+            variant="feed"
           >
             {feedTiles.map((item) => (
               <CatalogBrowserTileCard
@@ -240,6 +241,7 @@ export const CatalogBrowserPage = () => {
             <CatalogBrowserTilesGrid
               title={SELLER_PERSONAL_CATEGORY_PAGE_UI.TILES_SECTION_TITLE}
               gap={gridLayout.gap}
+              variant="categories"
             >
               {personalCategoryTiles.map((tile) => (
                 <CatalogBrowserTileCard
@@ -258,6 +260,7 @@ export const CatalogBrowserPage = () => {
             title={PRODUCT_CATEGORY_DISPLAY_UI.CATEGORIES_SECTION_TITLE}
             accessibilityLabel={PRODUCT_CATEGORY_DISPLAY_UI.GRID_ARIA}
             gap={gridLayout.gap}
+            variant="categories"
           >
             {categoryItems.map((item) => (
               <CatalogBrowserTileCard

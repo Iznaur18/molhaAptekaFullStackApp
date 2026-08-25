@@ -1,6 +1,6 @@
 /**
  * Паритет с mobile HomeCuratedListsSection + useHomeCuratedListsStyles:
- *   listBlock — SquircleView radius 16, bg surface, padding 12/8, БЕЗ рамки
+ *   listBlock — SquircleView radius 28 (= web 1.75rem squircle), bg surface, padding 12/8, БЕЗ рамки
  *   title     — 16/600, letterSpacing -0.4, color ink, mb 10, paddingX 4
  *   row       — padding 4/4/8, gap 12
  *   section   — gap 8 (HOME_FEED_SECTION_GAP)

@@ -27,6 +27,7 @@ type PasswordTextInputProps = {
   returnKeyType?: TextInputProps["returnKeyType"];
   onSubmitEditing?: TextInputProps["onSubmitEditing"];
   accessibilityLabel?: string;
+  editable?: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -54,6 +55,7 @@ export const PasswordTextInput = ({
   returnKeyType,
   onSubmitEditing,
   accessibilityLabel = AUTH_UI.PASSWORD_LABEL,
+  editable = true,
   style,
 }: PasswordTextInputProps) => {
   const styles = useLoginScreenStyles();
@@ -89,6 +91,7 @@ export const PasswordTextInput = ({
         spellCheck={false}
         showSoftInputOnFocus
         caretHidden={false}
+        editable={editable}
         placeholder={placeholder}
         placeholderTextColor={theme.colors.textMuted}
         returnKeyType={returnKeyType}
@@ -101,6 +104,7 @@ export const PasswordTextInput = ({
         accessibilityRole="button"
         accessibilityLabel={toggleAria}
         hitSlop={8}
+        disabled={!editable}
         tabIndex={-1}
         focusable={false}
       >

@@ -4,6 +4,7 @@ export {
   getAccessToken,
   getRefreshToken,
   isCookieAuthWeb,
+  isWebDevBearerAuth,
   setAuthTokens,
 } from "./mobile-auth-storage";
 export {

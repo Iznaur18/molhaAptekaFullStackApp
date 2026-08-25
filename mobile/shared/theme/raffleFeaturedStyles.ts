@@ -76,6 +76,15 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     width: "100%",
     height: "100%",
   },
+  /** Паритет web `filter: blur(28px)` + `scale(1.16)`. */
+  mediaBlurBg: {
+    ...StyleSheet.absoluteFillObject,
+    transform: [{ scale: 1.16 }],
+  },
+  mediaFg: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 1,
+  },
   videoWrap: {
     ...StyleSheet.absoluteFillObject,
     overflow: "hidden",
@@ -85,6 +94,7 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     position: "absolute",
     right: SOUND_BUTTON_INSET,
     bottom: SOUND_BUTTON_INSET,
+    zIndex: 5,
     width: SOUND_BUTTON_SIZE,
     height: SOUND_BUTTON_SIZE,
     borderRadius: SOUND_BUTTON_SIZE / 2,
@@ -425,74 +435,6 @@ export const useRaffleFeaturedBannerManageMenuStyles = createThemedStyles((theme
   },
 }));
 
-export const useRaffleDescriptionModalStyles = createThemedStyles((theme) => ({
-  backdrop: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 16,
-    backgroundColor: P.overlayMidnight,
-  },
-  dialog: {
-    width: "100%",
-    maxWidth: 512,
-    maxHeight: "80%",
-    borderWidth: 2,
-    borderColor: P.premiumPurpleMuted,
-    borderRadius: 16,
-    backgroundColor: P.accentPinkSurface,
-    paddingHorizontal: 18,
-    paddingVertical: 16,
-    gap: 12,
-    shadowColor: P.accentPurple,
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.22,
-    shadowRadius: 38,
-    elevation: 8,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: 17,
-    lineHeight: 21,
-    fontWeight: "700",
-    color: P.accentPurpleText,
-  },
-  closeButton: {
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: P.accentPurple,
-    backgroundColor: P.accentPurpleSoft,
-  },
-  closeButtonText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: P.accentPurpleText,
-  },
-  raffleTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    lineHeight: 20,
-    color: theme.colors.text,
-  },
-  textScroll: {
-    maxHeight: 280,
-  },
-  text: {
-    fontSize: 14,
-    lineHeight: 21,
-    color: theme.colors.text,
-    opacity: 0.92,
-  },
-}));
-
 export const useRaffleFeaturedSectionStyles = createThemedStyles((theme) => ({
   root: {
     width: "100%",
@@ -533,247 +475,6 @@ export const useRaffleFeaturedCarouselStyles = createThemedStyles(() => ({
     width: "100%",
     maxWidth: "100%",
     overflow: "hidden",
-  },
-}));
-
-const FEATURED_RAFFLE_MODAL_BACKDROP = "rgba(0, 0, 0, 0.62)";
-
-/** Паритет web HomeFeaturedRaffleModal bottom sheet. */
-export const FEATURED_RAFFLE_MODAL_ANIMATION = {
-  enterMs: 420,
-  exitMs: 420,
-  heightRatio: 0.8,
-  sheetRadius: 32,
-} as const;
-
-export const useFeaturedRaffleModalStyles = createThemedStyles((theme) => ({
-  overlay: {
-    flex: 1,
-    justifyContent: "flex-end",
-    backgroundColor: "transparent",
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: FEATURED_RAFFLE_MODAL_BACKDROP,
-  },
-  backdropPressable: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  dialogShell: {
-    width: "100%",
-  },
-  dialog: {
-    flex: 1,
-    overflow: "hidden",
-    backgroundColor: theme.colors.surface,
-  },
-  dialogShadow: {
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: -12 },
-    shadowOpacity: 0.18,
-    shadowRadius: 40,
-    elevation: 12,
-  },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingBottom: 16,
-    paddingHorizontal: 0,
-  },
-  carousel: {
-    width: "100%",
-    overflow: "hidden",
-  },
-  footer: {
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingTop: 10,
-    paddingBottom: 12,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
-  },
-  footerButton: {
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 14,
-    backgroundColor: theme.colors.action,
-  },
-  footerButtonText: {
-    fontSize: 15,
-    lineHeight: 20,
-    fontWeight: "700",
-    color: P.onContrast,
-  },
-  footerClose: {
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-  },
-  footerCloseText: {
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: "500",
-    color: theme.colors.textMuted,
-  },
-}));
-
-export const useFeaturedRaffleModalCardStyles = createThemedStyles((theme) => ({
-  root: {
-    width: "100%",
-    gap: L.cardPanelGap,
-  },
-  visualWrap: {
-    position: "relative",
-    alignSelf: "center",
-    zIndex: 2,
-    // Android VideoView иначе вылезает из квадрата и ломает модалку.
-    overflow: "hidden",
-  },
-  visualCard: {
-    overflow: "hidden",
-    backgroundColor: theme.colors.surfaceMuted,
-  },
-  visualCardCompleted: {
-    backgroundColor: theme.colors.surfaceMuted,
-  },
-  visual: {
-    position: "relative",
-    overflow: "hidden",
-    backgroundColor: theme.colors.surfaceMuted,
-    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
-  },
-  visualTopBar: {
-    position: "absolute",
-    top: L.visualControlInset,
-    left: L.visualControlInset,
-    right: L.visualControlInset,
-    zIndex: 5,
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    gap: 4,
-    overflow: "visible",
-  },
-  badge: {
-    maxWidth: "70%",
-    minHeight: 21,
-    paddingHorizontal: 6,
-    paddingVertical: 0,
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.72)",
-  },
-  badgeLabel: {
-    color: theme.colors.ink,
-    fontSize: 9,
-    fontWeight: "700",
-    lineHeight: 11,
-  },
-  body: {
-    gap: L.footerContentGap,
-    paddingHorizontal: 12,
-  },
-  progressBar: {
-    width: "100%",
-    height: L.progressBarHeight,
-    borderRadius: L.progressBarBorderRadius,
-    backgroundColor: theme.colors.actionBorder,
-    overflow: "hidden",
-  },
-  progressBarCompleted: {
-    backgroundColor: theme.colors.successSurface,
-  },
-  progressFill: {
-    height: "100%",
-    borderRadius: L.progressBarBorderRadius,
-    backgroundColor: theme.colors.action,
-  },
-  progressFillCompleted: {
-    backgroundColor: theme.colors.success,
-  },
-  stats: {
-    flexDirection: "row",
-    gap: 6.4,
-  },
-  stat: {
-    flex: 1,
-    minWidth: 0,
-    gap: 2.4,
-    paddingVertical: 8.8,
-    paddingHorizontal: 6.4,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    borderRadius: 12,
-    backgroundColor: theme.colors.surfaceMuted,
-    alignItems: "center",
-  },
-  statAccent: {
-    borderColor: "rgba(124, 58, 237, 0.35)",
-    backgroundColor: theme.colors.accentSoft,
-  },
-  statLabel: {
-    fontSize: 10.4,
-    fontWeight: "700",
-    letterSpacing: 0.4,
-    textTransform: "uppercase",
-    color: theme.colors.textMuted,
-    textAlign: "center",
-  },
-  statValue: {
-    fontSize: 14.4,
-    fontWeight: "800",
-    fontVariant: ["tabular-nums"],
-    color: theme.colors.ink,
-    textAlign: "center",
-  },
-  statValueAccent: {
-    color: theme.colors.accent,
-  },
-  title: {
-    fontSize: 17,
-    lineHeight: 22,
-    fontWeight: "700",
-    color: theme.colors.text,
-  },
-  description: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: theme.colors.text,
-    opacity: 0.88,
-  },
-  secondaryActions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    gap: L.actionsGap,
-    marginTop: 4,
-  },
-  btnInstagram: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: P.accentPink,
-    backgroundColor: P.accentPinkSoft,
-  },
-  btnInstagramText: {
-    fontSize: 13.2,
-    fontWeight: "600",
-    color: P.accentPinkDeep,
-  },
-  completedLabel: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: P.successDeep,
   },
 }));
 

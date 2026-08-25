@@ -13,16 +13,20 @@ import { SquircleView } from "@/shared/ui/SquircleView";
 type ProfileMobileSectionToggleProps = {
   activeLabel: string;
   onPress: () => void;
+  /** phone ≤640 filled; tablet 641–900 soft (web MyProfilePage.css). */
+  appearance?: "phone" | "tablet";
 };
 
 export const ProfileMobileSectionToggle = ({
   activeLabel,
   onPress,
+  appearance = "phone",
 }: ProfileMobileSectionToggleProps) => {
   const styles = useProfileMobileNavToggleStyles();
   const { theme } = useAppThemeSettings();
   const scale = useSharedValue(1);
   const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  const isTablet = appearance === "tablet";
 
   return (
     <Animated.View style={[styles.outer, animatedStyle]}>
@@ -40,19 +44,26 @@ export const ProfileMobileSectionToggle = ({
       >
         <SquircleView
           radius={PROFILE_MOBILE_NAV_TOGGLE_BORDER_RADIUS}
-          style={styles.root}
-          shadowStyle={styles.shadow}
+          style={[styles.root, isTablet && styles.rootTablet]}
+          shadowStyle={isTablet ? styles.shadowTablet : styles.shadow}
         >
-          <View style={styles.iconWrap}>
+          <View style={[styles.iconWrap, isTablet && styles.iconWrapTablet]}>
             <MaterialIcons name="menu" size={20} color={theme.colors.action} />
           </View>
           <View style={styles.textWrap}>
-            <Text style={styles.caption}>{MY_PROFILE_PAGE_UI.MOBILE_NAV_CURRENT_SECTION}</Text>
-            <Text style={styles.label} numberOfLines={1}>
+            <Text style={[styles.caption, isTablet && styles.captionTablet]}>
+              {MY_PROFILE_PAGE_UI.MOBILE_NAV_CURRENT_SECTION}
+            </Text>
+            <Text
+              style={[styles.label, isTablet && styles.labelTablet]}
+              numberOfLines={1}
+            >
               {activeLabel}
             </Text>
           </View>
-          <MaterialIcons name="expand-more" size={24} color={theme.colors.onContrast} />
+          {isTablet ? null : (
+            <MaterialIcons name="expand-more" size={24} color={theme.colors.onContrast} />
+          )}
         </SquircleView>
       </Pressable>
     </Animated.View>

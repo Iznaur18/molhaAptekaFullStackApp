@@ -1,5 +1,5 @@
 .site-header-banner-carousel {
-  /* Паритет с mobile SITE_HEADER_BANNER_HEIGHT_PX / radius 22 */
+  /* Паритет contract resolveSiteHeaderBannerHeightPx: 220 / 260 / 300 */
   --site-header-banner-height: 220px;
   --site-header-banner-radius: 22px;
   position: relative;

@@ -7,7 +7,7 @@ import { HomeCatalogHeaderPanel } from "@/features/home-feed/ui/HomeCatalogHeade
 import { HomeCatalogHeaderSearch } from "@/features/home-feed/ui/HomeCatalogHeaderSearch";
 import { HomeCatalogUsersButton } from "@/features/home-feed/ui/HomeCatalogUsersButton";
 import {
-  HOME_CATALOG_HEADER_PANEL_PADDING,
+  HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING,
   resolveHomeCatalogHeaderPanelPaddingTop,
 } from "@/shared/lib/homeCatalogHeaderLayout";
 import { useHomeCatalogHeaderStyles } from "@/shared/theme/homeCatalogHeaderStyles";
@@ -30,7 +30,7 @@ export const HomeCatalogSearchRow = ({
   const styles = useHomeCatalogHeaderStyles();
   const { viewerRegionCode, setViewerRegionCode } = useViewerRegion();
   const paddingTop = embeddedInForegroundSheet
-    ? HOME_CATALOG_HEADER_PANEL_PADDING.top
+    ? HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING.top
     : resolveHomeCatalogHeaderPanelPaddingTop(insets.top);
 
   return (
@@ -41,9 +41,11 @@ export const HomeCatalogSearchRow = ({
     >
       <View style={styles.topRow}>
         <HomeCatalogHeaderSearch value={value} onChange={onChange} onSubmit={onSubmit} />
-        <HomeCatalogUsersButton embeddedInForegroundSheet={embeddedInForegroundSheet} />
+        <View style={styles.authActions}>
+          <ViewerRegionSelect value={viewerRegionCode} onChange={setViewerRegionCode} />
+          <HomeCatalogUsersButton embeddedInForegroundSheet={embeddedInForegroundSheet} />
+        </View>
       </View>
-      <ViewerRegionSelect value={viewerRegionCode} onChange={setViewerRegionCode} />
     </HomeCatalogHeaderPanel>
   );
 };

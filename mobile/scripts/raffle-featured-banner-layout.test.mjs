@@ -47,7 +47,8 @@ test("RaffleFeaturedBanner: split-card layout with square visual", () => {
   assert.doesNotMatch(section, /SquircleView/);
   assert.doesNotMatch(section, /RAFFLES_SECTION_TITLE/);
   assert.match(section, /HomeFeaturedRafflesRevealButton/);
-  assert.match(section, /HomeFeaturedRaffleModal/);
+  assert.match(section, /router\.push\(`\/raffle\/\$\{/);
+  assert.doesNotMatch(section, /HomeFeaturedRaffleModal/);
   assert.doesNotMatch(section, /isExpanded/);
 });
 

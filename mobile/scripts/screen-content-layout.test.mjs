@@ -82,6 +82,14 @@ test("mobile bottom nav uses floating liquid-glass pill (web parity)", () => {
   assert.match(contentLayout, /resolveMobileBottomNavOverlayContentInset/);
   assert.match(cartScreen, /resolveMobileBottomNavLayoutHeight/);
   assert.match(tabBar, /itemActive[\s\S]*backgroundColor: withAlpha/);
+
+  const appShell = readFile(MOBILE_ROOT, "shared/lib/appShellLayout.ts");
+  const indexCss = readFile(CLIENT_ROOT, "src/index.css");
+  assert.match(appShell, /resolveAppShellMaxWidthStyle/);
+  assert.match(indexCss, /--app-shell-max-width: 60rem/);
+  assert.match(indexCss, /--app-shell-max-width: 75rem/);
+  assert.match(indexCss, /min-width: 1024px/);
+  assert.match(indexCss, /min-width: 1280px/);
 });
 
 test("resolveMobileBottomNavLayoutHeight matches floating pill chrome", () => {

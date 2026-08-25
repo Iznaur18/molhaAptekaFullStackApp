@@ -13,16 +13,23 @@ import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 import { useRaffleFeaturedBannerStyles } from "@/shared/theme/raffleFeaturedStyles";
 import { LoopingCoverVideo } from "@/shared/ui/LoopingCoverVideo";
 
+const MEDIA_BLUR_RADIUS = 28;
+
 type RafflePrizeMediaProps = {
   raffle: RaffleFromApi;
   showSoundToggle?: boolean;
   isVideoActive?: boolean;
+  /** Паритет web RaffleProductsPage: contain + blur backdrop. */
+  contentFit?: "cover" | "contain";
+  blurBackground?: boolean;
 };
 
 export const RafflePrizeMedia = ({
   raffle,
   showSoundToggle = false,
   isVideoActive = true,
+  contentFit = "cover",
+  blurBackground = false,
 }: RafflePrizeMediaProps) => {
   const styles = useRaffleFeaturedBannerStyles();
   const { theme } = useAppThemeSettings();
@@ -36,11 +43,23 @@ export const RafflePrizeMedia = ({
   if (isVideo && videoSrc) {
     return (
       <View style={styles.videoWrap} collapsable={false} pointerEvents="box-none">
+        {blurBackground && imageSrc ? (
+          <Image
+            source={{ uri: imageSrc }}
+            style={styles.mediaBlurBg}
+            contentFit="cover"
+            contentPosition={contentPosition}
+            blurRadius={MEDIA_BLUR_RADIUS}
+            accessible={false}
+            pointerEvents="none"
+          />
+        ) : null}
         <LoopingCoverVideo
           uri={videoSrc}
           isMuted={isMuted}
           isPlaying={isVideoActive}
-          style={styles.media}
+          contentFit={contentFit}
+          style={blurBackground ? styles.mediaFg : styles.media}
         />
         {showSoundToggle ? (
           <Pressable
@@ -65,13 +84,37 @@ export const RafflePrizeMedia = ({
     return null;
   }
 
+  if (blurBackground) {
+    return (
+      <View style={styles.mediaFrame} pointerEvents="box-none">
+        <Image
+          source={{ uri: imageSrc }}
+          style={styles.mediaBlurBg}
+          contentFit="cover"
+          contentPosition={contentPosition}
+          blurRadius={MEDIA_BLUR_RADIUS}
+          accessible={false}
+          pointerEvents="none"
+        />
+        <Image
+          source={{ uri: imageSrc }}
+          style={styles.mediaFg}
+          contentFit={contentFit}
+          contentPosition={contentPosition}
+          pointerEvents="none"
+        />
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.mediaFrame}>
+    <View style={styles.mediaFrame} pointerEvents="box-none">
       <Image
         source={{ uri: imageSrc }}
         style={styles.media}
-        contentFit="cover"
+        contentFit={contentFit}
         contentPosition={contentPosition}
+        pointerEvents="none"
       />
     </View>
   );

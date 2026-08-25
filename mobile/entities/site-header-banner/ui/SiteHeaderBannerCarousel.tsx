@@ -6,6 +6,7 @@ import {
   Linking,
   Pressable,
   Text,
+  useWindowDimensions,
   View,
   type LayoutChangeEvent,
   type NativeScrollEvent,
@@ -26,7 +27,10 @@ import {
 } from "@/shared/lib/siteHeaderBannerCarouselLayout";
 import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
-import { SITE_HEADER_BANNER_LAYOUT } from "@/shared/lib/siteHeaderBannerLayout";
+import {
+  resolveSiteHeaderBannerHeightPx,
+  SITE_HEADER_BANNER_LAYOUT,
+} from "@/shared/lib/siteHeaderBannerLayout";
 import { useSiteHeaderBannerCarouselStyles } from "@/shared/theme/siteHeaderBannerStyles";
 import { SquircleView } from "@/shared/ui/SquircleView";
 
@@ -81,32 +85,25 @@ export const SiteHeaderBannerCarousel = ({
 }: SiteHeaderBannerCarouselProps) => {
   const router = useRouter();
   const styles = useSiteHeaderBannerCarouselStyles();
+  const { width: windowWidth } = useWindowDimensions();
+  const bannerHeight = resolveSiteHeaderBannerHeightPx(windowWidth);
+  const bannerHeightStyle = useMemo(
+    () => ({ height: bannerHeight, minHeight: bannerHeight }),
+    [bannerHeight],
+  );
   const [viewportWidth, setViewportWidth] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const listRef = useRef<FlatList<LoopSlideItem>>(null);
   const isJumpingRef = useRef(false);
 
-  const carouselMetrics = useMemo(
+  const { slideWidth, stride } = useMemo(
     () => resolveSiteHeaderBannerCarouselMetrics(viewportWidth),
     [viewportWidth],
   );
 
-  const { slideWidth, stride, sideInset } = edgeToEdge
-    ? {
-        slideWidth: viewportWidth,
-        stride: viewportWidth,
-        sideInset: 0,
-      }
-    : carouselMetrics;
-
   const loopEnabled = slides.length > 1;
   const loopItems = useMemo(() => buildLoopSlideItems(slides), [slides]);
-
-  const contentContainerStyle = useMemo(
-    () => (sideInset > 0 ? { paddingHorizontal: sideInset } : undefined),
-    [sideInset],
-  );
 
   const edgeStyles = edgeToEdge
     ? {
@@ -279,29 +276,40 @@ export const SiteHeaderBannerCarousel = ({
     const slideStyle = slide.backgroundColor
       ? { backgroundColor: slide.backgroundColor }
       : undefined;
-    const image = (
-      <Image
-        source={{ uri: imageUri }}
-        style={styles.image}
-        accessibilityLabel={slide.imageAlt}
-        contentFit="cover"
-        cachePolicy="memory-disk"
-        transition={200}
-      />
+    const media = (
+      <View style={styles.media}>
+        <Image
+          source={{ uri: imageUri }}
+          style={styles.imageBg}
+          contentFit="cover"
+          blurRadius={SITE_HEADER_BANNER_LAYOUT.imageBlurRadius}
+          cachePolicy="memory-disk"
+          accessible={false}
+          importantForAccessibility="no"
+        />
+        <Image
+          source={{ uri: imageUri }}
+          style={styles.image}
+          accessibilityLabel={slide.imageAlt}
+          contentFit="contain"
+          cachePolicy="memory-disk"
+          transition={200}
+        />
+      </View>
     );
 
     return (
-      <View style={[styles.slide, edgeStyles.slide, slideStyle]}>
+      <View style={[styles.slide, edgeStyles.slide, bannerHeightStyle, slideStyle]}>
         {slide.linkPath ? (
           <Pressable
-            style={styles.pressable}
+            style={[styles.pressable, bannerHeightStyle]}
             accessibilityRole="button"
             onPress={() => handleSlidePress(slide.linkPath)}
           >
-            {image}
+            {media}
           </Pressable>
         ) : (
-          image
+          media
         )}
         <View style={styles.adBadge} pointerEvents="none" accessibilityElementsHidden>
           <Text style={styles.adBadgeText}>{SITE_HEADER_BANNER_UI.AD_BADGE}</Text>
@@ -319,7 +327,7 @@ export const SiteHeaderBannerCarousel = ({
   if (slides.length === 1) {
     const singleSlideContent = (
       <View
-        style={[rootStyle, styles.singleSlide, edgeStyles.singleSlide]}
+        style={[rootStyle, styles.singleSlide, edgeStyles.singleSlide, bannerHeightStyle]}
         onLayout={handleViewportLayout}
         accessibilityLabel={SITE_HEADER_BANNER_UI.CAROUSEL_ARIA}
       >
@@ -334,7 +342,7 @@ export const SiteHeaderBannerCarousel = ({
     return (
       <SquircleView radius={SITE_HEADER_BANNER_LAYOUT.radius} style={rootStyle}>
         <View
-          style={[styles.singleSlide, edgeStyles.singleSlide]}
+          style={[styles.singleSlide, edgeStyles.singleSlide, bannerHeightStyle]}
           onLayout={handleViewportLayout}
           accessibilityLabel={SITE_HEADER_BANNER_UI.CAROUSEL_ARIA}
         >
@@ -350,15 +358,12 @@ export const SiteHeaderBannerCarousel = ({
         ref={listRef}
         horizontal
         {...nestedHorizontalScrollProps}
-        pagingEnabled={edgeToEdge}
-        snapToInterval={edgeToEdge || stride <= 0 ? undefined : stride}
-        snapToAlignment="start"
+        pagingEnabled
         decelerationRate="fast"
         disableIntervalMomentum
         data={loopItems}
         keyExtractor={(item) => item.key}
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={contentContainerStyle}
         onMomentumScrollEnd={handleMomentumScrollEnd}
         onScrollEndDrag={handleScrollEndDrag}
         getItemLayout={

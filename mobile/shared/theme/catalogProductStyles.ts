@@ -15,8 +15,13 @@ import {
 import { PRODUCT_DETAILS_BADGE_SOFT_COLORS } from "@/entities/product/lib/productDetailsBadgeSoftPalette";
 import { resolveProductCardSoftElevationShadow } from "@/entities/product/lib/productCardPromotionFramePalette";
 import { PRODUCT_CARD_MOBILE_CATALOG_LAYOUT as MCL } from "@/entities/product/lib/productCardMobileCatalogLayout";
+import { CATALOG_BROWSER_LANDING_LAYOUT } from "@/features/catalog-browser/lib/catalogBrowserLandingLayout";
 import { HOME_FEED_SECTION_GAP } from "@/features/home-feed/lib/homeFeedSectionLayout";
 import { resolveCuratedCompactCardColors } from "@/entities/curated-product-list/lib/curatedCompactCardColors";
+import {
+  CATALOG_BROWSER_DISPLAY_TITLE,
+  HOME_FEED_DISPLAY_TITLE,
+} from "@/shared/theme/displayTypography";
 import {
   CURATED_PRODUCT_LIST_HOME_CARD_GAP,
   CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_BOTTOM,
@@ -25,8 +30,6 @@ import {
   CURATED_PRODUCT_LIST_HOME_SECTION_MARGIN_BOTTOM,
   CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_HORIZONTAL,
   CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_VERTICAL,
-  CURATED_PRODUCT_LIST_HOME_TITLE_MARGIN_BOTTOM,
-  CURATED_PRODUCT_LIST_HOME_TITLE_PADDING_X,
 } from "@/entities/curated-product-list/lib/curatedProductListHomeLayout";
 import {
   USER_STORY_STRIP_INNER_SIZE,
@@ -37,7 +40,6 @@ import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import {
   SCREEN_CONTENT_PADDING_BOTTOM,
   SCREEN_CONTENT_PADDING_HORIZONTAL,
-  SCREEN_CONTENT_SECTION_GAP,
 } from "@/shared/theme/screenContentLayout";
 
 export const MEDIA_OVERLAY_SCRIM = "rgba(0,0,0,0.55)";
@@ -92,10 +94,15 @@ export const useFeedScreenStyles = createThemedStyles((theme) => ({
     paddingHorizontal: 0,
     flexGrow: 1,
   },
+  homeFeedSearchHeader: {
+    width: "100%",
+    marginBottom: HOME_FEED_SECTION_GAP,
+  },
   homeFeedInsetContent: {
     width: "100%",
     alignSelf: "stretch",
-    paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+    // Inline pad — у app-shell contentContainer / sticky shell (паритет web).
+    paddingHorizontal: 0,
   },
   homeFeedForeground: {
     // Единый передний фон ленты; совпадает со сценой (homeFeedScene) и с
@@ -174,13 +181,17 @@ export const useCatalogBreadcrumbStyles = createThemedStyles((theme) => ({
     paddingTop: 0,
     marginBottom: HOME_FEED_SECTION_GAP,
   },
-  // iOS large title
+  // Паритет web `.home-feed-section-title`
   title: {
-    fontSize: 28,
-    fontWeight: "800",
-    lineHeight: 34,
-    letterSpacing: -0.7,
-    color: theme.colors.ink,
+    fontFamily: HOME_FEED_DISPLAY_TITLE.fontFamily,
+    fontSize: HOME_FEED_DISPLAY_TITLE.fontSize,
+    fontWeight: HOME_FEED_DISPLAY_TITLE.fontWeight,
+    lineHeight: HOME_FEED_DISPLAY_TITLE.lineHeight,
+    letterSpacing: HOME_FEED_DISPLAY_TITLE.letterSpacing,
+    textTransform: HOME_FEED_DISPLAY_TITLE.textTransform,
+    color: theme.colors.text,
+    marginTop: HOME_FEED_DISPLAY_TITLE.marginTop,
+    marginBottom: HOME_FEED_DISPLAY_TITLE.marginBottom,
   },
 }));
 
@@ -3083,6 +3094,9 @@ export const useHomeCuratedListsStyles = createThemedStyles((theme) => ({
   section: {
     gap: CURATED_PRODUCT_LIST_HOME_SECTION_MARGIN_BOTTOM,
   },
+  listGroup: {
+    gap: 0,
+  },
   listBlock: {
     marginBottom: 0,
     paddingHorizontal: CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_HORIZONTAL,
@@ -3092,12 +3106,17 @@ export const useHomeCuratedListsStyles = createThemedStyles((theme) => ({
     borderColor: "transparent",
   },
   title: {
-    fontSize: 16,
-    fontWeight: "600",
-    letterSpacing: -0.4,
-    color: theme.colors.ink,
-    marginBottom: CURATED_PRODUCT_LIST_HOME_TITLE_MARGIN_BOTTOM,
-    paddingHorizontal: CURATED_PRODUCT_LIST_HOME_TITLE_PADDING_X,
+    fontFamily: HOME_FEED_DISPLAY_TITLE.fontFamily,
+    fontSize: HOME_FEED_DISPLAY_TITLE.fontSize,
+    fontWeight: HOME_FEED_DISPLAY_TITLE.fontWeight,
+    lineHeight: HOME_FEED_DISPLAY_TITLE.lineHeight,
+    letterSpacing: HOME_FEED_DISPLAY_TITLE.letterSpacing,
+    textTransform: HOME_FEED_DISPLAY_TITLE.textTransform,
+    color: theme.colors.text,
+    marginTop: HOME_FEED_DISPLAY_TITLE.marginTop,
+    marginBottom: HOME_FEED_DISPLAY_TITLE.marginBottom,
+    paddingLeft: HOME_FEED_DISPLAY_TITLE.paddingLeft,
+    paddingRight: HOME_FEED_DISPLAY_TITLE.paddingRight,
   },
   row: {
     paddingTop: CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_TOP,
@@ -3121,12 +3140,17 @@ export const useUserStoriesStripStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   title: {
-    fontSize: 16,
-    fontWeight: "600",
-    letterSpacing: -0.4,
-    color: theme.colors.ink,
-    marginBottom: USER_STORY_STRIP_LAYOUT.titleMarginBottom,
-    paddingHorizontal: USER_STORY_STRIP_LAYOUT.titlePaddingHorizontal,
+    fontFamily: HOME_FEED_DISPLAY_TITLE.fontFamily,
+    fontSize: HOME_FEED_DISPLAY_TITLE.fontSize,
+    fontWeight: HOME_FEED_DISPLAY_TITLE.fontWeight,
+    lineHeight: HOME_FEED_DISPLAY_TITLE.lineHeight,
+    letterSpacing: HOME_FEED_DISPLAY_TITLE.letterSpacing,
+    textTransform: HOME_FEED_DISPLAY_TITLE.textTransform,
+    color: theme.colors.text,
+    marginTop: HOME_FEED_DISPLAY_TITLE.marginTop,
+    marginBottom: HOME_FEED_DISPLAY_TITLE.marginBottom,
+    paddingLeft: HOME_FEED_DISPLAY_TITLE.paddingLeft,
+    paddingRight: HOME_FEED_DISPLAY_TITLE.paddingRight,
   },
   scroll: {
     flexDirection: "row",
@@ -3235,7 +3259,7 @@ export const useCatalogBrowserPageStyles = createThemedStyles((theme) => ({
     width: "100%",
     padding: SCREEN_CONTENT_PADDING_HORIZONTAL,
     paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
-    gap: theme.spacing[2],
+    // Без gap: отступы секций = web `.catalog-feed-tiles` / `__categories`.
     backgroundColor: theme.colors.bg,
   },
 }));
@@ -3299,22 +3323,33 @@ export const useCatalogSubcategoryPickerStyles = createThemedStyles((theme) => (
 }));
 
 export const useCatalogBrowserSectionStyles = createThemedStyles((theme) => ({
-  section: {
-    marginTop: 6,
-    marginBottom: Math.max(SCREEN_CONTENT_SECTION_GAP, 14),
-    paddingTop: 6,
+  sectionFeed: {
+    marginTop: 0,
+    marginBottom: CATALOG_BROWSER_LANDING_LAYOUT.feedMarginBottom,
+    paddingTop: CATALOG_BROWSER_LANDING_LAYOUT.feedPaddingTop,
+  },
+  sectionCategories: {
+    marginTop: CATALOG_BROWSER_LANDING_LAYOUT.categoriesMarginTop,
+    marginBottom: 0,
+    paddingTop: CATALOG_BROWSER_LANDING_LAYOUT.categoriesPaddingTop,
   },
   sectionTitle: {
-    marginTop: 10,
-    marginBottom: 15,
-    fontSize: 22,
-    fontWeight: "800",
-    letterSpacing: -0.7,
-    lineHeight: 26,
+    marginTop: CATALOG_BROWSER_LANDING_LAYOUT.titleMarginTop,
+    marginBottom: CATALOG_BROWSER_LANDING_LAYOUT.titleMarginBottom,
+    fontFamily: CATALOG_BROWSER_DISPLAY_TITLE.fontFamily,
+    fontSize: CATALOG_BROWSER_DISPLAY_TITLE.fontSize,
+    fontWeight: CATALOG_BROWSER_DISPLAY_TITLE.fontWeight,
+    letterSpacing: CATALOG_BROWSER_DISPLAY_TITLE.letterSpacing,
+    lineHeight: CATALOG_BROWSER_DISPLAY_TITLE.lineHeight,
     color: theme.colors.ink,
     paddingLeft: 12,
-    borderLeftWidth: 3.5,
+    borderLeftWidth: CATALOG_BROWSER_LANDING_LAYOUT.titleAccentWidth,
     borderLeftColor: theme.colors.action,
+  },
+  sectionTitleCategories: {
+    // Web `.catalog-browser-landing__categories-title` clamp mid ≈ 18–20.
+    fontSize: 20,
+    lineHeight: 23,
   },
   grid: {
     flexDirection: "row",

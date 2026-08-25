@@ -33,6 +33,7 @@ function RootLayout() {
   const [queryClient] = useState(() => createAppQueryClient());
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    Intro: require("../assets/fonts/IntroDemo-BlackCAPS.otf"),
   });
 
   useEffect(() => {

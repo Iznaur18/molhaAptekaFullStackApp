@@ -1,7 +1,7 @@
-import {
-  SITE_HEADER_BANNER_CAROUSEL_PEEK_PX,
-  SITE_HEADER_BANNER_CAROUSEL_SLIDE_GAP_PX,
-} from "@molha/api-contract";
+/**
+ * Метрики карусели site-header banner.
+ * Паритет web Embla: слайд = 100% viewport (без peek/gap).
+ */
 
 /** Клоны по краям: [last, ...slides, first]. Реальные слайды с индекса 1. */
 export const SITE_HEADER_BANNER_CAROUSEL_LOOP_EDGE_CLONES = 1;
@@ -10,29 +10,22 @@ export const SITE_HEADER_BANNER_CAROUSEL_LOOP_EDGE_CLONES = 1;
  * @param {number} viewportWidth
  */
 export function resolveSiteHeaderBannerCarouselMetrics(viewportWidth) {
-  const gapWidth = SITE_HEADER_BANNER_CAROUSEL_SLIDE_GAP_PX;
-  const peekWidth = SITE_HEADER_BANNER_CAROUSEL_PEEK_PX;
-
   if (viewportWidth <= 0) {
     return {
-      gapWidth,
-      peekWidth,
+      gapWidth: 0,
+      peekWidth: 0,
       sideInset: 0,
       slideWidth: 0,
       stride: 0,
     };
   }
 
-  const sideInset = peekWidth;
-  const slideWidth = Math.max(viewportWidth - sideInset * 2, 1);
-  const stride = slideWidth + gapWidth;
-
   return {
-    gapWidth,
-    peekWidth,
-    sideInset,
-    slideWidth,
-    stride,
+    gapWidth: 0,
+    peekWidth: 0,
+    sideInset: 0,
+    slideWidth: viewportWidth,
+    stride: viewportWidth,
   };
 }
 

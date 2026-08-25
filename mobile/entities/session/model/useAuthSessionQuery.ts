@@ -1,20 +1,31 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
-import { authMeQueryKeys, getAccessToken } from "@/shared/api";
+import { authMeQueryKeys, getAccessToken, isCookieAuthWeb } from "@/shared/api";
 import { AUTH_ME_STALE_TIME_MS } from "@/shared/config";
 
 import { fetchAuthMe } from "../api/fetchAuthMe";
 
+/**
+ * Native + Expo web DEV: Bearer (SecureStore / sessionStorage).
+ * Prod Expo web: httpOnly cookies — без гейта по getAccessToken.
+ */
+export const resolveAuthSessionQueryData = async (): Promise<
+  Awaited<ReturnType<typeof fetchAuthMe>>
+> => {
+  if (isCookieAuthWeb()) {
+    return fetchAuthMe();
+  }
+  const token = await getAccessToken();
+  if (!token) {
+    return null;
+  }
+  return fetchAuthMe();
+};
+
 export const useAuthSessionQuery = () => {
   return useQuery({
     queryKey: authMeQueryKeys.all,
-    queryFn: async () => {
-      const token = await getAccessToken();
-      if (!token) {
-        return null;
-      }
-      return fetchAuthMe();
-    },
+    queryFn: resolveAuthSessionQueryData,
     staleTime: AUTH_ME_STALE_TIME_MS,
     retry: false,
     placeholderData: keepPreviousData,

@@ -42,28 +42,29 @@ export const HomeCuratedCategoryListsSection = ({
       accessibilityLabel={HOME_FEED_UI.CURATED_CATEGORIES_SECTION_ARIA}
     >
       {lists.map((list) => (
-        <SquircleView
-          key={list._id}
-          radius={CURATED_PRODUCT_LIST_HOME_SECTION_BORDER_RADIUS}
-          style={styles.listBlock}
-        >
+        <View key={list._id} style={styles.listGroup}>
           <Text style={styles.title}>{list.title}</Text>
-          <ScrollView
-            horizontal
-            {...nestedHorizontalScrollProps}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.row}
+          <SquircleView
+            radius={CURATED_PRODUCT_LIST_HOME_SECTION_BORDER_RADIUS}
+            style={styles.listBlock}
           >
-            {list.categories.map((category) => (
-              <CuratedCategoryCompactCard
-                key={category.itemKey}
-                category={category}
-                width={compactCardWidth}
-                onOpen={onOpenCategory}
-              />
-            ))}
-          </ScrollView>
-        </SquircleView>
+            <ScrollView
+              horizontal
+              {...nestedHorizontalScrollProps}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.row}
+            >
+              {list.categories.map((category) => (
+                <CuratedCategoryCompactCard
+                  key={category.itemKey}
+                  category={category}
+                  width={compactCardWidth}
+                  onOpen={onOpenCategory}
+                />
+              ))}
+            </ScrollView>
+          </SquircleView>
+        </View>
       ))}
     </View>
   );

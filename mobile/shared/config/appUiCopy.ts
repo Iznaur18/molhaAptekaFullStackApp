@@ -1254,10 +1254,18 @@ export const USER_SAVED_ADDRESSES_UI = {
 } as const;
 
 export const CATALOG_FILTER_UI = {
-  SEARCH_PLACEHOLDER: "Поиск товаров",
+  SEARCH_PLACEHOLDER: "Поиск товара по названию…",
   ALL_CATEGORIES: "Все",
   ALL_IN_CATEGORY: "Вся категория",
   CLEAR_SEARCH: "Очистить",
+} as const;
+
+/** Паритет web `PRODUCT_SEARCH_INPUT_UI`. */
+export const PRODUCT_SEARCH_INPUT_UI = {
+  PLACEHOLDER: "Поиск товара по названию…",
+  ARIA_LABEL: "Поиск товаров",
+  CLEAR_ARIA: "Очистить поле поиска",
+  PENDING_ARIA: "Идёт поиск",
 } as const;
 
 export const COMMERCE_CARD_UI = {
@@ -1382,6 +1390,8 @@ export const AUTH_UI = {
   CHANNEL_EMAIL: "Email",
   CHANNEL_PHONE: "Телефон",
   CHANNEL_TOGGLE_ARIA: "Способ входа",
+  FORGOT_CHANNEL_ARIA: "Способ восстановления",
+  REGISTER_CHANNEL_ARIA: "Способ регистрации",
   PHONE_METHOD_TOGGLE_ARIA: "Способ по телефону",
   PHONE_METHOD_PASSWORD: "Пароль",
   PHONE_METHOD_SMS: "Код из SMS",
@@ -1398,6 +1408,7 @@ export const AUTH_UI = {
   USER_NAME_LABEL: "Имя пользователя",
   USER_NAME_PLACEHOLDER: "user.name",
   LOGIN_BUTTON: "Войти",
+  LOGIN_SUBMIT_LOADING: "Входим…",
   LOGIN_SEND_CODE: "Получить код",
   LOGIN_SEND_CODE_LOADING: "Отправка…",
   LOGIN_CODE_SENT: "Код отправлен по SMS",

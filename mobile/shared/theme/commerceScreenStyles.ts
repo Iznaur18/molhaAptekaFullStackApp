@@ -717,13 +717,31 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
     flexGrow: 1,
   },
   pageHeader: {
-    gap: theme.spacing[3],
-    marginBottom: theme.spacing[3],
+    gap: 12,
+    marginBottom: 10,
+  },
+  summaryLayout: {
+    gap: 0,
+  },
+  summaryLayoutWide: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 14,
+  },
+  hero: {
+    position: "relative",
+    flex: 1,
+    minWidth: 0,
+  },
+  summarySide: {
+    minWidth: 0,
+  },
+  summarySideWide: {
+    flex: 1,
   },
   headerCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
+    gap: 6,
+    marginBottom: 12,
     padding: 12,
     overflow: "hidden",
     borderWidth: 1,
@@ -732,14 +750,47 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   media: {
+    position: "relative",
+    width: "100%",
+    marginBottom: 12,
     overflow: "hidden",
+    borderRadius: 22,
     backgroundColor: theme.colors.surfaceMuted,
   },
+  mediaForeground: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 5,
+  },
+  swipeOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 2,
+    opacity: 0.01,
+  },
+  swipeDots: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 12,
+    zIndex: 6,
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    alignSelf: "center",
+  },
+  swipeDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: "rgba(255,255,255,0.55)",
+  },
+  swipeDotActive: {
+    backgroundColor: "#fff",
+  },
   copy: {
-    flex: 1,
     gap: 6,
     minWidth: 0,
-    paddingRight: 4,
   },
   eyebrow: {
     fontSize: 11.5,
@@ -757,13 +808,18 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
     color: theme.colors.text,
   },
   description: {
+    marginBottom: 12,
     fontSize: 15,
     lineHeight: 22,
     color: theme.colors.text,
     opacity: 0.9,
   },
+  manageDesktop: {
+    marginBottom: 14,
+  },
   progress: {
     gap: 10,
+    marginBottom: 16,
     paddingVertical: 14,
     paddingHorizontal: 14,
     borderWidth: 1,

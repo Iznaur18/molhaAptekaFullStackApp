@@ -89,11 +89,11 @@ export const UserStoriesStrip = ({
   return (
     <>
       <View style={styles.root} accessibilityLabel={HOME_FEED_UI.STORIES_SECTION_ARIA}>
+        <Text style={styles.title}>{HOME_FEED_UI.STORIES_SECTION_TITLE}</Text>
         <SquircleView
           radius={USER_STORY_STRIP_LAYOUT.scrollBorderRadius}
           style={styles.scrollWrapper}
         >
-          <Text style={styles.title}>{HOME_FEED_UI.STORIES_SECTION_TITLE}</Text>
           <FlatList
             horizontal
             {...nestedHorizontalScrollProps}

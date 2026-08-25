@@ -37,6 +37,13 @@
     opacity var(--iz-transition-base);
 }
 
+@supports (corner-shape: squircle) {
+  .raffle-featured-home-section__reveal {
+    border-radius: var(--iz-radius-card-lg);
+    corner-shape: squircle;
+  }
+}
+
 .raffle-featured-home-section__reveal:hover {
   background: var(--iz-color-action-hover);
 }

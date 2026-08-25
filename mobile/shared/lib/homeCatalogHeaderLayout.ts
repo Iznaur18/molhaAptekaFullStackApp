@@ -1,7 +1,4 @@
-import {
-  MOBILE_BOTTOM_NAV_FLOAT_OFFSET,
-  resolveMobileBottomNavHorizontalInset,
-} from "@/shared/lib/mobileBottomNavLayout";
+import { resolveMobileBottomNavHorizontalInset } from "@/shared/lib/mobileBottomNavLayout";
 
 /** Выравнивание контента ленты (карусели, баннеры) — не менять вместе с панелью. */
 export const HOME_CATALOG_HEADER_SHELL_HORIZONTAL_INSET = 16;
@@ -21,6 +18,16 @@ export const HOME_CATALOG_HEADER_PANEL_PADDING = {
   horizontal: HOME_CATALOG_HEADER_SHELL_HORIZONTAL_INSET,
   bottom: 8,
 } as const;
+
+/** Web v2 `.app-shell__header-panel` `padding: 0.5rem 0.65rem`. */
+export const HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING = {
+  top: 8,
+  horizontal: 10,
+  bottom: 8,
+} as const;
+
+/** Web `.app-shell--header-v2 .app-shell__header--v2` sticky `top: 0.5rem`. */
+export const HOME_CATALOG_HEADER_STICKY_TOP_OFFSET = 8;
 
 /** Web `.app-shell--header-v1 .app-shell__header--v1` margin-bottom @mobile preview. */
 export const HOME_CATALOG_HEADER_BOTTOM_MARGIN = 0;
@@ -127,24 +134,14 @@ export const HOME_CATALOG_HEADER_USERS_PILL_PADDING = 0;
 /** Web `.app-shell__auth-actions--mobile-top` gap `0.3rem` @640. */
 export const HOME_CATALOG_HEADER_USERS_PILL_GAP = 4.8;
 
-/** Вертикальный паддинг поисковой «пилюли». */
+/** Web v2 search field: `0.95rem`, leading-icon pad `2.375rem` / icon `0.875rem`. */
 export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_VERTICAL = 8;
-
-/** Левый паддинг поисковой «пилюли»: место под иконку-лупу. */
 export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_LEFT = 38;
-
-/** Размер и отступ иконки-лупы внутри поля поиска. */
 export const HOME_CATALOG_HEADER_SEARCH_ICON_SIZE = 20;
 export const HOME_CATALOG_HEADER_SEARCH_ICON_LEFT = 14;
-
-/** Правый паддинг (место под clear-кнопку). */
 export const HOME_CATALOG_HEADER_SEARCH_INPUT_PADDING_RIGHT = 36;
-
-/** Ozon-стиль: скруглённый прямоугольник, не пилюля. */
-export const HOME_CATALOG_HEADER_SEARCH_INPUT_BORDER_RADIUS = 14;
-
-/** Ozon-стиль: крупный читабельный шрифт поиска. */
-export const HOME_CATALOG_HEADER_SEARCH_INPUT_FONT_SIZE = 16;
+export const HOME_CATALOG_HEADER_SEARCH_INPUT_BORDER_RADIUS = 999;
+export const HOME_CATALOG_HEADER_SEARCH_INPUT_FONT_SIZE = 15;
 
 type ScreenSafeAreaInsets = {
   left?: number;
@@ -171,26 +168,6 @@ export const resolveHomeCatalogHeaderPanelTopMargin = (): number =>
 export const resolveHomeCatalogHeaderPanelPaddingTop = (safeAreaTop: number): number =>
   safeAreaTop + HOME_CATALOG_HEADER_PANEL_PADDING.top;
 
-/**
- * Высота glass-панели поиска без safe-area (embedded overlay).
- * top pad + поле поиска + bottom pad.
- */
-export const resolveHomeCatalogOverlaySearchPanelHeight = (): number =>
-  HOME_CATALOG_HEADER_PANEL_PADDING.top +
-  HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT +
-  HOME_CATALOG_HEADER_PANEL_PADDING.bottom;
-
-/**
- * Inset контента ленты под absolute top-bar:
- * safe-area + float + панель + зазор до контента.
- * Без этого баннер/карточки стартуют под полупрозрачной шапкой.
- */
-export const resolveHomeCatalogOverlayContentInsetTop = (safeAreaTop = 0): number =>
-  Math.max(safeAreaTop, 0) +
-  MOBILE_BOTTOM_NAV_FLOAT_OFFSET +
-  resolveHomeCatalogOverlaySearchPanelHeight() +
-  HOME_CATALOG_HEADER_BANNER_BELOW_PANEL_MARGIN;
-
 type HomeCatalogUsersMenuPortalAnchor = {
   x: number;
   y: number;
@@ -198,13 +175,13 @@ type HomeCatalogUsersMenuPortalAnchor = {
   height: number;
 };
 
-/** Верх портала stretch-menu при sticky-шапке (safe-area + padding панели). */
+/** Верх портала stretch-menu (safe-area + padding панели). */
 export const resolveHomeCatalogUsersMenuPortalTop = (
   safeAreaTop: number,
   embeddedInForegroundSheet = false,
 ): number =>
   embeddedInForegroundSheet
-    ? safeAreaTop + MOBILE_BOTTOM_NAV_FLOAT_OFFSET + HOME_CATALOG_HEADER_PANEL_PADDING.top
+    ? safeAreaTop + HOME_CATALOG_HEADER_STICKY_TOP_OFFSET + HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING.top
     : resolveHomeCatalogHeaderPanelPaddingTop(safeAreaTop);
 
 const isStaleStickyMenuAnchorY = (anchorY: number, fallbackTop: number): boolean =>
@@ -235,7 +212,7 @@ export const resolveHomeCatalogUsersMenuPortalStyle = (
   );
   const fallbackRight = embeddedInForegroundSheet
     ? resolveMobileBottomNavHorizontalInset(safeAreaInsets) +
-      HOME_CATALOG_HEADER_PANEL_PADDING.horizontal
+      HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING.horizontal
     : resolveHomeCatalogHeaderShellInset(safeAreaInsets);
   const measuredRight = windowWidth - anchor.x - anchor.width;
 

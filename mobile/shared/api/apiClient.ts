@@ -21,6 +21,7 @@ import {
   getAccessToken,
   getRefreshToken,
   isCookieAuthWeb,
+  isWebDevBearerAuth,
   setAuthTokens,
 } from "./mobile-auth-storage";
 import { parseAuthSessionData } from "./parseApiContract";
@@ -52,10 +53,6 @@ const refreshAuthSession = async (): Promise<void> => {
   );
 
   const session = parseAuthSessionData(data);
-  // На нативе токены обязаны прийти в теле: схема разрешает их отсутствие
-  // только ради Expo web, где сессия живёт в cookie. Записать undefined —
-  // значит сохранить строку "undefined" и уйти в цикл рефрешей, поэтому
-  // считаем это провалом обновления сессии.
   if (!session.accessToken || !session.refreshToken) {
     await clearAuthTokens();
     throw new Error("Refresh token required");
@@ -77,13 +74,14 @@ setupAuthSessionInterceptors(apiClient, {
       throw new Error(API_CLIENT_UI.API_URL_MISSING);
     }
     config.headers = config.headers ?? {};
-    // Native: Bearer в JSON. Web: httpOnly cookies (без X-Auth-Client: mobile).
-    if (Platform.OS !== "web") {
+    if (isWebDevBearerAuth()) {
+      // Паритет Vite DEV: JWT в JSON + sessionStorage (LAN-dev-access.md).
+      config.headers["X-Auth-Client"] = "web-dev";
+    } else if (Platform.OS !== "web") {
       config.headers["X-Auth-Client"] = "mobile";
     }
   },
   onRefreshFailure: async (refreshError) => {
-    // Сеть / 5xx — не чистим SecureStore; иначе ложный logout после краткого сбоя API.
     if (isDefinitiveAuthRefreshFailure(refreshError)) {
       await clearAuthTokens();
     }
