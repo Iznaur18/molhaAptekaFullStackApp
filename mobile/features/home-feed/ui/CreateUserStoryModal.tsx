@@ -314,7 +314,19 @@ export const CreateUserStoryModal = ({
                 <ProductPreviewVideo uri={previewUri} />
               ) : null}
               {previewUri && mediaType === USER_STORY_MEDIA_TYPE_IMAGE ? (
-                <Image source={{ uri: previewUri }} style={styles.previewMedia} contentFit="cover" />
+                <>
+                  <Image
+                    source={{ uri: previewUri }}
+                    style={[styles.previewMedia, styles.previewBlur]}
+                    contentFit="cover"
+                    blurRadius={36}
+                  />
+                  <Image
+                    source={{ uri: previewUri }}
+                    style={styles.previewMedia}
+                    contentFit="contain"
+                  />
+                </>
               ) : null}
               {!previewUri ? (
                 <Text style={styles.placeholder}>{USER_STORY_UI.ERROR_MEDIA_REQUIRED}</Text>

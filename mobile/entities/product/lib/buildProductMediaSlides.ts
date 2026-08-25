@@ -27,3 +27,20 @@ export const buildProductMediaSlides = ({
 
   return slides;
 };
+
+/**
+ * Индекс фото среди фото — из индекса слайда, где первым может стоять видео.
+ * Порт `resolveProductImageIndexForLightbox` из веба.
+ */
+export const resolveProductImageIndexForLightbox = (
+  slides: ProductMediaSlide[],
+  slideIndex: number,
+): number => {
+  let imageIndex = 0;
+  for (let i = 0; i < slideIndex && i < slides.length; i += 1) {
+    if (slides[i]?.type === "image") {
+      imageIndex += 1;
+    }
+  }
+  return imageIndex;
+};

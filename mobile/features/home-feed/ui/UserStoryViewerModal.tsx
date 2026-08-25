@@ -350,21 +350,34 @@ export const UserStoryViewerModal = ({
                       onEnded={advanceStoryOrClose}
                     />
                   ) : (
-                    <Image
-                      source={{ uri: resolvedMediaUrl }}
-                      style={[
-                        styles.media,
-                        styles.mediaActive,
-                        isMediaLoading && styles.mediaHidden,
-                      ]}
-                      contentFit="contain"
-                      transition={340}
-                      onLoad={() => setIsMediaLoading(false)}
-                      onError={() => {
-                        setHasMediaError(true);
-                        setIsMediaLoading(false);
-                      }}
-                    />
+                    <>
+                      <Image
+                        source={{ uri: resolvedMediaUrl }}
+                        style={[
+                          styles.media,
+                          styles.mediaBlur,
+                          styles.mediaActive,
+                          isMediaLoading && styles.mediaHidden,
+                        ]}
+                        contentFit="cover"
+                        blurRadius={36}
+                      />
+                      <Image
+                        source={{ uri: resolvedMediaUrl }}
+                        style={[
+                          styles.media,
+                          styles.mediaActive,
+                          isMediaLoading && styles.mediaHidden,
+                        ]}
+                        contentFit="contain"
+                        transition={340}
+                        onLoad={() => setIsMediaLoading(false)}
+                        onError={() => {
+                          setHasMediaError(true);
+                          setIsMediaLoading(false);
+                        }}
+                      />
+                    </>
                   )}
                 </View>
 

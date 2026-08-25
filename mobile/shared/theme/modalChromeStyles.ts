@@ -224,8 +224,10 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
     justifyContent: "center",
   },
   previewMedia: {
-    width: "100%",
-    height: "100%",
+    ...StyleSheet.absoluteFillObject,
+  },
+  previewBlur: {
+    transform: [{ scale: 1.16 }],
   },
   placeholder: {
     color: theme.colors.textMuted,
@@ -384,6 +386,9 @@ export const useStoryViewerModalStyles = createThemedStyles((theme) => ({
     ...StyleSheet.absoluteFillObject,
     width: "100%",
     height: "100%",
+  },
+  mediaBlur: {
+    transform: [{ scale: 1.16 }],
   },
   mediaUnderlay: {
     zIndex: 1,

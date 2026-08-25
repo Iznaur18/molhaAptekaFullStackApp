@@ -2,10 +2,14 @@ import { useMemo, useState, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-import { buildProductMediaSlides } from "@/entities/product/lib/buildProductMediaSlides";
+import {
+  buildProductMediaSlides,
+  resolveProductImageIndexForLightbox,
+} from "@/entities/product/lib/buildProductMediaSlides";
 import { ProductMediaHorizontalPager } from "@/entities/product/ui/ProductMediaHorizontalPager";
+import { ProductImageLightbox } from "@/entities/product/ui/ProductImageLightbox";
 import { ProductMediaSlideContent } from "@/entities/product/ui/ProductMediaSlideContent";
-import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
+import { PRODUCT_CARD_UI, PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
 import { resolveProductDetailHeroSize } from "@/shared/lib/productDetailScreenLayout";
 import { useProductMediaGalleryStyles } from "@/shared/theme/catalogProductStyles";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
@@ -30,6 +34,7 @@ export const ProductMediaGallery = ({
   const styles = useProductMediaGalleryStyles();
   const [previewVideoFailed, setPreviewVideoFailed] = useState(false);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const isDetail = variant === "detail";
 
   const mediaSlides = useMemo(() => {
@@ -111,6 +116,12 @@ export const ProductMediaGallery = ({
               imageStyle={styles.media}
               blurBackdrop={isDetail}
               onVideoFailed={() => setPreviewVideoFailed(true)}
+              onPress={
+                isDetail && mediaSlides[index]?.type === "image"
+                  ? () => setIsLightboxOpen(true)
+                  : undefined
+              }
+              pressAccessibilityLabel={PRODUCT_CARD_UI.IMAGE_LIGHTBOX_OPEN_LABEL}
             />
           )}
         />
@@ -134,6 +145,14 @@ export const ProductMediaGallery = ({
         {renderCounter()}
       </View>
       {renderThumbs()}
+      {isDetail ? (
+        <ProductImageLightbox
+          visible={isLightboxOpen}
+          imageUrls={imageUrls}
+          startIndex={resolveProductImageIndexForLightbox(mediaSlides, safeSlideIndex)}
+          onClose={() => setIsLightboxOpen(false)}
+        />
+      ) : null}
     </View>
   );
 };
