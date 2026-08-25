@@ -1153,6 +1153,8 @@ export const INSTALLMENT_UI = {
 export const CHECKOUT_FORM_UI = {
   HEADING: "Оформление заказа",
   LABEL_FULFILLMENT: "Способ получения",
+  LABEL_SAVED_ADDRESSES: "Сохранённые адреса",
+  SAVED_ADDRESS_OTHER: "Указать другой на карте",
   FULFILLMENT_PICKUP: "Самовывоз",
   FULFILLMENT_DELIVERY: "Доставка",
   FULFILLMENT_DELIVERY_SOON: "Скоро",

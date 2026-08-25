@@ -27,7 +27,15 @@ import { useCheckoutFormStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 import { CheckoutPaymentMethodPicker } from "@/features/checkout/ui/CheckoutPaymentMethodPicker";
 import { CheckoutShippingProviderPicker } from "@/features/checkout/ui/CheckoutShippingProviderPicker";
+import {
+  CHECKOUT_SAVED_ADDRESS_CUSTOM_ID,
+  deliveryAddressFromSaved,
+  matchCheckoutSavedAddressId,
+  resolveInitialCheckoutSavedAddressId,
+} from "@/entities/address/lib/deliveryAddressFromSaved";
+import { userSavedAddressesFromUser } from "@/entities/address/lib/userSavedAddressesFromUser";
 import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
+import { CheckoutSavedAddressPicker } from "@/features/checkout/ui/CheckoutSavedAddressPicker";
 
 type CheckoutFormProps = {
   defaultUser?: Record<string, unknown> | null;
@@ -68,9 +76,24 @@ export const CheckoutForm = ({
   const [fulfillmentMethod, setFulfillmentMethod] = useState<OrderFulfillmentMethod>(
     ORDER_FULFILLMENT_PICKUP,
   );
-  const [deliveryAddress, setDeliveryAddress] = useState<RuDeliveryAddressValue>(() =>
-    addressValueFromUser(defaultUser),
+  /** Книга адресов профиля — источник для выбора без повторного ввода. */
+  const savedAddresses = useMemo(
+    () => (defaultUser != null ? userSavedAddressesFromUser(defaultUser) : []),
+    [defaultUser],
   );
+  const [selectedSavedAddressId, setSelectedSavedAddressId] = useState(() =>
+    resolveInitialCheckoutSavedAddressId(savedAddresses),
+  );
+  const [deliveryAddress, setDeliveryAddress] = useState<RuDeliveryAddressValue>(() => {
+    const initialId = resolveInitialCheckoutSavedAddressId(savedAddresses);
+    if (initialId !== CHECKOUT_SAVED_ADDRESS_CUSTOM_ID) {
+      const item = savedAddresses.find((address) => address.id === initialId);
+      if (item) {
+        return deliveryAddressFromSaved(item);
+      }
+    }
+    return addressValueFromUser(defaultUser);
+  });
   const [paymentMethod, setPaymentMethod] = useState<OrderPaymentMethod>(
     ORDER_PAYMENT_METHOD_DEFAULT,
   );
@@ -82,6 +105,46 @@ export const CheckoutForm = ({
   useEffect(() => {
     setSelectedPickupByProductId(resolveInitialPickupSelections(pickupGroups));
   }, [pickupGroups]);
+
+  // Профиль подгрузился позже открытия формы — переезжаем на адрес по умолчанию.
+  useEffect(() => {
+    const initialId = resolveInitialCheckoutSavedAddressId(savedAddresses);
+    setSelectedSavedAddressId(initialId);
+    if (initialId !== CHECKOUT_SAVED_ADDRESS_CUSTOM_ID) {
+      const item = savedAddresses.find((address) => address.id === initialId);
+      if (item) {
+        setDeliveryAddress(deliveryAddressFromSaved(item));
+        return;
+      }
+    }
+    setDeliveryAddress(addressValueFromUser(defaultUser));
+  }, [defaultUser, savedAddresses]);
+
+  const handleSavedAddressSelect = (nextId: string) => {
+    setSelectedSavedAddressId(nextId);
+    if (nextId === CHECKOUT_SAVED_ADDRESS_CUSTOM_ID) {
+      setDeliveryAddress({
+        line: "",
+        flat: "",
+        fiasId: "",
+        geo: null,
+        regionCode: null,
+        selectedFromSuggest: false,
+      });
+      return;
+    }
+
+    const item = savedAddresses.find((address) => address.id === nextId);
+    if (item) {
+      setDeliveryAddress(deliveryAddressFromSaved(item));
+    }
+  };
+
+  /** Правка руками — подсветка сама переезжает на совпавший адрес или «другой». */
+  const handleDeliveryAddressChange = (nextAddress: RuDeliveryAddressValue) => {
+    setDeliveryAddress(nextAddress);
+    setSelectedSavedAddressId(matchCheckoutSavedAddressId(nextAddress, savedAddresses));
+  };
 
   const deliverySelectable =
     PRODUCT_DELIVERY_FULFILLMENT_ENABLED && deliveryAvailable;
@@ -321,9 +384,16 @@ export const CheckoutForm = ({
           </View>
         ) : (
           <>
+            <CheckoutSavedAddressPicker
+              addresses={savedAddresses}
+              selectedId={selectedSavedAddressId}
+              onSelect={handleSavedAddressSelect}
+              disabled={isDisabled || isSubmitting}
+            />
+
             <AddressSuggestInput
               value={deliveryAddress}
-              onChange={setDeliveryAddress}
+              onChange={handleDeliveryAddressChange}
               disabled={isDisabled || isSubmitting}
               displayOnly
               placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_DELIVERY_ADDRESS}
