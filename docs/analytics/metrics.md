@@ -40,3 +40,20 @@
 ## Экспорт
 
 CSV строится из тех же агрегатов, что overview. В ответе: `csv`, `sha256` (SHA-256 hex от UTF-8 тела CSV), `asOf`, `definitionsVersion`.
+
+## Traffic (Plausible) — уровень 1.5
+
+Внешний счётчик посещений (не Mongo). Включается env:
+
+| App | Env | Назначение |
+|-----|-----|------------|
+| Web | `VITE_PLAUSIBLE_DOMAIN` | domain сайта в Plausible |
+| Web | `VITE_PLAUSIBLE_SCRIPT_SRC` | optional script URL (default cloud) |
+| Web | `VITE_PLAUSIBLE_SHARED_URL` | optional shared dashboard link в `/admin-analytics` |
+| Mobile | `EXPO_PUBLIC_PLAUSIBLE_DOMAIN` | тот же domain |
+| Mobile | `EXPO_PUBLIC_PLAUSIBLE_URL_BASE` | origin для URL pageview |
+| Mobile | `EXPO_PUBLIC_PLAUSIBLE_API_HOST` | Events API host (default `https://plausible.io`) |
+
+Без `*_PLAUSIBLE_DOMAIN` интеграция **выключена**.
+
+Доказательство третьим лицам: shared link в Plausible (read-only) + сверка с `/admin-analytics` (регистрации/заказы).

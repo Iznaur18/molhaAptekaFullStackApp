@@ -18,6 +18,7 @@ import {
   prepareColdStartSplash,
   releaseColdStartSplash,
 } from "@/shared/model/coldStartSplashGate";
+import { useMobilePlausiblePageviews } from "@/shared/lib/useMobilePlausiblePageviews";
 import { AppProviders } from "@/shared/providers/AppProviders";
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 
@@ -58,6 +59,7 @@ function RootLayout() {
 function RootLayoutNav() {
   const { colorScheme, theme } = useAppThemeSettings();
   const pathname = usePathname();
+  useMobilePlausiblePageviews();
 
   // Deep link / auth / другие вкладки: прячем сплэш сразу. На "/" — гейт главной.
   useEffect(() => {

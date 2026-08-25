@@ -202,6 +202,9 @@ export const ADMIN_ANALYTICS_PAGE_UI = {
   EXPORT_LOADING: "Экспорт…",
   EXPORT_ERROR: "Не удалось скачать отчёт",
   EXPORT_SHA256: (hash) => `SHA-256: ${hash}`,
+  PLAUSIBLE_OPEN: "Открыть Plausible",
+  PLAUSIBLE_HINT:
+    "Внешний traffic (Plausible). Задайте VITE_PLAUSIBLE_DOMAIN (+ optional VITE_PLAUSIBLE_SHARED_URL).",
   RECONCILE: "Сверить integrity",
   RECONCILE_LOADING: "Сверка…",
   RECONCILE_ERROR: "Не удалось запустить сверку",

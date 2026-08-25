@@ -4,6 +4,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import { isClientSentryEnabled } from "../shared/lib/clientSentryEnv.js";
+import { isPlausibleEnabled } from "../shared/lib/plausibleEnv.js";
 import { disableDocumentPinchZoom } from "../shared/lib/disableDocumentPinchZoom.js";
 import { enableAndroidFocusFieldScroll } from "../shared/lib/enableAndroidFocusFieldScroll.js";
 import { enablePortraitOrientationLock } from "../shared/lib/enablePortraitOrientationLock.js";
@@ -21,6 +22,19 @@ if (isClientSentryEnabled()) {
     window.requestIdleCallback(bootSentry, { timeout: 4000 });
   } else {
     window.setTimeout(bootSentry, 2500);
+  }
+}
+
+if (isPlausibleEnabled()) {
+  const bootPlausible = () => {
+    void import("../shared/lib/initPlausible.js").then(({ initPlausible }) =>
+      initPlausible(),
+    );
+  };
+  if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+    window.requestIdleCallback(bootPlausible, { timeout: 4000 });
+  } else {
+    window.setTimeout(bootPlausible, 2500);
   }
 }
 

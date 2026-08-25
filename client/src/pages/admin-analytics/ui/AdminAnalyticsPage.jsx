@@ -15,10 +15,12 @@ import { downloadAnalyticsCsvFile } from "../../../entities/admin-analytics/lib/
 import { adminAnalyticsQueryKeys } from "../../../entities/admin-analytics/model/adminAnalyticsQueryKeys.js";
 import { useAdminAnalyticsOverviewQuery } from "../../../entities/admin-analytics/model/useAdminAnalyticsOverviewQuery.js";
 import { ADMIN_ANALYTICS_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { getPlausibleSharedDashboardUrl } from "../../../shared/lib/plausibleEnv.js";
 
 import "./AdminAnalyticsPage.css";
 
 const UI = ADMIN_ANALYTICS_PAGE_UI;
+const PLAUSIBLE_SHARED_URL = getPlausibleSharedDashboardUrl();
 
 const PERIOD_OPTIONS = [
   { value: ADMIN_ANALYTICS_PERIOD_TODAY, label: UI.PERIOD_TODAY },
@@ -81,6 +83,15 @@ export function AdminAnalyticsPage() {
       <header className="admin-analytics-page__header">
         <h2 className="admin-analytics-page__title">{UI.TITLE}</h2>
         <p className="admin-analytics-page__hint">{UI.HINT}</p>
+        {PLAUSIBLE_SHARED_URL ? (
+          <p className="admin-analytics-page__meta">
+            <a href={PLAUSIBLE_SHARED_URL} target="_blank" rel="noreferrer">
+              {UI.PLAUSIBLE_OPEN}
+            </a>
+          </p>
+        ) : (
+          <p className="admin-analytics-page__meta">{UI.PLAUSIBLE_HINT}</p>
+        )}
       </header>
 
       <div className="admin-analytics-page__toolbar">

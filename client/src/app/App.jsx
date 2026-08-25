@@ -12,6 +12,7 @@ import { captureAffiliateCodeFromSearch } from "../shared/lib/affiliateCodeStora
 import { clearStaleChunkReloadFlag } from "../shared/lib/reloadOnceOnStaleChunk.js";
 import { useReleaseStaleBodyScroll } from "../shared/lib/useReleaseStaleBodyScroll.js";
 import { AppErrorBoundary } from "../shared/ui/AppErrorBoundary/AppErrorBoundary.jsx";
+import { PlausiblePageviews } from "../shared/ui/PlausiblePageviews.jsx";
 import { renderAppShellRoutes } from "./routes/appRoutes.jsx";
 
 import "./App.css";
@@ -36,6 +37,7 @@ function AppRoutes() {
       <AppIntroProvider>
         <BrowserRouter>
           <CaptureAttributionCodes />
+          <PlausiblePageviews />
           <CartProvider>
             <WishlistProvider>
               <main className="app-main">
