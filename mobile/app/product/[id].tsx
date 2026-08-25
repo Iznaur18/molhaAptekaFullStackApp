@@ -41,6 +41,7 @@ import { ProductDetailTabBar } from "@/features/product-detail/ui/ProductDetailT
 import { ProductDetailsDetailsTab } from "@/features/product-detail/ui/ProductDetailsDetailsTab";
 import { ProductAuctionTab, type ProductAuctionDockFooter } from "@/features/product-detail/ui/ProductAuctionTab";
 import { ProductInstallmentTab, type ProductInstallmentDockFooter } from "@/features/product-detail/ui/ProductInstallmentTab";
+import { ProductCompareTab } from "@/features/product-detail/ui/ProductCompareTab";
 import { ProductQaTab } from "@/features/product-detail/ui/ProductQaTab";
 import { ProductReviewsTab } from "@/features/product-detail/ui/ProductReviewsTab";
 import {
@@ -141,6 +142,7 @@ export default function ProductDetailScreen() {
     topStatFieldKeys,
     handleAuctionShortcut,
     handleInstallmentShortcut,
+    handleCompareShortcut,
   } = useProductDetailTabs({
     product,
     currentUserId,
@@ -300,6 +302,7 @@ export default function ProductDetailScreen() {
     activeTab === "reviews" ||
     activeTab === "qa" ||
     activeTab === "similar" ||
+    activeTab === "compare" ||
     activeTab === "auction" ||
     activeTab === "installment";
 
@@ -650,6 +653,7 @@ export default function ProductDetailScreen() {
                   product={productRecord}
                   topStatFieldKeys={topStatFieldKeys}
                   onOpenInstallmentTab={handleInstallmentShortcut}
+                  onOpenCompareTab={handleCompareShortcut}
                   onOpenAuctionTab={handleAuctionShortcut}
                   auctionActive={auctionUi.auctionActive}
                   canShowAddToCart={canShowAddToCart}
@@ -673,6 +677,9 @@ export default function ProductDetailScreen() {
                   isAuthorized={isAuthorized}
                   isOwnProduct={isOwnProduct}
                 />
+              ) : null}
+              {activeTab === "compare" ? (
+                <ProductCompareTab productId={productId} enabled />
               ) : null}
               {activeTab === "auction" ? (
                 <ProductAuctionTab

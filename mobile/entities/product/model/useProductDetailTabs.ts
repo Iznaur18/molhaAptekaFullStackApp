@@ -13,6 +13,7 @@ import {
   PRODUCT_PRICE_OFFER_UI,
   PRODUCT_QA_UI,
   PRODUCT_REVIEW_UI,
+  PRODUCT_COMPARE_UI,
   PRODUCT_SIMILAR_UI,
 } from "@/shared/config";
 
@@ -21,6 +22,7 @@ export type ProductDetailTabId =
   | "reviews"
   | "qa"
   | "similar"
+  | "compare"
   | "auction"
   | "installment";
 
@@ -47,6 +49,8 @@ export const useProductDetailTabs = ({ product, currentUserId }: UseProductDetai
       : product.productQaEnabled === true &&
         product.productModerationStatus === PRODUCT_MODERATION_APPROVED);
   const showSimilarTab = product?._id != null && similarFilters != null;
+  /** Как в вебе: вкладка есть у любого товара, содержимое решает сервер. */
+  const showCompareTab = product?._id != null;
   const showAuctionTab =
     product?._id != null &&
     (isOwnProduct ? auctionUi.showSellerAuctionTab : product.productAuctionEnabled === true);
@@ -57,6 +61,7 @@ export const useProductDetailTabs = ({ product, currentUserId }: UseProductDetai
     showReviewsTab ||
     showQaTab ||
     showSimilarTab ||
+    showCompareTab ||
     showAuctionTab ||
     showInstallmentTab;
 
@@ -79,6 +84,9 @@ export const useProductDetailTabs = ({ product, currentUserId }: UseProductDetai
     if (showSimilarTab) {
       items.push({ id: "similar", label: PRODUCT_SIMILAR_UI.TAB });
     }
+    if (showCompareTab) {
+      items.push({ id: "compare", label: PRODUCT_COMPARE_UI.TAB });
+    }
     if (showInstallmentTab) {
       items.push({ id: "installment", label: INSTALLMENT_UI.TAB });
     }
@@ -90,6 +98,7 @@ export const useProductDetailTabs = ({ product, currentUserId }: UseProductDetai
     reviewsTabLabel,
     showAuctionTab,
     showInstallmentTab,
+    showCompareTab,
     showQaTab,
     showReviewsTab,
     showSimilarTab,
@@ -102,6 +111,13 @@ export const useProductDetailTabs = ({ product, currentUserId }: UseProductDetai
     }
     return keys;
   }, [isOwnProduct]);
+
+  const handleCompareShortcut = () => {
+    if (!showCompareTab) {
+      return;
+    }
+    setActiveTab("compare");
+  };
 
   const handleAuctionShortcut = () => {
     if (!auctionUi.auctionActive) {
@@ -127,6 +143,7 @@ export const useProductDetailTabs = ({ product, currentUserId }: UseProductDetai
     installmentActive,
     topStatFieldKeys,
     handleAuctionShortcut,
+    handleCompareShortcut,
     handleInstallmentShortcut,
   };
 };

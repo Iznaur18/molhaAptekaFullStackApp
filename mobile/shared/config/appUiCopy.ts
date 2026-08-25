@@ -451,6 +451,20 @@ export const PRODUCT_SIMILAR_UI = {
   FETCH_FALLBACK: "Не удалось загрузить похожие товары",
 } as const;
 
+/** Вкладка «Сравнение» — похожие предложения рядом с товаром */
+export const PRODUCT_COMPARE_UI = {
+  TAB: "Сравнение",
+  TITLE: "Сравнение",
+  SECTION_ARIA: "Сравнение с похожими товарами",
+  LOADING: "Подбираем товары для сравнения…",
+  EMPTY: "Нет данных для сравнения",
+  FETCH_FALLBACK: "Не удалось загрузить сравнение",
+  RETRY: "Повторить",
+  DETAILS_TEASER_TITLE: "Сравнить товар",
+  DETAILS_TEASER_SUBTITLE: "С похожими предложениями",
+  DETAILS_TEASER_ARIA: "Открыть вкладку сравнения",
+} as const;
+
 export const PRODUCT_SALE_UI = {
   DETAILS_TEASER_TITLE: "Распродажа",
   DETAILS_TEASER_REMAINING: (count: number) => `Осталось ${count} шт.`,

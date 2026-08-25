@@ -24,6 +24,7 @@ import { ProductDetailsSellerPreview } from "@/entities/product/ui/ProductDetail
 import { ProductPriceDisplay } from "@/entities/product/ui/ProductPriceDisplay";
 import { UserProfileProductsList } from "@/entities/user/ui/UserProfileProductsList";
 import { ProductDetailsAuctionTeaser } from "@/features/product-detail/ui/ProductDetailsAuctionTeaser";
+import { ProductDetailsCompareTeaser } from "@/features/product-detail/ui/ProductDetailsCompareTeaser";
 import { ProductDetailsInstallmentTeaser } from "@/features/product-detail/ui/ProductDetailsInstallmentTeaser";
 import { ProductDetailsRaffleTeaser } from "@/features/product-detail/ui/ProductDetailsRaffleTeaser";
 import { ProductDetailsRentalTeaser } from "@/features/product-detail/ui/ProductDetailsRentalTeaser";
@@ -45,6 +46,7 @@ type ProductDetailsDetailsTabProps = {
   product: Record<string, unknown>;
   topStatFieldKeys: readonly string[];
   onOpenInstallmentTab?: () => void;
+  onOpenCompareTab?: () => void;
   onOpenAuctionTab?: () => void;
   auctionActive?: boolean;
   canShowAddToCart?: boolean;
@@ -56,6 +58,7 @@ export const ProductDetailsDetailsTab = ({
   product,
   topStatFieldKeys,
   onOpenInstallmentTab,
+  onOpenCompareTab,
   onOpenAuctionTab,
   auctionActive = false,
   canShowAddToCart = true,
@@ -199,6 +202,12 @@ export const ProductDetailsDetailsTab = ({
                   productId={productId}
                   auctionActive={auctionActive}
                   onPress={onOpenAuctionTab}
+                />
+              ) : null}
+              {productId && onOpenCompareTab ? (
+                <ProductDetailsCompareTeaser
+                  productId={productId}
+                  onPress={onOpenCompareTab}
                 />
               ) : null}
               {sellerId ? (

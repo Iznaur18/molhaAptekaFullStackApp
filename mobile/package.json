@@ -109,6 +109,7 @@
     "test:price-offer-api-parity": "node --test scripts/price-offer-api-parity.test.mjs",
     "test:deep-link-routes": "node --test scripts/deep-link-routes.test.mjs",
     "test:flash-sale": "node --test scripts/flash-sale.test.mjs",
+    "test:product-compare-tab": "node --test scripts/product-compare-tab.test.mjs",
     "test:product-details-badge-sort": "node --test scripts/product-details-badge-sort.test.mjs",
     "smoke:buyer-path": "node scripts/buyer-path-api-smoke.mjs"
   },
