@@ -24,6 +24,8 @@ type ProductPromotionManageTabProps = {
 
   onSetRental?: (productId: string, productRentalEnabled: boolean) => void | Promise<void>;
 
+  onSetQa?: (productId: string, productQaEnabled: boolean) => void | Promise<void>;
+
   onSetFlashSale?: (
     productId: string,
     productFlashSaleEnabled: boolean,
@@ -64,6 +66,8 @@ type ProductPromotionManageTabProps = {
   isRentalTogglePending?: boolean;
 
   isFlashSaleTogglePending?: boolean;
+
+  isQaTogglePending?: boolean;
 
   isAffiliateTogglePending?: boolean;
 

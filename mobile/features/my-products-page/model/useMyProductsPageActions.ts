@@ -48,6 +48,7 @@ export const useMyProductsPageActions = () => {
   );
   const [togglingBuyNFreeProductId, setTogglingBuyNFreeProductId] = useState<string | null>(null);
   const [togglingRentalProductId, setTogglingRentalProductId] = useState<string | null>(null);
+  const [togglingQaProductId, setTogglingQaProductId] = useState<string | null>(null);
   const [togglingFlashSaleProductId, setTogglingFlashSaleProductId] = useState<string | null>(
     null,
   );
@@ -318,6 +319,32 @@ export const useMyProductsPageActions = () => {
    * Только выключение: включение проходит через модалку — серверу нужны цена
    * и длительность, отдельного «просто включить» сценария нет.
    */
+  const handleSetProductQa = useCallback(
+    async (productId: string, qaEnabled: boolean) => {
+      const normalizedProductId = String(productId ?? "").trim();
+      if (!normalizedProductId) {
+        return;
+      }
+
+      setTogglingQaProductId(normalizedProductId);
+      setManageErrorMessage("");
+      try {
+        const updated = await patchMutation.mutateAsync({
+          productId: normalizedProductId,
+          body: { productQaEnabled: qaEnabled },
+        });
+        syncPromotionProduct(updated as MyProductsCatalogProduct);
+      } catch (error) {
+        setManageErrorMessage(
+          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        );
+      } finally {
+        setTogglingQaProductId(null);
+      }
+    },
+    [patchMutation, syncPromotionProduct],
+  );
+
   const handleSetProductFlashSale = useCallback(
     async (productId: string, flashSaleEnabled: boolean) => {
       const normalizedProductId = String(productId ?? "").trim();
@@ -511,6 +538,8 @@ export const useMyProductsPageActions = () => {
       promotionProductId != null && togglingWholesaleProductId === promotionProductId,
     isBuyNFreeTogglePending:
       promotionProductId != null && togglingBuyNFreeProductId === promotionProductId,
+    isQaTogglePending:
+      promotionProductId != null && togglingQaProductId === promotionProductId,
     isFlashSaleTogglePending:
       promotionProductId != null && togglingFlashSaleProductId === promotionProductId,
     isRentalTogglePending:
@@ -533,6 +562,7 @@ export const useMyProductsPageActions = () => {
     handleSetProductWholesale,
     handleSetProductBuyNFree,
     handleSetProductRental,
+    handleSetProductQa,
     handleSetProductFlashSale,
     handleSetProductAffiliate,
     handleSetProductLoyaltyPoints,

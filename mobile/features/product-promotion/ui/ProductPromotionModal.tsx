@@ -119,6 +119,11 @@ type ProductPromotionModalProps = {
   isBuyNFreeTogglePending?: boolean;
   isRentalTogglePending?: boolean;
   isFlashSaleTogglePending?: boolean;
+  isQaTogglePending?: boolean;
+  onSetProductQa?: (
+    productId: string,
+    productQaEnabled: boolean,
+  ) => void | Promise<void>;
   isAffiliateTogglePending?: boolean;
   isLoyaltyTogglePending?: boolean;
   isInstallmentTogglePending?: boolean;
@@ -157,6 +162,7 @@ export const ProductPromotionModal = ({
   onSetProductBuyNFree,
   onSetProductRental,
   onSetProductFlashSale,
+  onSetProductQa,
   onSetProductAffiliate,
   onSetProductLoyaltyPoints,
   onSetProductInstallment,
@@ -170,6 +176,7 @@ export const ProductPromotionModal = ({
   isBuyNFreeTogglePending = false,
   isRentalTogglePending = false,
   isFlashSaleTogglePending = false,
+  isQaTogglePending = false,
   isAffiliateTogglePending = false,
   isLoyaltyTogglePending = false,
   isInstallmentTogglePending = false,
@@ -445,6 +452,7 @@ export const ProductPromotionModal = ({
         onSetBuyNFree={onSetProductBuyNFree}
         onSetRental={onSetProductRental}
         onSetFlashSale={onSetProductFlashSale}
+        onSetQa={onSetProductQa}
         onSetAffiliate={onSetProductAffiliate}
         onSetLoyaltyPoints={onSetProductLoyaltyPoints}
         onSetInstallment={onSetProductInstallment}
@@ -457,6 +465,7 @@ export const ProductPromotionModal = ({
         isBuyNFreeTogglePending={isBuyNFreeTogglePending}
         isRentalTogglePending={isRentalTogglePending}
         isFlashSaleTogglePending={isFlashSaleTogglePending}
+        isQaTogglePending={isQaTogglePending}
         isAffiliateTogglePending={isAffiliateTogglePending}
         isLoyaltyTogglePending={isLoyaltyTogglePending}
         isInstallmentTogglePending={isInstallmentTogglePending}

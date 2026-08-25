@@ -50,6 +50,8 @@ type ProductEditManageSectionProps = {
   isBuyNFreeTogglePending?: boolean;
   isRentalTogglePending?: boolean;
   isFlashSaleTogglePending?: boolean;
+  isQaTogglePending?: boolean;
+  onSetQa?: (productId: string, productQaEnabled: boolean) => void | Promise<void>;
   isAffiliateTogglePending?: boolean;
   isLoyaltyTogglePending?: boolean;
   isInstallmentTogglePending?: boolean;
@@ -106,6 +108,7 @@ export const ProductEditManageSection = ({
   isBuyNFreeTogglePending = false,
   isRentalTogglePending = false,
   isFlashSaleTogglePending = false,
+  isQaTogglePending = false,
   isAffiliateTogglePending = false,
   isLoyaltyTogglePending = false,
   isInstallmentTogglePending = false,
@@ -124,6 +127,7 @@ export const ProductEditManageSection = ({
   onOpenRentalSettings,
   onOpenFlashSaleSettings,
   onSetFlashSale,
+  onSetQa,
   onOpenAffiliateSettings,
   onOpenLoyaltySettings,
   onOpenOutOfStockSettings,
@@ -176,6 +180,8 @@ export const ProductEditManageSection = ({
     typeof onOpenAffiliateSettings === "function" || typeof onSetAffiliate === "function";
   const showLoyalty =
     typeof onOpenLoyaltySettings === "function" || typeof onSetLoyaltyPoints === "function";
+  const showQaToggle = typeof onSetQa === "function" && canEdit;
+  const isQaEnabled = product.productQaEnabled === true;
   const showRaffleToggle =
     sellerRaffleActive && typeof onToggleRaffleParticipation === "function";
   const showInstallmentButton =
@@ -199,6 +205,7 @@ export const ProductEditManageSection = ({
     isBuyNFreeTogglePending ||
     isRentalTogglePending ||
     isFlashSaleTogglePending ||
+    isQaTogglePending ||
     isAffiliateTogglePending ||
     isLoyaltyTogglePending ||
     isInstallmentTogglePending ||
@@ -260,6 +267,23 @@ export const ProductEditManageSection = ({
                 return;
               }
               void onSetAuction(String(product._id), !isAuctionEnabled);
+            }}
+          />
+        ) : null}
+        {showQaToggle ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_UI.MANAGE_QA_TITLE}
+            description={CREATE_PRODUCT_UI.MANAGE_QA_HINT}
+            checked={isQaEnabled}
+            disabled={actionsLocked}
+            pending={isQaTogglePending}
+            pendingLabel={CREATE_PRODUCT_UI.QA_TOGGLE_PENDING}
+            onCheckedChange={() => {
+              if (product._id == null || actionsLocked) {
+                return { revert: true };
+              }
+              void onSetQa?.(String(product._id), !isQaEnabled);
+              return undefined;
             }}
           />
         ) : null}
