@@ -1,4 +1,5 @@
 const SENTRY_INGEST_HOST_PATTERN = "https://*.ingest.sentry.io";
+const PLAUSIBLE_ORIGIN = "https://plausible.io";
 
 /**
  * @param {string | undefined | null} raw
@@ -35,6 +36,22 @@ function sentryConnectOriginsFromDsn(dsn) {
 }
 
 /**
+ * @param {{
+ *   plausibleScriptSrc?: string | null;
+ *   plausibleDomain?: string | null;
+ * }} options
+ */
+function isPlausibleConfigured(options = {}) {
+  const scriptSrc = String(
+    options.plausibleScriptSrc ?? process.env.VITE_PLAUSIBLE_SCRIPT_SRC ?? "",
+  ).trim();
+  const domain = String(
+    options.plausibleDomain ?? process.env.VITE_PLAUSIBLE_DOMAIN ?? "",
+  ).trim();
+  return scriptSrc.length > 0 || domain.length > 0;
+}
+
+/**
  * CSP для HTML SPA (nginx / vite preview). Медиа с CDN — `PUBLIC_UPLOAD_BASE_URL`.
  *
  * @param {{
@@ -42,6 +59,8 @@ function sentryConnectOriginsFromDsn(dsn) {
  *   mediaOrigin?: string | null;
  *   apiOrigin?: string | null;
  *   sentryDsn?: string | null;
+ *   plausibleScriptSrc?: string | null;
+ *   plausibleDomain?: string | null;
  *   upgradeInsecureRequests?: boolean;
  * }} [options]
  * @returns {string}
@@ -60,6 +79,7 @@ export function buildSpaContentSecurityPolicy(options = {}) {
   const imgSources = new Set(["'self'", "data:", "blob:", "https:"]);
   const mediaSources = new Set(["'self'", "blob:", "https:"]);
   const connectSources = new Set(["'self'"]);
+  const scriptSources = new Set(["'self'"]);
 
   if (mediaOrigin && mediaOrigin !== frontendOrigin) {
     imgSources.add(mediaOrigin);
@@ -75,6 +95,15 @@ export function buildSpaContentSecurityPolicy(options = {}) {
   }
   connectSources.add(SENTRY_INGEST_HOST_PATTERN);
 
+  if (isPlausibleConfigured(options)) {
+    const scriptOrigin =
+      parseHttpOrigin(
+        options.plausibleScriptSrc ?? process.env.VITE_PLAUSIBLE_SCRIPT_SRC,
+      ) ?? PLAUSIBLE_ORIGIN;
+    scriptSources.add(scriptOrigin);
+    connectSources.add(scriptOrigin);
+  }
+
   const upgradeInsecure =
     options.upgradeInsecureRequests ?? Boolean(frontendOrigin?.startsWith("https:"));
 
@@ -82,7 +111,7 @@ export function buildSpaContentSecurityPolicy(options = {}) {
     "default-src 'self'",
     "base-uri 'self'",
     "object-src 'none'",
-    "script-src 'self'",
+    `script-src ${[...scriptSources].join(" ")}`,
     "style-src 'self' 'unsafe-inline'",
     `img-src ${[...imgSources].join(" ")}`,
     `media-src ${[...mediaSources].join(" ")}`,

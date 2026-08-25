@@ -361,7 +361,7 @@ server {
     # См. server/docs/CSP-HELMET.md — для S3 подставится https://cdn.gitorg.ru в img-src/media-src
 
     location / {
-        add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: https://cdn.gitorg.ru; media-src 'self' blob: https: https://cdn.gitorg.ru; font-src 'self' data:; connect-src 'self' https://*.ingest.sentry.io; frame-ancestors 'self'; form-action 'self'; upgrade-insecure-requests;" always;
+        add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://plausible.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: https://cdn.gitorg.ru; media-src 'self' blob: https: https://cdn.gitorg.ru; font-src 'self' data:; connect-src 'self' https://*.ingest.sentry.io https://plausible.io; frame-ancestors 'self'; form-action 'self'; upgrade-insecure-requests;" always;
         # Доп. security-заголовки (defense-in-depth к CSP).
         add_header X-Content-Type-Options "nosniff" always;
         add_header Referrer-Policy "strict-origin-when-cross-origin" always;

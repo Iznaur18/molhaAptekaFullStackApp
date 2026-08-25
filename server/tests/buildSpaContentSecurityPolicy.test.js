@@ -49,4 +49,15 @@ describe("buildSpaContentSecurityPolicy", () => {
     assert.match(csp, /connect-src[^;]*https:\/\/o123\.ingest\.sentry\.io/);
     assert.match(csp, /connect-src[^;]*https:\/\/\*\.ingest\.sentry\.io/);
   });
+
+  test("Plausible script adds script-src and connect-src", () => {
+    const csp = buildSpaContentSecurityPolicy({
+      frontendOrigin: "https://gitorg.ru",
+      plausibleScriptSrc: "https://plausible.io/js/pa-bpk-uLbAhfVhsvkpa1DW3.js",
+      upgradeInsecureRequests: true,
+    });
+
+    assert.match(csp, /script-src[^;]*https:\/\/plausible\.io/);
+    assert.match(csp, /connect-src[^;]*https:\/\/plausible\.io/);
+  });
 });
