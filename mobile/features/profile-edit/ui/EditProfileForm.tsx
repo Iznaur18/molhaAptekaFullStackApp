@@ -21,14 +21,13 @@ import {
   USER_GENDER_NO_SELECTED,
   NOTES_ABOUT_USER_MAX_CHARS,
 } from "@/entities/user/model/constants";
-import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
-import { UserSavedAddressesReadOnlyList } from "@/entities/address/ui/UserSavedAddressesReadOnlyList";
+import { UserSavedAddressesEditor } from "@/entities/address/ui/UserSavedAddressesEditor";
 import { RuRegionSelect } from "@/entities/region/ui/RuRegionSelect";
 import { ProfileAvatarUpload } from "@/features/image-upload/ui/ProfileAvatarUpload";
 import { ProfileBackgroundUpload } from "@/features/image-upload/ui/ProfileBackgroundUpload";
 import { DeleteAccountSection } from "@/features/profile-edit/ui/DeleteAccountSection";
 import { EditProfileSocialLinksFields } from "@/features/profile-edit/ui/EditProfileSocialLinksFields";
-import { ADDRESS_DELIVERY_UI, ADDRESS_STRUCTURED_UI, AUTH_UI, EDIT_PROFILE_UI, USER_SAVED_ADDRESSES_UI } from "@/shared/config";
+import { ADDRESS_STRUCTURED_UI, AUTH_UI, EDIT_PROFILE_UI, USER_SAVED_ADDRESSES_UI } from "@/shared/config";
 import { keepDigitsOnly } from "@/shared/lib/rubPriceInput";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useEditProfileFormStyles } from "@/shared/theme/editProfileFormStyles";
@@ -55,6 +54,7 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
   const initialForm = useMemo(() => mapUserToEditProfileForm(user), [user]);
   const [baselineForm, setBaselineForm] = useState(initialForm);
   const [form, setForm] = useState<EditProfileFormState>(initialForm);
+  const [addressDraftOpen, setAddressDraftOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [phoneBindCode, setPhoneBindCode] = useState("");
@@ -99,6 +99,12 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
   };
 
   const handleSubmit = async () => {
+    // Незакрытый черновик адреса потерялся бы молча при сохранении.
+    if (addressDraftOpen) {
+      setErrorMessage(USER_SAVED_ADDRESSES_UI.ERROR_DRAFT_OPEN);
+      return;
+    }
+
     const validationError = validateEditProfileForm(form);
     if (validationError) {
       setErrorMessage(validationError);
@@ -576,44 +582,30 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
       {section(
         ADDRESS_STRUCTURED_UI.SECTION_LABEL,
         <>
-          <UserSavedAddressesReadOnlyList user={user} />
-          <Text style={styles.hint}>
-            {USER_SAVED_ADDRESSES_UI.MOBILE_DEFAULT_EDIT_HINT}
-          </Text>
-          <AddressSuggestInput
-            autoFocus={focusAddress}
-            value={form.deliveryAddress}
-            onChange={(deliveryAddress) => {
-              setForm((prev) => ({
-                ...prev,
-                deliveryAddress,
-                ...(deliveryAddress.regionCode
-                  ? { userRegionCode: deliveryAddress.regionCode }
-                  : {}),
-              }));
+          <UserSavedAddressesEditor
+            value={form.savedAddresses}
+            autoStartAdd={focusAddress}
+            disabled={isSubmitting}
+            onEditingChange={setAddressDraftOpen}
+            onChange={(savedAddresses) => {
+              setForm((prev) => {
+                const defaultAddress =
+                  savedAddresses.find((item) => item.isDefault) ?? null;
+                return {
+                  ...prev,
+                  savedAddresses,
+                  ...(defaultAddress?.regionCode
+                    ? { userRegionCode: defaultAddress.regionCode }
+                    : {}),
+                };
+              });
               setErrorMessage("");
               setSuccessMessage("");
             }}
-            disabled={isSubmitting}
-            label={ADDRESS_DELIVERY_UI.LABEL_LINE}
-            placeholder={ADDRESS_DELIVERY_UI.PLACEHOLDER_LINE}
           />
-          <View style={styles.field}>
-            {fieldLabel(ADDRESS_DELIVERY_UI.LABEL_FLAT)}
-            <TextInput
-              style={styles.input}
-              value={form.deliveryAddress.flat}
-              onChangeText={(value) =>
-                setForm((prev) => ({
-                  ...prev,
-                  deliveryAddress: { ...prev.deliveryAddress, flat: value },
-                }))
-              }
-              placeholder={ADDRESS_STRUCTURED_UI.PLACEHOLDER_FLAT}
-              placeholderTextColor={theme.colors.textMuted}
-              editable={!isSubmitting}
-            />
-          </View>
+          <Text style={styles.hint}>
+            {USER_SAVED_ADDRESSES_UI.MOBILE_DEFAULT_EDIT_HINT}
+          </Text>
         </>,
         (event) => {
           addressOffsetRef.current = event.nativeEvent.layout.y;

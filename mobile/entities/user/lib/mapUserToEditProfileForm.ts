@@ -1,6 +1,8 @@
 import { USER_SOCIAL_LINK_FIELD_IDS, storedSocialUrlToInputValue, DEFAULT_VIEWER_REGION_CODE, isRuRegionCode } from "@molha/api-contract";
 import { addressValueFromUser } from "@/entities/address/lib/addressValueFromUser";
 import type { RuDeliveryAddressValue } from "@/entities/address/model/types";
+import type { UserSavedAddressFormValue } from "@/entities/address/model/userSavedAddressTypes";
+import { userSavedAddressesFromUser } from "@/entities/address/lib/userSavedAddressesFromUser";
 import { formatBirthDateForInput } from "@/entities/user/lib/birthDateInputMask";
 import { getUserBackgroundFocus } from "@/entities/user/lib/profileImageFocus";
 import type { ProfileImageFocus } from "@/entities/user/lib/profileImageFocus";
@@ -19,6 +21,7 @@ export type EditProfileFormState = {
   userBirthDate: string;
   userGender: "male" | "female" | "noSelected";
   deliveryAddress: RuDeliveryAddressValue;
+  savedAddresses: UserSavedAddressFormValue[];
   userRegionCode: string;
   userPhoneNumber: string;
   userAvatarUrl: string;
@@ -100,6 +103,7 @@ export const mapUserToEditProfileForm = (
         ? user.userGender
         : USER_GENDER_NO_SELECTED,
     deliveryAddress,
+    savedAddresses: userSavedAddressesFromUser(user),
     userRegionCode: isRuRegionCode(regionRaw) ? regionRaw : DEFAULT_VIEWER_REGION_CODE,
     userPhoneNumber:
       typeof user.userPhoneNumber === "string"

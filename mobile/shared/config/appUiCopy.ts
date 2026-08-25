@@ -1232,8 +1232,20 @@ export const ADDRESS_DELIVERY_UI = {
 export const USER_SAVED_ADDRESSES_UI = {
   SECTION_LABEL: "Сохранённые адреса",
   LABEL_DEFAULT: "По умолчанию",
-  MOBILE_READ_ONLY_HINT: "Список только для просмотра",
-  MOBILE_MANAGE_ON_WEB: "Добавление и удаление адресов — в профиле на сайте",
+  LABEL_NAME: "Метка",
+  PLACEHOLDER_NAME: "Дом, работа…",
+  ADD: "Добавить адрес",
+  EDIT: "Изменить",
+  REMOVE: "Удалить",
+  SAVE: "Сохранить адрес",
+  CANCEL: "Отмена",
+  EMPTY: "Адреса не добавлены",
+  ERROR_MAX_COUNT: (max: number) => `Не больше ${max} адресов`,
+  ERROR_DEFAULT_REQUIRED: "Укажите адрес по умолчанию",
+  ERROR_DUPLICATE: "Такой адрес уже добавлен",
+  ERROR_LABEL_MAX: (max: number) => `Метка не длиннее ${max} символов`,
+  REMOVE_CONFIRM: "Удалить этот адрес?",
+  ERROR_DRAFT_OPEN: "Сохраните или отмените редактирование адреса",
   MOBILE_DEFAULT_EDIT_HINT: "Ниже можно изменить адрес по умолчанию для доставки",
   FORMAT_LINE: (line: string, flat: string) => {
     const trimmedFlat = String(flat ?? "").trim();

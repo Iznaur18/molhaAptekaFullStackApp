@@ -48,7 +48,8 @@ test("address prompt host, CTA focus and CMS fallback are wired", () => {
   assert.match(host, /focus: "address"/);
   assert.match(host, /primaryActionLabel/);
   assert.match(editScreen, /focusAddress/);
-  assert.match(editForm, /autoFocus=\{focusAddress\}/);
+  // Подсказка ведёт в книгу адресов и сразу открывает черновик нового адреса.
+  assert.match(editForm, /autoStartAdd=\{focusAddress\}/);
   assert.match(copy, /profile_address:/);
   const limitModal = readMobileFile("entities/product/ui/SellerProductsLimitModal.tsx");
   const regionSelect = readMobileFile("entities/region/ui/RuRegionSelect.tsx");

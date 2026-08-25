@@ -5,6 +5,7 @@ import {
   assertUserNameFormat,
 } from "@molha/api-contract";
 import { validateRuDeliveryAddressForm } from "@/entities/address/lib/validateRuDeliveryAddressForm";
+import { validateUserSavedAddressesForm } from "@/entities/address/lib/validateUserSavedAddressesForm";
 import { EDIT_PROFILE_UI } from "@/shared/config";
 
 import { isBirthDateInputComplete, parseBirthDateInputToIsoDate } from "./birthDateInputMask";
@@ -37,6 +38,9 @@ export const validateEditProfileForm = (form: EditProfileFormState): string | nu
 
   const addressError = validateRuDeliveryAddressForm(form.deliveryAddress);
   if (addressError) return addressError;
+
+  const savedAddressesError = validateUserSavedAddressesForm(form.savedAddresses);
+  if (savedAddressesError) return savedAddressesError;
 
   if (!isRuRegionCode(form.userRegionCode)) {
     return EDIT_PROFILE_UI.ERROR_REGION_REQUIRED;

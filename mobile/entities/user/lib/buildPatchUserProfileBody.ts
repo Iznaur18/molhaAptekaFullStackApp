@@ -4,18 +4,15 @@ import {
   validateSocialLinkInput,
   isRuRegionCode,
 } from "@molha/api-contract";
+import { appendUserAddressesToPayload } from "@/entities/address/lib/appendUserAddressesToPayload";
+import { isUserSavedAddressesEqual } from "@/entities/address/lib/isUserSavedAddressesEqual";
 import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
 import { normalizeUploadUrlForStorage } from "@/shared/lib";
 
 import { birthDateIsoDateToApiValue, parseBirthDateInputToIsoDate } from "./birthDateInputMask";
 import { getUserBackgroundFocus } from "./profileImageFocus";
-import { EMPTY_DELIVERY_ADDRESS, type EditProfileFormState } from "./mapUserToEditProfileForm";
+import type { EditProfileFormState } from "./mapUserToEditProfileForm";
 import { serializeUserBackground } from "./userBackgroundValue";
-
-const isDeliveryAddressEqual = (
-  a: EditProfileFormState["deliveryAddress"],
-  b: EditProfileFormState["deliveryAddress"],
-) => a.line.trim() === b.line.trim() && a.flat.trim() === b.flat.trim();
 
 export const buildPatchUserProfileBody = (
   form: EditProfileFormState,
@@ -44,16 +41,14 @@ export const buildPatchUserProfileBody = (
     body.userGender = form.userGender;
   }
 
-  const baseline = initial.deliveryAddress ?? EMPTY_DELIVERY_ADDRESS;
-  if (!isDeliveryAddressEqual(form.deliveryAddress, baseline)) {
-    const line = form.deliveryAddress.line.trim();
-    if (line === "") {
-      body.userAddress = null;
-      body.userAddressFlat = null;
-    } else {
-      body.userAddress = line;
-      body.userAddressFlat = form.deliveryAddress.flat.trim() || null;
-    }
+  // Легаси-поле `userAddress` из формы профиля больше не уходит: адрес задаётся
+  // книгой адресов, а сервер сам переносит адрес по умолчанию в userAddress*.
+  // Контракт запрещает слать userAddress и userAddresses одним запросом
+  // (USER_ADDRESS_PATCH_CONFLICT_MESSAGE) — в вебе поля тоже нет.
+
+  // Книга адресов уходит целиком: сервер заменяет список, а не патчит по одному.
+  if (!isUserSavedAddressesEqual(form.savedAddresses, initial.savedAddresses)) {
+    appendUserAddressesToPayload(body, form.savedAddresses);
   }
 
   if (
