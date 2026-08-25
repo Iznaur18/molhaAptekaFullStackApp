@@ -5,24 +5,26 @@ type OrderSeller = {
   userPhoneNumber?: string;
 };
 
-type OrderLike = {
-  items?: Array<{
-    productId?:
-      | string
-      | {
-          productSeller?:
-            | string
-            | {
-                _id?: string;
-                userName?: string;
-                email?: string;
-                userPhoneNumber?: string;
-              }
-            | null;
-        }
-      | null;
-  }>;
+/**
+ * `productId` приходит из контракта как `unknown`: сервер отдаёт либо строку-id,
+ * либо populate-объект товара. Сужаем здесь, а не в типе, — иначе каждый экран
+ * заказов приходится кастовать (из-за этого падал tsc в MyOrders, MySales,
+ * AdminOrders и AddressPromptHost).
+ */
+export type OrderLineLike = {
+  status?: string;
+  productId?: unknown;
 };
+
+type OrderLike = {
+  items?: OrderLineLike[];
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const readString = (value: unknown): string =>
+  typeof value === "string" ? value : "";
 
 /** Уникальные продавцы по позициям заказа (после populate productSeller). */
 export function resolveOrderSellers(order: OrderLike | null | undefined): OrderSeller[] {
@@ -30,7 +32,7 @@ export function resolveOrderSellers(order: OrderLike | null | undefined): OrderS
 
   for (const item of order?.items ?? []) {
     const product = item?.productId;
-    if (product == null || typeof product === "string") {
+    if (!isRecord(product)) {
       continue;
     }
     const seller = product.productSeller;
@@ -44,15 +46,18 @@ export function resolveOrderSellers(order: OrderLike | null | undefined): OrderS
       }
       continue;
     }
+    if (!isRecord(seller)) {
+      continue;
+    }
     const id = seller._id != null ? String(seller._id) : "";
     if (!id || byId.has(id)) {
       continue;
     }
     byId.set(id, {
       _id: id,
-      userName: seller.userName,
-      email: seller.email,
-      userPhoneNumber: seller.userPhoneNumber,
+      userName: readString(seller.userName) || undefined,
+      email: readString(seller.email) || undefined,
+      userPhoneNumber: readString(seller.userPhoneNumber) || undefined,
     });
   }
 

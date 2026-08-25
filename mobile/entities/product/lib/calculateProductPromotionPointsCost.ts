@@ -15,6 +15,14 @@ export {
   PRODUCT_PROMOTION_DURATION_MULT,
 };
 
+/**
+ * Контракт — обычный JS, поэтому TS выводит у карты ставок литеральный тип
+ * { 1: number; 2: number; 3: number } и запрещает индексировать её произвольным
+ * number. Расширяем до Record: промах по ключу код и так проверяет на null.
+ */
+const TIER_RATE_BY_TIER: Record<number, number | undefined> =
+  PRODUCT_PROMOTION_TIER_RATES;
+
 export const PRODUCT_PROMOTION_TIER_LABELS: Record<number, string> = {
   [PRODUCT_PROMOTION_TIER_GOLD]: "Золото",
   [PRODUCT_PROMOTION_TIER_TOP]: "Топ",
@@ -35,7 +43,7 @@ export const calculateProductPromotionPointsCost = ({
   tier,
   durationCode,
 }: CalculatePromotionCostParams): number => {
-  const rate = PRODUCT_PROMOTION_TIER_RATES[Number(tier)];
+  const rate = TIER_RATE_BY_TIER[Number(tier)];
   const durationMult = PRODUCT_PROMOTION_DURATION_MULT[durationCode];
   if (rate == null || durationMult == null) {
     return 0;
@@ -45,7 +53,7 @@ export const calculateProductPromotionPointsCost = ({
 };
 
 export const formatProductPromotionTierRatePercent = (tier: number): string => {
-  const rate = PRODUCT_PROMOTION_TIER_RATES[Number(tier)];
+  const rate = TIER_RATE_BY_TIER[Number(tier)];
   if (rate == null) {
     return "";
   }

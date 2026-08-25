@@ -33,7 +33,10 @@ import {
 import { resolveOrderLineItemName } from "@/entities/order/lib/resolveOrderLineItemName";
 import { resolveOrderStatusBadgeStyle } from "@/entities/order/lib/resolveOrderStatusBadgeStyle";
 import { resolveOrderStatusLabelRu } from "@/entities/order/lib/resolveOrderStatusLabelRu";
-import { resolveOrderSellers } from "@/entities/order/lib/resolveOrderSellers";
+import {
+  resolveOrderSellers,
+  type OrderLineLike,
+} from "@/entities/order/lib/resolveOrderSellers";
 import { OrderCardLineItemThumb } from "@/entities/order/ui/OrderCardLineItemThumb";
 import { BuyerPassportSharePanel } from "@/entities/installment/ui/BuyerPassportSharePanel";
 import {
@@ -82,23 +85,7 @@ type OrderCardOrder = {
     passportSelfiePhotoUrl?: string;
     consentAt?: string | null;
   } | null;
-  items?: Array<{
-    status?: string;
-    productId?:
-      | string
-      | {
-          productSeller?:
-            | string
-            | {
-                _id?: string;
-                userName?: string;
-                email?: string;
-                userPhoneNumber?: string;
-              }
-            | null;
-        }
-      | null;
-  }>;
+  items?: OrderLineLike[];
 };
 
 type OrderCardProps = {

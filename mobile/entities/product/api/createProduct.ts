@@ -5,7 +5,12 @@ import { apiClient, parseCreateProductData } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
-export type CreateProductBody = z.infer<typeof createProductBodySchema>;
+/**
+ * `z.input`, а не `z.infer`: схему парсит сама `createProduct` ниже, поэтому
+ * вызывающая сторона отдаёт «сырое» тело и вправе не передавать поля с
+ * `.default()` (productOutOfStock, productOutOfStockLabel и т.п.).
+ */
+export type CreateProductBody = z.input<typeof createProductBodySchema>;
 
 export const createProduct = async (body: CreateProductBody) => {
   try {

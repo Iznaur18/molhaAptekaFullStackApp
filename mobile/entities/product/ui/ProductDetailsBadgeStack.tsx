@@ -195,6 +195,15 @@ const renderBadge = ({
     );
   }
 
+  // Сюда доходят "priceMarket" и "promo". Своей палитры у "promo" нет ни здесь,
+  // ни в вебе (client/.../ProductDetailsBadgeStack.jsx — такой же fall-through),
+  // поэтому бейдж промокодов рисуется чипом без заливки. Поведение оставлено
+  // как в вебе намеренно: чинить тон нужно на обеих платформах разом.
+  const tone =
+    item.kind === "priceMarket"
+      ? { backgroundColor: item.backgroundColor, color: item.color }
+      : { backgroundColor: undefined, color: undefined };
+
   return (
     <Wrapper
       key={item.key}
@@ -202,13 +211,13 @@ const renderBadge = ({
         styles.metaInfoChip,
         styles.metaInfoChipRow,
         softBadgeChrome,
-        { backgroundColor: item.backgroundColor },
+        { backgroundColor: tone.backgroundColor },
       ]}
       accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.PRICE_MARKET_STATUS_SLOT_ARIA}
       {...wrapperProps}
     >
-      <MaterialIcons name="sell" size={14} color={item.color} />
-      <Text style={[softBadgeText, { color: item.color }]} numberOfLines={1}>
+      <MaterialIcons name="sell" size={14} color={tone.color} />
+      <Text style={[softBadgeText, { color: tone.color }]} numberOfLines={1}>
         {item.label}
       </Text>
     </Wrapper>

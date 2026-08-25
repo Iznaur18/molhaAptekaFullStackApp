@@ -2,6 +2,7 @@ import {
   isProductRentalConfigured,
   PRODUCT_RENTAL_PRICE_UNIT_DAY,
   PRODUCT_RENTAL_PRICE_UNIT_HOUR,
+  type ProductRentalPriceUnit,
 } from "@izibuy/shared-lib";
 import { useEffect, useState } from "react";
 import {
@@ -52,7 +53,7 @@ export const ProductRentalManageModal = ({
   const { patchMutation } = useMyProductMutations();
 
   const [price, setPrice] = useState("");
-  const [unit, setUnit] = useState<string>(PRODUCT_RENTAL_PRICE_UNIT_DAY);
+  const [unit, setUnit] = useState<ProductRentalPriceUnit>(PRODUCT_RENTAL_PRICE_UNIT_DAY);
   const [error, setError] = useState("");
 
   const productId = product?._id != null ? String(product._id) : "";

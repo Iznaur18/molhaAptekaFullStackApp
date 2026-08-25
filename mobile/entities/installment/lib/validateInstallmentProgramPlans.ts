@@ -7,17 +7,25 @@ import {
 } from "@/entities/installment/model/programConstants";
 import { INSTALLMENT_UI } from "@/shared/config";
 
+/**
+ * Пустая строка — это состояние очищенного поля ввода, а не «ноль»: пока
+ * продавец стирает число, в драфте лежит `""`, и восстановление значения
+ * происходит на blur. Валидация ниже приводит поля через `Number(...)`,
+ * поэтому `""` честно проваливает проверку минимума.
+ */
+type NumericDraftField = number | "";
+
 export type InstallmentProgramPlanDraft = {
   title?: string;
-  monthsCount?: number;
-  monthlyAmountRub?: number;
+  monthsCount?: NumericDraftField;
+  monthlyAmountRub?: NumericDraftField;
   firstPaymentRequiredNow?: boolean;
   /**
    * Процент надбавки, который ввёл продавец. Это источник правды для поля
    * ввода: `monthlyAmountRub` считается из него, а не наоборот, иначе
    * округление ежемесячного платежа «перебивает» набранный процент.
    */
-  markupPercent?: number;
+  markupPercent?: NumericDraftField;
 };
 
 export const validateInstallmentProgramPlans = (

@@ -1,104 +1,46 @@
-const PRODUCT_PATH_RE = /\/product\/([^/?#]+)/i;
-const RAFFLE_PATH_RE = /\/raffle\/([^/?#]+)/i;
-const SELLER_PATH_RE = /\/seller\/([^/?#]+)/i;
-const USER_PROFILE_PATH_RE = /^\/user\/([^/?#]+)$/i;
-const HUB_PATH_RE = /\/hub\/([^/?#]+)/i;
+import {
+  HOME_ROUTE,
+  normalizeWebPath,
+  resolveWebPathToMobileRoute,
+} from "@/features/deep-linking/lib/resolveWebPathToMobileRoute";
 
-const RESERVED_USER_PATH_SEGMENTS = new Set(["search", "me", "data-confirmation-requests"]);
+const APP_SCHEMES = new Set(["gitorg", "izibuy"]);
+const APP_HOSTS = new Set(["gitorg.ru", "www.gitorg.ru", "izibuy.ru", "www.izibuy.ru"]);
 
-const normalizePath = (rawPath: string): string => {
-  const trimmed = rawPath.trim();
-  if (!trimmed) {
-    return "/";
-  }
-  return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
-};
-
-const matchNamedRoute = (pathname: string): string | null => {
-  const productMatch = pathname.match(PRODUCT_PATH_RE);
-  if (productMatch?.[1]) {
-    return `/product/${decodeURIComponent(productMatch[1])}`;
-  }
-
-  const raffleMatch = pathname.match(RAFFLE_PATH_RE);
-  if (raffleMatch?.[1]) {
-    return `/raffle/${decodeURIComponent(raffleMatch[1])}`;
-  }
-
-  const sellerMatch = pathname.match(SELLER_PATH_RE);
-  if (sellerMatch?.[1]) {
-    return `/seller/${decodeURIComponent(sellerMatch[1])}`;
-  }
-
-  const userMatch = pathname.match(USER_PROFILE_PATH_RE);
-  if (userMatch?.[1]) {
-    const userId = decodeURIComponent(userMatch[1]);
-    if (!RESERVED_USER_PATH_SEGMENTS.has(userId)) {
-      return `/user/${userId}`;
-    }
-  }
-
-  const hubMatch = pathname.match(HUB_PATH_RE);
-  if (hubMatch?.[1]) {
-    return `/hub/${decodeURIComponent(hubMatch[1])}`;
-  }
-
-  if (pathname === "/orders" || pathname.startsWith("/orders/")) {
-    return "/orders";
-  }
-
-  if (pathname === "/notifications" || pathname.startsWith("/notifications/")) {
-    return "/notifications";
-  }
-
-  if (pathname === "/catalog" || pathname === "/catalog-browser") {
-    return "/catalog-browser";
-  }
-
-  if (pathname === "/user-list" || pathname === "/users") {
-    return "/users";
-  }
-
-  if (pathname === "/login") {
-    return "/(auth)/login";
-  }
-
-  if (pathname === "/register") {
-    return "/(auth)/register";
-  }
-
-  if (pathname === "/" || pathname === "/(tabs)") {
-    return "/(tabs)";
-  }
-
-  return null;
-};
+/**
+ * Путь, который мы не умеем открыть, ведёт на главную — так же, как веб
+ * (`<Route path="*" element={<Navigate to="/" replace />} />` в appRoutes).
+ * Раньше такая ссылка возвращала null и `useAppDeepLinking` молча ничего не
+ * делал: приложение открывалось, но человек оставался там, где был.
+ *
+ * Важно: fallback применяется только к нашим хостам и схемам. Чужой URL
+ * по-прежнему возвращает null и никуда не ведёт.
+ */
+const resolveOwnLink = (rawPath: string): string =>
+  resolveWebPathToMobileRoute(rawPath) ?? HOME_ROUTE;
 
 export const parseAppDeepLink = (url: string): string | null => {
   try {
     const parsed = new URL(url);
-    const scheme = parsed.protocol.replace(":", "");
-    if (scheme === "gitorg" || scheme === "izibuy") {
+    const scheme = parsed.protocol.replace(":", "").toLowerCase();
+
+    if (APP_SCHEMES.has(scheme)) {
+      // `gitorg://product/123` → hostname "product", pathname "/123".
       const hostPath = parsed.hostname
         ? `/${parsed.hostname}${parsed.pathname}`
         : parsed.pathname;
-      return matchNamedRoute(normalizePath(hostPath));
+      return resolveOwnLink(normalizeWebPath(hostPath));
     }
 
-    const host = parsed.hostname.toLowerCase();
-    if (
-      host === "gitorg.ru" ||
-      host === "www.gitorg.ru" ||
-      host === "izibuy.ru" ||
-      host === "www.izibuy.ru"
-    ) {
-      return matchNamedRoute(normalizePath(parsed.pathname));
+    if (APP_HOSTS.has(parsed.hostname.toLowerCase())) {
+      return resolveOwnLink(normalizeWebPath(parsed.pathname));
     }
   } catch {
-    const normalized = normalizePath(
-      url.replace(/^(?:gitorg|izibuy):\/\//i, "/"),
-    );
-    return matchNamedRoute(normalized);
+    // Не URL — но это может быть `gitorg://…` в форме, которую не осилил парсер.
+    const stripped = url.replace(/^(?:gitorg|izibuy):\/\//i, "/");
+    if (stripped !== url) {
+      return resolveOwnLink(normalizeWebPath(stripped));
+    }
   }
 
   return null;

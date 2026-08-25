@@ -518,7 +518,7 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
   pickupOption: {
     borderWidth: 1,
     borderColor: theme.colors.border,
-    borderRadius: theme.radii.md,
+    borderRadius: theme.radius.md,
     paddingHorizontal: 12,
     paddingVertical: 10,
     gap: 2,

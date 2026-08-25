@@ -52,6 +52,14 @@ const refreshAuthSession = async (): Promise<void> => {
   );
 
   const session = parseAuthSessionData(data);
+  // На нативе токены обязаны прийти в теле: схема разрешает их отсутствие
+  // только ради Expo web, где сессия живёт в cookie. Записать undefined —
+  // значит сохранить строку "undefined" и уйти в цикл рефрешей, поэтому
+  // считаем это провалом обновления сессии.
+  if (!session.accessToken || !session.refreshToken) {
+    await clearAuthTokens();
+    throw new Error("Refresh token required");
+  }
   await setAuthTokens({
     accessToken: session.accessToken,
     refreshToken: session.refreshToken,

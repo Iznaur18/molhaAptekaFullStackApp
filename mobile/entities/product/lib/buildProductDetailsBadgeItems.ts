@@ -16,11 +16,14 @@ import {
 } from "@/shared/config";
 
 import { isProductOriginalBadgeVisible } from "./productIsOriginal";
+import { sortProductDetailsBadgesByLabelLength } from "./sortProductDetailsBadgesByLabelLength";
 import {
   resolveProductListingOriginPresentation,
   type ProductListingOriginIconName,
 } from "./productListingOrigin";
 import { resolveProductPriceMarketStatusPresentation } from "./productPriceMarketStatus";
+
+export { sortProductDetailsBadgesByLabelLength };
 
 export type ProductDetailsBadgeItem = {
   key: string;
@@ -42,19 +45,6 @@ export type ProductDetailsBadgeItem = {
 type BuildProductDetailsBadgeItemsInput = {
   product: Record<string, unknown>;
 };
-
-export const sortProductDetailsBadgesByLabelLength = <
-  T extends { key: string; label: string },
->(
-  items: readonly T[],
-): T[] =>
-  [...items].sort((left, right) => {
-    const byLength = left.label.length - right.label.length;
-    if (byLength !== 0) {
-      return byLength;
-    }
-    return left.key.localeCompare(right.key);
-  });
 
 export const buildProductDetailsBadgeItems = ({
   product,

@@ -4,11 +4,11 @@ import { isProductOutOfStock } from "@/entities/product/lib/isProductOutOfStock"
 import { resolveProductOutOfStockOverlayLabel } from "@/entities/product/lib/resolveProductOutOfStockOverlayLabel";
 import { AddToCartButton } from "@/features/cart-add/ui/AddToCartButton";
 import { FIXED_FONT_PROPS } from "@/shared/lib/fixedTypography";
+import { useProductDetailPurchaseActionsStyles } from "@/shared/theme/catalogProductStyles";
 import {
   PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS,
   useAddToCartButtonStyles,
-  useProductDetailPurchaseActionsStyles,
-} from "@/shared/theme/catalogProductStyles";
+} from "@/shared/theme/uploadFieldStyles";
 import { SquircleView } from "@/shared/ui/SquircleView";
 
 type ProductDetailPurchaseActionsProps = {

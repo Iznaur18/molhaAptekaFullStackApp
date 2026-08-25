@@ -13,6 +13,7 @@ type CatalogProduct = {
   productPrice?: number | null;
   productOldPrice?: number | null;
   productIsAvailable?: boolean | null;
+  productOutOfStock?: boolean | null;
   productPickupAddress?: string | null;
   productPickupEnabled?: boolean | null;
   productDeliveryEnabled?: boolean | null;

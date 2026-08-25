@@ -4,9 +4,16 @@ export const AFFILIATE_MANAGE_DEFAULT_PERCENT = 10;
 export const AFFILIATE_PERCENT_MIN = 1;
 export const AFFILIATE_PERCENT_MAX = 50;
 
+/**
+ * Товар глазами партнёрской панели. Кроме процента вызывающая сторона читает
+ * текущее состояние тумблера и цену (для лоялти-гейта при включении) —
+ * держим их в типе, иначе mobile падает на `tsc`, а web молча работает.
+ */
 type AffiliatePercentSource = {
   _id?: unknown;
   affiliatePercent?: unknown;
+  affiliateEnabled?: unknown;
+  productPrice?: unknown;
 } | null | undefined;
 
 /** True when listing has a valid sharer payout %. */

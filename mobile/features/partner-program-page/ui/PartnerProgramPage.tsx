@@ -214,7 +214,9 @@ export const PartnerProgramPage = () => {
 
       <ProfileMobileNavSheet
         visible={navSheetVisible}
+        activeSectionId="partner-program"
         onClose={() => setNavSheetVisible(false)}
+        onOverviewPress={() => router.replace("/(tabs)/profile")}
       />
     </>
   );

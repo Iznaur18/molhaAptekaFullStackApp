@@ -8,11 +8,21 @@ import { useProductManageToggleRowStyles } from "@/shared/theme/modalChromeStyle
 
 type ToggleChangeResult = void | { needsSetup?: boolean; revert?: boolean };
 
+/**
+ * Обработчик может ответить синхронно (`{ revert: true }` — вернуть тумблер
+ * назад, не дожидаясь сети) или промисом. commitChange ниже одинаково
+ * разбирает оба через Promise.resolve; тип раньше разрешал только промис,
+ * из-за чего пять синхронных call site'ов в ProductEditManageSection падали.
+ */
+type ToggleChangeHandler = (
+  checked: boolean,
+) => ToggleChangeResult | Promise<ToggleChangeResult>;
+
 type ProductManageToggleRowProps = {
   title: string;
   description: string;
   checked?: boolean;
-  onCheckedChange?: (checked: boolean) => void | Promise<ToggleChangeResult>;
+  onCheckedChange?: ToggleChangeHandler;
   onPress?: () => void;
   disabled?: boolean;
   pending?: boolean;
@@ -28,7 +38,7 @@ type ProductManageToggleRowProps = {
 const resolveControl = (
   variant: ProductManageToggleRowVariant,
   onPress?: () => void,
-  onCheckedChange?: (checked: boolean) => void | Promise<ToggleChangeResult>,
+  onCheckedChange?: ToggleChangeHandler,
 ): "switch" | "chevron" | "none" => {
   if (variant === "danger") {
     return "none";

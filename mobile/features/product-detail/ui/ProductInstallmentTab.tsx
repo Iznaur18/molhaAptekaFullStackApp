@@ -6,7 +6,7 @@ import {
   doProductsSupportSellerDelivery,
 } from "@molha/api-contract";
 
-import { buildCheckoutPickupLocations } from "@/entities/cart/lib/buildCheckoutPickupLocations";
+import { buildCheckoutPickupGroups } from "@/entities/cart/lib/buildCheckoutPickupLocations";
 import type { InstallmentPlan } from "@/entities/installment/api/installmentApi";
 import { resolveInstallmentPlanPriceSummary } from "@/entities/installment/lib/resolveInstallmentPlanPriceSummary";
 import { useInstallmentMutations } from "@/entities/installment/model/useInstallmentMutations";
@@ -116,8 +116,8 @@ export const ProductInstallmentTab = ({
     [product, productId],
   );
 
-  const pickupLocations = useMemo(
-    () => buildCheckoutPickupLocations([{ product: productForCheckout }]),
+  const pickupGroups = useMemo(
+    () => buildCheckoutPickupGroups([{ product: productForCheckout }]),
     [productForCheckout],
   );
   const pickupAvailable = useMemo(
@@ -384,7 +384,7 @@ export const ProductInstallmentTab = ({
       <CheckoutSheetModal
         visible={isCheckoutSheetOpen}
         defaultUser={defaultUser}
-        pickupLocations={pickupLocations}
+        pickupGroups={pickupGroups}
         deliveryAvailable={deliveryAvailable}
         pickupAvailable={pickupAvailable}
         isSubmitting={false}

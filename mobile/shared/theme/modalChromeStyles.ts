@@ -764,7 +764,12 @@ export const useProductEditManageSectionStyles = createThemedStyles((theme) => (
   },
   deleteBtnTitle: {
     fontSize: 15,
-    fontWeight: "650",
+    // В вебе здесь `font-weight: 650`. RN такого значения не знает, а CSS при
+    // подборе начертания для веса > 500 берёт ближайшее не меньшее — то есть
+    // фактически рисует 700. Ставим 700, чтобы совпало по картинке.
+    // Из-за невалидного "650" весь объект стилей терял тип и ломал 21 обращение
+    // к styles.* в ProductEditManageSection.
+    fontWeight: "700",
     lineHeight: 20,
     color: theme.colors.danger,
   },

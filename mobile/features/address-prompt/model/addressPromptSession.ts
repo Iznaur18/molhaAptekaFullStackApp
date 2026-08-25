@@ -18,8 +18,12 @@ export const markAddressPromptSeenThisSession = (userId: unknown) => {
   }
 };
 
+/**
+ * Профиль приходит zod-схемой с `.passthrough()`, поэтому `userAddress` нет в
+ * объявленной форме типа — принимаем произвольную запись и читаем поле по ключу.
+ */
 export const userHasProfileAddress = (
-  user: { userAddress?: unknown } | null | undefined,
+  user: Record<string, unknown> | null | undefined,
 ) => String(user?.userAddress ?? "").trim().length > 0;
 
 export const isAddressPromptCatalogPath = (pathname: string) => {

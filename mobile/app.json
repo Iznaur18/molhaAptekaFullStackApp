@@ -18,16 +18,13 @@
       "supportsTablet": true,
       "bundleIdentifier": "ru.gitorg.app",
       "associatedDomains": ["applinks:gitorg.ru", "applinks:www.gitorg.ru"],
-      "infoPlist": {
-        "NSAppTransportSecurity": {
-          "NSAllowsLocalNetworking": true
-        }
+      "config": {
+        "usesNonExemptEncryption": false
       }
     },
     "android": {
       "package": "ru.gitorg.app",
       "screenOrientation": "portrait",
-      "usesCleartextTraffic": true,
       "intentFilters": [
         {
           "action": "VIEW",
@@ -46,29 +43,32 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ]
+      "permissions": []
     },
     "web": {
       "bundler": "metro",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-dev-client",
       "expo-router",
       [
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#ffffff",
+          "dark": {
+            "image": "./assets/images/splash-icon.png",
+            "backgroundColor": "#0c0e12"
+          }
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Gitorg нужен доступ к фото для загрузки аватара"
+          "photosPermission": "Gitorg нужен доступ к галерее, чтобы вы могли прикрепить фото и видео к объявлению и загрузить фото профиля",
+          "cameraPermission": false,
+          "microphonePermission": false
         }
       ],
       [
