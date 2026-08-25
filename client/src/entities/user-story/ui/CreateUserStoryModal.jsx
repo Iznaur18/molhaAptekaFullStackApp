@@ -255,7 +255,16 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
                   loop
                 />
               ) : (
-                <img className="create-user-story-modal__media" src={previewUrl} alt="" />
+                <>
+                  <img
+                    className="create-user-story-modal__media-blur"
+                    src={previewUrl}
+                    alt=""
+                    aria-hidden="true"
+                    draggable={false}
+                  />
+                  <img className="create-user-story-modal__media" src={previewUrl} alt="" />
+                </>
               )
             ) : (
               <p className="create-user-story-modal__placeholder">

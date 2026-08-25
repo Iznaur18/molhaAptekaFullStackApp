@@ -488,25 +488,36 @@ export function UserStoryViewer({
                       playsInline
                     />
                   ) : (
-                    <img
-                      key={activeStory._id}
-                      className="user-story-viewer__media"
-                      src={resolveUserStoryMediaUrl(activeStory.mediaUrl)}
-                      alt=""
-                      draggable={false}
-                      decoding="async"
-                      onLoad={handleImageLoad}
-                      onError={handleImageError}
-                      ref={(node) => {
-                        if (
-                          node != null &&
-                          node.complete &&
-                          node.naturalWidth > 0
-                        ) {
-                          handleImageLoad();
-                        }
-                      }}
-                    />
+                    <>
+                      <img
+                        key={`${activeStory._id}-blur`}
+                        className="user-story-viewer__media-blur"
+                        src={resolveUserStoryMediaUrl(activeStory.mediaUrl)}
+                        alt=""
+                        aria-hidden="true"
+                        draggable={false}
+                        decoding="async"
+                      />
+                      <img
+                        key={activeStory._id}
+                        className="user-story-viewer__media"
+                        src={resolveUserStoryMediaUrl(activeStory.mediaUrl)}
+                        alt=""
+                        draggable={false}
+                        decoding="async"
+                        onLoad={handleImageLoad}
+                        onError={handleImageError}
+                        ref={(node) => {
+                          if (
+                            node != null &&
+                            node.complete &&
+                            node.naturalWidth > 0
+                          ) {
+                            handleImageLoad();
+                          }
+                        }}
+                      />
+                    </>
                   )}
                 </div>
                 <div className={dimVeilClassName} aria-hidden />
