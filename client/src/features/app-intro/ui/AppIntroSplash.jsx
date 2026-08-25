@@ -4,6 +4,10 @@ import { useNavigate } from "react-router-dom";
 
 import { resolveAppIntroPlaybackConfig } from "../../../entities/app-intro-settings/lib/resolveAppIntroPlaybackConfig.js";
 import { useAppIntroSettingsQuery } from "../../../entities/app-intro-settings/model/useAppIntroSettingsQuery.js";
+import {
+  trackIntroAdClick,
+  trackIntroAdImpression,
+} from "../../../entities/analytics/api/trackAdAnalyticsEvent.js";
 import { useAppIntro } from "../model/AppIntroContext.jsx";
 import { prefersReducedMotion } from "../lib/prefersReducedMotion.js";
 import { APP_INTRO_UI } from "../../../shared/config/appUiCopy.js";
@@ -25,6 +29,7 @@ function AppIntroSplashContent({ config, onDismiss }) {
   const openedAtRef = useRef(0);
   const closingRef = useRef(false);
   const dismissedRef = useRef(false);
+  const impressionSentRef = useRef(false);
   const minTimerRef = useRef(
     /** @type {ReturnType<typeof setTimeout> | null} */ (null),
   );
@@ -84,16 +89,30 @@ function AppIntroSplashContent({ config, onDismiss }) {
     openedAtRef.current = Date.now();
     closingRef.current = false;
     dismissedRef.current = false;
+    impressionSentRef.current = false;
     setVideoFailed(false);
     setIsClosing(false);
     setIsMuted(true);
 
     maxTimerRef.current = setTimeout(beginDismiss, config.maxMs);
 
+    if (config.isPaidIntro && !impressionSentRef.current) {
+      impressionSentRef.current = true;
+      const subjectId = config.advertiserId || "paid-intro";
+      void trackIntroAdImpression(subjectId);
+    }
+
     return () => {
       clearDismissTimers();
     };
-  }, [beginDismiss, clearDismissTimers, config.maxMs, config.videoMp4Src]);
+  }, [
+    beginDismiss,
+    clearDismissTimers,
+    config.advertiserId,
+    config.isPaidIntro,
+    config.maxMs,
+    config.videoMp4Src,
+  ]);
 
   useEffect(() => {
     if (!isClosing) return undefined;
@@ -124,6 +143,9 @@ function AppIntroSplashContent({ config, onDismiss }) {
   const handleAdvertiserClick = () => {
     if (!config.advertiserId) {
       return;
+    }
+    if (config.isPaidIntro) {
+      void trackIntroAdClick(config.advertiserId);
     }
     beginDismiss();
     if (config.ctaType === "seller_products") {

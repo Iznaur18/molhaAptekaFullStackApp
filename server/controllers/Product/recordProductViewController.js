@@ -1,5 +1,6 @@
 import { ProductModel, ProductViewModel } from "../../models/index.js";
 import { errorRes, successRes } from "../../services/http/index.js";
+import { emitProductViewedEvent } from "../../services/analytics-events/index.js";
 
 const isDuplicateKeyError = (error) => error?.code === 11000;
 
@@ -36,6 +37,11 @@ export const recordProductViewController = async (req, res) => {
       { _id: productId },
       { $inc: { uniqueViewerCount: 1 } },
     );
+    void emitProductViewedEvent({
+      productId: String(productId),
+      viewerUserId,
+      sellerUserId: sellerId || null,
+    });
     return successRes(res, {
       recorded: true,
       uniqueViewerCount: currentCount + 1,

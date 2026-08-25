@@ -729,6 +729,15 @@ export {
   adminAnalyticsPeriodQuerySchema,
 } from "./adminAnalytics.js";
 export {
+  ANALYTICS_AD_KIND_IMPRESSION,
+  ANALYTICS_AD_KIND_CLICK,
+  ANALYTICS_AD_KINDS,
+  ANALYTICS_AD_SURFACE_INTRO,
+  ANALYTICS_AD_SURFACE_SITE_HEADER,
+  ANALYTICS_AD_SURFACES,
+  trackAdAnalyticsBodySchema,
+} from "./analyticsTrackAd.js";
+export {
   getOneCLogsQuerySchema,
   putOneCSettingsBodySchema,
 } from "./onec.js";

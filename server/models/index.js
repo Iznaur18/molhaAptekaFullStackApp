@@ -39,6 +39,7 @@ import { SellerShelfModel } from "./SellerShelfModel.js";
 import ProductBuyNFreeProgressModel from "./ProductBuyNFreeProgressModel.js";
 import StaffAuditLogModel from "./StaffAuditLogModel.js";
 import AnalyticsReconciliationModel from "./AnalyticsReconciliationModel.js";
+import AnalyticsEventModel from "./AnalyticsEventModel.js";
 import PassportVaultAccessLogModel from "./PassportVaultAccessLogModel.js";
 import ReferralLedgerEntryModel from "./ReferralLedgerEntryModel.js";
 import AffiliateLedgerEntryModel from "./AffiliateLedgerEntryModel.js";
@@ -90,6 +91,7 @@ export {
   ProductBuyNFreeProgressModel,
   StaffAuditLogModel,
   AnalyticsReconciliationModel,
+  AnalyticsEventModel,
   PassportVaultAccessLogModel,
   ReferralLedgerEntryModel,
   AffiliateLedgerEntryModel,

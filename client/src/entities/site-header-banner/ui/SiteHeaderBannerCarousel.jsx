@@ -5,6 +5,10 @@ import { useNavigate } from "react-router-dom";
 
 import { SITE_HEADER_BANNER_UI } from "../../../shared/config/appUiCopy.js";
 import {
+  trackSiteHeaderBannerClick,
+  trackSiteHeaderBannerImpression,
+} from "../../analytics/api/trackAdAnalyticsEvent.js";
+import {
   isExternalHttpUrl,
   openSiteHeaderBannerLink,
   resolveSiteHeaderBannerHref,
@@ -71,6 +75,17 @@ export function SiteHeaderBannerCarousel({ slides }) {
 
   const pointerDownRef = useRef({ x: 0, y: 0 });
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const impressedIdsRef = useRef(/** @type {Set<string>} */ (new Set()));
+
+  useEffect(() => {
+    for (const slide of slides) {
+      if (!slide?.id || impressedIdsRef.current.has(slide.id)) {
+        continue;
+      }
+      impressedIdsRef.current.add(slide.id);
+      void trackSiteHeaderBannerImpression(slide.id);
+    }
+  }, [slides]);
 
   useEffect(() => {
     if (!emblaApi) {
@@ -98,10 +113,10 @@ export function SiteHeaderBannerCarousel({ slides }) {
 
   /**
    * @param {MouseEvent | import('react').MouseEvent} event
-   * @param {string | null | undefined} linkPath
+   * @param {import('../model/types.js').SiteHeaderBannerSlide} slide
    */
-  const handleSlideActivate = (event, linkPath) => {
-    const href = resolveSiteHeaderBannerHref(linkPath);
+  const handleSlideActivate = (event, slide) => {
+    const href = resolveSiteHeaderBannerHref(slide.linkPath);
     if (!href) {
       return;
     }
@@ -121,6 +136,10 @@ export function SiteHeaderBannerCarousel({ slides }) {
     if (movedX > CLICK_MOVE_TOLERANCE_PX || movedY > CLICK_MOVE_TOLERANCE_PX) {
       event.preventDefault();
       return;
+    }
+
+    if (slide.id) {
+      void trackSiteHeaderBannerClick(slide.id);
     }
 
     if (isExternalHttpUrl(href)) {
@@ -196,7 +215,7 @@ export function SiteHeaderBannerCarousel({ slides }) {
             onPointerDownCapture={(event) => {
               pointerDownRef.current = { x: event.clientX, y: event.clientY };
             }}
-            onClick={(event) => handleSlideActivate(event, slide.linkPath)}
+            onClick={(event) => handleSlideActivate(event, slide)}
           >
             {content}
           </a>

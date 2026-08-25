@@ -333,5 +333,17 @@ export async function confirmPendingRegistration(registrationId, rawCode) {
     });
   }
 
+  try {
+    const { emitUserRegisteredEvent } = await import(
+      "../analytics-events/emitAnalyticsEvents.js"
+    );
+    emitUserRegisteredEvent({
+      userId: String(user._id),
+      channel: isPhoneChannel ? "phone" : "email",
+    });
+  } catch {
+    // analytics must not block registration
+  }
+
   return user;
 }

@@ -131,6 +131,13 @@ export async function markOrderItemDeliveredBySeller({
     previousStatus,
     nextStatus: ORDER_STATUS_DELIVERED,
     quantity: targetItem.quantity,
+    analytics: {
+      orderId,
+      itemIndex,
+      buyerUserId: normalizeId(order.userBuyerId),
+      sellerUserId: sellerId,
+      unitPriceAtOrder: targetItem.unitPriceAtOrder,
+    },
   });
 
   order.status = buildOrderStatusFromItems(order.items);

@@ -581,6 +581,28 @@ export async function createOrder({
       itemCount: Array.isArray(items) ? items.length : 0,
     });
 
+    try {
+      const { emitOrderCreatedEvent } = await import(
+        "../analytics-events/emitAnalyticsEvents.js"
+      );
+      const sellerUserIds = [
+        ...new Set(
+          Object.values(productById)
+            .map((row) => (row?.sellerId != null ? String(row.sellerId) : null))
+            .filter(Boolean),
+        ),
+      ];
+      emitOrderCreatedEvent({
+        orderId: String(created._id),
+        buyerUserId: String(userId),
+        totalAmount: Number(created.totalAmount) || 0,
+        itemCount: Array.isArray(created.items) ? created.items.length : 0,
+        sellerUserIds,
+      });
+    } catch {
+      // analytics must not block order
+    }
+
     void notifySellersAboutNewOrder({
       order: created,
       buyerUserId: String(userId),

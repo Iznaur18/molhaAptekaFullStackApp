@@ -98,6 +98,7 @@ import {
   getAnalyticsOverviewController,
   runAnalyticsReconciliationController,
 } from "./Analytics/analyticsControllers.js";
+import { trackAdAnalyticsController } from "./Analytics/trackAdAnalyticsController.js";
 import {
   getHomeCuratedProductListsController,
   listCuratedProductListsAdminController,
@@ -512,4 +513,5 @@ export {
   getAnalyticsOverviewController,
   getAnalyticsExportController,
   runAnalyticsReconciliationController,
+  trackAdAnalyticsController,
 };

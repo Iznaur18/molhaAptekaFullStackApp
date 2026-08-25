@@ -62,4 +62,19 @@ Web без `SCRIPT_SRC` и без `DOMAIN` — **выключено**. Mobile б
 VITE_PLAUSIBLE_SCRIPT_SRC=https://plausible.io/js/pa-bpk-uLbAhfVhsvkpa1DW3.js
 ```
 
-Доказательство третьим лицам: shared link в Plausible (read-only) + сверка с `/admin-analytics` (регистрации/заказы).
+## Event Store (Level 2 / Phase A)
+
+Append-only коллекция `AnalyticsEvent`. Пишется в фоне (ошибки не ломают бизнес).
+
+| eventType | idempotencyKey | Когда |
+|-----------|----------------|-------|
+| `user.registered` | `user.registered:{userId}` | confirm регистрации |
+| `product.viewed` | `product.viewed:{productId}:{viewerId}` | уникальный просмотр |
+| `order.created` | `order.created:{orderId}` | после createOrder |
+| `order.item_sold` | `order.item_sold:{orderId}:{itemIndex}` | soldQuantity delta > 0 |
+| `ad.impression` | `ad.impression:{surface}:{subject}:{actor}:{minute}` | intro/banner show |
+| `ad.click` | `ad.click:{surface}:{subject}:{actor}:{minute}` | intro/banner click |
+
+Fraud flags (минимальные): `own_product`, `view_velocity`, `buyer_is_seller` → `suspectedFraud` + `fraudReasons`.
+
+Клиентский трек рекламы: `POST /analytics/track-ad` (auth optional).

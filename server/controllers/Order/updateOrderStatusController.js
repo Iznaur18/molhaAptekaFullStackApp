@@ -194,6 +194,12 @@ export const updateOrderStatusController = async (req, res) => {
         previousStatus: item.status,
         nextStatus: status,
         quantity: item.quantity,
+        analytics: {
+          orderId: String(order._id),
+          itemIndex: order.items.indexOf(item),
+          buyerUserId: normalizeId(order.userBuyerId?._id ?? order.userBuyerId),
+          unitPriceAtOrder: item.unitPriceAtOrder,
+        },
       });
     }
 

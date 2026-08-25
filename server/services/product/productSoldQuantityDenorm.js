@@ -75,12 +75,35 @@ export const applySoldQuantityDeltaForItemStatusChange = async ({
   nextStatus,
   quantity,
   session = null,
+  analytics = null,
 }) => {
   const delta = computeProductSoldQuantityDelta(previousStatus, nextStatus, quantity);
   if (delta === 0) {
-    return;
+    return delta;
   }
   await applyProductSoldQuantityDelta(productId, delta, session);
+
+  if (delta > 0 && analytics?.orderId != null && analytics?.itemIndex != null) {
+    try {
+      const { emitOrderItemSoldEvent } = await import(
+        "../analytics-events/emitAnalyticsEvents.js"
+      );
+      emitOrderItemSoldEvent({
+        orderId: String(analytics.orderId),
+        itemIndex: Number(analytics.itemIndex),
+        productId: String(productId),
+        buyerUserId: analytics.buyerUserId ?? null,
+        sellerUserId: analytics.sellerUserId ?? null,
+        quantity,
+        unitPriceAtOrder: analytics.unitPriceAtOrder ?? 0,
+        status: String(nextStatus),
+      });
+    } catch {
+      // analytics must not block soldQuantity
+    }
+  }
+
+  return delta;
 };
 
 /** Агрегат из orders для backfill / сверки. */

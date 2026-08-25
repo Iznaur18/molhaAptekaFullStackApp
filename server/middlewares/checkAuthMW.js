@@ -107,6 +107,27 @@ export const checkAuthMW = async (req, res, next) => {
   }
 };
 
+/** Auth optional: ставит req.userId если токен валиден, иначе продолжает гостем. */
+export const optionalAuthMW = async (req, res, next) => {
+  const token = getAuthTokenFromRequest(req);
+  if (!token) {
+    return next();
+  }
+
+  try {
+    const errorResponse = await attachUserIdFromAccessToken(req, res);
+    if (errorResponse) {
+      // для track-ad не валим гостя из-за протухшего токена
+      req.userId = undefined;
+      return next();
+    }
+    return next();
+  } catch {
+    req.userId = undefined;
+    return next();
+  }
+};
+
 /** GET /auth/me: без cookie — гость; просроченный access — 401; битый JWT — очистка cookie и гость. */
 export const checkAuthMeMW = async (req, res, next) => {
   const token = getAuthTokenFromRequest(req);
