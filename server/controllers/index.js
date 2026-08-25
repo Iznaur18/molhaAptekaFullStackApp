@@ -94,6 +94,11 @@ import {
 } from "./Product/productSearchSynonymAdminControllers.js";
 import { listStaffAuditLogController } from "./Audit/staffAuditControllers.js";
 import {
+  getAnalyticsExportController,
+  getAnalyticsOverviewController,
+  runAnalyticsReconciliationController,
+} from "./Analytics/analyticsControllers.js";
+import {
   getHomeCuratedProductListsController,
   listCuratedProductListsAdminController,
   previewCuratedListProductAdminController,
@@ -504,4 +509,7 @@ export {
   getPendingInstallmentDisputesCountController,
   resolveInstallmentDisputeController,
   listStaffAuditLogController,
+  getAnalyticsOverviewController,
+  getAnalyticsExportController,
+  runAnalyticsReconciliationController,
 };

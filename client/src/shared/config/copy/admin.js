@@ -192,6 +192,40 @@ export const POPULAR_CATEGORIES_ADMIN_PAGE_UI = {
   PREVIEW_OK: "Можно добавить в эту подборку",
 };
 
+/** Админка: платформенная аналитика (KPI из primary aggregates) */
+export const ADMIN_ANALYTICS_PAGE_UI = {
+  TITLE: "Аналитика платформы",
+  HINT: "KPI считаются из первичных коллекций (Order, User, Product, ProductView), не из счётчиков на карточках. Период — UTC. См. docs/analytics/metrics.md.",
+  LOADING: "Загрузка…",
+  REFRESH: "Обновить",
+  EXPORT: "Скачать CSV",
+  EXPORT_LOADING: "Экспорт…",
+  EXPORT_ERROR: "Не удалось скачать отчёт",
+  EXPORT_SHA256: (hash) => `SHA-256: ${hash}`,
+  RECONCILE: "Сверить integrity",
+  RECONCILE_LOADING: "Сверка…",
+  RECONCILE_ERROR: "Не удалось запустить сверку",
+  PERIOD_TODAY: "Сегодня",
+  PERIOD_7D: "7 дней",
+  PERIOD_30D: "30 дней",
+  PERIOD_ALL: "Всё время",
+  META: (asOf, version, periodKey) =>
+    `asOf ${asOf} · definitions v${version} · период ${periodKey}`,
+  METRIC_NEW_USERS: "Новые пользователи",
+  METRIC_PUBLICATIONS: "Публикации",
+  METRIC_ORDERS: "Заказы",
+  METRIC_SOLD_UNITS: "Продано шт.",
+  METRIC_GMV: "GMV ₽",
+  METRIC_VIEWS: "Просмотры",
+  INTEGRITY_TITLE: "Integrity",
+  INTEGRITY_EMPTY: "Сверка ещё не запускалась. Нажмите «Сверить integrity» или дождитесь nightly job.",
+  INTEGRITY_OK: "Integrity OK",
+  INTEGRITY_BAD: "Integrity: есть расхождения",
+  /** @param {{ ranAt?: string|null; soldQuantityMismatches?: number; uniqueViewerCountMismatches?: number; productsChecked?: number }} r */
+  INTEGRITY_DETAIL: (r) =>
+    `ranAt ${r.ranAt ?? "—"} · sold mismatches ${r.soldQuantityMismatches ?? 0} · view mismatches ${r.uniqueViewerCountMismatches ?? 0} · products ${r.productsChecked ?? 0}`,
+};
+
 /** Админка: журнал действий сотрудников (audit log) */
 export const STAFF_AUDIT_LOG_ADMIN_PAGE_UI = {
   TITLE: "Журнал действий сотрудников",

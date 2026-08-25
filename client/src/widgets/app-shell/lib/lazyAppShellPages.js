@@ -55,6 +55,11 @@ export const LazyAdminOrdersPage = lazyNamedExport(
   "AdminOrdersPage",
 );
 
+export const LazyAdminAnalyticsPage = lazyNamedExport(
+  () => import("../../../pages/admin-analytics/ui/AdminAnalyticsPage.jsx"),
+  "AdminAnalyticsPage",
+);
+
 export const LazyStaffAuditLogAdminPage = lazyNamedExport(
   () => import("../../../pages/staff-audit-log-admin/ui/StaffAuditLogAdminPage.jsx"),
   "StaffAuditLogAdminPage",

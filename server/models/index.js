@@ -38,6 +38,7 @@ import { SellerPersonalCategoryCampaignModel } from "./SellerPersonalCategoryCam
 import { SellerShelfModel } from "./SellerShelfModel.js";
 import ProductBuyNFreeProgressModel from "./ProductBuyNFreeProgressModel.js";
 import StaffAuditLogModel from "./StaffAuditLogModel.js";
+import AnalyticsReconciliationModel from "./AnalyticsReconciliationModel.js";
 import PassportVaultAccessLogModel from "./PassportVaultAccessLogModel.js";
 import ReferralLedgerEntryModel from "./ReferralLedgerEntryModel.js";
 import AffiliateLedgerEntryModel from "./AffiliateLedgerEntryModel.js";
@@ -88,6 +89,7 @@ export {
   SellerShelfModel,
   ProductBuyNFreeProgressModel,
   StaffAuditLogModel,
+  AnalyticsReconciliationModel,
   PassportVaultAccessLogModel,
   ReferralLedgerEntryModel,
   AffiliateLedgerEntryModel,

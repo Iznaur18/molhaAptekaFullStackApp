@@ -66,6 +66,7 @@ export const PROFILE_NAV_ITEM_META = {
   "data-confirmation-requests": { icon: UserCheck },
   "installment-disputes": { icon: MessageSquareWarning },
   "admin-orders": { icon: ListOrdered },
+  "admin-analytics": { icon: TrendingUp },
   "staff-audit-log-admin": { icon: ScrollText },
   "broadcast-notifications-admin": { icon: Bell },
   "search-synonyms-admin": { icon: Search },

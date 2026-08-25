@@ -47,6 +47,7 @@ export const MY_PROFILE_PAGE_UI = {
   /** @param {number} count */
   TAB_BADGE: (count) => (count > 99 ? "99+" : String(count)),
   TAB_ADMIN_ORDERS: "Все заказы",
+  TAB_ADMIN_ANALYTICS: "Аналитика",
   TAB_STAFF_AUDIT_LOG_ADMIN: "Журнал действий",
   TAB_BROADCAST_NOTIFICATIONS_ADMIN: "Уведомления",
   TAB_SEARCH_SYNONYMS_ADMIN: "Синонимы поиска",

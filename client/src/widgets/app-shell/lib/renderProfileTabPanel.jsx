@@ -1,4 +1,5 @@
 import {
+  LazyAdminAnalyticsPage,
   LazyAdminOrdersPage,
   LazyAuctionPage,
   LazyCategoryTreeAdminPage,
@@ -212,6 +213,8 @@ export function renderProfileTabPanel(mainView, props) {
       );
     case "admin-orders":
       return <LazyAdminOrdersPage />;
+    case "admin-analytics":
+      return <LazyAdminAnalyticsPage />;
     case "staff-audit-log-admin":
       return <LazyStaffAuditLogAdminPage />;
     case "broadcast-notifications-admin":

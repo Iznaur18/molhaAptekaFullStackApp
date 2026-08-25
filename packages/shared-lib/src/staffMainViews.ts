@@ -1,5 +1,6 @@
 export const STAFF_SECTION_IDS = [
   "admin-orders",
+  "admin-analytics",
   "search-synonyms-admin",
   "category-tree-admin",
   "app-intro-admin",
@@ -24,6 +25,7 @@ type StaffAccessRule = {
 
 const STAFF_ACCESS: Record<StaffSectionId, StaffAccessRule> = {
   "admin-orders": { requireAdmin: true, requireModerator: false },
+  "admin-analytics": { requireAdmin: true, requireModerator: false },
   "search-synonyms-admin": { requireAdmin: true, requireModerator: false },
   "category-tree-admin": { requireAdmin: true, requireModerator: false },
   "app-intro-admin": { requireAdmin: true, requireModerator: false },

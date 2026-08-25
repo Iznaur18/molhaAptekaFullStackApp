@@ -26,6 +26,7 @@ export const DEV_API_PROXY_PREFIXES = [
   "/seller-shelf",
   "/seller",
   "/audit",
+  "/analytics",
   "/staff",
   "/onec",
   "/health",

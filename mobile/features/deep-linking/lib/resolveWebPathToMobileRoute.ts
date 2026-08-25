@@ -21,6 +21,7 @@ const WEB_ONLY_PATHS = new Set([
   "/profile/onec-integration",
   "/staff-audit-log-admin",
   "/broadcast-notifications-admin",
+  "/admin-analytics",
 ]);
 
 /** Точные пути сайта. Ключи в нижнем регистре. */

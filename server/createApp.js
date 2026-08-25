@@ -23,6 +23,7 @@ import {
   sellerPersonalCategoryRouter,
   sellerShelfRouter,
   auditRouter,
+  analyticsRouter,
   staffRouter,
   onecRouter,
 } from "./routes/index.js";
@@ -122,6 +123,7 @@ export const createApp = () => {
   app.use("/seller-personal-category", sellerPersonalCategoryRouter);
   app.use("/seller-shelf", sellerShelfRouter);
   app.use("/audit", auditRouter);
+  app.use("/analytics", analyticsRouter);
   app.use("/staff", staffRouter);
   app.use("/onec", onecRouter);
 

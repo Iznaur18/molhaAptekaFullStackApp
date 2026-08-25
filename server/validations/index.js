@@ -1,4 +1,5 @@
 import { staffAuditListValidation } from "./audit/staffAuditListValidation.js";
+import { analyticsPeriodQueryValidation } from "./analytics/analyticsPeriodQueryValidation.js";
 import { loginUserValidation } from "./user/loginUserValidation.js";
 import { registerUserValidation } from "./user/registerUserValidation.js";
 import { updateProfileValidation } from "./user/updateProfileValidation.js";
@@ -246,4 +247,5 @@ export {
   getMyInstallmentContractsListValidation,
   getMyInstallmentSalesValidation,
   staffAuditListValidation,
+  analyticsPeriodQueryValidation,
 };

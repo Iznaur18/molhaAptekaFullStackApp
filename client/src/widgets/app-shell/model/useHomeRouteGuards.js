@@ -72,6 +72,7 @@ export const useHomeRouteGuards = ({
 
     const requiresAdmin =
       mainView === "admin-orders" ||
+      mainView === "admin-analytics" ||
       mainView === "search-synonyms-admin" ||
       mainView === "category-tree-admin" ||
       mainView === "app-intro-admin" ||

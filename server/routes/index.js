@@ -28,6 +28,7 @@ import { introAdRouter } from "./introAdRouter.js";
 import { sellerPersonalCategoryRouter } from "./sellerPersonalCategoryRouter.js";
 import sellerShelfRouter from "./sellerShelfRouter.js";
 import { auditRouter } from "./auditRouter.js";
+import { analyticsRouter } from "./analyticsRouter.js";
 import { staffRouter } from "./staffRouter.js";
 import onecRouter from "./onecRouter.js";
 
@@ -51,6 +52,7 @@ export {
   sellerPersonalCategoryRouter,
   sellerShelfRouter,
   auditRouter,
+  analyticsRouter,
   staffRouter,
   onecRouter,
 };

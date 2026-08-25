@@ -1,6 +1,7 @@
 import {
   normalizeProfileTab,
   PROFILE_TAB_ADMIN_ORDERS,
+  PROFILE_TAB_ADMIN_ANALYTICS,
   PROFILE_TAB_AUCTION,
   PROFILE_TAB_CATEGORY_TREE_ADMIN,
   PROFILE_TAB_DATA_CONFIRMATION,
@@ -54,6 +55,7 @@ export const PROFILE_TAB_TO_MAIN_VIEW = {
   [PROFILE_TAB_ONEC_INTEGRATION]: "onec-integration",
   [PROFILE_TAB_EDIT_PROFILE]: "edit-profile",
   [PROFILE_TAB_ADMIN_ORDERS]: "admin-orders",
+  [PROFILE_TAB_ADMIN_ANALYTICS]: "admin-analytics",
   [PROFILE_TAB_STAFF_AUDIT_LOG_ADMIN]: "staff-audit-log-admin",
   [PROFILE_TAB_BROADCAST_NOTIFICATIONS_ADMIN]: "broadcast-notifications-admin",
   [PROFILE_TAB_SEARCH_SYNONYMS_ADMIN]: "search-synonyms-admin",

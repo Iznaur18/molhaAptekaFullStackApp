@@ -29,6 +29,7 @@ export function buildProfileNavGroups({
   canUseDataConfirmationQueue,
   canUseInstallmentDisputes,
   canUseAdminOrders,
+  canUseAdminAnalytics,
   canUseStaffAuditLogAdmin,
   canUseBroadcastNotificationsAdmin,
   canUseSearchSynonymsAdmin,
@@ -368,6 +369,15 @@ export function buildProfileNavGroups({
             tab: "admin-orders",
             label: MY_PROFILE_PAGE_UI.TAB_ADMIN_ORDERS,
             onClick: () => selectTab("admin-orders", onAdminOrdersClick),
+          },
+        ]
+      : []),
+    ...(canUseAdminAnalytics
+      ? [
+          {
+            tab: "admin-analytics",
+            label: MY_PROFILE_PAGE_UI.TAB_ADMIN_ANALYTICS,
+            onClick: () => selectTab("admin-analytics"),
           },
         ]
       : []),
