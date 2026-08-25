@@ -16,6 +16,7 @@ import { getCartLineExclusionReason } from "@/entities/cart/lib/getCartLineExclu
 import { groupCartLinesByFulfillment } from "@/entities/cart/lib/groupCartLinesByFulfillment";
 import { selectCartCheckoutSummary } from "@/entities/cart/lib/selectCartCheckoutSummary";
 import { selectCartLines } from "@/entities/cart/lib/selectCartLines";
+import { useCartFlashSalePriceTick } from "@/entities/cart/model/useCartFlashSalePriceTick";
 import { useCartActions } from "@/entities/cart/model/useCartActions";
 import { useCartProductsQuery } from "@/entities/cart/model/useCartProductsQuery";
 import { useCartSelection } from "@/entities/cart/model/useCartSelection";
@@ -122,6 +123,12 @@ export default function CartScreen() {
     return map;
   }, [buyNFreeProductIds, buyNFreeProgressQueries]);
 
+  /** Пока в корзине есть горящая скидка — тикаем и гасим её по истечении. */
+  const cartPriceNowMs = useCartFlashSalePriceTick(
+    cartQuery.data ?? {},
+    productsQuery.products ?? [],
+  );
+
   const { lines } = useMemo(
     () =>
       selectCartLines(
@@ -129,8 +136,15 @@ export default function CartScreen() {
         productsQuery.products,
         appliedPromosQuery.data?.appliedPromos ?? [],
         buyNFreeProgressByProductId,
+        cartPriceNowMs,
       ),
-    [cartQuery.data, productsQuery.products, appliedPromosQuery.data, buyNFreeProgressByProductId],
+    [
+      cartQuery.data,
+      productsQuery.products,
+      appliedPromosQuery.data,
+      buyNFreeProgressByProductId,
+      cartPriceNowMs,
+    ],
   );
 
   const visibleLines = useMemo(

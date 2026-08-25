@@ -1,5 +1,6 @@
 import { hasProductCharacteristicsContent } from "@izibuy/shared-lib";
-import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useState } from "react";
 import { Platform, Pressable, ScrollView, Text, View } from "react-native";
 
 import {
@@ -27,11 +28,13 @@ import { ProductDetailsInstallmentTeaser } from "@/features/product-detail/ui/Pr
 import { ProductDetailsRaffleTeaser } from "@/features/product-detail/ui/ProductDetailsRaffleTeaser";
 import { ProductDetailsRentalTeaser } from "@/features/product-detail/ui/ProductDetailsRentalTeaser";
 import { ProductDetailsPromoTeaser } from "@/features/product-detail/ui/ProductDetailsPromoTeaser";
+import { ProductFlashSaleCountdown } from "@/features/product-detail/ui/ProductFlashSaleCountdown";
 import { ProductPromoCodeActivateSheet } from "@/features/product-detail/ui/ProductPromoCodeActivateSheet";
 import { ProductDetailsSaleTeaser } from "@/features/product-detail/ui/ProductDetailsSaleTeaser";
 import { ProductDetailsWholesaleOffer } from "@/features/product-detail/ui/ProductDetailsWholesaleOffer";
 import { ProductDetailsBuyNFreeOffer } from "@/features/product-detail/ui/ProductDetailsBuyNFreeOffer";
 import { ProductPickupDetailsPanel } from "@/features/product-detail/ui/ProductPickupDetailsPanel";
+import { catalogQueryKeys } from "@/shared/api";
 import { PRODUCT_DETAILS_MODAL_UI, PRODUCT_RENTAL_UI, SELLER_PRODUCTS_PAGE_UI } from "@/shared/config";
 import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
@@ -69,6 +72,11 @@ export const ProductDetailsDetailsTab = ({
     null,
   );
   const [isPromoSheetOpen, setIsPromoSheetOpen] = useState(false);
+  const queryClient = useQueryClient();
+  /** Скидка истекла — тянем каталог заново, чтобы цена вернулась к базовой. */
+  const handleFlashSaleExpired = useCallback(() => {
+    void queryClient.invalidateQueries({ queryKey: catalogQueryKeys.all });
+  }, [queryClient]);
 
   useProductBadgeExplainsQuery({ enabled: true });
 
@@ -133,6 +141,10 @@ export const ProductDetailsDetailsTab = ({
             variant="detail"
             onDiscountBadgePress={openBadgeExplain}
             onLoyaltyBadgePress={openBadgeExplain}
+          />
+          <ProductFlashSaleCountdown
+            product={product}
+            onExpired={handleFlashSaleExpired}
           />
           <ProductDetailsWholesaleOffer
             product={product}

@@ -3,6 +3,9 @@ import { useMemo } from "react";
 import { formatProductWholesaleBadgeLabel } from "@izibuy/shared-lib";
 
 import { isProductRaffleParticipant } from "@/entities/raffle/lib/isProductRaffleParticipant";
+import { PRODUCT_FLASH_SALE_UI } from "@/shared/config";
+
+import { isProductFlashSaleActive } from "./isProductFlashSaleActive";
 
 import { resolveAuctionUiState } from "./resolveAuctionUiState";
 import { resolveProductDiscountPercent } from "./computeProductDiscountPercent";
@@ -59,6 +62,10 @@ export const useProductCardChromeFlags = (
       affiliatePercent > 0;
     const wholesaleBadgeLabel = formatProductWholesaleBadgeLabel(product);
     const showWholesaleBadge = !isModerationQueue && wholesaleBadgeLabel != null;
+    const showFlashSaleBadge = !isModerationQueue && isProductFlashSaleActive(product);
+    const flashSaleBadgeLabel = showFlashSaleBadge
+      ? PRODUCT_FLASH_SALE_UI.CATALOG_BADGE(discountPercent)
+      : null;
     const showRaffleParticipantChrome =
       (highlightRaffleProduct || showRaffleBadge) && !isMineMode && !isModerationQueue;
 
@@ -85,6 +92,8 @@ export const useProductCardChromeFlags = (
       showInstallmentBadge: product.productInstallmentEnabled === true,
       showWholesaleBadge,
       wholesaleBadgeLabel,
+      showFlashSaleBadge,
+      flashSaleBadgeLabel,
       showRaffleBadge,
       showAffiliateBadge,
       affiliatePercent,

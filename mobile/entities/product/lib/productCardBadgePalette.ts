@@ -48,6 +48,27 @@ export const resolveProductCardBadgeColors = (c: ThemeColors) =>
     ratingPlaceholder: `${c.text}7a`,
   }) as const;
 
+/**
+ * Горящая скидка. В light веб хардкодит тёплый оранжевый
+ * (.product-card__flash-sale-badge), в dark — переключается на warning-токены
+ * (:root[data-theme="dark"] в ProductCardBadges.css). Повторяем обе ветки.
+ */
+export const resolveProductCardFlashSaleBadgeColors = (
+  c: ThemeColors,
+  isDark: boolean,
+): { borderColor: string; backgroundColor: string; textColor: string } =>
+  isDark
+    ? {
+        borderColor: `${c.warning}66`,
+        backgroundColor: c.warningSurface,
+        textColor: c.warningText,
+      }
+    : {
+        borderColor: "#fdba7466",
+        backgroundColor: "#fff3e8",
+        textColor: "#c2410c",
+      };
+
 /** Ozon-стиль: непрозрачные пастельные плашки с ярким жирным текстом поверх фото. */
 export const resolveProductCardImageBadgeOverlay = (c: ThemeColors) =>
   ({

@@ -32,6 +32,7 @@ import { ProductPromotionManageTab } from "@/features/product-promotion/ui/Produ
 import { InstallmentProgramModal } from "@/entities/installment/ui/InstallmentProgramModal";
 import { WholesalePriceModal } from "@/entities/product/ui/WholesalePriceModal";
 import { ProductRentalManageModal } from "@/entities/product/ui/ProductRentalManageModal";
+import { ProductFlashSaleModal } from "@/entities/product/ui/ProductFlashSaleModal";
 import { AffiliatePercentModal } from "@/entities/product/ui/AffiliatePercentModal";
 import { ProductLoyaltyPointsModal } from "@/entities/product/ui/ProductLoyaltyPointsModal";
 import { ProductBuyNFreeModal } from "@/entities/product/ui/ProductBuyNFreeModal";
@@ -93,6 +94,10 @@ type ProductPromotionModalProps = {
     productId: string,
     productRentalEnabled: boolean,
   ) => void | Promise<void>;
+  onSetProductFlashSale?: (
+    productId: string,
+    productFlashSaleEnabled: boolean,
+  ) => void | Promise<void>;
   onSetProductAffiliate?: (
     productId: string,
     affiliateEnabled: boolean,
@@ -113,6 +118,7 @@ type ProductPromotionModalProps = {
   isWholesaleTogglePending?: boolean;
   isBuyNFreeTogglePending?: boolean;
   isRentalTogglePending?: boolean;
+  isFlashSaleTogglePending?: boolean;
   isAffiliateTogglePending?: boolean;
   isLoyaltyTogglePending?: boolean;
   isInstallmentTogglePending?: boolean;
@@ -150,6 +156,7 @@ export const ProductPromotionModal = ({
   onSetProductWholesale,
   onSetProductBuyNFree,
   onSetProductRental,
+  onSetProductFlashSale,
   onSetProductAffiliate,
   onSetProductLoyaltyPoints,
   onSetProductInstallment,
@@ -162,6 +169,7 @@ export const ProductPromotionModal = ({
   isWholesaleTogglePending = false,
   isBuyNFreeTogglePending = false,
   isRentalTogglePending = false,
+  isFlashSaleTogglePending = false,
   isAffiliateTogglePending = false,
   isLoyaltyTogglePending = false,
   isInstallmentTogglePending = false,
@@ -201,6 +209,7 @@ export const ProductPromotionModal = ({
   const [isBuyNFreeOpen, setIsBuyNFreeOpen] = useState(false);
   const [isOutOfStockLabelOpen, setIsOutOfStockLabelOpen] = useState(false);
   const [isRentalOpen, setIsRentalOpen] = useState(false);
+  const [isFlashSaleOpen, setIsFlashSaleOpen] = useState(false);
   const [isAffiliateOpen, setIsAffiliateOpen] = useState(false);
   const [isLoyaltyOpen, setIsLoyaltyOpen] = useState(false);
   const bodyScrollRef = useRef<ScrollView>(null);
@@ -212,6 +221,7 @@ export const ProductPromotionModal = ({
       setIsBuyNFreeOpen(false);
       setIsOutOfStockLabelOpen(false);
       setIsRentalOpen(false);
+      setIsFlashSaleOpen(false);
       setIsAffiliateOpen(false);
       setIsLoyaltyOpen(false);
       return;
@@ -434,6 +444,7 @@ export const ProductPromotionModal = ({
         onSetWholesale={onSetProductWholesale}
         onSetBuyNFree={onSetProductBuyNFree}
         onSetRental={onSetProductRental}
+        onSetFlashSale={onSetProductFlashSale}
         onSetAffiliate={onSetProductAffiliate}
         onSetLoyaltyPoints={onSetProductLoyaltyPoints}
         onSetInstallment={onSetProductInstallment}
@@ -445,6 +456,7 @@ export const ProductPromotionModal = ({
         isWholesaleTogglePending={isWholesaleTogglePending}
         isBuyNFreeTogglePending={isBuyNFreeTogglePending}
         isRentalTogglePending={isRentalTogglePending}
+        isFlashSaleTogglePending={isFlashSaleTogglePending}
         isAffiliateTogglePending={isAffiliateTogglePending}
         isLoyaltyTogglePending={isLoyaltyTogglePending}
         isInstallmentTogglePending={isInstallmentTogglePending}
@@ -461,6 +473,7 @@ export const ProductPromotionModal = ({
         onOpenBuyNFreeSettings={() => setIsBuyNFreeOpen(true)}
         onOpenOutOfStockSettings={() => setIsOutOfStockLabelOpen(true)}
         onOpenRentalSettings={() => setIsRentalOpen(true)}
+        onOpenFlashSaleSettings={() => setIsFlashSaleOpen(true)}
         onOpenAffiliateSettings={() => setIsAffiliateOpen(true)}
         onOpenLoyaltySettings={() => setIsLoyaltyOpen(true)}
         isSubmitting={isSubmitting}
@@ -604,6 +617,15 @@ export const ProductPromotionModal = ({
             visible
             product={product}
             onClose={() => setIsRentalOpen(false)}
+            onSaved={onWholesaleSaved}
+          />
+        ) : null}
+        {isFlashSaleOpen ? (
+          <ProductFlashSaleModal
+            embedded
+            visible
+            product={product}
+            onClose={() => setIsFlashSaleOpen(false)}
             onSaved={onWholesaleSaved}
           />
         ) : null}

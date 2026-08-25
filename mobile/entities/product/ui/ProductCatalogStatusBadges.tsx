@@ -77,6 +77,14 @@ export const ProductCatalogStatusBadges = ({
         variant: "near",
       });
     }
+    // Порядок как в вебе: near → горящая скидка → розыгрыш.
+    if (flags.showFlashSaleBadge && flags.flashSaleBadgeLabel) {
+      badges.push({
+        key: "flash-sale",
+        label: flags.flashSaleBadgeLabel,
+        variant: "flashSale",
+      });
+    }
     if (flags.showRaffleBadge) {
       badges.push({
         key: "raffle",

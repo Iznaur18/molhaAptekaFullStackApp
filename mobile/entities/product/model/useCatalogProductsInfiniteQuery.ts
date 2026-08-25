@@ -35,6 +35,7 @@ export const useCatalogProductsInfiniteQuery = (
         wholesaleOnly: filters.wholesaleOnly,
         buyNFreeOnly: filters.buyNFreeOnly,
         originalOnly: filters.originalOnly,
+        flashSaleOnly: filters.flashSaleOnly,
         near: filters.near,
         regionCode: filters.regionCode,
       }),

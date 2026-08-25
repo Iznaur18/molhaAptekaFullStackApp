@@ -13,6 +13,7 @@ type HomeCatalogMainViewParams = {
   wholesaleOnly: boolean;
   buyNFreeOnly: boolean;
   originalOnly: boolean;
+  flashSaleOnly?: boolean;
   near?: boolean;
 };
 
@@ -31,6 +32,7 @@ export const isHomeCatalogMainView = ({
   wholesaleOnly,
   buyNFreeOnly,
   originalOnly,
+  flashSaleOnly = false,
   near = false,
 }: HomeCatalogMainViewParams) =>
   !search &&
@@ -47,4 +49,5 @@ export const isHomeCatalogMainView = ({
   !wholesaleOnly &&
   !buyNFreeOnly &&
   !originalOnly &&
+  !flashSaleOnly &&
   !near;

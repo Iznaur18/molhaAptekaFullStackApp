@@ -1,3 +1,4 @@
+import { isDimColorScheme } from "@izibuy/design-tokens";
 import { useMemo } from "react";
 import { StyleSheet, type TextStyle, type ViewStyle } from "react-native";
 
@@ -7,8 +8,9 @@ import {
   PRODUCT_CARD_STATUS_BADGE_OVERLAY_LAYOUT as BSOL,
   PRODUCT_CARD_STATUS_BADGES_USE_OVERLAY_STYLE,
   resolveProductCardBadgeColors,
+  resolveProductCardFlashSaleBadgeColors,
 } from "@/entities/product/lib/productCardBadgePalette";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useAppTheme, useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 
 export type ProductStatusBadgeVariant =
   | "hidden"
@@ -19,6 +21,7 @@ export type ProductStatusBadgeVariant =
   | "near"
   | "installment"
   | "wholesale"
+  | "flashSale"
   | "raffle"
   | "affiliate"
   | "placeholder"
@@ -106,6 +109,8 @@ export const useProductStatusBadgeVariantStyles = (
   size: ProductStatusBadgeSize = "compact",
 ): Record<ProductStatusBadgeVariant, { badge: ViewStyle; text: TextStyle }> => {
   const theme = useAppTheme();
+  const { colorScheme } = useAppThemeSettings();
+  const isDarkScheme = isDimColorScheme(colorScheme);
 
   return useMemo(() => {
     const layout = resolveBadgeLayout(size);
@@ -148,6 +153,8 @@ export const useProductStatusBadgeVariantStyles = (
     const near = fill(BC.auctionBg, BC.auctionText);
     const installment = fill(BC.installmentBg, BC.installmentText);
     const wholesale = fill(BC.wholesaleBg, BC.wholesaleText);
+    const flashSaleColors = resolveProductCardFlashSaleBadgeColors(theme.colors, isDarkScheme);
+    const flashSale = fill(flashSaleColors.backgroundColor, flashSaleColors.textColor);
     const raffle = fill(BC.raffleBg, BC.raffleText);
     const placeholder = fill(BC.statusPlaceholderBg, BC.statusPlaceholderText);
     const loyaltyOvercommit = fill(theme.colors.dangerSurface, theme.colors.dangerText);
@@ -210,6 +217,13 @@ export const useProductStatusBadgeVariantStyles = (
         wholesale.backgroundColor,
         wholesale.textColor,
       ),
+      flashSale: createBadge(
+        layout,
+        baseText,
+        flashSaleColors.borderColor,
+        flashSale.backgroundColor,
+        flashSale.textColor,
+      ),
       raffle: createBadge(layout, baseText, BC.raffleBorder, raffle.backgroundColor, raffle.textColor),
       affiliate: createBadge(
         layout,
@@ -246,7 +260,7 @@ export const useProductStatusBadgeVariantStyles = (
         { fontWeight: "600" },
       ),
     };
-  }, [size, theme]);
+  }, [isDarkScheme, size, theme]);
 };
 
 const compactScrollStyles = StyleSheet.create({

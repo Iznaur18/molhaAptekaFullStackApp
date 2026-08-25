@@ -85,6 +85,7 @@ export const useCatalogBreadcrumbLabel = ({
       affiliateOnly: feedFilters.affiliateOnly,
       wholesaleOnly: feedFilters.wholesaleOnly,
       originalOnly: feedFilters.originalOnly,
+      flashSaleOnly: feedFilters.flashSaleOnly,
       near: feedFilters.near,
     });
   }, [
@@ -98,6 +99,7 @@ export const useCatalogBreadcrumbLabel = ({
     feedFilters.installmentOnly,
     feedFilters.near,
     feedFilters.originalOnly,
+    feedFilters.flashSaleOnly,
     feedFilters.rentalOnly,
     feedFilters.saleOnly,
     feedFilters.sort,

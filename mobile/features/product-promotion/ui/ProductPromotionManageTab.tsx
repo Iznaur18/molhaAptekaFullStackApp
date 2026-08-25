@@ -24,6 +24,11 @@ type ProductPromotionManageTabProps = {
 
   onSetRental?: (productId: string, productRentalEnabled: boolean) => void | Promise<void>;
 
+  onSetFlashSale?: (
+    productId: string,
+    productFlashSaleEnabled: boolean,
+  ) => void | Promise<void>;
+
   onSetAffiliate?: (productId: string, affiliateEnabled: boolean) => void | Promise<void>;
 
   onSetLoyaltyPoints?: (
@@ -58,6 +63,8 @@ type ProductPromotionManageTabProps = {
 
   isRentalTogglePending?: boolean;
 
+  isFlashSaleTogglePending?: boolean;
+
   isAffiliateTogglePending?: boolean;
 
   isLoyaltyTogglePending?: boolean;
@@ -89,6 +96,8 @@ type ProductPromotionManageTabProps = {
   onOpenOutOfStockSettings?: () => void;
 
   onOpenRentalSettings?: () => void;
+
+  onOpenFlashSaleSettings?: () => void;
 
   onOpenAffiliateSettings?: () => void;
 

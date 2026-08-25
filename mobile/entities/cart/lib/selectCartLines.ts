@@ -5,6 +5,8 @@ import {
   resolveProductWholesaleOffer,
 } from "@izibuy/shared-lib";
 
+import { normalizeStaleFlashSaleProduct } from "@/entities/product/lib/isProductFlashSaleActive";
+
 import type { CartItemsByProductId } from "../model/types";
 
 type CatalogProduct = {
@@ -57,6 +59,8 @@ export const selectCartLines = (
   buyNFreeProgressByProductId:
     | Record<string, BuyNFreeProgressRow>
     | Map<string, BuyNFreeProgressRow> = {},
+  /** Тик из useCartFlashSalePriceTick — по нему гасим истёкшую горящую скидку. */
+  nowMs: number = Date.now(),
 ): { lines: CartLine[]; total: number } => {
   const productById = new Map(products.map((product) => [String(product._id), product]));
   const promoByProductId = new Map(
@@ -75,7 +79,9 @@ export const selectCartLines = (
   }
 
   const lines = Object.entries(cartItems).map(([productId, quantity]) => {
-    const product = productById.get(productId) ?? null;
+    const rawProduct = productById.get(productId) ?? null;
+    const product =
+      rawProduct != null ? normalizeStaleFlashSaleProduct(rawProduct, nowMs) : null;
     const qty = Math.floor(Number(quantity)) || 0;
     const promo = promoByProductId.get(productId) ?? null;
     const promoDiscountPercent =

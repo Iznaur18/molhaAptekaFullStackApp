@@ -24,6 +24,7 @@ export const CATALOG_FILTER_AFFILIATE_ONLY = "__affiliate_only__";
 export const CATALOG_FILTER_WHOLESALE_ONLY = "__wholesale_only__";
 export const CATALOG_FILTER_BUY_N_FREE_ONLY = "__buy_n_free_only__";
 export const CATALOG_FILTER_ORIGINAL_ONLY = "__original_only__";
+export const CATALOG_FILTER_FLASH_SALE_ONLY = "__flash_sale_only__";
 
 export const CATALOG_FEED_TILES: CatalogFeedTile[] = [
   {
@@ -37,6 +38,12 @@ export const CATALOG_FEED_TILES: CatalogFeedTile[] = [
   { key: "sort:reviews", kind: "sort", value: CATALOG_SORT_REVIEWS, label: "По отзывам" },
   { key: "sort:premium", kind: "sort", value: CATALOG_SORT_PREMIUM, label: "Premium" },
   { key: "sort:confirmed", kind: "sort", value: CATALOG_SORT_CONFIRMED, label: "Проверенные" },
+  {
+    key: `filter:${CATALOG_FILTER_FLASH_SALE_ONLY}`,
+    kind: "filter",
+    value: CATALOG_FILTER_FLASH_SALE_ONLY,
+    label: "Горящие скидки",
+  },
   {
     key: `filter:${CATALOG_FILTER_NEAR}`,
     kind: "filter",

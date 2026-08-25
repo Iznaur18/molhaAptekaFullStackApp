@@ -2,6 +2,7 @@ import {
   CATALOG_FILTER_AFFILIATE_ONLY,
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_BUY_N_FREE_ONLY,
+  CATALOG_FILTER_FLASH_SALE_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
   CATALOG_FILTER_NEAR,
@@ -21,6 +22,7 @@ const CATALOG_SORT_LABEL_RU: Record<string, string> = {
   confirmed: "Подтверждённые продавцы",
   reviews: "По отзывам",
   [CATALOG_FILTER_NEAR]: "Рядом",
+  [CATALOG_FILTER_FLASH_SALE_ONLY]: "Горящие скидки",
   [CATALOG_FILTER_FOLLOWING_ONLY]: "Только от подписок",
   [CATALOG_FILTER_AUCTION_ONLY]: "Только с аукционом",
   [CATALOG_FILTER_INSTALLMENT_ONLY]: "Только в рассрочку",
@@ -43,12 +45,16 @@ type CatalogFeedQuery = {
   wholesaleOnly?: boolean;
   buyNFreeOnly?: boolean;
   originalOnly?: boolean;
+  flashSaleOnly?: boolean;
   near?: boolean;
 };
 
 export const resolveActiveCatalogFeedLabel = (query: CatalogFeedQuery): string | null => {
   if (query.near) {
     return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_NEAR];
+  }
+  if (query.flashSaleOnly) {
+    return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_FLASH_SALE_ONLY];
   }
   if (query.followingOnly) {
     return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_FOLLOWING_ONLY];

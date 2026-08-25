@@ -19,6 +19,7 @@ export type FetchCatalogProductsPageOptions = {
   wholesaleOnly?: boolean;
   buyNFreeOnly?: boolean;
   originalOnly?: boolean;
+  flashSaleOnly?: boolean;
   near?: boolean;
   regionCode?: string;
 };
@@ -40,6 +41,7 @@ export const fetchCatalogProductsPage = async ({
   wholesaleOnly,
   buyNFreeOnly,
   originalOnly,
+  flashSaleOnly,
   near,
   regionCode,
 }: FetchCatalogProductsPageOptions = {}) => {
@@ -64,6 +66,7 @@ export const fetchCatalogProductsPage = async ({
         ...(wholesaleOnly ? { wholesaleOnly: "true" } : {}),
         ...(buyNFreeOnly ? { buyNFreeOnly: "true" } : {}),
         ...(originalOnly ? { originalOnly: "true" } : {}),
+        ...(flashSaleOnly ? { flashSaleOnly: "true" } : {}),
         ...(near ? { near: "true" } : {}),
         ...(regionCode?.trim() ? { regionCode: regionCode.trim() } : {}),
       },

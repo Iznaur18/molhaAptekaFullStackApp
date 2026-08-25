@@ -12,6 +12,7 @@ export type HomeCatalogFeedFiltersState = Pick<
   | "wholesaleOnly"
   | "buyNFreeOnly"
   | "originalOnly"
+  | "flashSaleOnly"
   | "near"
 >;
 
@@ -26,5 +27,6 @@ export const EMPTY_HOME_CATALOG_FEED_FILTERS: HomeCatalogFeedFiltersState = {
   wholesaleOnly: false,
   buyNFreeOnly: false,
   originalOnly: false,
+  flashSaleOnly: false,
   near: false,
 };

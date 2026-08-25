@@ -3,6 +3,7 @@ import {
   CATALOG_FILTER_AFFILIATE_ONLY,
   CATALOG_FILTER_AUCTION_ONLY,
   CATALOG_FILTER_BUY_N_FREE_ONLY,
+  CATALOG_FILTER_FLASH_SALE_ONLY,
   CATALOG_FILTER_FOLLOWING_ONLY,
   CATALOG_FILTER_INSTALLMENT_ONLY,
   CATALOG_FILTER_NEAR,
@@ -29,6 +30,7 @@ export const buildQueryForCatalogFeedTile = (
   | "wholesaleOnly"
   | "buyNFreeOnly"
   | "originalOnly"
+  | "flashSaleOnly"
   | "near"
 > => {
   if (tile.kind === "sort") {
@@ -43,6 +45,7 @@ export const buildQueryForCatalogFeedTile = (
       wholesaleOnly: false,
       buyNFreeOnly: false,
       originalOnly: false,
+      flashSaleOnly: false,
       near: false,
     };
   }
@@ -58,6 +61,7 @@ export const buildQueryForCatalogFeedTile = (
     wholesaleOnly: false,
     buyNFreeOnly: false,
     originalOnly: false,
+    flashSaleOnly: false,
     near: false,
   };
 
@@ -91,6 +95,9 @@ export const buildQueryForCatalogFeedTile = (
       buyNFreeOnly: true,
       sort: CATALOG_SORT_PURCHASES as CatalogListFilters["sort"],
     };
+  }
+  if (tile.value === CATALOG_FILTER_FLASH_SALE_ONLY) {
+    return { ...base, flashSaleOnly: true };
   }
   if (tile.value === CATALOG_FILTER_ORIGINAL_ONLY) {
     return { ...base, originalOnly: true };

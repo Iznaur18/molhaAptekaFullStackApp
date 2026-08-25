@@ -12,7 +12,8 @@ import { isProductRaffleParticipant } from "@/entities/raffle/lib/isProductRaffl
 import { resolveProductLoyaltyPointsPerUnit } from "@/entities/product/lib/resolveProductLoyaltyPointsPerUnit";
 import { ProductManageToggleRow } from "@/entities/product/ui/ProductManageToggleRow";
 import { PRODUCT_MODERATION_APPROVED } from "@/entities/product/model/productModerationConstants";
-import { CREATE_PRODUCT_UI, PRODUCT_CARD_UI } from "@/shared/config";
+import { CREATE_PRODUCT_UI, PRODUCT_CARD_UI, PRODUCT_FLASH_SALE_UI } from "@/shared/config";
+import { hasProductManualCatalogDiscount } from "@/entities/product/lib/hasProductManualCatalogDiscount";
 import { useProductEditManageSectionStyles } from "@/shared/theme/modalChromeStyles";
 import { semanticColors } from "@/shared/theme/semanticColors";
 
@@ -48,6 +49,7 @@ type ProductEditManageSectionProps = {
   isWholesaleTogglePending?: boolean;
   isBuyNFreeTogglePending?: boolean;
   isRentalTogglePending?: boolean;
+  isFlashSaleTogglePending?: boolean;
   isAffiliateTogglePending?: boolean;
   isLoyaltyTogglePending?: boolean;
   isInstallmentTogglePending?: boolean;
@@ -64,6 +66,11 @@ type ProductEditManageSectionProps = {
   onOpenWholesaleSettings?: () => void;
   onOpenBuyNFreeSettings?: () => void;
   onOpenRentalSettings?: () => void;
+  onOpenFlashSaleSettings?: () => void;
+  onSetFlashSale?: (
+    productId: string,
+    productFlashSaleEnabled: boolean,
+  ) => void | Promise<void>;
   onOpenAffiliateSettings?: () => void;
   onOpenLoyaltySettings?: () => void;
   onOpenOutOfStockSettings?: () => void;
@@ -98,6 +105,7 @@ export const ProductEditManageSection = ({
   isWholesaleTogglePending = false,
   isBuyNFreeTogglePending = false,
   isRentalTogglePending = false,
+  isFlashSaleTogglePending = false,
   isAffiliateTogglePending = false,
   isLoyaltyTogglePending = false,
   isInstallmentTogglePending = false,
@@ -114,6 +122,8 @@ export const ProductEditManageSection = ({
   onOpenWholesaleSettings,
   onOpenBuyNFreeSettings,
   onOpenRentalSettings,
+  onOpenFlashSaleSettings,
+  onSetFlashSale,
   onOpenAffiliateSettings,
   onOpenLoyaltySettings,
   onOpenOutOfStockSettings,
@@ -156,6 +166,12 @@ export const ProductEditManageSection = ({
     typeof onOpenBuyNFreeSettings === "function" || typeof onSetBuyNFree === "function";
   const showRental =
     typeof onOpenRentalSettings === "function" || typeof onSetRental === "function";
+  const showFlashSale =
+    typeof onOpenFlashSaleSettings === "function" || typeof onSetFlashSale === "function";
+  const isFlashSaleEnabled = product.productFlashSaleEnabled === true;
+  /** Сервер запрещает совмещать горящую скидку с аукционом и ручной скидкой. */
+  const flashSaleBlockedByAuction = product.productAuctionEnabled === true;
+  const flashSaleBlockedByManualDiscount = hasProductManualCatalogDiscount(product);
   const showAffiliate =
     typeof onOpenAffiliateSettings === "function" || typeof onSetAffiliate === "function";
   const showLoyalty =
@@ -182,6 +198,7 @@ export const ProductEditManageSection = ({
     isWholesaleTogglePending ||
     isBuyNFreeTogglePending ||
     isRentalTogglePending ||
+    isFlashSaleTogglePending ||
     isAffiliateTogglePending ||
     isLoyaltyTogglePending ||
     isInstallmentTogglePending ||
@@ -377,6 +394,47 @@ export const ProductEditManageSection = ({
               }
               if (typeof onSetRental === "function") {
                 void onSetRental(String(product._id), next);
+              }
+              return undefined;
+            }}
+          />
+        ) : null}
+        {showFlashSale ? (
+          <ProductManageToggleRow
+            // key со статусом: после включения скидки строка должна перерисоваться
+            // с новым `checked`, даже если объект товара пришёл тем же.
+            key={`flash-sale-${String(product._id)}-${isFlashSaleEnabled ? "on" : "off"}`}
+            title={PRODUCT_FLASH_SALE_UI.MANAGE_TITLE}
+            description={
+              flashSaleBlockedByAuction
+                ? PRODUCT_FLASH_SALE_UI.MANAGE_HINT +
+                  PRODUCT_FLASH_SALE_UI.MANAGE_HINT_AUCTION_BLOCKED
+                : flashSaleBlockedByManualDiscount
+                  ? PRODUCT_FLASH_SALE_UI.MANAGE_HINT +
+                    PRODUCT_FLASH_SALE_UI.MANAGE_HINT_MANUAL_DISCOUNT_BLOCKED
+                  : PRODUCT_FLASH_SALE_UI.MANAGE_HINT
+            }
+            checked={isFlashSaleEnabled}
+            disabled={
+              actionsLocked || flashSaleBlockedByAuction || flashSaleBlockedByManualDiscount
+            }
+            pending={isFlashSaleTogglePending}
+            pendingLabel={PRODUCT_FLASH_SALE_UI.TOGGLE_PENDING}
+            onPress={() => onOpenFlashSaleSettings?.()}
+            onCheckedChange={(next) => {
+              if (product._id == null || actionsLocked) {
+                return { revert: true };
+              }
+              if (next && (flashSaleBlockedByAuction || flashSaleBlockedByManualDiscount)) {
+                return { revert: true };
+              }
+              // Включение всегда через модалку: нужны цена и длительность.
+              if (next) {
+                onOpenFlashSaleSettings?.();
+                return { revert: true };
+              }
+              if (typeof onSetFlashSale === "function") {
+                void onSetFlashSale(String(product._id), false);
               }
               return undefined;
             }}

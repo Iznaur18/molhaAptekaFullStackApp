@@ -20,6 +20,7 @@ const PLACEHOLDER_SCOPE_KEYS: Array<keyof CatalogListQueryKeyParams> = [
   "buyNFreeOnly",
   "originalOnly",
   "near",
+  "flashSaleOnly",
   "regionCode",
 ];
 

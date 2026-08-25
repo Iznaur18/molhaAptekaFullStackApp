@@ -18,6 +18,7 @@ export type CatalogListFilters = {
   wholesaleOnly?: boolean;
   buyNFreeOnly?: boolean;
   originalOnly?: boolean;
+  flashSaleOnly?: boolean;
   near?: boolean;
   regionCode?: string;
 };
@@ -38,6 +39,7 @@ export const buildCatalogListQueryKey = (filters: CatalogListFilters) => ({
   wholesaleOnly: filters.wholesaleOnly === true ? true : undefined,
   buyNFreeOnly: filters.buyNFreeOnly === true ? true : undefined,
   originalOnly: filters.originalOnly === true ? true : undefined,
+  flashSaleOnly: filters.flashSaleOnly === true ? true : undefined,
   near: filters.near === true ? true : undefined,
   regionCode: filters.regionCode?.trim() || undefined,
 });

@@ -261,6 +261,7 @@ export const MyProductsPage = () => {
         onSetProductWholesale={pageActions.handleSetProductWholesale}
         onSetProductBuyNFree={pageActions.handleSetProductBuyNFree}
         onSetProductRental={pageActions.handleSetProductRental}
+        onSetProductFlashSale={pageActions.handleSetProductFlashSale}
         onSetProductAffiliate={pageActions.handleSetProductAffiliate}
         onSetProductLoyaltyPoints={pageActions.handleSetProductLoyaltyPoints}
         onSetProductInstallment={pageActions.handleSetProductInstallment}
@@ -273,6 +274,7 @@ export const MyProductsPage = () => {
         isWholesaleTogglePending={pageActions.isWholesaleTogglePending}
         isBuyNFreeTogglePending={pageActions.isBuyNFreeTogglePending}
         isRentalTogglePending={pageActions.isRentalTogglePending}
+        isFlashSaleTogglePending={pageActions.isFlashSaleTogglePending}
         isAffiliateTogglePending={pageActions.isAffiliateTogglePending}
         isLoyaltyTogglePending={pageActions.isLoyaltyTogglePending}
         isInstallmentTogglePending={pageActions.isInstallmentTogglePending}

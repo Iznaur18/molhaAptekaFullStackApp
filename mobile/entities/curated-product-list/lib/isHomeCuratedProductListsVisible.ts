@@ -14,6 +14,7 @@ export type HomeCuratedProductListsVisibilityParams = {
   catalogWholesaleOnly: boolean;
   catalogBuyNFreeOnly: boolean;
   catalogOriginalOnly: boolean;
+  catalogFlashSaleOnly?: boolean;
   catalogNear?: boolean;
 };
 
@@ -32,6 +33,7 @@ export const isHomeCuratedProductListsVisible = ({
   catalogWholesaleOnly,
   catalogBuyNFreeOnly,
   catalogOriginalOnly,
+  catalogFlashSaleOnly = false,
   catalogNear = false,
 }: HomeCuratedProductListsVisibilityParams): boolean =>
   isHomeCatalogMainView &&
@@ -48,4 +50,5 @@ export const isHomeCuratedProductListsVisible = ({
   !catalogWholesaleOnly &&
   !catalogBuyNFreeOnly &&
   !catalogOriginalOnly &&
+  !catalogFlashSaleOnly &&
   !catalogNear;
