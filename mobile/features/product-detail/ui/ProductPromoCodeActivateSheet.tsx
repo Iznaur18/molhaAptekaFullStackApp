@@ -12,11 +12,12 @@ import {
   activateProductPromoCode,
   fetchMyAppliedProductPromos,
 } from "@/entities/product-promo-code/api/productPromoCodeApi";
+import { productPromoCodeQueryKeys } from "@/entities/product-promo-code/model/productPromoCodeQueryKeys";
 import { PRODUCT_PROMO_CODE_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { PRODUCT_PROMO_CODE_MAX_LENGTH } from "@molha/api-contract";
 
-const appliedMineKey = ["product-promo-code", "applied-mine"] as const;
+const appliedMineKey = productPromoCodeQueryKeys.appliedMine();
 
 type ProductPromoCodeActivateSheetProps = {
   isOpen: boolean;

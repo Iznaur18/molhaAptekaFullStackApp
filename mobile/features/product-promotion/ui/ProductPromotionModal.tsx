@@ -33,6 +33,7 @@ import { InstallmentProgramModal } from "@/entities/installment/ui/InstallmentPr
 import { WholesalePriceModal } from "@/entities/product/ui/WholesalePriceModal";
 import { ProductRentalManageModal } from "@/entities/product/ui/ProductRentalManageModal";
 import { ProductFlashSaleModal } from "@/entities/product/ui/ProductFlashSaleModal";
+import { ProductPromoCodesModal } from "@/entities/product/ui/ProductPromoCodesModal";
 import { AffiliatePercentModal } from "@/entities/product/ui/AffiliatePercentModal";
 import { ProductLoyaltyPointsModal } from "@/entities/product/ui/ProductLoyaltyPointsModal";
 import { ProductBuyNFreeModal } from "@/entities/product/ui/ProductBuyNFreeModal";
@@ -217,6 +218,7 @@ export const ProductPromotionModal = ({
   const [isOutOfStockLabelOpen, setIsOutOfStockLabelOpen] = useState(false);
   const [isRentalOpen, setIsRentalOpen] = useState(false);
   const [isFlashSaleOpen, setIsFlashSaleOpen] = useState(false);
+  const [isPromoCodesOpen, setIsPromoCodesOpen] = useState(false);
   const [isAffiliateOpen, setIsAffiliateOpen] = useState(false);
   const [isLoyaltyOpen, setIsLoyaltyOpen] = useState(false);
   const bodyScrollRef = useRef<ScrollView>(null);
@@ -229,6 +231,7 @@ export const ProductPromotionModal = ({
       setIsOutOfStockLabelOpen(false);
       setIsRentalOpen(false);
       setIsFlashSaleOpen(false);
+      setIsPromoCodesOpen(false);
       setIsAffiliateOpen(false);
       setIsLoyaltyOpen(false);
       return;
@@ -483,6 +486,7 @@ export const ProductPromotionModal = ({
         onOpenOutOfStockSettings={() => setIsOutOfStockLabelOpen(true)}
         onOpenRentalSettings={() => setIsRentalOpen(true)}
         onOpenFlashSaleSettings={() => setIsFlashSaleOpen(true)}
+        onOpenPromoCodesSettings={() => setIsPromoCodesOpen(true)}
         onOpenAffiliateSettings={() => setIsAffiliateOpen(true)}
         onOpenLoyaltySettings={() => setIsLoyaltyOpen(true)}
         isSubmitting={isSubmitting}
@@ -636,6 +640,22 @@ export const ProductPromotionModal = ({
             product={product}
             onClose={() => setIsFlashSaleOpen(false)}
             onSaved={onWholesaleSaved}
+          />
+        ) : null}
+        {isPromoCodesOpen ? (
+          <ProductPromoCodesModal
+            embedded
+            visible
+            product={product}
+            onClose={() => setIsPromoCodesOpen(false)}
+            onSaved={(payload) => {
+              if (product) {
+                onWholesaleSaved?.({
+                  ...product,
+                  productHasActivePromoCodes: payload.productHasActivePromoCodes,
+                });
+              }
+            }}
           />
         ) : null}
         {isAffiliateOpen ? (

@@ -28,6 +28,7 @@ import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import { useCreateOrderMutation } from "@/entities/order/model/useCreateOrderMutation";
 import { fetchMyProductBuyNFreeProgress } from "@/entities/product/api/fetchMyProductBuyNFreeProgress";
 import { fetchMyAppliedProductPromos } from "@/entities/product-promo-code/api/productPromoCodeApi";
+import { productPromoCodeQueryKeys } from "@/entities/product-promo-code/model/productPromoCodeQueryKeys";
 import type { MyPriceOfferBid } from "@/entities/product-price-offer/api/incomingPriceOffersApi";
 import { useMyAcceptedBidsQuery } from "@/entities/product-price-offer/model/useMyAcceptedBidsQuery";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
@@ -76,7 +77,7 @@ export default function CartScreen() {
   const productsQuery = useCartProductsQuery(productIds);
   const acceptedBidsQuery = useMyAcceptedBidsQuery(isAuthorized);
   const appliedPromosQuery = useQuery({
-    queryKey: ["product-promo-code", "applied-mine"],
+    queryKey: productPromoCodeQueryKeys.appliedMine(),
     queryFn: fetchMyAppliedProductPromos,
     enabled: isAuthorized,
     staleTime: 0,

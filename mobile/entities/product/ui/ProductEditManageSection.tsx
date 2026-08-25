@@ -69,6 +69,7 @@ type ProductEditManageSectionProps = {
   onOpenBuyNFreeSettings?: () => void;
   onOpenRentalSettings?: () => void;
   onOpenFlashSaleSettings?: () => void;
+  onOpenPromoCodesSettings?: () => void;
   onSetFlashSale?: (
     productId: string,
     productFlashSaleEnabled: boolean,
@@ -126,6 +127,7 @@ export const ProductEditManageSection = ({
   onOpenBuyNFreeSettings,
   onOpenRentalSettings,
   onOpenFlashSaleSettings,
+  onOpenPromoCodesSettings,
   onSetFlashSale,
   onSetQa,
   onOpenAffiliateSettings,
@@ -180,6 +182,7 @@ export const ProductEditManageSection = ({
     typeof onOpenAffiliateSettings === "function" || typeof onSetAffiliate === "function";
   const showLoyalty =
     typeof onOpenLoyaltySettings === "function" || typeof onSetLoyaltyPoints === "function";
+  const showPromoCodes = typeof onOpenPromoCodesSettings === "function" && canEdit;
   const showQaToggle = typeof onSetQa === "function" && canEdit;
   const isQaEnabled = product.productQaEnabled === true;
   const showRaffleToggle =
@@ -461,6 +464,22 @@ export const ProductEditManageSection = ({
                 void onSetFlashSale(String(product._id), false);
               }
               return undefined;
+            }}
+          />
+        ) : null}
+        {showPromoCodes ? (
+          <ProductManageToggleRow
+            title={CREATE_PRODUCT_UI.MANAGE_PROMO_CODES_TITLE}
+            description={CREATE_PRODUCT_UI.MANAGE_PROMO_CODES_HINT}
+            checked={product.productHasActivePromoCodes === true}
+            disabled={actionsLocked}
+            pending={false}
+            pendingLabel={CREATE_PRODUCT_UI.MANAGE_PROMO_CODES_PENDING}
+            onPress={() => onOpenPromoCodesSettings?.()}
+            onCheckedChange={() => {
+              // Тумблер здесь — только вход в модалку: коды заводятся списком.
+              onOpenPromoCodesSettings?.();
+              return { revert: true };
             }}
           />
         ) : null}

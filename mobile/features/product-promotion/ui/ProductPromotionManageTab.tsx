@@ -103,6 +103,8 @@ type ProductPromotionManageTabProps = {
 
   onOpenFlashSaleSettings?: () => void;
 
+  onOpenPromoCodesSettings?: () => void;
+
   onOpenAffiliateSettings?: () => void;
 
   onOpenLoyaltySettings?: () => void;

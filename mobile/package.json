@@ -114,6 +114,7 @@
     "test:checkout-saved-address": "node --test scripts/checkout-saved-address.test.mjs",
     "test:saved-addresses-editor": "node --test scripts/saved-addresses-editor.test.mjs",
     "test:product-qa-toggle": "node --test scripts/product-qa-toggle.test.mjs",
+    "test:product-promo-codes": "node --test scripts/product-promo-codes-modal.test.mjs",
     "test:product-details-badge-sort": "node --test scripts/product-details-badge-sort.test.mjs",
     "smoke:buyer-path": "node scripts/buyer-path-api-smoke.mjs"
   },
