@@ -1,18 +1,23 @@
 import {
   PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
   PRODUCT_PICKUP_ADDRESS_MAX_LENGTH,
+  PRODUCT_PICKUP_LOCATIONS_MAX,
   SHIPPING_PROVIDER_LABEL_RU,
   SHIPPING_PROVIDERS,
 } from "@molha/api-contract";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { createUserSavedAddressId } from "@/entities/address/lib/createUserSavedAddressId";
 import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
 import {
   SavedAddressPicker,
   type SavedAddressPickerItem,
 } from "@/entities/address/ui/SavedAddressPicker";
 import {
+  canAddPickupLocationAddress,
   canUseSavedAddressAsPickupLocation,
+  manualPickupLocations,
+  normalizePickupLocations,
   pickupLocationsFromSelectedAddresses,
   type ProductPickupLocationValue as PickupPointValue,
 } from "@/entities/product/lib/productPickupLocationsFromSavedAddresses";
@@ -83,6 +88,13 @@ export const ProductPickupLocationFields = ({
   const selectedPointIds = pickupLocations.map((item) => item.id);
   const defaultPointId = pickupLocations.find((item) => item.isDefault)?.id ?? null;
 
+  /** Точки, добавленные вручную — их нельзя терять при клике по книге. */
+  const manualPoints = manualPickupLocations(pickupLocations, savedAddresses);
+
+  const commitPoints = (nextPoints: PickupPointValue[]) => {
+    onPickupLocationsChange?.(normalizePickupLocations(nextPoints, defaultPointId));
+  };
+
   const togglePickupPoint = (id: string) => {
     if (disabled) {
       return;
@@ -90,9 +102,40 @@ export const ProductPickupLocationFields = ({
     const nextIds = selectedPointIds.includes(id)
       ? selectedPointIds.filter((item) => item !== id)
       : [...selectedPointIds, id];
-    onPickupLocationsChange?.(
-      pickupLocationsFromSelectedAddresses(savedAddresses, nextIds, defaultPointId),
+    const fromBook = pickupLocationsFromSelectedAddresses(
+      savedAddresses,
+      nextIds,
+      defaultPointId,
     );
+    commitPoints([...fromBook, ...manualPoints]);
+  };
+
+  const canAddTypedAddress =
+    !disabled && canAddPickupLocationAddress(pickupLocations, address, lat, lon);
+
+  /** Набранный в поле адрес становится ещё одной точкой — как «добавить» в вебе. */
+  const addTypedAddressAsPoint = () => {
+    if (!canAddTypedAddress || lat == null || lon == null) {
+      return;
+    }
+    commitPoints([
+      ...pickupLocations,
+      {
+        id: createUserSavedAddressId(),
+        label: "",
+        address: address.trim(),
+        lat,
+        lon,
+        isDefault: pickupLocations.length === 0,
+      },
+    ]);
+  };
+
+  const removePickupPoint = (id: string) => {
+    if (disabled) {
+      return;
+    }
+    commitPoints(pickupLocations.filter((item) => item.id !== id));
   };
 
   const emit = (patch: Partial<ProductPickupLocationValue>) => {
@@ -179,6 +222,64 @@ export const ProductPickupLocationFields = ({
         }
         maxLength={PRODUCT_PICKUP_ADDRESS_MAX_LENGTH}
       />
+
+      {typeof onPickupLocationsChange === "function" ? (
+        <View style={styles.savedBlock}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !canAddTypedAddress }}
+            disabled={!canAddTypedAddress}
+            onPress={addTypedAddressAsPoint}
+            style={[
+              styles.addPointButton,
+              { borderColor: theme.colors.action },
+              !canAddTypedAddress && styles.addPointDisabled,
+            ]}
+          >
+            <Text style={[styles.addPointText, { color: theme.colors.action }]}>
+              {PRODUCT_PICKUP_UI.ADD_LOCATION}
+            </Text>
+          </Pressable>
+
+          {manualPoints.length > 0 ? (
+            <View style={styles.savedBlock}>
+              {manualPoints.map((point) => (
+                <View
+                  key={point.id}
+                  style={[styles.manualPoint, { borderColor: theme.colors.border }]}
+                >
+                  <Text style={[styles.manualPointLine, { color: theme.colors.text }]}>
+                    {point.address}
+                  </Text>
+                  {point.isDefault ? (
+                    <Text
+                      style={[styles.manualPointHint, { color: theme.colors.textSecondary }]}
+                    >
+                      {PRODUCT_PICKUP_UI.LOCATION_DEFAULT}
+                    </Text>
+                  ) : null}
+                  <Pressable
+                    accessibilityRole="button"
+                    disabled={disabled}
+                    onPress={() => removePickupPoint(point.id)}
+                    style={styles.manualPointRemove}
+                  >
+                    <Text style={{ color: theme.colors.danger }}>
+                      {PRODUCT_PICKUP_UI.REMOVE_LOCATION}
+                    </Text>
+                  </Pressable>
+                </View>
+              ))}
+            </View>
+          ) : null}
+
+          {pickupLocations.length >= PRODUCT_PICKUP_LOCATIONS_MAX ? (
+            <Text style={fieldStyles.hint}>
+              {PRODUCT_PICKUP_UI.LOCATIONS_MAX(PRODUCT_PICKUP_LOCATIONS_MAX)}
+            </Text>
+          ) : null}
+        </View>
+      ) : null}
 
       <Text style={fieldStyles.labelStrong}>
         {PRODUCT_PICKUP_UI.FULFILLMENT_LEGEND}
@@ -291,6 +392,38 @@ const styles = StyleSheet.create({
   },
   savedBlock: {
     gap: 6,
+  },
+  addPointButton: {
+    alignSelf: "flex-start",
+    minHeight: 40,
+    justifyContent: "center",
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderRadius: 10,
+  },
+  addPointDisabled: {
+    opacity: 0.5,
+  },
+  addPointText: {
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  manualPoint: {
+    gap: 4,
+    padding: 12,
+    borderWidth: 1,
+    borderRadius: 10,
+  },
+  manualPointLine: {
+    fontSize: 14,
+    lineHeight: 19.6,
+  },
+  manualPointHint: {
+    fontSize: 12,
+  },
+  manualPointRemove: {
+    alignSelf: "flex-end",
+    paddingVertical: 4,
   },
   methods: {
     gap: 8,

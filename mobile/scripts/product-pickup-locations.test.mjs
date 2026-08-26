@@ -1,3 +1,4 @@
+import { PRODUCT_PICKUP_LOCATIONS_MAX } from "@molha/api-contract";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -5,7 +6,10 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import {
+  canAddPickupLocationAddress,
   canUseSavedAddressAsPickupLocation,
+  manualPickupLocations,
+  normalizePickupLocations,
   pickupLocationFromSavedAddress,
   pickupLocationsFromSelectedAddresses,
 } from "../entities/product/lib/productPickupLocationsFromSavedAddresses.ts";
@@ -121,4 +125,89 @@ test("подписи самовывоза заведены", () => {
   ]) {
     assert.ok(copy.includes(key), `нет ${key}`);
   }
+});
+
+const point = (over = {}) => ({
+  id: "p1",
+  label: "",
+  address: "г Москва, ул Арбат, д 5",
+  lat: 55.75,
+  lon: 37.59,
+  isDefault: false,
+  ...over,
+});
+
+test("ручная точка переживает переключение адреса книги", () => {
+  const book = [addr({ id: "a" }), addr({ id: "b", line: "г Москва, ул Ленина, д 2" })];
+  const manual = point({ id: "manual-1" });
+  const current = [...pickupLocationsFromSelectedAddresses(book, ["a"], null), manual];
+
+  assert.deepEqual(
+    manualPickupLocations(current, book).map((item) => item.id),
+    ["manual-1"],
+  );
+
+  // Продавец ставит галочку на втором адресе книги: ручная точка остаётся.
+  const fromBook = pickupLocationsFromSelectedAddresses(book, ["a", "b"], "a");
+  const next = normalizePickupLocations(
+    [...fromBook, ...manualPickupLocations(current, book)],
+    "a",
+  );
+  assert.deepEqual(next.map((item) => item.id), ["a", "b", "manual-1"]);
+
+  // И снятие галочки со всей книги её тоже не трогает.
+  const cleared = normalizePickupLocations(
+    [...pickupLocationsFromSelectedAddresses(book, [], "a"), manual],
+    "a",
+  );
+  assert.deepEqual(cleared.map((item) => item.id), ["manual-1"]);
+  assert.equal(cleared[0].isDefault, true);
+});
+
+test("normalizePickupLocations держит ровно одну основную и лимит", () => {
+  const many = Array.from({ length: 9 }, (_, index) =>
+    point({ id: `p${index}`, address: `адрес ${index}`, isDefault: true }),
+  );
+  const next = normalizePickupLocations(many, "p3");
+  assert.equal(next.length, PRODUCT_PICKUP_LOCATIONS_MAX);
+  assert.deepEqual(next.filter((item) => item.isDefault).map((item) => item.id), ["p3"]);
+
+  // Прежней основной в наборе нет — основной становится первая.
+  assert.equal(normalizePickupLocations(many, "нет-такой")[0].isDefault, true);
+  assert.deepEqual(normalizePickupLocations([], "p1"), []);
+});
+
+test("дубль адреса и адрес без координат добавить нельзя", () => {
+  const current = [point()];
+  assert.equal(
+    canAddPickupLocationAddress(current, "г Москва, ул Тверская, д 9", 55.7, 37.6),
+    true,
+  );
+  // Тот же адрес другим регистром/пробелами — контрактный ключ дублей тот же.
+  assert.equal(
+    canAddPickupLocationAddress(current, "  Г МОСКВА, УЛ АРБАТ, Д 5 ", 55.75, 37.59),
+    false,
+  );
+  assert.equal(canAddPickupLocationAddress(current, "г Тула, ул Мира, д 3", null, 37.6), false);
+  assert.equal(canAddPickupLocationAddress(current, "   ", 55.7, 37.6), false);
+
+  const full = Array.from({ length: PRODUCT_PICKUP_LOCATIONS_MAX }, (_, index) =>
+    point({ id: `p${index}`, address: `адрес ${index}` }),
+  );
+  assert.equal(canAddPickupLocationAddress(full, "новый адрес", 55.7, 37.6), false);
+});
+
+test("шаг мастера рисует кнопку добавления и удаление точки", () => {
+  const source = readMobileFile("entities/product/ui/ProductPickupLocationFields.tsx");
+  assert.ok(source.includes("PRODUCT_PICKUP_UI.ADD_LOCATION"), "нет кнопки добавления");
+  assert.ok(source.includes("onPress={addTypedAddressAsPoint}"), "кнопка не подключена");
+  assert.ok(source.includes("disabled={!canAddTypedAddress}"), "кнопка не блокируется");
+  assert.ok(source.includes("removePickupPoint(point.id)"), "нет удаления ручной точки");
+  assert.ok(
+    source.includes("PRODUCT_PICKUP_UI.LOCATIONS_MAX(PRODUCT_PICKUP_LOCATIONS_MAX)"),
+    "нет подсказки про лимит",
+  );
+
+  const copy = readMobileFile("shared/config/appUiCopy.ts");
+  assert.ok(copy.includes("REMOVE_LOCATION"), "нет копирайта REMOVE_LOCATION");
 });

@@ -1188,6 +1188,7 @@ export const PRODUCT_PICKUP_UI = {
   SAVED_ADDRESSES_LABEL: "Точки самовывоза из ваших адресов",
   SAVED_ADDRESS_OTHER: "Указать другой на карте",
   ADD_LOCATION: "Добавить точку",
+  REMOVE_LOCATION: "Убрать точку",
   PICKUP_MULTI_HINT: "Отметьте адреса, откуда покупатель сможет забрать товар",
   LOCATION_DEFAULT: "Основная точка",
   /** Адрес без координат в точку не превратить — их требует контракт. */
