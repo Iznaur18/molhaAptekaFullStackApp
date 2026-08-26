@@ -1,5 +1,10 @@
 import {
+  PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
+  PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
+  PRODUCT_PICKUP_COORDS_REQUIRED_MESSAGE,
   PRODUCT_PICKUP_LOCATIONS_MAX,
+  PRODUCT_PICKUP_LOCATION_DEFAULT_REQUIRED_MESSAGE,
+  PRODUCT_PICKUP_LOCATION_LABEL_MAX_LENGTH,
   productPickupLocationDuplicateKey,
 } from "@molha/api-contract";
 
@@ -146,4 +151,72 @@ export const canAddPickupLocationAddress = (
   }
   const key = productPickupLocationDuplicateKey(line);
   return !points.some((item) => productPickupLocationDuplicateKey(item.address) === key);
+};
+
+/**
+ * Проверка списка точек по правилам контракта — те же, что в вебе
+ * (`validateProductPickupLocationsForm`).
+ *
+ * Пустой список НЕ ошибка: мобилка, в отличие от веба, держит обязательным
+ * легаси-поле «адрес продажи», а сервер сам заворачивает его в единственную
+ * точку (`resolveProductPickupWriteFields`). Поэтому эффективный список
+ * никогда не пуст, и `PRODUCT_PICKUP_LOCATIONS_REQUIRED_MESSAGE` остаётся
+ * серверным guard'ом.
+ */
+export const validateProductPickupLocationsList = (
+  points: readonly ProductPickupLocationValue[],
+): string | null => {
+  const list = Array.isArray(points) ? points : [];
+  if (list.length === 0) {
+    return null;
+  }
+  if (list.length > PRODUCT_PICKUP_LOCATIONS_MAX) {
+    return `Не больше ${PRODUCT_PICKUP_LOCATIONS_MAX} точек самовывоза`;
+  }
+  if (list.filter((item) => item.isDefault).length !== 1) {
+    return PRODUCT_PICKUP_LOCATION_DEFAULT_REQUIRED_MESSAGE;
+  }
+
+  const keys = new Set<string>();
+  for (const item of list) {
+    if (String(item.label ?? "").trim().length > PRODUCT_PICKUP_LOCATION_LABEL_MAX_LENGTH) {
+      return `Метка не длиннее ${PRODUCT_PICKUP_LOCATION_LABEL_MAX_LENGTH} символов`;
+    }
+    const address = String(item.address ?? "").trim();
+    if (address.length < PRODUCT_PICKUP_ADDRESS_MIN_LENGTH) {
+      return PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE;
+    }
+    if (
+      item.lat == null ||
+      item.lon == null ||
+      !Number.isFinite(Number(item.lat)) ||
+      !Number.isFinite(Number(item.lon))
+    ) {
+      return PRODUCT_PICKUP_COORDS_REQUIRED_MESSAGE;
+    }
+    const key = productPickupLocationDuplicateKey(address);
+    if (keys.has(key)) {
+      return "Такой адрес уже добавлен";
+    }
+    keys.add(key);
+  }
+
+  return null;
+};
+
+/**
+ * Есть ли набранный в поле адрес среди точек. Когда список непустой, сервер
+ * (`resolveProductPickupWriteFields`) собирает легаси-поля товара из основной
+ * точки, а набранный отдельно адрес никуда не попадает — поэтому его либо
+ * добавляют точкой, либо поле чистят.
+ */
+export const isPickupAddressAmongLocations = (
+  address: string,
+  points: readonly ProductPickupLocationValue[],
+): boolean => {
+  const key = productPickupLocationDuplicateKey(address);
+  if (!key) {
+    return false;
+  }
+  return points.some((item) => productPickupLocationDuplicateKey(item.address) === key);
 };

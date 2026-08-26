@@ -10,6 +10,7 @@ import {
   PRODUCT_IMAGE_URLS_MAX,
   PRODUCT_NAME_MAX_LENGTH,
   PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
+  syncLegacyPickupFieldsFromLocations,
   PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
   PRODUCT_PRICE_RUB_MAX,
   PRODUCT_STOCK_QUANTITY_MAX,
@@ -44,6 +45,10 @@ import { userSavedAddressesFromUser } from "@/entities/address/lib/userSavedAddr
 import type { SavedAddressPickerItem } from "@/entities/address/ui/SavedAddressPicker";
 import type { ProductPickupLocationValue as ProductPickupPoint } from "@/entities/product/lib/productPickupLocationsFromSavedAddresses";
 import {
+  isPickupAddressAmongLocations,
+  validateProductPickupLocationsList,
+} from "@/entities/product/lib/productPickupLocationsFromSavedAddresses";
+import {
   createProductReturnTermRow,
   PRODUCT_RETURN_TERM_KEY_MAX,
   PRODUCT_RETURN_TERM_VALUE_MAX,
@@ -67,7 +72,7 @@ import {
   getCreateProductLaunchSeq,
   peekCreateProductLaunch,
 } from "@/features/create-product/model/productCopyDraftStore";
-import { API_CLIENT_UI, CREATE_PRODUCT_UI } from "@/shared/config";
+import { API_CLIENT_UI, CREATE_PRODUCT_UI, PRODUCT_PICKUP_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { formatRubPriceInput, parseRubPriceInput } from "@/shared/lib/rubPriceInput";
 import { ProductModalShell } from "@/shared/ui/ProductModalShell";
@@ -244,16 +249,35 @@ function validateStep(
     }
     case "pickup": {
       const address = form.productPickupAddress.trim();
-      if (address.length < PRODUCT_PICKUP_ADDRESS_MIN_LENGTH) {
-        return PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE;
+      const points = form.productPickupLocations;
+
+      if (points.length === 0) {
+        // Легаси-путь: точек нет, сервер завернёт одно поле адреса в
+        // единственную точку — значит адрес и координаты обязательны.
+        if (address.length < PRODUCT_PICKUP_ADDRESS_MIN_LENGTH) {
+          return PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE;
+        }
+        const hasLat =
+          form.productPickupLat != null && Number.isFinite(form.productPickupLat);
+        const hasLon =
+          form.productPickupLon != null && Number.isFinite(form.productPickupLon);
+        if (!hasLat || !hasLon) {
+          return CREATE_PRODUCT_UI.ERROR_PICKUP_COORDS;
+        }
+      } else {
+        // Непустой список на сервере перебивает легаси-поля, и проверять его
+        // надо по тем же правилам контракта, что и в вебе.
+        const locationsError = validateProductPickupLocationsList(points);
+        if (locationsError) {
+          return locationsError;
+        }
+        // Адрес, оставшийся в поле и не ставший точкой, при сохранении
+        // потеряется — молча терять то, что продавец набрал, нельзя.
+        if (address.length > 0 && !isPickupAddressAmongLocations(address, points)) {
+          return PRODUCT_PICKUP_UI.ERROR_ADDRESS_NOT_ADDED;
+        }
       }
-      const hasLat =
-        form.productPickupLat != null && Number.isFinite(form.productPickupLat);
-      const hasLon =
-        form.productPickupLon != null && Number.isFinite(form.productPickupLon);
-      if (!hasLat || !hasLon) {
-        return CREATE_PRODUCT_UI.ERROR_PICKUP_COORDS;
-      }
+
       if (form.productPickupEnabled === false && form.productDeliveryEnabled !== true) {
         return PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE;
       }
@@ -485,6 +509,18 @@ export const ProductWizardScreen = ({
       const oldPriceRaw = form.productOldPrice.trim();
       const oldPrice = oldPriceRaw ? parseRubPriceInput(form.productOldPrice) : null;
 
+      // Непустой список точек на сервере перебивает легаси-поля: он собирает
+      // их из основной точки. Шлём то же самое, иначе товар сохранится с
+      // адресом, которого продавец в списке не видел.
+      const legacyPickup =
+        form.productPickupLocations.length > 0
+          ? syncLegacyPickupFieldsFromLocations(form.productPickupLocations)
+          : {
+              productPickupAddress: form.productPickupAddress.trim(),
+              productPickupLat: form.productPickupLat,
+              productPickupLon: form.productPickupLon,
+            };
+
       if (isEdit) {
         await patchMutation.mutateAsync({
           productId,
@@ -498,10 +534,15 @@ export const ProductWizardScreen = ({
             ...(isRuRegionCode(form.productRegionCode.trim())
               ? { productRegionCode: form.productRegionCode.trim() }
               : {}),
-            productPickupLocations: form.productPickupLocations,
-            productPickupAddress: form.productPickupAddress.trim(),
-            productPickupLat: form.productPickupLat,
-            productPickupLon: form.productPickupLon,
+            // Пустой список не шлём: сервер тогда уходит на legacy-слияние
+            // (`mergeLegacyPickupIntoExistingLocations`) и сохраняет точки,
+            // заданные на сайте, вместо того чтобы схлопнуть их в одну.
+            ...(form.productPickupLocations.length > 0
+              ? { productPickupLocations: form.productPickupLocations }
+              : {}),
+            productPickupAddress: legacyPickup.productPickupAddress,
+            productPickupLat: legacyPickup.productPickupLat,
+            productPickupLon: legacyPickup.productPickupLon,
             productPickupEnabled: form.productPickupEnabled !== false,
             productDeliveryEnabled: form.productDeliveryEnabled === true,
             productStockQuantity: Math.floor(Number(form.productStockQuantity)),
@@ -544,9 +585,9 @@ export const ProductWizardScreen = ({
         ...(form.productPickupLocations.length > 0
           ? { productPickupLocations: form.productPickupLocations }
           : {}),
-        productPickupAddress: form.productPickupAddress.trim(),
-        productPickupLat: form.productPickupLat,
-        productPickupLon: form.productPickupLon,
+        productPickupAddress: legacyPickup.productPickupAddress,
+        productPickupLat: legacyPickup.productPickupLat,
+        productPickupLon: legacyPickup.productPickupLon,
         productPickupEnabled: form.productPickupEnabled !== false,
         productDeliveryEnabled: form.productDeliveryEnabled === true,
         productCharacteristics: form.characteristicRows

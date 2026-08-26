@@ -1,4 +1,7 @@
-import { PRODUCT_PICKUP_LOCATIONS_MAX } from "@molha/api-contract";
+import {
+  PRODUCT_PICKUP_LOCATIONS_MAX,
+  PRODUCT_PICKUP_LOCATION_DEFAULT_REQUIRED_MESSAGE,
+} from "@molha/api-contract";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -11,7 +14,9 @@ import {
   manualPickupLocations,
   normalizePickupLocations,
   pickupLocationFromSavedAddress,
+  isPickupAddressAmongLocations,
   pickupLocationsFromSelectedAddresses,
+  validateProductPickupLocationsList,
 } from "../entities/product/lib/productPickupLocationsFromSavedAddresses.ts";
 
 const mobileRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -210,4 +215,87 @@ test("шаг мастера рисует кнопку добавления и у
 
   const copy = readMobileFile("shared/config/appUiCopy.ts");
   assert.ok(copy.includes("REMOVE_LOCATION"), "нет копирайта REMOVE_LOCATION");
+});
+
+test("validateProductPickupLocationsList повторяет правила контракта", () => {
+  // Пустой список не ошибка: обязательное легаси-поле адреса сервер сам
+  // заворачивает в единственную точку.
+  assert.equal(validateProductPickupLocationsList([]), null);
+
+  const ok = [point({ id: "p1", isDefault: true }), point({ id: "p2", address: "г Тула, ул Мира, д 3" })];
+  assert.equal(validateProductPickupLocationsList(ok), null);
+
+  assert.equal(
+    validateProductPickupLocationsList([point({ isDefault: false })]),
+    PRODUCT_PICKUP_LOCATION_DEFAULT_REQUIRED_MESSAGE,
+  );
+  assert.equal(
+    validateProductPickupLocationsList([
+      point({ id: "p1", isDefault: true }),
+      point({ id: "p2", address: "г Тула, ул Мира, д 3", isDefault: true }),
+    ]),
+    PRODUCT_PICKUP_LOCATION_DEFAULT_REQUIRED_MESSAGE,
+  );
+
+  const tooMany = Array.from({ length: PRODUCT_PICKUP_LOCATIONS_MAX + 1 }, (_, index) =>
+    point({ id: `p${index}`, address: `г Тула, ул Мира, д ${index}`, isDefault: index === 0 }),
+  );
+  assert.match(validateProductPickupLocationsList(tooMany), /Не больше/);
+
+  assert.ok(
+    validateProductPickupLocationsList([point({ isDefault: true, address: "дом" })]),
+    "короткий адрес обязан отвергаться",
+  );
+  assert.ok(
+    validateProductPickupLocationsList([point({ isDefault: true, lat: null })]),
+    "точка без координат обязана отвергаться",
+  );
+  assert.match(
+    validateProductPickupLocationsList([
+      point({ id: "p1", isDefault: true }),
+      point({ id: "p2", address: "  Г МОСКВА, УЛ АРБАТ, Д 5  " }),
+    ]),
+    /уже добавлен/,
+  );
+  assert.match(
+    validateProductPickupLocationsList([point({ isDefault: true, label: "я".repeat(31) })]),
+    /Метка не длиннее/,
+  );
+});
+
+test("набранный адрес виден среди точек без оглядки на регистр", () => {
+  const points = [point({ isDefault: true })];
+  assert.equal(isPickupAddressAmongLocations("г Москва, ул Арбат, д 5", points), true);
+  assert.equal(isPickupAddressAmongLocations("  Г МОСКВА, УЛ АРБАТ, Д 5 ", points), true);
+  assert.equal(isPickupAddressAmongLocations("г Тула, ул Мира, д 3", points), false);
+  assert.equal(isPickupAddressAmongLocations("   ", points), false);
+});
+
+test("шаг мастера проверяет список и не теряет набранный адрес", () => {
+  const source = readMobileFile("features/create-product/ui/CreateProductScreen.tsx");
+  assert.ok(
+    source.includes("validateProductPickupLocationsList(points)"),
+    "шаг не проверяет список точек",
+  );
+  assert.ok(
+    source.includes("PRODUCT_PICKUP_UI.ERROR_ADDRESS_NOT_ADDED"),
+    "шаг молча теряет набранный адрес",
+  );
+  // Легаси-поля обязаны собираться из основной точки, иначе сервер сохранит
+  // адрес, которого продавец в списке не видел.
+  assert.ok(
+    source.includes("syncLegacyPickupFieldsFromLocations(form.productPickupLocations)"),
+    "легаси-поля не синхронизируются со списком",
+  );
+  assert.equal(
+    (source.match(/legacyPickup\.productPickupAddress/g) ?? []).length,
+    2,
+    "адрес должен браться из legacyPickup в обеих отправках",
+  );
+  // Пустой список в патче отправлять нельзя: сервер схлопнул бы мультиточки.
+  assert.equal(
+    (source.match(/form\.productPickupLocations\.length > 0/g) ?? []).length,
+    3,
+    "нет guard'ов на пустой список",
+  );
 });
