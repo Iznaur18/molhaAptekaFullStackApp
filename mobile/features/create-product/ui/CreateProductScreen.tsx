@@ -40,6 +40,9 @@ import { useCatalogProductQuery } from "@/entities/product/model/useCatalogProdu
 import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
 import { validateProductName } from "@/entities/product/lib/validateProductName";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
+import { userSavedAddressesFromUser } from "@/entities/address/lib/userSavedAddressesFromUser";
+import type { SavedAddressPickerItem } from "@/entities/address/ui/SavedAddressPicker";
+import type { ProductPickupLocationValue as ProductPickupPoint } from "@/entities/product/lib/productPickupLocationsFromSavedAddresses";
 import {
   createProductReturnTermRow,
   PRODUCT_RETURN_TERM_KEY_MAX,
@@ -155,6 +158,7 @@ type WizardForm = {
   productPickupLat: number | null;
   productPickupLon: number | null;
   productPickupSelectedFromSuggest: boolean;
+  productPickupLocations: ProductPickupPoint[];
   productPickupEnabled: boolean;
   productDeliveryEnabled: boolean;
   productPrice: string;
@@ -183,6 +187,7 @@ const INITIAL_FORM: WizardForm = {
   productRegionCode: "",
   productPickupAddress: "",
   productPickupLat: null,
+  productPickupLocations: [],
   productPickupLon: null,
   productPickupSelectedFromSuggest: false,
   productPickupEnabled: true,
@@ -355,6 +360,11 @@ export const ProductWizardScreen = ({
   const productQuery = useCatalogProductQuery(productId);
   const sessionQuery = useAuthSessionQuery();
   const user = sessionQuery.data?.user ?? null;
+  /** Книга адресов профиля — источник точек самовывоза в шаге «самовывоз». */
+  const savedAddresses = useMemo(
+    () => (user != null ? userSavedAddressesFromUser(user) : []),
+    [user],
+  );
   const initialLaunch = peekCreateProductLaunch();
   const [form, setForm] = useState<WizardForm>(() =>
     initialLaunch?.kind === "copy"
@@ -488,6 +498,7 @@ export const ProductWizardScreen = ({
             ...(isRuRegionCode(form.productRegionCode.trim())
               ? { productRegionCode: form.productRegionCode.trim() }
               : {}),
+            productPickupLocations: form.productPickupLocations,
             productPickupAddress: form.productPickupAddress.trim(),
             productPickupLat: form.productPickupLat,
             productPickupLon: form.productPickupLon,
@@ -528,6 +539,7 @@ export const ProductWizardScreen = ({
         ...(isRuRegionCode(form.productRegionCode.trim())
           ? { productRegionCode: form.productRegionCode.trim() }
           : {}),
+        productPickupLocations: form.productPickupLocations,
         productPickupAddress: form.productPickupAddress.trim(),
         productPickupLat: form.productPickupLat,
         productPickupLon: form.productPickupLon,
@@ -614,7 +626,12 @@ export const ProductWizardScreen = ({
         />
       ) : null}
       {stepId === "pickup" ? (
-        <PickupStep form={form} setForm={setForm} disabled={isSubmitting} />
+        <PickupStep
+          form={form}
+          setForm={setForm}
+          disabled={isSubmitting}
+          savedAddresses={savedAddresses}
+        />
       ) : null}
       {stepId === "commerce" ? (
         <CommerceStep
@@ -1242,14 +1259,21 @@ function PickupStep({
   form,
   setForm,
   disabled,
+  savedAddresses,
 }: {
   form: WizardForm;
   setForm: React.Dispatch<React.SetStateAction<WizardForm>>;
   disabled: boolean;
+  savedAddresses: SavedAddressPickerItem[];
 }) {
   return (
     <View style={{ gap: 16 }}>
       <ProductPickupLocationFields
+        savedAddresses={savedAddresses}
+        pickupLocations={form.productPickupLocations}
+        onPickupLocationsChange={(productPickupLocations) => {
+          setForm((prev) => ({ ...prev, productPickupLocations }));
+        }}
         address={form.productPickupAddress}
         lat={form.productPickupLat}
         lon={form.productPickupLon}

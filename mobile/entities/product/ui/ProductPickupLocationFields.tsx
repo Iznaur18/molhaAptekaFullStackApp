@@ -7,6 +7,15 @@ import {
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
+import {
+  SavedAddressPicker,
+  type SavedAddressPickerItem,
+} from "@/entities/address/ui/SavedAddressPicker";
+import {
+  canUseSavedAddressAsPickupLocation,
+  pickupLocationsFromSelectedAddresses,
+  type ProductPickupLocationValue as PickupPointValue,
+} from "@/entities/product/lib/productPickupLocationsFromSavedAddresses";
 import { PRODUCT_PICKUP_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useFormFieldStyles } from "@/shared/theme/formChromeStyles";
@@ -33,6 +42,10 @@ type ProductPickupLocationFieldsProps = {
   selectedFromSuggest?: boolean;
   addressLineDisplayOnly?: boolean;
   onChange: (next: ProductPickupLocationValue) => void;
+  /** Книга адресов профиля — из неё продавец отмечает точки самовывоза. */
+  savedAddresses?: SavedAddressPickerItem[];
+  pickupLocations?: PickupPointValue[];
+  onPickupLocationsChange?: (next: PickupPointValue[]) => void;
 };
 
 const toAddressValue = (
@@ -58,9 +71,29 @@ export const ProductPickupLocationFields = ({
   selectedFromSuggest = false,
   addressLineDisplayOnly = false,
   onChange,
+  savedAddresses = [],
+  pickupLocations = [],
+  onPickupLocationsChange,
 }: ProductPickupLocationFieldsProps) => {
   const theme = useAppTheme();
   const fieldStyles = useFormFieldStyles();
+
+  const showSavedAddresses =
+    typeof onPickupLocationsChange === "function" && savedAddresses.length > 0;
+  const selectedPointIds = pickupLocations.map((item) => item.id);
+  const defaultPointId = pickupLocations.find((item) => item.isDefault)?.id ?? null;
+
+  const togglePickupPoint = (id: string) => {
+    if (disabled) {
+      return;
+    }
+    const nextIds = selectedPointIds.includes(id)
+      ? selectedPointIds.filter((item) => item !== id)
+      : [...selectedPointIds, id];
+    onPickupLocationsChange?.(
+      pickupLocationsFromSelectedAddresses(savedAddresses, nextIds, defaultPointId),
+    );
+  };
 
   const emit = (patch: Partial<ProductPickupLocationValue>) => {
     onChange({
@@ -98,6 +131,34 @@ export const ProductPickupLocationFields = ({
 
   return (
     <View style={styles.wrap}>
+      {showSavedAddresses ? (
+        <View style={styles.savedBlock}>
+          <SavedAddressPicker
+            addresses={savedAddresses}
+            multiSelect
+            selectedIds={selectedPointIds}
+            onToggle={togglePickupPoint}
+            // Радио-часть в этом режиме не используется.
+            selectedId=""
+            onSelect={() => {}}
+            disabled={disabled}
+            sectionLabel={PRODUCT_PICKUP_UI.SAVED_ADDRESSES_LABEL}
+            isOptionDisabled={(id) => {
+              const item = savedAddresses.find((address) => address.id === id);
+              return !canUseSavedAddressAsPickupLocation(item);
+            }}
+            optionHint={(id) => {
+              const item = savedAddresses.find((address) => address.id === id);
+              if (!canUseSavedAddressAsPickupLocation(item)) {
+                return PRODUCT_PICKUP_UI.LOCATION_NEEDS_COORDS;
+              }
+              return id === defaultPointId ? PRODUCT_PICKUP_UI.LOCATION_DEFAULT : null;
+            }}
+          />
+          <Text style={fieldStyles.hint}>{PRODUCT_PICKUP_UI.PICKUP_MULTI_HINT}</Text>
+        </View>
+      ) : null}
+
       <AddressSuggestInput
         value={toAddressValue(address, lat, lon, selectedFromSuggest)}
         onChange={(next) => {
@@ -227,6 +288,9 @@ function MethodCheckRow({
 const styles = StyleSheet.create({
   wrap: {
     gap: 12,
+  },
+  savedBlock: {
+    gap: 6,
   },
   methods: {
     gap: 8,

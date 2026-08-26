@@ -13,6 +13,8 @@ import {
 import { resolveProductImageUrls } from "@/entities/product/lib/resolveProductImageUrls";
 import { formatRubPriceInput } from "@/shared/lib/rubPriceInput";
 
+import type { ProductPickupLocationValue } from "@/entities/product/lib/productPickupLocationsFromSavedAddresses";
+
 export type CopiedProductWizardForm = {
   productName: string;
   productListingOrigin: ProductListingOrigin | null;
@@ -29,6 +31,7 @@ export type CopiedProductWizardForm = {
   productPickupLat: number | null;
   productPickupLon: number | null;
   productPickupSelectedFromSuggest: boolean;
+  productPickupLocations: ProductPickupLocationValue[];
   productPickupEnabled: boolean;
   productDeliveryEnabled: boolean;
   productPrice: string;
@@ -89,7 +92,9 @@ export const createProductWizardFormFromCopiedProduct = (
     ).trim(),
     productCategory: String(product.productCategory ?? DEFAULT_PRODUCT_CATEGORY),
     productRegionCode: isRuRegionCode(regionRaw) ? regionRaw : "",
-    productPickupAddress: String(product.productPickupAddress ?? "").trim(),
+    // Точки самовывоза не копируются: у копии свой набор адресов продавца.
+  productPickupLocations: [],
+  productPickupAddress: String(product.productPickupAddress ?? "").trim(),
     productPickupLat:
       latRaw != null && Number.isFinite(Number(latRaw)) ? Number(latRaw) : null,
     productPickupLon:

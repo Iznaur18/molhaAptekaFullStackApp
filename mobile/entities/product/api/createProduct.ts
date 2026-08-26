@@ -89,6 +89,11 @@ export const createProduct = async (body: CreateProductBody) => {
     if (parsedBody.productPickupLon != null) {
       payload.productPickupLon = parsedBody.productPickupLon;
     }
+    // Точки самовывоза шлём только когда они заданы: пустой массив контракт
+    // трактует как «точек нет», а не как «не менять».
+    if (Array.isArray(parsedBody.productPickupLocations) && parsedBody.productPickupLocations.length > 0) {
+      payload.productPickupLocations = parsedBody.productPickupLocations;
+    }
     payload.productDeliveryEnabled = parsedBody.productDeliveryEnabled === true;
     payload.productPickupEnabled = parsedBody.productPickupEnabled !== false;
 
