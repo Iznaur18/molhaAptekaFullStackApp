@@ -1,7 +1,6 @@
 import {
   PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
   PRODUCT_PICKUP_ADDRESS_MAX_LENGTH,
-  PRODUCT_PICKUP_LOCATIONS_MAX,
   SHIPPING_PROVIDER_LABEL_RU,
   SHIPPING_PROVIDERS,
 } from "@molha/api-contract";
@@ -20,6 +19,7 @@ import {
   manualPickupLocations,
   normalizePickupLocations,
   pickupLocationsFromSelectedAddresses,
+  pickupLocationsLimit,
   setDefaultPickupLocation,
   type ProductPickupLocationValue as PickupPointValue,
 } from "@/entities/product/lib/productPickupLocationsFromSavedAddresses";
@@ -99,6 +99,9 @@ export const ProductPickupLocationFields = ({
     return geo ? { ...item, geo } : item;
   });
 
+  /** Склад без самовывоза отгружает с одной точки — как в вебе. */
+  const locationsLimit = pickupLocationsLimit(pickupEnabled);
+
   const showSavedAddresses =
     typeof onPickupLocationsChange === "function" && bookAddresses.length > 0;
   const selectedPointIds = pickupLocations.map((item) => item.id);
@@ -108,13 +111,19 @@ export const ProductPickupLocationFields = ({
   const manualPoints = manualPickupLocations(pickupLocations, bookAddresses);
 
   const commitPoints = (nextPoints: PickupPointValue[]) => {
-    onPickupLocationsChange?.(normalizePickupLocations(nextPoints, defaultPointId));
+    onPickupLocationsChange?.(
+      normalizePickupLocations(nextPoints, defaultPointId, locationsLimit),
+    );
   };
 
   const commitToggle = (id: string, addresses: SavedAddressPickerItem[]) => {
     const nextIds = selectedPointIds.includes(id)
       ? selectedPointIds.filter((item) => item !== id)
-      : [...selectedPointIds, id];
+      // При лимите в одну точку выбор не добавляется, а заменяет прежний:
+      // иначе normalizePickupLocations молча срезал бы только что отмеченное.
+      : locationsLimit === 1
+        ? [id]
+        : [...selectedPointIds, id];
     const fromBook = pickupLocationsFromSelectedAddresses(
       addresses,
       nextIds,
@@ -156,7 +165,8 @@ export const ProductPickupLocationFields = ({
   };
 
   const canAddTypedAddress =
-    !disabled && canAddPickupLocationAddress(pickupLocations, address, lat, lon);
+    !disabled &&
+    canAddPickupLocationAddress(pickupLocations, address, lat, lon, locationsLimit);
 
   /** Набранный в поле адрес становится ещё одной точкой — как «добавить» в вебе. */
   const addTypedAddressAsPoint = () => {
@@ -356,9 +366,9 @@ export const ProductPickupLocationFields = ({
             </View>
           ) : null}
 
-          {pickupLocations.length >= PRODUCT_PICKUP_LOCATIONS_MAX ? (
+          {pickupLocations.length >= locationsLimit ? (
             <Text style={fieldStyles.hint}>
-              {PRODUCT_PICKUP_UI.LOCATIONS_MAX(PRODUCT_PICKUP_LOCATIONS_MAX)}
+              {PRODUCT_PICKUP_UI.LOCATIONS_MAX(locationsLimit)}
             </Text>
           ) : null}
         </View>

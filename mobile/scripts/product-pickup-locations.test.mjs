@@ -16,6 +16,7 @@ import {
   pickupLocationFromSavedAddress,
   isPickupAddressAmongLocations,
   pickupLocationsFromSelectedAddresses,
+  pickupLocationsLimit,
   pickupLocationsSummary,
   setDefaultPickupLocation,
   validateProductPickupLocationsList,
@@ -211,7 +212,7 @@ test("шаг мастера рисует кнопку добавления и у
   assert.ok(source.includes("disabled={!canAddTypedAddress}"), "кнопка не блокируется");
   assert.ok(source.includes("removePickupPoint(point.id)"), "нет удаления ручной точки");
   assert.ok(
-    source.includes("PRODUCT_PICKUP_UI.LOCATIONS_MAX(PRODUCT_PICKUP_LOCATIONS_MAX)"),
+    source.includes("PRODUCT_PICKUP_UI.LOCATIONS_MAX(locationsLimit)"),
     "нет подсказки про лимит",
   );
 
@@ -406,4 +407,46 @@ test("адрес книги без координат догеокодирует
 
   const copy = readMobileFile("shared/config/appUiCopy.ts");
   assert.ok(copy.includes("LOCATION_RESOLVING"), "нет копирайта LOCATION_RESOLVING");
+});
+
+test("склад без самовывоза ограничен одной точкой, как в вебе", () => {
+  assert.equal(pickupLocationsLimit(true), PRODUCT_PICKUP_LOCATIONS_MAX);
+  assert.equal(pickupLocationsLimit(false), 1);
+
+  const two = [
+    point({ id: "p1", isDefault: true }),
+    point({ id: "p2", address: "г Тула, ул Мира, д 3" }),
+  ];
+  assert.deepEqual(
+    normalizePickupLocations(two, "p1", pickupLocationsLimit(false)).map((i) => i.id),
+    ["p1"],
+  );
+  assert.deepEqual(
+    normalizePickupLocations(two, "p1", pickupLocationsLimit(true)).map((i) => i.id),
+    ["p1", "p2"],
+  );
+  // Лимит меньше единицы набор не обнуляет.
+  assert.equal(normalizePickupLocations(two, "p1", 0).length, 1);
+
+  // Кнопка «добавить точку» тоже уважает лимит склада.
+  assert.equal(
+    canAddPickupLocationAddress([point()], "г Тула, ул Мира, д 3", 55.7, 37.6, 1),
+    false,
+  );
+  assert.equal(
+    canAddPickupLocationAddress([point()], "г Тула, ул Мира, д 3", 55.7, 37.6, 5),
+    true,
+  );
+
+  const source = readMobileFile("entities/product/ui/ProductPickupLocationFields.tsx");
+  assert.ok(
+    source.includes("pickupLocationsLimit(pickupEnabled)"),
+    "шаг не учитывает режим склада",
+  );
+  // При лимите в одну точку выбор обязан заменять прежний, а не срезаться.
+  assert.ok(source.includes("locationsLimit === 1"), "нет замены выбора при лимите в одну точку");
+  assert.ok(
+    !source.includes("PRODUCT_PICKUP_LOCATIONS_MAX"),
+    "лимит в шаге должен идти только через pickupLocationsLimit",
+  );
 });

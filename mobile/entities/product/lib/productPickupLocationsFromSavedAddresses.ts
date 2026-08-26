@@ -103,8 +103,9 @@ export const pickupLocationsFromSelectedAddresses = (
 export const normalizePickupLocations = (
   points: readonly ProductPickupLocationValue[],
   previousDefaultId?: string | null,
+  limit: number = PRODUCT_PICKUP_LOCATIONS_MAX,
 ): ProductPickupLocationValue[] => {
-  const limited = points.slice(0, PRODUCT_PICKUP_LOCATIONS_MAX);
+  const limited = points.slice(0, Math.max(1, limit));
   if (limited.length === 0) {
     return [];
   }
@@ -136,9 +137,10 @@ export const canAddPickupLocationAddress = (
   address: string,
   lat: number | null | undefined,
   lon: number | null | undefined,
+  limit: number = PRODUCT_PICKUP_LOCATIONS_MAX,
 ): boolean => {
   const line = String(address ?? "").trim();
-  if (line.length === 0 || points.length >= PRODUCT_PICKUP_LOCATIONS_MAX) {
+  if (line.length === 0 || points.length >= limit) {
     return false;
   }
   // `Number(null)` — это 0, поэтому пустые координаты отсекаем до приведения:
@@ -253,3 +255,12 @@ export const pickupLocationsSummary = (
     .join("; ");
   return joined || String(fallbackAddress ?? "").trim();
 };
+
+/**
+ * Сколько точек допустимо. При выключенном самовывозе товар отгружается с
+ * одного склада, и веб (`maxLocations = multiSelectEnabled ? MAX : 1`) даёт
+ * ровно одну точку — мобилка давала пять и позволяла завести данные, которых
+ * на сайте не создать.
+ */
+export const pickupLocationsLimit = (pickupEnabled: boolean): number =>
+  pickupEnabled ? PRODUCT_PICKUP_LOCATIONS_MAX : 1;
