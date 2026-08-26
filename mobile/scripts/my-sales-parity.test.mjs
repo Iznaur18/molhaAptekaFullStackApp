@@ -27,7 +27,21 @@ test("my sales page mirrors web toolbar, search and seller order card", () => {
   assert.match(page, /useDebouncedValue/);
   assert.match(page, /normalizeTotalSalesCount/);
   assert.match(page, /contentPaddingBottom/);
+  assert.match(page, /listInAccountShell/);
+  assert.match(page, /useProfileAdaptiveLayout/);
+  assert.match(page, /listItemFirst/);
+  assert.match(page, /ProfileAccountList/);
   assert.match(page, /compact/);
+
+  const pageStyles = readMobileFile("shared/theme/mySalesPageStyles.ts");
+  assert.match(pageStyles, /MY_SALES_PAGE_LAYOUT/);
+  assert.match(pageStyles, /listInAccountShell/);
+  assert.match(pageStyles, /paddingTop:\s*0/);
+  assert.match(pageStyles, /listItemFirst/);
+
+  const layout = readMobileFile("shared/lib/guestProfileLayout.ts");
+  assert.match(layout, /MY_SALES_PAGE_LAYOUT/);
+  assert.match(layout, /stackGap: 13\.6/);
   assert.match(page, /attentionRole="seller"/);
   assert.match(page, /showBuyer/);
   assert.match(page, /onBuyerNameClick/);

@@ -15,6 +15,7 @@ test("loyalty points page mirrors web balance and purchase panel", () => {
 
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /ProfileMobileNavSheet/);
+  assert.match(page, /ProfileAccountScrollBody/);
   assert.match(page, /contentPaddingBottom/);
   assert.match(page, /formatRubPriceInput/);
   assert.match(page, /parseRubPriceInput/);

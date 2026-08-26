@@ -27,7 +27,20 @@ test("auction page mirrors web toolbar and dashboard rows", () => {
   assert.match(page, /COUNT_FILTERED/);
   assert.match(page, /ListHeaderComponent/);
   assert.match(page, /contentPaddingBottom/);
+  assert.match(page, /listInAccountShell/);
+  assert.match(page, /useProfileAdaptiveLayout/);
+  assert.match(page, /listItemFirst/);
+  assert.match(page, /ProfileAccountList/);
   assert.match(page, /AuctionBuyerBidRow/);
+
+  const pageStyles = readMobileFile("shared/theme/auctionPageStyles.ts");
+  assert.match(pageStyles, /AUCTION_PAGE_LAYOUT/);
+  assert.match(pageStyles, /listInAccountShell/);
+  assert.match(pageStyles, /paddingTop:\s*0/);
+
+  const layout = readMobileFile("shared/lib/guestProfileLayout.ts");
+  assert.match(layout, /AUCTION_PAGE_LAYOUT/);
+
   assert.match(page, /AuctionSellerOfferRow/);
   assert.match(page, /ATTENTION_FILTER_HINT/);
   assert.doesNotMatch(page, /sellerFlowStyles/);

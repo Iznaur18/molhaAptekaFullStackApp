@@ -1,16 +1,11 @@
 import { StyleSheet } from "react-native";
 
+import { MY_SALES_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const TOOLBAR_PADDING_VERTICAL = 12;
-const TOOLBAR_PADDING_HORIZONTAL = 12;
-const TOOLBAR_RADIUS = 16;
-const TOOLBAR_GAP = 8;
-const CHIP_GAP = 6;
 const CHIP_PADDING_VERTICAL = 4;
 const CHIP_PADDING_HORIZONTAL = 8;
-const LIST_GAP = 4;
 const OVERVIEW_TILE_RADIUS = 16;
 const SEARCH_RADIUS = 12;
 
@@ -26,25 +21,34 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
   },
   list: {
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    gap: LIST_GAP,
     flexGrow: 1,
+  },
+  /** Desktop hub: shell уже даёт pad; gutter 0 как web `.my-sales-page`. */
+  listInAccountShell: {
+    paddingHorizontal: 0,
   },
   orderCardInList: {
     marginBottom: 0,
   },
+  /** web `.my-sales-page { gap: 0.85rem }` между toolbar / overview / list. */
   header: {
-    gap: 13.6,
-    paddingTop: 12,
-    paddingBottom: 12,
+    gap: L.stackGap,
+    paddingTop: 0,
+    paddingBottom: 0,
+  },
+  listItemFirst: {
+    marginTop: L.stackGap,
+  },
+  listItem: {
+    marginTop: L.listGap,
   },
   toolbar: {
-    gap: TOOLBAR_GAP,
-    paddingVertical: TOOLBAR_PADDING_VERTICAL,
-    paddingHorizontal: TOOLBAR_PADDING_HORIZONTAL,
-    borderRadius: TOOLBAR_RADIUS,
+    gap: L.toolbarGap,
+    padding: L.toolbarPadding,
+    borderRadius: L.toolbarRadius,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surfaceMuted,
+    backgroundColor: theme.colors.surface,
   },
   toolbarHead: {
     flexDirection: "row",
@@ -73,7 +77,7 @@ export const useMySalesPageStyles = createThemedStyles((theme) => ({
     color: theme.colors.textMuted,
   },
   statusChips: {
-    gap: CHIP_GAP,
+    gap: 6,
     paddingVertical: 2.4,
   },
   statusChip: {

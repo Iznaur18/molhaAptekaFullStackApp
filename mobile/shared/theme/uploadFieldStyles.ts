@@ -84,6 +84,11 @@ export const useProductPhotoGridStyles = createThemedStyles((theme) => ({
   wrap: {
     gap: theme.spacing[2],
   },
+  widthProbe: {
+    width: "100%",
+    height: 0,
+    overflow: "hidden",
+  },
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",

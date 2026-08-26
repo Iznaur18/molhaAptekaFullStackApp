@@ -1,16 +1,12 @@
 import { StyleSheet } from "react-native";
 
+import { ADMIN_ORDERS_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const TOOLBAR_PADDING_VERTICAL = 10.4;
-const TOOLBAR_PADDING_HORIZONTAL = 12;
-const TOOLBAR_RADIUS = 10.4;
-const TOOLBAR_GAP = 8;
 const CHIP_GAP = 5.6;
 const CHIP_PADDING_VERTICAL = 3.5;
 const CHIP_PADDING_HORIZONTAL = 8.8;
-const LIST_GAP = 12;
 
 export const useAdminOrdersPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -24,19 +20,27 @@ export const useAdminOrdersPageStyles = createThemedStyles((theme) => ({
   },
   list: {
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    gap: LIST_GAP,
     flexGrow: 1,
   },
+  listInAccountShell: {
+    paddingHorizontal: 0,
+  },
   header: {
-    gap: 13.6,
-    paddingTop: 12,
-    paddingBottom: 12,
+    gap: L.stackGap,
+    paddingTop: 0,
+    paddingBottom: 0,
+  },
+  listItemFirst: {
+    marginTop: L.stackGap,
+  },
+  listItem: {
+    marginTop: L.listGap,
   },
   toolbar: {
-    gap: TOOLBAR_GAP,
-    paddingVertical: TOOLBAR_PADDING_VERTICAL,
-    paddingHorizontal: TOOLBAR_PADDING_HORIZONTAL,
-    borderRadius: TOOLBAR_RADIUS,
+    gap: L.toolbarGap,
+    paddingVertical: L.toolbarPadding,
+    paddingHorizontal: L.toolbarPaddingHorizontal,
+    borderRadius: L.toolbarRadius,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: "rgba(31, 111, 235, 0.28)",
     backgroundColor: theme.colors.actionSoft,

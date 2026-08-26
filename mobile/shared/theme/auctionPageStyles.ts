@@ -1,18 +1,13 @@
 import { StyleSheet } from "react-native";
 
+import { AUCTION_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-const TOOLBAR_PADDING_VERTICAL = 12;
-const TOOLBAR_PADDING_HORIZONTAL = 12;
-const TOOLBAR_RADIUS = 16;
-const TOOLBAR_GAP = 8;
-const LIST_GAP = 4;
 const SECTION_GAP = 4;
 const ROW_GAP = 8;
 const ROW_PADDING = 8;
 const ROW_RADIUS = 20;
-const VIEW_CHIP_GAP = 6;
 const VIEW_CHIP_PADDING_VERTICAL = 4;
 const VIEW_CHIP_PADDING_HORIZONTAL = 8;
 const OVERVIEW_TILE_RADIUS = 16;
@@ -31,19 +26,28 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
   },
   list: {
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    gap: LIST_GAP,
     flexGrow: 1,
   },
+  /** Desktop hub: shell уже даёт pad; gutter 0 как web `.auction-page`. */
+  listInAccountShell: {
+    paddingHorizontal: 0,
+  },
+  /** web `.auction-page { gap: 0.85rem }` между toolbar / overview / list. */
   header: {
-    gap: 13.6,
-    paddingTop: 12,
-    paddingBottom: 12,
+    gap: L.stackGap,
+    paddingTop: 0,
+    paddingBottom: 0,
+  },
+  listItemFirst: {
+    marginTop: L.stackGap,
+  },
+  listItem: {
+    marginTop: L.listGap,
   },
   toolbar: {
-    gap: TOOLBAR_GAP,
-    paddingVertical: TOOLBAR_PADDING_VERTICAL,
-    paddingHorizontal: TOOLBAR_PADDING_HORIZONTAL,
-    borderRadius: TOOLBAR_RADIUS,
+    gap: L.toolbarGap,
+    padding: L.toolbarPadding,
+    borderRadius: L.toolbarRadius,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surfaceMuted,
@@ -130,7 +134,7 @@ export const useAuctionPageStyles = createThemedStyles((theme) => ({
   viewChips: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: VIEW_CHIP_GAP,
+    gap: 6,
     paddingVertical: 2.4,
   },
   viewChip: {

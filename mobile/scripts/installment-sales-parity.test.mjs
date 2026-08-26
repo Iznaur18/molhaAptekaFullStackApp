@@ -21,12 +21,20 @@ test("installment sales page mirrors web toolbar and compact seller contract car
   assert.match(page, /SALES_PAGE_TITLE/);
   assert.match(page, /ListHeaderComponent/);
   assert.match(page, /contentPaddingBottom/);
+  assert.match(page, /useProfileAdaptiveLayout/);
+  assert.match(page, /listInAccountShell/);
+  assert.match(page, /listItemFirst/);
+  assert.match(page, /ProfileAccountList/);
   assert.match(page, /role="seller"/);
   assert.match(page, /compact/);
   assert.match(page, /onCounterpartyClick/);
   assert.match(page, /onProductClick/);
   assert.match(page, /installment-sales/);
   assert.doesNotMatch(page, /useOrdersScreenStyles/);
+
+  const pageStyles = readMobileFile("shared/theme/installmentPaymentsPageStyles.ts");
+  assert.match(pageStyles, /INSTALLMENT_PAGE_LAYOUT/);
+  assert.match(pageStyles, /listInAccountShell/);
 });
 
 test("installment sales page ui copy matches web sales toolbar", () => {

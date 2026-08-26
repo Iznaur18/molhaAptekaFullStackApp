@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 
+import { MY_SALES_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
@@ -17,7 +18,11 @@ export const useInstallmentDisputesPageStyles = createThemedStyles((theme) => ({
   scroll: {
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     paddingTop: 12,
-    gap: 12,
+    gap: L.stackGap,
+  },
+  scrollInAccountShell: {
+    paddingHorizontal: 0,
+    paddingTop: 0,
   },
   header: {
     gap: 13.6,

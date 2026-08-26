@@ -15,6 +15,9 @@ export const useProductModerationPageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     paddingTop: 12,
   },
+  listInAccountShell: {
+    paddingHorizontal: 0,
+  },
   header: {
     marginBottom: 4,
     alignSelf: "stretch",

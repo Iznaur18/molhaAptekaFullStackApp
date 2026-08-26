@@ -49,7 +49,7 @@ export const ProductReturnTermsEditor = ({
             styles.charRow,
             {
               borderColor: `${theme.colors.border}cc`,
-              backgroundColor: theme.colors.surfaceElevated,
+              backgroundColor: theme.colors.surfaceMuted,
             },
           ]}
         >
@@ -59,7 +59,7 @@ export const ProductReturnTermsEditor = ({
               {
                 color: theme.colors.text,
                 backgroundColor: theme.colors.surface,
-                borderColor: theme.colors.border,
+                borderColor: `${theme.colors.border}d9`,
               },
             ]}
             value={row.key}
@@ -76,7 +76,7 @@ export const ProductReturnTermsEditor = ({
               {
                 color: theme.colors.text,
                 backgroundColor: theme.colors.surface,
-                borderColor: theme.colors.border,
+                borderColor: `${theme.colors.border}d9`,
               },
             ]}
             value={row.value}
@@ -87,7 +87,13 @@ export const ProductReturnTermsEditor = ({
             maxLength={PRODUCT_RETURN_TERM_VALUE_MAX}
           />
           <Pressable
-            style={[styles.charRemoveBtn, { borderColor: theme.colors.border }]}
+            style={[
+              styles.charRemoveBtn,
+              {
+                borderColor: `${theme.colors.border}d9`,
+                backgroundColor: theme.colors.surface,
+              },
+            ]}
             onPress={() => removeRow(row.id)}
             disabled={disabled}
             accessibilityLabel="Удалить условие возврата"

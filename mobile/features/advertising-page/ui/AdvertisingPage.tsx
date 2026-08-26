@@ -2,7 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { useMyIntroAdCampaignQuery } from "@/entities/intro-ad/model/useMyIntroAdCampaignQuery";
 import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
@@ -11,6 +11,8 @@ import { IntroAdAdvertisingSection } from "@/features/advertising-page/ui/IntroA
 import { PersonalCategoryAdvertisingSection } from "@/features/advertising-page/ui/PersonalCategoryAdvertisingSection";
 import { RaffleAdvertisingSection } from "@/features/advertising-page/ui/RaffleAdvertisingSection";
 import { SiteHeaderBannerAdvertisingSection } from "@/features/advertising-page/ui/SiteHeaderBannerAdvertisingSection";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountScrollBody } from "@/features/profile-tab/ui/ProfileAccountScrollBody";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import {
@@ -20,6 +22,7 @@ import {
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { pluralizeRuBall } from "@/shared/lib/pluralizeRuBall";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useAdvertisingPageStyles } from "@/shared/theme/advertisingPageStyles";
@@ -29,7 +32,9 @@ export const AdvertisingPage = () => {
   const router = useRouter();
   const theme = useAppTheme();
   const styles = useAdvertisingPageStyles();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
   const isAuthorized = useIsAuthorized();
   const loyaltyQuery = useMyLoyaltyPointsStatusQuery(isAuthorized);
   const campaignQuery = useMyIntroAdCampaignQuery(isAuthorized);
@@ -72,12 +77,13 @@ export const AdvertisingPage = () => {
 
   return (
     <>
-      <ScrollView
-        style={[styles.container, centeredContentStyle]}
+      <ProfileAccountScrollBody
+        style={[styles.container, scrollEnabled ? centeredContentStyle : null]}
         contentContainerStyle={[
           styles.scroll,
           styles.content,
-          { paddingBottom: contentPaddingBottom },
+          !isDrawerLayout ? styles.contentInAccountShell : null,
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
         ]}
         accessibilityLabel={INTRO_AD_PAGE_UI.PAGE_ARIA}
       >
@@ -117,13 +123,13 @@ export const AdvertisingPage = () => {
             <RaffleAdvertisingSection loyaltyBalance={loyaltyBalance} />
           </View>
         </View>
-      </ScrollView>
+      </ProfileAccountScrollBody>
 
       <ProfileMobileNavSheet
         visible={navSheetVisible}
         activeSectionId="advertising"
         onClose={() => setNavSheetVisible(false)}
-        onOverviewPress={() => router.replace("/(tabs)/profile")}
+        onOverviewPress={() => router.replace("/(tabs)/me")}
       />
     </>
   );

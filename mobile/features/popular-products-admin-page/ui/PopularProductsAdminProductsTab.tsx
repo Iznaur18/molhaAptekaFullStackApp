@@ -1,12 +1,15 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, type ReactNode } from "react";
-import { Alert, FlatList, Pressable, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, Text, TextInput, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { RuRegionSelect } from "@/entities/region/ui/RuRegionSelect";
 import { CuratedProductListAdminCard } from "@/features/popular-products-admin-page/ui/CuratedProductListAdminCard";
 import { usePopularProductsAdminPage } from "@/features/popular-products-admin-page/model/usePopularProductsAdminPage";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountList } from "@/features/profile-tab/ui/ProfileAccountList";
 import { POPULAR_PRODUCTS_ADMIN_PAGE_UI } from "@/shared/config";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAdminPanelStyles } from "@/shared/theme/adminPanelStyles";
 import { AdminPanelShell } from "@/shared/ui/AdminPanelShell";
@@ -20,7 +23,9 @@ export const PopularProductsAdminProductsTab = ({
   topSlot,
 }: PopularProductsAdminProductsTabProps) => {
   const styles = useAdminPanelStyles();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
 
   const {
     lists,
@@ -54,6 +59,12 @@ export const PopularProductsAdminProductsTab = ({
       void refetchLists();
     }, [refetchLists]),
   );
+
+  const pageListStyle = [
+    styles.pageContainer,
+    styles.pageList,
+    !isDrawerLayout ? styles.pageListInAccountShell : null,
+  ];
 
   const confirmDeleteList = (listId: string) => {
     Alert.alert(
@@ -131,7 +142,7 @@ export const PopularProductsAdminProductsTab = ({
 
   if (phase === "loading" && lists.length === 0) {
     return (
-      <View style={[styles.pageContainer, centeredContentStyle, styles.pageList]}>
+      <View style={[...pageListStyle, centeredContentStyle]}>
         <AdminPanelShell {...shellProps} count={0} isLoading error={displayError}>
           {null}
         </AdminPanelShell>
@@ -141,7 +152,7 @@ export const PopularProductsAdminProductsTab = ({
 
   if (phase === "error" && lists.length === 0) {
     return (
-      <View style={[styles.pageContainer, centeredContentStyle, styles.pageList]}>
+      <View style={[...pageListStyle, centeredContentStyle]}>
         <AdminPanelShell {...shellProps} count={0} isLoading={false} error={displayError}>
           <ScreenErrorState message={queryError} onRetry={() => void reloadLists()} />
         </AdminPanelShell>
@@ -150,11 +161,14 @@ export const PopularProductsAdminProductsTab = ({
   }
 
   return (
-    <FlatList
-      style={[styles.pageContainer, styles.pageList, centeredContentStyle]}
-      contentContainerStyle={{ paddingBottom: contentPaddingBottom, gap: 8 }}
+    <ProfileAccountList
       data={filteredLists}
       keyExtractor={(item) => `${item._id}-${item.updatedAt ?? ""}-${item.productIds.length}`}
+      style={[...pageListStyle, scrollEnabled ? centeredContentStyle : null]}
+      contentContainerStyle={{
+        paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom,
+        gap: 8,
+      }}
       refreshControl={
         <ThemedRefreshControl refreshing={isRefreshing} onRefresh={() => void reloadLists()} />
       }

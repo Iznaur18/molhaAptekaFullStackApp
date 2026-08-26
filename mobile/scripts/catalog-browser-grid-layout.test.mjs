@@ -62,4 +62,11 @@ test("useProductGridLayout accounts for web viewport client width", () => {
 
   assert.match(source, /resolveViewportLayoutWidth/);
   assert.match(source, /resolveGridTileWidth/);
+  assert.match(source, /reservedLeadingWidth/);
+});
+
+test("profile hub reserves sidebar width for product grids", () => {
+  const layout = readRepoFile("mobile/shared/lib/guestProfileLayout.ts");
+  assert.match(layout, /resolveProfileHubMainReservedWidth/);
+  assert.match(layout, /MY_PROFILE_SIDEBAR_WIDTH \+ MY_PROFILE_LAYOUT_GAP/);
 });

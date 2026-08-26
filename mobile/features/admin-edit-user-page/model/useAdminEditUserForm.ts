@@ -144,7 +144,7 @@ export const useAdminEditUserForm = ({ userId, currentUserId }: UseAdminEditUser
 
   useEffect(() => {
     if (!canAccess && !profileQuery.isPending) {
-      router.replace(userId ? `/user/${userId}` : "/(tabs)/profile");
+      router.replace(userId ? `/user/${userId}` : "/(tabs)/me");
     }
   }, [canAccess, profileQuery.isPending, router, userId]);
 

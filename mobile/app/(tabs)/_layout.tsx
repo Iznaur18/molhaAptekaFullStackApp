@@ -100,7 +100,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="me"
         options={{
           title: MY_PROFILE_PAGE_UI.TAB_TITLE,
           headerShown: false,

@@ -78,7 +78,7 @@ export const useHomeCatalogHeaderStyles = createThemedStyles((theme) => ({
     shadowRadius: 0,
     elevation: 0,
     ...(Platform.OS === "web"
-      ? ({ boxShadow: "none", outlineStyle: "none" } as ViewStyle)
+      ? ({ boxShadow: "none", outlineStyle: "none" } as unknown as ViewStyle)
       : null),
   },
   /** Glass fill под pill — дублируем radius (RN web absoluteFill иначе квадрат). */

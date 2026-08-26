@@ -22,6 +22,9 @@ import {
 } from "@/shared/theme/uploadFieldStyles";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 
+/** Web ScrollView: появление/исчезновение scrollbar даёт ±12–17px и бесконечный onLayout. */
+const SCROLLBAR_WIDTH_OSCILLATION_MAX_PX = 20;
+
 type ProductPhotoGridProps = {
   urls: string[];
   onChange: (urls: string[]) => void;
@@ -55,11 +58,25 @@ export const ProductPhotoGrid = ({
   const tileDimensions =
     tileSize > 0 ? { width: tileSize, height: tileHeight } : { width: 0, height: 0 };
 
-  const handleGridLayout = useCallback((event: LayoutChangeEvent) => {
+  const handleWidthProbeLayout = useCallback((event: LayoutChangeEvent) => {
     const nextWidth = Math.floor(event.nativeEvent.layout.width);
-    if (nextWidth > 0) {
-      setGridWidth((current) => (current === nextWidth ? current : nextWidth));
+    if (nextWidth <= 0) {
+      return;
     }
+    setGridWidth((current) => {
+      if (current === nextWidth) {
+        return current;
+      }
+      // Игнор мелкого сжатия: scrollbar появился → height вырос → width чуть упал → цикл.
+      if (
+        current > 0 &&
+        nextWidth < current &&
+        current - nextWidth <= SCROLLBAR_WIDTH_OSCILLATION_MAX_PX
+      ) {
+        return current;
+      }
+      return nextWidth;
+    });
   }, []);
 
   const handleAdd = async () => {
@@ -107,41 +124,50 @@ export const ProductPhotoGrid = ({
 
   return (
     <View style={styles.wrap}>
-      <View style={styles.grid} onLayout={handleGridLayout}>
-        {urls.map((url, index) => (
-          <Pressable
-            key={`${url}-${index}`}
-            style={[styles.tile, tileDimensions]}
-            onPress={() => makeCover(index)}
-            disabled={disabled || index === 0}
-          >
-            <CachedProductImage
-              uri={resolveUploadedMediaUrl(url)}
-              style={styles.tileImage}
-              contentFit="cover"
-            />
-            {index === 0 ? (
-              <View style={styles.coverBadge}>
-                <Text style={styles.coverBadgeText}>{IMAGE_UPLOAD_UI.COVER_BADGE}</Text>
-              </View>
-            ) : null}
-            <Pressable
-              style={styles.removeBadge}
-              hitSlop={8}
-              onPress={() => removeAt(index)}
-              disabled={disabled}
-              accessibilityLabel={IMAGE_UPLOAD_UI.REMOVE_PHOTO}
-            >
-              <Text style={styles.removeBadgeText}>✕</Text>
-            </Pressable>
-          </Pressable>
-        ))}
+      {/* Ширину меряем пустым зондом, не сеткой: появление тайлов не дёргает layout. */}
+      <View style={styles.widthProbe} onLayout={handleWidthProbeLayout} />
+      <View style={styles.grid}>
+        {tileSize > 0
+          ? urls.map((url, index) => (
+              <Pressable
+                key={url}
+                style={[styles.tile, tileDimensions]}
+                onPress={() => makeCover(index)}
+                disabled={disabled || index === 0}
+              >
+                <CachedProductImage
+                  uri={resolveUploadedMediaUrl(url)}
+                  style={styles.tileImage}
+                  contentFit="cover"
+                />
+                {index === 0 ? (
+                  <View style={styles.coverBadge}>
+                    <Text style={styles.coverBadgeText}>{IMAGE_UPLOAD_UI.COVER_BADGE}</Text>
+                  </View>
+                ) : null}
+                <Pressable
+                  style={styles.removeBadge}
+                  hitSlop={8}
+                  onPress={() => removeAt(index)}
+                  disabled={disabled}
+                  accessibilityLabel={IMAGE_UPLOAD_UI.REMOVE_PHOTO}
+                >
+                  <Text style={styles.removeBadgeText}>✕</Text>
+                </Pressable>
+              </Pressable>
+            ))
+          : null}
 
-        {Array.from({ length: uploadingCount }).map((_, i) => (
-          <View key={`uploading-${i}`} style={[styles.tile, styles.uploadingTile, tileDimensions]}>
-            <ActivityIndicator color={theme.colors.action} />
-          </View>
-        ))}
+        {tileSize > 0
+          ? Array.from({ length: uploadingCount }).map((_, i) => (
+              <View
+                key={`uploading-${i}`}
+                style={[styles.tile, styles.uploadingTile, tileDimensions]}
+              >
+                <ActivityIndicator color={theme.colors.action} />
+              </View>
+            ))
+          : null}
 
         {urls.length + uploadingCount < maxCount && tileSize > 0 ? (
           <Pressable

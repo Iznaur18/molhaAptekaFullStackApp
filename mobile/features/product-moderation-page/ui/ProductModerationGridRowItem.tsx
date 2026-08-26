@@ -6,11 +6,13 @@ import type { ProductModerationActions } from "@/entities/product/ui/ProductMode
 import type { CatalogGridRow } from "@/features/catalog-grid/lib/buildCatalogGridRows";
 import { catalogGridRowStyles } from "@/features/catalog-grid/lib/catalogGridLayout";
 import { CatalogGridRowEnteringShell } from "@/features/catalog-grid/ui/CatalogGridRowEnteringShell";
+import { resolveFlexGridItemWidthStyle } from "@/shared/lib/resolveFlexGridItemWidth";
 
 type ProductModerationGridRowItemProps = {
   row: CatalogGridRow;
   columns: number;
   gap: number;
+  contentWidth: number;
   tileWidth: number;
   rowIndex?: number;
   rejectComments: Record<string, string>;
@@ -26,7 +28,10 @@ type ProductModerationGridRowItemProps = {
 const buildModerationActions = (
   productId: string,
   product: ModerationProduct,
-  props: Omit<ProductModerationGridRowItemProps, "row" | "columns" | "gap" | "tileWidth">,
+  props: Omit<
+    ProductModerationGridRowItemProps,
+    "row" | "columns" | "gap" | "contentWidth" | "tileWidth"
+  >,
 ): ProductModerationActions => ({
   rejectComment: props.rejectComments[productId] ?? "",
   onRejectCommentChange: (value) => props.onRejectCommentChange(productId, value),
@@ -43,6 +48,7 @@ export const ProductModerationGridRowItem = ({
   row,
   columns,
   gap,
+  contentWidth,
   tileWidth,
   rowIndex = 0,
   ...actionProps
@@ -51,30 +57,35 @@ export const ProductModerationGridRowItem = ({
     return null;
   }
 
+  const cellWidthStyle =
+    columns <= 1
+      ? { width: "100%" as const, minWidth: 0 }
+      : resolveFlexGridItemWidthStyle({ contentWidth, columns, gap });
+
   return (
     <CatalogGridRowEnteringShell rowIndex={rowIndex}>
-      <View style={[catalogGridRowStyles.row, { gap }]}>
-      {row.products.map((product) => {
-        const productId = String(product._id);
+      <View style={[catalogGridRowStyles.row, { gap, width: "100%", alignSelf: "stretch" }]}>
+        {row.products.map((product) => {
+          const productId = String(product._id);
 
-        return (
-          <View key={productId} style={{ width: tileWidth }}>
-            <ProductModerationQueueCard
-              product={product as ModerationProduct}
-              moderationActions={buildModerationActions(
-                productId,
-                product as ModerationProduct,
-                actionProps,
-              )}
-            />
-          </View>
-        );
-      })}
-      {row.products.length < columns
-        ? Array.from({ length: columns - row.products.length }, (_, index) => (
-            <View key={`product-moderation-grid-pad-${index}`} style={{ width: tileWidth }} />
-          ))
-        : null}
+          return (
+            <View key={productId} style={cellWidthStyle}>
+              <ProductModerationQueueCard
+                product={product as ModerationProduct}
+                moderationActions={buildModerationActions(
+                  productId,
+                  product as ModerationProduct,
+                  actionProps,
+                )}
+              />
+            </View>
+          );
+        })}
+        {columns > 1 && row.products.length < columns
+          ? Array.from({ length: columns - row.products.length }, (_, index) => (
+              <View key={`product-moderation-grid-pad-${index}`} style={{ width: tileWidth }} />
+            ))
+          : null}
       </View>
     </CatalogGridRowEnteringShell>
   );

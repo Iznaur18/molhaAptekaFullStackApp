@@ -34,9 +34,11 @@ const STATIC_PATH_ROUTES: Record<string, string> = {
   "/basket": "/(tabs)/cart",
   "/cart": "/(tabs)/cart",
 
-  // Профиль
-  "/me": "/(tabs)/profile",
-  "/my-profile": "/(tabs)/profile",
+  // Профиль (публичный URL как web `/me`; легаси `/profile` → тот же экран)
+  "/me": "/(tabs)/me",
+  "/my-profile": "/(tabs)/me",
+  "/profile": "/(tabs)/me",
+  "/profile/edit": "/profile/edit",
   "/profile/edit-profile": "/profile/edit",
 
   // Торговля

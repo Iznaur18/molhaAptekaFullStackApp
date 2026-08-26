@@ -49,7 +49,7 @@ export default function EditProfileScreen() {
     <EditProfileForm
       user={user}
       focusAddress={focusAddress}
-      onSaved={() => router.replace("/(tabs)/profile")}
+      onSaved={() => router.replace("/(tabs)/me")}
     />
   );
 }

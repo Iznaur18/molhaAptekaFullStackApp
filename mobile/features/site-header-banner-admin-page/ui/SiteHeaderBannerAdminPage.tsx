@@ -14,6 +14,8 @@ import {
 } from "@/entities/site-header-banner/lib/resolvePreviewSiteHeaderBannerSlidesFromForm";
 import { SiteHeaderBannerCarousel } from "@/entities/site-header-banner/ui/SiteHeaderBannerCarousel";
 import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountScrollBody } from "@/features/profile-tab/ui/ProfileAccountScrollBody";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import {
@@ -26,6 +28,7 @@ import { SiteHeaderBannerManageToggleAdminSection } from "@/features/site-header
 import { SiteHeaderBannerAdminTabBar } from "@/features/site-header-banner-admin-page/ui/SiteHeaderBannerAdminTabBar";
 import { useSiteHeaderBannerAdminPage } from "@/features/site-header-banner-admin-page/model/useSiteHeaderBannerAdminPage";
 import { MY_PROFILE_PAGE_UI, SITE_HEADER_BANNER_ADMIN_PAGE_UI } from "@/shared/config";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useSiteHeaderBannerAdminPageStyles } from "@/shared/theme/siteHeaderBannerAdminPageStyles";
 import { ScreenErrorState } from "@/shared/ui/ScreenStates";
@@ -55,7 +58,9 @@ const resolveNextSelectedSlideId = (
 export const SiteHeaderBannerAdminPage = () => {
   const router = useRouter();
   const styles = useSiteHeaderBannerAdminPageStyles();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [activeTab, setActiveTab] = useState<SiteHeaderBannerAdminTabId>(
     SITE_HEADER_BANNER_ADMIN_TAB_SLIDES,
@@ -96,6 +101,14 @@ export const SiteHeaderBannerAdminPage = () => {
     [form],
   );
 
+  const scrollBodyStyle = [styles.container, scrollEnabled ? centeredContentStyle : null];
+  const scrollContentStyle = [
+    styles.scroll,
+    styles.content,
+    !isDrawerLayout ? styles.contentInAccountShell : null,
+    { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
+  ];
+
   const selectedSlide = form.items.find((item) => item.id === selectedSlideId) ?? null;
   const selectedSlideIndex = selectedSlide
     ? form.items.findIndex((item) => item.id === selectedSlide.id)
@@ -123,7 +136,7 @@ export const SiteHeaderBannerAdminPage = () => {
       visible={navSheetVisible}
       activeSectionId="site-header-banner-admin"
       onClose={() => setNavSheetVisible(false)}
-      onOverviewPress={() => router.replace("/(tabs)/profile")}
+      onOverviewPress={() => router.replace("/(tabs)/me")}
     />
   );
 
@@ -406,13 +419,10 @@ export const SiteHeaderBannerAdminPage = () => {
   if (phase === "loading") {
     return (
       <>
-        <ScrollView
-          style={[styles.container, centeredContentStyle]}
-          contentContainerStyle={[styles.scroll, styles.content, { paddingBottom: contentPaddingBottom }]}
-        >
+        <ProfileAccountScrollBody style={scrollBodyStyle} contentContainerStyle={scrollContentStyle}>
           {pageHeader}
           <Text style={styles.status}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LOADING}</Text>
-        </ScrollView>
+        </ProfileAccountScrollBody>
         {navSheet}
       </>
     );
@@ -421,13 +431,10 @@ export const SiteHeaderBannerAdminPage = () => {
   if (phase === "error") {
     return (
       <>
-        <ScrollView
-          style={[styles.container, centeredContentStyle]}
-          contentContainerStyle={[styles.scroll, styles.content, { paddingBottom: contentPaddingBottom }]}
-        >
+        <ProfileAccountScrollBody style={scrollBodyStyle} contentContainerStyle={scrollContentStyle}>
           {pageHeader}
           <ScreenErrorState message={queryError} onRetry={() => void reloadSettings()} />
-        </ScrollView>
+        </ProfileAccountScrollBody>
         {navSheet}
       </>
     );
@@ -435,10 +442,7 @@ export const SiteHeaderBannerAdminPage = () => {
 
   return (
     <>
-      <ScrollView
-        style={[styles.container, centeredContentStyle]}
-        contentContainerStyle={[styles.scroll, styles.content, { paddingBottom: contentPaddingBottom }]}
-      >
+      <ProfileAccountScrollBody style={scrollBodyStyle} contentContainerStyle={scrollContentStyle}>
         {pageHeader}
 
         {saveNotice ? (
@@ -448,7 +452,7 @@ export const SiteHeaderBannerAdminPage = () => {
         ) : null}
 
         {renderFormBody()}
-      </ScrollView>
+      </ProfileAccountScrollBody>
       {navSheet}
     </>
   );

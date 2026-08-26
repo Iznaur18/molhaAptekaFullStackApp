@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { z } from "zod";
-import { Alert, FlatList, Pressable, Text, View } from "react-native";
+import { Alert, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
@@ -23,6 +23,8 @@ import { OrderCard } from "@/entities/order/ui/OrderCard";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { MyOrdersPageOverview } from "@/features/my-orders-page/ui/MyOrdersPageOverview";
 import { MyOrdersPageToolbar } from "@/features/my-orders-page/ui/MyOrdersPageToolbar";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountList } from "@/features/profile-tab/ui/ProfileAccountList";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { orderQueryKeys } from "@/shared/api";
@@ -35,6 +37,7 @@ import {
   PRODUCT_REPORT_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useMyOrdersPageStyles } from "@/shared/theme/myOrdersPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
@@ -46,7 +49,9 @@ const EMPTY_ORDERS: OrderRecord[] = [];
 export const MyOrdersPage = () => {
   const router = useRouter();
   const styles = useMyOrdersPageStyles();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
   const queryClient = useQueryClient();
   const isAuthorized = useIsAuthorized();
   const ordersQuery = useMyOrdersQuery();
@@ -330,11 +335,19 @@ export const MyOrdersPage = () => {
 
   return (
     <>
-      <FlatList
-        style={[styles.container, styles.listFlex, centeredContentStyle]}
+      <ProfileAccountList
         data={filteredBlocks}
         keyExtractor={(block) => block.blockKey}
-        contentContainerStyle={[styles.list, { paddingBottom: contentPaddingBottom }]}
+        style={[
+          styles.container,
+          scrollEnabled ? styles.listFlex : null,
+          scrollEnabled ? centeredContentStyle : null,
+        ]}
+        contentContainerStyle={[
+          styles.list,
+          !isDrawerLayout ? styles.listInAccountShell : null,
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
+        ]}
         refreshControl={
           <ThemedRefreshControl
             refreshing={ordersQuery.isRefetching}
@@ -344,19 +357,21 @@ export const MyOrdersPage = () => {
           />
         }
         ListHeaderComponent={listHeader}
-        renderItem={({ item: block }) => (
-          <OrderCard
-            order={block.order}
-            style={styles.orderCardInList}
-            compact
-            showSeller
-            onSellerNameClick={handleSellerNameClick}
-            onProductClick={handleProductClick}
-            onConfirmDelivered={handleConfirmDelivered}
-            onCancelItem={handleCancelItem}
-            pendingActionKey={pendingActionKey}
-            itemActionErrors={itemActionErrors}
-          />
+        renderItem={({ item: block, index }) => (
+          <View style={index === 0 ? styles.listItemFirst : styles.listItem}>
+            <OrderCard
+              order={block.order}
+              style={styles.orderCardInList}
+              compact
+              showSeller
+              onSellerNameClick={handleSellerNameClick}
+              onProductClick={handleProductClick}
+              onConfirmDelivered={handleConfirmDelivered}
+              onCancelItem={handleCancelItem}
+              pendingActionKey={pendingActionKey}
+              itemActionErrors={itemActionErrors}
+            />
+          </View>
         )}
       />
 
@@ -364,7 +379,7 @@ export const MyOrdersPage = () => {
         visible={navSheetVisible}
         activeSectionId="my-orders"
         onClose={() => setNavSheetVisible(false)}
-        onOverviewPress={() => router.replace("/(tabs)/profile")}
+        onOverviewPress={() => router.replace("/(tabs)/me")}
       />
     </>
   );

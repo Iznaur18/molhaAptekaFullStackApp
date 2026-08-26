@@ -39,7 +39,7 @@ test("login screen matches web AuthPage layout tokens", () => {
   assert.match(login, /channelBtn/);
   assert.match(login, /LOGIN_SUBMIT_LOADING/);
   assert.match(login, /LayoutAnimation/);
-  assert.match(login, /router\.replace\("\/\(tabs\)\/profile"\)/);
+  assert.match(login, /router\.replace\("\/\(tabs\)\/me"\)/);
   assert.doesNotMatch(login, /ModalSectionTabs/);
   assert.match(webLogin, /navigate\("\/me"/);
 });

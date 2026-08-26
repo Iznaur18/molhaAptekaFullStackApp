@@ -14,31 +14,38 @@ import {
 } from "@/entities/product/model/useProductModerationMutations";
 import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGridRows";
 import { resolveCatalogGridListContentStyle } from "@/features/catalog-grid/lib/catalogGridLayout";
-import { CatalogScrollAnimationProvider } from "@/features/catalog-grid/model/CatalogScrollAnimationContext";
-import { CatalogAnimatedFlatList } from "@/features/catalog-grid/ui/CatalogAnimatedFlatList";
 import { ProductModerationGridRowItem } from "@/features/product-moderation-page/ui/ProductModerationGridRowItem";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountList } from "@/features/profile-tab/ui/ProfileAccountList";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { API_CLIENT_UI, MY_PROFILE_PAGE_UI, PRODUCT_MODERATION_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { resolveProfileHubMainReservedWidth } from "@/shared/lib/guestProfileLayout";
 import { useProductGridLayout, type ProductGridLayoutResolvers } from "@/shared/model/useProductGridLayout";
-import { resolveProductGridGap } from "@/shared/lib/screenBreakpoints";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { moderationQueryKeys, staffBadgeQueryKeys } from "@/shared/api";
 import { useProductModerationPageStyles } from "@/shared/theme/productModerationPageStyles";
 import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
 const MODERATION_QUEUE_LIMIT = 100;
+/** Паритет my-products list gap (0.75rem). */
+const MODERATION_QUEUE_LIST_GAP = 12;
 
 const moderationQueueGridResolvers: ProductGridLayoutResolvers = {
   resolveColumns: () => 1,
-  resolveGap: resolveProductGridGap,
+  resolveGap: () => MODERATION_QUEUE_LIST_GAP,
 };
 
 export const ProductModerationPage = () => {
   const router = useRouter();
   const styles = useProductModerationPageStyles();
-  const productGrid = useProductGridLayout(undefined, moderationQueueGridResolvers);
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
+  const { outerScrollOwns } = useProfileAccountNestedListScroll();
+  const productGrid = useProductGridLayout(undefined, moderationQueueGridResolvers, {
+    reservedLeadingWidth: resolveProfileHubMainReservedWidth(isDrawerLayout),
+  });
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const queryClient = useQueryClient();
   const { isAdmin } = useUserAccess();
@@ -168,7 +175,7 @@ export const ProductModerationPage = () => {
       visible={navSheetVisible}
       activeSectionId="product-moderation"
       onClose={() => setNavSheetVisible(false)}
-      onOverviewPress={() => router.replace("/(tabs)/profile")}
+      onOverviewPress={() => router.replace("/(tabs)/me")}
     />
   );
 
@@ -233,18 +240,20 @@ export const ProductModerationPage = () => {
 
   return (
     <>
-      <CatalogScrollAnimationProvider>
-        <CatalogAnimatedFlatList
-        style={[styles.container, centeredContentStyle]}
+      <ProfileAccountList
+        key={productGrid.listKey}
+        data={catalogGridRows}
+        keyExtractor={(item) => item.key}
+        style={[
+          styles.container,
+          isDrawerLayout ? centeredContentStyle : null,
+        ]}
         contentContainerStyle={[
           styles.list,
+          !isDrawerLayout ? styles.listInAccountShell : null,
           resolveCatalogGridListContentStyle(productGrid.gap),
-          { paddingBottom: contentPaddingBottom },
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
         ]}
-        data={catalogGridRows}
-        key={productGrid.listKey}
-        numColumns={1}
-        keyExtractor={(item) => item.key}
         accessibilityLabel={PRODUCT_MODERATION_PAGE_UI.PRODUCTS_LIST_ARIA}
         ListHeaderComponent={listHeader}
         refreshControl={
@@ -261,6 +270,7 @@ export const ProductModerationPage = () => {
             row={item}
             columns={productGrid.columns}
             gap={productGrid.gap}
+            contentWidth={productGrid.contentWidth}
             tileWidth={productGrid.tileWidth}
             rowIndex={index}
             rejectComments={rejectComments}
@@ -285,8 +295,7 @@ export const ProductModerationPage = () => {
             }
           />
         )}
-        />
-      </CatalogScrollAnimationProvider>
+      />
 
       {navSheet}
     </>

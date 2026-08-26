@@ -2,7 +2,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { contractNeedsSellerAttention } from "@/entities/installment/lib/contractNeedsSellerAttention";
@@ -15,12 +15,15 @@ import { INSTALLMENT_SALES_LIST_FILTER_IN_PROGRESS } from "@/entities/installmen
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { InstallmentPaymentsOverview } from "@/features/installment-payments-page/ui/InstallmentPaymentsOverview";
 import { InstallmentPaymentsPageToolbar } from "@/features/installment-payments-page/ui/InstallmentPaymentsPageToolbar";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountList } from "@/features/profile-tab/ui/ProfileAccountList";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { staffBadgeQueryKeys } from "@/shared/api";
 import { INSTALLMENT_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { mergeExpandedRowIds } from "@/shared/lib/mergeExpandedRowIds";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useInstallmentPaymentsPageStyles } from "@/shared/theme/installmentPaymentsPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
@@ -30,7 +33,9 @@ const EMPTY_INSTALLMENT_CONTRACTS: InstallmentContract[] = [];
 export const InstallmentSalesPage = () => {
   const router = useRouter();
   const styles = useInstallmentPaymentsPageStyles();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
   const queryClient = useQueryClient();
   const isAuthorized = useIsAuthorized();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
@@ -205,11 +210,19 @@ export const InstallmentSalesPage = () => {
 
   return (
     <>
-      <FlatList
-        style={[styles.container, styles.listFlex, centeredContentStyle]}
+      <ProfileAccountList
         data={contracts}
         keyExtractor={(contract) => contract._id}
-        contentContainerStyle={[styles.list, { paddingBottom: contentPaddingBottom }]}
+        style={[
+          styles.container,
+          scrollEnabled ? styles.listFlex : null,
+          scrollEnabled ? centeredContentStyle : null,
+        ]}
+        contentContainerStyle={[
+          styles.list,
+          !isDrawerLayout ? styles.listInAccountShell : null,
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
+        ]}
         refreshControl={
           <ThemedRefreshControl
             refreshing={salesQuery.isRefetching}
@@ -219,22 +232,24 @@ export const InstallmentSalesPage = () => {
           />
         }
         ListHeaderComponent={listHeader}
-        renderItem={({ item }) => {
+        renderItem={({ item, index }) => {
           const contractId = String(item._id);
           return (
-            <InstallmentContractCard
-              contract={item}
-              role="seller"
-              compact
-              collapsible
-              expanded={expandedIds.has(contractId)}
-              onExpandedChange={() => toggleExpanded(contractId)}
-              onProductClick={handleProductClick}
-              onCounterpartyClick={handleCounterpartyClick}
-              onUpdated={() => {
-                void handleRefresh();
-              }}
-            />
+            <View style={index === 0 ? styles.listItemFirst : styles.listItem}>
+              <InstallmentContractCard
+                contract={item}
+                role="seller"
+                compact
+                collapsible
+                expanded={expandedIds.has(contractId)}
+                onExpandedChange={() => toggleExpanded(contractId)}
+                onProductClick={handleProductClick}
+                onCounterpartyClick={handleCounterpartyClick}
+                onUpdated={() => {
+                  void handleRefresh();
+                }}
+              />
+            </View>
           );
         }}
       />
@@ -243,7 +258,7 @@ export const InstallmentSalesPage = () => {
         visible={navSheetVisible}
         activeSectionId="installment-sales"
         onClose={() => setNavSheetVisible(false)}
-        onOverviewPress={() => router.replace("/(tabs)/profile")}
+        onOverviewPress={() => router.replace("/(tabs)/me")}
       />
     </>
   );

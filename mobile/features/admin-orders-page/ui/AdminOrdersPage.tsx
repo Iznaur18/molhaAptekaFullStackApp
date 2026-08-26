@@ -2,7 +2,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import type { AdminOrder } from "@/entities/order/api/fetchAllOrdersAdmin";
@@ -12,6 +12,8 @@ import { useOrderMutations } from "@/entities/order/model/useOrderMutations";
 import { OrderCard } from "@/entities/order/ui/OrderCard";
 import { OrderStatusSelect } from "@/features/admin-order-status/ui/OrderStatusSelect";
 import { AdminOrdersPageToolbar } from "@/features/admin-orders-page/ui/AdminOrdersPageToolbar";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountList } from "@/features/profile-tab/ui/ProfileAccountList";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { orderQueryKeys } from "@/shared/api";
@@ -21,6 +23,7 @@ import {
   MY_PROFILE_PAGE_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAdminOrdersPageStyles } from "@/shared/theme/adminOrdersPageStyles";
 import { ScreenErrorState } from "@/shared/ui/ScreenStates";
@@ -28,7 +31,9 @@ import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 export const AdminOrdersPage = () => {
   const router = useRouter();
   const styles = useAdminOrdersPageStyles();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
   const queryClient = useQueryClient();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [statusFilter, setStatusFilter] = useState("");
@@ -117,7 +122,7 @@ export const AdminOrdersPage = () => {
       visible={navSheetVisible}
       activeSectionId="admin-orders"
       onClose={() => setNavSheetVisible(false)}
-      onOverviewPress={() => router.replace("/(tabs)/profile")}
+      onOverviewPress={() => router.replace("/(tabs)/me")}
     />
   );
 
@@ -174,11 +179,19 @@ export const AdminOrdersPage = () => {
 
   return (
     <>
-      <FlatList
-        style={[styles.container, styles.listFlex, centeredContentStyle]}
-        contentContainerStyle={[styles.list, { paddingBottom: contentPaddingBottom }]}
+      <ProfileAccountList
         data={orders}
         keyExtractor={(item) => String(item._id)}
+        style={[
+          styles.container,
+          scrollEnabled ? styles.listFlex : null,
+          scrollEnabled ? centeredContentStyle : null,
+        ]}
+        contentContainerStyle={[
+          styles.list,
+          !isDrawerLayout ? styles.listInAccountShell : null,
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
+        ]}
         ListHeaderComponent={listHeader}
         refreshControl={
           <ThemedRefreshControl
@@ -186,27 +199,29 @@ export const AdminOrdersPage = () => {
             onRefresh={() => ordersQuery.refetch()}
           />
         }
-        renderItem={({ item }) => {
+        renderItem={({ item, index }) => {
           const orderId = String(item._id);
 
           return (
-            <OrderCard
-              compact
-              showBuyer
-              order={item}
-              onBuyerNameClick={handleBuyerClick}
-              onProductClick={handleProductClick}
-              statusSlot={
-                <OrderStatusSelect
-                  value={String(item.status ?? "")}
-                  isPending={pendingOrderId === orderId}
-                  error={statusError[orderId] ?? ""}
-                  onChange={(nextStatus) => {
-                    void handleStatusChange(orderId, nextStatus);
-                  }}
-                />
-              }
-            />
+            <View style={index === 0 ? styles.listItemFirst : styles.listItem}>
+              <OrderCard
+                compact
+                showBuyer
+                order={item}
+                onBuyerNameClick={handleBuyerClick}
+                onProductClick={handleProductClick}
+                statusSlot={
+                  <OrderStatusSelect
+                    value={String(item.status ?? "")}
+                    isPending={pendingOrderId === orderId}
+                    error={statusError[orderId] ?? ""}
+                    onChange={(nextStatus) => {
+                      void handleStatusChange(orderId, nextStatus);
+                    }}
+                  />
+                }
+              />
+            </View>
           );
         }}
       />

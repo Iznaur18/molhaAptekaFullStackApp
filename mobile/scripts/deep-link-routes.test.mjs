@@ -28,7 +28,7 @@ test("пути, которые раньше молча не открывалис
   const cases = {
     "/basket": "/(tabs)/cart",
     "/wishlist": "/hub/wishlist",
-    "/me": "/(tabs)/profile",
+    "/me": "/(tabs)/me",
     "/my-products": "/hub/my-products",
     "/premium": "/hub/premium",
     "/faq": "/faq",
@@ -36,6 +36,8 @@ test("пути, которые раньше молча не открывалис
     "/legal/offer": "/legal/offer",
     "/partner-program": "/hub/partner-program",
     "/data-confirmation": "/hub/data-confirmation",
+    "/profile": "/(tabs)/me",
+    "/profile/edit": "/profile/edit",
     "/profile/edit-profile": "/profile/edit",
     "/forgot-password": "/(auth)/forgot-password",
   };
@@ -96,6 +98,7 @@ test("каждый путь HOME_MAIN_VIEW_PATH веба либо открыва
     "/profile/onec-integration",
     "/staff-audit-log-admin",
     "/broadcast-notifications-admin",
+    "/admin-analytics",
   ]);
 
   const unmapped = webPaths.filter(

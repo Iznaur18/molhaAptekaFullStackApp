@@ -14,11 +14,7 @@ import { resolveUserProfileBackgroundFromUser } from "@/entities/user/lib/resolv
 import { UserPremiumAvatar } from "@/entities/user/ui/UserPremiumAvatar";
 import { MY_PROFILE_PAGE_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import {
-  PROFILE_CARD_SQUIRCLE_RADIUS,
-  useProfileOverviewBannerStyles,
-} from "@/shared/theme/profileChromeStyles";
-import { SquircleView } from "@/shared/ui/SquircleView";
+import { useProfileOverviewBannerStyles } from "@/shared/theme/profileChromeStyles";
 
 type ProfileOverviewBannerProps = {
   user: Record<string, unknown>;
@@ -73,8 +69,11 @@ export const ProfileOverviewBanner = ({
 
   return (
     <View style={styles.wrap}>
-      <SquircleView
-        radius={PROFILE_CARD_SQUIRCLE_RADIUS}
+      {/*
+        Как web `.user-details-modal__banner`: height 216, radius 24, overflow hidden.
+        Обычный borderRadius — без corner-shape, как на /me.
+      */}
+      <View
         style={[
           styles.banner,
           profileBackground.kind === "preset" && canShowBackground
@@ -121,7 +120,7 @@ export const ProfileOverviewBanner = ({
             ) : null}
           </View>
         ) : null}
-      </SquircleView>
+      </View>
     </View>
   );
 };

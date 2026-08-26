@@ -24,7 +24,7 @@ test("address prompt catalog paths match home and catalog tabs", () => {
   for (const path of ["/", "/(tabs)", "/(tabs)/index", "/catalog", "/(tabs)/catalog"]) {
     assert.equal(isAddressPromptCatalogPath(path), true, path);
   }
-  for (const path of ["/profile", "/profile/edit", "/product/1", "/cart"]) {
+  for (const path of ["/profile", "/me", "/profile/edit", "/product/1", "/cart"]) {
     assert.equal(isAddressPromptCatalogPath(path), false, path);
   }
 

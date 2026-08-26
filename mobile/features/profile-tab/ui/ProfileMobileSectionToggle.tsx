@@ -3,6 +3,7 @@ import { Pressable, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 
 import { MY_PROFILE_PAGE_UI } from "@/shared/config";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
 import {
   PROFILE_MOBILE_NAV_TOGGLE_BORDER_RADIUS,
@@ -24,9 +25,15 @@ export const ProfileMobileSectionToggle = ({
 }: ProfileMobileSectionToggleProps) => {
   const styles = useProfileMobileNavToggleStyles();
   const { theme } = useAppThemeSettings();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
   const scale = useSharedValue(1);
   const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
   const isTablet = appearance === "tablet";
+
+  // web: toggle только ≤900; >900 постоянный sidebar.
+  if (!isDrawerLayout) {
+    return null;
+  }
 
   return (
     <Animated.View style={[styles.outer, animatedStyle]}>

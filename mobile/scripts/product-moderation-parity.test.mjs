@@ -17,9 +17,17 @@ test("product moderation page mirrors web queue grid and actions", () => {
   assert.match(page, /ProfileMobileNavSheet/);
   assert.match(page, /contentPaddingBottom/);
   assert.match(page, /ProductModerationGridRowItem/);
+  assert.match(page, /ProfileAccountList/);
+  assert.match(page, /useProfileAccountNestedListScroll/);
+  assert.doesNotMatch(page, /CatalogAnimatedFlatList/);
+  assert.doesNotMatch(page, /resolveListStyle/);
+  assert.doesNotMatch(page, /CatalogScrollAnimationProvider/);
   assert.match(page, /buildCatalogGridRows/);
   assert.match(page, /moderationQueueGridResolvers/);
   assert.match(page, /resolveColumns: \(\) => 1/);
+  assert.match(page, /resolveProfileHubMainReservedWidth/);
+  assert.match(page, /listInAccountShell/);
+  assert.match(page, /contentWidth=\{productGrid\.contentWidth\}/);
   assert.match(page, /removeFromQueue/);
   assert.match(page, /PRODUCTS_LIST_ARIA/);
   assert.match(page, /activeSectionId="product-moderation"/);
@@ -28,6 +36,7 @@ test("product moderation page mirrors web queue grid and actions", () => {
   assert.doesNotMatch(page, /staffQueueStyles/);
 
   assert.match(styles, /stateError/);
+  assert.match(styles, /listInAccountShell/);
 });
 
 test("product moderation details footer mirrors web", () => {
@@ -46,6 +55,8 @@ test("product moderation grid row uses compact queue card", () => {
 
   assert.match(rowItem, /ProductModerationQueueCard/);
   assert.match(rowItem, /tileWidth/);
+  assert.match(rowItem, /width: "100%"/);
+  assert.match(rowItem, /resolveFlexGridItemWidthStyle/);
   assert.match(card, /ProductModerationDetailsFooter/);
   assert.match(card, /variant="compact"/);
   assert.match(card, /ProductCompactCardMediaThumb/);

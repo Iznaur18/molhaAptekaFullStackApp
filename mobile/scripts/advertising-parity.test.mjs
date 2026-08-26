@@ -15,6 +15,7 @@ test("advertising page mirrors web hub chrome and balance bar", () => {
 
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /ProfileMobileNavSheet/);
+  assert.match(page, /ProfileAccountScrollBody/);
   assert.match(page, /contentPaddingBottom/);
   assert.match(page, /heroCard/);
   assert.match(page, /PAGE_LEAD/);

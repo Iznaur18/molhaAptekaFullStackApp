@@ -15,6 +15,7 @@ test("intro ad moderation page mirrors web hub chrome and filters", () => {
 
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /ProfileMobileNavSheet/);
+  assert.match(page, /ProfileAccountScrollBody/);
   assert.match(page, /contentPaddingBottom/);
   assert.match(page, /IntroAdModerationPageOverview/);
   assert.match(page, /IntroAdModerationPageToolbar/);

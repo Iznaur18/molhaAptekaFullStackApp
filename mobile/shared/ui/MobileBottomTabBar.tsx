@@ -81,7 +81,7 @@ const TAB_ITEMS: TabItemConfig[] = [
     accessibilityLabel: MOBILE_BOTTOM_NAV_UI.TAB_CART_ARIA,
   },
   {
-    routeName: "profile",
+    routeName: "me",
     icon: "user",
     label: MOBILE_BOTTOM_NAV_UI.TAB_PROFILE,
     accessibilityLabel: MOBILE_BOTTOM_NAV_UI.TAB_PROFILE_ARIA,
@@ -244,7 +244,7 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
     }
 
     // Паритет web MobileBottomNav: гость → /login, не экран профиля.
-    if (routeName === "profile" && !isAuthorized) {
+    if (routeName === "me" && !isAuthorized) {
       router.push("/(auth)/login");
       return;
     }
@@ -306,7 +306,7 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
       isFocused = isHomeTabActive && !isCategoryOnHomeTab;
     } else if (item.routeName === "catalog") {
       isFocused = isRouteActive || isCategoryOnHomeTab;
-    } else if (item.routeName === "profile") {
+    } else if (item.routeName === "me") {
       isFocused = isRouteActive || isProfileTabBarContext;
     } else {
       isFocused = isRouteActive;
@@ -314,7 +314,7 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
     const badge =
       item.routeName === "cart"
         ? cartBadge
-        : item.routeName === "profile"
+        : item.routeName === "me"
           ? profileBadge
           : null;
     const iconColor = isFocused ? theme.colors.action : theme.colors.textSecondary;

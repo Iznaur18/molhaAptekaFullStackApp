@@ -8,6 +8,7 @@ import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 import type { DataConfirmationRequest } from "@/entities/user-data-confirmation/api/dataConfirmationStaffApi";
 import { usePendingDataConfirmationRequestsQuery } from "@/entities/user-data-confirmation/model/useDataConfirmationStaffMutations";
 import { DataConfirmationRequestCard } from "@/entities/user-data-confirmation/ui/DataConfirmationRequestCard";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { dataConfirmationStaffQueryKeys, staffBadgeQueryKeys } from "@/shared/api";
@@ -21,6 +22,8 @@ export const DataConfirmationRequestsPage = () => {
   const router = useRouter();
   const styles = useDataConfirmationRequestsPageStyles();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled, resolveListStyle } =
+    useProfileAccountNestedListScroll();
   const queryClient = useQueryClient();
   const queueQuery = usePendingDataConfirmationRequestsQuery();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
@@ -75,7 +78,7 @@ export const DataConfirmationRequestsPage = () => {
       visible={navSheetVisible}
       activeSectionId="data-confirmation-requests"
       onClose={() => setNavSheetVisible(false)}
-      onOverviewPress={() => router.replace("/(tabs)/profile")}
+      onOverviewPress={() => router.replace("/(tabs)/me")}
     />
   );
 
@@ -112,8 +115,15 @@ export const DataConfirmationRequestsPage = () => {
   return (
     <>
       <ScrollView
-        style={[styles.container, centeredContentStyle]}
-        contentContainerStyle={[styles.scroll, { paddingBottom: contentPaddingBottom }]}
+        style={resolveListStyle([
+          styles.container,
+          scrollEnabled ? centeredContentStyle : null,
+        ])}
+        scrollEnabled={scrollEnabled}
+        contentContainerStyle={[
+          styles.scroll,
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
+        ]}
         accessibilityLabel={MY_PROFILE_PAGE_UI.TAB_DATA_CONFIRMATION}
         refreshControl={
           <ThemedRefreshControl

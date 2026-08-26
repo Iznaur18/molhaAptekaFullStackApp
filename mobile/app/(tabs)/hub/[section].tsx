@@ -1,7 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useLayoutEffect, useMemo } from "react";
+import { useEffect, useLayoutEffect, useMemo, type ReactNode } from "react";
 import { View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
@@ -16,19 +15,22 @@ import {
   isProfileSectionId,
   isProfileStaffWebOnlySection,
   PROFILE_SECTION_EXTERNAL_ROUTES,
+  type ProfileSectionId,
 } from "@/features/profile-hub/model/profileSections";
 import { buildProfileNavGroups } from "@/features/profile-hub/model/buildProfileNavGroups";
+import { ProfileAccountShell } from "@/features/profile-tab/ui/ProfileAccountShell";
 import { AUTH_UI, HUB_SECTION_UI } from "@/shared/config";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export default function HubSectionScreen() {
   const router = useRouter();
   const navigation = useNavigation();
-  const insets = useSafeAreaInsets();
   const { section } = useLocalSearchParams<{ section: string }>();
   const sectionId = String(section ?? "");
   const userAccess = useUserAccess();
   const hubAccess = useProfileHubAccess();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
 
   const sectionTitle = useMemo(() => {
     if (!isProfileSectionId(sectionId)) {
@@ -47,8 +49,8 @@ export default function HubSectionScreen() {
   }, [hubAccess, sectionId]);
 
   useLayoutEffect(() => {
-    navigation.setOptions({ title: sectionTitle });
-  }, [navigation, sectionTitle]);
+    navigation.setOptions({ title: sectionTitle, headerShown: isDrawerLayout });
+  }, [isDrawerLayout, navigation, sectionTitle]);
 
   useEffect(() => {
     if (sectionId === "product-manage-toggle-display-admin") {
@@ -56,8 +58,6 @@ export default function HubSectionScreen() {
       return;
     }
 
-    // Легаси-алиас: старый id секции ведёт на объединённую модерацию.
-    // Проверяем до isProfileSectionId — этого id нет в union валидных секций.
     if (sectionId === "seller-personal-category-moderation") {
       router.replace("/hub/intro-ad-moderation" as never);
       return;
@@ -68,7 +68,6 @@ export default function HubSectionScreen() {
       return;
     }
 
-    // Удалённая секция "Продвижение" → объединённая модерация "Продукты".
     if (sectionId === "product-promotions") {
       router.replace("/hub/product-moderation" as never);
       return;
@@ -86,73 +85,84 @@ export default function HubSectionScreen() {
 
     if (isProfileStaffWebOnlySection(sectionId)) {
       void openProfileStaffWebSection(sectionId).finally(() => {
-        router.replace("/(tabs)/profile");
+        router.replace("/(tabs)/me");
       });
       return;
     }
   }, [router, sectionId]);
 
-  const shell = { flex: 1, minHeight: 0, paddingTop: insets.top } as const;
+  const goMe = () => router.replace("/(tabs)/me");
+
+  const wrap = (node: ReactNode) => {
+    if (!isProfileSectionId(sectionId)) {
+      return node;
+    }
+    return (
+      <ProfileAccountShell activeSectionId={sectionId as ProfileSectionId} mode="hub">
+        {node}
+      </ProfileAccountShell>
+    );
+  };
 
   if (!userAccess.isAuthorized && userAccess.isGuest) {
-    return (
-      <View style={shell}>
+    return wrap(
+      <View style={{ flex: 1 }}>
         <HubSectionPlaceholder
           title={AUTH_UI.GUEST_STATUS}
           hint={HUB_SECTION_UI.REQUIRES_AUTH}
-          onBack={() => router.replace("/(tabs)/profile")}
+          onBack={goMe}
         />
-      </View>
+      </View>,
     );
   }
 
   if (!isProfileSectionId(sectionId)) {
     return (
-      <View style={shell}>
+      <View style={{ flex: 1 }}>
         <HubSectionPlaceholder
           title={HUB_SECTION_UI.FORBIDDEN_TITLE}
           hint={HUB_SECTION_UI.FORBIDDEN_HINT}
-          onBack={() => router.replace("/(tabs)/profile")}
+          onBack={goMe}
         />
       </View>
     );
   }
 
   if (PROFILE_SECTION_EXTERNAL_ROUTES[sectionId]) {
-    return (
-      <View style={shell}>
+    return wrap(
+      <View style={{ flex: 1 }}>
         <ScreenLoadingState message={AUTH_UI.SESSION_CHECK} />
-      </View>
+      </View>,
     );
   }
 
   if (isProfileStaffWebOnlySection(sectionId)) {
-    return (
-      <View style={shell}>
+    return wrap(
+      <View style={{ flex: 1 }}>
         <ScreenLoadingState message={HUB_SECTION_UI.OPENING_WEB} />
-      </View>
+      </View>,
     );
   }
 
   if (!canAccessProfileSection(sectionId, userAccess, hubAccess)) {
-    return (
-      <View style={shell}>
+    return wrap(
+      <View style={{ flex: 1 }}>
         <HubSectionPlaceholder
           title={HUB_SECTION_UI.FORBIDDEN_TITLE}
           hint={HUB_SECTION_UI.FORBIDDEN_HINT}
-          onBack={() => router.replace("/(tabs)/profile")}
+          onBack={goMe}
         />
-      </View>
+      </View>,
     );
   }
 
-  return (
-    <View style={shell}>
+  return wrap(
+    <View style={isDrawerLayout ? { flex: 1, minHeight: 0 } : { width: "100%" }}>
       <HubSectionContent
         sectionId={sectionId}
         sectionTitle={sectionTitle}
-        onBack={() => router.replace("/(tabs)/profile")}
+        onBack={goMe}
       />
-    </View>
+    </View>,
   );
 }

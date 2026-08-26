@@ -61,7 +61,7 @@ test("create raffle modal mirrors web edit flow", () => {
   assert.match(home, /CreateRaffleModal/);
   assert.match(home, /setEditingRaffle/);
   assert.match(home, /editUseStaffApi/);
-  assert.doesNotMatch(home, /router\.push\("\/\(tabs\)\/profile"/);
+  assert.doesNotMatch(home, /router\.push\("\/\(tabs\)\/me"/);
   assert.match(patchMy, /\/product\/raffles\/\$\{raffleId\}/);
   assert.match(patchStaff, /\/staff/);
 });

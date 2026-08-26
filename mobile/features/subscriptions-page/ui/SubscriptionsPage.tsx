@@ -2,16 +2,19 @@ import { Feather } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { useMyFollowingQuery } from "@/entities/user-follow/model/useMyFollowingQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountList } from "@/features/profile-tab/ui/ProfileAccountList";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { SubscriptionUserRow } from "@/features/subscriptions-page/ui/SubscriptionUserRow";
 import { MY_PROFILE_PAGE_UI, SUBSCRIPTIONS_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { pluralizeRu } from "@/shared/lib/pluralizeRu";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useSubscriptionsPageStyles } from "@/shared/theme/subscriptionsPageStyles";
@@ -21,7 +24,9 @@ export const SubscriptionsPage = () => {
   const router = useRouter();
   const theme = useAppTheme();
   const styles = useSubscriptionsPageStyles();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
   const isAuthorized = useIsAuthorized();
   const followingQuery = useMyFollowingQuery({ enabled: isAuthorized });
   const [navSheetVisible, setNavSheetVisible] = useState(false);
@@ -106,7 +111,14 @@ export const SubscriptionsPage = () => {
   if (users.length === 0) {
     return (
       <>
-        <View style={[styles.container, centeredContentStyle, styles.emptyRoot]}>
+        <View
+          style={[
+            styles.container,
+            centeredContentStyle,
+            styles.emptyRoot,
+            !isDrawerLayout ? styles.emptyInAccountShell : null,
+          ]}
+        >
           {listHeader}
           <View style={styles.emptyBody}>
             <Text style={styles.state}>{SUBSCRIPTIONS_PAGE_UI.EMPTY}</Text>
@@ -116,7 +128,7 @@ export const SubscriptionsPage = () => {
           visible={navSheetVisible}
           activeSectionId="subscriptions"
           onClose={() => setNavSheetVisible(false)}
-          onOverviewPress={() => router.replace("/(tabs)/profile")}
+          onOverviewPress={() => router.replace("/(tabs)/me")}
         />
       </>
     );
@@ -124,17 +136,20 @@ export const SubscriptionsPage = () => {
 
   return (
     <>
-      <FlatList
-        style={[styles.container, centeredContentStyle]}
-        contentContainerStyle={[
-          styles.listContent,
-          { paddingBottom: contentPaddingBottom },
-        ]}
+      <ProfileAccountList
         data={users}
         keyExtractor={(item) => item._id}
+        style={[styles.container, scrollEnabled ? centeredContentStyle : null]}
+        contentContainerStyle={[
+          styles.listContent,
+          !isDrawerLayout ? styles.listInAccountShell : null,
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
+        ]}
         ListHeaderComponent={listHeader}
-        renderItem={({ item }) => (
-          <SubscriptionUserRow user={item} onRowClick={handleOpenProfile} />
+        renderItem={({ item, index }) => (
+          <View style={index === 0 ? null : styles.listItem}>
+            <SubscriptionUserRow user={item} onRowClick={handleOpenProfile} />
+          </View>
         )}
       />
 
@@ -142,7 +157,7 @@ export const SubscriptionsPage = () => {
         visible={navSheetVisible}
         activeSectionId="subscriptions"
         onClose={() => setNavSheetVisible(false)}
-        onOverviewPress={() => router.replace("/(tabs)/profile")}
+        onOverviewPress={() => router.replace("/(tabs)/me")}
       />
     </>
   );

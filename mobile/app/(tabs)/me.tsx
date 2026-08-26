@@ -8,11 +8,10 @@ import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { useGuestProfileLoginMenuBannerImageQuery } from "@/entities/site-header-banner/model/useGuestProfileLoginMenuBannerImageQuery";
 import { EmailVerificationModal } from "@/features/email-verify/ui/EmailVerificationModal";
-import { ProfileHubMenu } from "@/features/profile-hub/ui/ProfileHubMenu";
 import { PROFILE_SECTION_OVERVIEW } from "@/features/profile-hub/model/profileSections";
+import { ProfileAccountShell } from "@/features/profile-tab/ui/ProfileAccountShell";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
-import { ProfileNavLogoutFooter } from "@/features/profile-tab/ui/ProfileNavLogoutFooter";
 import { ProfileTabOverviewSection } from "@/features/profile-tab/ui/ProfileTabOverviewSection";
 import { ThemePreferenceToggle } from "@/features/theme-settings/ui/ThemePreferenceToggle";
 import {
@@ -35,7 +34,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const scrollRef = useRef<ScrollView>(null);
   const styles = useProfileScreenStyles();
-  const { contentPaddingBottom, centeredContentStyle } = useScreenLayout();
+  const { contentPaddingBottom } = useScreenLayout();
   const { isDrawerLayout, isPhoneLayout } = useProfileAdaptiveLayout();
   const guestHeroHeight = useStableAuthHeroHeight();
   const sessionQuery = useAuthSessionQuery();
@@ -157,13 +156,11 @@ export default function ProfileScreen() {
 
   const overviewBlocks = (
     <>
-      {isDrawerLayout ? (
-        <ProfileMobileSectionToggle
-          activeLabel={MY_PROFILE_PAGE_UI.TAB_OVERVIEW}
-          appearance={isPhoneLayout ? "phone" : "tablet"}
-          onPress={() => setNavSheetVisible(true)}
-        />
-      ) : null}
+      <ProfileMobileSectionToggle
+        activeLabel={MY_PROFILE_PAGE_UI.TAB_OVERVIEW}
+        appearance={isPhoneLayout ? "phone" : "tablet"}
+        onPress={() => setNavSheetVisible(true)}
+      />
 
       {needsEmailVerification ? (
         <View style={styles.emailBanner}>
@@ -191,45 +188,19 @@ export default function ProfileScreen() {
 
   return (
     <>
-      <SafeAreaView edges={["top"]} style={styles.safeArea}>
-        <View style={[styles.safeArea, centeredContentStyle, styles.shellPad]}>
-          {/* Один скролл как web document scroll на /me (не два независимых). */}
-          <ScrollView
-            ref={scrollRef}
-            style={styles.safeArea}
-            contentContainerStyle={[
-              styles.pageScrollContent,
-              { paddingBottom: contentPaddingBottom },
-            ]}
-            refreshControl={
-              <ThemedRefreshControl
-                refreshing={isManualRefreshing}
-                onRefresh={handleManualRefresh}
-              />
-            }
-          >
-            {isDrawerLayout ? (
-              <View style={styles.scrollContent}>{overviewBlocks}</View>
-            ) : (
-              <View style={styles.pageLayout}>
-                <View style={styles.sidebarWrap}>
-                  <View style={styles.sidebarInner}>
-                    <ProfileHubMenu
-                      activeSectionId={PROFILE_SECTION_OVERVIEW}
-                      onOverviewPress={handleOverviewPress}
-                      variant="sidebar"
-                    />
-                    <ProfileNavLogoutFooter />
-                  </View>
-                </View>
-                <View style={[styles.mainColumn, styles.scrollContent]}>
-                  {overviewBlocks}
-                </View>
-              </View>
-            )}
-          </ScrollView>
-        </View>
-      </SafeAreaView>
+      <ProfileAccountShell
+        activeSectionId={PROFILE_SECTION_OVERVIEW}
+        mode="overview"
+        scrollRef={scrollRef}
+        refreshControl={
+          <ThemedRefreshControl
+            refreshing={isManualRefreshing}
+            onRefresh={handleManualRefresh}
+          />
+        }
+      >
+        {overviewBlocks}
+      </ProfileAccountShell>
 
       {isDrawerLayout ? (
         <ProfileMobileNavSheet

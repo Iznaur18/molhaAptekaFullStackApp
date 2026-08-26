@@ -25,6 +25,11 @@ export type ProductGridLayoutResolvers = {
   resolveGap: (width: number) => number;
 };
 
+export type ProductGridLayoutOptions = {
+  /** Ширина, занятая соседней колонкой (sidebar+gap в profile hub). */
+  reservedLeadingWidth?: number;
+};
+
 const defaultProductGridResolvers: ProductGridLayoutResolvers = {
   resolveColumns: resolveProductGridColumns,
   resolveGap: resolveProductGridGap,
@@ -33,24 +38,29 @@ const defaultProductGridResolvers: ProductGridLayoutResolvers = {
 export const useProductGridLayout = (
   pagePadding: number = SCREEN_CONTENT_PADDING_HORIZONTAL,
   resolvers: ProductGridLayoutResolvers = defaultProductGridResolvers,
+  options: ProductGridLayoutOptions = {},
 ): ProductGridLayout => {
   const { width, height } = useWindowDimensions();
+  const reservedLeadingWidth = options.reservedLeadingWidth ?? 0;
 
   return useMemo(() => {
     const viewportWidth = resolveViewportLayoutWidth(width);
     const layoutWidth = resolveLayoutContentWidth(viewportWidth);
     const columns = resolvers.resolveColumns({ width: viewportWidth, height });
-    const contentWidth = layoutWidth - pagePadding * 2;
+    const contentWidth = Math.max(
+      0,
+      layoutWidth - pagePadding * 2 - reservedLeadingWidth,
+    );
     const gap = resolvers.resolveGap(viewportWidth);
     const tileWidth = resolveGridTileWidth(contentWidth, columns, gap);
 
     return {
       columns,
-      listKey: `product-grid-${columns}`,
+      listKey: `product-grid-${columns}-${contentWidth}`,
       gap,
       padding: pagePadding,
       contentWidth,
       tileWidth,
     };
-  }, [width, height, pagePadding, resolvers]);
+  }, [width, height, pagePadding, reservedLeadingWidth, resolvers]);
 };

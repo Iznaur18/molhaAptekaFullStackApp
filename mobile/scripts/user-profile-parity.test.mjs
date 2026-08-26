@@ -5,9 +5,13 @@ import { fileURLToPath } from "node:url";
 import { test } from "node:test";
 
 const MOBILE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+const CLIENT_ROOT = join(MOBILE_ROOT, "../client/src");
 
 const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
+
+const readClientFile = (relativePath) =>
+  readFileSync(join(CLIENT_ROOT, relativePath), "utf8");
 
 test("UserDetailsPage mirrors web modal section order", () => {
   const body = readMobileFile("features/user-details-page/ui/UserDetailsProfileBody.tsx");
@@ -57,6 +61,8 @@ test("ProfileOverviewBanner supports image focus like web", () => {
   const focus = readMobileFile("entities/user/lib/profileImageFocus.ts");
   const avatar = readMobileFile("entities/user/ui/UserPremiumAvatar.tsx");
   const chrome = readMobileFile("shared/theme/profileChromeStyles.ts");
+  const webModal = readClientFile("entities/user/ui/UserDetailsModal.css");
+  const webPage = readClientFile("pages/my-profile/ui/MyProfilePage.css");
 
   assert.match(focus, /getUserAvatarFocus/);
   assert.match(focus, /getUserBackgroundFocus/);
@@ -64,9 +70,17 @@ test("ProfileOverviewBanner supports image focus like web", () => {
   assert.match(banner, /contentPosition/);
   assert.match(banner, /avatarWrapPremium/);
   assert.match(banner, /isPremium \? styles\.avatarWrapPremium/);
+  assert.doesNotMatch(banner, /SquircleView/);
   assert.match(avatar, /contentPosition/);
   assert.match(chrome, /avatarWrapPremium:/);
   assert.match(chrome, /borderColor: theme\.colors\.premium/);
+  assert.match(chrome, /PROFILE_BANNER_HEIGHT = PROFILE_AVATAR_SIZE \* 3/);
+  assert.match(chrome, /PROFILE_BANNER_RADIUS = 24/);
+  assert.match(chrome, /height: PROFILE_BANNER_HEIGHT/);
+  assert.match(chrome, /borderRadius: PROFILE_BANNER_RADIUS/);
+  assert.match(webModal, /--modal-profile-banner-radius:\s*24px/);
+  assert.match(webModal, /--modal-profile-banner-height-mult:\s*3/);
+  assert.match(webPage, /--modal-profile-banner-radius:\s*24px/);
 });
 
 test("user profile product thumb seeds catalog cache before product screen", () => {
@@ -84,8 +98,12 @@ test("user profile info detail rows align label and value on one line", () => {
 
   assert.match(detailRowBlock, /flexDirection:\s*"row"/);
   assert.match(detailRowBlock, /justifyContent:\s*"space-between"/);
+  assert.match(detailRowBlock, /flexWrap:\s*"nowrap"/);
   assert.match(detailValueBlock, /textAlign:\s*"right"/);
   assert.doesNotMatch(detailRowBlock, /flexDirection:\s*"column"/);
+  assert.doesNotMatch(panel, /SquircleView/);
+  assert.match(panel, /borderRadius: O\.infoSectionRadius/);
+  assert.match(panel, /gap: O\.infoSectionsGap/);
 });
 
 test("subscriptions and seller name open user profile", () => {

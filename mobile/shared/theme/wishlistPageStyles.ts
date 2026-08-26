@@ -1,11 +1,10 @@
 import { StyleSheet } from "react-native";
 
+import { WISHLIST_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 const PRODUCT_IMAGE_THUMB_SIDE = 64;
-
-const LIST_GAP = 4;
 
 export const useWishlistPageStyles = createThemedStyles((theme) => ({
   container: {
@@ -14,15 +13,23 @@ export const useWishlistPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.bg,
   },
   listContent: {
-    gap: LIST_GAP,
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     paddingTop: 12,
+    flexGrow: 1,
+  },
+  /** Desktop hub: gutter 0 как web `.wishlist-page { padding: 0 }`. */
+  listInAccountShell: {
+    paddingHorizontal: 0,
+    paddingTop: 0,
   },
   header: {
     alignSelf: "stretch",
     width: "100%",
-    gap: 14,
-    marginBottom: 10,
+    gap: L.headerGap,
+    marginBottom: L.headerMarginBottom,
+  },
+  listItem: {
+    marginTop: L.listGap,
   },
   heroCard: {
     flexDirection: "row",
@@ -87,6 +94,10 @@ export const useWishlistPageStyles = createThemedStyles((theme) => ({
     flex: 1,
     paddingTop: 12,
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
+  },
+  emptyInAccountShell: {
+    paddingTop: 0,
+    paddingHorizontal: 0,
   },
   emptyBody: {
     flex: 1,

@@ -21,7 +21,7 @@ test("bottom nav profile: guest goes to /(auth)/login (web /login parity)", () =
 
   assert.match(webNav, /handleProfileClick/);
   assert.match(webNav, /onLoginClick\(\)/);
-  assert.match(tabBar, /routeName === "profile" && !isAuthorized/);
+  assert.match(tabBar, /routeName === "me" && !isAuthorized/);
   assert.match(tabBar, /router\.push\("\/\(auth\)\/login"\)/);
   assert.match(
     tabBar,

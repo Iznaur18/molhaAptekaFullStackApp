@@ -245,7 +245,8 @@ export function RuRegionPickerSheet({
             }}
             style={styles.sheet}
             shadowStyle={styles.sheetShadow}
-            accessibilityRole="dialog"
+            // RN не знает роль "dialog" — модальность отдаём через флаг.
+            accessibilityViewIsModal
             accessibilityLabel={REGION_UI.SHEET_TITLE}
           >
             <View style={styles.header}>

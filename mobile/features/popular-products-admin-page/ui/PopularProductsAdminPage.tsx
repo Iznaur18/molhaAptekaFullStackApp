@@ -57,7 +57,7 @@ export const PopularProductsAdminPage = () => {
         visible={navSheetVisible}
         activeSectionId="popular-products-admin"
         onClose={() => setNavSheetVisible(false)}
-        onOverviewPress={() => router.replace("/(tabs)/profile")}
+        onOverviewPress={() => router.replace("/(tabs)/me")}
       />
     </>
   );

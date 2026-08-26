@@ -3,17 +3,20 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { useMyPremiumStatusQuery } from "@/entities/user/model/useMyPremiumStatusQuery";
 import { usePurchasePremiumMutation } from "@/entities/user/model/usePurchasePremiumMutation";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { UserPremiumVerifiedBadge } from "@/entities/user/ui/UserPremiumVerifiedBadge";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountScrollBody } from "@/features/profile-tab/ui/ProfileAccountScrollBody";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { MY_PROFILE_PAGE_UI, PREMIUM_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { pluralizeRuBall } from "@/shared/lib/pluralizeRuBall";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { usePremiumPageStyles } from "@/shared/theme/premiumPageStyles";
@@ -24,7 +27,9 @@ export const PremiumPage = () => {
   const router = useRouter();
   const styles = usePremiumPageStyles();
   const theme = useAppTheme();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
   const isAuthorized = useIsAuthorized();
   const statusQuery = useMyPremiumStatusQuery(isAuthorized);
   const purchaseMutation = usePurchasePremiumMutation();
@@ -86,12 +91,13 @@ export const PremiumPage = () => {
 
   return (
     <>
-      <ScrollView
-        style={[styles.container, centeredContentStyle]}
+      <ProfileAccountScrollBody
+        style={[styles.container, scrollEnabled ? centeredContentStyle : null]}
         contentContainerStyle={[
           styles.scroll,
           styles.content,
-          { paddingBottom: contentPaddingBottom },
+          !isDrawerLayout ? styles.contentInAccountShell : null,
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
         ]}
         accessibilityLabel={PREMIUM_PAGE_UI.PAGE_ARIA}
       >
@@ -218,13 +224,13 @@ export const PremiumPage = () => {
             </View>
           ) : null}
         </View>
-      </ScrollView>
+      </ProfileAccountScrollBody>
 
       <ProfileMobileNavSheet
         visible={navSheetVisible}
         activeSectionId="premium"
         onClose={() => setNavSheetVisible(false)}
-        onOverviewPress={() => router.replace("/(tabs)/profile")}
+        onOverviewPress={() => router.replace("/(tabs)/me")}
       />
     </>
   );

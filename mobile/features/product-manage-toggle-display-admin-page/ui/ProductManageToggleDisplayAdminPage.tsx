@@ -83,7 +83,7 @@ export const ProductManageToggleDisplayAdminPage = () => {
         visible={navSheetVisible}
         activeSectionId="product-manage-toggle-display-admin"
         onClose={() => setNavSheetVisible(false)}
-        onOverviewPress={() => router.replace("/(tabs)/profile")}
+        onOverviewPress={() => router.replace("/(tabs)/me")}
       />
     </>
   );

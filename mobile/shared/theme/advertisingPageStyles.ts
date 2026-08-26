@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 
+import { PROFILE_ACCOUNT_STACK_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { cancelButtonStyleBlock } from "@/shared/theme/cancelButtonChromeStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
@@ -16,9 +17,13 @@ export const useAdvertisingPageStyles = createThemedStyles((theme) => ({
     flexGrow: 1,
   },
   content: {
-    gap: 16,
+    gap: L.stackGap,
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     paddingTop: 12,
+  },
+  contentInAccountShell: {
+    paddingHorizontal: 0,
+    paddingTop: 0,
   },
   header: {
     gap: 14,

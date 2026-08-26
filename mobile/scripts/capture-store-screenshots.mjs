@@ -45,7 +45,7 @@ const GUEST_SCREENS = [
   { file: "03-cart-guest", path: "/cart", waitForText: "Войдите" },
   { file: "04-login", path: "/login", waitForText: "Войти" },
   { file: "05-register", path: "/register", waitForText: "Зарегистрироваться" },
-  { file: "06-profile-guest", path: "/profile", waitForText: "Профиль" },
+  { file: "06-profile-guest", path: "/me", waitForText: "Профиль" },
   { file: "07-privacy", path: "/legal/privacy", waitForText: "Политика конфиденциальности" },
 ];
 

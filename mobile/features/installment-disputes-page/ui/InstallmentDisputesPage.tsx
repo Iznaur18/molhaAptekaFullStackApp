@@ -2,7 +2,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import type { InstallmentDispute } from "@/entities/installment/api/installmentStaffApi";
@@ -12,11 +12,14 @@ import {
 } from "@/entities/installment/model/useInstallmentStaffMutations";
 import { InstallmentDisputesQueueCard } from "@/entities/installment/ui/InstallmentDisputesQueueCard";
 import { InstallmentDisputesPageToolbar } from "@/features/installment-disputes-page/ui/InstallmentDisputesPageToolbar";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountScrollBody } from "@/features/profile-tab/ui/ProfileAccountScrollBody";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { installmentQueryKeys, staffBadgeQueryKeys } from "@/shared/api";
 import { INSTALLMENT_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useInstallmentDisputesPageStyles } from "@/shared/theme/installmentDisputesPageStyles";
 import { ScreenErrorState } from "@/shared/ui/ScreenStates";
@@ -24,7 +27,9 @@ import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 export const InstallmentDisputesPage = () => {
   const router = useRouter();
   const styles = useInstallmentDisputesPageStyles();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
   const queryClient = useQueryClient();
   const disputesQuery = usePendingInstallmentDisputesQuery();
   const { resolveDisputeMutation } = useInstallmentStaffMutations();
@@ -102,7 +107,7 @@ export const InstallmentDisputesPage = () => {
       visible={navSheetVisible}
       activeSectionId="installment-disputes"
       onClose={() => setNavSheetVisible(false)}
-      onOverviewPress={() => router.replace("/(tabs)/profile")}
+      onOverviewPress={() => router.replace("/(tabs)/me")}
     />
   );
 
@@ -141,9 +146,13 @@ export const InstallmentDisputesPage = () => {
 
   return (
     <>
-      <ScrollView
-        style={[styles.container, centeredContentStyle]}
-        contentContainerStyle={[styles.scroll, { paddingBottom: contentPaddingBottom }]}
+      <ProfileAccountScrollBody
+        style={[styles.container, scrollEnabled ? centeredContentStyle : null]}
+        contentContainerStyle={[
+          styles.scroll,
+          !isDrawerLayout ? styles.scrollInAccountShell : null,
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
+        ]}
         accessibilityLabel={INSTALLMENT_UI.DISPUTES_PAGE_TITLE}
         refreshControl={
           <ThemedRefreshControl
@@ -195,7 +204,7 @@ export const InstallmentDisputesPage = () => {
             })}
           </View>
         )}
-      </ScrollView>
+      </ProfileAccountScrollBody>
 
       {navSheet}
     </>

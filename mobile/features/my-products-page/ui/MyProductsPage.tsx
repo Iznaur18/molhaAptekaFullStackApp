@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
@@ -25,33 +25,48 @@ import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
 import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGridRows";
 import { resolveCatalogGridListContentStyle } from "@/features/catalog-grid/lib/catalogGridLayout";
-import { CatalogScrollAnimationProvider } from "@/features/catalog-grid/model/CatalogScrollAnimationContext";
-import { CatalogAnimatedFlatList } from "@/features/catalog-grid/ui/CatalogAnimatedFlatList";
 import { MyProductsCatalogToolbar } from "@/features/my-products-catalog-toolbar/ui/MyProductsCatalogToolbar";
 import { useMyProductsPageActions } from "@/features/my-products-page/model/useMyProductsPageActions";
 import { MyProductsCatalogGridRowItem } from "@/features/my-products-page/ui/MyProductsCatalogGridRowItem";
 import { MyProductsShelvesPanel } from "@/features/my-products-page/ui/MyProductsShelvesPanel";
 import { usePlaceProductPress } from "@/features/place-product/model/usePlaceProductPress";
 import { ProductPromotionModal } from "@/features/product-promotion/ui/ProductPromotionModal";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountList } from "@/features/profile-tab/ui/ProfileAccountList";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { MY_PRODUCTS_PAGE_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import {
+  MY_PRODUCTS_PAGE_LAYOUT,
+  resolveProfileHubMainReservedWidth,
+} from "@/shared/lib/guestProfileLayout";
 import { useProductGridLayout, type ProductGridLayoutResolvers } from "@/shared/model/useProductGridLayout";
-import { resolveProductGridGap } from "@/shared/lib/screenBreakpoints";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useMyProductsPageStyles } from "@/shared/theme/sellerFlowStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
+/** web `.my-products-catalog-section__list` override `gap: 0.75rem` */
+const MY_PRODUCTS_CATALOG_LIST_GAP = MY_PRODUCTS_PAGE_LAYOUT.listGap;
+
 const myProductsGridResolvers: ProductGridLayoutResolvers = {
   resolveColumns: () => 1,
-  resolveGap: resolveProductGridGap,
+  resolveGap: () => MY_PRODUCTS_CATALOG_LIST_GAP,
 };
 
 export const MyProductsPage = () => {
   const router = useRouter();
   const styles = useMyProductsPageStyles();
-  const productGrid = useProductGridLayout(undefined, myProductsGridResolvers);
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
+  const {
+    outerScrollOwns,
+    scrollEnabled,
+    registerNearEndHandler,
+  } = useProfileAccountNestedListScroll();
+  const productGrid = useProductGridLayout(undefined, myProductsGridResolvers, {
+    reservedLeadingWidth: resolveProfileHubMainReservedWidth(isDrawerLayout),
+  });
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
@@ -69,6 +84,27 @@ export const MyProductsPage = () => {
   });
   const myProductsTotalQuery = useMyProductsTotalQuery({ enabled: isAuthorized });
   const loyaltyPointsQuery = useMyLoyaltyPointsStatusQuery(isAuthorized);
+
+  useEffect(() => {
+    if (!outerScrollOwns) {
+      registerNearEndHandler(null);
+      return;
+    }
+
+    registerNearEndHandler(() => {
+      if (productsQuery.hasNextPage && !productsQuery.isFetchingNextPage) {
+        void productsQuery.fetchNextPage();
+      }
+    });
+
+    return () => registerNearEndHandler(null);
+  }, [
+    outerScrollOwns,
+    productsQuery.fetchNextPage,
+    productsQuery.hasNextPage,
+    productsQuery.isFetchingNextPage,
+    registerNearEndHandler,
+  ]);
 
   const sellerProductsLimit = useMemo(() => {
     if (isAdmin) {
@@ -141,17 +177,20 @@ export const MyProductsPage = () => {
 
   return (
     <>
-      <CatalogScrollAnimationProvider>
-        <CatalogAnimatedFlatList
-        style={[styles.container, styles.listFlex, centeredContentStyle]}
+      <ProfileAccountList
         key={productGrid.listKey}
         data={catalogGridRows}
         keyExtractor={(item) => item.key}
-        numColumns={1}
+        style={[
+          styles.container,
+          scrollEnabled ? styles.listFlex : null,
+          isDrawerLayout ? centeredContentStyle : null,
+        ]}
         contentContainerStyle={[
           styles.list,
+          !isDrawerLayout ? styles.listInAccountShell : null,
           resolveCatalogGridListContentStyle(productGrid.gap),
-          { paddingBottom: contentPaddingBottom },
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
         ]}
         ListHeaderComponent={
           <View style={styles.header}>
@@ -195,12 +234,16 @@ export const MyProductsPage = () => {
             }}
           />
         }
-        onEndReached={() => {
-          if (productsQuery.hasNextPage && !productsQuery.isFetchingNextPage) {
-            void productsQuery.fetchNextPage();
-          }
-        }}
-        onEndReachedThreshold={0.4}
+        onEndReached={
+          scrollEnabled
+            ? () => {
+                if (productsQuery.hasNextPage && !productsQuery.isFetchingNextPage) {
+                  void productsQuery.fetchNextPage();
+                }
+              }
+            : undefined
+        }
+        onEndReachedThreshold={scrollEnabled ? 0.4 : undefined}
         ListEmptyComponent={
           <View style={styles.centered}>
             <Text style={styles.hint}>{emptyMessage}</Text>
@@ -219,6 +262,7 @@ export const MyProductsPage = () => {
             row={item}
             columns={productGrid.columns}
             gap={productGrid.gap}
+            contentWidth={productGrid.contentWidth}
             tileWidth={productGrid.tileWidth}
             rowIndex={index}
             onEditProduct={pageActions.handleEditProduct}
@@ -227,14 +271,13 @@ export const MyProductsPage = () => {
             resolveLoyaltyOvercommitted={resolveLoyaltyOvercommitted}
           />
         )}
-        />
-      </CatalogScrollAnimationProvider>
+      />
 
       <ProfileMobileNavSheet
         visible={navSheetVisible}
         activeSectionId="my-products"
         onClose={() => setNavSheetVisible(false)}
-        onOverviewPress={() => router.replace("/(tabs)/profile")}
+        onOverviewPress={() => router.replace("/(tabs)/me")}
       />
 
       <ProductPromotionModal

@@ -10,6 +10,7 @@ import { usePendingProductReportsQuery } from "@/entities/product-report/model/u
 import { usePendingUserStoryReportsQuery } from "@/entities/user-story/model/useUserStoryReportStaffMutations";
 import { UserStoryReportGroupCard } from "@/entities/user-story/ui/UserStoryReportGroupCard";
 import { ProductReportsToolbar } from "@/features/product-reports-page/ui/ProductReportsToolbar";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { staffBadgeQueryKeys } from "@/shared/api";
@@ -25,6 +26,8 @@ export const ProductReportsPage = () => {
   const router = useRouter();
   const styles = useProductReportsPageStyles();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled, resolveListStyle } =
+    useProfileAccountNestedListScroll();
   const queryClient = useQueryClient();
   const productReportsQuery = usePendingProductReportsQuery();
   const storyReportsQuery = usePendingUserStoryReportsQuery();
@@ -80,7 +83,7 @@ export const ProductReportsPage = () => {
       visible={navSheetVisible}
       activeSectionId="product-reports"
       onClose={() => setNavSheetVisible(false)}
-      onOverviewPress={() => router.replace("/(tabs)/profile")}
+      onOverviewPress={() => router.replace("/(tabs)/me")}
     />
   );
 
@@ -140,8 +143,15 @@ export const ProductReportsPage = () => {
   return (
     <>
       <ScrollView
-        style={[styles.container, centeredContentStyle]}
-        contentContainerStyle={[styles.scroll, { paddingBottom: contentPaddingBottom }]}
+        style={resolveListStyle([
+          styles.container,
+          scrollEnabled ? centeredContentStyle : null,
+        ])}
+        scrollEnabled={scrollEnabled}
+        contentContainerStyle={[
+          styles.scroll,
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
+        ]}
         accessibilityLabel={PRODUCT_REPORTS_PAGE_UI.TITLE}
         refreshControl={
           <ThemedRefreshControl

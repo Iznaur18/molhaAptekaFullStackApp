@@ -26,6 +26,7 @@ import { resolveCreateRaffleBlockNotice } from "@/features/create-raffle-page/li
 import { CreateRaffleBlockNotice } from "@/features/create-raffle-page/ui/CreateRaffleBlockNotice";
 import { CreateRaffleFormBody } from "@/features/create-raffle-page/ui/CreateRaffleFormBody";
 import { CreateRaffleWizardProgress } from "@/features/create-raffle-page/ui/CreateRaffleWizardProgress";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import {
@@ -44,6 +45,8 @@ export const CreateRafflePage = () => {
   const theme = useAppTheme();
   const styles = useCreateRafflePageStyles();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled, resolveListStyle } =
+    useProfileAccountNestedListScroll();
   const isAuthorized = useIsAuthorized();
   const { isUserDataConfirmed } = useUserAccess();
   const createMutation = useCreateRaffleMutation();
@@ -253,7 +256,7 @@ export const CreateRafflePage = () => {
       onOverviewPress={() =>
         requestDiscard(() => {
           setNavSheetVisible(false);
-          router.replace("/(tabs)/profile");
+          router.replace("/(tabs)/me");
         })
       }
     />
@@ -324,11 +327,15 @@ export const CreateRafflePage = () => {
   return (
     <>
       <ScrollView
-        style={[styles.container, centeredContentStyle]}
+        style={resolveListStyle([
+          styles.container,
+          scrollEnabled ? centeredContentStyle : null,
+        ])}
+        scrollEnabled={scrollEnabled}
         contentContainerStyle={[
           styles.scroll,
           styles.content,
-          { paddingBottom: contentPaddingBottom },
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
         ]}
         keyboardShouldPersistTaps="handled"
         accessibilityLabel={CREATE_RAFFLE_MODAL_UI.ARIA_DIALOG}

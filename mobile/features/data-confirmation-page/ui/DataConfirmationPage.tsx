@@ -2,7 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, Pressable, Text, View } from "react-native";
 
 import {
   USER_DATA_CONFIRMATION_STATUS_PENDING,
@@ -11,10 +11,13 @@ import {
 import { useMyDataConfirmationStatusQuery } from "@/entities/user-data-confirmation/model/useMyDataConfirmationStatusQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { DataConfirmationRequestModal } from "@/features/data-confirmation-page/ui/DataConfirmationRequestModal";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountScrollBody } from "@/features/profile-tab/ui/ProfileAccountScrollBody";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { MY_PROFILE_PAGE_UI, USER_DATA_CONFIRMATION_PROFILE_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useDataConfirmationPageStyles } from "@/shared/theme/dataConfirmationPageStyles";
@@ -25,7 +28,9 @@ export const DataConfirmationPage = () => {
   const router = useRouter();
   const theme = useAppTheme();
   const styles = useDataConfirmationPageStyles();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
   const isAuthorized = useIsAuthorized();
   const statusQuery = useMyDataConfirmationStatusQuery(isAuthorized);
   const [navSheetVisible, setNavSheetVisible] = useState(false);
@@ -85,12 +90,13 @@ export const DataConfirmationPage = () => {
 
   return (
     <>
-      <ScrollView
-        style={[styles.container, centeredContentStyle]}
+      <ProfileAccountScrollBody
+        style={[styles.container, scrollEnabled ? centeredContentStyle : null]}
         contentContainerStyle={[
           styles.scroll,
           styles.content,
-          { paddingBottom: contentPaddingBottom },
+          !isDrawerLayout ? styles.contentInAccountShell : null,
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
         ]}
         accessibilityLabel={USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.PAGE_ARIA}
       >
@@ -200,7 +206,7 @@ export const DataConfirmationPage = () => {
             />
           ) : null}
         </View>
-      </ScrollView>
+      </ProfileAccountScrollBody>
 
       <DataConfirmationRequestModal
         visible={requestModalVisible}
@@ -212,7 +218,7 @@ export const DataConfirmationPage = () => {
         visible={navSheetVisible}
         activeSectionId="data-confirmation"
         onClose={() => setNavSheetVisible(false)}
-        onOverviewPress={() => router.replace("/(tabs)/profile")}
+        onOverviewPress={() => router.replace("/(tabs)/me")}
       />
     </>
   );

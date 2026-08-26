@@ -2,7 +2,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import type {
@@ -24,11 +24,14 @@ import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { AuctionPageOverview } from "@/features/auction-page/ui/AuctionPageOverview";
 import { AuctionPageSection } from "@/features/auction-page/ui/AuctionPageSection";
 import { AuctionPageToolbar } from "@/features/auction-page/ui/AuctionPageToolbar";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountList } from "@/features/profile-tab/ui/ProfileAccountList";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { staffBadgeQueryKeys } from "@/shared/api";
 import { AUCTION_PAGE_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAuctionPageStyles } from "@/shared/theme/auctionPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
@@ -44,7 +47,9 @@ const EMPTY_SELLER_OFFERS: IncomingPriceOffer[] = [];
 export const AuctionPage = () => {
   const router = useRouter();
   const styles = useAuctionPageStyles();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
   const queryClient = useQueryClient();
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
@@ -228,11 +233,19 @@ export const AuctionPage = () => {
 
   return (
     <>
-      <FlatList
-        style={[styles.container, styles.listFlex, centeredContentStyle]}
+      <ProfileAccountList
         data={listItems}
         keyExtractor={(item) => `${item.kind}-${item.id}`}
-        contentContainerStyle={[styles.list, { paddingBottom: contentPaddingBottom }]}
+        style={[
+          styles.container,
+          scrollEnabled ? styles.listFlex : null,
+          scrollEnabled ? centeredContentStyle : null,
+        ]}
+        contentContainerStyle={[
+          styles.list,
+          !isDrawerLayout ? styles.listInAccountShell : null,
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
+        ]}
         refreshControl={
           <ThemedRefreshControl
             refreshing={bidsQuery.isRefetching || offersQuery.isRefetching}
@@ -242,33 +255,43 @@ export const AuctionPage = () => {
           />
         }
         ListHeaderComponent={listHeader}
-        renderItem={({ item }) => {
+        renderItem={({ item, index }) => {
+          const itemStyle = index === 0 ? styles.listItemFirst : styles.listItem;
+
           if (item.kind === "section") {
-            return <AuctionPageSection title={item.title} count={item.count} />;
+            return (
+              <View style={itemStyle}>
+                <AuctionPageSection title={item.title} count={item.count} />
+              </View>
+            );
           }
 
           if (item.kind === "bid") {
             return (
-              <AuctionBuyerBidRow
-                bid={item.bid}
-                isUserDataConfirmed={isUserDataConfirmed}
-                onProductClick={handleProductClick}
-                onChanged={() => {
-                  void handleRefresh();
-                }}
-              />
+              <View style={itemStyle}>
+                <AuctionBuyerBidRow
+                  bid={item.bid}
+                  isUserDataConfirmed={isUserDataConfirmed}
+                  onProductClick={handleProductClick}
+                  onChanged={() => {
+                    void handleRefresh();
+                  }}
+                />
+              </View>
             );
           }
 
           return (
-            <AuctionSellerOfferRow
-              offer={item.offer}
-              onProductClick={handleProductClick}
-              onBuyerClick={handleBuyerClick}
-              onChanged={() => {
-                void handleRefresh();
-              }}
-            />
+            <View style={itemStyle}>
+              <AuctionSellerOfferRow
+                offer={item.offer}
+                onProductClick={handleProductClick}
+                onBuyerClick={handleBuyerClick}
+                onChanged={() => {
+                  void handleRefresh();
+                }}
+              />
+            </View>
           );
         }}
       />
@@ -277,7 +300,7 @@ export const AuctionPage = () => {
         visible={navSheetVisible}
         activeSectionId="auction"
         onClose={() => setNavSheetVisible(false)}
-        onOverviewPress={() => router.replace("/(tabs)/profile")}
+        onOverviewPress={() => router.replace("/(tabs)/me")}
       />
     </>
   );

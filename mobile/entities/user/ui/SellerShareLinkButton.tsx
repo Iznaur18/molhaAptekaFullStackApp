@@ -28,8 +28,11 @@ const useSellerShareStyles = createThemedStyles((theme) => ({
     // position handled by parent bannerActions cluster on profile
   },
   meta: {
-    flexShrink: 0,
-    width: 34,
+    flexShrink: 1,
+    flexGrow: 1,
+    alignSelf: "stretch",
+    width: "auto" as const,
+    minWidth: 0,
     height: 34,
     padding: 0,
     borderRadius: theme.radius.button,

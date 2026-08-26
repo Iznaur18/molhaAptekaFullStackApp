@@ -4,7 +4,6 @@ import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   Pressable,
-  ScrollView,
   Share,
   Text,
   View,
@@ -13,9 +12,12 @@ import {
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useMyReferralProgramQuery } from "@/entities/user/model/useMyReferralProgramQuery";
 import { AffiliateEarningsPanel } from "@/features/affiliate-listings-page/ui/AffiliateEarningsPanel";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountScrollBody } from "@/features/profile-tab/ui/ProfileAccountScrollBody";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { MY_PROFILE_PAGE_UI, PARTNER_PROGRAM_PAGE_UI } from "@/shared/config";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { usePartnerProgramPageStyles } from "@/shared/theme/partnerProgramPageStyles";
 import { AppButton } from "@/shared/ui/AppButton";
@@ -24,7 +26,9 @@ import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 export const PartnerProgramPage = () => {
   const router = useRouter();
   const styles = usePartnerProgramPageStyles();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
   const isAuthorized = useIsAuthorized();
   const query = useMyReferralProgramQuery(isAuthorized);
   const [navSheetVisible, setNavSheetVisible] = useState(false);
@@ -131,12 +135,13 @@ export const PartnerProgramPage = () => {
 
   return (
     <>
-      <ScrollView
-        style={[styles.container, centeredContentStyle]}
+      <ProfileAccountScrollBody
+        style={[styles.container, scrollEnabled ? centeredContentStyle : null]}
         contentContainerStyle={[
           styles.scroll,
           styles.content,
-          { paddingBottom: contentPaddingBottom },
+          !isDrawerLayout ? styles.contentInAccountShell : null,
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
         ]}
         accessibilityLabel={PARTNER_PROGRAM_PAGE_UI.ARIA}
       >
@@ -210,13 +215,13 @@ export const PartnerProgramPage = () => {
         </View>
 
         <AffiliateEarningsPanel />
-      </ScrollView>
+      </ProfileAccountScrollBody>
 
       <ProfileMobileNavSheet
         visible={navSheetVisible}
         activeSectionId="partner-program"
         onClose={() => setNavSheetVisible(false)}
-        onOverviewPress={() => router.replace("/(tabs)/profile")}
+        onOverviewPress={() => router.replace("/(tabs)/me")}
       />
     </>
   );

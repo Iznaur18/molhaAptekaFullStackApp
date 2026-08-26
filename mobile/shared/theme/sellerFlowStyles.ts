@@ -1,5 +1,6 @@
 import { Platform, StyleSheet } from "react-native";
 
+import { MY_PRODUCTS_PAGE_LAYOUT } from "@/shared/lib/guestProfileLayout";
 import { MEDIA_OVERLAY_SCRIM } from "@/shared/theme/catalogProductStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
@@ -453,13 +454,17 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
     flexDirection: "row",
     gap: 8,
     alignItems: "center",
+    width: "100%",
     paddingVertical: 9,
     paddingHorizontal: 10,
     borderWidth: 1,
     borderRadius: 10,
   },
   charInput: {
-    flex: 1,
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 0,
+    minWidth: 0,
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 10,
@@ -467,15 +472,17 @@ export const useProductEditorScreenStyles = createThemedStyles((theme) => ({
     fontSize: 14,
   },
   charInputValue: {
-    flex: 1.5,
+    flexGrow: 1.5,
   },
   charRemoveBtn: {
     width: 32,
     height: 32,
+    flexShrink: 0,
     borderRadius: 7,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "transparent",
   },
   charRemoveText: {
     fontSize: 13,
@@ -580,10 +587,15 @@ export const useMyProductsPageStyles = createThemedStyles((theme) => ({
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     flexGrow: 1,
   },
+  /** Desktop hub: shell уже даёт pad; gutter 0 как web `--my-profile-shell-content-gutter: 0`. */
+  listInAccountShell: {
+    paddingHorizontal: 0,
+  },
+  /** web `__main { gap: 0.75rem }` — shelves / toolbar / notices; list gap отдельно. */
   header: {
-    gap: 13.6,
-    paddingTop: 12,
-    paddingBottom: 12,
+    gap: MY_PRODUCTS_PAGE_LAYOUT.stackGap,
+    paddingTop: 0,
+    paddingBottom: 0,
   },
   headerActions: {
     flexDirection: "row",

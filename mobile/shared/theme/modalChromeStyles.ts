@@ -1398,3 +1398,111 @@ export const useInstallmentPassportShareConsentModalStyles = createThemedStyles(
     opacity: 0.65,
   },
 }));
+
+export const useProductModalShellStyles = createThemedStyles((theme) => ({
+  backdrop: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: theme.spacing[4],
+    backgroundColor: MODAL_BACKDROP_SCRIM,
+  },
+  backdropFullScreen: {
+    flex: 1,
+    width: "100%",
+    backgroundColor: theme.colors.surface,
+  },
+  backdropDismiss: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  panel: {
+    width: "100%",
+    flexShrink: 1,
+    minHeight: 0,
+    flexDirection: "column",
+    overflow: "hidden",
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.surface,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 12 },
+        shadowOpacity: 0.18,
+        shadowRadius: 24,
+      },
+      android: { elevation: 12 },
+      default: {
+        boxShadow: "0 12px 32px rgba(0,0,0,0.18)",
+      },
+    }),
+  },
+  panelFullScreen: {
+    flex: 1,
+    width: "100%",
+    minHeight: 0,
+    flexDirection: "column",
+    overflow: "hidden",
+    backgroundColor: theme.colors.surface,
+  },
+  header: {
+    flexShrink: 0,
+    paddingHorizontal: theme.spacing[4],
+    paddingTop: theme.spacing[4],
+    paddingBottom: theme.spacing[3],
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
+  },
+  headerTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: theme.spacing[3],
+  },
+  title: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: "700",
+    lineHeight: 24,
+    color: theme.colors.text,
+  },
+  closeButton: {
+    width: 32,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    borderRadius: 999,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  closeButtonPressed: {
+    opacity: 0.85,
+    backgroundColor: theme.colors.surfaceElevated,
+  },
+  closeButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.textMuted,
+    lineHeight: 16,
+  },
+  bodyScroll: {
+    flexGrow: 1,
+    flexShrink: 1,
+    minHeight: 0,
+  },
+  bodyContent: {
+    paddingHorizontal: theme.spacing[4],
+    paddingTop: theme.spacing[4],
+    paddingBottom: theme.spacing[4],
+    gap: theme.spacing[4],
+  },
+  footer: {
+    flexShrink: 0,
+    paddingHorizontal: theme.spacing[4],
+    paddingTop: theme.spacing[3],
+    paddingBottom: theme.spacing[4],
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+}));

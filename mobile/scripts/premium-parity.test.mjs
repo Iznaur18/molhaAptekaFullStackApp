@@ -15,6 +15,7 @@ test("premium page mirrors web plan panel and purchase flow", () => {
 
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /ProfileMobileNavSheet/);
+  assert.match(page, /ProfileAccountScrollBody/);
   assert.match(page, /contentPaddingBottom/);
   assert.match(page, /PLAN_BENEFITS/);
   assert.match(page, /INSUFFICIENT_POINTS/);

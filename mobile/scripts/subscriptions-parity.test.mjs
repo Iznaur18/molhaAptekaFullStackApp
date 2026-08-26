@@ -16,6 +16,9 @@ test("subscriptions page mirrors web hub chrome and list", () => {
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /ProfileMobileNavSheet/);
   assert.match(page, /contentPaddingBottom/);
+  assert.match(page, /useProfileAdaptiveLayout/);
+  assert.match(page, /listInAccountShell/);
+  assert.match(page, /emptyInAccountShell/);
   assert.match(page, /SubscriptionUserRow/);
   assert.match(page, /activeSectionId="subscriptions"/);
   assert.match(page, /TAB_SUBSCRIPTIONS/);
@@ -24,7 +27,9 @@ test("subscriptions page mirrors web hub chrome and list", () => {
   assert.doesNotMatch(page, /useUnfollowUserMutation/);
 
   assert.match(styles, /loginButton/);
-  assert.match(styles, /LIST_GAP/);
+  assert.match(styles, /SUBSCRIPTIONS_PAGE_LAYOUT/);
+  assert.match(styles, /listInAccountShell/);
+  assert.match(styles, /paddingTop:\s*0/);
 });
 
 test("subscription user row mirrors web row layout", () => {

@@ -28,7 +28,22 @@ test("my orders page mirrors web toolbar and compact buyer order card", () => {
   assert.match(page, /COUNT_FILTERED/);
   assert.match(page, /ListHeaderComponent/);
   assert.match(page, /contentPaddingBottom/);
+  assert.match(page, /listInAccountShell/);
+  assert.match(page, /useProfileAdaptiveLayout/);
+  assert.match(page, /listItemFirst/);
+  assert.match(page, /ProfileAccountList/);
   assert.match(page, /compact/);
+
+  const pageStyles = readMobileFile("shared/theme/myOrdersPageStyles.ts");
+  assert.match(pageStyles, /MY_ORDERS_PAGE_LAYOUT/);
+  assert.match(pageStyles, /listInAccountShell/);
+  assert.match(pageStyles, /paddingTop:\s*0/);
+  assert.match(pageStyles, /listItemFirst/);
+
+  const layout = readMobileFile("shared/lib/guestProfileLayout.ts");
+  assert.match(layout, /MY_ORDERS_PAGE_LAYOUT/);
+  assert.match(layout, /stackGap: 13\.6/);
+
   assert.match(page, /onProductClick/);
   assert.match(page, /onConfirmDelivered/);
   assert.match(page, /loyaltyFlash/);

@@ -69,6 +69,34 @@ export const ProfileHubMenu = ({
   }
 
   const isChromeVariant = variant === "sheet" || variant === "sidebar";
+  const isSidebar = variant === "sidebar";
+
+  const heading = (
+    <Text style={[styles.heading, isSidebar && styles.headingSidebar]}>
+      {MY_PROFILE_PAGE_UI.TAB_TITLE}
+    </Text>
+  );
+
+  const groups = navGroups.map((group, groupIndex) => (
+    <View
+      key={group.id}
+      style={[
+        styles.group,
+        isSidebar && styles.groupSidebar,
+        groupIndex > 0 && styles.groupDivided,
+      ]}
+    >
+      {group.label ? <Text style={styles.groupLabel}>{group.label}</Text> : null}
+      {group.items.map((item) => (
+        <ProfileHubNavItem
+          key={item.sectionId}
+          item={item}
+          isActive={activeSectionId === item.sectionId}
+          onPress={() => void openSection(item.sectionId)}
+        />
+      ))}
+    </View>
+  ));
 
   return (
     <View
@@ -76,27 +104,12 @@ export const ProfileHubMenu = ({
         styles.root,
         !isChromeVariant && profileContentStyle,
         variant === "sheet" && styles.rootSheet,
-        variant === "sidebar" && styles.rootSidebar,
+        isSidebar && styles.rootSidebar,
       ]}
       accessibilityLabel={MY_PROFILE_PAGE_UI.NAV_ARIA}
     >
-      <Text style={styles.heading}>{MY_PROFILE_PAGE_UI.TAB_TITLE}</Text>
-      {navGroups.map((group, groupIndex) => (
-        <View
-          key={group.id}
-          style={[styles.group, groupIndex > 0 && styles.groupDivided]}
-        >
-          {group.label ? <Text style={styles.groupLabel}>{group.label}</Text> : null}
-          {group.items.map((item) => (
-            <ProfileHubNavItem
-              key={item.sectionId}
-              item={item}
-              isActive={activeSectionId === item.sectionId}
-              onPress={() => void openSection(item.sectionId)}
-            />
-          ))}
-        </View>
-      ))}
+      {isSidebar ? <View style={styles.sidebarHead}>{heading}</View> : heading}
+      {isSidebar ? <View style={styles.sidebarNav}>{groups}</View> : groups}
     </View>
   );
 };

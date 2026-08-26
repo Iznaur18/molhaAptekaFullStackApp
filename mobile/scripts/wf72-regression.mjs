@@ -36,7 +36,7 @@ const EXPECTED_APP_ROUTES = [
   "app/(tabs)/catalog.tsx",
   "app/(tabs)/place-product.tsx",
   "app/(tabs)/cart.tsx",
-  "app/(tabs)/profile.tsx",
+  "app/(tabs)/me.tsx",
   "app/(auth)/login.tsx",
   "app/(auth)/register.tsx",
   "app/catalog-browser.tsx",
@@ -190,7 +190,7 @@ const BUYER_CRITICAL_ROUTES = [
   "app/product/[id].tsx",
   "app/(tabs)/cart.tsx",
   "app/(tabs)/orders.tsx",
-  "app/(tabs)/profile.tsx",
+  "app/(tabs)/me.tsx",
   "app/(tabs)/hub/[section].tsx",
   "app/profile/edit.tsx",
 ];
@@ -198,7 +198,7 @@ const BUYER_CRITICAL_ROUTES = [
 const HUB_TAB_BAR_CHECKS = [
   {
     file: "app/(tabs)/_layout.tsx",
-    mustInclude: ['name="hub/[section]"', 'name="orders"', 'name="users"', "href: null"],
+    mustInclude: ['name="hub/[section]"', 'name="orders"', 'name="users"', 'name="me"', "href: null"],
   },
   {
     file: "shared/ui/MobileBottomTabBar.tsx",
@@ -208,8 +208,10 @@ const HUB_TAB_BAR_CHECKS = [
       "resolveMobileBottomNavHorizontalInset",
       "styles.shell",
       'pointerEvents: "box-none"',
-      'item.routeName === "profile" && isProfileTabBarContext',
-      'item.routeName === "index" && isHomeTabBarContext',
+      'item.routeName === "me"',
+      "isProfileTabBarContext",
+      "isHomeTabBarContext",
+      "HOME_TAB_ROUTE",
     ],
   },
   {
@@ -494,7 +496,7 @@ const BUYER_UI_WIRING_CHECKS = [
     mustInclude: ["createOrderMutation", 'router.replace("/orders")'],
   },
   {
-    file: "app/(tabs)/profile.tsx",
+    file: "app/(tabs)/me.tsx",
     mustInclude: ["useAuthSessionQuery"],
   },
 ];

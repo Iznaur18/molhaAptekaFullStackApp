@@ -15,6 +15,7 @@ test("installment disputes page mirrors web layout and hub chrome", () => {
 
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /ProfileMobileNavSheet/);
+  assert.match(page, /ProfileAccountScrollBody/);
   assert.match(page, /contentPaddingBottom/);
   assert.match(page, /InstallmentDisputesPageToolbar/);
   assert.match(page, /InstallmentDisputesQueueCard/);

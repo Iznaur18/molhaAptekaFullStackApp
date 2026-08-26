@@ -2,17 +2,20 @@ import { Feather } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { useMyFavoritesQuery } from "@/entities/wishlist/model/useMyFavoritesQuery";
 import { useWishlist } from "@/entities/wishlist/model/WishlistProvider";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountList } from "@/features/profile-tab/ui/ProfileAccountList";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { WishlistRow } from "@/features/wishlist-page/ui/WishlistRow";
 import { MY_PROFILE_PAGE_UI, WISHLIST_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { pluralizeRu } from "@/shared/lib/pluralizeRu";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useWishlistPageStyles } from "@/shared/theme/wishlistPageStyles";
@@ -30,7 +33,9 @@ export const WishlistPage = () => {
   const router = useRouter();
   const theme = useAppTheme();
   const styles = useWishlistPageStyles();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
   const isAuthorized = useIsAuthorized();
   const favoritesQuery = useMyFavoritesQuery({ enabled: isAuthorized });
   const { items } = useWishlist();
@@ -124,7 +129,14 @@ export const WishlistPage = () => {
   if (products.length === 0) {
     return (
       <>
-        <View style={[styles.container, centeredContentStyle, styles.emptyRoot]}>
+        <View
+          style={[
+            styles.container,
+            centeredContentStyle,
+            styles.emptyRoot,
+            !isDrawerLayout ? styles.emptyInAccountShell : null,
+          ]}
+        >
           {listHeader}
           <View style={styles.emptyBody}>
             <Text style={styles.state}>{WISHLIST_PAGE_UI.EMPTY}</Text>
@@ -134,7 +146,7 @@ export const WishlistPage = () => {
           visible={navSheetVisible}
           activeSectionId="wishlist"
           onClose={() => setNavSheetVisible(false)}
-          onOverviewPress={() => router.replace("/(tabs)/profile")}
+          onOverviewPress={() => router.replace("/(tabs)/me")}
         />
       </>
     );
@@ -142,17 +154,20 @@ export const WishlistPage = () => {
 
   return (
     <>
-      <FlatList
-        style={[styles.container, centeredContentStyle]}
-        contentContainerStyle={[
-          styles.listContent,
-          { paddingBottom: contentPaddingBottom },
-        ]}
+      <ProfileAccountList
         data={products}
         keyExtractor={(item) => item._id}
+        style={[styles.container, scrollEnabled ? centeredContentStyle : null]}
+        contentContainerStyle={[
+          styles.listContent,
+          !isDrawerLayout ? styles.listInAccountShell : null,
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
+        ]}
         ListHeaderComponent={listHeader}
-        renderItem={({ item }) => (
-          <WishlistRow product={item} onProductPress={handleOpenProduct} />
+        renderItem={({ item, index }) => (
+          <View style={index === 0 ? null : styles.listItem}>
+            <WishlistRow product={item} onProductPress={handleOpenProduct} />
+          </View>
         )}
       />
 
@@ -160,7 +175,7 @@ export const WishlistPage = () => {
         visible={navSheetVisible}
         activeSectionId="wishlist"
         onClose={() => setNavSheetVisible(false)}
-        onOverviewPress={() => router.replace("/(tabs)/profile")}
+        onOverviewPress={() => router.replace("/(tabs)/me")}
       />
     </>
   );

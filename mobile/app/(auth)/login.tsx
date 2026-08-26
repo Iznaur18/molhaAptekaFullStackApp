@@ -68,7 +68,7 @@ export default function LoginScreen() {
   const finishLogin = useCallback(() => {
     releaseColdStartSplash();
     // Паритет web LoginPage → `/me`
-    router.replace("/(tabs)/profile");
+    router.replace("/(tabs)/me");
   }, [router]);
 
   const handleChannelChange = useCallback((next: AuthChannel) => {

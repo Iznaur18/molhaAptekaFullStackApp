@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 
 import { MODAL_BACKDROP_SCRIM } from "@/shared/theme/formChromeStyles";
+import { PROFILE_ACCOUNT_STACK_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
@@ -14,9 +15,14 @@ export const useDataConfirmationPageStyles = createThemedStyles((theme) => ({
     flexGrow: 1,
   },
   content: {
-    gap: 16,
+    gap: L.stackGap,
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
     paddingTop: 12,
+  },
+  /** Desktop hub: shell уже даёт gutter. */
+  contentInAccountShell: {
+    paddingHorizontal: 0,
+    paddingTop: 0,
   },
   header: {
     gap: 14,

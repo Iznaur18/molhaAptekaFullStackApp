@@ -23,6 +23,7 @@ import {
 } from "@/entities/seller-shelf/api/sellerShelfApi";
 import { sellerShelfQueryKeys } from "@/entities/seller-shelf/model/sellerShelfQueryKeys";
 import { SELLER_SHELF_UI } from "@/shared/config";
+import { MY_PRODUCTS_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
@@ -48,26 +49,26 @@ async function fetchAllMyProductsForShelves() {
 
 const useStyles = createThemedStyles((theme) => ({
   root: {
-    gap: 8,
-    padding: 12,
-    borderRadius: theme.radius.sm,
+    gap: 0,
+    paddingVertical: L.shelvesPaddingY,
+    paddingHorizontal: L.shelvesPaddingX,
+    borderRadius: L.shelvesRadius,
     borderWidth: 1,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.actionSurface,
-    marginBottom: 8,
   },
   toggle: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 8,
+    gap: L.shelvesToggleGap,
   },
   toggleMain: {
     flex: 1,
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "baseline",
-    gap: 8,
+    gap: L.shelvesToggleGap,
   },
   title: { fontSize: 16, fontWeight: "600", color: theme.colors.text },
   hint: { fontSize: 13, color: theme.colors.textMuted },

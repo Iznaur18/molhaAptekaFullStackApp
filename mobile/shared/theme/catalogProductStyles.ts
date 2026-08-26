@@ -646,18 +646,18 @@ export const useListPageFilterBarStyles = createThemedStyles((theme) => ({
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
-    gap: 13.6,
+    gap: 10,
   },
   field: {
     flexGrow: 1,
     flexBasis: "46%",
     minWidth: 140,
-    gap: 4.8,
+    gap: 8,
   },
   fieldLabel: {
-    fontSize: 11.5,
+    fontSize: 12,
     fontWeight: "600",
-    lineHeight: 14.4,
+    lineHeight: 16,
     color: theme.colors.textSecondary,
   },
   control: {

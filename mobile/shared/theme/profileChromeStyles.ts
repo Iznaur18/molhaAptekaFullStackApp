@@ -4,6 +4,7 @@ import {
   GUEST_PROFILE_LAYOUT as G,
   MY_PROFILE_LAYOUT_GAP,
   MY_PROFILE_SHELL_PAD_X,
+  MY_PROFILE_SIDEBAR_LAYOUT as S,
   MY_PROFILE_SIDEBAR_WIDTH,
   PROFILE_OVERVIEW_LAYOUT as O,
 } from "@/shared/lib/guestProfileLayout";
@@ -14,9 +15,21 @@ import { SCREEN_CONTENT_PADDING_BOTTOM, SCREEN_CONTENT_PADDING_HORIZONTAL } from
 /** @deprecated используйте resolveProfileContentMaxWidth / useScreenLayout */
 export const PROFILE_CONTENT_MAX_WIDTH = PROFILE_CONTENT_MAX_WIDTH_PHONE;
 export const PROFILE_ACTIONS_MAX_WIDTH = 320;
+/** `--modal-avatar-lead-size: 4.5rem` */
 const PROFILE_AVATAR_SIZE = 72;
-/** Высота шапки-баннера профиля. Переиспользуется превью фона в редакторе. */
+/**
+ * Паритет web `--modal-profile-banner-height-mult: 3`
+ * → `min-height: calc(4.5rem * 3)` = 216px.
+ */
 export const PROFILE_BANNER_HEIGHT = PROFILE_AVATAR_SIZE * 3;
+/** `--modal-profile-banner-radius: 24px` (обычный radius, не squircle). */
+export const PROFILE_BANNER_RADIUS = 24;
+/**
+ * web banner `margin-bottom: 1rem` схлопывается с share `margin-top`.
+ * На RN отступ после баннера — только `PROFILE_OVERVIEW_LAYOUT.shareRowMarginTop`.
+ */
+export const PROFILE_BANNER_MARGIN_BOTTOM = 0;
+/** Карточки info/share — тот же 24, что и web surface. */
 export const PROFILE_CARD_SQUIRCLE_RADIUS = 24;
 /** Паритет с teaser/wholesale chrome на экране товара. */
 export const PRODUCT_DETAIL_SECTION_RADIUS = 20;
@@ -46,19 +59,29 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
     alignSelf: "stretch",
     borderWidth: 1,
     borderColor: theme.colors.border,
-    borderRadius: 14,
+    borderRadius: S.radius,
     backgroundColor: theme.colors.surface,
     overflow: "hidden",
   },
   sidebarInner: {
-    paddingTop: 16,
+    paddingTop: 0,
     paddingBottom: 12,
-    paddingHorizontal: 8,
-    gap: 8,
+    paddingHorizontal: 0,
+    gap: 0,
   },
   mainColumn: {
     flex: 1,
     minWidth: 0,
+    backgroundColor: theme.colors.bg,
+  },
+  /** Контент колонки overview: gap как web `__main { gap: 0.75rem }` между siblings. */
+  mainColumnContent: {
+    flexGrow: 1,
+    width: "100%",
+    alignSelf: "stretch",
+    paddingTop: O.scrollPaddingTop,
+    paddingBottom: SCREEN_CONTENT_PADDING_BOTTOM,
+    gap: O.mainGap,
     backgroundColor: theme.colors.bg,
   },
   guestSafeArea: {
@@ -181,6 +204,7 @@ export const useProfileScreenStyles = createThemedStyles((theme) => ({
 
 export const useProfileOverviewSectionStyles = createThemedStyles((theme) => ({
   root: {
+    width: "100%",
     gap: 0,
   },
   shareRow: {
@@ -207,6 +231,7 @@ export const useProfileOverviewSectionStyles = createThemedStyles((theme) => ({
   },
   infoPanel: {
     marginTop: O.infoMarginTop,
+    width: "100%",
   },
   raffleSection: {
     marginBottom: theme.spacing[1],
@@ -216,10 +241,16 @@ export const useProfileOverviewSectionStyles = createThemedStyles((theme) => ({
 export const useProfileOverviewBannerStyles = createThemedStyles((theme) => ({
   wrap: {
     width: "100%",
+    marginBottom: PROFILE_BANNER_MARGIN_BOTTOM,
   },
   banner: {
     position: "relative",
+    width: "100%",
+    height: PROFILE_BANNER_HEIGHT,
     minHeight: PROFILE_BANNER_HEIGHT,
+    borderRadius: PROFILE_BANNER_RADIUS,
+    overflow: "hidden",
+    backgroundColor: theme.colors.surfaceMuted,
   },
   bannerFallback: {
     backgroundColor: theme.colors.surfaceMuted,
@@ -228,6 +259,7 @@ export const useProfileOverviewBannerStyles = createThemedStyles((theme) => ({
     ...StyleSheet.absoluteFillObject,
     width: "100%",
     height: "100%",
+    borderRadius: PROFILE_BANNER_RADIUS,
   },
   bannerScrim: {
     ...StyleSheet.absoluteFillObject,
@@ -407,7 +439,8 @@ export const useProfileMobileNavSheetStyles = createThemedStyles((theme) => ({
     gap: theme.spacing[4],
   },
   logoutFooter: {
-    marginTop: theme.spacing[2],
+    marginTop: S.groupMarginTop,
+    marginHorizontal: S.navPaddingX,
     padding: theme.spacing[3],
     borderRadius: theme.radius.md,
     borderWidth: 1,
@@ -447,7 +480,20 @@ export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
   rootSidebar: {
     marginTop: 0,
     maxWidth: undefined,
-    gap: 6,
+    // web: head и nav стык в стык (без flex-gap между ними)
+    gap: 0,
+  },
+  sidebarHead: {
+    paddingTop: S.headPaddingTop,
+    paddingHorizontal: S.headPaddingX,
+    paddingBottom: S.headPaddingBottom,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  sidebarNav: {
+    paddingVertical: S.navPaddingY,
+    paddingHorizontal: S.navPaddingX,
+    gap: S.navGap,
   },
   heading: {
     fontSize: 18,
@@ -456,14 +502,23 @@ export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
     textAlign: "center",
     color: theme.colors.primary,
   },
+  headingSidebar: {
+    fontSize: S.titleFontSize,
+    textAlign: "left",
+    letterSpacing: -0.32,
+  },
   group: {
-    gap: 2,
+    gap: S.itemGap,
     paddingVertical: theme.spacing[2],
     paddingHorizontal: theme.spacing[2],
   },
+  groupSidebar: {
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+  },
   groupDivided: {
-    marginTop: theme.spacing[1],
-    paddingTop: theme.spacing[3],
+    marginTop: S.groupMarginTop,
+    paddingTop: S.groupPaddingTop,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
   },
@@ -472,18 +527,17 @@ export const useProfileHubMenuStyles = createThemedStyles((theme) => ({
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 0.7,
-    marginBottom: theme.spacing[2],
-    paddingHorizontal: 9,
+    marginBottom: S.groupLabelMarginBottom,
+    paddingHorizontal: S.groupLabelPaddingX,
     color: theme.colors.primaryBright,
   },
   item: {
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing[2],
-    paddingVertical: 10,
-    paddingRight: 10,
-    paddingLeft: 7,
-    borderRadius: 10,
+    paddingVertical: S.itemPaddingY,
+    paddingHorizontal: S.itemPaddingX,
+    borderRadius: S.itemRadius,
     backgroundColor: "transparent",
     borderLeftWidth: 3,
     borderLeftColor: "transparent",

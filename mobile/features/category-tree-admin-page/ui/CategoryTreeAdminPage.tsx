@@ -1,7 +1,7 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Alert, FlatList, Pressable, Switch, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, Switch, Text, TextInput, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import type { ProductCategoryAdminRow } from "@/entities/product-category-tree/model/adminTypes";
@@ -9,9 +9,12 @@ import { useCategoryTreeAdminPage } from "@/features/category-tree-admin-page/mo
 import { CategoryTreeAdminCard } from "@/features/category-tree-admin-page/ui/CategoryTreeAdminCard";
 import { CategoryTreeLegacyPicker } from "@/features/category-tree-admin-page/ui/CategoryTreeLegacyPicker";
 import { CategoryTreeParentPicker } from "@/features/category-tree-admin-page/ui/CategoryTreeParentPicker";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountList } from "@/features/profile-tab/ui/ProfileAccountList";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { CATEGORY_TREE_ADMIN_PAGE_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAdminPanelStyles } from "@/shared/theme/adminPanelStyles";
 import { AdminPanelShell } from "@/shared/ui/AdminPanelShell";
@@ -20,7 +23,9 @@ import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 export const CategoryTreeAdminPage = () => {
   const router = useRouter();
   const styles = useAdminPanelStyles();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
 
   const {
@@ -193,7 +198,7 @@ export const CategoryTreeAdminPage = () => {
       visible={navSheetVisible}
       activeSectionId="category-tree-admin"
       onClose={() => setNavSheetVisible(false)}
-      onOverviewPress={() => router.replace("/(tabs)/profile")}
+      onOverviewPress={() => router.replace("/(tabs)/me")}
     />
   );
 
@@ -211,10 +216,16 @@ export const CategoryTreeAdminPage = () => {
     topSlot: sectionToggle,
   };
 
+  const pageListStyle = [
+    styles.pageContainer,
+    styles.pageList,
+    !isDrawerLayout ? styles.pageListInAccountShell : null,
+  ];
+
   if (phase === "loading" && rows.length === 0) {
     return (
       <>
-        <View style={[styles.pageContainer, centeredContentStyle, styles.pageList]}>
+        <View style={[...pageListStyle, centeredContentStyle]}>
           <AdminPanelShell
             {...shellProps}
             count={0}
@@ -232,7 +243,7 @@ export const CategoryTreeAdminPage = () => {
   if (phase === "error" && rows.length === 0) {
     return (
       <>
-        <View style={[styles.pageContainer, centeredContentStyle, styles.pageList]}>
+        <View style={[...pageListStyle, centeredContentStyle]}>
           <AdminPanelShell
             {...shellProps}
             count={0}
@@ -249,11 +260,17 @@ export const CategoryTreeAdminPage = () => {
 
   return (
     <>
-      <FlatList
-        style={[styles.pageContainer, styles.pageList, centeredContentStyle]}
-        contentContainerStyle={{ paddingBottom: contentPaddingBottom, gap: 8 }}
+      <ProfileAccountList
         data={filteredRows}
         keyExtractor={(item) => item._id}
+        style={[
+          ...pageListStyle,
+          scrollEnabled ? centeredContentStyle : null,
+        ]}
+        contentContainerStyle={{
+          paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom,
+          gap: 8,
+        }}
         refreshControl={
           <ThemedRefreshControl
             refreshing={isRefreshing}

@@ -34,7 +34,7 @@ test("register screen matches web AuthPage layout", () => {
   assert.match(register, /AUTH_PAGE_LAYOUT/);
   assert.match(register, /LayoutAnimation/);
   assert.match(register, /REGISTER_CHANNEL_ARIA/);
-  assert.match(register, /router\.replace\("\/\(tabs\)\/profile"\)/);
+  assert.match(register, /router\.replace\("\/\(tabs\)\/me"\)/);
   assert.doesNotMatch(register, /ModalSectionTabs/);
   assert.doesNotMatch(register, /useScreenLayout/);
   assert.doesNotMatch(register, /centeredContentStyle/);

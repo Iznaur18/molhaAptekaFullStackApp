@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import type { z } from "zod";
-import { Alert, FlatList, Pressable, Text, View } from "react-native";
+import { Alert, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
@@ -25,6 +25,8 @@ import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { normalizeTotalSalesCount } from "@/entities/user/lib/formatSearchRowTotalSales";
 import { MySalesPageOverview } from "@/features/my-sales-page/ui/MySalesPageOverview";
 import { MySalesPageToolbar } from "@/features/my-sales-page/ui/MySalesPageToolbar";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountList } from "@/features/profile-tab/ui/ProfileAccountList";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { orderQueryKeys } from "@/shared/api";
@@ -37,6 +39,7 @@ import {
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useDebouncedValue } from "@/shared/lib/useDebouncedValue";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useMySalesPageStyles } from "@/shared/theme/mySalesPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
@@ -48,7 +51,9 @@ const EMPTY_ORDERS: OrderRecord[] = [];
 export const MySalesPage = () => {
   const router = useRouter();
   const styles = useMySalesPageStyles();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
   const queryClient = useQueryClient();
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
@@ -333,11 +338,19 @@ export const MySalesPage = () => {
 
   return (
     <>
-      <FlatList
-        style={[styles.container, styles.listFlex, centeredContentStyle]}
+      <ProfileAccountList
         data={filteredOrders}
         keyExtractor={(order) => order._id}
-        contentContainerStyle={[styles.list, { paddingBottom: contentPaddingBottom }]}
+        style={[
+          styles.container,
+          scrollEnabled ? styles.listFlex : null,
+          scrollEnabled ? centeredContentStyle : null,
+        ]}
+        contentContainerStyle={[
+          styles.list,
+          !isDrawerLayout ? styles.listInAccountShell : null,
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
+        ]}
         refreshControl={
           <ThemedRefreshControl
             refreshing={salesQuery.isRefetching || overviewQuery.isRefetching}
@@ -347,21 +360,23 @@ export const MySalesPage = () => {
           />
         }
         ListHeaderComponent={listHeader}
-        renderItem={({ item }) => (
-          <OrderCard
-            order={item}
-            style={styles.orderCardInList}
-            compact
-            attentionRole="seller"
-            showBuyer
-            onBuyerNameClick={handleBuyerNameClick}
-            onProductClick={handleProductClick}
-            onMarkShipped={handleMarkShipped}
-            onMarkDelivered={handleMarkDelivered}
-            onCancelItem={handleCancelItem}
-            pendingActionKey={pendingActionKey}
-            itemActionErrors={itemActionErrors}
-          />
+        renderItem={({ item, index }) => (
+          <View style={index === 0 ? styles.listItemFirst : styles.listItem}>
+            <OrderCard
+              order={item}
+              style={styles.orderCardInList}
+              compact
+              attentionRole="seller"
+              showBuyer
+              onBuyerNameClick={handleBuyerNameClick}
+              onProductClick={handleProductClick}
+              onMarkShipped={handleMarkShipped}
+              onMarkDelivered={handleMarkDelivered}
+              onCancelItem={handleCancelItem}
+              pendingActionKey={pendingActionKey}
+              itemActionErrors={itemActionErrors}
+            />
+          </View>
         )}
       />
 
@@ -369,7 +384,7 @@ export const MySalesPage = () => {
         visible={navSheetVisible}
         activeSectionId="my-sales"
         onClose={() => setNavSheetVisible(false)}
-        onOverviewPress={() => router.replace("/(tabs)/profile")}
+        onOverviewPress={() => router.replace("/(tabs)/me")}
       />
     </>
   );

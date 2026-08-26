@@ -2,7 +2,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { campaignToIntroAdPreviewSettings } from "@/entities/intro-ad/lib/campaignToIntroAdPreviewSettings";
@@ -40,12 +40,15 @@ import { RaffleModerationSection } from "@/features/intro-ad-moderation-page/ui/
 import { SellerPersonalCategoryCampaignModerationSection } from "@/features/intro-ad-moderation-page/ui/SellerPersonalCategoryCampaignModerationSection";
 import { SiteHeaderBannerCampaignModerationSection } from "@/features/intro-ad-moderation-page/ui/SiteHeaderBannerCampaignModerationSection";
 import { UsersLoyaltyRaffleAdminModerationSection } from "@/features/intro-ad-moderation-page/ui/UsersLoyaltyRaffleAdminModerationSection";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
+import { ProfileAccountScrollBody } from "@/features/profile-tab/ui/ProfileAccountScrollBody";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { introAdQueryKeys, staffBadgeQueryKeys } from "@/shared/api";
 import { INTRO_AD_MODERATION_PAGE_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
 import { campaignModerationNeedsAttention } from "@/shared/lib/campaignModerationAttention";
 import { formatApiErrorMessage } from "@/shared/lib";
+import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useIntroAdModerationPageStyles } from "@/shared/theme/introAdModerationPageStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
@@ -55,7 +58,9 @@ const EMPTY_CAMPAIGNS: never[] = [];
 export const IntroAdModerationPage = () => {
   const router = useRouter();
   const styles = useIntroAdModerationPageStyles();
+  const { isDrawerLayout } = useProfileAdaptiveLayout();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
   const queryClient = useQueryClient();
   const { previewIntro } = useAppIntro();
   const { isAdmin } = useUserAccess();
@@ -379,7 +384,7 @@ export const IntroAdModerationPage = () => {
       visible={navSheetVisible}
       activeSectionId="intro-ad-moderation"
       onClose={() => setNavSheetVisible(false)}
-      onOverviewPress={() => router.replace("/(tabs)/profile")}
+      onOverviewPress={() => router.replace("/(tabs)/me")}
     />
   );
 
@@ -564,9 +569,13 @@ export const IntroAdModerationPage = () => {
 
   return (
     <>
-      <ScrollView
-        style={[styles.container, centeredContentStyle]}
-        contentContainerStyle={[styles.scroll, { paddingBottom: contentPaddingBottom }]}
+      <ProfileAccountScrollBody
+        style={[styles.container, scrollEnabled ? centeredContentStyle : null]}
+        contentContainerStyle={[
+          styles.scroll,
+          !isDrawerLayout ? styles.scrollInAccountShell : null,
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
+        ]}
         refreshControl={
           <ThemedRefreshControl refreshing={isRefreshing} onRefresh={reload} />
         }
@@ -581,7 +590,7 @@ export const IntroAdModerationPage = () => {
         ) : null}
         {listActions}
         {moderationSections}
-      </ScrollView>
+      </ProfileAccountScrollBody>
       {navSheet}
     </>
   );

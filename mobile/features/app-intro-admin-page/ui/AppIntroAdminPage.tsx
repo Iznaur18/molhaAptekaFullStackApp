@@ -6,6 +6,7 @@ import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-nati
 import { useAppIntroAdminPage } from "@/features/app-intro-admin-page/model/useAppIntroAdminPage";
 import { IntroVideoUploadField } from "@/features/image-upload/ui/IntroVideoUploadField";
 import { ImageUrlUploadField } from "@/features/image-upload/ui/ImageUrlUploadField";
+import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/ProfileAccountScrollContext";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { APP_INTRO_ADMIN_PAGE_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
@@ -17,6 +18,8 @@ export const AppIntroAdminPage = () => {
   const router = useRouter();
   const styles = useAppIntroAdminPageStyles();
   const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { outerScrollOwns, scrollEnabled, resolveListStyle } =
+    useProfileAccountNestedListScroll();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
 
   const {
@@ -45,7 +48,7 @@ export const AppIntroAdminPage = () => {
       visible={navSheetVisible}
       activeSectionId="app-intro-admin"
       onClose={() => setNavSheetVisible(false)}
-      onOverviewPress={() => router.replace("/(tabs)/profile")}
+      onOverviewPress={() => router.replace("/(tabs)/me")}
     />
   );
 
@@ -68,8 +71,16 @@ export const AppIntroAdminPage = () => {
     return (
       <>
         <ScrollView
-          style={[styles.container, centeredContentStyle]}
-          contentContainerStyle={[styles.scroll, styles.content, { paddingBottom: contentPaddingBottom }]}
+          style={resolveListStyle([
+            styles.container,
+            scrollEnabled ? centeredContentStyle : null,
+          ])}
+          scrollEnabled={scrollEnabled}
+          contentContainerStyle={[
+            styles.scroll,
+            styles.content,
+            { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
+          ]}
         >
           {pageHeader}
           <Text style={styles.status}>{APP_INTRO_ADMIN_PAGE_UI.LOADING}</Text>
@@ -83,8 +94,16 @@ export const AppIntroAdminPage = () => {
     return (
       <>
         <ScrollView
-          style={[styles.container, centeredContentStyle]}
-          contentContainerStyle={[styles.scroll, styles.content, { paddingBottom: contentPaddingBottom }]}
+          style={resolveListStyle([
+            styles.container,
+            scrollEnabled ? centeredContentStyle : null,
+          ])}
+          scrollEnabled={scrollEnabled}
+          contentContainerStyle={[
+            styles.scroll,
+            styles.content,
+            { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
+          ]}
         >
           {pageHeader}
           <ScreenErrorState message={queryError} onRetry={() => void reloadSettings()} />
@@ -97,8 +116,16 @@ export const AppIntroAdminPage = () => {
   return (
     <>
       <ScrollView
-        style={[styles.container, centeredContentStyle]}
-        contentContainerStyle={[styles.scroll, styles.content, { paddingBottom: contentPaddingBottom }]}
+        style={resolveListStyle([
+          styles.container,
+          scrollEnabled ? centeredContentStyle : null,
+        ])}
+        scrollEnabled={scrollEnabled}
+        contentContainerStyle={[
+          styles.scroll,
+          styles.content,
+          { paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom },
+        ]}
       >
         {pageHeader}
 

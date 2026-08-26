@@ -24,9 +24,21 @@ test("installment payments page mirrors web toolbar and compact contract card", 
   assert.match(page, /ListHeaderComponent/);
   assert.match(page, /contentPaddingBottom/);
   assert.match(page, /compact/);
+  assert.match(page, /useProfileAdaptiveLayout/);
+  assert.match(page, /listInAccountShell/);
+  assert.match(page, /listItemFirst/);
+  assert.match(page, /ProfileAccountList/);
   assert.match(page, /onCounterpartyClick/);
   assert.match(page, /onProductClick/);
   assert.doesNotMatch(page, /useOrdersScreenStyles/);
+
+  const pageStyles = readMobileFile("shared/theme/installmentPaymentsPageStyles.ts");
+  assert.match(pageStyles, /INSTALLMENT_PAGE_LAYOUT/);
+  assert.match(pageStyles, /listInAccountShell/);
+  assert.match(pageStyles, /listItemFirst/);
+
+  const layout = readMobileFile("shared/lib/guestProfileLayout.ts");
+  assert.match(layout, /INSTALLMENT_PAGE_LAYOUT/);
 
   assert.match(toolbar, /contractsCountLabel/);
   assert.match(page, /COUNT_FILTERED/);

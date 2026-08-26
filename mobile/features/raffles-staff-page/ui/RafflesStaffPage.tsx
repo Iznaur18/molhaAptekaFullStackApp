@@ -185,7 +185,7 @@ export const RafflesStaffPage = () => {
       visible={navSheetVisible}
       activeSectionId="raffles"
       onClose={() => setNavSheetVisible(false)}
-      onOverviewPress={() => router.replace("/(tabs)/profile")}
+      onOverviewPress={() => router.replace("/(tabs)/me")}
     />
   );
 

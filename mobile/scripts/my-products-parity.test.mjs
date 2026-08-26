@@ -46,10 +46,32 @@ test("my products page uses catalog toolbar, grid and seller card footer", () =>
   assert.match(gridRow, /onEditProduct/);
   assert.match(gridRow, /onCopyProduct/);
   assert.match(gridRow, /onPromoteProduct/);
+  assert.match(gridRow, /width: "100%"/);
+  assert.match(gridRow, /resolveFlexGridItemWidthStyle/);
   assert.doesNotMatch(gridRow, /layout="catalog-grid"/);
 
   assert.match(page, /myProductsGridResolvers/);
   assert.match(page, /resolveColumns: \(\) => 1/);
+  assert.match(page, /resolveProfileHubMainReservedWidth/);
+  assert.match(page, /listInAccountShell/);
+  assert.match(page, /contentWidth=\{productGrid\.contentWidth\}/);
+  assert.match(page, /MY_PRODUCTS_CATALOG_LIST_GAP/);
+  assert.match(page, /useProfileAccountNestedListScroll/);
+  assert.match(page, /ProfileAccountList/);
+  assert.match(page, /registerNearEndHandler/);
+  assert.doesNotMatch(page, /resolveListStyle/);
+  assert.doesNotMatch(page, /scrollEnabled=\{scrollEnabled\}/);
+  assert.doesNotMatch(page, /CatalogAnimatedFlatList/);
+  assert.match(page, /MY_PRODUCTS_PAGE_LAYOUT/);
+
+  const shelves = readMobileFile("features/my-products-page/ui/MyProductsShelvesPanel.tsx");
+  assert.match(shelves, /MY_PRODUCTS_PAGE_LAYOUT/);
+  assert.match(shelves, /shelvesPaddingY/);
+  assert.doesNotMatch(shelves, /marginBottom:\s*8/);
+
+  const pageStyles = readMobileFile("shared/theme/sellerFlowStyles.ts");
+  assert.match(pageStyles, /stackGap/);
+  assert.match(pageStyles, /paddingTop:\s*0/);
 
   const myProductCard = readMobileFile("entities/product/ui/MyProductCatalogCard.tsx");
   assert.match(myProductCard, /onCopyProduct/);

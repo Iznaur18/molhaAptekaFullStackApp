@@ -203,7 +203,7 @@ export default function RegisterScreen() {
       await clearPersistedReferralCode();
       releaseColdStartSplash();
       // Паритет web RegisterPage → `/me`
-      router.replace("/(tabs)/profile");
+      router.replace("/(tabs)/me");
     } catch (error) {
       setCodeError(formatApiErrorMessage(error, EMAIL_VERIFICATION_UI.CONFIRM_ERROR));
     }

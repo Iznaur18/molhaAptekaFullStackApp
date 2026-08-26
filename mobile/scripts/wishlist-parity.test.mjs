@@ -16,6 +16,9 @@ test("wishlist page mirrors web hub chrome and list", () => {
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /ProfileMobileNavSheet/);
   assert.match(page, /contentPaddingBottom/);
+  assert.match(page, /useProfileAdaptiveLayout/);
+  assert.match(page, /listInAccountShell/);
+  assert.match(page, /emptyInAccountShell/);
   assert.match(page, /WishlistRow/);
   assert.match(page, /activeSectionId="wishlist"/);
   assert.match(page, /TAB_WISHLIST/);
@@ -23,6 +26,9 @@ test("wishlist page mirrors web hub chrome and list", () => {
 
   assert.match(styles, /PRODUCT_IMAGE_THUMB_SIDE/);
   assert.match(styles, /loginButton/);
+  assert.match(styles, /WISHLIST_PAGE_LAYOUT/);
+  assert.match(styles, /listInAccountShell/);
+  assert.match(styles, /paddingTop:\s*0/);
 });
 
 test("wishlist row mirrors web row layout", () => {

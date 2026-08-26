@@ -16,10 +16,9 @@ import {
   toRuPhoneTelHref,
 } from "@/entities/user/lib/ruPhone";
 import { USER_PROFILE_COPY } from "@/shared/config";
+import { PROFILE_OVERVIEW_LAYOUT as O } from "@/shared/lib/guestProfileLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import { PROFILE_CARD_SQUIRCLE_RADIUS } from "@/shared/theme/profileChromeStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import { SquircleView } from "@/shared/ui/SquircleView";
 
 const PHONE_ROW_ID = "userPhoneNumber";
 
@@ -35,17 +34,19 @@ const PROFILE_INFO_SECTION_TITLE_FG = izColors.onContrast;
 
 const useStyles = createThemedStyles((theme) => ({
   root: {
-    gap: theme.spacing[4],
+    gap: O.infoSectionsGap,
   },
   section: {
     borderWidth: 1,
+    borderRadius: O.infoSectionRadius,
+    overflow: "hidden",
     backgroundColor: theme.colors.surface,
     borderColor: theme.colors.border,
   },
   sectionTitle: {
     fontSize: 11,
     fontWeight: "800",
-    letterSpacing: 0.9,
+    letterSpacing: 0.66,
     textTransform: "uppercase",
     paddingVertical: 8,
     paddingHorizontal: 14,
@@ -56,11 +57,10 @@ const useStyles = createThemedStyles((theme) => ({
   },
   detailRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    flexWrap: "nowrap",
     alignItems: "center",
     justifyContent: "space-between",
-    columnGap: 12,
-    rowGap: 6,
+    gap: 12,
     paddingHorizontal: 14,
     paddingVertical: 11,
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -70,8 +70,9 @@ const useStyles = createThemedStyles((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    flexGrow: 1,
+    flexGrow: 0,
     flexShrink: 1,
+    maxWidth: "55%",
     minWidth: 0,
   },
   detailIconWrap: {
@@ -94,8 +95,9 @@ const useStyles = createThemedStyles((theme) => ({
     fontWeight: "600",
     lineHeight: 20,
     textAlign: "right",
-    flexShrink: 0,
-    marginLeft: "auto",
+    flexGrow: 1,
+    flexShrink: 1,
+    minWidth: 0,
     color: theme.colors.textSecondary,
   },
   detailValueEmpty: {
@@ -118,6 +120,8 @@ const useStyles = createThemedStyles((theme) => ({
     textAlign: "right",
   },
   detailValuePositive: {
+    flexGrow: 0,
+    flexShrink: 0,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 999,
@@ -125,6 +129,8 @@ const useStyles = createThemedStyles((theme) => ({
     color: theme.colors.textSecondary,
   },
   detailValueMuted: {
+    flexGrow: 0,
+    flexShrink: 0,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 999,
@@ -261,11 +267,7 @@ export const UserProfileInfoPanel = ({
   return (
     <View style={styles.root}>
       {sections.map((section) => (
-        <SquircleView
-          key={section.id}
-          radius={PROFILE_CARD_SQUIRCLE_RADIUS}
-          style={styles.section}
-        >
+        <View key={section.id} style={styles.section}>
           {section.title ? (
             <Text style={styles.sectionTitle}>{section.title}</Text>
           ) : null}
@@ -295,7 +297,7 @@ export const UserProfileInfoPanel = ({
               </View>
             );
           })}
-        </SquircleView>
+        </View>
       ))}
     </View>
   );

@@ -15,6 +15,7 @@ test("data confirmation page mirrors web plan panel and status blocks", () => {
 
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /ProfileMobileNavSheet/);
+  assert.match(page, /ProfileAccountScrollBody/);
   assert.match(page, /contentPaddingBottom/);
   assert.match(page, /DataConfirmationRequestModal/);
   assert.match(page, /PLAN_BENEFITS/);

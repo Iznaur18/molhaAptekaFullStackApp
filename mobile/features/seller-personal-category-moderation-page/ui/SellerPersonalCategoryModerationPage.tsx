@@ -52,7 +52,7 @@ export const SellerPersonalCategoryModerationPage = () => {
       visible={navSheetVisible}
       activeSectionId="seller-personal-category-moderation"
       onClose={() => setNavSheetVisible(false)}
-      onOverviewPress={() => router.replace("/(tabs)/profile")}
+      onOverviewPress={() => router.replace("/(tabs)/me")}
     />
   );
 

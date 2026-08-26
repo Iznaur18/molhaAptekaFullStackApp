@@ -239,32 +239,54 @@ export const AddressSuggestInput = ({
         {label ?? ADDRESS_DELIVERY_UI.LABEL_LINE}
       </Text>
       <View style={styles.inputRow}>
-        <TextInput
-          style={[
-            fieldStyles.input,
-            fieldStyles.inputCompact,
-            inputStyle,
-            value.line && !disabled && !displayOnly ? styles.inputWithClear : null,
-          ]}
-          value={value.line}
-          onChangeText={displayOnly ? undefined : handleLineChange}
-          placeholder={placeholder}
-          placeholderTextColor={theme.colors.textMuted}
-          editable={!disabled && !displayOnly}
-          autoCorrect={false}
-          autoFocus={autoFocus}
-          maxLength={maxLength}
-          caretHidden={displayOnly}
-          showSoftInputOnFocus={!displayOnly}
-          accessibilityRole={mapOpensFromLine ? "button" : undefined}
-          accessibilityLabel={
-            mapOpensFromLine
-              ? `${label ?? ADDRESS_DELIVERY_UI.LABEL_LINE}. ${ADDRESS_DELIVERY_UI.MAP_OPEN}`
-              : undefined
-          }
-          onPressIn={mapOpensFromLine ? openMapFromLine : undefined}
-          {...(displayOnly ? {} : textInputFocusScrollProps)}
-        />
+        {mapOpensFromLine ? (
+          <Pressable
+            style={[
+              fieldStyles.input,
+              fieldStyles.inputCompact,
+              // Pressable принимает только ViewStyle; текстовая часть стиля
+              // применяется ниже, к самому Text внутри.
+              inputStyle as StyleProp<ViewStyle>,
+              disabled ? styles.displayOnlyDisabled : null,
+            ]}
+            onPress={openMapFromLine}
+            disabled={disabled}
+            accessibilityRole="button"
+            accessibilityLabel={`${label ?? ADDRESS_DELIVERY_UI.LABEL_LINE}. ${ADDRESS_DELIVERY_UI.MAP_OPEN}`}
+          >
+            <Text
+              style={[
+                styles.displayOnlyText,
+                {
+                  color: value.line ? theme.colors.text : theme.colors.textMuted,
+                },
+              ]}
+              numberOfLines={3}
+            >
+              {value.line || placeholder || ADDRESS_DELIVERY_UI.MAP_OPEN}
+            </Text>
+          </Pressable>
+        ) : (
+          <TextInput
+            style={[
+              fieldStyles.input,
+              fieldStyles.inputCompact,
+              inputStyle,
+              value.line && !disabled && !displayOnly ? styles.inputWithClear : null,
+            ]}
+            value={value.line}
+            onChangeText={displayOnly ? undefined : handleLineChange}
+            placeholder={placeholder}
+            placeholderTextColor={theme.colors.textMuted}
+            editable={!disabled && !displayOnly}
+            autoCorrect={false}
+            autoFocus={autoFocus}
+            maxLength={maxLength}
+            caretHidden={displayOnly}
+            showSoftInputOnFocus={!displayOnly}
+            {...(displayOnly ? {} : textInputFocusScrollProps)}
+          />
+        )}
         {value.line && !disabled && !displayOnly ? (
           <Pressable
             accessibilityRole="button"
@@ -476,6 +498,13 @@ const styles = StyleSheet.create({
   },
   inputWithClear: {
     paddingRight: 38,
+  },
+  displayOnlyText: {
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  displayOnlyDisabled: {
+    opacity: 0.6,
   },
   clearBtn: {
     position: "absolute",
