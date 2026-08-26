@@ -20,7 +20,18 @@ type SavedAddressPickerProps = {
   /** Ниже этого числа адресов список не показываем. */
   minCount?: number;
   sectionLabel: string;
-  otherLabel: string;
+  /** В режиме мультиселекта не показывается — там нет «другого адреса». */
+  otherLabel?: string;
+  /**
+   * Мультиселект: чекбоксы вместо радио, пункта «указать другой» нет.
+   * Так веб выбирает точки самовывоза при создании товара.
+   */
+  multiSelect?: boolean;
+  selectedIds?: readonly string[];
+  onToggle?: (id: string) => void;
+  /** Адрес без координат выбрать нельзя — точке нужны lat/lon. */
+  isOptionDisabled?: (id: string) => boolean;
+  optionHint?: (id: string) => string | null;
 };
 
 /**
@@ -35,6 +46,11 @@ export const SavedAddressPicker = ({
   minCount = 1,
   sectionLabel,
   otherLabel,
+  multiSelect = false,
+  selectedIds = [],
+  onToggle,
+  isOptionDisabled,
+  optionHint,
 }: SavedAddressPickerProps) => {
   const theme = useAppTheme();
 
@@ -56,17 +72,24 @@ export const SavedAddressPicker = ({
   return (
     <View style={styles.root}>
       <Text style={[styles.label, { color: theme.colors.text }]}>{sectionLabel}</Text>
-      <View style={styles.list} accessibilityRole="radiogroup">
+      <View
+        style={styles.list}
+        accessibilityRole={multiSelect ? "list" : "radiogroup"}
+      >
         {addresses.map((item) => {
-          const active = selectedId === item.id;
+          const active = multiSelect
+            ? selectedIds.includes(item.id)
+            : selectedId === item.id;
+          const optionDisabled = disabled || isOptionDisabled?.(item.id) === true;
+          const hint = optionHint?.(item.id) ?? null;
           return (
             <Pressable
               key={item.id}
-              accessibilityRole="radio"
-              accessibilityState={{ checked: active, disabled }}
-              disabled={disabled}
-              onPress={() => onSelect(item.id)}
-              style={optionStyle(active)}
+              accessibilityRole={multiSelect ? "checkbox" : "radio"}
+              accessibilityState={{ checked: active, disabled: optionDisabled }}
+              disabled={optionDisabled}
+              onPress={() => (multiSelect ? onToggle?.(item.id) : onSelect(item.id))}
+              style={[optionStyle(active), optionDisabled && styles.optionDisabled]}
             >
               {item.label ? (
                 <Text style={[styles.optionLabel, { color: theme.colors.text }]}>
@@ -81,10 +104,16 @@ export const SavedAddressPicker = ({
                   {USER_SAVED_ADDRESSES_UI.LABEL_DEFAULT}
                 </Text>
               ) : null}
+              {hint ? (
+                <Text style={[styles.optionBadge, { color: theme.colors.textMuted }]}>
+                  {hint}
+                </Text>
+              ) : null}
             </Pressable>
           );
         })}
 
+        {multiSelect || !otherLabel ? null : (
         <Pressable
           accessibilityRole="radio"
           accessibilityState={{
@@ -97,6 +126,7 @@ export const SavedAddressPicker = ({
         >
           <Text style={[styles.optionLine, { color: theme.colors.text }]}>{otherLabel}</Text>
         </Pressable>
+        )}
       </View>
     </View>
   );
