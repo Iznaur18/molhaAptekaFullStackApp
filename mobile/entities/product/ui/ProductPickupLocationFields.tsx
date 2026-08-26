@@ -5,6 +5,7 @@ import {
   SHIPPING_PROVIDER_LABEL_RU,
   SHIPPING_PROVIDERS,
 } from "@molha/api-contract";
+import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { createUserSavedAddressId } from "@/entities/address/lib/createUserSavedAddressId";
@@ -22,6 +23,7 @@ import {
   setDefaultPickupLocation,
   type ProductPickupLocationValue as PickupPointValue,
 } from "@/entities/product/lib/productPickupLocationsFromSavedAddresses";
+import { resolvePickupGeoForSavedAddress } from "@/entities/product/lib/resolvePickupGeoForSavedAddress";
 import { PRODUCT_PICKUP_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useFormFieldStyles } from "@/shared/theme/formChromeStyles";
@@ -84,31 +86,73 @@ export const ProductPickupLocationFields = ({
   const theme = useAppTheme();
   const fieldStyles = useFormFieldStyles();
 
+  /** Координаты, догеокодированные по строке адреса, — книгу они не меняют. */
+  const [resolvedGeo, setResolvedGeo] = useState<
+    Record<string, { lat: number; lon: number }>
+  >({});
+  const [resolvingId, setResolvingId] = useState<string | null>(null);
+  /** Адреса, для которых подсказки координат не дали, — их выбрать нельзя. */
+  const [unresolvedIds, setUnresolvedIds] = useState<readonly string[]>([]);
+
+  const bookAddresses = savedAddresses.map((item) => {
+    const geo = resolvedGeo[String(item.id)];
+    return geo ? { ...item, geo } : item;
+  });
+
   const showSavedAddresses =
-    typeof onPickupLocationsChange === "function" && savedAddresses.length > 0;
+    typeof onPickupLocationsChange === "function" && bookAddresses.length > 0;
   const selectedPointIds = pickupLocations.map((item) => item.id);
   const defaultPointId = pickupLocations.find((item) => item.isDefault)?.id ?? null;
 
   /** Точки, добавленные вручную — их нельзя терять при клике по книге. */
-  const manualPoints = manualPickupLocations(pickupLocations, savedAddresses);
+  const manualPoints = manualPickupLocations(pickupLocations, bookAddresses);
 
   const commitPoints = (nextPoints: PickupPointValue[]) => {
     onPickupLocationsChange?.(normalizePickupLocations(nextPoints, defaultPointId));
   };
 
-  const togglePickupPoint = (id: string) => {
-    if (disabled) {
-      return;
-    }
+  const commitToggle = (id: string, addresses: SavedAddressPickerItem[]) => {
     const nextIds = selectedPointIds.includes(id)
       ? selectedPointIds.filter((item) => item !== id)
       : [...selectedPointIds, id];
     const fromBook = pickupLocationsFromSelectedAddresses(
-      savedAddresses,
+      addresses,
       nextIds,
       defaultPointId,
     );
     commitPoints([...fromBook, ...manualPoints]);
+  };
+
+  const togglePickupPoint = (id: string) => {
+    if (disabled || resolvingId != null) {
+      return;
+    }
+    const item = bookAddresses.find((address) => address.id === id);
+    // Адрес без координат контракт как точку не примет. Веб в этом месте не
+    // блокирует адрес, а догеокодирует его по строке — делаем так же, иначе
+    // выбрать нельзя половину собственной книги.
+    if (item != null && !canUseSavedAddressAsPickupLocation(item)) {
+      setResolvingId(id);
+      void resolvePickupGeoForSavedAddress(item)
+        .then((geo) => {
+          if (geo == null) {
+            setUnresolvedIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+            return;
+          }
+          setResolvedGeo((prev) => ({ ...prev, [id]: geo }));
+          commitToggle(
+            id,
+            bookAddresses.map((address) =>
+              address.id === id ? { ...address, geo } : address,
+            ),
+          );
+        })
+        .finally(() => {
+          setResolvingId(null);
+        });
+      return;
+    }
+    commitToggle(id, bookAddresses);
   };
 
   const canAddTypedAddress =
@@ -189,7 +233,7 @@ export const ProductPickupLocationFields = ({
       {showSavedAddresses ? (
         <View style={styles.savedBlock}>
           <SavedAddressPicker
-            addresses={savedAddresses}
+            addresses={bookAddresses}
             multiSelect
             selectedIds={selectedPointIds}
             onToggle={togglePickupPoint}
@@ -198,13 +242,16 @@ export const ProductPickupLocationFields = ({
             onSelect={() => {}}
             disabled={disabled}
             sectionLabel={PRODUCT_PICKUP_UI.SAVED_ADDRESSES_LABEL}
-            isOptionDisabled={(id) => {
-              const item = savedAddresses.find((address) => address.id === id);
-              return !canUseSavedAddressAsPickupLocation(item);
-            }}
+            isOptionDisabled={(id) =>
+              // Блокируем только то, что уже пытались догеокодировать и не
+              // смогли: адрес без координат сам по себе — не повод.
+              unresolvedIds.includes(id) || (resolvingId != null && resolvingId !== id)
+            }
             optionHint={(id) => {
-              const item = savedAddresses.find((address) => address.id === id);
-              if (!canUseSavedAddressAsPickupLocation(item)) {
+              if (resolvingId === id) {
+                return PRODUCT_PICKUP_UI.LOCATION_RESOLVING;
+              }
+              if (unresolvedIds.includes(id)) {
                 return PRODUCT_PICKUP_UI.LOCATION_NEEDS_COORDS;
               }
               return id === defaultPointId ? PRODUCT_PICKUP_UI.LOCATION_DEFAULT : null;

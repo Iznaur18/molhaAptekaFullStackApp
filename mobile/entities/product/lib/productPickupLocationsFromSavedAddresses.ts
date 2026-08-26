@@ -236,3 +236,20 @@ export const setDefaultPickupLocation = (
   }
   return points.map((item) => ({ ...item, isDefault: item.id === target }));
 };
+
+/**
+ * Строка для экрана проверки: все точки через «; », как в вебе. Когда точек
+ * нет — легаси-адрес, который сервер сам завернёт в единственную точку.
+ * Показывать одну точку из нескольких нельзя: экран проверки на то и нужен,
+ * чтобы продавец увидел, что именно уедет на сервер.
+ */
+export const pickupLocationsSummary = (
+  points: readonly ProductPickupLocationValue[],
+  fallbackAddress: string,
+): string => {
+  const joined = points
+    .map((item) => String(item.address ?? "").trim())
+    .filter(Boolean)
+    .join("; ");
+  return joined || String(fallbackAddress ?? "").trim();
+};

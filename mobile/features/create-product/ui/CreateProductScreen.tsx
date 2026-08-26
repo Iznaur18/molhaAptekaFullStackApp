@@ -46,6 +46,7 @@ import type { SavedAddressPickerItem } from "@/entities/address/ui/SavedAddressP
 import type { ProductPickupLocationValue as ProductPickupPoint } from "@/entities/product/lib/productPickupLocationsFromSavedAddresses";
 import {
   isPickupAddressAmongLocations,
+  pickupLocationsSummary,
   validateProductPickupLocationsList,
 } from "@/entities/product/lib/productPickupLocationsFromSavedAddresses";
 import {
@@ -1748,7 +1749,9 @@ function ReviewStep({
     },
     {
       label: "Адрес самовывоза",
-      value: form.productPickupAddress.trim() || "—",
+      value:
+        pickupLocationsSummary(form.productPickupLocations, form.productPickupAddress) ||
+        "—",
       stepIndex: 4,
       multiline: true,
     },

@@ -16,6 +16,7 @@ import {
   pickupLocationFromSavedAddress,
   isPickupAddressAmongLocations,
   pickupLocationsFromSelectedAddresses,
+  pickupLocationsSummary,
   setDefaultPickupLocation,
   validateProductPickupLocationsList,
 } from "../entities/product/lib/productPickupLocationsFromSavedAddresses.ts";
@@ -348,4 +349,61 @@ test("шаг мастера даёт выбрать основную точку"
     source.includes("{pickupLocations.map((point) => ("),
     "список точек рисуется не целиком",
   );
+});
+
+test("экран проверки показывает все точки, а не одну", () => {
+  assert.equal(
+    pickupLocationsSummary(
+      [point({ id: "p1", isDefault: true }), point({ id: "p2", address: "г Тула, ул Мира, д 3" })],
+      "г Тверь, ул Софьи, д 8",
+    ),
+    "г Москва, ул Арбат, д 5; г Тула, ул Мира, д 3",
+  );
+  // Точек нет — показываем легаси-адрес, его сервер завернёт в единственную точку.
+  assert.equal(pickupLocationsSummary([], "  г Тверь, ул Софьи, д 8 "), "г Тверь, ул Софьи, д 8");
+  assert.equal(pickupLocationsSummary([], ""), "");
+  // Пустые адреса в списке не дают висячих «; ».
+  assert.equal(
+    pickupLocationsSummary([point({ id: "p1", address: "  " }), point({ id: "p2" })], "запас"),
+    "г Москва, ул Арбат, д 5",
+  );
+
+  const source = readMobileFile("features/create-product/ui/CreateProductScreen.tsx");
+  assert.ok(
+    source.includes("pickupLocationsSummary(form.productPickupLocations"),
+    "экран проверки всё ещё показывает одно легаси-поле",
+  );
+});
+
+test("адрес книги без координат догеокодируется, а не блокируется", () => {
+  const source = readMobileFile("entities/product/ui/ProductPickupLocationFields.tsx");
+  // Раньше опция гасилась просто из-за отсутствия geo — веб так не делает.
+  assert.ok(
+    !/isOptionDisabled=\{\(id\) => \{[\s\S]{0,300}!canUseSavedAddressAsPickupLocation/.test(source),
+    "адрес без координат не должен блокироваться сам по себе",
+  );
+  assert.ok(
+    source.includes("resolvePickupGeoForSavedAddress(item)"),
+    "нет догеокодирования при выборе адреса",
+  );
+  assert.ok(source.includes("unresolvedIds.includes(id)"), "нет отметки о неудаче");
+  assert.ok(
+    source.includes("PRODUCT_PICKUP_UI.LOCATION_RESOLVING"),
+    "нет подсказки на время запроса",
+  );
+
+  const resolver = readMobileFile("entities/product/lib/resolvePickupGeoForSavedAddress.ts");
+  // Ошибка подсказок не должна ронять шаг — адрес просто останется без точки.
+  assert.ok(resolver.includes("} catch {"), "резолвер обязан глотать ошибку подсказок");
+  assert.ok(
+    resolver.includes("ADDRESS_SUGGEST_MIN_QUERY_LENGTH"),
+    "короткую строку в подсказки слать нельзя",
+  );
+  assert.ok(
+    resolver.includes("pickFirstHouseSuggestion"),
+    "координаты берём только у подсказки с домом",
+  );
+
+  const copy = readMobileFile("shared/config/appUiCopy.ts");
+  assert.ok(copy.includes("LOCATION_RESOLVING"), "нет копирайта LOCATION_RESOLVING");
 });
