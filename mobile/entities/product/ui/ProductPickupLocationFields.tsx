@@ -19,6 +19,7 @@ import {
   manualPickupLocations,
   normalizePickupLocations,
   pickupLocationsFromSelectedAddresses,
+  setDefaultPickupLocation,
   type ProductPickupLocationValue as PickupPointValue,
 } from "@/entities/product/lib/productPickupLocationsFromSavedAddresses";
 import { PRODUCT_PICKUP_UI } from "@/shared/config";
@@ -131,6 +132,17 @@ export const ProductPickupLocationFields = ({
     ]);
   };
 
+  /**
+   * Основную точку меняем не через `commitPoints`: тот, наоборот, бережёт
+   * прежнюю основную и откатил бы выбор.
+   */
+  const setDefaultPoint = (id: string) => {
+    if (disabled) {
+      return;
+    }
+    onPickupLocationsChange?.(setDefaultPickupLocation(pickupLocations, id));
+  };
+
   const removePickupPoint = (id: string) => {
     if (disabled) {
       return;
@@ -241,9 +253,12 @@ export const ProductPickupLocationFields = ({
             </Text>
           </Pressable>
 
-          {manualPoints.length > 0 ? (
+          {pickupLocations.length > 0 ? (
             <View style={styles.savedBlock}>
-              {manualPoints.map((point) => (
+              <Text style={fieldStyles.labelStrong}>
+                {PRODUCT_PICKUP_UI.LOCATIONS_LIST_LABEL}
+              </Text>
+              {pickupLocations.map((point) => (
                 <View
                   key={point.id}
                   style={[styles.manualPoint, { borderColor: theme.colors.border }]}
@@ -251,25 +266,46 @@ export const ProductPickupLocationFields = ({
                   <Text style={[styles.manualPointLine, { color: theme.colors.text }]}>
                     {point.address}
                   </Text>
-                  {point.isDefault ? (
-                    <Text
-                      style={[styles.manualPointHint, { color: theme.colors.textSecondary }]}
+                  <View style={styles.manualPointActions}>
+                    {point.isDefault ? (
+                      <Text
+                        style={[styles.manualPointHint, { color: theme.colors.action }]}
+                      >
+                        {PRODUCT_PICKUP_UI.LOCATION_DEFAULT}
+                      </Text>
+                    ) : (
+                      <Pressable
+                        accessibilityRole="radio"
+                        accessibilityState={{ checked: false, disabled }}
+                        disabled={disabled}
+                        onPress={() => setDefaultPoint(point.id)}
+                        style={styles.manualPointAction}
+                      >
+                        <Text
+                          style={[styles.manualPointHint, { color: theme.colors.action }]}
+                        >
+                          {PRODUCT_PICKUP_UI.SET_DEFAULT_LOCATION}
+                        </Text>
+                      </Pressable>
+                    )}
+                    <Pressable
+                      accessibilityRole="button"
+                      disabled={disabled}
+                      onPress={() => removePickupPoint(point.id)}
+                      style={styles.manualPointAction}
                     >
-                      {PRODUCT_PICKUP_UI.LOCATION_DEFAULT}
-                    </Text>
-                  ) : null}
-                  <Pressable
-                    accessibilityRole="button"
-                    disabled={disabled}
-                    onPress={() => removePickupPoint(point.id)}
-                    style={styles.manualPointRemove}
-                  >
-                    <Text style={{ color: theme.colors.danger }}>
-                      {PRODUCT_PICKUP_UI.REMOVE_LOCATION}
-                    </Text>
-                  </Pressable>
+                      <Text
+                        style={[styles.manualPointHint, { color: theme.colors.danger }]}
+                      >
+                        {PRODUCT_PICKUP_UI.REMOVE_LOCATION}
+                      </Text>
+                    </Pressable>
+                  </View>
                 </View>
               ))}
+              <Text style={fieldStyles.hint}>
+                {PRODUCT_PICKUP_UI.DEFAULT_LOCATION_HINT}
+              </Text>
             </View>
           ) : null}
 
@@ -421,9 +457,15 @@ const styles = StyleSheet.create({
   manualPointHint: {
     fontSize: 12,
   },
-  manualPointRemove: {
-    alignSelf: "flex-end",
-    paddingVertical: 4,
+  manualPointActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 12,
+  },
+  manualPointAction: {
+    minHeight: 32,
+    justifyContent: "center",
   },
   methods: {
     gap: 8,

@@ -220,3 +220,19 @@ export const isPickupAddressAmongLocations = (
   }
   return points.some((item) => productPickupLocationDuplicateKey(item.address) === key);
 };
+
+/**
+ * Делает основной точку с указанным id. Если такой точки нет, набор
+ * возвращается как есть — молча переносить «основную» на чужую точку хуже,
+ * чем не сделать ничего.
+ */
+export const setDefaultPickupLocation = (
+  points: readonly ProductPickupLocationValue[],
+  id: string,
+): ProductPickupLocationValue[] => {
+  const target = String(id ?? "");
+  if (!points.some((item) => item.id === target)) {
+    return points.slice();
+  }
+  return points.map((item) => ({ ...item, isDefault: item.id === target }));
+};

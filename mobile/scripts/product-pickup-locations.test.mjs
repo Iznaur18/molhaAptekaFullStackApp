@@ -16,6 +16,7 @@ import {
   pickupLocationFromSavedAddress,
   isPickupAddressAmongLocations,
   pickupLocationsFromSelectedAddresses,
+  setDefaultPickupLocation,
   validateProductPickupLocationsList,
 } from "../entities/product/lib/productPickupLocationsFromSavedAddresses.ts";
 
@@ -297,5 +298,54 @@ test("шаг мастера проверяет список и не теряет
     (source.match(/form\.productPickupLocations\.length > 0/g) ?? []).length,
     3,
     "нет guard'ов на пустой список",
+  );
+});
+
+test("основная точка меняется тапом и не размножается", () => {
+  const points = [
+    point({ id: "p1", isDefault: true }),
+    point({ id: "p2", address: "г Тула, ул Мира, д 3" }),
+    point({ id: "p3", address: "г Тверь, ул Софьи, д 8" }),
+  ];
+
+  const next = setDefaultPickupLocation(points, "p3");
+  assert.deepEqual(next.filter((item) => item.isDefault).map((item) => item.id), ["p3"]);
+  assert.equal(validateProductPickupLocationsList(next), null);
+  // Порядок и содержимое точек тап не трогает.
+  assert.deepEqual(next.map((item) => item.address), points.map((item) => item.address));
+
+  // Неизвестный id ничего не переносит: молчаливая смена основной хуже отказа.
+  assert.deepEqual(setDefaultPickupLocation(points, "нет-такой"), points);
+  assert.deepEqual(setDefaultPickupLocation([], "p1"), []);
+
+  // Исходный набор не мутируется.
+  assert.equal(points[0].isDefault, true);
+  assert.equal(points[2].isDefault, false);
+});
+
+test("шаг мастера даёт выбрать основную точку", () => {
+  const source = readMobileFile("entities/product/ui/ProductPickupLocationFields.tsx");
+  assert.ok(source.includes("setDefaultPoint(point.id)"), "нет тапа по «сделать основной»");
+  assert.ok(
+    source.includes("setDefaultPickupLocation(pickupLocations, id)"),
+    "смена основной идёт мимо чистой функции",
+  );
+  // commitPoints бережёт прежнюю основную — через него выбор бы откатился.
+  const setDefaultBody = source
+    .slice(source.indexOf("const setDefaultPoint = "))
+    .split("\n  };")[0];
+  assert.ok(setDefaultBody.length > 0, "не нашёл тело setDefaultPoint");
+  assert.ok(
+    !setDefaultBody.includes("commitPoints"),
+    "смена основной не должна идти через commitPoints",
+  );
+  assert.ok(
+    source.includes("PRODUCT_PICKUP_UI.SET_DEFAULT_LOCATION"),
+    "нет подписи «сделать основной»",
+  );
+  // Список рисуется по всем точкам, иначе основную у адреса книги не сменить.
+  assert.ok(
+    source.includes("{pickupLocations.map((point) => ("),
+    "список точек рисуется не целиком",
   );
 });
