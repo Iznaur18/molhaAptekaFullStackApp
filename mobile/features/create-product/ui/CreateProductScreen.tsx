@@ -39,6 +39,8 @@ import { createProductWizardFormFromProduct } from "@/entities/product/lib/creat
 import { serializeProductCharacteristicRows } from "@/entities/product/lib/productCharacteristicRows";
 import { useCatalogProductQuery } from "@/entities/product/model/useCatalogProductQuery";
 import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
+import { resolveCategoryDefaultCharacteristicRows } from "@/entities/product/lib/resolveCategoryDefaultCharacteristicRows";
+import { validateProductCharacteristicsRows } from "@/entities/product/lib/validateProductCharacteristicsRows";
 import { validateProductName } from "@/entities/product/lib/validateProductName";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { userSavedAddressesFromUser } from "@/entities/address/lib/userSavedAddressesFromUser";
@@ -154,6 +156,10 @@ type WizardForm = {
   productIsOriginal: boolean;
   productDescription: string;
   characteristicRows: CharacteristicRow[];
+  /** Ключи характеристик выбранной категории и след их подстановки. */
+  categoryDefaultCharacteristicKeys: string[];
+  characteristicsSellerTouched: boolean;
+  characteristicsAutoAppliedForCategoryId: string | null;
   imageUrls: string[];
   productPreviewVideoUrl: string;
   productCategoryId: string | null;
@@ -185,6 +191,9 @@ const INITIAL_FORM: WizardForm = {
   productIsOriginal: false,
   productDescription: "",
   characteristicRows: [],
+  categoryDefaultCharacteristicKeys: [],
+  characteristicsSellerTouched: false,
+  characteristicsAutoAppliedForCategoryId: null,
   imageUrls: [],
   productPreviewVideoUrl: "",
   productCategoryId: null,
@@ -230,7 +239,9 @@ function validateStep(
       if (descLen > PRODUCT_DESCRIPTION_MAX_CHARS) {
         return `Описание — не более ${PRODUCT_DESCRIPTION_MAX_CHARS} символов`;
       }
-      return null;
+      // Без этой проверки строка, заполненная наполовину, молча терялась при
+      // отправке, а дубли ключей уезжали на сервер.
+      return validateProductCharacteristicsRows(form.characteristicRows);
     }
     case "originality": {
       if (!isProductListingOrigin(form.productListingOrigin)) {
@@ -1049,6 +1060,7 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
     if (form.characteristicRows.length >= PRODUCT_CHARACTERISTICS_MAX_ITEMS) return;
     setForm((prev) => ({
       ...prev,
+      characteristicsSellerTouched: true,
       characteristicRows: [
         ...prev.characteristicRows,
         { id: nextCharId(), key: "", value: "" },
@@ -1059,6 +1071,7 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
   const removeCharRow = (id: number) => {
     setForm((prev) => ({
       ...prev,
+      characteristicsSellerTouched: true,
       characteristicRows: prev.characteristicRows.filter((r) => r.id !== id),
     }));
   };
@@ -1066,6 +1079,7 @@ function BasicStep({ form, setForm, disabled, theme, styles }: StepProps) {
   const updateCharRow = (id: number, field: "key" | "value", text: string) => {
     setForm((prev) => ({
       ...prev,
+      characteristicsSellerTouched: true,
       characteristicRows: prev.characteristicRows.map((r) =>
         r.id === id ? { ...r, [field]: text } : r,
       ),
@@ -1279,13 +1293,38 @@ function CategoryStep({ form, setForm, disabled, theme, styles }: StepProps) {
       <CreateProductCategoryPicker
         selectedCategoryId={form.productCategoryId}
         selectedCategoryLabel={form.productCategoryLabel}
-        onSelect={(id, label) =>
-          setForm((prev) => ({
-            ...prev,
-            productCategoryId: id,
-            productCategoryLabel: label,
-            productCategory: "", // clear legacy when tree category is selected
-          }))
+        onSelect={(id, label, defaultCharacteristicKeys) =>
+          setForm((prev) => {
+            const next = {
+              ...prev,
+              productCategoryId: id,
+              productCategoryLabel: label,
+              productCategory: "", // clear legacy when tree category is selected
+              categoryDefaultCharacteristicKeys: defaultCharacteristicKeys,
+            };
+            // Заготовки характеристик по категории — только пока продавец не
+            // правил строки сам.
+            const patch = resolveCategoryDefaultCharacteristicRows({
+              productCategoryId: next.productCategoryId,
+              categoryDefaultCharacteristicKeys: next.categoryDefaultCharacteristicKeys,
+              characteristicRows: next.characteristicRows,
+              characteristicsSellerTouched: next.characteristicsSellerTouched,
+              characteristicsAutoAppliedForCategoryId:
+                next.characteristicsAutoAppliedForCategoryId,
+            });
+            if (patch == null) {
+              return next;
+            }
+            return {
+              ...next,
+              ...patch,
+              characteristicRows: patch.characteristicRows.map((row) => ({
+                id: nextCharId(),
+                key: row.key,
+                value: row.value,
+              })),
+            };
+          })
         }
       />
 

@@ -21,6 +21,9 @@ export type CopiedProductWizardForm = {
   productIsOriginal: boolean;
   productDescription: string;
   characteristicRows: Array<{ id: number; key: string; value: string }>;
+  categoryDefaultCharacteristicKeys: string[];
+  characteristicsSellerTouched: boolean;
+  characteristicsAutoAppliedForCategoryId: string | null;
   imageUrls: string[];
   productPreviewVideoUrl: string;
   productCategoryId: string | null;
@@ -84,6 +87,10 @@ export const createProductWizardFormFromCopiedProduct = (
     productIsOriginal: product.productIsOriginal === true,
     productDescription: String(product.productDescription ?? "").trim(),
     characteristicRows: mapProductCharacteristicsToRows(product.productCharacteristics),
+    categoryDefaultCharacteristicKeys: [],
+    // Характеристики уже заданы продавцом — заготовки категории их не трут.
+    characteristicsSellerTouched: true,
+    characteristicsAutoAppliedForCategoryId: null,
     imageUrls: resolveProductImageUrls(product),
     productPreviewVideoUrl: String(product.productPreviewVideoUrl ?? "").trim(),
     productCategoryId: categoryId,

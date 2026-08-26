@@ -7,6 +7,8 @@ export type ProductCategorySearchResult = {
   labelRu: string;
   pathLabelRu: string[];
   isLeaf: boolean;
+  /** Ключи характеристик категории — мастер подставляет их продавцу. */
+  defaultCharacteristicKeys: string[];
 };
 
 const normalizeSearchNode = (raw: Record<string, unknown>): ProductCategorySearchResult => ({
@@ -14,6 +16,9 @@ const normalizeSearchNode = (raw: Record<string, unknown>): ProductCategorySearc
   labelRu: String(raw.labelRu ?? raw.name ?? ""),
   pathLabelRu: Array.isArray(raw.pathLabelRu) ? raw.pathLabelRu.map(String) : [],
   isLeaf: raw.isLeaf === true,
+  defaultCharacteristicKeys: Array.isArray(raw.defaultCharacteristicKeys)
+    ? raw.defaultCharacteristicKeys.map(String)
+    : [],
 });
 
 export const fetchProductCategorySearch = async (

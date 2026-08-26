@@ -36,6 +36,8 @@ type CategoryNode = {
   isLeaf: boolean;
   slug?: string;
   legacyProductCategory?: string | null;
+  /** Ключи характеристик, заданные админом категории. */
+  defaultCharacteristicKeys?: string[];
 };
 
 type TrailItem = {
@@ -46,7 +48,11 @@ type TrailItem = {
 export type CreateProductCategoryPickerProps = {
   selectedCategoryId: string | null;
   selectedCategoryLabel: string;
-  onSelect: (categoryId: string, label: string) => void;
+  onSelect: (
+    categoryId: string,
+    label: string,
+    defaultCharacteristicKeys: string[],
+  ) => void;
 };
 
 const normalizeNode = (raw: Record<string, unknown>): CategoryNode => ({
@@ -56,6 +62,9 @@ const normalizeNode = (raw: Record<string, unknown>): CategoryNode => ({
   slug: typeof raw.slug === "string" ? raw.slug : undefined,
   legacyProductCategory:
     typeof raw.legacyProductCategory === "string" ? raw.legacyProductCategory : null,
+  defaultCharacteristicKeys: Array.isArray(raw.defaultCharacteristicKeys)
+    ? raw.defaultCharacteristicKeys.map(String)
+    : [],
 });
 
 const buildFullPath = (pathLabelRu: string[], labelRu: string): string[] =>
@@ -159,14 +168,22 @@ export const CreateProductCategoryPicker = ({
     setSheetOpen(false);
   };
 
-  const finishSelect = (categoryId: string, fullLabel: string) => {
-    onSelect(categoryId, fullLabel);
+  const finishSelect = (
+    categoryId: string,
+    fullLabel: string,
+    defaultCharacteristicKeys: string[] = [],
+  ) => {
+    onSelect(categoryId, fullLabel, defaultCharacteristicKeys);
     closeSheet();
   };
 
   const handleBrowsePick = (node: CategoryNode) => {
     if (node.isLeaf) {
-      finishSelect(node.id, [...trail.map((t) => t.labelRu), node.labelRu].join(" › "));
+      finishSelect(
+        node.id,
+        [...trail.map((t) => t.labelRu), node.labelRu].join(" › "),
+        node.defaultCharacteristicKeys ?? [],
+      );
       return;
     }
     setTrail((prev) => [...prev, { id: node.id, labelRu: node.labelRu }]);
@@ -264,7 +281,13 @@ export const CreateProductCategoryPicker = ({
                         index === all.length - 1 && s.rowLast,
                         pressed && s.rowPressed,
                       ]}
-                      onPress={() => finishSelect(result.id, fullPath.join(" › "))}
+                      onPress={() =>
+                        finishSelect(
+                          result.id,
+                          fullPath.join(" › "),
+                          result.defaultCharacteristicKeys ?? [],
+                        )
+                      }
                     >
                       <View style={s.rowTextWrap}>
                         <Text style={s.rowLabel} numberOfLines={2}>

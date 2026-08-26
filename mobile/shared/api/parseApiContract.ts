@@ -87,6 +87,7 @@ const productCategoryPublicNodeSchema = z
     isLeaf: z.boolean().optional(),
     legacyProductCategory: z.string().nullable().optional(),
     searchKeywords: z.array(z.string()).optional(),
+    defaultCharacteristicKeys: z.array(z.string()).optional(),
   })
   .passthrough()
   .refine((node) => Boolean(node.id || node._id), {
