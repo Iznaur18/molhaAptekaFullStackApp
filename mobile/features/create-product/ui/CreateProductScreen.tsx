@@ -539,7 +539,11 @@ export const ProductWizardScreen = ({
         ...(isRuRegionCode(form.productRegionCode.trim())
           ? { productRegionCode: form.productRegionCode.trim() }
           : {}),
-        productPickupLocations: form.productPickupLocations,
+        // Пустой список не шлём: контракт примет его как «точек нет» и сотрёт
+        // то, что продавец задал на сайте.
+        ...(form.productPickupLocations.length > 0
+          ? { productPickupLocations: form.productPickupLocations }
+          : {}),
         productPickupAddress: form.productPickupAddress.trim(),
         productPickupLat: form.productPickupLat,
         productPickupLon: form.productPickupLon,
