@@ -1961,6 +1961,10 @@ export const CREATE_PRODUCT_UI = {
   ERROR_ORIGINALITY: "Выберите: оригинал или нет",
   LABEL_ORIGINALITY: "Оригинал",
   ORIGINALITY_TOGGLE_PENDING: "Сохраняем…",
+  DRAFT_SAVE_EXIT: "Сохранить черновик и выйти",
+  DRAFT_RESTORED_HINT:
+    "Восстановили незаконченный товар — можно продолжить с того же места.",
+  DRAFT_RESTORED_DISCARD: "Начать заново",
   WIZARD_STEP_ORIGINALITY_SUBTITLE:
     "Выберите, откуда товар: своё, куплено на перепродажу или вы производитель. Покупатели увидят это в карточке.",
   WIZARD_STEP_ORIGINALITY_MANAGE_SUBTITLE: "Подтвердите, что продаёте официальный товар",

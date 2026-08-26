@@ -39,6 +39,10 @@ import { createProductWizardFormFromProduct } from "@/entities/product/lib/creat
 import { serializeProductCharacteristicRows } from "@/entities/product/lib/productCharacteristicRows";
 import { useCatalogProductQuery } from "@/entities/product/model/useCatalogProductQuery";
 import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
+import {
+  clearCreateProductFormDraft,
+  readCreateProductFormDraft,
+} from "@/entities/product/lib/createProductFormDraftStorage";
 import { resolveCategoryDefaultCharacteristicRows } from "@/entities/product/lib/resolveCategoryDefaultCharacteristicRows";
 import { validateProductCharacteristicsRows } from "@/entities/product/lib/validateProductCharacteristicsRows";
 import { validateProductName } from "@/entities/product/lib/validateProductName";
@@ -75,6 +79,7 @@ import {
   getCreateProductLaunchSeq,
   peekCreateProductLaunch,
 } from "@/features/create-product/model/productCopyDraftStore";
+import { useCreateProductFormDraft } from "@/features/create-product/model/useCreateProductFormDraft";
 import { API_CLIENT_UI, CREATE_PRODUCT_UI, PRODUCT_PICKUP_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { formatRubPriceInput, parseRubPriceInput } from "@/shared/lib/rubPriceInput";
@@ -402,19 +407,31 @@ export const ProductWizardScreen = ({
     [user],
   );
   const initialLaunch = peekCreateProductLaunch();
-  const [form, setForm] = useState<WizardForm>(() =>
-    initialLaunch?.kind === "copy"
-      ? createProductWizardFormFromCopiedProduct(initialLaunch.product)
-      : {
-          ...INITIAL_FORM,
-          ...createProductPickupFieldsFromUser(user),
-        },
-  );
-  const [stepIndex, setStepIndex] = useState(0);
+  // Черновик ведём только для «чистого» создания: при редактировании и
+  // копировании форма префилится из товара — черновику там не место.
+  const draftEnabled = !isEdit && initialLaunch?.kind !== "copy";
+  // Чтение синхронное, поэтому черновик попадает в самый первый рендер и
+  // автосейву нечего затирать пустой формой.
+  const initialDraft = draftEnabled
+    ? readCreateProductFormDraft<WizardForm>(WIZARD_STEPS.length)
+    : null;
+  const [form, setForm] = useState<WizardForm>(() => {
+    if (initialLaunch?.kind === "copy") {
+      return createProductWizardFormFromCopiedProduct(initialLaunch.product);
+    }
+    if (initialDraft) {
+      return initialDraft.form;
+    }
+    return { ...INITIAL_FORM, ...createProductPickupFieldsFromUser(user) };
+  });
+  const [stepIndex, setStepIndex] = useState(initialDraft?.stepIndex ?? 0);
+  const [draftRestored, setDraftRestored] = useState(initialDraft != null);
   const [stepError, setStepError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const profilePickupSeededRef = useRef(
-    Boolean(user) || initialLaunch?.kind === "copy",
+    // Восстановленный черновик уже несёт свой самовывоз — поверх него
+    // профильный подставлять нельзя.
+    Boolean(user) || initialLaunch?.kind === "copy" || initialDraft != null,
   );
   const appliedLaunchSeqRef = useRef(
     initialLaunch ? getCreateProductLaunchSeq() : 0,
@@ -435,11 +452,21 @@ export const ProductWizardScreen = ({
       setForm(createProductWizardFormFromCopiedProduct(launch.product));
       profilePickupSeededRef.current = true;
     } else {
+      const draft = readCreateProductFormDraft<WizardForm>(WIZARD_STEPS.length);
+      if (draft) {
+        setForm(draft.form);
+        profilePickupSeededRef.current = true;
+        setDraftRestored(true);
+        setStepIndex(draft.stepIndex);
+        setStepError("");
+        return;
+      }
       setForm({
         ...INITIAL_FORM,
         ...createProductPickupFieldsFromUser(user),
       });
       profilePickupSeededRef.current = Boolean(user);
+      setDraftRestored(false);
     }
     setStepIndex(0);
     setStepError("");
@@ -471,6 +498,22 @@ export const ProductWizardScreen = ({
     setStepIndex(0);
     setStepError("");
   }, [isEdit, productQuery.data]);
+
+  const { saveNow: saveDraftNow } = useCreateProductFormDraft({
+    enabled: draftEnabled,
+    form,
+    stepIndex,
+    isSubmitting,
+  });
+
+  const discardDraft = useCallback(() => {
+    clearCreateProductFormDraft();
+    setForm({ ...INITIAL_FORM, ...createProductPickupFieldsFromUser(user) });
+    profilePickupSeededRef.current = Boolean(user);
+    setDraftRestored(false);
+    setStepIndex(0);
+    setStepError("");
+  }, [user]);
 
   const stepId = WIZARD_STEPS[stepIndex];
   const isFirstStep = stepIndex === 0;
@@ -612,6 +655,10 @@ export const ProductWizardScreen = ({
             : [],
       });
 
+      // Товар создан — черновику больше незачем жить, иначе следующий вход
+      // предложит восстановить только что отправленное.
+      clearCreateProductFormDraft();
+      setDraftRestored(false);
       router.replace("/hub/my-products");
     } catch (err) {
       setStepError(
@@ -624,6 +671,11 @@ export const ProductWizardScreen = ({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSaveDraftAndExit = () => {
+    saveDraftNow();
+    handleCancel();
   };
 
   const handlePrimaryPress = () => {
@@ -725,6 +777,31 @@ export const ProductWizardScreen = ({
   const renderWizardBody = () => (
     <>
       <WizardProgress steps={WIZARD_STEPS} stepIndex={stepIndex} theme={theme} />
+      {draftRestored ? (
+        <View
+          style={[
+            styles.draftBanner,
+            {
+              borderColor: theme.colors.actionBorder,
+              backgroundColor: theme.colors.actionSurface,
+            },
+          ]}
+        >
+          <Text style={[styles.draftBannerText, { color: theme.colors.text }]}>
+            {CREATE_PRODUCT_UI.DRAFT_RESTORED_HINT}
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={discardDraft}
+            disabled={isSubmitting}
+            style={styles.draftBannerAction}
+          >
+            <Text style={[styles.draftBannerActionText, { color: theme.colors.action }]}>
+              {CREATE_PRODUCT_UI.DRAFT_RESTORED_DISCARD}
+            </Text>
+          </Pressable>
+        </View>
+      ) : null}
       {showStepHeadline ? (
         <View style={styles.stepHeadline}>
           <Text style={[styles.stepTitle, { color: theme.colors.primary }]}>
@@ -844,6 +921,22 @@ export const ProductWizardScreen = ({
           </Text>
         )}
       </Pressable>
+
+      {draftEnabled && !isLastStep ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={handleSaveDraftAndExit}
+          disabled={isSubmitting}
+          style={styles.draftSaveButton}
+        >
+          <Text
+            style={[styles.draftSaveButtonText, { color: theme.colors.textSecondary }]}
+            numberOfLines={1}
+          >
+            {CREATE_PRODUCT_UI.DRAFT_SAVE_EXIT}
+          </Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 
@@ -2122,6 +2215,38 @@ const useStyles = createThemedStyles((theme) => ({
 
   // ── Error — mirrors .create-product-wizard__error ──
 
+  draftBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderRadius: 12,
+  },
+  draftBannerText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18.2,
+  },
+  draftBannerAction: {
+    minHeight: 32,
+    justifyContent: "center",
+  },
+  draftBannerActionText: {
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  draftSaveButton: {
+    flexBasis: "100%",
+    minHeight: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  draftSaveButtonText: {
+    fontSize: 13,
+    fontWeight: "600",
+  },
   errorBox: {
     borderWidth: 1,
     borderRadius: 9, // 0.55rem
@@ -2137,6 +2262,7 @@ const useStyles = createThemedStyles((theme) => ({
 
   footer: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: 10, // 0.65rem
     marginHorizontal: -20, // bleed to screen edges inside body padding
     paddingHorizontal: 20, // 1.25rem
@@ -2145,6 +2271,7 @@ const useStyles = createThemedStyles((theme) => ({
   },
   footerInModal: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: 10,
   },
   backButtonPlaceholder: {
