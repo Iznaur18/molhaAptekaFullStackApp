@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type Ref } from "react";
 import {
   ActivityIndicator,
+  Pressable,
   Text,
   useWindowDimensions,
   View,
@@ -58,7 +59,13 @@ import { HomeFeedListHeader } from "@/features/home-feed/ui/HomeFeedListHeader";
 import { HomeCatalogFeedSheetCap } from "@/features/home-feed/ui/HomeCatalogFeedSheetCap";
 import { HomeCatalogPrimaryBackdrop } from "@/features/home-feed/ui/HomeCatalogPrimaryBackdrop";
 import { HomeCatalogSearchRow } from "@/features/home-feed/ui/HomeCatalogSearchRow";
-import { API_CLIENT_UI, CATALOG_SEARCH_MIN_LENGTH } from "@/shared/config";
+import { resolveCatalogEmptyReason } from "@/entities/product/lib/resolveCatalogEmptyReason";
+import {
+  API_CLIENT_UI,
+  CATALOG_EMPTY_MESSAGE,
+  CATALOG_LOAD_MORE_UI,
+  CATALOG_SEARCH_MIN_LENGTH,
+} from "@/shared/config";
 import { CATALOG_SEARCH_QUERY_MAX_LENGTH } from "@molha/api-contract";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { setCatalogCategoryView } from "@/shared/lib/catalogCategoryViewStore";
@@ -82,6 +89,7 @@ import {
   useVisibleRowsController,
   VisibleRowsProvider,
 } from "@/shared/model/rowVisibility";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useFeedScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
@@ -100,6 +108,7 @@ const resolveHomeFeedDockOffset = (windowHeight: number): number => {
 
 export default function CatalogScreen() {
   const styles = useFeedScreenStyles();
+  const theme = useAppTheme();
   const queryClient = useQueryClient();
   const productGrid = useProductGridLayout();
   const { centeredContentStyle, contentPaddingBottom, contentPaddingHorizontal } =
@@ -296,9 +305,24 @@ export default function CatalogScreen() {
     [submittedSearch, feedFilters, selectedRootSlug, selectedSubcategoryId, showHomeFeed],
   );
 
-  const catalogEmptyLabel = feedFilters.near
-    ? API_CLIENT_UI.CATALOG_EMPTY_NEAR
-    : API_CLIENT_UI.CATALOG_EMPTY;
+  // Общее «Товаров пока нет» на включённый фильтр не объясняет, что виноват
+  // фильтр, а не поломка — веб на каждый случай даёт свой текст.
+  const catalogEmptyLabel =
+    CATALOG_EMPTY_MESSAGE[
+      resolveCatalogEmptyReason({
+        hasQuery: Boolean(submittedSearch),
+        hasSelectedCategory: Boolean(selectedRootSlug || selectedSubcategoryId),
+        near: feedFilters.near === true,
+        saleOnly: feedFilters.saleOnly === true,
+        rentalOnly: feedFilters.rentalOnly === true,
+        affiliateOnly: feedFilters.affiliateOnly === true,
+        wholesaleOnly: feedFilters.wholesaleOnly === true,
+        originalOnly: feedFilters.originalOnly === true,
+        installmentOnly: feedFilters.installmentOnly === true,
+        followingOnly: feedFilters.followingOnly === true,
+        auctionOnly: feedFilters.auctionOnly === true,
+      })
+    ];
 
   const homeFeedContentReady = useHomeFeedContentReady({
     enabled: showHomeFeed,
@@ -462,8 +486,31 @@ export default function CatalogScreen() {
 
   const isRefreshing = isPullRefreshing || catalogQuery.isRefetching;
 
+  // Упавшая догрузка в вебе показывает ошибку и «Повторить»; молча вставшая
+  // лента выглядит как конец каталога.
+  const loadMoreFooter = catalogQuery.isFetchNextPageError ? (
+    <View style={styles.centered}>
+      <Text style={[styles.empty, { color: theme.colors.danger }]}>
+        {formatApiErrorMessage(catalogQuery.error, CATALOG_LOAD_MORE_UI.FAIL)}
+      </Text>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => catalogQuery.fetchNextPage()}
+        style={styles.loadMoreRetry}
+      >
+        <Text style={[styles.loadMoreRetryText, { color: theme.colors.action }]}>
+          {CATALOG_LOAD_MORE_UI.RETRY}
+        </Text>
+      </Pressable>
+    </View>
+  ) : null;
+
   const handleLoadMore = () => {
-    if (catalogQuery.hasNextPage && !catalogQuery.isFetchingNextPage) {
+    if (
+      catalogQuery.hasNextPage &&
+      !catalogQuery.isFetchingNextPage &&
+      !catalogQuery.isFetchNextPageError
+    ) {
       catalogQuery.fetchNextPage();
     }
   };
@@ -786,6 +833,7 @@ export default function CatalogScreen() {
                                 <ActivityIndicator style={styles.footerLoader} />
                               </View>
                             ) : null}
+                            {loadMoreFooter}
                             {homeFeedListFooter}
                           </View>
                         }
@@ -831,9 +879,12 @@ export default function CatalogScreen() {
             </View>
           }
           ListFooterComponent={
-            catalogQuery.isFetchingNextPage ? (
-              <ActivityIndicator style={styles.footerLoader} />
-            ) : null
+            <>
+              {catalogQuery.isFetchingNextPage ? (
+                <ActivityIndicator style={styles.footerLoader} />
+              ) : null}
+              {loadMoreFooter}
+            </>
           }
         />
       </View>

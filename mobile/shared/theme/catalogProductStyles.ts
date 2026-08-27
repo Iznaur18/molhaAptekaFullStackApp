@@ -154,6 +154,17 @@ export const useFeedScreenStyles = createThemedStyles((theme) => ({
     fontSize: 16,
     color: theme.colors.textMuted,
   },
+  loadMoreRetry: {
+    marginTop: 8,
+    minHeight: 40,
+    paddingHorizontal: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadMoreRetryText: {
+    fontSize: 14,
+    fontWeight: "700",
+  },
   footerLoader: {
     marginVertical: theme.spacing[4],
   },

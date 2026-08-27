@@ -2,6 +2,8 @@ import {
   SELLER_PRODUCTS_LIMIT_PREMIUM,
   SELLER_PRODUCTS_LIMIT_REGULAR,
 } from "@molha/api-contract";
+
+import type { CatalogEmptyReason } from "@/entities/product/lib/resolveCatalogEmptyReason";
 import { pluralizeRu } from "@/shared/lib/pluralizeRu";
 import { pluralizeRuBall } from "@/shared/lib/pluralizeRuBall";
 
@@ -3123,4 +3125,32 @@ export const POPULAR_CATEGORIES_ADMIN_PAGE_UI = {
   PREVIEW_REGION_LABEL: "Регион",
   PREVIEW_NOT_VISIBLE: "Категория недоступна в каталоге — добавить нельзя",
   PREVIEW_OK: "Можно добавить в эту подборку",
+} as const;
+
+/**
+ * Тексты пустого каталога — по одному на причину, как в вебе
+ * (`HomeCatalogGrid`). Общее «Товаров пока нет» на включённый фильтр
+ * не объясняет продавцу, что виноват фильтр, а не поломка.
+ */
+export const CATALOG_EMPTY_MESSAGE: Record<CatalogEmptyReason, string> = {
+  query: "По вашему запросу ничего не найдено.",
+  near: "Нет товаров рядом с вашим адресом.",
+  sale: "Нет товаров в распродаже от 35%.",
+  rental: "Нет товаров в прокате и аренде.",
+  affiliate: "Нет товаров с партнёрской программой.",
+  wholesale: "Нет товаров с оптовой ценой.",
+  original: "Нет оригинальных товаров.",
+  installment: "Нет товаров с рассрочкой с текущими фильтрами.",
+  following: "Нет товаров от ваших подписок с текущими фильтрами.",
+  mineByModerationStatus: "Нет товаров с выбранным статусом.",
+  mineFiltered: "У вас нет товаров в каталоге с текущими фильтрами.",
+  mine: "У вас пока нет товаров в каталоге.",
+  category: "В выбранной категории товаров нет.",
+  generic: "Товаров пока нет.",
+};
+
+export const CATALOG_LOAD_MORE_UI = {
+  FAIL: "Не удалось подгрузить ещё товары",
+  RETRY: "Повторить",
+  LOADING: "Подгружаем…",
 } as const;

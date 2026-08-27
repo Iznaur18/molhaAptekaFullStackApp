@@ -116,6 +116,7 @@
     "test:saved-addresses-editor": "node --test scripts/saved-addresses-editor.test.mjs",
     "test:product-qa-toggle": "node --test scripts/product-qa-toggle.test.mjs",
     "test:product-promo-codes": "node --test scripts/product-promo-codes-modal.test.mjs",
+    "test:catalog-empty-and-retry": "node --test scripts/catalog-empty-and-retry.test.mjs",
     "test:shelves-and-moderation-origin": "node --test scripts/shelves-and-moderation-origin.test.mjs",
     "test:create-product-form-draft": "node --test scripts/create-product-form-draft.test.mjs",
     "test:product-characteristics-parity": "node --test scripts/product-characteristics-parity.test.mjs",
