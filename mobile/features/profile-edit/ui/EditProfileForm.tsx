@@ -29,6 +29,7 @@ import { DeleteAccountSection } from "@/features/profile-edit/ui/DeleteAccountSe
 import { EditProfileSocialLinksFields } from "@/features/profile-edit/ui/EditProfileSocialLinksFields";
 import { ADDRESS_STRUCTURED_UI, AUTH_UI, EDIT_PROFILE_UI, USER_SAVED_ADDRESSES_UI } from "@/shared/config";
 import { keepDigitsOnly } from "@/shared/lib/rubPriceInput";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useEditProfileFormStyles } from "@/shared/theme/editProfileFormStyles";
 import { AppButton } from "@/shared/ui/AppButton";
@@ -74,6 +75,8 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
   const [passwordChangeNotice, setPasswordChangeNotice] = useState("");
   const patchMutation = usePatchUserProfileMutation();
   const scrollRef = useRef<ScrollView>(null);
+  // Как web `.app-shell`: на планшете колонка ограничена и центрируется.
+  const { centeredContentStyle } = useScreenLayout();
   const addressOffsetRef = useRef(0);
 
   useEffect(() => {
@@ -322,7 +325,7 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
     <ScrollView
       ref={scrollRef}
       style={styles.scrollView}
-      contentContainerStyle={styles.scroll}
+      contentContainerStyle={[styles.scroll, centeredContentStyle]}
       keyboardShouldPersistTaps="handled"
     >
       {/* Зона: оформление профиля (аватар + фон) */}

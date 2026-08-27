@@ -5,10 +5,13 @@ import { FAQ_SECTIONS, FAQ_UPDATED_AT } from "@/features/faq/model/faqContent";
 import { FaqAccordionItem } from "@/features/faq/ui/FaqAccordionItem";
 import { LEGAL_CONTACT_EMAIL } from "@/features/legal/model/legalSharedConstants";
 import { FAQ_UI } from "@/shared/config";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useFaqPageStyles } from "@/shared/theme/faqPageStyles";
 
 export const FaqScreen = () => {
   const styles = useFaqPageStyles();
+  // Как web `.app-shell`: на планшете колонка ограничена и центрируется.
+  const { centeredContentStyle } = useScreenLayout();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const handleToggle = useCallback((id: string) => {
@@ -16,7 +19,7 @@ export const FaqScreen = () => {
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, centeredContentStyle]}>
       <Text style={styles.title}>{FAQ_UI.TITLE}</Text>
       <Text style={styles.meta}>
         {FAQ_UI.UPDATED_PREFIX} {FAQ_UPDATED_AT}

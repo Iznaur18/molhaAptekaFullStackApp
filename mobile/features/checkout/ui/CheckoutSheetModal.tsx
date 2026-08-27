@@ -1,5 +1,14 @@
 import { useMemo } from "react";
-import { Dimensions, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Dimensions,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import Animated from "react-native-reanimated";
 
 import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
@@ -7,6 +16,7 @@ import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import type { CheckoutProductPickupGroup } from "@/entities/cart/lib/buildCheckoutPickupLocations";
 import { CheckoutForm } from "@/features/checkout/ui/CheckoutForm";
 import { CHECKOUT_FORM_UI, CART_PAGE_UI } from "@/shared/config";
+import { resolveAppShellMaxWidthStyle } from "@/shared/lib/appShellLayout";
 import { useAdminEditModalAnimation } from "@/shared/model/useAdminEditModalAnimation";
 import { useBottomSheetFormStyles } from "@/shared/theme/formChromeStyles";
 import { CHECKOUT_SHEET_MODAL_ANIMATION } from "@/shared/theme/modalChromeStyles";
@@ -46,6 +56,7 @@ export const CheckoutSheetModal = ({
   onSubmit,
 }: CheckoutSheetModalProps) => {
   const sheetStyles = useBottomSheetFormStyles();
+  const { width: windowWidth } = useWindowDimensions();
   const sheetSlideDistance = useMemo(() => Dimensions.get("window").height, []);
   const { modalVisible, backdropAnimatedStyle, sheetAnimatedStyle } =
     useAdminEditModalAnimation(visible, {
@@ -53,6 +64,8 @@ export const CheckoutSheetModal = ({
       enterMs: CHECKOUT_SHEET_MODAL_ANIMATION.enterMs,
       exitMs: CHECKOUT_SHEET_MODAL_ANIMATION.exitMs,
     });
+
+  const sheetMaxWidthStyle = resolveAppShellMaxWidthStyle(windowWidth);
 
   if (!modalVisible) {
     return null;
@@ -73,7 +86,14 @@ export const CheckoutSheetModal = ({
           accessibilityRole="button"
         />
         <Animated.View
-          style={[sheetStyles.sheet, sheetStyles.checkoutSheet, sheetAnimatedStyle]}
+          style={[
+            sheetStyles.sheet,
+            sheetStyles.checkoutSheet,
+            // Веб ограничивает шторку той же лесенкой, что и контент
+            // (`width: min(100%, --app-shell-max-width)`) и центрирует её.
+            sheetMaxWidthStyle,
+            sheetAnimatedStyle,
+          ]}
         >
           <View style={sheetStyles.header}>
             <Text style={sheetStyles.title}>{CHECKOUT_FORM_UI.HEADING}</Text>

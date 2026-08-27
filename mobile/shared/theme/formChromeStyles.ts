@@ -12,7 +12,8 @@ export const EMAIL_VERIFY_MODAL_CORNER_RADIUS = 36;
 export const PASSWORD_TOGGLE_ICON_SIZE = A.passwordToggleSize;
 
 /** Высота checkout bottom sheet, % viewport (было 88%, −20% → 70). */
-export const CHECKOUT_SHEET_HEIGHT_PERCENT = 60;
+/** Паритет web `--checkout-sheet-height: 70%` в CheckoutSheetModal.css. */
+export const CHECKOUT_SHEET_HEIGHT_PERCENT = 70;
 
 export const useAuthFormStyles = createThemedStyles((theme) => ({
   flex: {

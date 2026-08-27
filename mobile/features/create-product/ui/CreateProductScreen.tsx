@@ -93,6 +93,9 @@ import { resolveWizardFooterPaddingBottom } from "@/shared/theme/screenContentLa
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 
+/** Паритет web: `@container app-viewport (min-width: 40rem)` в CreateProductWizard.css. */
+const WIZARD_COLUMN_MAX_WIDTH = 640;
+
 const WIZARD_STEPS = [
   "category",
   "basic",
@@ -395,6 +398,9 @@ export const ProductWizardScreen = ({
   const theme = useAppTheme();
   const styles = useStyles();
   const insets = useSafeAreaInsets();
+  // Мастер в вебе ограничен не общей лесенкой, а собственными 40rem
+  // (`CreateProductWizard.css`: `calc((100vw - 40rem) / 2)`).
+  const wizardColumnStyle = { width: "100%" as const, maxWidth: WIZARD_COLUMN_MAX_WIDTH, alignSelf: "center" as const };
   const { width: screenWidth } = useWindowDimensions();
   const createMutation = useCreateProductMutation();
   const { patchMutation } = useMyProductMutations();
@@ -992,7 +998,7 @@ export const ProductWizardScreen = ({
     >
       <ScrollView
         style={[styles.body, { backgroundColor: theme.colors.bg }]}
-        contentContainerStyle={[styles.bodyContent, { flexGrow: 1 }]}
+        contentContainerStyle={[styles.bodyContent, wizardColumnStyle, { flexGrow: 1 }]}
         keyboardShouldPersistTaps="handled"
         automaticallyAdjustKeyboardInsets
         automaticallyAdjustsScrollIndicatorInsets

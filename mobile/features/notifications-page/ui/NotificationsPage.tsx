@@ -15,6 +15,7 @@ import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { API_CLIENT_UI, AUTH_UI, NOTIFICATIONS_PAGE_UI } from "@/shared/config";
 import { formatApiErrorMessage, formatIsoDateTime } from "@/shared/lib";
+import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useNotificationsPageStyles } from "@/shared/theme/accountFeatureStyles";
 import { ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
@@ -31,6 +32,8 @@ const openNotificationTarget = (
 export const NotificationsPage = () => {
   const router = useRouter();
   const styles = useNotificationsPageStyles();
+  // Как web `.app-shell`: на планшете колонка ограничена и центрируется.
+  const { centeredContentStyle } = useScreenLayout();
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
   const liveNotifications = useInAppNotifications();
@@ -108,7 +111,7 @@ export const NotificationsPage = () => {
   }
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, centeredContentStyle]}>
       <View style={styles.toolbar}>
         <Text style={styles.count}>{NOTIFICATIONS_PAGE_UI.COUNT(notifications.length)}</Text>
         <Pressable
