@@ -9,6 +9,7 @@ import {
   analyticsPeriodQueryValidation,
   trackAdAnalyticsValidation,
 } from "../validations/index.js";
+import { emptyBodyValidation } from "../validations/common/emptyBodyValidation.js";
 import { checkAuthMW, checkAdminMW, optionalAuthMW } from "../middlewares/index.js";
 
 const router = createAsyncRouter();
@@ -36,10 +37,13 @@ router.get(
   getAnalyticsExportController,
 );
 
+// Контроллер тело не читает: валидация отклоняет лишние поля, чтобы маршрут
+// не выпадал из аудита `scripts/auditRouteBodyValidation.js`.
 router.post(
   "/reconciliation/run",
   checkAuthMW,
   checkAdminMW,
+  emptyBodyValidation,
   runAnalyticsReconciliationController,
 );
 
