@@ -1,7 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useLayoutEffect, useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
 import { View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { HubSectionContent } from "@/features/profile-hub/ui/HubSectionContent";
@@ -25,7 +24,6 @@ import { ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export default function HubSectionScreen() {
   const router = useRouter();
-  const navigation = useNavigation();
   const { section } = useLocalSearchParams<{ section: string }>();
   const sectionId = String(section ?? "");
   const userAccess = useUserAccess();
@@ -47,10 +45,6 @@ export default function HubSectionScreen() {
 
     return sectionId;
   }, [hubAccess, sectionId]);
-
-  useLayoutEffect(() => {
-    navigation.setOptions({ title: sectionTitle, headerShown: isDrawerLayout });
-  }, [isDrawerLayout, navigation, sectionTitle]);
 
   useEffect(() => {
     if (sectionId === "product-manage-toggle-display-admin") {

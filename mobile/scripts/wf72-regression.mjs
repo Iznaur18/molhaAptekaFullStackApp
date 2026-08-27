@@ -49,7 +49,7 @@ const EXPECTED_APP_ROUTES = [
   "app/notifications/index.tsx",
   "app/product/[id].tsx",
   "app/profile/edit.tsx",
-  "app/raffle/[id].tsx",
+  "app/(tabs)/raffle/[id].tsx",
   "app/seller/[userId].tsx",
   "app/user/[id].tsx",
   "app/user/[id]/edit.tsx",

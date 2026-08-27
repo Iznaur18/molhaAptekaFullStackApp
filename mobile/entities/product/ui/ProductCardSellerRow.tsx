@@ -9,11 +9,16 @@ import { useProductCardSellerRowStyles } from "@/shared/theme/catalogProductStyl
 
 type ProductCardSellerRowProps = {
   product: Record<string, unknown>;
+  layout?: "default" | "catalog-grid";
 };
 
-export const ProductCardSellerRow = ({ product }: ProductCardSellerRowProps) => {
+export const ProductCardSellerRow = ({
+  product,
+  layout = "default",
+}: ProductCardSellerRowProps) => {
   const router = useRouter();
   const styles = useProductCardSellerRowStyles();
+  const isCatalogGrid = layout === "catalog-grid";
   const sellerProfile = getProductSellerProfile(product);
 
   if (!sellerProfile) {
@@ -24,13 +29,16 @@ export const ProductCardSellerRow = ({ product }: ProductCardSellerRowProps) => 
 
   if (!sellerId) {
     return (
-      <View style={styles.root}>
+      <View style={[styles.root, isCatalogGrid && styles.rootCatalogGrid]}>
         <UserPremiumDisplayName
           name={displayName}
           isPremium={isPremiumUser}
           isUserDataConfirmed={isUserDataConfirmed}
           badgeSize={PRODUCT_CARD_BADGE_LAYOUT.sellerBadgeSize}
-          textStyle={styles.nameTextPlain}
+          textStyle={[
+            styles.nameTextPlain,
+            isCatalogGrid && styles.nameTextPlainCatalogGrid,
+          ]}
         />
       </View>
     );
@@ -42,13 +50,13 @@ export const ProductCardSellerRow = ({ product }: ProductCardSellerRowProps) => 
       isPremium={isPremiumUser}
       isUserDataConfirmed={isUserDataConfirmed}
       badgeSize={PRODUCT_CARD_BADGE_LAYOUT.sellerBadgeSize}
-      textStyle={styles.nameText}
+      textStyle={[styles.nameText, isCatalogGrid && styles.nameTextCatalogGrid]}
     />
   );
 
   return (
     <Pressable
-      style={styles.root}
+      style={[styles.root, isCatalogGrid && styles.rootCatalogGrid]}
       onPress={() => router.push({ pathname: "/user/[id]", params: { id: sellerId } })}
       accessibilityRole="link"
       accessibilityLabel={PRODUCT_CARD_UI.SELLER_PROFILE_ARIA(displayName)}

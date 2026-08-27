@@ -1,7 +1,7 @@
+import { Share2 } from "@/shared/ui/productDetailsLucideIcons";
 import { useState } from "react";
-import { Pressable, Share, Text, View } from "react-native";
+import { Share, Text } from "react-native";
 import { useQuery } from "@tanstack/react-query";
-import { Feather } from "@expo/vector-icons";
 import { AFFILIATE_QUERY_PARAM } from "@izibuy/shared-lib";
 import * as Clipboard from "expo-clipboard";
 
@@ -9,10 +9,10 @@ import { getProductSellerId } from "@/entities/product/lib/getProductSellerId";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { fetchMyReferralProgram } from "@/entities/user/api/referralProgram";
+import { ProductDetailsFeatureCard } from "@/entities/product/ui/ProductDetailsFeatureCard";
 import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
 import { WEB_APP_BASE_URL } from "@/shared/config/webAppBaseUrl";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
 
 type ProductAffiliateShareButtonProps = {
   product: Record<string, unknown>;
@@ -24,7 +24,6 @@ export const ProductAffiliateShareButton = ({
   onRequestLogin,
 }: ProductAffiliateShareButtonProps) => {
   const theme = useAppTheme();
-  const styles = useProductDetailScreenStyles();
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
   const enabled = product.affiliateEnabled === true;
@@ -87,9 +86,11 @@ export const ProductAffiliateShareButton = ({
 
   return (
     <>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={
+      <ProductDetailsFeatureCard
+        icon={Share2}
+        title={title}
+        subtitle={subtitle}
+        ariaLabel={
           isAuthorized
             ? PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE
             : PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_LOGIN
@@ -98,28 +99,7 @@ export const ProductAffiliateShareButton = ({
           void handlePress();
         }}
         disabled={busy}
-        style={({ pressed }) => [
-          styles.featureCard,
-          {
-            opacity: busy ? 0.65 : pressed ? 0.92 : 1,
-            borderColor: pressed ? theme.colors.actionBorder : "transparent",
-          },
-        ]}
-      >
-        <View style={styles.featureCardIcon}>
-          <Feather name="share-2" size={20} color={theme.colors.action} />
-        </View>
-        <View style={styles.featureCardText}>
-          <Text style={styles.featureCardTitle}>{title}</Text>
-          <Text style={styles.featureCardSubtitle}>{subtitle}</Text>
-        </View>
-        <Feather
-          name="chevron-right"
-          size={22}
-          color={theme.colors.action}
-          style={styles.featureCardChevron}
-        />
-      </Pressable>
+      />
       {status ? (
         <Text style={{ fontSize: 12, color: theme.colors.textMuted }}>{status}</Text>
       ) : null}

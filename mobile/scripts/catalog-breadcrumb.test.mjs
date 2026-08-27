@@ -28,6 +28,9 @@ test("catalog screen uses breadcrumb instead of category chips", () => {
   assert.match(styles, /title:/);
   assert.match(styles, /paddingTop: 16/);
   assert.match(styles, /HOME_FEED_DISPLAY_TITLE/);
+  assert.match(styles, /paddingLeft: HOME_FEED_DISPLAY_TITLE\.paddingLeft/);
+  assert.match(styles, /titleCompactTop/);
+  assert.match(breadcrumb, /titleCompactTop/);
   assert.match(webCss, /catalog-categories-browser__breadcrumb/);
 
   const display = readFile(MOBILE_ROOT, "shared/theme/displayTypography.ts");

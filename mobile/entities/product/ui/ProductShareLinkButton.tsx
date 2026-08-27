@@ -5,30 +5,15 @@ import * as Clipboard from "expo-clipboard";
 
 import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
 import { WEB_APP_BASE_URL } from "@/shared/config/webAppBaseUrl";
+import { PRODUCT_DETAIL_HERO_CHROME } from "@/shared/lib/productDetailHeroChromeLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { useProductDetailHeroChromeStyles } from "@/shared/theme/catalogProductStyles";
 
 type ProductShareLinkButtonProps = {
   product: Record<string, unknown>;
 };
 
 const COPIED_ICON_MS = 1600;
-
-const useShareLinkStyles = createThemedStyles((theme) => ({
-  root: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: theme.colors.surface,
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-}));
 
 /**
  * Иконка «Ссылка» в chrome галереи.
@@ -38,7 +23,7 @@ export const ProductShareLinkButton = ({
   product,
 }: ProductShareLinkButtonProps) => {
   const theme = useAppTheme();
-  const styles = useShareLinkStyles();
+  const styles = useProductDetailHeroChromeStyles();
   const [copied, setCopied] = useState(false);
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -86,7 +71,7 @@ export const ProductShareLinkButton = ({
 
   return (
     <Pressable
-      style={styles.root}
+      style={styles.actionButton}
       onPress={() => {
         void handlePress();
       }}
@@ -100,7 +85,7 @@ export const ProductShareLinkButton = ({
     >
       <Feather
         name={copied ? "check" : "link"}
-        size={20}
+        size={PRODUCT_DETAIL_HERO_CHROME.iconSize}
         color={copied ? theme.colors.success : theme.colors.text}
       />
     </Pressable>

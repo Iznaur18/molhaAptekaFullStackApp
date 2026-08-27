@@ -40,6 +40,7 @@ test("product detail section tabs use underline chrome instead of pill chips", (
     MOBILE_ROOT,
     "features/product-detail/ui/ProductDetailTabBar.tsx",
   );
+  const layout = readFile(MOBILE_ROOT, "shared/lib/productDetailTabBarLayout.ts");
   const webTabsCss = readFile(
     CLIENT_ROOT,
     "src/entities/product/ui/product-details-modal/ProductDetailsModalTabs.css",
@@ -50,14 +51,39 @@ test("product detail section tabs use underline chrome instead of pill chips", (
   const tabActiveBlock = tabBarStylesBlock.match(/tabActive:\s*\{([^}]*)\}/)?.[1] ?? "";
 
   assert.match(tabBar, /useProductDetailTabBarStyles/);
+  assert.match(tabBar, /LayoutAnimation/);
+  assert.match(tabBar, /withSpring/);
+  assert.match(layout, /underlineWidth: 2\.5/);
   assert.match(tabBlock, /backgroundColor:\s*"transparent"/);
-  assert.match(tabBlock, /borderRadius:\s*8/);
-  assert.doesNotMatch(tabBlock, /radius\.pill/);
-  assert.doesNotMatch(tabBlock, /borderWidth:\s*1/);
-  assert.match(tabActiveBlock, /backgroundColor:\s*theme\.colors\.action/);
+  assert.match(tabBlock, /borderRadius:\s*0/);
+  assert.match(tabBlock, /borderBottomWidth:/);
+  assert.doesNotMatch(tabActiveBlock, /backgroundColor:\s*theme\.colors\.action/);
+  assert.match(tabActiveBlock, /borderBottomColor:\s*theme\.colors\.action/);
   assert.match(webTabsCss, /\.product-details-modal__tabs \.modal-section-tabs__tab/);
   assert.match(webTabsCss, /border-bottom:\s*2\.5px solid transparent/);
   assert.match(webTabsCss, /border-radius:\s*0/);
+});
+
+test("split wide product detail tabs drop root margin (parent gap only)", () => {
+  const tabBar = readFile(
+    MOBILE_ROOT,
+    "features/product-detail/ui/ProductDetailTabBar.tsx",
+  );
+  const layout = readFile(MOBILE_ROOT, "shared/lib/productDetailTabBarLayout.ts");
+  const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
+  const pageCss = readFile(
+    CLIENT_ROOT,
+    "src/pages/product-details/ui/ProductDetailsPage.css",
+  );
+
+  assert.match(layout, /wideRootMarginBottom:\s*0/);
+  assert.match(styles, /rootWide:[\s\S]*marginBottom:\s*PRODUCT_DETAIL_TAB_BAR_LAYOUT\.wideRootMarginBottom/);
+  assert.match(tabBar, /layout === "wide" && styles\.rootWide/);
+  assert.doesNotMatch(tabBar, /<View style=\{styles\.root\}/);
+  assert.match(
+    pageCss,
+    /\.product-details-page__wide-tabs[\s\S]*\.product-details-modal__tabs[\s\S]*margin:\s*0/,
+  );
 });
 
 test("web mobile bottom nav hidden while product details modal is open", () => {
@@ -113,24 +139,62 @@ test("mobile product detail stat rows match web modal stats grid layout", () => 
   assert.match(registry, /isProductFieldMultilineRead[\s\S]*productPickupAddress/);
 });
 
+test("mobile product detail meta grid matches web modal meta rows layout", () => {
+  const layout = readFile(MOBILE_ROOT, "entities/product/lib/productDetailsMetaGridLayout.ts");
+  const fieldRows = readFile(MOBILE_ROOT, "entities/product/ui/ProductDetailFieldRows.tsx");
+  const detailsTab = readFile(MOBILE_ROOT, "features/product-detail/ui/ProductDetailsDetailsTab.tsx");
+  const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
+  const webCss = readFile(
+    CLIENT_ROOT,
+    "src/entities/product/ui/product-details-modal/ProductDetailsModalFields.css",
+  );
+
+  assert.match(layout, /columns: 3/);
+  assert.match(layout, /narrowBreakpoint: 576/);
+  assert.match(layout, /rowPaddingVertical: 8\.8/);
+  assert.match(webCss, /grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
+  assert.match(webCss, /product-details-modal__row--meta/);
+  assert.match(fieldRows, /layout === "meta"/);
+  assert.match(fieldRows, /metaGridThreeCol/);
+  assert.match(fieldRows, /useWindowDimensions/);
+  assert.match(detailsTab, /layout="meta"/);
+  assert.match(styles, /borderColor: theme\.colors\.surfaceMuted/);
+  assert.match(styles, /gridTemplateColumns: "repeat\(3, minmax\(0, 1fr\)\)"/);
+});
+
 test("mobile product description panel matches web content-switcher chrome", () => {
   const detailsTab = readFile(MOBILE_ROOT, "features/product-detail/ui/ProductDetailsDetailsTab.tsx");
+  const layout = readFile(
+    MOBILE_ROOT,
+    "entities/product/lib/productDetailsContentSwitcherLayout.ts",
+  );
   const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
   const webCss = readFile(
     CLIENT_ROOT,
     "src/entities/product/ui/product-details-modal/ProductDetailsContentSwitcher.css",
   );
+  const webTabsCss = readFile(CLIENT_ROOT, "src/shared/ui/ModalSectionTabs/ModalSectionTabs.css");
   const panelBlock = styles.match(/contentSwitcherPanel:\s*\{([^}]*)\}/)?.[1] ?? "";
+  const tabBlock = styles.match(/contentSwitcherTab:\s*\{([^}]*)\}/)?.[1] ?? "";
   const tabActiveBlock = styles.match(/contentSwitcherTabActive:\s*\{([^}]*)\}/)?.[1] ?? "";
 
+  assert.match(layout, /tabMinHeight: 36/);
+  assert.match(layout, /tabPaddingVertical: 6\.4/);
+  assert.match(layout, /tabPaddingHorizontal: 13\.6/);
+  assert.match(layout, /tabsGap: 8/);
+  assert.match(layout, /sectionGap: 9/);
+  assert.match(webTabsCss, /padding: 0\.4rem 0\.85rem/);
   assert.match(webCss, /product-details-content-switcher__panel/);
   assert.match(webCss, /border:\s*1px solid/);
   assert.match(webCss, /background:\s*var\(--iz-color-ink\)/);
   assert.match(detailsTab, /contentSwitcherPanel/);
+  assert.match(detailsTab, /styles\.contentSwitcher/);
   assert.match(detailsTab, /descriptionText/);
-  assert.match(panelBlock, /borderWidth:\s*1/);
+  assert.match(panelBlock, /borderWidth:\s*CS\.panelBorderWidth/);
   assert.match(panelBlock, /borderColor:\s*theme\.colors\.border/);
-  assert.match(panelBlock, /backgroundColor:\s*theme\.colors\.surface/);
+  assert.match(panelBlock, /borderRadius:\s*CS\.panelBorderRadius/);
+  assert.match(tabBlock, /minHeight:\s*CS\.tabMinHeight/);
+  assert.match(tabBlock, /borderColor:\s*theme\.colors\.borderStrong/);
   assert.match(tabActiveBlock, /backgroundColor:\s*theme\.colors\.ink/);
   assert.match(tabActiveBlock, /borderColor:\s*theme\.colors\.ink/);
 });
@@ -155,15 +219,27 @@ test("mobile product characteristics row matches web key-value layout", () => {
 });
 
 test("mobile seller preview matches web product-details-seller-preview chrome", () => {
+  const layout = readFile(
+    MOBILE_ROOT,
+    "entities/product/lib/productDetailsSellerPreviewLayout.ts",
+  );
   const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
   const preview = readFile(MOBILE_ROOT, "entities/product/ui/ProductDetailsSellerPreview.tsx");
+  const webCss = readFile(CLIENT_ROOT, "src/entities/product/ui/ProductDetailsSellerPreview.css");
+  const webPageCss = readFile(CLIENT_ROOT, "src/pages/product-details/ui/ProductDetailsPage.css");
   const sellerStylesBlock =
     styles.match(/export const useProductDetailsSellerPreviewStyles[\s\S]*?}\)\);/)?.[0] ?? "";
 
+  assert.match(layout, /rootPadding: 14/);
+  assert.match(layout, /avatarSize: 56/);
+  assert.match(webCss, /padding: 0\.875rem/);
+  assert.match(webCss, /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(webPageCss, /product-details-modal--page-split \.product-details-seller-preview/);
   assert.match(sellerStylesBlock, /backgroundColor:\s*theme\.colors\.surfaceMuted/);
-  assert.match(sellerStylesBlock, /rootPressed:/);
+  assert.match(sellerStylesBlock, /rootSplit:/);
+  assert.match(sellerStylesBlock, /marginHorizontal: 0/);
+  assert.match(preview, /presentation === "split-rest" && styles\.rootSplit/);
   assert.match(preview, /pressed && styles\.rootPressed/);
-  assert.match(sellerStylesBlock, /width:\s*"48%"/);
   assert.match(sellerStylesBlock, /backgroundColor:\s*theme\.colors\.actionSoft/);
 });
 
@@ -229,14 +305,22 @@ test("product detail dock CTA uses AddToCartButton only", () => {
   );
   const addToCart = readFile(MOBILE_ROOT, "features/cart-add/ui/AddToCartButton.tsx");
   const cartStyles = readFile(MOBILE_ROOT, "shared/theme/uploadFieldStyles.ts");
+  const webCss = readFile(CLIENT_ROOT, "src/features/cart-add/ui/AddToCartButton.css");
 
   assert.match(purchaseActions, /AddToCartButton/);
+  assert.match(purchaseActions, /detailOutOfStockButton/);
+  assert.match(purchaseActions, /OutOfStockPurchaseButton/);
+  assert.doesNotMatch(purchaseActions, /buttonDisabled/);
   assert.doesNotMatch(purchaseActions, /AUCTION_SHORTCUT/);
   assert.doesNotMatch(purchaseActions, /INSTALLMENT_UI\.SHORTCUT/);
   assert.doesNotMatch(purchaseActions, /shortcutsRow/);
   assert.match(addToCart, /SquircleView/);
   assert.match(addToCart, /PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS/);
   assert.match(cartStyles, /PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS = 11\.2/);
+  assert.match(cartStyles, /detailOutOfStockButton:/);
+  assert.match(cartStyles, /backgroundColor: theme\.colors\.surfaceMuted/);
+  assert.match(webCss, /add-to-cart--out-of-stock/);
+  assert.match(webCss, /color: var\(--iz-color-text-muted\)/);
 });
 
 test("mobile product detail screen is outside tabs and uses dock-only scroll padding", () => {

@@ -12,6 +12,7 @@ type LoopingCoverVideoProps = {
   onPlaybackFailed?: () => void;
   onReady?: () => void;
   onEnded?: () => void;
+  onUnmuteRejected?: () => void;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -24,6 +25,7 @@ export const LoopingCoverVideo = ({
   onPlaybackFailed,
   onReady,
   onEnded,
+  onUnmuteRejected,
   style,
 }: LoopingCoverVideoProps) => {
   const player = useVideoPlayer(uri, (instance) => {
@@ -40,7 +42,23 @@ export const LoopingCoverVideo = ({
 
   useEffect(() => {
     player.muted = isMuted;
-  }, [isMuted, player]);
+    if (isMuted || !isPlaying) {
+      return;
+    }
+
+    try {
+      const playResult = player.play() as void | Promise<void>;
+      if (playResult != null && typeof (playResult as Promise<void>).catch === "function") {
+        void (playResult as Promise<void>).catch(() => {
+          player.muted = true;
+          onUnmuteRejected?.();
+        });
+      }
+    } catch {
+      player.muted = true;
+      onUnmuteRejected?.();
+    }
+  }, [isMuted, isPlaying, onUnmuteRejected, player]);
 
   useEffect(() => {
     if (isPlaying) {

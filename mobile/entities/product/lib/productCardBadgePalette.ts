@@ -1,12 +1,14 @@
 import { izColors, type IzTheme } from "@izibuy/design-tokens";
 
+import { mixHexColors } from "@/shared/lib/mixHexColors";
+
 type ThemeColors = IzTheme["colors"];
 
-/** Card price keeps light brand blue in all themes (dark remaps `action`/`link`). */
-const PRODUCT_CARD_PRICE_CURRENT = izColors.action;
-const PRODUCT_CARD_PRICE_OLD = "#93c5fd";
+/** client ProductPriceDisplay.css — color-mix(in srgb, currentColor 52%, transparent) на surface карточки */
+export const resolveProductPriceDisplayOldColor = (c: ThemeColors) =>
+  mixHexColors(c.text, c.surface, 0.52);
 
-/** Синхронизировано с client product-card/ProductCardBadges.css + ProductPriceDisplay.css */
+/** Синхронизировано с client ProductPriceDisplay.css + ProductCardMobileCatalog.css */
 export const resolveProductCardBadgeColors = (c: ThemeColors) =>
   ({
     discountBorder: c.dangerSurface,
@@ -42,10 +44,10 @@ export const resolveProductCardBadgeColors = (c: ThemeColors) =>
     statusPlaceholderBorder: c.border,
     statusPlaceholderBg: c.surfaceMuted,
     statusPlaceholderText: `${c.text}7a`,
-    priceCurrent: PRODUCT_CARD_PRICE_CURRENT,
-    priceOld: PRODUCT_CARD_PRICE_OLD,
-    rating: c.warning,
-    ratingPlaceholder: `${c.text}7a`,
+    priceCurrent: c.action,
+    priceOld: resolveProductPriceDisplayOldColor(c),
+    rating: c.textMuted,
+    ratingPlaceholder: mixHexColors(c.textMuted, c.surface, 0.48),
   }) as const;
 
 /**

@@ -105,6 +105,10 @@ export const HOME_CATALOG_HEADER_USERS_STRETCH_BOTTOM_PADDING = 8;
 /** Stretch open/close duration (symmetric). */
 export const HOME_CATALOG_HEADER_USERS_STRETCH_ANIMATION_MS = 220;
 
+/** Паритет web `.header-users-stretch { --header-users-stretch-ease }`. */
+export const HOME_CATALOG_HEADER_USERS_STRETCH_ANIMATION_EASING_CSS =
+  "cubic-bezier(0.33, 1, 0.68, 1)";
+
 export const resolveHomeCatalogUsersStretchMenuHeight = (itemCount: number): number => {
   if (itemCount <= 0) {
     return HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE;

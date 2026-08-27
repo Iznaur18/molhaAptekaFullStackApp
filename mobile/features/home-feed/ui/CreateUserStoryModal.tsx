@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -13,15 +13,11 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import Animated, {
-  Easing,
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { computeCreateStoryPreviewSize } from "@/entities/user-story/lib/computeUserStoryFrameSize";
+import { CREATE_USER_STORY_MODAL_LAYOUT as L } from "@/entities/user-story/lib/createUserStoryModalLayout";
+import { useCreateUserStoryModalAnimation } from "@/entities/user-story/model/useCreateUserStoryModalAnimation";
 import { useUserStoryMutations } from "@/entities/user-story/model/useUserStoryMutations";
 import {
   USER_STORY_CAPTION_MAX_CHARS,
@@ -40,7 +36,6 @@ import { USER_STORY_UI } from "@/shared/config";
 import { useRegisterBlockingOverlay } from "@/shared/lib/useBlockingOverlayOccupancy";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import {
-  CREATE_STORY_MODAL_ANIMATION,
   CREATE_STORY_SUBMIT_FOOTER_HEIGHT_PX,
   useCreateStoryModalStyles,
 } from "@/shared/theme/modalChromeStyles";
@@ -52,9 +47,6 @@ type CreateUserStoryModalProps = {
   onPublished?: () => void;
 };
 
-const { enterMs, exitMs, sheetSlideDistance, maxHeightRatio } = CREATE_STORY_MODAL_ANIMATION;
-const DISMISS_GUARD_MS = 600;
-
 export const CreateUserStoryModal = ({
   visible,
   onClose,
@@ -62,38 +54,24 @@ export const CreateUserStoryModal = ({
 }: CreateUserStoryModalProps) => {
   const styles = useCreateStoryModalStyles();
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
-  const previewSize = useMemo(
-    () => computeCreateStoryPreviewSize(windowWidth, windowHeight),
-    [windowWidth, windowHeight],
-  );
-  const cardMaxHeight = useMemo(
-    () => windowHeight * maxHeightRatio,
-    [windowHeight],
-  );
+  const insets = useSafeAreaInsets();
+  const sheetHeight = useMemo(() => windowHeight * L.heightRatio, [windowHeight]);
   const bodyScrollMaxHeight = useMemo(
-    () => cardMaxHeight - CREATE_STORY_SUBMIT_FOOTER_HEIGHT_PX,
-    [cardMaxHeight],
+    () => sheetHeight - CREATE_STORY_SUBMIT_FOOTER_HEIGHT_PX - insets.bottom,
+    [sheetHeight, insets.bottom],
   );
+  const isWide = windowWidth >= L.wideBreakpoint;
   const theme = useAppTheme();
   const { createMutation } = useUserStoryMutations();
   const uploadImageMutation = useUploadImageMutation();
   const uploadVideoMutation = useUploadVideoMutation();
   const dismissGuardUntilRef = useRef(0);
 
-  const [modalVisible, setModalVisible] = useState(visible);
-  useRegisterBlockingOverlay(modalVisible);
   const [captionText, setCaptionText] = useState("");
   const [mediaType, setMediaType] = useState<UserStoryMediaType | null>(null);
   const [imageFile, setImageFile] = useState<UploadImageFilePayload | null>(null);
   const [videoFile, setVideoFile] = useState<UploadVideoFilePayload | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
-  const backdropOpacity = useSharedValue(0);
-  const sheetTranslateY = useSharedValue<number>(sheetSlideDistance);
-
-  const isBusy =
-    createMutation.isPending || uploadImageMutation.isPending || uploadVideoMutation.isPending;
-
-  const previewUri = imageFile?.uri ?? videoFile?.uri ?? null;
 
   const resetForm = useCallback(() => {
     setCaptionText("");
@@ -103,59 +81,18 @@ export const CreateUserStoryModal = ({
     setErrorMessage("");
   }, []);
 
-  const finishClose = useCallback(() => {
-    setModalVisible(false);
-    resetForm();
-  }, [resetForm]);
+  const { modalVisible, backdropAnimatedStyle, sheetAnimatedStyle, useCssTransition } =
+    useCreateUserStoryModalAnimation(visible, sheetHeight, resetForm);
 
-  useEffect(() => {
-    if (visible) {
-      setModalVisible(true);
-      backdropOpacity.value = 0;
-      sheetTranslateY.value = sheetSlideDistance;
-      backdropOpacity.value = withTiming(1, {
-        duration: enterMs,
-        easing: Easing.out(Easing.cubic),
-      });
-      sheetTranslateY.value = withTiming(0, {
-        duration: enterMs,
-        easing: Easing.out(Easing.cubic),
-      });
-      return;
-    }
+  useRegisterBlockingOverlay(modalVisible);
 
-    if (!modalVisible) {
-      return;
-    }
+  const isBusy =
+    createMutation.isPending || uploadImageMutation.isPending || uploadVideoMutation.isPending;
 
-    backdropOpacity.value = withTiming(0, {
-      duration: exitMs,
-      easing: Easing.in(Easing.cubic),
-    });
-    sheetTranslateY.value = withTiming(
-      sheetSlideDistance,
-      {
-        duration: exitMs,
-        easing: Easing.in(Easing.cubic),
-      },
-      (finished) => {
-        if (finished) {
-          runOnJS(finishClose)();
-        }
-      },
-    );
-  }, [backdropOpacity, finishClose, modalVisible, sheetTranslateY, visible]);
-
-  const backdropAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: backdropOpacity.value,
-  }));
-
-  const sheetAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: sheetTranslateY.value }],
-  }));
+  const previewUri = imageFile?.uri ?? videoFile?.uri ?? null;
 
   const armDismissGuard = useCallback(() => {
-    dismissGuardUntilRef.current = Date.now() + DISMISS_GUARD_MS;
+    dismissGuardUntilRef.current = Date.now() + L.dismissGuardMs;
   }, []);
 
   const handleClose = () => {
@@ -265,25 +202,40 @@ export const CreateUserStoryModal = ({
     return null;
   }
 
+  const BackdropContainer = useCssTransition ? View : Animated.View;
+  const SheetContainer = useCssTransition ? View : Animated.View;
+
   return (
-    <Modal visible={modalVisible} animationType="none" transparent onRequestClose={handleClose}>
-      <View style={styles.root}>
-        <Animated.View style={[styles.backdrop, backdropAnimatedStyle]} pointerEvents="box-none">
+    <Modal
+      visible={modalVisible}
+      animationType="none"
+      transparent
+      statusBarTranslucent
+      presentationStyle="overFullScreen"
+      onRequestClose={handleClose}
+    >
+      <View style={styles.root} accessibilityViewIsModal>
+        <BackdropContainer style={[styles.backdrop, backdropAnimatedStyle]} pointerEvents="box-none">
           <Pressable
             style={StyleSheet.absoluteFillObject}
             onPress={handleDismiss}
             disabled={isBusy}
             accessibilityLabel={USER_STORY_UI.CLOSE}
           />
-        </Animated.View>
+        </BackdropContainer>
 
-        <Animated.View
-          style={[styles.card, { maxHeight: cardMaxHeight }, sheetAnimatedStyle]}
+        <SheetContainer
+          style={[
+            styles.card,
+            isWide ? styles.cardWide : null,
+            { height: sheetHeight, maxHeight: sheetHeight },
+            sheetAnimatedStyle,
+          ]}
+          accessibilityRole="none"
         >
           <ScrollView
             style={[styles.bodyScroll, { maxHeight: bodyScrollMaxHeight }]}
             contentContainerStyle={styles.bodyScrollContent}
-            scrollEnabled={false}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
             automaticallyAdjustKeyboardInsets={false}
@@ -298,13 +250,7 @@ export const CreateUserStoryModal = ({
             </View>
 
             <Pressable
-              style={[
-                styles.preview,
-                previewSize.width > 0 && previewSize.height > 0
-                  ? { width: previewSize.width, height: previewSize.height }
-                  : null,
-                isBusy && styles.pickDisabled,
-              ]}
+              style={[styles.preview, isBusy && styles.pickDisabled]}
               onPress={handlePreviewPress}
               disabled={isBusy}
               accessibilityRole="button"
@@ -319,7 +265,7 @@ export const CreateUserStoryModal = ({
                     source={{ uri: previewUri }}
                     style={[styles.previewMedia, styles.previewBlur]}
                     contentFit="cover"
-                    blurRadius={36}
+                    blurRadius={28}
                   />
                   <Image
                     source={{ uri: previewUri }}
@@ -333,6 +279,8 @@ export const CreateUserStoryModal = ({
               ) : null}
             </Pressable>
 
+            {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+
             <View style={styles.captionBlock}>
               <Text style={styles.label}>{USER_STORY_UI.CAPTION_LABEL}</Text>
               <TextInput
@@ -345,16 +293,19 @@ export const CreateUserStoryModal = ({
                 numberOfLines={6}
                 editable={!isBusy}
                 autoFocus={false}
-                scrollEnabled={true}
+                scrollEnabled
               />
-
-              {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
             </View>
 
             <View style={styles.submitSpacer} />
           </ScrollView>
 
-          <View style={styles.submitFooter}>
+          <View
+            style={[
+              styles.submitFooter,
+              { paddingBottom: Math.max(L.footerPaddingBottomMin, insets.bottom) },
+            ]}
+          >
             <Pressable
               style={[styles.submit, isBusy && styles.submitDisabled]}
               onPress={() => {
@@ -369,7 +320,7 @@ export const CreateUserStoryModal = ({
               )}
             </Pressable>
           </View>
-        </Animated.View>
+        </SheetContainer>
       </View>
     </Modal>
   );

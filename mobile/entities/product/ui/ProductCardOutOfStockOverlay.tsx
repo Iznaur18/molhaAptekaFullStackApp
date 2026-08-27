@@ -9,10 +9,16 @@ type ProductCardOutOfStockOverlayProps = {
 
 export const ProductCardOutOfStockOverlay = ({ product }: ProductCardOutOfStockOverlayProps) => {
   const styles = useProductCardOutOfStockOverlayStyles();
+  const label = resolveProductOutOfStockOverlayLabel(product);
 
   return (
-    <View style={styles.overlay} pointerEvents="none">
-      <Text style={styles.label}>{resolveProductOutOfStockOverlayLabel(product)}</Text>
+    <View
+      style={styles.overlay}
+      pointerEvents="none"
+      accessibilityRole="text"
+      accessibilityLabel={label}
+    >
+      <Text style={styles.label}>{label}</Text>
     </View>
   );
 };

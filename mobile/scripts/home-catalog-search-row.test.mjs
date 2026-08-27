@@ -108,9 +108,14 @@ test("HomeCatalogUsersButton opens stretch menu from circle", () => {
   assert.match(menu, /accessibilityLabel=\{item\.accessibilityLabel\}/);
 
   assert.match(animation, /portalVisible/);
+  assert.match(animation, /menuExpanded/);
+  assert.match(animation, /scheduleOpenAfterPaint/);
   assert.match(animation, /HOME_CATALOG_HEADER_USERS_STRETCH_ANIMATION_MS/);
-  assert.match(menu, /visible=\{portalVisible\}/);
-  assert.match(menu, /isMenuExpanded/);
+  assert.match(animation, /HOME_CATALOG_HEADER_USERS_STRETCH_ANIMATION_EASING_CSS/);
+  assert.match(animation, /transitionProperty: "height, background-color, border-color"/);
+  assert.match(menu, /useCssTransition \? View : Animated\.View/);
+  assert.match(menu, /menuExpanded/);
+  assert.match(menu, /portalVisible \? <View style=\{styles\.usersNavPillPlaceholder\}/);
   assert.match(menu, /closedBackgroundColor: theme\.colors\.action/);
   assert.match(menu, /openBackgroundColor: theme\.colors\.surface/);
   assert.match(menu, /toggleIconColor/);

@@ -26,7 +26,7 @@ type ProductPriceDisplayProps = {
     [key: string]: unknown;
   };
   showLabel?: boolean;
-  variant?: "card" | "inline" | "detail" | "banner" | "cart";
+  variant?: "card" | "catalog-grid" | "inline" | "detail" | "banner" | "cart";
   /** После скидки, иначе сразу после текущей цены (detail). */
   afterPriceSlot?: ReactNode;
   onDiscountBadgePress?: (payload: BadgePressPayload) => void;
@@ -48,25 +48,30 @@ export const ProductPriceDisplay = ({
   const isDetail = variant === "detail";
   const isBanner = variant === "banner";
   const isCart = variant === "cart";
+  const isCatalogGrid = variant === "catalog-grid";
   const rootStyle = isDetail
     ? styles.detailRoot
     : isBanner
       ? styles.bannerRoot
       : isCart
         ? styles.cartRoot
-        : variant === "inline"
-          ? styles.inlineRoot
-          : styles.cardRoot;
+        : isCatalogGrid
+          ? [styles.cardRoot, styles.cardRootCatalogGrid]
+          : variant === "inline"
+            ? styles.inlineRoot
+            : styles.cardRoot;
   const currentStyle = [
     styles.current,
-    variant === "card" && styles.cardCurrent,
+    (variant === "card" || isCatalogGrid) && styles.cardCurrent,
+    isCatalogGrid && styles.cardCurrentCatalogGrid,
     isDetail && styles.detailCurrent,
     isBanner && styles.bannerCurrent,
     isCart && styles.cartCurrent,
   ];
   const oldStyle = [
     styles.old,
-    variant === "card" && styles.cardOld,
+    (variant === "card" || isCatalogGrid) && styles.cardOld,
+    isCatalogGrid && styles.cardOldCatalogGrid,
     isDetail && styles.detailOld,
     isBanner && styles.bannerOld,
     isCart && styles.cartOld,

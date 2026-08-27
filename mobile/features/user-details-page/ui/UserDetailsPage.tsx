@@ -12,6 +12,7 @@ import { formatApiErrorMessage } from "@/shared/lib";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useUserDetailsPageStyles } from "@/shared/theme/profileChromeStyles";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
+import { ScreenWithBack } from "@/shared/ui/ScreenWithBack";
 
 export const UserDetailsPage = () => {
   const router = useRouter();
@@ -36,23 +37,31 @@ export const UserDetailsPage = () => {
 
   if (!userId) {
     return (
-      <ScreenErrorState
-        message={USER_DETAILS_PAGE_UI.FETCH_FALLBACK}
-        onRetry={() => router.back()}
-      />
+      <ScreenWithBack>
+        <ScreenErrorState
+          message={USER_DETAILS_PAGE_UI.FETCH_FALLBACK}
+          onRetry={() => router.back()}
+        />
+      </ScreenWithBack>
     );
   }
 
   if (profileQuery.isPending) {
-    return <ScreenLoadingState message={USER_DETAILS_PAGE_UI.LOADING} />;
+    return (
+      <ScreenWithBack>
+        <ScreenLoadingState message={USER_DETAILS_PAGE_UI.LOADING} />
+      </ScreenWithBack>
+    );
   }
 
   if (profileQuery.isError || !user) {
     return (
-      <ScreenErrorState
-        message={formatApiErrorMessage(profileQuery.error, USER_DETAILS_PAGE_UI.FETCH_FALLBACK)}
-        onRetry={() => profileQuery.refetch()}
-      />
+      <ScreenWithBack>
+        <ScreenErrorState
+          message={formatApiErrorMessage(profileQuery.error, USER_DETAILS_PAGE_UI.FETCH_FALLBACK)}
+          onRetry={() => profileQuery.refetch()}
+        />
+      </ScreenWithBack>
     );
   }
 

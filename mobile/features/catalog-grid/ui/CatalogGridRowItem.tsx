@@ -59,6 +59,7 @@ export const CatalogGridRowItem = memo(({
             <ProductCard
               product={product}
               layout="catalog-grid"
+              catalogGridTileWidth={tileWidth}
               highlightRaffleProduct={highlightRaffleProduct}
             />
           </View>

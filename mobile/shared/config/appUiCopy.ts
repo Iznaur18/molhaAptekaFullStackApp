@@ -394,6 +394,10 @@ export const PRODUCT_UI = {
   INSTALLMENT_ACTIVE: "Доступна рассрочка",
 } as const;
 
+export const SCREEN_BACK_UI = {
+  BACK_ARIA: "Назад",
+} as const;
+
 export const PRODUCT_DETAILS_MODAL_UI = {
   BACK_ARIA: "Назад",
   GALLERY_THUMBS_ARIA: "Дополнительные фотографии товара",
@@ -409,7 +413,7 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   RETURNS_SECTION_ARIA: "Условия возврата",
   RETURNS_PLACEHOLDER: "Сведения о возврате появятся позже.",
   RETURNS_NONE: "Возврат не предусмотрен.",
-  DELIVERY_TITLE: "Доставка",
+  DELIVERY_TITLE: "Получение",
   DELIVERY_SECTION_ARIA: "Доставка",
   DELIVERY_IN_DEVELOPMENT: "В разработке",
   PROTOTYPE_SLOTS_ARIA: "Дополнительный раздел",
@@ -722,7 +726,7 @@ export const PRODUCT_REVIEW_UI = {
   LOADING: "Загрузка отзывов…",
   EMPTY: "Отзывов пока нет",
   NO_REVIEWS: "Отзывов пока нет",
-  RATING_LINE: "★ {rating} · {count} отзывов",
+  RATING_LINE: "★ {rating} · {count}",
   FETCH_FALLBACK: "Не удалось загрузить отзывы",
   SUMMARY_LINE: (rating: number, count: number) =>
     count > 0 ? `Средняя оценка ${rating.toFixed(1)} · ${count} отзывов` : "Нет оценок",
@@ -767,6 +771,9 @@ export const PRODUCT_QA_UI = {
   LOAD_MORE: "Показать ещё",
   SLOTS_LEFT: (used: number, max: number) => `${used} / ${max}`,
   TEXT_CHARS_USED: (current: number, max: number) => `${current} / ${max}`,
+  DETAILS_TEASER_TITLE: "Написать продавцу",
+  DETAILS_TEASER_SUBTITLE: "Спросить о товаре",
+  DETAILS_TEASER_ARIA: "Открыть вкладку вопросов и ответов",
   FETCH_SUMMARY_FALLBACK: "Не удалось загрузить вопросы",
   FETCH_QUESTIONS_FALLBACK: "Не удалось загрузить вопросы",
   ASK_FALLBACK: "Не удалось отправить вопрос",
@@ -1221,6 +1228,7 @@ export const PRODUCT_PICKUP_UI = {
   DETAILS_ROUTE: "Маршрут",
   DETAILS_OPEN_MAP: "Открыть на карте",
   DETAILS_NO_ADDRESS: "Адрес самовывоза не указан",
+  DETAILS_LOCATION_DEFAULT: "По умолчанию",
   DETAILS_DELIVERY_HINT: "Адрес укажете при оформлении заказа",
 } as const;
 
@@ -1650,6 +1658,7 @@ export const USER_DETAILS_PAGE_UI = {
   FETCH_FALLBACK: "Не удалось загрузить профиль",
   SELF_REDIRECT_HINT: "Это ваш профиль",
   OPEN_OVERVIEW: "Мой обзор",
+  BACK_ARIA: "Назад",
 } as const;
 
 export const USER_PROFILE_PRODUCTS_UI = {

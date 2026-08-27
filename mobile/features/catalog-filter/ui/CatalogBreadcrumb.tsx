@@ -18,7 +18,7 @@ export const CatalogBreadcrumb = ({ label, compactTop = false }: CatalogBreadcru
   return (
     <View style={[styles.toolbar, compactTop && styles.toolbarCompactTop]}>
       <Text
-        style={styles.title}
+        style={[styles.title, compactTop && styles.titleCompactTop]}
         accessibilityRole="header"
         accessibilityLabel={`${HOME_PAGE_UI.BREADCRUMB_CATALOG}: ${label}`}
       >

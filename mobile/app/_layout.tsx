@@ -12,7 +12,6 @@ import "react-native-reanimated";
 
 import { AddressPromptHost } from "@/features/address-prompt/ui/AddressPromptHost";
 import { createAppQueryClient } from "@/shared/api";
-import { FAQ_UI, LEGAL_UI } from "@/shared/config";
 import {
   COLD_START_SPLASH_MAX_WAIT_MS,
   prepareColdStartSplash,
@@ -102,24 +101,23 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={navigationTheme}>
-      <Stack screenOptions={{ headerBackTitle: "Назад" }}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="product/[id]" options={{ headerShown: false }} />
-        <Stack.Screen name="profile" options={{ headerShown: false }} />
-        <Stack.Screen name="notifications/index" options={{ headerShown: true }} />
-        <Stack.Screen name="catalog-browser" options={{ headerShown: true }} />
-        <Stack.Screen name="create-product" options={{ headerShown: false }} />
-        <Stack.Screen name="edit-product/[id]" options={{ title: "Редактирование" }} />
-        <Stack.Screen name="raffle/[id]" options={{ title: "Розыгрыш" }} />
-        <Stack.Screen name="user/[id]" options={{ title: "Профиль" }} />
-        <Stack.Screen name="user/[id]/edit" options={{ title: "Редактирование" }} />
-        <Stack.Screen name="seller/[userId]" options={{ title: "Товары продавца" }} />
-        <Stack.Screen name="legal/privacy" options={{ title: LEGAL_UI.PRIVACY_TITLE }} />
-        <Stack.Screen name="legal/terms" options={{ title: LEGAL_UI.TERMS_TITLE }} />
-        <Stack.Screen name="legal/listing" options={{ title: LEGAL_UI.LISTING_TITLE }} />
-        <Stack.Screen name="legal/offer" options={{ title: LEGAL_UI.OFFER_TITLE }} />
-        <Stack.Screen name="faq" options={{ title: FAQ_UI.TITLE }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="product/[id]" />
+        <Stack.Screen name="profile" />
+        <Stack.Screen name="notifications/index" />
+        <Stack.Screen name="catalog-browser" />
+        <Stack.Screen name="create-product" />
+        <Stack.Screen name="edit-product/[id]" />
+        <Stack.Screen name="user/[id]" />
+        <Stack.Screen name="user/[id]/edit" />
+        <Stack.Screen name="seller/[userId]" />
+        <Stack.Screen name="legal/privacy" />
+        <Stack.Screen name="legal/terms" />
+        <Stack.Screen name="legal/listing" />
+        <Stack.Screen name="legal/offer" />
+        <Stack.Screen name="faq" />
       </Stack>
       <AddressPromptHost />
     </ThemeProvider>

@@ -8,13 +8,15 @@ export const CURATED_PRODUCT_LIST_HOME_CARD_MAX_WIDTH = 168;
 export const CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_X = 0;
 export const CURATED_PRODUCT_LIST_HOME_SECTION_MARGIN_BOTTOM = HOME_FEED_SECTION_GAP;
 export const CURATED_PRODUCT_LIST_HOME_SECTION_BORDER_RADIUS = 28;
-export const CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_HORIZONTAL = 12;
-export const CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_VERTICAL = 8;
+/** Web `.curated-product-list-carousel { padding: 12px 0 }` — без горизонтали на section. */
+export const CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_HORIZONTAL = 0;
+export const CURATED_PRODUCT_LIST_HOME_SECTION_PADDING_VERTICAL = 12;
 export const CURATED_PRODUCT_LIST_HOME_TITLE_MARGIN_BOTTOM = 10;
 export const CURATED_PRODUCT_LIST_HOME_TITLE_PADDING_X = 4;
-export const CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_TOP = 4;
-export const CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_BOTTOM = 8;
-export const CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_HORIZONTAL = 4;
+/** Web `.curated-product-list-carousel__track { padding: 0 12px }` — только на scroll row. */
+export const CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_TOP = 0;
+export const CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_BOTTOM = 0;
+export const CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_HORIZONTAL = 12;
 
 /** Синхронизировано с CuratedProductListCarousel.css clamp() */
 export const resolveCuratedCompactCardWidth = (scrollContainerWidth: number): number => {

@@ -8,6 +8,7 @@ import {
   MY_PROFILE_SIDEBAR_WIDTH,
   PROFILE_OVERVIEW_LAYOUT as O,
 } from "@/shared/lib/guestProfileLayout";
+import { PRODUCT_DETAILS_SELLER_PRODUCTS_CAROUSEL_LAYOUT as SPC } from "@/entities/product/lib/productDetailsSellerProductsCarouselLayout";
 import { PROFILE_CONTENT_MAX_WIDTH_PHONE } from "@/shared/lib/screenBreakpoints";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { SCREEN_CONTENT_PADDING_BOTTOM, SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
@@ -636,9 +637,9 @@ export const useThemePreferenceToggleStyles = createThemedStyles((theme) => ({
   },
 }));
 
-const USER_PROFILE_THUMB_SIZE = 64;
-export const USER_PROFILE_THUMB_SQUIRCLE_RADIUS = 18;
-export const USER_PROFILE_THUMB_GAP = 10;
+const USER_PROFILE_THUMB_SIZE = SPC.thumbSize;
+export const USER_PROFILE_THUMB_SQUIRCLE_RADIUS = SPC.thumbRadius;
+export const USER_PROFILE_THUMB_GAP = SPC.trackGap;
 /** До первого onLayout — запасной размер ряда. */
 export const USER_PROFILE_THUMB_ROW_SIZE = 5;
 
@@ -667,9 +668,10 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
     marginBottom: 0,
     backgroundColor: theme.colors.surfaceMuted,
     borderColor: theme.colors.border,
+    borderWidth: SPC.borderWidth,
   },
   rootHorizontalRadius: {
-    borderRadius: PRODUCT_DETAIL_SECTION_RADIUS,
+    borderRadius: SPC.borderRadius,
     overflow: "hidden",
     ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
@@ -687,7 +689,10 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
   headerHorizontal: {
     backgroundColor: "transparent",
     borderBottomWidth: 0,
-    paddingBottom: 4,
+    paddingTop: SPC.headingPaddingTop,
+    paddingHorizontal: SPC.headingPaddingHorizontal,
+    paddingBottom: SPC.headingPaddingBottom,
+    paddingVertical: 0,
   },
   headerTitle: {
     flex: 1,
@@ -699,9 +704,10 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
     color: theme.colors.onContrast,
   },
   headerTitleHorizontal: {
-    fontSize: 13,
-    fontWeight: "700",
-    letterSpacing: 0.2,
+    fontSize: SPC.headingFontSize,
+    fontWeight: SPC.headingFontWeight,
+    letterSpacing: SPC.headingLetterSpacing,
+    lineHeight: SPC.headingLineHeight,
     textTransform: "none",
     color: theme.colors.text,
   },
@@ -723,7 +729,11 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
     gap: theme.spacing[2],
   },
   bodyHorizontal: {
-    paddingTop: 4,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    paddingTop: 0,
+    paddingBottom: 0,
+    gap: 0,
     backgroundColor: "transparent",
   },
   state: {
@@ -733,6 +743,14 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
   },
   stateError: {
     color: theme.colors.danger,
+  },
+  stateErrorHorizontal: {
+    margin: 0,
+    paddingHorizontal: SPC.errorPaddingHorizontal,
+    paddingBottom: SPC.errorPaddingBottom,
+    fontSize: SPC.errorFontSize,
+    lineHeight: SPC.errorFontSize * 1.35,
+    textAlign: "left",
   },
   grid: {
     gap: 10,
@@ -747,25 +765,36 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
   },
   scrollRow: {
     flexGrow: 0,
+    width: "100%",
+    maxWidth: "100%",
+    minWidth: 0,
   },
   scrollRowContent: {
     flexDirection: "row",
     alignItems: "center",
     gap: USER_PROFILE_THUMB_GAP,
+    paddingTop: SPC.trackPaddingTop,
+    paddingHorizontal: SPC.trackPaddingHorizontal,
+    paddingBottom: SPC.trackPaddingBottom,
+    minWidth: "100%",
   },
   thumbButton: {
     width: USER_PROFILE_THUMB_SIZE,
     height: USER_PROFILE_THUMB_SIZE,
   },
   thumbButtonUnavailable: {
-    opacity: 0.72,
+    opacity: SPC.thumbUnavailableOpacity,
   },
   thumbClip: {
     width: USER_PROFILE_THUMB_SIZE,
     height: USER_PROFILE_THUMB_SIZE,
     backgroundColor: theme.colors.surfaceMuted,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: SPC.thumbBorderWidth,
     borderColor: theme.colors.border,
+  },
+  thumbClipCurrent: {
+    borderWidth: SPC.thumbCurrentOutlineWidth,
+    borderColor: theme.colors.action,
   },
   thumbImage: {
     width: "100%",
@@ -821,6 +850,13 @@ export const useUserDetailsPageStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "space-between",
     gap: theme.spacing[2],
+  },
+  titleLeading: {
+    flex: 1,
+    minWidth: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing[1],
   },
   titleName: {
     flex: 1,

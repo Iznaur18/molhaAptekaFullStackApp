@@ -1,16 +1,16 @@
 import type { ProductBadgeExplainKey } from "@izibuy/shared-lib";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Image,
   Linking,
   Modal,
-  Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
+import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { fetchUserPhone } from "@/entities/user/api/fetchUserPhone";
@@ -18,20 +18,25 @@ import {
   formatRuPhoneDisplayOrEmpty,
   toRuPhoneTelHref,
 } from "@/entities/user/lib/ruPhone";
+import {
+  estimateProductBadgeExplainSheetSlideDistance,
+  useProductBadgeExplainSheetAnimation,
+} from "@/entities/product-badge-explain/model/useProductBadgeExplainSheetAnimation";
 import { PRODUCT_BADGE_EXPLAIN_UI } from "@/shared/config";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
+import { PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT } from "@/shared/lib/productBadgeExplainSheetLayout";
 import { useRegisterBlockingOverlay } from "@/shared/lib/useBlockingOverlayOccupancy";
-import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { useAppThemeSettings } from "@/shared/theme/AppThemeProvider";
+import { useProductBadgeExplainSheetStyles } from "@/shared/theme/modalChromeStyles";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 import { SquircleView } from "@/shared/ui/SquircleView";
 
 import { resolveProductBadgeExplainSheetContent } from "../lib/resolveProductBadgeExplainSheet";
 import { useProductBadgeExplainByKeyMap } from "../model/useProductBadgeExplainByKeyMap";
 
-const SHEET_RADIUS = 32;
-
 const SHEET_CORNER_RADII = {
-  topLeft: SHEET_RADIUS,
-  topRight: SHEET_RADIUS,
+  topLeft: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.panelTopRadius,
+  topRight: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.panelTopRadius,
   bottomLeft: 0,
   bottomRight: 0,
 } as const;
@@ -48,86 +53,6 @@ type ProductBadgeExplainSheetProps = {
   onPrimaryAction?: () => void;
 };
 
-const useStyles = createThemedStyles((theme) => ({
-  overlay: {
-    flex: 1,
-    justifyContent: "flex-end" as const,
-    backgroundColor: "rgba(0,0,0,0.48)",
-  },
-  dismiss: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  shell: {
-    width: "100%",
-    maxHeight: "70%",
-  },
-  dialog: {
-    backgroundColor: theme.colors.surface,
-    overflow: "hidden" as const,
-  },
-  dialogShadow: {
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: -12 },
-    shadowOpacity: 0.18,
-    shadowRadius: 40,
-    elevation: 12,
-  },
-  media: {
-    width: "100%",
-    aspectRatio: 16 / 9,
-    backgroundColor: theme.colors.bg,
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-  },
-  body: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
-    gap: 10,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "700" as const,
-    lineHeight: 24,
-    color: theme.colors.text,
-  },
-  description: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: theme.colors.textSecondary,
-  },
-  footer: {
-    paddingHorizontal: 16,
-    paddingTop: 10,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: theme.colors.border,
-    gap: 8,
-  },
-  closeButton: {
-    width: "100%",
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: "center" as const,
-    backgroundColor: theme.colors.ink,
-  },
-  closeButtonDisabled: {
-    opacity: 0.55,
-  },
-  closeButtonText: {
-    fontSize: 16,
-    fontWeight: "700" as const,
-    color: theme.colors.onContrast,
-  },
-  error: {
-    fontSize: 13,
-    lineHeight: 18,
-    textAlign: "center" as const,
-    color: theme.colors.dangerText,
-  },
-}));
-
 export const ProductBadgeExplainSheet = ({
   visible,
   title,
@@ -139,15 +64,27 @@ export const ProductBadgeExplainSheet = ({
   primaryActionLabel = null,
   onPrimaryAction,
 }: ProductBadgeExplainSheetProps) => {
-  const styles = useStyles();
+  const styles = useProductBadgeExplainSheetStyles();
+  const { colorScheme } = useAppThemeSettings();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  const isDark = colorScheme === "dark";
+  const maxPanelHeight = windowHeight * PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.panelMaxHeightRatio;
+  const [panelHeight, setPanelHeight] = useState(0);
+  const estimatedSlideDistance = useMemo(
+    () => estimateProductBadgeExplainSheetSlideDistance(windowWidth, windowHeight),
+    [windowHeight, windowWidth],
+  );
+  const sheetSlideDistance = panelHeight > 0 ? panelHeight : estimatedSlideDistance;
+  const { modalVisible, backdropAnimatedStyle, sheetAnimatedStyle, useCssTransition } =
+    useProductBadgeExplainSheetAnimation(visible, sheetSlideDistance);
   const descriptionOverride =
     typeof description === "string" ? description.trim() : "";
   const hasDescriptionOverride = descriptionOverride.length > 0;
   const adminByKey = useProductBadgeExplainByKeyMap({
-    enabled: visible && !hasDescriptionOverride,
+    enabled: modalVisible && !hasDescriptionOverride,
   });
-  useRegisterBlockingOverlay(visible && !onPrimaryAction);
+  useRegisterBlockingOverlay(modalVisible && !onPrimaryAction);
 
   const sellerId =
     typeof contactSellerUserId === "string" ? contactSellerUserId.trim() : "";
@@ -175,6 +112,7 @@ export const ProductBadgeExplainSheet = ({
       setRevealedPhone(null);
       setContactPending(false);
       setContactError("");
+      setPanelHeight(0);
     }
   }, [visible]);
 
@@ -209,56 +147,90 @@ export const ProductBadgeExplainSheet = ({
     ? formatRuPhoneDisplayOrEmpty(revealedPhone)
     : "";
 
+  if (!modalVisible) {
+    return null;
+  }
+
+  const footerPaddingBottom = Math.max(
+    insets.bottom,
+    PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.footerPaddingBottom,
+  );
+
+  const BackdropContainer = useCssTransition ? View : Animated.View;
+  const SheetContainer = useCssTransition ? View : Animated.View;
+
   return (
-    <Modal
-      visible={visible}
-      animationType={Platform.OS === "web" ? "fade" : "slide"}
-      transparent
-      onRequestClose={onClose}
-    >
-      <View style={styles.overlay}>
-        <Pressable style={styles.dismiss} onPress={onClose} accessibilityRole="button" />
-        <View style={styles.shell}>
+    <Modal visible={modalVisible} animationType="none" transparent onRequestClose={onClose}>
+      <View style={styles.root}>
+        <BackdropContainer style={[styles.backdrop, backdropAnimatedStyle]} pointerEvents="box-none">
+          <ModalSheetGradientBackdrop />
+          <Pressable
+            style={styles.dismiss}
+            onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel={PRODUCT_BADGE_EXPLAIN_UI.CLOSE}
+          />
+        </BackdropContainer>
+
+        <SheetContainer
+          style={[styles.panelHost, sheetAnimatedStyle, { maxHeight: maxPanelHeight }]}
+          onLayout={(event) => {
+            const nextHeight = Math.round(event.nativeEvent.layout.height);
+            if (nextHeight > 0 && nextHeight !== panelHeight) {
+              setPanelHeight(nextHeight);
+            }
+          }}
+        >
           <SquircleView
             cornerRadii={SHEET_CORNER_RADII}
-            style={styles.dialog}
-            shadowStyle={styles.dialogShadow}
+            style={styles.panel}
+            shadowStyle={styles.panelShadow}
             accessibilityRole="summary"
             accessibilityLabel={PRODUCT_BADGE_EXPLAIN_UI.ARIA_DIALOG}
           >
-            <ScrollView bounces={false}>
-              {imageSrc ? (
-                <View style={styles.media}>
-                  <Image
-                    source={{ uri: imageSrc }}
-                    style={styles.image}
-                    resizeMode="cover"
-                    accessibilityIgnoresInvertColors
-                  />
-                </View>
-              ) : null}
+            {imageSrc ? (
+              <View style={styles.media}>
+                <Image
+                  source={{ uri: imageSrc }}
+                  style={styles.image}
+                  resizeMode="cover"
+                  accessibilityIgnoresInvertColors
+                />
+              </View>
+            ) : null}
+
+            <ScrollView
+              style={styles.bodyScroll}
+              bounces={false}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
               <View style={styles.body}>
                 <Text style={styles.title}>{title}</Text>
                 <Text style={styles.description}>{content.description}</Text>
               </View>
             </ScrollView>
-            <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+
+            <View style={[styles.footer, { paddingBottom: footerPaddingBottom }]}>
               {contactMode && phoneHref && phoneDisplay ? (
                 <Pressable
-                  style={styles.closeButton}
+                  style={[styles.closeButton, isDark && styles.closeButtonDark]}
                   accessibilityRole="link"
                   accessibilityLabel={phoneDisplay}
                   onPress={() => {
                     void Linking.openURL(phoneHref).catch(() => undefined);
                   }}
                 >
-                  <Text style={styles.closeButtonText}>{phoneDisplay}</Text>
+                  <Text style={[styles.closeButtonText, isDark && styles.closeButtonTextDark]}>
+                    {phoneDisplay}
+                  </Text>
                 </Pressable>
               ) : contactMode ? (
                 <>
                   <Pressable
                     style={[
                       styles.closeButton,
+                      isDark && styles.closeButtonDark,
                       contactPending ? styles.closeButtonDisabled : null,
                     ]}
                     accessibilityRole="button"
@@ -267,7 +239,7 @@ export const ProductBadgeExplainSheet = ({
                       void handleContact();
                     }}
                   >
-                    <Text style={styles.closeButtonText}>
+                    <Text style={[styles.closeButtonText, isDark && styles.closeButtonTextDark]}>
                       {contactPending
                         ? PRODUCT_BADGE_EXPLAIN_UI.CONTACT_PENDING
                         : PRODUCT_BADGE_EXPLAIN_UI.CONTACT}
@@ -281,28 +253,28 @@ export const ProductBadgeExplainSheet = ({
                 </>
               ) : onPrimaryAction ? (
                 <Pressable
-                  style={styles.closeButton}
+                  style={[styles.closeButton, isDark && styles.closeButtonDark]}
                   accessibilityRole="button"
                   onPress={onPrimaryAction}
                 >
-                  <Text style={styles.closeButtonText}>
+                  <Text style={[styles.closeButtonText, isDark && styles.closeButtonTextDark]}>
                     {primaryActionLabel || PRODUCT_BADGE_EXPLAIN_UI.CLOSE}
                   </Text>
                 </Pressable>
               ) : (
                 <Pressable
-                  style={styles.closeButton}
+                  style={[styles.closeButton, isDark && styles.closeButtonDark]}
                   accessibilityRole="button"
                   onPress={onClose}
                 >
-                  <Text style={styles.closeButtonText}>
+                  <Text style={[styles.closeButtonText, isDark && styles.closeButtonTextDark]}>
                     {PRODUCT_BADGE_EXPLAIN_UI.CLOSE}
                   </Text>
                 </Pressable>
               )}
             </View>
           </SquircleView>
-        </View>
+        </SheetContainer>
       </View>
     </Modal>
   );

@@ -1,5 +1,4 @@
-import { Pressable, Text, View } from "react-native";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { CreditCard } from "@/shared/ui/productDetailsLucideIcons";
 
 import {
   resolveInstallmentPlanMonthlyAmountRub,
@@ -8,8 +7,8 @@ import {
 import { useProductInstallmentProgramQuery } from "@/entities/installment/model/useProductInstallmentProgramQuery";
 import { INSTALLMENT_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
+
+import { ProductDetailsFeatureCard } from "@/entities/product/ui/ProductDetailsFeatureCard";
 
 type ProductDetailsInstallmentTeaserProps = {
   productId: string;
@@ -22,8 +21,6 @@ export const ProductDetailsInstallmentTeaser = ({
   installmentEnabled,
   onPress,
 }: ProductDetailsInstallmentTeaserProps) => {
-  const theme = useAppTheme();
-  const styles = useProductDetailScreenStyles();
   const programQuery = useProductInstallmentProgramQuery(productId, installmentEnabled);
 
   if (!installmentEnabled) {
@@ -40,30 +37,12 @@ export const ProductDetailsInstallmentTeaser = ({
   const monthlyLabel = formatPriceRub(monthlyAmountRub);
 
   return (
-    <Pressable
-      style={({ pressed }) => [
-        styles.featureCard,
-        pressed ? { opacity: 0.92, borderColor: theme.colors.actionBorder } : null,
-      ]}
+    <ProductDetailsFeatureCard
+      icon={CreditCard}
+      title={INSTALLMENT_UI.DETAILS_TEASER_TITLE}
+      subtitle={INSTALLMENT_UI.DETAILS_TEASER_FROM_MONTHLY(monthlyLabel)}
+      ariaLabel={INSTALLMENT_UI.DETAILS_TEASER_ARIA}
       onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={INSTALLMENT_UI.DETAILS_TEASER_ARIA}
-    >
-      <View style={styles.featureCardIcon}>
-        <MaterialIcons name="credit-card" size={20} color={theme.colors.action} />
-      </View>
-      <View style={styles.featureCardText}>
-        <Text style={styles.featureCardTitle}>{INSTALLMENT_UI.DETAILS_TEASER_TITLE}</Text>
-        <Text style={styles.featureCardSubtitle}>
-          {INSTALLMENT_UI.DETAILS_TEASER_FROM_MONTHLY(monthlyLabel)}
-        </Text>
-      </View>
-      <MaterialIcons
-        name="chevron-right"
-        size={22}
-        color={theme.colors.action}
-        style={styles.featureCardChevron}
-      />
-    </Pressable>
+    />
   );
 };

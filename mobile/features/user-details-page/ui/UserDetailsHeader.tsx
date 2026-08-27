@@ -2,8 +2,9 @@ import { View } from "react-native";
 
 import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
 import { UserFollowButton } from "@/features/user-follow/ui/UserFollowButton";
-import { USER_LIST_ROW_UI } from "@/shared/config";
+import { USER_DETAILS_PAGE_UI, USER_LIST_ROW_UI } from "@/shared/config";
 import { useUserDetailsPageStyles } from "@/shared/theme/profileChromeStyles";
+import { ScreenBackButton } from "@/shared/ui/ScreenBackButton";
 
 type UserDetailsHeaderProps = {
   user: Record<string, unknown>;
@@ -28,13 +29,19 @@ export const UserDetailsHeader = ({
   return (
     <View style={styles.header}>
       <View style={styles.titleRow}>
-        <View style={styles.titleName}>
-          <UserPremiumDisplayName
-            name={displayName}
-            isPremium={user.isPremiumUser === true}
-            isUserDataConfirmed={user.isUserDataConfirmed === true}
-            textStyle={styles.titleText}
+        <View style={styles.titleLeading}>
+          <ScreenBackButton
+            variant="inline"
+            accessibilityLabel={USER_DETAILS_PAGE_UI.BACK_ARIA}
           />
+          <View style={styles.titleName}>
+            <UserPremiumDisplayName
+              name={displayName}
+              isPremium={user.isPremiumUser === true}
+              isUserDataConfirmed={user.isUserDataConfirmed === true}
+              textStyle={styles.titleText}
+            />
+          </View>
         </View>
         {!isSelf ? (
           <UserFollowButton

@@ -1,6 +1,8 @@
 import { StyleSheet, Platform } from "react-native";
 
 import { USER_STORY_FRAME_ASPECT_RATIO } from "@/entities/user-story/lib/computeUserStoryFrameSize";
+import { CREATE_USER_STORY_MODAL_LAYOUT as L } from "@/entities/user-story/lib/createUserStoryModalLayout";
+import { PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT } from "@/shared/lib/productBadgeExplainSheetLayout";
 import { MODAL_BACKDROP_SCRIM } from "@/shared/theme/formChromeStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { semanticColors } from "@/shared/theme/semanticColors";
@@ -13,10 +15,9 @@ export const STORY_VIEWER_OVERLAY_SCRIM = "rgba(0,0,0,0.55)";
 export const USER_STORY_FRAME_BORDER_RADIUS = 16;
 
 export const CREATE_STORY_MODAL_ANIMATION = {
-  enterMs: 300,
-  exitMs: 240,
-  sheetSlideDistance: 420,
-  maxHeightRatio: 0.92,
+  enterMs: 420,
+  exitMs: 420,
+  maxHeightRatio: 0.8,
 } as const;
 
 /** Зазор между полем подписи и sticky-footer «Опубликовать». */
@@ -158,21 +159,31 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
   root: {
     flex: 1,
     justifyContent: "flex-end",
+    alignItems: "center",
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: MODAL_BACKDROP_SCRIM,
+    backgroundColor: L.backdropScrim,
   },
   card: {
     width: "100%",
-    alignSelf: "stretch",
+    alignSelf: "center",
     backgroundColor: theme.colors.surface,
-    borderTopLeftRadius: theme.radius.md,
-    borderTopRightRadius: theme.radius.md,
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    borderTopLeftRadius: L.borderRadius,
+    borderTopRightRadius: L.borderRadius,
+    paddingHorizontal: L.bodyPaddingHorizontal,
+    paddingTop: L.bodyPaddingTop,
     paddingBottom: 0,
-    maxHeight: "92%",
+    maxHeight: `${L.heightRatio * 100}%`,
+    overflow: "hidden",
+    shadowColor: theme.colors.ink,
+    shadowOffset: { width: 0, height: -12 },
+    shadowOpacity: 0.18,
+    shadowRadius: 40,
+    elevation: 24,
+  },
+  cardWide: {
+    maxWidth: L.maxWidthWide,
   },
   bodyScroll: {
     flexGrow: 0,
@@ -180,9 +191,10 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
   },
   bodyScrollContent: {
     flexGrow: 1,
+    paddingBottom: L.bodyPaddingBottom,
   },
   captionBlock: {
-    marginTop: theme.spacing[3],
+    gap: L.captionLabelGap,
   },
   submitSpacer: {
     minHeight:
@@ -193,15 +205,19 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
   },
   submitFooter: {
     flexShrink: 0,
-    paddingTop: theme.spacing[4],
-    paddingBottom: theme.spacing[8],
+    paddingTop: L.footerPaddingTop,
+    paddingHorizontal: L.footerPaddingHorizontal,
+    paddingBottom: L.footerPaddingBottomMin,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: theme.spacing[3],
+    gap: 12,
+    marginBottom: L.headerMarginBottom,
   },
   title: {
     fontSize: 18,
@@ -209,14 +225,18 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
     color: theme.colors.text,
   },
   close: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: L.closeFontSize,
+    fontWeight: "500",
     color: theme.colors.textMuted,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
   },
   preview: {
     alignSelf: "center",
-    width: "100%",
+    maxWidth: "100%",
+    height: L.previewMaxHeight,
     aspectRatio: USER_STORY_FRAME_ASPECT_RATIO,
+    marginBottom: L.previewMarginBottom,
     borderRadius: theme.radius.sm,
     backgroundColor: theme.colors.nearBlack,
     overflow: "hidden",
@@ -239,35 +259,35 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
     opacity: 0.5,
   },
   label: {
-    marginTop: theme.spacing[2],
     fontSize: 14,
     fontWeight: "600",
     color: theme.colors.textSecondary,
   },
   caption: {
-    marginTop: theme.spacing[4],
-    minHeight: 192,
-    height: 192,
-    maxHeight: 192,
+    minHeight: L.captionHeight,
+    height: L.captionHeight,
+    maxHeight: L.captionHeight,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
-    borderRadius: 10,
+    borderColor: theme.colors.borderStrong,
+    borderRadius: L.captionBorderRadius,
     backgroundColor: theme.colors.surfaceMuted,
-    padding: theme.spacing[3],
-    fontSize: 16,
+    paddingVertical: L.captionPaddingVertical,
+    paddingHorizontal: L.captionPaddingHorizontal,
+    fontSize: L.captionFontSize,
     lineHeight: 22,
     color: theme.colors.text,
     textAlignVertical: "top",
   },
   error: {
-    marginTop: 10,
-    fontSize: 13,
+    marginBottom: 8,
+    fontSize: 14,
     color: theme.colors.danger,
   },
   submit: {
     marginTop: 0,
     paddingVertical: 14,
-    borderRadius: 10,
+    paddingHorizontal: 16,
+    borderRadius: L.submitBorderRadius,
     backgroundColor: theme.colors.action,
     alignItems: "center",
     justifyContent: "center",
@@ -277,8 +297,8 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
     opacity: 0.6,
   },
   submitText: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: L.submitFontSize,
+    fontWeight: "700",
     color: theme.colors.onContrast,
   },
 }));
@@ -1504,5 +1524,103 @@ export const useProductModalShellStyles = createThemedStyles((theme) => ({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
+  },
+}));
+
+export const useProductBadgeExplainSheetStyles = createThemedStyles((theme) => ({
+  root: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  dismiss: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  panelHost: {
+    width: "100%",
+    maxWidth: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.panelMaxWidth,
+  },
+  panel: {
+    width: "100%",
+    maxHeight: "100%",
+    flexDirection: "column",
+    backgroundColor: theme.colors.surface,
+    overflow: "hidden",
+  },
+  panelShadow: {
+    shadowColor: theme.colors.ink,
+    shadowOffset: {
+      width: 0,
+      height: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.shadowOffsetY,
+    },
+    shadowOpacity: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.shadowOpacity,
+    shadowRadius: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.shadowRadius,
+    elevation: 12,
+  },
+  media: {
+    width: "100%",
+    aspectRatio: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.mediaAspectRatio,
+    backgroundColor: theme.colors.bg,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+  },
+  bodyScroll: {
+    flexGrow: 0,
+    flexShrink: 1,
+  },
+  body: {
+    padding: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.bodyPadding,
+    gap: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.bodyGap,
+  },
+  title: {
+    fontSize: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.titleFontSize,
+    fontWeight: "700",
+    lineHeight: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.titleLineHeight,
+    color: theme.colors.text,
+  },
+  description: {
+    fontSize: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.descriptionFontSize,
+    lineHeight: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.descriptionLineHeight,
+    color: theme.colors.textMuted,
+  },
+  footer: {
+    paddingTop: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.footerPaddingTop,
+    paddingHorizontal: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.footerPaddingHorizontal,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.colors.border,
+    gap: 8,
+  },
+  closeButton: {
+    width: "100%",
+    borderRadius: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.closeRadius,
+    paddingVertical: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.closePaddingVertical,
+    paddingHorizontal: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.closePaddingHorizontal,
+    alignItems: "center",
+    backgroundColor: theme.colors.ink,
+  },
+  closeButtonDark: {
+    backgroundColor: "#ffffff",
+  },
+  closeButtonDisabled: {
+    opacity: 0.55,
+  },
+  closeButtonText: {
+    fontSize: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.closeFontSize,
+    fontWeight: "700",
+    color: theme.colors.onContrast,
+  },
+  closeButtonTextDark: {
+    color: theme.colors.ink,
+  },
+  error: {
+    fontSize: 14,
+    lineHeight: 18.9,
+    textAlign: "center",
+    color: theme.colors.dangerText,
   },
 }));

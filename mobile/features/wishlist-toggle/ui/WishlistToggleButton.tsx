@@ -7,7 +7,9 @@ import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuer
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useWishlist } from "@/entities/wishlist/model/WishlistProvider";
 import { WISHLIST_TOGGLE_UI } from "@/shared/config";
+import { PRODUCT_DETAIL_HERO_CHROME } from "@/shared/lib/productDetailHeroChromeLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useProductDetailHeroChromeStyles } from "@/shared/theme/catalogProductStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 type WishlistToggleButtonProps = {
@@ -42,17 +44,6 @@ const useWishlistToggleStyles = createThemedStyles((theme) => ({
     shadowRadius: 4,
     elevation: 2,
   },
-  detailHeroInline: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: theme.colors.surface,
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 2,
-  },
 }));
 
 export const WishlistToggleButton = ({
@@ -63,6 +54,7 @@ export const WishlistToggleButton = ({
   const router = useRouter();
   const theme = useAppTheme();
   const styles = useWishlistToggleStyles();
+  const heroChromeStyles = useProductDetailHeroChromeStyles();
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
   const { isInWishlist, toggleItem } = useWishlist();
@@ -74,6 +66,7 @@ export const WishlistToggleButton = ({
   }
 
   const active = isInWishlist(id);
+  const isHeroInline = variant === "detailHeroInline";
 
   const handlePress = () => {
     if (!isAuthorized) {
@@ -86,11 +79,10 @@ export const WishlistToggleButton = ({
   return (
     <Pressable
       style={[
-        styles.root,
+        isHeroInline ? heroChromeStyles.actionButton : styles.root,
         variant === "card" && styles.card,
         variant === "detailHero" && styles.detailHero,
-        variant === "detailHeroInline" && styles.detailHeroInline,
-        active && { backgroundColor: theme.colors.danger },
+        active && (isHeroInline ? heroChromeStyles.wishlistActive : { backgroundColor: theme.colors.danger }),
       ]}
       onPress={handlePress}
       accessibilityRole="button"
@@ -99,7 +91,11 @@ export const WishlistToggleButton = ({
     >
       <MaterialIcons
         name={active ? "favorite" : "favorite-border"}
-        size={variant === "card" || variant === "detailHero" || variant === "detailHeroInline" ? 20 : 24}
+        size={
+          variant === "card" || variant === "detailHero" || isHeroInline
+            ? PRODUCT_DETAIL_HERO_CHROME.iconSize
+            : 24
+        }
         color={active ? theme.colors.onContrast : theme.colors.text}
       />
     </Pressable>

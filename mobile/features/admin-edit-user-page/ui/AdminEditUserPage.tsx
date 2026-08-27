@@ -1,5 +1,4 @@
-import { useLocalSearchParams, useNavigation } from "expo-router";
-import { useLayoutEffect } from "react";
+import { useLocalSearchParams } from "expo-router";
 import { ScrollView, Switch, Text, TextInput, View } from "react-native";
 
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
@@ -16,7 +15,6 @@ import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 export const AdminEditUserPage = () => {
-  const navigation = useNavigation();
   const theme = useAppTheme();
   const styles = useFormFieldStyles();
   const params = useLocalSearchParams<{ id?: string }>();
@@ -40,10 +38,6 @@ export const AdminEditUserPage = () => {
     staffCanEditPremium,
     isAdmin,
   } = useAdminEditUserForm({ userId, currentUserId });
-
-  useLayoutEffect(() => {
-    navigation.setOptions({ title: ADMIN_EDIT_USER_UI.TITLE });
-  }, [navigation]);
 
   if (!userId) {
     return <ScreenErrorState message={EDIT_PROFILE_UI.SAVE_ERROR} />;

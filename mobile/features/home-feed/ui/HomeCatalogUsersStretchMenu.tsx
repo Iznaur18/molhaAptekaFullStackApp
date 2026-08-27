@@ -43,14 +43,15 @@ export const HomeCatalogUsersStretchMenu = ({
   const insets = useSafeAreaInsets();
   const anchorRef = useRef<View>(null);
   const [menuAnchor, setMenuAnchor] = useState<LayoutRectangle | null>(null);
-  const { portalVisible, shellAnimatedStyle, itemsAnimatedStyle } = useHomeCatalogUsersStretchMenuAnimation({
-    open,
-    itemCount: items.length,
-    closedBackgroundColor: theme.colors.action,
-    openBackgroundColor: theme.colors.surface,
-    closedBorderColor: "transparent",
-    openBorderColor: theme.colors.border,
-  });
+  const { portalVisible, menuExpanded, shellAnimatedStyle, itemsAnimatedStyle, useCssTransition } =
+    useHomeCatalogUsersStretchMenuAnimation({
+      open,
+      itemCount: items.length,
+      closedBackgroundColor: theme.colors.action,
+      openBackgroundColor: theme.colors.surface,
+      closedBorderColor: "transparent",
+      openBorderColor: theme.colors.border,
+    });
   useRegisterBlockingOverlay(portalVisible);
 
   const measureAnchor = useCallback(() => {
@@ -71,7 +72,7 @@ export const HomeCatalogUsersStretchMenu = ({
     return () => cancelAnimationFrame(frame);
   }, [measureAnchor, portalVisible]);
 
-  const isMenuExpanded = open || portalVisible;
+  const isMenuExpanded = menuExpanded;
   const toggleIconColor = theme.colors.onContrast;
 
   const handleToggle = useCallback(() => {
@@ -93,7 +94,12 @@ export const HomeCatalogUsersStretchMenu = ({
     [onItemPress],
   );
 
-  const renderShellBody = () => (
+  const ShellContainer = useCssTransition ? View : Animated.View;
+  const ItemsContainer = useCssTransition ? View : Animated.View;
+
+  const renderShellBody = (
+    ItemsWrapper: typeof View | typeof Animated.View = ItemsContainer,
+  ) => (
     <>
       <Pressable
         style={styles.usersStretchToggle}
@@ -111,7 +117,7 @@ export const HomeCatalogUsersStretchMenu = ({
         )}
       </Pressable>
 
-      <Animated.View style={[styles.usersStretchItems, itemsAnimatedStyle]}>
+      <ItemsWrapper style={[styles.usersStretchItems, itemsAnimatedStyle]}>
         {items.map((item) => {
           const isActive = item.key === activeItemKey;
           const iconColor = isActive ? theme.colors.action : theme.colors.textSecondary;
@@ -128,18 +134,18 @@ export const HomeCatalogUsersStretchMenu = ({
             </Pressable>
           );
         })}
-      </Animated.View>
+      </ItemsWrapper>
     </>
   );
 
   const renderShell = (shellStyle?: StyleProp<ViewStyle>) => (
-    <Animated.View
+    <ShellContainer
       style={[styles.usersStretchShell, shellStyle, shellAnimatedStyle]}
       accessibilityRole="menu"
       accessibilityLabel={HEADER_USERS_BUTTON_UI.MENU_ARIA}
     >
       {renderShellBody()}
-    </Animated.View>
+    </ShellContainer>
   );
 
   const portalShellStyle =
@@ -155,7 +161,7 @@ export const HomeCatalogUsersStretchMenu = ({
   return (
     <>
       <View ref={anchorRef} style={styles.usersNavPill} onLayout={measureAnchor} collapsable={false}>
-        {isMenuExpanded ? <View style={styles.usersNavPillPlaceholder} /> : renderShell()}
+        {portalVisible ? <View style={styles.usersNavPillPlaceholder} /> : renderShell()}
       </View>
 
       <Modal

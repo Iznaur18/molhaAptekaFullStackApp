@@ -8,6 +8,7 @@ import { formatApiErrorMessage } from "@/shared/lib";
 import { useAuthGateStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
+import { ScreenWithBack } from "@/shared/ui/ScreenWithBack";
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -20,36 +21,46 @@ export default function EditProfileScreen() {
   const user = sessionQuery.data?.user;
 
   if (sessionQuery.isPending) {
-    return <ScreenLoadingState message={AUTH_UI.SESSION_CHECK} />;
+    return (
+      <ScreenWithBack>
+        <ScreenLoadingState message={AUTH_UI.SESSION_CHECK} />
+      </ScreenWithBack>
+    );
   }
 
   if (sessionQuery.isError) {
     return (
-      <ScreenErrorState
-        message={formatApiErrorMessage(sessionQuery.error, AUTH_UI.SESSION_ERROR)}
-        onRetry={() => sessionQuery.refetch()}
-      />
+      <ScreenWithBack>
+        <ScreenErrorState
+          message={formatApiErrorMessage(sessionQuery.error, AUTH_UI.SESSION_ERROR)}
+          onRetry={() => sessionQuery.refetch()}
+        />
+      </ScreenWithBack>
     );
   }
 
   if (!user?._id) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.message}>{EDIT_PROFILE_UI.AUTH_REQUIRED}</Text>
-        <AppButton
-          label={AUTH_UI.LOGIN_BUTTON}
-          variant="primary"
-          onPress={() => router.push("/(auth)/login")}
-        />
-      </View>
+      <ScreenWithBack>
+        <View style={styles.centered}>
+          <Text style={styles.message}>{EDIT_PROFILE_UI.AUTH_REQUIRED}</Text>
+          <AppButton
+            label={AUTH_UI.LOGIN_BUTTON}
+            variant="primary"
+            onPress={() => router.push("/(auth)/login")}
+          />
+        </View>
+      </ScreenWithBack>
     );
   }
 
   return (
-    <EditProfileForm
-      user={user}
-      focusAddress={focusAddress}
-      onSaved={() => router.replace("/(tabs)/me")}
-    />
+    <ScreenWithBack>
+      <EditProfileForm
+        user={user}
+        focusAddress={focusAddress}
+        onSaved={() => router.replace("/(tabs)/me")}
+      />
+    </ScreenWithBack>
   );
 }

@@ -28,6 +28,11 @@ test("curated home layout uses web card gap", () => {
   );
 
   assert.match(source, /CURATED_PRODUCT_LIST_HOME_CARD_GAP = 12/);
+  assert.match(source, /SECTION_PADDING_VERTICAL = 12/);
+  assert.match(source, /SECTION_PADDING_HORIZONTAL = 0/);
+  assert.match(source, /SCROLL_PADDING_HORIZONTAL = 12/);
+  assert.match(source, /SCROLL_PADDING_TOP = 0/);
+  assert.match(source, /SCROLL_PADDING_BOTTOM = 0/);
 });
 
 test("home catalog screen wires home-feed refresh", () => {
@@ -56,7 +61,9 @@ test("home feed sections share one vertical gap constant", () => {
 
   assert.match(layout, /HOME_FEED_SECTION_GAP = 8/);
   assert.match(catalogStyles, /listHeader:[\s\S]*gap: HOME_FEED_SECTION_GAP/);
-  assert.match(catalogStyles, /toolbarCompactTop:[\s\S]*marginBottom: HOME_FEED_SECTION_GAP/);
+  assert.match(catalogStyles, /toolbarCompactTop:[\s\S]*marginBottom: 0/);
+  assert.match(catalogStyles, /toolbarCompactTop:[\s\S]*marginTop: -HOME_CATALOG_SECTION_TITLE_COMPACT_PULL_UP/);
+  assert.match(catalogStyles, /titleCompactTop:[\s\S]*HOME_CATALOG_SECTION_TITLE_MARGIN_TOP/);
   assert.match(curated, /CURATED_PRODUCT_LIST_HOME_SECTION_MARGIN_BOTTOM = HOME_FEED_SECTION_GAP/);
   assert.match(header, /bannerBelowPanel:[\s\S]*marginTop: 0/);
   assert.match(header, /bannerBelowPanel:[\s\S]*marginBottom: 0/);
@@ -132,4 +139,40 @@ test("raffle section opens /raffle/:id from reveal button (web parity)", () => {
   assert.match(page, /useFeaturedRafflesQuery/);
   assert.match(page, /pagingEnabled/);
   assert.match(page, /RaffleManageActions/);
+});
+
+test("create story modal matches web animation and layout tokens", () => {
+  const layout = readMobileFile("entities/user-story/lib/createUserStoryModalLayout.ts");
+  const animation = readMobileFile("entities/user-story/model/useCreateUserStoryModalAnimation.ts");
+  const modal = readMobileFile("features/home-feed/ui/CreateUserStoryModal.tsx");
+  const strip = readMobileFile("features/home-feed/ui/UserStoriesStrip.tsx");
+  const chrome = readMobileFile("shared/theme/modalChromeStyles.ts");
+
+  assert.match(layout, /enterMs: 420/);
+  assert.match(layout, /heightRatio: 0\.8/);
+  assert.match(layout, /borderRadius: 32/);
+  assert.match(layout, /backdropScrim: "rgba\(0,0,0,0\.62\)"/);
+  assert.match(layout, /captionHeight: 180/);
+  assert.match(layout, /sheetEnterEasingCss: "cubic-bezier\(0\.215, 0\.61, 0\.355, 1\)"/);
+
+  assert.match(animation, /useAdminEditModalAnimation/);
+  assert.match(animation, /deferEnterUntilPaint: true/);
+  assert.match(animation, /scheduleOpenAfterPaint/);
+  assert.match(animation, /transitionProperty: "transform"/);
+  assert.match(animation, /exitEasing: enterEasing/);
+
+  assert.match(modal, /useCreateUserStoryModalAnimation/);
+  assert.match(modal, /presentationStyle="overFullScreen"/);
+  assert.match(modal, /sheetHeight = useMemo\(\(\) => windowHeight \* L\.heightRatio/);
+  assert.match(modal, /useCssTransition \? View : Animated\.View/);
+  assert.match(modal, /height: sheetHeight, maxHeight: sheetHeight/);
+  assert.doesNotMatch(modal, /sheetTranslateY/);
+
+  assert.match(strip, /CreateUserStoryModal/);
+  assert.match(strip, /visible={isCreateOpen}/);
+  assert.doesNotMatch(strip, /isCreateOpen \?/);
+
+  assert.match(chrome, /borderTopLeftRadius: L\.borderRadius/);
+  assert.match(chrome, /backgroundColor: L\.backdropScrim/);
+  assert.match(chrome, /maxWidth: L\.maxWidthWide/);
 });

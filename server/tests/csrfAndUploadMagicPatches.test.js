@@ -93,6 +93,82 @@ test("csrfCookieOriginCheckMW: refresh-only cookie requires Origin", async () =>
   }
 });
 
+test("csrfCookieOriginCheckMW: mobile client without browser Origin passes with cookies", () => {
+  const previousEnv = process.env.NODE_ENV;
+  const previousFrontend = process.env.FRONTEND_URL;
+  process.env.NODE_ENV = "development";
+  process.env.FRONTEND_URL = "https://gitorg.ru";
+
+  try {
+    /** @type {{ statusCode?: number; body?: unknown }} */
+    const res = {
+      status(code) {
+        this.statusCode = code;
+        return this;
+      },
+      json(body) {
+        this.body = body;
+        return this;
+      },
+    };
+
+    let nextCalled = false;
+    const req = {
+      method: "POST",
+      cookies: { [REFRESH_COOKIE_NAME]: "refresh-jwt" },
+      get(name) {
+        if (name === "x-auth-client") return "mobile";
+        return undefined;
+      },
+    };
+
+    csrfCookieOriginCheckMW(req, res, () => {
+      nextCalled = true;
+    });
+
+    assert.equal(nextCalled, true);
+
+    let expNext = false;
+    const expReq = {
+      method: "PUT",
+      cookies: { [AUTH_COOKIE_NAME]: "access" },
+      get(name) {
+        if (name === "x-auth-client") return "mobile";
+        if (name === "origin") return "exp://192.168.1.97:8081";
+        return undefined;
+      },
+    };
+    csrfCookieOriginCheckMW(expReq, res, () => {
+      expNext = true;
+    });
+    assert.equal(expNext, true);
+
+    let evilNext = false;
+    res.statusCode = undefined;
+    const evilReq = {
+      method: "POST",
+      cookies: { [AUTH_COOKIE_NAME]: "access" },
+      get(name) {
+        if (name === "x-auth-client") return "mobile";
+        if (name === "origin") return "https://evil.example";
+        return undefined;
+      },
+    };
+    csrfCookieOriginCheckMW(evilReq, res, () => {
+      evilNext = true;
+    });
+    assert.equal(evilNext, false);
+    assert.equal(res.statusCode, 403);
+  } finally {
+    process.env.NODE_ENV = previousEnv;
+    if (previousFrontend === undefined) {
+      delete process.env.FRONTEND_URL;
+    } else {
+      process.env.FRONTEND_URL = previousFrontend;
+    }
+  }
+});
+
 test("csrfCookieOriginCheckMW: non-prod allows LAN even if FRONTEND_URL is localhost-only", () => {
   const previousEnv = process.env.NODE_ENV;
   const previousFrontend = process.env.FRONTEND_URL;

@@ -34,6 +34,7 @@ type ThumbPressableProps = {
   item: UserProfileThumbItem;
   thumbSrc: string | null;
   isUnavailable: boolean;
+  isCurrent?: boolean;
   onPress: () => void;
   onImageError: () => void;
 };
@@ -42,6 +43,7 @@ const UserProfileThumbPressable = ({
   item,
   thumbSrc,
   isUnavailable,
+  isCurrent = false,
   onPress,
   onImageError,
 }: ThumbPressableProps) => {
@@ -51,10 +53,15 @@ const UserProfileThumbPressable = ({
     <Pressable
       style={[styles.thumbButton, isUnavailable && styles.thumbButtonUnavailable]}
       onPress={onPress}
+      disabled={isUnavailable || isCurrent}
       accessibilityRole="button"
       accessibilityLabel={item.productName}
+      accessibilityState={{ selected: isCurrent, disabled: isUnavailable || isCurrent }}
     >
-      <SquircleView radius={USER_PROFILE_THUMB_SQUIRCLE_RADIUS} style={styles.thumbClip}>
+      <SquircleView
+        radius={USER_PROFILE_THUMB_SQUIRCLE_RADIUS}
+        style={[styles.thumbClip, isCurrent && styles.thumbClipCurrent]}
+      >
         {thumbSrc ? (
           <Image source={{ uri: thumbSrc }} style={styles.thumbImage} onError={onImageError} />
         ) : (
@@ -141,12 +148,14 @@ export const UserProfileThumbGrid = ({
 
 type UserProfileThumbScrollRowProps = {
   items: UserProfileThumbItem[];
+  currentProductId?: string;
   unavailableHint?: string;
   onItemPress: (item: UserProfileThumbItem) => void;
 };
 
 export const UserProfileThumbScrollRow = ({
   items,
+  currentProductId = "",
   unavailableHint = "",
   onItemPress,
 }: UserProfileThumbScrollRowProps) => {
@@ -180,6 +189,8 @@ export const UserProfileThumbScrollRow = ({
       >
         {items.map((item) => {
           const isUnavailable = !item.viewable || item.product == null;
+          const isCurrent =
+            currentProductId.length > 0 && String(item.productId) === currentProductId;
           const thumbSrc = failedThumbIds.has(item.productId)
             ? null
             : getUserProfileThumbSrc(item.product);
@@ -190,6 +201,7 @@ export const UserProfileThumbScrollRow = ({
               item={item}
               thumbSrc={thumbSrc}
               isUnavailable={isUnavailable}
+              isCurrent={isCurrent}
               onPress={() => onItemPress(item)}
               onImageError={() => markThumbFailed(item.productId)}
             />
@@ -228,6 +240,7 @@ type UserProfileThumbSectionProps = {
   onShowMore?: () => void;
   onShowLess?: () => void;
   layout?: UserProfileThumbSectionLayout;
+  currentProductId?: string;
 };
 
 export const UserProfileThumbSection = ({
@@ -251,6 +264,7 @@ export const UserProfileThumbSection = ({
   onShowMore,
   onShowLess,
   layout = "grid",
+  currentProductId = "",
 }: UserProfileThumbSectionProps) => {
   const styles = useUserProfileThumbListStyles();
   const [unavailableHint, setUnavailableHint] = useState("");
@@ -330,6 +344,7 @@ export const UserProfileThumbSection = ({
         {isHorizontal ? (
           <UserProfileThumbScrollRow
             items={items}
+            currentProductId={currentProductId}
             unavailableHint={unavailableHint}
             onItemPress={handleItemPress}
           />
@@ -343,7 +358,14 @@ export const UserProfileThumbSection = ({
         )}
 
         {phase === "error" && items.length > 0 && errorText ? (
-          <Text style={[styles.state, styles.stateError]} accessibilityRole="alert">
+          <Text
+            style={[
+              styles.state,
+              styles.stateError,
+              isHorizontal && styles.stateErrorHorizontal,
+            ]}
+            accessibilityRole="alert"
+          >
             {errorText}
           </Text>
         ) : null}

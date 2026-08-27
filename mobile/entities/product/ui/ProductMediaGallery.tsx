@@ -10,7 +10,12 @@ import { ProductMediaHorizontalPager } from "@/entities/product/ui/ProductMediaH
 import { ProductImageLightbox } from "@/entities/product/ui/ProductImageLightbox";
 import { ProductMediaSlideContent } from "@/entities/product/ui/ProductMediaSlideContent";
 import { PRODUCT_CARD_UI, PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
-import { resolveProductDetailHeroSize } from "@/shared/lib/productDetailScreenLayout";
+import { PRODUCT_DETAIL_HERO_CHROME } from "@/shared/lib/productDetailHeroChromeLayout";
+import {
+  resolveProductDetailHeroSize,
+  type ProductDetailHeroSize,
+} from "@/shared/lib/productDetailScreenLayout";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductMediaGalleryStyles } from "@/shared/theme/catalogProductStyles";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 
@@ -18,6 +23,8 @@ type ProductMediaGalleryProps = {
   previewVideoUrl?: string | null;
   imageUrls: string[];
   variant?: "catalog" | "detail";
+  heroSize?: ProductDetailHeroSize;
+  isSplitLayout?: boolean;
   onBack?: () => void;
   heroOverlay?: ReactNode;
   reportOverlay?: ReactNode;
@@ -27,10 +34,13 @@ export const ProductMediaGallery = ({
   previewVideoUrl = null,
   imageUrls,
   variant = "catalog",
+  heroSize: heroSizeProp,
+  isSplitLayout = false,
   onBack,
   heroOverlay = null,
   reportOverlay = null,
 }: ProductMediaGalleryProps) => {
+  const theme = useAppTheme();
   const styles = useProductMediaGalleryStyles();
   const [previewVideoFailed, setPreviewVideoFailed] = useState(false);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
@@ -50,7 +60,10 @@ export const ProductMediaGallery = ({
   const pagerSlideCount = Math.max(mediaSlides.length, 1);
   const hasMultipleSlides = mediaSlides.length > 1;
 
-  const detailHeroSize = useMemo(() => resolveProductDetailHeroSize(), []);
+  const detailHeroSize = useMemo(
+    () => heroSizeProp ?? resolveProductDetailHeroSize(360, false),
+    [heroSizeProp],
+  );
   const heroStyle = isDetail
     ? [
         styles.detailHero,
@@ -61,7 +74,9 @@ export const ProductMediaGallery = ({
         },
       ]
     : styles.hero;
-  const rootStyle = isDetail ? styles.detailRoot : styles.root;
+  const rootStyle = isDetail
+    ? [styles.detailRoot, isSplitLayout && styles.detailRootSplit]
+    : styles.root;
   const counterStyle = isDetail ? styles.detailCounter : styles.counter;
 
   const renderCounter = () => {
@@ -133,7 +148,11 @@ export const ProductMediaGallery = ({
             accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.BACK_ARIA}
             hitSlop={8}
           >
-            <MaterialIcons name="chevron-left" size={28} />
+            <MaterialIcons
+              name="chevron-left"
+              size={PRODUCT_DETAIL_HERO_CHROME.iconSize}
+              color={theme.colors.text}
+            />
           </Pressable>
         ) : null}
         {isDetail ? (

@@ -1,5 +1,6 @@
 import { View } from "react-native";
 
+import { resolveProductCardCatalogGridTotalHeight } from "@/entities/product/lib/productCardMobileCatalogLayout";
 import { SkeletonShimmer } from "@/shared/ui/SkeletonShimmer";
 import { useHomeFeedSkeletonStyles } from "@/shared/theme/homeFeedSkeletonStyles";
 
@@ -31,8 +32,16 @@ export const CatalogGridSkeleton = ({
       {Array.from({ length: rows }, (_, rowIndex) => (
         <View key={rowIndex} style={[catalogGridRowStyles.row, { gap }]}>
           {Array.from({ length: columns }, (_, columnIndex) => (
-            <View key={columnIndex} style={{ width: tileWidth }}>
-              <View style={styles.catalogTile}>
+            <View
+              key={columnIndex}
+              style={{ width: tileWidth }}
+            >
+              <View
+                style={[
+                  styles.catalogTile,
+                  { minHeight: resolveProductCardCatalogGridTotalHeight(tileWidth) },
+                ]}
+              >
                 <View style={styles.catalogTileImage} />
                 <View style={styles.catalogTileContent}>
                   <View style={styles.catalogTileLine} />

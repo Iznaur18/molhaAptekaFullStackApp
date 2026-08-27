@@ -1,5 +1,6 @@
-import { Text, View } from "react-native";
+import { useWindowDimensions, Text, View } from "react-native";
 
+import { PRODUCT_DETAILS_META_GRID_LAYOUT as MG } from "@/entities/product/lib/productDetailsMetaGridLayout";
 import {
   getProductFieldLabel,
   getProductFieldReadLayout,
@@ -18,7 +19,7 @@ const PRODUCT_ID_FIELD_KEY = "_id";
 type ProductDetailFieldRowsProps = {
   product: Record<string, unknown>;
   fieldKeys: readonly string[];
-  layout?: "grid" | "stack";
+  layout?: "grid" | "stack" | "meta";
 };
 
 export const ProductDetailFieldRows = ({
@@ -27,9 +28,25 @@ export const ProductDetailFieldRows = ({
   layout = "grid",
 }: ProductDetailFieldRowsProps) => {
   const styles = useProductDetailFieldStyles();
+  const { width: viewportWidth } = useWindowDimensions();
+  const isMetaLayout = layout === "meta";
+  const metaColumns =
+    viewportWidth >= MG.narrowBreakpoint ? MG.columns : 1;
+
+  const containerStyle = isMetaLayout
+    ? [
+        styles.metaGrid,
+        metaColumns === MG.columns ? styles.metaGridThreeCol : styles.metaGridOneCol,
+      ]
+    : layout === "stack"
+      ? styles.stack
+      : styles.statsGrid;
+
+  const metaCellStyle =
+    metaColumns === MG.columns ? styles.metaGridCellThreeCol : styles.metaGridCellOneCol;
 
   return (
-    <View style={layout === "grid" ? styles.statsGrid : styles.stack}>
+    <View style={containerStyle}>
       {fieldKeys.map((key) => {
         const readLayout = getProductFieldReadLayout(key);
         const rowStyle =
@@ -71,7 +88,11 @@ export const ProductDetailFieldRows = ({
         return (
           <View
             key={key}
-            style={[rowStyle, isStatRow && isMultiline ? styles.rowStatMultiline : null]}
+            style={[
+              rowStyle,
+              isStatRow && isMultiline ? styles.rowStatMultiline : null,
+              isMetaLayout ? metaCellStyle : null,
+            ]}
           >
             <Text
               style={labelStyle}

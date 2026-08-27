@@ -24,6 +24,9 @@ export const HOME_FEED_DISPLAY_TITLE = {
   marginBottom: 6,
 } as const;
 
+/** Web `.home-feed-section-title` — полный `margin-top: 1.2rem` без listHeader gap. */
+export const HOME_CATALOG_SECTION_TITLE_MARGIN_TOP = 19;
+
 /** `.catalog-feed-tiles__title` / `.catalog-browser-landing__categories-title` */
 export const CATALOG_BROWSER_DISPLAY_TITLE = {
   fontFamily: DISPLAY_FONT_FAMILY,

@@ -2,12 +2,14 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 
+import type { ProductDetailHeroSize } from "@/shared/lib/productDetailScreenLayout";
 import { ProductMediaGallery } from "@/entities/product/ui/ProductMediaGallery";
 import { ProductShareLinkButton } from "@/entities/product/ui/ProductShareLinkButton";
 import { WishlistToggleButton } from "@/features/wishlist-toggle/ui/WishlistToggleButton";
 import { PRODUCT_REPORT_UI } from "@/shared/config";
+import { PRODUCT_DETAIL_HERO_CHROME } from "@/shared/lib/productDetailHeroChromeLayout";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
-import { semanticColors } from "@/shared/theme/semanticColors";
 
 type ProductDetailMediaSectionProps = {
   product: Record<string, unknown>;
@@ -17,6 +19,8 @@ type ProductDetailMediaSectionProps = {
   isOwnProduct: boolean;
   onReportPress: () => void;
   reportDisabled: boolean;
+  heroSize?: ProductDetailHeroSize;
+  isSplitLayout?: boolean;
 };
 
 export const ProductDetailMediaSection = ({
@@ -27,8 +31,11 @@ export const ProductDetailMediaSection = ({
   isOwnProduct,
   onReportPress,
   reportDisabled,
+  heroSize,
+  isSplitLayout = false,
 }: ProductDetailMediaSectionProps) => {
   const router = useRouter();
+  const theme = useAppTheme();
   const styles = useProductDetailScreenStyles();
 
   return (
@@ -36,6 +43,8 @@ export const ProductDetailMediaSection = ({
       variant="detail"
       previewVideoUrl={previewVideoUrl}
       imageUrls={imageUrls}
+      heroSize={heroSize}
+      isSplitLayout={isSplitLayout}
       onBack={() => router.back()}
       heroOverlay={
         <View style={styles.heroActions}>
@@ -50,7 +59,11 @@ export const ProductDetailMediaSection = ({
                 reportDisabled ? PRODUCT_REPORT_UI.ALREADY_REPORTED : PRODUCT_REPORT_UI.REPORT_BUTTON
               }
             >
-              <MaterialIcons name="flag" size={20} color={semanticColors.danger} />
+              <MaterialIcons
+                name="flag"
+                size={PRODUCT_DETAIL_HERO_CHROME.iconSize}
+                color={theme.colors.text}
+              />
             </Pressable>
           ) : null}
           <ProductShareLinkButton product={product} />

@@ -10,6 +10,7 @@ import { getUserAvatarFocus } from "@/entities/user/lib/profileImageFocus";
 import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
 import { UserPremiumAvatar } from "@/entities/user/ui/UserPremiumAvatar";
 import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayName";
+import { PRODUCT_DETAILS_SELLER_PREVIEW_LAYOUT as SP } from "@/entities/product/lib/productDetailsSellerPreviewLayout";
 import {
   PRODUCT_SELLER_PREVIEW_UI,
   USER_LIST_ROW_UI,
@@ -34,6 +35,7 @@ type SellerObject = {
 
 type ProductDetailsSellerPreviewProps = {
   seller: unknown;
+  presentation?: "default" | "split-rest";
 };
 
 const formatFollowersCount = (value?: number): string => {
@@ -44,7 +46,10 @@ const formatFollowersCount = (value?: number): string => {
   return String(Math.max(0, Math.floor(Number(value)) || 0));
 };
 
-export const ProductDetailsSellerPreview = ({ seller }: ProductDetailsSellerPreviewProps) => {
+export const ProductDetailsSellerPreview = ({
+  seller,
+  presentation = "default",
+}: ProductDetailsSellerPreviewProps) => {
   const router = useRouter();
   const theme = useAppTheme();
   const styles = useProductDetailsSellerPreviewStyles();
@@ -110,7 +115,11 @@ export const ProductDetailsSellerPreview = ({ seller }: ProductDetailsSellerPrev
 
   return (
     <Pressable
-      style={({ pressed }) => [styles.root, pressed && styles.rootPressed]}
+      style={({ pressed }) => [
+        styles.root,
+        presentation === "split-rest" && styles.rootSplit,
+        pressed && styles.rootPressed,
+      ]}
       onPress={handleOpenProfile}
       accessibilityRole="button"
       accessibilityLabel={PRODUCT_SELLER_PREVIEW_UI.OPEN_PROFILE_ARIA}
@@ -133,7 +142,12 @@ export const ProductDetailsSellerPreview = ({ seller }: ProductDetailsSellerPrev
             badgeSize={16}
           />
         </View>
-        <Feather name="chevron-right" size={20} color={theme.colors.action} />
+        <Feather
+          name="chevron-right"
+          size={SP.chevronSize}
+          color={theme.colors.action}
+          style={styles.chevron}
+        />
       </View>
 
       <View style={styles.metrics}>

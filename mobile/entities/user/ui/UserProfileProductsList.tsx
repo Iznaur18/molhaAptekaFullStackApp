@@ -24,6 +24,7 @@ type UserProfileProductsListProps = {
   hideWhenEmpty?: boolean;
   heading?: string;
   layout?: UserProfileThumbSectionLayout;
+  currentProductId?: string;
 };
 
 export const UserProfileProductsList = ({
@@ -32,6 +33,7 @@ export const UserProfileProductsList = ({
   hideWhenEmpty = false,
   heading = USER_PROFILE_PRODUCTS_UI.HEADING,
   layout = "grid",
+  currentProductId = "",
 }: UserProfileProductsListProps) => {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -99,6 +101,18 @@ export const UserProfileProductsList = ({
   );
   const displayError = error || (phase === "error" ? fetchError : "");
 
+  if (hideWhenEmpty && isHorizontal) {
+    if (phase === "loading") {
+      return null;
+    }
+    if (phase === "error" && items.length === 0) {
+      return null;
+    }
+    if (phase === "success" && total === 0) {
+      return null;
+    }
+  }
+
   if (hideWhenEmpty && phase === "success" && total === 0) {
     return null;
   }
@@ -131,6 +145,7 @@ export const UserProfileProductsList = ({
       items={items}
       totalCount={total}
       layout={layout}
+      currentProductId={currentProductId}
       loadingText={USER_PROFILE_PRODUCTS_UI.LOADING}
       emptyText={USER_PROFILE_PRODUCTS_UI.EMPTY}
       errorText={displayError}

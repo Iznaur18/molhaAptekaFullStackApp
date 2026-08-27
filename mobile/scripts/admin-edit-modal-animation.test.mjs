@@ -20,6 +20,8 @@ assert.match(shellSource, /backdropAnimatedStyle/);
 assert.match(animationSource, /backdropOpacity/);
 assert.match(animationSource, /withTiming/);
 assert.match(animationSource, /finishClose/);
+assert.match(animationSource, /scheduleOpenAfterPaint/);
+assert.match(animationSource, /deferEnterUntilPaint/);
 assert.doesNotMatch(animationSource, /isWeb/);
 assert.match(shellSource, /pointerEvents={dismissDisabled \? "none" : "auto"}/);
 assert.match(categoryModalSource, /useSyncAdminEditFormOnOpen/);

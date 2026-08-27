@@ -124,13 +124,11 @@ export const UserStoriesStrip = ({
         />
       ) : null}
 
-      {isCreateOpen ? (
-        <CreateUserStoryModal
-          visible
-          onClose={() => setIsCreateOpen(false)}
-          onPublished={onPublished}
-        />
-      ) : null}
+      <CreateUserStoryModal
+        visible={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        onPublished={onPublished}
+      />
 
       <AccountRequirementModal {...storyGate.modalProps} />
     </>

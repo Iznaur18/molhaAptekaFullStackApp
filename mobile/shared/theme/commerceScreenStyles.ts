@@ -1,6 +1,7 @@
 import { Platform, StyleSheet } from "react-native";
 
 import { ORDER_CARD_ITEM_THUMB_SIZE } from "@/entities/product/model/constants";
+import { RAFFLE_PRODUCTS_PAGE_LAYOUT as L } from "@/entities/raffle/lib/raffleProductsPageLayout";
 import { CART_LINE_IMAGE_SIZE } from "@/shared/config/cartConstants";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { semanticColors } from "@/shared/theme/semanticColors";
@@ -712,13 +713,10 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.bg,
   },
   list: {
-    paddingHorizontal: 6,
-    paddingTop: 6,
     flexGrow: 1,
   },
-  pageHeader: {
-    gap: 12,
-    marginBottom: 10,
+  listContent: {
+    paddingTop: 8,
   },
   summaryLayout: {
     gap: 0,
@@ -726,7 +724,10 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
   summaryLayoutWide: {
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: 14,
+    gap: L.summaryLayoutWideGap,
+  },
+  productsBlock: {
+    marginTop: L.productsBlockMarginTop,
   },
   hero: {
     position: "relative",
@@ -738,10 +739,11 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
   },
   summarySideWide: {
     flex: 1,
+    gap: 0,
   },
   headerCard: {
     gap: 6,
-    marginBottom: 12,
+    marginBottom: L.headerMarginBottom,
     padding: 12,
     overflow: "hidden",
     borderWidth: 1,
@@ -749,13 +751,22 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
     borderRadius: 20,
     backgroundColor: theme.colors.surface,
   },
+  headerCardWide: {
+    marginTop: L.summarySideHeaderMarginTopWide,
+    marginBottom: 0,
+    paddingVertical: L.headerPaddingWideVertical,
+    paddingHorizontal: L.headerPaddingWideHorizontal,
+  },
   media: {
     position: "relative",
     width: "100%",
-    marginBottom: 12,
+    marginBottom: L.mediaMarginBottom,
     overflow: "hidden",
     borderRadius: 22,
     backgroundColor: theme.colors.surfaceMuted,
+  },
+  mediaWide: {
+    marginBottom: L.mediaMarginBottomWide,
   },
   mediaForeground: {
     ...StyleSheet.absoluteFillObject,
@@ -808,24 +819,36 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
     color: theme.colors.text,
   },
   description: {
-    marginBottom: 12,
+    marginBottom: L.descriptionMarginBottom,
+    paddingHorizontal: 2.4,
     fontSize: 15,
     lineHeight: 22,
     color: theme.colors.text,
     opacity: 0.9,
   },
+  descriptionDesktop: {
+    marginTop: L.descriptionDesktopMarginTop,
+    marginBottom: 0,
+    paddingHorizontal: 0,
+  },
   manageDesktop: {
-    marginBottom: 14,
+    marginBottom: L.manageDesktopMarginBottom,
   },
   progress: {
     gap: 10,
-    marginBottom: 16,
+    marginBottom: L.progressMarginBottom,
     paddingVertical: 14,
     paddingHorizontal: 14,
     borderWidth: 1,
     borderColor: theme.colors.border,
     borderRadius: 18,
     backgroundColor: theme.colors.surface,
+  },
+  progressWide: {
+    gap: L.progressGapWide,
+    marginBottom: 0,
+    paddingVertical: L.progressPaddingWideVertical,
+    paddingHorizontal: L.progressPaddingWideHorizontal,
   },
   progressBar: {
     width: "100%",
@@ -849,6 +872,9 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
     flexDirection: "row",
     gap: 7,
   },
+  statsWide: {
+    gap: L.statsGapWide,
+  },
   stat: {
     flex: 1,
     gap: 2,
@@ -860,6 +886,10 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
     borderRadius: 14,
     backgroundColor: theme.colors.surfaceMuted,
     alignItems: "center",
+  },
+  statWide: {
+    paddingVertical: L.statPaddingWideVertical,
+    paddingHorizontal: L.statPaddingWideHorizontal,
   },
   statAccent: {
     borderColor: `${theme.colors.action}59`,

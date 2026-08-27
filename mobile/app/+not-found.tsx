@@ -1,8 +1,8 @@
-import { Link, Stack } from "expo-router";
+import { Link } from "expo-router";
 import { Text, View } from "react-native";
 
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { ScreenWithBack } from "@/shared/ui/ScreenWithBack";
 
 const useStyles = createThemedStyles((theme) => ({
   container: {
@@ -31,14 +31,13 @@ export default function NotFoundScreen() {
   const styles = useStyles();
 
   return (
-    <>
-      <Stack.Screen options={{ title: "Не найдено" }} />
+    <ScreenWithBack>
       <View style={styles.container}>
         <Text style={styles.title}>Экран не существует</Text>
         <Link href="/" style={styles.link}>
           <Text style={styles.linkText}>На главную</Text>
         </Link>
       </View>
-    </>
+    </ScreenWithBack>
   );
 }

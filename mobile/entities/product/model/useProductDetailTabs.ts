@@ -112,6 +112,13 @@ export const useProductDetailTabs = ({ product, currentUserId }: UseProductDetai
     return keys;
   }, [isOwnProduct]);
 
+  const handleQaShortcut = () => {
+    if (!showQaTab) {
+      return;
+    }
+    setActiveTab("qa");
+  };
+
   const handleCompareShortcut = () => {
     if (!showCompareTab) {
       return;
@@ -142,6 +149,9 @@ export const useProductDetailTabs = ({ product, currentUserId }: UseProductDetai
     auctionUi,
     installmentActive,
     topStatFieldKeys,
+    showQaTab,
+    showCompareTab,
+    handleQaShortcut,
     handleAuctionShortcut,
     handleCompareShortcut,
     handleInstallmentShortcut,

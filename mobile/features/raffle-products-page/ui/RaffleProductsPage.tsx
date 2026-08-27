@@ -17,7 +17,9 @@ import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { buildFeaturedRaffleProgress } from "@/entities/raffle/lib/buildFeaturedRaffleProgressLabel";
 import { canSellerEditRaffle } from "@/entities/raffle/lib/canSellerEditRaffle";
+import { isRafflePrizeVideo } from "@/entities/raffle/lib/isRafflePrizeVideo";
 import { RAFFLE_PRODUCTS_PAGE_LAYOUT as L } from "@/entities/raffle/lib/raffleProductsPageLayout";
+import { resolveRafflePrizeVideoUrl } from "@/entities/raffle/lib/resolveRafflePrizeVideoUrl";
 import { useFeaturedRafflesQuery } from "@/entities/raffle/model/useFeaturedRafflesQuery";
 import { useMyRaffleMutations } from "@/entities/raffle/model/useMyRaffleMutations";
 import { useRaffleByIdQuery } from "@/entities/raffle/model/useRaffleByIdQuery";
@@ -26,10 +28,9 @@ import { useRaffleStaffMutations } from "@/entities/raffle/model/useRaffleStaffM
 import type { RaffleFromApi } from "@/entities/raffle/model/types";
 import { FeaturedRaffleWinnerCard } from "@/entities/raffle/ui/FeaturedRaffleWinnerCard";
 import { RaffleManageActions } from "@/entities/raffle/ui/RaffleManageActions";
-import { RafflePrizeMedia } from "@/entities/raffle/ui/RafflePrizeMedia";
+import { RafflePrizeMedia, RafflePrizeMediaSoundToggle } from "@/entities/raffle/ui/RafflePrizeMedia";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGridRows";
-import { resolveCatalogGridListContentStyle } from "@/features/catalog-grid/lib/catalogGridLayout";
 import { CatalogScrollAnimationProvider } from "@/features/catalog-grid/model/CatalogScrollAnimationContext";
 import { CatalogAnimatedFlatList } from "@/features/catalog-grid/ui/CatalogAnimatedFlatList";
 import { CatalogGridRowItem } from "@/features/catalog-grid/ui/CatalogGridRowItem";
@@ -82,13 +83,18 @@ const RaffleProductsSummaryCopy = ({
 const RaffleProductsProgressBlock = ({
   progressUi,
   raffle,
+  isWide,
 }: {
   progressUi: ProgressUi;
   raffle: RaffleFromApi | null;
+  isWide: boolean;
 }) => {
   const styles = useRaffleProductsPageStyles();
   return (
-    <View style={styles.progress} accessibilityLabel={progressUi.label}>
+    <View
+      style={[styles.progress, isWide && styles.progressWide]}
+      accessibilityLabel={progressUi.label}
+    >
       <View
         style={[styles.progressBar, progressUi.isCompleted && styles.progressBarCompleted]}
       >
@@ -105,8 +111,8 @@ const RaffleProductsProgressBlock = ({
         <FeaturedRaffleWinnerCard winner={raffle.winner} />
       ) : null}
 
-      <View style={styles.stats}>
-        <View style={[styles.stat, styles.statAccent]}>
+      <View style={[styles.stats, isWide && styles.statsWide]}>
+        <View style={[styles.stat, styles.statAccent, isWide && styles.statWide]}>
           <Text style={styles.statLabel}>{RAFFLE_FEATURED_BANNER_UI.STAT_SOLD}</Text>
           <Text style={[styles.statValue, styles.statValueAccent]}>
             {RAFFLE_FEATURED_BANNER_UI.STAT_SOLD_VALUE(
@@ -115,11 +121,11 @@ const RaffleProductsProgressBlock = ({
             )}
           </Text>
         </View>
-        <View style={styles.stat}>
+        <View style={[styles.stat, isWide && styles.statWide]}>
           <Text style={styles.statLabel}>{RAFFLE_FEATURED_BANNER_UI.STAT_PARTICIPANTS}</Text>
           <Text style={styles.statValue}>{progressUi.participantsCount}</Text>
         </View>
-        <View style={styles.stat}>
+        <View style={[styles.stat, isWide && styles.statWide]}>
           <Text style={styles.statLabel}>{RAFFLE_FEATURED_BANNER_UI.STAT_GOAL}</Text>
           <Text style={styles.statValue}>{progressUi.target}</Text>
         </View>
@@ -161,7 +167,8 @@ export const RaffleProductsPage = () => {
   const styles = useRaffleProductsPageStyles();
   const productGrid = useProductGridLayout();
   const { width: windowWidth } = useWindowDimensions();
-  const { centeredContentStyle, contentPaddingBottom } = useScreenLayout();
+  const { centeredContentStyle, contentPaddingBottom, contentPaddingHorizontal } =
+    useScreenLayout();
   const { id } = useLocalSearchParams<{ id: string }>();
   const routeRaffleId = resolveRouteRaffleId(id);
 
@@ -170,6 +177,7 @@ export const RaffleProductsPage = () => {
   const [mediaWidth, setMediaWidth] = useState(0);
   const [editingRaffle, setEditingRaffle] = useState<RaffleFromApi | null>(null);
   const [editUseStaffApi, setEditUseStaffApi] = useState(false);
+  const [isRaffleMediaMuted, setIsRaffleMediaMuted] = useState(true);
 
   const swipeListRef = useRef<FlatList<RaffleFromApi>>(null);
   const activeRaffleIdRef = useRef(activeRaffleId);
@@ -186,6 +194,10 @@ export const RaffleProductsPage = () => {
   useEffect(() => {
     setActiveRaffleId(routeRaffleId);
   }, [routeRaffleId]);
+
+  useEffect(() => {
+    setIsRaffleMediaMuted(true);
+  }, [activeRaffleId]);
 
   useEffect(() => {
     activeRaffleIdRef.current = activeRaffleId;
@@ -387,23 +399,58 @@ export const RaffleProductsPage = () => {
 
   const description =
     typeof raffle?.description === "string" ? raffle.description.trim() : "";
+  const showRaffleVideoSoundToggle = useMemo(() => {
+    if (!raffle || !isRafflePrizeVideo(raffle)) {
+      return false;
+    }
+    return Boolean(resolveRafflePrizeVideoUrl(raffle));
+  }, [raffle]);
 
   const listHeader = (
-    <View style={styles.pageHeader}>
+    <>
       <View style={[styles.summaryLayout, isWide && styles.summaryLayoutWide]}>
         <View style={styles.hero}>
           <View
             style={[
               styles.media,
+              isWide && styles.mediaWide,
               { height: isWide ? L.mediaHeightWide : L.mediaHeight },
             ]}
             onLayout={handleMediaLayout}
           >
+            {hasCarousel && mediaWidth > 0 ? (
+              <FlatList
+                ref={swipeListRef}
+                style={styles.swipeOverlay}
+                data={carouselRaffles}
+                keyExtractor={(item) => String(item._id)}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                onMomentumScrollEnd={handleSwipeMomentumEnd}
+                getItemLayout={(_, index) => ({
+                  length: mediaWidth,
+                  offset: mediaWidth * index,
+                  index,
+                })}
+                renderItem={() => (
+                  <View
+                    style={{
+                      width: mediaWidth,
+                      height: isWide ? L.mediaHeightWide : L.mediaHeight,
+                    }}
+                  />
+                )}
+                {...nestedHorizontalScrollProps}
+              />
+            ) : null}
+
             {raffle ? (
               <View style={styles.mediaForeground} pointerEvents="box-none">
                 <RafflePrizeMedia
                   raffle={raffle}
-                  showSoundToggle
+                  isMuted={isRaffleMediaMuted}
+                  onMutedChange={setIsRaffleMediaMuted}
                   isVideoActive
                   contentFit="contain"
                   blurBackground
@@ -411,38 +458,19 @@ export const RaffleProductsPage = () => {
               </View>
             ) : null}
 
+            {showRaffleVideoSoundToggle ? (
+              <RafflePrizeMediaSoundToggle
+                isMuted={isRaffleMediaMuted}
+                onToggle={setIsRaffleMediaMuted}
+              />
+            ) : null}
+
             {hasCarousel && mediaWidth > 0 ? (
-              <>
-                <FlatList
-                  ref={swipeListRef}
-                  style={styles.swipeOverlay}
-                  data={carouselRaffles}
-                  keyExtractor={(item) => String(item._id)}
-                  horizontal
-                  pagingEnabled
-                  showsHorizontalScrollIndicator={false}
-                  onMomentumScrollEnd={handleSwipeMomentumEnd}
-                  getItemLayout={(_, index) => ({
-                    length: mediaWidth,
-                    offset: mediaWidth * index,
-                    index,
-                  })}
-                  renderItem={() => (
-                    <View
-                      style={{
-                        width: mediaWidth,
-                        height: isWide ? L.mediaHeightWide : L.mediaHeight,
-                      }}
-                    />
-                  )}
-                  {...nestedHorizontalScrollProps}
-                />
-                <RaffleProductsSwipeDots
-                  raffles={carouselRaffles}
-                  activeIndex={activeSwipeIndex}
-                  onSelect={handleSelectSwipeIndex}
-                />
-              </>
+              <RaffleProductsSwipeDots
+                raffles={carouselRaffles}
+                activeIndex={activeSwipeIndex}
+                onSelect={handleSelectSwipeIndex}
+              />
             ) : null}
           </View>
 
@@ -459,9 +487,13 @@ export const RaffleProductsPage = () => {
 
         {progressUi ? (
           <View style={[styles.summarySide, isWide && styles.summarySideWide]}>
-            <RaffleProductsProgressBlock progressUi={progressUi} raffle={raffle} />
+            <RaffleProductsProgressBlock
+              progressUi={progressUi}
+              raffle={raffle}
+              isWide={isWide}
+            />
             {isWide ? (
-              <View style={styles.headerCard}>
+              <View style={[styles.headerCard, styles.headerCardWide]}>
                 <RaffleProductsSummaryCopy
                   raffle={raffle}
                   showManage={false}
@@ -470,7 +502,9 @@ export const RaffleProductsPage = () => {
               </View>
             ) : null}
             {isWide && description ? (
-              <Text style={styles.description}>{description}</Text>
+              <Text style={[styles.description, styles.descriptionDesktop]}>
+                {description}
+              </Text>
             ) : null}
           </View>
         ) : null}
@@ -480,12 +514,14 @@ export const RaffleProductsPage = () => {
         <Text style={styles.description}>{description}</Text>
       ) : null}
 
-      {isWide && manageProps ? (
-        <View style={styles.manageDesktop}>
-          <RaffleManageActions {...manageProps} />
-        </View>
-      ) : null}
-    </View>
+      <View style={styles.productsBlock}>
+        {isWide && manageProps ? (
+          <View style={styles.manageDesktop}>
+            <RaffleManageActions {...manageProps} />
+          </View>
+        ) : null}
+      </View>
+    </>
   );
 
   if (!routeRaffleId) {
@@ -524,8 +560,11 @@ export const RaffleProductsPage = () => {
           numColumns={1}
           contentContainerStyle={[
             styles.list,
-            resolveCatalogGridListContentStyle(productGrid.gap),
-            { paddingBottom: contentPaddingBottom },
+            styles.listContent,
+            {
+              paddingHorizontal: contentPaddingHorizontal,
+              paddingBottom: contentPaddingBottom,
+            },
           ]}
           refreshControl={
             <ThemedRefreshControl
@@ -549,14 +588,16 @@ export const RaffleProductsPage = () => {
             ) : null
           }
           renderItem={({ item, index }) => (
-            <CatalogGridRowItem
-              row={item}
-              columns={productGrid.columns}
-              gap={productGrid.gap}
-              tileWidth={productGrid.tileWidth}
-              rowIndex={index}
-              highlightRaffleProduct
-            />
+            <View style={index > 0 ? { marginTop: productGrid.gap } : undefined}>
+              <CatalogGridRowItem
+                row={item}
+                columns={productGrid.columns}
+                gap={productGrid.gap}
+                tileWidth={productGrid.tileWidth}
+                rowIndex={index}
+                highlightRaffleProduct
+              />
+            </View>
           )}
         />
       </View>

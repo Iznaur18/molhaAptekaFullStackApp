@@ -1,6 +1,7 @@
 import { Platform, StyleSheet } from "react-native";
 
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { PRODUCT_DETAIL_OUT_OF_STOCK_BUTTON_LAYOUT as OOS_BTN } from "@/entities/product/lib/productDetailOutOfStockButtonLayout";
 import { semanticColors } from "@/shared/theme/semanticColors";
 
 export const PRODUCT_PHOTO_GRID_COLUMNS = 3;
@@ -233,6 +234,25 @@ export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
     color: theme.colors.onContrast,
     fontWeight: "600",
     fontSize: 16.3,
+  },
+  detailOutOfStockButton: {
+    marginTop: 0,
+    width: "100%",
+    minHeight: OOS_BTN.minHeight,
+    paddingVertical: OOS_BTN.paddingVertical,
+    paddingHorizontal: OOS_BTN.paddingHorizontal,
+    borderWidth: OOS_BTN.borderWidth,
+    borderColor: theme.colors.border,
+    borderRadius: OOS_BTN.borderRadius,
+    backgroundColor: theme.colors.surfaceMuted,
+    alignItems: "center",
+    justifyContent: "center",
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+  },
+  detailOutOfStockButtonText: {
+    color: theme.colors.textMuted,
+    fontWeight: OOS_BTN.fontWeight,
+    fontSize: OOS_BTN.fontSize,
   },
   detailDockLoginButton: {
     marginTop: 0,

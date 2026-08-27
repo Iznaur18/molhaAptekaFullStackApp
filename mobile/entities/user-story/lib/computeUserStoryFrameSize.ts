@@ -7,7 +7,7 @@ export const USER_STORY_FRAME_ASPECT_RATIO =
 
 export const CREATE_STORY_MODAL_HORIZONTAL_PADDING_PX = 40;
 export const CREATE_STORY_MODAL_PREVIEW_CHROME_RESERVE_PX = 320;
-export const CREATE_STORY_MODAL_MAX_HEIGHT_RATIO = 0.92;
+export const CREATE_STORY_MODAL_MAX_HEIGHT_RATIO = 0.8;
 /** Компактная миниатюра в форме опубликованного сторис (9:16), не full-bleed. */
 export const CREATE_STORY_MODAL_PREVIEW_MAX_HEIGHT_PX = 220;
 

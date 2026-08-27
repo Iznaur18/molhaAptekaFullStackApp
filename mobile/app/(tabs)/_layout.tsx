@@ -1,6 +1,5 @@
 import { Tabs } from "expo-router";
 
-import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import {
   CART_PAGE_UI,
   CATALOG_BROWSER_UI,
@@ -39,11 +38,7 @@ export default function TabLayout() {
           flex: 1,
           backgroundColor: theme.colors.bg,
         },
-        headerStyle: {
-          backgroundColor: theme.colors.surface,
-        },
-        headerTintColor: theme.colors.text,
-        headerShown: useClientOnlyValue(false, true),
+        headerShown: false,
       }}
     >
       <Tabs.Screen
@@ -103,6 +98,13 @@ export default function TabLayout() {
         name="me"
         options={{
           title: MY_PROFILE_PAGE_UI.TAB_TITLE,
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="raffle/[id]"
+        options={{
+          href: null,
           headerShown: false,
         }}
       />

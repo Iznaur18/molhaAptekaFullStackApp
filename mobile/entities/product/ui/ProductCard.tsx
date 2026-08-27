@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import { memo, useCallback, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
-import { formatProductReviewRatingLine } from "@/entities/product-review/lib/formatProductReviewRatingLine";
+import { ProductCardRatingRow } from "@/entities/product/ui/ProductCardRatingRow";
 import {
   canSellerEditProduct,
   getProductModerationBadgeLabel,
@@ -14,6 +14,7 @@ import { isCurrentUserProductSeller } from "@/entities/product/lib/isCurrentUser
 import { useProductCardImageTapActions } from "@/entities/product/lib/useProductCardImageTapActions";
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
+import { resolveProductCardCatalogGridTotalHeight } from "@/entities/product/lib/productCardMobileCatalogLayout";
 import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCardChromeFlags";
 import { resolveProductCardPromotionFrameStyle } from "@/entities/product/lib/resolveProductCardPromotionFrameStyle";
 import { resolveProductCardRaffleParticipantFrameStyle } from "@/entities/product/lib/resolveProductCardRaffleParticipantFrameStyle";
@@ -48,7 +49,6 @@ import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuer
 import {
   PRODUCT_MODERATION_PAGE_UI,
   PRODUCT_CARD_UI,
-  PRODUCT_REVIEW_UI,
   PRODUCT_UI,
 } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
@@ -68,6 +68,7 @@ type ProductCardProps = {
   };
   promotionFullWidth?: boolean;
   layout?: "default" | "catalog-grid";
+  catalogGridTileWidth?: number;
   highlightCatalogPromotion?: boolean;
   highlightRaffleProduct?: boolean;
   isMineMode?: boolean;
@@ -87,6 +88,7 @@ export const ProductCard = memo(
     product,
     promotionFullWidth = false,
     layout = "default",
+    catalogGridTileWidth,
     highlightCatalogPromotion = true,
     highlightRaffleProduct = false,
     isMineMode = false,
@@ -151,11 +153,6 @@ export const ProductCard = memo(
     }
 
     const name = product.productName?.trim() || "Без названия";
-    const reviewLine = formatProductReviewRatingLine(
-      product.averageRating,
-      product.reviewCount,
-    );
-    const hasReviewRating = reviewLine.length > 0;
     const openProductLabel = PRODUCT_UI.OPEN_ARIA(name);
 
     const gallerySlideCount = Math.max(cardMedia.mediaSlides.length, 1);
@@ -201,11 +198,17 @@ export const ProductCard = memo(
         typeof onDeleteProduct === "function");
     const isWishlisted = isInWishlist(product._id);
 
+    const catalogGridMinHeight =
+      isCatalogGrid && catalogGridTileWidth != null && catalogGridTileWidth > 0
+        ? resolveProductCardCatalogGridTotalHeight(catalogGridTileWidth)
+        : undefined;
+
     return (
       <View
         style={[
           styles.card,
           isCatalogGrid && styles.cardCatalogGrid,
+          catalogGridMinHeight != null ? { minHeight: catalogGridMinHeight } : null,
           isCatalogGrid && isModerationQueue && styles.cardCatalogGridModerationQueue,
           showOutOfStockOverlay && styles.cardOutOfStock,
           promotionFrameStyle,
@@ -286,7 +289,10 @@ export const ProductCard = memo(
 
         <View style={[styles.content, isCatalogGrid && styles.contentCatalogGrid]}>
           <Pressable
-            style={styles.contentPressable}
+            style={[
+              styles.contentPressable,
+              isCatalogGrid && styles.contentPressableCatalogGrid,
+            ]}
             onPress={handlePress}
             accessibilityRole="button"
             accessibilityLabel={openProductLabel}
@@ -298,7 +304,11 @@ export const ProductCard = memo(
               {name}
             </Text>
 
-            <ProductPriceDisplay product={product} showLabel={false} variant="card" />
+            <ProductPriceDisplay
+              product={product}
+              showLabel={false}
+              variant={isCatalogGrid ? "catalog-grid" : "card"}
+            />
 
             {isModerationQueue ? (
               <>
@@ -342,19 +352,11 @@ export const ProductCard = memo(
                   accessibilityLabel={openProductLabel}
                   importantForAccessibility="no-hide-descendants"
                 >
-                  <Text
-                    style={[
-                      styles.rating,
-                      isCatalogGrid && styles.ratingCatalogGrid,
-                      !hasReviewRating && styles.ratingPlaceholder,
-                    ]}
-                    numberOfLines={1}
-                    accessibilityLabel={
-                      hasReviewRating ? reviewLine : PRODUCT_REVIEW_UI.NO_REVIEWS
-                    }
-                  >
-                    {hasReviewRating ? reviewLine : PRODUCT_REVIEW_UI.NO_REVIEWS}
-                  </Text>
+                  <ProductCardRatingRow
+                    averageRating={product.averageRating}
+                    reviewCount={product.reviewCount}
+                    layout={isCatalogGrid ? "catalog-grid" : "default"}
+                  />
                 </Pressable>
 
                 <ProductCatalogStatusBadges
@@ -378,7 +380,10 @@ export const ProductCard = memo(
                     isMineMode ? PRODUCT_CARD_UI.PREVIEW_FIELDS_ARIA : undefined
                   }
                 >
-                  <ProductCardSellerRow product={product} />
+                  <ProductCardSellerRow
+                    product={product}
+                    layout={isCatalogGrid ? "catalog-grid" : "default"}
+                  />
                 </View>
 
                 {showModerationBadge ? (

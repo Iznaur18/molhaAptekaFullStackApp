@@ -25,8 +25,9 @@ test("faq screen is wired from header menu and stack route", () => {
   assert.match(button, /isFaqActive/);
   assert.match(button, /"faq"/);
   assert.match(route, /FaqScreen/);
+  assert.match(route, /ScreenWithBack/);
   assert.match(layout, /name="faq"/);
-  assert.match(layout, /FAQ_UI\.TITLE/);
+  assert.match(layout, /headerShown:\s*false/);
   assert.match(screen, /FAQ_SECTIONS/);
   assert.match(screen, /FaqAccordionItem/);
   assert.match(accordion, /accessibilityState=\{\{ expanded \}\}/);

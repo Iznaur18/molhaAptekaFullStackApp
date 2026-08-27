@@ -1,4 +1,8 @@
 import {
+  AUTH_CLIENT_HEADER,
+  AUTH_CLIENT_MOBILE,
+} from "../constants/authClientConstants.js";
+import {
   AUTH_COOKIE_NAME,
   REFRESH_COOKIE_NAME,
 } from "../constants/authCookieConstants.js";
@@ -21,9 +25,36 @@ function hasCookieAuthSession(req) {
 }
 
 /**
+ * @param {import('express').Request} req
+ */
+function resolveAuthClient(req) {
+  return String(req.get(AUTH_CLIENT_HEADER) ?? "")
+    .trim()
+    .toLowerCase();
+}
+
+/**
+ * RN/Expo часто шлёт cookie (withCredentials) без Origin или с exp://.
+ * Браузерный CSRF всегда даёт http(s) Origin — его по-прежнему режем allowlist'ом.
+ *
+ * @param {string | null} origin
+ */
+function isNonBrowserOrigin(origin) {
+  if (!origin || origin === "null") {
+    return true;
+  }
+  try {
+    const protocol = new URL(origin).protocol;
+    return protocol !== "http:" && protocol !== "https:";
+  } catch {
+    return true;
+  }
+}
+
+/**
  * CSRF для cookie-auth мутаций: Origin/Referer должен быть в FRONTEND_URL.
  * Non-prod: дополнительно loopback + private LAN (Vite с телефона по 192.168.x.x).
- * Bearer-only (mobile) — без cookie — пропускаем.
+ * Bearer mobile (`X-Auth-Client: mobile`) без browser Origin — пропускаем.
  *
  * @param {import('express').Request} req
  * @param {import('express').Response} res
@@ -52,7 +83,13 @@ export function csrfCookieOriginCheckMW(req, res, next) {
   }
 
   const requestOrigin = resolveRequestBrowserOrigin(req);
-  if (!requestOrigin) {
+  const authClient = resolveAuthClient(req);
+
+  if (authClient === AUTH_CLIENT_MOBILE && isNonBrowserOrigin(requestOrigin)) {
+    return next();
+  }
+
+  if (!requestOrigin || requestOrigin === "null") {
     return errorRes(res, 403, "Запрос отклонён (origin)");
   }
 

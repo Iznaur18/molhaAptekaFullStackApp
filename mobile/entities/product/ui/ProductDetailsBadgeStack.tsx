@@ -1,5 +1,11 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
+import type { ReactNode } from "react";
 
 import {
   buildProductDetailsBadgeItems,
@@ -9,6 +15,7 @@ import {
   PRODUCT_DETAILS_BADGE_SOFT_COLORS,
   PRODUCT_DETAILS_SOFT_BADGE_LAYOUT,
 } from "@/entities/product/lib/productDetailsBadgeSoftPalette";
+import { PRODUCT_DETAIL_TAB_BAR_LAYOUT } from "@/shared/lib/productDetailTabBarLayout";
 import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
 import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
@@ -18,6 +25,48 @@ import { AppText } from "@/shared/ui/AppText";
 type ProductDetailsBadgeStackProps = {
   product: Record<string, unknown>;
   onBadgePress?: (item: ProductDetailsBadgeItem) => void;
+};
+
+const BadgePressable = ({
+  children,
+  style,
+  accessibilityLabel,
+  onPress,
+}: {
+  children: ReactNode;
+  style: StyleProp<ViewStyle>;
+  accessibilityLabel: string;
+  onPress: () => void;
+}) => {
+  const scale = useSharedValue(1);
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <Animated.View style={animatedStyle}>
+      <Pressable
+        style={style}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
+        onPress={onPress}
+        onPressIn={() => {
+          scale.value = withSpring(PRODUCT_DETAIL_TAB_BAR_LAYOUT.pressScale, {
+            damping: PRODUCT_DETAIL_TAB_BAR_LAYOUT.springDamping,
+            stiffness: PRODUCT_DETAIL_TAB_BAR_LAYOUT.springStiffness,
+          });
+        }}
+        onPressOut={() => {
+          scale.value = withSpring(1, {
+            damping: PRODUCT_DETAIL_TAB_BAR_LAYOUT.springDamping,
+            stiffness: PRODUCT_DETAIL_TAB_BAR_LAYOUT.springStiffness,
+          });
+        }}
+      >
+        {children}
+      </Pressable>
+    </Animated.View>
+  );
 };
 
 const softBadgeChrome = {
@@ -34,6 +83,30 @@ const softBadgeText = {
   fontWeight: "800" as const,
 };
 
+const renderBadgeShell = ({
+  interactive,
+  style,
+  accessibilityLabel,
+  onPress,
+  children,
+}: {
+  interactive: boolean;
+  style: StyleProp<ViewStyle>;
+  accessibilityLabel: string;
+  onPress: () => void;
+  children: ReactNode;
+}) => {
+  if (!interactive) {
+    return <View style={style}>{children}</View>;
+  }
+
+  return (
+    <BadgePressable style={style} accessibilityLabel={accessibilityLabel} onPress={onPress}>
+      {children}
+    </BadgePressable>
+  );
+};
+
 const renderSoftTextBadge = ({
   item,
   tone,
@@ -45,25 +118,13 @@ const renderSoftTextBadge = ({
   interactive: boolean;
   onBadgePress?: (item: ProductDetailsBadgeItem) => void;
 }) => {
-  const Wrapper = interactive ? Pressable : View;
-  const wrapperProps = interactive
-    ? {
-        accessibilityRole: "button" as const,
-        onPress: () => onBadgePress?.(item),
-      }
-    : {};
-
-  return (
-    <Wrapper
-      key={item.key}
-      style={[softBadgeChrome, { backgroundColor: tone.backgroundColor }]}
-      accessibilityRole={interactive ? "button" : "text"}
-      accessibilityLabel={item.label}
-      {...wrapperProps}
-    >
-      <AppText style={[softBadgeText, { color: tone.color }]}>{item.label}</AppText>
-    </Wrapper>
-  );
+  return renderBadgeShell({
+    interactive,
+    style: [softBadgeChrome, { backgroundColor: tone.backgroundColor }],
+    accessibilityLabel: item.label,
+    onPress: () => onBadgePress?.(item),
+    children: <AppText style={[softBadgeText, { color: tone.color }]}>{item.label}</AppText>,
+  });
 };
 
 const renderBadge = ({
@@ -78,120 +139,151 @@ const renderBadge = ({
   onBadgePress?: (item: ProductDetailsBadgeItem) => void;
 }) => {
   const interactive = typeof onBadgePress === "function";
-  const Wrapper = interactive ? Pressable : View;
-  const wrapperProps = interactive
-    ? {
-        accessibilityRole: "button" as const,
-        onPress: () => onBadgePress?.(item),
-      }
-    : {};
 
   if (item.kind === "original") {
     return (
-      <Wrapper
-        key={item.key}
-        style={[
-          styles.metaInfoChip,
-          styles.metaInfoChipRow,
-          styles.metaInfoChipOriginal,
-          softBadgeChrome,
-        ]}
-        accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.ORIGINAL_BADGE_ARIA}
-        {...wrapperProps}
-      >
-        <MaterialIcons name="check-circle" size={14} color={theme.colors.success} />
-        <Text
-          style={[softBadgeText, styles.metaInfoChipOriginalText]}
-          numberOfLines={1}
-        >
-          {item.label}
-        </Text>
-      </Wrapper>
+      <View key={item.key}>
+        {renderBadgeShell({
+          interactive,
+          style: [
+            styles.metaInfoChip,
+            styles.metaInfoChipRow,
+            styles.metaInfoChipOriginal,
+            softBadgeChrome,
+          ],
+          accessibilityLabel: PRODUCT_DETAILS_MODAL_UI.ORIGINAL_BADGE_ARIA,
+          onPress: () => onBadgePress?.(item),
+          children: (
+            <>
+              <MaterialIcons name="check-circle" size={14} color={theme.colors.success} />
+              <Text
+                style={[softBadgeText, styles.metaInfoChipOriginalText]}
+                numberOfLines={1}
+              >
+                {item.label}
+              </Text>
+            </>
+          ),
+        })}
+      </View>
     );
   }
 
   if (item.kind === "raffle") {
-    return renderSoftTextBadge({
-      item,
-      tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.raffle,
-      interactive,
-      onBadgePress,
-    });
+    return (
+      <View key={item.key}>
+        {renderSoftTextBadge({
+          item,
+          tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.raffle,
+          interactive,
+          onBadgePress,
+        })}
+      </View>
+    );
   }
 
   if (item.kind === "affiliate") {
-    return renderSoftTextBadge({
-      item,
-      tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.affiliate,
-      interactive,
-      onBadgePress,
-    });
+    return (
+      <View key={item.key}>
+        {renderSoftTextBadge({
+          item,
+          tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.affiliate,
+          interactive,
+          onBadgePress,
+        })}
+      </View>
+    );
   }
 
   if (item.kind === "auction") {
-    return renderSoftTextBadge({
-      item,
-      tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.auction,
-      interactive,
-      onBadgePress,
-    });
+    return (
+      <View key={item.key}>
+        {renderSoftTextBadge({
+          item,
+          tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.auction,
+          interactive,
+          onBadgePress,
+        })}
+      </View>
+    );
   }
 
   if (item.kind === "installment") {
-    return renderSoftTextBadge({
-      item,
-      tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.installment,
-      interactive,
-      onBadgePress,
-    });
+    return (
+      <View key={item.key}>
+        {renderSoftTextBadge({
+          item,
+          tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.installment,
+          interactive,
+          onBadgePress,
+        })}
+      </View>
+    );
   }
 
   if (item.kind === "wholesale") {
-    return renderSoftTextBadge({
-      item,
-      tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.wholesale,
-      interactive,
-      onBadgePress,
-    });
+    return (
+      <View key={item.key}>
+        {renderSoftTextBadge({
+          item,
+          tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.wholesale,
+          interactive,
+          onBadgePress,
+        })}
+      </View>
+    );
   }
 
   if (item.kind === "rental") {
-    return renderSoftTextBadge({
-      item,
-      tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.rental,
-      interactive,
-      onBadgePress,
-    });
+    return (
+      <View key={item.key}>
+        {renderSoftTextBadge({
+          item,
+          tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.rental,
+          interactive,
+          onBadgePress,
+        })}
+      </View>
+    );
   }
 
   if (item.kind === "nearDistance") {
-    return renderSoftTextBadge({
-      item,
-      tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.nearDistance,
-      interactive,
-      onBadgePress,
-    });
+    return (
+      <View key={item.key}>
+        {renderSoftTextBadge({
+          item,
+          tone: PRODUCT_DETAILS_BADGE_SOFT_COLORS.nearDistance,
+          interactive,
+          onBadgePress,
+        })}
+      </View>
+    );
   }
 
   if (item.kind === "listingOrigin") {
     const tone = PRODUCT_DETAILS_BADGE_SOFT_COLORS.listingOrigin;
     return (
-      <Wrapper
-        key={item.key}
-        style={[
-          styles.metaInfoChip,
-          styles.metaInfoChipRow,
-          softBadgeChrome,
-          { backgroundColor: tone.backgroundColor },
-        ]}
-        accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.LISTING_ORIGIN_SLOT_ARIA}
-        {...wrapperProps}
-      >
-        <MaterialIcons name={item.iconName} size={14} color={tone.color} />
-        <Text style={[softBadgeText, { color: tone.color }]} numberOfLines={1}>
-          {item.label}
-        </Text>
-      </Wrapper>
+      <View key={item.key}>
+        {renderBadgeShell({
+          interactive,
+          style: [
+            styles.metaInfoChip,
+            styles.metaInfoChipRow,
+            softBadgeChrome,
+            { backgroundColor: tone.backgroundColor },
+          ],
+          accessibilityLabel: PRODUCT_DETAILS_MODAL_UI.LISTING_ORIGIN_SLOT_ARIA,
+          onPress: () => onBadgePress?.(item),
+          children: (
+            <>
+              <MaterialIcons name={item.iconName} size={14} color={tone.color} />
+              <Text style={[softBadgeText, { color: tone.color }]} numberOfLines={1}>
+                {item.label}
+              </Text>
+            </>
+          ),
+        })}
+      </View>
     );
   }
 
@@ -205,22 +297,27 @@ const renderBadge = ({
       : { backgroundColor: undefined, color: undefined };
 
   return (
-    <Wrapper
-      key={item.key}
-      style={[
-        styles.metaInfoChip,
-        styles.metaInfoChipRow,
-        softBadgeChrome,
-        { backgroundColor: tone.backgroundColor },
-      ]}
-      accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.PRICE_MARKET_STATUS_SLOT_ARIA}
-      {...wrapperProps}
-    >
-      <MaterialIcons name="sell" size={14} color={tone.color} />
-      <Text style={[softBadgeText, { color: tone.color }]} numberOfLines={1}>
-        {item.label}
-      </Text>
-    </Wrapper>
+    <View key={item.key}>
+      {renderBadgeShell({
+        interactive,
+        style: [
+          styles.metaInfoChip,
+          styles.metaInfoChipRow,
+          softBadgeChrome,
+          { backgroundColor: tone.backgroundColor },
+        ],
+        accessibilityLabel: PRODUCT_DETAILS_MODAL_UI.PRICE_MARKET_STATUS_SLOT_ARIA,
+        onPress: () => onBadgePress?.(item),
+        children: (
+          <>
+            <MaterialIcons name="sell" size={14} color={tone.color} />
+            <Text style={[softBadgeText, { color: tone.color }]} numberOfLines={1}>
+              {item.label}
+            </Text>
+          </>
+        ),
+      })}
+    </View>
   );
 };
 

@@ -13,15 +13,15 @@ import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { filterRuRegionsByQuery } from "@/entities/region/lib/filterRuRegionsByQuery";
+import { useViewerRegionPickerSheetAnimation } from "@/entities/region/model/useViewerRegionPickerSheetAnimation";
+import { VIEWER_REGION_PICKER_SHEET_ANIMATION } from "@/entities/region/lib/viewerRegionPickerSheetAnimation";
 import { REGION_UI } from "@/shared/config";
-import { useAdminEditModalAnimation } from "@/shared/model/useAdminEditModalAnimation";
 import { useRegisterBlockingOverlay } from "@/shared/lib/useBlockingOverlayOccupancy";
-import { CREATE_STORY_MODAL_ANIMATION } from "@/shared/theme/modalChromeStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { SquircleView } from "@/shared/ui/SquircleView";
 
 /** Паритет web `--viewer-region-sheet-height: min(92svh, 36rem)`. */
-const SHEET_MAX_HEIGHT_PX = 576;
+const SHEET_MAX_HEIGHT_PX = VIEWER_REGION_PICKER_SHEET_ANIMATION.maxHeightPx;
 /** Паритет web `@media (min-width: 641px) max-width: min(26rem, 100%)`. */
 const SHEET_DESKTOP_BREAKPOINT_PX = 641;
 const SHEET_DESKTOP_MAX_WIDTH_PX = 416;
@@ -59,6 +59,12 @@ const useRuRegionPickerSheetStyles = createThemedStyles((theme) => ({
   },
   sheetShell: {
     width: "100%",
+    // Выше absoluteFill backdrop — иначе scrim перехватывает тапы по списку.
+    zIndex: 1,
+  },
+  /** Outer SquircleView (shadow) должен иметь bounded height — иначе flex:1 внутри = 0. */
+  sheetFill: {
+    flex: 1,
   },
   sheet: {
     flex: 1,
@@ -153,7 +159,10 @@ const resolveSheetMaxWidth = (windowWidth: number): number => {
 };
 
 const resolveSheetHeight = (windowHeight: number): number =>
-  Math.min(Math.round(windowHeight * CREATE_STORY_MODAL_ANIMATION.maxHeightRatio), SHEET_MAX_HEIGHT_PX);
+  Math.min(
+    Math.round(windowHeight * VIEWER_REGION_PICKER_SHEET_ANIMATION.maxHeightRatio),
+    SHEET_MAX_HEIGHT_PX,
+  );
 
 export function RuRegionPickerSheet({
   open,
@@ -166,12 +175,8 @@ export function RuRegionPickerSheet({
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const sheetHeight = resolveSheetHeight(windowHeight);
   const sheetMaxWidth = resolveSheetMaxWidth(windowWidth);
-  const { modalVisible, backdropAnimatedStyle, sheetAnimatedStyle } =
-    useAdminEditModalAnimation(open, {
-      sheetSlideDistance: sheetHeight,
-      enterMs: CREATE_STORY_MODAL_ANIMATION.enterMs,
-      exitMs: CREATE_STORY_MODAL_ANIMATION.exitMs,
-    });
+  const { modalVisible, backdropAnimatedStyle, sheetAnimatedStyle, useCssTransition } =
+    useViewerRegionPickerSheetAnimation(open, sheetHeight);
   useRegisterBlockingOverlay(modalVisible);
   const [query, setQuery] = useState("");
 
@@ -211,6 +216,9 @@ export function RuRegionPickerSheet({
     return null;
   }
 
+  const BackdropContainer = useCssTransition ? View : Animated.View;
+  const SheetContainer = useCssTransition ? View : Animated.View;
+
   return (
     <Modal
       visible={modalVisible}
@@ -220,21 +228,22 @@ export function RuRegionPickerSheet({
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        <Animated.View style={[styles.backdrop, backdropAnimatedStyle]} pointerEvents="box-none">
+        <BackdropContainer style={[styles.backdrop, backdropAnimatedStyle]} pointerEvents="box-none">
           <Pressable
             style={styles.backdropPressable}
             onPress={onClose}
             accessibilityRole="button"
             accessibilityLabel={REGION_UI.SHEET_CLOSE}
           />
-        </Animated.View>
+        </BackdropContainer>
 
-        <Animated.View
+        <SheetContainer
           style={[
             styles.sheetShell,
             { maxWidth: sheetMaxWidth, height: sheetHeight },
             sheetAnimatedStyle,
           ]}
+          pointerEvents="box-none"
         >
           <SquircleView
             cornerRadii={{
@@ -244,6 +253,7 @@ export function RuRegionPickerSheet({
               bottomRight: 0,
             }}
             style={styles.sheet}
+            outerStyle={styles.sheetFill}
             shadowStyle={styles.sheetShadow}
             // RN не знает роль "dialog" — модальность отдаём через флаг.
             accessibilityViewIsModal
@@ -277,7 +287,7 @@ export function RuRegionPickerSheet({
               ListEmptyComponent={<Text style={styles.empty}>{REGION_UI.SEARCH_EMPTY}</Text>}
             />
           </SquircleView>
-        </Animated.View>
+        </SheetContainer>
       </View>
     </Modal>
   );

@@ -6,8 +6,9 @@ import { ProductMediaGallery } from "@/entities/product/ui/ProductMediaGallery";
 import { ProductShareLinkButton } from "@/entities/product/ui/ProductShareLinkButton";
 import { WishlistToggleButton } from "@/features/wishlist-toggle/ui/WishlistToggleButton";
 import { PRODUCT_REPORT_UI } from "@/shared/config";
+import { PRODUCT_DETAIL_HERO_CHROME } from "@/shared/lib/productDetailHeroChromeLayout";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
-import { semanticColors } from "@/shared/theme/semanticColors";
 
 type ProductDetailMediaHeroProps = {
   product: Record<string, unknown>;
@@ -29,6 +30,7 @@ export const ProductDetailMediaHero = ({
   reportDisabled,
 }: ProductDetailMediaHeroProps) => {
   const router = useRouter();
+  const theme = useAppTheme();
   const styles = useProductDetailScreenStyles();
 
   return (
@@ -55,7 +57,11 @@ export const ProductDetailMediaHero = ({
                   : PRODUCT_REPORT_UI.REPORT_BUTTON
               }
             >
-              <MaterialIcons name="flag" size={20} color={semanticColors.danger} />
+              <MaterialIcons
+                name="flag"
+                size={PRODUCT_DETAIL_HERO_CHROME.iconSize}
+                color={theme.colors.text}
+              />
             </Pressable>
           ) : null}
           <ProductShareLinkButton product={product} />

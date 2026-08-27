@@ -81,6 +81,22 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     ...StyleSheet.absoluteFillObject,
     transform: [{ scale: 1.16 }],
   },
+  mediaBlurBgWrap: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: "hidden",
+  },
+  mediaBlurBgVideo: {
+    ...StyleSheet.absoluteFillObject,
+    transform: [{ scale: 1.16 }],
+    ...(Platform.OS === "web"
+      ? ({
+          filter: "blur(28px) saturate(1.05)",
+        } as object)
+      : null),
+  },
+  mediaBlurOverlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
   mediaFg: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 1,
@@ -101,6 +117,11 @@ export const useRaffleFeaturedBannerStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgba(17, 17, 17, 0.55)",
+  },
+  /** Поверх swipe-overlay на RaffleProductsPage (паритет web z-index). */
+  soundButtonOverlay: {
+    zIndex: 10,
+    elevation: 10,
   },
   visualTopBar: {
     position: "absolute",
