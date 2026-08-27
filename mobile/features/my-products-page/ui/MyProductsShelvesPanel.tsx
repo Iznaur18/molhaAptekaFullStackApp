@@ -14,10 +14,16 @@ import {
   View,
 } from "react-native";
 
+import {
+  SELLER_SHELF_MAX_PER_SELLER,
+  SELLER_SHELF_NAME_MAX_CHARS,
+} from "@molha/api-contract";
+
 import { fetchMyProductsPage } from "@/entities/product/api/fetchMyProductsPage";
 import {
   createSellerShelf,
   deleteSellerShelf,
+  patchSellerShelf,
   reorderSellerShelves,
   setSellerShelfProducts,
 } from "@/entities/seller-shelf/api/sellerShelfApi";
@@ -131,6 +137,8 @@ export const MyProductsShelvesPanel = () => {
   const [assignShelfId, setAssignShelfId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isExpanded, setIsExpanded] = useState(false);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState("");
 
   const shelvesQuery = useQuery({
     queryKey: sellerShelfQueryKeys.mine(),
@@ -143,6 +151,9 @@ export const MyProductsShelvesPanel = () => {
   });
 
   const shelves = shelvesQuery.data?.shelves ?? [];
+  // Лимиты приходят с сервера — зашивать 10 и 30 в экран нельзя.
+  const nameMaxChars = shelvesQuery.data?.nameMaxChars ?? SELLER_SHELF_NAME_MAX_CHARS;
+  const atLimit = shelves.length >= (shelvesQuery.data?.maxShelves ?? SELLER_SHELF_MAX_PER_SELLER);
   const assignShelf = useMemo(
     () => shelves.find((s) => s._id === assignShelfId) ?? null,
     [assignShelfId, shelves],
@@ -177,6 +188,22 @@ export const MyProductsShelvesPanel = () => {
     },
     onError: (error) => {
       Alert.alert("Ошибка", error instanceof Error ? error.message : "Ошибка");
+    },
+  });
+
+  const patchMutation = useMutation({
+    mutationFn: (input: { shelfId: string; name: string }) =>
+      patchSellerShelf(input.shelfId, { name: input.name }),
+    onSuccess: () => {
+      setRenamingId(null);
+      setRenameValue("");
+      invalidate();
+    },
+    onError: (error) => {
+      Alert.alert(
+        "Ошибка",
+        error instanceof Error ? error.message : SELLER_SHELF_UI.LOAD_ERROR,
+      );
     },
   });
 
@@ -250,26 +277,93 @@ export const MyProductsShelvesPanel = () => {
               onChangeText={setName}
               placeholder={SELLER_SHELF_UI.CREATE_PLACEHOLDER}
               placeholderTextColor={theme.colors.textMuted}
-              maxLength={30}
+              maxLength={nameMaxChars}
             />
             <Pressable
               style={styles.btn}
-              disabled={!name.trim() || createMutation.isPending || shelves.length >= 10}
+              disabled={!name.trim() || createMutation.isPending || atLimit}
               onPress={() => createMutation.mutate()}
             >
-              <Text style={styles.btnText}>{SELLER_SHELF_UI.CREATE}</Text>
+              <Text style={styles.btnText}>
+                {createMutation.isPending
+                  ? SELLER_SHELF_UI.CREATE_PENDING
+                  : SELLER_SHELF_UI.CREATE}
+              </Text>
             </Pressable>
           </View>
-          {shelvesQuery.isLoading ? <ActivityIndicator /> : null}
-          {shelves.length === 0 && !shelvesQuery.isLoading ? (
+          {atLimit ? (
+            <Text style={styles.muted}>{SELLER_SHELF_UI.LIMIT_REACHED}</Text>
+          ) : null}
+          {shelvesQuery.isLoading ? (
+            <View style={styles.row}>
+              <ActivityIndicator />
+              <Text style={styles.muted}>{SELLER_SHELF_UI.LOADING}</Text>
+            </View>
+          ) : null}
+          {shelvesQuery.isError ? (
+            <Text
+              accessibilityRole="alert"
+              style={[styles.muted, { color: theme.colors.danger }]}
+            >
+              {shelvesQuery.error instanceof Error
+                ? shelvesQuery.error.message
+                : SELLER_SHELF_UI.LOAD_ERROR}
+            </Text>
+          ) : null}
+          {shelves.length === 0 && !shelvesQuery.isLoading && !shelvesQuery.isError ? (
             <Text style={styles.muted}>{SELLER_SHELF_UI.EMPTY}</Text>
           ) : null}
-          {shelves.map((shelf, index) => (
+          {shelves.map((shelf, index) =>
+            renamingId === shelf._id ? (
+              <View key={shelf._id} style={styles.item}>
+                <View style={styles.row}>
+                  <TextInput
+                    style={styles.input}
+                    value={renameValue}
+                    onChangeText={setRenameValue}
+                    maxLength={nameMaxChars}
+                    autoFocus
+                    placeholder={SELLER_SHELF_UI.CREATE_PLACEHOLDER}
+                    placeholderTextColor={theme.colors.textMuted}
+                  />
+                  <Pressable
+                    style={styles.btn}
+                    disabled={!renameValue.trim() || patchMutation.isPending}
+                    onPress={() =>
+                      patchMutation.mutate({
+                        shelfId: shelf._id,
+                        name: renameValue.trim(),
+                      })
+                    }
+                  >
+                    <Text style={styles.btnText}>{SELLER_SHELF_UI.SAVE_NAME}</Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.ghostBtn}
+                    onPress={() => {
+                      setRenamingId(null);
+                      setRenameValue("");
+                    }}
+                  >
+                    <Text style={styles.ghostText}>{SELLER_SHELF_UI.CANCEL_RENAME}</Text>
+                  </Pressable>
+                </View>
+              </View>
+            ) : (
             <View key={shelf._id} style={styles.item}>
               <Text style={styles.itemName}>
-                {shelf.name} · {shelf.productCount}
+                {shelf.name} · {SELLER_SHELF_UI.PRODUCT_COUNT(shelf.productCount)}
               </Text>
               <View style={styles.row}>
+                <Pressable
+                  style={styles.ghostBtn}
+                  onPress={() => {
+                    setRenamingId(shelf._id);
+                    setRenameValue(shelf.name);
+                  }}
+                >
+                  <Text style={styles.ghostText}>{SELLER_SHELF_UI.RENAME}</Text>
+                </Pressable>
                 <Pressable style={styles.ghostBtn} onPress={() => setAssignShelfId(shelf._id)}>
                   <Text style={styles.ghostText}>{SELLER_SHELF_UI.ASSIGN}</Text>
                 </Pressable>
@@ -306,7 +400,8 @@ export const MyProductsShelvesPanel = () => {
                 </Pressable>
               </View>
             </View>
-          ))}
+            ),
+          )}
         </View>
       ) : null}
 
@@ -317,6 +412,9 @@ export const MyProductsShelvesPanel = () => {
           </Text>
           <ScrollView>
             {productsQuery.isLoading ? <ActivityIndicator /> : null}
+            {!productsQuery.isLoading && (productsQuery.data ?? []).length === 0 ? (
+              <Text style={styles.muted}>{SELLER_SHELF_UI.ASSIGN_EMPTY}</Text>
+            ) : null}
             {(productsQuery.data ?? []).map((product) => {
               const id = String(product._id);
               const checked = selectedIds.has(id);
@@ -346,7 +444,11 @@ export const MyProductsShelvesPanel = () => {
             disabled={assignMutation.isPending}
             onPress={() => assignMutation.mutate()}
           >
-            <Text style={styles.btnText}>{SELLER_SHELF_UI.ASSIGN_SAVE}</Text>
+            <Text style={styles.btnText}>
+              {assignMutation.isPending
+                ? SELLER_SHELF_UI.ASSIGN_PENDING
+                : SELLER_SHELF_UI.ASSIGN_SAVE}
+            </Text>
           </Pressable>
           <Pressable style={styles.ghostBtn} onPress={() => setAssignShelfId(null)}>
             <Text style={styles.ghostText}>Закрыть</Text>
