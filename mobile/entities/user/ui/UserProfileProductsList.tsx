@@ -18,6 +18,7 @@ type UserProfileProductsListProps = {
   heading?: string;
   layout?: UserProfileThumbSectionLayout;
   currentProductId?: string;
+  isSelf?: boolean;
 };
 
 export const UserProfileProductsList = ({
@@ -27,6 +28,7 @@ export const UserProfileProductsList = ({
   heading = USER_PROFILE_PRODUCTS_UI.HEADING,
   layout = "profile-scroll",
   currentProductId = "",
+  isSelf = false,
 }: UserProfileProductsListProps) => {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -91,6 +93,8 @@ export const UserProfileProductsList = ({
       onHeadingPress={onViewAllProducts}
       viewAllLabel={USER_PROFILE_PRODUCTS_UI.VIEW_ALL}
       onViewAllPress={onViewAllProducts}
+      isSelf={isSelf}
+      applySellerProductGates
     />
   );
 };

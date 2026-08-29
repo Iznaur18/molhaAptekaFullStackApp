@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { useAuthSession } from "../../../user/model/useAuthSession.js";
+import { isProfileProductThumbUnavailable } from "../../../user/lib/resolveProfileProductThumbState.js";
 import { useUserProfileProductsAllPagesQuery } from "../../../user/model/useUserProfileProductsAllPagesQuery.js";
 import { resolveProductImageUrl } from "../../lib/resolveProductImageUrl.js";
 import { navigateToProductDetails } from "../../lib/navigateToProductDetails.js";
@@ -23,6 +25,9 @@ const THUMB_SIZE_PX = 64;
  */
 export function ProductDetailsSellerProductsCarousel({ sellerId, excludeProductId = "" }) {
   const navigate = useNavigate();
+  const { currentUserId } = useAuthSession();
+  const isSelf =
+    currentUserId != null && String(currentUserId) === String(sellerId).trim();
   const productsQuery = useUserProfileProductsAllPagesQuery({
     userId: sellerId,
     enabled: sellerId.trim().length > 0,
@@ -64,7 +69,7 @@ export function ProductDetailsSellerProductsCarousel({ sellerId, excludeProductI
             const isCurrent =
               currentProductId.length > 0 &&
               String(item.productId) === currentProductId;
-            const isUnavailable = !item.viewable || item.product == null;
+            const isUnavailable = isProfileProductThumbUnavailable(item, { isSelf });
 
             return (
               <li key={item.productId} className="product-details-seller-products-carousel__item">

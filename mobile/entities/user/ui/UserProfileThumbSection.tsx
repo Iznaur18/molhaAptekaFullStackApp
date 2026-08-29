@@ -8,6 +8,7 @@ import {
 } from "react-native";
 
 import { getUserProfileThumbSrc } from "@/entities/user/lib/getUserProfileThumbSrc";
+import { isProfileProductThumbUnavailable } from "@/entities/user/lib/resolveProfileProductThumbState";
 import type { UserProfileThumbItem } from "@/entities/user/model/userProfileThumbTypes";
 import { isReactNativeWeb } from "@/shared/lib/isReactNativeWeb";
 import {
@@ -107,6 +108,8 @@ type UserProfileThumbGridProps = {
   columnsPerRow: number;
   unavailableHint?: string;
   onItemPress: (item: UserProfileThumbItem) => void;
+  isSelf?: boolean;
+  applySellerProductGates?: boolean;
 };
 
 export const UserProfileThumbGrid = ({
@@ -114,6 +117,8 @@ export const UserProfileThumbGrid = ({
   columnsPerRow,
   unavailableHint = "",
   onItemPress,
+  isSelf = false,
+  applySellerProductGates = false,
 }: UserProfileThumbGridProps) => {
   const styles = useUserProfileThumbListStyles();
   const [failedThumbIds, setFailedThumbIds] = useState<Set<string>>(() => new Set());
@@ -147,7 +152,9 @@ export const UserProfileThumbGrid = ({
               style={[styles.gridRow, isPartialRow && styles.gridRowPartial]}
             >
               {rowItems.map((item) => {
-                const isUnavailable = !item.viewable || item.product == null;
+                const isUnavailable = applySellerProductGates
+                  ? isProfileProductThumbUnavailable(item, { isSelf })
+                  : !item.viewable || item.product == null;
                 const thumbSrc = failedThumbIds.has(item.productId)
                   ? null
                   : getUserProfileThumbSrc(item.product);
@@ -181,6 +188,8 @@ type UserProfileThumbScrollRowProps = {
   currentProductId?: string;
   unavailableHint?: string;
   onItemPress: (item: UserProfileThumbItem) => void;
+  isSelf?: boolean;
+  applySellerProductGates?: boolean;
 };
 
 export const UserProfileThumbScrollRow = ({
@@ -188,6 +197,8 @@ export const UserProfileThumbScrollRow = ({
   currentProductId = "",
   unavailableHint = "",
   onItemPress,
+  isSelf = false,
+  applySellerProductGates = false,
 }: UserProfileThumbScrollRowProps) => {
   const styles = useUserProfileThumbListStyles();
   const [failedThumbIds, setFailedThumbIds] = useState<Set<string>>(() => new Set());
@@ -208,7 +219,9 @@ export const UserProfileThumbScrollRow = ({
   }
 
   const thumbItems = items.map((item) => {
-    const isUnavailable = !item.viewable || item.product == null;
+    const isUnavailable = applySellerProductGates
+      ? isProfileProductThumbUnavailable(item, { isSelf })
+      : !item.viewable || item.product == null;
     const isCurrent = currentProductId.length > 0 && String(item.productId) === currentProductId;
     const thumbSrc = failedThumbIds.has(item.productId)
       ? null
@@ -260,6 +273,8 @@ type UserProfileThumbSectionProps = {
   onViewAllPress?: () => void;
   layout?: UserProfileThumbSectionLayout;
   currentProductId?: string;
+  isSelf?: boolean;
+  applySellerProductGates?: boolean;
 };
 
 export const UserProfileThumbSection = ({
@@ -276,6 +291,8 @@ export const UserProfileThumbSection = ({
   onViewAllPress,
   layout = "grid",
   currentProductId = "",
+  isSelf = false,
+  applySellerProductGates = false,
 }: UserProfileThumbSectionProps) => {
   const styles = useUserProfileThumbListStyles();
   const [unavailableHint, setUnavailableHint] = useState("");
@@ -286,12 +303,19 @@ export const UserProfileThumbSection = ({
   const showViewAll = typeof onViewAllPress === "function" && phase === "success" && items.length > 0;
 
   const handleItemPress = (item: UserProfileThumbItem) => {
-    if (item.viewable && item.product != null) {
-      setUnavailableHint("");
-      onItemPress(item);
+    const isUnavailable = applySellerProductGates
+      ? isProfileProductThumbUnavailable(item, { isSelf })
+      : !item.viewable || item.product == null;
+
+    if (isUnavailable) {
+      if (!applySellerProductGates) {
+        setUnavailableHint(unavailableText);
+      }
       return;
     }
-    setUnavailableHint(unavailableText);
+
+    setUnavailableHint("");
+    onItemPress(item);
   };
 
   const handleBodyLayout = (event: LayoutChangeEvent) => {
@@ -351,6 +375,8 @@ export const UserProfileThumbSection = ({
             currentProductId={currentProductId}
             unavailableHint={unavailableHint}
             onItemPress={handleItemPress}
+            isSelf={isSelf}
+            applySellerProductGates={applySellerProductGates}
           />
         ) : (
           <UserProfileThumbGrid
@@ -358,6 +384,8 @@ export const UserProfileThumbSection = ({
             columnsPerRow={columnsPerRow}
             unavailableHint={unavailableHint}
             onItemPress={handleItemPress}
+            isSelf={isSelf}
+            applySellerProductGates={applySellerProductGates}
           />
         )}
 

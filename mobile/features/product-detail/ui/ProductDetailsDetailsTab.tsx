@@ -224,6 +224,7 @@ export const ProductDetailsDetailsTab = ({
           heading={SELLER_PRODUCTS_PAGE_UI.TITLE}
           layout="horizontal"
           currentProductId={productId}
+          isSelf={isOwnProduct}
         />
       ) : null}
       {featureCardsBlock}

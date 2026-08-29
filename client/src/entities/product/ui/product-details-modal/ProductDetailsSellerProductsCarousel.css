@@ -83,8 +83,14 @@
 }
 
 .product-details-seller-products-carousel__thumb-btn--unavailable {
-  opacity: 0.72;
+  opacity: 1;
   cursor: default;
+}
+
+.product-details-seller-products-carousel__thumb-btn--unavailable
+  .product-details-seller-products-carousel__thumb {
+  opacity: 0.55;
+  filter: grayscale(1);
 }
 
 .product-details-seller-products-carousel__thumb {

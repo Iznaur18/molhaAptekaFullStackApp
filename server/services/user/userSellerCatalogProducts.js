@@ -5,6 +5,7 @@ import { PRODUCT_SORT_NEWEST } from "../../constants/productCatalogSort.js";
 import { countProducts, findProductsPage } from "../product/productCatalogQuery.js";
 import { attachProductSellerClosedState } from "../product/attachProductSellerClosedState.js";
 import { isProductViewableForProfile } from "../product/isProductViewableForProfile.js";
+import { isUserBlockedBy } from "./userBlockHelpers.js";
 
 const { ObjectId } = mongoose.Types;
 
@@ -66,8 +67,19 @@ export const getSellerCatalogProductsPage = async (sellerId, page, limit, opts =
     opts.viewerUserId ?? null,
   );
 
+  const sellerIdStr = String(sellerId);
+  const viewerUserId =
+    opts.viewerUserId != null ? String(opts.viewerUserId) : "";
+  const isBlockedBySeller =
+    viewerUserId.length > 0 &&
+    viewerUserId !== sellerIdStr &&
+    (await isUserBlockedBy(sellerIdStr, viewerUserId));
+
   const items = productsWithClosedState.map((product) =>
-    mapProductToProfileThumbItem(product),
+    mapProductToProfileThumbItem({
+      ...product,
+      isBlockedBySeller,
+    }),
   );
   const totalPages = Math.ceil(total / limit) || 0;
 

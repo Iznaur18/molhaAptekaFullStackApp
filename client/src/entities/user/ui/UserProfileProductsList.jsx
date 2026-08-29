@@ -4,6 +4,7 @@ import { ChevronRight } from "lucide-react";
 import { useUserProfileProductsAllPagesQuery } from "../model/useUserProfileProductsAllPagesQuery.js";
 import { resolveProductImageUrls } from "../../product/lib/resolveProductImageUrls.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../product/model/productConstants.js";
+import { isProfileProductThumbUnavailable } from "../lib/resolveProfileProductThumbState.js";
 import {
   API_CLIENT_UI,
   USER_PROFILE_PRODUCTS_UI,
@@ -32,26 +33,26 @@ function getThumbSrc(item) {
  *     product: import('../../product/model/types.js').ProductFromApi,
  *   ) => void;
  *   onViewAllProducts?: () => void;
+ *   isSelf?: boolean;
  * }} props
  */
 export function UserProfileProductsList({
   targetUserId,
   onProductClick,
   onViewAllProducts,
+  isSelf = false,
 }) {
   const productsQuery = useUserProfileProductsAllPagesQuery({
     userId: targetUserId,
     enabled: true,
   });
   const [error, setError] = useState("");
-  const [unavailableHint, setUnavailableHint] = useState("");
   const [failedThumbIds, setFailedThumbIds] = useState(
     /** @type {Set<string>} */ () => new Set(),
   );
 
   useEffect(() => {
     setError("");
-    setUnavailableHint("");
     setFailedThumbIds(new Set());
   }, [targetUserId]);
 
@@ -81,16 +82,15 @@ export function UserProfileProductsList({
 
   /** @param {import('../model/userProfileProductThumbTypes.js').UserProfileProductThumbItem} item */
   const handleItemClick = (item) => {
-    if (item.viewable && item.product != null) {
-      setUnavailableHint("");
-      onProductClick?.(
-        /** @type {import('../../product/model/types.js').ProductFromApi} */ (
-          item.product
-        ),
-      );
+    if (isProfileProductThumbUnavailable(item, { isSelf })) {
       return;
     }
-    setUnavailableHint(USER_PROFILE_PRODUCTS_UI.UNAVAILABLE);
+
+    onProductClick?.(
+      /** @type {import('../../product/model/types.js').ProductFromApi} */ (
+        item.product
+      ),
+    );
   };
 
   /** @param {string} productId */
@@ -152,7 +152,7 @@ export function UserProfileProductsList({
         {items.length > 0 ? (
           <ul className="user-profile-purchases__list" role="list">
             {items.map((item) => {
-              const isUnavailable = !item.viewable || item.product == null;
+              const isUnavailable = isProfileProductThumbUnavailable(item, { isSelf });
               const thumbSrc = failedThumbIds.has(item.productId)
                 ? PRODUCT_IMAGE_PLACEHOLDER_URL
                 : getThumbSrc(item);
@@ -170,6 +170,7 @@ export function UserProfileProductsList({
                       .filter(Boolean)
                       .join(" ")}
                     onClick={() => handleItemClick(item)}
+                    disabled={isUnavailable}
                     aria-label={item.productName}
                     title={item.productName}
                   >
@@ -195,11 +196,6 @@ export function UserProfileProductsList({
             role="alert"
           >
             {displayError}
-          </p>
-        ) : null}
-        {unavailableHint ? (
-          <p className="user-profile-purchases__hint" role="status">
-            {unavailableHint}
           </p>
         ) : null}
       </div>

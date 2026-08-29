@@ -165,8 +165,13 @@
   border: 1px solid var(--iz-color-border);
 }
 
+.user-profile-purchases__row_unavailable {
+  cursor: default;
+}
+
 .user-profile-purchases__row_unavailable .user-profile-purchases__thumb {
-  opacity: 0.72;
+  opacity: 0.55;
+  filter: grayscale(1);
 }
 
 .user-profile-purchases__hint {
