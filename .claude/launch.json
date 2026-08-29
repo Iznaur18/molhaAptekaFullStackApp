@@ -4,7 +4,10 @@
     {
       "name": "Backend (Express + nodemon)",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "start:dev"],
+      "runtimeArgs": [
+        "run",
+        "start:dev"
+      ],
       "cwd": "server",
       "port": 4444,
       "autoPort": false
@@ -12,7 +15,10 @@
     {
       "name": "Client (Vite dev)",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "cwd": "client",
       "port": 5173,
       "autoPort": false
@@ -20,16 +26,36 @@
     {
       "name": "Mobile (Expo)",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "start:dev"],
+      "runtimeArgs": [
+        "run",
+        "start:dev"
+      ],
       "cwd": "mobile",
       "port": 8081
     },
     {
       "name": "Mobile (Expo Web)",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "web", "--", "--port", "8082"],
+      "runtimeArgs": [
+        "run",
+        "web",
+        "--",
+        "--port",
+        "8082"
+      ],
       "cwd": "mobile",
       "port": 8082,
+      "autoPort": false
+    },
+    {
+      "name": "Client (Vite preview)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "preview"
+      ],
+      "cwd": "client",
+      "port": 4173,
       "autoPort": false
     }
   ]
