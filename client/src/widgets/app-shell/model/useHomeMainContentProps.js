@@ -17,6 +17,7 @@ export const useHomeMainContentProps = () => {
     myProfilePage,
     setMyProfilePage,
     notificationsPageItems,
+    inAppNotifications,
     pendingRafflesCount,
     pendingProductPromotionsCount,
     pendingModerationCount,
@@ -113,6 +114,9 @@ export const useHomeMainContentProps = () => {
     ],
   );
 
+  /** Столько же непрочитанных, сколько показывает колокольчик в шапке. */
+  const unreadNotificationsCount = inAppNotifications.length;
+
   const onRequestLogin = useCallback(() => {
     setIsLoginModalOpen(true);
   }, [setIsLoginModalOpen]);
@@ -170,6 +174,7 @@ export const useHomeMainContentProps = () => {
       canModerateProducts,
       myProfilePage,
       notificationsPageItems,
+      unreadNotificationsCount,
       pendingRafflesCount,
       pendingProductPromotionsCount,
       pendingModerationCount,
@@ -251,6 +256,7 @@ export const useHomeMainContentProps = () => {
       canModerateProducts,
       myProfilePage,
       notificationsPageItems,
+      unreadNotificationsCount,
       pendingRafflesCount,
       pendingProductPromotionsCount,
       pendingModerationCount,

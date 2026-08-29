@@ -13,6 +13,7 @@ import { validateEditProfileForm } from "../lib/validateEditProfileForm.js";
 import { ADMIN_EDIT_USER_UI, EDIT_PROFILE_MODAL_UI, USER_SAVED_ADDRESSES_UI } from "../../../shared/config/appUiCopy.js";
 import { isHttpProfileImageUrl } from "../lib/profileImageFocus.js";
 import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
+import { useBlockBackgroundScroll } from "../../../shared/lib/useBlockBackgroundScroll.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 
 /**
@@ -81,7 +82,13 @@ export function useEditProfileModal({
     return undefined;
   }, [isOpen, user]);
 
-  useScrollLock(isOpen && !isPageVariant);
+  // strategy "overflow": position:fixed на body ломает мобильную клавиатуру —
+  // после первого символа фокус слетал и клавиатура закрывалась (форма админа = модалка).
+  const isModalLockActive = isOpen && !isPageVariant;
+  useScrollLock(isModalLockActive, { strategy: "overflow" });
+  // Селектор — любой открытый диалог: поверх модалки открывается fullscreen-карта адреса,
+  // ей нужен свой touchmove (панорамирование), иначе карта "залипает".
+  useBlockBackgroundScroll(isModalLockActive, '[aria-modal="true"]');
 
   useEffect(() => {
     if (!isOpen || isPageVariant) return undefined;

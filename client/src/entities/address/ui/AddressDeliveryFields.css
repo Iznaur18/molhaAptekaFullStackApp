@@ -182,7 +182,9 @@
 .address-delivery-fields__map-fullscreen {
   position: fixed;
   inset: 0;
-  z-index: var(--iz-z-modal-shell, 1200);
+  /* Карта открывается ИЗ модалок (edit-profile 1300, чекаут 1000) — держим выше них,
+     иначе fullscreen-карту не видно за окном редактирования. */
+  z-index: 1400;
   display: flex;
   flex-direction: column;
   background: #e8f0ea;

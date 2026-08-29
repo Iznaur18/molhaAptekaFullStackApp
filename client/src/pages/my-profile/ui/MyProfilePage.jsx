@@ -73,6 +73,7 @@ import "./MyProfilePage.css";
  * pendingProductPromotionsCount?: number;
  * pendingRafflesCount?: number;
  * pendingDataConfirmationCount?: number;
+ * unreadNotificationsCount?: number;
  * onSubscriptionsClick?: () => void;
  * onWishlistClick?: () => void;
  * activeTab?: string;
@@ -127,6 +128,7 @@ export function MyProfilePage({
   pendingProductPromotionsCount = 0,
   pendingRafflesCount = 0,
   pendingDataConfirmationCount = 0,
+  unreadNotificationsCount = 0,
   onSubscriptionsClick,
   onWishlistClick,
   activeTab = "overview",
@@ -416,6 +418,16 @@ export function MyProfilePage({
                         onClick={() => navigate("/notifications")}
                       >
                         <AppIcon icon={Bell} size="lg" strokeWidth={2.1} />
+                        {unreadNotificationsCount > 0 ? (
+                          <span
+                            className="my-profile-page__notifications-badge"
+                            aria-label={HEADER_NOTIFICATIONS_BUTTON_UI.COUNT_ARIA}
+                          >
+                            {HEADER_NOTIFICATIONS_BUTTON_UI.BADGE(
+                              unreadNotificationsCount,
+                            )}
+                          </span>
+                        ) : null}
                       </button>
                       <SellerShareLinkButton
                         sellerId={String(user._id)}

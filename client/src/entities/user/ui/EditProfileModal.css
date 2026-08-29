@@ -111,8 +111,9 @@
   font-size: var(--iz-font-md);
 }
 
-/* WebKit date: intrinsic min-width иначе вылезает из карточки */
-.edit-profile-modal__input[type="date"] {
+/* WebKit date/time: intrinsic min-width иначе вылезает из карточки */
+.edit-profile-modal__input[type="date"],
+.edit-profile-modal__input[type="time"] {
   min-width: 0;
   max-width: 100%;
   -webkit-appearance: none;

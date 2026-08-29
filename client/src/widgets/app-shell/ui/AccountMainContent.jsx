@@ -31,6 +31,7 @@ export function AccountMainContent({
   canModerateProducts,
   myProfilePage,
   notificationsPageItems,
+  unreadNotificationsCount = 0,
   pendingRafflesCount,
   pendingModerationCount,
   pendingIntroAdModerationCount,
@@ -241,6 +242,7 @@ export function AccountMainContent({
         pendingProductPromotionsCount={pendingProductPromotionsCount}
         pendingRafflesCount={pendingRafflesCount}
         pendingDataConfirmationCount={pendingDataConfirmationCount}
+        unreadNotificationsCount={unreadNotificationsCount}
         activeTab={activeProfileTab}
         onTabChange={setMyProfileTab}
         tabContent={tabContent}
