@@ -101,6 +101,31 @@ export function useUserDetailsPage() {
     [queryClient, userId],
   );
 
+  const handleBlockChange = useCallback(
+    (patch) => {
+      queryClient.setQueryData(userProfileQueryKeys.byId(userId), (old) => {
+        if (!old || typeof old !== "object") {
+          return old;
+        }
+        return {
+          ...old,
+          isBlockedByMe: patch.isBlockedByMe,
+          ...(patch.isBlockedByMe ? { isFollowing: false } : {}),
+        };
+      });
+      setProfileSnapshot((prev) =>
+        prev
+          ? {
+              ...prev,
+              isBlockedByMe: patch.isBlockedByMe,
+              ...(patch.isBlockedByMe ? { isFollowing: false } : {}),
+            }
+          : prev,
+      );
+    },
+    [queryClient, userId],
+  );
+
   const handleRated = useCallback(
     (snapshot) => {
       if (!snapshot || typeof snapshot !== "object") {
@@ -148,6 +173,7 @@ export function useUserDetailsPage() {
     canModerateProducts,
     isAdmin,
     handleFollowChange,
+    handleBlockChange,
     handleRated,
     handleViewAllSellerProducts,
     handleProductClick,

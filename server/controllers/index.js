@@ -254,6 +254,12 @@ import {
   listMyFollowingController,
   listMyFollowersController,
 } from "./User/userFollowControllers.js";
+import {
+  blockUserController,
+  unblockUserController,
+  listMyBlockedUsersController,
+  listUserBlockedUsersModeratorController,
+} from "./User/userBlockControllers.js";
 import { getMyCartController } from "./Cart/getMyCartController.js";
 import { replaceMyCartController } from "./Cart/replaceMyCartController.js";
 import { getMyFavoritesController } from "./Favorites/getMyFavoritesController.js";
@@ -476,6 +482,10 @@ export {
   unfollowUserController,
   listMyFollowingController,
   listMyFollowersController,
+  blockUserController,
+  unblockUserController,
+  listMyBlockedUsersController,
+  listUserBlockedUsersModeratorController,
   getMyCartController,
   replaceMyCartController,
   getMyFavoritesController,

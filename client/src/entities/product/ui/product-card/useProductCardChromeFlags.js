@@ -2,6 +2,7 @@ import { useMemo } from "react";
 
 import { SHOW_ADD_TO_CART_ON_CATALOG_CARD } from "../../lib/catalogCardPurchasePolicy.js";
 import { isProductOutOfStock } from "../../lib/isProductOutOfStock.js";
+import { isProductSellerClosedNow } from "@molha/api-contract";
 import { isProductRaffleParticipant } from "../../../raffle/lib/isProductRaffleParticipant.js";
 import { resolveAuctionUiState } from "../../lib/resolveAuctionUiState.js";
 import { shouldShowPremiumProductCardChrome } from "../../lib/isPremiumSellerProduct.js";
@@ -84,18 +85,22 @@ export function useProductCardChromeFlags(props, currentUserId) {
     promotionTier === PRODUCT_PROMOTION_TIER_BANNER;
   const showImageOverlayBadges =
     !showBannerLayout && (showDiscountBadge || showLoyaltyPointsBadge);
-  const showWishlistToggle = !isMineMode && !isModerationQueue;
+  const showWishlistToggle =
+    !isMineMode && !isModerationQueue && !isProductSellerClosedNow(product);
   const showRaffleParticipantChrome =
     (highlightRaffleProduct || showRaffleBadge) && !isMineMode && !isModerationQueue;
   const showOutOfStockChrome =
     !isModerationQueue && isProductOutOfStock(product);
+  const showSellerClosedChrome =
+    !isModerationQueue && !showOutOfStockChrome && isProductSellerClosedNow(product);
 
   const showAddToCartButton =
     SHOW_ADD_TO_CART_ON_CATALOG_CARD &&
     !isModerationQueue &&
     product.productIsAvailable !== false &&
     product._id != null &&
-    !isCurrentUserProductSeller(product, currentUserId);
+    !isCurrentUserProductSeller(product, currentUserId) &&
+    !isProductSellerClosedNow(product);
 
   const hasSellerToolbar = onDeleteProduct != null;
   const showFooterActions =
@@ -110,13 +115,14 @@ export function useProductCardChromeFlags(props, currentUserId) {
       [
         "product-card",
         showOutOfStockChrome ? "product-card--out-of-stock" : "",
+        showSellerClosedChrome ? "product-card--seller-closed" : "",
         showRaffleParticipantChrome ? "product-card--raffle-participant" : "",
         showBannerLayout ? "product-card--banner-layout" : "",
         isModerationQueue ? "product-card--list" : "",
       ]
         .filter(Boolean)
         .join(" "),
-    [isModerationQueue, showBannerLayout, showOutOfStockChrome, showRaffleParticipantChrome],
+    [isModerationQueue, showBannerLayout, showOutOfStockChrome, showSellerClosedChrome, showRaffleParticipantChrome],
   );
 
   const frameClassName = useMemo(
@@ -167,6 +173,7 @@ export function useProductCardChromeFlags(props, currentUserId) {
     showPromotionChrome,
     showPremiumChrome,
     showOutOfStockChrome,
+    showSellerClosedChrome,
     cardClassName,
     frameClassName,
   };

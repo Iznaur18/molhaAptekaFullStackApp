@@ -7,6 +7,7 @@ import {
 } from "../../constants/cartConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { ProductModel } from "../../models/index.js";
+import { getSellerIdsBlockingBuyer } from "../../services/user/userBlockHelpers.js";
 
 /**
  * Приводит сырые данные из БД/тела к объекту productId -> quantity.
@@ -61,9 +62,10 @@ export const parseReplaceCartBodyItems = (raw) => {
 /**
  * Оставляет только существующие и доступные к покупке товары.
  * @param {Record<string, number>} items
+ * @param {string | null | undefined} [buyerUserId]
  * @returns {Promise<Record<string, number>>}
  */
-export const filterCartItemsToPurchasableProducts = async (items) => {
+export const filterCartItemsToPurchasableProducts = async (items, buyerUserId = null) => {
   const ids = Object.keys(items);
   if (ids.length === 0) return {};
 
@@ -75,10 +77,19 @@ export const filterCartItemsToPurchasableProducts = async (items) => {
     productOutOfStock: { $ne: true },
     productStockQuantity: { $gt: 0 },
   })
-    .select("_id")
+    .select("_id productSeller")
     .lean();
 
-  const allowed = new Set(alive.map((p) => String(p._id)));
+  let allowedProducts = alive;
+  if (buyerUserId) {
+    const sellerIds = alive.map((product) => String(product.productSeller));
+    const blockingSellerIds = await getSellerIdsBlockingBuyer(buyerUserId, sellerIds);
+    allowedProducts = alive.filter(
+      (product) => !blockingSellerIds.has(String(product.productSeller)),
+    );
+  }
+
+  const allowed = new Set(allowedProducts.map((p) => String(p._id)));
   return Object.fromEntries(
     Object.entries(items).filter(([productId]) => allowed.has(productId)),
   );

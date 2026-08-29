@@ -1,4 +1,5 @@
 import { createPortal } from "react-dom";
+import { USER_FULL_NAME_MAX_LENGTH } from "@molha/api-contract";
 
 import { useEditProfileModal } from "../model/useEditProfileModal.js";
 import { UserSavedAddressesEditor } from "../../address/ui/UserSavedAddressesEditor.jsx";
@@ -29,6 +30,7 @@ import { UserBackgroundPresetPicker } from "./UserBackgroundPresetPicker.jsx";
 import { UserBackgroundPreview } from "./UserBackgroundPreview.jsx";
 import { AdminPremiumStaffControl } from "./AdminPremiumStaffControl.jsx";
 import { EditProfileSocialLinksFields } from "./EditProfileSocialLinksFields.jsx";
+import { EditProfileBusinessHoursFields } from "./EditProfileBusinessHoursFields.jsx";
 import { EmailBindControls } from "./EmailBindControls.jsx";
 import { PhoneBindControls } from "./PhoneBindControls.jsx";
 import { ChangePasswordControls } from "./ChangePasswordControls.jsx";
@@ -166,6 +168,47 @@ export function EditProfileModal({
               />
               <span className="edit-profile-modal__hint">
                 {EDIT_PROFILE_MODAL_UI.USERNAME_HINT}
+              </span>
+            </label>
+            <div className="edit-profile-modal__subsection">
+              <h3 className="edit-profile-modal__subsection-title">
+                {EDIT_PROFILE_MODAL_UI.SECTION_BUSINESS_HOURS}
+              </h3>
+              <EditProfileBusinessHoursFields
+                enabled={form.userBusinessHoursEnabled}
+                weekdays={form.userBusinessHoursWeekdays}
+                openTime={form.userBusinessHoursOpenTime}
+                closeTime={form.userBusinessHoursCloseTime}
+                disabled={isSubmitting}
+                onEnabledChange={(userBusinessHoursEnabled) =>
+                  setForm((prev) => ({ ...prev, userBusinessHoursEnabled }))
+                }
+                onWeekdaysChange={(userBusinessHoursWeekdays) =>
+                  setForm((prev) => ({ ...prev, userBusinessHoursWeekdays }))
+                }
+                onOpenTimeChange={(userBusinessHoursOpenTime) =>
+                  setForm((prev) => ({ ...prev, userBusinessHoursOpenTime }))
+                }
+                onCloseTimeChange={(userBusinessHoursCloseTime) =>
+                  setForm((prev) => ({ ...prev, userBusinessHoursCloseTime }))
+                }
+              />
+            </div>
+            <label className="edit-profile-modal__label">
+              {EDIT_PROFILE_MODAL_UI.LABEL_FULL_NAME}
+              <input
+                className="edit-profile-modal__input"
+                type="text"
+                name="userFullName"
+                value={form.userFullName}
+                onChange={handleChange}
+                maxLength={USER_FULL_NAME_MAX_LENGTH}
+                autoComplete="name"
+                placeholder="Иван Иванов"
+                disabled={isSubmitting}
+              />
+              <span className="edit-profile-modal__hint">
+                {EDIT_PROFILE_MODAL_UI.HINT_FULL_NAME}
               </span>
             </label>
             <label className="edit-profile-modal__label">

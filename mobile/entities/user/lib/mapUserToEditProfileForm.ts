@@ -12,11 +12,17 @@ import {
   resolveBackgroundModeFromUser,
   type BackgroundMode,
 } from "@/entities/user/lib/userBackgroundValue";
+import { mapUserBusinessHoursFromUser } from "./userBusinessHoursForm";
 import { DEFAULT_USER_AVATAR_URL, USER_GENDER_NO_SELECTED } from "@/entities/user/model/constants";
 import { DEFAULT_USER_BACKGROUND_PRESET_ID } from "@/entities/user/model/userBackgroundPresets";
 
 export type EditProfileFormState = {
   userName: string;
+  userFullName: string;
+  userBusinessHoursEnabled: boolean;
+  userBusinessHoursWeekdays: number[];
+  userBusinessHoursOpenTime: string;
+  userBusinessHoursCloseTime: string;
   email: string;
   userBirthDate: string;
   userGender: "male" | "female" | "noSelected";
@@ -96,6 +102,8 @@ export const mapUserToEditProfileForm = (
 
   return {
     userName: typeof user.userName === "string" ? user.userName : "",
+    userFullName: typeof user.userFullName === "string" ? user.userFullName : "",
+    ...mapUserBusinessHoursFromUser(user),
     email: typeof user.email === "string" ? user.email.trim().toLowerCase() : "",
     userBirthDate: formatBirthDateForInput(user.userBirthDate),
     userGender:

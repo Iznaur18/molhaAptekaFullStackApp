@@ -9,7 +9,7 @@ import { isUserSavedAddressesEqual } from "@/entities/address/lib/isUserSavedAdd
 import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
 import { normalizeUploadUrlForStorage } from "@/shared/lib";
 
-import { birthDateIsoDateToApiValue, parseBirthDateInputToIsoDate } from "./birthDateInputMask";
+import { buildUserBusinessHoursPatchBody } from "@/entities/user/lib/userBusinessHoursForm";
 import { getUserBackgroundFocus } from "./profileImageFocus";
 import type { EditProfileFormState } from "./mapUserToEditProfileForm";
 import { serializeUserBackground } from "./userBackgroundValue";
@@ -24,6 +24,18 @@ export const buildPatchUserProfileBody = (
   const initialName = initial.userName.trim().toLowerCase();
   if (rawName.length > 0 && rawName !== initialName) {
     body.userName = rawName;
+  }
+
+  const rawFullName = form.userFullName.trim().replace(/\s+/g, " ");
+  const initialFullName = initial.userFullName.trim().replace(/\s+/g, " ");
+  if (rawFullName !== initialFullName) {
+    body.userFullName = rawFullName === "" ? null : rawFullName;
+  }
+
+  const businessHoursBody = buildUserBusinessHoursPatchBody(form);
+  const initialBusinessHoursBody = buildUserBusinessHoursPatchBody(initial);
+  if (JSON.stringify(businessHoursBody) !== JSON.stringify(initialBusinessHoursBody)) {
+    Object.assign(body, businessHoursBody);
   }
 
   if (form.userBirthDate === "") {

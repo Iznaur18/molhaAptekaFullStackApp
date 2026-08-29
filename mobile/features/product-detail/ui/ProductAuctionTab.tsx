@@ -7,6 +7,7 @@ import { usePriceOfferMutations } from "@/entities/product-price-offer/model/use
 import { useTopPriceOffersQuery } from "@/entities/product-price-offer/model/useTopPriceOffersQuery";
 import { ProductPriceOfferTopList } from "@/features/product-detail/ui/ProductPriceOfferTopList";
 import { API_CLIENT_UI, PRODUCT_PRICE_OFFER_UI, PRODUCT_UI } from "@/shared/config";
+import { BlockedPurchaseButton } from "@/shared/ui/BlockedPurchaseButton";
 import { formatApiErrorMessage } from "@/shared/lib";
 import {
   formatRubPriceInput,
@@ -37,6 +38,8 @@ type ProductAuctionTabProps = {
   isOwnProduct: boolean;
   dockSubmit?: boolean;
   onDockFooterChange?: (footer: ProductAuctionDockFooter | null) => void;
+  isPurchaseBlocked?: boolean;
+  blockedPurchaseLabel?: string;
 };
 
 export const ProductAuctionTab = ({
@@ -48,6 +51,8 @@ export const ProductAuctionTab = ({
   isOwnProduct,
   dockSubmit = true,
   onDockFooterChange,
+  isPurchaseBlocked = false,
+  blockedPurchaseLabel = "",
 }: ProductAuctionTabProps) => {
   const router = useRouter();
   const theme = useAppTheme();
@@ -150,8 +155,12 @@ export const ProductAuctionTab = ({
   const showDockPrimaryAction =
     dockSubmit && !isOwnProduct && (showForm || !isAuthorized);
 
-  const dockLabel = !isAuthorized ? PRODUCT_PRICE_OFFER_UI.SUBMIT : offerSubmitLabel;
-  const dockDisabled = isAuthorized ? isBusy : false;
+  const dockLabel = isPurchaseBlocked
+    ? blockedPurchaseLabel
+    : !isAuthorized
+      ? PRODUCT_PRICE_OFFER_UI.SUBMIT
+      : offerSubmitLabel;
+  const dockDisabled = isPurchaseBlocked || (isAuthorized ? isBusy : false);
 
   useEffect(() => {
     if (!onDockFooterChange) {
@@ -235,7 +244,9 @@ export const ProductAuctionTab = ({
     <View style={styles.root} accessibilityLabel={PRODUCT_PRICE_OFFER_UI.TAB_AUCTION}>
       <Text style={styles.pageTitle}>{PRODUCT_PRICE_OFFER_UI.TAB_AUCTION}</Text>
 
-      {showForm ? (
+      {isPurchaseBlocked ? (
+        <BlockedPurchaseButton label={blockedPurchaseLabel} variant="offer" />
+      ) : showForm ? (
         <>
           <Text style={styles.sectionLabel}>{PRODUCT_PRICE_OFFER_UI.SECTION_FORM_TITLE}</Text>
           <TextInput
@@ -274,7 +285,7 @@ export const ProductAuctionTab = ({
         </>
       ) : null}
 
-      {!isOwnProduct && !isAuthorized && !showDockPrimaryAction ? (
+      {!isPurchaseBlocked && !isOwnProduct && !isAuthorized && !showDockPrimaryAction ? (
         <AppButton
           label={PRODUCT_PRICE_OFFER_UI.SUBMIT}
           variant="contrast"
@@ -289,7 +300,7 @@ export const ProductAuctionTab = ({
 
       {statusText ? <Text style={[styles.status, statusStyle]}>{statusText}</Text> : null}
 
-      {showGoToCartButton ? (
+      {!isPurchaseBlocked && showGoToCartButton ? (
         <AppButton
           label={PRODUCT_PRICE_OFFER_UI.GO_TO_CART}
           variant="contrast"

@@ -29,6 +29,10 @@ import { parseProductSortFromQuery } from "./productCatalogQuery.js";
 import { USER_FOLLOW_FOLLOWING_ONLY_AUTH_MESSAGE } from "../../constants/userFollowConstants.js";
 import { getVisibleFollowingSellerIds } from "../user/userFollowHelpers.js";
 import { attachProductAvailablePurchaseQuantity } from "./productStock.js";
+import {
+  attachProductSellerClosedState,
+  stripProductSellerClosedState,
+} from "./attachProductSellerClosedState.js";
 import { buildProductSaleOnlyMatch } from "./productDiscount.js";
 import {
   mergeProductCatalogCategoryFilter,
@@ -86,7 +90,10 @@ export async function getCatalogProducts({ userId, query }) {
   if (!includeHidden) {
     const cached = getCachedCatalogProducts(cacheKey);
     if (cached) {
-      return cached;
+      return {
+        ...cached,
+        products: await attachProductSellerClosedState(cached.products, userId ?? null),
+      };
     }
   }
 
@@ -98,10 +105,16 @@ export async function getCatalogProducts({ userId, query }) {
   });
 
   if (!includeHidden) {
-    setCachedCatalogProducts(cacheKey, result);
+    setCachedCatalogProducts(cacheKey, {
+      ...result,
+      products: stripProductSellerClosedState(result.products),
+    });
   }
 
-  return result;
+  return {
+    ...result,
+    products: await attachProductSellerClosedState(result.products, userId ?? null),
+  };
 }
 
 /**

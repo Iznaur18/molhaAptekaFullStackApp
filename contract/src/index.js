@@ -93,6 +93,16 @@ export {
   UPLOAD_VIDEO_EXTENSIONS,
 } from "./uploadLimits.js";
 export { userFollowListQuerySchema } from "./userFollow.js";
+export {
+  USER_BLOCK_MAX_PER_USER,
+  USER_BLOCK_LIST_MAX_LIMIT,
+  USER_BLOCKED_PURCHASE_MESSAGE,
+  userBlockListQuerySchema,
+  isCatalogProductViewerBlockStateKnown,
+  isCatalogProductSellerClosedStateKnown,
+  isCatalogProductViewerPurchaseContextKnown,
+  isProductPurchaseBlockedBySeller,
+} from "./userBlock.js";
 export { voteBodySchema } from "./userVote.js";
 export {
   submitProductReportBodySchema,
@@ -142,7 +152,24 @@ export {
   RAFFLE_TARGET_SALES_MAX,
   RAFFLE_CREATE_PRICE_POINTS,
 } from "./raffle.js";
-export { updateProfileBodySchema } from "./userProfile.js";
+export {
+  updateProfileBodySchema,
+  USER_FULL_NAME_MAX_LENGTH,
+} from "./userProfile.js";
+export {
+  USER_BUSINESS_HOURS_WEEKDAY_LABELS_RU,
+  USER_SELLER_CLOSED_MESSAGE,
+  SELLER_CLOSED_UNTIL_PREFIX,
+  SELLER_CLOSED_FALLBACK_OVERLAY,
+  formatSellerClosedUntilLabel,
+  formatUserBusinessHoursForProfile,
+  resolveSellerScheduleOpensAtTime,
+  isProductSellerClosedNow,
+  isSellerScheduleClosedNow,
+  isUserSellerClosedNow,
+  userBusinessHoursScheduleSchema,
+} from "./userBusinessHours.js";
+export { resolveRuRegionIanaTimeZone } from "./ruRegionTimeZones.js";
 export {
   USER_SAVED_ADDRESSES_MAX,
   USER_SAVED_ADDRESS_LABEL_MAX_LENGTH,

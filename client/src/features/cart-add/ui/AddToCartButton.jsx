@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useCart } from "../../../entities/cart/model/useCart.js";
 import { ADD_TO_CART_UI } from "../../../shared/config/appUiCopy.js";
+import { BlockedPurchaseButton } from "../../../shared/ui/BlockedPurchaseButton.jsx";
 import { HOME_MAIN_VIEW_PATH } from "../../../shared/lib/homeMainViewPaths.js";
 
 import "./AddToCartButton.css";
@@ -19,6 +20,8 @@ import "./AddToCartButton.css";
  *   maxQuantity?: number;
  *   unitPriceSnapshot?: number;
  *   variant?: 'default' | 'detail';
+ *   isPurchaseBlocked?: boolean;
+ *   blockedPurchaseLabel?: string;
  * }} props
  */
 export function AddToCartButton({
@@ -28,6 +31,8 @@ export function AddToCartButton({
   maxQuantity,
   unitPriceSnapshot,
   variant = "default",
+  isPurchaseBlocked = false,
+  blockedPurchaseLabel = ADD_TO_CART_UI.BLOCKED,
 }) {
   const navigate = useNavigate();
   const { items, addItem, setItemQuantity, removeItem } = useCart();
@@ -42,6 +47,10 @@ export function AddToCartButton({
     }
     setItemQuantity(productId, purchaseLimit);
   }, [productId, purchaseLimit, quantity, setItemQuantity]);
+
+  if (isPurchaseBlocked) {
+    return <BlockedPurchaseButton label={blockedPurchaseLabel} variant="cart" />;
+  }
 
   if (!isAuthorized) {
     return (

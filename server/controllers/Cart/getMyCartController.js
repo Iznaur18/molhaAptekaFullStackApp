@@ -19,7 +19,7 @@ export const getMyCartController = async (req, res) => {
       ? doc.items
       : {};
   const normalized = normalizeStoredCartItems(rawItems);
-  const purchasable = await filterCartItemsToPurchasableProducts(normalized);
+  const purchasable = await filterCartItemsToPurchasableProducts(normalized, userId);
 
   if (!doc && Object.keys(purchasable).length === 0) {
     return successRes(res, { items: {} });

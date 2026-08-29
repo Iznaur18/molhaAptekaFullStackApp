@@ -3,6 +3,7 @@ import { useCallback, useRef } from "react";
 import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
 import { PRODUCT_CARD_UI, PRODUCT_MODERATION_PAGE_UI } from "../../../../shared/config/appUiCopy.js";
 import { resolveProductOutOfStockOverlayLabel } from "../../lib/resolveProductOutOfStockOverlayLabel.js";
+import { resolveProductSellerClosedOverlayLabel } from "../../lib/resolveProductSellerClosedOverlayLabel.js";
 import { ProductMediaHorizontalPager } from "../ProductMediaHorizontalPager.jsx";
 import { ProductMediaSlideContent } from "../ProductMediaSlideContent.jsx";
 import { ProductDiscountBadge } from "../ProductPriceDisplay.jsx";
@@ -125,6 +126,16 @@ export function ProductCardMedia({ vm }) {
         <span className="product-card__out-of-stock-overlay" role="status">
           <span className="product-card__out-of-stock-overlay-label">
             {resolveProductOutOfStockOverlayLabel(vm.product)}
+          </span>
+        </span>
+      ) : null}
+      {vm.showSellerClosedChrome ? (
+        <span
+          className="product-card__out-of-stock-overlay product-card__seller-closed-overlay"
+          role="status"
+        >
+          <span className="product-card__out-of-stock-overlay-label">
+            {resolveProductSellerClosedOverlayLabel(vm.product)}
           </span>
         </span>
       ) : null}

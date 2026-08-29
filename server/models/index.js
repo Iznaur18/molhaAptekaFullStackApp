@@ -11,6 +11,7 @@ import UserInAppNotificationModel from "./UserInAppNotificationModel.js";
 import UserDataConfirmationRequestModel from "./UserDataConfirmationRequestModel.js";
 import ProductPriceOfferModel from "./ProductPriceOfferModel.js";
 import UserFollowModel from "./UserFollowModel.js";
+import UserBlockModel from "./UserBlockModel.js";
 import ProductReviewModel from "./ProductReviewModel.js";
 import ProductQuestionModel from "./ProductQuestionModel.js";
 import ProductPromotionModel from "./ProductPromotionModel.js";
@@ -63,6 +64,7 @@ export {
   UserDataConfirmationRequestModel,
   ProductPriceOfferModel,
   UserFollowModel,
+  UserBlockModel,
   ProductReviewModel,
   ProductQuestionModel,
   ProductPromotionModel,

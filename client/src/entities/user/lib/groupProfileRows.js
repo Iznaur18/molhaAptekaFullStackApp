@@ -12,6 +12,7 @@ const PROFILE_ROW_SECTIONS = [
       "totalSalesCount",
       "totalSalesAmount",
       "totalPurchasesAmount",
+      "userBusinessHours",
       "userRatingByVotes",
       "userLoyaltyPoints",
     ],
@@ -36,7 +37,7 @@ const PROFILE_ROW_SECTIONS = [
   {
     id: "personal",
     title: "Личные данные",
-    rowIds: ["userBirthDate", "userGender"],
+    rowIds: ["userFullName", "userBirthDate", "userGender"],
   },
   {
     id: "account",

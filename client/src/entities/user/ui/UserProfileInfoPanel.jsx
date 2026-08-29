@@ -29,6 +29,7 @@ const PHONE_ROW_ID = "userPhoneNumber";
  * className?: string;
  * hidePhoneUntilReveal?: boolean;
  * userId?: string | null;
+ * accountSectionFooter?: import('react').ReactNode;
  * }} props
  */
 export function UserProfileInfoPanel({
@@ -36,6 +37,7 @@ export function UserProfileInfoPanel({
   className = "",
   hidePhoneUntilReveal = false,
   userId = null,
+  accountSectionFooter = null,
 }) {
   const sections = useMemo(() => groupProfileRows(rows), [rows]);
 
@@ -53,6 +55,7 @@ export function UserProfileInfoPanel({
           rows={section.rows}
           hidePhoneUntilReveal={hidePhoneUntilReveal}
           userId={userId}
+          sectionFooter={section.id === "account" ? accountSectionFooter : null}
         />
       ))}
     </div>
@@ -66,6 +69,7 @@ export function UserProfileInfoPanel({
  * rows: { id: string; label: string; value: string; href?: string; needsPhoneReveal?: boolean }[];
  * hidePhoneUntilReveal: boolean;
  * userId: string | null;
+ * sectionFooter?: import('react').ReactNode;
  * }} props
  */
 function ProfileDetailsSection({
@@ -74,6 +78,7 @@ function ProfileDetailsSection({
   rows,
   hidePhoneUntilReveal,
   userId,
+  sectionFooter = null,
 }) {
   const sectionTone = getProfileSectionTone(sectionId);
 
@@ -118,6 +123,7 @@ function ProfileDetailsSection({
             </div>
           );
         })}
+        {sectionFooter}
       </dl>
     </section>
   );

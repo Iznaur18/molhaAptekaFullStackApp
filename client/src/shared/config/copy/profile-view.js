@@ -52,6 +52,14 @@ export const USER_FOLLOW_BUTTON_UI = {
   ERROR: "Не удалось изменить подписку",
 };
 
+export const USER_BLOCK_BUTTON_UI = {
+  LABEL: "Заблокировать",
+  BLOCK: "Заблокировать",
+  UNBLOCK: "Разблокировать",
+  LOADING: "…",
+  ERROR: "Не удалось изменить блокировку",
+};
+
 /** Оценка пользователя `POST /vote/:targetUserId` */
 export const USER_VOTE_RATING_UI = {
   COLLAPSE_SUMMARY: "Оценить пользователя",

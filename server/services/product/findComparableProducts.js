@@ -10,6 +10,7 @@ import { PRODUCT_SELLER_PUBLIC_SELECT } from "../../constants/productSellerPubli
 import { ProductModel } from "../../models/index.js";
 import { getHiddenSellerIds } from "../access/adminUserGuard.js";
 import { attachProductSellerSnapshots } from "./attachProductSellerSnapshots.js";
+import { attachProductSellerClosedState } from "./attachProductSellerClosedState.js";
 import { enrichProductApiFields } from "./productDiscount.js";
 import { attachProductAvailablePurchaseQuantity } from "./productStock.js";
 import {
@@ -147,9 +148,10 @@ export function extractComparablePeerPrices(collected) {
 
 /**
  * @param {string} productId
+ * @param {string | null | undefined} [viewerUserId]
  * @returns {Promise<{ products: Record<string, unknown>[] }>}
  */
-export async function findComparableProducts(productId) {
+export async function findComparableProducts(productId, viewerUserId = null) {
   const collected = await collectComparableMatchedPeers(productId);
   if (!collected) {
     return { products: [] };
@@ -161,8 +163,9 @@ export async function findComparableProducts(productId) {
   const withSnapshots = await attachProductSellerSnapshots(top);
   const enriched = withSnapshots.map((row) => enrichProductApiFields(row));
   const withStock = await attachProductAvailablePurchaseQuantity(enriched);
+  const withClosedState = await attachProductSellerClosedState(withStock, viewerUserId);
 
-  return { products: withStock };
+  return { products: withClosedState };
 }
 
 /**

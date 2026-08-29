@@ -1,0 +1,45 @@
+.edit-profile-business-hours {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.edit-profile-business-hours__weekdays {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.edit-profile-business-hours__legend {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.edit-profile-business-hours__weekday-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.edit-profile-business-hours__weekday {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--iz-surface-muted, #f3f4f6);
+  font-size: 0.875rem;
+}
+
+.edit-profile-business-hours__times {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .edit-profile-business-hours__times {
+    grid-template-columns: 1fr;
+  }
+}

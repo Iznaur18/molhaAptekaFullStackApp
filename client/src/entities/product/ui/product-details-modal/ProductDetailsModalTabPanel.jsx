@@ -145,6 +145,10 @@ export function ProductDetailsModalTabPanel({
         onOffersChanged={onOffersChanged}
         onCloseModal={fieldHandlers.onClose}
         showSellerArchive={false}
+        isPurchaseBlocked={ctrl.isPurchaseBlocked || ctrl.showSellerClosedPurchaseButton}
+        blockedPurchaseLabel={
+          ctrl.isPurchaseBlocked ? ctrl.blockedPurchaseLabel : ctrl.sellerClosedPurchaseLabel
+        }
       />
     );
   }
@@ -162,6 +166,10 @@ export function ProductDetailsModalTabPanel({
         onRequestLogin={onRequestLogin}
         onSuccess={onInstallmentSuccess}
         dockSubmit={dockSubmit}
+        isPurchaseBlocked={ctrl.isPurchaseBlocked || ctrl.showSellerClosedPurchaseButton}
+        blockedPurchaseLabel={
+          ctrl.isPurchaseBlocked ? ctrl.blockedPurchaseLabel : ctrl.sellerClosedPurchaseLabel
+        }
       />
     );
   }

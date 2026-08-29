@@ -1,6 +1,8 @@
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { getHiddenSellerIds } from "../../services/access/adminUserGuard.js";
+import { isUserBlockedBy } from "../../services/user/userBlockHelpers.js";
 import { findCatalogProductById } from "../../services/product/findCatalogProductById.js";
+import { attachProductSellerClosedState } from "../../services/product/attachProductSellerClosedState.js";
 import { attachProductAvailablePurchaseQuantity } from "../../services/product/productStock.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 import { userHasPurchasedProduct } from "../../services/user/userPurchasedProduct.js";
@@ -41,7 +43,20 @@ export const getCatalogProductByIdController = async (req, res) => {
     }
   }
 
+  const productWithStock = (await attachProductAvailablePurchaseQuantity([product]))[0];
+  const [productWithViewerState] = await attachProductSellerClosedState(
+    [productWithStock],
+    viewerUserId,
+  );
+  let isBlockedBySeller = false;
+  if (viewerUserId && sellerId && sellerId !== viewerUserId) {
+    isBlockedBySeller = await isUserBlockedBy(sellerId, viewerUserId);
+  }
+
   return successRes(res, {
-    product: (await attachProductAvailablePurchaseQuantity([product]))[0],
+    product: {
+      ...productWithViewerState,
+      isBlockedBySeller,
+    },
   });
 };

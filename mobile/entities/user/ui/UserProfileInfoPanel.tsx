@@ -1,5 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import { izColors } from "@izibuy/design-tokens";
 
@@ -26,6 +26,7 @@ type UserProfileInfoPanelProps = {
   rows: ProfileRow[];
   hidePhoneUntilReveal?: boolean;
   userId?: string | null;
+  accountSectionFooter?: ReactNode;
 };
 
 /** Section chrome stays black/white in all themes (dark remaps `ink` to white). */
@@ -255,6 +256,7 @@ export const UserProfileInfoPanel = ({
   rows,
   hidePhoneUntilReveal = false,
   userId = null,
+  accountSectionFooter = null,
 }: UserProfileInfoPanelProps) => {
   const theme = useAppTheme();
   const styles = useStyles();
@@ -273,7 +275,7 @@ export const UserProfileInfoPanel = ({
           ) : null}
           {section.rows.map((row, index) => {
             const icon = getProfileRowIcon(row.id);
-            const isLast = index === section.rows.length - 1;
+            const isLast = index === section.rows.length - 1 && !accountSectionFooter;
 
             return (
               <View
@@ -297,6 +299,7 @@ export const UserProfileInfoPanel = ({
               </View>
             );
           })}
+          {section.id === "account" ? accountSectionFooter : null}
         </View>
       ))}
     </View>

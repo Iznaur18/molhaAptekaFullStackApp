@@ -18,7 +18,7 @@ export const replaceMyCartController = async (req, res) => {
     return errorRes(res, 400, parsed.message);
   }
 
-  const purchasable = await filterCartItemsToPurchasableProducts(parsed.items);
+  const purchasable = await filterCartItemsToPurchasableProducts(parsed.items, userId);
 
   await CartModel.findOneAndUpdate(
     { userId },

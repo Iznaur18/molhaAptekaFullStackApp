@@ -17,6 +17,7 @@ import {
   parseRubPriceInput,
 } from "../../../shared/lib/numericInput.js";
 import { PRODUCT_PRICE_OFFER_UI } from "../../../shared/config/appUiCopy.js";
+import { BlockedPurchaseButton } from "../../../shared/ui/BlockedPurchaseButton.jsx";
 import {
   AccountRequirementModal,
   useAccountRequirementModal,
@@ -41,6 +42,8 @@ import "./ProductPriceOffer.css";
  *   onRequestLogin?: () => void;
  *   onOffersChanged?: () => void;
  *   onCloseModal?: () => void;
+ *   isPurchaseBlocked?: boolean;
+ *   blockedPurchaseLabel?: string;
  * }} props
  */
 export function ProductPriceOfferBuyerBlock({
@@ -53,6 +56,8 @@ export function ProductPriceOfferBuyerBlock({
   onRequestLogin,
   onOffersChanged,
   onCloseModal,
+  isPurchaseBlocked = false,
+  blockedPurchaseLabel = "",
 }) {
   const navigate = useNavigate();
   const myOfferQueryEnabled = isAuthorized && !isOwnProduct;
@@ -164,29 +169,41 @@ export function ProductPriceOfferBuyerBlock({
     dockSubmit && !isOwnProduct && (showForm || !isAuthorized);
 
   const dockPrimaryAction = showDockPrimaryAction
-    ? {
-        label: !isAuthorized ? PRODUCT_PRICE_OFFER_UI.SUBMIT : offerSubmitLabel,
-        onClick: () => {
-          if (!isAuthorized) {
-            onRequestLogin?.();
-            return;
-          }
-          void handleSubmitOffer();
-        },
-        disabled: isAuthorized ? isBusy : false,
-      }
+    ? isPurchaseBlocked
+      ? {
+          label: blockedPurchaseLabel,
+          onClick: () => {},
+          disabled: true,
+        }
+      : {
+          label: !isAuthorized ? PRODUCT_PRICE_OFFER_UI.SUBMIT : offerSubmitLabel,
+          onClick: () => {
+            if (!isAuthorized) {
+              onRequestLogin?.();
+              return;
+            }
+            void handleSubmitOffer();
+          },
+          disabled: isAuthorized ? isBusy : false,
+        }
     : null;
 
-  const renderPrimaryButton = ({ label, onClick, disabled }) => (
-    <button
-      type="button"
-      className="app-btn app-btn--contrast product-price-offer__btn"
-      disabled={disabled}
-      onClick={onClick}
-    >
-      {label}
-    </button>
-  );
+  const renderPrimaryButton = ({ label, onClick, disabled }) => {
+    if (isPurchaseBlocked) {
+      return <BlockedPurchaseButton label={blockedPurchaseLabel} variant="offer" />;
+    }
+
+    return (
+      <button
+        type="button"
+        className="app-btn app-btn--contrast product-price-offer__btn"
+        disabled={disabled}
+        onClick={onClick}
+      >
+        {label}
+      </button>
+    );
+  };
 
   const portalTarget =
     pageDockHost === undefined

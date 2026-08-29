@@ -24,6 +24,8 @@ import {
   canSellerToggleCatalogVisibility,
 } from "@/entities/product/lib/getProductModerationUi";
 import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";
+import { resolveProductPurchaseBlockState } from "@/entities/product/lib/resolveProductPurchaseBlockState";
+import { resolveProductSellerClosedPurchaseState } from "@/entities/product/lib/resolveProductSellerClosedPurchaseState";
 import { useCatalogProductQuery } from "@/entities/product/model/useCatalogProductQuery";
 import { useMyProductMutations } from "@/entities/product/model/useMyProductMutations";
 import { useProductDetailTabs } from "@/entities/product/model/useProductDetailTabs";
@@ -293,15 +295,31 @@ export default function ProductDetailScreen() {
   const productPrice = Number(productRecord.productPrice) || 0;
   const purchaseLimit = getProductPurchaseLimit(productRecord);
   const isProductOutOfStock = productRecord.productOutOfStock === true;
+  const { isPurchaseBlocked, blockedLabel } = resolveProductPurchaseBlockState(productRecord);
+  const { isSellerClosed, closedLabel: sellerClosedLabel } =
+    resolveProductSellerClosedPurchaseState(productRecord);
   const canShowAddToCart =
-    !isOwnProduct && isAvailable && purchaseLimit > 0 && !isProductOutOfStock;
+    !isOwnProduct &&
+    isAvailable &&
+    purchaseLimit > 0 &&
+    !isProductOutOfStock &&
+    !isPurchaseBlocked &&
+    !isSellerClosed;
   const showOutOfStockPurchaseButton = !isOwnProduct && isProductOutOfStock;
+  const showBlockedPurchaseButton = !isOwnProduct && isPurchaseBlocked;
+  const showSellerClosedPurchaseButton =
+    !isOwnProduct && isSellerClosed && !isPurchaseBlocked && !isProductOutOfStock;
   const showManageActions = (isOwnProduct || isAdmin) && activeTab === "details";
   const hasOpenSalesLocked = productRecord.hasOpenSales === true;
   const showMobilePurchaseDock =
     !pageLayout.isPageSplit &&
     activeTab === "details" &&
-    (canShowAddToCart || showOutOfStockPurchaseButton || auctionUi.auctionActive || installmentActive);
+    (canShowAddToCart ||
+      showOutOfStockPurchaseButton ||
+      showBlockedPurchaseButton ||
+      showSellerClosedPurchaseButton ||
+      auctionUi.auctionActive ||
+      installmentActive);
   const scrollPaddingBottom = pageLayout.resolveScrollPaddingBottom(
     insets.bottom,
     showMobilePurchaseDock,
@@ -622,6 +640,10 @@ export default function ProductDetailScreen() {
     auctionActive: auctionUi.auctionActive,
     canShowAddToCart,
     showOutOfStockPurchaseButton,
+    showBlockedPurchaseButton,
+    blockedPurchaseLabel: blockedLabel,
+    showSellerClosedPurchaseButton,
+    sellerClosedPurchaseLabel: sellerClosedLabel,
     showInlinePurchaseActions: pageLayout.isPageSplit,
     isAuthorized,
     onRequestLogin: () => {
@@ -659,6 +681,10 @@ export default function ProductDetailScreen() {
           isOwnProduct={isOwnProduct}
           dockSubmit={!pageLayout.isPageSplit}
           onDockFooterChange={handleAuctionDockChange}
+          isPurchaseBlocked={isPurchaseBlocked || showSellerClosedPurchaseButton}
+          blockedPurchaseLabel={
+            isPurchaseBlocked ? blockedLabel : sellerClosedLabel
+          }
         />
       ) : null}
       {activeTab === "installment" ? (
@@ -673,6 +699,10 @@ export default function ProductDetailScreen() {
           defaultUser={sessionQuery.data?.user ?? null}
           dockSubmit={!pageLayout.isPageSplit}
           onDockFooterChange={handleInstallmentDockChange}
+          isPurchaseBlocked={isPurchaseBlocked || showSellerClosedPurchaseButton}
+          blockedPurchaseLabel={
+            isPurchaseBlocked ? blockedLabel : sellerClosedLabel
+          }
         />
       ) : null}
     </>
@@ -859,6 +889,10 @@ export default function ProductDetailScreen() {
               product={productRecord}
               canShowAddToCart={canShowAddToCart}
               showOutOfStockPurchaseButton={showOutOfStockPurchaseButton}
+              showBlockedPurchaseButton={showBlockedPurchaseButton}
+              blockedPurchaseLabel={blockedLabel}
+              showSellerClosedPurchaseButton={showSellerClosedPurchaseButton}
+              sellerClosedPurchaseLabel={sellerClosedLabel}
               variant="dock"
             />
           </SquircleView>

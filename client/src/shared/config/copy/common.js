@@ -156,6 +156,8 @@ export const API_CLIENT_UI = {
   REJECT_PRICE_OFFER_FALLBACK: "Не удалось отклонить предложение",
   FOLLOW_USER_FALLBACK: "Не удалось подписаться",
   UNFOLLOW_USER_FALLBACK: "Не удалось отписаться",
+  BLOCK_USER_FALLBACK: "Не удалось заблокировать пользователя",
+  UNBLOCK_USER_FALLBACK: "Не удалось разблокировать пользователя",
   FETCH_MY_FOLLOWING_FALLBACK: "Не удалось загрузить подписки",
   FETCH_PRODUCT_REVIEW_SUMMARY_FALLBACK: "Не удалось загрузить отзывы",
   FETCH_PRODUCT_REVIEWS_FALLBACK: "Не удалось загрузить список отзывов",

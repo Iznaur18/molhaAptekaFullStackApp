@@ -1,6 +1,7 @@
 import {
   USER_SOCIAL_LINK_FIELDS,
   formatSocialLinkDisplay,
+  formatUserBusinessHoursForProfile,
 } from "@molha/api-contract";
 import {
   COMMON_UI,
@@ -76,9 +77,19 @@ const INTERNAL_ROW_IDS = new Set(["notesAboutUser"]);
 export function getUserProfileRows(user, options = {}) {
   const { showAdminRole = false, hideMediaUrls = true } = options;
   const rating = user.userRatingByVotes;
+  const businessHoursValue = formatUserBusinessHoursForProfile(user);
 
   const rows = [
     { id: "userName", label: L.userName, value: dashIfEmpty(user.userName) },
+    ...(typeof user.userFullName === "string" && user.userFullName.trim() !== ""
+      ? [
+          {
+            id: "userFullName",
+            label: L.userFullName,
+            value: user.userFullName.trim(),
+          },
+        ]
+      : []),
     {
       id: "followersCount",
       label: L.followersCount,
@@ -95,6 +106,15 @@ export function getUserProfileRows(user, options = {}) {
           ? COMMON_UI.EM_DASH
           : String(Math.max(0, user.followingCount)),
     },
+    ...(businessHoursValue != null
+      ? [
+          {
+            id: "userBusinessHours",
+            label: L.userBusinessHours,
+            value: businessHoursValue,
+          },
+        ]
+      : []),
     {
       id: "totalSalesCount",
       label: L.totalSalesCount,

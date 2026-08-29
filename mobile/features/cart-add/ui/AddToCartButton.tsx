@@ -6,8 +6,11 @@ import { useCartActions } from "@/entities/cart/model/useCartActions";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useMyCartQuery } from "@/entities/cart/model/useMyCartQuery";
 import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";
+import { resolveProductPurchaseBlockState } from "@/entities/product/lib/resolveProductPurchaseBlockState";
+import { resolveProductSellerClosedPurchaseState } from "@/entities/product/lib/resolveProductSellerClosedPurchaseState";
 import { ADD_TO_CART_BUTTON_LAYOUT } from "@/entities/product/lib/addToCartButtonLayout";
 import { ADD_TO_CART_UI } from "@/shared/config";
+import { BlockedPurchaseButton } from "@/shared/ui/BlockedPurchaseButton";
 import { FIXED_FONT_PROPS } from "@/shared/lib/fixedTypography";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import {
@@ -47,6 +50,11 @@ export const AddToCartButton = ({
   const quantity = cartQuery.data?.[productId] ?? 0;
   const purchaseLimit = getProductPurchaseLimit(product);
   const hasStockLimit = purchaseLimit > 0;
+  const { isPurchaseBlocked, blockedLabel } = resolveProductPurchaseBlockState(
+    product as Record<string, unknown> | null | undefined,
+  );
+  const { isSellerClosed, closedLabel: sellerClosedLabel } =
+    resolveProductSellerClosedPurchaseState(product as Record<string, unknown> | null | undefined);
 
   useEffect(() => {
     if (!hasStockLimit || quantity <= purchaseLimit) {
@@ -54,6 +62,24 @@ export const AddToCartButton = ({
     }
     void setItemQuantity(productId, purchaseLimit).catch(showCartError);
   }, [hasStockLimit, productId, purchaseLimit, quantity, setItemQuantity]);
+
+  if (isPurchaseBlocked) {
+    return (
+      <BlockedPurchaseButton
+        label={blockedLabel}
+        variant={isDetailDock ? "detailDock" : "default"}
+      />
+    );
+  }
+
+  if (isSellerClosed) {
+    return (
+      <BlockedPurchaseButton
+        label={sellerClosedLabel}
+        variant={isDetailDock ? "detailDock" : "default"}
+      />
+    );
+  }
 
   const handleLogin = () => {
     router.push("/(auth)/login");

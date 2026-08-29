@@ -59,6 +59,10 @@ type ProductDetailsDetailsTabProps = {
   auctionActive?: boolean;
   canShowAddToCart?: boolean;
   showOutOfStockPurchaseButton?: boolean;
+  showBlockedPurchaseButton?: boolean;
+  blockedPurchaseLabel?: string;
+  showSellerClosedPurchaseButton?: boolean;
+  sellerClosedPurchaseLabel?: string;
   showInlinePurchaseActions?: boolean;
   presentation?: ProductDetailsDetailsPresentation;
   isAuthorized?: boolean;
@@ -78,6 +82,10 @@ export const ProductDetailsDetailsTab = ({
   auctionActive = false,
   canShowAddToCart = true,
   showOutOfStockPurchaseButton = false,
+  showBlockedPurchaseButton = false,
+  blockedPurchaseLabel = "",
+  showSellerClosedPurchaseButton = false,
+  sellerClosedPurchaseLabel = "",
   showInlinePurchaseActions = false,
   presentation = "default",
   isAuthorized = false,
@@ -238,6 +246,10 @@ export const ProductDetailsDetailsTab = ({
           product={product}
           canShowAddToCart={canShowAddToCart}
           showOutOfStockPurchaseButton={showOutOfStockPurchaseButton}
+          showBlockedPurchaseButton={showBlockedPurchaseButton}
+          blockedPurchaseLabel={blockedPurchaseLabel}
+          showSellerClosedPurchaseButton={showSellerClosedPurchaseButton}
+          sellerClosedPurchaseLabel={sellerClosedPurchaseLabel}
           variant="inline"
         />
       ) : null}

@@ -51,8 +51,25 @@ const convertProfileFieldValue = (field, value) => {
   if (field === "userName") {
     return typeof value === "string" ? value.trim().toLowerCase() : value;
   }
+  if (field === "userBusinessHours") {
+    if (value == null) {
+      return null;
+    }
+    if (typeof value !== "object") {
+      return value;
+    }
+    const weekdays = Array.isArray(value.weekdays)
+      ? [...new Set(value.weekdays.map((day) => Math.floor(Number(day))).filter(Number.isFinite))]
+      : [];
+    return {
+      weekdays,
+      openTime: typeof value.openTime === "string" ? value.openTime.trim() : value.openTime,
+      closeTime: typeof value.closeTime === "string" ? value.closeTime.trim() : value.closeTime,
+    };
+  }
   if (
     field === "userPhoneNumber" ||
+    field === "userFullName" ||
     field === "userAddress" ||
     field === "userAddressFlat" ||
     field === "userAddressFiasId" ||

@@ -1,6 +1,24 @@
-.product-card--out-of-stock {
+.product-card--out-of-stock,
+.product-card--seller-closed {
   filter: grayscale(1);
   opacity: 0.72;
+}
+
+.product-card--seller-closed .product-card__body {
+  cursor: default;
+  position: relative;
+}
+
+.product-card__seller-closed-overlay {
+  pointer-events: auto;
+  cursor: default;
+}
+
+.product-card__seller-closed-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  cursor: default;
 }
 
 .product-card__out-of-stock-overlay {

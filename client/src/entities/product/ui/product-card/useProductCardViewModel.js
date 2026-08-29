@@ -61,10 +61,11 @@ export function useProductCardViewModel(props) {
   const fallbackHeadingId = useId();
   const heading = product.productName?.trim() || PRODUCT_CARD_UI.DEFAULT_TITLE;
   const headingId = resolveProductCardHeadingId(product._id) ?? fallbackHeadingId;
-  const isDetailsSurfaceInteractive = onOpenDetails != null;
 
   const media = useProductCardMediaState(product);
   const chrome = useProductCardChromeFlags(props, currentUserId);
+  const isDetailsSurfaceInteractive =
+    onOpenDetails != null && !chrome.showSellerClosedChrome;
 
   const previewFieldKeys = useMemo(() => {
     if (isModerationQueue) return PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS;

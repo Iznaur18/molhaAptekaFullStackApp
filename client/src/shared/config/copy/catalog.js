@@ -164,6 +164,9 @@ export const PRODUCT_CATEGORY_DISPLAY_UI = {
 export const ADD_TO_CART_UI = {
   ADD: "В корзину",
   OUT_OF_STOCK: "Нет в наличии",
+  BLOCKED: "Вы заблокированы",
+  SELLER_CLOSED: "У нас закрыто",
+  SELLER_CLOSED_OVERLAY_FALLBACK: "Закрыто",
   GO_TO_CART: "Перейти в корзину",
   LOGIN_TO_ADD: "Войти, чтобы купить",
   DECREASE_ARIA: "Уменьшить количество",
@@ -223,6 +226,7 @@ export const PRODUCT_CARD_UI = {
   HIDDEN_FROM_CATALOG_BADGE: "Скрыт от покупателей",
   OUT_OF_STOCK_OVERLAY: "Нет в наличии",
   OUT_OF_STOCK_OVERLAY_COMING_SOON: "Скоро поступление",
+  SELLER_CLOSED_OVERLAY_FALLBACK: "Закрыто",
   OUT_OF_STOCK_TOGGLE_PENDING: "Сохраняем…",
   IMAGE_LIGHTBOX_OPEN_LABEL: "Показать изображение в полном размере",
   IMAGE_LIGHTBOX_CLOSE: "Закрыть просмотр изображения",

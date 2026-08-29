@@ -3,10 +3,12 @@ import {
   validateSocialLinkInput,
   isRuRegionCode,
   assertUserNameFormat,
+  USER_FULL_NAME_MAX_LENGTH,
 } from "@molha/api-contract";
 import { validateRuDeliveryAddressForm } from "@/entities/address/lib/validateRuDeliveryAddressForm";
 import { validateUserSavedAddressesForm } from "@/entities/address/lib/validateUserSavedAddressesForm";
 import { EDIT_PROFILE_UI } from "@/shared/config";
+import { validateUserBusinessHoursForm } from "@/entities/user/lib/userBusinessHoursForm";
 
 import { isBirthDateInputComplete, parseBirthDateInputToIsoDate } from "./birthDateInputMask";
 import { validateRuPhoneField } from "./ruPhone";
@@ -21,6 +23,14 @@ export const validateEditProfileForm = (form: EditProfileFormState): string | nu
       return error instanceof Error ? error.message : "Неверный никнейм";
     }
   }
+
+  const fullName = form.userFullName.trim();
+  if (fullName.length > USER_FULL_NAME_MAX_LENGTH) {
+    return `Имя и фамилия: не больше ${USER_FULL_NAME_MAX_LENGTH} символов`;
+  }
+
+  const businessHoursError = validateUserBusinessHoursForm(form);
+  if (businessHoursError) return businessHoursError;
 
   const birthDate = form.userBirthDate.trim();
   if (birthDate !== "") {

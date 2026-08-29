@@ -14,6 +14,7 @@ import { useInstallmentMutations } from "../model/useInstallmentMutations.js";
 import { resolveInstallmentPlanPriceSummary } from "../lib/resolveInstallmentPlanPriceSummary.js";
 import { resolveInstallmentDeliveryFromSheet } from "../lib/resolveInstallmentDeliveryFromSheet.js";
 import { CHECKOUT_FORM_UI, INSTALLMENT_UI } from "../../../shared/config/appUiCopy.js";
+import { BlockedPurchaseButton } from "../../../shared/ui/BlockedPurchaseButton.jsx";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { useAppShellCompactLayout } from "../../../shared/lib/useAppShellCompactLayout.js";
 import { useProductDetailsPageDockHost } from "../../../shared/lib/productDetailsPageDockHostContext.js";
@@ -32,6 +33,9 @@ import "./InstallmentBuyerBlockMobile.css";
  *   dockSubmit?: boolean;
  *   onSuccess?: () => void;
  *   onRequestLogin?: () => void;
+ *   onSuccess?: () => void;
+ *   isPurchaseBlocked?: boolean;
+ *   blockedPurchaseLabel?: string;
  * }} props
  */
 export function InstallmentBuyerBlock({
@@ -42,6 +46,8 @@ export function InstallmentBuyerBlock({
   dockSubmit: dockSubmitProp,
   onSuccess,
   onRequestLogin,
+  isPurchaseBlocked = false,
+  blockedPurchaseLabel = "",
 }) {
   const { createContractMutation } = useInstallmentMutations();
   const { user: authUser } = useAuthSession();
@@ -237,20 +243,36 @@ export function InstallmentBuyerBlock({
       .filter(Boolean)
       .join(" ");
 
-  const isSubmitDisabled = isSubmitting || (isAuthorized && !isUserDataConfirmed);
-  const submitLabel = isSubmitting ? INSTALLMENT_UI.SUBMITTING : INSTALLMENT_UI.SUBMIT;
+  const isSubmitDisabled =
+    isSubmitting || isPurchaseBlocked || (isAuthorized && !isUserDataConfirmed);
+  const submitLabel = isPurchaseBlocked
+    ? blockedPurchaseLabel
+    : isSubmitting
+      ? INSTALLMENT_UI.SUBMITTING
+      : INSTALLMENT_UI.SUBMIT;
 
-  const renderSubmitButton = (linkedToForm) => (
-    <button
-      type={linkedToForm ? "submit" : "button"}
-      className="installment-buyer-block__submit"
-      form={linkedToForm ? formId : undefined}
-      disabled={isSubmitDisabled}
-      onClick={linkedToForm ? undefined : openCheckoutSheet}
-    >
-      {submitLabel}
-    </button>
-  );
+  const renderSubmitButton = (linkedToForm) => {
+    if (isPurchaseBlocked) {
+      return (
+        <BlockedPurchaseButton
+          label={blockedPurchaseLabel}
+          variant="installment"
+        />
+      );
+    }
+
+    return (
+      <button
+        type={linkedToForm ? "submit" : "button"}
+        className="installment-buyer-block__submit"
+        form={linkedToForm ? formId : undefined}
+        disabled={isSubmitDisabled}
+        onClick={linkedToForm ? undefined : openCheckoutSheet}
+      >
+        {submitLabel}
+      </button>
+    );
+  };
 
   const portalTarget =
     pageDockHost === undefined

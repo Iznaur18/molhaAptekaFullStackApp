@@ -3,6 +3,7 @@ import { View } from "react-native";
 import type { ProfileRow } from "@/entities/user/lib/getUserProfileRows";
 import { ProfileOverviewBanner } from "@/entities/user/ui/ProfileOverviewBanner";
 import { UserProfileInfoPanel } from "@/entities/user/ui/UserProfileInfoPanel";
+import { UserBlockProfileRow } from "@/entities/user-block/ui/UserBlockProfileRow";
 import { UserProfileProductsList } from "@/entities/user/ui/UserProfileProductsList";
 import { UserProfilePurchasesList } from "@/entities/user/ui/UserProfilePurchasesList";
 import { useUserDetailsPageStyles } from "@/shared/theme/profileChromeStyles";
@@ -13,7 +14,10 @@ type UserDetailsProfileBodyProps = {
   profileRows: ProfileRow[];
   showOtherUserPurchases: boolean;
   showOtherUserProducts: boolean;
+  isAuthorized: boolean;
   onViewAllSellerProducts: () => void;
+  onRequestLogin: () => void;
+  onBlockedChange: (patch: { isBlockedByMe: boolean }) => void;
 };
 
 export const UserDetailsProfileBody = ({
@@ -22,7 +26,10 @@ export const UserDetailsProfileBody = ({
   profileRows,
   showOtherUserPurchases,
   showOtherUserProducts,
+  isAuthorized,
   onViewAllSellerProducts,
+  onRequestLogin,
+  onBlockedChange,
 }: UserDetailsProfileBodyProps) => {
   const styles = useUserDetailsPageStyles();
 
@@ -43,6 +50,16 @@ export const UserDetailsProfileBody = ({
         rows={profileRows}
         hidePhoneUntilReveal
         userId={userId}
+        accountSectionFooter={
+          <UserBlockProfileRow
+            targetUserId={userId}
+            isBlockedByMe={user.isBlockedByMe === true}
+            isAuthorized={isAuthorized}
+            isSelf={false}
+            onRequestLogin={onRequestLogin}
+            onBlockedChange={onBlockedChange}
+          />
+        }
       />
     </View>
   );

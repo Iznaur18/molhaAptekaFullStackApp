@@ -18,6 +18,7 @@ import { UserProfileInfoPanel } from "../../../entities/user/ui/UserProfileInfoP
 import { UserProfileProductsList } from "../../../entities/user/ui/UserProfileProductsList.jsx";
 import { UserProfilePurchasesList } from "../../../entities/user/ui/UserProfilePurchasesList.jsx";
 import { UserFollowButton } from "../../../entities/user-follow/ui/UserFollowButton.jsx";
+import { UserBlockProfileRow } from "../../../entities/user-block/ui/UserBlockProfileRow.jsx";
 import { UserVoteRatingForm } from "../../../entities/user-vote-rating/ui/UserVoteRatingForm.jsx";
 import {
   ADMIN_EDIT_USER_UI,
@@ -57,6 +58,7 @@ export function UserDetailsPage() {
     canModerateProducts,
     isAdmin,
     handleFollowChange,
+    handleBlockChange,
     handleRated,
     handleViewAllSellerProducts,
     handleProductClick,
@@ -247,6 +249,16 @@ export function UserDetailsPage() {
           rows={profileRows}
           hidePhoneUntilReveal
           userId={userId}
+          accountSectionFooter={
+            <UserBlockProfileRow
+              targetUserId={userId}
+              isBlockedByMe={user.isBlockedByMe === true}
+              isAuthorized={isAuthorized}
+              isSelf={false}
+              onRequestLogin={handleRequestLogin}
+              onBlockedChange={handleBlockChange}
+            />
+          }
         />
 
         {canModerateProducts ? (

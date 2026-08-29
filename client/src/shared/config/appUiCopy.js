@@ -122,6 +122,7 @@ export {
   USER_PROFILE_PRODUCTS_UI,
   USER_STORY_UI,
   USER_FOLLOW_BUTTON_UI,
+  USER_BLOCK_BUTTON_UI,
 } from "./copy/profile-view.js";
 export {
   LOYALTY_POINTS_PAGE_UI,

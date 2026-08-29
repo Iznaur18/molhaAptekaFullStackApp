@@ -12,6 +12,7 @@ import { userSellerProductsValidation } from "./user/userSellerProductsValidatio
 import { submitDataConfirmationValidation } from "./user/submitDataConfirmationValidation.js";
 import { resolveDataConfirmationValidation } from "./user/resolveDataConfirmationValidation.js";
 import { userFollowListValidation } from "./user/userFollowListValidation.js";
+import { userBlockListValidation } from "./user/userBlockValidation.js";
 import {
   registerPushTokenValidation,
   removePushTokenValidation,
@@ -155,6 +156,7 @@ export {
   submitDataConfirmationValidation,
   resolveDataConfirmationValidation,
   userFollowListValidation,
+  userBlockListValidation,
   refreshAuthValidation,
   verifyEmailTokenValidation,
   adminCreditLoyaltyPointsValidation,

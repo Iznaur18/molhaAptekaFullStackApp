@@ -32,7 +32,10 @@ import { useProductCardMediaStyles } from "@/shared/theme/catalogProductStyles";
 import { ProductCardBanner } from "@/entities/product/ui/ProductCardBanner";
 import { ProductCardModerationPendingOverlay } from "@/entities/product/ui/ProductCardModerationPendingOverlay";
 import { isProductOutOfStock } from "@/entities/product/lib/isProductOutOfStock";
+import { resolveProductSellerClosedOverlayLabel } from "@/entities/product/lib/resolveProductSellerClosedOverlayLabel";
+import { isProductSellerClosedNow } from "@molha/api-contract";
 import { ProductCardOutOfStockOverlay } from "@/entities/product/ui/ProductCardOutOfStockOverlay";
+import { ProductCardSellerClosedOverlay } from "@/entities/product/ui/ProductCardSellerClosedOverlay";
 import { ProductCardModerationPreviewFields } from "@/entities/product/ui/ProductCardModerationPreviewFields";
 import {
   ProductModerationDetailsFooter,
@@ -120,14 +123,23 @@ export const ProductCard = memo(
       isModerationQueue,
     });
     const cardMedia = useProductCardMediaState(product);
-    const showWishlistToggle = !isMineMode && !isModerationQueue;
+    const isSellerClosedForViewer =
+      !isMineMode &&
+      !isModerationQueue &&
+      !isProductOutOfStock(product) &&
+      isProductSellerClosedNow(product);
+    const showWishlistToggle =
+      !isMineMode && !isModerationQueue && !isSellerClosedForViewer;
     const currentUserId = sessionQuery.data?.user?._id ?? null;
     const canDoubleTapWishlist =
       showWishlistToggle && !isCurrentUserProductSeller(product, currentUserId);
 
     const handlePress = useCallback(() => {
+      if (isSellerClosedForViewer) {
+        return;
+      }
       router.push({ pathname: "/product/[id]", params: { id: product._id } });
-    }, [product._id, router]);
+    }, [isSellerClosedForViewer, product._id, router]);
 
     const handleDoubleTapWishlist = useCallback(() => {
       if (!isAuthorized) {
@@ -199,6 +211,8 @@ export const ProductCard = memo(
       },
     );
     const showOutOfStockOverlay = !isModerationQueue && isProductOutOfStock(product);
+    const showSellerClosedOverlay = isSellerClosedForViewer;
+    const sellerClosedOverlayLabel = resolveProductSellerClosedOverlayLabel(product);
     const showModerationBadge =
       (isMineMode || isModerationQueue) &&
       !showModerationPendingOverlay &&
@@ -223,6 +237,7 @@ export const ProductCard = memo(
           catalogGridMinHeight != null ? { minHeight: catalogGridMinHeight } : null,
           isCatalogGrid && isModerationQueue && styles.cardCatalogGridModerationQueue,
           showOutOfStockOverlay && styles.cardOutOfStock,
+          showSellerClosedOverlay && styles.cardOutOfStock,
           promotionFrameStyle,
           raffleParticipantFrameStyle,
         ]}
@@ -244,9 +259,12 @@ export const ProductCard = memo(
             renderSlide={(index) => (
               <Pressable
                 style={cardMediaStyles.frame}
-                onPress={handleImagePress}
-                accessibilityRole="button"
-                accessibilityLabel={openProductLabel}
+                onPress={showSellerClosedOverlay ? undefined : handleImagePress}
+                disabled={showSellerClosedOverlay}
+                accessibilityRole={showSellerClosedOverlay ? "text" : "button"}
+                accessibilityLabel={
+                  showSellerClosedOverlay ? sellerClosedOverlayLabel : openProductLabel
+                }
                 accessibilityHint={
                   canDoubleTapWishlist
                     ? PRODUCT_CARD_UI.DOUBLE_TAP_WISHLIST_HINT
@@ -267,6 +285,9 @@ export const ProductCard = memo(
           ) : null}
           {showOutOfStockOverlay ? (
             <ProductCardOutOfStockOverlay product={product} />
+          ) : null}
+          {showSellerClosedOverlay ? (
+            <ProductCardSellerClosedOverlay label={sellerClosedOverlayLabel} />
           ) : null}
 
           {promotionRibbonTier ? (
@@ -311,9 +332,12 @@ export const ProductCard = memo(
               styles.contentPressable,
               isCatalogGrid && styles.contentPressableCatalogGrid,
             ]}
-            onPress={handlePress}
-            accessibilityRole="button"
-            accessibilityLabel={openProductLabel}
+            onPress={showSellerClosedOverlay ? undefined : handlePress}
+            disabled={showSellerClosedOverlay}
+            accessibilityRole={showSellerClosedOverlay ? "text" : "button"}
+            accessibilityLabel={
+              showSellerClosedOverlay ? sellerClosedOverlayLabel : openProductLabel
+            }
           >
             <Text
               style={[styles.name, isCatalogGrid && styles.nameCatalogGrid]}
@@ -365,9 +389,12 @@ export const ProductCard = memo(
               >
                 <Pressable
                   style={styles.contentPressable}
-                  onPress={handlePress}
-                  accessibilityRole="button"
-                  accessibilityLabel={openProductLabel}
+                  onPress={showSellerClosedOverlay ? undefined : handlePress}
+                  disabled={showSellerClosedOverlay}
+                  accessibilityRole={showSellerClosedOverlay ? "text" : "button"}
+                  accessibilityLabel={
+                    showSellerClosedOverlay ? sellerClosedOverlayLabel : openProductLabel
+                  }
                   importantForAccessibility="no-hide-descendants"
                 >
                   <ProductCardRatingRow

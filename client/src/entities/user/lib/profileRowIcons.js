@@ -3,6 +3,7 @@ import {
   Cake,
   Calendar,
   Camera,
+  Clock,
   Crown,
   Globe,
   Link2,
@@ -22,6 +23,7 @@ import {
   UserCheck,
   Users,
   UserCircle,
+  BadgeCheck,
 } from "lucide-react";
 
 /** @typedef {import("lucide-react").LucideIcon} LucideIcon */
@@ -29,6 +31,7 @@ import {
 /** @type {Record<string, LucideIcon>} */
 export const PROFILE_ROW_ICONS = {
   userName: User,
+  userFullName: BadgeCheck,
   followersCount: Users,
   followingCount: UserCheck,
   email: Mail,
@@ -43,6 +46,7 @@ export const PROFILE_ROW_ICONS = {
   totalSalesCount: ShoppingBag,
   totalSalesAmount: Wallet,
   totalPurchasesAmount: ShoppingCart,
+  userBusinessHours: Clock,
   userRatingByVotes: Star,
   createdAt: Calendar,
   socialTelegramUrl: MessageCircle,

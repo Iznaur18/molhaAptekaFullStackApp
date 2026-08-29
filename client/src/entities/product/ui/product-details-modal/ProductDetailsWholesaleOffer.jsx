@@ -3,9 +3,12 @@ import { useNavigate } from "react-router-dom";
 
 import { useCart } from "../../../cart/model/useCart.js";
 import { getProductPurchaseLimit } from "../../lib/getProductPurchaseLimit.js";
+import { resolveProductPurchaseBlockState } from "../../lib/resolveProductPurchaseBlockState.js";
+import { resolveProductSellerClosedPurchaseState } from "../../lib/resolveProductSellerClosedPurchaseState.js";
 import { PRODUCT_WHOLESALE_UI } from "../../../../shared/config/appUiCopy.js";
 import { HOME_MAIN_VIEW_PATH } from "../../../../shared/lib/homeMainViewPaths.js";
 import { formatPriceRub } from "../../../../shared/lib/formatPriceRub.js";
+import { BlockedPurchaseButton } from "../../../../shared/ui/BlockedPurchaseButton.jsx";
 
 import "./ProductDetailsTeaser.css";
 import "./ProductDetailsWholesaleOffer.css";
@@ -33,7 +36,15 @@ export function ProductDetailsWholesaleOffer({
 
   const productId = String(product._id ?? "");
   const purchaseLimit = getProductPurchaseLimit(product);
-  const goDisabled = !canShowAddToCart || purchaseLimit < offer.minQty || productId.length === 0;
+  const { isPurchaseBlocked, blockedLabel } = resolveProductPurchaseBlockState(product);
+  const { isSellerClosed, closedLabel: sellerClosedLabel } =
+    resolveProductSellerClosedPurchaseState(product);
+  const goDisabled =
+    !canShowAddToCart ||
+    isPurchaseBlocked ||
+    isSellerClosed ||
+    purchaseLimit < offer.minQty ||
+    productId.length === 0;
 
   const wholesalePriceLabel = formatPriceRub(offer.wholesalePrice);
   const savingsLabel = formatPriceRub(offer.savingsPerUnit);
@@ -43,7 +54,11 @@ export function ProductDetailsWholesaleOffer({
     wholesalePriceLabel,
     offer.discountPercent,
   );
-  const goLabel = PRODUCT_WHOLESALE_UI.DETAILS_OFFER_GO;
+  const goLabel = isPurchaseBlocked
+    ? blockedLabel
+    : isSellerClosed
+      ? sellerClosedLabel
+      : PRODUCT_WHOLESALE_UI.DETAILS_OFFER_GO;
   const ariaLabel = [
     PRODUCT_WHOLESALE_UI.DETAILS_OFFER_ARIA,
     subtitle,
@@ -78,15 +93,22 @@ export function ProductDetailsWholesaleOffer({
         <span className="product-details-teaser__title">{title}</span>
         <span className="product-details-teaser__subtitle">{subtitle}</span>
       </span>
-      <button
-        type="button"
-        className="product-details-teaser__go product-details-wholesale-offer__go"
-        disabled={goDisabled}
-        aria-label={PRODUCT_WHOLESALE_UI.DETAILS_OFFER_GO_ARIA}
-        onClick={handleGoClick}
-      >
-        {goLabel}
-      </button>
+      {isPurchaseBlocked || isSellerClosed ? (
+        <BlockedPurchaseButton
+          label={isPurchaseBlocked ? blockedLabel : sellerClosedLabel}
+          variant="teaser"
+        />
+      ) : (
+        <button
+          type="button"
+          className="product-details-teaser__go product-details-wholesale-offer__go"
+          disabled={goDisabled}
+          aria-label={PRODUCT_WHOLESALE_UI.DETAILS_OFFER_GO_ARIA}
+          onClick={handleGoClick}
+        >
+          {goLabel}
+        </button>
+      )}
     </aside>
   );
 }

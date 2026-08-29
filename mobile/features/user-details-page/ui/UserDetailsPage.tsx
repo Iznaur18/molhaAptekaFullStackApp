@@ -30,6 +30,7 @@ export const UserDetailsPage = () => {
     showOtherUserPurchases,
     canModerate,
     handleFollowChange,
+    handleBlockChange,
     handleRated,
     handleViewAllSellerProducts,
     handleEditUser,
@@ -92,7 +93,10 @@ export const UserDetailsPage = () => {
             profileRows={profileRows}
             showOtherUserPurchases={showOtherUserPurchases}
             showOtherUserProducts={showOtherUserProducts}
+            isAuthorized={isAuthorized}
             onViewAllSellerProducts={handleViewAllSellerProducts}
+            onRequestLogin={() => router.push("/(auth)/login")}
+            onBlockedChange={handleBlockChange}
           />
 
           {canModerate && !isSelf ? <AdminUserStaffActions onEditPress={handleEditUser} /> : null}

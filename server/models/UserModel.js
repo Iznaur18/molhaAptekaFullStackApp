@@ -276,6 +276,33 @@ const UserSchema = new mongoose.Schema(
       required: false,
       sparse: true,
     },
+    userFullName: {
+      // отображаемое имя (имя, фамилия или название)
+      type: String,
+      trim: true,
+      default: null,
+      maxlength: 80,
+    },
+    userBusinessHoursEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    userBusinessHours: {
+      weekdays: {
+        type: [Number],
+        default: [],
+      },
+      openTime: {
+        type: String,
+        trim: true,
+        default: null,
+      },
+      closeTime: {
+        type: String,
+        trim: true,
+        default: null,
+      },
+    },
     userPhoneNumber: {
       // номер телефона пользователя (строка — сохраняются ведущие нули)
       type: String,

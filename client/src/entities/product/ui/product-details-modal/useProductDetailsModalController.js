@@ -16,6 +16,7 @@ import { resolveProductDetailsContentPanels } from "../../lib/resolveProductDeta
 import { useAuthSession } from "../../../user/model/useAuthSession.js";
 import { getProductPurchaseLimit } from "../../lib/getProductPurchaseLimit.js";
 import { resolveProductOutOfStockOverlayLabel } from "../../lib/resolveProductOutOfStockOverlayLabel.js";
+import { resolveProductSellerClosedPurchaseState } from "../../lib/resolveProductSellerClosedPurchaseState.js";
 import { PRODUCT_QA_UI, PRODUCT_REVIEW_UI } from "../../../../shared/config/appUiCopy.js";
 import { useProductDetailsModalQueries } from "./useProductDetailsModalQueries.js";
 import { useProductDetailsModalTabs } from "./useProductDetailsModalTabs.js";
@@ -144,14 +145,27 @@ export function useProductDetailsModalController({
   }, [bottomMetaFieldKeys, contentPanels, product]);
   const purchaseLimit = product ? getProductPurchaseLimit(product) : 0;
   const isProductOutOfStock = product?.productOutOfStock === true;
+  const { isPurchaseBlocked, blockedLabel } = resolveProductPurchaseBlockState(product);
+  const { isSellerClosed, closedLabel: sellerClosedLabel } =
+    resolveProductSellerClosedPurchaseState(product);
   const canShowAddToCart =
     showAddToCart &&
     product?._id != null &&
     !tabs.isOwnProduct &&
     purchaseLimit > 0 &&
-    !isProductOutOfStock;
+    !isProductOutOfStock &&
+    !isPurchaseBlocked &&
+    !isSellerClosed;
   const showOutOfStockPurchaseButton =
     showAddToCart && product?._id != null && !tabs.isOwnProduct && isProductOutOfStock;
+  const showBlockedPurchaseButton =
+    product?._id != null && !tabs.isOwnProduct && isPurchaseBlocked;
+  const showSellerClosedPurchaseButton =
+    product?._id != null &&
+    !tabs.isOwnProduct &&
+    isSellerClosed &&
+    !isPurchaseBlocked &&
+    !isProductOutOfStock;
   const outOfStockPurchaseLabel = product
     ? resolveProductOutOfStockOverlayLabel(product)
     : "";
@@ -183,6 +197,11 @@ export function useProductDetailsModalController({
     hasDetailsSection,
     canShowAddToCart,
     showOutOfStockPurchaseButton,
+    showBlockedPurchaseButton,
+    blockedPurchaseLabel: blockedLabel,
+    showSellerClosedPurchaseButton,
+    sellerClosedPurchaseLabel: sellerClosedLabel,
+    isPurchaseBlocked,
     outOfStockPurchaseLabel,
     purchaseLimit,
     reviewsTabLabel,

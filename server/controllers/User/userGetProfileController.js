@@ -4,6 +4,7 @@ import { USER_DATA } from "../../constants/constants.js";
 import { getOptionalViewerFromRequest } from "../../services/user/optionalViewerFromRequest.js";
 import { sanitizeUserProfileForViewer } from "../../services/user/userProfileVisibility.js";
 import { attachFollowFieldsToPublicProfile } from "../../services/user/userFollowHelpers.js";
+import { attachBlockFieldsToPublicProfile } from "../../services/user/userBlockHelpers.js";
 import { attachUserCommerceStatsToUser } from "../../services/user/attachUserListCommerceStats.js";
 
 /** Получение профиля другого пользователя по id. GET /user/:userId (публичный — без авторизации) */
@@ -37,7 +38,11 @@ export const userGetProfileController = async (req, res) => {
     viewerId: viewer?._id ?? null,
   });
 
-  const userWithCommerce = await attachUserCommerceStatsToUser(userWithFollow);
+  const userWithBlock = await attachBlockFieldsToPublicProfile(userWithFollow, {
+    viewerId: viewer?._id ?? null,
+  });
+
+  const userWithCommerce = await attachUserCommerceStatsToUser(userWithBlock);
 
   return successRes(res, { user: userWithCommerce });
 };

@@ -45,6 +45,8 @@ export const API_CLIENT_UI = {
   REPLACE_WISHLIST_FALLBACK: "Не удалось сохранить список желаний",
   FETCH_MY_FOLLOWING_FALLBACK: "Не удалось загрузить подписки",
   UNFOLLOW_USER_FALLBACK: "Не удалось отписаться",
+  BLOCK_USER_FALLBACK: "Не удалось заблокировать пользователя",
+  UNBLOCK_USER_FALLBACK: "Не удалось разблокировать пользователя",
   MARK_NOTIFICATIONS_READ_FALLBACK: "Не удалось очистить уведомления",
   RECORD_PRODUCT_VIEW_FALLBACK: "Не удалось зафиксировать просмотр",
   FETCH_PRODUCT_REVIEWS_FALLBACK: "Не удалось загрузить отзывы",
@@ -143,9 +145,18 @@ export const EDIT_PROFILE_UI = {
   SECTION_APPEARANCE: "Оформление",
   SECTION_ACCOUNT: "Аккаунт",
   SECTION_PERSONAL: "Личные данные",
+  SECTION_BUSINESS_HOURS: "Часы работы",
+  LABEL_BUSINESS_HOURS_ENABLED: "Показывать часы работы",
+  LABEL_BUSINESS_HOURS_DAYS: "Рабочие дни",
+  LABEL_BUSINESS_HOURS_OPEN: "Открытие",
+  LABEL_BUSINESS_HOURS_CLOSE: "Закрытие",
+  HINT_BUSINESS_HOURS:
+    "Вне рабочего времени ваши товары видны, но покупка недоступна. Часовой пояс — по региону профиля.",
   SECTION_NOTIFICATIONS: "Уведомления",
   SECTION_ABOUT: "О себе",
   SECTION_SOCIAL: "Соцсети",
+  LABEL_FULL_NAME: "Имя и фамилия",
+  HINT_FULL_NAME: "Как вас видят другие пользователи. Можно указать имя, фамилию или название.",
   LABEL_EMAIL: "Email",
   LABEL_USERNAME: "Никнейм",
   USERNAME_HINT:
@@ -294,6 +305,9 @@ export const ADMIN_EDIT_USER_UI = {
 export const ADD_TO_CART_UI = {
   ADD: "В корзину",
   OUT_OF_STOCK: "Нет в наличии",
+  BLOCKED: "Вы заблокированы",
+  SELLER_CLOSED: "У нас закрыто",
+  SELLER_CLOSED_OVERLAY_FALLBACK: "Закрыто",
   GO_TO_CART: "Перейти в корзину",
   LOGIN_TO_ADD: "Войти, чтобы купить",
   ADD_FAILED: "Не удалось добавить в корзину",
@@ -494,6 +508,7 @@ export const PRODUCT_CARD_UI = {
   HIDDEN_FROM_CATALOG_BADGE: "Скрыт от покупателей",
   OUT_OF_STOCK_OVERLAY: "Нет в наличии",
   OUT_OF_STOCK_OVERLAY_COMING_SOON: "Скоро поступление",
+  SELLER_CLOSED_OVERLAY_FALLBACK: "Закрыто",
   OUT_OF_STOCK_TOGGLE_PENDING: "Сохраняем…",
   LOYALTY_POINTS_CONFIRMED: (points: number) => `+${points} баллов`,
   LOYALTY_POINTS_UNCONFIRMED: (points: number) => `+${points} баллов`,
@@ -1563,6 +1578,7 @@ export const USER_PROFILE_COPY = {
   SHOW_PHONE_NUMBER_ERROR: "Не удалось показать номер",
   LABELS: {
     userName: "Никнейм",
+    userFullName: "Имя и фамилия",
     email: "Email",
     userBirthDate: "Дата рождения",
     userGender: "Пол",
@@ -1586,6 +1602,7 @@ export const USER_PROFILE_COPY = {
     totalSalesCount: "Продаж",
     totalSalesAmount: "Продаж на сумму",
     totalPurchasesAmount: "Покупок на сумму",
+    userBusinessHours: "Часы работы",
     createdAt: "Создан",
   },
 } as const;
@@ -1833,6 +1850,14 @@ export const USER_FOLLOW_BUTTON_UI = {
   UNFOLLOW: "Отписаться",
   LOADING: "…",
   ERROR: "Не удалось изменить подписку",
+} as const;
+
+export const USER_BLOCK_BUTTON_UI = {
+  LABEL: "Заблокировать",
+  BLOCK: "Заблокировать",
+  UNBLOCK: "Разблокировать",
+  LOADING: "…",
+  ERROR: "Не удалось изменить блокировку",
 } as const;
 
 export const CATALOG_BROWSER_UI = {

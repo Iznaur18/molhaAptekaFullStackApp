@@ -10,6 +10,7 @@ import { serializeUserBackgroundForForm } from "./userBackgroundValue.js";
 import { DEFAULT_USER_AVATAR_URL } from "../model/userConstants.js";
 import { appendUserAddressesToPayload } from "../../address/lib/appendUserAddressesToPayload.js";
 import { isUserSavedAddressesEqual } from "../../address/lib/isUserSavedAddressesEqual.js";
+import { buildUserBusinessHoursPatchBody } from "./userBusinessHoursForm.js";
 
 /**
  * Тело `PATCH /user/:id` (только разрешённые пользователю поля).
@@ -32,6 +33,11 @@ export function buildPatchUserProfileBody(form, options = {}) {
   if (rawName.length > 0) {
     body.userName = rawName;
   }
+
+  const rawFullName = String(form.userFullName).trim().replace(/\s+/g, " ");
+  body.userFullName = rawFullName === "" ? null : rawFullName;
+
+  Object.assign(body, buildUserBusinessHoursPatchBody(form));
 
   if (form.userBirthDate === "") {
     body.userBirthDate = null;

@@ -148,6 +148,31 @@ export const useEditProfileFormStyles = createThemedStyles((theme) => ({
     fontWeight: "500",
     color: theme.colors.text,
   },
+  weekdayRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: theme.spacing[2],
+  },
+  weekdayChip: {
+    borderRadius: theme.radius.pill,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceMuted,
+    paddingHorizontal: theme.spacing[3],
+    paddingVertical: theme.spacing[2],
+  },
+  weekdayChipSelected: {
+    backgroundColor: theme.colors.action,
+    borderColor: theme.colors.action,
+  },
+  weekdayChipText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+  },
+  weekdayChipTextSelected: {
+    color: theme.colors.onContrast,
+  },
 
   charMeter: {
     fontSize: 12,

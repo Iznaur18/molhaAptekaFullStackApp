@@ -5,8 +5,11 @@ import { Pressable, Text, View } from "react-native";
 import { useCartActions } from "@/entities/cart/model/useCartActions";
 import { useMyCartQuery } from "@/entities/cart/model/useMyCartQuery";
 import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";
+import { resolveProductPurchaseBlockState } from "@/entities/product/lib/resolveProductPurchaseBlockState";
+import { resolveProductSellerClosedPurchaseState } from "@/entities/product/lib/resolveProductSellerClosedPurchaseState";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { PRODUCT_WHOLESALE_UI } from "@/shared/config";
+import { BlockedPurchaseButton } from "@/shared/ui/BlockedPurchaseButton";
 import { formatPriceRub } from "@/shared/lib";
 import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
 
@@ -31,8 +34,13 @@ export const ProductDetailsWholesaleOffer = ({
 
   const productId = product._id != null ? String(product._id) : "";
   const purchaseLimit = getProductPurchaseLimit(product);
+  const { isPurchaseBlocked, blockedLabel } = resolveProductPurchaseBlockState(product);
+  const { isSellerClosed, closedLabel: sellerClosedLabel } =
+    resolveProductSellerClosedPurchaseState(product);
   const goDisabled =
     !canShowAddToCart ||
+    isPurchaseBlocked ||
+    isSellerClosed ||
     purchaseLimit < offer.minQty ||
     productId.length === 0 ||
     isUpdating;
@@ -45,7 +53,11 @@ export const ProductDetailsWholesaleOffer = ({
     wholesalePriceLabel,
     offer.discountPercent,
   );
-  const goLabel = PRODUCT_WHOLESALE_UI.DETAILS_OFFER_GO;
+  const goLabel = isPurchaseBlocked
+    ? blockedLabel
+    : isSellerClosed
+      ? sellerClosedLabel
+      : PRODUCT_WHOLESALE_UI.DETAILS_OFFER_GO;
   const accessibilityLabel = [
     PRODUCT_WHOLESALE_UI.DETAILS_OFFER_ARIA,
     subtitle,
@@ -80,20 +92,27 @@ export const ProductDetailsWholesaleOffer = ({
         <Text style={styles.installmentTeaserTitle}>{title}</Text>
         <Text style={styles.installmentTeaserMonthly}>{subtitle}</Text>
       </View>
-      <Pressable
-        onPress={handleGoPress}
-        disabled={goDisabled}
-        accessibilityRole="button"
-        accessibilityLabel={PRODUCT_WHOLESALE_UI.DETAILS_OFFER_GO_ARIA}
-        accessibilityState={{ disabled: goDisabled }}
-        style={({ pressed }) => [
-          styles.installmentTeaserGo,
-          goDisabled ? { opacity: 0.45 } : null,
-          pressed && !goDisabled ? { opacity: 0.85 } : null,
-        ]}
-      >
-        <Text style={styles.installmentTeaserGoText}>{goLabel}</Text>
-      </Pressable>
+      {isPurchaseBlocked || isSellerClosed ? (
+        <BlockedPurchaseButton
+          label={isPurchaseBlocked ? blockedLabel : sellerClosedLabel}
+          variant="teaser"
+        />
+      ) : (
+        <Pressable
+          onPress={handleGoPress}
+          disabled={goDisabled}
+          accessibilityRole="button"
+          accessibilityLabel={PRODUCT_WHOLESALE_UI.DETAILS_OFFER_GO_ARIA}
+          accessibilityState={{ disabled: goDisabled }}
+          style={({ pressed }) => [
+            styles.installmentTeaserGo,
+            goDisabled ? { opacity: 0.45 } : null,
+            pressed && !goDisabled ? { opacity: 0.85 } : null,
+          ]}
+        >
+          <Text style={styles.installmentTeaserGoText}>{goLabel}</Text>
+        </Pressable>
+      )}
     </View>
   );
 };

@@ -6,6 +6,7 @@ import {
   PRODUCT_PICKUP_MISSING_FOR_ORDER_MESSAGE,
   PRODUCT_PICKUP_NOT_ENABLED_FOR_ITEMS_MESSAGE,
 } from "@molha/api-contract";
+import { USER_BLOCK_CART_ORDER_MESSAGE } from "../../constants/userBlockConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { AppError } from "../../errors/AppError.js";
 import {
@@ -51,6 +52,9 @@ import {
   listAppliedProductPromosForUser,
 } from "../product/productPromoCode.js";
 import { claimBuyNFreeRedemption } from "../product/productBuyNFreeProgress.js";
+import { getSellerIdsBlockingBuyer } from "../user/userBlockHelpers.js";
+import { isUserSellerClosedNow } from "@molha/api-contract";
+import { USER_SELLER_CLOSED_ORDER_MESSAGE } from "../../constants/userBusinessHoursConstants.js";
 
 const calculateTotalAmount = (items) =>
   items.reduce(
@@ -196,6 +200,38 @@ const fetchAvailableProductsForOrder = async (productIds) => {
     };
   }
   return byId;
+};
+
+/**
+ * @param {string} buyerUserId
+ * @param {Record<string, { sellerId: string }>} productById
+ */
+const assertBuyerNotBlockedForProducts = async (buyerUserId, productById) => {
+  const sellerIds = Object.values(productById).map((snapshot) => snapshot.sellerId);
+  const blockingSellerIds = await getSellerIdsBlockingBuyer(buyerUserId, sellerIds);
+  if (blockingSellerIds.size > 0) {
+    throw new AppError(403, USER_BLOCK_CART_ORDER_MESSAGE);
+  }
+};
+
+/**
+ * @param {Record<string, { sellerId: string }>} productById
+ */
+const assertSellersOpenForProducts = async (productById) => {
+  const sellerIds = [...new Set(Object.values(productById).map((snapshot) => snapshot.sellerId))];
+  if (sellerIds.length === 0) {
+    return;
+  }
+
+  const sellers = await UserModel.find({ _id: { $in: sellerIds } })
+    .select("userBusinessHoursEnabled userBusinessHours userRegionCode")
+    .lean();
+
+  for (const seller of sellers) {
+    if (isUserSellerClosedNow(seller)) {
+      throw new AppError(403, USER_SELLER_CLOSED_ORDER_MESSAGE);
+    }
+  }
 };
 
 /**
@@ -392,6 +428,9 @@ export async function createOrder({
       throw new AppError(400, "Один или несколько товаров не найдены или недоступны");
     }
   }
+
+  await assertBuyerNotBlockedForProducts(String(userId), productById);
+  await assertSellersOpenForProducts(productById);
 
   const resolvedFulfillment =
     fulfillmentMethod === "delivery" ? "delivery" : ORDER_FULFILLMENT_PICKUP;

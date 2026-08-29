@@ -1,0 +1,26 @@
+.product-details-teaser__go--blocked,
+.product-details-teaser__go--blocked:hover {
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-muted-surface, var(--iz-color-surface-muted));
+  color: var(--iz-color-text-muted);
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.installment-buyer-block__submit--blocked,
+.installment-buyer-block__submit--blocked:hover {
+  border-color: var(--iz-color-border);
+  background: var(--iz-color-muted-surface, var(--iz-color-surface-muted));
+  color: var(--iz-color-text-muted);
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.product-price-offer__btn--blocked,
+.product-price-offer__btn--blocked:hover {
+  border-color: var(--iz-color-border);
+  background: var(--iz-color-muted-surface, var(--iz-color-surface-muted));
+  color: var(--iz-color-text-muted);
+  cursor: not-allowed;
+  opacity: 1;
+}

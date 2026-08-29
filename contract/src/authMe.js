@@ -4,6 +4,7 @@ export const userPublicProfileSchema = z
   .object({
     _id: z.string(),
     userName: z.string().optional(),
+    userFullName: z.string().nullable().optional(),
     email: z.string().optional(),
     isEmailVerified: z.boolean().optional(),
     isPhoneVerified: z.boolean().optional(),

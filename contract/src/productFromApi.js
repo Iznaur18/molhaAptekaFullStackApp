@@ -17,6 +17,8 @@ export const productFromApiSchema = z
     productIsAvailable: z.boolean().nullish(),
     productOutOfStock: z.boolean().nullish(),
     productOutOfStockLabel: productOutOfStockLabelFieldSchema.nullish(),
+    isSellerClosedNow: z.boolean().nullish(),
+    sellerClosedOpensAt: z.string().nullish(),
     productQaEnabled: z.boolean().nullish(),
     soldQuantity: z.number().nullish(),
     productFlashSaleEnabled: z.boolean().nullish(),

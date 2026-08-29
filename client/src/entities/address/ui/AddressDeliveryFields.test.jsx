@@ -106,4 +106,37 @@ describe("AddressDeliveryFields", () => {
     expect(screen.getByText("Кастомный адрес")).toBeInTheDocument();
     expect(screen.getByPlaceholderText(ADDRESS_DELIVERY_UI.PLACEHOLDER_LINE)).toBeInTheDocument();
   });
+
+  it("requests browser geolocation from fullscreen map", async () => {
+    vi.useRealTimers();
+    const getCurrentPosition = vi.fn((success) => {
+      success({
+        coords: { latitude: 55.75, longitude: 37.62, accuracy: 40 },
+      });
+    });
+    const clearWatch = vi.fn();
+    const watchPosition = vi.fn((success) => {
+      success({
+        coords: { latitude: 55.75, longitude: 37.62, accuracy: 40 },
+      });
+      return 1;
+    });
+    vi.stubGlobal("navigator", {
+      geolocation: { getCurrentPosition, watchPosition, clearWatch },
+    });
+
+    renderWithProviders(<AddressDeliveryFieldsHarness />);
+
+    fireEvent.click(screen.getByRole("button", { name: ADDRESS_DELIVERY_UI.MAP_OPEN }));
+
+    fireEvent.click(
+      screen.getByRole("button", { name: ADDRESS_DELIVERY_UI.MAP_MY_LOCATION }),
+    );
+
+    await waitFor(() => {
+      expect(watchPosition).toHaveBeenCalledTimes(1);
+    });
+
+    vi.unstubAllGlobals();
+  });
 });

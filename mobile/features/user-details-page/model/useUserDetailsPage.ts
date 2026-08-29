@@ -66,6 +66,31 @@ export const useUserDetailsPage = () => {
     [queryClient, userId],
   );
 
+  const handleBlockChange = useCallback(
+    (patch: { isBlockedByMe: boolean }) => {
+      queryClient.setQueryData(userProfileQueryKeys.byId(userId), (old) => {
+        if (!old || typeof old !== "object") {
+          return old;
+        }
+        return {
+          ...old,
+          isBlockedByMe: patch.isBlockedByMe,
+          ...(patch.isBlockedByMe ? { isFollowing: false } : {}),
+        };
+      });
+      setProfileSnapshot((prev) =>
+        prev
+          ? {
+              ...prev,
+              isBlockedByMe: patch.isBlockedByMe,
+              ...(patch.isBlockedByMe ? { isFollowing: false } : {}),
+            }
+          : prev,
+      );
+    },
+    [queryClient, userId],
+  );
+
   const handleRated = useCallback(
     (snapshot: Record<string, unknown>) => {
       queryClient.setQueryData(userProfileQueryKeys.byId(userId), snapshot);
@@ -95,6 +120,7 @@ export const useUserDetailsPage = () => {
     showOtherUserPurchases,
     canModerate,
     handleFollowChange,
+    handleBlockChange,
     handleRated,
     handleViewAllSellerProducts,
     handleEditUser,

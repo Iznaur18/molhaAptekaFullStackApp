@@ -1,3 +1,4 @@
+import { isCatalogProductViewerPurchaseContextKnown } from "@molha/api-contract";
 import { useQuery } from "@tanstack/react-query";
 
 import { fetchCatalogProductById } from "../api/fetchCatalogProductById.js";
@@ -15,5 +16,11 @@ export function useCatalogProductByIdQuery({ productId, enabled = true }) {
     queryFn: () => fetchCatalogProductById(id),
     // Seed из карточки каталога — сразу полный UI без skeleton.
     staleTime: 30_000,
+    refetchOnMount: (query) => {
+      if (!isCatalogProductViewerPurchaseContextKnown(query.state.data)) {
+        return "always";
+      }
+      return query.isStale();
+    },
   });
 }

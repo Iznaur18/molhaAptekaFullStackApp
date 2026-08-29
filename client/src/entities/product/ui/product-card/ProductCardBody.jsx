@@ -37,6 +37,14 @@ export function ProductCardBody({ vm, detailsSurface }) {
   return (
     <article className={vm.cardClassName} aria-labelledby={vm.headingId}>
       <div className={vm.bodyClassName} {...detailsSurfaceProps}>
+        {vm.showSellerClosedChrome ? (
+          <div
+            className="product-card__seller-closed-shield"
+            aria-hidden="true"
+            onClick={detailsSurface.stopCardDetailsActivation}
+            onKeyDown={detailsSurface.stopCardDetailsActivation}
+          />
+        ) : null}
         <ProductCardMedia vm={vm} />
         {vm.showBannerLayout ? (
           <div className="product-card__banner-content">

@@ -19,6 +19,8 @@ import "../../../product-price-offer/ui/ProductPriceOffer.css";
  *   onOffersChanged: () => void;
  *   onCloseModal?: () => void;
  *   showSellerArchive: boolean;
+ *   isPurchaseBlocked?: boolean;
+ *   blockedPurchaseLabel?: string;
  * }} props
  */
 export function ProductDetailsModalAuctionTab({
@@ -34,6 +36,8 @@ export function ProductDetailsModalAuctionTab({
   onOffersChanged,
   onCloseModal,
   showSellerArchive,
+  isPurchaseBlocked = false,
+  blockedPurchaseLabel = "",
 }) {
   if (isSellerView) {
     return (
@@ -70,6 +74,8 @@ export function ProductDetailsModalAuctionTab({
           onRequestLogin={onRequestLogin}
           onOffersChanged={onOffersChanged}
           onCloseModal={onCloseModal}
+          isPurchaseBlocked={isPurchaseBlocked}
+          blockedPurchaseLabel={blockedPurchaseLabel}
         />
       ) : (
         <p className="product-price-offer__inactive-hint">

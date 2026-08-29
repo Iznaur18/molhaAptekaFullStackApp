@@ -15,6 +15,10 @@ import {
   unfollowUserController,
   listMyFollowingController,
   listMyFollowersController,
+  blockUserController,
+  unblockUserController,
+  listMyBlockedUsersController,
+  listUserBlockedUsersModeratorController,
   getUserStoriesFeedController,
   getUserStoriesByAuthorController,
   createUserStoryController,
@@ -54,6 +58,7 @@ import {
   submitDataConfirmationValidation,
   resolveDataConfirmationValidation,
   userFollowListValidation,
+  userBlockListValidation,
   userStoryIdParamValidation,
   createUserStoryValidation,
   submitUserStoryReportValidation,
@@ -125,6 +130,13 @@ router.post(
   userStoryIdParamValidation,
   submitUserStoryReportValidation,
   submitUserStoryReportController,
+);
+
+router.get(
+  "/me/blocked-users",
+  checkAuthMW,
+  userBlockListValidation,
+  listMyBlockedUsersController,
 );
 
 router.get(
@@ -220,6 +232,28 @@ router.get(
   userIdParamValidation,
   userSellerProductsValidation,
   getUserProductsController,
+);
+router.get(
+  "/:userIdClient/blocked-users",
+  checkAuthMW,
+  checkProductModeratorMW,
+  userIdParamValidation,
+  userBlockListValidation,
+  listUserBlockedUsersModeratorController,
+);
+router.post(
+  "/:userIdClient/block",
+  checkAuthMW,
+  updateProfileRateLimiter,
+  userIdParamValidation,
+  blockUserController,
+);
+router.delete(
+  "/:userIdClient/block",
+  checkAuthMW,
+  updateProfileRateLimiter,
+  userIdParamValidation,
+  unblockUserController,
 );
 router.post(
   "/:userIdClient/follow",

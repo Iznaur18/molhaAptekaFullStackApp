@@ -104,6 +104,14 @@ export const ADDRESS_DELIVERY_UI = {
   MAP_PICK_HINT: "Или укажите точку на карте",
   MAP_OPEN: "Указать на карте",
   MAP_DONE: "Готово",
+  MAP_MY_LOCATION: "Мое местоположение",
+  MAP_MY_LOCATION_LOADING: "Определяем местоположение…",
+  MAP_MY_LOCATION_UNAVAILABLE: "Геолокация недоступна в этом браузере",
+  MAP_MY_LOCATION_DENIED: "Разрешите доступ к геолокации в настройках браузера",
+  MAP_MY_LOCATION_LOW_ACCURACY:
+    "Местоположение неточное ({distance}). Сдвиньте метку на карте или введите адрес вручную",
+  MAP_MY_LOCATION_TIMEOUT: "Не удалось определить местоположение — попробуйте ещё раз",
+  MAP_MY_LOCATION_ERROR: "Не удалось определить местоположение",
   MAP_GEOLOCATE_LOADING: "Определяем адрес…",
   MAP_GEOLOCATE_NO_HOUSE:
     "Дом по точке не найден — адрес подставлен, уточните из списка при необходимости",

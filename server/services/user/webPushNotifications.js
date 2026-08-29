@@ -48,6 +48,9 @@ export function buildWebPushClickPath(params) {
   if (kind === "user_new_follower" && params.actorUserId) {
     return `/subscriptions`;
   }
+  if (kind === "user_blocked_by_seller" && params.actorUserId) {
+    return `/user/${encodeURIComponent(String(params.actorUserId))}`;
+  }
   if (kind === "product_price_offer_seller" || kind === "price_offer_seller") {
     return `/auction`;
   }

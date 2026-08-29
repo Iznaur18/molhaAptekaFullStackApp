@@ -19,6 +19,7 @@ import {
 import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import { CheckoutSheetModal } from "@/features/checkout/ui/CheckoutSheetModal";
 import { CHECKOUT_FORM_UI, INSTALLMENT_UI, PRODUCT_UI } from "@/shared/config";
+import { BlockedPurchaseButton } from "@/shared/ui/BlockedPurchaseButton";
 import { formatPriceRub } from "@/shared/lib";
 import { textInputFocusScrollProps } from "@/shared/lib/scrollTextInputIntoViewOnFocus";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
@@ -50,6 +51,8 @@ type ProductInstallmentTabProps = {
   defaultUser?: Record<string, unknown> | null;
   dockSubmit?: boolean;
   onDockFooterChange?: (footer: ProductInstallmentDockFooter | null) => void;
+  isPurchaseBlocked?: boolean;
+  blockedPurchaseLabel?: string;
 };
 
 type PendingCheckout = {
@@ -95,6 +98,8 @@ export const ProductInstallmentTab = ({
   defaultUser,
   dockSubmit = true,
   onDockFooterChange,
+  isPurchaseBlocked = false,
+  blockedPurchaseLabel = "",
 }: ProductInstallmentTabProps) => {
   const theme = useAppTheme();
   const styles = useProductDetailTabStyles();
@@ -231,8 +236,13 @@ export const ProductInstallmentTab = ({
     : null;
   const baseTotalRub = (selectedPlanPriceSummary?.productPriceRub ?? 0) * qty;
   const markupTotalRub = (selectedPlanPriceSummary?.markupRub ?? 0) * qty;
-  const isSubmitDisabled = isCreateContractPending || !isAuthorized || !isUserDataConfirmed;
-  const dockLabel = isCreateContractPending ? INSTALLMENT_UI.SUBMITTING : INSTALLMENT_UI.SUBMIT;
+  const isSubmitDisabled =
+    isCreateContractPending || isPurchaseBlocked || !isAuthorized || !isUserDataConfirmed;
+  const dockLabel = isPurchaseBlocked
+    ? blockedPurchaseLabel
+    : isCreateContractPending
+      ? INSTALLMENT_UI.SUBMITTING
+      : INSTALLMENT_UI.SUBMIT;
   const showCheckoutForm =
     !isOwnProduct &&
     installmentEnabled &&
@@ -372,18 +382,22 @@ export const ProductInstallmentTab = ({
       {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
 
       {!dockSubmit ? (
-        <Pressable
-          style={[
-            styles.installmentBuyerSubmit,
-            isSubmitDisabled && styles.installmentBuyerSubmitDisabled,
-          ]}
-          disabled={isSubmitDisabled}
-          onPress={openCheckoutSheet}
-          accessibilityRole="button"
-          accessibilityLabel={INSTALLMENT_UI.SUBMIT}
-        >
-          <Text style={styles.installmentBuyerSubmitText}>{dockLabel}</Text>
-        </Pressable>
+        isPurchaseBlocked ? (
+          <BlockedPurchaseButton label={blockedPurchaseLabel} variant="installment" />
+        ) : (
+          <Pressable
+            style={[
+              styles.installmentBuyerSubmit,
+              isSubmitDisabled && styles.installmentBuyerSubmitDisabled,
+            ]}
+            disabled={isSubmitDisabled}
+            onPress={openCheckoutSheet}
+            accessibilityRole="button"
+            accessibilityLabel={INSTALLMENT_UI.SUBMIT}
+          >
+            <Text style={styles.installmentBuyerSubmitText}>{dockLabel}</Text>
+          </Pressable>
+        )
       ) : null}
 
       <CheckoutSheetModal

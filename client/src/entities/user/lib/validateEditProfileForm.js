@@ -12,8 +12,9 @@ import {
   USER_ROLE_USER,
 } from "../model/userConstants.js";
 import { isUserBackgroundPresetId } from "../model/userBackgroundPresets.js";
-import { assertUserNameFormat, isRuRegionCode } from "@molha/api-contract";
+import { assertUserNameFormat, isRuRegionCode, USER_FULL_NAME_MAX_LENGTH } from "@molha/api-contract";
 import { EDIT_PROFILE_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import { validateUserBusinessHoursForm } from "./userBusinessHoursForm.js";
 
 const DISCOUNT_MIN = 0;
 const DISCOUNT_MAX = 100;
@@ -37,6 +38,14 @@ export function validateEditProfileForm(form, options = {}) {
       return error instanceof Error ? error.message : "Неверный никнейм";
     }
   }
+
+  const fullName = String(form.userFullName).trim();
+  if (fullName.length > USER_FULL_NAME_MAX_LENGTH) {
+    return `Имя и фамилия: не больше ${USER_FULL_NAME_MAX_LENGTH} символов`;
+  }
+
+  const businessHoursError = validateUserBusinessHoursForm(form);
+  if (businessHoursError) return businessHoursError;
 
   const phoneError = validateRuPhoneField(form.userPhoneNumber);
   if (phoneError) return phoneError;

@@ -1,0 +1,26 @@
+.user-block-profile-row__btn {
+  border: 1px solid var(--iz-color-border, #d8dce3);
+  border-radius: 10px;
+  background: var(--iz-color-surface, #fff);
+  color: var(--iz-color-text, #1a1a1a);
+  cursor: pointer;
+  font: inherit;
+  padding: 0.35rem 0.85rem;
+}
+
+.user-block-profile-row__btn_blocked {
+  color: var(--iz-color-danger, #c62828);
+  border-color: color-mix(in srgb, var(--iz-color-danger, #c62828) 35%, transparent);
+}
+
+.user-block-profile-row__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.user-block-profile-row__error {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--iz-color-danger, #c62828);
+  font-size: 0.85rem;
+}

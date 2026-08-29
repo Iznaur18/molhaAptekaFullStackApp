@@ -1,3 +1,4 @@
+import { USER_BUSINESS_HOURS_WEEKDAY_LABELS_RU, USER_FULL_NAME_MAX_LENGTH } from "@molha/api-contract";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
 import { sanitizeUserNameInputLive } from "@molha/api-contract";
@@ -473,8 +474,95 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
 
       {/* Зона: личные данные (телефон, дата рождения, пол) */}
       {section(
+        EDIT_PROFILE_UI.SECTION_BUSINESS_HOURS,
+        <>
+          <View style={styles.field}>
+            <View style={styles.switchRow}>
+              <Text style={styles.label}>{EDIT_PROFILE_UI.LABEL_BUSINESS_HOURS_ENABLED}</Text>
+              <Switch
+                value={form.userBusinessHoursEnabled}
+                onValueChange={(value) => updateField("userBusinessHoursEnabled", value)}
+                disabled={isSubmitting}
+              />
+            </View>
+          </View>
+          {form.userBusinessHoursEnabled ? (
+            <>
+              <View style={styles.field}>
+                <Text style={styles.label}>{EDIT_PROFILE_UI.LABEL_BUSINESS_HOURS_DAYS}</Text>
+                <View style={styles.weekdayRow}>
+                  {USER_BUSINESS_HOURS_WEEKDAY_LABELS_RU.map((label, index) => {
+                    const selected = form.userBusinessHoursWeekdays.includes(index);
+                    return (
+                      <Pressable
+                        key={label}
+                        style={[styles.weekdayChip, selected ? styles.weekdayChipSelected : null]}
+                        disabled={isSubmitting}
+                        onPress={() => {
+                          const next = selected
+                            ? form.userBusinessHoursWeekdays.filter((day) => day !== index)
+                            : [...form.userBusinessHoursWeekdays, index].sort((a, b) => a - b);
+                          updateField("userBusinessHoursWeekdays", next);
+                        }}
+                      >
+                        <Text
+                          style={[
+                            styles.weekdayChipText,
+                            selected ? styles.weekdayChipTextSelected : null,
+                          ]}
+                        >
+                          {label}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              </View>
+              <View style={styles.field}>
+                <Text style={styles.label}>{EDIT_PROFILE_UI.LABEL_BUSINESS_HOURS_OPEN}</Text>
+                <TextInput
+                  style={styles.input}
+                  value={form.userBusinessHoursOpenTime}
+                  onChangeText={(value) => updateField("userBusinessHoursOpenTime", value)}
+                  editable={!isSubmitting}
+                  placeholder="09:00"
+                  placeholderTextColor={theme.colors.textMuted}
+                />
+              </View>
+              <View style={styles.field}>
+                <Text style={styles.label}>{EDIT_PROFILE_UI.LABEL_BUSINESS_HOURS_CLOSE}</Text>
+                <TextInput
+                  style={styles.input}
+                  value={form.userBusinessHoursCloseTime}
+                  onChangeText={(value) => updateField("userBusinessHoursCloseTime", value)}
+                  editable={!isSubmitting}
+                  placeholder="18:00"
+                  placeholderTextColor={theme.colors.textMuted}
+                />
+              </View>
+              <Text style={styles.hint}>{EDIT_PROFILE_UI.HINT_BUSINESS_HOURS}</Text>
+            </>
+          ) : null}
+        </>,
+      )}
+
+      {section(
         EDIT_PROFILE_UI.SECTION_PERSONAL,
         <>
+          <View style={styles.field}>
+            {fieldLabel(EDIT_PROFILE_UI.LABEL_FULL_NAME)}
+            <TextInput
+              style={styles.input}
+              value={form.userFullName}
+              onChangeText={(value) => updateField("userFullName", value)}
+              editable={!isSubmitting}
+              placeholder="Иван Иванов"
+              placeholderTextColor={theme.colors.textMuted}
+              maxLength={USER_FULL_NAME_MAX_LENGTH}
+              autoComplete="name"
+            />
+            <Text style={styles.hint}>{EDIT_PROFILE_UI.HINT_FULL_NAME}</Text>
+          </View>
           <View style={styles.field}>
             {fieldLabel(EDIT_PROFILE_UI.LABEL_PHONE)}
             <TextInput

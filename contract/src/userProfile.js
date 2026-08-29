@@ -19,6 +19,9 @@ import { optionalRuRegionCodeFieldSchema } from "./ruRegions.js";
 import { isStoredMediaUrl } from "./storedMediaUrl.js";
 import { userSocialLinksBodyShape } from "./userSocialLinks.js";
 import { userAddressesPatchFieldSchema, USER_ADDRESS_PATCH_CONFLICT_MESSAGE } from "./userAddresses.js";
+import {
+  userBusinessHoursBodySchema,
+} from "./userBusinessHours.js";
 
 /** Синхрон с `server/constants/profileImageFocusConstants.js`. */
 export const PROFILE_IMAGE_FOCUS_MIN = 0;
@@ -26,6 +29,9 @@ export const PROFILE_IMAGE_FOCUS_MAX = 100;
 
 /** Синхрон с `server/utils/maxWordsText.js`. */
 export const NOTES_ABOUT_USER_MAX_CHARS = 500;
+
+/** Синхрон с `UserModel.userFullName.maxlength`. */
+export const USER_FULL_NAME_MAX_LENGTH = 80;
 
 export const USER_ROLE_VALUES = ["user", "admin", "moderator"];
 
@@ -78,6 +84,18 @@ export const nullableProfileImageFocusSchema = z
   .optional();
 
 const clearableProfileImageFocusSchema = nullableProfileImageFocusSchema;
+
+const clearableUserFullNameSchema = clearableOptionalString
+  .transform((value) => {
+    if (value === undefined) return undefined;
+    if (value === null || value === "") return null;
+    return String(value).trim().replace(/\s+/g, " ");
+  })
+  .refine(
+    (value) =>
+      value === undefined || value === null || value.length <= USER_FULL_NAME_MAX_LENGTH,
+    `Имя не длиннее ${USER_FULL_NAME_MAX_LENGTH} символов`,
+  );
 
 const clearableUserNameSchema = clearableOptionalString
   .transform((value) => {
@@ -177,6 +195,9 @@ const clearableBooleanSchema = z.union([z.boolean(), z.null()]).optional();
 /** Тело `PATCH /user/:userIdClient` (структура; DaData — отдельно на сервере). */
 export const updateProfileBodySchema = z.object({
   userName: clearableUserNameSchema,
+  userFullName: clearableUserFullNameSchema,
+  userBusinessHoursEnabled: clearableBooleanSchema,
+  userBusinessHours: userBusinessHoursBodySchema,
   userBirthDate: clearableBirthDateSchema,
   userGender: z.union([z.enum(USER_GENDER_VALUES), z.null()]).optional(),
   userPhoneNumber: clearableRuPhoneSchema,

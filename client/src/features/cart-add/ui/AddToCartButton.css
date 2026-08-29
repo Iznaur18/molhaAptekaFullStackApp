@@ -41,6 +41,15 @@
   cursor: not-allowed;
 }
 
+.add-to-cart--blocked,
+.add-to-cart--blocked:hover {
+  border-color: var(--iz-color-border);
+  background: var(--iz-color-muted-surface, var(--iz-color-surface-muted));
+  color: var(--iz-color-text-muted);
+  cursor: not-allowed;
+  opacity: 1;
+}
+
 .add-to-cart__stepper {
   display: inline-flex;
   align-items: center;

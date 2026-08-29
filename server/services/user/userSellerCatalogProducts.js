@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { PRODUCT_SORT_NEWEST } from "../../constants/productCatalogSort.js";
 import { countProducts, findProductsPage } from "../product/productCatalogQuery.js";
+import { attachProductSellerClosedState } from "../product/attachProductSellerClosedState.js";
 import { isProductViewableForProfile } from "../product/isProductViewableForProfile.js";
 
 const { ObjectId } = mongoose.Types;
@@ -49,7 +50,7 @@ export const mapProductToProfileThumbItem = (product) => ({
  * @param {import('mongoose').Types.ObjectId | string} sellerId
  * @param {number} page
  * @param {number} limit
- * @param {{ shelfId?: string | null }} [opts]
+ * @param {{ shelfId?: string | null; viewerUserId?: string | null }} [opts]
  */
 export const getSellerCatalogProductsPage = async (sellerId, page, limit, opts = {}) => {
   const productsQuery = buildSellerCatalogProductsQuery(sellerId, opts);
@@ -60,7 +61,14 @@ export const getSellerCatalogProductsPage = async (sellerId, page, limit, opts =
     countProducts(productsQuery),
   ]);
 
-  const items = products.map((product) => mapProductToProfileThumbItem(product));
+  const productsWithClosedState = await attachProductSellerClosedState(
+    products,
+    opts.viewerUserId ?? null,
+  );
+
+  const items = productsWithClosedState.map((product) =>
+    mapProductToProfileThumbItem(product),
+  );
   const totalPages = Math.ceil(total / limit) || 0;
 
   return {

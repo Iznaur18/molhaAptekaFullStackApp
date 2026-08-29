@@ -6,6 +6,10 @@ import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCard
 import { resolveProductCardPromotionFrameStyle } from "@/entities/product/lib/resolveProductCardPromotionFrameStyle";
 import { PRODUCT_CARD_PROMOTION_TIER } from "@/entities/product/lib/productCardPromotionFramePalette";
 import { useProductCardMediaState } from "@/entities/product/lib/useProductCardMediaState";
+import { isProductOutOfStock } from "@/entities/product/lib/isProductOutOfStock";
+import { resolveProductSellerClosedOverlayLabel } from "@/entities/product/lib/resolveProductSellerClosedOverlayLabel";
+import { isProductSellerClosedNow } from "@molha/api-contract";
+import { ProductCardSellerClosedOverlay } from "@/entities/product/ui/ProductCardSellerClosedOverlay";
 import { ProductCardPromotionBackground } from "@/entities/product/ui/ProductCardPromotionBackground";
 import { ProductCardMediaSlide } from "@/entities/product/ui/ProductCardMediaSlide";
 import { ProductCardSellerRow } from "@/entities/product/ui/ProductCardSellerRow";
@@ -44,7 +48,14 @@ export const ProductCardBanner = ({ product }: ProductCardBannerProps) => {
   const hasReviewRating = reviewLine.length > 0;
   const openProductLabel = PRODUCT_UI.OPEN_ARIA(name);
 
+  const showSellerClosedOverlay =
+    !isProductOutOfStock(product) && isProductSellerClosedNow(product);
+  const sellerClosedOverlayLabel = resolveProductSellerClosedOverlayLabel(product);
+
   const handlePress = () => {
+    if (showSellerClosedOverlay) {
+      return;
+    }
     router.push({ pathname: "/product/[id]", params: { id: product._id } });
   };
 
@@ -60,11 +71,12 @@ export const ProductCardBanner = ({ product }: ProductCardBannerProps) => {
         style={({ pressed }) => [
           styles.card,
           bannerInnerFrameStyle,
-          pressed && styles.cardPressed,
+          pressed && !showSellerClosedOverlay ? styles.cardPressed : null,
         ]}
-        onPress={handlePress}
-        accessibilityRole="button"
-        accessibilityLabel={openProductLabel}
+        onPress={showSellerClosedOverlay ? undefined : handlePress}
+        disabled={showSellerClosedOverlay}
+        accessibilityRole={showSellerClosedOverlay ? "text" : "button"}
+        accessibilityLabel={showSellerClosedOverlay ? sellerClosedOverlayLabel : openProductLabel}
       >
         <ProductCardPromotionBackground
           tier={PRODUCT_CARD_PROMOTION_TIER.BANNER}
@@ -76,6 +88,9 @@ export const ProductCardBanner = ({ product }: ProductCardBannerProps) => {
           <View style={styles.imagePressable}>
             <ProductCardMediaSlide media={cardMedia} />
           </View>
+          {showSellerClosedOverlay ? (
+            <ProductCardSellerClosedOverlay label={sellerClosedOverlayLabel} />
+          ) : null}
         </View>
 
         <View style={styles.content}>
@@ -114,9 +129,11 @@ export const ProductCardBanner = ({ product }: ProductCardBannerProps) => {
         </View>
       </Pressable>
 
-      <View style={styles.wishlistSlot}>
-        <WishlistToggleButton productId={product._id} product={product} variant="card" />
-      </View>
+      {!showSellerClosedOverlay ? (
+        <View style={styles.wishlistSlot}>
+          <WishlistToggleButton productId={product._id} product={product} variant="card" />
+        </View>
+      ) : null}
     </View>
   );
 };

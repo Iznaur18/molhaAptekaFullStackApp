@@ -6,6 +6,7 @@ import {
 } from "@molha/api-contract";
 
 import { userSavedAddressesFromUser } from "../../address/lib/userSavedAddressesFromUser.js";
+import { mapUserBusinessHoursFromUser } from "./userBusinessHoursForm.js";
 import { getUserAvatarFocus, getUserBackgroundFocus } from "./profileImageFocus.js";
 import { parseUserBackgroundFormFields } from "./userBackgroundValue.js";
 import { formatPremiumExpiresAtForInput } from "./formatPremiumExpiresAtForInput.js";
@@ -20,6 +21,7 @@ import {
 /**
  * @typedef {object} EditProfileFormState
  * @property {string} userName
+ * @property {string} userFullName
  * @property {string} email
  * @property {string} userBirthDate
  * @property {'male'|'female'|'noSelected'} userGender
@@ -46,6 +48,10 @@ import {
  * @property {boolean} isActiveUser
  * @property {boolean} isUserDataConfirmed
  * @property {boolean} isBlockedUser
+ * @property {boolean} userBusinessHoursEnabled
+ * @property {number[]} userBusinessHoursWeekdays
+ * @property {string} userBusinessHoursOpenTime
+ * @property {string} userBusinessHoursCloseTime
  */
 
 /**
@@ -69,6 +75,7 @@ export function mapUserToEditProfileForm(user) {
 
   return {
     userName: user.userName ?? "",
+    userFullName: user.userFullName ?? "",
     email: typeof user.email === "string" ? user.email.trim().toLowerCase() : "",
     userBirthDate: birthInput,
     userGender: user.userGender ?? USER_GENDER_NO_SELECTED,
@@ -94,5 +101,6 @@ export function mapUserToEditProfileForm(user) {
     isActiveUser: user.isActiveUser !== false,
     isUserDataConfirmed: user.isUserDataConfirmed === true,
     isBlockedUser: Boolean(user.isBlockedUser),
+    ...mapUserBusinessHoursFromUser(user),
   };
 }

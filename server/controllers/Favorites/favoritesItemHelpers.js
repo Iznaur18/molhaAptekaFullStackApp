@@ -5,6 +5,7 @@ import { ProductModel, WishlistModel } from "../../models/index.js";
 import { attachProductSellerSnapshots } from "../../utils/attachProductSellerSnapshots.js";
 import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
 import { attachProductAvailablePurchaseQuantity } from "../../utils/productStock.js";
+import { attachProductSellerClosedState } from "../../services/product/attachProductSellerClosedState.js";
 import { applyProductWishlistCountDelta } from "../../services/product/productWishlistCount.js";
 
 import { resolveFavoritesUserId } from "./resolveFavoritesUserId.js";
@@ -110,8 +111,9 @@ export const filterWishlistItemsToKeepableProducts = async (items, userId) => {
 
 /**
  * @param {Record<string, number>} items
+ * @param {string | null | undefined} [viewerUserId]
  */
-export async function populateWishlistProducts(items) {
+export async function populateWishlistProducts(items, viewerUserId = null) {
   const ids = Object.keys(items);
   if (ids.length === 0) return [];
 
@@ -123,7 +125,8 @@ export async function populateWishlistProducts(items) {
   const productById = new Map(products.map((row) => [String(row._id), row]));
   const ordered = sortedIds.map((id) => productById.get(id)).filter(Boolean);
   const withSeller = await attachProductSellerSnapshots(ordered);
-  return attachProductAvailablePurchaseQuantity(withSeller);
+  const withStock = await attachProductAvailablePurchaseQuantity(withSeller);
+  return attachProductSellerClosedState(withStock, viewerUserId);
 }
 
 /**
@@ -175,7 +178,7 @@ export async function syncWishlistForUser(userId, nextItems) {
       withMongoSession({ upsert: true }, session),
     );
 
-    let products = await populateWishlistProducts(filtered);
+    let products = await populateWishlistProducts(filtered, String(userObjectId));
     let finalItems = filtered;
     const { reconciled, ghostIds } = reconcileWishlistItemsWithProducts(
       filtered,

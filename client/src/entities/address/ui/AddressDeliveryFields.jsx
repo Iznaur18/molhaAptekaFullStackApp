@@ -1,3 +1,4 @@
+import { Navigation } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -16,8 +17,14 @@ import {
 } from "../model/constants.js";
 import { useAddressSuggestionsQuery } from "../model/useAddressSuggestionsQuery.js";
 import { MapPointPicker } from "../../maps/ui/MapPointPicker.jsx";
+import {
+  formatGeolocationLowAccuracyMessage,
+  isGeolocationAccuracyLow,
+} from "../../maps/lib/geolocationAccuracy.js";
+import { requestBrowserGeolocation } from "../../maps/lib/requestBrowserGeolocation.js";
 import { ADDRESS_DELIVERY_UI } from "../../../shared/config/appUiCopy.js";
 import { FormFieldLabel } from "../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
+import { AppIcon } from "../../../shared/ui/icon/index.js";
 
 import "./AddressDeliveryFields.css";
 
@@ -85,6 +92,10 @@ export function AddressDeliveryFields({
     /** @type {'idle' | 'loading' | 'error'} */ ("idle"),
   );
   const [mapError, setMapError] = useState(/** @type {string | null} */ (null));
+  const [myLocationStatus, setMyLocationStatus] = useState(
+    /** @type {'idle' | 'loading'} */ ("idle"),
+  );
+  const [myLocationError, setMyLocationError] = useState(/** @type {string | null} */ (null));
 
   const lineLabel = labels.line ?? ADDRESS_DELIVERY_UI.LABEL_LINE;
   const trimmedLine = value.line.trim();
@@ -117,6 +128,8 @@ export function AddressDeliveryFields({
       return undefined;
     }
     setMapSuggestPanelOpen(true);
+    setMyLocationError(null);
+    setMyLocationStatus("idle");
     const onKeyDown = (event) => {
       if (event.key === "Escape") {
         setMapOpen(false);
@@ -261,6 +274,50 @@ export function AddressDeliveryFields({
     }, MAP_GEOLOCATE_DEBOUNCE_MS);
   };
 
+  const handleMyLocationClick = () => {
+    if (disabled || myLocationStatus === "loading") {
+      return;
+    }
+
+    setMyLocationError(null);
+    setMyLocationStatus("loading");
+
+    void requestBrowserGeolocation()
+      .then(({ lat, lon, accuracyMeters }) => {
+        if (isGeolocationAccuracyLow(accuracyMeters)) {
+          setMyLocationError(
+            formatGeolocationLowAccuracyMessage(
+              accuracyMeters,
+              ADDRESS_DELIVERY_UI.MAP_MY_LOCATION_LOW_ACCURACY,
+            ),
+          );
+          setMapStatus("idle");
+          setMapError(null);
+          setDebouncedQuery("");
+          patch({
+            line: "",
+            geo: { lat, lon },
+            selectedFromSuggest: false,
+            fiasId: "",
+            regionCode: null,
+          });
+          return;
+        }
+
+        handleMapPointChange({ lat, lon });
+      })
+      .catch((error) => {
+        setMyLocationError(
+          error instanceof Error && error.message
+            ? error.message
+            : ADDRESS_DELIVERY_UI.MAP_MY_LOCATION_ERROR,
+        );
+      })
+      .finally(() => {
+        setMyLocationStatus("idle");
+      });
+  };
+
   const handleClearLine = () => {
     if (disabled) {
       return;
@@ -396,6 +453,25 @@ export function AddressDeliveryFields({
                     role="alert"
                   >
                     {mapError}
+                  </p>
+                ) : null}
+                <button
+                  type="button"
+                  className="address-delivery-fields__map-fullscreen-my-location"
+                  disabled={disabled || myLocationStatus === "loading" || mapStatus === "loading"}
+                  onClick={handleMyLocationClick}
+                  aria-label={ADDRESS_DELIVERY_UI.MAP_MY_LOCATION}
+                  title={ADDRESS_DELIVERY_UI.MAP_MY_LOCATION}
+                  aria-busy={myLocationStatus === "loading" || undefined}
+                >
+                  <AppIcon icon={Navigation} size="md" strokeWidth={2.25} />
+                </button>
+                {myLocationError ? (
+                  <p
+                    className="address-delivery-fields__map-fullscreen-location-error"
+                    role="alert"
+                  >
+                    {myLocationError}
                   </p>
                 ) : null}
                 <button

@@ -267,6 +267,23 @@ export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
     fontWeight: OOS_BTN.fontWeight,
     fontSize: OOS_BTN.fontSize,
   },
+  teaserBlockedButton: {
+    flexShrink: 0,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceMuted,
+    alignItems: "center",
+    justifyContent: "center",
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+  },
+  teaserBlockedButtonText: {
+    color: theme.colors.textMuted,
+    fontWeight: "700",
+    fontSize: 13,
+  },
   detailDockLoginButton: {
     marginTop: 0,
     width: "100%",

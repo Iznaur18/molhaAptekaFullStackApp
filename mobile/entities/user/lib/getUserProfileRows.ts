@@ -1,6 +1,7 @@
 import {
   USER_SOCIAL_LINK_FIELDS,
   formatSocialLinkDisplay,
+  formatUserBusinessHoursForProfile,
 } from "@molha/api-contract";
 import {
   formatSearchRowTotalSales,
@@ -95,6 +96,7 @@ export const getUserProfileRows = (
     | { countVotes?: number; totalRating?: number }
     | null
     | undefined;
+  const businessHoursValue = formatUserBusinessHoursForProfile(user);
 
   const socialRows: ProfileRow[] = USER_SOCIAL_LINK_FIELDS.flatMap((field) => {
     const raw = user[field.id];
@@ -117,6 +119,15 @@ export const getUserProfileRows = (
 
   const rows: ProfileRow[] = [
     { id: "userName", label: USER_PROFILE_COPY.LABELS.userName, value: dashIfEmpty(user.userName) },
+    ...(typeof user.userFullName === "string" && user.userFullName.trim() !== ""
+      ? [
+          {
+            id: "userFullName",
+            label: USER_PROFILE_COPY.LABELS.userFullName,
+            value: user.userFullName.trim(),
+          },
+        ]
+      : []),
     {
       id: "followersCount",
       label: USER_PROFILE_COPY.LABELS.followersCount,
@@ -133,6 +144,15 @@ export const getUserProfileRows = (
           ? EM_DASH
           : String(Math.max(0, Number(user.followingCount) || 0)),
     },
+    ...(businessHoursValue != null
+      ? [
+          {
+            id: "userBusinessHours",
+            label: USER_PROFILE_COPY.LABELS.userBusinessHours,
+            value: businessHoursValue,
+          },
+        ]
+      : []),
     {
       id: "totalSalesCount",
       label: USER_PROFILE_COPY.LABELS.totalSalesCount,

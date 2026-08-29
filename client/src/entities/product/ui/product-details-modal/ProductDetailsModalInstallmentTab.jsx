@@ -17,6 +17,8 @@ import {
  *   onRequestLogin: () => void;
  *   onSuccess: () => void;
  *   dockSubmit?: boolean;
+ *   isPurchaseBlocked?: boolean;
+ *   blockedPurchaseLabel?: string;
  * }} props
  */
 export function ProductDetailsModalInstallmentTab({
@@ -30,6 +32,8 @@ export function ProductDetailsModalInstallmentTab({
   onRequestLogin,
   onSuccess,
   dockSubmit = false,
+  isPurchaseBlocked = false,
+  blockedPurchaseLabel = "",
 }) {
   if (isSellerView) {
     return (
@@ -59,6 +63,8 @@ export function ProductDetailsModalInstallmentTab({
         onRequestLogin={onRequestLogin}
         onSuccess={onSuccess}
         dockSubmit={dockSubmit}
+        isPurchaseBlocked={isPurchaseBlocked}
+        blockedPurchaseLabel={blockedPurchaseLabel}
       />
     );
   }
