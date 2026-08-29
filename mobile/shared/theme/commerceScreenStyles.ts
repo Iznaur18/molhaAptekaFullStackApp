@@ -774,15 +774,28 @@ export const useRaffleProductsPageStyles = createThemedStyles((theme) => ({
   },
   swipeOverlay: {
     ...StyleSheet.absoluteFillObject,
-    zIndex: 2,
+    zIndex: 6,
     opacity: 0.01,
+    ...(Platform.OS === "web"
+      ? ({
+          // Оверлей ловит ГОРИЗОНТАЛЬНЫЙ свайп между розыгрышами, а `pan-y`
+          // отдаёт браузеру только вертикаль — горизонтальные жесты до списка
+          // не доходили, и карусель не листалась. Нужны обе оси: вертикаль
+          // уходит на прокрутку страницы, горизонталь — в карусель.
+          // Так же сделано в вебе у галереи товара (touch-action: pan-x pan-y).
+          touchAction: "pan-x pan-y",
+        } as const)
+      : null),
+  },
+  swipeSoundToggle: {
+    zIndex: 7,
   },
   swipeDots: {
     position: "absolute",
     left: 0,
     right: 0,
     bottom: 12,
-    zIndex: 6,
+    zIndex: 8,
     flexDirection: "row",
     justifyContent: "center",
     gap: 6,

@@ -112,23 +112,10 @@
 
 @media (max-width: 420px) {
   .seller-profile-quick-stats__grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .seller-profile-quick-stats__item {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    min-height: 0;
-    padding: 12px 14px;
-    text-align: start;
-  }
-
-  .seller-profile-quick-stats__item_phone .seller-profile-quick-stats__value {
-    font-size: 0.9375rem;
-  }
-
-  .seller-profile-quick-stats__reveal-wrap {
-    align-items: flex-start;
+  .seller-profile-quick-stats__item_phone {
+    grid-column: 1 / -1;
   }
 }

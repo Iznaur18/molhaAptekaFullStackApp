@@ -16,6 +16,7 @@ import {
 import { CreateRaffleFormBody } from "@/features/create-raffle-page/ui/CreateRaffleFormBody";
 import { API_CLIENT_UI, CREATE_RAFFLE_MODAL_UI } from "@/shared/config";
 import { useCreateRaffleModalStyles } from "@/shared/theme/createRafflePageStyles";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 
 type CreateRaffleModalProps = {
   visible: boolean;
@@ -120,6 +121,7 @@ export const CreateRaffleModal = ({
       accessibilityViewIsModal
     >
       <View style={styles.overlay}>
+        <ModalSheetGradientBackdrop />
         <Pressable style={styles.backdropPressable} onPress={handleClose} accessibilityRole="button" />
         <View style={styles.card} accessibilityLabel={ariaDialog}>
           <View style={styles.header}>

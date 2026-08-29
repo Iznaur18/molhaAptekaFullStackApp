@@ -27,6 +27,7 @@ import {
 } from "@/shared/theme/formChromeStyles";
 import { EMAIL_VERIFY_MODAL_ANIMATION } from "@/shared/theme/modalChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 import { SquircleView } from "@/shared/ui/SquircleView";
 
 const CODE_LENGTH = 6;
@@ -175,6 +176,7 @@ export const EmailVerificationModal = ({
           style={[sheetStyles.emailVerifyBackdropLayer, backdropAnimatedStyle]}
           pointerEvents="box-none"
         >
+          <ModalSheetGradientBackdrop />
           <Pressable
             style={StyleSheet.absoluteFillObject}
             onPress={handleClose}

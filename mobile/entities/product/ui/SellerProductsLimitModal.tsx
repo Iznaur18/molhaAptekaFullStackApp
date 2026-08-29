@@ -4,6 +4,7 @@ import { SELLER_PRODUCTS_LIMIT_PREMIUM } from "@/entities/product/model/productC
 import { SELLER_PRODUCTS_LIMIT_MODAL_UI } from "@/shared/config";
 import { useRegisterBlockingOverlay } from "@/shared/lib/useBlockingOverlayOccupancy";
 import { useSellerProductsLimitModalStyles } from "@/shared/theme/modalChromeStyles";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 
 type SellerProductsLimitModalProps = {
   visible: boolean;
@@ -32,6 +33,7 @@ export const SellerProductsLimitModal = ({
   return (
     <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
       <View style={styles.overlay}>
+        <ModalSheetGradientBackdrop />
         <View style={styles.card} accessibilityRole="alert">
           <Text style={styles.title}>{SELLER_PRODUCTS_LIMIT_MODAL_UI.TITLE}</Text>
           <Text style={styles.body}>{body}</Text>

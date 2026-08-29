@@ -116,6 +116,20 @@ test("подписи чекаута совпадают с вебом", () => {
   }
 });
 
+test("поля чекаута совпадают с web checkout-form__input", () => {
+  const styles = readMobileFile("shared/theme/formChromeStyles.ts");
+  const layout = readMobileFile("features/checkout/lib/checkoutFormInputLayout.ts");
+  const webCss = readRepoFile("client/src/shared/ui/CheckoutForm/CheckoutForm.css");
+
+  assert.match(webCss, /background: var\(--iz-color-surface-muted\)/);
+  assert.match(webCss, /color: var\(--iz-color-text\)/);
+  assert.match(layout, /paddingVertical: 9/);
+  assert.match(layout, /fontSize: 15/);
+  assert.match(styles, /CHECKOUT_FORM_INPUT_LAYOUT/);
+  assert.match(styles, /fieldInput:[\s\S]*backgroundColor: theme\.colors\.surfaceMuted/);
+  assert.match(styles, /fieldInput:[\s\S]*color: theme\.colors\.text/);
+});
+
 test("форма чекаута показывает список и слушает ручную правку", () => {
   const form = readMobileFile("features/checkout/ui/CheckoutForm.tsx");
   assert.match(form, /<CheckoutSavedAddressPicker/);

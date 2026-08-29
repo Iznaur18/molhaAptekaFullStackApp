@@ -22,11 +22,12 @@ import {
   PRODUCT_REPORT_TEXT_MAX_CHARS,
   PRODUCT_REPORT_UI,
 } from "@/shared/config";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 import {
   REPORT_PRODUCT_MODAL_ANIMATION,
   useBottomSheetReportModalStyles,
 } from "@/shared/theme/modalChromeStyles";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 
 type ReportProductModalProps = {
   visible: boolean;
@@ -157,6 +158,7 @@ export const ReportProductModal = ({
     <Modal visible={modalVisible} animationType="none" transparent onRequestClose={handleClose}>
       <View style={[styles.root, { paddingBottom: sheetRestOffset }]}>
         <Animated.View style={[styles.backdrop, backdropAnimatedStyle]} pointerEvents="box-none">
+          <ModalSheetGradientBackdrop />
           <Pressable
             style={StyleSheet.absoluteFillObject}
             onPress={handleClose}

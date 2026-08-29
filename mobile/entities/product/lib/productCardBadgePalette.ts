@@ -1,5 +1,6 @@
 import { izColors, type IzTheme } from "@izibuy/design-tokens";
 
+import { PRODUCT_CARD_MOBILE_CATALOG_LAYOUT } from "@/entities/product/lib/productCardMobileCatalogLayout";
 import { mixHexColors } from "@/shared/lib/mixHexColors";
 
 type ThemeColors = IzTheme["colors"];
@@ -87,6 +88,17 @@ export const PRODUCT_CARD_BADGE_COLORS = resolveProductCardBadgeColors(izColors)
 
 /** @deprecated light snapshot — prefer resolve* + theme */
 export const PRODUCT_CARD_IMAGE_BADGE_OVERLAY = resolveProductCardImageBadgeOverlay(izColors);
+
+/**
+ * Компенсация image bleed (`marginHorizontal: -contentInsetX`): overlay с left:0
+ * обрезается `overflow:hidden` карточки. Web mobile catalog ставит bleed-x: 0.
+ */
+export const resolveProductCardImageOverlayInsetX = (
+  layout: "default" | "catalog-grid" = "default",
+): number =>
+  layout === "catalog-grid"
+    ? PRODUCT_CARD_MOBILE_CATALOG_LAYOUT.contentInsetX
+    : PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX;
 
 /** Ozon-стиль: стопка плашек флеш к левому краю фото, скругление только справа. */
 export const PRODUCT_CARD_IMAGE_BADGE_OVERLAY_LAYOUT = {

@@ -1,4 +1,3 @@
-import Feather from "@expo/vector-icons/Feather";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
@@ -29,6 +28,7 @@ import { AppButton } from "@/shared/ui/AppButton";
 import { AuthScreenScroll } from "@/shared/ui/AuthScreenScroll";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 import { PasswordTextInput } from "@/shared/ui/PasswordTextInput";
+import { ScreenBackButton } from "@/shared/ui/ScreenBackButton";
 
 type AuthChannel = "email" | "phone";
 type ResetStep = "request" | "confirm" | "done";
@@ -194,23 +194,6 @@ export default function ForgotPasswordScreen() {
 
   return (
     <View style={styles.flex}>
-      <Pressable
-        style={[
-          styles.backButtonOverlay,
-          {
-            top: insets.top + A.backTopInset,
-            left: Math.max(insets.left, A.backLeftInset),
-          },
-          isLoading && styles.backButtonOverlayDisabled,
-        ]}
-        onPress={handleBack}
-        disabled={isLoading}
-        accessibilityRole="button"
-        accessibilityLabel={AUTH_UI.BACK_BUTTON}
-      >
-        <Feather name="chevron-left" size={22} color={theme.colors.link} />
-      </Pressable>
-
       <AuthScreenScroll
         style={styles.flex}
         contentContainerStyle={[
@@ -219,6 +202,11 @@ export default function ForgotPasswordScreen() {
         ]}
       >
         <View style={styles.column}>
+          <ScreenBackButton
+            accessibilityLabel={AUTH_UI.BACK_BUTTON}
+            disabled={isLoading}
+            onPress={handleBack}
+          />
           <View style={[styles.hero, { height: heroHeight }]}>
             {bannerImageUri ? (
               <CachedProductImage

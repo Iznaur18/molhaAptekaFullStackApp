@@ -6,6 +6,7 @@ import { useCartActions } from "@/entities/cart/model/useCartActions";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useMyCartQuery } from "@/entities/cart/model/useMyCartQuery";
 import { getProductPurchaseLimit } from "@/entities/product/lib/getProductPurchaseLimit";
+import { ADD_TO_CART_BUTTON_LAYOUT } from "@/entities/product/lib/addToCartButtonLayout";
 import { ADD_TO_CART_UI } from "@/shared/config";
 import { FIXED_FONT_PROPS } from "@/shared/lib/fixedTypography";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
@@ -94,8 +95,12 @@ export const AddToCartButton = ({
     }
 
     return (
-      <Pressable style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginButtonText}>{ADD_TO_CART_UI.LOGIN_TO_ADD}</Text>
+      <Pressable style={styles.loginButtonPressable} onPress={handleLogin}>
+        <SquircleView radius={ADD_TO_CART_BUTTON_LAYOUT.borderRadius} style={styles.loginButton}>
+          <Text style={styles.loginButtonText} {...fixedFontProps}>
+            {ADD_TO_CART_UI.LOGIN_TO_ADD}
+          </Text>
+        </SquircleView>
       </Pressable>
     );
   }
@@ -129,15 +134,22 @@ export const AddToCartButton = ({
 
     return (
       <Pressable
-        style={[styles.addButton, disabled && styles.buttonDisabled]}
+        style={styles.addButtonPressable}
         onPress={handleAdd}
         disabled={disabled}
       >
-        {isUpdating ? (
-          <ActivityIndicator color={theme.colors.onContrast} />
-        ) : (
-          <Text style={styles.addButtonText}>{ADD_TO_CART_UI.ADD}</Text>
-        )}
+        <SquircleView
+          radius={ADD_TO_CART_BUTTON_LAYOUT.borderRadius}
+          style={[styles.addButton, disabled && styles.buttonDisabled]}
+        >
+          {isUpdating ? (
+            <ActivityIndicator color={theme.colors.onContrast} />
+          ) : (
+            <Text style={styles.addButtonText} {...fixedFontProps}>
+              {ADD_TO_CART_UI.ADD}
+            </Text>
+          )}
+        </SquircleView>
       </Pressable>
     );
   }

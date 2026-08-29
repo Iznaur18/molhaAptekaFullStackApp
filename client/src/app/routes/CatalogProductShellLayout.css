@@ -1,4 +1,20 @@
 /* Каталог под /product/:id остаётся в потоке (scrollY), но невидим и inert. */
+.catalog-product-shell__catalog {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+}
+
+/* Вложенная сетка: без home edge-bleed (AppShell.css ≤667). */
+.catalog-product-shell__catalog .app-shell__grid,
+.catalog-product-shell__catalog .app-shell__grid-virtual-host {
+  box-sizing: border-box;
+  margin-inline: 0;
+  width: 100%;
+  min-width: 0;
+}
+
 .catalog-product-shell__catalog--dormant {
   visibility: hidden;
   pointer-events: none;

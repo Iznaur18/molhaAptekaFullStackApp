@@ -57,3 +57,20 @@ test("product details feature cards match web chrome and lucide icons", () => {
   assert.match(detailsTab, /ProductDetailsCompareTeaser/);
   assert.match(detailsTab, /ProductDetailsQaTeaser/);
 });
+
+test("affiliate share button flashes check icon like web", () => {
+  const mobile = readFile(
+    MOBILE_ROOT,
+    "entities/product/ui/ProductAffiliateShareButton.tsx",
+  );
+  const web = readFile(
+    CLIENT_ROOT,
+    "src/entities/product/ui/product-details-modal/ProductAffiliateShareButton.jsx",
+  );
+
+  assert.match(mobile, /COPIED_ICON_MS = 1600/);
+  assert.match(mobile, /icon=\{copied \? Check : Share2\}/);
+  assert.doesNotMatch(mobile, /AFFILIATE_SHARE_COPIED/);
+  assert.match(web, /COPIED_ICON_MS = 1600/);
+  assert.match(web, /icon=\{copied \? Check : Share2\}/);
+});

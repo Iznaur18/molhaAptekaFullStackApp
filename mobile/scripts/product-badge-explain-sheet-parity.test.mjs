@@ -38,8 +38,9 @@ test("product badge explain sheet matches web panel layout", () => {
       MOBILE_ROOT,
       "entities/product-badge-explain/model/useProductBadgeExplainSheetAnimation.ts",
     ),
-    /transitionProperty: "transform"/,
+    /translateY\(100%\)/,
   );
+  assert.match(sheet, /if \(!modalVisible\)/);
   assert.match(layout, /mediaAspectRatio: 16 \/ 9/);
   assert.match(sheet, /ModalSheetGradientBackdrop/);
   assert.match(sheet, /useProductBadgeExplainSheetAnimation/);

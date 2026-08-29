@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { useUserFollowMutations } from "@/entities/user-follow/model/useUserFollowMutations";
+import { SELLER_PRODUCTS_PAGE_LAYOUT as L } from "@/features/seller-products-page/lib/sellerProductsPageLayout";
 import { USER_FOLLOW_BUTTON_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useUserFollowButtonStyles } from "@/shared/theme/accountFeatureStyles";
@@ -12,7 +13,7 @@ type UserFollowButtonProps = {
   isFollowing: boolean;
   isAuthorized: boolean;
   isSelf: boolean;
-  layout?: "default" | "inline";
+  layout?: "default" | "inline" | "sellerMeta";
   onFollowChange?: (next: { isFollowing: boolean }) => void;
 };
 
@@ -59,19 +60,34 @@ export const UserFollowButton = ({
   };
 
   const label = isFollowing ? USER_FOLLOW_BUTTON_UI.UNFOLLOW : USER_FOLLOW_BUTTON_UI.FOLLOW;
+  const isSellerMeta = layout === "sellerMeta";
 
   return (
-    <View style={[styles.root, layout === "inline" && styles.rootInline]}>
+    <View
+      style={[
+        styles.root,
+        (layout === "inline" || isSellerMeta) && styles.rootInline,
+      ]}
+    >
       <Pressable
         style={[
           styles.button,
-          layout === "inline" && styles.buttonInline,
+          (layout === "inline" || isSellerMeta) && styles.buttonInline,
+          isSellerMeta && styles.buttonSellerMeta,
           isFollowing && styles.buttonFollowing,
+          isSellerMeta && isFollowing && styles.buttonFollowingSellerMeta,
         ]}
         onPress={() => void handlePress()}
         disabled={isBusy}
+        accessibilityState={{ pressed: isFollowing }}
       >
-        <Text style={[styles.buttonText, isFollowing && styles.buttonTextFollowing]}>
+        <Text
+          style={[
+            styles.buttonText,
+            isFollowing && styles.buttonTextFollowing,
+            isSellerMeta && isFollowing && styles.buttonTextFollowingSellerMeta,
+          ]}
+        >
           {isBusy ? USER_FOLLOW_BUTTON_UI.LOADING : label}
         </Text>
       </Pressable>

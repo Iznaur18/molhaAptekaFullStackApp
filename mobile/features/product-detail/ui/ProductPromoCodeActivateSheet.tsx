@@ -1,20 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
+  Dimensions,
   Modal,
   Pressable,
+  ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated from "react-native-reanimated";
 
 import {
   activateProductPromoCode,
   fetchMyAppliedProductPromos,
 } from "@/entities/product-promo-code/api/productPromoCodeApi";
 import { productPromoCodeQueryKeys } from "@/entities/product-promo-code/model/productPromoCodeQueryKeys";
+import { WHOLESALE_PRICE_SHEET_LAYOUT as WS } from "@/entities/product/lib/wholesalePriceSheetLayout";
+import { useWholesalePriceSheetAnimation } from "@/entities/product/model/useWholesalePriceSheetAnimation";
 import { PRODUCT_PROMO_CODE_UI } from "@/shared/config";
+import { textInputFocusScrollProps } from "@/shared/lib/scrollTextInputIntoViewOnFocus";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useWholesalePriceSheetStyles } from "@/shared/theme/wholesalePriceSheetStyles";
+import { AppButton } from "@/shared/ui/AppButton";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 import { PRODUCT_PROMO_CODE_MAX_LENGTH } from "@molha/api-contract";
 
 const appliedMineKey = productPromoCodeQueryKeys.appliedMine();
@@ -35,10 +46,19 @@ export const ProductPromoCodeActivateSheet = ({
   onClose,
 }: ProductPromoCodeActivateSheetProps) => {
   const theme = useAppTheme();
+  const insets = useSafeAreaInsets();
+  const styles = useWholesalePriceSheetStyles();
   const queryClient = useQueryClient();
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const sheetSlideDistance = useMemo(() => Dimensions.get("window").height, []);
+  const { modalVisible, backdropAnimatedStyle, sheetAnimatedStyle, useCssTransition } =
+    useWholesalePriceSheetAnimation(isOpen, sheetSlideDistance);
+
+  const BackdropContainer = useCssTransition ? View : Animated.View;
+  const SheetContainer = useCssTransition ? View : Animated.View;
 
   const appliedQuery = useQuery({
     queryKey: appliedMineKey,
@@ -88,119 +108,101 @@ export const ProductPromoCodeActivateSheet = ({
     }
   };
 
+  if (!modalVisible) {
+    return null;
+  }
+
+  const footerPaddingBottom = Math.max(insets.bottom, WS.footerPaddingHorizontal);
+
   return (
-    <Modal visible={isOpen} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable
-        style={{ flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.35)" }}
-        onPress={onClose}
-      >
-        <Pressable
-          onPress={(event) => event.stopPropagation()}
-          style={{
-            backgroundColor: theme.colors.surface,
-            borderTopLeftRadius: 16,
-            borderTopRightRadius: 16,
-            padding: 16,
-            gap: 12,
-          }}
+    <Modal visible={modalVisible} transparent animationType="none" onRequestClose={onClose}>
+      <View style={styles.backdrop}>
+        <BackdropContainer
+          style={[StyleSheet.absoluteFillObject, backdropAnimatedStyle]}
+          pointerEvents="none"
         >
-          <Text style={{ fontSize: 18, fontWeight: "700", color: theme.colors.text }}>
-            {PRODUCT_PROMO_CODE_UI.SHEET_TITLE}
-          </Text>
-          <Text style={{ color: theme.colors.textMuted }}>
-            {PRODUCT_PROMO_CODE_UI.SHEET_LEAD}
-          </Text>
-          {applied ? (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 12,
-                paddingHorizontal: 14,
-                paddingVertical: 12,
-                borderRadius: 12,
-                borderWidth: 1,
-                borderColor: `${theme.colors.success}48`,
-                backgroundColor: theme.colors.successSurface,
-              }}
-            >
-              <Text
-                style={{
-                  flex: 1,
-                  color: theme.colors.successText,
-                  fontSize: 15,
-                  fontWeight: "600",
-                }}
-              >
-                {PRODUCT_PROMO_CODE_UI.APPLIED_LABEL}
-              </Text>
-              <View
-                style={{
-                  paddingHorizontal: 10,
-                  paddingVertical: 6,
-                  borderRadius: 999,
-                  backgroundColor: theme.colors.success,
-                }}
-              >
-                <Text
-                  style={{
-                    color: theme.colors.onContrast,
-                    fontSize: 16,
-                    fontWeight: "800",
-                  }}
-                >
+          <ModalSheetGradientBackdrop />
+        </BackdropContainer>
+        <Pressable
+          style={styles.dismiss}
+          onPress={onClose}
+          accessibilityRole="button"
+          accessibilityLabel={PRODUCT_PROMO_CODE_UI.CLOSE}
+        />
+        <SheetContainer style={[styles.panel, sheetAnimatedStyle]}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{PRODUCT_PROMO_CODE_UI.SHEET_TITLE}</Text>
+            <Pressable onPress={onClose} hitSlop={8} accessibilityRole="button">
+              <Text style={styles.close}>{PRODUCT_PROMO_CODE_UI.CLOSE}</Text>
+            </Pressable>
+          </View>
+
+          <ScrollView
+            style={styles.bodyScroll}
+            contentContainerStyle={styles.body}
+            keyboardShouldPersistTaps="handled"
+            bounces={false}
+          >
+            <Text style={styles.hint}>{PRODUCT_PROMO_CODE_UI.SHEET_LEAD}</Text>
+
+            {applied ? (
+              <View style={styles.promoApplied} accessibilityRole="text">
+                <Text style={styles.promoAppliedLabel}>
+                  {PRODUCT_PROMO_CODE_UI.APPLIED_LABEL}
+                </Text>
+                <Text style={styles.promoAppliedPercent}>
                   {PRODUCT_PROMO_CODE_UI.APPLIED_PERCENT(applied.discountPercent)}
                 </Text>
               </View>
-            </View>
-          ) : (
-            <TextInput
-              value={code}
-              onChangeText={setCode}
-              maxLength={PRODUCT_PROMO_CODE_MAX_LENGTH}
-              placeholder={PRODUCT_PROMO_CODE_UI.CODE_PLACEHOLDER}
-              autoCapitalize="characters"
-              style={{
-                borderWidth: 1,
-                borderColor: theme.colors.border,
-                borderRadius: 10,
-                paddingHorizontal: 12,
-                paddingVertical: 10,
-                color: theme.colors.text,
-              }}
-            />
-          )}
-          {error ? <Text style={{ color: theme.colors.danger }}>{error}</Text> : null}
-          {success ? <Text style={{ color: theme.colors.text }}>{success}</Text> : null}
-          {!applied ? (
-            <Pressable
-              onPress={() => {
-                void handleActivate();
-              }}
-              disabled={activateMutation.isPending || !code.trim()}
-              style={{
-                backgroundColor: theme.colors.primary,
-                borderRadius: 10,
-                paddingVertical: 12,
-                alignItems: "center",
-                opacity: activateMutation.isPending || !code.trim() ? 0.6 : 1,
-              }}
-            >
-              <Text style={{ color: "#fff", fontWeight: "700" }}>
-                {activateMutation.isPending
-                  ? PRODUCT_PROMO_CODE_UI.ACTIVATE_PENDING
-                  : PRODUCT_PROMO_CODE_UI.ACTIVATE}
+            ) : (
+              <View style={styles.field}>
+                <Text style={styles.label}>{PRODUCT_PROMO_CODE_UI.CODE_LABEL}</Text>
+                <TextInput
+                  value={code}
+                  onChangeText={setCode}
+                  maxLength={PRODUCT_PROMO_CODE_MAX_LENGTH}
+                  placeholder={PRODUCT_PROMO_CODE_UI.CODE_PLACEHOLDER}
+                  placeholderTextColor={theme.colors.textMuted}
+                  autoCapitalize="characters"
+                  editable={!activateMutation.isPending}
+                  style={styles.input}
+                  {...textInputFocusScrollProps}
+                />
+              </View>
+            )}
+
+            {error ? (
+              <Text style={styles.error} accessibilityRole="alert">
+                {error}
               </Text>
-            </Pressable>
+            ) : null}
+
+            {success ? (
+              <View style={styles.promoApplied} accessibilityRole="text">
+                <Text style={styles.promoAppliedSuccess}>{success}</Text>
+              </View>
+            ) : null}
+          </ScrollView>
+
+          {!applied ? (
+            <View style={[styles.footer, { paddingBottom: footerPaddingBottom }]}>
+              <AppButton
+                label={
+                  activateMutation.isPending
+                    ? PRODUCT_PROMO_CODE_UI.ACTIVATE_PENDING
+                    : PRODUCT_PROMO_CODE_UI.ACTIVATE
+                }
+                variant="primary"
+                disabled={activateMutation.isPending || !code.trim()}
+                onPress={() => {
+                  void handleActivate();
+                }}
+                style={styles.footerButton}
+              />
+            </View>
           ) : null}
-          <Pressable onPress={onClose} style={{ alignItems: "center", paddingVertical: 8 }}>
-            <Text style={{ color: theme.colors.textMuted }}>
-              {PRODUCT_PROMO_CODE_UI.CLOSE}
-            </Text>
-          </Pressable>
-        </Pressable>
-      </Pressable>
+        </SheetContainer>
+      </View>
     </Modal>
   );
 };

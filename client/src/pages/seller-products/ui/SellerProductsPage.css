@@ -29,6 +29,17 @@
   display: flex;
   flex-direction: column;
   gap: var(--seller-products-screen-gap);
+  min-width: 0;
+  overflow-x: clip;
+}
+
+/* Без home edge-bleed (AppShell.css ≤667): сетка в границах shell. */
+.seller-products-page .app-shell__grid,
+.seller-products-page .app-shell__grid-virtual-host {
+  box-sizing: border-box;
+  margin-inline: 0;
+  width: 100%;
+  min-width: 0;
 }
 
 .seller-products-page__nav {
@@ -102,6 +113,7 @@
 .seller-products-page__seller-name {
   flex: 1 1 auto;
   min-width: 0;
+  overflow: hidden;
   margin: 0;
   padding: 0;
   border: none;
@@ -128,6 +140,19 @@
 .seller-products-page__seller-meta .user-follow-button {
   flex-shrink: 0;
   align-self: center;
+}
+
+.seller-products-page__seller-name .user-premium-name {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.seller-products-page__seller-name .user-premium-name__text {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .seller-products-page__seller-actions {

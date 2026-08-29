@@ -1,7 +1,11 @@
 import { Platform, StyleSheet } from "react-native";
 
-import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import {
+  ADD_TO_CART_BUTTON_LAYOUT as CART_BTN,
+  ADD_TO_CART_STEPPER_LAYOUT as CART_STEPPER,
+} from "@/entities/product/lib/addToCartButtonLayout";
 import { PRODUCT_DETAIL_OUT_OF_STOCK_BUTTON_LAYOUT as OOS_BTN } from "@/entities/product/lib/productDetailOutOfStockButtonLayout";
+import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import { semanticColors } from "@/shared/theme/semanticColors";
 
 export const PRODUCT_PHOTO_GRID_COLUMNS = 3;
@@ -187,17 +191,26 @@ export const PRODUCT_DETAIL_DOCK_WARNING_AMBER = semanticColors.warning;
 export const PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS = 11.2;
 
 export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
+  addButtonPressable: {
+    marginTop: 0,
+    width: "100%",
+  },
   addButton: {
-    marginTop: theme.spacing[4],
-    backgroundColor: theme.colors.nearBlack,
-    borderRadius: theme.radius.button,
-    paddingVertical: theme.spacing[3],
+    width: "100%",
+    paddingVertical: CART_BTN.paddingVertical,
+    paddingHorizontal: CART_BTN.paddingHorizontal,
+    borderWidth: CART_BTN.borderWidth,
+    borderColor: theme.colors.action,
+    borderRadius: CART_BTN.borderRadius,
+    backgroundColor: theme.colors.action,
     alignItems: "center",
+    justifyContent: "center",
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   addButtonText: {
     color: theme.colors.onContrast,
-    fontWeight: "600",
-    fontSize: 15,
+    fontWeight: CART_BTN.fontWeight,
+    fontSize: CART_BTN.fontSize,
   },
   detailDockPressable: {
     width: "100%",
@@ -308,46 +321,62 @@ export const useAddToCartButtonStyles = createThemedStyles((theme) => ({
     textAlign: "center",
     color: theme.colors.text,
   },
+  loginButtonPressable: {
+    marginTop: 0,
+    width: "100%",
+  },
   loginButton: {
-    marginTop: theme.spacing[4],
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.nearBlack,
-    borderRadius: theme.radius.button,
-    paddingVertical: theme.spacing[3],
+    width: "100%",
+    paddingVertical: CART_BTN.paddingVertical,
+    paddingHorizontal: CART_BTN.paddingHorizontal,
+    borderWidth: CART_BTN.borderWidth,
+    borderColor: theme.colors.action,
+    borderRadius: CART_BTN.borderRadius,
+    backgroundColor: theme.colors.action,
     alignItems: "center",
-    backgroundColor: theme.colors.surface,
+    justifyContent: "center",
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   loginButtonText: {
-    color: theme.colors.nearBlack,
-    fontWeight: "600",
-    fontSize: 15,
+    color: theme.colors.onContrast,
+    fontWeight: CART_BTN.fontWeight,
+    fontSize: CART_BTN.fontSize,
   },
   stepButton: {
-    width: 40,
-    height: 40,
-    backgroundColor: theme.colors.surfaceMuted,
-    borderRadius: theme.radius.button,
+    width: CART_STEPPER.stepButtonSize,
+    height: CART_STEPPER.stepButtonSize,
+    borderRadius: CART_STEPPER.stepButtonRadius,
+    backgroundColor: theme.colors.surface,
     alignItems: "center",
     justifyContent: "center",
   },
   stepButtonText: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: theme.colors.text,
+    fontSize: CART_STEPPER.stepButtonFontSize,
+    fontWeight: "700",
+    color: theme.colors.action,
+    lineHeight: CART_STEPPER.stepButtonFontSize,
   },
   quantity: {
-    fontSize: 18,
+    fontSize: CART_STEPPER.quantityFontSize,
     fontWeight: "600",
-    minWidth: 24,
+    minWidth: CART_STEPPER.quantityMinWidth,
     textAlign: "center",
     color: theme.colors.text,
   },
   stepper: {
-    marginTop: theme.spacing[4],
+    marginTop: 0,
+    width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    alignSelf: "flex-start",
-    gap: theme.spacing[3],
+    justifyContent: "center",
+    gap: CART_STEPPER.gap,
+    paddingVertical: CART_STEPPER.paddingVertical,
+    paddingHorizontal: CART_STEPPER.paddingHorizontal,
+    borderWidth: CART_STEPPER.borderWidth,
+    borderColor: theme.colors.action,
+    borderRadius: CART_STEPPER.borderRadius,
+    backgroundColor: theme.colors.actionSoft,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
   },
   buttonDisabled: {
     opacity: 0.5,

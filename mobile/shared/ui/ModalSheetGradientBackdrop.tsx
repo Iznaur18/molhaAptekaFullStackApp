@@ -1,23 +1,50 @@
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View, type ViewStyle } from "react-native";
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 
-import { semanticColors } from "@/shared/theme/semanticColors";
+import {
+  MODAL_SHEET_BACKDROP_STOPS,
+  buildModalSheetBackdropGradientCss,
+} from "@/shared/lib/modalSheetBackdropGradient";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 
 const MODAL_SHEET_BACKDROP_GRADIENT_ID = "modalSheetBackdropGradient";
 
 /** Постепенное затемнение сверху вниз — сильнее у нижнего края sheet. */
-export const ModalSheetGradientBackdrop = () => (
-  <View style={StyleSheet.absoluteFill} pointerEvents="none">
-    <Svg width="100%" height="100%" preserveAspectRatio="none">
-      <Defs>
-        <LinearGradient id={MODAL_SHEET_BACKDROP_GRADIENT_ID} x1="0" y1="0" x2="0" y2="1">
-          <Stop offset="0" stopColor={semanticColors.ink} stopOpacity="0.28" />
-          <Stop offset="0.38" stopColor={semanticColors.ink} stopOpacity="0.48" />
-          <Stop offset="0.68" stopColor={semanticColors.ink} stopOpacity="0.68" />
-          <Stop offset="1" stopColor={semanticColors.ink} stopOpacity="0.82" />
-        </LinearGradient>
-      </Defs>
-      <Rect width="100%" height="100%" fill={`url(#${MODAL_SHEET_BACKDROP_GRADIENT_ID})`} />
-    </Svg>
-  </View>
-);
+export const ModalSheetGradientBackdrop = () => {
+  const theme = useAppTheme();
+  const ink = theme.colors.ink;
+
+  if (Platform.OS === "web") {
+    return (
+      <View
+        style={
+          {
+            ...StyleSheet.absoluteFillObject,
+            backgroundImage: buildModalSheetBackdropGradientCss(ink),
+          } as ViewStyle
+        }
+        pointerEvents="none"
+      />
+    );
+  }
+
+  return (
+    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+      <Svg width="100%" height="100%" preserveAspectRatio="none">
+        <Defs>
+          <LinearGradient id={MODAL_SHEET_BACKDROP_GRADIENT_ID} x1="0" y1="0" x2="0" y2="1">
+            {MODAL_SHEET_BACKDROP_STOPS.map(({ offset, opacity }) => (
+              <Stop
+                key={offset}
+                offset={String(offset)}
+                stopColor={ink}
+                stopOpacity={String(opacity)}
+              />
+            ))}
+          </LinearGradient>
+        </Defs>
+        <Rect width="100%" height="100%" fill={`url(#${MODAL_SHEET_BACKDROP_GRADIENT_ID})`} />
+      </Svg>
+    </View>
+  );
+};

@@ -1,4 +1,14 @@
+import { Platform } from "react-native";
+
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+
+const WEB_ELLIPSIS_TEXT =
+  Platform.OS === "web"
+    ? ({
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+      } as const)
+    : null;
 
 export const useUserPremiumDisplayNameStyles = createThemedStyles((theme) => ({
   root: {
@@ -10,11 +20,32 @@ export const useUserPremiumDisplayNameStyles = createThemedStyles((theme) => ({
     maxWidth: "100%",
     alignSelf: "stretch",
   },
+  rootSingleLine: {
+    flex: 1,
+    flexWrap: "nowrap",
+    width: "100%",
+    minWidth: 0,
+    overflow: "hidden",
+  },
+  textClip: {
+    flex: 1,
+    minWidth: 0,
+    overflow: "hidden",
+  },
   text: {
     flexShrink: 1,
     fontSize: 15,
     fontWeight: "700",
     color: theme.colors.text,
+  },
+  textSingleLine: {
+    ...(Platform.OS === "web"
+      ? {
+          width: "100%",
+          ...WEB_ELLIPSIS_TEXT,
+        }
+      : null),
+    overflow: "hidden",
   },
   badgeSlot: {
     flexShrink: 0,

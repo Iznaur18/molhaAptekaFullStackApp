@@ -30,7 +30,7 @@ test("register screen matches web AuthPage layout", () => {
 
   assert.match(register, /styles\.column/);
   assert.match(register, /channelBtn/);
-  assert.match(register, /chevron-left/);
+  assert.match(register, /ScreenBackButton/);
   assert.match(register, /AUTH_PAGE_LAYOUT/);
   assert.match(register, /LayoutAnimation/);
   assert.match(register, /REGISTER_CHANNEL_ARIA/);

@@ -364,7 +364,6 @@ export const useCreateRafflePageStyles = createThemedStyles((theme) => ({
 export const useCreateRaffleModalStyles = createThemedStyles((theme) => ({
   overlay: {
     flex: 1,
-    backgroundColor: MODAL_BACKDROP_SCRIM,
   },
   backdropPressable: {
     ...StyleSheet.absoluteFillObject,

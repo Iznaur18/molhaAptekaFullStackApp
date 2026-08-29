@@ -4,6 +4,7 @@ import Animated from "react-native-reanimated";
 
 import { useAdminEditModalAnimation } from "@/shared/model/useAdminEditModalAnimation";
 import { useAdminEditModalStyles } from "@/shared/theme/modalChromeStyles";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 
 type AdminEditModalShellProps = {
   visible: boolean;
@@ -47,6 +48,7 @@ export const AdminEditModalShell = ({
           style={[styles.backdrop, backdropAnimatedStyle]}
           pointerEvents={dismissDisabled ? "none" : "box-none"}
         >
+          <ModalSheetGradientBackdrop />
           <Pressable
             style={StyleSheet.absoluteFillObject}
             onPress={onClose}

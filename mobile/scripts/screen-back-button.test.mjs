@@ -44,6 +44,30 @@ test("resolveScreenBackContentPaddingTop reserves button + safe area", () => {
   );
 });
 
+test("screen back overlay matches auth-page__back chrome", () => {
+  const layout = readMobileFile("shared/lib/screenBackButtonLayout.ts");
+  const styles = readMobileFile("shared/theme/screenBackButtonStyles.ts");
+  const backButton = readMobileFile("shared/ui/ScreenBackButton.tsx");
+  const authLayout = readMobileFile("shared/lib/authPageLayout.ts");
+  const webCss = readFileSync(
+    join(dirname(fileURLToPath(import.meta.url)), "../../client/src/pages/auth/ui/AuthPage.css"),
+    "utf8",
+  );
+
+  assert.match(layout, /SCREEN_BACK_BUTTON_SIZE = 40/);
+  assert.match(layout, /SCREEN_BACK_BUTTON_TOP_INSET = 8/);
+  assert.match(layout, /SCREEN_BACK_BUTTON_LEFT_INSET = 16/);
+  assert.match(authLayout, /backSize: 40/);
+  assert.match(authLayout, /backRadius: 10/);
+  assert.match(styles, /backgroundColor: "rgba\(255, 255, 255, 0\.14\)"/);
+  assert.match(styles, /borderRadius: SCREEN_BACK_BUTTON_RADIUS/);
+  assert.match(backButton, /Math\.max\(insets\.left, SCREEN_BACK_BUTTON_LEFT_INSET\)/);
+  assert.match(backButton, /Feather/);
+  assert.match(backButton, /theme\.colors\.link/);
+  assert.match(webCss, /\.auth-page__back[\s\S]*background: rgba\(255, 255, 255, 0\.14\)/);
+  assert.match(webCss, /border-radius: var\(--iz-control-btn-radius, 10px\)/);
+});
+
 test("stack screens hide native header and wire ScreenWithBack / ScreenBackButton", () => {
   const layout = readMobileFile("app/_layout.tsx");
   const profileLayout = readMobileFile("app/profile/_layout.tsx");

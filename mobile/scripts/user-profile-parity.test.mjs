@@ -49,9 +49,21 @@ test("profile thumb lists match web purchases/products blocks", () => {
   const products = readMobileFile("entities/user/ui/UserProfileProductsList.tsx");
   const purchases = readMobileFile("entities/user/ui/UserProfilePurchasesList.tsx");
   const section = readMobileFile("entities/user/ui/UserProfileThumbSection.tsx");
+  const chrome = readMobileFile("shared/theme/profileChromeStyles.ts");
 
   assert.match(products, /UserProfileThumbSection/);
-  assert.match(products, /SHOW_MORE/);
+  assert.match(products, /useUserProfileProductsAllPagesQuery/);
+  assert.match(products, /enabled: true/);
+  assert.match(products, /profile-scroll/);
+  assert.doesNotMatch(products, /SHOW_MORE/);
+  assert.match(section, /HorizontalOverflowRow/);
+  assert.match(section, /CachedProductImage/);
+  assert.match(section, /TouchableOpacity/);
+  assert.match(section, /isReactNativeWeb/);
+  assert.match(section, /profile-scroll/);
+  assert.match(chrome, /USER_PROFILE_THUMB_TRACK_HEIGHT/);
+  assert.match(section, /height=\{USER_PROFILE_THUMB_TRACK_HEIGHT\}/);
+  assert.match(chrome, /flexWrap: "nowrap"/);
   assert.match(purchases, /useUserPurchasesQuery/);
   assert.match(section, /useUserProfileThumbListStyles/);
 });

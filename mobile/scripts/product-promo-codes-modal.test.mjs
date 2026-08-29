@@ -35,6 +35,29 @@ test("ключи запросов совпадают с вебом", () => {
   assert.match(web, /"applied-mine"/);
 });
 
+test("sheet активации промокода совпадает с web wholesale-price-modal", () => {
+  const sheet = readMobileFile("features/product-detail/ui/ProductPromoCodeActivateSheet.tsx");
+  const styles = readMobileFile("shared/theme/wholesalePriceSheetStyles.ts");
+  const animation = readMobileFile("entities/product/model/useWholesalePriceSheetAnimation.ts");
+  const layout = readMobileFile("entities/product/lib/wholesalePriceSheetLayout.ts");
+  const webCss = readRepoFile("client/src/entities/product/ui/WholesalePriceModal.css");
+
+  assert.match(webCss, /max-width: 30rem/);
+  assert.match(webCss, /--wholesale-sheet-radius: 2rem/);
+  assert.match(webCss, /--wholesale-sheet-enter-ms: 280ms/);
+  assert.match(sheet, /useWholesalePriceSheetAnimation/);
+  assert.match(sheet, /useWholesalePriceSheetStyles/);
+  assert.match(sheet, /ModalSheetGradientBackdrop/);
+  assert.match(sheet, /useCssTransition \? View : Animated\.View/);
+  assert.match(sheet, /animationType="none"/);
+  assert.match(sheet, /AppButton/);
+  assert.match(sheet, /CODE_LABEL/);
+  assert.doesNotMatch(sheet, /animationType="slide"/);
+  assert.match(styles, /maxWidth: WS\.maxWidth/);
+  assert.match(layout, /maxWidth: 480/);
+  assert.match(animation, /scheduleOpenAfterPaint/);
+});
+
 test("инлайновых копий ключа больше нет", () => {
   for (const relativePath of [
     "features/product-detail/ui/ProductPromoCodeActivateSheet.tsx",

@@ -20,6 +20,7 @@ import {
   PROFILE_MOBILE_NAV_SHEET_ANIMATION,
   useProfileMobileNavSheetStyles,
 } from "@/shared/theme/profileChromeStyles";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 
 type ProfileMobileNavSheetProps = {
   visible: boolean;
@@ -123,6 +124,7 @@ export const ProfileMobileNavSheet = ({
           isFromLeft && { flexDirection: "row-reverse" as const },
         ]}
       >
+        <ModalSheetGradientBackdrop />
         <Pressable
           style={styles.backdropPress}
           accessibilityLabel={MY_PROFILE_PAGE_UI.MOBILE_NAV_CLOSE_ARIA}

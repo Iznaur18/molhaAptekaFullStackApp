@@ -1,7 +1,9 @@
 import { memo, useMemo, type ReactNode } from "react";
+import { View } from "react-native";
 import Animated from "react-native-reanimated";
 
 import { createCatalogGridRowEntering } from "@/features/catalog-grid/lib/catalogGridRowEnteringAnimation";
+import { catalogGridRowStyles } from "@/features/catalog-grid/lib/catalogGridLayout";
 import { useCatalogScrollAnimation } from "@/features/catalog-grid/model/CatalogScrollAnimationContext";
 
 type CatalogGridRowEnteringShellProps = {
@@ -24,8 +26,12 @@ export const CatalogGridRowEnteringShell = ({
     [disableEntering, rowIndex, scrollAnimation],
   );
   if (!entering) {
-    return children;
+    return <View style={catalogGridRowStyles.shell}>{children}</View>;
   }
 
-  return <Animated.View entering={entering}>{children}</Animated.View>;
+  return (
+    <Animated.View entering={entering} style={catalogGridRowStyles.shell}>
+      {children}
+    </Animated.View>
+  );
 };

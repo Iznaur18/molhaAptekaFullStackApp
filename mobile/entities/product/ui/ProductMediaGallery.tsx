@@ -1,11 +1,13 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import {
   buildProductMediaSlides,
   resolveProductImageIndexForLightbox,
 } from "@/entities/product/lib/buildProductMediaSlides";
+import { PRODUCT_MEDIA_GALLERY_READONLY_LAYOUT as GRL } from "@/entities/product/lib/productMediaGalleryReadonlyLayout";
+import { isReactNativeWeb } from "@/shared/lib/isReactNativeWeb";
 import { ProductMediaHorizontalPager } from "@/entities/product/ui/ProductMediaHorizontalPager";
 import { ProductImageLightbox } from "@/entities/product/ui/ProductImageLightbox";
 import { ProductMediaSlideContent } from "@/entities/product/ui/ProductMediaSlideContent";
@@ -18,6 +20,7 @@ import {
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductMediaGalleryStyles } from "@/shared/theme/catalogProductStyles";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
+import { HorizontalOverflowRow } from "@/shared/ui/HorizontalOverflowRow";
 
 type ProductMediaGalleryProps = {
   previewVideoUrl?: string | null;
@@ -96,25 +99,47 @@ export const ProductMediaGallery = ({
     }
     const thumbStyle = isDetail ? styles.detailThumb : styles.thumb;
     const thumbActiveStyle = isDetail ? styles.detailThumbActive : styles.thumbActive;
-    const thumbsWrapStyle = isDetail ? styles.detailThumbs : styles.thumbs;
+    const thumbsContentStyle = isDetail
+      ? [styles.detailThumbs, isSplitLayout && styles.detailThumbsSplit]
+      : styles.thumbs;
+    const thumbVideoLabelStyle = isDetail ? styles.detailThumbVideoLabel : styles.thumbVideoLabel;
 
-    return (
-      <View style={thumbsWrapStyle}>
-        {mediaSlides.map((slide, index) => (
-          <Pressable
-            key={`${slide.type}-${slide.url}`}
-            style={[thumbStyle, index === safeSlideIndex && thumbActiveStyle]}
-            onPress={() => setActiveSlideIndex(index)}
-          >
-            {slide.type === "video" ? (
-              <Text style={styles.thumbVideoLabel}>▶</Text>
-            ) : (
-              <CachedProductImage uri={slide.url} style={styles.thumbImage} />
-            )}
-          </Pressable>
-        ))}
-      </View>
-    );
+    const DetailThumbTouchable = isDetail && isReactNativeWeb() ? TouchableOpacity : Pressable;
+    const detailThumbActiveOpacity = isDetail && isReactNativeWeb() ? 0.85 : undefined;
+
+    const thumbs = mediaSlides.map((slide, index) => (
+      <DetailThumbTouchable
+        key={`${slide.type}-${slide.url}`}
+        style={[thumbStyle, index === safeSlideIndex && thumbActiveStyle]}
+        onPress={() => setActiveSlideIndex(index)}
+        accessibilityRole="tab"
+        accessibilityState={{ selected: index === safeSlideIndex }}
+        {...(detailThumbActiveOpacity != null ? { activeOpacity: detailThumbActiveOpacity } : null)}
+      >
+        {slide.type === "video" ? (
+          <Text style={thumbVideoLabelStyle}>▶</Text>
+        ) : (
+          <View style={styles.detailThumbImageHost}>
+            <CachedProductImage uri={slide.url} style={styles.detailThumbImageFill} />
+          </View>
+        )}
+      </DetailThumbTouchable>
+    ));
+
+    if (isDetail) {
+      return (
+        <HorizontalOverflowRow
+          height={GRL.thumbSize}
+          trackStyle={thumbsContentStyle}
+          accessibilityRole="tablist"
+          accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.GALLERY_THUMBS_ARIA}
+        >
+          {thumbs}
+        </HorizontalOverflowRow>
+      );
+    }
+
+    return <View style={thumbsContentStyle}>{thumbs}</View>;
   };
 
   return (

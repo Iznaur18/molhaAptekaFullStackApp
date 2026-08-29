@@ -108,13 +108,13 @@ export const ProductBadgeExplainSheet = ({
     : null;
 
   useEffect(() => {
-    if (!visible) {
+    if (!modalVisible) {
       setRevealedPhone(null);
       setContactPending(false);
       setContactError("");
       setPanelHeight(0);
     }
-  }, [visible]);
+  }, [modalVisible]);
 
   useEffect(() => {
     setRevealedPhone(null);
@@ -164,13 +164,13 @@ export const ProductBadgeExplainSheet = ({
       <View style={styles.root}>
         <BackdropContainer style={[styles.backdrop, backdropAnimatedStyle]} pointerEvents="box-none">
           <ModalSheetGradientBackdrop />
-          <Pressable
-            style={styles.dismiss}
-            onPress={onClose}
-            accessibilityRole="button"
-            accessibilityLabel={PRODUCT_BADGE_EXPLAIN_UI.CLOSE}
-          />
         </BackdropContainer>
+        <Pressable
+          style={styles.dismiss}
+          onPress={onClose}
+          accessibilityRole="button"
+          accessibilityLabel={PRODUCT_BADGE_EXPLAIN_UI.CLOSE}
+        />
 
         <SheetContainer
           style={[styles.panelHost, sheetAnimatedStyle, { maxHeight: maxPanelHeight }]}

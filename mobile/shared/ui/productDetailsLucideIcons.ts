@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react-native";
 
+export { default as Check } from "lucide-react-native/icons/check";
 export { default as ChevronRight } from "lucide-react-native/icons/chevron-right";
 export { default as CreditCard } from "lucide-react-native/icons/credit-card";
 export { default as Gavel } from "lucide-react-native/icons/gavel";

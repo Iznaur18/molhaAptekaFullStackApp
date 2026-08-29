@@ -76,6 +76,11 @@ test("product detail tab bar layout matches web modal section tabs", () => {
 
 test("product detail hero chrome matches web gallery readonly sizes", () => {
   const layout = readFile(MOBILE_ROOT, "shared/lib/productDetailHeroChromeLayout.ts");
+  const thumbLayout = readFile(
+    MOBILE_ROOT,
+    "entities/product/lib/productMediaGalleryReadonlyLayout.ts",
+  );
+  const gallery = readFile(MOBILE_ROOT, "entities/product/ui/ProductMediaGallery.tsx");
   const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
   const webCss = readFile(CLIENT_ROOT, "src/entities/product/ui/ProductMediaGalleryReadonly.css");
   const mediaSection = readFile(
@@ -88,6 +93,19 @@ test("product detail hero chrome matches web gallery readonly sizes", () => {
   assert.match(layout, /backSize: 36/);
   assert.match(layout, /actionSize: 32/);
   assert.match(layout, /iconSize: 20/);
+  assert.match(thumbLayout, /thumbSize: 64/);
+  assert.match(thumbLayout, /thumbGap: 6\.4/);
+  assert.match(thumbLayout, /thumbBorderWidth: 2/);
+  assert.match(webCss, /width: var\(--product-image-thumb-side\)/);
+  assert.match(webCss, /gap: 0\.4rem/);
+  assert.match(webCss, /border-color: var\(--iz-color-link\)/);
+  assert.match(gallery, /HorizontalOverflowRow/);
+  assert.match(gallery, /height=\{GRL\.thumbSize\}/);
+  assert.match(gallery, /GALLERY_THUMBS_ARIA/);
+  assert.match(styles, /detailThumbs:[\s\S]*flexWrap: "nowrap"/);
+  assert.match(styles, /detailThumb:[\s\S]*GRL\.thumbSize/);
+  assert.match(styles, /detailThumbActive:[\s\S]*theme\.colors\.link/);
+  assert.match(styles, /detailThumbsSplit:[\s\S]*GRL\.thumbsPaddingInlineSplit/);
   assert.match(webCss, /width: 2\.25rem/);
   assert.match(webPageCss, /width: 32px/);
   assert.match(styles, /PRODUCT_DETAIL_HERO_CHROME\.backSize/);
@@ -97,6 +115,8 @@ test("product detail hero chrome matches web gallery readonly sizes", () => {
 });
 
 test("product detail split styles mirror web page-wide layout", () => {
+  const screen = readFile(MOBILE_ROOT, "app/product/[id].tsx");
+  const similarTab = readFile(MOBILE_ROOT, "features/product-detail/ui/ProductSimilarTab.tsx");
   const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
   const detailsTab = readFile(
     MOBILE_ROOT,
@@ -115,4 +135,11 @@ test("product detail split styles mirror web page-wide layout", () => {
   assert.match(webCss, /product-details-page__wide-top/);
   assert.match(webCss, /grid-template-columns: minmax\(0, var\(--product-image-modal-main-side\)\)/);
   assert.match(webCss, /grid-template-columns: repeat\(auto-fit, minmax\(12rem, 1fr\)\)/);
+  assert.match(webCss, /product-details-modal--page-split \.product-details-modal__tab-panel--inset[\s\S]*padding-inline: 0/);
+  assert.match(styles, /tabPanelSplit:/);
+  assert.match(screen, /pageWideAltPanel, styles\.tabPanelSplit/);
+  assert.match(screen, /variant="detailTab"/);
+  assert.match(similarTab, /variant === "detailTab"/);
+  assert.match(similarTab, /rowInsetX = isDetailTab \? 0/);
+  assert.doesNotMatch(screen, /isAltTab && !isSimilarTab/);
 });

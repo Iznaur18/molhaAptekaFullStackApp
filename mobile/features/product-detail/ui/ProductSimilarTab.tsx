@@ -25,6 +25,7 @@ type ProductSimilarTabProps = {
   contentPaddingBottom?: number;
   enabled?: boolean;
   onRegisterLoadMore?: (loadMore: (() => void) | null) => void;
+  variant?: "default" | "detailTab";
 };
 
 export const ProductSimilarTab = ({
@@ -33,9 +34,12 @@ export const ProductSimilarTab = ({
   contentPaddingBottom = SIMILAR_DEFAULT_CONTENT_PADDING_BOTTOM,
   enabled = true,
   onRegisterLoadMore,
+  variant = "default",
 }: ProductSimilarTabProps) => {
   const styles = useProductDetailTabStyles();
+  const isDetailTab = variant === "detailTab";
   const productGrid = useProductGridLayout();
+  const rowInsetX = isDetailTab ? 0 : productGrid.padding;
   const filters = resolveProductSimilarCatalogFilters(product);
   const catalogQuery = useCatalogProductsInfiniteQuery(
     {
@@ -86,7 +90,12 @@ export const ProductSimilarTab = ({
   if (filters == null) {
     return (
       <Text
-        style={[styles.empty, localStyles.emptyPad, { paddingHorizontal: productGrid.padding }]}
+        style={[
+          styles.empty,
+          isDetailTab && styles.root,
+          localStyles.emptyPad,
+          rowInsetX > 0 ? { paddingHorizontal: rowInsetX } : null,
+        ]}
       >
         {PRODUCT_SIMILAR_UI.EMPTY}
       </Text>
@@ -115,7 +124,12 @@ export const ProductSimilarTab = ({
   if (catalogGridRows.length === 0) {
     return (
       <Text
-        style={[styles.empty, localStyles.emptyPad, { paddingHorizontal: productGrid.padding }]}
+        style={[
+          styles.empty,
+          isDetailTab && styles.root,
+          localStyles.emptyPad,
+          rowInsetX > 0 ? { paddingHorizontal: rowInsetX } : null,
+        ]}
       >
         {PRODUCT_SIMILAR_UI.EMPTY}
       </Text>
@@ -123,13 +137,22 @@ export const ProductSimilarTab = ({
   }
 
   return (
-    <View style={{ paddingBottom: contentPaddingBottom, gap: productGrid.gap }}>
+    <View
+      style={[
+        isDetailTab && styles.root,
+        { paddingBottom: contentPaddingBottom, gap: productGrid.gap },
+      ]}
+    >
       {catalogGridRows.map((item, index) => (
-        <View key={item.key} style={{ paddingHorizontal: productGrid.padding }}>
+        <View
+          key={item.key}
+          style={rowInsetX > 0 ? { paddingHorizontal: rowInsetX } : undefined}
+        >
           <CatalogGridRowItem
             row={item}
             columns={productGrid.columns}
             gap={productGrid.gap}
+            contentWidth={productGrid.contentWidth}
             tileWidth={productGrid.tileWidth}
             rowIndex={index}
             disableEntering

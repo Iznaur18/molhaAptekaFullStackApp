@@ -93,6 +93,7 @@ export const ProductCompareTab = ({
             row={item}
             columns={productGrid.columns}
             gap={productGrid.gap}
+            contentWidth={productGrid.contentWidth}
             tileWidth={productGrid.tileWidth}
             rowIndex={index}
             disableEntering

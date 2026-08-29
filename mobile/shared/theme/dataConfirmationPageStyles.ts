@@ -178,7 +178,6 @@ export const useDataConfirmationRequestModalStyles = createThemedStyles((theme) 
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: MODAL_BACKDROP_SCRIM,
   },
   keyboardHost: {
     flex: 1,

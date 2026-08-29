@@ -3,6 +3,7 @@ import { Pressable, Share } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 
+import { SELLER_PRODUCTS_PAGE_LAYOUT as L } from "@/features/seller-products-page/lib/sellerProductsPageLayout";
 import { SELLER_PRODUCTS_PAGE_UI } from "@/shared/config";
 import { WEB_APP_BASE_URL } from "@/shared/config/webAppBaseUrl";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
@@ -21,24 +22,23 @@ const useSellerShareStyles = createThemedStyles((theme) => ({
   root: {
     alignItems: "center",
     justifyContent: "center",
+  },
+  banner: {
     padding: 6,
     borderRadius: 20,
   },
-  banner: {
-    // position handled by parent bannerActions cluster on profile
-  },
   meta: {
-    flexShrink: 1,
-    flexGrow: 1,
-    alignSelf: "stretch",
-    width: "auto" as const,
-    minWidth: 0,
-    height: 34,
+    flexShrink: 0,
+    width: L.shareMetaSize,
+    height: L.shareMetaSize,
     padding: 0,
-    borderRadius: theme.radius.button,
+    borderRadius: L.followBorderRadius,
     borderWidth: 1,
     borderColor: theme.colors.action,
     backgroundColor: "transparent",
+  },
+  metaCopied: {
+    borderColor: theme.colors.success,
   },
 }));
 
@@ -110,11 +110,16 @@ export const SellerShareLinkButton = ({
 
   return (
     <Pressable
-      style={[styles.root, variant === "banner" ? styles.banner : styles.meta, style]}
+      style={[
+        styles.root,
+        variant === "banner" ? styles.banner : styles.meta,
+        variant === "meta" && copied ? styles.metaCopied : null,
+        style,
+      ]}
       onPress={() => {
         void handlePress();
       }}
-      hitSlop={10}
+      hitSlop={variant === "banner" ? 10 : 0}
       accessibilityRole="button"
       accessibilityLabel={
         copied
@@ -124,7 +129,7 @@ export const SellerShareLinkButton = ({
     >
       <Feather
         name={copied ? "check" : variant === "meta" ? "share-2" : "link"}
-        size={20}
+        size={variant === "meta" ? L.shareMetaIconSize : 20}
         color={iconColor}
       />
     </Pressable>

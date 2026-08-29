@@ -129,6 +129,18 @@ test("шторка чекаута: высота и ширина как в веб
   // Радиус верхних углов — 2rem в обоих.
   assert.match(webSheet, /--checkout-sheet-radius: 2rem/);
   assert.ok(styles.includes("borderTopLeftRadius: 32"));
+
+  const animation = readMobileFile("features/checkout/model/useCheckoutSheetModalAnimation.ts");
+  const timing = readMobileFile("features/checkout/lib/checkoutSheetModalAnimation.ts");
+  assert.match(sheet, /useCheckoutSheetModalAnimation/);
+  assert.match(sheet, /useCssTransition \? View : Animated\.View/);
+  assert.match(animation, /scheduleOpenAfterPaint/);
+  assert.match(animation, /transitionProperty: "transform"/);
+  assert.match(timing, /enterMs: 280/);
+  assert.match(timing, /exitMs: 220/);
+  assert.match(timing, /enterEasingCss: "cubic-bezier\(0.215, 0.61, 0.355, 1\)"/);
+  assert.match(webSheet, /--checkout-sheet-enter-ms: 280ms/);
+  assert.match(webSheet, /--checkout-sheet-exit-ms: 220ms/);
 });
 
 test("пропорция и вписывание картинок берутся из общего пакета токенов", () => {
@@ -153,4 +165,10 @@ test("пропорция и вписывание картинок берутся
       `${webCss} потерял contain`,
     );
   }
+});
+
+test("catalog-product-shell: сетка не выходит за catalog wrapper (без edge-bleed)", () => {
+  const css = readRepoFile("client/src/app/routes/CatalogProductShellLayout.css");
+  assert.match(css, /\.catalog-product-shell__catalog \.app-shell__grid[\s\S]*margin-inline: 0/);
+  assert.match(css, /overflow-x: clip/);
 });

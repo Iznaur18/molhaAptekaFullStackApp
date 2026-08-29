@@ -37,7 +37,12 @@ test("RaffleProductsPage: web parity hero/swipe/progress/manage", () => {
   assert.match(page, /RaffleManageActions/);
   assert.match(page, /CreateRaffleModal/);
   assert.match(page, /FeaturedRaffleWinnerCard/);
+  assert.match(page, /pointerEvents="none"/);
+  assert.match(page, /onScrollEndDrag=\{handleSwipeScrollEnd\}/);
   assert.match(styles, /swipeOverlay/);
+  assert.match(styles, /touchAction: "pan-y"/);
+  assert.match(styles, /swipeSoundToggle/);
+  assert.match(styles, /zIndex: 6/);
   assert.match(styles, /borderRadius: 22/);
   assert.match(styles, /paddingTop: 8/);
   assert.match(page, /productsBlock/);

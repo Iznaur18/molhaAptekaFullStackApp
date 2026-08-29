@@ -5,6 +5,7 @@ import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { ACCOUNT_REQUIREMENT_MODAL_UI } from "@/shared/config";
 import { useRegisterBlockingOverlay } from "@/shared/lib/useBlockingOverlayOccupancy";
 import { useAccountRequirementModalStyles } from "@/shared/theme/modalChromeStyles";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 
 export type AccountRequirement = "premium" | "data-confirmation";
 
@@ -48,6 +49,7 @@ export const AccountRequirementModal = ({
   return (
     <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
       <View style={styles.overlay}>
+        <ModalSheetGradientBackdrop />
         <View style={styles.card} accessibilityRole="alert" accessibilityLabel={ACCOUNT_REQUIREMENT_MODAL_UI.ARIA_DIALOG}>
           <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
             <View

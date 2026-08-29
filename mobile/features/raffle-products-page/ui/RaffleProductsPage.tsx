@@ -274,7 +274,7 @@ export const RaffleProductsPage = () => {
     syncCarouselToActive(activeRaffleId);
   }, [activeRaffleId, syncCarouselToActive]);
 
-  const handleSwipeMomentumEnd = useCallback(
+  const handleSwipeScrollEnd = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       if (!hasCarousel || mediaWidth <= 0) {
         return;
@@ -291,6 +291,8 @@ export const RaffleProductsPage = () => {
     },
     [carouselRaffles, hasCarousel, mediaWidth],
   );
+
+  const handleSwipeMomentumEnd = handleSwipeScrollEnd;
 
   const handleSelectSwipeIndex = useCallback(
     (index: number) => {
@@ -418,6 +420,19 @@ export const RaffleProductsPage = () => {
             ]}
             onLayout={handleMediaLayout}
           >
+            {raffle ? (
+              <View style={styles.mediaForeground} pointerEvents="none">
+                <RafflePrizeMedia
+                  raffle={raffle}
+                  isMuted={isRaffleMediaMuted}
+                  onMutedChange={setIsRaffleMediaMuted}
+                  isVideoActive
+                  contentFit="contain"
+                  blurBackground
+                />
+              </View>
+            ) : null}
+
             {hasCarousel && mediaWidth > 0 ? (
               <FlatList
                 ref={swipeListRef}
@@ -428,6 +443,7 @@ export const RaffleProductsPage = () => {
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
                 onMomentumScrollEnd={handleSwipeMomentumEnd}
+                onScrollEndDrag={handleSwipeScrollEnd}
                 getItemLayout={(_, index) => ({
                   length: mediaWidth,
                   offset: mediaWidth * index,
@@ -445,23 +461,11 @@ export const RaffleProductsPage = () => {
               />
             ) : null}
 
-            {raffle ? (
-              <View style={styles.mediaForeground} pointerEvents="box-none">
-                <RafflePrizeMedia
-                  raffle={raffle}
-                  isMuted={isRaffleMediaMuted}
-                  onMutedChange={setIsRaffleMediaMuted}
-                  isVideoActive
-                  contentFit="contain"
-                  blurBackground
-                />
-              </View>
-            ) : null}
-
             {showRaffleVideoSoundToggle ? (
               <RafflePrizeMediaSoundToggle
                 isMuted={isRaffleMediaMuted}
                 onToggle={setIsRaffleMediaMuted}
+                style={styles.swipeSoundToggle}
               />
             ) : null}
 
@@ -593,6 +597,7 @@ export const RaffleProductsPage = () => {
                 row={item}
                 columns={productGrid.columns}
                 gap={productGrid.gap}
+                contentWidth={productGrid.contentWidth}
                 tileWidth={productGrid.tileWidth}
                 rowIndex={index}
                 highlightRaffleProduct

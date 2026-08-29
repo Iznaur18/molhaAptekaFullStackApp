@@ -4,6 +4,7 @@ import { View } from "react-native";
 import { ProductCard } from "@/entities/product/ui/ProductCard";
 import { ProductCardBanner } from "@/entities/product/ui/ProductCardBanner";
 import { CatalogGridRowEnteringShell } from "@/features/catalog-grid/ui/CatalogGridRowEnteringShell";
+import { resolveFlexGridItemWidthStyle } from "@/shared/lib/resolveFlexGridItemWidth";
 import { AppText } from "@/shared/ui/AppText";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 
@@ -14,6 +15,7 @@ type CatalogGridRowItemProps = {
   row: CatalogGridRow;
   columns: number;
   gap: number;
+  contentWidth: number;
   tileWidth: number;
   rowIndex?: number;
   disableEntering?: boolean;
@@ -24,6 +26,7 @@ export const CatalogGridRowItem = memo(({
   row,
   columns,
   gap,
+  contentWidth,
   tileWidth,
   rowIndex = 0,
   disableEntering = false,
@@ -34,6 +37,11 @@ export const CatalogGridRowItem = memo(({
   if (!row) {
     return null;
   }
+
+  const cellWidthStyle =
+    columns <= 1
+      ? { width: "100%" as const, minWidth: 0 }
+      : resolveFlexGridItemWidthStyle({ contentWidth, columns, gap });
 
   const content =
     row.kind === "section-header" ? (
@@ -55,7 +63,7 @@ export const CatalogGridRowItem = memo(({
     ) : (
       <View style={[catalogGridRowStyles.row, { gap }]}>
         {row.products.map((product) => (
-          <View key={product._id} style={{ width: tileWidth }}>
+          <View key={product._id} style={cellWidthStyle}>
             <ProductCard
               product={product}
               layout="catalog-grid"
@@ -64,9 +72,9 @@ export const CatalogGridRowItem = memo(({
             />
           </View>
         ))}
-        {row.products.length < columns
+        {columns > 1 && row.products.length < columns
           ? Array.from({ length: columns - row.products.length }, (_, index) => (
-              <View key={`catalog-grid-pad-${index}`} style={{ width: tileWidth }} />
+              <View key={`catalog-grid-pad-${index}`} style={cellWidthStyle} />
             ))
           : null}
       </View>

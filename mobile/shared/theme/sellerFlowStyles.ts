@@ -1,5 +1,6 @@
 import { Platform, StyleSheet } from "react-native";
 
+import { SELLER_PRODUCTS_PAGE_LAYOUT as L } from "@/features/seller-products-page/lib/sellerProductsPageLayout";
 import { MY_PRODUCTS_PAGE_LAYOUT } from "@/shared/lib/guestProfileLayout";
 import { MEDIA_OVERLAY_SCRIM } from "@/shared/theme/catalogProductStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
@@ -666,45 +667,90 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,
     backgroundColor: theme.colors.bg,
+    width: "100%",
+    minWidth: 0,
+    overflow: "hidden",
   },
   listFlex: {
     flex: 1,
+    width: "100%",
+    minWidth: 0,
   },
   list: {
     paddingHorizontal: SCREEN_CONTENT_PADDING_HORIZONTAL,
-    paddingTop: theme.spacing[3],
+    paddingTop: 0,
     flexGrow: 1,
+    width: "100%",
+    alignSelf: "stretch",
+    minWidth: 0,
+  },
+  nav: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing[1],
+    minHeight: L.navMinHeight,
+    marginTop: -L.screenPaddingTop,
+    marginBottom: 0,
+  },
+  navBack: {
+    width: L.navBackSize,
+    height: L.navBackSize,
+    borderRadius: theme.radius.md,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  navBackPressed: {
+    backgroundColor: theme.colors.actionSurface,
+  },
+  navTitle: {
+    flex: 1,
+    minWidth: 0,
+    fontSize: L.navTitleFontSize,
+    fontWeight: "600",
+    lineHeight: L.navTitleLineHeight,
+    color: theme.colors.text,
   },
   header: {
-    marginBottom: theme.spacing[3],
-    gap: theme.spacing[2],
+    gap: L.screenGap,
+    paddingTop: L.screenPaddingTop,
   },
   sellerMetaZone: {
     flexDirection: "row",
+    flexWrap: "nowrap",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: theme.spacing[2],
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderRadius: theme.radius.sm,
+    gap: L.metaZoneGap,
+    paddingVertical: L.metaZonePaddingVertical,
+    paddingHorizontal: L.metaZonePaddingHorizontal,
+    borderRadius: L.metaZoneBorderRadius,
     backgroundColor: theme.colors.actionSurface,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
   },
-  sellerMetaName: {
+  sellerMetaNameHost: {
     flex: 1,
     minWidth: 0,
+    overflow: "hidden",
+  },
+  sellerMetaName: {
+    width: "100%",
+    alignItems: "flex-start",
     justifyContent: "center",
+  },
+  sellerMetaNamePressed: {
+    opacity: 0.88,
   },
   sellerMetaActions: {
     flexDirection: "row",
     flexShrink: 0,
     alignItems: "center",
-    gap: 4,
+    gap: L.metaActionsGap,
   },
   sellerName: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: L.sellerNameFontSize,
+    fontWeight: L.sellerNameFontWeight,
+    lineHeight: L.sellerNameLineHeight,
     color: theme.colors.text,
   },
   hint: {
@@ -712,6 +758,34 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
     marginTop: theme.spacing[6],
     fontSize: 15,
     color: theme.colors.textMuted,
+  },
+  shelvesRow: {
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    alignItems: "center",
+    gap: L.shelfRowGap,
+    paddingTop: L.shelfRowPaddingTop,
+    paddingBottom: L.shelfRowPaddingBottom,
+  },
+  shelfChip: {
+    flexShrink: 0,
+    paddingVertical: L.shelfChipPaddingVertical,
+    paddingHorizontal: L.shelfChipPaddingHorizontal,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: theme.colors.action,
+    backgroundColor: "transparent",
+  },
+  shelfChipActive: {
+    backgroundColor: theme.colors.action,
+  },
+  shelfChipText: {
+    fontSize: L.shelfChipFontSize,
+    fontWeight: "600",
+    color: theme.colors.action,
+  },
+  shelfChipTextActive: {
+    color: theme.colors.onContrast,
   },
   footerLoader: {
     marginVertical: theme.spacing[4],
@@ -734,6 +808,96 @@ export const useSellerProductsPageStyles = createThemedStyles((theme) => ({
     color: theme.colors.onContrast,
     fontSize: 15,
     fontWeight: "600",
+  },
+}));
+
+export const useSellerProfileQuickStatsStyles = createThemedStyles((theme) => ({
+  root: {
+    width: "100%",
+  },
+  gridRow: {
+    flexDirection: "row",
+    gap: L.statsGridGap,
+  },
+  gridCompact: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: L.statsGridGap,
+  },
+  itemCompactHalf: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: "48%",
+    maxWidth: "48%",
+  },
+  itemCompactFull: {
+    width: "100%",
+    flexBasis: "100%",
+    maxWidth: "100%",
+  },
+  item: {
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 0,
+    paddingVertical: L.statsItemPaddingVertical,
+    paddingHorizontal: L.statsItemPaddingHorizontal,
+    borderRadius: L.statsItemBorderRadius,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.actionSurface,
+  },
+  itemFollowers: {
+    flex: L.statsColumnFlexFollowers,
+  },
+  itemRating: {
+    flex: L.statsColumnFlexRating,
+  },
+  itemPhone: {
+    flex: L.statsColumnFlexPhone,
+  },
+  body: {
+    gap: 2,
+    minWidth: 0,
+    width: "100%",
+    alignItems: "center",
+  },
+  value: {
+    fontSize: L.statsValueFontSize,
+    fontWeight: "700",
+    lineHeight: 18,
+    color: theme.colors.ink,
+    textAlign: "center",
+  },
+  valuePhone: {
+    fontSize: L.statsPhoneValueFontSize,
+    letterSpacing: -0.16,
+  },
+  label: {
+    fontSize: L.statsLabelFontSize,
+    fontWeight: "500",
+    lineHeight: 13,
+    color: theme.colors.textMuted,
+    textAlign: "center",
+  },
+  link: {
+    color: theme.colors.ink,
+  },
+  reveal: {
+    padding: 0,
+  },
+  revealText: {
+    fontSize: L.statsPhoneValueFontSize,
+    fontWeight: "600",
+    lineHeight: 16,
+    color: theme.colors.action,
+    textDecorationLine: "underline",
+  },
+  revealError: {
+    marginTop: 4,
+    fontSize: L.statsLabelFontSize,
+    fontWeight: "500",
+    color: theme.colors.danger,
+    textAlign: "center",
   },
 }));
 

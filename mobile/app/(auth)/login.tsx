@@ -1,4 +1,3 @@
-import Feather from "@expo/vector-icons/Feather";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { LayoutAnimation, Platform, Pressable, Text, TextInput, UIManager, View } from "react-native";
@@ -20,6 +19,7 @@ import { AppButton } from "@/shared/ui/AppButton";
 import { AuthScreenScroll } from "@/shared/ui/AuthScreenScroll";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 import { PasswordTextInput } from "@/shared/ui/PasswordTextInput";
+import { ScreenBackButton } from "@/shared/ui/ScreenBackButton";
 
 type AuthChannel = "email" | "phone";
 type LoginField = "email" | "phone";
@@ -56,14 +56,6 @@ export default function LoginScreen() {
     : null;
 
   const isLoading = loginMutation.isPending || phoneLoginMutation.isPending;
-
-  const handleBack = useCallback(() => {
-    if (router.canGoBack()) {
-      router.back();
-      return;
-    }
-    router.replace("/(tabs)");
-  }, [router]);
 
   const finishLogin = useCallback(() => {
     releaseColdStartSplash();
@@ -119,23 +111,6 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.flex}>
-      <Pressable
-        style={[
-          styles.backButtonOverlay,
-          {
-            top: insets.top + A.backTopInset,
-            left: Math.max(insets.left, A.backLeftInset),
-          },
-          isLoading && styles.backButtonOverlayDisabled,
-        ]}
-        onPress={handleBack}
-        disabled={isLoading}
-        accessibilityRole="button"
-        accessibilityLabel={AUTH_UI.BACK_BUTTON}
-      >
-        <Feather name="chevron-left" size={22} color={theme.colors.link} />
-      </Pressable>
-
       <AuthScreenScroll
         style={styles.flex}
         contentContainerStyle={[
@@ -144,6 +119,10 @@ export default function LoginScreen() {
         ]}
       >
         <View style={styles.column}>
+          <ScreenBackButton
+            accessibilityLabel={AUTH_UI.BACK_BUTTON}
+            disabled={isLoading}
+          />
           <View style={[styles.hero, { height: heroHeight }]}>
             {bannerImageUri ? (
               <CachedProductImage

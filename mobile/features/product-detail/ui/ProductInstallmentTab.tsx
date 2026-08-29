@@ -373,11 +373,16 @@ export const ProductInstallmentTab = ({
 
       {!dockSubmit ? (
         <Pressable
-          style={[styles.planCard, isSubmitDisabled && { opacity: 0.5 }]}
+          style={[
+            styles.installmentBuyerSubmit,
+            isSubmitDisabled && styles.installmentBuyerSubmitDisabled,
+          ]}
           disabled={isSubmitDisabled}
           onPress={openCheckoutSheet}
+          accessibilityRole="button"
+          accessibilityLabel={INSTALLMENT_UI.SUBMIT}
         >
-          <Text style={styles.planTitle}>{dockLabel}</Text>
+          <Text style={styles.installmentBuyerSubmitText}>{dockLabel}</Text>
         </Pressable>
       ) : null}
 

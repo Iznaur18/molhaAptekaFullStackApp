@@ -1,6 +1,6 @@
-import { Share2 } from "@/shared/ui/productDetailsLucideIcons";
-import { useState } from "react";
-import { Share, Text } from "react-native";
+import { Check, Share2 } from "@/shared/ui/productDetailsLucideIcons";
+import { useEffect, useRef, useState } from "react";
+import { Share } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { AFFILIATE_QUERY_PARAM } from "@izibuy/shared-lib";
 import * as Clipboard from "expo-clipboard";
@@ -12,7 +12,8 @@ import { fetchMyReferralProgram } from "@/entities/user/api/referralProgram";
 import { ProductDetailsFeatureCard } from "@/entities/product/ui/ProductDetailsFeatureCard";
 import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
 import { WEB_APP_BASE_URL } from "@/shared/config/webAppBaseUrl";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+
+const COPIED_ICON_MS = 1600;
 
 type ProductAffiliateShareButtonProps = {
   product: Record<string, unknown>;
@@ -23,7 +24,6 @@ export const ProductAffiliateShareButton = ({
   product,
   onRequestLogin,
 }: ProductAffiliateShareButtonProps) => {
-  const theme = useAppTheme();
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
   const enabled = product.affiliateEnabled === true;
@@ -37,7 +37,16 @@ export const ProductAffiliateShareButton = ({
     currentUserId != null &&
     sellerId != null &&
     currentUserId === String(sellerId);
-  const [status, setStatus] = useState("");
+  const [copied, setCopied] = useState(false);
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current != null) {
+        clearTimeout(resetTimerRef.current);
+      }
+    };
+  }, []);
 
   const referralQuery = useQuery({
     queryKey: ["user", "me", "referral", "for-affiliate-share"],
@@ -50,6 +59,17 @@ export const ProductAffiliateShareButton = ({
     return null;
   }
 
+  const flashCopied = () => {
+    setCopied(true);
+    if (resetTimerRef.current != null) {
+      clearTimeout(resetTimerRef.current);
+    }
+    resetTimerRef.current = setTimeout(() => {
+      setCopied(false);
+      resetTimerRef.current = null;
+    }, COPIED_ICON_MS);
+  };
+
   const handlePress = async () => {
     if (!isAuthorized) {
       onRequestLogin();
@@ -58,21 +78,20 @@ export const ProductAffiliateShareButton = ({
     const code = String(referralQuery.data?.referralCode ?? "").trim();
     const productId = String(product._id ?? "");
     if (!code || !productId) {
-      setStatus(PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_FAILED);
       return;
     }
     const origin = WEB_APP_BASE_URL.replace(/\/$/, "");
     const url = `${origin}/product/${encodeURIComponent(productId)}?${AFFILIATE_QUERY_PARAM}=${encodeURIComponent(code)}`;
     try {
       await Clipboard.setStringAsync(url);
-      setStatus(PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_COPIED);
       try {
         await Share.share({ message: url });
       } catch {
         // cancelled
       }
+      flashCopied();
     } catch {
-      setStatus(PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_FAILED);
+      // parity: web logs only, no inline status
     }
   };
 
@@ -85,24 +104,19 @@ export const ProductAffiliateShareButton = ({
   const busy = isAuthorized && referralQuery.isLoading;
 
   return (
-    <>
-      <ProductDetailsFeatureCard
-        icon={Share2}
-        title={title}
-        subtitle={subtitle}
-        ariaLabel={
-          isAuthorized
-            ? PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE
-            : PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_LOGIN
-        }
-        onPress={() => {
-          void handlePress();
-        }}
-        disabled={busy}
-      />
-      {status ? (
-        <Text style={{ fontSize: 12, color: theme.colors.textMuted }}>{status}</Text>
-      ) : null}
-    </>
+    <ProductDetailsFeatureCard
+      icon={copied ? Check : Share2}
+      title={title}
+      subtitle={subtitle}
+      ariaLabel={
+        isAuthorized
+          ? PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE
+          : PRODUCT_DETAILS_MODAL_UI.AFFILIATE_SHARE_LOGIN
+      }
+      onPress={() => {
+        void handlePress();
+      }}
+      disabled={busy}
+    />
   );
 };

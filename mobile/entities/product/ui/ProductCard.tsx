@@ -14,10 +14,12 @@ import { isCurrentUserProductSeller } from "@/entities/product/lib/isCurrentUser
 import { useProductCardImageTapActions } from "@/entities/product/lib/useProductCardImageTapActions";
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
+import { resolveProductCardImageOverlayInsetX } from "@/entities/product/lib/productCardBadgePalette";
 import { resolveProductCardCatalogGridTotalHeight } from "@/entities/product/lib/productCardMobileCatalogLayout";
 import { useProductCardChromeFlags } from "@/entities/product/lib/useProductCardChromeFlags";
 import { resolveProductCardPromotionFrameStyle } from "@/entities/product/lib/resolveProductCardPromotionFrameStyle";
 import { resolveProductCardRaffleParticipantFrameStyle } from "@/entities/product/lib/resolveProductCardRaffleParticipantFrameStyle";
+import { PRODUCT_CARD_PROMOTION_TIER } from "@/entities/product/lib/productCardPromotionFramePalette";
 import { useProductCardMediaState } from "@/entities/product/lib/useProductCardMediaState";
 import { ProductCardGalleryDots } from "@/entities/product/ui/ProductCardGalleryDots";
 import { ProductCardWishlistBurst } from "@/entities/product/ui/ProductCardWishlistBurst";
@@ -158,8 +160,18 @@ export const ProductCard = memo(
     const gallerySlideCount = Math.max(cardMedia.mediaSlides.length, 1);
 
     const isCatalogGrid = layout === "catalog-grid";
+    const imageOverlayInsetX = resolveProductCardImageOverlayInsetX(
+      isCatalogGrid ? "catalog-grid" : "default",
+    );
     const showPromotionFrame =
       flags.showPromotionChrome && flags.promotionFrameTier != null;
+    const promotionRibbonTier = flags.showPromotionBoostBadge
+      ? PRODUCT_CARD_PROMOTION_TIER.GOLD
+      : flags.showPromotionTopBadge
+        ? PRODUCT_CARD_PROMOTION_TIER.TOP
+        : flags.showPromotionBannerBadge
+          ? PRODUCT_CARD_PROMOTION_TIER.BANNER
+          : null;
     const showCardChrome = showPromotionFrame || flags.showPremiumChrome;
 
     const promotionFrameStyle = showCardChrome
@@ -257,12 +269,18 @@ export const ProductCard = memo(
             <ProductCardOutOfStockOverlay product={product} />
           ) : null}
 
-          {showPromotionFrame && flags.promotionFrameTier ? (
-            <ProductCardPromotionCornerFlag tier={flags.promotionFrameTier} />
+          {promotionRibbonTier ? (
+            <ProductCardPromotionCornerFlag
+              tier={promotionRibbonTier}
+              insetLeft={imageOverlayInsetX}
+            />
           ) : null}
 
           {flags.showDiscountBadge || flags.showLoyaltyPointsBadge ? (
-            <View style={styles.imageBadges} pointerEvents="box-none">
+            <View
+              style={[styles.imageBadges, { left: imageOverlayInsetX }]}
+              pointerEvents="box-none"
+            >
               {flags.showDiscountBadge ? (
                 <ProductDiscountBadge product={product} variant="overlay" />
               ) : null}

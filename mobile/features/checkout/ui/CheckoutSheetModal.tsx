@@ -15,11 +15,10 @@ import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import type { CheckoutProductPickupGroup } from "@/entities/cart/lib/buildCheckoutPickupLocations";
 import { CheckoutForm } from "@/features/checkout/ui/CheckoutForm";
+import { useCheckoutSheetModalAnimation } from "@/features/checkout/model/useCheckoutSheetModalAnimation";
 import { CHECKOUT_FORM_UI, CART_PAGE_UI } from "@/shared/config";
 import { resolveAppShellMaxWidthStyle } from "@/shared/lib/appShellLayout";
-import { useAdminEditModalAnimation } from "@/shared/model/useAdminEditModalAnimation";
 import { useBottomSheetFormStyles } from "@/shared/theme/formChromeStyles";
-import { CHECKOUT_SHEET_MODAL_ANIMATION } from "@/shared/theme/modalChromeStyles";
 import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 
 type CheckoutSheetModalProps = {
@@ -58,14 +57,12 @@ export const CheckoutSheetModal = ({
   const sheetStyles = useBottomSheetFormStyles();
   const { width: windowWidth } = useWindowDimensions();
   const sheetSlideDistance = useMemo(() => Dimensions.get("window").height, []);
-  const { modalVisible, backdropAnimatedStyle, sheetAnimatedStyle } =
-    useAdminEditModalAnimation(visible, {
-      sheetSlideDistance,
-      enterMs: CHECKOUT_SHEET_MODAL_ANIMATION.enterMs,
-      exitMs: CHECKOUT_SHEET_MODAL_ANIMATION.exitMs,
-    });
+  const { modalVisible, backdropAnimatedStyle, sheetAnimatedStyle, useCssTransition } =
+    useCheckoutSheetModalAnimation(visible, sheetSlideDistance);
 
   const sheetMaxWidthStyle = resolveAppShellMaxWidthStyle(windowWidth);
+  const BackdropContainer = useCssTransition ? View : Animated.View;
+  const SheetContainer = useCssTransition ? View : Animated.View;
 
   if (!modalVisible) {
     return null;
@@ -74,18 +71,18 @@ export const CheckoutSheetModal = ({
   return (
     <Modal visible={modalVisible} animationType="none" transparent onRequestClose={onClose}>
       <View style={sheetStyles.backdrop}>
-        <Animated.View
+        <BackdropContainer
           style={[StyleSheet.absoluteFillObject, backdropAnimatedStyle]}
           pointerEvents="none"
         >
           <ModalSheetGradientBackdrop />
-        </Animated.View>
+        </BackdropContainer>
         <Pressable
           style={sheetStyles.backdropDismiss}
           onPress={onClose}
           accessibilityRole="button"
         />
-        <Animated.View
+        <SheetContainer
           style={[
             sheetStyles.sheet,
             sheetStyles.checkoutSheet,
@@ -123,7 +120,7 @@ export const CheckoutSheetModal = ({
               onSubmit={onSubmit}
             />
           </ScrollView>
-        </Animated.View>
+        </SheetContainer>
       </View>
     </Modal>
   );

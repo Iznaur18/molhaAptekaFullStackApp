@@ -39,6 +39,7 @@ import {
   CREATE_STORY_SUBMIT_FOOTER_HEIGHT_PX,
   useCreateStoryModalStyles,
 } from "@/shared/theme/modalChromeStyles";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 import { ProductPreviewVideo } from "@/shared/ui/ProductPreviewVideo";
 
 type CreateUserStoryModalProps = {
@@ -216,6 +217,7 @@ export const CreateUserStoryModal = ({
     >
       <View style={styles.root} accessibilityViewIsModal>
         <BackdropContainer style={[styles.backdrop, backdropAnimatedStyle]} pointerEvents="box-none">
+          <ModalSheetGradientBackdrop />
           <Pressable
             style={StyleSheet.absoluteFillObject}
             onPress={handleDismiss}

@@ -47,6 +47,7 @@ import { useCancelButtonStyles } from "@/shared/theme/cancelButtonChromeStyles";
 import { useDataConfirmationRequestModalStyles } from "@/shared/theme/dataConfirmationPageStyles";
 import { useFormFieldStyles } from "@/shared/theme/formChromeStyles";
 import { AppButton } from "@/shared/ui/AppButton";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 import { ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 const keepDigitsOnly = (value: string): string => value.replace(/\D/g, "");
@@ -201,7 +202,9 @@ export const DataConfirmationRequestModal = ({
           onPress={onClose}
           accessibilityRole="button"
           accessibilityLabel={DATA_CONFIRMATION_MODAL_UI.CANCEL}
-        />
+        >
+          <ModalSheetGradientBackdrop />
+        </Pressable>
         <View style={styles.keyboardHost}>
           <View style={styles.card} {...resolveDialogAccessibilityProps()}>
             <View style={styles.header}>

@@ -306,8 +306,14 @@ export default function ProductDetailScreen() {
     insets.bottom,
     showMobilePurchaseDock,
   );
-  const showInstallmentDock = activeTab === "installment" && installmentDock != null;
-  const showAuctionDock = activeTab === "auction" && auctionDock != null;
+  const showInstallmentDock =
+    !pageLayout.isPageSplit &&
+    activeTab === "installment" &&
+    installmentDock != null;
+  const showAuctionDock =
+    !pageLayout.isPageSplit &&
+    activeTab === "auction" &&
+    auctionDock != null;
   const isAltTab =
     activeTab === "reviews" ||
     activeTab === "qa" ||
@@ -651,6 +657,7 @@ export default function ProductDetailScreen() {
           isAuthorized={isAuthorized}
           isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
           isOwnProduct={isOwnProduct}
+          dockSubmit={!pageLayout.isPageSplit}
           onDockFooterChange={handleAuctionDockChange}
         />
       ) : null}
@@ -664,6 +671,7 @@ export default function ProductDetailScreen() {
           isUserDataConfirmed={sessionQuery.data?.user?.isUserDataConfirmed === true}
           isOwnProduct={isOwnProduct}
           defaultUser={sessionQuery.data?.user ?? null}
+          dockSubmit={!pageLayout.isPageSplit}
           onDockFooterChange={handleInstallmentDockChange}
         />
       ) : null}
@@ -768,18 +776,19 @@ export default function ProductDetailScreen() {
                   </View>
                 ) : null}
 
-                {isSimilarTab ? (
-                  <ProductSimilarTab
-                    product={productRecord}
-                    excludeProductId={productId}
-                    enabled
-                    onRegisterLoadMore={handleRegisterSimilarLoadMore}
-                  />
-                ) : null}
-
-                {isAltTab && !isSimilarTab ? (
-                  <View style={[styles.tabPanel, styles.tabPanelInset, styles.pageWideAltPanel]}>
-                    {renderAltTabPanel()}
+                {isAltTab ? (
+                  <View style={[styles.tabPanel, styles.pageWideAltPanel, styles.tabPanelSplit]}>
+                    {isSimilarTab ? (
+                      <ProductSimilarTab
+                        product={productRecord}
+                        excludeProductId={productId}
+                        enabled
+                        variant="detailTab"
+                        onRegisterLoadMore={handleRegisterSimilarLoadMore}
+                      />
+                    ) : (
+                      renderAltTabPanel()
+                    )}
                   </View>
                 ) : null}
 
@@ -809,29 +818,25 @@ export default function ProductDetailScreen() {
                   <ProductDetailTabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
                 ) : null}
 
-                {isSimilarTab ? (
-                  <ProductSimilarTab
-                    product={productRecord}
-                    excludeProductId={productId}
-                    enabled
-                    onRegisterLoadMore={handleRegisterSimilarLoadMore}
-                  />
-                ) : null}
-
-                <View
-                  style={[
-                    styles.tabPanel,
-                    isAltTab && styles.tabPanelInset,
-                    isSimilarTab && styles.productTabPanelHidden,
-                  ]}
-                  pointerEvents={isSimilarTab ? "none" : "auto"}
-                  collapsable={false}
-                >
-                  {activeTab === "details" ? (
+                {isAltTab ? (
+                  <View style={[styles.tabPanel, styles.tabPanelInset]}>
+                    {isSimilarTab ? (
+                      <ProductSimilarTab
+                        product={productRecord}
+                        excludeProductId={productId}
+                        enabled
+                        variant="detailTab"
+                        onRegisterLoadMore={handleRegisterSimilarLoadMore}
+                      />
+                    ) : (
+                      renderAltTabPanel()
+                    )}
+                  </View>
+                ) : (
+                  <View style={styles.tabPanel}>
                     <ProductDetailsDetailsTab {...detailsTabProps} presentation="default" />
-                  ) : null}
-                  {renderAltTabPanel()}
-                </View>
+                  </View>
+                )}
 
                 {renderManageActions()}
 
@@ -876,7 +881,7 @@ export default function ProductDetailScreen() {
           <View style={[styles.installmentDock, { paddingBottom: Math.max(insets.bottom, 10.4) }]}>
             <AppButton
               label={auctionDock.label}
-              variant="primary"
+              variant="contrast"
               onPress={auctionDock.onSubmit}
               disabled={auctionDock.disabled}
               style={styles.installmentDockButton}

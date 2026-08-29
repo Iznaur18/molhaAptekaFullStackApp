@@ -1,27 +1,28 @@
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 import {
-  SCREEN_BACK_BUTTON_EDGE,
+  SCREEN_BACK_BUTTON_LEFT_INSET,
+  SCREEN_BACK_BUTTON_RADIUS,
   SCREEN_BACK_BUTTON_SIZE,
+  SCREEN_BACK_BUTTON_TOP_INSET,
 } from "@/shared/lib/screenBackButtonLayout";
 
+/** Паритет `client/pages/auth/ui/AuthPage.css` → `.auth-page__back`. */
 export const useScreenBackButtonStyles = createThemedStyles((theme) => ({
   overlay: {
     position: "absolute",
-    left: SCREEN_BACK_BUTTON_EDGE,
-    zIndex: 20,
-    elevation: 20,
+    zIndex: 10,
+    elevation: 10,
   },
   button: {
     width: SCREEN_BACK_BUTTON_SIZE,
     height: SCREEN_BACK_BUTTON_SIZE,
-    borderRadius: SCREEN_BACK_BUTTON_SIZE / 2,
+    borderRadius: SCREEN_BACK_BUTTON_RADIUS,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.92)",
-    shadowColor: theme.colors.ink,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.14,
-    shadowRadius: 4,
+    backgroundColor: "rgba(255, 255, 255, 0.14)",
+  },
+  buttonDisabled: {
+    opacity: 0.55,
   },
   buttonInline: {
     width: SCREEN_BACK_BUTTON_SIZE,
@@ -43,3 +44,10 @@ export const useScreenWithBackStyles = createThemedStyles((theme) => ({
     flex: 1,
   },
 }));
+
+export const SCREEN_BACK_BUTTON_LAYOUT = {
+  size: SCREEN_BACK_BUTTON_SIZE,
+  topInset: SCREEN_BACK_BUTTON_TOP_INSET,
+  leftInset: SCREEN_BACK_BUTTON_LEFT_INSET,
+  radius: SCREEN_BACK_BUTTON_RADIUS,
+} as const;

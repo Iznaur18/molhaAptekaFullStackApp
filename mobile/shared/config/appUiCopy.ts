@@ -1682,6 +1682,7 @@ export const USER_PROFILE_PURCHASES_UI = {
 
 export const SELLER_PRODUCTS_PAGE_UI = {
   TITLE: "Товары продавца",
+  BACK_ARIA: "Назад",
   LOADING: "Загрузка…",
   LOGIN_HINT: "Войдите, чтобы посмотреть товары продавца.",
   LOGIN_BUTTON: "Войти",
@@ -1691,6 +1692,8 @@ export const SELLER_PRODUCTS_PAGE_UI = {
   SHARE_LINK_COPIED_ARIA: "Ссылка скопирована",
   SHELF_FILTER_ARIA: "Полки продавца",
   SHELF_FILTER_ALL: "Все",
+  STATS_ARIA: "Статистика продавца",
+  STATS_VOTE_RATING: "Рейтинг голосов",
   /** @param userName seller display name */
   TITLE_FOR: (userName: string) => `Товары ${userName}`,
 } as const;

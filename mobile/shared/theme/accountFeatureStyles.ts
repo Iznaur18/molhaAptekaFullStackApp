@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 
+import { SELLER_PRODUCTS_PAGE_LAYOUT as L } from "@/features/seller-products-page/lib/sellerProductsPageLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
 export const useAccountPageChromeStyles = createThemedStyles((theme) => ({
@@ -69,10 +70,22 @@ export const useUserFollowButtonStyles = createThemedStyles((theme) => ({
   buttonInline: {
     alignSelf: "center",
   },
+  buttonSellerMeta: {
+    paddingVertical: L.followPaddingVertical,
+    paddingHorizontal: L.followPaddingHorizontal,
+    borderRadius: L.followBorderRadius,
+    borderWidth: 1,
+    borderColor: theme.colors.action,
+  },
   buttonFollowing: {
     backgroundColor: theme.colors.surface,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.borderStrong,
+  },
+  buttonFollowingSellerMeta: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: theme.colors.action,
   },
   buttonText: {
     fontSize: 14,
@@ -81,6 +94,9 @@ export const useUserFollowButtonStyles = createThemedStyles((theme) => ({
   },
   buttonTextFollowing: {
     color: theme.colors.textSecondary,
+  },
+  buttonTextFollowingSellerMeta: {
+    color: theme.colors.action,
   },
   error: {
     marginTop: 4,

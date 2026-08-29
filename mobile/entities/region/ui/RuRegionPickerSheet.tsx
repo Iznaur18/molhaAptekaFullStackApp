@@ -18,6 +18,7 @@ import { VIEWER_REGION_PICKER_SHEET_ANIMATION } from "@/entities/region/lib/view
 import { REGION_UI } from "@/shared/config";
 import { useRegisterBlockingOverlay } from "@/shared/lib/useBlockingOverlayOccupancy";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 import { SquircleView } from "@/shared/ui/SquircleView";
 
 /** Паритет web `--viewer-region-sheet-height: min(92svh, 36rem)`. */
@@ -28,8 +29,6 @@ const SHEET_DESKTOP_MAX_WIDTH_PX = 416;
 /** Паритет web `--viewer-region-radius: 2rem`. */
 const SHEET_TOP_RADIUS = 32;
 const SHEET_INLINE_PADDING = 16;
-/** Web `color-mix(ink 55%, transparent)`. */
-const SHEET_BACKDROP_SCRIM = "rgba(0, 0, 0, 0.55)";
 
 type RuRegionPickerSheetProps = {
   open: boolean;
@@ -52,7 +51,6 @@ const useRuRegionPickerSheetStyles = createThemedStyles((theme) => ({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: SHEET_BACKDROP_SCRIM,
   },
   backdropPressable: {
     ...StyleSheet.absoluteFillObject,
@@ -229,6 +227,7 @@ export function RuRegionPickerSheet({
     >
       <View style={styles.overlay}>
         <BackdropContainer style={[styles.backdrop, backdropAnimatedStyle]} pointerEvents="box-none">
+          <ModalSheetGradientBackdrop />
           <Pressable
             style={styles.backdropPressable}
             onPress={onClose}

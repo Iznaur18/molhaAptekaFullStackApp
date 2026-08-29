@@ -30,7 +30,7 @@ test("forgot-password screen matches web AuthPage layout", () => {
 
   assert.match(forgot, /styles\.column/);
   assert.match(forgot, /channelBtn/);
-  assert.match(forgot, /chevron-left/);
+  assert.match(forgot, /ScreenBackButton/);
   assert.match(forgot, /AUTH_PAGE_LAYOUT/);
   assert.match(forgot, /LayoutAnimation/);
   assert.match(forgot, /FORGOT_CHANNEL_ARIA/);

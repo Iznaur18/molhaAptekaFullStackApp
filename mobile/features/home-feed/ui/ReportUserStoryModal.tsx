@@ -13,7 +13,7 @@ import {
   PRODUCT_REPORT_TEXT_MAX_CHARS,
   USER_STORY_UI,
 } from "@/shared/config";
-import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 import { useBottomSheetReportModalStyles } from "@/shared/theme/modalChromeStyles";
 
 type ReportUserStoryModalProps = {
@@ -74,6 +74,7 @@ export const ReportUserStoryModal = ({
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
       <View style={styles.overlay}>
+        <ModalSheetGradientBackdrop />
         <View style={styles.card}>
           <Text style={styles.title}>{USER_STORY_UI.STORY_REPORT_TITLE}</Text>
 

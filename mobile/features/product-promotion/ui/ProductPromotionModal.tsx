@@ -42,6 +42,7 @@ import { ProductPromotionModalTabs } from "@/features/product-promotion/ui/Produ
 import { PRODUCT_CARD_UI, PRODUCT_PROMOTION_UI } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductPromotionModalStyles } from "@/shared/theme/modalChromeStyles";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 
 const TIER_BADGE_LABELS: Record<number, string> = {
@@ -503,6 +504,7 @@ export const ProductPromotionModal = ({
       onRequestClose={onClose}
     >
       <View style={styles.overlay} pointerEvents="box-none">
+        <ModalSheetGradientBackdrop />
         <View style={styles.card} pointerEvents="auto">
           <View style={styles.headerRow}>
             <Text style={styles.title}>{PRODUCT_PROMOTION_UI.MODAL_TITLE}</Text>

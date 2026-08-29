@@ -72,7 +72,7 @@ export const ProductQuestionListItem = ({
   };
 
   return (
-    <View style={styles.item}>
+    <View style={styles.qaItem}>
       <View style={styles.itemHeader}>
         <Text style={styles.itemAuthorName} numberOfLines={1}>
           {authorName}
@@ -99,12 +99,12 @@ export const ProductQuestionListItem = ({
               <Text style={styles.itemDate}>{formatQaDate(answer.answeredAt)}</Text>
             ) : null}
           </View>
-          <Text style={styles.itemBody}>{answer.text}</Text>
+          <Text style={styles.qaAnswerText}>{answer.text}</Text>
         </View>
       ) : null}
 
       {isPending && question.isMine && !isSeller ? (
-        <Text style={styles.hint}>{PRODUCT_QA_UI.PENDING_HINT}</Text>
+        <Text style={styles.qaItemHint}>{PRODUCT_QA_UI.PENDING_HINT}</Text>
       ) : null}
 
       {(canAnswer || canHide || canDelete) && !isAnswerOpen ? (
@@ -120,7 +120,7 @@ export const ProductQuestionListItem = ({
           ) : null}
           {canDelete ? (
             <Pressable
-              style={styles.qaAction}
+              style={[styles.qaAction, styles.qaActionDanger]}
               disabled={isActionPending}
               onPress={handleDeletePress}
             >
@@ -129,7 +129,7 @@ export const ProductQuestionListItem = ({
           ) : null}
           {canAnswer ? (
             <Pressable
-              style={styles.qaAction}
+              style={[styles.qaAction, styles.qaActionPrimary]}
               disabled={isActionPending}
               onPress={() => setIsAnswerOpen(true)}
             >

@@ -628,6 +628,7 @@ export default function CatalogScreen() {
               row={item.row}
               columns={productGrid.columns}
               gap={productGrid.gap}
+              contentWidth={productGrid.contentWidth}
               tileWidth={productGrid.tileWidth}
               rowIndex={productRowIndex}
               disableEntering
@@ -639,6 +640,7 @@ export default function CatalogScreen() {
     [
       feedHeaderElement,
       productGrid.columns,
+      productGrid.contentWidth,
       productGrid.gap,
       productGrid.tileWidth,
       styles.homeFeedInsetContent,
@@ -668,6 +670,7 @@ export default function CatalogScreen() {
             row={item}
             columns={productGrid.columns}
             gap={productGrid.gap}
+            contentWidth={productGrid.contentWidth}
             tileWidth={productGrid.tileWidth}
             rowIndex={index}
             disableEntering
@@ -675,7 +678,7 @@ export default function CatalogScreen() {
         </RowVisibilityBoundary>
       );
     },
-    [productGrid.columns, productGrid.gap, productGrid.tileWidth],
+    [productGrid.columns, productGrid.contentWidth, productGrid.gap, productGrid.tileWidth],
   );
 
   const renderHomeFeedScene = (content: ReactNode) => (

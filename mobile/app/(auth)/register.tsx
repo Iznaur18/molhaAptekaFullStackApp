@@ -1,5 +1,4 @@
 import { sanitizeUserNameInputLive } from "@molha/api-contract";
-import Feather from "@expo/vector-icons/Feather";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
@@ -39,6 +38,7 @@ import { AppButton } from "@/shared/ui/AppButton";
 import { AuthScreenScroll } from "@/shared/ui/AuthScreenScroll";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 import { PasswordTextInput } from "@/shared/ui/PasswordTextInput";
+import { ScreenBackButton } from "@/shared/ui/ScreenBackButton";
 
 type AuthChannel = "email" | "phone";
 type RegisterField = "email" | "phone" | "userName" | "code";
@@ -246,23 +246,6 @@ export default function RegisterScreen() {
 
   return (
     <View style={styles.flex}>
-      <Pressable
-        style={[
-          styles.backButtonOverlay,
-          {
-            top: insets.top + A.backTopInset,
-            left: Math.max(insets.left, A.backLeftInset),
-          },
-          isBusy && styles.backButtonOverlayDisabled,
-        ]}
-        onPress={handleBack}
-        disabled={isBusy}
-        accessibilityRole="button"
-        accessibilityLabel={AUTH_UI.BACK_BUTTON}
-      >
-        <Feather name="chevron-left" size={22} color={theme.colors.link} />
-      </Pressable>
-
       <AuthScreenScroll
         style={styles.flex}
         contentContainerStyle={[
@@ -271,6 +254,11 @@ export default function RegisterScreen() {
         ]}
       >
         <View style={styles.column}>
+          <ScreenBackButton
+            accessibilityLabel={AUTH_UI.BACK_BUTTON}
+            disabled={isBusy}
+            onPress={handleBack}
+          />
           <View style={[styles.hero, { height: heroHeight }]}>
             {bannerImageUri ? (
               <CachedProductImage

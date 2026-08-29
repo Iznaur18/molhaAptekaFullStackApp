@@ -319,6 +319,15 @@ test("product detail dock CTA uses AddToCartButton only", () => {
   assert.match(cartStyles, /PRODUCT_DETAIL_DOCK_CTA_BORDER_RADIUS = 11\.2/);
   assert.match(cartStyles, /detailOutOfStockButton:/);
   assert.match(cartStyles, /backgroundColor: theme\.colors\.surfaceMuted/);
+  assert.match(cartStyles, /ADD_TO_CART_BUTTON_LAYOUT/);
+  assert.match(cartStyles, /loginButton:[\s\S]*backgroundColor: theme\.colors\.action/);
+  assert.match(cartStyles, /addButton:[\s\S]*backgroundColor: theme\.colors\.action/);
+  assert.match(cartStyles, /addButtonText:[\s\S]*color: theme\.colors\.onContrast/);
+  assert.match(cartStyles, /stepper:[\s\S]*backgroundColor: theme\.colors\.actionSoft/);
+  assert.match(cartStyles, /loginButtonText:[\s\S]*color: theme\.colors\.onContrast/);
+  assert.match(cartStyles, /fontSize: CART_BTN\.fontSize/);
+  assert.match(webCss, /font-size: 0\.9rem/);
+  assert.match(webCss, /background: var\(--iz-color-action\)/);
   assert.match(webCss, /add-to-cart--out-of-stock/);
   assert.match(webCss, /color: var\(--iz-color-text-muted\)/);
 });
@@ -350,9 +359,14 @@ test("mobile installment tab matches web buyer hint and docked submit", () => {
   assert.match(styles, /infoNavy/);
   assert.match(tab, /installmentBuyerHint/);
   assert.match(tab, /INSTALLMENT_UI\.BUYER_HINT/);
+  assert.match(webCss, /installment-buyer-block__submit/);
+  assert.match(webCss, /min-height: 3rem/);
+  assert.match(webCss, /border-radius: 11\.2px/);
+  assert.match(tab, /installmentBuyerSubmit/);
+  assert.match(screen, /dockSubmit=\{!pageLayout\.isPageSplit\}/);
+  assert.match(screen, /!pageLayout\.isPageSplit[\s\S]*showInstallmentDock/);
   assert.match(tab, /onDockFooterChange/);
   assert.match(screen, /installmentDock/);
-  assert.match(screen, /showInstallmentDock/);
   assert.match(styles, /installmentDock:/);
 });
 
@@ -375,6 +389,14 @@ test("mobile auction tab matches web price-offer layout and docked submit", () =
   assert.match(topList, /topRank/);
   assert.match(screen, /auctionDock/);
   assert.match(screen, /showAuctionDock/);
+  assert.match(screen, /dockSubmit=\{!pageLayout\.isPageSplit\}/);
+  assert.match(
+    screen,
+    /showAuctionDock[\s\S]*!pageLayout\.isPageSplit/,
+    "auction dock hidden on split layout",
+  );
+  assert.match(tab, /variant="contrast"/);
+  assert.match(styles, /PRODUCT_PRICE_OFFER_BUTTON_LAYOUT/);
   assert.match(tab, /myOfferQueryEnabled/);
   assert.match(tab, /myOfferQueryEnabled && myOfferQuery\.isLoading/);
   assert.doesNotMatch(tab, /isAuthorized && myOfferQuery\.isPending/);

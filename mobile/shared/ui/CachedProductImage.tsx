@@ -16,6 +16,7 @@ type CachedProductImageProps = {
   priority?: "low" | "normal" | "high";
   /** Размытие самого изображения (фон letterbox). */
   blurRadius?: number;
+  onError?: () => void;
 };
 
 export const CachedProductImage = ({
@@ -26,6 +27,7 @@ export const CachedProductImage = ({
   blurhash,
   priority = "normal",
   blurRadius,
+  onError,
 }: CachedProductImageProps) => {
   const styles = useCachedProductImageStyles();
 
@@ -51,6 +53,7 @@ export const CachedProductImage = ({
       // переиспользовании ячеек списка (виртуализация / FlashList).
       recyclingKey={uri}
       transition={200}
+      onError={onError}
       {...(typeof blurRadius === "number" ? { blurRadius } : null)}
     />
   );

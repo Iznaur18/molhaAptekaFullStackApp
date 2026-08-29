@@ -1,13 +1,20 @@
-import { semanticColors } from "@/shared/theme/semanticColors";
-import { StyleSheet, View } from "react-native";
+import { useId } from "react";
+import { Platform, StyleSheet, View } from "react-native";
+import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 
 import {
   PRODUCT_CARD_PROMOTION_TIER,
   type ProductCardPromotionTier,
 } from "@/entities/product/lib/productCardPromotionFramePalette";
-import { getProductPromotionTierChrome } from "@/entities/product/lib/productPromotionTierChrome";
+import {
+  PRODUCT_CARD_PROMOTION_RIBBON_LAYOUT,
+  resolveProductCardPromotionRibbonGradient,
+} from "@/entities/product/lib/productCardPromotionRibbonLayout";
 import { PRODUCT_CARD_UI } from "@/shared/config";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { AppText } from "@/shared/ui/AppText";
+
+const L = PRODUCT_CARD_PROMOTION_RIBBON_LAYOUT;
 
 const TIER_LABEL: Record<ProductCardPromotionTier, string> = {
   [PRODUCT_CARD_PROMOTION_TIER.GOLD]: PRODUCT_CARD_UI.PROMOTED_BADGE,
@@ -17,47 +24,94 @@ const TIER_LABEL: Record<ProductCardPromotionTier, string> = {
 
 type ProductCardPromotionCornerFlagProps = {
   tier: ProductCardPromotionTier;
+  /** Смещение от левого края imageWrap; компенсирует negative margin bleed. */
+  insetLeft?: number;
 };
 
 /**
- * Угловая плашка «БУСТ» / «ТОП» / «БАННЕР» в левом верхнем углу фото —
- * цвет тарифа из productPromotionTierChrome (рамки карточки нет).
+ * Угловая плашка «БУСТ» / «ТОП» / «БАННЕР» — паритет web `.product-card__promotion-ribbon`.
  */
-export const ProductCardPromotionCornerFlag = ({ tier }: ProductCardPromotionCornerFlagProps) => {
-  const chrome = getProductPromotionTierChrome(tier);
+export const ProductCardPromotionCornerFlag = ({
+  tier,
+  insetLeft = L.insetLeft,
+}: ProductCardPromotionCornerFlagProps) => {
+  const theme = useAppTheme();
+  const gradientId = useId().replace(/:/g, "");
   const label = TIER_LABEL[tier];
+  const gradient = resolveProductCardPromotionRibbonGradient(tier, theme.colors);
+  const letterSpacing = L.fontSize * L.letterSpacingEm;
+  const lineHeight = L.fontSize * L.lineHeightRatio;
 
   return (
     <View
-      style={[styles.flag, { backgroundColor: chrome.accent, shadowColor: chrome.accent }]}
+      style={[
+        styles.shell,
+        {
+          left: insetLeft,
+          borderBottomRightRadius: L.borderBottomRightRadius,
+          shadowColor: theme.colors.text,
+          ...(Platform.OS === "android"
+            ? { elevation: 2 }
+            : {
+                shadowOffset: { width: 0, height: L.shadowOffsetY },
+                shadowOpacity: 0.08,
+                shadowRadius: L.shadowRadius,
+              }),
+        },
+      ]}
       pointerEvents="none"
       accessibilityRole="text"
       accessibilityLabel={label}
     >
-      <AppText style={styles.text}>{label.toUpperCase()}</AppText>
+      <View
+        style={[
+          styles.gradientClip,
+          { borderBottomRightRadius: L.borderBottomRightRadius },
+        ]}
+      >
+        <Svg width="100%" height="100%" preserveAspectRatio="none">
+          <Defs>
+            <LinearGradient id={gradientId} x1="0" y1="1" x2="1" y2="0">
+              <Stop offset="0" stopColor={gradient.start} />
+              <Stop offset="1" stopColor={gradient.end} />
+            </LinearGradient>
+          </Defs>
+          <Rect width="100%" height="100%" fill={`url(#${gradientId})`} />
+        </Svg>
+      </View>
+      <AppText
+        style={[
+          styles.text,
+          {
+            color: theme.colors.onContrast,
+            fontSize: L.fontSize,
+            lineHeight,
+            letterSpacing,
+          },
+        ]}
+      >
+        {label.toUpperCase()}
+      </AppText>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  flag: {
+  shell: {
     position: "absolute",
-    top: 0,
-    left: 6,
-    zIndex: 3,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderBottomRightRadius: 18,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.35,
-    shadowRadius: 6,
-    elevation: 3,
+    top: L.insetTop,
+    zIndex: L.zIndex,
+    overflow: "hidden",
+    paddingTop: L.paddingTop,
+    paddingRight: L.paddingRight,
+    paddingBottom: L.paddingBottom,
+    paddingLeft: L.paddingLeft,
+  },
+  gradientClip: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: "hidden",
   },
   text: {
-    color: semanticColors.onContrast,
-    fontSize: 10.5,
-    fontWeight: "800",
-    letterSpacing: 0.9,
-    lineHeight: 13,
+    fontWeight: L.fontWeight,
   },
 });

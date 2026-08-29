@@ -99,12 +99,13 @@ export const useProductBadgeExplainSheetAnimation = (
 
   const webSheetStyle = useMemo(
     (): ViewStyle => ({
-      transform: [{ translateY: webOpen ? 0 : slideDistance }],
+      transform: webOpen ? "translateY(0px)" : "translateY(100%)",
       transitionProperty: "transform",
       transitionDuration: `${webOpen ? enterMs : exitMs}ms`,
       transitionTimingFunction: webOpen ? enterEasingCss : exitEasingCss,
+      willChange: "transform",
     }),
-    [slideDistance, webOpen],
+    [webOpen],
   );
 
   if (isWeb) {

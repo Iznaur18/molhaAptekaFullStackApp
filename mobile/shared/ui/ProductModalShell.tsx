@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CREATE_RAFFLE_MODAL_UI } from "@/shared/config";
 import { useProductModalShellStyles } from "@/shared/theme/modalChromeStyles";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 
 const PANEL_LG_MAX_WIDTH = 768;
 const PANEL_MD_MAX_WIDTH = 480;
@@ -70,12 +71,15 @@ export const ProductModalShell = ({
       ]}
     >
       {!fullScreen ? (
-        <Pressable
+        <>
+          <ModalSheetGradientBackdrop />
+          <Pressable
           style={styles.backdropDismiss}
           onPress={onClose}
           accessibilityRole="button"
           accessibilityLabel={CREATE_RAFFLE_MODAL_UI.ARIA_CLOSE}
         />
+        </>
       ) : null}
       <View
         style={[

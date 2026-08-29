@@ -16,6 +16,10 @@ import { PRODUCT_DETAILS_FEATURE_CARD_LAYOUT as FC } from "@/entities/product/li
 import { PRODUCT_DETAILS_CONTENT_SWITCHER_LAYOUT as CS } from "@/entities/product/lib/productDetailsContentSwitcherLayout";
 import { PRODUCT_PICKUP_DETAILS_PANEL_LAYOUT as PL } from "@/entities/product/lib/productPickupDetailsPanelLayout";
 import { PRODUCT_DETAILS_META_GRID_LAYOUT as MG } from "@/entities/product/lib/productDetailsMetaGridLayout";
+import { PRODUCT_MEDIA_GALLERY_READONLY_LAYOUT as GRL } from "@/entities/product/lib/productMediaGalleryReadonlyLayout";
+import { PRODUCT_QA_ITEM_LAYOUT as QI } from "@/entities/product-qa/lib/productQaItemLayout";
+import { INSTALLMENT_BUYER_SUBMIT_LAYOUT as IB_SUBMIT } from "@/entities/installment/lib/installmentBuyerBlockLayout";
+import { PRODUCT_PRICE_OFFER_BUTTON_LAYOUT as PO_BTN } from "@/features/product-detail/lib/productPriceOfferButtonLayout";
 import { PRODUCT_DETAILS_SELLER_PREVIEW_LAYOUT as SP } from "@/entities/product/lib/productDetailsSellerPreviewLayout";
 import { PRODUCT_DETAILS_BADGE_SOFT_COLORS } from "@/entities/product/lib/productDetailsBadgeSoftPalette";
 import { resolveProductCardSoftElevationShadow } from "@/entities/product/lib/productCardPromotionFramePalette";
@@ -1850,30 +1854,64 @@ export const useProductMediaGalleryStyles = createThemedStyles((theme) => ({
     fontWeight: "700",
     lineHeight: 11.5,
   },
+  detailThumbsScroll: {
+    width: "100%",
+    flexGrow: 0,
+  },
+  detailThumbImageHost: {
+    width: GRL.thumbSize,
+    height: GRL.thumbSize,
+    overflow: "hidden",
+    position: "relative",
+  },
+  detailThumbImageFill: {
+    ...StyleSheet.absoluteFillObject,
+  },
   detailThumbs: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6.4,
-    paddingHorizontal: 12,
-    paddingVertical: DBRC.paddingVertical,
-    borderRadius: DBRC.borderRadius,
-    backgroundColor: theme.colors.surfaceMuted,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border,
+    flexWrap: "nowrap",
+    alignItems: "center",
+    gap: GRL.thumbGap,
+    paddingHorizontal: GRL.thumbsPaddingInlinePage,
+  },
+  detailThumbsSplit: {
+    paddingHorizontal: GRL.thumbsPaddingInlineSplit,
   },
   detailThumb: {
-    width: 56,
-    height: 56,
-    borderRadius: 5.6,
+    width: GRL.thumbSize,
+    height: GRL.thumbSize,
+    flex: 0,
+    flexShrink: 0,
+    flexGrow: 0,
     overflow: "hidden",
-    borderWidth: 2,
+    borderRadius: GRL.thumbSquircleRadius,
+    ...(Platform.OS === "web"
+      ? ({
+          flexBasis: GRL.thumbSize,
+          minWidth: GRL.thumbSize,
+          maxWidth: GRL.thumbSize,
+          minHeight: GRL.thumbSize,
+          maxHeight: GRL.thumbSize,
+          alignSelf: "center",
+        } as const)
+      : null),
+    overflow: "hidden",
+    borderWidth: GRL.thumbBorderWidth,
     borderColor: "transparent",
     backgroundColor: theme.colors.border,
     alignItems: "center",
     justifyContent: "center",
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+    ...(Platform.OS === "web"
+      ? ({ cornerShape: "squircle" } as const)
+      : null),
   },
   detailThumbActive: {
-    borderColor: theme.colors.action,
+    borderColor: theme.colors.link,
+  },
+  detailThumbVideoLabel: {
+    fontSize: GRL.thumbVideoFontSize,
+    color: theme.colors.textSecondary,
   },
 }));
 
@@ -1904,6 +1942,10 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
   tabPanelInset: {
     paddingHorizontal: DETAIL_SPEC_PADDING_H,
     paddingBottom: 16,
+  },
+  /** Паритет `.product-details-modal--page-split .product-details-modal__tab-panel--inset`. */
+  tabPanelSplit: {
+    paddingHorizontal: 0,
   },
   rowTop: {
     gap: PRODUCT_DETAILS_GAP,
@@ -2696,8 +2738,12 @@ export const useProductPriceOfferStyles = createThemedStyles((theme) => ({
     gap: 8,
   },
   inlinePrimaryButton: {
-    minHeight: 44,
-    borderRadius: 12,
+    alignSelf: "stretch",
+    width: "100%",
+    minHeight: PO_BTN.minHeight,
+    paddingVertical: PO_BTN.paddingVertical,
+    paddingHorizontal: PO_BTN.paddingHorizontal,
+    borderRadius: PO_BTN.borderRadius,
   },
   hint: {
     fontSize: 14,
@@ -2816,6 +2862,8 @@ export const useProductDetailPurchaseActionsStyles = createThemedStyles((theme) 
 
 export const useProductDetailTabStyles = createThemedStyles((theme) => ({
   root: {
+    width: "100%",
+    minWidth: 0,
     gap: theme.spacing[3],
     paddingTop: theme.spacing[2],
   },
@@ -2926,6 +2974,19 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
   list: {
     gap: 8,
   },
+  qaItem: {
+    width: "100%",
+    minWidth: 0,
+    gap: QI.gap,
+    paddingVertical: QI.paddingVertical,
+    paddingHorizontal: QI.paddingHorizontal,
+    borderRadius: QI.borderRadius,
+    backgroundColor: theme.colors.surfaceMuted,
+    borderWidth: QI.borderWidth,
+    borderColor: theme.colors.border,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+    ...(Platform.OS === "web" ? ({ cornerShape: "squircle" } as const) : null),
+  },
   item: {
     paddingVertical: 12,
     paddingHorizontal: 14,
@@ -2945,8 +3006,8 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: theme.spacing[2],
-    marginBottom: 4,
+    gap: QI.actionsGap,
+    marginBottom: QI.headMarginBottom,
   },
   itemAuthor: {
     flexDirection: "row",
@@ -2960,7 +3021,7 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
   itemAuthorName: {
     flexGrow: 0,
     flexShrink: 1,
-    fontSize: 14.4,
+    fontSize: QI.authorFontSize,
     fontWeight: "600",
     color: theme.colors.text,
   },
@@ -2968,7 +3029,7 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
     flexShrink: 0,
   },
   itemDate: {
-    fontSize: 12,
+    fontSize: QI.dateFontSize,
     color: theme.colors.textMuted,
     flexShrink: 0,
   },
@@ -3003,60 +3064,85 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
   qaHeadMeta: {
     flexDirection: "row",
     alignItems: "center",
-    gap: theme.spacing[2],
+    gap: QI.actionsGap,
     flexShrink: 0,
   },
   qaBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingHorizontal: QI.badgePaddingHorizontal,
+    paddingVertical: QI.badgePaddingVertical,
     borderRadius: 999,
-    backgroundColor: theme.colors.actionSoft,
+    backgroundColor: theme.colors.warningSurface,
   },
   qaBadgeText: {
-    fontSize: 11,
+    fontSize: QI.badgeFontSize,
     fontWeight: "600",
-    color: theme.colors.action,
+    color: theme.colors.warning,
   },
   qaQuestion: {
-    fontSize: 14.4,
-    fontWeight: "500",
-    color: theme.colors.text,
-    lineHeight: 20,
+    fontSize: QI.questionFontSize,
+    lineHeight: QI.questionLineHeight,
+    color: theme.colors.textSecondary,
   },
   qaAnswer: {
-    gap: 2,
-    paddingLeft: theme.spacing[3],
-    borderLeftWidth: 2,
-    borderLeftColor: theme.colors.actionBorder,
+    gap: QI.answerGap,
+    marginTop: QI.answerMarginTop,
+    paddingVertical: QI.answerPaddingVertical,
+    paddingHorizontal: QI.answerPaddingHorizontal,
+    borderRadius: QI.answerBorderRadius,
+    backgroundColor: theme.colors.surface,
+    borderLeftWidth: QI.answerBorderLeftWidth,
+    borderLeftColor: theme.colors.action,
   },
   qaAnswerHead: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: theme.spacing[2],
+    gap: QI.actionsGap,
   },
   qaAnswerLabel: {
-    fontSize: 12.5,
+    fontSize: QI.answerLabelFontSize,
     fontWeight: "700",
-    color: theme.colors.action,
-  },
-  qaAction: {
-    paddingVertical: 4,
-  },
-  qaActionText: {
-    fontSize: 13,
-    fontWeight: "600",
+    letterSpacing: QI.answerLabelLetterSpacing,
+    textTransform: "uppercase",
     color: theme.colors.textSecondary,
   },
+  qaAnswerText: {
+    fontSize: QI.answerTextFontSize,
+    lineHeight: QI.answerTextLineHeight,
+    color: theme.colors.text,
+  },
+  qaItemHint: {
+    fontSize: QI.hintFontSize,
+    color: theme.colors.textMuted,
+  },
+  qaAction: {
+    paddingVertical: QI.actionPaddingVertical,
+    paddingHorizontal: QI.actionPaddingHorizontal,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: QI.actionBorderRadius,
+    backgroundColor: theme.colors.surface,
+  },
+  qaActionText: {
+    fontSize: QI.actionFontSize,
+    color: theme.colors.textSecondary,
+  },
+  qaActionDanger: {
+    borderColor: theme.colors.danger,
+  },
   qaActionDangerText: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: QI.actionFontSize,
     color: theme.colors.danger,
   },
+  qaActionPrimary: {
+    marginLeft: "auto",
+    borderColor: "transparent",
+    backgroundColor: theme.colors.action,
+  },
   qaActionPrimaryText: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: theme.colors.action,
+    fontSize: QI.actionFontSize,
+    fontWeight: "600",
+    color: theme.colors.onContrast,
   },
   qaComposer: {
     gap: theme.spacing[2],
@@ -3109,7 +3195,9 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
   actions: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: theme.spacing[2],
+    alignItems: "center",
+    gap: QI.actionsGap,
+    marginTop: QI.actionsMarginTop,
   },
   compactInput: {
     borderWidth: StyleSheet.hairlineWidth,
@@ -3362,6 +3450,27 @@ export const useProductDetailTabStyles = createThemedStyles((theme) => ({
     paddingTop: theme.spacing[2],
     gap: theme.spacing[2],
   },
+  installmentBuyerSubmit: {
+    width: "100%",
+    minHeight: IB_SUBMIT.minHeight,
+    paddingVertical: IB_SUBMIT.paddingVertical,
+    paddingHorizontal: IB_SUBMIT.paddingHorizontal,
+    borderWidth: IB_SUBMIT.borderWidth,
+    borderColor: theme.colors.action,
+    borderRadius: IB_SUBMIT.borderRadius,
+    backgroundColor: theme.colors.action,
+    alignItems: "center",
+    justifyContent: "center",
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+  },
+  installmentBuyerSubmitDisabled: {
+    opacity: 0.6,
+  },
+  installmentBuyerSubmitText: {
+    fontSize: IB_SUBMIT.fontSize,
+    fontWeight: IB_SUBMIT.fontWeight,
+    color: theme.colors.onContrast,
+  },
 }));
 
 export const useCartScreenStyles = createThemedStyles((theme) => ({
@@ -3575,6 +3684,15 @@ export const useHomeCuratedListsStyles = createThemedStyles((theme) => ({
     paddingBottom: CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_BOTTOM,
     paddingHorizontal: CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_HORIZONTAL,
     gap: CURATED_PRODUCT_LIST_HOME_CARD_GAP,
+    /*
+     * Контейнер горизонтального ScrollView — это row, а у row по умолчанию
+     * alignItems: "stretch". На нативе Yoga тянет карточки по вертикали на
+     * всю высоту ленты, и заданный им aspectRatio это не спасает: блок
+     * подборки уезжал вниз на пол-экрана. На вебе CSS ведёт себя иначе,
+     * поэтому там симптома не было. Пришпиливаем к верху — карточки
+     * остаются той высоты, которую задаёт их пропорция.
+     */
+    alignItems: "flex-start",
   },
 }));
 

@@ -2,6 +2,7 @@ import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 
 import { INSTALLMENT_UI } from "@/shared/config";
 import { useInstallmentPassportShareConsentModalStyles } from "@/shared/theme/modalChromeStyles";
+import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 
 type InstallmentPassportShareConsentModalProps = {
   visible: boolean;
@@ -21,6 +22,7 @@ export const InstallmentPassportShareConsentModal = ({
   return (
     <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
       <View style={styles.overlay}>
+        <ModalSheetGradientBackdrop />
         <View
           style={styles.card}
           accessibilityRole="alert"

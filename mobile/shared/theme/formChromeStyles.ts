@@ -1,5 +1,6 @@
 import { Platform, StyleSheet } from "react-native";
 
+import { CHECKOUT_FORM_INPUT_LAYOUT as CF_INPUT } from "@/features/checkout/lib/checkoutFormInputLayout";
 import { CHECKOUT_PAYMENT_METHOD_CARD_LAYOUT } from "@/entities/order/lib/checkoutPaymentMethodCardTheme";
 import { AUTH_PAGE_LAYOUT as A } from "@/shared/lib/authPageLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
@@ -117,6 +118,7 @@ export const useLoginScreenStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   column: {
+    position: "relative",
     width: "100%",
     maxWidth: A.columnMaxWidth,
     flexGrow: 1,
@@ -439,14 +441,14 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
     marginBottom: 4,
   },
   fieldInput: {
-    borderWidth: 1,
+    borderWidth: CF_INPUT.borderWidth,
     borderColor: theme.colors.border,
-    borderRadius: theme.radius.input,
-    paddingHorizontal: 14,
-    paddingVertical: 9,
+    borderRadius: CF_INPUT.borderRadius,
+    paddingHorizontal: CF_INPUT.paddingHorizontal,
+    paddingVertical: CF_INPUT.paddingVertical,
     marginBottom: 0,
-    fontSize: 15,
-    backgroundColor: theme.colors.surface,
+    fontSize: CF_INPUT.fontSize,
+    backgroundColor: theme.colors.surfaceMuted,
     color: theme.colors.text,
   },
   fulfillmentRow: {
@@ -867,7 +869,6 @@ export const useBottomSheetFormStyles = createThemedStyles((theme) => ({
   },
   emailVerifyBackdropLayer: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: MODAL_BACKDROP_SCRIM,
   },
   emailVerifyCard: {
     width: "100%",

@@ -42,10 +42,7 @@ export const ADMIN_EDIT_MODAL_ANIMATION = {
 } as const;
 
 /** Checkout sheet ~70% высоты — слайд на полный экран, иначе sheet торчит при старте. */
-export const CHECKOUT_SHEET_MODAL_ANIMATION = {
-  enterMs: 280,
-  exitMs: 220,
-} as const;
+export { CHECKOUT_SHEET_MODAL_ANIMATION } from "@/features/checkout/lib/checkoutSheetModalAnimation";
 
 export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
   root: {
@@ -54,11 +51,9 @@ export const useBottomSheetReportModalStyles = createThemedStyles((theme) => ({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: MODAL_BACKDROP_SCRIM,
   },
   overlay: {
     flex: 1,
-    backgroundColor: MODAL_BACKDROP_SCRIM,
     justifyContent: "flex-end",
   },
   card: {
@@ -163,7 +158,6 @@ export const useCreateStoryModalStyles = createThemedStyles((theme) => ({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: L.backdropScrim,
   },
   card: {
     width: "100%",
@@ -500,14 +494,12 @@ export const useAdminEditModalStyles = createThemedStyles((theme) => ({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: MODAL_BACKDROP_SCRIM,
   },
   sheet: {
     maxHeight: "92%",
   },
   overlay: {
     flex: 1,
-    backgroundColor: MODAL_BACKDROP_SCRIM,
     justifyContent: "flex-end",
   },
   scroll: {
@@ -854,7 +846,6 @@ export const useProductEditManageSectionStyles = createThemedStyles((theme) => (
 export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
   overlay: {
     flex: 1,
-    backgroundColor: MODAL_BACKDROP_SCRIM,
     justifyContent: "flex-end",
     ...Platform.select({
       web: {
@@ -1188,7 +1179,6 @@ export const useProductPromotionModalStyles = createThemedStyles((theme) => ({
 export const useAccountRequirementModalStyles = createThemedStyles((theme) => ({
   overlay: {
     flex: 1,
-    backgroundColor: MODAL_BACKDROP_SCRIM,
     justifyContent: "center",
     padding: 24,
   },
@@ -1314,7 +1304,6 @@ export const useAccountRequirementModalStyles = createThemedStyles((theme) => ({
 export const useSellerProductsLimitModalStyles = createThemedStyles((theme) => ({
   overlay: {
     flex: 1,
-    backgroundColor: MODAL_BACKDROP_SCRIM,
     justifyContent: "center",
     padding: 24,
   },
@@ -1351,7 +1340,6 @@ export const useSellerProductsLimitModalStyles = createThemedStyles((theme) => (
 export const useInstallmentPassportShareConsentModalStyles = createThemedStyles((theme) => ({
   overlay: {
     flex: 1,
-    backgroundColor: MODAL_BACKDROP_SCRIM,
     justifyContent: "center",
     padding: 24,
   },
@@ -1425,7 +1413,6 @@ export const useProductModalShellStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: theme.spacing[4],
-    backgroundColor: MODAL_BACKDROP_SCRIM,
   },
   backdropFullScreen: {
     flex: 1,
@@ -1542,6 +1529,7 @@ export const useProductBadgeExplainSheetStyles = createThemedStyles((theme) => (
   panelHost: {
     width: "100%",
     maxWidth: PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.panelMaxWidth,
+    zIndex: 1,
   },
   panel: {
     width: "100%",

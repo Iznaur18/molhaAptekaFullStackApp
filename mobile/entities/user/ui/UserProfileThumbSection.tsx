@@ -1,23 +1,25 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
-  Image,
   Pressable,
-  ScrollView,
   Text,
+  TouchableOpacity,
   View,
   type LayoutChangeEvent,
 } from "react-native";
 
 import { getUserProfileThumbSrc } from "@/entities/user/lib/getUserProfileThumbSrc";
 import type { UserProfileThumbItem } from "@/entities/user/model/userProfileThumbTypes";
-import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
+import { isReactNativeWeb } from "@/shared/lib/isReactNativeWeb";
 import {
   PROFILE_CARD_SQUIRCLE_RADIUS,
   resolveUserProfileThumbColumns,
   USER_PROFILE_THUMB_ROW_SIZE,
   USER_PROFILE_THUMB_SQUIRCLE_RADIUS,
+  USER_PROFILE_THUMB_TRACK_HEIGHT,
   useUserProfileThumbListStyles,
 } from "@/shared/theme/profileChromeStyles";
+import { CachedProductImage } from "@/shared/ui/CachedProductImage";
+import { HorizontalOverflowRow } from "@/shared/ui/HorizontalOverflowRow";
 import { SquircleView } from "@/shared/ui/SquircleView";
 
 const chunkProfileThumbItems = <TItem,>(items: TItem[], rowSize: number): TItem[][] => {
@@ -48,26 +50,54 @@ const UserProfileThumbPressable = ({
   onImageError,
 }: ThumbPressableProps) => {
   const styles = useUserProfileThumbListStyles();
+  const isDisabled = isUnavailable || isCurrent;
+  const thumbContent = (
+    <SquircleView
+      radius={USER_PROFILE_THUMB_SQUIRCLE_RADIUS}
+      style={[styles.thumbClip, isCurrent && styles.thumbClipCurrent]}
+    >
+      {thumbSrc ? (
+        <View style={styles.thumbImageHost}>
+          <CachedProductImage
+            uri={thumbSrc}
+            style={styles.thumbImage}
+            contentFit="cover"
+            priority="low"
+            onError={onImageError}
+          />
+        </View>
+      ) : (
+        <View style={styles.thumbPlaceholder} />
+      )}
+    </SquircleView>
+  );
+
+  if (isReactNativeWeb()) {
+    return (
+      <TouchableOpacity
+        style={[styles.thumbButton, isUnavailable && styles.thumbButtonUnavailable]}
+        onPress={onPress}
+        disabled={isDisabled}
+        activeOpacity={0.85}
+        accessibilityRole="button"
+        accessibilityLabel={item.productName}
+        accessibilityState={{ selected: isCurrent, disabled: isDisabled }}
+      >
+        {thumbContent}
+      </TouchableOpacity>
+    );
+  }
 
   return (
     <Pressable
       style={[styles.thumbButton, isUnavailable && styles.thumbButtonUnavailable]}
       onPress={onPress}
-      disabled={isUnavailable || isCurrent}
+      disabled={isDisabled}
       accessibilityRole="button"
       accessibilityLabel={item.productName}
-      accessibilityState={{ selected: isCurrent, disabled: isUnavailable || isCurrent }}
+      accessibilityState={{ selected: isCurrent, disabled: isDisabled }}
     >
-      <SquircleView
-        radius={USER_PROFILE_THUMB_SQUIRCLE_RADIUS}
-        style={[styles.thumbClip, isCurrent && styles.thumbClipCurrent]}
-      >
-        {thumbSrc ? (
-          <Image source={{ uri: thumbSrc }} style={styles.thumbImage} onError={onImageError} />
-        ) : (
-          <View style={styles.thumbPlaceholder} />
-        )}
-      </SquircleView>
+      {thumbContent}
     </Pressable>
   );
 };
@@ -177,37 +207,34 @@ export const UserProfileThumbScrollRow = ({
     return null;
   }
 
+  const thumbItems = items.map((item) => {
+    const isUnavailable = !item.viewable || item.product == null;
+    const isCurrent = currentProductId.length > 0 && String(item.productId) === currentProductId;
+    const thumbSrc = failedThumbIds.has(item.productId)
+      ? null
+      : getUserProfileThumbSrc(item.product);
+
+    return (
+      <UserProfileThumbPressable
+        key={item.productId}
+        item={item}
+        thumbSrc={thumbSrc}
+        isUnavailable={isUnavailable}
+        isCurrent={isCurrent}
+        onPress={() => onItemPress(item)}
+        onImageError={() => markThumbFailed(item.productId)}
+      />
+    );
+  });
+
   return (
     <>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.scrollRow}
-        contentContainerStyle={styles.scrollRowContent}
-        {...nestedHorizontalScrollProps}
-        keyboardShouldPersistTaps="handled"
+      <HorizontalOverflowRow
+        height={USER_PROFILE_THUMB_TRACK_HEIGHT}
+        trackStyle={styles.scrollRowContent}
       >
-        {items.map((item) => {
-          const isUnavailable = !item.viewable || item.product == null;
-          const isCurrent =
-            currentProductId.length > 0 && String(item.productId) === currentProductId;
-          const thumbSrc = failedThumbIds.has(item.productId)
-            ? null
-            : getUserProfileThumbSrc(item.product);
-
-          return (
-            <UserProfileThumbPressable
-              key={item.productId}
-              item={item}
-              thumbSrc={thumbSrc}
-              isUnavailable={isUnavailable}
-              isCurrent={isCurrent}
-              onPress={() => onItemPress(item)}
-              onImageError={() => markThumbFailed(item.productId)}
-            />
-          );
-        })}
-      </ScrollView>
+        {thumbItems}
+      </HorizontalOverflowRow>
       {unavailableHint ? (
         <Text style={styles.hint} accessibilityRole="alert">
           {unavailableHint}
@@ -217,7 +244,7 @@ export const UserProfileThumbScrollRow = ({
   );
 };
 
-export type UserProfileThumbSectionLayout = "grid" | "horizontal";
+export type UserProfileThumbSectionLayout = "grid" | "horizontal" | "profile-scroll";
 
 type UserProfileThumbSectionProps = {
   heading: string;
@@ -231,14 +258,6 @@ type UserProfileThumbSectionProps = {
   onHeadingPress?: () => void;
   viewAllLabel?: string;
   onViewAllPress?: () => void;
-  showMoreLabel?: string;
-  showLessLabel?: string;
-  loadingMoreLabel?: string;
-  totalCount?: number;
-  isExpanded?: boolean;
-  isLoadingMore?: boolean;
-  onShowMore?: () => void;
-  onShowLess?: () => void;
   layout?: UserProfileThumbSectionLayout;
   currentProductId?: string;
 };
@@ -255,26 +274,16 @@ export const UserProfileThumbSection = ({
   onHeadingPress,
   viewAllLabel,
   onViewAllPress,
-  showMoreLabel,
-  showLessLabel,
-  loadingMoreLabel,
-  totalCount,
-  isExpanded = false,
-  isLoadingMore = false,
-  onShowMore,
-  onShowLess,
   layout = "grid",
   currentProductId = "",
 }: UserProfileThumbSectionProps) => {
   const styles = useUserProfileThumbListStyles();
   const [unavailableHint, setUnavailableHint] = useState("");
   const [columnsPerRow, setColumnsPerRow] = useState(USER_PROFILE_THUMB_ROW_SIZE);
-  const isHorizontal = layout === "horizontal";
+  const isHorizontalChrome = layout === "horizontal";
+  const useScrollRow = layout === "horizontal" || layout === "profile-scroll";
 
   const showViewAll = typeof onViewAllPress === "function" && phase === "success" && items.length > 0;
-  const shouldCollapse = !isHorizontal && typeof onShowMore === "function";
-  const effectiveTotal = totalCount ?? items.length;
-  const canToggleExpand = shouldCollapse && effectiveTotal > columnsPerRow;
 
   const handleItemPress = (item: UserProfileThumbItem) => {
     if (item.viewable && item.product != null) {
@@ -286,37 +295,28 @@ export const UserProfileThumbSection = ({
   };
 
   const handleBodyLayout = (event: LayoutChangeEvent) => {
-    if (isHorizontal) {
+    if (useScrollRow) {
       return;
     }
     const nextColumns = resolveUserProfileThumbColumns(event.nativeEvent.layout.width);
     setColumnsPerRow((prev) => (prev === nextColumns ? prev : nextColumns));
   };
 
-  const visibleItems = useMemo(
-    () => (!shouldCollapse || isExpanded ? items : items.slice(0, columnsPerRow)),
-    [columnsPerRow, isExpanded, items, shouldCollapse],
-  );
-
-  const showMoreFooter =
-    canToggleExpand && !isExpanded && Boolean(showMoreLabel) && typeof onShowMore === "function";
-  const showLessFooter =
-    canToggleExpand && isExpanded && Boolean(showLessLabel) && typeof onShowLess === "function";
   const cardContent = (
     <>
-      <View style={[styles.header, isHorizontal && styles.headerHorizontal]}>
+      <View style={[styles.header, isHorizontalChrome && styles.headerHorizontal]}>
         {showViewAll && onHeadingPress ? (
           <Pressable
             style={styles.headerTitlePressable}
             onPress={onHeadingPress}
             accessibilityRole="button"
           >
-            <Text style={[styles.headerTitle, isHorizontal && styles.headerTitleHorizontal]}>
+            <Text style={[styles.headerTitle, isHorizontalChrome && styles.headerTitleHorizontal]}>
               {heading}
             </Text>
           </Pressable>
         ) : (
-          <Text style={[styles.headerTitle, isHorizontal && styles.headerTitleHorizontal]}>
+          <Text style={[styles.headerTitle, isHorizontalChrome && styles.headerTitleHorizontal]}>
             {heading}
           </Text>
         )}
@@ -328,7 +328,11 @@ export const UserProfileThumbSection = ({
       </View>
 
       <View
-        style={[styles.body, isHorizontal && styles.bodyHorizontal]}
+        style={[
+          styles.body,
+          isHorizontalChrome && styles.bodyHorizontal,
+          layout === "profile-scroll" && styles.bodyProfileScrollRow,
+        ]}
         onLayout={handleBodyLayout}
       >
         {phase === "loading" ? <Text style={styles.state}>{loadingText}</Text> : null}
@@ -341,7 +345,7 @@ export const UserProfileThumbSection = ({
           <Text style={styles.state}>{emptyText}</Text>
         ) : null}
 
-        {isHorizontal ? (
+        {useScrollRow ? (
           <UserProfileThumbScrollRow
             items={items}
             currentProductId={currentProductId}
@@ -350,7 +354,7 @@ export const UserProfileThumbSection = ({
           />
         ) : (
           <UserProfileThumbGrid
-            items={visibleItems}
+            items={items}
             columnsPerRow={columnsPerRow}
             unavailableHint={unavailableHint}
             onItemPress={handleItemPress}
@@ -362,7 +366,7 @@ export const UserProfileThumbSection = ({
             style={[
               styles.state,
               styles.stateError,
-              isHorizontal && styles.stateErrorHorizontal,
+              isHorizontalChrome && styles.stateErrorHorizontal,
             ]}
             accessibilityRole="alert"
           >
@@ -370,29 +374,10 @@ export const UserProfileThumbSection = ({
           </Text>
         ) : null}
       </View>
-
-      {showMoreFooter ? (
-        <Pressable
-          style={[styles.footerAction, isLoadingMore && styles.footerActionDisabled]}
-          onPress={onShowMore}
-          disabled={isLoadingMore}
-          accessibilityRole="button"
-        >
-          <Text style={styles.footerActionText}>
-            {isLoadingMore && loadingMoreLabel ? loadingMoreLabel : showMoreLabel}
-          </Text>
-        </Pressable>
-      ) : null}
-
-      {showLessFooter ? (
-        <Pressable style={styles.footerAction} onPress={onShowLess} accessibilityRole="button">
-          <Text style={styles.footerActionText}>{showLessLabel}</Text>
-        </Pressable>
-      ) : null}
     </>
   );
 
-  if (isHorizontal) {
+  if (isHorizontalChrome) {
     return (
       <View style={[styles.root, styles.rootHorizontal, styles.rootHorizontalRadius]}>
         {cardContent}

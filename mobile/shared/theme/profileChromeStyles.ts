@@ -411,7 +411,6 @@ export const useProfileMobileNavSheetStyles = createThemedStyles((theme) => ({
   backdrop: {
     flex: 1,
     flexDirection: "row",
-    backgroundColor: "rgba(0,0,0,0.48)",
   },
   backdropPress: {
     flex: 1,
@@ -638,8 +637,12 @@ export const useThemePreferenceToggleStyles = createThemedStyles((theme) => ({
 }));
 
 const USER_PROFILE_THUMB_SIZE = SPC.thumbSize;
+export { USER_PROFILE_THUMB_SIZE };
 export const USER_PROFILE_THUMB_SQUIRCLE_RADIUS = SPC.thumbRadius;
 export const USER_PROFILE_THUMB_GAP = SPC.trackGap;
+/** Паритет `.user-profile-purchases__list` / seller carousel track — фиксирует высоту на RN Web. */
+export const USER_PROFILE_THUMB_TRACK_HEIGHT =
+  SPC.thumbSize + SPC.trackPaddingTop + SPC.trackPaddingBottom;
 /** До первого onLayout — запасной размер ряда. */
 export const USER_PROFILE_THUMB_ROW_SIZE = 5;
 
@@ -663,6 +666,9 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
     backgroundColor: theme.colors.surface,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border,
+    flexGrow: 0,
+    flexShrink: 0,
+    alignSelf: "stretch",
   },
   rootHorizontal: {
     marginBottom: 0,
@@ -728,6 +734,12 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
     paddingVertical: 12,
     gap: theme.spacing[2],
   },
+  bodyProfileScrollRow: {
+    flexGrow: 0,
+    flexShrink: 0,
+    overflow: "hidden",
+    gap: 0,
+  },
   bodyHorizontal: {
     paddingHorizontal: 0,
     paddingVertical: 0,
@@ -763,24 +775,34 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
     justifyContent: "flex-start",
     gap: USER_PROFILE_THUMB_GAP,
   },
-  scrollRow: {
-    flexGrow: 0,
-    width: "100%",
-    maxWidth: "100%",
-    minWidth: 0,
-  },
   scrollRowContent: {
     flexDirection: "row",
+    flexWrap: "nowrap",
     alignItems: "center",
     gap: USER_PROFILE_THUMB_GAP,
     paddingTop: SPC.trackPaddingTop,
     paddingHorizontal: SPC.trackPaddingHorizontal,
     paddingBottom: SPC.trackPaddingBottom,
-    minWidth: "100%",
+    flexGrow: 0,
+    flexShrink: 0,
   },
   thumbButton: {
     width: USER_PROFILE_THUMB_SIZE,
     height: USER_PROFILE_THUMB_SIZE,
+    flex: 0,
+    flexShrink: 0,
+    flexGrow: 0,
+    overflow: "hidden",
+    ...(Platform.OS === "web"
+      ? ({
+          flexBasis: USER_PROFILE_THUMB_SIZE,
+          minWidth: USER_PROFILE_THUMB_SIZE,
+          maxWidth: USER_PROFILE_THUMB_SIZE,
+          minHeight: USER_PROFILE_THUMB_SIZE,
+          maxHeight: USER_PROFILE_THUMB_SIZE,
+          alignSelf: "center",
+        } as const)
+      : null),
   },
   thumbButtonUnavailable: {
     opacity: SPC.thumbUnavailableOpacity,
@@ -796,36 +818,24 @@ export const useUserProfileThumbListStyles = createThemedStyles((theme) => ({
     borderWidth: SPC.thumbCurrentOutlineWidth,
     borderColor: theme.colors.action,
   },
+  thumbImageHost: {
+    width: USER_PROFILE_THUMB_SIZE,
+    height: USER_PROFILE_THUMB_SIZE,
+    overflow: "hidden",
+    position: "relative",
+  },
   thumbImage: {
-    width: "100%",
-    height: "100%",
+    ...StyleSheet.absoluteFillObject,
   },
   thumbPlaceholder: {
-    width: "100%",
-    height: "100%",
+    width: USER_PROFILE_THUMB_SIZE,
+    height: USER_PROFILE_THUMB_SIZE,
     backgroundColor: theme.colors.surfaceMuted,
   },
   hint: {
     fontSize: 13,
     textAlign: "center",
     color: theme.colors.warningText,
-  },
-  footerAction: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 11,
-    paddingHorizontal: 14,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: theme.colors.border,
-    backgroundColor: theme.colors.surfaceMuted,
-  },
-  footerActionDisabled: {
-    opacity: 0.65,
-  },
-  footerActionText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: theme.colors.action,
   },
 }));
 

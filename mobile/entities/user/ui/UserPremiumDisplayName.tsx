@@ -1,4 +1,4 @@
-import { StyleSheet, type StyleProp, Text, type TextStyle, View } from "react-native";
+import { type StyleProp, Text, type TextStyle, View } from "react-native";
 
 import { UserDataConfirmedBadge } from "@/entities/user/ui/UserDataConfirmedBadge";
 import { UserPremiumVerifiedBadge } from "@/entities/user/ui/UserPremiumVerifiedBadge";
@@ -11,6 +11,8 @@ type UserPremiumDisplayNameProps = {
   isUserDataConfirmed?: boolean;
   badgeSize?: number;
   textStyle?: StyleProp<TextStyle>;
+  /** Одна строка без переноса бейджей — seller-meta / списки. */
+  singleLine?: boolean;
 };
 
 export const UserPremiumDisplayName = ({
@@ -19,14 +21,27 @@ export const UserPremiumDisplayName = ({
   isUserDataConfirmed = false,
   badgeSize = 18,
   textStyle,
+  singleLine = false,
 }: UserPremiumDisplayNameProps) => {
   const styles = useUserPremiumDisplayNameStyles();
 
   return (
-    <View style={styles.root}>
-      <Text style={[styles.text, textStyle]} numberOfLines={1}>
-        {name}
-      </Text>
+    <View style={[styles.root, singleLine && styles.rootSingleLine]}>
+      {singleLine ? (
+        <View style={styles.textClip}>
+          <Text
+            style={[styles.text, styles.textSingleLine, textStyle]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {name}
+          </Text>
+        </View>
+      ) : (
+        <Text style={[styles.text, textStyle]} numberOfLines={1} ellipsizeMode="tail">
+          {name}
+        </Text>
+      )}
       {isPremium ? (
         <View
           style={styles.badgeSlot}

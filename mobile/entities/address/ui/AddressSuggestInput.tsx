@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
     paddingRight: 38,
   },
   displayOnlyText: {
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 22,
   },
   displayOnlyDisabled: {
