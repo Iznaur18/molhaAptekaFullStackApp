@@ -61,6 +61,7 @@ function isPlausibleConfigured(options = {}) {
  *   sentryDsn?: string | null;
  *   plausibleScriptSrc?: string | null;
  *   plausibleDomain?: string | null;
+ *   inlineScriptHashes?: string[];
  *   upgradeInsecureRequests?: boolean;
  * }} [options]
  * @returns {string}
@@ -80,6 +81,15 @@ export function buildSpaContentSecurityPolicy(options = {}) {
   const mediaSources = new Set(["'self'", "blob:", "https:"]);
   const connectSources = new Set(["'self'"]);
   const scriptSources = new Set(["'self'"]);
+
+  // Инлайн-скрипт index.html (пред-пейнт темы) без своего хэша блокируется
+  // директивой `script-src 'self'` — см. server/utils/inlineScriptCspHashes.js.
+  for (const hash of options.inlineScriptHashes ?? []) {
+    const value = String(hash ?? "").trim();
+    if (value) {
+      scriptSources.add(value);
+    }
+  }
 
   if (mediaOrigin && mediaOrigin !== frontendOrigin) {
     imgSources.add(mediaOrigin);

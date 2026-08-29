@@ -60,4 +60,17 @@ describe("buildSpaContentSecurityPolicy", () => {
     assert.match(csp, /script-src[^;]*https:\/\/plausible\.io/);
     assert.match(csp, /connect-src[^;]*https:\/\/plausible\.io/);
   });
+
+  test("inline script hashes land in script-src", () => {
+    const csp = buildSpaContentSecurityPolicy({
+      frontendOrigin: "https://gitorg.ru",
+      inlineScriptHashes: ["'sha256-XTXJQvmpZzPx4C1a9cJbXI7HH/DvsaJqqxo+7aILbqc='", ""],
+      upgradeInsecureRequests: true,
+    });
+
+    assert.match(
+      csp,
+      /script-src 'self' 'sha256-XTXJQvmpZzPx4C1a9cJbXI7HH\/DvsaJqqxo\+7aILbqc='/,
+    );
+  });
 });

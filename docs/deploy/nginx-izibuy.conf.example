@@ -325,6 +325,17 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    # POST /analytics/track-ad (показы/клики баннеров) + админские отчёты.
+    # Без этого блока nginx отдаёт статику и POST падает с 405 Method Not Allowed.
+    location /analytics {
+        proxy_pass http://izibuy_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
     location /onec {
         proxy_pass http://izibuy_api;
         proxy_http_version 1.1;
@@ -358,10 +369,12 @@ server {
 
     # --- SPA (React Router) ---
     # CSP: cd server && node scripts/printSpaCspHeader.js  (из production .env)
+    # Скрипт читает client/.env* (VITE_PLAUSIBLE_*) и считает 'sha256-…' инлайн-скрипта
+    # из client/dist/index.html — после правки client/index.html перегенерируй заголовок.
     # См. server/docs/CSP-HELMET.md — для S3 подставится https://cdn.gitorg.ru в img-src/media-src
 
     location / {
-        add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://plausible.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: https://cdn.gitorg.ru; media-src 'self' blob: https: https://cdn.gitorg.ru; font-src 'self' data:; connect-src 'self' https://*.ingest.sentry.io https://plausible.io; frame-ancestors 'self'; form-action 'self'; upgrade-insecure-requests;" always;
+        add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'sha256-XTXJQvmpZzPx4C1a9cJbXI7HH/DvsaJqqxo+7aILbqc=' https://plausible.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: https://cdn.gitorg.ru; media-src 'self' blob: https: https://cdn.gitorg.ru; font-src 'self' data:; connect-src 'self' https://*.ingest.sentry.io https://plausible.io; frame-ancestors 'self'; form-action 'self'; upgrade-insecure-requests;" always;
         # Доп. security-заголовки (defense-in-depth к CSP).
         add_header X-Content-Type-Options "nosniff" always;
         add_header Referrer-Policy "strict-origin-when-cross-origin" always;

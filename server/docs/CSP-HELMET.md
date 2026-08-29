@@ -21,12 +21,17 @@ node scripts/printSpaCspHeader.js
 
 Источник правды: `server/utils/buildSpaContentSecurityPolicy.js`.
 
+Скрипт дополнительно читает `client/.env*` (оттуда `VITE_PLAUSIBLE_*` → `script-src`)
+и считает `sha256`-хэши инлайн-скриптов из `client/dist/index.html` (иначе `client/index.html`).
+**После правки `client/index.html` заголовок в nginx надо перегенерировать** — старый хэш
+не совпадёт, и пред-пейнт темы заблокируется (`Executing inline script violates …`).
+
 ### Директивы (v1)
 
 | Директива | Значение | Зачем |
 |-----------|----------|--------|
 | `default-src` | `'self'` | база |
-| `script-src` | `'self'` | Vite bundles, без `unsafe-eval` |
+| `script-src` | `'self'` + `sha256`-хэши инлайн-скриптов + Plausible | Vite bundles, пред-пейнт темы в index.html, без `unsafe-eval` |
 | `style-src` | `'self' 'unsafe-inline'` | inline `style=` в React |
 | `img-src` | `'self' data: blob: https:` + CDN origin | карточки, placeholder, внешние URL товаров |
 | `media-src` | `'self' blob: https:` + CDN origin | превью-видео, blob при upload сторис |
