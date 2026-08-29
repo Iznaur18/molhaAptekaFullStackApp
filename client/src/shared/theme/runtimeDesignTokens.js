@@ -8,7 +8,11 @@ import {
 
 /** @typedef {import('./themePreferenceStorage.js').ThemePreference} ThemePreference */
 
-const COLOR_VAR_MAP = {
+/**
+ * Токен палитры -> CSS-переменная. Экспортируется ради теста паритета:
+ * значения в designTokens.css держатся вручную и обязаны совпадать с пакетом.
+ */
+export const COLOR_VAR_MAP = {
   text: "--iz-color-text",
   textMuted: "--iz-color-text-muted",
   textSecondary: "--iz-color-text-secondary",
