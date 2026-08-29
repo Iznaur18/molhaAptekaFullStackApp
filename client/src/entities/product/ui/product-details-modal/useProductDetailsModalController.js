@@ -16,6 +16,7 @@ import { resolveProductDetailsContentPanels } from "../../lib/resolveProductDeta
 import { useAuthSession } from "../../../user/model/useAuthSession.js";
 import { getProductPurchaseLimit } from "../../lib/getProductPurchaseLimit.js";
 import { resolveProductOutOfStockOverlayLabel } from "../../lib/resolveProductOutOfStockOverlayLabel.js";
+import { resolveProductPurchaseBlockState } from "../../lib/resolveProductPurchaseBlockState.js";
 import { resolveProductSellerClosedPurchaseState } from "../../lib/resolveProductSellerClosedPurchaseState.js";
 import { PRODUCT_QA_UI, PRODUCT_REVIEW_UI } from "../../../../shared/config/appUiCopy.js";
 import { useProductDetailsModalQueries } from "./useProductDetailsModalQueries.js";
