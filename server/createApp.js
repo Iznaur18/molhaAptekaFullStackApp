@@ -26,6 +26,7 @@ import {
   analyticsRouter,
   staffRouter,
   onecRouter,
+  onecExchangeRouter,
 } from "./routes/index.js";
 import {
   generalRateLimiter,
@@ -55,6 +56,12 @@ export const createApp = () => {
   app.set("trust proxy", 1);
   app.use(requestIdMW);
   app.use(accessLogMW);
+
+  // CommerceML-обмен смонтирован ДО json-парсера, CORS и CSRF-гейта:
+  // `mode=file` присылает бинарный ZIP потоком (его читает сам контроллер),
+  // а 1С не браузер — ни Origin, ни куки сайта у неё нет.
+  app.use("/onec/exchange", onecExchangeRouter);
+
   app.use(express.json({ limit: API_JSON_BODY_LIMIT }));
   app.use(cookieParser());
   app.use(resolveApiCorsMiddleware(isProduction));

@@ -94,3 +94,51 @@ export async function fetchOneCLogs(params = {}) {
     rethrowApiError(error);
   }
 }
+
+/**
+ * Выдать (или перевыпустить) логин и пароль, которые продавец вбивает
+ * в узел «Обмен с сайтом» своей 1С.
+ *
+ * Пароль приходит только в этом ответе — на сервере лежит один bcrypt-хэш.
+ */
+export async function postOneCExchangeCredentials() {
+  try {
+    const { data } = await apiClient.post("/onec/exchange-credentials");
+    return unwrapApiData(data);
+  } catch (error) {
+    rethrowApiError(error);
+  }
+}
+
+export async function fetchOneCCategoryMappings() {
+  try {
+    const { data } = await apiClient.get("/onec/category-mappings");
+    return unwrapApiData(data).mappings ?? [];
+  } catch (error) {
+    rethrowApiError(error);
+  }
+}
+
+/**
+ * @param {Array<{ externalId: string; categoryId: string | null }>} items
+ */
+export async function putOneCCategoryMappings(items) {
+  try {
+    const { data } = await apiClient.put("/onec/category-mappings", { items });
+    return unwrapApiData(data);
+  } catch (error) {
+    rethrowApiError(error);
+  }
+}
+
+/**
+ * @param {{ limit?: number }} [params]
+ */
+export async function fetchOneCImportJobs(params = {}) {
+  try {
+    const { data } = await apiClient.get("/onec/import-jobs", { params });
+    return unwrapApiData(data).jobs ?? [];
+  } catch (error) {
+    rethrowApiError(error);
+  }
+}

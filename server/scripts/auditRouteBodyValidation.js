@@ -29,6 +29,11 @@ const ALLOWED_WITHOUT_BODY_VALIDATION = new Set([
   "productRouter.js:POST:/bulk-import",
   "onecRouter.js:POST:/test",
   "onecRouter.js:POST:/sync",
+  // Действие без payload — выдаёт новую пару логин/пароль обмена.
+  "onecRouter.js:POST:/exchange-credentials",
+  // Тело `mode=file` — бинарный поток CommerceML, его читает сам контроллер
+  // (роутер смонтирован до express.json). Параметры приходят в query.
+  "onecExchangeRouter.js:POST:/",
   "productRouter.js:POST:/raffles/unlock-create",
   "productRouter.js:POST:/raffles/cancel-create",
 ]);

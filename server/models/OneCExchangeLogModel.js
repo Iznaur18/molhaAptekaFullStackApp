@@ -42,7 +42,7 @@ const OneCExchangeLogSchema = new mongoose.Schema(
     },
     triggeredBy: {
       type: String,
-      enum: ["cron", "manual", "order_create"],
+      enum: ["cron", "manual", "order_create", "exchange"],
       default: "cron",
     },
   },

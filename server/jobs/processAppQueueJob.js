@@ -11,6 +11,7 @@ import {
   JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_CRON,
   JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_PEERS,
   JOB_PROCESS_ONEC_SYNC_CRON,
+  JOB_PROCESS_ONEC_COMMERCEML_IMPORT,
   JOB_PROCESS_ANALYTICS_RECONCILIATION,
   JOB_PROCESS_PRODUCT_BULK_IMPORT,
   JOB_SEND_EMAIL_VERIFICATION,
@@ -29,6 +30,7 @@ import {
   processProductPriceMarketStatusPeers,
 } from "../services/product/refreshProductPriceMarketStatus.js";
 import { processOneCCronTasks } from "../services/onec/index.js";
+import { processOneCImportJob } from "../services/onec/exchange/processOneCImportJob.js";
 import { runAnalyticsReconciliation } from "../services/analytics/index.js";
 import { expireStaleUserStories } from "../utils/userStoryHelpers.js";
 import { processProductBulkImportJob } from "../services/product/bulkImport/processProductBulkImportJob.js";
@@ -64,6 +66,8 @@ export async function processAppQueueJob(job) {
       return processProductPriceMarketStatusPeers(job.data.productIds);
     case JOB_PROCESS_ONEC_SYNC_CRON:
       return processOneCCronTasks();
+    case JOB_PROCESS_ONEC_COMMERCEML_IMPORT:
+      return processOneCImportJob(job.data.jobId);
     case JOB_PROCESS_ANALYTICS_RECONCILIATION:
       return runAnalyticsReconciliation();
     case JOB_PROCESS_PRODUCT_BULK_IMPORT:

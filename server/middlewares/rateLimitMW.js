@@ -23,6 +23,14 @@ import {
   ORDER_ITEM_ACTION_RATE_LIMIT_PER_15_MIN,
 } from "../constants/orderRateLimitConstants.js";
 import {
+  ONEC_EXCHANGE_AUTH_MAX_PER_WINDOW,
+  ONEC_EXCHANGE_CHECKAUTH_MAX_PER_WINDOW,
+  ONEC_EXCHANGE_COOKIE_NAME,
+  ONEC_EXCHANGE_CHECKAUTH_WINDOW_MS,
+  ONEC_EXCHANGE_REQUEST_MAX_PER_WINDOW,
+  ONEC_EXCHANGE_REQUEST_WINDOW_MS,
+} from "../constants/onecExchangeConstants.js";
+import {
   GENERAL_RATE_LIMIT_MAX,
   GENERAL_RATE_LIMIT_WINDOW_MS,
   USER_PHONE_REVEAL_RATE_LIMIT_PER_HOUR,
@@ -50,6 +58,67 @@ function rateLimitKeyByAuthIdentityOrIp(req) {
     return `auth:${ip}:${email}`;
   }
   return `auth:${ip}`;
+}
+
+/**
+ * Ключи обмена с 1С.
+ *
+ * По одному IP ходят разные продавцы (общий NAT офиса, хостинг 1С, филиалы
+ * одной компании), поэтому «частоту обмена» считаем по логину, а не по адресу —
+ * иначе один продавец глушит соседа. IP остаётся в ключе, чтобы чужим логином
+ * нельзя было исчерпать лимит владельца.
+ *
+ * @param {import('express').Request} req
+ */
+function oneCExchangeLoginKey(req) {
+  const ip = String(req.ip ?? req.socket?.remoteAddress ?? "unknown");
+  const header = String(req.get("authorization") ?? "");
+  const encoded = /^basic\s+/i.test(header)
+    ? header.replace(/^basic\s+/i, "").trim()
+    : "";
+
+  let login = "";
+  if (encoded) {
+    try {
+      const decoded = Buffer.from(encoded, "base64").toString("utf8");
+      const separator = decoded.indexOf(":");
+      login = separator < 0 ? "" : decoded.slice(0, separator).trim();
+    } catch {
+      login = "";
+    }
+  }
+
+  return `1c-start:${ip}:${login.slice(0, 64) || "anonymous"}`;
+}
+
+/**
+ * Перебор пароля считаем по IP, но успешные попытки не штрафуем — иначе
+ * штатный обмен блокировал бы сам себя.
+ *
+ * @param {import('express').Request} req
+ */
+function oneCExchangeAuthKey(req) {
+  return `1c-auth:${String(req.ip ?? req.socket?.remoteAddress ?? "unknown")}`;
+}
+
+/**
+ * Внутри сессии считаем по самой сессии: кусков файла и картинок бывают сотни,
+ * и общий счётчик по IP срезал бы большой каталог на середине.
+ *
+ * @param {import('express').Request} req
+ */
+function oneCExchangeSessionKey(req) {
+  const header = req.headers?.cookie;
+  if (typeof header === "string") {
+    for (const part of header.split(";")) {
+      const separator = part.indexOf("=");
+      if (separator < 0) continue;
+      if (part.slice(0, separator).trim() !== ONEC_EXCHANGE_COOKIE_NAME) continue;
+      const value = part.slice(separator + 1).trim();
+      if (value) return `1c-sess:${value}`;
+    }
+  }
+  return `1c-sess-ip:${String(req.ip ?? req.socket?.remoteAddress ?? "unknown")}`;
 }
 
 /** @param {import('express').Request} req */
@@ -542,6 +611,57 @@ export function initRateLimitMiddlewares(store) {
     },
     store,
   );
+
+  // Частоту обмена задаёт продавец в своей 1С — при «каждую минуту» на большом
+  // каталоге сайт бы просто захлебнулся. Тело ответа текстовое: 1С показывает
+  // его пользователю как есть, JSON здесь ей непонятен.
+  handlers.onecExchangeStart = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      limiterName: "onec_exchange_start",
+      windowMs: ONEC_EXCHANGE_CHECKAUTH_WINDOW_MS,
+      max: ONEC_EXCHANGE_CHECKAUTH_MAX_PER_WINDOW,
+      keyGenerator: oneCExchangeLoginKey,
+      validate: { ip: false, trustProxy: false, xForwardedForHeader: false },
+      // 1С смотрит только на первую строку тела; на не-200 часть конфигураций
+      // показывает «сервер недоступен» вместо нашего текста.
+      statusCode: 200,
+      message: "failure\nСлишком частый обмен, увеличьте интервал в настройках 1С",
+    },
+    store,
+  );
+
+  handlers.onecExchangeAuth = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      limiterName: "onec_exchange_auth",
+      windowMs: ONEC_EXCHANGE_CHECKAUTH_WINDOW_MS,
+      max: ONEC_EXCHANGE_AUTH_MAX_PER_WINDOW,
+      skipSuccessfulRequests: true,
+      keyGenerator: oneCExchangeAuthKey,
+      validate: { ip: false, trustProxy: false, xForwardedForHeader: false },
+      statusCode: 200,
+      message:
+        "failure\nСлишком много неудачных попыток авторизации обмена",
+    },
+    store,
+  );
+
+  // Внутри одной сессии запросов много: каждый кусок файла и каждая картинка —
+  // отдельный POST, так что окно здесь совсем другого масштаба.
+  handlers.onecExchangeRequest = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      limiterName: "onec_exchange_request",
+      windowMs: ONEC_EXCHANGE_REQUEST_WINDOW_MS,
+      max: ONEC_EXCHANGE_REQUEST_MAX_PER_WINDOW,
+      keyGenerator: oneCExchangeSessionKey,
+      validate: { ip: false, trustProxy: false, xForwardedForHeader: false },
+      statusCode: 200,
+      message: "failure\nСлишком много запросов обмена, попробуйте позже",
+    },
+    store,
+  );
 }
 
 /** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
@@ -656,3 +776,15 @@ export const catalogListRateLimiter = (req, res, next) =>
   handlers.catalogList(req, res, next);
 
 initRateLimitMiddlewares();
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const onecExchangeStartRateLimiter = (req, res, next) =>
+  handlers.onecExchangeStart(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const onecExchangeRequestRateLimiter = (req, res, next) =>
+  handlers.onecExchangeRequest(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const onecExchangeAuthRateLimiter = (req, res, next) =>
+  handlers.onecExchangeAuth(req, res, next);

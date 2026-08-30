@@ -47,6 +47,9 @@ import AffiliateLedgerEntryModel from "./AffiliateLedgerEntryModel.js";
 import { MoneyIdempotencyRecordModel } from "./MoneyIdempotencyRecordModel.js";
 import OneCExchangeLogModel from "./OneCExchangeLogModel.js";
 import OneCOrderPushModel from "./OneCOrderPushModel.js";
+import OneCExchangeSessionModel from "./OneCExchangeSessionModel.js";
+import OneCCategoryMappingModel from "./OneCCategoryMappingModel.js";
+import OneCImportJobModel from "./OneCImportJobModel.js";
 import ProductPromoActivationModel from "./ProductPromoActivationModel.js";
 import ProductBulkImportJobModel from "./ProductBulkImportJobModel.js";
 
@@ -100,6 +103,9 @@ export {
   MoneyIdempotencyRecordModel,
   OneCExchangeLogModel,
   OneCOrderPushModel,
+  OneCExchangeSessionModel,
+  OneCCategoryMappingModel,
+  OneCImportJobModel,
   ProductPromoActivationModel,
   ProductBulkImportJobModel,
 };

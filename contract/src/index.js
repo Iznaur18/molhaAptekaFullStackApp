@@ -770,6 +770,9 @@ export {
   trackAdAnalyticsBodySchema,
 } from "./analyticsTrackAd.js";
 export {
+  ONEC_CHANNEL_VALUES,
+  getOneCImportJobsQuerySchema,
   getOneCLogsQuerySchema,
+  putOneCCategoryMappingsBodySchema,
   putOneCSettingsBodySchema,
 } from "./onec.js";

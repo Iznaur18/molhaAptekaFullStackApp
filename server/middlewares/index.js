@@ -36,6 +36,9 @@ import {
   productBulkImportRateLimiter,
   installmentActionRateLimiter,
   catalogListRateLimiter,
+  onecExchangeStartRateLimiter,
+  onecExchangeRequestRateLimiter,
+  onecExchangeAuthRateLimiter,
 } from "./rateLimitMW.js";
 import { csrfCookieOriginCheckMW } from "./csrfCookieOriginCheckMW.js";
 import {
@@ -92,6 +95,9 @@ export {
   productBulkImportRateLimiter,
   installmentActionRateLimiter,
   catalogListRateLimiter,
+  onecExchangeStartRateLimiter,
+  onecExchangeRequestRateLimiter,
+  onecExchangeAuthRateLimiter,
   errorHandler,
   notFoundHandler,
   asyncHandler,

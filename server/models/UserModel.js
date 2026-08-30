@@ -528,13 +528,75 @@ const UserSchema = new mongoose.Schema(
     },
 
     /**
-     * Интеграция с 1С (per-seller). API-ключ хранится зашифрованным (apiKeySealed).
-     * Контракт: docs/product/onec-http-contract.md
+     * Интеграция с 1С (per-seller). Секреты хранятся зашифрованными.
+     *
+     * Два канала (`channel`):
+     *  - `pull` — сайт сам ходит в HTTP-сервис 1С (docs/product/onec-http-contract.md);
+     *  - `commerceml` — 1С сама шлёт CommerceML на `/onec/exchange`
+     *    (docs/product/onec-commerceml-exchange.md), штатный «Обмен с сайтом» в УТ 11.
      */
     oneCIntegration: {
       enabled: {
         type: Boolean,
         default: false,
+      },
+      channel: {
+        type: String,
+        enum: ["pull", "commerceml"],
+        default: "pull",
+      },
+      /** Доступы, которые продавец вбивает в узел обмена 1С (только для `commerceml`). */
+      exchange: {
+        login: {
+          type: String,
+          default: "",
+          trim: true,
+          maxlength: 64,
+        },
+        /** bcrypt-хэш. Пароль показывается один раз при генерации. */
+        passwordHash: {
+          type: String,
+          default: "",
+          maxlength: 200,
+        },
+        /**
+         * Ид типов цен из `offers.xml`, которые продавец разрешил на витрину.
+         * Пусто — берём первый попавшийся тип (типовой случай «одна цена»).
+         */
+        priceTypeIds: {
+          type: [String],
+          default: [],
+        },
+        /** Ид складов, чьи остатки суммируем. Пусто — суммируем все. */
+        warehouseIds: {
+          type: [String],
+          default: [],
+        },
+        /** Справочники, увиденные в последнем `offers.xml` — для чекбоксов в кабинете. */
+        knownPriceTypes: {
+          type: [
+            {
+              _id: false,
+              externalId: { type: String, default: "", maxlength: 128 },
+              name: { type: String, default: "", maxlength: 200 },
+            },
+          ],
+          default: [],
+        },
+        knownWarehouses: {
+          type: [
+            {
+              _id: false,
+              externalId: { type: String, default: "", maxlength: 128 },
+              name: { type: String, default: "", maxlength: 200 },
+            },
+          ],
+          default: [],
+        },
+        lastExchangeAt: {
+          type: Date,
+          default: null,
+        },
       },
       baseUrl: {
         type: String,
@@ -605,6 +667,18 @@ UserSchema.index({ referredByUserId: 1, createdAt: -1 });
 UserSchema.index(
   { "oneCIntegration.enabled": 1 },
   { name: "onec_integration_enabled" },
+);
+
+/** `mode=checkauth`: логин → продавец. Уникален глобально, иначе Basic auth неоднозначен. */
+UserSchema.index(
+  { "oneCIntegration.exchange.login": 1 },
+  {
+    unique: true,
+    name: "onec_exchange_login_unique",
+    partialFilterExpression: {
+      "oneCIntegration.exchange.login": { $type: "string", $gt: "" },
+    },
+  },
 );
 
 export const UserModel = mongoose.model("User", UserSchema); // Модель пользователя для MongoDB

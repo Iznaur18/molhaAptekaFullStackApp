@@ -35,6 +35,7 @@ import { up as productRegionFromPickupGeoUp } from "./20260804-product-region-fr
 import { up as productRentalManageUp } from "./20260806-product-rental-manage.js";
 import { up as hideHardcodedProductCategoriesUp } from "./20260817-hide-hardcoded-product-categories.js";
 import { up as priceOfferAcceptedAwaitingPaymentIndexUp } from "./20260808-price-offer-accepted-awaiting-payment-index.js";
+import { up as onecCommerceMlExchangeUp } from "./20260830-onec-commerceml-exchange.js";
 
 export const MIGRATIONS = [
   {
@@ -227,5 +228,11 @@ export const MIGRATIONS = [
     description:
       "Remove seeded catalog categories so users only see admin-created tree",
     up: hideHardcodedProductCategoriesUp,
+  },
+  {
+    id: "20260830-onec-commerceml-exchange",
+    description:
+      "CommerceML channel: default oneCIntegration.channel=pull, widen product1cGuid index to 128 chars, add exchange collections",
+    up: onecCommerceMlExchangeUp,
   },
 ];

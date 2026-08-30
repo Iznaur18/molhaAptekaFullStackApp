@@ -5,17 +5,24 @@ import {
   deleteOneCSettings,
   fetchOneCLogs,
   fetchOneCSettings,
+  postOneCExchangeCredentials,
   postOneCSync,
   postOneCTest,
   putOneCSettings,
 } from "../../../entities/onec/api/onecApi.js";
 
 import { ONEC_INTEGRATION_PAGE_UI as UI } from "../model/onecIntegrationCopy.js";
+import { OneCCategoryMappingTable } from "./OneCCategoryMappingTable.jsx";
+import { OneCExchangeAccessCard } from "./OneCExchangeAccessCard.jsx";
+import { OneCImportJobsList } from "./OneCImportJobsList.jsx";
 
 import "./OneCIntegrationPage.css";
 
 const SETTINGS_KEY = ["onec", "settings"];
 const LOGS_KEY = ["onec", "logs"];
+
+const CHANNEL_COMMERCEML = "commerceml";
+const CHANNEL_PULL = "pull";
 
 /**
  * @param {{
@@ -25,9 +32,15 @@ const LOGS_KEY = ["onec", "logs"];
  */
 export function OneCIntegrationPage({ isAuthorized = false, onRequestLogin }) {
   const queryClient = useQueryClient();
+  const [channel, setChannel] = useState(CHANNEL_COMMERCEML);
   const [baseUrl, setBaseUrl] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [enabled, setEnabled] = useState(false);
+  const [priceTypeIds, setPriceTypeIds] = useState([]);
+  const [warehouseIds, setWarehouseIds] = useState([]);
+  // Пароль обмена приходит один раз в ответе на генерацию — держим его в
+  // состоянии страницы, пока продавец не уйдёт с неё.
+  const [issuedPassword, setIssuedPassword] = useState("");
   const [feedback, setFeedback] = useState("");
   const [error, setError] = useState("");
 
@@ -47,6 +60,9 @@ export function OneCIntegrationPage({ isAuthorized = false, onRequestLogin }) {
     if (!settingsQuery.data) return;
     setBaseUrl(settingsQuery.data.baseUrl || "");
     setEnabled(settingsQuery.data.enabled === true);
+    setChannel(settingsQuery.data.channel || CHANNEL_PULL);
+    setPriceTypeIds(settingsQuery.data.exchange?.priceTypeIds ?? []);
+    setWarehouseIds(settingsQuery.data.exchange?.warehouseIds ?? []);
   }, [settingsQuery.data]);
 
   const invalidate = async () => {
@@ -58,12 +74,28 @@ export function OneCIntegrationPage({ isAuthorized = false, onRequestLogin }) {
     mutationFn: () =>
       putOneCSettings({
         enabled,
-        baseUrl,
-        ...(apiKey.trim() ? { apiKey: apiKey.trim() } : {}),
+        channel,
+        ...(channel === CHANNEL_PULL
+          ? { baseUrl, ...(apiKey.trim() ? { apiKey: apiKey.trim() } : {}) }
+          : { priceTypeIds, warehouseIds }),
       }),
     onSuccess: async (result) => {
       setApiKey("");
       setFeedback(result.message || "Сохранено");
+      setError("");
+      await invalidate();
+    },
+    onError: (err) => {
+      setError(err.message);
+      setFeedback("");
+    },
+  });
+
+  const credentialsMutation = useMutation({
+    mutationFn: postOneCExchangeCredentials,
+    onSuccess: async (result) => {
+      setIssuedPassword(result.credentials?.password ?? "");
+      setFeedback(result.message || "Доступы выданы");
       setError("");
       await invalidate();
     },
@@ -128,18 +160,24 @@ export function OneCIntegrationPage({ isAuthorized = false, onRequestLogin }) {
   }
 
   const settings = settingsQuery.data;
+  const isCommerceMl = channel === CHANNEL_COMMERCEML;
   const busy =
     saveMutation.isPending ||
     testMutation.isPending ||
     syncMutation.isPending ||
+    credentialsMutation.isPending ||
     disconnectMutation.isPending;
+
+  const toggleIn = (list, value) =>
+    list.includes(value)
+      ? list.filter((item) => item !== value)
+      : [...list, value];
 
   return (
     <section className="onec-page">
       <header className="onec-page__header">
         <h1 className="onec-page__title">{UI.TITLE}</h1>
         <p className="onec-page__lead">{UI.LEAD}</p>
-        <p className="onec-page__hint">{UI.MOCK_HINT}</p>
       </header>
 
       {settingsQuery.isLoading ? (
@@ -149,111 +187,196 @@ export function OneCIntegrationPage({ isAuthorized = false, onRequestLogin }) {
           {settingsQuery.error?.message || "Ошибка загрузки"}
         </p>
       ) : (
-        <form
-          className="onec-page__form"
-          onSubmit={(event) => {
-            event.preventDefault();
-            saveMutation.mutate();
-          }}
-        >
-          <label className="onec-page__check">
-            <input
-              type="checkbox"
-              checked={enabled}
-              onChange={(e) => setEnabled(e.target.checked)}
-              disabled={busy}
-            />
-            <span>{UI.LABEL_ENABLED}</span>
-          </label>
+        <>
+          <form
+            className="onec-page__form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              saveMutation.mutate();
+            }}
+          >
+            <fieldset className="onec-page__channels">
+              <legend className="onec-page__subtitle">{UI.CHANNEL_TITLE}</legend>
 
-          <label className="onec-page__field">
-            <span>{UI.LABEL_BASE_URL}</span>
-            <input
-              type="url"
-              value={baseUrl}
-              onChange={(e) => setBaseUrl(e.target.value)}
-              placeholder={UI.PLACEHOLDER_BASE_URL}
-              disabled={busy}
-              autoComplete="off"
-            />
-          </label>
+              <label className="onec-page__channel">
+                <input
+                  type="radio"
+                  name="onec-channel"
+                  checked={isCommerceMl}
+                  onChange={() => setChannel(CHANNEL_COMMERCEML)}
+                  disabled={busy}
+                />
+                <span>
+                  <strong>{UI.CHANNEL_COMMERCEML}</strong>
+                  <small>{UI.CHANNEL_COMMERCEML_HINT}</small>
+                </span>
+              </label>
 
-          <label className="onec-page__field">
-            <span>{UI.LABEL_API_KEY}</span>
-            <input
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder={UI.PLACEHOLDER_API_KEY}
-              disabled={busy}
-              autoComplete="new-password"
-            />
-            {settings?.hasApiKey ? (
-              <small>
-                {UI.HINT_API_KEY_SET} {settings.apiKeyMasked}. {UI.HINT_LEAVE_KEY}
-              </small>
-            ) : null}
-          </label>
+              <label className="onec-page__channel">
+                <input
+                  type="radio"
+                  name="onec-channel"
+                  checked={!isCommerceMl}
+                  onChange={() => setChannel(CHANNEL_PULL)}
+                  disabled={busy}
+                />
+                <span>
+                  <strong>{UI.CHANNEL_PULL}</strong>
+                  <small>{UI.CHANNEL_PULL_HINT}</small>
+                </span>
+              </label>
+            </fieldset>
 
-          {settings ? (
-            <p className="onec-page__status" role="status">
-              {settings.lastSyncStatus === "success"
-                ? UI.STATUS_SUCCESS
-                : settings.lastSyncStatus === "error"
-                  ? UI.STATUS_ERROR
-                  : UI.STATUS_IDLE}
-              {settings.lastSyncAt
-                ? ` · ${new Date(settings.lastSyncAt).toLocaleString("ru-RU")}`
-                : ""}
-              {settings.lastSyncError ? ` — ${settings.lastSyncError}` : ""}
-            </p>
-          ) : null}
+            <label className="onec-page__check">
+              <input
+                type="checkbox"
+                checked={enabled}
+                onChange={(e) => setEnabled(e.target.checked)}
+                disabled={busy}
+              />
+              <span>{UI.LABEL_ENABLED}</span>
+            </label>
 
-          {error ? (
-            <p className="onec-page__error" role="alert">
-              {error}
-            </p>
-          ) : null}
-          {feedback ? (
-            <p className="onec-page__ok" role="status">
-              {feedback}
-            </p>
-          ) : null}
-
-          <div className="onec-page__actions">
-            <button type="submit" className="onec-page__btn" disabled={busy}>
-              {saveMutation.isPending ? UI.SAVE_PENDING : UI.SAVE}
-            </button>
-            <button
-              type="button"
-              className="onec-page__btn onec-page__btn_secondary"
-              disabled={busy}
-              onClick={() => testMutation.mutate()}
-            >
-              {testMutation.isPending ? UI.TEST_PENDING : UI.TEST}
-            </button>
-            <button
-              type="button"
-              className="onec-page__btn onec-page__btn_secondary"
-              disabled={busy}
-              onClick={() => syncMutation.mutate()}
-            >
-              {syncMutation.isPending ? UI.SYNC_PENDING : UI.SYNC}
-            </button>
-            <button
-              type="button"
-              className="onec-page__btn onec-page__btn_danger"
-              disabled={busy}
-              onClick={() => {
-                if (window.confirm(UI.DISCONNECT_CONFIRM)) {
-                  disconnectMutation.mutate();
+            {isCommerceMl ? (
+              <OneCExchangeAccessCard
+                settings={settings}
+                issuedPassword={issuedPassword}
+                busy={busy}
+                priceTypeIds={priceTypeIds}
+                warehouseIds={warehouseIds}
+                isGenerating={credentialsMutation.isPending}
+                onGenerate={() => credentialsMutation.mutate()}
+                onTogglePriceType={(id) =>
+                  setPriceTypeIds((list) => toggleIn(list, id))
                 }
-              }}
-            >
-              {UI.DISCONNECT}
-            </button>
-          </div>
-        </form>
+                onToggleWarehouse={(id) =>
+                  setWarehouseIds((list) => toggleIn(list, id))
+                }
+              />
+            ) : (
+              <>
+                <p className="onec-page__hint">{UI.MOCK_HINT}</p>
+
+                <label className="onec-page__field">
+                  <span>{UI.LABEL_BASE_URL}</span>
+                  <input
+                    type="url"
+                    value={baseUrl}
+                    onChange={(e) => setBaseUrl(e.target.value)}
+                    placeholder={UI.PLACEHOLDER_BASE_URL}
+                    disabled={busy}
+                    autoComplete="off"
+                  />
+                </label>
+
+                <label className="onec-page__field">
+                  <span>{UI.LABEL_API_KEY}</span>
+                  <input
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder={UI.PLACEHOLDER_API_KEY}
+                    disabled={busy}
+                    autoComplete="new-password"
+                  />
+                  {settings?.hasApiKey ? (
+                    <small>
+                      {UI.HINT_API_KEY_SET} {settings.apiKeyMasked}.{" "}
+                      {UI.HINT_LEAVE_KEY}
+                    </small>
+                  ) : null}
+                </label>
+              </>
+            )}
+
+            {settings ? (
+              <p className="onec-page__status" role="status">
+                {settings.lastSyncStatus === "success"
+                  ? UI.STATUS_SUCCESS
+                  : settings.lastSyncStatus === "error"
+                    ? UI.STATUS_ERROR
+                    : UI.STATUS_IDLE}
+                {settings.lastSyncAt
+                  ? ` · ${new Date(settings.lastSyncAt).toLocaleString("ru-RU")}`
+                  : ""}
+                {settings.lastSyncError ? ` — ${settings.lastSyncError}` : ""}
+              </p>
+            ) : null}
+
+            {error ? (
+              <p className="onec-page__error" role="alert">
+                {error}
+              </p>
+            ) : null}
+            {feedback ? (
+              <p className="onec-page__ok" role="status">
+                {feedback}
+              </p>
+            ) : null}
+
+            <div className="onec-page__actions">
+              <button type="submit" className="onec-page__btn" disabled={busy}>
+                {saveMutation.isPending ? UI.SAVE_PENDING : UI.SAVE}
+              </button>
+              {/* Обе кнопки дёргают чужой HTTP-сервис — в CommerceML его нет. */}
+              {isCommerceMl ? null : (
+                <>
+                  <button
+                    type="button"
+                    className="onec-page__btn onec-page__btn_secondary"
+                    disabled={busy}
+                    onClick={() => testMutation.mutate()}
+                  >
+                    {testMutation.isPending ? UI.TEST_PENDING : UI.TEST}
+                  </button>
+                  <button
+                    type="button"
+                    className="onec-page__btn onec-page__btn_secondary"
+                    disabled={busy}
+                    onClick={() => syncMutation.mutate()}
+                  >
+                    {syncMutation.isPending ? UI.SYNC_PENDING : UI.SYNC}
+                  </button>
+                </>
+              )}
+              <button
+                type="button"
+                className="onec-page__btn onec-page__btn_danger"
+                disabled={busy}
+                onClick={() => {
+                  if (window.confirm(UI.DISCONNECT_CONFIRM)) {
+                    disconnectMutation.mutate();
+                  }
+                }}
+              >
+                {UI.DISCONNECT}
+              </button>
+            </div>
+          </form>
+
+          {isCommerceMl ? (
+            <>
+              <section className="onec-page__block">
+                <h2 className="onec-page__subtitle">{UI.MAPPING_TITLE}</h2>
+                <OneCCategoryMappingTable
+                  onError={(message) => {
+                    setError(message);
+                    setFeedback("");
+                  }}
+                  onSuccess={(message) => {
+                    setFeedback(message);
+                    setError("");
+                  }}
+                />
+              </section>
+
+              <section className="onec-page__block">
+                <h2 className="onec-page__subtitle">{UI.IMPORTS_TITLE}</h2>
+                <OneCImportJobsList />
+              </section>
+            </>
+          ) : null}
+        </>
       )}
 
       <section className="onec-page__logs">

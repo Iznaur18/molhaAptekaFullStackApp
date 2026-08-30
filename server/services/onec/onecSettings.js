@@ -6,6 +6,12 @@ import {
   ONEC_EXCHANGE_STATUS_SUCCESS,
   ONEC_SYNC_STATUS_IDLE,
 } from "../../constants/onecConstants.js";
+import {
+  ONEC_CHANNELS,
+  ONEC_CHANNEL_COMMERCEML,
+  ONEC_CHANNEL_PULL,
+} from "../../constants/onecExchangeConstants.js";
+import { buildOneCExchangeEndpointUrl } from "./exchange/buildOneCExchangeEndpointUrl.js";
 import { AppError } from "../../errors/AppError.js";
 import { OneCExchangeLogModel, UserModel } from "../../models/index.js";
 import {
@@ -18,6 +24,42 @@ import {
   testOneCConnection,
 } from "./onecHttpClient.js";
 
+/** @returns {Record<string, unknown>} */
+function emptyExchangeSettings() {
+  return {
+    login: "",
+    hasPassword: false,
+    endpointUrl: buildOneCExchangeEndpointUrl(),
+    priceTypeIds: [],
+    warehouseIds: [],
+    knownPriceTypes: [],
+    knownWarehouses: [],
+    lastExchangeAt: null,
+  };
+}
+
+/**
+ * Пароль обмена наружу не отдаём никогда — он показывается ровно один раз при
+ * генерации, дальше в базе только bcrypt-хэш.
+ *
+ * @param {Record<string, unknown> | null | undefined} raw
+ */
+function readExchangeSettings(raw) {
+  if (!raw || typeof raw !== "object") return emptyExchangeSettings();
+  return {
+    login: typeof raw.login === "string" ? raw.login : "",
+    hasPassword: Boolean(raw.passwordHash),
+    endpointUrl: buildOneCExchangeEndpointUrl(),
+    priceTypeIds: Array.isArray(raw.priceTypeIds) ? raw.priceTypeIds : [],
+    warehouseIds: Array.isArray(raw.warehouseIds) ? raw.warehouseIds : [],
+    knownPriceTypes: Array.isArray(raw.knownPriceTypes) ? raw.knownPriceTypes : [],
+    knownWarehouses: Array.isArray(raw.knownWarehouses)
+      ? raw.knownWarehouses
+      : [],
+    lastExchangeAt: raw.lastExchangeAt ?? null,
+  };
+}
+
 /**
  * @param {import("mongoose").Document | Record<string, unknown> | null | undefined} user
  */
@@ -26,9 +68,11 @@ export function getOneCIntegrationFromUser(user) {
   if (!raw || typeof raw !== "object") {
     return {
       enabled: false,
+      channel: ONEC_CHANNEL_PULL,
       baseUrl: "",
       hasApiKey: false,
       apiKeyMasked: "",
+      exchange: emptyExchangeSettings(),
       lastSyncAt: null,
       lastSyncStatus: ONEC_SYNC_STATUS_IDLE,
       lastSyncError: "",
@@ -51,9 +95,11 @@ export function getOneCIntegrationFromUser(user) {
 
   return {
     enabled: raw.enabled === true,
+    channel: ONEC_CHANNELS.includes(raw.channel) ? raw.channel : ONEC_CHANNEL_PULL,
     baseUrl: typeof raw.baseUrl === "string" ? raw.baseUrl : "",
     hasApiKey,
     apiKeyMasked,
+    exchange: readExchangeSettings(raw.exchange),
     lastSyncAt: raw.lastSyncAt ?? null,
     lastSyncStatus: raw.lastSyncStatus ?? ONEC_SYNC_STATUS_IDLE,
     lastSyncError: typeof raw.lastSyncError === "string" ? raw.lastSyncError : "",
@@ -110,11 +156,37 @@ export async function saveSellerOneCSettings(sellerId, body) {
     next.apiKeySealed = sealOneCSecret(apiKey);
   }
 
+  if (body.channel !== undefined) {
+    if (!ONEC_CHANNELS.includes(body.channel)) {
+      throw new AppError(400, "Неизвестный канал обмена");
+    }
+    next.channel = body.channel;
+  }
+  if (!next.channel) next.channel = ONEC_CHANNEL_PULL;
+
+  if (body.priceTypeIds !== undefined) {
+    next.exchange = { ...(next.exchange ?? {}), priceTypeIds: body.priceTypeIds };
+  }
+  if (body.warehouseIds !== undefined) {
+    next.exchange = { ...(next.exchange ?? {}), warehouseIds: body.warehouseIds };
+  }
+
   if (body.enabled !== undefined) {
     next.enabled = body.enabled === true;
   }
 
-  if (next.enabled) {
+  // Каналы включаются по-разному: pull требует адрес чужого HTTP-сервиса,
+  // CommerceML — выданной пары логин/пароль, которую 1С вобьёт у себя.
+  if (next.enabled && next.channel === ONEC_CHANNEL_COMMERCEML) {
+    if (!next.exchange?.login || !next.exchange?.passwordHash) {
+      throw new AppError(
+        400,
+        "Сначала сгенерируйте логин и пароль для обмена с 1С",
+      );
+    }
+  }
+
+  if (next.enabled && next.channel === ONEC_CHANNEL_PULL) {
     if (!next.baseUrl) {
       throw new AppError(400, "Для включения интеграции укажите URL 1С");
     }
@@ -143,7 +215,10 @@ export async function disconnectSellerOneC(sellerId) {
     throw new AppError(404, "Пользователь не найден");
   }
 
+  // `exchange` переживает отключение: логин уже вбит в узел обмена 1С, и
+  // стирать его на «выключить на неделю» значит ломать настройку у продавца.
   user.oneCIntegration = {
+    ...(user.oneCIntegration?.toObject?.() ?? user.oneCIntegration ?? {}),
     enabled: false,
     baseUrl: "",
     apiKeySealed: null,

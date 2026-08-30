@@ -30,7 +30,8 @@
     "seed:product-reviews": "node scripts/seedProductReviews.js",
     "seed:auction-bids": "node scripts/seedProductAuctionBids.js",
     "delete-products-without-images": "node scripts/deleteProductsWithoutImages.js",
-    "delete-products-without-images:apply": "node scripts/deleteProductsWithoutImages.js --apply"
+    "delete-products-without-images:apply": "node scripts/deleteProductsWithoutImages.js --apply",
+    "onec:commerceml-smoke": "node scripts/onecCommerceMlSmoke.mjs"
   },
   "devDependencies": {
     "mongodb-memory-server": "^10.1.4",
@@ -57,9 +58,11 @@
     "mongodb": "^7.5.0",
     "mongoose": "^9.9.1",
     "multer": "^2.0.2",
+    "node-stream-zip": "^1.15.0",
     "nodemailer": "^9.0.3",
     "rate-limit-redis": "^4.2.0",
     "redis": "^6.0.0",
+    "sax": "^1.4.1",
     "sharp": "^0.35.3",
     "web-push": "^3.6.7",
     "zod": "^3.25.76"

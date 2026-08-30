@@ -1,5 +1,7 @@
 import {
+  getOneCImportJobsQuerySchema,
   getOneCLogsQuerySchema,
+  putOneCCategoryMappingsBodySchema,
   putOneCSettingsBodySchema,
 } from "@molha/api-contract";
 
@@ -12,4 +14,12 @@ export const putOneCSettingsValidation = [
 
 export const getOneCLogsValidation = [
   validateQueryZod(getOneCLogsQuerySchema),
+];
+
+export const putOneCCategoryMappingsValidation = [
+  validateBodyZod(putOneCCategoryMappingsBodySchema),
+];
+
+export const getOneCImportJobsValidation = [
+  validateQueryZod(getOneCImportJobsQuerySchema),
 ];

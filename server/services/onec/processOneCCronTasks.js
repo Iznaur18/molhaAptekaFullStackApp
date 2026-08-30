@@ -5,8 +5,12 @@ import {
   ONEC_SYNC_STATUS_ERROR,
   ONEC_SYNC_STATUS_SUCCESS,
 } from "../../constants/onecConstants.js";
+import { AppError } from "../../errors/AppError.js";
 import { OneCExchangeLogModel, UserModel } from "../../models/index.js";
 import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
+import { ONEC_CHANNEL_PULL } from "../../constants/onecExchangeConstants.js";
+import { purgeExpiredOneCExchangeDirs } from "./exchange/onecExchangeSession.js";
+import { resumeStalledOneCImportJobs } from "./exchange/processOneCImportJob.js";
 import { pushPendingSellerOrders } from "./pushSellerOrders.js";
 import { syncSellerNomenclature } from "./syncSellerNomenclature.js";
 
@@ -17,6 +21,8 @@ import { syncSellerNomenclature } from "./syncSellerNomenclature.js";
  */
 export async function runSellerOneCSync(sellerId, opts = {}) {
   const triggeredBy = opts.triggeredBy ?? "manual";
+
+  await assertSellerUsesPullChannel(sellerId);
 
   try {
     const nomenclature = await syncSellerNomenclature(sellerId, { triggeredBy });
@@ -74,12 +80,38 @@ export async function runSellerOneCSync(sellerId, opts = {}) {
 }
 
 /**
- * Cron: все продавцы с включённой 1С.
+ * Инициатива обмена принадлежит одной стороне: в `pull` ходит сайт, в
+ * `commerceml` — сама 1С. Дёргать `runSellerOneCSync` во втором случае нечем
+ * и незачем, поэтому отсекаем это явной ошибкой, а не пустым результатом.
+ *
+ * @param {string} sellerId
+ */
+async function assertSellerUsesPullChannel(sellerId) {
+  const user = await UserModel.findById(sellerId)
+    .select("oneCIntegration.channel")
+    .lean();
+  const channel = user?.oneCIntegration?.channel ?? ONEC_CHANNEL_PULL;
+  if (channel !== ONEC_CHANNEL_PULL) {
+    throw new AppError(
+      400,
+      "У вас включён обмен CommerceML: выгрузку запускает сама 1С, кнопкой на сайте её не вызвать",
+    );
+  }
+}
+
+/**
+ * Cron: все продавцы с включённой 1С по каналу `pull`.
  */
 export async function processOneCCronTasks() {
+  const housekeeping = await runOneCExchangeHousekeeping();
+
   const sellers = await UserModel.find({
     "oneCIntegration.enabled": true,
     "oneCIntegration.baseUrl": { $exists: true, $ne: "" },
+    $or: [
+      { "oneCIntegration.channel": ONEC_CHANNEL_PULL },
+      { "oneCIntegration.channel": { $exists: false } },
+    ],
   })
     .select("_id")
     .lean();
@@ -101,5 +133,35 @@ export async function processOneCCronTasks() {
     }
   }
 
-  return { sellers: sellers.length, ok, failed };
+  return { sellers: sellers.length, ok, failed, ...housekeeping };
+}
+
+/**
+ * Обслуживание CommerceML-канала: подчистить брошенные временные папки и
+ * дозапустить разбор, не переживший рестарт процесса.
+ */
+async function runOneCExchangeHousekeeping() {
+  const result = { purgedDirs: 0, resumedImports: 0 };
+
+  try {
+    const purged = await purgeExpiredOneCExchangeDirs();
+    result.purgedDirs = purged.removed;
+  } catch (error) {
+    logServerEvent("warn", {
+      event: "onec.exchange_housekeeping_purge_failed",
+      ...formatLogError(error),
+    });
+  }
+
+  try {
+    const resumed = await resumeStalledOneCImportJobs();
+    result.resumedImports = resumed.restarted;
+  } catch (error) {
+    logServerEvent("warn", {
+      event: "onec.exchange_housekeeping_resume_failed",
+      ...formatLogError(error),
+    });
+  }
+
+  return result;
 }

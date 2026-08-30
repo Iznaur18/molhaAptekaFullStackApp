@@ -22,6 +22,10 @@ import {
   PRODUCT_MODERATION_APPROVED,
   PRODUCT_MODERATION_STATUSES,
 } from "../constants/productModerationConstants.js";
+import {
+  ONEC_CATEGORY_EXTERNAL_ID_MAX_LENGTH,
+  ONEC_EXTERNAL_ID_MAX_LENGTH,
+} from "../constants/onecExchangeConstants.js";
 import { ProductPromoCodeSchema } from "./ProductPromoCodeSubschema.js";
 
 const Schema = mongoose.Schema;
@@ -158,12 +162,27 @@ const ProductSchema = new Schema(
       ref: "User",
       required: true,
     },
-    /** GUID номенклатуры в 1С (источник истины при интеграции). */
+    /**
+     * Ид номенклатуры в 1С (источник истины при интеграции).
+     * У торговых предложений CommerceML это `ИдТовара#ИдХарактеристики` — два
+     * GUID'а через `#`, поэтому лимит выше длины одного GUID.
+     */
     product1cGuid: {
       type: String,
       default: null,
       trim: true,
-      maxlength: 64,
+      maxlength: ONEC_EXTERNAL_ID_MAX_LENGTH,
+    },
+    /**
+     * Ид группы номенклатуры 1С, в которой лежит товар. Нужен, чтобы после
+     * правки сопоставления категорий в кабинете перевесить уже импортированные
+     * карточки, не дожидаясь следующего обмена.
+     */
+    product1cGroupId: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: ONEC_CATEGORY_EXTERNAL_ID_MAX_LENGTH,
     },
     /** Артикул / код номенклатуры (опционально). */
     productArticle: {
@@ -177,6 +196,26 @@ const ProductSchema = new Schema(
       type: Boolean,
       default: false,
       index: true,
+    },
+    /**
+     * Когда карточку последний раз видели в выгрузке 1С.
+     *
+     * После полной выгрузки каталога снимаем с витрины всё, чья метка старше
+     * начала обмена. Список из десятков тысяч `$nin`-GUID'ов Mongo не осилит,
+     * а метка времени укладывается в обычный индексный запрос.
+     */
+    product1cSeenAt: {
+      type: Date,
+      default: null,
+    },
+    /**
+     * MD5 исходников картинок, уже залитых из 1С, в порядке `productImageUrls`.
+     * 1С кладёт в каждый архив весь `import_files/` заново — без сверки хэшей
+     * S3 копил бы дубликат каталога на каждый обмен.
+     */
+    product1cImageHashes: {
+      type: [String],
+      default: [],
     },
     productSaleCity: {
       type: String,
@@ -511,6 +550,23 @@ ProductSchema.index(
     name: "seller_onec_guid_unique",
     partialFilterExpression: {
       product1cGuid: { $type: "string" },
+    },
+  },
+);
+
+/** Снятие с витрины того, что исчезло из полной выгрузки 1С. */
+ProductSchema.index(
+  { productSeller: 1, productFromOneC: 1, product1cSeenAt: 1 },
+  { name: "seller_onec_seen_at" },
+);
+
+/** Перевешивание карточек при правке сопоставления категорий 1С. */
+ProductSchema.index(
+  { productSeller: 1, product1cGroupId: 1 },
+  {
+    name: "seller_onec_group",
+    partialFilterExpression: {
+      product1cGroupId: { $type: "string" },
     },
   },
 );

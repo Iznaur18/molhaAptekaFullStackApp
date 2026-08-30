@@ -3,4 +3,4 @@
  * `false` — временно скрыто.
  * Вернуть: поставить `true`.
  */
-export const IS_ONEC_INTEGRATION_ENABLED = false;
+export const IS_ONEC_INTEGRATION_ENABLED = true;

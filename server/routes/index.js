@@ -31,6 +31,7 @@ import { auditRouter } from "./auditRouter.js";
 import { analyticsRouter } from "./analyticsRouter.js";
 import { staffRouter } from "./staffRouter.js";
 import onecRouter from "./onecRouter.js";
+import onecExchangeRouter from "./onecExchangeRouter.js";
 
 export {
   uploadRouter,
@@ -55,4 +56,5 @@ export {
   analyticsRouter,
   staffRouter,
   onecRouter,
+  onecExchangeRouter,
 };

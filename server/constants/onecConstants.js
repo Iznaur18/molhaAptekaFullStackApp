@@ -39,12 +39,15 @@ export const ONEC_EXCHANGE_DIRECTION_PULL = "pull_nomenclature";
 export const ONEC_EXCHANGE_DIRECTION_PUSH = "push_customer_order";
 export const ONEC_EXCHANGE_DIRECTION_TEST = "test_connection";
 export const ONEC_EXCHANGE_DIRECTION_SYNC = "full_sync";
+/** Приём пакета CommerceML, присланного самой 1С. */
+export const ONEC_EXCHANGE_DIRECTION_COMMERCEML = "commerceml_import";
 
 export const ONEC_EXCHANGE_DIRECTIONS = [
   ONEC_EXCHANGE_DIRECTION_PULL,
   ONEC_EXCHANGE_DIRECTION_PUSH,
   ONEC_EXCHANGE_DIRECTION_TEST,
   ONEC_EXCHANGE_DIRECTION_SYNC,
+  ONEC_EXCHANGE_DIRECTION_COMMERCEML,
 ];
 
 export const ONEC_EXCHANGE_STATUS_SUCCESS = "success";
