@@ -88,6 +88,12 @@ const OrderLineItemSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    /** Кто оформил возврат — покупатель отказался или продавец принял назад. */
+    returnedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
     deliveredBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

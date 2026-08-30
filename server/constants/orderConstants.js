@@ -50,6 +50,16 @@ export const IN_APP_NOTIFICATION_MESSAGE_SELLER_NEW_ORDER = "Новый зака
  */
 export const IN_APP_NOTIFICATION_KIND_BUYER_ORDER_STATUS = "buyer_order_status";
 
+/**
+ * Покупатель отказался от позиции. Без этого продавец про отказ не узнаёт
+ * вовсе: уведомления о статусе адресованы покупателю и при его же действии
+ * подавляются.
+ */
+export const IN_APP_NOTIFICATION_KIND_SELLER_ORDER_RETURNED =
+  "seller_order_returned";
+export const IN_APP_NOTIFICATION_MESSAGE_SELLER_ORDER_RETURNED =
+  "Покупатель отказался от заказа";
+
 /** Подписи статуса для покупателя: он читает «отправлен», а не `shipped`. */
 export const BUYER_ORDER_STATUS_MESSAGES = Object.freeze({
   [ORDER_STATUS_SHIPPED]: "Заказ передан в доставку",

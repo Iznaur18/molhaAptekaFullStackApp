@@ -14,7 +14,7 @@ const { OrderModel, ProductModel, UserInAppNotificationModel } = await import(
 );
 const {
   markOrderItemDeliveredBySeller,
-  markOrderItemReturnedBySeller,
+  markOrderItemReturned,
   markOrderItemShippedBySeller,
 } = await import("../services/order/updateOrderItemStatus.js");
 const { getReservedQuantityByProductIds } = await import(
@@ -49,11 +49,11 @@ const deliver = (order, sellerId) =>
   });
 
 /** @param {any} order @param {string} sellerId */
-const doReturn = (order, sellerId) =>
-  markOrderItemReturnedBySeller({
+const doReturn = (order, userId) =>
+  markOrderItemReturned({
     orderId: String(order._id),
     itemIndex: 0,
-    sellerId: String(sellerId),
+    requestUserId: String(userId),
   });
 
 describe("статус заказа из позиций", () => {
@@ -169,6 +169,69 @@ describe("оформление возврата продавцом", () => {
     assert.equal(rows.length, 2);
     assert.match(rows[0].message, /передан в доставку/);
     assert.match(rows[1].message, /вернулся продавцу/);
+  });
+
+
+  it("покупатель может отказаться сам, и продавец узнаёт об этом", async () => {
+    const { seller, buyer, product, order } = await makeOrder();
+    await ship(order, seller._id);
+
+    await doReturn(order, buyer._id);
+
+    const fresh = await OrderModel.findById(order._id).lean();
+    assert.equal(fresh.items[0].status, "returned");
+    assert.equal(
+      String(fresh.items[0].returnedBy),
+      String(buyer._id),
+      "зафиксирован инициатор возврата",
+    );
+
+    const reserved = await getReservedQuantityByProductIds([String(product._id)]);
+    assert.equal(reserved[String(product._id)] ?? 0, 0, "резерв снят");
+
+    const sellerNotes = await UserInAppNotificationModel.find({
+      userId: seller._id,
+      kind: "seller_order_returned",
+    }).lean();
+    assert.equal(sellerNotes.length, 1, "продавцу ушло уведомление об отказе");
+    assert.match(sellerNotes[0].message, /отказался от заказа/);
+  });
+
+  it("свой же отказ покупателю не пересказывают", async () => {
+    const { seller, buyer, order } = await makeOrder();
+    await ship(order, seller._id);
+
+    const beforeCount = await UserInAppNotificationModel.countDocuments({
+      userId: buyer._id,
+    });
+    await doReturn(order, buyer._id);
+    const afterCount = await UserInAppNotificationModel.countDocuments({
+      userId: buyer._id,
+    });
+
+    assert.equal(afterCount, beforeCount, "новых уведомлений покупателю нет");
+  });
+
+  it("возврат продавца не шлёт продавцу уведомление о самом себе", async () => {
+    const { seller, order } = await makeOrder();
+    await ship(order, seller._id);
+    await doReturn(order, seller._id);
+
+    assert.equal(
+      await UserInAppNotificationModel.countDocuments({
+        userId: seller._id,
+        kind: "seller_order_returned",
+      }),
+      0,
+    );
+  });
+
+  it("посторонний пользователь возврат оформить не может", async () => {
+    const { seller, order } = await makeOrder();
+    const stranger = await createOrderLoyaltyFixture();
+    await ship(order, seller._id);
+
+    await assert.rejects(() => doReturn(order, stranger.buyer._id), /Нет прав/);
   });
 
   it("освобождает зарезервированные баллы продавца", async () => {

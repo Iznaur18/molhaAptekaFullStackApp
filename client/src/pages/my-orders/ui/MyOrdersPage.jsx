@@ -39,7 +39,8 @@ const EMPTY_ORDERS = [];
  */
 export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }) {
   const queryClient = useQueryClient();
-  const { confirmItemMutation, cancelItemMutation } = useOrderMutations();
+  const { confirmItemMutation, cancelItemMutation, returnItemMutation } =
+    useOrderMutations();
   const ordersQuery = useMyOrdersQuery({ enabled: isAuthorized });
   const allOrders = ordersQuery.data ?? EMPTY_ORDERS;
   const [statusFilter, setStatusFilter] = useState("");
@@ -197,6 +198,36 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
     }
   };
 
+  /**
+   * Отказ покупателя от уже отправленного товара: у двери, на выдаче.
+   * До этого в статусе «Отправлен» у него не было ни одной кнопки.
+   */
+  const handleRefuseItem = async ({ orderId, itemIndex }) => {
+    if (!window.confirm(ORDER_CARD_UI.ACTION_REFUSE_CONFIRM)) {
+      return;
+    }
+
+    const actionKey = `${orderId}:${itemIndex}`;
+    setPendingActionKey(actionKey);
+    setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+
+    try {
+      const updatedOrder = await returnItemMutation.mutateAsync({ orderId, itemIndex });
+      patchOrders((prev) =>
+        prev.map((order) => (order._id === orderId ? updatedOrder : order)),
+      );
+      onQueueChanged?.();
+      void reloadOrders();
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+      setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
+      void reloadOrders();
+    } finally {
+      setPendingActionKey(null);
+    }
+  };
+
   const emptyMessage =
     totalAll === 0
       ? MY_ORDERS_PAGE_UI.EMPTY
@@ -283,6 +314,7 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
                 onProductClick={openCatalogProductFromOrderLine}
                 onConfirmDelivered={handleConfirmDelivered}
                 onCancelItem={handleCancelItem}
+                onMarkReturned={handleRefuseItem}
                 pendingActionKey={pendingActionKey}
                 itemActionErrors={itemActionErrors}
               />

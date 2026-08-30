@@ -23,7 +23,12 @@ export const ORDER_CARD_UI = {
   ACTION_RETURN: "Вернулся",
   ACTION_RETURN_CONFIRM:
     "Оформить возврат? Товар вернётся в остаток, покупатель получит уведомление.",
+  ACTION_REFUSE: "Отказаться",
+  ACTION_REFUSE_CONFIRM:
+    "Отказаться от товара? Заказ закроется, продавец получит уведомление. Отменить это будет нельзя.",
   ITEM_RETURNED_AT_LABEL: "Возвращён",
+  ITEM_RETURNED_BY_BUYER: "покупатель отказался",
+  ITEM_RETURNED_BY_SELLER: "оформил продавец",
   ACTION_CONFIRM: "Подтвердить",
   ACTION_CANCEL: "Отменить",
   ACTION_PENDING: "Сохраняем…",

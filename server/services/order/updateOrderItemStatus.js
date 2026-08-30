@@ -12,6 +12,7 @@ import {
 } from "../../constants/installmentConstants.js";
 import { AppError } from "../../errors/AppError.js";
 import { notifyBuyerAboutOrderItemStatus } from "./notifyBuyerAboutOrderItemStatus.js";
+import { notifySellerAboutOrderItemReturn } from "./notifySellerAboutOrderItemReturn.js";
 import { InstallmentContractModel, UserModel } from "../../models/index.js";
 import { runInTransaction } from "../../utils/mongoTransaction.js";
 import { cancelLinkedOrderForInstallmentContract } from "./cancelLinkedOrderForInstallmentContract.js";
@@ -507,23 +508,34 @@ export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, use
  * подтвердил получение. После `confirmed` деньги уже прошли: начислены баллы
  * и партнёрская выплата — это возврат с компенсацией, отдельная история.
  *
- * Ставит продавец: физический факт «товар вернулся» знает он, а не покупатель.
+ * Оформить может любая сторона: покупатель отказывается у двери, продавец
+ * принимает товар назад. Кто именно — пишем в `returnedBy`: для продавца это
+ * разные ситуации (товар ещё едет обратно или уже на полке).
  *
  * @param {{
  *   orderId: string;
  *   itemIndex: number;
- *   sellerId: string;
- *   reason?: string;
+ *   requestUserId: string;
  * }} input
  */
-export async function markOrderItemReturnedBySeller({
+export async function markOrderItemReturned({
   orderId,
   itemIndex,
-  sellerId,
+  requestUserId,
 }) {
   const preview = await loadOrderWithItems(orderId);
   const previewItem = getPopulatedOrderItemOrThrow(preview, itemIndex);
-  assertSellerOwnsOrderItem(previewItem, sellerId);
+
+  const buyerId = normalizeId(preview.userBuyerId?._id ?? preview.userBuyerId);
+  const itemSellerId = normalizeId(
+    previewItem.productId.productSeller?._id ?? previewItem.productId.productSeller,
+  );
+  const isBuyer = buyerId === requestUserId;
+  const isSeller = itemSellerId === requestUserId;
+
+  if (!isBuyer && !isSeller) {
+    throw new AppError(403, "Нет прав на возврат позиции");
+  }
 
   // Повторный клик по кнопке не должен превращаться в ошибку: возврат уже
   // оформлен, эффекты применены — просто отдаём текущее состояние.
@@ -541,8 +553,6 @@ export async function markOrderItemReturnedBySeller({
       'Возврат оформляется только из статусов "Отправлен" или "Доставлен"',
     );
   }
-
-  const buyerId = normalizeId(preview.userBuyerId?._id ?? preview.userBuyerId);
 
   await runInTransaction(async (session) => {
     // Перечитываем внутри транзакции: на ретрае после WriteConflict мутации
@@ -572,6 +582,7 @@ export async function markOrderItemReturnedBySeller({
 
     txnItem.status = ORDER_STATUS_RETURNED;
     txnItem.returnedAt = new Date();
+    txnItem.returnedBy = requestUserId;
     markOrderLineLoyaltyReserveReleased(txnItem);
 
     txnOrder.status = buildOrderStatusFromItems(txnOrder.items);
@@ -608,10 +619,18 @@ export async function markOrderItemReturnedBySeller({
 
   const updatedOrder = await reloadOrderWithItems(orderId);
 
+  // Узнаёт та сторона, которая возврат не оформляла.
   await notifyBuyerAboutOrderItemStatus({
     buyerUserId: buyerId,
-    actorUserId: sellerId,
+    actorUserId: requestUserId,
     status: ORDER_STATUS_RETURNED,
+    productName: previewItem.productNameAtOrder,
+    orderId,
+  });
+  await notifySellerAboutOrderItemReturn({
+    sellerUserId: itemSellerId,
+    actorUserId: requestUserId,
+    buyerUserId: buyerId,
     productName: previewItem.productNameAtOrder,
     orderId,
   });

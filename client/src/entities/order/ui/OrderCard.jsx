@@ -15,6 +15,7 @@ import {
   orderNeedsSellerAttention,
   resolveSellerOrderCollapsedPreview,
 } from "../lib/orderNeedsSellerAttention.js";
+import { ORDER_STATUS_RETURNED } from "../model/constants.js";
 import { resolveOrderStatusLabelRu } from "../lib/resolveOrderStatusLabelRu.js";
 import { resolveOrderSellers } from "../lib/resolveOrderSellers.js";
 import {
@@ -201,6 +202,7 @@ function OrderCardLineItem({
   onProductClick,
   onMarkShipped,
   onMarkReturned,
+  buyerUserId,
   onMarkDelivered,
   onCancelItem,
   onConfirmDelivered,
@@ -219,6 +221,14 @@ function OrderCardLineItem({
   // уехал, но сделка не состоялась — отказ у двери, неудачное вручение.
   const canMarkReturned =
     item.status === ORDER_STATUS_SHIPPED || item.status === ORDER_STATUS_DELIVERED;
+  // Для продавца «клиент отказался» и «я принял назад» — разные ситуации:
+  // в первом случае товар ещё едет обратно.
+  const returnedByLabel =
+    item.status === ORDER_STATUS_RETURNED && item.returnedBy
+      ? String(item.returnedBy) === String(buyerUserId)
+        ? ORDER_CARD_UI.ITEM_RETURNED_BY_BUYER
+        : ORDER_CARD_UI.ITEM_RETURNED_BY_SELLER
+      : "";
   const deliveredAtText = item.deliveredAt ? formatIsoDateTime(item.deliveredAt) : "";
   const confirmedAtText = item.confirmedAt ? formatIsoDateTime(item.confirmedAt) : "";
   const loyaltyPoints = Math.floor(Number(item.loyaltyPointsPerUnitAtOrder));
@@ -271,6 +281,11 @@ function OrderCardLineItem({
         {confirmedAtText ? (
           <span className="order-card__item-timestamp">
             {ORDER_CARD_UI.ITEM_CONFIRMED_AT_LABEL}: {confirmedAtText}
+          </span>
+        ) : null}
+        {returnedByLabel ? (
+          <span className="order-card__item-timestamp">
+            {ORDER_CARD_UI.ITEM_RETURNED_AT_LABEL}: {returnedByLabel}
           </span>
         ) : null}
       </div>
@@ -400,7 +415,11 @@ function OrderCardLineItem({
               onClick={() => onMarkReturned({ orderId, itemIndex })}
               disabled={isActionPending}
             >
-              {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_RETURN}
+              {isActionPending
+                ? ORDER_CARD_UI.ACTION_PENDING
+                : attentionRole === "seller"
+                  ? ORDER_CARD_UI.ACTION_RETURN
+                  : ORDER_CARD_UI.ACTION_REFUSE}
             </button>
           ) : null}
           {canConfirmDelivered && onConfirmDelivered ? (
@@ -495,6 +514,7 @@ export function OrderCard({
     onMarkReturned,
     onCancelItem,
     onConfirmDelivered,
+    buyerUserId: order.userBuyerId?._id ?? order.userBuyerId,
     pendingActionKey,
     itemActionErrors,
     attentionRole,
