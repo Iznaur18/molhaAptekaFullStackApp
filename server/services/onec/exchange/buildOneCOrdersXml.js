@@ -5,6 +5,10 @@ import {
   ONEC_ORDER_PUSH_SYNCED,
 } from "../../../constants/onecConstants.js";
 import {
+  ONEC_ORDER_STATUS_LABELS,
+  ONEC_PAYMENT_METHOD_LABELS,
+} from "../../../constants/onecExchangeConstants.js";
+import {
   OneCOrderPushModel,
   OrderModel,
   ProductModel,
@@ -107,11 +111,11 @@ ${lines
       </ЗначениеРеквизита>
       <ЗначениеРеквизита>
         <Наименование>Метод оплаты</Наименование>
-        <Значение>${escapeXml(order.paymentMethod ?? "")}</Значение>
+        <Значение>${escapeXml(ONEC_PAYMENT_METHOD_LABELS[order.paymentMethod] ?? order.paymentMethod ?? "")}</Значение>
       </ЗначениеРеквизита>
       <ЗначениеРеквизита>
         <Наименование>Статус заказа</Наименование>
-        <Значение>${escapeXml(order.status ?? "")}</Значение>
+        <Значение>${escapeXml(ONEC_ORDER_STATUS_LABELS[order.status] ?? order.status ?? "")}</Значение>
       </ЗначениеРеквизита>
     </ЗначенияРеквизитов>
   </Документ>`;

@@ -487,6 +487,10 @@ describe("CommerceML обмен: заказы", () => {
     assert.match(xml, new RegExp(`<Ид>${OFFER_GUID_SIMPLE}</Ид>`));
     assert.match(xml, /<Количество>2<\/Количество>/);
     assert.match(xml, /<Сумма>241\.00<\/Сумма>/);
+    // Реквизиты читает человек в 1С — сырые enum'ы ему ничего не скажут.
+    assert.match(xml, /<Значение>Наличными при получении<\/Значение>/);
+    assert.match(xml, /<Значение>Новый<\/Значение>/);
+    assert.match(xml, /<Значение>Самовывоз<\/Значение>/);
 
     // До подтверждения заказ ещё не считается переданным.
     const midway = await OneCOrderPushModel.findById(push._id).lean();

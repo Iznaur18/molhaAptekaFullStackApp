@@ -135,3 +135,22 @@ export const ONEC_IMPORT_BATCH_SIZE = 200;
 
 /** Максимум характеристик, которые переносим в карточку из ЗначенияСвойств. */
 export const ONEC_IMPORT_MAX_CHARACTERISTICS = 30;
+
+/**
+ * Подписи для `ЗначенияРеквизитов` в документе заказа.
+ *
+ * В 1С это читает человек, а не программа: сырые `pending` и `cashOnDelivery`
+ * из наших enum'ов оператору ничего не говорят.
+ */
+export const ONEC_ORDER_STATUS_LABELS = Object.freeze({
+  pending: "Новый",
+  confirmed: "Подтверждён",
+  shipped: "Отправлен",
+  delivered: "Доставлен",
+  cancelled: "Отменён",
+});
+
+export const ONEC_PAYMENT_METHOD_LABELS = Object.freeze({
+  cashOnDelivery: "Наличными при получении",
+  cardPrepaid: "Картой онлайн",
+});
