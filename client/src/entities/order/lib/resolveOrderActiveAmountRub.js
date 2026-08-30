@@ -1,7 +1,10 @@
-import { ORDER_STATUS_CANCELLED } from "../model/constants.js";
+import {
+  ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_RETURNED,
+} from "../model/constants.js";
 
 /**
- * Сумма заказа без отменённых позиций.
+ * Сумма заказа без отменённых и возвращённых позиций.
  * `order.totalAmount` при отмене позиции не пересчитывается на сервере.
  *
  * @param {{
@@ -12,7 +15,10 @@ import { ORDER_STATUS_CANCELLED } from "../model/constants.js";
  * @returns {number}
  */
 export function resolveOrderActiveAmountRub(order) {
-  if (order?.status === ORDER_STATUS_CANCELLED) {
+  if (
+    order?.status === ORDER_STATUS_CANCELLED ||
+    order?.status === ORDER_STATUS_RETURNED
+  ) {
     return 0;
   }
 
@@ -23,7 +29,10 @@ export function resolveOrderActiveAmountRub(order) {
 
   let sum = 0;
   for (const item of items) {
-    if (item?.status === ORDER_STATUS_CANCELLED) {
+    if (
+      item?.status === ORDER_STATUS_CANCELLED ||
+      item?.status === ORDER_STATUS_RETURNED
+    ) {
       continue;
     }
     const quantity = Number(item?.quantity) || 0;

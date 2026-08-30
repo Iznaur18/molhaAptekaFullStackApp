@@ -3,6 +3,8 @@ export const ORDER_STATUS_CONFIRMED = "confirmed";
 export const ORDER_STATUS_SHIPPED = "shipped";
 export const ORDER_STATUS_DELIVERED = "delivered";
 export const ORDER_STATUS_CANCELLED = "cancelled";
+/** Товар уехал и вернулся: отказ у двери, неудачное вручение. */
+export const ORDER_STATUS_RETURNED = "returned";
 
 const EVERY_IN = (
   items: Array<{ status?: string }>,
@@ -35,7 +37,14 @@ export function buildOrderStatusFromItems(
   ) {
     return ORDER_STATUS_SHIPPED;
   }
+  if (EVERY_IN(items, new Set([ORDER_STATUS_RETURNED]))) {
+    return ORDER_STATUS_RETURNED;
+  }
   if (EVERY_IN(items, new Set([ORDER_STATUS_CANCELLED]))) {
+    return ORDER_STATUS_CANCELLED;
+  }
+  // Часть отменили до отправки, часть вернулась: сделка не состоялась целиком.
+  if (EVERY_IN(items, new Set([ORDER_STATUS_CANCELLED, ORDER_STATUS_RETURNED]))) {
     return ORDER_STATUS_CANCELLED;
   }
   return ORDER_STATUS_PENDING;
