@@ -6,7 +6,12 @@ import {
   DADATA_QC_COMPLETE_MAX,
   DADATA_QC_GEO_MAX,
 } from "../../constants/dadataConstants.js";
-import { cleanRuAddress, isDadataConfigured } from "./dadataClient.js";
+import {
+  cleanRuAddress,
+  isDadataConfigured,
+  isDadataSuggestConfigured,
+  suggestRuAddresses,
+} from "./dadataClient.js";
 
 /**
  * @param {string} line
@@ -76,6 +81,93 @@ function softAcceptVerifiedAddress(line, flatInput) {
 }
 
 /**
+ * Разбор одной подсказки DaData в тот же формат, что даёт clean.
+ *
+ * Принимаем адрес, только если он доведён до **конкретного объекта** — дома
+ * (`house_fias_id`) или участка (`stead_fias_id`) — и у него есть координаты.
+ * Иначе к произвольной строке прилипли бы координаты центра улицы или города.
+ *
+ * @param {{ value?: unknown; data?: unknown } | null | undefined} suggestion
+ * @param {{ line: string; flatInput: string }} context
+ * @returns {ReturnType<typeof softAcceptVerifiedAddress> | null}
+ */
+export function mapSuggestionToVerifiedAddress(suggestion, { line, flatInput }) {
+  const data = suggestion?.data;
+  if (!data || typeof data !== "object") return null;
+
+  // `Number(null)` и `Number("")` дают 0 — без явной проверки на пустое
+  // значение отсутствующая координата превращается в валидный ноль
+  // (Гвинейский залив).
+  const rawLat = data.geo_lat;
+  const rawLon = data.geo_lon;
+  if (rawLat == null || rawLat === "" || rawLon == null || rawLon === "") {
+    return null;
+  }
+  const lat = Number(rawLat);
+  const lon = Number(rawLon);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+
+  const fiasId =
+    pickStringField(data, "house_fias_id") ??
+    pickStringField(data, "stead_fias_id");
+  if (!fiasId) return null;
+
+  const structured = pickStructuredFromCleaned(data);
+  const value = suggestion?.value;
+  const resultLine =
+    typeof value === "string" && value.trim() !== "" ? value.trim() : line;
+
+  return {
+    displayAddress:
+      resultLine.length > ADDRESS_LINE_MAX_LENGTH
+        ? resultLine.slice(0, ADDRESS_LINE_MAX_LENGTH)
+        : resultLine,
+    flat: pickFlatFromCleaned(data) ?? flatInput,
+    fiasId,
+    geo: { lat, lon },
+    city: structured.city,
+    district: structured.district,
+    street: structured.street,
+    // У участка `house` пустой, номер лежит в `stead` («уч 51»).
+    house: structured.house || (pickStringField(data, "stead") ?? ""),
+    regionCode: resolveRuRegionCodeFromDadataData(data),
+  };
+}
+
+/**
+ * Координаты из подсказок, когда «Стандартизация» (clean) недоступна.
+ *
+ * У DaData это две разные услуги: подсказки могут работать, а clean отвечать
+ * 403 «Feature CLEAN disabled» — тогда сайт принимал адрес, но без координат,
+ * и товар нельзя было ни привязать к точке самовывоза, ни найти в «рядом».
+ * Поля в `suggestion.data` называются так же, как в ответе clean, поэтому
+ * разбор общий.
+ *
+ * Обогащает, но **никогда не отклоняет**: если уверенности нет, возвращаем
+ * `null`, и вызывающий код мягко принимает адрес как раньше. Иначе включение
+ * фолбэка начало бы резать адреса, которые сейчас спокойно сохраняются.
+ *
+ * @param {string} line
+ * @param {string} flatInput
+ * @returns {Promise<ReturnType<typeof softAcceptVerifiedAddress> | null>}
+ */
+async function resolveFromSuggestions(line, flatInput) {
+  if (!isDadataSuggestConfigured()) return null;
+
+  let suggestions;
+  try {
+    suggestions = await suggestRuAddresses(
+      buildAddressQueryForClean(line, flatInput),
+    );
+  } catch {
+    return null;
+  }
+
+  const top = Array.isArray(suggestions) ? suggestions[0] : null;
+  return mapSuggestionToVerifiedAddress(top, { line, flatInput });
+}
+
+/**
  * @param {{ addressLine: string; flat?: string }} params
  * @returns {Promise<{
  *   displayAddress: string;
@@ -104,15 +196,23 @@ export async function verifyRuDeliveryAddress({ addressLine, flat = "" }) {
   }
 
   if (!isDadataConfigured()) {
-    return softAcceptVerifiedAddress(line, flatInput);
+    // Секрет для clean не задан — координаты всё ещё можно взять из подсказок.
+    return (
+      (await resolveFromSuggestions(line, flatInput)) ??
+      softAcceptVerifiedAddress(line, flatInput)
+    );
   }
 
   let cleaned;
   try {
     cleaned = await cleanRuAddress(buildAddressQueryForClean(line, flatInput));
   } catch {
-    // DaData clean недоступен — не блокируем заказ, принимаем введённую строку.
-    return softAcceptVerifiedAddress(line, flatInput);
+    // DaData clean недоступен (не оплачен, лимит, сбой) — не блокируем заказ,
+    // но пробуем достать координаты подсказками, прежде чем сдаться.
+    return (
+      (await resolveFromSuggestions(line, flatInput)) ??
+      softAcceptVerifiedAddress(line, flatInput)
+    );
   }
 
   const cleanedFlat = pickFlatFromCleaned(cleaned) ?? flatInput;
