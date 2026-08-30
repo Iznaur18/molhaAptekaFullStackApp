@@ -58,6 +58,10 @@ export const ONEC_INTEGRATION_PAGE_UI = {
   MAPPING_SAVE_PENDING: "Сохраняем…",
   MAPPING_PRODUCTS: (count) => `Товаров: ${count}`,
   MAPPING_UNMAPPED_COUNT: (count) => `Не сопоставлено групп: ${count}`,
+  MAPPING_NOTHING_PICKED:
+    "Кнопка станет активной, когда выберете категорию: нажмите «Не сопоставлено», введите 2+ буквы и кликните по варианту из списка.",
+  MAPPING_PENDING_COUNT: (count) =>
+    `Готово к сохранению: ${count}. Нажмите «Сохранить сопоставления».`,
 
   IMPORTS_TITLE: "Приёмка файлов из 1С",
   IMPORTS_EMPTY: "1С ещё ничего не присылала",

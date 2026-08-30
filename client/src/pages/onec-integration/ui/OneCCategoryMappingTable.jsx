@@ -185,6 +185,17 @@ export function OneCCategoryMappingTable({ onError, onSuccess }) {
       >
         {saveMutation.isPending ? UI.MAPPING_SAVE_PENDING : UI.MAPPING_SAVE}
       </button>
+
+      {/* Кнопка выключена, пока ничего не выбрано. Без этой строки нажатие
+          выглядит как «сохранил, но не сработало» — открыть список мало,
+          нужно кликнуть по варианту. */}
+      {Object.keys(drafts).length === 0 ? (
+        <p className="onec-page__hint">{UI.MAPPING_NOTHING_PICKED}</p>
+      ) : (
+        <p className="onec-page__ok">
+          {UI.MAPPING_PENDING_COUNT(Object.keys(drafts).length)}
+        </p>
+      )}
     </div>
   );
 }
