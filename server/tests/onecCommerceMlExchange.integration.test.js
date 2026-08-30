@@ -26,10 +26,20 @@ const {
   waitForImportJobs,
 } = await import("./helpers/onecExchangeTestHelpers.js");
 
-const { OneCCategoryMappingModel, OneCOrderPushModel, OrderModel, ProductModel } =
-  await import("../models/index.js");
+const {
+  OneCCategoryMappingModel,
+  OneCOrderPushModel,
+  OrderModel,
+  ProductModel,
+} = await import("../models/index.js");
 const { saveOneCCategoryMappings } = await import(
   "../services/onec/exchange/index.js"
+);
+const { createOneCCatalogApplier } = await import(
+  "../services/onec/exchange/applyOneCCatalogProducts.js"
+);
+const { UNCATEGORIZED_CATEGORY_WRITE } = await import(
+  "../services/onec/exchange/onecCategoryMappings.js"
 );
 
 /** @type {Awaited<ReturnType<typeof startHttpTestServer>>} */
@@ -194,6 +204,65 @@ describe("CommerceML обмен: каталог", () => {
     }).lean();
     assert.equal(published.productIsAvailable, true);
     assert.equal(published.productStockQuantity, 7);
+  });
+
+  it("дозаполняет адрес самовывоза карточкам, созданным без него", async () => {
+    // Частый порядок действий: продавец подключил 1С, а адрес в профиле завёл
+    // позже. Дефолты применялись только при создании, и такие карточки
+    // оставались навсегда без точки самовывоза — то есть некупляемыми.
+    const { seller, credentials } = await createExchangeSeller();
+
+    await runCatalogExchange({
+      request: http.request,
+      login: credentials.login,
+      password: credentials.password,
+      archive: buildExchangeZip(),
+    });
+    await waitForImportJobs(String(seller._id));
+
+    // В тестах DaData не настроена, поэтому карточки заведомо создаются без
+    // адреса — ровно то состояние, из которого их надо вытащить.
+    const before = await ProductModel.findOne({
+      productSeller: seller._id,
+      product1cGuid: OFFER_GUID_SIMPLE,
+    }).lean();
+    assert.equal(before.productPickupAddress, "");
+
+    const applier = createOneCCatalogApplier({
+      sellerId: String(seller._id),
+      resolver: { resolve: async () => ({ categoryWrite: UNCATEGORIZED_CATEGORY_WRITE, mapped: false }) },
+      sellerDefaults: {
+        productPickupAddress: "г Москва, ул Тверская, д 1",
+        productPickupLat: 55.757,
+        productPickupLon: 37.61,
+        productPickupEnabled: true,
+        productDeliveryEnabled: false,
+      },
+      resolveImagePath: () => null,
+      onIssue: () => {},
+    });
+
+    await applier.applyBatch([
+      {
+        externalId: OFFER_GUID_SIMPLE,
+        article: "ASP-500",
+        name: "Аспирин 500 мг",
+        description: "",
+        groupIds: [GROUP_VITAMINS],
+        imagePaths: [],
+        characteristics: [],
+        deleted: false,
+      },
+    ]);
+
+    const after = await ProductModel.findOne({
+      productSeller: seller._id,
+      product1cGuid: OFFER_GUID_SIMPLE,
+    }).lean();
+    assert.equal(after.productPickupAddress, "г Москва, ул Тверская, д 1");
+    assert.equal(after.productPickupEnabled, true);
+    assert.equal(applier.stats.updated, 1);
+    assert.equal(applier.stats.created, 0);
   });
 
   it("не перезаливает картинку с тем же содержимым", async () => {
