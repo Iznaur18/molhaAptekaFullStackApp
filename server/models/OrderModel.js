@@ -83,6 +83,11 @@ const OrderLineItemSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    /** Когда позиция вернулась продавцу: отказ у двери, неудачное вручение. */
+    returnedAt: {
+      type: Date,
+      default: null,
+    },
     deliveredBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

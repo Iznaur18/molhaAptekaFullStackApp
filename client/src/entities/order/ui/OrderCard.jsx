@@ -182,6 +182,7 @@ function OrderCardMeta({
  *   showSecondaryOnly?: boolean;
  *   onProductClick?: (item: import("../model/types.js").OrderLineItem) => void;
  *   onMarkShipped?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
+ *   onMarkReturned?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   onMarkDelivered?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   onCancelItem?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   onConfirmDelivered?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
@@ -199,6 +200,7 @@ function OrderCardLineItem({
   itemsCount = 1,
   onProductClick,
   onMarkShipped,
+  onMarkReturned,
   onMarkDelivered,
   onCancelItem,
   onConfirmDelivered,
@@ -213,6 +215,10 @@ function OrderCardLineItem({
   const canMarkShipped = item.status === ORDER_STATUS_PENDING;
   const canMarkDelivered = item.status === ORDER_STATUS_SHIPPED;
   const canConfirmDelivered = item.status === ORDER_STATUS_DELIVERED;
+  // Возврат оформляется, пока покупатель не подтвердил получение: товар уже
+  // уехал, но сделка не состоялась — отказ у двери, неудачное вручение.
+  const canMarkReturned =
+    item.status === ORDER_STATUS_SHIPPED || item.status === ORDER_STATUS_DELIVERED;
   const deliveredAtText = item.deliveredAt ? formatIsoDateTime(item.deliveredAt) : "";
   const confirmedAtText = item.confirmedAt ? formatIsoDateTime(item.confirmedAt) : "";
   const loyaltyPoints = Math.floor(Number(item.loyaltyPointsPerUnitAtOrder));
@@ -274,7 +280,8 @@ function OrderCardLineItem({
   const hasItemActions =
     (canMarkShipped && (onMarkShipped || onCancelItem)) ||
     (canMarkDelivered && onMarkDelivered) ||
-    (canConfirmDelivered && onConfirmDelivered);
+    (canConfirmDelivered && onConfirmDelivered) ||
+    (canMarkReturned && onMarkReturned);
 
   return (
     <li className="order-card__item" role="listitem">
@@ -386,6 +393,16 @@ function OrderCardLineItem({
               {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_DELIVERED}
             </button>
           ) : null}
+          {canMarkReturned && onMarkReturned ? (
+            <button
+              type="button"
+              className="order-card__item-action-button order-card__item-action-button_cancel"
+              onClick={() => onMarkReturned({ orderId, itemIndex })}
+              disabled={isActionPending}
+            >
+              {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_RETURN}
+            </button>
+          ) : null}
           {canConfirmDelivered && onConfirmDelivered ? (
             <button
               type="button"
@@ -416,6 +433,7 @@ function OrderCardLineItem({
  *   onProductClick?: (item: import('../model/types.js').OrderLineItem) => void;
  *   onMarkShipped?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   onMarkDelivered?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
+ *   onMarkReturned?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   onCancelItem?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   onConfirmDelivered?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   pendingActionKey?: string | null;
@@ -438,6 +456,7 @@ export function OrderCard({
   onProductClick,
   onMarkShipped,
   onMarkDelivered,
+  onMarkReturned,
   onCancelItem,
   onConfirmDelivered,
   pendingActionKey = null,
@@ -473,6 +492,7 @@ export function OrderCard({
     onProductClick,
     onMarkShipped,
     onMarkDelivered,
+    onMarkReturned,
     onCancelItem,
     onConfirmDelivered,
     pendingActionKey,

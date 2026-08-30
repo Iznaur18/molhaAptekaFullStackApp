@@ -58,7 +58,12 @@ export function MySalesPage({
   const hasSearchQuery = debouncedSearchTerm.trim() !== "";
 
   const queryClient = useQueryClient();
-  const { cancelItemMutation, shipItemMutation, deliverItemMutation } = useOrderMutations();
+  const {
+    cancelItemMutation,
+    shipItemMutation,
+    deliverItemMutation,
+    returnItemMutation,
+  } = useOrderMutations();
   const { openCatalogProductFromOrderLine } = useCatalogProductDetailsOpener();
   const [pendingActionKey, setPendingActionKey] = useState(null);
   const [itemActionErrors, setItemActionErrors] = useState({});
@@ -277,6 +282,35 @@ export function MySalesPage({
     }
   };
 
+  const handleMarkReturned = async ({ orderId, itemIndex }) => {
+    // Возврат виден покупателю уведомлением — подтверждаем намерение.
+    if (!window.confirm(ORDER_CARD_UI.ACTION_RETURN_CONFIRM)) return;
+
+    const actionKey = `${orderId}:${itemIndex}`;
+    setPendingActionKey(actionKey);
+    setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+
+    try {
+      const updatedOrder = await returnItemMutation.mutateAsync({ orderId, itemIndex });
+      patchOrders((prev) =>
+        prev.map((order) => (order._id === orderId ? updatedOrder : order)),
+      );
+      onQueueChanged?.();
+      void reloadSales();
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+      setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
+      try {
+        await reloadSales();
+      } catch {
+        /* откат списка не критичен при 429 после серии ошибок */
+      }
+    } finally {
+      setPendingActionKey(null);
+    }
+  };
+
   const emptyMessage = hasSearchQuery
     ? MY_SALES_PAGE_UI.EMPTY_BY_SEARCH
     : hasFilters
@@ -362,6 +396,7 @@ export function MySalesPage({
                 onProductClick={openCatalogProductFromOrderLine}
                 onMarkShipped={handleMarkShipped}
                 onMarkDelivered={handleMarkDelivered}
+                onMarkReturned={handleMarkReturned}
                 onCancelItem={handleCancelItem}
                 pendingActionKey={pendingActionKey}
                 itemActionErrors={itemActionErrors}

@@ -19,6 +19,7 @@ export const ORDER_STATUSES = [
   "confirmed",
   "shipped",
   "delivered",
+  "returned",
   "cancelled",
 ];
 export const ORDER_LINE_ITEM_QUANTITY_MIN = 1;

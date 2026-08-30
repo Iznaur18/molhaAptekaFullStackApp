@@ -20,6 +20,10 @@ export const ORDER_CARD_UI = {
   SELLER_LABEL: "Продавец",
   ACTION_SHIPPED: "Принять",
   ACTION_DELIVERED: "Доставлен",
+  ACTION_RETURN: "Вернулся",
+  ACTION_RETURN_CONFIRM:
+    "Оформить возврат? Товар вернётся в остаток, покупатель получит уведомление.",
+  ITEM_RETURNED_AT_LABEL: "Возвращён",
   ACTION_CONFIRM: "Подтвердить",
   ACTION_CANCEL: "Отменить",
   ACTION_PENDING: "Сохраняем…",

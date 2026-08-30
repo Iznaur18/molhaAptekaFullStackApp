@@ -2,6 +2,7 @@ import {
   confirmOrderItemByBuyer,
   markOrderItemCancelled,
   markOrderItemDeliveredBySeller,
+  markOrderItemReturnedBySeller,
   markOrderItemShippedBySeller,
 } from "../../services/order/updateOrderItemStatus.js";
 import { parseItemIndex } from "../../services/order/orderItemStatusHelpers.js";
@@ -50,6 +51,21 @@ export const markOrderItemCancelledBySellerController =
 export const markOrderItemShippedBySellerController = async (req, res) => {
   const { orderId, itemIndex: rawItemIndex } = req.params;
   const result = await markOrderItemShippedBySeller({
+    orderId,
+    itemIndex: parseItemIndex(rawItemIndex),
+    sellerId: String(req.userId),
+  });
+
+  return successRes(res, {
+    ...result,
+    order: sanitizeOrderForSellerApi(result.order),
+  });
+};
+
+/** `PATCH /order/:orderId/items/:itemIndex/returned` — продавец оформляет возврат непринятой позиции. */
+export const markOrderItemReturnedBySellerController = async (req, res) => {
+  const { orderId, itemIndex: rawItemIndex } = req.params;
+  const result = await markOrderItemReturnedBySeller({
     orderId,
     itemIndex: parseItemIndex(rawItemIndex),
     sellerId: String(req.userId),

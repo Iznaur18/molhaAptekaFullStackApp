@@ -3,6 +3,7 @@ import {
   ORDER_STATUS_CONFIRMED,
   ORDER_STATUS_DELIVERED,
   ORDER_STATUS_PENDING,
+  ORDER_STATUS_RETURNED,
   ORDER_STATUS_SHIPPED,
 } from "../../constants/orderConstants.js";
 import {
@@ -492,4 +493,128 @@ export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, use
   await runConfirmItemSideEffects(updatedOrder, updatedItem ?? {}, productId);
 
   return { order: updatedOrder, pointsEarned };
+}
+
+/**
+ * Возврат: товар уехал к покупателю и вернулся.
+ *
+ * Закрывает дыру, из-за которой отказ у двери или неудачное вручение было
+ * нечем оформить: `cancelled` разрешён только из «В обработке», и позиция
+ * навсегда застревала в `shipped` / `delivered` — с ней зависал и резерв
+ * остатка, и возможность покупателя подтвердить получение.
+ *
+ * Разрешён только из `shipped` и `delivered`, то есть пока покупатель не
+ * подтвердил получение. После `confirmed` деньги уже прошли: начислены баллы
+ * и партнёрская выплата — это возврат с компенсацией, отдельная история.
+ *
+ * Ставит продавец: физический факт «товар вернулся» знает он, а не покупатель.
+ *
+ * @param {{
+ *   orderId: string;
+ *   itemIndex: number;
+ *   sellerId: string;
+ *   reason?: string;
+ * }} input
+ */
+export async function markOrderItemReturnedBySeller({
+  orderId,
+  itemIndex,
+  sellerId,
+}) {
+  const preview = await loadOrderWithItems(orderId);
+  const previewItem = getPopulatedOrderItemOrThrow(preview, itemIndex);
+  assertSellerOwnsOrderItem(previewItem, sellerId);
+
+  // Повторный клик по кнопке не должен превращаться в ошибку: возврат уже
+  // оформлен, эффекты применены — просто отдаём текущее состояние.
+  if (previewItem.status === ORDER_STATUS_RETURNED) {
+    await populateOrderForResponse(preview);
+    return { order: preview };
+  }
+
+  if (
+    previewItem.status !== ORDER_STATUS_SHIPPED &&
+    previewItem.status !== ORDER_STATUS_DELIVERED
+  ) {
+    throw new AppError(
+      409,
+      'Возврат оформляется только из статусов "Отправлен" или "Доставлен"',
+    );
+  }
+
+  const buyerId = normalizeId(preview.userBuyerId?._id ?? preview.userBuyerId);
+
+  await runInTransaction(async (session) => {
+    // Перечитываем внутри транзакции: на ретрае после WriteConflict мутации
+    // документа, загруженного снаружи, теряются молча.
+    const txnOrder = await loadOrderWithItems(orderId, session);
+    const txnItem = getPopulatedOrderItemOrThrow(txnOrder, itemIndex);
+
+    if (txnItem.status === ORDER_STATUS_RETURNED) {
+      return;
+    }
+    if (
+      txnItem.status !== ORDER_STATUS_SHIPPED &&
+      txnItem.status !== ORDER_STATUS_DELIVERED
+    ) {
+      throw new AppError(
+        409,
+        'Возврат оформляется только из статусов "Отправлен" или "Доставлен"',
+      );
+    }
+
+    const previousStatus = txnItem.status;
+    const releaseLine = {
+      ...(txnItem.toObject?.() ?? txnItem),
+      productId: txnItem.productId,
+    };
+    const productId = resolveProductIdFromItem(txnItem.productId);
+
+    txnItem.status = ORDER_STATUS_RETURNED;
+    txnItem.returnedAt = new Date();
+    markOrderLineLoyaltyReserveReleased(txnItem);
+
+    txnOrder.status = buildOrderStatusFromItems(txnOrder.items);
+    if (
+      txnOrder.status === ORDER_STATUS_RETURNED ||
+      txnOrder.status === ORDER_STATUS_CANCELLED
+    ) {
+      clearBuyerPassportShareOnOrder(txnOrder);
+    }
+    await txnOrder.save({ session });
+
+    // Из `delivered` позиция считалась проданной — снимаем её из soldQuantity.
+    // Из `shipped` дельта нулевая, функция это учитывает сама.
+    await applySoldQuantityDeltaForItemStatusChange({
+      productId,
+      previousStatus,
+      nextStatus: ORDER_STATUS_RETURNED,
+      quantity: txnItem.quantity,
+      session,
+    });
+
+    await releaseUnawardedLoyaltyReservesForOrder([releaseLine], session);
+
+    const freeUnits = Math.floor(Number(txnItem.buyNFreeUnitsAtOrder) || 0);
+    if (freeUnits > 0 && productId) {
+      await releaseBuyNFreeRedemptionClaim({
+        buyerId,
+        productId,
+        orderId,
+        session,
+      });
+    }
+  });
+
+  const updatedOrder = await reloadOrderWithItems(orderId);
+
+  await notifyBuyerAboutOrderItemStatus({
+    buyerUserId: buyerId,
+    actorUserId: sellerId,
+    status: ORDER_STATUS_RETURNED,
+    productName: previewItem.productNameAtOrder,
+    orderId,
+  });
+
+  return { order: updatedOrder };
 }

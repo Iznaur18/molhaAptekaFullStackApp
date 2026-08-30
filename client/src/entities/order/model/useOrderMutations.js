@@ -5,6 +5,7 @@ import {
   confirmOrderItem,
   markOrderItemCancelled,
   markOrderItemDelivered,
+  markOrderItemReturned,
   markOrderItemShipped,
 } from "../api/updateOrderItemStatus.js";
 import { invalidateOrderActionCounts, invalidateOrderQueries } from "../lib/orderQueryCache.js";
@@ -37,6 +38,11 @@ export function useOrderMutations() {
     onSuccess: invalidateOrders,
   });
 
+  const returnItemMutation = useMutation({
+    mutationFn: ({ orderId, itemIndex }) => markOrderItemReturned(orderId, itemIndex),
+    onSuccess: invalidateOrders,
+  });
+
   const updateStatusMutation = useMutation({
     mutationFn: ({ orderId, status }) => updateOrderStatus(orderId, status),
     onSuccess: invalidateOrders,
@@ -47,6 +53,7 @@ export function useOrderMutations() {
     cancelItemMutation,
     shipItemMutation,
     deliverItemMutation,
+    returnItemMutation,
     updateStatusMutation,
   };
 }

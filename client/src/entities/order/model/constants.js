@@ -29,6 +29,8 @@ export const ORDER_STATUS_CONFIRMED = "confirmed";
 export const ORDER_STATUS_SHIPPED = "shipped";
 export const ORDER_STATUS_DELIVERED = "delivered";
 export const ORDER_STATUS_CANCELLED = "cancelled";
+/** Товар уехал и вернулся: отказ у двери, неудачное вручение. */
+export const ORDER_STATUS_RETURNED = "returned";
 
 export const ORDER_STATUSES = [
   ORDER_STATUS_PENDING,
@@ -36,6 +38,7 @@ export const ORDER_STATUSES = [
   ORDER_STATUS_SHIPPED,
   ORDER_STATUS_DELIVERED,
   ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_RETURNED,
 ];
 
 export const ORDER_STATUS_LABEL_RU = {
@@ -44,6 +47,7 @@ export const ORDER_STATUS_LABEL_RU = {
   [ORDER_STATUS_SHIPPED]: "Отправлен",
   [ORDER_STATUS_DELIVERED]: "Доставлен",
   [ORDER_STATUS_CANCELLED]: "Отменён",
+  [ORDER_STATUS_RETURNED]: "Возвращён",
 };
 
 /** Лейблы статусов в «Мои продажи» (seller): shipped → «Принят». */

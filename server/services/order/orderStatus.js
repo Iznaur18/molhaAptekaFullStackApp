@@ -3,6 +3,7 @@ import {
   ORDER_STATUS_CONFIRMED,
   ORDER_STATUS_DELIVERED,
   ORDER_STATUS_PENDING,
+  ORDER_STATUS_RETURNED,
   ORDER_STATUS_SHIPPED,
 } from "../../constants/orderConstants.js";
 
@@ -124,7 +125,15 @@ export const buildOrderStatusFromItems = (items) => {
   ) {
     return ORDER_STATUS_SHIPPED;
   }
+  if (EVERY_IN(items, new Set([ORDER_STATUS_RETURNED]))) {
+    return ORDER_STATUS_RETURNED;
+  }
   if (EVERY_IN(items, new Set([ORDER_STATUS_CANCELLED]))) {
+    return ORDER_STATUS_CANCELLED;
+  }
+  // Часть отменили до отправки, часть вернулась: сделка не состоялась целиком,
+  // и для покупателя это «отменён» — так же, как если бы всё отменили сразу.
+  if (EVERY_IN(items, new Set([ORDER_STATUS_CANCELLED, ORDER_STATUS_RETURNED]))) {
     return ORDER_STATUS_CANCELLED;
   }
   return ORDER_STATUS_PENDING;

@@ -54,6 +54,34 @@ export async function markOrderItemCancelled(orderId, itemIndex) {
 }
 
 /**
+ * `PATCH /order/:orderId/items/:itemIndex/returned`
+ *
+ * Товар уехал и вернулся: отказ у двери, неудачное вручение.
+ *
+ * @param {string} orderId
+ * @param {number} itemIndex
+ * @returns {Promise<import("../model/types.js").Order>}
+ */
+export async function markOrderItemReturned(orderId, itemIndex) {
+  try {
+    const { data } = await apiClient.patch(
+      `/order/${orderId}/items/${itemIndex}/returned`,
+    );
+
+    if (!data?.success || !data.data?.order) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+    return data.data.order;
+  } catch (e) {
+    const message =
+      e?.response?.data?.message ??
+      e?.message ??
+      API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+    throw new Error(message);
+  }
+}
+
+/**
  * `PATCH /order/:orderId/items/:itemIndex/shipped`
  *
  * @param {string} orderId

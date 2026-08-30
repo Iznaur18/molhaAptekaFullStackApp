@@ -13,6 +13,12 @@ export const ORDER_STATUS_CONFIRMED = "confirmed";
 export const ORDER_STATUS_SHIPPED = "shipped";
 export const ORDER_STATUS_DELIVERED = "delivered";
 export const ORDER_STATUS_CANCELLED = "cancelled";
+/**
+ * Товар уехал к покупателю и вернулся: отказ у двери, неудачное вручение,
+ * возврат отправителю. Отличается от `cancelled` (отменён до отправки) —
+ * иначе в статистике не видно, сколько заказов срывается на вручении.
+ */
+export const ORDER_STATUS_RETURNED = "returned";
 
 export const ORDER_STATUSES = [
   ORDER_STATUS_PENDING,
@@ -20,6 +26,7 @@ export const ORDER_STATUSES = [
   ORDER_STATUS_SHIPPED,
   ORDER_STATUS_DELIVERED,
   ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_RETURNED,
 ];
 
 /** Минимальное количество одной позиции заказа. */
@@ -48,4 +55,5 @@ export const BUYER_ORDER_STATUS_MESSAGES = Object.freeze({
   [ORDER_STATUS_SHIPPED]: "Заказ передан в доставку",
   [ORDER_STATUS_DELIVERED]: "Заказ доставлен — подтвердите получение",
   [ORDER_STATUS_CANCELLED]: "Продавец отменил позицию заказа",
+  [ORDER_STATUS_RETURNED]: "Заказ вернулся продавцу",
 });

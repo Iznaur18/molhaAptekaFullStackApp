@@ -10,6 +10,7 @@ import {
   updateOrderStatusController,
   markOrderItemShippedBySellerController,
   markOrderItemDeliveredBySellerController,
+  markOrderItemReturnedBySellerController,
   markOrderItemCancelledBySellerController,
   confirmOrderItemByBuyerController,
 } from "../controllers/index.js";
@@ -76,6 +77,13 @@ router.patch(
   orderItemActionRateLimiter,
   orderItemActionValidation,
   markOrderItemDeliveredBySellerController,
+);
+router.patch(
+  "/:orderId/items/:itemIndex/returned",
+  checkAuthMW,
+  orderItemActionRateLimiter,
+  orderItemActionValidation,
+  markOrderItemReturnedBySellerController,
 );
 router.patch(
   "/:orderId/items/:itemIndex/confirm",
