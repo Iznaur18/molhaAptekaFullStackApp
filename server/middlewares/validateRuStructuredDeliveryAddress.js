@@ -21,6 +21,56 @@ function trimField(raw) {
 }
 
 /**
+ * Порядок строк-кандидатов на проверку в DaData.
+ *
+ * Каноническая строка, которую клиент получил из подсказки, точнее пересборки
+ * из частей: пересборка всегда пишет «д {house}» и теряет тип объекта —
+ * «уч 51» превращается в «д 51», и DaData такой адрес уже не узнаёт (а значит
+ * не отдаёт координаты). Пересборку оставляем запасным вариантом: она нужна,
+ * когда клиент прислал только части.
+ *
+ * @param {{ rawLine: string; structuredLine: string }} params
+ * @returns {string[]}
+ */
+export function buildAddressCandidates({ rawLine, structuredLine }) {
+  const candidates = [];
+  if (rawLine) candidates.push(rawLine);
+  if (structuredLine && structuredLine !== rawLine) {
+    candidates.push(structuredLine);
+  }
+  return candidates;
+}
+
+/**
+ * Проверяет кандидатов по очереди и берёт первого, у кого есть координаты.
+ *
+ * @param {{ rawLine: string; structuredLine: string; flat: string }} params
+ */
+async function verifyStructuredAddressCandidates({
+  rawLine,
+  structuredLine,
+  flat,
+}) {
+  const candidates = buildAddressCandidates({ rawLine, structuredLine });
+
+  let fallback = null;
+  let lastError = null;
+
+  for (const addressLine of candidates) {
+    try {
+      const attempt = await verifyRuDeliveryAddress({ addressLine, flat });
+      if (attempt.geo) return attempt;
+      fallback ??= attempt;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  if (fallback) return fallback;
+  throw lastError ?? new Error("Некорректный адрес доставки");
+}
+
+/**
  * DaData-проверка структурированного адреса профиля.
  */
 export function validateRuStructuredDeliveryAddress() {
@@ -59,15 +109,14 @@ export function validateRuStructuredDeliveryAddress() {
         return errorRes(res, 400, "Укажите город, улицу и номер дома");
       }
 
-      const addressLine = buildAddressLineFromStructured({
-        city,
-        district,
-        street,
-        house,
-      });
-
-      const verified = await verifyRuDeliveryAddress({
-        addressLine,
+      const verified = await verifyStructuredAddressCandidates({
+        rawLine: trimField(req.body.userAddress),
+        structuredLine: buildAddressLineFromStructured({
+          city,
+          district,
+          street,
+          house,
+        }),
         flat,
       });
 

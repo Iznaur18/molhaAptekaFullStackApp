@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
-import test from "node:test";
+import test, { describe, it } from "node:test";
 
-import { validateRuStructuredDeliveryAddress } from "../middlewares/validateRuStructuredDeliveryAddress.js";
+import {
+  buildAddressCandidates,
+  validateRuStructuredDeliveryAddress,
+} from "../middlewares/validateRuStructuredDeliveryAddress.js";
 
 /**
  * @param {Record<string, unknown>} body
@@ -68,4 +71,33 @@ test("structured city/street/house без house → 400", async () => {
 
   assert.equal(nextCalled, false);
   assert.equal(res.statusCode, 400);
+});
+
+describe("порядок строк-кандидатов", () => {
+  it("каноническая строка идёт раньше пересборки", () => {
+    assert.deepEqual(
+      buildAddressCandidates({
+        rawLine: "г Грозный, р-н Ахматовский, ул Хамида Ахмадовича Ахмадова, уч 51",
+        structuredLine: "Грозный, Ахматовский, Хамида Ахмадовича Ахмадова, д 51",
+      }),
+      [
+        "г Грозный, р-н Ахматовский, ул Хамида Ахмадовича Ахмадова, уч 51",
+        "Грозный, Ахматовский, Хамида Ахмадовича Ахмадова, д 51",
+      ],
+    );
+  });
+
+  it("без канонической строки остаётся только пересборка", () => {
+    assert.deepEqual(
+      buildAddressCandidates({ rawLine: "", structuredLine: "Грозный, д 1" }),
+      ["Грозный, д 1"],
+    );
+  });
+
+  it("не дублирует одинаковые строки", () => {
+    assert.deepEqual(
+      buildAddressCandidates({ rawLine: "Грозный, д 1", structuredLine: "Грозный, д 1" }),
+      ["Грозный, д 1"],
+    );
+  });
 });
