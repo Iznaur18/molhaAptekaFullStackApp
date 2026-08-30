@@ -23,11 +23,16 @@ export const up = async () => {
     { $set: { "oneCIntegration.channel": ONEC_CHANNEL_PULL } },
   );
 
-  await Promise.all([
-    UserModel.syncIndexes(),
-    ProductModel.syncIndexes(),
-    OneCCategoryMappingModel.syncIndexes(),
-    OneCExchangeSessionModel.syncIndexes(),
-    OneCImportJobModel.syncIndexes(),
-  ]);
+  // `createIndexes`, а не `syncIndexes`: последний ДРОПАЕТ всё, чего нет в
+  // схеме, а на проде в products исторически живут индексы, заведённые руками.
+  // Нам нужно только досоздать новые — ничего убирать не требуется.
+  //
+  // Сам `seller_onec_guid_unique` пересобирать не нужно: поля и опции индекса
+  // не изменились, расширение product1cGuid 64→128 — это maxlength схемы,
+  // который проверяется на валидации, а не в индексе.
+  await UserModel.createIndexes();
+  await ProductModel.createIndexes();
+  await OneCCategoryMappingModel.createIndexes();
+  await OneCExchangeSessionModel.createIndexes();
+  await OneCImportJobModel.createIndexes();
 };
