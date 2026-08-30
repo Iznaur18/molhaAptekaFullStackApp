@@ -179,18 +179,25 @@ const archive = buildStoredZip([
   { name: "import_files/smoke/pixel.png", data: tinyPngBuffer() },
 ]);
 
+// Имена как у живой 1С: архив уходит под временным именем, а import
+// вызывается по именам файлов ВНУТРИ архива. Иначе смоук проверяет не тот путь.
+const archiveName = `v8_${Math.random().toString(16).slice(2, 8)}.zip`;
+
 report(
-  `catalog: file (${archive.length} Б)`,
-  await call("type=catalog&mode=file&filename=smoke.zip", {
+  `catalog: file ${archiveName} (${archive.length} Б)`,
+  await call(`type=catalog&mode=file&filename=${archiveName}`, {
     method: "POST",
     body: archive,
     useAuth: true,
   }),
 );
-report(
-  "catalog: import",
-  await call("type=catalog&mode=import&filename=smoke.zip", { useAuth: true }),
-);
+
+for (const inner of ["import.xml", "offers.xml"]) {
+  report(
+    `catalog: import ${inner}`,
+    await call(`type=catalog&mode=import&filename=${inner}`, { useAuth: true }),
+  );
+}
 
 // --- Заказы ---
 await authenticate("sale");

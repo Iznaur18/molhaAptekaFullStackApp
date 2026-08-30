@@ -21,6 +21,7 @@ const {
   buildImportXml,
   createExchangeSeller,
   createLeafCategory,
+  latestJobOfKind,
   runCatalogExchange,
   waitForImportJobs,
 } = await import("./helpers/onecExchangeTestHelpers.js");
@@ -61,10 +62,14 @@ describe("CommerceML обмен: каталог", () => {
 
     assert.match(result.initBody, /^zip=yes\nfile_limit=\d+$/);
     assert.equal(result.uploadBody, "success");
-    assert.equal(result.importBody, "success");
+    // Живая 1С зовёт import по именам файлов ВНУТРИ архива, а не по имени
+    // самого архива — оба вызова должны отработать.
+    assert.deepEqual(result.importBodies, ["success", "success"]);
 
-    const [job] = await waitForImportJobs(String(seller._id));
+    const jobs = await waitForImportJobs(String(seller._id));
+    const job = latestJobOfKind(jobs, "catalog");
     assert.equal(job.status, "completed", job.errorMessage);
+    assert.equal(job.filename, "import.xml");
     assert.equal(job.stats.catalog.created, 2);
     assert.equal(job.stats.catalog.onlyChanges, false);
 
@@ -179,9 +184,8 @@ describe("CommerceML обмен: каталог", () => {
       login: credentials.login,
       password: credentials.password,
       archive: buildExchangeZip(),
-      filename: "izibuy2.zip",
     });
-    await waitForImportJobs(String(seller._id), 2);
+    await waitForImportJobs(String(seller._id), 4);
 
     const published = await ProductModel.findOne({
       productSeller: seller._id,
@@ -200,7 +204,11 @@ describe("CommerceML обмен: каталог", () => {
       password: credentials.password,
       archive: buildExchangeZip(),
     });
-    const [first] = await waitForImportJobs(String(seller._id));
+    const first = latestJobOfKind(
+      await waitForImportJobs(String(seller._id)),
+      "catalog",
+    );
+    assert.equal(first.status, "completed", first.errorMessage);
     assert.equal(first.stats.catalog.imagesUploaded, 1);
 
     const before = await ProductModel.findOne({
@@ -213,10 +221,11 @@ describe("CommerceML обмен: каталог", () => {
       login: credentials.login,
       password: credentials.password,
       archive: buildExchangeZip(),
-      filename: "izibuy2.zip",
     });
-    const jobs = await waitForImportJobs(String(seller._id), 2);
-    const second = jobs[0];
+    const second = latestJobOfKind(
+      await waitForImportJobs(String(seller._id), 4),
+      "catalog",
+    );
     assert.equal(second.stats.catalog.imagesUploaded, 0);
 
     const after = await ProductModel.findOne({
@@ -245,9 +254,8 @@ describe("CommerceML обмен: каталог", () => {
       login: credentials.login,
       password: credentials.password,
       archive: buildExchangeZip(),
-      filename: "full2.zip",
     });
-    await waitForImportJobs(String(seller._id), 2);
+    await waitForImportJobs(String(seller._id), 4);
 
     const { buildStoredZip } = await import("./helpers/zipTestHelpers.js");
 
@@ -263,9 +271,9 @@ describe("CommerceML обмен: каталог", () => {
       archive: buildStoredZip([
         { name: "import.xml", data: Buffer.from(partial, "utf8") },
       ]),
-      filename: "partial.zip",
+      importNames: ["import.xml"],
     });
-    await waitForImportJobs(String(seller._id), 3);
+    await waitForImportJobs(String(seller._id), 5);
 
     const survived = await ProductModel.findOne({
       productSeller: seller._id,
@@ -285,9 +293,9 @@ describe("CommerceML обмен: каталог", () => {
       archive: buildStoredZip([
         { name: "import.xml", data: Buffer.from(full, "utf8") },
       ]),
-      filename: "full3.zip",
+      importNames: ["import.xml"],
     });
-    await waitForImportJobs(String(seller._id), 4);
+    await waitForImportJobs(String(seller._id), 6);
 
     const removed = await ProductModel.findOne({
       productSeller: seller._id,

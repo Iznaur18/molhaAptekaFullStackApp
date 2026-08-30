@@ -8,6 +8,7 @@ import {
 import {
   ONEC_IMPORT_KIND_CATALOG,
   ONEC_IMPORT_KIND_OFFERS,
+  ONEC_IMPORT_KIND_UNKNOWN,
   ONEC_IMPORT_STATUS_COMPLETED,
   ONEC_IMPORT_STATUS_FAILED,
   ONEC_IMPORT_STATUS_PENDING,
@@ -16,6 +17,7 @@ import {
 import {
   OneCCategoryMappingModel,
   OneCExchangeLogModel,
+  OneCExchangeSessionModel,
   OneCImportJobModel,
   ProductModel,
   UserModel,
@@ -24,13 +26,12 @@ import { formatLogError, logServerEvent } from "../../../utils/logServerEvent.js
 import { resolveSellerDefaultPickupFromUser } from "../../product/bulkImport/resolveSellerDefaultPickupFromUser.js";
 import { resolveProductPickupWriteFields } from "../../product/productPickupLocations.js";
 import { applyProductSaleCityFields } from "../../product/ruCityNormalized.js";
-import {
-  createArchiveImageResolver,
-  createOneCCatalogApplier,
-} from "./applyOneCCatalogProducts.js";
+import { createOneCCatalogApplier } from "./applyOneCCatalogProducts.js";
 import { createOneCOffersApplier } from "./applyOneCOffers.js";
-import { expandOneCImportFile } from "./expandOneCImportFile.js";
-import { buildOneCExchangeSessionDir } from "./onecExchangeSession.js";
+import {
+  createMultiRootImageResolver,
+  resolveOneCImportTarget,
+} from "./resolveOneCImportTarget.js";
 import {
   createOneCCategoryResolver,
   saveOneCCategoryTree,
@@ -103,11 +104,88 @@ async function saveGroupProductCounts(sellerId, groupCounts) {
 }
 
 /**
+ * Очередь разбора на каждого продавца.
+ *
+ * 1С шлёт файлы строго по очереди и ждёт `success` на каждый, но мы отвечаем
+ * сразу и разбираем в фоне — без этой цепочки `offers.xml` обгонял бы
+ * `import.xml` и не находил ещё не созданные карточки (цена и остаток
+ * терялись бы молча).
+ *
+ * @type {Map<string, Promise<unknown>>}
+ */
+const sellerImportQueues = new Map();
+
+/**
+ * Подстраховка на случай, когда задачи одного продавца разбирают разные
+ * процессы (api и worker): ждём, пока доработает более ранняя задача.
+ *
+ * @param {{ _id: unknown; sellerId: unknown; createdAt: Date }} job
+ */
+async function waitForEarlierJobs(job) {
+  const deadline = Date.now() + 60_000;
+
+  while (Date.now() < deadline) {
+    const earlier = await OneCImportJobModel.countDocuments({
+      sellerId: job.sellerId,
+      _id: { $ne: job._id },
+      createdAt: { $lt: job.createdAt },
+      status: {
+        $in: [ONEC_IMPORT_STATUS_PENDING, ONEC_IMPORT_STATUS_PROCESSING],
+      },
+    });
+    if (earlier === 0) return;
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+
+  // Зависшая задача не должна блокировать обмен навсегда — идём дальше,
+  // худший случай виден в статистике как «предложение без карточки».
+  logServerEvent("warn", {
+    event: "onec.commerceml_import_order_timeout",
+    jobId: String(job._id),
+  });
+}
+
+/**
  * Разобрать один присланный 1С файл и применить его к каталогу продавца.
+ *
+ * Задачи одного продавца выполняются строго последовательно, в порядке
+ * поступления от 1С.
  *
  * @param {string} jobId
  */
 export async function processOneCImportJob(jobId) {
+  const head = await OneCImportJobModel.findById(jobId)
+    .select("sellerId")
+    .lean();
+  if (!head) {
+    throw new Error(`OneCImportJob ${jobId} не найден`);
+  }
+
+  const key = String(head.sellerId);
+  const previous = sellerImportQueues.get(key) ?? Promise.resolve();
+  const current = previous
+    .catch(() => {})
+    .then(() => runOneCImportJob(jobId));
+
+  // В Map кладём «проглатывающую» обёртку, иначе падение одной задачи
+  // оборвало бы цепочку для всех следующих файлов этого обмена.
+  const guarded = current.catch(() => {});
+  sellerImportQueues.set(key, guarded);
+
+  try {
+    return await current;
+  } finally {
+    // Не даём Map расти бесконечно: убираем ключ, если после нас никто не встал.
+    if (sellerImportQueues.get(key) === guarded) {
+      sellerImportQueues.delete(key);
+    }
+  }
+}
+
+/**
+ * @param {string} jobId
+ */
+async function runOneCImportJob(jobId) {
   const job = await OneCImportJobModel.findById(jobId);
   if (!job) {
     throw new Error(`OneCImportJob ${jobId} не найден`);
@@ -118,6 +196,8 @@ export async function processOneCImportJob(jobId) {
   ) {
     return job.stats ?? null;
   }
+
+  await waitForEarlierJobs(job);
 
   job.status = ONEC_IMPORT_STATUS_PROCESSING;
   job.startedAt = new Date();
@@ -145,17 +225,31 @@ export async function processOneCImportJob(jobId) {
       .lean();
     const exchange = user?.oneCIntegration?.exchange ?? {};
 
-    const { xmlFiles, rootDir } = await expandOneCImportFile({
-      filePath: job.filePath,
-      filename: job.filename,
-      sessionDir: buildOneCExchangeSessionDir(job.sessionId),
-    });
-
-    if (xmlFiles.length === 0) {
+    const session = await OneCExchangeSessionModel.findOne({
+      sessionId: job.sessionId,
+    }).lean();
+    if (!session) {
       throw new Error(
-        `В ${job.filename} нет распознанных файлов CommerceML (import*/offers*/prices*/rests*.xml)`,
+        `Сессия обмена ${job.sessionId} истекла — временные файлы уже убраны`,
       );
     }
+
+    const target = await resolveOneCImportTarget({
+      session,
+      filename: job.filename,
+    });
+    const xmlFiles = [target];
+
+    if (target.kind === ONEC_IMPORT_KIND_UNKNOWN) {
+      throw new Error(
+        `${job.filename} не похож на файл CommerceML (ждём import*/offers*/prices*/rests*.xml)`,
+      );
+    }
+
+    // Путь и распознанный тип фиксируем в задаче — по ним потом видно,
+    // что именно разбиралось.
+    job.filePath = target.filePath;
+    job.kind = target.kind;
 
     const { defaults: sellerDefaults, warning } =
       await resolveSellerProductDefaults(sellerId);
@@ -163,7 +257,7 @@ export async function processOneCImportJob(jobId) {
       addIssue({ externalId: "", name: "", message: warning });
     }
 
-    const resolveImagePath = createArchiveImageResolver(rootDir);
+    const resolveImagePath = createMultiRootImageResolver(target.rootDirs);
 
     /** @type {Record<string, unknown>} */
     const stats = { files: xmlFiles.map((row) => row.filename) };

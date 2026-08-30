@@ -35,7 +35,6 @@ import {
 } from "../../services/onec/exchange/onecExchangeSession.js";
 import {
   receiveOneCFileChunk,
-  resolveOneCFilePath,
   sanitizeOneCFilename,
 } from "../../services/onec/exchange/receiveOneCFile.js";
 import { AppError } from "../../errors/AppError.js";
@@ -168,22 +167,24 @@ async function handleFile(req, res, session) {
  */
 async function handleImport(req, res, session) {
   const filename = sanitizeOneCFilename(readParam(req, "filename"));
-  const known = session.files.find((row) => row.filename === filename);
-  if (!known) {
-    return sendFailure(res, `Файл ${filename} не был загружен`);
+
+  if (session.files.length === 0) {
+    return sendFailure(res, "В этой сессии не было загружено ни одного файла");
   }
 
-  const filePath = resolveOneCFilePath(session.uploadDir, filename);
   const job = await OneCImportJobModel.create({
     sellerId: session.sellerId,
     sessionId: session.sessionId,
     filename,
-    filePath,
+    // Путь вычисляет воркер: при zip=yes имя относится к содержимому архива,
+    // и чтобы его найти, архив нужно распаковать — на это 1С ждать не должна.
+    filePath: "",
     kind: classifyOneCImportFile(filename),
     status: ONEC_IMPORT_STATUS_PENDING,
   });
 
-  known.imported = true;
+  const known = session.files.find((row) => row.filename === filename);
+  if (known) known.imported = true;
   await session.save();
 
   await enqueueOneCImportJob(String(job._id));

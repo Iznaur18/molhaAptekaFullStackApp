@@ -225,7 +225,7 @@ export async function createLeafCategory() {
  * @param {string} sellerId
  * @param {number} [expectedCount]
  */
-export async function waitForImportJobs(sellerId, expectedCount = 1) {
+export async function waitForImportJobs(sellerId, expectedCount = 2) {
   const deadline = Date.now() + 30_000;
   while (Date.now() < deadline) {
     const jobs = await OneCImportJobModel.find({ sellerId })
@@ -241,7 +241,26 @@ export async function waitForImportJobs(sellerId, expectedCount = 1) {
 }
 
 /**
+ * Один обмен = несколько задач разбора (по одной на файл внутри архива),
+ * поэтому в тестах нужна не «последняя», а «последняя нужного вида».
+ *
+ * @param {Array<Record<string, any>>} jobs
+ * @param {"catalog" | "offers"} kind
+ */
+export function latestJobOfKind(jobs, kind) {
+  const found = jobs.find((job) => job.kind === kind);
+  if (!found) {
+    throw new Error(`Нет задачи разбора вида ${kind}: ${jobs.map((j) => j.filename + ":" + j.kind).join(", ")}`);
+  }
+  return found;
+}
+
+/**
  * Полный цикл `type=catalog`: checkauth → init → file → import.
+ *
+ * Воспроизводит поведение живой 1С: архив заливается под временным именем
+ * (`v8_E902_1f.zip`), а `mode=import` зовётся по именам файлов ВНУТРИ архива.
+ * Пока тест звал import по имени архива, баг резолвинга был не виден.
  *
  * @param {{
  *   request: (path: string, init?: RequestInit) => Promise<Response>;
@@ -249,6 +268,7 @@ export async function waitForImportJobs(sellerId, expectedCount = 1) {
  *   password: string;
  *   archive: Buffer;
  *   filename?: string;
+ *   importNames?: string[];
  * }} params
  */
 export async function runCatalogExchange({
@@ -256,7 +276,8 @@ export async function runCatalogExchange({
   login,
   password,
   archive,
-  filename = "izibuy.zip",
+  filename = `v8_${Math.random().toString(16).slice(2, 8)}.zip`,
+  importNames = ["import.xml", "offers.xml"],
 }) {
   const basic = Buffer.from(`${login}:${password}`, "utf8").toString("base64");
 
@@ -285,11 +306,22 @@ export async function runCatalogExchange({
   );
   const uploadBody = await upload.text();
 
-  const imported = await request(
-    `/onec/exchange?type=catalog&mode=import&filename=${encodeURIComponent(filename)}`,
-    { headers: { Cookie: cookie } },
-  );
-  const importBody = await imported.text();
+  /** @type {string[]} */
+  const importBodies = [];
+  for (const name of importNames) {
+    const imported = await request(
+      `/onec/exchange?type=catalog&mode=import&filename=${encodeURIComponent(name)}`,
+      { headers: { Cookie: cookie } },
+    );
+    importBodies.push(await imported.text());
+  }
 
-  return { cookie, checkAuthBody, initBody, uploadBody, importBody };
+  return {
+    cookie,
+    checkAuthBody,
+    initBody,
+    uploadBody,
+    importBody: importBodies[0],
+    importBodies,
+  };
 }
