@@ -10,6 +10,7 @@ import {
   INSTALLMENT_CONTRACT_STATUS_COMPLETED,
 } from "../../constants/installmentConstants.js";
 import { AppError } from "../../errors/AppError.js";
+import { notifyBuyerAboutOrderItemStatus } from "./notifyBuyerAboutOrderItemStatus.js";
 import { InstallmentContractModel, UserModel } from "../../models/index.js";
 import { runInTransaction } from "../../utils/mongoTransaction.js";
 import { cancelLinkedOrderForInstallmentContract } from "./cancelLinkedOrderForInstallmentContract.js";
@@ -144,6 +145,14 @@ export async function markOrderItemDeliveredBySeller({
   await order.save();
   await populateOrderForResponse(order);
 
+  await notifyBuyerAboutOrderItemStatus({
+    buyerUserId: order.userBuyerId?._id ?? order.userBuyerId,
+    actorUserId: sellerId,
+    status: ORDER_STATUS_DELIVERED,
+    productName: targetItem.productNameAtOrder,
+    orderId,
+  });
+
   return { order };
 }
 
@@ -251,6 +260,15 @@ export async function markOrderItemCancelled({
   }
 
   const updatedOrder = await reloadOrderWithItems(orderId);
+
+  await notifyBuyerAboutOrderItemStatus({
+    buyerUserId: buyerId,
+    actorUserId: requestUserId,
+    status: ORDER_STATUS_CANCELLED,
+    productName: targetItem.productNameAtOrder,
+    orderId,
+  });
+
   return { order: updatedOrder };
 }
 
@@ -277,6 +295,14 @@ export async function markOrderItemShippedBySeller({ orderId, itemIndex, sellerI
   order.status = buildOrderStatusFromItems(order.items);
   await order.save();
   await populateOrderForResponse(order);
+
+  await notifyBuyerAboutOrderItemStatus({
+    buyerUserId: order.userBuyerId?._id ?? order.userBuyerId,
+    actorUserId: sellerId,
+    status: ORDER_STATUS_SHIPPED,
+    productName: targetItem.productNameAtOrder,
+    orderId,
+  });
 
   return { order };
 }

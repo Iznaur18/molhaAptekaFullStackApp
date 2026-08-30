@@ -34,3 +34,18 @@ export const ORDER_LINE_ITEM_DELETED_PRODUCT_NAME = "Товар удалён";
 /** In-app / push: новый заказ на товар продавца. */
 export const IN_APP_NOTIFICATION_KIND_SELLER_NEW_ORDER = "seller_new_order";
 export const IN_APP_NOTIFICATION_MESSAGE_SELLER_NEW_ORDER = "Новый заказ на ваш товар";
+
+/**
+ * In-app / push покупателю при смене статуса его позиции.
+ *
+ * До этого сайт уведомлял только продавца о новом заказе, и покупатель узнавал
+ * об отправке, только если сам открывал заказ.
+ */
+export const IN_APP_NOTIFICATION_KIND_BUYER_ORDER_STATUS = "buyer_order_status";
+
+/** Подписи статуса для покупателя: он читает «отправлен», а не `shipped`. */
+export const BUYER_ORDER_STATUS_MESSAGES = Object.freeze({
+  [ORDER_STATUS_SHIPPED]: "Заказ передан в доставку",
+  [ORDER_STATUS_DELIVERED]: "Заказ доставлен — подтвердите получение",
+  [ORDER_STATUS_CANCELLED]: "Продавец отменил позицию заказа",
+});
