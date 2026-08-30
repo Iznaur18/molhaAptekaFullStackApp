@@ -175,9 +175,10 @@ describe("CommerceML обмен: каталог", () => {
     }).lean();
     assert.equal(String(afterMapping.productCategoryId), String(leaf._id));
     assert.equal(afterMapping.categoryBreadcrumbRu, "Аптека › Витамины");
-    // Витрину открывает только следующий пакет предложений: категория
-    // проставлена, но `productIsAvailable` пересчитывается в offers.
-    assert.equal(afterMapping.productIsAvailable, false);
+    // Цена и остаток уже приехали прошлым обменом, поэтому товар выходит на
+    // витрину сразу после сопоставления — ждать следующей выгрузки не нужно.
+    assert.equal(afterMapping.productIsAvailable, true);
+    assert.equal(afterMapping.productStockQuantity, 7);
 
     await runCatalogExchange({
       request: http.request,

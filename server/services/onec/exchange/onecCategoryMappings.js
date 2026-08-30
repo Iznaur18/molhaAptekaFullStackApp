@@ -275,21 +275,41 @@ export async function remapOneCProductsForSeller(sellerId) {
   let changed = 0;
   for (const groupId of groups) {
     const { categoryWrite } = await resolver.resolve([groupId]);
+
+    // Пересчитываем и витрину: цена с остатком у карточек уже есть из прошлого
+    // обмена, и ждать следующего, чтобы товар «проявился», незачем. Условие
+    // считает сам Mongo — pipeline-обновление видит поля документа.
+    const availability = categoryWrite.productCategoryId
+      ? {
+          $and: [
+            { $gt: ["$productPrice", 0] },
+            { $gt: ["$productStockQuantity", 0] },
+          ],
+        }
+      : false;
+
     const result = await ProductModel.updateMany(
       {
         productSeller: sellerId,
         productFromOneC: true,
         product1cGroupId: groupId,
-        productCategoryId: { $ne: categoryWrite.productCategoryId },
       },
-      {
-        $set: {
-          productCategory: categoryWrite.productCategory,
-          productCategoryId: categoryWrite.productCategoryId,
-          categoryPathIds: categoryWrite.categoryPathIds,
-          categoryBreadcrumbRu: categoryWrite.categoryBreadcrumbRu,
+      [
+        {
+          $set: {
+            // `$literal` — строка из дерева категорий может начинаться с «$»,
+            // и агрегация приняла бы её за путь к полю.
+            productCategory: { $literal: categoryWrite.productCategory },
+            productCategoryId: categoryWrite.productCategoryId,
+            categoryPathIds: categoryWrite.categoryPathIds,
+            categoryBreadcrumbRu: { $literal: categoryWrite.categoryBreadcrumbRu },
+            productIsAvailable: availability,
+            productOutOfStock: { $lte: ["$productStockQuantity", 0] },
+          },
         },
-      },
+      ],
+      // Mongoose иначе не отличает pipeline от обычного `$set`-объекта.
+      { updatePipeline: true },
     );
     changed += result.modifiedCount ?? 0;
   }
