@@ -8,6 +8,7 @@ import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "../../../entities/order/model
 import { orderQueryKeys } from "../../../entities/order/model/orderQueryKeys.js";
 import { useMyOrdersQuery } from "../../../entities/order/model/useMyOrdersQuery.js";
 import { useOrderMutations } from "../../../entities/order/model/useOrderMutations.js";
+import { useReplaceShipmentCourierMutation } from "../../../entities/courier/model/courierQueries.js";
 import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_CONFIRMED,
@@ -45,6 +46,7 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
   const allOrders = ordersQuery.data ?? EMPTY_ORDERS;
   const [statusFilter, setStatusFilter] = useState("");
   const [attentionOnly, setAttentionOnly] = useState(false);
+  const replaceCourierMutation = useReplaceShipmentCourierMutation();
   const [pendingActionKey, setPendingActionKey] = useState(null);
   const [itemActionErrors, setItemActionErrors] = useState({});
   const [loyaltyFlash, setLoyaltyFlash] = useState("");
@@ -290,6 +292,32 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
     );
   }
 
+  /**
+   * Покупатель отказывается от назначенного курьера. Заказ вернётся в общий
+   * список, а этот курьер по нему больше не появится.
+   */
+  const handleReplaceCourier = async ({ orderId }) => {
+    if (!window.confirm(ORDER_CARD_UI.SHIPMENT_REPLACE_CONFIRM)) return;
+
+    const actionKey = `${orderId}:shipment`;
+    setPendingActionKey(actionKey);
+    setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+    try {
+      const block = sellerBlocks.find((row) => row.order._id === orderId);
+      await replaceCourierMutation.mutateAsync({
+        orderId,
+        sellerId: block?.sellerId,
+      });
+      void reloadOrders();
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+      setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
+    } finally {
+      setPendingActionKey(null);
+    }
+  };
+
   return (
     <div className="my-orders-page">
       {toolbar}
@@ -315,6 +343,7 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
                 onConfirmDelivered={handleConfirmDelivered}
                 onCancelItem={handleCancelItem}
                 onMarkReturned={handleRefuseItem}
+                onReplaceCourier={handleReplaceCourier}
                 pendingActionKey={pendingActionKey}
                 itemActionErrors={itemActionErrors}
               />

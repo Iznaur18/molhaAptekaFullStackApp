@@ -135,6 +135,9 @@ export const issueHandoverCode = ({ orderId, sellerId }) =>
 export const confirmCourierHandover = ({ orderId, sellerId, code }) =>
   postCourierAction(`${shipmentBase(orderId, sellerId)}/handover`, { code });
 
+export const replaceShipmentCourier = ({ orderId, sellerId }) =>
+  postCourierAction(`${shipmentBase(orderId, sellerId)}/replace-courier`);
+
 export const startCourierDelivery = ({ orderId, sellerId }) =>
   postCourierAction(`${shipmentBase(orderId, sellerId)}/start-delivery`);
 

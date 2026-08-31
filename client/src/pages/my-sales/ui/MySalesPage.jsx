@@ -15,7 +15,10 @@ import {
   ORDER_STATUSES,
   SALES_ORDER_STATUS_LABEL_RU,
 } from "../../../entities/order/model/constants.js";
-import { useIssueHandoverCodeMutation } from "../../../entities/courier/model/courierQueries.js";
+import {
+  useIssueHandoverCodeMutation,
+  useReplaceShipmentCourierMutation,
+} from "../../../entities/courier/model/courierQueries.js";
 import { OrderCard } from "../../../entities/order/ui/OrderCard.jsx";
 import { useCatalogProductDetailsOpener } from "../../../entities/product/lib/useCatalogProductDetailsOpener.js";
 import {
@@ -68,6 +71,7 @@ export function MySalesPage({
   } = useOrderMutations();
   const { openCatalogProductFromOrderLine } = useCatalogProductDetailsOpener();
   const issueCodeMutation = useIssueHandoverCodeMutation();
+  const replaceCourierMutation = useReplaceShipmentCourierMutation();
   /** Выданный код держим в памяти страницы: сервер его больше не отдаст. */
   const [issuedCodes, setIssuedCodes] = useState(
     /** @type {Record<string, string>} */ ({}),
@@ -344,6 +348,36 @@ export function MySalesPage({
     }
   };
 
+  /**
+   * Отказ от назначенного курьера. Заказ возвращается в общий список, а этот
+   * курьер по нему больше не появится.
+   */
+  const handleReplaceCourier = async ({ orderId }) => {
+    if (!window.confirm(ORDER_CARD_UI.SHIPMENT_REPLACE_CONFIRM)) return;
+
+    const actionKey = `${orderId}:shipment`;
+    setPendingActionKey(actionKey);
+    setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+    try {
+      const order = filteredOrders.find((row) => row._id === orderId);
+      const sellerId = order?.shipments?.[0]?.sellerId;
+      const updatedOrder = await replaceCourierMutation.mutateAsync({
+        orderId,
+        sellerId,
+      });
+      patchOrders((prev) =>
+        prev.map((row) => (row._id === orderId ? updatedOrder.order ?? row : row)),
+      );
+      void reloadSales();
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+      setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
+    } finally {
+      setPendingActionKey(null);
+    }
+  };
+
   const handleMarkReturned = async ({ orderId, itemIndex }) => {
     // Возврат виден покупателю уведомлением — подтверждаем намерение.
     if (!window.confirm(ORDER_CARD_UI.ACTION_RETURN_CONFIRM)) return;
@@ -458,6 +492,7 @@ export function MySalesPage({
                 onProductClick={openCatalogProductFromOrderLine}
                 onAdvanceShipment={handleAdvanceShipment}
                 onIssueHandoverCode={handleIssueHandoverCode}
+                onReplaceCourier={handleReplaceCourier}
                 issuedHandoverCode={issuedCodes[order._id] ?? ""}
                 onMarkShipped={handleMarkShipped}
                 onMarkDelivered={handleMarkDelivered}

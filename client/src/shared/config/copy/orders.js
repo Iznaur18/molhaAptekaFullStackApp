@@ -35,6 +35,9 @@ export const ORDER_CARD_UI = {
   ITEM_RETURNED_BY_SELLER: "оформил продавец",
   SHIPMENT_HEADING: "Отправление",
   SHIPMENT_ISSUE_CODE: "Выдать код курьеру",
+  SHIPMENT_REPLACE_COURIER: "Сменить курьера",
+  SHIPMENT_REPLACE_CONFIRM:
+    "Сменить курьера? Заказ вернётся в общий список, а этот курьер больше не сможет его взять.",
   /** @param {string} code */
   SHIPMENT_CODE_SHOWN: (code) => `Назовите курьеру: ${code}`,
   /** @param {string} code */

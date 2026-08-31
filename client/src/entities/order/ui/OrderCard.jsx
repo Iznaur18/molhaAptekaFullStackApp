@@ -510,6 +510,7 @@ export function OrderCard({
   onConfirmDelivered,
   onAdvanceShipment,
   onIssueHandoverCode,
+  onReplaceCourier,
   issuedHandoverCode = "",
   pendingActionKey = null,
   itemActionErrors = {},
@@ -582,6 +583,11 @@ export function OrderCard({
     buildOrderStatusFromItems(order.items) === "courier_assigned";
   const buyerDeliveryCode =
     attentionRole === "buyer" ? (shipmentOwn?.deliveryCode ?? "") : "";
+  // Сменить курьера можно только до передачи товара: дальше он уже в машине,
+  // и это возврат, а не смена.
+  const canReplaceCourier =
+    Boolean(onReplaceCourier) &&
+    buildOrderStatusFromItems(order.items) === "courier_assigned";
   const shipmentActionKey = `${order._id}:shipment`;
   const isShipmentActionPending = pendingActionKey === shipmentActionKey;
 
@@ -613,6 +619,18 @@ export function OrderCard({
               ? ORDER_CARD_UI.SHIPMENT_DELIVERY
               : ORDER_CARD_UI.SHIPMENT_PICKUP}
           </span>
+          {canReplaceCourier ? (
+            <button
+              type="button"
+              className="order-card__item-action-button order-card__item-action-button_cancel"
+              onClick={() => onReplaceCourier({ orderId: order._id })}
+              disabled={isShipmentActionPending}
+            >
+              {isShipmentActionPending
+                ? ORDER_CARD_UI.ACTION_PENDING
+                : ORDER_CARD_UI.SHIPMENT_REPLACE_COURIER}
+            </button>
+          ) : null}
           {canIssueCode ? (
             issuedHandoverCode ? (
               <span className="order-card__handover-code">

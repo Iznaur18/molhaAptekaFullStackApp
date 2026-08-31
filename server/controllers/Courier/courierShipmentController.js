@@ -11,6 +11,7 @@ import {
   listMyCourierDeliveries,
 } from "../../services/courier/courierOverview.js";
 import { raiseShipmentDeliveryFee } from "../../services/courier/courierDeliveryFee.js";
+import { replaceShipmentCourier } from "../../services/courier/replaceShipmentCourier.js";
 import { sanitizeOrderForBuyerApi } from "../../services/order/buyerPassportShare.js";
 import { successRes } from "../../services/http/index.js";
 
@@ -111,4 +112,17 @@ export const raiseDeliveryFeeController = async (req, res) => {
 export const getMyCourierDeliveriesController = async (req, res) => {
   const result = await listMyCourierDeliveries({ courierId: String(req.userId) });
   return successRes(res, result);
+};
+
+/**
+ * `POST /couriers/shipments/:orderId/:sellerId/replace-courier` — продавец или
+ * покупатель отказывается от назначенного курьера.
+ */
+export const replaceShipmentCourierController = async (req, res) => {
+  const result = await replaceShipmentCourier({
+    orderId: req.params.orderId,
+    sellerId: req.params.sellerId,
+    requestUserId: String(req.userId),
+  });
+  return respondWithOrder(res, result);
 };

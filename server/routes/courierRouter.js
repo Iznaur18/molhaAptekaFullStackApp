@@ -9,6 +9,7 @@ import {
   submitCourierApplicationController,
   getCourierOverviewController,
   getMyCourierDeliveriesController,
+  replaceShipmentCourierController,
 } from "../controllers/index.js";
 import { checkAuthMW, orderItemActionRateLimiter } from "../middlewares/index.js";
 import {
@@ -51,6 +52,13 @@ router.post(
   orderItemActionRateLimiter,
   courierShipmentValidation,
   acceptShipmentController,
+);
+router.post(
+  `${shipmentBase}/replace-courier`,
+  checkAuthMW,
+  orderItemActionRateLimiter,
+  courierShipmentValidation,
+  replaceShipmentCourierController,
 );
 router.post(
   `${shipmentBase}/handover-code`,

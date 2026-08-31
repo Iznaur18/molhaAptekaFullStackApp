@@ -69,3 +69,13 @@ export const COURIER_DELIVERY_FEE_DECREASE_MESSAGE =
 
 /** Радиус «Обзора»: дальше курьеру ехать незачем. */
 export const COURIER_OVERVIEW_RADIUS_KM = 50;
+
+/** In-app: у курьера забрали отправление до передачи товара. */
+export const IN_APP_NOTIFICATION_KIND_COURIER_REPLACED = "courier_replaced";
+export const COURIER_REPLACED_MESSAGE =
+  "Заказ передан другому курьеру — он снова в общем списке";
+
+export const COURIER_REPLACE_TOO_LATE_MESSAGE =
+  "Товар уже у курьера — это возврат, а не смена курьера";
+export const COURIER_REPLACE_NO_COURIER_MESSAGE =
+  "Курьер ещё не принял отправление";
