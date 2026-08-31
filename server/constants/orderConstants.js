@@ -60,6 +60,15 @@ export const ORDER_STATUS_READY_TO_SHIP = "ready_to_ship";
  */
 export const ORDER_STATUS_RETURNED = "returned";
 
+/**
+ * Товар вне контроля: курьер пропал, вручение сорвалось непонятно как.
+ *
+ * Не терминальный статус: сделка не закрыта, её разбирает модератор. Остаток
+ * товара при этом на витрину не возвращается — иначе продадим то, что
+ * неизвестно где.
+ */
+export const ORDER_STATUS_DISPUTED = "disputed";
+
 export const ORDER_STATUSES = [
   ORDER_STATUS_PENDING,
   ORDER_STATUS_ACCEPTED,
@@ -74,6 +83,7 @@ export const ORDER_STATUSES = [
   ORDER_STATUS_DELIVERED,
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_RETURNED,
+  ORDER_STATUS_DISPUTED,
 ];
 
 /**
@@ -104,6 +114,26 @@ export const ORDER_TERMINAL_STATUSES = Object.freeze([
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_RETURNED,
 ]);
+
+/**
+ * Позиции, которые держат остаток товара занятым.
+ *
+ * Это всё, кроме отменённого, вернувшегося и подтверждённого: на
+ * подтверждении остаток списывается по-настоящему, а отмена и возврат его
+ * освобождают. Спор тоже держит — товар неизвестно где, и продавать его
+ * второй раз нельзя.
+ *
+ * Перечисляем вычитанием, а не списком: список забыли бы пополнить при
+ * появлении новой ступени, и товар молча становился бы доступен снова.
+ */
+export const ORDER_STOCK_RESERVING_STATUSES = Object.freeze(
+  ORDER_STATUSES.filter(
+    (status) =>
+      status !== ORDER_STATUS_CANCELLED &&
+      status !== ORDER_STATUS_RETURNED &&
+      status !== ORDER_STATUS_CONFIRMED,
+  ),
+);
 
 /**
  * Товар ещё у продавца. Отсюда заказ можно отменить без последствий и отсюда

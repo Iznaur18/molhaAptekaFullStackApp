@@ -32,6 +32,7 @@ export const ORDER_STATUSES = [
   "delivered",
   "returned",
   "cancelled",
+  "disputed",
 ];
 
 /**

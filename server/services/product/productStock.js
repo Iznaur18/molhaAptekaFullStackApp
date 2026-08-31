@@ -15,15 +15,17 @@ import {
   PRODUCT_STOCK_REQUIRED_WHEN_AVAILABLE_MESSAGE,
 } from "../../constants/productStockConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
+import { ORDER_STOCK_RESERVING_STATUSES } from "../../constants/orderConstants.js";
 import { OrderModel, ProductModel, RaffleModel } from "../../models/index.js";
 import { RAFFLE_STATUS_COMPLETED } from "../../constants/raffleConstants.js";
 import { recalculateRaffleSalesProgress } from "../raffle/raffleHelpers.js";
 
-export const STOCK_RESERVATION_ITEM_STATUSES = [
-  ORDER_STATUS_PENDING,
-  ORDER_STATUS_SHIPPED,
-  ORDER_STATUS_DELIVERED,
-];
+/**
+ * Раньше здесь был список из трёх статусов, и появление ступеней сборки его
+ * молча обошло: после «Принят» позиция переставала держать остаток, и тот же
+ * товар можно было продать второй раз.
+ */
+export const STOCK_RESERVATION_ITEM_STATUSES = ORDER_STOCK_RESERVING_STATUSES;
 
 /** В каталоге: есть сток или временно «нет в наличии» (серая карточка). */
 export const CATALOG_STOCK_OR_OUT_OF_STOCK_VISIBLE_MATCH = {
