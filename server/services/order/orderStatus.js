@@ -12,6 +12,7 @@ const EVERY_IN = (items, allowedSet) =>
 
 const ITEM_RUNTIME_DEFAULTS = Object.freeze({
   status: ORDER_STATUS_PENDING,
+  sellerIdAtOrder: null,
   deliveredAt: null,
   confirmedAt: null,
   deliveredBy: null,
@@ -59,6 +60,8 @@ export const normalizeOrderItemsForRuntime = (items) => {
       typeof item.status === "string" && item.status.trim() !== ""
         ? item.status
         : ITEM_RUNTIME_DEFAULTS.status;
+    item.sellerIdAtOrder =
+      item.sellerIdAtOrder ?? ITEM_RUNTIME_DEFAULTS.sellerIdAtOrder;
     item.deliveredAt = item.deliveredAt ?? ITEM_RUNTIME_DEFAULTS.deliveredAt;
     item.confirmedAt = item.confirmedAt ?? ITEM_RUNTIME_DEFAULTS.confirmedAt;
     item.deliveredBy = item.deliveredBy ?? ITEM_RUNTIME_DEFAULTS.deliveredBy;

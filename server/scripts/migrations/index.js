@@ -36,6 +36,7 @@ import { up as productRentalManageUp } from "./20260806-product-rental-manage.js
 import { up as hideHardcodedProductCategoriesUp } from "./20260817-hide-hardcoded-product-categories.js";
 import { up as priceOfferAcceptedAwaitingPaymentIndexUp } from "./20260808-price-offer-accepted-awaiting-payment-index.js";
 import { up as onecCommerceMlExchangeUp } from "./20260830-onec-commerceml-exchange.js";
+import { up as orderLineSellerIdUp } from "./20260831-order-line-seller-id.js";
 
 export const MIGRATIONS = [
   {
@@ -234,5 +235,10 @@ export const MIGRATIONS = [
     description:
       "CommerceML channel: default oneCIntegration.channel=pull, widen product1cGuid index to 128 chars, add exchange collections",
     up: onecCommerceMlExchangeUp,
+  },
+  {
+    id: "20260831-order-line-seller-id",
+    description: "Backfill items.sellerIdAtOrder on orders (basis for shipments)",
+    up: orderLineSellerIdUp,
   },
 ];

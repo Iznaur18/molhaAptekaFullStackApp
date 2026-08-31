@@ -91,6 +91,7 @@ export const createOrderWithReserveTransaction = async ({
       quantity,
       unitPriceAtOrder: product.productPrice,
       productNameAtOrder: product.productName,
+      sellerIdAtOrder: seller._id,
       ...loyaltyLine,
     },
   ];

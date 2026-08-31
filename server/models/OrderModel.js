@@ -69,6 +69,18 @@ const OrderLineItemSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    /**
+     * Продавец позиции на момент заказа.
+     *
+     * Раньше продавец каждый раз выяснялся через `populate` товара, и связь
+     * рвалась вместе с удалением товара. Отправление (заказ + продавец) без
+     * этого поля не собрать: группировать не по чему.
+     */
+    sellerIdAtOrder: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
     status: {
       type: String,
       required: true,

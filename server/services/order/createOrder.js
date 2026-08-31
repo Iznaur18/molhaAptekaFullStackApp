@@ -143,6 +143,7 @@ const buildItemsWithPriceSnapshot = (
       buyNFreeProgressAction: null,
       buyNFreeProgressCountBefore: 0,
       productNameAtOrder: snapshot.name,
+      sellerIdAtOrder: snapshot.sellerId ?? null,
       promoCodeAtOrder: promo?.code ?? null,
       promoDiscountPercentAtOrder: promo?.discountPercent ?? null,
       pickupLocationIdAtOrder: pickup?.id ?? null,
