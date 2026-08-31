@@ -1,10 +1,8 @@
 import {
   ORDER_STATUS_CANCELLED,
-  ORDER_STATUS_CONFIRMED,
-  ORDER_STATUS_DELIVERED,
+  ORDER_STATUS_LADDER_RANK,
   ORDER_STATUS_PENDING,
   ORDER_STATUS_RETURNED,
-  ORDER_STATUS_SHIPPED,
 } from "../../constants/orderConstants.js";
 
 const EVERY_IN = (items, allowedSet) =>
@@ -109,25 +107,19 @@ export const normalizeOrderItemsForRuntime = (items) => {
 
 /**
  * Собирает общий статус заказа на основе item-level статусов.
- * Приоритет от "самого завершённого" к "наименее завершённому".
+ *
+ * Статус заказа — это статус самой отстающей активной позиции: пока продавец
+ * не довёл до конца всё, заказ целиком не считается доведённым. Сравниваем по
+ * рангу, а не перебором наборов, иначе каждая новая ступень лестницы требует
+ * ещё одной ветки.
+ *
+ * Возвращаем всегда чей-то реальный статус, а не синтезированный: у ступени
+ * «готов» две параллельные ветки (`ready_for_pickup` / `ready_to_ship`), и
+ * придумывать для их смеси третье значение было бы враньём.
  */
 export const buildOrderStatusFromItems = (items) => {
   if (!Array.isArray(items) || items.length === 0) return ORDER_STATUS_PENDING;
 
-  if (EVERY_IN(items, new Set([ORDER_STATUS_CONFIRMED]))) {
-    return ORDER_STATUS_CONFIRMED;
-  }
-  if (EVERY_IN(items, new Set([ORDER_STATUS_DELIVERED, ORDER_STATUS_CONFIRMED]))) {
-    return ORDER_STATUS_DELIVERED;
-  }
-  if (
-    EVERY_IN(
-      items,
-      new Set([ORDER_STATUS_SHIPPED, ORDER_STATUS_DELIVERED, ORDER_STATUS_CONFIRMED]),
-    )
-  ) {
-    return ORDER_STATUS_SHIPPED;
-  }
   if (EVERY_IN(items, new Set([ORDER_STATUS_RETURNED]))) {
     return ORDER_STATUS_RETURNED;
   }
@@ -139,7 +131,21 @@ export const buildOrderStatusFromItems = (items) => {
   if (EVERY_IN(items, new Set([ORDER_STATUS_CANCELLED, ORDER_STATUS_RETURNED]))) {
     return ORDER_STATUS_CANCELLED;
   }
-  return ORDER_STATUS_PENDING;
+
+  // Терминальная позиция рядом с активной означает, что заказ ещё в работе и
+  // закрывать его рано.
+  let leader = null;
+  let leaderRank = Number.POSITIVE_INFINITY;
+  for (const item of items) {
+    const rank = ORDER_STATUS_LADDER_RANK[item?.status];
+    if (rank === undefined) return ORDER_STATUS_PENDING;
+    if (rank < leaderRank) {
+      leaderRank = rank;
+      leader = item.status;
+    }
+  }
+
+  return leader ?? ORDER_STATUS_PENDING;
 };
 
 /**

@@ -13,6 +13,19 @@ export const ORDER_STATUS_CONFIRMED = "confirmed";
 export const ORDER_STATUS_SHIPPED = "shipped";
 export const ORDER_STATUS_DELIVERED = "delivered";
 export const ORDER_STATUS_CANCELLED = "cancelled";
+
+/**
+ * Ступени сборки, общие для самовывоза и доставки.
+ *
+ * До них покупатель между «В обработке» и «Отправлен» не видел ничего и не
+ * понимал, взялся ли продавец за заказ вообще.
+ */
+export const ORDER_STATUS_ACCEPTED = "accepted";
+export const ORDER_STATUS_ASSEMBLING = "assembling";
+
+/** Развилка лестниц: самовывоз ждут на точке, доставку — отгружают. */
+export const ORDER_STATUS_READY_FOR_PICKUP = "ready_for_pickup";
+export const ORDER_STATUS_READY_TO_SHIP = "ready_to_ship";
 /**
  * Товар уехал к покупателю и вернулся: отказ у двери, неудачное вручение,
  * возврат отправителю. Отличается от `cancelled` (отменён до отправки) —
@@ -22,12 +35,41 @@ export const ORDER_STATUS_RETURNED = "returned";
 
 export const ORDER_STATUSES = [
   ORDER_STATUS_PENDING,
+  ORDER_STATUS_ACCEPTED,
+  ORDER_STATUS_ASSEMBLING,
+  ORDER_STATUS_READY_FOR_PICKUP,
+  ORDER_STATUS_READY_TO_SHIP,
   ORDER_STATUS_CONFIRMED,
   ORDER_STATUS_SHIPPED,
   ORDER_STATUS_DELIVERED,
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_RETURNED,
 ];
+
+/**
+ * Насколько статус продвинут по лестнице. Статус заказа — это статус самой
+ * отстающей позиции, поэтому сравнивать их надо числом, а не перебором.
+ *
+ * `ready_for_pickup` и `ready_to_ship` — параллельные ветки одной ступени:
+ * отправление идёт либо самовывозом, либо доставкой, но в одном заказе рядом
+ * могут оказаться оба.
+ */
+export const ORDER_STATUS_LADDER_RANK = Object.freeze({
+  [ORDER_STATUS_PENDING]: 0,
+  [ORDER_STATUS_ACCEPTED]: 1,
+  [ORDER_STATUS_ASSEMBLING]: 2,
+  [ORDER_STATUS_READY_FOR_PICKUP]: 3,
+  [ORDER_STATUS_READY_TO_SHIP]: 3,
+  [ORDER_STATUS_SHIPPED]: 4,
+  [ORDER_STATUS_DELIVERED]: 5,
+  [ORDER_STATUS_CONFIRMED]: 6,
+});
+
+/** Сделка закончилась: по лестнице такие позиции уже не двигаются. */
+export const ORDER_TERMINAL_STATUSES = Object.freeze([
+  ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_RETURNED,
+]);
 
 /** Минимальное количество одной позиции заказа. */
 export const ORDER_LINE_ITEM_QUANTITY_MIN = 1;
@@ -62,6 +104,10 @@ export const IN_APP_NOTIFICATION_MESSAGE_SELLER_ORDER_RETURNED =
 
 /** Подписи статуса для покупателя: он читает «отправлен», а не `shipped`. */
 export const BUYER_ORDER_STATUS_MESSAGES = Object.freeze({
+  [ORDER_STATUS_ACCEPTED]: "Продавец принял заказ",
+  [ORDER_STATUS_ASSEMBLING]: "Заказ собирают",
+  [ORDER_STATUS_READY_FOR_PICKUP]: "Заказ готов к выдаче — можно забирать",
+  [ORDER_STATUS_READY_TO_SHIP]: "Заказ готов к отгрузке",
   [ORDER_STATUS_SHIPPED]: "Заказ передан в доставку",
   [ORDER_STATUS_DELIVERED]: "Заказ доставлен — подтвердите получение",
   [ORDER_STATUS_CANCELLED]: "Продавец отменил позицию заказа",
