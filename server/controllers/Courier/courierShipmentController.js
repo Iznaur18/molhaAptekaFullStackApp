@@ -6,6 +6,8 @@ import {
   markArrivedByCourier,
   startDeliveryByCourier,
 } from "../../services/courier/courierShipmentFlow.js";
+import { listCourierOverview } from "../../services/courier/courierOverview.js";
+import { raiseShipmentDeliveryFee } from "../../services/courier/courierDeliveryFee.js";
 import { sanitizeOrderForBuyerApi } from "../../services/order/buyerPassportShare.js";
 import { successRes } from "../../services/http/index.js";
 
@@ -75,4 +77,29 @@ export const completeDeliveryController = async (req, res) => {
     code: req.body.code,
   });
   return respondWithOrder(res, result);
+};
+
+/** `GET /couriers/overview` — свободные отправления в регионе курьера. */
+export const getCourierOverviewController = async (req, res) => {
+  const result = await listCourierOverview({
+    courierId: String(req.userId),
+    lat: req.query.lat ?? null,
+    lon: req.query.lon ?? null,
+    limit: req.query.limit,
+  });
+  return successRes(res, result);
+};
+
+/** `PATCH /order/:orderId/shipment/:sellerId/delivery-fee` — покупатель поднимает сумму. */
+export const raiseDeliveryFeeController = async (req, res) => {
+  const result = await raiseShipmentDeliveryFee({
+    orderId: req.params.orderId,
+    sellerId: req.params.sellerId,
+    buyerId: String(req.userId),
+    feeRub: req.body.deliveryFeeRub,
+  });
+  return successRes(res, {
+    deliveryFeeRub: result.deliveryFeeRub,
+    order: sanitizeOrderForBuyerApi(result.order),
+  });
 };

@@ -9,6 +9,7 @@ import {
   getAllOrdersController,
   updateOrderStatusController,
   advanceMyShipmentStatusController,
+  raiseDeliveryFeeController,
   markOrderItemShippedBySellerController,
   markOrderItemDeliveredBySellerController,
   markOrderItemReturnedBySellerController,
@@ -30,6 +31,7 @@ import {
   orderItemActionValidation,
   orderItemCancelValidation,
   advanceShipmentStatusValidation,
+  shipmentDeliveryFeeValidation,
 } from "../validations/index.js";
 
 const router = createAsyncRouter();
@@ -58,6 +60,13 @@ router.patch(
   checkAdminMW,
   updateOrderStatusValidation,
   updateOrderStatusController,
+);
+router.patch(
+  "/:orderId/shipment/:sellerId/delivery-fee",
+  checkAuthMW,
+  orderItemActionRateLimiter,
+  shipmentDeliveryFeeValidation,
+  raiseDeliveryFeeController,
 );
 router.patch(
   "/:orderId/shipment/status",

@@ -127,6 +127,7 @@ export const buildStoredShipments = (
   items,
   fulfillmentBySellerId,
   fallbackFulfillment = ORDER_FULFILLMENT_PICKUP,
+  deliveryFeeBySellerId = null,
 ) => {
   const grouped = groupOrderItemsBySellerId(items);
   /** @type {Array<{ sellerId: string; fulfillmentMethod: "pickup" | "delivery" }>} */
@@ -135,12 +136,18 @@ export const buildStoredShipments = (
   for (const bucket of grouped.values()) {
     if (!bucket.sellerId) continue;
     const chosen = fulfillmentBySellerId?.[bucket.sellerId] ?? fallbackFulfillment;
+    const method =
+      chosen === ORDER_FULFILLMENT_DELIVERY
+        ? ORDER_FULFILLMENT_DELIVERY
+        : ORDER_FULFILLMENT_PICKUP;
     shipments.push({
       sellerId: bucket.sellerId,
-      fulfillmentMethod:
-        chosen === ORDER_FULFILLMENT_DELIVERY
-          ? ORDER_FULFILLMENT_DELIVERY
-          : ORDER_FULFILLMENT_PICKUP,
+      fulfillmentMethod: method,
+      // У самовывоза платить курьеру некому.
+      deliveryFeeRub:
+        method === ORDER_FULFILLMENT_DELIVERY
+          ? (deliveryFeeBySellerId?.[bucket.sellerId] ?? 0)
+          : 0,
     });
   }
 

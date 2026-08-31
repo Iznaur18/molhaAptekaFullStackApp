@@ -87,6 +87,8 @@ export const createOrderBodySchema = z
       .record(z.enum(["pickup", "delivery"]))
       .optional()
       .default({}),
+    /** Сколько покупатель предлагает курьеру, по продавцам. */
+    deliveryFeeBySellerId: z.record(z.coerce.number().int()).optional().default({}),
     /** Выбор точки самовывоза на товар (при ≥2 точках у товара). */
     pickupSelections: z
       .array(orderPickupSelectionSchema)

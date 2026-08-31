@@ -234,6 +234,12 @@ const OrderShipmentSchema = new mongoose.Schema(
       enum: ["pickup", "delivery"],
       default: "pickup",
     },
+    /**
+     * Сколько покупатель предлагает курьеру. У самовывоза всегда 0.
+     * Платформа деньги не проводит — это заявленная сумма, но хранить её
+     * надо: иначе спор разбирать не по чему.
+     */
+    deliveryFeeRub: { type: Number, default: 0, min: 0 },
     /** Курьер, принявший отправление в «Обзоре». */
     courierId: {
       type: mongoose.Schema.Types.ObjectId,

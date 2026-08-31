@@ -8,6 +8,7 @@ import {
 } from "@molha/api-contract";
 import { buildStoredShipments } from "./orderShipments.js";
 import { resolveOrderFulfillmentSplit } from "./resolveOrderFulfillmentSplit.js";
+import { resolveDeliveryFeesBySeller } from "../courier/courierDeliveryFee.js";
 import { USER_BLOCK_CART_ORDER_MESSAGE } from "../../constants/userBlockConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { AppError } from "../../errors/AppError.js";
@@ -351,6 +352,7 @@ export async function createOrder({
   priceOfferId,
   fulfillmentMethod = ORDER_FULFILLMENT_PICKUP,
   fulfillmentBySellerId = null,
+  deliveryFeeBySellerId = null,
   pickupSelections = [],
   verifiedDeliveryAddress = null,
   affiliateCode = null,
@@ -564,6 +566,10 @@ export async function createOrder({
               pricedItems,
               fulfillmentSplit.fulfillmentBySellerId,
               resolvedFulfillment,
+              resolveDeliveryFeesBySeller({
+                fulfillmentBySellerId: fulfillmentSplit.fulfillmentBySellerId,
+                feeBySellerId: deliveryFeeBySellerId,
+              }),
             ),
             paymentMethod,
             status: orderStatus,

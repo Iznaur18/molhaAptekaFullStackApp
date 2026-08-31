@@ -44,6 +44,7 @@ export const makeOrderController = async (req, res) => {
         priceOfferId: req.body.priceOfferId,
         fulfillmentMethod: req.body.fulfillmentMethod,
         fulfillmentBySellerId: req.body.fulfillmentBySellerId,
+        deliveryFeeBySellerId: req.body.deliveryFeeBySellerId,
         pickupSelections: req.body.pickupSelections,
         verifiedDeliveryAddress: req.verifiedDeliveryAddress,
         affiliateCode: req.body.affiliateCode,

@@ -99,3 +99,18 @@ export const courierHandoverCodeBodySchema = z.object({
     .trim()
     .regex(/^\d{4}$/, "Код — четыре цифры"),
 });
+
+/** Query `GET /couriers/overview` — геопозиция необязательна, влияет на порядок. */
+export const courierOverviewQuerySchema = z.object({
+  lat: z.coerce.number().min(-90).max(90).optional(),
+  lon: z.coerce.number().min(-180).max(180).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(30),
+});
+
+export const COURIER_DELIVERY_FEE_MIN_RUB = 100;
+export const COURIER_DELIVERY_FEE_STEP_RUB = 25;
+
+/** Body `PATCH /order/:orderId/shipment/:sellerId/delivery-fee`. */
+export const shipmentDeliveryFeeBodySchema = z.object({
+  deliveryFeeRub: z.coerce.number().int().min(COURIER_DELIVERY_FEE_MIN_RUB),
+});

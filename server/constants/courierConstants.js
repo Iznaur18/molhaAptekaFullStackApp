@@ -49,3 +49,23 @@ export const COURIER_MODERATION_MESSAGES = Object.freeze({
   [COURIER_MODERATION_APPROVED]: "Заявка курьера одобрена — можно брать заказы",
   [COURIER_MODERATION_REJECTED]: "Заявка курьера отклонена",
 });
+
+/**
+ * Цена доставки: её назначает покупатель, а не тариф платформы.
+ *
+ * Тарифа по километражу нет намеренно — вместо него покупатель поднимает
+ * сумму кнопками, пока курьер не найдётся. Крупногабарит никто не берёт за
+ * минимум, и рынок решает это сам, без полей веса и объёма у товара.
+ */
+export const COURIER_DELIVERY_FEE_MIN_RUB = 100;
+export const COURIER_DELIVERY_FEE_STEP_RUB = 25;
+/** Верхняя граница — защита от опечатки в лишний ноль, а не бизнес-правило. */
+export const COURIER_DELIVERY_FEE_MAX_RUB = 100_000;
+
+export const COURIER_DELIVERY_FEE_FROZEN_MESSAGE =
+  "Курьер уже принял заказ — сумму доставки изменить нельзя";
+export const COURIER_DELIVERY_FEE_DECREASE_MESSAGE =
+  "Сумму доставки можно только повысить";
+
+/** Радиус «Обзора»: дальше курьеру ехать незачем. */
+export const COURIER_OVERVIEW_RADIUS_KM = 50;

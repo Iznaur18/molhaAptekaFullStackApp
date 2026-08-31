@@ -7,12 +7,14 @@ import {
   markArrivedController,
   startDeliveryController,
   submitCourierApplicationController,
+  getCourierOverviewController,
 } from "../controllers/index.js";
 import { checkAuthMW, orderItemActionRateLimiter } from "../middlewares/index.js";
 import {
   courierApplicationValidation,
   courierHandoverCodeValidation,
   courierShipmentValidation,
+  courierOverviewValidation,
 } from "../validations/index.js";
 import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 
@@ -27,6 +29,14 @@ router.post(
   checkAuthMW,
   courierApplicationValidation,
   submitCourierApplicationController,
+);
+
+// Свободные отправления в регионе курьера.
+router.get(
+  "/overview",
+  checkAuthMW,
+  courierOverviewValidation,
+  getCourierOverviewController,
 );
 
 // Отправление адресуется парой «заказ + продавец» — это и есть его ключ.
