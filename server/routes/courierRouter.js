@@ -10,6 +10,7 @@ import {
   getCourierOverviewController,
   getMyCourierDeliveriesController,
   replaceShipmentCourierController,
+  setShipmentPaymentConfirmedController,
 } from "../controllers/index.js";
 import { checkAuthMW, orderItemActionRateLimiter } from "../middlewares/index.js";
 import {
@@ -17,6 +18,7 @@ import {
   courierHandoverCodeValidation,
   courierShipmentValidation,
   courierOverviewValidation,
+  shipmentPaymentConfirmedValidation,
 } from "../validations/index.js";
 import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 
@@ -52,6 +54,13 @@ router.post(
   orderItemActionRateLimiter,
   courierShipmentValidation,
   acceptShipmentController,
+);
+router.post(
+  `${shipmentBase}/payment-confirmed`,
+  checkAuthMW,
+  orderItemActionRateLimiter,
+  shipmentPaymentConfirmedValidation,
+  setShipmentPaymentConfirmedController,
 );
 router.post(
   `${shipmentBase}/replace-courier`,

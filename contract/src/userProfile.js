@@ -193,9 +193,16 @@ const clearablePremiumExpiresAtSchema = clearableOptionalString.superRefine((val
 const clearableBooleanSchema = z.union([z.boolean(), z.null()]).optional();
 
 /** Тело `PATCH /user/:userIdClient` (структура; DaData — отдельно на сервере). */
+/** Куда покупатель переводит при оплате картой в момент получения. */
+export const sellerPayoutRequisitesFieldSchema = z
+  .string()
+  .trim()
+  .max(120, "Реквизиты не длиннее 120 символов");
+
 export const updateProfileBodySchema = z.object({
   userName: clearableUserNameSchema,
   userFullName: clearableUserFullNameSchema,
+  sellerPayoutRequisites: sellerPayoutRequisitesFieldSchema.optional(),
   userBusinessHoursEnabled: clearableBooleanSchema,
   userBusinessHours: userBusinessHoursBodySchema,
   userBirthDate: clearableBirthDateSchema,

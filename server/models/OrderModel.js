@@ -247,6 +247,20 @@ const OrderShipmentSchema = new mongoose.Schema(
      * надо: иначе спор разбирать не по чему.
      */
     deliveryFeeRub: { type: Number, default: 0, min: 0 },
+    /**
+     * Продавец подтвердил, что перевод дошёл.
+     *
+     * Курьер не касается денег продавца, поэтому перед вручением нужно третье
+     * рукопожатие: покупатель перевёл → продавец подтвердил → курьер отдал.
+     */
+    paymentConfirmedAt: { type: Date, default: null },
+    /**
+     * Реквизиты продавца снимком на момент заказа.
+     *
+     * Снимок, а не чтение вживую: если аккаунт продавца уведут посреди
+     * заказа, покупатель не должен перевести деньги новому владельцу.
+     */
+    sellerPayoutRequisites: { type: String, default: "", trim: true, maxlength: 120 },
     /** Курьер, принявший отправление в «Обзоре». */
     courierId: {
       type: mongoose.Schema.Types.ObjectId,

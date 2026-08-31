@@ -129,6 +129,7 @@ export const buildStoredShipments = (
   fallbackFulfillment = ORDER_FULFILLMENT_PICKUP,
   deliveryFeeBySellerId = null,
   courierDeliveryBySellerId = null,
+  payoutRequisitesBySellerId = null,
 ) => {
   const grouped = groupOrderItemsBySellerId(items);
   /** @type {Array<{ sellerId: string; fulfillmentMethod: "pickup" | "delivery" }>} */
@@ -153,6 +154,8 @@ export const buildStoredShipments = (
       courierDelivery:
         method === ORDER_FULFILLMENT_DELIVERY &&
         courierDeliveryBySellerId?.[bucket.sellerId] === true,
+      sellerPayoutRequisites:
+        payoutRequisitesBySellerId?.[bucket.sellerId] ?? "",
     });
   }
 

@@ -18,6 +18,7 @@ import {
 import {
   useIssueHandoverCodeMutation,
   useReplaceShipmentCourierMutation,
+  useSetShipmentPaymentConfirmedMutation,
 } from "../../../entities/courier/model/courierQueries.js";
 import { OrderCard } from "../../../entities/order/ui/OrderCard.jsx";
 import { useCatalogProductDetailsOpener } from "../../../entities/product/lib/useCatalogProductDetailsOpener.js";
@@ -72,6 +73,7 @@ export function MySalesPage({
   const { openCatalogProductFromOrderLine } = useCatalogProductDetailsOpener();
   const issueCodeMutation = useIssueHandoverCodeMutation();
   const replaceCourierMutation = useReplaceShipmentCourierMutation();
+  const confirmPaymentMutation = useSetShipmentPaymentConfirmedMutation();
   /** Выданный код держим в памяти страницы: сервер его больше не отдаст. */
   const [issuedCodes, setIssuedCodes] = useState(
     /** @type {Record<string, string>} */ ({}),
@@ -378,6 +380,28 @@ export function MySalesPage({
     }
   };
 
+  /** Продавец подтверждает, что перевод от покупателя дошёл. */
+  const handleConfirmPayment = async ({ orderId }) => {
+    const actionKey = `${orderId}:shipment`;
+    setPendingActionKey(actionKey);
+    setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+    try {
+      const order = filteredOrders.find((row) => row._id === orderId);
+      await confirmPaymentMutation.mutateAsync({
+        orderId,
+        sellerId: order?.shipments?.[0]?.sellerId,
+        confirmed: true,
+      });
+      void reloadSales();
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+      setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
+    } finally {
+      setPendingActionKey(null);
+    }
+  };
+
   const handleMarkReturned = async ({ orderId, itemIndex }) => {
     // Возврат виден покупателю уведомлением — подтверждаем намерение.
     if (!window.confirm(ORDER_CARD_UI.ACTION_RETURN_CONFIRM)) return;
@@ -493,6 +517,7 @@ export function MySalesPage({
                 onAdvanceShipment={handleAdvanceShipment}
                 onIssueHandoverCode={handleIssueHandoverCode}
                 onReplaceCourier={handleReplaceCourier}
+                onConfirmPayment={handleConfirmPayment}
                 issuedHandoverCode={issuedCodes[order._id] ?? ""}
                 onMarkShipped={handleMarkShipped}
                 onMarkDelivered={handleMarkDelivered}

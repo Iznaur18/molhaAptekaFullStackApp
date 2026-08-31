@@ -155,6 +155,7 @@ export {
 export {
   updateProfileBodySchema,
   USER_FULL_NAME_MAX_LENGTH,
+  sellerPayoutRequisitesFieldSchema,
 } from "./userProfile.js";
 export {
   USER_BUSINESS_HOURS_WEEKDAY_LABELS_RU,
@@ -650,6 +651,8 @@ export {
   shipmentDeliveryFeeBodySchema,
   COURIER_DELIVERY_FEE_MIN_RUB,
   COURIER_DELIVERY_FEE_STEP_RUB,
+  shipmentPaymentConfirmedBodySchema,
+  SELLER_PAYOUT_REQUISITES_MAX_LENGTH,
 } from "./courier.js";
 export {
   authMeDataSchema,

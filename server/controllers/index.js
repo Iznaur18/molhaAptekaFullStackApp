@@ -66,6 +66,7 @@ import {
   raiseDeliveryFeeController,
   getMyCourierDeliveriesController,
   replaceShipmentCourierController,
+  setShipmentPaymentConfirmedController,
 } from "./Courier/courierShipmentController.js";
 import { getAllOrdersController } from "./Order/getAllOrdersController.js";
 import { updateOrderStatusController } from "./Order/updateOrderStatusController.js";
@@ -376,6 +377,7 @@ export {
   raiseDeliveryFeeController,
   getMyCourierDeliveriesController,
   replaceShipmentCourierController,
+  setShipmentPaymentConfirmedController,
   advanceMyShipmentStatusController,
   markOrderItemReturnedBySellerController,
   markOrderItemShippedBySellerController,

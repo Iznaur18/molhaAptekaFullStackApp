@@ -9,6 +9,11 @@ import {
 import { buildStoredShipments } from "./orderShipments.js";
 import { resolveOrderFulfillmentSplit } from "./resolveOrderFulfillmentSplit.js";
 import { resolveDeliveryFeesBySeller } from "../courier/courierDeliveryFee.js";
+import {
+  COURIER_DELIVERY_CASH_FORBIDDEN_MESSAGE,
+  ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
+  SELLER_PAYOUT_REQUISITES_REQUIRED_MESSAGE,
+} from "../../constants/orderConstants.js";
 import { USER_BLOCK_CART_ORDER_MESSAGE } from "../../constants/userBlockConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { AppError } from "../../errors/AppError.js";
@@ -243,6 +248,32 @@ const assertSellersOpenForProducts = async (productById) => {
  * @param {Record<string, { deliveryEnabled: boolean }>} productById
  * @param {string[]} productIds
  */
+
+/**
+ * Реквизиты продавца при курьерской доставке обязательны: покупатель стоит
+ * у двери и должен куда-то перевести. При самовывозе люди встречаются лично,
+ * и вопрос не возникает.
+ *
+ * @param {string[]} sellerIds
+ */
+const assertSellersHavePayoutRequisites = async (sellerIds) => {
+  const sellers = await UserModel.find({ _id: { $in: sellerIds } })
+    .select("sellerPayoutRequisites")
+    .lean();
+
+  /** @type {Record<string, string>} */
+  const bySeller = {};
+  for (const seller of sellers) {
+    bySeller[String(seller._id)] = String(seller?.sellerPayoutRequisites ?? "").trim();
+  }
+
+  const missing = sellerIds.some((id) => !bySeller[id]);
+  if (missing) {
+    throw new AppError(400, SELLER_PAYOUT_REQUISITES_REQUIRED_MESSAGE);
+  }
+  return bySeller;
+};
+
 const assertProductsSupportDelivery = (productById, productIds) => {
   for (const id of productIds) {
     const snapshot = productById[id];
@@ -487,6 +518,21 @@ export async function createOrder({
     productById,
     fulfillmentSplit.deliveryProductIds,
   );
+
+  /** @type {Record<string, string>} */
+  let payoutRequisitesBySeller = {};
+  const courierSellerIds = Object.entries(courierDeliveryBySeller)
+    .filter(([, byCourier]) => byCourier)
+    .map(([sellerId]) => sellerId);
+
+  if (courierSellerIds.length > 0) {
+    // Наличные у курьера означают, что продавец их не видит и подтвердить
+    // оплату не может — третье рукопожатие рассыпается.
+    if (paymentMethod === ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY) {
+      throw new AppError(400, COURIER_DELIVERY_CASH_FORBIDDEN_MESSAGE);
+    }
+    payoutRequisitesBySeller = await assertSellersHavePayoutRequisites(courierSellerIds);
+  }
   assertProductsSupportPickup(productById, fulfillmentSplit.pickupProductIds);
 
   /** @type {Record<string, { id: string; address: string; lat: number | null; lon: number | null }> | null} */
@@ -608,6 +654,7 @@ export async function createOrder({
                 feeBySellerId: deliveryFeeBySellerId,
               }),
               courierDeliveryBySeller,
+              payoutRequisitesBySeller,
             ),
             paymentMethod,
             status: orderStatus,

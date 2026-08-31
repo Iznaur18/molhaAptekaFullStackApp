@@ -70,6 +70,7 @@ const convertProfileFieldValue = (field, value) => {
   if (
     field === "userPhoneNumber" ||
     field === "userFullName" ||
+    field === "sellerPayoutRequisites" ||
     field === "userAddress" ||
     field === "userAddressFlat" ||
     field === "userAddressFiasId" ||

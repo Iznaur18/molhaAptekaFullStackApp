@@ -5,6 +5,7 @@ import {
   COURIER_MODERATION_APPROVED,
 } from "../../constants/courierConstants.js";
 import {
+  ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
   ORDER_STATUS_COURIER_ASSIGNED,
   ORDER_STATUS_COURIER_HOLDING,
   ORDER_STATUS_DELIVERED,
@@ -282,6 +283,14 @@ export async function completeDeliveryByCourier({
   if (status !== ORDER_STATUS_DELIVERED) {
     throw new AppError(409, "Сначала отметьте, что привезли заказ");
   }
+  // Курьер не касается денег продавца: без его подтверждения перевода товар
+  // отдавать нельзя.
+  if (
+    order.paymentMethod === ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY &&
+    !shipment.paymentConfirmedAt
+  ) {
+    throw new AppError(409, "Продавец ещё не подтвердил оплату");
+  }
 
   const result = verifyHandoverCode({
     expected: shipment.deliveryCode,
@@ -314,4 +323,41 @@ export async function completeDeliveryByCourier({
   }
 
   return { order: latest?.order ?? order };
+}
+
+/**
+ * Продавец подтверждает, что перевод дошёл.
+ *
+ * Курьер денег продавца не касается, поэтому перед вручением нужно третье
+ * рукопожатие: покупатель перевёл → продавец подтвердил → курьер отдал.
+ *
+ * @param {{ orderId: string; sellerId: string; confirmed: boolean }} input
+ */
+export async function setShipmentPaymentConfirmed({ orderId, sellerId, confirmed }) {
+  const order = await loadOrderWithItems(orderId);
+  const { shipment, status } = locateShipment(order, sellerId);
+
+  if (order.paymentMethod !== ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY) {
+    throw new AppError(409, "Этот заказ оплачивается иначе");
+  }
+  // Откат возможен, пока курьер не запросил код вручения: после этого товар
+  // уже отдан, и отменять нечего — только спор.
+  if (!confirmed && status !== ORDER_STATUS_DELIVERED && shipment.paymentConfirmedAt) {
+    shipment.paymentConfirmedAt = null;
+    await order.save();
+    await populateOrderForResponse(order);
+    return { order };
+  }
+  if (!confirmed) {
+    throw new AppError(409, "Отменить подтверждение оплаты уже нельзя");
+  }
+  if (status !== ORDER_STATUS_IN_DELIVERY && status !== ORDER_STATUS_DELIVERED) {
+    throw new AppError(409, "Оплату подтверждают, когда курьер уже привёз заказ");
+  }
+
+  shipment.paymentConfirmedAt = new Date();
+  await order.save();
+  await populateOrderForResponse(order);
+
+  return { order };
 }

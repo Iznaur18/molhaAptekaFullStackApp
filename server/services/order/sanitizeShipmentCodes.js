@@ -1,4 +1,8 @@
-import { ORDER_STATUS_DELIVERED } from "../../constants/orderConstants.js";
+import {
+  ORDER_STATUS_DELIVERED,
+  ORDER_STATUS_LADDER_RANK,
+  ORDER_STATUS_COURIER_HOLDING,
+} from "../../constants/orderConstants.js";
 
 import { resolveItemSellerId } from "./orderShipments.js";
 import { buildOrderStatusFromItems } from "./orderStatus.js";
@@ -33,6 +37,12 @@ export const stripShipmentCodes = (order, audience) => {
     }
     delete shipment.handoverAttempts;
     delete shipment.deliveryAttempts;
+
+    // Реквизиты продавца покупатель видит, только когда товар уже едет:
+    // до передачи переводить некуда и незачем.
+    if (audience !== "buyer" || !isShipmentUnderway(order, shipment.sellerId)) {
+      delete shipment.sellerPayoutRequisites;
+    }
   }
 
   return order;
@@ -47,4 +57,21 @@ function isShipmentDelivered(order, sellerId) {
     (item) => resolveItemSellerId(item) === String(sellerId),
   );
   return items.length > 0 && buildOrderStatusFromItems(items) === ORDER_STATUS_DELIVERED;
+}
+
+/**
+ * Товар у курьера или дальше — значит передача состоялась.
+ *
+ * @param {Record<string, any>} order
+ * @param {unknown} sellerId
+ */
+function isShipmentUnderway(order, sellerId) {
+  const items = (order.items ?? []).filter(
+    (item) => resolveItemSellerId(item) === String(sellerId),
+  );
+  if (items.length === 0) return false;
+
+  const status = buildOrderStatusFromItems(items);
+  const rank = ORDER_STATUS_LADDER_RANK[status];
+  return rank !== undefined && rank >= ORDER_STATUS_LADDER_RANK[ORDER_STATUS_COURIER_HOLDING];
 }

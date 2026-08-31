@@ -15,6 +15,7 @@ import {
   issueHandoverCode,
   raiseShipmentDeliveryFee,
   replaceShipmentCourier,
+  setShipmentPaymentConfirmed,
 } from "../api/courierApi.js";
 
 export const courierQueryKeys = {
@@ -119,6 +120,8 @@ export const useCompleteCourierDeliveryMutation = () =>
   useCourierStepMutation(completeCourierDelivery);
 export const useIssueHandoverCodeMutation = () =>
   useCourierStepMutation(issueHandoverCode);
+export const useSetShipmentPaymentConfirmedMutation = () =>
+  useCourierStepMutation(setShipmentPaymentConfirmed);
 export const useReplaceShipmentCourierMutation = () =>
   useCourierStepMutation(replaceShipmentCourier);
 export const useRaiseDeliveryFeeMutation = () =>

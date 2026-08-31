@@ -135,6 +135,11 @@ export const issueHandoverCode = ({ orderId, sellerId }) =>
 export const confirmCourierHandover = ({ orderId, sellerId, code }) =>
   postCourierAction(`${shipmentBase(orderId, sellerId)}/handover`, { code });
 
+export const setShipmentPaymentConfirmed = ({ orderId, sellerId, confirmed = true }) =>
+  postCourierAction(`${shipmentBase(orderId, sellerId)}/payment-confirmed`, {
+    confirmed,
+  });
+
 export const replaceShipmentCourier = ({ orderId, sellerId }) =>
   postCourierAction(`${shipmentBase(orderId, sellerId)}/replace-courier`);
 

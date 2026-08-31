@@ -36,6 +36,12 @@ export const ORDER_CARD_UI = {
   SHIPMENT_HEADING: "Отправление",
   SHIPMENT_ISSUE_CODE: "Выдать код курьеру",
   SHIPMENT_REPLACE_COURIER: "Сменить курьера",
+  SHIPMENT_PAYMENT_CONFIRM: "Оплата получена",
+  SHIPMENT_PAYMENT_CONFIRMED: "Оплата подтверждена",
+  /** @param {string} requisites */
+  SHIPMENT_PAY_TO: (requisites) => `Перевести продавцу: ${requisites}`,
+  SHIPMENT_PAY_TO_HINT:
+    "Курьер отдаст заказ, когда продавец подтвердит перевод.",
   SHIPMENT_REPLACE_CONFIRM:
     "Сменить курьера? Заказ вернётся в общий список, а этот курьер больше не сможет его взять.",
   /** @param {string} code */

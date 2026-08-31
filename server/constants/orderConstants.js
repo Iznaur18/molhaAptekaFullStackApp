@@ -1,11 +1,33 @@
 /** Способы оплаты заказа (enum в OrderModel и валидации). */
 export const ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY = "cashOnDelivery";
 export const ORDER_PAYMENT_METHOD_CARD_PREPAID = "cardPrepaid";
+/**
+ * Перевод продавцу при получении.
+ *
+ * Отдельно от `cardPrepaid`: тот значит предоплату и зарезервирован под
+ * будущий эквайринг. Здесь платформа денег не касается — покупатель
+ * переводит напрямую на реквизиты продавца.
+ */
+export const ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY = "cardOnDelivery";
 
 export const ORDER_PAYMENT_METHODS = [
   ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
   ORDER_PAYMENT_METHOD_CARD_PREPAID,
+  ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
 ];
+
+/**
+ * Наличные и курьеры Gitorg несовместимы.
+ *
+ * Наличные покупатель отдаёт курьеру, продавец их не видит и не может
+ * подтвердить оплату — третье рукопожатие рассыпается, а у незнакомого
+ * человека оказываются и товар, и деньги продавца.
+ */
+export const COURIER_DELIVERY_CASH_FORBIDDEN_MESSAGE =
+  "Наличные недоступны при доставке курьером Gitorg — выберите оплату картой при получении";
+
+export const SELLER_PAYOUT_REQUISITES_REQUIRED_MESSAGE =
+  "У продавца не указаны реквизиты для перевода — оплата картой при получении невозможна";
 
 /** Жизненный цикл статуса заказа (enum в OrderModel и валидации). */
 export const ORDER_STATUS_PENDING = "pending";

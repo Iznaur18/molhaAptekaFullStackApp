@@ -8,7 +8,7 @@ export const DEFAULT_BACKGROUND_URL = getDefaultUserBackgroundStoredValue();
 
 /** Поля пользователя для отображения на клиенте (GET /me, GET /user/:id). Строка для .select() — без passwordHash */
 export const USER_DATA =
-  "_id userName userFullName userBusinessHoursEnabled userBusinessHours email isEmailVerified isPhoneVerified userAvatarUrl userAvatarFocus userBackgroundUrl userBackgroundFocus userBirthDate userGender userAddress userAddressFlat userAddressCity userAddressDistrict userAddressStreet userAddressHouse userAddressFiasId userAddressGeo userAddresses userRegionCode userPhoneNumber userRole userDiscountPercent userLoyaltyPoints isPremiumUser premiumExpiresAt isUserDataConfirmed notificationsEnabled userRatingByVotes isActiveUser isBlockedUser createdAt updatedAt userLastLoginAt notesAboutUser socialTelegramUrl socialInstagramUrl socialVkUrl socialYoutubeUrl socialWhatsappUrl socialWebsiteUrl buyList courierProfile";
+  "_id userName userFullName userBusinessHoursEnabled userBusinessHours email isEmailVerified isPhoneVerified userAvatarUrl userAvatarFocus userBackgroundUrl userBackgroundFocus userBirthDate userGender userAddress userAddressFlat userAddressCity userAddressDistrict userAddressStreet userAddressHouse userAddressFiasId userAddressGeo userAddresses userRegionCode userPhoneNumber userRole userDiscountPercent userLoyaltyPoints isPremiumUser premiumExpiresAt isUserDataConfirmed notificationsEnabled userRatingByVotes isActiveUser isBlockedUser createdAt updatedAt userLastLoginAt notesAboutUser socialTelegramUrl socialInstagramUrl socialVkUrl socialYoutubeUrl socialWhatsappUrl socialWebsiteUrl buyList courierProfile sellerPayoutRequisites";
 
 /** Поля пользователя для отображения на клиенте (GET /me/rating). Строка для .select() — без passwordHash */
 export const USER_ME_RAITING = "_id userRatingByVotes userName email userAvatarUrl";
@@ -16,6 +16,7 @@ export const USER_ME_RAITING = "_id userRatingByVotes userName email userAvatarU
 // Разрешённые поля для обычного пользователя, иначе возвращаются все поля такие как passwordHash, userRole, email, userPhoneNumber, isActiveUser, isBlockedUser
 export const ALLOWED_FIELDS_FOR_USER = [
   "userName",
+  "sellerPayoutRequisites",
   "userFullName",
   "userBusinessHoursEnabled",
   "userBusinessHours",

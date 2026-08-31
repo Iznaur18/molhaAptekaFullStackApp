@@ -13,7 +13,11 @@ import {
 import { PRODUCT_PICKUP_LOCATION_ID_MAX_LENGTH } from "./productPickupLocations.js";
 
 /** Синхрон с `server/constants/orderConstants.js`. */
-export const ORDER_PAYMENT_METHODS = ["cashOnDelivery", "cardPrepaid"];
+export const ORDER_PAYMENT_METHODS = [
+  "cashOnDelivery",
+  "cardPrepaid",
+  "cardOnDelivery",
+];
 export const ORDER_STATUSES = [
   "pending",
   "accepted",

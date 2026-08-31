@@ -511,6 +511,7 @@ export function OrderCard({
   onAdvanceShipment,
   onIssueHandoverCode,
   onReplaceCourier,
+  onConfirmPayment,
   issuedHandoverCode = "",
   pendingActionKey = null,
   itemActionErrors = {},
@@ -585,6 +586,17 @@ export function OrderCard({
     attentionRole === "buyer" ? (shipmentOwn?.deliveryCode ?? "") : "";
   // Сменить курьера можно только до передачи товара: дальше он уже в машине,
   // и это возврат, а не смена.
+  const shipmentStatusNow = buildOrderStatusFromItems(order.items);
+  // Продавец подтверждает перевод, когда курьер уже привёз заказ.
+  const canConfirmPayment =
+    attentionRole === "seller" &&
+    Boolean(onConfirmPayment) &&
+    order.paymentMethod === "cardOnDelivery" &&
+    !shipmentOwn?.paymentConfirmedAt &&
+    (shipmentStatusNow === "in_delivery" || shipmentStatusNow === "delivered");
+  const paymentConfirmed = Boolean(shipmentOwn?.paymentConfirmedAt);
+  const payToRequisites =
+    attentionRole === "buyer" ? (shipmentOwn?.sellerPayoutRequisites ?? "") : "";
   const canReplaceCourier =
     Boolean(onReplaceCourier) &&
     buildOrderStatusFromItems(order.items) === "courier_assigned";
@@ -619,6 +631,22 @@ export function OrderCard({
               ? ORDER_CARD_UI.SHIPMENT_DELIVERY
               : ORDER_CARD_UI.SHIPMENT_PICKUP}
           </span>
+          {canConfirmPayment ? (
+            <button
+              type="button"
+              className="order-card__item-action-button"
+              onClick={() => onConfirmPayment({ orderId: order._id })}
+              disabled={isShipmentActionPending}
+            >
+              {isShipmentActionPending
+                ? ORDER_CARD_UI.ACTION_PENDING
+                : ORDER_CARD_UI.SHIPMENT_PAYMENT_CONFIRM}
+            </button>
+          ) : paymentConfirmed && attentionRole === "seller" ? (
+            <span className="order-card__shipment-label">
+              {ORDER_CARD_UI.SHIPMENT_PAYMENT_CONFIRMED}
+            </span>
+          ) : null}
           {canReplaceCourier ? (
             <button
               type="button"
@@ -667,6 +695,13 @@ export function OrderCard({
           </button>
         ) : null}
       </div>
+
+      {payToRequisites ? (
+        <div className="order-card__buyer-code">
+          <strong>{ORDER_CARD_UI.SHIPMENT_PAY_TO(payToRequisites)}</strong>
+          <span>{ORDER_CARD_UI.SHIPMENT_PAY_TO_HINT}</span>
+        </div>
+      ) : null}
 
       {buyerDeliveryCode ? (
         <div className="order-card__buyer-code">

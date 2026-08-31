@@ -1,10 +1,13 @@
 /** Способы оплаты — совпадают с `enum` в `server/constants/orderConstants.js`. */
 export const ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY = "cashOnDelivery";
 export const ORDER_PAYMENT_METHOD_CARD_PREPAID = "cardPrepaid";
+/** Перевод продавцу при получении — платформа денег не касается. */
+export const ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY = "cardOnDelivery";
 
 export const ORDER_PAYMENT_METHODS = [
   ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
   ORDER_PAYMENT_METHOD_CARD_PREPAID,
+  ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
 ];
 
 /**
@@ -13,6 +16,7 @@ export const ORDER_PAYMENT_METHODS = [
  */
 export const ORDER_PAYMENT_METHODS_SELECTABLE = [
   ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
+  ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
 ];
 
 /** Способ оплаты по умолчанию в формах чекаута. */
@@ -21,6 +25,7 @@ export const ORDER_PAYMENT_METHOD_DEFAULT = ORDER_PAYMENT_METHOD_CASH_ON_DELIVER
 export const ORDER_PAYMENT_METHOD_LABEL_RU = {
   [ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY]: "Наличными при получении",
   [ORDER_PAYMENT_METHOD_CARD_PREPAID]: "Картой заранее",
+  [ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY]: "Картой при получении",
 };
 
 /** Статусы заказа — совпадают с `enum` в `server/constants/orderConstants.js`. */

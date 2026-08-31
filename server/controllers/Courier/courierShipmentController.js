@@ -5,6 +5,7 @@ import {
   issueHandoverCode,
   markArrivedByCourier,
   startDeliveryByCourier,
+  setShipmentPaymentConfirmed,
 } from "../../services/courier/courierShipmentFlow.js";
 import {
   listCourierOverview,
@@ -123,6 +124,20 @@ export const replaceShipmentCourierController = async (req, res) => {
     orderId: req.params.orderId,
     sellerId: req.params.sellerId,
     requestUserId: String(req.userId),
+  });
+  return respondWithOrder(res, result);
+};
+
+/**
+ * `POST /couriers/shipments/:orderId/:sellerId/payment-confirmed` — продавец
+ * подтверждает, что перевод дошёл (или откатывает подтверждение).
+ */
+export const setShipmentPaymentConfirmedController = async (req, res) => {
+  const result = await setShipmentPaymentConfirmed({
+    orderId: req.params.orderId,
+    // Подтверждает только продавец — свой id берём из сессии.
+    sellerId: String(req.userId),
+    confirmed: req.body.confirmed !== false,
   });
   return respondWithOrder(res, result);
 };

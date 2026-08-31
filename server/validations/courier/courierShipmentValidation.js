@@ -3,6 +3,7 @@ import {
   courierOverviewQuerySchema,
   courierShipmentParamsSchema,
   shipmentDeliveryFeeBodySchema,
+  shipmentPaymentConfirmedBodySchema,
 } from "@molha/api-contract";
 
 import { validateBodyZod } from "../../middlewares/validateBodyZod.js";
@@ -25,4 +26,9 @@ export const courierOverviewValidation = [
 export const shipmentDeliveryFeeValidation = [
   validateParamsZod(courierShipmentParamsSchema),
   validateBodyZod(shipmentDeliveryFeeBodySchema),
+];
+
+export const shipmentPaymentConfirmedValidation = [
+  validateParamsZod(courierShipmentParamsSchema),
+  validateBodyZod(shipmentPaymentConfirmedBodySchema),
 ];

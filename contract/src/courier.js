@@ -114,3 +114,10 @@ export const COURIER_DELIVERY_FEE_STEP_RUB = 25;
 export const shipmentDeliveryFeeBodySchema = z.object({
   deliveryFeeRub: z.coerce.number().int().min(COURIER_DELIVERY_FEE_MIN_RUB),
 });
+
+/** Body `POST /couriers/shipments/:orderId/:sellerId/payment-confirmed`. */
+export const shipmentPaymentConfirmedBodySchema = z.object({
+  confirmed: z.coerce.boolean(),
+});
+
+export const SELLER_PAYOUT_REQUISITES_MAX_LENGTH = 120;
