@@ -9,6 +9,7 @@ import {
   voteRouter,
   userRouter,
   orderRouter,
+  courierRouter,
   productRouter,
   cartRouter,
   favoritesRouter,
@@ -116,6 +117,7 @@ export const createApp = () => {
   app.use("/vote", voteRouter);
   app.use("/user", userRouter);
   app.use("/order", orderRouter);
+  app.use("/courier", courierRouter);
   app.use("/cart", cartRouter);
   app.use("/favorites", favoritesRouter);
   app.use("/product", productRouter);

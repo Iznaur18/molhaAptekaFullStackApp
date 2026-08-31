@@ -49,6 +49,12 @@ import {
   getMyOrdersActionCountController,
   getMySalesActionCountController,
 } from "./Order/orderActionCountControllers.js";
+import {
+  getMyCourierProfileController,
+  submitCourierApplicationController,
+  getStaffCourierApplicationsController,
+  patchStaffCourierModerationController,
+} from "./Courier/courierApplicationController.js";
 import { getAllOrdersController } from "./Order/getAllOrdersController.js";
 import { updateOrderStatusController } from "./Order/updateOrderStatusController.js";
 import {
@@ -344,6 +350,10 @@ export {
   getMySalesActionCountController,
   getAllOrdersController,
   updateOrderStatusController,
+  getMyCourierProfileController,
+  submitCourierApplicationController,
+  getStaffCourierApplicationsController,
+  patchStaffCourierModerationController,
   advanceMyShipmentStatusController,
   markOrderItemReturnedBySellerController,
   markOrderItemShippedBySellerController,

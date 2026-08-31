@@ -4,6 +4,14 @@ import {
   USER_SAVED_ADDRESS_ID_MAX_LENGTH,
 } from "@molha/api-contract";
 import { ADDRESS_LINE_MAX_LENGTH } from "../constants/dadataConstants.js";
+import {
+  COURIER_MODERATION_COMMENT_MAX_LENGTH,
+  COURIER_MODERATION_NONE,
+  COURIER_MODERATION_STATUSES,
+  COURIER_VEHICLE_COLOR_MAX_LENGTH,
+  COURIER_VEHICLE_MAKE_MAX_LENGTH,
+  COURIER_VEHICLE_PLATE_MAX_LENGTH,
+} from "../constants/courierConstants.js";
 import { DEFAULT_AVATAR_URL, DEFAULT_BACKGROUND_URL } from "../constants/constants.js";
 import {
   DEFAULT_USER_AVATAR_FOCUS,
@@ -505,6 +513,65 @@ const UserSchema = new mongoose.Schema(
       select: false,
     },
 
+    // - - - Курьер - - -
+    /**
+     * Курьер — не отдельная сущность, а состояние обычного пользователя.
+     * Отдельного кабинета нет: заявка и её статус живут в профиле.
+     *
+     * Регион курьера берётся из адреса профиля (`userRegionCode`), поэтому
+     * подать заявку без заполненного адреса нельзя.
+     */
+    courierProfile: {
+      moderationStatus: {
+        type: String,
+        enum: COURIER_MODERATION_STATUSES,
+        default: COURIER_MODERATION_NONE,
+      },
+      /** Марка и модель одной строкой — так их и пишут в документах. */
+      vehicleMake: {
+        type: String,
+        trim: true,
+        maxlength: COURIER_VEHICLE_MAKE_MAX_LENGTH,
+        default: "",
+      },
+      vehicleColor: {
+        type: String,
+        trim: true,
+        maxlength: COURIER_VEHICLE_COLOR_MAX_LENGTH,
+        default: "",
+      },
+      vehiclePlate: {
+        type: String,
+        trim: true,
+        maxlength: COURIER_VEHICLE_PLATE_MAX_LENGTH,
+        default: "",
+      },
+      submittedAt: { type: Date, default: null },
+      reviewedAt: { type: Date, default: null },
+      reviewedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null,
+      },
+      /** Причина отказа — курьер должен понимать, что исправить. */
+      moderationComment: {
+        type: String,
+        trim: true,
+        maxlength: COURIER_MODERATION_COMMENT_MAX_LENGTH,
+        default: "",
+      },
+      /**
+       * Сколько раз курьер отказался от уже принятой заявки. Штрафов в v1
+       * нет, но без счётчика не отличить нормального курьера от того, кто
+       * берёт заказы ради адресов.
+       */
+      declinedJobCount: {
+        type: Number,
+        default: 0,
+        min: 0,
+      },
+    },
+
     // - - - Список покупок / заказов (подготовка под будущую модель) - - -
     buyList: {
       // список id заказов или покупок; при создании модели Order/Purchase указать ref: 'Order' или ref: 'Purchase'
@@ -638,6 +705,12 @@ const UserSchema = new mongoose.Schema(
 // Индексы для производительности (email, userName, userPhoneNumber уже индексируются через unique: true в полях)
 // Составной индекс для фильтрации активных пользователей по роли (для админ-панели)
 UserSchema.index({ userRole: 1, isActiveUser: 1, isBlockedUser: 1 });
+
+/** Очередь модерации курьеров: свежие заявки сверху. */
+UserSchema.index(
+  { "courierProfile.moderationStatus": 1, "courierProfile.submittedAt": -1 },
+  { name: "courier_moderation_queue" },
+);
 
 // Индекс для сортировки по рейтингу (для топ пользователей)
 UserSchema.index({

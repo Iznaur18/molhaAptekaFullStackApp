@@ -71,6 +71,11 @@ import { getMyOrdersValidation } from "./order/getMyOrdersValidation.js";
 import { orderItemActionValidation } from "./order/orderItemActionValidation.js";
 import { orderItemCancelValidation } from "./order/orderItemCancelValidation.js";
 import { advanceShipmentStatusValidation } from "./order/advanceShipmentStatusValidation.js";
+import {
+  courierApplicationValidation,
+  staffCourierListValidation,
+  staffCourierModerationValidation,
+} from "./courier/courierApplicationValidation.js";
 import { replaceMyCartValidation } from "./cart/replaceMyCartValidation.js";
 import { replaceMyFavoritesValidation } from "./favorites/replaceMyFavoritesValidation.js";
 import {
@@ -202,6 +207,9 @@ export {
   orderItemActionValidation,
   orderItemCancelValidation,
   advanceShipmentStatusValidation,
+  courierApplicationValidation,
+  staffCourierListValidation,
+  staffCourierModerationValidation,
   replaceMyCartValidation,
   replaceMyFavoritesValidation,
   userStoryIdParamValidation,
