@@ -8,6 +8,7 @@ export const MY_ORDER_UNKNOWN_SELLER_ID = "__unknown__";
 
 export type MyOrderSellerBlockOrderLine = {
   productId?: unknown;
+  sellerIdAtOrder?: unknown;
   status?: string;
   quantity?: number;
   unitPriceAtOrder?: number;
@@ -20,8 +21,30 @@ export type MyOrderSellerBlockSource = {
   items?: MyOrderSellerBlockOrderLine[] | null;
   status?: string;
   totalAmount?: number;
+  fulfillmentMethod?: string;
+  shipments?: Array<{ sellerId?: unknown; fulfillmentMethod?: string }> | null;
   [key: string]: unknown;
 };
+
+/**
+ * Способ получения отправления этого продавца.
+ *
+ * Блок наследовал способ всего заказа, и в смешанном заказе одна из половин
+ * показывала покупателю неправду: «Доставка» у того, что он забирает сам.
+ */
+function resolveBlockFulfillment(
+  order: MyOrderSellerBlockSource,
+  sellerId: string,
+): "pickup" | "delivery" {
+  const stored = Array.isArray(order?.shipments)
+    ? order.shipments.find(
+        (row) => row?.sellerId != null && String(row.sellerId) === sellerId,
+      )
+    : null;
+
+  const candidate = stored?.fulfillmentMethod ?? order?.fulfillmentMethod;
+  return candidate === "delivery" ? "delivery" : "pickup";
+}
 
 export type MyOrderSellerBlock<T extends MyOrderSellerBlockSource = MyOrderSellerBlockSource> = {
   blockKey: string;
@@ -33,8 +56,15 @@ export type MyOrderSellerBlock<T extends MyOrderSellerBlockSource = MyOrderSelle
  * Id продавца позиции (после populate productSeller или raw id).
  */
 export function resolveOrderLineSellerId(
-  item: { productId?: unknown } | null | undefined,
+  item: { productId?: unknown; sellerIdAtOrder?: unknown } | null | undefined,
 ): string {
+  // Денормализованный продавец надёжнее populate: он переживает удаление
+  // товара и совпадает с тем, по чему сервер собирает отправления.
+  if (item?.sellerIdAtOrder != null) {
+    const denormalized = String(item.sellerIdAtOrder).trim();
+    if (denormalized) return denormalized;
+  }
+
   const product = item?.productId;
   if (product == null || typeof product === "string") {
     return MY_ORDER_UNKNOWN_SELLER_ID;
@@ -102,6 +132,7 @@ export function projectMyOrderSellerBlocks<T extends MyOrderSellerBlockSource>(
         items: sellerItems,
         status: buildOrderStatusFromItems(sellerItems),
         totalAmount: calculateOrderItemsTotalAmount(sellerItems),
+        fulfillmentMethod: resolveBlockFulfillment(order, sellerId),
       },
     });
   }

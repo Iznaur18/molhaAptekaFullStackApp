@@ -118,6 +118,21 @@ function OrderCardMeta({
     : null;
   const sellers = showSeller ? resolveOrderSellers(order) : [];
 
+  // Блок покупателя — это отправление одного продавца, и способ у него свой.
+  const isPickupShipment = order.fulfillmentMethod !== "delivery";
+  const pickupAddresses = isPickupShipment
+    ? [
+        ...new Set(
+          (order.items ?? [])
+            .map((item) => String(item?.pickupAddressAtOrder ?? "").trim())
+            .filter(Boolean),
+        ),
+      ]
+    : [];
+  const shipmentAddress = isPickupShipment
+    ? pickupAddresses.join("; ") || order.deliveryAddress
+    : order.deliveryAddress;
+
   return (
     <dl className="order-card__meta">
       {showBuyer ? (
@@ -145,9 +160,15 @@ function OrderCardMeta({
         <dt>{ORDER_CARD_UI.CREATED_LABEL}</dt>
         <dd>{formatIsoDateTime(order.createdAt)}</dd>
       </div>
+      {/* У самовывозного отправления адрес свой — точка выдачи. Показывать
+          там адрес покупателя было бы враньём: он туда ничего не везёт. */}
       <div className="order-card__meta-row">
-        <dt>{ORDER_CARD_UI.ADDRESS_LABEL}</dt>
-        <dd>{order.deliveryAddress || COMMON_UI.EM_DASH}</dd>
+        <dt>
+          {isPickupShipment
+            ? ORDER_CARD_UI.PICKUP_ADDRESS_LABEL
+            : ORDER_CARD_UI.ADDRESS_LABEL}
+        </dt>
+        <dd>{shipmentAddress || COMMON_UI.EM_DASH}</dd>
       </div>
       {order.shippingTrackingNumber ? (
         <div className="order-card__meta-row">
@@ -570,14 +591,17 @@ export function OrderCard({
         </>
       )}
 
-      {shipmentAdvance ? (
-        <div className="order-card__shipment-row">
+      {/* Способ показываем всегда: в смешанном заказе покупателю надо видеть,
+          какую часть он забирает сам, а какую ему везут. Кнопка — только
+          продавцу, и только пока есть куда двигать. */}
+      <div className="order-card__shipment-row">
           <span className="order-card__shipment-label">
             {ORDER_CARD_UI.SHIPMENT_HEADING}:{" "}
             {shipmentFulfillment === "delivery"
               ? ORDER_CARD_UI.SHIPMENT_DELIVERY
               : ORDER_CARD_UI.SHIPMENT_PICKUP}
           </span>
+          {shipmentAdvance ? (
           <button
             type="button"
             className="order-card__item-action-button"
@@ -593,8 +617,8 @@ export function OrderCard({
               ? ORDER_CARD_UI.ACTION_PENDING
               : shipmentAdvance.label}
           </button>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
 
       <h3 className="order-card__items-heading">{ORDER_CARD_UI.ITEMS_HEADING}</h3>
       <ul className="order-card__items" role="list">

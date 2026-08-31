@@ -9,6 +9,8 @@ export const ORDER_CARD_UI = {
   DETAILS_FOLD_SUMMARY: "Подробности заказа",
   TOTAL_LABEL: "Итого",
   ADDRESS_LABEL: "Адрес доставки",
+  /** У отправления с самовывозом адрес другой — точка выдачи, а не адрес покупателя. */
+  PICKUP_ADDRESS_LABEL: "Забрать по адресу",
   TRACKING_LABEL: "Трек-номер",
   PAYMENT_LABEL: "Оплата",
   STATUS_LABEL: "Статус",
