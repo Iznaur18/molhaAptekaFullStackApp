@@ -28,6 +28,7 @@ export function buildProfileNavGroups({
   canUseRaffles,
   canUseCourier,
   canUseCourierModeration,
+  canUseCourierOverview,
   canUseDataConfirmationQueue,
   canUseInstallmentDisputes,
   canUseAdminOrders,
@@ -79,6 +80,7 @@ export function buildProfileNavGroups({
   onRafflesClick,
   onCourierClick,
   onCourierModerationClick,
+  onCourierOverviewClick,
   onDataConfirmationQueueClick,
   onInstallmentDisputesClick,
   onAdminOrdersClick,
@@ -293,6 +295,15 @@ export function buildProfileNavGroups({
             label: "Жалоба (модерация)",
             badgeCount: pendingProductReportsCount,
             onClick: () => selectTab("product-reports", onProductReportsClick),
+          },
+        ]
+      : []),
+    ...(canUseCourierOverview
+      ? [
+          {
+            tab: "courier-overview",
+            label: "Обзор (курьер)",
+            onClick: () => selectTab("courier-overview", onCourierOverviewClick),
           },
         ]
       : []),

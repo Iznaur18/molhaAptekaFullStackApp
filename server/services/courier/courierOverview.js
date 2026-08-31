@@ -6,6 +6,7 @@ import {
   COURIER_OVERVIEW_RADIUS_KM,
 } from "../../constants/courierConstants.js";
 import {
+  ORDER_STATUS_COURIER_ASSIGNED,
   ORDER_STATUS_READY_TO_SHIP,
   ORDER_TERMINAL_STATUSES,
 } from "../../constants/orderConstants.js";
@@ -140,6 +141,9 @@ export async function listCourierOverview({ courierId, lat = null, lon = null, l
       );
       if (items.length === 0) continue;
       if (buildOrderStatusFromItems(items) !== ORDER_STATUS_READY_TO_SHIP) continue;
+      // Заказы до появления цены доставки идут с нулём — за 0 ₽ никто не
+      // поедет, и в «Обзоре» это просто мусор.
+      if (!(Number(shipment.deliveryFeeRub) > 0)) continue;
 
       sellerIds.add(sellerId);
       for (const item of items) {
@@ -233,4 +237,100 @@ export async function listCourierOverview({ courierId, lat = null, lon = null, l
     radiusKm: COURIER_OVERVIEW_RADIUS_KM,
     shipments: rows.slice(0, safeLimit),
   };
+}
+
+/**
+ * Активные доставки курьера.
+ *
+ * Точный адрес и телефон покупателя открываются только после передачи товара
+ * (`courier_holding` и дальше). До неё курьеру хватает района: иначе любой
+ * подтверждённый курьер мог бы брать заказы, забирать контакты и отказываться.
+ *
+ * @param {{ courierId: string }} input
+ */
+export async function listMyCourierDeliveries({ courierId }) {
+  const orders = await OrderModel.find({
+    shipments: { $elemMatch: { courierId } },
+  })
+    .select("items shipments deliveryAddress deliveryAddressFlat createdAt userBuyerId")
+    .populate("userBuyerId", "userName userPhoneNumber")
+    .sort({ createdAt: -1 })
+    .limit(100)
+    .lean();
+
+  const sellerIds = new Set();
+  const productIds = new Set();
+  /** @type {Array<Record<string, any>>} */
+  const candidates = [];
+
+  for (const order of orders) {
+    for (const shipment of order.shipments ?? []) {
+      if (String(shipment.courierId ?? "") !== String(courierId)) continue;
+
+      const sellerId = String(shipment.sellerId);
+      const items = (order.items ?? []).filter(
+        (item) =>
+          resolveItemSellerId(item) === sellerId && !TERMINAL.has(item.status),
+      );
+      if (items.length === 0) continue;
+
+      const status = buildOrderStatusFromItems(items);
+      // Подтверждённое отправление курьеру больше не нужно.
+      if (status === "confirmed") continue;
+
+      sellerIds.add(sellerId);
+      for (const item of items) {
+        if (item.productId) productIds.add(String(item.productId));
+      }
+      candidates.push({ order, shipment, sellerId, items, status });
+    }
+  }
+
+  if (candidates.length === 0) return { deliveries: [] };
+
+  const [sellers, products] = await Promise.all([
+    UserModel.find({ _id: { $in: [...sellerIds] } })
+      .select("userName userAddress userAddressGeo userPhoneNumber")
+      .lean(),
+    ProductModel.find({ _id: { $in: [...productIds] } })
+      .select("productName productPickupAddress productPickupLat productPickupLon")
+      .lean(),
+  ]);
+  const sellerById = new Map(sellers.map((row) => [String(row._id), row]));
+  const productById = new Map(products.map((row) => [String(row._id), row]));
+
+  const deliveries = candidates.map(({ order, shipment, sellerId, items, status }) => {
+    const seller = sellerById.get(sellerId);
+    const pickup = resolvePickupPoint(
+      items.map((item) => productById.get(String(item.productId))).filter(Boolean),
+      seller,
+    );
+    // Товар уже у курьера — значит передача состоялась, и контакты нужны.
+    const contactsUnlocked = status !== ORDER_STATUS_COURIER_ASSIGNED;
+    const buyer = order.userBuyerId;
+
+    return {
+      orderId: String(order._id),
+      sellerId,
+      sellerName: seller?.userName ?? "",
+      sellerPhone: seller?.userPhoneNumber ?? "",
+      status,
+      deliveryFeeRub: Number(shipment.deliveryFeeRub) || 0,
+      pickupAddress: pickup.address,
+      buyerName: contactsUnlocked ? (buyer?.userName ?? "") : "",
+      buyerPhone: contactsUnlocked ? (buyer?.userPhoneNumber ?? "") : "",
+      deliveryAddress: contactsUnlocked
+        ? [order.deliveryAddress, order.deliveryAddressFlat]
+            .filter(Boolean)
+            .join(", ")
+        : String(order.deliveryAddress ?? "").split(",").slice(0, 2).join(",").trim(),
+      contactsUnlocked,
+      items: items.map((item) => ({
+        name: item.productNameAtOrder,
+        quantity: item.quantity,
+      })),
+    };
+  });
+
+  return { deliveries };
 }

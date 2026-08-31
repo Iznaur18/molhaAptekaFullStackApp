@@ -53,6 +53,7 @@ import "./MyProfilePage.css";
  * onCreateRaffleClick?: () => void;
  * onCourierClick?: () => void;
  * onCourierModerationClick?: () => void;
+ * onCourierOverviewClick?: () => void;
  * onDataConfirmationQueueClick?: () => void;
  * onDataConfirmationClick?: () => void;
  * onPremiumClick?: () => void;
@@ -110,6 +111,7 @@ export function MyProfilePage({
   onCreateRaffleClick,
   onCourierClick,
   onCourierModerationClick,
+  onCourierOverviewClick,
   onDataConfirmationQueueClick,
   onDataConfirmationClick,
   onPremiumClick,
@@ -211,6 +213,7 @@ export function MyProfilePage({
     onRafflesClick,
     onCourierClick,
     onCourierModerationClick,
+    onCourierOverviewClick,
     onDataConfirmationQueueClick,
     onInstallmentDisputesClick,
     onAdminOrdersClick,

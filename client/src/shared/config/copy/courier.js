@@ -53,3 +53,31 @@ export const COURIER_MODERATION_UI = {
   LOADING: "Загрузка заявок…",
   ERROR_GENERIC: "Не удалось выполнить действие. Попробуйте ещё раз.",
 };
+
+/** «Обзор» курьера: свободные заказы и активные доставки. */
+export const COURIER_OVERVIEW_UI = {
+  TITLE: "Обзор",
+  TAB_FREE: "Свободные",
+  TAB_MINE: "Мои доставки",
+  /** @param {string} region @param {number} radiusKm */
+  REGION: (region, radiusKm) => `Регион ${region}, до ${radiusKm} км.`,
+  NO_GEO_HINT: "Геопозиция не разрешена — сортируем от вашего адреса.",
+  /** @param {number} km */
+  DISTANCE: (km) => `${km} км`,
+  PICKUP: "Забрать",
+  DROPOFF: "Привезти",
+  ACCEPT: "Принять заказ",
+  SAVING: "Сохраняем…",
+  STEP_TAKE: "Забрал у продавца",
+  STEP_GO: "Выехал",
+  STEP_ARRIVED: "Привёз",
+  STEP_HANDED: "Вручил",
+  CODE_FROM_SELLER: "Код у продавца",
+  CODE_FROM_BUYER: "Код у покупателя",
+  CONTACTS_LOCKED:
+    "Точный адрес и телефон покупателя откроются, когда заберёте заказ.",
+  EMPTY_FREE: "Свободных заказов в вашем регионе нет.",
+  EMPTY_MINE: "Активных доставок нет.",
+  LOADING: "Загрузка…",
+  ERROR_GENERIC: "Не удалось выполнить действие. Попробуйте ещё раз.",
+};

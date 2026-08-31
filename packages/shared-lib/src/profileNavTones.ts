@@ -73,6 +73,7 @@ const PROFILE_NAV_SECTION_TONE_MAP = {
   "data-confirmation-requests": "slate",
   courier: "green",
   "courier-moderation": "slate",
+  "courier-overview": "green",
   "installment-disputes": "red",
   "admin-orders": "blue",
   "search-synonyms-admin": "blue",

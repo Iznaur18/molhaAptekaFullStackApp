@@ -8,6 +8,7 @@ import {
   startDeliveryController,
   submitCourierApplicationController,
   getCourierOverviewController,
+  getMyCourierDeliveriesController,
 } from "../controllers/index.js";
 import { checkAuthMW, orderItemActionRateLimiter } from "../middlewares/index.js";
 import {
@@ -38,6 +39,8 @@ router.get(
   courierOverviewValidation,
   getCourierOverviewController,
 );
+
+router.get("/my-deliveries", checkAuthMW, getMyCourierDeliveriesController);
 
 // Отправление адресуется парой «заказ + продавец» — это и есть его ключ.
 const shipmentBase = "/shipments/:orderId/:sellerId";

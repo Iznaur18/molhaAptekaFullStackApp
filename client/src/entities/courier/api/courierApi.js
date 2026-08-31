@@ -76,3 +76,86 @@ export async function reviewCourierApplication({ userId, nextStatus, comment = "
     throw new Error(toMessage(e));
   }
 }
+
+/** @param {string} path @param {object} [body] */
+async function postCourierAction(path, body) {
+  try {
+    const { data } = await apiClient.post(path, body);
+    if (!data?.success || !data.data) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+    return data.data;
+  } catch (e) {
+    throw new Error(toMessage(e));
+  }
+}
+
+/** `GET /couriers/overview` — свободные отправления в регионе курьера. */
+export async function fetchCourierOverview({ lat = null, lon = null } = {}) {
+  try {
+    const params = {};
+    if (Number.isFinite(lat) && Number.isFinite(lon)) {
+      params.lat = lat;
+      params.lon = lon;
+    }
+    const { data } = await apiClient.get("/couriers/overview", { params });
+    if (!data?.success || !data.data) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+    return data.data;
+  } catch (e) {
+    throw new Error(toMessage(e));
+  }
+}
+
+/** `GET /couriers/my-deliveries` — активные доставки курьера. */
+export async function fetchMyCourierDeliveries() {
+  try {
+    const { data } = await apiClient.get("/couriers/my-deliveries");
+    if (!data?.success || !data.data) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+    return data.data;
+  } catch (e) {
+    throw new Error(toMessage(e));
+  }
+}
+
+const shipmentBase = (orderId, sellerId) =>
+  `/couriers/shipments/${orderId}/${sellerId}`;
+
+/** @param {{ orderId: string; sellerId: string }} ids */
+export const acceptCourierShipment = ({ orderId, sellerId }) =>
+  postCourierAction(`${shipmentBase(orderId, sellerId)}/accept`);
+
+/** Продавец выдаёт код передачи — ответ содержит четыре цифры. */
+export const issueHandoverCode = ({ orderId, sellerId }) =>
+  postCourierAction(`${shipmentBase(orderId, sellerId)}/handover-code`);
+
+export const confirmCourierHandover = ({ orderId, sellerId, code }) =>
+  postCourierAction(`${shipmentBase(orderId, sellerId)}/handover`, { code });
+
+export const startCourierDelivery = ({ orderId, sellerId }) =>
+  postCourierAction(`${shipmentBase(orderId, sellerId)}/start-delivery`);
+
+export const markCourierArrived = ({ orderId, sellerId }) =>
+  postCourierAction(`${shipmentBase(orderId, sellerId)}/arrived`);
+
+export const completeCourierDelivery = ({ orderId, sellerId, code }) =>
+  postCourierAction(`${shipmentBase(orderId, sellerId)}/complete`, { code });
+
+/** `PATCH /order/:orderId/shipment/:sellerId/delivery-fee` — покупатель поднимает сумму. */
+export async function raiseShipmentDeliveryFee({ orderId, sellerId, deliveryFeeRub }) {
+  try {
+    const { data } = await apiClient.patch(
+      `/order/${orderId}/shipment/${sellerId}/delivery-fee`,
+      { deliveryFeeRub },
+    );
+    if (!data?.success || !data.data?.order) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+    return data.data;
+  } catch (e) {
+    throw new Error(toMessage(e));
+  }
+}

@@ -6,7 +6,10 @@ import {
   markArrivedByCourier,
   startDeliveryByCourier,
 } from "../../services/courier/courierShipmentFlow.js";
-import { listCourierOverview } from "../../services/courier/courierOverview.js";
+import {
+  listCourierOverview,
+  listMyCourierDeliveries,
+} from "../../services/courier/courierOverview.js";
 import { raiseShipmentDeliveryFee } from "../../services/courier/courierDeliveryFee.js";
 import { sanitizeOrderForBuyerApi } from "../../services/order/buyerPassportShare.js";
 import { successRes } from "../../services/http/index.js";
@@ -102,4 +105,10 @@ export const raiseDeliveryFeeController = async (req, res) => {
     deliveryFeeRub: result.deliveryFeeRub,
     order: sanitizeOrderForBuyerApi(result.order),
   });
+};
+
+/** `GET /couriers/my-deliveries` — активные доставки курьера. */
+export const getMyCourierDeliveriesController = async (req, res) => {
+  const result = await listMyCourierDeliveries({ courierId: String(req.userId) });
+  return successRes(res, result);
 };

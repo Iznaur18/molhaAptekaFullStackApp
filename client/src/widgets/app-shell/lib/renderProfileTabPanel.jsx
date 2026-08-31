@@ -6,6 +6,7 @@ import {
   LazyDataConfirmationPage,
   LazyCourierApplicationPage,
   LazyCourierModerationPage,
+  LazyCourierOverviewPage,
   LazyDataConfirmationRequestsPage,
   LazyInstallmentDisputesPage,
   LazyInstallmentPaymentsPage,
@@ -291,6 +292,8 @@ export function renderProfileTabPanel(mainView, props) {
       );
     case "courier":
       return <LazyCourierApplicationPage />;
+    case "courier-overview":
+      return <LazyCourierOverviewPage />;
     case "courier-moderation":
       return (
         <LazyCourierModerationPage

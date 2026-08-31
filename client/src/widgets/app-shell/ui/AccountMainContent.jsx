@@ -73,6 +73,7 @@ export function AccountMainContent({
   onCreateRaffleClick,
   handleCourierFromProfile,
   handleCourierModerationFromProfile,
+  handleCourierOverviewFromProfile,
   handleDataConfirmationQueueFromProfile,
   handleDataConfirmationFromProfile,
   setIsDataConfirmationModalOpen,
@@ -205,6 +206,9 @@ export function AccountMainContent({
         onRafflesClick={canModerateProducts ? handleRafflesFromProfile : undefined}
         onCreateRaffleClick={onCreateRaffleClick}
         onCourierClick={isAuthorized ? handleCourierFromProfile : undefined}
+        onCourierOverviewClick={
+          isAuthorized ? handleCourierOverviewFromProfile : undefined
+        }
         onCourierModerationClick={
           canModerateProducts ? handleCourierModerationFromProfile : undefined
         }

@@ -31,6 +31,8 @@ export const PROFILE_SECTION_DATA_CONFIRMATION_REQUESTS = "data-confirmation-req
 /** Заявка курьера — обычный раздел профиля, отдельного кабинета у курьера нет. */
 export const PROFILE_SECTION_COURIER = "courier";
 export const PROFILE_SECTION_COURIER_MODERATION = "courier-moderation";
+/** «Обзор» — свободные заказы и активные доставки курьера. */
+export const PROFILE_SECTION_COURIER_OVERVIEW = "courier-overview";
 export const PROFILE_SECTION_INSTALLMENT_PAYMENTS = "installment-payments";
 export const PROFILE_SECTION_INSTALLMENT_SALES = "installment-sales";
 export const PROFILE_SECTION_INSTALLMENT_DISPUTES = "installment-disputes";
@@ -68,6 +70,7 @@ export const PROFILE_SECTION_IDS = [
   PROFILE_SECTION_DATA_CONFIRMATION_REQUESTS,
   PROFILE_SECTION_COURIER,
   PROFILE_SECTION_COURIER_MODERATION,
+  PROFILE_SECTION_COURIER_OVERVIEW,
   PROFILE_SECTION_INSTALLMENT_PAYMENTS,
   PROFILE_SECTION_INSTALLMENT_SALES,
   PROFILE_SECTION_INSTALLMENT_DISPUTES,

@@ -91,6 +91,7 @@ export function useMyProfileNav({
   onRafflesClick,
   onCourierClick,
   onCourierModerationClick,
+  onCourierOverviewClick,
   onDataConfirmationQueueClick,
   onInstallmentDisputesClick,
   onAdminOrdersClick,
@@ -178,6 +179,9 @@ export function useMyProfileNav({
   const canUseCourier = isProfileReady && Boolean(onCourierClick);
   const canUseCourierModeration =
     !isRegularUser && isProfileReady && Boolean(onCourierModerationClick);
+  // «Обзор» показываем только подтверждённому курьеру — остальным там пусто.
+  const canUseCourierOverview =
+    isProfileReady && user?.courierProfile?.moderationStatus === "approved";
   const canUseDataConfirmationQueue =
     !isRegularUser && isProfileReady && Boolean(onDataConfirmationQueueClick);
   const canUseInstallmentDisputes =
@@ -201,6 +205,7 @@ export function useMyProfileNav({
         canUseRaffles,
         canUseCourier,
         canUseCourierModeration,
+        canUseCourierOverview,
         canUseDataConfirmationQueue,
         canUseInstallmentDisputes,
         canUseAdminOrders,
@@ -252,6 +257,7 @@ export function useMyProfileNav({
         onRafflesClick,
         onCourierClick,
         onCourierModerationClick,
+        onCourierOverviewClick,
         onDataConfirmationQueueClick,
         onInstallmentDisputesClick,
         onAdminOrdersClick,
@@ -278,6 +284,7 @@ export function useMyProfileNav({
       canUseCategoryTreeAdmin,
       canUseCourier,
       canUseCourierModeration,
+      canUseCourierOverview,
       canUseCreateRaffle,
       canUseDataConfirmation,
       canUseDataConfirmationQueue,
@@ -313,6 +320,7 @@ export function useMyProfileNav({
       onDataConfirmationClick,
       onCourierClick,
       onCourierModerationClick,
+      onCourierOverviewClick,
       onDataConfirmationQueueClick,
       onEditProfileClick,
       onInstallmentDisputesClick,
