@@ -121,3 +121,37 @@ export const shipmentPaymentConfirmedBodySchema = z.object({
 });
 
 export const SELLER_PAYOUT_REQUISITES_MAX_LENGTH = 120;
+
+/** Синхрон с `server/constants/courierConstants.js`. */
+export const COURIER_DISPUTE_REASON_MAX_LENGTH = 500;
+
+/**
+ * Body `POST /couriers/shipments/:orderId/:sellerId/open-dispute`.
+ *
+ * Причина необязательна: спор чаще всего открывают, когда сказать нечего
+ * кроме «курьер пропал», а требовать текст значит задерживать сигнал.
+ */
+export const shipmentDisputeBodySchema = z.object({
+  reason: z
+    .string()
+    .trim()
+    .max(COURIER_DISPUTE_REASON_MAX_LENGTH)
+    .optional()
+    .default(""),
+});
+
+export const SHIPMENT_DISPUTE_OUTCOME_RETURNED = "returned";
+export const SHIPMENT_DISPUTE_OUTCOME_CONFIRMED = "confirmed";
+
+/** Body `POST /staff/shipment-disputes/:orderId/:sellerId/resolve`. */
+export const staffResolveDisputeBodySchema = z.object({
+  outcome: z.enum([
+    SHIPMENT_DISPUTE_OUTCOME_RETURNED,
+    SHIPMENT_DISPUTE_OUTCOME_CONFIRMED,
+  ]),
+});
+
+/** Query `GET /staff/shipment-disputes`. */
+export const staffDisputeListQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(100).optional().default(50),
+});

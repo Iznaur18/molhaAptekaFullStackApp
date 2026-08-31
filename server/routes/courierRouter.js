@@ -11,6 +11,8 @@ import {
   getMyCourierDeliveriesController,
   replaceShipmentCourierController,
   setShipmentPaymentConfirmedController,
+  declineShipmentController,
+  openShipmentDisputeController,
 } from "../controllers/index.js";
 import { checkAuthMW, orderItemActionRateLimiter } from "../middlewares/index.js";
 import {
@@ -19,6 +21,7 @@ import {
   courierShipmentValidation,
   courierOverviewValidation,
   shipmentPaymentConfirmedValidation,
+  shipmentDisputeValidation,
 } from "../validations/index.js";
 import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 
@@ -103,6 +106,23 @@ router.post(
   orderItemActionRateLimiter,
   courierHandoverCodeValidation,
   completeDeliveryController,
+);
+
+router.post(
+  `${shipmentBase}/decline`,
+  checkAuthMW,
+  orderItemActionRateLimiter,
+  courierShipmentValidation,
+  declineShipmentController,
+);
+// Спор открывают стороны сделки, а не курьер: у курьера для отказа есть
+// /decline, а с товаром на руках его слово тут ничего не решает.
+router.post(
+  `${shipmentBase}/open-dispute`,
+  checkAuthMW,
+  orderItemActionRateLimiter,
+  shipmentDisputeValidation,
+  openShipmentDisputeController,
 );
 
 export { router as courierRouter };

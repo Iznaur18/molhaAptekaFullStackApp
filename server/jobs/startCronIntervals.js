@@ -4,6 +4,7 @@ import { isBullMqEnabled } from "../queues/bullMqEnabled.js";
 
 import { ONEC_SYNC_INTERVAL_MS } from "../constants/onecConstants.js";
 import { ANALYTICS_RECONCILIATION_CRON_INTERVAL_MS } from "../constants/analyticsConstants.js";
+import { COURIER_STUCK_SHIPMENT_CRON_INTERVAL_MS } from "../constants/courierConstants.js";
 import { INSTALLMENT_CRON_INTERVAL_MS } from "../constants/installmentConstants.js";
 import { INTRO_AD_CRON_INTERVAL_MS } from "../constants/introAdCampaignConstants.js";
 import { PREMIUM_CRON_INTERVAL_MS } from "../constants/premiumConstants.js";
@@ -25,6 +26,7 @@ import { purgeExpiredBuyerPassportShares } from "../services/passport-vault/inde
 import { processProductPriceMarketStatusCronTasks } from "../services/product/refreshProductPriceMarketStatus.js";
 import { processOneCCronTasks } from "../services/onec/index.js";
 import { runAnalyticsReconciliation } from "../services/analytics/index.js";
+import { processCourierStuckShipmentCronTasks } from "../services/courier/courierStuckShipmentsCron.js";
 
 import { shouldRunCronOnThisProcess } from "./shouldRunCronOnThisProcess.js";
 
@@ -117,6 +119,11 @@ export function startCronIntervals() {
     "process_analytics_reconciliation",
     ANALYTICS_RECONCILIATION_CRON_INTERVAL_MS,
     runAnalyticsReconciliation,
+  );
+  scheduleCronJob(
+    "process_courier_stuck_shipments",
+    COURIER_STUCK_SHIPMENT_CRON_INTERVAL_MS,
+    processCourierStuckShipmentCronTasks,
   );
 
   return true;

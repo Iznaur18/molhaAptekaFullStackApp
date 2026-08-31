@@ -653,6 +653,12 @@ export {
   COURIER_DELIVERY_FEE_STEP_RUB,
   shipmentPaymentConfirmedBodySchema,
   SELLER_PAYOUT_REQUISITES_MAX_LENGTH,
+  shipmentDisputeBodySchema,
+  staffResolveDisputeBodySchema,
+  staffDisputeListQuerySchema,
+  COURIER_DISPUTE_REASON_MAX_LENGTH,
+  SHIPMENT_DISPUTE_OUTCOME_RETURNED,
+  SHIPMENT_DISPUTE_OUTCOME_CONFIRMED,
 } from "./courier.js";
 export {
   authMeDataSchema,

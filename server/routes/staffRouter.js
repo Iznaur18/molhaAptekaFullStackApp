@@ -4,10 +4,14 @@ import {
   postStaffBroadcastNotificationController,
   getStaffCourierApplicationsController,
   patchStaffCourierModerationController,
+  getStaffDisputesController,
+  postStaffResolveDisputeController,
 } from "../controllers/index.js";
 import {
   staffCourierListValidation,
   staffCourierModerationValidation,
+  staffDisputeListValidation,
+  staffResolveDisputeValidation,
 } from "../validations/index.js";
 import { checkProductModeratorMW } from "../middlewares/checkProductModeratorMW.js";
 import { staffBroadcastNotificationValidation } from "../validations/user/staffBroadcastNotificationValidation.js";
@@ -44,6 +48,22 @@ router.patch(
   checkProductModeratorMW,
   staffCourierModerationValidation,
   patchStaffCourierModerationController,
+);
+
+// Споры по отправлениям разбирают те же, кто модерирует курьеров.
+router.get(
+  "/shipment-disputes",
+  checkAuthMW,
+  checkProductModeratorMW,
+  staffDisputeListValidation,
+  getStaffDisputesController,
+);
+router.post(
+  "/shipment-disputes/:orderId/:sellerId/resolve",
+  checkAuthMW,
+  checkProductModeratorMW,
+  staffResolveDisputeValidation,
+  postStaffResolveDisputeController,
 );
 
 export { router as staffRouter };

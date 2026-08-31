@@ -133,7 +133,10 @@ describe("оформление возврата продавцом", () => {
   it("не даёт оформить возврат из «В обработке» — там отмена", async () => {
     const { seller, order } = await makeOrder();
 
-    await assert.rejects(() => doReturn(order, seller._id), /Отправлен|Доставлен/);
+    await assert.rejects(
+      () => doReturn(order, seller._id),
+      /пока товар в пути или вручён/,
+    );
   });
 
   it("не даёт чужому продавцу тронуть позицию", async () => {

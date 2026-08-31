@@ -46,6 +46,8 @@ export const ORDER_STATUS_READY_TO_SHIP = "ready_to_ship";
 export const ORDER_STATUS_COURIER_ASSIGNED = "courier_assigned";
 export const ORDER_STATUS_COURIER_HOLDING = "courier_holding";
 export const ORDER_STATUS_IN_DELIVERY = "in_delivery";
+/** Товар вне контроля: разбирается модератором. */
+export const ORDER_STATUS_DISPUTED = "disputed";
 
 export const ORDER_STATUSES = [
   ORDER_STATUS_PENDING,
@@ -61,6 +63,7 @@ export const ORDER_STATUSES = [
   ORDER_STATUS_DELIVERED,
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_RETURNED,
+  ORDER_STATUS_DISPUTED,
 ];
 
 export const ORDER_STATUS_LABEL_RU = {
@@ -77,6 +80,7 @@ export const ORDER_STATUS_LABEL_RU = {
   [ORDER_STATUS_DELIVERED]: "Доставлен",
   [ORDER_STATUS_CANCELLED]: "Отменён",
   [ORDER_STATUS_RETURNED]: "Возвращён",
+  [ORDER_STATUS_DISPUTED]: "Спор",
 };
 
 /**

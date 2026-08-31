@@ -82,6 +82,9 @@ import {
   courierOverviewValidation,
   shipmentDeliveryFeeValidation,
   shipmentPaymentConfirmedValidation,
+  shipmentDisputeValidation,
+  staffResolveDisputeValidation,
+  staffDisputeListValidation,
 } from "./courier/courierShipmentValidation.js";
 import { replaceMyCartValidation } from "./cart/replaceMyCartValidation.js";
 import { replaceMyFavoritesValidation } from "./favorites/replaceMyFavoritesValidation.js";
@@ -222,6 +225,9 @@ export {
   courierOverviewValidation,
   shipmentDeliveryFeeValidation,
   shipmentPaymentConfirmedValidation,
+  shipmentDisputeValidation,
+  staffResolveDisputeValidation,
+  staffDisputeListValidation,
   replaceMyCartValidation,
   replaceMyFavoritesValidation,
   userStoryIdParamValidation,

@@ -4,6 +4,9 @@ import {
   courierShipmentParamsSchema,
   shipmentDeliveryFeeBodySchema,
   shipmentPaymentConfirmedBodySchema,
+  shipmentDisputeBodySchema,
+  staffResolveDisputeBodySchema,
+  staffDisputeListQuerySchema,
 } from "@molha/api-contract";
 
 import { validateBodyZod } from "../../middlewares/validateBodyZod.js";
@@ -31,4 +34,18 @@ export const shipmentDeliveryFeeValidation = [
 export const shipmentPaymentConfirmedValidation = [
   validateParamsZod(courierShipmentParamsSchema),
   validateBodyZod(shipmentPaymentConfirmedBodySchema),
+];
+
+export const shipmentDisputeValidation = [
+  validateParamsZod(courierShipmentParamsSchema),
+  validateBodyZod(shipmentDisputeBodySchema),
+];
+
+export const staffResolveDisputeValidation = [
+  validateParamsZod(courierShipmentParamsSchema),
+  validateBodyZod(staffResolveDisputeBodySchema),
+];
+
+export const staffDisputeListValidation = [
+  validateQueryZod(staffDisputeListQuerySchema),
 ];

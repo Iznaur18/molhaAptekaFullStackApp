@@ -555,11 +555,12 @@ export async function markOrderItemReturned({
 
   if (
     previewItem.status !== ORDER_STATUS_SHIPPED &&
+    previewItem.status !== ORDER_STATUS_IN_DELIVERY &&
     previewItem.status !== ORDER_STATUS_DELIVERED
   ) {
     throw new AppError(
       409,
-      'Возврат оформляется только из статусов "Отправлен" или "Доставлен"',
+      "Возврат оформляется, только пока товар в пути или вручён",
     );
   }
 
@@ -574,11 +575,12 @@ export async function markOrderItemReturned({
     }
     if (
       txnItem.status !== ORDER_STATUS_SHIPPED &&
+      txnItem.status !== ORDER_STATUS_IN_DELIVERY &&
       txnItem.status !== ORDER_STATUS_DELIVERED
     ) {
       throw new AppError(
         409,
-        'Возврат оформляется только из статусов "Отправлен" или "Доставлен"',
+        "Возврат оформляется, только пока товар в пути или вручён",
       );
     }
 

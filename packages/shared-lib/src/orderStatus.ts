@@ -15,6 +15,8 @@ export const ORDER_STATUS_READY_TO_SHIP = "ready_to_ship";
 export const ORDER_STATUS_COURIER_ASSIGNED = "courier_assigned";
 export const ORDER_STATUS_COURIER_HOLDING = "courier_holding";
 export const ORDER_STATUS_IN_DELIVERY = "in_delivery";
+/** Товар вне контроля: разбирается модератором. */
+export const ORDER_STATUS_DISPUTED = "disputed";
 
 /** Совпадает с `ORDER_STATUS_LADDER_RANK` в `server/constants/orderConstants.js`. */
 const LADDER_RANK: Record<string, number> = {
@@ -47,6 +49,12 @@ export function buildOrderStatusFromItems(
 ): string {
   if (!Array.isArray(items) || items.length === 0) {
     return ORDER_STATUS_PENDING;
+  }
+
+  // Спор поднимается наверх: товар вне контроля, и это важнее того, на
+  // какой ступени стоят остальные позиции.
+  if (items.some((item) => String(item?.status) === ORDER_STATUS_DISPUTED)) {
+    return ORDER_STATUS_DISPUTED;
   }
 
   if (EVERY_IN(items, new Set([ORDER_STATUS_RETURNED]))) {

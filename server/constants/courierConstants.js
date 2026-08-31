@@ -79,3 +79,24 @@ export const COURIER_REPLACE_TOO_LATE_MESSAGE =
   "Товар уже у курьера — это возврат, а не смена курьера";
 export const COURIER_REPLACE_NO_COURIER_MESSAGE =
   "Курьер ещё не принял отправление";
+
+/** Сколько отправление может висеть у курьера, прежде чем это станет спором. */
+export const COURIER_STUCK_SHIPMENT_HOURS = 24;
+
+/** Как часто таймер ищет зависшие отправления. */
+export const COURIER_STUCK_SHIPMENT_CRON_INTERVAL_MS = 30 * 60 * 1000;
+
+export const COURIER_DISPUTE_REASON_MAX_LENGTH = 500;
+export const COURIER_DISPUTE_TOO_EARLY_MESSAGE =
+  "Спор открывают, когда товар уже у курьера";
+export const COURIER_DISPUTE_ALREADY_OPEN_MESSAGE = "Спор уже открыт";
+
+/** In-app: курьер отказался от принятой заявки. */
+export const IN_APP_NOTIFICATION_KIND_COURIER_DECLINED = "courier_declined";
+export const COURIER_DECLINED_MESSAGE =
+  "Курьер отказался от заказа — он снова в общем списке";
+
+/** In-app: по отправлению открыт спор. */
+export const IN_APP_NOTIFICATION_KIND_SHIPMENT_DISPUTED = "shipment_disputed";
+export const SHIPMENT_DISPUTED_MESSAGE =
+  "По заказу открыт спор — с ним разбирается модератор";

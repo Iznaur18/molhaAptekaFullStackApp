@@ -68,6 +68,12 @@ import {
   replaceShipmentCourierController,
   setShipmentPaymentConfirmedController,
 } from "./Courier/courierShipmentController.js";
+import {
+  declineShipmentController,
+  openShipmentDisputeController,
+  getStaffDisputesController,
+  postStaffResolveDisputeController,
+} from "./Courier/courierDisputeController.js";
 import { getAllOrdersController } from "./Order/getAllOrdersController.js";
 import { updateOrderStatusController } from "./Order/updateOrderStatusController.js";
 import {
@@ -378,7 +384,10 @@ export {
   getMyCourierDeliveriesController,
   replaceShipmentCourierController,
   setShipmentPaymentConfirmedController,
-  advanceMyShipmentStatusController,
+  declineShipmentController,
+  openShipmentDisputeController,
+  getStaffDisputesController,
+  postStaffResolveDisputeController,  advanceMyShipmentStatusController,
   markOrderItemReturnedBySellerController,
   markOrderItemShippedBySellerController,
   markOrderItemDeliveredBySellerController,

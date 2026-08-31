@@ -283,6 +283,15 @@ const OrderShipmentSchema = new mongoose.Schema(
     deliveryCode: { type: String, default: "" },
     deliveryCodeIssuedAt: { type: Date, default: null },
     deliveryAttempts: { type: Number, default: 0, min: 0 },
+    /** Спор: товар вне контроля, разбирается модератором. */
+    disputeOpenedAt: { type: Date, default: null },
+    disputeOpenedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    disputeReason: { type: String, default: "", trim: true, maxlength: 500 },
+    disputeResolvedAt: { type: Date, default: null },
     /** Курьеры, которым отказали по этому отправлению: назад их не пускаем. */
     declinedCourierIds: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],

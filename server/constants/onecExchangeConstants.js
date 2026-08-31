@@ -153,6 +153,7 @@ export const ONEC_ORDER_STATUS_LABELS = Object.freeze({
   delivered: "Доставлен",
   cancelled: "Отменён",
   returned: "Возвращён",
+  disputed: "Спор",
 });
 
 export const ONEC_PAYMENT_METHOD_LABELS = Object.freeze({

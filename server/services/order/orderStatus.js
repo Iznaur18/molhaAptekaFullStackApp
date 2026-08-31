@@ -1,5 +1,6 @@
 import {
   ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_DISPUTED,
   ORDER_STATUS_LADDER_RANK,
   ORDER_STATUS_PENDING,
   ORDER_STATUS_RETURNED,
@@ -119,6 +120,12 @@ export const normalizeOrderItemsForRuntime = (items) => {
  */
 export const buildOrderStatusFromItems = (items) => {
   if (!Array.isArray(items) || items.length === 0) return ORDER_STATUS_PENDING;
+
+  // Спор поднимается наверх: товар вне контроля, и это важнее того, на
+  // какой ступени стоят остальные позиции.
+  if (items.some((item) => item?.status === ORDER_STATUS_DISPUTED)) {
+    return ORDER_STATUS_DISPUTED;
+  }
 
   if (EVERY_IN(items, new Set([ORDER_STATUS_RETURNED]))) {
     return ORDER_STATUS_RETURNED;
