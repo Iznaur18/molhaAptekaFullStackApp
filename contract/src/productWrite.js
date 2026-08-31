@@ -9,6 +9,7 @@ import { storedMediaUrlOrEmptySchema, storedMediaUrlSchema } from "./storedMedia
 import {
   assertPickupCoordsPair,
   PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
+  PRODUCT_COURIER_DELIVERY_CONFLICT_MESSAGE,
   productPickupAddressFieldSchema,
   productPickupLatFieldSchema,
   productPickupLonFieldSchema,
@@ -249,6 +250,8 @@ export const createProductBodySchema = z
     productPickupLon: productPickupLonFieldSchema.nullable().optional(),
     productPickupEnabled: z.coerce.boolean().optional(),
     productDeliveryEnabled: z.coerce.boolean().optional(),
+  productCourierDeliveryEnabled: z.coerce.boolean().optional(),
+    productCourierDeliveryEnabled: z.coerce.boolean().optional(),
     productArticle: z.string().trim().max(64).optional(),
   })
   .superRefine(assertCreateProductRequiresPhoto)
@@ -258,7 +261,18 @@ export const createProductBodySchema = z
   .superRefine((body, ctx) => {
     const pickupOn = body.productPickupEnabled !== false;
     const deliveryOn = body.productDeliveryEnabled === true;
-    if (!pickupOn && !deliveryOn) {
+    const courierOn = body.productCourierDeliveryEnabled === true;
+
+    // Либо продавец везёт сам, либо отдаёт курьеру: смешение сделало бы
+    // непонятным, кому предлагать отправление в «Обзоре».
+    if (deliveryOn && courierOn) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["productCourierDeliveryEnabled"],
+        message: PRODUCT_COURIER_DELIVERY_CONFLICT_MESSAGE,
+      });
+    }
+    if (!pickupOn && !deliveryOn && !courierOn) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["productPickupEnabled"],

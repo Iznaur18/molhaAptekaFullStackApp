@@ -27,7 +27,7 @@ async function readyShipment() {
     {
       $set: {
         fulfillmentMethod: "delivery",
-        shipments: [{ sellerId: seller._id, fulfillmentMethod: "delivery" }],
+        shipments: [{ sellerId: seller._id, fulfillmentMethod: "delivery", courierDelivery: true }],
       },
     },
   );

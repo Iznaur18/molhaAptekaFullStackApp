@@ -85,7 +85,7 @@ describe("покупатель поднимает сумму", () => {
         $set: {
           fulfillmentMethod: "delivery",
           shipments: [
-            { sellerId: seller._id, fulfillmentMethod: "delivery", deliveryFeeRub: 100 },
+            { sellerId: seller._id, fulfillmentMethod: "delivery", courierDelivery: true, deliveryFeeRub: 100 },
           ],
         },
       },
@@ -212,6 +212,7 @@ describe("обзор курьера", () => {
             {
               sellerId: seller._id,
               fulfillmentMethod: "delivery",
+              courierDelivery: true,
               deliveryFeeRub: fee,
             },
           ],
@@ -257,7 +258,7 @@ describe("обзор курьера", () => {
       {
         $set: {
           fulfillmentMethod: "delivery",
-          shipments: [{ sellerId: seller._id, fulfillmentMethod: "delivery" }],
+          shipments: [{ sellerId: seller._id, fulfillmentMethod: "delivery", courierDelivery: true }],
         },
       },
     );

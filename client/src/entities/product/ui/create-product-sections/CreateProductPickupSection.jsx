@@ -33,6 +33,7 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
         locations={locations}
         pickupEnabled={form.productPickupEnabled !== false}
         deliveryEnabled={form.productDeliveryEnabled === true}
+        courierDeliveryEnabled={form.productCourierDeliveryEnabled === true}
         disabled={isSubmitting}
         savedAddresses={savedAddresses}
         onChange={(next) => {
@@ -46,6 +47,8 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
             ...legacy,
             productPickupEnabled: next.productPickupEnabled !== false,
             productDeliveryEnabled: next.productDeliveryEnabled === true,
+            productCourierDeliveryEnabled:
+              next.productCourierDeliveryEnabled === true,
             ...(next.productRegionCode
               ? { productRegionCode: next.productRegionCode }
               : {}),

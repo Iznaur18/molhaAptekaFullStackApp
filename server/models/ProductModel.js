@@ -287,6 +287,18 @@ const ProductSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    /**
+     * Доставку выполняют свободные курьеры Gitorg.
+     *
+     * Взаимоисключающе с `productDeliveryEnabled`: либо продавец везёт сам,
+     * либо отдаёт курьеру. Дефолт `false` намеренно — у существующих товаров
+     * с доставкой продавец возит сам, и отдавать их чужим людям без его
+     * ведома нельзя.
+     */
+    productCourierDeliveryEnabled: {
+      type: Boolean,
+      default: false,
+    },
     /** Самовывоз доступен покупателю (по умолчанию да). */
     productPickupEnabled: {
       type: Boolean,

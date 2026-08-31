@@ -57,6 +57,9 @@ const locateShipment = (order, sellerId) => {
   if (shipment.fulfillmentMethod !== ORDER_FULFILLMENT_DELIVERY) {
     throw new AppError(409, "Это отправление забирают самовывозом");
   }
+  if (shipment.courierDelivery !== true) {
+    throw new AppError(409, "Это отправление продавец везёт сам");
+  }
 
   return { shipment, items, status: buildOrderStatusFromItems(items) };
 };

@@ -226,7 +226,12 @@ export async function postProduct({
   const productDeliveryEnabled = resolveProductDeliveryEnabledForWrite(
     body?.productDeliveryEnabled,
   );
-  assertProductFulfillmentMethods(productPickupEnabled, productDeliveryEnabled);
+  // Взаимоисключение уже проверено схемой; здесь только сохраняем выбор.
+  const productCourierDeliveryEnabled = body?.productCourierDeliveryEnabled === true;
+  assertProductFulfillmentMethods(
+    productPickupEnabled,
+    productDeliveryEnabled || productCourierDeliveryEnabled,
+  );
 
   const productArticleRaw =
     productArticleOverride ??
@@ -252,6 +257,7 @@ export async function postProduct({
     productPickupLocations: salePickup.productPickupLocations,
     productPickupEnabled,
     productDeliveryEnabled,
+    productCourierDeliveryEnabled,
     productCategory: categoryWrite.productCategory,
     productCategoryId: categoryWrite.productCategoryId,
     categoryPathIds: categoryWrite.categoryPathIds,

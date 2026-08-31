@@ -125,6 +125,8 @@ export async function listCourierOverview({ courierId, lat = null, lon = null, l
   for (const order of orders) {
     for (const shipment of order.shipments ?? []) {
       if (shipment.fulfillmentMethod !== ORDER_FULFILLMENT_DELIVERY) continue;
+      // Продавец, который возит сам, курьеру своё отправление не отдавал.
+      if (shipment.courierDelivery !== true) continue;
       if (shipment.courierId) continue;
       if (
         (shipment.declinedCourierIds ?? []).some(

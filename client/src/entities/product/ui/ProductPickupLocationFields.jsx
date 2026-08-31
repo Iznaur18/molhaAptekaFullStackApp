@@ -55,6 +55,7 @@ function buildSelectedProfileIdSet(profileAddresses, selectedProfileIds) {
  *   locations: import('../lib/productPickupLocationsForm.js').ProductPickupLocationFormValue[];
  *   pickupEnabled?: boolean;
  *   deliveryEnabled: boolean;
+ *   courierDeliveryEnabled?: boolean;
  *   disabled?: boolean;
  *   savedAddresses?: Array<{
  *     id: string;
@@ -76,6 +77,7 @@ export function ProductPickupLocationFields({
   locations = [],
   pickupEnabled = true,
   deliveryEnabled,
+  courierDeliveryEnabled = false,
   disabled = false,
   savedAddresses = [],
   onChange,
@@ -105,7 +107,7 @@ export function ProductPickupLocationFields({
   const multiSelectEnabled = pickupEnabled;
   const maxLocations = multiSelectEnabled ? PRODUCT_PICKUP_LOCATIONS_MAX : 1;
   const canAddMoreLocations = list.length < maxLocations;
-  const showAddressSection = pickupEnabled || deliveryEnabled;
+  const showAddressSection = pickupEnabled || deliveryEnabled || courierDeliveryEnabled;
 
   const customLocations = useMemo(
     () => findCustomPickupLocations(list, profileAddresses),
@@ -123,6 +125,7 @@ export function ProductPickupLocationFields({
       productPickupLocations: list,
       productPickupEnabled: pickupEnabled,
       productDeliveryEnabled: deliveryEnabled,
+      productCourierDeliveryEnabled: courierDeliveryEnabled,
       ...patch,
     });
   };
@@ -445,7 +448,24 @@ export function ProductPickupLocationFields({
     if (deliveryEnabled && !pickupEnabled) {
       return;
     }
-    emit({ productDeliveryEnabled: !deliveryEnabled });
+    // Включая доставку продавцом, гасим курьеров: одно вместо другого.
+    emit({
+      productDeliveryEnabled: !deliveryEnabled,
+      ...(!deliveryEnabled ? { productCourierDeliveryEnabled: false } : {}),
+    });
+  };
+
+  const toggleCourierDelivery = () => {
+    if (disabled) {
+      return;
+    }
+    if (courierDeliveryEnabled && !pickupEnabled) {
+      return;
+    }
+    emit({
+      productCourierDeliveryEnabled: !courierDeliveryEnabled,
+      ...(!courierDeliveryEnabled ? { productDeliveryEnabled: false } : {}),
+    });
   };
 
   return (
@@ -623,6 +643,29 @@ export function ProductPickupLocationFields({
               : null}
           </span>
         </label>
+        <label
+          className={[
+            "product-pickup-location-fields__check",
+            courierDeliveryEnabled
+              ? "product-pickup-location-fields__check_on"
+              : "",
+            disabled ? "product-pickup-location-fields__check_disabled" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          <input
+            type="checkbox"
+            className="product-pickup-location-fields__checkbox"
+            checked={courierDeliveryEnabled}
+            disabled={disabled || (courierDeliveryEnabled && !pickupEnabled)}
+            onChange={toggleCourierDelivery}
+          />
+          <span className="product-pickup-location-fields__check-label">
+            {PRODUCT_PICKUP_UI.FULFILLMENT_COURIER}
+          </span>
+        </label>
+
       </div>
 
       <p className="product-pickup-location-fields__sublegend">

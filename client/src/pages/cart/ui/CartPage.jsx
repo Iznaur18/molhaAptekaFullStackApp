@@ -510,11 +510,11 @@ export function CartPage({
               onChange: (method) =>
                 chooseSellerFulfillment(group.sellerId, method),
             }}
-            deliveryFee={{
+            deliveryFee={group.courierDelivery ? {
               value:
                 deliveryFeeBySeller[group.sellerId] ?? CART_DELIVERY_FEE_UI.MIN_RUB,
               onChange: (next) => chooseDeliveryFee(group.sellerId, next),
-            }}
+            } : null}
             showDeliveryFeeNote={false}
           />
         ))}

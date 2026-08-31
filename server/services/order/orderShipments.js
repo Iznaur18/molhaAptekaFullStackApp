@@ -128,6 +128,7 @@ export const buildStoredShipments = (
   fulfillmentBySellerId,
   fallbackFulfillment = ORDER_FULFILLMENT_PICKUP,
   deliveryFeeBySellerId = null,
+  courierDeliveryBySellerId = null,
 ) => {
   const grouped = groupOrderItemsBySellerId(items);
   /** @type {Array<{ sellerId: string; fulfillmentMethod: "pickup" | "delivery" }>} */
@@ -148,6 +149,10 @@ export const buildStoredShipments = (
         method === ORDER_FULFILLMENT_DELIVERY
           ? (deliveryFeeBySellerId?.[bucket.sellerId] ?? 0)
           : 0,
+      // Только такие отправления попадают в «Обзор» курьера.
+      courierDelivery:
+        method === ORDER_FULFILLMENT_DELIVERY &&
+        courierDeliveryBySellerId?.[bucket.sellerId] === true,
     });
   }
 

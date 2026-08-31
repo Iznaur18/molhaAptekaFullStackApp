@@ -13,6 +13,7 @@
  *   lines: CartLine[];
  *   pickupAvailable: boolean;
  *   deliveryAvailable: boolean;
+ *   courierDelivery: boolean;
  *   defaultMethod: "pickup" | "delivery" | null;
  * }} CartSellerGroup
  */
@@ -50,6 +51,10 @@ export function groupCartLinesBySeller(visibleLines) {
       lines: [],
       pickupAvailable: true,
       deliveryAvailable: true,
+      // Курьеры Gitorg и доставка продавцом взаимоисключающи на товаре,
+      // но у продавца могут быть товары обоих видов — тогда группа не
+      // курьерская, и суммы курьеру в ней нет.
+      courierDelivery: true,
       defaultMethod: /** @type {"pickup" | "delivery" | null} */ ("pickup"),
     };
 
@@ -57,8 +62,14 @@ export function groupCartLinesBySeller(visibleLines) {
     if (product.productPickupEnabled === false) {
       group.pickupAvailable = false;
     }
-    if (product.productDeliveryEnabled !== true) {
+    if (
+      product.productDeliveryEnabled !== true &&
+      product.productCourierDeliveryEnabled !== true
+    ) {
       group.deliveryAvailable = false;
+    }
+    if (product.productCourierDeliveryEnabled !== true) {
+      group.courierDelivery = false;
     }
     if (!group.sellerName) {
       group.sellerName = resolveSellerName(line);

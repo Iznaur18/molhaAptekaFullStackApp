@@ -189,6 +189,11 @@ export const PRODUCT_PICKUP_UI = {
   FULFILLMENT_LEGEND: "Выберите способ получения",
   FULFILLMENT_PICKUP: "Самовывоз",
   FULFILLMENT_DELIVERY: "Доставка продавцом",
+  FULFILLMENT_COURIER: "Курьеры Gitorg",
+  FULFILLMENT_COURIER_HINT:
+    "Заказ заберёт свободный курьер. Сумму доставки назначает покупатель, вам платить не нужно.",
+  FULFILLMENT_CONFLICT_HINT:
+    "Выберите одно: везёте сами или отдаёте курьеру.",
   CARRIERS_LEGEND: "Выберите способ доставки",
   SOON_BADGE: " · скоро",
   METHODS_REQUIRED_HINT: "Можно выбрать несколько. Хотя бы один способ обязателен.",

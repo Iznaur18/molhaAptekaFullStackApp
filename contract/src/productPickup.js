@@ -40,6 +40,12 @@ export const PRODUCT_PICKUP_MISSING_FOR_ORDER_MESSAGE =
 export const PRODUCT_PICKUP_NOT_ENABLED_FOR_ITEMS_MESSAGE =
   "Самовывоз недоступен для одного или нескольких товаров в заказе";
 
+export const PRODUCT_COURIER_DELIVERY_CONFLICT_MESSAGE =
+  "Выберите одно: доставка продавцом или курьеры Gitorg";
+
+export const PRODUCT_COURIER_DELIVERY_NOT_ENABLED_MESSAGE =
+  "Курьеры Gitorg недоступны для одного или нескольких товаров в заказе";
+
 export const PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE =
   "Выберите хотя бы один способ: самовывоз или доставку";
 

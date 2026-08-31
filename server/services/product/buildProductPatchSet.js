@@ -236,6 +236,7 @@ const applyPickupFields = async (body, $set, $unset, existing) => {
   const touchesLat = hasBodyField(body, "productPickupLat");
   const touchesLon = hasBodyField(body, "productPickupLon");
   const touchesDelivery = hasBodyField(body, "productDeliveryEnabled");
+  const touchesCourier = hasBodyField(body, "productCourierDeliveryEnabled");
   const touchesPickupEnabled = hasBodyField(body, "productPickupEnabled");
 
   if (
@@ -244,6 +245,7 @@ const applyPickupFields = async (body, $set, $unset, existing) => {
     !touchesLat &&
     !touchesLon &&
     !touchesDelivery &&
+    !touchesCourier &&
     !touchesPickupEnabled
   ) {
     return;
@@ -254,6 +256,11 @@ const applyPickupFields = async (body, $set, $unset, existing) => {
       $set.productDeliveryEnabled = resolveProductDeliveryEnabledForWrite(
         body.productDeliveryEnabled,
       );
+    }
+
+    if (touchesCourier) {
+      $set.productCourierDeliveryEnabled =
+        body.productCourierDeliveryEnabled === true;
     }
 
     if (touchesPickupEnabled) {

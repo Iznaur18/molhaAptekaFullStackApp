@@ -171,7 +171,7 @@ const fetchAvailableProductsForOrder = async (productIds) => {
     productStockQuantity: { $gt: 0 },
   })
     .select(
-      "_id productPrice productName loyaltyPointsPerUnit productSeller productPickupAddress productPickupLat productPickupLon productPickupLocations productPickupEnabled productDeliveryEnabled productWholesaleEnabled productWholesaleMinQty productWholesalePrice affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
+      "_id productPrice productName loyaltyPointsPerUnit productSeller productPickupAddress productPickupLat productPickupLon productPickupLocations productPickupEnabled productDeliveryEnabled productCourierDeliveryEnabled productWholesaleEnabled productWholesaleMinQty productWholesalePrice affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
     )
     .lean();
 
@@ -194,6 +194,7 @@ const fetchAvailableProductsForOrder = async (productIds) => {
       productPickupLocations: product.productPickupLocations,
       pickupEnabled: product.productPickupEnabled !== false,
       deliveryEnabled: product.productDeliveryEnabled === true,
+      courierDeliveryEnabled: product.productCourierDeliveryEnabled === true,
       wholesaleEnabled: product.productWholesaleEnabled === true,
       wholesaleMinQty: product.productWholesaleMinQty ?? null,
       wholesalePrice: product.productWholesalePrice ?? null,
@@ -244,10 +245,41 @@ const assertSellersOpenForProducts = async (productById) => {
  */
 const assertProductsSupportDelivery = (productById, productIds) => {
   for (const id of productIds) {
-    if (!productById[id]?.deliveryEnabled) {
+    const snapshot = productById[id];
+    if (!snapshot?.deliveryEnabled && !snapshot?.courierDeliveryEnabled) {
       throw new AppError(400, PRODUCT_DELIVERY_NOT_ENABLED_FOR_ITEMS_MESSAGE);
     }
   }
+};
+
+/**
+ * Кто везёт отправление продавца: свободный курьер или он сам.
+ *
+ * Флаги на товаре взаимоисключающие, но у одного продавца могут быть товары
+ * обоих видов. Смешивать их в одном отправлении нельзя: непонятно, кому его
+ * предлагать.
+ *
+ * @param {Record<string, { sellerId?: string; courierDeliveryEnabled?: boolean }>} productById
+ * @param {string[]} deliveryProductIds
+ * @returns {Record<string, boolean>}
+ */
+const resolveCourierDeliveryBySeller = (productById, deliveryProductIds) => {
+  /** @type {Record<string, boolean>} */
+  const bySeller = {};
+  for (const id of deliveryProductIds) {
+    const snapshot = productById[id];
+    const sellerId = String(snapshot?.sellerId ?? "");
+    if (!sellerId) continue;
+    const byCourier = snapshot?.courierDeliveryEnabled === true;
+    if (sellerId in bySeller && bySeller[sellerId] !== byCourier) {
+      throw new AppError(
+        400,
+        "У одного продавца нельзя смешивать доставку продавцом и курьерами Gitorg",
+      );
+    }
+    bySeller[sellerId] = byCourier;
+  }
+  return bySeller;
 };
 
 /**
@@ -384,7 +416,7 @@ export async function createOrder({
       );
       const product = await ProductModel.findById(productId)
         .select(
-          "loyaltyPointsPerUnit productSeller productPickupAddress productPickupLat productPickupLon productPickupLocations productPickupEnabled productDeliveryEnabled affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
+          "loyaltyPointsPerUnit productSeller productPickupAddress productPickupLat productPickupLon productPickupLocations productPickupEnabled productDeliveryEnabled productCourierDeliveryEnabled affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
         )
         .lean();
       if (!product) {
@@ -404,6 +436,7 @@ export async function createOrder({
         productPickupLocations: product.productPickupLocations,
         pickupEnabled: product.productPickupEnabled !== false,
         deliveryEnabled: product.productDeliveryEnabled === true,
+      courierDeliveryEnabled: product.productCourierDeliveryEnabled === true,
         wholesaleEnabled: false,
         wholesaleMinQty: null,
         wholesalePrice: null,
@@ -450,6 +483,10 @@ export async function createOrder({
   // Проверяем каждую половину своим правилом: в смешанном заказе товар
   // самовывозного продавца не обязан поддерживать доставку, и наоборот.
   assertProductsSupportDelivery(productById, fulfillmentSplit.deliveryProductIds);
+  const courierDeliveryBySeller = resolveCourierDeliveryBySeller(
+    productById,
+    fulfillmentSplit.deliveryProductIds,
+  );
   assertProductsSupportPickup(productById, fulfillmentSplit.pickupProductIds);
 
   /** @type {Record<string, { id: string; address: string; lat: number | null; lon: number | null }> | null} */
@@ -570,6 +607,7 @@ export async function createOrder({
                 fulfillmentBySellerId: fulfillmentSplit.fulfillmentBySellerId,
                 feeBySellerId: deliveryFeeBySellerId,
               }),
+              courierDeliveryBySeller,
             ),
             paymentMethod,
             status: orderStatus,

@@ -4,6 +4,7 @@ import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { isRuRegionCode } from "@molha/api-contract";
 import {
   PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
+  PRODUCT_COURIER_DELIVERY_CONFLICT_MESSAGE,
 } from "@molha/api-contract";
 import {
   legacyPickupFieldsFromLocations,
@@ -164,8 +165,13 @@ export function prepareCreateProductSubmit({
 
   const productPickupEnabled = form.productPickupEnabled !== false;
   const productDeliveryEnabled = form.productDeliveryEnabled === true;
-  if (!productPickupEnabled && !productDeliveryEnabled) {
+  const productCourierDeliveryEnabled = form.productCourierDeliveryEnabled === true;
+  if (!productPickupEnabled && !productDeliveryEnabled && !productCourierDeliveryEnabled) {
     return { ok: false, message: PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE };
+  }
+  // Либо продавец везёт сам, либо отдаёт курьеру.
+  if (productDeliveryEnabled && productCourierDeliveryEnabled) {
+    return { ok: false, message: PRODUCT_COURIER_DELIVERY_CONFLICT_MESSAGE };
   }
 
   if (form.productReturnEnabled == null) {
@@ -209,6 +215,7 @@ export function prepareCreateProductSubmit({
       ...pickupLocationFields,
       productPickupEnabled,
       productDeliveryEnabled,
+      productCourierDeliveryEnabled,
       productReturnEnabled,
       productReturnTerms,
     };
@@ -247,6 +254,7 @@ export function prepareCreateProductSubmit({
       ...pickupLocationFields,
       productPickupEnabled,
       productDeliveryEnabled,
+      productCourierDeliveryEnabled,
       productReturnEnabled,
       productReturnTerms,
     },
