@@ -144,10 +144,15 @@ export const ONEC_IMPORT_MAX_CHARACTERISTICS = 30;
  */
 export const ONEC_ORDER_STATUS_LABELS = Object.freeze({
   pending: "Новый",
+  accepted: "Принят",
+  assembling: "На сборке",
+  ready_for_pickup: "Готов к выдаче",
+  ready_to_ship: "Готов к отгрузке",
   confirmed: "Подтверждён",
   shipped: "Отправлен",
   delivered: "Доставлен",
   cancelled: "Отменён",
+  returned: "Возвращён",
 });
 
 export const ONEC_PAYMENT_METHOD_LABELS = Object.freeze({
