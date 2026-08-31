@@ -6,13 +6,13 @@ import {
 } from "../../services/courier/courierApplication.js";
 import { successRes } from "../../services/http/index.js";
 
-/** `GET /courier/me` — статус собственной заявки курьера. */
+/** `GET /couriers/me` — статус собственной заявки курьера. */
 export const getMyCourierProfileController = async (req, res) => {
   const profile = await getMyCourierProfile(String(req.userId));
   return successRes(res, { courier: profile });
 };
 
-/** `POST /courier/application` — подать или переподать заявку. */
+/** `POST /couriers/application` — подать или переподать заявку. */
 export const submitCourierApplicationController = async (req, res) => {
   const profile = await submitCourierApplication({
     userId: String(req.userId),

@@ -13,6 +13,7 @@ export const STAFF_SECTION_IDS = [
   "product-promotions",
   "staff-raffles",
   "data-confirmation-requests",
+  "courier-moderation",
   "installment-disputes",
 ] as const;
 
@@ -38,6 +39,8 @@ const STAFF_ACCESS: Record<StaffSectionId, StaffAccessRule> = {
   "product-promotions": { requireAdmin: false, requireModerator: true },
   "staff-raffles": { requireAdmin: false, requireModerator: true },
   "data-confirmation-requests": { requireAdmin: false, requireModerator: true },
+  // Модерация курьеров — как модерация товаров: админ и модератор.
+  "courier-moderation": { requireAdmin: false, requireModerator: true },
   "installment-disputes": { requireAdmin: false, requireModerator: true },
 };
 

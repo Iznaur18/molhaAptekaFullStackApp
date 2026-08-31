@@ -71,6 +71,8 @@ export function AccountMainContent({
   handleProductPromotionsFromProfile,
   handleRafflesFromProfile,
   onCreateRaffleClick,
+  handleCourierFromProfile,
+  handleCourierModerationFromProfile,
   handleDataConfirmationQueueFromProfile,
   handleDataConfirmationFromProfile,
   setIsDataConfirmationModalOpen,
@@ -202,6 +204,10 @@ export function AccountMainContent({
         }
         onRafflesClick={canModerateProducts ? handleRafflesFromProfile : undefined}
         onCreateRaffleClick={onCreateRaffleClick}
+        onCourierClick={isAuthorized ? handleCourierFromProfile : undefined}
+        onCourierModerationClick={
+          canModerateProducts ? handleCourierModerationFromProfile : undefined
+        }
         onDataConfirmationQueueClick={
           canModerateProducts ? handleDataConfirmationQueueFromProfile : undefined
         }

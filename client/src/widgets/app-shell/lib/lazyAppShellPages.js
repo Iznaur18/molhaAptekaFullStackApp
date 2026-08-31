@@ -30,6 +30,16 @@ export const LazyDataConfirmationRequestsPage = lazyNamedExport(
   "DataConfirmationRequestsPage",
 );
 
+export const LazyCourierApplicationPage = lazyNamedExport(
+  () => import("../../../pages/courier/ui/CourierApplicationPage.jsx"),
+  "CourierApplicationPage",
+);
+
+export const LazyCourierModerationPage = lazyNamedExport(
+  () => import("../../../pages/courier-moderation/ui/CourierModerationPage.jsx"),
+  "CourierModerationPage",
+);
+
 export const LazyInstallmentPaymentsPage = lazyNamedExport(
   () => import("../../../pages/installment-payments/ui/InstallmentPaymentsPage.jsx"),
   "InstallmentPaymentsPage",

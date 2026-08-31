@@ -10,6 +10,8 @@ import {
   PROFILE_TAB_AUCTION,
   PROFILE_TAB_DATA_CONFIRMATION,
   PROFILE_TAB_DATA_CONFIRMATION_REQUESTS,
+  PROFILE_TAB_COURIER,
+  PROFILE_TAB_COURIER_MODERATION,
   PROFILE_TAB_INSTALLMENT_DISPUTES,
   PROFILE_TAB_INSTALLMENT_PAYMENTS,
   PROFILE_TAB_INSTALLMENT_SALES,
@@ -135,6 +137,14 @@ export const useHomeProfileNavigation = ({
     navigateFromProfileTab(PROFILE_TAB_AUCTION);
   }, [navigateFromProfileTab]);
 
+  const handleCourierFromProfile = useCallback(() => {
+    navigateFromProfileTab(PROFILE_TAB_COURIER);
+  }, [navigateFromProfileTab]);
+
+  const handleCourierModerationFromProfile = useCallback(() => {
+    navigateFromProfileTab(PROFILE_TAB_COURIER_MODERATION);
+  }, [navigateFromProfileTab]);
+
   const handleDataConfirmationQueueFromProfile = useCallback(() => {
     navigateFromProfileTab(PROFILE_TAB_DATA_CONFIRMATION_REQUESTS);
   }, [navigateFromProfileTab]);
@@ -226,6 +236,8 @@ export const useHomeProfileNavigation = ({
 
     handleAuctionFromProfile,
 
+    handleCourierFromProfile,
+    handleCourierModerationFromProfile,
     handleDataConfirmationQueueFromProfile,
 
     handleDataConfirmationFromProfile,

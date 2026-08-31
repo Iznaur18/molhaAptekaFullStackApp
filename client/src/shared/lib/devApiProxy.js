@@ -13,6 +13,9 @@ export const DEV_API_PROXY_PREFIXES = [
   "/user",
   "/vote",
   "/order",
+  // Множественное число намеренно: SPA-роуты /become-courier и
+  // /courier-moderation не должны попадать в прокси по префиксу.
+  "/couriers",
   "/product",
   "/installment",
   "/price-offers",

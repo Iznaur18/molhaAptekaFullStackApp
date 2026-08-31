@@ -4,6 +4,8 @@ import {
   LazyAuctionPage,
   LazyCategoryTreeAdminPage,
   LazyDataConfirmationPage,
+  LazyCourierApplicationPage,
+  LazyCourierModerationPage,
   LazyDataConfirmationRequestsPage,
   LazyInstallmentDisputesPage,
   LazyInstallmentPaymentsPage,
@@ -285,6 +287,14 @@ export function renderProfileTabPanel(mainView, props) {
         <LazyDataConfirmationRequestsPage
           onApplicantClick={onSellerNameClick}
           onQueueChanged={() => void refreshPendingDataConfirmationCount()}
+        />
+      );
+    case "courier":
+      return <LazyCourierApplicationPage />;
+    case "courier-moderation":
+      return (
+        <LazyCourierModerationPage
+          onApplicantClick={onSellerNameClick}
         />
       );
     case "installment-disputes":

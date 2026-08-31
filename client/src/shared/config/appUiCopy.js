@@ -91,6 +91,7 @@ export {
   MY_SALES_PAGE_UI,
   ADMIN_ORDERS_PAGE_UI,
 } from "./copy/orders.js";
+export { COURIER_UI, COURIER_MODERATION_UI } from "./copy/courier.js";
 export {
   AUCTION_PAGE_UI,
 } from "./copy/auction.js";

@@ -89,6 +89,8 @@ export function useMyProfileNav({
   onProductReportsClick,
   onProductPromotionsClick,
   onRafflesClick,
+  onCourierClick,
+  onCourierModerationClick,
   onDataConfirmationQueueClick,
   onInstallmentDisputesClick,
   onAdminOrdersClick,
@@ -172,6 +174,10 @@ export function useMyProfileNav({
     isProfileReady &&
     user?.isUserDataConfirmed === true &&
     Boolean(onCreateRaffleClick);
+  // Курьером может стать любой авторизованный; модерация — стаффу.
+  const canUseCourier = isProfileReady && Boolean(onCourierClick);
+  const canUseCourierModeration =
+    !isRegularUser && isProfileReady && Boolean(onCourierModerationClick);
   const canUseDataConfirmationQueue =
     !isRegularUser && isProfileReady && Boolean(onDataConfirmationQueueClick);
   const canUseInstallmentDisputes =
@@ -193,6 +199,8 @@ export function useMyProfileNav({
         canUseProductReports,
         canUseProductPromotions,
         canUseRaffles,
+        canUseCourier,
+        canUseCourierModeration,
         canUseDataConfirmationQueue,
         canUseInstallmentDisputes,
         canUseAdminOrders,
@@ -242,6 +250,8 @@ export function useMyProfileNav({
         onProductReportsClick,
         onProductPromotionsClick,
         onRafflesClick,
+        onCourierClick,
+        onCourierModerationClick,
         onDataConfirmationQueueClick,
         onInstallmentDisputesClick,
         onAdminOrdersClick,
@@ -266,6 +276,8 @@ export function useMyProfileNav({
       canUseAppIntroAdmin,
       canUsePopularProductsAdmin,
       canUseCategoryTreeAdmin,
+      canUseCourier,
+      canUseCourierModeration,
       canUseCreateRaffle,
       canUseDataConfirmation,
       canUseDataConfirmationQueue,
@@ -299,6 +311,8 @@ export function useMyProfileNav({
       onCategoryTreeAdminClick,
       onCreateRaffleClick,
       onDataConfirmationClick,
+      onCourierClick,
+      onCourierModerationClick,
       onDataConfirmationQueueClick,
       onEditProfileClick,
       onInstallmentDisputesClick,

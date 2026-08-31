@@ -8,7 +8,7 @@ import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 
 const router = createAsyncRouter();
 
-// путь в createApp: /courier
+// путь в createApp: /couriers
 router.get("/me", checkAuthMW, getMyCourierProfileController);
 router.post(
   "/application",

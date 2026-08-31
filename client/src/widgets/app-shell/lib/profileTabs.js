@@ -32,6 +32,9 @@ export const PROFILE_TAB_PRODUCT_REPORTS = "product-reports";
 export const PROFILE_TAB_PRODUCT_PROMOTIONS = "product-promotions";
 export const PROFILE_TAB_RAFFLES = "raffles";
 export const PROFILE_TAB_DATA_CONFIRMATION_REQUESTS = "data-confirmation-requests";
+/** Заявка курьера — в обычном профиле, отдельного кабинета у курьера нет. */
+export const PROFILE_TAB_COURIER = "courier";
+export const PROFILE_TAB_COURIER_MODERATION = "courier-moderation";
 export const PROFILE_TAB_INSTALLMENT_PAYMENTS = "installment-payments";
 export const PROFILE_TAB_INSTALLMENT_SALES = "installment-sales";
 export const PROFILE_TAB_INSTALLMENT_DISPUTES = "installment-disputes";
@@ -80,6 +83,8 @@ export const PROFILE_TAB_VALUES = [
   PROFILE_TAB_PRODUCT_PROMOTIONS,
   PROFILE_TAB_RAFFLES,
   PROFILE_TAB_DATA_CONFIRMATION_REQUESTS,
+  PROFILE_TAB_COURIER,
+  PROFILE_TAB_COURIER_MODERATION,
   PROFILE_TAB_INSTALLMENT_PAYMENTS,
   PROFILE_TAB_INSTALLMENT_SALES,
   PROFILE_TAB_INSTALLMENT_DISPUTES,

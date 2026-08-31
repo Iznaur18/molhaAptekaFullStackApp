@@ -1,0 +1,131 @@
+.courier-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1rem;
+}
+
+.courier-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.courier-page__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.courier-page__status {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: var(--iz-color-bg-subtle, rgba(0, 0, 0, 0.06));
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
+.courier-page__status--approved {
+  background: rgba(31, 94, 75, 0.14);
+  color: #1f5e4b;
+}
+
+.courier-page__status--pending {
+  background: rgba(169, 76, 23, 0.14);
+  color: #a94c17;
+}
+
+.courier-page__status--rejected {
+  background: rgba(190, 40, 40, 0.14);
+  color: #be2828;
+}
+
+.courier-page__intro,
+.courier-page__privacy,
+.courier-page__hint {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
+.courier-page__privacy {
+  font-size: 0.82rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--iz-color-border);
+}
+
+.courier-page__warning,
+.courier-page__rejection,
+.courier-page__error {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  background: rgba(190, 40, 40, 0.1);
+  color: #be2828;
+}
+
+.courier-page__approved {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: rgba(31, 94, 75, 0.12);
+  color: #1f5e4b;
+}
+
+.courier-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.courier-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--iz-color-text);
+}
+
+.courier-page__field input {
+  font: inherit;
+  font-weight: 400;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 8px;
+  background: var(--iz-color-surface, transparent);
+  color: var(--iz-color-text);
+}
+
+.courier-page__field input:disabled {
+  opacity: 0.6;
+}
+
+.courier-page__submit {
+  font: inherit;
+  font-weight: 700;
+  padding: 0.7rem 1rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--iz-color-accent, #f2542d);
+  color: #fff;
+  cursor: pointer;
+}
+
+.courier-page__submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.courier-page__loading {
+  padding: 1rem;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}

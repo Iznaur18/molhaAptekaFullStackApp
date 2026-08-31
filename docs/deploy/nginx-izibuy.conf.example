@@ -160,6 +160,17 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    # Множественное число намеренно: SPA-роуты /become-courier и
+    # /courier-moderation не должны попадать в API по префиксу.
+    location /couriers {
+        proxy_pass http://izibuy_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
     # SPA document: /product/:mongoId — люди → index.html; crawler → API (OG).
     location ~ "^/product/[a-fA-F\d]{24}$" {
         error_page 418 = @gitorg_api_proxy;
