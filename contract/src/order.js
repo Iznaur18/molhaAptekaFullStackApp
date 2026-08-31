@@ -75,6 +75,15 @@ export const createOrderBodySchema = z
       .max(ORDER_DELIVERY_FLAT_MAX_LENGTH)
       .optional()
       .default(""),
+    /**
+     * Способ получения на продавца — заказ распадается на отправления, и у
+     * каждого свой способ. Чего покупатель не прислал, берётся из общего
+     * `fulfillmentMethod`, поэтому старые клиенты работают без изменений.
+     */
+    fulfillmentBySellerId: z
+      .record(z.enum(["pickup", "delivery"]))
+      .optional()
+      .default({}),
     /** Выбор точки самовывоза на товар (при ≥2 точках у товара). */
     pickupSelections: z
       .array(orderPickupSelectionSchema)
@@ -123,7 +132,12 @@ export const createOrderBodySchema = z
       seenPickupProductIds.add(productId);
     }
 
-    if (body.fulfillmentMethod === "delivery") {
+    // Адрес нужен, как только хоть одно отправление едет к покупателю —
+    // даже если общий способ заказа остался самовывозом.
+    const anySellerDelivery = Object.values(body.fulfillmentBySellerId ?? {}).some(
+      (method) => method === "delivery",
+    );
+    if (body.fulfillmentMethod === "delivery" || anySellerDelivery) {
       const line = String(body.deliveryAddress ?? "").trim();
       if (!line) {
         ctx.addIssue({

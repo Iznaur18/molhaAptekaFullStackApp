@@ -7,6 +7,7 @@ import {
   PRODUCT_PICKUP_NOT_ENABLED_FOR_ITEMS_MESSAGE,
 } from "@molha/api-contract";
 import { buildStoredShipments } from "./orderShipments.js";
+import { resolveOrderFulfillmentSplit } from "./resolveOrderFulfillmentSplit.js";
 import { USER_BLOCK_CART_ORDER_MESSAGE } from "../../constants/userBlockConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { AppError } from "../../errors/AppError.js";
@@ -349,6 +350,7 @@ export async function createOrder({
   paymentMethod,
   priceOfferId,
   fulfillmentMethod = ORDER_FULFILLMENT_PICKUP,
+  fulfillmentBySellerId = null,
   pickupSelections = [],
   verifiedDeliveryAddress = null,
   affiliateCode = null,
@@ -434,27 +436,36 @@ export async function createOrder({
   await assertBuyerNotBlockedForProducts(String(userId), productById);
   await assertSellersOpenForProducts(productById);
 
-  const resolvedFulfillment =
-    fulfillmentMethod === "delivery" ? "delivery" : ORDER_FULFILLMENT_PICKUP;
+  const fulfillmentSplit = resolveOrderFulfillmentSplit({
+    productIds: uniqueProductIds,
+    productById,
+    fulfillmentBySellerId,
+    fallbackFulfillment:
+      fulfillmentMethod === "delivery" ? "delivery" : ORDER_FULFILLMENT_PICKUP,
+  });
+  const resolvedFulfillment = fulfillmentSplit.orderFulfillmentMethod;
 
-  if (resolvedFulfillment === "delivery") {
-    assertProductsSupportDelivery(productById, uniqueProductIds);
-  } else {
-    assertProductsSupportPickup(productById, uniqueProductIds);
-  }
+  // Проверяем каждую половину своим правилом: в смешанном заказе товар
+  // самовывозного продавца не обязан поддерживать доставку, и наоборот.
+  assertProductsSupportDelivery(productById, fulfillmentSplit.deliveryProductIds);
+  assertProductsSupportPickup(productById, fulfillmentSplit.pickupProductIds);
 
   /** @type {Record<string, { id: string; address: string; lat: number | null; lon: number | null }> | null} */
   let pickupByProductId = null;
   let addressForOrder = verifiedDeliveryAddress;
 
-  if (resolvedFulfillment === ORDER_FULFILLMENT_PICKUP) {
+  if (fulfillmentSplit.hasPickup) {
     const resolvedPickup = resolvePickupSelectionsByProductId(
       productById,
-      uniqueProductIds,
+      fulfillmentSplit.pickupProductIds,
       pickupSelections,
     );
     pickupByProductId = resolvedPickup.pickupByProductId;
-    addressForOrder = resolvedPickup.addressForOrder;
+    // Адрес заказа — покупательский, как только хоть что-то едет к нему.
+    // Точки самовывоза при этом никуда не деваются: они лежат на позициях.
+    if (!fulfillmentSplit.hasDelivery) {
+      addressForOrder = resolvedPickup.addressForOrder;
+    }
   }
 
   if (!addressForOrder?.displayAddress) {
@@ -524,7 +535,9 @@ export async function createOrder({
         },
         promoByProductId,
         freeUnitsByProductId,
-        resolvedFulfillment === ORDER_FULFILLMENT_PICKUP ? pickupByProductId : null,
+        // Мапа уже содержит только самовывозные товары — доставочные позиции
+        // точку получения не получат даже в смешанном заказе.
+        pickupByProductId,
       );
       const totalAmount = calculateTotalAmount(pricedItems);
       const orderStatus = buildOrderStatusFromItems(pricedItems);
@@ -547,7 +560,11 @@ export async function createOrder({
             deliveryAddressFlat: addressForOrder.flat ?? "",
             deliveryAddressFiasId: addressForOrder.fiasId ?? "",
             fulfillmentMethod: resolvedFulfillment,
-            shipments: buildStoredShipments(pricedItems, null, resolvedFulfillment),
+            shipments: buildStoredShipments(
+              pricedItems,
+              fulfillmentSplit.fulfillmentBySellerId,
+              resolvedFulfillment,
+            ),
             paymentMethod,
             status: orderStatus,
             priceOfferId: linkedPriceOfferId,
