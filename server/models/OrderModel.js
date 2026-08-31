@@ -234,6 +234,33 @@ const OrderShipmentSchema = new mongoose.Schema(
       enum: ["pickup", "delivery"],
       default: "pickup",
     },
+    /** Курьер, принявший отправление в «Обзоре». */
+    courierId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    courierAssignedAt: { type: Date, default: null },
+    /**
+     * Коды передачи. Продавец показывает свой курьеру, покупатель — свой при
+     * вручении: последовательных кнопок мало, продавец мог бы объявить
+     * передачу, пока курьер ещё едет.
+     *
+     * Храним как есть, а не хешем: код надо показать тому, кто его называет,
+     * и он живёт минуты. Защита — счётчик попыток, а не необратимость.
+     */
+    handoverCode: { type: String, default: "" },
+    handoverCodeIssuedAt: { type: Date, default: null },
+    handoverAttempts: { type: Number, default: 0, min: 0 },
+    /** Код вручения покупателю: генерируется при `delivered`. */
+    deliveryCode: { type: String, default: "" },
+    deliveryCodeIssuedAt: { type: Date, default: null },
+    deliveryAttempts: { type: Number, default: 0, min: 0 },
+    /** Курьеры, которым отказали по этому отправлению: назад их не пускаем. */
+    declinedCourierIds: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+      default: [],
+    },
   },
   { _id: false },
 );

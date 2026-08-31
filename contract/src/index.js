@@ -641,6 +641,9 @@ export {
   staffCourierListQuerySchema,
   staffCourierParamsSchema,
   staffCourierModerationBodySchema,
+  courierShipmentParamsSchema,
+  courierHandoverCodeBodySchema,
+  COURIER_HANDOVER_CODE_LENGTH,
 } from "./courier.js";
 export {
   authMeDataSchema,

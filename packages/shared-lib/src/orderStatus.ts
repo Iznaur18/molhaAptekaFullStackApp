@@ -11,6 +11,10 @@ export const ORDER_STATUS_ASSEMBLING = "assembling";
 /** Развилка лестниц: самовывоз ждут на точке, доставку — отгружают. */
 export const ORDER_STATUS_READY_FOR_PICKUP = "ready_for_pickup";
 export const ORDER_STATUS_READY_TO_SHIP = "ready_to_ship";
+/** Ступени курьера. */
+export const ORDER_STATUS_COURIER_ASSIGNED = "courier_assigned";
+export const ORDER_STATUS_COURIER_HOLDING = "courier_holding";
+export const ORDER_STATUS_IN_DELIVERY = "in_delivery";
 
 /** Совпадает с `ORDER_STATUS_LADDER_RANK` в `server/constants/orderConstants.js`. */
 const LADDER_RANK: Record<string, number> = {
@@ -19,9 +23,13 @@ const LADDER_RANK: Record<string, number> = {
   [ORDER_STATUS_ASSEMBLING]: 2,
   [ORDER_STATUS_READY_FOR_PICKUP]: 3,
   [ORDER_STATUS_READY_TO_SHIP]: 3,
-  [ORDER_STATUS_SHIPPED]: 4,
-  [ORDER_STATUS_DELIVERED]: 5,
-  [ORDER_STATUS_CONFIRMED]: 6,
+  [ORDER_STATUS_COURIER_ASSIGNED]: 4,
+  [ORDER_STATUS_COURIER_HOLDING]: 5,
+  // Legacy `shipped` значит ровно «в пути» — тот же уровень, что и in_delivery.
+  [ORDER_STATUS_SHIPPED]: 6,
+  [ORDER_STATUS_IN_DELIVERY]: 6,
+  [ORDER_STATUS_DELIVERED]: 7,
+  [ORDER_STATUS_CONFIRMED]: 8,
 };
 
 const EVERY_IN = (

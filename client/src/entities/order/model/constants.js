@@ -37,6 +37,10 @@ export const ORDER_STATUS_ASSEMBLING = "assembling";
 /** Развилка лестниц: самовывоз ждут на точке, доставку — отгружают. */
 export const ORDER_STATUS_READY_FOR_PICKUP = "ready_for_pickup";
 export const ORDER_STATUS_READY_TO_SHIP = "ready_to_ship";
+/** Ступени курьера. */
+export const ORDER_STATUS_COURIER_ASSIGNED = "courier_assigned";
+export const ORDER_STATUS_COURIER_HOLDING = "courier_holding";
+export const ORDER_STATUS_IN_DELIVERY = "in_delivery";
 
 export const ORDER_STATUSES = [
   ORDER_STATUS_PENDING,
@@ -44,6 +48,9 @@ export const ORDER_STATUSES = [
   ORDER_STATUS_ASSEMBLING,
   ORDER_STATUS_READY_FOR_PICKUP,
   ORDER_STATUS_READY_TO_SHIP,
+  ORDER_STATUS_COURIER_ASSIGNED,
+  ORDER_STATUS_COURIER_HOLDING,
+  ORDER_STATUS_IN_DELIVERY,
   ORDER_STATUS_CONFIRMED,
   ORDER_STATUS_SHIPPED,
   ORDER_STATUS_DELIVERED,
@@ -57,6 +64,9 @@ export const ORDER_STATUS_LABEL_RU = {
   [ORDER_STATUS_ASSEMBLING]: "На сборке",
   [ORDER_STATUS_READY_FOR_PICKUP]: "Готов к выдаче",
   [ORDER_STATUS_READY_TO_SHIP]: "Готов к отгрузке",
+  [ORDER_STATUS_COURIER_ASSIGNED]: "Принят курьером",
+  [ORDER_STATUS_COURIER_HOLDING]: "У курьера",
+  [ORDER_STATUS_IN_DELIVERY]: "На доставке",
   [ORDER_STATUS_CONFIRMED]: "Подтверждён",
   [ORDER_STATUS_SHIPPED]: "Отправлен",
   [ORDER_STATUS_DELIVERED]: "Доставлен",

@@ -83,3 +83,19 @@ export const staffCourierModerationBodySchema = z
       });
     }
   });
+
+/** Params курьерских действий: отправление = заказ + продавец. */
+export const courierShipmentParamsSchema = z.object({
+  orderId: mongoIdSchema,
+  sellerId: mongoIdSchema,
+});
+
+export const COURIER_HANDOVER_CODE_LENGTH = 4;
+
+/** Body шагов с кодом: передача продавцом и вручение покупателю. */
+export const courierHandoverCodeBodySchema = z.object({
+  code: z
+    .string({ required_error: "Введите код" })
+    .trim()
+    .regex(/^\d{4}$/, "Код — четыре цифры"),
+});

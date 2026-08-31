@@ -55,6 +55,14 @@ import {
   getStaffCourierApplicationsController,
   patchStaffCourierModerationController,
 } from "./Courier/courierApplicationController.js";
+import {
+  acceptShipmentController,
+  completeDeliveryController,
+  confirmHandoverController,
+  issueHandoverCodeController,
+  markArrivedController,
+  startDeliveryController,
+} from "./Courier/courierShipmentController.js";
 import { getAllOrdersController } from "./Order/getAllOrdersController.js";
 import { updateOrderStatusController } from "./Order/updateOrderStatusController.js";
 import {
@@ -354,6 +362,12 @@ export {
   submitCourierApplicationController,
   getStaffCourierApplicationsController,
   patchStaffCourierModerationController,
+  acceptShipmentController,
+  completeDeliveryController,
+  confirmHandoverController,
+  issueHandoverCodeController,
+  markArrivedController,
+  startDeliveryController,
   advanceMyShipmentStatusController,
   markOrderItemReturnedBySellerController,
   markOrderItemShippedBySellerController,

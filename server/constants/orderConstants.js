@@ -23,6 +23,11 @@ export const ORDER_STATUS_CANCELLED = "cancelled";
 export const ORDER_STATUS_ACCEPTED = "accepted";
 export const ORDER_STATUS_ASSEMBLING = "assembling";
 
+/** Ступени курьера. `shipped` остаётся синонимом «в пути» у старых заказов. */
+export const ORDER_STATUS_COURIER_ASSIGNED = "courier_assigned";
+export const ORDER_STATUS_COURIER_HOLDING = "courier_holding";
+export const ORDER_STATUS_IN_DELIVERY = "in_delivery";
+
 /** Развилка лестниц: самовывоз ждут на точке, доставку — отгружают. */
 export const ORDER_STATUS_READY_FOR_PICKUP = "ready_for_pickup";
 export const ORDER_STATUS_READY_TO_SHIP = "ready_to_ship";
@@ -39,6 +44,9 @@ export const ORDER_STATUSES = [
   ORDER_STATUS_ASSEMBLING,
   ORDER_STATUS_READY_FOR_PICKUP,
   ORDER_STATUS_READY_TO_SHIP,
+  ORDER_STATUS_COURIER_ASSIGNED,
+  ORDER_STATUS_COURIER_HOLDING,
+  ORDER_STATUS_IN_DELIVERY,
   ORDER_STATUS_CONFIRMED,
   ORDER_STATUS_SHIPPED,
   ORDER_STATUS_DELIVERED,
@@ -60,9 +68,13 @@ export const ORDER_STATUS_LADDER_RANK = Object.freeze({
   [ORDER_STATUS_ASSEMBLING]: 2,
   [ORDER_STATUS_READY_FOR_PICKUP]: 3,
   [ORDER_STATUS_READY_TO_SHIP]: 3,
-  [ORDER_STATUS_SHIPPED]: 4,
-  [ORDER_STATUS_DELIVERED]: 5,
-  [ORDER_STATUS_CONFIRMED]: 6,
+  [ORDER_STATUS_COURIER_ASSIGNED]: 4,
+  [ORDER_STATUS_COURIER_HOLDING]: 5,
+  // Legacy `shipped` значит ровно «в пути» — тот же уровень, что и in_delivery.
+  [ORDER_STATUS_SHIPPED]: 6,
+  [ORDER_STATUS_IN_DELIVERY]: 6,
+  [ORDER_STATUS_DELIVERED]: 7,
+  [ORDER_STATUS_CONFIRMED]: 8,
 });
 
 /** Сделка закончилась: по лестнице такие позиции уже не двигаются. */
@@ -123,6 +135,9 @@ export const BUYER_ORDER_STATUS_MESSAGES = Object.freeze({
   [ORDER_STATUS_ASSEMBLING]: "Заказ собирают",
   [ORDER_STATUS_READY_FOR_PICKUP]: "Заказ готов к выдаче — можно забирать",
   [ORDER_STATUS_READY_TO_SHIP]: "Заказ готов к отгрузке",
+  [ORDER_STATUS_COURIER_ASSIGNED]: "Курьер принял заказ",
+  [ORDER_STATUS_COURIER_HOLDING]: "Заказ у курьера",
+  [ORDER_STATUS_IN_DELIVERY]: "Заказ везут к вам",
   [ORDER_STATUS_SHIPPED]: "Заказ передан в доставку",
   [ORDER_STATUS_DELIVERED]: "Заказ доставлен — подтвердите получение",
   [ORDER_STATUS_CANCELLED]: "Продавец отменил позицию заказа",

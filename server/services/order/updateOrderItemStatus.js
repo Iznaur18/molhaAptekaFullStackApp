@@ -3,6 +3,7 @@ import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_CONFIRMED,
   ORDER_STATUS_DELIVERED,
+  ORDER_STATUS_IN_DELIVERY,
   ORDER_STATUS_PENDING,
   ORDER_STATUS_RETURNED,
   ORDER_STATUS_SHIPPED,
@@ -121,11 +122,13 @@ export async function markOrderItemDeliveredBySeller({
   const targetItem = getPopulatedOrderItemOrThrow(order, itemIndex);
   assertSellerOwnsOrderItem(targetItem, sellerId);
 
-  if (targetItem.status !== ORDER_STATUS_SHIPPED) {
-    throw new AppError(
-      409,
-      'Позицию можно отметить доставленной только из статуса "Отправлен"',
-    );
+  // Курьерская лестница приводит сюда из «На доставке», продавцовская — из
+  // «Отправлен». Оба пути законны.
+  if (
+    targetItem.status !== ORDER_STATUS_SHIPPED &&
+    targetItem.status !== ORDER_STATUS_IN_DELIVERY
+  ) {
+    throw new AppError(409, "Позицию можно отметить доставленной, только пока она в пути");
   }
 
   const previousStatus = targetItem.status;

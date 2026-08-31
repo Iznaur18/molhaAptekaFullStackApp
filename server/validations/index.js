@@ -76,6 +76,10 @@ import {
   staffCourierListValidation,
   staffCourierModerationValidation,
 } from "./courier/courierApplicationValidation.js";
+import {
+  courierHandoverCodeValidation,
+  courierShipmentValidation,
+} from "./courier/courierShipmentValidation.js";
 import { replaceMyCartValidation } from "./cart/replaceMyCartValidation.js";
 import { replaceMyFavoritesValidation } from "./favorites/replaceMyFavoritesValidation.js";
 import {
@@ -210,6 +214,8 @@ export {
   courierApplicationValidation,
   staffCourierListValidation,
   staffCourierModerationValidation,
+  courierHandoverCodeValidation,
+  courierShipmentValidation,
   replaceMyCartValidation,
   replaceMyFavoritesValidation,
   userStoryIdParamValidation,
