@@ -93,3 +93,56 @@
   justify-content: space-between;
   gap: 12px;
 }
+
+/* Сумму курьеру назначает покупатель — тарифа по километражу нет. */
+.cart-fulfillment__fee {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0 var(--cart-page-content-inset, 12px) 10px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 10px;
+}
+
+.cart-fulfillment__fee-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
+.cart-fulfillment__fee-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.cart-fulfillment__fee-controls button {
+  font: inherit;
+  font-size: 1.2rem;
+  line-height: 1;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--iz-color-text);
+  cursor: pointer;
+}
+
+.cart-fulfillment__fee-controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cart-fulfillment__fee-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--iz-color-text);
+}
+
+.cart-fulfillment__fee-hint {
+  font-size: 0.78rem;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}

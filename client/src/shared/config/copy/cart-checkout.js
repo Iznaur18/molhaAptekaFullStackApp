@@ -222,3 +222,13 @@ export const PRODUCT_PICKUP_UI = {
   DETAILS_NO_ADDRESS: "Адрес самовывоза не указан",
   DETAILS_DELIVERY_HINT: "Адрес укажете при оформлении заказа",
 };
+
+/** Сумму доставки назначает покупатель — тарифа по километражу нет. */
+export const CART_DELIVERY_FEE_UI = {
+  LABEL: "Курьеру за доставку",
+  DECREASE: "Уменьшить на 25 ₽",
+  INCREASE: "Увеличить на 25 ₽",
+  HINT: "Чем выше сумма, тем быстрее найдётся курьер.",
+  MIN_RUB: 100,
+  STEP_RUB: 25,
+};

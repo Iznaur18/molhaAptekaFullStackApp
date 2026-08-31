@@ -712,3 +712,35 @@
   color: var(--iz-color-text-secondary);
 }
 
+
+/* Код передачи продавец называет курьеру вживую — он и есть доказательство,
+   что оба стоят рядом. */
+.order-card__handover-code {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--iz-color-accent, #f2542d);
+  font-variant-numeric: tabular-nums;
+}
+
+.order-card__buyer-code {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px dashed var(--iz-color-accent, #f2542d);
+  border-radius: 8px;
+}
+
+.order-card__buyer-code strong {
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  color: var(--iz-color-accent, #f2542d);
+  font-variant-numeric: tabular-nums;
+}
+
+.order-card__buyer-code span {
+  font-size: 0.82rem;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}

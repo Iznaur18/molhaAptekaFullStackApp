@@ -31,6 +31,7 @@ import { userSavedAddressesFromUser } from "../../../entities/address/lib/userSa
 import { CheckoutSheetModal } from "../../../features/checkout/ui/CheckoutSheetModal.jsx";
 import {
   CART_AUCTION_UI,
+  CART_DELIVERY_FEE_UI,
   CART_PAGE_UI,
   CHECKOUT_FORM_UI,
 } from "../../../shared/config/appUiCopy.js";
@@ -105,6 +106,10 @@ export function CartPage({
 
   /** Заказ теперь один на всю корзину; секций по способу больше нет. */
   const [isCartCheckoutOpen, setIsCartCheckoutOpen] = useState(false);
+  /** Сумма курьеру по продавцам; минимум задаёт контракт. */
+  const [deliveryFeeBySeller, setDeliveryFeeBySeller] = useState(
+    /** @type {Record<string, number>} */ ({}),
+  );
   /** Выбор покупателя по продавцам; пустое значение = дефолт отправления. */
   const [chosenFulfillmentBySeller, setChosenFulfillmentBySeller] = useState(
     /** @type {Record<string, "pickup" | "delivery">} */ ({}),
@@ -330,6 +335,12 @@ export function CartPage({
     setIsCartCheckoutOpen(true);
   };
 
+  /** @param {string} sellerId @param {number} feeRub */
+  const chooseDeliveryFee = (sellerId, feeRub) => {
+    const clamped = Math.max(CART_DELIVERY_FEE_UI.MIN_RUB, feeRub);
+    setDeliveryFeeBySeller((prev) => ({ ...prev, [sellerId]: clamped }));
+  };
+
   /** @param {string} sellerId @param {"pickup" | "delivery"} method */
   const chooseSellerFulfillment = (sellerId, method) => {
     setChosenFulfillmentBySeller((prev) => ({ ...prev, [sellerId]: method }));
@@ -391,6 +402,7 @@ export function CartPage({
         })),
         fulfillmentMethod,
         fulfillmentBySellerId,
+        deliveryFeeBySellerId: deliveryFeeBySeller,
         deliveryAddress,
         deliveryAddressFlat,
         paymentMethod,
@@ -498,9 +510,12 @@ export function CartPage({
               onChange: (method) =>
                 chooseSellerFulfillment(group.sellerId, method),
             }}
-            showDeliveryFeeNote={
-              fulfillmentBySellerId[group.sellerId] === "delivery"
-            }
+            deliveryFee={{
+              value:
+                deliveryFeeBySeller[group.sellerId] ?? CART_DELIVERY_FEE_UI.MIN_RUB,
+              onChange: (next) => chooseDeliveryFee(group.sellerId, next),
+            }}
+            showDeliveryFeeNote={false}
           />
         ))}
 

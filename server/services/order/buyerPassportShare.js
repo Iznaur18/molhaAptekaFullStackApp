@@ -8,6 +8,7 @@ import {
   sealPassportPlain,
 } from "../passport-vault/index.js";
 import { maskPassportForBuyerApi } from "../user/maskPassportForApi.js";
+import { stripShipmentCodes } from "./sanitizeShipmentCodes.js";
 
 /**
  * @param {unknown} value
@@ -120,7 +121,7 @@ export const sanitizeOrderForBuyerApi = (order) => {
   }
   delete plain.buyerPassportShare;
   delete plain.passportShareConsentAt;
-  return plain;
+  return stripShipmentCodes(plain, "buyer");
 };
 
 /**
@@ -134,7 +135,7 @@ export const sanitizeOrderForSellerApi = (order) => {
   const buyerPassportShare = resolveSellerBuyerPassportShare(plain);
   delete plain.buyerPassportShare;
   plain.buyerPassportShare = buyerPassportShare;
-  return plain;
+  return stripShipmentCodes(plain, "seller");
 };
 
 /**

@@ -509,6 +509,8 @@ export function OrderCard({
   onCancelItem,
   onConfirmDelivered,
   onAdvanceShipment,
+  onIssueHandoverCode,
+  issuedHandoverCode = "",
   pendingActionKey = null,
   itemActionErrors = {},
   onBuyerNameClick,
@@ -570,6 +572,16 @@ export function OrderCard({
           shipmentFulfillment,
         )
       : null;
+  // Продавец выдаёт код, когда курьер уже приехал за заказом. Покупателю его
+  // код сервер отдаёт только на «Доставлен» — раньше он не нужен, а лишний
+  // повод показать код это лишний повод его слить.
+  const shipmentOwn = order.shipments?.length === 1 ? order.shipments[0] : null;
+  const canIssueCode =
+    attentionRole === "seller" &&
+    Boolean(onIssueHandoverCode) &&
+    buildOrderStatusFromItems(order.items) === "courier_assigned";
+  const buyerDeliveryCode =
+    attentionRole === "buyer" ? (shipmentOwn?.deliveryCode ?? "") : "";
   const shipmentActionKey = `${order._id}:shipment`;
   const isShipmentActionPending = pendingActionKey === shipmentActionKey;
 
@@ -601,6 +613,24 @@ export function OrderCard({
               ? ORDER_CARD_UI.SHIPMENT_DELIVERY
               : ORDER_CARD_UI.SHIPMENT_PICKUP}
           </span>
+          {canIssueCode ? (
+            issuedHandoverCode ? (
+              <span className="order-card__handover-code">
+                {ORDER_CARD_UI.SHIPMENT_CODE_SHOWN(issuedHandoverCode)}
+              </span>
+            ) : (
+              <button
+                type="button"
+                className="order-card__item-action-button"
+                onClick={() => onIssueHandoverCode({ orderId: order._id })}
+                disabled={isShipmentActionPending}
+              >
+                {isShipmentActionPending
+                  ? ORDER_CARD_UI.ACTION_PENDING
+                  : ORDER_CARD_UI.SHIPMENT_ISSUE_CODE}
+              </button>
+            )
+          ) : null}
           {shipmentAdvance ? (
           <button
             type="button"
@@ -619,6 +649,13 @@ export function OrderCard({
           </button>
         ) : null}
       </div>
+
+      {buyerDeliveryCode ? (
+        <div className="order-card__buyer-code">
+          <strong>{ORDER_CARD_UI.SHIPMENT_BUYER_CODE(buyerDeliveryCode)}</strong>
+          <span>{ORDER_CARD_UI.SHIPMENT_BUYER_CODE_HINT}</span>
+        </div>
+      ) : null}
 
       <h3 className="order-card__items-heading">{ORDER_CARD_UI.ITEMS_HEADING}</h3>
       <ul className="order-card__items" role="list">

@@ -7,6 +7,8 @@ import { formatApiErrorMessage } from "@izibuy/shared-lib";
  * @param {{
  *   items: { productId: string; quantity: number }[];
  *   fulfillmentMethod?: string;
+ *   fulfillmentBySellerId?: Record<string, "pickup" | "delivery">;
+ *   deliveryFeeBySellerId?: Record<string, number>;
  *   deliveryAddress?: string;
  *   deliveryAddressFlat?: string;
  *   paymentMethod: import('../model/constants.js').ORDER_PAYMENT_METHODS[number];

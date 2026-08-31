@@ -84,6 +84,7 @@ export {
   USER_SAVED_ADDRESSES_UI,
   CHECKOUT_FORM_UI,
   PRODUCT_PICKUP_UI,
+  CART_DELIVERY_FEE_UI,
 } from "./copy/cart-checkout.js";
 export {
   ORDER_CARD_UI,

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
-import { CART_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { CART_DELIVERY_FEE_UI, CART_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import { CartLineItem } from "./CartLineItem.jsx";
 import { CartSelectAllRow } from "./CartSelectAllRow.jsx";
@@ -47,6 +47,7 @@ export function CartFulfillmentSection({
   canCheckout,
   onCheckout,
   fulfillmentPicker = null,
+  deliveryFee = null,
   showDeliveryFeeNote = false,
 }) {
   if (lines.length === 0) {
@@ -89,6 +90,37 @@ export function CartFulfillmentSection({
           </div>
         ) : null}
       </header>
+
+        {fulfillmentPicker?.value === "delivery" && deliveryFee ? (
+          <div className="cart-fulfillment__fee">
+            <span className="cart-fulfillment__fee-label">
+              {CART_DELIVERY_FEE_UI.LABEL}
+            </span>
+            <div className="cart-fulfillment__fee-controls">
+              <button
+                type="button"
+                aria-label={CART_DELIVERY_FEE_UI.DECREASE}
+                onClick={() => deliveryFee.onChange(deliveryFee.value - 25)}
+                disabled={deliveryFee.value <= CART_DELIVERY_FEE_UI.MIN_RUB}
+              >
+                −
+              </button>
+              <span className="cart-fulfillment__fee-value">
+                {formatPriceRub(deliveryFee.value)}
+              </span>
+              <button
+                type="button"
+                aria-label={CART_DELIVERY_FEE_UI.INCREASE}
+                onClick={() => deliveryFee.onChange(deliveryFee.value + 25)}
+              >
+                +
+              </button>
+            </div>
+            <span className="cart-fulfillment__fee-hint">
+              {CART_DELIVERY_FEE_UI.HINT}
+            </span>
+          </div>
+        ) : null}
 
       <CartSelectAllRow
         selectedCount={selectedCount}

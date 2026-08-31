@@ -34,6 +34,13 @@ export const ORDER_CARD_UI = {
   ITEM_RETURNED_BY_BUYER: "покупатель отказался",
   ITEM_RETURNED_BY_SELLER: "оформил продавец",
   SHIPMENT_HEADING: "Отправление",
+  SHIPMENT_ISSUE_CODE: "Выдать код курьеру",
+  /** @param {string} code */
+  SHIPMENT_CODE_SHOWN: (code) => `Назовите курьеру: ${code}`,
+  /** @param {string} code */
+  SHIPMENT_BUYER_CODE: (code) => `Код для курьера: ${code}`,
+  SHIPMENT_BUYER_CODE_HINT:
+    "Назовите его курьеру при получении — заказ закроется автоматически.",
   SHIPMENT_PICKUP: "Самовывоз",
   SHIPMENT_DELIVERY: "Доставка",
   ACTION_CONFIRM: "Подтвердить",
