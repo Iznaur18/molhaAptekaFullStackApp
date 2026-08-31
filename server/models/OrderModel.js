@@ -213,6 +213,31 @@ const OrderLineItemSchema = new mongoose.Schema(
   { _id: true },
 );
 
+/**
+ * Отправление — заказ плюс один продавец.
+ *
+ * Хранится только способ получения: он выбирается покупателем и из позиций не
+ * выводится. Состав и статус отправления считаются из `items` по
+ * `sellerIdAtOrder` — дублировать их здесь нельзя, разъедутся при первой же
+ * смене статуса позиции.
+ */
+const OrderShipmentSchema = new mongoose.Schema(
+  {
+    sellerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    fulfillmentMethod: {
+      type: String,
+      required: true,
+      enum: ["pickup", "delivery"],
+      default: "pickup",
+    },
+  },
+  { _id: false },
+);
+
 const OrderSchema = new mongoose.Schema(
   {
     userBuyerId: {
@@ -250,11 +275,21 @@ const OrderSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+    /**
+     * Способ получения на весь заказ.
+     *
+     * Остаётся для совместимости и как фолбэк для заказов до отправлений;
+     * актуальный способ у каждого отправления свой — см. `shipments`.
+     */
     fulfillmentMethod: {
       type: String,
       required: true,
       enum: ["pickup", "delivery"],
       default: "pickup",
+    },
+    shipments: {
+      type: [OrderShipmentSchema],
+      default: [],
     },
     /** Каркас под СДЭК / Яндекс / Почту; заполняется вручную / API позже. */
     shippingProvider: {

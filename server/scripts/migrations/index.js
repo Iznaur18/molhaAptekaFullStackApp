@@ -37,6 +37,7 @@ import { up as hideHardcodedProductCategoriesUp } from "./20260817-hide-hardcode
 import { up as priceOfferAcceptedAwaitingPaymentIndexUp } from "./20260808-price-offer-accepted-awaiting-payment-index.js";
 import { up as onecCommerceMlExchangeUp } from "./20260830-onec-commerceml-exchange.js";
 import { up as orderLineSellerIdUp } from "./20260831-order-line-seller-id.js";
+import { up as orderShipmentsUp } from "./20260831-order-shipments.js";
 
 export const MIGRATIONS = [
   {
@@ -240,5 +241,10 @@ export const MIGRATIONS = [
     id: "20260831-order-line-seller-id",
     description: "Backfill items.sellerIdAtOrder on orders (basis for shipments)",
     up: orderLineSellerIdUp,
+  },
+  {
+    id: "20260831-order-shipments",
+    description: "Backfill orders.shipments (order + seller) from fulfillmentMethod",
+    up: orderShipmentsUp,
   },
 ];

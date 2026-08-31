@@ -6,6 +6,7 @@ import {
   PRODUCT_PICKUP_MISSING_FOR_ORDER_MESSAGE,
   PRODUCT_PICKUP_NOT_ENABLED_FOR_ITEMS_MESSAGE,
 } from "@molha/api-contract";
+import { buildStoredShipments } from "./orderShipments.js";
 import { USER_BLOCK_CART_ORDER_MESSAGE } from "../../constants/userBlockConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { AppError } from "../../errors/AppError.js";
@@ -546,6 +547,7 @@ export async function createOrder({
             deliveryAddressFlat: addressForOrder.flat ?? "",
             deliveryAddressFiasId: addressForOrder.fiasId ?? "",
             fulfillmentMethod: resolvedFulfillment,
+            shipments: buildStoredShipments(pricedItems, null, resolvedFulfillment),
             paymentMethod,
             status: orderStatus,
             priceOfferId: linkedPriceOfferId,
