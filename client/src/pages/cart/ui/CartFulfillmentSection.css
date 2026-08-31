@@ -7,9 +7,42 @@
 
 .cart-fulfillment__header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin: 0 var(--cart-page-content-inset, 12px) 10px;
   padding: 0 4px;
+}
+
+/* Способ получения выбирается на отправление, поэтому переключатель живёт
+   в шапке секции продавца, а не один на всю корзину. */
+.cart-fulfillment__method {
+  display: inline-flex;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.cart-fulfillment__method-option {
+  border: none;
+  background: transparent;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.35rem 0.8rem;
+  cursor: pointer;
+}
+
+.cart-fulfillment__method-option[aria-pressed="true"] {
+  background: var(--iz-color-accent, #f2542d);
+  color: #fff;
+}
+
+.cart-fulfillment__method-option:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .cart-fulfillment__title {

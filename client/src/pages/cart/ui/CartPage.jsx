@@ -2,8 +2,6 @@ import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  CART_FULFILLMENT_SECTION_DELIVERY,
-  CART_FULFILLMENT_SECTION_PICKUP,
   doProductsSupportPickup,
   doProductsSupportSellerDelivery,
 } from "@molha/api-contract";
@@ -11,7 +9,10 @@ import { isProductBuyNFreeActive } from "@izibuy/shared-lib";
 
 import { buildCheckoutPickupLocations } from "../../../entities/cart/lib/buildCheckoutPickupLocations.js";
 import { getCartLineExclusionReason } from "../../../entities/cart/lib/getCartLineExclusionReason.js";
-import { groupCartLinesByFulfillment } from "../../../entities/cart/lib/groupCartLinesByFulfillment.js";
+import {
+  groupCartLinesBySeller,
+  resolveCartFulfillmentBySeller,
+} from "../../../entities/cart/lib/groupCartLinesBySeller.js";
 import { selectCartCheckoutSummary } from "../../../entities/cart/lib/selectCartCheckoutSummary.js";
 import { selectCartLines } from "../../../entities/cart/lib/selectCartLines.js";
 import { useCart } from "../../../entities/cart/model/useCart.js";
@@ -35,6 +36,7 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 
 import { CartAuctionSection } from "./CartAuctionSection.jsx";
+import { CartCheckoutBar } from "./CartCheckoutBar.jsx";
 import { CartFulfillmentSection } from "./CartFulfillmentSection.jsx";
 
 import "./CartPage.css";
@@ -101,9 +103,11 @@ export function CartPage({
     return userSavedAddressesFromUser(user);
   }, [isAuthorized, user]);
 
-  /** @type {"pickup" | "delivery" | null} */
-  const [checkoutSection, setCheckoutSection] = useState(
-    /** @type {"pickup" | "delivery" | null} */ (null),
+  /** Заказ теперь один на всю корзину; секций по способу больше нет. */
+  const [isCartCheckoutOpen, setIsCartCheckoutOpen] = useState(false);
+  /** Выбор покупателя по продавцам; пустое значение = дефолт отправления. */
+  const [chosenFulfillmentBySeller, setChosenFulfillmentBySeller] = useState(
+    /** @type {Record<string, "pickup" | "delivery">} */ ({}),
   );
   const [auctionCheckoutBid, setAuctionCheckoutBid] = useState(
     /** @type {import('../../../entities/product-price-offer/model/types.js').PriceOfferBuyerBidRow | null} */ (
@@ -182,22 +186,17 @@ export function CartPage({
     [lines, currentUserId],
   );
 
-  const { pickupLines, deliveryLines } = useMemo(
-    () => groupCartLinesByFulfillment(visibleLines),
+  // Корзина делится на отправления — по одному на продавца. Способ получения
+  // выбирает покупатель у каждого; раньше его выбирала сама корзина, и товар
+  // с обоими способами всегда уезжал в самовывоз.
+  const sellerGroups = useMemo(
+    () => groupCartLinesBySeller(visibleLines),
     [visibleLines],
   );
 
   const purchasableIds = useMemo(
     () => visibleLines.map((line) => line.productId),
     [visibleLines],
-  );
-  const pickupIds = useMemo(
-    () => pickupLines.map((line) => line.productId),
-    [pickupLines],
-  );
-  const deliveryIds = useMemo(
-    () => deliveryLines.map((line) => line.productId),
-    [deliveryLines],
   );
 
   const {
@@ -209,25 +208,40 @@ export function CartPage({
     selectedCountIn,
   } = useCartSelection(purchasableIds);
 
-  const pickupSummary = useMemo(
-    () => selectCartCheckoutSummary(pickupLines, currentUserId, deselectedIds),
-    [pickupLines, currentUserId, deselectedIds],
+  const cartSummary = useMemo(
+    () => selectCartCheckoutSummary(visibleLines, currentUserId, deselectedIds),
+    [visibleLines, currentUserId, deselectedIds],
   );
-  const deliverySummary = useMemo(
+
+  /** Свод на каждое отправление — чтобы у продавца были свои итоги и чекбоксы. */
+  const groupSummaries = useMemo(
     () =>
-      selectCartCheckoutSummary(deliveryLines, currentUserId, deselectedIds),
-    [deliveryLines, currentUserId, deselectedIds],
+      sellerGroups.map((group) => ({
+        group,
+        summary: selectCartCheckoutSummary(
+          group.lines,
+          currentUserId,
+          deselectedIds,
+        ),
+        productIds: group.lines.map((line) => line.productId),
+      })),
+    [sellerGroups, currentUserId, deselectedIds],
   );
 
-  const activeSummary =
-    checkoutSection === CART_FULFILLMENT_SECTION_DELIVERY
-      ? deliverySummary
-      : pickupSummary;
+  /**
+   * Итоговый выбор способов, который уедет на сервер. Считается от групп, а не
+   * от состояния: сохранившийся выбор мог стать недоступным, если покупатель
+   * убрал из корзины товар, который его разрешал.
+   */
+  const fulfillmentBySellerId = useMemo(
+    () => resolveCartFulfillmentBySeller(sellerGroups, chosenFulfillmentBySeller),
+    [sellerGroups, chosenFulfillmentBySeller],
+  );
 
+  const activeSummary = cartSummary;
   const canCheckoutActive = activeSummary.selectedLines.length > 0;
   const isCartEmpty = lines.length === 0 && auctionBids.length === 0;
-  const isCheckoutSheetOpen =
-    checkoutSection != null || auctionCheckoutBid != null;
+  const isCheckoutSheetOpen = isCartCheckoutOpen || auctionCheckoutBid != null;
 
   const pickupLocations = useMemo(() => {
     if (auctionCheckoutBid) {
@@ -236,8 +250,20 @@ export function CartPage({
       );
       return buildCheckoutPickupLocations([{ product }]);
     }
-    return buildCheckoutPickupLocations(activeSummary.selectedLines);
-  }, [auctionCheckoutBid, activeSummary.selectedLines, productsQuery.data]);
+    // Только отправления, которые покупатель забирает сам: иначе в «Где
+    // забрать» попадёт товар, который к нему едет.
+    const pickupLines = activeSummary.selectedLines.filter((line) => {
+      const sellerId =
+        line?.product?.productSeller?._id ?? line?.product?.productSeller;
+      return fulfillmentBySellerId[String(sellerId ?? "")] !== "delivery";
+    });
+    return buildCheckoutPickupLocations(pickupLines);
+  }, [
+    auctionCheckoutBid,
+    activeSummary.selectedLines,
+    fulfillmentBySellerId,
+    productsQuery.data,
+  ]);
 
   const deliveryAvailable = useMemo(() => {
     if (auctionCheckoutBid) {
@@ -263,21 +289,55 @@ export function CartPage({
     );
   }, [auctionCheckoutBid, activeSummary.selectedLines, productsQuery.data]);
 
+  /**
+   * Что форме чекаута собирать: адрес, точки самовывоза или и то и другое.
+   *
+   * Считаем по выбранным позициям, а не по всей корзине: невыбранное в заказ
+   * не поедет и требовать под него адрес незачем.
+   */
+  const cartFulfillmentMode = useMemo(() => {
+    if (auctionCheckoutBid) return null;
+
+    const selectedIds = new Set(
+      activeSummary.selectedLines.map((line) => line.productId),
+    );
+    let hasPickup = false;
+    let hasDelivery = false;
+
+    for (const { group, productIds } of groupSummaries) {
+      if (!productIds.some((id) => selectedIds.has(id))) continue;
+      if (fulfillmentBySellerId[group.sellerId] === "delivery") {
+        hasDelivery = true;
+      } else {
+        hasPickup = true;
+      }
+    }
+
+    if (hasPickup && hasDelivery) return "mixed";
+    if (hasDelivery) return "delivery";
+    return "pickup";
+  }, [auctionCheckoutBid, activeSummary.selectedLines, groupSummaries, fulfillmentBySellerId]);
+
   const closeCheckoutSheet = () => {
-    setCheckoutSection(null);
+    setIsCartCheckoutOpen(false);
     setAuctionCheckoutBid(null);
     setSubmitState({ isSubmitting: false, error: "", success: "" });
   };
 
-  const openSectionCheckout = (section) => {
+  const openCartCheckout = () => {
     setAuctionCheckoutBid(null);
     setSubmitState({ isSubmitting: false, error: "", success: "" });
-    setCheckoutSection(section);
+    setIsCartCheckoutOpen(true);
+  };
+
+  /** @param {string} sellerId @param {"pickup" | "delivery"} method */
+  const chooseSellerFulfillment = (sellerId, method) => {
+    setChosenFulfillmentBySeller((prev) => ({ ...prev, [sellerId]: method }));
   };
 
   const handleOpenAuctionCheckout = (bid) => {
     setSubmitState({ isSubmitting: false, error: "", success: "" });
-    setCheckoutSection(null);
+    setIsCartCheckoutOpen(false);
     setAuctionCheckoutBid(bid);
   };
 
@@ -330,13 +390,14 @@ export function CartPage({
           quantity: line.quantity,
         })),
         fulfillmentMethod,
+        fulfillmentBySellerId,
         deliveryAddress,
         deliveryAddressFlat,
         paymentMethod,
         pickupSelections,
       });
       removeItems(orderedProductIds);
-      setCheckoutSection(null);
+      setIsCartCheckoutOpen(false);
       setSubmitState({
         isSubmitting: false,
         error: "",
@@ -418,37 +479,35 @@ export function CartPage({
           onCheckout={handleOpenAuctionCheckout}
         />
 
-        <CartFulfillmentSection
-          title={CART_PAGE_UI.SECTION_PICKUP}
-          lines={pickupLines}
-          selectedCount={selectedCountIn(pickupIds)}
-          areAllSelected={areAllSelectedIn(pickupIds)}
-          onToggleAll={() => toggleAllIn(pickupIds)}
-          isLineSelected={isLineSelected}
-          onToggleSelected={toggleLine}
-          onProductClick={handleProductClick}
-          summary={pickupSummary}
-          canCheckout={pickupSummary.selectedLines.length > 0}
-          onCheckout={() =>
-            openSectionCheckout(CART_FULFILLMENT_SECTION_PICKUP)
-          }
-        />
+        {groupSummaries.map(({ group, summary, productIds }) => (
+          <CartFulfillmentSection
+            key={group.sellerId || "unknown-seller"}
+            title={group.sellerName || CART_PAGE_UI.SECTION_SELLER_FALLBACK}
+            lines={group.lines}
+            selectedCount={selectedCountIn(productIds)}
+            areAllSelected={areAllSelectedIn(productIds)}
+            onToggleAll={() => toggleAllIn(productIds)}
+            isLineSelected={isLineSelected}
+            onToggleSelected={toggleLine}
+            onProductClick={handleProductClick}
+            summary={summary}
+            fulfillmentPicker={{
+              value: fulfillmentBySellerId[group.sellerId] ?? group.defaultMethod,
+              pickupAvailable: group.pickupAvailable,
+              deliveryAvailable: group.deliveryAvailable,
+              onChange: (method) =>
+                chooseSellerFulfillment(group.sellerId, method),
+            }}
+            showDeliveryFeeNote={
+              fulfillmentBySellerId[group.sellerId] === "delivery"
+            }
+          />
+        ))}
 
-        <CartFulfillmentSection
-          title={CART_PAGE_UI.SECTION_DELIVERY}
-          lines={deliveryLines}
-          selectedCount={selectedCountIn(deliveryIds)}
-          areAllSelected={areAllSelectedIn(deliveryIds)}
-          onToggleAll={() => toggleAllIn(deliveryIds)}
-          isLineSelected={isLineSelected}
-          onToggleSelected={toggleLine}
-          onProductClick={handleProductClick}
-          summary={deliverySummary}
-          canCheckout={deliverySummary.selectedLines.length > 0}
-          onCheckout={() =>
-            openSectionCheckout(CART_FULFILLMENT_SECTION_DELIVERY)
-          }
-          showDeliveryFeeNote
+        <CartCheckoutBar
+          summary={cartSummary}
+          canCheckout={canCheckoutActive}
+          onCheckout={openCartCheckout}
         />
       </div>
 
@@ -460,6 +519,7 @@ export function CartPage({
         pickupLocations={pickupLocations}
         deliveryAvailable={deliveryAvailable}
         pickupAvailable={pickupAvailable}
+        fulfillmentMode={cartFulfillmentMode}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}
         submitSuccess={submitState.success}

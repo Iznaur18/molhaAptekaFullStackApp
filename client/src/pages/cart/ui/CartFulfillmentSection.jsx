@@ -46,6 +46,7 @@ export function CartFulfillmentSection({
   summary,
   canCheckout,
   onCheckout,
+  fulfillmentPicker = null,
   showDeliveryFeeNote = false,
 }) {
   if (lines.length === 0) {
@@ -61,6 +62,32 @@ export function CartFulfillmentSection({
     <section className="cart-fulfillment">
       <header className="cart-fulfillment__header">
         <h2 className="cart-fulfillment__title">{title}</h2>
+        {fulfillmentPicker ? (
+          <div
+            className="cart-fulfillment__method"
+            role="group"
+            aria-label={CART_PAGE_UI.SECTION_METHOD_LABEL}
+          >
+            <button
+              type="button"
+              className="cart-fulfillment__method-option"
+              aria-pressed={fulfillmentPicker.value === "pickup"}
+              disabled={!fulfillmentPicker.pickupAvailable}
+              onClick={() => fulfillmentPicker.onChange("pickup")}
+            >
+              {CART_PAGE_UI.SECTION_PICKUP}
+            </button>
+            <button
+              type="button"
+              className="cart-fulfillment__method-option"
+              aria-pressed={fulfillmentPicker.value === "delivery"}
+              disabled={!fulfillmentPicker.deliveryAvailable}
+              onClick={() => fulfillmentPicker.onChange("delivery")}
+            >
+              {CART_PAGE_UI.SECTION_DELIVERY}
+            </button>
+          </div>
+        ) : null}
       </header>
 
       <CartSelectAllRow
@@ -161,29 +188,37 @@ export function CartFulfillmentSection({
           </div>
         </div>
 
-        {!canCheckout && summary.checkoutBlockReason ? (
-          <p className="cart-page__checkout-hint">{summary.checkoutBlockReason}</p>
+        {/* Оформление переехало на страницу целиком: заказ теперь один на всю
+            корзину, а секция показывает только итог своего отправления. */}
+        {onCheckout ? (
+          <>
+            {!canCheckout && summary.checkoutBlockReason ? (
+              <p className="cart-page__checkout-hint">
+                {summary.checkoutBlockReason}
+              </p>
+            ) : null}
+
+            <button
+              type="button"
+              className="cart-page__checkout-cta"
+              disabled={!canCheckout}
+              onClick={onCheckout}
+            >
+              {CART_PAGE_UI.CHECKOUT_OPEN}
+            </button>
+
+            <p className="cart-page__checkout-legal">
+              {CART_PAGE_UI.CHECKOUT_LEGAL_HINT_PREFIX}
+              <Link className="cart-page__checkout-legal-link" to="/legal/privacy">
+                {CART_PAGE_UI.CHECKOUT_LEGAL_PRIVACY_LINK}
+              </Link>
+              {CART_PAGE_UI.CHECKOUT_LEGAL_HINT_MIDDLE}
+              <Link className="cart-page__checkout-legal-link" to="/legal/offer">
+                {CART_PAGE_UI.CHECKOUT_LEGAL_OFFER_LINK}
+              </Link>
+            </p>
+          </>
         ) : null}
-
-        <button
-          type="button"
-          className="cart-page__checkout-cta"
-          disabled={!canCheckout}
-          onClick={onCheckout}
-        >
-          {CART_PAGE_UI.CHECKOUT_OPEN}
-        </button>
-
-        <p className="cart-page__checkout-legal">
-          {CART_PAGE_UI.CHECKOUT_LEGAL_HINT_PREFIX}
-          <Link className="cart-page__checkout-legal-link" to="/legal/privacy">
-            {CART_PAGE_UI.CHECKOUT_LEGAL_PRIVACY_LINK}
-          </Link>
-          {CART_PAGE_UI.CHECKOUT_LEGAL_HINT_MIDDLE}
-          <Link className="cart-page__checkout-legal-link" to="/legal/offer">
-            {CART_PAGE_UI.CHECKOUT_LEGAL_OFFER_LINK}
-          </Link>
-        </p>
       </div>
     </section>
   );

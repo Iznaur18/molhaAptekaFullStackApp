@@ -82,6 +82,7 @@ export function CheckoutForm({
   pickupLocations = EMPTY_PICKUP_LOCATIONS,
   deliveryAvailable = false,
   pickupAvailable = true,
+  fulfillmentMode = null,
   isSubmitting,
   submitError,
   submitSuccess,
@@ -172,7 +173,16 @@ export function CheckoutForm({
     }
   }, [deliverySelectable, pickupSelectable, fulfillmentMethod]);
 
-  const isPickup = fulfillmentMethod === ORDER_FULFILLMENT_PICKUP;
+  // Смешанный заказ: часть отправлений забирают, часть везут. Способ уже
+  // выбран в корзине на каждого продавца, поэтому переключатель здесь не
+  // нужен — форме остаётся собрать и точки самовывоза, и адрес.
+  const needsPickup = fulfillmentMode
+    ? fulfillmentMode !== "delivery"
+    : fulfillmentMethod === ORDER_FULFILLMENT_PICKUP;
+  const needsDelivery = fulfillmentMode
+    ? fulfillmentMode !== "pickup"
+    : fulfillmentMethod === ORDER_FULFILLMENT_DELIVERY;
+  const isPickup = needsPickup && !needsDelivery;
   const pickupGroups = useMemo(
     () => (Array.isArray(pickupLocations) ? pickupLocations : []),
     [pickupLocations],
@@ -200,14 +210,27 @@ export function CheckoutForm({
   const showPickupTitles = pickupGroups.length > 1;
 
   const isAddressValid = useMemo(() => {
-    if (isPickup) {
-      return pickupSelectable && pickupReady;
+    if (needsPickup && !(pickupSelectable && pickupReady)) {
+      return false;
     }
-    return (
-      deliverySelectable &&
-      validateRuDeliveryAddressForm(deliveryAddress, { required: true }) === null
-    );
-  }, [deliveryAddress, deliverySelectable, isPickup, pickupReady, pickupSelectable]);
+    if (
+      needsDelivery &&
+      !(
+        deliverySelectable &&
+        validateRuDeliveryAddressForm(deliveryAddress, { required: true }) === null
+      )
+    ) {
+      return false;
+    }
+    return needsPickup || needsDelivery;
+  }, [
+    deliveryAddress,
+    deliverySelectable,
+    needsDelivery,
+    needsPickup,
+    pickupReady,
+    pickupSelectable,
+  ]);
 
   const deliveryOptionHint = !PRODUCT_DELIVERY_FULFILLMENT_ENABLED
     ? SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT
@@ -221,44 +244,42 @@ export function CheckoutForm({
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (isPickup) {
-      if (!pickupSelectable || !pickupReady) {
-        setLocalError(
-          pickupOptionHint || CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED,
-        );
-        return;
-      }
-      setLocalError("");
-      void onSubmit({
-        fulfillmentMethod: ORDER_FULFILLMENT_PICKUP,
-        deliveryAddress: "",
-        deliveryAddressFlat: "",
-        paymentMethod,
-        pickupSelections: buildPickupSelectionsPayload(selectedPickupByProductId),
-      });
+
+    if (needsPickup && (!pickupSelectable || !pickupReady)) {
+      setLocalError(pickupOptionHint || CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED);
       return;
     }
 
-    if (!deliverySelectable) {
+    if (needsDelivery && !deliverySelectable) {
       setLocalError(
         deliveryOptionHint || CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_UNAVAILABLE,
       );
       return;
     }
 
-    const validationError = validateRuDeliveryAddressForm(deliveryAddress, {
-      required: true,
-    });
-    if (validationError) {
-      setLocalError(validationError);
-      return;
+    if (needsDelivery) {
+      const validationError = validateRuDeliveryAddressForm(deliveryAddress, {
+        required: true,
+      });
+      if (validationError) {
+        setLocalError(validationError);
+        return;
+      }
     }
+
     setLocalError("");
+    // В смешанном заказе уезжает и адрес, и точки: сервер разложит их по
+    // отправлениям сам, опираясь на выбор способа по продавцам.
     void onSubmit({
-      fulfillmentMethod: ORDER_FULFILLMENT_DELIVERY,
-      deliveryAddress: deliveryAddress.line.trim(),
-      deliveryAddressFlat: deliveryAddress.flat.trim(),
+      fulfillmentMethod: needsDelivery
+        ? ORDER_FULFILLMENT_DELIVERY
+        : ORDER_FULFILLMENT_PICKUP,
+      deliveryAddress: needsDelivery ? deliveryAddress.line.trim() : "",
+      deliveryAddressFlat: needsDelivery ? deliveryAddress.flat.trim() : "",
       paymentMethod,
+      pickupSelections: needsPickup
+        ? buildPickupSelectionsPayload(selectedPickupByProductId)
+        : [],
     });
   };
 
@@ -312,6 +333,10 @@ export function CheckoutForm({
             <h2 className="checkout-form__heading">{CHECKOUT_FORM_UI.HEADING}</h2>
           ) : null}
 
+          {/* Способ уже выбран в корзине на каждого продавца — здесь
+              переключателю делать нечего. Не hidden: у блока свой display,
+              он перебил бы атрибут. */}
+          {fulfillmentMode == null ? (
           <div className="checkout-form__fulfillment">
             <span className="checkout-form__label" id={`${formId}-fulfillment-label`}>
               {CHECKOUT_FORM_UI.LABEL_FULFILLMENT}
@@ -385,8 +410,9 @@ export function CheckoutForm({
               </button>
             </div>
           </div>
+          ) : null}
 
-          {isPickup ? (
+          {needsPickup ? (
             <div className="checkout-form__pickup">
               <span className="checkout-form__label">{CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}</span>
               {pickupReady ? (
@@ -470,7 +496,9 @@ export function CheckoutForm({
                 </p>
               )}
             </div>
-          ) : (
+          ) : null}
+
+          {needsDelivery ? (
             <>
               <CheckoutSavedAddressPicker
                 addresses={savedAddresses}
@@ -512,7 +540,7 @@ export function CheckoutForm({
                 disabled={isDisabled || isSubmitting}
               />
             </>
-          )}
+          ) : null}
 
           <CheckoutPaymentMethodPicker
             value={paymentMethod}

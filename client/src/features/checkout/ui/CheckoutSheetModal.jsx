@@ -18,6 +18,7 @@ import "./CheckoutSheetModal.css";
  *   pickupLocations?: Array<{ address: string; productTitles?: string[] }>;
  *   deliveryAvailable?: boolean;
  *   pickupAvailable?: boolean;
+ *   fulfillmentMode?: "pickup" | "delivery" | "mixed" | null;
  *   isSubmitting: boolean;
  *   submitError: string;
  *   submitSuccess: string;
@@ -38,6 +39,7 @@ export function CheckoutSheetModal({
   pickupLocations = [],
   deliveryAvailable = false,
   pickupAvailable = true,
+  fulfillmentMode = null,
   isSubmitting,
   submitError,
   submitSuccess,
@@ -118,6 +120,7 @@ export function CheckoutSheetModal({
             pickupLocations={pickupLocations}
             deliveryAvailable={deliveryAvailable}
             pickupAvailable={pickupAvailable}
+            fulfillmentMode={fulfillmentMode}
             isSubmitting={isSubmitting}
             submitError={submitError}
             submitSuccess={submitSuccess}
