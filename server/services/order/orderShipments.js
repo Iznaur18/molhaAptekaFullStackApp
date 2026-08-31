@@ -21,6 +21,27 @@ import { buildOrderStatusFromItems } from "./orderStatus.js";
 export const ORPHAN_SHIPMENT_KEY = "";
 
 /**
+ * Продавец позиции.
+ *
+ * Основной источник — денормализованный `sellerIdAtOrder`. У заказов до
+ * бэкфила его нет, поэтому падаем на populate товара: там продавец есть,
+ * пока сам товар не удалён.
+ *
+ * @param {{ sellerIdAtOrder?: unknown; productId?: unknown }} item
+ * @returns {string | null}
+ */
+export const resolveItemSellerId = (item) => {
+  if (item?.sellerIdAtOrder) return String(item.sellerIdAtOrder);
+
+  const product = item?.productId;
+  if (!product || typeof product !== "object") return null;
+
+  const seller = product.productSeller;
+  if (!seller) return null;
+  return String(seller._id ?? seller);
+};
+
+/**
  * @param {Array<Record<string, unknown>>} items
  * @returns {Map<string, { sellerId: string | null; itemIndexes: number[]; items: Array<Record<string, unknown>> }>}
  */
@@ -33,8 +54,8 @@ export const groupOrderItemsBySellerId = (items) => {
     const item = items[index];
     if (!item || typeof item !== "object") continue;
 
-    const raw = item.sellerIdAtOrder;
-    const key = raw ? String(raw) : ORPHAN_SHIPMENT_KEY;
+    const raw = resolveItemSellerId(item);
+    const key = raw ?? ORPHAN_SHIPMENT_KEY;
     const bucket = bySeller.get(key) ?? {
       sellerId: key === ORPHAN_SHIPMENT_KEY ? null : key,
       itemIndexes: [],

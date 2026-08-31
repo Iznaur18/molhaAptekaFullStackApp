@@ -71,6 +71,21 @@ export const ORDER_TERMINAL_STATUSES = Object.freeze([
   ORDER_STATUS_RETURNED,
 ]);
 
+/**
+ * Товар ещё у продавца. Отсюда заказ можно отменить без последствий и отсюда
+ * же его отгружают.
+ *
+ * Ступени сборки необязательные: продавец вправе отгрузить сразу из
+ * «В обработке», не проходя «Принят» и «На сборке».
+ */
+export const ORDER_PRE_SHIPMENT_STATUSES = Object.freeze([
+  ORDER_STATUS_PENDING,
+  ORDER_STATUS_ACCEPTED,
+  ORDER_STATUS_ASSEMBLING,
+  ORDER_STATUS_READY_FOR_PICKUP,
+  ORDER_STATUS_READY_TO_SHIP,
+]);
+
 /** Минимальное количество одной позиции заказа. */
 export const ORDER_LINE_ITEM_QUANTITY_MIN = 1;
 

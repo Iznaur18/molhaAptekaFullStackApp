@@ -52,6 +52,7 @@ import {
 import { getAllOrdersController } from "./Order/getAllOrdersController.js";
 import { updateOrderStatusController } from "./Order/updateOrderStatusController.js";
 import {
+  advanceMyShipmentStatusController,
   markOrderItemReturnedBySellerController,
   markOrderItemShippedBySellerController,
   markOrderItemDeliveredBySellerController,
@@ -343,6 +344,7 @@ export {
   getMySalesActionCountController,
   getAllOrdersController,
   updateOrderStatusController,
+  advanceMyShipmentStatusController,
   markOrderItemReturnedBySellerController,
   markOrderItemShippedBySellerController,
   markOrderItemDeliveredBySellerController,

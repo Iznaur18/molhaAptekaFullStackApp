@@ -70,6 +70,7 @@ import { getMySalesValidation } from "./order/getMySalesValidation.js";
 import { getMyOrdersValidation } from "./order/getMyOrdersValidation.js";
 import { orderItemActionValidation } from "./order/orderItemActionValidation.js";
 import { orderItemCancelValidation } from "./order/orderItemCancelValidation.js";
+import { advanceShipmentStatusValidation } from "./order/advanceShipmentStatusValidation.js";
 import { replaceMyCartValidation } from "./cart/replaceMyCartValidation.js";
 import { replaceMyFavoritesValidation } from "./favorites/replaceMyFavoritesValidation.js";
 import {
@@ -200,6 +201,7 @@ export {
   getMyOrdersValidation,
   orderItemActionValidation,
   orderItemCancelValidation,
+  advanceShipmentStatusValidation,
   replaceMyCartValidation,
   replaceMyFavoritesValidation,
   userStoryIdParamValidation,

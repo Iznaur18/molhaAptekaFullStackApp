@@ -1,4 +1,5 @@
 import {
+  ORDER_PRE_SHIPMENT_STATUSES,
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_CONFIRMED,
   ORDER_STATUS_DELIVERED,
@@ -38,6 +39,9 @@ import {
   rollbackBuyNFreeProgressOnCancel,
 } from "../product/productBuyNFreeProgress.js";
 import { buildOrderStatusFromItems } from "./orderStatus.js";
+
+/** Товар ещё у продавца: отсюда можно и отменить, и отгрузить. */
+const PRE_SHIPMENT = new Set(ORDER_PRE_SHIPMENT_STATUSES);
 
 import { clearBuyerPassportShareOnOrder } from "./buyerPassportShare.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
@@ -188,8 +192,9 @@ export async function markOrderItemCancelled({
     throw new AppError(403, "Нет прав на отмену позиции");
   }
 
-  if (targetItem.status !== ORDER_STATUS_PENDING) {
-    throw new AppError(409, 'Позицию можно отменить только из статуса "В обработке"');
+  // Отмена свободна, пока товар не уехал: собранный заказ ещё ничего не стоил.
+  if (!PRE_SHIPMENT.has(targetItem.status)) {
+    throw new AppError(409, "Позицию можно отменить, только пока товар у продавца");
   }
 
   // Рассрочный заказ: отмена buyer ИЛИ seller должна гасить и Order, и InstallmentContract.
@@ -228,10 +233,10 @@ export async function markOrderItemCancelled({
       if (txnItem.status === ORDER_STATUS_CANCELLED) {
         return;
       }
-      if (txnItem.status !== ORDER_STATUS_PENDING) {
+      if (!PRE_SHIPMENT.has(txnItem.status)) {
         throw new AppError(
           409,
-          'Позицию можно отменить только из статуса "В обработке"',
+          "Позицию можно отменить, только пока товар у продавца",
         );
       }
 
@@ -286,10 +291,11 @@ export async function markOrderItemShippedBySeller({ orderId, itemIndex, sellerI
   const targetItem = getPopulatedOrderItemOrThrow(order, itemIndex);
   assertSellerOwnsOrderItem(targetItem, sellerId);
 
-  if (targetItem.status !== ORDER_STATUS_PENDING) {
+  // Ступени сборки необязательные: отгрузить можно и сразу из «В обработке».
+  if (!PRE_SHIPMENT.has(targetItem.status)) {
     throw new AppError(
       409,
-      'Позицию можно отметить отправленной только из статуса "В обработке"',
+      "Позицию можно отметить отправленной, только пока товар у вас",
     );
   }
 

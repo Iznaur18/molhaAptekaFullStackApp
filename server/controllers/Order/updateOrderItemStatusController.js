@@ -5,12 +5,35 @@ import {
   markOrderItemReturned,
   markOrderItemShippedBySeller,
 } from "../../services/order/updateOrderItemStatus.js";
+import { advanceOrderShipmentStatus } from "../../services/order/advanceShipmentStatus.js";
 import { parseItemIndex } from "../../services/order/orderItemStatusHelpers.js";
 import {
   sanitizeOrderForBuyerApi,
   sanitizeOrderForSellerApi,
 } from "../../services/order/buyerPassportShare.js";
 import { successRes } from "../../services/http/index.js";
+
+/**
+ * `PATCH /order/:orderId/shipment/status` — продавец двигает своё отправление
+ * на ступень: «Принят» → «На сборке» → «Готов».
+ *
+ * Продавца берём из сессии, а не из пути: чужое отправление тронуть нельзя
+ * по построению.
+ */
+export const advanceMyShipmentStatusController = async (req, res) => {
+  const { orderId } = req.params;
+  const result = await advanceOrderShipmentStatus({
+    orderId,
+    sellerId: String(req.userId),
+    nextStatus: req.body.nextStatus,
+  });
+
+  return successRes(res, {
+    fulfillmentMethod: result.fulfillmentMethod,
+    movedItemCount: result.movedItemCount,
+    order: sanitizeOrderForSellerApi(result.order),
+  });
+};
 
 /** `PATCH /order/:orderId/items/:itemIndex/delivered` — продавец помечает позицию как доставленную. */
 export const markOrderItemDeliveredBySellerController = async (req, res) => {

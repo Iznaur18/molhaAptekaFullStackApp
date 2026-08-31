@@ -623,6 +623,8 @@ export {
   orderItemActionParamsSchema,
   orderItemCancelBodySchema,
   ORDER_ITEM_CANCELLATION_REASON_MAX_LENGTH,
+  advanceShipmentStatusBodySchema,
+  ORDER_SHIPMENT_ADVANCE_STATUSES,
   updateOrderStatusBodySchema,
 } from "./order.js";
 export {

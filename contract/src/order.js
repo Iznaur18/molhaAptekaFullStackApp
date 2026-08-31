@@ -16,11 +16,28 @@ import { PRODUCT_PICKUP_LOCATION_ID_MAX_LENGTH } from "./productPickupLocations.
 export const ORDER_PAYMENT_METHODS = ["cashOnDelivery", "cardPrepaid"];
 export const ORDER_STATUSES = [
   "pending",
+  "accepted",
+  "assembling",
+  "ready_for_pickup",
+  "ready_to_ship",
   "confirmed",
   "shipped",
   "delivered",
   "returned",
   "cancelled",
+];
+
+/**
+ * Ступени, на которые продавец двигает своё отправление вручную.
+ *
+ * Отдельно от `ORDER_STATUSES`: остальные значения ставит система или другие
+ * участники, и принимать их в теле запроса нельзя.
+ */
+export const ORDER_SHIPMENT_ADVANCE_STATUSES = [
+  "accepted",
+  "assembling",
+  "ready_for_pickup",
+  "ready_to_ship",
 ];
 export const ORDER_LINE_ITEM_QUANTITY_MIN = 1;
 export const ORDER_ITEMS_MAX = 100;
@@ -162,6 +179,11 @@ export const orderIdParamsSchema = z.object({
 export const orderItemActionParamsSchema = z.object({
   orderId: mongoIdSchema,
   itemIndex: z.coerce.number().int().min(0, "itemIndex должен быть целым числом >= 0"),
+});
+
+/** Body `PATCH /order/:orderId/shipment/status` — продавец двигает своё отправление. */
+export const advanceShipmentStatusBodySchema = z.object({
+  nextStatus: z.enum(ORDER_SHIPMENT_ADVANCE_STATUSES),
 });
 
 /** Синхрон с `server/models/InstallmentContractModel.js` — `cancellationReason.maxlength`. */
