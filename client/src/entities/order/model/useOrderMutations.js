@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { updateOrderStatus } from "../api/updateOrderStatus.js";
 import {
+  advanceShipmentStatus,
   confirmOrderItem,
   markOrderItemCancelled,
   markOrderItemDelivered,
@@ -33,6 +34,12 @@ export function useOrderMutations() {
     onSuccess: invalidateOrders,
   });
 
+  /** Двигает всё отправление продавца, поэтому без `itemIndex`. */
+  const advanceShipmentMutation = useMutation({
+    mutationFn: ({ orderId, nextStatus }) => advanceShipmentStatus(orderId, nextStatus),
+    onSuccess: invalidateOrders,
+  });
+
   const deliverItemMutation = useMutation({
     mutationFn: ({ orderId, itemIndex }) => markOrderItemDelivered(orderId, itemIndex),
     onSuccess: invalidateOrders,
@@ -52,6 +59,7 @@ export function useOrderMutations() {
     confirmItemMutation,
     cancelItemMutation,
     shipItemMutation,
+    advanceShipmentMutation,
     deliverItemMutation,
     returnItemMutation,
     updateStatusMutation,

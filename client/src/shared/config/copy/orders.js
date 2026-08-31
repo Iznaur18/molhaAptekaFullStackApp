@@ -18,7 +18,9 @@ export const ORDER_CARD_UI = {
   CREATED_LABEL: "Создан",
   BUYER_LABEL: "Покупатель",
   SELLER_LABEL: "Продавец",
-  ACTION_SHIPPED: "Принять",
+  // Раньше было «Принять», но теперь «Принят» — настоящая ступень лестницы,
+  // и две разные кнопки под одним словом путали бы продавца.
+  ACTION_SHIPPED: "Отгрузить",
   ACTION_DELIVERED: "Доставлен",
   ACTION_RETURN: "Вернулся",
   ACTION_RETURN_CONFIRM:
@@ -29,6 +31,9 @@ export const ORDER_CARD_UI = {
   ITEM_RETURNED_AT_LABEL: "Возвращён",
   ITEM_RETURNED_BY_BUYER: "покупатель отказался",
   ITEM_RETURNED_BY_SELLER: "оформил продавец",
+  SHIPMENT_HEADING: "Отправление",
+  SHIPMENT_PICKUP: "Самовывоз",
+  SHIPMENT_DELIVERY: "Доставка",
   ACTION_CONFIRM: "Подтвердить",
   ACTION_CANCEL: "Отменить",
   ACTION_PENDING: "Сохраняем…",

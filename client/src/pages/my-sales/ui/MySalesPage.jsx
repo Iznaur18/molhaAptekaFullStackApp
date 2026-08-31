@@ -61,6 +61,7 @@ export function MySalesPage({
   const {
     cancelItemMutation,
     shipItemMutation,
+    advanceShipmentMutation,
     deliverItemMutation,
     returnItemMutation,
   } = useOrderMutations();
@@ -282,6 +283,39 @@ export function MySalesPage({
     }
   };
 
+  /**
+   * Двигает отправление целиком, поэтому ключ действия — на заказ, а не на
+   * позицию: кнопка одна, и блокировать надо её.
+   */
+  const handleAdvanceShipment = async ({ orderId, nextStatus }) => {
+    const actionKey = `${orderId}:shipment`;
+    setPendingActionKey(actionKey);
+    setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+
+    try {
+      const updatedOrder = await advanceShipmentMutation.mutateAsync({
+        orderId,
+        nextStatus,
+      });
+      patchOrders((prev) =>
+        prev.map((order) => (order._id === orderId ? updatedOrder : order)),
+      );
+      onQueueChanged?.();
+      void reloadSales();
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+      setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
+      try {
+        await reloadSales();
+      } catch {
+        /* откат списка не критичен при 429 после серии ошибок */
+      }
+    } finally {
+      setPendingActionKey(null);
+    }
+  };
+
   const handleMarkReturned = async ({ orderId, itemIndex }) => {
     // Возврат виден покупателю уведомлением — подтверждаем намерение.
     if (!window.confirm(ORDER_CARD_UI.ACTION_RETURN_CONFIRM)) return;
@@ -394,6 +428,7 @@ export function MySalesPage({
                 showBuyer
                 onBuyerNameClick={onSellerNameClick}
                 onProductClick={openCatalogProductFromOrderLine}
+                onAdvanceShipment={handleAdvanceShipment}
                 onMarkShipped={handleMarkShipped}
                 onMarkDelivered={handleMarkDelivered}
                 onMarkReturned={handleMarkReturned}

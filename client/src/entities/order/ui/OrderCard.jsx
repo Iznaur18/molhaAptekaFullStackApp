@@ -2,7 +2,6 @@ import { resolveOrderShippingTrackingUrl } from "@molha/api-contract";
 import { useState } from "react";
 
 import {
-  ORDER_STATUS_PENDING,
   ORDER_STATUS_DELIVERED,
   ORDER_STATUS_SHIPPED,
   ORDER_PAYMENT_METHOD_LABEL_RU,
@@ -15,7 +14,15 @@ import {
   orderNeedsSellerAttention,
   resolveSellerOrderCollapsedPreview,
 } from "../lib/orderNeedsSellerAttention.js";
-import { ORDER_STATUS_RETURNED } from "../model/constants.js";
+import { buildOrderStatusFromItems } from "@izibuy/shared-lib";
+
+import {
+  ORDER_PRE_SHIPMENT_STATUSES,
+  ORDER_STATUS_RETURNED,
+} from "../model/constants.js";
+import { resolveShipmentAdvanceAction } from "../lib/resolveNextShipmentStatus.js";
+
+const PRE_SHIPMENT_STATUSES = new Set(ORDER_PRE_SHIPMENT_STATUSES);
 import { resolveOrderStatusLabelRu } from "../lib/resolveOrderStatusLabelRu.js";
 import { resolveOrderSellers } from "../lib/resolveOrderSellers.js";
 import {
@@ -214,7 +221,9 @@ function OrderCardLineItem({
   const actionKey = `${orderId}:${itemIndex}`;
   const isActionPending = pendingActionKey === actionKey;
   const actionError = itemActionErrors[actionKey] ?? "";
-  const canMarkShipped = item.status === ORDER_STATUS_PENDING;
+  // Пока товар у продавца, его можно и отгрузить, и отменить — на любой
+  // ступени сборки, а не только из «В обработке».
+  const canMarkShipped = PRE_SHIPMENT_STATUSES.has(item.status);
   const canMarkDelivered = item.status === ORDER_STATUS_SHIPPED;
   const canConfirmDelivered = item.status === ORDER_STATUS_DELIVERED;
   // Возврат оформляется, пока покупатель не подтвердил получение: товар уже
@@ -478,6 +487,7 @@ export function OrderCard({
   onMarkReturned,
   onCancelItem,
   onConfirmDelivered,
+  onAdvanceShipment,
   pendingActionKey = null,
   itemActionErrors = {},
   onBuyerNameClick,
@@ -525,6 +535,23 @@ export function OrderCard({
     0,
   );
 
+  // Продавцу в «Мои продажи» приходят только его позиции, поэтому их свод и
+  // есть статус его отправления. Способ получения берём с самого отправления,
+  // а на заказах до отправлений — с общего поля.
+  const shipmentFulfillment =
+    order.shipments?.length === 1
+      ? order.shipments[0].fulfillmentMethod
+      : order.fulfillmentMethod;
+  const shipmentAdvance =
+    attentionRole === "seller" && onAdvanceShipment
+      ? resolveShipmentAdvanceAction(
+          buildOrderStatusFromItems(order.items),
+          shipmentFulfillment,
+        )
+      : null;
+  const shipmentActionKey = `${order._id}:shipment`;
+  const isShipmentActionPending = pendingActionKey === shipmentActionKey;
+
   const expandedBody = (
     <>
       {compact ? null : (
@@ -542,6 +569,32 @@ export function OrderCard({
           ) : null}
         </>
       )}
+
+      {shipmentAdvance ? (
+        <div className="order-card__shipment-row">
+          <span className="order-card__shipment-label">
+            {ORDER_CARD_UI.SHIPMENT_HEADING}:{" "}
+            {shipmentFulfillment === "delivery"
+              ? ORDER_CARD_UI.SHIPMENT_DELIVERY
+              : ORDER_CARD_UI.SHIPMENT_PICKUP}
+          </span>
+          <button
+            type="button"
+            className="order-card__item-action-button"
+            onClick={() =>
+              onAdvanceShipment({
+                orderId: order._id,
+                nextStatus: shipmentAdvance.nextStatus,
+              })
+            }
+            disabled={isShipmentActionPending}
+          >
+            {isShipmentActionPending
+              ? ORDER_CARD_UI.ACTION_PENDING
+              : shipmentAdvance.label}
+          </button>
+        </div>
+      ) : null}
 
       <h3 className="order-card__items-heading">{ORDER_CARD_UI.ITEMS_HEADING}</h3>
       <ul className="order-card__items" role="list">

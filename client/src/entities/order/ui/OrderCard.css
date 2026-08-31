@@ -169,6 +169,27 @@
   text-decoration: underline;
 }
 
+/* Ступень отправления идёт над списком позиций: продавец двигает свой кусок
+   заказа целиком, а не строку за строкой. */
+.order-card__shipment-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: var(--iz-radius-sm, 6px);
+  background: var(--iz-color-bg-subtle, transparent);
+}
+
+.order-card__shipment-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
 .order-card__items-heading {
   margin: 0.25rem 0 0;
   font-size: 0.95rem;

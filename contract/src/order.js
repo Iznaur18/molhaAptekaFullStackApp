@@ -155,6 +155,15 @@ export const orderFromApiSchema = z
     paymentMethod: z.enum(ORDER_PAYMENT_METHODS),
     status: z.enum(ORDER_STATUSES),
     fulfillmentMethod: z.enum(["pickup", "delivery"]).optional(),
+    /** Отправления заказа — по одному на продавца. */
+    shipments: z
+      .array(
+        z.object({
+          sellerId: z.string(),
+          fulfillmentMethod: z.enum(["pickup", "delivery"]),
+        }),
+      )
+      .optional(),
     shippingProvider: z.string().nullable().optional(),
     shippingServiceType: z.string().nullable().optional(),
     shippingTrackingNumber: z.string().nullable().optional(),
