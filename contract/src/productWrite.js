@@ -330,6 +330,7 @@ const patchFieldShape = {
   productPickupLon: productPickupLonFieldSchema.nullable().optional(),
   productPickupEnabled: z.coerce.boolean().optional(),
   productDeliveryEnabled: z.coerce.boolean().optional(),
+  productCourierDeliveryEnabled: z.coerce.boolean().optional(),
 };
 
 const PATCH_BODY_KEYS = Object.keys(patchFieldShape);
@@ -352,6 +353,18 @@ export const patchMyProductBodySchema = z
     assertOldPricePair(body, ctx, Object.hasOwn(body, "productPrice")),
   )
   .superRefine(assertReturnPolicy)
+  .superRefine((body, ctx) => {
+    if (
+      body.productDeliveryEnabled === true &&
+      body.productCourierDeliveryEnabled === true
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["productCourierDeliveryEnabled"],
+        message: PRODUCT_COURIER_DELIVERY_CONFLICT_MESSAGE,
+      });
+    }
+  })
   .superRefine((body, ctx) => {
     if (
       Object.prototype.hasOwnProperty.call(body, "productPickupLat") ||
