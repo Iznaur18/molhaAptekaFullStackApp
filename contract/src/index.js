@@ -541,6 +541,7 @@ export {
   resolveCartLineFulfillmentSection,
   doProductsSupportPickup,
   doProductsSupportSellerDelivery,
+  doProductsSupportAnyDelivery,
 } from "./productPickup.js";
 export {
   PRODUCT_PICKUP_LOCATIONS_MAX,

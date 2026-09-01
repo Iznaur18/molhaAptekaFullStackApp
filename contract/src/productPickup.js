@@ -116,6 +116,30 @@ export function doProductsSupportSellerDelivery(products) {
   return products.every((product) => product?.productDeliveryEnabled === true);
 }
 
+/**
+ * Товар вообще может доехать до покупателя — сам продавец или курьер Gitorg.
+ *
+ * Отдельно от `doProductsSupportSellerDelivery`: та отвечает на вопрос «везёт
+ * ли продавец сам» и нужна там, где курьеров нет (рассрочка). На чекауте же
+ * важно другое — есть ли у корзины хоть какая-то доставка; товар «только
+ * курьеры Gitorg» иначе считался недоставляемым, и кнопка «Доставка» была
+ * недоступна.
+ *
+ * @param {Array<{ productDeliveryEnabled?: boolean | null; productCourierDeliveryEnabled?: boolean | null } | null | undefined>} products
+ * @returns {boolean}
+ */
+export function doProductsSupportAnyDelivery(products) {
+  if (!Array.isArray(products) || products.length === 0) {
+    return false;
+  }
+  return products.every(
+    (product) =>
+      (PRODUCT_DELIVERY_FULFILLMENT_ENABLED &&
+        product?.productDeliveryEnabled === true) ||
+      product?.productCourierDeliveryEnabled === true,
+  );
+}
+
 export const productPickupLatFieldSchema = z.coerce.number().min(-90).max(90);
 export const productPickupLonFieldSchema = z.coerce.number().min(-180).max(180);
 

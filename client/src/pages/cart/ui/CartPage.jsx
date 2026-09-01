@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   doProductsSupportPickup,
-  doProductsSupportSellerDelivery,
+  doProductsSupportAnyDelivery,
 } from "@molha/api-contract";
 import { isProductBuyNFreeActive } from "@izibuy/shared-lib";
 
@@ -286,9 +286,9 @@ export function CartPage({
       const product = (productsQuery.data ?? []).find(
         (item) => String(item._id) === String(auctionCheckoutBid.productId),
       );
-      return doProductsSupportSellerDelivery([product]);
+      return doProductsSupportAnyDelivery([product]);
     }
-    return doProductsSupportSellerDelivery(
+    return doProductsSupportAnyDelivery(
       activeSummary.selectedLines.map((line) => line.product),
     );
   }, [auctionCheckoutBid, activeSummary.selectedLines, productsQuery.data]);
