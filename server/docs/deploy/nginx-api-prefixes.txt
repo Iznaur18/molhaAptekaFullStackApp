@@ -1,0 +1,32 @@
+# Префиксы, которые nginx на проде обязан проксировать в gitorg_api.
+#
+# Список сверяется тестом tests/nginxApiPrefixes.test.js с тем, что реально
+# монтирует createApp.js. Добавили роутер — добавьте строку сюда и блок
+# location в конфиг на сервере, иначе запросы уйдут в SPA и вернут HTML
+# вместо JSON. Именно так раздел «Стать курьером» уехал на прод мёртвым.
+#
+# Конфиг на сервере: /etc/nginx/sites-enabled/gitorg
+
+/address
+/analytics
+/app-intro
+/audit
+/auth
+/cart
+/couriers
+/favorites
+/installment
+/intro-ad
+/onec
+/order
+/price-offers
+/product
+/seller-personal-category
+/seller-shelf
+/site-header-banner
+/site-header-banner-campaign
+/staff
+/upload
+/user
+/users-loyalty-raffle
+/vote
