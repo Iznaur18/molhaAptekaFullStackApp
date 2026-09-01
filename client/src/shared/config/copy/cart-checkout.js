@@ -166,6 +166,8 @@ export const CHECKOUT_FORM_UI = {
   PICKUP_MULTI_HINT:
     "Несколько точек — каждый товар по своему адресу. Курьер поедет туда же.",
   LABEL_DELIVERY_ADDRESS: "Адрес доставки",
+  PICKUP_NOT_NEEDED: "Заказ везут вам — точку самовывоза выбирать не нужно.",
+  DELIVERY_NOT_NEEDED: "Заказ вы забираете сами — адрес доставки не нужен.",
   LABEL_SAVED_ADDRESSES: "Сохранённые адреса",
   SAVED_ADDRESS_OTHER: "Указать другой на карте",
   PLACEHOLDER_DELIVERY_ADDRESS: "Город, улица, дом",

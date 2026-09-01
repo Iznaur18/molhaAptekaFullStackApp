@@ -412,6 +412,15 @@ export function CheckoutForm({
           </div>
           ) : null}
 
+          {!needsPickup ? (
+            <div className="checkout-form__pickup checkout-form__block_off">
+              <span className="checkout-form__label">
+                {CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}
+              </span>
+              <p className="checkout-form__hint">{CHECKOUT_FORM_UI.PICKUP_NOT_NEEDED}</p>
+            </div>
+          ) : null}
+
           {needsPickup ? (
             <div className="checkout-form__pickup">
               <span className="checkout-form__label">{CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}</span>
@@ -495,6 +504,17 @@ export function CheckoutForm({
                   {CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED}
                 </p>
               )}
+            </div>
+          ) : null}
+
+          {!needsDelivery ? (
+            <div className="checkout-form__delivery checkout-form__block_off">
+              <span className="checkout-form__label">
+                {CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS}
+              </span>
+              <p className="checkout-form__hint">
+                {CHECKOUT_FORM_UI.DELIVERY_NOT_NEEDED}
+              </p>
             </div>
           ) : null}
 

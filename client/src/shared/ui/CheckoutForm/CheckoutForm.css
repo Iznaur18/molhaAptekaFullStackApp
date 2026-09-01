@@ -353,3 +353,16 @@
     opacity: var(--iz-state-pressed-opacity);
   }
 }
+
+/* Шаг, который в этом заказе не нужен: видно, что он есть, и почему сейчас
+   неактивен. Заглушка, а не отключённая форма — пустое поле адреса на
+   самовывозе только сбивало бы. */
+.checkout-form__block_off {
+  opacity: 0.55;
+}
+
+.checkout-form__hint {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
