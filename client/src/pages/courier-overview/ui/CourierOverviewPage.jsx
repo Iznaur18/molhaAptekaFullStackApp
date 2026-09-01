@@ -9,6 +9,8 @@ import { COURIER_OVERVIEW_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 
 import { CourierDeliveryCard } from "./CourierDeliveryCard.jsx";
+import { CourierOrderItem } from "./CourierOrderItem.jsx";
+import { useCatalogProductDetailsOpener } from "../../../entities/product/lib/useCatalogProductDetailsOpener.js";
 
 import "./CourierOverviewPage.css";
 
@@ -26,6 +28,7 @@ const TABS = [
  */
 /** @param {{ onUserClick?: (userId: string) => void }} props */
 export function CourierOverviewPage({ onUserClick }) {
+  const { openCatalogProductById } = useCatalogProductDetailsOpener();
   const [tab, setTab] = useState("free");
   const [coords, setCoords] = useState(
     /** @type {{ lat: number; lon: number } | null} */ (null),
@@ -163,17 +166,11 @@ export function CourierOverviewPage({ onUserClick }) {
 
               <ul className="courier-overview__items" role="list">
                 {row.items.map((item, index) => (
-                  <li key={`${item.name}-${index}`}>
-                    {item.name} × {item.quantity}
-                    {item.characteristics?.length ? (
-                      <span className="courier-overview__chars">
-                        {item.characteristics
-                          .slice(0, 3)
-                          .map((c) => `${c.key}: ${c.value}`)
-                          .join(" · ")}
-                      </span>
-                    ) : null}
-                  </li>
+                  <CourierOrderItem
+                    key={`${item.name}-${index}`}
+                    item={item}
+                    onProductClick={openCatalogProductById}
+                  />
                 ))}
               </ul>
 
@@ -197,6 +194,7 @@ export function CourierOverviewPage({ onUserClick }) {
               key={`${row.orderId}:${row.sellerId}`}
               delivery={row}
               onUserClick={onUserClick}
+              onProductClick={openCatalogProductById}
               onError={setError}
             />
           ))}

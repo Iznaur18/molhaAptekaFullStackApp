@@ -174,7 +174,7 @@ export async function listCourierOverview({ courierId, lat = null, lon = null, l
       .lean(),
     ProductModel.find({ _id: { $in: [...productIds] } })
       .select(
-        "productName productCharacteristics productPickupAddress productPickupLat productPickupLon",
+        "productName productImageUrls productCharacteristics productPickupAddress productPickupLat productPickupLon",
       )
       .lean(),
   ]);
@@ -227,8 +227,10 @@ export async function listCourierOverview({ courierId, lat = null, lon = null, l
       items: items.map((item) => {
         const product = productById.get(String(item.productId));
         return {
+          productId: String(item.productId ?? ""),
           name: item.productNameAtOrder,
           quantity: item.quantity,
+          imageUrl: product?.productImageUrls?.[0] ?? "",
           // Габаритов у товара нет — курьер решает по характеристикам.
           characteristics: product?.productCharacteristics ?? [],
         };
@@ -304,7 +306,7 @@ export async function listMyCourierDeliveries({ courierId }) {
       .select("userName userAddress userAddressGeo userPhoneNumber")
       .lean(),
     ProductModel.find({ _id: { $in: [...productIds] } })
-      .select("productName productPickupAddress productPickupLat productPickupLon")
+      .select("productName productImageUrls productPickupAddress productPickupLat productPickupLon")
       .lean(),
   ]);
   const sellerById = new Map(sellers.map((row) => [String(row._id), row]));
@@ -328,8 +330,8 @@ export async function listMyCourierDeliveries({ courierId }) {
       status,
       deliveryFeeRub: Number(shipment.deliveryFeeRub) || 0,
       pickupAddress: pickup.address,
-      buyerId: contactsUnlocked ? String(buyer?._id ?? buyer ?? "") : "",
-      buyerName: contactsUnlocked ? (buyer?.userName ?? "") : "",
+      buyerId: String(buyer?._id ?? buyer ?? ""),
+      buyerName: buyer?.userName ?? "",
       buyerPhone: contactsUnlocked ? (buyer?.userPhoneNumber ?? "") : "",
       deliveryAddress: contactsUnlocked
         ? [order.deliveryAddress, order.deliveryAddressFlat]
@@ -338,8 +340,11 @@ export async function listMyCourierDeliveries({ courierId }) {
         : String(order.deliveryAddress ?? "").split(",").slice(0, 2).join(",").trim(),
       contactsUnlocked,
       items: items.map((item) => ({
+        productId: String(item.productId ?? ""),
         name: item.productNameAtOrder,
         quantity: item.quantity,
+        imageUrl:
+          productById.get(String(item.productId))?.productImageUrls?.[0] ?? "",
       })),
     };
   });

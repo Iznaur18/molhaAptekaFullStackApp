@@ -212,3 +212,44 @@
   text-underline-offset: 2px;
   cursor: pointer;
 }
+
+.courier-overview__item {
+  display: block;
+}
+
+.courier-overview__item-button {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  padding: 0.25rem;
+  margin: -0.25rem;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.courier-overview__item-button:hover {
+  background: var(--iz-color-surface-muted, rgba(0, 0, 0, 0.04));
+}
+
+.courier-overview__item-image {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface-muted, transparent);
+}
+
+.courier-overview__item-name {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}

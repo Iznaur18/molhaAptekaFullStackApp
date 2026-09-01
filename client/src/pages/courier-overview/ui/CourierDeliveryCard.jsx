@@ -9,6 +9,7 @@ import {
 } from "../../../entities/courier/model/courierQueries.js";
 import { ORDER_STATUS_LABEL_RU } from "../../../entities/order/model/constants.js";
 import { COURIER_OVERVIEW_UI } from "../../../shared/config/appUiCopy.js";
+import { CourierOrderItem } from "./CourierOrderItem.jsx";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 
 /**
@@ -42,9 +43,15 @@ function PersonName({ name, userId, onUserClick }) {
  *   delivery: Record<string, any>;
  *   onError: (message: string) => void;
  *   onUserClick?: (userId: string) => void;
+ *   onProductClick?: (productId: string) => void;
  * }} props
  */
-export function CourierDeliveryCard({ delivery, onError, onUserClick }) {
+export function CourierDeliveryCard({
+  delivery,
+  onError,
+  onUserClick,
+  onProductClick,
+}) {
   const [code, setCode] = useState("");
 
   const handoverMutation = useConfirmCourierHandoverMutation();
@@ -185,9 +192,11 @@ export function CourierDeliveryCard({ delivery, onError, onUserClick }) {
 
       <ul className="courier-overview__items" role="list">
         {delivery.items.map((item, index) => (
-          <li key={`${item.name}-${index}`}>
-            {item.name} × {item.quantity}
-          </li>
+          <CourierOrderItem
+            key={`${item.name}-${index}`}
+            item={item}
+            onProductClick={onProductClick}
+          />
         ))}
       </ul>
 
