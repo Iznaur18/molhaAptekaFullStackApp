@@ -72,6 +72,7 @@ export function CheckoutShippingProviderPicker({
             "checkout-shipping-provider-picker__card",
             isSelected ? "checkout-shipping-provider-picker__card--selected" : "",
             !isSelected ? "checkout-shipping-provider-picker__card--idle" : "",
+            option.live ? "" : "checkout-shipping-provider-picker__card--locked",
           ]
             .filter(Boolean)
             .join(" ");
@@ -83,10 +84,17 @@ export function CheckoutShippingProviderPicker({
               className={className}
               role="radio"
               aria-checked={isSelected}
-              aria-disabled={disabled}
-              disabled={disabled}
+              aria-disabled
+              disabled
             >
-              <span className="checkout-shipping-provider-picker__label">{label}</span>
+              <span className="checkout-shipping-provider-picker__label">
+                {label}
+                {option.live ? null : (
+                  <span className="checkout-shipping-provider-picker__soon">
+                    {CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SOON}
+                  </span>
+                )}
+              </span>
             </button>
           );
         })}

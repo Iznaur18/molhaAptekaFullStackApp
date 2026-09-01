@@ -107,3 +107,11 @@
   line-height: 1.35;
   color: var(--iz-color-text-muted);
 }
+
+/* «Скоро» подписью, а не отдельной строкой: карточка и так узкая. */
+.checkout-shipping-provider-picker__soon {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--iz-color-text-muted);
+}

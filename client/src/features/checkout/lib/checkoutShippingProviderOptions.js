@@ -18,17 +18,18 @@ export const CHECKOUT_SHIPPING_PROVIDER_SELLER = "seller";
  */
 
 /**
- * Опции служб для чекаута: продавец + только live-перевозчики.
- * Locked «скоро» в UI не показываем — появятся после подключения ключей.
+ * Опции служб для чекаута: продавец и все перевозчики.
+ *
+ * Неподключённые показываем с пометкой «скоро», а не прячем: покупатель
+ * должен видеть, куда движется сервис, и не гадать, есть ли вообще СДЭК.
+ * Так же они выглядят и у продавца в карточке товара.
+ *
  * @returns {CheckoutShippingProviderOption[]}
  */
 export function listCheckoutShippingProviderOptions() {
   return [
     { id: CHECKOUT_SHIPPING_PROVIDER_SELLER, live: true },
-    ...SHIPPING_PROVIDERS.filter((id) => isShippingProviderLive(id)).map((id) => ({
-      id,
-      live: true,
-    })),
+    ...SHIPPING_PROVIDERS.map((id) => ({ id, live: isShippingProviderLive(id) })),
   ];
 }
 

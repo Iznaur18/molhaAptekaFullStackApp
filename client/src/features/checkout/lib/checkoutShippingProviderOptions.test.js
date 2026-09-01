@@ -10,9 +10,15 @@ import {
 } from "./checkoutShippingProviderOptions.js";
 
 describe("checkoutShippingProviderOptions", () => {
-  it("lists only seller while carriers are not live", () => {
+  it("перечисляет все службы, неподключённые — как неживые", () => {
     const options = listCheckoutShippingProviderOptions();
-    expect(options).toEqual([{ id: CHECKOUT_SHIPPING_PROVIDER_SELLER, live: true }]);
+
+    // Продавец живой всегда, перевозчики видны, но помечены неживыми: их
+    // показывают со «скоро», а не прячут.
+    expect(options[0]).toEqual({ id: CHECKOUT_SHIPPING_PROVIDER_SELLER, live: true });
+    expect(options.length).toBeGreaterThan(1);
+    expect(options.slice(1).every((option) => option.live === false)).toBe(true);
+
     expect(hasCheckoutLiveCarrierProviders()).toBe(false);
     expect(listCheckoutShippingServiceOptions()).toEqual([]);
   });
