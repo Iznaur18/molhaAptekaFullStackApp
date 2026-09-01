@@ -193,6 +193,7 @@ export const CHECKOUT_FORM_UI = {
 
 export const PRODUCT_PICKUP_UI = {
   FULFILLMENT_LEGEND: "Выберите способ получения",
+  FULFILLMENT_DELIVERY_ANY: "Доставка",
   FULFILLMENT_PICKUP: "Самовывоз",
   FULFILLMENT_DELIVERY: "Доставка продавцом",
   FULFILLMENT_COURIER: "Курьеры Gitorg",
@@ -201,6 +202,7 @@ export const PRODUCT_PICKUP_UI = {
   FULFILLMENT_CONFLICT_HINT:
     "Выберите одно: везёте сами или отдаёте курьеру.",
   CARRIERS_LEGEND: "Выберите способ доставки",
+  CARRIERS_HINT: "Одна служба на товар. Курьеры Gitorg работают уже сейчас.",
   SOON_BADGE: " · скоро",
   METHODS_REQUIRED_HINT: "Можно выбрать несколько. Хотя бы один способ обязателен.",
   METHODS_BOTH_HINT:

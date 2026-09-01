@@ -446,30 +446,33 @@ export function ProductPickupLocationFields({
     emit({ productPickupEnabled: !pickupEnabled });
   };
 
-  const toggleDelivery = () => {
-    if (!deliverySelectable) {
-      return;
-    }
-    if (deliveryEnabled && !pickupEnabled) {
-      return;
-    }
-    // Включая доставку продавцом, гасим курьеров: одно вместо другого.
-    emit({
-      productDeliveryEnabled: !deliveryEnabled,
-      ...(!deliveryEnabled ? { productCourierDeliveryEnabled: false } : {}),
-    });
-  };
-
-  const toggleCourierDelivery = () => {
+  /**
+   * Доставка целиком: включаем — сразу с рабочей службой, выключаем — гасим
+   * обе. Служба выбирается ниже, отдельным вопросом.
+   */
+  const toggleDeliveryMode = () => {
     if (disabled) {
       return;
     }
-    if (courierDeliveryEnabled && !pickupEnabled) {
+    if (shipsToBuyer && !pickupEnabled) {
       return;
     }
+    emit(
+      shipsToBuyer
+        ? { productDeliveryEnabled: false, productCourierDeliveryEnabled: false }
+        : { productDeliveryEnabled: false, productCourierDeliveryEnabled: true },
+    );
+  };
+
+  /** @param {"seller" | "courier"} carrier */
+  const chooseCarrier = (carrier) => {
+    if (disabled) {
+      return;
+    }
+    // Службы взаимоисключающи: непонятно, кому предлагать отправление.
     emit({
-      productCourierDeliveryEnabled: !courierDeliveryEnabled,
-      ...(!courierDeliveryEnabled ? { productDeliveryEnabled: false } : {}),
+      productDeliveryEnabled: carrier === "seller",
+      productCourierDeliveryEnabled: carrier === "courier",
     });
   };
 
@@ -625,11 +628,8 @@ export function ProductPickupLocationFields({
         <label
           className={[
             "product-pickup-location-fields__check",
-            deliveryEnabled ? "product-pickup-location-fields__check_on" : "",
-            !PRODUCT_DELIVERY_FULFILLMENT_ENABLED
-              ? "product-pickup-location-fields__check_soon"
-              : "",
-            !deliverySelectable ? "product-pickup-location-fields__check_disabled" : "",
+            shipsToBuyer ? "product-pickup-location-fields__check_on" : "",
+            disabled ? "product-pickup-location-fields__check_disabled" : "",
           ]
             .filter(Boolean)
             .join(" ")}
@@ -637,17 +637,27 @@ export function ProductPickupLocationFields({
           <input
             type="checkbox"
             className="product-pickup-location-fields__checkbox"
-            checked={deliveryEnabled}
-            disabled={!deliverySelectable || (deliveryEnabled && !pickupEnabled)}
-            onChange={toggleDelivery}
+            checked={shipsToBuyer}
+            disabled={disabled || (shipsToBuyer && !pickupEnabled)}
+            onChange={toggleDeliveryMode}
           />
           <span className="product-pickup-location-fields__check-label">
-            {PRODUCT_PICKUP_UI.FULFILLMENT_DELIVERY}
-            {!PRODUCT_DELIVERY_FULFILLMENT_ENABLED
-              ? PRODUCT_PICKUP_UI.SOON_BADGE
-              : null}
+            {PRODUCT_PICKUP_UI.FULFILLMENT_DELIVERY_ANY}
           </span>
         </label>
+
+      </div>
+
+      {shipsToBuyer ? (
+        <>
+      <p className="product-pickup-location-fields__sublegend">
+        {PRODUCT_PICKUP_UI.CARRIERS_LEGEND}
+      </p>
+      <div
+        className="product-pickup-location-fields__methods product-pickup-location-fields__methods_carriers"
+        role="radiogroup"
+        aria-label={PRODUCT_PICKUP_UI.CARRIERS_LEGEND}
+      >
         <label
           className={[
             "product-pickup-location-fields__check",
@@ -660,27 +670,46 @@ export function ProductPickupLocationFields({
             .join(" ")}
         >
           <input
-            type="checkbox"
+            type="radio"
+            name="product-delivery-carrier"
             className="product-pickup-location-fields__checkbox"
             checked={courierDeliveryEnabled}
-            disabled={disabled || (courierDeliveryEnabled && !pickupEnabled)}
-            onChange={toggleCourierDelivery}
+            disabled={disabled}
+            onChange={() => chooseCarrier("courier")}
           />
           <span className="product-pickup-location-fields__check-label">
             {PRODUCT_PICKUP_UI.FULFILLMENT_COURIER}
           </span>
         </label>
 
-      </div>
+        <label
+          className={[
+            "product-pickup-location-fields__check",
+            deliveryEnabled ? "product-pickup-location-fields__check_on" : "",
+            !PRODUCT_DELIVERY_FULFILLMENT_ENABLED
+              ? "product-pickup-location-fields__check_soon"
+              : "",
+            !deliverySelectable ? "product-pickup-location-fields__check_disabled" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          <input
+            type="radio"
+            name="product-delivery-carrier"
+            className="product-pickup-location-fields__checkbox"
+            checked={deliveryEnabled}
+            disabled={!deliverySelectable}
+            onChange={() => chooseCarrier("seller")}
+          />
+          <span className="product-pickup-location-fields__check-label">
+            {PRODUCT_PICKUP_UI.FULFILLMENT_DELIVERY}
+            {!PRODUCT_DELIVERY_FULFILLMENT_ENABLED
+              ? PRODUCT_PICKUP_UI.SOON_BADGE
+              : null}
+          </span>
+        </label>
 
-      <p className="product-pickup-location-fields__sublegend">
-        {PRODUCT_PICKUP_UI.CARRIERS_LEGEND}
-      </p>
-      <div
-        className="product-pickup-location-fields__methods product-pickup-location-fields__methods_carriers"
-        role="group"
-        aria-label={PRODUCT_PICKUP_UI.CARRIERS_LEGEND}
-      >
         {SHIPPING_PROVIDERS.map((providerId) => (
           <label
             key={providerId}
@@ -700,6 +729,11 @@ export function ProductPickupLocationFields({
           </label>
         ))}
       </div>
+      <p className="product-pickup-location-fields__hint">
+        {PRODUCT_PICKUP_UI.CARRIERS_HINT}
+      </p>
+        </>
+      ) : null}
 
       <p className="product-pickup-location-fields__hint">
         {multiSelectEnabled
