@@ -560,6 +560,7 @@ export function MySalesPage({
                 onIssueHandoverCode={handleIssueHandoverCode}
                 onReplaceCourier={handleReplaceCourier}
                 onOpenDispute={handleOpenDispute}
+                onCourierNameClick={onSellerNameClick}
                 onConfirmPayment={handleConfirmPayment}
                 issuedHandoverCode={issuedCodes[order._id] ?? ""}
                 onMarkShipped={handleMarkShipped}

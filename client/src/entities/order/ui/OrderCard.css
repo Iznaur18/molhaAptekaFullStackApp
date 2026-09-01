@@ -760,3 +760,15 @@
 .order-card__courier-car {
   color: var(--iz-color-text-muted, var(--iz-color-text));
 }
+
+.order-card__courier-link {
+  font: inherit;
+  font-weight: 700;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--iz-color-accent, #f2542d);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}

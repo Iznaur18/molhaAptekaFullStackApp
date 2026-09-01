@@ -373,6 +373,7 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
                 onMarkReturned={handleRefuseItem}
                 onReplaceCourier={handleReplaceCourier}
                 onOpenDispute={handleOpenDispute}
+                onCourierNameClick={onSellerNameClick}
                 pendingActionKey={pendingActionKey}
                 itemActionErrors={itemActionErrors}
               />

@@ -294,7 +294,7 @@ export function renderProfileTabPanel(mainView, props) {
     case "courier":
       return <LazyCourierApplicationPage />;
     case "courier-overview":
-      return <LazyCourierOverviewPage />;
+      return <LazyCourierOverviewPage onUserClick={onSellerNameClick} />;
     case "courier-moderation":
       return (
         <LazyCourierModerationPage

@@ -328,6 +328,7 @@ export async function listMyCourierDeliveries({ courierId }) {
       status,
       deliveryFeeRub: Number(shipment.deliveryFeeRub) || 0,
       pickupAddress: pickup.address,
+      buyerId: contactsUnlocked ? String(buyer?._id ?? buyer ?? "") : "",
       buyerName: contactsUnlocked ? (buyer?.userName ?? "") : "",
       buyerPhone: contactsUnlocked ? (buyer?.userPhoneNumber ?? "") : "",
       deliveryAddress: contactsUnlocked

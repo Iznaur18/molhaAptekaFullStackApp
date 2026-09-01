@@ -24,7 +24,8 @@ const TABS = [
  * заказам даёт регион из профиля, иначе курьер без разрешения на геолокацию
  * не увидел бы ничего.
  */
-export function CourierOverviewPage() {
+/** @param {{ onUserClick?: (userId: string) => void }} props */
+export function CourierOverviewPage({ onUserClick }) {
   const [tab, setTab] = useState("free");
   const [coords, setCoords] = useState(
     /** @type {{ lat: number; lon: number } | null} */ (null),
@@ -135,6 +136,22 @@ export function CourierOverviewPage() {
 
               <dl className="courier-overview__meta">
                 <div>
+                  <dt>{COURIER_OVERVIEW_UI.SELLER}</dt>
+                  <dd>
+                    {onUserClick && row.sellerId ? (
+                      <button
+                        type="button"
+                        className="courier-overview__person"
+                        onClick={() => onUserClick(String(row.sellerId))}
+                      >
+                        {row.sellerName || "—"}
+                      </button>
+                    ) : (
+                      row.sellerName || "—"
+                    )}
+                  </dd>
+                </div>
+                <div>
                   <dt>{COURIER_OVERVIEW_UI.PICKUP}</dt>
                   <dd>{row.pickupAddress || "—"}</dd>
                 </div>
@@ -179,6 +196,7 @@ export function CourierOverviewPage() {
             <CourierDeliveryCard
               key={`${row.orderId}:${row.sellerId}`}
               delivery={row}
+              onUserClick={onUserClick}
               onError={setError}
             />
           ))}

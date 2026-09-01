@@ -200,3 +200,15 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Имя стороны сделки: ссылка, а не кнопка-действие. */
+.courier-overview__person {
+  font: inherit;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--iz-color-accent, #f2542d);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}

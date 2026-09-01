@@ -515,6 +515,7 @@ export function OrderCard({
   onReplaceCourier,
   onConfirmPayment,
   onOpenDispute,
+  onCourierNameClick,
   issuedHandoverCode = "",
   pendingActionKey = null,
   itemActionErrors = {},
@@ -743,7 +744,17 @@ export function OrderCard({
           <span className="order-card__courier-label">
             {ORDER_CARD_UI.SHIPMENT_COURIER}:
           </span>{" "}
-          <strong>{shipmentOwn.courier.userName}</strong>
+          {onCourierNameClick && shipmentOwn.courierId ? (
+            <button
+              type="button"
+              className="order-card__courier-link"
+              onClick={() => onCourierNameClick(String(shipmentOwn.courierId))}
+            >
+              {shipmentOwn.courier.userName}
+            </button>
+          ) : (
+            <strong>{shipmentOwn.courier.userName}</strong>
+          )}
           {shipmentOwn.courier.rating != null ? (
             <span className="order-card__courier-rating">
               {" "}

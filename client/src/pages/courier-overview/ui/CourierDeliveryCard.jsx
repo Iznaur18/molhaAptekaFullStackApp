@@ -12,6 +12,26 @@ import { COURIER_OVERVIEW_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 
 /**
+ * Имя стороны сделки: ссылка в профиль, если открывать есть куда.
+ *
+ * @param {{ name?: string; userId?: string; onUserClick?: (userId: string) => void }} props
+ */
+function PersonName({ name, userId, onUserClick }) {
+  const label = String(name ?? "").trim();
+  if (!label) return "—";
+  if (!onUserClick || !userId) return label;
+  return (
+    <button
+      type="button"
+      className="courier-overview__person"
+      onClick={() => onUserClick(String(userId))}
+    >
+      {label}
+    </button>
+  );
+}
+
+/**
  * Одна активная доставка со следующим шагом.
  *
  * Два шага требуют кода: забрать у продавца и вручить покупателю. Код
@@ -21,9 +41,10 @@ import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
  * @param {{
  *   delivery: Record<string, any>;
  *   onError: (message: string) => void;
+ *   onUserClick?: (userId: string) => void;
  * }} props
  */
-export function CourierDeliveryCard({ delivery, onError }) {
+export function CourierDeliveryCard({ delivery, onError, onUserClick }) {
   const [code, setCode] = useState("");
 
   const handoverMutation = useConfirmCourierHandoverMutation();
@@ -118,6 +139,30 @@ export function CourierDeliveryCard({ delivery, onError }) {
       </div>
 
       <dl className="courier-overview__meta">
+        <div>
+          <dt>{COURIER_OVERVIEW_UI.SELLER}</dt>
+          <dd>
+            <PersonName
+              name={delivery.sellerName}
+              userId={delivery.sellerId}
+              onUserClick={onUserClick}
+            />
+          </dd>
+        </div>
+        {/* Покупателя показываем, только когда контакты уже открыты: до
+            передачи товара курьеру знать, кому везти, ещё рано. */}
+        {delivery.buyerName ? (
+          <div>
+            <dt>{COURIER_OVERVIEW_UI.BUYER}</dt>
+            <dd>
+              <PersonName
+                name={delivery.buyerName}
+                userId={delivery.buyerId}
+                onUserClick={onUserClick}
+              />
+            </dd>
+          </div>
+        ) : null}
         <div>
           <dt>{COURIER_OVERVIEW_UI.PICKUP}</dt>
           <dd>

@@ -82,6 +82,8 @@ export const COURIER_OVERVIEW_UI = {
   NO_GEO_HINT: "Геопозиция не разрешена — сортируем от вашего адреса.",
   /** @param {number} km */
   DISTANCE: (km) => `${km} км`,
+  SELLER: "Продавец",
+  BUYER: "Покупатель",
   PICKUP: "Забрать",
   DROPOFF: "Привезти",
   ACCEPT: "Принять заказ",
