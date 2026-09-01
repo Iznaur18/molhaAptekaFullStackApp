@@ -240,6 +240,45 @@ describe("обзор курьера", () => {
     assert.ok(row.items[0].name, "состав заказа виден — по нему судят о габаритах");
   });
 
+  it("продавец не видит и не берёт своё же отправление", async () => {
+    const { seller, args } = await readyOrder({ fee: 300 });
+    // Продавец сам подтверждён курьером — но рукопожатие кодами теряет смысл,
+    // если продавец и курьер один человек.
+    await UserModel.updateOne(
+      { _id: seller._id },
+      { $set: { "courierProfile.moderationStatus": "approved" } },
+    );
+
+    const result = await listCourierOverview({ courierId: String(seller._id) });
+    assert.equal(result.shipments.length, 0);
+
+    await assert.rejects(
+      () => acceptShipmentByCourier({ ...args, courierId: String(seller._id) }),
+      /Свой заказ курьером не возят/i,
+    );
+  });
+
+  it("покупатель не берёт свой же заказ", async () => {
+    const { buyer, args } = await readyOrder({ fee: 300 });
+    await UserModel.updateOne(
+      { _id: buyer._id },
+      {
+        $set: {
+          "courierProfile.moderationStatus": "approved",
+          userRegionCode: "RU-MOW",
+          userAddress: "г Москва, дом",
+        },
+      },
+    );
+
+    const result = await listCourierOverview({ courierId: String(buyer._id) });
+    assert.equal(result.shipments.length, 0);
+
+    await assert.rejects(
+      () => acceptShipmentByCourier({ ...args, courierId: String(buyer._id) }),
+      /Свой заказ курьером не возят/i,
+    );
+  });
   it("не показывает заказы чужого региона", async () => {
     const courier = await makeCourier({ region: "RU-SPE" });
     await readyOrder({ sellerRegion: "RU-MOW" });

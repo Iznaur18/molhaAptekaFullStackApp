@@ -1,6 +1,7 @@
 import { ORDER_FULFILLMENT_DELIVERY } from "@molha/api-contract";
 
 import {
+  COURIER_IS_ORDER_PARTY_MESSAGE,
   COURIER_NOT_APPROVED_MESSAGE,
   COURIER_MODERATION_APPROVED,
 } from "../../constants/courierConstants.js";
@@ -110,6 +111,11 @@ export async function acceptShipmentByCourier({ orderId, sellerId, courierId }) 
 
   const order = await loadOrderWithItems(orderId);
   const { shipment, items, status } = locateShipment(order, sellerId);
+
+  const buyerId = String(order.userBuyerId?._id ?? order.userBuyerId ?? "");
+  if (String(courierId) === String(sellerId) || String(courierId) === buyerId) {
+    throw new AppError(403, COURIER_IS_ORDER_PARTY_MESSAGE);
+  }
 
   // Занятость проверяем раньше статуса: опоздавшему курьеру важно услышать
   // «уже взяли», а не «не готов к отгрузке» — статус к этому моменту уже ушёл.

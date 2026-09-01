@@ -135,6 +135,15 @@ export async function listCourierOverview({ courierId, lat = null, lon = null, l
       ) {
         continue;
       }
+      // Своё же отправление курьеру не показываем: взять его он всё равно
+      // не сможет, а в списке оно только путало бы.
+      const buyerIdForSelfCheck = String(order.userBuyerId ?? "");
+      if (
+        String(shipment.sellerId) === String(courierId) ||
+        buyerIdForSelfCheck === String(courierId)
+      ) {
+        continue;
+      }
 
       const sellerId = String(shipment.sellerId);
       const items = (order.items ?? []).filter(
