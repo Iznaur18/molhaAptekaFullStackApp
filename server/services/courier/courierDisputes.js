@@ -325,6 +325,39 @@ export async function listOpenDisputes({ limit = 50 } = {}) {
 }
 
 /**
+ * Откат неудавшегося разбора: спор снова открыт, позиции снова спорные.
+ *
+ * @param {{ orderId: string; sellerId: string; indexes: number[] }} input
+ */
+async function restoreDisputeAfterFailedResolve({ orderId, sellerId, indexes }) {
+  try {
+    const order = await loadOrderWithItems(orderId);
+    const shipment = (order.shipments ?? []).find(
+      (row) => row?.sellerId != null && String(row.sellerId) === String(sellerId),
+    );
+    if (shipment) {
+      shipment.disputeResolvedAt = null;
+    }
+    for (const item of order.items ?? []) {
+      // Позицию, которую успели довести до конца, не трогаем: её эффекты уже
+      // применены, и откатывать баллы с остатком отсюда нельзя.
+      if (!indexes.includes(item.itemIndex)) continue;
+      if (TERMINAL.has(item.status)) continue;
+      item.status = ORDER_STATUS_DISPUTED;
+    }
+    order.status = buildOrderStatusFromItems(order.items);
+    await order.save();
+  } catch (restoreError) {
+    logServerEvent("error", {
+      event: "courier_dispute_restore_failed",
+      orderId: String(orderId),
+      sellerId: String(sellerId),
+      ...formatLogError(restoreError),
+    });
+  }
+}
+
+/**
  * Модератор закрывает спор.
  *
  * Позиции переводятся туда, куда решил модератор: вернулись продавцу или
@@ -347,6 +380,8 @@ export async function resolveShipmentDispute({
   }
 
   shipment.disputeResolvedAt = new Date();
+  shipment.disputeResolvedBy = moderatorId ?? null;
+  shipment.disputeOutcome = outcome;
 
   const { markOrderItemReturned } = await import(
     "../order/updateOrderItemStatus.js"
@@ -368,20 +403,28 @@ export async function resolveShipmentDispute({
   const indexes = items.map((item) => item.itemIndex);
   let latest = null;
 
-  for (const itemIndex of indexes) {
-    latest =
-      outcome === "confirmed"
-        ? await confirmOrderItemByBuyer({
-            orderId: String(orderId),
-            itemIndex,
-            buyerId,
-            userId: buyerId,
-          })
-        : await markOrderItemReturned({
-            orderId: String(orderId),
-            itemIndex,
-            requestUserId: String(sellerId),
-          });
+  try {
+    for (const itemIndex of indexes) {
+      latest =
+        outcome === "confirmed"
+          ? await confirmOrderItemByBuyer({
+              orderId: String(orderId),
+              itemIndex,
+              buyerId,
+              userId: buyerId,
+            })
+          : await markOrderItemReturned({
+              orderId: String(orderId),
+              itemIndex,
+              requestUserId: String(sellerId),
+            });
+    }
+  } catch (error) {
+    // На середине падать нельзя: спор уже помечен закрытым, а позиции сидят
+    // в переходном статусе — заказ молча исчезал бы из очереди модератора,
+    // так и не разобранным. Возвращаем как было и отдаём ошибку наверх.
+    await restoreDisputeAfterFailedResolve({ orderId, sellerId, indexes });
+    throw error;
   }
 
   logServerEvent("info", {

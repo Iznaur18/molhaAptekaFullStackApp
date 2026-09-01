@@ -1,6 +1,8 @@
 import { resolveProfileNavSectionTone } from "@izibuy/shared-lib";
 import {
   Database,
+  Car,
+  CarFront,
   Clapperboard,
   ClipboardCheck,
   CreditCard,
@@ -28,6 +30,7 @@ import {
   Store,
   Ticket,
   ToggleLeft,
+  Truck,
   Trash2,
   UserCheck,
   TrendingUp,
@@ -64,6 +67,9 @@ export const PROFILE_NAV_ITEM_META = {
   "product-promotions": { icon: TrendingUp },
   raffles: { icon: Ticket },
   "data-confirmation-requests": { icon: UserCheck },
+  courier: { icon: Car },
+  "courier-overview": { icon: Truck },
+  "courier-moderation": { icon: CarFront },
   "installment-disputes": { icon: MessageSquareWarning },
   "shipment-disputes": { icon: MessageSquareWarning },
   "admin-orders": { icon: ListOrdered },

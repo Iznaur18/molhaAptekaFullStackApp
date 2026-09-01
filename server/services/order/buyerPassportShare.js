@@ -125,6 +125,26 @@ export const sanitizeOrderForBuyerApi = (order) => {
 };
 
 /**
+ * Курьеру — ни кодов, ни реквизитов, ни паспорта.
+ *
+ * Раньше курьерские ручки отвечали покупательской чисткой, и на шаге
+ * «Привёз» курьер получал в ответе код вручения. Тогда `/complete` он мог
+ * вызвать сам, без покупателя, — второе рукопожатие переставало что-либо
+ * доказывать.
+ *
+ * @param {unknown} order
+ */
+export const sanitizeOrderForCourierApi = (order) => {
+  const plain = toPlainOrder(order);
+  if (!plain) {
+    return plain;
+  }
+  delete plain.buyerPassportShare;
+  delete plain.passportShareConsentAt;
+  return stripShipmentCodes(plain, "courier");
+};
+
+/**
  * @param {unknown} order
  */
 export const sanitizeOrderForSellerApi = (order) => {

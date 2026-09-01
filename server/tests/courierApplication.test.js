@@ -7,7 +7,9 @@ process.env.JWT_SECRET =
 
 const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollections } =
   await import("./helpers/mongoTestDb.js");
-const { UserModel, UserInAppNotificationModel } = await import("../models/index.js");
+const { PrivateUploadModel, UserModel, UserInAppNotificationModel } = await import(
+  "../models/index.js"
+);
 const {
   getMyCourierProfile,
   listCourierApplications,
@@ -28,6 +30,23 @@ const VEHICLE = {
   vehiclePlate: "х123ум797",
   ...DOCS,
 };
+
+/**
+ * Заявка принимает только свои файлы, поэтому владельца заводим явно.
+ *
+ * @param {Parameters<typeof submitCourierApplication>[0]} input
+ */
+async function submitWithDocs(input) {
+  for (const url of Object.values(DOCS)) {
+    const filename = url.replace("/upload/private/", "");
+    await PrivateUploadModel.updateOne(
+      { filename },
+      { $set: { uploaderId: input.userId, purpose: "courier-document" } },
+      { upsert: true },
+    );
+  }
+  return submitCourierApplication(input);
+}
 
 /** @param {{ withAddress?: boolean; role?: string }} [options] */
 async function makeUser({ withAddress = true, role = "user" } = {}) {
@@ -59,7 +78,7 @@ describe("заявка курьера", () => {
   it("подача заявки переводит её в ожидание", async () => {
     const user = await makeUser();
 
-    const profile = await submitCourierApplication({
+    const profile = await submitWithDocs({
       userId: String(user._id),
       ...VEHICLE,
     });
@@ -82,7 +101,7 @@ describe("заявка курьера", () => {
 
   it("повторная подача поверх ожидающей отклоняется", async () => {
     const user = await makeUser();
-    await submitCourierApplication({ userId: String(user._id), ...VEHICLE });
+    await submitWithDocs({ userId: String(user._id), ...VEHICLE });
 
     await assert.rejects(
       () => submitCourierApplication({ userId: String(user._id), ...VEHICLE }),
@@ -100,7 +119,7 @@ describe("модерация заявки курьера", () => {
   async function pendingCourier() {
     const courier = await makeUser();
     const moderator = await makeUser({ role: "moderator" });
-    await submitCourierApplication({ userId: String(courier._id), ...VEHICLE });
+    await submitWithDocs({ userId: String(courier._id), ...VEHICLE });
     return { courier, moderator };
   }
 
@@ -159,7 +178,7 @@ describe("модерация заявки курьера", () => {
       comment: "Не читается номер",
     });
 
-    const profile = await submitCourierApplication({
+    const profile = await submitWithDocs({
       userId: String(courier._id),
       ...VEHICLE,
       vehiclePlate: "а777аа77",
@@ -211,8 +230,8 @@ describe("очередь модерации", () => {
     const approved = await makeUser();
     await makeUser(); // вообще не подавал
 
-    await submitCourierApplication({ userId: String(waiting._id), ...VEHICLE });
-    await submitCourierApplication({ userId: String(approved._id), ...VEHICLE });
+    await submitWithDocs({ userId: String(waiting._id), ...VEHICLE });
+    await submitWithDocs({ userId: String(approved._id), ...VEHICLE });
     await reviewCourierApplication({
       userId: String(approved._id),
       moderatorId: String(moderator._id),
@@ -227,7 +246,7 @@ describe("очередь модерации", () => {
 
   it("отдаёт модератору данные авто и регион, но не паспорт", async () => {
     const courier = await makeUser();
-    await submitCourierApplication({ userId: String(courier._id), ...VEHICLE });
+    await submitWithDocs({ userId: String(courier._id), ...VEHICLE });
 
     const [row] = (await listCourierApplications({ status: "pending" })).applications;
 
@@ -247,7 +266,7 @@ describe("документы курьера", () => {
   it("снимки сохраняются и возвращаются самому курьеру", async () => {
     const user = await makeUser();
 
-    await submitCourierApplication({ userId: String(user._id), ...VEHICLE });
+    await submitWithDocs({ userId: String(user._id), ...VEHICLE });
     const profile = await getMyCourierProfile(String(user._id));
 
     assert.equal(profile.driverLicensePhotoUrl, DOCS.driverLicensePhotoUrl);
@@ -256,7 +275,7 @@ describe("документы курьера", () => {
 
   it("модератор видит снимки в очереди", async () => {
     const user = await makeUser();
-    await submitCourierApplication({ userId: String(user._id), ...VEHICLE });
+    await submitWithDocs({ userId: String(user._id), ...VEHICLE });
 
     const { applications } = await listCourierApplications({ status: "pending" });
 
@@ -270,7 +289,7 @@ describe("документы курьера", () => {
       "../services/upload/canAccessPrivateUpload.js"
     );
     const user = await makeUser();
-    await submitCourierApplication({ userId: String(user._id), ...VEHICLE });
+    await submitWithDocs({ userId: String(user._id), ...VEHICLE });
 
     assert.equal(
       await canAccessPrivateUpload(String(user._id), "license.webp"),
@@ -292,6 +311,52 @@ describe("документы курьера", () => {
     assert.equal(
       await canAccessPrivateUpload(String(moderator._id), "license.webp"),
       true,
+    );
+  });
+});
+
+describe("чужие файлы в заявке", () => {
+  before(connectMongoTestReplSet);
+  after(disconnectMongoTestReplSet);
+  beforeEach(clearMongoCollections);
+
+  it("подставить чужую ссылку нельзя", async () => {
+    const owner = await makeUser();
+    const stranger = await makeUser();
+    await PrivateUploadModel.create({
+      filename: "secret.webp",
+      uploaderId: owner._id,
+      purpose: "courier-document",
+    });
+
+    await assert.rejects(
+      () =>
+        submitCourierApplication({
+          userId: String(stranger._id),
+          ...VEHICLE,
+          driverLicensePhotoUrl: "/upload/private/secret.webp",
+        }),
+      /загружали не вы/i,
+      "иначе чужой документ можно показать модератору как свой",
+    );
+  });
+
+  it("чужой файл не открывается по прямой ссылке", async () => {
+    const { canAccessPrivateUpload } = await import(
+      "../services/upload/canAccessPrivateUpload.js"
+    );
+    const owner = await makeUser();
+    const stranger = await makeUser();
+    await PrivateUploadModel.create({
+      filename: "secret.webp",
+      uploaderId: owner._id,
+      purpose: "courier-document",
+    });
+
+    assert.equal(await canAccessPrivateUpload(String(owner._id), "secret.webp"), true);
+    assert.equal(
+      await canAccessPrivateUpload(String(stranger._id), "secret.webp"),
+      false,
     );
   });
 });

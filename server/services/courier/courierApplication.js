@@ -12,6 +12,7 @@ import { AppError } from "../../errors/AppError.js";
 import { UserModel } from "../../models/index.js";
 import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { createUserInAppNotification } from "../user/userInAppNotifications.js";
+import { assertPrivateUploadsOwnedBy } from "../upload/privateUploadOwnership.js";
 
 /** Поля профиля курьера, безопасные для самого курьера и для стаффа. */
 const COURIER_PROFILE_FIELDS =
@@ -88,6 +89,18 @@ export async function submitCourierApplication({
   if (!String(user.userAddress ?? "").trim() || !String(user.userRegionCode ?? "").trim()) {
     throw new AppError(400, COURIER_ADDRESS_REQUIRED_MESSAGE);
   }
+
+  // Ссылку на приватный файл нельзя принимать на слово: подставив чужую,
+  // заявитель показал бы модератору чужой документ как свой.
+  await assertPrivateUploadsOwnedBy({
+    userId,
+    urls: [
+      vehiclePhotoFrontUrl,
+      vehiclePhotoRearUrl,
+      driverLicensePhotoUrl,
+      vehicleRegistrationPhotoUrl,
+    ],
+  });
 
   const status = user.courierProfile?.moderationStatus ?? COURIER_MODERATION_NONE;
   if (status === COURIER_MODERATION_PENDING) {

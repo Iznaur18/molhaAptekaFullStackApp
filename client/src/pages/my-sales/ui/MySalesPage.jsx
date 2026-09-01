@@ -36,8 +36,21 @@ import { MySalesPageOverview } from "./MySalesPageOverview.jsx";
 
 import "./MySalesPage.css";
 import "./MySalesPageOverview.css";
+import { resolveOrderLineSellerId } from "@izibuy/shared-lib";
 
 const EMPTY_ORDERS = [];
+
+/**
+ * Чей это заказ со стороны продавца.
+ *
+ * Массив отправлений приходит целиком, включая чужие, поэтому `shipments[0]`
+ * в смешанном заказе указывал не туда. Позиции же продавцу приходят только
+ * его собственные — по ним и определяем.
+ *
+ * @param {{ items?: Array<Record<string, unknown>> } | null | undefined} order
+ */
+const resolveSaleSellerId = (order) =>
+  order?.items?.length ? resolveOrderLineSellerId(order.items[0]) : "";
 
 /**
  * @param {{
@@ -340,7 +353,7 @@ export function MySalesPage({
     setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
     try {
       const order = filteredOrders.find((row) => row._id === orderId);
-      const sellerId = order?.shipments?.[0]?.sellerId;
+      const sellerId = resolveSaleSellerId(order);
       const result = await issueCodeMutation.mutateAsync({ orderId, sellerId });
       setIssuedCodes((prev) => ({ ...prev, [orderId]: result.code }));
     } catch (e) {
@@ -364,7 +377,7 @@ export function MySalesPage({
       const order = filteredOrders.find((row) => row._id === orderId);
       const updatedOrder = await openDisputeMutation.mutateAsync({
         orderId,
-        sellerId: order?.shipments?.[0]?.sellerId,
+        sellerId: resolveSaleSellerId(order),
       });
       patchOrders((prev) =>
         prev.map((row) => (row._id === orderId ? updatedOrder.order ?? row : row)),
@@ -391,7 +404,7 @@ export function MySalesPage({
     setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
     try {
       const order = filteredOrders.find((row) => row._id === orderId);
-      const sellerId = order?.shipments?.[0]?.sellerId;
+      const sellerId = resolveSaleSellerId(order);
       const updatedOrder = await replaceCourierMutation.mutateAsync({
         orderId,
         sellerId,
@@ -418,7 +431,7 @@ export function MySalesPage({
       const order = filteredOrders.find((row) => row._id === orderId);
       await confirmPaymentMutation.mutateAsync({
         orderId,
-        sellerId: order?.shipments?.[0]?.sellerId,
+        sellerId: resolveSaleSellerId(order),
         confirmed: true,
       });
       void reloadSales();

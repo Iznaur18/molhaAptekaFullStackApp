@@ -181,7 +181,7 @@ export function buildProfileNavGroups({
           ? [
               {
                 tab: "courier-overview",
-                label: "Обзор (курьер)",
+                label: "Свободные заказы",
                 onClick: () => selectTab("courier-overview", onCourierOverviewClick),
               },
             ]

@@ -18,6 +18,7 @@ import {
   isObjectStorageUploadEnabled,
   persistPrivateUploadToObjectStorage,
 } from "../../services/upload/objectStorageUpload.js";
+import { rememberPrivateUploadOwner } from "../../services/upload/privateUploadOwnership.js";
 import { successRes, errorRes } from "../../services/http/index.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
@@ -104,6 +105,12 @@ export async function uploadController(req, res) {
     const filename = isObjectStorageUploadEnabled()
       ? await persistPrivateUploadToObjectStorage(req.file)
       : await moveUploadFileToPrivateDir(await finalizeUploadedFile(req.file));
+
+    await rememberPrivateUploadOwner({
+      filename,
+      uploaderId: String(req.userId),
+      purpose: resolveUploadPurpose(req),
+    });
 
     return successRes(res, {
       url: buildPrivateUploadApiUrl(filename),

@@ -45,6 +45,7 @@ import PassportVaultAccessLogModel from "./PassportVaultAccessLogModel.js";
 import ReferralLedgerEntryModel from "./ReferralLedgerEntryModel.js";
 import AffiliateLedgerEntryModel from "./AffiliateLedgerEntryModel.js";
 import { MoneyIdempotencyRecordModel } from "./MoneyIdempotencyRecordModel.js";
+import { PrivateUploadModel } from "./PrivateUploadModel.js";
 import OneCExchangeLogModel from "./OneCExchangeLogModel.js";
 import OneCOrderPushModel from "./OneCOrderPushModel.js";
 import OneCExchangeSessionModel from "./OneCExchangeSessionModel.js";
@@ -101,6 +102,7 @@ export {
   ReferralLedgerEntryModel,
   AffiliateLedgerEntryModel,
   MoneyIdempotencyRecordModel,
+  PrivateUploadModel,
   OneCExchangeLogModel,
   OneCOrderPushModel,
   OneCExchangeSessionModel,

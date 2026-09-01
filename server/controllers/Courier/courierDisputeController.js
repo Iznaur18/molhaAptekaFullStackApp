@@ -4,12 +4,30 @@ import {
   openShipmentDispute,
   resolveShipmentDispute,
 } from "../../services/courier/courierDisputes.js";
-import { sanitizeOrderForBuyerApi } from "../../services/order/buyerPassportShare.js";
+import {
+  sanitizeOrderForBuyerApi,
+  sanitizeOrderForCourierApi,
+  sanitizeOrderForSellerApi,
+} from "../../services/order/buyerPassportShare.js";
 import { successRes } from "../../services/http/index.js";
 
-/** Курьеру и продавцу паспортные данные покупателя не показываем. */
-const respondWithOrder = (res, result) =>
-  successRes(res, { order: sanitizeOrderForBuyerApi(result.order) });
+/**
+ * Отвечаем по звонящему: код вручения и реквизиты положены только покупателю.
+ *
+ * @param {import('express').Response} res
+ * @param {{ order: any }} result
+ * @param {string} requestUserId
+ */
+const respondToParty = (res, result, requestUserId) => {
+  const order = result.order;
+  const buyerId = String(order?.userBuyerId?._id ?? order?.userBuyerId ?? "");
+  return successRes(res, {
+    order:
+      buyerId === String(requestUserId)
+        ? sanitizeOrderForBuyerApi(order)
+        : sanitizeOrderForSellerApi(order),
+  });
+};
 
 /**
  * `POST /couriers/shipments/:orderId/:sellerId/decline` — курьер снимает с
@@ -21,7 +39,7 @@ export const declineShipmentController = async (req, res) => {
     sellerId: req.params.sellerId,
     courierId: String(req.userId),
   });
-  return respondWithOrder(res, result);
+  return successRes(res, { order: sanitizeOrderForCourierApi(result.order) });
 };
 
 /**
@@ -35,7 +53,7 @@ export const openShipmentDisputeController = async (req, res) => {
     requestUserId: String(req.userId),
     reason: req.body?.reason ?? "",
   });
-  return respondWithOrder(res, result);
+  return respondToParty(res, result, String(req.userId));
 };
 
 /** `GET /staff/shipment-disputes` — очередь модератора. */
@@ -52,5 +70,5 @@ export const postStaffResolveDisputeController = async (req, res) => {
     outcome: req.body.outcome,
     moderatorId: String(req.userId),
   });
-  return respondWithOrder(res, result);
+  return successRes(res, { order: sanitizeOrderForSellerApi(result.order) });
 };

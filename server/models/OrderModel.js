@@ -292,6 +292,13 @@ const OrderShipmentSchema = new mongoose.Schema(
     },
     disputeReason: { type: String, default: "", trim: true, maxlength: 500 },
     disputeResolvedAt: { type: Date, default: null },
+    /** Кто и чем закрыл спор: лог ротируется, а разбор нужен в истории. */
+    disputeResolvedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    disputeOutcome: { type: String, trim: true, default: "" },
     /** Курьеры, которым отказали по этому отправлению: назад их не пускаем. */
     declinedCourierIds: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],

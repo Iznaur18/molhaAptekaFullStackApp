@@ -33,6 +33,7 @@ import {
   PRODUCT_CARD_UI,
   SHIPMENT_DISPUTE_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { resolveOrderLineSellerId } from "@izibuy/shared-lib";
 import {
   isOrderLineItemProductClickable,
   resolveOrderLineItemProductName,
@@ -565,10 +566,19 @@ export function OrderCard({
   // Продавцу в «Мои продажи» приходят только его позиции, поэтому их свод и
   // есть статус его отправления. Способ получения берём с самого отправления,
   // а на заказах до отправлений — с общего поля.
+  // Отправление ищем по продавцу позиций, а не по «единственному в массиве»:
+  // в смешанном заказе блок покупателя несёт все отправления сразу, и
+  // shipments[0] мог оказаться чужим — тогда покупатель не видел ни своего
+  // кода вручения, ни реквизитов для перевода.
+  const cardSellerId = order.items?.length
+    ? resolveOrderLineSellerId(order.items[0])
+    : "";
+  const shipmentOwn =
+    (order.shipments ?? []).find(
+      (row) => row?.sellerId != null && String(row.sellerId) === cardSellerId,
+    ) ?? null;
   const shipmentFulfillment =
-    order.shipments?.length === 1
-      ? order.shipments[0].fulfillmentMethod
-      : order.fulfillmentMethod;
+    shipmentOwn?.fulfillmentMethod ?? order.fulfillmentMethod;
   const shipmentAdvance =
     attentionRole === "seller" && onAdvanceShipment
       ? resolveShipmentAdvanceAction(
@@ -579,7 +589,6 @@ export function OrderCard({
   // Продавец выдаёт код, когда курьер уже приехал за заказом. Покупателю его
   // код сервер отдаёт только на «Доставлен» — раньше он не нужен, а лишний
   // повод показать код это лишний повод его слить.
-  const shipmentOwn = order.shipments?.length === 1 ? order.shipments[0] : null;
   const canIssueCode =
     attentionRole === "seller" &&
     Boolean(onIssueHandoverCode) &&
@@ -608,7 +617,10 @@ export function OrderCard({
     Boolean(onOpenDispute) &&
     (shipmentStatusNow === "courier_holding" ||
       shipmentStatusNow === "in_delivery");
-  const disputeOpened = Boolean(shipmentOwn?.disputeOpenedAt);
+  // Закрытый спор больше не спор: иначе строка про модератора висела бы на
+  // заказе вечно.
+  const disputeOpened =
+    Boolean(shipmentOwn?.disputeOpenedAt) && !shipmentOwn?.disputeResolvedAt;
   const shipmentActionKey = `${order._id}:shipment`;
   const isShipmentActionPending = pendingActionKey === shipmentActionKey;
 

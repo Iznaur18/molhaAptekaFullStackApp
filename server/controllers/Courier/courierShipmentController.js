@@ -13,12 +13,35 @@ import {
 } from "../../services/courier/courierOverview.js";
 import { raiseShipmentDeliveryFee } from "../../services/courier/courierDeliveryFee.js";
 import { replaceShipmentCourier } from "../../services/courier/replaceShipmentCourier.js";
-import { sanitizeOrderForBuyerApi } from "../../services/order/buyerPassportShare.js";
+import {
+  sanitizeOrderForBuyerApi,
+  sanitizeOrderForCourierApi,
+  sanitizeOrderForSellerApi,
+} from "../../services/order/buyerPassportShare.js";
 import { successRes } from "../../services/http/index.js";
 
-/** Курьеру и продавцу паспортные данные покупателя не показываем. */
-const respondWithOrder = (res, result) =>
-  successRes(res, { order: sanitizeOrderForBuyerApi(result.order) });
+/** Шаги курьера: ни кодов, ни реквизитов, ни паспорта. */
+const respondToCourier = (res, result) =>
+  successRes(res, { order: sanitizeOrderForCourierApi(result.order) });
+
+/**
+ * Ручку дёргают обе стороны сделки, и покупателю положено видеть свой код
+ * вручения и реквизиты для перевода, а продавцу — нет.
+ *
+ * @param {import('express').Response} res
+ * @param {{ order: any }} result
+ * @param {string} requestUserId
+ */
+const respondToParty = (res, result, requestUserId) => {
+  const order = result.order;
+  const buyerId = String(order?.userBuyerId?._id ?? order?.userBuyerId ?? "");
+  return successRes(res, {
+    order:
+      buyerId === String(requestUserId)
+        ? sanitizeOrderForBuyerApi(order)
+        : sanitizeOrderForSellerApi(order),
+  });
+};
 
 /** `POST /couriers/shipments/:orderId/:sellerId/accept` */
 export const acceptShipmentController = async (req, res) => {
@@ -27,7 +50,7 @@ export const acceptShipmentController = async (req, res) => {
     sellerId: req.params.sellerId,
     courierId: String(req.userId),
   });
-  return respondWithOrder(res, result);
+  return respondToCourier(res, result);
 };
 
 /**
@@ -50,7 +73,7 @@ export const confirmHandoverController = async (req, res) => {
     courierId: String(req.userId),
     code: req.body.code,
   });
-  return respondWithOrder(res, result);
+  return respondToCourier(res, result);
 };
 
 /** `POST /couriers/shipments/:orderId/:sellerId/start-delivery` */
@@ -60,7 +83,7 @@ export const startDeliveryController = async (req, res) => {
     sellerId: req.params.sellerId,
     courierId: String(req.userId),
   });
-  return respondWithOrder(res, result);
+  return respondToCourier(res, result);
 };
 
 /** `POST /couriers/shipments/:orderId/:sellerId/arrived` */
@@ -70,7 +93,7 @@ export const markArrivedController = async (req, res) => {
     sellerId: req.params.sellerId,
     courierId: String(req.userId),
   });
-  return respondWithOrder(res, result);
+  return respondToCourier(res, result);
 };
 
 /** `POST /couriers/shipments/:orderId/:sellerId/complete` */
@@ -81,7 +104,7 @@ export const completeDeliveryController = async (req, res) => {
     courierId: String(req.userId),
     code: req.body.code,
   });
-  return respondWithOrder(res, result);
+  return respondToCourier(res, result);
 };
 
 /** `GET /couriers/overview` — свободные отправления в регионе курьера. */
@@ -125,7 +148,7 @@ export const replaceShipmentCourierController = async (req, res) => {
     sellerId: req.params.sellerId,
     requestUserId: String(req.userId),
   });
-  return respondWithOrder(res, result);
+  return respondToParty(res, result, String(req.userId));
 };
 
 /**
@@ -139,5 +162,5 @@ export const setShipmentPaymentConfirmedController = async (req, res) => {
     sellerId: String(req.userId),
     confirmed: req.body.confirmed !== false,
   });
-  return respondWithOrder(res, result);
+  return successRes(res, { order: sanitizeOrderForSellerApi(result.order) });
 };

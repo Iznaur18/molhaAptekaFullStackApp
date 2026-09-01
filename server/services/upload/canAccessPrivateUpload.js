@@ -2,6 +2,7 @@ import { ORDER_STATUS_CANCELLED } from "../../constants/orderConstants.js";
 import { OrderModel, ProductModel, UserModel } from "../../models/index.js";
 import { canModerateProductsRole } from "../product/productModeration.js";
 import { buildPrivateUploadApiUrl } from "./privateUploadPaths.js";
+import { isPrivateUploadOwnedBy } from "./privateUploadOwnership.js";
 
 /**
  * @param {string} value
@@ -10,7 +11,7 @@ const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /**
  * Staff/moderator — любой private file.
- * Курьер — свои же фото авто и документов из заявки.
+ * Загрузивший — свой же файл.
  * Продавец — только если selfie есть в незакрытой рассрочной заявке по его товару.
  *
  * @param {string} userId
@@ -35,8 +36,14 @@ export async function canAccessPrivateUpload(userId, filename) {
 
   const selfieUrl = buildPrivateUploadApiUrl(safeFilename);
 
-  // Свою же заявку курьер открывает при переподаче после отказа — иначе он
-  // не видит, что именно приложил, и грузит всё заново.
+  // Свой же файл видно всегда: курьер при переподаче должен понимать, что
+  // именно он приложил.
+  if (await isPrivateUploadOwnedBy(userId, safeFilename)) {
+    return true;
+  }
+
+  // Файлы, загруженные до появления реестра владельцев, опознаём по ссылке
+  // в собственной заявке.
   const courierProfile = user.courierProfile ?? {};
   const ownCourierDocument = [
     courierProfile.vehiclePhotoFrontUrl,
