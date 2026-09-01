@@ -48,6 +48,8 @@ export const ORDER_CARD_UI = {
   SHIPMENT_PAY_TO: (requisites) => `Перевести продавцу: ${requisites}`,
   SHIPMENT_PAY_TO_HINT:
     "Курьер отдаст заказ, когда продавец подтвердит перевод.",
+  SHIPMENT_PAYMENT_RECEIVED_BY_SELLER: "Продавец подтвердил, что перевод дошёл",
+  SHIPMENT_PAYMENT_RECEIVED_HINT: "Больше переводить ничего не нужно.",
   SHIPMENT_REPLACE_CONFIRM:
     "Сменить курьера? Заказ вернётся в общий список, а этот курьер больше не сможет его взять.",
   /** @param {string} code */

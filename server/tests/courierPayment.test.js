@@ -9,7 +9,9 @@ const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollectio
   await import("./helpers/mongoTestDb.js");
 const { createOrderLoyaltyFixture, createOrderWithReserveTransaction } =
   await import("./helpers/orderLoyaltyTestHelpers.js");
-const { OrderModel, UserModel } = await import("../models/index.js");
+const { OrderModel, UserInAppNotificationModel, UserModel } = await import(
+  "../models/index.js"
+);
 const { advanceOrderShipmentStatus } = await import(
   "../services/order/advanceShipmentStatus.js"
 );
@@ -100,6 +102,21 @@ describe("третье рукопожатие: оплата", () => {
     assert.equal(fresh.status, "confirmed");
   });
 
+  it("покупатель узнаёт, что перевод дошёл", async () => {
+    const { args, buyer } = await deliveredShipment();
+
+    await flow.setShipmentPaymentConfirmed({ ...args, confirmed: true });
+
+    const notifications = await UserInAppNotificationModel.find({
+      userId: buyer._id,
+      kind: "shipment_payment_confirmed",
+    }).lean();
+    assert.equal(
+      notifications.length,
+      1,
+      "иначе покупатель перевёл деньги и сидит в тишине",
+    );
+  });
   it("подтверждение до приезда курьера не принимается", async () => {
     const { seller, buyer, product } = await createOrderLoyaltyFixture();
     const order = await createOrderWithReserveTransaction({ buyer, seller, product });

@@ -772,3 +772,25 @@
   text-underline-offset: 2px;
   cursor: pointer;
 }
+
+/* Оплата дошла: спокойный зелёный, в отличие от пунктирной рамки кодов —
+   это уже не задача, а закрытый вопрос. */
+.order-card__payment-done {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--iz-color-success, #2f8f4e);
+  border-radius: 8px;
+  color: var(--iz-color-text);
+}
+
+.order-card__payment-done strong {
+  color: var(--iz-color-success, #2f8f4e);
+}
+
+.order-card__payment-done span {
+  font-size: 0.85rem;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}

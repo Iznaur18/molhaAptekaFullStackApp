@@ -664,7 +664,7 @@ export function OrderCard({
                 ? ORDER_CARD_UI.ACTION_PENDING
                 : ORDER_CARD_UI.SHIPMENT_PAYMENT_CONFIRM}
             </button>
-          ) : paymentConfirmed && attentionRole === "seller" ? (
+          ) : paymentConfirmed ? (
             <span className="order-card__shipment-label">
               {ORDER_CARD_UI.SHIPMENT_PAYMENT_CONFIRMED}
             </span>
@@ -778,7 +778,12 @@ export function OrderCard({
         </p>
       ) : null}
 
-      {payToRequisites ? (
+      {attentionRole === "buyer" && paymentConfirmed ? (
+        <div className="order-card__payment-done">
+          <strong>{ORDER_CARD_UI.SHIPMENT_PAYMENT_RECEIVED_BY_SELLER}</strong>
+          <span>{ORDER_CARD_UI.SHIPMENT_PAYMENT_RECEIVED_HINT}</span>
+        </div>
+      ) : payToRequisites ? (
         <div className="order-card__buyer-code">
           <strong>{ORDER_CARD_UI.SHIPMENT_PAY_TO(payToRequisites)}</strong>
           <span>{ORDER_CARD_UI.SHIPMENT_PAY_TO_HINT}</span>

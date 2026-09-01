@@ -4,6 +4,8 @@ import {
   COURIER_IS_ORDER_PARTY_MESSAGE,
   COURIER_NOT_APPROVED_MESSAGE,
   COURIER_MODERATION_APPROVED,
+  IN_APP_NOTIFICATION_KIND_SHIPMENT_PAYMENT_CONFIRMED,
+  SHIPMENT_PAYMENT_CONFIRMED_MESSAGE,
 } from "../../constants/courierConstants.js";
 import {
   ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
@@ -15,6 +17,8 @@ import {
   ORDER_TERMINAL_STATUSES,
 } from "../../constants/orderConstants.js";
 import { AppError } from "../../errors/AppError.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
+import { createUserInAppNotification } from "../user/userInAppNotifications.js";
 import { UserModel } from "../../models/index.js";
 import { notifyBuyerAboutOrderItemStatus } from "../order/notifyBuyerAboutOrderItemStatus.js";
 import {
@@ -339,6 +343,25 @@ export async function completeDeliveryByCourier({
  *
  * @param {{ orderId: string; sellerId: string; confirmed: boolean }} input
  */
+/** @param {any} order */
+async function notifyBuyerAboutPaymentConfirmed(order) {
+  const buyerId = order.userBuyerId?._id ?? order.userBuyerId;
+  if (!buyerId) return;
+  try {
+    await createUserInAppNotification({
+      userId: String(buyerId),
+      kind: IN_APP_NOTIFICATION_KIND_SHIPMENT_PAYMENT_CONFIRMED,
+      message: SHIPMENT_PAYMENT_CONFIRMED_MESSAGE,
+    });
+  } catch (error) {
+    logServerEvent("error", {
+      event: "notify_payment_confirmed_failed",
+      orderId: String(order._id ?? ""),
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
 export async function setShipmentPaymentConfirmed({ orderId, sellerId, confirmed }) {
   const order = await loadOrderWithItems(orderId);
   const { shipment, status } = locateShipment(order, sellerId);
@@ -364,6 +387,10 @@ export async function setShipmentPaymentConfirmed({ orderId, sellerId, confirmed
   shipment.paymentConfirmedAt = new Date();
   await order.save();
   await populateOrderForResponse(order);
+
+  // Покупатель только что перевёл деньги и ждёт, дошли ли они. Молчание тут
+  // — худшая часть ожидания.
+  await notifyBuyerAboutPaymentConfirmed(order);
 
   return { order };
 }

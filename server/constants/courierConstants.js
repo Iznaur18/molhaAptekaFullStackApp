@@ -107,6 +107,12 @@ export const IN_APP_NOTIFICATION_KIND_COURIER_DECLINED = "courier_declined";
 export const COURIER_DECLINED_MESSAGE =
   "Курьер отказался от заказа — он снова в общем списке";
 
+/** In-app: продавец подтвердил, что перевод дошёл. */
+export const IN_APP_NOTIFICATION_KIND_SHIPMENT_PAYMENT_CONFIRMED =
+  "shipment_payment_confirmed";
+export const SHIPMENT_PAYMENT_CONFIRMED_MESSAGE =
+  "Продавец подтвердил, что перевод получен";
+
 /** In-app: по отправлению открыт спор. */
 export const IN_APP_NOTIFICATION_KIND_SHIPMENT_DISPUTED = "shipment_disputed";
 export const SHIPMENT_DISPUTED_MESSAGE =
