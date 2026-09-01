@@ -37,6 +37,10 @@ export function buildPatchUserProfileBody(form, options = {}) {
   const rawFullName = String(form.userFullName).trim().replace(/\s+/g, " ");
   body.userFullName = rawFullName === "" ? null : rawFullName;
 
+  // Пустая строка — это «убрать реквизиты», а не «не трогать»: продавец
+  // должен иметь возможность их стереть.
+  body.sellerPayoutRequisites = String(form.sellerPayoutRequisites ?? "").trim();
+
   Object.assign(body, buildUserBusinessHoursPatchBody(form));
 
   if (form.userBirthDate === "") {

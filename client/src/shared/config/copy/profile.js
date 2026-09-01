@@ -127,6 +127,10 @@ export const EDIT_PROFILE_MODAL_UI = {
   SECTION_SOCIAL: "Соцсети",
   LABEL_FULL_NAME: "Имя и фамилия",
   HINT_FULL_NAME: "Как вас видят другие пользователи. Можно указать имя, фамилию или название.",
+  LABEL_PAYOUT_REQUISITES: "Реквизиты для перевода",
+  HINT_PAYOUT_REQUISITES:
+    "Номер карты или телефон для СБП. Покупатель увидит их, только когда его заказ уже везёт курьер и платить надо переводом. Платформа деньги не принимает — перевод идёт напрямую вам.",
+  PLACEHOLDER_PAYOUT_REQUISITES: "2200 1234 5678 9010 или +7 900 000-00-00",
   LABEL_EMAIL: "Email",
   LABEL_USERNAME: "Никнейм",
   USERNAME_HINT:

@@ -1,4 +1,7 @@
-import { USER_FULL_NAME_MAX_LENGTH } from "@molha/api-contract";
+import {
+  SELLER_PAYOUT_REQUISITES_MAX_LENGTH,
+  USER_FULL_NAME_MAX_LENGTH,
+} from "@molha/api-contract";
 import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -315,6 +318,22 @@ export function EditProfilePage({
               />
               <span className="edit-profile-modal__hint">
                 {EDIT_PROFILE_MODAL_UI.HINT_FULL_NAME}
+              </span>
+            </label>
+            <label className="edit-profile-modal__label">
+              {EDIT_PROFILE_MODAL_UI.LABEL_PAYOUT_REQUISITES}
+              <input
+                className="edit-profile-modal__input"
+                type="text"
+                name="sellerPayoutRequisites"
+                value={form.sellerPayoutRequisites}
+                onChange={handleChange}
+                maxLength={SELLER_PAYOUT_REQUISITES_MAX_LENGTH}
+                placeholder={EDIT_PROFILE_MODAL_UI.PLACEHOLDER_PAYOUT_REQUISITES}
+                disabled={isSubmitting}
+              />
+              <span className="edit-profile-modal__hint">
+                {EDIT_PROFILE_MODAL_UI.HINT_PAYOUT_REQUISITES}
               </span>
             </label>
             <label className="edit-profile-modal__label">

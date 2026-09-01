@@ -76,6 +76,7 @@ export function mapUserToEditProfileForm(user) {
   return {
     userName: user.userName ?? "",
     userFullName: user.userFullName ?? "",
+    sellerPayoutRequisites: user.sellerPayoutRequisites ?? "",
     email: typeof user.email === "string" ? user.email.trim().toLowerCase() : "",
     userBirthDate: birthInput,
     userGender: user.userGender ?? USER_GENDER_NO_SELECTED,
