@@ -159,8 +159,9 @@ export const CHECKOUT_FORM_UI = {
   FULFILLMENT_DELIVERY_SOON: "Скоро",
   FULFILLMENT_DELIVERY_UNAVAILABLE: "Доставка недоступна для выбранных товаров",
   FULFILLMENT_PICKUP_UNAVAILABLE: "Самовывоз недоступен для выбранных товаров",
-  PICKUP_ADDRESS_LABEL: "Где забрать",
-  PICKUP_MULTI_HINT: "Несколько точек — каждый товар по своему адресу",
+  PICKUP_ADDRESS_LABEL: "Откуда забрать заказ",
+  PICKUP_MULTI_HINT:
+    "Несколько точек — каждый товар по своему адресу. Курьер поедет туда же.",
   LABEL_DELIVERY_ADDRESS: "Адрес доставки",
   LABEL_SAVED_ADDRESSES: "Сохранённые адреса",
   SAVED_ADDRESS_OTHER: "Указать другой на карте",
@@ -216,7 +217,7 @@ export const PRODUCT_PICKUP_UI = {
   SAVED_ADDRESS_ADDED: "Добавлено",
   SAVED_ADDRESS_NO_GEO: "Укажите точку на карте",
   PICKUP_MULTI_HINT:
-    "При самовывозе можно выбрать до 5 точек — покупатель выберет, откуда забрать заказ.",
+    "До 5 точек — покупатель выберет, откуда забрать заказ сам или откуда его заберёт курьер.",
   SAVE_LOCATION: "Сохранить точку",
   REMOVE_LOCATION_CONFIRM: "Удалить эту точку?",
   CHECKOUT_PICK_LOCATION: "Где забрать",

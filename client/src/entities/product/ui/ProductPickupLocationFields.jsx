@@ -104,7 +104,7 @@ export function ProductPickupLocationFields({
   const listRef = useRef(list);
   listRef.current = list;
 
-  const multiSelectEnabled = pickupEnabled;
+  const multiSelectEnabled = pickupEnabled || courierDeliveryEnabled;
   const maxLocations = multiSelectEnabled ? PRODUCT_PICKUP_LOCATIONS_MAX : 1;
   const canAddMoreLocations = list.length < maxLocations;
   const showAddressSection = pickupEnabled || deliveryEnabled || courierDeliveryEnabled;
@@ -431,11 +431,16 @@ export function ProductPickupLocationFields({
   const deliverySelectable = PRODUCT_DELIVERY_FULFILLMENT_ENABLED && !disabled;
   const selectedProfileIdSet = buildSelectedProfileIdSet(profileAddresses, selectedProfileIds);
 
+  // Способ доставки товара до покупателя — любой из двух. Раньше здесь
+  // спрашивали только про доставку продавцом, и «только курьеры Gitorg»
+  // выбрать было нельзя: самовывоз не снимался.
+  const shipsToBuyer = deliveryEnabled || courierDeliveryEnabled;
+
   const togglePickup = () => {
     if (disabled) {
       return;
     }
-    if (pickupEnabled && !deliveryEnabled) {
+    if (pickupEnabled && !shipsToBuyer) {
       return;
     }
     emit({ productPickupEnabled: !pickupEnabled });
@@ -609,7 +614,7 @@ export function ProductPickupLocationFields({
             type="checkbox"
             className="product-pickup-location-fields__checkbox"
             checked={pickupEnabled}
-            disabled={disabled || (pickupEnabled && !deliveryEnabled)}
+            disabled={disabled || (pickupEnabled && !shipsToBuyer)}
             onChange={togglePickup}
           />
           <span className="product-pickup-location-fields__check-label">

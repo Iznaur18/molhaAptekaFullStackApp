@@ -255,18 +255,29 @@ export function CartPage({
       );
       return buildCheckoutPickupLocations([{ product }]);
     }
-    // Только отправления, которые покупатель забирает сам: иначе в «Где
-    // забрать» попадёт товар, который к нему едет.
+    // Точка нужна и покупателю, который забирает сам, и курьеру — ему это
+    // адрес, откуда везти. Не нужна она только там, где везёт сам продавец:
+    // он отправляет откуда захочет.
+    const courierSellerIds = new Set(
+      sellerGroups
+        .filter((group) => group.courierDelivery)
+        .map((group) => String(group.sellerId)),
+    );
     const pickupLines = activeSummary.selectedLines.filter((line) => {
-      const sellerId =
-        line?.product?.productSeller?._id ?? line?.product?.productSeller;
-      return fulfillmentBySellerId[String(sellerId ?? "")] !== "delivery";
+      const sellerId = String(
+        line?.product?.productSeller?._id ?? line?.product?.productSeller ?? "",
+      );
+      return (
+        fulfillmentBySellerId[sellerId] !== "delivery" ||
+        courierSellerIds.has(sellerId)
+      );
     });
     return buildCheckoutPickupLocations(pickupLines);
   }, [
     auctionCheckoutBid,
     activeSummary.selectedLines,
     fulfillmentBySellerId,
+    sellerGroups,
     productsQuery.data,
   ]);
 
