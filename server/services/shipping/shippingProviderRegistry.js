@@ -1,11 +1,14 @@
 import {
   SHIPPING_NOT_AVAILABLE_MESSAGE,
   SHIPPING_PROVIDER_LABEL_RU,
+  SHIPPING_PROVIDER_LOBO,
   SHIPPING_PROVIDERS,
   isShippingProviderLive,
 } from "@molha/api-contract";
 
 import { AppError } from "../../errors/AppError.js";
+
+import { createLoboShippingProvider } from "./lobo/loboProvider.js";
 
 /**
  * @param {{ id: string }} params
@@ -30,8 +33,14 @@ export function createStubShippingProvider({ id }) {
   };
 }
 
+// ЛОБО — единственная служба с живым API; остальные пока заглушки.
 const registry = new Map(
-  SHIPPING_PROVIDERS.map((id) => [id, createStubShippingProvider({ id })]),
+  SHIPPING_PROVIDERS.map((id) => [
+    id,
+    id === SHIPPING_PROVIDER_LOBO
+      ? createLoboShippingProvider()
+      : createStubShippingProvider({ id }),
+  ]),
 );
 
 /**
@@ -50,21 +59,17 @@ export function listShippingProviders() {
 }
 
 /**
- * Live-вызовы пока всегда 501; заказ создавать можно без этого.
+ * Вызов метода службы. У заглушек любой метод отвечает 501.
+ *
  * @param {string} providerId
- * @param {"quote" | "createShipment" | "getTracking"} method
+ * @param {"quote" | "createShipment" | "getTracking" | "cancelShipment"} method
  * @param {unknown} [payload]
  */
 export async function invokeShippingProvider(providerId, method, payload) {
   const provider = getShippingProvider(providerId);
-  if (method === "quote") {
-    return provider.quote(payload);
+  const handler = provider[method];
+  if (typeof handler !== "function") {
+    throw new AppError(400, `Неизвестный метод провайдера: ${method}`);
   }
-  if (method === "createShipment") {
-    return provider.createShipment(payload);
-  }
-  if (method === "getTracking") {
-    return provider.getTracking(payload);
-  }
-  throw new AppError(400, `Неизвестный метод провайдера: ${method}`);
+  return handler(payload);
 }

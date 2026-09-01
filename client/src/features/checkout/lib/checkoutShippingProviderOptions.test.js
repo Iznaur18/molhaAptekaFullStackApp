@@ -10,16 +10,22 @@ import {
 } from "./checkoutShippingProviderOptions.js";
 
 describe("checkoutShippingProviderOptions", () => {
-  it("перечисляет все службы, неподключённые — как неживые", () => {
-    const options = listCheckoutShippingProviderOptions();
+  it("вне Чечни ЛОБО не предлагается", () => {
+    const moscow = listCheckoutShippingProviderOptions({ regionCode: "RU-MOW" });
+    expect(moscow.some((option) => option.id === "lobo")).toBe(false);
+    expect(moscow[0]).toEqual({ id: CHECKOUT_SHIPPING_PROVIDER_SELLER, live: true });
+  });
 
-    // Продавец живой всегда, перевозчики видны, но помечены неживыми: их
-    // показывают со «скоро», а не прячут.
-    expect(options[0]).toEqual({ id: CHECKOUT_SHIPPING_PROVIDER_SELLER, live: true });
-    expect(options.length).toBeGreaterThan(1);
-    expect(options.slice(1).every((option) => option.live === false)).toBe(true);
+  it("в Чечне ЛОБО есть и она живая", () => {
+    const grozny = listCheckoutShippingProviderOptions({ regionCode: "RU-CE" });
+    const lobo = grozny.find((option) => option.id === "lobo");
+    expect(lobo).toEqual({ id: "lobo", live: true });
+  });
 
-    expect(hasCheckoutLiveCarrierProviders()).toBe(false);
+  it("неподключённые перевозчики видны, но неживые", () => {
+    const grozny = listCheckoutShippingProviderOptions({ regionCode: "RU-CE" });
+    const cdek = grozny.find((option) => option.id === "cdek");
+    expect(cdek).toEqual({ id: "cdek", live: false });
     expect(listCheckoutShippingServiceOptions()).toEqual([]);
   });
 

@@ -560,7 +560,9 @@ export {
   assertProductWriteFulfillmentMethods,
 } from "./productPickupLocations.js";
 export {
+  SHIPPING_PROVIDER_LOBO,
   SHIPPING_PROVIDER_CDEK,
+  SHIPPING_PROVIDER_REGIONS,
   SHIPPING_PROVIDER_YANDEX_DELIVERY,
   SHIPPING_PROVIDER_RUSSIAN_POST,
   SHIPPING_PROVIDERS,
@@ -583,6 +585,8 @@ export {
   shippingTrackingUrlSchema,
   orderShippingStubFieldsSchema,
   isShippingProviderLive,
+  isShippingProviderAvailableInRegion,
+  listLiveShippingProvidersForRegion,
   buildShippingTrackingUrl,
   resolveOrderShippingTrackingUrl,
 } from "./shippingProvider.js";

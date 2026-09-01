@@ -4,6 +4,7 @@ import {
   SHIPPING_SERVICE_COURIER,
   SHIPPING_SERVICE_PICKUP_POINT,
   SHIPPING_SERVICE_TYPES,
+  isShippingProviderAvailableInRegion,
   isShippingProviderLive,
 } from "@molha/api-contract";
 
@@ -18,18 +19,25 @@ export const CHECKOUT_SHIPPING_PROVIDER_SELLER = "seller";
  */
 
 /**
- * Опции служб для чекаута: продавец и все перевозчики.
+ * Опции служб для чекаута: продавец и перевозчики.
  *
  * Неподключённые показываем с пометкой «скоро», а не прячем: покупатель
  * должен видеть, куда движется сервис, и не гадать, есть ли вообще СДЭК.
- * Так же они выглядят и у продавца в карточке товара.
  *
+ * А вот службу, которой в этом регионе нет, не показываем вовсе — обещать
+ * ЛОБО жителю Москвы хуже, чем промолчать.
+ *
+ * @param {{ regionCode?: string | null }} [options]
  * @returns {CheckoutShippingProviderOption[]}
  */
-export function listCheckoutShippingProviderOptions() {
+export function listCheckoutShippingProviderOptions({ regionCode = null } = {}) {
   return [
     { id: CHECKOUT_SHIPPING_PROVIDER_SELLER, live: true },
-    ...SHIPPING_PROVIDERS.map((id) => ({ id, live: isShippingProviderLive(id) })),
+    ...SHIPPING_PROVIDERS.filter((id) =>
+      // Ограничение по региону есть только у локальных служб; у остальных
+      // помощник всегда возвращает true.
+      isShippingProviderAvailableInRegion(id, regionCode),
+    ).map((id) => ({ id, live: isShippingProviderLive(id) })),
   ];
 }
 
@@ -37,8 +45,8 @@ export function listCheckoutShippingProviderOptions() {
  * Есть ли хотя бы один live-перевозчик (не «Продавцом»).
  * Типы «Курьер» / «ПВЗ» показываем только тогда.
  */
-export function hasCheckoutLiveCarrierProviders() {
-  return listCheckoutShippingProviderOptions().some(
+export function hasCheckoutLiveCarrierProviders(regionCode = null) {
+  return listCheckoutShippingProviderOptions({ regionCode }).some(
     (option) => option.id !== CHECKOUT_SHIPPING_PROVIDER_SELLER && option.live,
   );
 }

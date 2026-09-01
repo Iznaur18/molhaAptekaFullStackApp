@@ -1,22 +1,57 @@
 import { z } from "zod";
 
-/** Провайдеры доставки (каркас; live API — позже). */
+/** Провайдеры доставки. Живой пока один — ЛОБО. */
+export const SHIPPING_PROVIDER_LOBO = "lobo";
 export const SHIPPING_PROVIDER_CDEK = "cdek";
 export const SHIPPING_PROVIDER_YANDEX_DELIVERY = "yandex_delivery";
 export const SHIPPING_PROVIDER_RUSSIAN_POST = "russian_post";
 
-/** @type {readonly ["cdek", "yandex_delivery", "russian_post"]} */
+/** @type {readonly ["lobo", "cdek", "yandex_delivery", "russian_post"]} */
 export const SHIPPING_PROVIDERS = [
+  SHIPPING_PROVIDER_LOBO,
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_YANDEX_DELIVERY,
   SHIPPING_PROVIDER_RUSSIAN_POST,
 ];
 
 export const SHIPPING_PROVIDER_LABEL_RU = {
+  [SHIPPING_PROVIDER_LOBO]: "ЛОБО",
   [SHIPPING_PROVIDER_CDEK]: "СДЭК",
   [SHIPPING_PROVIDER_YANDEX_DELIVERY]: "Яндекс Доставка",
   [SHIPPING_PROVIDER_RUSSIAN_POST]: "Почта России",
 };
+
+/**
+ * Регионы, где служба вообще работает. `null` — по всей стране.
+ *
+ * ЛОБО возит по Чечне: показывать её остальным значит обещать доставку,
+ * которой не будет.
+ */
+export const SHIPPING_PROVIDER_REGIONS = {
+  [SHIPPING_PROVIDER_LOBO]: ["RU-CE"],
+  [SHIPPING_PROVIDER_CDEK]: null,
+  [SHIPPING_PROVIDER_YANDEX_DELIVERY]: null,
+  [SHIPPING_PROVIDER_RUSSIAN_POST]: null,
+};
+
+/**
+ * Доступна ли служба в этом регионе.
+ *
+ * Регион неизвестен — службу с ограничением не предлагаем: лучше не показать
+ * доступное, чем показать недоступное.
+ *
+ * @param {string | null | undefined} providerId
+ * @param {string | null | undefined} regionCode
+ * @returns {boolean}
+ */
+export function isShippingProviderAvailableInRegion(providerId, regionCode) {
+  if (providerId == null || providerId === "") return false;
+  const regions = SHIPPING_PROVIDER_REGIONS[providerId];
+  if (regions == null) return true;
+  const code = String(regionCode ?? "").trim().toUpperCase();
+  if (!code) return false;
+  return regions.includes(code);
+}
 
 export const SHIPPING_SERVICE_PICKUP_POINT = "pickup_point";
 export const SHIPPING_SERVICE_COURIER = "courier";
@@ -31,17 +66,18 @@ export const SHIPPING_SERVICE_TYPES = [
  * Глобальный kill-switch интеграций с перевозчиками.
  * Независимо от PRODUCT_DELIVERY_FULFILLMENT_ENABLED (доставка продавцом).
  */
-export const SHIPPING_PROVIDERS_ENABLED = false;
+export const SHIPPING_PROVIDERS_ENABLED = true;
 
-/** Per-provider flags (все false, пока нет живых ключей). */
+/** Per-provider flags. Живой только ЛОБО; остальные ждут ключей. */
 export const SHIPPING_PROVIDER_ENABLED = {
+  [SHIPPING_PROVIDER_LOBO]: true,
   [SHIPPING_PROVIDER_CDEK]: false,
   [SHIPPING_PROVIDER_YANDEX_DELIVERY]: false,
   [SHIPPING_PROVIDER_RUSSIAN_POST]: false,
 };
 
-/** Первый кандидат на live-подключение. */
-export const SHIPPING_PROVIDER_PRIMARY = SHIPPING_PROVIDER_CDEK;
+/** Первый живой перевозчик. */
+export const SHIPPING_PROVIDER_PRIMARY = SHIPPING_PROVIDER_LOBO;
 
 export const SHIPPING_TRACKING_NUMBER_MAX_LENGTH = 64;
 export const SHIPPING_TRACKING_URL_MAX_LENGTH = 500;
@@ -82,6 +118,19 @@ export function isShippingProviderLive(providerId) {
     return false;
   }
   return SHIPPING_PROVIDER_ENABLED[providerId] === true;
+}
+
+/**
+ * Службы, доступные в этом регионе прямо сейчас: живые и разрешённые.
+ *
+ * @param {string | null | undefined} regionCode
+ * @returns {string[]}
+ */
+export function listLiveShippingProvidersForRegion(regionCode) {
+  return SHIPPING_PROVIDERS.filter(
+    (id) =>
+      isShippingProviderLive(id) && isShippingProviderAvailableInRegion(id, regionCode),
+  );
 }
 
 /**
@@ -134,6 +183,10 @@ export function buildShippingTrackingUrl(provider, trackingNumber) {
     case SHIPPING_PROVIDER_RUSSIAN_POST:
       return `https://www.pochta.ru/tracking#${encodeURIComponent(code)}`;
     case SHIPPING_PROVIDER_YANDEX_DELIVERY:
+      return null;
+    // У ЛОБО нет публичной страницы трекинга: статус приходит по API и
+    // показывается у нас в заказе.
+    case SHIPPING_PROVIDER_LOBO:
       return null;
     default:
       return null;

@@ -8,6 +8,8 @@ import {
   SHIPPING_SERVICE_PICKUP_POINT,
 } from "../lib/checkoutShippingProviderOptions.js";
 import { CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
+import { resolveClientViewerRegionCode } from "../../../entities/region/lib/viewerRegion.js";
+import { useAuthSession } from "../../../entities/user/model/useAuthSession.js";
 
 import "./CheckoutShippingProviderPicker.css";
 
@@ -26,9 +28,13 @@ export function CheckoutShippingProviderPicker({
   disabled = false,
   courierDelivery = null,
 }) {
-  const providerOptions = listCheckoutShippingProviderOptions();
+  const { user } = useAuthSession();
+  // Локальные службы вроде ЛОБО показываем только там, где они возят.
+  const regionCode = resolveClientViewerRegionCode(user?.userRegionCode);
+  const providerOptions = listCheckoutShippingProviderOptions({ regionCode });
   const serviceOptions = listCheckoutShippingServiceOptions();
-  const showCarrierServices = hasCheckoutLiveCarrierProviders() && serviceOptions.length > 0;
+  const showCarrierServices =
+    hasCheckoutLiveCarrierProviders(regionCode) && serviceOptions.length > 0;
 
   return (
     <div className="checkout-shipping-provider-picker">
