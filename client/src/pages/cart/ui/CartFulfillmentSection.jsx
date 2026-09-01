@@ -78,14 +78,48 @@ export function CartFulfillmentSection({
             >
               {CART_PAGE_UI.SECTION_PICKUP}
             </button>
+            {/* Способы доставки показываем все, а нажать можно только те,
+                что подключил продавец: иначе покупатель не понимает, кто
+                повезёт — сам продавец или курьер Gitorg. */}
             <button
               type="button"
               className="cart-fulfillment__method-option"
-              aria-pressed={fulfillmentPicker.value === "delivery"}
-              disabled={!fulfillmentPicker.deliveryAvailable}
+              aria-pressed={
+                fulfillmentPicker.value === "delivery" &&
+                fulfillmentPicker.courierDelivery === true
+              }
+              disabled={
+                !fulfillmentPicker.deliveryAvailable ||
+                fulfillmentPicker.courierDelivery !== true
+              }
+              title={
+                fulfillmentPicker.courierDelivery === true
+                  ? undefined
+                  : CART_PAGE_UI.SECTION_METHOD_UNAVAILABLE
+              }
               onClick={() => fulfillmentPicker.onChange("delivery")}
             >
-              {CART_PAGE_UI.SECTION_DELIVERY}
+              {CART_PAGE_UI.SECTION_DELIVERY_COURIER}
+            </button>
+            <button
+              type="button"
+              className="cart-fulfillment__method-option"
+              aria-pressed={
+                fulfillmentPicker.value === "delivery" &&
+                fulfillmentPicker.courierDelivery !== true
+              }
+              disabled={
+                !fulfillmentPicker.deliveryAvailable ||
+                fulfillmentPicker.courierDelivery === true
+              }
+              title={
+                fulfillmentPicker.courierDelivery === true
+                  ? CART_PAGE_UI.SECTION_METHOD_UNAVAILABLE
+                  : undefined
+              }
+              onClick={() => fulfillmentPicker.onChange("delivery")}
+            >
+              {CART_PAGE_UI.SECTION_DELIVERY_SELLER}
             </button>
           </div>
         ) : null}

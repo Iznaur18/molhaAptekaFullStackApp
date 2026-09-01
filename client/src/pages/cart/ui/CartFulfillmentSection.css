@@ -19,8 +19,12 @@
    в шапке секции продавца, а не один на всю корзину. */
 .cart-fulfillment__method {
   display: inline-flex;
+  /* Способов стало три и будут ещё: на узком экране они переносятся, а не
+     ужимаются в нечитаемое. */
+  flex-wrap: wrap;
+  gap: 1px;
   border: 1px solid var(--iz-color-border);
-  border-radius: 999px;
+  border-radius: 14px;
   overflow: hidden;
 }
 

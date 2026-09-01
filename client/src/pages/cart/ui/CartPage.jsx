@@ -518,6 +518,7 @@ export function CartPage({
               value: fulfillmentBySellerId[group.sellerId] ?? group.defaultMethod,
               pickupAvailable: group.pickupAvailable,
               deliveryAvailable: group.deliveryAvailable,
+              courierDelivery: group.courierDelivery,
               onChange: (method) =>
                 chooseSellerFulfillment(group.sellerId, method),
             }}

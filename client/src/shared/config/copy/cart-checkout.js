@@ -43,6 +43,9 @@ export const CART_PAGE_UI = {
     "У товаров нет адреса самовывоза — оформить заказ нельзя",
   SECTION_PICKUP: "Самовывоз",
   SECTION_DELIVERY: "Доставка",
+  SECTION_DELIVERY_COURIER: "Курьеры Gitorg",
+  SECTION_DELIVERY_SELLER: "Доставка продавцом",
+  SECTION_METHOD_UNAVAILABLE: "Продавец не подключил этот способ",
   /** Корзина группируется по продавцам — по одному отправлению на каждого. */
   SECTION_SELLER_FALLBACK: "Продавец",
   SECTION_METHOD_LABEL: "Способ получения",
