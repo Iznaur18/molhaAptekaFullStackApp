@@ -744,3 +744,19 @@
   font-size: 0.82rem;
   color: var(--iz-color-text-muted, var(--iz-color-text));
 }
+
+/* Кто приедет за заказом: строка спокойнее кодов — это справка, не действие. */
+.order-card__courier {
+  margin: 0.4rem 0 0;
+  font-size: 0.9rem;
+  color: var(--iz-color-text);
+}
+
+.order-card__courier-label {
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
+.order-card__courier-rating,
+.order-card__courier-car {
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}

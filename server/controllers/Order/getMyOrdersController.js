@@ -7,6 +7,7 @@ import { syncOrderStatusFromItems } from "../../services/order/orderStatus.js";
 import { successRes } from "../../services/http/index.js";
 
 import { ORDER_ITEMS_POPULATE } from "./orderQueries.js";
+import { attachShipmentCourierInfo } from "../../services/order/attachShipmentCourierInfo.js";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 50;
@@ -63,6 +64,8 @@ export const getMyOrdersController = async (req, res) => {
     const withPlan = installmentContract ? { ...order, installmentContract } : order;
     return sanitizeOrderForBuyerApi(withPlan);
   });
+
+  await attachShipmentCourierInfo(sortedOrders);
 
   return successRes(res, {
     orders: sortedOrders,

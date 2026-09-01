@@ -33,6 +33,12 @@ export const ORDER_CARD_UI = {
   ITEM_RETURNED_AT_LABEL: "Возвращён",
   ITEM_RETURNED_BY_BUYER: "покупатель отказался",
   ITEM_RETURNED_BY_SELLER: "оформил продавец",
+  SHIPMENT_COURIER: "Курьер",
+  /** @param {string} make @param {string} color @param {string} plate */
+  SHIPMENT_COURIER_CAR: (make, color, plate) =>
+    [make, color, plate].filter(Boolean).join(", "),
+  /** @param {number} rating */
+  SHIPMENT_COURIER_RATING: (rating) => `★ ${rating}`,
   SHIPMENT_HEADING: "Отправление",
   SHIPMENT_ISSUE_CODE: "Выдать код курьеру",
   SHIPMENT_REPLACE_COURIER: "Сменить курьера",

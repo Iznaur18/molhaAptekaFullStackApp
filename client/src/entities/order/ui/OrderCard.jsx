@@ -736,6 +736,37 @@ export function OrderCard({
         ) : null}
       </div>
 
+      {/* Кто приедет: имя, рейтинг и авто. Паспорта курьера тут нет и быть
+          не должно — сторонам сделки хватает того, что видно у машины. */}
+      {shipmentOwn?.courier ? (
+        <p className="order-card__courier">
+          <span className="order-card__courier-label">
+            {ORDER_CARD_UI.SHIPMENT_COURIER}:
+          </span>{" "}
+          <strong>{shipmentOwn.courier.userName}</strong>
+          {shipmentOwn.courier.rating != null ? (
+            <span className="order-card__courier-rating">
+              {" "}
+              {ORDER_CARD_UI.SHIPMENT_COURIER_RATING(shipmentOwn.courier.rating)}
+            </span>
+          ) : null}
+          {ORDER_CARD_UI.SHIPMENT_COURIER_CAR(
+            shipmentOwn.courier.vehicleMake,
+            shipmentOwn.courier.vehicleColor,
+            shipmentOwn.courier.vehiclePlate,
+          ) ? (
+            <span className="order-card__courier-car">
+              {" · "}
+              {ORDER_CARD_UI.SHIPMENT_COURIER_CAR(
+                shipmentOwn.courier.vehicleMake,
+                shipmentOwn.courier.vehicleColor,
+                shipmentOwn.courier.vehiclePlate,
+              )}
+            </span>
+          ) : null}
+        </p>
+      ) : null}
+
       {payToRequisites ? (
         <div className="order-card__buyer-code">
           <strong>{ORDER_CARD_UI.SHIPMENT_PAY_TO(payToRequisites)}</strong>

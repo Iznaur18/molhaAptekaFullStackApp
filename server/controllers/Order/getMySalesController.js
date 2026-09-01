@@ -5,6 +5,7 @@ import { errorRes, successRes } from "../../services/http/index.js";
 import { buildRegexSearchOr } from "../../utils/buildRegexSearchOr.js";
 import { loadInstallmentPlanSummariesByIds } from "../../services/installment/installmentHelpers.js";
 import { sanitizeOrderForSellerApi } from "../../services/order/buyerPassportShare.js";
+import { attachShipmentCourierInfo } from "../../services/order/attachShipmentCourierInfo.js";
 
 import { ORDER_BUYER_PUBLIC_FIELDS, ORDER_ITEMS_POPULATE } from "./orderQueries.js";
 import { ORDER_AFFILIATE_REFERRER_POPULATE } from "../../services/order/orderQueries.js";
@@ -196,6 +197,8 @@ export const getMySalesController = async (req, res) => {
     const withPlan = installmentContract ? { ...order, installmentContract } : order;
     return sanitizeOrderForSellerApi(withPlan);
   });
+
+  await attachShipmentCourierInfo(ordersWithInstallment);
 
   return successRes(res, {
     orders: ordersWithInstallment,
