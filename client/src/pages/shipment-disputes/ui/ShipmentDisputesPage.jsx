@@ -5,6 +5,7 @@ import {
   useShipmentDisputesQuery,
 } from "../../../entities/courier/model/courierQueries.js";
 import { SHIPMENT_DISPUTE_UI } from "../../../shared/config/appUiCopy.js";
+import { ConfirmButton } from "../../../shared/ui/ConfirmButton/ConfirmButton.jsx";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 
 import "./ShipmentDisputesPage.css";
@@ -36,8 +37,6 @@ export function ShipmentDisputesPage({ onQueueChanged }) {
 
   /** @param {Record<string, any>} row @param {"returned" | "confirmed"} outcome */
   const handleResolve = async (row, outcome) => {
-    if (!window.confirm(SHIPMENT_DISPUTE_UI.RESOLVE_CONFIRM)) return;
-
     const key = `${row.orderId}:${row.sellerId}`;
     setPendingKey(key);
     setRowError((prev) => ({ ...prev, [key]: "" }));
@@ -137,22 +136,20 @@ export function ShipmentDisputesPage({ onQueueChanged }) {
                 ) : null}
 
                 <div className="shipment-disputes__actions">
-                  <button
-                    type="button"
+                  <ConfirmButton
                     className="shipment-disputes__returned"
-                    onClick={() => handleResolve(row, "returned")}
+                    label={SHIPMENT_DISPUTE_UI.RESOLVE_RETURNED}
+                    question={SHIPMENT_DISPUTE_UI.RESOLVE_CONFIRM}
+                    onConfirm={() => handleResolve(row, "returned")}
                     disabled={isRowPending}
-                  >
-                    {SHIPMENT_DISPUTE_UI.RESOLVE_RETURNED}
-                  </button>
-                  <button
-                    type="button"
+                  />
+                  <ConfirmButton
                     className="shipment-disputes__confirmed"
-                    onClick={() => handleResolve(row, "confirmed")}
+                    label={SHIPMENT_DISPUTE_UI.RESOLVE_CONFIRMED}
+                    question={SHIPMENT_DISPUTE_UI.RESOLVE_CONFIRM}
+                    onConfirm={() => handleResolve(row, "confirmed")}
                     disabled={isRowPending}
-                  >
-                    {SHIPMENT_DISPUTE_UI.RESOLVE_CONFIRMED}
-                  </button>
+                  />
                 </div>
               </li>
             );

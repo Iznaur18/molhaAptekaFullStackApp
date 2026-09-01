@@ -120,6 +120,7 @@ export async function listCourierOverview({ courierId, lat = null, lon = null, l
   /** @type {Array<Record<string, any>>} */
   const candidates = [];
   const sellerIds = new Set();
+  const buyerIds = new Set();
   const productIds = new Set();
 
   for (const order of orders) {
@@ -157,6 +158,7 @@ export async function listCourierOverview({ courierId, lat = null, lon = null, l
       if (!(Number(shipment.deliveryFeeRub) > 0)) continue;
 
       sellerIds.add(sellerId);
+      if (order.userBuyerId) buyerIds.add(String(order.userBuyerId));
       for (const item of items) {
         if (item.productId) productIds.add(String(item.productId));
       }
@@ -168,9 +170,14 @@ export async function listCourierOverview({ courierId, lat = null, lon = null, l
     return { regionCode, radiusKm: COURIER_OVERVIEW_RADIUS_KM, shipments: [] };
   }
 
-  const [sellers, products] = await Promise.all([
+  const [sellers, buyers, products] = await Promise.all([
     UserModel.find({ _id: { $in: [...sellerIds] } })
       .select("userName userRegionCode userAddress userAddressGeo userPhoneNumber")
+      .lean(),
+    // Только имя: телефон и точный адрес покупателя открываются позже, когда
+    // курьер уже забрал товар.
+    UserModel.find({ _id: { $in: [...buyerIds] } })
+      .select("userName")
       .lean(),
     ProductModel.find({ _id: { $in: [...productIds] } })
       .select(
@@ -180,6 +187,7 @@ export async function listCourierOverview({ courierId, lat = null, lon = null, l
   ]);
 
   const sellerById = new Map(sellers.map((row) => [String(row._id), row]));
+  const buyerById = new Map(buyers.map((row) => [String(row._id), row]));
   const productById = new Map(products.map((row) => [String(row._id), row]));
 
   const origin =
@@ -217,6 +225,8 @@ export async function listCourierOverview({ courierId, lat = null, lon = null, l
       createdAt: order.createdAt,
       distanceKm: distanceKm == null ? null : Math.round(distanceKm * 10) / 10,
       pickupAddress: pickup.address,
+      buyerId: String(order.userBuyerId ?? ""),
+      buyerName: buyerById.get(String(order.userBuyerId))?.userName ?? "",
       // Точный адрес и телефон покупателя откроются только после передачи
       // товара — до неё курьеру хватает района.
       deliveryAreaHint: String(order.deliveryAddress ?? "")

@@ -168,10 +168,6 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
   };
 
   const handleCancelItem = async ({ orderId, itemIndex }) => {
-    if (!window.confirm(ORDER_CARD_UI.BUYER_CANCEL_CONFIRM)) {
-      return;
-    }
-
     const actionKey = `${orderId}:${itemIndex}`;
     setPendingActionKey(actionKey);
     setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
@@ -211,10 +207,6 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
    * До этого в статусе «Отправлен» у него не было ни одной кнопки.
    */
   const handleRefuseItem = async ({ orderId, itemIndex }) => {
-    if (!window.confirm(ORDER_CARD_UI.ACTION_REFUSE_CONFIRM)) {
-      return;
-    }
-
     const actionKey = `${orderId}:${itemIndex}`;
     setPendingActionKey(actionKey);
     setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
@@ -352,8 +344,6 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
    * список, а этот курьер по нему больше не появится.
    */
   const handleReplaceCourier = async ({ orderId }) => {
-    if (!window.confirm(ORDER_CARD_UI.SHIPMENT_REPLACE_CONFIRM)) return;
-
     const actionKey = `${orderId}:shipment`;
     setPendingActionKey(actionKey);
     setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));

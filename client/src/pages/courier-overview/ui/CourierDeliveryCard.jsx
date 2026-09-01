@@ -9,6 +9,7 @@ import {
 } from "../../../entities/courier/model/courierQueries.js";
 import { ORDER_STATUS_LABEL_RU } from "../../../entities/order/model/constants.js";
 import { COURIER_OVERVIEW_UI } from "../../../shared/config/appUiCopy.js";
+import { ConfirmButton } from "../../../shared/ui/ConfirmButton/ConfirmButton.jsx";
 import { CourierOrderItem } from "./CourierOrderItem.jsx";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 
@@ -224,17 +225,15 @@ export function CourierDeliveryCard({
 
       {/* Отказ возможен, только пока товар у продавца: дальше это уже спор. */}
       {delivery.status === "courier_assigned" ? (
-        <button
-          type="button"
+        <ConfirmButton
           className="courier-overview__decline"
+          label={COURIER_OVERVIEW_UI.DECLINE}
+          pendingLabel={COURIER_OVERVIEW_UI.SAVING}
+          isPending={isBusy}
+          question={COURIER_OVERVIEW_UI.DECLINE_CONFIRM}
+          onConfirm={() => void guard(() => declineMutation.mutateAsync(ids))}
           disabled={isBusy}
-          onClick={() => {
-            if (!window.confirm(COURIER_OVERVIEW_UI.DECLINE_CONFIRM)) return;
-            void guard(() => declineMutation.mutateAsync(ids));
-          }}
-        >
-          {COURIER_OVERVIEW_UI.DECLINE}
-        </button>
+        />
       ) : null}
     </li>
   );

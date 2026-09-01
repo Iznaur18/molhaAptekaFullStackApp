@@ -154,6 +154,24 @@ export function CourierOverviewPage({ onUserClick }) {
                     )}
                   </dd>
                 </div>
+                {row.buyerName ? (
+                  <div>
+                    <dt>{COURIER_OVERVIEW_UI.BUYER}</dt>
+                    <dd>
+                      {onUserClick && row.buyerId ? (
+                        <button
+                          type="button"
+                          className="courier-overview__person"
+                          onClick={() => onUserClick(String(row.buyerId))}
+                        >
+                          {row.buyerName}
+                        </button>
+                      ) : (
+                        row.buyerName
+                      )}
+                    </dd>
+                  </div>
+                ) : null}
                 <div>
                   <dt>{COURIER_OVERVIEW_UI.PICKUP}</dt>
                   <dd>{row.pickupAddress || "—"}</dd>

@@ -190,10 +190,6 @@ export function MySalesPage({
   );
 
   const handleCancelItem = async ({ orderId, itemIndex }) => {
-    if (!window.confirm(ORDER_CARD_UI.CANCEL_CONFIRM)) {
-      return;
-    }
-
     const actionKey = `${orderId}:${itemIndex}`;
     setPendingActionKey(actionKey);
     setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
@@ -397,8 +393,6 @@ export function MySalesPage({
    * курьер по нему больше не появится.
    */
   const handleReplaceCourier = async ({ orderId }) => {
-    if (!window.confirm(ORDER_CARD_UI.SHIPMENT_REPLACE_CONFIRM)) return;
-
     const actionKey = `${orderId}:shipment`;
     setPendingActionKey(actionKey);
     setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
@@ -446,8 +440,6 @@ export function MySalesPage({
 
   const handleMarkReturned = async ({ orderId, itemIndex }) => {
     // Возврат виден покупателю уведомлением — подтверждаем намерение.
-    if (!window.confirm(ORDER_CARD_UI.ACTION_RETURN_CONFIRM)) return;
-
     const actionKey = `${orderId}:${itemIndex}`;
     setPendingActionKey(actionKey);
     setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));

@@ -34,6 +34,7 @@ import {
   SHIPMENT_DISPUTE_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { resolveOrderLineSellerId } from "@izibuy/shared-lib";
+import { ConfirmButton } from "../../../shared/ui/ConfirmButton/ConfirmButton.jsx";
 import {
   isOrderLineItemProductClickable,
   resolveOrderLineItemProductName,
@@ -409,14 +410,19 @@ function OrderCardLineItem({
           {canMarkShipped && (onMarkShipped || onCancelItem) ? (
             <>
               {onCancelItem ? (
-                <button
-                  type="button"
+                <ConfirmButton
                   className="order-card__item-action-button order-card__item-action-button_cancel"
-                  onClick={() => onCancelItem({ orderId, itemIndex })}
+                  label={ORDER_CARD_UI.ACTION_CANCEL}
+                  pendingLabel={ORDER_CARD_UI.ACTION_PENDING}
+                  isPending={isActionPending}
+                  question={
+                    attentionRole === "buyer"
+                      ? ORDER_CARD_UI.BUYER_CANCEL_CONFIRM
+                      : ORDER_CARD_UI.CANCEL_CONFIRM
+                  }
+                  onConfirm={() => onCancelItem({ orderId, itemIndex })}
                   disabled={isActionPending}
-                >
-                  {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_CANCEL}
-                </button>
+                />
               ) : null}
               {onMarkShipped ? (
                 <button
@@ -441,18 +447,23 @@ function OrderCardLineItem({
             </button>
           ) : null}
           {canMarkReturned && onMarkReturned ? (
-            <button
-              type="button"
+            <ConfirmButton
               className="order-card__item-action-button order-card__item-action-button_cancel"
-              onClick={() => onMarkReturned({ orderId, itemIndex })}
-              disabled={isActionPending}
-            >
-              {isActionPending
-                ? ORDER_CARD_UI.ACTION_PENDING
-                : attentionRole === "seller"
+              label={
+                attentionRole === "seller"
                   ? ORDER_CARD_UI.ACTION_RETURN
-                  : ORDER_CARD_UI.ACTION_REFUSE}
-            </button>
+                  : ORDER_CARD_UI.ACTION_REFUSE
+              }
+              pendingLabel={ORDER_CARD_UI.ACTION_PENDING}
+              isPending={isActionPending}
+              question={
+                attentionRole === "seller"
+                  ? ORDER_CARD_UI.ACTION_RETURN_CONFIRM
+                  : ORDER_CARD_UI.ACTION_REFUSE_CONFIRM
+              }
+              onConfirm={() => onMarkReturned({ orderId, itemIndex })}
+              disabled={isActionPending}
+            />
           ) : null}
           {canConfirmDelivered && onConfirmDelivered ? (
             <button
@@ -544,12 +555,26 @@ export function OrderCard({
     onExpandedChange?.(!expanded);
   };
 
+  // Отправление ищем по продавцу позиций, а не по «единственному в массиве»:
+  // в смешанном заказе блок покупателя несёт все отправления сразу, и
+  // shipments[0] мог оказаться чужим — тогда покупатель не видел ни своего
+  // кода вручения, ни реквизитов для перевода.
+  const cardSellerId = order.items?.length
+    ? resolveOrderLineSellerId(order.items[0])
+    : "";
+  const shipmentOwn =
+    (order.shipments ?? []).find(
+      (row) => row?.sellerId != null && String(row.sellerId) === cardSellerId,
+    ) ?? null;
+
   const lineItemProps = {
     orderId: order._id,
     compact,
     itemsCount: order.items.length,
     onProductClick,
-    onMarkShipped,
+    // На курьерском отправлении отгружает курьер, а не продавец: кнопка
+    // увела бы заказ из «Свободных», оставив товар на руках.
+    onMarkShipped: shipmentOwn?.courierDelivery === true ? undefined : onMarkShipped,
     onMarkDelivered,
     onMarkReturned,
     onCancelItem,
@@ -568,17 +593,6 @@ export function OrderCard({
   // Продавцу в «Мои продажи» приходят только его позиции, поэтому их свод и
   // есть статус его отправления. Способ получения берём с самого отправления,
   // а на заказах до отправлений — с общего поля.
-  // Отправление ищем по продавцу позиций, а не по «единственному в массиве»:
-  // в смешанном заказе блок покупателя несёт все отправления сразу, и
-  // shipments[0] мог оказаться чужим — тогда покупатель не видел ни своего
-  // кода вручения, ни реквизитов для перевода.
-  const cardSellerId = order.items?.length
-    ? resolveOrderLineSellerId(order.items[0])
-    : "";
-  const shipmentOwn =
-    (order.shipments ?? []).find(
-      (row) => row?.sellerId != null && String(row.sellerId) === cardSellerId,
-    ) ?? null;
   const shipmentFulfillment =
     shipmentOwn?.fulfillmentMethod ?? order.fulfillmentMethod;
   const shipmentAdvance =
@@ -684,16 +698,15 @@ export function OrderCard({
             </span>
           ) : null}
           {canReplaceCourier ? (
-            <button
-              type="button"
+            <ConfirmButton
               className="order-card__item-action-button order-card__item-action-button_cancel"
-              onClick={() => onReplaceCourier({ orderId: order._id })}
+              label={ORDER_CARD_UI.SHIPMENT_REPLACE_COURIER}
+              pendingLabel={ORDER_CARD_UI.ACTION_PENDING}
+              isPending={isShipmentActionPending}
+              question={ORDER_CARD_UI.SHIPMENT_REPLACE_CONFIRM}
+              onConfirm={() => onReplaceCourier({ orderId: order._id })}
               disabled={isShipmentActionPending}
-            >
-              {isShipmentActionPending
-                ? ORDER_CARD_UI.ACTION_PENDING
-                : ORDER_CARD_UI.SHIPMENT_REPLACE_COURIER}
-            </button>
+            />
           ) : null}
           {canIssueCode ? (
             issuedHandoverCode ? (
@@ -718,19 +731,15 @@ export function OrderCard({
               {SHIPMENT_DISPUTE_UI.OPENED}
             </span>
           ) : canOpenDispute ? (
-            <button
-              type="button"
+            <ConfirmButton
               className="order-card__item-action-button order-card__item-action-button_cancel"
-              onClick={() => {
-                if (!window.confirm(SHIPMENT_DISPUTE_UI.OPEN_CONFIRM)) return;
-                onOpenDispute({ orderId: order._id });
-              }}
+              label={SHIPMENT_DISPUTE_UI.OPEN}
+              pendingLabel={ORDER_CARD_UI.ACTION_PENDING}
+              isPending={isShipmentActionPending}
+              question={SHIPMENT_DISPUTE_UI.OPEN_CONFIRM}
+              onConfirm={() => onOpenDispute({ orderId: order._id })}
               disabled={isShipmentActionPending}
-            >
-              {isShipmentActionPending
-                ? ORDER_CARD_UI.ACTION_PENDING
-                : SHIPMENT_DISPUTE_UI.OPEN}
-            </button>
+            />
           ) : null}
           {shipmentAdvance ? (
           <button

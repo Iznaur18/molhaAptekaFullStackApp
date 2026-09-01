@@ -289,6 +289,24 @@ export async function markOrderItemCancelled({
  *   sellerId: string;
  * }} input
  */
+/**
+ * @param {any} order
+ * @param {any} item
+ */
+function isCourierShipmentForItem(order, item) {
+  const sellerId = String(
+    item?.sellerIdAtOrder ??
+      item?.productId?.productSeller?._id ??
+      item?.productId?.productSeller ??
+      "",
+  );
+  if (!sellerId) return false;
+  const shipment = (order.shipments ?? []).find(
+    (row) => row?.sellerId != null && String(row.sellerId) === sellerId,
+  );
+  return shipment?.courierDelivery === true;
+}
+
 export async function markOrderItemShippedBySeller({ orderId, itemIndex, sellerId }) {
   const order = await loadOrderWithItems(orderId);
   const targetItem = getPopulatedOrderItemOrThrow(order, itemIndex);
@@ -300,6 +318,13 @@ export async function markOrderItemShippedBySeller({ orderId, itemIndex, sellerI
       409,
       "Позицию можно отметить отправленной, только пока товар у вас",
     );
+  }
+
+  // Курьерское отправление продавец не отгружает сам: это сделает курьер,
+  // забрав товар. Иначе заказ уходит из «Готов к отгрузке», пропадает из
+  // «Свободных заказов» и повисает — товар у продавца, а везти его некому.
+  if (isCourierShipmentForItem(order, targetItem)) {
+    throw new AppError(409, "Это отправление везёт курьер — отгрузит он");
   }
 
   targetItem.status = ORDER_STATUS_SHIPPED;
