@@ -90,9 +90,12 @@ export function ShipmentDisputesPage({ onQueueChanged }) {
                   </span>
                 </div>
 
+                {/* Без причины подпись «Причина:» лишняя — фраза сама себя
+                    объясняет. */}
                 <p className="shipment-disputes__reason">
-                  {SHIPMENT_DISPUTE_UI.REASON}:{" "}
-                  {row.reason || SHIPMENT_DISPUTE_UI.NO_REASON}
+                  {row.reason
+                    ? `${SHIPMENT_DISPUTE_UI.REASON}: ${row.reason}`
+                    : SHIPMENT_DISPUTE_UI.NO_REASON}
                 </p>
 
                 <dl className="shipment-disputes__people">
