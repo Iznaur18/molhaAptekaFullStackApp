@@ -15,6 +15,7 @@ export const STAFF_SECTION_IDS = [
   "data-confirmation-requests",
   "courier-moderation",
   "installment-disputes",
+  "shipment-disputes",
 ] as const;
 
 export type StaffSectionId = (typeof STAFF_SECTION_IDS)[number];
@@ -42,6 +43,8 @@ const STAFF_ACCESS: Record<StaffSectionId, StaffAccessRule> = {
   // Модерация курьеров — как модерация товаров: админ и модератор.
   "courier-moderation": { requireAdmin: false, requireModerator: true },
   "installment-disputes": { requireAdmin: false, requireModerator: true },
+  // Споры по доставке разбирают те же, кто модерирует курьеров.
+  "shipment-disputes": { requireAdmin: false, requireModerator: true },
 };
 
 export const isStaffSectionId = (sectionId: string): sectionId is StaffSectionId =>

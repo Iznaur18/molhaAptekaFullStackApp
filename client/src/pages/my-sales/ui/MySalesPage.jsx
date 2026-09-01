@@ -17,6 +17,7 @@ import {
 } from "../../../entities/order/model/constants.js";
 import {
   useIssueHandoverCodeMutation,
+  useOpenShipmentDisputeMutation,
   useReplaceShipmentCourierMutation,
   useSetShipmentPaymentConfirmedMutation,
 } from "../../../entities/courier/model/courierQueries.js";
@@ -73,6 +74,7 @@ export function MySalesPage({
   const { openCatalogProductFromOrderLine } = useCatalogProductDetailsOpener();
   const issueCodeMutation = useIssueHandoverCodeMutation();
   const replaceCourierMutation = useReplaceShipmentCourierMutation();
+  const openDisputeMutation = useOpenShipmentDisputeMutation();
   const confirmPaymentMutation = useSetShipmentPaymentConfirmedMutation();
   /** Выданный код держим в памяти страницы: сервер его больше не отдаст. */
   const [issuedCodes, setIssuedCodes] = useState(
@@ -351,6 +353,33 @@ export function MySalesPage({
   };
 
   /**
+   * Товар уже у курьера, а курьер пропал: дальше разбирается модератор.
+   * Остаток при этом не возвращается на витрину — неизвестно, где товар.
+   */
+  const handleOpenDispute = async ({ orderId }) => {
+    const actionKey = `${orderId}:shipment`;
+    setPendingActionKey(actionKey);
+    setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+    try {
+      const order = filteredOrders.find((row) => row._id === orderId);
+      const updatedOrder = await openDisputeMutation.mutateAsync({
+        orderId,
+        sellerId: order?.shipments?.[0]?.sellerId,
+      });
+      patchOrders((prev) =>
+        prev.map((row) => (row._id === orderId ? updatedOrder.order ?? row : row)),
+      );
+      void reloadSales();
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+      setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
+    } finally {
+      setPendingActionKey(null);
+    }
+  };
+
+  /**
    * Отказ от назначенного курьера. Заказ возвращается в общий список, а этот
    * курьер по нему больше не появится.
    */
@@ -517,6 +546,7 @@ export function MySalesPage({
                 onAdvanceShipment={handleAdvanceShipment}
                 onIssueHandoverCode={handleIssueHandoverCode}
                 onReplaceCourier={handleReplaceCourier}
+                onOpenDispute={handleOpenDispute}
                 onConfirmPayment={handleConfirmPayment}
                 issuedHandoverCode={issuedCodes[order._id] ?? ""}
                 onMarkShipped={handleMarkShipped}

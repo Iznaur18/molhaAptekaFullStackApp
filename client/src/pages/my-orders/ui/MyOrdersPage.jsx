@@ -8,7 +8,10 @@ import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "../../../entities/order/model
 import { orderQueryKeys } from "../../../entities/order/model/orderQueryKeys.js";
 import { useMyOrdersQuery } from "../../../entities/order/model/useMyOrdersQuery.js";
 import { useOrderMutations } from "../../../entities/order/model/useOrderMutations.js";
-import { useReplaceShipmentCourierMutation } from "../../../entities/courier/model/courierQueries.js";
+import {
+  useOpenShipmentDisputeMutation,
+  useReplaceShipmentCourierMutation,
+} from "../../../entities/courier/model/courierQueries.js";
 import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_CONFIRMED,
@@ -47,6 +50,7 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
   const [statusFilter, setStatusFilter] = useState("");
   const [attentionOnly, setAttentionOnly] = useState(false);
   const replaceCourierMutation = useReplaceShipmentCourierMutation();
+  const openDisputeMutation = useOpenShipmentDisputeMutation();
   const [pendingActionKey, setPendingActionKey] = useState(null);
   const [itemActionErrors, setItemActionErrors] = useState({});
   const [loyaltyFlash, setLoyaltyFlash] = useState("");
@@ -293,6 +297,30 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
   }
 
   /**
+   * Товар уже у курьера, а курьер пропал. Дальше разбирается модератор:
+   * вернуть заказ в общий список нельзя — неизвестно, где товар.
+   */
+  const handleOpenDispute = async ({ orderId }) => {
+    const actionKey = `${orderId}:shipment`;
+    setPendingActionKey(actionKey);
+    setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+    try {
+      const block = sellerBlocks.find((row) => row.order._id === orderId);
+      await openDisputeMutation.mutateAsync({
+        orderId,
+        sellerId: block?.sellerId,
+      });
+      void reloadOrders();
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+      setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
+    } finally {
+      setPendingActionKey(null);
+    }
+  };
+
+  /**
    * Покупатель отказывается от назначенного курьера. Заказ вернётся в общий
    * список, а этот курьер по нему больше не появится.
    */
@@ -344,6 +372,7 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
                 onCancelItem={handleCancelItem}
                 onMarkReturned={handleRefuseItem}
                 onReplaceCourier={handleReplaceCourier}
+                onOpenDispute={handleOpenDispute}
                 pendingActionKey={pendingActionKey}
                 itemActionErrors={itemActionErrors}
               />

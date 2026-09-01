@@ -65,6 +65,7 @@ export const PROFILE_NAV_ITEM_META = {
   raffles: { icon: Ticket },
   "data-confirmation-requests": { icon: UserCheck },
   "installment-disputes": { icon: MessageSquareWarning },
+  "shipment-disputes": { icon: MessageSquareWarning },
   "admin-orders": { icon: ListOrdered },
   "admin-analytics": { icon: TrendingUp },
   "staff-audit-log-admin": { icon: ScrollText },

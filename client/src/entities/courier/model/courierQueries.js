@@ -16,6 +16,10 @@ import {
   raiseShipmentDeliveryFee,
   replaceShipmentCourier,
   setShipmentPaymentConfirmed,
+  declineCourierShipment,
+  openShipmentDispute,
+  fetchShipmentDisputes,
+  resolveShipmentDispute,
 } from "../api/courierApi.js";
 
 export const courierQueryKeys = {
@@ -126,3 +130,20 @@ export const useReplaceShipmentCourierMutation = () =>
   useCourierStepMutation(replaceShipmentCourier);
 export const useRaiseDeliveryFeeMutation = () =>
   useCourierStepMutation(raiseShipmentDeliveryFee);
+export const useDeclineCourierShipmentMutation = () =>
+  useCourierStepMutation(declineCourierShipment);
+export const useOpenShipmentDisputeMutation = () =>
+  useCourierStepMutation(openShipmentDispute);
+
+/** @param {{ enabled?: boolean }} [options] */
+export function useShipmentDisputesQuery({ enabled = true } = {}) {
+  return useQuery({
+    queryKey: ["courier", "disputes"],
+    queryFn: fetchShipmentDisputes,
+    enabled,
+    staleTime: 10_000,
+  });
+}
+
+export const useResolveShipmentDisputeMutation = () =>
+  useCourierStepMutation(resolveShipmentDispute);

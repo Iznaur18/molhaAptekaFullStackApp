@@ -1,0 +1,131 @@
+.shipment-disputes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1rem;
+}
+
+.shipment-disputes__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.shipment-disputes__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.shipment-disputes__loading,
+.shipment-disputes__empty {
+  margin: 0;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
+.shipment-disputes__error,
+.shipment-disputes__row-error {
+  margin: 0;
+  color: var(--iz-color-danger, #d64545);
+  font-size: 0.9rem;
+}
+
+.shipment-disputes__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shipment-disputes__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.9rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 14px;
+  background: var(--iz-color-surface, transparent);
+}
+
+.shipment-disputes__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.shipment-disputes__when {
+  font-size: 0.85rem;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
+.shipment-disputes__fee {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--iz-color-text);
+}
+
+.shipment-disputes__reason {
+  margin: 0;
+  color: var(--iz-color-text);
+}
+
+.shipment-disputes__people {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.shipment-disputes__people dt {
+  font-size: 0.8rem;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
+.shipment-disputes__people dd {
+  margin: 0;
+  color: var(--iz-color-text);
+}
+
+.shipment-disputes__items {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+  font-size: 0.9rem;
+}
+
+.shipment-disputes__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.shipment-disputes__returned,
+.shipment-disputes__confirmed {
+  font: inherit;
+  font-weight: 700;
+  padding: 0.55rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* Оба исхода закрывают сделку, поэтому ни один не оформлен «главным». */
+.shipment-disputes__returned {
+  border: 1px solid var(--iz-color-border);
+  background: transparent;
+  color: var(--iz-color-text);
+}
+
+.shipment-disputes__confirmed {
+  border: none;
+  background: var(--iz-color-accent, #f2542d);
+  color: #fff;
+}
+
+.shipment-disputes__returned:disabled,
+.shipment-disputes__confirmed:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

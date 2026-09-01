@@ -73,6 +73,7 @@ export function AccountMainContent({
   onCreateRaffleClick,
   handleCourierFromProfile,
   handleCourierModerationFromProfile,
+  handleShipmentDisputesFromProfile,
   handleCourierOverviewFromProfile,
   handleDataConfirmationQueueFromProfile,
   handleDataConfirmationFromProfile,
@@ -211,6 +212,9 @@ export function AccountMainContent({
         }
         onCourierModerationClick={
           canModerateProducts ? handleCourierModerationFromProfile : undefined
+        }
+        onShipmentDisputesClick={
+          canModerateProducts ? handleShipmentDisputesFromProfile : undefined
         }
         onDataConfirmationQueueClick={
           canModerateProducts ? handleDataConfirmationQueueFromProfile : undefined

@@ -274,7 +274,9 @@ export async function listOpenDisputes({ limit = 50 } = {}) {
     .limit(safeLimit)
     .lean();
 
-  const sellerIds = new Set();
+  // Модератору звонить обеим сторонам и курьеру, поэтому имена и телефоны
+  // подтягиваем одним запросом на всех.
+  const userIds = new Set();
   const rows = [];
 
   for (const order of orders) {
@@ -282,11 +284,13 @@ export async function listOpenDisputes({ limit = 50 } = {}) {
       if (!shipment.disputeOpenedAt || shipment.disputeResolvedAt) continue;
 
       const sellerId = String(shipment.sellerId);
-      sellerIds.add(sellerId);
+      const courierId = shipment.courierId ? String(shipment.courierId) : "";
+      userIds.add(sellerId);
+      if (courierId) userIds.add(courierId);
       rows.push({
         orderId: String(order._id),
         sellerId,
-        courierId: shipment.courierId ? String(shipment.courierId) : "",
+        courierId,
         openedAt: shipment.disputeOpenedAt,
         reason: shipment.disputeReason ?? "",
         deliveryFeeRub: Number(shipment.deliveryFeeRub) || 0,
@@ -303,7 +307,7 @@ export async function listOpenDisputes({ limit = 50 } = {}) {
     }
   }
 
-  const users = await UserModel.find({ _id: { $in: [...sellerIds] } })
+  const users = await UserModel.find({ _id: { $in: [...userIds] } })
     .select("userName userPhoneNumber")
     .lean();
   const byId = new Map(users.map((row) => [String(row._id), row]));
@@ -312,6 +316,9 @@ export async function listOpenDisputes({ limit = 50 } = {}) {
     const seller = byId.get(row.sellerId);
     row.sellerName = seller?.userName ?? "";
     row.sellerPhone = seller?.userPhoneNumber ?? "";
+    const courier = row.courierId ? byId.get(row.courierId) : null;
+    row.courierName = courier?.userName ?? "";
+    row.courierPhone = courier?.userPhoneNumber ?? "";
   }
 
   return { disputes: rows };

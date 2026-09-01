@@ -60,6 +60,11 @@ export const LazyInstallmentDisputesPage = lazyNamedExport(
   "InstallmentDisputesPage",
 );
 
+export const LazyShipmentDisputesPage = lazyNamedExport(
+  () => import("../../../pages/shipment-disputes/ui/ShipmentDisputesPage.jsx"),
+  "ShipmentDisputesPage",
+);
+
 export const LazyAuctionPage = lazyNamedExport(
   () => import("../../../pages/auction/ui/AuctionPage.jsx"),
   "AuctionPage",

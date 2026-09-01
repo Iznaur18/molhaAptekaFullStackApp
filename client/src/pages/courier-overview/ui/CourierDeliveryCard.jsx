@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
   useCompleteCourierDeliveryMutation,
   useConfirmCourierHandoverMutation,
+  useDeclineCourierShipmentMutation,
   useMarkCourierArrivedMutation,
   useStartCourierDeliveryMutation,
 } from "../../../entities/courier/model/courierQueries.js";
@@ -29,13 +30,15 @@ export function CourierDeliveryCard({ delivery, onError }) {
   const startMutation = useStartCourierDeliveryMutation();
   const arrivedMutation = useMarkCourierArrivedMutation();
   const completeMutation = useCompleteCourierDeliveryMutation();
+  const declineMutation = useDeclineCourierShipmentMutation();
 
   const ids = { orderId: delivery.orderId, sellerId: delivery.sellerId };
   const isBusy =
     handoverMutation.isPending ||
     startMutation.isPending ||
     arrivedMutation.isPending ||
-    completeMutation.isPending;
+    completeMutation.isPending ||
+    declineMutation.isPending;
 
   /** @param {() => Promise<unknown>} run */
   const guard = async (run) => {
@@ -164,6 +167,21 @@ export function CourierDeliveryCard({ delivery, onError }) {
       ) : null}
 
       {renderAction()}
+
+      {/* Отказ возможен, только пока товар у продавца: дальше это уже спор. */}
+      {delivery.status === "courier_assigned" ? (
+        <button
+          type="button"
+          className="courier-overview__decline"
+          disabled={isBusy}
+          onClick={() => {
+            if (!window.confirm(COURIER_OVERVIEW_UI.DECLINE_CONFIRM)) return;
+            void guard(() => declineMutation.mutateAsync(ids));
+          }}
+        >
+          {COURIER_OVERVIEW_UI.DECLINE}
+        </button>
+      ) : null}
     </li>
   );
 }

@@ -9,6 +9,7 @@ import {
   LazyCourierOverviewPage,
   LazyDataConfirmationRequestsPage,
   LazyInstallmentDisputesPage,
+  LazyShipmentDisputesPage,
   LazyInstallmentPaymentsPage,
   LazyInstallmentSalesPage,
   LazyLoyaltyPointsPage,
@@ -306,6 +307,8 @@ export function renderProfileTabPanel(mainView, props) {
           onQueueChanged={refreshPendingInstallmentDisputesCount}
         />
       );
+    case "shipment-disputes":
+      return <LazyShipmentDisputesPage />;
     default:
       return null;
   }

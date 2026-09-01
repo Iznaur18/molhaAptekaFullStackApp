@@ -184,3 +184,19 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Отказ — не отмена заказа, а шаг назад: тише основного действия. */
+.courier-overview__decline {
+  font: inherit;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--iz-color-border, #d7d7d7);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--iz-color-text-muted, #6b6b6b);
+  cursor: pointer;
+}
+
+.courier-overview__decline:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

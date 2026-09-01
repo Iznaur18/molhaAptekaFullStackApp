@@ -31,6 +31,7 @@ export function buildProfileNavGroups({
   canUseCourierOverview,
   canUseDataConfirmationQueue,
   canUseInstallmentDisputes,
+  canUseShipmentDisputes,
   canUseAdminOrders,
   canUseAdminAnalytics,
   canUseStaffAuditLogAdmin,
@@ -83,6 +84,7 @@ export function buildProfileNavGroups({
   onCourierOverviewClick,
   onDataConfirmationQueueClick,
   onInstallmentDisputesClick,
+  onShipmentDisputesClick,
   onAdminOrdersClick,
   onSearchSynonymsAdminClick,
   onCategoryTreeAdminClick,
@@ -344,6 +346,15 @@ export function buildProfileNavGroups({
             label: "Споры (модерация)",
             badgeCount: pendingInstallmentDisputesCount,
             onClick: () => selectTab("installment-disputes", onInstallmentDisputesClick),
+          },
+        ]
+      : []),
+    ...(canUseShipmentDisputes
+      ? [
+          {
+            tab: "shipment-disputes",
+            label: "Споры доставки",
+            onClick: () => selectTab("shipment-disputes", onShipmentDisputesClick),
           },
         ]
       : []),

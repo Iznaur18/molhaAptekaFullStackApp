@@ -31,6 +31,7 @@ import {
   MY_ORDERS_PAGE_UI,
   ORDER_CARD_UI,
   PRODUCT_CARD_UI,
+  SHIPMENT_DISPUTE_UI,
 } from "../../../shared/config/appUiCopy.js";
 import {
   isOrderLineItemProductClickable,
@@ -512,6 +513,7 @@ export function OrderCard({
   onIssueHandoverCode,
   onReplaceCourier,
   onConfirmPayment,
+  onOpenDispute,
   issuedHandoverCode = "",
   pendingActionKey = null,
   itemActionErrors = {},
@@ -600,6 +602,13 @@ export function OrderCard({
   const canReplaceCourier =
     Boolean(onReplaceCourier) &&
     buildOrderStatusFromItems(order.items) === "courier_assigned";
+  // Товар уже уехал, а курьер молчит. До передачи спора нет: там курьера
+  // просто меняют кнопкой выше.
+  const canOpenDispute =
+    Boolean(onOpenDispute) &&
+    (shipmentStatusNow === "courier_holding" ||
+      shipmentStatusNow === "in_delivery");
+  const disputeOpened = Boolean(shipmentOwn?.disputeOpenedAt);
   const shipmentActionKey = `${order._id}:shipment`;
   const isShipmentActionPending = pendingActionKey === shipmentActionKey;
 
@@ -676,6 +685,25 @@ export function OrderCard({
                   : ORDER_CARD_UI.SHIPMENT_ISSUE_CODE}
               </button>
             )
+          ) : null}
+          {disputeOpened ? (
+            <span className="order-card__shipment-label">
+              {SHIPMENT_DISPUTE_UI.OPENED}
+            </span>
+          ) : canOpenDispute ? (
+            <button
+              type="button"
+              className="order-card__item-action-button order-card__item-action-button_cancel"
+              onClick={() => {
+                if (!window.confirm(SHIPMENT_DISPUTE_UI.OPEN_CONFIRM)) return;
+                onOpenDispute({ orderId: order._id });
+              }}
+              disabled={isShipmentActionPending}
+            >
+              {isShipmentActionPending
+                ? ORDER_CARD_UI.ACTION_PENDING
+                : SHIPMENT_DISPUTE_UI.OPEN}
+            </button>
           ) : null}
           {shipmentAdvance ? (
           <button

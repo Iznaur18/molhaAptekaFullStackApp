@@ -96,6 +96,7 @@ export {
   COURIER_UI,
   COURIER_MODERATION_UI,
   COURIER_OVERVIEW_UI,
+  SHIPMENT_DISPUTE_UI,
 } from "./copy/courier.js";
 export {
   AUCTION_PAGE_UI,
