@@ -311,6 +311,24 @@ export function CartPage({
    * Считаем по выбранным позициям, а не по всей корзине: невыбранное в заказ
    * не поедет и требовать под него адрес незачем.
    */
+  /**
+   * Кто везёт выбранное: курьеры Gitorg или сам продавец.
+   *
+   * Решает продавец на товаре, покупатель это только видит. В смешанной
+   * корзине может быть и так и так — тогда честнее показать оба варианта
+   * активными, чем выбрать за покупателя один.
+   */
+  const checkoutCourierDelivery = useMemo(() => {
+    const deliveryGroups = sellerGroups.filter(
+      (group) => fulfillmentBySellerId[String(group.sellerId)] === "delivery",
+    );
+    if (deliveryGroups.length === 0) return null;
+    const withCourier = deliveryGroups.filter((group) => group.courierDelivery);
+    if (withCourier.length === deliveryGroups.length) return "courier";
+    if (withCourier.length === 0) return "seller";
+    return "mixed";
+  }, [sellerGroups, fulfillmentBySellerId]);
+
   const cartFulfillmentMode = useMemo(() => {
     if (auctionCheckoutBid) return null;
 
@@ -518,7 +536,6 @@ export function CartPage({
               value: fulfillmentBySellerId[group.sellerId] ?? group.defaultMethod,
               pickupAvailable: group.pickupAvailable,
               deliveryAvailable: group.deliveryAvailable,
-              courierDelivery: group.courierDelivery,
               onChange: (method) =>
                 chooseSellerFulfillment(group.sellerId, method),
             }}
@@ -547,6 +564,7 @@ export function CartPage({
         deliveryAvailable={deliveryAvailable}
         pickupAvailable={pickupAvailable}
         fulfillmentMode={cartFulfillmentMode}
+        courierDelivery={checkoutCourierDelivery}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}
         submitSuccess={submitState.success}

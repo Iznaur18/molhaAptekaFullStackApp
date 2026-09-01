@@ -83,6 +83,7 @@ export function CheckoutForm({
   deliveryAvailable = false,
   pickupAvailable = true,
   fulfillmentMode = null,
+  courierDelivery = null,
   isSubmitting,
   submitError,
   submitSuccess,
@@ -558,6 +559,7 @@ export function CheckoutForm({
 
               <CheckoutShippingProviderPicker
                 disabled={isDisabled || isSubmitting}
+                courierDelivery={courierDelivery}
               />
             </>
           ) : null}

@@ -176,7 +176,10 @@ export const CHECKOUT_FORM_UI = {
   LABEL_PAYMENT_METHOD: "Способ оплаты",
   PAYMENT_METHOD_CARD_SOON: "Скоро",
   LABEL_SHIPPING_PROVIDER: "Служба доставки",
-  SHIPPING_PROVIDER_SELLER: "Продавцом",
+  SHIPPING_PROVIDER_SELLER: "Доставка продавцом",
+  SHIPPING_PROVIDER_COURIER: "Курьеры Gitorg",
+  SHIPPING_PROVIDER_CHOSEN_BY_SELLER:
+    "Службу выбирает продавец на товаре — здесь видно, кто повезёт.",
   SHIPPING_PROVIDER_SOON: "Скоро",
   LABEL_SHIPPING_SERVICE: "Тип доставки",
   SHIPPING_SERVICE_COURIER: "Курьер",

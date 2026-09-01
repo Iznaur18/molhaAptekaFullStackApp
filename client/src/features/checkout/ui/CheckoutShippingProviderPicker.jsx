@@ -20,9 +20,12 @@ const SERVICE_LABEL = {
  * Службы доставки в чекауте.
  * Live сейчас только «Продавцом»; перевозчики и типы выдачи — после подключения ключей.
  *
- * @param {{ disabled?: boolean }} props
+ * @param {{ disabled?: boolean; courierDelivery?: "courier" | "seller" | "mixed" | null }} props
  */
-export function CheckoutShippingProviderPicker({ disabled = false }) {
+export function CheckoutShippingProviderPicker({
+  disabled = false,
+  courierDelivery = null,
+}) {
   const providerOptions = listCheckoutShippingProviderOptions();
   const serviceOptions = listCheckoutShippingServiceOptions();
   const showCarrierServices = hasCheckoutLiveCarrierProviders() && serviceOptions.length > 0;
@@ -37,8 +40,31 @@ export function CheckoutShippingProviderPicker({ disabled = false }) {
         role="radiogroup"
         aria-label={CHECKOUT_FORM_UI.LABEL_SHIPPING_PROVIDER}
       >
+        {/* Курьеры Gitorg — такая же служба, как продавец: обе рабочие, и
+            выбор между ними сделан на товаре. */}
+        <button
+          type="button"
+          className={[
+            "checkout-shipping-provider-picker__card",
+            courierDelivery === "courier" || courierDelivery === "mixed"
+              ? "checkout-shipping-provider-picker__card--selected"
+              : "checkout-shipping-provider-picker__card--idle",
+          ].join(" ")}
+          role="radio"
+          aria-checked={courierDelivery === "courier" || courierDelivery === "mixed"}
+          aria-disabled
+          disabled
+        >
+          <span className="checkout-shipping-provider-picker__label">
+            {CHECKOUT_FORM_UI.SHIPPING_PROVIDER_COURIER}
+          </span>
+        </button>
+
         {providerOptions.map((option) => {
-          const isSelected = option.id === CHECKOUT_SHIPPING_PROVIDER_SELLER;
+          const isSeller = option.id === CHECKOUT_SHIPPING_PROVIDER_SELLER;
+          const isSelected = isSeller
+            ? courierDelivery === "seller" || courierDelivery === "mixed"
+            : false;
           const label = resolveCheckoutShippingProviderLabel(option.id, {
             sellerLabel: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SELLER,
           });
@@ -96,7 +122,7 @@ export function CheckoutShippingProviderPicker({ disabled = false }) {
       ) : null}
 
       <p className="checkout-shipping-provider-picker__hint">
-        {CHECKOUT_FORM_UI.SHIPPING_PROVIDER_HINT}
+        {CHECKOUT_FORM_UI.SHIPPING_PROVIDER_CHOSEN_BY_SELLER}
       </p>
     </div>
   );
