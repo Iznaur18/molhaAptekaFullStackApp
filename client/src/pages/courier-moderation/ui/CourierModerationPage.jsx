@@ -4,9 +4,21 @@ import {
   useCourierApplicationsQuery,
   useReviewCourierApplicationMutation,
 } from "../../../entities/courier/model/courierQueries.js";
+import { CourierDocumentThumb } from "../../../entities/courier/ui/CourierDocumentThumb.jsx";
 import { COURIER_MODERATION_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./CourierModerationPage.css";
+
+/** Снимки заявки в том порядке, в каком их просят у курьера. */
+const DOCUMENT_FIELDS = [
+  { field: "vehiclePhotoFrontUrl", label: COURIER_MODERATION_UI.PHOTO_FRONT },
+  { field: "vehiclePhotoRearUrl", label: COURIER_MODERATION_UI.PHOTO_REAR },
+  { field: "driverLicensePhotoUrl", label: COURIER_MODERATION_UI.PHOTO_LICENSE },
+  {
+    field: "vehicleRegistrationPhotoUrl",
+    label: COURIER_MODERATION_UI.PHOTO_REGISTRATION,
+  },
+];
 
 const TABS = [
   { status: "pending", label: COURIER_MODERATION_UI.TAB_PENDING },
@@ -139,6 +151,29 @@ export function CourierModerationPage({ onQueueChanged, onApplicantClick }) {
                     </div>
                   ) : null}
                 </dl>
+
+                {(() => {
+                  const photos = DOCUMENT_FIELDS.filter(({ field }) => row[field]);
+                  if (photos.length === 0) {
+                    return (
+                      <p className="courier-moderation__no-photos">
+                        {COURIER_MODERATION_UI.PHOTO_MISSING}
+                      </p>
+                    );
+                  }
+                  return (
+                    <div className="courier-moderation__photos">
+                      {photos.map(({ field, label }) => (
+                        <CourierDocumentThumb
+                          key={field}
+                          url={row[field]}
+                          label={label}
+                          failedLabel={COURIER_MODERATION_UI.ERROR_GENERIC}
+                        />
+                      ))}
+                    </div>
+                  );
+                })()}
 
                 {status === "rejected" && row.moderationComment ? (
                   <p className="courier-moderation__reason">

@@ -1,0 +1,23 @@
+.courier-doc-thumb {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
+.courier-doc-thumb img,
+/* Пустая заглушка держит место, пока картинка едет: иначе сетка прыгает. */
+.courier-doc-thumb > span {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface-muted, transparent);
+}
+
+.courier-doc-thumb_failed {
+  color: var(--iz-color-danger, #d64545);
+}

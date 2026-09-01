@@ -54,9 +54,10 @@ async function safeUnlink(filePath) {
  * возвращаем оригинал без изменений (upload не должен падать из-за оптимизации).
  *
  * @param {import('express').Multer.File} file
+ * @param {{ maxDim?: number, quality?: number }} [options]
  * @returns {Promise<import('express').Multer.File>}
  */
-export async function compressUploadedImageFile(file) {
+export async function compressUploadedImageFile(file, options = {}) {
   if (!file) {
     throw new Error("Файл не передан");
   }
@@ -74,7 +75,7 @@ export async function compressUploadedImageFile(file) {
     return file;
   }
 
-  const compressed = await compressImageToWebp(inputBuffer);
+  const compressed = await compressImageToWebp(inputBuffer, options);
   if (!compressed) {
     return file;
   }

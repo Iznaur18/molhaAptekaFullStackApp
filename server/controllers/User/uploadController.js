@@ -1,6 +1,11 @@
 import fs from "node:fs/promises";
 
-import { PASSPORT_SELFIE_UPLOAD_PURPOSE } from "../../constants/privateUploadConstants.js";
+import {
+  COURIER_DOCUMENT_MAX_DIM,
+  COURIER_DOCUMENT_WEBP_QUALITY,
+  COURIER_DOCUMENT_UPLOAD_PURPOSE,
+  PASSPORT_SELFIE_UPLOAD_PURPOSE,
+} from "../../constants/privateUploadConstants.js";
 import { buildPublicUploadUrl } from "../../services/upload/buildPublicUploadUrl.js";
 import { finalizeUploadedFile } from "../../services/upload/finalizeUploadedFile.js";
 import { compressUploadedImageFile } from "../../services/upload/compressUploadedImageFile.js";
@@ -19,12 +24,24 @@ import { logServerEvent } from "../../utils/logServerEvent.js";
 /**
  * @param {import('express').Request} req
  */
+function resolveUploadPurpose(req) {
+  return String(req.query?.purpose ?? "")
+    .trim()
+    .toLowerCase();
+}
+
+/**
+ * @param {import('express').Request} req
+ */
 function isPassportSelfieUpload(req) {
-  return (
-    String(req.query?.purpose ?? "")
-      .trim()
-      .toLowerCase() === PASSPORT_SELFIE_UPLOAD_PURPOSE
-  );
+  return resolveUploadPurpose(req) === PASSPORT_SELFIE_UPLOAD_PURPOSE;
+}
+
+/**
+ * @param {import('express').Request} req
+ */
+function isCourierDocumentUpload(req) {
+  return resolveUploadPurpose(req) === COURIER_DOCUMENT_UPLOAD_PURPOSE;
 }
 
 /**
@@ -61,9 +78,29 @@ export async function uploadController(req, res) {
     );
   }
 
-  const wantPrivate = isPassportSelfieUpload(req);
+  const isCourierDocument = isCourierDocumentUpload(req);
+  const wantPrivate = isPassportSelfieUpload(req) || isCourierDocument;
 
   if (wantPrivate) {
+    // Селфи с паспортом исторически кладём как есть; документы курьера жмём:
+    // их шлют прямо с камеры телефона, и оригинал весит десятки мегабайт.
+    if (isCourierDocument) {
+      try {
+        await compressUploadedImageFile(req.file, {
+          maxDim: COURIER_DOCUMENT_MAX_DIM,
+          quality: COURIER_DOCUMENT_WEBP_QUALITY,
+        });
+      } catch (compressError) {
+        logServerEvent("error", {
+          event: "courier_document_compress_failed",
+          error:
+            compressError instanceof Error
+              ? compressError.message
+              : String(compressError),
+        });
+      }
+    }
+
     const filename = isObjectStorageUploadEnabled()
       ? await persistPrivateUploadToObjectStorage(req.file)
       : await moveUploadFileToPrivateDir(await finalizeUploadedFile(req.file));

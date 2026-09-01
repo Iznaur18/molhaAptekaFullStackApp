@@ -21,6 +21,23 @@ export const COURIER_VEHICLE_COLOR_MAX_LENGTH = 30;
 export const COURIER_VEHICLE_PLATE_MAX_LENGTH = 15;
 export const COURIER_MODERATION_COMMENT_MAX_LENGTH = 500;
 
+/**
+ * Ссылка на снимок из private uploads.
+ *
+ * Проверяем префикс, а не просто «непустую строку»: публичный URL здесь
+ * означал бы, что права и ПТС лежат в открытом каталоге.
+ *
+ * @param {string} message
+ */
+const courierDocumentUrlSchema = (message) =>
+  z
+    .string({ required_error: message })
+    .trim()
+    .min(1, message)
+    .refine((value) => value.startsWith("/upload/private/"), {
+      message: "Файл должен быть загружен как документ курьера",
+    });
+
 /** Body `POST /courier/application` — заявка курьера с данными авто. */
 export const courierApplicationBodySchema = z.object({
   vehicleMake: z
@@ -38,6 +55,10 @@ export const courierApplicationBodySchema = z.object({
     .trim()
     .min(5, "Укажите госномер полностью")
     .max(COURIER_VEHICLE_PLATE_MAX_LENGTH),
+  vehiclePhotoFrontUrl: courierDocumentUrlSchema("Добавьте фото авто спереди"),
+  vehiclePhotoRearUrl: courierDocumentUrlSchema("Добавьте фото авто сзади"),
+  driverLicensePhotoUrl: courierDocumentUrlSchema("Добавьте фото водительских прав"),
+  vehicleRegistrationPhotoUrl: courierDocumentUrlSchema("Добавьте фото ПТС"),
 });
 
 /** Query `GET /staff/couriers` — очередь модерации. */

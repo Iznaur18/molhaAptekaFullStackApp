@@ -15,10 +15,18 @@ const {
   submitCourierApplication,
 } = await import("../services/courier/courierApplication.js");
 
+const DOCS = {
+  vehiclePhotoFrontUrl: "/upload/private/front.webp",
+  vehiclePhotoRearUrl: "/upload/private/rear.webp",
+  driverLicensePhotoUrl: "/upload/private/license.webp",
+  vehicleRegistrationPhotoUrl: "/upload/private/sts.webp",
+};
+
 const VEHICLE = {
   vehicleMake: "Lada Granta",
   vehicleColor: "белый",
   vehiclePlate: "х123ум797",
+  ...DOCS,
 };
 
 /** @param {{ withAddress?: boolean; role?: string }} [options] */
@@ -228,5 +236,62 @@ describe("очередь модерации", () => {
     assert.ok(row.userName);
     assert.equal(row.passport, undefined, "паспорта в очереди быть не должно");
     assert.equal(row.passwordHash, undefined);
+  });
+});
+
+describe("документы курьера", () => {
+  before(connectMongoTestReplSet);
+  after(disconnectMongoTestReplSet);
+  beforeEach(clearMongoCollections);
+
+  it("снимки сохраняются и возвращаются самому курьеру", async () => {
+    const user = await makeUser();
+
+    await submitCourierApplication({ userId: String(user._id), ...VEHICLE });
+    const profile = await getMyCourierProfile(String(user._id));
+
+    assert.equal(profile.driverLicensePhotoUrl, DOCS.driverLicensePhotoUrl);
+    assert.equal(profile.vehicleRegistrationPhotoUrl, DOCS.vehicleRegistrationPhotoUrl);
+  });
+
+  it("модератор видит снимки в очереди", async () => {
+    const user = await makeUser();
+    await submitCourierApplication({ userId: String(user._id), ...VEHICLE });
+
+    const { applications } = await listCourierApplications({ status: "pending" });
+
+    assert.equal(applications.length, 1);
+    assert.equal(applications[0].vehiclePhotoFrontUrl, DOCS.vehiclePhotoFrontUrl);
+    assert.equal(applications[0].vehiclePhotoRearUrl, DOCS.vehiclePhotoRearUrl);
+  });
+
+  it("курьер открывает свой же файл, чужой — нет", async () => {
+    const { canAccessPrivateUpload } = await import(
+      "../services/upload/canAccessPrivateUpload.js"
+    );
+    const user = await makeUser();
+    await submitCourierApplication({ userId: String(user._id), ...VEHICLE });
+
+    assert.equal(
+      await canAccessPrivateUpload(String(user._id), "license.webp"),
+      true,
+    );
+    assert.equal(
+      await canAccessPrivateUpload(String(user._id), "someone-else.webp"),
+      false,
+      "иначе любой курьер читал бы чужие права по имени файла",
+    );
+  });
+
+  it("модератору открыт любой private-файл", async () => {
+    const { canAccessPrivateUpload } = await import(
+      "../services/upload/canAccessPrivateUpload.js"
+    );
+    const moderator = await makeUser({ role: "moderator" });
+
+    assert.equal(
+      await canAccessPrivateUpload(String(moderator._id), "license.webp"),
+      true,
+    );
   });
 });

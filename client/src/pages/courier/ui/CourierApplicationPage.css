@@ -129,3 +129,84 @@
   padding: 1rem;
   color: var(--iz-color-text-muted, var(--iz-color-text));
 }
+
+.courier-page__docs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 14px;
+}
+
+.courier-page__docs-heading {
+  padding: 0 0.3rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.courier-page__docs-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
+.courier-page__docs-required {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--iz-color-danger, #d64545);
+}
+
+.courier-page__docs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.6rem;
+}
+
+.courier-page__doc {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: flex-start;
+}
+
+.courier-page__doc-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--iz-color-text);
+}
+
+.courier-page__doc-preview {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--iz-color-border);
+}
+
+.courier-page__doc-ready {
+  font-size: 0.8rem;
+  color: var(--iz-color-success, #2f8f4e);
+}
+
+/* Нативный инпут прячем: кнопка ниже читаемее и не ломает вёрстку сетки. */
+.courier-page__doc-input {
+  display: none;
+}
+
+.courier-page__doc-button {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--iz-color-text);
+  cursor: pointer;
+}
+
+.courier-page__doc-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

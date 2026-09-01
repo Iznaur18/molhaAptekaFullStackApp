@@ -10,6 +10,7 @@ const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /**
  * Staff/moderator — любой private file.
+ * Курьер — свои же фото авто и документов из заявки.
  * Продавец — только если selfie есть в незакрытой рассрочной заявке по его товару.
  *
  * @param {string} userId
@@ -22,7 +23,9 @@ export async function canAccessPrivateUpload(userId, filename) {
     return false;
   }
 
-  const user = await UserModel.findById(userId).select("userRole").lean();
+  const user = await UserModel.findById(userId)
+    .select("userRole courierProfile")
+    .lean();
   if (!user) {
     return false;
   }
@@ -31,6 +34,19 @@ export async function canAccessPrivateUpload(userId, filename) {
   }
 
   const selfieUrl = buildPrivateUploadApiUrl(safeFilename);
+
+  // Свою же заявку курьер открывает при переподаче после отказа — иначе он
+  // не видит, что именно приложил, и грузит всё заново.
+  const courierProfile = user.courierProfile ?? {};
+  const ownCourierDocument = [
+    courierProfile.vehiclePhotoFrontUrl,
+    courierProfile.vehiclePhotoRearUrl,
+    courierProfile.driverLicensePhotoUrl,
+    courierProfile.vehicleRegistrationPhotoUrl,
+  ].some((url) => String(url ?? "") === selfieUrl);
+  if (ownCourierDocument) {
+    return true;
+  }
   const filenameSuffixRe = new RegExp(`${escapeRegex(`/${safeFilename}`)}$`, "i");
 
   const orders = await OrderModel.find({

@@ -27,6 +27,10 @@ export const projectCourierProfile = (user) => {
     vehicleMake: profile.vehicleMake ?? "",
     vehicleColor: profile.vehicleColor ?? "",
     vehiclePlate: profile.vehiclePlate ?? "",
+    vehiclePhotoFrontUrl: profile.vehiclePhotoFrontUrl ?? "",
+    vehiclePhotoRearUrl: profile.vehiclePhotoRearUrl ?? "",
+    driverLicensePhotoUrl: profile.driverLicensePhotoUrl ?? "",
+    vehicleRegistrationPhotoUrl: profile.vehicleRegistrationPhotoUrl ?? "",
     moderationComment: profile.moderationComment ?? "",
     submittedAt: profile.submittedAt ?? null,
     reviewedAt: profile.reviewedAt ?? null,
@@ -69,6 +73,10 @@ export async function submitCourierApplication({
   vehicleMake,
   vehicleColor,
   vehiclePlate,
+  vehiclePhotoFrontUrl,
+  vehiclePhotoRearUrl,
+  driverLicensePhotoUrl,
+  vehicleRegistrationPhotoUrl,
 }) {
   const user = await UserModel.findById(userId).select(
     "courierProfile userAddress userRegionCode",
@@ -92,6 +100,10 @@ export async function submitCourierApplication({
     vehicleMake,
     vehicleColor,
     vehiclePlate,
+    vehiclePhotoFrontUrl,
+    vehiclePhotoRearUrl,
+    driverLicensePhotoUrl,
+    vehicleRegistrationPhotoUrl,
     submittedAt: new Date(),
     // Переподача после отказа: старое решение больше не актуально.
     reviewedAt: null,

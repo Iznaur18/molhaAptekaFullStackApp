@@ -5,6 +5,7 @@ import {
   useSubmitCourierApplicationMutation,
 } from "../../../entities/courier/model/courierQueries.js";
 import { COURIER_UI } from "../../../shared/config/appUiCopy.js";
+import { CourierDocumentField } from "./CourierDocumentField.jsx";
 
 import "./CourierApplicationPage.css";
 
@@ -27,6 +28,10 @@ export function CourierApplicationPage() {
     vehicleMake: "",
     vehicleColor: "",
     vehiclePlate: "",
+    vehiclePhotoFrontUrl: "",
+    vehiclePhotoRearUrl: "",
+    driverLicensePhotoUrl: "",
+    vehicleRegistrationPhotoUrl: "",
   });
   const [error, setError] = useState("");
 
@@ -42,12 +47,30 @@ export function CourierApplicationPage() {
       vehicleMake: profile.vehicleMake ?? "",
       vehicleColor: profile.vehicleColor ?? "",
       vehiclePlate: profile.vehiclePlate ?? "",
+      vehiclePhotoFrontUrl: profile.vehiclePhotoFrontUrl ?? "",
+      vehiclePhotoRearUrl: profile.vehiclePhotoRearUrl ?? "",
+      driverLicensePhotoUrl: profile.driverLicensePhotoUrl ?? "",
+      vehicleRegistrationPhotoUrl: profile.vehicleRegistrationPhotoUrl ?? "",
     });
   }, [profile]);
 
   const handleChange = (field) => (event) => {
     setForm((prev) => ({ ...prev, [field]: event.target.value }));
   };
+
+  const handlePhoto = (field) => (url) => {
+    setForm((prev) => ({ ...prev, [field]: url }));
+  };
+
+  const DOCUMENT_FIELDS = [
+    { field: "vehiclePhotoFrontUrl", label: COURIER_UI.FIELD_PHOTO_FRONT },
+    { field: "vehiclePhotoRearUrl", label: COURIER_UI.FIELD_PHOTO_REAR },
+    { field: "driverLicensePhotoUrl", label: COURIER_UI.FIELD_PHOTO_LICENSE },
+    {
+      field: "vehicleRegistrationPhotoUrl",
+      label: COURIER_UI.FIELD_PHOTO_REGISTRATION,
+    },
+  ];
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -73,8 +96,12 @@ export function CourierApplicationPage() {
     );
   }
 
+  const hasAllDocuments = DOCUMENT_FIELDS.every(({ field }) =>
+    Boolean(form[field]),
+  );
   const canSubmit =
     !isPending &&
+    hasAllDocuments &&
     form.vehicleMake.trim().length >= 2 &&
     form.vehicleColor.trim().length >= 2 &&
     form.vehiclePlate.trim().length >= 5;
@@ -145,6 +172,32 @@ export function CourierApplicationPage() {
             maxLength={15}
           />
         </label>
+
+        <fieldset className="courier-page__docs">
+          <legend className="courier-page__docs-heading">
+            {COURIER_UI.DOCS_HEADING}
+          </legend>
+          <p className="courier-page__docs-hint">{COURIER_UI.DOCS_HINT}</p>
+
+          <div className="courier-page__docs-grid">
+            {DOCUMENT_FIELDS.map(({ field, label }) => (
+              <CourierDocumentField
+                key={field}
+                label={label}
+                value={form[field]}
+                disabled={isPending || submitMutation.isPending}
+                onChange={handlePhoto(field)}
+                onError={setError}
+              />
+            ))}
+          </div>
+
+          {!hasAllDocuments && !isPending ? (
+            <p className="courier-page__docs-required">
+              {COURIER_UI.PHOTO_REQUIRED}
+            </p>
+          ) : null}
+        </fieldset>
 
         {error ? (
           <p className="courier-page__error" role="alert">

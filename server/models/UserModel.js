@@ -546,6 +546,16 @@ const UserSchema = new mongoose.Schema(
         maxlength: COURIER_VEHICLE_PLATE_MAX_LENGTH,
         default: "",
       },
+      /**
+       * Снимки к заявке: авто спереди и сзади, права, ПТС.
+       *
+       * Лежат в private uploads и хранятся как `/upload/private/<file>` —
+       * отдаются только стаффу и самому курьеру.
+       */
+      vehiclePhotoFrontUrl: { type: String, trim: true, default: "" },
+      vehiclePhotoRearUrl: { type: String, trim: true, default: "" },
+      driverLicensePhotoUrl: { type: String, trim: true, default: "" },
+      vehicleRegistrationPhotoUrl: { type: String, trim: true, default: "" },
       submittedAt: { type: Date, default: null },
       reviewedAt: { type: Date, default: null },
       reviewedBy: {

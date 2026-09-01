@@ -19,6 +19,10 @@ export const submitCourierApplicationController = async (req, res) => {
     vehicleMake: req.body.vehicleMake,
     vehicleColor: req.body.vehicleColor,
     vehiclePlate: req.body.vehiclePlate,
+    vehiclePhotoFrontUrl: req.body.vehiclePhotoFrontUrl,
+    vehiclePhotoRearUrl: req.body.vehiclePhotoRearUrl,
+    driverLicensePhotoUrl: req.body.driverLicensePhotoUrl,
+    vehicleRegistrationPhotoUrl: req.body.vehicleRegistrationPhotoUrl,
   });
   return successRes(res, { courier: profile });
 };
