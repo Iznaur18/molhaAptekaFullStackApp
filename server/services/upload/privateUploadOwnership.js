@@ -37,6 +37,22 @@ export async function isPrivateUploadOwnedBy(userId, filename) {
 }
 
 /**
+ * Ссылка ведёт на приватный файл, загруженный кем-то другим?
+ *
+ * Публичные и пустые ссылки не «чужие»: там нечего защищать, и legacy-анкеты
+ * с `/uploads/` должны продолжать работать.
+ *
+ * @param {string} userId
+ * @param {string | null | undefined} url
+ * @returns {Promise<boolean>}
+ */
+export async function isForeignPrivateUpload(userId, url) {
+  const filename = parsePrivateUploadFilenameFromUrl(url);
+  if (!filename) return false;
+  return !(await isPrivateUploadOwnedBy(userId, filename));
+}
+
+/**
  * Проверяет, что все ссылки указывают на файлы, загруженные этим же
  * пользователем.
  *

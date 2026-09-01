@@ -54,12 +54,18 @@ export const CART_FULFILLMENT_SECTION_DELIVERY = "delivery";
 
 /**
  * Секция корзины: dual/pickup → самовывоз; delivery-only → доставка.
- * @param {{ productPickupEnabled?: boolean | null; productDeliveryEnabled?: boolean | null } | null | undefined} product
+ *
+ * Курьеры Gitorg — тоже доставка: товар «только курьеры» иначе оказывался в
+ * секции самовывоза, где его нельзя было заказать.
+ *
+ * @param {{ productPickupEnabled?: boolean | null; productDeliveryEnabled?: boolean | null; productCourierDeliveryEnabled?: boolean | null } | null | undefined} product
  * @returns {"pickup" | "delivery"}
  */
 export function resolveCartLineFulfillmentSection(product) {
   const pickupOn = product?.productPickupEnabled !== false;
-  const deliveryOn = product?.productDeliveryEnabled === true;
+  const deliveryOn =
+    product?.productDeliveryEnabled === true ||
+    product?.productCourierDeliveryEnabled === true;
   if (!pickupOn && deliveryOn) {
     return CART_FULFILLMENT_SECTION_DELIVERY;
   }
@@ -179,11 +185,16 @@ export const productPickupCreateFieldsSchema = z
     productPickupEnabled: z.coerce.boolean().optional(),
     /** Доставка продавцом; отклоняется, пока PRODUCT_DELIVERY_FULFILLMENT_ENABLED=false. */
     productDeliveryEnabled: z.coerce.boolean().optional(),
+    /** Курьеры Gitorg. */
+    productCourierDeliveryEnabled: z.coerce.boolean().optional(),
   })
   .superRefine((body, ctx) => {
     assertPickupCoordsRequired(body, ctx);
     const pickupOn = body.productPickupEnabled !== false;
-    const deliveryOn = body.productDeliveryEnabled === true;
+    // Курьеры Gitorg — такой же способ доставки, как и доставка продавцом.
+    const deliveryOn =
+      body.productDeliveryEnabled === true ||
+      body.productCourierDeliveryEnabled === true;
     if (!pickupOn && !deliveryOn) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

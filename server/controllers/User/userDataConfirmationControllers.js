@@ -14,6 +14,7 @@ import { normalizePassportPayload } from "../../services/user/validatePassportPa
 import { sealPassportPlain } from "../../services/passport-vault/index.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
+import { isForeignPrivateUpload } from "../../services/upload/privateUploadOwnership.js";
 
 /**
  * `POST /user/me/data-confirmation-request`
@@ -71,6 +72,13 @@ export const submitDataConfirmationRequestController = async (req, res) => {
           ? validationError.message
           : "Некорректное фото",
       );
+    }
+
+    // Ссылку на приватный файл нельзя принимать на слово: зная имя, заявитель
+    // приложил бы к своей анкете чужое селфи с паспортом — и заодно получил бы
+    // к нему постоянный доступ как «к своему».
+    if (await isForeignPrivateUpload(userId, passportSelfiePhotoUrl)) {
+      return errorRes(res, 403, "Это фото загружали не вы — загрузите своё");
     }
 
     await UserDataConfirmationRequestModel.create({

@@ -230,7 +230,8 @@ export async function postProduct({
   const productCourierDeliveryEnabled = body?.productCourierDeliveryEnabled === true;
   assertProductFulfillmentMethods(
     productPickupEnabled,
-    productDeliveryEnabled || productCourierDeliveryEnabled,
+    productDeliveryEnabled,
+    productCourierDeliveryEnabled,
   );
 
   const productArticleRaw =

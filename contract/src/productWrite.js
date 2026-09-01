@@ -250,7 +250,6 @@ export const createProductBodySchema = z
     productPickupLon: productPickupLonFieldSchema.nullable().optional(),
     productPickupEnabled: z.coerce.boolean().optional(),
     productDeliveryEnabled: z.coerce.boolean().optional(),
-  productCourierDeliveryEnabled: z.coerce.boolean().optional(),
     productCourierDeliveryEnabled: z.coerce.boolean().optional(),
     productArticle: z.string().trim().max(64).optional(),
   })

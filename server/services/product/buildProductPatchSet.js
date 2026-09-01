@@ -282,8 +282,19 @@ const applyPickupFields = async (body, $set, $unset, existing) => {
       ? $set.productDeliveryEnabled === true
       : existing.productDeliveryEnabled === true;
 
-    if (touchesDelivery || touchesPickupEnabled) {
-      assertProductFulfillmentMethods(nextPickupEnabled, nextDeliveryEnabled);
+    const nextCourierDeliveryEnabled = Object.prototype.hasOwnProperty.call(
+      $set,
+      "productCourierDeliveryEnabled",
+    )
+      ? $set.productCourierDeliveryEnabled === true
+      : existing.productCourierDeliveryEnabled === true;
+
+    if (touchesDelivery || touchesCourier || touchesPickupEnabled) {
+      assertProductFulfillmentMethods(
+        nextPickupEnabled,
+        nextDeliveryEnabled,
+        nextCourierDeliveryEnabled,
+      );
     }
 
     if (!touchesLocations && !touchesAddress && !touchesLat && !touchesLon) {

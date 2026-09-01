@@ -100,11 +100,22 @@ export const resolveProductDeliveryEnabledForWrite = (raw) => {
 export const resolveProductPickupEnabledForWrite = (raw) => raw !== false;
 
 /**
+ * Хотя бы один способ получить товар.
+ *
+ * Курьеры принимаются третьим аргументом, а не «зашиваются» в deliveryEnabled
+ * вызывающим: раньше каждый вызов решал это сам, и половина про курьеров не
+ * знала — товар «только курьеры Gitorg» нельзя было ни создать, ни сохранить.
+ *
  * @param {boolean} pickupEnabled
  * @param {boolean} deliveryEnabled
+ * @param {boolean} [courierDeliveryEnabled]
  */
-export const assertProductFulfillmentMethods = (pickupEnabled, deliveryEnabled) => {
-  if (!pickupEnabled && !deliveryEnabled) {
+export const assertProductFulfillmentMethods = (
+  pickupEnabled,
+  deliveryEnabled,
+  courierDeliveryEnabled = false,
+) => {
+  if (!pickupEnabled && !deliveryEnabled && !courierDeliveryEnabled) {
     throw new AppError(400, PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE);
   }
 };
@@ -127,7 +138,11 @@ export const resolveCreateProductPickupFields = (body) => {
     const productDeliveryEnabled = resolveProductDeliveryEnabledForWrite(
       body?.productDeliveryEnabled,
     );
-    assertProductFulfillmentMethods(productPickupEnabled, productDeliveryEnabled);
+    assertProductFulfillmentMethods(
+      productPickupEnabled,
+      productDeliveryEnabled,
+      body?.productCourierDeliveryEnabled === true,
+    );
     return {
       productPickupAddress,
       ...coords,
