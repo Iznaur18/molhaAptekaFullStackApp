@@ -177,6 +177,15 @@ export function buildProfileNavGroups({
               },
             ]
           : []),
+        ...(canUseCourierOverview
+          ? [
+              {
+                tab: "courier-overview",
+                label: "Обзор (курьер)",
+                onClick: () => selectTab("courier-overview", onCourierOverviewClick),
+              },
+            ]
+          : []),
         ...(canUseInstallmentSales
           ? [
               {
@@ -260,6 +269,15 @@ export function buildProfileNavGroups({
               },
             ]
           : []),
+        ...(canUseCourier
+          ? [
+              {
+                tab: "courier",
+                label: "Стать курьером",
+                onClick: () => selectTab("courier", onCourierClick),
+              },
+            ]
+          : []),
         ...(canUseEditProfile && !showEditOnBanner
           ? [
               {
@@ -297,24 +315,6 @@ export function buildProfileNavGroups({
             label: "Жалоба (модерация)",
             badgeCount: pendingProductReportsCount,
             onClick: () => selectTab("product-reports", onProductReportsClick),
-          },
-        ]
-      : []),
-    ...(canUseCourierOverview
-      ? [
-          {
-            tab: "courier-overview",
-            label: "Обзор (курьер)",
-            onClick: () => selectTab("courier-overview", onCourierOverviewClick),
-          },
-        ]
-      : []),
-    ...(canUseCourier
-      ? [
-          {
-            tab: "courier",
-            label: "Стать курьером",
-            onClick: () => selectTab("courier", onCourierClick),
           },
         ]
       : []),
