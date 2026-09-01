@@ -10,6 +10,7 @@ import { useMyOrdersQuery } from "../../../entities/order/model/useMyOrdersQuery
 import { useOrderMutations } from "../../../entities/order/model/useOrderMutations.js";
 import {
   useOpenShipmentDisputeMutation,
+  useRaiseDeliveryFeeMutation,
   useReplaceShipmentCourierMutation,
 } from "../../../entities/courier/model/courierQueries.js";
 import {
@@ -51,6 +52,7 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
   const [attentionOnly, setAttentionOnly] = useState(false);
   const replaceCourierMutation = useReplaceShipmentCourierMutation();
   const openDisputeMutation = useOpenShipmentDisputeMutation();
+  const raiseDeliveryFeeMutation = useRaiseDeliveryFeeMutation();
   const [pendingActionKey, setPendingActionKey] = useState(null);
   const [itemActionErrors, setItemActionErrors] = useState({});
   const [loyaltyFlash, setLoyaltyFlash] = useState("");
@@ -297,6 +299,31 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
   }
 
   /**
+   * Покупатель поднимает сумму, если заказ долго никто не берёт. Снижать
+   * нельзя: курьер мог уже согласиться на объявленную цену.
+   */
+  const handleRaiseDeliveryFee = async ({ orderId, deliveryFeeRub }) => {
+    const actionKey = `${orderId}:shipment`;
+    setPendingActionKey(actionKey);
+    setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+    try {
+      const block = sellerBlocks.find((row) => row.order._id === orderId);
+      await raiseDeliveryFeeMutation.mutateAsync({
+        orderId,
+        sellerId: block?.sellerId,
+        deliveryFeeRub,
+      });
+      void reloadOrders();
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+      setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
+    } finally {
+      setPendingActionKey(null);
+    }
+  };
+
+  /**
    * Товар уже у курьера, а курьер пропал. Дальше разбирается модератор:
    * вернуть заказ в общий список нельзя — неизвестно, где товар.
    */
@@ -373,6 +400,7 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
                 onMarkReturned={handleRefuseItem}
                 onReplaceCourier={handleReplaceCourier}
                 onOpenDispute={handleOpenDispute}
+                onRaiseDeliveryFee={handleRaiseDeliveryFee}
                 onCourierNameClick={onSellerNameClick}
                 pendingActionKey={pendingActionKey}
                 itemActionErrors={itemActionErrors}

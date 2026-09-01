@@ -516,6 +516,7 @@ export function OrderCard({
   onConfirmPayment,
   onOpenDispute,
   onCourierNameClick,
+  onRaiseDeliveryFee,
   issuedHandoverCode = "",
   pendingActionKey = null,
   itemActionErrors = {},
@@ -620,6 +621,19 @@ export function OrderCard({
       shipmentStatusNow === "in_delivery");
   // Закрытый спор больше не спор: иначе строка про модератора висела бы на
   // заказе вечно.
+  // Сумму поднимает покупатель — он за неё и платит, — и только пока никто
+  // не взялся везти: после назначения курьера уговор уже состоялся.
+  const deliveryFeeRub = Number(shipmentOwn?.deliveryFeeRub) || 0;
+  const canRaiseFee =
+    attentionRole === "buyer" &&
+    Boolean(onRaiseDeliveryFee) &&
+    shipmentOwn?.courierDelivery === true &&
+    !shipmentOwn?.courierId &&
+    // Ступени, на которых заказ ещё ищет курьера.
+    (shipmentStatusNow === "pending" ||
+      shipmentStatusNow === "accepted" ||
+      shipmentStatusNow === "assembling" ||
+      shipmentStatusNow === "ready_to_ship");
   const disputeOpened =
     Boolean(shipmentOwn?.disputeOpenedAt) && !shipmentOwn?.disputeResolvedAt;
   const shipmentActionKey = `${order._id}:shipment`;
@@ -776,6 +790,28 @@ export function OrderCard({
             </span>
           ) : null}
         </p>
+      ) : null}
+
+      {canRaiseFee ? (
+        <div className="order-card__fee">
+          <span>{ORDER_CARD_UI.SHIPMENT_FEE(formatPriceRub(deliveryFeeRub))}</span>
+          <button
+            type="button"
+            className="order-card__item-action-button"
+            onClick={() =>
+              onRaiseDeliveryFee({
+                orderId: order._id,
+                deliveryFeeRub: Math.max(100, deliveryFeeRub) + 25,
+              })
+            }
+            disabled={isShipmentActionPending}
+          >
+            {isShipmentActionPending
+              ? ORDER_CARD_UI.ACTION_PENDING
+              : ORDER_CARD_UI.SHIPMENT_FEE_RAISE}
+          </button>
+          <span className="order-card__fee-hint">{ORDER_CARD_UI.SHIPMENT_FEE_HINT}</span>
+        </div>
       ) : null}
 
       {attentionRole === "buyer" && paymentConfirmed ? (

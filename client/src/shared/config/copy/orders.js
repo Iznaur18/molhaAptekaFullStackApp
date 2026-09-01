@@ -50,6 +50,11 @@ export const ORDER_CARD_UI = {
     "Курьер отдаст заказ, когда продавец подтвердит перевод.",
   SHIPMENT_PAYMENT_RECEIVED_BY_SELLER: "Продавец подтвердил, что перевод дошёл",
   SHIPMENT_PAYMENT_RECEIVED_HINT: "Больше переводить ничего не нужно.",
+  /** @param {string} fee */
+  SHIPMENT_FEE: (fee) => `Курьеру за доставку: ${fee}`,
+  SHIPMENT_FEE_RAISE: "+25 ₽",
+  SHIPMENT_FEE_HINT:
+    "Заказ долго никто не берёт? Поднимите сумму — снизить её потом нельзя.",
   SHIPMENT_REPLACE_CONFIRM:
     "Сменить курьера? Заказ вернётся в общий список, а этот курьер больше не сможет его взять.",
   /** @param {string} code */

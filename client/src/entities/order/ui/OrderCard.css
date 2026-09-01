@@ -794,3 +794,20 @@
   font-size: 0.85rem;
   color: var(--iz-color-text-muted, var(--iz-color-text));
 }
+
+/* Сумма курьеру: строка с одним действием — поднять. Снизить нельзя, и
+   отсутствующая кнопка «минус» честнее, чем всегда серая. */
+.order-card__fee {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.order-card__fee-hint {
+  flex-basis: 100%;
+  font-size: 0.8rem;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
