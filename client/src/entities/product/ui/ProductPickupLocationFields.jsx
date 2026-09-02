@@ -28,6 +28,16 @@ import { USER_SAVED_ADDRESSES_UI } from "../../../shared/config/appUiCopy.js";
 import "../../address/ui/SavedAddressPicker.css";
 import "./ProductPickupLocationFields.css";
 import "./create-product-sections/CreateProductSections.css";
+import {
+  PRODUCT_DELIVERY_CARRIER_GITORG,
+  PRODUCT_DELIVERY_CARRIER_LABEL_RU,
+  PRODUCT_DELIVERY_CARRIER_LOBO,
+  PRODUCT_DELIVERY_CARRIER_SELLER,
+  buildLegacyDeliveryFlags,
+  productShipsToBuyer,
+  listDeliveryCarriersForRegion,
+  resolveProductDeliveryCarrier,
+} from "@molha/api-contract";
 
 const EMPTY_INLINE_ADDRESS = {
   line: "",
@@ -78,6 +88,9 @@ export function ProductPickupLocationFields({
   pickupEnabled = true,
   deliveryEnabled,
   courierDeliveryEnabled = false,
+  productDeliveryCarrier = "",
+  productRegionCode = "",
+  sellerRegionCode = "",
   disabled = false,
   savedAddresses = [],
   onChange,
@@ -431,10 +444,13 @@ export function ProductPickupLocationFields({
   const deliverySelectable = PRODUCT_DELIVERY_FULFILLMENT_ENABLED && !disabled;
   const selectedProfileIdSet = buildSelectedProfileIdSet(profileAddresses, selectedProfileIds);
 
-  // Способ доставки товара до покупателя — любой из двух. Раньше здесь
-  // спрашивали только про доставку продавцом, и «только курьеры Gitorg»
-  // выбрать было нельзя: самовывоз не снимался.
-  const shipsToBuyer = deliveryEnabled || courierDeliveryEnabled;
+  // Едет ли товар до покупателя — вопрос к перевозчику, а не к двум старым
+  // флагам: у товара с ЛОБО оба false, и раздел доставки пропадал целиком.
+  const shipsToBuyer = productShipsToBuyer({
+    productDeliveryCarrier,
+    productDeliveryEnabled: deliveryEnabled,
+    productCourierDeliveryEnabled: courierDeliveryEnabled,
+  });
 
   const togglePickup = () => {
     if (disabled) {
@@ -470,11 +486,24 @@ export function ProductPickupLocationFields({
       return;
     }
     // Службы взаимоисключающи: непонятно, кому предлагать отправление.
+    // Флаги пишем производными — их читает существующий код.
     emit({
-      productDeliveryEnabled: carrier === "seller",
-      productCourierDeliveryEnabled: carrier === "courier",
+      productDeliveryCarrier: carrier,
+      ...buildLegacyDeliveryFlags(carrier),
     });
   };
+
+  // Локальные службы предлагаем только там, где они возят. Регион берём с
+  // товара: ЛОБО приедет именно на точку отправления, а не туда, где
+  // прописан продавец.
+  const carrierRegionCode = productRegionCode || sellerRegionCode;
+  const availableCarriers = listDeliveryCarriersForRegion(carrierRegionCode);
+  const currentCarrier =
+    resolveProductDeliveryCarrier({
+      productDeliveryCarrier,
+      productDeliveryEnabled: deliveryEnabled,
+      productCourierDeliveryEnabled: courierDeliveryEnabled,
+    }) ?? "";
 
   return (
     <div className="product-pickup-location-fields">
@@ -673,9 +702,9 @@ export function ProductPickupLocationFields({
             type="radio"
             name="product-delivery-carrier"
             className="product-pickup-location-fields__checkbox"
-            checked={courierDeliveryEnabled}
+            checked={currentCarrier === PRODUCT_DELIVERY_CARRIER_GITORG}
             disabled={disabled}
-            onChange={() => chooseCarrier("courier")}
+            onChange={() => chooseCarrier(PRODUCT_DELIVERY_CARRIER_GITORG)}
           />
           <span className="product-pickup-location-fields__check-label">
             {PRODUCT_PICKUP_UI.FULFILLMENT_COURIER}
@@ -698,9 +727,9 @@ export function ProductPickupLocationFields({
             type="radio"
             name="product-delivery-carrier"
             className="product-pickup-location-fields__checkbox"
-            checked={deliveryEnabled}
+            checked={currentCarrier === PRODUCT_DELIVERY_CARRIER_SELLER}
             disabled={!deliverySelectable}
-            onChange={() => chooseCarrier("seller")}
+            onChange={() => chooseCarrier(PRODUCT_DELIVERY_CARRIER_SELLER)}
           />
           <span className="product-pickup-location-fields__check-label">
             {PRODUCT_PICKUP_UI.FULFILLMENT_DELIVERY}
@@ -710,7 +739,35 @@ export function ProductPickupLocationFields({
           </span>
         </label>
 
-        {SHIPPING_PROVIDERS.map((providerId) => (
+        {availableCarriers.includes(PRODUCT_DELIVERY_CARRIER_LOBO) ? (
+          <label
+            className={[
+              "product-pickup-location-fields__check",
+              currentCarrier === PRODUCT_DELIVERY_CARRIER_LOBO
+                ? "product-pickup-location-fields__check_on"
+                : "",
+              disabled ? "product-pickup-location-fields__check_disabled" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
+            <input
+              type="radio"
+              name="product-delivery-carrier"
+              className="product-pickup-location-fields__checkbox"
+              checked={currentCarrier === PRODUCT_DELIVERY_CARRIER_LOBO}
+              disabled={disabled}
+              onChange={() => chooseCarrier(PRODUCT_DELIVERY_CARRIER_LOBO)}
+            />
+            <span className="product-pickup-location-fields__check-label">
+              {PRODUCT_DELIVERY_CARRIER_LABEL_RU[PRODUCT_DELIVERY_CARRIER_LOBO]}
+            </span>
+          </label>
+        ) : null}
+
+        {SHIPPING_PROVIDERS.filter(
+          (providerId) => providerId !== PRODUCT_DELIVERY_CARRIER_LOBO,
+        ).map((providerId) => (
           <label
             key={providerId}
             className="product-pickup-location-fields__check product-pickup-location-fields__check_soon product-pickup-location-fields__check_disabled"

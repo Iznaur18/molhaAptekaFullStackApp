@@ -9,6 +9,7 @@ import {
   legacyPickupFieldsFromLocations,
   productPickupLocationsFromApiProduct,
 } from "./productPickupLocationsForm.js";
+import { resolveProductDeliveryCarrier } from "@molha/api-contract";
 
 export const CREATE_PRODUCT_INITIAL_FORM = {
   productName: "",
@@ -40,6 +41,7 @@ export const CREATE_PRODUCT_INITIAL_FORM = {
   productPickupEnabled: true,
   productDeliveryEnabled: false,
   productCourierDeliveryEnabled: false,
+  productDeliveryCarrier: "",
   productReturnEnabled: null,
   returnTermRows: [],
 };
@@ -98,6 +100,7 @@ export function createProductFormStateFromProduct(product) {
     productPickupEnabled: product.productPickupEnabled !== false,
     productDeliveryEnabled: product.productDeliveryEnabled === true,
     productCourierDeliveryEnabled: product.productCourierDeliveryEnabled === true,
+    productDeliveryCarrier: resolveProductDeliveryCarrier(product) ?? "",
     productReturnEnabled: product.productReturnEnabled === true,
     returnTermRows:
       product.productReturnEnabled === true

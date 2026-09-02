@@ -1,7 +1,10 @@
 import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
 
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
-import { isRuRegionCode } from "@molha/api-contract";
+import {
+  isRuRegionCode,
+  resolveProductDeliveryCarrier,
+} from "@molha/api-contract";
 import {
   PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
   PRODUCT_COURIER_DELIVERY_CONFLICT_MESSAGE,
@@ -166,7 +169,13 @@ export function prepareCreateProductSubmit({
   const productPickupEnabled = form.productPickupEnabled !== false;
   const productDeliveryEnabled = form.productDeliveryEnabled === true;
   const productCourierDeliveryEnabled = form.productCourierDeliveryEnabled === true;
-  if (!productPickupEnabled && !productDeliveryEnabled && !productCourierDeliveryEnabled) {
+  const productDeliveryCarrier =
+    resolveProductDeliveryCarrier({
+      productDeliveryCarrier: form.productDeliveryCarrier,
+      productDeliveryEnabled,
+      productCourierDeliveryEnabled,
+    }) ?? "";
+  if (!productPickupEnabled && !productDeliveryCarrier) {
     return { ok: false, message: PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE };
   }
   // Либо продавец везёт сам, либо отдаёт курьеру.
@@ -216,6 +225,7 @@ export function prepareCreateProductSubmit({
       productPickupEnabled,
       productDeliveryEnabled,
       productCourierDeliveryEnabled,
+      ...(productDeliveryCarrier ? { productDeliveryCarrier } : {}),
       productReturnEnabled,
       productReturnTerms,
     };
@@ -255,6 +265,7 @@ export function prepareCreateProductSubmit({
       productPickupEnabled,
       productDeliveryEnabled,
       productCourierDeliveryEnabled,
+      ...(productDeliveryCarrier ? { productDeliveryCarrier } : {}),
       productReturnEnabled,
       productReturnTerms,
     },
