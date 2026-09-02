@@ -13,6 +13,7 @@ import {
   PROFILE_TAB_COURIER,
   PROFILE_TAB_COURIER_MODERATION,
   PROFILE_TAB_SHIPMENT_DISPUTES,
+  PROFILE_TAB_SHIPPING_CARRIERS,
   PROFILE_TAB_COURIER_OVERVIEW,
   PROFILE_TAB_INSTALLMENT_DISPUTES,
   PROFILE_TAB_INSTALLMENT_PAYMENTS,
@@ -155,6 +156,10 @@ export const useHomeProfileNavigation = ({
     navigateFromProfileTab(PROFILE_TAB_SHIPMENT_DISPUTES);
   }, [navigateFromProfileTab]);
 
+  const handleShippingCarriersFromProfile = useCallback(() => {
+    navigateFromProfileTab(PROFILE_TAB_SHIPPING_CARRIERS);
+  }, [navigateFromProfileTab]);
+
   const handleDataConfirmationQueueFromProfile = useCallback(() => {
     navigateFromProfileTab(PROFILE_TAB_DATA_CONFIRMATION_REQUESTS);
   }, [navigateFromProfileTab]);
@@ -249,6 +254,7 @@ export const useHomeProfileNavigation = ({
     handleCourierFromProfile,
     handleCourierModerationFromProfile,
     handleShipmentDisputesFromProfile,
+    handleShippingCarriersFromProfile,
     handleCourierOverviewFromProfile,
     handleDataConfirmationQueueFromProfile,
 

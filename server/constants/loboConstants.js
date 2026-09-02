@@ -46,3 +46,7 @@ export const LOBO_NOT_CONFIGURED_MESSAGE =
   "Доставка ЛОБО не настроена: нет ключей API";
 export const LOBO_UNAVAILABLE_MESSAGE =
   "Служба ЛОБО не отвечает — попробуйте позже";
+
+/** Службу выключил админ: не ошибка пользователя, а решение платформы. */
+export const SHIPPING_CARRIER_DISABLED_MESSAGE =
+  "Эта служба доставки сейчас отключена";

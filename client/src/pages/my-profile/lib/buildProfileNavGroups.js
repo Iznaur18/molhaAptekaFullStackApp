@@ -37,6 +37,7 @@ export function buildProfileNavGroups({
   canUseStaffAuditLogAdmin,
   canUseBroadcastNotificationsAdmin,
   canUseSearchSynonymsAdmin,
+  canUseShippingCarriers,
   canUseCategoryTreeAdmin,
   canUseAppIntroAdmin,
   canUseSiteHeaderBannerAdmin,
@@ -85,6 +86,7 @@ export function buildProfileNavGroups({
   onDataConfirmationQueueClick,
   onInstallmentDisputesClick,
   onShipmentDisputesClick,
+  onShippingCarriersClick,
   onAdminOrdersClick,
   onSearchSynonymsAdminClick,
   onCategoryTreeAdminClick,
@@ -361,6 +363,16 @@ export function buildProfileNavGroups({
   ];
 
   const managementItems = [
+    ...(canUseShippingCarriers
+      ? [
+          {
+            tab: "shipping-carriers",
+            label: "Службы доставки",
+            onClick: () =>
+              selectTab("shipping-carriers", onShippingCarriersClick),
+          },
+        ]
+      : []),
     ...(canUseCategoryTreeAdmin
       ? [
           {

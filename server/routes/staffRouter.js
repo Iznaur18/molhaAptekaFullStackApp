@@ -6,12 +6,15 @@ import {
   patchStaffCourierModerationController,
   getStaffDisputesController,
   postStaffResolveDisputeController,
+  getStaffShippingCarriersController,
+  patchStaffShippingCarrierController,
 } from "../controllers/index.js";
 import {
   staffCourierListValidation,
   staffCourierModerationValidation,
   staffDisputeListValidation,
   staffResolveDisputeValidation,
+  shippingCarrierToggleValidation,
 } from "../validations/index.js";
 import { checkProductModeratorMW } from "../middlewares/checkProductModeratorMW.js";
 import { staffBroadcastNotificationValidation } from "../validations/user/staffBroadcastNotificationValidation.js";
@@ -64,6 +67,22 @@ router.post(
   checkProductModeratorMW,
   staffResolveDisputeValidation,
   postStaffResolveDisputeController,
+);
+
+// Службы доставки включает и выключает только админ: это решение о том,
+// что вообще предлагать продавцам и покупателям.
+router.get(
+  "/shipping-carriers",
+  checkAuthMW,
+  checkAdminMW,
+  getStaffShippingCarriersController,
+);
+router.patch(
+  "/shipping-carriers/:carrierId",
+  checkAuthMW,
+  checkAdminMW,
+  shippingCarrierToggleValidation,
+  patchStaffShippingCarrierController,
 );
 
 export { router as staffRouter };

@@ -10,6 +10,7 @@ import {
   LazyDataConfirmationRequestsPage,
   LazyInstallmentDisputesPage,
   LazyShipmentDisputesPage,
+  LazyShippingCarriersPage,
   LazyInstallmentPaymentsPage,
   LazyInstallmentSalesPage,
   LazyLoyaltyPointsPage,
@@ -309,6 +310,8 @@ export function renderProfileTabPanel(mainView, props) {
       );
     case "shipment-disputes":
       return <LazyShipmentDisputesPage />;
+    case "shipping-carriers":
+      return <LazyShippingCarriersPage />;
     default:
       return null;
   }

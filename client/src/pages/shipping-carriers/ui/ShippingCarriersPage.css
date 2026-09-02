@@ -1,0 +1,99 @@
+.shipping-carriers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1rem;
+}
+
+.shipping-carriers__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.shipping-carriers__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.shipping-carriers__intro,
+.shipping-carriers__muted {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
+.shipping-carriers__error {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--iz-color-danger, #d64545);
+}
+
+.shipping-carriers__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shipping-carriers__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding: 0.9rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 14px;
+  background: var(--iz-color-surface, transparent);
+}
+
+.shipping-carriers__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.shipping-carriers__name {
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+/* Состояние читают раньше кнопки: сначала «что сейчас», потом «что сделать». */
+.shipping-carriers__state {
+  font-size: 0.85rem;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
+.shipping-carriers__state_on {
+  color: var(--iz-color-success, #2f8f4e);
+  font-weight: 600;
+}
+
+.shipping-carriers__regions {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
+.shipping-carriers__toggle {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--iz-color-text);
+  cursor: pointer;
+}
+
+.shipping-carriers__toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

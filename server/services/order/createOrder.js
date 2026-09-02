@@ -11,6 +11,9 @@ import {
   resolveProductDeliveryCarrier,
 } from "@molha/api-contract";
 
+import { SHIPPING_CARRIER_DISABLED_MESSAGE } from "../../constants/loboConstants.js";
+import { isCarrierAvailable } from "../shipping/shippingCarrierSettings.js";
+
 import { buildStoredShipments } from "./orderShipments.js";
 import { resolveOrderFulfillmentSplit } from "./resolveOrderFulfillmentSplit.js";
 import { resolveDeliveryFeesBySeller } from "../courier/courierDeliveryFee.js";
@@ -527,6 +530,15 @@ export async function createOrder({
     productById,
     fulfillmentSplit.deliveryProductIds,
   );
+
+  // Выключенной службой заказ не оформить: товар с ней мог быть создан до
+  // того, как админ её погасил.
+  for (const carrier of new Set(Object.values(deliveryCarrierBySeller))) {
+    if (!carrier) continue;
+    if (!(await isCarrierAvailable(carrier))) {
+      throw new AppError(409, SHIPPING_CARRIER_DISABLED_MESSAGE);
+    }
+  }
   /** Курьеры Gitorg — частный случай перевозчика; их читает «Обзор». */
   const courierDeliveryBySeller = Object.fromEntries(
     Object.entries(deliveryCarrierBySeller).map(([sellerId, carrier]) => [

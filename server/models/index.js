@@ -46,6 +46,7 @@ import ReferralLedgerEntryModel from "./ReferralLedgerEntryModel.js";
 import AffiliateLedgerEntryModel from "./AffiliateLedgerEntryModel.js";
 import { MoneyIdempotencyRecordModel } from "./MoneyIdempotencyRecordModel.js";
 import { PrivateUploadModel } from "./PrivateUploadModel.js";
+import { ShippingCarrierSettingModel } from "./ShippingCarrierSettingModel.js";
 import OneCExchangeLogModel from "./OneCExchangeLogModel.js";
 import OneCOrderPushModel from "./OneCOrderPushModel.js";
 import OneCExchangeSessionModel from "./OneCExchangeSessionModel.js";
@@ -103,6 +104,7 @@ export {
   AffiliateLedgerEntryModel,
   MoneyIdempotencyRecordModel,
   PrivateUploadModel,
+  ShippingCarrierSettingModel,
   OneCExchangeLogModel,
   OneCOrderPushModel,
   OneCExchangeSessionModel,

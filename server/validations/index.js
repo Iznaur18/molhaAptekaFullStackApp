@@ -87,6 +87,7 @@ import {
   staffDisputeListValidation,
 } from "./courier/courierShipmentValidation.js";
 import { shippingEstimateValidation } from "./order/shippingEstimateValidation.js";
+import { shippingCarrierToggleValidation } from "./order/shippingCarrierValidation.js";
 import { replaceMyCartValidation } from "./cart/replaceMyCartValidation.js";
 import { replaceMyFavoritesValidation } from "./favorites/replaceMyFavoritesValidation.js";
 import {
@@ -230,6 +231,7 @@ export {
   staffResolveDisputeValidation,
   staffDisputeListValidation,
   shippingEstimateValidation,
+  shippingCarrierToggleValidation,
   replaceMyCartValidation,
   replaceMyFavoritesValidation,
   userStoryIdParamValidation,

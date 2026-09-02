@@ -3,6 +3,7 @@ import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 import {
   makeOrderController,
   postShippingEstimateController,
+  getShippingCarriersController,
   getMyOrdersController,
   getMySalesController,
   getMyOrdersActionCountController,
@@ -49,6 +50,10 @@ router.get("/action-count", checkAuthMW, getMyOrdersActionCountController);
 router.get("/", checkAuthMW, getMyOrdersValidation, getMyOrdersController);
 router.get("/sales/action-count", checkAuthMW, getMySalesActionCountController);
 router.get("/sales", checkAuthMW, getMySalesValidation, getMySalesController);
+// Список служб задаёт админ, поэтому клиент спрашивает его у нас, а не
+// держит копию в константах.
+router.get("/shipping-carriers", checkAuthMW, getShippingCarriersController);
+
 // Расчёт доставки внешней службой до оформления: покупатель должен знать
 // сумму заранее, а не узнавать её у двери.
 router.post(

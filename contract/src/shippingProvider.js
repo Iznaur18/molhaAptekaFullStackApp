@@ -105,6 +105,11 @@ export const shippingEstimateBodySchema = z.object({
   deliveryLon: z.coerce.number().min(-180).max(180),
 });
 
+/** Body `PATCH /staff/shipping-carriers/:carrierId`. */
+export const shippingCarrierToggleBodySchema = z.object({
+  enabled: z.coerce.boolean(),
+});
+
 export const shippingProviderSchema = z.enum(SHIPPING_PROVIDERS);
 export const shippingServiceTypeSchema = z.enum(SHIPPING_SERVICE_TYPES);
 

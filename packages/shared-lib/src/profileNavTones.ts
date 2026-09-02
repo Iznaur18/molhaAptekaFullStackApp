@@ -76,6 +76,7 @@ const PROFILE_NAV_SECTION_TONE_MAP = {
   "courier-overview": "green",
   "installment-disputes": "red",
   "shipment-disputes": "red",
+  "shipping-carriers": "blue",
   "admin-orders": "blue",
   "search-synonyms-admin": "blue",
   "category-tree-admin": "green",

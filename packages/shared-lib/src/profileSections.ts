@@ -38,6 +38,8 @@ export const PROFILE_SECTION_INSTALLMENT_SALES = "installment-sales";
 export const PROFILE_SECTION_INSTALLMENT_DISPUTES = "installment-disputes";
 /** Споры по доставке: товар у курьера, а курьер пропал. */
 export const PROFILE_SECTION_SHIPMENT_DISPUTES = "shipment-disputes";
+/** Какие службы доставки вообще предлагать: решение админа. */
+export const PROFILE_SECTION_SHIPPING_CARRIERS = "shipping-carriers";
 export const PROFILE_SECTION_CREATE_RAFFLE = "create-raffle";
 export const PROFILE_SECTION_EDIT_PROFILE = "edit-profile";
 
@@ -77,6 +79,7 @@ export const PROFILE_SECTION_IDS = [
   PROFILE_SECTION_INSTALLMENT_SALES,
   PROFILE_SECTION_INSTALLMENT_DISPUTES,
   PROFILE_SECTION_SHIPMENT_DISPUTES,
+  PROFILE_SECTION_SHIPPING_CARRIERS,
   PROFILE_SECTION_CREATE_RAFFLE,
   PROFILE_SECTION_EDIT_PROFILE,
 ] as const;
@@ -117,6 +120,7 @@ export const PROFILE_STAFF_SECTION_ORDER = [
 ] as const;
 
 export const PROFILE_MANAGEMENT_SECTION_ORDER = [
+  PROFILE_SECTION_SHIPPING_CARRIERS,
   PROFILE_SECTION_CATEGORY_TREE_ADMIN,
   PROFILE_SECTION_POPULAR_PRODUCTS_ADMIN,
   PROFILE_SECTION_APP_INTRO_ADMIN,

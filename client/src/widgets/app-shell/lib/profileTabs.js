@@ -40,6 +40,7 @@ export const PROFILE_TAB_INSTALLMENT_PAYMENTS = "installment-payments";
 export const PROFILE_TAB_INSTALLMENT_SALES = "installment-sales";
 export const PROFILE_TAB_INSTALLMENT_DISPUTES = "installment-disputes";
 export const PROFILE_TAB_SHIPMENT_DISPUTES = "shipment-disputes";
+export const PROFILE_TAB_SHIPPING_CARRIERS = "shipping-carriers";
 
 export const PROFILE_FULL_WIDTH_CATALOG_TABS = new Set([
   PROFILE_TAB_MY_PRODUCTS,

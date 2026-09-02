@@ -3,6 +3,18 @@ import { describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "../../../test/renderWithProviders.jsx";
 
+// Список служб приходит с сервера; здесь проверяем не его, а раскладку по
+// регионам и запись выбора.
+vi.mock("../../shipping/model/shippingCarrierQueries.js", () => ({
+  useShippingCarriersQuery: () => ({
+    data: [
+      { carrierId: "seller", available: true },
+      { carrierId: "gitorg_courier", available: true },
+      { carrierId: "lobo", available: true },
+    ],
+  }),
+}));
+
 const { ProductPickupLocationFields } = await import(
   "./ProductPickupLocationFields.jsx"
 );

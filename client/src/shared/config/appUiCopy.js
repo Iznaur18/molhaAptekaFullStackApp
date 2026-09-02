@@ -98,6 +98,7 @@ export {
   COURIER_OVERVIEW_UI,
   SHIPMENT_DISPUTE_UI,
 } from "./copy/courier.js";
+export { SHIPPING_CARRIERS_ADMIN_UI } from "./copy/shipping-carriers.js";
 export {
   AUCTION_PAGE_UI,
 } from "./copy/auction.js";

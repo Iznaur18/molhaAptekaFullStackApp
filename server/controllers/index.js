@@ -76,6 +76,11 @@ import {
 } from "./Courier/courierDisputeController.js";
 import { getAllOrdersController } from "./Order/getAllOrdersController.js";
 import { postShippingEstimateController } from "./Order/shippingEstimateController.js";
+import {
+  getShippingCarriersController,
+  getStaffShippingCarriersController,
+  patchStaffShippingCarrierController,
+} from "./Order/shippingCarriersController.js";
 import { updateOrderStatusController } from "./Order/updateOrderStatusController.js";
 import {
   advanceMyShipmentStatusController,
@@ -370,6 +375,9 @@ export {
   getMySalesActionCountController,
   getAllOrdersController,
   postShippingEstimateController,
+  getShippingCarriersController,
+  getStaffShippingCarriersController,
+  patchStaffShippingCarrierController,
   updateOrderStatusController,
   getMyCourierProfileController,
   submitCourierApplicationController,

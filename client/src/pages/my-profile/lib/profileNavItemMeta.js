@@ -72,6 +72,7 @@ export const PROFILE_NAV_ITEM_META = {
   "courier-moderation": { icon: CarFront },
   "installment-disputes": { icon: MessageSquareWarning },
   "shipment-disputes": { icon: MessageSquareWarning },
+  "shipping-carriers": { icon: Truck },
   "admin-orders": { icon: ListOrdered },
   "admin-analytics": { icon: TrendingUp },
   "staff-audit-log-admin": { icon: ScrollText },

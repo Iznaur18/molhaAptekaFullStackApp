@@ -92,6 +92,7 @@ export function useMyProfileNav({
   onCourierClick,
   onCourierModerationClick,
   onShipmentDisputesClick,
+  onShippingCarriersClick,
   onCourierOverviewClick,
   onDataConfirmationQueueClick,
   onInstallmentDisputesClick,
@@ -190,6 +191,8 @@ export function useMyProfileNav({
   // Споры по доставке разбирают те же, кто модерирует курьеров.
   const canUseShipmentDisputes =
     !isRegularUser && isProfileReady && Boolean(onShipmentDisputesClick);
+  // Службы доставки включает только админ: колбэк ему и передают.
+  const canUseShippingCarriers = isProfileReady && Boolean(onShippingCarriersClick);
   const canUseSubscriptions = isProfileReady && Boolean(onSubscriptionsClick);
   const canUseWishlist = isProfileReady && Boolean(onWishlistClick);
 
@@ -213,6 +216,7 @@ export function useMyProfileNav({
         canUseDataConfirmationQueue,
         canUseInstallmentDisputes,
         canUseShipmentDisputes,
+        canUseShippingCarriers,
         canUseAdminOrders,
         canUseAdminAnalytics,
         canUseStaffAuditLogAdmin,
@@ -266,6 +270,7 @@ export function useMyProfileNav({
         onDataConfirmationQueueClick,
         onInstallmentDisputesClick,
         onShipmentDisputesClick,
+  onShippingCarriersClick,
         onAdminOrdersClick,
         onSearchSynonymsAdminClick,
         onCategoryTreeAdminClick,
@@ -298,6 +303,7 @@ export function useMyProfileNav({
       canUseEditProfile,
       canUseInstallmentDisputes,
       canUseShipmentDisputes,
+      canUseShippingCarriers,
       canUseInstallmentPayments,
       canUseInstallmentSales,
       canUseLoyaltyPoints,
@@ -332,6 +338,7 @@ export function useMyProfileNav({
       onEditProfileClick,
       onInstallmentDisputesClick,
       onShipmentDisputesClick,
+  onShippingCarriersClick,
       onInstallmentPaymentsClick,
       onInstallmentSalesClick,
       onLoyaltyPointsClick,

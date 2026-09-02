@@ -28,6 +28,7 @@ import { USER_SAVED_ADDRESSES_UI } from "../../../shared/config/appUiCopy.js";
 import "../../address/ui/SavedAddressPicker.css";
 import "./ProductPickupLocationFields.css";
 import "./create-product-sections/CreateProductSections.css";
+import { useShippingCarriersQuery } from "../../shipping/model/shippingCarrierQueries.js";
 import {
   PRODUCT_DELIVERY_CARRIER_GITORG,
   PRODUCT_DELIVERY_CARRIER_LABEL_RU,
@@ -95,6 +96,7 @@ export function ProductPickupLocationFields({
   savedAddresses = [],
   onChange,
 }) {
+  const carriersQuery = useShippingCarriersQuery();
   const list = useMemo(
     () => (Array.isArray(locations) ? locations : []),
     [locations],
@@ -497,7 +499,15 @@ export function ProductPickupLocationFields({
   // товара: ЛОБО приедет именно на точку отправления, а не туда, где
   // прописан продавец.
   const carrierRegionCode = productRegionCode || sellerRegionCode;
-  const availableCarriers = listDeliveryCarriersForRegion(carrierRegionCode);
+  // Что вообще включено — решает админ; регион сужает это дальше.
+  const enabledCarrierIds = new Set(
+    (carriersQuery.data ?? [])
+      .filter((row) => row.available)
+      .map((row) => row.carrierId),
+  );
+  const availableCarriers = listDeliveryCarriersForRegion(carrierRegionCode).filter(
+    (carrier) => enabledCarrierIds.has(carrier),
+  );
   const currentCarrier =
     resolveProductDeliveryCarrier({
       productDeliveryCarrier,
@@ -687,6 +697,7 @@ export function ProductPickupLocationFields({
         role="radiogroup"
         aria-label={PRODUCT_PICKUP_UI.CARRIERS_LEGEND}
       >
+        {availableCarriers.includes(PRODUCT_DELIVERY_CARRIER_GITORG) ? (
         <label
           className={[
             "product-pickup-location-fields__check",
@@ -710,7 +721,9 @@ export function ProductPickupLocationFields({
             {PRODUCT_PICKUP_UI.FULFILLMENT_COURIER}
           </span>
         </label>
+        ) : null}
 
+        {availableCarriers.includes(PRODUCT_DELIVERY_CARRIER_SELLER) ? (
         <label
           className={[
             "product-pickup-location-fields__check",
@@ -738,6 +751,7 @@ export function ProductPickupLocationFields({
               : null}
           </span>
         </label>
+        ) : null}
 
         {availableCarriers.includes(PRODUCT_DELIVERY_CARRIER_LOBO) ? (
           <label

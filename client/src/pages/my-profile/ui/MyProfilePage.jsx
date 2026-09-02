@@ -54,6 +54,7 @@ import "./MyProfilePage.css";
  * onCourierClick?: () => void;
  * onCourierModerationClick?: () => void;
  * onShipmentDisputesClick?: () => void;
+ * onShippingCarriersClick?: () => void;
  * onCourierOverviewClick?: () => void;
  * onDataConfirmationQueueClick?: () => void;
  * onDataConfirmationClick?: () => void;
@@ -113,6 +114,7 @@ export function MyProfilePage({
   onCourierClick,
   onCourierModerationClick,
   onShipmentDisputesClick,
+  onShippingCarriersClick,
   onCourierOverviewClick,
   onDataConfirmationQueueClick,
   onDataConfirmationClick,
@@ -216,6 +218,7 @@ export function MyProfilePage({
     onCourierClick,
     onCourierModerationClick,
     onShipmentDisputesClick,
+  onShippingCarriersClick,
     onCourierOverviewClick,
     onDataConfirmationQueueClick,
     onInstallmentDisputesClick,

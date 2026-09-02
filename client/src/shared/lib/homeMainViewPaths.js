@@ -5,7 +5,7 @@ import { isStaffStandaloneMainView } from "./staffMainViews.js";
  * `/cart` на Express. `/user/:mongoId` — SPA-профиль (Accept: text/html) и
  * API (XHR); `/user-list` ок для списка пользователей.
  *
- * @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'wishlist' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'auction' | 'data-confirmation' | 'premium' | 'loyalty-points' | 'partner-program' | 'advertising' | 'onec-integration' | 'edit-profile' | 'admin-orders' | 'admin-analytics' | 'staff-audit-log-admin' | 'broadcast-notifications-admin' | 'search-synonyms-admin' | 'category-tree-admin' | 'app-intro-admin' | 'site-header-banner-admin' | 'product-manage-toggle-display-admin' | 'popular-products-admin' | 'product-moderation' | 'intro-ad-moderation' | 'seller-personal-category-moderation' | 'product-reports' | 'staff-raffles' | 'data-confirmation-requests' | 'courier' | 'courier-moderation' | 'courier-overview' | 'installment-payments' | 'installment-sales' | 'installment-disputes' | 'shipment-disputes'} HomeMainView
+ * @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'wishlist' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'auction' | 'data-confirmation' | 'premium' | 'loyalty-points' | 'partner-program' | 'advertising' | 'onec-integration' | 'edit-profile' | 'admin-orders' | 'admin-analytics' | 'staff-audit-log-admin' | 'broadcast-notifications-admin' | 'search-synonyms-admin' | 'category-tree-admin' | 'app-intro-admin' | 'site-header-banner-admin' | 'product-manage-toggle-display-admin' | 'popular-products-admin' | 'product-moderation' | 'intro-ad-moderation' | 'seller-personal-category-moderation' | 'product-reports' | 'staff-raffles' | 'data-confirmation-requests' | 'courier' | 'courier-moderation' | 'courier-overview' | 'installment-payments' | 'installment-sales' | 'installment-disputes' | 'shipment-disputes' | 'shipping-carriers'} HomeMainView
  */
 
 /** @type {Record<HomeMainView, string>} */
@@ -49,6 +49,7 @@ export const HOME_MAIN_VIEW_PATH = {
   courier: "/become-courier",
   "courier-moderation": "/courier-moderation",
   "shipment-disputes": "/shipment-disputes",
+  "shipping-carriers": "/shipping-carriers",
   "courier-overview": "/courier-overview",
   "installment-payments": "/installment-payments",
   "installment-sales": "/installment-sales",

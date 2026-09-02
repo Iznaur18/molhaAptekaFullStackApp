@@ -74,6 +74,7 @@ export function AccountMainContent({
   handleCourierFromProfile,
   handleCourierModerationFromProfile,
   handleShipmentDisputesFromProfile,
+  handleShippingCarriersFromProfile,
   handleCourierOverviewFromProfile,
   handleDataConfirmationQueueFromProfile,
   handleDataConfirmationFromProfile,
@@ -215,6 +216,9 @@ export function AccountMainContent({
         }
         onShipmentDisputesClick={
           canModerateProducts ? handleShipmentDisputesFromProfile : undefined
+        }
+        onShippingCarriersClick={
+          isAdmin ? handleShippingCarriersFromProfile : undefined
         }
         onDataConfirmationQueueClick={
           canModerateProducts ? handleDataConfirmationQueueFromProfile : undefined
