@@ -22,6 +22,7 @@ import {
   ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
   SELLER_PAYOUT_REQUISITES_REQUIRED_MESSAGE,
 } from "../../constants/orderConstants.js";
+import { ADDRESS_LINE_MAX_LENGTH } from "../../constants/dadataConstants.js";
 import { USER_BLOCK_CART_ORDER_MESSAGE } from "../../constants/userBlockConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { AppError } from "../../errors/AppError.js";
@@ -339,6 +340,31 @@ const assertProductsSupportPickup = (productById, productIds) => {
  * @param {string[]} productIds
  * @param {Array<{ productId?: unknown; pickupLocationId?: string }> | null | undefined} pickupSelections
  */
+/**
+ * Одна строка адреса для самовывозного заказа.
+ *
+ * В поле заказа влезает лишь ADDRESS_LINE_MAX_LENGTH символов, а точек может
+ * быть несколько: два грозненских адреса в сумме дают 116 символов, и заказ
+ * не создавался вовсе. Реальные точки лежат на самих позициях, здесь — только
+ * человекочитаемая сводка, поэтому длинный список сворачиваем в первую точку
+ * и число остальных. Резать список посередине нельзя: получился бы обрывок
+ * чужого адреса.
+ *
+ * @param {string[]} addresses
+ */
+export const buildPickupSummaryAddress = (addresses) => {
+  const joined = addresses.join("; ");
+  if (joined.length <= ADDRESS_LINE_MAX_LENGTH) return joined;
+
+  // «всего точек: N» — без склонения, годится для любого числа.
+  const suffix = `; всего точек: ${addresses.length}`;
+  const head = String(addresses[0] ?? "").slice(
+    0,
+    ADDRESS_LINE_MAX_LENGTH - suffix.length,
+  );
+  return `${head}${suffix}`;
+};
+
 const resolvePickupSelectionsByProductId = (
   productById,
   productIds,
@@ -381,7 +407,7 @@ const resolvePickupSelectionsByProductId = (
   return {
     pickupByProductId,
     addressForOrder: {
-      displayAddress: addresses.join("; "),
+      displayAddress: buildPickupSummaryAddress(addresses),
       flat: "",
       fiasId: "",
     },

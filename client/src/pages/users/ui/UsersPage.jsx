@@ -18,16 +18,43 @@ import { UsersPodium } from "./UsersPodium.jsx";
 
 import "./UsersPage.css";
 
+/** Приглашение войти: список пользователей сервер отдаёт только своим. */
+function UsersPageAuthPrompt() {
+  const navigate = useNavigate();
+
+  return (
+    <div className="users-page__auth">
+      <p className="users-page__state">{USERS_PAGE_UI.LOGIN_HINT}</p>
+      <button
+        type="button"
+        className="app-btn app-btn--primary users-page__login"
+        onClick={() => navigate(AUTH_LOGIN_PATH)}
+      >
+        {USERS_PAGE_UI.LOGIN_BUTTON}
+      </button>
+    </div>
+  );
+}
+
 /**
- * @param {{ onUserRowClick?: (userId: string) => void; isAdminViewer?: boolean }} props
+ * @param {{
+ *   onUserRowClick?: (userId: string) => void;
+ *   isAdminViewer?: boolean;
+ *   isAuthorized?: boolean;
+ * }} props
  */
-export function UsersPage({ onUserRowClick }) {
+export function UsersPage({ onUserRowClick, isAuthorized = true }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [submittedSearch, setSubmittedSearch] = useState("");
   const hasSearchQuery = submittedSearch.trim().length >= USER_SEARCH_MIN_LENGTH;
   const isSearchInputTooShort = isUsersSearchInputTooShort(submittedSearch);
 
-  const { phase, users, error } = useUsersSearchQuery({ search: submittedSearch });
+  // Гостю сервер отвечает 401, и страница вставала на «Загрузка…» навсегда:
+  // запрос до неё не доходит, а показать нечего. Спрашиваем только своих.
+  const { phase, users, error } = useUsersSearchQuery({
+    search: submittedSearch,
+    enabled: isAuthorized,
+  });
   const isSearchPending = hasSearchQuery && phase === "loading";
 
   // Ввод не ищет сам по себе — запрос уходит по «Найти». Пустое поле не поиск,
@@ -42,6 +69,14 @@ export function UsersPage({ onUserRowClick }) {
   const handleSearchSubmit = () => {
     setSubmittedSearch(searchTerm);
   };
+
+  if (!isAuthorized) {
+    return (
+      <div className="users-page">
+        <UsersPageAuthPrompt />
+      </div>
+    );
+  }
 
   return (
     <div className="users-page">
@@ -85,7 +120,6 @@ function UsersPageBody({
   isSearchInputTooShort = false,
   onUserRowClick,
 }) {
-  const navigate = useNavigate();
   const showPodium = !hasActiveFilters && !isSearchInputTooShort;
   const monthlyLoyaltyQuery = useUsersMonthlyLoyaltyPointsQuery({
     enabled: showPodium,
@@ -106,18 +140,7 @@ function UsersPageBody({
 
   if (phase === "error") {
     if (isAuthSessionError(new Error(error))) {
-      return (
-        <div className="users-page__auth">
-          <p className="users-page__state">{USERS_PAGE_UI.LOGIN_HINT}</p>
-          <button
-            type="button"
-            className="app-btn app-btn--primary users-page__login"
-            onClick={() => navigate(AUTH_LOGIN_PATH)}
-          >
-            {USERS_PAGE_UI.LOGIN_BUTTON}
-          </button>
-        </div>
-      );
+      return <UsersPageAuthPrompt />;
     }
     return (
       <p className="users-page__state users-page__state_error" role="alert">

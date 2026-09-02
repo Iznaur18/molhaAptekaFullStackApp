@@ -8,11 +8,11 @@ import { usersSearchQueryKeys } from "./usersSearchQueryKeys.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
- * @param {{ search: string }} params
+ * @param {{ search: string; enabled?: boolean }} params
  */
-export function useUsersSearchQuery({ search }) {
+export function useUsersSearchQuery({ search, enabled = true }) {
   const normalizedSearch = search.trim();
-  const canFetch = canFetchUsersSearch(normalizedSearch);
+  const canFetch = enabled && canFetchUsersSearch(normalizedSearch);
 
   const query = useQuery({
     queryKey: usersSearchQueryKeys.list(normalizedSearch),

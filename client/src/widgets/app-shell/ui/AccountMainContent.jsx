@@ -274,6 +274,7 @@ export function AccountMainContent({
       <LazyUsersPage
         onUserRowClick={onSellerNameClick}
         isAdminViewer={isAdmin}
+        isAuthorized={isAuthorized}
       />
     );
   }
