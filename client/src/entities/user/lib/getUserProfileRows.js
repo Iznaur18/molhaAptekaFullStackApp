@@ -19,6 +19,7 @@ import {
 import { formatUserBackgroundForDisplay } from "./userBackgroundValue.js";
 import { formatSearchRowTotalSalesCount } from "./formatSearchRowTotalSalesCount.js";
 import { formatSearchRowTotalSales } from "./formatSearchRowTotalSales.js";
+import { buildUserVehicleProfileRows } from "./buildUserVehicleProfileRows.js";
 import { isPremiumActive } from "./isPremiumActive.js";
 import {
   formatRuPhoneDisplayOrEmpty,
@@ -141,6 +142,7 @@ export function getUserProfileRows(user, options = {}) {
       label: L.userGender,
       value: formatGender(user.userGender),
     },
+    ...buildUserVehicleProfileRows(user),
     {
       id: "userAddress",
       label: L.userAddress,

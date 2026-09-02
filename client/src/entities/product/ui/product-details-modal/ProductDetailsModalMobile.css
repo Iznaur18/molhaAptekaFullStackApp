@@ -276,10 +276,15 @@
     padding-inline: var(--iz-space-4);
   }
 
-  .product-details-modal .product-details-seller-preview {
+  .product-details-modal .product-details-seller-stack {
     box-sizing: border-box;
     width: calc(100% - 2 * var(--iz-space-4));
     margin: var(--iz-space-2) var(--iz-space-4) 0;
+  }
+
+  .product-details-modal .product-details-seller-stack .product-details-seller-preview {
+    width: 100%;
+    margin: 0;
   }
 
   .product-details-modal .product-details-modal__stats-grid--standalone {

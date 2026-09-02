@@ -38,6 +38,7 @@ export const ProductDetailMediaHero = ({
       variant="detail"
       previewVideoUrl={previewVideoUrl}
       imageUrls={imageUrls}
+      product={product}
       onBack={() => router.back()}
       heroOverlay={
         <View style={styles.heroActions}>

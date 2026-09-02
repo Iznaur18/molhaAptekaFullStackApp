@@ -186,6 +186,7 @@ export function CheckoutForm({
     ? fulfillmentMode !== "pickup"
     : fulfillmentMethod === ORDER_FULFILLMENT_DELIVERY;
   const isPickup = needsPickup && !needsDelivery;
+  const isMixedFulfillment = needsPickup && needsDelivery;
   const pickupGroups = useMemo(
     () => (Array.isArray(pickupLocations) ? pickupLocations : []),
     [pickupLocations],
@@ -427,159 +428,196 @@ export function CheckoutForm({
           ) : null}
 
           {!needsPickup ? (
-            <div className="checkout-form__pickup checkout-form__block_off">
-              <span className="checkout-form__label">
-                {CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}
-              </span>
+            <section
+              className="checkout-form__fulfillment-section checkout-form__fulfillment-section--pickup checkout-form__fulfillment-section--off checkout-form__block_off"
+              aria-disabled="true"
+            >
+              <header className="checkout-form__fulfillment-section-head">
+                <span className="checkout-form__fulfillment-section-badge">
+                  {CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}
+                </span>
+                <span className="checkout-form__fulfillment-section-title">
+                  {CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}
+                </span>
+              </header>
               <p className="checkout-form__hint">{CHECKOUT_FORM_UI.PICKUP_NOT_NEEDED}</p>
-            </div>
+            </section>
           ) : null}
 
           {needsPickup ? (
-            <div className="checkout-form__pickup">
-              <span className="checkout-form__label">{CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}</span>
-              {pickupReady ? (
-                <div className="checkout-form__pickup-groups">
-                  {pickupGroups.map((group) => {
-                    const needsSelect = group.locations.length >= 2;
-                    const selectedId =
-                      selectedPickupByProductId[group.productId] ??
-                      group.locations.find((item) => item.isDefault)?.id ??
-                      group.locations[0]?.id;
+            <section className="checkout-form__fulfillment-section checkout-form__fulfillment-section--pickup">
+              <header className="checkout-form__fulfillment-section-head">
+                <span className="checkout-form__fulfillment-section-badge">
+                  {CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}
+                </span>
+                <span className="checkout-form__fulfillment-section-title">
+                  {CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}
+                </span>
+              </header>
+              <div className="checkout-form__fulfillment-section-body checkout-form__pickup">
+                {pickupReady ? (
+                  <div className="checkout-form__pickup-groups">
+                    {pickupGroups.map((group) => {
+                      const needsSelect = group.locations.length >= 2;
+                      const selectedId =
+                        selectedPickupByProductId[group.productId] ??
+                        group.locations.find((item) => item.isDefault)?.id ??
+                        group.locations[0]?.id;
 
-                    return (
-                      <div
-                        key={group.productId}
-                        className="checkout-form__pickup-group"
-                      >
-                        {showPickupTitles && group.productTitle ? (
-                          <p className="checkout-form__pickup-products">
-                            {group.productTitle}
-                          </p>
-                        ) : null}
-                        {needsSelect ? (
-                          <>
-                            <span className="checkout-form__pickup-select-label">
-                              {PRODUCT_PICKUP_UI.CHECKOUT_PICK_LOCATION}
-                            </span>
-                            <div
-                              className="checkout-form__pickup-options"
-                              role="radiogroup"
-                              aria-label={PRODUCT_PICKUP_UI.CHECKOUT_PICK_LOCATION}
-                            >
-                              {group.locations.map((location) => {
-                                const active = selectedId === location.id;
-                                return (
-                                  <button
-                                    key={location.id}
-                                    type="button"
-                                    role="radio"
-                                    aria-checked={active}
-                                    disabled={isDisabled || isSubmitting}
-                                    className={[
-                                      "checkout-form__pickup-option",
-                                      active
-                                        ? "checkout-form__pickup-option--active"
-                                        : "",
-                                    ]
-                                      .filter(Boolean)
-                                      .join(" ")}
-                                    onClick={() =>
-                                      setSelectedPickupByProductId((prev) => ({
-                                        ...prev,
-                                        [group.productId]: location.id,
-                                      }))
-                                    }
-                                  >
-                                    {location.label ? (
-                                      <span className="checkout-form__pickup-option-label">
-                                        {location.label}
+                      return (
+                        <div
+                          key={group.productId}
+                          className="checkout-form__pickup-group"
+                        >
+                          {showPickupTitles && group.productTitle ? (
+                            <p className="checkout-form__pickup-products">
+                              {group.productTitle}
+                            </p>
+                          ) : null}
+                          {needsSelect ? (
+                            <>
+                              <span className="checkout-form__pickup-select-label">
+                                {PRODUCT_PICKUP_UI.CHECKOUT_PICK_LOCATION}
+                              </span>
+                              <div
+                                className="checkout-form__pickup-options"
+                                role="radiogroup"
+                                aria-label={PRODUCT_PICKUP_UI.CHECKOUT_PICK_LOCATION}
+                              >
+                                {group.locations.map((location) => {
+                                  const active = selectedId === location.id;
+                                  return (
+                                    <button
+                                      key={location.id}
+                                      type="button"
+                                      role="radio"
+                                      aria-checked={active}
+                                      disabled={isDisabled || isSubmitting}
+                                      className={[
+                                        "checkout-form__pickup-option",
+                                        active
+                                          ? "checkout-form__pickup-option--active"
+                                          : "",
+                                      ]
+                                        .filter(Boolean)
+                                        .join(" ")}
+                                      onClick={() =>
+                                        setSelectedPickupByProductId((prev) => ({
+                                          ...prev,
+                                          [group.productId]: location.id,
+                                        }))
+                                      }
+                                    >
+                                      {location.label ? (
+                                        <span className="checkout-form__pickup-option-label">
+                                          {location.label}
+                                        </span>
+                                      ) : null}
+                                      <span className="checkout-form__pickup-address">
+                                        {location.address}
                                       </span>
-                                    ) : null}
-                                    <span className="checkout-form__pickup-address">
-                                      {location.address}
-                                    </span>
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          </>
-                        ) : (
-                          <p className="checkout-form__pickup-address">
-                            {group.locations[0]?.address}
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="checkout-form__pickup-address checkout-form__pickup-address_error">
-                  {CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED}
-                </p>
-              )}
-            </div>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </>
+                          ) : (
+                            <p className="checkout-form__pickup-address">
+                              {group.locations[0]?.address}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="checkout-form__pickup-address checkout-form__pickup-address_error">
+                    {CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED}
+                  </p>
+                )}
+              </div>
+            </section>
+          ) : null}
+
+          {isMixedFulfillment ? (
+            <div
+              className="checkout-form__fulfillment-split"
+              role="separator"
+              aria-label={`${CHECKOUT_FORM_UI.FULFILLMENT_PICKUP} / ${CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}`}
+            />
           ) : null}
 
           {!needsDelivery ? (
-            <div className="checkout-form__delivery checkout-form__block_off">
-              <span className="checkout-form__label">
-                {CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS}
-              </span>
+            <section
+              className="checkout-form__fulfillment-section checkout-form__fulfillment-section--delivery checkout-form__fulfillment-section--off checkout-form__block_off"
+              aria-disabled="true"
+            >
+              <header className="checkout-form__fulfillment-section-head">
+                <span className="checkout-form__fulfillment-section-badge">
+                  {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
+                </span>
+              </header>
               <p className="checkout-form__hint">
                 {CHECKOUT_FORM_UI.DELIVERY_NOT_NEEDED}
               </p>
-            </div>
+            </section>
           ) : null}
 
           {needsDelivery ? (
-            <>
-              <CheckoutSavedAddressPicker
-                addresses={savedAddresses}
-                selectedId={selectedSavedAddressId}
-                onSelect={handleSavedAddressSelect}
-                disabled={isDisabled || isSubmitting}
-              />
-
-              <AddressDeliveryFields
-                value={deliveryAddress}
-                onChange={handleDeliveryAddressChange}
-                disabled={isDisabled || isSubmitting}
-                displayOnly
-                lineInputClassName="checkout-form__input"
-                labels={{
-                  line: CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS,
-                }}
-              />
-
-              <label className="checkout-form__field">
-                <span className="checkout-form__label">{CHECKOUT_FORM_UI.LABEL_FLAT}</span>
-                <input
-                  type="text"
-                  className="checkout-form__input"
-                  value={deliveryAddress.flat}
-                  onChange={(event) =>
-                    handleDeliveryAddressChange({
-                      ...deliveryAddress,
-                      flat: event.target.value,
-                    })
-                  }
+            <section className="checkout-form__fulfillment-section checkout-form__fulfillment-section--delivery">
+              <header className="checkout-form__fulfillment-section-head">
+                <span className="checkout-form__fulfillment-section-badge">
+                  {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
+                </span>
+              </header>
+              <div className="checkout-form__fulfillment-section-body checkout-form__delivery">
+                <CheckoutSavedAddressPicker
+                  addresses={savedAddresses}
+                  selectedId={selectedSavedAddressId}
+                  onSelect={handleSavedAddressSelect}
                   disabled={isDisabled || isSubmitting}
-                  placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
-                  autoComplete="address-line2"
                 />
-              </label>
 
-              <CheckoutShippingProviderPicker
-                disabled={isDisabled || isSubmitting}
-                courierDelivery={courierDelivery}
-              />
+                <AddressDeliveryFields
+                  value={deliveryAddress}
+                  onChange={handleDeliveryAddressChange}
+                  disabled={isDisabled || isSubmitting}
+                  displayOnly
+                  lineInputClassName="checkout-form__input"
+                  labels={{
+                    line: CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS,
+                  }}
+                />
 
-              <CheckoutShippingEstimate
-                productIds={deliveryProductIds}
-                deliveryGeo={deliveryAddress.geo ?? null}
-              />
-            </>
+                <label className="checkout-form__field">
+                  <span className="checkout-form__label">{CHECKOUT_FORM_UI.LABEL_FLAT}</span>
+                  <input
+                    type="text"
+                    className="checkout-form__input"
+                    value={deliveryAddress.flat}
+                    onChange={(event) =>
+                      handleDeliveryAddressChange({
+                        ...deliveryAddress,
+                        flat: event.target.value,
+                      })
+                    }
+                    disabled={isDisabled || isSubmitting}
+                    placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
+                    autoComplete="address-line2"
+                  />
+                </label>
+
+                <CheckoutShippingProviderPicker
+                  disabled={isDisabled || isSubmitting}
+                  courierDelivery={courierDelivery}
+                />
+
+                <CheckoutShippingEstimate
+                  productIds={deliveryProductIds}
+                  deliveryGeo={deliveryAddress.geo ?? null}
+                />
+              </div>
+            </section>
           ) : null}
 
           <CheckoutPaymentMethodPicker

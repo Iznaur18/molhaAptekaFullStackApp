@@ -35,6 +35,7 @@ export function ProductDetailsModalPinnedGallery({
     <ProductMediaGalleryReadonly
       imageUrls={imageUrls}
       previewVideoUrl={previewVideoUrl}
+      product={product}
       isActive={isOpen}
       resetToken={product._id}
       onBack={fieldHandlers.onClose}

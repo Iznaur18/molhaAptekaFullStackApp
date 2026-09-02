@@ -7,6 +7,7 @@ import {
   formatSearchRowTotalSales,
   formatSearchRowTotalSalesCount,
 } from "@/entities/user/lib/formatSearchRowTotalSales";
+import { buildUserVehicleProfileRows } from "@/entities/user/lib/buildUserVehicleProfileRows";
 import { isPremiumActive } from "@/entities/user/lib/isPremiumActive";
 import {
   formatRuPhoneDisplayOrEmpty,
@@ -179,6 +180,7 @@ export const getUserProfileRows = (
       label: USER_PROFILE_COPY.LABELS.userGender,
       value: formatGender(user.userGender),
     },
+    ...buildUserVehicleProfileRows(user),
     {
       id: "userAddress",
       label: USER_PROFILE_COPY.LABELS.userAddress,

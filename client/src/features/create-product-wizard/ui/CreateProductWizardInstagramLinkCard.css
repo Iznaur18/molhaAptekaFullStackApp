@@ -1,0 +1,65 @@
+.create-product-wizard-instagram-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.create-product-wizard-instagram-link__label {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--iz-color-text-secondary);
+}
+
+.create-product-wizard-instagram-link__optional {
+  font-weight: 400;
+  color: var(--iz-color-text-muted);
+}
+
+.create-product-wizard-instagram-link__hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--iz-color-text-muted);
+}
+
+.create-product-wizard-instagram-link__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.create-product-wizard-instagram-link__field-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--iz-color-text-secondary);
+}
+
+.create-product-wizard-instagram-link__input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 40px;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-border) 85%, transparent);
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--iz-color-ink) 5%, var(--iz-color-surface));
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: 0.95rem;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.create-product-wizard-instagram-link__input:focus {
+  outline: none;
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-surface);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--iz-color-action) 18%, transparent);
+}
+
+.create-product-wizard-instagram-link__input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

@@ -192,6 +192,8 @@ export const API_CLIENT_UI = {
   FETCH_CATALOG_FEED_DISPLAYS_FALLBACK: "Не удалось загрузить подборки",
   PATCH_CATALOG_FEED_DISPLAY_FALLBACK: "Не удалось сохранить подборку",
   FETCH_MANAGE_TOGGLE_DISPLAYS_FALLBACK: "Не удалось загрузить оформление кнопок",
+  FETCH_FAQ_ITEM_LINKS_FALLBACK: "Не удалось загрузить ссылки FAQ",
+  PATCH_FAQ_ITEM_LINK_FALLBACK: "Не удалось сохранить ссылку FAQ",
   PATCH_MANAGE_TOGGLE_DISPLAY_FALLBACK: "Не удалось сохранить оформление кнопки",
   FETCH_BADGE_EXPLAINS_FALLBACK: "Не удалось загрузить описания бейджей",
   PATCH_BADGE_EXPLAIN_FALLBACK: "Не удалось сохранить описание бейджа",

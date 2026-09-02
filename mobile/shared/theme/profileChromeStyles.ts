@@ -208,15 +208,39 @@ export const useProfileOverviewSectionStyles = createThemedStyles((theme) => ({
     width: "100%",
     gap: 0,
   },
-  shareRow: {
+  quickActions: {
     flexDirection: "row",
     alignItems: "stretch",
     gap: O.shareRowGap,
-    marginTop: O.shareRowMarginTop,
+    marginTop: O.infoMarginTop,
+    marginBottom: O.infoMarginTop,
     width: "100%",
+  },
+  storefrontBtn: {
+    flex: 3,
+    minWidth: 0,
+    height: O.notificationsBtnHeight,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    borderRadius: theme.radius.button,
+    borderWidth: 1,
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.actionSurface,
+  },
+  storefrontBtnPressed: {
+    opacity: 0.85,
+  },
+  storefrontBtnText: {
+    flexShrink: 1,
+    color: theme.colors.action,
+    fontSize: 13,
+    fontWeight: "600",
   },
   notificationsBtn: {
     flex: 1,
+    minWidth: 0,
     height: O.notificationsBtnHeight,
     alignItems: "center",
     justifyContent: "center",
@@ -227,11 +251,12 @@ export const useProfileOverviewSectionStyles = createThemedStyles((theme) => ({
   },
   shareHalfBtn: {
     flex: 1,
+    minWidth: 0,
     width: "auto" as const,
     alignSelf: "stretch",
   },
   infoPanel: {
-    marginTop: O.infoMarginTop,
+    marginTop: 0,
     width: "100%",
   },
   raffleSection: {

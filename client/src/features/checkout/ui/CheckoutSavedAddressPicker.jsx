@@ -30,6 +30,7 @@ export function CheckoutSavedAddressPicker({
       minCount={1}
       sectionLabel={CHECKOUT_FORM_UI.LABEL_SAVED_ADDRESSES}
       otherLabel={CHECKOUT_FORM_UI.SAVED_ADDRESS_OTHER}
+      layout="carousel"
     />
   );
 }

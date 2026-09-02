@@ -206,7 +206,7 @@ export function ProductPromoCodeActivateSheet({
           {!applied ? (
             <button
               type="button"
-              className="app-btn app-btn--primary"
+              className="wholesale-price-modal__save"
               disabled={activateMutation.isPending || !code.trim()}
               onClick={() => {
                 void handleActivate();

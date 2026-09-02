@@ -9,6 +9,7 @@ import {
   assertProductPreviewVideoRequiresPhotos,
   normalizeProductPreviewVideoUrl,
 } from "./productPreviewVideo.js";
+import { normalizeProductInstagramPostUrl } from "./productInstagramPostUrl.js";
 import { patchBodyTouchesModerationContent } from "./productModeration.js";
 import {
   assertProductOldPricePair,
@@ -508,6 +509,19 @@ const applyPreviewVideoFields = async (body, $set, existing) => {
   }
 };
 
+const applyInstagramPostUrlField = (body, $set) => {
+  if (!hasBodyField(body, "productInstagramPostUrl")) {
+    return;
+  }
+  try {
+    $set.productInstagramPostUrl = normalizeProductInstagramPostUrl(
+      body.productInstagramPostUrl,
+    );
+  } catch (error) {
+    throwFieldError(error, "Некорректная ссылка Instagram");
+  }
+};
+
 const applyModerationAndAvailability = (body, $set, existing, isAdmin) => {
   const touchesContent = patchBodyTouchesModerationContent(body);
 
@@ -609,6 +623,7 @@ export async function buildProductPatchSet({ existing, body, isAdmin, productId 
   await applyAffiliateFields(body, $set, existing);
   applyImageFields(body, $set);
   await applyPreviewVideoFields(body, $set, existing);
+  applyInstagramPostUrlField(body, $set);
   applyModerationAndAvailability(body, $set, existing, isAdmin);
   await applyStockField(body, $set, existing, productId);
 

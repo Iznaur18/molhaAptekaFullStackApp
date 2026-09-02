@@ -31,6 +31,7 @@ import {
   productDeliveryCarrierSchema,
   productShipsToBuyer,
 } from "./productDeliveryCarrier.js";
+import { productInstagramPostUrlFieldSchema } from "./productInstagramPostUrl.js";
 
 /** SSOT category slug list — client/mobile/server re-export отсюда. */
 export const PRODUCT_CATEGORY_VALUES = [
@@ -218,6 +219,7 @@ export const createProductBodySchema = z
     productImageUrls: productImageUrlsSchema,
     productImageUrl: storedMediaUrlSchema.optional(),
     productPreviewVideoUrl: storedMediaUrlOrEmptySchema.optional(),
+    productInstagramPostUrl: productInstagramPostUrlFieldSchema.optional(),
     productPrice: z.coerce.number().int().min(0).max(PRODUCT_PRICE_RUB_MAX),
     productOldPrice: z.coerce.number().int().min(0).nullable().optional(),
     productCategoryId: mongoIdSchema.optional(),
@@ -298,6 +300,7 @@ const patchFieldShape = {
   productImageUrls: productImageUrlsSchema,
   productImageUrl: storedMediaUrlSchema.optional(),
   productPreviewVideoUrl: storedMediaUrlOrEmptySchema.optional(),
+  productInstagramPostUrl: productInstagramPostUrlFieldSchema.optional(),
   productPrice: z.coerce.number().int().min(0).max(PRODUCT_PRICE_RUB_MAX).optional(),
   productOldPrice: z.coerce.number().int().min(0).nullable().optional(),
   productCategoryId: mongoIdSchema.optional(),

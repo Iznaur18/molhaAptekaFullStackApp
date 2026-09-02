@@ -48,6 +48,10 @@ export async function createProduct(body) {
     if (previewVideo) {
       payload.productPreviewVideoUrl = previewVideo;
     }
+    const instagramPostUrl = body.productInstagramPostUrl?.trim();
+    if (instagramPostUrl) {
+      payload.productInstagramPostUrl = instagramPostUrl;
+    }
     if (Array.isArray(body.productCharacteristics)) {
       payload.productCharacteristics = body.productCharacteristics;
     }

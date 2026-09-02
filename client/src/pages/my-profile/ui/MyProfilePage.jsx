@@ -1,4 +1,5 @@
 import { createPortal } from "react-dom";
+import { Store } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
@@ -19,6 +20,7 @@ import { MyProductsShelvesPanel } from "../../../entities/seller-shelf/ui/MyProd
 import { useMyProfileNav } from "../model/useMyProfileNav.js";
 import { useMyProfilePageUi } from "../model/useMyProfilePageUi.js";
 import { AppIcon, Bell, ChevronDown, Menu, Pencil } from "../../../shared/ui/icon/index.js";
+import { buildSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
 import { UserProfileInfoPanel } from "../../../entities/user/ui/UserProfileInfoPanel.jsx";
 import { GuestProfilePanel } from "./GuestProfilePanel.jsx";
 import { ProfileSidebar } from "./ProfileSidebar.jsx";
@@ -425,7 +427,24 @@ export function MyProfilePage({
                     </div>
                   ) : null}
                   {user?._id ? (
-                    <div className="my-profile-page__share-row">
+                    <div className="my-profile-page__quick-actions">
+                      <SellerShareLinkButton
+                        sellerId={String(user._id)}
+                        sellerName={String(user.userName ?? "").trim()}
+                        variant="meta"
+                      />
+                      <button
+                        type="button"
+                        className="my-profile-page__storefront-btn"
+                        onClick={() =>
+                          navigate(buildSellerProductsPath(String(user._id)))
+                        }
+                      >
+                        <AppIcon icon={Store} size="sm" strokeWidth={2.1} />
+                        <span className="my-profile-page__storefront-btn-text">
+                          {MY_PROFILE_PAGE_UI.MY_STOREFRONT}
+                        </span>
+                      </button>
                       <button
                         type="button"
                         className="my-profile-page__notifications-btn"
@@ -444,11 +463,6 @@ export function MyProfilePage({
                           </span>
                         ) : null}
                       </button>
-                      <SellerShareLinkButton
-                        sellerId={String(user._id)}
-                        sellerName={String(user.userName ?? "").trim()}
-                        variant="meta"
-                      />
                     </div>
                   ) : null}
                   {tabContent ? (

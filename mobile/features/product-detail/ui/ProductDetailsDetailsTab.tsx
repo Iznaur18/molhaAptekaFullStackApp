@@ -40,7 +40,7 @@ import { ProductPickupDetailsPanel } from "@/features/product-detail/ui/ProductP
 import { catalogQueryKeys } from "@/shared/api";
 import { PRODUCT_DETAILS_MODAL_UI, PRODUCT_RENTAL_UI, SELLER_PRODUCTS_PAGE_UI } from "@/shared/config";
 import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
-import { useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
+import { useProductDetailScreenStyles, useProductDetailsSellerStackStyles } from "@/shared/theme/catalogProductStyles";
 
 type ContentTabId = "description" | "characteristics" | "returns" | "delivery";
 
@@ -92,6 +92,8 @@ export const ProductDetailsDetailsTab = ({
   onRequestLogin,
 }: ProductDetailsDetailsTabProps) => {
   const styles = useProductDetailScreenStyles();
+  const stackStyles = useProductDetailsSellerStackStyles();
+  const isSplitRest = presentation === "split-rest";
   const name = String(product.productName ?? "").trim() || "Товар";
   const sellerId = getProductSellerId(product);
   const productId = product._id != null ? String(product._id) : "";
@@ -409,10 +411,13 @@ export const ProductDetailsDetailsTab = ({
         )}
       </View>
 
-      <ProductDetailsSellerPreview
-        seller={product.productSeller}
-        presentation={presentation === "split-rest" ? "split-rest" : "default"}
-      />
+      <View style={[stackStyles.root, isSplitRest ? stackStyles.rootSplit : null]}>
+        <ProductDetailsSellerPreview
+          seller={product.productSeller}
+          presentation={isSplitRest ? "split-rest" : "stack"}
+          showStorefrontButton={Boolean(sellerId)}
+        />
+      </View>
 
       {topStatFieldKeys.length > 0 ? (
         <View style={[styles.spec, presentation !== "default" && styles.specSplit]}>

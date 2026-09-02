@@ -18,6 +18,7 @@ import {
 } from "@/shared/config";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useProductDetailsSellerPreviewStyles } from "@/shared/theme/catalogProductStyles";
+import { ProductDetailsSellerStorefrontButton } from "@/entities/product/ui/ProductDetailsSellerStorefrontButton";
 
 type SellerObject = {
   _id: string;
@@ -35,7 +36,8 @@ type SellerObject = {
 
 type ProductDetailsSellerPreviewProps = {
   seller: unknown;
-  presentation?: "default" | "split-rest";
+  presentation?: "default" | "split-rest" | "stack";
+  showStorefrontButton?: boolean;
 };
 
 const formatFollowersCount = (value?: number): string => {
@@ -49,6 +51,7 @@ const formatFollowersCount = (value?: number): string => {
 export const ProductDetailsSellerPreview = ({
   seller,
   presentation = "default",
+  showStorefrontButton = false,
 }: ProductDetailsSellerPreviewProps) => {
   const router = useRouter();
   const theme = useAppTheme();
@@ -114,17 +117,19 @@ export const ProductDetailsSellerPreview = ({
   };
 
   return (
-    <Pressable
-      style={({ pressed }) => [
+    <View
+      style={[
         styles.root,
         presentation === "split-rest" && styles.rootSplit,
-        pressed && styles.rootPressed,
+        presentation === "stack" && styles.rootStack,
       ]}
-      onPress={handleOpenProfile}
-      accessibilityRole="button"
-      accessibilityLabel={PRODUCT_SELLER_PREVIEW_UI.OPEN_PROFILE_ARIA}
     >
-      <View style={styles.header}>
+      <Pressable
+        style={({ pressed }) => [styles.headerBtn, pressed && styles.headerBtnPressed]}
+        onPress={handleOpenProfile}
+        accessibilityRole="button"
+        accessibilityLabel={PRODUCT_SELLER_PREVIEW_UI.OPEN_PROFILE_ARIA}
+      >
         <UserPremiumAvatar
           uri={avatarUri}
           isPremium={isPremium}
@@ -148,7 +153,11 @@ export const ProductDetailsSellerPreview = ({
           color={theme.colors.action}
           style={styles.chevron}
         />
-      </View>
+      </Pressable>
+
+      {showStorefrontButton ? (
+        <ProductDetailsSellerStorefrontButton sellerId={sellerId} embedded />
+      ) : null}
 
       <View style={styles.metrics}>
         {metrics.map((row) => (
@@ -167,6 +176,6 @@ export const ProductDetailsSellerPreview = ({
           </View>
         ))}
       </View>
-    </Pressable>
+    </View>
   );
 };

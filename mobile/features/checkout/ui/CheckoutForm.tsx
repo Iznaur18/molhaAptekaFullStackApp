@@ -308,114 +308,156 @@ export const CheckoutForm = ({
         </View>
 
         {isPickup ? (
-          <View style={checkoutStyles.fieldGroup}>
-            <Text style={checkoutStyles.fieldLabel}>{CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}</Text>
-            {pickupReady ? (
-              <>
-                {pickupGroups.length > 1 ? (
-                  <Text style={checkoutStyles.pickupHint}>{CHECKOUT_FORM_UI.PICKUP_MULTI_HINT}</Text>
-                ) : null}
-                <View style={checkoutStyles.pickupList}>
-                  {pickupGroups.map((group) => {
-                    const needsSelect = group.locations.length >= 2;
-                    const selectedId =
-                      selectedPickupByProductId[group.productId] ??
-                      group.locations.find((item) => item.isDefault)?.id ??
-                      group.locations[0]?.id;
-
-                    return (
-                      <View key={group.productId} style={checkoutStyles.pickupGroup}>
-                        {showPickupTitles && group.productTitle ? (
-                          <Text style={checkoutStyles.pickupProducts}>{group.productTitle}</Text>
-                        ) : null}
-                        {needsSelect ? (
-                          <>
-                            <Text style={checkoutStyles.pickupSelectLabel}>
-                              {CHECKOUT_FORM_UI.CHECKOUT_PICK_LOCATION}
-                            </Text>
-                            <View style={checkoutStyles.pickupOptions}>
-                              {group.locations.map((location) => {
-                                const active = selectedId === location.id;
-                                return (
-                                  <Pressable
-                                    key={location.id}
-                                    disabled={isDisabled || isSubmitting}
-                                    accessibilityRole="radio"
-                                    accessibilityState={{ checked: active }}
-                                    onPress={() =>
-                                      setSelectedPickupByProductId((prev) => ({
-                                        ...prev,
-                                        [group.productId]: location.id,
-                                      }))
-                                    }
-                                    style={[
-                                      checkoutStyles.pickupOption,
-                                      active && checkoutStyles.pickupOptionActive,
-                                    ]}
-                                  >
-                                    {location.label ? (
-                                      <Text style={checkoutStyles.pickupOptionLabel}>
-                                        {location.label}
-                                      </Text>
-                                    ) : null}
-                                    <Text style={checkoutStyles.pickupAddressText}>
-                                      {location.address}
-                                    </Text>
-                                  </Pressable>
-                                );
-                              })}
-                            </View>
-                          </>
-                        ) : (
-                          <Text style={checkoutStyles.pickupAddressText}>
-                            {group.locations[0]?.address}
-                          </Text>
-                        )}
-                      </View>
-                    );
-                  })}
-                </View>
-              </>
-            ) : (
-              <Text style={[checkoutStyles.pickupAddressText, checkoutStyles.pickupAddressError]}>
-                {CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED}
+          <View
+            style={[
+              checkoutStyles.fulfillmentSection,
+              checkoutStyles.fulfillmentSectionPickup,
+            ]}
+          >
+            <View style={checkoutStyles.fulfillmentSectionHead}>
+              <Text
+                style={[
+                  checkoutStyles.fulfillmentSectionBadge,
+                  checkoutStyles.fulfillmentSectionBadgePickup,
+                ]}
+              >
+                {CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}
               </Text>
-            )}
+              <Text style={checkoutStyles.fulfillmentSectionTitle}>
+                {CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}
+              </Text>
+            </View>
+            <View style={checkoutStyles.fulfillmentSectionBody}>
+              {pickupReady ? (
+                <>
+                  {pickupGroups.length > 1 ? (
+                    <Text style={checkoutStyles.pickupHint}>
+                      {CHECKOUT_FORM_UI.PICKUP_MULTI_HINT}
+                    </Text>
+                  ) : null}
+                  <View style={checkoutStyles.pickupList}>
+                    {pickupGroups.map((group) => {
+                      const needsSelect = group.locations.length >= 2;
+                      const selectedId =
+                        selectedPickupByProductId[group.productId] ??
+                        group.locations.find((item) => item.isDefault)?.id ??
+                        group.locations[0]?.id;
+
+                      return (
+                        <View key={group.productId} style={checkoutStyles.pickupGroup}>
+                          {showPickupTitles && group.productTitle ? (
+                            <Text style={checkoutStyles.pickupProducts}>
+                              {group.productTitle}
+                            </Text>
+                          ) : null}
+                          {needsSelect ? (
+                            <>
+                              <Text style={checkoutStyles.pickupSelectLabel}>
+                                {CHECKOUT_FORM_UI.CHECKOUT_PICK_LOCATION}
+                              </Text>
+                              <View style={checkoutStyles.pickupOptions}>
+                                {group.locations.map((location) => {
+                                  const active = selectedId === location.id;
+                                  return (
+                                    <Pressable
+                                      key={location.id}
+                                      disabled={isDisabled || isSubmitting}
+                                      accessibilityRole="radio"
+                                      accessibilityState={{ checked: active }}
+                                      onPress={() =>
+                                        setSelectedPickupByProductId((prev) => ({
+                                          ...prev,
+                                          [group.productId]: location.id,
+                                        }))
+                                      }
+                                      style={[
+                                        checkoutStyles.pickupOption,
+                                        active && checkoutStyles.pickupOptionActive,
+                                      ]}
+                                    >
+                                      {location.label ? (
+                                        <Text style={checkoutStyles.pickupOptionLabel}>
+                                          {location.label}
+                                        </Text>
+                                      ) : null}
+                                      <Text style={checkoutStyles.pickupAddressText}>
+                                        {location.address}
+                                      </Text>
+                                    </Pressable>
+                                  );
+                                })}
+                              </View>
+                            </>
+                          ) : (
+                            <Text style={checkoutStyles.pickupAddressText}>
+                              {group.locations[0]?.address}
+                            </Text>
+                          )}
+                        </View>
+                      );
+                    })}
+                  </View>
+                </>
+              ) : (
+                <Text
+                  style={[checkoutStyles.pickupAddressText, checkoutStyles.pickupAddressError]}
+                >
+                  {CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED}
+                </Text>
+              )}
+            </View>
           </View>
         ) : (
-          <>
-            <CheckoutSavedAddressPicker
-              addresses={savedAddresses}
-              selectedId={selectedSavedAddressId}
-              onSelect={handleSavedAddressSelect}
-              disabled={isDisabled || isSubmitting}
-            />
+          <View
+            style={[
+              checkoutStyles.fulfillmentSection,
+              checkoutStyles.fulfillmentSectionDelivery,
+            ]}
+          >
+            <View style={checkoutStyles.fulfillmentSectionHead}>
+              <Text
+                style={[
+                  checkoutStyles.fulfillmentSectionBadge,
+                  checkoutStyles.fulfillmentSectionBadgeDelivery,
+                ]}
+              >
+                {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
+              </Text>
+            </View>
+            <View style={checkoutStyles.fulfillmentSectionBody}>
+              <CheckoutSavedAddressPicker
+                addresses={savedAddresses}
+                selectedId={selectedSavedAddressId}
+                onSelect={handleSavedAddressSelect}
+                disabled={isDisabled || isSubmitting}
+              />
 
-            <AddressSuggestInput
-              value={deliveryAddress}
-              onChange={handleDeliveryAddressChange}
-              disabled={isDisabled || isSubmitting}
-              displayOnly
-              placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_DELIVERY_ADDRESS}
-              label={CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS}
-              containerStyle={checkoutStyles.fieldGroup}
-              labelStyle={checkoutStyles.fieldLabel}
-              inputStyle={checkoutStyles.fieldInput}
-            />
+              <AddressSuggestInput
+                value={deliveryAddress}
+                onChange={handleDeliveryAddressChange}
+                disabled={isDisabled || isSubmitting}
+                displayOnly
+                placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_DELIVERY_ADDRESS}
+                label={CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS}
+                containerStyle={checkoutStyles.fieldGroup}
+                labelStyle={checkoutStyles.fieldLabel}
+                inputStyle={checkoutStyles.fieldInput}
+              />
 
-            <Text style={checkoutStyles.fieldLabel}>{CHECKOUT_FORM_UI.LABEL_FLAT}</Text>
-            <TextInput
-              style={checkoutStyles.fieldInput}
-              value={deliveryAddress.flat}
-              onChangeText={(flat) => setDeliveryAddress((prev) => ({ ...prev, flat }))}
-              placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
-              placeholderTextColor={theme.colors.textMuted}
-              editable={!isDisabled && !isSubmitting}
-              keyboardType="default"
-            />
+              <Text style={checkoutStyles.fieldLabel}>{CHECKOUT_FORM_UI.LABEL_FLAT}</Text>
+              <TextInput
+                style={checkoutStyles.fieldInput}
+                value={deliveryAddress.flat}
+                onChangeText={(flat) => setDeliveryAddress((prev) => ({ ...prev, flat }))}
+                placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
+                placeholderTextColor={theme.colors.textMuted}
+                editable={!isDisabled && !isSubmitting}
+                keyboardType="default"
+              />
 
-            <CheckoutShippingProviderPicker disabled={isDisabled || isSubmitting} />
-          </>
+              <CheckoutShippingProviderPicker disabled={isDisabled || isSubmitting} />
+            </View>
+          </View>
         )}
 
         <CheckoutPaymentMethodPicker

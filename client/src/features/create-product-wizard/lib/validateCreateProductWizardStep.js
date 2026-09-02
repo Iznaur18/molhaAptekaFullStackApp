@@ -6,6 +6,7 @@ import {
 } from "../../../entities/product/lib/computeProductDiscountPercent.js";
 import { getProductPriceRubMaxError } from "../../../entities/product/lib/productPriceRubValidation.js";
 import { urlsFromImageRows } from "../../../entities/product/lib/productImageRowHelpers.js";
+import { validateInstagramPostUrlInput } from "@molha/api-contract";
 import { prepareCreateProductSubmit } from "../../../entities/product/lib/prepareCreateProductSubmit.js";
 import { validateProductCharacteristicsRows } from "../../../entities/product/lib/validateProductCharacteristicsRows.js";
 import { validateProductDescription } from "../../../entities/product/lib/validateProductDescription.js";
@@ -58,6 +59,10 @@ export function validateCreateProductWizardStep(stepId, form, context = {}) {
       );
       if (urls.length === 0) {
         return CREATE_PRODUCT_MODAL_UI.ERROR_IMAGE_REQUIRED;
+      }
+      const instagramError = validateInstagramPostUrlInput(form.productInstagramPostUrl);
+      if (instagramError) {
+        return instagramError;
       }
       return null;
     }

@@ -1,0 +1,11 @@
+.product-details-seller-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  width: 100%;
+  margin: 0;
+}
+
+.product-details-seller-stack .product-details-seller-preview {
+  margin: 0;
+}

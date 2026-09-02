@@ -83,16 +83,22 @@ export function CourierApplicationPage() {
   };
 
   if (profileQuery.isPending) {
-    return <p className="courier-page__loading">{COURIER_UI.LOADING}</p>;
+    return (
+      <section className="courier-page">
+        <p className="courier-page__loading">{COURIER_UI.LOADING}</p>
+      </section>
+    );
   }
 
   if (profileQuery.isError) {
     return (
-      <p className="courier-page__error" role="alert">
-        {profileQuery.error instanceof Error
-          ? profileQuery.error.message
-          : COURIER_UI.ERROR_GENERIC}
-      </p>
+      <section className="courier-page">
+        <p className="courier-page__error" role="alert">
+          {profileQuery.error instanceof Error
+            ? profileQuery.error.message
+            : COURIER_UI.ERROR_GENERIC}
+        </p>
+      </section>
     );
   }
 
@@ -115,28 +121,33 @@ export function CourierApplicationPage() {
         </span>
       </header>
 
-      <p className="courier-page__intro">{COURIER_UI.INTRO}</p>
+      <div className="courier-page__messages">
+        <p className="courier-page__intro">{COURIER_UI.INTRO}</p>
 
-      {profile?.hasAddress === false ? (
-        <p className="courier-page__warning" role="alert">
-          {COURIER_UI.ADDRESS_REQUIRED}
-        </p>
-      ) : null}
+        {profile?.hasAddress === false ? (
+          <p className="courier-page__warning" role="alert">
+            {COURIER_UI.ADDRESS_REQUIRED}
+          </p>
+        ) : null}
 
-      {status === "approved" ? (
-        <p className="courier-page__approved">
-          {COURIER_UI.APPROVED_HINT}
-          {profile?.addressCity ? ` ${COURIER_UI.REGION(profile.addressCity)}` : ""}
-        </p>
-      ) : null}
+        {status === "approved" ? (
+          <p className="courier-page__approved">
+            {COURIER_UI.APPROVED_HINT}
+            {profile?.addressCity ? ` ${COURIER_UI.REGION(profile.addressCity)}` : ""}
+          </p>
+        ) : null}
 
-      {status === "rejected" && profile?.moderationComment ? (
-        <p className="courier-page__rejection" role="alert">
-          {COURIER_UI.REJECTION_REASON}: {profile.moderationComment}
-        </p>
-      ) : null}
+        {status === "rejected" && profile?.moderationComment ? (
+          <p className="courier-page__rejection" role="alert">
+            {COURIER_UI.REJECTION_REASON}: {profile.moderationComment}
+          </p>
+        ) : null}
+      </div>
 
       <form className="courier-page__form" onSubmit={handleSubmit}>
+        <div className="courier-page__vehicle">
+          <h3 className="courier-page__section-title">{COURIER_UI.VEHICLE_SECTION}</h3>
+          <div className="courier-page__vehicle-grid">
         <label className="courier-page__field">
           <span>{COURIER_UI.FIELD_MAKE}</span>
           <input
@@ -172,6 +183,8 @@ export function CourierApplicationPage() {
             maxLength={15}
           />
         </label>
+          </div>
+        </div>
 
         <fieldset className="courier-page__docs">
           <legend className="courier-page__docs-heading">

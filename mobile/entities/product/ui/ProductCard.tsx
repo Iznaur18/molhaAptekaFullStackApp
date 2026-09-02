@@ -22,6 +22,7 @@ import { resolveProductCardRaffleParticipantFrameStyle } from "@/entities/produc
 import { PRODUCT_CARD_PROMOTION_TIER } from "@/entities/product/lib/productCardPromotionFramePalette";
 import { useProductCardMediaState } from "@/entities/product/lib/useProductCardMediaState";
 import { ProductCardGalleryDots } from "@/entities/product/ui/ProductCardGalleryDots";
+import { ProductInstagramPostMediaOverlay } from "@/entities/product/ui/ProductInstagramPostMediaOverlay";
 import { ProductCardWishlistBurst } from "@/entities/product/ui/ProductCardWishlistBurst";
 import { ProductCardPromotionBackground } from "@/entities/product/ui/ProductCardPromotionBackground";
 import { ProductCardPromotionCornerFlag } from "@/entities/product/ui/ProductCardPromotionCornerFlag";
@@ -323,6 +324,12 @@ export const ProductCard = memo(
           <ProductCardGalleryDots
             slideIndex={cardMedia.cardSlideIndex}
             slideCount={cardMedia.mediaSlides.length}
+          />
+
+          <ProductInstagramPostMediaOverlay
+            product={product}
+            size="card"
+            withGalleryDots={cardMedia.mediaSlides.length > 1}
           />
         </View>
 

@@ -334,6 +334,13 @@ export {
   productBadgeExplainKeyParamsSchema,
 } from "./productBadgeExplain.js";
 export {
+  FAQ_ITEM_ID_MAX_LENGTH,
+  FAQ_ITEM_LINK_HREF_MAX_LENGTH,
+  faqItemIdParamsSchema,
+  faqItemLinkPatchBodySchema,
+  isAllowedFaqItemLinkHref,
+} from "./faqItemLink.js";
+export {
   PRODUCT_PROMO_CODES_MAX_ACTIVE,
   PRODUCT_PROMO_CODE_MAX_LENGTH,
   PRODUCT_PROMO_CODE_MIN_LENGTH,
@@ -438,6 +445,14 @@ export {
   productModerationFromApiSchema,
   productWriteDataSchema,
 } from "./productWrite.js";
+export {
+  PRODUCT_INSTAGRAM_POST_URL_MAX_LENGTH,
+  PRODUCT_INSTAGRAM_POST_URL_INVALID_MESSAGE,
+  INSTAGRAM_MEDIA_KINDS,
+  parseInstagramPostUrl,
+  validateInstagramPostUrlInput,
+  productInstagramPostUrlFieldSchema,
+} from "./productInstagramPostUrl.js";
 export {
   PRODUCT_BULK_IMPORT_JOB_STATUSES,
   productBulkImportValidationErrorSchema,
@@ -679,6 +694,9 @@ export {
   COURIER_DISPUTE_REASON_MAX_LENGTH,
   SHIPMENT_DISPUTE_OUTCOME_RETURNED,
   SHIPMENT_DISPUTE_OUTCOME_CONFIRMED,
+  getCourierVehiclePublicFields,
+  formatCourierVehicleDisplay,
+  sanitizeCourierProfileForViewer,
 } from "./courier.js";
 export {
   authMeDataSchema,

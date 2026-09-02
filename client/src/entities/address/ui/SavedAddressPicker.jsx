@@ -18,6 +18,7 @@ import "./SavedAddressPicker.css";
  *   minCount?: number;
  *   sectionLabel: string;
  *   otherLabel: string;
+ *   layout?: "list" | "carousel";
  * }} props
  */
 export function SavedAddressPicker({
@@ -28,15 +29,32 @@ export function SavedAddressPicker({
   minCount = 1,
   sectionLabel,
   otherLabel,
+  layout = "list",
 }) {
   if (!Array.isArray(addresses) || addresses.length < minCount) {
     return null;
   }
 
+  const isCarousel = layout === "carousel";
+  const rootClassName = [
+    "saved-address-picker",
+    isCarousel ? "saved-address-picker--carousel" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const listClassName = [
+    "saved-address-picker__list",
+    isCarousel ? "saved-address-picker__list--carousel" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className="saved-address-picker">
-      <span className="saved-address-picker__label">{sectionLabel}</span>
-      <div className="saved-address-picker__list" role="radiogroup">
+    <div className={rootClassName}>
+      {!isCarousel ? (
+        <span className="saved-address-picker__label">{sectionLabel}</span>
+      ) : null}
+      <div className={listClassName} role="radiogroup">
         {addresses.map((item) => {
           const active = selectedId === item.id;
           return (

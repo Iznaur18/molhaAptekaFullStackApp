@@ -1,5 +1,7 @@
 import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
 
+import { validateInstagramPostUrlInput, parseInstagramPostUrl } from "@molha/api-contract";
+
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import {
   isRuRegionCode,
@@ -105,6 +107,14 @@ export function prepareCreateProductSubmit({
   const previewVideoUrl = normalizeUploadUrlForStorage(
     String(form.productPreviewVideoUrl ?? "").trim(),
   );
+  const instagramPostUrlRaw = String(form.productInstagramPostUrl ?? "").trim();
+  const instagramPostUrlError = validateInstagramPostUrlInput(instagramPostUrlRaw);
+  if (instagramPostUrlError) {
+    return { ok: false, message: instagramPostUrlError };
+  }
+  const productInstagramPostUrl = instagramPostUrlRaw
+    ? parseInstagramPostUrl(instagramPostUrlRaw)?.postUrl ?? ""
+    : "";
   if (previewVideoUrl && urls.length === 0) {
     return {
       ok: false,
@@ -217,6 +227,7 @@ export function prepareCreateProductSubmit({
       productDescription: String(form.productDescription).trim(),
       productImageUrls: urls,
       productPreviewVideoUrl: previewVideoUrl,
+      productInstagramPostUrl,
       productPrice,
       productOldPrice,
       productCharacteristics,
@@ -253,6 +264,7 @@ export function prepareCreateProductSubmit({
       productDescription: form.productDescription,
       productImageUrls: urls,
       productPreviewVideoUrl: previewVideoUrl || undefined,
+      productInstagramPostUrl: productInstagramPostUrl || undefined,
       productPrice,
       productOldPrice,
       ...(productCategoryId ? { productCategoryId } : {}),

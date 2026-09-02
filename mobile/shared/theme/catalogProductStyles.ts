@@ -970,6 +970,57 @@ export const useProductCardGalleryDotsStyles = createThemedStyles((theme) => ({
   },
 }));
 
+export const useProductInstagramPostMediaButtonStyles = createThemedStyles((theme) => ({
+  root: {
+    width: 32,
+    height: 32,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(15, 23, 42, 0.72)",
+    shadowColor: "#000",
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  rootDetail: {
+    width: 38,
+    height: 38,
+  },
+  igBadge: {
+    position: "absolute",
+    right: -2,
+    bottom: -2,
+    width: 14,
+    height: 14,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#dd2a7b",
+  },
+  igBadgeDetail: {
+    width: 16,
+    height: 16,
+  },
+}));
+
+export const useProductInstagramPostMediaOverlayStyles = createThemedStyles(() => ({
+  slot: {
+    position: "absolute",
+    right: 8,
+    bottom: 8,
+    zIndex: 4,
+  },
+  slotDetail: {
+    right: 10,
+    bottom: 10,
+  },
+  slotWithDots: {
+    bottom: 28,
+  },
+}));
+
 export const useProductCardWishlistBurstStyles = createThemedStyles(() => ({
   root: {
     alignItems: "center",
@@ -1454,15 +1505,23 @@ export const useProductDetailsSellerPreviewStyles = createThemedStyles((theme) =
     marginTop: 0,
     marginHorizontal: 0,
   },
-  rootPressed: {
-    borderColor: theme.colors.actionBorder,
-    backgroundColor: theme.colors.actionSoft,
+  rootStack: {
+    width: "100%",
+    marginTop: 0,
+    marginHorizontal: 0,
   },
-  header: {
+  headerBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: SP.headerGap,
     minWidth: 0,
+    width: "100%",
+    borderRadius: SP.metricBorderRadius,
+    paddingVertical: 2,
+    marginVertical: -2,
+  },
+  headerBtnPressed: {
+    backgroundColor: theme.colors.actionSoft,
   },
   avatar: {
     width: SP.avatarSize,
@@ -1544,6 +1603,78 @@ export const useProductDetailsSellerPreviewStyles = createThemedStyles((theme) =
     fontWeight: SP.metricKeyFontWeight,
     color: theme.colors.textMuted,
     lineHeight: SP.metricKeyLineHeight,
+  },
+}));
+
+export const useProductDetailsSellerStorefrontButtonStyles = createThemedStyles((theme) => ({
+  root: {
+    alignSelf: "stretch",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    minHeight: 62,
+    margin: 0,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 16,
+    backgroundColor: theme.colors.surfaceMuted,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+  },
+  rootPressed: {
+    borderColor: theme.colors.actionBorder,
+    backgroundColor: theme.colors.actionSoft,
+    transform: [{ scale: 0.985 }],
+  },
+  rootEmbedded: {
+    minHeight: 54,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: theme.colors.bg,
+  },
+  iconWrap: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.actionSoft,
+    flexShrink: 0,
+  },
+  copy: {
+    flex: 1,
+    minWidth: 0,
+  },
+  title: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: theme.colors.ink,
+    lineHeight: 19,
+  },
+  hint: {
+    fontSize: 13,
+    lineHeight: 17,
+    color: theme.colors.textMuted,
+  },
+  chevron: {
+    flexShrink: 0,
+    opacity: 0.88,
+  },
+}));
+
+export const useProductDetailsSellerStackStyles = createThemedStyles(() => ({
+  root: {
+    alignSelf: "stretch",
+    gap: 10,
+    marginTop: SP.rootMarginTop,
+    marginHorizontal: SP.rootMarginHorizontal,
+  },
+  rootSplit: {
+    width: "100%",
+    marginTop: 0,
+    marginHorizontal: 0,
   },
 }));
 

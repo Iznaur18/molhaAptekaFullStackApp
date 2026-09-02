@@ -1,4 +1,5 @@
 import { ADMIN_ROLE, isStaffRole } from "../access/adminUserGuard.js";
+import { sanitizeCourierProfileForViewer } from "@molha/api-contract";
 
 /**
  * Поля только для self/admin.
@@ -44,6 +45,29 @@ function stripPhoneNumber(user) {
 }
 
 /**
+ * @param {Record<string, unknown>} user
+ * @param {boolean} isFullAccess
+ */
+function applyCourierProfileVisibility(user, isFullAccess) {
+  if (!Object.prototype.hasOwnProperty.call(user, "courierProfile")) {
+    return user;
+  }
+
+  const out = { ...user };
+  const sanitized = sanitizeCourierProfileForViewer(out.courierProfile, {
+    isFullAccess,
+  });
+
+  if (sanitized === undefined) {
+    delete out.courierProfile;
+  } else {
+    out.courierProfile = sanitized;
+  }
+
+  return out;
+}
+
+/**
  * @param {{ userRole?: string; isBlockedUser?: boolean } | null | undefined} viewer
  */
 export function isPrivilegedAdminViewer(viewer) {
@@ -79,7 +103,7 @@ export function sanitizeUserProfileForViewer(user, ctx) {
   };
 
   if (privileged || isSelf) {
-    return stripOneCSecrets({ ...user });
+    return stripOneCSecrets(applyCourierProfileVisibility({ ...user }, true));
   }
 
   const hasPhoneNumber = Boolean(String(user.userPhoneNumber ?? "").trim());
@@ -94,7 +118,7 @@ export function sanitizeUserProfileForViewer(user, ctx) {
     out.hasPhoneNumber = true;
   }
 
-  return out;
+  return applyCourierProfileVisibility(out, false);
 }
 
 /**
@@ -128,7 +152,10 @@ export function sanitizeUsersSearchList(users, ctx) {
   }
 
   return users.map((row) => {
-    const item = stripPhoneNumber(stripPrivateProfileFields(row));
+    const item = applyCourierProfileVisibility(
+      stripPhoneNumber(stripPrivateProfileFields(row)),
+      false,
+    );
     delete item.userRole;
     delete item.isActiveUser;
     delete item.isBlockedUser;

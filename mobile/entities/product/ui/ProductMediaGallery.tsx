@@ -11,6 +11,7 @@ import { isReactNativeWeb } from "@/shared/lib/isReactNativeWeb";
 import { ProductMediaHorizontalPager } from "@/entities/product/ui/ProductMediaHorizontalPager";
 import { ProductImageLightbox } from "@/entities/product/ui/ProductImageLightbox";
 import { ProductMediaSlideContent } from "@/entities/product/ui/ProductMediaSlideContent";
+import { ProductInstagramPostMediaOverlay } from "@/entities/product/ui/ProductInstagramPostMediaOverlay";
 import { PRODUCT_CARD_UI, PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
 import { PRODUCT_DETAIL_HERO_CHROME } from "@/shared/lib/productDetailHeroChromeLayout";
 import {
@@ -25,6 +26,7 @@ import { HorizontalOverflowRow } from "@/shared/ui/HorizontalOverflowRow";
 type ProductMediaGalleryProps = {
   previewVideoUrl?: string | null;
   imageUrls: string[];
+  product?: Record<string, unknown> | null;
   variant?: "catalog" | "detail";
   heroSize?: ProductDetailHeroSize;
   isSplitLayout?: boolean;
@@ -36,6 +38,7 @@ type ProductMediaGalleryProps = {
 export const ProductMediaGallery = ({
   previewVideoUrl = null,
   imageUrls,
+  product = null,
   variant = "catalog",
   heroSize: heroSizeProp,
   isSplitLayout = false,
@@ -187,6 +190,13 @@ export const ProductMediaGallery = ({
           </View>
         ) : null}
         {renderCounter()}
+        {product ? (
+          <ProductInstagramPostMediaOverlay
+            product={product}
+            size={isDetail ? "detail" : "card"}
+            withGalleryDots={hasMultipleSlides}
+          />
+        ) : null}
       </View>
       {renderThumbs()}
       {isDetail ? (

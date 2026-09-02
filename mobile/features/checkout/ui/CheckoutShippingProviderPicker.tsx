@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import {
   CHECKOUT_SHIPPING_PROVIDER_SELLER,
@@ -35,7 +35,12 @@ export const CheckoutShippingProviderPicker = ({
       <Text style={[styles.legend, { color: theme.colors.textSecondary }]}>
         {CHECKOUT_FORM_UI.LABEL_SHIPPING_PROVIDER}
       </Text>
-      <View style={styles.wrap} accessibilityRole="radiogroup">
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.wrap}
+        accessibilityRole="radiogroup"
+      >
         {providerOptions.map((option) => {
           const isSelected = option.id === CHECKOUT_SHIPPING_PROVIDER_SELLER;
           const label = resolveCheckoutShippingProviderLabel(option.id, {
@@ -73,7 +78,7 @@ export const CheckoutShippingProviderPicker = ({
             </Pressable>
           );
         })}
-      </View>
+      </ScrollView>
 
       {showCarrierServices ? (
         <>
@@ -86,7 +91,12 @@ export const CheckoutShippingProviderPicker = ({
           >
             {CHECKOUT_FORM_UI.LABEL_SHIPPING_SERVICE}
           </Text>
-          <View style={styles.row} accessibilityRole="radiogroup">
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.row}
+            accessibilityRole="radiogroup"
+          >
             {serviceOptions.map((option) => {
               const label = SERVICE_LABEL[option.id] ?? option.id;
               return (
@@ -107,7 +117,7 @@ export const CheckoutShippingProviderPicker = ({
                 </Pressable>
               );
             })}
-          </View>
+          </ScrollView>
         </>
       ) : null}
 
@@ -132,16 +142,16 @@ const styles = StyleSheet.create({
   },
   wrap: {
     flexDirection: "row",
-    flexWrap: "wrap",
     gap: 12,
+    paddingRight: 4,
   },
   row: {
     flexDirection: "row",
     gap: 10,
+    paddingRight: 4,
   },
   card: {
-    flexGrow: 1,
-    flexBasis: "40%",
+    width: 116,
     minHeight: 72,
     borderWidth: 2,
     borderRadius: 16,
@@ -157,7 +167,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   chip: {
-    flex: 1,
+    minWidth: 120,
     minHeight: 44,
     borderWidth: 1,
     borderRadius: 8,

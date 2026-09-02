@@ -7,6 +7,7 @@ import { buildProductMediaSlides } from "../lib/buildProductMediaSlides.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../model/productConstants.js";
 import { ProductMediaHorizontalPager } from "./ProductMediaHorizontalPager.jsx";
 import { ProductMediaSlideContent } from "./ProductMediaSlideContent.jsx";
+import { ProductInstagramPostMediaOverlay } from "./ProductInstagramPostMediaOverlay.jsx";
 
 import "./ProductMediaGalleryReadonly.css";
 
@@ -19,6 +20,7 @@ import "./ProductMediaGalleryReadonly.css";
  *   onBack?: () => void;
  *   className?: string;
  *   heroOverlay?: import('react').ReactNode;
+ *   product?: Record<string, unknown> | null;
  * }} props
  */
 export function ProductMediaGalleryReadonly({
@@ -29,6 +31,7 @@ export function ProductMediaGalleryReadonly({
   onBack,
   className = "",
   heroOverlay = null,
+  product = null,
 }) {
   const [previewVideoFailed, setPreviewVideoFailed] = useState(false);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
@@ -142,6 +145,9 @@ export function ProductMediaGalleryReadonly({
             </button>
           ) : null}
           {heroOverlay}
+          {product ? (
+            <ProductInstagramPostMediaOverlay product={product} size="detail" />
+          ) : null}
           {hasMultipleSlides ? (
             <span
               className="product-media-gallery-readonly__slider-counter"

@@ -21,12 +21,19 @@ describe("shouldProxyToApi", () => {
     expect(DEV_API_PROXY_PREFIXES).toContain("/users-loyalty-raffle");
     expect(DEV_API_PROXY_PREFIXES).toContain("/seller-shelf");
     expect(DEV_API_PROXY_PREFIXES).toContain("/seller");
+    expect(DEV_API_PROXY_PREFIXES).toContain("/faq");
     expect(DEV_API_PROXY_PREFIXES.indexOf("/seller-shelf")).toBeLessThan(
       DEV_API_PROXY_PREFIXES.indexOf("/seller"),
     );
     expect(DEV_API_PROXY_PREFIXES.indexOf("/uploads")).toBeLessThan(
       DEV_API_PROXY_PREFIXES.indexOf("/upload"),
     );
+  });
+
+  it("keeps SPA /faq and proxies /faq/item-links to API", () => {
+    expect(shouldProxyToApi("/faq", "/faq")).toBe(false);
+    expect(shouldProxyToApi("/faq", "/faq/item-links")).toBe(true);
+    expect(shouldProxyToApi("/faq", "/faq/item-links/register")).toBe(true);
   });
 
   it("proxies /seller/:id only for link-preview bots", () => {

@@ -24,6 +24,7 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 
+import { ProductDetailsSellerStorefrontButton } from "./ProductDetailsSellerStorefrontButton.jsx";
 import "./ProductDetailsSellerPreview.css";
 
 /**
@@ -41,9 +42,14 @@ function formatFollowersCount(value) {
  * @param {{
  *   seller: import("../model/types.js").ProductSellerPopulated | string | null | undefined;
  *   onOpenProfile?: (userId: string) => void;
+ *   showStorefrontButton?: boolean;
  * }} props
  */
-export function ProductDetailsSellerPreview({ seller, onOpenProfile }) {
+export function ProductDetailsSellerPreview({
+  seller,
+  onOpenProfile,
+  showStorefrontButton = false,
+}) {
   const [avatarFailed, setAvatarFailed] = useState(false);
 
   const sellerObj =
@@ -108,43 +114,62 @@ export function ProductDetailsSellerPreview({ seller, onOpenProfile }) {
     },
   ];
 
-  const handleClick = () => {
+  const handleOpenProfile = () => {
     if (!canOpenProfile) return;
     onOpenProfile(sellerId);
   };
 
+  const header = (
+    <>
+      <UserPremiumAvatar
+        className="product-details-seller-preview__avatar"
+        src={avatarSrc}
+        isPremium={isPremium}
+        objectPosition={avatarObjectPosition}
+        decoding="async"
+        onError={() => setAvatarFailed(true)}
+      />
+      <span className="product-details-seller-preview__header-text">
+        <span className="product-details-seller-preview__label">
+          {PRODUCT_SELLER_PREVIEW_UI.SECTION_LABEL}
+        </span>
+        <UserPremiumDisplayName
+          name={displayName}
+          isPremium={isPremium}
+          isUserDataConfirmed={isConfirmed}
+          className="product-details-seller-preview__name"
+          textClassName="product-details-seller-preview__name-text"
+        />
+      </span>
+      {canOpenProfile ? (
+        <AppIcon
+          icon={ChevronRight}
+          size="md"
+          strokeWidth={2.5}
+          className="product-details-seller-preview__chevron"
+        />
+      ) : null}
+    </>
+  );
+
   const content = (
     <>
-      <span className="product-details-seller-preview__header">
-        <UserPremiumAvatar
-          className="product-details-seller-preview__avatar"
-          src={avatarSrc}
-          isPremium={isPremium}
-          objectPosition={avatarObjectPosition}
-          decoding="async"
-          onError={() => setAvatarFailed(true)}
-        />
-        <span className="product-details-seller-preview__header-text">
-          <span className="product-details-seller-preview__label">
-            {PRODUCT_SELLER_PREVIEW_UI.SECTION_LABEL}
-          </span>
-          <UserPremiumDisplayName
-            name={displayName}
-            isPremium={isPremium}
-            isUserDataConfirmed={isConfirmed}
-            className="product-details-seller-preview__name"
-            textClassName="product-details-seller-preview__name-text"
-          />
-        </span>
-        {canOpenProfile ? (
-          <AppIcon
-            icon={ChevronRight}
-            size="md"
-            strokeWidth={2.5}
-            className="product-details-seller-preview__chevron"
-          />
-        ) : null}
-      </span>
+      {canOpenProfile ? (
+        <button
+          type="button"
+          className="product-details-seller-preview__header-btn"
+          aria-label={PRODUCT_SELLER_PREVIEW_UI.OPEN_PROFILE_ARIA}
+          onClick={handleOpenProfile}
+        >
+          {header}
+        </button>
+      ) : (
+        <span className="product-details-seller-preview__header">{header}</span>
+      )}
+
+      {showStorefrontButton ? (
+        <ProductDetailsSellerStorefrontButton sellerId={sellerId} embedded />
+      ) : null}
 
       <dl className="product-details-seller-preview__metrics">
         {metrics.map((row) => (
@@ -164,25 +189,14 @@ export function ProductDetailsSellerPreview({ seller, onOpenProfile }) {
     </>
   );
 
-  if (!canOpenProfile) {
-    return (
-      <section
-        className="product-details-seller-preview product-details-seller-preview--static"
-        aria-label={PRODUCT_SELLER_PREVIEW_UI.SECTION_LABEL}
-      >
-        {content}
-      </section>
-    );
-  }
-
   return (
-    <button
-      type="button"
-      className="product-details-seller-preview"
-      aria-label={PRODUCT_SELLER_PREVIEW_UI.OPEN_PROFILE_ARIA}
-      onClick={handleClick}
+    <section
+      className={`product-details-seller-preview${
+        canOpenProfile ? "" : " product-details-seller-preview--static"
+      }`}
+      aria-label={PRODUCT_SELLER_PREVIEW_UI.SECTION_LABEL}
     >
       {content}
-    </button>
+    </section>
   );
 }

@@ -10,6 +10,7 @@ import { ProductDiscountBadge } from "../ProductPriceDisplay.jsx";
 import { ProductLoyaltyPointsBadge } from "../ProductLoyaltyPointsBadge.jsx";
 
 import { ProductCardGalleryDots } from "./ProductCardGalleryDots.jsx";
+import { ProductInstagramPostMediaOverlay } from "../ProductInstagramPostMediaOverlay.jsx";
 
 /**
  * @param {{
@@ -162,6 +163,7 @@ export function ProductCardMedia({ vm }) {
           slideCount={slideCount}
         />
       ) : null}
+      <ProductInstagramPostMediaOverlay product={vm.product} size="card" />
     </div>
   );
 }

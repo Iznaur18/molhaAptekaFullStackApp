@@ -28,6 +28,7 @@ import {
   staffRouter,
   onecRouter,
   onecExchangeRouter,
+  faqRouter,
 } from "./routes/index.js";
 import {
   generalRateLimiter,
@@ -135,6 +136,7 @@ export const createApp = () => {
   app.use("/analytics", analyticsRouter);
   app.use("/staff", staffRouter);
   app.use("/onec", onecRouter);
+  app.use("/faq", faqRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

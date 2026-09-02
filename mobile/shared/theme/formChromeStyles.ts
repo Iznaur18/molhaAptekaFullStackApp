@@ -500,6 +500,65 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
   fulfillmentOptionHintActive: {
     color: "rgba(255,255,255,0.85)",
   },
+  fulfillmentSection: {
+    gap: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderRadius: 14,
+    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+  },
+  fulfillmentSectionPickup: {
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.actionSoft,
+  },
+  fulfillmentSectionDelivery: {
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  fulfillmentSectionOff: {
+    opacity: 0.55,
+    paddingVertical: 10,
+  },
+  fulfillmentSectionHead: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 6,
+  },
+  fulfillmentSectionBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 0.4,
+    textTransform: "uppercase",
+    overflow: "hidden",
+  },
+  fulfillmentSectionBadgePickup: {
+    backgroundColor: theme.colors.actionSoft,
+    color: theme.colors.action,
+  },
+  fulfillmentSectionBadgeDelivery: {
+    backgroundColor: theme.colors.surface,
+    color: theme.colors.textSecondary,
+  },
+  fulfillmentSectionTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+  },
+  fulfillmentSectionBody: {
+    gap: 10,
+  },
+  fulfillmentSplit: {
+    height: 0,
+    borderTopWidth: 2,
+    borderStyle: "dashed",
+    borderTopColor: theme.colors.border,
+    marginVertical: 2,
+  },
   pickupAddressText: {
     fontSize: 15,
     lineHeight: 22,
@@ -543,12 +602,19 @@ export const useCheckoutFormStyles = createThemedStyles((theme) => ({
   },
   pickupProducts: {
     fontSize: 13,
+    fontWeight: "700",
     lineHeight: 17,
-    color: theme.colors.link,
+    color: theme.colors.text,
   },
   pickupGroup: {
     gap: 8,
-    marginBottom: 12,
+    marginBottom: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 12,
+    backgroundColor: theme.colors.surfaceMuted,
   },
   pickupSelectLabel: {
     fontSize: 13,

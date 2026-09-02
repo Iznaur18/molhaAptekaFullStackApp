@@ -1,0 +1,141 @@
+.product-details-seller-storefront-btn {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 1rem;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--iz-color-action) 8%, var(--iz-color-surface-muted)),
+    var(--iz-color-surface-muted)
+  );
+  color: var(--iz-color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--iz-color-on-contrast) 6%, transparent);
+  transition:
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.product-details-seller-storefront-btn:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--iz-color-action) 42%, var(--iz-color-border));
+  background: var(--iz-color-action-soft);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--iz-color-action) 14%, transparent);
+}
+
+.product-details-seller-storefront-btn:active {
+  transform: translateY(0) scale(0.985);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--iz-color-action) 10%, transparent);
+}
+
+.product-details-seller-storefront-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px var(--iz-color-accent-ring),
+    0 8px 20px color-mix(in srgb, var(--iz-color-action) 12%, transparent);
+}
+
+.product-details-seller-storefront-btn__icon-wrap {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 2.375rem;
+  height: 2.375rem;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--iz-color-action) 14%, var(--iz-color-surface));
+  color: var(--iz-color-action);
+  transition:
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.18s ease;
+}
+
+.product-details-seller-storefront-btn:hover .product-details-seller-storefront-btn__icon-wrap {
+  transform: scale(1.04);
+  background: color-mix(in srgb, var(--iz-color-action) 20%, var(--iz-color-surface));
+}
+
+.product-details-seller-storefront-btn__copy {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.product-details-seller-storefront-btn__title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--iz-color-ink);
+}
+
+:root[data-theme="dark"] .product-details-seller-storefront-btn__title {
+  color: var(--iz-color-text);
+}
+
+.product-details-seller-storefront-btn__hint {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--iz-color-text-muted);
+}
+
+.product-details-seller-storefront-btn__chevron {
+  flex: 0 0 auto;
+  color: var(--iz-color-action);
+  opacity: 0.88;
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.product-details-seller-storefront-btn:hover .product-details-seller-storefront-btn__chevron {
+  transform: translateX(2px);
+}
+
+.product-details-seller-storefront-btn--embedded {
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.75rem;
+  background: var(--iz-color-bg);
+  box-shadow: none;
+}
+
+.product-details-seller-storefront-btn--embedded:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: color-mix(in srgb, var(--iz-color-action) 38%, var(--iz-color-border));
+  background: color-mix(in srgb, var(--iz-color-action) 8%, var(--iz-color-bg));
+}
+
+.product-details-seller-storefront-btn--embedded:active {
+  transform: scale(0.99);
+  box-shadow: none;
+}
+
+.product-details-seller-storefront-btn--embedded:focus-visible {
+  box-shadow: 0 0 0 3px var(--iz-color-accent-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-details-seller-storefront-btn,
+  .product-details-seller-storefront-btn__icon-wrap,
+  .product-details-seller-storefront-btn__chevron {
+    transition: none;
+  }
+
+  .product-details-seller-storefront-btn:hover,
+  .product-details-seller-storefront-btn:active {
+    transform: none;
+  }
+
+  .product-details-seller-storefront-btn:hover .product-details-seller-storefront-btn__chevron {
+    transform: none;
+  }
+}

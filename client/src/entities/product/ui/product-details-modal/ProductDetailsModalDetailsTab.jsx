@@ -14,6 +14,8 @@ import { getProductSellerId } from "../../lib/getProductSellerId.js";
 import { ProductDetailsBadgeStack } from "../ProductDetailsBadgeStack.jsx";
 import { ProductDetailsSellerPreview } from "../ProductDetailsSellerPreview.jsx";
 import { ProductMediaGalleryReadonly } from "../ProductMediaGalleryReadonly.jsx";
+
+import "../ProductDetailsSellerStack.css";
 import { ProductPriceDisplay } from "../ProductPriceDisplay.jsx";
 import { ProductPromoCodeActivateSheet } from "../ProductPromoCodeActivateSheet.jsx";
 import { ProductAffiliateShareButton } from "./ProductAffiliateShareButton.jsx";
@@ -255,6 +257,7 @@ export function ProductDetailsModalDetailsTab({
     <ProductMediaGalleryReadonly
       imageUrls={imageUrls}
       previewVideoUrl={previewVideoUrl}
+      product={product}
       isActive={isOpen}
       resetToken={product._id}
       onBack={fieldHandlers.onClose}
@@ -307,10 +310,13 @@ export function ProductDetailsModalDetailsTab({
         </section>
       ) : null}
 
-      <ProductDetailsSellerPreview
-        seller={product.productSeller}
-        onOpenProfile={handleOpenSellerProfile}
-      />
+      <div className="product-details-seller-stack">
+        <ProductDetailsSellerPreview
+          seller={product.productSeller}
+          onOpenProfile={handleOpenSellerProfile}
+          showStorefrontButton={Boolean(sellerId)}
+        />
+      </div>
 
       {topStatFieldKeys.length > 0 ? (
         <dl className="product-details-modal__stats-grid product-details-modal__stats-grid--standalone">

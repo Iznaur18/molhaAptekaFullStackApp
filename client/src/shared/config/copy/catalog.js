@@ -188,6 +188,9 @@ export const PRODUCT_WISHLIST_UI = {
 export const PRODUCT_SELLER_PREVIEW_UI = {
   SECTION_LABEL: "Продавец",
   OPEN_PROFILE_ARIA: "Открыть профиль продавца",
+  SELLER_STOREFRONT_BUTTON: "Витрина продавца",
+  SELLER_STOREFRONT_HINT: "Все товары и полки продавца",
+  SELLER_STOREFRONT_ARIA: "Открыть витрину продавца",
   LISTED_PRODUCTS_LABEL: "Товаров в продаже",
   PROFILE_CTA: "Смотреть профиль",
   PREMIUM_LABEL: "Премиум",
@@ -270,6 +273,11 @@ export const PRODUCT_CARD_UI = {
   INSTALLMENT_BADGE: "Рассрочка",
   WHOLESALE_BADGE: "Опт",
   INSTALLMENT_SELL_BUTTON: "Продать в рассрочку",
+};
+
+/** Кнопка перехода в пост Instagram на карточке/в деталях товара */
+export const PRODUCT_INSTAGRAM_POST_UI = {
+  OPEN_BUTTON_ARIA: "Открыть пост в Instagram",
 };
 
 /** Аренда (бейдж / feature-card деталей) */

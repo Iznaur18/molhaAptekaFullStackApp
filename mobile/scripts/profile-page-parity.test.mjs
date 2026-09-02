@@ -22,7 +22,7 @@ test("profile overview matches web guest + phone layout tokens", () => {
   assert.match(guestCss, /--guest-profile-column-max:\s*420px/);
   assert.match(heroCss, /border-radius:\s*32px/);
   assert.match(pageCss, /border-radius:\s*20px/);
-  assert.match(pageCss, /margin:\s*0\.5rem 0 0/);
+  assert.match(pageCss, /margin:\s*0\.75rem 0/);
   assert.match(pageCss, /height:\s*2\.125rem/);
 
   assert.match(layout, /columnMaxWidth: 420/);
@@ -41,8 +41,8 @@ test("profile overview matches web guest + phone layout tokens", () => {
   assert.match(styles, /borderRadius: S\.radius/);
   assert.match(styles, /mainColumnContent:/);
   assert.match(styles, /PROFILE_BANNER_MARGIN_BOTTOM = 0/);
-  assert.match(styles, /marginTop: O\.shareRowMarginTop/);
   assert.match(styles, /marginTop: O\.infoMarginTop/);
+  assert.match(styles, /marginBottom: O\.infoMarginTop/);
   assert.doesNotMatch(styles, /borderBottomLeftRadius:\s*32/);
   assert.doesNotMatch(styles, /guestContent:/);
 

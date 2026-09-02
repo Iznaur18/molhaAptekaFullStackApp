@@ -8,6 +8,18 @@ export const FAQ_UI = {
   CONTACT_PREFIX: "Не нашли ответ? Напишите:",
   /** @param {string} question */
   QUESTION_ARIA: (question) => `Вопрос: ${question}`,
+  LINK_OPEN: "Видеоинструкция",
+  /** @param {string} href */
+  LINK_ARIA: (href) => `Видеоинструкция: ${href}`,
+  ADMIN_LINK_LABEL: "Ссылка для этого вопроса",
+  ADMIN_LINK_HINT: "Только администратор. Покупатели увидят кнопку под ответом.",
+  ADMIN_LINK_PLACEHOLDER: "https://… или /legal/terms",
+  ADMIN_LINK_SAVE: "Сохранить ссылку",
+  ADMIN_LINK_CLEAR: "Убрать",
+  ADMIN_LINK_SAVING: "Сохраняем…",
+  ADMIN_LINK_SAVED: "Ссылка сохранена",
+  ADMIN_LINK_CLEARED: "Ссылка удалена",
+  LINKS_LOAD_ERROR: "Не удалось загрузить ссылки к вопросам",
 };
 
 /** Юридические документы */

@@ -176,3 +176,66 @@ export const staffResolveDisputeBodySchema = z.object({
 export const staffDisputeListQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).optional().default(50),
 });
+
+/**
+ * Публичные поля авто из `courierProfile`, если пользователь их указал.
+ *
+ * @param {Record<string, unknown> | null | undefined} courierProfile
+ * @returns {{ vehicleMake: string; vehicleColor: string; vehiclePlate: string } | null}
+ */
+export function getCourierVehiclePublicFields(courierProfile) {
+  if (!courierProfile || typeof courierProfile !== "object") {
+    return null;
+  }
+
+  const vehicleMake = String(courierProfile.vehicleMake ?? "").trim();
+  const vehicleColor = String(courierProfile.vehicleColor ?? "").trim();
+  const vehiclePlate = String(courierProfile.vehiclePlate ?? "").trim();
+
+  if (!vehicleMake && !vehicleColor && !vehiclePlate) {
+    return null;
+  }
+
+  return { vehicleMake, vehicleColor, vehiclePlate };
+}
+
+/**
+ * @param {{ vehicleMake?: string; vehicleColor?: string; vehiclePlate?: string } | null | undefined} vehicle
+ */
+export function formatCourierVehicleDisplay(vehicle) {
+  if (!vehicle) {
+    return "";
+  }
+
+  return [vehicle.vehicleMake, vehicle.vehicleColor, vehicle.vehiclePlate]
+    .filter(Boolean)
+    .join(", ");
+}
+
+/**
+ * Для GET /user/:id — не отдаём права, ПТС и служебные поля модерации.
+ *
+ * @param {Record<string, unknown> | null | undefined} courierProfile
+ * @param {{ isFullAccess?: boolean }} [options]
+ */
+export function sanitizeCourierProfileForViewer(courierProfile, options = {}) {
+  if (!courierProfile || typeof courierProfile !== "object") {
+    return undefined;
+  }
+
+  if (options.isFullAccess === true) {
+    return courierProfile;
+  }
+
+  const vehicle = getCourierVehiclePublicFields(courierProfile);
+  if (!vehicle) {
+    return undefined;
+  }
+
+  const moderationStatus = String(courierProfile.moderationStatus ?? "").trim();
+
+  return {
+    ...(moderationStatus ? { moderationStatus } : {}),
+    ...vehicle,
+  };
+}

@@ -150,8 +150,10 @@ export function OneCIntegrationPage({ isAuthorized = false, onRequestLogin }) {
   if (!isAuthorized) {
     return (
       <section className="onec-page">
-        <h1 className="onec-page__title">{UI.TITLE}</h1>
-        <p className="onec-page__lead">{UI.AUTH_REQUIRED}</p>
+        <header className="onec-page__header">
+          <h1 className="onec-page__title">{UI.TITLE}</h1>
+          <p className="onec-page__lead">{UI.AUTH_REQUIRED}</p>
+        </header>
         <button type="button" className="onec-page__btn" onClick={onRequestLogin}>
           {UI.LOGIN_BUTTON}
         </button>
@@ -290,7 +292,17 @@ export function OneCIntegrationPage({ isAuthorized = false, onRequestLogin }) {
             )}
 
             {settings ? (
-              <p className="onec-page__status" role="status">
+              <p
+                className={[
+                  "onec-page__status",
+                  settings.lastSyncStatus === "success"
+                    ? "onec-page__status_success"
+                    : settings.lastSyncStatus === "error"
+                      ? "onec-page__status_error"
+                      : "onec-page__status_idle",
+                ].join(" ")}
+                role="status"
+              >
                 {settings.lastSyncStatus === "success"
                   ? UI.STATUS_SUCCESS
                   : settings.lastSyncStatus === "error"

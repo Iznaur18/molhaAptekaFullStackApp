@@ -5,6 +5,7 @@ import {
   urlsFromImageRows,
 } from "../../../entities/product/lib/productImageRowHelpers.js";
 import { PRODUCT_IMAGE_URLS_MAX } from "../../../entities/product/model/productConstants.js";
+import { CreateProductWizardInstagramLinkCard } from "./CreateProductWizardInstagramLinkCard.jsx";
 import { CreateProductWizardMediaGrid } from "./CreateProductWizardMediaGrid.jsx";
 import { CreateProductWizardMediaVideoCard } from "./CreateProductWizardMediaVideoCard.jsx";
 
@@ -46,6 +47,13 @@ export function CreateProductWizardMediaStep({ form, setForm, isSubmitting }) {
         value={String(form.productPreviewVideoUrl ?? "")}
         onChange={(productPreviewVideoUrl) =>
           setForm((prev) => ({ ...prev, productPreviewVideoUrl }))
+        }
+        disabled={isSubmitting}
+      />
+      <CreateProductWizardInstagramLinkCard
+        value={String(form.productInstagramPostUrl ?? "")}
+        onChange={(productInstagramPostUrl) =>
+          setForm((prev) => ({ ...prev, productInstagramPostUrl }))
         }
         disabled={isSubmitting}
       />

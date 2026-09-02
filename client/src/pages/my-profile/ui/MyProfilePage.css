@@ -513,20 +513,74 @@
   background: var(--iz-color-surface);
 }
 
-.my-profile-page__share-row {
+.my-profile-page__body .user-details-modal__banner {
+  margin-bottom: 0;
+}
+
+.my-profile-page__body > .user-profile-info {
+  margin-top: 0;
+}
+
+.my-profile-page__quick-actions + .my-profile-page__tab-content_lead {
+  margin-top: 0;
+}
+
+.my-profile-page__quick-actions {
   display: flex;
   align-items: stretch;
   gap: var(--iz-space-1);
-  margin: 0.5rem 0 0;
+  margin: 0.75rem 0;
   width: 100%;
 }
 
-.my-profile-page__share-row > .my-profile-page__notifications-btn,
-.my-profile-page__share-row > .seller-share-link--meta {
-  flex: 1 1 50%;
+.my-profile-page__quick-actions > .my-profile-page__notifications-btn,
+.my-profile-page__quick-actions > .seller-share-link--meta {
+  flex: 1 1 0;
   width: auto;
   min-width: 0;
   height: 2.125rem;
+  margin: 0;
+}
+
+.my-profile-page__quick-actions > .my-profile-page__storefront-btn {
+  flex: 3 1 0;
+  width: auto;
+  min-width: 0;
+  height: 2.125rem;
+  margin: 0;
+}
+
+.my-profile-page__storefront-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0 0.55rem;
+  border-radius: var(--iz-radius-input);
+  border: 1px solid var(--iz-color-action);
+  background: color-mix(in srgb, var(--iz-color-action) 10%, transparent);
+  color: var(--iz-color-action);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.my-profile-page__storefront-btn-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.my-profile-page__storefront-btn:hover {
+  background: color-mix(in srgb, var(--iz-color-action) 16%, transparent);
+}
+
+.my-profile-page__storefront-btn:focus-visible {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 2px;
 }
 
 .my-profile-page__notifications-btn {

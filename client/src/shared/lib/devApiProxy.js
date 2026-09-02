@@ -32,6 +32,7 @@ export const DEV_API_PROXY_PREFIXES = [
   "/analytics",
   "/staff",
   "/onec",
+  "/faq",
   "/health",
   "/uploads",
   "/upload",
@@ -65,6 +66,9 @@ export function shouldProxyToApi(prefix, pathname, acceptHeader, userAgent) {
   }
   if (prefix === "/product") {
     return shouldProxyProductPathToApi(pathname, acceptHeader, userAgent);
+  }
+  if (prefix === "/faq") {
+    return pathname.startsWith("/faq/");
   }
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
 }

@@ -15,6 +15,7 @@
 /cart
 /couriers
 /favorites
+/faq
 /installment
 /intro-ad
 /onec

@@ -12,6 +12,7 @@ import {
   assertProductPreviewVideoRequiresPhotos,
   normalizeProductPreviewVideoUrl,
 } from "./productPreviewVideo.js";
+import { normalizeProductInstagramPostUrl } from "./productInstagramPostUrl.js";
 import { assertSellerCanCreateProduct } from "./sellerProductsLimit.js";
 import { notifyFollowersOfSellerNewCatalogProduct } from "../user/userFollowHelpers.js";
 import { notifyFollowersOfSellerProductDiscount } from "./productDiscount.js";
@@ -133,6 +134,14 @@ const resolvePreviewVideo = (body, productImageUrls) => {
   return productPreviewVideoUrl;
 };
 
+const resolveInstagramPostUrl = (body) => {
+  try {
+    return normalizeProductInstagramPostUrl(body?.productInstagramPostUrl);
+  } catch (instagramPostError) {
+    throwFieldError(instagramPostError, "Некорректная ссылка Instagram");
+  }
+};
+
 const notifyApprovedProductFollowers = async (productPayload) => {
   try {
     await notifyFollowersOfSellerNewCatalogProduct(productPayload);
@@ -191,6 +200,7 @@ export async function postProduct({
 
   const productImageUrls = mergeProductImageUrlsFromBody(body);
   const productPreviewVideoUrl = resolvePreviewVideo(body, productImageUrls);
+  const productInstagramPostUrl = resolveInstagramPostUrl(body);
 
   const productModerationStatus = isAdmin
     ? PRODUCT_MODERATION_APPROVED
@@ -279,6 +289,7 @@ export async function postProduct({
     productSearchBlob,
     productImageUrls,
     productPreviewVideoUrl,
+    productInstagramPostUrl,
     productPrice,
     productOldPrice,
     productSeller: userId,

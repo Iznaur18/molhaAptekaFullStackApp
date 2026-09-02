@@ -84,3 +84,28 @@ test("sanitizeUsersSearchList: non-admin never gets phone", () => {
   assert.equal(row.email, undefined);
   assert.equal(row.userLoyaltyPoints, 42);
 });
+
+test("sanitizeUserProfileForViewer: guest gets public vehicle only from courierProfile", () => {
+  const out = sanitizeUserProfileForViewer(
+    {
+      ...TARGET,
+      courierProfile: {
+        moderationStatus: "approved",
+        vehicleMake: "Lada Granta",
+        vehicleColor: "белый",
+        vehiclePlate: "х123ум797",
+        vehiclePhotoFrontUrl: "/upload/private/front.webp",
+        driverLicensePhotoUrl: "/upload/private/license.webp",
+      },
+    },
+    { viewer: null, viewerId: null },
+  );
+
+  assert.deepEqual(out.courierProfile, {
+    moderationStatus: "approved",
+    vehicleMake: "Lada Granta",
+    vehicleColor: "белый",
+    vehiclePlate: "х123ум797",
+  });
+  assert.equal(out.courierProfile.vehiclePhotoFrontUrl, undefined);
+});

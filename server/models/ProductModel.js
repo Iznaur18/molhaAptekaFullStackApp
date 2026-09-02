@@ -123,6 +123,12 @@ const ProductSchema = new Schema(
       default: "",
       trim: true,
     },
+    productInstagramPostUrl: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 500,
+    },
     productPrice: { type: Number, required: true },
     productOldPrice: {
       type: Number,

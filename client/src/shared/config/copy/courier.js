@@ -18,6 +18,7 @@ export const COURIER_UI = {
   FIELD_MAKE: "Марка и модель",
   FIELD_COLOR: "Цвет",
   FIELD_PLATE: "Госномер",
+  VEHICLE_SECTION: "Данные авто",
   PLACEHOLDER_MAKE: "Lada Granta",
   PLACEHOLDER_COLOR: "белый",
   PLACEHOLDER_PLATE: "х123ум797",

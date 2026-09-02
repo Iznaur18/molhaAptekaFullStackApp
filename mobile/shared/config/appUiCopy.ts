@@ -29,6 +29,8 @@ export const API_CLIENT_UI = {
   FETCH_CATEGORY_DISPLAYS_FALLBACK: "Не удалось загрузить категории",
   FETCH_CATALOG_FEED_DISPLAYS_FALLBACK: "Не удалось загрузить подборки каталога",
   FETCH_MANAGE_TOGGLE_DISPLAYS_FALLBACK: "Не удалось загрузить оформление кнопок",
+  FETCH_FAQ_ITEM_LINKS_FALLBACK: "Не удалось загрузить ссылки FAQ",
+  PATCH_FAQ_ITEM_LINK_FALLBACK: "Не удалось сохранить ссылку FAQ",
   FETCH_BADGE_EXPLAINS_FALLBACK: "Не удалось загрузить описания бейджей",
   PATCH_MANAGE_TOGGLE_DISPLAY_FALLBACK: "Не удалось сохранить оформление кнопки",
   PATCH_CATEGORY_DISPLAY_FALLBACK: "Не удалось сохранить категорию",
@@ -545,6 +547,10 @@ export const PRODUCT_CARD_UI = {
     "Удаление недоступно: по товару есть незавершённые продажи или активные заказы.",
 } as const;
 
+export const PRODUCT_INSTAGRAM_POST_UI = {
+  OPEN_BUTTON_ARIA: "Открыть пост в Instagram",
+} as const;
+
 /** Аренда (бейдж / feature-card деталей) */
 export const PRODUCT_RENTAL_UI = {
   DETAILS_BADGE: "Аренда",
@@ -729,6 +735,9 @@ export const PRODUCT_PROMOTION_UI = {
 export const PRODUCT_SELLER_PREVIEW_UI = {
   SECTION_LABEL: "Продавец",
   OPEN_PROFILE_ARIA: "Открыть профиль продавца",
+  SELLER_STOREFRONT_BUTTON: "Витрина продавца",
+  SELLER_STOREFRONT_HINT: "Все товары и полки продавца",
+  SELLER_STOREFRONT_ARIA: "Открыть витрину продавца",
   LISTED_PRODUCTS_LABEL: "Товаров в продаже",
   PROFILE_CTA: "Смотреть профиль",
   PREMIUM_LABEL: "Премиум",
@@ -1405,6 +1414,17 @@ export const FAQ_UI = {
   UPDATED_PREFIX: "Обновлено:",
   CONTACT_PREFIX: "Не нашли ответ? Напишите:",
   QUESTION_ARIA: (question: string) => `Вопрос: ${question}`,
+  LINK_OPEN: "Видеоинструкция",
+  LINK_ARIA: (href: string) => `Видеоинструкция: ${href}`,
+  ADMIN_LINK_LABEL: "Ссылка для этого вопроса",
+  ADMIN_LINK_HINT: "Только администратор. Покупатели увидят кнопку под ответом.",
+  ADMIN_LINK_PLACEHOLDER: "https://… или /legal/terms",
+  ADMIN_LINK_SAVE: "Сохранить ссылку",
+  ADMIN_LINK_CLEAR: "Убрать",
+  ADMIN_LINK_SAVING: "Сохраняем…",
+  ADMIN_LINK_SAVED: "Ссылка сохранена",
+  ADMIN_LINK_CLEARED: "Ссылка удалена",
+  LINKS_LOAD_ERROR: "Не удалось загрузить ссылки к вопросам",
 } as const;
 
 export const LEGAL_UI = {
@@ -1557,6 +1577,7 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_AFFILIATE_LISTINGS: "Заработок с объявлений",
   TAB_ADVERTISING: "Реклама",
   EDIT_PROFILE: "Изменить профиль",
+  MY_STOREFRONT: "Моя витрина",
   LOGOUT: "Выйти",
   LOGOUT_CONFIRM: "Вы точно хотите выйти?",
   LOGOUT_YES: "Да, выйти",
@@ -1603,6 +1624,9 @@ export const USER_PROFILE_COPY = {
     totalSalesAmount: "Продаж на сумму",
     totalPurchasesAmount: "Покупок на сумму",
     userBusinessHours: "Часы работы",
+    userVehicleMake: "Марка и модель",
+    userVehicleColor: "Цвет авто",
+    userVehiclePlate: "Госномер",
     createdAt: "Создан",
   },
 } as const;

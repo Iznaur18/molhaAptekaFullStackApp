@@ -37,7 +37,7 @@ const PROFILE_ROW_SECTIONS = [
   {
     id: "personal",
     title: "Личные данные",
-    rowIds: ["userFullName", "userBirthDate", "userGender"],
+    rowIds: ["userFullName", "userBirthDate", "userGender", "userVehicleMake", "userVehicleColor", "userVehiclePlate"],
   },
   {
     id: "account",

@@ -348,6 +348,14 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WIZARD_MEDIA_VIDEO_UPLOAD_LOADING: "Загружаем…",
   WIZARD_MEDIA_VIDEO_TOGGLE_OPEN: "Добавить видео",
   WIZARD_MEDIA_VIDEO_TOGGLE_CLOSE: "Скрыть блок видео",
+  WIZARD_MEDIA_INSTAGRAM_TITLE: "Ссылка из Instagram",
+  WIZARD_MEDIA_INSTAGRAM_OPTIONAL_TAG: "(необязательно)",
+  WIZARD_MEDIA_INSTAGRAM_LEAD:
+    "Можно вставить ссылку на пост или Reel из Instagram.",
+  WIZARD_MEDIA_INSTAGRAM_LABEL: "Ссылка на пост Instagram",
+  WIZARD_MEDIA_INSTAGRAM_PLACEHOLDER: "https://www.instagram.com/p/…",
+  ERROR_INSTAGRAM_POST_URL:
+    "Укажите ссылку на пост Instagram: /p/, /reel/ или /tv/",
   WIZARD_MEDIA_FILLED_COUNT: (count, max) => `${count} из ${max} фото`,
   WIZARD_CATEGORY_LEAD: "Выберите самую точную подкатегорию.",
   WIZARD_COMMERCE_LEAD: "Старая цена покажет скидку, если она выше текущей.",

@@ -13,7 +13,7 @@ import "./ProductModalShell.css";
  * @param {{
  *   isOpen: boolean;
  *   onClose: () => void;
- *   title: string;
+ *   title: import('react').ReactNode;
  *   titleId: string;
  *   ariaLabel?: string;
  *   children: import('react').ReactNode;
@@ -23,11 +23,13 @@ import "./ProductModalShell.css";
  *   bodyClassName?: string;
  *   footerClassName?: string;
  *   bodyRef?: import('react').RefObject<HTMLDivElement | null>;
- *   size?: 'md' | 'lg';
+ *   size?: 'md' | 'lg' | 'fullHeight';
  *   closeOnEscape?: boolean;
  *   hideHeader?: boolean;
  *   hideTitle?: boolean;
+ *   hideCloseButton?: boolean;
  *   headerAddon?: import('react').ReactNode;
+ *   subheader?: import('react').ReactNode;
  * }} props
  */
 export function ProductModalShell({
@@ -47,7 +49,9 @@ export function ProductModalShell({
   closeOnEscape = true,
   hideHeader = false,
   hideTitle = false,
+  hideCloseButton = false,
   headerAddon = null,
+  subheader = null,
 }) {
   const panelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const closeButtonRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
@@ -55,7 +59,8 @@ export function ProductModalShell({
   useScrollLock(isOpen);
   useDialogFocusTrap(panelRef, {
     active: isOpen,
-    initialFocusRef: hideHeader ? panelRef : closeButtonRef,
+    initialFocusRef:
+      hideHeader || hideCloseButton ? panelRef : closeButtonRef,
   });
 
   useEffect(() => {
@@ -86,8 +91,19 @@ export function ProductModalShell({
 
   const panelClass = [
     "product-modal-shell__panel",
-    size === "md" ? "product-modal-shell__panel_md" : "product-modal-shell__panel_lg",
+    size === "md"
+      ? "product-modal-shell__panel_md"
+      : size === "fullHeight"
+        ? "product-modal-shell__panel_full-height"
+        : "product-modal-shell__panel_lg",
     panelClassName,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const backdropClass = [
+    "product-modal-shell__backdrop",
+    size === "fullHeight" ? "product-modal-shell__backdrop_full-height" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -101,7 +117,7 @@ export function ProductModalShell({
     .join(" ");
 
   return createPortal(
-    <div className="product-modal-shell__backdrop" role="presentation">
+    <div className={backdropClass} role="presentation">
       <div className="product-modal-shell__keyboard-bleed" aria-hidden="true" />
       <div
         ref={panelRef}
@@ -120,6 +136,7 @@ export function ProductModalShell({
             className={[
               "product-modal-shell__header",
               hideTitle ? "product-modal-shell__header--title-hidden" : "",
+              hideCloseButton ? "product-modal-shell__header--no-close" : "",
               headerAddon ? "product-modal-shell__header--with-addon" : "",
             ]
               .filter(Boolean)
@@ -135,21 +152,26 @@ export function ProductModalShell({
                   {title}
                 </h2>
               )}
-              <button
-                ref={closeButtonRef}
-                type="button"
-                className="product-modal-shell__close"
-                onClick={onClose}
-                aria-label={USER_DETAILS_MODAL_UI.ARIA_CLOSE}
-              >
-                <ModalCloseIcon />
-              </button>
+              {hideCloseButton ? null : (
+                <button
+                  ref={closeButtonRef}
+                  type="button"
+                  className="product-modal-shell__close"
+                  onClick={onClose}
+                  aria-label={USER_DETAILS_MODAL_UI.ARIA_CLOSE}
+                >
+                  <ModalCloseIcon />
+                </button>
+              )}
             </div>
             {headerAddon ? (
               <div className="product-modal-shell__header-addon">{headerAddon}</div>
             ) : null}
           </header>
         )}
+        {subheader ? (
+          <div className="product-modal-shell__subheader">{subheader}</div>
+        ) : null}
         <div ref={bodyRef} className={bodyClass}>
           {children}
         </div>
