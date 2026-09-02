@@ -252,7 +252,10 @@ export async function cancelShipmentInLobo({ orderId, sellerId }) {
   if (shipment.shippingCarrierStatus === LOBO_STATUS_CANCELLED) {
     return { ok: true, alreadyCancelled: true };
   }
-  if (!LOBO_CANCELLABLE_STATUSES.includes(shipment.shippingCarrierStatus)) {
+  // Пустой статус — заказ только что создан и службой ещё не обработан:
+  // отменять такой можно, а отказ выглядел бы как «уже везут».
+  const carrierStatus = String(shipment.shippingCarrierStatus ?? "");
+  if (carrierStatus && !LOBO_CANCELLABLE_STATUSES.includes(carrierStatus)) {
     return { ok: false, reason: "Курьер уже забрал заказ — отмена через спор" };
   }
 

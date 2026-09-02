@@ -32,6 +32,8 @@ import { buildProductSearchBlobFromFields } from "./buildProductSearchBlob.js";
 import { resolveProductCategoryWriteFromBody } from "./resolveProductCategoryWrite.js";
 import { resolveActiveSellerPersonalCategoryId } from "../seller-personal-category/sellerPersonalCategoryHelpers.js";
 import { applyProductSaleCityFields } from "./ruCityNormalized.js";
+import { LOBO_NOT_CONFIGURED_MESSAGE } from "../../constants/loboConstants.js";
+import { isLoboConfigured } from "../shipping/lobo/loboClient.js";
 import {
   PRODUCT_DELIVERY_CARRIER_LOBO,
   buildLegacyDeliveryFlags,
@@ -241,6 +243,15 @@ export async function postProduct({
       productDeliveryEnabled,
       productCourierDeliveryEnabled,
     }) ?? "";
+  // Служба без ключей ничего не умеет: разрешить её на товаре значит
+  // пообещать доставку, которая молча зависнет на «Готов к отгрузке».
+  if (
+    productDeliveryCarrier === PRODUCT_DELIVERY_CARRIER_LOBO &&
+    !isLoboConfigured()
+  ) {
+    throw new AppError(503, LOBO_NOT_CONFIGURED_MESSAGE);
+  }
+
   const legacyFlags = buildLegacyDeliveryFlags(productDeliveryCarrier);
   assertProductFulfillmentMethods(
     productPickupEnabled,

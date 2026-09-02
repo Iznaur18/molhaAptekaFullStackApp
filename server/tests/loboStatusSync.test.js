@@ -129,6 +129,25 @@ describe("раскладка статусов ЛОБО на нашу лестн�
     assert.ok(fresh.shipments[0].shippingSyncedAt, "отметка опроса проставлена");
   });
 
+  it("пропущенный «забрал» не подвешивает отправление", async () => {
+    const { order, seller } = await handedOverShipment();
+    // Курьер забрал и довёз между двумя опросами: у нас всё ещё «Готов к
+    // отгрузке», а служба уже говорит «доставлен».
+    const { syncLoboShipmentStatuses } = sync;
+    const before = await OrderModel.findById(order._id).lean();
+    assert.equal(before.status, "ready_to_ship");
+
+    await sync.__applyForTest({
+      orderId: String(order._id),
+      sellerId: String(seller._id),
+      ladderStatus: "delivered",
+    });
+
+    const fresh = await OrderModel.findById(order._id).lean();
+    assert.equal(fresh.status, "delivered", "иначе отправление зависает навсегда");
+    assert.ok(syncLoboShipmentStatuses);
+  });
+
   it("непереданное отправление догоняется повтором", async () => {
     const { order, args } = await handedOverShipment();
     // Имитируем неудачную передачу: номера у службы нет.

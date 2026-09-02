@@ -97,16 +97,29 @@ export async function findLoboShipmentsToSync({ limit = BATCH_LIMIT } = {}) {
  */
 async function applyLadderStatus({ orderId, sellerId, ladderStatus }) {
   if (ladderStatus === "delivered") {
+    // Опрос идёт раз в несколько минут, и курьер успевает забрать и довезти
+    // между двумя проходами. Тогда позиции всё ещё «Готов к отгрузке», а
+    // штатный сервис принимает только то, что уже в пути: сначала догоняем
+    // пропущенную ступень, иначе отправление зависает навсегда.
+    await applyLadderStatus({
+      orderId,
+      sellerId,
+      ladderStatus: ORDER_STATUS_IN_DELIVERY,
+    });
+
     const { markOrderItemDeliveredBySeller } = await import(
       "../../order/updateOrderItemStatus.js"
     );
     const order = await OrderModel.findById(orderId).select("items").lean();
+    // Номер позиции берём по месту в массиве: поле itemIndex проставляет
+    // нормализация при чтении через сервисы, а в сыром документе его нет.
     const indexes = (order?.items ?? [])
+      .map((item, index) => ({ item, index }))
       .filter(
-        (item) =>
+        ({ item }) =>
           resolveItemSellerId(item) === String(sellerId) && !TERMINAL.has(item.status),
       )
-      .map((item) => item.itemIndex);
+      .map(({ index }) => index);
 
     for (const itemIndex of indexes) {
       await markOrderItemDeliveredBySeller({
@@ -254,6 +267,10 @@ export async function retryPendingLoboHandovers() {
 
   return { retried };
 }
+
+/** Раскладку статуса проверяем напрямую: воспроизводить гонку опроса
+ * таймерами — тест, который врёт через раз. */
+export const __applyForTest = applyLadderStatus;
 
 /** Один вызов для крона: сначала догоняем непереданные, потом статусы. */
 export async function processLoboCronTasks() {
