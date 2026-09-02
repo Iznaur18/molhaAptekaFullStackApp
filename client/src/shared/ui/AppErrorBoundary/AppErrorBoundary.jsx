@@ -1,6 +1,7 @@
 import { Component } from "react";
 
 import { APP_RUNTIME_UI } from "../../config/appUiCopy.js";
+import { isClientSentryEnabled } from "../../lib/clientSentryEnv.js";
 import { reloadOnceOnStaleChunk } from "../../lib/reloadOnceOnStaleChunk.js";
 
 import "./AppErrorBoundary.css";
@@ -18,8 +19,19 @@ export class AppErrorBoundary extends Component {
     return { error };
   }
 
-  componentDidCatch(error) {
+  componentDidCatch(error, errorInfo) {
     reloadOnceOnStaleChunk(error);
+
+    // Падение в React сюда и упирается: граница его гасит, до window.onerror
+    // оно не доходит, и в Sentry не попадало ничего — а это ровно тот случай,
+    // когда пользователь видит сломанный экран.
+    if (isClientSentryEnabled()) {
+      void import("../../lib/sentryClient.js").then((Sentry) => {
+        Sentry.captureException(error, {
+          contexts: { react: { componentStack: errorInfo?.componentStack } },
+        });
+      });
+    }
   }
 
   handleReload = () => {

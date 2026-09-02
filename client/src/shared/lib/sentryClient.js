@@ -13,4 +13,5 @@ export {
   init,
   browserTracingIntegration,
   addBreadcrumb,
+  captureException,
 } from "@sentry/react";
