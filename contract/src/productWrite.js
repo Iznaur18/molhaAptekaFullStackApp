@@ -27,6 +27,10 @@ import {
 } from "./productAffiliate.js";
 import { productFlashSalePatchFieldsShape } from "./productFlashSale.js";
 import { productOutOfStockLabelFieldSchema } from "./productOutOfStockLabel.js";
+import {
+  productDeliveryCarrierSchema,
+  productShipsToBuyer,
+} from "./productDeliveryCarrier.js";
 
 /** SSOT category slug list — client/mobile/server re-export отсюда. */
 export const PRODUCT_CATEGORY_VALUES = [
@@ -251,6 +255,7 @@ export const createProductBodySchema = z
     productPickupEnabled: z.coerce.boolean().optional(),
     productDeliveryEnabled: z.coerce.boolean().optional(),
     productCourierDeliveryEnabled: z.coerce.boolean().optional(),
+    productDeliveryCarrier: productDeliveryCarrierSchema.optional(),
     productArticle: z.string().trim().max(64).optional(),
   })
   .superRefine(assertCreateProductRequiresPhoto)
@@ -261,6 +266,8 @@ export const createProductBodySchema = z
     const pickupOn = body.productPickupEnabled !== false;
     const deliveryOn = body.productDeliveryEnabled === true;
     const courierOn = body.productCourierDeliveryEnabled === true;
+    // Перевозчик — источник правды; флаги остаются для старых клиентов.
+    const carrierOn = productShipsToBuyer(body);
 
     // Либо продавец везёт сам, либо отдаёт курьеру: смешение сделало бы
     // непонятным, кому предлагать отправление в «Обзоре».
@@ -271,7 +278,7 @@ export const createProductBodySchema = z
         message: PRODUCT_COURIER_DELIVERY_CONFLICT_MESSAGE,
       });
     }
-    if (!pickupOn && !deliveryOn && !courierOn) {
+    if (!pickupOn && !deliveryOn && !courierOn && !carrierOn) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["productPickupEnabled"],
@@ -331,6 +338,7 @@ const patchFieldShape = {
   productPickupEnabled: z.coerce.boolean().optional(),
   productDeliveryEnabled: z.coerce.boolean().optional(),
   productCourierDeliveryEnabled: z.coerce.boolean().optional(),
+  productDeliveryCarrier: productDeliveryCarrierSchema.optional(),
 };
 
 const PATCH_BODY_KEYS = Object.keys(patchFieldShape);

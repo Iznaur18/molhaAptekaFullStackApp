@@ -33,6 +33,11 @@ import { resolveProductCategoryWriteFromBody } from "./resolveProductCategoryWri
 import { resolveActiveSellerPersonalCategoryId } from "../seller-personal-category/sellerPersonalCategoryHelpers.js";
 import { applyProductSaleCityFields } from "./ruCityNormalized.js";
 import {
+  PRODUCT_DELIVERY_CARRIER_LOBO,
+  buildLegacyDeliveryFlags,
+  resolveProductDeliveryCarrier,
+} from "@molha/api-contract";
+import {
   assertProductFulfillmentMethods,
   resolveProductDeliveryEnabledForWrite,
   resolveProductPickupEnabledForWrite,
@@ -228,10 +233,20 @@ export async function postProduct({
   );
   // Взаимоисключение уже проверено схемой; здесь только сохраняем выбор.
   const productCourierDeliveryEnabled = body?.productCourierDeliveryEnabled === true;
+  // Перевозчик — источник правды. Старые клиенты шлют только флаги, поэтому
+  // при отсутствии поля выводим его из них.
+  const productDeliveryCarrier =
+    resolveProductDeliveryCarrier({
+      productDeliveryCarrier: body?.productDeliveryCarrier,
+      productDeliveryEnabled,
+      productCourierDeliveryEnabled,
+    }) ?? "";
+  const legacyFlags = buildLegacyDeliveryFlags(productDeliveryCarrier);
   assertProductFulfillmentMethods(
     productPickupEnabled,
-    productDeliveryEnabled,
-    productCourierDeliveryEnabled,
+    legacyFlags.productDeliveryEnabled,
+    legacyFlags.productCourierDeliveryEnabled ||
+      productDeliveryCarrier === PRODUCT_DELIVERY_CARRIER_LOBO,
   );
 
   const productArticleRaw =
@@ -257,8 +272,9 @@ export async function postProduct({
     productPickupLocation: salePickup.productPickupLocation,
     productPickupLocations: salePickup.productPickupLocations,
     productPickupEnabled,
-    productDeliveryEnabled,
-    productCourierDeliveryEnabled,
+    // Флаги пишем производными от перевозчика, чтобы они не разъезжались.
+    ...legacyFlags,
+    productDeliveryCarrier,
     productCategory: categoryWrite.productCategory,
     productCategoryId: categoryWrite.productCategoryId,
     categoryPathIds: categoryWrite.categoryPathIds,

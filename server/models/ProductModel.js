@@ -299,6 +299,17 @@ const ProductSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    /**
+     * Кто везёт товар: продавец, курьеры Gitorg или служба вроде ЛОБО.
+     *
+     * Источник правды с появлением третьего перевозчика; два флага выше
+     * остаются производными для существующего кода. Пусто — доставки нет.
+     */
+    productDeliveryCarrier: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     /** Самовывоз доступен покупателю (по умолчанию да). */
     productPickupEnabled: {
       type: Boolean,

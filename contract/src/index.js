@@ -560,6 +560,19 @@ export {
   assertProductWriteFulfillmentMethods,
 } from "./productPickupLocations.js";
 export {
+  PRODUCT_DELIVERY_CARRIER_SELLER,
+  PRODUCT_DELIVERY_CARRIER_GITORG,
+  PRODUCT_DELIVERY_CARRIER_LOBO,
+  PRODUCT_DELIVERY_CARRIERS,
+  PRODUCT_DELIVERY_CARRIER_LABEL_RU,
+  productDeliveryCarrierSchema,
+  resolveProductDeliveryCarrier,
+  productShipsToBuyer,
+  buildLegacyDeliveryFlags,
+  isDeliveryCarrierAvailableInRegion,
+  listDeliveryCarriersForRegion,
+} from "./productDeliveryCarrier.js";
+export {
   SHIPPING_PROVIDER_LOBO,
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_REGIONS,
