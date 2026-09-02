@@ -24,6 +24,7 @@ export const JOB_PROCESS_ONEC_SYNC_CRON = "processOneCSyncCronTasks";
 export const JOB_PROCESS_ONEC_COMMERCEML_IMPORT = "processOneCCommerceMlImport";
 export const JOB_PROCESS_ANALYTICS_RECONCILIATION =
   "processAnalyticsReconciliation";
+export const JOB_PROCESS_LOBO_CRON = "processLoboCronTasks";
 export const JOB_PROCESS_COURIER_STUCK_SHIPMENTS =
   "processCourierStuckShipmentCronTasks";
 export const JOB_PROCESS_PRODUCT_BULK_IMPORT = "processProductBulkImport";

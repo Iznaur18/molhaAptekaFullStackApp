@@ -271,6 +271,10 @@ export async function markOrderItemCancelled({
 
   const updatedOrder = await reloadOrderWithItems(orderId);
 
+  // Заказ отменён у нас — снимаем его и у внешней службы, пока курьер не
+  // забрал груз. Иначе он приедет за товаром, которого уже нет.
+  await cancelExternalShipmentIfNeeded({ order: updatedOrder, sellerId: itemSellerId });
+
   await notifyBuyerAboutOrderItemStatus({
     buyerUserId: buyerId,
     actorUserId: requestUserId,
@@ -280,6 +284,51 @@ export async function markOrderItemCancelled({
   });
 
   return { order: updatedOrder };
+}
+
+/**
+ * Снимает заказ у внешней службы, если в отправлении не осталось живых позиций.
+ *
+ * Отменённая позиция — ещё не отменённое отправление: в нём могут быть
+ * другие товары того же продавца, и курьер по-прежнему нужен.
+ *
+ * @param {{ order: any; sellerId: string }} input
+ */
+async function cancelExternalShipmentIfNeeded({ order, sellerId }) {
+  const shipment = (order?.shipments ?? []).find(
+    (row) => row?.sellerId != null && String(row.sellerId) === String(sellerId),
+  );
+  if (!shipment?.shippingExternalId) return;
+
+  const stillAlive = (order.items ?? []).some(
+    (item) =>
+      normalizeId(
+        item?.sellerIdAtOrder ??
+          item?.productId?.productSeller?._id ??
+          item?.productId?.productSeller,
+      ) === String(sellerId) &&
+      item?.status !== ORDER_STATUS_CANCELLED &&
+      item?.status !== ORDER_STATUS_RETURNED,
+  );
+  if (stillAlive) return;
+
+  try {
+    const { cancelShipmentInLobo } = await import(
+      "../shipping/lobo/loboShipmentOrders.js"
+    );
+    await cancelShipmentInLobo({
+      orderId: String(order._id),
+      sellerId: String(sellerId),
+    });
+  } catch (error) {
+    // Отмену у нас это не отменяет: у службы заказ снимет крон или человек.
+    logServerEvent("error", {
+      event: "external_shipment_cancel_failed",
+      orderId: String(order?._id ?? ""),
+      sellerId: String(sellerId),
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 }
 
 /**

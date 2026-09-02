@@ -5,6 +5,7 @@ import { isBullMqEnabled } from "../queues/bullMqEnabled.js";
 import { ONEC_SYNC_INTERVAL_MS } from "../constants/onecConstants.js";
 import { ANALYTICS_RECONCILIATION_CRON_INTERVAL_MS } from "../constants/analyticsConstants.js";
 import { COURIER_STUCK_SHIPMENT_CRON_INTERVAL_MS } from "../constants/courierConstants.js";
+import { LOBO_POLL_INTERVAL_MS } from "../constants/loboConstants.js";
 import { INSTALLMENT_CRON_INTERVAL_MS } from "../constants/installmentConstants.js";
 import { INTRO_AD_CRON_INTERVAL_MS } from "../constants/introAdCampaignConstants.js";
 import { PREMIUM_CRON_INTERVAL_MS } from "../constants/premiumConstants.js";
@@ -27,6 +28,7 @@ import { processProductPriceMarketStatusCronTasks } from "../services/product/re
 import { processOneCCronTasks } from "../services/onec/index.js";
 import { runAnalyticsReconciliation } from "../services/analytics/index.js";
 import { processCourierStuckShipmentCronTasks } from "../services/courier/courierStuckShipmentsCron.js";
+import { processLoboCronTasks } from "../services/shipping/lobo/loboStatusSync.js";
 
 import { shouldRunCronOnThisProcess } from "./shouldRunCronOnThisProcess.js";
 
@@ -125,6 +127,8 @@ export function startCronIntervals() {
     COURIER_STUCK_SHIPMENT_CRON_INTERVAL_MS,
     processCourierStuckShipmentCronTasks,
   );
+  // У ЛОБО нет вебхуков: статусы приходится спрашивать самим.
+  scheduleCronJob("process_lobo_cron_tasks", LOBO_POLL_INTERVAL_MS, processLoboCronTasks);
 
   return true;
 }

@@ -14,11 +14,13 @@ import {
   JOB_PROCESS_ONEC_COMMERCEML_IMPORT,
   JOB_PROCESS_ANALYTICS_RECONCILIATION,
   JOB_PROCESS_COURIER_STUCK_SHIPMENTS,
+  JOB_PROCESS_LOBO_CRON,
   JOB_PROCESS_PRODUCT_BULK_IMPORT,
   JOB_SEND_EMAIL_VERIFICATION,
 } from "../queues/queueConstants.js";
 import { sendEmailVerificationForUser } from "../services/auth/emailVerification.js";
 import { processCourierStuckShipmentCronTasks } from "../services/courier/courierStuckShipmentsCron.js";
+import { processLoboCronTasks } from "../services/shipping/lobo/loboStatusSync.js";
 import { processIntroAdCampaignCronTasks } from "../services/intro-ad/introAdCampaignHelpers.js";
 import { processInstallmentCronTasks } from "../utils/installmentHelpers.js";
 import { processPremiumCronTasks } from "../utils/premiumAccess.js";
@@ -74,6 +76,8 @@ export async function processAppQueueJob(job) {
       return runAnalyticsReconciliation();
     case JOB_PROCESS_COURIER_STUCK_SHIPMENTS:
       return processCourierStuckShipmentCronTasks();
+    case JOB_PROCESS_LOBO_CRON:
+      return processLoboCronTasks();
     case JOB_PROCESS_PRODUCT_BULK_IMPORT:
       return processProductBulkImportJob(job.data.jobId);
     default:
