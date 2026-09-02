@@ -42,6 +42,7 @@ export function CheckoutSheetModal({
   pickupAvailable = true,
   fulfillmentMode = null,
   courierDelivery = null,
+  deliveryProductIds = [],
   isSubmitting,
   submitError,
   submitSuccess,
@@ -124,6 +125,7 @@ export function CheckoutSheetModal({
             pickupAvailable={pickupAvailable}
             fulfillmentMode={fulfillmentMode}
             courierDelivery={courierDelivery}
+            deliveryProductIds={deliveryProductIds}
             isSubmitting={isSubmitting}
             submitError={submitError}
             submitSuccess={submitSuccess}

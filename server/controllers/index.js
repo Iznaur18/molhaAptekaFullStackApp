@@ -75,6 +75,7 @@ import {
   postStaffResolveDisputeController,
 } from "./Courier/courierDisputeController.js";
 import { getAllOrdersController } from "./Order/getAllOrdersController.js";
+import { postShippingEstimateController } from "./Order/shippingEstimateController.js";
 import { updateOrderStatusController } from "./Order/updateOrderStatusController.js";
 import {
   advanceMyShipmentStatusController,
@@ -368,6 +369,7 @@ export {
   getMyOrdersActionCountController,
   getMySalesActionCountController,
   getAllOrdersController,
+  postShippingEstimateController,
   updateOrderStatusController,
   getMyCourierProfileController,
   submitCourierApplicationController,

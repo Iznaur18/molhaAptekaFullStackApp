@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { mongoIdSchema } from "./mongoId.js";
+
 /** Провайдеры доставки. Живой пока один — ЛОБО. */
 export const SHIPPING_PROVIDER_LOBO = "lobo";
 export const SHIPPING_PROVIDER_CDEK = "cdek";
@@ -90,6 +92,18 @@ export const SHIPPING_NOT_AVAILABLE_MESSAGE =
 export const SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT = `Скоро: ${SHIPPING_PROVIDERS.map(
   (id) => SHIPPING_PROVIDER_LABEL_RU[id],
 ).join(", ")}`;
+
+/**
+ * Body `POST /order/shipping-estimate` — расчёт до оформления заказа.
+ *
+ * Товары нужны, чтобы понять точку отправления и службу; координаты — куда
+ * везти. Без них служба посчитать не сможет.
+ */
+export const shippingEstimateBodySchema = z.object({
+  productIds: z.array(mongoIdSchema).min(1).max(50),
+  deliveryLat: z.coerce.number().min(-90).max(90),
+  deliveryLon: z.coerce.number().min(-180).max(180),
+});
 
 export const shippingProviderSchema = z.enum(SHIPPING_PROVIDERS);
 export const shippingServiceTypeSchema = z.enum(SHIPPING_SERVICE_TYPES);

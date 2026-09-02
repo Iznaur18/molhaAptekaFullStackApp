@@ -329,6 +329,20 @@ export function CartPage({
     return "mixed";
   }, [sellerGroups, fulfillmentBySellerId]);
 
+  /** Товары, которые везут: по ним считается стоимость доставки. */
+  const deliveryProductIds = useMemo(() => {
+    if (auctionCheckoutBid) return [];
+    return activeSummary.selectedLines
+      .filter((line) => {
+        const sellerId = String(
+          line?.product?.productSeller?._id ?? line?.product?.productSeller ?? "",
+        );
+        return fulfillmentBySellerId[sellerId] === "delivery";
+      })
+      .map((line) => String(line.productId))
+      .filter(Boolean);
+  }, [auctionCheckoutBid, activeSummary.selectedLines, fulfillmentBySellerId]);
+
   const cartFulfillmentMode = useMemo(() => {
     if (auctionCheckoutBid) return null;
 
@@ -565,6 +579,7 @@ export function CartPage({
         pickupAvailable={pickupAvailable}
         fulfillmentMode={cartFulfillmentMode}
         courierDelivery={checkoutCourierDelivery}
+        deliveryProductIds={deliveryProductIds}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}
         submitSuccess={submitState.success}

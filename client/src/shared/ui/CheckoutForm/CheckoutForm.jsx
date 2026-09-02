@@ -11,6 +11,7 @@ import { AddressDeliveryFields } from "../../../entities/address/ui/AddressDeliv
 import { CheckoutSavedAddressPicker } from "../../../features/checkout/ui/CheckoutSavedAddressPicker.jsx";
 import { CheckoutPaymentMethodPicker } from "../../../features/checkout/ui/CheckoutPaymentMethodPicker.jsx";
 import { CheckoutShippingProviderPicker } from "../../../features/checkout/ui/CheckoutShippingProviderPicker.jsx";
+import { CheckoutShippingEstimate } from "../../../features/checkout/ui/CheckoutShippingEstimate.jsx";
 import { addressValueFromUser } from "../../../entities/address/lib/addressValueFromUser.js";
 import {
   CHECKOUT_SAVED_ADDRESS_CUSTOM_ID,
@@ -84,6 +85,7 @@ export function CheckoutForm({
   pickupAvailable = true,
   fulfillmentMode = null,
   courierDelivery = null,
+  deliveryProductIds = [],
   isSubmitting,
   submitError,
   submitSuccess,
@@ -571,6 +573,11 @@ export function CheckoutForm({
               <CheckoutShippingProviderPicker
                 disabled={isDisabled || isSubmitting}
                 courierDelivery={courierDelivery}
+              />
+
+              <CheckoutShippingEstimate
+                productIds={deliveryProductIds}
+                deliveryGeo={deliveryAddress.geo ?? null}
               />
             </>
           ) : null}

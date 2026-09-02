@@ -2,6 +2,7 @@ import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 
 import {
   makeOrderController,
+  postShippingEstimateController,
   getMyOrdersController,
   getMySalesController,
   getMyOrdersActionCountController,
@@ -24,6 +25,7 @@ import {
 } from "../middlewares/index.js";
 import {
   makeOrderValidation,
+  shippingEstimateValidation,
   updateOrderStatusValidation,
   getAllOrdersValidation,
   getMyOrdersValidation,
@@ -47,6 +49,15 @@ router.get("/action-count", checkAuthMW, getMyOrdersActionCountController);
 router.get("/", checkAuthMW, getMyOrdersValidation, getMyOrdersController);
 router.get("/sales/action-count", checkAuthMW, getMySalesActionCountController);
 router.get("/sales", checkAuthMW, getMySalesValidation, getMySalesController);
+// Расчёт доставки внешней службой до оформления: покупатель должен знать
+// сумму заранее, а не узнавать её у двери.
+router.post(
+  "/shipping-estimate",
+  checkAuthMW,
+  orderCreateRateLimiter,
+  shippingEstimateValidation,
+  postShippingEstimateController,
+);
 router.post(
   "/",
   checkAuthMW,

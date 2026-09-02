@@ -598,6 +598,7 @@ export {
   shippingTrackingUrlSchema,
   orderShippingStubFieldsSchema,
   isShippingProviderLive,
+  shippingEstimateBodySchema,
   isShippingProviderAvailableInRegion,
   listLiveShippingProvidersForRegion,
   buildShippingTrackingUrl,

@@ -178,6 +178,11 @@ export const CHECKOUT_FORM_UI = {
   LABEL_SHIPPING_PROVIDER: "Служба доставки",
   SHIPPING_PROVIDER_SELLER: "Доставка продавцом",
   SHIPPING_PROVIDER_COURIER: "Курьеры Gitorg",
+  /** @param {string} cost @param {string} carrier */
+  SHIPPING_ESTIMATE: (cost, carrier) => `${carrier}: примерно ${cost}`,
+  SHIPPING_ESTIMATE_HINT: "Точную сумму назовёт курьер при получении.",
+  SHIPPING_ESTIMATE_UNAVAILABLE:
+    "Стоимость доставки посчитаем позже — её назовёт курьер.",
   SHIPPING_PROVIDER_CHOSEN_BY_SELLER:
     "Службу выбирает продавец на товаре — здесь видно, кто повезёт.",
   SHIPPING_PROVIDER_SOON: "Скоро",
