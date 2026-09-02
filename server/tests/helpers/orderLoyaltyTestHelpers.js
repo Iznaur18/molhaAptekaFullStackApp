@@ -111,6 +111,9 @@ export const createOrderWithReserveTransaction = async ({
           userBuyerId: buyer._id,
           items: orderItems,
           totalAmount: product.productPrice * quantity,
+          // Адрес доставки без способа «доставка» — противоречивые данные:
+          // такой заказ никто не везёт, а тесты про отгрузку на нём стояли.
+          fulfillmentMethod: "delivery",
           deliveryAddress: "Test delivery address",
           deliveryAddressFlat: "1",
           paymentMethod: ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,

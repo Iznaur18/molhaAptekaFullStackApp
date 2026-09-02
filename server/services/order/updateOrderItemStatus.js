@@ -5,6 +5,7 @@ import {
   ORDER_STATUS_DELIVERED,
   ORDER_STATUS_IN_DELIVERY,
   ORDER_STATUS_PENDING,
+  ORDER_STATUS_READY_FOR_PICKUP,
   ORDER_STATUS_RETURNED,
   ORDER_STATUS_SHIPPED,
 } from "../../constants/orderConstants.js";
@@ -123,10 +124,15 @@ export async function markOrderItemDeliveredBySeller({
   assertSellerOwnsOrderItem(targetItem, sellerId);
 
   // Курьерская лестница приводит сюда из «На доставке», продавцовская — из
-  // «Отправлен». Оба пути законны.
+  // «Отправлен». Самовывоз — из «Готов к выдаче»: там ничего не везут, товар
+  // отдают в руки на точке, и промежуточная ступень «в пути» была бы ложью.
+  const isPickupHandover =
+    targetItem.status === ORDER_STATUS_READY_FOR_PICKUP &&
+    resolveShipmentKindForItem(order, targetItem) === "pickup";
   if (
     targetItem.status !== ORDER_STATUS_SHIPPED &&
-    targetItem.status !== ORDER_STATUS_IN_DELIVERY
+    targetItem.status !== ORDER_STATUS_IN_DELIVERY &&
+    !isPickupHandover
   ) {
     throw new AppError(409, "Позицию можно отметить доставленной, только пока она в пути");
   }
@@ -339,21 +345,30 @@ async function cancelExternalShipmentIfNeeded({ order, sellerId }) {
  * }} input
  */
 /**
+ * Как этот товар попадёт к покупателю: везёт продавец, курьер или самовывоз.
+ *
  * @param {any} order
  * @param {any} item
+ * @returns {"seller" | "courier" | "pickup"}
  */
-function isCourierShipmentForItem(order, item) {
+function resolveShipmentKindForItem(order, item) {
   const sellerId = String(
     item?.sellerIdAtOrder ??
       item?.productId?.productSeller?._id ??
       item?.productId?.productSeller ??
       "",
   );
-  if (!sellerId) return false;
+  if (!sellerId) return "seller";
   const shipment = (order.shipments ?? []).find(
     (row) => row?.sellerId != null && String(row.sellerId) === sellerId,
   );
-  return shipment?.courierDelivery === true;
+  const method = shipment?.fulfillmentMethod ?? order.fulfillmentMethod;
+  if (method !== "delivery") return "pickup";
+  // Внешняя служба или курьеры Gitorg — товар отгружает не продавец.
+  if (shipment?.courierDelivery === true || shipment?.deliveryCarrier) {
+    return shipment?.deliveryCarrier === "seller" ? "seller" : "courier";
+  }
+  return "seller";
 }
 
 export async function markOrderItemShippedBySeller({ orderId, itemIndex, sellerId }) {
@@ -369,11 +384,15 @@ export async function markOrderItemShippedBySeller({ orderId, itemIndex, sellerI
     );
   }
 
-  // Курьерское отправление продавец не отгружает сам: это сделает курьер,
-  // забрав товар. Иначе заказ уходит из «Готов к отгрузке», пропадает из
-  // «Свободных заказов» и повисает — товар у продавца, а везти его некому.
-  if (isCourierShipmentForItem(order, targetItem)) {
+  // Отгружает только тот, кто сам везёт. Курьерское отправление заберёт
+  // курьер, а самовывоз покупатель забирает на точке — «отгружать» там
+  // нечего, и статус «в пути» был бы неправдой.
+  const shipmentKind = resolveShipmentKindForItem(order, targetItem);
+  if (shipmentKind === "courier") {
     throw new AppError(409, "Это отправление везёт курьер — отгрузит он");
+  }
+  if (shipmentKind === "pickup") {
+    throw new AppError(409, "Это отправление покупатель забирает сам");
   }
 
   targetItem.status = ORDER_STATUS_SHIPPED;

@@ -34,6 +34,10 @@ import {
   SHIPMENT_DISPUTE_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { resolveOrderLineSellerId } from "@izibuy/shared-lib";
+import {
+  PRODUCT_DELIVERY_CARRIER_SELLER,
+  resolveProductDeliveryCarrier,
+} from "@molha/api-contract";
 import { ConfirmButton } from "../../../shared/ui/ConfirmButton/ConfirmButton.jsx";
 import {
   isOrderLineItemProductClickable,
@@ -230,6 +234,7 @@ function OrderCardLineItem({
   compact = false,
   showSecondaryOnly = false,
   itemsCount = 1,
+  isPickupShipmentItem = false,
   onProductClick,
   onMarkShipped,
   onMarkReturned,
@@ -248,7 +253,11 @@ function OrderCardLineItem({
   // Пока товар у продавца, его можно и отгрузить, и отменить — на любой
   // ступени сборки, а не только из «В обработке».
   const canMarkShipped = PRE_SHIPMENT_STATUSES.has(item.status);
-  const canMarkDelivered = item.status === ORDER_STATUS_SHIPPED;
+  // На самовывозе продавец не отгружает, а выдаёт товар в руки: кнопка
+  // появляется на «Готов к выдаче» и сразу закрывает доставку.
+  const canMarkDelivered =
+    item.status === ORDER_STATUS_SHIPPED ||
+    (isPickupShipmentItem && item.status === "ready_for_pickup");
   const canConfirmDelivered = item.status === ORDER_STATUS_DELIVERED;
   // Возврат оформляется, пока покупатель не подтвердил получение: товар уже
   // уехал, но сделка не состоялась — отказ у двери, неудачное вручение.
@@ -443,7 +452,11 @@ function OrderCardLineItem({
               onClick={() => onMarkDelivered({ orderId, itemIndex })}
               disabled={isActionPending}
             >
-              {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_DELIVERED}
+              {isActionPending
+                ? ORDER_CARD_UI.ACTION_PENDING
+                : isPickupShipmentItem
+                  ? ORDER_CARD_UI.ACTION_HANDED_TO_BUYER
+                  : ORDER_CARD_UI.ACTION_DELIVERED}
             </button>
           ) : null}
           {canMarkReturned && onMarkReturned ? (
@@ -567,14 +580,30 @@ export function OrderCard({
       (row) => row?.sellerId != null && String(row.sellerId) === cardSellerId,
     ) ?? null;
 
+  // Везёт ли этот товар сам продавец. Способ берём с отправления, а на
+  // заказах до отправлений — с общего поля заказа.
+  const shipmentMethod =
+    shipmentOwn?.fulfillmentMethod ?? order.fulfillmentMethod;
+  const shipmentCarrier = resolveProductDeliveryCarrier({
+    productDeliveryCarrier: shipmentOwn?.deliveryCarrier,
+    productCourierDeliveryEnabled: shipmentOwn?.courierDelivery === true,
+    productDeliveryEnabled: shipmentMethod === "delivery",
+  });
+  const sellerDeliversThisShipment =
+    shipmentMethod === "delivery" &&
+    shipmentCarrier === PRODUCT_DELIVERY_CARRIER_SELLER;
+
   const lineItemProps = {
     orderId: order._id,
     compact,
     itemsCount: order.items.length,
     onProductClick,
-    // На курьерском отправлении отгружает курьер, а не продавец: кнопка
-    // увела бы заказ из «Свободных», оставив товар на руках.
-    onMarkShipped: shipmentOwn?.courierDelivery === true ? undefined : onMarkShipped,
+    // «Отгрузить» — про то, что продавец сам повёз товар. При самовывозе
+    // везти некуда: покупатель придёт на точку. На курьерском отправлении
+    // отгружает курьер, а кнопка увела бы заказ из «Свободных», оставив
+    // товар на руках.
+    onMarkShipped: sellerDeliversThisShipment ? onMarkShipped : undefined,
+    isPickupShipmentItem: shipmentMethod !== "delivery",
     onMarkDelivered,
     onMarkReturned,
     onCancelItem,

@@ -13,9 +13,11 @@ const { OrderModel, UserInAppNotificationModel } = await import("../models/index
 const { advanceOrderShipmentStatus, resolveNextShipmentStatus } = await import(
   "../services/order/advanceShipmentStatus.js"
 );
-const { markOrderItemCancelled, markOrderItemShippedBySeller } = await import(
-  "../services/order/updateOrderItemStatus.js"
-);
+const {
+  markOrderItemCancelled,
+  markOrderItemDeliveredBySeller,
+  markOrderItemShippedBySeller,
+} = await import("../services/order/updateOrderItemStatus.js");
 
 /** @param {any} order @param {string} sellerId @param {string} nextStatus */
 const advance = (order, sellerId, nextStatus) =>
@@ -226,6 +228,60 @@ describe("ступени не ломают отгрузку и отмену", ()
           requestUserId: String(seller._id),
         }),
       /пока товар у продавца/,
+    );
+  });
+
+  it("самовывоз не отгружают: покупатель забирает сам", async () => {
+    const { seller, buyer, product } = await createOrderLoyaltyFixture();
+    const order = await createOrderWithReserveTransaction({ buyer, seller, product });
+    await setFulfillment(order, "pickup", seller._id);
+
+    await assert.rejects(
+      () =>
+        markOrderItemShippedBySeller({
+          orderId: String(order._id),
+          itemIndex: 0,
+          sellerId: String(seller._id),
+        }),
+      /покупатель забирает сам/,
+    );
+  });
+
+  it("самовывоз закрывают выдачей прямо с «Готов к выдаче»", async () => {
+    const { seller, buyer, product } = await createOrderLoyaltyFixture();
+    const order = await createOrderWithReserveTransaction({ buyer, seller, product });
+    await setFulfillment(order, "pickup", seller._id);
+
+    await advance(order, seller._id, "accepted");
+    await advance(order, seller._id, "assembling");
+    await advance(order, seller._id, "ready_for_pickup");
+
+    const { order: fresh } = await markOrderItemDeliveredBySeller({
+      orderId: String(order._id),
+      itemIndex: 0,
+      sellerId: String(seller._id),
+    });
+
+    assert.equal(fresh.items[0].status, "delivered");
+  });
+
+  it("доставку с «Готов к отгрузке» выдачей не закрыть — её ещё везут", async () => {
+    const { seller, buyer, product } = await createOrderLoyaltyFixture();
+    const order = await createOrderWithReserveTransaction({ buyer, seller, product });
+    await setFulfillment(order, "delivery", seller._id);
+
+    await advance(order, seller._id, "accepted");
+    await advance(order, seller._id, "assembling");
+    await advance(order, seller._id, "ready_to_ship");
+
+    await assert.rejects(
+      () =>
+        markOrderItemDeliveredBySeller({
+          orderId: String(order._id),
+          itemIndex: 0,
+          sellerId: String(seller._id),
+        }),
+      /только пока она в пути/,
     );
   });
 });

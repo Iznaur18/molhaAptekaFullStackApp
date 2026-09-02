@@ -200,6 +200,11 @@ export async function createInstallmentContract({
             userBuyerId: buyerUserId,
             items: orderItems,
             totalAmount: product.productPrice * quantity,
+            // В рассрочке самовывоза нет: адрес обязателен и проверяется выше.
+            // По умолчанию модель ставит «самовывоз» — заказ выглядел бы так,
+            // будто покупатель придёт на точку, и продавцу нечем было бы его
+            // отгрузить.
+            fulfillmentMethod: "delivery",
             deliveryAddress: verifiedDeliveryAddress.displayAddress,
             deliveryAddressFlat: verifiedDeliveryAddress.flat,
             deliveryAddressFiasId: verifiedDeliveryAddress.fiasId,

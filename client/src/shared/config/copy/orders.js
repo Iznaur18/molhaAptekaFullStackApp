@@ -24,6 +24,7 @@ export const ORDER_CARD_UI = {
   // и две разные кнопки под одним словом путали бы продавца.
   ACTION_SHIPPED: "Отгрузить",
   ACTION_DELIVERED: "Доставлен",
+  ACTION_HANDED_TO_BUYER: "Выдал покупателю",
   ACTION_RETURN: "Вернулся",
   ACTION_RETURN_CONFIRM:
     "Оформить возврат? Товар вернётся в остаток, покупатель получит уведомление.",
