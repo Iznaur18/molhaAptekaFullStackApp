@@ -1,4 +1,7 @@
-import { ORDER_FULFILLMENT_DELIVERY } from "@molha/api-contract";
+import {
+  ORDER_FULFILLMENT_DELIVERY,
+  PRODUCT_DELIVERY_CARRIER_LOBO,
+} from "@molha/api-contract";
 
 import {
   ORDER_STATUS_ACCEPTED,
@@ -9,6 +12,7 @@ import {
   ORDER_TERMINAL_STATUSES,
 } from "../../constants/orderConstants.js";
 import { AppError } from "../../errors/AppError.js";
+import { logServerEvent } from "../../utils/logServerEvent.js";
 
 import { notifyBuyerAboutOrderItemStatus } from "./notifyBuyerAboutOrderItemStatus.js";
 import {
@@ -114,5 +118,54 @@ export async function advanceOrderShipmentStatus({ orderId, sellerId, nextStatus
     orderId,
   });
 
-  return { order, fulfillmentMethod, movedItemCount: items.length };
+  // Собранное отправление внешняя служба забирает сама — вызываем её здесь.
+  // Ступень при этом уже сохранена: если служба недоступна, товар всё равно
+  // готов к отгрузке, а передачу повторит крон или продавец кнопкой.
+  let shippingHandover = null;
+  if (nextStatus === ORDER_STATUS_READY_TO_SHIP) {
+    shippingHandover = await handOverShipmentIfExternalCarrier({
+      orderId,
+      sellerId,
+      order,
+    });
+  }
+
+  return {
+    order,
+    fulfillmentMethod,
+    movedItemCount: items.length,
+    shippingHandover,
+  };
+}
+
+/**
+ * Отдаёт отправление внешней службе, если товар везёт она.
+ *
+ * Ошибку наружу не бросаем: продавец сделал свою часть, и ступень отменять
+ * из-за чужого сервиса нельзя.
+ *
+ * @param {{ orderId: string; sellerId: string; order: any }} input
+ */
+async function handOverShipmentIfExternalCarrier({ orderId, sellerId, order }) {
+  const shipment = (order.shipments ?? []).find(
+    (row) => row?.sellerId != null && String(row.sellerId) === String(sellerId),
+  );
+  if (shipment?.deliveryCarrier !== PRODUCT_DELIVERY_CARRIER_LOBO) {
+    return null;
+  }
+
+  try {
+    const { handOverShipmentToLobo } = await import(
+      "../shipping/lobo/loboShipmentOrders.js"
+    );
+    return await handOverShipmentToLobo({ orderId, sellerId });
+  } catch (error) {
+    logServerEvent("error", {
+      event: "shipment_handover_failed",
+      orderId: String(orderId),
+      sellerId: String(sellerId),
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return { ok: false, reason: "Служба доставки недоступна" };
+  }
 }

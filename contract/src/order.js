@@ -77,6 +77,20 @@ export const createOrderBodySchema = z
       .max(ORDER_DELIVERY_ADDRESS_MAX_LENGTH)
       .optional()
       .default(""),
+    /**
+     * Координаты адреса доставки.
+     *
+     * Нужны службам доставки: ЛОБО без них заказ не примет. Необязательны —
+     * старые клиенты и заказы без карты продолжают работать, просто такой
+     * заказ службе не отдать.
+     */
+    deliveryAddressGeo: z
+      .object({
+        lat: z.coerce.number().min(-90).max(90),
+        lon: z.coerce.number().min(-180).max(180),
+      })
+      .nullable()
+      .optional(),
     deliveryAddressFlat: z
       .string()
       .trim()

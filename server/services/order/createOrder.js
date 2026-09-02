@@ -6,6 +6,11 @@ import {
   PRODUCT_PICKUP_MISSING_FOR_ORDER_MESSAGE,
   PRODUCT_PICKUP_NOT_ENABLED_FOR_ITEMS_MESSAGE,
 } from "@molha/api-contract";
+import {
+  PRODUCT_DELIVERY_CARRIER_GITORG,
+  resolveProductDeliveryCarrier,
+} from "@molha/api-contract";
+
 import { buildStoredShipments } from "./orderShipments.js";
 import { resolveOrderFulfillmentSplit } from "./resolveOrderFulfillmentSplit.js";
 import { resolveDeliveryFeesBySeller } from "../courier/courierDeliveryFee.js";
@@ -200,6 +205,7 @@ const fetchAvailableProductsForOrder = async (productIds) => {
       pickupEnabled: product.productPickupEnabled !== false,
       deliveryEnabled: product.productDeliveryEnabled === true,
       courierDeliveryEnabled: product.productCourierDeliveryEnabled === true,
+      deliveryCarrier: resolveProductDeliveryCarrier(product),
       wholesaleEnabled: product.productWholesaleEnabled === true,
       wholesaleMinQty: product.productWholesaleMinQty ?? null,
       wholesalePrice: product.productWholesalePrice ?? null,
@@ -277,7 +283,7 @@ const assertSellersHavePayoutRequisites = async (sellerIds) => {
 const assertProductsSupportDelivery = (productById, productIds) => {
   for (const id of productIds) {
     const snapshot = productById[id];
-    if (!snapshot?.deliveryEnabled && !snapshot?.courierDeliveryEnabled) {
+    if (!snapshot?.deliveryCarrier) {
       throw new AppError(400, PRODUCT_DELIVERY_NOT_ENABLED_FOR_ITEMS_MESSAGE);
     }
   }
@@ -294,21 +300,21 @@ const assertProductsSupportDelivery = (productById, productIds) => {
  * @param {string[]} deliveryProductIds
  * @returns {Record<string, boolean>}
  */
-const resolveCourierDeliveryBySeller = (productById, deliveryProductIds) => {
-  /** @type {Record<string, boolean>} */
+const resolveDeliveryCarrierBySeller = (productById, deliveryProductIds) => {
+  /** @type {Record<string, string>} */
   const bySeller = {};
   for (const id of deliveryProductIds) {
     const snapshot = productById[id];
     const sellerId = String(snapshot?.sellerId ?? "");
     if (!sellerId) continue;
-    const byCourier = snapshot?.courierDeliveryEnabled === true;
-    if (sellerId in bySeller && bySeller[sellerId] !== byCourier) {
+    const carrier = String(snapshot?.deliveryCarrier ?? "");
+    if (sellerId in bySeller && bySeller[sellerId] !== carrier) {
       throw new AppError(
         400,
-        "У одного продавца нельзя смешивать доставку продавцом и курьерами Gitorg",
+        "У одного продавца нельзя смешивать разные службы доставки в одном заказе",
       );
     }
-    bySeller[sellerId] = byCourier;
+    bySeller[sellerId] = carrier;
   }
   return bySeller;
 };
@@ -405,6 +411,7 @@ const appendOrderToBuyList = async (userId, orderId, session) => {
  *     flat?: string;
  *     fiasId: string;
  *   } | null;
+ *   deliveryAddressGeo?: { lat: number; lon: number } | null;
  *   affiliateCode?: string | null;
  * }} input
  */
@@ -418,6 +425,7 @@ export async function createOrder({
   deliveryFeeBySellerId = null,
   pickupSelections = [],
   verifiedDeliveryAddress = null,
+  deliveryAddressGeo = null,
   affiliateCode = null,
 }) {
   const emailCheck = await checkUserEmailVerified(userId);
@@ -468,6 +476,7 @@ export async function createOrder({
         pickupEnabled: product.productPickupEnabled !== false,
         deliveryEnabled: product.productDeliveryEnabled === true,
       courierDeliveryEnabled: product.productCourierDeliveryEnabled === true,
+      deliveryCarrier: resolveProductDeliveryCarrier(product),
         wholesaleEnabled: false,
         wholesaleMinQty: null,
         wholesalePrice: null,
@@ -514,9 +523,16 @@ export async function createOrder({
   // Проверяем каждую половину своим правилом: в смешанном заказе товар
   // самовывозного продавца не обязан поддерживать доставку, и наоборот.
   assertProductsSupportDelivery(productById, fulfillmentSplit.deliveryProductIds);
-  const courierDeliveryBySeller = resolveCourierDeliveryBySeller(
+  const deliveryCarrierBySeller = resolveDeliveryCarrierBySeller(
     productById,
     fulfillmentSplit.deliveryProductIds,
+  );
+  /** Курьеры Gitorg — частный случай перевозчика; их читает «Обзор». */
+  const courierDeliveryBySeller = Object.fromEntries(
+    Object.entries(deliveryCarrierBySeller).map(([sellerId, carrier]) => [
+      sellerId,
+      carrier === PRODUCT_DELIVERY_CARRIER_GITORG,
+    ]),
   );
 
   /** @type {Record<string, string>} */
@@ -644,6 +660,9 @@ export async function createOrder({
             deliveryAddress: addressForOrder.displayAddress,
             deliveryAddressFlat: addressForOrder.flat ?? "",
             deliveryAddressFiasId: addressForOrder.fiasId ?? "",
+            // Координаты берём с клиента: стандартизация DaData отключена,
+            // и в проверенном адресе geo почти всегда пустой.
+            deliveryAddressGeo: deliveryAddressGeo ?? addressForOrder.geo ?? null,
             fulfillmentMethod: resolvedFulfillment,
             shipments: buildStoredShipments(
               pricedItems,
@@ -654,6 +673,7 @@ export async function createOrder({
                 feeBySellerId: deliveryFeeBySellerId,
               }),
               courierDeliveryBySeller,
+              deliveryCarrierBySeller,
               payoutRequisitesBySeller,
             ),
             paymentMethod,

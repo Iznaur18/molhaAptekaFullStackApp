@@ -108,6 +108,8 @@ describe("CheckoutForm", () => {
       fulfillmentMethod: "pickup",
       deliveryAddress: "",
       deliveryAddressFlat: "",
+      // Самовывоз координат не требует: везти некому.
+      deliveryAddressGeo: null,
       paymentMethod: ORDER_PAYMENT_METHOD_DEFAULT,
       pickupSelections: [{ productId: "p1", pickupLocationId: "legacy-default" }],
     });

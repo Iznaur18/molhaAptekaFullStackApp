@@ -130,6 +130,7 @@ export const buildStoredShipments = (
   deliveryFeeBySellerId = null,
   courierDeliveryBySellerId = null,
   payoutRequisitesBySellerId = null,
+  deliveryCarrierBySellerId = null,
 ) => {
   const grouped = groupOrderItemsBySellerId(items);
   /** @type {Array<{ sellerId: string; fulfillmentMethod: "pickup" | "delivery" }>} */
@@ -156,6 +157,12 @@ export const buildStoredShipments = (
         courierDeliveryBySellerId?.[bucket.sellerId] === true,
       sellerPayoutRequisites:
         payoutRequisitesBySellerId?.[bucket.sellerId] ?? "",
+      // Кто именно везёт: продавец, курьеры Gitorg или внешняя служба.
+      // У самовывоза перевозчика нет.
+      deliveryCarrier:
+        method === ORDER_FULFILLMENT_DELIVERY
+          ? (deliveryCarrierBySellerId?.[bucket.sellerId] ?? "")
+          : "",
     });
   }
 

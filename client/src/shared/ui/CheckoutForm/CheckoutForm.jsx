@@ -277,6 +277,17 @@ export function CheckoutForm({
         : ORDER_FULFILLMENT_PICKUP,
       deliveryAddress: needsDelivery ? deliveryAddress.line.trim() : "",
       deliveryAddressFlat: needsDelivery ? deliveryAddress.flat.trim() : "",
+      // Координаты нужны службам доставки: без них ЛОБО заказ не примет.
+      // Их даёт подсказка адреса или точка на карте.
+      deliveryAddressGeo:
+        needsDelivery &&
+        Number.isFinite(Number(deliveryAddress.geo?.lat)) &&
+        Number.isFinite(Number(deliveryAddress.geo?.lon))
+          ? {
+              lat: Number(deliveryAddress.geo.lat),
+              lon: Number(deliveryAddress.geo.lon),
+            }
+          : null,
       paymentMethod,
       pickupSelections: needsPickup
         ? buildPickupSelectionsPayload(selectedPickupByProductId)

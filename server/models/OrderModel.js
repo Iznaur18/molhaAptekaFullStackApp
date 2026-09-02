@@ -242,6 +242,23 @@ const OrderShipmentSchema = new mongoose.Schema(
      */
     courierDelivery: { type: Boolean, default: false },
     /**
+     * Кто везёт отправление: продавец, курьеры Gitorg или внешняя служба.
+     *
+     * Снимок на момент заказа: продавец может позже сменить перевозчика на
+     * товаре, а это отправление уже едет по прежней договорённости.
+     */
+    deliveryCarrier: { type: String, trim: true, default: "" },
+    /**
+     * Заказ у внешней службы: её id у нас, наш номер у неё и её статус.
+     *
+     * Живут на отправлении, а не на заказе: в смешанном заказе у каждого
+     * продавца своя служба и свой номер.
+     */
+    shippingProvider: { type: String, trim: true, default: "" },
+    shippingExternalId: { type: String, trim: true, default: "" },
+    shippingCarrierStatus: { type: String, trim: true, default: "" },
+    shippingSyncedAt: { type: Date, default: null },
+    /**
      * Сколько покупатель предлагает курьеру. У самовывоза всегда 0.
      * Платформа деньги не проводит — это заявленная сумма, но хранить её
      * надо: иначе спор разбирать не по чему.
@@ -339,6 +356,15 @@ const OrderSchema = new mongoose.Schema(
       trim: true,
       required: false,
       default: "",
+    },
+    /** Координаты адреса доставки: без них внешняя служба заказ не примет. */
+    deliveryAddressGeo: {
+      type: {
+        lat: { type: Number },
+        lon: { type: Number },
+      },
+      _id: false,
+      default: null,
     },
     deliveryAddressFiasId: {
       type: String,
