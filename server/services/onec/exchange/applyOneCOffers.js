@@ -1,5 +1,27 @@
 import { ONEC_STOCK_MAX } from "../../../constants/onecConstants.js";
 import { ProductModel } from "../../../models/index.js";
+import { productHasImages } from "../../product/productImagePresence.js";
+import {
+  findHeldOneCProducts,
+  holdOneCProduct,
+  withdrawProductToHold,
+} from "./onecHeldProducts.js";
+
+/** Поля карточки, которых хватает и на обновление, и на удаление по правилу. */
+const PRODUCT_FIELDS = [
+  "_id",
+  "product1cGuid",
+  "productName",
+  "productDescription",
+  "productArticle",
+  "productCharacteristics",
+  "product1cGroupId",
+  "productImageUrls",
+  "productPreviewVideoUrl",
+  "productPrice",
+  "productStockQuantity",
+  "productCategoryId",
+].join(" ");
 
 /**
  * Цена, которую продавец разрешил показывать на маркетплейсе.
@@ -59,11 +81,23 @@ export function pickOfferStock(offer, allowedWarehouseIds) {
  * поэтому обновления частичные: нет `<Цены>` — цену не трогаем, нет остатка —
  * не трогаем остаток. Иначе `prices.xml` обнулял бы склад, а `rests.xml` — цену.
  *
+ * Здесь же отрабатывает вторая половина правила «нет картинок и нет остатка»:
+ * именно из этого файла впервые становится известен остаток. Товар без
+ * картинок, у которого остаток появился, разворачивается из отстойника в
+ * карточку; карточка без картинок, у которой остаток обнулился, — наоборот,
+ * уезжает в отстойник.
+ *
  * @param {{
  *   sellerId: string;
  *   priceTypeIds: string[];
  *   warehouseIds: string[];
  *   onIssue: (issue: { externalId: string; name: string; message: string }) => void;
+ *   materializeHeld?: (params: {
+ *     held: Record<string, any>;
+ *     price: number;
+ *     stock: number;
+ *   }) => Promise<unknown>;
+ *   seenAt?: Date;
  * }} context
  */
 export function createOneCOffersApplier({
@@ -71,6 +105,8 @@ export function createOneCOffersApplier({
   priceTypeIds,
   warehouseIds,
   onIssue,
+  materializeHeld,
+  seenAt = new Date(),
 }) {
   const allowedPriceTypeIds = new Set(
     (priceTypeIds ?? []).map(String).filter(Boolean),
@@ -85,6 +121,14 @@ export function createOneCOffersApplier({
     stockUpdated: 0,
     published: 0,
     missing: 0,
+    /** Отложено правилом «нет картинок и нет остатка». */
+    held: 0,
+    /** Из них: карточки, удалённые с сайта уже после создания. */
+    heldDeleted: 0,
+    /** Не удалось удалить из-за незакрытых заказов — только сняты с витрины. */
+    heldBlocked: 0,
+    /** Отложенные, у которых появился остаток и которые стали карточками. */
+    restored: 0,
   };
 
   /**
@@ -98,23 +142,58 @@ export function createOneCOffersApplier({
       productSeller: sellerId,
       product1cGuid: { $in: externalIds },
     })
-      .select("_id product1cGuid productPrice productStockQuantity productCategoryId")
+      .select(PRODUCT_FIELDS)
       .lean();
     const byGuid = new Map(products.map((row) => [row.product1cGuid, row]));
+
+    const missingIds = externalIds.filter((id) => !byGuid.has(id));
+    const heldByGuid = await findHeldOneCProducts({
+      sellerId,
+      externalIds: missingIds,
+    });
 
     /** @type {import('mongoose').AnyBulkWriteOperation[]} */
     const operations = [];
 
     for (const offer of offers) {
       const product = byGuid.get(offer.externalId);
+      const price = pickOfferPrice(offer.prices, allowedPriceTypeIds);
+      const stock = pickOfferStock(offer, allowedWarehouseIds);
+
       if (!product) {
-        stats.missing += 1;
-        onIssue({
+        const held = heldByGuid.get(offer.externalId);
+        if (!held) {
+          stats.missing += 1;
+          onIssue({
+            externalId: offer.externalId,
+            name: offer.name,
+            message:
+              "Предложение без карточки — товара нет в import.xml этой выгрузки",
+          });
+          continue;
+        }
+
+        const effectiveStock = stock ?? held.lastKnownStock ?? null;
+        const effectivePrice = price ?? held.lastKnownPrice ?? 0;
+
+        if (effectiveStock !== null && effectiveStock > 0 && materializeHeld) {
+          await materializeHeld({
+            held,
+            price: effectivePrice,
+            stock: effectiveStock,
+          });
+          stats.restored += 1;
+          continue;
+        }
+
+        await holdOneCProduct({
+          sellerId,
           externalId: offer.externalId,
-          name: offer.name,
-          message:
-            "Предложение без карточки — товара нет в import.xml этой выгрузки",
+          stock,
+          price,
+          seenAt,
         });
+        stats.held += 1;
         continue;
       }
 
@@ -123,14 +202,12 @@ export function createOneCOffersApplier({
       /** @type {Record<string, unknown>} */
       const set = {};
 
-      const price = pickOfferPrice(offer.prices, allowedPriceTypeIds);
       if (price !== null && price !== product.productPrice) {
         set.productPrice = price;
         stats.priceUpdated += 1;
       }
       if (offer.article) set.productArticle = offer.article;
 
-      const stock = pickOfferStock(offer, allowedWarehouseIds);
       if (stock !== null && stock !== product.productStockQuantity) {
         set.productStockQuantity = stock;
         stats.stockUpdated += 1;
@@ -138,6 +215,27 @@ export function createOneCOffersApplier({
 
       const effectivePrice = set.productPrice ?? product.productPrice;
       const effectiveStock = set.productStockQuantity ?? product.productStockQuantity;
+
+      // Остаток обнулился, а картинок у карточки нет — на сайте ей делать
+      // нечего: удаляем и кладём описание в отстойник до лучших времён.
+      if (effectiveStock <= 0 && !productHasImages(product)) {
+        const { deleted } = await withdrawProductToHold({
+          sellerId,
+          product,
+          stock: effectiveStock,
+          price: effectivePrice,
+          seenAt,
+          onIssue,
+        });
+        if (deleted) {
+          stats.heldDeleted += 1;
+          stats.held += 1;
+        } else {
+          stats.heldBlocked += 1;
+        }
+        continue;
+      }
+
       const isAvailable =
         Boolean(product.productCategoryId) &&
         effectivePrice > 0 &&

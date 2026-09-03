@@ -52,6 +52,7 @@ import OneCOrderPushModel from "./OneCOrderPushModel.js";
 import OneCExchangeSessionModel from "./OneCExchangeSessionModel.js";
 import OneCCategoryMappingModel from "./OneCCategoryMappingModel.js";
 import OneCImportJobModel from "./OneCImportJobModel.js";
+import OneCPendingProductModel from "./OneCPendingProductModel.js";
 import ProductPromoActivationModel from "./ProductPromoActivationModel.js";
 import ProductBulkImportJobModel from "./ProductBulkImportJobModel.js";
 
@@ -110,6 +111,7 @@ export {
   OneCExchangeSessionModel,
   OneCCategoryMappingModel,
   OneCImportJobModel,
+  OneCPendingProductModel,
   ProductPromoActivationModel,
   ProductBulkImportJobModel,
 };

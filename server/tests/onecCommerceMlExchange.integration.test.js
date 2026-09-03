@@ -29,6 +29,7 @@ const {
 const {
   OneCCategoryMappingModel,
   OneCOrderPushModel,
+  OneCPendingProductModel,
   OrderModel,
   ProductModel,
 } = await import("../models/index.js");
@@ -80,8 +81,15 @@ describe("CommerceML обмен: каталог", () => {
     const job = latestJobOfKind(jobs, "catalog");
     assert.equal(job.status, "completed", job.errorMessage);
     assert.equal(job.filename, "import.xml");
-    assert.equal(job.stats.catalog.created, 2);
+    // Из каталога рождается только товар с картинкой. Второй — без картинки,
+    // остаток на момент разбора import.xml ещё неизвестен, поэтому он ждёт
+    // в отстойнике и станет карточкой уже на offers.xml.
+    assert.equal(job.stats.catalog.created, 1);
+    assert.equal(job.stats.catalog.held, 1);
     assert.equal(job.stats.catalog.onlyChanges, false);
+
+    const offersJob = latestJobOfKind(jobs, "offers");
+    assert.equal(offersJob.stats.offers["offers.xml"].restored, 1);
 
     const products = await ProductModel.find({ productSeller: seller._id })
       .sort({ product1cGuid: 1 })
@@ -373,6 +381,142 @@ describe("CommerceML обмен: каталог", () => {
     }).lean();
     assert.equal(removed.productIsAvailable, false);
     assert.equal(removed.productStockQuantity, 0);
+  });
+});
+
+describe("CommerceML обмен: товары без картинок и без остатка", () => {
+  it("не заводит карточку и не держит её в каталоге", async () => {
+    const { seller, credentials } = await createExchangeSeller();
+
+    await runCatalogExchange({
+      request: http.request,
+      login: credentials.login,
+      password: credentials.password,
+      archive: buildExchangeZip({ variantQuantity: 0 }),
+    });
+    const jobs = await waitForImportJobs(String(seller._id));
+
+    const products = await ProductModel.find({ productSeller: seller._id }).lean();
+    assert.deepEqual(
+      products.map((row) => row.product1cGuid),
+      [OFFER_GUID_SIMPLE],
+      "на сайт попал только товар с картинкой",
+    );
+
+    assert.equal(latestJobOfKind(jobs, "catalog").stats.catalog.held, 1);
+    assert.equal(
+      latestJobOfKind(jobs, "offers").stats.offers["offers.xml"].held,
+      1,
+    );
+
+    // Описание не потеряно: лежит в отстойнике вместе с нулевым остатком.
+    const pending = await OneCPendingProductModel.find({
+      sellerId: seller._id,
+    }).lean();
+    assert.equal(pending.length, 1);
+    assert.equal(pending[0].externalId, OFFER_GUID_VARIANT);
+    assert.equal(pending[0].name, "Витамин D3, 60 капсул");
+    assert.equal(pending[0].lastKnownStock, 0);
+  });
+
+  it("разворачивает отложенное, как только приходит остаток", async () => {
+    const { seller, credentials } = await createExchangeSeller();
+    const leaf = await createLeafCategory();
+
+    await runCatalogExchange({
+      request: http.request,
+      login: credentials.login,
+      password: credentials.password,
+      archive: buildExchangeZip({ variantQuantity: 0 }),
+    });
+    await waitForImportJobs(String(seller._id));
+    await saveOneCCategoryMappings(String(seller._id), [
+      { externalId: GROUP_VITAMINS, categoryId: String(leaf._id) },
+    ]);
+
+    await runCatalogExchange({
+      request: http.request,
+      login: credentials.login,
+      password: credentials.password,
+      archive: buildExchangeZip({ variantQuantity: 5 }),
+    });
+    const jobs = await waitForImportJobs(String(seller._id), 4);
+
+    const variant = await ProductModel.findOne({
+      productSeller: seller._id,
+      product1cGuid: OFFER_GUID_VARIANT,
+    }).lean();
+    assert.ok(variant, "карточка создана из отстойника");
+    assert.equal(variant.productStockQuantity, 5);
+    assert.equal(variant.productPrice, 899);
+    assert.equal(variant.productName, "Витамин D3, 60 капсул");
+    assert.deepEqual(variant.productImageUrls, []);
+    // Свежая карточка проходит модерацию как любая другая новая.
+    assert.equal(variant.productModerationStatus, "pending");
+    assert.equal(String(variant.productCategoryId), String(leaf._id));
+
+    assert.equal(
+      latestJobOfKind(jobs, "offers").stats.offers["offers.xml"].restored,
+      1,
+    );
+    assert.equal(
+      await OneCPendingProductModel.countDocuments({ sellerId: seller._id }),
+      0,
+    );
+  });
+
+  it("убирает с сайта карточку без картинок, когда остаток обнулился", async () => {
+    const { seller, credentials } = await createExchangeSeller();
+
+    await runCatalogExchange({
+      request: http.request,
+      login: credentials.login,
+      password: credentials.password,
+      archive: buildExchangeZip(),
+    });
+    await waitForImportJobs(String(seller._id));
+    assert.ok(
+      await ProductModel.findOne({
+        productSeller: seller._id,
+        product1cGuid: OFFER_GUID_VARIANT,
+      }).lean(),
+      "карточка без картинки, но с остатком на сайте есть",
+    );
+
+    await runCatalogExchange({
+      request: http.request,
+      login: credentials.login,
+      password: credentials.password,
+      archive: buildExchangeZip({ variantQuantity: 0 }),
+    });
+    const jobs = await waitForImportJobs(String(seller._id), 4);
+
+    assert.equal(
+      await ProductModel.countDocuments({
+        productSeller: seller._id,
+        product1cGuid: OFFER_GUID_VARIANT,
+      }),
+      0,
+      "карточка удалена, а не оставлена пустышкой",
+    );
+    assert.equal(
+      latestJobOfKind(jobs, "offers").stats.offers["offers.xml"].heldDeleted,
+      1,
+    );
+
+    const pending = await OneCPendingProductModel.findOne({
+      sellerId: seller._id,
+      externalId: OFFER_GUID_VARIANT,
+    }).lean();
+    assert.ok(pending, "описание уехало в отстойник");
+
+    // Товар с картинкой правило не трогает даже при нулевом остатке.
+    assert.ok(
+      await ProductModel.findOne({
+        productSeller: seller._id,
+        product1cGuid: OFFER_GUID_SIMPLE,
+      }).lean(),
+    );
   });
 });
 

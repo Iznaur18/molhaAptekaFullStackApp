@@ -38,6 +38,7 @@ import { up as priceOfferAcceptedAwaitingPaymentIndexUp } from "./20260808-price
 import { up as onecCommerceMlExchangeUp } from "./20260830-onec-commerceml-exchange.js";
 import { up as orderLineSellerIdUp } from "./20260831-order-line-seller-id.js";
 import { up as orderShipmentsUp } from "./20260831-order-shipments.js";
+import { up as onecProductsWithoutImagesAndStockUp } from "./20260903-onec-products-without-images-and-stock.js";
 
 export const MIGRATIONS = [
   {
@@ -246,5 +247,11 @@ export const MIGRATIONS = [
     id: "20260831-order-shipments",
     description: "Backfill orders.shipments (order + seller) from fulfillmentMethod",
     up: orderShipmentsUp,
+  },
+  {
+    id: "20260903-onec-products-without-images-and-stock",
+    description:
+      "Delete 1C products that have neither images nor stock (new import rule), add OneCPendingProduct indexes",
+    up: onecProductsWithoutImagesAndStockUp,
   },
 ];

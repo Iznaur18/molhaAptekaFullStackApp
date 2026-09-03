@@ -7,6 +7,8 @@ import {
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { OneCExchangeLogModel, ProductModel } from "../../models/index.js";
 import { buildProductSearchBlobFromFields } from "../product/buildProductSearchBlob.js";
+import { deleteProductsCascade } from "../product/deleteProductsCascade.js";
+import { productHasImages } from "../product/productImagePresence.js";
 import { fetchOneCNomenclature } from "./onecHttpClient.js";
 import { resolveSellerOneCCredentials } from "./onecSettings.js";
 
@@ -38,6 +40,9 @@ export async function syncSellerNomenclature(sellerId, opts = {}) {
   let created = 0;
   let updated = 0;
   let deactivated = 0;
+  let held = 0;
+  let heldDeleted = 0;
+  let heldBlocked = 0;
 
   for (const item of items) {
     seenGuids.add(item.guid);
@@ -53,7 +58,42 @@ export async function syncSellerNomenclature(sellerId, opts = {}) {
     const existing = await ProductModel.findOne({
       productSeller: sellerId,
       product1cGuid: item.guid,
-    }).select("_id");
+    })
+      .select("_id productImageUrls productPreviewVideoUrl")
+      .lean();
+
+    // Пустой imageUrls в ответе 1С означает «данных нет», а не «картинок нет»:
+    // код ниже картинки в этом случае не трогает. Поэтому уже залитые картинки
+    // карточки считаются наравне с присланными.
+    const hasImages =
+      item.imageUrls.length > 0 || (existing ? productHasImages(existing) : false);
+
+    // То же правило приёмки, что и в CommerceML: без картинок и без остатка
+    // товар на сайт не заводится, а заведённый раньше — удаляется. Здесь
+    // остаток и картинки приезжают вместе с номенклатурой, поэтому отстойник
+    // не нужен: следующая синхронизация принесёт товар целиком.
+    if (!hasImages && !(item.stock > 0)) {
+      if (existing) {
+        const { deletedIds } = await deleteProductsCascade([existing]);
+        if (deletedIds.length > 0) {
+          heldDeleted += 1;
+        } else {
+          await ProductModel.updateOne(
+            { _id: existing._id },
+            {
+              $set: {
+                productIsAvailable: false,
+                productOutOfStock: true,
+                productStockQuantity: 0,
+              },
+            },
+          );
+          heldBlocked += 1;
+        }
+      }
+      held += 1;
+      continue;
+    }
 
     const setFields = {
       productName: item.name,
@@ -111,6 +151,10 @@ export async function syncSellerNomenclature(sellerId, opts = {}) {
     created,
     updated,
     deactivated,
+    /** Не заведены на сайте: нет картинок и нет остатка. */
+    held,
+    heldDeleted,
+    heldBlocked,
   };
 
   await OneCExchangeLogModel.create({

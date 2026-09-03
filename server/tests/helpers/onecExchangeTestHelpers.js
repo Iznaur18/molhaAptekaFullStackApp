@@ -90,8 +90,12 @@ export function buildImportXml(opts = {}) {
 
 /**
  * Пакет предложений: два типа цены и два склада, чтобы проверить фильтрацию.
+ *
+ * @param {{ variantQuantity?: number }} [opts] остаток товара без картинки —
+ *   именно он решает, попадёт ли такая номенклатура на сайт
  */
-export function buildOffersXml() {
+export function buildOffersXml(opts = {}) {
+  const variantQuantity = opts.variantQuantity ?? 3;
   return `<?xml version="1.0" encoding="UTF-8"?>
 <КоммерческаяИнформация ВерсияСхемы="2.05" ДатаФормирования="2026-08-30T10:00:00">
   <ПакетПредложений>
@@ -141,7 +145,7 @@ export function buildOffersXml() {
             <ЦенаЗаЕдиницу>899</ЦенаЗаЕдиницу>
           </Цена>
         </Цены>
-        <Количество>3</Количество>
+        <Количество>${variantQuantity}</Количество>
       </Предложение>
     </Предложения>
   </ПакетПредложений>
@@ -149,13 +153,13 @@ export function buildOffersXml() {
 }
 
 /**
- * @param {{ onlyChanges?: boolean }} [opts]
+ * @param {{ onlyChanges?: boolean; variantQuantity?: number }} [opts]
  * @returns {Buffer}
  */
 export function buildExchangeZip(opts = {}) {
   return buildStoredZip([
     { name: "import.xml", data: Buffer.from(buildImportXml(opts), "utf8") },
-    { name: "offers.xml", data: Buffer.from(buildOffersXml(), "utf8") },
+    { name: "offers.xml", data: Buffer.from(buildOffersXml(opts), "utf8") },
     { name: "import_files/aa/aspirin.png", data: tinyPngBuffer() },
   ]);
 }

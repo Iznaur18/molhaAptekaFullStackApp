@@ -384,6 +384,7 @@ export function OneCIntegrationPage({ isAuthorized = false, onRequestLogin }) {
 
               <section className="onec-page__block">
                 <h2 className="onec-page__subtitle">{UI.IMPORTS_TITLE}</h2>
+                <p className="onec-page__hint">{UI.IMPORT_HOLD_HINT}</p>
                 <OneCImportJobsList />
               </section>
             </>

@@ -76,7 +76,11 @@ export const ONEC_INTEGRATION_PAGE_UI = {
   IMPORT_UNCATEGORIZED: "без категории",
   IMPORT_IMAGES: "картинок залито",
   IMPORT_DEACTIVATED: "снято с витрины",
+  IMPORT_HELD: "отложено без картинок и остатка",
+  IMPORT_RESTORED: "возвращено с остатком",
   IMPORT_ISSUES: "Замечания",
+  IMPORT_HOLD_HINT:
+    "Номенклатура без картинок и без остатка на сайт не заводится. Как только в выгрузке появится остаток или картинка, товар создастся сам.",
 
   SAVE: "Сохранить",
   SAVE_PENDING: "Сохраняем…",

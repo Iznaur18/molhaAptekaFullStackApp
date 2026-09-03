@@ -29,6 +29,10 @@ import { applyProductSaleCityFields } from "../../product/ruCityNormalized.js";
 import { createOneCCatalogApplier } from "./applyOneCCatalogProducts.js";
 import { createOneCOffersApplier } from "./applyOneCOffers.js";
 import {
+  dropStaleHeldOneCProducts,
+  materializeHeldOneCProduct,
+} from "./onecHeldProducts.js";
+import {
   createMultiRootImageResolver,
   resolveOneCImportTarget,
 } from "./resolveOneCImportTarget.js";
@@ -312,11 +316,32 @@ async function runOneCImportJob(jobId) {
 
       if (file.kind !== ONEC_IMPORT_KIND_OFFERS) continue;
 
+      /**
+       * Резолвер категорий нужен только на «оживление» отложенной
+       * номенклатуры, а это редкий случай — заводим лениво.
+       *
+       * @type {Awaited<ReturnType<typeof createOneCCategoryResolver>> | null}
+       */
+      let offersResolver = null;
+
       const offersApplier = createOneCOffersApplier({
         sellerId,
         priceTypeIds: exchange.priceTypeIds ?? [],
         warehouseIds: exchange.warehouseIds ?? [],
         onIssue: addIssue,
+        seenAt: startedAt,
+        materializeHeld: async ({ held, price, stock }) => {
+          offersResolver ??= await createOneCCategoryResolver(sellerId);
+          return materializeHeldOneCProduct({
+            sellerId,
+            held,
+            resolver: offersResolver,
+            sellerDefaults,
+            price,
+            stock,
+            seenAt: startedAt,
+          });
+        },
       });
 
       const parsed = await parseCommerceMlOffers({
@@ -348,13 +373,18 @@ async function runOneCImportJob(jobId) {
     // Частичную (`СодержитТолькоИзменения`) так трактовать нельзя — снесли бы
     // всё, что 1С в этот раз просто не присылала.
     if (fullCatalogSeen) {
+      // Отсечка — по началу ВСЕЙ сессии обмена, а не этой задачи: большой
+      // каталог 1С режет на `import0_1.xml`, `import0_2.xml`…, и по началу
+      // задачи разбор второго файла снимал бы с витрины товары первого.
+      const exchangeStartedAt = session.createdAt ?? startedAt;
+
       const stale = await ProductModel.updateMany(
         {
           productSeller: sellerId,
           productFromOneC: true,
           $or: [
             { product1cSeenAt: null },
-            { product1cSeenAt: { $lt: startedAt } },
+            { product1cSeenAt: { $lt: exchangeStartedAt } },
           ],
           $and: [
             {
@@ -368,6 +398,13 @@ async function runOneCImportJob(jobId) {
         { $set: { productIsAvailable: false, productStockQuantity: 0 } },
       );
       stats.deactivated = stale.modifiedCount ?? 0;
+
+      // Отстойник живёт по тому же правилу: чего нет в полной выгрузке, того
+      // нет и в 1С — держать описание больше незачем.
+      stats.heldDropped = await dropStaleHeldOneCProducts({
+        sellerId,
+        before: exchangeStartedAt,
+      });
     }
 
     job.status = ONEC_IMPORT_STATUS_COMPLETED;

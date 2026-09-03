@@ -7,7 +7,7 @@ import { test } from "node:test";
 import {
   productHasImages,
   productsWithoutImagesFilter,
-} from "../scripts/lib/productsWithoutImagesQuery.js";
+} from "../services/product/productImagePresence.js";
 
 const SERVER_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -27,5 +27,5 @@ test("maintenance script exports mongo filter and apply flag", () => {
   assert.equal(typeof productsWithoutImagesFilter.$expr, "object");
   assert.match(source, /--apply/);
   assert.match(source, /getProductIdsWithOpenSales/);
-  assert.match(source, /removeProductIdsFromAllWishlists/);
+  assert.match(source, /deleteProductsCascade/);
 });

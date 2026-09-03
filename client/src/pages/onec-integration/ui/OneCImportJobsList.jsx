@@ -21,13 +21,20 @@ function summarize(stats) {
     if (catalog.imagesUploaded > 0) {
       parts.push(`${UI.IMPORT_IMAGES}: ${catalog.imagesUploaded}`);
     }
+    if (catalog.held > 0) {
+      parts.push(`${UI.IMPORT_HELD}: ${catalog.held}`);
+    }
   }
   if (stats.offers) {
-    const matched = Object.values(stats.offers).reduce(
-      (sum, row) => sum + (row?.matched ?? 0),
-      0,
-    );
-    parts.push(`цены и остатки: ${matched}`);
+    const rows = Object.values(stats.offers);
+    const sum = (key) => rows.reduce((acc, row) => acc + (row?.[key] ?? 0), 0);
+    parts.push(`цены и остатки: ${sum("matched")}`);
+    if (sum("restored") > 0) {
+      parts.push(`${UI.IMPORT_RESTORED}: ${sum("restored")}`);
+    }
+    if (sum("held") > 0) {
+      parts.push(`${UI.IMPORT_HELD}: ${sum("held")}`);
+    }
   }
   if (stats.deactivated > 0) {
     parts.push(`${UI.IMPORT_DEACTIVATED}: ${stats.deactivated}`);
