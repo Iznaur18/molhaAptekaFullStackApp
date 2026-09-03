@@ -10,6 +10,7 @@ import {
   userRouter,
   orderRouter,
   courierRouter,
+  sellerRouter,
   productRouter,
   cartRouter,
   favoritesRouter,
@@ -119,6 +120,7 @@ export const createApp = () => {
   app.use("/user", userRouter);
   app.use("/order", orderRouter);
   app.use("/couriers", courierRouter);
+  app.use("/sellers", sellerRouter);
   app.use("/cart", cartRouter);
   app.use("/favorites", favoritesRouter);
   app.use("/product", productRouter);

@@ -1,0 +1,278 @@
+.safe-deal-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 0.25rem 0 2rem;
+  color: var(--iz-color-text);
+}
+
+.safe-deal-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.125rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-action) 16%, var(--iz-color-border));
+  border-radius: 1.125rem;
+  background:
+    radial-gradient(
+      ellipse 120% 80% at 100% 0%,
+      color-mix(in srgb, var(--iz-color-success) 10%, transparent),
+      transparent 58%
+    ),
+    var(--iz-color-surface);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--iz-color-ink) 4%, transparent);
+}
+
+.safe-deal-page__title {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--iz-color-text);
+}
+
+.safe-deal-page__status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--iz-color-border);
+  background: var(--iz-color-surface-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--iz-color-text-secondary);
+}
+
+.safe-deal-page__status--none {
+  border-color: var(--iz-color-border);
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text-muted);
+}
+
+.safe-deal-page__status--approved {
+  border-color: color-mix(in srgb, var(--iz-color-success) 30%, var(--iz-color-border));
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
+}
+
+.safe-deal-page__status--pending {
+  border-color: color-mix(in srgb, var(--iz-color-warning) 30%, var(--iz-color-border));
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
+}
+
+.safe-deal-page__status--rejected {
+  border-color: color-mix(in srgb, var(--iz-color-danger) 30%, var(--iz-color-border));
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger-text);
+}
+
+.safe-deal-page__messages {
+  display: grid;
+  gap: 0.625rem;
+}
+
+.safe-deal-page__intro,
+.safe-deal-page__pending {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--iz-color-text-secondary);
+}
+
+.safe-deal-page__why {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 1rem;
+  background: var(--iz-color-surface-muted);
+}
+
+.safe-deal-page__section-title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.safe-deal-page__why-list {
+  margin: 0;
+  padding-left: 1.15rem;
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--iz-color-text-secondary);
+}
+
+.safe-deal-page__rejection,
+.safe-deal-page__error {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-danger) 28%, var(--iz-color-border));
+  font-size: 0.875rem;
+  line-height: 1.45;
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger-text);
+}
+
+.safe-deal-page__approved {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-success) 28%, var(--iz-color-border));
+  font-size: 0.875rem;
+  line-height: 1.45;
+  background: var(--iz-color-success-surface);
+  color: var(--iz-color-success-text);
+}
+
+.safe-deal-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.125rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 1.125rem;
+  background: var(--iz-color-surface);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--iz-color-ink) 4%, transparent);
+}
+
+.safe-deal-page__grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(7rem, 0.5fr) minmax(11rem, 1fr);
+}
+
+@media (max-width: 30rem) {
+  .safe-deal-page__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.safe-deal-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.safe-deal-page__field > span:first-child {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--iz-color-text-secondary);
+}
+
+.safe-deal-page__field input,
+.safe-deal-page__field select {
+  box-sizing: border-box;
+  width: 100%;
+  font: inherit;
+  font-size: 0.9375rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.75rem;
+  background: var(--iz-color-surface-muted);
+  color: var(--iz-color-text);
+  transition:
+    border-color var(--iz-transition-base),
+    box-shadow var(--iz-transition-base);
+}
+
+/* ИНН читают по цифрам и сверяют с выпиской — моноширинный тут не украшение. */
+.safe-deal-page__field input {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.safe-deal-page__field input:focus,
+.safe-deal-page__field select:focus {
+  outline: none;
+  border-color: var(--iz-color-action);
+  box-shadow: var(--iz-shadow-input-focus);
+}
+
+.safe-deal-page__field input[aria-invalid="true"] {
+  border-color: color-mix(in srgb, var(--iz-color-danger) 45%, var(--iz-color-border));
+}
+
+.safe-deal-page__field input:disabled,
+.safe-deal-page__field select:disabled {
+  opacity: var(--iz-state-disabled-opacity);
+}
+
+.safe-deal-page__hint {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--iz-color-text-muted);
+}
+
+.safe-deal-page__hint--error {
+  color: var(--iz-color-danger-text);
+}
+
+.safe-deal-page__legal {
+  margin: 0;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.875rem;
+  background: var(--iz-color-surface-muted);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--iz-color-text-secondary);
+}
+
+.safe-deal-page__submit {
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.875rem;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast);
+  cursor: pointer;
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--iz-color-action) 24%, transparent);
+  transition:
+    background var(--iz-transition-base),
+    transform var(--iz-transition-press),
+    opacity var(--iz-transition-base);
+}
+
+.safe-deal-page__submit:hover:not(:disabled) {
+  background: var(--iz-color-action-hover);
+}
+
+.safe-deal-page__submit:active:not(:disabled) {
+  transform: scale(var(--iz-state-pressed-scale));
+}
+
+.safe-deal-page__submit:disabled {
+  opacity: var(--iz-state-disabled-opacity);
+  cursor: not-allowed;
+}
+
+.safe-deal-page__privacy {
+  margin: 0;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 1rem;
+  background: var(--iz-color-surface-muted);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--iz-color-text-muted);
+}
+
+.safe-deal-page__loading {
+  margin: 0;
+  padding: 1.5rem 0;
+  text-align: center;
+  color: var(--iz-color-text-muted);
+}

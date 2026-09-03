@@ -77,6 +77,11 @@ import {
   staffCourierModerationValidation,
 } from "./courier/courierApplicationValidation.js";
 import {
+  safeDealApplicationValidation,
+  staffSafeDealListValidation,
+  staffSafeDealModerationValidation,
+} from "./seller/sellerSafeDealValidation.js";
+import {
   courierHandoverCodeValidation,
   courierShipmentValidation,
   courierOverviewValidation,
@@ -222,6 +227,9 @@ export {
   courierApplicationValidation,
   staffCourierListValidation,
   staffCourierModerationValidation,
+  safeDealApplicationValidation,
+  staffSafeDealListValidation,
+  staffSafeDealModerationValidation,
   courierHandoverCodeValidation,
   courierShipmentValidation,
   courierOverviewValidation,

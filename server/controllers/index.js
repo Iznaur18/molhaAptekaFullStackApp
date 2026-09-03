@@ -56,6 +56,12 @@ import {
   patchStaffCourierModerationController,
 } from "./Courier/courierApplicationController.js";
 import {
+  getMySellerSafeDealController,
+  submitSellerSafeDealApplicationController,
+  getStaffSafeDealApplicationsController,
+  patchStaffSafeDealModerationController,
+} from "./Seller/sellerSafeDealController.js";
+import {
   acceptShipmentController,
   completeDeliveryController,
   confirmHandoverController,
@@ -383,6 +389,10 @@ export {
   submitCourierApplicationController,
   getStaffCourierApplicationsController,
   patchStaffCourierModerationController,
+  getMySellerSafeDealController,
+  submitSellerSafeDealApplicationController,
+  getStaffSafeDealApplicationsController,
+  patchStaffSafeDealModerationController,
   acceptShipmentController,
   completeDeliveryController,
   confirmHandoverController,

@@ -51,6 +51,7 @@ export function buildProfileNavGroups({
   canUsePartnerProgram,
   canUseAdvertising,
   canUseOneCIntegration,
+  canUseSafeDeal,
   canUseEditProfile,
   showEditOnBanner,
   pendingMySalesActionCount,
@@ -101,6 +102,7 @@ export function buildProfileNavGroups({
   onPartnerProgramClick,
   onAdvertisingClick,
   onOneCIntegrationClick,
+  onSafeDealClick,
   onEditProfileClick,
 }) {
   /** @param {string} tab @param {() => void} [action] */
@@ -268,6 +270,15 @@ export function buildProfileNavGroups({
                 tab: "onec-integration",
                 label: MY_PROFILE_PAGE_UI.TAB_ONEC_INTEGRATION,
                 onClick: () => selectTab("onec-integration", onOneCIntegrationClick),
+              },
+            ]
+          : []),
+        ...(canUseSafeDeal
+          ? [
+              {
+                tab: "safe-deal",
+                label: MY_PROFILE_PAGE_UI.TAB_SAFE_DEAL,
+                onClick: () => selectTab("safe-deal", onSafeDealClick),
               },
             ]
           : []),

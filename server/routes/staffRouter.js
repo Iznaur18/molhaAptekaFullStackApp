@@ -4,6 +4,8 @@ import {
   postStaffBroadcastNotificationController,
   getStaffCourierApplicationsController,
   patchStaffCourierModerationController,
+  getStaffSafeDealApplicationsController,
+  patchStaffSafeDealModerationController,
   getStaffDisputesController,
   postStaffResolveDisputeController,
   getStaffShippingCarriersController,
@@ -12,6 +14,8 @@ import {
 import {
   staffCourierListValidation,
   staffCourierModerationValidation,
+  staffSafeDealListValidation,
+  staffSafeDealModerationValidation,
   staffDisputeListValidation,
   staffResolveDisputeValidation,
   shippingCarrierToggleValidation,
@@ -51,6 +55,23 @@ router.patch(
   checkProductModeratorMW,
   staffCourierModerationValidation,
   patchStaffCourierModerationController,
+);
+
+// Заявки на безопасную сделку модерируют те же, кто и курьеров: проверка
+// сводится к сверке ИНН с ЕГРЮЛ/ЕГРИП, отдельной роли под это не нужно.
+router.get(
+  "/safe-deal",
+  checkAuthMW,
+  checkProductModeratorMW,
+  staffSafeDealListValidation,
+  getStaffSafeDealApplicationsController,
+);
+router.patch(
+  "/safe-deal/:userId/moderation",
+  checkAuthMW,
+  checkProductModeratorMW,
+  staffSafeDealModerationValidation,
+  patchStaffSafeDealModerationController,
 );
 
 // Споры по отправлениям разбирают те же, кто модерирует курьеров.

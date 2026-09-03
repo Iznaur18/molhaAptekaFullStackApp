@@ -24,6 +24,7 @@
 /product
 /seller-personal-category
 /seller-shelf
+/sellers
 /site-header-banner
 /site-header-banner-campaign
 /staff

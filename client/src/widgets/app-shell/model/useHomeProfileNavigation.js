@@ -22,6 +22,7 @@ import {
   PROFILE_TAB_PARTNER_PROGRAM,
   PROFILE_TAB_ADVERTISING,
   PROFILE_TAB_ONEC_INTEGRATION,
+  PROFILE_TAB_SAFE_DEAL,
   PROFILE_TAB_EDIT_PROFILE,
   PROFILE_TAB_MY_ORDERS,
   PROFILE_TAB_MY_SALES,
@@ -188,6 +189,10 @@ export const useHomeProfileNavigation = ({
     navigateFromProfileTab(PROFILE_TAB_ONEC_INTEGRATION);
   }, [navigateFromProfileTab]);
 
+  const handleSafeDealFromProfile = useCallback(() => {
+    navigateFromProfileTab(PROFILE_TAB_SAFE_DEAL);
+  }, [navigateFromProfileTab]);
+
   const handleEditProfileFromProfile = useCallback(() => {
     navigateFromProfileTab(PROFILE_TAB_EDIT_PROFILE);
   }, [navigateFromProfileTab]);
@@ -269,6 +274,8 @@ export const useHomeProfileNavigation = ({
     handleAdvertisingFromProfile,
 
     handleOneCIntegrationFromProfile,
+
+    handleSafeDealFromProfile,
 
     handleEditProfileFromProfile,
 

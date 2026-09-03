@@ -17,6 +17,7 @@ import {
   LazyPartnerProgramPage,
   LazyAdvertisingPage,
   LazyOneCIntegrationPage,
+  LazySafeDealPage,
   LazyEditProfilePage,
   LazyIntroAdModerationPage,
   LazySellerPersonalCategoryModerationPage,
@@ -144,6 +145,8 @@ export function renderProfileTabPanel(mainView, props) {
           onRequestLogin={onRequestLogin}
         />
       );
+    case "safe-deal":
+      return <LazySafeDealPage />;
     case "edit-profile":
       return (
         <LazyEditProfilePage

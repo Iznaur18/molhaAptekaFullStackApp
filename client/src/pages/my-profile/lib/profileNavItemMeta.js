@@ -58,6 +58,7 @@ export const PROFILE_NAV_ITEM_META = {
   "affiliate-listings": { icon: Users },
   advertising: { icon: Megaphone },
   "onec-integration": { icon: Database },
+  "safe-deal": { icon: ShieldCheck },
   "edit-profile": { icon: Pencil },
   "create-raffle": { icon: Gift },
   "product-moderation": { icon: ClipboardCheck },

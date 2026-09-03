@@ -16,6 +16,9 @@ export const DEV_API_PROXY_PREFIXES = [
   // Множественное число намеренно: SPA-роуты /become-courier и
   // /courier-moderation не должны попадать в прокси по префиксу.
   "/couriers",
+  // Строго до "/seller": иначе `/sellers/...` попадёт в crawler-only ветку
+  // и вместо API вернётся index.html.
+  "/sellers",
   "/product",
   "/installment",
   "/price-offers",

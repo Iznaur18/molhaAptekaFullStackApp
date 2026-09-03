@@ -12,6 +12,14 @@ import {
   COURIER_VEHICLE_MAKE_MAX_LENGTH,
   COURIER_VEHICLE_PLATE_MAX_LENGTH,
 } from "../constants/courierConstants.js";
+import {
+  SAFE_DEAL_INN_MAX_LENGTH,
+  SAFE_DEAL_MODERATION_COMMENT_MAX_LENGTH,
+  SAFE_DEAL_MODERATION_NONE,
+  SAFE_DEAL_MODERATION_STATUSES,
+  SELLER_LEGAL_FORM_NONE,
+  SELLER_LEGAL_FORM_VALUES,
+} from "../constants/safeDealConstants.js";
 import { DEFAULT_AVATAR_URL, DEFAULT_BACKGROUND_URL } from "../constants/constants.js";
 import {
   DEFAULT_USER_AVATAR_FOCUS,
@@ -596,6 +604,48 @@ const UserSchema = new mongoose.Schema(
       maxlength: 120,
     },
 
+    // - - - Безопасная сделка - - -
+    /**
+     * Заявка продавца на безопасную сделку: правовая форма + ИНН + модерация.
+     *
+     * Отдельной сущности нет по той же причине, что и у курьера: это состояние
+     * обычного пользователя, а не новый субъект. Реквизиты выплаты сюда не
+     * кладём — их принимает платёжный сервис, площадка чужие деньги не держит.
+     */
+    sellerSafeDeal: {
+      moderationStatus: {
+        type: String,
+        enum: SAFE_DEAL_MODERATION_STATUSES,
+        default: SAFE_DEAL_MODERATION_NONE,
+      },
+      legalForm: {
+        type: String,
+        enum: SELLER_LEGAL_FORM_VALUES,
+        default: SELLER_LEGAL_FORM_NONE,
+      },
+      /** Хранится как есть, цифрами: сравнение и поиск по нему точные. */
+      inn: {
+        type: String,
+        trim: true,
+        maxlength: SAFE_DEAL_INN_MAX_LENGTH,
+        default: "",
+      },
+      submittedAt: { type: Date, default: null },
+      reviewedAt: { type: Date, default: null },
+      reviewedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null,
+      },
+      /** Причина отказа — продавец должен понимать, что исправить. */
+      moderationComment: {
+        type: String,
+        trim: true,
+        maxlength: SAFE_DEAL_MODERATION_COMMENT_MAX_LENGTH,
+        default: "",
+      },
+    },
+
     // - - - Список покупок / заказов (подготовка под будущую модель) - - -
     buyList: {
       // список id заказов или покупок; при создании модели Order/Purchase указать ref: 'Order' или ref: 'Purchase'
@@ -734,6 +784,30 @@ UserSchema.index({ userRole: 1, isActiveUser: 1, isBlockedUser: 1 });
 UserSchema.index(
   { "courierProfile.moderationStatus": 1, "courierProfile.submittedAt": -1 },
   { name: "courier_moderation_queue" },
+);
+
+/** Очередь модерации безопасной сделки: свежие заявки сверху. */
+UserSchema.index(
+  { "sellerSafeDeal.moderationStatus": 1, "sellerSafeDeal.submittedAt": -1 },
+  { name: "safe_deal_moderation_queue" },
+);
+
+/**
+ * Один подтверждённый ИНН — один продавец.
+ *
+ * Уникальность только среди подтверждённых: до одобрения ИНН вбит со слов
+ * продавца, и опечатка соседа не должна блокировать чужую заявку.
+ */
+UserSchema.index(
+  { "sellerSafeDeal.inn": 1 },
+  {
+    unique: true,
+    name: "safe_deal_approved_inn_unique",
+    partialFilterExpression: {
+      "sellerSafeDeal.inn": { $type: "string", $gt: "" },
+      "sellerSafeDeal.moderationStatus": "approved",
+    },
+  },
 );
 
 // Индекс для сортировки по рейтингу (для топ пользователей)
