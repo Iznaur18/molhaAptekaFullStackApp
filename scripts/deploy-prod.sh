@@ -38,7 +38,14 @@ echo "==> [1/6] git push origin $DEPLOY_REF:main"
 git push origin "$DEPLOY_REF:main"
 
 echo "==> [2/6] сборка client локально"
-( cd client && npm ci --prefer-offline --no-audit --fund=false && npm run build )
+# Ставим из КОРНЯ, а не из client/. У client есть свой package-lock.json, и
+# `cd client && npm ci` выглядит законно, но client объявлен воркспейсом
+# корневого package.json: npm 7+ поднимается до корня, ограничивает установку
+# одним воркспейсом и выметает корневые devDependencies — следом падает
+# корневой postinstall, потому что сам patch-package он только что и удалил.
+# Установка обрывается, client/node_modules остаётся пустой.
+npm ci --prefer-offline --no-audit --fund=false
+npm run build --workspace=client
 
 echo "==> [3/6] доставка кода на сервер пакетом (git bundle)"
 # На VPS нет доступа к GitHub: учётных данных не заведено, и `git pull` уходит
