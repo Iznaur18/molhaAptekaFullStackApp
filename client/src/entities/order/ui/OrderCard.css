@@ -811,3 +811,19 @@
   font-size: 0.8rem;
   color: var(--iz-color-text-muted, var(--iz-color-text));
 }
+
+/* Заказ оформлен с предоплатой, но деньги ещё не пришли. */
+.order-card__awaiting-prepayment {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin-top: 0.6rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-warning) 30%, var(--iz-color-border));
+  border-radius: 0.75rem;
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}

@@ -14,6 +14,7 @@ import {
 import { AppError } from "../../errors/AppError.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
+import { assertOrderPrepaid } from "./assertOrderPrepaid.js";
 import { notifyBuyerAboutOrderItemStatus } from "./notifyBuyerAboutOrderItemStatus.js";
 import {
   loadOrderWithItems,
@@ -81,6 +82,8 @@ export const resolveNextShipmentStatus = (currentStatus, fulfillmentMethod) => {
  */
 export async function advanceOrderShipmentStatus({ orderId, sellerId, nextStatus }) {
   const order = await loadOrderWithItems(orderId);
+  // Предоплаченный заказ не двигается, пока деньги не пришли.
+  assertOrderPrepaid(order);
   const items = collectShipmentItems(order, sellerId);
 
   if (items.length === 0) {

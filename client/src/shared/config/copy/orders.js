@@ -47,6 +47,13 @@ export const ORDER_CARD_UI = {
   SHIPMENT_PAYMENT_CONFIRMED: "Оплата подтверждена",
   /** @param {string} requisites */
   SHIPMENT_PAY_TO: (requisites) => `Перевести продавцу: ${requisites}`,
+  AWAITING_PREPAYMENT: "Ожидает оплаты",
+  AWAITING_PREPAYMENT_BUYER_HINT:
+    "Заказ создан, но не оплачен. Продавец начнёт собирать его после оплаты.",
+  AWAITING_PREPAYMENT_SELLER_HINT:
+    "Покупатель ещё не оплатил заказ. Собирать и отгружать его пока рано.",
+  PAY_NOW: "Оплатить",
+  PAY_NOW_PENDING: "Открываем оплату…",
   SHIPMENT_PAY_TO_HINT:
     "Курьер отдаст заказ, когда продавец подтвердит перевод.",
   SHIPMENT_PAYMENT_RECEIVED_BY_SELLER: "Продавец подтвердил, что перевод дошёл",

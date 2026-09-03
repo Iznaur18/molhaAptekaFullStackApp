@@ -541,6 +541,8 @@ export function OrderCard({
   onOpenDispute,
   onCourierNameClick,
   onRaiseDeliveryFee,
+  onPayOrder,
+  isPayOrderPending = false,
   issuedHandoverCode = "",
   pendingActionKey = null,
   itemActionErrors = {},
@@ -651,6 +653,10 @@ export function OrderCard({
     !shipmentOwn?.paymentConfirmedAt &&
     (shipmentStatusNow === "in_delivery" || shipmentStatusNow === "delivered");
   const paymentConfirmed = Boolean(shipmentOwn?.paymentConfirmedAt);
+  // Заказ оформлен с предоплатой, а деньги не пришли: покупателю нужна
+  // кнопка «доплатить», продавцу — объяснение, почему нет кнопок сборки.
+  const awaitingPrepayment =
+    order.paymentMethod === "cardPrepaid" && !order.prepaidPaidAt;
   const payToRequisites =
     attentionRole === "buyer" ? (shipmentOwn?.sellerPayoutRequisites ?? "") : "";
   const canReplaceCourier =
@@ -849,6 +855,29 @@ export function OrderCard({
               : ORDER_CARD_UI.SHIPMENT_FEE_RAISE}
           </button>
           <span className="order-card__fee-hint">{ORDER_CARD_UI.SHIPMENT_FEE_HINT}</span>
+        </div>
+      ) : null}
+
+      {awaitingPrepayment ? (
+        <div className="order-card__awaiting-prepayment">
+          <strong>{ORDER_CARD_UI.AWAITING_PREPAYMENT}</strong>
+          <span>
+            {attentionRole === "seller"
+              ? ORDER_CARD_UI.AWAITING_PREPAYMENT_SELLER_HINT
+              : ORDER_CARD_UI.AWAITING_PREPAYMENT_BUYER_HINT}
+          </span>
+          {attentionRole === "buyer" && onPayOrder ? (
+            <button
+              type="button"
+              className="order-card__item-action-button"
+              onClick={() => onPayOrder({ orderId: order._id })}
+              disabled={isPayOrderPending}
+            >
+              {isPayOrderPending
+                ? ORDER_CARD_UI.PAY_NOW_PENDING
+                : ORDER_CARD_UI.PAY_NOW}
+            </button>
+          ) : null}
         </div>
       ) : null}
 

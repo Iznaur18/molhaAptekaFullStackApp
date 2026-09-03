@@ -14,6 +14,7 @@ import {
   INSTALLMENT_CONTRACT_STATUS_COMPLETED,
 } from "../../constants/installmentConstants.js";
 import { AppError } from "../../errors/AppError.js";
+import { assertOrderPrepaid } from "./assertOrderPrepaid.js";
 import { notifyBuyerAboutOrderItemStatus } from "./notifyBuyerAboutOrderItemStatus.js";
 import { notifySellerAboutOrderItemReturn } from "./notifySellerAboutOrderItemReturn.js";
 import { InstallmentContractModel, UserModel } from "../../models/index.js";
@@ -120,6 +121,7 @@ export async function markOrderItemDeliveredBySeller({
   userId,
 }) {
   const order = await loadOrderWithItems(orderId);
+  assertOrderPrepaid(order);
   const targetItem = getPopulatedOrderItemOrThrow(order, itemIndex);
   assertSellerOwnsOrderItem(targetItem, sellerId);
 
@@ -373,6 +375,7 @@ function resolveShipmentKindForItem(order, item) {
 
 export async function markOrderItemShippedBySeller({ orderId, itemIndex, sellerId }) {
   const order = await loadOrderWithItems(orderId);
+  assertOrderPrepaid(order);
   const targetItem = getPopulatedOrderItemOrThrow(order, itemIndex);
   assertSellerOwnsOrderItem(targetItem, sellerId);
 

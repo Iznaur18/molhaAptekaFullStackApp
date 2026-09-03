@@ -5,6 +5,7 @@ import { orderMatchesMyOrdersFilters } from "../../../entities/order/lib/filterM
 import { projectMyOrdersSellerBlocks } from "../../../entities/order/lib/projectMyOrdersSellerBlocks.js";
 import { summarizeMyOrders } from "../../../entities/order/lib/summarizeMyOrders.js";
 import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "../../../entities/order/model/myOrdersListFilters.js";
+import { useCreateOrderPaymentMutation } from "../../../entities/payment/model/paymentQueries.js";
 import { orderQueryKeys } from "../../../entities/order/model/orderQueryKeys.js";
 import { useMyOrdersQuery } from "../../../entities/order/model/useMyOrdersQuery.js";
 import { useOrderMutations } from "../../../entities/order/model/useOrderMutations.js";
@@ -53,6 +54,7 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
   const replaceCourierMutation = useReplaceShipmentCourierMutation();
   const openDisputeMutation = useOpenShipmentDisputeMutation();
   const raiseDeliveryFeeMutation = useRaiseDeliveryFeeMutation();
+  const createOrderPaymentMutation = useCreateOrderPaymentMutation();
   const [pendingActionKey, setPendingActionKey] = useState(null);
   const [itemActionErrors, setItemActionErrors] = useState({});
   const [loyaltyFlash, setLoyaltyFlash] = useState("");
@@ -294,6 +296,31 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
    * Покупатель поднимает сумму, если заказ долго никто не берёт. Снижать
    * нельзя: курьер мог уже согласиться на объявленную цену.
    */
+  // Оплата неоплаченного заказа: покупатель мог закрыть форму банка или
+  // уйти по ошибке — без этой кнопки заказ остаётся мёртвым.
+  const handlePayOrder = async ({ orderId }) => {
+    const actionKey = `${orderId}:pay`;
+    setPendingActionKey(actionKey);
+    setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+    try {
+      const payment = await createOrderPaymentMutation.mutateAsync({
+        orderId,
+        returnUrl: "/my-orders",
+      });
+      if (payment.confirmationUrl) {
+        window.location.assign(payment.confirmationUrl);
+        return;
+      }
+      setPendingActionKey("");
+    } catch (e) {
+      setPendingActionKey("");
+      setItemActionErrors((prev) => ({
+        ...prev,
+        [actionKey]: e instanceof Error ? e.message : ORDER_CARD_UI.ACTION_ERROR,
+      }));
+    }
+  };
+
   const handleRaiseDeliveryFee = async ({ orderId, deliveryFeeRub }) => {
     const actionKey = `${orderId}:shipment`;
     setPendingActionKey(actionKey);
@@ -391,6 +418,8 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
                 onReplaceCourier={handleReplaceCourier}
                 onOpenDispute={handleOpenDispute}
                 onRaiseDeliveryFee={handleRaiseDeliveryFee}
+                onPayOrder={handlePayOrder}
+                isPayOrderPending={pendingActionKey === `${block.order._id}:pay`}
                 onCourierNameClick={onSellerNameClick}
                 pendingActionKey={pendingActionKey}
                 itemActionErrors={itemActionErrors}

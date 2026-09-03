@@ -191,6 +191,8 @@ export const orderFromApiSchema = z
     totalAmount: z.number(),
     deliveryAddress: z.string(),
     paymentMethod: z.enum(ORDER_PAYMENT_METHODS),
+    /** Когда прошла предоплата картой; null — заказ ещё ждёт денег. */
+    prepaidPaidAt: z.union([z.string(), z.date(), z.null()]).optional(),
     status: z.enum(ORDER_STATUSES),
     fulfillmentMethod: z.enum(["pickup", "delivery"]).optional(),
     /** Отправления заказа — по одному на продавца. */
