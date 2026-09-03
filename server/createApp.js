@@ -11,6 +11,7 @@ import {
   orderRouter,
   courierRouter,
   sellerRouter,
+  paymentRouter,
   productRouter,
   cartRouter,
   favoritesRouter,
@@ -121,6 +122,7 @@ export const createApp = () => {
   app.use("/order", orderRouter);
   app.use("/couriers", courierRouter);
   app.use("/sellers", sellerRouter);
+  app.use("/payments", paymentRouter);
   app.use("/cart", cartRouter);
   app.use("/favorites", favoritesRouter);
   app.use("/product", productRouter);

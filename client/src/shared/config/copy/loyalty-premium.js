@@ -40,6 +40,12 @@ export const LOYALTY_POINTS_PAGE_UI = {
   PURCHASE_AMOUNT_MAX: (max) => `Не больше ${max} ₽`,
   BUY: "Купить",
   COMING_SOON: "Пополнение картой и по QR — скоро.",
+  PAY_REDIRECT: "Открываем страницу оплаты…",
+  PAY_ERROR: "Не удалось начать оплату",
+  PAY_PENDING: "Ждём подтверждения оплаты от банка…",
+  /** @param {number} points */
+  PAY_SUCCESS: (points) => `Оплата прошла — начислено ${points} баллов.`,
+  PAY_CANCELED: "Оплата не прошла. Деньги не списаны, можно попробовать снова.",
   /** @param {number} rub @param {number} points */
   COMING_SOON_AMOUNT: (rub, points) =>
     `Пополнение на ${rub} ₽ (${points} баллов) картой и по QR — скоро.`,

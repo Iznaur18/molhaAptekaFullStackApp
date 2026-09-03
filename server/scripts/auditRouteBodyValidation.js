@@ -34,6 +34,11 @@ const ALLOWED_WITHOUT_BODY_VALIDATION = new Set([
   // Тело `mode=file` — бинарный поток CommerceML, его читает сам контроллер
   // (роутер смонтирован до express.json). Параметры приходят в query.
   "onecExchangeRouter.js:POST:/",
+  // Уведомление ЮKassa. Схема тут дала бы ложную уверенность: телу мы не
+  // верим вовсе, из него берётся только `object.id`, а статус и сумма
+  // перезапрашиваются в API. Плюс жёсткая схема отвергала бы новые поля,
+  // которые провайдер вправе добавить в любой момент.
+  "paymentRouter.js:POST:/yookassa/webhook",
   "productRouter.js:POST:/raffles/unlock-create",
   "productRouter.js:POST:/raffles/cancel-create",
 ]);

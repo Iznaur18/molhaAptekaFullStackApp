@@ -19,6 +19,7 @@ export const DEV_API_PROXY_PREFIXES = [
   // Строго до "/seller": иначе `/sellers/...` попадёт в crawler-only ветку
   // и вместо API вернётся index.html.
   "/sellers",
+  "/payments",
   "/product",
   "/installment",
   "/price-offers",

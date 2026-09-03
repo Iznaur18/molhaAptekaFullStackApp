@@ -62,6 +62,12 @@ import {
   patchStaffSafeDealModerationController,
 } from "./Seller/sellerSafeDealController.js";
 import {
+  getPaymentConfigController,
+  createLoyaltyPointsPaymentController,
+  getMyPaymentController,
+  postYookassaWebhookController,
+} from "./Payment/paymentController.js";
+import {
   acceptShipmentController,
   completeDeliveryController,
   confirmHandoverController,
@@ -393,6 +399,10 @@ export {
   submitSellerSafeDealApplicationController,
   getStaffSafeDealApplicationsController,
   patchStaffSafeDealModerationController,
+  getPaymentConfigController,
+  createLoyaltyPointsPaymentController,
+  getMyPaymentController,
+  postYookassaWebhookController,
   acceptShipmentController,
   completeDeliveryController,
   confirmHandoverController,

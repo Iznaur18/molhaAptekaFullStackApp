@@ -171,6 +171,17 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    # Приём платежей и вебхук ЮKassa. Уведомление приходит от банка, без кук:
+    # без этого блока оно упрётся в SPA, а деньги останутся без начисления.
+    location /payments {
+        proxy_pass http://izibuy_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
     # Множественное число намеренно: SPA-роут /profile/safe-deal не должен
     # попадать в API по префиксу.
     location /sellers {

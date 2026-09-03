@@ -1,9 +1,19 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   LOYALTY_POINTS_ADMIN_FREE_CREDIT_MAX,
   LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN,
 } from "@molha/api-contract";
 
+import {
+  forgetPendingPaymentId,
+  readPendingPaymentId,
+  rememberPendingPaymentId,
+} from "../../../entities/payment/lib/pendingPaymentStorage.js";
+import {
+  useCreateLoyaltyPointsPaymentMutation,
+  useMyPaymentQuery,
+  usePaymentConfigQuery,
+} from "../../../entities/payment/model/paymentQueries.js";
 import { useAdminCreditOwnLoyaltyPointsMutation } from "../../../entities/user/model/useAdminCreditOwnLoyaltyPointsMutation.js";
 import { useMyLoyaltyPointsStatusQuery } from "../../../entities/user/model/useMyLoyaltyPointsStatusQuery.js";
 import { LOYALTY_POINTS_PAGE_UI } from "../../../shared/config/appUiCopy.js";
@@ -17,6 +27,7 @@ import { pluralizeRuBall } from "../../../shared/lib/pluralizeRuBall.js";
 import {
   LOYALTY_POINTS_PURCHASE_MAX_RUB,
   LOYALTY_POINTS_PURCHASE_MIN_RUB,
+  LOYALTY_POINTS_RETURN_PATH,
 } from "../model/loyaltyPointsPurchaseUiConstants.js";
 
 import "./LoyaltyPointsPage.css";
@@ -107,6 +118,32 @@ export function LoyaltyPointsPage({
   });
   const [purchaseAmountInput, setPurchaseAmountInput] = useState("");
   const [purchaseValidationError, setPurchaseValidationError] = useState("");
+  const [paymentError, setPaymentError] = useState("");
+  // Платёж, за которым следим после возврата с формы оплаты.
+  const [watchedPaymentId, setWatchedPaymentId] = useState("");
+
+  const paymentConfigQuery = usePaymentConfigQuery();
+  const createPaymentMutation = useCreateLoyaltyPointsPaymentMutation();
+  const isCardPaymentEnabled = paymentConfigQuery.data?.cardPaymentEnabled === true;
+
+  // Вернулись с оплаты — подхватываем платёж и ждём подтверждения банка.
+  useEffect(() => {
+    if (!new URLSearchParams(window.location.search).has("paid")) return;
+    const pendingId = readPendingPaymentId();
+    if (pendingId) {
+      setWatchedPaymentId(pendingId);
+    }
+  }, []);
+
+  const watchedPaymentQuery = useMyPaymentQuery({ paymentId: watchedPaymentId || null });
+  const watchedPayment = watchedPaymentQuery.data;
+
+  // Платёж дошёл до конца — больше следить не за чем.
+  useEffect(() => {
+    if (watchedPayment && watchedPayment.status !== "created") {
+      forgetPendingPaymentId();
+    }
+  }, [watchedPayment]);
   const [comingSoonMessage, setComingSoonMessage] = useState("");
   const [adminAmountInput, setAdminAmountInput] = useState("");
   const [adminValidationError, setAdminValidationError] = useState("");
@@ -154,8 +191,9 @@ export function LoyaltyPointsPage({
     setAdminSuccessMessage("");
   };
 
-  const handlePurchaseSubmit = () => {
+  const handlePurchaseSubmit = async () => {
     setComingSoonMessage("");
+    setPaymentError("");
     if (purchaseAmountRub == null) {
       setPurchaseValidationError(LOYALTY_POINTS_PAGE_UI.PURCHASE_AMOUNT_MIN(1));
       return;
@@ -174,9 +212,38 @@ export function LoyaltyPointsPage({
     }
 
     setPurchaseValidationError("");
-    setComingSoonMessage(
-      LOYALTY_POINTS_PAGE_UI.COMING_SOON_AMOUNT(purchaseAmountRub, purchasePointsPreview),
-    );
+
+    // Пока платёжный сервис не подключён, ведём себя как раньше — заглушкой,
+    // а не сломанной кнопкой.
+    if (!isCardPaymentEnabled) {
+      setComingSoonMessage(
+        LOYALTY_POINTS_PAGE_UI.COMING_SOON_AMOUNT(
+          purchaseAmountRub,
+          purchasePointsPreview,
+        ),
+      );
+      return;
+    }
+
+    try {
+      const payment = await createPaymentMutation.mutateAsync({
+        amountRub: purchaseAmountRub,
+        // Адрес возврата фиксируется при создании платежа, а id появляется
+        // только в ответе — поэтому id кладём в sessionStorage, а в ссылку
+        // возврата ставим просто флаг.
+        returnUrl: `${LOYALTY_POINTS_RETURN_PATH}?paid=1`,
+      });
+      rememberPendingPaymentId(payment.paymentId);
+      if (!payment.confirmationUrl) {
+        setPaymentError(LOYALTY_POINTS_PAGE_UI.PAY_ERROR);
+        return;
+      }
+      window.location.assign(payment.confirmationUrl);
+    } catch (error) {
+      setPaymentError(
+        error instanceof Error ? error.message : LOYALTY_POINTS_PAGE_UI.PAY_ERROR,
+      );
+    }
   };
 
   const handleAdminFreeCreditSubmit = async () => {
@@ -258,7 +325,8 @@ export function LoyaltyPointsPage({
   const canSubmitPurchase =
     purchaseAmountRub != null &&
     purchaseAmountRub >= LOYALTY_POINTS_PURCHASE_MIN_RUB &&
-    purchaseAmountRub <= LOYALTY_POINTS_PURCHASE_MAX_RUB;
+    purchaseAmountRub <= LOYALTY_POINTS_PURCHASE_MAX_RUB &&
+    !createPaymentMutation.isPending;
 
   const canSubmitAdminCredit =
     adminAmountPoints != null &&
@@ -333,6 +401,26 @@ export function LoyaltyPointsPage({
         {comingSoonMessage ? (
           <p className="loyalty-points-page__soon" role="status">
             {comingSoonMessage}
+          </p>
+        ) : null}
+        {paymentError ? (
+          <p className="loyalty-points-page__purchase-error" role="alert">
+            {paymentError}
+          </p>
+        ) : null}
+        {watchedPayment?.status === "created" ? (
+          <p className="loyalty-points-page__soon" role="status">
+            {LOYALTY_POINTS_PAGE_UI.PAY_PENDING}
+          </p>
+        ) : null}
+        {watchedPayment?.status === "succeeded" ? (
+          <p className="loyalty-points-page__soon" role="status">
+            {LOYALTY_POINTS_PAGE_UI.PAY_SUCCESS(watchedPayment.creditedPoints)}
+          </p>
+        ) : null}
+        {watchedPayment?.status === "canceled" ? (
+          <p className="loyalty-points-page__purchase-error" role="alert">
+            {LOYALTY_POINTS_PAGE_UI.PAY_CANCELED}
           </p>
         ) : null}
       </div>

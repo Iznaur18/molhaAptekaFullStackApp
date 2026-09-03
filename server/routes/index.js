@@ -9,6 +9,7 @@ import { userRouter } from "./userRouter.js";
 import { orderRouter } from "./orderRouter.js";
 import { courierRouter } from "./courierRouter.js";
 import { sellerRouter } from "./sellerRouter.js";
+import { paymentRouter } from "./paymentRouter.js";
 
 import { productRouter } from "./productRouter.js";
 
@@ -44,6 +45,7 @@ export {
   orderRouter,
   courierRouter,
   sellerRouter,
+  paymentRouter,
   productRouter,
   cartRouter,
   favoritesRouter,

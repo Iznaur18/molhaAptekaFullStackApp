@@ -20,6 +20,7 @@
 /intro-ad
 /onec
 /order
+/payments
 /price-offers
 /product
 /seller-personal-category
