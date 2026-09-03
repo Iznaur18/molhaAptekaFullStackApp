@@ -101,22 +101,31 @@ ssh "$SERVER" bash -se <<REMOTE
 REMOTE
 
 echo "==> [5/6] заливка свежего client/dist на сервер"
-tar czf - -C client/dist . | ssh "$SERVER" bash -se <<REMOTE
-  set -euo pipefail
-  cd "$REMOTE_DIR/client"
-  rm -rf dist.new
-  mkdir -p dist.new
-  tar xzf - -C dist.new
-  # Старые хешированные ассеты переносим в новый каталог: у части посетителей
-  # в кеше висит прошлый index.html, и без своих файлов он падает в белый
-  # экран (на iOS Safari — стабильно). Новые файлы не перезаписываем.
-  if [ -d dist/assets ]; then cp -rn dist/assets/. dist.new/assets/ 2>/dev/null || true; fi
-  ts=\$(date +%Y%m%d-%H%M%S)
-  mv dist "dist.prev-\$ts"
-  mv dist.new dist
-  # Держим два последних снимка для отката, старьё убираем.
-  ls -1dt dist.prev-* 2>/dev/null | tail -n +3 | xargs -r rm -rf
+# Скрипт передаём АРГУМЕНТОМ, а не heredoc'ом на stdin: stdin здесь занят
+# потоком tar. При `ssh … bash -se <<REMOTE` heredoc перебивал пайп — tar
+# локально падал в broken pipe, а удалённый `tar xzf -` вычитывал со stdin
+# остаток самого heredoc и ругался «not in gzip format». Шаг не работал
+# никогда, поэтому выкаты и делались руками.
+#
+# $REMOTE_DIR подставляется здесь, \$ts и \$(date) остаются серверу.
+UPLOAD_DIST_SCRIPT=$(cat <<REMOTE
+set -euo pipefail
+cd "$REMOTE_DIR/client"
+rm -rf dist.new
+mkdir -p dist.new
+tar xzf - -C dist.new
+# Старые хешированные ассеты переносим в новый каталог: у части посетителей
+# в кеше висит прошлый index.html, и без своих файлов он падает в белый
+# экран (на iOS Safari — стабильно). Новые файлы не перезаписываем.
+if [ -d dist/assets ]; then cp -rn dist/assets/. dist.new/assets/ 2>/dev/null || true; fi
+ts=\$(date +%Y%m%d-%H%M%S)
+mv dist "dist.prev-\$ts"
+mv dist.new dist
+# Держим два последних снимка для отката, старьё убираем.
+ls -1dt dist.prev-* 2>/dev/null | tail -n +3 | xargs -r rm -rf
 REMOTE
+)
+tar czf - -C client/dist . | ssh "$SERVER" "$UPLOAD_DIST_SCRIPT"
 
 echo "==> [6/6] health-check"
 curl -fsS "$HEALTH_URL" && echo
