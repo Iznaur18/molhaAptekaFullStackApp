@@ -128,6 +128,25 @@ REMOTE
 tar czf - -C client/dist . | ssh "$SERVER" "$UPLOAD_DIST_SCRIPT"
 
 echo "==> [6/6] health-check"
-curl -fsS "$HEALTH_URL" && echo
+# gitorg-api поднимается ~4 с (Mongo + индексы до bind:4444), и одиночный curl
+# сразу после рестарта стабильно ловил 502. Хуже, что деплой этого не замечал:
+# в `curl … && echo` сам curl выведен из-под errexit — он не последний в
+# &&-списке, — и скрипт печатал «Готово» с кодом 0 поверх лежащего прода.
+# Ретраим до 20 с и падаем явно.
+HEALTH_BODY=""
+for attempt in $(seq 1 40); do
+  if HEALTH_BODY="$(curl -fsS -m 5 "$HEALTH_URL" 2>/dev/null)"; then
+    echo "    здоров с попытки $attempt: $HEALTH_BODY"
+    break
+  fi
+  sleep 0.5
+done
+if [ -z "$HEALTH_BODY" ]; then
+  echo "ОШИБКА: $HEALTH_URL не ответил за 20 с после рестарта." >&2
+  echo "Смотри: ssh $SERVER 'journalctl -u gitorg-api -n 50 --no-pager'" >&2
+  echo "Откат клиента: на сервере в $REMOTE_DIR/client лежат снимки dist.prev-*" >&2
+  exit 1
+fi
+
 echo
 echo "✅ Готово. Открой https://gitorg.ru и обнови Ctrl+F5."
