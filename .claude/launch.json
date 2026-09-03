@@ -35,11 +35,12 @@
     },
     {
       "name": "Mobile (Expo Web)",
-      "runtimeExecutable": "npm",
+      "runtimeExecutable": "npx",
       "runtimeArgs": [
-        "run",
-        "web",
-        "--",
+        "expo",
+        "start",
+        "--web",
+        "--go",
         "--port",
         "8082"
       ],
@@ -56,6 +57,17 @@
       ],
       "cwd": "client",
       "port": 4173,
+      "autoPort": false
+    },
+    {
+      "name": "Mobile (Expo Go)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "start:go"
+      ],
+      "cwd": "mobile",
+      "port": 8081,
       "autoPort": false
     }
   ]
