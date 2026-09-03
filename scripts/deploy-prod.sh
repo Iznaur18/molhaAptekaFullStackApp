@@ -8,7 +8,7 @@
 # Что делает:
 #   1. git push origin main (код уезжает на GitHub)
 #   2. собирает client ЛОКАЛЬНО (VPS слабый по RAM — не собираем там)
-#   3. заливает готовый client/dist на сервер (замена целиком)
+#   3. заливает готовый client/dist на сервер (старые ассеты сохраняются)
 #   4. на сервере: git pull + deps (contract, shared-lib, server) +
 #      миграции + рестарт gitorg-api / gitorg-worker
 #   5. проверяет https://gitorg.ru/health
@@ -46,9 +46,19 @@ REMOTE
 echo "==> [4/5] заливка свежего client/dist на сервер"
 tar czf - -C client/dist . | ssh "$SERVER" bash -se <<REMOTE
   set -euo pipefail
-  rm -rf "$REMOTE_DIR/client/dist"
-  mkdir -p "$REMOTE_DIR/client/dist"
-  tar xzf - -C "$REMOTE_DIR/client/dist"
+  cd "$REMOTE_DIR/client"
+  rm -rf dist.new
+  mkdir -p dist.new
+  tar xzf - -C dist.new
+  # Старые хешированные ассеты переносим в новый каталог: у части посетителей
+  # в кеше висит прошлый index.html, и без своих файлов он падает в белый
+  # экран (на iOS Safari — стабильно). Новые файлы не перезаписываем.
+  if [ -d dist/assets ]; then cp -rn dist/assets/. dist.new/assets/ 2>/dev/null || true; fi
+  ts=\$(date +%Y%m%d-%H%M%S)
+  mv dist "dist.prev-\$ts"
+  mv dist.new dist
+  # Держим два последних снимка для отката, старьё убираем.
+  ls -1dt dist.prev-* 2>/dev/null | tail -n +3 | xargs -r rm -rf
 REMOTE
 
 echo "==> [5/5] health-check"

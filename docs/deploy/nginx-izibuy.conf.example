@@ -403,6 +403,11 @@ server {
         # HSTS — только по HTTPS (браузер игнорирует по HTTP). Если certbot уже
         # добавляет Strict-Transport-Security — удали эту строку, чтобы не дублировать.
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+        # Оболочку SPA кешировать нельзя. Без Cache-Control Safari (особенно на
+        # iOS) держит старый index.html эвристически и просит ассеты, которых
+        # после выката уже нет, — получается белый экран вместо сайта.
+        # Хешированные файлы это не трогает: у /assets/ свой immutable-блок.
+        add_header Cache-Control "no-cache" always;
         try_files $uri $uri/ /index.html;
     }
 

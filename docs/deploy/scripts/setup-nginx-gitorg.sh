@@ -63,4 +63,5 @@ elif ! grep -q "ssl_certificate" "${SITE}"; then
   echo
   echo "ВАЖНО: сертификат в системе есть, а в конфиге его нет. Верните HTTPS:"
   echo "  certbot install --cert-name gitorg.ru --nginx --non-interactive"
+  echo "  и допишите http2 в listen 443 — certbot ставит только 'listen 443 ssl;'"
 fi
