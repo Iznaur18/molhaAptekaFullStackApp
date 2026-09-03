@@ -1,11 +1,23 @@
 import {
-  ORDER_STATUS_CANCELLED,
   ORDER_STATUS_CONFIRMED,
   ORDER_STATUS_PENDING,
+  ORDER_TERMINAL_STATUSES,
 } from "../../constants/orderConstants.js";
 import { OrderModel } from "../../models/index.js";
 
-const SALE_CLOSED_ITEM_STATUSES = [ORDER_STATUS_CONFIRMED, ORDER_STATUS_CANCELLED];
+/**
+ * Позиции, которые товар уже не держат: покупатель подтвердил получение либо
+ * сделка оборвалась терминально — отмена и возврат.
+ *
+ * `returned` сюда раньше не входил, хотя остаток он освобождает наравне с
+ * отменой (ORDER_STOCK_RESERVING_STATUSES). Из-за этого отказ покупателя у
+ * двери запирал товар навсегда: подтвердить такую позицию уже некому, и
+ * продавец до конца жизни товара не мог ни скрыть его, ни удалить.
+ */
+const SALE_CLOSED_ITEM_STATUSES = [
+  ORDER_STATUS_CONFIRMED,
+  ...ORDER_TERMINAL_STATUSES,
+];
 
 const SALE_CLOSED_STATUS_SET = new Set(SALE_CLOSED_ITEM_STATUSES);
 

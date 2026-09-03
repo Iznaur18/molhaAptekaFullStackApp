@@ -20,6 +20,39 @@ import {
 const buildOwnerFilter = (productId, userId, isAdmin) =>
   isAdmin ? { _id: productId } : { _id: productId, productSeller: userId };
 
+const hasBodyField = (body, field) =>
+  Object.prototype.hasOwnProperty.call(body, field);
+
+/**
+ * Замок незакрытых продаж сторожит ровно то, что названо в его сообщении:
+ * снятие товара с витрины и включение аукциона (удаление живёт в своём
+ * контроллере). Клиент гасит по `hasOpenSales` те же действия.
+ *
+ * Раньше замок стоял на входе в PATCH и валил любую правку: продавец с одним
+ * живым заказом не мог поправить даже опечатку в описании и получал в ответ
+ * «Нельзя скрыть или удалить».
+ *
+ * @param {Record<string, unknown>} body
+ * @param {Record<string, unknown>} existing
+ */
+const patchTouchesOpenSalesLock = (body, existing) => {
+  if (hasBodyField(body, "productIsAvailable") && body.productIsAvailable === false) {
+    return existing.productIsAvailable !== false;
+  }
+  if (
+    hasBodyField(body, "productStockQuantity") &&
+    Number(body.productStockQuantity) === 0
+  ) {
+    return existing.productIsAvailable !== false;
+  }
+  if (hasBodyField(body, "productAuctionEnabled")) {
+    return (
+      Boolean(body.productAuctionEnabled) !== (existing.productAuctionEnabled === true)
+    );
+  }
+  return false;
+};
+
 /**
  * @param {{
  *   userId: string;
@@ -30,14 +63,17 @@ const buildOwnerFilter = (productId, userId, isAdmin) =>
 export async function patchMyProduct({ userId, productId, body }) {
   const isAdmin = await isUserAdmin(userId);
 
-  if (await hasProductOpenSales(productId)) {
-    throw new AppError(409, OPEN_SALES_BLOCK_MESSAGE);
-  }
-
   const ownerFilter = buildOwnerFilter(productId, userId, isAdmin);
   const existing = await ProductModel.findOne(ownerFilter);
   if (!existing) {
     throw new AppError(404, "Товар не найден или нет прав на изменение");
+  }
+
+  if (
+    patchTouchesOpenSalesLock(body, existing) &&
+    (await hasProductOpenSales(productId))
+  ) {
+    throw new AppError(409, OPEN_SALES_BLOCK_MESSAGE);
   }
 
   const {
