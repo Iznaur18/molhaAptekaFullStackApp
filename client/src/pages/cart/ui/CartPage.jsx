@@ -13,6 +13,11 @@ import {
   groupCartLinesBySeller,
   resolveCartFulfillmentBySeller,
 } from "../../../entities/cart/lib/groupCartLinesBySeller.js";
+import {
+  useCardPrepaidAvailable,
+  useCreateOrderPaymentMutation,
+} from "../../../entities/payment/model/paymentQueries.js";
+import { ORDER_PAYMENT_METHOD_CARD_PREPAID } from "../../../entities/order/model/constants.js";
 import { selectCartCheckoutSummary } from "../../../entities/cart/lib/selectCartCheckoutSummary.js";
 import { selectCartLines } from "../../../entities/cart/lib/selectCartLines.js";
 import { useCart } from "../../../entities/cart/model/useCart.js";
@@ -198,6 +203,14 @@ export function CartPage({
     () => groupCartLinesBySeller(visibleLines),
     [visibleLines],
   );
+
+  // Предоплата картой доступна, только если весь заказ — товар площадки.
+  const cartSellerIds = useMemo(
+    () => sellerGroups.map((group) => String(group.sellerId)),
+    [sellerGroups],
+  );
+  const cardPrepaidAvailable = useCardPrepaidAvailable({ sellerIds: cartSellerIds });
+  const createOrderPaymentMutation = useCreateOrderPaymentMutation();
 
   const purchasableIds = useMemo(
     () => visibleLines.map((line) => line.productId),
@@ -438,7 +451,7 @@ export function CartPage({
       (line) => line.productId,
     );
     try {
-      await createOrderMutation.mutateAsync({
+      const createdOrder = await createOrderMutation.mutateAsync({
         items: activeSummary.selectedLines.map((line) => ({
           productId: line.productId,
           quantity: line.quantity,
@@ -453,6 +466,20 @@ export function CartPage({
       });
       removeItems(orderedProductIds);
       setIsCartCheckoutOpen(false);
+
+      // Предоплата: заказ создан, теперь его надо оплатить. Уводим на форму
+      // банка сразу — возвращаться в корзину за оплатой покупатель не станет.
+      if (paymentMethod === ORDER_PAYMENT_METHOD_CARD_PREPAID && createdOrder?._id) {
+        const payment = await createOrderPaymentMutation.mutateAsync({
+          orderId: String(createdOrder._id),
+          returnUrl: "/my-orders",
+        });
+        if (payment.confirmationUrl) {
+          window.location.assign(payment.confirmationUrl);
+          return;
+        }
+      }
+
       setSubmitState({
         isSubmitting: false,
         error: "",
@@ -580,6 +607,7 @@ export function CartPage({
         fulfillmentMode={cartFulfillmentMode}
         courierDelivery={checkoutCourierDelivery}
         deliveryProductIds={deliveryProductIds}
+        cardPrepaidAvailable={cardPrepaidAvailable}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}
         submitSuccess={submitState.success}

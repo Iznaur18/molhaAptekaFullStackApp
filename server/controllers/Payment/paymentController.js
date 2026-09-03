@@ -1,15 +1,38 @@
 import { createLoyaltyPointsTopUp } from "../../services/payments/loyaltyPointsTopUp.js";
 import {
+  createOrderPrepayment,
+  isOrderPrepaymentAvailable,
+} from "../../services/payments/orderPrepayment.js";
+import {
   handleYookassaNotification,
   syncPaymentForUser,
 } from "../../services/payments/yookassaWebhook.js";
+import { resolvePlatformSellerUserIds } from "../../constants/yookassaConstants.js";
 import { isYookassaConfigured } from "../../services/payments/yookassaClient.js";
 import { successRes } from "../../services/http/index.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
 /** `GET /payments/config` — доступна ли оплата картой вообще. */
 export const getPaymentConfigController = async (_req, res) => {
-  return successRes(res, { cardPaymentEnabled: isYookassaConfigured() });
+  return successRes(res, {
+    cardPaymentEnabled: isYookassaConfigured(),
+    // Id продавцов, за чей товар площадка принимает предоплату. Публичные
+    // идентификаторы: по ним чекаут решает, показывать ли «картой заранее».
+    cardPrepaidSellerIds: isOrderPrepaymentAvailable()
+      ? resolvePlatformSellerUserIds()
+      : [],
+  });
+};
+
+/** `POST /payments/order/:orderId` — предоплата заказа картой. */
+export const createOrderPaymentController = async (req, res) => {
+  const result = await createOrderPrepayment({
+    userId: String(req.userId),
+    orderId: req.params.orderId,
+    returnUrl: req.body.returnUrl,
+    idempotencyKey: req.body.idempotencyKey,
+  });
+  return successRes(res, { payment: result });
 };
 
 /** `POST /payments/loyalty-points` — создать платёж на пополнение баллов. */

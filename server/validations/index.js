@@ -83,6 +83,7 @@ import {
 } from "./seller/sellerSafeDealValidation.js";
 import {
   loyaltyPointsPaymentValidation,
+  orderPaymentValidation,
   paymentIdParamsValidation,
 } from "./payment/paymentValidation.js";
 import {
@@ -235,6 +236,7 @@ export {
   staffSafeDealListValidation,
   staffSafeDealModerationValidation,
   loyaltyPointsPaymentValidation,
+  orderPaymentValidation,
   paymentIdParamsValidation,
   courierHandoverCodeValidation,
   courierShipmentValidation,

@@ -39,6 +39,13 @@ const paymentSchema = new mongoose.Schema(
       default: PAYMENT_STATUS_CREATED,
       index: true,
     },
+    /** Заказ, если платёж — предоплата заказа. */
+    orderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Order",
+      default: null,
+      index: true,
+    },
     /** Идентификатор платежа в ЮKassa. */
     providerPaymentId: {
       type: String,

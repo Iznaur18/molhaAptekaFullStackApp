@@ -1,10 +1,12 @@
 import {
   PAYMENT_PURPOSE_LOYALTY_POINTS,
+  PAYMENT_PURPOSE_ORDER,
   YOOKASSA_WEBHOOK_EVENTS,
 } from "../../constants/yookassaConstants.js";
 import { PaymentModel } from "../../models/index.js";
 import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { applyLoyaltyPointsTopUp } from "./loyaltyPointsTopUp.js";
+import { applyOrderPrepayment } from "./orderPrepayment.js";
 import { getYookassaPayment } from "./yookassaClient.js";
 
 /**
@@ -56,16 +58,23 @@ export async function handleYookassaNotification(body) {
   const providerStatus = String(providerPayment?.status ?? "");
   const providerAmountRub = Number(providerPayment?.amount?.value ?? 0);
 
-  if (payment.purpose === PAYMENT_PURPOSE_LOYALTY_POINTS) {
-    const result = await applyLoyaltyPointsTopUp({
-      paymentId: String(payment._id),
-      providerStatus,
-      providerAmountRub,
-    });
-    return { handled: true, ...result };
+  const apply =
+    payment.purpose === PAYMENT_PURPOSE_LOYALTY_POINTS
+      ? applyLoyaltyPointsTopUp
+      : payment.purpose === PAYMENT_PURPOSE_ORDER
+        ? applyOrderPrepayment
+        : null;
+
+  if (!apply) {
+    return { handled: false, reason: "purpose_unsupported" };
   }
 
-  return { handled: false, reason: "purpose_unsupported" };
+  const result = await apply({
+    paymentId: String(payment._id),
+    providerStatus,
+    providerAmountRub,
+  });
+  return { handled: true, ...result };
 }
 
 /**
@@ -85,8 +94,14 @@ export async function syncPaymentForUser({ userId, paymentId }) {
   if (payment.status === "created" && payment.providerPaymentId) {
     try {
       const providerPayment = await getYookassaPayment(payment.providerPaymentId);
-      if (payment.purpose === PAYMENT_PURPOSE_LOYALTY_POINTS) {
-        await applyLoyaltyPointsTopUp({
+      const apply =
+        payment.purpose === PAYMENT_PURPOSE_LOYALTY_POINTS
+          ? applyLoyaltyPointsTopUp
+          : payment.purpose === PAYMENT_PURPOSE_ORDER
+            ? applyOrderPrepayment
+            : null;
+      if (apply) {
+        await apply({
           paymentId: String(payment._id),
           providerStatus: String(providerPayment?.status ?? ""),
           providerAmountRub: Number(providerPayment?.amount?.value ?? 0),

@@ -1,5 +1,6 @@
 import {
   createLoyaltyPointsPaymentController,
+  createOrderPaymentController,
   getMyPaymentController,
   getPaymentConfigController,
   postYookassaWebhookController,
@@ -7,6 +8,7 @@ import {
 import { checkAuthMW } from "../middlewares/index.js";
 import {
   loyaltyPointsPaymentValidation,
+  orderPaymentValidation,
   paymentIdParamsValidation,
 } from "../validations/index.js";
 import { createAsyncRouter } from "../utils/createAsyncRouter.js";
@@ -25,6 +27,13 @@ router.post(
   checkAuthMW,
   loyaltyPointsPaymentValidation,
   createLoyaltyPointsPaymentController,
+);
+
+router.post(
+  "/order/:orderId",
+  checkAuthMW,
+  orderPaymentValidation,
+  createOrderPaymentController,
 );
 
 // Ниже маршрутов с фиксированным префиксом: иначе `/config` уедет сюда.

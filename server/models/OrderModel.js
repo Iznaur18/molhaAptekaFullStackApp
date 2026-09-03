@@ -433,6 +433,16 @@ const OrderSchema = new mongoose.Schema(
       required: true,
       enum: ORDER_PAYMENT_METHODS,
     },
+    /**
+     * Предоплата картой. Заполняется только подтверждённым платежом, а не
+     * фактом перехода покупателя на форму оплаты.
+     */
+    prepaidPaidAt: { type: Date, default: null },
+    prepaidPaymentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Payment",
+      default: null,
+    },
     status: {
       type: String,
       required: true,

@@ -91,6 +91,7 @@ export function CheckoutForm({
   submitSuccess,
   onSubmit,
   isDisabled = false,
+  cardPrepaidAvailable = false,
   dockSubmit = false,
   pinSubmitToBottom = false,
   showHeading = true,
@@ -625,6 +626,7 @@ export function CheckoutForm({
             onChange={setPaymentMethod}
             disabled={isDisabled || isSubmitting}
             legend={CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD}
+            cardPrepaidAvailable={cardPrepaidAvailable}
           />
 
           {displayError ? (

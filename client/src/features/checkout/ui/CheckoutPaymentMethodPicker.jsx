@@ -1,4 +1,5 @@
 import {
+  ORDER_PAYMENT_METHOD_CARD_PREPAID,
   ORDER_PAYMENT_METHOD_LABEL_RU,
   ORDER_PAYMENT_METHODS,
   ORDER_PAYMENT_METHODS_SELECTABLE,
@@ -15,6 +16,7 @@ const SELECTABLE_SET = new Set(ORDER_PAYMENT_METHODS_SELECTABLE);
  *   onChange: (method: string) => void;
  *   disabled?: boolean;
  *   legend: string;
+ *   cardPrepaidAvailable?: boolean;
  * }} props
  */
 export function CheckoutPaymentMethodPicker({
@@ -22,13 +24,17 @@ export function CheckoutPaymentMethodPicker({
   onChange,
   disabled = false,
   legend,
+  cardPrepaidAvailable = false,
 }) {
+  const selectableSet = cardPrepaidAvailable
+    ? new Set([...SELECTABLE_SET, ORDER_PAYMENT_METHOD_CARD_PREPAID])
+    : SELECTABLE_SET;
   return (
     <div className="checkout-payment-method-picker">
       <div className="checkout-payment-method-picker__legend">{legend}</div>
       <div className="checkout-payment-method-picker__scroll" role="radiogroup" aria-label={legend}>
         {ORDER_PAYMENT_METHODS.map((method) => {
-          const isSelectable = SELECTABLE_SET.has(method);
+          const isSelectable = selectableSet.has(method);
           const isSelected = value === method;
           const isLocked = !isSelectable;
           const cardClassName = [

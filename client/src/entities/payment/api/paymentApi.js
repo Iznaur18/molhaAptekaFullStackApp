@@ -41,6 +41,23 @@ export async function createLoyaltyPointsPayment(payload) {
 }
 
 /**
+ * `POST /payments/order/:orderId` — предоплата заказа картой.
+ *
+ * @param {{ orderId: string; returnUrl: string; idempotencyKey?: string }} payload
+ */
+export async function createOrderPayment({ orderId, ...body }) {
+  try {
+    const { data } = await apiClient.post(`/payments/order/${orderId}`, body);
+    if (!data?.success || !data.data?.payment) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+    return data.data.payment;
+  } catch (e) {
+    throw new Error(toMessage(e));
+  }
+}
+
+/**
  * `GET /payments/:paymentId` — статус своего платежа после возврата с оплаты.
  *
  * @param {string} paymentId

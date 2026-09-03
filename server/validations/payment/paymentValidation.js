@@ -1,5 +1,7 @@
 import {
   loyaltyPointsPaymentBodySchema,
+  orderPaymentBodySchema,
+  orderPaymentParamsSchema,
   paymentIdParamsSchema,
 } from "@molha/api-contract";
 
@@ -11,3 +13,8 @@ export const loyaltyPointsPaymentValidation = [
 ];
 
 export const paymentIdParamsValidation = [validateParamsZod(paymentIdParamsSchema)];
+
+export const orderPaymentValidation = [
+  validateParamsZod(orderPaymentParamsSchema),
+  validateBodyZod(orderPaymentBodySchema),
+];

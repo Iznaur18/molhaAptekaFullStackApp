@@ -43,3 +43,13 @@ export const loyaltyPointsPaymentBodySchema = z.object({
 export const paymentIdParamsSchema = z.object({
   paymentId: mongoIdSchema,
 });
+
+export const orderPaymentParamsSchema = z.object({
+  orderId: mongoIdSchema,
+});
+
+/** Body `POST /payments/order/:orderId`. */
+export const orderPaymentBodySchema = z.object({
+  returnUrl: returnUrlSchema,
+  idempotencyKey: z.string().trim().min(1).max(64).optional(),
+});

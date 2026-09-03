@@ -731,6 +731,8 @@ export {
   PAYMENT_STATUS_CANCELED,
   loyaltyPointsPaymentBodySchema,
   paymentIdParamsSchema,
+  orderPaymentParamsSchema,
+  orderPaymentBodySchema,
 } from "./payments.js";
 export {
   authMeDataSchema,

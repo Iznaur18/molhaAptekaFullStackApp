@@ -43,6 +43,7 @@ export function CheckoutSheetModal({
   fulfillmentMode = null,
   courierDelivery = null,
   deliveryProductIds = [],
+  cardPrepaidAvailable = false,
   isSubmitting,
   submitError,
   submitSuccess,
@@ -126,6 +127,7 @@ export function CheckoutSheetModal({
             fulfillmentMode={fulfillmentMode}
             courierDelivery={courierDelivery}
             deliveryProductIds={deliveryProductIds}
+            cardPrepaidAvailable={cardPrepaidAvailable}
             isSubmitting={isSubmitting}
             submitError={submitError}
             submitSuccess={submitSuccess}

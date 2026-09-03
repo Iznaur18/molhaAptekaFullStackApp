@@ -19,6 +19,7 @@ import { resolveOrderFulfillmentSplit } from "./resolveOrderFulfillmentSplit.js"
 import { resolveDeliveryFeesBySeller } from "../courier/courierDeliveryFee.js";
 import {
   COURIER_DELIVERY_CASH_FORBIDDEN_MESSAGE,
+  ORDER_PAYMENT_METHOD_CARD_PREPAID,
   ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
   SELLER_PAYOUT_REQUISITES_REQUIRED_MESSAGE,
 } from "../../constants/orderConstants.js";
@@ -26,6 +27,12 @@ import { ADDRESS_LINE_MAX_LENGTH } from "../../constants/dadataConstants.js";
 import { USER_BLOCK_CART_ORDER_MESSAGE } from "../../constants/userBlockConstants.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { AppError } from "../../errors/AppError.js";
+import { YOOKASSA_NOT_CONFIGURED_MESSAGE } from "../../constants/yookassaConstants.js";
+import {
+  areAllSellersPlatformOwned,
+  isOrderPrepaymentAvailable,
+  ORDER_PREPAYMENT_FOREIGN_SELLER_MESSAGE,
+} from "../payments/orderPrepayment.js";
 import {
   CartModel,
   OrderModel,
@@ -572,6 +579,21 @@ export async function createOrder({
       carrier === PRODUCT_DELIVERY_CARRIER_GITORG,
     ]),
   );
+
+  // Предоплата картой означает, что деньги придут на счёт площадки. За чужой
+  // товар это уже агентская схема со сплитом, поэтому проверяем продавцов
+  // здесь, а не только в UI: чекаут можно позвать и мимо формы.
+  if (paymentMethod === ORDER_PAYMENT_METHOD_CARD_PREPAID) {
+    if (!isOrderPrepaymentAvailable()) {
+      throw new AppError(503, YOOKASSA_NOT_CONFIGURED_MESSAGE);
+    }
+    const sellerRefs = Object.values(productById).map((row) => ({
+      sellerId: row?.sellerId,
+    }));
+    if (!areAllSellersPlatformOwned(sellerRefs)) {
+      throw new AppError(400, ORDER_PREPAYMENT_FOREIGN_SELLER_MESSAGE);
+    }
+  }
 
   /** @type {Record<string, string>} */
   let payoutRequisitesBySeller = {};

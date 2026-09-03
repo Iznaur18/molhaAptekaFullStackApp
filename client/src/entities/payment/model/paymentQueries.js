@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   createLoyaltyPointsPayment,
+  createOrderPayment,
   fetchMyPayment,
   fetchPaymentConfig,
 } from "../api/paymentApi.js";
@@ -25,6 +26,28 @@ export function usePaymentConfigQuery({ enabled = true } = {}) {
 
 export function useCreateLoyaltyPointsPaymentMutation() {
   return useMutation({ mutationFn: createLoyaltyPointsPayment });
+}
+
+export function useCreateOrderPaymentMutation() {
+  return useMutation({ mutationFn: createOrderPayment });
+}
+
+/**
+ * Можно ли платить картой заранее за эту корзину.
+ *
+ * Пока деньги идут на счёт площадки, предоплата доступна только за её
+ * собственный товар: за чужой это уже сплит.
+ *
+ * @param {{ sellerIds: string[] }} params
+ */
+export function useCardPrepaidAvailable({ sellerIds }) {
+  const configQuery = usePaymentConfigQuery();
+  const allowed = configQuery.data?.cardPrepaidSellerIds ?? [];
+  if (allowed.length === 0 || sellerIds.length === 0) {
+    return false;
+  }
+  const allowedSet = new Set(allowed.map(String));
+  return sellerIds.every((id) => allowedSet.has(String(id)));
 }
 
 /**

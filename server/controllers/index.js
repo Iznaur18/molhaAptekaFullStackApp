@@ -64,6 +64,7 @@ import {
 import {
   getPaymentConfigController,
   createLoyaltyPointsPaymentController,
+  createOrderPaymentController,
   getMyPaymentController,
   postYookassaWebhookController,
 } from "./Payment/paymentController.js";
@@ -401,6 +402,7 @@ export {
   patchStaffSafeDealModerationController,
   getPaymentConfigController,
   createLoyaltyPointsPaymentController,
+  createOrderPaymentController,
   getMyPaymentController,
   postYookassaWebhookController,
   acceptShipmentController,

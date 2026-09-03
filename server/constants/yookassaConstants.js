@@ -23,10 +23,36 @@ export const YOOKASSA_PAYMENT_STATUSES = Object.freeze([
   YOOKASSA_PAYMENT_STATUS_CANCELED,
 ]);
 
-/** За что платит пользователь. Пока только баллы — товары ждут сплита. */
+/** За что платит пользователь. */
 export const PAYMENT_PURPOSE_LOYALTY_POINTS = "loyalty_points";
+/**
+ * Предоплата заказа.
+ *
+ * Пока — только товары самой площадки: деньги приходят на её же счёт. Для
+ * чужих продавцов сюда добавится сплит, и это будет тот же платёж с массивом
+ * получателей, а не другая схема.
+ */
+export const PAYMENT_PURPOSE_ORDER = "order";
 
-export const PAYMENT_PURPOSES = Object.freeze([PAYMENT_PURPOSE_LOYALTY_POINTS]);
+export const PAYMENT_PURPOSES = Object.freeze([
+  PAYMENT_PURPOSE_LOYALTY_POINTS,
+  PAYMENT_PURPOSE_ORDER,
+]);
+
+/**
+ * Продавцы, за чей товар площадка вправе принимать деньги на свой счёт.
+ *
+ * Сейчас это она сама. Пустой список выключает предоплату картой вовсе —
+ * безопасное значение по умолчанию: случайно собрать чужие деньги нельзя.
+ *
+ * @returns {string[]}
+ */
+export function resolvePlatformSellerUserIds() {
+  return String(process.env.PLATFORM_SELLER_USER_IDS ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+}
 
 /** Наш внутренний статус платежа: не путать со статусом у провайдера. */
 export const PAYMENT_STATUS_CREATED = "created";
@@ -63,6 +89,9 @@ export const YOOKASSA_VAT_CODE_DEFAULT = 1;
  * («платёж»), а не `commodity`.
  */
 export const YOOKASSA_POINTS_PAYMENT_SUBJECT = "payment";
+
+/** Товар в чеке заказа — обычный предмет расчёта. */
+export const YOOKASSA_ORDER_PAYMENT_SUBJECT = "commodity";
 
 /** Признак способа расчёта: полная оплата в момент покупки. */
 export const YOOKASSA_POINTS_PAYMENT_MODE = "full_payment";

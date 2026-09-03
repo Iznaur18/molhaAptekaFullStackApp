@@ -20,6 +20,7 @@ import { PaymentModel, UserModel } from "../../models/index.js";
 import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { creditLoyaltyPoints } from "../loyalty/loyaltyPointsSpend.js";
 import { logMoneyEvent } from "../loyalty/logMoneyEvent.js";
+import { buildReturnUrl } from "./paymentReturnUrl.js";
 import { createYookassaPayment, isYookassaConfigured } from "./yookassaClient.js";
 
 /** 1 ₽ = 1 балл — как в `loyaltyPointsConstants.js` на клиенте. */
@@ -84,28 +85,6 @@ function buildLoyaltyPointsReceipt({ amountRub, email, phone }) {
   };
 }
 
-/**
- * Абсолютный адрес возврата для ЮKassa.
- *
- * Origin берём из `FRONTEND_URL`, а не из тела запроса: клиент передаёт только
- * путь внутри сайта, иначе кнопка оплаты стала бы открытым редиректом.
- *
- * @param {string} relativePath
- */
-function buildReturnUrl(relativePath) {
-  const origin = String(process.env.FRONTEND_URL ?? "")
-    .split(",")[0]
-    .trim()
-    .replace(/\/+$/, "");
-  if (!origin) {
-    throw new AppError(500, "Не настроен FRONTEND_URL — некуда возвращать после оплаты");
-  }
-  const path = String(relativePath ?? "").trim();
-  if (!path.startsWith("/") || path.startsWith("//")) {
-    throw new AppError(400, "Адрес возврата должен быть путём внутри сайта");
-  }
-  return `${origin}${path}`;
-}
 
 /**
  * Создать платёж на пополнение баллов и вернуть ссылку на оплату.
