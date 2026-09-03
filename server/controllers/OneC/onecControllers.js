@@ -24,9 +24,12 @@ export const getOneCSettingsController = async (req, res) => {
 export const putOneCSettingsController = async (req, res) => {
   const settings = await saveSellerOneCSettings(req.userId, {
     enabled: req.body.enabled,
+    channel: req.body.channel,
     baseUrl: req.body.baseUrl,
     apiKey: req.body.apiKey,
     clearApiKey: req.body.clearApiKey === true,
+    priceTypeIds: req.body.priceTypeIds,
+    warehouseIds: req.body.warehouseIds,
   });
   return successRes(res, {
     message: "Настройки 1С сохранены",
