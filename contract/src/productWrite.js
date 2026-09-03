@@ -28,7 +28,7 @@ import {
 import { productFlashSalePatchFieldsShape } from "./productFlashSale.js";
 import { productOutOfStockLabelFieldSchema } from "./productOutOfStockLabel.js";
 import {
-  productDeliveryCarrierSchema,
+  productDeliveryCarrierWriteSchema,
   productShipsToBuyer,
 } from "./productDeliveryCarrier.js";
 import { productInstagramPostUrlFieldSchema } from "./productInstagramPostUrl.js";
@@ -257,7 +257,7 @@ export const createProductBodySchema = z
     productPickupEnabled: z.coerce.boolean().optional(),
     productDeliveryEnabled: z.coerce.boolean().optional(),
     productCourierDeliveryEnabled: z.coerce.boolean().optional(),
-    productDeliveryCarrier: productDeliveryCarrierSchema.optional(),
+    productDeliveryCarrier: productDeliveryCarrierWriteSchema.optional(),
     productArticle: z.string().trim().max(64).optional(),
   })
   .superRefine(assertCreateProductRequiresPhoto)
@@ -341,7 +341,7 @@ const patchFieldShape = {
   productPickupEnabled: z.coerce.boolean().optional(),
   productDeliveryEnabled: z.coerce.boolean().optional(),
   productCourierDeliveryEnabled: z.coerce.boolean().optional(),
-  productDeliveryCarrier: productDeliveryCarrierSchema.optional(),
+  productDeliveryCarrier: productDeliveryCarrierWriteSchema.optional(),
 };
 
 const PATCH_BODY_KEYS = Object.keys(patchFieldShape);

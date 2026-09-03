@@ -9,6 +9,18 @@ import {
   assertProductPreviewVideoRequiresPhotos,
   normalizeProductPreviewVideoUrl,
 } from "./productPreviewVideo.js";
+import {
+  PRODUCT_DELIVERY_CARRIER_LOBO,
+  buildLegacyDeliveryFlags,
+  resolveProductDeliveryCarrier,
+} from "@molha/api-contract";
+
+import { isLoboConfigured } from "../shipping/lobo/loboClient.js";
+import { isCarrierAvailable } from "../shipping/shippingCarrierSettings.js";
+import {
+  LOBO_NOT_CONFIGURED_MESSAGE,
+  SHIPPING_CARRIER_DISABLED_MESSAGE,
+} from "../../constants/loboConstants.js";
 import { normalizeProductInstagramPostUrl } from "./productInstagramPostUrl.js";
 import { patchBodyTouchesModerationContent } from "./productModeration.js";
 import {
@@ -239,6 +251,7 @@ const applyPickupFields = async (body, $set, $unset, existing) => {
   const touchesDelivery = hasBodyField(body, "productDeliveryEnabled");
   const touchesCourier = hasBodyField(body, "productCourierDeliveryEnabled");
   const touchesPickupEnabled = hasBodyField(body, "productPickupEnabled");
+  const touchesCarrier = hasBodyField(body, "productDeliveryCarrier");
 
   if (
     !touchesLocations &&
@@ -247,7 +260,8 @@ const applyPickupFields = async (body, $set, $unset, existing) => {
     !touchesLon &&
     !touchesDelivery &&
     !touchesCourier &&
-    !touchesPickupEnabled
+    !touchesPickupEnabled &&
+    !touchesCarrier
   ) {
     return;
   }
@@ -290,11 +304,39 @@ const applyPickupFields = async (body, $set, $unset, existing) => {
       ? $set.productCourierDeliveryEnabled === true
       : existing.productCourierDeliveryEnabled === true;
 
-    if (touchesDelivery || touchesCourier || touchesPickupEnabled) {
+    // Перевозчик — источник правды, флаги лишь его отражение. Раньше это
+    // поле при редактировании не применялось вовсе: выбранная однажды служба
+    // оставалась навсегда, и товар нельзя было перевести на один самовывоз —
+    // флажок «Доставка» возвращался включённым.
+    const nextCarrier = touchesCarrier
+      ? String(body.productDeliveryCarrier ?? "")
+      : (resolveProductDeliveryCarrier({
+          productDeliveryCarrier: existing.productDeliveryCarrier,
+          productDeliveryEnabled: nextDeliveryEnabled,
+          productCourierDeliveryEnabled: nextCourierDeliveryEnabled,
+        }) ?? "");
+
+    if (touchesCarrier) {
+      if (nextCarrier === PRODUCT_DELIVERY_CARRIER_LOBO && !isLoboConfigured()) {
+        throw new AppError(503, LOBO_NOT_CONFIGURED_MESSAGE);
+      }
+      if (nextCarrier && !(await isCarrierAvailable(nextCarrier))) {
+        throw new AppError(409, SHIPPING_CARRIER_DISABLED_MESSAGE);
+      }
+
+      const legacyFlags = buildLegacyDeliveryFlags(nextCarrier);
+      $set.productDeliveryCarrier = nextCarrier;
+      $set.productDeliveryEnabled = legacyFlags.productDeliveryEnabled;
+      $set.productCourierDeliveryEnabled = legacyFlags.productCourierDeliveryEnabled;
+    }
+
+    if (touchesDelivery || touchesCourier || touchesPickupEnabled || touchesCarrier) {
       assertProductFulfillmentMethods(
         nextPickupEnabled,
-        nextDeliveryEnabled,
-        nextCourierDeliveryEnabled,
+        touchesCarrier ? $set.productDeliveryEnabled : nextDeliveryEnabled,
+        // ЛОБО везёт, хотя оба старых флага при ней выключены.
+        (touchesCarrier ? $set.productCourierDeliveryEnabled : nextCourierDeliveryEnabled) ||
+          nextCarrier === PRODUCT_DELIVERY_CARRIER_LOBO,
       );
     }
 

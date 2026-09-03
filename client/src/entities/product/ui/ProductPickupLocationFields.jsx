@@ -477,8 +477,19 @@ export function ProductPickupLocationFields({
     }
     emit(
       shipsToBuyer
-        ? { productDeliveryEnabled: false, productCourierDeliveryEnabled: false }
-        : { productDeliveryEnabled: false, productCourierDeliveryEnabled: true },
+        ? {
+            productDeliveryEnabled: false,
+            productCourierDeliveryEnabled: false,
+            // Службу тоже гасим: по ней товар считается едущим к покупателю,
+            // и без этого флажок «Доставка» тут же возвращался включённым —
+            // остаться на одном самовывозе было невозможно.
+            productDeliveryCarrier: "",
+          }
+        : {
+            productDeliveryEnabled: false,
+            productCourierDeliveryEnabled: true,
+            productDeliveryCarrier: PRODUCT_DELIVERY_CARRIER_GITORG,
+          },
     );
   };
 

@@ -11,8 +11,13 @@ import { resolveRuRegionCodeFromDadataData } from "@molha/api-contract";
  */
 export function mapDadataSuggestion(suggestion) {
   const data = suggestion.data ?? {};
-  const fiasIdRaw = data.house_fias_id;
-  const fiasId = fiasIdRaw != null ? String(fiasIdRaw).trim() : "";
+  // У адреса на участке дома нет: идентификатор лежит в `stead_fias_id`.
+  // Сервер читает оба поля, поэтому и здесь берём первый непустой — иначе
+  // адрес «уч 27а» сохранялся без идентификатора.
+  const fiasId =
+    [data.house_fias_id, data.stead_fias_id]
+      .map((value) => String(value ?? "").trim())
+      .find((value) => value.length > 0) ?? "";
 
   const lat = Number(data.geo_lat);
   const lon = Number(data.geo_lon);

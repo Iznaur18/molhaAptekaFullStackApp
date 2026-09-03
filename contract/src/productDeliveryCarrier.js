@@ -38,6 +38,16 @@ const REGIONAL_CARRIERS = new Set([PRODUCT_DELIVERY_CARRIER_LOBO]);
 export const productDeliveryCarrierSchema = z.enum(PRODUCT_DELIVERY_CARRIERS);
 
 /**
+ * То же для записи товара, плюс пустая строка — «доставки нет, только
+ * самовывоз». Без неё продавец не мог убрать ранее выбранную службу: поле
+ * просто не проходило проверку, и товар оставался «едущим к покупателю».
+ */
+export const productDeliveryCarrierWriteSchema = z.union([
+  productDeliveryCarrierSchema,
+  z.literal(""),
+]);
+
+/**
  * Кто везёт этот товар. `null` — доставки нет, только самовывоз.
  *
  * @param {{
