@@ -67,3 +67,41 @@ describe("buildProductDetailsBadgeItems", () => {
     expect(items.some((item) => item.kind === "wholesale")).toBe(false);
   });
 });
+
+describe("buildProductDetailsBadgeItems — безопасная сделка", () => {
+  it("показывает значок, когда у продавца заявка одобрена", () => {
+    const items = buildProductDetailsBadgeItems({
+      product: {
+        productPrice: 1000,
+        productPriceMarketStatus: "unknown",
+        productSeller: { _id: "s1", sellerSafeDeal: { moderationStatus: "approved" } },
+      },
+    });
+
+    expect(items.some((item) => item.kind === "safeDeal")).toBe(true);
+  });
+
+  it("не показывает значок, пока заявка на проверке", () => {
+    const items = buildProductDetailsBadgeItems({
+      product: {
+        productPrice: 1000,
+        productPriceMarketStatus: "unknown",
+        productSeller: { _id: "s1", sellerSafeDeal: { moderationStatus: "pending" } },
+      },
+    });
+
+    expect(items.some((item) => item.kind === "safeDeal")).toBe(false);
+  });
+
+  it("не падает, когда продавец приехал строкой-идентификатором", () => {
+    const items = buildProductDetailsBadgeItems({
+      product: {
+        productPrice: 1000,
+        productPriceMarketStatus: "unknown",
+        productSeller: "68f0c0c0c0c0c0c0c0c0c0c0",
+      },
+    });
+
+    expect(items.some((item) => item.kind === "safeDeal")).toBe(false);
+  });
+});

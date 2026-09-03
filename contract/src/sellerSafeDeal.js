@@ -94,6 +94,25 @@ export function isInnLengthValidForLegalForm(legalForm, inn) {
   return String(inn ?? "").trim().length === expected;
 }
 
+/**
+ * Подключена ли продавцу безопасная сделка.
+ *
+ * Принимает и профиль пользователя, и продавца, приехавшего внутри товара:
+ * наружу отдаётся только `sellerSafeDeal.moderationStatus`, без ИНН.
+ *
+ * @param {unknown} userLike
+ * @returns {boolean}
+ */
+export function isSellerSafeDealApproved(userLike) {
+  if (!userLike || typeof userLike !== "object") return false;
+  const safeDeal = /** @type {{ sellerSafeDeal?: unknown }} */ (userLike).sellerSafeDeal;
+  if (!safeDeal || typeof safeDeal !== "object") return false;
+  return (
+    /** @type {{ moderationStatus?: unknown }} */ (safeDeal).moderationStatus ===
+    SAFE_DEAL_MODERATION_APPROVED
+  );
+}
+
 export const SAFE_DEAL_INN_INVALID_MESSAGE = "ИНН введён с ошибкой — проверьте цифры";
 export const SAFE_DEAL_INN_LENGTH_MESSAGE_IP = "У ИП ИНН из 12 цифр";
 export const SAFE_DEAL_INN_LENGTH_MESSAGE_OOO = "У ООО ИНН из 10 цифр";

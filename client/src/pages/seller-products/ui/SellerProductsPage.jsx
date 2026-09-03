@@ -14,6 +14,8 @@ import {
 import { resolveUserProfileBackgroundFromUser } from "../../../entities/user/lib/userBackgroundValue.js";
 import { UserFollowButton } from "../../../entities/user-follow/ui/UserFollowButton.jsx";
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
+import { isSellerSafeDealApproved } from "@molha/api-contract";
+
 import { UserPremiumDisplayName } from "../../../entities/user/ui/UserPremiumDisplayName.jsx";
 import { SellerProfileQuickStats } from "../../../entities/user/ui/SellerProfileQuickStats.jsx";
 import { SellerShareLinkButton } from "../../../entities/user/ui/SellerShareLinkButton.jsx";
@@ -265,6 +267,7 @@ export function SellerProductsPage({
                 name={displayName}
                 isPremium={Boolean(seller.isPremiumUser)}
                 isUserDataConfirmed={Boolean(seller.isUserDataConfirmed)}
+                hasSafeDeal={isSellerSafeDealApproved(seller)}
               />
             </button>
             {isSelf && !showProfileBanner ? (

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { isSellerSafeDealApproved } from "@molha/api-contract";
 import {
   ChevronRight,
   Package,
@@ -73,6 +74,7 @@ export function ProductDetailsSellerPreview({
   const displayName = userName || USER_LIST_ROW_UI.MISSING_NAME;
   const isPremium = sellerObj.isPremiumUser === true;
   const isConfirmed = sellerObj.isUserDataConfirmed === true;
+  const hasSafeDeal = isSellerSafeDealApproved(sellerObj);
   const canOpenProfile = typeof onOpenProfile === "function";
   const listedRaw = sellerObj.sellerListedProductCount;
   const listedCount = Number(listedRaw);
@@ -137,6 +139,7 @@ export function ProductDetailsSellerPreview({
           name={displayName}
           isPremium={isPremium}
           isUserDataConfirmed={isConfirmed}
+          hasSafeDeal={hasSafeDeal}
           className="product-details-seller-preview__name"
           textClassName="product-details-seller-preview__name-text"
         />

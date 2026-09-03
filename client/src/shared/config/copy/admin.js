@@ -477,6 +477,9 @@ export const PRODUCT_BADGE_EXPLAIN_ADMIN_UI = {
   TITLE_PROFILE_ADDRESS: "Адрес в профиле",
   HINT_PROFILE_ADDRESS:
     "Подсказка без адреса: картинка и текст окна, которое появляется на главной.",
+  TITLE_SAFE_DEAL: "Безопасная сделка",
+  HINT_SAFE_DEAL:
+    "Значок проверенного продавца: что увидит покупатель, нажав на него в карточке товара.",
 };
 
 /**

@@ -13,6 +13,8 @@ import { canStaffEditTargetUserPremium } from "../../../entities/user/lib/canSta
 import { AdminDeleteUserConfirmModal } from "../../../entities/user/ui/AdminDeleteUserConfirmModal.jsx";
 import { EditProfileModal } from "../../../entities/user/ui/EditProfileModal.jsx";
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
+import { isSellerSafeDealApproved } from "@molha/api-contract";
+
 import { UserPremiumDisplayName } from "../../../entities/user/ui/UserPremiumDisplayName.jsx";
 import { UserProfileInfoPanel } from "../../../entities/user/ui/UserProfileInfoPanel.jsx";
 import { UserProfileProductsList } from "../../../entities/user/ui/UserProfileProductsList.jsx";
@@ -175,6 +177,7 @@ export function UserDetailsPage() {
                 name={displayName}
                 isPremium={user.isPremiumUser === true}
                 isUserDataConfirmed={user.isUserDataConfirmed === true}
+                hasSafeDeal={isSellerSafeDealApproved(user)}
               />
             </p>
           </div>

@@ -5,12 +5,18 @@ import {
 } from "@izibuy/shared-lib";
 
 import { PRODUCT_BADGE_EXPLAIN_UI } from "../../../shared/config/appUiCopy.js";
+import { resolveSafeDealBadgeCopy } from "../../seller-safe-deal/lib/safeDealBadgeCopy.js";
 
 /**
  * @param {string | null | undefined} badgeKey
  * @returns {string}
  */
 export function resolveProductBadgeExplainFallbackDescription(badgeKey) {
+  // Текст зависит от того, работает ли заморозка денег, поэтому берём его из
+  // общего места, а не из статичной таблицы.
+  if (badgeKey === "safe_deal") {
+    return resolveSafeDealBadgeCopy().EXPLAIN;
+  }
   const fallbacks = PRODUCT_BADGE_EXPLAIN_UI.FALLBACK;
   if (badgeKey && Object.prototype.hasOwnProperty.call(fallbacks, badgeKey)) {
     return fallbacks[badgeKey];
@@ -38,6 +44,9 @@ export function resolveProductDetailsBadgeExplainRequest(item) {
 
   if (item.kind === "original") {
     return { title: item.label, badgeKey: "original", fallbackKey: "original" };
+  }
+  if (item.kind === "safeDeal") {
+    return { title: item.label, badgeKey: "safe_deal", fallbackKey: "safe_deal" };
   }
   if (item.kind === "raffle") {
     return { title: item.label, badgeKey: "raffle", fallbackKey: "raffle" };

@@ -1,5 +1,7 @@
 import { CircleCheck, Tag } from "lucide-react";
 
+import { SafeDealSellerBadge } from "../../seller-safe-deal/ui/SafeDealSellerBadge.jsx";
+
 import { PRODUCT_DETAILS_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { PRODUCT_DETAILS_BADGE_SOFT_COLORS } from "../lib/productDetailsBadgeSoftPalette.js";
 import { buildProductDetailsBadgeItems } from "../lib/buildProductDetailsBadgeItems.js";
@@ -94,6 +96,26 @@ export function ProductDetailsBadgeStack({ product, onBadgePress }) {
                 "product-details-modal__meta-info-chip product-details-modal__meta-info-chip--original",
                 undefined,
                 PRODUCT_DETAILS_MODAL_UI.ORIGINAL_BADGE_ARIA,
+              );
+            }
+
+            if (item.kind === "safeDeal") {
+              return renderChip(
+                item,
+                <>
+                  <SafeDealSellerBadge
+                    className="product-details-modal__meta-info-chip-icon"
+                    size={14}
+                  />
+                  <span>{item.label}</span>
+                </>,
+                "product-details-modal__meta-info-chip",
+                {
+                  backgroundColor:
+                    PRODUCT_DETAILS_BADGE_SOFT_COLORS.safeDeal.backgroundColor,
+                  color: PRODUCT_DETAILS_BADGE_SOFT_COLORS.safeDeal.color,
+                },
+                item.label,
               );
             }
 

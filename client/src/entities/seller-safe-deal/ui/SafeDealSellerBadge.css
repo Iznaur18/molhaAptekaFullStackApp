@@ -1,0 +1,11 @@
+.safe-deal-seller-badge {
+  display: block;
+}
+
+.safe-deal-seller-badge__mark {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}

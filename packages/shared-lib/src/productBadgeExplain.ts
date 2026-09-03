@@ -28,7 +28,8 @@ export type ProductBadgeExplainKey =
   | "rental"
   | "near_distance"
   | "promo"
-  | "profile_address";
+  | "profile_address"
+  | "safe_deal";
 
 export type ProductBadgeExplainAdminRow = {
   badgeKey: ProductBadgeExplainKey;

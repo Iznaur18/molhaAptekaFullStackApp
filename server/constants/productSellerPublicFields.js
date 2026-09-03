@@ -13,6 +13,8 @@ export const PRODUCT_SELLER_PUBLIC_FIELD_NAMES = [
   "createdAt",
   "totalSalesAmount",
   "followersCount",
+  // Только статус: ИНН и комментарий модератора наружу не отдаём.
+  "sellerSafeDeal.moderationStatus",
 ];
 
 export const PRODUCT_SELLER_PUBLIC_SELECT = PRODUCT_SELLER_PUBLIC_FIELD_NAMES.join(" ");

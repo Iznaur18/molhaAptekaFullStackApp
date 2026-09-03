@@ -1,3 +1,5 @@
+import { isSellerSafeDealApproved } from "@molha/api-contract";
+
 import { COMMON_UI, PRODUCT_CARD_UI } from "../../../../shared/config/appUiCopy.js";
 import { UserPremiumDisplayName } from "../../../user/ui/UserPremiumDisplayName.jsx";
 
@@ -22,6 +24,7 @@ export function renderProductCardSellerValue({ raw, display, onSellerNameClick }
       name={display}
       isPremium={raw.isPremiumUser === true}
       isUserDataConfirmed={raw.isUserDataConfirmed === true}
+      hasSafeDeal={isSellerSafeDealApproved(raw)}
       className="product-card__seller-display-name"
       textClassName="product-card__seller-display-name__text"
     />

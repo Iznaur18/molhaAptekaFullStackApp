@@ -716,6 +716,7 @@ export {
   SAFE_DEAL_INN_LENGTH_MESSAGE_OOO,
   isValidInn,
   isInnLengthValidForLegalForm,
+  isSellerSafeDealApproved,
   safeDealApplicationBodySchema,
   staffSafeDealListQuerySchema,
   staffSafeDealParamsSchema,

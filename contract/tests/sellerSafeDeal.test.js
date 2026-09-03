@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   isInnLengthValidForLegalForm,
+  isSellerSafeDealApproved,
   isValidInn,
   safeDealApplicationBodySchema,
   SELLER_LEGAL_FORM_IP,
@@ -73,5 +74,26 @@ test("safeDealApplicationBodySchema не принимает самозанято
       inn: VALID_INN_12,
     });
     assert.equal(result.success, false, `legalForm=${legalForm} должен быть отклонён`);
+  }
+});
+
+test("isSellerSafeDealApproved читает статус продавца из товара и профиля", () => {
+  assert.equal(
+    isSellerSafeDealApproved({ sellerSafeDeal: { moderationStatus: "approved" } }),
+    true,
+  );
+  assert.equal(
+    isSellerSafeDealApproved({ sellerSafeDeal: { moderationStatus: "pending" } }),
+    false,
+  );
+  assert.equal(
+    isSellerSafeDealApproved({ sellerSafeDeal: { moderationStatus: "rejected" } }),
+    false,
+  );
+});
+
+test("isSellerSafeDealApproved не падает на пустом продавце", () => {
+  for (const value of [null, undefined, "", 42, {}, { sellerSafeDeal: null }]) {
+    assert.equal(isSellerSafeDealApproved(value), false);
   }
 });

@@ -2,6 +2,7 @@ import {
   USER_DATA_CONFIRMED_UI,
   USER_PREMIUM_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { SafeDealSellerBadgeMark } from "../../seller-safe-deal/ui/SafeDealSellerBadge.jsx";
 import { UserDataConfirmedBadge } from "./UserDataConfirmedBadge.jsx";
 import { UserPremiumVerifiedBadge } from "./UserPremiumVerifiedBadge.jsx";
 
@@ -12,6 +13,7 @@ import "./UserPremiumUi.css";
  *   name: string;
  *   isPremium?: boolean;
  *   isUserDataConfirmed?: boolean;
+ *   hasSafeDeal?: boolean;
  *   className?: string;
  *   textClassName?: string;
  * }} props
@@ -20,6 +22,7 @@ export function UserPremiumDisplayName({
   name,
   isPremium = false,
   isUserDataConfirmed = false,
+  hasSafeDeal = false,
   className = "",
   textClassName = "user-premium-name__text",
 }) {
@@ -46,6 +49,7 @@ export function UserPremiumDisplayName({
           <UserDataConfirmedBadge size={18} />
         </span>
       ) : null}
+      <SafeDealSellerBadgeMark hasSafeDeal={hasSafeDeal} size={18} />
     </span>
   );
 }

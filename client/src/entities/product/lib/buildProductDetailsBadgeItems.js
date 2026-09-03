@@ -1,5 +1,6 @@
 import {
   formatCatalogNearDistanceLabel,
+  isSellerSafeDealApproved,
   PRODUCT_PRICE_MARKET_STATUS_UNKNOWN,
 } from "@molha/api-contract";
 import { isProductRentalConfigured, isProductWholesaleConfigured } from "@izibuy/shared-lib";
@@ -11,6 +12,7 @@ import {
   PRODUCT_RENTAL_UI,
   PRODUCT_WHOLESALE_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { resolveSafeDealBadgeCopy } from "../../seller-safe-deal/lib/safeDealBadgeCopy.js";
 import { isProductRaffleParticipant } from "../../raffle/lib/isProductRaffleParticipant.js";
 import { isProductOriginalBadgeVisible } from "./productIsOriginal.js";
 import { resolveProductListingOriginPresentation } from "./productListingOrigin.js";
@@ -23,6 +25,7 @@ import { resolveProductAffiliateOffer } from "./resolveProductAffiliateOffer.js"
  *   label: string;
  * } & (
  *   | { kind: "original" }
+ *   | { kind: "safeDeal" }
  *   | { kind: "raffle" }
  *   | { kind: "affiliate" }
  *   | { kind: "auction" }
@@ -66,6 +69,16 @@ export function buildProductDetailsBadgeItems({ product }) {
       key: "original",
       kind: "original",
       label: PRODUCT_DETAILS_MODAL_UI.ORIGINAL_BADGE,
+    });
+  }
+
+  // Значок продавца, а не товара, но покупатель принимает решение здесь —
+  // рядом с ценой, а не на странице профиля.
+  if (isSellerSafeDealApproved(product.productSeller)) {
+    items.push({
+      key: "safeDeal",
+      kind: "safeDeal",
+      label: resolveSafeDealBadgeCopy().LABEL,
     });
   }
 
