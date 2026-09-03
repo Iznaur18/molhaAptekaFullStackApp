@@ -59,6 +59,7 @@ export const PROFILE_NAV_ITEM_META = {
   advertising: { icon: Megaphone },
   "onec-integration": { icon: Database },
   "safe-deal": { icon: ShieldCheck },
+  "safe-deal-moderation": { icon: ShieldCheck },
   "edit-profile": { icon: Pencil },
   "create-raffle": { icon: Gift },
   "product-moderation": { icon: ClipboardCheck },

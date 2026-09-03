@@ -55,6 +55,7 @@ import { getActiveProfileNavLabel } from "../lib/getActiveProfileNavLabel.js";
  *   onAdvertisingClick?: () => void;
  *   onOneCIntegrationClick?: () => void;
  *   onSafeDealClick?: () => void;
+ *   onSafeDealModerationClick?: () => void;
  *   onEditProfileClick?: () => void;
  * }} params
  */
@@ -112,6 +113,7 @@ export function useMyProfileNav({
   onAdvertisingClick,
   onOneCIntegrationClick,
   onSafeDealClick,
+  onSafeDealModerationClick,
   onEditProfileClick,
 }) {
   const isRegularUser = user?.userRole === USER_ROLE_USER;
@@ -171,6 +173,9 @@ export function useMyProfileNav({
   // Безопасную сделку подключает любой авторизованный: подтверждение ИП или
   // ООО и есть фильтр, отдельного признака продавца в профиле нет.
   const canUseSafeDeal = isProfileReady && Boolean(onSafeDealClick);
+  // Сверять ИНН с ЕГРЮЛ — работа модератора, как и модерация курьеров.
+  const canUseSafeDealModeration =
+    !isRegularUser && isProfileReady && Boolean(onSafeDealModerationClick);
   const canUseProductModeration =
     !isRegularUser && isProfileReady && Boolean(onProductModerationClick);
   const canUseProductReports =
@@ -241,6 +246,7 @@ export function useMyProfileNav({
         canUseAdvertising,
         canUseOneCIntegration,
         canUseSafeDeal,
+        canUseSafeDealModeration,
         canUseEditProfile,
         showEditOnBanner,
         pendingMySalesActionCount,
@@ -292,6 +298,7 @@ export function useMyProfileNav({
         onAdvertisingClick,
         onOneCIntegrationClick,
         onSafeDealClick,
+        onSafeDealModerationClick,
         onEditProfileClick,
       }),
     [
@@ -318,6 +325,7 @@ export function useMyProfileNav({
       canUseAdvertising,
       canUseOneCIntegration,
       canUseSafeDeal,
+      canUseSafeDealModeration,
       canUseMyOrders,
       canUseMyProducts,
       canUseMySales,
@@ -354,6 +362,7 @@ export function useMyProfileNav({
       onAdvertisingClick,
       onOneCIntegrationClick,
       onSafeDealClick,
+      onSafeDealModerationClick,
       onIntroAdModerationClick,
       onSellerPersonalCategoryModerationClick,
       onMyOrdersClick,

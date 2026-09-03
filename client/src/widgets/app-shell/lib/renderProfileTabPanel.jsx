@@ -18,6 +18,7 @@ import {
   LazyAdvertisingPage,
   LazyOneCIntegrationPage,
   LazySafeDealPage,
+  LazySafeDealModerationPage,
   LazyEditProfilePage,
   LazyIntroAdModerationPage,
   LazySellerPersonalCategoryModerationPage,
@@ -299,6 +300,10 @@ export function renderProfileTabPanel(mainView, props) {
       return <LazyCourierApplicationPage />;
     case "courier-overview":
       return <LazyCourierOverviewPage onUserClick={onSellerNameClick} />;
+    case "safe-deal-moderation":
+      return (
+        <LazySafeDealModerationPage onApplicantClick={onSellerNameClick} />
+      );
     case "courier-moderation":
       return (
         <LazyCourierModerationPage

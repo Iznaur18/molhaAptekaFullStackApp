@@ -40,6 +40,11 @@ export const LazyCourierApplicationPage = lazyNamedExport(
   "CourierApplicationPage",
 );
 
+export const LazySafeDealModerationPage = lazyNamedExport(
+  () => import("../../../pages/safe-deal-moderation/ui/SafeDealModerationPage.jsx"),
+  "SafeDealModerationPage",
+);
+
 export const LazyCourierModerationPage = lazyNamedExport(
   () => import("../../../pages/courier-moderation/ui/CourierModerationPage.jsx"),
   "CourierModerationPage",

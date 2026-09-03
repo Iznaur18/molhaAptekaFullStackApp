@@ -99,7 +99,12 @@ export {
   COURIER_OVERVIEW_UI,
   SHIPMENT_DISPUTE_UI,
 } from "./copy/courier.js";
-export { SAFE_DEAL_UI, SAFE_DEAL_BADGE_UI } from "./copy/safe-deal.js";
+export {
+  SAFE_DEAL_UI,
+  SAFE_DEAL_BADGE_UI,
+  SAFE_DEAL_MODERATION_UI,
+  SAFE_DEAL_REGISTRY_CHECK_URL,
+} from "./copy/safe-deal.js";
 export { SHIPPING_CARRIERS_ADMIN_UI } from "./copy/shipping-carriers.js";
 export {
   AUCTION_PAGE_UI,

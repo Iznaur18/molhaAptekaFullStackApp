@@ -66,6 +66,7 @@ import "./MyProfilePage.css";
  * onAdvertisingClick?: () => void;
  * onOneCIntegrationClick?: () => void;
  * onSafeDealClick?: () => void;
+ * onSafeDealModerationClick?: () => void;
  * onIntroAdModerationClick?: () => void;
  * onSellerPersonalCategoryModerationClick?: () => void;
  * pendingIntroAdModerationCount?: number;
@@ -127,6 +128,7 @@ export function MyProfilePage({
   onAdvertisingClick,
   onOneCIntegrationClick,
   onSafeDealClick,
+  onSafeDealModerationClick,
   onIntroAdModerationClick,
   onSellerPersonalCategoryModerationClick,
   pendingModerationCount = 0,
@@ -241,6 +243,7 @@ export function MyProfilePage({
     onAdvertisingClick,
     onOneCIntegrationClick,
     onSafeDealClick,
+    onSafeDealModerationClick,
     onEditProfileClick,
   });
 

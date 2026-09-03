@@ -52,6 +52,7 @@ export function buildProfileNavGroups({
   canUseAdvertising,
   canUseOneCIntegration,
   canUseSafeDeal,
+  canUseSafeDealModeration,
   canUseEditProfile,
   showEditOnBanner,
   pendingMySalesActionCount,
@@ -103,6 +104,7 @@ export function buildProfileNavGroups({
   onAdvertisingClick,
   onOneCIntegrationClick,
   onSafeDealClick,
+  onSafeDealModerationClick,
   onEditProfileClick,
 }) {
   /** @param {string} tab @param {() => void} [action] */
@@ -328,6 +330,16 @@ export function buildProfileNavGroups({
             label: "Жалоба (модерация)",
             badgeCount: pendingProductReportsCount,
             onClick: () => selectTab("product-reports", onProductReportsClick),
+          },
+        ]
+      : []),
+    ...(canUseSafeDealModeration
+      ? [
+          {
+            tab: "safe-deal-moderation",
+            label: "Безопасная сделка (модерация)",
+            onClick: () =>
+              selectTab("safe-deal-moderation", onSafeDealModerationClick),
           },
         ]
       : []),

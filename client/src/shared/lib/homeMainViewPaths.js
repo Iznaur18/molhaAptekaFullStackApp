@@ -5,7 +5,7 @@ import { isStaffStandaloneMainView } from "./staffMainViews.js";
  * `/cart` на Express. `/user/:mongoId` — SPA-профиль (Accept: text/html) и
  * API (XHR); `/user-list` ок для списка пользователей.
  *
- * @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'wishlist' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'auction' | 'data-confirmation' | 'premium' | 'loyalty-points' | 'partner-program' | 'advertising' | 'onec-integration' | 'safe-deal' | 'edit-profile' | 'admin-orders' | 'admin-analytics' | 'staff-audit-log-admin' | 'broadcast-notifications-admin' | 'search-synonyms-admin' | 'category-tree-admin' | 'app-intro-admin' | 'site-header-banner-admin' | 'product-manage-toggle-display-admin' | 'popular-products-admin' | 'product-moderation' | 'intro-ad-moderation' | 'seller-personal-category-moderation' | 'product-reports' | 'staff-raffles' | 'data-confirmation-requests' | 'courier' | 'courier-moderation' | 'courier-overview' | 'installment-payments' | 'installment-sales' | 'installment-disputes' | 'shipment-disputes' | 'shipping-carriers'} HomeMainView
+ * @typedef {'catalog' | 'catalog-browser' | 'my-profile' | 'my-products' | 'users' | 'subscriptions' | 'wishlist' | 'notifications' | 'cart' | 'my-sales' | 'my-orders' | 'auction' | 'data-confirmation' | 'premium' | 'loyalty-points' | 'partner-program' | 'advertising' | 'onec-integration' | 'safe-deal' | 'safe-deal-moderation' | 'edit-profile' | 'admin-orders' | 'admin-analytics' | 'staff-audit-log-admin' | 'broadcast-notifications-admin' | 'search-synonyms-admin' | 'category-tree-admin' | 'app-intro-admin' | 'site-header-banner-admin' | 'product-manage-toggle-display-admin' | 'popular-products-admin' | 'product-moderation' | 'intro-ad-moderation' | 'seller-personal-category-moderation' | 'product-reports' | 'staff-raffles' | 'data-confirmation-requests' | 'courier' | 'courier-moderation' | 'courier-overview' | 'installment-payments' | 'installment-sales' | 'installment-disputes' | 'shipment-disputes' | 'shipping-carriers'} HomeMainView
  */
 
 /** @type {Record<HomeMainView, string>} */
@@ -31,6 +31,7 @@ export const HOME_MAIN_VIEW_PATH = {
   advertising: "/profile/advertising",
   "onec-integration": "/profile/onec-integration",
   "safe-deal": "/profile/safe-deal",
+  "safe-deal-moderation": "/safe-deal-moderation",
   "edit-profile": "/profile/edit-profile",
   "admin-orders": "/admin-orders",
   "admin-analytics": "/admin-analytics",

@@ -14,6 +14,7 @@ export const STAFF_SECTION_IDS = [
   "staff-raffles",
   "data-confirmation-requests",
   "courier-moderation",
+  "safe-deal-moderation",
   "installment-disputes",
   "shipment-disputes",
   "shipping-carriers",
@@ -43,6 +44,8 @@ const STAFF_ACCESS: Record<StaffSectionId, StaffAccessRule> = {
   "data-confirmation-requests": { requireAdmin: false, requireModerator: true },
   // Модерация курьеров — как модерация товаров: админ и модератор.
   "courier-moderation": { requireAdmin: false, requireModerator: true },
+  // Сверка ИНН с ЕГРЮЛ — та же работа, что и модерация курьеров.
+  "safe-deal-moderation": { requireAdmin: false, requireModerator: true },
   "installment-disputes": { requireAdmin: false, requireModerator: true },
   // Споры по доставке разбирают те же, кто модерирует курьеров.
   "shipment-disputes": { requireAdmin: false, requireModerator: true },

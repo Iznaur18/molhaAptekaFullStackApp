@@ -14,6 +14,7 @@ export const PROFILE_TAB_ADVERTISING = "advertising";
 export const PROFILE_TAB_ONEC_INTEGRATION = "onec-integration";
 /** Подключение безопасной сделки — раздел профиля продавца. */
 export const PROFILE_TAB_SAFE_DEAL = "safe-deal";
+export const PROFILE_TAB_SAFE_DEAL_MODERATION = "safe-deal-moderation";
 export const PROFILE_TAB_EDIT_PROFILE = "edit-profile";
 export const PROFILE_TAB_ADMIN_ORDERS = "admin-orders";
 export const PROFILE_TAB_ADMIN_ANALYTICS = "admin-analytics";
@@ -91,6 +92,7 @@ export const PROFILE_TAB_VALUES = [
   PROFILE_TAB_DATA_CONFIRMATION_REQUESTS,
   PROFILE_TAB_COURIER,
   PROFILE_TAB_COURIER_MODERATION,
+  PROFILE_TAB_SAFE_DEAL_MODERATION,
   PROFILE_TAB_COURIER_OVERVIEW,
   PROFILE_TAB_INSTALLMENT_PAYMENTS,
   PROFILE_TAB_INSTALLMENT_SALES,
