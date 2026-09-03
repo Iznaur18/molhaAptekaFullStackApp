@@ -10,6 +10,9 @@ process.env.LOBO_API_LOGIN = "mock";
 process.env.LOBO_API_PASSWORD = "mock";
 process.env.LOBO_API_BASE_URL = "http://127.0.0.1:3092/api/v1/external";
 
+const { startLoboMock } = await import("./helpers/loboMockProcess.js");
+let loboMock;
+
 const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollections } =
   await import("./helpers/mongoTestDb.js");
 const { createOrderLoyaltyFixture, createOrderWithReserveTransaction } =
@@ -68,8 +71,14 @@ const setCarrierStatus = (orderId, carrierStatus) =>
   );
 
 describe("раскладка статусов ЛОБО на нашу лестницу", () => {
-  before(connectMongoTestReplSet);
-  after(disconnectMongoTestReplSet);
+  before(async () => {
+    loboMock = await startLoboMock({ port: 3092 });
+    await connectMongoTestReplSet();
+  });
+  after(async () => {
+    await disconnectMongoTestReplSet();
+    await loboMock?.stop();
+  });
   beforeEach(clearMongoCollections);
 
   it("«забрал» переводит заказ в «На доставке»", async () => {

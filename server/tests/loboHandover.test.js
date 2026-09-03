@@ -8,7 +8,10 @@ process.env.JWT_SECRET =
 process.env.LOBO_API_KEY = "dms_mock_key";
 process.env.LOBO_API_LOGIN = "mock";
 process.env.LOBO_API_PASSWORD = "mock";
-process.env.LOBO_API_BASE_URL = "http://127.0.0.1:3092/api/v1/external";
+process.env.LOBO_API_BASE_URL = "http://127.0.0.1:3093/api/v1/external";
+
+const { startLoboMock } = await import("./helpers/loboMockProcess.js");
+let loboMock;
 
 const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollections } =
   await import("./helpers/mongoTestDb.js");
@@ -61,8 +64,14 @@ async function loboOrder({ withGeo = true } = {}) {
 }
 
 describe("передача отправления в ЛОБО", () => {
-  before(connectMongoTestReplSet);
-  after(disconnectMongoTestReplSet);
+  before(async () => {
+    loboMock = await startLoboMock({ port: 3093 });
+    await connectMongoTestReplSet();
+  });
+  after(async () => {
+    await disconnectMongoTestReplSet();
+    await loboMock?.stop();
+  });
   beforeEach(clearMongoCollections);
 
   it("на «Готов к отгрузке» заказ уходит в службу", async () => {
