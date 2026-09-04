@@ -82,8 +82,11 @@ export const resolveNextShipmentStatus = (currentStatus, fulfillmentMethod) => {
  */
 export async function advanceOrderShipmentStatus({ orderId, sellerId, nextStatus }) {
   const order = await loadOrderWithItems(orderId);
-  // Предоплаченный заказ не двигается, пока деньги не пришли.
-  assertOrderPrepaid(order);
+  // Подтвердить заказ можно и до оплаты — это и есть сигнал покупателю
+  // «товар есть, платите». Дальше подтверждения неоплаченный не двигается.
+  if (nextStatus !== ORDER_STATUS_ACCEPTED) {
+    assertOrderPrepaid(order);
+  }
   const items = collectShipmentItems(order, sellerId);
 
   if (items.length === 0) {

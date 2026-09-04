@@ -595,6 +595,17 @@ export function OrderCard({
     shipmentMethod === "delivery" &&
     shipmentCarrier === PRODUCT_DELIVERY_CARRIER_SELLER;
 
+  const shipmentStatusNow = buildOrderStatusFromItems(order.items);
+  // Заказ оформлен с предоплатой, а деньги не пришли: продавцу не показываем
+  // кнопки сборки, покупателю — кнопку оплаты, но только после подтверждения.
+  const awaitingPrepayment =
+    order.paymentMethod === "cardPrepaid" && !order.prepaidPaidAt;
+  // Оплата открывается после подтверждения продавцом: сначала он проверяет,
+  // что товар есть, и только потом покупатель платит.
+  const acceptedBySeller = shipmentStatusNow !== "pending";
+  const awaitingSellerAccept = awaitingPrepayment && !acceptedBySeller;
+  const awaitingPaymentAfterAccept = awaitingPrepayment && acceptedBySeller;
+
   const lineItemProps = {
     orderId: order._id,
     compact,
@@ -604,9 +615,10 @@ export function OrderCard({
     // везти некуда: покупатель придёт на точку. На курьерском отправлении
     // отгружает курьер, а кнопка увела бы заказ из «Свободных», оставив
     // товар на руках.
-    onMarkShipped: sellerDeliversThisShipment ? onMarkShipped : undefined,
+    onMarkShipped:
+      sellerDeliversThisShipment && !awaitingPrepayment ? onMarkShipped : undefined,
     isPickupShipmentItem: shipmentMethod !== "delivery",
-    onMarkDelivered,
+    onMarkDelivered: awaitingPrepayment ? undefined : onMarkDelivered,
     onMarkReturned,
     onCancelItem,
     onConfirmDelivered,
@@ -626,13 +638,19 @@ export function OrderCard({
   // а на заказах до отправлений — с общего поля.
   const shipmentFulfillment =
     shipmentOwn?.fulfillmentMethod ?? order.fulfillmentMethod;
-  const shipmentAdvance =
+  const shipmentAdvanceCandidate =
     attentionRole === "seller" && onAdvanceShipment
-      ? resolveShipmentAdvanceAction(
-          buildOrderStatusFromItems(order.items),
-          shipmentFulfillment,
-        )
+      ? resolveShipmentAdvanceAction(shipmentStatusNow, shipmentFulfillment)
       : null;
+  // Подтвердить заказ продавец может и до оплаты — это его «товар есть».
+  // Всё, что дальше по лестнице, сервер всё равно отклонит, поэтому и кнопку
+  // не показываем: мёртвая кнопка хуже, чем её отсутствие.
+  const shipmentAdvance =
+    shipmentAdvanceCandidate &&
+    awaitingPrepayment &&
+    shipmentAdvanceCandidate.nextStatus !== "accepted"
+      ? null
+      : shipmentAdvanceCandidate;
   // Продавец выдаёт код, когда курьер уже приехал за заказом. Покупателю его
   // код сервер отдаёт только на «Доставлен» — раньше он не нужен, а лишний
   // повод показать код это лишний повод его слить.
@@ -644,7 +662,6 @@ export function OrderCard({
     attentionRole === "buyer" ? (shipmentOwn?.deliveryCode ?? "") : "";
   // Сменить курьера можно только до передачи товара: дальше он уже в машине,
   // и это возврат, а не смена.
-  const shipmentStatusNow = buildOrderStatusFromItems(order.items);
   // Продавец подтверждает перевод, когда курьер уже привёз заказ.
   const canConfirmPayment =
     attentionRole === "seller" &&
@@ -653,10 +670,6 @@ export function OrderCard({
     !shipmentOwn?.paymentConfirmedAt &&
     (shipmentStatusNow === "in_delivery" || shipmentStatusNow === "delivered");
   const paymentConfirmed = Boolean(shipmentOwn?.paymentConfirmedAt);
-  // Заказ оформлен с предоплатой, а деньги не пришли: покупателю нужна
-  // кнопка «доплатить», продавцу — объяснение, почему нет кнопок сборки.
-  const awaitingPrepayment =
-    order.paymentMethod === "cardPrepaid" && !order.prepaidPaidAt;
   const payToRequisites =
     attentionRole === "buyer" ? (shipmentOwn?.sellerPayoutRequisites ?? "") : "";
   const canReplaceCourier =
@@ -860,13 +873,21 @@ export function OrderCard({
 
       {awaitingPrepayment ? (
         <div className="order-card__awaiting-prepayment">
-          <strong>{ORDER_CARD_UI.AWAITING_PREPAYMENT}</strong>
+          <strong>
+            {awaitingSellerAccept
+              ? ORDER_CARD_UI.AWAITING_ACCEPT
+              : ORDER_CARD_UI.AWAITING_PREPAYMENT}
+          </strong>
           <span>
-            {attentionRole === "seller"
-              ? ORDER_CARD_UI.AWAITING_PREPAYMENT_SELLER_HINT
-              : ORDER_CARD_UI.AWAITING_PREPAYMENT_BUYER_HINT}
+            {awaitingSellerAccept
+              ? attentionRole === "seller"
+                ? ORDER_CARD_UI.AWAITING_ACCEPT_SELLER_HINT
+                : ORDER_CARD_UI.AWAITING_ACCEPT_BUYER_HINT
+              : attentionRole === "seller"
+                ? ORDER_CARD_UI.AWAITING_PREPAYMENT_SELLER_HINT
+                : ORDER_CARD_UI.AWAITING_PREPAYMENT_BUYER_HINT}
           </span>
-          {attentionRole === "buyer" && onPayOrder ? (
+          {awaitingPaymentAfterAccept && attentionRole === "buyer" && onPayOrder ? (
             <button
               type="button"
               className="order-card__item-action-button"

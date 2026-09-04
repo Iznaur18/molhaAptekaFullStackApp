@@ -17,6 +17,7 @@ import {
 import { AppError } from "../../errors/AppError.js";
 import { OrderModel, PaymentModel, UserModel } from "../../models/index.js";
 import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
+import { assertOrderAcceptedBySeller } from "../order/assertOrderPrepaid.js";
 import { logMoneyEvent } from "../loyalty/logMoneyEvent.js";
 import { buildReturnUrl } from "./paymentReturnUrl.js";
 import { createYookassaPayment, isYookassaConfigured } from "./yookassaClient.js";
@@ -116,6 +117,9 @@ export async function createOrderPrepayment({
   if (order.prepaidPaidAt) {
     throw new AppError(409, ORDER_PREPAYMENT_ALREADY_PAID_MESSAGE);
   }
+
+  // Платим за подтверждённый заказ: продавец уже проверил, что товар есть.
+  assertOrderAcceptedBySeller(order);
 
   // Проверяем по позициям заказа, а не по корзине: между чекаутом и оплатой
   // корзина могла измениться, а платить надо ровно за то, что заказано.

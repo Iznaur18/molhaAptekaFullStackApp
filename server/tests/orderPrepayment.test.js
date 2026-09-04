@@ -72,6 +72,8 @@ async function makeOrder({ userId, sellerId, total = 1500 }) {
         priceAtOrder: 750,
         productNameAtOrder: "Тестовый товар",
         sellerIdAtOrder: sellerId,
+        // Оплата открыта только после подтверждения продавцом.
+        status: "accepted",
       },
     ],
     totalAmount: total,

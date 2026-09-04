@@ -13,11 +13,7 @@ import {
   groupCartLinesBySeller,
   resolveCartFulfillmentBySeller,
 } from "../../../entities/cart/lib/groupCartLinesBySeller.js";
-import {
-  useCardPrepaidAvailable,
-  useCreateOrderPaymentMutation,
-} from "../../../entities/payment/model/paymentQueries.js";
-import { ORDER_PAYMENT_METHOD_CARD_PREPAID } from "../../../entities/order/model/constants.js";
+import { useCardPrepaidAvailable } from "../../../entities/payment/model/paymentQueries.js";
 import { selectCartCheckoutSummary } from "../../../entities/cart/lib/selectCartCheckoutSummary.js";
 import { selectCartLines } from "../../../entities/cart/lib/selectCartLines.js";
 import { useCart } from "../../../entities/cart/model/useCart.js";
@@ -210,7 +206,6 @@ export function CartPage({
     [sellerGroups],
   );
   const cardPrepaidAvailable = useCardPrepaidAvailable({ sellerIds: cartSellerIds });
-  const createOrderPaymentMutation = useCreateOrderPaymentMutation();
 
   const purchasableIds = useMemo(
     () => visibleLines.map((line) => line.productId),
@@ -451,7 +446,7 @@ export function CartPage({
       (line) => line.productId,
     );
     try {
-      const createdOrder = await createOrderMutation.mutateAsync({
+      await createOrderMutation.mutateAsync({
         items: activeSummary.selectedLines.map((line) => ({
           productId: line.productId,
           quantity: line.quantity,
@@ -467,19 +462,10 @@ export function CartPage({
       removeItems(orderedProductIds);
       setIsCartCheckoutOpen(false);
 
-      // Предоплата: заказ создан, теперь его надо оплатить. Уводим на форму
-      // банка сразу — возвращаться в корзину за оплатой покупатель не станет.
-      if (paymentMethod === ORDER_PAYMENT_METHOD_CARD_PREPAID && createdOrder?._id) {
-        const payment = await createOrderPaymentMutation.mutateAsync({
-          orderId: String(createdOrder._id),
-          returnUrl: "/my-orders",
-        });
-        if (payment.confirmationUrl) {
-          window.location.assign(payment.confirmationUrl);
-          return;
-        }
-      }
-
+      // Предоплату здесь не начинаем: сначала продавец подтверждает, что товар
+      // есть, и только потом покупатель платит. Иначе на каждый «нет в
+      // наличии» приходился бы возврат денег руками через кабинет банка.
+      // Кнопка оплаты ждёт покупателя в «Моих покупках».
       setSubmitState({
         isSubmitting: false,
         error: "",
