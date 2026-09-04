@@ -226,6 +226,91 @@ export function formatUserBusinessHoursForProfile(user) {
 }
 
 /**
+ * @param {number[]} weekdays sorted unique 0…6
+ * @returns {string} e.g. "ПН-СБ" | "ПН-СР, ПТ"
+ */
+export function formatBusinessHoursWeekdayRangesCompact(weekdays) {
+  if (!Array.isArray(weekdays) || weekdays.length === 0) {
+    return "";
+  }
+
+  const labels = USER_BUSINESS_HOURS_WEEKDAY_LABELS_RU.map((label) =>
+    String(label).toUpperCase(),
+  );
+
+  /** @type {Array<[number, number]>} */
+  const ranges = [];
+  let rangeStart = weekdays[0];
+  let rangeEnd = weekdays[0];
+
+  for (let index = 1; index < weekdays.length; index += 1) {
+    const day = weekdays[index];
+    if (day === rangeEnd + 1) {
+      rangeEnd = day;
+      continue;
+    }
+    ranges.push([rangeStart, rangeEnd]);
+    rangeStart = day;
+    rangeEnd = day;
+  }
+  ranges.push([rangeStart, rangeEnd]);
+
+  return ranges
+    .map(([start, end]) =>
+      start === end ? labels[start] : `${labels[start]}-${labels[end]}`,
+    )
+    .join(", ");
+}
+
+/**
+ * Компактный график для карточек: «ПН-СБ, 10:00–18:00».
+ *
+ * @param {unknown} user
+ * @returns {string | null}
+ */
+export function formatUserBusinessHoursCompactRange(user) {
+  if (user == null || typeof user !== "object" || user.userBusinessHoursEnabled !== true) {
+    return null;
+  }
+
+  const schedule = user.userBusinessHours;
+  if (schedule == null || typeof schedule !== "object") {
+    return null;
+  }
+
+  const weekdays = Array.isArray(schedule.weekdays)
+    ? [
+        ...new Set(
+          schedule.weekdays
+            .map((day) => Number(day))
+            .filter(
+              (day) =>
+                Number.isInteger(day) &&
+                day >= USER_BUSINESS_HOURS_WEEKDAY_MIN &&
+                day <= USER_BUSINESS_HOURS_WEEKDAY_MAX,
+            ),
+        ),
+      ].sort((left, right) => left - right)
+    : [];
+  if (weekdays.length === 0) {
+    return null;
+  }
+
+  const openTime = String(schedule.openTime ?? "").trim();
+  const closeTime = String(schedule.closeTime ?? "").trim();
+  if (!openTime || !closeTime) {
+    return null;
+  }
+
+  const dayPart = formatBusinessHoursWeekdayRangesCompact(weekdays);
+  if (!dayPart) {
+    return null;
+  }
+
+  return `${dayPart}, ${openTime}–${closeTime}`;
+}
+
+/**
  * @param {unknown} user
  * @param {Date} [at]
  * @returns {boolean}

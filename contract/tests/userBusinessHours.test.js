@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { isSellerScheduleClosedNow, resolveSellerScheduleOpensAtTime } from "../src/userBusinessHours.js";
+import {
+  formatBusinessHoursWeekdayRangesCompact,
+  formatUserBusinessHoursCompactRange,
+  isSellerScheduleClosedNow,
+  resolveSellerScheduleOpensAtTime,
+} from "../src/userBusinessHours.js";
 
 describe("userBusinessHours", () => {
   it("returns false when schedule disabled", () => {
@@ -16,7 +21,6 @@ describe("userBusinessHours", () => {
   });
 
   it("returns true outside working hours on working day", () => {
-    // Friday 2026-08-28 22:00 UTC = Saturday 01:00 MSK — use Monday 2026-08-31 05:00 UTC = 08:00 MSK
     assert.equal(
       isSellerScheduleClosedNow(
         { enabled: true, weekdays: [0, 1, 2, 3, 4], openTime: "09:00", closeTime: "18:00" },
@@ -57,6 +61,30 @@ describe("userBusinessHours", () => {
         new Date("2026-08-31T16:00:00.000Z"),
       ),
       "09:00",
+    );
+  });
+
+  it("formats weekday ranges as ПН-СБ", () => {
+    assert.equal(formatBusinessHoursWeekdayRangesCompact([0, 1, 2, 3, 4, 5]), "ПН-СБ");
+    assert.equal(formatBusinessHoursWeekdayRangesCompact([0, 1, 2, 3, 4]), "ПН-ПТ");
+    assert.equal(formatBusinessHoursWeekdayRangesCompact([0]), "ПН");
+    assert.equal(
+      formatBusinessHoursWeekdayRangesCompact([0, 1, 2, 4, 5]),
+      "ПН-СР, ПТ-СБ",
+    );
+  });
+
+  it("formats compact schedule with time", () => {
+    assert.equal(
+      formatUserBusinessHoursCompactRange({
+        userBusinessHoursEnabled: true,
+        userBusinessHours: {
+          weekdays: [0, 1, 2, 3, 4, 5],
+          openTime: "10:00",
+          closeTime: "18:00",
+        },
+      }),
+      "ПН-СБ, 10:00–18:00",
     );
   });
 });

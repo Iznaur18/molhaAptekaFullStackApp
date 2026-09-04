@@ -1,0 +1,150 @@
+.curated-list-view-all-sheet__backdrop {
+  --curated-sheet-enter-ms: 280ms;
+  --curated-sheet-exit-ms: 220ms;
+  --curated-sheet-enter-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --curated-sheet-exit-ease: cubic-bezier(0.55, 0.055, 0.675, 1);
+  --curated-sheet-radius: 2rem;
+  --curated-sheet-card-gap: 12px;
+  --curated-sheet-card-min: 86px;
+  --curated-sheet-card-max: 168px;
+
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  z-index: 1300;
+  display: flex;
+  align-items: flex-end;
+  justify-content: stretch;
+  background: transparent;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.curated-list-view-all-sheet__dismiss {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.curated-list-view-all-sheet__panel {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: none;
+  max-height: min(85dvh, 100%);
+  min-height: min(40dvh, 16rem);
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--curated-sheet-radius) var(--curated-sheet-radius) 0 0;
+  corner-shape: squircle;
+  background: var(--iz-color-surface);
+  box-shadow: 0 -12px 40px color-mix(in srgb, var(--iz-color-ink) 18%, transparent);
+  overflow: hidden;
+  isolation: isolate;
+  outline: none;
+  transform: translate3d(0, 100dvh, 0);
+  transition: transform var(--curated-sheet-exit-ms) var(--curated-sheet-exit-ease);
+  will-change: transform;
+}
+
+.curated-list-view-all-sheet__backdrop--open .curated-list-view-all-sheet__panel {
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--curated-sheet-enter-ms) var(--curated-sheet-enter-ease);
+}
+
+@supports not (height: 100dvh) {
+  .curated-list-view-all-sheet__panel {
+    transform: translate3d(0, 100vh, 0);
+  }
+}
+
+.curated-list-view-all-sheet__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--iz-space-4);
+  padding-bottom: calc(var(--iz-space-4) + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.curated-list-view-all-sheet__title {
+  margin: 0;
+  flex: 0 0 auto;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--iz-color-text);
+}
+
+.curated-list-view-all-sheet__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(var(--curated-sheet-card-min), 1fr)
+  );
+  gap: var(--curated-sheet-card-gap);
+  align-items: start;
+}
+
+.curated-list-view-all-sheet__grid-item {
+  min-width: 0;
+  max-width: var(--curated-sheet-card-max);
+  justify-self: stretch;
+  width: 100%;
+}
+
+.curated-list-view-all-sheet__grid--categories {
+  /* Телефон: одна категория на всю ширину, скролл вниз по body. */
+  grid-template-columns: 1fr;
+}
+
+.curated-list-view-all-sheet__grid--categories .curated-list-view-all-sheet__grid-item {
+  max-width: none;
+  width: 100%;
+}
+
+@media (min-width: 40rem) {
+  .curated-list-view-all-sheet__grid:not(.curated-list-view-all-sheet__grid--categories) {
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(
+        clamp(
+          var(--curated-sheet-card-min),
+          7.5rem,
+          var(--curated-sheet-card-max)
+        ),
+        1fr
+      )
+    );
+  }
+
+  .curated-list-view-all-sheet__grid:not(.curated-list-view-all-sheet__grid--categories)
+    .curated-list-view-all-sheet__grid-item {
+    max-width: none;
+  }
+
+  .curated-list-view-all-sheet__backdrop--categories {
+    --curated-sheet-card-gap: 1.25rem;
+  }
+
+  /* Не через CSS-var: инлайн с карусели (172px) иначе перебивает размер. */
+  .curated-list-view-all-sheet__grid--categories {
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    gap: 1.25rem;
+  }
+}

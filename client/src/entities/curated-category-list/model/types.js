@@ -25,6 +25,10 @@
  * @property {string | null} imageUrl
  * @property {string | null} [categorySlug]
  * @property {string | null} [sellerId]
+ * @property {string | null} [sellerFullName]
+ * @property {number | null} [sellerRatingAverage]
+ * @property {number} [sellerRatingVotes]
+ * @property {string | null} [sellerBusinessHoursLabel]
  */
 
 /**

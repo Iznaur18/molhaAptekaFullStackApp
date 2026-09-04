@@ -343,4 +343,6 @@ export const CURATED_LIST_CAROUSEL_UI = {
   VIEW_ALL: "Все",
   /** @param {string} listTitle */
   VIEW_ALL_ARIA: (listTitle) => `Все из подборки «${listTitle}»`,
+  SHEET_CLOSE_ARIA: "Закрыть подборку",
+  SHEET_ARIA: "Подборка",
 };

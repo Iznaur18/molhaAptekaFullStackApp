@@ -8,11 +8,13 @@ const VIEW_ALL_CHEVRON_SIZE_PX = 24;
 
 /**
  * Заголовок карусели + «Все» справа.
- * Пока кнопка-заглушка: перехода на страницу подборки ещё нет.
  *
- * @param {{ title: string }} props
+ * @param {{
+ *   title: string;
+ *   onViewAll?: () => void;
+ * }} props
  */
-export function CuratedListCarouselHeader({ title }) {
+export function CuratedListCarouselHeader({ title, onViewAll }) {
   return (
     <div className="curated-list-carousel-header">
       <h2 className="curated-list-carousel-header__title">{title}</h2>
@@ -20,6 +22,7 @@ export function CuratedListCarouselHeader({ title }) {
         type="button"
         className="curated-list-carousel-header__view-all"
         aria-label={CURATED_LIST_CAROUSEL_UI.VIEW_ALL_ARIA(title)}
+        onClick={onViewAll}
       >
         <span>{CURATED_LIST_CAROUSEL_UI.VIEW_ALL}</span>
         <ChevronRight

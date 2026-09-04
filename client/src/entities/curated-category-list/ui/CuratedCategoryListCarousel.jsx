@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
   CURATED_CATEGORY_LIST_HOME_CARD_GAP_PX,
   CURATED_CATEGORY_LIST_HOME_CARD_MAX_WIDTH_PX,
@@ -6,6 +8,7 @@ import {
 } from "../lib/curatedCategoryListHomeLayout.js";
 import { useCuratedCarouselImageDragScroll } from "../../curated-product-list/lib/useCuratedCarouselImageDragScroll.js";
 import { CuratedListCarouselHeader } from "../../curated-product-list/ui/CuratedListCarouselHeader.jsx";
+import { CuratedListViewAllSheet } from "../../curated-product-list/ui/CuratedListViewAllSheet.jsx";
 import { CuratedCategoryCompactCard } from "./CuratedCategoryCompactCard.jsx";
 
 import "./CuratedCategoryListCarousel.css";
@@ -19,6 +22,7 @@ import "./CuratedCategoryListCarousel.css";
  */
 export function CuratedCategoryListCarousel({ title, categories, onOpenCategory }) {
   const { ref: scrollRef, dragScrollProps } = useCuratedCarouselImageDragScroll();
+  const [isViewAllOpen, setIsViewAllOpen] = useState(false);
 
   if (categories.length === 0) {
     return null;
@@ -26,7 +30,10 @@ export function CuratedCategoryListCarousel({ title, categories, onOpenCategory 
 
   return (
     <>
-      <CuratedListCarouselHeader title={title} />
+      <CuratedListCarouselHeader
+        title={title}
+        onViewAll={() => setIsViewAllOpen(true)}
+      />
       <section
         className="curated-category-list-carousel"
         aria-label={title}
@@ -51,6 +58,13 @@ export function CuratedCategoryListCarousel({ title, categories, onOpenCategory 
           </ul>
         </div>
       </section>
+      <CuratedListViewAllSheet
+        isOpen={isViewAllOpen}
+        title={title}
+        categories={categories}
+        onOpenCategory={onOpenCategory}
+        onClose={() => setIsViewAllOpen(false)}
+      />
     </>
   );
 }

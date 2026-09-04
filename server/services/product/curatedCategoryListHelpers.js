@@ -3,6 +3,7 @@ import {
   buildCuratedCategoryItemKey,
   formatCuratedCategoryRegionMismatchMessage,
   formatCuratedRegionLabel,
+  formatUserBusinessHoursCompactRange,
   resolveViewerRegionCode,
 } from "@molha/api-contract";
 
@@ -10,7 +11,7 @@ import { AppError } from "../../errors/AppError.js";
 import CuratedCategoryListModel from "../../models/CuratedCategoryListModel.js";
 import ProductCategoryModel from "../../models/ProductCategoryModel.js";
 import ProductCategoryDisplayModel from "../../models/ProductCategoryDisplayModel.js";
-import { SellerPersonalCategoryModel } from "../../models/index.js";
+import { SellerPersonalCategoryModel, UserModel } from "../../models/index.js";
 import {
   filterCuratedListsForViewerRegion,
   normalizeCuratedProductListRegionCode,
@@ -271,6 +272,92 @@ export const autopurgeCuratedCategoryLists = async (lists) => {
 };
 
 /**
+ * @param {unknown} raw
+ * @returns {{ average: number | null; votes: number }}
+ */
+const resolveSellerRatingParts = (raw) => {
+  if (raw == null || typeof raw !== "object") {
+    return { average: null, votes: 0 };
+  }
+  const votes = Number(raw.countVotes) || 0;
+  const total = Number(raw.totalRating) || 0;
+  if (votes <= 0) {
+    return { average: null, votes: 0 };
+  }
+  return {
+    average: Math.round((total / votes) * 10) / 10,
+    votes,
+  };
+};
+
+/**
+ * @param {import('mongoose').LeanDocument<import('../models/UserModel.js').default> | null | undefined} seller
+ */
+const toCuratedCategorySellerMeta = (seller) => {
+  if (!seller) {
+    return {
+      sellerFullName: null,
+      sellerRatingAverage: null,
+      sellerRatingVotes: 0,
+      sellerBusinessHoursLabel: null,
+    };
+  }
+
+  const fullName = String(seller.userFullName ?? "").trim();
+  const rating = resolveSellerRatingParts(seller.userRatingByVotes);
+  const hoursLabel = formatUserBusinessHoursCompactRange(seller);
+
+  return {
+    sellerFullName: fullName || null,
+    sellerRatingAverage: rating.average,
+    sellerRatingVotes: rating.votes,
+    sellerBusinessHoursLabel: hoursLabel,
+  };
+};
+
+/**
+ * Подмешивает имя/рейтинг/график продавца в личные категории home-ленты.
+ *
+ * @param {Array<Record<string, any>>} lists
+ */
+const attachSellerMetaToHomeCuratedCategories = async (lists) => {
+  const sellerIds = new Set();
+  for (const list of lists) {
+    for (const category of list.categories ?? []) {
+      if (category?.kind === "personal" && category.sellerId) {
+        sellerIds.add(String(category.sellerId));
+      }
+    }
+  }
+
+  if (sellerIds.size === 0) {
+    return lists;
+  }
+
+  const sellers = await UserModel.find({ _id: { $in: [...sellerIds] } })
+    .select(
+      "userFullName userRatingByVotes userBusinessHoursEnabled userBusinessHours",
+    )
+    .lean();
+  const sellerById = new Map(sellers.map((row) => [String(row._id), row]));
+
+  return lists.map((list) => ({
+    ...list,
+    categories: (list.categories ?? []).map((category) => {
+      if (category?.kind !== "personal") {
+        return category;
+      }
+      return {
+        ...category,
+        ...toCuratedCategorySellerMeta(
+          sellerById.get(String(category.sellerId ?? "")),
+        ),
+      };
+    }),
+  }));
+};
+
+/**
  * @param {import('mongoose').LeanDocument<import('../models/CuratedCategoryListModel.js').default>[]} lists
  * @param {{ viewerRegionCode?: string | null }} [options]
  */
@@ -284,7 +371,7 @@ export const buildHomeCuratedCategoryListsResponse = async (lists, options = {})
   const { categoriesById, personalById, displaysById, displaysBySlug } =
     await fetchCuratedCategoryEntities(treeIds, personalIds);
 
-  return purgedLists
+  const payload = purgedLists
     .map((list) => {
       const categories = resolveOrderedListCategoryItems(
         list,
@@ -299,6 +386,8 @@ export const buildHomeCuratedCategoryListsResponse = async (lists, options = {})
       };
     })
     .filter((list) => list.categories.length > 0);
+
+  return attachSellerMetaToHomeCuratedCategories(payload);
 };
 
 /**

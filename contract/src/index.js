@@ -164,6 +164,8 @@ export {
   SELLER_CLOSED_FALLBACK_OVERLAY,
   formatSellerClosedUntilLabel,
   formatUserBusinessHoursForProfile,
+  formatBusinessHoursWeekdayRangesCompact,
+  formatUserBusinessHoursCompactRange,
   resolveSellerScheduleOpensAtTime,
   isProductSellerClosedNow,
   isSellerScheduleClosedNow,
