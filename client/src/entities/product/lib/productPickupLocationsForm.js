@@ -3,6 +3,7 @@ import {
   PRODUCT_PICKUP_LOCATIONS_MAX,
   PRODUCT_PICKUP_LOCATION_LABEL_MAX_LENGTH,
   ensureSingleDefaultProductPickupLocation,
+  pickAddressSuggestionForGeo,
   productPickupLocationDuplicateKey,
   productPickupLocationsFromProduct,
   syncLegacyPickupFieldsFromLocations,
@@ -11,7 +12,6 @@ import {
 import { splitAddressForForm } from "../../address/lib/splitAddressForForm.js";
 import { fetchAddressSuggestions } from "../../address/api/fetchAddressSuggestions.js";
 import { mapDadataSuggestion } from "../../address/lib/mapDadataSuggestion.js";
-import { pickFirstHouseSuggestion } from "../../address/lib/pickFirstHouseSuggestion.js";
 import { ADDRESS_SUGGEST_MIN_QUERY_LENGTH } from "../../address/model/constants.js";
 
 /**
@@ -239,7 +239,7 @@ export async function resolvePickupGeoForSavedAddress(saved) {
 
   try {
     const suggestions = await fetchAddressSuggestions(line);
-    const pick = pickFirstHouseSuggestion(suggestions);
+    const pick = pickAddressSuggestionForGeo(suggestions);
     if (!pick) {
       return null;
     }

@@ -1,4 +1,9 @@
-import { resolveRuRegionCodeFromDadataData } from "@molha/api-contract";
+import {
+  dadataSuggestionGeo,
+  dadataSuggestionObjectFiasId,
+  hasDadataSuggestionHouseNumber,
+  resolveRuRegionCodeFromDadataData,
+} from "@molha/api-contract";
 
 import {
   ADDRESS_FLAT_MAX_LENGTH,
@@ -83,9 +88,14 @@ function softAcceptVerifiedAddress(line, flatInput) {
 /**
  * Разбор одной подсказки DaData в тот же формат, что даёт clean.
  *
- * Принимаем адрес, только если он доведён до **конкретного объекта** — дома
- * (`house_fias_id`) или участка (`stead_fias_id`) — и у него есть координаты.
- * Иначе к произвольной строке прилипли бы координаты центра улицы или города.
+ * Принимаем адрес, только если он доведён до дома: либо у него есть
+ * идентификатор объекта в ФИАС (`house_fias_id` / `stead_fias_id`), либо DaData
+ * хотя бы разобрала номер дома. Дома, которого нет в ФИАС, — обычное дело:
+ * «г Грозный, р-н Ахматовский, ул Субры Кишиевой, д 56» приходит с `house: 56`,
+ * пустым `house_fias_id` и координатами улицы. Без этой ветки такой адрес
+ * сохранялся вообще без координат, и продавец не мог сделать его точкой
+ * отправления товара. Подсказку без разобранного дома по-прежнему отбрасываем:
+ * иначе к произвольной строке прилипнет центр улицы или города.
  *
  * @param {{ value?: unknown; data?: unknown } | null | undefined} suggestion
  * @param {{ line: string; flatInput: string }} context
@@ -95,22 +105,11 @@ export function mapSuggestionToVerifiedAddress(suggestion, { line, flatInput }) 
   const data = suggestion?.data;
   if (!data || typeof data !== "object") return null;
 
-  // `Number(null)` и `Number("")` дают 0 — без явной проверки на пустое
-  // значение отсутствующая координата превращается в валидный ноль
-  // (Гвинейский залив).
-  const rawLat = data.geo_lat;
-  const rawLon = data.geo_lon;
-  if (rawLat == null || rawLat === "" || rawLon == null || rawLon === "") {
-    return null;
-  }
-  const lat = Number(rawLat);
-  const lon = Number(rawLon);
-  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  const geo = dadataSuggestionGeo(data);
+  if (!geo) return null;
 
-  const fiasId =
-    pickStringField(data, "house_fias_id") ??
-    pickStringField(data, "stead_fias_id");
-  if (!fiasId) return null;
+  const fiasId = dadataSuggestionObjectFiasId(data);
+  if (!fiasId && !hasDadataSuggestionHouseNumber(data)) return null;
 
   const structured = pickStructuredFromCleaned(data);
   const value = suggestion?.value;
@@ -124,7 +123,7 @@ export function mapSuggestionToVerifiedAddress(suggestion, { line, flatInput }) 
         : resultLine,
     flat: pickFlatFromCleaned(data) ?? flatInput,
     fiasId,
-    geo: { lat, lon },
+    geo,
     city: structured.city,
     district: structured.district,
     street: structured.street,

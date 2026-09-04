@@ -1,6 +1,7 @@
+import { pickAddressSuggestionForGeo } from "@molha/api-contract";
+
 import { fetchAddressSuggestions } from "@/entities/address/api/fetchAddressSuggestions";
 import { mapDadataSuggestion } from "@/entities/address/lib/mapDadataSuggestion";
-import { pickFirstHouseSuggestion } from "@/entities/address/lib/pickFirstHouseSuggestion";
 import { ADDRESS_SUGGEST_MIN_QUERY_LENGTH } from "@/entities/address/model/constants";
 
 type SavedAddressLike = {
@@ -48,7 +49,7 @@ export const resolvePickupGeoForSavedAddress = async (
 
   try {
     const suggestions = await fetchAddressSuggestions(line);
-    const pick = pickFirstHouseSuggestion(suggestions);
+    const pick = pickAddressSuggestionForGeo(suggestions);
     if (!pick) {
       return null;
     }

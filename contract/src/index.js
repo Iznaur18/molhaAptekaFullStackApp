@@ -249,7 +249,13 @@ export {
   confirmRegistrationBodySchema,
   resendRegistrationCodeBodySchema,
 } from "./registration.js";
-export { addressSuggestBodySchema } from "./addressSuggest.js";
+export {
+  addressSuggestBodySchema,
+  dadataSuggestionGeo,
+  dadataSuggestionObjectFiasId,
+  hasDadataSuggestionHouseNumber,
+  pickAddressSuggestionForGeo,
+} from "./addressSuggest.js";
 export { addressGeolocateBodySchema } from "./addressGeolocate.js";
 export { adminCatalogDisplayPatchBodySchema } from "./adminDisplay.js";
 export {

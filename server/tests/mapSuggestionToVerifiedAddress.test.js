@@ -64,6 +64,34 @@ describe("подсказка DaData → проверенный адрес", () =
     assert.equal(result.house, "51");
   });
 
+  it("принимает дом, которого нет в ФИАС — DaData разобрала номер", () => {
+    // Снято с прода 2026-09-04: дом есть в адресе и в разборе, но в реестре
+    // его нет, поэтому house_fias_id пустой, а координаты — уровня улицы.
+    const houseWithoutFias = {
+      value: "г Грозный, р-н Ахматовский, ул Субры Кишиевой, д 56",
+      data: {
+        city: "Грозный",
+        settlement: "Ахматовский",
+        street: "Субры Кишиевой",
+        house: "56",
+        house_fias_id: null,
+        stead_fias_id: null,
+        fias_level: "7",
+        qc_geo: "2",
+        geo_lat: "43.324728",
+        geo_lon: "45.711483",
+        region_kladr_id: "2000000000000",
+      },
+    };
+
+    const result = mapSuggestionToVerifiedAddress(houseWithoutFias, context);
+
+    assert.ok(result, "без координат адрес нельзя сделать точкой отправления");
+    assert.equal(result.fiasId, "");
+    assert.deepEqual(result.geo, { lat: 43.324728, lon: 45.711483 });
+    assert.equal(result.house, "56");
+  });
+
   it("отклоняет адрес до улицы — координаты были бы не те", () => {
     const streetOnly = {
       value: "г Грозный, ул им Мовсара Кишиева",
