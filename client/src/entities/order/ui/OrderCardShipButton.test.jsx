@@ -9,11 +9,16 @@ const { OrderCard } = await import("./OrderCard.jsx");
 const SELLER = "aaaaaaaaaaaaaaaaaaaaaaaa";
 
 /**
- * Заказ продавца на ступени, где товар ещё у него.
+ * Заказ продавца на ступени «Готов к отгрузке» — там живёт кнопка отгрузки.
  *
  * @param {{ method: string; carrier?: string; courierDelivery?: boolean }} shipment
  */
-const makeOrder = ({ method, carrier = "", courierDelivery = false, status = "accepted" }) => ({
+const makeOrder = ({
+  method,
+  carrier = "",
+  courierDelivery = false,
+  status = "ready_to_ship",
+}) => ({
   _id: "order-1",
   status,
   createdAt: new Date().toISOString(),
@@ -120,5 +125,37 @@ describe("кнопка «Отгрузить»", () => {
     expect(
       screen.getByRole("button", { name: ORDER_CARD_UI.ACTION_CANCEL }),
     ).toBeTruthy();
+  });
+});
+
+describe("«Отгрузить» — последняя ступень, а не ярлык", () => {
+  it("нет на «Принят»: сначала сборка", () => {
+    renderCard(makeOrder({ method: "delivery", carrier: "seller", status: "accepted" }));
+
+    expect(shipButton()).toBeNull();
+  });
+
+  it("нет на «Собирается»: товар ещё собирают", () => {
+    renderCard(
+      makeOrder({ method: "delivery", carrier: "seller", status: "assembling" }),
+    );
+
+    expect(shipButton()).toBeNull();
+  });
+
+  it("появляется на «Готов к отгрузке»", () => {
+    renderCard(
+      makeOrder({ method: "delivery", carrier: "seller", status: "ready_to_ship" }),
+    );
+
+    expect(shipButton()).not.toBeNull();
+  });
+
+  it("на ранних ступенях остаётся одно действие вперёд — ступень сборки", () => {
+    renderCard(makeOrder({ method: "delivery", carrier: "seller", status: "accepted" }));
+
+    // Ради этого всё и затевалось: два «вперёд» рядом сбивали продавца.
+    expect(shipButton()).toBeNull();
+    expect(screen.queryByRole("button", { name: ORDER_CARD_UI.ACTION_CANCEL })).not.toBeNull();
   });
 });

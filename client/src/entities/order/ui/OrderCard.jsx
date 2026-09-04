@@ -18,6 +18,7 @@ import { buildOrderStatusFromItems } from "@izibuy/shared-lib";
 
 import {
   ORDER_PRE_SHIPMENT_STATUSES,
+  ORDER_STATUS_READY_TO_SHIP,
   ORDER_STATUS_RETURNED,
 } from "../model/constants.js";
 import { resolveShipmentAdvanceAction } from "../lib/resolveNextShipmentStatus.js";
@@ -250,9 +251,14 @@ function OrderCardLineItem({
   const actionKey = `${orderId}:${itemIndex}`;
   const isActionPending = pendingActionKey === actionKey;
   const actionError = itemActionErrors[actionKey] ?? "";
-  // Пока товар у продавца, его можно и отгрузить, и отменить — на любой
-  // ступени сборки, а не только из «В обработке».
-  const canMarkShipped = PRE_SHIPMENT_STATUSES.has(item.status);
+  // Отгрузка — последняя ступень, а не ярлык в обход остальных: иначе рядом
+  // с «На сборку» висело второе действие «вперёд», и было непонятно, какое
+  // из них правильное. Отменить по-прежнему можно на любой ступени.
+  const canMarkShipped = item.status === ORDER_STATUS_READY_TO_SHIP;
+  // Отменить можно на любой ступени, пока товар не уехал: это отдельное право,
+  // и с отгрузкой его связывать нельзя — иначе кнопка отмены пропадала вместе
+  // с ярлыком отгрузки.
+  const canCancelItem = PRE_SHIPMENT_STATUSES.has(item.status);
   // На самовывозе продавец не отгружает, а выдаёт товар в руки: кнопка
   // появляется на «Готов к выдаче» и сразу закрывает доставку.
   const canMarkDelivered =
@@ -335,7 +341,8 @@ function OrderCardLineItem({
   }
 
   const hasItemActions =
-    (canMarkShipped && (onMarkShipped || onCancelItem)) ||
+    (canCancelItem && onCancelItem) ||
+    (canMarkShipped && onMarkShipped) ||
     (canMarkDelivered && onMarkDelivered) ||
     (canConfirmDelivered && onConfirmDelivered) ||
     (canMarkReturned && onMarkReturned);
@@ -416,34 +423,30 @@ function OrderCardLineItem({
       </div>
       {hasItemActions || actionError ? (
         <div className="order-card__item-actions-row">
-          {canMarkShipped && (onMarkShipped || onCancelItem) ? (
-            <>
-              {onCancelItem ? (
-                <ConfirmButton
-                  className="order-card__item-action-button order-card__item-action-button_cancel"
-                  label={ORDER_CARD_UI.ACTION_CANCEL}
-                  pendingLabel={ORDER_CARD_UI.ACTION_PENDING}
-                  isPending={isActionPending}
-                  question={
-                    attentionRole === "buyer"
-                      ? ORDER_CARD_UI.BUYER_CANCEL_CONFIRM
-                      : ORDER_CARD_UI.CANCEL_CONFIRM
-                  }
-                  onConfirm={() => onCancelItem({ orderId, itemIndex })}
-                  disabled={isActionPending}
-                />
-              ) : null}
-              {onMarkShipped ? (
-                <button
-                  type="button"
-                  className="order-card__item-action-button"
-                  onClick={() => onMarkShipped({ orderId, itemIndex })}
-                  disabled={isActionPending}
-                >
-                  {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_SHIPPED}
-                </button>
-              ) : null}
-            </>
+          {canCancelItem && onCancelItem ? (
+            <ConfirmButton
+              className="order-card__item-action-button order-card__item-action-button_cancel"
+              label={ORDER_CARD_UI.ACTION_CANCEL}
+              pendingLabel={ORDER_CARD_UI.ACTION_PENDING}
+              isPending={isActionPending}
+              question={
+                attentionRole === "buyer"
+                  ? ORDER_CARD_UI.BUYER_CANCEL_CONFIRM
+                  : ORDER_CARD_UI.CANCEL_CONFIRM
+              }
+              onConfirm={() => onCancelItem({ orderId, itemIndex })}
+              disabled={isActionPending}
+            />
+          ) : null}
+          {canMarkShipped && onMarkShipped ? (
+            <button
+              type="button"
+              className="order-card__item-action-button"
+              onClick={() => onMarkShipped({ orderId, itemIndex })}
+              disabled={isActionPending}
+            >
+              {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_SHIPPED}
+            </button>
           ) : null}
           {canMarkDelivered && onMarkDelivered ? (
             <button
