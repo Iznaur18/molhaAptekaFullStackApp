@@ -69,7 +69,6 @@ async function makeOrder({ userId, sellerId, total = 1500 }) {
         productId: new mongoose.Types.ObjectId(),
         quantity: 2,
         unitPriceAtOrder: 750,
-        priceAtOrder: 750,
         productNameAtOrder: "Тестовый товар",
         sellerIdAtOrder: sellerId,
         // Оплата открыта только после подтверждения продавцом.
@@ -266,6 +265,104 @@ describe("предоплата заказа картой", () => {
         returnUrl: "/my-orders",
       }),
     );
+    assert.equal(await PaymentModel.countDocuments({ userId: buyer._id }), 0);
+  });
+});
+
+describe("чек по заказу", () => {
+  before(connectMongoTestReplSet);
+  after(async () => {
+    globalThis.fetch = realFetch;
+    await disconnectMongoTestReplSet();
+  });
+  beforeEach(async () => {
+    await clearMongoCollections();
+    fetchCalls = [];
+  });
+  afterEach(() => {
+    globalThis.fetch = realFetch;
+  });
+
+  it("цена берётся из unitPriceAtOrder — поля priceAtOrder в заказе нет", async () => {
+    const buyer = await makeBuyer();
+    const order = await makeOrder({ userId: buyer._id, sellerId: PLATFORM_SELLER_ID });
+    stubFetch(() => pendingPayment("2c8f-receipt-1"));
+
+    await createOrderPrepayment({
+      userId: String(buyer._id),
+      orderId: String(order._id),
+      returnUrl: "/my-orders",
+    });
+
+    const body = JSON.parse(fetchCalls[0].init.body);
+    assert.equal(body.receipt.items[0].amount.value, "750.00", "нулевой цены быть не должно");
+    assert.equal(body.receipt.items[0].quantity, "2.00");
+  });
+
+  it("бесплатные единицы по акции в чек не попадают", async () => {
+    const buyer = await makeBuyer();
+    const order = await OrderModel.create({
+      userBuyerId: buyer._id,
+      items: [
+        {
+          productId: new mongoose.Types.ObjectId(),
+          quantity: 3,
+          unitPriceAtOrder: 100,
+          buyNFreeUnitsAtOrder: 1,
+          productNameAtOrder: "Акционный товар",
+          sellerIdAtOrder: PLATFORM_SELLER_ID,
+          status: "accepted",
+        },
+      ],
+      // Платит покупатель за две единицы из трёх.
+      totalAmount: 200,
+      paymentMethod: "cardPrepaid",
+      deliveryAddress: "г Москва, ул Тестовая, д 1",
+    });
+    stubFetch(() => pendingPayment("2c8f-receipt-2"));
+
+    await createOrderPrepayment({
+      userId: String(buyer._id),
+      orderId: String(order._id),
+      returnUrl: "/my-orders",
+    });
+
+    const body = JSON.parse(fetchCalls[0].init.body);
+    assert.equal(body.receipt.items[0].quantity, "2.00", "бесплатная единица не оплачивается");
+    assert.equal(body.amount.value, "200.00");
+  });
+
+  it("расхождение чека с суммой заказа не пускает платёж в банк", async () => {
+    const buyer = await makeBuyer();
+    const order = await OrderModel.create({
+      userBuyerId: buyer._id,
+      items: [
+        {
+          productId: new mongoose.Types.ObjectId(),
+          quantity: 1,
+          unitPriceAtOrder: 100,
+          productNameAtOrder: "Товар",
+          sellerIdAtOrder: PLATFORM_SELLER_ID,
+          status: "accepted",
+        },
+      ],
+      // Сумма заказа не сходится с позициями — чек был бы неверным.
+      totalAmount: 999,
+      paymentMethod: "cardPrepaid",
+      deliveryAddress: "г Москва, ул Тестовая, д 1",
+    });
+    stubFetch(() => pendingPayment("2c8f-receipt-3"));
+
+    await assert.rejects(
+      () =>
+        createOrderPrepayment({
+          userId: String(buyer._id),
+          orderId: String(order._id),
+          returnUrl: "/my-orders",
+        }),
+      /не удалось собрать чек/i,
+    );
+    assert.equal(fetchCalls.length, 0, "в банк такой платёж не уходит");
     assert.equal(await PaymentModel.countDocuments({ userId: buyer._id }), 0);
   });
 });

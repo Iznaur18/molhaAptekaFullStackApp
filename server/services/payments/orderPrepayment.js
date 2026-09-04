@@ -27,6 +27,9 @@ export const ORDER_PREPAYMENT_FOREIGN_SELLER_MESSAGE =
 
 export const ORDER_PREPAYMENT_ALREADY_PAID_MESSAGE = "Заказ уже оплачен";
 
+export const ORDER_RECEIPT_MISMATCH_MESSAGE =
+  "Не удалось собрать чек по заказу — напишите в поддержку, оплата не списана";
+
 /**
  * Все ли продавцы заказа — площадка.
  *
@@ -74,21 +77,49 @@ function buildOrderReceipt(order, contact) {
   const vatCode =
     Math.floor(Number(process.env.YOOKASSA_VAT_CODE)) || YOOKASSA_VAT_CODE_DEFAULT;
 
-  const items = (Array.isArray(order.items) ? order.items : []).map((item) => {
-    const quantity = Math.max(1, Math.floor(Number(item.quantity) || 1));
-    const unitPrice = Number(item.priceAtOrder) || 0;
-    return {
+  const items = [];
+  for (const item of Array.isArray(order.items) ? order.items : []) {
+    // Цена позиции лежит в `unitPriceAtOrder`; `priceAtOrder` — на случай
+    // старых заказов. Промах по имени поля стоил чека с нулевой ценой и
+    // отказа банка.
+    const unitPrice = Number(item.unitPriceAtOrder ?? item.priceAtOrder) || 0;
+    const quantity = Math.max(0, Math.floor(Number(item.quantity) || 0));
+    // Бесплатные единицы по акции «N+1» покупатель не оплачивает — в чек
+    // попадают только платные, иначе его сумма разойдётся с платежом.
+    const freeUnits = Math.max(0, Math.floor(Number(item.buyNFreeUnitsAtOrder) || 0));
+    const paidQuantity = Math.max(0, quantity - freeUnits);
+    if (paidQuantity === 0 || unitPrice <= 0) {
+      continue;
+    }
+    items.push({
       description: String(item.productNameAtOrder ?? "Товар").slice(0, 128),
-      quantity: quantity.toFixed(2),
+      quantity: paidQuantity.toFixed(2),
       amount: { value: unitPrice.toFixed(2), currency: "RUB" },
       vat_code: vatCode,
       payment_subject: YOOKASSA_ORDER_PAYMENT_SUBJECT,
       payment_mode: YOOKASSA_POINTS_PAYMENT_MODE,
-    };
-  });
+    });
+  }
 
   if (items.length === 0) {
     throw new AppError(400, "В заказе нет позиций для чека");
+  }
+
+  // Чек — фискальный документ: его сумма обязана совпадать с суммой платежа.
+  // Если разошлись, лучше не проводить оплату вовсе, чем пробить неверный чек.
+  const receiptTotal = items.reduce(
+    (sum, row) => sum + Number(row.amount.value) * Number(row.quantity),
+    0,
+  );
+  const orderTotal = Number(order.totalAmount) || 0;
+  if (Math.abs(receiptTotal - orderTotal) > 0.01) {
+    logServerEvent("error", {
+      event: "payment.receipt_total_mismatch",
+      orderId: String(order._id ?? ""),
+      receiptTotal,
+      orderTotal,
+    });
+    throw new AppError(400, ORDER_RECEIPT_MISMATCH_MESSAGE);
   }
 
   return { customer, tax_system_code: taxSystemCode, items };

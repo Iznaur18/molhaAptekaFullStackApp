@@ -52,7 +52,12 @@ async function readErrorDescription(response) {
     if (!text) return "";
     try {
       const parsed = JSON.parse(text);
-      return String(parsed?.description ?? parsed?.code ?? text).slice(0, 300);
+      // `parameter` называет поле, которое банку не понравилось. Без него в
+      // логе остаётся только «Invalid parameter value» — искать нечего.
+      const parts = [parsed?.description, parsed?.code, parsed?.parameter]
+        .map((part) => String(part ?? "").trim())
+        .filter(Boolean);
+      return (parts.length > 0 ? parts.join(" | ") : text).slice(0, 300);
     } catch {
       return text.slice(0, 300);
     }
