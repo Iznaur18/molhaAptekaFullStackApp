@@ -32,6 +32,8 @@
     "seed:auction-bids": "node scripts/seedProductAuctionBids.js",
     "delete-products-without-images": "node scripts/deleteProductsWithoutImages.js",
     "delete-products-without-images:apply": "node scripts/deleteProductsWithoutImages.js --apply",
+    "backfill:user-address-geo": "node scripts/backfillUserAddressGeo.js",
+    "backfill:user-address-geo:apply": "node scripts/backfillUserAddressGeo.js --apply",
     "onec:commerceml-smoke": "node scripts/onecCommerceMlSmoke.mjs"
   },
   "devDependencies": {
