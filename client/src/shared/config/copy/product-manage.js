@@ -90,8 +90,6 @@ export const PRODUCT_PROMOTION_UI = {
   BALANCE_POINTS: (balance) => `${balance} баллов`,
   PAYMENT_HINT_POINTS:
     "Оплата только баллами. Списание сразу, продвижение включается автоматически.",
-  REGION_BOOST_HINT:
-    "Буст и Баннер поднимают карточку в регионе продажи. ТОП — абсолютный верх выдачи во всех регионах. Оформление карточки видно везде.",
   TIER_LABEL: "Уровень продвижения",
   /** @param {string} percent */
   TIER_RATE_HINT: (percent) => `${percent}% от цены товара`,

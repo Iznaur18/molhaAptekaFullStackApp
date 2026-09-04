@@ -89,9 +89,6 @@ export function ProductPromotionFormPanel({
       <p className="product-promotion-modal__hint">
         {PRODUCT_PROMOTION_UI.PAYMENT_HINT_POINTS}
       </p>
-      <p className="product-promotion-modal__hint">
-        {PRODUCT_PROMOTION_UI.REGION_BOOST_HINT}
-      </p>
 
       <fieldset
         className="product-promotion-modal__section"
