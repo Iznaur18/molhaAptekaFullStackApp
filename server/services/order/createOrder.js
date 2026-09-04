@@ -724,6 +724,10 @@ export async function createOrder({
             // и в проверенном адресе geo почти всегда пустой.
             deliveryAddressGeo: deliveryAddressGeo ?? addressForOrder.geo ?? null,
             fulfillmentMethod: resolvedFulfillment,
+            // Порядок хвоста: fee → courier flag → payout → carrier.
+            // Перепутать payout и carrier нельзя: в карточке покупателя
+            // реквизиты рисуются как «Перевести продавцу: …», и вместо телефона
+            // всплывал код перевозчика («seller»).
             shipments: buildStoredShipments(
               pricedItems,
               fulfillmentSplit.fulfillmentBySellerId,
@@ -733,8 +737,8 @@ export async function createOrder({
                 feeBySellerId: deliveryFeeBySellerId,
               }),
               courierDeliveryBySeller,
-              deliveryCarrierBySeller,
               payoutRequisitesBySeller,
+              deliveryCarrierBySeller,
             ),
             paymentMethod,
             status: orderStatus,

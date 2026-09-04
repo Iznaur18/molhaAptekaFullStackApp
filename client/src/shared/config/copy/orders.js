@@ -18,6 +18,9 @@ export const ORDER_CARD_UI = {
   ITEM_DELIVERED_AT_LABEL: "Доставлен",
   ITEM_CONFIRMED_AT_LABEL: "Подтверждён",
   CREATED_LABEL: "Создан",
+  ORDER_NUMBER_LABEL: "Номер заказа",
+  /** @param {string} number */
+  ORDER_NUMBER: (number) => `№ ${number}`,
   BUYER_LABEL: "Покупатель",
   SELLER_LABEL: "Продавец",
   // Раньше было «Принять», но теперь «Принят» — настоящая ступень лестницы,
@@ -57,6 +60,11 @@ export const ORDER_CARD_UI = {
     "Продавец подтвердил заказ. Оплатите — и он начнёт собирать.",
   AWAITING_PREPAYMENT_SELLER_HINT:
     "Заказ подтверждён, ждём оплату от покупателя. Собирать и отгружать его пока рано.",
+  AWAITING_COURIER: "Ищем курьера",
+  AWAITING_COURIER_BUYER_HINT:
+    "Ищем курьера. Можно поднять оплату за доставку — так заказ быстрее возьмут.",
+  AWAITING_COURIER_SELLER_HINT:
+    "Ждём, пока курьер примет заказ в «Свободные заказы».",
   PAY_NOW: "Оплатить",
   PAY_NOW_PENDING: "Открываем оплату…",
   SHIPMENT_PAY_TO_HINT:
@@ -76,6 +84,8 @@ export const ORDER_CARD_UI = {
   SHIPMENT_BUYER_CODE: (code) => `Код для курьера: ${code}`,
   SHIPMENT_BUYER_CODE_HINT:
     "Назовите его курьеру при получении — заказ закроется автоматически.",
+  COURIER_CONFIRM_VIA_CODE_HINT:
+    "Заказ закроет курьер, когда введёт ваш код. Кнопка «Подтвердить» здесь не нужна.",
   SHIPMENT_PICKUP: "Самовывоз",
   SHIPMENT_DELIVERY: "Доставка",
   ACTION_CONFIRM: "Подтвердить",

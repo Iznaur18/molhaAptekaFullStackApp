@@ -1,26 +1,58 @@
 .confirm-button {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Вопрос читают до того, как жмут «Да», — поэтому он идёт первым и не мельче
-   самих кнопок. */
 .confirm-button__question {
   font-size: 0.85rem;
+  line-height: 1.4;
   color: var(--iz-color-text);
 }
 
-.confirm-button__no {
+.confirm-button__actions {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.confirm-button__no,
+.confirm-button__yes {
+  flex: 1 1 0;
+  min-width: 0;
   font: inherit;
-  font-size: 0.85rem;
-  padding: 0.35rem 0.7rem;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--iz-color-text-muted, var(--iz-color-text));
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
   cursor: pointer;
+  text-align: center;
+}
+
+/* «Нет» слева — отказ от действия; «Да» справа — подтверждение. */
+.confirm-button__no {
+  background: var(--iz-color-status-danger-soft, #fee2e2);
+  border-color: color-mix(in srgb, var(--iz-color-danger, #dc2626) 35%, transparent);
+  color: var(--iz-color-danger, #dc2626);
+}
+
+.confirm-button__yes {
+  background: var(--iz-color-status-success-soft, #dcfce7);
+  border-color: color-mix(in srgb, var(--iz-color-success, #16a34a) 35%, transparent);
+  color: var(--iz-color-success, #16a34a);
+}
+
+.confirm-button__no:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--iz-color-danger, #dc2626) 14%, white);
+}
+
+.confirm-button__yes:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--iz-color-success, #16a34a) 14%, white);
 }
 
 .confirm-button__no:disabled,

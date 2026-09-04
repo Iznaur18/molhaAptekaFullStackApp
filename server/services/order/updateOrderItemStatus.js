@@ -420,9 +420,16 @@ export async function markOrderItemShippedBySeller({ orderId, itemIndex, sellerI
  *   itemIndex: number;
  *   buyerId: string;
  *   userId: string;
+ *   viaCourierCodeHandover?: boolean;
  * }} input
  */
-export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, userId }) {
+export async function confirmOrderItemByBuyer({
+  orderId,
+  itemIndex,
+  buyerId,
+  userId,
+  viaCourierCodeHandover = false,
+}) {
   const preview = await loadOrderWithItems(orderId);
 
   if (normalizeId(preview.userBuyerId) !== buyerId) {
@@ -433,6 +440,29 @@ export async function confirmOrderItemByBuyer({ orderId, itemIndex, buyerId, use
 
   if (previewItem.status !== ORDER_STATUS_DELIVERED) {
     throw new AppError(409, 'Подтверждение доступно только для статуса "Доставлен"');
+  }
+
+  // Курьеры Gitorg: сделку закрывает ввод кода курьером, не кнопка покупателя.
+  // Иначе обходятся и оплата продавцом, и рукопожатие у двери.
+  if (
+    !viaCourierCodeHandover &&
+    resolveShipmentKindForItem(preview, previewItem) === "courier"
+  ) {
+    const sellerId = String(
+      previewItem?.sellerIdAtOrder ??
+        previewItem?.productId?.productSeller?._id ??
+        previewItem?.productId?.productSeller ??
+        "",
+    );
+    const shipment = (preview.shipments ?? []).find(
+      (row) => row?.sellerId != null && String(row.sellerId) === sellerId,
+    );
+    if (shipment?.courierDelivery === true) {
+      throw new AppError(
+        409,
+        "Это отправление закрывает курьер по коду — назовите ему код из заказа",
+      );
+    }
   }
 
   if (previewItem.loyaltyPointsAwarded) {

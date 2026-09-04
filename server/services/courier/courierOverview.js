@@ -275,7 +275,9 @@ export async function listMyCourierDeliveries({ courierId }) {
   const orders = await OrderModel.find({
     shipments: { $elemMatch: { courierId } },
   })
-    .select("items shipments deliveryAddress deliveryAddressFlat createdAt userBuyerId")
+    .select(
+      "items shipments deliveryAddress deliveryAddressFlat createdAt userBuyerId paymentMethod",
+    )
     .populate("userBuyerId", "userName userPhoneNumber")
     .sort({ createdAt: -1 })
     .limit(100)
@@ -338,6 +340,8 @@ export async function listMyCourierDeliveries({ courierId }) {
       sellerName: seller?.userName ?? "",
       sellerPhone: seller?.userPhoneNumber ?? "",
       status,
+      paymentMethod: String(order.paymentMethod ?? ""),
+      paymentConfirmed: Boolean(shipment.paymentConfirmedAt),
       deliveryFeeRub: Number(shipment.deliveryFeeRub) || 0,
       pickupAddress: pickup.address,
       buyerId: String(buyer?._id ?? buyer ?? ""),

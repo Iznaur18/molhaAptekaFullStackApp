@@ -60,6 +60,16 @@
   font-weight: 600;
 }
 
+.order-card__order-number {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
 .order-card__status_pending {
   background: var(--iz-color-status-warning-soft);
   color: var(--iz-color-warning-text);
@@ -182,6 +192,15 @@
   border: 1px solid var(--iz-color-border);
   border-radius: var(--iz-radius-sm, 6px);
   background: var(--iz-color-bg-subtle, transparent);
+}
+
+.order-card__shipment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-left: auto;
 }
 
 .order-card__shipment-label {
@@ -813,7 +832,9 @@
 }
 
 /* Заказ оформлен с предоплатой, но деньги ещё не пришли. */
-.order-card__awaiting-prepayment {
+/* Курьеры Gitorg ещё не взяли готовое отправление. */
+.order-card__awaiting-prepayment,
+.order-card__awaiting-courier {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -826,4 +847,9 @@
   color: var(--iz-color-warning-text);
   font-size: 0.85rem;
   line-height: 1.45;
+}
+
+.order-card__status_awaiting-courier {
+  background: var(--iz-color-status-warning-soft);
+  color: var(--iz-color-warning-text);
 }

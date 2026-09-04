@@ -322,6 +322,33 @@ describe("доставка до подтверждения", () => {
     assert.ok(buyer._id);
   });
 
+  it("покупатель не может закрыть Gitorg-доставку кнопкой — только код курьера", async () => {
+    const { ids, courierId, order, seller, buyer } = await holding();
+    await flow.startDeliveryByCourier({ ...ids, courierId });
+    await flow.markArrivedByCourier({ ...ids, courierId });
+
+    const { confirmOrderItemByBuyer } = await import(
+      "../services/order/updateOrderItemStatus.js"
+    );
+
+    await assert.rejects(
+      () =>
+        confirmOrderItemByBuyer({
+          orderId: String(order._id),
+          itemIndex: 0,
+          buyerId: String(buyer._id),
+          userId: String(buyer._id),
+        }),
+      /закрывает курьер по коду/i,
+    );
+
+    assert.equal(
+      (await readShipment(order._id, seller._id)).order.status,
+      "delivered",
+      "статус не ушёл в confirmed в обход курьера",
+    );
+  });
+
   it("нельзя выехать, не забрав товар", async () => {
     const { order, seller, courier } = await readyShipment();
     const ids = { orderId: String(order._id), sellerId: String(seller._id) };

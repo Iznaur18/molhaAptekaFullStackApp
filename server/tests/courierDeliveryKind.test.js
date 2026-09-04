@@ -83,6 +83,22 @@ describe("вид доставки на отправлении", () => {
       "безопасный дефолт: чужим курьерам заказ без спроса не отдаём",
     );
   });
+
+  it("carrier и payout не путаются по позиции аргументов", () => {
+    const [shipment] = buildStoredShipments(
+      [line(SELLER_A)],
+      { [SELLER_A]: "delivery" },
+      "pickup",
+      { [SELLER_A]: 100 },
+      { [SELLER_A]: false },
+      { [SELLER_A]: "+7 900 000-00-00" },
+      { [SELLER_A]: "seller" },
+    );
+
+    assert.equal(shipment.deliveryCarrier, "seller");
+    assert.equal(shipment.sellerPayoutRequisites, "+7 900 000-00-00");
+    assert.equal(shipment.courierDelivery, false);
+  });
 });
 
 describe("взаимоисключение способов на товаре", () => {

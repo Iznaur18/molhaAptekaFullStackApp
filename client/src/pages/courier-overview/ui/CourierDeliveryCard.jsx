@@ -83,6 +83,12 @@ export function CourierDeliveryCard({
   const needsCode =
     delivery.status === "courier_assigned" || delivery.status === "delivered";
   const codeReady = /^\d{4}$/.test(code.trim());
+  // Картой при получении: курьер ждёт «Оплата получена» у продавца — без
+  // этого «Вручил» на сервере режется. Блок только информационный.
+  const showCardOnDeliveryPayment =
+    delivery.paymentMethod === "cardOnDelivery" &&
+    (delivery.status === "in_delivery" || delivery.status === "delivered");
+  const paymentConfirmed = delivery.paymentConfirmed === true;
 
   const renderAction = () => {
     switch (delivery.status) {
@@ -189,6 +195,20 @@ export function CourierDeliveryCard({
 
       {!delivery.contactsUnlocked ? (
         <p className="courier-overview__hint">{COURIER_OVERVIEW_UI.CONTACTS_LOCKED}</p>
+      ) : null}
+
+      {showCardOnDeliveryPayment ? (
+        paymentConfirmed ? (
+          <div className="courier-overview__payment courier-overview__payment--done">
+            <strong>{COURIER_OVERVIEW_UI.PAYMENT_RECEIVED}</strong>
+            <span>{COURIER_OVERVIEW_UI.PAYMENT_RECEIVED_HINT}</span>
+          </div>
+        ) : (
+          <div className="courier-overview__payment courier-overview__payment--awaiting">
+            <strong>{COURIER_OVERVIEW_UI.PAYMENT_AWAITING}</strong>
+            <span>{COURIER_OVERVIEW_UI.PAYMENT_AWAITING_HINT}</span>
+          </div>
+        )
       ) : null}
 
       <ul className="courier-overview__items" role="list">

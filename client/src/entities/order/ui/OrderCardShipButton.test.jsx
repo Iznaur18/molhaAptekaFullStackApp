@@ -119,12 +119,145 @@ describe("кнопка «Отгрузить»", () => {
     ).toBeNull();
   });
 
-  it("«Отменить» остаётся везде: отменить можно любое отправление", () => {
-    renderCard(makeOrder({ method: "pickup" }));
+  it("«Оплата получена» только у курьера, не при доставке продавцом", () => {
+    const onConfirmPayment = vi.fn();
+    renderWithProviders(
+      <OrderCard
+        order={makeOrder({
+          method: "delivery",
+          carrier: "seller",
+          status: "delivered",
+        })}
+        attentionRole="seller"
+        onConfirmPayment={onConfirmPayment}
+        onCancelItem={vi.fn()}
+      />,
+    );
 
     expect(
-      screen.getByRole("button", { name: ORDER_CARD_UI.ACTION_CANCEL }),
+      screen.queryByRole("button", { name: ORDER_CARD_UI.SHIPMENT_PAYMENT_CONFIRM }),
+    ).toBeNull();
+  });
+
+  it("«Оплата получена» есть на курьерском in_delivery", () => {
+    renderWithProviders(
+      <OrderCard
+        order={makeOrder({
+          method: "delivery",
+          carrier: "gitorg_courier",
+          courierDelivery: true,
+          status: "in_delivery",
+        })}
+        attentionRole="seller"
+        onConfirmPayment={vi.fn()}
+        onCancelItem={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: ORDER_CARD_UI.SHIPMENT_PAYMENT_CONFIRM }),
     ).toBeTruthy();
+  });
+  it("«Отгрузить» стоит в строке отправления, не у позиции", () => {
+    const { container } = renderCard(
+      makeOrder({ method: "delivery", carrier: "seller", status: "ready_to_ship" }),
+    );
+
+    const shipmentRow = container.querySelector(".order-card__shipment-row");
+    const itemRow = container.querySelector(".order-card__item-actions-row");
+    expect(
+      shipmentRow?.querySelector("button")?.textContent,
+    ).toContain(ORDER_CARD_UI.ACTION_SHIPPED);
+    expect(itemRow?.textContent ?? "").not.toContain(ORDER_CARD_UI.ACTION_SHIPPED);
+  });
+
+  it("«Доставлен» стоит в строке отправления после отгрузки", () => {
+    const { container } = renderCard(
+      makeOrder({ method: "delivery", carrier: "seller", status: "shipped" }),
+    );
+
+    const shipmentRow = container.querySelector(".order-card__shipment-row");
+    const itemRow = container.querySelector(".order-card__item-actions-row");
+    expect(shipmentRow?.textContent ?? "").toContain(ORDER_CARD_UI.ACTION_DELIVERED);
+    expect(itemRow?.textContent ?? "").not.toContain(ORDER_CARD_UI.ACTION_DELIVERED);
+  });
+
+  it("«Подтвердить» у покупателя в строке отправления", () => {
+    const { container } = renderWithProviders(
+      <OrderCard
+        order={makeOrder({
+          method: "delivery",
+          carrier: "seller",
+          status: "delivered",
+        })}
+        attentionRole="buyer"
+        onConfirmDelivered={vi.fn()}
+        onCancelItem={vi.fn()}
+      />,
+    );
+
+    const shipmentRow = container.querySelector(".order-card__shipment-row");
+    const itemRow = container.querySelector(".order-card__item-actions-row");
+    expect(shipmentRow?.textContent ?? "").toContain(ORDER_CARD_UI.ACTION_CONFIRM);
+    expect(itemRow?.textContent ?? "").not.toContain(ORDER_CARD_UI.ACTION_CONFIRM);
+  });
+
+  it("на курьере Gitorg «Подтвердить» у покупателя нет", () => {
+    renderWithProviders(
+      <OrderCard
+        order={makeOrder({
+          method: "delivery",
+          carrier: "gitorg_courier",
+          courierDelivery: true,
+          status: "delivered",
+        })}
+        attentionRole="buyer"
+        onConfirmDelivered={vi.fn()}
+        onCancelItem={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: ORDER_CARD_UI.ACTION_CONFIRM }),
+    ).toBeNull();
+    expect(
+      screen.getByText(ORDER_CARD_UI.COURIER_CONFIRM_VIA_CODE_HINT),
+    ).toBeTruthy();
+  });
+
+  it("при поиске курьера Gitorg показывает «Ищем курьера»", () => {
+    renderWithProviders(
+      <OrderCard
+        order={makeOrder({
+          method: "delivery",
+          carrier: "gitorg_courier",
+          courierDelivery: true,
+          status: "ready_to_ship",
+        })}
+        attentionRole="buyer"
+        onCancelItem={vi.fn()}
+      />,
+    );
+
+    expect(screen.getAllByText(ORDER_CARD_UI.AWAITING_COURIER).length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText(ORDER_CARD_UI.AWAITING_COURIER_BUYER_HINT)).toBeTruthy();
+  });
+
+  it("продавцу при поиске курьера — свой текст", () => {
+    renderWithProviders(
+      <OrderCard
+        order={makeOrder({
+          method: "delivery",
+          carrier: "gitorg_courier",
+          courierDelivery: true,
+          status: "ready_to_ship",
+        })}
+        attentionRole="seller"
+        onCancelItem={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText(ORDER_CARD_UI.AWAITING_COURIER_SELLER_HINT)).toBeTruthy();
   });
 });
 

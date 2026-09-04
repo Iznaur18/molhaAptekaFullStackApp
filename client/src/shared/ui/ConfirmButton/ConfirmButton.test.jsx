@@ -35,6 +35,14 @@ describe("подтверждение прямо в кнопке", () => {
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 
+  it("«Нет» слева, «Да» справа", () => {
+    setup(vi.fn());
+    fireEvent.click(screen.getByRole("button", { name: "Отменить" }));
+
+    const buttons = screen.getAllByRole("button");
+    expect(buttons.map((b) => b.textContent)).toEqual(["Нет", "Да"]);
+  });
+
   it("«Нет» возвращает кнопку и ничего не делает", () => {
     const onConfirm = vi.fn();
     setup(onConfirm);

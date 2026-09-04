@@ -18,6 +18,7 @@ import { buildOrderStatusFromItems } from "@izibuy/shared-lib";
 
 import {
   ORDER_PRE_SHIPMENT_STATUSES,
+  ORDER_STATUS_READY_FOR_PICKUP,
   ORDER_STATUS_READY_TO_SHIP,
   ORDER_STATUS_RETURNED,
 } from "../model/constants.js";
@@ -46,6 +47,8 @@ import {
 } from "../lib/resolveOrderLineItemProductName.js";
 import { OrderCardLineItemThumb } from "./OrderCardLineItemThumb.jsx";
 import { resolveOrderLineAffiliateSellerLine } from "../lib/resolveOrderLineAffiliateSellerLine.js";
+import { formatOrderNumber } from "../lib/formatOrderNumber.js";
+import { isAwaitingGitorgCourier } from "../lib/isAwaitingGitorgCourier.js";
 import { BuyerPassportSharePanel } from "../../installment/ui/BuyerPassportSharePanel.jsx";
 import { formatIsoDateTime } from "../../../shared/lib/formatIsoDateTime.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
@@ -165,6 +168,10 @@ function OrderCardMeta({
         </div>
       ) : null}
       <div className="order-card__meta-row">
+        <dt>{ORDER_CARD_UI.ORDER_NUMBER_LABEL}</dt>
+        <dd>{ORDER_CARD_UI.ORDER_NUMBER(formatOrderNumber(order._id))}</dd>
+      </div>
+      <div className="order-card__meta-row">
         <dt>{ORDER_CARD_UI.CREATED_LABEL}</dt>
         <dd>{formatIsoDateTime(order.createdAt)}</dd>
       </div>
@@ -218,11 +225,8 @@ function OrderCardMeta({
  *   compact?: boolean;
  *   showSecondaryOnly?: boolean;
  *   onProductClick?: (item: import("../model/types.js").OrderLineItem) => void;
- *   onMarkShipped?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   onMarkReturned?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
- *   onMarkDelivered?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   onCancelItem?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
- *   onConfirmDelivered?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   pendingActionKey?: string | null;
  *   itemActionErrors?: Record<string, string>;
  *   itemsCount?: number;
@@ -235,14 +239,10 @@ function OrderCardLineItem({
   compact = false,
   showSecondaryOnly = false,
   itemsCount = 1,
-  isPickupShipmentItem = false,
   onProductClick,
-  onMarkShipped,
   onMarkReturned,
   buyerUserId,
-  onMarkDelivered,
   onCancelItem,
-  onConfirmDelivered,
   pendingActionKey = null,
   itemActionErrors = {},
   attentionRole = "buyer",
@@ -251,20 +251,11 @@ function OrderCardLineItem({
   const actionKey = `${orderId}:${itemIndex}`;
   const isActionPending = pendingActionKey === actionKey;
   const actionError = itemActionErrors[actionKey] ?? "";
-  // Отгрузка — последняя ступень, а не ярлык в обход остальных: иначе рядом
-  // с «На сборку» висело второе действие «вперёд», и было непонятно, какое
-  // из них правильное. Отменить по-прежнему можно на любой ступени.
-  const canMarkShipped = item.status === ORDER_STATUS_READY_TO_SHIP;
   // Отменить можно на любой ступени, пока товар не уехал: это отдельное право,
   // и с отгрузкой его связывать нельзя — иначе кнопка отмены пропадала вместе
   // с ярлыком отгрузки.
   const canCancelItem = PRE_SHIPMENT_STATUSES.has(item.status);
-  // На самовывозе продавец не отгружает, а выдаёт товар в руки: кнопка
-  // появляется на «Готов к выдаче» и сразу закрывает доставку.
-  const canMarkDelivered =
-    item.status === ORDER_STATUS_SHIPPED ||
-    (isPickupShipmentItem && item.status === "ready_for_pickup");
-  const canConfirmDelivered = item.status === ORDER_STATUS_DELIVERED;
+  // «Отгрузить» / «Доставлен» / «Выдал» / «Подтвердить» — в строке отправления.
   // Возврат оформляется, пока покупатель не подтвердил получение: товар уже
   // уехал, но сделка не состоялась — отказ у двери, неудачное вручение.
   const canMarkReturned =
@@ -341,11 +332,7 @@ function OrderCardLineItem({
   }
 
   const hasItemActions =
-    (canCancelItem && onCancelItem) ||
-    (canMarkShipped && onMarkShipped) ||
-    (canMarkDelivered && onMarkDelivered) ||
-    (canConfirmDelivered && onConfirmDelivered) ||
-    (canMarkReturned && onMarkReturned);
+    (canCancelItem && onCancelItem) || (canMarkReturned && onMarkReturned);
 
   return (
     <li className="order-card__item" role="listitem">
@@ -438,30 +425,6 @@ function OrderCardLineItem({
               disabled={isActionPending}
             />
           ) : null}
-          {canMarkShipped && onMarkShipped ? (
-            <button
-              type="button"
-              className="order-card__item-action-button"
-              onClick={() => onMarkShipped({ orderId, itemIndex })}
-              disabled={isActionPending}
-            >
-              {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_SHIPPED}
-            </button>
-          ) : null}
-          {canMarkDelivered && onMarkDelivered ? (
-            <button
-              type="button"
-              className="order-card__item-action-button"
-              onClick={() => onMarkDelivered({ orderId, itemIndex })}
-              disabled={isActionPending}
-            >
-              {isActionPending
-                ? ORDER_CARD_UI.ACTION_PENDING
-                : isPickupShipmentItem
-                  ? ORDER_CARD_UI.ACTION_HANDED_TO_BUYER
-                  : ORDER_CARD_UI.ACTION_DELIVERED}
-            </button>
-          ) : null}
           {canMarkReturned && onMarkReturned ? (
             <ConfirmButton
               className="order-card__item-action-button order-card__item-action-button_cancel"
@@ -480,16 +443,6 @@ function OrderCardLineItem({
               onConfirm={() => onMarkReturned({ orderId, itemIndex })}
               disabled={isActionPending}
             />
-          ) : null}
-          {canConfirmDelivered && onConfirmDelivered ? (
-            <button
-              type="button"
-              className="order-card__item-action-button"
-              onClick={() => onConfirmDelivered({ orderId, itemIndex })}
-              disabled={isActionPending}
-            >
-              {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_CONFIRM}
-            </button>
           ) : null}
           {actionError ? (
             <span className="order-card__item-action-error" role="alert">
@@ -614,17 +567,9 @@ export function OrderCard({
     compact,
     itemsCount: order.items.length,
     onProductClick,
-    // «Отгрузить» — про то, что продавец сам повёз товар. При самовывозе
-    // везти некуда: покупатель придёт на точку. На курьерском отправлении
-    // отгружает курьер, а кнопка увела бы заказ из «Свободных», оставив
-    // товар на руках.
-    onMarkShipped:
-      sellerDeliversThisShipment && !awaitingPrepayment ? onMarkShipped : undefined,
-    isPickupShipmentItem: shipmentMethod !== "delivery",
-    onMarkDelivered: awaitingPrepayment ? undefined : onMarkDelivered,
+    // Ступени отправления — в shipment-row; у позиции остаются отмена/возврат.
     onMarkReturned,
     onCancelItem,
-    onConfirmDelivered,
     buyerUserId: order.userBuyerId?._id ?? order.userBuyerId,
     pendingActionKey,
     itemActionErrors,
@@ -654,6 +599,100 @@ export function OrderCard({
     shipmentAdvanceCandidate.nextStatus !== "accepted"
       ? null
       : shipmentAdvanceCandidate;
+  // Самовывоз: после «Готов к выдаче» продавец жмёт здесь же справа —
+  // рядом со способом получения, а не у строки товара.
+  const pickupHandOverIndexes =
+    attentionRole === "seller" &&
+    shipmentFulfillment !== "delivery" &&
+    !awaitingPrepayment &&
+    onMarkDelivered
+      ? order.items
+          .map((item, index) => ({
+            itemIndex: typeof item.itemIndex === "number" ? item.itemIndex : index,
+            status: item.status,
+          }))
+          .filter((row) => row.status === ORDER_STATUS_READY_FOR_PICKUP)
+          .map((row) => row.itemIndex)
+      : [];
+  const canHandPickupToBuyer = pickupHandOverIndexes.length > 0;
+  const isHandPickupPending = pickupHandOverIndexes.some(
+    (itemIndex) => pendingActionKey === `${order._id}:${itemIndex}`,
+  );
+  const handleHandPickupToBuyer = async () => {
+    for (const itemIndex of pickupHandOverIndexes) {
+      await onMarkDelivered?.({ orderId: order._id, itemIndex });
+    }
+  };
+  // Доставка продавцом: «Отгрузить» справа в строке отправления — на
+  // «Готов к отгрузке», целиком по отправлению, не у каждой позиции.
+  const shipItemIndexes =
+    attentionRole === "seller" &&
+    sellerDeliversThisShipment &&
+    !awaitingPrepayment &&
+    onMarkShipped
+      ? order.items
+          .map((item, index) => ({
+            itemIndex: typeof item.itemIndex === "number" ? item.itemIndex : index,
+            status: item.status,
+          }))
+          .filter((row) => row.status === ORDER_STATUS_READY_TO_SHIP)
+          .map((row) => row.itemIndex)
+      : [];
+  const canShipSellerDelivery = shipItemIndexes.length > 0;
+  const isShipPending = shipItemIndexes.some(
+    (itemIndex) => pendingActionKey === `${order._id}:${itemIndex}`,
+  );
+  const handleShipSellerDelivery = async () => {
+    for (const itemIndex of shipItemIndexes) {
+      await onMarkShipped?.({ orderId: order._id, itemIndex });
+    }
+  };
+  // Доставка продавцом: «Доставлен» после «Отгружен» — тоже в строке отправления.
+  const deliverItemIndexes =
+    attentionRole === "seller" &&
+    sellerDeliversThisShipment &&
+    !awaitingPrepayment &&
+    onMarkDelivered
+      ? order.items
+          .map((item, index) => ({
+            itemIndex: typeof item.itemIndex === "number" ? item.itemIndex : index,
+            status: item.status,
+          }))
+          .filter((row) => row.status === ORDER_STATUS_SHIPPED)
+          .map((row) => row.itemIndex)
+      : [];
+  const canMarkSellerDelivered = deliverItemIndexes.length > 0;
+  const isDeliverPending = deliverItemIndexes.some(
+    (itemIndex) => pendingActionKey === `${order._id}:${itemIndex}`,
+  );
+  const handleMarkSellerDelivered = async () => {
+    for (const itemIndex of deliverItemIndexes) {
+      await onMarkDelivered?.({ orderId: order._id, itemIndex });
+    }
+  };
+  // Покупатель подтверждает получение — справа в строке отправления.
+  // Курьеры Gitorg: закрытие только кодом у курьера, кнопка здесь обходила бы оплату.
+  const confirmItemIndexes =
+    attentionRole === "buyer" &&
+    onConfirmDelivered &&
+    shipmentOwn?.courierDelivery !== true
+      ? order.items
+          .map((item, index) => ({
+            itemIndex: typeof item.itemIndex === "number" ? item.itemIndex : index,
+            status: item.status,
+          }))
+          .filter((row) => row.status === ORDER_STATUS_DELIVERED)
+          .map((row) => row.itemIndex)
+      : [];
+  const canConfirmShipment = confirmItemIndexes.length > 0;
+  const isConfirmPending = confirmItemIndexes.some(
+    (itemIndex) => pendingActionKey === `${order._id}:${itemIndex}`,
+  );
+  const handleConfirmShipment = async () => {
+    for (const itemIndex of confirmItemIndexes) {
+      await onConfirmDelivered?.({ orderId: order._id, itemIndex });
+    }
+  };
   // Продавец выдаёт код, когда курьер уже приехал за заказом. Покупателю его
   // код сервер отдаёт только на «Доставлен» — раньше он не нужен, а лишний
   // повод показать код это лишний повод его слить.
@@ -666,15 +705,31 @@ export function OrderCard({
   // Сменить курьера можно только до передачи товара: дальше он уже в машине,
   // и это возврат, а не смена.
   // Продавец подтверждает перевод, когда курьер уже привёз заказ.
+  // Только курьерское отправление: при доставке продавцом рукопожатия нет,
+  // а API отвечает 409 «продавец везёт сам» — кнопка выглядела мёртвой.
   const canConfirmPayment =
     attentionRole === "seller" &&
     Boolean(onConfirmPayment) &&
     order.paymentMethod === "cardOnDelivery" &&
+    shipmentOwn?.courierDelivery === true &&
     !shipmentOwn?.paymentConfirmedAt &&
     (shipmentStatusNow === "in_delivery" || shipmentStatusNow === "delivered");
   const paymentConfirmed = Boolean(shipmentOwn?.paymentConfirmedAt);
   const payToRequisites =
     attentionRole === "buyer" ? (shipmentOwn?.sellerPayoutRequisites ?? "") : "";
+  // Только курьер + «картой при получении»: иначе при доставке продавцом /
+  // наличке всплывал чужой блок «Перевести продавцу» (ещё и с кодом carrier).
+  const showBuyerPayToSeller =
+    attentionRole === "buyer" &&
+    order.paymentMethod === "cardOnDelivery" &&
+    shipmentOwn?.courierDelivery === true &&
+    Boolean(String(payToRequisites).trim()) &&
+    !paymentConfirmed;
+  const showBuyerPaymentReceived =
+    attentionRole === "buyer" &&
+    order.paymentMethod === "cardOnDelivery" &&
+    shipmentOwn?.courierDelivery === true &&
+    paymentConfirmed;
   const canReplaceCourier =
     Boolean(onReplaceCourier) &&
     buildOrderStatusFromItems(order.items) === "courier_assigned";
@@ -689,6 +744,10 @@ export function OrderCard({
   // Сумму поднимает покупатель — он за неё и платит, — и только пока никто
   // не взялся везти: после назначения курьера уговор уже состоялся.
   const deliveryFeeRub = Number(shipmentOwn?.deliveryFeeRub) || 0;
+  const awaitingGitorgCourier = isAwaitingGitorgCourier({
+    status: shipmentStatusNow,
+    shipment: shipmentOwn,
+  });
   const canRaiseFee =
     attentionRole === "buyer" &&
     Boolean(onRaiseDeliveryFee) &&
@@ -703,6 +762,7 @@ export function OrderCard({
     Boolean(shipmentOwn?.disputeOpenedAt) && !shipmentOwn?.disputeResolvedAt;
   const shipmentActionKey = `${order._id}:shipment`;
   const isShipmentActionPending = pendingActionKey === shipmentActionKey;
+  const shipmentActionError = itemActionErrors[shipmentActionKey] ?? "";
 
   const expandedBody = (
     <>
@@ -732,6 +792,7 @@ export function OrderCard({
               ? ORDER_CARD_UI.SHIPMENT_DELIVERY
               : ORDER_CARD_UI.SHIPMENT_PICKUP}
           </span>
+          <div className="order-card__shipment-actions">
           {canConfirmPayment ? (
             <button
               type="button"
@@ -809,6 +870,68 @@ export function OrderCard({
               : shipmentAdvance.label}
           </button>
         ) : null}
+          {canShipSellerDelivery ? (
+            <button
+              type="button"
+              className="order-card__item-action-button"
+              onClick={() => {
+                void handleShipSellerDelivery();
+              }}
+              disabled={isShipPending || isShipmentActionPending}
+            >
+              {isShipPending
+                ? ORDER_CARD_UI.ACTION_PENDING
+                : ORDER_CARD_UI.ACTION_SHIPPED}
+            </button>
+          ) : null}
+          {canMarkSellerDelivered ? (
+            <button
+              type="button"
+              className="order-card__item-action-button"
+              onClick={() => {
+                void handleMarkSellerDelivered();
+              }}
+              disabled={isDeliverPending || isShipmentActionPending}
+            >
+              {isDeliverPending
+                ? ORDER_CARD_UI.ACTION_PENDING
+                : ORDER_CARD_UI.ACTION_DELIVERED}
+            </button>
+          ) : null}
+          {canHandPickupToBuyer ? (
+            <button
+              type="button"
+              className="order-card__item-action-button"
+              onClick={() => {
+                void handleHandPickupToBuyer();
+              }}
+              disabled={isHandPickupPending || isShipmentActionPending}
+            >
+              {isHandPickupPending
+                ? ORDER_CARD_UI.ACTION_PENDING
+                : ORDER_CARD_UI.ACTION_HANDED_TO_BUYER}
+            </button>
+          ) : null}
+          {canConfirmShipment ? (
+            <button
+              type="button"
+              className="order-card__item-action-button"
+              onClick={() => {
+                void handleConfirmShipment();
+              }}
+              disabled={isConfirmPending || isShipmentActionPending}
+            >
+              {isConfirmPending
+                ? ORDER_CARD_UI.ACTION_PENDING
+                : ORDER_CARD_UI.ACTION_CONFIRM}
+            </button>
+          ) : null}
+          {shipmentActionError ? (
+            <span className="order-card__item-action-error" role="alert">
+              {shipmentActionError}
+            </span>
+          ) : null}
+          </div>
       </div>
 
       {/* Кто приедет: имя, рейтинг и авто. Паспорта курьера тут нет и быть
@@ -850,6 +973,17 @@ export function OrderCard({
             </span>
           ) : null}
         </p>
+      ) : null}
+
+      {awaitingGitorgCourier ? (
+        <div className="order-card__awaiting-courier">
+          <strong>{ORDER_CARD_UI.AWAITING_COURIER}</strong>
+          <span>
+            {attentionRole === "seller"
+              ? ORDER_CARD_UI.AWAITING_COURIER_SELLER_HINT
+              : ORDER_CARD_UI.AWAITING_COURIER_BUYER_HINT}
+          </span>
+        </div>
       ) : null}
 
       {canRaiseFee ? (
@@ -905,12 +1039,12 @@ export function OrderCard({
         </div>
       ) : null}
 
-      {attentionRole === "buyer" && paymentConfirmed ? (
+      {showBuyerPaymentReceived ? (
         <div className="order-card__payment-done">
           <strong>{ORDER_CARD_UI.SHIPMENT_PAYMENT_RECEIVED_BY_SELLER}</strong>
           <span>{ORDER_CARD_UI.SHIPMENT_PAYMENT_RECEIVED_HINT}</span>
         </div>
-      ) : payToRequisites ? (
+      ) : showBuyerPayToSeller ? (
         <div className="order-card__buyer-code">
           <strong>{ORDER_CARD_UI.SHIPMENT_PAY_TO(payToRequisites)}</strong>
           <span>{ORDER_CARD_UI.SHIPMENT_PAY_TO_HINT}</span>
@@ -921,6 +1055,12 @@ export function OrderCard({
         <div className="order-card__buyer-code">
           <strong>{ORDER_CARD_UI.SHIPMENT_BUYER_CODE(buyerDeliveryCode)}</strong>
           <span>{ORDER_CARD_UI.SHIPMENT_BUYER_CODE_HINT}</span>
+        </div>
+      ) : attentionRole === "buyer" &&
+        shipmentOwn?.courierDelivery === true &&
+        shipmentStatusNow === ORDER_STATUS_DELIVERED ? (
+        <div className="order-card__buyer-code">
+          <span>{ORDER_CARD_UI.COURIER_CONFIRM_VIA_CODE_HINT}</span>
         </div>
       ) : null}
 
@@ -1005,9 +1145,27 @@ export function OrderCard({
       <header className="order-card__header">
         <div className="order-card__header-main">
           <div className="order-card__header-badges">
-            <span className={`order-card__status order-card__status_${order.status}`}>
-              {resolveOrderStatusLabelRu(order.status, attentionRole)}
+            <span
+              className={[
+                "order-card__status",
+                `order-card__status_${order.status}`,
+                awaitingGitorgCourier ? "order-card__status_awaiting-courier" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              {resolveOrderStatusLabelRu(order.status, attentionRole, {
+                awaitingGitorgCourier,
+              })}
             </span>
+            {formatOrderNumber(order._id) ? (
+              <span
+                className="order-card__order-number"
+                title={ORDER_CARD_UI.ORDER_NUMBER_LABEL}
+              >
+                {ORDER_CARD_UI.ORDER_NUMBER(formatOrderNumber(order._id))}
+              </span>
+            ) : null}
             {isAuctionOrder ? (
               <span className="order-card__auction-badge">{PRODUCT_CARD_UI.AUCTION_BADGE}</span>
             ) : null}

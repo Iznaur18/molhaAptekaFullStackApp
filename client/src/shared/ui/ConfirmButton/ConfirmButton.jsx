@@ -61,25 +61,27 @@ export function ConfirmButton({
   return (
     <span className="confirm-button" role="group">
       <span className="confirm-button__question">{question}</span>
-      <button
-        type="button"
-        className={`${className} confirm-button__yes`}
-        onClick={() => {
-          setAsking(false);
-          onConfirm();
-        }}
-        disabled={disabled}
-      >
-        {FORMAT_BOOLEAN_RU.YES}
-      </button>
-      <button
-        type="button"
-        className="confirm-button__no"
-        onClick={() => setAsking(false)}
-        disabled={disabled}
-      >
-        {FORMAT_BOOLEAN_RU.NO}
-      </button>
+      <span className="confirm-button__actions">
+        <button
+          type="button"
+          className="confirm-button__no"
+          onClick={() => setAsking(false)}
+          disabled={disabled}
+        >
+          {FORMAT_BOOLEAN_RU.NO}
+        </button>
+        <button
+          type="button"
+          className="confirm-button__yes"
+          onClick={() => {
+            setAsking(false);
+            onConfirm();
+          }}
+          disabled={disabled}
+        >
+          {FORMAT_BOOLEAN_RU.YES}
+        </button>
+      </span>
     </span>
   );
 }

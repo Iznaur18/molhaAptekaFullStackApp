@@ -95,6 +95,11 @@ export const COURIER_OVERVIEW_UI = {
   STEP_HANDED: "Вручил",
   CODE_FROM_SELLER: "Код у продавца",
   CODE_FROM_BUYER: "Код у покупателя",
+  PAYMENT_AWAITING: "Ожидает оплаты",
+  PAYMENT_AWAITING_HINT:
+    "Вручить заказ можно после того, как продавец подтвердит перевод.",
+  PAYMENT_RECEIVED: "Оплата получена",
+  PAYMENT_RECEIVED_HINT: "Продавец подтвердил перевод — можно вручать.",
   CONTACTS_LOCKED:
     "Точный адрес и телефон покупателя откроются, когда заберёте заказ.",
   EMPTY_FREE: "Свободных заказов в вашем регионе нет.",

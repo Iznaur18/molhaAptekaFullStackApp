@@ -122,6 +122,10 @@ export const buildOrderShipments = (order) => {
  * @param {Array<Record<string, unknown>>} items
  * @param {Record<string, "pickup" | "delivery"> | null} fulfillmentBySellerId
  * @param {"pickup" | "delivery"} fallbackFulfillment
+ * @param {Record<string, number> | null} [deliveryFeeBySellerId]
+ * @param {Record<string, boolean> | null} [courierDeliveryBySellerId]
+ * @param {Record<string, string> | null} [payoutRequisitesBySellerId]
+ * @param {Record<string, string> | null} [deliveryCarrierBySellerId]
  */
 export const buildStoredShipments = (
   items,

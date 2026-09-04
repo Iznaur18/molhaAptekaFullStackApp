@@ -117,6 +117,27 @@ describe("третье рукопожатие: оплата", () => {
       "иначе покупатель перевёл деньги и сидит в тишине",
     );
   });
+
+  it("в «Моих доставках» курьер видит флаг оплаты", async () => {
+    const { courierId, order, args } = await deliveredShipment();
+    const { listMyCourierDeliveries } = await import(
+      "../services/courier/courierOverview.js"
+    );
+
+    const before = await listMyCourierDeliveries({ courierId });
+    const row = before.deliveries.find((d) => d.orderId === String(order._id));
+    assert.ok(row);
+    assert.equal(row.paymentMethod, "cardOnDelivery");
+    assert.equal(row.paymentConfirmed, false);
+    assert.equal(row.status, "delivered");
+
+    await flow.setShipmentPaymentConfirmed({ ...args, confirmed: true });
+
+    const after = await listMyCourierDeliveries({ courierId });
+    const paid = after.deliveries.find((d) => d.orderId === String(order._id));
+    assert.equal(paid.paymentConfirmed, true);
+  });
+
   it("подтверждение до приезда курьера не принимается", async () => {
     const { seller, buyer, product } = await createOrderLoyaltyFixture();
     const order = await createOrderWithReserveTransaction({ buyer, seller, product });

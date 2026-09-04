@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
-  padding: 1rem;
+  padding: 0.75rem 0;
 }
 
 .courier-overview__header {
@@ -128,6 +128,40 @@
   color: var(--iz-color-text);
 }
 
+.courier-overview__payment {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+}
+
+.courier-overview__payment--awaiting {
+  border: 1px dashed var(--iz-color-accent, #f2542d);
+}
+
+.courier-overview__payment--done {
+  border: 1px solid var(--iz-color-success, #2f8f4e);
+}
+
+.courier-overview__payment strong {
+  font-size: 0.95rem;
+  color: var(--iz-color-text);
+}
+
+.courier-overview__payment--awaiting strong {
+  color: var(--iz-color-accent, #f2542d);
+}
+
+.courier-overview__payment--done strong {
+  color: var(--iz-color-success, #2f8f4e);
+}
+
+.courier-overview__payment span {
+  font-size: 0.82rem;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
 .courier-overview__items {
   list-style: none;
   margin: 0;
@@ -187,6 +221,9 @@
 
 /* Отказ — не отмена заказа, а шаг назад: тише основного действия. */
 .courier-overview__decline {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
   font: inherit;
   padding: 0.5rem 1rem;
   border: 1px solid var(--iz-color-border, #d7d7d7);
@@ -199,6 +236,11 @@
 .courier-overview__decline:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Подтверждение отказа занимает всю ширину карточки. */
+.courier-overview__card .confirm-button {
+  width: 100%;
 }
 
 /* Имя стороны сделки: ссылка, а не кнопка-действие. */
