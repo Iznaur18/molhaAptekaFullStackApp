@@ -337,3 +337,10 @@ export const CURATED_PRODUCT_COMPACT_CARD_UI = {
   /** @param {string} [name] */
   OPEN_ARIA: (name) => `Открыть товар ${name ?? ""}`.trim(),
 };
+
+/** Заголовок карусели подборки на главной */
+export const CURATED_LIST_CAROUSEL_UI = {
+  VIEW_ALL: "Все",
+  /** @param {string} listTitle */
+  VIEW_ALL_ARIA: (listTitle) => `Все из подборки «${listTitle}»`,
+};

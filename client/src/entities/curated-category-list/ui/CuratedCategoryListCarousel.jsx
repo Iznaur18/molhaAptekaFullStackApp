@@ -5,6 +5,7 @@ import {
   CURATED_CATEGORY_LIST_HOME_VISIBLE_CARD_MAX,
 } from "../lib/curatedCategoryListHomeLayout.js";
 import { useCuratedCarouselImageDragScroll } from "../../curated-product-list/lib/useCuratedCarouselImageDragScroll.js";
+import { CuratedListCarouselHeader } from "../../curated-product-list/ui/CuratedListCarouselHeader.jsx";
 import { CuratedCategoryCompactCard } from "./CuratedCategoryCompactCard.jsx";
 
 import "./CuratedCategoryListCarousel.css";
@@ -25,7 +26,7 @@ export function CuratedCategoryListCarousel({ title, categories, onOpenCategory 
 
   return (
     <>
-      <h2 className="curated-category-list-carousel__title">{title}</h2>
+      <CuratedListCarouselHeader title={title} />
       <section
         className="curated-category-list-carousel"
         aria-label={title}

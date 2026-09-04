@@ -1,0 +1,92 @@
+.curated-list-carousel-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 1.2rem 0 0.4rem;
+  padding: 0 16px;
+  min-width: 0;
+}
+
+.curated-list-carousel-header__title {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  min-width: 0;
+  flex: 1 1 auto;
+  font-size: clamp(1.08rem, 1rem + 0.35vw, 1.28rem);
+  font-family: var(--iz-font-display);
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--iz-color-text);
+}
+
+.curated-list-carousel-header__view-all {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  gap: 0.05rem;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0.22rem 0.4rem 0.22rem 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-border) 40%, transparent);
+  border-radius: 8px;
+  background: color-mix(
+    in srgb,
+    var(--iz-color-surface-muted, var(--iz-color-surface)) 42%,
+    transparent
+  );
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: none;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--iz-color-text);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.curated-list-carousel-header__view-all > span {
+  display: block;
+  line-height: 1;
+}
+
+.curated-list-carousel-header__view-all-icon {
+  flex: none;
+  display: block;
+  width: 1.45em;
+  height: 1.45em;
+  margin: 0;
+  padding: 0;
+}
+
+.curated-list-carousel-header__view-all:hover {
+  background: color-mix(
+    in srgb,
+    var(--iz-color-surface-muted, var(--iz-color-surface)) 62%,
+    transparent
+  );
+  border-color: color-mix(in srgb, var(--iz-color-border) 65%, transparent);
+  color: var(--iz-color-text);
+}
+
+.curated-list-carousel-header__view-all:active {
+  background: color-mix(
+    in srgb,
+    var(--iz-color-surface-muted, var(--iz-color-surface)) 78%,
+    transparent
+  );
+}

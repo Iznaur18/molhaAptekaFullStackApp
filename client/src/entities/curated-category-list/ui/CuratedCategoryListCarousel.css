@@ -17,19 +17,6 @@
   }
 }
 
-.curated-category-list-carousel__title {
-  margin: 1.2rem 0 0.4rem;
-  padding: 0 0.15rem 0 16px;
-  font-size: clamp(1.08rem, 1rem + 0.35vw, 1.28rem);
-  font-family: var(--iz-font-display);
-  font-weight: 400;
-  font-synthesis: none;
-  line-height: 1.15;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--iz-color-text);
-}
-
 .curated-category-list-carousel__scroll {
   --curated-visible-cards: 5;
   --curated-card-gap: 12px;
