@@ -20,7 +20,11 @@ import {
   resolveInitialCheckoutSavedAddressId,
 } from "../../../entities/address/lib/deliveryAddressFromSaved.js";
 import { validateRuDeliveryAddressForm } from "../../../entities/address/lib/validateRuDeliveryAddressForm.js";
-import { ORDER_PAYMENT_METHOD_DEFAULT } from "../../../entities/order/model/constants.js";
+import {
+  ORDER_PAYMENT_METHOD_CARD_PREPAID,
+  ORDER_PAYMENT_METHOD_DEFAULT,
+  ORDER_PAYMENT_METHODS_SELECTABLE,
+} from "../../../entities/order/model/constants.js";
 import {
   resolveInitialPickupSelections,
   buildPickupSelectionsPayload,
@@ -99,6 +103,7 @@ export function CheckoutForm({
   onSubmit,
   isDisabled = false,
   cardPrepaidAvailable = false,
+  allowedPaymentMethods = null,
   dockSubmit = false,
   pinSubmitToBottom = false,
   showHeading = true,
@@ -129,6 +134,30 @@ export function CheckoutForm({
   });
   const [paymentMethod, setPaymentMethod] = useState(ORDER_PAYMENT_METHOD_DEFAULT);
   const [localError, setLocalError] = useState("");
+
+  // Способы, которые реально уйдут на сервер: умеет площадка И принимает
+  // продавец. Считаем здесь же, а не только в пикере, потому что дефолтный
+  // «наличными» иначе остался бы выбранным у продавца, который наличные не
+  // берёт, — и заказ падал бы с 400 уже после нажатия кнопки.
+  const selectablePaymentMethods = useMemo(() => {
+    const platform = cardPrepaidAvailable
+      ? [...ORDER_PAYMENT_METHODS_SELECTABLE, ORDER_PAYMENT_METHOD_CARD_PREPAID]
+      : [...ORDER_PAYMENT_METHODS_SELECTABLE];
+    if (!Array.isArray(allowedPaymentMethods)) {
+      return platform;
+    }
+    return platform.filter((method) => allowedPaymentMethods.includes(method));
+  }, [cardPrepaidAvailable, allowedPaymentMethods]);
+
+  useEffect(() => {
+    if (selectablePaymentMethods.length === 0) {
+      return;
+    }
+    if (selectablePaymentMethods.includes(paymentMethod)) {
+      return;
+    }
+    setPaymentMethod(selectablePaymentMethods[0]);
+  }, [selectablePaymentMethods, paymentMethod]);
 
   const deliverySelectable =
     PRODUCT_DELIVERY_FULFILLMENT_ENABLED && deliveryAvailable;
@@ -653,6 +682,7 @@ export function CheckoutForm({
             disabled={isDisabled || isSubmitting}
             legend={CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD}
             cardPrepaidAvailable={cardPrepaidAvailable}
+            allowedMethods={allowedPaymentMethods}
           />
 
           {displayError ? (

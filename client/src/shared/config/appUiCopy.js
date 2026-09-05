@@ -108,6 +108,10 @@ export {
 } from "./copy/safe-deal.js";
 export { SHIPPING_CARRIERS_ADMIN_UI } from "./copy/shipping-carriers.js";
 export {
+  SELLER_COMMERCE_DEFAULTS_UI,
+  PRODUCT_FULFILLMENT_SOURCE_UI,
+} from "./copy/seller-commerce-defaults.js";
+export {
   AUCTION_PAGE_UI,
 } from "./copy/auction.js";
 export {

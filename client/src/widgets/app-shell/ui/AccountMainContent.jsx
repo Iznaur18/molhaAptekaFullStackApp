@@ -85,6 +85,7 @@ export function AccountMainContent({
   handlePartnerProgramFromProfile,
   handleAdvertisingFromProfile,
   handleOneCIntegrationFromProfile,
+  handleDeliveryPaymentFromProfile,
   handleSafeDealFromProfile,
   handleSafeDealModerationFromProfile,
   handleIntroAdModerationFromProfile,
@@ -236,6 +237,9 @@ export function AccountMainContent({
           IS_ONEC_INTEGRATION_ENABLED && isAuthorized
             ? handleOneCIntegrationFromProfile
             : undefined
+        }
+        onDeliveryPaymentClick={
+          isAuthorized ? handleDeliveryPaymentFromProfile : undefined
         }
         onSafeDealClick={isAuthorized ? handleSafeDealFromProfile : undefined}
         onSafeDealModerationClick={

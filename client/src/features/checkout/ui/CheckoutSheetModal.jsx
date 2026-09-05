@@ -49,6 +49,7 @@ export function CheckoutSheetModal({
   initialFulfillmentMethod = null,
   onFulfillmentMethodChange = null,
   cardPrepaidAvailable = false,
+  allowedPaymentMethods = null,
   isSubmitting,
   submitError,
   submitSuccess,
@@ -135,6 +136,7 @@ export function CheckoutSheetModal({
             initialFulfillmentMethod={initialFulfillmentMethod}
             onFulfillmentMethodChange={onFulfillmentMethodChange}
             cardPrepaidAvailable={cardPrepaidAvailable}
+            allowedPaymentMethods={allowedPaymentMethods}
             isSubmitting={isSubmitting}
             submitError={submitError}
             submitSuccess={submitSuccess}

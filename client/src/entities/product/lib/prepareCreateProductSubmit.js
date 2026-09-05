@@ -4,6 +4,8 @@ import { validateInstagramPostUrlInput, parseInstagramPostUrl } from "@molha/api
 
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import {
+  PRODUCT_FULFILLMENT_SOURCE_CUSTOM,
+  PRODUCT_FULFILLMENT_SOURCE_PROFILE,
   isRuRegionCode,
   resolveProductDeliveryCarrier,
 } from "@molha/api-contract";
@@ -157,10 +159,18 @@ export function prepareCreateProductSubmit({
       ? String(form.productCategoryId).trim()
       : "";
 
+  // Товар может следовать настройкам профиля: тогда адреса в форме нет
+  // вовсе, и проверять нечего — их подставит сервер. Слать их вместе с
+  // источником "profile" схема запрещает, чтобы адрес не терялся молча.
+  const followsSellerProfile =
+    form.productFulfillmentSource === PRODUCT_FULFILLMENT_SOURCE_PROFILE;
+
   const productPickupLocationsRaw = Array.isArray(form.productPickupLocations)
     ? form.productPickupLocations
     : [];
-  const locationsError = validateProductPickupLocationsForm(productPickupLocationsRaw);
+  const locationsError = followsSellerProfile
+    ? null
+    : validateProductPickupLocationsForm(productPickupLocationsRaw);
   if (locationsError) {
     return { ok: false, message: locationsError };
   }
@@ -185,11 +195,11 @@ export function prepareCreateProductSubmit({
       productDeliveryEnabled,
       productCourierDeliveryEnabled,
     }) ?? "";
-  if (!productPickupEnabled && !productDeliveryCarrier) {
+  if (!followsSellerProfile && !productPickupEnabled && !productDeliveryCarrier) {
     return { ok: false, message: PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE };
   }
   // Либо продавец везёт сам, либо отдаёт курьеру.
-  if (productDeliveryEnabled && productCourierDeliveryEnabled) {
+  if (!followsSellerProfile && productDeliveryEnabled && productCourierDeliveryEnabled) {
     return { ok: false, message: PRODUCT_COURIER_DELIVERY_CONFLICT_MESSAGE };
   }
 
@@ -220,6 +230,19 @@ export function prepareCreateProductSubmit({
           productPickupLon,
         };
 
+  /** Всё, что задаёт способ получения: либо ссылка на профиль, либо свои поля. */
+  const fulfillmentFields = followsSellerProfile
+    ? { productFulfillmentSource: PRODUCT_FULFILLMENT_SOURCE_PROFILE }
+    : {
+        ...(productRegionCode ? { productRegionCode } : {}),
+        ...pickupLocationFields,
+        productPickupEnabled,
+        productDeliveryEnabled,
+        productCourierDeliveryEnabled,
+        ...(productDeliveryCarrier ? { productDeliveryCarrier } : {}),
+        productFulfillmentSource: PRODUCT_FULFILLMENT_SOURCE_CUSTOM,
+      };
+
   if (isEdit) {
     const patchBody = {
       productName: String(form.productName).trim(),
@@ -231,12 +254,7 @@ export function prepareCreateProductSubmit({
       productPrice,
       productOldPrice,
       productCharacteristics,
-      ...(productRegionCode ? { productRegionCode } : {}),
-      ...pickupLocationFields,
-      productPickupEnabled,
-      productDeliveryEnabled,
-      productCourierDeliveryEnabled,
-      ...(productDeliveryCarrier ? { productDeliveryCarrier } : {}),
+      ...fulfillmentFields,
       productReturnEnabled,
       productReturnTerms,
     };
@@ -272,12 +290,7 @@ export function prepareCreateProductSubmit({
       productStockQuantity,
       loyaltyPointsPerUnit: 0,
       productCharacteristics,
-      ...(productRegionCode ? { productRegionCode } : {}),
-      ...pickupLocationFields,
-      productPickupEnabled,
-      productDeliveryEnabled,
-      productCourierDeliveryEnabled,
-      ...(productDeliveryCarrier ? { productDeliveryCarrier } : {}),
+      ...fulfillmentFields,
       productReturnEnabled,
       productReturnTerms,
     },

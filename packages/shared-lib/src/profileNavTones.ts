@@ -62,6 +62,7 @@ const PROFILE_NAV_SECTION_TONE_MAP = {
   "affiliate-listings": "green",
   advertising: "amber",
   "onec-integration": "blue",
+  "delivery-payment": "green",
   "safe-deal": "green",
   "safe-deal-moderation": "green",
   "edit-profile": "slate",

@@ -2,6 +2,10 @@ import { apiClient } from "../../../shared/api/index.js";
 import { parseCreateProductData } from "../../../shared/api/parseApiContract.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 import { formatApiErrorMessage } from "@izibuy/shared-lib";
+import {
+  PRODUCT_FULFILLMENT_SOURCE_CUSTOM,
+  PRODUCT_FULFILLMENT_SOURCE_PROFILE,
+} from "@molha/api-contract";
 
 /** @typedef {import('@molha/api-contract/types').CreateProductBodyContract} CreateProductBody */
 
@@ -55,28 +59,58 @@ export async function createProduct(body) {
     if (Array.isArray(body.productCharacteristics)) {
       payload.productCharacteristics = body.productCharacteristics;
     }
-    const saleRegion = body.productRegionCode?.trim();
-    if (saleRegion) {
-      payload.productRegionCode = saleRegion;
+    // Товар, следующий профилю продавца, НЕ шлёт ни адрес, ни флаги: их
+    // подставит сервер, а присланные рядом с источником схема отклоняет —
+    // чтобы адрес не пропадал молча. Всё остальное (возврат, картинки)
+    // отправляется как обычно, поэтому здесь ветвление, а не ранний выход.
+    const followsSellerProfile =
+      body.productFulfillmentSource === PRODUCT_FULFILLMENT_SOURCE_PROFILE;
+    payload.productFulfillmentSource = followsSellerProfile
+      ? PRODUCT_FULFILLMENT_SOURCE_PROFILE
+      : PRODUCT_FULFILLMENT_SOURCE_CUSTOM;
+
+    if (!followsSellerProfile) {
+      const saleRegion = body.productRegionCode?.trim();
+      if (saleRegion) {
+        payload.productRegionCode = saleRegion;
+      }
+      const pickupLocations = Array.isArray(body.productPickupLocations)
+        ? body.productPickupLocations
+        : [];
+      if (pickupLocations.length > 0) {
+        payload.productPickupLocations = pickupLocations;
+      } else {
+        const pickupAddress = body.productPickupAddress?.trim();
+        if (pickupAddress) {
+          payload.productPickupAddress = pickupAddress;
+        }
+        if (
+          body.productPickupLat != null &&
+          Number.isFinite(Number(body.productPickupLat))
+        ) {
+          payload.productPickupLat = Number(body.productPickupLat);
+        }
+        if (
+          body.productPickupLon != null &&
+          Number.isFinite(Number(body.productPickupLon))
+        ) {
+          payload.productPickupLon = Number(body.productPickupLon);
+        }
+      }
+      payload.productDeliveryEnabled = body.productDeliveryEnabled === true;
+      payload.productPickupEnabled = body.productPickupEnabled !== false;
+      // Перевозчик — источник правды на сервере, и без него выбор «Курьеры
+      // Gitorg» или «ЛОБО» на шаге доставки терялся: белый список payload его
+      // не переносил, и товар создавался как «везёт продавец» либо вовсе без
+      // доставки.
+      payload.productCourierDeliveryEnabled =
+        body.productCourierDeliveryEnabled === true;
+      const deliveryCarrier = body.productDeliveryCarrier?.trim();
+      if (deliveryCarrier) {
+        payload.productDeliveryCarrier = deliveryCarrier;
+      }
     }
-    const pickupLocations =
-      Array.isArray(body.productPickupLocations) ? body.productPickupLocations : [];
-    if (pickupLocations.length > 0) {
-      payload.productPickupLocations = pickupLocations;
-    } else {
-      const pickupAddress = body.productPickupAddress?.trim();
-      if (pickupAddress) {
-        payload.productPickupAddress = pickupAddress;
-      }
-      if (body.productPickupLat != null && Number.isFinite(Number(body.productPickupLat))) {
-        payload.productPickupLat = Number(body.productPickupLat);
-      }
-      if (body.productPickupLon != null && Number.isFinite(Number(body.productPickupLon))) {
-        payload.productPickupLon = Number(body.productPickupLon);
-      }
-    }
-    payload.productDeliveryEnabled = body.productDeliveryEnabled === true;
-    payload.productPickupEnabled = body.productPickupEnabled !== false;
+
     if (body.productReturnEnabled != null) {
       payload.productReturnEnabled = body.productReturnEnabled === true;
       payload.productReturnTerms =

@@ -54,6 +54,7 @@ import { getActiveProfileNavLabel } from "../lib/getActiveProfileNavLabel.js";
  *   onPartnerProgramClick?: () => void;
  *   onAdvertisingClick?: () => void;
  *   onOneCIntegrationClick?: () => void;
+ *   onDeliveryPaymentClick?: () => void;
  *   onSafeDealClick?: () => void;
  *   onSafeDealModerationClick?: () => void;
  *   onEditProfileClick?: () => void;
@@ -112,6 +113,7 @@ export function useMyProfileNav({
   onPartnerProgramClick,
   onAdvertisingClick,
   onOneCIntegrationClick,
+  onDeliveryPaymentClick,
   onSafeDealClick,
   onSafeDealModerationClick,
   onEditProfileClick,
@@ -172,6 +174,7 @@ export function useMyProfileNav({
     Boolean(onOneCIntegrationClick);
   // Безопасную сделку подключает любой авторизованный: подтверждение ИП или
   // ООО и есть фильтр, отдельного признака продавца в профиле нет.
+  const canUseDeliveryPayment = isProfileReady && Boolean(onDeliveryPaymentClick);
   const canUseSafeDeal = isProfileReady && Boolean(onSafeDealClick);
   // Сверять ИНН с ЕГРЮЛ — работа модератора, как и модерация курьеров.
   const canUseSafeDealModeration =
@@ -245,6 +248,7 @@ export function useMyProfileNav({
         canUsePartnerProgram,
         canUseAdvertising,
         canUseOneCIntegration,
+        canUseDeliveryPayment,
         canUseSafeDeal,
         canUseSafeDealModeration,
         canUseEditProfile,
@@ -297,6 +301,7 @@ export function useMyProfileNav({
         onPartnerProgramClick,
         onAdvertisingClick,
         onOneCIntegrationClick,
+        onDeliveryPaymentClick,
         onSafeDealClick,
         onSafeDealModerationClick,
         onEditProfileClick,
@@ -324,6 +329,7 @@ export function useMyProfileNav({
       canUsePartnerProgram,
       canUseAdvertising,
       canUseOneCIntegration,
+      canUseDeliveryPayment,
       canUseSafeDeal,
       canUseSafeDealModeration,
       canUseMyOrders,
@@ -361,6 +367,7 @@ export function useMyProfileNav({
       onPartnerProgramClick,
       onAdvertisingClick,
       onOneCIntegrationClick,
+      onDeliveryPaymentClick,
       onSafeDealClick,
       onSafeDealModerationClick,
       onIntroAdModerationClick,

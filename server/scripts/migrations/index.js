@@ -40,6 +40,7 @@ import { up as orderLineSellerIdUp } from "./20260831-order-line-seller-id.js";
 import { up as orderShipmentsUp } from "./20260831-order-shipments.js";
 import { up as onecProductsWithoutImagesAndStockUp } from "./20260903-onec-products-without-images-and-stock.js";
 import { up as swapShipmentPayoutCarrierUp } from "./20260904-swap-shipment-payout-carrier.js";
+import { up as sellerFulfillmentDefaultsUp } from "./20260905-seller-fulfillment-defaults.js";
 
 export const MIGRATIONS = [
   {
@@ -260,5 +261,11 @@ export const MIGRATIONS = [
     description:
       "Swap miswired shipment.sellerPayoutRequisites ↔ deliveryCarrier from createOrder arg swap",
     up: swapShipmentPayoutCarrierUp,
+  },
+  {
+    id: "20260905-seller-fulfillment-defaults",
+    description:
+      "Seed sellerFulfillmentDefaults from each seller most common product setup and mark matching products as profile-following",
+    up: sellerFulfillmentDefaultsUp,
   },
 ];

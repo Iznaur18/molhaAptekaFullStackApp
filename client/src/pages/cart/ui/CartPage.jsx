@@ -9,6 +9,7 @@ import { isProductBuyNFreeActive } from "@izibuy/shared-lib";
 import { ChevronLeft } from "lucide-react";
 
 import { buildCheckoutPickupLocations } from "../../../entities/cart/lib/buildCheckoutPickupLocations.js";
+import { resolveCartAllowedPaymentMethods } from "../../../entities/cart/lib/resolveCartAllowedPaymentMethods.js";
 import { getCartLineExclusionReason } from "../../../entities/cart/lib/getCartLineExclusionReason.js";
 import {
   groupCartLinesBySeller,
@@ -335,6 +336,13 @@ export function CartPage({
       (group) => String(group.sellerId) === String(checkoutSellerId),
     );
   }, [checkoutSellerId, sellerGroups]);
+
+  // Покупатель видит только те оплаты, что принимает продавец этого
+  // отправления. На аукционном чекауте групп нет — там остаются все.
+  const allowedPaymentMethods = useMemo(
+    () => resolveCartAllowedPaymentMethods(checkoutSellerGroups),
+    [checkoutSellerGroups],
+  );
 
   const pickupLocations = useMemo(() => {
     if (auctionCheckoutBid) {
@@ -707,6 +715,7 @@ export function CartPage({
             : null
         }
         cardPrepaidAvailable={cardPrepaidAvailable}
+        allowedPaymentMethods={allowedPaymentMethods}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}
         submitSuccess={submitState.success}

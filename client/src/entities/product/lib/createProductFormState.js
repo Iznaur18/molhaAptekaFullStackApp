@@ -9,7 +9,10 @@ import {
   legacyPickupFieldsFromLocations,
   productPickupLocationsFromApiProduct,
 } from "./productPickupLocationsForm.js";
-import { resolveProductDeliveryCarrier } from "@molha/api-contract";
+import {
+  resolveProductDeliveryCarrier,
+  resolveProductFulfillmentSource,
+} from "@molha/api-contract";
 
 export const CREATE_PRODUCT_INITIAL_FORM = {
   productName: "",
@@ -43,6 +46,12 @@ export const CREATE_PRODUCT_INITIAL_FORM = {
   productDeliveryEnabled: false,
   productCourierDeliveryEnabled: false,
   productDeliveryCarrier: "",
+  /**
+   * Пусто — продавец ещё не выбирал. Форма подставит "profile", если в
+   * профиле есть настройки, и "custom", если их нет: спрашивать адрес у того,
+   * у кого он уже задан, незачем.
+   */
+  productFulfillmentSource: "",
   productReturnEnabled: null,
   returnTermRows: [],
 };
@@ -103,6 +112,7 @@ export function createProductFormStateFromProduct(product) {
     productDeliveryEnabled: product.productDeliveryEnabled === true,
     productCourierDeliveryEnabled: product.productCourierDeliveryEnabled === true,
     productDeliveryCarrier: resolveProductDeliveryCarrier(product) ?? "",
+    productFulfillmentSource: resolveProductFulfillmentSource(product),
     productReturnEnabled: product.productReturnEnabled === true,
     returnTermRows:
       product.productReturnEnabled === true

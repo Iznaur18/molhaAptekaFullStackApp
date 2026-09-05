@@ -596,6 +596,28 @@ export {
   listDeliveryCarriersForRegion,
 } from "./productDeliveryCarrier.js";
 export {
+  PRODUCT_FULFILLMENT_SOURCE_PROFILE,
+  PRODUCT_FULFILLMENT_SOURCE_CUSTOM,
+  PRODUCT_FULFILLMENT_SOURCES,
+  productFulfillmentSourceSchema,
+  SELLER_FULFILLMENT_DEFAULTS_NOT_SET_MESSAGE,
+  SELLER_FULFILLMENT_LOCATIONS_REQUIRED_MESSAGE,
+  SELLER_PAYMENT_METHODS_REQUIRED_MESSAGE,
+  SELLER_PAYMENT_METHOD_NOT_ACCEPTED_MESSAGE,
+  PRODUCT_FULFILLMENT_SOURCE_PROFILE_CONFLICT_MESSAGE,
+  SELLER_PAYMENT_METHODS_DEFAULT,
+  sellerPaymentMethodsFieldSchema,
+  sellerFulfillmentLocationsFieldSchema,
+  sellerCommerceDefaultsBodySchema,
+  sellerCommerceDefaultsDataSchema,
+  resolveSellerFulfillmentDefaults,
+  resolveSellerPaymentMethods,
+  isPaymentMethodAcceptedBySeller,
+  resolveProductFulfillmentSource,
+  productFollowsSellerProfile,
+  productMatchesSellerFulfillmentDefaults,
+} from "./sellerCommerceDefaults.js";
+export {
   SHIPPING_PROVIDER_LOBO,
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_REGIONS,

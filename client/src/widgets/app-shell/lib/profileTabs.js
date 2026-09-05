@@ -12,6 +12,8 @@ export const PROFILE_TAB_PARTNER_PROGRAM = "partner-program";
 export const PROFILE_TAB_AFFILIATE_LISTINGS = "affiliate-listings";
 export const PROFILE_TAB_ADVERTISING = "advertising";
 export const PROFILE_TAB_ONEC_INTEGRATION = "onec-integration";
+/** Адрес, доставка и оплата сразу для всех товаров продавца. */
+export const PROFILE_TAB_DELIVERY_PAYMENT = "delivery-payment";
 /** Подключение безопасной сделки — раздел профиля продавца. */
 export const PROFILE_TAB_SAFE_DEAL = "safe-deal";
 export const PROFILE_TAB_SAFE_DEAL_MODERATION = "safe-deal-moderation";
@@ -72,6 +74,7 @@ export const PROFILE_TAB_VALUES = [
   PROFILE_TAB_AFFILIATE_LISTINGS,
   PROFILE_TAB_ADVERTISING,
   PROFILE_TAB_ONEC_INTEGRATION,
+  PROFILE_TAB_DELIVERY_PAYMENT,
   PROFILE_TAB_SAFE_DEAL,
   PROFILE_TAB_EDIT_PROFILE,
   PROFILE_TAB_ADMIN_ORDERS,

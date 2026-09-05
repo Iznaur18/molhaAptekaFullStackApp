@@ -14,6 +14,7 @@
  *   sellerAvatarFocus: { x?: number; y?: number } | null;
  *   isPremiumUser: boolean;
  *   isUserDataConfirmed: boolean;
+ *   sellerPaymentMethods: string[];
  *   lines: CartLine[];
  *   pickupAvailable: boolean;
  *   deliveryAvailable: boolean;
@@ -41,6 +42,7 @@ const resolveSellerProfile = (line) => {
       sellerAvatarFocus: null,
       isPremiumUser: false,
       isUserDataConfirmed: false,
+      sellerPaymentMethods: [],
     };
   }
 
@@ -50,6 +52,9 @@ const resolveSellerProfile = (line) => {
     sellerAvatarFocus: seller.userAvatarFocus ?? null,
     isPremiumUser: seller.isPremiumUser === true,
     isUserDataConfirmed: seller.isUserDataConfirmed === true,
+    sellerPaymentMethods: Array.isArray(seller.sellerPaymentMethods)
+      ? seller.sellerPaymentMethods
+      : [],
   };
 };
 
@@ -75,6 +80,7 @@ export function groupCartLinesBySeller(visibleLines) {
       sellerAvatarFocus: profile.sellerAvatarFocus,
       isPremiumUser: profile.isPremiumUser,
       isUserDataConfirmed: profile.isUserDataConfirmed,
+      sellerPaymentMethods: profile.sellerPaymentMethods,
       lines: [],
       pickupAvailable: true,
       deliveryAvailable: true,
@@ -110,6 +116,12 @@ export function groupCartLinesBySeller(visibleLines) {
     }
     if (!group.isUserDataConfirmed && profile.isUserDataConfirmed) {
       group.isUserDataConfirmed = true;
+    }
+    if (
+      group.sellerPaymentMethods.length === 0 &&
+      profile.sellerPaymentMethods.length > 0
+    ) {
+      group.sellerPaymentMethods = profile.sellerPaymentMethods;
     }
 
     bySeller.set(sellerId, group);

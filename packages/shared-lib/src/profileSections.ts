@@ -12,6 +12,8 @@ export const PROFILE_SECTION_PARTNER_PROGRAM = "partner-program";
 export const PROFILE_SECTION_AFFILIATE_LISTINGS = "affiliate-listings";
 export const PROFILE_SECTION_ADVERTISING = "advertising";
 export const PROFILE_SECTION_ONEC_INTEGRATION = "onec-integration";
+/** Адрес, служба доставки и приём оплаты сразу для всех товаров продавца. */
+export const PROFILE_SECTION_DELIVERY_PAYMENT = "delivery-payment";
 /** Заявка продавца на безопасную сделку: правовая форма, ИНН, модерация. */
 export const PROFILE_SECTION_SAFE_DEAL = "safe-deal";
 /** Очередь заявок на безопасную сделку (стафф). */
@@ -62,6 +64,7 @@ export const PROFILE_SECTION_IDS = [
   PROFILE_SECTION_AFFILIATE_LISTINGS,
   PROFILE_SECTION_ADVERTISING,
   PROFILE_SECTION_ONEC_INTEGRATION,
+  PROFILE_SECTION_DELIVERY_PAYMENT,
   PROFILE_SECTION_SAFE_DEAL,
   PROFILE_SECTION_SAFE_DEAL_MODERATION,
   PROFILE_SECTION_ADMIN_ORDERS,
@@ -111,6 +114,7 @@ export const PROFILE_ACCOUNT_SECTION_ORDER = [
   PROFILE_SECTION_PARTNER_PROGRAM,
   PROFILE_SECTION_ADVERTISING,
   PROFILE_SECTION_ONEC_INTEGRATION,
+  PROFILE_SECTION_DELIVERY_PAYMENT,
   PROFILE_SECTION_SAFE_DEAL,
   PROFILE_SECTION_COURIER,
   PROFILE_SECTION_EDIT_PROFILE,

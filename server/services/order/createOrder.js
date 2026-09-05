@@ -8,6 +8,8 @@ import {
 } from "@molha/api-contract";
 import {
   PRODUCT_DELIVERY_CARRIER_GITORG,
+  SELLER_PAYMENT_METHOD_NOT_ACCEPTED_MESSAGE,
+  isPaymentMethodAcceptedBySeller,
   resolveProductDeliveryCarrier,
 } from "@molha/api-contract";
 
@@ -292,6 +294,30 @@ const assertSellersHavePayoutRequisites = async (sellerIds) => {
   return bySeller;
 };
 
+/**
+ * Покупатель платит только тем способом, который продавец принимает.
+ *
+ * Проверяем на сервере, а не только в форме: чекаут можно позвать и мимо
+ * неё, а деньги мимо кассы — это уже спор, а не опечатка. Продавец, который
+ * настройку не трогал, принимает всё (см. resolveSellerPaymentMethods).
+ *
+ * @param {string[]} sellerIds
+ * @param {string} paymentMethod
+ */
+const assertSellersAcceptPaymentMethod = async (sellerIds, paymentMethod) => {
+  if (sellerIds.length === 0) {
+    return;
+  }
+  const sellers = await UserModel.find({ _id: { $in: sellerIds } })
+    .select("sellerPaymentMethods")
+    .lean();
+  for (const seller of sellers) {
+    if (!isPaymentMethodAcceptedBySeller(seller, paymentMethod)) {
+      throw new AppError(400, SELLER_PAYMENT_METHOD_NOT_ACCEPTED_MESSAGE);
+    }
+  }
+};
+
 const assertProductsSupportDelivery = (productById, productIds) => {
   for (const id of productIds) {
     const snapshot = productById[id];
@@ -548,6 +574,13 @@ export async function createOrder({
   await assertBuyerNotBlockedForProducts(String(userId), productById);
   await assertSellersOpenForProducts(productById);
   assertCreateOrderSingleSeller(productById);
+
+  await assertSellersAcceptPaymentMethod(
+    [...new Set(Object.values(productById).map((row) => String(row?.sellerId ?? "")))].filter(
+      Boolean,
+    ),
+    paymentMethod,
+  );
 
   const fulfillmentSplit = resolveOrderFulfillmentSplit({
     productIds: uniqueProductIds,

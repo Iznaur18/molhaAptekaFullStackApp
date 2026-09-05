@@ -32,6 +32,11 @@ import {
   productShipsToBuyer,
 } from "./productDeliveryCarrier.js";
 import { productInstagramPostUrlFieldSchema } from "./productInstagramPostUrl.js";
+import {
+  PRODUCT_FULFILLMENT_SOURCE_PROFILE,
+  PRODUCT_FULFILLMENT_SOURCE_PROFILE_CONFLICT_MESSAGE,
+  productFulfillmentSourceSchema,
+} from "./sellerCommerceDefaults.js";
 
 /** SSOT category slug list — client/mobile/server re-export отсюда. */
 export const PRODUCT_CATEGORY_VALUES = [
@@ -207,6 +212,29 @@ const assertOldPricePair = (body, ctx, requireProductPrice) => {
   }
 };
 
+/**
+ * Товар наследует адрес и перевозчика из профиля продавца.
+ *
+ * Проверки самовывоза при этом пропускаются целиком: полей в теле нет, и
+ * требовать их — значит требовать заполнить то, что вот-вот придёт с сервера.
+ *
+ * @param {{ productFulfillmentSource?: unknown }} body
+ */
+const followsSellerProfileBody = (body) =>
+  body?.productFulfillmentSource === PRODUCT_FULFILLMENT_SOURCE_PROFILE;
+
+/** Поля, которые задаёт профиль продавца, когда товар следует ему. */
+const PICKUP_PATCH_KEYS = [
+  "productPickupLocations",
+  "productPickupAddress",
+  "productPickupLat",
+  "productPickupLon",
+  "productPickupEnabled",
+  "productDeliveryEnabled",
+  "productCourierDeliveryEnabled",
+  "productDeliveryCarrier",
+];
+
 /** Тело `POST /product`. */
 export const createProductBodySchema = z
   .object({
@@ -258,13 +286,36 @@ export const createProductBodySchema = z
     productDeliveryEnabled: z.coerce.boolean().optional(),
     productCourierDeliveryEnabled: z.coerce.boolean().optional(),
     productDeliveryCarrier: productDeliveryCarrierWriteSchema.optional(),
+    /**
+     * `profile` — адрес и перевозчик берутся из настроек продавца, и поля
+     * самовывоза в теле не нужны: их подставит сервер.
+     */
+    productFulfillmentSource: productFulfillmentSourceSchema.optional(),
     productArticle: z.string().trim().max(64).optional(),
   })
   .superRefine(assertCreateProductRequiresPhoto)
   .superRefine((body, ctx) => assertOldPricePair(body, ctx, true))
   .superRefine(assertReturnPolicy)
-  .superRefine(assertCreateProductPickupLocationsOrLegacy)
   .superRefine((body, ctx) => {
+    if (!followsSellerProfileBody(body)) {
+      assertCreateProductPickupLocationsOrLegacy(body, ctx);
+      return;
+    }
+    const conflicting = PICKUP_PATCH_KEYS.find((key) =>
+      Object.prototype.hasOwnProperty.call(body, key),
+    );
+    if (conflicting) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [conflicting],
+        message: PRODUCT_FULFILLMENT_SOURCE_PROFILE_CONFLICT_MESSAGE,
+      });
+    }
+  })
+  .superRefine((body, ctx) => {
+    if (followsSellerProfileBody(body)) {
+      return;
+    }
     const pickupOn = body.productPickupEnabled !== false;
     const deliveryOn = body.productDeliveryEnabled === true;
     const courierOn = body.productCourierDeliveryEnabled === true;
@@ -342,6 +393,7 @@ const patchFieldShape = {
   productDeliveryEnabled: z.coerce.boolean().optional(),
   productCourierDeliveryEnabled: z.coerce.boolean().optional(),
   productDeliveryCarrier: productDeliveryCarrierWriteSchema.optional(),
+  productFulfillmentSource: productFulfillmentSourceSchema.optional(),
 };
 
 const PATCH_BODY_KEYS = Object.keys(patchFieldShape);
@@ -382,6 +434,23 @@ export const patchMyProductBodySchema = z
       Object.prototype.hasOwnProperty.call(body, "productPickupLon")
     ) {
       assertPickupCoordsPair(body, ctx);
+    }
+  })
+  .superRefine((body, ctx) => {
+    // Перевод товара на профиль вместе с собственным адресом — противоречие:
+    // адрес всё равно был бы перезаписан профильным, причём молча.
+    if (!followsSellerProfileBody(body)) {
+      return;
+    }
+    const conflicting = PICKUP_PATCH_KEYS.find((key) =>
+      Object.prototype.hasOwnProperty.call(body, key),
+    );
+    if (conflicting) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [conflicting],
+        message: PRODUCT_FULFILLMENT_SOURCE_PROFILE_CONFLICT_MESSAGE,
+      });
     }
   })
   .superRefine((body, ctx) => assertAffiliatePatchPair(body, ctx));

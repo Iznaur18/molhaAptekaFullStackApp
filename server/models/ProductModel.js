@@ -26,6 +26,10 @@ import {
   ONEC_CATEGORY_EXTERNAL_ID_MAX_LENGTH,
   ONEC_EXTERNAL_ID_MAX_LENGTH,
 } from "../constants/onecExchangeConstants.js";
+import {
+  PRODUCT_FULFILLMENT_SOURCE_CUSTOM,
+  PRODUCT_FULFILLMENT_SOURCES,
+} from "@molha/api-contract";
 import { ProductPromoCodeSchema } from "./ProductPromoCodeSubschema.js";
 
 const Schema = mongoose.Schema;
@@ -321,6 +325,22 @@ const ProductSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    /**
+     * Откуда взяты адрес продажи и перевозчик: из профиля продавца или свои.
+     *
+     * Поля выше при этом заполнены в обоих случаях — по ним ищет каталог
+     * (`productPickupLocation` 2dsphere, `productRegionCode`). Флаг решает
+     * только одно: перепишет ли их пересинк, когда продавец поменяет профиль.
+     *
+     * Дефолт `custom` намеренно: старый клиент, приславший адрес и ничего не
+     * знающий про профиль, не должен получить товар, который завтра молча
+     * переедет в другой город.
+     */
+    productFulfillmentSource: {
+      type: String,
+      enum: PRODUCT_FULFILLMENT_SOURCES,
+      default: PRODUCT_FULFILLMENT_SOURCE_CUSTOM,
+    },
     /** Тумблер «Вопросы и ответы» на карточке товара. */
     productQaEnabled: {
       type: Boolean,
@@ -569,6 +589,16 @@ ProductSchema.index(
 ProductSchema.index(
   { productSeller: 1, productModerationStatus: 1, createdAt: -1 },
   { name: "seller_moderation_created" },
+);
+
+/**
+ * Пересинк настроек доставки из профиля: один updateMany на все товары
+ * продавца, следующие профилю. Без индекса это был бы COLLSCAN на каждое
+ * сохранение профиля.
+ */
+ProductSchema.index(
+  { productSeller: 1, productFulfillmentSource: 1 },
+  { name: "seller_fulfillment_source" },
 );
 
 /** Маппинг номенклатуры 1С ↔ Product (уникален в рамках продавца). */

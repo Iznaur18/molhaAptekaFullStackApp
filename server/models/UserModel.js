@@ -20,6 +20,7 @@ import {
   SELLER_LEGAL_FORM_NONE,
   SELLER_LEGAL_FORM_VALUES,
 } from "../constants/safeDealConstants.js";
+import { ORDER_PAYMENT_METHODS } from "../constants/orderConstants.js";
 import { DEFAULT_AVATAR_URL, DEFAULT_BACKGROUND_URL } from "../constants/constants.js";
 import {
   DEFAULT_USER_AVATAR_FOCUS,
@@ -105,6 +106,23 @@ const userSavedAddressSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+  },
+  { _id: false },
+);
+
+/**
+ * Точка продажи / самовывоза продавца. Формат совпадает с
+ * `productPickupLocations` на товаре: пересинк копирует её как есть, без
+ * преобразований, которым потом пришлось бы верить на слово.
+ */
+const sellerFulfillmentLocationSchema = new mongoose.Schema(
+  {
+    id: { type: String, required: true, trim: true, maxlength: 64 },
+    label: { type: String, trim: true, default: "", maxlength: 30 },
+    address: { type: String, required: true, trim: true, maxlength: 100 },
+    lat: { type: Number, required: true, min: -90, max: 90 },
+    lon: { type: Number, required: true, min: -180, max: 180 },
+    isDefault: { type: Boolean, default: false },
   },
   { _id: false },
 );
@@ -602,6 +620,44 @@ const UserSchema = new mongoose.Schema(
       default: "",
       trim: true,
       maxlength: 120,
+    },
+
+    // - - - Настройки продавца по умолчанию - - -
+    /**
+     * Адрес продажи и перевозчик для всех товаров продавца сразу.
+     *
+     * Продавец с тысячей товаров, переехавший на другую улицу, иначе должен
+     * был бы открыть тысячу форм. Здесь он правит одно место, а товары с
+     * `productFulfillmentSource: "profile"` переезжают одним `updateMany`.
+     *
+     * Точки хранятся уже проверенными (DaData отработала при сохранении):
+     * пересинк не должен ходить во внешний сервис за каждым товаром.
+     */
+    sellerFulfillmentDefaults: {
+      pickupLocations: {
+        type: [sellerFulfillmentLocationSchema],
+        default: [],
+      },
+      /** Покупатель может забрать сам. Адрес нужен и без самовывоза. */
+      pickupEnabled: { type: Boolean, default: true },
+      /** Пусто — доставки нет, только самовывоз. */
+      deliveryCarrier: { type: String, trim: true, default: "" },
+      /** Регион основной точки: его получает каждый товар при пересинке. */
+      regionCode: { type: String, trim: true, default: "" },
+      updatedAt: { type: Date, default: null },
+      _id: false,
+    },
+    /**
+     * Способы оплаты, которые принимает продавец.
+     *
+     * Пустой массив читается как «не настраивал» и означает все способы:
+     * иначе у каждого, кто завёлся до появления настройки, оформление заказа
+     * упало бы с «продавец не принимает такой способ оплаты».
+     */
+    sellerPaymentMethods: {
+      type: [String],
+      enum: ORDER_PAYMENT_METHODS,
+      default: [],
     },
 
     // - - - Безопасная сделка - - -

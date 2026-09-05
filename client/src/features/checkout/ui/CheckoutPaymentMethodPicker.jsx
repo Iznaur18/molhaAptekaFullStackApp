@@ -17,6 +17,7 @@ const SELECTABLE_SET = new Set(ORDER_PAYMENT_METHODS_SELECTABLE);
  *   disabled?: boolean;
  *   legend: string;
  *   cardPrepaidAvailable?: boolean;
+ *   allowedMethods?: string[];
  * }} props
  */
 export function CheckoutPaymentMethodPicker({
@@ -25,10 +26,18 @@ export function CheckoutPaymentMethodPicker({
   disabled = false,
   legend,
   cardPrepaidAvailable = false,
+  allowedMethods = null,
 }) {
-  const selectableSet = cardPrepaidAvailable
+  const platformSelectable = cardPrepaidAvailable
     ? new Set([...SELECTABLE_SET, ORDER_PAYMENT_METHOD_CARD_PREPAID])
     : SELECTABLE_SET;
+  // Продавец сужает то, что вообще умеет площадка, но не расширяет:
+  // «картой заранее» без эквайринга не заработает от его галочки.
+  const selectableSet = Array.isArray(allowedMethods)
+    ? new Set(
+        [...platformSelectable].filter((method) => allowedMethods.includes(method)),
+      )
+    : platformSelectable;
   return (
     <div className="checkout-payment-method-picker">
       <div className="checkout-payment-method-picker__legend">{legend}</div>
@@ -37,6 +46,13 @@ export function CheckoutPaymentMethodPicker({
           const isSelectable = selectableSet.has(method);
           const isSelected = value === method;
           const isLocked = !isSelectable;
+          // «Скоро» и «продавец не принимает» — разные вещи. Показывать
+          // первое вместо второго значит обещать покупателю, что способ
+          // вот-вот появится, хотя у этого продавца он не появится никогда.
+          const lockReason =
+            isLocked && platformSelectable.has(method)
+              ? CHECKOUT_FORM_UI.PAYMENT_METHOD_NOT_ACCEPTED
+              : CHECKOUT_FORM_UI.PAYMENT_METHOD_CARD_SOON;
           const cardClassName = [
             "checkout-payment-method-picker__card",
             `checkout-payment-method-picker__card--${method}`,
@@ -67,7 +83,7 @@ export function CheckoutPaymentMethodPicker({
                 {isLocked ? (
                   <span className="checkout-payment-method-picker__soon">
                     {" "}
-                    ({CHECKOUT_FORM_UI.PAYMENT_METHOD_CARD_SOON})
+                    ({lockReason})
                   </span>
                 ) : null}
               </span>

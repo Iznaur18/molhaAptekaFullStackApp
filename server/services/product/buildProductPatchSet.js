@@ -11,9 +11,16 @@ import {
 } from "./productPreviewVideo.js";
 import {
   PRODUCT_DELIVERY_CARRIER_LOBO,
+  PRODUCT_FULFILLMENT_SOURCE_CUSTOM,
+  PRODUCT_FULFILLMENT_SOURCE_PROFILE,
   buildLegacyDeliveryFlags,
   resolveProductDeliveryCarrier,
 } from "@molha/api-contract";
+
+import {
+  buildProductFieldsFromSellerDefaults,
+  requireSellerDefaultsForProductWrite,
+} from "../seller/sellerCommerceDefaults.js";
 
 import { isLoboConfigured } from "../shipping/lobo/loboClient.js";
 import { isCarrierAvailable } from "../shipping/shippingCarrierSettings.js";
@@ -243,7 +250,94 @@ const applySaleCityField = (body, $set) => {
   }
 };
 
+/** Поля, по которым видно, что способ получения товара реально изменился. */
+const FULFILLMENT_COMPARE_KEYS = [
+  "productPickupEnabled",
+  "productDeliveryEnabled",
+  "productCourierDeliveryEnabled",
+  "productDeliveryCarrier",
+  "productPickupAddress",
+  "productPickupLat",
+  "productPickupLon",
+];
+
+/**
+ * Правка действительно меняет способ получения, а не просто повторяет его.
+ *
+ * Мобилка не знает про источник настроек и присылает адрес при ЛЮБОМ
+ * сохранении товара. Без этой проверки правка одной только цены отвязывала бы
+ * товар от профиля — и продавец переставал бы управлять им из профиля, ничего
+ * об этом не узнав.
+ *
+ * @param {Record<string, unknown>} $set
+ * @param {Record<string, any>} existing
+ */
+const fulfillmentSetChangesProduct = ($set, existing) => {
+  const scalarChanged = FULFILLMENT_COMPARE_KEYS.some((key) => {
+    if (!hasSetField($set, key)) {
+      return false;
+    }
+    const next = $set[key];
+    const prev = existing?.[key];
+    if (next == null || prev == null) {
+      return next !== prev;
+    }
+    return String(next) !== String(prev);
+  });
+  if (scalarChanged) {
+    return true;
+  }
+  if (!hasSetField($set, "productPickupLocations")) {
+    return false;
+  }
+  // Точки сравниваем по адресам: id и подписи площадка может переставить сама.
+  const keyOf = (list) =>
+    (Array.isArray(list) ? list : [])
+      .map((item) => String(item?.address ?? "").trim().toLowerCase())
+      .sort()
+      .join("~");
+  return (
+    keyOf($set.productPickupLocations) !== keyOf(existing?.productPickupLocations)
+  );
+};
+
+/**
+ * Перевести товар на настройки профиля продавца.
+ *
+ * Схема патча уже отклонила бы свой адрес рядом с источником "profile", так
+ * что здесь достаточно взять готовые поля профиля.
+ */
+const applyProfileFulfillment = async ($set, $unset, existing) => {
+  const defaults = await requireSellerDefaultsForProductWrite(existing.productSeller);
+  if (defaults.deliveryCarrier) {
+    if (
+      defaults.deliveryCarrier === PRODUCT_DELIVERY_CARRIER_LOBO &&
+      !isLoboConfigured()
+    ) {
+      throw new AppError(503, LOBO_NOT_CONFIGURED_MESSAGE);
+    }
+    if (!(await isCarrierAvailable(defaults.deliveryCarrier))) {
+      throw new AppError(409, SHIPPING_CARRIER_DISABLED_MESSAGE);
+    }
+  }
+
+  Object.assign($set, buildProductFieldsFromSellerDefaults(defaults));
+  $set.productFulfillmentSource = PRODUCT_FULFILLMENT_SOURCE_PROFILE;
+
+  if (!$set.productPickupLocation) {
+    delete $set.productPickupLocation;
+    $unset.productPickupLocation = 1;
+  } else {
+    delete $unset.productPickupLocation;
+  }
+};
+
 const applyPickupFields = async (body, $set, $unset, existing) => {
+  if (body?.productFulfillmentSource === PRODUCT_FULFILLMENT_SOURCE_PROFILE) {
+    await applyProfileFulfillment($set, $unset, existing);
+    return;
+  }
+
   const touchesLocations = hasBodyField(body, "productPickupLocations");
   const touchesAddress = hasBodyField(body, "productPickupAddress");
   const touchesLat = hasBodyField(body, "productPickupLat");
@@ -252,6 +346,7 @@ const applyPickupFields = async (body, $set, $unset, existing) => {
   const touchesCourier = hasBodyField(body, "productCourierDeliveryEnabled");
   const touchesPickupEnabled = hasBodyField(body, "productPickupEnabled");
   const touchesCarrier = hasBodyField(body, "productDeliveryCarrier");
+  const touchesSource = hasBodyField(body, "productFulfillmentSource");
 
   if (
     !touchesLocations &&
@@ -261,7 +356,8 @@ const applyPickupFields = async (body, $set, $unset, existing) => {
     !touchesDelivery &&
     !touchesCourier &&
     !touchesPickupEnabled &&
-    !touchesCarrier
+    !touchesCarrier &&
+    !touchesSource
   ) {
     return;
   }
@@ -412,6 +508,33 @@ const applyPickupFields = async (body, $set, $unset, existing) => {
       throw error;
     }
     throwFieldError(error, "Некорректный адрес продажи");
+  }
+};
+
+/**
+ * Кто управляет доставкой товара после этой правки.
+ *
+ * Решается после `applyPickupFields`, а не внутри: у той несколько ранних
+ * выходов, и на части из них товар молча оставался бы за профилем.
+ *
+ * @param {Record<string, unknown>} body
+ * @param {Record<string, unknown>} $set
+ * @param {Record<string, any>} existing
+ */
+const applyFulfillmentSourceDetach = (body, $set, existing) => {
+  if (body?.productFulfillmentSource === PRODUCT_FULFILLMENT_SOURCE_PROFILE) {
+    // Перевод на профиль уже проставлен applyProfileFulfillment.
+    return;
+  }
+  // Явный выбор продавца сильнее любых сравнений.
+  if (body?.productFulfillmentSource === PRODUCT_FULFILLMENT_SOURCE_CUSTOM) {
+    $set.productFulfillmentSource = PRODUCT_FULFILLMENT_SOURCE_CUSTOM;
+    return;
+  }
+  // Иначе отвязываем, только если правка реально меняет способ получения:
+  // иначе следующее сохранение профиля затёрло бы её пересинком.
+  if (fulfillmentSetChangesProduct($set, existing)) {
+    $set.productFulfillmentSource = PRODUCT_FULFILLMENT_SOURCE_CUSTOM;
   }
 };
 
@@ -660,6 +783,7 @@ export async function buildProductPatchSet({ existing, body, isAdmin, productId 
   applyPriceFields(body, $set, existing);
   applySaleCityField(body, $set);
   await applyPickupFields(body, $set, $unset, existing);
+  applyFulfillmentSourceDetach(body, $set, existing);
   await applyCategoryFields(body, $set, existing);
   await applyLoyaltyField(body, $set, existing, productId);
   await applyAffiliateFields(body, $set, existing);

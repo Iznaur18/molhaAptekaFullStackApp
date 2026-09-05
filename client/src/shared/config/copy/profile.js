@@ -75,6 +75,7 @@ export const MY_PROFILE_PAGE_UI = {
   TAB_AFFILIATE_LISTINGS: "Заработок с объявлений",
   TAB_ADVERTISING: "Реклама",
   TAB_ONEC_INTEGRATION: "1С Интеграция",
+  TAB_DELIVERY_PAYMENT: "Доставка и оплата",
   TAB_SAFE_DEAL: "Безопасная сделка",
   EDIT_PROFILE: "Изменить профиль",
   MY_STOREFRONT: "Моя витрина",

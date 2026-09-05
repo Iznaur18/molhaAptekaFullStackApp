@@ -182,6 +182,8 @@ export const CHECKOUT_FORM_UI = {
   PLACEHOLDER_FLAT: "подъезд, этаж, кв",
   LABEL_PAYMENT_METHOD: "Способ оплаты",
   PAYMENT_METHOD_CARD_SOON: "Скоро",
+  /** Способ есть у площадки, но конкретный продавец его не принимает. */
+  PAYMENT_METHOD_NOT_ACCEPTED: "Продавец не принимает",
   LABEL_SHIPPING_PROVIDER: "Служба доставки",
   SHIPPING_PROVIDER_SELLER: "Доставка продавцом",
   SHIPPING_PROVIDER_COURIER: "Курьеры Gitorg",

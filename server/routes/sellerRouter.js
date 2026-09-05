@@ -1,9 +1,14 @@
 import {
+  getMySellerCommerceDefaultsController,
   getMySellerSafeDealController,
+  putMySellerCommerceDefaultsController,
   submitSellerSafeDealApplicationController,
 } from "../controllers/index.js";
 import { checkAuthMW } from "../middlewares/index.js";
-import { safeDealApplicationValidation } from "../validations/index.js";
+import {
+  safeDealApplicationValidation,
+  sellerCommerceDefaultsValidation,
+} from "../validations/index.js";
 import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 
 const router = createAsyncRouter();
@@ -17,6 +22,15 @@ router.post(
   checkAuthMW,
   safeDealApplicationValidation,
   submitSellerSafeDealApplicationController,
+);
+
+// Настройки доставки и оплаты продавца: один раз здесь — и на всех товарах.
+router.get("/commerce-defaults/me", checkAuthMW, getMySellerCommerceDefaultsController);
+router.put(
+  "/commerce-defaults",
+  checkAuthMW,
+  sellerCommerceDefaultsValidation,
+  putMySellerCommerceDefaultsController,
 );
 
 export { router as sellerRouter };

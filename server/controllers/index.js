@@ -62,6 +62,10 @@ import {
   patchStaffSafeDealModerationController,
 } from "./Seller/sellerSafeDealController.js";
 import {
+  getMySellerCommerceDefaultsController,
+  putMySellerCommerceDefaultsController,
+} from "./Seller/sellerCommerceDefaultsController.js";
+import {
   getPaymentConfigController,
   createLoyaltyPointsPaymentController,
   createOrderPaymentController,
@@ -400,6 +404,8 @@ export {
   submitSellerSafeDealApplicationController,
   getStaffSafeDealApplicationsController,
   patchStaffSafeDealModerationController,
+  getMySellerCommerceDefaultsController,
+  putMySellerCommerceDefaultsController,
   getPaymentConfigController,
   createLoyaltyPointsPaymentController,
   createOrderPaymentController,

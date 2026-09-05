@@ -39,8 +39,13 @@ import {
 } from "../../constants/loboConstants.js";
 import { isLoboConfigured } from "../shipping/lobo/loboClient.js";
 import { isCarrierAvailable } from "../shipping/shippingCarrierSettings.js";
+import { requireSellerDefaultsForProductWrite } from "../seller/sellerCommerceDefaults.js";
 import {
+  PRODUCT_DELIVERY_CARRIER_GITORG,
   PRODUCT_DELIVERY_CARRIER_LOBO,
+  PRODUCT_DELIVERY_CARRIER_SELLER,
+  PRODUCT_FULFILLMENT_SOURCE_CUSTOM,
+  PRODUCT_FULFILLMENT_SOURCE_PROFILE,
   buildLegacyDeliveryFlags,
   resolveProductDeliveryCarrier,
 } from "@molha/api-contract";
@@ -238,25 +243,50 @@ export async function postProduct({
       : null;
 
   const { productSaleCity, productSaleCityNormalized } = resolveCreateSaleCity({});
-  const salePickup = await resolveProductPickupWriteFields(body ?? {}, {
-    fallbackRegionCode: body?.productRegionCode,
-  });
-  const productPickupEnabled = resolveProductPickupEnabledForWrite(
-    body?.productPickupEnabled,
-  );
+
+  // Товар может наследовать адрес и перевозчика из профиля продавца: тогда
+  // в теле их нет вовсе (схема запрещает слать и то и другое), и всё
+  // берётся из настроек. Поля при этом всё равно ложатся НА товар — по ним
+  // ищет каталог.
+  const followsSellerProfile =
+    body?.productFulfillmentSource === PRODUCT_FULFILLMENT_SOURCE_PROFILE;
+  const sellerDefaults = followsSellerProfile
+    ? await requireSellerDefaultsForProductWrite(userId)
+    : null;
+
+  const salePickup = sellerDefaults
+    ? {
+        productPickupLocations: sellerDefaults.pickupLocations,
+        productPickupAddress: sellerDefaults.productPickupAddress,
+        productPickupLat: sellerDefaults.productPickupLat,
+        productPickupLon: sellerDefaults.productPickupLon,
+        productPickupLocation: sellerDefaults.productPickupLocation,
+        productRegionCode: sellerDefaults.regionCode,
+      }
+    : await resolveProductPickupWriteFields(body ?? {}, {
+        fallbackRegionCode: body?.productRegionCode,
+      });
+  const productPickupEnabled = sellerDefaults
+    ? sellerDefaults.pickupEnabled
+    : resolveProductPickupEnabledForWrite(body?.productPickupEnabled);
   const productDeliveryEnabled = resolveProductDeliveryEnabledForWrite(
-    body?.productDeliveryEnabled,
+    sellerDefaults
+      ? sellerDefaults.deliveryCarrier === PRODUCT_DELIVERY_CARRIER_SELLER
+      : body?.productDeliveryEnabled,
   );
   // Взаимоисключение уже проверено схемой; здесь только сохраняем выбор.
-  const productCourierDeliveryEnabled = body?.productCourierDeliveryEnabled === true;
+  const productCourierDeliveryEnabled = sellerDefaults
+    ? sellerDefaults.deliveryCarrier === PRODUCT_DELIVERY_CARRIER_GITORG
+    : body?.productCourierDeliveryEnabled === true;
   // Перевозчик — источник правды. Старые клиенты шлют только флаги, поэтому
   // при отсутствии поля выводим его из них.
-  const productDeliveryCarrier =
-    resolveProductDeliveryCarrier({
-      productDeliveryCarrier: body?.productDeliveryCarrier,
-      productDeliveryEnabled,
-      productCourierDeliveryEnabled,
-    }) ?? "";
+  const productDeliveryCarrier = sellerDefaults
+    ? sellerDefaults.deliveryCarrier
+    : (resolveProductDeliveryCarrier({
+        productDeliveryCarrier: body?.productDeliveryCarrier,
+        productDeliveryEnabled,
+        productCourierDeliveryEnabled,
+      }) ?? "");
   // Служба без ключей ничего не умеет, а выключенную админом предлагать
   // нельзя: и то и другое обернулось бы заказом, который молча зависнет на
   // «Готов к отгрузке».
@@ -302,6 +332,9 @@ export async function postProduct({
     productPickupLocation: salePickup.productPickupLocation,
     productPickupLocations: salePickup.productPickupLocations,
     productPickupEnabled,
+    productFulfillmentSource: followsSellerProfile
+      ? PRODUCT_FULFILLMENT_SOURCE_PROFILE
+      : PRODUCT_FULFILLMENT_SOURCE_CUSTOM,
     // Флаги пишем производными от перевозчика, чтобы они не разъезжались.
     ...legacyFlags,
     productDeliveryCarrier,

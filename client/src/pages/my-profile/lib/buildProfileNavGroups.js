@@ -51,6 +51,7 @@ export function buildProfileNavGroups({
   canUsePartnerProgram,
   canUseAdvertising,
   canUseOneCIntegration,
+  canUseDeliveryPayment,
   canUseSafeDeal,
   canUseSafeDealModeration,
   canUseEditProfile,
@@ -103,6 +104,7 @@ export function buildProfileNavGroups({
   onPartnerProgramClick,
   onAdvertisingClick,
   onOneCIntegrationClick,
+  onDeliveryPaymentClick,
   onSafeDealClick,
   onSafeDealModerationClick,
   onEditProfileClick,
@@ -272,6 +274,16 @@ export function buildProfileNavGroups({
                 tab: "onec-integration",
                 label: MY_PROFILE_PAGE_UI.TAB_ONEC_INTEGRATION,
                 onClick: () => selectTab("onec-integration", onOneCIntegrationClick),
+              },
+            ]
+          : []),
+        ...(canUseDeliveryPayment
+          ? [
+              {
+                tab: "delivery-payment",
+                label: MY_PROFILE_PAGE_UI.TAB_DELIVERY_PAYMENT,
+                onClick: () =>
+                  selectTab("delivery-payment", onDeliveryPaymentClick),
               },
             ]
           : []),
