@@ -88,8 +88,6 @@ export const PRODUCT_PROMOTION_UI = {
   BALANCE_LABEL: "Ваш баланс",
   /** @param {number} balance */
   BALANCE_POINTS: (balance) => `${balance} баллов`,
-  PAYMENT_HINT_POINTS:
-    "Оплата только баллами. Списание сразу, продвижение включается автоматически.",
   TIER_LABEL: "Уровень продвижения",
   /** @param {string} percent */
   TIER_RATE_HINT: (percent) => `${percent}% от цены товара`,
@@ -97,18 +95,18 @@ export const PRODUCT_PROMOTION_UI = {
   TIER_OPTION: (title, description) => `${title} — ${description}`,
   DURATION_LABEL: "Срок",
   /** @param {number} pricePoints */
-  DURATION_PRICE_POINTS: (pricePoints) => `${pricePoints} б.`,
+  DURATION_PRICE_POINTS: (pricePoints) => `${pricePoints} руб.`,
   /** @param {string} title @param {number} pricePoints */
-  DURATION_OPTION_POINTS: (title, pricePoints) => `${title} — ${pricePoints} баллов`,
+  DURATION_OPTION_POINTS: (title, pricePoints) => `${title} — ${pricePoints} руб.`,
   SUMMARY_TIER: "Уровень",
   SUMMARY_DURATION: "Срок действия",
   TOTAL_LABEL: "К оплате",
   /** @param {number} pricePoints */
-  TOTAL_POINTS: (pricePoints) => `${pricePoints} баллов`,
+  TOTAL_POINTS: (pricePoints) => `${pricePoints} руб.`,
   TARIFF_DURATION: (durationHours) => `${durationHours} ч.`,
   INSUFFICIENT_POINTS: (required, balance) =>
     `Недостаточно баллов: нужно ${required}, у вас ${balance}.`,
-  SUBMIT_POINTS: "Оплатить баллами",
+  SUBMIT_POINTS: "Оплатить",
   SUBMIT_PENDING: "Отправка…",
   CANCEL: "Отмена",
   CLOSE: "Закрыть",

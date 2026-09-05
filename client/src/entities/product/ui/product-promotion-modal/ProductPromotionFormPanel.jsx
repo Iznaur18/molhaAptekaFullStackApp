@@ -86,10 +86,6 @@ export function ProductPromotionFormPanel({
         </strong>
       </div>
 
-      <p className="product-promotion-modal__hint">
-        {PRODUCT_PROMOTION_UI.PAYMENT_HINT_POINTS}
-      </p>
-
       <fieldset
         className="product-promotion-modal__section"
         disabled={isSubmitting || tiers.length === 0}

@@ -97,13 +97,6 @@
   color: #ffffff;
 }
 
-.product-promotion-modal__hint {
-  margin: 0;
-  font-size: 0.84rem;
-  line-height: 1.45;
-  color: var(--iz-color-text-muted);
-}
-
 .product-promotion-modal__section {
   margin: 0;
   padding: 0;

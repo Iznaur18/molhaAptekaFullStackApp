@@ -317,7 +317,6 @@ export const ProductPromotionModal = ({
               {PRODUCT_PROMOTION_UI.BALANCE_POINTS(loyaltyPoints)}
             </Text>
           </View>
-          <Text style={styles.hint}>{PRODUCT_PROMOTION_UI.PAYMENT_HINT_POINTS}</Text>
         </View>
 
         <View>
