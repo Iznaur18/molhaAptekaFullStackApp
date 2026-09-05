@@ -17,6 +17,7 @@ import { runMoneyIdempotentMutation } from "../loyalty/runMoneyIdempotentMutatio
 import {
   activateProductPromotionRecord,
   expireProductPromotionsAndSendNotifications,
+  buildProductPromotionAlreadyActiveMessage,
   isProductCatalogPromotionActive,
   PRODUCT_PROMOTION_NOTIFICATION_KIND_APPROVED,
   PRODUCT_PROMOTION_NOTIFICATION_KIND_REJECTED,
@@ -121,7 +122,7 @@ async function requestProductPromotionOnce({
     throw new AppError(409, "Скрытый товар нельзя продвигать");
   }
   if (isProductCatalogPromotionActive(product)) {
-    throw new AppError(409, "У товара уже есть активное продвижение");
+    throw new AppError(409, buildProductPromotionAlreadyActiveMessage(product));
   }
 
   const duration = findProductPromotionDuration(tariffCode);
@@ -369,7 +370,7 @@ export async function approveProductPromotion({ staffId, promotionId }) {
     throw new AppError(409, "Скрытый товар нельзя продвигать");
   }
   if (isProductCatalogPromotionActive(product)) {
-    throw new AppError(409, "У товара уже есть активное продвижение");
+    throw new AppError(409, buildProductPromotionAlreadyActiveMessage(product));
   }
 
   const tierMeta = PRODUCT_PROMOTION_TIER_META.find(

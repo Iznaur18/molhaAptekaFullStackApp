@@ -279,3 +279,50 @@ export const isProductCatalogPromotionActive = (product) => {
   }
   return new Date(product.catalogPromotionExpiresAt).getTime() > Date.now();
 };
+
+const PROMOTION_EXPIRY_TIME_ZONE = "Europe/Moscow";
+
+/**
+ * Дата окончания продвижения словами, в московском времени.
+ *
+ * Часовой пояс важен: продвижение, истекающее в 00:30 МСК, в UTC пришлось бы
+ * на предыдущий день, и продавец увидел бы дату на сутки раньше настоящей.
+ *
+ * Время показываем вместе с датой — тарифы бывают на сутки, и «до 27 сентября»
+ * без часа там не отвечает на вопрос «когда можно будет снова».
+ *
+ * @param {unknown} value
+ * @returns {string | null}
+ */
+export const formatProductPromotionExpiryLabel = (value) => {
+  if (!value) {
+    return null;
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+  return new Intl.DateTimeFormat("ru-RU", {
+    timeZone: PROMOTION_EXPIRY_TIME_ZONE,
+    day: "numeric",
+    month: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+};
+
+/**
+ * Отказ «уже продвигается» с датой, до которой ждать.
+ *
+ * Без даты продавец видит запрет и не понимает, вернуться ему через час или
+ * через месяц.
+ *
+ * @param {{ catalogPromotionExpiresAt?: unknown } | null | undefined} product
+ * @returns {string}
+ */
+export const buildProductPromotionAlreadyActiveMessage = (product) => {
+  const until = formatProductPromotionExpiryLabel(product?.catalogPromotionExpiresAt);
+  return until
+    ? `У товара уже есть активное продвижение — до ${until}`
+    : "У товара уже есть активное продвижение";
+};
