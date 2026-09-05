@@ -30,6 +30,7 @@ import {
   buildPickupSelectionsPayload,
 } from "../../../entities/cart/lib/buildCheckoutPickupLocations.js";
 import { CHECKOUT_FORM_UI, PRODUCT_PICKUP_UI } from "../../config/appUiCopy.js";
+import { AppIcon, CircleAlert } from "../icon/index.js";
 
 import "./CheckoutForm.css";
 
@@ -687,7 +688,12 @@ export function CheckoutForm({
 
           {displayError ? (
             <p className="checkout-form__error" role="alert">
-              {displayError}
+              <AppIcon
+                icon={CircleAlert}
+                className="checkout-form__error-icon"
+                size={18}
+              />
+              <span className="checkout-form__error-text">{displayError}</span>
             </p>
           ) : null}
           {submitSuccess ? (

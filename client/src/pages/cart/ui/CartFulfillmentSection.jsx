@@ -66,32 +66,38 @@ export function CartFulfillmentSection({
 
         {deliveryFee ? (
           <div className="cart-fulfillment__fee">
-            <span className="cart-fulfillment__fee-label">
-              {CART_DELIVERY_FEE_UI.LABEL}
-            </span>
-            <div className="cart-fulfillment__fee-controls">
-              <button
-                type="button"
-                aria-label={CART_DELIVERY_FEE_UI.DECREASE}
-                onClick={() => deliveryFee.onChange(deliveryFee.value - 25)}
-                disabled={deliveryFee.value <= CART_DELIVERY_FEE_UI.MIN_RUB}
-              >
-                −
-              </button>
-              <span className="cart-fulfillment__fee-value">
-                {formatPriceRub(deliveryFee.value)}
-              </span>
-              <button
-                type="button"
-                aria-label={CART_DELIVERY_FEE_UI.INCREASE}
-                onClick={() => deliveryFee.onChange(deliveryFee.value + 25)}
-              >
-                +
-              </button>
+            <div className="cart-fulfillment__fee-row">
+              <div className="cart-fulfillment__fee-copy">
+                <span className="cart-fulfillment__fee-label">
+                  {CART_DELIVERY_FEE_UI.LABEL}
+                </span>
+                <span className="cart-fulfillment__fee-hint">
+                  {CART_DELIVERY_FEE_UI.HINT}
+                </span>
+              </div>
+              <div className="cart-fulfillment__fee-controls">
+                <button
+                  type="button"
+                  className="cart-fulfillment__fee-btn"
+                  aria-label={CART_DELIVERY_FEE_UI.DECREASE}
+                  onClick={() => deliveryFee.onChange(deliveryFee.value - 25)}
+                  disabled={deliveryFee.value <= CART_DELIVERY_FEE_UI.MIN_RUB}
+                >
+                  −
+                </button>
+                <span className="cart-fulfillment__fee-value">
+                  {formatPriceRub(deliveryFee.value)}
+                </span>
+                <button
+                  type="button"
+                  className="cart-fulfillment__fee-btn"
+                  aria-label={CART_DELIVERY_FEE_UI.INCREASE}
+                  onClick={() => deliveryFee.onChange(deliveryFee.value + 25)}
+                >
+                  +
+                </button>
+              </div>
             </div>
-            <span className="cart-fulfillment__fee-hint">
-              {CART_DELIVERY_FEE_UI.HINT}
-            </span>
           </div>
         ) : null}
 

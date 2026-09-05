@@ -37,6 +37,7 @@ export const MY_PROFILE_PAGE_UI = {
   NAV_ARIA: "Разделы профиля",
   NAV_SECTION_TRADE: "Торговля",
   NAV_SECTION_ACCOUNT: "Аккаунт",
+  NAV_SECTION_SERVICES: "Сервисы",
   NAV_SECTION_STAFF: "Модерация",
   NAV_SECTION_MANAGEMENT: "Управление",
   TAB_CREATE_RAFFLE: "Создать розыгрыш",

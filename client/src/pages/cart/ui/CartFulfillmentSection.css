@@ -99,53 +99,103 @@
 
 /* Сумму курьеру назначает покупатель — тарифа по километражу нет. */
 .cart-fulfillment__fee {
+  margin: 0 var(--cart-page-content-inset, 12px) 12px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--iz-color-ink) 8%, transparent);
+  border-radius: 16px;
+  background: var(--iz-color-surface-elevated, var(--iz-color-surface, var(--iz-color-bg)));
+  box-sizing: border-box;
+}
+
+.cart-fulfillment__fee-row {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cart-fulfillment__fee-copy {
+  display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
-  gap: 0.35rem;
-  margin: 0 var(--cart-page-content-inset, 12px) 10px;
-  padding: 0.6rem 0.75rem;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 10px;
+  gap: 4px;
+  min-width: 0;
 }
 
 .cart-fulfillment__fee-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--iz-color-text-muted, var(--iz-color-text));
-}
-
-.cart-fulfillment__fee-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.cart-fulfillment__fee-controls button {
-  font: inherit;
-  font-size: 1.2rem;
-  line-height: 1;
-  width: 2rem;
-  height: 2rem;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 50%;
-  background: transparent;
-  color: var(--iz-color-text);
-  cursor: pointer;
-}
-
-.cart-fulfillment__fee-controls button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.cart-fulfillment__fee-value {
-  font-size: 1.05rem;
+  margin: 0;
+  font-size: 0.9375rem;
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
   color: var(--iz-color-text);
 }
 
 .cart-fulfillment__fee-hint {
+  margin: 0;
   font-size: 0.78rem;
-  color: var(--iz-color-text-muted, var(--iz-color-text));
+  line-height: 1.35;
+  color: var(--iz-color-text-muted, var(--iz-color-muted));
+}
+
+.cart-fulfillment__fee-controls {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--iz-color-ink) 5%, transparent);
+}
+
+.cart-fulfillment__fee-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--iz-color-surface, var(--iz-color-bg));
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--iz-color-ink) 8%, transparent);
+  cursor: pointer;
+}
+
+.cart-fulfillment__fee-btn:hover:not(:disabled) {
+  color: var(--iz-color-accent, #f2542d);
+}
+
+.cart-fulfillment__fee-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.cart-fulfillment__fee-value {
+  min-width: 4.75rem;
+  padding: 0 0.35rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  text-align: center;
+  color: var(--iz-color-text);
+}
+
+@media (max-width: 480px) {
+  .cart-fulfillment__fee-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .cart-fulfillment__fee-controls {
+    align-self: flex-end;
+  }
 }

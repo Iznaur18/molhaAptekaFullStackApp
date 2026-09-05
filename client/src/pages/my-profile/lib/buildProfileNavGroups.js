@@ -2,6 +2,7 @@ import { MY_PROFILE_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import {
   PROFILE_ACCOUNT_SECTION_ORDER,
   PROFILE_MANAGEMENT_SECTION_ORDER,
+  PROFILE_SERVICES_SECTION_ORDER,
   PROFILE_STAFF_SECTION_ORDER,
   PROFILE_TRADE_SECTION_ORDER,
 } from "@izibuy/shared-lib";
@@ -268,43 +269,6 @@ export function buildProfileNavGroups({
               },
             ]
           : []),
-        ...(canUseOneCIntegration
-          ? [
-              {
-                tab: "onec-integration",
-                label: MY_PROFILE_PAGE_UI.TAB_ONEC_INTEGRATION,
-                onClick: () => selectTab("onec-integration", onOneCIntegrationClick),
-              },
-            ]
-          : []),
-        ...(canUseDeliveryPayment
-          ? [
-              {
-                tab: "delivery-payment",
-                label: MY_PROFILE_PAGE_UI.TAB_DELIVERY_PAYMENT,
-                onClick: () =>
-                  selectTab("delivery-payment", onDeliveryPaymentClick),
-              },
-            ]
-          : []),
-        ...(canUseSafeDeal
-          ? [
-              {
-                tab: "safe-deal",
-                label: MY_PROFILE_PAGE_UI.TAB_SAFE_DEAL,
-                onClick: () => selectTab("safe-deal", onSafeDealClick),
-              },
-            ]
-          : []),
-        ...(canUseCourier
-          ? [
-              {
-                tab: "courier",
-                label: "Стать курьером",
-                onClick: () => selectTab("courier", onCourierClick),
-              },
-            ]
-          : []),
         ...(canUseEditProfile && !showEditOnBanner
           ? [
               {
@@ -317,6 +281,57 @@ export function buildProfileNavGroups({
       ], PROFILE_ACCOUNT_SECTION_ORDER),
     },
   ];
+
+  const servicesItems = orderNavItems(
+    [
+      ...(canUseOneCIntegration
+        ? [
+            {
+              tab: "onec-integration",
+              label: MY_PROFILE_PAGE_UI.TAB_ONEC_INTEGRATION,
+              onClick: () => selectTab("onec-integration", onOneCIntegrationClick),
+            },
+          ]
+        : []),
+      ...(canUseDeliveryPayment
+        ? [
+            {
+              tab: "delivery-payment",
+              label: MY_PROFILE_PAGE_UI.TAB_DELIVERY_PAYMENT,
+              onClick: () =>
+                selectTab("delivery-payment", onDeliveryPaymentClick),
+            },
+          ]
+        : []),
+      ...(canUseSafeDeal
+        ? [
+            {
+              tab: "safe-deal",
+              label: MY_PROFILE_PAGE_UI.TAB_SAFE_DEAL,
+              onClick: () => selectTab("safe-deal", onSafeDealClick),
+            },
+          ]
+        : []),
+      ...(canUseCourier
+        ? [
+            {
+              tab: "courier",
+              label: "Стать курьером",
+              onClick: () => selectTab("courier", onCourierClick),
+            },
+          ]
+        : []),
+    ],
+    PROFILE_SERVICES_SECTION_ORDER,
+  );
+
+  if (servicesItems.length > 0) {
+    groups.push({
+      id: "services",
+      label: MY_PROFILE_PAGE_UI.NAV_SECTION_SERVICES,
+      items: servicesItems,
+    });
+  }
 
   const staffItems = [
     ...(canUseProductModeration

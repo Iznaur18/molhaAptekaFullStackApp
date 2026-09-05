@@ -381,15 +381,41 @@
 }
 
 .checkout-form__error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
   margin: 0;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--iz-color-danger-border, color-mix(in srgb, var(--iz-color-danger) 35%, transparent));
+  border-radius: 12px;
+  background: var(--iz-color-danger-surface, color-mix(in srgb, var(--iz-color-danger) 10%, transparent));
+  color: var(--iz-color-danger-text, var(--iz-color-danger));
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.checkout-form__error-icon {
+  flex: 0 0 auto;
+  margin-top: 0.1rem;
   color: var(--iz-color-danger);
-  font-size: var(--iz-font-base);
+}
+
+.checkout-form__error-text {
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .checkout-form__success {
   margin: 0;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-success) 35%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--iz-color-success) 10%, transparent);
   color: var(--iz-color-success);
-  font-size: var(--iz-font-base);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 /* useCheckoutFormStyles.submitSpacer — minHeight 52, тень action */

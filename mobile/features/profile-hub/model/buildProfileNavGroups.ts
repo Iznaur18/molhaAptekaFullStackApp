@@ -2,6 +2,7 @@ import { MY_PROFILE_PAGE_UI } from "@/shared/config/appUiCopy";
 import {
   PROFILE_ACCOUNT_SECTION_ORDER,
   PROFILE_MANAGEMENT_SECTION_ORDER,
+  PROFILE_SERVICES_SECTION_ORDER,
   PROFILE_STAFF_SECTION_ORDER,
   PROFILE_TRADE_SECTION_ORDER,
 } from "@izibuy/shared-lib";
@@ -289,6 +290,22 @@ export const buildProfileNavGroups = (
       items: accountItems,
     },
   ];
+
+  const servicesItems: ProfileNavItem[] = PROFILE_SERVICES_SECTION_ORDER.flatMap(
+    (sectionId): ProfileNavItem[] => {
+      // Пункты сервисов на mobile появятся по мере экранов; порядок уже общий.
+      void sectionId;
+      return [];
+    },
+  );
+
+  if (servicesItems.length > 0) {
+    groups.push({
+      id: "services",
+      label: MY_PROFILE_PAGE_UI.NAV_SECTION_SERVICES,
+      items: servicesItems,
+    });
+  }
 
   if (staffItems.length > 0) {
     groups.push({
