@@ -139,6 +139,21 @@ export const POPULAR_PRODUCTS_ADMIN_PAGE_UI = {
   PREVIEW_REGION_LABEL: "Регион товара",
   PREVIEW_NOT_VISIBLE: "Товар недоступен в каталоге — добавить нельзя",
   PREVIEW_OK: "Можно добавить в эту подборку",
+  DETAILS_BUTTON: "В популярные",
+  DETAILS_BUTTON_IN_LIST: "В популярных",
+  DETAILS_MODAL_TITLE: "Популярные товары",
+  DETAILS_MODAL_CLOSE: "Закрыть",
+  DETAILS_MODAL_HINT:
+    "Подборки вкладки «Товары» (не «Категории»). Списки региона товара — первыми; заголовок любой.",
+  DETAILS_MODAL_EMPTY:
+    "Нет подборок товаров. Профиль → Специальный блок → вкладка «Товары» (не «Категории»).",
+  DETAILS_MODAL_LOADING: "Загрузка списков…",
+  DETAILS_ADD: "Добавить",
+  DETAILS_REMOVE: "Убрать",
+  DETAILS_ADD_SUCCESS: "Товар добавлен в популярные",
+  DETAILS_REMOVE_SUCCESS: "Товар убран из популярных",
+  DETAILS_REGION_FALLBACK: "Регион",
+  DETAILS_REGION_MISMATCH: "регион товара не совпадает",
 };
 
 /** Админка: подборки категорий на главной */

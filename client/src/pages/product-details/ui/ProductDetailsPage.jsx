@@ -277,12 +277,19 @@ export function ProductDetailsPage() {
         adminFooter={
           showManageFooter ? (
             <ProductDetailsAdminFooter
+              productId={String(product._id)}
+              productRegionCode={
+                product.productRegionCode != null
+                  ? String(product.productRegionCode)
+                  : null
+              }
               onEdit={handleEdit}
               onPromote={handlePromote}
               onDelete={canDeleteProduct ? handleDelete : undefined}
               canEdit={shell.isAdmin || canSellerEditProduct(product)}
               canPromote={canPromote}
               canDelete={canDeleteProduct}
+              canManagePopularLists={Boolean(shell.isAdmin)}
               hasOpenSales={product.hasOpenSales === true}
               isDeletePending={
                 shell.deletingProductId != null &&

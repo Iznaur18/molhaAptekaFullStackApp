@@ -26,6 +26,16 @@
   background: color-mix(in srgb, var(--iz-color-action) 92%, black);
 }
 
+.product-details-admin-footer .product-details-modal__footer-btn--popular {
+  border-color: color-mix(in srgb, var(--iz-color-action) 35%, var(--iz-color-border));
+  background: color-mix(in srgb, var(--iz-color-action) 10%, var(--iz-color-surface));
+  color: var(--iz-color-action);
+}
+
+.product-details-admin-footer .product-details-modal__footer-btn--popular:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--iz-color-action) 16%, var(--iz-color-surface));
+}
+
 .product-details-admin-footer .product-details-modal__footer-btn--edit {
   border-color: color-mix(in srgb, var(--iz-color-border-strong) 85%, transparent);
   background: color-mix(in srgb, var(--iz-color-surface) 92%, var(--iz-color-surface-muted));

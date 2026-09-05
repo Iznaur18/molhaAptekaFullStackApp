@@ -3,29 +3,36 @@ import { Megaphone, Pencil, Trash2 } from "lucide-react";
 
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
+import { ProductDetailsPopularListsControl } from "./ProductDetailsPopularListsControl.jsx";
 
 import "./ProductDetailsAdminFooter.css";
 
 /**
  * @param {{
+ *   productId?: string | null;
+ *   productRegionCode?: string | null;
  *   onEdit: () => void;
  *   onPromote?: () => void;
  *   onDelete?: () => void | Promise<void>;
  *   canEdit?: boolean;
  *   canPromote?: boolean;
  *   canDelete?: boolean;
+ *   canManagePopularLists?: boolean;
  *   hasOpenSales?: boolean;
  *   isDeletePending?: boolean;
  *   errorMessage?: string;
  * }} props
  */
 export function ProductDetailsAdminFooter({
+  productId = null,
+  productRegionCode = null,
   onEdit,
   onPromote,
   onDelete,
   canEdit = true,
   canPromote = false,
   canDelete = false,
+  canManagePopularLists = false,
   hasOpenSales = false,
   isDeletePending = false,
   errorMessage = "",
@@ -36,9 +43,11 @@ export function ProductDetailsAdminFooter({
     setIsDeleteConfirmOpen(false);
   }, [onDelete]);
 
-  if (!canEdit && !canPromote && !canDelete) {
+  if (!canEdit && !canPromote && !canDelete && !canManagePopularLists) {
     return null;
   }
+
+  const actionsLocked = isDeletePending || isDeleteConfirmOpen;
 
   return (
     <div className="product-details-admin-footer">
@@ -51,18 +60,25 @@ export function ProductDetailsAdminFooter({
         <button
           type="button"
           className="product-details-modal__footer-btn product-details-modal__footer-btn--promote"
-          disabled={isDeletePending || isDeleteConfirmOpen}
+          disabled={actionsLocked}
           onClick={onPromote}
         >
           <AppIcon icon={Megaphone} size="sm" strokeWidth={2.15} />
           {PRODUCT_CARD_UI.PROMOTION_BUTTON}
         </button>
       ) : null}
+      {canManagePopularLists && productId ? (
+        <ProductDetailsPopularListsControl
+          productId={String(productId)}
+          productRegionCode={productRegionCode}
+          disabled={actionsLocked}
+        />
+      ) : null}
       {canEdit ? (
         <button
           type="button"
           className="product-details-modal__footer-btn product-details-modal__footer-btn--edit"
-          disabled={isDeletePending || isDeleteConfirmOpen}
+          disabled={actionsLocked}
           onClick={onEdit}
         >
           <AppIcon icon={Pencil} size="sm" strokeWidth={2.15} />
