@@ -2,12 +2,12 @@ import { ProductModel, ProductPromotionModel, UserModel } from "../../models/ind
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import {
   calculateProductPromotionAmountRub,
-  calculateProductPromotionPointsCost,
   findProductPromotionDuration,
   isValidProductPromotionTier,
   PRODUCT_PROMOTION_DURATION_OPTIONS,
-  PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
+  PRODUCT_PROMOTION_PAYMENT_METHOD_SBP,
   PRODUCT_PROMOTION_STATUS_ACTIVE,
+  PRODUCT_PROMOTION_STATUS_AWAITING_PAYMENT,
   PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
   PRODUCT_PROMOTION_STATUS_REJECTED,
   PRODUCT_PROMOTION_TIER_META,
@@ -23,15 +23,13 @@ import {
   refundProductPromotionPaymentIfNeeded,
 } from "./productPromotionHelpers.js";
 import {
-  deductLoyaltyPoints,
-  InsufficientLoyaltyPointsError,
 } from "../loyalty/loyaltyPointsSpend.js";
 import {
   creditReferralCashbackFromSpend,
   notifyReferralCashbackCredited,
 } from "../referral/creditReferralCashbackFromSpend.js";
 import { REFERRAL_SOURCE_KIND_PRODUCT_PROMOTION } from "../../constants/referralConstants.js";
-import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
+import { runInTransaction } from "../../utils/mongoTransaction.js";
 import { createUserInAppNotification } from "../user/userInAppNotifications.js";
 
 import {
@@ -132,95 +130,140 @@ async function requestProductPromotionOnce({
   }
 
   const tierMeta = PRODUCT_PROMOTION_TIER_META.find((item) => item.tier === tier);
-  const chargedAt = new Date();
-  const amountPoints = calculateProductPromotionPointsCost({
-    productPrice: product.productPrice,
-    tier,
-    durationCode: tariffCode,
-  });
+
   const amountRub = calculateProductPromotionAmountRub({
     productPrice: product.productPrice,
     tier,
     durationCode: tariffCode,
   });
-  const promotionMessage = "Продвижение товара активировано";
+  // Заявка больше не списывает баллы: продвижение оплачивается по СБП, а
+  // деньги от провайдера приходят асинхронно. Поэтому запись создаётся
+  // неактивной, а включает её подтверждённый платёж.
+  const promotion = await ProductPromotionModel.create({
+    productId,
+    sellerId: userId,
+    status: PRODUCT_PROMOTION_STATUS_AWAITING_PAYMENT,
+    tier,
+    tariffCode: duration.code,
+    tariffTitle: duration.title,
+    durationHours: duration.durationHours,
+    amountRub,
+    paymentMethod: PRODUCT_PROMOTION_PAYMENT_METHOD_SBP,
+    amountPoints: null,
+    pointsChargedAt: null,
+    rubChargedAt: null,
+  });
 
-  try {
-    const { promotion, loyaltyPointsBalance, cashback } = await runInTransaction(
-      async (session) => {
-        const loyaltyPointsBalance = await deductLoyaltyPoints({
-          userId,
-          amount: amountPoints,
-          session,
-        });
+  return {
+    message: `Счёт на ${amountRub} ₽ выставлен — продвижение начнётся после оплаты.`,
+    promotion: toPromotionPayload(promotion.toObject()),
+    requiresPayment: true,
+    amountRub,
+    tierTitle: tierMeta?.title ?? `L${tier}`,
+    durationTitle: duration.title,
+  };
+}
 
-        const [promotion] = await ProductPromotionModel.create(
-          [
-            {
-              productId,
-              sellerId: userId,
-              status: PRODUCT_PROMOTION_STATUS_ACTIVE,
-              tier,
-              tariffCode: duration.code,
-              tariffTitle: duration.title,
-              durationHours: duration.durationHours,
-              amountRub,
-              paymentMethod: PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
-              amountPoints,
-              pointsChargedAt: chargedAt,
-              rubChargedAt: null,
-            },
-          ],
-          withMongoSession({}, session),
-        );
+/**
+ * Продвижение, ожидающее оплаты, — для выставления счёта платёжным слоем.
+ *
+ * Заодно проверяет, что заявка принадлежит этому продавцу: сумму и цель
+ * платежа определяет сервер, а не запрос.
+ *
+ * @param {string} promotionId
+ * @param {string} userId
+ */
+export async function loadPayableProductPromotion(promotionId, userId) {
+  const promotion = await ProductPromotionModel.findOne({
+    _id: promotionId,
+    sellerId: userId,
+    status: PRODUCT_PROMOTION_STATUS_AWAITING_PAYMENT,
+  }).lean();
 
-        await activateProductPromotionRecord(promotion, {
-          notificationMessage: promotionMessage,
-          session,
-          skipNotification: true,
-        });
+  if (!promotion) {
+    return null;
+  }
 
-        const cashback = await creditReferralCashbackFromSpend({
-          spenderUserId: userId,
-          pointsSpent: amountPoints,
-          sourceKind: REFERRAL_SOURCE_KIND_PRODUCT_PROMOTION,
-          sourceId: String(promotion._id),
-          session,
-        });
+  const meta = PRODUCT_PROMOTION_TIER_META.find((item) => item.tier === promotion.tier);
+  return {
+    amountRub: Number(promotion.amountRub) || 0,
+    description: `Продвижение товара: ${meta?.title ?? `L${promotion.tier}`}, ${promotion.tariffTitle}`,
+  };
+}
 
-        return { promotion, loyaltyPointsBalance, cashback };
+/**
+ * Включить продвижение после оплаты.
+ *
+ * Единственный вход — подтверждённый платёж; пользователь сюда не попадает.
+ *
+ * @param {string} promotionId
+ * @param {string} paymentId
+ */
+export async function activateProductPromotionAfterPayment(promotionId, paymentId) {
+  const chargedAt = new Date();
+
+  const { promotion, cashback } = await runInTransaction(async (session) => {
+    // Фильтр по статусу — защита от повторного уведомления: второй раз
+    // запись просто не найдётся, и срок продвижения не удвоится.
+    const found = await ProductPromotionModel.findOneAndUpdate(
+      { _id: promotionId, status: PRODUCT_PROMOTION_STATUS_AWAITING_PAYMENT },
+      {
+        $set: {
+          status: PRODUCT_PROMOTION_STATUS_ACTIVE,
+          rubChargedAt: chargedAt,
+          paidAt: chargedAt,
+          paymentId,
+        },
       },
+      { returnDocument: "after", session },
     );
 
-    if (cashback?.deferNotification) {
-      await notifyReferralCashbackCredited({
-        referrerUserId: cashback.referrerUserId,
-        amount: cashback.amount,
-        spenderUserId: userId,
-      });
+    if (!found) {
+      return { promotion: null, cashback: null };
     }
 
-    await createUserInAppNotification({
-      userId: promotion.sellerId,
-      kind: PRODUCT_PROMOTION_NOTIFICATION_KIND_APPROVED,
-      message: `${promotionMessage} (${tierMeta?.title ?? `L${tier}`}, ${duration.title})`,
-      productId: promotion.productId,
+    await activateProductPromotionRecord(found, {
+      notificationMessage: "Продвижение товара активировано",
+      session,
+      skipNotification: true,
     });
 
-    return {
-      message: "Продвижение запущено — баллы списаны с баланса.",
-      promotion: toPromotionPayload(promotion.toObject()),
-      loyaltyPointsBalance: loyaltyPointsBalance ?? null,
-    };
-  } catch (error) {
-    if (error instanceof InsufficientLoyaltyPointsError) {
-      throw new AppError(
-        409,
-        `Недостаточно баллов. Нужно: ${error.required}, у вас: ${error.available}`,
-      );
-    }
-    throw error;
+    // Реферальный кэшбэк считается от потраченного. Баллы и рубли у вас 1:1,
+    // поэтому рублёвая сумма подставляется без пересчёта.
+    const credited = await creditReferralCashbackFromSpend({
+      spenderUserId: String(found.sellerId),
+      pointsSpent: Number(found.amountRub) || 0,
+      sourceKind: REFERRAL_SOURCE_KIND_PRODUCT_PROMOTION,
+      sourceId: String(found._id),
+      session,
+    });
+
+    return { promotion: found, cashback: credited };
+  });
+
+  if (!promotion) {
+    return null;
   }
+
+  if (cashback?.deferNotification) {
+    await notifyReferralCashbackCredited({
+      referrerUserId: cashback.referrerUserId,
+      amount: cashback.amount,
+      spenderUserId: String(promotion.sellerId),
+    });
+  }
+
+  const activeMeta = PRODUCT_PROMOTION_TIER_META.find(
+    (item) => item.tier === promotion.tier,
+  );
+  await createUserInAppNotification({
+    userId: promotion.sellerId,
+    kind: PRODUCT_PROMOTION_NOTIFICATION_KIND_APPROVED,
+    message: `Продвижение товара активировано (${activeMeta?.title ?? `L${promotion.tier}`}, ${promotion.tariffTitle})`,
+    productId: promotion.productId,
+  });
+
+  return promotion;
 }
 
 /**

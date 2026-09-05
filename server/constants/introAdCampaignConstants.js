@@ -1,4 +1,12 @@
 export const INTRO_AD_CAMPAIGN_STATUS_PENDING = "pending";
+/**
+ * Модерация пройдена, ждём оплату по СБП. В показ ролик ещё не идёт.
+ *
+ * Появился, когда реклама перестала резервировать баллы: теперь площадка
+ * сначала смотрит ролик и только потом берёт деньги — за отклонённую
+ * заявку рекламодатель не платит вовсе.
+ */
+export const INTRO_AD_CAMPAIGN_STATUS_AWAITING_PAYMENT = "awaiting_payment";
 export const INTRO_AD_CAMPAIGN_STATUS_QUEUED = "queued";
 export const INTRO_AD_CAMPAIGN_STATUS_ACTIVE = "active";
 export const INTRO_AD_CAMPAIGN_STATUS_EXPIRED = "expired";
@@ -7,6 +15,7 @@ export const INTRO_AD_CAMPAIGN_STATUS_CANCELLED = "cancelled";
 
 export const INTRO_AD_CAMPAIGN_STATUSES = [
   INTRO_AD_CAMPAIGN_STATUS_PENDING,
+  INTRO_AD_CAMPAIGN_STATUS_AWAITING_PAYMENT,
   INTRO_AD_CAMPAIGN_STATUS_QUEUED,
   INTRO_AD_CAMPAIGN_STATUS_ACTIVE,
   INTRO_AD_CAMPAIGN_STATUS_EXPIRED,
@@ -16,11 +25,17 @@ export const INTRO_AD_CAMPAIGN_STATUSES = [
 
 export const INTRO_AD_CAMPAIGN_OPEN_STATUSES = [
   INTRO_AD_CAMPAIGN_STATUS_PENDING,
+  // Неоплаченная заявка тоже занимает слот: иначе рекламодатель подал бы
+  // десять и оплатил ту, что дешевле.
+  INTRO_AD_CAMPAIGN_STATUS_AWAITING_PAYMENT,
   INTRO_AD_CAMPAIGN_STATUS_QUEUED,
   INTRO_AD_CAMPAIGN_STATUS_ACTIVE,
 ];
 
 export const INTRO_AD_PRICE_POINTS = 6_000;
+
+/** Цена в рублях. Баллы и рубли у площадки 1:1, поэтому число то же. */
+export const INTRO_AD_PRICE_RUB = 6_000;
 
 /** Сколько платных intro-роликов может крутиться одновременно (проигрываются подряд). */
 export const INTRO_AD_MAX_ACTIVE = 5;

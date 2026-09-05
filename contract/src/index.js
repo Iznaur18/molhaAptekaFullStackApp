@@ -34,6 +34,7 @@ export {
   requestProductPromotionBodySchema,
   myProductPromotionsQuerySchema,
   rejectProductPromotionBodySchema,
+  PRODUCT_PROMOTION_STATUS_AWAITING_PAYMENT,
   PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
   PRODUCT_PROMOTION_STATUS_ACTIVE,
   PRODUCT_PROMOTION_STATUS_EXPIRED,
@@ -633,6 +634,13 @@ export {
   normalizeGeoCoord,
 } from "./sellerDeliveryTariff.js";
 export {
+  PLATFORM_COMMISSION_PERCENT_DEFAULT,
+  PLATFORM_COMMISSION_PERCENT_MAX,
+  PLATFORM_COMMISSION_ON_DELIVERY,
+  normalizePlatformCommissionPercent,
+  splitOrderAmountForPlatform,
+} from "./platformCommission.js";
+export {
   SHIPPING_PROVIDER_LOBO,
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_REGIONS,
@@ -778,6 +786,9 @@ export {
   paymentIdParamsSchema,
   orderPaymentParamsSchema,
   orderPaymentBodySchema,
+  PLATFORM_SERVICE_KINDS,
+  platformServicePaymentParamsSchema,
+  platformServicePaymentBodySchema,
 } from "./payments.js";
 export {
   authMeDataSchema,

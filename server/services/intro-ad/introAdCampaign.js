@@ -1,12 +1,14 @@
 import {
   INTRO_AD_CAMPAIGN_STATUS_ACTIVE,
   INTRO_AD_CAMPAIGN_STATUS_CANCELLED,
+  INTRO_AD_CAMPAIGN_STATUS_AWAITING_PAYMENT,
   INTRO_AD_CAMPAIGN_STATUS_PENDING,
   INTRO_AD_CAMPAIGN_STATUS_QUEUED,
   INTRO_AD_CAMPAIGN_STATUS_REJECTED,
   INTRO_AD_DURATION_MS,
   INTRO_AD_MAX_ACTIVE,
   INTRO_AD_PRICE_POINTS,
+  INTRO_AD_PRICE_RUB,
 } from "../../constants/introAdCampaignConstants.js";
 import { IntroAdCampaignModel, UserModel } from "../../models/index.js";
 import { AppError } from "../../errors/AppError.js";
@@ -22,19 +24,14 @@ import {
   toIntroAdCampaignPayload,
 } from "./introAdCampaignHelpers.js";
 import {
-  chargeReservedLoyaltyPoints,
-  releaseLoyaltyPointsReservation,
-  reserveLoyaltyPoints,
 } from "../loyalty/loyaltyPointsReserve.js";
 import {
   InsufficientLoyaltyPointsError,
-  refundLoyaltyPoints,
 } from "../loyalty/loyaltyPointsSpend.js";
 import {
   creditReferralCashbackFromSpend,
   notifyReferralCashbackCredited,
 } from "../referral/creditReferralCashbackFromSpend.js";
-import { reverseReferralCashbackForSource } from "../referral/reverseReferralCashbackForSource.js";
 import { REFERRAL_SOURCE_KIND_INTRO_AD } from "../../constants/referralConstants.js";
 import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
 
@@ -52,6 +49,9 @@ export function getIntroAdConfig() {
 /**
  * @param {{ userId: string }} input
  */
+export const INTRO_AD_PAID_CANCEL_MESSAGE =
+  "Оплаченную кампанию отменяет поддержка — напишите нам";
+
 export async function getMyIntroAdCampaign({ userId }) {
   const campaign = await IntroAdCampaignModel.findOne({
     advertiserId: userId,
@@ -83,15 +83,10 @@ export async function submitIntroAdCampaign({ userId, body }) {
   const reservedAt = new Date();
 
   try {
-    const { campaign, loyaltyPointsBalance } = await runInTransaction(
+    const { campaign } = await runInTransaction(
       async (session) => {
         await assertNoOpenIntroAdCampaignForAdvertiser(userId, session);
 
-        const loyaltyPointsBalance = await reserveLoyaltyPoints({
-          userId,
-          amount: INTRO_AD_PRICE_POINTS,
-          session,
-        });
 
         const [campaign] = await IntroAdCampaignModel.create(
           [
@@ -106,14 +101,15 @@ export async function submitIntroAdCampaign({ userId, body }) {
           withMongoSession({}, session),
         );
 
-        return { campaign, loyaltyPointsBalance };
+        return { campaign };
       },
     );
 
     return {
-      message: "Заявка отправлена на модерацию. Баллы зарезервированы.",
+      // Деньги не берём и не резервируем: за отклонённую заявку
+      // рекламодатель платить не должен.
+      message: "Заявка отправлена на модерацию. Счёт придёт после одобрения.",
       campaign: toIntroAdCampaignPayload(campaign.toObject()),
-      loyaltyPointsBalance: loyaltyPointsBalance ?? null,
     };
   } catch (error) {
     if (error instanceof InsufficientLoyaltyPointsError) {
@@ -148,25 +144,17 @@ export async function cancelMyIntroAdCampaign({ userId, campaignId }) {
   }
   if (
     campaign.status !== INTRO_AD_CAMPAIGN_STATUS_PENDING &&
-    campaign.status !== INTRO_AD_CAMPAIGN_STATUS_QUEUED
+    campaign.status !== INTRO_AD_CAMPAIGN_STATUS_AWAITING_PAYMENT
   ) {
-    throw new AppError(409, "Отменить можно только до начала показа");
+    // Оплаченную кампанию отменить нельзя, пока нет возврата у провайдера:
+    // прежний код возвращал баллы, которых теперь никто не списывал, —
+    // это была бы раздача денег из воздуха.
+    throw new AppError(409, INTRO_AD_PAID_CANCEL_MESSAGE);
   }
 
   const now = new Date();
-  const amount = Math.ceil(Number(campaign.amountPoints) || INTRO_AD_PRICE_POINTS);
 
   await runInTransaction(async (session) => {
-    if (campaign.status === INTRO_AD_CAMPAIGN_STATUS_PENDING) {
-      await releaseLoyaltyPointsReservation({ userId, amount, session });
-    } else if (campaign.pointsChargedAt) {
-      await refundLoyaltyPoints({ userId, amount, session });
-      await reverseReferralCashbackForSource({
-        sourceKind: REFERRAL_SOURCE_KIND_INTRO_AD,
-        sourceId: String(campaign._id),
-        session,
-      });
-    }
 
     await IntroAdCampaignModel.updateOne(
       { _id: campaign._id },
@@ -209,37 +197,102 @@ export async function scheduleIntroAdCampaignAfterApproval({
     throw new AppError(409, "Заявка уже обработана");
   }
 
-  await chargeReservedLoyaltyPoints({
-    userId: String(campaign.advertiserId),
-    amount,
-    session,
-  });
-
-  const cashback = await creditReferralCashbackFromSpend({
-    spenderUserId: String(campaign.advertiserId),
-    pointsSpent: amount,
-    sourceKind: REFERRAL_SOURCE_KIND_INTRO_AD,
-    sourceId: String(campaign._id),
-    session,
-  });
-
+  // Одобрение больше не списывает деньги: оно выставляет счёт. Оплата
+  // придёт по СБП, и только она поставит ролик в очередь.
   const ctaType = await resolveIntroAdCtaType(campaign.advertiserId);
   campaign.ctaType = ctaType;
-  campaign.pointsChargedAt = now;
   campaign.approvedByUserId = approvedByUserId;
-
-  // Ставим в очередь и сразу активируем, если есть свободный слот (до INTRO_AD_MAX_ACTIVE).
-  campaign.status = INTRO_AD_CAMPAIGN_STATUS_QUEUED;
-  campaign.scheduledStartAt = now;
+  campaign.approvedAt = now;
+  campaign.status = INTRO_AD_CAMPAIGN_STATUS_AWAITING_PAYMENT;
   await campaign.save(withMongoSession({}, session));
 
-  let result = campaign.toObject();
-  if (activeCount < INTRO_AD_MAX_ACTIVE) {
-    const activated = await activateIntroAdCampaignRecord(campaign._id, session);
-    result = activated ?? result;
+  void activeCount;
+  void amount;
+  return { campaign: campaign.toObject(), cashback: null };
+}
+
+/**
+ * Кампания, ожидающая оплаты, — для выставления счёта платёжным слоем.
+ *
+ * @param {string} campaignId
+ * @param {string} userId
+ */
+export async function loadPayableIntroAdCampaign(campaignId, userId) {
+  const campaign = await IntroAdCampaignModel.findOne({
+    _id: campaignId,
+    advertiserId: userId,
+    status: INTRO_AD_CAMPAIGN_STATUS_AWAITING_PAYMENT,
+  }).lean();
+
+  if (!campaign) {
+    return null;
   }
 
-  return { campaign: result, cashback };
+  return {
+    amountRub: INTRO_AD_PRICE_RUB,
+    description: "Реклама на заставке Gitorg",
+  };
+}
+
+/**
+ * Оплата пришла — ставим ролик в очередь и запускаем, если есть слот.
+ *
+ * @param {string} campaignId
+ * @param {string} paymentId
+ */
+export async function activateIntroAdCampaignAfterPayment(campaignId, paymentId) {
+  const now = new Date();
+
+  const { campaign, cashback } = await runInTransaction(async (session) => {
+    // Фильтр по статусу — защита от повторного уведомления провайдера.
+    const found = await IntroAdCampaignModel.findOneAndUpdate(
+      { _id: campaignId, status: INTRO_AD_CAMPAIGN_STATUS_AWAITING_PAYMENT },
+      {
+        $set: {
+          status: INTRO_AD_CAMPAIGN_STATUS_QUEUED,
+          scheduledStartAt: now,
+          paidAt: now,
+          paymentId,
+        },
+      },
+      { returnDocument: "after", session },
+    );
+
+    if (!found) {
+      return { campaign: null, cashback: null };
+    }
+
+    // Кэшбэк реферала считается от потраченного; баллы и рубли 1:1.
+    const credited = await creditReferralCashbackFromSpend({
+      spenderUserId: String(found.advertiserId),
+      pointsSpent: INTRO_AD_PRICE_RUB,
+      sourceKind: REFERRAL_SOURCE_KIND_INTRO_AD,
+      sourceId: String(found._id),
+      session,
+    });
+
+    return { campaign: found, cashback: credited };
+  });
+
+  if (!campaign) {
+    return null;
+  }
+
+  // Свободен слот — крутим сразу, иначе ролик ждёт своей очереди.
+  const activeCount = await countActiveIntroAdCampaigns(null);
+  if (activeCount < INTRO_AD_MAX_ACTIVE) {
+    await activateIntroAdCampaignRecord(campaign._id, null);
+  }
+
+  if (cashback?.deferNotification) {
+    await notifyReferralCashbackCredited({
+      referrerUserId: cashback.referrerUserId,
+      amount: cashback.amount,
+      spenderUserId: String(campaign.advertiserId),
+    });
+  }
+
+  return campaign;
 }
 
 export async function countPendingIntroAdCampaigns() {
@@ -347,11 +400,9 @@ export async function rejectIntroAdCampaign({ campaignId, reason: rawReason }) {
   }
 
   const now = new Date();
-  const amount = Math.ceil(Number(campaign.amountPoints) || INTRO_AD_PRICE_POINTS);
-  const userId = String(campaign.advertiserId);
 
   await runInTransaction(async (session) => {
-    await releaseLoyaltyPointsReservation({ userId, amount, session });
+    // Освобождать нечего: за неодобренную заявку деньги не брались.
     await IntroAdCampaignModel.updateOne(
       { _id: campaign._id },
       {

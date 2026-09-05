@@ -1,13 +1,31 @@
 import {
   PAYMENT_PURPOSE_LOYALTY_POINTS,
   PAYMENT_PURPOSE_ORDER,
+  PAYMENT_PURPOSE_PLATFORM_SERVICE,
   YOOKASSA_WEBHOOK_EVENTS,
 } from "../../constants/yookassaConstants.js";
 import { PaymentModel } from "../../models/index.js";
 import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { applyLoyaltyPointsTopUp } from "./loyaltyPointsTopUp.js";
 import { applyOrderPrepayment } from "./orderPrepayment.js";
+import { applyPlatformServicePayment } from "./platformServiceInvoice.js";
 import { getYookassaPayment } from "./yookassaClient.js";
+
+/**
+ * Что делать с деньгами по каждой цели платежа.
+ *
+ * Одна таблица на весь файл: раньше сопоставление было продублировано в
+ * вебхуке и в догоняющей синхронизации, и новая цель работала бы ровно в
+ * половине случаев — там, где про неё не забыли.
+ */
+const PAYMENT_APPLIERS = Object.freeze({
+  [PAYMENT_PURPOSE_LOYALTY_POINTS]: applyLoyaltyPointsTopUp,
+  [PAYMENT_PURPOSE_ORDER]: applyOrderPrepayment,
+  [PAYMENT_PURPOSE_PLATFORM_SERVICE]: applyPlatformServicePayment,
+});
+
+/** @param {string} purpose */
+const resolvePaymentApplier = (purpose) => PAYMENT_APPLIERS[purpose] ?? null;
 
 /**
  * Обработать уведомление ЮKassa.
@@ -58,12 +76,7 @@ export async function handleYookassaNotification(body) {
   const providerStatus = String(providerPayment?.status ?? "");
   const providerAmountRub = Number(providerPayment?.amount?.value ?? 0);
 
-  const apply =
-    payment.purpose === PAYMENT_PURPOSE_LOYALTY_POINTS
-      ? applyLoyaltyPointsTopUp
-      : payment.purpose === PAYMENT_PURPOSE_ORDER
-        ? applyOrderPrepayment
-        : null;
+  const apply = resolvePaymentApplier(payment.purpose);
 
   if (!apply) {
     return { handled: false, reason: "purpose_unsupported" };
@@ -94,12 +107,7 @@ export async function syncPaymentForUser({ userId, paymentId }) {
   if (payment.status === "created" && payment.providerPaymentId) {
     try {
       const providerPayment = await getYookassaPayment(payment.providerPaymentId);
-      const apply =
-        payment.purpose === PAYMENT_PURPOSE_LOYALTY_POINTS
-          ? applyLoyaltyPointsTopUp
-          : payment.purpose === PAYMENT_PURPOSE_ORDER
-            ? applyOrderPrepayment
-            : null;
+      const apply = resolvePaymentApplier(payment.purpose);
       if (apply) {
         await apply({
           paymentId: String(payment._id),

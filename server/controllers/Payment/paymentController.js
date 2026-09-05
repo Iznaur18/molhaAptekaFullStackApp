@@ -9,6 +9,7 @@ import {
 } from "../../services/payments/yookassaWebhook.js";
 import { resolvePlatformSellerUserIds } from "../../constants/yookassaConstants.js";
 import { isYookassaConfigured } from "../../services/payments/yookassaClient.js";
+import { createPlatformServicePayment } from "../../services/payments/platformServiceInvoice.js";
 import { successRes } from "../../services/http/index.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
@@ -29,6 +30,23 @@ export const createOrderPaymentController = async (req, res) => {
   const result = await createOrderPrepayment({
     userId: String(req.userId),
     orderId: req.params.orderId,
+    returnUrl: req.body.returnUrl,
+    idempotencyKey: req.body.idempotencyKey,
+  });
+  return successRes(res, { payment: result });
+};
+
+/**
+ * `POST /payments/service/:serviceKind/:targetId` — оплатить услугу площадки.
+ *
+ * Сумму и право на оплату определяет сервер по самой услуге: из тела
+ * приходит только адрес возврата.
+ */
+export const createPlatformServicePaymentController = async (req, res) => {
+  const result = await createPlatformServicePayment({
+    userId: String(req.userId),
+    serviceKind: req.params.serviceKind,
+    targetId: req.params.targetId,
     returnUrl: req.body.returnUrl,
     idempotencyKey: req.body.idempotencyKey,
   });

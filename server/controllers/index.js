@@ -67,6 +67,7 @@ import {
 } from "./Seller/sellerCommerceDefaultsController.js";
 import {
   getPaymentConfigController,
+  createPlatformServicePaymentController,
   createLoyaltyPointsPaymentController,
   createOrderPaymentController,
   getMyPaymentController,
@@ -407,6 +408,7 @@ export {
   getMySellerCommerceDefaultsController,
   putMySellerCommerceDefaultsController,
   getPaymentConfigController,
+  createPlatformServicePaymentController,
   createLoyaltyPointsPaymentController,
   createOrderPaymentController,
   getMyPaymentController,

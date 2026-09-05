@@ -14,6 +14,10 @@ import {
   INSTALLMENT_CONTRACT_STATUS_COMPLETED,
 } from "../../constants/installmentConstants.js";
 import { AppError } from "../../errors/AppError.js";
+import {
+  markEscrowReleasable,
+  scheduleEscrowAutoRelease,
+} from "../payments/escrowLedger.js";
 import { assertOrderPrepaid } from "./assertOrderPrepaid.js";
 import { notifyBuyerAboutOrderItemStatus } from "./notifyBuyerAboutOrderItemStatus.js";
 import { notifySellerAboutOrderItemReturn } from "./notifySellerAboutOrderItemReturn.js";
@@ -161,6 +165,15 @@ export async function markOrderItemDeliveredBySeller({
   order.status = buildOrderStatusFromItems(order.items);
   await order.save();
   await populateOrderForResponse(order);
+
+  // Товар вручён — пошёл срок автоматической выплаты. Вне транзакции
+  // намеренно: сбой в леджере не должен отменять факт вручения, а сама
+  // операция идемпотентна и переживёт повторный вызов.
+  await scheduleEscrowAutoRelease({
+    orderId,
+    sellerId,
+    deliveredAt: targetItem.deliveredAt,
+  });
 
   await notifyBuyerAboutOrderItemStatus({
     buyerUserId: order.userBuyerId?._id ?? order.userBuyerId,
@@ -627,6 +640,12 @@ export async function confirmOrderItemByBuyer({
   const updatedOrder = await reloadOrderWithItems(orderId);
   const updatedItem = getOrderItemByIndex(updatedOrder, itemIndex);
   await runConfirmItemSideEffects(updatedOrder, updatedItem ?? {}, productId);
+
+  // Покупатель подтвердил получение — ждать неделю больше незачем.
+  const confirmedSellerId = String(updatedItem?.sellerIdAtOrder ?? "");
+  if (confirmedSellerId) {
+    await markEscrowReleasable({ orderId, sellerId: confirmedSellerId });
+  }
 
   return { order: updatedOrder, pointsEarned };
 }

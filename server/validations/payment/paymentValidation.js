@@ -1,4 +1,6 @@
 import {
+  platformServicePaymentParamsSchema,
+  platformServicePaymentBodySchema,
   loyaltyPointsPaymentBodySchema,
   orderPaymentBodySchema,
   orderPaymentParamsSchema,
@@ -17,4 +19,9 @@ export const paymentIdParamsValidation = [validateParamsZod(paymentIdParamsSchem
 export const orderPaymentValidation = [
   validateParamsZod(orderPaymentParamsSchema),
   validateBodyZod(orderPaymentBodySchema),
+];
+
+export const platformServicePaymentValidation = [
+  validateParamsZod(platformServicePaymentParamsSchema),
+  validateBodyZod(platformServicePaymentBodySchema),
 ];

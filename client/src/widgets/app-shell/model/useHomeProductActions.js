@@ -19,6 +19,9 @@ import { navigateToProductDetails } from "../../../entities/product/lib/navigate
 import { catalogQueryKeys } from "../../../entities/product/model/catalogQueryKeys.js";
 import { useRaffleMutations } from "../../../entities/raffle/model/useRaffleMutations.js";
 import { PRODUCT_MODERATION_PENDING } from "../../../entities/product/model/productModerationConstants.js";
+import { createPlatformServicePayment } from "../../../entities/payment/api/paymentApi.js";
+import { createClientIdempotencyKey } from "../../../shared/lib/createClientIdempotencyKey.js";
+import { HOME_MAIN_VIEW_PATH } from "../../../shared/lib/homeMainViewPaths.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
@@ -60,7 +63,6 @@ export const useHomeProductActions = ({
   productToEdit,
   loyaltyPoints,
   loyaltyPointsReserved,
-  setLoyaltyPoints,
   refreshCatalogFeed,
   refreshRaffleSurfaces,
   setRaffleParticipationPendingProductId,
@@ -774,18 +776,27 @@ export const useHomeProductActions = ({
       setIsPromotionSubmitPending(true);
       setPromotionModalError("");
       try {
-        const { loyaltyPointsBalance, message } = await requestPromotionMutation.mutateAsync({
+        const { promotion } = await requestPromotionMutation.mutateAsync({
           productId: String(promotionProduct._id),
           tier,
           tariffCode,
         });
-        if (loyaltyPointsBalance != null) {
-          setLoyaltyPoints(loyaltyPointsBalance);
+
+        // Заявка больше не включает продвижение — она выставляет счёт.
+        // Ведём человека на оплату сразу: искать неоплаченную заявку в
+        // списке он не должен.
+        const payment = await createPlatformServicePayment({
+          serviceKind: "product_promotion",
+          targetId: String(promotion._id),
+          returnUrl: HOME_MAIN_VIEW_PATH["my-products"],
+          idempotencyKey: createClientIdempotencyKey(),
+        });
+
+        if (!payment?.confirmationUrl) {
+          throw new Error(API_CLIENT_UI.REQUEST_PRODUCT_PROMOTION_FALLBACK);
         }
-        setMyProductsCatalogNotice(message ?? "Продвижение активировано.");
-        void refreshCatalogFeed();
         handleClosePromotionModal();
-        goToMainView("my-products");
+        window.location.assign(payment.confirmationUrl);
       } catch (e) {
         setPromotionModalError(
           e instanceof Error
@@ -797,14 +808,10 @@ export const useHomeProductActions = ({
       }
     },
     [
-      goToMainView,
       handleClosePromotionModal,
       promotionProduct,
-      refreshCatalogFeed,
       requestPromotionMutation,
       setIsPromotionSubmitPending,
-      setLoyaltyPoints,
-      setMyProductsCatalogNotice,
       setPromotionModalError,
     ],
   );

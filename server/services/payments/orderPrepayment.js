@@ -20,6 +20,7 @@ import { OrderModel, PaymentModel, UserModel } from "../../models/index.js";
 import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { assertOrderAcceptedBySeller } from "../order/assertOrderPrepaid.js";
 import { logMoneyEvent } from "../loyalty/logMoneyEvent.js";
+import { openEscrowForPaidOrder } from "./escrowLedger.js";
 import { buildReturnUrl } from "./paymentReturnUrl.js";
 import { createYookassaPayment, isYookassaConfigured } from "./yookassaClient.js";
 
@@ -307,6 +308,13 @@ export async function applyOrderPrepayment({
       { _id: payment.orderId },
       { $set: { prepaidPaidAt: new Date(), prepaidPaymentId: payment._id } },
     );
+    // Деньги на счёте площадки, но они чужие: с этого момента по каждому
+    // отправлению висит запись «должны продавцу или покупателю». Без неё
+    // факт долга существует только в голове.
+    const paidOrder = await OrderModel.findById(payment.orderId).lean();
+    if (paidOrder) {
+      await openEscrowForPaidOrder({ order: paidOrder, paymentId: payment._id });
+    }
     logMoneyEvent("info", "order_prepayment_applied", {
       userId: String(payment.userId),
       orderId: String(payment.orderId),

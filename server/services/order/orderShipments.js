@@ -1,4 +1,5 @@
 import {
+  PLATFORM_COMMISSION_PERCENT_DEFAULT,
   ORDER_FULFILLMENT_DELIVERY,
   ORDER_FULFILLMENT_PICKUP,
 } from "@molha/api-contract";
@@ -185,6 +186,8 @@ export const buildStoredShipments = (items, options = {}) => {
         method === ORDER_FULFILLMENT_DELIVERY
           ? (deliveryCarrierBySellerId?.[bucket.sellerId] ?? "")
           : "",
+      // Ставка комиссии площадки — снимком: её меняют, заказы остаются.
+      platformCommissionPercentAtOrder: PLATFORM_COMMISSION_PERCENT_DEFAULT,
       // Тариф собственной доставки продавца — снимком, вместе с суммой.
       sellerDeliveryFeeRub: sellerDelivery?.feeRub ?? 0,
       sellerDeliveryDistanceKm: sellerDelivery?.distanceKm ?? null,

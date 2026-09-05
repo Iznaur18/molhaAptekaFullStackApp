@@ -73,3 +73,36 @@ export async function fetchMyPayment(paymentId) {
     throw new Error(toMessage(e));
   }
 }
+
+/**
+ * `POST /payments/service/:serviceKind/:targetId` — оплатить услугу площадки.
+ *
+ * Сумму сервер берёт из самой услуги: тело её не содержит и содержать не
+ * должно, иначе продвижение можно было бы купить за рубль.
+ *
+ * @param {{
+ *   serviceKind: "product_promotion" | "intro_ad" | "site_header_banner" | "seller_personal_category";
+ *   targetId: string;
+ *   returnUrl: string;
+ *   idempotencyKey?: string;
+ * }} payload
+ * @returns {Promise<{ paymentId: string; confirmationUrl: string; amountRub: number }>}
+ */
+export async function createPlatformServicePayment({
+  serviceKind,
+  targetId,
+  ...body
+}) {
+  try {
+    const { data } = await apiClient.post(
+      `/payments/service/${serviceKind}/${targetId}`,
+      body,
+    );
+    if (!data?.success || !data.data?.payment) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+    return data.data.payment;
+  } catch (e) {
+    throw new Error(toMessage(e));
+  }
+}

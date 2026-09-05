@@ -85,6 +85,7 @@ import { sellerCommerceDefaultsValidation } from "./seller/sellerCommerceDefault
 import {
   loyaltyPointsPaymentValidation,
   orderPaymentValidation,
+  platformServicePaymentValidation,
   paymentIdParamsValidation,
 } from "./payment/paymentValidation.js";
 import {
@@ -239,6 +240,7 @@ export {
   sellerCommerceDefaultsValidation,
   loyaltyPointsPaymentValidation,
   orderPaymentValidation,
+  platformServicePaymentValidation,
   paymentIdParamsValidation,
   courierHandoverCodeValidation,
   courierShipmentValidation,

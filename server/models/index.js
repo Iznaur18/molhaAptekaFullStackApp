@@ -44,6 +44,7 @@ import AnalyticsEventModel from "./AnalyticsEventModel.js";
 import PassportVaultAccessLogModel from "./PassportVaultAccessLogModel.js";
 import ReferralLedgerEntryModel from "./ReferralLedgerEntryModel.js";
 import AffiliateLedgerEntryModel from "./AffiliateLedgerEntryModel.js";
+import { EscrowLedgerEntryModel } from "./EscrowLedgerEntryModel.js";
 import { MoneyIdempotencyRecordModel } from "./MoneyIdempotencyRecordModel.js";
 import { PaymentModel } from "./PaymentModel.js";
 import { PrivateUploadModel } from "./PrivateUploadModel.js";
@@ -104,6 +105,7 @@ export {
   PassportVaultAccessLogModel,
   ReferralLedgerEntryModel,
   AffiliateLedgerEntryModel,
+  EscrowLedgerEntryModel,
   MoneyIdempotencyRecordModel,
   PaymentModel,
   PrivateUploadModel,

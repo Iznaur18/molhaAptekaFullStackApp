@@ -1,3 +1,5 @@
+import { PLATFORM_SERVICE_KINDS } from "@molha/api-contract";
+
 /**
  * ЮKassa: приём онлайн-платежей и чеки по 54-ФЗ.
  *
@@ -34,10 +36,33 @@ export const PAYMENT_PURPOSE_LOYALTY_POINTS = "loyalty_points";
  */
 export const PAYMENT_PURPOSE_ORDER = "order";
 
+/**
+ * Платная услуга площадки: продвижение товара, реклама, баннер.
+ *
+ * Одна цель на все услуги, а не по цели на каждую: платёж у них устроен
+ * одинаково, различается только то, что включается после оплаты. Конкретную
+ * услугу называет `serviceKind` на платеже.
+ */
+export const PAYMENT_PURPOSE_PLATFORM_SERVICE = "platform_service";
+
 export const PAYMENT_PURPOSES = Object.freeze([
   PAYMENT_PURPOSE_LOYALTY_POINTS,
   PAYMENT_PURPOSE_ORDER,
+  PAYMENT_PURPOSE_PLATFORM_SERVICE,
 ]);
+
+/** Услуги, которые продавец оплачивает по счёту. */
+export const PLATFORM_SERVICE_KIND_PRODUCT_PROMOTION = "product_promotion";
+export const PLATFORM_SERVICE_KIND_INTRO_AD = "intro_ad";
+export const PLATFORM_SERVICE_KIND_SITE_HEADER_BANNER = "site_header_banner";
+export const PLATFORM_SERVICE_KIND_SELLER_CATEGORY = "seller_personal_category";
+
+// Сам список — в контракте: он же валидирует параметр ручки оплаты, и две
+// копии разошлись бы на первой новой услуге.
+export { PLATFORM_SERVICE_KINDS };
+
+/** Услуги площадки — это услуги, а не товар (ФФД). */
+export const YOOKASSA_SERVICE_PAYMENT_SUBJECT = "service";
 
 /**
  * Продавцы, за чей товар площадка вправе принимать деньги на свой счёт.

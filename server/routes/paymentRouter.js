@@ -1,6 +1,7 @@
 import {
   createLoyaltyPointsPaymentController,
   createOrderPaymentController,
+  createPlatformServicePaymentController,
   getMyPaymentController,
   getPaymentConfigController,
   postYookassaWebhookController,
@@ -10,6 +11,7 @@ import {
   loyaltyPointsPaymentValidation,
   orderPaymentValidation,
   paymentIdParamsValidation,
+  platformServicePaymentValidation,
 } from "../validations/index.js";
 import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 
@@ -34,6 +36,13 @@ router.post(
   checkAuthMW,
   orderPaymentValidation,
   createOrderPaymentController,
+);
+
+router.post(
+  "/service/:serviceKind/:targetId",
+  checkAuthMW,
+  platformServicePaymentValidation,
+  createPlatformServicePaymentController,
 );
 
 // Ниже маршрутов с фиксированным префиксом: иначе `/config` уедет сюда.

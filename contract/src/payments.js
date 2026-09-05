@@ -48,6 +48,26 @@ export const orderPaymentParamsSchema = z.object({
   orderId: mongoIdSchema,
 });
 
+/** Услуги площадки, оплачиваемые счётом. Синхрон с `yookassaConstants.js`. */
+export const PLATFORM_SERVICE_KINDS = [
+  "product_promotion",
+  "intro_ad",
+  "site_header_banner",
+  "seller_personal_category",
+];
+
+/** Params `POST /payments/service/:serviceKind/:targetId`. */
+export const platformServicePaymentParamsSchema = z.object({
+  serviceKind: z.enum(PLATFORM_SERVICE_KINDS),
+  targetId: mongoIdSchema,
+});
+
+/** Body той же ручки: сумму сервер берёт из услуги, из тела — только возврат. */
+export const platformServicePaymentBodySchema = z.object({
+  returnUrl: returnUrlSchema,
+  idempotencyKey: z.string().trim().min(1).max(64).optional(),
+});
+
 /** Body `POST /payments/order/:orderId`. */
 export const orderPaymentBodySchema = z.object({
   returnUrl: returnUrlSchema,

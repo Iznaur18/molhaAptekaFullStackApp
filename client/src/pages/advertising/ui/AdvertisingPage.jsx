@@ -1,4 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createPlatformServicePayment } from "../../../entities/payment/api/paymentApi.js";
+import { createClientIdempotencyKey } from "../../../shared/lib/createClientIdempotencyKey.js";
+import { HOME_MAIN_VIEW_PATH } from "../../../shared/lib/homeMainViewPaths.js";
 import { useState } from "react";
 
 import { mapAppIntroSettingsToForm } from "../../../entities/app-intro-settings/lib/mapAppIntroSettingsToForm.js";
@@ -57,6 +60,9 @@ function resolveCampaignStatusLabel(status) {
   if (status === "pending") {
     return INTRO_AD_PAGE_UI.STATUS_PENDING;
   }
+  if (status === "awaiting_payment") {
+    return INTRO_AD_PAGE_UI.STATUS_AWAITING_PAYMENT;
+  }
   if (status === "queued") {
     return INTRO_AD_PAGE_UI.STATUS_QUEUED;
   }
@@ -73,7 +79,7 @@ function resolveStatusPanelClass(status) {
   if (status === "active") {
     return "advertising-page__status advertising-page__status_active";
   }
-  if (status === "pending" || status === "queued") {
+  if (status === "pending" || status === "queued" || status === "awaiting_payment") {
     return "advertising-page__status advertising-page__status_pending";
   }
   return "advertising-page__status";
@@ -128,7 +134,35 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
   const campaign = campaignQuery.data?.campaign ?? null;
   const pricePoints = campaignQuery.data?.pricePoints ?? 6_000;
   const loyaltyBalance = loyaltyQuery.data?.loyaltyPointsBalance ?? 0;
-  const canCancel = campaign?.status === "pending" || campaign?.status === "queued";
+  // Отменить можно, пока не заплачено: возврата у провайдера ещё нет, и
+  // отмена оплаченной кампании означала бы долг перед рекламодателем.
+  const canCancel =
+    campaign?.status === "pending" || campaign?.status === "awaiting_payment";
+  const canPay = campaign?.status === "awaiting_payment";
+
+  const [isPaying, setIsPaying] = useState(false);
+  const handlePay = async () => {
+    if (!campaign?._id) return;
+    setIsPaying(true);
+    setActionError("");
+    try {
+      const payment = await createPlatformServicePayment({
+        serviceKind: "intro_ad",
+        targetId: String(campaign._id),
+        returnUrl: HOME_MAIN_VIEW_PATH.advertising,
+        idempotencyKey: createClientIdempotencyKey(),
+      });
+      if (!payment?.confirmationUrl) {
+        throw new Error(INTRO_AD_PAGE_UI.PAY_FALLBACK);
+      }
+      window.location.assign(payment.confirmationUrl);
+    } catch (error) {
+      setActionError(
+        error instanceof Error ? error.message : INTRO_AD_PAGE_UI.PAY_FALLBACK,
+      );
+      setIsPaying(false);
+    }
+  };
   const hasOpenCampaign = Boolean(campaign);
   const isSubmitting = submitMutation.isPending || cancelMutation.isPending;
 
@@ -289,12 +323,22 @@ export function AdvertisingPage({ isAuthorized, onRequestLogin, onOpenCreateRaff
                 <p className="advertising-page__status-text">
                   {resolveCampaignStatusLabel(campaign.status)}
                 </p>
+                {canPay ? (
+                  <button
+                    type="button"
+                    className="app-btn app-btn--primary"
+                    onClick={handlePay}
+                    disabled={isPaying || isSubmitting}
+                  >
+                    {isPaying ? INTRO_AD_PAGE_UI.PAY_PENDING : INTRO_AD_PAGE_UI.PAY}
+                  </button>
+                ) : null}
                 {canCancel ? (
                   <button
                     type="button"
                     className="app-btn app-btn--cancel"
                     onClick={handleCancel}
-                    disabled={isSubmitting}
+                    disabled={isPaying || isSubmitting}
                   >
                     {INTRO_AD_PAGE_UI.CANCEL}
                   </button>

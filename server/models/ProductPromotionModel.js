@@ -75,6 +75,19 @@ const ProductPromotionSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    /**
+     * Оплата по СБП: когда прошла и каким платежом.
+     *
+     * Ссылка на платёж обязательна, иначе связь «за что заплатили» живёт
+     * только в логах, и разбирать спор не по чему.
+     */
+    paidAt: { type: Date, default: null },
+    paymentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Payment",
+      default: null,
+      index: true,
+    },
     approvedByUserId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

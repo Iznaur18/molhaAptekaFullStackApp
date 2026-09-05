@@ -5,6 +5,7 @@ import {
   INTRO_AD_CAMPAIGN_STATUSES,
   INTRO_AD_CTA_TYPES,
   INTRO_AD_PRICE_POINTS,
+  INTRO_AD_PRICE_RUB,
 } from "../constants/introAdCampaignConstants.js";
 import {
   APP_INTRO_FADE_OUT_MS_DEFAULT,
@@ -70,6 +71,8 @@ const IntroAdCampaignSchema = new mongoose.Schema(
       default: APP_INTRO_FADE_OUT_MS_DEFAULT,
       min: 0,
     },
+    /** Цена в рублях — то, что реально спишет СБП. Баллы и рубли 1:1. */
+    amountRub: { type: Number, default: INTRO_AD_PRICE_RUB, min: 0 },
     amountPoints: {
       type: Number,
       default: INTRO_AD_PRICE_POINTS,
@@ -87,6 +90,21 @@ const IntroAdCampaignSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    /**
+     * Оплата по СБП: когда прошла и каким платежом.
+     *
+     * Ссылка на платёж обязательна, иначе связь «за что заплатили» живёт
+     * только в логах, и разбирать спор не по чему.
+     */
+    paidAt: { type: Date, default: null },
+    paymentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Payment",
+      default: null,
+      index: true,
+    },
+    /** Когда модератор одобрил — с этого момента можно платить. */
+    approvedAt: { type: Date, default: null },
     approvedByUserId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

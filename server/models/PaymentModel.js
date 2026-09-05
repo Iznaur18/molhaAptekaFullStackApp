@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 import {
   PAYMENT_PURPOSES,
+  PLATFORM_SERVICE_KINDS,
   PAYMENT_STATUS_CREATED,
   PAYMENT_STATUSES,
 } from "../constants/yookassaConstants.js";
@@ -43,6 +44,25 @@ const paymentSchema = new mongoose.Schema(
     orderId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Order",
+      default: null,
+      index: true,
+    },
+    /**
+     * Какую услугу площадки оплачивает этот платёж и за что именно.
+     *
+     * Ссылка нетипизированная (`serviceKind` + `serviceTargetId`), потому
+     * что услуги живут в разных коллекциях: продвижение, интро-реклама,
+     * баннер. Заводить по полю на каждую — значит переписывать модель
+     * платежа при каждой новой услуге.
+     */
+    serviceKind: {
+      type: String,
+      enum: [...PLATFORM_SERVICE_KINDS, null],
+      default: null,
+      index: true,
+    },
+    serviceTargetId: {
+      type: mongoose.Schema.Types.ObjectId,
       default: null,
       index: true,
     },

@@ -1,6 +1,14 @@
 import { z } from "zod";
 
 /** SSOT продвижения товара — client/mobile/server re-export отсюда. */
+/**
+ * Заявка создана, ждём оплату по СБП. Продвижение ещё не работает.
+ *
+ * Появился, когда продвижение перестало списываться с баллов: деньги
+ * приходят от провайдера асинхронно, и между «нажал купить» и «работает»
+ * теперь есть состояние, которого раньше не было.
+ */
+export const PRODUCT_PROMOTION_STATUS_AWAITING_PAYMENT = "awaiting_payment";
 export const PRODUCT_PROMOTION_STATUS_PENDING_STAFF = "pending_staff";
 export const PRODUCT_PROMOTION_STATUS_ACTIVE = "active";
 export const PRODUCT_PROMOTION_STATUS_EXPIRED = "expired";
@@ -8,6 +16,7 @@ export const PRODUCT_PROMOTION_STATUS_REJECTED = "rejected";
 export const PRODUCT_PROMOTION_STATUS_CANCELLED_BY_ADMIN = "cancelled_by_admin";
 
 export const PRODUCT_PROMOTION_STATUSES = [
+  PRODUCT_PROMOTION_STATUS_AWAITING_PAYMENT,
   PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
   PRODUCT_PROMOTION_STATUS_ACTIVE,
   PRODUCT_PROMOTION_STATUS_EXPIRED,

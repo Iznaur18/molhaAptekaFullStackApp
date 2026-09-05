@@ -48,12 +48,16 @@ import { resolveApiCorsMiddleware } from "./utils/resolveApiCorsMiddleware.js";
 import { resolveUploadContentType } from "./utils/resolveUploadContentType.js";
 import { resolveUploadsRequestPathPrivacy } from "./utils/resolveUploadsRequestPathPrivacy.js";
 import { UPLOADS_DIR } from "./utils/uploadsDir.js";
+import { registerPlatformServices } from "./services/payments/registerPlatformServices.js";
 import {
   productLinkPreviewController,
   sellerLinkPreviewController,
 } from "./controllers/LinkPreview/linkPreviewControllers.js";
 
 export const createApp = () => {
+  // Платёжный слой узнаёт про услуги площадки здесь: сам он их не импортирует,
+  // иначе получился бы цикл — услуга зовёт платёж, платёж зовёт услугу.
+  registerPlatformServices();
   const app = express();
   const isProduction = process.env.NODE_ENV === "production";
 
