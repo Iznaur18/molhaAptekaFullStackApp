@@ -24,6 +24,7 @@ export const putMySellerCommerceDefaultsController = async (req, res) => {
     deliveryCarrier: req.body.deliveryCarrier,
     paymentMethods: req.body.paymentMethods,
     regionCode: req.body.regionCode,
+    deliveryTariff: req.body.deliveryTariff,
   });
   return successRes(res, { defaults });
 };

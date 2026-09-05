@@ -93,6 +93,60 @@ test("настройки продавца: PUT → GET возвращает со
   assert.equal(read.defaults.followingProductCount, 0);
 });
 
+test("тариф своей доставки сохраняется и возвращается", async () => {
+  const { cookie } = await registerUserAndGetCookie(request, "defaults-tariff");
+
+  const saved = await parseSuccessData(
+    await putDefaults(cookie, {
+      deliveryCarrier: "seller",
+      deliveryTariff: {
+        paid: true,
+        baseFeeRub: 200,
+        perKmRub: 30,
+        freeFromRub: 5000,
+      },
+    }),
+  );
+
+  assert.equal(saved.defaults.deliveryTariff.paid, true);
+  assert.equal(saved.defaults.deliveryTariff.baseFeeRub, 200);
+  assert.equal(saved.defaults.deliveryTariff.perKmRub, 30);
+  assert.equal(saved.defaults.deliveryTariff.freeFromRub, 5000);
+
+  const read = await parseSuccessData(
+    await request("/sellers/commerce-defaults/me", { headers: { Cookie: cookie } }),
+  );
+  assert.equal(read.defaults.deliveryTariff.baseFeeRub, 200);
+});
+
+test("платный тариф с курьерами Gitorg → 400", async () => {
+  const { cookie } = await registerUserAndGetCookie(request, "defaults-tariff-bad");
+
+  const response = await putDefaults(cookie, {
+    deliveryCarrier: "gitorg_courier",
+    deliveryTariff: { paid: true, baseFeeRub: 200, perKmRub: 0, freeFromRub: 0 },
+  });
+
+  assert.equal(response.status, 400);
+});
+
+test("смена перевозчика гасит тариф", async () => {
+  const { cookie } = await registerUserAndGetCookie(request, "defaults-tariff-off");
+
+  await putDefaults(cookie, {
+    deliveryCarrier: "seller",
+    deliveryTariff: { paid: true, baseFeeRub: 200, perKmRub: 0, freeFromRub: 0 },
+  });
+  // Возврат к самовывозу без доставки: цены не должны ожить при следующем
+  // включении своей доставки.
+  const saved = await parseSuccessData(
+    await putDefaults(cookie, { deliveryCarrier: "" }),
+  );
+
+  assert.equal(saved.defaults.deliveryTariff.paid, false);
+  assert.equal(saved.defaults.deliveryTariff.baseFeeRub, 0);
+});
+
 test("настройки продавца: без единого способа получения → 400", async () => {
   const { cookie } = await registerUserAndGetCookie(request, "defaults-none");
   const response = await putDefaults(cookie, {

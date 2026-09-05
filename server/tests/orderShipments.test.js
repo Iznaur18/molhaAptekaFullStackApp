@@ -139,8 +139,7 @@ describe("хранимая часть отправлений", () => {
   it("по одному отправлению на продавца", () => {
     const stored = buildStoredShipments(
       [line(SELLER_A), line(SELLER_B), line(SELLER_A)],
-      null,
-      "delivery",
+      { fallbackFulfillment: "delivery" },
     );
 
     assert.equal(stored.length, 2);
@@ -148,11 +147,9 @@ describe("хранимая часть отправлений", () => {
   });
 
   it("разрешает разный способ получения у разных продавцов", () => {
-    const stored = buildStoredShipments(
-      [line(SELLER_A), line(SELLER_B)],
-      { [SELLER_A]: "delivery", [SELLER_B]: "pickup" },
-      "pickup",
-    );
+    const stored = buildStoredShipments([line(SELLER_A), line(SELLER_B)], {
+      fulfillmentBySellerId: { [SELLER_A]: "delivery", [SELLER_B]: "pickup" },
+    });
 
     const byId = Object.fromEntries(
       stored.map((row) => [row.sellerId, row.fulfillmentMethod]),
@@ -162,7 +159,7 @@ describe("хранимая часть отправлений", () => {
   });
 
   it("позиции без продавца отправления не создают", () => {
-    assert.deepEqual(buildStoredShipments([line(null)], null, "pickup"), []);
+    assert.deepEqual(buildStoredShipments([line(null)], {}), []);
   });
 });
 

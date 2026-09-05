@@ -7,6 +7,7 @@ import {
   PAYMENT_STATUS_SUCCEEDED,
   resolvePlatformSellerUserIds,
   YOOKASSA_NOT_CONFIGURED_MESSAGE,
+  YOOKASSA_DELIVERY_PAYMENT_SUBJECT,
   YOOKASSA_ORDER_PAYMENT_SUBJECT,
   YOOKASSA_PAYMENT_STATUS_CANCELED,
   YOOKASSA_PAYMENT_STATUS_SUCCEEDED,
@@ -60,8 +61,9 @@ export function isOrderPrepaymentAvailable() {
 /**
  * @param {{ items: { productNameAtOrder?: string; priceAtOrder?: number; quantity?: number }[]; totalAmount: number }} order
  * @param {{ email: string; phone: string }} contact
+ * @param {number} [deliveryTotalRub] доставка по тарифу продавца, отдельной строкой
  */
-function buildOrderReceipt(order, contact) {
+function buildOrderReceipt(order, contact, deliveryTotalRub = 0) {
   const customer = {};
   if (contact.email) customer.email = contact.email;
   const digits = String(contact.phone ?? "").replace(/\D/g, "");
@@ -105,13 +107,25 @@ function buildOrderReceipt(order, contact) {
     throw new AppError(400, "В заказе нет позиций для чека");
   }
 
+  const delivery = Math.max(0, Math.floor(Number(deliveryTotalRub) || 0));
+  if (delivery > 0) {
+    items.push({
+      description: "Доставка продавцом",
+      quantity: (1).toFixed(2),
+      amount: { value: delivery.toFixed(2), currency: "RUB" },
+      vat_code: vatCode,
+      payment_subject: YOOKASSA_DELIVERY_PAYMENT_SUBJECT,
+      payment_mode: YOOKASSA_POINTS_PAYMENT_MODE,
+    });
+  }
+
   // Чек — фискальный документ: его сумма обязана совпадать с суммой платежа.
   // Если разошлись, лучше не проводить оплату вовсе, чем пробить неверный чек.
   const receiptTotal = items.reduce(
     (sum, row) => sum + Number(row.amount.value) * Number(row.quantity),
     0,
   );
-  const orderTotal = Number(order.totalAmount) || 0;
+  const orderTotal = (Number(order.totalAmount) || 0) + delivery;
   if (Math.abs(receiptTotal - orderTotal) > 0.01) {
     logServerEvent("error", {
       event: "payment.receipt_total_mismatch",
@@ -161,7 +175,12 @@ export async function createOrderPrepayment({
     throw new AppError(400, ORDER_PREPAYMENT_FOREIGN_SELLER_MESSAGE);
   }
 
-  const amountRub = Number(order.totalAmount) || 0;
+  // Доставка по тарифу продавца — часть того, что покупатель платит картой.
+  // Курьерская `deliveryFeeRub` сюда не входит: те деньги покупатель отдаёт
+  // курьеру из рук в руки, площадка их не проводит.
+  const deliveryTotalRub = (Array.isArray(order.shipments) ? order.shipments : [])
+    .reduce((sum, row) => sum + (Number(row?.sellerDeliveryFeeRub) || 0), 0);
+  const amountRub = (Number(order.totalAmount) || 0) + deliveryTotalRub;
   if (amountRub <= 0) {
     throw new AppError(400, "Сумма заказа должна быть больше 0");
   }
@@ -178,10 +197,14 @@ export async function createOrderPrepayment({
   }
 
   const user = await UserModel.findById(userId).select("email userPhoneNumber").lean();
-  const receipt = buildOrderReceipt(order, {
-    email: String(user?.email ?? "").trim(),
-    phone: String(user?.userPhoneNumber ?? "").trim(),
-  });
+  const receipt = buildOrderReceipt(
+    order,
+    {
+      email: String(user?.email ?? "").trim(),
+      phone: String(user?.userPhoneNumber ?? "").trim(),
+    },
+    deliveryTotalRub,
+  );
 
   const payment = await PaymentModel.create({
     userId,

@@ -163,6 +163,19 @@ export const USER_SAVED_ADDRESSES_UI = {
 /** Форма оформления заказа */
 export const CHECKOUT_FORM_UI = {
   HEADING: "Оформление заказа",
+  SELLER_DELIVERY_LEGEND: "Доставка продавцом",
+  SELLER_DELIVERY_FREE: "Бесплатно",
+  /** @param {string} price */
+  SELLER_DELIVERY_FROM: (price) => `от ${price}`,
+  SELLER_DELIVERY_NEED_ADDRESS:
+    "Точная сумма появится, когда выберете адрес: она зависит от расстояния",
+  /** @param {string} price */
+  SELLER_DELIVERY_FREE_FROM: (price) => `Бесплатно от ${price}`,
+  /** @param {string} km */
+  SELLER_DELIVERY_DISTANCE: (km) => `${km} км по прямой`,
+  TOTAL_GOODS: "Товары",
+  TOTAL_DELIVERY: "Доставка",
+  TOTAL_TO_PAY: "Итого",
   LABEL_FULFILLMENT: "Способ получения",
   FULFILLMENT_PICKUP: "Самовывоз",
   FULFILLMENT_DELIVERY: "Доставка",

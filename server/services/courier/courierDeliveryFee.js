@@ -13,6 +13,9 @@ import { populateOrderForResponse } from "../order/orderItemStatusHelpers.js";
 import { resolveItemSellerId } from "../order/orderShipments.js";
 import { normalizeId } from "../order/orderItemStatusHelpers.js";
 
+export const SELLER_DELIVERY_FEE_NOT_RAISABLE_MESSAGE =
+  "Стоимость доставки назначает продавец — её нельзя изменить";
+
 /**
  * Приводит присланную сумму к допустимой или объясняет, почему нельзя.
  *
@@ -105,6 +108,12 @@ export async function raiseShipmentDeliveryFee({
   }
   if (shipment.fulfillmentMethod !== ORDER_FULFILLMENT_DELIVERY) {
     throw new AppError(409, "Это отправление забирают самовывозом");
+  }
+  // Поднимать сумму имеет смысл только там, где ищут курьера. У собственной
+  // доставки цену назначает продавец тарифом, и торга по ней нет: иначе
+  // покупатель менял бы поле, которое в его заказе ни на что не влияет.
+  if (shipment.courierDelivery !== true) {
+    throw new AppError(409, SELLER_DELIVERY_FEE_NOT_RAISABLE_MESSAGE);
   }
   if (shipment.courierId) {
     throw new AppError(409, COURIER_DELIVERY_FEE_FROZEN_MESSAGE);

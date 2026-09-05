@@ -18,6 +18,9 @@ export const PRODUCT_SELLER_PUBLIC_FIELD_NAMES = [
   // Покупателю на чекауте показываем лишь те оплаты, что принимает продавец.
   // Приходит вместе с карточкой товара — отдельный запрос за этим не нужен.
   "sellerPaymentMethods",
+  // Только тариф: адреса и точки продавца наружу через этот select не идут,
+  // на товаре они и так свои.
+  "sellerFulfillmentDefaults.deliveryTariff",
 ];
 
 export const PRODUCT_SELLER_PUBLIC_SELECT = PRODUCT_SELLER_PUBLIC_FIELD_NAMES.join(" ");

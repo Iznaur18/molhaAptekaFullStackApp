@@ -3,6 +3,12 @@ import { z } from "zod";
 import { ORDER_PAYMENT_METHODS } from "./order.js";
 import { optionalRuRegionCodeFieldSchema } from "./ruRegions.js";
 import {
+  FREE_SELLER_DELIVERY_TARIFF,
+  SELLER_DELIVERY_TARIFF_CARRIER_MESSAGE,
+  normalizeSellerDeliveryTariff,
+  sellerDeliveryTariffSchema,
+} from "./sellerDeliveryTariff.js";
+import {
   PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
   productPickupAddressFieldSchema,
   productPickupLatFieldSchema,
@@ -17,6 +23,7 @@ import {
 } from "./productPickupLocations.js";
 import {
   PRODUCT_DELIVERY_CARRIERS,
+  PRODUCT_DELIVERY_CARRIER_SELLER,
   productDeliveryCarrierWriteSchema,
   resolveProductDeliveryCarrier,
 } from "./productDeliveryCarrier.js";
@@ -131,8 +138,23 @@ export const sellerCommerceDefaultsBodySchema = z
      * товар без региона выпадает из регионального буста каталога.
      */
     regionCode: optionalRuRegionCodeFieldSchema,
+    /** Тариф собственной доставки; у остальных перевозчиков не применяется. */
+    deliveryTariff: sellerDeliveryTariffSchema.optional(),
   })
   .superRefine((body, ctx) => {
+    // Платный тариф при чужом перевозчике не сработал бы никогда: сумму
+    // там называет либо покупатель (курьеры), либо служба. Молча его
+    // проглотить — значит пообещать продавцу доход, которого не будет.
+    if (
+      body.deliveryTariff?.paid === true &&
+      body.deliveryCarrier !== PRODUCT_DELIVERY_CARRIER_SELLER
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["deliveryTariff"],
+        message: SELLER_DELIVERY_TARIFF_CARRIER_MESSAGE,
+      });
+    }
     if (!body.pickupEnabled && !body.deliveryCarrier) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -158,6 +180,12 @@ export const sellerCommerceDefaultsDataSchema = z.object({
     }),
   ),
   regionCode: z.string().nullable(),
+  deliveryTariff: z.object({
+    paid: z.boolean(),
+    baseFeeRub: z.number(),
+    perKmRub: z.number(),
+    freeFromRub: z.number(),
+  }),
   paymentMethods: z.array(z.enum(ORDER_PAYMENT_METHODS)),
   /** Сколько товаров сейчас следуют профилю — показываем в предупреждении. */
   followingProductCount: z.number().int().min(0).nullable(),
@@ -209,6 +237,13 @@ export function resolveSellerFulfillmentDefaults(user) {
     deliveryCarrier,
     pickupLocations,
     regionCode: String(raw.regionCode ?? "").trim() || null,
+    // Тариф живёт только у собственной доставки: у курьеров и служб он
+    // ничего не значит, и хранить его «на всякий случай» — это ждать, что
+    // однажды он применится не к тому перевозчику.
+    deliveryTariff:
+      deliveryCarrier === PRODUCT_DELIVERY_CARRIER_SELLER
+        ? normalizeSellerDeliveryTariff(raw.deliveryTariff)
+        : { ...FREE_SELLER_DELIVERY_TARIFF },
   };
 }
 

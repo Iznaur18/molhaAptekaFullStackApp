@@ -1,11 +1,14 @@
 import {
+  FREE_SELLER_DELIVERY_TARIFF,
   PRODUCT_DELIVERY_CARRIER_LOBO,
+  PRODUCT_DELIVERY_CARRIER_SELLER,
   PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE,
   PRODUCT_FULFILLMENT_SOURCE_PROFILE,
   SELLER_FULFILLMENT_DEFAULTS_NOT_SET_MESSAGE,
   SELLER_PAYMENT_METHODS_DEFAULT,
   buildLegacyDeliveryFlags,
   resolveSellerFulfillmentDefaults,
+  normalizeSellerDeliveryTariff,
   resolveSellerPaymentMethods,
 } from "@molha/api-contract";
 
@@ -45,6 +48,7 @@ export function projectSellerCommerceDefaults(user, followingProductCount = null
     deliveryCarrier: fulfillment?.deliveryCarrier ?? "",
     pickupLocations: fulfillment?.pickupLocations ?? [],
     regionCode: fulfillment?.regionCode ?? null,
+    deliveryTariff: fulfillment?.deliveryTariff ?? { ...FREE_SELLER_DELIVERY_TARIFF },
     paymentMethods: resolveSellerPaymentMethods(user),
     followingProductCount,
   };
@@ -213,6 +217,7 @@ async function assertCarrierUsable(carrier) {
  *   deliveryCarrier: string;
  *   paymentMethods: string[];
  *   regionCode?: string | null;
+ *   deliveryTariff?: unknown;
  * }} input
  */
 export async function saveSellerCommerceDefaults({
@@ -222,6 +227,7 @@ export async function saveSellerCommerceDefaults({
   deliveryCarrier,
   paymentMethods,
   regionCode = null,
+  deliveryTariff = null,
 }) {
   const carrier = String(deliveryCarrier ?? "").trim();
   // Схема ручки это уже проверила, но сервис зовут и мимо неё (миграции,
@@ -262,6 +268,13 @@ export async function saveSellerCommerceDefaults({
     pickupEnabled: pickupEnabled !== false,
     deliveryCarrier: carrier,
     regionCode: salePickup.productRegionCode ?? "",
+    // Тариф хранится только у собственной доставки. Продавец, переключивший
+    // перевозчика на курьеров, не должен обнаружить, что его цены ожили
+    // при возврате обратно.
+    deliveryTariff:
+      carrier === PRODUCT_DELIVERY_CARRIER_SELLER
+        ? normalizeSellerDeliveryTariff(deliveryTariff)
+        : { ...FREE_SELLER_DELIVERY_TARIFF },
     updatedAt: new Date(),
   };
 

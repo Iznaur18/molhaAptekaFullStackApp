@@ -1,0 +1,74 @@
+.seller-delivery-tariff {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.seller-delivery-tariff__hint,
+.seller-delivery-tariff__field-hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--iz-color-text-secondary);
+}
+
+.seller-delivery-tariff__modes {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.seller-delivery-tariff__mode {
+  flex: 1 1 10rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.875rem;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.seller-delivery-tariff__mode--selected {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action-bg-selected, var(--iz-color-action-soft));
+  color: var(--iz-color-action);
+}
+
+.seller-delivery-tariff__mode:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.seller-delivery-tariff__grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.seller-delivery-tariff__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.seller-delivery-tariff__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--iz-color-text);
+}
+
+.seller-delivery-tariff__input {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.75rem;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: 0.9375rem;
+}
+
+.seller-delivery-tariff__input:disabled {
+  opacity: 0.6;
+}

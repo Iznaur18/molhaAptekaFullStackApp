@@ -119,25 +119,39 @@ export const buildOrderShipments = (order) => {
  * Статус и состав выводятся из позиций, дублировать их в документе нельзя:
  * разъедутся при первой же смене статуса позиции.
  *
+ * Параметры приходят объектом, а не хвостом позиционных аргументов: их семь,
+ * они все одинакового вида «мапа по продавцу», и один раз их уже перепутали
+ * местами — реквизиты продавца уехали в поле перевозчика, а покупатель видел
+ * «Перевести продавцу: seller» (миграция 20260904-swap-shipment-payout-carrier).
+ *
  * @param {Array<Record<string, unknown>>} items
- * @param {Record<string, "pickup" | "delivery"> | null} fulfillmentBySellerId
- * @param {"pickup" | "delivery"} fallbackFulfillment
- * @param {Record<string, number> | null} [deliveryFeeBySellerId]
- * @param {Record<string, boolean> | null} [courierDeliveryBySellerId]
- * @param {Record<string, string> | null} [payoutRequisitesBySellerId]
- * @param {Record<string, string> | null} [deliveryCarrierBySellerId]
+ * @param {{
+ *   fulfillmentBySellerId?: Record<string, "pickup" | "delivery"> | null;
+ *   fallbackFulfillment?: "pickup" | "delivery";
+ *   deliveryFeeBySellerId?: Record<string, number> | null;
+ *   courierDeliveryBySellerId?: Record<string, boolean> | null;
+ *   payoutRequisitesBySellerId?: Record<string, string> | null;
+ *   deliveryCarrierBySellerId?: Record<string, string> | null;
+ *   sellerDeliveryBySellerId?: Record<string, {
+ *     feeRub: number;
+ *     distanceKm: number | null;
+ *     tariff: { paid: boolean; baseFeeRub: number; perKmRub: number; freeFromRub: number };
+ *   }> | null;
+ * }} [options]
  */
-export const buildStoredShipments = (
-  items,
-  fulfillmentBySellerId,
-  fallbackFulfillment = ORDER_FULFILLMENT_PICKUP,
-  deliveryFeeBySellerId = null,
-  courierDeliveryBySellerId = null,
-  payoutRequisitesBySellerId = null,
-  deliveryCarrierBySellerId = null,
-) => {
+export const buildStoredShipments = (items, options = {}) => {
+  const {
+    fulfillmentBySellerId = null,
+    fallbackFulfillment = ORDER_FULFILLMENT_PICKUP,
+    deliveryFeeBySellerId = null,
+    courierDeliveryBySellerId = null,
+    payoutRequisitesBySellerId = null,
+    deliveryCarrierBySellerId = null,
+    sellerDeliveryBySellerId = null,
+  } = options ?? {};
+
   const grouped = groupOrderItemsBySellerId(items);
-  /** @type {Array<{ sellerId: string; fulfillmentMethod: "pickup" | "delivery" }>} */
+  /** @type {Array<Record<string, unknown>>} */
   const shipments = [];
 
   for (const bucket of grouped.values()) {
@@ -147,6 +161,10 @@ export const buildStoredShipments = (
       chosen === ORDER_FULFILLMENT_DELIVERY
         ? ORDER_FULFILLMENT_DELIVERY
         : ORDER_FULFILLMENT_PICKUP;
+    const sellerDelivery =
+      method === ORDER_FULFILLMENT_DELIVERY
+        ? (sellerDeliveryBySellerId?.[bucket.sellerId] ?? null)
+        : null;
     shipments.push({
       sellerId: bucket.sellerId,
       fulfillmentMethod: method,
@@ -167,6 +185,12 @@ export const buildStoredShipments = (
         method === ORDER_FULFILLMENT_DELIVERY
           ? (deliveryCarrierBySellerId?.[bucket.sellerId] ?? "")
           : "",
+      // Тариф собственной доставки продавца — снимком, вместе с суммой.
+      sellerDeliveryFeeRub: sellerDelivery?.feeRub ?? 0,
+      sellerDeliveryDistanceKm: sellerDelivery?.distanceKm ?? null,
+      ...(sellerDelivery?.tariff
+        ? { sellerDeliveryTariffAtOrder: sellerDelivery.tariff }
+        : {}),
     });
   }
 

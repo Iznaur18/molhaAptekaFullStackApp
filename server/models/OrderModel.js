@@ -265,6 +265,28 @@ const OrderShipmentSchema = new mongoose.Schema(
      */
     deliveryFeeRub: { type: Number, default: 0, min: 0 },
     /**
+     * Доставка по тарифу продавца, когда он везёт сам.
+     *
+     * Отдельно от `deliveryFeeRub`: та — предложение покупателя курьеру
+     * Gitorg, которое покупатель же и поднимает, пока курьер не нашёлся.
+     * Здесь наоборот — цена продавца, и торга по ней нет.
+     */
+    sellerDeliveryFeeRub: { type: Number, default: 0, min: 0 },
+    /** Километраж, по которому посчитали тариф (по прямой). */
+    sellerDeliveryDistanceKm: { type: Number, default: null },
+    /**
+     * Тариф снимком на момент заказа — по той же причине, что и реквизиты:
+     * продавец может поменять цены, пока заказ едет, и покупателю нельзя
+     * пересчитать сумму задним числом.
+     */
+    sellerDeliveryTariffAtOrder: {
+      paid: { type: Boolean, default: false },
+      baseFeeRub: { type: Number, default: 0, min: 0 },
+      perKmRub: { type: Number, default: 0, min: 0 },
+      freeFromRub: { type: Number, default: 0, min: 0 },
+      _id: false,
+    },
+    /**
      * Продавец подтвердил, что перевод дошёл.
      *
      * Курьер не касается денег продавца, поэтому перед вручением нужно третье

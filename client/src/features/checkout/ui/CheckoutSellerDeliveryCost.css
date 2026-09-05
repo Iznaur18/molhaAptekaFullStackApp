@@ -1,0 +1,64 @@
+.checkout-seller-delivery {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.875rem;
+  background: var(--iz-color-surface-muted);
+}
+
+.checkout-seller-delivery__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.checkout-seller-delivery__legend {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--iz-color-text);
+}
+
+.checkout-seller-delivery__value {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.checkout-seller-delivery__hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--iz-color-text-secondary);
+}
+
+.checkout-seller-delivery__totals {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 0.4rem 0 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--iz-color-border);
+  font-size: 0.875rem;
+}
+
+.checkout-seller-delivery__total-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.checkout-seller-delivery__total-row dt,
+.checkout-seller-delivery__total-row dd {
+  margin: 0;
+  color: var(--iz-color-text-secondary);
+}
+
+.checkout-seller-delivery__total-row--sum dt,
+.checkout-seller-delivery__total-row--sum dd {
+  font-weight: 700;
+  color: var(--iz-color-text);
+}

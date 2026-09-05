@@ -21,6 +21,11 @@ import { buildStoredShipments } from "./orderShipments.js";
 import { resolveOrderFulfillmentSplit } from "./resolveOrderFulfillmentSplit.js";
 import { resolveDeliveryFeesBySeller } from "../courier/courierDeliveryFee.js";
 import {
+  buildDeliveryOriginBySeller,
+  buildGoodsTotalBySeller,
+  resolveSellerDeliveryFeesBySeller,
+} from "./sellerDeliveryFee.js";
+import {
   COURIER_DELIVERY_CASH_FORBIDDEN_MESSAGE,
   ORDER_PAYMENT_METHOD_CARD_PREPAID,
   ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
@@ -195,7 +200,10 @@ const fetchAvailableProductsForOrder = async (productIds) => {
     productStockQuantity: { $gt: 0 },
   })
     .select(
-      "_id productPrice productName loyaltyPointsPerUnit productSeller productPickupAddress productPickupLat productPickupLon productPickupLocations productPickupEnabled productDeliveryEnabled productCourierDeliveryEnabled productWholesaleEnabled productWholesaleMinQty productWholesalePrice affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
+      // productDeliveryCarrier обязателен: у ЛОБО оба старых флага сняты,
+      // и без явного поля resolveProductDeliveryCarrier возвращал null —
+      // заказ падал с «Доставка недоступна для одного из товаров».
+      "_id productPrice productName loyaltyPointsPerUnit productSeller productPickupAddress productPickupLat productPickupLon productPickupLocations productPickupEnabled productDeliveryEnabled productCourierDeliveryEnabled productDeliveryCarrier productWholesaleEnabled productWholesaleMinQty productWholesalePrice affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
     )
     .lean();
 
@@ -736,6 +744,16 @@ export async function createOrder({
         pickupByProductId,
       );
       const totalAmount = calculateTotalAmount(pricedItems);
+      // Доставку по тарифу продавца считаем на сервере от позиций заказа:
+      // порог «бесплатно от суммы» должен смотреть на то, что реально
+      // заказано, а не на корзину, которая с тех пор могла измениться.
+      const sellerDeliveryBySeller = await resolveSellerDeliveryFeesBySeller({
+        fulfillmentBySellerId: fulfillmentSplit.fulfillmentBySellerId,
+        deliveryCarrierBySellerId: deliveryCarrierBySeller,
+        goodsTotalBySellerId: buildGoodsTotalBySeller(pricedItems),
+        originBySellerId: buildDeliveryOriginBySeller(productById),
+        deliveryAddressGeo: deliveryAddressGeo ?? addressForOrder.geo ?? null,
+      });
       const orderStatus = buildOrderStatusFromItems(pricedItems);
       const reserveLines = pricedItems.map((line, index) => ({
         ...line,
@@ -759,22 +777,18 @@ export async function createOrder({
             // и в проверенном адресе geo почти всегда пустой.
             deliveryAddressGeo: deliveryAddressGeo ?? addressForOrder.geo ?? null,
             fulfillmentMethod: resolvedFulfillment,
-            // Порядок хвоста: fee → courier flag → payout → carrier.
-            // Перепутать payout и carrier нельзя: в карточке покупателя
-            // реквизиты рисуются как «Перевести продавцу: …», и вместо телефона
-            // всплывал код перевозчика («seller»).
-            shipments: buildStoredShipments(
-              pricedItems,
-              fulfillmentSplit.fulfillmentBySellerId,
-              resolvedFulfillment,
-              resolveDeliveryFeesBySeller({
+            shipments: buildStoredShipments(pricedItems, {
+              fulfillmentBySellerId: fulfillmentSplit.fulfillmentBySellerId,
+              fallbackFulfillment: resolvedFulfillment,
+              deliveryFeeBySellerId: resolveDeliveryFeesBySeller({
                 fulfillmentBySellerId: fulfillmentSplit.fulfillmentBySellerId,
                 feeBySellerId: deliveryFeeBySellerId,
               }),
-              courierDeliveryBySeller,
-              payoutRequisitesBySeller,
-              deliveryCarrierBySeller,
-            ),
+              courierDeliveryBySellerId: courierDeliveryBySeller,
+              payoutRequisitesBySellerId: payoutRequisitesBySeller,
+              deliveryCarrierBySellerId: deliveryCarrierBySeller,
+              sellerDeliveryBySellerId: sellerDeliveryBySeller,
+            }),
             paymentMethod,
             status: orderStatus,
             priceOfferId: linkedPriceOfferId,

@@ -10,6 +10,7 @@ import { ChevronLeft } from "lucide-react";
 
 import { buildCheckoutPickupLocations } from "../../../entities/cart/lib/buildCheckoutPickupLocations.js";
 import { resolveCartAllowedPaymentMethods } from "../../../entities/cart/lib/resolveCartAllowedPaymentMethods.js";
+import { resolveCartSellerDelivery } from "../../../entities/cart/lib/resolveCartSellerDelivery.js";
 import { getCartLineExclusionReason } from "../../../entities/cart/lib/getCartLineExclusionReason.js";
 import {
   groupCartLinesBySeller,
@@ -342,6 +343,18 @@ export function CartPage({
   const allowedPaymentMethods = useMemo(
     () => resolveCartAllowedPaymentMethods(checkoutSellerGroups),
     [checkoutSellerGroups],
+  );
+
+  // Тариф собственной доставки продавца: считается той же функцией контракта,
+  // что и на сервере, поэтому сумма в корзине совпадает с суммой заказа.
+  const sellerDelivery = useMemo(
+    () =>
+      resolveCartSellerDelivery({
+        sellerGroups: checkoutSellerGroups,
+        fulfillmentBySellerId,
+        goodsTotalRub: activeSummary.selectedTotal,
+      }),
+    [checkoutSellerGroups, fulfillmentBySellerId, activeSummary.selectedTotal],
   );
 
   const pickupLocations = useMemo(() => {
@@ -716,6 +729,7 @@ export function CartPage({
         }
         cardPrepaidAvailable={cardPrepaidAvailable}
         allowedPaymentMethods={allowedPaymentMethods}
+        sellerDelivery={sellerDelivery}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}
         submitSuccess={submitState.success}

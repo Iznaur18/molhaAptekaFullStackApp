@@ -744,6 +744,9 @@ export function OrderCard({
   // Сумму поднимает покупатель — он за неё и платит, — и только пока никто
   // не взялся везти: после назначения курьера уговор уже состоялся.
   const deliveryFeeRub = Number(shipmentOwn?.deliveryFeeRub) || 0;
+  // Тариф продавца: отдельная сумма и отдельная строка — её платят
+  // продавцу, а не курьеру, и поднимать её покупатель не может.
+  const sellerDeliveryFeeRub = Number(shipmentOwn?.sellerDeliveryFeeRub) || 0;
   const awaitingGitorgCourier = isAwaitingGitorgCourier({
     status: shipmentStatusNow,
     shipment: shipmentOwn,
@@ -982,6 +985,16 @@ export function OrderCard({
             {attentionRole === "seller"
               ? ORDER_CARD_UI.AWAITING_COURIER_SELLER_HINT
               : ORDER_CARD_UI.AWAITING_COURIER_BUYER_HINT}
+          </span>
+        </div>
+      ) : null}
+
+      {sellerDeliveryFeeRub > 0 ? (
+        <div className="order-card__fee">
+          <span>
+            {ORDER_CARD_UI.SELLER_DELIVERY_FEE(
+              formatPriceRub(sellerDeliveryFeeRub),
+            )}
           </span>
         </div>
       ) : null}

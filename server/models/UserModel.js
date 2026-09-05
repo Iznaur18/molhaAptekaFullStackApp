@@ -644,6 +644,20 @@ const UserSchema = new mongoose.Schema(
       deliveryCarrier: { type: String, trim: true, default: "" },
       /** Регион основной точки: его получает каждый товар при пересинке. */
       regionCode: { type: String, trim: true, default: "" },
+      /**
+       * Тариф собственной доставки: платная ли она, цена за вызов, цена за
+       * километр и сумма заказа, с которой доставка бесплатна.
+       *
+       * Применяется только при `deliveryCarrier === "seller"`: у курьеров
+       * Gitorg сумму называет покупатель, у внешней службы — сама служба.
+       */
+      deliveryTariff: {
+        paid: { type: Boolean, default: false },
+        baseFeeRub: { type: Number, default: 0, min: 0 },
+        perKmRub: { type: Number, default: 0, min: 0 },
+        freeFromRub: { type: Number, default: 0, min: 0 },
+        _id: false,
+      },
       updatedAt: { type: Date, default: null },
       _id: false,
     },

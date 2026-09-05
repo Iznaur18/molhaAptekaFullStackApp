@@ -93,6 +93,14 @@ export const YOOKASSA_POINTS_PAYMENT_SUBJECT = "payment";
 /** Товар в чеке заказа — обычный предмет расчёта. */
 export const YOOKASSA_ORDER_PAYMENT_SUBJECT = "commodity";
 
+/**
+ * Доставка в чеке — услуга, а не товар (ФФД).
+ *
+ * Отдельной строкой, а не прибавкой к цене позиции: чек обязан сходиться с
+ * платежом, а сумма доставки к конкретному товару не относится.
+ */
+export const YOOKASSA_DELIVERY_PAYMENT_SUBJECT = "service";
+
 /** Признак способа расчёта: полная оплата в момент покупки. */
 export const YOOKASSA_POINTS_PAYMENT_MODE = "full_payment";
 

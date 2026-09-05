@@ -618,6 +618,21 @@ export {
   productMatchesSellerFulfillmentDefaults,
 } from "./sellerCommerceDefaults.js";
 export {
+  SELLER_DELIVERY_BASE_FEE_MAX_RUB,
+  SELLER_DELIVERY_PER_KM_MAX_RUB,
+  SELLER_DELIVERY_FREE_FROM_MAX_RUB,
+  SELLER_DELIVERY_MAX_DISTANCE_KM,
+  SELLER_DELIVERY_TARIFF_EMPTY_MESSAGE,
+  SELLER_DELIVERY_TARIFF_CARRIER_MESSAGE,
+  FREE_SELLER_DELIVERY_TARIFF,
+  sellerDeliveryTariffSchema,
+  normalizeSellerDeliveryTariff,
+  resolveSellerDeliveryTariff,
+  calculateSellerDeliveryFee,
+  sellerDeliveryDistanceKm,
+  normalizeGeoCoord,
+} from "./sellerDeliveryTariff.js";
+export {
   SHIPPING_PROVIDER_LOBO,
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_REGIONS,

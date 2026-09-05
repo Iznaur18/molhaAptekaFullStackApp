@@ -50,6 +50,7 @@ export function CheckoutSheetModal({
   onFulfillmentMethodChange = null,
   cardPrepaidAvailable = false,
   allowedPaymentMethods = null,
+  sellerDelivery = null,
   isSubmitting,
   submitError,
   submitSuccess,
@@ -137,6 +138,7 @@ export function CheckoutSheetModal({
             onFulfillmentMethodChange={onFulfillmentMethodChange}
             cardPrepaidAvailable={cardPrepaidAvailable}
             allowedPaymentMethods={allowedPaymentMethods}
+            sellerDelivery={sellerDelivery}
             isSubmitting={isSubmitting}
             submitError={submitError}
             submitSuccess={submitSuccess}

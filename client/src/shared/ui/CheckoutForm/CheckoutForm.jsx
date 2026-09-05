@@ -12,6 +12,7 @@ import { CheckoutSavedAddressPicker } from "../../../features/checkout/ui/Checko
 import { CheckoutPaymentMethodPicker } from "../../../features/checkout/ui/CheckoutPaymentMethodPicker.jsx";
 import { CheckoutShippingProviderPicker } from "../../../features/checkout/ui/CheckoutShippingProviderPicker.jsx";
 import { CheckoutShippingEstimate } from "../../../features/checkout/ui/CheckoutShippingEstimate.jsx";
+import { CheckoutSellerDeliveryCost } from "../../../features/checkout/ui/CheckoutSellerDeliveryCost.jsx";
 import { addressValueFromUser } from "../../../entities/address/lib/addressValueFromUser.js";
 import {
   CHECKOUT_SAVED_ADDRESS_CUSTOM_ID,
@@ -82,6 +83,13 @@ const EMPTY_SAVED_DELIVERY_ADDRESSES = [];
  *     pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
  *   }) => void | Promise<void>;
  *   isDisabled?: boolean;
+ *   cardPrepaidAvailable?: boolean;
+ *   allowedPaymentMethods?: string[] | null;
+ *   sellerDelivery?: {
+ *     tariff: unknown;
+ *     origin?: { lat: number; lon: number } | null;
+ *     goodsTotalRub?: number;
+ *   } | null;
  *   dockSubmit?: boolean;
  *   pinSubmitToBottom?: boolean;
  *   showHeading?: boolean;
@@ -105,6 +113,7 @@ export function CheckoutForm({
   isDisabled = false,
   cardPrepaidAvailable = false,
   allowedPaymentMethods = null,
+  sellerDelivery = null,
   dockSubmit = false,
   pinSubmitToBottom = false,
   showHeading = true,
@@ -673,6 +682,15 @@ export function CheckoutForm({
                   productIds={deliveryProductIds}
                   deliveryGeo={deliveryAddress.geo ?? null}
                 />
+
+                {sellerDelivery ? (
+                  <CheckoutSellerDeliveryCost
+                    tariff={sellerDelivery.tariff}
+                    origin={sellerDelivery.origin ?? null}
+                    deliveryGeo={deliveryAddress.geo ?? null}
+                    goodsTotalRub={sellerDelivery.goodsTotalRub ?? 0}
+                  />
+                ) : null}
               </div>
             </section>
           ) : null}

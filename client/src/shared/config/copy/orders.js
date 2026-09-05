@@ -73,6 +73,8 @@ export const ORDER_CARD_UI = {
   SHIPMENT_PAYMENT_RECEIVED_HINT: "Больше переводить ничего не нужно.",
   /** @param {string} fee */
   SHIPMENT_FEE: (fee) => `Курьеру за доставку: ${fee}`,
+  /** Доставка по тарифу продавца — платится продавцу, а не курьеру. */
+  SELLER_DELIVERY_FEE: (fee) => `Доставка продавцом: ${fee}`,
   SHIPMENT_FEE_RAISE: "+25 ₽",
   SHIPMENT_FEE_HINT:
     "Заказ долго никто не берёт? Поднимите сумму — снизить её потом нельзя.",

@@ -15,25 +15,21 @@ const line = (sellerId) => ({ sellerIdAtOrder: sellerId, status: "pending" });
 
 describe("вид доставки на отправлении", () => {
   it("курьерское отправление помечается", () => {
-    const [shipment] = buildStoredShipments(
-      [line(SELLER_A)],
-      { [SELLER_A]: "delivery" },
-      "pickup",
-      { [SELLER_A]: 250 },
-      { [SELLER_A]: true },
-    );
+    const [shipment] = buildStoredShipments([line(SELLER_A)], {
+      fulfillmentBySellerId: { [SELLER_A]: "delivery" },
+      deliveryFeeBySellerId: { [SELLER_A]: 250 },
+      courierDeliveryBySellerId: { [SELLER_A]: true },
+    });
 
     assert.equal(shipment.courierDelivery, true);
   });
 
   it("доставка продавцом курьерской не считается", () => {
-    const [shipment] = buildStoredShipments(
-      [line(SELLER_A)],
-      { [SELLER_A]: "delivery" },
-      "pickup",
-      { [SELLER_A]: 250 },
-      { [SELLER_A]: false },
-    );
+    const [shipment] = buildStoredShipments([line(SELLER_A)], {
+      fulfillmentBySellerId: { [SELLER_A]: "delivery" },
+      deliveryFeeBySellerId: { [SELLER_A]: 250 },
+      courierDeliveryBySellerId: { [SELLER_A]: false },
+    });
 
     assert.equal(
       shipment.courierDelivery,
@@ -43,25 +39,19 @@ describe("вид доставки на отправлении", () => {
   });
 
   it("самовывоз курьерским не бывает", () => {
-    const [shipment] = buildStoredShipments(
-      [line(SELLER_A)],
-      { [SELLER_A]: "pickup" },
-      "pickup",
-      null,
-      { [SELLER_A]: true },
-    );
+    const [shipment] = buildStoredShipments([line(SELLER_A)], {
+      fulfillmentBySellerId: { [SELLER_A]: "pickup" },
+      courierDeliveryBySellerId: { [SELLER_A]: true },
+    });
 
     assert.equal(shipment.courierDelivery, false);
   });
 
   it("у разных продавцов вид свой", () => {
-    const shipments = buildStoredShipments(
-      [line(SELLER_A), line(SELLER_B)],
-      { [SELLER_A]: "delivery", [SELLER_B]: "delivery" },
-      "pickup",
-      null,
-      { [SELLER_A]: true, [SELLER_B]: false },
-    );
+    const shipments = buildStoredShipments([line(SELLER_A), line(SELLER_B)], {
+      fulfillmentBySellerId: { [SELLER_A]: "delivery", [SELLER_B]: "delivery" },
+      courierDeliveryBySellerId: { [SELLER_A]: true, [SELLER_B]: false },
+    });
     const byId = Object.fromEntries(
       shipments.map((s) => [s.sellerId, s.courierDelivery]),
     );
@@ -71,11 +61,9 @@ describe("вид доставки на отправлении", () => {
   });
 
   it("без карты видов всё считается доставкой продавцом", () => {
-    const [shipment] = buildStoredShipments(
-      [line(SELLER_A)],
-      { [SELLER_A]: "delivery" },
-      "pickup",
-    );
+    const [shipment] = buildStoredShipments([line(SELLER_A)], {
+      fulfillmentBySellerId: { [SELLER_A]: "delivery" },
+    });
 
     assert.equal(
       shipment.courierDelivery,
@@ -84,16 +72,14 @@ describe("вид доставки на отправлении", () => {
     );
   });
 
-  it("carrier и payout не путаются по позиции аргументов", () => {
-    const [shipment] = buildStoredShipments(
-      [line(SELLER_A)],
-      { [SELLER_A]: "delivery" },
-      "pickup",
-      { [SELLER_A]: 100 },
-      { [SELLER_A]: false },
-      { [SELLER_A]: "+7 900 000-00-00" },
-      { [SELLER_A]: "seller" },
-    );
+  it("carrier и payout не путаются: параметры именованные", () => {
+    const [shipment] = buildStoredShipments([line(SELLER_A)], {
+      fulfillmentBySellerId: { [SELLER_A]: "delivery" },
+      deliveryFeeBySellerId: { [SELLER_A]: 100 },
+      courierDeliveryBySellerId: { [SELLER_A]: false },
+      payoutRequisitesBySellerId: { [SELLER_A]: "+7 900 000-00-00" },
+      deliveryCarrierBySellerId: { [SELLER_A]: "seller" },
+    });
 
     assert.equal(shipment.deliveryCarrier, "seller");
     assert.equal(shipment.sellerPayoutRequisites, "+7 900 000-00-00");
