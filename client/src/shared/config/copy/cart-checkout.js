@@ -53,7 +53,14 @@ export const CART_PAGE_UI = {
   STOCK_REMAINING: (left) => `Осталось ${left} шт`,
   STOCK_QUANTITY_LIMITED: "Количество ограничено",
   CHECKOUT_OPEN: "Оформить заказ",
+  CHECKOUT_SELLER: "Оформить",
+  SELLER_ROW_OPEN: "Перейти",
   CHECKOUT_SHEET_CLOSE: "Закрыть",
+  CHECKOUT_SELLER_HINT:
+    "Каждый продавец оформляется отдельно — свой заказ и своя оплата.",
+  SELLERS_LIST_HINT:
+    "Выберите продавца, чтобы открыть его корзину и оформить заказ.",
+  BACK_TO_SELLERS: "К продавцам",
   CHECKOUT_LEGAL_HINT_PREFIX: "Нажимая на кнопку, вы соглашаетесь с ",
   CHECKOUT_LEGAL_PRIVACY_LINK: "Условиями обработки персональных данных",
   CHECKOUT_LEGAL_HINT_MIDDLE: ", а также с ",

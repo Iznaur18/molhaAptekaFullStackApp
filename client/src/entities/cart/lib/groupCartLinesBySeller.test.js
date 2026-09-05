@@ -34,6 +34,32 @@ describe("группировка корзины по продавцам", () => 
     expect(group.sellerName).toBe("Пётр");
   });
 
+  it("подхватывает аватар и флаги профиля продавца", () => {
+    const [group] = groupCartLinesBySeller([
+      {
+        productId: "p1",
+        quantity: 1,
+        product: {
+          productSeller: {
+            _id: "s1",
+            userName: "Анна",
+            userAvatarUrl: "https://cdn.example/a.jpg",
+            userAvatarFocus: { x: 40, y: 60 },
+            isPremiumUser: true,
+            isUserDataConfirmed: true,
+          },
+          productPickupEnabled: true,
+          productDeliveryEnabled: false,
+        },
+      },
+    ]);
+
+    expect(group.sellerAvatarUrl).toBe("https://cdn.example/a.jpg");
+    expect(group.sellerAvatarFocus).toEqual({ x: 40, y: 60 });
+    expect(group.isPremiumUser).toBe(true);
+    expect(group.isUserDataConfirmed).toBe(true);
+  });
+
   it("товар с обоими способами даёт выбор, а не только самовывоз", () => {
     const [group] = groupCartLinesBySeller([
       line("s1", { pickup: true, delivery: true }),

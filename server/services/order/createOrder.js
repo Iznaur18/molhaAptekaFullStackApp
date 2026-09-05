@@ -14,6 +14,7 @@ import {
 import { SHIPPING_CARRIER_DISABLED_MESSAGE } from "../../constants/loboConstants.js";
 import { isCarrierAvailable } from "../shipping/shippingCarrierSettings.js";
 
+import { assertCreateOrderSingleSeller } from "./assertCreateOrderSingleSeller.js";
 import { buildStoredShipments } from "./orderShipments.js";
 import { resolveOrderFulfillmentSplit } from "./resolveOrderFulfillmentSplit.js";
 import { resolveDeliveryFeesBySeller } from "../courier/courierDeliveryFee.js";
@@ -546,6 +547,7 @@ export async function createOrder({
 
   await assertBuyerNotBlockedForProducts(String(userId), productById);
   await assertSellersOpenForProducts(productById);
+  assertCreateOrderSingleSeller(productById);
 
   const fulfillmentSplit = resolveOrderFulfillmentSplit({
     productIds: uniqueProductIds,

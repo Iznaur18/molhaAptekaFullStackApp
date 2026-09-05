@@ -10,6 +10,10 @@
  * @typedef {{
  *   sellerId: string;
  *   sellerName: string;
+ *   sellerAvatarUrl: string;
+ *   sellerAvatarFocus: { x?: number; y?: number } | null;
+ *   isPremiumUser: boolean;
+ *   isUserDataConfirmed: boolean;
  *   lines: CartLine[];
  *   pickupAvailable: boolean;
  *   deliveryAvailable: boolean;
@@ -28,8 +32,26 @@ const resolveSellerId = (line) => {
 };
 
 /** @param {CartLine} line */
-const resolveSellerName = (line) =>
-  String(line?.product?.productSeller?.userName ?? line?.productSellerName ?? "").trim();
+const resolveSellerProfile = (line) => {
+  const seller = line?.product?.productSeller;
+  if (!seller || typeof seller !== "object") {
+    return {
+      sellerName: String(line?.productSellerName ?? "").trim(),
+      sellerAvatarUrl: "",
+      sellerAvatarFocus: null,
+      isPremiumUser: false,
+      isUserDataConfirmed: false,
+    };
+  }
+
+  return {
+    sellerName: String(seller.userName ?? line?.productSellerName ?? "").trim(),
+    sellerAvatarUrl: String(seller.userAvatarUrl ?? "").trim(),
+    sellerAvatarFocus: seller.userAvatarFocus ?? null,
+    isPremiumUser: seller.isPremiumUser === true,
+    isUserDataConfirmed: seller.isUserDataConfirmed === true,
+  };
+};
 
 /**
  * Отправление едет одним способом целиком, поэтому способ доступен, только
@@ -45,9 +67,14 @@ export function groupCartLinesBySeller(visibleLines) {
   for (const line of Array.isArray(visibleLines) ? visibleLines : []) {
     const sellerId = resolveSellerId(line);
     const product = line?.product ?? {};
+    const profile = resolveSellerProfile(line);
     const group = bySeller.get(sellerId) ?? {
       sellerId,
-      sellerName: resolveSellerName(line),
+      sellerName: profile.sellerName,
+      sellerAvatarUrl: profile.sellerAvatarUrl,
+      sellerAvatarFocus: profile.sellerAvatarFocus,
+      isPremiumUser: profile.isPremiumUser,
+      isUserDataConfirmed: profile.isUserDataConfirmed,
       lines: [],
       pickupAvailable: true,
       deliveryAvailable: true,
@@ -71,8 +98,18 @@ export function groupCartLinesBySeller(visibleLines) {
     if (product.productCourierDeliveryEnabled !== true) {
       group.courierDelivery = false;
     }
-    if (!group.sellerName) {
-      group.sellerName = resolveSellerName(line);
+    if (!group.sellerName && profile.sellerName) {
+      group.sellerName = profile.sellerName;
+    }
+    if (!group.sellerAvatarUrl && profile.sellerAvatarUrl) {
+      group.sellerAvatarUrl = profile.sellerAvatarUrl;
+      group.sellerAvatarFocus = profile.sellerAvatarFocus;
+    }
+    if (!group.isPremiumUser && profile.isPremiumUser) {
+      group.isPremiumUser = true;
+    }
+    if (!group.isUserDataConfirmed && profile.isUserDataConfirmed) {
+      group.isUserDataConfirmed = true;
     }
 
     bySeller.set(sellerId, group);

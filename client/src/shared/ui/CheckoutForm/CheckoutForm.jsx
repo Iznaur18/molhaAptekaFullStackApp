@@ -61,6 +61,11 @@ const EMPTY_SAVED_DELIVERY_ADDRESSES = [];
  *   }>;
  *   deliveryAvailable?: boolean;
  *   pickupAvailable?: boolean;
+ *   fulfillmentMode?: "pickup" | "delivery" | "mixed" | null;
+ *   courierDelivery?: "courier" | "seller" | "mixed" | null;
+ *   deliveryProductIds?: string[];
+ *   initialFulfillmentMethod?: "pickup" | "delivery" | null;
+ *   onFulfillmentMethodChange?: (method: "pickup" | "delivery") => void;
  *   isSubmitting: boolean;
  *   submitError: string;
  *   submitSuccess: string;
@@ -86,6 +91,8 @@ export function CheckoutForm({
   fulfillmentMode = null,
   courierDelivery = null,
   deliveryProductIds = [],
+  initialFulfillmentMethod = null,
+  onFulfillmentMethodChange = null,
   isSubmitting,
   submitError,
   submitSuccess,
@@ -97,7 +104,11 @@ export function CheckoutForm({
   showHeading = true,
 }) {
   const formId = useId();
-  const [fulfillmentMethod, setFulfillmentMethod] = useState(ORDER_FULFILLMENT_PICKUP);
+  const [fulfillmentMethod, setFulfillmentMethod] = useState(() =>
+    initialFulfillmentMethod === ORDER_FULFILLMENT_DELIVERY
+      ? ORDER_FULFILLMENT_DELIVERY
+      : ORDER_FULFILLMENT_PICKUP,
+  );
   const savedAddresses = useMemo(
     () => (Array.isArray(savedDeliveryAddresses) ? savedDeliveryAddresses : []),
     [savedDeliveryAddresses],
@@ -161,6 +172,21 @@ export function CheckoutForm({
     setSelectedSavedAddressId(
       matchCheckoutSavedAddressId(nextAddress, savedAddresses),
     );
+  };
+
+  useEffect(() => {
+    if (initialFulfillmentMethod === ORDER_FULFILLMENT_DELIVERY) {
+      setFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
+      return;
+    }
+    if (initialFulfillmentMethod === ORDER_FULFILLMENT_PICKUP) {
+      setFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
+    }
+  }, [initialFulfillmentMethod]);
+
+  const applyFulfillmentMethod = (method) => {
+    setFulfillmentMethod(method);
+    onFulfillmentMethodChange?.(method);
   };
 
   useEffect(() => {
@@ -386,7 +412,7 @@ export function CheckoutForm({
                     return;
                   }
                   setLocalError("");
-                  setFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
+                  applyFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
                 }}
               >
                 <span className="checkout-form__fulfillment-option-title">
@@ -417,7 +443,7 @@ export function CheckoutForm({
                     return;
                   }
                   setLocalError("");
-                  setFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
+                  applyFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
                 }}
               >
                 <span className="checkout-form__fulfillment-option-title">

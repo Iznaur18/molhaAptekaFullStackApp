@@ -20,6 +20,9 @@ import "./CheckoutSheetModal.css";
  *   pickupAvailable?: boolean;
  *   fulfillmentMode?: "pickup" | "delivery" | "mixed" | null;
  *   courierDelivery?: "courier" | "seller" | "mixed" | null;
+ *   deliveryProductIds?: string[];
+ *   initialFulfillmentMethod?: "pickup" | "delivery" | null;
+ *   onFulfillmentMethodChange?: (method: "pickup" | "delivery") => void;
  *   isSubmitting: boolean;
  *   submitError: string;
  *   submitSuccess: string;
@@ -43,6 +46,8 @@ export function CheckoutSheetModal({
   fulfillmentMode = null,
   courierDelivery = null,
   deliveryProductIds = [],
+  initialFulfillmentMethod = null,
+  onFulfillmentMethodChange = null,
   cardPrepaidAvailable = false,
   isSubmitting,
   submitError,
@@ -127,6 +132,8 @@ export function CheckoutSheetModal({
             fulfillmentMode={fulfillmentMode}
             courierDelivery={courierDelivery}
             deliveryProductIds={deliveryProductIds}
+            initialFulfillmentMethod={initialFulfillmentMethod}
+            onFulfillmentMethodChange={onFulfillmentMethodChange}
             cardPrepaidAvailable={cardPrepaidAvailable}
             isSubmitting={isSubmitting}
             submitError={submitError}

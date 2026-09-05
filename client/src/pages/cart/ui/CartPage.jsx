@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -6,6 +6,7 @@ import {
   doProductsSupportAnyDelivery,
 } from "@molha/api-contract";
 import { isProductBuyNFreeActive } from "@izibuy/shared-lib";
+import { ChevronLeft } from "lucide-react";
 
 import { buildCheckoutPickupLocations } from "../../../entities/cart/lib/buildCheckoutPickupLocations.js";
 import { getCartLineExclusionReason } from "../../../entities/cart/lib/getCartLineExclusionReason.js";
@@ -13,6 +14,7 @@ import {
   groupCartLinesBySeller,
   resolveCartFulfillmentBySeller,
 } from "../../../entities/cart/lib/groupCartLinesBySeller.js";
+import { scopeRecordBySellerId } from "../../../entities/cart/lib/scopeRecordBySellerId.js";
 import { useCardPrepaidAvailable } from "../../../entities/payment/model/paymentQueries.js";
 import { selectCartCheckoutSummary } from "../../../entities/cart/lib/selectCartCheckoutSummary.js";
 import { selectCartLines } from "../../../entities/cart/lib/selectCartLines.js";
@@ -36,10 +38,11 @@ import {
   CART_PAGE_UI,
   CHECKOUT_FORM_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { AppIcon } from "../../../shared/ui/icon/index.js";
 
 import { CartAuctionSection } from "./CartAuctionSection.jsx";
-import { CartCheckoutBar } from "./CartCheckoutBar.jsx";
 import { CartFulfillmentSection } from "./CartFulfillmentSection.jsx";
+import { CartSellerList } from "./CartSellerList.jsx";
 
 import "./CartPage.css";
 
@@ -105,7 +108,14 @@ export function CartPage({
     return userSavedAddressesFromUser(user);
   }, [isAuthorized, user]);
 
-  /** Заказ теперь один на всю корзину; секций по способу больше нет. */
+  /** Оформление по одному продавцу; null — sheet закрыт (или аукцион). */
+  const [checkoutSellerId, setCheckoutSellerId] = useState(
+    /** @type {string | null} */ (null),
+  );
+  /** Внутренняя корзина продавца; null — общий список продавцов. */
+  const [activeSellerCartId, setActiveSellerCartId] = useState(
+    /** @type {string | null} */ (null),
+  );
   const [isCartCheckoutOpen, setIsCartCheckoutOpen] = useState(false);
   /** Сумма курьеру по продавцам; минимум задаёт контракт. */
   const [deliveryFeeBySeller, setDeliveryFeeBySeller] = useState(
@@ -200,12 +210,16 @@ export function CartPage({
     [visibleLines],
   );
 
-  // Предоплата картой доступна, только если весь заказ — товар площадки.
-  const cartSellerIds = useMemo(
-    () => sellerGroups.map((group) => String(group.sellerId)),
-    [sellerGroups],
-  );
-  const cardPrepaidAvailable = useCardPrepaidAvailable({ sellerIds: cartSellerIds });
+  // Предоплата картой — только товары площадки; в sheet смотрим активного продавца.
+  const prepaidSellerIds = useMemo(() => {
+    if (checkoutSellerId) {
+      return [String(checkoutSellerId)];
+    }
+    return sellerGroups.map((group) => String(group.sellerId));
+  }, [checkoutSellerId, sellerGroups]);
+  const cardPrepaidAvailable = useCardPrepaidAvailable({
+    sellerIds: prepaidSellerIds,
+  });
 
   const purchasableIds = useMemo(
     () => visibleLines.map((line) => line.productId),
@@ -251,10 +265,76 @@ export function CartPage({
     [sellerGroups, chosenFulfillmentBySeller],
   );
 
-  const activeSummary = cartSummary;
-  const canCheckoutActive = activeSummary.selectedLines.length > 0;
+  useEffect(() => {
+    if (!activeSellerCartId) {
+      return;
+    }
+    const stillThere = sellerGroups.some(
+      (group) => String(group.sellerId) === String(activeSellerCartId),
+    );
+    if (!stillThere) {
+      setActiveSellerCartId(null);
+    }
+  }, [activeSellerCartId, sellerGroups]);
+
+  const activeSellerEntry = useMemo(() => {
+    if (!activeSellerCartId) {
+      return null;
+    }
+    return (
+      groupSummaries.find(
+        (entry) => String(entry.group.sellerId) === String(activeSellerCartId),
+      ) ?? null
+    );
+  }, [activeSellerCartId, groupSummaries]);
+
+  const activeSummary = useMemo(() => {
+    if (checkoutSellerId) {
+      const found = groupSummaries.find(
+        (entry) => String(entry.group.sellerId) === String(checkoutSellerId),
+      );
+      return (
+        found?.summary ??
+        selectCartCheckoutSummary([], currentUserId, deselectedIds)
+      );
+    }
+    if (activeSellerEntry) {
+      return activeSellerEntry.summary;
+    }
+    return cartSummary;
+  }, [
+    checkoutSellerId,
+    groupSummaries,
+    activeSellerEntry,
+    cartSummary,
+    currentUserId,
+    deselectedIds,
+  ]);
+
+  const canCheckoutActive =
+    activeSummary.selectedLines.length > 0 &&
+    !activeSummary.checkoutBlockReason;
   const isCartEmpty = lines.length === 0 && auctionBids.length === 0;
   const isCheckoutSheetOpen = isCartCheckoutOpen || auctionCheckoutBid != null;
+
+  const scopedFulfillmentBySellerId = useMemo(
+    () => scopeRecordBySellerId(fulfillmentBySellerId, checkoutSellerId),
+    [checkoutSellerId, fulfillmentBySellerId],
+  );
+
+  const scopedDeliveryFeeBySellerId = useMemo(
+    () => scopeRecordBySellerId(deliveryFeeBySeller, checkoutSellerId),
+    [checkoutSellerId, deliveryFeeBySeller],
+  );
+
+  const checkoutSellerGroups = useMemo(() => {
+    if (!checkoutSellerId) {
+      return sellerGroups;
+    }
+    return sellerGroups.filter(
+      (group) => String(group.sellerId) === String(checkoutSellerId),
+    );
+  }, [checkoutSellerId, sellerGroups]);
 
   const pickupLocations = useMemo(() => {
     if (auctionCheckoutBid) {
@@ -267,7 +347,7 @@ export function CartPage({
     // адрес, откуда везти. Не нужна она только там, где везёт сам продавец:
     // он отправляет откуда захочет.
     const courierSellerIds = new Set(
-      sellerGroups
+      checkoutSellerGroups
         .filter((group) => group.courierDelivery)
         .map((group) => String(group.sellerId)),
     );
@@ -285,7 +365,7 @@ export function CartPage({
     auctionCheckoutBid,
     activeSummary.selectedLines,
     fulfillmentBySellerId,
-    sellerGroups,
+    checkoutSellerGroups,
     productsQuery.data,
   ]);
 
@@ -314,20 +394,12 @@ export function CartPage({
   }, [auctionCheckoutBid, activeSummary.selectedLines, productsQuery.data]);
 
   /**
-   * Что форме чекаута собирать: адрес, точки самовывоза или и то и другое.
-   *
-   * Считаем по выбранным позициям, а не по всей корзине: невыбранное в заказ
-   * не поедет и требовать под него адрес незачем.
-   */
-  /**
    * Кто везёт выбранное: курьеры Gitorg или сам продавец.
    *
-   * Решает продавец на товаре, покупатель это только видит. В смешанной
-   * корзине может быть и так и так — тогда честнее показать оба варианта
-   * активными, чем выбрать за покупателя один.
+   * Решает продавец на товаре, покупатель это только видит.
    */
   const checkoutCourierDelivery = useMemo(() => {
-    const deliveryGroups = sellerGroups.filter(
+    const deliveryGroups = checkoutSellerGroups.filter(
       (group) => fulfillmentBySellerId[String(group.sellerId)] === "delivery",
     );
     if (deliveryGroups.length === 0) return null;
@@ -335,7 +407,7 @@ export function CartPage({
     if (withCourier.length === deliveryGroups.length) return "courier";
     if (withCourier.length === 0) return "seller";
     return "mixed";
-  }, [sellerGroups, fulfillmentBySellerId]);
+  }, [checkoutSellerGroups, fulfillmentBySellerId]);
 
   /** Товары, которые везут: по ним считается стоимость доставки. */
   const deliveryProductIds = useMemo(() => {
@@ -351,37 +423,26 @@ export function CartPage({
       .filter(Boolean);
   }, [auctionCheckoutBid, activeSummary.selectedLines, fulfillmentBySellerId]);
 
-  const cartFulfillmentMode = useMemo(() => {
-    if (auctionCheckoutBid) return null;
-
-    const selectedIds = new Set(
-      activeSummary.selectedLines.map((line) => line.productId),
-    );
-    let hasPickup = false;
-    let hasDelivery = false;
-
-    for (const { group, productIds } of groupSummaries) {
-      if (!productIds.some((id) => selectedIds.has(id))) continue;
-      if (fulfillmentBySellerId[group.sellerId] === "delivery") {
-        hasDelivery = true;
-      } else {
-        hasPickup = true;
-      }
-    }
-
-    if (hasPickup && hasDelivery) return "mixed";
-    if (hasDelivery) return "delivery";
-    return "pickup";
-  }, [auctionCheckoutBid, activeSummary.selectedLines, groupSummaries, fulfillmentBySellerId]);
-
   const closeCheckoutSheet = () => {
     setIsCartCheckoutOpen(false);
+    setCheckoutSellerId(null);
     setAuctionCheckoutBid(null);
     setSubmitState({ isSubmitting: false, error: "", success: "" });
   };
 
-  const openCartCheckout = () => {
+  /** @param {string} sellerId */
+  const openSellerCart = (sellerId) => {
+    setActiveSellerCartId(sellerId);
+  };
+
+  const closeSellerCart = () => {
+    setActiveSellerCartId(null);
+  };
+
+  /** @param {string} sellerId */
+  const openSellerCheckout = (sellerId) => {
     setAuctionCheckoutBid(null);
+    setCheckoutSellerId(sellerId);
     setSubmitState({ isSubmitting: false, error: "", success: "" });
     setIsCartCheckoutOpen(true);
   };
@@ -400,6 +461,7 @@ export function CartPage({
   const handleOpenAuctionCheckout = (bid) => {
     setSubmitState({ isSubmitting: false, error: "", success: "" });
     setIsCartCheckoutOpen(false);
+    setCheckoutSellerId(null);
     setAuctionCheckoutBid(bid);
   };
 
@@ -452,8 +514,8 @@ export function CartPage({
           quantity: line.quantity,
         })),
         fulfillmentMethod,
-        fulfillmentBySellerId,
-        deliveryFeeBySellerId: deliveryFeeBySeller,
+        fulfillmentBySellerId: scopedFulfillmentBySellerId,
+        deliveryFeeBySellerId: scopedDeliveryFeeBySellerId,
         deliveryAddress,
         deliveryAddressFlat,
         paymentMethod,
@@ -461,6 +523,7 @@ export function CartPage({
       });
       removeItems(orderedProductIds);
       setIsCartCheckoutOpen(false);
+      setCheckoutSellerId(null);
 
       // Предоплату здесь не начинаем: сначала продавец подтверждает, что товар
       // есть, и только потом покупатель платит. Иначе на каждый «нет в
@@ -480,6 +543,17 @@ export function CartPage({
       });
     }
   };
+
+  const activeSellerCart = activeSellerEntry
+    ? {
+        group: activeSellerEntry.group,
+        summary: activeSellerEntry.summary,
+        productIds: activeSellerEntry.productIds,
+        canCheckout:
+          activeSellerEntry.summary.selectedLines.length > 0 &&
+          !activeSellerEntry.summary.checkoutBlockReason,
+      }
+    : null;
 
   if (!isAuthorized) {
     return (
@@ -542,44 +616,73 @@ export function CartPage({
   return (
     <div className="cart-page cart-page--sections">
       <div className="cart-page__content">
-        <CartAuctionSection
-          bids={auctionBids}
-          onCheckout={handleOpenAuctionCheckout}
-        />
+        {activeSellerCart ? (
+          <>
+            <div className="cart-page__seller-cart-nav">
+              <button
+                type="button"
+                className="cart-page__back-to-sellers"
+                onClick={closeSellerCart}
+              >
+                <AppIcon icon={ChevronLeft} size={18} aria-hidden />
+                {CART_PAGE_UI.BACK_TO_SELLERS}
+              </button>
+            </div>
 
-        {groupSummaries.map(({ group, summary, productIds }) => (
-          <CartFulfillmentSection
-            key={group.sellerId || "unknown-seller"}
-            title={group.sellerName || CART_PAGE_UI.SECTION_SELLER_FALLBACK}
-            lines={group.lines}
-            selectedCount={selectedCountIn(productIds)}
-            areAllSelected={areAllSelectedIn(productIds)}
-            onToggleAll={() => toggleAllIn(productIds)}
-            isLineSelected={isLineSelected}
-            onToggleSelected={toggleLine}
-            onProductClick={handleProductClick}
-            summary={summary}
-            fulfillmentPicker={{
-              value: fulfillmentBySellerId[group.sellerId] ?? group.defaultMethod,
-              pickupAvailable: group.pickupAvailable,
-              deliveryAvailable: group.deliveryAvailable,
-              onChange: (method) =>
-                chooseSellerFulfillment(group.sellerId, method),
-            }}
-            deliveryFee={group.courierDelivery ? {
-              value:
-                deliveryFeeBySeller[group.sellerId] ?? CART_DELIVERY_FEE_UI.MIN_RUB,
-              onChange: (next) => chooseDeliveryFee(group.sellerId, next),
-            } : null}
-            showDeliveryFeeNote={false}
-          />
-        ))}
+            <CartFulfillmentSection
+              key={activeSellerCart.group.sellerId || "unknown-seller"}
+              title={
+                activeSellerCart.group.sellerName ||
+                CART_PAGE_UI.SECTION_SELLER_FALLBACK
+              }
+              lines={activeSellerCart.group.lines}
+              selectedCount={selectedCountIn(activeSellerCart.productIds)}
+              areAllSelected={areAllSelectedIn(activeSellerCart.productIds)}
+              onToggleAll={() => toggleAllIn(activeSellerCart.productIds)}
+              isLineSelected={isLineSelected}
+              onToggleSelected={toggleLine}
+              onProductClick={handleProductClick}
+              summary={activeSellerCart.summary}
+              canCheckout={activeSellerCart.canCheckout}
+              onCheckout={() =>
+                openSellerCheckout(activeSellerCart.group.sellerId)
+              }
+              deliveryFee={
+                activeSellerCart.group.courierDelivery &&
+                fulfillmentBySellerId[activeSellerCart.group.sellerId] ===
+                  "delivery"
+                  ? {
+                      value:
+                        deliveryFeeBySeller[activeSellerCart.group.sellerId] ??
+                        CART_DELIVERY_FEE_UI.MIN_RUB,
+                      onChange: (next) =>
+                        chooseDeliveryFee(
+                          activeSellerCart.group.sellerId,
+                          next,
+                        ),
+                    }
+                  : null
+              }
+              showDeliveryFeeNote={false}
+            />
+          </>
+        ) : (
+          <>
+            <p className="cart-page__seller-checkout-hint">
+              {CART_PAGE_UI.SELLERS_LIST_HINT}
+            </p>
 
-        <CartCheckoutBar
-          summary={cartSummary}
-          canCheckout={canCheckoutActive}
-          onCheckout={openCartCheckout}
-        />
+            <CartAuctionSection
+              bids={auctionBids}
+              onCheckout={handleOpenAuctionCheckout}
+            />
+
+            <CartSellerList
+              entries={groupSummaries}
+              onOpenSeller={openSellerCart}
+            />
+          </>
+        )}
       </div>
 
       <CheckoutSheetModal
@@ -590,9 +693,19 @@ export function CartPage({
         pickupLocations={pickupLocations}
         deliveryAvailable={deliveryAvailable}
         pickupAvailable={pickupAvailable}
-        fulfillmentMode={cartFulfillmentMode}
+        fulfillmentMode={null}
         courierDelivery={checkoutCourierDelivery}
         deliveryProductIds={deliveryProductIds}
+        initialFulfillmentMethod={
+          checkoutSellerId
+            ? (fulfillmentBySellerId[checkoutSellerId] ?? "pickup")
+            : null
+        }
+        onFulfillmentMethodChange={
+          checkoutSellerId
+            ? (method) => chooseSellerFulfillment(checkoutSellerId, method)
+            : null
+        }
         cardPrepaidAvailable={cardPrepaidAvailable}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}

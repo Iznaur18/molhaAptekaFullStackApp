@@ -46,7 +46,6 @@ export function CartFulfillmentSection({
   summary,
   canCheckout,
   onCheckout,
-  fulfillmentPicker = null,
   deliveryFee = null,
   showDeliveryFeeNote = false,
 }) {
@@ -63,35 +62,9 @@ export function CartFulfillmentSection({
     <section className="cart-fulfillment">
       <header className="cart-fulfillment__header">
         <h2 className="cart-fulfillment__title">{title}</h2>
-        {fulfillmentPicker ? (
-          <div
-            className="cart-fulfillment__method"
-            role="group"
-            aria-label={CART_PAGE_UI.SECTION_METHOD_LABEL}
-          >
-            <button
-              type="button"
-              className="cart-fulfillment__method-option"
-              aria-pressed={fulfillmentPicker.value === "pickup"}
-              disabled={!fulfillmentPicker.pickupAvailable}
-              onClick={() => fulfillmentPicker.onChange("pickup")}
-            >
-              {CART_PAGE_UI.SECTION_PICKUP}
-            </button>
-            <button
-              type="button"
-              className="cart-fulfillment__method-option"
-              aria-pressed={fulfillmentPicker.value === "delivery"}
-              disabled={!fulfillmentPicker.deliveryAvailable}
-              onClick={() => fulfillmentPicker.onChange("delivery")}
-            >
-              {CART_PAGE_UI.SECTION_DELIVERY}
-            </button>
-          </div>
-        ) : null}
       </header>
 
-        {fulfillmentPicker?.value === "delivery" && deliveryFee ? (
+        {deliveryFee ? (
           <div className="cart-fulfillment__fee">
             <span className="cart-fulfillment__fee-label">
               {CART_DELIVERY_FEE_UI.LABEL}
@@ -220,8 +193,7 @@ export function CartFulfillmentSection({
           </div>
         </div>
 
-        {/* Оформление переехало на страницу целиком: заказ теперь один на всю
-            корзину, а секция показывает только итог своего отправления. */}
+        {/* Оформление по продавцу: отдельный заказ и оплата на каждую секцию. */}
         {onCheckout ? (
           <>
             {!canCheckout && summary.checkoutBlockReason ? (
@@ -236,7 +208,7 @@ export function CartFulfillmentSection({
               disabled={!canCheckout}
               onClick={onCheckout}
             >
-              {CART_PAGE_UI.CHECKOUT_OPEN}
+              {CART_PAGE_UI.CHECKOUT_SELLER}
             </button>
 
             <p className="cart-page__checkout-legal">
