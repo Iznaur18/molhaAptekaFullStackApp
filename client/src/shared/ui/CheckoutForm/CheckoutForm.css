@@ -147,11 +147,15 @@
 .checkout-form__fulfillment-option--active {
   border-color: var(--iz-color-action);
   background: var(--iz-color-action);
-  color: var(--iz-color-on-contrast);
+  color: var(--iz-color-on-contrast, #fff);
+}
+
+.checkout-form__fulfillment-option--active .checkout-form__fulfillment-option-title {
+  color: inherit;
 }
 
 .checkout-form__fulfillment-option--active .checkout-form__soon {
-  color: color-mix(in srgb, var(--iz-color-on-contrast) 85%, transparent);
+  color: color-mix(in srgb, var(--iz-color-on-contrast, #fff) 85%, transparent);
 }
 
 .checkout-form__fulfillment-option--disabled {

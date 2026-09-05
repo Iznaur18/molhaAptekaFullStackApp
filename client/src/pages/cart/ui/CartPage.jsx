@@ -33,6 +33,7 @@ import { invalidatePriceOfferQueries } from "../../../entities/product-price-off
 import { useMyAcceptedBidsQuery } from "../../../entities/product-price-offer/model/useMyAcceptedBidsQuery.js";
 import { useAuthSession } from "../../../entities/user/model/useAuthSession.js";
 import { userSavedAddressesFromUser } from "../../../entities/address/lib/userSavedAddressesFromUser.js";
+import { CheckoutForm } from "../../../shared/ui/CheckoutForm/CheckoutForm.jsx";
 import { CheckoutSheetModal } from "../../../features/checkout/ui/CheckoutSheetModal.jsx";
 import {
   CART_AUCTION_UI,
@@ -47,6 +48,8 @@ import { CartFulfillmentSection } from "./CartFulfillmentSection.jsx";
 import { CartSellerList } from "./CartSellerList.jsx";
 
 import "./CartPage.css";
+
+const SELLER_CHECKOUT_FORM_ID = "cart-seller-checkout-form";
 
 /**
  * @param {{
@@ -110,15 +113,10 @@ export function CartPage({
     return userSavedAddressesFromUser(user);
   }, [isAuthorized, user]);
 
-  /** Оформление по одному продавцу; null — sheet закрыт (или аукцион). */
-  const [checkoutSellerId, setCheckoutSellerId] = useState(
-    /** @type {string | null} */ (null),
-  );
   /** Внутренняя корзина продавца; null — общий список продавцов. */
   const [activeSellerCartId, setActiveSellerCartId] = useState(
     /** @type {string | null} */ (null),
   );
-  const [isCartCheckoutOpen, setIsCartCheckoutOpen] = useState(false);
   /** Сумма курьеру по продавцам; минимум задаёт контракт. */
   const [deliveryFeeBySeller, setDeliveryFeeBySeller] = useState(
     /** @type {Record<string, number>} */ ({}),
@@ -137,6 +135,9 @@ export function CartPage({
     error: "",
     success: "",
   });
+
+  /** Оформление обычной корзины — на странице продавца; sheet только у аукциона. */
+  const checkoutSellerId = auctionCheckoutBid ? null : activeSellerCartId;
 
   const handleProductClick = useCallback(
     (product) => {
@@ -313,11 +314,8 @@ export function CartPage({
     deselectedIds,
   ]);
 
-  const canCheckoutActive =
-    activeSummary.selectedLines.length > 0 &&
-    !activeSummary.checkoutBlockReason;
   const isCartEmpty = lines.length === 0 && auctionBids.length === 0;
-  const isCheckoutSheetOpen = isCartCheckoutOpen || auctionCheckoutBid != null;
+  const isAuctionCheckoutOpen = auctionCheckoutBid != null;
 
   const scopedFulfillmentBySellerId = useMemo(
     () => scopeRecordBySellerId(fulfillmentBySellerId, checkoutSellerId),
@@ -356,6 +354,20 @@ export function CartPage({
       }),
     [checkoutSellerGroups, fulfillmentBySellerId, activeSummary.selectedTotal],
   );
+
+  const [checkoutDeliveryGeo, setCheckoutDeliveryGeo] = useState(
+    /** @type {{ lat: number; lon: number } | null} */ (null),
+  );
+
+  const handleDeliveryGeoChange = useCallback((geo) => {
+    setCheckoutDeliveryGeo(geo);
+  }, []);
+
+  useEffect(() => {
+    if (!sellerDelivery) {
+      setCheckoutDeliveryGeo(null);
+    }
+  }, [sellerDelivery]);
 
   const pickupLocations = useMemo(() => {
     if (auctionCheckoutBid) {
@@ -444,28 +456,21 @@ export function CartPage({
       .filter(Boolean);
   }, [auctionCheckoutBid, activeSummary.selectedLines, fulfillmentBySellerId]);
 
-  const closeCheckoutSheet = () => {
-    setIsCartCheckoutOpen(false);
-    setCheckoutSellerId(null);
+  const closeAuctionCheckout = () => {
     setAuctionCheckoutBid(null);
     setSubmitState({ isSubmitting: false, error: "", success: "" });
   };
 
   /** @param {string} sellerId */
   const openSellerCart = (sellerId) => {
+    setAuctionCheckoutBid(null);
     setActiveSellerCartId(sellerId);
+    setSubmitState({ isSubmitting: false, error: "", success: "" });
   };
 
   const closeSellerCart = () => {
     setActiveSellerCartId(null);
-  };
-
-  /** @param {string} sellerId */
-  const openSellerCheckout = (sellerId) => {
-    setAuctionCheckoutBid(null);
-    setCheckoutSellerId(sellerId);
     setSubmitState({ isSubmitting: false, error: "", success: "" });
-    setIsCartCheckoutOpen(true);
   };
 
   /** @param {string} sellerId @param {number} feeRub */
@@ -481,8 +486,7 @@ export function CartPage({
 
   const handleOpenAuctionCheckout = (bid) => {
     setSubmitState({ isSubmitting: false, error: "", success: "" });
-    setIsCartCheckoutOpen(false);
-    setCheckoutSellerId(null);
+    setActiveSellerCartId(null);
     setAuctionCheckoutBid(bid);
   };
 
@@ -543,8 +547,7 @@ export function CartPage({
         pickupSelections,
       });
       removeItems(orderedProductIds);
-      setIsCartCheckoutOpen(false);
-      setCheckoutSellerId(null);
+      setActiveSellerCartId(null);
 
       // Предоплату здесь не начинаем: сначала продавец подтверждает, что товар
       // есть, и только потом покупатель платит. Иначе на каждый «нет в
@@ -665,8 +668,44 @@ export function CartPage({
               onProductClick={handleProductClick}
               summary={activeSellerCart.summary}
               canCheckout={activeSellerCart.canCheckout}
-              onCheckout={() =>
-                openSellerCheckout(activeSellerCart.group.sellerId)
+              checkoutFormId={SELLER_CHECKOUT_FORM_ID}
+              isCheckoutSubmitting={submitState.isSubmitting}
+              sellerDelivery={sellerDelivery}
+              deliveryGeo={checkoutDeliveryGeo}
+              checkoutBeforeDock={
+                <div className="cart-fulfillment__checkout">
+                  <CheckoutForm
+                    id={SELLER_CHECKOUT_FORM_ID}
+                    defaultDeliveryAddress={defaultAddress}
+                    savedDeliveryAddresses={savedDeliveryAddresses}
+                    pickupLocations={pickupLocations}
+                    deliveryAvailable={deliveryAvailable}
+                    pickupAvailable={pickupAvailable}
+                    fulfillmentMode={null}
+                    courierDelivery={checkoutCourierDelivery}
+                    deliveryProductIds={deliveryProductIds}
+                    initialFulfillmentMethod={
+                      fulfillmentBySellerId[activeSellerCart.group.sellerId] ??
+                      "pickup"
+                    }
+                    onFulfillmentMethodChange={(method) =>
+                      chooseSellerFulfillment(
+                        activeSellerCart.group.sellerId,
+                        method,
+                      )
+                    }
+                    cardPrepaidAvailable={cardPrepaidAvailable}
+                    allowedPaymentMethods={allowedPaymentMethods}
+                    onDeliveryGeoChange={handleDeliveryGeoChange}
+                    isSubmitting={submitState.isSubmitting}
+                    submitError={submitState.error}
+                    submitSuccess={submitState.success}
+                    isDisabled={!activeSellerCart.canCheckout}
+                    showHeading={false}
+                    showSubmitButton={false}
+                    onSubmit={handleCheckoutSubmit}
+                  />
+                </div>
               }
               deliveryFee={
                 activeSellerCart.group.courierDelivery &&
@@ -707,8 +746,8 @@ export function CartPage({
       </div>
 
       <CheckoutSheetModal
-        isOpen={isCheckoutSheetOpen}
-        onClose={closeCheckoutSheet}
+        isOpen={isAuctionCheckoutOpen}
+        onClose={closeAuctionCheckout}
         defaultDeliveryAddress={defaultAddress}
         savedDeliveryAddresses={savedDeliveryAddresses}
         pickupLocations={pickupLocations}
@@ -717,23 +756,14 @@ export function CartPage({
         fulfillmentMode={null}
         courierDelivery={checkoutCourierDelivery}
         deliveryProductIds={deliveryProductIds}
-        initialFulfillmentMethod={
-          checkoutSellerId
-            ? (fulfillmentBySellerId[checkoutSellerId] ?? "pickup")
-            : null
-        }
-        onFulfillmentMethodChange={
-          checkoutSellerId
-            ? (method) => chooseSellerFulfillment(checkoutSellerId, method)
-            : null
-        }
+        initialFulfillmentMethod={null}
+        onFulfillmentMethodChange={null}
         cardPrepaidAvailable={cardPrepaidAvailable}
         allowedPaymentMethods={allowedPaymentMethods}
-        sellerDelivery={sellerDelivery}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}
         submitSuccess={submitState.success}
-        isDisabled={auctionCheckoutBid == null && !canCheckoutActive}
+        isDisabled={false}
         onSubmit={handleCheckoutSubmit}
       />
     </div>

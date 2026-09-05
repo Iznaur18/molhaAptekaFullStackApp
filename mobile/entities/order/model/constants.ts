@@ -19,7 +19,7 @@ export const ORDER_PAYMENT_METHOD_DEFAULT: OrderPaymentMethod =
   ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY;
 
 export const ORDER_PAYMENT_METHOD_LABEL_RU: Record<OrderPaymentMethod, string> = {
-  [ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY]: "Наличными при получении",
+  [ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY]: "Наличными",
   [ORDER_PAYMENT_METHOD_CARD_PREPAID]: "Картой заранее",
 };
 

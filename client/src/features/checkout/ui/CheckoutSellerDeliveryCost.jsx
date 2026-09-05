@@ -1,19 +1,18 @@
 import { formatPriceRub } from "@izibuy/shared-lib";
 import {
-  calculateSellerDeliveryFee,
   normalizeSellerDeliveryTariff,
   sellerDeliveryDistanceKm,
 } from "@molha/api-contract";
 
+import { quoteCartSellerDelivery } from "../../../entities/cart/lib/quoteCartSellerDelivery.js";
 import { CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
 
 import "./CheckoutSellerDeliveryCost.css";
 
 /**
- * Стоимость доставки по тарифу продавца — на оформлении, до нажатия кнопки.
+ * Стоимость доставки по тарифу продавца — в dock корзины / оформлении.
  *
- * Считает та же функция контракта, что и сервер при создании заказа: разойдись
- * они — и это спор о деньгах, а не расхождение в вёрстке.
+ * Считает та же функция контракта, что и сервер при создании заказа.
  *
  * @param {{
  *   tariff: unknown;
@@ -28,19 +27,20 @@ export function CheckoutSellerDeliveryCost({
   deliveryGeo = null,
   goodsTotalRub = 0,
 }) {
+  const quote = quoteCartSellerDelivery({
+    tariff,
+    origin,
+    deliveryGeo,
+    goodsTotalRub,
+  });
   const normalized = normalizeSellerDeliveryTariff(tariff);
-  if (!normalized.paid) {
+  const distanceKm = sellerDeliveryDistanceKm(origin, deliveryGeo);
+
+  if (!quote) {
     return null;
   }
 
-  const distanceKm = sellerDeliveryDistanceKm(origin, deliveryGeo);
-  const { feeRub, isFree, isEstimate } = calculateSellerDeliveryFee({
-    tariff: normalized,
-    goodsTotalRub,
-    distanceKm,
-  });
-
-  const goods = Number(goodsTotalRub) || 0;
+  const { feeRub, isFree, isEstimate, goodsTotalRub: goods, payableRub } = quote;
 
   return (
     <div className="checkout-seller-delivery">
@@ -88,15 +88,15 @@ export function CheckoutSellerDeliveryCost({
           <div className="checkout-seller-delivery__total-row">
             <dt>{CHECKOUT_FORM_UI.TOTAL_DELIVERY}</dt>
             <dd>
-              {isFree ? CHECKOUT_FORM_UI.SELLER_DELIVERY_FREE : formatPriceRub(feeRub)}
+              {isFree
+                ? CHECKOUT_FORM_UI.SELLER_DELIVERY_FREE
+                : formatPriceRub(feeRub)}
             </dd>
           </div>
           <div className="checkout-seller-delivery__total-row checkout-seller-delivery__total-row--sum">
             <dt>{CHECKOUT_FORM_UI.TOTAL_TO_PAY}</dt>
             <dd>
-              {formatPriceRub(goods + feeRub)}
-              {/* «от» повторяем и в итоге: без адреса километраж ещё не в сумме,
-                  и молчаливое «Итого» выглядело бы окончательным. */}
+              {formatPriceRub(payableRub)}
               {isEstimate ? " …" : ""}
             </dd>
           </div>

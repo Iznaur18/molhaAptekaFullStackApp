@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import {
   listCheckoutShippingProviderOptions,
   listCheckoutShippingServiceOptions,
@@ -18,6 +19,8 @@ const SERVICE_LABEL = {
   [SHIPPING_SERVICE_PICKUP_POINT]: CHECKOUT_FORM_UI.SHIPPING_SERVICE_PICKUP_POINT,
 };
 
+const COURIER_OPTION_ID = "gitorg-courier";
+
 /**
  * Службы доставки в чекауте.
  * Live сейчас только «Продавцом»; перевозчики и типы выдачи — после подключения ключей.
@@ -29,6 +32,8 @@ export function CheckoutShippingProviderPicker({
   courierDelivery = null,
 }) {
   const { user } = useAuthSession();
+  const scrollRef = useRef(/** @type {HTMLDivElement | null} */ (null));
+  const selectedRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
   // Локальные службы вроде ЛОБО показываем только там, где они возят.
   const regionCode = resolveClientViewerRegionCode(user?.userRegionCode);
   const providerOptions = listCheckoutShippingProviderOptions({ regionCode });
@@ -36,70 +41,101 @@ export function CheckoutShippingProviderPicker({
   const showCarrierServices =
     hasCheckoutLiveCarrierProviders(regionCode) && serviceOptions.length > 0;
 
+  const isCourierSelected =
+    courierDelivery === "courier" || courierDelivery === "mixed";
+  const isSellerSelected =
+    courierDelivery === "seller" || courierDelivery === "mixed";
+
+  const cards = [
+    {
+      id: COURIER_OPTION_ID,
+      label: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_COURIER,
+      selected: isCourierSelected,
+      locked: false,
+    },
+    ...providerOptions.map((option) => {
+      const isSeller = option.id === CHECKOUT_SHIPPING_PROVIDER_SELLER;
+      const selected = isSeller ? isSellerSelected : false;
+      const label = resolveCheckoutShippingProviderLabel(option.id, {
+        sellerLabel: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SELLER,
+      });
+      return {
+        id: option.id,
+        label,
+        selected,
+        locked: !option.live,
+        soon: !option.live,
+      };
+    }),
+  ].sort((a, b) => Number(b.selected) - Number(a.selected));
+
+  useEffect(() => {
+    const node = selectedRef.current;
+    if (!node || typeof node.scrollIntoView !== "function") {
+      return;
+    }
+    try {
+      node.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest",
+      });
+    } catch {
+      node.scrollIntoView();
+    }
+  }, [courierDelivery]);
+
+  const selectedLabel =
+    cards.find((card) => card.selected)?.label ??
+    CHECKOUT_FORM_UI.SHIPPING_PROVIDER_CHOSEN_BY_SELLER;
+
   return (
     <div className="checkout-shipping-provider-picker">
       <div className="checkout-shipping-provider-picker__legend">
         {CHECKOUT_FORM_UI.LABEL_SHIPPING_PROVIDER}
       </div>
+      {courierDelivery ? (
+        <p className="checkout-shipping-provider-picker__current" role="status">
+          {selectedLabel}
+        </p>
+      ) : null}
       <div
+        ref={scrollRef}
         className="checkout-shipping-provider-picker__scroll"
         role="radiogroup"
         aria-label={CHECKOUT_FORM_UI.LABEL_SHIPPING_PROVIDER}
       >
-        {/* Курьеры Gitorg — такая же служба, как продавец: обе рабочие, и
-            выбор между ними сделан на товаре. */}
-        <button
-          type="button"
-          className={[
-            "checkout-shipping-provider-picker__card",
-            courierDelivery === "courier" || courierDelivery === "mixed"
-              ? "checkout-shipping-provider-picker__card--selected"
-              : "checkout-shipping-provider-picker__card--idle",
-          ].join(" ")}
-          role="radio"
-          aria-checked={courierDelivery === "courier" || courierDelivery === "mixed"}
-          aria-disabled
-          disabled
-        >
-          <span className="checkout-shipping-provider-picker__label">
-            {CHECKOUT_FORM_UI.SHIPPING_PROVIDER_COURIER}
-          </span>
-        </button>
-
-        {providerOptions.map((option) => {
-          const isSeller = option.id === CHECKOUT_SHIPPING_PROVIDER_SELLER;
-          const isSelected = isSeller
-            ? courierDelivery === "seller" || courierDelivery === "mixed"
-            : false;
-          const label = resolveCheckoutShippingProviderLabel(option.id, {
-            sellerLabel: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SELLER,
-          });
+        {cards.map((card) => {
           const className = [
             "checkout-shipping-provider-picker__card",
-            isSelected ? "checkout-shipping-provider-picker__card--selected" : "",
-            !isSelected ? "checkout-shipping-provider-picker__card--idle" : "",
-            option.live ? "" : "checkout-shipping-provider-picker__card--locked",
+            card.selected
+              ? "checkout-shipping-provider-picker__card--selected"
+              : "checkout-shipping-provider-picker__card--idle",
+            card.locked
+              ? "checkout-shipping-provider-picker__card--locked"
+              : "",
           ]
             .filter(Boolean)
             .join(" ");
 
           return (
             <button
-              key={option.id}
+              key={card.id}
+              ref={card.selected ? selectedRef : undefined}
               type="button"
               className={className}
               role="radio"
-              aria-checked={isSelected}
+              aria-checked={card.selected}
               aria-disabled
               disabled
             >
               <span className="checkout-shipping-provider-picker__label">
-                {label}
-                {option.live ? null : (
+                {card.label}
+                {card.soon ? (
                   <span className="checkout-shipping-provider-picker__soon">
                     {CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SOON}
                   </span>
-                )}
+                ) : null}
               </span>
             </button>
           );

@@ -15,18 +15,34 @@
 
 .checkout-payment-method-picker__scroll {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.checkout-payment-method-picker__scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .checkout-payment-method-picker__card {
   box-sizing: border-box;
-  flex: 1 1 0;
-  min-width: 7.5rem;
-  min-height: 5.25rem;
-  padding: 0.75rem;
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 8.5rem;
+  max-width: 11.5rem;
+  min-height: 3.25rem;
+  padding: 0.5rem 0.75rem;
   border: 1px solid transparent;
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -35,6 +51,7 @@
   color: var(--iz-color-text);
   font: inherit;
   text-align: center;
+  scroll-snap-align: start;
 }
 
 .checkout-payment-method-picker__card--cardPrepaid:not(
@@ -86,14 +103,27 @@
 }
 
 .checkout-payment-method-picker__soon {
-  font-weight: var(--iz-weight-semibold);
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.6875rem;
+  font-weight: var(--iz-weight-medium);
+  line-height: 1.2;
   color: inherit;
   opacity: 0.85;
 }
 
-/* cardLabel: 13/17, 600, по центру */
+/* cardLabel: компактнее для горизонтального ряда */
 .checkout-payment-method-picker__label {
-  font-size: var(--iz-font-sm);
-  line-height: var(--iz-leading-xs);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  font-size: 0.8125rem;
+  line-height: 1.25;
   font-weight: var(--iz-weight-semibold);
+}
+
+.checkout-payment-method-picker__title {
+  display: block;
 }

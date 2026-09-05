@@ -12,7 +12,6 @@ import { CheckoutSavedAddressPicker } from "../../../features/checkout/ui/Checko
 import { CheckoutPaymentMethodPicker } from "../../../features/checkout/ui/CheckoutPaymentMethodPicker.jsx";
 import { CheckoutShippingProviderPicker } from "../../../features/checkout/ui/CheckoutShippingProviderPicker.jsx";
 import { CheckoutShippingEstimate } from "../../../features/checkout/ui/CheckoutShippingEstimate.jsx";
-import { CheckoutSellerDeliveryCost } from "../../../features/checkout/ui/CheckoutSellerDeliveryCost.jsx";
 import { addressValueFromUser } from "../../../entities/address/lib/addressValueFromUser.js";
 import {
   CHECKOUT_SAVED_ADDRESS_CUSTOM_ID,
@@ -85,14 +84,12 @@ const EMPTY_SAVED_DELIVERY_ADDRESSES = [];
  *   isDisabled?: boolean;
  *   cardPrepaidAvailable?: boolean;
  *   allowedPaymentMethods?: string[] | null;
- *   sellerDelivery?: {
- *     tariff: unknown;
- *     origin?: { lat: number; lon: number } | null;
- *     goodsTotalRub?: number;
- *   } | null;
+ *   onDeliveryGeoChange?: (geo: { lat: number; lon: number } | null) => void;
  *   dockSubmit?: boolean;
  *   pinSubmitToBottom?: boolean;
  *   showHeading?: boolean;
+ *   showSubmitButton?: boolean;
+ *   id?: string;
  * }} props
  */
 export function CheckoutForm({
@@ -113,12 +110,15 @@ export function CheckoutForm({
   isDisabled = false,
   cardPrepaidAvailable = false,
   allowedPaymentMethods = null,
-  sellerDelivery = null,
+  onDeliveryGeoChange = null,
   dockSubmit = false,
   pinSubmitToBottom = false,
   showHeading = true,
+  showSubmitButton = true,
+  id: formIdProp,
 }) {
-  const formId = useId();
+  const generatedFormId = useId();
+  const formId = formIdProp || generatedFormId;
   const [fulfillmentMethod, setFulfillmentMethod] = useState(() =>
     initialFulfillmentMethod === ORDER_FULFILLMENT_DELIVERY
       ? ORDER_FULFILLMENT_DELIVERY
@@ -185,6 +185,14 @@ export function CheckoutForm({
     }
     setDeliveryAddress(addressValueFromUser(defaultDeliveryAddress));
   }, [defaultDeliveryAddress, savedAddresses]);
+
+  useEffect(() => {
+    onDeliveryGeoChange?.(deliveryAddress.geo ?? null);
+  }, [
+    onDeliveryGeoChange,
+    deliveryAddress.geo?.lat,
+    deliveryAddress.geo?.lon,
+  ]);
 
   const handleSavedAddressSelect = (nextId) => {
     setSelectedSavedAddressId(nextId);
@@ -682,15 +690,6 @@ export function CheckoutForm({
                   productIds={deliveryProductIds}
                   deliveryGeo={deliveryAddress.geo ?? null}
                 />
-
-                {sellerDelivery ? (
-                  <CheckoutSellerDeliveryCost
-                    tariff={sellerDelivery.tariff}
-                    origin={sellerDelivery.origin ?? null}
-                    deliveryGeo={deliveryAddress.geo ?? null}
-                    goodsTotalRub={sellerDelivery.goodsTotalRub ?? 0}
-                  />
-                ) : null}
               </div>
             </section>
           ) : null}
@@ -721,7 +720,9 @@ export function CheckoutForm({
           ) : null}
         </div>
 
-        {!dockSubmit || pinSubmitToBottom ? renderSubmitButton(false) : null}
+        {showSubmitButton && (!dockSubmit || pinSubmitToBottom)
+          ? renderSubmitButton(false)
+          : null}
       </form>
       {dockedSubmit}
     </>

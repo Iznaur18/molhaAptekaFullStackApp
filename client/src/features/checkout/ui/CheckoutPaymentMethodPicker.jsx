@@ -17,7 +17,7 @@ const SELECTABLE_SET = new Set(ORDER_PAYMENT_METHODS_SELECTABLE);
  *   disabled?: boolean;
  *   legend: string;
  *   cardPrepaidAvailable?: boolean;
- *   allowedMethods?: string[];
+ *   allowedMethods?: string[] | null;
  * }} props
  */
 export function CheckoutPaymentMethodPicker({
@@ -38,11 +38,23 @@ export function CheckoutPaymentMethodPicker({
         [...platformSelectable].filter((method) => allowedMethods.includes(method)),
       )
     : platformSelectable;
+
+  // Все способы на виду; активный — первым в горизонтальном ряду.
+  const orderedMethods = [...ORDER_PAYMENT_METHODS].sort((a, b) => {
+    if (a === value) return -1;
+    if (b === value) return 1;
+    return 0;
+  });
+
   return (
     <div className="checkout-payment-method-picker">
       <div className="checkout-payment-method-picker__legend">{legend}</div>
-      <div className="checkout-payment-method-picker__scroll" role="radiogroup" aria-label={legend}>
-        {ORDER_PAYMENT_METHODS.map((method) => {
+      <div
+        className="checkout-payment-method-picker__scroll"
+        role="radiogroup"
+        aria-label={legend}
+      >
+        {orderedMethods.map((method) => {
           const isSelectable = selectableSet.has(method);
           const isSelected = value === method;
           const isLocked = !isSelectable;
@@ -79,11 +91,12 @@ export function CheckoutPaymentMethodPicker({
               }}
             >
               <span className="checkout-payment-method-picker__label">
-                {ORDER_PAYMENT_METHOD_LABEL_RU[method]}
+                <span className="checkout-payment-method-picker__title">
+                  {ORDER_PAYMENT_METHOD_LABEL_RU[method]}
+                </span>
                 {isLocked ? (
                   <span className="checkout-payment-method-picker__soon">
-                    {" "}
-                    ({lockReason})
+                    {lockReason}
                   </span>
                 ) : null}
               </span>

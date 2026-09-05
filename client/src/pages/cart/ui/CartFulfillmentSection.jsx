@@ -1,7 +1,12 @@
 import { Link } from "react-router-dom";
 
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
-import { CART_DELIVERY_FEE_UI, CART_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  CART_DELIVERY_FEE_UI,
+  CART_PAGE_UI,
+  CHECKOUT_FORM_UI,
+} from "../../../shared/config/appUiCopy.js";
+import { CheckoutSellerDeliveryCost } from "../../../features/checkout/ui/CheckoutSellerDeliveryCost.jsx";
 
 import { CartLineItem } from "./CartLineItem.jsx";
 import { CartSelectAllRow } from "./CartSelectAllRow.jsx";
@@ -30,8 +35,22 @@ import "./CartFulfillmentSection.css";
  *     selectedLines: unknown[];
  *   };
  *   canCheckout: boolean;
- *   onCheckout: () => void;
+ *   onCheckout?: (() => void) | null;
+ *   checkoutFormId?: string | null;
+ *   checkoutBeforeDock?: import('react').ReactNode;
+ *   isCheckoutSubmitting?: boolean;
+ *   checkoutCtaLabel?: string | null;
  *   showDeliveryFeeNote?: boolean;
+ *   sellerDelivery?: {
+ *     tariff: unknown;
+ *     origin?: { lat: number; lon: number } | null;
+ *     goodsTotalRub?: number;
+ *   } | null;
+ *   deliveryGeo?: { lat: number; lon: number } | null;
+ *   deliveryFee?: {
+ *     value: number;
+ *     onChange: (next: number) => void;
+ *   } | null;
  * }} props
  */
 export function CartFulfillmentSection({
@@ -45,9 +64,15 @@ export function CartFulfillmentSection({
   onProductClick,
   summary,
   canCheckout,
-  onCheckout,
+  onCheckout = null,
+  checkoutFormId = null,
+  checkoutBeforeDock = null,
+  isCheckoutSubmitting = false,
+  checkoutCtaLabel = null,
   deliveryFee = null,
   showDeliveryFeeNote = false,
+  sellerDelivery = null,
+  deliveryGeo = null,
 }) {
   if (lines.length === 0) {
     return null;
@@ -57,6 +82,14 @@ export function CartFulfillmentSection({
     (sum, line) => sum + (Number(line?.quantity) || 0),
     0,
   );
+  const showCheckoutActions = Boolean(onCheckout || checkoutFormId);
+  const ctaLabel =
+    checkoutCtaLabel ||
+    (isCheckoutSubmitting
+      ? CHECKOUT_FORM_UI.SUBMIT_LOADING
+      : CART_PAGE_UI.CHECKOUT_SELLER);
+  const ctaDisabled = !canCheckout || isCheckoutSubmitting;
+  const showSellerDeliveryCost = Boolean(sellerDelivery);
 
   return (
     <section className="cart-fulfillment">
@@ -64,42 +97,42 @@ export function CartFulfillmentSection({
         <h2 className="cart-fulfillment__title">{title}</h2>
       </header>
 
-        {deliveryFee ? (
-          <div className="cart-fulfillment__fee">
-            <div className="cart-fulfillment__fee-row">
-              <div className="cart-fulfillment__fee-copy">
-                <span className="cart-fulfillment__fee-label">
-                  {CART_DELIVERY_FEE_UI.LABEL}
-                </span>
-                <span className="cart-fulfillment__fee-hint">
-                  {CART_DELIVERY_FEE_UI.HINT}
-                </span>
-              </div>
-              <div className="cart-fulfillment__fee-controls">
-                <button
-                  type="button"
-                  className="cart-fulfillment__fee-btn"
-                  aria-label={CART_DELIVERY_FEE_UI.DECREASE}
-                  onClick={() => deliveryFee.onChange(deliveryFee.value - 25)}
-                  disabled={deliveryFee.value <= CART_DELIVERY_FEE_UI.MIN_RUB}
-                >
-                  −
-                </button>
-                <span className="cart-fulfillment__fee-value">
-                  {formatPriceRub(deliveryFee.value)}
-                </span>
-                <button
-                  type="button"
-                  className="cart-fulfillment__fee-btn"
-                  aria-label={CART_DELIVERY_FEE_UI.INCREASE}
-                  onClick={() => deliveryFee.onChange(deliveryFee.value + 25)}
-                >
-                  +
-                </button>
-              </div>
+      {deliveryFee ? (
+        <div className="cart-fulfillment__fee">
+          <div className="cart-fulfillment__fee-row">
+            <div className="cart-fulfillment__fee-copy">
+              <span className="cart-fulfillment__fee-label">
+                {CART_DELIVERY_FEE_UI.LABEL}
+              </span>
+              <span className="cart-fulfillment__fee-hint">
+                {CART_DELIVERY_FEE_UI.HINT}
+              </span>
+            </div>
+            <div className="cart-fulfillment__fee-controls">
+              <button
+                type="button"
+                className="cart-fulfillment__fee-btn"
+                aria-label={CART_DELIVERY_FEE_UI.DECREASE}
+                onClick={() => deliveryFee.onChange(deliveryFee.value - 25)}
+                disabled={deliveryFee.value <= CART_DELIVERY_FEE_UI.MIN_RUB}
+              >
+                −
+              </button>
+              <span className="cart-fulfillment__fee-value">
+                {formatPriceRub(deliveryFee.value)}
+              </span>
+              <button
+                type="button"
+                className="cart-fulfillment__fee-btn"
+                aria-label={CART_DELIVERY_FEE_UI.INCREASE}
+                onClick={() => deliveryFee.onChange(deliveryFee.value + 25)}
+              >
+                +
+              </button>
             </div>
           </div>
-        ) : null}
+        </div>
+      ) : null}
 
       <CartSelectAllRow
         selectedCount={selectedCount}
@@ -120,6 +153,8 @@ export function CartFulfillmentSection({
           </li>
         ))}
       </ul>
+
+      {checkoutBeforeDock}
 
       <div className="cart-fulfillment__dock">
         <div className="cart-fulfillment__dock-top">
@@ -188,19 +223,30 @@ export function CartFulfillmentSection({
                 </span>
               </div>
             ) : null}
-            <div className="cart-page__dock-total-row">
-              <span className="cart-page__payable-label">
-                {CART_PAGE_UI.PAYABLE_LABEL}
-              </span>
-              <span className="cart-page__total-value">
-                {formatPriceRub(summary.selectedTotal)}
-              </span>
-            </div>
+
+            {showSellerDeliveryCost ? (
+              <CheckoutSellerDeliveryCost
+                tariff={sellerDelivery.tariff}
+                origin={sellerDelivery.origin ?? null}
+                deliveryGeo={deliveryGeo}
+                goodsTotalRub={
+                  sellerDelivery.goodsTotalRub ?? summary.selectedTotal
+                }
+              />
+            ) : (
+              <div className="cart-page__dock-total-row">
+                <span className="cart-page__payable-label">
+                  {CART_PAGE_UI.PAYABLE_LABEL}
+                </span>
+                <span className="cart-page__total-value">
+                  {formatPriceRub(summary.selectedTotal)}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Оформление по продавцу: отдельный заказ и оплата на каждую секцию. */}
-        {onCheckout ? (
+        {showCheckoutActions ? (
           <>
             {!canCheckout && summary.checkoutBlockReason ? (
               <p className="cart-page__checkout-hint">
@@ -208,14 +254,25 @@ export function CartFulfillmentSection({
               </p>
             ) : null}
 
-            <button
-              type="button"
-              className="cart-page__checkout-cta"
-              disabled={!canCheckout}
-              onClick={onCheckout}
-            >
-              {CART_PAGE_UI.CHECKOUT_SELLER}
-            </button>
+            {checkoutFormId ? (
+              <button
+                type="submit"
+                className="cart-page__checkout-cta"
+                form={checkoutFormId}
+                disabled={ctaDisabled}
+              >
+                {ctaLabel}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="cart-page__checkout-cta"
+                disabled={ctaDisabled}
+                onClick={onCheckout ?? undefined}
+              >
+                {ctaLabel}
+              </button>
+            )}
 
             <p className="cart-page__checkout-legal">
               {CART_PAGE_UI.CHECKOUT_LEGAL_HINT_PREFIX}
