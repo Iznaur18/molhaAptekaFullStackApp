@@ -24,7 +24,10 @@ export const ORDER_PAYMENT_METHOD_DEFAULT = ORDER_PAYMENT_METHOD_CASH_ON_DELIVER
 
 export const ORDER_PAYMENT_METHOD_LABEL_RU = {
   [ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY]: "Наличными",
-  [ORDER_PAYMENT_METHOD_CARD_PREPAID]: "Картой заранее",
+  // Значение в базе осталось `cardPrepaid` — это «предоплата через
+  // площадку». Способ у провайдера теперь строго СБП, и подпись должна
+  // обещать то, что покупатель реально увидит.
+  [ORDER_PAYMENT_METHOD_CARD_PREPAID]: "СБП",
   [ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY]: "Картой при получении",
 };
 

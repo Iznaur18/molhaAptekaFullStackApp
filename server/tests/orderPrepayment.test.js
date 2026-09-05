@@ -136,6 +136,9 @@ describe("предоплата заказа картой", () => {
     assert.equal(body.receipt.items[0].description, "Тестовый товар");
     assert.equal(body.receipt.items[0].quantity, "2.00");
     assert.equal(body.receipt.items[0].payment_subject, "commodity");
+    // Без явного способа ЮKassa показала бы витрину со всеми подключёнными
+    // способами, и покупатель ушёл бы платить картой.
+    assert.equal(body.payment_method_data.type, "sbp");
   });
 
   it("за чужой товар платёж не создаётся", async () => {

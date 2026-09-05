@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import {
   YOOKASSA_API_BASE_URL_DEFAULT,
+  YOOKASSA_PAYMENT_METHOD_SBP,
   YOOKASSA_HTTP_TIMEOUT_MS,
   YOOKASSA_NOT_CONFIGURED_MESSAGE,
   YOOKASSA_UNAVAILABLE_MESSAGE,
@@ -152,6 +153,9 @@ export async function createYookassaPayment({
     amount: { value: Number(amountRub).toFixed(2), currency: "RUB" },
     // Одностадийный платёж: деньги списываются сразу, без холдирования.
     capture: true,
+    // Только СБП. Без этого поля ЮKassa открыла бы витрину со всеми
+    // подключёнными способами, и платёж ушёл бы картой.
+    payment_method_data: { type: YOOKASSA_PAYMENT_METHOD_SBP },
     confirmation: { type: "redirect", return_url: returnUrl },
     description: String(description).slice(0, 128),
     ...(metadata ? { metadata } : {}),

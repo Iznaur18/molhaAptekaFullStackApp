@@ -103,6 +103,8 @@ describe("пополнение баллов через ЮKassa", () => {
       "origin берётся из FRONTEND_URL, а не из тела запроса",
     );
     assert.equal(body.receipt.items[0].amount.value, "500.00");
+    // Пополнение баллов идёт тем же способом, что и заказы, — только СБП.
+    assert.equal(body.payment_method_data.type, "sbp");
     assert.equal(body.receipt.customer.phone, "79990000000");
   });
 

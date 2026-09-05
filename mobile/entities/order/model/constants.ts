@@ -20,7 +20,8 @@ export const ORDER_PAYMENT_METHOD_DEFAULT: OrderPaymentMethod =
 
 export const ORDER_PAYMENT_METHOD_LABEL_RU: Record<OrderPaymentMethod, string> = {
   [ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY]: "Наличными",
-  [ORDER_PAYMENT_METHOD_CARD_PREPAID]: "Картой заранее",
+  // Значение в базе осталось `cardPrepaid`; способ у провайдера — СБП.
+  [ORDER_PAYMENT_METHOD_CARD_PREPAID]: "СБП",
 };
 
 export const ORDER_STATUS_PENDING = "pending" as const;

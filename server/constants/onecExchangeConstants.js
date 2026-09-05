@@ -158,5 +158,5 @@ export const ONEC_ORDER_STATUS_LABELS = Object.freeze({
 
 export const ONEC_PAYMENT_METHOD_LABELS = Object.freeze({
   cashOnDelivery: "Наличными при получении",
-  cardPrepaid: "Картой онлайн",
+  cardPrepaid: "СБП",
 });
