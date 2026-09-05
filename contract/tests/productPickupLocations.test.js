@@ -21,6 +21,18 @@ test("productPickupLocationsFromProduct falls back to legacy scalars", () => {
   assert.equal(locations[0].address, "Москва, Тверская улица, д 1");
 });
 
+test("пустой/битый productPickupLocations не прячет legacy-адрес", () => {
+  const locations = productPickupLocationsFromProduct({
+    productPickupLocations: [{ id: "bad", address: "  ", lat: 1, lon: 2 }],
+    productPickupAddress: "г Грозный, ул Кишиевой, д 28а",
+    productPickupLat: 43.3,
+    productPickupLon: 45.7,
+  });
+  assert.equal(locations.length, 1);
+  assert.equal(locations[0].address, "г Грозный, ул Кишиевой, д 28а");
+  assert.equal(locations[0].lat, 43.3);
+});
+
 test("syncLegacyPickupFieldsFromLocations uses default", () => {
   const synced = syncLegacyPickupFieldsFromLocations([
     {

@@ -12,14 +12,6 @@
   color: var(--iz-color-text-secondary);
 }
 
-.checkout-shipping-provider-picker__current {
-  margin: 0;
-  font-size: var(--iz-font-base);
-  font-weight: var(--iz-weight-bold);
-  line-height: 1.3;
-  color: var(--iz-color-text);
-}
-
 .checkout-shipping-provider-picker__legend--sub {
   margin-top: var(--iz-space-1);
 }

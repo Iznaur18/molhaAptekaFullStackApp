@@ -376,29 +376,13 @@ export function CartPage({
       );
       return buildCheckoutPickupLocations([{ product }]);
     }
-    // Точка нужна и покупателю, который забирает сам, и курьеру — ему это
-    // адрес, откуда везти. Не нужна она только там, где везёт сам продавец:
-    // он отправляет откуда захочет.
-    const courierSellerIds = new Set(
-      checkoutSellerGroups
-        .filter((group) => group.courierDelivery)
-        .map((group) => String(group.sellerId)),
-    );
-    const pickupLines = activeSummary.selectedLines.filter((line) => {
-      const sellerId = String(
-        line?.product?.productSeller?._id ?? line?.product?.productSeller ?? "",
-      );
-      return (
-        fulfillmentBySellerId[sellerId] !== "delivery" ||
-        courierSellerIds.has(sellerId)
-      );
-    });
-    return buildCheckoutPickupLocations(pickupLines);
+    // Точки самовывоза / отправления всегда с выбранных строк. Раньше при
+    // «доставке продавцом» их выкидывали — и при самовывозе чекаут мог
+    // остаться с пустым списком («адреса нет»), хотя на товаре он есть.
+    return buildCheckoutPickupLocations(activeSummary.selectedLines);
   }, [
     auctionCheckoutBid,
     activeSummary.selectedLines,
-    fulfillmentBySellerId,
-    checkoutSellerGroups,
     productsQuery.data,
   ]);
 

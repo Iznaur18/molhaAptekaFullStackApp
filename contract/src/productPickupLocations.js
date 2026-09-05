@@ -176,12 +176,17 @@ export function productPickupLocationsFromProduct(product) {
     : [];
 
   if (list.length > 0) {
-    return ensureSingleDefaultProductPickupLocation(
+    const fromList = ensureSingleDefaultProductPickupLocation(
       list
         .map((item) => normalizeStoredProductPickupLocation(item))
         .filter((item) => item.address.length >= PRODUCT_PICKUP_ADDRESS_MIN_LENGTH)
         .slice(0, PRODUCT_PICKUP_LOCATIONS_MAX),
     );
+    // Пустой массив точек после фильтра — не глотаем legacy-адрес: иначе
+    // doProductsSupportPickup видит productPickupAddress, а чекаут — «адреса нет».
+    if (fromList.length > 0) {
+      return fromList;
+    }
   }
 
   const address = String(product?.productPickupAddress ?? "").trim();

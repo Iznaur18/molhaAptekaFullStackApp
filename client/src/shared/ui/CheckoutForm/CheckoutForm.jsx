@@ -239,13 +239,13 @@ export function CheckoutForm({
   useEffect(() => {
     if (!deliverySelectable && fulfillmentMethod === ORDER_FULFILLMENT_DELIVERY) {
       if (pickupSelectable) {
-        setFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
+        applyFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
       }
       return;
     }
     if (!pickupSelectable && fulfillmentMethod === ORDER_FULFILLMENT_PICKUP) {
       if (deliverySelectable) {
-        setFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
+        applyFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
       }
     }
   }, [deliverySelectable, pickupSelectable, fulfillmentMethod]);
@@ -501,7 +501,7 @@ export function CheckoutForm({
           </div>
           ) : null}
 
-          {!needsPickup ? (
+          {!needsPickup && pickupSelectable ? (
             <section
               className="checkout-form__fulfillment-section checkout-form__fulfillment-section--pickup checkout-form__fulfillment-section--off checkout-form__block_off"
               aria-disabled="true"
@@ -621,7 +621,7 @@ export function CheckoutForm({
             />
           ) : null}
 
-          {!needsDelivery ? (
+          {!needsDelivery && deliverySelectable ? (
             <section
               className="checkout-form__fulfillment-section checkout-form__fulfillment-section--delivery checkout-form__fulfillment-section--off checkout-form__block_off"
               aria-disabled="true"

@@ -85,20 +85,11 @@ export function CheckoutShippingProviderPicker({
     }
   }, [courierDelivery]);
 
-  const selectedLabel =
-    cards.find((card) => card.selected)?.label ??
-    CHECKOUT_FORM_UI.SHIPPING_PROVIDER_CHOSEN_BY_SELLER;
-
   return (
     <div className="checkout-shipping-provider-picker">
       <div className="checkout-shipping-provider-picker__legend">
         {CHECKOUT_FORM_UI.LABEL_SHIPPING_PROVIDER}
       </div>
-      {courierDelivery ? (
-        <p className="checkout-shipping-provider-picker__current" role="status">
-          {selectedLabel}
-        </p>
-      ) : null}
       <div
         ref={scrollRef}
         className="checkout-shipping-provider-picker__scroll"
