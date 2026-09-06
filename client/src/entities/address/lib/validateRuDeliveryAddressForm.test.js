@@ -49,7 +49,20 @@ describe("validateRuDeliveryAddressForm", () => {
 
   it("rejects line longer than max length", async () => {
     const validate = await loadValidator(false);
-    const longLine = "а".repeat(101);
+    // Длину берём из константы, а не числом: она уже росла со 100 до 200 ради
+    // адресов, которые DaData отдаёт длиннее сотни, и зашитое здесь число молча
+    // превращало тест в проверку валидного адреса.
+    const { ADDRESS_LINE_MAX_LENGTH } = await import("../model/constants.js");
+    const longLine = "а".repeat(ADDRESS_LINE_MAX_LENGTH + 1);
     expect(validate({ line: longLine, selectedFromSuggest: true })).toMatch(/не длиннее/);
+  });
+
+  it("accepts a real address that used to be too long", async () => {
+    const validate = await loadValidator(false);
+    // 102 символа: три таких варианта DaData отдаёт по одному посёлку в ХМАО,
+    // и на прежнем лимите заказать оттуда было нельзя вовсе.
+    const line =
+      "Ханты-Мансийский Автономный округ - Югра, Кондинский р-н, пгт Междуреченский, ул Волгоградская, уч 12а";
+    expect(validate({ line, selectedFromSuggest: true })).toBeNull();
   });
 });
