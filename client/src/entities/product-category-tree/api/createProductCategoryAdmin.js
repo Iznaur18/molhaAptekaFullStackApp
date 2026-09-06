@@ -10,7 +10,12 @@ export async function createProductCategoryAdmin(payload) {
     if (!data?.success || !data.data?.category) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
-    return data.data.category;
+    // Родитель-лист углубляется сервером, и его товары переезжают в новую
+    // категорию — сколько именно, продавцу и админу важно увидеть.
+    return {
+      category: data.data.category,
+      movedProductCount: Number(data.data.movedProductCount) || 0,
+    };
   } catch (e) {
     const message =
       e?.response?.data?.message ?? e?.message ?? "Не удалось создать категорию";

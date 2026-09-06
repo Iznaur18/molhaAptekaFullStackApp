@@ -328,6 +328,11 @@ export const CATEGORY_TREE_ADMIN_PAGE_UI = {
   SEARCH_PLACEHOLDER: "Название, slug, ключевые слова, подпись плитки…",
   /** @param {string} label */
   STOREFRONT_LABEL: (label) => `На витрине плитка называется «${label}»`,
+  /** @param {string} path */
+  PARENT_LEAF_OPTION: (path) => `${path} — сейчас лист, товары переедут в новую`,
+  /** @param {number} count */
+  MOVED_PRODUCTS: (count) =>
+    `Категория создана. Товаров переехало в неё: ${count}`,
   LOADING: "Загрузка…",
   LOAD_ERROR: "Не удалось загрузить категории",
   SAVE_ERROR: "Не удалось сохранить",

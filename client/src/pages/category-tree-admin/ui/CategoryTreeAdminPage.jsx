@@ -34,6 +34,7 @@ export function CategoryTreeAdminPage() {
     newLegacySlug,
     setNewLegacySlug,
     displayError,
+    actionNotice,
     isCreateRoot,
     parentOptions,
     filteredRows,
@@ -160,23 +161,30 @@ export function CategoryTreeAdminPage() {
       return null;
     }
     return (
-      <ul className="admin-panel__list">
-        {filteredRows.map((row) => (
-          <CategoryTreeAdminCard
-            key={row._id}
-            row={row}
-            parentOptions={parentOptions}
-            isEditing={editingId === row._id}
-            isPending={pendingId === row._id}
-            editDraft={editDraft}
-            onDraftChange={patchDraft}
-            onStartEdit={() => startEdit(row)}
-            onCancelEdit={cancelEdit}
-            onSave={() => void handleSaveEdit(row)}
-            onDelete={() => void handleDelete(row)}
-          />
-        ))}
-      </ul>
+      <>
+        {actionNotice ? (
+          <p className="admin-panel__alert admin-panel__alert_info" role="status">
+            {actionNotice}
+          </p>
+        ) : null}
+        <ul className="admin-panel__list">
+          {filteredRows.map((row) => (
+            <CategoryTreeAdminCard
+              key={row._id}
+              row={row}
+              parentOptions={parentOptions}
+              isEditing={editingId === row._id}
+              isPending={pendingId === row._id}
+              editDraft={editDraft}
+              onDraftChange={patchDraft}
+              onStartEdit={() => startEdit(row)}
+              onCancelEdit={cancelEdit}
+              onSave={() => void handleSaveEdit(row)}
+              onDelete={() => void handleDelete(row)}
+            />
+          ))}
+        </ul>
+      </>
     );
   })();
 

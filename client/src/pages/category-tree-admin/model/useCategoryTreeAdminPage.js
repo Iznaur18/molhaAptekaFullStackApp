@@ -51,6 +51,8 @@ export function useCategoryTreeAdminPage() {
   const [newCharacteristicKeysText, setNewCharacteristicKeysText] = useState("");
   const [newLegacySlug, setNewLegacySlug] = useState("");
   const [actionError, setActionError] = useState("");
+  /** Итог удавшегося действия: сколько товаров переехало при углублении дерева. */
+  const [actionNotice, setActionNotice] = useState("");
 
   const updateRows = useCallback(
     (
@@ -82,14 +84,18 @@ export function useCategoryTreeAdminPage() {
     [categoriesQuery],
   );
 
+  // Листья тоже годятся в родители: сервер углубит дерево сам и перенесёт
+  // товары листа в новую подкатегорию. Пока их отсюда выкидывали, категорию с
+  // товарами нельзя было разложить по полкам вообще никак — снять лист мешали
+  // те же товары.
   const parentOptions = useMemo(
     () =>
-      rows
-        .filter((row) => row.isLeaf !== true)
-        .map((row) => ({
-          id: row._id,
-          label: formatCategoryPath(row),
-        })),
+      rows.map((row) => ({
+        id: row._id,
+        label: row.isLeaf
+          ? CATEGORY_TREE_ADMIN_PAGE_UI.PARENT_LEAF_OPTION(formatCategoryPath(row))
+          : formatCategoryPath(row),
+      })),
     [rows],
   );
 
@@ -141,7 +147,8 @@ export function useCategoryTreeAdminPage() {
     try {
       setPendingId("create");
       setActionError("");
-      const created = await createMutation.mutateAsync({
+      setActionNotice("");
+      const { category: created, movedProductCount } = await createMutation.mutateAsync({
         slug,
         labelRu: newLabelRu.trim(),
         parentId: newParentId.trim() || null,
@@ -153,7 +160,14 @@ export function useCategoryTreeAdminPage() {
             : [],
         legacyProductCategory: newParentId.trim() ? newLegacySlug.trim() || null : null,
       });
-      updateRows((prev) => [...prev, created]);
+      if (movedProductCount > 0) {
+        // Родитель перестал быть листом, а товары сменили категорию: локальной
+        // вставкой одной строки это не описать, перечитываем дерево целиком.
+        await categoriesQuery.refetch();
+        setActionNotice(CATEGORY_TREE_ADMIN_PAGE_UI.MOVED_PRODUCTS(movedProductCount));
+      } else {
+        updateRows((prev) => [...prev, created]);
+      }
       resetCreateForm();
       setIsCreateOpen(false);
     } catch (e) {
@@ -264,6 +278,7 @@ export function useCategoryTreeAdminPage() {
     newLegacySlug,
     setNewLegacySlug,
     displayError,
+    actionNotice,
     isCreateRoot,
     parentOptions,
     filteredRows,

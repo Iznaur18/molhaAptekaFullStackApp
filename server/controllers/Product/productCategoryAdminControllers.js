@@ -182,13 +182,35 @@ export async function createProductCategoryAdminController(req, res) {
     return errorRes(res, 409, "Категория с таким slug уже есть");
   }
 
+  // Родитель-лист — не ошибка, а обычное «пора углубить дерево».
+  //
+  // Раньше это был тупик без выхода: подкатегорию под лист добавить нельзя, а
+  // снять с него лист нельзя, пока в нём лежат товары. Категория с товарами
+  // навсегда оставалась без возможности обзавестись подкатегориями — ровно так
+  // «Автомобили» с 23 карточками нельзя было разложить по полкам.
+  //
+  // Товары родителя переезжают в новую подкатегорию: другого разумного места у
+  // них нет, а оставить их на ветке нельзя — товар живёт только на листе.
+  let leafParentProductIds = [];
   if (parentId) {
     const parent = await ProductCategoryModel.findById(parentId).lean();
     if (!parent) {
       return errorRes(res, 400, "Родитель не найден");
     }
     if (parent.isLeaf === true) {
-      return errorRes(res, 400, "Нельзя добавить дочернюю к листу");
+      leafParentProductIds = await ProductModel.find({ productCategoryId: parent._id })
+        .distinct("_id")
+        .lean();
+
+      if (leafParentProductIds.length > 0 && !isLeaf) {
+        return errorRes(
+          res,
+          400,
+          "В «" +
+            parent.labelRu +
+            "» лежат товары: первая подкатегория должна быть листом, чтобы им было куда переехать",
+        );
+      }
     }
   }
 
@@ -217,7 +239,31 @@ export async function createProductCategoryAdminController(req, res) {
     await ensureProductCategoryDisplayForSlug(slug);
   }
 
-  successRes(res, { category: toCategoryAdminPayload(doc.toObject()) }, 201);
+  // Родитель перестаёт быть листом ПОСЛЕ создания ребёнка: упади создание —
+  // и он останется прежним, а не превратится в ветку без веток.
+  let movedProductCount = 0;
+  if (parentId) {
+    const parentUpdate = await ProductCategoryModel.updateOne(
+      { _id: parentId, isLeaf: true },
+      { $set: { isLeaf: false }, $unset: { defaultCharacteristicKeys: "" } },
+    );
+
+    if (parentUpdate.modifiedCount > 0 && leafParentProductIds.length > 0) {
+      const moved = await ProductModel.updateMany(
+        { _id: { $in: leafParentProductIds } },
+        { $set: { productCategoryId: doc._id } },
+      );
+      movedProductCount = moved.modifiedCount;
+      // Хлебные крошки, путь и поисковый блоб пересобираются от нового листа.
+      await syncProductsDenormForCategorySubtree(parentId);
+    }
+  }
+
+  successRes(
+    res,
+    { category: toCategoryAdminPayload(doc.toObject()), movedProductCount },
+    201,
+  );
 }
 
 /** PATCH /product/admin/categories/:categoryId */
