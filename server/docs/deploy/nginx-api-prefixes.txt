@@ -6,6 +6,13 @@
 # вместо JSON. Именно так раздел «Стать курьером» уехал на прод мёртвым.
 #
 # Конфиг на сервере: /etc/nginx/sites-enabled/gitorg
+#
+# Тест сверяет этот список с кодом, но не с сервером — и спокойно проходил,
+# пока на проде не было location /sellers. Живой сервер сверяет deploy-prod.sh
+# на шаге 6, тем же разбором:
+#
+#     ssh root@СЕРВЕР 'cat /etc/nginx/sites-enabled/gitorg' \
+#       | node server/scripts/checkNginxPrefixes.mjs
 
 /address
 /analytics

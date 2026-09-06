@@ -12,7 +12,7 @@
 #   4. на сервере: ff-only merge на нужный SHA + deps (contract, shared-lib,
 #      server) + миграции + права на uploads + рестарт gitorg-api / gitorg-worker
 #   5. заливает готовый client/dist на сервер (старые ассеты сохраняются)
-#   6. проверяет https://gitorg.ru/health
+#   6. проверяет https://gitorg.ru/health и что nginx знает все API-префиксы
 #
 # Катим main. Чтобы выкатить ветку, не переключаясь на неё:
 #     DEPLOY_REF=fix/моя-ветка bash scripts/deploy-prod.sh
@@ -148,5 +148,29 @@ if [ -z "$HEALTH_BODY" ]; then
   exit 1
 fi
 
+
+# Сверка боевого nginx со списком API-префиксов.
+#
+# Конфиг nginx этот скрипт не выкатывает — его правят на сервере руками, и он
+# отстаёт молча. Забытый блок не роняет сайт: GET уходит в раздачу SPA и
+# возвращает HTML с кодом 200, остальные методы — 405. Так «Доставка и оплата»
+# продавца жила сломанной, пока кто-то не полез в devtools.
+#
+# Деплой из-за этого не валим: код уже на месте и работает, а чинить надо
+# конфиг. Но говорим об этом громко и меняем финальную строку.
+NGINX_OK=1
+if ! ssh "$SERVER" 'cat /etc/nginx/sites-enabled/gitorg' \
+  | node server/scripts/checkNginxPrefixes.mjs; then
+  NGINX_OK=0
+fi
+
 echo
-echo "✅ Готово. Открой https://gitorg.ru и обнови Ctrl+F5."
+if [ "$NGINX_OK" = 1 ]; then
+  echo "✅ Готово. Открой https://gitorg.ru и обнови Ctrl+F5."
+else
+  echo "⚠️  Код выкачен и работает, но nginx на сервере отстал (см. выше)."
+  echo "    Пока блока нет, эти ручки отвечают HTML вместо JSON."
+  echo "    Образец: docs/deploy/nginx-izibuy.conf.example"
+  echo "    На сервере: правь /etc/nginx/sites-available/gitorg (sites-enabled —"
+  echo "    симлинк на него), бэкап делай cp -L, потом nginx -t && systemctl reload nginx."
+fi
