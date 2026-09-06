@@ -186,15 +186,6 @@ export function buildProfileNavGroups({
               },
             ]
           : []),
-        ...(canUseCourierOverview
-          ? [
-              {
-                tab: "courier-overview",
-                label: "Свободные заказы",
-                onClick: () => selectTab("courier-overview", onCourierOverviewClick),
-              },
-            ]
-          : []),
         ...(canUseInstallmentSales
           ? [
               {
@@ -284,6 +275,15 @@ export function buildProfileNavGroups({
 
   const servicesItems = orderNavItems(
     [
+      ...(canUseCourierOverview
+        ? [
+            {
+              tab: "courier-overview",
+              label: "Свободные заказы",
+              onClick: () => selectTab("courier-overview", onCourierOverviewClick),
+            },
+          ]
+        : []),
       ...(canUseOneCIntegration
         ? [
             {

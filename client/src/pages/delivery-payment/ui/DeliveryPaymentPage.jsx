@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { CircleAlert, CircleCheck } from "lucide-react";
+import {
+  FREE_SELLER_DELIVERY_TARIFF,
+  PRODUCT_DELIVERY_CARRIER_SELLER,
+  SELLER_PAYOUT_REQUISITES_MAX_LENGTH,
+  normalizeSellerDeliveryTariff,
+} from "@molha/api-contract";
 
 import {
   ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
@@ -9,6 +15,7 @@ import {
 } from "../../../entities/order/model/constants.js";
 import { userSavedAddressesFromUser } from "../../../entities/address/lib/userSavedAddressesFromUser.js";
 import { useAuthSession } from "../../../entities/user/model/useAuthSession.js";
+import { useUserProfileMutations } from "../../../entities/user/model/useUserProfileMutations.js";
 import { ProductPickupLocationFields } from "../../../entities/product/ui/ProductPickupLocationFields.jsx";
 import { SellerDeliveryTariffFields } from "../../../entities/seller-commerce-defaults/ui/SellerDeliveryTariffFields.jsx";
 import {
@@ -16,11 +23,6 @@ import {
   useSaveSellerCommerceDefaultsMutation,
 } from "../../../entities/seller-commerce-defaults/model/sellerCommerceDefaultsQueries.js";
 import { SELLER_COMMERCE_DEFAULTS_UI } from "../../../shared/config/appUiCopy.js";
-import {
-  FREE_SELLER_DELIVERY_TARIFF,
-  PRODUCT_DELIVERY_CARRIER_SELLER,
-  normalizeSellerDeliveryTariff,
-} from "@molha/api-contract";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 
 import "./DeliveryPaymentPage.css";
@@ -64,33 +66,109 @@ function formFromDefaults(defaults) {
 }
 
 /**
+ * @param {{
+ *   paymentMethods: string[];
+ *   ownDelivery: boolean;
+ *   deliveryTariff: { paid?: boolean; baseFeeRub?: number; perKmRub?: number } | null | undefined;
+ *   userId: string;
+ * }} input
+ * @returns {string}
+ */
+function validateDeliveryPaymentForm(input) {
+  if (input.paymentMethods.length === 0) {
+    return SELLER_COMMERCE_DEFAULTS_UI.PAYMENT_REQUIRED;
+  }
+  if (
+    input.ownDelivery &&
+    input.deliveryTariff?.paid &&
+    !input.deliveryTariff.baseFeeRub &&
+    !input.deliveryTariff.perKmRub
+  ) {
+    return SELLER_COMMERCE_DEFAULTS_UI.TARIFF_EMPTY_ERROR;
+  }
+  if (!input.userId) {
+    return SELLER_COMMERCE_DEFAULTS_UI.ERROR_GENERIC;
+  }
+  return "";
+}
+
+/**
+ * @param {{
+ *   locations: Array<{
+ *     id?: string;
+ *     label?: string;
+ *     address: string;
+ *     lat: number;
+ *     lon: number;
+ *     isDefault?: boolean;
+ *   }>;
+ *   form: {
+ *     productPickupEnabled?: boolean;
+ *     productDeliveryCarrier?: string;
+ *     paymentMethods: string[];
+ *     deliveryTariff: unknown;
+ *     productRegionCode?: string;
+ *   };
+ *   ownDelivery: boolean;
+ * }} input
+ */
+function buildCommerceDefaultsPayload({ locations, form, ownDelivery }) {
+  return {
+    pickupLocations: locations.map((item) => ({
+      id: item.id,
+      label: item.label ?? "",
+      address: item.address,
+      lat: Number(item.lat),
+      lon: Number(item.lon),
+      isDefault: item.isDefault === true,
+    })),
+    pickupEnabled: form.productPickupEnabled !== false,
+    deliveryCarrier: String(form.productDeliveryCarrier ?? ""),
+    paymentMethods: form.paymentMethods,
+    deliveryTariff: ownDelivery
+      ? form.deliveryTariff
+      : { ...FREE_SELLER_DELIVERY_TARIFF },
+    ...(form.productRegionCode
+      ? { regionCode: String(form.productRegionCode) }
+      : {}),
+  };
+}
+
+/**
  * «Доставка и оплата» — настройки продавца, общие для всех его товаров.
  *
  * Товар хранит адрес у себя (по нему ищет каталог), но пока он помечен
  * «как в профиле», сохранение здесь переписывает его одним запросом.
  */
 export function DeliveryPaymentPage() {
-  const { user } = useAuthSession();
+  const { user, patchAuthMeUser } = useAuthSession();
   const defaultsQuery = useMySellerCommerceDefaultsQuery();
   const saveMutation = useSaveSellerCommerceDefaultsMutation();
+  const { patchMutation } = useUserProfileMutations();
 
   const [form, setForm] = useState(() => formFromDefaults(undefined));
+  const [sellerPayoutRequisites, setSellerPayoutRequisites] = useState("");
   const [error, setError] = useState("");
   const [savedMessage, setSavedMessage] = useState("");
 
   const defaults = defaultsQuery.data;
+  const userId = user?._id ? String(user._id) : "";
 
   useEffect(() => {
     if (!defaults) return;
     setForm(formFromDefaults(defaults));
   }, [defaults]);
 
+  useEffect(() => {
+    setSellerPayoutRequisites(String(user?.sellerPayoutRequisites ?? ""));
+  }, [user?.sellerPayoutRequisites]);
+
   const savedAddresses = useMemo(
     () => (user ? userSavedAddressesFromUser(user) : []),
     [user],
   );
 
-  const isSubmitting = saveMutation.isPending;
+  const isSubmitting = saveMutation.isPending || patchMutation.isPending;
   const ownDelivery =
     String(form.productDeliveryCarrier ?? "") === PRODUCT_DELIVERY_CARRIER_SELLER;
   const locations = Array.isArray(form.productPickupLocations)
@@ -113,8 +191,6 @@ export function DeliveryPaymentPage() {
       }
       return {
         ...prev,
-        // Канонический порядок: карточки на чекауте не должны прыгать
-        // от того, в каком порядке продавец натыкал галочки.
         paymentMethods: ORDER_PAYMENT_METHODS.filter((item) => current.has(item)),
       };
     });
@@ -125,44 +201,32 @@ export function DeliveryPaymentPage() {
     setError("");
     setSavedMessage("");
 
-    if (form.paymentMethods.length === 0) {
-      setError(SELLER_COMMERCE_DEFAULTS_UI.PAYMENT_REQUIRED);
-      return;
-    }
-    if (
-      ownDelivery &&
-      form.deliveryTariff?.paid &&
-      !form.deliveryTariff.baseFeeRub &&
-      !form.deliveryTariff.perKmRub
-    ) {
-      setError(SELLER_COMMERCE_DEFAULTS_UI.TARIFF_EMPTY_ERROR);
+    const validationError = validateDeliveryPaymentForm({
+      paymentMethods: form.paymentMethods,
+      ownDelivery,
+      deliveryTariff: form.deliveryTariff,
+      userId,
+    });
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
+    const trimmedPayout = String(sellerPayoutRequisites ?? "").trim();
+
     try {
-      const saved = await saveMutation.mutateAsync({
-        pickupLocations: locations.map((item) => ({
-          id: item.id,
-          label: item.label ?? "",
-          address: item.address,
-          lat: Number(item.lat),
-          lon: Number(item.lon),
-          isDefault: item.isDefault === true,
-        })),
-        pickupEnabled: form.productPickupEnabled !== false,
-        deliveryCarrier: String(form.productDeliveryCarrier ?? ""),
-        paymentMethods: form.paymentMethods,
-        // Тариф уходит только со своей доставкой: схема отклонит платный
-        // тариф при другом перевозчике, а не проглотит его молча.
-        deliveryTariff: ownDelivery
-          ? form.deliveryTariff
-          : { ...FREE_SELLER_DELIVERY_TARIFF },
-        // Регион уже вытащен из подсказки адреса: без DaData на сервере
-        // это единственный способ не потерять региональный буст.
-        ...(form.productRegionCode
-          ? { regionCode: String(form.productRegionCode) }
-          : {}),
+      const updatedUser = await patchMutation.mutateAsync({
+        userId,
+        body: { sellerPayoutRequisites: trimmedPayout },
       });
+      patchAuthMeUser({
+        sellerPayoutRequisites:
+          updatedUser?.sellerPayoutRequisites ?? trimmedPayout,
+      });
+
+      const saved = await saveMutation.mutateAsync(
+        buildCommerceDefaultsPayload({ locations, form, ownDelivery }),
+      );
       setSavedMessage(
         saved?.syncedProductCount
           ? SELLER_COMMERCE_DEFAULTS_UI.SAVED_WITH_SYNC(saved.syncedProductCount)
@@ -211,6 +275,32 @@ export function DeliveryPaymentPage() {
       </header>
 
       <form className="delivery-payment-page__form" onSubmit={handleSubmit}>
+        <fieldset className="delivery-payment-page__block">
+          <legend className="delivery-payment-page__legend">
+            {SELLER_COMMERCE_DEFAULTS_UI.SECTION_PAYOUT}
+          </legend>
+          <label className="delivery-payment-page__field">
+            <input
+              className="delivery-payment-page__input"
+              type="text"
+              name="sellerPayoutRequisites"
+              value={sellerPayoutRequisites}
+              onChange={(event) => {
+                setSavedMessage("");
+                setSellerPayoutRequisites(event.target.value);
+              }}
+              maxLength={SELLER_PAYOUT_REQUISITES_MAX_LENGTH}
+              placeholder={SELLER_COMMERCE_DEFAULTS_UI.PAYOUT_PLACEHOLDER}
+              disabled={isSubmitting}
+              autoComplete="off"
+              aria-label={SELLER_COMMERCE_DEFAULTS_UI.SECTION_PAYOUT}
+            />
+            <span className="delivery-payment-page__block-hint">
+              {SELLER_COMMERCE_DEFAULTS_UI.PAYOUT_HINT}
+            </span>
+          </label>
+        </fieldset>
+
         <fieldset className="delivery-payment-page__block">
           <legend className="delivery-payment-page__legend">
             {SELLER_COMMERCE_DEFAULTS_UI.SECTION_FULFILLMENT}

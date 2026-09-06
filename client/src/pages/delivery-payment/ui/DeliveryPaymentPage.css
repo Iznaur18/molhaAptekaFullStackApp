@@ -119,6 +119,39 @@
   color: var(--iz-color-text-muted);
 }
 
+.delivery-payment-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0;
+  min-width: 0;
+}
+
+.delivery-payment-page__input {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.85rem;
+  background: var(--iz-color-surface-muted, var(--iz-color-bg));
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+}
+
+.delivery-payment-page__input:focus {
+  outline: 2px solid color-mix(in srgb, var(--iz-color-action) 45%, transparent);
+  outline-offset: 1px;
+  border-color: color-mix(in srgb, var(--iz-color-action) 40%, var(--iz-color-border));
+}
+
+.delivery-payment-page__input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 .delivery-payment-page__methods {
   display: flex;
   flex-direction: column;
