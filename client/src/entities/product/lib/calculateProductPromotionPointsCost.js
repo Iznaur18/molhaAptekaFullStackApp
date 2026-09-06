@@ -1,5 +1,5 @@
-import { rublesToLoyaltyPoints } from "../../../shared/config/loyaltyPointsConstants.js";
 import {
+  calculateProductPromotionAmountRub,
   PRODUCT_PROMOTION_TIER_GOLD,
   PRODUCT_PROMOTION_TIER_TOP,
   PRODUCT_PROMOTION_TIER_BANNER,
@@ -8,6 +8,7 @@ import {
 } from "@molha/api-contract";
 
 export {
+  calculateProductPromotionAmountRub,
   PRODUCT_PROMOTION_TIER_GOLD,
   PRODUCT_PROMOTION_TIER_TOP,
   PRODUCT_PROMOTION_TIER_BANNER,
@@ -22,18 +23,9 @@ export const PRODUCT_PROMOTION_TIER_LABELS = {
   [PRODUCT_PROMOTION_TIER_BANNER]: "Баннер",
 };
 
-/**
- * @param {{ productPrice: number; tier: number; durationCode: string }} params
- */
-export function calculateProductPromotionPointsCost({ productPrice, tier, durationCode }) {
-  const rate = PRODUCT_PROMOTION_TIER_RATES[Number(tier)];
-  const durationMult = PRODUCT_PROMOTION_DURATION_MULT[durationCode];
-  if (rate == null || durationMult == null) {
-    return 0;
-  }
-  const priceRub = Number(productPrice) * rate * durationMult;
-  return rublesToLoyaltyPoints(priceRub);
-}
+// Цену считает контракт: она же выставляется счётом на сервере, и своя копия
+// формулы здесь уже расходилась с серверной — см.
+// calculateProductPromotionAmountRub.
 
 /**
  * @param {number | null | undefined} tier

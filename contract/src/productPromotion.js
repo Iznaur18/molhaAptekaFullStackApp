@@ -59,6 +59,62 @@ export const PRODUCT_PROMOTION_DURATION_MULT = Object.fromEntries(
 export const findProductPromotionDuration = (code) =>
   PRODUCT_PROMOTION_DURATION_OPTIONS.find((item) => item.code === code) ?? null;
 
+/**
+ * Минимальный счёт за продвижение.
+ *
+ * Провайдер не проводит платёж меньше рубля, а доля от цены товара уходит ниже
+ * легко: у товара за 1 ₽ сутки «Золота» стоят 0.002 ₽. Такая заявка создавалась,
+ * но оплатить её было нельзя ни разу — счёт округлялся в ноль, и продвижение
+ * висело в ожидании оплаты навсегда.
+ */
+export const PRODUCT_PROMOTION_MIN_AMOUNT_RUB = 1;
+
+/**
+ * Привести сырую долю от цены к сумме, которую можно выставить счётом.
+ *
+ * Округление ВВЕРХ: это цена услуги площадки, а не чужие деньги, и продавец
+ * видит её до оплаты. Ноль остаётся нулём — он означает «посчитать не смогли»,
+ * и превращать его в рубль было бы счётом из ниоткуда.
+ *
+ * @param {unknown} raw
+ * @returns {number}
+ */
+export function normalizeProductPromotionAmountRub(raw) {
+  const amount = Number(raw);
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return 0;
+  }
+  return Math.max(PRODUCT_PROMOTION_MIN_AMOUNT_RUB, Math.ceil(amount));
+}
+
+/**
+ * Сколько стоит продвижение товара.
+ *
+ * Живёт в контракте, потому что сумму считают трое: сервер выставляет счёт,
+ * веб и мобилка показывают её в модалке до оплаты. Три копии формулы уже
+ * разошлись однажды — клиент округлял вверх и показывал 1 ₽, сервер не
+ * округлял вовсе и записывал 0.002 ₽.
+ *
+ * @param {{ productPrice: unknown; tier: unknown; durationCode: string }} params
+ * @returns {number} рубли; 0 — если уровень или срок неизвестны
+ */
+export function calculateProductPromotionAmountRub({
+  productPrice,
+  tier,
+  durationCode,
+}) {
+  const rate = PRODUCT_PROMOTION_TIER_RATES[Number(tier)];
+  const durationMult = PRODUCT_PROMOTION_DURATION_MULT[durationCode];
+  if (rate == null || durationMult == null) {
+    return 0;
+  }
+  const price = Number(productPrice);
+  if (!Number.isFinite(price) || price <= 0) {
+    return 0;
+  }
+  return normalizeProductPromotionAmountRub(price * rate * durationMult);
+}
+
 export const PRODUCT_PROMOTION_REJECT_COMMENT_MAX_CHARS = 500;
 
 export const requestProductPromotionBodySchema = z.object({

@@ -112,7 +112,6 @@ export function AppShellProductModals({
         product={promotionProduct}
         tiers={promotionConfig.tiers}
         durations={promotionConfig.durations}
-        loyaltyPoints={loyaltyPoints}
         errorMessage={promotionModalError}
         isSubmitting={isPromotionSubmitPending}
         onClose={handleClosePromotionModal}

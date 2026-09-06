@@ -1,5 +1,7 @@
-import { rublesToLoyaltyPoints } from "./loyaltyPointsConstants.js";
 import {
+  calculateProductPromotionAmountRub,
+  normalizeProductPromotionAmountRub,
+  PRODUCT_PROMOTION_MIN_AMOUNT_RUB,
   PRODUCT_PROMOTION_STATUS_AWAITING_PAYMENT,
   PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
   PRODUCT_PROMOTION_STATUS_ACTIVE,
@@ -16,6 +18,9 @@ import {
 } from "@molha/api-contract";
 
 export {
+  calculateProductPromotionAmountRub,
+  normalizeProductPromotionAmountRub,
+  PRODUCT_PROMOTION_MIN_AMOUNT_RUB,
   PRODUCT_PROMOTION_STATUS_AWAITING_PAYMENT,
   PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
   PRODUCT_PROMOTION_STATUS_ACTIVE,
@@ -92,35 +97,5 @@ export const PRODUCT_PROMOTION_PAYMENT_METHODS = [
 export const isValidProductPromotionTier = (tier) =>
   PRODUCT_PROMOTION_TIERS.includes(Number(tier));
 
-/**
- * @param {{ productPrice: number; tier: number; durationCode: string }} params
- */
-export const calculateProductPromotionPointsCost = ({
-  productPrice,
-  tier,
-  durationCode,
-}) => {
-  const duration = findProductPromotionDuration(durationCode);
-  const rate = PRODUCT_PROMOTION_TIER_RATES[Number(tier)];
-  if (!duration || rate == null) {
-    return 0;
-  }
-  const priceRub = Number(productPrice) * rate * duration.durationMult;
-  return rublesToLoyaltyPoints(priceRub);
-};
-
-/**
- * @param {{ productPrice: number; tier: number; durationCode: string }} params
- */
-export const calculateProductPromotionAmountRub = ({
-  productPrice,
-  tier,
-  durationCode,
-}) => {
-  const duration = findProductPromotionDuration(durationCode);
-  const rate = PRODUCT_PROMOTION_TIER_RATES[Number(tier)];
-  if (!duration || rate == null) {
-    return 0;
-  }
-  return Number(productPrice) * rate * duration.durationMult;
-};
+// Цена продвижения считается в контракте: три копии формулы (сервер, веб,
+// мобилка) уже разошлись однажды — см. calculateProductPromotionAmountRub.

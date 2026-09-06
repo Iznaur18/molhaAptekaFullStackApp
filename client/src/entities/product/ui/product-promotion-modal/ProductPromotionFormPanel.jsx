@@ -1,6 +1,6 @@
 import { PRODUCT_CARD_UI, PRODUCT_PROMOTION_UI } from "../../../../shared/config/appUiCopy.js";
 import {
-  calculateProductPromotionPointsCost,
+  calculateProductPromotionAmountRub,
   PRODUCT_PROMOTION_TIER_BANNER,
   PRODUCT_PROMOTION_TIER_GOLD,
   PRODUCT_PROMOTION_TIER_TOP,
@@ -29,8 +29,6 @@ function formatTierRatePercent(tier) {
 /**
  * @param {{
  *   productName: string;
- *   loyaltyPoints: number;
- *   hasEnoughFunds: boolean;
  *   tiers: Array<{ tier: number; title: string; description: string }>;
  *   durations: Array<{ code: string; title: string; durationHours: number; durationMult: number }>;
  *   productPrice: number;
@@ -38,8 +36,7 @@ function formatTierRatePercent(tier) {
  *   selectedDurationCode: string;
  *   selectedDuration: { code: string; title: string; durationHours: number } | null;
  *   selectedTierMeta: { tier: number; title: string; description: string } | null;
- *   selectedPricePoints: number;
- *   insufficientMessage: string;
+ *   selectedAmountRub: number;
  *   errorMessage: string;
  *   isSubmitting: boolean;
  *   onTierChange: (tier: number) => void;
@@ -48,8 +45,6 @@ function formatTierRatePercent(tier) {
  */
 export function ProductPromotionFormPanel({
   productName,
-  loyaltyPoints,
-  hasEnoughFunds,
   tiers,
   durations,
   productPrice,
@@ -57,8 +52,7 @@ export function ProductPromotionFormPanel({
   selectedDurationCode,
   selectedDuration,
   selectedTierMeta,
-  selectedPricePoints,
-  insufficientMessage,
+  selectedAmountRub,
   errorMessage,
   isSubmitting,
   onTierChange,
@@ -69,22 +63,6 @@ export function ProductPromotionFormPanel({
       <p className="product-promotion-modal__product">
         {PRODUCT_PROMOTION_UI.MODAL_SUBTITLE(productName)}
       </p>
-
-      <div
-        className={[
-          "product-promotion-modal__balance-card",
-          hasEnoughFunds
-            ? "product-promotion-modal__balance-card_ok"
-            : "product-promotion-modal__balance-card_low",
-        ].join(" ")}
-      >
-        <span className="product-promotion-modal__balance-label">
-          {PRODUCT_PROMOTION_UI.BALANCE_LABEL}
-        </span>
-        <strong className="product-promotion-modal__balance-value">
-          {PRODUCT_PROMOTION_UI.BALANCE_POINTS(loyaltyPoints)}
-        </strong>
-      </div>
 
       <fieldset
         className="product-promotion-modal__section"
@@ -142,7 +120,7 @@ export function ProductPromotionFormPanel({
         </legend>
         <div className="product-promotion-modal__duration-row">
           {durations.map((duration) => {
-            const pricePoints = calculateProductPromotionPointsCost({
+            const amountRub = calculateProductPromotionAmountRub({
               productPrice,
               tier: selectedTier,
               durationCode: duration.code,
@@ -165,7 +143,7 @@ export function ProductPromotionFormPanel({
                   {duration.title}
                 </span>
                 <span className="product-promotion-modal__duration-price">
-                  {PRODUCT_PROMOTION_UI.DURATION_PRICE_POINTS(pricePoints)}
+                  {PRODUCT_PROMOTION_UI.DURATION_PRICE_RUB(amountRub)}
                 </span>
               </button>
             );
@@ -187,16 +165,11 @@ export function ProductPromotionFormPanel({
           </div>
           <div className="product-promotion-modal__summary-row product-promotion-modal__summary-row_total">
             <span>{PRODUCT_PROMOTION_UI.TOTAL_LABEL}</span>
-            <strong>{PRODUCT_PROMOTION_UI.TOTAL_POINTS(selectedPricePoints)}</strong>
+            <strong>{PRODUCT_PROMOTION_UI.TOTAL_RUB(selectedAmountRub)}</strong>
           </div>
         </div>
       ) : null}
 
-      {insufficientMessage ? (
-        <p className="product-promotion-modal__error" role="alert">
-          {insufficientMessage}
-        </p>
-      ) : null}
       {errorMessage ? (
         <p className="product-promotion-modal__error" role="alert">
           {errorMessage}

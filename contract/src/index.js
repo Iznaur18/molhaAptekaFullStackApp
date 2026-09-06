@@ -50,7 +50,10 @@ export {
   PRODUCT_PROMOTION_DURATION_OPTIONS,
   PRODUCT_PROMOTION_DURATION_MULT,
   PRODUCT_PROMOTION_REJECT_COMMENT_MAX_CHARS,
+  PRODUCT_PROMOTION_MIN_AMOUNT_RUB,
   findProductPromotionDuration,
+  calculateProductPromotionAmountRub,
+  normalizeProductPromotionAmountRub,
 } from "./productPromotion.js";
 export { productPriceOfferBodySchema } from "./productPriceOffer.js";
 export { PRODUCT_SALE_FILTER_MIN_DISCOUNT_PERCENT } from "./productSale.js";
@@ -407,6 +410,8 @@ export {
   userNameFieldSchema,
   ruPhoneOptionalFieldSchema,
   ruPhoneRequiredFieldSchema,
+  ADDRESS_LINE_MAX_LENGTH,
+  ADDRESS_FLAT_MAX_LENGTH,
 } from "./userFields.js";
 export { mongoIdSchema } from "./mongoId.js";
 export { paginationSchema } from "./pagination.js";

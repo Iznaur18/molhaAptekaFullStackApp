@@ -941,7 +941,6 @@ export default function ProductDetailScreen() {
         productPrice={productPrice}
         tiers={promotionTariffsQuery.data?.tiers ?? []}
         durations={promotionTariffsQuery.data?.durations ?? []}
-        loyaltyPoints={loyaltyPointsBalance}
         isTariffsLoading={promotionTariffsQuery.isPending}
         tariffsError={
           promotionTariffsQuery.error instanceof Error ? promotionTariffsQuery.error : null

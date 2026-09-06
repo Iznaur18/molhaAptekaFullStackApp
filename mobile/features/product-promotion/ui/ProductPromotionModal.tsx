@@ -12,7 +12,7 @@ import {
 } from "react-native";
 
 import {
-  calculateProductPromotionPointsCost,
+  calculateProductPromotionAmountRub,
   formatProductPromotionTierRatePercent,
   PRODUCT_PROMOTION_TIER_BANNER,
   PRODUCT_PROMOTION_TIER_GOLD,
@@ -60,7 +60,6 @@ type ProductPromotionModalProps = {
   productPrice?: number;
   tiers: ProductPromotionTier[];
   durations: ProductPromotionDuration[];
-  loyaltyPoints: number;
   isTariffsLoading?: boolean;
   tariffsError?: Error | null;
   isSubmitting?: boolean;
@@ -148,7 +147,6 @@ export const ProductPromotionModal = ({
   productPrice = 0,
   tiers,
   durations,
-  loyaltyPoints,
   isTariffsLoading = false,
   tariffsError = null,
   isSubmitting = false,
@@ -258,25 +256,22 @@ export const ProductPromotionModal = ({
     [selectedTier, tiers],
   );
 
-  const selectedPricePoints = useMemo(() => {
+  const selectedAmountRub = useMemo(() => {
     if (!selectedDuration) {
       return 0;
     }
-    return calculateProductPromotionPointsCost({
+    return calculateProductPromotionAmountRub({
       productPrice: resolvedProductPrice,
       tier: selectedTier,
       durationCode: selectedDuration.code,
     });
   }, [resolvedProductPrice, selectedDuration, selectedTier]);
 
-  const hasEnoughFunds = loyaltyPoints >= selectedPricePoints;
-  const insufficientMessage =
-    selectedDuration && !hasEnoughFunds
-      ? PRODUCT_PROMOTION_UI.INSUFFICIENT_POINTS(selectedPricePoints, loyaltyPoints)
-      : "";
-
+  // Баланс баллов продвижение не оплачивает с перехода на СБП: счёт приходит
+  // после заявки. С прежней проверкой продавец без баллов не мог даже её
+  // отправить.
   const handleSubmit = () => {
-    if (!selectedDuration || isSubmitting || !hasEnoughFunds || tiers.length === 0) {
+    if (!selectedDuration || isSubmitting || tiers.length === 0) {
       return;
     }
     void onSubmit(selectedTier, selectedDuration.code);
@@ -298,23 +293,11 @@ export const ProductPromotionModal = ({
 
     return (
       <>
-        <View
-          style={[
-            styles.overviewCard,
-            hasEnoughFunds ? styles.overviewCardOk : styles.overviewCardInsufficient,
-          ]}
-        >
+        <View style={[styles.overviewCard, styles.overviewCardOk]}>
           <View>
             <Text style={styles.overviewProductLabel}>{PRODUCT_PROMOTION_UI.PRODUCT_LABEL}</Text>
             <Text style={styles.overviewProductName} numberOfLines={2}>
               {resolvedProductName}
-            </Text>
-          </View>
-          <View style={styles.overviewDivider} />
-          <View style={styles.overviewBalanceRow}>
-            <Text style={styles.balanceLabel}>{PRODUCT_PROMOTION_UI.BALANCE_LABEL}</Text>
-            <Text style={styles.balanceValue}>
-              {PRODUCT_PROMOTION_UI.BALANCE_POINTS(loyaltyPoints)}
             </Text>
           </View>
         </View>
@@ -364,7 +347,7 @@ export const ProductPromotionModal = ({
           <Text style={styles.sectionTitle}>{PRODUCT_PROMOTION_UI.DURATION_LABEL}</Text>
           <View style={styles.durationRow}>
             {durations.map((duration) => {
-              const pricePoints = calculateProductPromotionPointsCost({
+              const amountRub = calculateProductPromotionAmountRub({
                 productPrice: resolvedProductPrice,
                 tier: selectedTier,
                 durationCode: duration.code,
@@ -383,7 +366,7 @@ export const ProductPromotionModal = ({
                 >
                   <Text style={styles.durationTitle}>{duration.title}</Text>
                   <Text style={[styles.durationPrice, durationStyle.price]}>
-                    {PRODUCT_PROMOTION_UI.DURATION_PRICE_POINTS(pricePoints)}
+                    {PRODUCT_PROMOTION_UI.DURATION_PRICE_RUB(amountRub)}
                   </Text>
                 </Pressable>
               );
@@ -413,18 +396,13 @@ export const ProductPromotionModal = ({
                     },
                   ]}
                 >
-                  {PRODUCT_PROMOTION_UI.TOTAL_POINTS(selectedPricePoints)}
+                  {PRODUCT_PROMOTION_UI.TOTAL_RUB(selectedAmountRub)}
                 </Text>
               </View>
             </>
           ) : null}
         </View>
 
-        {insufficientMessage ? (
-          <View style={styles.errorBox} accessibilityRole="alert">
-            <Text style={styles.error}>{insufficientMessage}</Text>
-          </View>
-        ) : null}
         {errorMessage ? (
           <View style={styles.errorBox} accessibilityRole="alert">
             <Text style={styles.error}>{errorMessage}</Text>
@@ -563,7 +541,6 @@ export const ProductPromotionModal = ({
                     Boolean(tariffsError) ||
                     !selectedDuration ||
                     isSubmitting ||
-                    !hasEnoughFunds ||
                     tiers.length === 0) &&
                     styles.buttonDisabled,
                 ]}
@@ -573,7 +550,6 @@ export const ProductPromotionModal = ({
                   Boolean(tariffsError) ||
                   !selectedDuration ||
                   isSubmitting ||
-                  !hasEnoughFunds ||
                   tiers.length === 0
                 }
               >

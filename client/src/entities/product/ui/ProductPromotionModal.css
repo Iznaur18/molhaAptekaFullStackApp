@@ -63,40 +63,6 @@
   overflow-wrap: anywhere;
 }
 
-.product-promotion-modal__balance-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.7rem 0.85rem;
-  border-radius: 0.65rem;
-  border: 1px solid transparent;
-}
-
-.product-promotion-modal__balance-card_ok {
-  background: var(--iz-color-success-surface);
-  border-color: color-mix(in srgb, var(--iz-color-success) 28%, transparent);
-}
-
-.product-promotion-modal__balance-card_low {
-  background: var(--iz-color-danger-surface);
-  border-color: color-mix(in srgb, var(--iz-color-danger) 28%, transparent);
-}
-
-.product-promotion-modal__balance-label {
-  font-size: 0.82rem;
-  color: var(--iz-color-text-muted);
-}
-
-.product-promotion-modal__balance-value {
-  font-size: 1rem;
-  color: var(--iz-color-ink);
-}
-
-:root[data-theme="dark"] .product-promotion-modal__balance-value {
-  color: #ffffff;
-}
-
 .product-promotion-modal__section {
   margin: 0;
   padding: 0;

@@ -117,9 +117,6 @@ export const MyProductsPage = () => {
 
   const pageActions = useMyProductsPageActions();
   const promotionTariffsQuery = useProductPromotionTariffsQuery(pageActions.promotionModalVisible);
-  const promotionLoyaltyQuery = useMyLoyaltyPointsStatusQuery(
-    pageActions.promotionModalVisible && isAuthorized,
-  );
 
   const catalogGridRows = useMemo(
     () => buildCatalogGridRows(productsQuery.products, productGrid.columns, { isMineMode: true }),
@@ -287,7 +284,6 @@ export const MyProductsPage = () => {
         productPrice={promotionProductPrice}
         tiers={promotionTariffsQuery.data?.tiers ?? []}
         durations={promotionTariffsQuery.data?.durations ?? []}
-        loyaltyPoints={promotionLoyaltyQuery.data?.loyaltyPointsBalance ?? 0}
         isTariffsLoading={promotionTariffsQuery.isPending}
         tariffsError={
           promotionTariffsQuery.error instanceof Error ? promotionTariffsQuery.error : null

@@ -11,7 +11,7 @@ import { AffiliatePercentModal } from "./AffiliatePercentModal.jsx";
 import { ProductLoyaltyPointsModal } from "./ProductLoyaltyPointsModal.jsx";
 import { ProductBuyNFreeModal } from "./ProductBuyNFreeModal.jsx";
 import { ProductOutOfStockLabelModal } from "./ProductOutOfStockLabelModal.jsx";
-import { calculateProductPromotionPointsCost } from "../lib/calculateProductPromotionPointsCost.js";
+import { calculateProductPromotionAmountRub } from "../lib/calculateProductPromotionPointsCost.js";
 import { ProductPromotionFormPanel } from "./product-promotion-modal/ProductPromotionFormPanel.jsx";
 import { ProductPromotionManageTab } from "./product-promotion-modal/ProductPromotionManageTab.jsx";
 import { ProductPromotionModalTabs } from "./product-promotion-modal/ProductPromotionModalTabs.jsx";
@@ -30,7 +30,6 @@ const PRODUCT_PROMOTION_MODAL_TITLE_ID = "product-promotion-modal-title";
  *   productPrice?: number;
  *   tiers: Array<{ tier: number; title: string; description: string }>;
  *   durations: Array<{ code: string; title: string; durationHours: number; durationMult: number }>;
- *   loyaltyPoints: number;
  *   isSubmitting?: boolean;
  *   errorMessage?: string;
  *   onClose: () => void;
@@ -115,7 +114,6 @@ export function ProductPromotionModal({
   productPrice = 0,
   tiers,
   durations,
-  loyaltyPoints,
   isSubmitting = false,
   errorMessage = "",
   onClose,
@@ -209,23 +207,16 @@ export function ProductPromotionModal({
     [selectedTier, tiers],
   );
 
-  const selectedPricePoints = useMemo(() => {
+  const selectedAmountRub = useMemo(() => {
     if (!selectedDuration) {
       return 0;
     }
-    return calculateProductPromotionPointsCost({
+    return calculateProductPromotionAmountRub({
       productPrice: resolvedProductPrice,
       tier: selectedTier,
       durationCode: selectedDuration.code,
     });
   }, [resolvedProductPrice, selectedDuration, selectedTier]);
-
-  const hasEnoughFunds = loyaltyPoints >= selectedPricePoints;
-
-  const insufficientMessage =
-    selectedDuration && !hasEnoughFunds
-      ? PRODUCT_PROMOTION_UI.INSUFFICIENT_POINTS(selectedPricePoints, loyaltyPoints)
-      : "";
 
   const handleTierChange = (tier) => {
     if (isSubmitting || tiers.length === 0) {
@@ -242,7 +233,7 @@ export function ProductPromotionModal({
   };
 
   const handleSubmit = () => {
-    if (!selectedDuration || isSubmitting || !hasEnoughFunds || tiers.length === 0) {
+    if (!selectedDuration || isSubmitting || tiers.length === 0) {
       return;
     }
     void onSubmit(selectedTier, selectedDuration.code);
@@ -261,9 +252,7 @@ export function ProductPromotionModal({
       <button
         type="button"
         className="app-btn app-btn--primary"
-        disabled={
-          !selectedDuration || isSubmitting || !hasEnoughFunds || tiers.length === 0
-        }
+        disabled={!selectedDuration || isSubmitting || tiers.length === 0}
         onClick={handleSubmit}
       >
         {isSubmitting
@@ -299,8 +288,6 @@ export function ProductPromotionModal({
         {isPromotionTab ? (
           <ProductPromotionFormPanel
             productName={resolvedProductName}
-            loyaltyPoints={loyaltyPoints}
-            hasEnoughFunds={hasEnoughFunds}
             tiers={tiers}
             durations={durations}
             productPrice={resolvedProductPrice}
@@ -308,8 +295,7 @@ export function ProductPromotionModal({
             selectedDurationCode={selectedDurationCode}
             selectedDuration={selectedDuration}
             selectedTierMeta={selectedTierMeta}
-            selectedPricePoints={selectedPricePoints}
-            insufficientMessage={insufficientMessage}
+            selectedAmountRub={selectedAmountRub}
             errorMessage={errorMessage}
             isSubmitting={isSubmitting}
             onTierChange={handleTierChange}

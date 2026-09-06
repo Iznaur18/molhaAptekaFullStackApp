@@ -41,6 +41,7 @@ import { up as orderShipmentsUp } from "./20260831-order-shipments.js";
 import { up as onecProductsWithoutImagesAndStockUp } from "./20260903-onec-products-without-images-and-stock.js";
 import { up as swapShipmentPayoutCarrierUp } from "./20260904-swap-shipment-payout-carrier.js";
 import { up as sellerFulfillmentDefaultsUp } from "./20260905-seller-fulfillment-defaults.js";
+import { up as productPromotionMinAmountUp } from "./20260906-product-promotion-min-amount.js";
 
 export const MIGRATIONS = [
   {
@@ -267,5 +268,11 @@ export const MIGRATIONS = [
     description:
       "Seed sellerFulfillmentDefaults from each seller most common product setup and mark matching products as profile-following",
     up: sellerFulfillmentDefaultsUp,
+  },
+  {
+    id: "20260906-product-promotion-min-amount",
+    description:
+      "Round awaiting-payment promotion prices up to the 1 RUB minimum so their invoices stop being rejected as zero",
+    up: productPromotionMinAmountUp,
   },
 ];

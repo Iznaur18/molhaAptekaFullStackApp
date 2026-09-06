@@ -1,5 +1,5 @@
-import { rublesToLoyaltyPoints } from "@/shared/config/loyaltyPointsConstants";
 import {
+  calculateProductPromotionAmountRub,
   PRODUCT_PROMOTION_TIER_GOLD,
   PRODUCT_PROMOTION_TIER_TOP,
   PRODUCT_PROMOTION_TIER_BANNER,
@@ -8,6 +8,7 @@ import {
 } from "@molha/api-contract";
 
 export {
+  calculateProductPromotionAmountRub,
   PRODUCT_PROMOTION_TIER_GOLD,
   PRODUCT_PROMOTION_TIER_TOP,
   PRODUCT_PROMOTION_TIER_BANNER,
@@ -32,25 +33,9 @@ export const PRODUCT_PROMOTION_TIER_LABELS: Record<number, string> = {
 export const getProductPromotionTierLabel = (tier: number | null | undefined): string =>
   PRODUCT_PROMOTION_TIER_LABELS[Number(tier)] ?? "";
 
-type CalculatePromotionCostParams = {
-  productPrice: number;
-  tier: number;
-  durationCode: string;
-};
-
-export const calculateProductPromotionPointsCost = ({
-  productPrice,
-  tier,
-  durationCode,
-}: CalculatePromotionCostParams): number => {
-  const rate = TIER_RATE_BY_TIER[Number(tier)];
-  const durationMult = PRODUCT_PROMOTION_DURATION_MULT[durationCode];
-  if (rate == null || durationMult == null) {
-    return 0;
-  }
-  const priceRub = Number(productPrice) * rate * durationMult;
-  return rublesToLoyaltyPoints(priceRub);
-};
+// Цену считает контракт: тем же счётом её выставляет сервер, а своя копия
+// формулы здесь уже расходилась с серверной — см.
+// calculateProductPromotionAmountRub.
 
 export const formatProductPromotionTierRatePercent = (tier: number): string => {
   const rate = TIER_RATE_BY_TIER[Number(tier)];
