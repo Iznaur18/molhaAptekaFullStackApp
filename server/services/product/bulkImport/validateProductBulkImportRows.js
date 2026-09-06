@@ -11,6 +11,7 @@ import {
   PRODUCT_PRICE_RUB_MAX,
   PRODUCT_STOCK_QUANTITY_MAX,
   PRODUCT_STOCK_QUANTITY_MIN,
+  isSellerProductsLimitUnlimited,
   SELLER_PRODUCTS_LIMIT_PREMIUM,
 } from "@molha/api-contract";
 
@@ -135,8 +136,14 @@ export async function validateProductBulkImportRows(input) {
     };
   }
 
+  const sellerLimit = getSellerProductsLimit(user);
+  const unlimited = isSellerProductsLimitUnlimited(sellerLimit);
+
+  // Размер пачки — по «весу» аккаунта, а не по точному совпадению с премиумом:
+  // с персональным лимитом число перестало быть ровно премиумным, и продавец с
+  // лимитом в 500 товаров грузил бы файлы как обычный.
   const maxRows =
-    getSellerProductsLimit(user) === SELLER_PRODUCTS_LIMIT_PREMIUM
+    unlimited || sellerLimit >= SELLER_PRODUCTS_LIMIT_PREMIUM
       ? PRODUCT_BULK_IMPORT_MAX_ROWS_PREMIUM
       : PRODUCT_BULK_IMPORT_MAX_ROWS_REGULAR;
 
@@ -154,7 +161,11 @@ export async function validateProductBulkImportRows(input) {
   }
 
   const currentCount = await countSellerProducts(sellerId);
-  const remainingSlots = Math.max(0, getSellerProductsLimit(user) - currentCount);
+  // У безлимитного вычитание дало бы отрицательное «свободно», и импорт падал
+  // бы с «недостаточно слотов» именно у того, у кого их бесконечно много.
+  const remainingSlots = unlimited
+    ? Number.POSITIVE_INFINITY
+    : Math.max(0, sellerLimit - currentCount);
   if (parsedRows.length > remainingSlots) {
     return {
       ok: false,

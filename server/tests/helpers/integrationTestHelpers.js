@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 
 import { ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY } from "../../constants/orderConstants.js";
-import { SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE } from "../../constants/productConstants.js";
+import { sellerProductsLimitErrorMessage } from "@molha/api-contract";
 import { USER_DATA_CONFIRMATION_STATUS_APPROVED } from "../../constants/userDataConfirmationConstants.js";
 import {
   PendingRegistrationModel,
@@ -268,4 +268,4 @@ export const buildOrderBody = (productId, quantity = 1) => ({
   idempotencyKey: randomUUID(),
 });
 
-export { SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE };
+export { sellerProductsLimitErrorMessage };

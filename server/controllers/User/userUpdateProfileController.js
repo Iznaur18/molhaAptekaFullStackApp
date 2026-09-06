@@ -1,3 +1,5 @@
+import { normalizeSellerProductsLimitOverride } from "@molha/api-contract";
+
 import { UserModel } from "../../models/index.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 import { bumpUserAuthTokenVersion } from "../../services/auth/userAuthTokenVersion.js";
@@ -97,6 +99,10 @@ export const userUpdateProfileController = async (req, res) => {
         } else if (field === "userDiscountPercent") {
           // Конвертация в число (валидация диапазона уже выполнена в middleware)
           updateData[field] = Number(value);
+        } else if (field === "sellerProductsLimitOverride") {
+          // Пустое поле в админке значит «персонального лимита нет», а не ноль:
+          // ноль здесь — осмысленный запрет создавать товары.
+          updateData[field] = normalizeSellerProductsLimitOverride(value);
         } else if (field === "userLoyaltyPoints") {
           const points = Math.floor(Number(value));
           updateData[field] = Number.isFinite(points) ? Math.max(0, points) : 0;

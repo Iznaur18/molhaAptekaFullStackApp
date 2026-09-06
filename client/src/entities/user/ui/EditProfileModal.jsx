@@ -451,6 +451,22 @@ export function EditProfileModal({
                         onChange={handleChange}
                       />
                     </label>
+                    <label className="edit-profile-modal__label">
+                      {ADMIN_EDIT_USER_UI.LABEL_PRODUCTS_LIMIT}
+                      <input
+                        className="edit-profile-modal__input"
+                        type="text"
+                        inputMode="numeric"
+                        name="sellerProductsLimitOverride"
+                        maxLength={6}
+                        placeholder={ADMIN_EDIT_USER_UI.PRODUCTS_LIMIT_PLACEHOLDER}
+                        value={form.sellerProductsLimitOverride}
+                        onChange={handleChange}
+                      />
+                      <span className="edit-profile-modal__hint">
+                        {ADMIN_EDIT_USER_UI.PRODUCTS_LIMIT_HINT}
+                      </span>
+                    </label>
                   </>
                 ) : null}
                 <label className="edit-profile-modal__label edit-profile-modal__label_row">

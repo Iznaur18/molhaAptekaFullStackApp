@@ -15,6 +15,10 @@ import {
   normalizeUserNameInput,
   RU_PHONE_E164_REGEX,
 } from "./userFields.js";
+import {
+  SELLER_PRODUCTS_LIMIT_OVERRIDE_MAX,
+  SELLER_PRODUCTS_LIMIT_UNLIMITED,
+} from "./productWrite.js";
 import { optionalRuRegionCodeFieldSchema } from "./ruRegions.js";
 import { isStoredMediaUrl } from "./storedMediaUrl.js";
 import { userSocialLinksBodyShape } from "./userSocialLinks.js";
@@ -249,6 +253,22 @@ export const updateProfileBodySchema = z.object({
     .refine(
       (value) => value === undefined || value === null || (value >= 0 && value <= 100),
       "Процент скидки должен быть числом от 0 до 100",
+    ),
+  /**
+   * Персональный лимит товаров: `null` — считать по премиуму, `-1` — без
+   * ограничений, иначе точное число.
+   */
+  sellerProductsLimitOverride: z
+    .union([z.coerce.number(), z.null()])
+    .optional()
+    .refine(
+      (value) =>
+        value === undefined ||
+        value === null ||
+        (Number.isInteger(value) &&
+          value >= SELLER_PRODUCTS_LIMIT_UNLIMITED &&
+          value <= SELLER_PRODUCTS_LIMIT_OVERRIDE_MAX),
+      `Лимит товаров: целое от 0 до ${SELLER_PRODUCTS_LIMIT_OVERRIDE_MAX} или -1 для «без ограничений»`,
     ),
   userLoyaltyPoints: z
     .union([z.coerce.number().int(), z.null()])

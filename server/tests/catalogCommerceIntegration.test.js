@@ -14,7 +14,7 @@ import {
   parseErrorMessage,
   parseSuccessData,
   registerUserAndGetCookie,
-  SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE,
+  sellerProductsLimitErrorMessage,
   setUserRole,
   verifyUserEmail,
 } from "./helpers/integrationTestHelpers.js";
@@ -140,7 +140,9 @@ test("seller limit: POST /product сверх лимита → 403", async () => 
   });
   assert.equal(blocked.status, 403);
   const message = await parseErrorMessage(blocked);
-  assert.equal(message, SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE);
+  // Сообщение называет действующий лимит: у продавца может быть персональный,
+  // и прежний текст про «50 для обычных, 100 для премиум» ему бы врал.
+  assert.equal(message, sellerProductsLimitErrorMessage(SELLER_PRODUCTS_LIMIT_REGULAR));
 });
 
 test("moderation: pending → approve → visible in GET /product", async () => {

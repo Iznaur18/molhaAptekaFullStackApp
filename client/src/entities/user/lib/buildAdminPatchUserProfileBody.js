@@ -1,3 +1,5 @@
+import { normalizeSellerProductsLimitOverride } from "@molha/api-contract";
+
 import { normalizeRuPhoneInput } from "./ruPhone.js";
 import { buildPatchUserProfileBody } from "./buildPatchUserProfileBody.js";
 import {
@@ -37,6 +39,12 @@ export function buildAdminPatchUserProfileBody(form, options = {}) {
 
   const discount = Number(String(form.userDiscountPercent).trim());
   body.userDiscountPercent = Number.isFinite(discount) ? discount : 0;
+
+  // Нормализацию доверяем контракту: он же считает лимит на сервере, и «пусто
+  // значит нет лимита» должно пониматься там и тут одинаково.
+  body.sellerProductsLimitOverride = normalizeSellerProductsLimitOverride(
+    form.sellerProductsLimitOverride,
+  );
 
   if (includePremium) {
     const premiumExpiresAtRaw = String(form.premiumExpiresAt ?? "").trim();

@@ -43,6 +43,7 @@ import {
  * @property {string} socialWebsiteUrl
  * @property {'user'|'admin'|'moderator'} userRole
  * @property {string} userDiscountPercent
+ * @property {string} sellerProductsLimitOverride пусто — лимита нет, «∞» — без ограничений
  * @property {string} userLoyaltyPoints
  * @property {string} premiumExpiresAt
  * @property {boolean} isActiveUser
@@ -96,6 +97,13 @@ export function mapUserToEditProfileForm(user) {
     userRole: user.userRole ?? USER_ROLE_USER,
     userDiscountPercent:
       user.userDiscountPercent != null ? String(user.userDiscountPercent) : "0",
+    // Пустая строка означает «персонального лимита нет» — тогда действует
+    // обычный порог по премиуму. Безлимит показываем как -1: то же значение
+    // админ и вводит, отдельного переключателя ради одного числа не заводим.
+    sellerProductsLimitOverride:
+      user.sellerProductsLimitOverride != null
+        ? String(user.sellerProductsLimitOverride)
+        : "",
     userLoyaltyPoints:
       user.userLoyaltyPoints != null ? String(user.userLoyaltyPoints) : "0",
     premiumExpiresAt: formatPremiumExpiresAtForInput(user.premiumExpiresAt),

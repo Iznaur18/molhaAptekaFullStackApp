@@ -37,6 +37,10 @@ export const ADMIN_EDIT_USER_UI = {
   SECTION_ADMIN: "Администрирование",
   LABEL_ROLE: "Роль",
   LABEL_DISCOUNT: "Скидка, %",
+  LABEL_PRODUCTS_LIMIT: "Лимит товаров",
+  PRODUCTS_LIMIT_HINT:
+    "Пусто — как у всех: 50, с премиумом 100. Число — столько и разрешено. −1 — без ограничений.",
+  PRODUCTS_LIMIT_PLACEHOLDER: "как у всех",
   LABEL_LOYALTY_POINTS: "Баллы лояльности",
   LABEL_PREMIUM: "Премиум",
   PREMIUM_CARD_TITLE: "Премиум",

@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import {
+  SELLER_PRODUCTS_LIMIT_OVERRIDE_MAX,
+  SELLER_PRODUCTS_LIMIT_UNLIMITED,
   USER_SAVED_ADDRESS_LABEL_MAX_LENGTH,
   USER_SAVED_ADDRESS_ID_MAX_LENGTH,
 } from "@molha/api-contract";
@@ -393,6 +395,22 @@ const UserSchema = new mongoose.Schema(
       // процент скидки
       type: Number,
       default: 0,
+    },
+    /**
+     * Персональный лимит товаров, назначенный админом.
+     *
+     * `null` — лимита нет, работает обычный порог по премиуму.
+     * `-1` (SELLER_PRODUCTS_LIMIT_UNLIMITED) — без ограничений.
+     * `0` и больше — точное число: ноль осмысленно закрывает создание.
+     *
+     * Отдельным полем, а не подкруткой премиума: премиум продавец покупает сам
+     * и на месяц, а этот лимит выдаёт админ и бессрочно.
+     */
+    sellerProductsLimitOverride: {
+      type: Number,
+      default: null,
+      min: SELLER_PRODUCTS_LIMIT_UNLIMITED,
+      max: SELLER_PRODUCTS_LIMIT_OVERRIDE_MAX,
     },
     notificationsEnabled: {
       // включены ли уведомления

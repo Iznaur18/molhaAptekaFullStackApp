@@ -92,6 +92,81 @@ export const SELLER_PRODUCTS_LIMIT_REGULAR = 50;
 export const SELLER_PRODUCTS_LIMIT_PREMIUM = 100;
 export const SELLER_PRODUCTS_LIMIT_ERROR_MESSAGE = `Достигнут лимит товаров: ${SELLER_PRODUCTS_LIMIT_REGULAR} для обычных пользователей, ${SELLER_PRODUCTS_LIMIT_PREMIUM} для премиум.`;
 
+/**
+ * Персональный лимит «без ограничений».
+ *
+ * Отдельное значение, а не ноль: ноль — это осмысленный лимит «больше не
+ * создавать», и путать его с безлимитом нельзя. `null` в поле пользователя
+ * значит «персонального лимита нет», и тогда работает обычный премиум-порог.
+ */
+export const SELLER_PRODUCTS_LIMIT_UNLIMITED = -1;
+
+/** Персональный лимит выключен — считаем по премиуму. */
+export const SELLER_PRODUCTS_LIMIT_NO_OVERRIDE = null;
+
+/** Больше персонального лимита не даём: опечатка в админке дороже. */
+export const SELLER_PRODUCTS_LIMIT_OVERRIDE_MAX = 100000;
+
+/**
+ * Приводит значение из админки к тому, что можно положить в профиль.
+ *
+ * @param {unknown} raw
+ * @returns {number | null}
+ */
+export function normalizeSellerProductsLimitOverride(raw) {
+  if (raw === null || raw === undefined || raw === "") {
+    return null;
+  }
+  const value = Math.floor(Number(raw));
+  if (!Number.isFinite(value)) {
+    return null;
+  }
+  if (value < 0) {
+    return SELLER_PRODUCTS_LIMIT_UNLIMITED;
+  }
+  return Math.min(value, SELLER_PRODUCTS_LIMIT_OVERRIDE_MAX);
+}
+
+/**
+ * Сколько товаров разрешено продавцу.
+ *
+ * Персональный лимит перекрывает премиум: админ ставит его точечно, и премиум
+ * не должен ни поднимать, ни опускать назначенное вручную.
+ *
+ * @param {{ sellerProductsLimitOverride?: unknown }} user
+ * @param {boolean} isPremium
+ * @returns {number} `SELLER_PRODUCTS_LIMIT_UNLIMITED` — без ограничений
+ */
+export function resolveSellerProductsLimit(user, isPremium) {
+  const override = normalizeSellerProductsLimitOverride(
+    user?.sellerProductsLimitOverride,
+  );
+  if (override !== null) {
+    return override;
+  }
+  return isPremium ? SELLER_PRODUCTS_LIMIT_PREMIUM : SELLER_PRODUCTS_LIMIT_REGULAR;
+}
+
+/** @param {number} limit */
+export function isSellerProductsLimitUnlimited(limit) {
+  return limit === SELLER_PRODUCTS_LIMIT_UNLIMITED;
+}
+
+/**
+ * Сообщение об упёршемся лимите — с той цифрой, которая реально действует.
+ *
+ * Прежний текст был константой и всегда называл 50 и 100, поэтому продавцу с
+ * персональным лимитом врал.
+ *
+ * @param {number} limit
+ */
+export function sellerProductsLimitErrorMessage(limit) {
+  if (limit <= 0) {
+    return "Создание товаров для вашего аккаунта закрыто — напишите в поддержку.";
+  }
+  return `Достигнут лимит товаров: ${limit}. Напишите в поддержку, если нужно больше.`;
+}
+
 export const PRODUCT_LISTING_ORIGIN_OWN = "own";
 export const PRODUCT_LISTING_ORIGIN_RESALE = "resale";
 export const PRODUCT_LISTING_ORIGIN_MANUFACTURER = "manufacturer";
