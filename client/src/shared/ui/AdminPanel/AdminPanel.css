@@ -237,6 +237,13 @@
   color: var(--admin-panel-muted);
 }
 
+/* Подпись плитки на витрине, когда она разошлась с названием в дереве. */
+.admin-panel__storefront-label {
+  margin: 0.15rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--admin-panel-muted);
+}
+
 .admin-panel__path {
   font-size: 0.9375rem;
   font-weight: 600;

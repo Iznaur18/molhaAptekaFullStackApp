@@ -325,7 +325,9 @@ export const SEARCH_SYNONYMS_ADMIN_PAGE_UI = {
 export const CATEGORY_TREE_ADMIN_PAGE_UI = {
   TITLE: "Дерево категорий",
   HINT: "Корневые категории — плитки на главной каталога. Подкатегории — визард при размещении товара.",
-  SEARCH_PLACEHOLDER: "Название, slug, ключевые слова…",
+  SEARCH_PLACEHOLDER: "Название, slug, ключевые слова, подпись плитки…",
+  /** @param {string} label */
+  STOREFRONT_LABEL: (label) => `На витрине плитка называется «${label}»`,
   LOADING: "Загрузка…",
   LOAD_ERROR: "Не удалось загрузить категории",
   SAVE_ERROR: "Не удалось сохранить",

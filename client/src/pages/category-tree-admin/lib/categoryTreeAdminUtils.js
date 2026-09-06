@@ -60,9 +60,14 @@ export const filterCategoryRows = (rows, query) => {
     const haystack = [
       row.slug,
       row.labelRu,
+      // Плитку могли переименовать на витрине: админ помнит новое название и
+      // ищет по нему, а дерево хранит старое. Без этой строки переименованную
+      // категорию было не найти вовсе.
+      row.storefrontLabel,
       formatCategoryPath(row),
       ...(row.searchKeywords ?? []),
     ]
+      .filter(Boolean)
       .join(" ")
       .toLowerCase();
     return haystack.includes(q);

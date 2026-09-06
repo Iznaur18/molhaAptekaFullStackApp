@@ -53,17 +53,23 @@ ProductCategoryDisplaySchema.index(
   { unique: true, partialFilterExpression: { categoryId: { $type: "objectId" } } },
 );
 
-ProductCategoryDisplaySchema.pre("validate", function validateCategoryDisplayKey(next) {
+/**
+ * Ключ ровно один: либо слаг корневой плитки, либо id узла дерева.
+ *
+ * Хук был написан в старом стиле, через `next`, а mongoose 9 его больше не
+ * передаёт: на успешном пути падало «next is not a function», то есть любой
+ * `create()`/`save()` по этой модели бросал исключение, а сама проверка не
+ * выполнялась никогда. Не всплывало потому, что приложение пишет сюда только
+ * через `findOneAndUpdate`, а он документные хуки не запускает вовсе.
+ */
+ProductCategoryDisplaySchema.pre("validate", function validateCategoryDisplayKey() {
   const hasSlug =
     typeof this.categorySlug === "string" && this.categorySlug.trim().length > 0;
   const hasId = this.categoryId != null;
 
   if (hasSlug === hasId) {
-    next(new Error("Укажите ровно одно из полей: categorySlug или categoryId"));
-    return;
+    throw new Error("Укажите ровно одно из полей: categorySlug или categoryId");
   }
-
-  next();
 });
 
 export default mongoose.model("ProductCategoryDisplay", ProductCategoryDisplaySchema);

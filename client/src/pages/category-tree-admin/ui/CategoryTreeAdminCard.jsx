@@ -34,6 +34,13 @@ export const CategoryTreeAdminCard = memo(function CategoryTreeAdminCard({
   onDelete,
 }) {
   const pathLabel = formatCategoryPath(row);
+  // Показываем, только когда подпись плитки разошлась с названием в дереве:
+  // совпадающую строку дублировать незачем.
+  const rawStorefrontLabel = String(row.storefrontLabel ?? "").trim();
+  const storefrontLabel =
+    rawStorefrontLabel && rawStorefrontLabel !== String(row.labelRu ?? "").trim()
+      ? rawStorefrontLabel
+      : "";
   const keywords = row.searchKeywords ?? [];
   const defaultCharacteristicKeys = row.defaultCharacteristicKeys ?? [];
 
@@ -153,6 +160,11 @@ export const CategoryTreeAdminCard = memo(function CategoryTreeAdminCard({
                 <div className="admin-panel__card-main">
                   <p className="admin-panel__path">{pathLabel}</p>
                   <span className="admin-panel__slug">{row.slug}</span>
+                  {storefrontLabel ? (
+                    <p className="admin-panel__storefront-label">
+                      {CATEGORY_TREE_ADMIN_PAGE_UI.STOREFRONT_LABEL(storefrontLabel)}
+                    </p>
+                  ) : null}
                   <div className="admin-panel__meta">
                     <span
                       className={[

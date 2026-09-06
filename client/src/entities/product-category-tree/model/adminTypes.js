@@ -12,6 +12,7 @@
  * @property {boolean} isLeaf
  * @property {string | null} [legacyProductCategory]
  * @property {number} sortOrder
+ * @property {string | null} [storefrontLabel] подпись плитки, если её меняли на витрине
  */
 
 /**

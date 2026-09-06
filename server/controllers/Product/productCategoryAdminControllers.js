@@ -5,6 +5,7 @@ import {
   PRODUCT_CATEGORY_LABEL_RU_MAX_LENGTH,
   PRODUCT_CATEGORY_SLUG_MAX_LENGTH,
 } from "../../constants/productCategoryTreeConstants.js";
+import ProductCategoryDisplayModel from "../../models/ProductCategoryDisplayModel.js";
 import ProductCategoryModel from "../../models/ProductCategoryModel.js";
 import ProductModel from "../../models/ProductModel.js";
 import { AppError } from "../../errors/AppError.js";
@@ -25,7 +26,23 @@ const CATEGORY_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 /**
  * @param {import('mongoose').LeanDocument<import('../../models/ProductCategoryModel.js').default>} row
  */
-const toCategoryAdminPayload = (row) => ({
+/**
+ * Название плитки, если админ переименовал её на витрине.
+ *
+ * Дерево категорий и витрина — разные вещи: `labelRu` попадает в карточки
+ * товаров и хлебные крошки, а `customLabel` меняет только подпись плитки. Пока
+ * админка дерева про переопределение не знала, переименованную категорию в ней
+ * было не найти: на витрине «Транспорт и запчасти», в дереве по-прежнему
+ * «Автомобили», и поиск по новому названию не давал ничего.
+ *
+ * @param {Record<string, any>} row
+ * @param {Map<string, string>} labelBySlug
+ * @param {Map<string, string>} labelById
+ */
+const resolveStorefrontLabel = (row, labelBySlug, labelById) =>
+  labelById.get(String(row._id)) ?? labelBySlug.get(String(row.slug ?? "")) ?? null;
+
+const toCategoryAdminPayload = (row, storefrontLabel = null) => ({
   _id: String(row._id),
   slug: String(row.slug ?? ""),
   labelRu: String(row.labelRu ?? ""),
@@ -42,6 +59,8 @@ const toCategoryAdminPayload = (row) => ({
     typeof row.legacyProductCategory === "string" ? row.legacyProductCategory : null,
   sortOrder: Number(row.sortOrder) || 0,
   updatedAt: row.updatedAt ?? null,
+  // `null`, когда плитку не переименовывали: витрина показывает `labelRu`.
+  storefrontLabel: storefrontLabel || null,
 });
 
 /**
@@ -103,7 +122,29 @@ export async function listProductCategoriesAdminController(_req, res) {
   const rows = await ProductCategoryModel.find()
     .sort({ pathSlugs: 1, sortOrder: 1, labelRu: 1 })
     .lean();
-  successRes(res, { categories: rows.map(toCategoryAdminPayload) });
+
+  // Переопределения витрины заводятся то по слагу (корневые плитки), то по id
+  // узла — забираем оба ключа разом, чтобы не ходить в базу на каждую строку.
+  const displays = await ProductCategoryDisplayModel.find({
+    customLabel: { $nin: [null, ""] },
+  })
+    .select("categorySlug categoryId customLabel")
+    .lean();
+
+  const labelBySlug = new Map();
+  const labelById = new Map();
+  for (const item of displays) {
+    const label = String(item.customLabel ?? "").trim();
+    if (!label) continue;
+    if (item.categoryId) labelById.set(String(item.categoryId), label);
+    if (item.categorySlug) labelBySlug.set(String(item.categorySlug), label);
+  }
+
+  successRes(res, {
+    categories: rows.map((row) =>
+      toCategoryAdminPayload(row, resolveStorefrontLabel(row, labelBySlug, labelById)),
+    ),
+  });
 }
 
 /** POST /product/admin/categories */
