@@ -1,8 +1,10 @@
 import { z } from "zod";
 
-/** Синхрон с `ORDER_DELIVERY_ADDRESS_MAX_LENGTH` / DaData line. */
+import { ADDRESS_LINE_MAX_LENGTH } from "./userFields.js";
+
 export const PRODUCT_PICKUP_ADDRESS_MIN_LENGTH = 5;
-export const PRODUCT_PICKUP_ADDRESS_MAX_LENGTH = 100;
+/** Тот же адрес, что у доставки, — и та же длина. */
+export const PRODUCT_PICKUP_ADDRESS_MAX_LENGTH = ADDRESS_LINE_MAX_LENGTH;
 
 export const ORDER_FULFILLMENT_PICKUP = "pickup";
 export const ORDER_FULFILLMENT_DELIVERY = "delivery";

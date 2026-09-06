@@ -1,7 +1,8 @@
-/** Как `server/constants/dadataConstants.js`. */
-export const ADDRESS_LINE_MAX_LENGTH = 100;
-
-export const ADDRESS_FLAT_MAX_LENGTH = 20;
+// Длина адреса — из контракта, одна на сервер, веб и мобилку.
+export {
+  ADDRESS_LINE_MAX_LENGTH,
+  ADDRESS_FLAT_MAX_LENGTH,
+} from "@molha/api-contract";
 
 /** Как `contract/src/addressStructured.js`. */
 export const ADDRESS_CITY_MAX_LENGTH = 80;

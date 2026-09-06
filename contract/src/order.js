@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { mongoIdSchema } from "./mongoId.js";
+import { ADDRESS_LINE_MAX_LENGTH } from "./userFields.js";
 import {
   optionalLimitQuery,
   optionalPageQuery,
@@ -50,8 +51,8 @@ export const ORDER_SHIPMENT_ADVANCE_STATUSES = [
 export const ORDER_LINE_ITEM_QUANTITY_MIN = 1;
 export const ORDER_ITEMS_MAX = 100;
 
-/** Синхрон с `server/constants/dadataConstants.js`. */
-export const ORDER_DELIVERY_ADDRESS_MAX_LENGTH = 100;
+/** Адрес заказа — тот же адрес, что и везде. */
+export const ORDER_DELIVERY_ADDRESS_MAX_LENGTH = ADDRESS_LINE_MAX_LENGTH;
 export const ORDER_DELIVERY_FLAT_MAX_LENGTH = 20;
 
 const orderLineItemInputSchema = z.object({
