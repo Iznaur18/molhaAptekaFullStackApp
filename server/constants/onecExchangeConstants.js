@@ -78,15 +78,15 @@ export const ONEC_EXCHANGE_ALLOW_ZIP = true;
 /**
  * Rate limit: сколько сессий обмена продавец может начать за окно.
  *
- * Полный цикл 1С — это два `checkauth` (каталог и заказы), так что шесть
- * стартов = три обмена за десять минут. Для боя в самый раз, а при настройке
- * узла и отладке — мало, поэтому значение поднимается переменной окружения.
+ * Полный цикл 1С — это два `checkauth` (каталог и заказы). При настройке узла
+ * (проверка связи + повторные запуски) 6 за 10 минут мало — дефолт 30.
+ * Переопределение: `ONEC_EXCHANGE_CHECKAUTH_MAX_PER_WINDOW`.
  */
 export const ONEC_EXCHANGE_CHECKAUTH_WINDOW_MS = 10 * 60 * 1000;
 export const ONEC_EXCHANGE_CHECKAUTH_MAX_PER_WINDOW = (() => {
   const raw = Number(process.env.ONEC_EXCHANGE_CHECKAUTH_MAX_PER_WINDOW);
   if (Number.isFinite(raw) && raw >= 1) return Math.floor(raw);
-  return 6;
+  return 30;
 })();
 /** Отдельный потолок на перебор пароля с одного IP (успешные не считаются). */
 export const ONEC_EXCHANGE_AUTH_MAX_PER_WINDOW = 60;
