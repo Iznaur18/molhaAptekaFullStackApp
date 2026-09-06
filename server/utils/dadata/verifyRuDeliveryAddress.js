@@ -30,6 +30,23 @@ export function buildAddressQueryForClean(line, flat) {
 }
 
 /**
+ * Запрос к подсказкам — без квартиры.
+ *
+ * У «Стандартизации» (clean) и «Подсказок» (suggest) разные требования к
+ * строке: clean принимает «…, д 7, кв 1» и разбирает квартиру, а suggest на ту
+ * же строку возвращает **ноль вариантов**. Пока сюда шёл общий запрос с
+ * квартирой, фолбэк на подсказки не срабатывал ни разу: адрес с квартирой
+ * (то есть почти любой адрес доставки) оставался без координат и без ФИАС.
+ * Проверено на боевых ключах — «г Москва, ул Тверская, д 7» даёт 7 подсказок,
+ * «г Москва, ул Тверская, д 7, кв 1» — ни одной.
+ *
+ * @param {string} line
+ */
+export function buildAddressQueryForSuggest(line) {
+  return String(line).trim();
+}
+
+/**
  * @param {Record<string, unknown>} cleaned
  * @returns {string | null}
  */
@@ -155,9 +172,7 @@ async function resolveFromSuggestions(line, flatInput) {
 
   let suggestions;
   try {
-    suggestions = await suggestRuAddresses(
-      buildAddressQueryForClean(line, flatInput),
-    );
+    suggestions = await suggestRuAddresses(buildAddressQueryForSuggest(line));
   } catch {
     return null;
   }

@@ -20,6 +20,7 @@ import { assertCreateOrderSingleSeller } from "./assertCreateOrderSingleSeller.j
 import { buildStoredShipments } from "./orderShipments.js";
 import { resolveOrderFulfillmentSplit } from "./resolveOrderFulfillmentSplit.js";
 import { resolveDeliveryFeesBySeller } from "../courier/courierDeliveryFee.js";
+import { resolveOrderDeliveryGeo } from "./resolveOrderDeliveryGeo.js";
 import {
   buildDeliveryOriginBySeller,
   buildGoodsTotalBySeller,
@@ -676,6 +677,11 @@ export async function createOrder({
     throw new AppError(400, "Адрес доставки обязателен");
   }
 
+  const orderGeo = resolveOrderDeliveryGeo({
+    verifiedGeo: addressForOrder.geo,
+    clientGeo: deliveryAddressGeo,
+  });
+
   const referrerUserId = await resolveAffiliateReferrerUserId(affiliateCode);
   const appliedPromos = await listAppliedProductPromosForUser({
     userId: String(userId),
@@ -747,12 +753,14 @@ export async function createOrder({
       // Доставку по тарифу продавца считаем на сервере от позиций заказа:
       // порог «бесплатно от суммы» должен смотреть на то, что реально
       // заказано, а не на корзину, которая с тех пор могла измениться.
+      // Километраж — только по проверенным координатам: почему, написано в
+      // resolveOrderDeliveryGeo.
       const sellerDeliveryBySeller = await resolveSellerDeliveryFeesBySeller({
         fulfillmentBySellerId: fulfillmentSplit.fulfillmentBySellerId,
         deliveryCarrierBySellerId: deliveryCarrierBySeller,
         goodsTotalBySellerId: buildGoodsTotalBySeller(pricedItems),
         originBySellerId: buildDeliveryOriginBySeller(productById),
-        deliveryAddressGeo: deliveryAddressGeo ?? addressForOrder.geo ?? null,
+        deliveryAddressGeo: orderGeo.tariffGeo,
       });
       const orderStatus = buildOrderStatusFromItems(pricedItems);
       const reserveLines = pricedItems.map((line, index) => ({
@@ -773,9 +781,10 @@ export async function createOrder({
             deliveryAddress: addressForOrder.displayAddress,
             deliveryAddressFlat: addressForOrder.flat ?? "",
             deliveryAddressFiasId: addressForOrder.fiasId ?? "",
-            // Координаты берём с клиента: стандартизация DaData отключена,
-            // и в проверенном адресе geo почти всегда пустой.
-            deliveryAddressGeo: deliveryAddressGeo ?? addressForOrder.geo ?? null,
+            // Точка для службы доставки: клиентская точнее (подъезд, а не
+            // улица), а на деньги она больше не влияет — см.
+            // resolveOrderDeliveryGeo.
+            deliveryAddressGeo: orderGeo.storedGeo,
             fulfillmentMethod: resolvedFulfillment,
             shipments: buildStoredShipments(pricedItems, {
               fulfillmentBySellerId: fulfillmentSplit.fulfillmentBySellerId,
