@@ -18,6 +18,7 @@ import { AppError } from "../../errors/AppError.js";
 import { PaymentModel, UserModel } from "../../models/index.js";
 import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { logMoneyEvent } from "../loyalty/logMoneyEvent.js";
+import { resolveReusablePayment } from "./paymentIdempotency.js";
 import { buildReturnUrl } from "./paymentReturnUrl.js";
 import { createYookassaPayment, isYookassaConfigured } from "./yookassaClient.js";
 
@@ -137,7 +138,14 @@ export async function createPlatformServicePayment({
   }
 
   const key = String(idempotencyKey ?? "").trim() || randomUUID();
-  const existing = await PaymentModel.findOne({ userId, idempotenceKey: key }).lean();
+  const existing = await resolveReusablePayment({
+    userId,
+    idempotenceKey: key,
+    purpose: PAYMENT_PURPOSE_PLATFORM_SERVICE,
+    amountRub,
+    serviceKind,
+    serviceTargetId: targetId,
+  });
   if (existing) {
     return {
       paymentId: String(existing._id),

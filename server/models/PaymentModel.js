@@ -124,4 +124,37 @@ paymentSchema.index(
   { unique: true, name: "payment_user_idempotence_unique" },
 );
 
+/**
+ * По одному заказу — один неоплаченный счёт.
+ *
+ * Последняя линия обороны, а не первая: переиспользование открытого платежа
+ * живёт в `paymentIdempotency`, но две одновременные попытки успевают
+ * разойтись между чтением и записью. Здесь их разводит уже база — второй
+ * запрос получает 409 вместо второго оплачиваемого счёта на те же деньги.
+ */
+paymentSchema.index(
+  { orderId: 1 },
+  {
+    unique: true,
+    name: "payment_open_order_unique",
+    partialFilterExpression: {
+      orderId: { $type: "objectId" },
+      status: PAYMENT_STATUS_CREATED,
+    },
+  },
+);
+
+/** То же для услуг площадки: один неоплаченный счёт на одну услугу. */
+paymentSchema.index(
+  { serviceKind: 1, serviceTargetId: 1 },
+  {
+    unique: true,
+    name: "payment_open_service_unique",
+    partialFilterExpression: {
+      serviceTargetId: { $type: "objectId" },
+      status: PAYMENT_STATUS_CREATED,
+    },
+  },
+);
+
 export const PaymentModel = mongoose.model("Payment", paymentSchema);

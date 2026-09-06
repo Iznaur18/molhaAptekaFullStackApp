@@ -3,7 +3,9 @@ import { IntroAdCampaignModel } from "../models/IntroAdCampaignModel.js";
 import { SiteHeaderBannerCampaignModel } from "../models/SiteHeaderBannerCampaignModel.js";
 import {
   AffiliateLedgerEntryModel,
+  EscrowLedgerEntryModel,
   MoneyIdempotencyRecordModel,
+  PaymentModel,
   PendingRegistrationModel,
   ProductPriceOfferModel,
   ReferralLedgerEntryModel,
@@ -45,6 +47,12 @@ export async function syncCriticalIndexes() {
   await syncModelIndexes(MoneyIdempotencyRecordModel, "MoneyIdempotencyRecord");
   await syncModelIndexes(AffiliateLedgerEntryModel, "AffiliateLedgerEntry");
   await syncModelIndexes(ProductPriceOfferModel, "ProductPriceOffer");
+  // Partial-unique по заказу и по услуге: не дают выставить второй
+  // оплачиваемый счёт на то, за что уже платят.
+  await syncModelIndexes(PaymentModel, "Payment");
+  // Состояние переехало на строки — старый индекс по `state + releaseDueAt`
+  // надо не только перестать использовать, но и убрать.
+  await syncModelIndexes(EscrowLedgerEntryModel, "EscrowLedgerEntry");
   // Partial-unique по advertiserId: не даёт завести вторую открытую кампанию
   // и, как следствие, зарезервировать баллы дважды.
   await syncModelIndexes(IntroAdCampaignModel, "IntroAdCampaign");

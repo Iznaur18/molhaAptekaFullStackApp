@@ -21,6 +21,7 @@ import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { assertOrderAcceptedBySeller } from "../order/assertOrderPrepaid.js";
 import { logMoneyEvent } from "../loyalty/logMoneyEvent.js";
 import { openEscrowForPaidOrder } from "./escrowLedger.js";
+import { resolveReusablePayment } from "./paymentIdempotency.js";
 import { buildReturnUrl } from "./paymentReturnUrl.js";
 import { createYookassaPayment, isYookassaConfigured } from "./yookassaClient.js";
 
@@ -187,7 +188,15 @@ export async function createOrderPrepayment({
   }
 
   const key = String(idempotencyKey ?? "").trim() || randomUUID();
-  const existing = await PaymentModel.findOne({ userId, idempotenceKey: key }).lean();
+  // Ключа клиент может и не прислать — тогда от второго счёта на тот же заказ
+  // страхует открытый платёж по этому заказу. Подробности в paymentIdempotency.
+  const existing = await resolveReusablePayment({
+    userId,
+    idempotenceKey: key,
+    purpose: PAYMENT_PURPOSE_ORDER,
+    amountRub,
+    orderId: order._id,
+  });
   if (existing) {
     return {
       paymentId: String(existing._id),
@@ -325,11 +334,21 @@ export async function applyOrderPrepayment({
     return { applied: true, orderId: String(payment.orderId) };
   } catch (error) {
     // Деньги у банка есть, а заказ не отмечен: возвращаем платёж в `created`,
-    // чтобы повторное уведомление довело дело до конца.
-    await PaymentModel.updateOne(
-      { _id: payment._id },
-      { $set: { status: PAYMENT_STATUS_CREATED, appliedAt: null } },
-    );
+    // чтобы повторное уведомление довело дело до конца. Возврат может не
+    // пройти — если по заказу уже успели завести новый открытый счёт, его
+    // держит уникальный индекс. Тогда важнее не потерять исходную ошибку.
+    try {
+      await PaymentModel.updateOne(
+        { _id: payment._id },
+        { $set: { status: PAYMENT_STATUS_CREATED, appliedAt: null } },
+      );
+    } catch (resetError) {
+      logServerEvent("error", {
+        event: "payment.order_mark_reset_failed",
+        paymentId: String(payment._id),
+        ...formatLogError(resetError),
+      });
+    }
     logServerEvent("error", {
       event: "payment.order_mark_failed",
       paymentId: String(payment._id),

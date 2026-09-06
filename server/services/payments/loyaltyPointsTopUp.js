@@ -20,6 +20,7 @@ import { PaymentModel, UserModel } from "../../models/index.js";
 import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { creditLoyaltyPoints } from "../loyalty/loyaltyPointsSpend.js";
 import { logMoneyEvent } from "../loyalty/logMoneyEvent.js";
+import { resolveReusablePayment } from "./paymentIdempotency.js";
 import { buildReturnUrl } from "./paymentReturnUrl.js";
 import { createYookassaPayment, isYookassaConfigured } from "./yookassaClient.js";
 
@@ -112,8 +113,15 @@ export async function createLoyaltyPointsTopUp({
 
   const key = String(idempotencyKey ?? "").trim() || randomUUID();
 
-  // Повтор с тем же ключом отдаёт ту же ссылку, а не второй платёж.
-  const existing = await PaymentModel.findOne({ userId, idempotenceKey: key }).lean();
+  // Повтор с тем же ключом отдаёт ту же ссылку, а не второй платёж. Ключ
+  // сверяется вместе с целью и суммой: у пополнения нет объекта, за который
+  // платят, и одна пара «пользователь + ключ» ничего не доказывает.
+  const existing = await resolveReusablePayment({
+    userId,
+    idempotenceKey: key,
+    purpose: PAYMENT_PURPOSE_LOYALTY_POINTS,
+    amountRub: rub,
+  });
   if (existing) {
     return {
       paymentId: String(existing._id),
