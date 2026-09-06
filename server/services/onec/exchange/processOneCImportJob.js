@@ -1,3 +1,5 @@
+import { PRODUCT_FULFILLMENT_SOURCE_PROFILE } from "@molha/api-contract";
+
 import {
   ONEC_EXCHANGE_DIRECTION_COMMERCEML,
   ONEC_EXCHANGE_STATUS_ERROR,
@@ -26,6 +28,11 @@ import { formatLogError, logServerEvent } from "../../../utils/logServerEvent.js
 import { resolveSellerDefaultPickupFromUser } from "../../product/bulkImport/resolveSellerDefaultPickupFromUser.js";
 import { resolveProductPickupWriteFields } from "../../product/productPickupLocations.js";
 import { applyProductSaleCityFields } from "../../product/ruCityNormalized.js";
+import {
+  buildProductFieldsFromSellerDefaults,
+  resolveSellerDefaultsForProductWrite,
+  SELLER_COMMERCE_DEFAULTS_SELECT,
+} from "../../seller/sellerCommerceDefaults.js";
 import { createOneCCatalogApplier } from "./applyOneCCatalogProducts.js";
 import { createOneCOffersApplier } from "./applyOneCOffers.js";
 import {
@@ -47,16 +54,43 @@ import { parseCommerceMlOffers } from "./parseCommerceMlOffers.js";
 const MAX_ISSUES = 100;
 
 /**
- * Точка самовывоза и город для новых карточек берутся из профиля продавца:
+ * Точка самовывоза и город для карточек берутся из профиля продавца:
  * CommerceML их не содержит, а без адреса товар нельзя купить.
+ *
+ * Источников два, и порядок важен. Основной — раздел «Доставка и оплата»
+ * (`sellerFulfillmentDefaults`): он для того и заведён, чтобы продавец с
+ * тысячей карточек правил адрес один раз. Запасной — старые одиночные поля
+ * профиля, для тех, кто новый раздел ещё не открывал.
+ *
+ * Пока читались только старые поля, выгрузка молча ломалась: у продавца с
+ * заполненной «Доставкой и оплатой», но пустым `userAddressGeo`, резолвер
+ * отдавал `null`, и все карточки создавались с выключенным самовывозом и без
+ * адреса. Повторная выгрузка не лечила — долив дефолтов брал их отсюда же.
  *
  * @param {string} sellerId
  * @returns {Promise<{ defaults: Record<string, unknown>; warning: string }>}
  */
-async function resolveSellerProductDefaults(sellerId) {
+export async function resolveSellerProductDefaults(sellerId) {
   const user = await UserModel.findById(sellerId)
-    .select("userAddress userAddressFlat userAddressGeo")
+    .select(`${SELLER_COMMERCE_DEFAULTS_SELECT} userAddress userAddressFlat userAddressGeo`)
     .lean();
+
+  const profileDefaults = await resolveSellerDefaultsForProductWrite(user);
+  if (profileDefaults) {
+    const saleCity = applyProductSaleCityFields(undefined);
+    return {
+      defaults: {
+        productSaleCity: saleCity.productSaleCity,
+        productSaleCityNormalized: saleCity.productSaleCityNormalized,
+        ...buildProductFieldsFromSellerDefaults(profileDefaults),
+        // Карточка из 1С своего адреса не имеет и иметь не может, поэтому
+        // следует профилю: правка раздела разойдётся по ней одним updateMany,
+        // а не потребует новой выгрузки.
+        productFulfillmentSource: PRODUCT_FULFILLMENT_SOURCE_PROFILE,
+      },
+      warning: "",
+    };
+  }
 
   try {
     const pickup = resolveSellerDefaultPickupFromUser(user);
