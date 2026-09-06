@@ -15,7 +15,12 @@ import {
 } from "../../constants/installmentConstants.js";
 import { AppError } from "../../errors/AppError.js";
 import {
-  markEscrowReleasable,
+  ESCROW_REFUND_REASON_ITEM_CANCELLED,
+  ESCROW_REFUND_REASON_ITEM_RETURNED,
+} from "../../constants/escrowConstants.js";
+import {
+  markEscrowLineRefundable,
+  markEscrowLineReleasable,
   scheduleEscrowAutoRelease,
 } from "../payments/escrowLedger.js";
 import { assertOrderPrepaid } from "./assertOrderPrepaid.js";
@@ -172,6 +177,7 @@ export async function markOrderItemDeliveredBySeller({
   await scheduleEscrowAutoRelease({
     orderId,
     sellerId,
+    itemIndex,
     deliveredAt: targetItem.deliveredAt,
   });
 
@@ -291,6 +297,16 @@ export async function markOrderItemCancelled({
   }
 
   const updatedOrder = await reloadOrderWithItems(orderId);
+
+  // Предоплаченный заказ: деньги за отменённую позицию уже у площадки, и
+  // теперь это долг перед покупателем. Без пометки строка так и уехала бы
+  // продавцу вместе с остальными.
+  await markEscrowLineRefundable({
+    orderId,
+    sellerId: itemSellerId,
+    itemIndex,
+    reason: ESCROW_REFUND_REASON_ITEM_CANCELLED,
+  });
 
   // Заказ отменён у нас — снимаем его и у внешней службы, пока курьер не
   // забрал груз. Иначе он приедет за товаром, которого уже нет.
@@ -642,9 +658,15 @@ export async function confirmOrderItemByBuyer({
   await runConfirmItemSideEffects(updatedOrder, updatedItem ?? {}, productId);
 
   // Покупатель подтвердил получение — ждать неделю больше незачем.
+  // Размораживается ровно эта позиция: соседние могут быть ещё в пути, и
+  // деньги за них продавцу пока не принадлежат.
   const confirmedSellerId = String(updatedItem?.sellerIdAtOrder ?? "");
   if (confirmedSellerId) {
-    await markEscrowReleasable({ orderId, sellerId: confirmedSellerId });
+    await markEscrowLineReleasable({
+      orderId,
+      sellerId: confirmedSellerId,
+      itemIndex,
+    });
   }
 
   return { order: updatedOrder, pointsEarned };
@@ -774,6 +796,15 @@ export async function markOrderItemReturned({
   });
 
   const updatedOrder = await reloadOrderWithItems(orderId);
+
+  // Товар вернулся — деньги за него тоже. Отсчёт до автоматической выплаты
+  // снимается там же: платить продавцу больше не за что.
+  await markEscrowLineRefundable({
+    orderId,
+    sellerId: itemSellerId,
+    itemIndex,
+    reason: ESCROW_REFUND_REASON_ITEM_RETURNED,
+  });
 
   // Узнаёт та сторона, которая возврат не оформляла.
   await notifyBuyerAboutOrderItemStatus({
