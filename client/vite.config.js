@@ -130,11 +130,25 @@ export default defineConfig({
           if (!id.includes("node_modules")) {
             return undefined;
           }
-          if (id.includes("@sentry")) {
-            return "vendor-sentry";
-          }
-          if (id.includes("leaflet") || id.includes("react-leaflet")) {
-            return "vendor-leaflet";
+          // @sentry и leaflet НАРОЧНО остаются без ручного чанка.
+          //
+          // `undefined` здесь значит «решай сам, Rollup»: пакет уедет внутрь
+          // того чанка, который его импортирует, — а импортируют их только
+          // ленивые sentryClient и MapPointPicker. Именованный чанк, наоборот,
+          // становился статической зависимостью entry даже при динамическом
+          // импорте в исходниках: в index.html появлялся modulepreload, и
+          // каждый гость качал 48 КБ Sentry (который без DSN даже не
+          // запускается) и 57 КБ карты на страницах, где карты нет.
+          //
+          // Важно вернуть `undefined` ЗДЕСЬ, до общего `vendor-misc` внизу:
+          // тот собирает остаток node_modules в один чанк, и оба пакета
+          // приезжали бы в стартовую загрузку снова, просто под другим именем.
+          if (
+            id.includes("@sentry") ||
+            id.includes("leaflet") ||
+            id.includes("react-leaflet")
+          ) {
+            return undefined;
           }
           if (id.includes("embla-carousel")) {
             return "vendor-embla";

@@ -1,5 +1,5 @@
 import { Navigation } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { fetchAddressGeolocate } from "../api/fetchAddressGeolocate.js";
@@ -16,7 +16,18 @@ import {
   ADDRESS_SUGGEST_MIN_QUERY_LENGTH,
 } from "../model/constants.js";
 import { useAddressSuggestionsQuery } from "../model/useAddressSuggestionsQuery.js";
-import { MapPointPicker } from "../../maps/ui/MapPointPicker.jsx";
+/**
+ * Карта грузится по требованию.
+ *
+ * Статический импорт тянул leaflet в стартовый граф: 57 КБ сжатого js и css
+ * ехали на КАЖДУЮ страницу, включая главную, где карты нет вовсе. Открывается
+ * она в полноэкранном диалоге по кнопке — до этого момента её код не нужен.
+ */
+const MapPointPicker = lazy(() =>
+  import("../../maps/ui/MapPointPicker.jsx").then((m) => ({
+    default: m.MapPointPicker,
+  })),
+);
 import {
   formatGeolocationLowAccuracyMessage,
   isGeolocationAccuracyLow,
@@ -368,14 +379,22 @@ export function AddressDeliveryFields({
               {ADDRESS_DELIVERY_UI.MAP_ARIA}
             </h2>
             <div className="address-delivery-fields__map-fullscreen-body">
-              <MapPointPicker
-                lat={mapLat}
-                lon={mapLon}
-                disabled={disabled}
-                ariaLabel={ADDRESS_DELIVERY_UI.MAP_ARIA}
-                className="map-point-picker--fullscreen"
-                onPointChange={handleMapPointChange}
-              />
+              <Suspense
+                fallback={
+                  <p className="address-delivery-fields__map-loading">
+                    {ADDRESS_DELIVERY_UI.MAP_LOADING}
+                  </p>
+                }
+              >
+                <MapPointPicker
+                  lat={mapLat}
+                  lon={mapLon}
+                  disabled={disabled}
+                  ariaLabel={ADDRESS_DELIVERY_UI.MAP_ARIA}
+                  className="map-point-picker--fullscreen"
+                  onPointChange={handleMapPointChange}
+                />
+              </Suspense>
             </div>
             <div className="address-delivery-fields__map-fullscreen-overlay">
               <div className="address-delivery-fields__map-fullscreen-top">
