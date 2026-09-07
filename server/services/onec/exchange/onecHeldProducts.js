@@ -1,5 +1,6 @@
+import { PRODUCT_MODERATION_APPROVED } from "../../../constants/productModerationConstants.js";
 import { OneCPendingProductModel, ProductModel } from "../../../models/index.js";
-import { deleteProductsCascade } from "../../product/deleteProductsCascade.js";
+import { buildProductModerationFingerprint } from "../../product/productContentFingerprint.js";
 import {
   buildOneCProductCommonFields,
   createOneCProduct,
@@ -20,8 +21,8 @@ import {
 export const ONEC_HOLD_RULE_MESSAGE =
   "Нет картинок и нет остатка — карточка на сайте не заводится";
 
-export const ONEC_HOLD_BLOCKED_MESSAGE =
-  "Нет картинок и нет остатка, но по товару есть незакрытые заказы — карточка снята с витрины, но не удалена";
+export const ONEC_HOLD_HIDDEN_MESSAGE =
+  "Нет картинок и нет остатка — карточка снята с витрины до ближайшего остатка";
 
 /**
  * @param {{ hasImages: boolean; stock: number | null | undefined }} params
@@ -67,6 +68,8 @@ export async function findHeldOneCProducts({ sellerId, externalIds }) {
  *   stock?: number | null;
  *   price?: number | null;
  *   seenAt?: Date | null;
+ *   moderationStatus?: string;
+ *   moderationHash?: string;
  * }} params
  */
 export async function holdOneCProduct({
@@ -76,9 +79,17 @@ export async function holdOneCProduct({
   stock = null,
   price = null,
   seenAt = null,
+  moderationStatus = "",
+  moderationHash = "",
 }) {
   /** @type {Record<string, unknown>} */
   const set = {};
+
+  // Пишется только теми путями, которые карточку всё-таки убирают с сайта
+  // (наследие прежнего поведения). Правило приёмки живые карточки больше не
+  // удаляет, поэтому обычно эти поля остаются пустыми.
+  if (moderationStatus) set.moderationStatus = moderationStatus;
+  if (moderationHash) set.moderationHash = moderationHash;
 
   if (item) {
     set.name = item.name ?? "";
@@ -130,74 +141,65 @@ export async function dropStaleHeldOneCProducts({ sellerId, before }) {
 }
 
 /**
- * Карточка, попавшая под правило, уезжает в отстойник: сама карточка удаляется
- * со всеми связями, описание сохраняется — вернётся, когда 1С пришлёт остаток.
+ * Карточку, попавшую под правило, снимаем с витрины — и только.
  *
- * Товар с незакрытыми продажами не удаляем: на него ссылается строка заказа.
+ * Раньше здесь стоял `deleteProductsCascade`, а вернувшийся остаток создавал
+ * товар заново. Цена такого «оборота» оказалась несопоставима с пользой:
+ * у карточки менялся `_id`, терялись отзывы, вопросы, избранное и внешние
+ * ссылки, а весь каталог продавца заново вставал в очередь модерации — при
+ * тысяче позиций и обмене раз в десять минут это делало модерацию
+ * неработоспособной. Пустая карточка и так недостижима: `productIsAvailable`
+ * убирает её из витрины и поиска.
+ *
+ * Отстойник (`OneCPendingProduct`) остаётся только для номенклатуры, у которой
+ * карточки на сайте никогда не было, — там он по-прежнему нужен.
  *
  * @param {{
  *   sellerId: string;
  *   product: Record<string, any>;
  *   item?: Record<string, any> | null;
- *   stock?: number | null;
- *   price?: number | null;
  *   seenAt?: Date | null;
  *   onIssue?: (issue: { externalId: string; name: string; message: string }) => void;
  * }} params
- * @returns {Promise<{ deleted: boolean; blocked: boolean }>}
+ * Уже спрятанную карточку не трогаем вовсе: у продавца, чья 1С картинок не
+ * выгружает, под правилом живёт половина каталога, и переписывать её на каждом
+ * обмене — та же бессмысленная работа, от которой уходим. Отметку «видели в
+ * выгрузке» такой карточке ставит вызывающий, одним запросом на пачку.
+ *
+ * @returns {Promise<{ hidden: boolean; alreadyHidden: boolean }>}
  */
-export async function withdrawProductToHold({
-  sellerId,
+export async function hideProductByOneCHoldRule({
+  sellerId: _sellerId,
   product,
   item = null,
-  stock = null,
-  price = null,
   seenAt = null,
   onIssue,
 }) {
   const externalId = String(product.product1cGuid ?? "");
   const name = String(item?.name ?? product.productName ?? "");
 
-  const payload = item ?? {
-    name,
-    description: product.productDescription ?? "",
-    article: product.productArticle ?? "",
-    groupIds: product.product1cGroupId ? [product.product1cGroupId] : [],
-    characteristics: product.productCharacteristics ?? [],
-  };
+  const alreadyHidden =
+    product.product1cHeld === true &&
+    product.productIsAvailable === false &&
+    (product.productStockQuantity ?? 0) === 0;
 
-  const { deletedIds } = await deleteProductsCascade([product]);
-  const deleted = deletedIds.length > 0;
+  if (alreadyHidden) return { hidden: false, alreadyHidden: true };
 
-  if (!deleted) {
-    // Удалить нельзя, но и продавать нечего: снимаем с витрины и оставляем
-    // карточку жить ради истории заказов.
-    await ProductModel.updateOne(
-      { _id: product._id },
-      {
-        $set: {
-          productIsAvailable: false,
-          productOutOfStock: true,
-          productStockQuantity: 0,
-          ...(seenAt ? { product1cSeenAt: seenAt } : {}),
-        },
+  await ProductModel.updateOne(
+    { _id: product._id },
+    {
+      $set: {
+        productIsAvailable: false,
+        productOutOfStock: true,
+        productStockQuantity: 0,
+        product1cHeld: true,
+        ...(seenAt ? { product1cSeenAt: seenAt } : {}),
       },
-    );
-    onIssue?.({ externalId, name, message: ONEC_HOLD_BLOCKED_MESSAGE });
-    return { deleted: false, blocked: true };
-  }
+    },
+  );
+  onIssue?.({ externalId, name, message: ONEC_HOLD_HIDDEN_MESSAGE });
 
-  await holdOneCProduct({
-    sellerId,
-    externalId,
-    item: payload,
-    stock,
-    price,
-    seenAt,
-  });
-  onIssue?.({ externalId, name, message: ONEC_HOLD_RULE_MESSAGE });
-
-  return { deleted: true, blocked: false };
+  return { hidden: true, alreadyHidden: false };
 }
 
 /**
@@ -247,6 +249,18 @@ export async function materializeHeldOneCProduct({
   const isAvailable =
     Boolean(categoryWrite.productCategoryId) && price > 0 && stock > 0;
 
+  // Карточка уже была одобрена под этим `Ид`, и с тех пор в ней не изменилось
+  // ничего из того, что смотрит модератор, — значит, смотреть заново нечего.
+  const fingerprint = buildProductModerationFingerprint({
+    ...commonFields,
+    productImageUrls: [],
+    productCategoryId: categoryWrite.productCategoryId,
+  });
+  const keepsApproval =
+    held.moderationStatus === PRODUCT_MODERATION_APPROVED &&
+    Boolean(held.moderationHash) &&
+    held.moderationHash === fingerprint;
+
   const created = await createOneCProduct({
     sellerId,
     externalId: held.externalId,
@@ -256,6 +270,12 @@ export async function materializeHeldOneCProduct({
     price,
     stock,
     isAvailable,
+    ...(keepsApproval
+      ? {
+          moderationStatus: PRODUCT_MODERATION_APPROVED,
+          moderationHash: fingerprint,
+        }
+      : {}),
   });
 
   await OneCPendingProductModel.deleteOne({ _id: held._id });

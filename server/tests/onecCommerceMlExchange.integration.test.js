@@ -491,24 +491,28 @@ describe("CommerceML обмен: товары без картинок и без 
     });
     const jobs = await waitForImportJobs(String(seller._id), 4);
 
+    const variant = await ProductModel.findOne({
+      productSeller: seller._id,
+      product1cGuid: OFFER_GUID_VARIANT,
+    }).lean();
+    assert.ok(variant, "карточка осталась в базе, а не удалена");
+    assert.equal(variant.productIsAvailable, false, "но убрана с витрины");
+    assert.equal(variant.productStockQuantity, 0);
+    assert.equal(variant.product1cHeld, true);
     assert.equal(
-      await ProductModel.countDocuments({
-        productSeller: seller._id,
-        product1cGuid: OFFER_GUID_VARIANT,
-      }),
-      0,
-      "карточка удалена, а не оставлена пустышкой",
-    );
-    assert.equal(
-      latestJobOfKind(jobs, "offers").stats.offers["offers.xml"].heldDeleted,
+      latestJobOfKind(jobs, "offers").stats.offers["offers.xml"].heldHidden,
       1,
     );
 
-    const pending = await OneCPendingProductModel.findOne({
-      sellerId: seller._id,
-      externalId: OFFER_GUID_VARIANT,
-    }).lean();
-    assert.ok(pending, "описание уехало в отстойник");
+    // Отстойник для неё не нужен: описание живёт в самой карточке.
+    assert.equal(
+      await OneCPendingProductModel.countDocuments({
+        sellerId: seller._id,
+        externalId: OFFER_GUID_VARIANT,
+      }),
+      0,
+      "существующая карточка в отстойник не дублируется",
+    );
 
     // Товар с картинкой правило не трогает даже при нулевом остатке.
     assert.ok(
@@ -517,6 +521,123 @@ describe("CommerceML обмен: товары без картинок и без 
         product1cGuid: OFFER_GUID_SIMPLE,
       }).lean(),
     );
+  });
+
+  it("возвращает спрятанную карточку на витрину той же самой", async () => {
+    const { seller, credentials } = await createExchangeSeller();
+    const leaf = await createLeafCategory();
+
+    await runCatalogExchange({
+      request: http.request,
+      login: credentials.login,
+      password: credentials.password,
+      archive: buildExchangeZip(),
+    });
+    await waitForImportJobs(String(seller._id));
+    await saveOneCCategoryMappings(String(seller._id), [
+      { externalId: GROUP_VITAMINS, categoryId: String(leaf._id) },
+    ]);
+
+    const before = await ProductModel.findOne({
+      productSeller: seller._id,
+      product1cGuid: OFFER_GUID_VARIANT,
+    }).lean();
+
+    // Остаток обнулился — карточка прячется.
+    await runCatalogExchange({
+      request: http.request,
+      login: credentials.login,
+      password: credentials.password,
+      archive: buildExchangeZip({ variantQuantity: 0 }),
+    });
+    await waitForImportJobs(String(seller._id), 4);
+
+    // Остаток вернулся — карточка снова на витрине.
+    await runCatalogExchange({
+      request: http.request,
+      login: credentials.login,
+      password: credentials.password,
+      archive: buildExchangeZip({ variantQuantity: 4 }),
+    });
+    await waitForImportJobs(String(seller._id), 6);
+
+    const after = await ProductModel.findOne({
+      productSeller: seller._id,
+      product1cGuid: OFFER_GUID_VARIANT,
+    }).lean();
+
+    assert.equal(String(after._id), String(before._id), "карточка та же самая");
+    assert.equal(after.product1cHeld, false);
+    assert.equal(after.productStockQuantity, 4);
+    assert.equal(after.productIsAvailable, true);
+    // Модерацию по второму кругу не проходит: карточка не пересоздавалась.
+    assert.equal(after.productModerationStatus, before.productModerationStatus);
+    assert.equal(
+      await ProductModel.countDocuments({
+        productSeller: seller._id,
+        product1cGuid: OFFER_GUID_VARIANT,
+      }),
+      1,
+      "дубля не появилось",
+    );
+  });
+});
+
+describe("CommerceML обмен: повторная выгрузка без изменений", () => {
+  it("не переписывает карточки, в которых ничего не поменялось", async () => {
+    const { seller, credentials } = await createExchangeSeller();
+
+    // Первый обмен заводит карточки, второй досогласовывает то, что родилось
+    // из отстойника уже после разбора каталога. К третьему меняться нечему.
+    for (const expected of [2, 4, 6]) {
+      await runCatalogExchange({
+        request: http.request,
+        login: credentials.login,
+        password: credentials.password,
+        archive: buildExchangeZip(),
+      });
+      await waitForImportJobs(String(seller._id), expected);
+    }
+
+    const before = await ProductModel.find({ productSeller: seller._id })
+      .sort({ product1cGuid: 1 })
+      .lean();
+    assert.equal(before.length, 2);
+
+    await runCatalogExchange({
+      request: http.request,
+      login: credentials.login,
+      password: credentials.password,
+      archive: buildExchangeZip(),
+    });
+    const jobs = await waitForImportJobs(String(seller._id), 8);
+    const catalog = latestJobOfKind(jobs, "catalog").stats.catalog;
+    const offers = latestJobOfKind(jobs, "offers").stats.offers["offers.xml"];
+
+    assert.equal(catalog.unchanged, 2, "обе карточки признаны неизменившимися");
+    assert.equal(catalog.updated, 0, "и ни одна не переписана");
+    // То же самое и по пакету предложений: цены и остатки те же.
+    assert.equal(offers.unchanged, 2);
+    assert.equal(offers.priceUpdated, 0);
+    assert.equal(offers.stockUpdated, 0);
+
+    const after = await ProductModel.find({ productSeller: seller._id })
+      .sort({ product1cGuid: 1 })
+      .lean();
+
+    for (const [index, row] of after.entries()) {
+      assert.equal(
+        Number(row.updatedAt),
+        Number(before[index].updatedAt),
+        `updatedAt карточки ${row.product1cGuid} не сдвинут`,
+      );
+      // Отметка «видели в этой выгрузке» при этом обновляется: без неё уборка
+      // после полной выгрузки сочла бы товар исчезнувшим из 1С.
+      assert.ok(
+        Number(row.product1cSeenAt) > Number(before[index].product1cSeenAt),
+        `product1cSeenAt карточки ${row.product1cGuid} обновлён`,
+      );
+    }
   });
 });
 

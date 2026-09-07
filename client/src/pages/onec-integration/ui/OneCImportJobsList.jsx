@@ -15,6 +15,11 @@ function summarize(stats) {
   if (catalog) {
     parts.push(`${UI.IMPORT_CREATED}: ${catalog.created ?? 0}`);
     parts.push(`${UI.IMPORT_UPDATED}: ${catalog.updated ?? 0}`);
+    // Иначе рядовой обмен выглядел бы как «создано: 0 · обновлено: 0», хотя
+    // каталог принят целиком — просто в нём ничего не поменялось.
+    if (catalog.unchanged > 0) {
+      parts.push(`${UI.IMPORT_UNCHANGED}: ${catalog.unchanged}`);
+    }
     if (catalog.uncategorized > 0) {
       parts.push(`${UI.IMPORT_UNCATEGORIZED}: ${catalog.uncategorized}`);
     }

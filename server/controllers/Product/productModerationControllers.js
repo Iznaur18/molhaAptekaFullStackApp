@@ -15,6 +15,7 @@ import {
   notifyFollowersOfSellerProductDiscount,
 } from "../../utils/productDiscount.js";
 import { buildProductSearchBlobFromFields } from "../../utils/buildProductSearchBlob.js";
+import { buildProductModerationFingerprint } from "../../services/product/productContentFingerprint.js";
 import { resolveActiveSellerPersonalCategoryId } from "../../services/seller-personal-category/sellerPersonalCategoryHelpers.js";
 import {
   resolveDefaultLeafIdForLegacyCategory,
@@ -143,6 +144,12 @@ export const approveProductModerationController = async (req, res) => {
   if (sellerPersonalCategoryId) {
     product.sellerPersonalCategoryId = sellerPersonalCategoryId;
   }
+
+  // Снимок того, что человек сейчас посмотрел и одобрил: по нему потом видно,
+  // изменилось ли с тех пор содержимое карточки, или приезжали только цена и
+  // остаток из обмена.
+  product.productModerationApprovedHash =
+    buildProductModerationFingerprint(product);
 
   await product.save();
   await product.populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT);

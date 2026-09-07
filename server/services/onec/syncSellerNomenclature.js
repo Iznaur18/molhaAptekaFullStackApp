@@ -7,7 +7,6 @@ import {
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { OneCExchangeLogModel, ProductModel } from "../../models/index.js";
 import { buildProductSearchBlobFromFields } from "../product/buildProductSearchBlob.js";
-import { deleteProductsCascade } from "../product/deleteProductsCascade.js";
 import { productHasImages } from "../product/productImagePresence.js";
 import { fetchOneCNomenclature } from "./onecHttpClient.js";
 import { resolveSellerOneCCredentials } from "./onecSettings.js";
@@ -41,8 +40,7 @@ export async function syncSellerNomenclature(sellerId, opts = {}) {
   let updated = 0;
   let deactivated = 0;
   let held = 0;
-  let heldDeleted = 0;
-  let heldBlocked = 0;
+  let heldHidden = 0;
 
   for (const item of items) {
     seenGuids.add(item.guid);
@@ -74,22 +72,20 @@ export async function syncSellerNomenclature(sellerId, opts = {}) {
     // не нужен: следующая синхронизация принесёт товар целиком.
     if (!hasImages && !(item.stock > 0)) {
       if (existing) {
-        const { deletedIds } = await deleteProductsCascade([existing]);
-        if (deletedIds.length > 0) {
-          heldDeleted += 1;
-        } else {
-          await ProductModel.updateOne(
-            { _id: existing._id },
-            {
-              $set: {
-                productIsAvailable: false,
-                productOutOfStock: true,
-                productStockQuantity: 0,
-              },
+        // Карточку не удаляем: следующая синхронизация с остатком вернула бы
+        // её новым `_id`, без отзывов и избранного и с новой модерацией.
+        await ProductModel.updateOne(
+          { _id: existing._id },
+          {
+            $set: {
+              productIsAvailable: false,
+              productOutOfStock: true,
+              productStockQuantity: 0,
+              product1cHeld: true,
             },
-          );
-          heldBlocked += 1;
-        }
+          },
+        );
+        heldHidden += 1;
       }
       held += 1;
       continue;
@@ -153,8 +149,8 @@ export async function syncSellerNomenclature(sellerId, opts = {}) {
     deactivated,
     /** Не заведены на сайте: нет картинок и нет остатка. */
     held,
-    heldDeleted,
-    heldBlocked,
+    /** Из них: существовавшие карточки, снятые с витрины (не удалённые). */
+    heldHidden,
   };
 
   await OneCExchangeLogModel.create({

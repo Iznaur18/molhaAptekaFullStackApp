@@ -3,11 +3,15 @@ import { ProductModel } from "../../../models/index.js";
 import { productHasImages } from "../../product/productImagePresence.js";
 import {
   findHeldOneCProducts,
+  hideProductByOneCHoldRule,
   holdOneCProduct,
-  withdrawProductToHold,
 } from "./onecHeldProducts.js";
 
-/** Поля карточки, которых хватает и на обновление, и на удаление по правилу. */
+/**
+ * Поля карточки, которых хватает и на обновление, и на решение по правилу
+ * приёмки. Читаем и текущие значения витрины: без них не отличить «ничего не
+ * изменилось» от «надо переписать».
+ */
 const PRODUCT_FIELDS = [
   "_id",
   "product1cGuid",
@@ -21,6 +25,9 @@ const PRODUCT_FIELDS = [
   "productPrice",
   "productStockQuantity",
   "productCategoryId",
+  "productIsAvailable",
+  "productOutOfStock",
+  "product1cHeld",
 ].join(" ");
 
 /**
@@ -120,13 +127,13 @@ export function createOneCOffersApplier({
     priceUpdated: 0,
     stockUpdated: 0,
     published: 0,
+    /** Совпало с тем, что уже лежит в карточке, — записи не было. */
+    unchanged: 0,
     missing: 0,
     /** Отложено правилом «нет картинок и нет остатка». */
     held: 0,
-    /** Из них: карточки, удалённые с сайта уже после создания. */
-    heldDeleted: 0,
-    /** Не удалось удалить из-за незакрытых заказов — только сняты с витрины. */
-    heldBlocked: 0,
+    /** Из них: существовавшие карточки, снятые с витрины (не удалённые). */
+    heldHidden: 0,
     /** Отложенные, у которых появился остаток и которые стали карточками. */
     restored: 0,
   };
@@ -206,7 +213,9 @@ export function createOneCOffersApplier({
         set.productPrice = price;
         stats.priceUpdated += 1;
       }
-      if (offer.article) set.productArticle = offer.article;
+      if (offer.article && offer.article !== product.productArticle) {
+        set.productArticle = offer.article;
+      }
 
       if (stock !== null && stock !== product.productStockQuantity) {
         set.productStockQuantity = stock;
@@ -216,23 +225,18 @@ export function createOneCOffersApplier({
       const effectivePrice = set.productPrice ?? product.productPrice;
       const effectiveStock = set.productStockQuantity ?? product.productStockQuantity;
 
-      // Остаток обнулился, а картинок у карточки нет — на сайте ей делать
-      // нечего: удаляем и кладём описание в отстойник до лучших времён.
+      // Остаток обнулился, а картинок у карточки нет — показывать нечего:
+      // снимаем с витрины и ждём ближайшего остатка. Карточку не удаляем,
+      // иначе её пришлось бы заводить заново и гнать через модерацию.
       if (effectiveStock <= 0 && !productHasImages(product)) {
-        const { deleted } = await withdrawProductToHold({
+        const { hidden } = await hideProductByOneCHoldRule({
           sellerId,
           product,
-          stock: effectiveStock,
-          price: effectivePrice,
           seenAt,
           onIssue,
         });
-        if (deleted) {
-          stats.heldDeleted += 1;
-          stats.held += 1;
-        } else {
-          stats.heldBlocked += 1;
-        }
+        if (hidden) stats.heldHidden += 1;
+        stats.held += 1;
         continue;
       }
 
@@ -241,9 +245,25 @@ export function createOneCOffersApplier({
         effectivePrice > 0 &&
         effectiveStock > 0;
 
-      set.productIsAvailable = isAvailable;
-      set.productOutOfStock = effectiveStock <= 0;
+      const outOfStock = effectiveStock <= 0;
+      if (isAvailable !== product.productIsAvailable) {
+        set.productIsAvailable = isAvailable;
+      }
+      if (outOfStock !== product.productOutOfStock) {
+        set.productOutOfStock = outOfStock;
+      }
+      // Остаток вернулся — снимаем метку правила, иначе карточка так и
+      // осталась бы помеченной как спрятанная обменом.
+      if (product.product1cHeld === true) set.product1cHeld = false;
       if (isAvailable) stats.published += 1;
+
+      // Ни цена, ни остаток, ни витрина не изменились — писать нечего.
+      // 1С шлёт полный пакет предложений каждый обмен, и без этой проверки
+      // каждый прогон переписывал бы весь каталог продавца.
+      if (Object.keys(set).length === 0) {
+        stats.unchanged += 1;
+        continue;
+      }
 
       operations.push({
         updateOne: { filter: { _id: product._id }, update: { $set: set } },

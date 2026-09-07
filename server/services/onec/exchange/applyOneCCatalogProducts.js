@@ -11,11 +11,12 @@ import { importOneCLocalImage } from "./importOneCLocalImage.js";
 import {
   dropHeldOneCProducts,
   findHeldOneCProducts,
+  hideProductByOneCHoldRule,
   holdOneCProduct,
   shouldHoldOneCProduct,
-  withdrawProductToHold,
 } from "./onecHeldProducts.js";
 import {
+  buildOneCContentHash,
   buildOneCProductCommonFields,
   createOneCProduct,
   normalizeCharacteristics,
@@ -42,6 +43,9 @@ const EXISTING_PRODUCT_FIELDS = [
   "productStockQuantity",
   "productModerationStatus",
   "productPickupAddress",
+  "productIsAvailable",
+  "product1cContentHash",
+  "product1cHeld",
 ].join(" ");
 
 /**
@@ -131,9 +135,15 @@ async function resolveProductImages({
  *    ни карточки, ни залитых файлов — только строка в отстойнике
  *    (`OneCPendingProduct`), из которой товар развернётся, когда придёт
  *    остаток. Остаток на момент разбора каталога известен только для тех, кто
- *    уже был на сайте или уже лежит в отстойнике;
+ *    уже был на сайте или уже лежит в отстойнике. Отстойник — только для
+ *    номенклатуры без карточки: уже созданная под то же правило просто
+ *    прячется с витрины и ждёт остатка на месте;
  *  - статус модерации проставляется только при создании. Перевыгрузка каталога
  *    не должна отправлять уже одобренный товар на повторную проверку;
+ *  - карточка, в которой ничего не изменилось, не переписывается вовсе:
+ *    сверяем отпечаток присланного с сохранённым на карточке. 1С шлёт полный
+ *    каталог каждый обмен, поэтому без сверки тысяча карточек переписывалась бы
+ *    десятки раз в сутки без единого изменения по существу;
  *  - без сопоставления группы 1С с категорией сайта товар остаётся
  *    в `uncategorized` и вне витрины: по `productCategoryId` его всё равно
  *    не найдёт ни один фильтр каталога.
@@ -158,15 +168,15 @@ export function createOneCCatalogApplier({
   const stats = {
     created: 0,
     updated: 0,
+    /** Пришли без единого изменения — карточку не трогали. */
+    unchanged: 0,
     archived: 0,
     uncategorized: 0,
     imagesUploaded: 0,
     /** Отложено правилом «нет картинок и нет остатка». */
     held: 0,
-    /** Из них: карточки, которые пришлось удалить с сайта. */
-    heldDeleted: 0,
-    /** Не удалось удалить из-за незакрытых заказов — только сняты с витрины. */
-    heldBlocked: 0,
+    /** Из них: существовавшие карточки, снятые с витрины (не удалённые). */
+    heldHidden: 0,
   };
   /** @type {Map<string, number>} */
   const groupCounts = new Map();
@@ -175,23 +185,22 @@ export function createOneCCatalogApplier({
    * @param {import('./parseCommerceMlCatalog.js').OneCCatalogProduct} item
    * @param {Record<string, any> | null} existing
    * @param {number | null} stock
+   * @param {unknown[]} untouchedIds карточки, которым хватит отметки «видели»
    */
-  async function moveToHold(item, existing, stock) {
+  async function moveToHold(item, existing, stock, untouchedIds) {
     if (existing) {
-      const { deleted } = await withdrawProductToHold({
+      const { hidden, alreadyHidden } = await hideProductByOneCHoldRule({
         sellerId,
         product: existing,
         item,
-        stock,
         seenAt,
         onIssue,
       });
-      if (deleted) {
-        stats.heldDeleted += 1;
-        stats.held += 1;
-      } else {
-        stats.heldBlocked += 1;
-      }
+      if (hidden) stats.heldHidden += 1;
+      // Спрятана ещё в прошлый раз — ей нужна только отметка о том, что 1С её
+      // всё ещё присылает, иначе уборка сочла бы товар исчезнувшим.
+      if (alreadyHidden) untouchedIds.push(existing._id);
+      stats.held += 1;
       return;
     }
 
@@ -222,6 +231,13 @@ export function createOneCCatalogApplier({
       existingRows.map((row) => [row.product1cGuid, row]),
     );
     const heldByGuid = await findHeldOneCProducts({ sellerId, externalIds });
+
+    /** Карточки, у которых поменялось хоть что-то, — пишем одной пачкой. */
+    /** @type {import('mongoose').AnyBulkWriteOperation[]} */
+    const operations = [];
+    /** Неизменившиеся: им нужна только метка «видели в этой выгрузке». */
+    /** @type {unknown[]} */
+    const untouchedIds = [];
 
     for (const item of products) {
       const existing = existingByGuid.get(item.externalId) ?? null;
@@ -277,7 +293,7 @@ export function createOneCCatalogApplier({
         item.imagePaths.length === 0 &&
         shouldHoldOneCProduct({ hasImages: existingHasImages, stock: knownStock })
       ) {
-        await moveToHold(item, existing, knownStock);
+        await moveToHold(item, existing, knownStock, untouchedIds);
         continue;
       }
 
@@ -302,7 +318,7 @@ export function createOneCCatalogApplier({
           stock: knownStock,
         })
       ) {
-        await moveToHold(item, existing, knownStock);
+        await moveToHold(item, existing, knownStock, untouchedIds);
         continue;
       }
 
@@ -315,18 +331,39 @@ export function createOneCCatalogApplier({
       });
 
       if (existing) {
-        // Снятие с витрины при потере категории: иначе карточка остаётся
-        // «видимой», но недостижимой ни одним фильтром каталога.
-        if (!mapped) commonFields.productIsAvailable = false;
+        const contentHash = buildOneCContentHash(commonFields);
 
         // Точку самовывоза продавец мог завести уже ПОСЛЕ первого импорта:
         // карточки создались без адреса и сами бы его никогда не получили,
         // потому что дефолты применялись только при создании.
-        if (!existing.productPickupAddress && sellerDefaults.productPickupAddress) {
-          Object.assign(commonFields, sellerDefaults);
+        const needsPickupDefaults =
+          !existing.productPickupAddress && Boolean(sellerDefaults.productPickupAddress);
+        // Снятие с витрины при потере категории: иначе карточка остаётся
+        // «видимой», но недостижимой ни одним фильтром каталога.
+        const needsUnlist = !mapped && existing.productIsAvailable !== false;
+        // Товар вернулся под правило «есть картинки или остаток» — метка
+        // спрятанной обменом карточки больше не нужна.
+        const needsUnhold = existing.product1cHeld === true;
+
+        if (
+          contentHash === existing.product1cContentHash &&
+          !needsPickupDefaults &&
+          !needsUnlist &&
+          !needsUnhold
+        ) {
+          untouchedIds.push(existing._id);
+          stats.unchanged += 1;
+          continue;
         }
 
-        await ProductModel.updateOne({ _id: existing._id }, { $set: commonFields });
+        commonFields.product1cContentHash = contentHash;
+        if (needsUnlist) commonFields.productIsAvailable = false;
+        if (needsUnhold) commonFields.product1cHeld = false;
+        if (needsPickupDefaults) Object.assign(commonFields, sellerDefaults);
+
+        operations.push({
+          updateOne: { filter: { _id: existing._id }, update: { $set: commonFields } },
+        });
         stats.updated += 1;
         continue;
       }
@@ -349,6 +386,20 @@ export function createOneCCatalogApplier({
       if (held) {
         await dropHeldOneCProducts({ sellerId, externalIds: [item.externalId] });
       }
+    }
+
+    if (operations.length > 0) {
+      await ProductModel.bulkWrite(operations, { ordered: false });
+    }
+
+    // Неизменившимся хватает отметки о том, что 1С их всё ещё присылает: без
+    // неё уборка после полной выгрузки сняла бы их с витрины как исчезнувшие.
+    if (untouchedIds.length > 0) {
+      await ProductModel.updateMany(
+        { _id: { $in: untouchedIds } },
+        { $set: { product1cSeenAt: seenAt } },
+        { timestamps: false },
+      );
     }
   }
 
