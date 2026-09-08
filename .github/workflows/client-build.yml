@@ -1,23 +1,20 @@
 name: Client build & tests
 
+# Фильтров по путям здесь намеренно нет. Эта проверка обязательная в правиле
+# ветки main, а GitHub считает не запустившуюся обязательную проверку не
+# «пропущенной», а «ещё не пришедшей»: PR навсегда зависает в Expected. Цена —
+# лишние прогоны, поэтому ниже включена отмена устаревших.
 on:
   push:
-    paths:
-      - "client/**"
-      - "contract/**"
-      - ".github/workflows/client-build.yml"
   pull_request:
-    paths:
-      - "client/**"
-      - "contract/**"
-      - ".github/workflows/client-build.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: client
 
     steps:
       - name: Checkout
@@ -26,20 +23,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
+          # Та же мажорная версия, что на боевом сервере (v20.20.2).
           node-version: "20"
 
-      - name: Install contract package
-        working-directory: contract
-        run: npm install
-
-      - name: Install client dependencies
+      # Ставим ИЗ КОРНЯ, а не внутри client. client — воркспейс, и установка
+      # внутри него сметает корневые devDependencies: postinstall тут же
+      # падает с «patch-package: not found». Корневая установка заодно
+      # разрешает file:-зависимости на contract и shared-lib.
+      - name: Install workspace dependencies
         run: npm install
 
       - name: Build shared-lib
         run: npm run build --workspace=@izibuy/shared-lib
 
-      - name: Run client unit tests
-        run: npm test
+      - name: Client unit tests
+        run: npm test --workspace=client
 
       - name: Production build
-        run: npm run build
+        run: npm run build --workspace=client

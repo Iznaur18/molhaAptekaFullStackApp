@@ -239,7 +239,14 @@ test("mobile seller preview matches web product-details-seller-preview chrome", 
   assert.match(sellerStylesBlock, /rootSplit:/);
   assert.match(sellerStylesBlock, /marginHorizontal: 0/);
   assert.match(preview, /presentation === "split-rest" && styles\.rootSplit/);
-  assert.match(preview, /pressed && styles\.rootPressed/);
+  // Нажатое состояние переехало в ProductDetailsSellerStorefrontButton и
+  // записано тернарником, а не &&. Гарантия та же: у карточки продавца есть
+  // отклик на нажатие.
+  const storefrontButton = readFile(
+    MOBILE_ROOT,
+    "entities/product/ui/ProductDetailsSellerStorefrontButton.tsx",
+  );
+  assert.match(storefrontButton, /pressed \? styles\.rootPressed/);
   assert.match(sellerStylesBlock, /backgroundColor:\s*theme\.colors\.actionSoft/);
 });
 
@@ -308,7 +315,12 @@ test("product detail dock CTA uses AddToCartButton only", () => {
   const webCss = readFile(CLIENT_ROOT, "src/features/cart-add/ui/AddToCartButton.css");
 
   assert.match(purchaseActions, /AddToCartButton/);
-  assert.match(purchaseActions, /detailOutOfStockButton/);
+  // Кнопку «нет в наличии» вынесли из этого файла в общий
+  // BlockedPurchaseButton. Гарантия та же — squircle-стиль, а не самодельная
+  // «отключённая» кнопка, — но проверять её надо там, где она теперь живёт.
+  assert.match(purchaseActions, /BlockedPurchaseButton/);
+  const blockedButton = readFile(MOBILE_ROOT, "shared/ui/BlockedPurchaseButton.tsx");
+  assert.match(blockedButton, /detailOutOfStockButton/);
   assert.match(purchaseActions, /OutOfStockPurchaseButton/);
   assert.doesNotMatch(purchaseActions, /buttonDisabled/);
   assert.doesNotMatch(purchaseActions, /AUCTION_SHORTCUT/);

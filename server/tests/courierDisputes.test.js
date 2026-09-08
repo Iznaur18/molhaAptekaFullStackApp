@@ -10,6 +10,9 @@ const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollectio
 const { createOrderLoyaltyFixture, createOrderWithReserveTransaction } =
   await import("./helpers/orderLoyaltyTestHelpers.js");
 const { OrderModel, UserModel } = await import("../models/index.js");
+const { ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY } = await import(
+  "../constants/orderConstants.js"
+);
 const { advanceOrderShipmentStatus } = await import(
   "../services/order/advanceShipmentStatus.js"
 );
@@ -281,6 +284,31 @@ describe("разбор спора модератором", () => {
       true,
       "денежные эффекты не потерялись",
     );
+  });
+
+  it("без подтверждённого перевода сделку не закрыть как доставленную", async () => {
+    // Курьер денег продавца не касается. Если модератор закроет спор исходом
+    // «дошёл» до того, как продавец подтвердил перевод, заказ станет успешным,
+    // а продавец останется ни с чем — при штатном вручении такой путь закрыт
+    // проверкой в completeDeliveryByCourier.
+    const { args, seller, order } = await disputed();
+    await OrderModel.updateOne(
+      { _id: order._id },
+      { $set: { paymentMethod: ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY } },
+    );
+
+    await assert.rejects(
+      () =>
+        disputes.resolveShipmentDispute({
+          ...args,
+          outcome: "confirmed",
+          moderatorId: String(seller._id),
+        }),
+      /не подтвердил перевод/iu,
+    );
+
+    const fresh = await OrderModel.findById(order._id).lean();
+    assert.equal(fresh.status, "disputed", "спор должен остаться в очереди");
   });
 
   it("закрывать нечего, если спора нет", async () => {

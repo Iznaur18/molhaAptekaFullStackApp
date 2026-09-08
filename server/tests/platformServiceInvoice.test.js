@@ -57,7 +57,10 @@ const makeSeller = () =>
     email: `promo-${Math.random().toString(36).slice(2)}@example.com`,
     passwordHash: "x".repeat(20),
     userName: `promo${Math.random().toString(36).slice(2, 9)}`,
-    userPhoneNumber: "+79000000000",
+    // Телефон в схеме unique: с фиксированным номером второй продавец в тесте
+    // падал на E11000. Раньше это не всплывало только потому, что индекс не
+    // успевал построиться до вставок.
+    userPhoneNumber: `+79${String(Math.floor(Math.random() * 1e9)).padStart(9, "0")}`,
   });
 
 /** @param {unknown} sellerId @param {Record<string, unknown>} [overrides] */

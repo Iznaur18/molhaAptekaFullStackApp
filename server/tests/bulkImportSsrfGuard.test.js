@@ -55,6 +55,29 @@ describe("bulk import SSRF guard — assertPublicHttpUrl", () => {
     );
   });
 
+  it("блокирует IPv6-литералы, а не уводит их в DNS", async () => {
+    // URL отдаёт такой хост в скобках, а isIP скобки не понимает: литерал
+    // уезжал мимо проверки диапазонов в резолвер. На Windows тот скобки
+    // проглатывал и адрес всё же блокировался, на Linux падал с другой
+    // ошибкой — расхождение вскрылось только когда CI впервые заработал.
+    // Плюс URL нормализует ::ffff:127.0.0.1 в ::ffff:7f00:1, и точечный
+    // разбор вложенного IPv4 по такой записи не срабатывал.
+    for (const url of [
+      "http://[::1]/a.jpg",
+      "http://[::ffff:127.0.0.1]/a.jpg",
+      "http://[::ffff:169.254.169.254]/a.jpg",
+      "http://[fe80::1]/a.jpg",
+      "http://[fc00::1]/a.jpg",
+    ]) {
+      await assert.rejects(() => assertPublicHttpUrl(url), /внутренний адрес/, url);
+    }
+  });
+
+  it("публичный IPv6-литерал не блокируется заодно", async () => {
+    const parsed = await assertPublicHttpUrl("http://[2606:4700:4700::1111]/a.jpg");
+    assert.match(parsed.href, /2606:4700:4700::1111/);
+  });
+
   it("allows public ip literals", async () => {
     const parsed = await assertPublicHttpUrl("http://1.1.1.1/a.jpg");
     assert.equal(parsed.hostname, "1.1.1.1");

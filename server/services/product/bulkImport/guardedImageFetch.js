@@ -72,6 +72,17 @@ const isBlockedIpv6 = (ip) => {
   if (embeddedV4) {
     return isBlockedIpv4(embeddedV4[1]);
   }
+  // Тот же адрес, но в шестнадцатеричной записи: URL нормализует
+  // ::ffff:127.0.0.1 в ::ffff:7f00:1, и точечный разбор выше по нему не
+  // срабатывает. Без этого IPv4-mapped петля пролетала мимо проверки.
+  const mappedHex = normalized.match(/^::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/);
+  if (mappedHex) {
+    const high = Number.parseInt(mappedHex[1], 16);
+    const low = Number.parseInt(mappedHex[2], 16);
+    return isBlockedIpv4(
+      [high >> 8, high & 0xff, low >> 8, low & 0xff].join("."),
+    );
+  }
   const firstHextet = normalized.split(":")[0];
   const head = Number.parseInt(firstHextet || "0", 16);
   if (Number.isNaN(head)) {
@@ -119,7 +130,12 @@ export async function assertPublicHttpUrl(rawUrl) {
     throw new Error("URL фото должен начинаться с http:// или https://");
   }
 
-  const host = parsed.hostname;
+  // URL отдаёт IPv6-хост в скобках («[::1]»), а isIP такую запись не понимает
+  // и возвращает 0 — литерал уезжал мимо проверки диапазонов в DNS-резолв.
+  // Ветка проверки IPv6-литералов из-за этого не работала вовсе: на Windows
+  // резолвер скобки проглатывал и адрес всё-таки блокировался, на Linux
+  // падал с «не удалось разрешить адрес».
+  const host = parsed.hostname.replace(/^\[|\]$/g, "");
   if (!host) {
     throw new Error("Некорректный URL фото");
   }

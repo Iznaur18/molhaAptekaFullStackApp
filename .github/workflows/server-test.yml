@@ -1,21 +1,20 @@
 name: Server tests
 
+# Фильтров по путям здесь намеренно нет. Эта проверка обязательная в правиле
+# ветки main, а GitHub считает не запустившуюся обязательную проверку не
+# «пропущенной», а «ещё не пришедшей»: PR навсегда зависает в Expected. Цена —
+# лишние прогоны, поэтому ниже включена отмена устаревших.
 on:
   push:
-    paths:
-      - "server/**"
-      - ".github/workflows/server-test.yml"
   pull_request:
-    paths:
-      - "server/**"
-      - ".github/workflows/server-test.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: server
 
     steps:
       - name: Checkout
@@ -24,10 +23,28 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
+          # Та же мажорная версия, что на боевом сервере (v20.20.2).
           node-version: "20"
 
-      - name: Install dependencies
+      # Одной установки внутри server/ мало. Тесты тянут @molha/api-contract и
+      # @izibuy/shared-lib, а те живут вне server: contract со своим локом и
+      # своим zod, shared-lib — воркспейс, чей dist в гит не коммитится и его
+      # надо собирать. Без этой подготовки набор падал на ERR_MODULE_NOT_FOUND
+      # ещё на первом тесте.
+      - name: Install workspace dependencies
         run: npm install
 
+      - name: Install contract dependencies
+        working-directory: contract
+        run: npm ci
+
+      - name: Build shared-lib
+        run: npm run build --workspace=@izibuy/shared-lib
+
+      - name: Install server dependencies
+        working-directory: server
+        run: npm ci
+
       - name: Run tests
+        working-directory: server
         run: npm test

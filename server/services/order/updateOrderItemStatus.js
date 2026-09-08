@@ -449,7 +449,7 @@ export async function markOrderItemShippedBySeller({ orderId, itemIndex, sellerI
  *   itemIndex: number;
  *   buyerId: string;
  *   userId: string;
- *   viaCourierCodeHandover?: boolean;
+ *   courierCodeGateBypass?: "code_handover" | "dispute_resolution" | null;
  * }} input
  */
 export async function confirmOrderItemByBuyer({
@@ -457,7 +457,7 @@ export async function confirmOrderItemByBuyer({
   itemIndex,
   buyerId,
   userId,
-  viaCourierCodeHandover = false,
+  courierCodeGateBypass = null,
 }) {
   const preview = await loadOrderWithItems(orderId);
 
@@ -473,8 +473,13 @@ export async function confirmOrderItemByBuyer({
 
   // Курьеры Gitorg: сделку закрывает ввод кода курьером, не кнопка покупателя.
   // Иначе обходятся и оплата продавцом, и рукопожатие у двери.
+  //
+  // Обойти гейт можно двумя путями, и оба названы вслух. Второй — разбор
+  // спора модератором: спор открывают ровно тогда, когда рукопожатия у двери
+  // уже не будет (курьер пропал вместе с товаром), и решение принимает
+  // человек. Без этого исхода «дошёл» упирался в собственный гейт.
   if (
-    !viaCourierCodeHandover &&
+    courierCodeGateBypass === null &&
     resolveShipmentKindForItem(preview, previewItem) === "courier"
   ) {
     const sellerId = String(
