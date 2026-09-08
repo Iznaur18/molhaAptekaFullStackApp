@@ -6,13 +6,19 @@ on:
       - "client/**"
       - "server/**"
       - "contract/**"
+      - "packages/**"
       - ".github/workflows/e2e-playwright.yml"
   pull_request:
     paths:
       - "client/**"
       - "server/**"
       - "contract/**"
+      - "packages/**"
       - ".github/workflows/e2e-playwright.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   e2e:
@@ -38,23 +44,33 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
+          # Та же мажорная версия, что на боевом сервере (v20.20.2).
           node-version: "20"
 
-      - name: Install contract
-        working-directory: contract
+      # Ставим ИЗ КОРНЯ. client — воркспейс, и `npm install` внутри него
+      # выметает корневые devDependencies, после чего падает корневой
+      # postinstall («patch-package: not found»). Корневая установка заодно
+      # связывает shared-lib и разрешает file:-зависимости на contract.
+      - name: Install workspace dependencies
         run: npm install
 
-      - name: Install server
+      - name: Install contract dependencies
+        working-directory: contract
+        run: npm ci
+
+      # Без собранного dist миграции падали на ERR_MODULE_NOT_FOUND ещё до
+      # запуска браузера: серверный код тянет @izibuy/shared-lib, а его dist
+      # в гит не коммитится.
+      - name: Build shared-lib
+        run: npm run build --workspace=@izibuy/shared-lib
+
+      - name: Install server dependencies
         working-directory: server
-        run: npm install
+        run: npm ci
 
       - name: Apply migrations
         working-directory: server
         run: npm run migrate:apply
-
-      - name: Install client
-        working-directory: client
-        run: npm install
 
       - name: Install Playwright Chromium
         working-directory: client
@@ -63,3 +79,11 @@ jobs:
       - name: Run E2E
         working-directory: client
         run: npm run test:e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: client/playwright-report/
+          retention-days: 7
