@@ -173,15 +173,6 @@ body:has(.edit-profile-page) .my-profile-page__tab-content {
   border-top: 1px solid var(--iz-color-border);
 }
 
-/*
- * iOS поднимает fixed bottom nav над клавиатурой.
- * На фокусе инпута — nav скрыт, чтобы не прыгал вверх.
- */
-html.edit-profile-keyboard-open .mobile-bottom-nav {
-  visibility: hidden;
-  pointer-events: none;
-}
-
 .edit-profile-page__feedback {
   min-height: 1.25rem;
 }
