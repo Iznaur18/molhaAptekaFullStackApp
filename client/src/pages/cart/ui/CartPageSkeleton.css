@@ -1,0 +1,72 @@
+/*
+ * Повторяет геометрию строки корзины (CartLineItem.css): карточка с рамкой,
+ * квадратная картинка 72px, справа — название, цена и счётчик. Отступы и
+ * радиусы берём теми же переменными, что и настоящая строка, чтобы приход
+ * данных не дёргал список.
+ */
+
+.cart-skeleton__line {
+  --cart-line-image-size: 72px;
+  --cart-line-card-radius: 14px;
+  --cart-line-outer-inset: var(--cart-page-content-inset, 12px);
+
+  margin: 0 var(--cart-line-outer-inset) 4px;
+}
+
+.cart-skeleton__card {
+  box-sizing: border-box;
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--iz-color-border);
+  border-radius: var(--cart-line-card-radius);
+  background: var(--iz-color-surface);
+}
+
+.cart-skeleton__image {
+  flex-shrink: 0;
+  width: var(--cart-line-image-size);
+  height: var(--cart-line-image-size);
+  border-radius: 10px;
+}
+
+.cart-skeleton__info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
+  /* Высота реальной части: название в две строки, цена, счётчик. */
+  padding-top: 2px;
+}
+
+.cart-skeleton__title {
+  width: 85%;
+}
+
+.cart-skeleton__subtitle {
+  width: 55%;
+}
+
+.cart-skeleton__price {
+  width: 30%;
+  height: 1.125rem;
+}
+
+/* Итоговая панель снизу: сумма и кнопка оформления. */
+.cart-skeleton__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px var(--cart-page-content-inset, 12px) 0;
+}
+
+.cart-skeleton__total {
+  width: 45%;
+  height: 1.25rem;
+}
+
+.cart-skeleton__button {
+  height: 3rem;
+  border-radius: 999px;
+}

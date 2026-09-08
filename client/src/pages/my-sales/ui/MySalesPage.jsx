@@ -26,7 +26,6 @@ import { useCatalogProductDetailsOpener } from "../../../entities/product/lib/us
 import {
   API_CLIENT_UI,
   MY_SALES_PAGE_UI,
-  ORDER_CARD_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
 import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
@@ -79,6 +78,7 @@ export function MySalesPage({
   const queryClient = useQueryClient();
   const {
     cancelItemMutation,
+    cancelOrderMutation,
     shipItemMutation,
     advanceShipmentMutation,
     deliverItemMutation,
@@ -301,6 +301,28 @@ export function MySalesPage({
       } catch {
         /* откат списка не критичен при 429 после серии ошибок */
       }
+    } finally {
+      setPendingActionKey(null);
+    }
+  };
+
+  /**
+   * Гасит заказ целиком. Список не патчим оптимистично: ответ несёт весь
+   * документ заказа, а карточка продавца — только его позиции.
+   */
+  const handleCancelOrder = async ({ orderId, sellerId }) => {
+    const actionKey = `${orderId}:shipment`;
+    setPendingActionKey(actionKey);
+    setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+
+    try {
+      await cancelOrderMutation.mutateAsync({ orderId, sellerId });
+      onQueueChanged?.();
+      await reloadSales();
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+      setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
     } finally {
       setPendingActionKey(null);
     }
@@ -559,6 +581,7 @@ export function MySalesPage({
                 onMarkDelivered={handleMarkDelivered}
                 onMarkReturned={handleMarkReturned}
                 onCancelItem={handleCancelItem}
+                onCancelOrder={handleCancelOrder}
                 pendingActionKey={pendingActionKey}
                 itemActionErrors={itemActionErrors}
               />

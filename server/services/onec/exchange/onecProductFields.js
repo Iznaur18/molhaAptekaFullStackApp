@@ -6,7 +6,10 @@ import { PRODUCT_LISTING_ORIGIN_RESALE } from "../../../constants/productListing
 import { PRODUCT_PRICE_MARKET_STATUS_DEFAULT } from "../../../constants/productPriceMarketStatusConstants.js";
 import { ProductModel } from "../../../models/index.js";
 import { buildProductSearchBlobFromFields } from "../../product/buildProductSearchBlob.js";
-import { hashStableValue } from "../../product/productContentFingerprint.js";
+import {
+  buildProductModerationFingerprint,
+  hashStableValue,
+} from "../../product/productContentFingerprint.js";
 
 /**
  * Поля карточки, общие для двух путей создания товара из 1С: обычного разбора
@@ -148,7 +151,15 @@ export function createOneCProduct({
     product1cContentHash: buildOneCContentHash(commonFields),
     product1cHeld: false,
     productModerationStatus: moderationStatus,
-    productModerationApprovedHash: approved ? moderationHash : "",
+    // Одобренная карточка без отпечатка потеряла бы одобрение при первом же
+    // пересоздании из отстойника, поэтому считаем его на месте.
+    productModerationApprovedHash: approved
+      ? moderationHash ||
+        buildProductModerationFingerprint({
+          ...commonFields,
+          productImageUrls: images?.urls ?? [],
+        })
+      : "",
     productModerationComment: "",
     productListingOrigin: PRODUCT_LISTING_ORIGIN_RESALE,
     productPriceMarketStatus: PRODUCT_PRICE_MARKET_STATUS_DEFAULT,

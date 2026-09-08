@@ -13,11 +13,12 @@ const { OrderModel, UserInAppNotificationModel } = await import("../models/index
 const { advanceOrderShipmentStatus, resolveNextShipmentStatus } = await import(
   "../services/order/advanceShipmentStatus.js"
 );
-const {
-  markOrderItemCancelled,
-  markOrderItemDeliveredBySeller,
-  markOrderItemShippedBySeller,
-} = await import("../services/order/updateOrderItemStatus.js");
+const { markOrderItemDeliveredBySeller, markOrderItemShippedBySeller } = await import(
+  "../services/order/updateOrderItemStatus.js"
+);
+const { markOrderItemCancelled } = await import(
+  "../services/order/cancelOrderItems.js"
+);
 
 /** @param {any} order @param {string} sellerId @param {string} nextStatus */
 const advance = (order, sellerId, nextStatus) =>

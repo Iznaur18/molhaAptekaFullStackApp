@@ -33,7 +33,7 @@ const patch = (body, existing = courierProduct) =>
   buildProductPatchSet({
     existing,
     body,
-    isAdmin: false,
+    skipsModeration: false,
     productId: "507f1f77bcf86cd799439011",
   });
 

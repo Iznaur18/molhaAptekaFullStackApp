@@ -37,6 +37,10 @@
 
 ## Auth — `/auth`
 
+Пока `EMAIL_AUTH_ENABLED_DEFAULT = false` в `packages/shared-lib/src/emailAuthKillSwitch.ts`:
+`POST /auth/register`, `POST /auth/login` и reset по `email` отвечают **503**. Телефон не трогаем.
+Вернуть почту: константу в `true`, `npm run build` в `packages/shared-lib`.
+
 | Метод | Путь | Доступ | Назначение |
 | ----- | ---- | ------ | ---------- |
 | GET | `/auth/me` | 🔑 | Текущий пользователь |
@@ -110,12 +114,18 @@
 | GET | `/order/sales` | 🔑 | Мои продажи |
 | GET | `/order/sales/action-count` | 🔑 | Счётчик действий по продажам |
 | GET | `/order/all` | 👑 | Все заказы |
+| GET | `/order/shipping-carriers` | 🔑 | Список служб доставки |
+| POST | `/order/shipping-estimate` | 🔑 ⏱ | Расчёт доставки до оформления |
 | POST | `/order` | 🔑 ⏱ | Создать заказ |
 | PATCH | `/order/:orderId/status` | 👑 | Сменить статус заказа |
+| PATCH | `/order/:orderId/shipment/status` | 🔑 ⏱ | Продвинуть статус своего отправления |
+| PATCH | `/order/:orderId/shipment/:sellerId/delivery-fee` | 🔑 ⏱ | Поднять стоимость доставки |
+| PATCH | `/order/:orderId/shipment/:sellerId/cancelled` | 🔑 ⏱ | Отмена заказа целиком (покупатель или продавец отправления) |
 | PATCH | `/order/:orderId/items/:itemIndex/shipped` | 🔑 ⏱ | Позиция отправлена |
 | PATCH | `/order/:orderId/items/:itemIndex/delivered` | 🔑 ⏱ | Позиция доставлена |
+| PATCH | `/order/:orderId/items/:itemIndex/returned` | 🔑 ⏱ | Позиция возвращена |
 | PATCH | `/order/:orderId/items/:itemIndex/confirm` | 🔑 ⏱ | Покупатель подтвердил получение |
-| PATCH | `/order/:orderId/items/:itemIndex/cancelled` | 🔑 ⏱ | Отмена позиции |
+| PATCH | `/order/:orderId/items/:itemIndex/cancelled` | 🔑 ⏱ | Отмена одной позиции |
 
 ## Cart — `/cart`
 
@@ -373,3 +383,19 @@
 | POST | `/seller-personal-category/moderation/:campaignId/reject` | 🛡 | Отклонить |
 | POST | `/seller-personal-category/moderation/:campaignId/cancel` | 🛡 | Отменить |
 | DELETE | `/seller-personal-category/moderation/:campaignId/staff` | 🛡 | Удалить (staff) |
+
+## Staff — `/staff`
+
+| Метод | Путь | Доступ | Назначение |
+| ----- | ---- | ------ | ---------- |
+| GET | `/staff/broadcast-notifications/recipients-count` | 👑 | Сколько получит рассылка |
+| POST | `/staff/broadcast-notifications` | 👑 | Разослать уведомление |
+| GET | `/staff/couriers` | 🛡 | Заявки курьеров |
+| PATCH | `/staff/couriers/:userId/moderation` | 🛡 | Решение по заявке курьера |
+| GET | `/staff/safe-deal` | 🛡 | Заявки на безопасную сделку |
+| PATCH | `/staff/safe-deal/:userId/moderation` | 🛡 | Решение по безопасной сделке |
+| GET | `/staff/shipment-disputes` | 🛡 | Споры по отправлениям |
+| POST | `/staff/shipment-disputes/:orderId/:sellerId/resolve` | 🛡 | Решение по спору |
+| GET | `/staff/shipping-carriers` | 👑 | Службы доставки |
+| PATCH | `/staff/shipping-carriers/:carrierId` | 👑 | Включить/выключить службу |
+| PATCH | `/staff/sellers/:userId/product-moderation-trust` | 👑 | Публикация товаров продавца без модерации |

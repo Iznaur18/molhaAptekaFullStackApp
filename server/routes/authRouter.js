@@ -65,6 +65,8 @@ import {
   registerAuthRateLimiter,
   refreshAuthRateLimiter,
   emailVerificationResendRateLimiter,
+  rejectEmailContactAuthIfDisabledMW,
+  rejectEmailOnlyAuthIfDisabledMW,
 } from "../middlewares/index.js";
 
 const router = createAsyncRouter();
@@ -107,6 +109,7 @@ router.delete(
 router.post(
   "/register",
   registerAuthRateLimiter,
+  rejectEmailOnlyAuthIfDisabledMW,
   registerUserValidation,
   registerUserController,
 );
@@ -128,7 +131,13 @@ router.post(
   resendRegistrationCodeValidation,
   resendRegistrationCodeController,
 );
-router.post("/login", authRateLimiter, loginUserValidation, loginUserController);
+router.post(
+  "/login",
+  authRateLimiter,
+  rejectEmailOnlyAuthIfDisabledMW,
+  loginUserValidation,
+  loginUserController,
+);
 router.post(
   "/login/phone",
   authRateLimiter,
@@ -179,12 +188,14 @@ router.post(
   "/password/reset/request",
   emailVerificationResendRateLimiter,
   passwordResetRequestValidation,
+  rejectEmailContactAuthIfDisabledMW,
   passwordResetRequestController,
 );
 router.post(
   "/password/reset/confirm",
   authRateLimiter,
   passwordResetConfirmValidation,
+  rejectEmailContactAuthIfDisabledMW,
   passwordResetConfirmController,
 );
 router.post(

@@ -412,6 +412,18 @@ const UserSchema = new mongoose.Schema(
       min: SELLER_PRODUCTS_LIMIT_UNLIMITED,
       max: SELLER_PRODUCTS_LIMIT_OVERRIDE_MAX,
     },
+    /**
+     * Товары продавца публикуются минуя очередь модерации.
+     *
+     * Выдаётся админом персонально — тем, кто грузит каталог сотнями позиций и
+     * уже проверен вручную. Отдельным полем, а не ролью: роль даёт доступ к
+     * чужим данным и staff-экранам, а здесь нужно ровно одно право — своя
+     * карточка попадает в каталог сразу.
+     */
+    productModerationTrusted: {
+      type: Boolean,
+      default: false,
+    },
     notificationsEnabled: {
       // включены ли уведомления
       type: Boolean,

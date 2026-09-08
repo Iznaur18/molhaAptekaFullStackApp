@@ -2,6 +2,7 @@ import { ScrollView, View } from "react-native";
 import { useRouter } from "expo-router";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
+import { AdminProductModerationTrustControl } from "@/entities/user/ui/AdminProductModerationTrustControl";
 import { AdminUserStaffActions } from "@/entities/user/ui/AdminUserStaffActions";
 import { UserVoteRatingForm } from "@/features/user-vote-rating/ui/UserVoteRatingForm";
 import { UserDetailsHeader } from "@/features/user-details-page/ui/UserDetailsHeader";
@@ -29,8 +30,10 @@ export const UserDetailsPage = () => {
     showOtherUserProducts,
     showOtherUserPurchases,
     canModerate,
+    isAdmin,
     handleFollowChange,
     handleBlockChange,
+    handleModerationTrustChange,
     handleRated,
     handleViewAllSellerProducts,
     handleEditUser,
@@ -100,6 +103,14 @@ export const UserDetailsPage = () => {
           />
 
           {canModerate && !isSelf ? <AdminUserStaffActions onEditPress={handleEditUser} /> : null}
+
+          {isAdmin && !isSelf ? (
+            <AdminProductModerationTrustControl
+              userId={userId}
+              isTrusted={user.productModerationTrusted === true}
+              onChanged={handleModerationTrustChange}
+            />
+          ) : null}
 
           <UserVoteRatingForm
             targetUser={user as Record<string, unknown> & { _id: string }}

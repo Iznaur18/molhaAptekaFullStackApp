@@ -259,9 +259,12 @@ async function runOneCImportJob(jobId) {
 
   try {
     const user = await UserModel.findById(sellerId)
-      .select("oneCIntegration.exchange")
+      .select("oneCIntegration.exchange productModerationTrusted")
       .lean();
     const exchange = user?.oneCIntegration?.exchange ?? {};
+    // Доверенный продавец грузит каталог тысячами позиций — очередь модерации
+    // такой обмен всё равно не разобрала бы.
+    const moderationTrusted = user?.productModerationTrusted === true;
 
     const session = await OneCExchangeSessionModel.findOne({
       sessionId: job.sessionId,
@@ -318,6 +321,7 @@ async function runOneCImportJob(jobId) {
             resolveImagePath,
             onIssue: addIssue,
             seenAt: startedAt,
+            moderationTrusted,
           });
           return applier;
         };
@@ -374,6 +378,7 @@ async function runOneCImportJob(jobId) {
             price,
             stock,
             seenAt: startedAt,
+            moderationTrusted,
           });
         },
       });

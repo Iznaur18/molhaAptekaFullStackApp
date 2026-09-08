@@ -1,3 +1,5 @@
+import { summarizeOrderItems } from "@izibuy/shared-lib";
+
 import {
   ORDER_STATUS_CANCELLED,
   ORDER_STATUS_RETURNED,
@@ -27,17 +29,5 @@ export function resolveOrderActiveAmountRub(order) {
     return Number(order?.totalAmount) || 0;
   }
 
-  let sum = 0;
-  for (const item of items) {
-    if (
-      item?.status === ORDER_STATUS_CANCELLED ||
-      item?.status === ORDER_STATUS_RETURNED
-    ) {
-      continue;
-    }
-    const quantity = Number(item?.quantity) || 0;
-    const unitPrice = Number(item?.unitPriceAtOrder) || 0;
-    sum += quantity * unitPrice;
-  }
-  return sum;
+  return summarizeOrderItems(items).totalAmount;
 }

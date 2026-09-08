@@ -23,6 +23,7 @@ import {
 } from "../../utils/resolveProductCategoryWrite.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 import { refreshProductPriceMarketStatus } from "../../services/product/refreshProductPriceMarketStatus.js";
+import { setSellerProductModerationTrust } from "../../services/product/setSellerProductModerationTrust.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
@@ -221,4 +222,15 @@ export const rejectProductModerationController = async (req, res) => {
     message: "Товар отклонён",
     product: enriched,
   });
+};
+
+/** `PATCH /staff/sellers/:userId/product-moderation-trust` */
+export const patchSellerProductModerationTrustController = async (req, res) => {
+  const seller = await setSellerProductModerationTrust({
+    sellerId: req.params.userId,
+    trusted: req.body.trusted === true,
+    actorUserId: String(req.userId),
+  });
+
+  return successRes(res, { seller });
 };

@@ -122,7 +122,9 @@ describe("статус отправления", () => {
       items: [line(SELLER_A, "returned"), line(SELLER_A, "shipped")],
     };
 
-    assert.equal(buildOrderShipments(order)[0].status, "pending");
+    // Ступень задают живые позиции: иначе отправление откатывалось в начало
+    // лестницы и кнопки продавца расходились с тем, что разрешает сервер.
+    assert.equal(buildOrderShipments(order)[0].status, "shipped");
   });
 
   it("отдаёт номера позиций для действий продавца", () => {

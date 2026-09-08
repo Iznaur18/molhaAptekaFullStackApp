@@ -50,11 +50,17 @@ import {
 import { requestIdMW } from "./requestIdMW.js";
 import { accessLogMW } from "./accessLogMW.js";
 import { auditStaffActionMW } from "./auditStaffActionMW.js";
+import {
+  rejectEmailContactAuthIfDisabledMW,
+  rejectEmailOnlyAuthIfDisabledMW,
+} from "./rejectEmailAuthIfDisabledMW.js";
 
 export {
   requestIdMW,
   accessLogMW,
   auditStaffActionMW,
+  rejectEmailOnlyAuthIfDisabledMW,
+  rejectEmailContactAuthIfDisabledMW,
   uploadMW,
   uploadExcelMW,
   uploadVideoMW,

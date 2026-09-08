@@ -9,7 +9,7 @@ import {
 } from "../constants/installmentConstants.js";
 import { ORDER_STATUS_CANCELLED } from "../constants/orderConstants.js";
 import { InstallmentContractModel, OrderModel } from "../models/index.js";
-import { markOrderItemCancelled } from "../services/order/updateOrderItemStatus.js";
+import { markOrderItemCancelled } from "../services/order/cancelOrderItems.js";
 import {
   createOrderLoyaltyFixture,
   createOrderWithReserveTransaction,

@@ -1,4 +1,8 @@
-import { ORDER_STATUS_CANCELLED } from "@/entities/order/model/constants";
+import {
+  ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_RETURNED,
+  summarizeOrderItems,
+} from "@izibuy/shared-lib";
 
 type OrderAmountRecord = {
   status?: string;
@@ -8,7 +12,10 @@ type OrderAmountRecord = {
 
 /** Сумма заказа без отменённых позиций (`totalAmount` при cancel не пересчитывается). */
 export const resolveOrderActiveAmountRub = (order: OrderAmountRecord): number => {
-  if (order?.status === ORDER_STATUS_CANCELLED) {
+  if (
+    order?.status === ORDER_STATUS_CANCELLED ||
+    order?.status === ORDER_STATUS_RETURNED
+  ) {
     return 0;
   }
 
@@ -17,14 +24,5 @@ export const resolveOrderActiveAmountRub = (order: OrderAmountRecord): number =>
     return Number(order?.totalAmount) || 0;
   }
 
-  let sum = 0;
-  for (const item of items) {
-    if (item?.status === ORDER_STATUS_CANCELLED) {
-      continue;
-    }
-    const quantity = Number(item?.quantity) || 0;
-    const unitPrice = Number(item?.unitPriceAtOrder) || 0;
-    sum += quantity * unitPrice;
-  }
-  return sum;
+  return summarizeOrderItems(items).totalAmount;
 };

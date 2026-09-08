@@ -1,6 +1,8 @@
 import {
   BUYER_ORDER_STATUS_MESSAGES,
   IN_APP_NOTIFICATION_KIND_BUYER_ORDER_STATUS,
+  IN_APP_NOTIFICATION_MESSAGE_BUYER_ORDER_CANCELLED,
+  ORDER_STATUS_CANCELLED,
 } from "../../constants/orderConstants.js";
 import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { createUserInAppNotification } from "../user/userInAppNotifications.js";
@@ -52,14 +54,68 @@ export async function notifyBuyerAboutOrderItemStatus({
   productName = "",
   orderId = null,
 }) {
+  await sendBuyerOrderNotification({
+    buyerUserId,
+    actorUserId,
+    status,
+    message: buildBuyerOrderStatusMessage({ status, productName }),
+    orderId,
+  });
+}
+
+/**
+ * Отмена: одна позиция или заказ целиком — покупателю это разные новости.
+ *
+ * @param {{
+ *   buyerUserId: unknown;
+ *   actorUserId?: unknown;
+ *   productName?: string;
+ *   wholeOrder?: boolean;
+ *   orderId?: unknown;
+ * }} params
+ */
+export async function notifyBuyerAboutOrderCancelled({
+  buyerUserId,
+  actorUserId = null,
+  productName = "",
+  wholeOrder = false,
+  orderId = null,
+}) {
+  await sendBuyerOrderNotification({
+    buyerUserId,
+    actorUserId,
+    status: ORDER_STATUS_CANCELLED,
+    message: wholeOrder
+      ? IN_APP_NOTIFICATION_MESSAGE_BUYER_ORDER_CANCELLED
+      : buildBuyerOrderStatusMessage({
+          status: ORDER_STATUS_CANCELLED,
+          productName,
+        }),
+    orderId,
+  });
+}
+
+/**
+ * @param {{
+ *   buyerUserId: unknown;
+ *   actorUserId: unknown;
+ *   status: string;
+ *   message: string;
+ *   orderId: unknown;
+ * }} params
+ */
+async function sendBuyerOrderNotification({
+  buyerUserId,
+  actorUserId,
+  status,
+  message,
+  orderId,
+}) {
   const buyerId = buyerUserId ? String(buyerUserId) : "";
-  if (!buyerId) return;
+  if (!buyerId || !message) return;
 
   // Покупатель сам отменил позицию — сообщать ему об этом незачем.
   if (actorUserId && String(actorUserId) === buyerId) return;
-
-  const message = buildBuyerOrderStatusMessage({ status, productName });
-  if (!message) return;
 
   try {
     await createUserInAppNotification({

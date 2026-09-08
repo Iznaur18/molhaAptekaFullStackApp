@@ -10,6 +10,7 @@ import {
   postStaffResolveDisputeController,
   getStaffShippingCarriersController,
   patchStaffShippingCarrierController,
+  patchSellerProductModerationTrustController,
 } from "../controllers/index.js";
 import {
   staffCourierListValidation,
@@ -19,6 +20,7 @@ import {
   staffDisputeListValidation,
   staffResolveDisputeValidation,
   shippingCarrierToggleValidation,
+  productModerationTrustValidation,
 } from "../validations/index.js";
 import { checkProductModeratorMW } from "../middlewares/checkProductModeratorMW.js";
 import { staffBroadcastNotificationValidation } from "../validations/user/staffBroadcastNotificationValidation.js";
@@ -104,6 +106,16 @@ router.patch(
   checkAdminMW,
   shippingCarrierToggleValidation,
   patchStaffShippingCarrierController,
+);
+
+// Публикацию без модерации выдаёт только админ: это отказ от проверки чужого
+// контента, а не работа с очередью, поэтому модератору такого права не даём.
+router.patch(
+  "/sellers/:userId/product-moderation-trust",
+  checkAuthMW,
+  checkAdminMW,
+  productModerationTrustValidation,
+  patchSellerProductModerationTrustController,
 );
 
 export { router as staffRouter };

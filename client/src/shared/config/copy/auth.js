@@ -5,6 +5,8 @@
 export const AUTH_UI = {
   LOGIN_TITLE: "Вход",
   LOGIN_SUBTITLE: "Войдите, чтобы продолжить покупки",
+  EMAIL_AUTH_DISABLED_NOTICE:
+    "Почта временно недоступна — используйте телефон.",
   REGISTER_TITLE: "Регистрация",
   REGISTER_SUBTITLE: "Создайте аккаунт за пару минут",
   EMAIL_LABEL: "Email",
@@ -49,6 +51,7 @@ export const AUTH_UI = {
   FORGOT_PASSWORD_LINK: "Забыли пароль?",
   FORGOT_TITLE: "Восстановление пароля",
   FORGOT_SUBTITLE: "Укажите подтверждённый email или телефон — пришлём код",
+  FORGOT_SUBTITLE_PHONE: "Укажите подтверждённый телефон — пришлём код",
   FORGOT_CONFIRM_SUBTITLE: "Введите код и новый пароль",
   FORGOT_DONE_SUBTITLE: "Можно войти с новым паролем",
   FORGOT_DONE_MESSAGE: "Пароль изменён. Войдите с новым паролем.",

@@ -113,6 +113,8 @@ export const MyProductsPage = () => {
     return getSellerProductsLimit(sessionQuery.data?.user);
   }, [isAdmin, sessionQuery.data?.user]);
 
+  const isModerationTrusted = sessionQuery.data?.user?.productModerationTrusted === true;
+
   const myProductsTotal = myProductsTotalQuery.myProductsTotal;
 
   const pageActions = useMyProductsPageActions();
@@ -208,6 +210,7 @@ export const MyProductsPage = () => {
               myProductsTotal={myProductsTotal}
               sellerProductsLimit={sellerProductsLimit}
               isAdmin={isAdmin}
+              isModerationTrusted={isModerationTrusted}
             />
 
             {pageActions.catalogNotice ? (

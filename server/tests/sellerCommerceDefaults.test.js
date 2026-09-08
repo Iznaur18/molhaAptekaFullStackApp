@@ -198,7 +198,7 @@ describe("источник настроек на товаре", () => {
     const { $set } = await buildProductPatchSet({
       existing: product,
       body: { productFulfillmentSource: PRODUCT_FULFILLMENT_SOURCE_PROFILE },
-      isAdmin: false,
+      skipsModeration: false,
       productId: String(product._id),
     });
 
@@ -215,7 +215,7 @@ describe("источник настроек на товаре", () => {
       buildProductPatchSet({
         existing: product,
         body: { productFulfillmentSource: PRODUCT_FULFILLMENT_SOURCE_PROFILE },
-        isAdmin: false,
+        skipsModeration: false,
         productId: String(product._id),
       }),
       /профил/i,
@@ -232,7 +232,7 @@ describe("источник настроек на товаре", () => {
     const { $set } = await buildProductPatchSet({
       existing: product,
       body: { productPickupEnabled: false },
-      isAdmin: false,
+      skipsModeration: false,
       productId: String(product._id),
     });
 
@@ -261,7 +261,7 @@ describe("источник настроек на товаре", () => {
         productPickupEnabled: true,
         productDeliveryCarrier: PRODUCT_DELIVERY_CARRIER_SELLER,
       },
-      isAdmin: false,
+      skipsModeration: false,
       productId: String(product._id),
     });
 
@@ -277,7 +277,7 @@ describe("источник настроек на товаре", () => {
     const { $set } = await buildProductPatchSet({
       existing: product,
       body: { productFulfillmentSource: PRODUCT_FULFILLMENT_SOURCE_CUSTOM },
-      isAdmin: false,
+      skipsModeration: false,
       productId: String(product._id),
     });
 
@@ -293,7 +293,7 @@ describe("источник настроек на товаре", () => {
     const { $set } = await buildProductPatchSet({
       existing: product,
       body: { productPrice: 2000 },
-      isAdmin: false,
+      skipsModeration: false,
       productId: String(product._id),
     });
 

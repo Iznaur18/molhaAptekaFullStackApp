@@ -120,6 +120,10 @@ export {
 } from "./productReport.js";
 export { rejectProductModerationBodySchema } from "./productModeration.js";
 export {
+  productModerationTrustParamsSchema,
+  productModerationTrustBodySchema,
+} from "./productModerationTrust.js";
+export {
   submitProductReviewBodySchema,
   patchProductReviewBodySchema,
   productReviewsListQuerySchema,
@@ -723,6 +727,7 @@ export {
   orderFromApiSchema,
   orderIdParamsSchema,
   orderItemActionParamsSchema,
+  orderShipmentParamsSchema,
   orderItemCancelBodySchema,
   ORDER_ITEM_CANCELLATION_REASON_MAX_LENGTH,
   advanceShipmentStatusBodySchema,

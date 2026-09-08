@@ -7,6 +7,8 @@ import {
 import { AppError } from "../../errors/AppError.js";
 import { attachProductSellerSnapshot } from "./attachProductSellerSnapshots.js";
 import { isUserAdmin } from "../access/adminUserGuard.js";
+import { buildProductModerationFingerprint } from "./productContentFingerprint.js";
+import { canSkipProductModeration } from "./productModerationTrust.js";
 import { mergeProductImageUrlsFromBody } from "./mergeProductImageUrlsFromBody.js";
 import {
   assertProductPreviewVideoRequiresPhotos,
@@ -207,12 +209,15 @@ export async function postProduct({
   const productPreviewVideoUrl = resolvePreviewVideo(body, productImageUrls);
   const productInstagramPostUrl = resolveInstagramPostUrl(body);
 
-  const productModerationStatus = isAdmin
+  // Доверие даёт ровно то же, что роль админа, но только здесь: очередь
+  // модерации карточку не видит, и в каталог она выходит сразу.
+  const skipsModeration = canSkipProductModeration(user);
+  const productModerationStatus = skipsModeration
     ? PRODUCT_MODERATION_APPROVED
     : PRODUCT_MODERATION_PENDING;
 
   const productStockQuantity = resolveCreateStock(body, productIsAvailable);
-  const visibleInCatalog = isAdmin && productStockQuantity > 0;
+  const visibleInCatalog = skipsModeration && productStockQuantity > 0;
 
   const loyaltyPointsPerUnit = await resolveCreateLoyaltyPoints(userId, body);
   const productCharacteristics = resolveCreateCharacteristics(body);
@@ -349,6 +354,19 @@ export async function postProduct({
     productAuctionCompletedOnce: false,
     productModerationStatus,
     productModerationComment: "",
+    // Одобренная карточка обязана нести отпечаток содержимого: по нему потом
+    // видно, менялось ли то, что проверяют, — и по нему же карточка,
+    // пересозданная обменом, сохраняет одобрение.
+    productModerationApprovedHash: skipsModeration
+      ? buildProductModerationFingerprint({
+          productName,
+          productDescription,
+          productImageUrls,
+          productPreviewVideoUrl,
+          productCategoryId: categoryWrite.productCategoryId,
+          productCharacteristics,
+        })
+      : "",
     loyaltyPointsPerUnit,
     productCharacteristics,
     productListingOrigin,

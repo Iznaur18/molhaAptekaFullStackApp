@@ -1,3 +1,5 @@
+import { resolveAuthContactChannel } from "@izibuy/shared-lib";
+
 const REGISTER_FORM_DRAFT_STORAGE_KEY = "izibuy.registerFormDraft.v1";
 
 /**
@@ -31,7 +33,9 @@ export function readRegisterFormDraft() {
     if (!parsed || typeof parsed !== "object") {
       return null;
     }
-    const channel = parsed.channel === "phone" ? "phone" : "email";
+    const channel = resolveAuthContactChannel(
+      parsed.channel === "phone" ? "phone" : "email",
+    );
     const form = parsed.form && typeof parsed.form === "object" ? parsed.form : {};
     return {
       channel,

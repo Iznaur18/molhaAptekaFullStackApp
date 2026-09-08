@@ -181,6 +181,10 @@ export const IN_APP_NOTIFICATION_KIND_SELLER_ORDER_RETURNED =
 export const IN_APP_NOTIFICATION_MESSAGE_SELLER_ORDER_RETURNED =
   "Покупатель отказался от заказа";
 
+/** Отмена заказа целиком: перечислять каждую позицию покупателю незачем. */
+export const IN_APP_NOTIFICATION_MESSAGE_BUYER_ORDER_CANCELLED =
+  "Продавец отменил заказ";
+
 /** Подписи статуса для покупателя: он читает «отправлен», а не `shipped`. */
 export const BUYER_ORDER_STATUS_MESSAGES = Object.freeze({
   [ORDER_STATUS_ACCEPTED]: "Продавец принял заказ",

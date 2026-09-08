@@ -1337,6 +1337,7 @@ export const ORDER_CARD_UI = {
   CANCEL_CONFIRM: "Отменить заказ покупателя?",
   BUYER_CANCEL_CONFIRM: "Отменить заказ?",
   SELLER_CANCEL_CONFIRM: "Отменить заказ покупателя?",
+  ITEM_CANCELLED_BADGE: "Отмена",
   DELETED_PRODUCT_NAME: "Товар удалён",
   LOYALTY_POINTS_LINE: (points: number) => `+${points} баллов за шт. (подтверждённому покупателю)`,
   AFFILIATE_LINE_ARIA: "Партнёрская атрибуция",
@@ -1438,6 +1439,8 @@ export const LEGAL_UI = {
 export const AUTH_UI = {
   LOGIN_TITLE: "Вход",
   LOGIN_SUBTITLE: "Войдите, чтобы продолжить покупки",
+  EMAIL_AUTH_DISABLED_NOTICE:
+    "Почта временно недоступна — используйте телефон.",
   REGISTER_TITLE: "Регистрация",
   REGISTER_SUBTITLE: "Создайте аккаунт за пару минут",
   CHANNEL_EMAIL: "Email",
@@ -1508,6 +1511,7 @@ export const AUTH_UI = {
   FORGOT_PASSWORD_LINK: "Забыли пароль?",
   FORGOT_TITLE: "Восстановление пароля",
   FORGOT_SUBTITLE: "Укажите подтверждённый email или телефон — пришлём код",
+  FORGOT_SUBTITLE_PHONE: "Укажите подтверждённый телефон — пришлём код",
   FORGOT_CONFIRM_SUBTITLE: "Введите код и новый пароль",
   FORGOT_DONE_SUBTITLE: "Можно войти с новым паролем",
   FORGOT_DONE_MESSAGE: "Пароль изменён. Войдите с новым паролем.",
@@ -1931,8 +1935,22 @@ export const MY_PRODUCTS_PAGE_UI = {
   SORT_LABEL: "Сортировка",
   MODERATION_STATUS_FILTER_LABEL: "Статус",
   QUOTA_LABEL: "Товаров",
+  TRUSTED_NOTICE: "Ваши товары публикуются без проверки",
   /** @param {number} count */
   COUNT: (count: number) => `${count} товаров`,
+} as const;
+
+/** Тумблер админа: публикация товаров продавца без модерации. */
+export const ADMIN_PRODUCT_MODERATION_TRUST_UI = {
+  TITLE: "Публикация без проверки",
+  STATUS_ON: "Включена: товары попадают в каталог сразу",
+  STATUS_OFF: "Выключена: товары проходят модерацию",
+  HINT: "Для проверенных продавцов с большим каталогом. Уже опубликованные товары при отключении остаются в каталоге.",
+  TOGGLE_LABEL: "Публиковать без проверки",
+  CONFIRM_GRANT: "Публиковать товары этого продавца без проверки?",
+  CONFIRM_REVOKE: "Вернуть товары этого продавца на проверку?",
+  CONFIRM_ACTION: "Подтвердить",
+  CANCEL: "Отмена",
 } as const;
 
 export const SELLER_PRODUCTS_LIMIT_MODAL_UI = {

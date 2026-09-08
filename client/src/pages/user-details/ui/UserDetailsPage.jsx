@@ -11,6 +11,7 @@ import { pickUserProfilePhotoUrl } from "../../../entities/user/lib/pickUserProf
 import { resolveUserProfileBackgroundFromUser } from "../../../entities/user/lib/userBackgroundValue.js";
 import { canStaffEditTargetUserPremium } from "../../../entities/user/lib/canStaffEditTargetUserPremium.js";
 import { AdminDeleteUserConfirmModal } from "../../../entities/user/ui/AdminDeleteUserConfirmModal.jsx";
+import { AdminProductModerationTrustControl } from "../../../entities/user/ui/AdminProductModerationTrustControl.jsx";
 import { EditProfileModal } from "../../../entities/user/ui/EditProfileModal.jsx";
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
 import { isSellerSafeDealApproved } from "@molha/api-contract";
@@ -30,6 +31,7 @@ import {
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 
 import { useUserDetailsPage } from "../model/useUserDetailsPage.js";
+import { UserDetailsPageSkeleton } from "./UserDetailsPageSkeleton.jsx";
 
 import "../../../entities/user/ui/UserDetailsModal.css";
 import "./UserDetailsPage.css";
@@ -127,11 +129,7 @@ export function UserDetailsPage() {
   }
 
   if (profileQuery.isPending) {
-    return (
-      <div className="user-details-page">
-        <p className="user-details-page__state">{USER_DETAILS_PAGE_UI.LOADING}</p>
-      </div>
-    );
+    return <UserDetailsPageSkeleton />;
   }
 
   if (profileQuery.isError || !user) {
@@ -281,6 +279,15 @@ export function UserDetailsPage() {
               >
                 {ADMIN_EDIT_USER_UI.DELETE_BUTTON}
               </button>
+            ) : null}
+            {isAdmin ? (
+              <AdminProductModerationTrustControl
+                user={user}
+                onChanged={(patch) => {
+                  handleRated({ ...user, ...patch });
+                  void refreshUsersList?.();
+                }}
+              />
             ) : null}
           </div>
         ) : null}

@@ -113,6 +113,7 @@ export function sanitizeUserProfileForViewer(user, ctx) {
   delete out.isBlockedUser;
   delete out.oneCIntegration;
   delete out.userDiscountPercent;
+  delete out.productModerationTrusted;
   delete out.notesAboutUser;
   if (hasPhoneNumber) {
     out.hasPhoneNumber = true;

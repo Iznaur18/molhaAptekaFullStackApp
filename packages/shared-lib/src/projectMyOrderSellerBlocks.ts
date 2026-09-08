@@ -1,7 +1,4 @@
-import {
-  buildOrderStatusFromItems,
-  calculateOrderItemsTotalAmount,
-} from "./orderStatus.js";
+import { buildOrderStatusFromItems, summarizeOrderItems } from "./orderStatus.js";
 
 /** Seller id для позиций без productSeller (legacy / удалённый товар). */
 export const MY_ORDER_UNKNOWN_SELLER_ID = "__unknown__";
@@ -131,7 +128,7 @@ export function projectMyOrderSellerBlocks<T extends MyOrderSellerBlockSource>(
         ...order,
         items: sellerItems,
         status: buildOrderStatusFromItems(sellerItems),
-        totalAmount: calculateOrderItemsTotalAmount(sellerItems),
+        totalAmount: summarizeOrderItems(sellerItems).totalAmount,
         fulfillmentMethod: resolveBlockFulfillment(order, sellerId),
       },
     });

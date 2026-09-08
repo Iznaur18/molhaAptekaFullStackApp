@@ -102,6 +102,7 @@ import {
 import { updateOrderStatusController } from "./Order/updateOrderStatusController.js";
 import {
   advanceMyShipmentStatusController,
+  cancelOrderShipmentController,
   markOrderItemReturnedBySellerController,
   markOrderItemShippedBySellerController,
   markOrderItemDeliveredBySellerController,
@@ -192,6 +193,7 @@ import {
   getPendingModerationProductsCountController,
   approveProductModerationController,
   rejectProductModerationController,
+  patchSellerProductModerationTrustController,
 } from "./Product/productModerationControllers.js";
 import {
   submitProductReportController,
@@ -427,7 +429,9 @@ export {
   declineShipmentController,
   openShipmentDisputeController,
   getStaffDisputesController,
-  postStaffResolveDisputeController,  advanceMyShipmentStatusController,
+  postStaffResolveDisputeController,
+  advanceMyShipmentStatusController,
+  cancelOrderShipmentController,
   markOrderItemReturnedBySellerController,
   markOrderItemShippedBySellerController,
   markOrderItemDeliveredBySellerController,
@@ -487,6 +491,7 @@ export {
   getPendingModerationProductsCountController,
   approveProductModerationController,
   rejectProductModerationController,
+  patchSellerProductModerationTrustController,
   submitProductReportController,
   getMyProductReportStatusController,
   getPendingProductReportsController,

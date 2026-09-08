@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { cancelOrder } from "../api/cancelOrder.js";
 import { updateOrderStatus } from "../api/updateOrderStatus.js";
 import {
   advanceShipmentStatus,
@@ -26,6 +27,12 @@ export function useOrderMutations() {
 
   const cancelItemMutation = useMutation({
     mutationFn: ({ orderId, itemIndex }) => markOrderItemCancelled(orderId, itemIndex),
+    onSuccess: invalidateOrders,
+  });
+
+  /** Гасит отправление целиком, поэтому без `itemIndex`. */
+  const cancelOrderMutation = useMutation({
+    mutationFn: ({ orderId, sellerId }) => cancelOrder({ orderId, sellerId }),
     onSuccess: invalidateOrders,
   });
 
@@ -58,6 +65,7 @@ export function useOrderMutations() {
   return {
     confirmItemMutation,
     cancelItemMutation,
+    cancelOrderMutation,
     shipItemMutation,
     advanceShipmentMutation,
     deliverItemMutation,

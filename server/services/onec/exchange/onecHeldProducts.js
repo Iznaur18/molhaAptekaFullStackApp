@@ -218,6 +218,7 @@ export async function hideProductByOneCHoldRule({
  *   price: number;
  *   stock: number;
  *   seenAt: Date;
+ *   moderationTrusted?: boolean;
  * }} params
  */
 export async function materializeHeldOneCProduct({
@@ -228,6 +229,7 @@ export async function materializeHeldOneCProduct({
   price,
   stock,
   seenAt,
+  moderationTrusted = false,
 }) {
   const item = {
     name: held.name ?? "",
@@ -257,9 +259,10 @@ export async function materializeHeldOneCProduct({
     productCategoryId: categoryWrite.productCategoryId,
   });
   const keepsApproval =
-    held.moderationStatus === PRODUCT_MODERATION_APPROVED &&
-    Boolean(held.moderationHash) &&
-    held.moderationHash === fingerprint;
+    moderationTrusted ||
+    (held.moderationStatus === PRODUCT_MODERATION_APPROVED &&
+      Boolean(held.moderationHash) &&
+      held.moderationHash === fingerprint);
 
   const created = await createOneCProduct({
     sellerId,

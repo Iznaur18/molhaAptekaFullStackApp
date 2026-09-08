@@ -12,6 +12,7 @@ import {
   updateOrderStatusController,
   advanceMyShipmentStatusController,
   raiseDeliveryFeeController,
+  cancelOrderShipmentController,
   markOrderItemShippedBySellerController,
   markOrderItemDeliveredBySellerController,
   markOrderItemReturnedBySellerController,
@@ -31,6 +32,7 @@ import {
   getAllOrdersValidation,
   getMyOrdersValidation,
   getMySalesValidation,
+  orderCancelValidation,
   orderItemActionValidation,
   orderItemCancelValidation,
   advanceShipmentStatusValidation,
@@ -90,6 +92,14 @@ router.patch(
   orderItemActionRateLimiter,
   advanceShipmentStatusValidation,
   advanceMyShipmentStatusController,
+);
+// Отмена заказа целиком: одна кнопка вместо клика по каждой позиции.
+router.patch(
+  "/:orderId/shipment/:sellerId/cancelled",
+  checkAuthMW,
+  orderItemActionRateLimiter,
+  orderCancelValidation,
+  cancelOrderShipmentController,
 );
 router.patch(
   "/:orderId/items/:itemIndex/shipped",

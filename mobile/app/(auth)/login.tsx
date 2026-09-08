@@ -3,6 +3,8 @@ import { useCallback, useState } from "react";
 import { LayoutAnimation, Platform, Pressable, Text, TextInput, UIManager, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { isEmailAuthEnabled, resolveAuthContactChannel } from "@izibuy/shared-lib";
+
 import { useLoginMutation } from "@/entities/session/model/useLoginMutation";
 import { usePhoneLoginMutation } from "@/entities/session/model/usePhoneLoginMutation";
 import { useGuestProfileLoginMenuBannerImageQuery } from "@/entities/site-header-banner/model/useGuestProfileLoginMenuBannerImageQuery";
@@ -19,6 +21,7 @@ import { AppButton } from "@/shared/ui/AppButton";
 import { AuthScreenScroll } from "@/shared/ui/AuthScreenScroll";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 import { PasswordTextInput } from "@/shared/ui/PasswordTextInput";
+import { AuthContactChannelToggle } from "@/shared/ui/AuthContactChannelToggle";
 import { ScreenBackButton } from "@/shared/ui/ScreenBackButton";
 
 type AuthChannel = "email" | "phone";
@@ -43,7 +46,9 @@ export default function LoginScreen() {
   const loginMutation = useLoginMutation();
   const phoneLoginMutation = usePhoneLoginMutation();
 
-  const [channel, setChannel] = useState<AuthChannel>("email");
+  const [channel, setChannel] = useState<AuthChannel>(() =>
+    resolveAuthContactChannel("email"),
+  );
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
@@ -138,56 +143,17 @@ export default function LoginScreen() {
           <View style={styles.body}>
             <Text style={styles.title}>{AUTH_UI.LOGIN_TITLE}</Text>
             <Text style={styles.subtitle}>{AUTH_UI.LOGIN_SUBTITLE}</Text>
+            {isEmailAuthEnabled() ? null : (
+              <Text style={styles.subtitle}>{AUTH_UI.EMAIL_AUTH_DISABLED_NOTICE}</Text>
+            )}
 
             <View style={styles.form}>
-              <View
-                style={styles.channelRow}
-                accessibilityRole="tablist"
+              <AuthContactChannelToggle
+                channel={channel}
+                onChange={handleChannelChange}
+                disabled={isLoading}
                 accessibilityLabel={AUTH_UI.CHANNEL_TOGGLE_ARIA}
-              >
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.channelBtn,
-                    channel === "email" && styles.channelBtnActive,
-                    isLoading && styles.channelBtnDisabled,
-                    pressed && !isLoading && styles.channelBtnPressed,
-                  ]}
-                  onPress={() => handleChannelChange("email")}
-                  disabled={isLoading}
-                  accessibilityRole="tab"
-                  accessibilityState={{ selected: channel === "email" }}
-                >
-                  <Text
-                    style={[
-                      styles.channelBtnLabel,
-                      channel === "email" && styles.channelBtnLabelActive,
-                    ]}
-                  >
-                    {AUTH_UI.CHANNEL_EMAIL}
-                  </Text>
-                </Pressable>
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.channelBtn,
-                    channel === "phone" && styles.channelBtnActive,
-                    isLoading && styles.channelBtnDisabled,
-                    pressed && !isLoading && styles.channelBtnPressed,
-                  ]}
-                  onPress={() => handleChannelChange("phone")}
-                  disabled={isLoading}
-                  accessibilityRole="tab"
-                  accessibilityState={{ selected: channel === "phone" }}
-                >
-                  <Text
-                    style={[
-                      styles.channelBtnLabel,
-                      channel === "phone" && styles.channelBtnLabelActive,
-                    ]}
-                  >
-                    {AUTH_UI.CHANNEL_PHONE}
-                  </Text>
-                </Pressable>
-              </View>
+              />
 
               {channel === "email" ? (
                 <View style={styles.field}>

@@ -38,7 +38,10 @@ describe("свод статуса заказа: старое поведение"
 
   it("возврат рядом с активной позицией не закрывает заказ", () => {
     assert.equal(rollup("returned", "pending"), "pending");
-    assert.equal(rollup("returned", "shipped"), "pending");
+  });
+
+  it("вернувшаяся позиция не тянет ступень живых назад", () => {
+    assert.equal(rollup("returned", "shipped"), "shipped");
   });
 
   it("пустой заказ — в обработке", () => {
@@ -73,8 +76,11 @@ describe("свод статуса заказа: новые ступени", () =
     assert.equal(rollup("ready_to_ship"), "ready_to_ship");
   });
 
-  it("отмена рядом с новой ступенью не закрывает заказ", () => {
-    assert.equal(rollup("cancelled", "assembling"), "pending");
+  it("отмена рядом с новой ступенью не закрывает заказ и не сбрасывает ступень", () => {
+    // Иначе продавцу после отмены строки снова показывали «Принять», а сервер
+    // на неё отвечал 409: он считает ступень по живым позициям.
+    assert.equal(rollup("cancelled", "assembling"), "assembling");
+    assert.equal(rollup("cancelled", "accepted"), "accepted");
   });
 
   it("неизвестный статус не роняет свод", () => {

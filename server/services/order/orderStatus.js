@@ -4,7 +4,10 @@ import {
   ORDER_STATUS_LADDER_RANK,
   ORDER_STATUS_PENDING,
   ORDER_STATUS_RETURNED,
+  ORDER_TERMINAL_STATUSES,
 } from "../../constants/orderConstants.js";
+
+const TERMINAL = new Set(ORDER_TERMINAL_STATUSES);
 
 const EVERY_IN = (items, allowedSet) =>
   items.length > 0 && items.every((item) => allowedSet.has(item.status));
@@ -139,11 +142,14 @@ export const buildOrderStatusFromItems = (items) => {
     return ORDER_STATUS_CANCELLED;
   }
 
-  // Терминальная позиция рядом с активной означает, что заказ ещё в работе и
-  // закрывать его рано.
+  // Терминальная позиция рядом с активной означает, что заказ ещё в работе,
+  // но саму ступень задают живые: `advanceShipmentStatus` считает переход
+  // именно по ним, и отменённая строка не должна тянуть заказ назад.
   let leader = null;
   let leaderRank = Number.POSITIVE_INFINITY;
   for (const item of items) {
+    if (TERMINAL.has(item?.status)) continue;
+
     const rank = ORDER_STATUS_LADDER_RANK[item?.status];
     if (rank === undefined) return ORDER_STATUS_PENDING;
     if (rank < leaderRank) {

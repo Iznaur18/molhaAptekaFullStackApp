@@ -182,6 +182,26 @@ export const useOrderCardStyles = createThemedStyles((theme) => ({
     fontSize: 12,
     color: theme.colors.textMuted,
   },
+  // Отменённая позиция остаётся в списке как история заказа, но читаться как
+  // «это вам везут» она не должна.
+  itemBlockCancelled: {
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  itemTextCancelled: {
+    color: theme.colors.textMuted,
+    textDecorationLine: "line-through",
+  },
+  itemCancelledBadge: {
+    paddingVertical: 1,
+    paddingHorizontal: 6,
+    borderRadius: 999,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+    fontSize: 11,
+    fontWeight: "700",
+    color: theme.colors.textSecondary,
+  },
   itemTimestamp: {
     marginTop: 2,
     fontSize: 12,

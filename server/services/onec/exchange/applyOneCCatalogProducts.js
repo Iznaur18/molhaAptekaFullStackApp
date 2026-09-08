@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { PRODUCT_IMAGE_URLS_MAX } from "../../../constants/productConstants.js";
+import { PRODUCT_MODERATION_APPROVED } from "../../../constants/productModerationConstants.js";
 import { ONEC_IMPORT_MAX_IMAGES_PER_PRODUCT } from "../../../constants/onecExchangeConstants.js";
 import { ProductModel } from "../../../models/index.js";
 import { productHasImages } from "../../product/productImagePresence.js";
@@ -155,6 +156,7 @@ async function resolveProductImages({
  *   resolveImagePath: (relativePath: string) => string | null;
  *   onIssue: (issue: { externalId: string; name: string; message: string }) => void;
  *   seenAt?: Date;
+ *   moderationTrusted?: boolean;
  * }} context
  */
 export function createOneCCatalogApplier({
@@ -164,6 +166,7 @@ export function createOneCCatalogApplier({
   resolveImagePath,
   onIssue,
   seenAt = new Date(),
+  moderationTrusted = false,
 }) {
   const stats = {
     created: 0,
@@ -378,6 +381,9 @@ export function createOneCCatalogApplier({
         images,
         price: held?.lastKnownPrice ?? 0,
         stock: held?.lastKnownStock ?? 0,
+        ...(moderationTrusted
+          ? { moderationStatus: PRODUCT_MODERATION_APPROVED }
+          : {}),
       });
       stats.created += 1;
 
