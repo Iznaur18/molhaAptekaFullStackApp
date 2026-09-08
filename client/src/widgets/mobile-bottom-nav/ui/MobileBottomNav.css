@@ -122,6 +122,14 @@ body:has(.product-details-page) .mobile-bottom-nav {
   display: none;
 }
 
+/* Софт-клавиатура: iOS Safari переносит fixed-элементы к нижней кромке visualViewport,
+   и плавающий pill уезжает вверх — поверх поля ввода. Пока клавиатура открыта, прячем его
+   (класс ставит shared/lib/enableSoftKeyboardOpenClass.js). */
+:root.app-soft-keyboard-open .mobile-bottom-nav {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 /* Открыт drawer «Обзор» профиля: прячем плавающий pill целиком. Иначе его
    стеклянная подложка просвечивает сквозь полупрозрачный scrim и рвёт
    единый цвет фона у нижней кромки / safe-area. */

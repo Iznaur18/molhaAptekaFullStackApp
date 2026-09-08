@@ -30,12 +30,6 @@ import { ChangePasswordControls } from "../../../entities/user/ui/ChangePassword
 import "../../../entities/user/ui/EditProfileModal.css";
 import "./EditProfilePage.css";
 
-const EDIT_PROFILE_KEYBOARD_OPEN_CLASS = "edit-profile-keyboard-open";
-
-const isEditableField = (node) =>
-  node instanceof HTMLElement &&
-  (node.matches("input, textarea, select") || node.isContentEditable);
-
 const GENDER_OPTIONS = [USER_GENDER_MALE, USER_GENDER_FEMALE, USER_GENDER_NO_SELECTED];
 
 function PencilIcon() {
@@ -127,40 +121,6 @@ export function EditProfilePage({
     }, 150);
     return () => window.clearTimeout(timer);
   }, [location.hash, user]);
-
-  useEffect(() => {
-    const page = pageRef.current;
-    if (!page) {
-      return undefined;
-    }
-
-    const setKeyboardOpen = (open) => {
-      document.documentElement.classList.toggle(EDIT_PROFILE_KEYBOARD_OPEN_CLASS, open);
-    };
-
-    const onFocusIn = (event) => {
-      if (isEditableField(event.target)) {
-        setKeyboardOpen(true);
-      }
-    };
-
-    const onFocusOut = () => {
-      window.requestAnimationFrame(() => {
-        const active = document.activeElement;
-        if (!page.contains(active) || !isEditableField(active)) {
-          setKeyboardOpen(false);
-        }
-      });
-    };
-
-    page.addEventListener("focusin", onFocusIn);
-    page.addEventListener("focusout", onFocusOut);
-    return () => {
-      page.removeEventListener("focusin", onFocusIn);
-      page.removeEventListener("focusout", onFocusOut);
-      setKeyboardOpen(false);
-    };
-  }, [user]);
 
   if (!isAuthorized) {
     return (

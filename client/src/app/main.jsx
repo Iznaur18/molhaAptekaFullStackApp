@@ -8,6 +8,7 @@ import { isPlausibleEnabled } from "../shared/lib/plausibleEnv.js";
 import { disableDocumentPinchZoom } from "../shared/lib/disableDocumentPinchZoom.js";
 import { enableAndroidFocusFieldScroll } from "../shared/lib/enableAndroidFocusFieldScroll.js";
 import { enablePortraitOrientationLock } from "../shared/lib/enablePortraitOrientationLock.js";
+import { enableSoftKeyboardOpenClass } from "../shared/lib/enableSoftKeyboardOpenClass.js";
 import { initRuntimeDesignTokens } from "../shared/theme/runtimeDesignTokens.js";
 import "../index.css";
 import App from "./App.jsx";
@@ -42,6 +43,7 @@ initRuntimeDesignTokens();
 disableDocumentPinchZoom();
 enableAndroidFocusFieldScroll();
 enablePortraitOrientationLock();
+enableSoftKeyboardOpenClass();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
