@@ -37,9 +37,8 @@
 
 ## Auth — `/auth`
 
-Пока `EMAIL_AUTH_ENABLED_DEFAULT = false` в `packages/shared-lib/src/emailAuthKillSwitch.ts`:
-`POST /auth/register`, `POST /auth/login` и reset по `email` отвечают **503**. Телефон не трогаем.
-Вернуть почту: константу в `true`, `npm run build` в `packages/shared-lib`.
+Почта включена (`EMAIL_AUTH_ENABLED_DEFAULT = true` в `packages/shared-lib/src/emailAuthKillSwitch.ts`).
+Чтобы временно отключить вход/регистрацию/сброс через email — константу в `false` и `npm run build` в `packages/shared-lib`.
 
 | Метод | Путь | Доступ | Назначение |
 | ----- | ---- | ------ | ---------- |

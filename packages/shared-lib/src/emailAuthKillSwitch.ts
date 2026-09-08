@@ -1,14 +1,14 @@
 /**
  * Временный выключатель входа / регистрации / сброса пароля через почту.
  *
- * Вернуть почту:
- * 1. Поставь `EMAIL_AUTH_ENABLED_DEFAULT = true`
+ * Выключить почту:
+ * 1. Поставь `EMAIL_AUTH_ENABLED_DEFAULT = false`
  * 2. `npm run build` в `packages/shared-lib`
  *
  * Env `EMAIL_AUTH_ENABLED=true|false` перекрывает константу (тесты, hotfix API).
  * В `NODE_ENV=test` без явного env почта включена, чтобы интеграционные тесты не падали.
  */
-export const EMAIL_AUTH_ENABLED_DEFAULT = false;
+export const EMAIL_AUTH_ENABLED_DEFAULT = true;
 
 export const EMAIL_AUTH_DISABLED_MESSAGE =
   "Вход, регистрация и восстановление пароля через почту временно недоступны. Используйте телефон.";

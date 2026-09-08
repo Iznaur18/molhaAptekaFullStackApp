@@ -19,7 +19,7 @@ test("явный EMAIL_AUTH_ENABLED=true включает почту", () => {
   );
 });
 
-test("без env в production почта выключена, в test — включена", () => {
-  assert.equal(isEmailAuthEnabled({ NODE_ENV: "production" }), false);
+test("без env почта включена и в production, и в test", () => {
+  assert.equal(isEmailAuthEnabled({ NODE_ENV: "production" }), true);
   assert.equal(isEmailAuthEnabled({ NODE_ENV: "test" }), true);
 });
