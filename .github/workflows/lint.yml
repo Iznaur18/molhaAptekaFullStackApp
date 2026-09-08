@@ -27,10 +27,11 @@ jobs:
           cache: npm
 
       - name: Install root tooling
-        # npm ci здесь падает: корневой package-lock.json собран на Windows и в
-      # нём нет @emnapi/runtime, который на Linux требует @img/sharp-wasm32.
-      # Пересобрать lock под Linux с этой машины нельзя, поэтому пока install.
-      run: npm install
+        # npm ci здесь падает: корневой package-lock.json собран на Windows и
+        # в нём нет @emnapi/runtime, который на Linux требует
+        # @img/sharp-wasm32. Пересобрать lock под Linux с этой машины не
+        # выходит, поэтому пока install.
+        run: npm install
 
       - name: Build shared-lib
         run: npm run build --workspace=@izibuy/shared-lib
