@@ -1,16 +1,16 @@
 name: Client build & tests
 
+# Фильтров по путям здесь намеренно нет. Эта проверка обязательная в правиле
+# ветки main, а GitHub считает не запустившуюся обязательную проверку не
+# «пропущенной», а «ещё не пришедшей»: PR навсегда зависает в Expected. Цена —
+# лишние прогоны, поэтому ниже включена отмена устаревших.
 on:
   push:
-    paths:
-      - "client/**"
-      - "contract/**"
-      - ".github/workflows/client-build.yml"
   pull_request:
-    paths:
-      - "client/**"
-      - "contract/**"
-      - ".github/workflows/client-build.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:

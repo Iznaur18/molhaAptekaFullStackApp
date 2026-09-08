@@ -1,14 +1,16 @@
 name: Contract smoke
 
+# Фильтров по путям здесь намеренно нет. Эта проверка обязательная в правиле
+# ветки main, а GitHub считает не запустившуюся обязательную проверку не
+# «пропущенной», а «ещё не пришедшей»: PR навсегда зависает в Expected. Цена —
+# лишние прогоны, поэтому ниже включена отмена устаревших.
 on:
   push:
-    paths:
-      - "contract/**"
-      - ".github/workflows/contract.yml"
   pull_request:
-    paths:
-      - "contract/**"
-      - ".github/workflows/contract.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   smoke:

@@ -1,19 +1,16 @@
 name: Server tests
 
+# Фильтров по путям здесь намеренно нет. Эта проверка обязательная в правиле
+# ветки main, а GitHub считает не запустившуюся обязательную проверку не
+# «пропущенной», а «ещё не пришедшей»: PR навсегда зависает в Expected. Цена —
+# лишние прогоны, поэтому ниже включена отмена устаревших.
 on:
   push:
-    paths:
-      - "server/**"
-      # Сервер зависит от контракта через file:../contract. Без этой строки
-      # правка общих констант не запускала серверные тесты — server-test был
-      # единственным workflow, где contract забыли.
-      - "contract/**"
-      - ".github/workflows/server-test.yml"
   pull_request:
-    paths:
-      - "server/**"
-      - "contract/**"
-      - ".github/workflows/server-test.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:

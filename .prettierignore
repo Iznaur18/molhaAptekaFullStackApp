@@ -8,3 +8,9 @@ package-lock.json
 **/package-lock.json
 .cursor
 todo.md
+
+# Служебные копии репозитория от агентов и локальные выгрузки Expo:
+# в CI их нет, локально они забивали вывод тысячами файлов.
+.claude
+**/.claude
+mobile/.expo-export-check*

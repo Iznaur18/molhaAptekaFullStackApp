@@ -2026,7 +2026,6 @@ export const useProductMediaGalleryStyles = createThemedStyles((theme) => ({
           alignSelf: "center",
         } as const)
       : null),
-    overflow: "hidden",
     borderWidth: GRL.thumbBorderWidth,
     borderColor: "transparent",
     backgroundColor: theme.colors.border,
