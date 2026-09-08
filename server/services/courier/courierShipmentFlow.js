@@ -329,7 +329,7 @@ export async function completeDeliveryByCourier({
       itemIndex,
       buyerId,
       userId: buyerId,
-      viaCourierCodeHandover: true,
+      courierCodeGateBypass: "code_handover",
     });
   }
 

@@ -56,7 +56,9 @@ async function makeBuyer() {
     userName: `buyer-${Math.random().toString(36).slice(2, 10)}`,
     email: `${Math.random().toString(36).slice(2, 10)}@example.com`,
     passwordHash: "x".repeat(60),
-    userPhoneNumber: "+79990000000",
+    // Телефон в схеме unique: фиксированный номер ронял второго покупателя
+    // на E11000. Не всплывало, пока тесты не начали ждать сборку индексов.
+    userPhoneNumber: `+79${String(Math.floor(Math.random() * 1e9)).padStart(9, "0")}`,
   });
 }
 

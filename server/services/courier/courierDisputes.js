@@ -11,6 +11,7 @@ import {
   SHIPMENT_DISPUTED_MESSAGE,
 } from "../../constants/courierConstants.js";
 import {
+  ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
   ORDER_STATUS_COURIER_ASSIGNED,
   ORDER_STATUS_COURIER_HOLDING,
   ORDER_STATUS_DELIVERED,
@@ -379,6 +380,23 @@ export async function resolveShipmentDispute({
     throw new AppError(409, "По этому отправлению спора нет");
   }
 
+  // Курьер денег продавца не касается: при оплате картой на месте перевод
+  // подтверждает сам продавец, и штатное вручение без этого не проходит
+  // (см. completeDeliveryByCourier). Модератор закрывает спор в обход того
+  // же гейта, поэтому проверку приходится повторить здесь — иначе исходом
+  // «дошёл» сделку можно было бы закрыть успешной, а продавец остался бы
+  // без денег.
+  if (
+    outcome === "confirmed" &&
+    order.paymentMethod === ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY &&
+    !shipment.paymentConfirmedAt
+  ) {
+    throw new AppError(
+      409,
+      "Продавец не подтвердил перевод — закрывать сделку как доставленную нельзя",
+    );
+  }
+
   shipment.disputeResolvedAt = new Date();
   shipment.disputeResolvedBy = moderatorId ?? null;
   shipment.disputeOutcome = outcome;
@@ -412,6 +430,7 @@ export async function resolveShipmentDispute({
               itemIndex,
               buyerId,
               userId: buyerId,
+              courierCodeGateBypass: "dispute_resolution",
             })
           : await markOrderItemReturned({
               orderId: String(orderId),

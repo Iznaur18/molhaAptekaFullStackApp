@@ -4,10 +4,15 @@ on:
   push:
     paths:
       - "server/**"
+      # Сервер зависит от контракта через file:../contract. Без этой строки
+      # правка общих констант не запускала серверные тесты — server-test был
+      # единственным workflow, где contract забыли.
+      - "contract/**"
       - ".github/workflows/server-test.yml"
   pull_request:
     paths:
       - "server/**"
+      - "contract/**"
       - ".github/workflows/server-test.yml"
 
 jobs:
@@ -24,10 +29,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
+          # Та же мажорная версия, что на боевом сервере (v20.20.2).
           node-version: "20"
 
       - name: Install dependencies
-        run: npm install
+        # ci, а не install: у server свой package-lock.json, и тесты должны
+        # идти на тех же версиях зависимостей, что уезжают на прод.
+        run: npm ci
 
       - name: Run tests
         run: npm test
