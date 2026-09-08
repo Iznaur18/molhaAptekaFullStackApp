@@ -8,6 +8,7 @@ import { AppError } from "../../errors/AppError.js";
 import { UserModel } from "../../models/index.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 import { createUserInAppNotification } from "../user/userInAppNotifications.js";
+import { approvePendingProductsForTrustedSeller } from "./approvePendingProductsForTrustedSeller.js";
 
 const notifySeller = async ({ sellerId, actorUserId, trusted }) => {
   try {
@@ -35,9 +36,9 @@ const notifySeller = async ({ sellerId, actorUserId, trusted }) => {
 /**
  * Включить или снять продавцу публикацию товаров без модерации.
  *
- * Уже опубликованные карточки не пересматриваются: снятие доверия закрывает
- * только следующие публикации, иначе один клик уносил бы из каталога сотни
- * позиций, к которым у модерации претензий не было.
+ * При выдаче доверия висящие `pending` этого продавца сразу уходят в каталог
+ * (без пушей подписчикам). `rejected` не трогаем. Снятие доверия закрывает
+ * только следующие публикации — уже одобренные остаются в каталоге.
  *
  * @param {{ sellerId: string; trusted: boolean; actorUserId: string }} input
  */
@@ -62,7 +63,26 @@ export async function setSellerProductModerationTrust({
     { $set: { productModerationTrusted: trusted } },
   );
 
+  let pendingApproved = 0;
+  if (trusted) {
+    try {
+      const result = await approvePendingProductsForTrustedSeller({ sellerId });
+      pendingApproved = result.approved;
+    } catch (error) {
+      // Флаг уже записан: очередь можно дочистить миграцией / повторной выдачей.
+      logServerEvent("error", {
+        event: "approve_pending_on_moderation_trust_grant",
+        sellerId: String(sellerId),
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
   await notifySeller({ sellerId, actorUserId, trusted });
 
-  return { userId: String(sellerId), productModerationTrusted: trusted };
+  return {
+    userId: String(sellerId),
+    productModerationTrusted: trusted,
+    pendingApproved,
+  };
 }

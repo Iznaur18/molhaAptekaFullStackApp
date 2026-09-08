@@ -26,7 +26,7 @@
 | 3   | **Что даёт**                | Новый товар создаётся сразу `approved`; в каталоге виден, если `productStockQuantity > 0`   |
 | 4   | **Правка контента**         | Уже одобренный товар остаётся `approved`, обновляется только `productModerationApprovedHash` |
 | 5   | **Отзыв доверия**           | Ранее одобренные товары остаются в каталоге; на модерацию идут только новые                 |
-| 6   | **Товары в `pending`**      | При выдаче доверия автоматически не одобряются — остаются в очереди у модератора            |
+| 6   | **Товары в `pending`**      | При выдаче доверия все `pending` продавца сразу `approved` (без пушей подписчикам); `rejected` не трогаем |
 | 7   | **1С-импорт**               | Тот же bypass: `processOneCImportJob` → applier и материализация held-карточек               |
 | 8   | **Продавец знает о статусе**| In-app уведомление при выдаче/отзыве + пометка в тулбаре «Мои товары»                        |
 | 9   | **Видимость флага**         | Отдаём себе и staff; в чужом профиле для обычного зрителя вырезаем                          |
@@ -56,6 +56,8 @@
 - `services/product/productModerationTrust.js` — `canSkipProductModeration`,
   `loadProductWriteAccess`, `isSellerProductModerationTrusted`.
 - `services/product/setSellerProductModerationTrust.js` — выдача/отзыв + уведомление.
+- `services/product/approvePendingProductsForTrustedSeller.js` — bulk-approve `pending` без пушей.
+- `scripts/migrations/20260909-approve-pending-for-trusted-sellers.js` — дочистка уже trusted.
 - `services/product/postProduct.js`, `buildProductPatchSet.js`, `patchMyProduct.js` — bypass и fingerprint.
 - `services/onec/exchange/{processOneCImportJob,applyOneCCatalogProducts,onecHeldProducts,onecProductFields}.js`
   — bypass в 1С-импорте.
@@ -92,7 +94,8 @@
 
 ## 6. Риски и что не вошло
 
-- Массовое авто-одобрение висящих `pending` при выдаче доверия — отдельная задача (решение 6).
+- Bulk-approve на grant не шлёт «новый товар» подписчикам (сотни пушей).
+- `rejected` при выдаче доверия не реанимируются — только ручной re-submit / правка.
 - Доверие бессрочное: авто-отзыв по жалобам/фроду не предусмотрен, только ручной.
 - Anti-fraud не проверяет поток от доверенного продавца отдельно — при масштабировании нужен
   сигнал в Risk Score.

@@ -6,6 +6,7 @@ import {
   PRODUCT_MODERATION_PENDING,
 } from "../constants/productModerationConstants.js";
 import { ProductModel, StaffAuditLogModel, UserModel } from "../models/index.js";
+import { invalidateCatalogProductsCache } from "../services/product/catalogProductsResponseCache.js";
 import { startHttpTestServer, stopHttpTestServer } from "./helpers/httpTestApp.js";
 import {
   createProductViaApi,
@@ -38,6 +39,7 @@ before(async () => {
 });
 
 afterEach(async () => {
+  invalidateCatalogProductsCache();
   await clearMongoCollections();
 });
 
@@ -196,4 +198,53 @@ test("уведомление продавцу приходит один раз �
 
   assert.equal(trustNotifications.length, 1);
   assert.equal(me.user.productModerationTrusted, true);
+});
+
+test("выдача доверия одобряет висящие pending, rejected не трогает", async () => {
+  await ensureProductCategoryTreeSeeded();
+
+  const { cookie: sellerCookie, user: seller } = await registerSeller("trust-flush");
+  const { cookie: adminCookie } = await registerAdmin("trust-flush-admin");
+
+  const pendingA = await createProductViaApi(request, sellerCookie, {
+    productName: "Pending Before Trust A",
+  });
+  const pendingB = await createProductViaApi(request, sellerCookie, {
+    productName: "Pending Before Trust B",
+  });
+  assert.equal(pendingA.productModerationStatus, PRODUCT_MODERATION_PENDING);
+  assert.equal(pendingB.productModerationStatus, PRODUCT_MODERATION_PENDING);
+
+  await ProductModel.create({
+    productName: "Rejected Before Trust",
+    productPrice: 100,
+    productStockQuantity: 1,
+    productSeller: seller._id,
+    productCategory: "pharmacy",
+    productModerationStatus: "rejected",
+    productModerationComment: "no",
+    productIsAvailable: false,
+  });
+
+  await setTrustViaApi({ cookie: adminCookie, userId: seller._id, trusted: true });
+
+  const approvedA = await ProductModel.findById(pendingA._id).lean();
+  const approvedB = await ProductModel.findById(pendingB._id).lean();
+  const stillRejected = await ProductModel.findOne({
+    productSeller: seller._id,
+    productName: "Rejected Before Trust",
+  }).lean();
+
+  assert.equal(approvedA?.productModerationStatus, PRODUCT_MODERATION_APPROVED);
+  assert.equal(approvedA?.productIsAvailable, true);
+  assert.ok(approvedA?.productModerationApprovedHash);
+  assert.equal(approvedB?.productModerationStatus, PRODUCT_MODERATION_APPROVED);
+  assert.equal(stillRejected?.productModerationStatus, "rejected");
+  assert.equal(stillRejected?.productIsAvailable, false);
+
+  const catalog = await parseSuccessData(await request("/product"));
+  const ids = (catalog.products ?? []).map((row) => String(row._id));
+  assert.ok(ids.includes(String(pendingA._id)));
+  assert.ok(ids.includes(String(pendingB._id)));
+  assert.equal(ids.includes(String(stillRejected?._id)), false);
 });
