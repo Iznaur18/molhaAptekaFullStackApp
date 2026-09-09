@@ -98,12 +98,18 @@ ssh "$SERVER" bash -se <<REMOTE
   chmod 755 server/uploads
   if [ -d server/uploads/private ]; then chmod 700 server/uploads/private; fi
 
-  # Рестарт по одному инстансу. "systemctl restart gitorg-api" оставляет ~4 с,
-  # когда на 4444 никто не слушает: 08.09.2026 в 02:15:35 в это окно попал
-  # живой пользователь и увидел 502. Пока перезапускается один, трафик держит
-  # второй — nginx уводит запрос по дефолтному proxy_next_upstream.
-  # Второго инстанса может не быть (его заводит scripts/enable-queue-and-ha.sh) —
-  # тогда ведём себя как раньше.
+  # ── Второй инстанс API: приводим к нужному состоянию на КАЖДОМ выкате ──
+  #
+  # Зачем он вообще: "systemctl restart gitorg-api" оставляет ~4 с, когда на
+  # 4444 никто не слушает. 08.09.2026 в 02:15:35 в это окно попал живой
+  # пользователь и увидел 502. Два бэкенда + рестарт по очереди убирают окно:
+  # nginx уводит запрос на живой по своему дефолтному proxy_next_upstream,
+  # отдельная директива не нужна.
+  #
+  # Почему провижн живёт ЗДЕСЬ, а не в отдельном скрипте: юнит, заведённый
+  # однажды руками, разъезжается с репозиторием и тихо протухает — так и
+  # вышло 09.09.2026. Теперь файл юнита пишется из этого скрипта каждый раз,
+  # поэтому он не может быть старее выката.
   #
   # ВНИМАНИЕ: heredoc REMOTE не закавычен (он нарочно подставляет \$REMOTE_DIR
   # локально), поэтому всё, что должно раскрыться НА СЕРВЕРЕ, экранируется:
@@ -118,20 +124,77 @@ ssh "$SERVER" bash -se <<REMOTE
     return 1
   }
 
-  systemctl restart gitorg-api
-  wait_api_health 4444
-
-  # Второй инстанс — не блокер выката. Если он не поднялся, трафик держит
-  # первый, а деплой обязан дойти до заливки client/dist: иначе фронтенд
-  # остаётся старым (09.09.2026 так и вышло — api2 падал на EADDRINUSE, и
-  # шаги [5/6] и [6/6] не выполнились вовсе). Поэтому предупреждаем, но идём
-  # дальше. Предупреждение видно в выводе, а health-check шага [6/6] всё равно
-  # проверит, что сайт жив.
-  if systemctl is-enabled gitorg-api2 >/dev/null 2>&1; then
-    systemctl restart gitorg-api2
-    if ! wait_api_health 4445; then
-      echo "ВНИМАНИЕ: gitorg-api2 не поднялся — деплой продолжается на одном инстансе" >&2
+  # Снять второй инстанс и вернуться к заведомо рабочей схеме с одним
+  # бэкендом. Вызывается, когда инстанс не поднялся: лучше честно остаться на
+  # одном, чем оставить в upstream мёртвый порт и юнит во flapping'е.
+  disable_api2() {
+    systemctl disable --now gitorg-api2 >/dev/null 2>&1 || true
+    if grep -q "127.0.0.1:4445" /etc/nginx/sites-available/gitorg; then
+      sed -i "/127\.0\.0\.1:4445/d" /etc/nginx/sites-available/gitorg
+      nginx -t >/dev/null 2>&1 && systemctl reload nginx
     fi
+    echo "ВНИМАНИЕ: gitorg-api2 не поднялся — отключён, работаем на одном инстансе" >&2
+  }
+
+  # Юнит пишем всегда: так он гарантированно свежий.
+  # PORT задаём В КОМАНДЕ, а не через Environment=: systemd применяет
+  # EnvironmentFile ПОСЛЕ Environment=, и PORT=4444 из server/.env перебивал
+  # бы его — инстанс лез на занятый порт и падал с EADDRINUSE.
+  # StartLimit* — в [Unit]: в systemd 229+ в [Service] эти ключи игнорируются,
+  # и без них systemd крутил рестарт вечно (за раз накрутило 103 попытки).
+  cat > /etc/systemd/system/gitorg-api2.service <<'UNIT'
+# Второй инстанс Gitorg API. Файл генерирует scripts/deploy-prod.sh —
+# править руками бесполезно, следующий выкат перезапишет.
+[Unit]
+Description=Gitorg Express API (instance 2)
+After=network.target redis-server.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/gitorg/server
+EnvironmentFile=/var/www/gitorg/server/.env
+Environment=CRON_LEADER=false
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/env PORT=4445 /usr/bin/node index.js
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+  systemctl daemon-reload
+
+  # Второй бэкенд в upstream — идемпотентно.
+  if ! grep -q "127.0.0.1:4445" /etc/nginx/sites-available/gitorg; then
+    sed -i -E "s|^(\\s*)server 127\\.0\\.0\\.1:4444;|\\1server 127.0.0.1:4444;\\n\\1server 127.0.0.1:4445;|" /etc/nginx/sites-available/gitorg
+    if nginx -t >/dev/null 2>&1; then
+      systemctl reload nginx
+    else
+      sed -i "/127\\.0\\.0\\.1:4445/d" /etc/nginx/sites-available/gitorg
+      echo "ВНИМАНИЕ: nginx -t не прошёл, второй бэкенд не добавлен" >&2
+    fi
+  fi
+
+  # Рестарт по очереди: пока перезапускается один, трафик держит другой.
+  systemctl enable gitorg-api2 >/dev/null 2>&1 || true
+  systemctl restart gitorg-api2
+  if wait_api_health 4445; then
+    systemctl restart gitorg-api
+    if ! wait_api_health 4444; then
+      echo "gitorg-api не поднялся" >&2
+      exit 1
+    fi
+  else
+    # Второй инстанс не блокер выката: деплой обязан дойти до заливки
+    # client/dist, иначе фронтенд останется старым (09.09.2026 так и вышло).
+    disable_api2
+    systemctl restart gitorg-api
+    wait_api_health 4444
   fi
 
   systemctl restart gitorg-worker
