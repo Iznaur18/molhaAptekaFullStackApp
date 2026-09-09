@@ -1,3 +1,6 @@
+import { createHash } from "node:crypto";
+import { createReadStream } from "node:fs";
+
 import { PRODUCT_FULFILLMENT_SOURCE_PROFILE } from "@molha/api-contract";
 
 import {
@@ -139,6 +142,51 @@ async function saveGroupProductCounts(sellerId, groupCounts) {
     })),
     { ordered: false },
   );
+}
+
+/**
+ * SHA-256 файла потоком: каталог бывает на сотни мегабайт, целиком в память
+ * его тянуть нельзя.
+ *
+ * @param {string} filePath
+ * @returns {Promise<string>}
+ */
+async function hashFile(filePath) {
+  const hash = createHash("sha256");
+  const stream = createReadStream(filePath);
+  for await (const chunk of stream) {
+    hash.update(chunk);
+  }
+  return hash.digest("hex");
+}
+
+/**
+ * Присылала ли 1С ровно этот же файл в прошлый успешный разбор.
+ *
+ * Сам разбор не пропускаем: за час товар мог измениться на сайте (модерация,
+ * правка продавца), и повторная выгрузка эти расхождения возвращает к тому,
+ * что лежит в 1С. А вот знать, что каталог не менялся, полезно: если флаг
+ * стоит в журнале обмена каждый час, значит расписание в 1С гоняет полную
+ * выгрузку впустую и его стоит проредить или включить «только изменения».
+ *
+ * @param {{ sellerId: string; filename: string; jobId: unknown; fileHash: string }} params
+ * @returns {Promise<boolean>}
+ */
+async function isIdenticalToPreviousImport({ sellerId, filename, jobId, fileHash }) {
+  if (!fileHash) return false;
+
+  const previous = await OneCImportJobModel.findOne({
+    sellerId,
+    filename,
+    _id: { $ne: jobId },
+    status: ONEC_IMPORT_STATUS_COMPLETED,
+    fileHash: { $ne: "" },
+  })
+    .sort({ createdAt: -1 })
+    .select("fileHash")
+    .lean();
+
+  return previous?.fileHash === fileHash;
 }
 
 /**
@@ -291,6 +339,22 @@ async function runOneCImportJob(jobId) {
     // что именно разбиралось.
     job.filePath = target.filePath;
     job.kind = target.kind;
+    job.fileHash = await hashFile(target.filePath);
+
+    const identicalToPrevious = await isIdenticalToPreviousImport({
+      sellerId,
+      filename: job.filename,
+      jobId: job._id,
+      fileHash: job.fileHash,
+    });
+    if (identicalToPrevious) {
+      logServerEvent("info", {
+        event: "onec.commerceml_import_identical",
+        sellerId,
+        jobId: String(job._id),
+        filename: job.filename,
+      });
+    }
 
     const { defaults: sellerDefaults, warning } =
       await resolveSellerProductDefaults(sellerId);
@@ -301,7 +365,10 @@ async function runOneCImportJob(jobId) {
     const resolveImagePath = createMultiRootImageResolver(target.rootDirs);
 
     /** @type {Record<string, unknown>} */
-    const stats = { files: xmlFiles.map((row) => row.filename) };
+    const stats = {
+      files: xmlFiles.map((row) => row.filename),
+      identicalToPrevious,
+    };
     let fullCatalogSeen = false;
 
     for (const file of xmlFiles) {

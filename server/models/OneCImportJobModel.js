@@ -42,6 +42,17 @@ const OneCImportJobSchema = new mongoose.Schema(
       default: "",
       maxlength: 1000,
     },
+    /**
+     * SHA-256 разобранного XML. 1С часто настроена на полную выгрузку по
+     * расписанию и присылает байт в байт тот же файл каждый час; по совпадению
+     * хеша с прошлой успешной задачей это видно в журнале обмена как
+     * `identicalToPrevious`, и понятно, что час работы ушёл впустую.
+     */
+    fileHash: {
+      type: String,
+      default: "",
+      maxlength: 64,
+    },
     kind: {
       type: String,
       enum: [
