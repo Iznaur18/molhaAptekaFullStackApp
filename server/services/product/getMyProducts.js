@@ -1,4 +1,3 @@
-import { MY_PRODUCTS_MODERATION_FILTER_VALUES } from "../../constants/productModerationConstants.js";
 import {
   PRODUCT_CATALOG_REVIEWS_MIN_REVIEW_COUNT,
   PRODUCT_SORT_REVIEWS,
@@ -21,15 +20,12 @@ import {
   categoryFromQuery,
   parsePagination,
 } from "./productListQueryHelpers.js";
-
-const moderationStatusFromQuery = (query) => {
-  const raw = query?.moderationStatus;
-  if (raw == null || String(raw).trim() === "") {
-    return null;
-  }
-  const value = String(raw).trim();
-  return MY_PRODUCTS_MODERATION_FILTER_VALUES.includes(value) ? value : null;
-};
+import { myProductsExcludeHiddenOneCFilter } from "./myProductsOneCVisibility.js";
+import {
+  buildMyProductsListFilterQuery,
+  parseMyProductsListFilter,
+  shouldExcludeHiddenOneCFromMyProducts,
+} from "./myProductsListFilter.js";
 
 /**
  * @param {{
@@ -45,12 +41,16 @@ export async function getMyProducts({ userId, query }) {
   const category = categoryFromQuery(query);
   const reviewsOnly = query.sort === PRODUCT_SORT_REVIEWS;
   const sort = parseProductSortFromQuery(query);
-  const moderationStatus = moderationStatusFromQuery(query);
+  const listFilter = parseMyProductsListFilter(query?.moderationStatus);
+  const listFilterQuery = buildMyProductsListFilterQuery({ listFilter });
 
   const myProductsBaseQuery = await mergeProductCatalogCategoryFilter(
     {
       productSeller: userId,
-      ...(moderationStatus ? { productModerationStatus: moderationStatus } : {}),
+      ...listFilterQuery,
+      ...(shouldExcludeHiddenOneCFromMyProducts(listFilter)
+        ? myProductsExcludeHiddenOneCFilter
+        : {}),
     },
     {
       categoryId: parseCategoryIdFromQuery(query.categoryId),

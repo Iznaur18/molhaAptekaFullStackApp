@@ -19,10 +19,14 @@ export { GROUP_VITAMINS, GROUP_ROOT };
  * Каталог CommerceML: корневая группа с подгруппой, простой товар с картинкой
  * и торговое предложение с характеристикой (`Ид` вида `товар#характеристика`).
  *
- * @param {{ onlyChanges?: boolean }} [opts]
+ * @param {{ onlyChanges?: boolean; includeVariantImage?: boolean }} [opts]
  */
 export function buildImportXml(opts = {}) {
   const onlyChanges = opts.onlyChanges === true ? "true" : "false";
+  const includeVariantImage = opts.includeVariantImage !== false;
+  const variantImageXml = includeVariantImage
+    ? "\n        <Картинка>import_files/aa/aspirin.png</Картинка>"
+    : "";
   return `<?xml version="1.0" encoding="UTF-8"?>
 <КоммерческаяИнформация ВерсияСхемы="2.05" ДатаФормирования="2026-08-30T10:00:00">
   <Классификатор>
@@ -75,7 +79,7 @@ export function buildImportXml(opts = {}) {
       <Товар>
         <Ид>${OFFER_GUID_VARIANT}</Ид>
         <Наименование>Витамин D3, 60 капсул</Наименование>
-        <Группы><Ид>${GROUP_VITAMINS}</Ид></Группы>
+        <Группы><Ид>${GROUP_VITAMINS}</Ид></Группы>${variantImageXml}
         <ЗначенияРеквизитов>
           <ЗначениеРеквизита>
             <Наименование>Форма выпуска</Наименование>
@@ -89,10 +93,7 @@ export function buildImportXml(opts = {}) {
 }
 
 /**
- * Пакет предложений: два типа цены и два склада, чтобы проверить фильтрацию.
- *
- * @param {{ variantQuantity?: number }} [opts] остаток товара без картинки —
- *   именно он решает, попадёт ли такая номенклатура на сайт
+ * @param {{ variantQuantity?: number }} [opts] остаток торгового предложения
  */
 export function buildOffersXml(opts = {}) {
   const variantQuantity = opts.variantQuantity ?? 3;
@@ -153,7 +154,11 @@ export function buildOffersXml(opts = {}) {
 }
 
 /**
- * @param {{ onlyChanges?: boolean; variantQuantity?: number }} [opts]
+ * @param {{
+ *   onlyChanges?: boolean;
+ *   variantQuantity?: number;
+ *   includeVariantImage?: boolean;
+ * }} [opts]
  * @returns {Buffer}
  */
 export function buildExchangeZip(opts = {}) {

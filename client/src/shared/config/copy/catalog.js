@@ -107,7 +107,7 @@ export const HOME_PAGE_UI = {
   FILTER_BUTTON_ARIA_SELECTED: (categoryLabel) =>
     `Фильтр по категории: ${categoryLabel}`,
   SORT_LABEL: "Сортировка",
-  MODERATION_STATUS_FILTER_LABEL: "Статус",
+  MODERATION_STATUS_FILTER_LABEL: "Фильтр",
   CATEGORY_ALL: "Все категории",
   EMPTY_MY_BY_MODERATION_STATUS: "Нет товаров с выбранным статусом.",
   MY_PRODUCTS_QUOTA_LABEL: "Товаров",

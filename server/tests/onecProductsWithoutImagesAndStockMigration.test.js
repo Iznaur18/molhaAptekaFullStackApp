@@ -134,5 +134,36 @@ describe("миграция: товары 1С без картинок и без �
     assert.ok(after, "карточка осталась — на неё ссылается заказ");
     assert.equal(after.productIsAvailable, false);
     assert.equal(after.productOutOfStock, true);
+    assert.equal(after.product1cHeld, true);
+  });
+
+  it("scope=unavailable удаляет недоступные 1С даже с картинкой", async () => {
+    const { cleanupOneCProductsWithoutImagesAndStock } = await import(
+      "../services/onec/cleanupOneCProductsWithoutImagesAndStock.js"
+    );
+
+    const doomed = await createProduct({
+      product1cGuid: "unavail",
+      productIsAvailable: false,
+      productImageUrls: ["/uploads/x.webp"],
+      productStockQuantity: 3,
+    });
+    const keep = await createProduct({
+      product1cGuid: "avail",
+      productIsAvailable: true,
+      productImageUrls: ["/uploads/y.webp"],
+      productStockQuantity: 3,
+    });
+
+    const result = await cleanupOneCProductsWithoutImagesAndStock({
+      isApply: true,
+      sellerId: String(seller._id),
+      scope: "unavailable",
+    });
+
+    assert.equal(result.candidates, 1);
+    assert.equal(result.deleted, 1);
+    assert.equal(await ProductModel.countDocuments({ _id: doomed._id }), 0);
+    assert.equal(await ProductModel.countDocuments({ _id: keep._id }), 1);
   });
 });
