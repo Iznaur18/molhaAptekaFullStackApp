@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import { describe, test } from "node:test";
+import { describe, expect, test } from "vitest";
 
 import {
   SELLER_PRODUCTS_LIMIT_PREMIUM,
@@ -15,42 +14,37 @@ import {
 
 describe("getSellerProductsLimit (client)", () => {
   test("без override — regular / premium", () => {
-    assert.equal(getSellerProductsLimit({}), SELLER_PRODUCTS_LIMIT_REGULAR);
-    assert.equal(
-      getSellerProductsLimit({ isPremiumUser: true }),
+    expect(getSellerProductsLimit({})).toBe(SELLER_PRODUCTS_LIMIT_REGULAR);
+    expect(getSellerProductsLimit({ isPremiumUser: true })).toBe(
       SELLER_PRODUCTS_LIMIT_PREMIUM,
     );
   });
 
   test("персональный override сильнее premium", () => {
-    assert.equal(
+    expect(
       getSellerProductsLimit({
         isPremiumUser: true,
         sellerProductsLimitOverride: 20000,
       }),
-      20000,
-    );
-    assert.equal(
+    ).toBe(20000);
+    expect(
       getSellerProductsLimit({
         sellerProductsLimitOverride: SELLER_PRODUCTS_LIMIT_UNLIMITED,
       }),
-      SELLER_PRODUCTS_LIMIT_UNLIMITED,
-    );
+    ).toBe(SELLER_PRODUCTS_LIMIT_UNLIMITED);
   });
 
   test("isSellerProductsLimitReached учитывает unlimited", () => {
-    assert.equal(isSellerProductsLimitReached(50, 50), true);
-    assert.equal(isSellerProductsLimitReached(20000, 100), false);
-    assert.equal(
+    expect(isSellerProductsLimitReached(50, 50)).toBe(true);
+    expect(isSellerProductsLimitReached(20000, 100)).toBe(false);
+    expect(
       isSellerProductsLimitReached(SELLER_PRODUCTS_LIMIT_UNLIMITED, 99999),
-      false,
-    );
+    ).toBe(false);
   });
 
   test("formatSellerProductsQuota для unlimited", () => {
-    assert.equal(formatSellerProductsQuota(12, 50), "12 / 50");
-    assert.equal(
-      formatSellerProductsQuota(12, SELLER_PRODUCTS_LIMIT_UNLIMITED),
+    expect(formatSellerProductsQuota(12, 50)).toBe("12 / 50");
+    expect(formatSellerProductsQuota(12, SELLER_PRODUCTS_LIMIT_UNLIMITED)).toBe(
       "12 / ∞",
     );
   });
