@@ -121,6 +121,13 @@ cat > /etc/systemd/system/gitorg-api2.service <<UNIT
 [Unit]
 Description=Gitorg Express API (instance 2)
 After=network.target redis-server.service
+# Потолок рестартов — в [Unit], в systemd 229+ в [Service] эти ключи молча
+# игнорируются. Без него systemd крутит перезапуск вечно: 09.09.2026 инстанс
+# с неверным портом успел стартануть 103 раза, каждый раз поднимая Mongo и
+# синхронизируя индексы на 2-ядерном VPS. Пять попыток за минуту — и юнит
+# встаёт в failed, где его видно, а не тлеет фоном.
+StartLimitIntervalSec=60
+StartLimitBurst=5
 
 [Service]
 Type=simple
