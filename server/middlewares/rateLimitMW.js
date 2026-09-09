@@ -138,12 +138,17 @@ const RATE_LIMIT_DEFAULTS = {
 };
 
 /**
+ * `createStore` — фабрика, а не готовый store: у каждого лимитера должен быть
+ * свой экземпляр со своим префиксом, иначе express-rate-limit ругается
+ * `ERR_ERL_STORE_REUSE`, а счётчик становится общим на все лимиты.
+ *
  * @param {import('express-rate-limit').Options & { limiterName?: string }} options
- * @param {import('express-rate-limit').Store | undefined} store
+ * @param {((limiterName: string) => import('express-rate-limit').Store) | undefined} createStore
  */
-function buildLimiter(options, store) {
+function buildLimiter(options, createStore) {
   const limiterName = options.limiterName ?? "unnamed";
   const { limiterName: _ignored, ...rest } = options;
+  const store = createStore ? createStore(limiterName) : undefined;
 
   const withHandler = {
     ...rest,
@@ -166,7 +171,9 @@ function buildLimiter(options, store) {
 }
 
 /**
- * @param {import('express-rate-limit').Store} [store]
+ * @param {(limiterName: string) => import('express-rate-limit').Store} [store]
+ *   Фабрика store'ов (см. `buildLimiter`). Без неё каждый лимитер заводит
+ *   собственный memory-store — поведение по умолчанию.
  */
 export function initRateLimitMiddlewares(store) {
   handlers.general = buildLimiter(

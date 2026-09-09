@@ -98,30 +98,40 @@ ssh "$SERVER" bash -se <<REMOTE
   chmod 755 server/uploads
   if [ -d server/uploads/private ]; then chmod 700 server/uploads/private; fi
 
-  # Рестарт по одному инстансу. `systemctl restart gitorg-api` оставляет ~4 с,
+  # Рестарт по одному инстансу. "systemctl restart gitorg-api" оставляет ~4 с,
   # когда на 4444 никто не слушает: 08.09.2026 в 02:15:35 в это окно попал
   # живой пользователь и увидел 502. Пока перезапускается один, трафик держит
   # второй — nginx уводит запрос по дефолтному proxy_next_upstream.
   # Второго инстанса может не быть (его заводит scripts/enable-queue-and-ha.sh) —
   # тогда ведём себя как раньше.
+  #
+  # ВНИМАНИЕ: heredoc REMOTE не закавычен (он нарочно подставляет \$REMOTE_DIR
+  # локально), поэтому всё, что должно раскрыться НА СЕРВЕРЕ, экранируется:
+  # \\\$1, \\\$(seq …). Без этого локальный set -u падает на «\$1: unbound
+  # variable» ещё до ssh, и шаг [4/6] не выполняется вовсе.
   wait_api_health() {
-    for _ in $(seq 1 30); do
-      if curl -fsS -m 3 "http://127.0.0.1:$1/health" >/dev/null 2>&1; then return 0; fi
+    for _ in \$(seq 1 30); do
+      if curl -fsS -m 3 "http://127.0.0.1:\$1/health" >/dev/null 2>&1; then return 0; fi
       sleep 1
     done
-    echo "API на порту $1 не поднялся за 30 с" >&2
+    echo "API на порту \$1 не поднялся за 30 с" >&2
     return 1
   }
 
-  if systemctl list-unit-files gitorg-api2.service >/dev/null 2>&1 &&
-     systemctl is-enabled gitorg-api2 >/dev/null 2>&1; then
-    systemctl restart gitorg-api
-    wait_api_health 4444
+  systemctl restart gitorg-api
+  wait_api_health 4444
+
+  # Второй инстанс — не блокер выката. Если он не поднялся, трафик держит
+  # первый, а деплой обязан дойти до заливки client/dist: иначе фронтенд
+  # остаётся старым (09.09.2026 так и вышло — api2 падал на EADDRINUSE, и
+  # шаги [5/6] и [6/6] не выполнились вовсе). Поэтому предупреждаем, но идём
+  # дальше. Предупреждение видно в выводе, а health-check шага [6/6] всё равно
+  # проверит, что сайт жив.
+  if systemctl is-enabled gitorg-api2 >/dev/null 2>&1; then
     systemctl restart gitorg-api2
-    wait_api_health 4445
-  else
-    systemctl restart gitorg-api
-    wait_api_health 4444
+    if ! wait_api_health 4445; then
+      echo "ВНИМАНИЕ: gitorg-api2 не поднялся — деплой продолжается на одном инстансе" >&2
+    fi
   fi
 
   systemctl restart gitorg-worker
