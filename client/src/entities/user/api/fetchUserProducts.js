@@ -8,6 +8,15 @@ export const USER_PROFILE_PRODUCTS_PAGE_SIZE = 5;
 export const USER_PROFILE_PRODUCTS_API_LIMIT_MAX = 20;
 
 /**
+ * Сколько товаров продавца тянут превью-блоки (полоска в профиле, карусель в
+ * карточке товара). Ровно одна страница: у продавца может быть несколько тысяч
+ * позиций, а превью показывает первые несколько — настоящее количество берётся
+ * из `pagination.total`, докачивать остальные страницы незачем.
+ */
+export const USER_PROFILE_PRODUCTS_PREVIEW_LIMIT =
+  USER_PROFILE_PRODUCTS_API_LIMIT_MAX;
+
+/**
  * `GET /user/:userId/products` — товары продавца в каталоге (JWT опционален).
  *
  * @param {string} userId
@@ -43,37 +52,4 @@ export async function fetchUserProducts(userId, params = {}) {
       API_CLIENT_UI.FETCH_USER_PRODUCTS_FALLBACK;
     throw new Error(message);
   }
-}
-
-/**
- * Все товары продавца (несколько страниц, если `total` > лимита API).
- *
- * @param {string} userId
- */
-export async function fetchAllUserProducts(userId) {
-  const merged = [];
-  let page = 1;
-  let hasMore = true;
-
-  while (hasMore) {
-    const result = await fetchUserProducts(userId, {
-      page,
-      limit: USER_PROFILE_PRODUCTS_API_LIMIT_MAX,
-    });
-    merged.push(...result.items);
-    hasMore = Boolean(result.pagination?.hasMore);
-    page += 1;
-  }
-
-  const total = merged.length;
-  return {
-    items: merged,
-    pagination: {
-      page: 1,
-      limit: total,
-      total,
-      totalPages: 1,
-      hasMore: false,
-    },
-  };
 }

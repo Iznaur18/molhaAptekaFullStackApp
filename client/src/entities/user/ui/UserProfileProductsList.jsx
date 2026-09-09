@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
 
-import { useUserProfileProductsAllPagesQuery } from "../model/useUserProfileProductsAllPagesQuery.js";
+import { useUserProfileProductsQuery } from "../model/useUserProfileProductsQuery.js";
+import { USER_PROFILE_PRODUCTS_PREVIEW_LIMIT } from "../api/fetchUserProducts.js";
 import { resolveProductImageUrls } from "../../product/lib/resolveProductImageUrls.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../product/model/productConstants.js";
 import { isProfileProductThumbUnavailable } from "../lib/resolveProfileProductThumbState.js";
@@ -42,8 +43,9 @@ export function UserProfileProductsList({
   onViewAllProducts,
   isSelf = false,
 }) {
-  const productsQuery = useUserProfileProductsAllPagesQuery({
+  const productsQuery = useUserProfileProductsQuery({
     userId: targetUserId,
+    limit: USER_PROFILE_PRODUCTS_PREVIEW_LIMIT,
     enabled: true,
   });
   const [error, setError] = useState("");

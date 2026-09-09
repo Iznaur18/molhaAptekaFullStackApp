@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuthSession } from "../../../user/model/useAuthSession.js";
 import { isProfileProductThumbUnavailable } from "../../../user/lib/resolveProfileProductThumbState.js";
-import { useUserProfileProductsAllPagesQuery } from "../../../user/model/useUserProfileProductsAllPagesQuery.js";
+import { useUserProfileProductsQuery } from "../../../user/model/useUserProfileProductsQuery.js";
+import { USER_PROFILE_PRODUCTS_PREVIEW_LIMIT } from "../../../user/api/fetchUserProducts.js";
 import { resolveProductImageUrl } from "../../lib/resolveProductImageUrl.js";
 import { navigateToProductDetails } from "../../lib/navigateToProductDetails.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../model/productConstants.js";
@@ -28,8 +29,9 @@ export function ProductDetailsSellerProductsCarousel({ sellerId, excludeProductI
   const { currentUserId } = useAuthSession();
   const isSelf =
     currentUserId != null && String(currentUserId) === String(sellerId).trim();
-  const productsQuery = useUserProfileProductsAllPagesQuery({
+  const productsQuery = useUserProfileProductsQuery({
     userId: sellerId,
+    limit: USER_PROFILE_PRODUCTS_PREVIEW_LIMIT,
     enabled: sellerId.trim().length > 0,
   });
   const [failedThumbIds, setFailedThumbIds] = useState(

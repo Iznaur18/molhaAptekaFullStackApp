@@ -2,7 +2,8 @@ import { useRouter } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { seedCatalogProductQueryCache } from "@/entities/product/lib/seedCatalogProductQueryCache";
-import { useUserProfileProductsAllPagesQuery } from "@/entities/user/model/useUserProfileProductsAllPagesQuery";
+import { USER_PROFILE_PRODUCTS_PREVIEW_LIMIT } from "@/entities/user/model/constants";
+import { useUserProfileProductsQuery } from "@/entities/user/model/useUserProfileProductsQuery";
 import type { UserProfileThumbItem } from "@/entities/user/model/userProfileThumbTypes";
 import {
   UserProfileThumbSection,
@@ -34,8 +35,9 @@ export const UserProfileProductsList = ({
   const queryClient = useQueryClient();
   const isHorizontal = layout === "horizontal";
 
-  const productsQuery = useUserProfileProductsAllPagesQuery({
+  const productsQuery = useUserProfileProductsQuery({
     userId: targetUserId,
+    limit: USER_PROFILE_PRODUCTS_PREVIEW_LIMIT,
     enabled: true,
   });
 
