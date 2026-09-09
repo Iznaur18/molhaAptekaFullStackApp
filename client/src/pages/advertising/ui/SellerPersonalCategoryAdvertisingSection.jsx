@@ -2,6 +2,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { DEFAULT_VIEWER_REGION_CODE, isRuRegionCode } from "@molha/api-contract";
 
+import { applyPromoReturnStreakDiscount } from "../../../entities/promo-return-streak/lib/promoReturnStreakPricing.js";
+import { useActivePromoReturnStreakDiscountPercent } from "../../../entities/promo-return-streak/model/useActivePromoReturnStreakDiscountPercent.js";
+import { invalidatePromoReturnStreak } from "../../../entities/promo-return-streak/model/usePromoReturnStreak.js";
 import {
   cancelSellerPersonalCategoryCampaign,
   submitSellerPersonalCategoryCampaign,
@@ -68,7 +71,14 @@ export function SellerPersonalCategoryAdvertisingSection({
     () => durations.find((item) => item.code === tariffCode) ?? durations[0] ?? null,
     [durations, tariffCode],
   );
-  const pricePoints = selectedDuration?.pricePoints ?? 0;
+  const listPricePoints = selectedDuration?.pricePoints ?? 0;
+  const streakDiscountPercent = useActivePromoReturnStreakDiscountPercent({
+    enabled: isAuthorized,
+  });
+  const pricePoints = useMemo(
+    () => applyPromoReturnStreakDiscount(listPricePoints, streakDiscountPercent),
+    [listPricePoints, streakDiscountPercent],
+  );
 
   const submitMutation = useMutation({
     mutationFn: submitSellerPersonalCategoryCampaign,
@@ -86,6 +96,7 @@ export function SellerPersonalCategoryAdvertisingSection({
           queryKey: [...sellerPersonalCategoryQueryKeys.all, "catalog-tiles"],
         }),
         invalidateLoyaltyPointsBalances(queryClient),
+        invalidatePromoReturnStreak(queryClient),
       ]);
       setShowForm(false);
       setFeedback(SELLER_PERSONAL_CATEGORY_PAGE_UI.SUBMIT_SUCCESS);
@@ -208,7 +219,15 @@ export function SellerPersonalCategoryAdvertisingSection({
         <div className="advertising-page__meta">
           <div className="advertising-page__meta-item">
             <span className="advertising-page__meta-label">Стоимость</span>
-            <span className="advertising-page__meta-value">{pricePoints} баллов</span>
+            <span className="advertising-page__meta-value">
+              {pricePoints} баллов
+              {streakDiscountPercent > 0 ? (
+                <span className="advertising-page__meta-list">
+                  {" "}
+                  (было {listPricePoints})
+                </span>
+              ) : null}
+            </span>
           </div>
           <div className="advertising-page__meta-item">
             <span className="advertising-page__meta-label">Срок</span>
@@ -299,7 +318,14 @@ export function SellerPersonalCategoryAdvertisingSection({
                     />
                     <span className="advertising-page__tariff-title">{item.title}</span>
                     <span className="advertising-page__tariff-price">
-                      {item.pricePoints} баллов
+                      {applyPromoReturnStreakDiscount(
+                        item.pricePoints,
+                        streakDiscountPercent,
+                      )}{" "}
+                      баллов
+                      {streakDiscountPercent > 0
+                        ? ` (было ${item.pricePoints})`
+                        : ""}
                     </span>
                   </label>
                 ))}

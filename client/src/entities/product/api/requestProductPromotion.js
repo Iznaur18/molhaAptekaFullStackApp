@@ -5,7 +5,12 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
  * @param {string} productId
- * @param {{ tier: number; tariffCode: string; idempotencyKey: string }} body
+ * @param {{
+ *   tier: number;
+ *   tariffCode: string;
+ *   paymentMethod?: "sbp" | "points";
+ *   idempotencyKey: string;
+ * }} body
  */
 export async function requestProductPromotion(productId, body) {
   try {
@@ -19,6 +24,7 @@ export async function requestProductPromotion(productId, body) {
     const pointsBalance = Number(data.data.loyaltyPointsBalance);
     return {
       promotion: data.data.promotion,
+      requiresPayment: data.data.requiresPayment !== false,
       loyaltyPointsBalance: Number.isFinite(pointsBalance) ? pointsBalance : null,
       message: typeof data.data.message === "string" ? data.data.message : null,
     };

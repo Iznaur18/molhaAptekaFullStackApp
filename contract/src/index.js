@@ -807,6 +807,14 @@ export {
   platformServicePaymentBodySchema,
 } from "./payments.js";
 export {
+  PROMO_RETURN_STREAK_TIME_ZONE,
+  PROMO_RETURN_STREAK_MAX_DAY,
+  PROMO_RETURN_STREAK_DISCOUNT_PERCENT_BY_DAY,
+  PROMO_RETURN_STREAK_SERVICE_KINDS,
+  getPromoReturnStreakDiscountPercent,
+  applyPromoReturnStreakDiscount,
+} from "./promoReturnStreak.js";
+export {
   authMeDataSchema,
   userPublicProfileSchema,
   inAppNotificationSchema,

@@ -98,8 +98,23 @@ export const PRODUCT_PROMOTION_UI = {
   TOTAL_LABEL: "К оплате",
   /** @param {number} amountRub */
   TOTAL_RUB: (amountRub) => `${amountRub} руб.`,
+  /** @param {number} amountPoints */
+  TOTAL_POINTS: (amountPoints) => `${amountPoints} баллов`,
+  /** @param {number} percent */
+  STREAK_DISCOUNT_BADGE: (percent) => `Скидка за возвращение −${percent}%`,
+  /** @param {number} listAmount @param {string} unit */
+  STREAK_LIST_PRICE: (listAmount, unit) => `Без скидки: ${listAmount} ${unit}`,
+  PAY_WITH_POINTS_LABEL: "Оплатить баллами",
+  PAY_WITH_POINTS_HINT: "Списать с баланса баллов вместо оплаты по СБП",
+  /** @param {number} balance */
+  POINTS_BALANCE: (balance) => `Доступно: ${balance} баллов`,
+  /** @param {number} required @param {number} available */
+  INSUFFICIENT_POINTS: (required, available) =>
+    `Не хватает баллов. Нужно ${required}, у вас ${available}.`,
+  TOP_UP_POINTS: "Пополнить баллы",
   TARIFF_DURATION: (durationHours) => `${durationHours} ч.`,
-  SUBMIT_POINTS: "Оплатить",
+  SUBMIT_RUB: "Оплатить",
+  SUBMIT_POINTS: "Оплатить баллами",
   SUBMIT_PENDING: "Отправка…",
   CANCEL: "Отмена",
   CLOSE: "Закрыть",

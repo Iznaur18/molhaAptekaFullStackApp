@@ -1,5 +1,4 @@
 import {
-  RAFFLE_CREATE_PRICE_POINTS,
   RAFFLE_STATUS_PENDING_STAFF,
 } from "../../constants/raffleConstants.js";
 import { AppError } from "../../errors/AppError.js";
@@ -26,7 +25,7 @@ export async function createRaffle({ sellerId, body }) {
   const prizeMediaType = normalizePrizeMediaType(body.prizeMediaType);
 
   const raffle = await runInTransaction(async (session) => {
-    await consumeRaffleCreateUnlock({ sellerId, session });
+    const unlock = await consumeRaffleCreateUnlock({ sellerId, session });
 
     const [created] = await RaffleModel.create(
       [
@@ -46,7 +45,7 @@ export async function createRaffle({ sellerId, body }) {
           instagramUrl: String(body.instagramUrl).trim(),
           regionCode: String(body.regionCode).trim(),
           status: RAFFLE_STATUS_PENDING_STAFF,
-          createPricePoints: RAFFLE_CREATE_PRICE_POINTS,
+          createPricePoints: unlock.createPricePoints,
         },
       ],
       { session },

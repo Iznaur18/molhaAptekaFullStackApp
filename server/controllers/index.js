@@ -298,6 +298,10 @@ import {
   getMyLoyaltyPointsStatusController,
   adminCreditOwnLoyaltyPointsController,
 } from "./User/loyaltyPointsPurchaseControllers.js";
+import {
+  claimMyPromoReturnStreakController,
+  getMyPromoReturnStreakController,
+} from "./User/promoReturnStreakControllers.js";
 import { getMyReferralProgramController } from "./User/referralControllers.js";
 import { getMyAffiliateEarningsController } from "./User/affiliateControllers.js";
 import { getMonthlyLoyaltyPointsAwardedController } from "./User/monthlyLoyaltyPointsControllers.js";
@@ -567,6 +571,8 @@ export {
   purchasePremiumController,
   getMyLoyaltyPointsStatusController,
   adminCreditOwnLoyaltyPointsController,
+  getMyPromoReturnStreakController,
+  claimMyPromoReturnStreakController,
   getMyReferralProgramController,
   getMyAffiliateEarningsController,
   getMonthlyLoyaltyPointsAwardedController,

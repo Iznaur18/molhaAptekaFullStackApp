@@ -1,4 +1,8 @@
-import { PRODUCT_CARD_UI, PRODUCT_PROMOTION_UI } from "../../../../shared/config/appUiCopy.js";
+import {
+  PRODUCT_CARD_UI,
+  PRODUCT_PROMOTION_UI,
+} from "../../../../shared/config/appUiCopy.js";
+import { applyPromoReturnStreakDiscount } from "../../../promo-return-streak/lib/promoReturnStreakPricing.js";
 import {
   calculateProductPromotionAmountRub,
   PRODUCT_PROMOTION_TIER_BANNER,
@@ -6,6 +10,7 @@ import {
   PRODUCT_PROMOTION_TIER_TOP,
   PRODUCT_PROMOTION_TIER_RATES,
 } from "../../lib/calculateProductPromotionPointsCost.js";
+import { ProductManageToggleRow } from "../ProductManageToggleRow.jsx";
 
 /** @type {Record<number, string>} */
 const TIER_BADGE_LABELS = {
@@ -23,7 +28,9 @@ function formatTierRatePercent(tier) {
     return "";
   }
   const percent = rate * 100;
-  return Number.isInteger(percent) ? String(percent) : percent.toFixed(1).replace(/\.0$/, "");
+  return Number.isInteger(percent)
+    ? String(percent)
+    : percent.toFixed(1).replace(/\.0$/, "");
 }
 
 /**
@@ -37,10 +44,16 @@ function formatTierRatePercent(tier) {
  *   selectedDuration: { code: string; title: string; durationHours: number } | null;
  *   selectedTierMeta: { tier: number; title: string; description: string } | null;
  *   selectedAmountRub: number;
+ *   listAmountRub?: number | null;
+ *   streakDiscountPercent?: number;
+ *   payWithPoints: boolean;
+ *   loyaltyPointsAvailable: number;
  *   errorMessage: string;
  *   isSubmitting: boolean;
  *   onTierChange: (tier: number) => void;
  *   onDurationChange: (code: string) => void;
+ *   onPayWithPointsChange: (value: boolean) => void;
+ *   onTopUpPoints: () => void;
  * }} props
  */
 export function ProductPromotionFormPanel({
@@ -53,11 +66,26 @@ export function ProductPromotionFormPanel({
   selectedDuration,
   selectedTierMeta,
   selectedAmountRub,
+  listAmountRub = null,
+  streakDiscountPercent = 0,
+  payWithPoints,
+  loyaltyPointsAvailable,
   errorMessage,
   isSubmitting,
   onTierChange,
   onDurationChange,
+  onPayWithPointsChange,
+  onTopUpPoints,
 }) {
+  const selectedAmountPoints = selectedAmountRub;
+  const hasEnoughPoints = loyaltyPointsAvailable >= selectedAmountPoints;
+  const showInsufficientHint =
+    payWithPoints && selectedDuration != null && !hasEnoughPoints;
+  const showStreakDiscount =
+    streakDiscountPercent > 0 &&
+    listAmountRub != null &&
+    listAmountRub > selectedAmountRub;
+
   return (
     <>
       <p className="product-promotion-modal__product">
@@ -96,7 +124,9 @@ export function ProductPromotionFormPanel({
                   onChange={() => onTierChange(tier.tier)}
                   className="product-promotion-modal__visually-hidden"
                 />
-                <span className="product-promotion-modal__tier-badge">{badgeLabel}</span>
+                <span className="product-promotion-modal__tier-badge">
+                  {badgeLabel}
+                </span>
                 {ratePercent ? (
                   <span className="product-promotion-modal__tier-rate">
                     {PRODUCT_PROMOTION_UI.TIER_RATE_HINT(ratePercent)}
@@ -120,11 +150,15 @@ export function ProductPromotionFormPanel({
         </legend>
         <div className="product-promotion-modal__duration-row">
           {durations.map((duration) => {
-            const amountRub = calculateProductPromotionAmountRub({
+            const listAmountRub = calculateProductPromotionAmountRub({
               productPrice,
               tier: selectedTier,
               durationCode: duration.code,
             });
+            const amountRub = applyPromoReturnStreakDiscount(
+              listAmountRub,
+              streakDiscountPercent,
+            );
             const isSelected = selectedDurationCode === duration.code;
 
             return (
@@ -165,9 +199,52 @@ export function ProductPromotionFormPanel({
           </div>
           <div className="product-promotion-modal__summary-row product-promotion-modal__summary-row_total">
             <span>{PRODUCT_PROMOTION_UI.TOTAL_LABEL}</span>
-            <strong>{PRODUCT_PROMOTION_UI.TOTAL_RUB(selectedAmountRub)}</strong>
+            <strong>
+              {payWithPoints
+                ? PRODUCT_PROMOTION_UI.TOTAL_POINTS(selectedAmountPoints)
+                : PRODUCT_PROMOTION_UI.TOTAL_RUB(selectedAmountRub)}
+            </strong>
           </div>
+          {showStreakDiscount ? (
+            <>
+              <div className="product-promotion-modal__summary-row">
+                <span>{PRODUCT_PROMOTION_UI.STREAK_DISCOUNT_BADGE(streakDiscountPercent)}</span>
+                <strong>
+                  {payWithPoints
+                    ? PRODUCT_PROMOTION_UI.STREAK_LIST_PRICE(listAmountRub, "баллов")
+                    : PRODUCT_PROMOTION_UI.STREAK_LIST_PRICE(listAmountRub, "руб.")}
+                </strong>
+              </div>
+            </>
+          ) : null}
         </div>
+      ) : null}
+
+      <div className="product-promotion-modal__pay-toggle">
+        <ProductManageToggleRow
+          title={PRODUCT_PROMOTION_UI.PAY_WITH_POINTS_LABEL}
+          description={`${PRODUCT_PROMOTION_UI.PAY_WITH_POINTS_HINT}. ${PRODUCT_PROMOTION_UI.POINTS_BALANCE(loyaltyPointsAvailable)}`}
+          checked={payWithPoints}
+          disabled={isSubmitting}
+          onCheckedChange={onPayWithPointsChange}
+        />
+      </div>
+
+      {showInsufficientHint ? (
+        <p className="product-promotion-modal__points-hint" role="status">
+          {PRODUCT_PROMOTION_UI.INSUFFICIENT_POINTS(
+            selectedAmountPoints,
+            loyaltyPointsAvailable,
+          )}{" "}
+          <button
+            type="button"
+            className="product-promotion-modal__top-up-link"
+            onClick={onTopUpPoints}
+            disabled={isSubmitting}
+          >
+            {PRODUCT_PROMOTION_UI.TOP_UP_POINTS}
+          </button>
+        </p>
       ) : null}
 
       {errorMessage ? (

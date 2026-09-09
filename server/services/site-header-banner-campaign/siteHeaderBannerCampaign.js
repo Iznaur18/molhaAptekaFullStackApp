@@ -18,6 +18,7 @@ import {
 } from "../loyalty/loyaltyPointsReserve.js";
 import { InsufficientLoyaltyPointsError } from "../loyalty/loyaltyPointsSpend.js";
 import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
+import { quoteAndConsumePromoReturnStreakAmount } from "../promo-return-streak/index.js";
 
 export async function getSiteHeaderBannerCampaignConfig() {
   return getSiteHeaderBannerCampaignConfigPayload();
@@ -57,9 +58,15 @@ export async function submitSiteHeaderBannerCampaign({ userId, body }) {
       async (session) => {
         await assertNoOpenSiteHeaderBannerCampaignForAdvertiser(userId, session);
 
-        const loyaltyPointsBalance = await reserveLoyaltyPoints({
+        const quoted = await quoteAndConsumePromoReturnStreakAmount({
           userId,
           amount: SITE_HEADER_BANNER_CAMPAIGN_PRICE_POINTS,
+          session,
+        });
+
+        const loyaltyPointsBalance = await reserveLoyaltyPoints({
+          userId,
+          amount: quoted.amount,
           session,
         });
 
@@ -71,7 +78,7 @@ export async function submitSiteHeaderBannerCampaign({ userId, body }) {
               ...payload,
               // Пустая ссылка → витрина рекламодателя (иначе клик по баннеру мёртвый).
               linkPath: payload.linkPath || `/seller/${userId}`,
-              amountPoints: SITE_HEADER_BANNER_CAMPAIGN_PRICE_POINTS,
+              amountPoints: quoted.amount,
               pointsReservedAt: reservedAt,
             },
           ],

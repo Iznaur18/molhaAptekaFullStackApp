@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { invalidatePromoReturnStreak } from "../../promo-return-streak/model/usePromoReturnStreak.js";
 import { loyaltyPointsQueryKeys } from "../../../entities/user/model/loyaltyPointsQueryKeys.js";
 import { invalidateLoyaltyPointsBalances } from "../../../entities/user/lib/loyaltyPointsQueryCache.js";
 import { unlockRaffleCreate } from "../api/unlockRaffleCreate.js";
@@ -21,6 +22,7 @@ export function useUnlockRaffleCreateMutation() {
           queryKey: raffleQueryKeys.createAdvertising(),
         }),
         invalidateLoyaltyPointsBalances(queryClient),
+        invalidatePromoReturnStreak(queryClient),
       ]);
     },
   });

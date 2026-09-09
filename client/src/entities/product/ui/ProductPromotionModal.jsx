@@ -12,6 +12,8 @@ import { ProductLoyaltyPointsModal } from "./ProductLoyaltyPointsModal.jsx";
 import { ProductBuyNFreeModal } from "./ProductBuyNFreeModal.jsx";
 import { ProductOutOfStockLabelModal } from "./ProductOutOfStockLabelModal.jsx";
 import { calculateProductPromotionAmountRub } from "../lib/calculateProductPromotionPointsCost.js";
+import { applyPromoReturnStreakDiscount } from "../../promo-return-streak/lib/promoReturnStreakPricing.js";
+import { useMyPromoReturnStreakQuery } from "../../promo-return-streak/model/usePromoReturnStreak.js";
 import { ProductPromotionFormPanel } from "./product-promotion-modal/ProductPromotionFormPanel.jsx";
 import { ProductPromotionManageTab } from "./product-promotion-modal/ProductPromotionManageTab.jsx";
 import { ProductPromotionModalTabs } from "./product-promotion-modal/ProductPromotionModalTabs.jsx";
@@ -33,7 +35,13 @@ const PRODUCT_PROMOTION_MODAL_TITLE_ID = "product-promotion-modal-title";
  *   isSubmitting?: boolean;
  *   errorMessage?: string;
  *   onClose: () => void;
- *   onSubmit: (tier: number, tariffCode: string) => void | Promise<void>;
+ *   onSubmit: (
+ *     tier: number,
+ *     tariffCode: string,
+ *     options?: { payWithPoints?: boolean },
+ *   ) => void | Promise<void>;
+ *   onTopUpPoints?: () => void;
+ *   loyaltyPointsAvailable?: number;
  *   onSetProductAvailability?: (
  *     productId: string,
  *     productIsAvailable: boolean,
@@ -118,6 +126,8 @@ export function ProductPromotionModal({
   errorMessage = "",
   onClose,
   onSubmit,
+  onTopUpPoints,
+  loyaltyPointsAvailable = 0,
   onSetProductAvailability,
   onSetProductAuction,
   onSetProductQa,
@@ -181,10 +191,12 @@ export function ProductPromotionModal({
   const defaultDuration = durations[0]?.code ?? "";
   const [selectedTier, setSelectedTier] = useState(defaultTier);
   const [selectedDurationCode, setSelectedDurationCode] = useState(defaultDuration);
+  const [payWithPoints, setPayWithPoints] = useState(false);
 
   useEffect(() => {
     setSelectedTier(defaultTier);
     setSelectedDurationCode(defaultDuration);
+    setPayWithPoints(false);
     if (!isOpen) {
       setIsInstallmentProgramOpen(false);
       setIsWholesaleOpen(false);
@@ -218,6 +230,16 @@ export function ProductPromotionModal({
     });
   }, [resolvedProductPrice, selectedDuration, selectedTier]);
 
+  const streakQuery = useMyPromoReturnStreakQuery({ enabled: isOpen });
+  const streakDiscountPercent =
+    streakQuery.data?.claimedToday === true
+      ? streakQuery.data.discountPercent
+      : 0;
+  const chargeAmountRub = useMemo(
+    () => applyPromoReturnStreakDiscount(selectedAmountRub, streakDiscountPercent),
+    [selectedAmountRub, streakDiscountPercent],
+  );
+
   const handleTierChange = (tier) => {
     if (isSubmitting || tiers.length === 0) {
       return;
@@ -236,8 +258,17 @@ export function ProductPromotionModal({
     if (!selectedDuration || isSubmitting || tiers.length === 0) {
       return;
     }
-    void onSubmit(selectedTier, selectedDuration.code);
+    if (payWithPoints && loyaltyPointsAvailable < chargeAmountRub) {
+      return;
+    }
+    void onSubmit(selectedTier, selectedDuration.code, { payWithPoints });
   };
+
+  const canSubmit =
+    Boolean(selectedDuration) &&
+    !isSubmitting &&
+    tiers.length > 0 &&
+    !(payWithPoints && loyaltyPointsAvailable < chargeAmountRub);
 
   const footer = isPromotionTab ? (
     <div className="product-promotion-modal__actions">
@@ -252,12 +283,14 @@ export function ProductPromotionModal({
       <button
         type="button"
         className="app-btn app-btn--primary"
-        disabled={!selectedDuration || isSubmitting || tiers.length === 0}
+        disabled={!canSubmit}
         onClick={handleSubmit}
       >
         {isSubmitting
           ? PRODUCT_PROMOTION_UI.SUBMIT_PENDING
-          : PRODUCT_PROMOTION_UI.SUBMIT_POINTS}
+          : payWithPoints
+            ? PRODUCT_PROMOTION_UI.SUBMIT_POINTS
+            : PRODUCT_PROMOTION_UI.SUBMIT_RUB}
       </button>
     </div>
   ) : null;
@@ -295,11 +328,23 @@ export function ProductPromotionModal({
             selectedDurationCode={selectedDurationCode}
             selectedDuration={selectedDuration}
             selectedTierMeta={selectedTierMeta}
-            selectedAmountRub={selectedAmountRub}
+            selectedAmountRub={chargeAmountRub}
+            listAmountRub={
+              streakDiscountPercent > 0 ? selectedAmountRub : null
+            }
+            streakDiscountPercent={streakDiscountPercent}
+            payWithPoints={payWithPoints}
+            loyaltyPointsAvailable={loyaltyPointsAvailable}
             errorMessage={errorMessage}
             isSubmitting={isSubmitting}
             onTierChange={handleTierChange}
             onDurationChange={handleDurationChange}
+            onPayWithPointsChange={setPayWithPoints}
+            onTopUpPoints={() => {
+              if (typeof onTopUpPoints === "function") {
+                onTopUpPoints();
+              }
+            }}
           />
         ) : (
           <ProductPromotionManageTab

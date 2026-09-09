@@ -111,6 +111,7 @@ export {
   SELLER_COMMERCE_DEFAULTS_UI,
   PRODUCT_FULFILLMENT_SOURCE_UI,
 } from "./copy/seller-commerce-defaults.js";
+export { PROMO_RETURN_STREAK_DOCK_UI } from "./copy/promo-return-streak.js";
 export {
   AUCTION_PAGE_UI,
 } from "./copy/auction.js";

@@ -22,6 +22,7 @@ import {
 } from "../loyalty/loyaltyPointsReserve.js";
 import { InsufficientLoyaltyPointsError } from "../loyalty/loyaltyPointsSpend.js";
 import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
+import { quoteAndConsumePromoReturnStreakAmount } from "../promo-return-streak/index.js";
 
 import { parseSellerPersonalCategorySubmitBody } from "./sellerPersonalCategoryServiceHelpers.js";
 
@@ -82,9 +83,15 @@ export async function submitSellerPersonalCategoryCampaign({ userId, body }) {
       async (session) => {
         await assertNoOpenSellerPersonalCategoryCampaign(userId, session);
 
-        const loyaltyPointsBalance = await reserveLoyaltyPoints({
+        const quoted = await quoteAndConsumePromoReturnStreakAmount({
           userId,
           amount: payload.amountPoints,
+          session,
+        });
+
+        const loyaltyPointsBalance = await reserveLoyaltyPoints({
+          userId,
+          amount: quoted.amount,
           session,
         });
 
@@ -94,6 +101,7 @@ export async function submitSellerPersonalCategoryCampaign({ userId, body }) {
               sellerId: userId,
               status: SELLER_PERSONAL_CATEGORY_STATUS_PENDING,
               ...payload,
+              amountPoints: quoted.amount,
               pointsReservedAt: reservedAt,
             },
           ],

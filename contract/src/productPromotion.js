@@ -133,6 +133,11 @@ export const requestProductPromotionBodySchema = z.object({
       (value) => PRODUCT_PROMOTION_DURATION_CODES.includes(value),
       "Неверный срок продвижения",
     ),
+  /**
+   * `sbp` — счёт ЮKassa (дефолт). `points` — списание баллов 1:1 с рублями
+   * и мгновенная активация.
+   */
+  paymentMethod: z.enum(["sbp", "points"]).optional().default("sbp"),
   idempotencyKey: z
     .string({ required_error: "Укажите idempotencyKey" })
     .trim()
