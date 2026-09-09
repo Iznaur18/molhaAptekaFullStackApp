@@ -226,6 +226,12 @@ export const orderIdParamsSchema = z.object({
   orderId: mongoIdSchema,
 });
 
+/** Params действий над отправлением: отправление = заказ + продавец. */
+export const orderShipmentParamsSchema = z.object({
+  orderId: mongoIdSchema,
+  sellerId: mongoIdSchema,
+});
+
 export const orderItemActionParamsSchema = z.object({
   orderId: mongoIdSchema,
   itemIndex: z.coerce.number().int().min(0, "itemIndex должен быть целым числом >= 0"),
@@ -239,7 +245,10 @@ export const advanceShipmentStatusBodySchema = z.object({
 /** Синхрон с `server/models/InstallmentContractModel.js` — `cancellationReason.maxlength`. */
 export const ORDER_ITEM_CANCELLATION_REASON_MAX_LENGTH = 2000;
 
-/** Body `PATCH /order/:orderId/items/:itemIndex/cancelled` (рассрочка — причина отмены). */
+/**
+ * Body отмены: `PATCH /order/:orderId/cancelled` и
+ * `PATCH /order/:orderId/items/:itemIndex/cancelled` (рассрочка — причина).
+ */
 export const orderItemCancelBodySchema = z
   .object({
     reason: z

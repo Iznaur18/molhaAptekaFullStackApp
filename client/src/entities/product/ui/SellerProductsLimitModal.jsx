@@ -2,9 +2,33 @@ import { useEffect } from "react";
 
 import { SELLER_PRODUCTS_LIMIT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
-import { SELLER_PRODUCTS_LIMIT_PREMIUM } from "../model/productConstants.js";
+import {
+  SELLER_PRODUCTS_LIMIT_PREMIUM,
+  SELLER_PRODUCTS_LIMIT_REGULAR,
+} from "../model/productConstants.js";
 
 import "./SellerProductsLimitModal.css";
+
+/**
+ * @param {number} limit
+ * @param {boolean} isPremiumUser
+ * @param {boolean} hasPersonalOverride
+ */
+function resolveLimitModalBody(limit, isPremiumUser, hasPersonalOverride) {
+  if (hasPersonalOverride) {
+    return SELLER_PRODUCTS_LIMIT_MODAL_UI.BODY_PERSONAL(limit);
+  }
+  if (isPremiumUser && limit === SELLER_PRODUCTS_LIMIT_PREMIUM) {
+    return SELLER_PRODUCTS_LIMIT_MODAL_UI.BODY_PREMIUM(limit);
+  }
+  if (!isPremiumUser && limit === SELLER_PRODUCTS_LIMIT_REGULAR) {
+    return SELLER_PRODUCTS_LIMIT_MODAL_UI.BODY_REGULAR(
+      limit,
+      SELLER_PRODUCTS_LIMIT_PREMIUM,
+    );
+  }
+  return SELLER_PRODUCTS_LIMIT_MODAL_UI.BODY_PERSONAL(limit);
+}
 
 /**
  * @param {{
@@ -12,9 +36,16 @@ import "./SellerProductsLimitModal.css";
  *   onClose: () => void;
  *   isPremiumUser: boolean;
  *   limit: number | null;
+ *   hasPersonalOverride?: boolean;
  * }} props
  */
-export function SellerProductsLimitModal({ isOpen, onClose, isPremiumUser, limit }) {
+export function SellerProductsLimitModal({
+  isOpen,
+  onClose,
+  isPremiumUser,
+  limit,
+  hasPersonalOverride = false,
+}) {
   useScrollLock(isOpen);
 
   useEffect(() => {
@@ -28,9 +59,7 @@ export function SellerProductsLimitModal({ isOpen, onClose, isPremiumUser, limit
 
   if (!isOpen || limit == null) return null;
 
-  const body = isPremiumUser
-    ? SELLER_PRODUCTS_LIMIT_MODAL_UI.BODY_PREMIUM(limit)
-    : SELLER_PRODUCTS_LIMIT_MODAL_UI.BODY_REGULAR(limit, SELLER_PRODUCTS_LIMIT_PREMIUM);
+  const body = resolveLimitModalBody(limit, isPremiumUser, hasPersonalOverride);
 
   return (
     <div className="seller-products-limit-modal" role="presentation">

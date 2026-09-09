@@ -45,8 +45,12 @@ const EMPTY_ORDERS = [];
  */
 export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }) {
   const queryClient = useQueryClient();
-  const { confirmItemMutation, cancelItemMutation, returnItemMutation } =
-    useOrderMutations();
+  const {
+    confirmItemMutation,
+    cancelItemMutation,
+    cancelOrderMutation,
+    returnItemMutation,
+  } = useOrderMutations();
   const ordersQuery = useMyOrdersQuery({ enabled: isAuthorized });
   const allOrders = ordersQuery.data ?? EMPTY_ORDERS;
   const [statusFilter, setStatusFilter] = useState("");
@@ -199,6 +203,27 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
         e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
       void reloadOrders();
+    } finally {
+      setPendingActionKey(null);
+    }
+  };
+
+  /**
+   * Гасит заказ целиком. Список не патчим оптимистично: ответ несёт весь
+   * документ заказа, а карточка — только позиции одного продавца.
+   */
+  const handleCancelOrder = async ({ orderId, sellerId }) => {
+    const actionKey = `${orderId}:shipment`;
+    setPendingActionKey(actionKey);
+    setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+
+    try {
+      await cancelOrderMutation.mutateAsync({ orderId, sellerId });
+      await reloadOrders();
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK;
+      setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
     } finally {
       setPendingActionKey(null);
     }
@@ -414,6 +439,7 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
                 onProductClick={openCatalogProductFromOrderLine}
                 onConfirmDelivered={handleConfirmDelivered}
                 onCancelItem={handleCancelItem}
+                onCancelOrder={handleCancelOrder}
                 onMarkReturned={handleRefuseItem}
                 onReplaceCourier={handleReplaceCourier}
                 onOpenDispute={handleOpenDispute}

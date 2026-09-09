@@ -4,20 +4,12 @@ import {
   ORDER_STATUS_CONFIRMED,
   ORDER_STATUS_DELIVERED,
   ORDER_STATUS_IN_DELIVERY,
-  ORDER_STATUS_PENDING,
   ORDER_STATUS_READY_FOR_PICKUP,
   ORDER_STATUS_RETURNED,
   ORDER_STATUS_SHIPPED,
 } from "../../constants/orderConstants.js";
-import {
-  INSTALLMENT_CONTRACT_STATUS_CANCELLED,
-  INSTALLMENT_CONTRACT_STATUS_COMPLETED,
-} from "../../constants/installmentConstants.js";
 import { AppError } from "../../errors/AppError.js";
-import {
-  ESCROW_REFUND_REASON_ITEM_CANCELLED,
-  ESCROW_REFUND_REASON_ITEM_RETURNED,
-} from "../../constants/escrowConstants.js";
+import { ESCROW_REFUND_REASON_ITEM_RETURNED } from "../../constants/escrowConstants.js";
 import {
   markEscrowLineRefundable,
   markEscrowLineReleasable,
@@ -26,9 +18,8 @@ import {
 import { assertOrderPrepaid } from "./assertOrderPrepaid.js";
 import { notifyBuyerAboutOrderItemStatus } from "./notifyBuyerAboutOrderItemStatus.js";
 import { notifySellerAboutOrderItemReturn } from "./notifySellerAboutOrderItemReturn.js";
-import { InstallmentContractModel, UserModel } from "../../models/index.js";
+import { UserModel } from "../../models/index.js";
 import { runInTransaction } from "../../utils/mongoTransaction.js";
-import { cancelLinkedOrderForInstallmentContract } from "./cancelLinkedOrderForInstallmentContract.js";
 import { prepareLoyaltyPointsForConfirmedOrderItem } from "./loyaltyPoints.js";
 import {
   markOrderLineLoyaltyReserveReleased,
@@ -48,13 +39,8 @@ import {
 import {
   applyBuyNFreeProgressOnConfirm,
   releaseBuyNFreeRedemptionClaim,
-  rollbackBuyNFreeProgressOnCancel,
 } from "../product/productBuyNFreeProgress.js";
 import { buildOrderStatusFromItems } from "./orderStatus.js";
-
-/** Товар ещё у продавца: отсюда можно и отменить, и отгрузить. */
-const PRE_SHIPMENT = new Set(ORDER_PRE_SHIPMENT_STATUSES);
-
 import { clearBuyerPassportShareOnOrder } from "./buyerPassportShare.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 import {
@@ -67,6 +53,9 @@ import {
   reloadOrderWithItems,
   resolveProductIdFromItem,
 } from "./orderItemStatusHelpers.js";
+
+/** Товар ещё у продавца: отсюда можно и отменить, и отгрузить. */
+const PRE_SHIPMENT = new Set(ORDER_PRE_SHIPMENT_STATUSES);
 
 const runConfirmItemSideEffects = async (order, targetItem, productId) => {
   if (!productId) return;
@@ -192,189 +181,6 @@ export async function markOrderItemDeliveredBySeller({
   return { order };
 }
 
-/**
- * @param {{
- *   orderId: string;
- *   itemIndex: number;
- *   requestUserId: string;
- *   userId: string;
- *   reason?: string;
- * }} input
- */
-export async function markOrderItemCancelled({
-  orderId,
-  itemIndex,
-  requestUserId,
-  userId,
-  reason,
-}) {
-  const order = await loadOrderWithItems(orderId);
-  const targetItem = getPopulatedOrderItemOrThrow(order, itemIndex);
-
-  const buyerId = normalizeId(order.userBuyerId?._id ?? order.userBuyerId);
-  const itemSellerId = normalizeId(
-    targetItem.productId.productSeller?._id ?? targetItem.productId.productSeller,
-  );
-  const isBuyer = buyerId === requestUserId;
-  const isSeller = itemSellerId === requestUserId;
-
-  if (!isBuyer && !isSeller) {
-    throw new AppError(403, "Нет прав на отмену позиции");
-  }
-
-  // Отмена свободна, пока товар не уехал: собранный заказ ещё ничего не стоил.
-  if (!PRE_SHIPMENT.has(targetItem.status)) {
-    throw new AppError(409, "Позицию можно отменить, только пока товар у продавца");
-  }
-
-  // Рассрочный заказ: отмена buyer ИЛИ seller должна гасить и Order, и InstallmentContract.
-  // Раньше seller-cancel через Order оставлял контракт pending/active → «призраки» в списках рассрочки.
-  if (order.installmentContractId) {
-    const defaultReason = isBuyer ? "Отменено покупателем" : "Отменено продавцом";
-    const cancellationReason = String(reason ?? defaultReason).trim() || defaultReason;
-
-    await runInTransaction(async (session) => {
-      const contract = await InstallmentContractModel.findById(
-        order.installmentContractId,
-      ).session(session);
-      if (!contract) {
-        throw new AppError(404, "Контракт рассрочки не найден");
-      }
-      if (contract.status === INSTALLMENT_CONTRACT_STATUS_COMPLETED) {
-        throw new AppError(409, "Контракт рассрочки уже закрыт");
-      }
-      if (contract.status !== INSTALLMENT_CONTRACT_STATUS_CANCELLED) {
-        contract.status = INSTALLMENT_CONTRACT_STATUS_CANCELLED;
-        contract.cancelledAt = new Date();
-        contract.cancelledByUserId = userId;
-        contract.cancellationReason = cancellationReason;
-        await contract.save({ session });
-      }
-      await cancelLinkedOrderForInstallmentContract(order._id, session);
-    });
-  } else {
-    await runInTransaction(async (session) => {
-      // Перечитываем внутри транзакции — см. loadOrderWithItems: на ретрае
-      // после WriteConflict мутации документа, загруженного снаружи, молча
-      // теряются, и позиция оставалась "pending" при успешном ответе.
-      const txnOrder = await loadOrderWithItems(orderId, session);
-      const txnItem = getPopulatedOrderItemOrThrow(txnOrder, itemIndex);
-
-      if (txnItem.status === ORDER_STATUS_CANCELLED) {
-        return;
-      }
-      if (!PRE_SHIPMENT.has(txnItem.status)) {
-        throw new AppError(
-          409,
-          "Позицию можно отменить, только пока товар у продавца",
-        );
-      }
-
-      const releaseLine = {
-        ...(txnItem.toObject?.() ?? txnItem),
-        productId: txnItem.productId,
-      };
-      const productIdForRelease = resolveProductIdFromItem(txnItem.productId);
-
-      txnItem.status = ORDER_STATUS_CANCELLED;
-      markOrderLineLoyaltyReserveReleased(txnItem);
-      txnOrder.status = buildOrderStatusFromItems(txnOrder.items);
-      if (txnOrder.status === ORDER_STATUS_CANCELLED) {
-        clearBuyerPassportShareOnOrder(txnOrder);
-      }
-      await txnOrder.save({ session });
-      await releaseUnawardedLoyaltyReservesForOrder([releaseLine], session);
-      const freeUnits = Math.floor(Number(txnItem.buyNFreeUnitsAtOrder) || 0);
-      if (freeUnits > 0 && productIdForRelease) {
-        await releaseBuyNFreeRedemptionClaim({
-          buyerId,
-          productId: productIdForRelease,
-          orderId,
-          session,
-        });
-      }
-    });
-  }
-
-  const updatedOrder = await reloadOrderWithItems(orderId);
-
-  // Предоплаченный заказ: деньги за отменённую позицию уже у площадки, и
-  // теперь это долг перед покупателем. Без пометки строка так и уехала бы
-  // продавцу вместе с остальными.
-  await markEscrowLineRefundable({
-    orderId,
-    sellerId: itemSellerId,
-    itemIndex,
-    reason: ESCROW_REFUND_REASON_ITEM_CANCELLED,
-  });
-
-  // Заказ отменён у нас — снимаем его и у внешней службы, пока курьер не
-  // забрал груз. Иначе он приедет за товаром, которого уже нет.
-  await cancelExternalShipmentIfNeeded({ order: updatedOrder, sellerId: itemSellerId });
-
-  await notifyBuyerAboutOrderItemStatus({
-    buyerUserId: buyerId,
-    actorUserId: requestUserId,
-    status: ORDER_STATUS_CANCELLED,
-    productName: targetItem.productNameAtOrder,
-    orderId,
-  });
-
-  return { order: updatedOrder };
-}
-
-/**
- * Снимает заказ у внешней службы, если в отправлении не осталось живых позиций.
- *
- * Отменённая позиция — ещё не отменённое отправление: в нём могут быть
- * другие товары того же продавца, и курьер по-прежнему нужен.
- *
- * @param {{ order: any; sellerId: string }} input
- */
-async function cancelExternalShipmentIfNeeded({ order, sellerId }) {
-  const shipment = (order?.shipments ?? []).find(
-    (row) => row?.sellerId != null && String(row.sellerId) === String(sellerId),
-  );
-  if (!shipment?.shippingExternalId) return;
-
-  const stillAlive = (order.items ?? []).some(
-    (item) =>
-      normalizeId(
-        item?.sellerIdAtOrder ??
-          item?.productId?.productSeller?._id ??
-          item?.productId?.productSeller,
-      ) === String(sellerId) &&
-      item?.status !== ORDER_STATUS_CANCELLED &&
-      item?.status !== ORDER_STATUS_RETURNED,
-  );
-  if (stillAlive) return;
-
-  try {
-    const { cancelShipmentInLobo } = await import(
-      "../shipping/lobo/loboShipmentOrders.js"
-    );
-    await cancelShipmentInLobo({
-      orderId: String(order._id),
-      sellerId: String(sellerId),
-    });
-  } catch (error) {
-    // Отмену у нас это не отменяет: у службы заказ снимет крон или человек.
-    logServerEvent("error", {
-      event: "external_shipment_cancel_failed",
-      orderId: String(order?._id ?? ""),
-      sellerId: String(sellerId),
-      error: error instanceof Error ? error.message : String(error),
-    });
-  }
-}
-
-/**
- * @param {{
- *   orderId: string;
- *   itemIndex: number;
- *   sellerId: string;
- * }} input
- */
 /**
  * Как этот товар попадёт к покупателю: везёт продавец, курьер или самовывоз.
  *

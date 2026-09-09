@@ -395,6 +395,7 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
         onClose={placeProduct.closeLimitModal}
         isPremiumUser={placeProduct.isPremiumUser}
         limit={placeProduct.sellerProductsLimit}
+        hasPersonalOverride={placeProduct.hasPersonalOverride}
       />
     </>
   );

@@ -13,6 +13,11 @@ import {
   refundLoyaltyPoints,
 } from "../loyalty/loyaltyPointsSpend.js";
 import { getSellerLoyaltyPointsAvailable } from "../loyalty/loyaltyPointsSeller.js";
+import {
+  applyPromoReturnStreakDiscount,
+  loadActivePromoReturnStreakDiscountPercent,
+  quoteAndConsumePromoReturnStreakAmount,
+} from "../promo-return-streak/index.js";
 import { creditReferralCashbackFromSpend } from "../referral/creditReferralCashbackFromSpend.js";
 import { reverseReferralCashbackForSource } from "../referral/reverseReferralCashbackForSource.js";
 import { REFERRAL_SOURCE_KIND_RAFFLE_CREATE_UNLOCK } from "../../constants/referralConstants.js";
@@ -51,14 +56,23 @@ export const getRaffleCreateAdvertisingStatus = async (sellerId) => {
   const hasPaidUnlock = hasRaffleCreateUnlock(user);
   const hasOpenRaffle = Boolean(activeRaffle);
   const canOpenForm = hasPaidUnlock && !hasOpenRaffle && access.ok;
+  const discountPercent = hasPaidUnlock
+    ? 0
+    : await loadActivePromoReturnStreakDiscountPercent(sellerId);
+  const pricePoints = applyPromoReturnStreakDiscount(
+    RAFFLE_CREATE_PRICE_POINTS,
+    discountPercent,
+  );
   const canPay =
     access.ok &&
     !hasOpenRaffle &&
     !hasPaidUnlock &&
-    loyaltyPointsBalance >= RAFFLE_CREATE_PRICE_POINTS;
+    loyaltyPointsBalance >= pricePoints;
 
   return {
-    pricePoints: RAFFLE_CREATE_PRICE_POINTS,
+    pricePoints,
+    listPricePoints: RAFFLE_CREATE_PRICE_POINTS,
+    discountPercent,
     hasPaidUnlock,
     hasOpenRaffle,
     canPay,
@@ -86,7 +100,9 @@ export const cancelRaffleCreateUnlock = async ({ sellerId }) => {
   }
 
   const user = await UserModel.findById(sellerId)
-    .select("raffleCreateUnlockAt userLoyaltyPoints userLoyaltyPointsReserved")
+    .select(
+      "raffleCreateUnlockAt raffleCreateUnlockPoints userLoyaltyPoints userLoyaltyPointsReserved",
+    )
     .lean();
 
   if (!user) {
@@ -101,10 +117,14 @@ export const cancelRaffleCreateUnlock = async ({ sellerId }) => {
     };
   }
 
+  const reservedPoints = Math.ceil(
+    Number(user.raffleCreateUnlockPoints) || RAFFLE_CREATE_PRICE_POINTS,
+  );
+
   const loyaltyPointsBalance = await runInTransaction(async (session) => {
     const updated = await UserModel.findOneAndUpdate(
       { _id: sellerId, ...paidRaffleCreateUnlockFilter() },
-      { $unset: { raffleCreateUnlockAt: "" } },
+      { $unset: { raffleCreateUnlockAt: "", raffleCreateUnlockPoints: "" } },
       { returnDocument: "after", session },
     ).lean();
 
@@ -114,7 +134,7 @@ export const cancelRaffleCreateUnlock = async ({ sellerId }) => {
 
     await releaseLoyaltyPointsReservation({
       userId: sellerId,
-      amount: RAFFLE_CREATE_PRICE_POINTS,
+      amount: reservedPoints,
       session,
     });
 
@@ -140,7 +160,9 @@ export const unlockRaffleCreate = async ({ sellerId }) => {
   }
 
   const user = await UserModel.findById(sellerId)
-    .select("raffleCreateUnlockAt userLoyaltyPoints userLoyaltyPointsReserved")
+    .select(
+      "raffleCreateUnlockAt raffleCreateUnlockPoints userLoyaltyPoints userLoyaltyPointsReserved",
+    )
     .lean();
 
   if (!user) {
@@ -158,9 +180,15 @@ export const unlockRaffleCreate = async ({ sellerId }) => {
 
   try {
     const outcome = await runInTransaction(async (session) => {
-      await reserveLoyaltyPoints({
+      const quoted = await quoteAndConsumePromoReturnStreakAmount({
         userId: sellerId,
         amount: RAFFLE_CREATE_PRICE_POINTS,
+        session,
+      });
+
+      await reserveLoyaltyPoints({
+        userId: sellerId,
+        amount: quoted.amount,
         session,
       });
 
@@ -171,7 +199,12 @@ export const unlockRaffleCreate = async ({ sellerId }) => {
       // зависали в userLoyaltyPointsReserved.
       const claimed = await UserModel.findOneAndUpdate(
         { _id: sellerId, raffleCreateUnlockAt: { $not: { $type: "date" } } },
-        { $set: { raffleCreateUnlockAt: new Date() } },
+        {
+          $set: {
+            raffleCreateUnlockAt: new Date(),
+            raffleCreateUnlockPoints: quoted.amount,
+          },
+        },
         withMongoSession({ returnDocument: "after" }, session),
       ).lean();
 
@@ -179,7 +212,7 @@ export const unlockRaffleCreate = async ({ sellerId }) => {
         // Конкурент оплатил разблокировку первым — наш резерв лишний.
         await releaseLoyaltyPointsReservation({
           userId: sellerId,
-          amount: RAFFLE_CREATE_PRICE_POINTS,
+          amount: quoted.amount,
           session,
         });
       }
@@ -222,27 +255,45 @@ export const consumeRaffleCreateUnlock = async ({ sellerId, session }) => {
       _id: sellerId,
       ...paidRaffleCreateUnlockFilter(),
     },
-    { $unset: { raffleCreateUnlockAt: "" } },
-    { returnDocument: "after", session: session ?? undefined },
+    { $unset: { raffleCreateUnlockAt: "", raffleCreateUnlockPoints: "" } },
+    { returnDocument: "before", session: session ?? undefined },
   ).lean();
 
   if (!updated) {
     throw new AppError(402, "Сначала оплатите создание розыгрыша в разделе «Реклама»");
   }
 
-  return updated;
+  const createPricePoints = Math.ceil(
+    Number(updated.raffleCreateUnlockPoints) || RAFFLE_CREATE_PRICE_POINTS,
+  );
+
+  return { user: updated, createPricePoints };
 };
 
 /**
- * @param {{ sellerId: string; session?: import('mongoose').ClientSession }} input
+ * @param {{
+ *   sellerId: string;
+ *   session?: import('mongoose').ClientSession;
+ *   createPricePoints?: number;
+ * }} input
  */
-export const restoreRaffleCreateUnlock = async ({ sellerId, session }) => {
+export const restoreRaffleCreateUnlock = async ({
+  sellerId,
+  session,
+  createPricePoints = RAFFLE_CREATE_PRICE_POINTS,
+}) => {
+  const points = Math.ceil(Number(createPricePoints) || RAFFLE_CREATE_PRICE_POINTS);
   await UserModel.updateOne(
     {
       _id: sellerId,
       raffleCreateUnlockAt: { $exists: false },
     },
-    { $set: { raffleCreateUnlockAt: new Date() } },
+    {
+      $set: {
+        raffleCreateUnlockAt: new Date(),
+        raffleCreateUnlockPoints: points,
+      },
+    },
     { session: session ?? undefined },
   );
 };

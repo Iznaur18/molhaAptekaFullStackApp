@@ -1,6 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 
+import { applyPromoReturnStreakDiscount } from "../../../entities/promo-return-streak/lib/promoReturnStreakPricing.js";
+import { useActivePromoReturnStreakDiscountPercent } from "../../../entities/promo-return-streak/model/useActivePromoReturnStreakDiscountPercent.js";
+import { invalidatePromoReturnStreak } from "../../../entities/promo-return-streak/model/usePromoReturnStreak.js";
 import {
   resolvePreviewSiteHeaderBannerSlidesFromForm,
   resolveSiteHeaderBannerColorInputValue,
@@ -67,7 +70,14 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
   const [actionError, setActionError] = useState("");
   const [feedback, setFeedback] = useState("");
 
-  const pricePoints = campaignQuery.data?.pricePoints ?? 7_000;
+  const pricePointsList = campaignQuery.data?.pricePoints ?? 7_000;
+  const streakDiscountPercent = useActivePromoReturnStreakDiscountPercent({
+    enabled: isAuthorized,
+  });
+  const pricePoints = useMemo(
+    () => applyPromoReturnStreakDiscount(pricePointsList, streakDiscountPercent),
+    [pricePointsList, streakDiscountPercent],
+  );
   const durationDays = campaignQuery.data?.durationDays ?? 7;
 
   const previewSlides = useMemo(
@@ -101,6 +111,7 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
           queryKey: siteHeaderBannerCampaignQueryKeys.myCampaign(),
         }),
         invalidateLoyaltyPointsBalances(queryClient),
+        invalidatePromoReturnStreak(queryClient),
       ]);
       setShowForm(false);
       setShowPreview(false);
@@ -217,7 +228,15 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
       <div className="advertising-page__meta">
         <div className="advertising-page__meta-item">
           <span className="advertising-page__meta-label">Стоимость</span>
-          <span className="advertising-page__meta-value">{pricePoints} баллов</span>
+          <span className="advertising-page__meta-value">
+            {pricePoints} баллов
+            {streakDiscountPercent > 0 ? (
+              <span className="advertising-page__meta-list">
+                {" "}
+                (было {pricePointsList})
+              </span>
+            ) : null}
+          </span>
         </div>
         <div className="advertising-page__meta-item">
           <span className="advertising-page__meta-label">Срок</span>

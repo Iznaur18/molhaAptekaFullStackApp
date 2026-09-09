@@ -5,6 +5,7 @@ import {
   findProductPromotionDuration,
   isValidProductPromotionTier,
   PRODUCT_PROMOTION_DURATION_OPTIONS,
+  PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
   PRODUCT_PROMOTION_PAYMENT_METHOD_SBP,
   PRODUCT_PROMOTION_STATUS_ACTIVE,
   PRODUCT_PROMOTION_STATUS_AWAITING_PAYMENT,
@@ -12,8 +13,11 @@ import {
   PRODUCT_PROMOTION_STATUS_REJECTED,
   PRODUCT_PROMOTION_TIER_META,
 } from "../../constants/productPromotionConstants.js";
+import { rublesToLoyaltyPoints } from "../../constants/loyaltyPointsConstants.js";
 import { AppError } from "../../errors/AppError.js";
+import { isUserStaff } from "../access/adminUserGuard.js";
 import { runMoneyIdempotentMutation } from "../loyalty/runMoneyIdempotentMutation.js";
+import { quoteAndConsumePromoReturnStreakAmount } from "../promo-return-streak/index.js";
 import {
   activateProductPromotionRecord,
   expireProductPromotionsAndSendNotifications,
@@ -22,8 +26,11 @@ import {
   PRODUCT_PROMOTION_NOTIFICATION_KIND_APPROVED,
   PRODUCT_PROMOTION_NOTIFICATION_KIND_REJECTED,
   refundProductPromotionPaymentIfNeeded,
+  setProductPromotionForProduct,
 } from "./productPromotionHelpers.js";
 import {
+  deductLoyaltyPoints,
+  InsufficientLoyaltyPointsError,
 } from "../loyalty/loyaltyPointsSpend.js";
 import {
   creditReferralCashbackFromSpend,
@@ -58,6 +65,7 @@ export function getProductPromotionTariffs() {
  *   productId: string;
  *   tier: unknown;
  *   tariffCode: unknown;
+ *   paymentMethod?: unknown;
  *   idempotencyKey: string;
  * }} input
  */
@@ -66,6 +74,7 @@ export async function requestProductPromotion({
   productId,
   tier: rawTier,
   tariffCode: rawTariffCode,
+  paymentMethod: rawPaymentMethod,
   idempotencyKey,
 }) {
   return runMoneyIdempotentMutation({
@@ -78,9 +87,21 @@ export async function requestProductPromotion({
         productId,
         tier: rawTier,
         tariffCode: rawTariffCode,
+        paymentMethod: rawPaymentMethod,
       }),
   });
 }
+
+/**
+ * @param {unknown} raw
+ */
+const normalizePromotionPaymentMethod = (raw) => {
+  const value = String(raw ?? PRODUCT_PROMOTION_PAYMENT_METHOD_SBP).trim();
+  if (value === PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS) {
+    return PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS;
+  }
+  return PRODUCT_PROMOTION_PAYMENT_METHOD_SBP;
+};
 
 /**
  * @param {{
@@ -88,6 +109,7 @@ export async function requestProductPromotion({
  *   productId: string;
  *   tier: unknown;
  *   tariffCode: unknown;
+ *   paymentMethod?: unknown;
  * }} input
  */
 async function requestProductPromotionOnce({
@@ -95,11 +117,13 @@ async function requestProductPromotionOnce({
   productId,
   tier: rawTier,
   tariffCode: rawTariffCode,
+  paymentMethod: rawPaymentMethod,
 }) {
   await expireProductPromotionsAndSendNotifications();
 
   const tier = Number(rawTier);
   const tariffCode = String(rawTariffCode || "").trim();
+  const paymentMethod = normalizePromotionPaymentMethod(rawPaymentMethod);
 
   if (!isValidProductPromotionTier(tier)) {
     throw new AppError(400, "Выберите уровень продвижения");
@@ -112,7 +136,10 @@ async function requestProductPromotionOnce({
   if (!product) {
     throw new AppError(404, "Товар не найден");
   }
-  if (String(product.productSeller) !== userId) {
+
+  const sellerId = String(product.productSeller);
+  const isOwner = sellerId === userId;
+  if (!isOwner && !(await isUserStaff(userId))) {
     throw new AppError(403, "Продвижение доступно только владельцу товара");
   }
   if (product.productModerationStatus !== PRODUCT_MODERATION_APPROVED) {
@@ -143,29 +170,197 @@ async function requestProductPromotionOnce({
   if (amountRub <= 0) {
     throw new AppError(400, "Не удалось рассчитать стоимость продвижения");
   }
-  // Заявка больше не списывает баллы: продвижение оплачивается по СБП, а
-  // деньги от провайдера приходят асинхронно. Поэтому запись создаётся
-  // неактивной, а включает её подтверждённый платёж.
+
+  if (paymentMethod === PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS) {
+    return payProductPromotionWithPoints({
+      payerUserId: userId,
+      sellerId,
+      productId,
+      tier,
+      tierMeta,
+      duration,
+      amountRub,
+    });
+  }
+
+  const quoted = await quoteAndConsumePromoReturnStreakAmount({
+    userId,
+    amount: amountRub,
+  });
+  const chargeRub = quoted.amount;
+
   const promotion = await ProductPromotionModel.create({
     productId,
-    sellerId: userId,
+    sellerId,
     status: PRODUCT_PROMOTION_STATUS_AWAITING_PAYMENT,
     tier,
     tariffCode: duration.code,
     tariffTitle: duration.title,
     durationHours: duration.durationHours,
-    amountRub,
+    amountRub: chargeRub,
     paymentMethod: PRODUCT_PROMOTION_PAYMENT_METHOD_SBP,
     amountPoints: null,
     pointsChargedAt: null,
     rubChargedAt: null,
   });
 
+  const discountNote =
+    quoted.discountPercent > 0
+      ? ` (скидка −${quoted.discountPercent}%)`
+      : "";
+
   return {
-    message: `Счёт на ${amountRub} ₽ выставлен — продвижение начнётся после оплаты.`,
+    message: `Счёт на ${chargeRub} ₽ выставлен${discountNote} — продвижение начнётся после оплаты.`,
     promotion: toPromotionPayload(promotion.toObject()),
     requiresPayment: true,
-    amountRub,
+    amountRub: chargeRub,
+    discountPercent: quoted.discountPercent,
+    tierTitle: tierMeta?.title ?? `L${tier}`,
+    durationTitle: duration.title,
+  };
+}
+
+/**
+ * Списание баллов 1:1 и мгновенная активация (как после успешного СБП).
+ *
+ * @param {{
+ *   payerUserId: string;
+ *   sellerId: string;
+ *   productId: string;
+ *   tier: number;
+ *   tierMeta: { title: string } | undefined;
+ *   duration: { code: string; title: string; durationHours: number };
+ *   amountRub: number;
+ * }} input
+ */
+async function payProductPromotionWithPoints({
+  payerUserId,
+  sellerId,
+  productId,
+  tier,
+  tierMeta,
+  duration,
+  amountRub,
+}) {
+  let loyaltyPointsBalance;
+  /** @type {{ toObject: () => Record<string, unknown> } | null} */
+  let promotionDoc = null;
+  /** @type {{ deferNotification?: boolean; referrerUserId?: string; amount?: number } | null} */
+  let cashback = null;
+  let chargedPoints = 0;
+  let discountPercent = 0;
+
+  try {
+    const result = await runInTransaction(async (session) => {
+      const quoted = await quoteAndConsumePromoReturnStreakAmount({
+        userId: payerUserId,
+        amount: amountRub,
+        session,
+      });
+      const amountPoints = rublesToLoyaltyPoints(quoted.amount);
+      if (amountPoints <= 0) {
+        throw new AppError(400, "Не удалось рассчитать стоимость продвижения");
+      }
+
+      const balance = await deductLoyaltyPoints({
+        userId: payerUserId,
+        amount: amountPoints,
+        session,
+      });
+
+      const chargedAt = new Date();
+      const activeUntil = new Date(
+        chargedAt.getTime() + duration.durationHours * 60 * 60 * 1000,
+      );
+
+      const [created] = await ProductPromotionModel.create(
+        [
+          {
+            productId,
+            sellerId,
+            status: PRODUCT_PROMOTION_STATUS_ACTIVE,
+            tier,
+            tariffCode: duration.code,
+            tariffTitle: duration.title,
+            durationHours: duration.durationHours,
+            amountRub: quoted.amount,
+            paymentMethod: PRODUCT_PROMOTION_PAYMENT_METHOD_POINTS,
+            amountPoints,
+            pointsChargedAt: chargedAt,
+            paidAt: chargedAt,
+            activatedAt: chargedAt,
+            activeUntil,
+          },
+        ],
+        { session },
+      );
+
+      await setProductPromotionForProduct({
+        productId,
+        tier,
+        activatedAt: chargedAt,
+        activeUntil,
+        session,
+      });
+
+      const credited = await creditReferralCashbackFromSpend({
+        spenderUserId: payerUserId,
+        pointsSpent: amountPoints,
+        sourceKind: REFERRAL_SOURCE_KIND_PRODUCT_PROMOTION,
+        sourceId: String(created._id),
+        session,
+      });
+
+      return {
+        promotion: created,
+        balance,
+        cashback: credited,
+        amountPoints,
+        discountPercent: quoted.discountPercent,
+      };
+    });
+
+    loyaltyPointsBalance = result.balance;
+    promotionDoc = result.promotion;
+    cashback = result.cashback;
+    chargedPoints = result.amountPoints;
+    discountPercent = result.discountPercent;
+  } catch (error) {
+    if (error instanceof InsufficientLoyaltyPointsError) {
+      throw new AppError(
+        409,
+        `Недостаточно баллов. Нужно: ${error.required}, у вас: ${error.available}`,
+      );
+    }
+    throw error;
+  }
+
+  if (cashback?.deferNotification) {
+    await notifyReferralCashbackCredited({
+      referrerUserId: cashback.referrerUserId,
+      amount: cashback.amount,
+      spenderUserId: payerUserId,
+    });
+  }
+
+  await createUserInAppNotification({
+    userId: sellerId,
+    kind: PRODUCT_PROMOTION_NOTIFICATION_KIND_APPROVED,
+    message: `Продвижение товара активировано (${tierMeta?.title ?? `L${tier}`}, ${duration.title})`,
+    productId,
+    ...(payerUserId !== sellerId ? { actorUserId: payerUserId } : {}),
+  });
+
+  return {
+    message: `Продвижение активировано — списано ${chargedPoints} баллов${
+      discountPercent > 0 ? ` (−${discountPercent}%)` : ""
+    }.`,
+    promotion: toPromotionPayload(promotionDoc.toObject()),
+    requiresPayment: false,
+    amountRub: promotionDoc.amountRub,
+    amountPoints: chargedPoints,
+    discountPercent,
+    loyaltyPointsBalance,
     tierTitle: tierMeta?.title ?? `L${tier}`,
     durationTitle: duration.title,
   };
@@ -174,8 +369,8 @@ async function requestProductPromotionOnce({
 /**
  * Продвижение, ожидающее оплаты, — для выставления счёта платёжным слоем.
  *
- * Заодно проверяет, что заявка принадлежит этому продавцу: сумму и цель
- * платежа определяет сервер, а не запрос.
+ * Заодно проверяет, что заявку может оплатить продавец или staff: сумму и
+ * цель платежа определяет сервер, а не запрос.
  *
  * @param {string} promotionId
  * @param {string} userId
@@ -183,11 +378,16 @@ async function requestProductPromotionOnce({
 export async function loadPayableProductPromotion(promotionId, userId) {
   const promotion = await ProductPromotionModel.findOne({
     _id: promotionId,
-    sellerId: userId,
     status: PRODUCT_PROMOTION_STATUS_AWAITING_PAYMENT,
+    paymentMethod: PRODUCT_PROMOTION_PAYMENT_METHOD_SBP,
   }).lean();
 
   if (!promotion) {
+    return null;
+  }
+
+  const isSeller = String(promotion.sellerId) === userId;
+  if (!isSeller && !(await isUserStaff(userId))) {
     return null;
   }
 

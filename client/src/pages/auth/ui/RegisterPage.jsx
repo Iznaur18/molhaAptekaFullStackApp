@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import { sanitizeUserNameInputLive } from "@molha/api-contract";
+import { isEmailAuthEnabled } from "@izibuy/shared-lib";
 
 import { useGuestProfileLoginMenuBannerImageQuery } from "../../../entities/site-header-banner/model/useGuestProfileLoginMenuBannerImageQuery.js";
 import { registerUserByPhone } from "../../../entities/user/api/registerUserByPhone.js";
@@ -31,6 +32,7 @@ import { useStableAuthHeroHeight } from "../../../shared/lib/useStableAuthHeroHe
 import { AuthHeroBanner } from "../../../shared/ui/AuthHeroBanner/AuthHeroBanner.jsx";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { PasswordInputField } from "../../../shared/ui/PasswordInputField/PasswordInputField.jsx";
+import { AuthContactChannelToggle } from "./AuthContactChannelToggle.jsx";
 
 import {
   clearRegisterFormDraft,
@@ -439,34 +441,19 @@ export function RegisterPage() {
         <div className="auth-page__body">
           <h1 className="auth-page__title">{AUTH_UI.REGISTER_TITLE}</h1>
           <p className="auth-page__subtitle">{AUTH_UI.REGISTER_SUBTITLE}</p>
+          {isEmailAuthEnabled() ? null : (
+            <p className="auth-page__notice">{AUTH_UI.EMAIL_AUTH_DISABLED_NOTICE}</p>
+          )}
 
           <form className="auth-page__form" onSubmit={handleSubmit}>
-            <div className="auth-page__channel" role="group" aria-label="Способ регистрации">
-              <button
-                type="button"
-                className={
-                  channel === "email"
-                    ? "auth-page__channel-btn auth-page__channel-btn--active"
-                    : "auth-page__channel-btn"
-                }
-                onClick={() => setChannel("email")}
-                disabled={isPending}
-              >
-                {REGISTER_MODAL_UI.CHANNEL_EMAIL}
-              </button>
-              <button
-                type="button"
-                className={
-                  channel === "phone"
-                    ? "auth-page__channel-btn auth-page__channel-btn--active"
-                    : "auth-page__channel-btn"
-                }
-                onClick={() => setChannel("phone")}
-                disabled={isPending}
-              >
-                {REGISTER_MODAL_UI.CHANNEL_PHONE}
-              </button>
-            </div>
+            <AuthContactChannelToggle
+              channel={channel}
+              onChange={setChannel}
+              disabled={isPending}
+              ariaLabel="Способ регистрации"
+              emailLabel={REGISTER_MODAL_UI.CHANNEL_EMAIL}
+              phoneLabel={REGISTER_MODAL_UI.CHANNEL_PHONE}
+            />
 
             {channel === "email" ? (
               <label className="auth-page__field">

@@ -1,10 +1,13 @@
 import {
   confirmOrderItemByBuyer,
-  markOrderItemCancelled,
   markOrderItemDeliveredBySeller,
   markOrderItemReturned,
   markOrderItemShippedBySeller,
 } from "../../services/order/updateOrderItemStatus.js";
+import {
+  cancelOrderShipment,
+  markOrderItemCancelled,
+} from "../../services/order/cancelOrderItems.js";
 import { advanceOrderShipmentStatus } from "../../services/order/advanceShipmentStatus.js";
 import { parseItemIndex } from "../../services/order/orderItemStatusHelpers.js";
 import {
@@ -69,6 +72,28 @@ export const markOrderItemCancelledController = async (req, res) => {
 
 export const markOrderItemCancelledBySellerController =
   markOrderItemCancelledController;
+
+/**
+ * `PATCH /order/:orderId/shipment/:sellerId/cancelled` — отмена заказа целиком
+ * одной кнопкой, вместо клика по каждой позиции.
+ *
+ * Адресуется отправлением: и покупатель, и продавец видят заказ карточкой
+ * одного продавца, и гасить надо ровно её содержимое.
+ */
+export const cancelOrderShipmentController = async (req, res) => {
+  const { orderId, sellerId } = req.params;
+  const result = await cancelOrderShipment({
+    orderId,
+    sellerId: String(sellerId),
+    requestUserId: String(req.userId),
+    userId: req.userId,
+    reason: req.body?.reason,
+  });
+
+  return successRes(res, {
+    order: sanitizeOrderForBuyerApi(result.order),
+  });
+};
 
 /** `PATCH /order/:orderId/items/:itemIndex/shipped` — продавец помечает позицию как отправленную. */
 export const markOrderItemShippedBySellerController = async (req, res) => {

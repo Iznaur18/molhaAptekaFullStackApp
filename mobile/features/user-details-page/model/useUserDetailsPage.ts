@@ -16,7 +16,7 @@ export const useUserDetailsPage = () => {
   const userId = String(params.id ?? "").trim();
 
   const sessionQuery = useAuthSessionQuery();
-  const { canModerate, canModerateProducts, isPremiumUser } = useUserAccess();
+  const { canModerate, canModerateProducts, isAdmin, isPremiumUser } = useUserAccess();
   const currentUser = sessionQuery.data?.user;
   const currentUserId = currentUser?._id != null ? String(currentUser._id) : null;
   const isAuthorized = Boolean(currentUser);
@@ -51,44 +51,36 @@ export const useUserDetailsPage = () => {
     }
   }, [isSelf, router, userId]);
 
-  const handleFollowChange = useCallback(
-    (patch: { isFollowing: boolean }) => {
+  const patchProfile = useCallback(
+    (patch: Record<string, unknown>) => {
       queryClient.setQueryData(userProfileQueryKeys.byId(userId), (old) => {
         if (!old || typeof old !== "object") {
           return old;
         }
-        return { ...old, isFollowing: patch.isFollowing };
+        return { ...old, ...patch };
       });
-      setProfileSnapshot((prev) =>
-        prev ? { ...prev, isFollowing: patch.isFollowing } : prev,
-      );
+      setProfileSnapshot((prev) => (prev ? { ...prev, ...patch } : prev));
     },
     [queryClient, userId],
   );
 
+  const handleFollowChange = useCallback(
+    (patch: { isFollowing: boolean }) => patchProfile(patch),
+    [patchProfile],
+  );
+
   const handleBlockChange = useCallback(
-    (patch: { isBlockedByMe: boolean }) => {
-      queryClient.setQueryData(userProfileQueryKeys.byId(userId), (old) => {
-        if (!old || typeof old !== "object") {
-          return old;
-        }
-        return {
-          ...old,
-          isBlockedByMe: patch.isBlockedByMe,
-          ...(patch.isBlockedByMe ? { isFollowing: false } : {}),
-        };
-      });
-      setProfileSnapshot((prev) =>
-        prev
-          ? {
-              ...prev,
-              isBlockedByMe: patch.isBlockedByMe,
-              ...(patch.isBlockedByMe ? { isFollowing: false } : {}),
-            }
-          : prev,
-      );
-    },
-    [queryClient, userId],
+    (patch: { isBlockedByMe: boolean }) =>
+      patchProfile({
+        ...patch,
+        ...(patch.isBlockedByMe ? { isFollowing: false } : {}),
+      }),
+    [patchProfile],
+  );
+
+  const handleModerationTrustChange = useCallback(
+    (patch: { productModerationTrusted: boolean }) => patchProfile(patch),
+    [patchProfile],
   );
 
   const handleRated = useCallback(
@@ -119,8 +111,10 @@ export const useUserDetailsPage = () => {
     showOtherUserProducts,
     showOtherUserPurchases,
     canModerate,
+    isAdmin,
     handleFollowChange,
     handleBlockChange,
+    handleModerationTrustChange,
     handleRated,
     handleViewAllSellerProducts,
     handleEditUser,

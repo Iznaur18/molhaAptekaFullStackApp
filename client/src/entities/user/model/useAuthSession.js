@@ -172,6 +172,7 @@ export function useAuthSession() {
     currentUserId: user ? String(user._id) : null,
     currentUserRole: user?.userRole ?? null,
     isPremiumUser: isPremiumActive(user),
+    isProductModerationTrusted: user?.productModerationTrusted === true,
     isEmailVerified: user ? user.isEmailVerified !== false : true,
     isPhoneVerified: user ? user.isPhoneVerified === true : false,
     currentUserEmail: user ? String(user.email ?? "").trim() : "",

@@ -28,6 +28,7 @@ import {
   USER_LIST_ROW_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
+import { SellerProductsPageSkeleton } from "./SellerProductsPageSkeleton.jsx";
 
 import "../../../entities/user/ui/UserDetailsModal.css";
 import "./SellerProductsPage.css";
@@ -146,10 +147,10 @@ export function SellerProductsPage({
     onSellerNameClick?.(sellerId);
   }, [onSellerNameClick, sellerId]);
 
+  // Ожидание сессии визуально ничем не отличается от загрузки данных —
+  // показываем тот же скелетон, иначе экран дважды меняет вид.
   if (!isSessionReady) {
-    return (
-      <p className="seller-products-page__state">{SELLER_PRODUCTS_PAGE_UI.LOADING}</p>
-    );
+    return <SellerProductsPageSkeleton />;
   }
 
   const displayName =
@@ -164,11 +165,7 @@ export function SellerProductsPage({
         : "";
 
   if (isPageLoading) {
-    return (
-      <div className="seller-products-page">
-        <p className="seller-products-page__state">{SELLER_PRODUCTS_PAGE_UI.LOADING}</p>
-      </div>
-    );
+    return <SellerProductsPageSkeleton />;
   }
 
   if (pageError) {

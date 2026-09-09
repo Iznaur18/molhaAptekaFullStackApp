@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { isEmailAuthEnabled, resolveAuthContactChannel } from "@izibuy/shared-lib";
+
 import {
   confirmPasswordReset,
   requestPasswordReset,
@@ -28,6 +30,7 @@ import { AppButton } from "@/shared/ui/AppButton";
 import { AuthScreenScroll } from "@/shared/ui/AuthScreenScroll";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 import { PasswordTextInput } from "@/shared/ui/PasswordTextInput";
+import { AuthContactChannelToggle } from "@/shared/ui/AuthContactChannelToggle";
 import { ScreenBackButton } from "@/shared/ui/ScreenBackButton";
 
 type AuthChannel = "email" | "phone";
@@ -57,7 +60,9 @@ export default function ForgotPasswordScreen() {
   const insets = useSafeAreaInsets();
   const heroHeight = useStableAuthHeroHeight();
 
-  const [channel, setChannel] = useState<AuthChannel>("email");
+  const [channel, setChannel] = useState<AuthChannel>(() =>
+    resolveAuthContactChannel("email"),
+  );
   const [step, setStep] = useState<ResetStep>("request");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -190,7 +195,9 @@ export default function ForgotPasswordScreen() {
       ? AUTH_UI.FORGOT_DONE_SUBTITLE
       : step === "confirm"
         ? AUTH_UI.FORGOT_CONFIRM_SUBTITLE
-        : AUTH_UI.FORGOT_SUBTITLE;
+        : isEmailAuthEnabled()
+          ? AUTH_UI.FORGOT_SUBTITLE
+          : AUTH_UI.FORGOT_SUBTITLE_PHONE;
 
   return (
     <View style={styles.flex}>
@@ -311,54 +318,12 @@ export default function ForgotPasswordScreen() {
                 </>
               ) : (
                 <>
-                  <View
-                    style={styles.channelRow}
-                    accessibilityRole="tablist"
+                  <AuthContactChannelToggle
+                    channel={channel}
+                    onChange={handleChannelChange}
+                    disabled={isLoading}
                     accessibilityLabel={AUTH_UI.FORGOT_CHANNEL_ARIA}
-                  >
-                    <Pressable
-                      style={({ pressed }) => [
-                        styles.channelBtn,
-                        channel === "email" && styles.channelBtnActive,
-                        isLoading && styles.channelBtnDisabled,
-                        pressed && !isLoading && styles.channelBtnPressed,
-                      ]}
-                      onPress={() => handleChannelChange("email")}
-                      disabled={isLoading}
-                      accessibilityRole="tab"
-                      accessibilityState={{ selected: channel === "email" }}
-                    >
-                      <Text
-                        style={[
-                          styles.channelBtnLabel,
-                          channel === "email" && styles.channelBtnLabelActive,
-                        ]}
-                      >
-                        {AUTH_UI.CHANNEL_EMAIL}
-                      </Text>
-                    </Pressable>
-                    <Pressable
-                      style={({ pressed }) => [
-                        styles.channelBtn,
-                        channel === "phone" && styles.channelBtnActive,
-                        isLoading && styles.channelBtnDisabled,
-                        pressed && !isLoading && styles.channelBtnPressed,
-                      ]}
-                      onPress={() => handleChannelChange("phone")}
-                      disabled={isLoading}
-                      accessibilityRole="tab"
-                      accessibilityState={{ selected: channel === "phone" }}
-                    >
-                      <Text
-                        style={[
-                          styles.channelBtnLabel,
-                          channel === "phone" && styles.channelBtnLabelActive,
-                        ]}
-                      >
-                        {AUTH_UI.CHANNEL_PHONE}
-                      </Text>
-                    </Pressable>
-                  </View>
+                  />
 
                   {channel === "email" ? (
                     <View style={styles.field}>

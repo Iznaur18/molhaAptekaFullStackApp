@@ -8,28 +8,26 @@ import {
 } from "./onecProductFields.js";
 
 /**
- * Правило приёмки: на сайт не попадает номенклатура 1С, у которой нет ни одной
- * картинки И нет остатка. Такой товар всё равно нельзя ни показать, ни купить,
- * а карточки-пустышки засоряют каталог, поиск и очередь модерации.
+ * Правило приёмки: на сайт не попадает номенклатура 1С без картинок.
+ * Остаток без фото не спасает — карточку всё равно нельзя нормально показать
+ * в каталоге и «Мои товары».
  *
  * Правило жёсткое, без настройки, и работает в обоих каналах (CommerceML и
- * pull). Особенность CommerceML — остаток приезжает отдельным файлом ПОСЛЕ
- * каталога, поэтому такая номенклатура складывается в `OneCPendingProduct`
- * (ни карточки, ни залитых картинок) и разворачивается в товар, как только
- * остаток окажется больше нуля.
+ * pull). Особенность CommerceML — картинки приходят в `import.xml`, остаток
+ * позже в offers/rests: без картинок номенклатура лежит в `OneCPendingProduct`
+ * и разворачивается в товар только когда в каталоге появятся файлы картинок.
  */
 export const ONEC_HOLD_RULE_MESSAGE =
-  "Нет картинок и нет остатка — карточка на сайте не заводится";
+  "Нет картинок — карточка на сайте не заводится";
 
 export const ONEC_HOLD_HIDDEN_MESSAGE =
-  "Нет картинок и нет остатка — карточка снята с витрины до ближайшего остатка";
+  "Нет картинок — карточка снята с витрины до появления фото в выгрузке";
 
 /**
- * @param {{ hasImages: boolean; stock: number | null | undefined }} params
+ * @param {{ hasImages: boolean; stock?: number | null | undefined }} params
  */
-export function shouldHoldOneCProduct({ hasImages, stock }) {
-  if (hasImages) return false;
-  return !(typeof stock === "number" && Number.isFinite(stock) && stock > 0);
+export function shouldHoldOneCProduct({ hasImages, stock: _stock }) {
+  return !hasImages;
 }
 
 /**
@@ -218,6 +216,7 @@ export async function hideProductByOneCHoldRule({
  *   price: number;
  *   stock: number;
  *   seenAt: Date;
+ *   moderationTrusted?: boolean;
  * }} params
  */
 export async function materializeHeldOneCProduct({
@@ -228,6 +227,7 @@ export async function materializeHeldOneCProduct({
   price,
   stock,
   seenAt,
+  moderationTrusted = false,
 }) {
   const item = {
     name: held.name ?? "",
@@ -257,9 +257,10 @@ export async function materializeHeldOneCProduct({
     productCategoryId: categoryWrite.productCategoryId,
   });
   const keepsApproval =
-    held.moderationStatus === PRODUCT_MODERATION_APPROVED &&
-    Boolean(held.moderationHash) &&
-    held.moderationHash === fingerprint;
+    moderationTrusted ||
+    (held.moderationStatus === PRODUCT_MODERATION_APPROVED &&
+      Boolean(held.moderationHash) &&
+      held.moderationHash === fingerprint);
 
   const created = await createOneCProduct({
     sellerId,

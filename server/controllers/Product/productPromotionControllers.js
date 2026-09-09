@@ -20,6 +20,7 @@ export const requestProductPromotionController = async (req, res) => {
     productId: req.params.productId,
     tier: req.body?.tier,
     tariffCode: req.body?.tariffCode,
+    paymentMethod: req.body?.paymentMethod,
     idempotencyKey: req.body?.idempotencyKey,
   });
 

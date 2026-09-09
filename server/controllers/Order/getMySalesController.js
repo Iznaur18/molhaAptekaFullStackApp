@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { summarizeOrderItems } from "@izibuy/shared-lib";
 
 import { OrderModel, ProductModel, UserModel } from "../../models/index.js";
 import { errorRes, successRes } from "../../services/http/index.js";
@@ -88,9 +89,6 @@ const parsePagination = (query) => {
 
 const normalizeId = (value) => String(value ?? "");
 
-const calculateTotalAmount = (items) =>
-  items.reduce((sum, item) => sum + item.quantity * item.unitPriceAtOrder, 0);
-
 const buildBuyerIdsBySearch = async (searchTerm) => {
   if (!searchTerm) return null;
 
@@ -176,7 +174,7 @@ export const getMySalesController = async (req, res) => {
       return {
         ...order,
         items: sellerItems,
-        totalAmount: calculateTotalAmount(sellerItems),
+        totalAmount: summarizeOrderItems(sellerItems).totalAmount,
         status: buildOrderStatusFromItems(sellerItems),
       };
     })

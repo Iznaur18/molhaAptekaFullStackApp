@@ -19,6 +19,7 @@ type MyProductsCatalogToolbarProps = {
   myProductsTotal: number | null;
   sellerProductsLimit: number | null;
   isAdmin: boolean;
+  isModerationTrusted?: boolean;
 };
 
 export const MyProductsCatalogToolbar = ({
@@ -29,6 +30,7 @@ export const MyProductsCatalogToolbar = ({
   myProductsTotal,
   sellerProductsLimit,
   isAdmin,
+  isModerationTrusted = false,
 }: MyProductsCatalogToolbarProps) => {
   const styles = useListPageFilterBarStyles();
   const showProductsQuota = sellerProductsLimit != null && !isAdmin;
@@ -65,6 +67,9 @@ export const MyProductsCatalogToolbar = ({
           <Text style={styles.quotaLabel}>{MY_PRODUCTS_PAGE_UI.QUOTA_LABEL}:</Text>{" "}
           {productsQuotaText}
         </Text>
+      ) : null}
+      {isModerationTrusted ? (
+        <Text style={styles.trustNotice}>{MY_PRODUCTS_PAGE_UI.TRUSTED_NOTICE}</Text>
       ) : null}
     </View>
   );

@@ -1,3 +1,8 @@
+import {
+  EMAIL_AUTH_DISABLED_MESSAGE,
+  isEmailAuthEnabled,
+} from "@izibuy/shared-lib";
+
 import { PendingRegistrationModel, UserModel } from "../../models/index.js";
 import {
   EMAIL_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE,
@@ -42,6 +47,22 @@ function buildTakenConditions({ email, userName, userPhoneNumber }) {
   return orConditions;
 }
 
+function isPendingPhoneChannel(pending) {
+  return (
+    pending.channel === "phone" ||
+    (!pending.email &&
+      pending.userPhoneNumber != null &&
+      pending.userPhoneNumber !== "")
+  );
+}
+
+function assertEmailRegistrationChannelAllowed(pending) {
+  if (isPendingPhoneChannel(pending) || isEmailAuthEnabled()) {
+    return;
+  }
+  throw new Error(EMAIL_AUTH_DISABLED_MESSAGE);
+}
+
 /**
  * Создаёт (или заменяет по email) заявку на регистрацию и отправляет код.
  *
@@ -64,6 +85,10 @@ function buildTakenConditions({ email, userName, userPhoneNumber }) {
  * @returns {Promise<{ registrationId: string; email: string }>}
  */
 export async function createPendingRegistration(fields) {
+  if (!isEmailAuthEnabled()) {
+    throw new Error(EMAIL_AUTH_DISABLED_MESSAGE);
+  }
+
   const email = String(fields.email).trim().toLowerCase();
 
   const exists = await UserModel.findOne({
@@ -185,11 +210,9 @@ export async function resendPendingRegistrationCode(registrationId) {
     throw new Error(PENDING_REGISTRATION_NOT_FOUND_MESSAGE);
   }
 
-  const isPhoneChannel =
-    pending.channel === "phone" ||
-    (!pending.email &&
-      pending.userPhoneNumber != null &&
-      pending.userPhoneNumber !== "");
+  assertEmailRegistrationChannelAllowed(pending);
+
+  const isPhoneChannel = isPendingPhoneChannel(pending);
 
   const code = generateEmailVerificationCode();
   pending.codeHash = hashEmailVerificationSecret(code);
@@ -246,6 +269,8 @@ export async function confirmPendingRegistration(registrationId, rawCode) {
     throw new Error(PENDING_REGISTRATION_NOT_FOUND_MESSAGE);
   }
 
+  assertEmailRegistrationChannelAllowed(pending);
+
   if ((pending.codeAttemptCount ?? 0) >= EMAIL_VERIFICATION_MAX_ATTEMPTS) {
     throw new Error(EMAIL_VERIFICATION_ATTEMPTS_EXCEEDED_MESSAGE);
   }
@@ -267,11 +292,7 @@ export async function confirmPendingRegistration(registrationId, rawCode) {
     throw new Error(PENDING_REGISTRATION_TAKEN_MESSAGE);
   }
 
-  const isPhoneChannel =
-    pending.channel === "phone" ||
-    (!pending.email &&
-      pending.userPhoneNumber != null &&
-      pending.userPhoneNumber !== "");
+  const isPhoneChannel = isPendingPhoneChannel(pending);
 
   const phone =
     pending.userPhoneNumber != null && pending.userPhoneNumber !== ""

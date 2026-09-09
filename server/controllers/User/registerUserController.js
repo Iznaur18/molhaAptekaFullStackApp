@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import { EMAIL_AUTH_DISABLED_MESSAGE } from "@izibuy/shared-lib";
 import { errorRes, successRes } from "../../services/http/index.js";
 import { sendUserWithToken } from "../../services/auth/sendUserWithToken.js";
 import {
@@ -81,6 +82,9 @@ export const registerUserController = async (req, res) => {
       registrationError instanceof Error
         ? registrationError.message
         : "Не удалось начать регистрацию";
+    if (message === EMAIL_AUTH_DISABLED_MESSAGE) {
+      return errorRes(res, 503, message);
+    }
     if (message === "EMAIL_DELIVERY_UNAVAILABLE") {
       return errorRes(res, 503, "Не удалось отправить письмо. Попробуйте позже");
     }
@@ -106,13 +110,14 @@ export const confirmRegistrationController = async (req, res) => {
   try {
     user = await confirmPendingRegistration(registrationId, code);
   } catch (confirmError) {
-    return errorRes(
-      res,
-      400,
+    const message =
       confirmError instanceof Error
         ? confirmError.message
-        : "Не удалось подтвердить регистрацию",
-    );
+        : "Не удалось подтвердить регистрацию";
+    if (message === EMAIL_AUTH_DISABLED_MESSAGE) {
+      return errorRes(res, 503, message);
+    }
+    return errorRes(res, 400, message);
   }
 
   return sendUserWithToken(user, res, req);
@@ -130,6 +135,9 @@ export const resendRegistrationCodeController = async (req, res) => {
   } catch (resendError) {
     const message =
       resendError instanceof Error ? resendError.message : "Не удалось отправить код";
+    if (message === EMAIL_AUTH_DISABLED_MESSAGE) {
+      return errorRes(res, 503, message);
+    }
     if (message === "SMS_DELIVERY_UNAVAILABLE") {
       return errorRes(res, 503, "Не удалось отправить SMS. Попробуйте позже");
     }

@@ -852,6 +852,12 @@ export const useListPageFilterBarStyles = createThemedStyles((theme) => ({
     fontWeight: "500",
     opacity: 0.85,
   },
+  trustNotice: {
+    flexBasis: "100%",
+    fontSize: 13.6,
+    fontWeight: "600",
+    color: theme.colors.success,
+  },
 }));
 
 export const useProductCardMediaStyles = createThemedStyles((theme) => ({

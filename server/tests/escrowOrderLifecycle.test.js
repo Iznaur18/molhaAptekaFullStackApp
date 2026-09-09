@@ -13,11 +13,13 @@ const { createOrderLoyaltyFixture } = await import(
 const { EscrowLedgerEntryModel, OrderModel } = await import("../models/index.js");
 const {
   confirmOrderItemByBuyer,
-  markOrderItemCancelled,
   markOrderItemDeliveredBySeller,
   markOrderItemReturned,
   markOrderItemShippedBySeller,
 } = await import("../services/order/updateOrderItemStatus.js");
+const { markOrderItemCancelled } = await import(
+  "../services/order/cancelOrderItems.js"
+);
 const { openEscrowForPaidOrder } = await import(
   "../services/payments/escrowLedger.js"
 );

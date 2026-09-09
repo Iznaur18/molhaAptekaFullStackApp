@@ -23,7 +23,7 @@ describe("buildProductPatchSet pending owner edit", () => {
     const { $set } = await buildProductPatchSet({
       existing: pendingProduct,
       body: { productName: "New title" },
-      isAdmin: false,
+      skipsModeration: false,
       productId: "507f1f77bcf86cd799439011",
     });
 
@@ -40,7 +40,7 @@ describe("buildProductPatchSet pending owner edit", () => {
         productIsAvailable: true,
       },
       body: { productName: "Edited" },
-      isAdmin: false,
+      skipsModeration: false,
       productId: "507f1f77bcf86cd799439011",
     });
 
@@ -56,7 +56,7 @@ describe("buildProductPatchSet pending owner edit", () => {
         buildProductPatchSet({
           existing: pendingProduct,
           body: { productIsAvailable: true },
-          isAdmin: false,
+          skipsModeration: false,
           productId: "507f1f77bcf86cd799439011",
         }),
       (error) =>

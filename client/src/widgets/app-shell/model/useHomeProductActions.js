@@ -20,6 +20,8 @@ import { catalogQueryKeys } from "../../../entities/product/model/catalogQueryKe
 import { useRaffleMutations } from "../../../entities/raffle/model/useRaffleMutations.js";
 import { PRODUCT_MODERATION_PENDING } from "../../../entities/product/model/productModerationConstants.js";
 import { createPlatformServicePayment } from "../../../entities/payment/api/paymentApi.js";
+import { invalidateLoyaltyPointsBalances } from "../../../entities/user/lib/loyaltyPointsQueryCache.js";
+import { invalidatePromoReturnStreak } from "../../../entities/promo-return-streak/model/usePromoReturnStreak.js";
 import { createClientIdempotencyKey } from "../../../shared/lib/createClientIdempotencyKey.js";
 import { HOME_MAIN_VIEW_PATH } from "../../../shared/lib/homeMainViewPaths.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
@@ -63,6 +65,7 @@ export const useHomeProductActions = ({
   productToEdit,
   loyaltyPoints,
   loyaltyPointsReserved,
+  setLoyaltyPoints,
   refreshCatalogFeed,
   refreshRaffleSurfaces,
   setRaffleParticipationPendingProductId,
@@ -127,12 +130,7 @@ export const useHomeProductActions = ({
         hasOpenSales: prev.hasOpenSales ?? product.hasOpenSales,
       }));
     },
-    [
-      isMineMode,
-      removeCatalogProduct,
-      selectedProductCategory,
-      updateCatalogProduct,
-    ],
+    [isMineMode, removeCatalogProduct, selectedProductCategory, updateCatalogProduct],
   );
 
   const handleCreateProductSuccess = useCallback(
@@ -244,9 +242,7 @@ export const useHomeProductActions = ({
         syncProductEditModalState(updated);
       } catch (e) {
         setMyProductsCatalogError(
-          e instanceof Error
-            ? e.message
-            : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+          e instanceof Error ? e.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
         );
       } finally {
         setTogglingAvailabilityProductId(null);
@@ -548,10 +544,11 @@ export const useHomeProductActions = ({
       setTogglingAffiliateProductId(normalizedProductId);
       setProductDetailsAdminError("");
       try {
-        const sourceProduct = resolveAffiliateToggleSourceProduct(
-          normalizedProductId,
-          [productHint, promotionProduct, productToEdit],
-        );
+        const sourceProduct = resolveAffiliateToggleSourceProduct(normalizedProductId, [
+          productHint,
+          promotionProduct,
+          productToEdit,
+        ]);
         if (affiliateEnabled && sourceProduct?.affiliateEnabled !== true) {
           const percent = Math.floor(Number(sourceProduct?.affiliatePercent) || 0);
           const price = Math.floor(Number(sourceProduct?.productPrice) || 0);
@@ -759,7 +756,12 @@ export const useHomeProductActions = ({
         setPromotionConfig({ tiers: [], durations: [] });
       }
     },
-    [ensureProductPromotionTariffs, setPromotionModalError, setPromotionProduct, setPromotionConfig],
+    [
+      ensureProductPromotionTariffs,
+      setPromotionModalError,
+      setPromotionProduct,
+      setPromotionConfig,
+    ],
   );
 
   const handleClosePromotionModal = useCallback(() => {
@@ -769,25 +771,46 @@ export const useHomeProductActions = ({
   }, [setPromotionModalError, setPromotionProduct, setPromotionConfig]);
 
   const handleSubmitPromotionRequest = useCallback(
-    async (tier, tariffCode) => {
+    async (tier, tariffCode, options = {}) => {
       if (!promotionProduct?._id) {
         return;
       }
+      const payWithPoints = options?.payWithPoints === true;
       setIsPromotionSubmitPending(true);
       setPromotionModalError("");
       try {
-        const { promotion } = await requestPromotionMutation.mutateAsync({
+        const result = await requestPromotionMutation.mutateAsync({
           productId: String(promotionProduct._id),
           tier,
           tariffCode,
+          paymentMethod: payWithPoints ? "points" : "sbp",
         });
+
+        if (payWithPoints || result.requiresPayment === false) {
+          if (
+            typeof setLoyaltyPoints === "function" &&
+            result.loyaltyPointsBalance != null
+          ) {
+            setLoyaltyPoints(result.loyaltyPointsBalance);
+          }
+          await invalidateLoyaltyPointsBalances(queryClient);
+          await invalidatePromoReturnStreak(queryClient);
+          await invalidateCatalogProducts(queryClient);
+          handleClosePromotionModal();
+          setMyProductsCatalogNotice(result.message || "Продвижение активировано");
+          return;
+        }
+
+        // Скидку streak сжигают при выставлении счёта СБП — до редиректа
+        // обновляем dock, иначе UI врёт до возврата с оплаты.
+        await invalidatePromoReturnStreak(queryClient);
 
         // Заявка больше не включает продвижение — она выставляет счёт.
         // Ведём человека на оплату сразу: искать неоплаченную заявку в
         // списке он не должен.
         const payment = await createPlatformServicePayment({
           serviceKind: "product_promotion",
-          targetId: String(promotion._id),
+          targetId: String(result.promotion._id),
           returnUrl: HOME_MAIN_VIEW_PATH["my-products"],
           idempotencyKey: createClientIdempotencyKey(),
         });
@@ -810,11 +833,19 @@ export const useHomeProductActions = ({
     [
       handleClosePromotionModal,
       promotionProduct,
+      queryClient,
       requestPromotionMutation,
       setIsPromotionSubmitPending,
+      setLoyaltyPoints,
+      setMyProductsCatalogNotice,
       setPromotionModalError,
     ],
   );
+
+  const handleTopUpPromotionPoints = useCallback(() => {
+    handleClosePromotionModal();
+    goToMainView("loyalty-points");
+  }, [goToMainView, handleClosePromotionModal]);
 
   const handleToggleRaffleParticipation = useCallback(
     async (product, enabled) => {
@@ -877,6 +908,7 @@ export const useHomeProductActions = ({
     handleOpenPromotionModal,
     handleClosePromotionModal,
     handleSubmitPromotionRequest,
+    handleTopUpPromotionPoints,
     handleToggleRaffleParticipation,
   };
 };

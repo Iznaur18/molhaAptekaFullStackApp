@@ -1,17 +1,29 @@
 import { useMemo } from "react";
+import { normalizeSellerProductsLimitOverride } from "@molha/api-contract";
 
 import {
   USER_ROLE_ADMIN,
   USER_ROLE_MODERATOR,
 } from "../../../entities/user/model/userConstants.js";
-import { getSellerProductsLimit } from "../../../entities/product/lib/sellerProductsLimit.js";
+import {
+  getSellerProductsLimit,
+  isSellerProductsLimitReached,
+} from "../../../entities/product/lib/sellerProductsLimit.js";
 
 /**
- * @param {object} params
+ * @param {{
+ *   currentUserRole: string | null | undefined;
+ *   authUser: {
+ *     isPremiumUser?: boolean;
+ *     premiumExpiresAt?: string | Date | null;
+ *     sellerProductsLimitOverride?: number | null;
+ *   } | null | undefined;
+ *   myProductsTotal: number | null | undefined;
+ * }} params
  */
 export const useHomeSellerAccess = ({
   currentUserRole,
-  isPremiumUser,
+  authUser,
   myProductsTotal,
 }) => {
   const isAdmin = currentUserRole === USER_ROLE_ADMIN;
@@ -22,18 +34,24 @@ export const useHomeSellerAccess = ({
     if (isAdmin) {
       return null;
     }
-    return getSellerProductsLimit({ isPremiumUser });
-  }, [isAdmin, isPremiumUser]);
+    return getSellerProductsLimit(authUser);
+  }, [authUser, isAdmin]);
 
-  const isAtSellerProductsLimit =
-    sellerProductsLimit != null &&
-    myProductsTotal != null &&
-    myProductsTotal >= sellerProductsLimit;
+  const hasPersonalSellerProductsLimit =
+    !isAdmin &&
+    normalizeSellerProductsLimitOverride(authUser?.sellerProductsLimitOverride) !==
+      null;
+
+  const isAtSellerProductsLimit = isSellerProductsLimitReached(
+    sellerProductsLimit,
+    myProductsTotal,
+  );
 
   return {
     isAdmin,
     canModerateProducts,
     sellerProductsLimit,
+    hasPersonalSellerProductsLimit,
     isAtSellerProductsLimit,
   };
 };

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
+import { isEmailAuthEnabled, resolveAuthContactChannel } from "@izibuy/shared-lib";
 
 import { useGuestProfileLoginMenuBannerImageQuery } from "../../../entities/site-header-banner/model/useGuestProfileLoginMenuBannerImageQuery.js";
 import {
@@ -29,6 +30,7 @@ import { useStableAuthHeroHeight } from "../../../shared/lib/useStableAuthHeroHe
 import { AuthHeroBanner } from "../../../shared/ui/AuthHeroBanner/AuthHeroBanner.jsx";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { PasswordInputField } from "../../../shared/ui/PasswordInputField/PasswordInputField.jsx";
+import { AuthContactChannelToggle } from "./AuthContactChannelToggle.jsx";
 
 import "./AuthPage.css";
 
@@ -37,7 +39,9 @@ export function LoginPage() {
   const queryClient = useQueryClient();
   const heroHeight = useStableAuthHeroHeight();
   const { isAuthorized, isSessionReady } = useAuthSession();
-  const [channel, setChannel] = useState(/** @type {"email" | "phone"} */ ("email"));
+  const [channel, setChannel] = useState(
+    /** @type {"email" | "phone"} */ (() => resolveAuthContactChannel("email")),
+  );
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
@@ -125,34 +129,19 @@ export function LoginPage() {
         <div className="auth-page__body">
           <h1 className="auth-page__title">{AUTH_UI.LOGIN_TITLE}</h1>
           <p className="auth-page__subtitle">{AUTH_UI.LOGIN_SUBTITLE}</p>
+          {isEmailAuthEnabled() ? null : (
+            <p className="auth-page__notice">{AUTH_UI.EMAIL_AUTH_DISABLED_NOTICE}</p>
+          )}
 
           <form className="auth-page__form" onSubmit={handleSubmit}>
-            <div className="auth-page__channel" role="group" aria-label="Способ входа">
-              <button
-                type="button"
-                className={
-                  channel === "email"
-                    ? "auth-page__channel-btn auth-page__channel-btn--active"
-                    : "auth-page__channel-btn"
-                }
-                onClick={() => setChannel("email")}
-                disabled={isPending}
-              >
-                {LOGIN_MODAL_UI.CHANNEL_EMAIL}
-              </button>
-              <button
-                type="button"
-                className={
-                  channel === "phone"
-                    ? "auth-page__channel-btn auth-page__channel-btn--active"
-                    : "auth-page__channel-btn"
-                }
-                onClick={() => setChannel("phone")}
-                disabled={isPending}
-              >
-                {LOGIN_MODAL_UI.CHANNEL_PHONE}
-              </button>
-            </div>
+            <AuthContactChannelToggle
+              channel={channel}
+              onChange={setChannel}
+              disabled={isPending}
+              ariaLabel="Способ входа"
+              emailLabel={LOGIN_MODAL_UI.CHANNEL_EMAIL}
+              phoneLabel={LOGIN_MODAL_UI.CHANNEL_PHONE}
+            />
 
             {channel === "email" ? (
               <label className="auth-page__field">

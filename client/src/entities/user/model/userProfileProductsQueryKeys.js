@@ -14,8 +14,4 @@ export const userProfileProductsQueryKeys = {
       limit: params.limit ?? USER_PROFILE_PRODUCTS_PAGE_SIZE,
     },
   ],
-  /**
-   * @param {string} userId
-   */
-  allPages: (userId) => [...userProfileProductsQueryKeys.all, userId, "all"],
 };

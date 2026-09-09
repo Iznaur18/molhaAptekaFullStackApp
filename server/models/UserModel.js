@@ -412,6 +412,18 @@ const UserSchema = new mongoose.Schema(
       min: SELLER_PRODUCTS_LIMIT_UNLIMITED,
       max: SELLER_PRODUCTS_LIMIT_OVERRIDE_MAX,
     },
+    /**
+     * Товары продавца публикуются минуя очередь модерации.
+     *
+     * Выдаётся админом персонально — тем, кто грузит каталог сотнями позиций и
+     * уже проверен вручную. Отдельным полем, а не ролью: роль даёт доступ к
+     * чужим данным и staff-экранам, а здесь нужно ровно одно право — своя
+     * карточка попадает в каталог сразу.
+     */
+    productModerationTrusted: {
+      type: Boolean,
+      default: false,
+    },
     notificationsEnabled: {
       // включены ли уведомления
       type: Boolean,
@@ -508,10 +520,33 @@ const UserSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
+    /**
+     * Daily return streak для скидки на услуги площадки (1..7).
+     * 0 — скидки нет (не забрали день / обнулили после оплаты).
+     */
+    promoReturnStreakDay: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 7,
+    },
+    /** YYYY-MM-DD по Europe/Moscow — день последнего «Забрать скидку». */
+    promoReturnStreakLastClaimDate: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: 10,
+    },
     /** Оплачен доступ к форме создания розыгрыша (до первого submit). */
     raffleCreateUnlockAt: {
       type: Date,
       default: null,
+    },
+    /** Сколько баллов зарезервировано за unlock (с учётом streak-скидки). */
+    raffleCreateUnlockPoints: {
+      type: Number,
+      default: null,
+      min: 1,
     },
     userRubBalance: {
       type: Number,

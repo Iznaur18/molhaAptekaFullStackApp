@@ -2,8 +2,8 @@ import { ProductModel } from "../../models/index.js";
 import { PRODUCT_SELLER_PUBLIC_SELECT } from "../../constants/productSellerPublicFields.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { AppError } from "../../errors/AppError.js";
-import { isUserAdmin } from "../access/adminUserGuard.js";
 import { hasProductOpenSales, OPEN_SALES_BLOCK_MESSAGE } from "./productOrderLocks.js";
+import { loadProductWriteAccess } from "./productModerationTrust.js";
 import { applyProductSearchBlobToSet } from "./applyProductSearchBlobToProductWrite.js";
 import {
   computeProductDiscountPercent,
@@ -61,7 +61,9 @@ const patchTouchesOpenSalesLock = (body, existing) => {
  * }} input
  */
 export async function patchMyProduct({ userId, productId, body }) {
-  const isAdmin = await isUserAdmin(userId);
+  // Роль решает, чью карточку можно править; доверие — только пройдёт ли
+  // правка через очередь модерации.
+  const { isAdmin, skipsModeration } = await loadProductWriteAccess(userId);
 
   const ownerFilter = buildOwnerFilter(productId, userId, isAdmin);
   const existing = await ProductModel.findOne(ownerFilter);
@@ -86,7 +88,7 @@ export async function patchMyProduct({ userId, productId, body }) {
   } = await buildProductPatchSet({
       existing,
       body,
-      isAdmin,
+      skipsModeration,
       productId,
     });
 

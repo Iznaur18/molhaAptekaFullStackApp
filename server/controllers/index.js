@@ -102,6 +102,7 @@ import {
 import { updateOrderStatusController } from "./Order/updateOrderStatusController.js";
 import {
   advanceMyShipmentStatusController,
+  cancelOrderShipmentController,
   markOrderItemReturnedBySellerController,
   markOrderItemShippedBySellerController,
   markOrderItemDeliveredBySellerController,
@@ -192,6 +193,7 @@ import {
   getPendingModerationProductsCountController,
   approveProductModerationController,
   rejectProductModerationController,
+  patchSellerProductModerationTrustController,
 } from "./Product/productModerationControllers.js";
 import {
   submitProductReportController,
@@ -296,6 +298,10 @@ import {
   getMyLoyaltyPointsStatusController,
   adminCreditOwnLoyaltyPointsController,
 } from "./User/loyaltyPointsPurchaseControllers.js";
+import {
+  claimMyPromoReturnStreakController,
+  getMyPromoReturnStreakController,
+} from "./User/promoReturnStreakControllers.js";
 import { getMyReferralProgramController } from "./User/referralControllers.js";
 import { getMyAffiliateEarningsController } from "./User/affiliateControllers.js";
 import { getMonthlyLoyaltyPointsAwardedController } from "./User/monthlyLoyaltyPointsControllers.js";
@@ -427,7 +433,9 @@ export {
   declineShipmentController,
   openShipmentDisputeController,
   getStaffDisputesController,
-  postStaffResolveDisputeController,  advanceMyShipmentStatusController,
+  postStaffResolveDisputeController,
+  advanceMyShipmentStatusController,
+  cancelOrderShipmentController,
   markOrderItemReturnedBySellerController,
   markOrderItemShippedBySellerController,
   markOrderItemDeliveredBySellerController,
@@ -487,6 +495,7 @@ export {
   getPendingModerationProductsCountController,
   approveProductModerationController,
   rejectProductModerationController,
+  patchSellerProductModerationTrustController,
   submitProductReportController,
   getMyProductReportStatusController,
   getPendingProductReportsController,
@@ -562,6 +571,8 @@ export {
   purchasePremiumController,
   getMyLoyaltyPointsStatusController,
   adminCreditOwnLoyaltyPointsController,
+  getMyPromoReturnStreakController,
+  claimMyPromoReturnStreakController,
   getMyReferralProgramController,
   getMyAffiliateEarningsController,
   getMonthlyLoyaltyPointsAwardedController,

@@ -492,6 +492,40 @@ test("catalogProductsQuerySchema rejects unknown category", () => {
   });
 });
 
+test("catalogProductsQuerySchema accepts my-products list filters", () => {
+  assert.equal(
+    catalogProductsQuerySchema.parse({ moderationStatus: "not_promoted" })
+      .moderationStatus,
+    "not_promoted",
+  );
+  assert.equal(
+    catalogProductsQuerySchema.parse({ moderationStatus: "promoted" })
+      .moderationStatus,
+    "promoted",
+  );
+  assert.equal(
+    catalogProductsQuerySchema.parse({ moderationStatus: "hidden" })
+      .moderationStatus,
+    "hidden",
+  );
+  assert.equal(
+    catalogProductsQuerySchema.parse({ moderationStatus: "approved" })
+      .moderationStatus,
+    "approved",
+  );
+});
+
+test("catalogProductsQuerySchema rejects unknown moderationStatus with RU message", () => {
+  const result = catalogProductsQuerySchema.safeParse({
+    moderationStatus: "garbage",
+  });
+  assert.equal(result.success, false);
+  assert.equal(
+    result.error.issues[0]?.message,
+    "Некорректный фильтр списка товаров",
+  );
+});
+
 test("catalogProductsQuerySchema accepts search up to CATALOG_SEARCH_QUERY_MAX_LENGTH", () => {
   const ok = "a".repeat(CATALOG_SEARCH_QUERY_MAX_LENGTH);
   assert.equal(catalogProductsQuerySchema.parse({ search: ok }).search, ok);

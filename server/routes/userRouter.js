@@ -32,6 +32,8 @@ import {
   purchasePremiumController,
   getMyLoyaltyPointsStatusController,
   adminCreditOwnLoyaltyPointsController,
+  getMyPromoReturnStreakController,
+  claimMyPromoReturnStreakController,
   getMyReferralProgramController,
   getMyAffiliateEarningsController,
   getMonthlyLoyaltyPointsAwardedController,
@@ -198,6 +200,14 @@ router.get(
   "/me/loyalty-points/status",
   checkAuthMW,
   getMyLoyaltyPointsStatusController,
+);
+
+router.get("/me/promo-return-streak", checkAuthMW, getMyPromoReturnStreakController);
+router.post(
+  "/me/promo-return-streak/claim",
+  checkAuthMW,
+  moneyMutationRateLimiter,
+  claimMyPromoReturnStreakController,
 );
 
 router.post(

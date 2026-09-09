@@ -34,6 +34,9 @@ const LADDER_RANK: Record<string, number> = {
   [ORDER_STATUS_CONFIRMED]: 8,
 };
 
+/** Сделка по позиции закончилась: ни по лестнице, ни в счёт она не идёт. */
+const TERMINAL_STATUSES = new Set([ORDER_STATUS_CANCELLED, ORDER_STATUS_RETURNED]);
+
 const EVERY_IN = (
   items: Array<{ status?: string }>,
   allowedSet: Set<string>,
@@ -68,22 +71,65 @@ export function buildOrderStatusFromItems(
     return ORDER_STATUS_CANCELLED;
   }
 
-  // Статус заказа — это статус самой отстающей активной позиции. Терминальная
-  // позиция рядом с активной означает, что заказ ещё в работе.
+  // Статус заказа — это статус самой отстающей живой позиции. Отменённая и
+  // вернувшаяся из лестницы выпадают: продавец про них уже решил, и тянуть
+  // ими весь заказ назад в «В обработке» нельзя — по этой ступени и клиент, и
+  // сервер решают, какую кнопку показывать и какой переход разрешать.
   let leader: string | null = null;
   let leaderRank = Number.POSITIVE_INFINITY;
   for (const item of items) {
-    const rank = LADDER_RANK[String(item?.status)];
+    const status = String(item?.status);
+    if (TERMINAL_STATUSES.has(status)) continue;
+
+    const rank = LADDER_RANK[status];
     if (rank === undefined) {
       return ORDER_STATUS_PENDING;
     }
     if (rank < leaderRank) {
       leaderRank = rank;
-      leader = String(item.status);
+      leader = status;
     }
   }
 
   return leader ?? ORDER_STATUS_PENDING;
+}
+
+export type OrderItemsSummary = {
+  /** Штук в заказе. */
+  quantity: number;
+  /** Сумма к оплате. */
+  totalAmount: number;
+};
+
+/**
+ * Свод карточки заказа: сколько штук и на какую сумму.
+ *
+ * Отменённые и возвращённые позиции в свод не входят: покупатель за них не
+ * платит, и после отмены карточка обязана показывать новую сумму, а не ту, с
+ * которой заказ создавали.
+ */
+export function summarizeOrderItems(
+  items:
+    | Array<{
+        status?: string;
+        quantity?: number;
+        unitPriceAtOrder?: number;
+        buyNFreeUnitsAtOrder?: number;
+      }>
+    | null
+    | undefined,
+): OrderItemsSummary {
+  const billable = Array.isArray(items)
+    ? items.filter((item) => !TERMINAL_STATUSES.has(String(item?.status)))
+    : [];
+
+  return {
+    quantity: billable.reduce(
+      (sum, item) => sum + Math.max(0, Math.floor(Number(item?.quantity) || 0)),
+      0,
+    ),
+    totalAmount: calculateOrderItemsTotalAmount(billable),
+  };
 }
 
 /**

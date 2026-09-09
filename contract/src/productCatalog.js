@@ -32,6 +32,22 @@ export const PRODUCT_CATALOG_NEAR_REGION_SECTION_TITLE = "В вашем реги
 export const CATALOG_SEARCH_QUERY_MAX_LENGTH = 200;
 
 /**
+ * Query `moderationStatus` для `GET /product/my` (единый list-фильтр).
+ * Синхрон с `server/constants/productModerationConstants.js`.
+ */
+export const MY_PRODUCTS_LIST_FILTER_VALUES = [
+  "pending",
+  "approved",
+  "rejected",
+  "hidden",
+  "promoted",
+  "not_promoted",
+];
+
+export const MY_PRODUCTS_LIST_FILTER_INVALID_MESSAGE =
+  "Некорректный фильтр списка товаров";
+
+/**
  * Подпись дистанции для каталога «Рядом».
  * &lt;10 км → `~1.2 км` (1 знак, мин. 0.1); ≥10 → `~12 км`.
  *
@@ -85,6 +101,15 @@ export function splitCatalogNearProducts(products) {
   }
   return { withDistance, withoutDistance };
 }
+
+/**
+ * Fallback-slug для товара, которому не досталось узла дерева (в основном —
+ * импорт из 1С). Каталожной категорией не является: в `roots` и меню не
+ * попадает, поэтому в `PRODUCT_CATEGORY_SLUGS` его нет. Но в товарах он лежит
+ * как настоящее значение `productCategory`, и фильтровать по нему можно —
+ * иначе карточка такого товара не может запросить «похожие».
+ */
+export const UNCATEGORIZED_PRODUCT_CATEGORY_SLUG = "uncategorized";
 
 /** Slug категории — синхрон с `server/constants/productConstants.js`. */
 export const PRODUCT_CATEGORY_SLUGS = [
@@ -143,6 +168,7 @@ export const catalogProductsQuerySchema = z.object({
   productCategory: optionalTrimmedString.refine(
     (slug) =>
       slug === undefined ||
+      slug === UNCATEGORIZED_PRODUCT_CATEGORY_SLUG ||
       PRODUCT_CATEGORY_SLUGS.includes(/** @type {(typeof PRODUCT_CATEGORY_SLUGS)[number]} */ (slug)),
     { message: "Указана неизвестная категория" },
   ),
@@ -169,7 +195,11 @@ export const catalogProductsQuerySchema = z.object({
   near: optionalTruthyFlag,
   /** Только активные горящие скидки. */
   flashSaleOnly: optionalTruthyFlag,
-  moderationStatus: z.enum(["pending", "rejected"]).optional(),
+  moderationStatus: z
+    .enum(MY_PRODUCTS_LIST_FILTER_VALUES, {
+      errorMap: () => ({ message: MY_PRODUCTS_LIST_FILTER_INVALID_MESSAGE }),
+    })
+    .optional(),
   regionCode: optionalRuRegionCodeFieldSchema,
 });
 

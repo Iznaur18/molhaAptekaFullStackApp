@@ -96,6 +96,8 @@ export function RaffleAdvertisingSection({
 
   const status = statusQuery.data ?? {};
   const pricePoints = status.pricePoints ?? 3_000;
+  const listPricePoints = status.listPricePoints ?? pricePoints;
+  const discountPercent = status.discountPercent ?? 0;
   const raffle = status.raffle ?? null;
   const hasOpenRaffle = status.hasOpenRaffle === true;
   const canOpenForm = status.canOpenForm === true;
@@ -117,7 +119,12 @@ export function RaffleAdvertisingSection({
       <dl className="advertising-page__meta">
         <div className="advertising-page__meta-item">
           <dt>{RAFFLE_ADVERTISING_PAGE_UI.COST_LABEL}</dt>
-          <dd>{RAFFLE_ADVERTISING_PAGE_UI.PRICE(pricePoints)}</dd>
+          <dd>
+            {RAFFLE_ADVERTISING_PAGE_UI.PRICE(pricePoints)}
+            {discountPercent > 0 && listPricePoints > pricePoints
+              ? ` (было ${listPricePoints})`
+              : ""}
+          </dd>
         </div>
       </dl>
 

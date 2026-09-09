@@ -1,4 +1,11 @@
 export {
+  EMAIL_AUTH_DISABLED_MESSAGE,
+  EMAIL_AUTH_ENABLED_DEFAULT,
+  isEmailAuthEnabled,
+  resolveAuthContactChannel,
+} from "./emailAuthKillSwitch.js";
+export type { AuthContactChannel } from "./emailAuthKillSwitch.js";
+export {
   extractZodIssueUserMessage,
   formatApiErrorMessage,
 } from "./formatApiErrorMessage.js";
@@ -49,7 +56,9 @@ export {
   ORDER_STATUS_SHIPPED,
   buildOrderStatusFromItems,
   calculateOrderItemsTotalAmount,
+  summarizeOrderItems,
 } from "./orderStatus.js";
+export type { OrderItemsSummary } from "./orderStatus.js";
 export {
   MY_ORDER_UNKNOWN_SELLER_ID,
   projectMyOrderSellerBlocks,

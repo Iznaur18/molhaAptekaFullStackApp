@@ -19,6 +19,7 @@ export function AppShellProductModals({
   isSellerProductsLimitModalOpen,
   setIsSellerProductsLimitModalOpen,
   sellerProductsLimit,
+  hasPersonalSellerProductsLimit,
   isCreateProductModalOpen,
   setIsCreateProductModalOpen,
   handleCreateProductSuccess,
@@ -71,6 +72,7 @@ export function AppShellProductModals({
   isPromotionSubmitPending,
   handleClosePromotionModal,
   handleSubmitPromotionRequest,
+  handleTopUpPromotionPoints,
   raffleModal,
   setRaffleModal,
   refreshRaffleSurfaces,
@@ -84,6 +86,7 @@ export function AppShellProductModals({
         onClose={() => setIsSellerProductsLimitModalOpen(false)}
         isPremiumUser={isPremiumUser}
         limit={sellerProductsLimit}
+        hasPersonalOverride={hasPersonalSellerProductsLimit}
       />
       <CreateProductModal
         isOpen={isCreateProductModalOpen}
@@ -116,6 +119,11 @@ export function AppShellProductModals({
         isSubmitting={isPromotionSubmitPending}
         onClose={handleClosePromotionModal}
         onSubmit={handleSubmitPromotionRequest}
+        onTopUpPoints={handleTopUpPromotionPoints}
+        loyaltyPointsAvailable={Math.max(
+          0,
+          (Number(loyaltyPoints) || 0) - (Number(loyaltyPointsReserved) || 0),
+        )}
         onSetProductAvailability={handleSetMyProductAvailability}
         onSetProductAuction={handleSetProductAuction}
         onSetProductQa={handleSetProductQa}

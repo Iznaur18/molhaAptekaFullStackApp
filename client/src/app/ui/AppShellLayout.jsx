@@ -13,6 +13,7 @@ import { useAppShell } from "../model/AppShellContext.jsx";
 import { AppShellHeader } from "./AppShellHeader.jsx";
 import { AppShellRouteSuspense } from "./AppShellRouteSuspense.jsx";
 import { AddressPromptHost } from "../../features/address-prompt/ui/AddressPromptHost.jsx";
+import { PromoReturnStreakDock } from "../../widgets/promo-return-streak-dock/ui/PromoReturnStreakDock.jsx";
 
 import "./AppShell.css";
 
@@ -73,6 +74,7 @@ export function AppShellLayout() {
         <LazyAppShellModalsLayer {...modalsLayerProps} />
       </Suspense>
       <AddressPromptHost />
+      {isAuthorized ? <PromoReturnStreakDock /> : null}
     </div>
   );
 }

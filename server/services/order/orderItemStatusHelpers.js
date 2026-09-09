@@ -52,6 +52,31 @@ export const loadOrderWithItems = async (orderId, session = null) => {
 };
 
 /**
+ * Позиция без требования живого товара.
+ *
+ * Удалённый из каталога товар не должен запирать заказ: продавец и название
+ * записаны в саму строку при оформлении, и для отмены этого достаточно.
+ *
+ * @param {import('mongoose').Document} order
+ * @param {number} itemIndex
+ */
+export const getOrderItemOrThrow = (order, itemIndex) => {
+  const targetItem = getOrderItemByIndex(order, itemIndex);
+  if (!targetItem) {
+    throw new AppError(404, "Позиция заказа не найдена");
+  }
+  return targetItem;
+};
+
+/** Продавец позиции: снимок на строке, каталог — только запасной путь. */
+export const resolveOrderItemSellerId = (item) =>
+  normalizeId(
+    item?.sellerIdAtOrder ??
+      item?.productId?.productSeller?._id ??
+      item?.productId?.productSeller,
+  );
+
+/**
  * @param {import('mongoose').Document} order
  * @param {number} itemIndex
  */

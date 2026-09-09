@@ -37,6 +37,7 @@ export const useHomeMainContentProps = () => {
     sellerProductsLimit,
     myProductsModerationFilter,
     setMyProductsModerationFilter,
+    isProductModerationTrusted,
     setIsLoginModalOpen,
     handleSellerNameClick,
     handleCatalogProductClick,
@@ -110,6 +111,7 @@ export const useHomeMainContentProps = () => {
       sellerProductsLimit,
       myProductsModerationFilter,
       onMyProductsModerationFilterChange: setMyProductsModerationFilter,
+      isModerationTrusted: isProductModerationTrusted,
     }),
     [
       catalogSort,
@@ -119,6 +121,7 @@ export const useHomeMainContentProps = () => {
       sellerProductsLimit,
       myProductsModerationFilter,
       setMyProductsModerationFilter,
+      isProductModerationTrusted,
     ],
   );
 

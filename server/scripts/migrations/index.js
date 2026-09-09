@@ -43,6 +43,7 @@ import { up as swapShipmentPayoutCarrierUp } from "./20260904-swap-shipment-payo
 import { up as sellerFulfillmentDefaultsUp } from "./20260905-seller-fulfillment-defaults.js";
 import { up as productPromotionMinAmountUp } from "./20260906-product-promotion-min-amount.js";
 import { up as productModerationFingerprintUp } from "./20260907-product-moderation-fingerprint.js";
+import { up as approvePendingForTrustedSellersUp } from "./20260909-approve-pending-for-trusted-sellers.js";
 
 export const MIGRATIONS = [
   {
@@ -281,5 +282,11 @@ export const MIGRATIONS = [
     description:
       "Backfill productModerationApprovedHash for already approved products so re-created 1C cards keep their approval",
     up: productModerationFingerprintUp,
+  },
+  {
+    id: "20260909-approve-pending-for-trusted-sellers",
+    description:
+      "Approve pending products for sellers who already have productModerationTrusted",
+    up: approvePendingForTrustedSellersUp,
   },
 ];

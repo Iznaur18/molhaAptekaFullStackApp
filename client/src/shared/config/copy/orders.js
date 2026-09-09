@@ -92,9 +92,14 @@ export const ORDER_CARD_UI = {
   SHIPMENT_DELIVERY: "Доставка",
   ACTION_CONFIRM: "Подтвердить",
   ACTION_CANCEL: "Отменить",
+  ACTION_CANCEL_ORDER: "Отменить заказ",
   ACTION_PENDING: "Сохраняем…",
   CANCEL_CONFIRM: "Отменить заказ покупателя?",
   BUYER_CANCEL_CONFIRM: "Отменить заказ?",
+  // Кнопка у строки убирает одну позицию, кнопка отправления — весь заказ.
+  // Один и тот же вопрос на обеих делал их неразличимыми.
+  ITEM_CANCEL_CONFIRM: "Убрать эту позицию из заказа?",
+  ITEM_CANCELLED_BADGE: "Отмена",
   DELETED_PRODUCT_NAME: "Товар удалён",
   /** @param {number} points */
   LOYALTY_POINTS_LINE: (points) => `+${points} баллов за шт. (подтверждённому покупателю)`,

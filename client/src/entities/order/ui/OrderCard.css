@@ -235,6 +235,36 @@
   border-radius: 0.4rem;
 }
 
+/* Отменённая позиция остаётся в списке как история заказа, но не должна
+   читаться как то, что покупателю всё ещё везут. */
+.order-card__item_cancelled {
+  background: var(--iz-color-surface-muted);
+}
+
+.order-card__item_cancelled .order-card__item-name,
+.order-card__item_cancelled .order-card__item-name-button,
+.order-card__item_cancelled .order-card__item-quantity,
+.order-card__item_cancelled .order-card__item-price {
+  color: var(--iz-color-text-muted);
+  text-decoration: line-through;
+}
+
+.order-card__item_cancelled .order-card__item-thumb-image {
+  filter: grayscale(1);
+}
+
+.order-card__item-cancelled-badge {
+  flex-shrink: 0;
+  padding: 0.05rem 0.4rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 999px;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
 .order-card__item-thumb,
 .order-card__item-thumb_button {
   display: block;
@@ -531,6 +561,10 @@
   border-radius: 14px;
   background: var(--iz-color-surface);
   border: 1px solid var(--iz-color-border);
+}
+
+.order-card--compact .order-card__item_cancelled {
+  background: var(--iz-color-surface-muted);
 }
 
 .order-card--compact .order-card__item-thumb,

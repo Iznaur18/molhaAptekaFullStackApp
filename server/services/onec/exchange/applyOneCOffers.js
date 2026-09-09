@@ -112,7 +112,7 @@ export function createOneCOffersApplier({
   priceTypeIds,
   warehouseIds,
   onIssue,
-  materializeHeld,
+  materializeHeld: _materializeHeld,
   seenAt = new Date(),
 }) {
   const allowedPriceTypeIds = new Set(
@@ -180,19 +180,8 @@ export function createOneCOffersApplier({
           continue;
         }
 
-        const effectiveStock = stock ?? held.lastKnownStock ?? null;
-        const effectivePrice = price ?? held.lastKnownPrice ?? 0;
-
-        if (effectiveStock !== null && effectiveStock > 0 && materializeHeld) {
-          await materializeHeld({
-            held,
-            price: effectivePrice,
-            stock: effectiveStock,
-          });
-          stats.restored += 1;
-          continue;
-        }
-
+        // Без картинок карточку не создаём даже при остатке > 0: фото приедут
+        // в import.xml, тогда applyCatalog сам заведёт Product из отстойника.
         await holdOneCProduct({
           sellerId,
           externalId: offer.externalId,
@@ -225,10 +214,8 @@ export function createOneCOffersApplier({
       const effectivePrice = set.productPrice ?? product.productPrice;
       const effectiveStock = set.productStockQuantity ?? product.productStockQuantity;
 
-      // Остаток обнулился, а картинок у карточки нет — показывать нечего:
-      // снимаем с витрины и ждём ближайшего остатка. Карточку не удаляем,
-      // иначе её пришлось бы заводить заново и гнать через модерацию.
-      if (effectiveStock <= 0 && !productHasImages(product)) {
+      // Без картинок показывать нечего — снимаем с витрины, даже если остаток > 0.
+      if (!productHasImages(product)) {
         const { hidden } = await hideProductByOneCHoldRule({
           sellerId,
           product,

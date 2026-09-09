@@ -5,7 +5,10 @@ import {
   MY_PRODUCTS_MODERATION_FILTER_OPTIONS,
   MY_PRODUCTS_MODERATION_FILTER_LABEL_RU,
 } from "../../../entities/product/model/productConstants.js";
-import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  HOME_PAGE_UI,
+  PRODUCT_MODERATION_PAGE_UI,
+} from "../../../shared/config/appUiCopy.js";
 import {
   ListPageFilter,
   ListPageFilterBar,
@@ -23,6 +26,7 @@ import "./MyProductsCatalogToolbar.css";
  *   sellerProductsLimit: number | null;
  *   myProductsModerationFilter?: string;
  *   onMyProductsModerationFilterChange?: (value: string) => void;
+ *   isModerationTrusted?: boolean;
  * }} props
  */
 export function MyProductsCatalogToolbar({
@@ -33,6 +37,7 @@ export function MyProductsCatalogToolbar({
   sellerProductsLimit,
   myProductsModerationFilter = "",
   onMyProductsModerationFilterChange,
+  isModerationTrusted = false,
 }) {
   const showProductsQuota = sellerProductsLimit != null && !isAdmin;
   const productsQuotaText =
@@ -69,6 +74,11 @@ export function MyProductsCatalogToolbar({
             ))}
           </ListPageFilterSelect>
         </ListPageFilter>
+      ) : null}
+      {isModerationTrusted ? (
+        <p className="my-products-catalog-toolbar__trust">
+          {PRODUCT_MODERATION_PAGE_UI.SELLER_TRUSTED_NOTICE}
+        </p>
       ) : null}
       {productsQuotaText ? (
         <p

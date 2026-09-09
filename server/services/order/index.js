@@ -16,9 +16,9 @@ export {
   syncOrderStatusFromItems,
 } from "./orderStatus.js";
 export { parseItemIndex } from "./orderItemStatusHelpers.js";
+export { cancelOrderShipment, markOrderItemCancelled } from "./cancelOrderItems.js";
 export {
   confirmOrderItemByBuyer,
-  markOrderItemCancelled,
   markOrderItemDeliveredBySeller,
   markOrderItemShippedBySeller,
 } from "./updateOrderItemStatus.js";

@@ -105,11 +105,8 @@ export const staffCourierModerationBodySchema = z
     }
   });
 
-/** Params курьерских действий: отправление = заказ + продавец. */
-export const courierShipmentParamsSchema = z.object({
-  orderId: mongoIdSchema,
-  sellerId: mongoIdSchema,
-});
+/** Params курьерских действий — тот же адрес отправления, что и у заказа. */
+export { orderShipmentParamsSchema as courierShipmentParamsSchema } from "./order.js";
 
 export const COURIER_HANDOVER_CODE_LENGTH = 4;
 

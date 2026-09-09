@@ -36,3 +36,11 @@ export const DEFAULT_USER_AVATAR_URL =
 
 export const USER_PROFILE_PRODUCTS_PAGE_SIZE = 5;
 export const USER_PROFILE_PRODUCTS_API_LIMIT_MAX = 20;
+
+/**
+ * Сколько товаров продавца тянут превью-блоки (полоска в профиле, карусель в
+ * карточке товара). Ровно одна страница: у продавца может быть несколько тысяч
+ * позиций, а превью показывает первые несколько — настоящее количество берётся
+ * из `pagination.total`, докачивать остальные страницы незачем.
+ */
+export const USER_PROFILE_PRODUCTS_PREVIEW_LIMIT = USER_PROFILE_PRODUCTS_API_LIMIT_MAX;

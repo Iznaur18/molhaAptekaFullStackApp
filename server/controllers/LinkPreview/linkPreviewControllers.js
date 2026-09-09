@@ -54,9 +54,13 @@ export const productLinkPreviewController = async (req, res, next) => {
     return next();
   }
 
+  // Под `/product/:productId` лежат и обычные API-пути в один сегмент
+  // (`/product/badge-explains`, `/product/my`, …). Отдавать на них OG-заглушку
+  // 404 нельзя: для crawler-UA это подменяло JSON на HTML — Googlebot ловил
+  // 404 на живом эндпоинте. Не ObjectId → это не карточка, пропускаем дальше.
   const productId = String(req.params.productId ?? "").trim();
   if (!mongoose.isValidObjectId(productId)) {
-    return sendSiteFallbackPreview(res, `/product/${encodeURIComponent(productId)}`);
+    return next();
   }
 
   const preview = await getProductLinkPreview(productId);
@@ -73,9 +77,11 @@ export const sellerLinkPreviewController = async (req, res, next) => {
     return next();
   }
 
+  // Как и в productLinkPreviewController: не ObjectId — не карточка продавца,
+  // отдаём путь дальше по цепочке, а не OG-заглушкой с 404.
   const sellerId = String(req.params.sellerId ?? "").trim();
   if (!mongoose.isValidObjectId(sellerId)) {
-    return sendSiteFallbackPreview(res, `/seller/${encodeURIComponent(sellerId)}`);
+    return next();
   }
 
   const preview = await getSellerLinkPreview(sellerId);

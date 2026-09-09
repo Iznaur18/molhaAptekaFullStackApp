@@ -27,6 +27,7 @@ import { productIdParamValidation } from "./product/productIdParamValidation.js"
 import { productsSearchValidation } from "./product/productsSearchValidation.js";
 import { patchMyProductValidation } from "./product/patchMyProductValidation.js";
 import { rejectProductModerationValidation } from "./product/rejectProductModerationValidation.js";
+import { productModerationTrustValidation } from "./product/productModerationTrustValidation.js";
 import { submitProductReportValidation } from "./product/submitProductReportValidation.js";
 import { resolveProductReportsValidation } from "./product/resolveProductReportsValidation.js";
 import {
@@ -68,6 +69,7 @@ import { updateOrderStatusValidation } from "./order/updateOrderStatusValidation
 import { getAllOrdersValidation } from "./order/getAllOrdersValidation.js";
 import { getMySalesValidation } from "./order/getMySalesValidation.js";
 import { getMyOrdersValidation } from "./order/getMyOrdersValidation.js";
+import { orderCancelValidation } from "./order/orderCancelValidation.js";
 import { orderItemActionValidation } from "./order/orderItemActionValidation.js";
 import { orderItemCancelValidation } from "./order/orderItemCancelValidation.js";
 import { advanceShipmentStatusValidation } from "./order/advanceShipmentStatusValidation.js";
@@ -199,6 +201,7 @@ export {
   productsSearchValidation,
   patchMyProductValidation,
   rejectProductModerationValidation,
+  productModerationTrustValidation,
   submitProductReportValidation,
   resolveProductReportsValidation,
   submitProductPriceOfferValidation,
@@ -228,6 +231,7 @@ export {
   getAllOrdersValidation,
   getMySalesValidation,
   getMyOrdersValidation,
+  orderCancelValidation,
   orderItemActionValidation,
   orderItemCancelValidation,
   advanceShipmentStatusValidation,

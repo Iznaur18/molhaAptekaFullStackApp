@@ -1,3 +1,4 @@
+import { isEmailAuthEnabled, resolveAuthContactChannel } from "@izibuy/shared-lib";
 import { sanitizeUserNameInputLive } from "@molha/api-contract";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -38,6 +39,7 @@ import { AppButton } from "@/shared/ui/AppButton";
 import { AuthScreenScroll } from "@/shared/ui/AuthScreenScroll";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 import { PasswordTextInput } from "@/shared/ui/PasswordTextInput";
+import { AuthContactChannelToggle } from "@/shared/ui/AuthContactChannelToggle";
 import { ScreenBackButton } from "@/shared/ui/ScreenBackButton";
 
 type AuthChannel = "email" | "phone";
@@ -75,7 +77,9 @@ export default function RegisterScreen() {
   const registerMutation = useRegisterMutation();
   const confirmMutation = useConfirmRegistrationMutation();
 
-  const [channel, setChannel] = useState<AuthChannel>("email");
+  const [channel, setChannel] = useState<AuthChannel>(() =>
+    resolveAuthContactChannel("email"),
+  );
   const [pendingRegistration, setPendingRegistration] =
     useState<PendingRegistration | null>(null);
   const [code, setCode] = useState("");
@@ -360,56 +364,17 @@ export default function RegisterScreen() {
             <View style={styles.body}>
               <Text style={styles.title}>{AUTH_UI.REGISTER_TITLE}</Text>
               <Text style={styles.subtitle}>{AUTH_UI.REGISTER_SUBTITLE}</Text>
+              {isEmailAuthEnabled() ? null : (
+                <Text style={styles.subtitle}>{AUTH_UI.EMAIL_AUTH_DISABLED_NOTICE}</Text>
+              )}
 
               <View style={styles.form}>
-                <View
-                  style={styles.channelRow}
-                  accessibilityRole="tablist"
+                <AuthContactChannelToggle
+                  channel={channel}
+                  onChange={handleChannelChange}
+                  disabled={isFormBusy}
                   accessibilityLabel={AUTH_UI.REGISTER_CHANNEL_ARIA}
-                >
-                  <Pressable
-                    style={({ pressed }) => [
-                      styles.channelBtn,
-                      channel === "email" && styles.channelBtnActive,
-                      isFormBusy && styles.channelBtnDisabled,
-                      pressed && !isFormBusy && styles.channelBtnPressed,
-                    ]}
-                    onPress={() => handleChannelChange("email")}
-                    disabled={isFormBusy}
-                    accessibilityRole="tab"
-                    accessibilityState={{ selected: channel === "email" }}
-                  >
-                    <Text
-                      style={[
-                        styles.channelBtnLabel,
-                        channel === "email" && styles.channelBtnLabelActive,
-                      ]}
-                    >
-                      {AUTH_UI.CHANNEL_EMAIL}
-                    </Text>
-                  </Pressable>
-                  <Pressable
-                    style={({ pressed }) => [
-                      styles.channelBtn,
-                      channel === "phone" && styles.channelBtnActive,
-                      isFormBusy && styles.channelBtnDisabled,
-                      pressed && !isFormBusy && styles.channelBtnPressed,
-                    ]}
-                    onPress={() => handleChannelChange("phone")}
-                    disabled={isFormBusy}
-                    accessibilityRole="tab"
-                    accessibilityState={{ selected: channel === "phone" }}
-                  >
-                    <Text
-                      style={[
-                        styles.channelBtnLabel,
-                        channel === "phone" && styles.channelBtnLabelActive,
-                      ]}
-                    >
-                      {AUTH_UI.CHANNEL_PHONE}
-                    </Text>
-                  </Pressable>
-                </View>
+                />
 
                 {channel === "email" ? (
                   <View style={styles.field}>

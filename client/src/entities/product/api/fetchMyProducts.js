@@ -14,7 +14,14 @@ import {
  *   limit?: number;
  *   productCategory?: string;
  *   sort?: string;
- *   moderationStatus?: '' | 'pending' | 'rejected';
+ *   moderationStatus?:
+ *     | ''
+ *     | 'pending'
+ *     | 'approved'
+ *     | 'rejected'
+ *     | 'hidden'
+ *     | 'promoted'
+ *     | 'not_promoted';
  * }} [options]
  * @returns {Promise<{
  *   products: import('../model/types.js').ProductFromApi[];

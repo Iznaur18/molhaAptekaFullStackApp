@@ -28,7 +28,10 @@ describe("rollup статуса заказа: старое поведение", 
 
   it("возврат рядом с активной позицией не закрывает заказ", () => {
     assert.equal(rollup("returned", "pending"), "pending");
-    assert.equal(rollup("returned", "shipped"), "pending");
+  });
+
+  it("вернувшаяся позиция не тянет ступень живых назад", () => {
+    assert.equal(rollup("returned", "shipped"), "shipped");
   });
 });
 
@@ -51,8 +54,11 @@ describe("rollup статуса заказа: новые ступени", () => 
     );
   });
 
-  it("отмена рядом с новой ступенью не закрывает заказ", () => {
-    assert.equal(rollup("cancelled", "assembling"), "pending");
+  it("отмена рядом с новой ступенью не закрывает заказ и не сбрасывает ступень", () => {
+    // Кнопка продавца строится по этой ступени, а сервер считает переход по
+    // живым позициям: разойдясь, они давали 409 на «Принять» после отмены.
+    assert.equal(rollup("cancelled", "assembling"), "assembling");
+    assert.equal(rollup("cancelled", "accepted"), "accepted");
   });
 
   it("неизвестный статус не роняет свод", () => {

@@ -1,11 +1,8 @@
-import { Copy } from "lucide-react";
-
 import {
   CURATED_PRODUCT_COMPACT_CARD_UI,
   PRODUCT_CARD_UI,
   PRODUCT_MODERATION_PAGE_UI,
 } from "../../../shared/config/appUiCopy.js";
-import { AppIcon } from "../../../shared/ui/icon/AppIcon.jsx";
 import { formatProductReviewRatingLine } from "../../product-review/lib/formatProductReviewRatingLine.js";
 import {
   hasProductCatalogDiscount,
@@ -26,6 +23,7 @@ import { isProductPromoteButtonDisabled } from "../lib/isProductPromoteButtonDis
 import { ProductPriceDisplay } from "./ProductPriceDisplay.jsx";
 import { ProductCompactCardMediaThumb } from "./ProductCompactCardMediaThumb.jsx";
 import { ProductCompactCardStatusPill } from "./ProductCompactCardStatusPill.jsx";
+import { MyProductCompactCardOverflowMenu } from "./MyProductCompactCardOverflowMenu.jsx";
 
 import "./MyProductCatalogCard.css";
 
@@ -38,6 +36,7 @@ import "./MyProductCatalogCard.css";
  *   onOpenProduct?: () => void;
  *   onEditProduct?: () => void;
  *   onCopyProduct?: () => void;
+ *   onDeleteProduct?: () => void;
  *   onPromoteProduct?: () => void;
  *   isDeletePending?: boolean;
  *   isAvailabilityTogglePending?: boolean;
@@ -52,6 +51,7 @@ export function MyProductCatalogCard({
   onOpenProduct,
   onEditProduct,
   onCopyProduct,
+  onDeleteProduct,
   onPromoteProduct,
   isDeletePending = false,
   isAvailabilityTogglePending = false,
@@ -86,6 +86,9 @@ export function MyProductCatalogCard({
   const showPromote = typeof onPromoteProduct === "function";
   const showEdit = typeof onEditProduct === "function" && canEdit;
   const showCopy = typeof onCopyProduct === "function";
+  const showDelete = typeof onDeleteProduct === "function";
+  const showMore = showCopy || showDelete;
+  const showToolbar = showPromote || showEdit || showMore;
   const promoteDisabled = isProductPromoteButtonDisabled({
     isDeletePending,
     isAvailabilityTogglePending,
@@ -164,7 +167,7 @@ export function MyProductCatalogCard({
         </p>
       ) : null}
 
-      {showPromote || showEdit || showCopy ? (
+      {showToolbar ? (
         <>
           <div className="my-product-compact-card__divider" />
           <div
@@ -193,16 +196,16 @@ export function MyProductCatalogCard({
                 {PRODUCT_CARD_UI.EDIT_PRODUCT}
               </button>
             ) : null}
-            {showCopy ? (
-              <button
-                type="button"
-                className="my-product-compact-card__copy"
+            {showMore ? (
+              <MyProductCompactCardOverflowMenu
+                showCopy={showCopy}
+                showDelete={showDelete}
+                isDeletePending={isDeletePending}
+                hasOpenSales={product.hasOpenSales === true}
                 disabled={isDeletePending}
-                onClick={onCopyProduct}
-                aria-label={PRODUCT_CARD_UI.COPY_PRODUCT_ARIA}
-              >
-                <AppIcon icon={Copy} size="sm" />
-              </button>
+                onCopyProduct={onCopyProduct}
+                onDeleteProduct={onDeleteProduct}
+              />
             ) : null}
           </div>
         </>

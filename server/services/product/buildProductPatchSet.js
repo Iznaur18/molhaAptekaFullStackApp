@@ -29,6 +29,7 @@ import {
   SHIPPING_CARRIER_DISABLED_MESSAGE,
 } from "../../constants/loboConstants.js";
 import { normalizeProductInstagramPostUrl } from "./productInstagramPostUrl.js";
+import { buildProductModerationFingerprint } from "./productContentFingerprint.js";
 import { patchBodyTouchesModerationContent } from "./productModeration.js";
 import {
   assertProductOldPricePair,
@@ -687,10 +688,10 @@ const applyInstagramPostUrlField = (body, $set) => {
   }
 };
 
-const applyModerationAndAvailability = (body, $set, existing, isAdmin) => {
+const applyModerationAndAvailability = (body, $set, existing, skipsModeration) => {
   const touchesContent = patchBodyTouchesModerationContent(body);
 
-  if (!isAdmin) {
+  if (!skipsModeration) {
     // Pending: owner may edit content; status stays pending (no queue re-bump).
     // Approved/rejected content → re-submit to pending + hide from catalog.
     const resubmitForModeration =
@@ -712,6 +713,15 @@ const applyModerationAndAvailability = (body, $set, existing, isAdmin) => {
   if (hasBodyField(body, "productIsAvailable")) {
     $set.productIsAvailable = Boolean(body.productIsAvailable);
   }
+
+  // Правка прошла без проверки — отпечаток обязан догнать новое содержимое,
+  // иначе он описывает карточку, которой больше нет.
+  if (touchesContent && existing.productModerationStatus === PRODUCT_MODERATION_APPROVED) {
+    $set.productModerationApprovedHash = buildProductModerationFingerprint({
+      ...existing,
+      ...$set,
+    });
+  }
 };
 
 const applyStockField = async (body, $set, existing, productId) => {
@@ -726,7 +736,10 @@ const applyStockField = async (body, $set, existing, productId) => {
     $set.productStockQuantity = nextStock;
     if (nextStock === 0) {
       $set.productIsAvailable = false;
-    } else if (existing.productModerationStatus === PRODUCT_MODERATION_APPROVED) {
+    } else if (
+      ($set.productModerationStatus ?? existing.productModerationStatus) ===
+      PRODUCT_MODERATION_APPROVED
+    ) {
       $set.productIsAvailable = true;
     }
   } catch (error) {
@@ -765,11 +778,16 @@ const applyQaField = (body, $set) => {
  * @param {{
  *   existing: import("mongoose").Document;
  *   body: Record<string, unknown>;
- *   isAdmin: boolean;
+ *   skipsModeration: boolean;
  *   productId: string;
  * }} input
  */
-export async function buildProductPatchSet({ existing, body, isAdmin, productId }) {
+export async function buildProductPatchSet({
+  existing,
+  body,
+  skipsModeration,
+  productId,
+}) {
   const $set = {};
   const $unset = {};
 
@@ -790,7 +808,7 @@ export async function buildProductPatchSet({ existing, body, isAdmin, productId 
   applyImageFields(body, $set);
   await applyPreviewVideoFields(body, $set, existing);
   applyInstagramPostUrlField(body, $set);
-  applyModerationAndAvailability(body, $set, existing, isAdmin);
+  applyModerationAndAvailability(body, $set, existing, skipsModeration);
   await applyStockField(body, $set, existing, productId);
 
   const auctionState = applyAuctionField(body, $set, existing);

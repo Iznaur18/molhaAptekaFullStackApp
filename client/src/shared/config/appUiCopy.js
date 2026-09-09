@@ -111,6 +111,7 @@ export {
   SELLER_COMMERCE_DEFAULTS_UI,
   PRODUCT_FULFILLMENT_SOURCE_UI,
 } from "./copy/seller-commerce-defaults.js";
+export { PROMO_RETURN_STREAK_DOCK_UI } from "./copy/promo-return-streak.js";
 export {
   AUCTION_PAGE_UI,
 } from "./copy/auction.js";
@@ -189,6 +190,7 @@ export {
   USERS_PODIUM_UI,
   USERS_MONTHLY_LOYALTY_LOADBAR_UI,
   ADMIN_EDIT_USER_UI,
+  ADMIN_PRODUCT_MODERATION_TRUST_UI,
   USER_LIST_ROW_UI,
   ADMIN_PANEL_UI,
   POPULAR_PRODUCTS_ADMIN_PAGE_UI,

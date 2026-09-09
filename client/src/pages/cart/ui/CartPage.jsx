@@ -46,6 +46,7 @@ import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { CartAuctionSection } from "./CartAuctionSection.jsx";
 import { CartFulfillmentSection } from "./CartFulfillmentSection.jsx";
 import { CartSellerList } from "./CartSellerList.jsx";
+import { CartPageSkeleton } from "./CartPageSkeleton.jsx";
 
 import "./CartPage.css";
 
@@ -579,7 +580,7 @@ export function CartPage({
   }
 
   if (phase === "loading") {
-    return <p className="cart-page__state">{CART_PAGE_UI.LOADING}</p>;
+    return <CartPageSkeleton />;
   }
   if (phase === "error") {
     return (

@@ -11,7 +11,10 @@ import {
   type ViewStyle,
 } from "react-native";
 import { resolveOrderShippingTrackingUrl } from "@molha/api-contract";
-import { resolveOrderLineAffiliateSellerLine } from "@izibuy/shared-lib";
+import {
+  resolveOrderLineAffiliateSellerLine,
+  summarizeOrderItems,
+} from "@izibuy/shared-lib";
 
 if (
   Platform.OS === "android" &&
@@ -41,6 +44,7 @@ import { OrderCardLineItemThumb } from "@/entities/order/ui/OrderCardLineItemThu
 import { BuyerPassportSharePanel } from "@/entities/installment/ui/BuyerPassportSharePanel";
 import {
   ORDER_PAYMENT_METHOD_LABEL_RU,
+  ORDER_STATUS_CANCELLED,
   ORDER_STATUS_DELIVERED,
   ORDER_STATUS_PENDING,
   ORDER_STATUS_SHIPPED,
@@ -397,6 +401,9 @@ export const OrderCard = ({
       attentionRole,
     });
     const showSecondaryInline = !compact;
+    // В компактной карточке статус строки не печатается, поэтому отменённую
+    // позицию видно только по метке.
+    const isCancelled = source.status === ORDER_STATUS_CANCELLED;
     const hasItemActions =
       (canMarkShipped && (onMarkShipped || onCancelItem)) ||
       (canMarkDelivered && onMarkDelivered) ||
@@ -405,7 +412,11 @@ export const OrderCard = ({
     return (
       <View
         key={key}
-        style={[styles.itemBlock, compact ? styles.itemBlockCompact : undefined]}
+        style={[
+          styles.itemBlock,
+          compact ? styles.itemBlockCompact : undefined,
+          isCancelled ? styles.itemBlockCancelled : undefined,
+        ]}
       >
         <View style={styles.itemRow}>
           <OrderCardLineItemThumb
@@ -417,17 +428,39 @@ export const OrderCard = ({
             <View style={styles.itemMain}>
               {isProductClickable ? (
                 <Pressable onPress={() => onProductClick?.(item)} style={styles.itemNamePressable}>
-                  <Text style={styles.itemNameLink} numberOfLines={2}>
+                  <Text
+                    style={[
+                      styles.itemNameLink,
+                      isCancelled ? styles.itemTextCancelled : undefined,
+                    ]}
+                    numberOfLines={2}
+                  >
                     {productName}
                   </Text>
                 </Pressable>
               ) : (
-                <Text style={styles.itemLine} numberOfLines={2}>
+                <Text
+                  style={[styles.itemLine, isCancelled ? styles.itemTextCancelled : undefined]}
+                  numberOfLines={2}
+                >
                   {productName}
                 </Text>
               )}
-              <Text style={styles.itemQuantity}>×{source.quantity ?? 1}</Text>
-              <Text style={styles.itemPrice}>{formatPriceRub(source.unitPriceAtOrder)}</Text>
+              {isCancelled ? (
+                <Text style={styles.itemCancelledBadge}>
+                  {ORDER_CARD_UI.ITEM_CANCELLED_BADGE}
+                </Text>
+              ) : null}
+              <Text
+                style={[styles.itemQuantity, isCancelled ? styles.itemTextCancelled : undefined]}
+              >
+                ×{source.quantity ?? 1}
+              </Text>
+              <Text
+                style={[styles.itemPrice, isCancelled ? styles.itemTextCancelled : undefined]}
+              >
+                {formatPriceRub(source.unitPriceAtOrder)}
+              </Text>
             </View>
 
             {showSecondaryInline && loyaltyPerUnit > 0 ? (
@@ -577,7 +610,9 @@ export const OrderCard = ({
             />
           ) : null}
         </View>
-        <Text style={styles.total}>{formatPriceRub(order.totalAmount)}</Text>
+        <Text style={styles.total}>
+          {formatPriceRub(summarizeOrderItems(order.items).totalAmount)}
+        </Text>
       </View>
 
       {collapsedPreview ? <Text style={styles.collapsedPreview}>{collapsedPreview}</Text> : null}

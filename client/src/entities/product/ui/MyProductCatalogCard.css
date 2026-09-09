@@ -209,16 +209,21 @@
 
 .my-product-compact-card__promote:disabled,
 .my-product-compact-card__edit:disabled,
-.my-product-compact-card__copy:disabled {
+.my-product-compact-card__more-btn:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
 
-.my-product-compact-card__copy {
+.my-product-compact-card__more {
+  position: relative;
   flex: 0 0 33px;
+  align-self: stretch;
+}
+
+.my-product-compact-card__more-btn {
   width: 33px;
   min-height: 33px;
-  align-self: stretch;
+  height: 100%;
   margin: 0;
   padding: 0;
   display: inline-flex;
@@ -229,6 +234,96 @@
   background: var(--iz-color-surface);
   color: var(--iz-color-text);
   cursor: pointer;
+}
+
+.my-product-compact-card__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  min-width: 168px;
+  max-width: min(260px, 80vw);
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid var(--iz-color-border-strong, #d1d5db);
+  background: var(--iz-color-surface);
+  box-shadow: 0 10px 28px rgb(15 23 42 / 14%);
+}
+
+.my-product-compact-card__menu-item {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+}
+
+.my-product-compact-card__menu-item:hover:not(:disabled) {
+  background: var(--iz-color-surface-muted, #f3f4f6);
+}
+
+.my-product-compact-card__menu-item--danger {
+  color: var(--iz-color-danger, #b91c1c);
+}
+
+.my-product-compact-card__menu-item:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.my-product-compact-card__menu-hint,
+.my-product-compact-card__menu-pending,
+.my-product-compact-card__menu-confirm-question {
+  margin: 6px 4px 4px;
+  color: var(--iz-color-text-muted, #6b7280);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.my-product-compact-card__menu-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px;
+}
+
+.my-product-compact-card__menu-confirm-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.my-product-compact-card__menu-confirm-yes,
+.my-product-compact-card__menu-confirm-cancel {
+  flex: 1 1 0;
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.my-product-compact-card__menu-confirm-yes {
+  border: none;
+  background: var(--iz-color-danger, #b91c1c);
+  color: #fff;
+}
+
+.my-product-compact-card__menu-confirm-cancel {
+  border: 1px solid var(--iz-color-border-strong, #d1d5db);
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
 }
 
 .my-product-compact-thumb {

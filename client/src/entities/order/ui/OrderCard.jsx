@@ -18,11 +18,13 @@ import { buildOrderStatusFromItems } from "@izibuy/shared-lib";
 
 import {
   ORDER_PRE_SHIPMENT_STATUSES,
+  ORDER_STATUS_CANCELLED,
   ORDER_STATUS_READY_FOR_PICKUP,
   ORDER_STATUS_READY_TO_SHIP,
   ORDER_STATUS_RETURNED,
 } from "../model/constants.js";
 import { resolveShipmentAdvanceAction } from "../lib/resolveNextShipmentStatus.js";
+import { canCancelOrderShipment } from "../lib/canCancelOrderShipment.js";
 
 const PRE_SHIPMENT_STATUSES = new Set(ORDER_PRE_SHIPMENT_STATUSES);
 import { resolveOrderStatusLabelRu } from "../lib/resolveOrderStatusLabelRu.js";
@@ -35,7 +37,7 @@ import {
   PRODUCT_CARD_UI,
   SHIPMENT_DISPUTE_UI,
 } from "../../../shared/config/appUiCopy.js";
-import { resolveOrderLineSellerId } from "@izibuy/shared-lib";
+import { resolveOrderLineSellerId, summarizeOrderItems } from "@izibuy/shared-lib";
 import {
   PRODUCT_DELIVERY_CARRIER_SELLER,
   resolveProductDeliveryCarrier,
@@ -278,6 +280,10 @@ function OrderCardLineItem({
   });
   const showPrimary = !showSecondaryOnly;
   const showSecondary = !compact || showSecondaryOnly;
+  // В компактной карточке статус строки не печатается, поэтому отменённую
+  // позицию видно только по метке: без неё обе стороны гадали, что именно
+  // выпало из заказа.
+  const isCancelled = item.status === ORDER_STATUS_CANCELLED;
 
   if (showSecondaryOnly) {
     const hasSecondary =
@@ -335,7 +341,12 @@ function OrderCardLineItem({
     (canCancelItem && onCancelItem) || (canMarkReturned && onMarkReturned);
 
   return (
-    <li className="order-card__item" role="listitem">
+    <li
+      className={
+        isCancelled ? "order-card__item order-card__item_cancelled" : "order-card__item"
+      }
+      role="listitem"
+    >
       <OrderCardLineItemThumb
         item={item}
         productName={productName}
@@ -355,6 +366,11 @@ function OrderCardLineItem({
             ) : (
               <span className="order-card__item-name">{productName}</span>
             )}
+            {isCancelled ? (
+              <span className="order-card__item-cancelled-badge">
+                {ORDER_CARD_UI.ITEM_CANCELLED_BADGE}
+              </span>
+            ) : null}
             {compact ? null : (
               <>
                 <span className="order-card__item-quantity">×{item.quantity}</span>
@@ -416,11 +432,7 @@ function OrderCardLineItem({
               label={ORDER_CARD_UI.ACTION_CANCEL}
               pendingLabel={ORDER_CARD_UI.ACTION_PENDING}
               isPending={isActionPending}
-              question={
-                attentionRole === "buyer"
-                  ? ORDER_CARD_UI.BUYER_CANCEL_CONFIRM
-                  : ORDER_CARD_UI.CANCEL_CONFIRM
-              }
+              question={ORDER_CARD_UI.ITEM_CANCEL_CONFIRM}
               onConfirm={() => onCancelItem({ orderId, itemIndex })}
               disabled={isActionPending}
             />
@@ -466,6 +478,7 @@ function OrderCardLineItem({
  *   onMarkDelivered?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   onMarkReturned?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   onCancelItem?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
+ *   onCancelOrder?: (ctx: { orderId: string; sellerId: string }) => void | Promise<void>;
  *   onConfirmDelivered?: (ctx: { orderId: string; itemIndex: number }) => void | Promise<void>;
  *   pendingActionKey?: string | null;
  *   itemActionErrors?: Record<string, string>;
@@ -489,6 +502,7 @@ export function OrderCard({
   onMarkDelivered,
   onMarkReturned,
   onCancelItem,
+  onCancelOrder,
   onConfirmDelivered,
   onAdvanceShipment,
   onIssueHandoverCode,
@@ -576,10 +590,9 @@ export function OrderCard({
     attentionRole,
   };
 
-  const totalQuantity = order.items.reduce(
-    (sum, item) => sum + (Number(item.quantity) || 0),
-    0,
-  );
+  // Свод считаем по позициям, а не берём `order.totalAmount`: после отмены
+  // строки сохранённая при оформлении сумма показывала бы старый чек.
+  const itemsSummary = summarizeOrderItems(order.items);
 
   // Продавцу в «Мои продажи» приходят только его позиции, поэтому их свод и
   // есть статус его отправления. Способ получения берём с самого отправления,
@@ -766,6 +779,11 @@ export function OrderCard({
   const shipmentActionKey = `${order._id}:shipment`;
   const isShipmentActionPending = pendingActionKey === shipmentActionKey;
   const shipmentActionError = itemActionErrors[shipmentActionKey] ?? "";
+  // Одна кнопка на весь заказ: раньше отменять приходилось построчно, и
+  // отмена «заказа» из нескольких позиций требовала нескольких кликов.
+  const canCancelOrder =
+    Boolean(onCancelOrder) &&
+    canCancelOrderShipment({ sellerId: cardSellerId, items: order.items });
 
   const expandedBody = (
     <>
@@ -796,6 +814,23 @@ export function OrderCard({
               : ORDER_CARD_UI.SHIPMENT_PICKUP}
           </span>
           <div className="order-card__shipment-actions">
+          {canCancelOrder ? (
+            <ConfirmButton
+              className="order-card__item-action-button order-card__item-action-button_cancel"
+              label={ORDER_CARD_UI.ACTION_CANCEL_ORDER}
+              pendingLabel={ORDER_CARD_UI.ACTION_PENDING}
+              isPending={isShipmentActionPending}
+              question={
+                attentionRole === "buyer"
+                  ? ORDER_CARD_UI.BUYER_CANCEL_CONFIRM
+                  : ORDER_CARD_UI.CANCEL_CONFIRM
+              }
+              onConfirm={() =>
+                onCancelOrder({ orderId: order._id, sellerId: cardSellerId })
+              }
+              disabled={isShipmentActionPending}
+            />
+          ) : null}
           {canConfirmPayment ? (
             <button
               type="button"
@@ -1209,10 +1244,12 @@ export function OrderCard({
           ) : null}
         </div>
         <div className="order-card__header-totals">
-          {compact && totalQuantity > 0 ? (
-            <span className="order-card__quantity">×{totalQuantity}</span>
+          {compact && itemsSummary.quantity > 0 ? (
+            <span className="order-card__quantity">×{itemsSummary.quantity}</span>
           ) : null}
-          <span className="order-card__total">{formatPriceRub(order.totalAmount)}</span>
+          <span className="order-card__total">
+            {formatPriceRub(itemsSummary.totalAmount)}
+          </span>
         </div>
       </header>
 
