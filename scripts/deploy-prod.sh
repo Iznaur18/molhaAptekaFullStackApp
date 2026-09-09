@@ -97,7 +97,34 @@ ssh "$SERVER" bash -se <<REMOTE
   chown -R www-data:www-data server/uploads
   chmod 755 server/uploads
   if [ -d server/uploads/private ]; then chmod 700 server/uploads/private; fi
-  systemctl restart gitorg-api gitorg-worker
+
+  # Рестарт по одному инстансу. `systemctl restart gitorg-api` оставляет ~4 с,
+  # когда на 4444 никто не слушает: 08.09.2026 в 02:15:35 в это окно попал
+  # живой пользователь и увидел 502. Пока перезапускается один, трафик держит
+  # второй — nginx уводит запрос по дефолтному proxy_next_upstream.
+  # Второго инстанса может не быть (его заводит scripts/enable-queue-and-ha.sh) —
+  # тогда ведём себя как раньше.
+  wait_api_health() {
+    for _ in $(seq 1 30); do
+      if curl -fsS -m 3 "http://127.0.0.1:$1/health" >/dev/null 2>&1; then return 0; fi
+      sleep 1
+    done
+    echo "API на порту $1 не поднялся за 30 с" >&2
+    return 1
+  }
+
+  if systemctl list-unit-files gitorg-api2.service >/dev/null 2>&1 &&
+     systemctl is-enabled gitorg-api2 >/dev/null 2>&1; then
+    systemctl restart gitorg-api
+    wait_api_health 4444
+    systemctl restart gitorg-api2
+    wait_api_health 4445
+  else
+    systemctl restart gitorg-api
+    wait_api_health 4444
+  fi
+
+  systemctl restart gitorg-worker
 REMOTE
 
 echo "==> [5/6] заливка свежего client/dist на сервер"
