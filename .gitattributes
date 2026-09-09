@@ -1,0 +1,8 @@
+# Shell-скрипты держим в LF даже на Windows.
+#
+# У репозитория core.autocrlf=true, поэтому при checkout каждый .sh получал
+# CRLF в рабочем дереве. Локально это незаметно (bash из Git for Windows
+# терпит \r), но такой файл, залитый на сервер через scp, Linux-bash уже не
+# исполняет: 09.09.2026 scripts/enable-queue-and-ha.sh падал на проде с
+# «$'\r': command not found» и «set: pipefail: invalid option».
+*.sh text eol=lf
