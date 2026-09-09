@@ -16,6 +16,8 @@ const ALLOWED_WITHOUT_BODY_VALIDATION = new Set([
   "userRouter.js:POST:/:userIdClient/follow",
   "userRouter.js:POST:/stories/:storyId/view",
   "userRouter.js:POST:/me/premium/purchase",
+  // Действие без payload — забирает уже начисленную скидку за возвращение.
+  "userRouter.js:POST:/me/promo-return-streak/claim",
   "installmentRouter.js:PATCH:/contracts/:contractId/payments/:paymentIndex/mark-paid",
   "installmentRouter.js:PATCH:/contracts/:contractId/payments/:paymentIndex/confirm",
   "installmentRouter.js:PATCH:/contracts/:contractId/payments/:paymentIndex/reject",

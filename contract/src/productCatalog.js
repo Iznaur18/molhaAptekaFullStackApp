@@ -102,6 +102,15 @@ export function splitCatalogNearProducts(products) {
   return { withDistance, withoutDistance };
 }
 
+/**
+ * Fallback-slug для товара, которому не досталось узла дерева (в основном —
+ * импорт из 1С). Каталожной категорией не является: в `roots` и меню не
+ * попадает, поэтому в `PRODUCT_CATEGORY_SLUGS` его нет. Но в товарах он лежит
+ * как настоящее значение `productCategory`, и фильтровать по нему можно —
+ * иначе карточка такого товара не может запросить «похожие».
+ */
+export const UNCATEGORIZED_PRODUCT_CATEGORY_SLUG = "uncategorized";
+
 /** Slug категории — синхрон с `server/constants/productConstants.js`. */
 export const PRODUCT_CATEGORY_SLUGS = [
   "grocery",
@@ -159,6 +168,7 @@ export const catalogProductsQuerySchema = z.object({
   productCategory: optionalTrimmedString.refine(
     (slug) =>
       slug === undefined ||
+      slug === UNCATEGORIZED_PRODUCT_CATEGORY_SLUG ||
       PRODUCT_CATEGORY_SLUGS.includes(/** @type {(typeof PRODUCT_CATEGORY_SLUGS)[number]} */ (slug)),
     { message: "Указана неизвестная категория" },
   ),

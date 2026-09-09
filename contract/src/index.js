@@ -551,6 +551,7 @@ export {
   splitCatalogNearProducts,
   catalogProductsQuerySchema,
   catalogProductsPageDataSchema,
+  UNCATEGORIZED_PRODUCT_CATEGORY_SLUG,
 } from "./productCatalog.js";
 export {
   PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
