@@ -130,8 +130,11 @@ WorkingDirectory=$APP_DIR/server
 EnvironmentFile=$APP_DIR/server/.env
 Environment=CRON_LEADER=false
 Environment=NODE_ENV=production
-Environment=PORT=$API_PORT_SECONDARY
-ExecStart=/usr/bin/node index.js
+# PORT задаём В КОМАНДЕ, а не через Environment=: systemd применяет
+# EnvironmentFile ПОСЛЕ Environment=, и \`PORT=4444\` из server/.env перебивал
+# бы его. Так этот инстанс пытался занять 4444 и падал с EADDRINUSE
+# (09.09.2026). Присваивание перед exec перебивает и файл, и Environment=.
+ExecStart=/usr/bin/env PORT=$API_PORT_SECONDARY /usr/bin/node index.js
 Restart=on-failure
 RestartSec=5
 LimitNOFILE=65535
@@ -173,7 +176,9 @@ wait_health() {
 }
 
 log "[5/6] роллинг-рестарт API + worker"
-systemctl start gitorg-api2
+# restart, а не start: при повторном запуске инстанс может висеть в
+# crash-loop'е со старым юнитом, и start его не подхватит.
+systemctl restart gitorg-api2
 wait_health "$API_PORT_SECONDARY" "gitorg-api2"
 
 systemctl reload nginx
