@@ -345,6 +345,7 @@ export const MyProductsPage = () => {
         onClose={placeProduct.closeLimitModal}
         isPremiumUser={placeProduct.isPremiumUser}
         limit={placeProduct.sellerProductsLimit}
+        hasPersonalOverride={placeProduct.hasPersonalOverride}
       />
     </>
   );

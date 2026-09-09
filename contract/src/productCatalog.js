@@ -32,6 +32,22 @@ export const PRODUCT_CATALOG_NEAR_REGION_SECTION_TITLE = "В вашем реги
 export const CATALOG_SEARCH_QUERY_MAX_LENGTH = 200;
 
 /**
+ * Query `moderationStatus` для `GET /product/my` (единый list-фильтр).
+ * Синхрон с `server/constants/productModerationConstants.js`.
+ */
+export const MY_PRODUCTS_LIST_FILTER_VALUES = [
+  "pending",
+  "approved",
+  "rejected",
+  "hidden",
+  "promoted",
+  "not_promoted",
+];
+
+export const MY_PRODUCTS_LIST_FILTER_INVALID_MESSAGE =
+  "Некорректный фильтр списка товаров";
+
+/**
  * Подпись дистанции для каталога «Рядом».
  * &lt;10 км → `~1.2 км` (1 знак, мин. 0.1); ≥10 → `~12 км`.
  *
@@ -169,7 +185,11 @@ export const catalogProductsQuerySchema = z.object({
   near: optionalTruthyFlag,
   /** Только активные горящие скидки. */
   flashSaleOnly: optionalTruthyFlag,
-  moderationStatus: z.enum(["pending", "rejected"]).optional(),
+  moderationStatus: z
+    .enum(MY_PRODUCTS_LIST_FILTER_VALUES, {
+      errorMap: () => ({ message: MY_PRODUCTS_LIST_FILTER_INVALID_MESSAGE }),
+    })
+    .optional(),
   regionCode: optionalRuRegionCodeFieldSchema,
 });
 

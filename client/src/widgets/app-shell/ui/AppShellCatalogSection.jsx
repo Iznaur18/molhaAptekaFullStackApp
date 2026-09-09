@@ -171,6 +171,7 @@ export function AppShellCatalogGridSection({
           deletingProductId={deletingProductId}
           onEditMyProduct={onEditMyProduct}
           onCopyMyProduct={onCopyMyProduct}
+          onDeleteMyProduct={onDeleteMyProduct}
           onPromoteMyProduct={onPromoteMyProduct}
           myProductsCatalogError={myProductsCatalogError}
           myProductsCatalogNotice={myProductsCatalogNotice}

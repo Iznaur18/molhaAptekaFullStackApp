@@ -19,6 +19,7 @@ export function AppShellProductModals({
   isSellerProductsLimitModalOpen,
   setIsSellerProductsLimitModalOpen,
   sellerProductsLimit,
+  hasPersonalSellerProductsLimit,
   isCreateProductModalOpen,
   setIsCreateProductModalOpen,
   handleCreateProductSuccess,
@@ -85,6 +86,7 @@ export function AppShellProductModals({
         onClose={() => setIsSellerProductsLimitModalOpen(false)}
         isPremiumUser={isPremiumUser}
         limit={sellerProductsLimit}
+        hasPersonalOverride={hasPersonalSellerProductsLimit}
       />
       <CreateProductModal
         isOpen={isCreateProductModalOpen}

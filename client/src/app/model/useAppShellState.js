@@ -107,10 +107,15 @@ export function useAppShellState(location, navigate) {
     invalidateAuthMe,
   });
 
-  const { isAdmin, canModerateProducts, sellerProductsLimit, isAtSellerProductsLimit } =
-    useHomeSellerAccess({
+  const {
+    isAdmin,
+    canModerateProducts,
+    sellerProductsLimit,
+    hasPersonalSellerProductsLimit,
+    isAtSellerProductsLimit,
+  } = useHomeSellerAccess({
       currentUserRole,
-      isPremiumUser,
+      authUser,
       myProductsTotal,
     });
 
@@ -212,6 +217,7 @@ export function useAppShellState(location, navigate) {
     isAdmin,
     canModerateProducts,
     sellerProductsLimit,
+    hasPersonalSellerProductsLimit,
     isAtSellerProductsLimit,
     ...staffBadges,
     ...sellerModalState,

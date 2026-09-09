@@ -1,8 +1,12 @@
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
+import { normalizeSellerProductsLimitOverride } from "@molha/api-contract";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
-import { getSellerProductsLimit } from "@/entities/product/lib/sellerProductsLimit";
+import {
+  getSellerProductsLimit,
+  isSellerProductsLimitReached,
+} from "@/entities/product/lib/sellerProductsLimit";
 import { useMyProductsTotalQuery } from "@/entities/product/model/useMyProductsTotalQuery";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
@@ -16,18 +20,24 @@ export const usePlaceProductPress = () => {
   const myProductsTotalQuery = useMyProductsTotalQuery({ enabled: isAuthorized });
   const [limitModalVisible, setLimitModalVisible] = useState(false);
 
+  const authUser = sessionQuery.data?.user;
+
   const sellerProductsLimit = useMemo(() => {
     if (isAdmin) {
       return null;
     }
-    return getSellerProductsLimit(sessionQuery.data?.user);
-  }, [isAdmin, sessionQuery.data?.user]);
+    return getSellerProductsLimit(authUser);
+  }, [authUser, isAdmin]);
+
+  const hasPersonalOverride =
+    !isAdmin &&
+    normalizeSellerProductsLimitOverride(authUser?.sellerProductsLimitOverride) !== null;
 
   const myProductsTotal = myProductsTotalQuery.myProductsTotal;
-  const isAtSellerProductsLimit =
-    sellerProductsLimit != null &&
-    myProductsTotal != null &&
-    myProductsTotal >= sellerProductsLimit;
+  const isAtSellerProductsLimit = isSellerProductsLimitReached(
+    sellerProductsLimit,
+    myProductsTotal,
+  );
 
   const handlePlaceProductPress = useCallback(() => {
     if (!isAuthorized) {
@@ -68,6 +78,7 @@ export const usePlaceProductPress = () => {
     limitModalVisible,
     closeLimitModal,
     sellerProductsLimit,
+    hasPersonalOverride,
     isPremiumUser,
     isAtSellerProductsLimit,
   };

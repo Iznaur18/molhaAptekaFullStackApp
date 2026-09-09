@@ -17,6 +17,7 @@ import "./MyProductsCatalogSection.css";
  *   deletingProductId: string | null;
  *   onEditMyProduct: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
  *   onCopyMyProduct: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
+ *   onDeleteMyProduct: (productId: string) => void;
  *   onPromoteMyProduct: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
  *   myProductsCatalogError: string;
  *   myProductsCatalogNotice?: string;
@@ -42,6 +43,7 @@ export function MyProductsCatalogSection({
   deletingProductId,
   onEditMyProduct,
   onCopyMyProduct,
+  onDeleteMyProduct,
   onPromoteMyProduct,
   myProductsCatalogError,
   myProductsCatalogNotice = "",
@@ -122,6 +124,7 @@ export function MyProductsCatalogSection({
                   onOpenProduct={() => onOpenProductDetails(product)}
                   onEditProduct={() => onEditMyProduct(product)}
                   onCopyProduct={() => onCopyMyProduct(product)}
+                  onDeleteProduct={() => onDeleteMyProduct(productId)}
                   onPromoteProduct={() => onPromoteMyProduct(product)}
                   isDeletePending={deletingProductId === productId}
                   isAvailabilityTogglePending={

@@ -10,17 +10,21 @@
   --prs-flame: #ff4d6d;
   --prs-flame-glow: rgb(255 77 109 / 45%);
   --prs-inset: 12px;
-  --prs-gap: 10px;
+  /* паритет .mobile-bottom-nav — иначе clearance плывёт */
+  --prs-nav-float-offset: 0.125rem;
+  --prs-nav-min-edge-gap: 0.75rem;
+  --prs-gap-above-nav: 14px;
 
   position: fixed;
   z-index: 35;
   isolation: isolate;
   left: max(var(--prs-inset), env(safe-area-inset-left, 0px));
   right: max(var(--prs-inset), env(safe-area-inset-right, 0px));
+  /* bottom(nav) + height(nav) + 24px — на всех ширинах, без override */
   bottom: calc(
-    var(--app-shell-mobile-bottom-nav-height, 3.1rem) +
-      var(--app-shell-mobile-bottom-nav-float-offset, 0.625rem) + var(--prs-gap) +
-      env(safe-area-inset-bottom, 0px)
+    var(--prs-nav-float-offset) +
+      max(var(--prs-nav-min-edge-gap), env(safe-area-inset-bottom, 0px)) +
+      var(--app-shell-mobile-bottom-nav-height, 3.1rem) + var(--prs-gap-above-nav)
   );
   box-sizing: border-box;
   display: flex;
@@ -311,7 +315,6 @@
       calc((100vw - var(--app-shell-max-width, 60rem)) / 2 + var(--prs-inset)),
       var(--prs-inset)
     );
-    bottom: calc(var(--prs-inset) + env(safe-area-inset-bottom, 0px));
   }
 }
 
