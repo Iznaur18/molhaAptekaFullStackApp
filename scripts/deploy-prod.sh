@@ -131,7 +131,9 @@ ssh "$SERVER" bash -se <<REMOTE
     systemctl disable --now gitorg-api2 >/dev/null 2>&1 || true
     if grep -q "127.0.0.1:4445" /etc/nginx/sites-available/gitorg; then
       sed -i "/127\.0\.0\.1:4445/d" /etc/nginx/sites-available/gitorg
-      nginx -t >/dev/null 2>&1 && systemctl reload nginx
+      # Через if: «nginx -t && reload» последней командой функции вернул бы
+      # ненулевой код и под errexit уронил бы весь выкат.
+      if nginx -t >/dev/null 2>&1; then systemctl reload nginx; fi
     fi
     echo "ВНИМАНИЕ: gitorg-api2 не поднялся — отключён, работаем на одном инстансе" >&2
   }
@@ -172,12 +174,25 @@ UNIT
   # Второй бэкенд в upstream — идемпотентно.
   if ! grep -q "127.0.0.1:4445" /etc/nginx/sites-available/gitorg; then
     sed -i -E "s|^(\\s*)server 127\\.0\\.0\\.1:4444;|\\1server 127.0.0.1:4444;\\n\\1server 127.0.0.1:4445;|" /etc/nginx/sites-available/gitorg
-    if nginx -t >/dev/null 2>&1; then
-      systemctl reload nginx
-    else
+    if ! nginx -t >/dev/null 2>&1; then
       sed -i "/127\\.0\\.0\\.1:4445/d" /etc/nginx/sites-available/gitorg
       echo "ВНИМАНИЕ: nginx -t не прошёл, второй бэкенд не добавлен" >&2
     fi
+  fi
+
+  # Перечитываем ВСЕГДА, а не только когда сами правили файл. Строка в конфиге
+  # не значит, что её загрузил работающий nginx: 09.09.2026 4445 попал в файл
+  # от прошлого запуска, ветка «уже есть» reload пропускала, и рабочие процессы
+  # неделю держали конфиг с одним бэкендом — балансировки не было вовсе, хотя
+  # по файлу всё выглядело правильно. Reload дешёвый и graceful, делать его
+  # каждый выкат нормально.
+  #
+  # Пишем через if, а не «nginx -t && systemctl reload»: под errexit падение
+  # левой части такого списка роняет весь выкат.
+  if nginx -t >/dev/null 2>&1; then
+    systemctl reload nginx
+  else
+    echo "ВНИМАНИЕ: nginx -t не прошёл, конфиг НЕ перечитан" >&2
   fi
 
   # Рестарт по очереди: пока перезапускается один, трафик держит другой.
