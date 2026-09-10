@@ -205,28 +205,12 @@ export const SiteHeaderBannerAdvertisingSection = ({
             value={form.imageUrl}
             onChange={(value) => updateField("imageUrl", value)}
           />
-          <Text style={styles.fieldLabel}>Alt-текст</Text>
-          <TextInput
-            style={styles.input}
-            value={form.imageAlt}
-            onChangeText={(value) => updateField("imageAlt", value)}
-            placeholderTextColor={theme.colors.textMuted}
-          />
           <Text style={styles.fieldLabel}>Ссылка (необязательно)</Text>
           <TextInput
             style={styles.input}
             value={form.linkPath}
             onChangeText={(value) => updateField("linkPath", value)}
             placeholder="/catalog или https://…"
-            placeholderTextColor={theme.colors.textMuted}
-            autoCapitalize="none"
-          />
-          <Text style={styles.fieldLabel}>Цвет фона (необязательно)</Text>
-          <TextInput
-            style={styles.input}
-            value={form.backgroundColor}
-            onChangeText={(value) => updateField("backgroundColor", value)}
-            placeholder="#RRGGBB"
             placeholderTextColor={theme.colors.textMuted}
             autoCapitalize="none"
           />

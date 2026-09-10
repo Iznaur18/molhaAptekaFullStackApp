@@ -9,16 +9,9 @@ import { sanitizeCourierProfileForViewer } from "@molha/api-contract";
  */
 const USER_PRIVATE_PROFILE_FIELDS = [
   "email",
-  "userAddress",
-  "userAddressFlat",
-  "userAddressDistrict",
-  "userAddressStreet",
-  "userAddressHouse",
   "userAddressFiasId",
   "userAddressGeo",
   "buyList",
-  "userBirthDate",
-  "userGender",
   "notificationsEnabled",
   "isEmailVerified",
   "userLastLoginAt",

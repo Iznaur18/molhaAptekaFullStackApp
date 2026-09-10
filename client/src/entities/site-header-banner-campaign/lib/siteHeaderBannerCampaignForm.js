@@ -3,27 +3,26 @@ import { DEFAULT_VIEWER_REGION_CODE, isRuRegionCode } from "@molha/api-contract"
 
 import { SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
+const DEFAULT_BANNER_IMAGE_ALT = "Рекламный баннер";
+
 /**
  * @param {{
  *   imageUrl: string;
- *   imageAlt: string;
+ *   imageAlt?: string;
  *   linkPath: string;
- *   backgroundColor: string;
+ *   backgroundColor?: string;
  *   regionCode: string;
  * }} form
  * @returns {string | null}
  */
 export const validateSiteHeaderBannerCampaignForm = (form) => {
   const imageUrl = String(form.imageUrl ?? "").trim();
-  const imageAlt = String(form.imageAlt ?? "").trim();
+  const imageAlt =
+    String(form.imageAlt ?? "").trim() || DEFAULT_BANNER_IMAGE_ALT;
   const regionCode = String(form.regionCode ?? "").trim();
 
   if (!imageUrl) {
     return "Загрузите изображение баннера";
-  }
-
-  if (!imageAlt) {
-    return "Укажите alt-текст баннера";
   }
 
   if (!isRuRegionCode(regionCode)) {
@@ -48,15 +47,15 @@ export const validateSiteHeaderBannerCampaignForm = (form) => {
 /**
  * @param {{
  *   imageUrl: string;
- *   imageAlt: string;
+ *   imageAlt?: string;
  *   linkPath: string;
- *   backgroundColor: string;
+ *   backgroundColor?: string;
  *   regionCode: string;
  * }} form
  */
 export const buildSubmitSiteHeaderBannerCampaignBody = (form) => ({
   imageUrl: String(form.imageUrl ?? "").trim(),
-  imageAlt: String(form.imageAlt ?? "").trim(),
+  imageAlt: String(form.imageAlt ?? "").trim() || DEFAULT_BANNER_IMAGE_ALT,
   linkPath: String(form.linkPath ?? "").trim() || null,
   backgroundColor: String(form.backgroundColor ?? "").trim() || null,
   regionCode: String(form.regionCode ?? "").trim(),

@@ -4,10 +4,7 @@ import { useMemo, useState } from "react";
 import { applyPromoReturnStreakDiscount } from "../../../entities/promo-return-streak/lib/promoReturnStreakPricing.js";
 import { useActivePromoReturnStreakDiscountPercent } from "../../../entities/promo-return-streak/model/useActivePromoReturnStreakDiscountPercent.js";
 import { invalidatePromoReturnStreak } from "../../../entities/promo-return-streak/model/usePromoReturnStreak.js";
-import {
-  resolvePreviewSiteHeaderBannerSlidesFromForm,
-  resolveSiteHeaderBannerColorInputValue,
-} from "../../../entities/site-header-banner/lib/resolvePreviewSiteHeaderBannerSlidesFromForm.js";
+import { resolvePreviewSiteHeaderBannerSlidesFromForm } from "../../../entities/site-header-banner/lib/resolvePreviewSiteHeaderBannerSlidesFromForm.js";
 import { SiteHeaderBannerCarousel } from "../../../entities/site-header-banner/ui/SiteHeaderBannerCarousel.jsx";
 import {
   cancelSiteHeaderBannerCampaign,
@@ -295,14 +292,6 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
               </span>
             </label>
             <label className="advertising-page__field">
-              Alt-текст
-              <input
-                className="advertising-page__input"
-                value={form.imageAlt}
-                onChange={(event) => updateField("imageAlt", event.target.value)}
-              />
-            </label>
-            <label className="advertising-page__field">
               Ссылка (необязательно)
               <input
                 className="advertising-page__input"
@@ -310,26 +299,6 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
                 onChange={(event) => updateField("linkPath", event.target.value)}
                 placeholder="/catalog или https://…"
               />
-            </label>
-            <label className="advertising-page__field">
-              Цвет фона (необязательно)
-              <div className="advertising-page__color-field">
-                <input
-                  type="color"
-                  value={resolveSiteHeaderBannerColorInputValue(form.backgroundColor)}
-                  onChange={(event) =>
-                    updateField("backgroundColor", event.target.value.toLowerCase())
-                  }
-                />
-                <input
-                  className="advertising-page__input"
-                  value={form.backgroundColor}
-                  onChange={(event) =>
-                    updateField("backgroundColor", event.target.value)
-                  }
-                  placeholder="#RRGGBB"
-                />
-              </div>
             </label>
             {showPreview && previewSlides.length > 0 ? (
               <div className="advertising-page__preview">

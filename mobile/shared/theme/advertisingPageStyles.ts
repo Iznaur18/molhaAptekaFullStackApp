@@ -322,7 +322,7 @@ export const useAdvertisingCardStyles = createThemedStyles((theme) => ({
   tariffTitle: {
     fontSize: 13.12,
     fontWeight: "700",
-    color: theme.colors.ink,
+    color: theme.colors.text,
   },
   tariffPrice: {
     fontSize: 12.48,

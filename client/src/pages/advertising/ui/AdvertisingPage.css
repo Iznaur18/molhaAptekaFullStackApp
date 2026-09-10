@@ -409,6 +409,10 @@
   color: var(--iz-color-ink);
 }
 
+:root[data-theme="dark"] .advertising-page__tariff-title {
+  color: #ffffff;
+}
+
 .advertising-page__tariff-price {
   font-size: 0.78rem;
   color: var(--iz-color-text-muted);
