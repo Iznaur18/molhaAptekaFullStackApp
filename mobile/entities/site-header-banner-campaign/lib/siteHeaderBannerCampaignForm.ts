@@ -6,6 +6,8 @@ import {
 
 import { SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI } from "@/shared/config";
 
+const DEFAULT_BANNER_IMAGE_ALT = "Рекламный баннер";
+
 export type SiteHeaderBannerCampaignFormState = {
   imageUrl: string;
   imageAlt: string;
@@ -27,15 +29,11 @@ export const validateSiteHeaderBannerCampaignForm = (
   form: SiteHeaderBannerCampaignFormState,
 ): string | null => {
   const imageUrl = form.imageUrl.trim();
-  const imageAlt = form.imageAlt.trim();
+  const imageAlt = form.imageAlt.trim() || DEFAULT_BANNER_IMAGE_ALT;
   const regionCode = form.regionCode.trim();
 
   if (!imageUrl) {
     return "Загрузите изображение баннера";
-  }
-
-  if (!imageAlt) {
-    return "Укажите alt-текст баннера";
   }
 
   if (!isRuRegionCode(regionCode)) {
@@ -61,7 +59,7 @@ export const buildSubmitSiteHeaderBannerCampaignBody = (
   form: SiteHeaderBannerCampaignFormState,
 ) => ({
   imageUrl: form.imageUrl.trim(),
-  imageAlt: form.imageAlt.trim(),
+  imageAlt: form.imageAlt.trim() || DEFAULT_BANNER_IMAGE_ALT,
   linkPath: form.linkPath.trim() || null,
   backgroundColor: form.backgroundColor.trim() || null,
   regionCode: form.regionCode.trim(),

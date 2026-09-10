@@ -38,8 +38,35 @@ test("sanitizeUserProfileForViewer: logged-in other strips phone, keeps loyalty 
   assert.equal(out.hasPhoneNumber, true);
   assert.equal(out.userLoyaltyPoints, 42);
   assert.equal(out.email, undefined);
-  assert.equal(out.userAddress, undefined);
+  assert.equal(out.userAddress, "secret");
   assert.equal(out.userRole, undefined);
+});
+
+test("sanitizeUserProfileForViewer: other viewer keeps birth, gender, address", () => {
+  const out = sanitizeUserProfileForViewer(
+    {
+      ...TARGET,
+      userBirthDate: "1990-01-15",
+      userGender: "male",
+      userAddressFlat: "12",
+      userAddressStreet: "Ленина",
+      userAddressHouse: "1",
+      userAddressDistrict: "Центр",
+    },
+    {
+      viewer: { _id: "bbbbbbbbbbbbbbbbbbbbbbbb", userRole: "user" },
+      viewerId: "bbbbbbbbbbbbbbbbbbbbbbbb",
+    },
+  );
+  assert.equal(out.userBirthDate, "1990-01-15");
+  assert.equal(out.userGender, "male");
+  assert.equal(out.userAddress, "secret");
+  assert.equal(out.userAddressFlat, "12");
+  assert.equal(out.userAddressStreet, "Ленина");
+  assert.equal(out.userAddressHouse, "1");
+  assert.equal(out.userAddressDistrict, "Центр");
+  assert.equal(out.userAddressFiasId, undefined);
+  assert.equal(out.userAddressGeo, undefined);
 });
 
 test("sanitizeUserProfileForViewer: self keeps phone and private fields", () => {
