@@ -8,7 +8,9 @@ export const verifyEmailWithCode = async (code: string) => {
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
-    return typeof data.message === "string" ? data.message : EMAIL_VERIFICATION_UI.VERIFIED_SUCCESS;
+    return typeof data.message === "string"
+      ? data.message
+      : EMAIL_VERIFICATION_UI.VERIFIED_SUCCESS;
   } catch (error) {
     throw new Error(formatApiErrorMessage(error, EMAIL_VERIFICATION_UI.CONFIRM_ERROR));
   }

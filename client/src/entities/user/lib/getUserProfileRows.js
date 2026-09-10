@@ -21,10 +21,7 @@ import { formatSearchRowTotalSalesCount } from "./formatSearchRowTotalSalesCount
 import { formatSearchRowTotalSales } from "./formatSearchRowTotalSales.js";
 import { buildUserVehicleProfileRows } from "./buildUserVehicleProfileRows.js";
 import { isPremiumActive } from "./isPremiumActive.js";
-import {
-  formatRuPhoneDisplayOrEmpty,
-  toRuPhoneTelHref,
-} from "./ruPhone.js";
+import { formatRuPhoneDisplayOrEmpty, toRuPhoneTelHref } from "./ruPhone.js";
 
 const DATE_TIME_FORMAT = new Intl.DateTimeFormat(
   COMMON_UI.LOCALE_RU,

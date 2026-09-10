@@ -15,10 +15,7 @@ import { ProductDetailsFeatureCard } from "./ProductDetailsFeatureCard.jsx";
  * }} props
  */
 export function ProductDetailsRentalTeaser({ product, onPress }) {
-  if (
-    product?.productRentalEnabled !== true ||
-    !isProductRentalConfigured(product)
-  ) {
+  if (product?.productRentalEnabled !== true || !isProductRentalConfigured(product)) {
     return null;
   }
 

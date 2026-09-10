@@ -1,6 +1,4 @@
-import {
-  ONEC_CATEGORY_MAPPINGS_MAX_PER_REQUEST,
-} from "../../../constants/onecExchangeConstants.js";
+import { ONEC_CATEGORY_MAPPINGS_MAX_PER_REQUEST } from "../../../constants/onecExchangeConstants.js";
 import { UNCATEGORIZED_PRODUCT_CATEGORY_SLUG } from "../../../constants/productCategoryTreeConstants.js";
 import { AppError } from "../../../errors/AppError.js";
 import {
@@ -71,7 +69,10 @@ export async function createOneCCategoryResolver(sellerId) {
   const index = new Map(
     rows.map((row) => [
       row.externalId,
-      { parentExternalId: row.parentExternalId ?? null, categoryId: row.categoryId ?? null },
+      {
+        parentExternalId: row.parentExternalId ?? null,
+        categoryId: row.categoryId ?? null,
+      },
     ]),
   );
 
@@ -140,7 +141,12 @@ export async function listOneCCategoryMappings(sellerId) {
     .lean();
 
   const categoryIds = [
-    ...new Set(rows.map((row) => row.categoryId).filter(Boolean).map(String)),
+    ...new Set(
+      rows
+        .map((row) => row.categoryId)
+        .filter(Boolean)
+        .map(String),
+    ),
   ];
   const categories = categoryIds.length
     ? await ProductCategoryModel.find({ _id: { $in: categoryIds } })
@@ -150,9 +156,7 @@ export async function listOneCCategoryMappings(sellerId) {
   const categoryById = new Map(categories.map((row) => [String(row._id), row]));
 
   return rows.map((row) => {
-    const category = row.categoryId
-      ? categoryById.get(String(row.categoryId))
-      : null;
+    const category = row.categoryId ? categoryById.get(String(row.categoryId)) : null;
     return {
       externalId: row.externalId,
       name: row.name,
@@ -281,10 +285,7 @@ export async function remapOneCProductsForSeller(sellerId) {
     // считает сам Mongo — pipeline-обновление видит поля документа.
     const availability = categoryWrite.productCategoryId
       ? {
-          $and: [
-            { $gt: ["$productPrice", 0] },
-            { $gt: ["$productStockQuantity", 0] },
-          ],
+          $and: [{ $gt: ["$productPrice", 0] }, { $gt: ["$productStockQuantity", 0] }],
         }
       : false;
 

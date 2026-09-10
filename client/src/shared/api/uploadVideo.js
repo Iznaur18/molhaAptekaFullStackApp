@@ -1,6 +1,9 @@
 import { apiClient } from "./apiClient.js";
 import { postMultipart } from "@izibuy/shared-api";
-import { formatApiErrorMessage, normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
+import {
+  formatApiErrorMessage,
+  normalizeUploadUrlForStorage,
+} from "@izibuy/shared-lib";
 import { VIDEO_URL_FIELD_UI } from "../config/appUiCopy.js";
 
 /**

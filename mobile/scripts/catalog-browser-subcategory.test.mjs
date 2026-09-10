@@ -11,8 +11,12 @@ const readMobileFile = (relativePath) =>
 
 test("catalog browser opens subcategory picker before leaf category products", () => {
   const page = readMobileFile("features/catalog-browser/ui/CatalogBrowserPage.tsx");
-  const hook = readMobileFile("features/catalog-browser/model/useCatalogSubcategoryPicker.ts");
-  const picker = readMobileFile("features/catalog-browser/ui/CatalogSubcategoryPicker.tsx");
+  const hook = readMobileFile(
+    "features/catalog-browser/model/useCatalogSubcategoryPicker.ts",
+  );
+  const picker = readMobileFile(
+    "features/catalog-browser/ui/CatalogSubcategoryPicker.tsx",
+  );
   const tiles = readMobileFile(
     "entities/product-category-display/lib/buildCatalogSubcategoryPickerTiles.ts",
   );

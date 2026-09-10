@@ -37,7 +37,9 @@ export const FeaturedRaffleWinnerCard = ({ winner }: FeaturedRaffleWinnerCardPro
       <Pressable
         style={styles.row}
         accessibilityRole="button"
-        accessibilityLabel={RAFFLE_FEATURED_BANNER_UI.WINNER_OPEN_PROFILE_ARIA(userName)}
+        accessibilityLabel={RAFFLE_FEATURED_BANNER_UI.WINNER_OPEN_PROFILE_ARIA(
+          userName,
+        )}
         onPress={() =>
           router.push({ pathname: "/user/[id]", params: { id: String(winner._id) } })
         }

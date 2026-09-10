@@ -21,7 +21,12 @@ import {
 const router = createAsyncRouter();
 
 router.get("/me", checkAuthMW, listMySellerShelvesController);
-router.post("/me/reorder", checkAuthMW, reorderSellerShelvesValidation, reorderSellerShelvesController);
+router.post(
+  "/me/reorder",
+  checkAuthMW,
+  reorderSellerShelvesValidation,
+  reorderSellerShelvesController,
+);
 router.post("/", checkAuthMW, createSellerShelfValidation, createSellerShelfController);
 router.patch(
   "/:shelfId",

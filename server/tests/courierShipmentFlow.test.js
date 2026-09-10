@@ -10,9 +10,8 @@ const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollectio
 const { createOrderLoyaltyFixture, createOrderWithReserveTransaction } =
   await import("./helpers/orderLoyaltyTestHelpers.js");
 const { OrderModel, UserModel } = await import("../models/index.js");
-const { advanceOrderShipmentStatus } = await import(
-  "../services/order/advanceShipmentStatus.js"
-);
+const { advanceOrderShipmentStatus } =
+  await import("../services/order/advanceShipmentStatus.js");
 const flow = await import("../services/courier/courierShipmentFlow.js");
 const { verifyHandoverCode, generateHandoverCode, HANDOVER_CODE_MAX_ATTEMPTS } =
   await import("../services/courier/courierHandoverCodes.js");
@@ -27,7 +26,13 @@ async function readyShipment() {
     {
       $set: {
         fulfillmentMethod: "delivery",
-        shipments: [{ sellerId: seller._id, fulfillmentMethod: "delivery", courierDelivery: true }],
+        shipments: [
+          {
+            sellerId: seller._id,
+            fulfillmentMethod: "delivery",
+            courierDelivery: true,
+          },
+        ],
       },
     },
   );
@@ -279,7 +284,10 @@ describe("доставка до подтверждения", () => {
     const { ids, courierId, order, seller, product } = await holding();
 
     await flow.startDeliveryByCourier({ ...ids, courierId });
-    assert.equal((await readShipment(order._id, seller._id)).order.status, "in_delivery");
+    assert.equal(
+      (await readShipment(order._id, seller._id)).order.status,
+      "in_delivery",
+    );
 
     await flow.markArrivedByCourier({ ...ids, courierId });
     const arrived = await readShipment(order._id, seller._id);
@@ -298,7 +306,11 @@ describe("доставка до подтверждения", () => {
 
     const { ProductModel } = await import("../models/index.js");
     const sold = await ProductModel.findById(product._id).select("soldQuantity").lean();
-    assert.equal(sold.soldQuantity, 1, "счётчик продаж не потерялся при курьерском пути");
+    assert.equal(
+      sold.soldQuantity,
+      1,
+      "счётчик продаж не потерялся при курьерском пути",
+    );
   });
 
   it("подтверждение начисляет баллы, а не просто меняет статус", async () => {
@@ -327,9 +339,8 @@ describe("доставка до подтверждения", () => {
     await flow.startDeliveryByCourier({ ...ids, courierId });
     await flow.markArrivedByCourier({ ...ids, courierId });
 
-    const { confirmOrderItemByBuyer } = await import(
-      "../services/order/updateOrderItemStatus.js"
-    );
+    const { confirmOrderItemByBuyer } =
+      await import("../services/order/updateOrderItemStatus.js");
 
     await assert.rejects(
       () =>

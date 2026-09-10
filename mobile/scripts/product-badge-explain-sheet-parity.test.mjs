@@ -7,8 +7,7 @@ import { test } from "node:test";
 const MOBILE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CLIENT_ROOT = join(MOBILE_ROOT, "..", "client");
 
-const readFile = (root, relativePath) =>
-  readFileSync(join(root, relativePath), "utf8");
+const readFile = (root, relativePath) => readFileSync(join(root, relativePath), "utf8");
 
 test("product badge explain sheet matches web panel layout", () => {
   const layout = readFile(MOBILE_ROOT, "shared/lib/productBadgeExplainSheetLayout.ts");
@@ -58,13 +57,19 @@ test("product details badge chips use web soft palette sizes", () => {
     MOBILE_ROOT,
     "entities/product/lib/productCardBadgePalette.ts",
   );
-  const stack = readFile(MOBILE_ROOT, "entities/product/ui/ProductDetailsBadgeStack.tsx");
+  const stack = readFile(
+    MOBILE_ROOT,
+    "entities/product/ui/ProductDetailsBadgeStack.tsx",
+  );
   const webCss = readFile(
     CLIENT_ROOT,
     "src/entities/product/ui/product-details-modal/ProductDetailsModalPrice.css",
   );
 
-  assert.match(palette, /listingOrigin: \{ backgroundColor: "#e0f2fe", color: "#0369a1" \}/);
+  assert.match(
+    palette,
+    /listingOrigin: \{ backgroundColor: "#e0f2fe", color: "#0369a1" \}/,
+  );
   assert.match(badgeLayout, /paddingVertical: 3\.5/);
   assert.match(badgeLayout, /fontSize: 10\.4/);
   assert.match(stack, /BadgePressable/);

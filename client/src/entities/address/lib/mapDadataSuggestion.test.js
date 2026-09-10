@@ -54,7 +54,12 @@ describe("адрес на участке", () => {
   it("идентификатор берётся из stead, когда дома нет", () => {
     const mapped = mapDadataSuggestion({
       value: "г Грозный, ул Хамида Ахмадовича Ахмадова, уч 27а",
-      data: { house_fias_id: "", stead_fias_id: "s1", geo_lat: "43.31", geo_lon: "45.71" },
+      data: {
+        house_fias_id: "",
+        stead_fias_id: "s1",
+        geo_lat: "43.31",
+        geo_lon: "45.71",
+      },
     });
 
     expect(mapped.fiasId).toBe("s1");

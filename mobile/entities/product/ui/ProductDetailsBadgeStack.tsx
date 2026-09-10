@@ -1,5 +1,12 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { Pressable, ScrollView, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -101,7 +108,11 @@ const renderBadgeShell = ({
   }
 
   return (
-    <BadgePressable style={style} accessibilityLabel={accessibilityLabel} onPress={onPress}>
+    <BadgePressable
+      style={style}
+      accessibilityLabel={accessibilityLabel}
+      onPress={onPress}
+    >
       {children}
     </BadgePressable>
   );
@@ -123,7 +134,9 @@ const renderSoftTextBadge = ({
     style: [softBadgeChrome, { backgroundColor: tone.backgroundColor }],
     accessibilityLabel: item.label,
     onPress: () => onBadgePress?.(item),
-    children: <AppText style={[softBadgeText, { color: tone.color }]}>{item.label}</AppText>,
+    children: (
+      <AppText style={[softBadgeText, { color: tone.color }]}>{item.label}</AppText>
+    ),
   });
 };
 
@@ -155,7 +168,11 @@ const renderBadge = ({
           onPress: () => onBadgePress?.(item),
           children: (
             <>
-              <MaterialIcons name="check-circle" size={14} color={theme.colors.success} />
+              <MaterialIcons
+                name="check-circle"
+                size={14}
+                color={theme.colors.success}
+              />
               <Text
                 style={[softBadgeText, styles.metaInfoChipOriginalText]}
                 numberOfLines={1}
@@ -338,9 +355,7 @@ export const ProductDetailsBadgeStack = ({
         {...nestedHorizontalScrollProps}
         keyboardShouldPersistTaps="handled"
       >
-        {items.map((item) =>
-          renderBadge({ item, styles, theme, onBadgePress }),
-        )}
+        {items.map((item) => renderBadge({ item, styles, theme, onBadgePress }))}
       </ScrollView>
     </View>
   );

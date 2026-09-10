@@ -50,7 +50,9 @@ export function SellerProfileQuickStats({
   hidePhoneUntilReveal = true,
 }) {
   const [phoneRevealed, setPhoneRevealed] = useState(false);
-  const [revealedPhone, setRevealedPhone] = useState(/** @type {string | null} */ (null));
+  const [revealedPhone, setRevealedPhone] = useState(
+    /** @type {string | null} */ (null),
+  );
   const [revealPending, setRevealPending] = useState(false);
   const [revealError, setRevealError] = useState("");
 
@@ -72,9 +74,7 @@ export function SellerProfileQuickStats({
   const phoneDisplay = revealedPhone
     ? formatRuPhoneDisplayOrEmpty(revealedPhone)
     : phoneRow.display;
-  const phoneHref = revealedPhone
-    ? toRuPhoneTelHref(revealedPhone)
-    : phoneRow.href;
+  const phoneHref = revealedPhone ? toRuPhoneTelHref(revealedPhone) : phoneRow.href;
 
   const phoneNeedsReveal =
     hidePhoneUntilReveal &&

@@ -9,10 +9,16 @@ const normalizeTotalSalesAmount = (totalSalesAmount: unknown): number => {
   return Number.isFinite(value) ? Math.max(0, value) : 0;
 };
 
-const formatCompactAmountPart = (amount: number, divisor: number, suffix: string): string => {
+const formatCompactAmountPart = (
+  amount: number,
+  divisor: number,
+  suffix: string,
+): string => {
   const scaled = amount / divisor;
   const rounded = Math.round(scaled * 10) / 10;
-  const text = Number.isInteger(rounded) ? String(rounded) : String(rounded).replace(/\.0$/, "");
+  const text = Number.isInteger(rounded)
+    ? String(rounded)
+    : String(rounded).replace(/\.0$/, "");
   return `${text}${suffix}`;
 };
 

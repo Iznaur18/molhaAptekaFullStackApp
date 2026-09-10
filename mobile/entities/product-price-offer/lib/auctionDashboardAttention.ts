@@ -7,7 +7,8 @@ import { formatPriceRub } from "@/shared/lib";
 
 export const bidNeedsAttention = (bid: MyPriceOfferBid) => bid.status === "accepted";
 
-export const offerNeedsAttention = (offer: IncomingPriceOffer) => offer.status === "pending";
+export const offerNeedsAttention = (offer: IncomingPriceOffer) =>
+  offer.status === "pending";
 
 export const resolveBuyerBidCollapsedPreview = (bid: MyPriceOfferBid) => {
   if (bid.status === "accepted") {

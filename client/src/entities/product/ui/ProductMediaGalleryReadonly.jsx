@@ -105,7 +105,9 @@ export function ProductMediaGalleryReadonly({
     [mediaSlides],
   );
 
-  const rootClass = ["product-media-gallery-readonly", className].filter(Boolean).join(" ");
+  const rootClass = ["product-media-gallery-readonly", className]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className={rootClass}>
@@ -141,7 +143,11 @@ export function ProductMediaGalleryReadonly({
                 onBack();
               }}
             >
-              <ChevronLeft size={ICON_SIZE_PX.lg} strokeWidth={2.25} aria-hidden="true" />
+              <ChevronLeft
+                size={ICON_SIZE_PX.lg}
+                strokeWidth={2.25}
+                aria-hidden="true"
+              />
             </button>
           ) : null}
           {heroOverlay}

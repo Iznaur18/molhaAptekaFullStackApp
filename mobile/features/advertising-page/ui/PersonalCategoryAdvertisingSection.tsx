@@ -1,11 +1,5 @@
 import { useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
 import { DEFAULT_VIEWER_REGION_CODE, isRuRegionCode } from "@molha/api-contract";
 
 import { RuRegionSelect } from "@/entities/region/ui/RuRegionSelect";
@@ -108,7 +102,9 @@ export const PersonalCategoryAdvertisingSection = ({
   if (campaignQuery.isPending) {
     return (
       <View style={[styles.card, styles.cardCategory]}>
-        <Text style={styles.cardTitle}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_TITLE}</Text>
+        <Text style={styles.cardTitle}>
+          {SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_TITLE}
+        </Text>
         <Text style={styles.state}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.LOADING}</Text>
       </View>
     );
@@ -117,7 +113,9 @@ export const PersonalCategoryAdvertisingSection = ({
   if (campaignQuery.isError) {
     return (
       <View style={[styles.card, styles.cardCategory]}>
-        <Text style={styles.cardTitle}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_TITLE}</Text>
+        <Text style={styles.cardTitle}>
+          {SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_TITLE}
+        </Text>
         <Text style={styles.error} accessibilityRole="alert">
           {formatApiErrorMessage(
             campaignQuery.error,
@@ -131,7 +129,9 @@ export const PersonalCategoryAdvertisingSection = ({
   return (
     <View style={[styles.card, styles.cardCategory]}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_TITLE}</Text>
+        <Text style={styles.cardTitle}>
+          {SELLER_PERSONAL_CATEGORY_PAGE_UI.SECTION_TITLE}
+        </Text>
         {selectedDuration ? (
           <Text style={styles.cardBadge}>{selectedDuration.title}</Text>
         ) : null}
@@ -154,12 +154,18 @@ export const PersonalCategoryAdvertisingSection = ({
 
       {campaign ? (
         <View style={resolvePersonalCategoryStatusPanelStyle(styles, campaign.status)}>
-          <Text style={[styles.statusText, isActiveCampaign && styles.statusTextActive]}>
+          <Text
+            style={[styles.statusText, isActiveCampaign && styles.statusTextActive]}
+          >
             {resolveStatusLabel(campaign.status)}
           </Text>
           {isActiveCampaign && campaign.activeUntil ? (
-            <Text style={[styles.statusText, isActiveCampaign && styles.statusTextActive]}>
-              {SELLER_PERSONAL_CATEGORY_PAGE_UI.STATUS_ACTIVE_UNTIL(campaign.activeUntil)}
+            <Text
+              style={[styles.statusText, isActiveCampaign && styles.statusTextActive]}
+            >
+              {SELLER_PERSONAL_CATEGORY_PAGE_UI.STATUS_ACTIVE_UNTIL(
+                campaign.activeUntil,
+              )}
             </Text>
           ) : null}
           {canCancel ? (
@@ -191,7 +197,9 @@ export const PersonalCategoryAdvertisingSection = ({
           <Text style={styles.panelTitle}>Заявка на личную категорию</Text>
           <View style={styles.form}>
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_NAME}</Text>
+              <Text style={styles.fieldLabel}>
+                {SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_NAME}
+              </Text>
               <TextInput
                 style={styles.input}
                 value={labelRu}
@@ -212,7 +220,9 @@ export const PersonalCategoryAdvertisingSection = ({
               label={SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_REGION}
               onChange={setRegionCode}
             />
-            <Text style={styles.timingHint}>{SELLER_PERSONAL_CATEGORY_PAGE_UI.HINT_REGION}</Text>
+            <Text style={styles.timingHint}>
+              {SELLER_PERSONAL_CATEGORY_PAGE_UI.HINT_REGION}
+            </Text>
             <View style={styles.field}>
               <Text style={styles.fieldLabel}>
                 {SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_DURATION}
@@ -242,7 +252,10 @@ export const PersonalCategoryAdvertisingSection = ({
 
             <View style={styles.actions}>
               <Pressable
-                style={[styles.cancelButton, isSubmitting && styles.cancelButtonDisabled]}
+                style={[
+                  styles.cancelButton,
+                  isSubmitting && styles.cancelButtonDisabled,
+                ]}
                 onPress={() => setShowForm(false)}
                 disabled={isSubmitting}
               >
@@ -251,7 +264,8 @@ export const PersonalCategoryAdvertisingSection = ({
               <Pressable
                 style={[
                   styles.primaryButton,
-                  (isSubmitting || loyaltyBalance < pricePoints) && styles.primaryButtonDisabled,
+                  (isSubmitting || loyaltyBalance < pricePoints) &&
+                    styles.primaryButtonDisabled,
                 ]}
                 onPress={() => {
                   void handleSubmit();

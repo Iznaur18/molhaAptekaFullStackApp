@@ -61,7 +61,10 @@ export const MySalesPage = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [attentionOnly, setAttentionOnly] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useDebouncedValue(searchTerm, MY_SALES_PAGE_UI.SEARCH_DEBOUNCE_MS);
+  const debouncedSearchTerm = useDebouncedValue(
+    searchTerm,
+    MY_SALES_PAGE_UI.SEARCH_DEBOUNCE_MS,
+  );
   const isSearchPending = searchTerm !== debouncedSearchTerm;
   const hasSearchQuery = debouncedSearchTerm.trim() !== "";
 
@@ -82,7 +85,8 @@ export const MySalesPage = () => {
     search: salesParams.search,
     enabled: isAuthorized,
   });
-  const { cancelItemMutation, shipItemMutation, deliverItemMutation } = useOrderMutations();
+  const { cancelItemMutation, shipItemMutation, deliverItemMutation } =
+    useOrderMutations();
   const [pendingActionKey, setPendingActionKey] = useState<string | null>(null);
   const [itemActionErrors, setItemActionErrors] = useState<Record<string, string>>({});
 
@@ -118,7 +122,9 @@ export const MySalesPage = () => {
   );
 
   const invalidateSalesQueues = useCallback(async () => {
-    await queryClient.invalidateQueries({ queryKey: orderQueryKeys.salesActionCount() });
+    await queryClient.invalidateQueries({
+      queryKey: orderQueryKeys.salesActionCount(),
+    });
   }, [queryClient]);
 
   const handleRefresh = useCallback(async () => {
@@ -187,7 +193,10 @@ export const MySalesPage = () => {
       await invalidateSalesQueues();
       void handleRefresh();
     } catch (error) {
-      const message = formatApiErrorMessage(error, API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK);
+      const message = formatApiErrorMessage(
+        error,
+        API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK,
+      );
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
       void handleRefresh();
     } finally {
@@ -330,7 +339,10 @@ export const MySalesPage = () => {
   if (salesQuery.isError) {
     return (
       <ScreenErrorState
-        message={formatApiErrorMessage(salesQuery.error, MY_SALES_PAGE_UI.FETCH_FALLBACK)}
+        message={formatApiErrorMessage(
+          salesQuery.error,
+          MY_SALES_PAGE_UI.FETCH_FALLBACK,
+        )}
         onRetry={() => salesQuery.refetch()}
       />
     );

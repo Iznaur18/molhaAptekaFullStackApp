@@ -88,9 +88,7 @@ export function CheckoutSellerDeliveryCost({
           <div className="checkout-seller-delivery__total-row">
             <dt>{CHECKOUT_FORM_UI.TOTAL_DELIVERY}</dt>
             <dd>
-              {isFree
-                ? CHECKOUT_FORM_UI.SELLER_DELIVERY_FREE
-                : formatPriceRub(feeRub)}
+              {isFree ? CHECKOUT_FORM_UI.SELLER_DELIVERY_FREE : formatPriceRub(feeRub)}
             </dd>
           </div>
           <div className="checkout-seller-delivery__total-row checkout-seller-delivery__total-row--sum">

@@ -41,7 +41,11 @@ export const attachProductSellerClosedState = async (products, viewerUserId = nu
       products
         .map((product) => {
           const sellerRef = product.productSeller;
-          if (sellerRef != null && typeof sellerRef === "object" && sellerRef._id != null) {
+          if (
+            sellerRef != null &&
+            typeof sellerRef === "object" &&
+            sellerRef._id != null
+          ) {
             return String(sellerRef._id);
           }
           return sellerRef != null ? String(sellerRef) : "";
@@ -110,6 +114,10 @@ export const stripProductSellerClosedState = (products) =>
     if (product == null || typeof product !== "object") {
       return product;
     }
-    const { isSellerClosedNow: _closed, sellerClosedOpensAt: _opensAt, ...rest } = product;
+    const {
+      isSellerClosedNow: _closed,
+      sellerClosedOpensAt: _opensAt,
+      ...rest
+    } = product;
     return rest;
   });

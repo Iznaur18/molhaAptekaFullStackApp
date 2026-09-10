@@ -30,7 +30,11 @@ export function ProductInstagramPostMediaButton({
       onClick={onClick}
     >
       <span className="product-instagram-post-media-btn__play" aria-hidden="true">
-        <Play size={size === "detail" ? 18 : 14} strokeWidth={2.5} fill="currentColor" />
+        <Play
+          size={size === "detail" ? 18 : 14}
+          strokeWidth={2.5}
+          fill="currentColor"
+        />
       </span>
       <span className="product-instagram-post-media-btn__ig" aria-hidden="true">
         <Camera size={size === "detail" ? 12 : 10} strokeWidth={2.25} />

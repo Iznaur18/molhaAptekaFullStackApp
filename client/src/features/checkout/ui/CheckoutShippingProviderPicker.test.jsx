@@ -4,9 +4,8 @@ import { describe, expect, it } from "vitest";
 import { CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
 import { renderWithProviders } from "../../../test/renderWithProviders.jsx";
 
-const { CheckoutShippingProviderPicker } = await import(
-  "./CheckoutShippingProviderPicker.jsx"
-);
+const { CheckoutShippingProviderPicker } =
+  await import("./CheckoutShippingProviderPicker.jsx");
 
 const courierButton = () =>
   screen.getByRole("radio", { name: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_COURIER });

@@ -58,7 +58,4 @@ const AnalyticsReconciliationSchema = new mongoose.Schema(
 
 AnalyticsReconciliationSchema.index({ ranAt: -1 });
 
-export default mongoose.model(
-  "AnalyticsReconciliation",
-  AnalyticsReconciliationSchema,
-);
+export default mongoose.model("AnalyticsReconciliation", AnalyticsReconciliationSchema);

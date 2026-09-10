@@ -211,7 +211,8 @@
 
 .my-profile-page__nav-button:hover:not(:disabled) .my-profile-page__nav-icon {
   color: var(--nav-tone-strong);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--nav-tone-strong) 28%, transparent);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--nav-tone-strong) 28%, transparent);
 }
 
 .my-profile-page__nav-button_active {
@@ -408,10 +409,18 @@
     --my-profile-catalog-grid-gap: 0.5rem;
 
     margin-inline: calc(
-      -1 * (var(--app-shell-content-inline-padding) - var(--my-profile-mobile-inline-inset))
+      -1 *
+        (
+          var(--app-shell-content-inline-padding) -
+            var(--my-profile-mobile-inline-inset)
+        )
     );
     width: calc(
-      100% + 2 * (var(--app-shell-content-inline-padding) - var(--my-profile-mobile-inline-inset))
+      100% + 2 *
+        (
+          var(--app-shell-content-inline-padding) -
+            var(--my-profile-mobile-inline-inset)
+        )
     );
   }
 
@@ -438,10 +447,18 @@
     --my-profile-catalog-grid-gap: 0.1rem;
 
     margin-inline: calc(
-      -1 * (var(--app-shell-content-inline-padding) - var(--my-profile-mobile-inline-inset))
+      -1 *
+        (
+          var(--app-shell-content-inline-padding) -
+            var(--my-profile-mobile-inline-inset)
+        )
     );
     width: calc(
-      100% + 2 * (var(--app-shell-content-inline-padding) - var(--my-profile-mobile-inline-inset))
+      100% + 2 *
+        (
+          var(--app-shell-content-inline-padding) -
+            var(--my-profile-mobile-inline-inset)
+        )
     );
   }
 
@@ -708,7 +725,8 @@
   width: 100%;
   margin: 0;
   padding: 0.7rem 0.85rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-action-soft) 55%, var(--iz-color-border));
+  border: 1px solid
+    color-mix(in srgb, var(--iz-color-action-soft) 55%, var(--iz-color-border));
   border-radius: var(--my-profile-surface-radius);
   background: linear-gradient(
     165deg,

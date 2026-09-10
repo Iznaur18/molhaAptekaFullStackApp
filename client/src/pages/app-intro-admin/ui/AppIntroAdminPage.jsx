@@ -79,7 +79,9 @@ export function AppIntroAdminPage() {
     try {
       setActionError("");
       setSaveNotice(false);
-      const saved = await patchMutation.mutateAsync(buildPatchAppIntroSettingsBody(form));
+      const saved = await patchMutation.mutateAsync(
+        buildPatchAppIntroSettingsBody(form),
+      );
       setForm(mapAppIntroSettingsToForm(saved.settings));
       setSaveNotice(true);
     } catch (error) {

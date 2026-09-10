@@ -46,8 +46,7 @@ export function ProductBadgeExplainSheet({
   const panelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const closeButtonRef = useRef(/** @type {HTMLElement | null} */ (null));
   const { mounted, isVisible } = useWholesalePriceSheetAnimation(isOpen);
-  const descriptionOverride =
-    typeof description === "string" ? description.trim() : "";
+  const descriptionOverride = typeof description === "string" ? description.trim() : "";
   const hasDescriptionOverride = descriptionOverride.length > 0;
   const adminByKey = useProductBadgeExplainByKeyMap({
     enabled: !hasDescriptionOverride,
@@ -66,15 +65,13 @@ export function ProductBadgeExplainSheet({
   const resolvedContent = resolveProductBadgeExplainSheetContent({
     badgeKey,
     fallbackKey,
-    adminRow: badgeKey ? adminByKey.get(badgeKey) ?? null : null,
+    adminRow: badgeKey ? (adminByKey.get(badgeKey) ?? null) : null,
   });
   const content = hasDescriptionOverride
     ? { description: descriptionOverride, imageUrl: null }
     : resolvedContent;
 
-  const imageSrc = content.imageUrl
-    ? resolveUploadedImageUrl(content.imageUrl)
-    : null;
+  const imageSrc = content.imageUrl ? resolveUploadedImageUrl(content.imageUrl) : null;
 
   useEffect(() => {
     if (!isOpen) {
@@ -130,9 +127,7 @@ export function ProductBadgeExplainSheet({
       setRevealedPhone(phone);
     } catch (error) {
       setContactError(
-        error instanceof Error
-          ? error.message
-          : PRODUCT_BADGE_EXPLAIN_UI.CONTACT_ERROR,
+        error instanceof Error ? error.message : PRODUCT_BADGE_EXPLAIN_UI.CONTACT_ERROR,
       );
     } finally {
       setContactPending(false);
@@ -144,9 +139,7 @@ export function ProductBadgeExplainSheet({
   }
 
   const phoneHref = revealedPhone ? toRuPhoneTelHref(revealedPhone) : null;
-  const phoneDisplay = revealedPhone
-    ? formatRuPhoneDisplayOrEmpty(revealedPhone)
-    : "";
+  const phoneDisplay = revealedPhone ? formatRuPhoneDisplayOrEmpty(revealedPhone) : "";
 
   return createPortal(
     <div
@@ -174,11 +167,7 @@ export function ProductBadgeExplainSheet({
       >
         {imageSrc ? (
           <div className="product-badge-explain-sheet__media">
-            <img
-              className="product-badge-explain-sheet__image"
-              src={imageSrc}
-              alt=""
-            />
+            <img className="product-badge-explain-sheet__image" src={imageSrc} alt="" />
           </div>
         ) : null}
         <div className="product-badge-explain-sheet__body">

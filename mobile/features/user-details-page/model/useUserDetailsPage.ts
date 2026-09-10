@@ -22,9 +22,15 @@ export const useUserDetailsPage = () => {
   const isAuthorized = Boolean(currentUser);
 
   const profileQuery = useUserProfileQuery({ userId, enabled: userId.length > 0 });
-  const [profileSnapshot, setProfileSnapshot] = useState<Record<string, unknown> | null>(null);
+  const [profileSnapshot, setProfileSnapshot] = useState<Record<
+    string,
+    unknown
+  > | null>(null);
 
-  const user = profileSnapshot ?? (profileQuery.data as Record<string, unknown> | undefined) ?? null;
+  const user =
+    profileSnapshot ??
+    (profileQuery.data as Record<string, unknown> | undefined) ??
+    null;
   const isSelf = currentUserId != null && userId === currentUserId;
   const isOtherUser = !isSelf && userId.length > 0;
 

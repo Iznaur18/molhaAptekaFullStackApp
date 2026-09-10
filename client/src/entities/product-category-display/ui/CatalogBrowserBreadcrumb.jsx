@@ -11,7 +11,10 @@ const TRAIL_SEP = " › ";
  * }} props
  */
 export function CatalogBrowserBreadcrumb({ label, onCatalogRootClick = null }) {
-  const segments = label.split(TRAIL_SEP).map((part) => part.trim()).filter(Boolean);
+  const segments = label
+    .split(TRAIL_SEP)
+    .map((part) => part.trim())
+    .filter(Boolean);
 
   return (
     <div className="catalog-categories-browser__toolbar">

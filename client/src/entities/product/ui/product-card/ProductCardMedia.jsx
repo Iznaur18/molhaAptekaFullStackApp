@@ -1,7 +1,10 @@
 import { useCallback, useRef } from "react";
 
 import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
-import { PRODUCT_CARD_UI, PRODUCT_MODERATION_PAGE_UI } from "../../../../shared/config/appUiCopy.js";
+import {
+  PRODUCT_CARD_UI,
+  PRODUCT_MODERATION_PAGE_UI,
+} from "../../../../shared/config/appUiCopy.js";
 import { resolveProductOutOfStockOverlayLabel } from "../../lib/resolveProductOutOfStockOverlayLabel.js";
 import { resolveProductSellerClosedOverlayLabel } from "../../lib/resolveProductSellerClosedOverlayLabel.js";
 import { ProductMediaHorizontalPager } from "../ProductMediaHorizontalPager.jsx";

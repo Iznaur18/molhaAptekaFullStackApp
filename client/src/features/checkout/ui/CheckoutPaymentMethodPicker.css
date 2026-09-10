@@ -55,16 +55,16 @@
 }
 
 .checkout-payment-method-picker__card--cardPrepaid:not(
-    .checkout-payment-method-picker__card--selected
-  ) {
+  .checkout-payment-method-picker__card--selected
+) {
   background: var(--iz-color-action-soft);
   border-color: var(--iz-color-action-soft);
   color: var(--iz-color-action);
 }
 
 .checkout-payment-method-picker__card--cashOnDelivery:not(
-    .checkout-payment-method-picker__card--selected
-  ) {
+  .checkout-payment-method-picker__card--selected
+) {
   background: var(--iz-color-success-surface);
   border-color: var(--iz-color-success-surface);
   color: var(--iz-color-success-text);
@@ -95,8 +95,8 @@
 }
 
 .checkout-payment-method-picker__card--locked:not(
-    .checkout-payment-method-picker__card--selected
-  ) {
+  .checkout-payment-method-picker__card--selected
+) {
   background: var(--iz-color-surface-muted);
   border-color: var(--iz-color-border);
   color: var(--iz-color-text-muted);

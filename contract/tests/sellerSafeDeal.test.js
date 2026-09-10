@@ -35,7 +35,10 @@ test("isValidInn отвергает нецифры и неверную длин�
 
 test("isInnLengthValidForLegalForm разводит ИП и ООО по длине", () => {
   assert.equal(isInnLengthValidForLegalForm(SELLER_LEGAL_FORM_OOO, VALID_INN_10), true);
-  assert.equal(isInnLengthValidForLegalForm(SELLER_LEGAL_FORM_OOO, VALID_INN_12), false);
+  assert.equal(
+    isInnLengthValidForLegalForm(SELLER_LEGAL_FORM_OOO, VALID_INN_12),
+    false,
+  );
   assert.equal(isInnLengthValidForLegalForm(SELLER_LEGAL_FORM_IP, VALID_INN_12), true);
   assert.equal(isInnLengthValidForLegalForm(SELLER_LEGAL_FORM_IP, VALID_INN_10), false);
   assert.equal(isInnLengthValidForLegalForm("", VALID_INN_10), false);

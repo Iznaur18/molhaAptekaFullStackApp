@@ -49,7 +49,9 @@ export async function submitSiteHeaderBannerCampaign(body) {
  */
 export async function cancelSiteHeaderBannerCampaign(campaignId) {
   try {
-    const { data } = await apiClient.delete(`/site-header-banner-campaign/${campaignId}`);
+    const { data } = await apiClient.delete(
+      `/site-header-banner-campaign/${campaignId}`,
+    );
     const parsed = parseApiContractData(data, cancelSiteHeaderBannerCampaignDataSchema);
     return {
       message: parsed.message,

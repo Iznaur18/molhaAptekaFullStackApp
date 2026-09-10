@@ -41,7 +41,12 @@ export const AuctionPageToolbar = ({
               style={[styles.viewChip, isActive ? styles.viewChipActive : null]}
               onPress={() => onViewFilterChange(option.value)}
             >
-              <Text style={[styles.viewChipText, isActive ? styles.viewChipTextActive : null]}>
+              <Text
+                style={[
+                  styles.viewChipText,
+                  isActive ? styles.viewChipTextActive : null,
+                ]}
+              >
                 {label}
               </Text>
             </Pressable>

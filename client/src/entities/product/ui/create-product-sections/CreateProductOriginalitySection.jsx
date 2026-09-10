@@ -25,7 +25,10 @@ export function CreateProductOriginalitySection({
       <p className="create-product-section__hint">
         {CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_ORIGINALITY_SUBTITLE}
       </p>
-      <fieldset className="create-product-section__listing-origin" disabled={isSubmitting}>
+      <fieldset
+        className="create-product-section__listing-origin"
+        disabled={isSubmitting}
+      >
         <div
           className="create-product-section__listing-origin-chips"
           role="radiogroup"

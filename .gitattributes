@@ -1,8 +1,31 @@
-# Shell-скрипты держим в LF даже на Windows.
+# Все текстовые файлы храним и выкладываем в рабочее дерево в LF.
 #
-# У репозитория core.autocrlf=true, поэтому при checkout каждый .sh получал
-# CRLF в рабочем дереве. Локально это незаметно (bash из Git for Windows
-# терпит \r), но такой файл, залитый на сервер через scp, Linux-bash уже не
-# исполняет: 09.09.2026 scripts/enable-queue-and-ha.sh падал на проде с
-# «$'\r': command not found» и «set: pipefail: invalid option».
-*.sh text eol=lf
+# Почему eol=lf, а не просто text=auto. У репозитория core.autocrlf=true, и до
+# 10.09.2026 переносы строк были смешанными: часть файлов лежала в индексе с
+# CRLF. Из-за этого:
+#
+#   - `npm run format:check` локально ругался на ВСЕ 3225 файлов (в
+#     prettier.config.js стоит endOfLine: "lf"), то есть был бесполезен как
+#     сигнал, и настоящие 1594 неотформатированных файла в этом шуме не
+#     различались — проверка Lint в CI не проходила ни разу;
+#   - shell-скрипт, залитый на сервер через scp, Linux-bash отказывался
+#     исполнять: «$'\r': command not found».
+#
+# С eol=lf локальная проверка совпадает с CI один в один, и prettier больше не
+# видит разницы между машинами.
+* text=auto eol=lf
+
+# Бинарные — не трогать (git обычно определяет сам, но явно надёжнее).
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.mp4 binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.pdf binary
+*.zip binary

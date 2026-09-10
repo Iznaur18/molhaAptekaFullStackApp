@@ -35,7 +35,8 @@ export function useInstallmentMutations() {
   });
 
   const upsertProgramMutation = useMutation({
-    mutationFn: ({ productId, body }) => upsertProductInstallmentProgram(productId, body),
+    mutationFn: ({ productId, body }) =>
+      upsertProductInstallmentProgram(productId, body),
     onSuccess: (_data, { productId }) => {
       invalidateInstallment();
       void queryClient.invalidateQueries({
@@ -82,21 +83,13 @@ export function useInstallmentContractMutations(contractId) {
 
   const confirmPaymentMutation = useMutation({
     mutationFn: (paymentIndex) =>
-      confirmInstallmentPayment(
-        contractId,
-        paymentIndex,
-        createClientIdempotencyKey(),
-      ),
+      confirmInstallmentPayment(contractId, paymentIndex, createClientIdempotencyKey()),
     onSuccess: invalidateInstallment,
   });
 
   const rejectPaymentMutation = useMutation({
     mutationFn: (paymentIndex) =>
-      rejectInstallmentPayment(
-        contractId,
-        paymentIndex,
-        createClientIdempotencyKey(),
-      ),
+      rejectInstallmentPayment(contractId, paymentIndex, createClientIdempotencyKey()),
     onSuccess: invalidateInstallment,
   });
 

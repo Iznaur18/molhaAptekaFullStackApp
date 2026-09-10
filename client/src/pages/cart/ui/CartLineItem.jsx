@@ -5,7 +5,13 @@ import { getCartLineStockHint } from "../../../entities/cart/lib/getCartLineStoc
 import { getProductPurchaseLimit } from "../../../entities/product/lib/getProductPurchaseLimit.js";
 import { resolveProductImageUrl } from "../../../entities/product/lib/resolveProductImageUrl.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
-import { CART_PAGE_UI, COMMON_UI, PRODUCT_BUY_N_FREE_UI, PRODUCT_FLASH_SALE_UI, PRODUCT_PROMO_CODE_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  CART_PAGE_UI,
+  COMMON_UI,
+  PRODUCT_BUY_N_FREE_UI,
+  PRODUCT_FLASH_SALE_UI,
+  PRODUCT_PROMO_CODE_UI,
+} from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { AppIcon, Trash2 } from "../../../shared/ui/icon/index.js";
 
@@ -23,12 +29,7 @@ const CART_LINE_IMAGE_SIZE_PX = 72;
  *   onProductClick?: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
  * }} props
  */
-export function CartLineItem({
-  line,
-  selected,
-  onToggleSelected,
-  onProductClick,
-}) {
+export function CartLineItem({ line, selected, onToggleSelected, onProductClick }) {
   const { setItemQuantity, removeItem } = useCart();
   const [imageFailed, setImageFailed] = useState(false);
   const product = line.product;
@@ -51,9 +52,7 @@ export function CartLineItem({
   const stockHint = getCartLineStockHint(purchaseLimit, line.quantity);
   const resolvedImage = resolveProductImageUrl(product);
   const imageUrl =
-    imageFailed || !resolvedImage
-      ? PRODUCT_IMAGE_PLACEHOLDER_URL
-      : resolvedImage;
+    imageFailed || !resolvedImage ? PRODUCT_IMAGE_PLACEHOLDER_URL : resolvedImage;
 
   const handleDecrease = () => {
     if (line.quantity <= 1) {
@@ -202,10 +201,7 @@ export function CartLineItem({
 
       <button
         type="button"
-        className={[
-          "cart-line__select",
-          selected && "cart-line__select_checked",
-        ]
+        className={["cart-line__select", selected && "cart-line__select_checked"]
           .filter(Boolean)
           .join(" ")}
         onClick={() => onToggleSelected(line.productId)}

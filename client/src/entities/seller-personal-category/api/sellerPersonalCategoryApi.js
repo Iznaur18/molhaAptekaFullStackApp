@@ -28,7 +28,10 @@ export async function submitSellerPersonalCategoryCampaign(body) {
   try {
     const parsedBody = submitSellerPersonalCategoryCampaignBodySchema.parse(body);
     const { data } = await apiClient.post("/seller-personal-category", parsedBody);
-    const parsed = parseApiContractData(data, submitSellerPersonalCategoryCampaignDataSchema);
+    const parsed = parseApiContractData(
+      data,
+      submitSellerPersonalCategoryCampaignDataSchema,
+    );
     return {
       message: parsed.message,
       campaign: parsed.campaign,
@@ -95,7 +98,10 @@ export async function fetchPendingSellerPersonalCategoryCampaignsCount() {
     return parsed.count;
   } catch (e) {
     throw new Error(
-      formatApiErrorMessage(e, SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.FETCH_FALLBACK),
+      formatApiErrorMessage(
+        e,
+        SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.FETCH_FALLBACK,
+      ),
     );
   }
 }
@@ -113,7 +119,10 @@ export async function fetchPendingSellerPersonalCategoryCampaigns(limit = 50) {
     return parsed.campaigns;
   } catch (e) {
     throw new Error(
-      formatApiErrorMessage(e, SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.FETCH_FALLBACK),
+      formatApiErrorMessage(
+        e,
+        SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.FETCH_FALLBACK,
+      ),
     );
   }
 }
@@ -133,7 +142,10 @@ export async function approveSellerPersonalCategoryCampaign(campaignId) {
     return parsed.message;
   } catch (e) {
     throw new Error(
-      formatApiErrorMessage(e, SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.APPROVE_FALLBACK),
+      formatApiErrorMessage(
+        e,
+        SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.APPROVE_FALLBACK,
+      ),
     );
   }
 }
@@ -155,14 +167,19 @@ export async function rejectSellerPersonalCategoryCampaign(campaignId, reason = 
     return parsed.message;
   } catch (e) {
     throw new Error(
-      formatApiErrorMessage(e, SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.REJECT_FALLBACK),
+      formatApiErrorMessage(
+        e,
+        SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.REJECT_FALLBACK,
+      ),
     );
   }
 }
 
 export async function fetchManagedSellerPersonalCategoryCampaigns() {
   try {
-    const { data } = await apiClient.get("/seller-personal-category/moderation/managed");
+    const { data } = await apiClient.get(
+      "/seller-personal-category/moderation/managed",
+    );
     const parsed = parseApiContractData(
       data,
       managedSellerPersonalCategoryCampaignsDataSchema,

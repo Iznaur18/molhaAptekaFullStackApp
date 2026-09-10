@@ -49,7 +49,10 @@ export const IntroVideoUploadField = ({
       if (!asset) {
         return;
       }
-      const storedUrl = await uploadMutation.mutateAsync({ ...asset, purpose: "intro" });
+      const storedUrl = await uploadMutation.mutateAsync({
+        ...asset,
+        purpose: "intro",
+      });
       onChange(storedUrl);
     } catch (error) {
       setErrorMessage(

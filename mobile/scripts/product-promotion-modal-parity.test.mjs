@@ -10,8 +10,12 @@ const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
 test("product promotion modal mirrors web tier and action colors", () => {
-  const modal = readMobileFile("features/product-promotion/ui/ProductPromotionModal.tsx");
-  const tabs = readMobileFile("features/product-promotion/ui/ProductPromotionModalTabs.tsx");
+  const modal = readMobileFile(
+    "features/product-promotion/ui/ProductPromotionModal.tsx",
+  );
+  const tabs = readMobileFile(
+    "features/product-promotion/ui/ProductPromotionModalTabs.tsx",
+  );
   const styles = readMobileFile("shared/theme/modalChromeStyles.ts");
   const chrome = readMobileFile("entities/product/lib/productPromotionTierChrome.ts");
   const manage = readMobileFile("entities/product/ui/ProductEditManageSection.tsx");

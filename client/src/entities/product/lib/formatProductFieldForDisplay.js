@@ -1,7 +1,11 @@
 import { formatProductDescriptionPlainText } from "@izibuy/shared-lib";
 import { getRuRegionByCode } from "@molha/api-contract";
 
-import { COMMON_UI, FORMAT_BOOLEAN_RU, PRODUCT_DETAILS_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  COMMON_UI,
+  FORMAT_BOOLEAN_RU,
+  PRODUCT_DETAILS_MODAL_UI,
+} from "../../../shared/config/appUiCopy.js";
 import { PRODUCT_CATEGORY_LABEL_RU } from "../model/productConstants.js";
 import { getProductModerationBadgeLabel } from "./getProductModerationUi.js";
 import { resolveProductImageUrls } from "./resolveProductImageUrls.js";

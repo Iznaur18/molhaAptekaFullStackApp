@@ -62,7 +62,9 @@ export const selectCartLines = (
   /** Тик из useCartFlashSalePriceTick — по нему гасим истёкшую горящую скидку. */
   nowMs: number = Date.now(),
 ): { lines: CartLine[]; total: number } => {
-  const productById = new Map(products.map((product) => [String(product._id), product]));
+  const productById = new Map(
+    products.map((product) => [String(product._id), product]),
+  );
   const promoByProductId = new Map(
     appliedPromos.map((row) => [String(row.productId), row]),
   );
@@ -72,7 +74,10 @@ export const selectCartLines = (
     for (const [productId, row] of buyNFreeProgressByProductId.entries()) {
       progressByProductId.set(String(productId), row);
     }
-  } else if (buyNFreeProgressByProductId && typeof buyNFreeProgressByProductId === "object") {
+  } else if (
+    buyNFreeProgressByProductId &&
+    typeof buyNFreeProgressByProductId === "object"
+  ) {
     for (const [productId, row] of Object.entries(buyNFreeProgressByProductId)) {
       progressByProductId.set(String(productId), row);
     }

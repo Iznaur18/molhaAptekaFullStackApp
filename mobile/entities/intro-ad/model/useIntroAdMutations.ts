@@ -2,7 +2,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { introAdQueryKeys, loyaltyPointsQueryKeys } from "@/shared/api";
 
-import { cancelIntroAdCampaign, submitIntroAdCampaign } from "../api/introAdMutationsApi";
+import {
+  cancelIntroAdCampaign,
+  submitIntroAdCampaign,
+} from "../api/introAdMutationsApi";
 
 export const useIntroAdMutations = () => {
   const queryClient = useQueryClient();

@@ -105,7 +105,9 @@ export function CategoryTreeAdminPage() {
                 <textarea
                   value={newCharacteristicKeysText}
                   onChange={(e) => setNewCharacteristicKeysText(e.target.value)}
-                  placeholder={CATEGORY_TREE_ADMIN_PAGE_UI.DEFAULT_CHARACTERISTICS_PLACEHOLDER}
+                  placeholder={
+                    CATEGORY_TREE_ADMIN_PAGE_UI.DEFAULT_CHARACTERISTICS_PLACEHOLDER
+                  }
                   rows={5}
                 />
                 <small className="admin-panel__field-hint">

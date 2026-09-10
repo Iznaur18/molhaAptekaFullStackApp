@@ -73,7 +73,9 @@ export const acceptPriceOffer = async (productId: string, offerId: string) => {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.ACCEPT_PRICE_OFFER_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.ACCEPT_PRICE_OFFER_FALLBACK),
+    );
   }
 };
 
@@ -86,6 +88,8 @@ export const rejectPriceOffer = async (productId: string, offerId: string) => {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.REJECT_PRICE_OFFER_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.REJECT_PRICE_OFFER_FALLBACK),
+    );
   }
 };

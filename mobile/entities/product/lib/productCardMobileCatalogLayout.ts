@@ -21,8 +21,7 @@ export const PRODUCT_CARD_MOBILE_CATALOG_LAYOUT = {
   priceRowGap: 3.2,
 } as const;
 
-export type ProductCardMobileCatalogLayout =
-  typeof PRODUCT_CARD_MOBILE_CATALOG_LAYOUT;
+export type ProductCardMobileCatalogLayout = typeof PRODUCT_CARD_MOBILE_CATALOG_LAYOUT;
 
 /** Фиксированная высота текстового стека под фото в catalog-grid. */
 export const resolveProductCardCatalogGridContentBelowImageHeight = (

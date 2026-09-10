@@ -37,7 +37,8 @@ const optionalTrimmedText = (maxLength) =>
     return String(value).trim();
   }, z.string().max(maxLength).nullable().optional());
 
-const timingMsSchema = (min, max) => z.coerce.number().int().min(min).max(max).optional();
+const timingMsSchema = (min, max) =>
+  z.coerce.number().int().min(min).max(max).optional();
 
 export const submitIntroAdCampaignBodySchema = z
   .object({

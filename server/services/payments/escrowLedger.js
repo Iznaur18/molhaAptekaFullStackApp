@@ -88,7 +88,8 @@ export function buildEscrowLinesForShipment(order, sellerId) {
     // Позиция могла отмениться между подтверждением заказа и оплатой: деньги
     // за неё покупатель всё равно внёс, значит это сразу долг перед ним, а не
     // повод выкинуть строку и потерять сумму.
-    const refundReason = REFUND_REASON_BY_ITEM_STATUS[String(item?.status ?? "")] ?? null;
+    const refundReason =
+      REFUND_REASON_BY_ITEM_STATUS[String(item?.status ?? "")] ?? null;
 
     lines.push({
       kind: ESCROW_LINE_KIND_GOODS,

@@ -19,7 +19,9 @@ test("my products page uses catalog toolbar, grid and seller card footer", () =>
     "features/my-products-page/ui/MyProductsCatalogGridRowItem.tsx",
   );
   const productCard = readMobileFile("entities/product/ui/ProductCard.tsx");
-  const sellerToolbar = readMobileFile("entities/product/ui/ProductCardSellerToolbar.tsx");
+  const sellerToolbar = readMobileFile(
+    "entities/product/ui/ProductCardSellerToolbar.tsx",
+  );
 
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /MyProductsCatalogToolbar/);
@@ -64,7 +66,9 @@ test("my products page uses catalog toolbar, grid and seller card footer", () =>
   assert.doesNotMatch(page, /CatalogAnimatedFlatList/);
   assert.match(page, /MY_PRODUCTS_PAGE_LAYOUT/);
 
-  const shelves = readMobileFile("features/my-products-page/ui/MyProductsShelvesPanel.tsx");
+  const shelves = readMobileFile(
+    "features/my-products-page/ui/MyProductsShelvesPanel.tsx",
+  );
   assert.match(shelves, /MY_PRODUCTS_PAGE_LAYOUT/);
   assert.match(shelves, /shelvesPaddingY/);
   assert.doesNotMatch(shelves, /marginBottom:\s*8/);
@@ -94,7 +98,9 @@ test("my products page uses catalog toolbar, grid and seller card footer", () =>
   assert.match(sellerToolbar, /COPY_PRODUCT_ARIA/);
   assert.match(sellerToolbar, /variant\?: "default" \| "compact"/);
 
-  const createScreen = readMobileFile("features/create-product/ui/CreateProductScreen.tsx");
+  const createScreen = readMobileFile(
+    "features/create-product/ui/CreateProductScreen.tsx",
+  );
   assert.match(createScreen, /useFocusEffect/);
   assert.match(createScreen, /peekCreateProductLaunch/);
   assert.match(createScreen, /getCreateProductLaunchSeq/);

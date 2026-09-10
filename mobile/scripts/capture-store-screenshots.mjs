@@ -8,14 +8,12 @@ const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const MOBILE_ROOT = path.resolve(SCRIPT_DIR, "..");
 const OUT_ROOT = path.resolve(MOBILE_ROOT, "store-assets");
 
-const WEB_APP_URL = (process.env.STORE_SCREENSHOT_WEB_URL ?? "http://localhost:8081").replace(
-  /\/$/,
-  "",
-);
-const API_URL = (process.env.STORE_SCREENSHOT_API_URL ?? "http://127.0.0.1:4444").replace(
-  /\/$/,
-  "",
-);
+const WEB_APP_URL = (
+  process.env.STORE_SCREENSHOT_WEB_URL ?? "http://localhost:8081"
+).replace(/\/$/, "");
+const API_URL = (
+  process.env.STORE_SCREENSHOT_API_URL ?? "http://127.0.0.1:4444"
+).replace(/\/$/, "");
 const PAGE_LOAD_TIMEOUT_MS = 60_000;
 const SCREEN_SETTLE_MS = 1_500;
 
@@ -46,7 +44,11 @@ const GUEST_SCREENS = [
   { file: "04-login", path: "/login", waitForText: "Войти" },
   { file: "05-register", path: "/register", waitForText: "Зарегистрироваться" },
   { file: "06-profile-guest", path: "/me", waitForText: "Профиль" },
-  { file: "07-privacy", path: "/legal/privacy", waitForText: "Политика конфиденциальности" },
+  {
+    file: "07-privacy",
+    path: "/legal/privacy",
+    waitForText: "Политика конфиденциальности",
+  },
 ];
 
 const fetchFirstProductPath = async () => {
@@ -128,7 +130,9 @@ try {
     await browser.close();
   }
 
-  console.log("\nDone. Auth screens (cart with items, checkout, orders) — вручную, см. mobile/docs/STORE-SCREENSHOTS.md");
+  console.log(
+    "\nDone. Auth screens (cart with items, checkout, orders) — вручную, см. mobile/docs/STORE-SCREENSHOTS.md",
+  );
 } catch (error) {
   console.error(error);
   process.exit(1);

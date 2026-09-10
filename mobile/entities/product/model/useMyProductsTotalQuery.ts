@@ -8,7 +8,9 @@ type UseMyProductsTotalQueryOptions = {
   enabled?: boolean;
 };
 
-export const useMyProductsTotalQuery = ({ enabled = true }: UseMyProductsTotalQueryOptions = {}) => {
+export const useMyProductsTotalQuery = ({
+  enabled = true,
+}: UseMyProductsTotalQueryOptions = {}) => {
   const query = useQuery({
     queryKey: myProductsQueryKeys.total(),
     enabled,

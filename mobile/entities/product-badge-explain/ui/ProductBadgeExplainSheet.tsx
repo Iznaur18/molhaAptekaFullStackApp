@@ -69,7 +69,8 @@ export const ProductBadgeExplainSheet = ({
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const isDark = colorScheme === "dark";
-  const maxPanelHeight = windowHeight * PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.panelMaxHeightRatio;
+  const maxPanelHeight =
+    windowHeight * PRODUCT_BADGE_EXPLAIN_SHEET_LAYOUT.panelMaxHeightRatio;
   const [panelHeight, setPanelHeight] = useState(0);
   const estimatedSlideDistance = useMemo(
     () => estimateProductBadgeExplainSheetSlideDistance(windowWidth, windowHeight),
@@ -78,8 +79,7 @@ export const ProductBadgeExplainSheet = ({
   const sheetSlideDistance = panelHeight > 0 ? panelHeight : estimatedSlideDistance;
   const { modalVisible, backdropAnimatedStyle, sheetAnimatedStyle, useCssTransition } =
     useProductBadgeExplainSheetAnimation(visible, sheetSlideDistance);
-  const descriptionOverride =
-    typeof description === "string" ? description.trim() : "";
+  const descriptionOverride = typeof description === "string" ? description.trim() : "";
   const hasDescriptionOverride = descriptionOverride.length > 0;
   const adminByKey = useProductBadgeExplainByKeyMap({
     enabled: modalVisible && !hasDescriptionOverride,
@@ -103,9 +103,7 @@ export const ProductBadgeExplainSheet = ({
     ? { description: descriptionOverride, imageUrl: null }
     : resolvedContent;
 
-  const imageSrc = content.imageUrl
-    ? resolveUploadedMediaUrl(content.imageUrl)
-    : null;
+  const imageSrc = content.imageUrl ? resolveUploadedMediaUrl(content.imageUrl) : null;
 
   useEffect(() => {
     if (!modalVisible) {
@@ -133,9 +131,7 @@ export const ProductBadgeExplainSheet = ({
       setRevealedPhone(phone);
     } catch (error) {
       setContactError(
-        error instanceof Error
-          ? error.message
-          : PRODUCT_BADGE_EXPLAIN_UI.CONTACT_ERROR,
+        error instanceof Error ? error.message : PRODUCT_BADGE_EXPLAIN_UI.CONTACT_ERROR,
       );
     } finally {
       setContactPending(false);
@@ -143,9 +139,7 @@ export const ProductBadgeExplainSheet = ({
   };
 
   const phoneHref = revealedPhone ? toRuPhoneTelHref(revealedPhone) : null;
-  const phoneDisplay = revealedPhone
-    ? formatRuPhoneDisplayOrEmpty(revealedPhone)
-    : "";
+  const phoneDisplay = revealedPhone ? formatRuPhoneDisplayOrEmpty(revealedPhone) : "";
 
   if (!modalVisible) {
     return null;
@@ -160,9 +154,17 @@ export const ProductBadgeExplainSheet = ({
   const SheetContainer = useCssTransition ? View : Animated.View;
 
   return (
-    <Modal visible={modalVisible} animationType="none" transparent onRequestClose={onClose}>
+    <Modal
+      visible={modalVisible}
+      animationType="none"
+      transparent
+      onRequestClose={onClose}
+    >
       <View style={styles.root}>
-        <BackdropContainer style={[styles.backdrop, backdropAnimatedStyle]} pointerEvents="box-none">
+        <BackdropContainer
+          style={[styles.backdrop, backdropAnimatedStyle]}
+          pointerEvents="box-none"
+        >
           <ModalSheetGradientBackdrop />
         </BackdropContainer>
         <Pressable
@@ -221,7 +223,12 @@ export const ProductBadgeExplainSheet = ({
                     void Linking.openURL(phoneHref).catch(() => undefined);
                   }}
                 >
-                  <Text style={[styles.closeButtonText, isDark && styles.closeButtonTextDark]}>
+                  <Text
+                    style={[
+                      styles.closeButtonText,
+                      isDark && styles.closeButtonTextDark,
+                    ]}
+                  >
                     {phoneDisplay}
                   </Text>
                 </Pressable>
@@ -239,7 +246,12 @@ export const ProductBadgeExplainSheet = ({
                       void handleContact();
                     }}
                   >
-                    <Text style={[styles.closeButtonText, isDark && styles.closeButtonTextDark]}>
+                    <Text
+                      style={[
+                        styles.closeButtonText,
+                        isDark && styles.closeButtonTextDark,
+                      ]}
+                    >
                       {contactPending
                         ? PRODUCT_BADGE_EXPLAIN_UI.CONTACT_PENDING
                         : PRODUCT_BADGE_EXPLAIN_UI.CONTACT}
@@ -257,7 +269,12 @@ export const ProductBadgeExplainSheet = ({
                   accessibilityRole="button"
                   onPress={onPrimaryAction}
                 >
-                  <Text style={[styles.closeButtonText, isDark && styles.closeButtonTextDark]}>
+                  <Text
+                    style={[
+                      styles.closeButtonText,
+                      isDark && styles.closeButtonTextDark,
+                    ]}
+                  >
                     {primaryActionLabel || PRODUCT_BADGE_EXPLAIN_UI.CLOSE}
                   </Text>
                 </Pressable>
@@ -267,7 +284,12 @@ export const ProductBadgeExplainSheet = ({
                   accessibilityRole="button"
                   onPress={onClose}
                 >
-                  <Text style={[styles.closeButtonText, isDark && styles.closeButtonTextDark]}>
+                  <Text
+                    style={[
+                      styles.closeButtonText,
+                      isDark && styles.closeButtonTextDark,
+                    ]}
+                  >
                     {PRODUCT_BADGE_EXPLAIN_UI.CLOSE}
                   </Text>
                 </Pressable>

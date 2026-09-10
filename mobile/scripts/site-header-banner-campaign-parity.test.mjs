@@ -18,16 +18,25 @@ test("site-header-banner-campaign advertising parity", () => {
 
   assert.match(webPage, /SiteHeaderBannerAdvertisingSection/);
   assert.match(mobilePage, /SiteHeaderBannerAdvertisingSection/);
-  assert.match(webPage, /SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI|SiteHeaderBannerAdvertisingSection/);
   assert.match(
-    readMobileFile("features/advertising-page/ui/SiteHeaderBannerAdvertisingSection.tsx"),
+    webPage,
+    /SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI|SiteHeaderBannerAdvertisingSection/,
+  );
+  assert.match(
+    readMobileFile(
+      "features/advertising-page/ui/SiteHeaderBannerAdvertisingSection.tsx",
+    ),
     /SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI/,
   );
 });
 
 test("site-header-banner-campaign moderation in intro-ad-moderation", () => {
-  const webPage = readRepoFile("client/src/pages/intro-ad-moderation/ui/IntroAdModerationPage.jsx");
-  const mobilePage = readMobileFile("features/intro-ad-moderation-page/ui/IntroAdModerationPage.tsx");
+  const webPage = readRepoFile(
+    "client/src/pages/intro-ad-moderation/ui/IntroAdModerationPage.jsx",
+  );
+  const mobilePage = readMobileFile(
+    "features/intro-ad-moderation-page/ui/IntroAdModerationPage.tsx",
+  );
 
   assert.match(webPage, /SiteHeaderBannerCampaignModerationSection/);
   assert.match(mobilePage, /SiteHeaderBannerCampaignModerationSection/);
@@ -42,8 +51,12 @@ test("site-header-banner-campaign API routes wired", () => {
 });
 
 test("paid slides merged in public banner API", () => {
-  const controller = readRepoFile("server/controllers/SiteHeaderBanner/siteHeaderBannerControllers.js");
-  const payload = readRepoFile("server/services/site-header-banner/resolveSiteHeaderBannerPayload.js");
+  const controller = readRepoFile(
+    "server/controllers/SiteHeaderBanner/siteHeaderBannerControllers.js",
+  );
+  const payload = readRepoFile(
+    "server/services/site-header-banner/resolveSiteHeaderBannerPayload.js",
+  );
 
   assert.match(controller, /resolveMergedPublicSiteHeaderBannerSlides/);
   assert.match(payload, /resolveActivePaidSiteHeaderBannerCampaignSlides/);
@@ -79,8 +92,12 @@ test("vite proxy routes site-header-banner-campaign before site-header-banner", 
 });
 
 test("external banner links supported", () => {
-  const webCarousel = readRepoFile("client/src/entities/site-header-banner/ui/SiteHeaderBannerCarousel.jsx");
-  const mobileCarousel = readMobileFile("entities/site-header-banner/ui/SiteHeaderBannerCarousel.tsx");
+  const webCarousel = readRepoFile(
+    "client/src/entities/site-header-banner/ui/SiteHeaderBannerCarousel.jsx",
+  );
+  const mobileCarousel = readMobileFile(
+    "entities/site-header-banner/ui/SiteHeaderBannerCarousel.tsx",
+  );
 
   assert.match(webCarousel, /openSiteHeaderBannerLink/);
   assert.match(mobileCarousel, /Linking\.openURL/);

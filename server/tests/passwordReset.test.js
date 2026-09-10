@@ -4,7 +4,11 @@ import { after, afterEach, before, test } from "node:test";
 import { PASSWORD_RESET_GENERIC_MESSAGE } from "../constants/passwordResetConstants.js";
 import { UserModel } from "../models/index.js";
 import { hashEmailVerificationSecret } from "../services/auth/emailVerification.js";
-import { startHttpTestServer, stopHttpTestServer, buildCookieHeader } from "./helpers/httpTestApp.js";
+import {
+  startHttpTestServer,
+  stopHttpTestServer,
+  buildCookieHeader,
+} from "./helpers/httpTestApp.js";
 import {
   buildRegisterPayload,
   completeRegistrationFlow,

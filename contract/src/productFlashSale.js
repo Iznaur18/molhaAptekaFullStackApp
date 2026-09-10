@@ -10,8 +10,7 @@ export const PRODUCT_FLASH_SALE_AUCTION_BLOCKED_MESSAGE =
   "Отключите аукцион, чтобы включить горящую скидку";
 export const PRODUCT_FLASH_SALE_MANUAL_DISCOUNT_BLOCKED_MESSAGE =
   "Сначала уберите ручную скидку (старую цену)";
-export const PRODUCT_FLASH_SALE_PRICE_REQUIRED_MESSAGE =
-  "Укажите цену со скидкой";
+export const PRODUCT_FLASH_SALE_PRICE_REQUIRED_MESSAGE = "Укажите цену со скидкой";
 export const PRODUCT_FLASH_SALE_PRICE_TOO_HIGH_MESSAGE =
   "Цена со скидкой должна быть меньше обычной";
 export const PRODUCT_FLASH_SALE_MAX_DISCOUNT_MESSAGE = `Скидка не более ${PRODUCT_FLASH_SALE_MAX_DISCOUNT_PERCENT}%`;
@@ -58,7 +57,9 @@ export const isProductFlashSaleActiveAt = (endsAtMs, nowMs = Date.now()) => {
   return ends > nowMs;
 };
 
-export const productFlashSaleDurationUnitSchema = z.enum(PRODUCT_FLASH_SALE_DURATION_UNITS);
+export const productFlashSaleDurationUnitSchema = z.enum(
+  PRODUCT_FLASH_SALE_DURATION_UNITS,
+);
 
 export const productFlashSalePatchFieldsShape = {
   productFlashSaleEnabled: z.coerce.boolean().optional(),

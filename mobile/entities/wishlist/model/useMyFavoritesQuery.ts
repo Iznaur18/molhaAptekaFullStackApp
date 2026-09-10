@@ -7,7 +7,9 @@ type UseMyFavoritesQueryOptions = {
   enabled?: boolean;
 };
 
-export const useMyFavoritesQuery = ({ enabled = true }: UseMyFavoritesQueryOptions = {}) =>
+export const useMyFavoritesQuery = ({
+  enabled = true,
+}: UseMyFavoritesQueryOptions = {}) =>
   useQuery({
     queryKey: wishlistQueryKeys.my(),
     queryFn: fetchMyFavorites,

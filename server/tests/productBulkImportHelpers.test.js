@@ -18,10 +18,10 @@ describe("product bulk import helpers", () => {
   });
 
   it("parseBulkImportImageUrls splits semicolon and comma", () => {
-    assert.deepEqual(parseBulkImportImageUrls("https://a.test/1.jpg; https://b.test/2.png"), [
-      "https://a.test/1.jpg",
-      "https://b.test/2.png",
-    ]);
+    assert.deepEqual(
+      parseBulkImportImageUrls("https://a.test/1.jpg; https://b.test/2.png"),
+      ["https://a.test/1.jpg", "https://b.test/2.png"],
+    );
   });
 
   it("buildLeafCategoryBreadcrumbPath avoids duplicate leaf label", () => {

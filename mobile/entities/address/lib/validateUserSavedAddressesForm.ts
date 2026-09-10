@@ -33,7 +33,9 @@ export const validateUserSavedAddressesForm = (
   for (const item of list) {
     const label = String(item.label ?? "").trim();
     if (label.length > USER_SAVED_ADDRESS_LABEL_MAX_LENGTH) {
-      return USER_SAVED_ADDRESSES_UI.ERROR_LABEL_MAX(USER_SAVED_ADDRESS_LABEL_MAX_LENGTH);
+      return USER_SAVED_ADDRESSES_UI.ERROR_LABEL_MAX(
+        USER_SAVED_ADDRESS_LABEL_MAX_LENGTH,
+      );
     }
 
     const addressError = validateRuDeliveryAddressForm(item);

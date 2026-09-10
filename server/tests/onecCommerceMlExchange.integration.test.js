@@ -5,14 +5,10 @@ process.env.NODE_ENV = process.env.NODE_ENV ?? "test";
 process.env.JWT_SECRET =
   process.env.JWT_SECRET ?? "integration-test-jwt-secret-min-32-chars";
 
-const {
-  connectMongoTestReplSet,
-  disconnectMongoTestReplSet,
-  clearMongoCollections,
-} = await import("./helpers/mongoTestDb.js");
-const { startHttpTestServer, stopHttpTestServer } = await import(
-  "./helpers/httpTestApp.js"
-);
+const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollections } =
+  await import("./helpers/mongoTestDb.js");
+const { startHttpTestServer, stopHttpTestServer } =
+  await import("./helpers/httpTestApp.js");
 const {
   GROUP_VITAMINS,
   OFFER_GUID_SIMPLE,
@@ -33,15 +29,11 @@ const {
   OrderModel,
   ProductModel,
 } = await import("../models/index.js");
-const { saveOneCCategoryMappings } = await import(
-  "../services/onec/exchange/index.js"
-);
-const { createOneCCatalogApplier } = await import(
-  "../services/onec/exchange/applyOneCCatalogProducts.js"
-);
-const { UNCATEGORIZED_CATEGORY_WRITE } = await import(
-  "../services/onec/exchange/onecCategoryMappings.js"
-);
+const { saveOneCCategoryMappings } = await import("../services/onec/exchange/index.js");
+const { createOneCCatalogApplier } =
+  await import("../services/onec/exchange/applyOneCCatalogProducts.js");
+const { UNCATEGORIZED_CATEGORY_WRITE } =
+  await import("../services/onec/exchange/onecCategoryMappings.js");
 
 /** @type {Awaited<ReturnType<typeof startHttpTestServer>>} */
 let http;
@@ -101,9 +93,10 @@ describe("CommerceML обмен: каталог", () => {
     assert.equal(aspirin.productFromOneC, true);
     assert.equal(aspirin.product1cGroupId, GROUP_VITAMINS);
     // Свойство из классификатора разворачивается в человекочитаемое значение.
-    assert.deepEqual(aspirin.productCharacteristics.map((c) => [c.key, c.value]), [
-      ["Дозировка", "500 мг"],
-    ]);
+    assert.deepEqual(
+      aspirin.productCharacteristics.map((c) => [c.key, c.value]),
+      [["Дозировка", "500 мг"]],
+    );
     assert.equal(aspirin.productImageUrls.length, 1);
     assert.equal(aspirin.product1cImageHashes.length, 1);
 
@@ -236,7 +229,12 @@ describe("CommerceML обмен: каталог", () => {
 
     const applier = createOneCCatalogApplier({
       sellerId: String(seller._id),
-      resolver: { resolve: async () => ({ categoryWrite: UNCATEGORIZED_CATEGORY_WRITE, mapped: false }) },
+      resolver: {
+        resolve: async () => ({
+          categoryWrite: UNCATEGORIZED_CATEGORY_WRITE,
+          mapped: false,
+        }),
+      },
       sellerDefaults: {
         productPickupAddress: "г Москва, ул Тверская, д 1",
         productPickupLat: 55.757,
@@ -405,10 +403,7 @@ describe("CommerceML обмен: товары без картинок", () => {
     );
 
     assert.equal(latestJobOfKind(jobs, "catalog").stats.catalog.held, 1);
-    assert.equal(
-      latestJobOfKind(jobs, "offers").stats.offers["offers.xml"].held,
-      1,
-    );
+    assert.equal(latestJobOfKind(jobs, "offers").stats.offers["offers.xml"].held, 1);
     assert.equal(
       latestJobOfKind(jobs, "offers").stats.offers["offers.xml"].restored,
       0,
@@ -500,8 +495,7 @@ describe("CommerceML обмен: товары без картинок", () => {
     assert.equal(variant.product1cHeld, true);
     assert.ok(
       latestJobOfKind(jobs, "catalog").stats.catalog.heldHidden >= 1 ||
-        latestJobOfKind(jobs, "offers").stats.offers["offers.xml"].heldHidden >=
-          1,
+        latestJobOfKind(jobs, "offers").stats.offers["offers.xml"].heldHidden >= 1,
     );
   });
 });
@@ -567,14 +561,11 @@ describe("CommerceML обмен: повторная выгрузка без из
 describe("CommerceML обмен: авторизация", () => {
   it("отвечает failure на неверный пароль", async () => {
     const { credentials } = await createExchangeSeller();
-    const basic = Buffer.from(`${credentials.login}:wrong`, "utf8").toString(
-      "base64",
-    );
+    const basic = Buffer.from(`${credentials.login}:wrong`, "utf8").toString("base64");
 
-    const response = await http.request(
-      "/onec/exchange?type=catalog&mode=checkauth",
-      { headers: { Authorization: `Basic ${basic}` } },
-    );
+    const response = await http.request("/onec/exchange?type=catalog&mode=checkauth", {
+      headers: { Authorization: `Basic ${basic}` },
+    });
     const body = await response.text();
 
     // 1С читает тело, а не код: HTTP-200 с `failure` — это и есть отказ.
@@ -595,10 +586,9 @@ describe("CommerceML обмен: авторизация", () => {
       "utf8",
     ).toString("base64");
 
-    const checkAuth = await http.request(
-      "/onec/exchange?type=catalog&mode=checkauth",
-      { headers: { Authorization: `Basic ${basic}` } },
-    );
+    const checkAuth = await http.request("/onec/exchange?type=catalog&mode=checkauth", {
+      headers: { Authorization: `Basic ${basic}` },
+    });
     const [, cookieName, cookieValue] = (await checkAuth.text()).split("\n");
 
     const response = await http.request(
@@ -659,10 +649,9 @@ describe("CommerceML обмен: заказы", () => {
       `${credentials.login}:${credentials.password}`,
       "utf8",
     ).toString("base64");
-    const checkAuth = await http.request(
-      "/onec/exchange?type=sale&mode=checkauth",
-      { headers: { Authorization: `Basic ${basic}` } },
-    );
+    const checkAuth = await http.request("/onec/exchange?type=sale&mode=checkauth", {
+      headers: { Authorization: `Basic ${basic}` },
+    });
     const [, cookieName, cookieValue] = (await checkAuth.text()).split("\n");
     const cookie = `${cookieName}=${cookieValue}`;
 

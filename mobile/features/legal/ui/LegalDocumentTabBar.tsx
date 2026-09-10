@@ -12,7 +12,10 @@ type LegalDocumentTabBarProps = {
   onKindChange: (kind: LegalDocumentKind) => void;
 };
 
-export const LegalDocumentTabBar = ({ activeKind, onKindChange }: LegalDocumentTabBarProps) => {
+export const LegalDocumentTabBar = ({
+  activeKind,
+  onKindChange,
+}: LegalDocumentTabBarProps) => {
   const styles = useLegalPageStyles();
 
   return (
@@ -33,7 +36,12 @@ export const LegalDocumentTabBar = ({ activeKind, onKindChange }: LegalDocumentT
               accessibilityState={{ selected: isActive }}
               onPress={() => onKindChange(tab.id)}
             >
-              <AppText style={[styles.documentTabText, isActive && styles.documentTabTextActive]}>
+              <AppText
+                style={[
+                  styles.documentTabText,
+                  isActive && styles.documentTabTextActive,
+                ]}
+              >
                 {tab.label}
               </AppText>
             </Pressable>

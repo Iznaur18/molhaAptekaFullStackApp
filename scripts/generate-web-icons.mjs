@@ -54,13 +54,28 @@ async function brandBackground() {
 async function squareIcon({ size, scale, background }) {
   const inner = Math.round(size * scale);
   const logo = await sharp(SOURCE)
-    .resize({ width: inner, height: inner, fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .resize({
+      width: inner,
+      height: inner,
+      fit: "contain",
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    })
     .png()
     .toBuffer();
   const canvas = background
     ? sharp({ create: { width: size, height: size, channels: 4, background } })
-    : sharp({ create: { width: size, height: size, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } });
-  return canvas.composite([{ input: logo, gravity: "center" }]).png().toBuffer();
+    : sharp({
+        create: {
+          width: size,
+          height: size,
+          channels: 4,
+          background: { r: 0, g: 0, b: 0, alpha: 0 },
+        },
+      });
+  return canvas
+    .composite([{ input: logo, gravity: "center" }])
+    .png()
+    .toBuffer();
 }
 
 /** Сборка .ico из PNG-буферов (ICO допускает PNG внутри; принимается браузерами). */
@@ -93,17 +108,26 @@ function buildIco(pngs) {
 async function main() {
   const bg = await brandBackground();
   const meta = await sharp(SOURCE).metadata();
-  console.log(`source ${SOURCE} ${meta.width}×${meta.height}, brand bg rgb(${bg.r},${bg.g},${bg.b})`);
+  console.log(
+    `source ${SOURCE} ${meta.width}×${meta.height}, brand bg rgb(${bg.r},${bg.g},${bg.b})`,
+  );
 
   // Логотип для шапки/OG — нормализуем исходник до 1024 (сохраняем прозрачность).
   await sharp(SOURCE)
-    .resize({ width: 1024, height: 1024, fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .resize({
+      width: 1024,
+      height: 1024,
+      fit: "contain",
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    })
     .png()
     .toFile(out("logo-gitorg.png"));
 
   // favicon PNG (прозрачный фон допустим).
   for (const size of [16, 32]) {
-    await sharp(await squareIcon({ size, scale: 1 })).toFile(out(`favicon-${size}.png`));
+    await sharp(await squareIcon({ size, scale: 1 })).toFile(
+      out(`favicon-${size}.png`),
+    );
   }
 
   // favicon.ico из 16/32/48.
@@ -116,16 +140,29 @@ async function main() {
   await writeFile(out("favicon.ico"), ico);
 
   // Непрозрачные иконки на фоне бренда.
-  await sharp(await squareIcon({ size: 180, scale: 1, background: bg })).toFile(out("apple-touch-icon.png"));
-  await sharp(await squareIcon({ size: 192, scale: 1, background: bg })).toFile(out("icon-192.png"));
-  await sharp(await squareIcon({ size: 512, scale: 1, background: bg })).toFile(out("icon-512.png"));
+  await sharp(await squareIcon({ size: 180, scale: 1, background: bg })).toFile(
+    out("apple-touch-icon.png"),
+  );
+  await sharp(await squareIcon({ size: 192, scale: 1, background: bg })).toFile(
+    out("icon-192.png"),
+  );
+  await sharp(await squareIcon({ size: 512, scale: 1, background: bg })).toFile(
+    out("icon-512.png"),
+  );
 
   // Maskable: логотип в safe-zone (~80%) на фоне бренда.
-  await sharp(await squareIcon({ size: 512, scale: 0.8, background: bg })).toFile(out("maskable-512.png"));
+  await sharp(await squareIcon({ size: 512, scale: 0.8, background: bg })).toFile(
+    out("maskable-512.png"),
+  );
 
   // OG-image 1200×630: логотип по центру на фоне бренда.
   const ogLogo = await sharp(SOURCE)
-    .resize({ width: 460, height: 460, fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .resize({
+      width: 460,
+      height: 460,
+      fit: "contain",
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    })
     .png()
     .toBuffer();
   await sharp({ create: { width: 1200, height: 630, channels: 4, background: bg } })
@@ -133,7 +170,9 @@ async function main() {
     .png()
     .toFile(out("og-image.png"));
 
-  console.log("done: logo-gitorg.png, favicon-16/32.png, favicon.ico, apple-touch-icon.png, icon-192/512.png, maskable-512.png, og-image.png");
+  console.log(
+    "done: logo-gitorg.png, favicon-16/32.png, favicon.ico, apple-touch-icon.png, icon-192/512.png, maskable-512.png, og-image.png",
+  );
 }
 
 main().catch((error) => {

@@ -25,6 +25,8 @@ export const fetchComparableProducts = async (
     }
     return payload.data.products as CatalogGridProduct[];
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_PRODUCTS_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_PRODUCTS_FALLBACK),
+    );
   }
 };

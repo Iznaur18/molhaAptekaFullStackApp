@@ -2,10 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { authMeQueryKeys, cartQueryKeys } from "@/shared/api";
 
-import {
-  confirmLoginPhoneOtp,
-  loginUserByPhonePassword,
-} from "../api/phoneAuth";
+import { confirmLoginPhoneOtp, loginUserByPhonePassword } from "../api/phoneAuth";
 import { fetchAuthMe } from "../api/fetchAuthMe";
 
 export type PhoneLoginPasswordParams = {

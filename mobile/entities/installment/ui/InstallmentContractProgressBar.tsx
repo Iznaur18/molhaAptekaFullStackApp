@@ -41,7 +41,9 @@ export const InstallmentContractProgressBar = ({
       style={styles.progress}
       accessibilityRole="progressbar"
       accessibilityValue={{ min: 0, max: 100, now: clampedPercent }}
-      accessibilityLabel={ariaLabel ?? `${INSTALLMENT_UI.CONTRACT_PAID}: ${clampedPercent}%`}
+      accessibilityLabel={
+        ariaLabel ?? `${INSTALLMENT_UI.CONTRACT_PAID}: ${clampedPercent}%`
+      }
     >
       <Animated.View style={[styles.progressFill, fillStyle]} />
     </View>

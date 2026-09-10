@@ -13,7 +13,8 @@ export const IN_APP_NOTIFICATION_KIND_DATA_CONFIRMATION_REJECTED =
 
 export const IN_APP_NOTIFICATION_KIND_PREMIUM_EXPIRING_SOON = "premium_expiring_soon";
 export const IN_APP_NOTIFICATION_KIND_PREMIUM_EXPIRED = "premium_expired";
-export const IN_APP_NOTIFICATION_KIND_PREMIUM_REVOKED_BY_STAFF = "premium_revoked_by_staff";
+export const IN_APP_NOTIFICATION_KIND_PREMIUM_REVOKED_BY_STAFF =
+  "premium_revoked_by_staff";
 
 export const IN_APP_NOTIFICATION_KIND_PRICE_OFFER_SELLER = "price_offer_seller";
 export const IN_APP_NOTIFICATION_KIND_SELLER_NEW_ORDER = "seller_new_order";
@@ -23,7 +24,8 @@ export const IN_APP_NOTIFICATION_KIND_INSTALLMENT_NEW_FOR_SELLER =
 export const IN_APP_NOTIFICATION_KIND_INSTALLMENT_PAYMENT_REMINDER =
   "installment_payment_reminder";
 export const IN_APP_NOTIFICATION_KIND_INSTALLMENT_OVERDUE = "installment_overdue";
-export const IN_APP_NOTIFICATION_KIND_INSTALLMENT_EARLY_PAYOFF = "installment_early_payoff";
+export const IN_APP_NOTIFICATION_KIND_INSTALLMENT_EARLY_PAYOFF =
+  "installment_early_payoff";
 export const IN_APP_NOTIFICATION_KIND_INSTALLMENT_SELLER_MESSAGE =
   "installment_seller_message";
 export const IN_APP_NOTIFICATION_KIND_INSTALLMENT_DISPUTE_OPENED =
@@ -35,7 +37,8 @@ export const INTRO_AD_NOTIFICATION_KIND_ACTIVATED = "intro_ad_activated";
 export const INTRO_AD_NOTIFICATION_KIND_APPROVED = "intro_ad_approved";
 export const INTRO_AD_NOTIFICATION_KIND_REJECTED = "intro_ad_rejected";
 export const INTRO_AD_NOTIFICATION_KIND_EXPIRED = "intro_ad_expired";
-export const INTRO_AD_NOTIFICATION_KIND_CANCELLED_BY_STAFF = "intro_ad_cancelled_by_staff";
+export const INTRO_AD_NOTIFICATION_KIND_CANCELLED_BY_STAFF =
+  "intro_ad_cancelled_by_staff";
 
 export const SELLER_PERSONAL_CATEGORY_NOTIFICATION_KIND_ACTIVATED =
   "seller_personal_category_activated";

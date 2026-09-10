@@ -12,14 +12,23 @@ export const PRODUCT_REVIEW_LIMIT_MAX = 50;
 const productReviewRatingSchema = z.coerce
   .number()
   .int(`rating от ${PRODUCT_REVIEW_RATING_MIN} до ${PRODUCT_REVIEW_RATING_MAX}`)
-  .min(PRODUCT_REVIEW_RATING_MIN, `rating от ${PRODUCT_REVIEW_RATING_MIN} до ${PRODUCT_REVIEW_RATING_MAX}`)
-  .max(PRODUCT_REVIEW_RATING_MAX, `rating от ${PRODUCT_REVIEW_RATING_MIN} до ${PRODUCT_REVIEW_RATING_MAX}`);
+  .min(
+    PRODUCT_REVIEW_RATING_MIN,
+    `rating от ${PRODUCT_REVIEW_RATING_MIN} до ${PRODUCT_REVIEW_RATING_MAX}`,
+  )
+  .max(
+    PRODUCT_REVIEW_RATING_MAX,
+    `rating от ${PRODUCT_REVIEW_RATING_MIN} до ${PRODUCT_REVIEW_RATING_MAX}`,
+  );
 
 const optionalReviewTextSchema = z
   .union([z.string(), z.null()])
   .optional()
   .refine(
-    (value) => value === undefined || value === null || value.length <= PRODUCT_REVIEW_TEXT_MAX_LENGTH,
+    (value) =>
+      value === undefined ||
+      value === null ||
+      value.length <= PRODUCT_REVIEW_TEXT_MAX_LENGTH,
     `text не длиннее ${PRODUCT_REVIEW_TEXT_MAX_LENGTH} символов`,
   );
 
@@ -32,7 +41,10 @@ export const patchProductReviewBodySchema = z.object({
   rating: productReviewRatingSchema.optional(),
   text: z
     .string({ invalid_type_error: "text должен быть строкой" })
-    .max(PRODUCT_REVIEW_TEXT_MAX_LENGTH, `text не длиннее ${PRODUCT_REVIEW_TEXT_MAX_LENGTH} символов`)
+    .max(
+      PRODUCT_REVIEW_TEXT_MAX_LENGTH,
+      `text не длиннее ${PRODUCT_REVIEW_TEXT_MAX_LENGTH} символов`,
+    )
     .optional(),
 });
 

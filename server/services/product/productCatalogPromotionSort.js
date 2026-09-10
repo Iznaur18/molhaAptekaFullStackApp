@@ -62,11 +62,7 @@ export const buildCatalogPromotionSortBoostAddFieldsStage = (
         ],
       },
       _promotionSortActivatedAt: {
-        $cond: [
-          catalogPromotionHasRegionRaise,
-          "$catalogPromotionActivatedAt",
-          null,
-        ],
+        $cond: [catalogPromotionHasRegionRaise, "$catalogPromotionActivatedAt", null],
       },
     },
   };
@@ -97,10 +93,7 @@ export const catalogReviewsSortKeys = {
  * @returns {Record<string, unknown>}
  */
 export const buildCatalogPromotionSortStage = (sort, options = {}) => {
-  const {
-    useSearchRank = false,
-    searchScoreField = "_searchRank",
-  } = options;
+  const { useSearchRank = false, searchScoreField = "_searchRank" } = options;
 
   if (useSearchRank) {
     if (sort === PRODUCT_SORT_PURCHASES) {

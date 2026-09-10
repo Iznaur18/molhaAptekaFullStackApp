@@ -13,7 +13,9 @@ test("profile tab public path is /me with legacy /profile redirect", () => {
   const redirect = readMobile("app/profile/index.tsx");
   const edit = readMobile("app/profile/edit.tsx");
   const tabBar = readMobile("shared/ui/MobileBottomTabBar.tsx");
-  const deepLink = readMobile("features/deep-linking/lib/resolveWebPathToMobileRoute.ts");
+  const deepLink = readMobile(
+    "features/deep-linking/lib/resolveWebPathToMobileRoute.ts",
+  );
 
   assert.match(tabs, /name="me"/);
   assert.doesNotMatch(tabs, /name="profile"/);

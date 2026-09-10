@@ -34,7 +34,9 @@ export const submitSiteHeaderBannerCampaign = async (body: Record<string, unknow
 
 export const cancelSiteHeaderBannerCampaign = async (campaignId: string) => {
   try {
-    const { data } = await apiClient.delete(`/site-header-banner-campaign/${campaignId}`);
+    const { data } = await apiClient.delete(
+      `/site-header-banner-campaign/${campaignId}`,
+    );
     return parseApiContractData(data, cancelSiteHeaderBannerCampaignDataSchema);
   } catch (error) {
     throw new Error(

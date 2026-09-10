@@ -282,8 +282,7 @@ export function assertCreateProductPickupLocationsOrLegacy(body, ctx) {
 export function assertProductWriteFulfillmentMethods(body, ctx) {
   const pickupOn = body.productPickupEnabled !== false;
   const deliveryOn =
-    body.productDeliveryEnabled === true ||
-    body.productCourierDeliveryEnabled === true;
+    body.productDeliveryEnabled === true || body.productCourierDeliveryEnabled === true;
   if (!pickupOn && !deliveryOn) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,

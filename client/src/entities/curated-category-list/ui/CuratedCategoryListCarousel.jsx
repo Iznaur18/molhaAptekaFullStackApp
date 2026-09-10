@@ -38,7 +38,9 @@ export function CuratedCategoryListCarousel({ title, categories, onOpenCategory 
         className="curated-category-list-carousel"
         aria-label={title}
         style={{
-          "--curated-visible-cards": String(CURATED_CATEGORY_LIST_HOME_VISIBLE_CARD_MAX),
+          "--curated-visible-cards": String(
+            CURATED_CATEGORY_LIST_HOME_VISIBLE_CARD_MAX,
+          ),
           "--curated-card-gap": `${CURATED_CATEGORY_LIST_HOME_CARD_GAP_PX}px`,
           "--curated-card-min-width": `${CURATED_CATEGORY_LIST_HOME_CARD_MIN_WIDTH_PX}px`,
           "--curated-card-max-width": `${CURATED_CATEGORY_LIST_HOME_CARD_MAX_WIDTH_PX}px`,
@@ -51,8 +53,14 @@ export function CuratedCategoryListCarousel({ title, categories, onOpenCategory 
         >
           <ul className="curated-category-list-carousel__track" role="list">
             {categories.map((category) => (
-              <li key={category.itemKey} className="curated-category-list-carousel__item">
-                <CuratedCategoryCompactCard category={category} onOpen={onOpenCategory} />
+              <li
+                key={category.itemKey}
+                className="curated-category-list-carousel__item"
+              >
+                <CuratedCategoryCompactCard
+                  category={category}
+                  onOpen={onOpenCategory}
+                />
               </li>
             ))}
           </ul>

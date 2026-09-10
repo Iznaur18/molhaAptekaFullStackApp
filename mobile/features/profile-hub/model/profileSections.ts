@@ -28,5 +28,6 @@ export const PROFILE_SECTION_EXTERNAL_ROUTES: Partial<
   [PROFILE_SECTION_EDIT_PROFILE]: "/profile/edit",
 };
 
-export const resolveProfileSectionRoute = (sectionId: ProfileSectionId): string | null =>
-  PROFILE_SECTION_EXTERNAL_ROUTES[sectionId] ?? `/hub/${sectionId}`;
+export const resolveProfileSectionRoute = (
+  sectionId: ProfileSectionId,
+): string | null => PROFILE_SECTION_EXTERNAL_ROUTES[sectionId] ?? `/hub/${sectionId}`;

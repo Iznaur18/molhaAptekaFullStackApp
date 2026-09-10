@@ -141,7 +141,11 @@
   gap: 0.4rem;
   padding: 0.55rem 0.65rem;
   border-radius: 0.55rem;
-  border-color: color-mix(in srgb, var(--iz-color-border) 85%, var(--iz-color-danger-surface));
+  border-color: color-mix(
+    in srgb,
+    var(--iz-color-border) 85%,
+    var(--iz-color-danger-surface)
+  );
   background: linear-gradient(
     180deg,
     var(--iz-color-surface) 0%,

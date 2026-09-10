@@ -48,26 +48,24 @@ export const resolveMobileBottomNavPaddingBottom = (safeAreaBottom = 0): number 
  * Для hide-анимации и absolute footer над баром.
  */
 export const resolveMobileBottomNavLayoutHeight = (safeAreaBottom = 0): number =>
-  resolveMobileBottomNavPaddingBottom(safeAreaBottom) + resolveMobileBottomNavPillHeight();
+  resolveMobileBottomNavPaddingBottom(safeAreaBottom) +
+  resolveMobileBottomNavPillHeight();
 
 /**
  * Inset списка под overlay-nav: высота pill + float/safe-area зона.
  * Дополнительный зазор между последним контентом и pill — в screenContentLayout.
  */
-export const resolveMobileBottomNavOverlayContentInset = (
-  safeAreaBottom = 0,
-): number => resolveMobileBottomNavLayoutHeight(safeAreaBottom);
+export const resolveMobileBottomNavOverlayContentInset = (safeAreaBottom = 0): number =>
+  resolveMobileBottomNavLayoutHeight(safeAreaBottom);
 
 /** @deprecated используйте resolveMobileBottomNavLayoutHeight / OverlayContentInset */
 export const resolveMobileBottomNavReservedHeight = (safeAreaBottom = 0): number =>
   resolveMobileBottomNavLayoutHeight(safeAreaBottom);
 
-export const resolveMobileBottomNavHorizontalInset = (insets: {
-  left?: number;
-  right?: number;
-} = {}): number =>
-  Math.max(
-    MOBILE_BOTTOM_NAV_HORIZONTAL_INSET,
-    insets.left ?? 0,
-    insets.right ?? 0,
-  );
+export const resolveMobileBottomNavHorizontalInset = (
+  insets: {
+    left?: number;
+    right?: number;
+  } = {},
+): number =>
+  Math.max(MOBILE_BOTTOM_NAV_HORIZONTAL_INSET, insets.left ?? 0, insets.right ?? 0);

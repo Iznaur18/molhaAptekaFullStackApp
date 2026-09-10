@@ -24,9 +24,7 @@ export const registerProcessFatalHandlers = () => {
   process.on("uncaughtException", (error) => {
     logServerEvent("fatal", {
       event: "process.uncaught_exception",
-      ...formatLogError(
-        error instanceof Error ? error : new Error(String(error)),
-      ),
+      ...formatLogError(error instanceof Error ? error : new Error(String(error))),
     });
     captureServerHttpError(
       error instanceof Error ? error : new Error(String(error)),

@@ -38,10 +38,10 @@ describe("attachCatalogDistanceMeters", () => {
   });
 
   it("skips products without pickup point", () => {
-    const [enriched] = attachCatalogDistanceMeters(
-      [{ _id: "1", productName: "x" }],
-      { lat: 55.75, lon: 37.62 },
-    );
+    const [enriched] = attachCatalogDistanceMeters([{ _id: "1", productName: "x" }], {
+      lat: 55.75,
+      lon: 37.62,
+    });
     assert.equal(enriched.distanceMeters, undefined);
   });
 

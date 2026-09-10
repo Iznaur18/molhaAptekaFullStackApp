@@ -32,7 +32,9 @@ export const FaqItemLinkAdminField = ({ itemId, href }: FaqItemLinkAdminFieldPro
         itemId,
         body: { href: draft.trim() === "" ? null : draft.trim() },
       });
-      setNotice(draft.trim() === "" ? FAQ_UI.ADMIN_LINK_CLEARED : FAQ_UI.ADMIN_LINK_SAVED);
+      setNotice(
+        draft.trim() === "" ? FAQ_UI.ADMIN_LINK_CLEARED : FAQ_UI.ADMIN_LINK_SAVED,
+      );
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : FAQ_UI.ADMIN_LINK_SAVE);
     }
@@ -50,7 +52,9 @@ export const FaqItemLinkAdminField = ({ itemId, href }: FaqItemLinkAdminFieldPro
       setDraft("");
       setNotice(FAQ_UI.ADMIN_LINK_CLEARED);
     } catch (clearError) {
-      setError(clearError instanceof Error ? clearError.message : FAQ_UI.ADMIN_LINK_CLEAR);
+      setError(
+        clearError instanceof Error ? clearError.message : FAQ_UI.ADMIN_LINK_CLEAR,
+      );
     }
   };
 
@@ -81,7 +85,10 @@ export const FaqItemLinkAdminField = ({ itemId, href }: FaqItemLinkAdminFieldPro
         <Pressable
           accessibilityRole="button"
           disabled={isSaving}
-          style={[styles.linkAdminSave, isSaving ? styles.linkAdminButtonDisabled : null]}
+          style={[
+            styles.linkAdminSave,
+            isSaving ? styles.linkAdminButtonDisabled : null,
+          ]}
           onPress={() => void handleSave()}
         >
           <Text style={styles.linkAdminSaveText}>
@@ -92,7 +99,10 @@ export const FaqItemLinkAdminField = ({ itemId, href }: FaqItemLinkAdminFieldPro
           <Pressable
             accessibilityRole="button"
             disabled={isSaving}
-            style={[styles.linkAdminClear, isSaving ? styles.linkAdminButtonDisabled : null]}
+            style={[
+              styles.linkAdminClear,
+              isSaving ? styles.linkAdminButtonDisabled : null,
+            ]}
             onPress={() => void handleClear()}
           >
             <Text style={styles.linkAdminClearText}>{FAQ_UI.ADMIN_LINK_CLEAR}</Text>

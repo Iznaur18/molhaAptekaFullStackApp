@@ -136,9 +136,7 @@ const walkAndUpdateImports = (dir) => {
       const relFromFile = path
         .relative(path.dirname(abs), path.join(SERVER_DIR, serviceRel))
         .replaceAll("\\", "/");
-      const normalized = relFromFile.startsWith(".")
-        ? relFromFile
-        : `./${relFromFile}`;
+      const normalized = relFromFile.startsWith(".") ? relFromFile : `./${relFromFile}`;
 
       if (re.test(source)) {
         source = source.replace(

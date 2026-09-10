@@ -68,6 +68,8 @@ export const changePassword = async (payload: PasswordChangePayload) => {
     }
     return { ...session, message };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, EDIT_PROFILE_UI.PASSWORD_CHANGE_ERROR));
+    throw new Error(
+      formatApiErrorMessage(error, EDIT_PROFILE_UI.PASSWORD_CHANGE_ERROR),
+    );
   }
 };

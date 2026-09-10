@@ -22,16 +22,18 @@ const ORDERS_PER_QUERY = 100;
  * @param {unknown} value
  */
 export function escapeXml(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;")
-    // Управляющие символы XML 1.0 не принимает ни в каком виде — 1С на таком
-    // документе падает с ошибкой разбора.
-    // eslint-disable-next-line no-control-regex -- вырезаем их намеренно
-    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "");
+  return (
+    String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&apos;")
+      // Управляющие символы XML 1.0 не принимает ни в каком виде — 1С на таком
+      // документе падает с ошибкой разбора.
+      // eslint-disable-next-line no-control-regex -- вырезаем их намеренно
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "")
+  );
 }
 
 /** @param {Date} date */

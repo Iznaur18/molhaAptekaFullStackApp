@@ -66,39 +66,143 @@
   --iz-color-focus-ring: rgb(31 111 235 / 15%);
 
   /* === Derived tokens === */
-  --iz-color-danger-border: color-mix(in srgb, var(--iz-color-danger) 25%, var(--iz-color-border));
-  --iz-color-warning-border: color-mix(in srgb, var(--iz-color-warning) 30%, var(--iz-color-border));
+  --iz-color-danger-border: color-mix(
+    in srgb,
+    var(--iz-color-danger) 25%,
+    var(--iz-color-border)
+  );
+  --iz-color-warning-border: color-mix(
+    in srgb,
+    var(--iz-color-warning) 30%,
+    var(--iz-color-border)
+  );
 
-  --iz-color-action-bg-hover: color-mix(in srgb, var(--iz-color-action) 6%, transparent);
-  --iz-color-action-bg-active: color-mix(in srgb, var(--iz-color-action) 10%, transparent);
-  --iz-color-action-bg-selected: color-mix(in srgb, var(--iz-color-action) 12%, transparent);
-  --iz-color-action-border-strong: color-mix(in srgb, var(--iz-color-action) 45%, transparent);
+  --iz-color-action-bg-hover: color-mix(
+    in srgb,
+    var(--iz-color-action) 6%,
+    transparent
+  );
+  --iz-color-action-bg-active: color-mix(
+    in srgb,
+    var(--iz-color-action) 10%,
+    transparent
+  );
+  --iz-color-action-bg-selected: color-mix(
+    in srgb,
+    var(--iz-color-action) 12%,
+    transparent
+  );
+  --iz-color-action-border-strong: color-mix(
+    in srgb,
+    var(--iz-color-action) 45%,
+    transparent
+  );
 
   --iz-color-overlay-border: var(--iz-color-overlay-subtle);
-  --iz-color-overlay-white: color-mix(in srgb, var(--iz-color-on-contrast) 92%, transparent);
-  --iz-color-overlay-white-border: color-mix(in srgb, var(--iz-color-on-contrast) 35%, transparent);
-  --iz-color-overlay-white-muted: color-mix(in srgb, var(--iz-color-on-contrast) 25%, transparent);
-  --iz-color-overlay-white-subtle: color-mix(in srgb, var(--iz-color-on-contrast) 14%, transparent);
-  --iz-color-overlay-slate-border: color-mix(in srgb, var(--iz-color-surface-elevated) 45%, transparent);
+  --iz-color-overlay-white: color-mix(
+    in srgb,
+    var(--iz-color-on-contrast) 92%,
+    transparent
+  );
+  --iz-color-overlay-white-border: color-mix(
+    in srgb,
+    var(--iz-color-on-contrast) 35%,
+    transparent
+  );
+  --iz-color-overlay-white-muted: color-mix(
+    in srgb,
+    var(--iz-color-on-contrast) 25%,
+    transparent
+  );
+  --iz-color-overlay-white-subtle: color-mix(
+    in srgb,
+    var(--iz-color-on-contrast) 14%,
+    transparent
+  );
+  --iz-color-overlay-slate-border: color-mix(
+    in srgb,
+    var(--iz-color-surface-elevated) 45%,
+    transparent
+  );
 
-  --iz-color-status-info-soft: color-mix(in srgb, var(--iz-color-info) 12%, transparent);
-  --iz-color-status-warning-soft: color-mix(in srgb, var(--iz-color-warning) 15%, transparent);
-  --iz-color-status-action-soft: color-mix(in srgb, var(--iz-color-action) 12%, transparent);
-  --iz-color-status-purple-soft: color-mix(in srgb, var(--iz-color-accent) 12%, transparent);
-  --iz-color-status-success-soft: color-mix(in srgb, var(--iz-color-success) 15%, transparent);
-  --iz-color-status-danger-soft: color-mix(in srgb, var(--iz-color-danger) 12%, transparent);
-  --iz-color-status-danger-subtle: color-mix(in srgb, var(--iz-color-danger) 6%, transparent);
-  --iz-color-status-danger-border: color-mix(in srgb, var(--iz-color-danger) 40%, transparent);
-  --iz-color-status-danger-surface: color-mix(in srgb, var(--iz-color-danger) 8%, transparent);
-  --iz-color-status-danger-strong: color-mix(in srgb, var(--iz-color-danger) 85%, transparent);
-  --iz-color-status-warning-border: color-mix(in srgb, var(--iz-color-warning) 45%, transparent);
-  --iz-color-status-warning-surface: color-mix(in srgb, var(--iz-color-warning) 8%, transparent);
-  --iz-color-status-neutral-soft: color-mix(in srgb, var(--iz-color-text-secondary) 12%, transparent);
+  --iz-color-status-info-soft: color-mix(
+    in srgb,
+    var(--iz-color-info) 12%,
+    transparent
+  );
+  --iz-color-status-warning-soft: color-mix(
+    in srgb,
+    var(--iz-color-warning) 15%,
+    transparent
+  );
+  --iz-color-status-action-soft: color-mix(
+    in srgb,
+    var(--iz-color-action) 12%,
+    transparent
+  );
+  --iz-color-status-purple-soft: color-mix(
+    in srgb,
+    var(--iz-color-accent) 12%,
+    transparent
+  );
+  --iz-color-status-success-soft: color-mix(
+    in srgb,
+    var(--iz-color-success) 15%,
+    transparent
+  );
+  --iz-color-status-danger-soft: color-mix(
+    in srgb,
+    var(--iz-color-danger) 12%,
+    transparent
+  );
+  --iz-color-status-danger-subtle: color-mix(
+    in srgb,
+    var(--iz-color-danger) 6%,
+    transparent
+  );
+  --iz-color-status-danger-border: color-mix(
+    in srgb,
+    var(--iz-color-danger) 40%,
+    transparent
+  );
+  --iz-color-status-danger-surface: color-mix(
+    in srgb,
+    var(--iz-color-danger) 8%,
+    transparent
+  );
+  --iz-color-status-danger-strong: color-mix(
+    in srgb,
+    var(--iz-color-danger) 85%,
+    transparent
+  );
+  --iz-color-status-warning-border: color-mix(
+    in srgb,
+    var(--iz-color-warning) 45%,
+    transparent
+  );
+  --iz-color-status-warning-surface: color-mix(
+    in srgb,
+    var(--iz-color-warning) 8%,
+    transparent
+  );
+  --iz-color-status-neutral-soft: color-mix(
+    in srgb,
+    var(--iz-color-text-secondary) 12%,
+    transparent
+  );
 
   --iz-color-accent-shadow: color-mix(in srgb, var(--iz-color-accent) 12%, transparent);
-  --iz-color-accent-shadow-strong: color-mix(in srgb, var(--iz-color-accent) 22%, transparent);
+  --iz-color-accent-shadow-strong: color-mix(
+    in srgb,
+    var(--iz-color-accent) 22%,
+    transparent
+  );
   --iz-color-accent-ring: color-mix(in srgb, var(--iz-color-accent) 12%, transparent);
-  --iz-color-accent-ring-soft: color-mix(in srgb, var(--iz-color-accent) 10%, transparent);
+  --iz-color-accent-ring-soft: color-mix(
+    in srgb,
+    var(--iz-color-accent) 10%,
+    transparent
+  );
 
   /* === Gradients === */
   --iz-gradient-surface-fade: linear-gradient(
@@ -160,7 +264,11 @@
     var(--iz-color-warning-surface),
     var(--iz-color-warning-surface)
   );
-  --iz-gradient-purple-bar: linear-gradient(90deg, var(--iz-color-accent), var(--iz-color-accent));
+  --iz-gradient-purple-bar: linear-gradient(
+    90deg,
+    var(--iz-color-accent),
+    var(--iz-color-accent)
+  );
   --iz-gradient-success-bar: linear-gradient(
     90deg,
     var(--iz-color-success-surface),
@@ -188,10 +296,12 @@
   --iz-shadow-card-subtle: 0 1px 2px var(--iz-color-overlay-subtle);
   --iz-shadow-card: 0 1px 2px var(--iz-color-overlay-subtle);
   --iz-shadow-card-hover: 0 6px 18px var(--iz-color-overlay);
-  --iz-shadow-dropdown: 0 4px 6px var(--iz-color-overlay-subtle), 0 12px 24px var(--iz-color-overlay);
+  --iz-shadow-dropdown:
+    0 4px 6px var(--iz-color-overlay-subtle), 0 12px 24px var(--iz-color-overlay);
   --iz-shadow-popover: 0 4px 16px var(--iz-color-overlay-subtle);
   --iz-shadow-elevated: 0 12px 32px var(--iz-color-overlay);
-  --iz-shadow-panel: 0 10px 28px var(--iz-color-overlay), 0 3px 10px var(--iz-color-overlay-subtle);
+  --iz-shadow-panel:
+    0 10px 28px var(--iz-color-overlay), 0 3px 10px var(--iz-color-overlay-subtle);
   --iz-shadow-dialog: 0 20px 45px var(--iz-color-overlay-strong);
   --iz-shadow-dialog-alt: 0 20px 40px var(--iz-color-overlay);
   --iz-shadow-dialog-dark: 0 12px 40px var(--iz-color-overlay);
@@ -331,7 +441,8 @@
   --iz-color-modal-scrim: rgb(0 0 0 / 45%);
 
   /* Фокус инпута: borderColor action + shadow action 0 2px 8px @ 0.14 */
-  --iz-shadow-input-focus: 0 2px 8px color-mix(in srgb, var(--iz-color-action) 14%, transparent);
+  --iz-shadow-input-focus: 0 2px 8px
+    color-mix(in srgb, var(--iz-color-action) 14%, transparent);
   /* segmentTabActive: shadowOffset 0/1, opacity .08, radius 3 */
   --iz-shadow-segment-active: 0 1px 3px var(--iz-color-overlay-subtle);
 }

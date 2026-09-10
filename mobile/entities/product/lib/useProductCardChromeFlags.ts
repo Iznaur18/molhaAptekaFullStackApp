@@ -43,8 +43,12 @@ export const useProductCardChromeFlags = (
       isMineMode,
       isModerationQueue,
     });
-    const { isPromotionActive, promotionTier, showPromotionChrome, promotionFrameTier } =
-      promotionChrome;
+    const {
+      isPromotionActive,
+      promotionTier,
+      showPromotionChrome,
+      promotionFrameTier,
+    } = promotionChrome;
     const showPremiumChrome = shouldShowPremiumProductCardChrome({
       product,
       isMineMode,
@@ -57,9 +61,7 @@ export const useProductCardChromeFlags = (
     const showRaffleBadge = !isModerationQueue && isProductRaffleParticipant(product);
     const affiliatePercent = Math.floor(Number(product.affiliatePercent) || 0);
     const showAffiliateBadge =
-      !isModerationQueue &&
-      product.affiliateEnabled === true &&
-      affiliatePercent > 0;
+      !isModerationQueue && product.affiliateEnabled === true && affiliatePercent > 0;
     const wholesaleBadgeLabel = formatProductWholesaleBadgeLabel(product);
     const showWholesaleBadge = !isModerationQueue && wholesaleBadgeLabel != null;
     const showFlashSaleBadge = !isModerationQueue && isProductFlashSaleActive(product);
@@ -70,7 +72,9 @@ export const useProductCardChromeFlags = (
       (highlightRaffleProduct || showRaffleBadge) && !isMineMode && !isModerationQueue;
 
     const showBannerLayout =
-      promotionFullWidth && isPromotionActive && promotionTier === PROMOTION_TIER_BANNER;
+      promotionFullWidth &&
+      isPromotionActive &&
+      promotionTier === PROMOTION_TIER_BANNER;
 
     return {
       discountPercent,
@@ -81,13 +85,15 @@ export const useProductCardChromeFlags = (
       promotionFrameTier,
       showPromotionBoostBadge:
         showPromotionChrome && promotionTier === PROMOTION_TIER_GOLD,
-      showPromotionTopBadge: showPromotionChrome && promotionTier === PROMOTION_TIER_TOP,
+      showPromotionTopBadge:
+        showPromotionChrome && promotionTier === PROMOTION_TIER_TOP,
       showPromotionBannerBadge:
         showPromotionChrome &&
         promotionTier === PROMOTION_TIER_BANNER &&
         !showBannerLayout,
       showBannerLayout,
-      showImageOverlayBadges: !showBannerLayout && (showDiscountBadge || showLoyaltyPointsBadge),
+      showImageOverlayBadges:
+        !showBannerLayout && (showDiscountBadge || showLoyaltyPointsBadge),
       showAuctionBadge: auctionActive,
       showInstallmentBadge: product.productInstallmentEnabled === true,
       showWholesaleBadge,

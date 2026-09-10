@@ -42,8 +42,7 @@ export const SAFE_DEAL_ALREADY_PENDING_MESSAGE =
 export const SAFE_DEAL_NO_APPLICATION_MESSAGE =
   "Продавец не подавал заявку на безопасную сделку";
 
-export const SAFE_DEAL_INN_TAKEN_MESSAGE =
-  "Этот ИНН уже подтверждён другим продавцом";
+export const SAFE_DEAL_INN_TAKEN_MESSAGE = "Этот ИНН уже подтверждён другим продавцом";
 
 /** In-app: модератор принял решение по заявке. */
 export const IN_APP_NOTIFICATION_KIND_SAFE_DEAL_MODERATION = "safe_deal_moderation";

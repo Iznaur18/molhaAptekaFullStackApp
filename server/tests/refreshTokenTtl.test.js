@@ -17,7 +17,8 @@ describe("refresh token TTL ~365d", () => {
   });
 
   it("JWT exp is ~365 days from now", () => {
-    process.env.JWT_SECRET = process.env.JWT_SECRET || "test-secret-for-ttl-check-32chars!!";
+    process.env.JWT_SECRET =
+      process.env.JWT_SECRET || "test-secret-for-ttl-check-32chars!!";
     const token = signRefreshToken("507f1f77bcf86cd799439011", 0);
     const decoded = verifyRefreshToken(token);
     const expMs = decoded.exp * 1000;

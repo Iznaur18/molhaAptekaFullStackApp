@@ -115,7 +115,10 @@ export const UserVoteRatingForm = ({
       return undefined;
     }
 
-    const timer = setTimeout(() => setFlashMessage(""), USER_VOTE_RATING_UI.SUCCESS_FLASH_MS);
+    const timer = setTimeout(
+      () => setFlashMessage(""),
+      USER_VOTE_RATING_UI.SUCCESS_FLASH_MS,
+    );
     return () => clearTimeout(timer);
   }, [flashMessage]);
 

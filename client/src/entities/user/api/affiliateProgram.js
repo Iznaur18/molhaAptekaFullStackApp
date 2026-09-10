@@ -11,8 +11,6 @@ export async function fetchMyAffiliateEarnings() {
     }
     return myAffiliateEarningsDataSchema.parse(data.data);
   } catch (e) {
-    throw new Error(
-      formatApiErrorMessage(e, "Не удалось загрузить начисления"),
-    );
+    throw new Error(formatApiErrorMessage(e, "Не удалось загрузить начисления"));
   }
 }

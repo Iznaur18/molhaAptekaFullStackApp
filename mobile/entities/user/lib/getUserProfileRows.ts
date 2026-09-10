@@ -119,7 +119,11 @@ export const getUserProfileRows = (
   });
 
   const rows: ProfileRow[] = [
-    { id: "userName", label: USER_PROFILE_COPY.LABELS.userName, value: dashIfEmpty(user.userName) },
+    {
+      id: "userName",
+      label: USER_PROFILE_COPY.LABELS.userName,
+      value: dashIfEmpty(user.userName),
+    },
     ...(typeof user.userFullName === "string" && user.userFullName.trim() !== ""
       ? [
           {
@@ -169,11 +173,17 @@ export const getUserProfileRows = (
       label: USER_PROFILE_COPY.LABELS.totalPurchasesAmount,
       value: formatSearchRowTotalSales(user.totalPurchasesAmount),
     },
-    { id: "email", label: USER_PROFILE_COPY.LABELS.email, value: dashIfEmpty(user.email) },
+    {
+      id: "email",
+      label: USER_PROFILE_COPY.LABELS.email,
+      value: dashIfEmpty(user.email),
+    },
     {
       id: "userBirthDate",
       label: USER_PROFILE_COPY.LABELS.userBirthDate,
-      value: user.userBirthDate ? formatIsoDateTime(String(user.userBirthDate)) : EM_DASH,
+      value: user.userBirthDate
+        ? formatIsoDateTime(String(user.userBirthDate))
+        : EM_DASH,
     },
     {
       id: "userGender",
@@ -230,8 +240,7 @@ export const getUserProfileRows = (
     {
       id: "userLoyaltyPoints",
       label: USER_PROFILE_COPY.LABELS.userLoyaltyPoints,
-      value:
-        user.userLoyaltyPoints == null ? EM_DASH : String(user.userLoyaltyPoints),
+      value: user.userLoyaltyPoints == null ? EM_DASH : String(user.userLoyaltyPoints),
     },
     {
       id: "userRatingByVotes",

@@ -62,9 +62,7 @@ export const fetchProductQuestionSummary = async (
     }
     return data.data as ProductQuestionSummary;
   } catch (error) {
-    throw new Error(
-      formatApiErrorMessage(error, PRODUCT_QA_UI.FETCH_SUMMARY_FALLBACK),
-    );
+    throw new Error(formatApiErrorMessage(error, PRODUCT_QA_UI.FETCH_SUMMARY_FALLBACK));
   }
 };
 

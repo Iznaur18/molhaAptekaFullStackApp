@@ -24,7 +24,8 @@ export const APP_PORTRAIT_LOCK_UI = {
 export const IMAGE_URL_FIELD_UI = {
   UPLOAD_BUTTON: "Выбрать файл",
   UPLOAD_LOADING: "Загрузка…",
-  UPLOAD_HINT: "JPEG, PNG или WebP, до 50 МБ — большие файлы сожмутся автоматически. Можно также вставить ссылку.",
+  UPLOAD_HINT:
+    "JPEG, PNG или WebP, до 50 МБ — большие файлы сожмутся автоматически. Можно также вставить ссылку.",
   UPLOAD_DISABLED_HINT: "Загрузка файла доступна после входа в аккаунт",
   ERROR_TYPE: "Допустимы только JPEG, PNG и WebP",
   ERROR_SIZE: "Файл не больше 50 МБ",

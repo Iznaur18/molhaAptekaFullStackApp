@@ -72,7 +72,9 @@ export const createProductWizardFormFromCopiedProduct = (
       ? product.productCategoryId.trim()
       : null;
   const regionRaw =
-    typeof product.productRegionCode === "string" ? product.productRegionCode.trim() : "";
+    typeof product.productRegionCode === "string"
+      ? product.productRegionCode.trim()
+      : "";
   const stockRaw = Number.parseInt(String(product.productStockQuantity ?? ""), 10);
   const latRaw = product.productPickupLat;
   const lonRaw = product.productPickupLon;
@@ -100,8 +102,8 @@ export const createProductWizardFormFromCopiedProduct = (
     productCategory: String(product.productCategory ?? DEFAULT_PRODUCT_CATEGORY),
     productRegionCode: isRuRegionCode(regionRaw) ? regionRaw : "",
     // Точки самовывоза не копируются: у копии свой набор адресов продавца.
-  productPickupLocations: [],
-  productPickupAddress: String(product.productPickupAddress ?? "").trim(),
+    productPickupLocations: [],
+    productPickupAddress: String(product.productPickupAddress ?? "").trim(),
     productPickupLat:
       latRaw != null && Number.isFinite(Number(latRaw)) ? Number(latRaw) : null,
     productPickupLon:
@@ -116,7 +118,8 @@ export const createProductWizardFormFromCopiedProduct = (
         ? formatRubPriceInput(Math.floor(Number(oldPrice)))
         : "",
     productIsAvailable: true,
-    productStockQuantity: Number.isFinite(stockRaw) && stockRaw > 0 ? String(stockRaw) : "1",
+    productStockQuantity:
+      Number.isFinite(stockRaw) && stockRaw > 0 ? String(stockRaw) : "1",
     loyaltyPointsPerUnit: "0",
     productReturnEnabled: returnPrefill.enabled,
     returnTermRows: returnPrefill.rows,

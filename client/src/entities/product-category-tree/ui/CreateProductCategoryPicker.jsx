@@ -76,12 +76,14 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
 
   const tiles = useMemo(() => {
     if (activeParentId == null) {
-      return buildResolvedProductCategoryDisplaysFromRoots(options, displays).map((item) => ({
-        key: item.categoryId ?? item.displaySlug,
-        label: item.label,
-        imageUrl: item.imageUrl,
-        categoryId: item.categoryId ?? undefined,
-      }));
+      return buildResolvedProductCategoryDisplaysFromRoots(options, displays).map(
+        (item) => ({
+          key: item.categoryId ?? item.displaySlug,
+          label: item.label,
+          imageUrl: item.imageUrl,
+          categoryId: item.categoryId ?? undefined,
+        }),
+      );
     }
 
     const parent = trail[trail.length - 1];

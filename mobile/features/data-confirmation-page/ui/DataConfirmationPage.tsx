@@ -15,7 +15,10 @@ import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/
 import { ProfileAccountScrollBody } from "@/features/profile-tab/ui/ProfileAccountScrollBody";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
-import { MY_PROFILE_PAGE_UI, USER_DATA_CONFIRMATION_PROFILE_PAGE_UI } from "@/shared/config";
+import {
+  MY_PROFILE_PAGE_UI,
+  USER_DATA_CONFIRMATION_PROFILE_PAGE_UI,
+} from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
@@ -52,8 +55,13 @@ export const DataConfirmationPage = () => {
   if (!isAuthorized) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.hint}>{USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.LOGIN_HINT}</Text>
-        <Pressable style={styles.loginButton} onPress={() => router.push("/(auth)/login")}>
+        <Text style={styles.hint}>
+          {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.LOGIN_HINT}
+        </Text>
+        <Pressable
+          style={styles.loginButton}
+          onPress={() => router.push("/(auth)/login")}
+        >
           <Text style={styles.loginButtonText}>
             {USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.LOGIN_BUTTON}
           </Text>
@@ -63,7 +71,9 @@ export const DataConfirmationPage = () => {
   }
 
   if (statusQuery.isPending) {
-    return <ScreenLoadingState message={USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.LOADING} />;
+    return (
+      <ScreenLoadingState message={USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.LOADING} />
+    );
   }
 
   if (statusQuery.isError) {
@@ -153,7 +163,10 @@ export const DataConfirmationPage = () => {
           </View>
 
           {isUserDataConfirmed ? (
-            <View style={[styles.statusBanner, styles.statusOk]} accessibilityRole="text">
+            <View
+              style={[styles.statusBanner, styles.statusOk]}
+              accessibilityRole="text"
+            >
               <Feather
                 name="check-circle"
                 size={18}
@@ -167,8 +180,12 @@ export const DataConfirmationPage = () => {
             </View>
           ) : null}
 
-          {!isUserDataConfirmed && requestStatus === USER_DATA_CONFIRMATION_STATUS_PENDING ? (
-            <View style={[styles.statusBanner, styles.statusPending]} accessibilityRole="text">
+          {!isUserDataConfirmed &&
+          requestStatus === USER_DATA_CONFIRMATION_STATUS_PENDING ? (
+            <View
+              style={[styles.statusBanner, styles.statusPending]}
+              accessibilityRole="text"
+            >
               <Feather
                 name="clock"
                 size={18}
@@ -182,8 +199,12 @@ export const DataConfirmationPage = () => {
             </View>
           ) : null}
 
-          {!isUserDataConfirmed && requestStatus === USER_DATA_CONFIRMATION_STATUS_REJECTED ? (
-            <View style={[styles.statusBanner, styles.statusRejected]} accessibilityRole="alert">
+          {!isUserDataConfirmed &&
+          requestStatus === USER_DATA_CONFIRMATION_STATUS_REJECTED ? (
+            <View
+              style={[styles.statusBanner, styles.statusRejected]}
+              accessibilityRole="alert"
+            >
               <Feather
                 name="alert-circle"
                 size={18}

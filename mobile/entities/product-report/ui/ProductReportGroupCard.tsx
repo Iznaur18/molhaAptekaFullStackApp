@@ -20,7 +20,10 @@ type ProductReportGroupCardProps = {
   onResolved: () => void;
 };
 
-export const ProductReportGroupCard = ({ group, onResolved }: ProductReportGroupCardProps) => {
+export const ProductReportGroupCard = ({
+  group,
+  onResolved,
+}: ProductReportGroupCardProps) => {
   const router = useRouter();
   const styles = useStaffReportGroupCardStyles();
   const resolveReportsMutation = useResolveProductReportsMutation();
@@ -29,7 +32,8 @@ export const ProductReportGroupCard = ({ group, onResolved }: ProductReportGroup
 
   const productId = String(group.product._id);
   const sellerId =
-    group.product.productSeller != null && typeof group.product.productSeller === "object"
+    group.product.productSeller != null &&
+    typeof group.product.productSeller === "object"
       ? String((group.product.productSeller as { _id?: string })._id ?? "")
       : null;
 
@@ -66,11 +70,19 @@ export const ProductReportGroupCard = ({ group, onResolved }: ProductReportGroup
       </View>
 
       <View style={styles.links}>
-        <Pressable onPress={() => router.push({ pathname: "/product/[id]", params: { id: productId } })}>
+        <Pressable
+          onPress={() =>
+            router.push({ pathname: "/product/[id]", params: { id: productId } })
+          }
+        >
           <Text style={styles.link}>{PRODUCT_REPORTS_PAGE_UI.OPEN_PRODUCT}</Text>
         </Pressable>
         {sellerId ? (
-          <Pressable onPress={() => router.push({ pathname: "/user/[id]", params: { id: sellerId } })}>
+          <Pressable
+            onPress={() =>
+              router.push({ pathname: "/user/[id]", params: { id: sellerId } })
+            }
+          >
             <Text style={styles.link}>{PRODUCT_REPORTS_PAGE_UI.OPEN_SELLER}</Text>
           </Pressable>
         ) : null}
@@ -92,9 +104,16 @@ export const ProductReportGroupCard = ({ group, onResolved }: ProductReportGroup
                 </Text>
                 {reporterId ? (
                   <Pressable
-                    onPress={() => router.push({ pathname: "/user/[id]", params: { id: reporterId } })}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/user/[id]",
+                        params: { id: reporterId },
+                      })
+                    }
                   >
-                    <Text style={styles.link}>{PRODUCT_REPORTS_PAGE_UI.OPEN_REPORTER}</Text>
+                    <Text style={styles.link}>
+                      {PRODUCT_REPORTS_PAGE_UI.OPEN_REPORTER}
+                    </Text>
                   </Pressable>
                 ) : null}
               </View>
@@ -132,7 +151,9 @@ export const ProductReportGroupCard = ({ group, onResolved }: ProductReportGroup
           }}
         >
           <Text style={styles.actionButtonText}>
-            {isBusy ? PRODUCT_REPORTS_PAGE_UI.ACTION_PENDING : PRODUCT_REPORTS_PAGE_UI.ACTION_DISMISS}
+            {isBusy
+              ? PRODUCT_REPORTS_PAGE_UI.ACTION_PENDING
+              : PRODUCT_REPORTS_PAGE_UI.ACTION_DISMISS}
           </Text>
         </Pressable>
         <Pressable
@@ -142,10 +163,16 @@ export const ProductReportGroupCard = ({ group, onResolved }: ProductReportGroup
             void handleResolve(PRODUCT_REPORT_RESOLUTION_HIDE);
           }}
         >
-          <Text style={styles.actionButtonText}>{PRODUCT_REPORTS_PAGE_UI.ACTION_HIDE}</Text>
+          <Text style={styles.actionButtonText}>
+            {PRODUCT_REPORTS_PAGE_UI.ACTION_HIDE}
+          </Text>
         </Pressable>
         <Pressable
-          style={[styles.actionButton, styles.actionButtonDanger, isBusy && styles.actionButtonDisabled]}
+          style={[
+            styles.actionButton,
+            styles.actionButtonDanger,
+            isBusy && styles.actionButtonDisabled,
+          ]}
           disabled={isBusy}
           onPress={() => {
             void handleResolve(PRODUCT_REPORT_RESOLUTION_REJECT);

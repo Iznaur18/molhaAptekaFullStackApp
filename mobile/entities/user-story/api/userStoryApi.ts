@@ -39,15 +39,21 @@ export const fetchUserStoriesFeed = async (): Promise<UserStoriesFeed> => {
   }
 };
 
-export const fetchUserStoriesByAuthor = async (authorUserId: string): Promise<UserStory[]> => {
+export const fetchUserStoriesByAuthor = async (
+  authorUserId: string,
+): Promise<UserStory[]> => {
   try {
-    const { data } = await apiClient.get(`/user/stories/author/${encodeURIComponent(authorUserId)}`);
+    const { data } = await apiClient.get(
+      `/user/stories/author/${encodeURIComponent(authorUserId)}`,
+    );
     if (!data?.success || !Array.isArray(data.data?.stories)) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
     return data.data.stories;
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, "Не удалось загрузить сторисы автора"));
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось загрузить сторисы автора"),
+    );
   }
 };
 

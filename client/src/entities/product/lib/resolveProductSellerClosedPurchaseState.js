@@ -12,7 +12,9 @@ import { ADD_TO_CART_UI } from "../../../shared/config/appUiCopy.js";
 export function resolveProductSellerClosedPurchaseState(product) {
   const isSellerClosed = isProductSellerClosedNow(product);
   const opensAt =
-    product != null && typeof product === "object" && typeof product.sellerClosedOpensAt === "string"
+    product != null &&
+    typeof product === "object" &&
+    typeof product.sellerClosedOpensAt === "string"
       ? product.sellerClosedOpensAt.trim()
       : "";
   const closedLabel =

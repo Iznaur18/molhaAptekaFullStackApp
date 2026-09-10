@@ -37,7 +37,10 @@ const STAFF_ACCESS: Record<StaffSectionId, StaffAccessRule> = {
   "popular-products-admin": { requireAdmin: true, requireModerator: false },
   "product-moderation": { requireAdmin: false, requireModerator: true },
   "intro-ad-moderation": { requireAdmin: false, requireModerator: true },
-  "seller-personal-category-moderation": { requireAdmin: false, requireModerator: true },
+  "seller-personal-category-moderation": {
+    requireAdmin: false,
+    requireModerator: true,
+  },
   "product-reports": { requireAdmin: false, requireModerator: true },
   "product-promotions": { requireAdmin: false, requireModerator: true },
   "staff-raffles": { requireAdmin: false, requireModerator: true },

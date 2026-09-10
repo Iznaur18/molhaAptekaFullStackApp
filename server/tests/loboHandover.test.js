@@ -18,12 +18,10 @@ const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollectio
 const { createOrderLoyaltyFixture, createOrderWithReserveTransaction } =
   await import("./helpers/orderLoyaltyTestHelpers.js");
 const { OrderModel } = await import("../models/index.js");
-const { advanceOrderShipmentStatus } = await import(
-  "../services/order/advanceShipmentStatus.js"
-);
-const { handOverShipmentToLobo, cancelShipmentInLobo } = await import(
-  "../services/shipping/lobo/loboShipmentOrders.js"
-);
+const { advanceOrderShipmentStatus } =
+  await import("../services/order/advanceShipmentStatus.js");
+const { handOverShipmentToLobo, cancelShipmentInLobo } =
+  await import("../services/shipping/lobo/loboShipmentOrders.js");
 
 /** Заказ, который везёт ЛОБО, доведённый до нужной ступени. */
 async function loboOrder({ withGeo = true } = {}) {
@@ -60,7 +58,12 @@ async function loboOrder({ withGeo = true } = {}) {
     },
   );
 
-  return { order, seller, buyer, args: { orderId: String(order._id), sellerId: String(seller._id) } };
+  return {
+    order,
+    seller,
+    buyer,
+    args: { orderId: String(order._id), sellerId: String(seller._id) },
+  };
 }
 
 describe("передача отправления в ЛОБО", () => {

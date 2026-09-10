@@ -69,7 +69,8 @@ export const IntroAdModerationPage = () => {
   const bannerPendingQuery = usePendingSiteHeaderBannerCampaignsQuery();
   const personalPendingQuery = usePendingSellerPersonalCategoryCampaignsQuery();
   const raffleQueueQuery = useStaffRafflesQueueQuery();
-  const { approveMutation, rejectMutation, staffCancelMutation } = useIntroAdModerationMutations();
+  const { approveMutation, rejectMutation, staffCancelMutation } =
+    useIntroAdModerationMutations();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [sectionFilter, setSectionFilter] = useState("");
   const [attentionOnly, setAttentionOnly] = useState(false);
@@ -92,7 +93,12 @@ export const IntroAdModerationPage = () => {
         personalPending: personalPendingCampaigns,
         rafflePendingCount,
       }),
-    [bannerPendingCampaigns, pendingCampaigns, personalPendingCampaigns, rafflePendingCount],
+    [
+      bannerPendingCampaigns,
+      pendingCampaigns,
+      personalPendingCampaigns,
+      rafflePendingCount,
+    ],
   );
 
   const filteredIntroPending = useMemo(
@@ -118,16 +124,21 @@ export const IntroAdModerationPage = () => {
   );
   const showUsersRaffleSection =
     isAdmin &&
-    isIntroAdModerationSectionVisible(sectionFilter, INTRO_AD_MODERATION_SECTION_USERS_RAFFLE);
+    isIntroAdModerationSectionVisible(
+      sectionFilter,
+      INTRO_AD_MODERATION_SECTION_USERS_RAFFLE,
+    );
 
   const totalPendingAll = summary.pendingTotal;
   const visiblePendingCount =
     (showIntroSection ? filteredIntroPending.length : 0) +
     (showBannerSection
-      ? filterPendingModerationCampaigns(bannerPendingCampaigns, { attentionOnly }).length
+      ? filterPendingModerationCampaigns(bannerPendingCampaigns, { attentionOnly })
+          .length
       : 0) +
     (showPersonalSection
-      ? filterPendingModerationCampaigns(personalPendingCampaigns, { attentionOnly }).length
+      ? filterPendingModerationCampaigns(personalPendingCampaigns, { attentionOnly })
+          .length
       : 0) +
     (showRaffleSection && !attentionOnly ? rafflePendingCount : 0);
 
@@ -164,15 +175,13 @@ export const IntroAdModerationPage = () => {
       const next = new Set(prev);
       let changed = false;
       const register = (prefix: string, campaigns: IntroAdModerationCampaign[]) => {
-        campaigns
-          .filter(campaignModerationNeedsAttention)
-          .forEach((campaign) => {
-            const rowId = buildModerationCampaignRowId(prefix, String(campaign._id));
-            if (!next.has(rowId)) {
-              next.add(rowId);
-              changed = true;
-            }
-          });
+        campaigns.filter(campaignModerationNeedsAttention).forEach((campaign) => {
+          const rowId = buildModerationCampaignRowId(prefix, String(campaign._id));
+          if (!next.has(rowId)) {
+            next.add(rowId);
+            changed = true;
+          }
+        });
       };
       register("intro", pendingCampaigns);
       register("banner", bannerPendingCampaigns);
@@ -200,13 +209,17 @@ export const IntroAdModerationPage = () => {
         next.add(buildModerationCampaignRowId("intro", String(campaign._id))),
       );
       if (showBannerSection) {
-        filterPendingModerationCampaigns(bannerPendingCampaigns, { attentionOnly }).forEach(
-          (campaign) => next.add(buildModerationCampaignRowId("banner", String(campaign._id))),
+        filterPendingModerationCampaigns(bannerPendingCampaigns, {
+          attentionOnly,
+        }).forEach((campaign) =>
+          next.add(buildModerationCampaignRowId("banner", String(campaign._id))),
         );
       }
       if (showPersonalSection) {
-        filterPendingModerationCampaigns(personalPendingCampaigns, { attentionOnly }).forEach(
-          (campaign) => next.add(buildModerationCampaignRowId("personal", String(campaign._id))),
+        filterPendingModerationCampaigns(personalPendingCampaigns, {
+          attentionOnly,
+        }).forEach((campaign) =>
+          next.add(buildModerationCampaignRowId("personal", String(campaign._id))),
         );
       }
       return next;
@@ -327,7 +340,9 @@ export const IntroAdModerationPage = () => {
       removeFromPendingQueue(campaignId);
       await refreshModerationQueries();
     } catch (error) {
-      setActionError(formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.APPROVE_FALLBACK));
+      setActionError(
+        formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.APPROVE_FALLBACK),
+      );
     } finally {
       setPendingCampaignId(null);
     }
@@ -344,7 +359,9 @@ export const IntroAdModerationPage = () => {
       removeFromPendingQueue(campaignId);
       await refreshModerationQueries();
     } catch (error) {
-      setActionError(formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.REJECT_FALLBACK));
+      setActionError(
+        formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.REJECT_FALLBACK),
+      );
     } finally {
       setPendingCampaignId(null);
     }
@@ -423,13 +440,19 @@ export const IntroAdModerationPage = () => {
     visiblePendingCount > 0 ? (
       <View style={styles.listActions}>
         <Pressable style={styles.listAction} onPress={expandAllVisible}>
-          <Text style={styles.listActionText}>{INTRO_AD_MODERATION_PAGE_UI.EXPAND_ALL}</Text>
+          <Text style={styles.listActionText}>
+            {INTRO_AD_MODERATION_PAGE_UI.EXPAND_ALL}
+          </Text>
         </Pressable>
         <Pressable style={styles.listAction} onPress={collapseAll}>
-          <Text style={styles.listActionText}>{INTRO_AD_MODERATION_PAGE_UI.COLLAPSE_ALL}</Text>
+          <Text style={styles.listActionText}>
+            {INTRO_AD_MODERATION_PAGE_UI.COLLAPSE_ALL}
+          </Text>
         </Pressable>
         {attentionOnly ? (
-          <Text style={styles.filterHint}>{INTRO_AD_MODERATION_PAGE_UI.ATTENTION_FILTER_HINT}</Text>
+          <Text style={styles.filterHint}>
+            {INTRO_AD_MODERATION_PAGE_UI.ATTENTION_FILTER_HINT}
+          </Text>
         ) : null}
       </View>
     ) : null;
@@ -447,7 +470,10 @@ export const IntroAdModerationPage = () => {
     const error = queueQuery.error ?? managedQuery.error;
     return (
       <ScreenErrorState
-        message={formatApiErrorMessage(error, INTRO_AD_MODERATION_PAGE_UI.FETCH_FALLBACK)}
+        message={formatApiErrorMessage(
+          error,
+          INTRO_AD_MODERATION_PAGE_UI.FETCH_FALLBACK,
+        )}
         onRetry={reload}
       />
     );
@@ -459,14 +485,22 @@ export const IntroAdModerationPage = () => {
 
   const introHasVisibleContent =
     showIntroSection &&
-    ((!attentionOnly && managedCampaigns.length > 0) || filteredIntroPending.length > 0);
+    ((!attentionOnly && managedCampaigns.length > 0) ||
+      filteredIntroPending.length > 0);
 
   const moderationSections = (
     <>
       {showIntroSection && !attentionOnly && managedCampaigns.length > 0 ? (
         <View style={styles.section}>
-          <ModerationSectionTitle title={INTRO_AD_MODERATION_PAGE_UI.INTRO_MANAGED_TITLE} />
-          <View style={resolveIntroAdModerationListPanelStyles(INTRO_AD_MODERATION_SECTION_INTRO, styles)}>
+          <ModerationSectionTitle
+            title={INTRO_AD_MODERATION_PAGE_UI.INTRO_MANAGED_TITLE}
+          />
+          <View
+            style={resolveIntroAdModerationListPanelStyles(
+              INTRO_AD_MODERATION_SECTION_INTRO,
+              styles,
+            )}
+          >
             {managedCampaigns.map((campaign) => {
               const campaignId = String(campaign._id);
               return (
@@ -492,7 +526,12 @@ export const IntroAdModerationPage = () => {
             title={INTRO_AD_MODERATION_PAGE_UI.INTRO_PENDING_TITLE}
             pendingCount={filteredIntroPending.length}
           />
-          <View style={resolveIntroAdModerationListPanelStyles(INTRO_AD_MODERATION_SECTION_INTRO, styles)}>
+          <View
+            style={resolveIntroAdModerationListPanelStyles(
+              INTRO_AD_MODERATION_SECTION_INTRO,
+              styles,
+            )}
+          >
             {filteredIntroPending.map((campaign) => {
               const campaignId = String(campaign._id);
               const rowId = buildModerationCampaignRowId("intro", campaignId);
@@ -557,7 +596,11 @@ export const IntroAdModerationPage = () => {
         <Text style={styles.empty}>{INTRO_AD_MODERATION_PAGE_UI.EMPTY}</Text>
       ) : null}
 
-      {hasFilters && visiblePendingCount === 0 && !attentionOnly && !showUsersRaffleSection && totalPendingAll > 0 ? (
+      {hasFilters &&
+      visiblePendingCount === 0 &&
+      !attentionOnly &&
+      !showUsersRaffleSection &&
+      totalPendingAll > 0 ? (
         <Text style={styles.empty}>{emptyMessage}</Text>
       ) : null}
 

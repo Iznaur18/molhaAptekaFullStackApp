@@ -140,7 +140,10 @@ export function isSavedAddressInPickupLocations(saved, locations) {
     return false;
   }
   return (Array.isArray(locations) ? locations : []).some(
-    (item) => String(item?.address ?? "").trim().toLowerCase() === line,
+    (item) =>
+      String(item?.address ?? "")
+        .trim()
+        .toLowerCase() === line,
   );
 }
 
@@ -172,7 +175,9 @@ export function pruneProductPickupLocationsToSelection(
     [...selectedProfileIds].map((id) => String(id ?? "").trim()).filter(Boolean),
   );
   const confirmedCustomIdSet = new Set(
-    [...confirmedCustomLocationIds].map((id) => String(id ?? "").trim()).filter(Boolean),
+    [...confirmedCustomLocationIds]
+      .map((id) => String(id ?? "").trim())
+      .filter(Boolean),
   );
 
   return list.filter((item) => {
@@ -282,13 +287,18 @@ export function createPickupLocationFromSaved(saved) {
  * @param {string} addressLine
  */
 export function removePickupLocationByAddressLine(locations, addressLine) {
-  const key = String(addressLine ?? "").trim().toLowerCase();
+  const key = String(addressLine ?? "")
+    .trim()
+    .toLowerCase();
   if (!key) {
     return ensureSingleDefaultProductPickupLocation(locations);
   }
   return ensureSingleDefaultProductPickupLocation(
     (Array.isArray(locations) ? locations : []).filter(
-      (item) => String(item?.address ?? "").trim().toLowerCase() !== key,
+      (item) =>
+        String(item?.address ?? "")
+          .trim()
+          .toLowerCase() !== key,
     ),
   );
 }
@@ -301,10 +311,9 @@ export function pickupAddressValueFromLocation(location) {
     line: String(location?.address ?? "").trim(),
     flat: "",
     fiasId: "",
-    geo:
-      hasValidPickupGeo({ lat: location?.lat, lon: location?.lon })
-        ? { lat: Number(location.lat), lon: Number(location.lon) }
-        : null,
+    geo: hasValidPickupGeo({ lat: location?.lat, lon: location?.lon })
+      ? { lat: Number(location.lat), lon: Number(location.lon) }
+      : null,
     regionCode: null,
     selectedFromSuggest: location?.selectedFromSuggest === true,
   };

@@ -19,10 +19,17 @@ import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/
 import { ProfileAccountList } from "@/features/profile-tab/ui/ProfileAccountList";
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
-import { API_CLIENT_UI, MY_PROFILE_PAGE_UI, PRODUCT_MODERATION_PAGE_UI } from "@/shared/config";
+import {
+  API_CLIENT_UI,
+  MY_PROFILE_PAGE_UI,
+  PRODUCT_MODERATION_PAGE_UI,
+} from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { resolveProfileHubMainReservedWidth } from "@/shared/lib/guestProfileLayout";
-import { useProductGridLayout, type ProductGridLayoutResolvers } from "@/shared/model/useProductGridLayout";
+import {
+  useProductGridLayout,
+  type ProductGridLayoutResolvers,
+} from "@/shared/model/useProductGridLayout";
 import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { moderationQueryKeys, staffBadgeQueryKeys } from "@/shared/api";
@@ -155,7 +162,10 @@ export const ProductModerationPage = () => {
       removeFromQueue(productId);
       await handleQueueChanged();
     } catch (error) {
-      const message = formatApiErrorMessage(error, API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK);
+      const message = formatApiErrorMessage(
+        error,
+        API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK,
+      );
       setActionError(message);
       setCardErrors((prev) => ({ ...prev, [productId]: message }));
     } finally {
@@ -244,10 +254,7 @@ export const ProductModerationPage = () => {
         key={productGrid.listKey}
         data={catalogGridRows}
         keyExtractor={(item) => item.key}
-        style={[
-          styles.container,
-          isDrawerLayout ? centeredContentStyle : null,
-        ]}
+        style={[styles.container, isDrawerLayout ? centeredContentStyle : null]}
         contentContainerStyle={[
           styles.list,
           !isDrawerLayout ? styles.listInAccountShell : null,

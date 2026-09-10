@@ -31,7 +31,9 @@ export const ProductReportsToolbar = ({
       accessibilityLabel={PRODUCT_REPORTS_PAGE_UI.SECTION_FILTER_LABEL}
     >
       <View style={styles.toolbarHead}>
-        <Text style={styles.toolbarCount}>{PRODUCT_REPORTS_PAGE_UI.COUNT(groupsCount)}</Text>
+        <Text style={styles.toolbarCount}>
+          {PRODUCT_REPORTS_PAGE_UI.COUNT(groupsCount)}
+        </Text>
       </View>
 
       <View style={styles.chips} accessibilityRole="tablist">
@@ -46,7 +48,9 @@ export const ProductReportsToolbar = ({
               accessibilityState={{ selected: isActive }}
               onPress={() => onSectionFilterChange(option.value)}
             >
-              <Text style={[styles.chipText, isActive && styles.chipTextActive]}>{option.label}</Text>
+              <Text style={[styles.chipText, isActive && styles.chipTextActive]}>
+                {option.label}
+              </Text>
             </Pressable>
           );
         })}

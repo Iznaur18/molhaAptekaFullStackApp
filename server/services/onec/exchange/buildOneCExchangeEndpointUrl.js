@@ -9,9 +9,7 @@ export function buildOneCExchangeEndpointUrl() {
   const path = "/onec/exchange";
 
   const explicit =
-    process.env.PUBLIC_API_BASE_URL?.trim() ||
-    process.env.API_PUBLIC_URL?.trim() ||
-    "";
+    process.env.PUBLIC_API_BASE_URL?.trim() || process.env.API_PUBLIC_URL?.trim() || "";
   if (explicit) {
     return `${explicit.replace(/\/+$/, "")}${path}`;
   }

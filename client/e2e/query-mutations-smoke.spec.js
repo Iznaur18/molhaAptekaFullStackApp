@@ -25,7 +25,9 @@ async function findProductIdByName(request, cookie, productName) {
     headers: { Cookie: cookie },
   });
   if (!response.ok()) {
-    throw new Error(`GET /product failed: ${response.status()} ${await response.text()}`);
+    throw new Error(
+      `GET /product failed: ${response.status()} ${await response.text()}`,
+    );
   }
   const body = await response.json();
   const products = body.data?.products ?? [];
@@ -89,7 +91,10 @@ test("story upload: модератор публикует фото-сторис"
   await expect(dialog).toBeVisible();
 
   await dialog.getByRole("button", { name: "Фото", exact: true }).click();
-  await dialog.locator('input[type="file"]').first().setInputFiles(E2E_SAMPLE_IMAGE_PATH);
+  await dialog
+    .locator('input[type="file"]')
+    .first()
+    .setInputFiles(E2E_SAMPLE_IMAGE_PATH);
 
   await expect(dialog.locator(".create-user-story-modal__media")).toBeVisible({
     timeout: 15_000,
@@ -122,9 +127,9 @@ test("KYC submit: покупатель подаёт заявку на подтв
   await dialog.getByLabel("Дата выдачи").fill("2010-06-20");
   await dialog.getByLabel("Код подразделения").fill("770-001");
 
-  await dialog.getByLabel("Выбрать изображение с устройства").setInputFiles(
-    E2E_SAMPLE_IMAGE_PATH,
-  );
+  await dialog
+    .getByLabel("Выбрать изображение с устройства")
+    .setInputFiles(E2E_SAMPLE_IMAGE_PATH);
   await expect(dialog.getByText("sample-upload.png")).toBeVisible({ timeout: 10_000 });
 
   await dialog.getByRole("button", { name: "Отправить заявку", exact: true }).click();

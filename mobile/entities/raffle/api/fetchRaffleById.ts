@@ -12,8 +12,6 @@ export const fetchRaffleById = async (raffleId: string): Promise<RaffleFromApi> 
     }
     return data.data.raffle as RaffleFromApi;
   } catch (error) {
-    throw new Error(
-      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_RAFFLE_FALLBACK),
-    );
+    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_RAFFLE_FALLBACK));
   }
 };

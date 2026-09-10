@@ -1,10 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import {
-  parseApiSuccess,
-  productWriteDataSchema,
-} from "../src/index.js";
+import { parseApiSuccess, productWriteDataSchema } from "../src/index.js";
 
 describe("productWriteDataSchema nullish resilience", () => {
   it("принимает null в optional полях карточки", () => {

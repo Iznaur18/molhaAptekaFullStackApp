@@ -400,7 +400,9 @@ export const ProductCard = memo(
                   disabled={showSellerClosedOverlay}
                   accessibilityRole={showSellerClosedOverlay ? "text" : "button"}
                   accessibilityLabel={
-                    showSellerClosedOverlay ? sellerClosedOverlayLabel : openProductLabel
+                    showSellerClosedOverlay
+                      ? sellerClosedOverlayLabel
+                      : openProductLabel
                   }
                   importantForAccessibility="no-hide-descendants"
                 >

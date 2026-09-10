@@ -169,8 +169,7 @@ export function CheckoutForm({
     setPaymentMethod(selectablePaymentMethods[0]);
   }, [selectablePaymentMethods, paymentMethod]);
 
-  const deliverySelectable =
-    PRODUCT_DELIVERY_FULFILLMENT_ENABLED && deliveryAvailable;
+  const deliverySelectable = PRODUCT_DELIVERY_FULFILLMENT_ENABLED && deliveryAvailable;
   const pickupSelectable = pickupAvailable;
 
   useEffect(() => {
@@ -188,11 +187,7 @@ export function CheckoutForm({
 
   useEffect(() => {
     onDeliveryGeoChange?.(deliveryAddress.geo ?? null);
-  }, [
-    onDeliveryGeoChange,
-    deliveryAddress.geo?.lat,
-    deliveryAddress.geo?.lon,
-  ]);
+  }, [onDeliveryGeoChange, deliveryAddress.geo?.lat, deliveryAddress.geo?.lon]);
 
   const handleSavedAddressSelect = (nextId) => {
     setSelectedSavedAddressId(nextId);
@@ -216,9 +211,7 @@ export function CheckoutForm({
 
   const handleDeliveryAddressChange = (nextAddress) => {
     setDeliveryAddress(nextAddress);
-    setSelectedSavedAddressId(
-      matchCheckoutSavedAddressId(nextAddress, savedAddresses),
-    );
+    setSelectedSavedAddressId(matchCheckoutSavedAddressId(nextAddress, savedAddresses));
   };
 
   useEffect(() => {
@@ -426,79 +419,79 @@ export function CheckoutForm({
               переключателю делать нечего. Не hidden: у блока свой display,
               он перебил бы атрибут. */}
           {fulfillmentMode == null ? (
-          <div className="checkout-form__fulfillment">
-            <span className="checkout-form__label" id={`${formId}-fulfillment-label`}>
-              {CHECKOUT_FORM_UI.LABEL_FULFILLMENT}
-            </span>
-            <div
-              className="checkout-form__fulfillment-row"
-              role="radiogroup"
-              aria-labelledby={`${formId}-fulfillment-label`}
-            >
-              <button
-                type="button"
-                role="radio"
-                aria-checked={isPickup}
-                aria-disabled={!pickupSelectable || isDisabled || isSubmitting}
-                className={[
-                  "checkout-form__fulfillment-option",
-                  isPickup ? "checkout-form__fulfillment-option--active" : "",
-                  !pickupSelectable
-                    ? "checkout-form__fulfillment-option--disabled"
-                    : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                disabled={isDisabled || isSubmitting}
-                onClick={() => {
-                  if (!pickupSelectable) {
-                    setLocalError(
-                      pickupOptionHint ||
-                        CHECKOUT_FORM_UI.FULFILLMENT_PICKUP_UNAVAILABLE,
-                    );
-                    return;
-                  }
-                  setLocalError("");
-                  applyFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
-                }}
+            <div className="checkout-form__fulfillment">
+              <span className="checkout-form__label" id={`${formId}-fulfillment-label`}>
+                {CHECKOUT_FORM_UI.LABEL_FULFILLMENT}
+              </span>
+              <div
+                className="checkout-form__fulfillment-row"
+                role="radiogroup"
+                aria-labelledby={`${formId}-fulfillment-label`}
               >
-                <span className="checkout-form__fulfillment-option-title">
-                  {CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}
-                </span>
-              </button>
-              <button
-                type="button"
-                role="radio"
-                aria-checked={!isPickup}
-                aria-disabled={!deliverySelectable || isDisabled || isSubmitting}
-                className={[
-                  "checkout-form__fulfillment-option",
-                  !isPickup ? "checkout-form__fulfillment-option--active" : "",
-                  !deliverySelectable
-                    ? "checkout-form__fulfillment-option--disabled"
-                    : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                disabled={isDisabled || isSubmitting}
-                onClick={() => {
-                  if (!deliverySelectable) {
-                    setLocalError(
-                      deliveryOptionHint ||
-                        CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_UNAVAILABLE,
-                    );
-                    return;
-                  }
-                  setLocalError("");
-                  applyFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
-                }}
-              >
-                <span className="checkout-form__fulfillment-option-title">
-                  {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
-                </span>
-              </button>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={isPickup}
+                  aria-disabled={!pickupSelectable || isDisabled || isSubmitting}
+                  className={[
+                    "checkout-form__fulfillment-option",
+                    isPickup ? "checkout-form__fulfillment-option--active" : "",
+                    !pickupSelectable
+                      ? "checkout-form__fulfillment-option--disabled"
+                      : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  disabled={isDisabled || isSubmitting}
+                  onClick={() => {
+                    if (!pickupSelectable) {
+                      setLocalError(
+                        pickupOptionHint ||
+                          CHECKOUT_FORM_UI.FULFILLMENT_PICKUP_UNAVAILABLE,
+                      );
+                      return;
+                    }
+                    setLocalError("");
+                    applyFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
+                  }}
+                >
+                  <span className="checkout-form__fulfillment-option-title">
+                    {CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={!isPickup}
+                  aria-disabled={!deliverySelectable || isDisabled || isSubmitting}
+                  className={[
+                    "checkout-form__fulfillment-option",
+                    !isPickup ? "checkout-form__fulfillment-option--active" : "",
+                    !deliverySelectable
+                      ? "checkout-form__fulfillment-option--disabled"
+                      : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  disabled={isDisabled || isSubmitting}
+                  onClick={() => {
+                    if (!deliverySelectable) {
+                      setLocalError(
+                        deliveryOptionHint ||
+                          CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_UNAVAILABLE,
+                      );
+                      return;
+                    }
+                    setLocalError("");
+                    applyFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
+                  }}
+                >
+                  <span className="checkout-form__fulfillment-option-title">
+                    {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
+                  </span>
+                </button>
+              </div>
             </div>
-          </div>
           ) : null}
 
           {!needsPickup && pickupSelectable ? (
@@ -514,7 +507,9 @@ export function CheckoutForm({
                   {CHECKOUT_FORM_UI.PICKUP_ADDRESS_LABEL}
                 </span>
               </header>
-              <p className="checkout-form__hint">{CHECKOUT_FORM_UI.PICKUP_NOT_NEEDED}</p>
+              <p className="checkout-form__hint">
+                {CHECKOUT_FORM_UI.PICKUP_NOT_NEEDED}
+              </p>
             </section>
           ) : null}
 
@@ -664,7 +659,9 @@ export function CheckoutForm({
                 />
 
                 <label className="checkout-form__field">
-                  <span className="checkout-form__label">{CHECKOUT_FORM_UI.LABEL_FLAT}</span>
+                  <span className="checkout-form__label">
+                    {CHECKOUT_FORM_UI.LABEL_FLAT}
+                  </span>
                   <input
                     type="text"
                     className="checkout-form__input"

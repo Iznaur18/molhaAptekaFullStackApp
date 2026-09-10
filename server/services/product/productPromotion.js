@@ -205,9 +205,7 @@ async function requestProductPromotionOnce({
   });
 
   const discountNote =
-    quoted.discountPercent > 0
-      ? ` (скидка −${quoted.discountPercent}%)`
-      : "";
+    quoted.discountPercent > 0 ? ` (скидка −${quoted.discountPercent}%)` : "";
 
   return {
     message: `Счёт на ${chargeRub} ₽ выставлен${discountNote} — продвижение начнётся после оплаты.`,

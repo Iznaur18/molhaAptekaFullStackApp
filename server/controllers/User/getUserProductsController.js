@@ -37,8 +37,7 @@ export const getUserProductsController = async (req, res) => {
   }
 
   const { page, limit } = parsePageLimit(req.query);
-  const shelfId =
-    req.query.shelfId != null ? String(req.query.shelfId).trim() : "";
+  const shelfId = req.query.shelfId != null ? String(req.query.shelfId).trim() : "";
   const payload = await getSellerCatalogProductsPage(targetUserId, page, limit, {
     shelfId: shelfId || null,
     viewerUserId: req.userId ?? null,

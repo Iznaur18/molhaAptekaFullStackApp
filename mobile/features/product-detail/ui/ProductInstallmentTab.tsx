@@ -167,7 +167,10 @@ export const ProductInstallmentTab = ({
       deliveryAddressFlat: string;
       paymentMethod: OrderPaymentMethod;
     }) => {
-      const resolved = resolveInstallmentDeliveryFromSheet(sheetPayload, productForCheckout);
+      const resolved = resolveInstallmentDeliveryFromSheet(
+        sheetPayload,
+        productForCheckout,
+      );
       if (!resolved.deliveryAddress) {
         setSheetSubmitError(CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED);
         return;
@@ -210,15 +213,11 @@ export const ProductInstallmentTab = ({
       setSuccessMessage(INSTALLMENT_UI.CONTRACT_SUCCESS);
     } catch (error) {
       setIsConsentOpen(false);
-      setErrorMessage(error instanceof Error ? error.message : INSTALLMENT_UI.ERROR_GENERIC);
+      setErrorMessage(
+        error instanceof Error ? error.message : INSTALLMENT_UI.ERROR_GENERIC,
+      );
     }
-  }, [
-    createInstallmentContract,
-    pendingCheckout,
-    productId,
-    quantity,
-    selectedPlanId,
-  ]);
+  }, [createInstallmentContract, pendingCheckout, productId, quantity, selectedPlanId]);
 
   const openCheckoutSheetRef = useRef(openCheckoutSheet);
   openCheckoutSheetRef.current = openCheckoutSheet;
@@ -237,7 +236,10 @@ export const ProductInstallmentTab = ({
   const baseTotalRub = (selectedPlanPriceSummary?.productPriceRub ?? 0) * qty;
   const markupTotalRub = (selectedPlanPriceSummary?.markupRub ?? 0) * qty;
   const isSubmitDisabled =
-    isCreateContractPending || isPurchaseBlocked || !isAuthorized || !isUserDataConfirmed;
+    isCreateContractPending ||
+    isPurchaseBlocked ||
+    !isAuthorized ||
+    !isUserDataConfirmed;
   const dockLabel = isPurchaseBlocked
     ? blockedPurchaseLabel
     : isCreateContractPending
@@ -313,7 +315,9 @@ export const ProductInstallmentTab = ({
   return (
     <View style={styles.tabContainer}>
       {!isUserDataConfirmed ? (
-        <Text style={styles.installmentBuyerHintBlocked}>{INSTALLMENT_UI.BUYER_HINT}</Text>
+        <Text style={styles.installmentBuyerHintBlocked}>
+          {INSTALLMENT_UI.BUYER_HINT}
+        </Text>
       ) : null}
 
       <Text style={styles.label}>{INSTALLMENT_UI.PLANS_LABEL}</Text>
@@ -325,7 +329,12 @@ export const ProductInstallmentTab = ({
             style={[styles.planCard, isSelected && styles.planCardSelected]}
             onPress={() => setSelectedPlanId(plan._id)}
           >
-            <View style={[styles.planRadioOuter, isSelected && styles.planRadioOuterSelected]}>
+            <View
+              style={[
+                styles.planRadioOuter,
+                isSelected && styles.planRadioOuterSelected,
+              ]}
+            >
               {isSelected ? <View style={styles.planRadioInner} /> : null}
             </View>
             <View style={styles.planContent}>
@@ -334,7 +343,9 @@ export const ProductInstallmentTab = ({
                 {plan.monthsCount} мес × {formatPriceRub(plan.monthlyAmountRub)}
               </Text>
               {!plan.firstPaymentRequiredNow ? (
-                <Text style={styles.planMeta}>{INSTALLMENT_UI.FIRST_PAYMENT_LATER}</Text>
+                <Text style={styles.planMeta}>
+                  {INSTALLMENT_UI.FIRST_PAYMENT_LATER}
+                </Text>
               ) : null}
             </View>
           </Pressable>
@@ -356,11 +367,15 @@ export const ProductInstallmentTab = ({
       {selectedPlan ? (
         <View style={{ gap: 8 }}>
           <View style={styles.totalBox}>
-            <Text style={styles.totalBoxLabel}>{INSTALLMENT_UI.BUYER_PRODUCT_PRICE_LABEL}</Text>
+            <Text style={styles.totalBoxLabel}>
+              {INSTALLMENT_UI.BUYER_PRODUCT_PRICE_LABEL}
+            </Text>
             <Text style={styles.totalBoxValue}>{formatPriceRub(baseTotalRub)}</Text>
           </View>
           <View style={styles.totalBox}>
-            <Text style={styles.totalBoxLabel}>{INSTALLMENT_UI.BUYER_MARKUP_LABEL}</Text>
+            <Text style={styles.totalBoxLabel}>
+              {INSTALLMENT_UI.BUYER_MARKUP_LABEL}
+            </Text>
             <Text style={styles.totalBoxValue}>+{formatPriceRub(markupTotalRub)}</Text>
           </View>
           <View style={styles.totalBox}>

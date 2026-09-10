@@ -1,4 +1,7 @@
-import { isProductPurchaseBlockedBySeller, USER_BLOCKED_PURCHASE_MESSAGE } from "@molha/api-contract";
+import {
+  isProductPurchaseBlockedBySeller,
+  USER_BLOCKED_PURCHASE_MESSAGE,
+} from "@molha/api-contract";
 
 /**
  * @param {Record<string, unknown> | null | undefined} product

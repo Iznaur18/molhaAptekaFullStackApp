@@ -39,7 +39,10 @@ test("home catalog header panel matches web mobile-split chrome", () => {
   assert.match(layout, /HOME_CATALOG_HEADER_BANNER_BELOW_PANEL_MARGIN/);
   assert.doesNotMatch(searchRow, /SiteHeaderBannerSlot/);
   assert.match(styles, /backgroundColor: "transparent"/);
-  assert.match(styles, /paddingHorizontal: HOME_CATALOG_HEADER_PANEL_PADDING\.horizontal/);
+  assert.match(
+    styles,
+    /paddingHorizontal: HOME_CATALOG_HEADER_PANEL_PADDING\.horizontal/,
+  );
   assert.match(styles, /paddingBottom: HOME_CATALOG_HEADER_PANEL_PADDING\.bottom/);
   assert.match(styles, /HOME_CATALOG_HEADER_SEARCH_INPUT_MIN_HEIGHT/);
   assert.match(styles, /borderTopLeftRadius: 0/);
@@ -91,7 +94,9 @@ test("HomeCatalogUsersButton opens stretch menu from circle", () => {
   const animation = readMobileFile(
     "features/home-feed/model/useHomeCatalogUsersStretchMenuAnimation.ts",
   );
-  const items = readMobileFile("features/home-feed/lib/buildHomeCatalogUsersMenuItems.ts");
+  const items = readMobileFile(
+    "features/home-feed/lib/buildHomeCatalogUsersMenuItems.ts",
+  );
   const layout = readMobileFile("shared/lib/homeCatalogHeaderLayout.ts");
   const styles = readMobileFile("shared/theme/homeCatalogHeaderStyles.ts");
 
@@ -112,10 +117,20 @@ test("HomeCatalogUsersButton opens stretch menu from circle", () => {
   assert.match(animation, /scheduleOpenAfterPaint/);
   assert.match(animation, /HOME_CATALOG_HEADER_USERS_STRETCH_ANIMATION_MS/);
   assert.match(animation, /HOME_CATALOG_HEADER_USERS_STRETCH_ANIMATION_EASING_CSS/);
-  assert.match(animation, /transitionProperty: "height, background-color, border-color"/);
+  assert.match(
+    animation,
+    /transitionProperty: "height, background-color, border-color"/,
+  );
   assert.match(menu, /useCssTransition \? View : Animated\.View/);
   assert.match(menu, /menuExpanded/);
-  assert.match(menu, /portalVisible \? <View style=\{styles\.usersNavPillPlaceholder\}/);
+  // Пробелы и переносы свободные: тест проверяет исходный текст компонента, а
+  // его раскладку задаёт prettier. С жёстким шаблоном тест ломался от одного
+  // лишь переформатирования — так и вышло 10.09.2026, когда репозиторий первый
+  // раз прогнали prettier'ом целиком.
+  assert.match(
+    menu,
+    /portalVisible\s*\?\s*\(?\s*<View style=\{styles\.usersNavPillPlaceholder\}/,
+  );
   assert.match(menu, /closedBackgroundColor: theme\.colors\.action/);
   assert.match(menu, /openBackgroundColor: theme\.colors\.surface/);
   assert.match(menu, /toggleIconColor/);

@@ -1,8 +1,6 @@
 import { z } from "zod";
 
-import {
-  requiredRuRegionCodeFieldSchema,
-} from "./ruRegions.js";
+import { requiredRuRegionCodeFieldSchema } from "./ruRegions.js";
 import { mongoIdSchema } from "./mongoId.js";
 import { PRODUCT_MODERATION_STATUSES, productFromApiSchema } from "./productFromApi.js";
 import { storedMediaUrlOrEmptySchema, storedMediaUrlSchema } from "./storedMediaUrl.js";
@@ -71,8 +69,7 @@ export const PRODUCT_CATEGORY_VALUES = [
 
 /** SSOT product-write лимитов — client/mobile/server re-export отсюда. */
 export const PRODUCT_IMAGE_URLS_MAX = 10;
-export const PRODUCT_IMAGE_REQUIRED_MESSAGE =
-  "Добавьте хотя бы одно фото товара";
+export const PRODUCT_IMAGE_REQUIRED_MESSAGE = "Добавьте хотя бы одно фото товара";
 export const PRODUCT_NAME_MIN_LENGTH = 3;
 export const PRODUCT_NAME_MAX_LENGTH = 100;
 export const PRODUCT_DESCRIPTION_MIN_CHARS = 10;
@@ -255,8 +252,7 @@ const assertCreateProductRequiresPhoto = (body, ctx) => {
     ? body.productImageUrls.filter((url) => String(url ?? "").trim().length > 0)
     : [];
   const hasLegacy =
-    typeof body.productImageUrl === "string" &&
-    body.productImageUrl.trim().length > 0;
+    typeof body.productImageUrl === "string" && body.productImageUrl.trim().length > 0;
   if (fromArray.length === 0 && !hasLegacy) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -344,7 +340,9 @@ export const createProductBodySchema = z
     productListingOrigin: productListingOriginSchema,
     productIsOriginal: z.coerce.boolean().optional().default(false),
     productOutOfStock: z.coerce.boolean().optional().default(false),
-    productOutOfStockLabel: productOutOfStockLabelFieldSchema.optional().default("out_of_stock"),
+    productOutOfStockLabel: productOutOfStockLabelFieldSchema
+      .optional()
+      .default("out_of_stock"),
     productReturnEnabled: z.coerce.boolean().optional(),
     productReturnTerms: z
       .array(productReturnTermSchema)

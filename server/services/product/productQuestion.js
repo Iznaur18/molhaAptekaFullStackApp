@@ -108,9 +108,7 @@ export async function listProductQuestions({ productId, viewerUserId, query }) {
   ]);
 
   return {
-    questions: questions.map((row) =>
-      serializeProductQuestion(row, { viewerUserId }),
-    ),
+    questions: questions.map((row) => serializeProductQuestion(row, { viewerUserId })),
     pagination: {
       page,
       limit,
@@ -294,9 +292,7 @@ export async function answerProductQuestion({
     throw new AppError(400, "Введите ответ");
   }
 
-  const product = await ProductModel.findById(productId)
-    .select("productSeller")
-    .lean();
+  const product = await ProductModel.findById(productId).select("productSeller").lean();
 
   if (!product) {
     throw new AppError(404, PRODUCT_QUESTION_MESSAGES.PRODUCT_NOT_FOUND);
@@ -360,9 +356,7 @@ export async function deleteMyProductQuestion({ userId, productId, questionId })
  * @param {{ userId: string; productId: string; questionId: string }} input
  */
 export async function hideProductQuestion({ userId, productId, questionId }) {
-  const product = await ProductModel.findById(productId)
-    .select("productSeller")
-    .lean();
+  const product = await ProductModel.findById(productId).select("productSeller").lean();
   if (!product) {
     throw new AppError(404, PRODUCT_QUESTION_MESSAGES.PRODUCT_NOT_FOUND);
   }

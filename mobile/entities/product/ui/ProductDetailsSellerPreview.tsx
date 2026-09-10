@@ -75,7 +75,8 @@ export const ProductDetailsSellerPreview = ({
   const displayName = sellerObj.userName?.trim() || USER_LIST_ROW_UI.MISSING_NAME;
   const isPremium = sellerObj.isPremiumUser === true;
   const isConfirmed = sellerObj.isUserDataConfirmed === true;
-  const listedRaw = sellerObj.sellerListedProductCount ?? sellerObj.sellerListedProductsCount;
+  const listedRaw =
+    sellerObj.sellerListedProductCount ?? sellerObj.sellerListedProductsCount;
   const listedCount = Number(listedRaw);
   const listedProductsText = Number.isFinite(listedCount)
     ? String(Math.max(0, Math.floor(listedCount)))

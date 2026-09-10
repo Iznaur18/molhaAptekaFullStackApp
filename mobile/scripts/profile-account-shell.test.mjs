@@ -9,8 +9,12 @@ const readMobile = (p) => readFileSync(join(ROOT, p), "utf8");
 
 test("profile account shell keeps sidebar on hub desktop like web /me", () => {
   const shell = readMobile("features/profile-tab/ui/ProfileAccountShell.tsx");
-  const scrollContext = readMobile("features/profile-tab/model/ProfileAccountScrollContext.tsx");
-  const profileAccountList = readMobile("features/profile-tab/ui/ProfileAccountList.tsx");
+  const scrollContext = readMobile(
+    "features/profile-tab/model/ProfileAccountScrollContext.tsx",
+  );
+  const profileAccountList = readMobile(
+    "features/profile-tab/ui/ProfileAccountList.tsx",
+  );
   const profileAccountScrollBody = readMobile(
     "features/profile-tab/ui/ProfileAccountScrollBody.tsx",
   );

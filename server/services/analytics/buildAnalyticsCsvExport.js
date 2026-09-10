@@ -42,10 +42,7 @@ function buildCsvBody(overview) {
     csvRow("productViewsUnique", metrics.productViewsUnique),
     csvRow("reconciliationOk", reconciliation?.ok ?? ""),
     csvRow("reconciliationRanAt", reconciliation?.ranAt ?? ""),
-    csvRow(
-      "soldQuantityMismatches",
-      reconciliation?.soldQuantityMismatches ?? "",
-    ),
+    csvRow("soldQuantityMismatches", reconciliation?.soldQuantityMismatches ?? ""),
     csvRow(
       "uniqueViewerCountMismatches",
       reconciliation?.uniqueViewerCountMismatches ?? "",

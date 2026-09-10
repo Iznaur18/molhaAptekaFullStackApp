@@ -8,12 +8,14 @@ const TARGET_DIR = path.join(__dirname, "../services/user");
 const PRODUCT_DIR = path.join(__dirname, "../services/product");
 
 const EXISTING_USER_FILES = fs.existsSync(TARGET_DIR)
-  ? fs.readdirSync(TARGET_DIR).filter((name) => name.endsWith(".js") && name !== "index.js")
+  ? fs
+      .readdirSync(TARGET_DIR)
+      .filter((name) => name.endsWith(".js") && name !== "index.js")
   : [];
 
-const PRODUCT_FILES = fs.readdirSync(PRODUCT_DIR).filter(
-  (name) => name.endsWith(".js") && name !== "index.js",
-);
+const PRODUCT_FILES = fs
+  .readdirSync(PRODUCT_DIR)
+  .filter((name) => name.endsWith(".js") && name !== "index.js");
 
 const USER_DOMAIN_FILES = [
   "attachUserListCommerceStats.js",
@@ -49,21 +51,18 @@ const rewriteImports = (source) => {
     .replaceAll('from "../db/', 'from "../../db/')
     .replaceAll('from "../controllers/', 'from "../../controllers/');
 
-  next = next.replace(
-    /from "\.\/([^"]+\.js)"/g,
-    (_match, relPath) => {
-      if (MOVED_USER_FILES.includes(relPath)) {
-        return `from "./${relPath}"`;
-      }
-      if (PRODUCT_IMPORTS.has(relPath)) {
-        return `from "../product/${relPath}"`;
-      }
-      if (RAFFLE_IMPORTS.has(relPath)) {
-        return `from "../raffle/${relPath}"`;
-      }
-      return `from "../../utils/${relPath}"`;
-    },
-  );
+  next = next.replace(/from "\.\/([^"]+\.js)"/g, (_match, relPath) => {
+    if (MOVED_USER_FILES.includes(relPath)) {
+      return `from "./${relPath}"`;
+    }
+    if (PRODUCT_IMPORTS.has(relPath)) {
+      return `from "../product/${relPath}"`;
+    }
+    if (RAFFLE_IMPORTS.has(relPath)) {
+      return `from "../raffle/${relPath}"`;
+    }
+    return `from "../../utils/${relPath}"`;
+  });
 
   return next;
 };

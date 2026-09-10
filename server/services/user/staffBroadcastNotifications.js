@@ -6,10 +6,7 @@ import {
   buildExpoPushDataPayload,
   sendExpoPushToUser,
 } from "./expoPushNotifications.js";
-import {
-  buildWebPushClickPath,
-  sendWebPushToUser,
-} from "./webPushNotifications.js";
+import { buildWebPushClickPath, sendWebPushToUser } from "./webPushNotifications.js";
 
 const INSERT_CHUNK = 400;
 const PUSH_CONCURRENCY = 25;
@@ -27,13 +24,16 @@ const recipientFilter = {
  */
 async function runPool(items, concurrency, worker) {
   let index = 0;
-  const runners = Array.from({ length: Math.min(concurrency, items.length) }, async () => {
-    while (index < items.length) {
-      const current = index;
-      index += 1;
-      await worker(items[current]);
-    }
-  });
+  const runners = Array.from(
+    { length: Math.min(concurrency, items.length) },
+    async () => {
+      while (index < items.length) {
+        const current = index;
+        index += 1;
+        await worker(items[current]);
+      }
+    },
+  );
   await Promise.all(runners);
 }
 
@@ -48,7 +48,11 @@ export async function countStaffBroadcastRecipients() {
  *   actorUserId: string;
  * }} params
  */
-export async function broadcastStaffNotificationToAllUsers({ title, message, actorUserId }) {
+export async function broadcastStaffNotificationToAllUsers({
+  title,
+  message,
+  actorUserId,
+}) {
   const recipients = await UserModel.find(recipientFilter).select("_id").lean();
   const combinedMessage = `${title}\n${message}`;
 

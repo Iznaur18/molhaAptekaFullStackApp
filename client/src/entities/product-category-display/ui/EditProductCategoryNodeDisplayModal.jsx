@@ -2,7 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { useProductCategoryDisplayMutations } from "../model/useProductCategoryDisplayMutations.js";
-import { resolveProductCategoryNodeDisplay, mapCategoryDisplaysById } from "../lib/resolveProductCategoryNodeDisplay.js";
+import {
+  resolveProductCategoryNodeDisplay,
+  mapCategoryDisplaysById,
+} from "../lib/resolveProductCategoryNodeDisplay.js";
 import { PRODUCT_CATEGORY_DISPLAY_UI } from "../../../shared/config/appUiCopy.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { normalizeUploadUrlForStorage } from "../../../shared/lib/resolveUploadedImageUrl.js";
@@ -89,8 +92,7 @@ export function EditProductCategoryNodeDisplayModal({
       setErrorMessage("");
 
       const trimmedLabel = label.trim();
-      const trimmedImage =
-        normalizeUploadUrlForStorage(imageUrl.trim()) || null;
+      const trimmedImage = normalizeUploadUrlForStorage(imageUrl.trim()) || null;
       const { display } = await patchCategoryNodeMutation.mutateAsync({
         categoryId,
         body: {

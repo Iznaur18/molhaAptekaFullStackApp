@@ -50,8 +50,15 @@ export const AccountRequirementModal = ({
     <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
       <View style={styles.overlay}>
         <ModalSheetGradientBackdrop />
-        <View style={styles.card} accessibilityRole="alert" accessibilityLabel={ACCOUNT_REQUIREMENT_MODAL_UI.ARIA_DIALOG}>
-          <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View
+          style={styles.card}
+          accessibilityRole="alert"
+          accessibilityLabel={ACCOUNT_REQUIREMENT_MODAL_UI.ARIA_DIALOG}
+        >
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
             <View
               style={[
                 styles.badge,
@@ -61,15 +68,23 @@ export const AccountRequirementModal = ({
               <MaterialIcons
                 name={meta.icon}
                 size={28}
-                style={meta.tone === "premium" ? styles.badgeIconPremium : styles.badgeIconConfirm}
+                style={
+                  meta.tone === "premium"
+                    ? styles.badgeIconPremium
+                    : styles.badgeIconConfirm
+                }
               />
             </View>
 
             <Text style={styles.title}>{copy.TITLE}</Text>
-            <Text style={styles.intro}>{ACCOUNT_REQUIREMENT_MODAL_UI.INTRO(actionLabel)}</Text>
+            <Text style={styles.intro}>
+              {ACCOUNT_REQUIREMENT_MODAL_UI.INTRO(actionLabel)}
+            </Text>
             <Text style={styles.description}>{copy.DESCRIPTION}</Text>
 
-            <Text style={styles.benefitsTitle}>{ACCOUNT_REQUIREMENT_MODAL_UI.BENEFITS_TITLE}</Text>
+            <Text style={styles.benefitsTitle}>
+              {ACCOUNT_REQUIREMENT_MODAL_UI.BENEFITS_TITLE}
+            </Text>
             <View style={styles.benefits}>
               {copy.BENEFITS.map((benefit) => (
                 <View key={benefit} style={styles.benefitRow}>
@@ -88,7 +103,9 @@ export const AccountRequirementModal = ({
               <Text style={styles.ctaText}>{copy.CTA}</Text>
             </Pressable>
             <Pressable style={styles.closeButton} onPress={onClose}>
-              <Text style={styles.closeButtonText}>{ACCOUNT_REQUIREMENT_MODAL_UI.CLOSE}</Text>
+              <Text style={styles.closeButtonText}>
+                {ACCOUNT_REQUIREMENT_MODAL_UI.CLOSE}
+              </Text>
             </Pressable>
           </View>
         </View>

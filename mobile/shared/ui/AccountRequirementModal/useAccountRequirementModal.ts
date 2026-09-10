@@ -10,9 +10,12 @@ type AccountRequirementState = {
 export const useAccountRequirementModal = () => {
   const [state, setState] = useState<AccountRequirementState | null>(null);
 
-  const require = useCallback((requirement: AccountRequirement, actionLabel?: string) => {
-    setState({ requirement, actionLabel });
-  }, []);
+  const require = useCallback(
+    (requirement: AccountRequirement, actionLabel?: string) => {
+      setState({ requirement, actionLabel });
+    },
+    [],
+  );
 
   const close = useCallback(() => {
     setState(null);

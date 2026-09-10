@@ -35,5 +35,7 @@ const withHexAlpha = (hex: string, alpha: number): string => {
   return `#${normalized}${channel}`;
 };
 
-export const resolveProductDetailTabUnderlineHoverColor = (colors: ThemeColors): string =>
+export const resolveProductDetailTabUnderlineHoverColor = (
+  colors: ThemeColors,
+): string =>
   withHexAlpha(colors.action, PRODUCT_DETAIL_TAB_BAR_LAYOUT.underlineHoverMix);

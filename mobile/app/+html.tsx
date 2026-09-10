@@ -1,7 +1,7 @@
-import { ScrollViewStyleReset } from 'expo-router/html';
-import type { ReactNode } from 'react';
+import { ScrollViewStyleReset } from "expo-router/html";
+import type { ReactNode } from "react";
 
-import { izColors, izColorsDark } from '@izibuy/design-tokens';
+import { izColors, izColorsDark } from "@izibuy/design-tokens";
 
 // This file is web-only and used to configure the root HTML for every
 // web page during static rendering.

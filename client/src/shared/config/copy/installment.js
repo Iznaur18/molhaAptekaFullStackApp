@@ -49,7 +49,8 @@ export const INSTALLMENT_UI = {
   MODERATION_PENDING: "Программа на модерации",
   PROGRAM_MODAL_REJECTED_HINT:
     "Программа была отклонена ранее. Исправьте планы и сохраните снова — рассрочка сразу станет доступна покупателям.",
-  PROGRAM_MODAL_APPROVED_HINT: "Рассрочка активна — покупатели могут оформить её на этот товар.",
+  PROGRAM_MODAL_APPROVED_HINT:
+    "Рассрочка активна — покупатели могут оформить её на этот товар.",
   MODERATION_REJECTED: "Программа отклонена",
   MODERATION_APPROVED: "Рассрочка активна",
   SELLER_TAB_HINT: "Настройте планы в «Изменить товар» → «Продать в рассрочку».",

@@ -1,4 +1,10 @@
-import { Text, View, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
+import {
+  Text,
+  View,
+  type StyleProp,
+  type TextStyle,
+  type ViewStyle,
+} from "react-native";
 
 import type { ProductCompactCardFeatureBadgeVariant } from "@/entities/product/lib/buildMyProductCompactCardFeatureBadges";
 import { useProductCompactCardStyles } from "@/shared/theme/productCompactCardStyles";
@@ -16,9 +22,15 @@ const resolveFeaturePillStyles = (
     case "auction":
       return { pill: styles.featurePillAuction, text: styles.featurePillTextAuction };
     case "installment":
-      return { pill: styles.featurePillInstallment, text: styles.featurePillTextInstallment };
+      return {
+        pill: styles.featurePillInstallment,
+        text: styles.featurePillTextInstallment,
+      };
     case "wholesale":
-      return { pill: styles.featurePillWholesale, text: styles.featurePillTextWholesale };
+      return {
+        pill: styles.featurePillWholesale,
+        text: styles.featurePillTextWholesale,
+      };
     case "raffle":
       return { pill: styles.featurePillRaffle, text: styles.featurePillTextRaffle };
     case "hidden":

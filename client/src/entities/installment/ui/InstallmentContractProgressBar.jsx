@@ -39,7 +39,8 @@ export function InstallmentContractProgressBar({ percent, ariaLabel }) {
     };
   }, [clampedPercent]);
 
-  const showShimmer = clampedPercent > 0 && clampedPercent < 100 && !prefersReducedMotion();
+  const showShimmer =
+    clampedPercent > 0 && clampedPercent < 100 && !prefersReducedMotion();
 
   return (
     <div

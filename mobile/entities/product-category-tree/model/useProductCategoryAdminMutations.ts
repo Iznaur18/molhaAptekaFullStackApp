@@ -9,7 +9,8 @@ import type { ProductCategoryAdminWritePayload } from "@/entities/product-catego
 
 export const useProductCategoryAdminMutations = () => {
   const createMutation = useMutation({
-    mutationFn: (payload: ProductCategoryAdminWritePayload) => createProductCategoryAdmin(payload),
+    mutationFn: (payload: ProductCategoryAdminWritePayload) =>
+      createProductCategoryAdmin(payload),
   });
 
   const patchMutation = useMutation({
@@ -23,7 +24,8 @@ export const useProductCategoryAdminMutations = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: ({ categoryId }: { categoryId: string }) => deleteProductCategoryAdmin(categoryId),
+    mutationFn: ({ categoryId }: { categoryId: string }) =>
+      deleteProductCategoryAdmin(categoryId),
   });
 
   return { createMutation, patchMutation, deleteMutation };

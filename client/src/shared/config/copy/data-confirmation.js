@@ -1,9 +1,7 @@
 // Автосгенерировано из appUiCopy.js: домен «data-confirmation».
 // Реэкспортируется через ../appUiCopy.js — импортируй оттуда, как раньше.
 
-import {
-  SELLER_PRODUCTS_LIMIT_PREMIUM,
-} from "@molha/api-contract";
+import { SELLER_PRODUCTS_LIMIT_PREMIUM } from "@molha/api-contract";
 
 /** Заявки на подтверждение данных (staff) */
 export const DATA_CONFIRMATION_PAGE_UI = {
@@ -46,8 +44,7 @@ export const USER_DATA_CONFIRMATION_PROFILE_PAGE_UI = {
     "Бейдж подтверждения у имени в каталоге",
     "Баллы лояльности за покупки",
   ],
-  PLAN_NOTE:
-    `Не заменяет премиум: ${SELLER_PRODUCTS_LIMIT_PREMIUM} товаров, золотая обводка и сторис — отдельно.`,
+  PLAN_NOTE: `Не заменяет премиум: ${SELLER_PRODUCTS_LIMIT_PREMIUM} товаров, золотая обводка и сторис — отдельно.`,
   STATUS_CONFIRMED: "Данные уже подтверждены.",
   STATUS_PENDING: "Заявка на рассмотрении. Дождитесь решения модератора.",
   /** @param {string} note */

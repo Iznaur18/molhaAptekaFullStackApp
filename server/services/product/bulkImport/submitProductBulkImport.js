@@ -42,9 +42,7 @@ export async function submitProductBulkImport({ userId, file }) {
     );
   }
 
-  const fileBuffer = file.buffer
-    ? file.buffer
-    : await readFile(String(file.path));
+  const fileBuffer = file.buffer ? file.buffer : await readFile(String(file.path));
 
   let parsedRows;
   try {

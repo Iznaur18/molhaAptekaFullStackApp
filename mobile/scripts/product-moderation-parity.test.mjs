@@ -10,7 +10,9 @@ const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
 test("product moderation page mirrors web queue grid and actions", () => {
-  const page = readMobileFile("features/product-moderation-page/ui/ProductModerationPage.tsx");
+  const page = readMobileFile(
+    "features/product-moderation-page/ui/ProductModerationPage.tsx",
+  );
   const styles = readMobileFile("shared/theme/productModerationPageStyles.ts");
 
   assert.match(page, /ProfileMobileSectionToggle/);
@@ -40,7 +42,9 @@ test("product moderation page mirrors web queue grid and actions", () => {
 });
 
 test("product moderation details footer mirrors web", () => {
-  const footer = readMobileFile("entities/product/ui/ProductModerationDetailsFooter.tsx");
+  const footer = readMobileFile(
+    "entities/product/ui/ProductModerationDetailsFooter.tsx",
+  );
 
   assert.match(footer, /REJECT_COMMENT_LABEL/);
   assert.match(footer, /APPROVE/);

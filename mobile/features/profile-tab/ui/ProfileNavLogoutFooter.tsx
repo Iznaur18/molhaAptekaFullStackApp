@@ -11,7 +11,9 @@ type ProfileNavLogoutFooterProps = {
   onLoggedOut?: () => void;
 };
 
-export const ProfileNavLogoutFooter = ({ onLoggedOut }: ProfileNavLogoutFooterProps) => {
+export const ProfileNavLogoutFooter = ({
+  onLoggedOut,
+}: ProfileNavLogoutFooterProps) => {
   const styles = useProfileMobileNavSheetStyles();
   const logoutMutation = useLogoutMutation();
   const [confirmOpen, setConfirmOpen] = useState(false);

@@ -28,17 +28,21 @@ export const InstallmentPassportShareConsentModal = ({
           accessibilityRole="alert"
           accessibilityLabel={INSTALLMENT_UI.PASSPORT_SHARE_CONSENT_TITLE}
         >
-          <Text style={styles.title}>{INSTALLMENT_UI.PASSPORT_SHARE_CONSENT_TITLE}</Text>
+          <Text style={styles.title}>
+            {INSTALLMENT_UI.PASSPORT_SHARE_CONSENT_TITLE}
+          </Text>
           <ScrollView
             style={styles.bodyScroll}
             contentContainerStyle={styles.bodyScrollContent}
             showsVerticalScrollIndicator
           >
-            {INSTALLMENT_UI.PASSPORT_SHARE_CONSENT_PARAGRAPHS.map((paragraph, index) => (
-              <Text key={index} style={styles.body}>
-                {paragraph}
-              </Text>
-            ))}
+            {INSTALLMENT_UI.PASSPORT_SHARE_CONSENT_PARAGRAPHS.map(
+              (paragraph, index) => (
+                <Text key={index} style={styles.body}>
+                  {paragraph}
+                </Text>
+              ),
+            )}
           </ScrollView>
           <View style={styles.actions}>
             <Pressable
@@ -51,7 +55,11 @@ export const InstallmentPassportShareConsentModal = ({
               </Text>
             </Pressable>
             <Pressable
-              style={[styles.button, styles.confirmButton, isConfirming ? styles.disabled : null]}
+              style={[
+                styles.button,
+                styles.confirmButton,
+                isConfirming ? styles.disabled : null,
+              ]}
               onPress={onConfirm}
               disabled={isConfirming}
             >

@@ -102,9 +102,7 @@ export function CourierApplicationPage() {
     );
   }
 
-  const hasAllDocuments = DOCUMENT_FIELDS.every(({ field }) =>
-    Boolean(form[field]),
-  );
+  const hasAllDocuments = DOCUMENT_FIELDS.every(({ field }) => Boolean(form[field]));
   const canSubmit =
     !isPending &&
     hasAllDocuments &&
@@ -148,41 +146,41 @@ export function CourierApplicationPage() {
         <div className="courier-page__vehicle">
           <h3 className="courier-page__section-title">{COURIER_UI.VEHICLE_SECTION}</h3>
           <div className="courier-page__vehicle-grid">
-        <label className="courier-page__field">
-          <span>{COURIER_UI.FIELD_MAKE}</span>
-          <input
-            type="text"
-            value={form.vehicleMake}
-            onChange={handleChange("vehicleMake")}
-            placeholder={COURIER_UI.PLACEHOLDER_MAKE}
-            disabled={isPending || submitMutation.isPending}
-            maxLength={60}
-          />
-        </label>
+            <label className="courier-page__field">
+              <span>{COURIER_UI.FIELD_MAKE}</span>
+              <input
+                type="text"
+                value={form.vehicleMake}
+                onChange={handleChange("vehicleMake")}
+                placeholder={COURIER_UI.PLACEHOLDER_MAKE}
+                disabled={isPending || submitMutation.isPending}
+                maxLength={60}
+              />
+            </label>
 
-        <label className="courier-page__field">
-          <span>{COURIER_UI.FIELD_COLOR}</span>
-          <input
-            type="text"
-            value={form.vehicleColor}
-            onChange={handleChange("vehicleColor")}
-            placeholder={COURIER_UI.PLACEHOLDER_COLOR}
-            disabled={isPending || submitMutation.isPending}
-            maxLength={30}
-          />
-        </label>
+            <label className="courier-page__field">
+              <span>{COURIER_UI.FIELD_COLOR}</span>
+              <input
+                type="text"
+                value={form.vehicleColor}
+                onChange={handleChange("vehicleColor")}
+                placeholder={COURIER_UI.PLACEHOLDER_COLOR}
+                disabled={isPending || submitMutation.isPending}
+                maxLength={30}
+              />
+            </label>
 
-        <label className="courier-page__field">
-          <span>{COURIER_UI.FIELD_PLATE}</span>
-          <input
-            type="text"
-            value={form.vehiclePlate}
-            onChange={handleChange("vehiclePlate")}
-            placeholder={COURIER_UI.PLACEHOLDER_PLATE}
-            disabled={isPending || submitMutation.isPending}
-            maxLength={15}
-          />
-        </label>
+            <label className="courier-page__field">
+              <span>{COURIER_UI.FIELD_PLATE}</span>
+              <input
+                type="text"
+                value={form.vehiclePlate}
+                onChange={handleChange("vehiclePlate")}
+                placeholder={COURIER_UI.PLACEHOLDER_PLATE}
+                disabled={isPending || submitMutation.isPending}
+                maxLength={15}
+              />
+            </label>
           </div>
         </div>
 
@@ -206,9 +204,7 @@ export function CourierApplicationPage() {
           </div>
 
           {!hasAllDocuments && !isPending ? (
-            <p className="courier-page__docs-required">
-              {COURIER_UI.PHOTO_REQUIRED}
-            </p>
+            <p className="courier-page__docs-required">{COURIER_UI.PHOTO_REQUIRED}</p>
           ) : null}
         </fieldset>
 

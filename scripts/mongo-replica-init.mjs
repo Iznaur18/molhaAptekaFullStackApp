@@ -43,7 +43,15 @@ const runDockerCompose = async (args) => {
  * @param {string} evalScript
  */
 const runMongoEval = async (evalScript) =>
-  runDockerCompose(["exec", "-T", MONGO_COMPOSE_SERVICE, "mongosh", "--quiet", "--eval", evalScript]);
+  runDockerCompose([
+    "exec",
+    "-T",
+    MONGO_COMPOSE_SERVICE,
+    "mongosh",
+    "--quiet",
+    "--eval",
+    evalScript,
+  ]);
 
 const waitForMongoPing = async () => {
   const pingScript = "db.adminCommand({ ping: 1 }).ok";

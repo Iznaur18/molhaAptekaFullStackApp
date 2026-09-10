@@ -15,7 +15,8 @@ const SERVER_URL = "http://127.0.0.1:4444";
 const SCROLL_PAUSE_MS = 500;
 const LOAD_MORE_ATTEMPTS = 25;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SAMPLE_IMAGE_PATH = E2E_SAMPLE_IMAGE_PATH ?? path.join(__dirname, "fixtures/sample-upload.png");
+const SAMPLE_IMAGE_PATH =
+  E2E_SAMPLE_IMAGE_PATH ?? path.join(__dirname, "fixtures/sample-upload.png");
 
 /**
  * @param {import('@playwright/test').APIRequestContext} request
@@ -34,7 +35,12 @@ async function fetchManageToggleDisplays(request) {
  * @param {string} toggleKey
  * @param {string} imageUrl
  */
-async function patchManageToggleDisplayViaApi(request, cookieHeader, toggleKey, imageUrl) {
+async function patchManageToggleDisplayViaApi(
+  request,
+  cookieHeader,
+  toggleKey,
+  imageUrl,
+) {
   const response = await request.patch(
     `${SERVER_URL}/product/manage-toggle-displays/${encodeURIComponent(toggleKey)}`,
     {
@@ -68,13 +74,16 @@ test.describe.serial("product manage toggle display", () => {
     await waitForServerReady(request);
   });
 
-  test("moderator: admin page uploads auction toggle artwork", async ({ page, request }) => {
+  test("moderator: admin page uploads auction toggle artwork", async ({
+    page,
+    request,
+  }) => {
     await loginViaApiCookies(page, request, E2E_MODERATOR);
     await page.goto("/site-header-banner-admin");
 
-    await expect(
-      page.getByRole("heading", { name: "Картинки" }),
-    ).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("heading", { name: "Картинки" })).toBeVisible({
+      timeout: 15_000,
+    });
     await page.getByRole("tab", { name: "Кнопки" }).click();
 
     const auctionCard = page.locator(".product-manage-toggle-admin-card").nth(0);
@@ -115,7 +124,10 @@ test.describe.serial("product manage toggle display", () => {
     ).toHaveAttribute("src", /\/uploads\/.+/);
   });
 
-  test("seller: product manage row shows auction artwork from API", async ({ page, request }) => {
+  test("seller: product manage row shows auction artwork from API", async ({
+    page,
+    request,
+  }) => {
     const moderatorCookie = await loginAndGetCookieHeader(request, E2E_MODERATOR);
     const imageUrl = "/uploads/e2e-auction-toggle-artwork.png";
 
@@ -141,7 +153,10 @@ test.describe.serial("product manage toggle display", () => {
 
     await expect(productCard.first()).toBeVisible({ timeout: 5_000 });
     await productCard.first().scrollIntoViewIfNeeded();
-    await productCard.first().getByRole("button", { name: "Управление", exact: true }).click();
+    await productCard
+      .first()
+      .getByRole("button", { name: "Управление", exact: true })
+      .click();
 
     const dialog = page.getByRole("dialog", { name: "Продвижение товара" });
     await expect(dialog).toBeVisible({ timeout: 15_000 });
@@ -152,9 +167,8 @@ test.describe.serial("product manage toggle display", () => {
       .filter({ hasText: "Аукцион" })
       .first();
     await expect(auctionRow).toBeVisible();
-    await expect(auctionRow.locator(".product-manage-toggle-row__artwork img")).toHaveAttribute(
-      "src",
-      /\/uploads\/.+/,
-    );
+    await expect(
+      auctionRow.locator(".product-manage-toggle-row__artwork img"),
+    ).toHaveAttribute("src", /\/uploads\/.+/);
   });
 });

@@ -54,10 +54,16 @@ export const validateCreateRaffleFormStep = (
   }
 
   if (stepId === "prize") {
-    if (form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_VIDEO && !form.prizeVideoUrl.trim()) {
+    if (
+      form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_VIDEO &&
+      !form.prizeVideoUrl.trim()
+    ) {
       return CREATE_RAFFLE_PAGE_UI.ERROR_PRIZE_VIDEO;
     }
-    if (form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_IMAGE && !form.prizeImageUrl.trim()) {
+    if (
+      form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_IMAGE &&
+      !form.prizeImageUrl.trim()
+    ) {
       return CREATE_RAFFLE_PAGE_UI.ERROR_PRIZE_IMAGE;
     }
     return null;

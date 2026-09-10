@@ -11,8 +11,7 @@ export const REFRESH_COOKIE_NAME = "refresh_token";
 export const REFRESH_TOKEN_TTL_DAYS = 365;
 
 /** Cookie maxAge для refresh — синхрон с JWT TTL. */
-export const REFRESH_COOKIE_MAX_AGE_MS =
-  REFRESH_TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000;
+export const REFRESH_COOKIE_MAX_AGE_MS = REFRESH_TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000;
 
 /**
  * Cookie maxAge для access-токена — это время жизни КУКИ-транспорта, а НЕ самого

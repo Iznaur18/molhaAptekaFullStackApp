@@ -1,7 +1,10 @@
-type PremiumUserRef = {
-  isPremiumUser?: boolean;
-  premiumExpiresAt?: string | Date | null;
-} | null | undefined;
+type PremiumUserRef =
+  | {
+      isPremiumUser?: boolean;
+      premiumExpiresAt?: string | Date | null;
+    }
+  | null
+  | undefined;
 
 export const isPremiumActive = (user: PremiumUserRef): boolean => {
   if (!user || user.isPremiumUser !== true) {

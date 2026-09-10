@@ -150,7 +150,8 @@
   flex-direction: column;
   gap: 0.45rem;
   padding: 0.6rem 0.7rem 0.65rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-border) 80%, var(--iz-color-action));
+  border: 1px solid
+    color-mix(in srgb, var(--iz-color-border) 80%, var(--iz-color-action));
   border-left: 3px solid var(--iz-color-action);
   border-radius: 0.55rem;
   background: var(--iz-color-surface);

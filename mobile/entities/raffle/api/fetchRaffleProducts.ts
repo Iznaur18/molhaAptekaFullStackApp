@@ -6,7 +6,10 @@ const DEFAULT_RAFFLE_PRODUCTS_LIMIT = 60;
 
 export const fetchRaffleProducts = async (
   raffleId: string,
-  { page = 1, limit = DEFAULT_RAFFLE_PRODUCTS_LIMIT }: { page?: number; limit?: number } = {},
+  {
+    page = 1,
+    limit = DEFAULT_RAFFLE_PRODUCTS_LIMIT,
+  }: { page?: number; limit?: number } = {},
 ) => {
   try {
     const { data } = await apiClient.get(`/product/raffles/${raffleId}/products`, {

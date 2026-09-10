@@ -11,7 +11,9 @@ const readMobileFile = (relativePath) =>
 
 test("app intro admin page mirrors web form sections and hub chrome", () => {
   const page = readMobileFile("features/app-intro-admin-page/ui/AppIntroAdminPage.tsx");
-  const hook = readMobileFile("features/app-intro-admin-page/model/useAppIntroAdminPage.ts");
+  const hook = readMobileFile(
+    "features/app-intro-admin-page/model/useAppIntroAdminPage.ts",
+  );
 
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /ProfileMobileNavSheet/);

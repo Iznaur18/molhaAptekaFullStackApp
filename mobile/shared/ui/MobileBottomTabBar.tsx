@@ -291,7 +291,9 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
     });
   };
 
-  const homeRouteIndex = state.routes.findIndex((route) => route.name === HOME_TAB_ROUTE);
+  const homeRouteIndex = state.routes.findIndex(
+    (route) => route.name === HOME_TAB_ROUTE,
+  );
   const isHomeTabActive =
     (homeRouteIndex >= 0 && state.index === homeRouteIndex) || isHomeTabBarContext;
   const isCategoryOnHomeTab = isCatalogCategoryView && isHomeTabActive;
@@ -328,7 +330,9 @@ export const MobileBottomTabBar = ({ state, navigation }: BottomTabBarProps) => 
         accessibilityRole="tab"
         accessibilityState={{ selected: isFocused }}
         accessibilityLabel={
-          item.routeName === PLACE_PRODUCT_ROUTE ? placeProductAria : item.accessibilityLabel
+          item.routeName === PLACE_PRODUCT_ROUTE
+            ? placeProductAria
+            : item.accessibilityLabel
         }
         onPress={() => handlePress(item.routeName)}
         onLongPress={() => handleLongPress(item.routeName)}

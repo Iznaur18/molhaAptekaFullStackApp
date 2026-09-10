@@ -147,10 +147,8 @@ test("excludeUsersPodiumFromList: removes podium leaders from general list", () 
     excludeUsersPodiumFromList(users, podiumEntries).map((user) => user._id),
     ["rest"],
   );
-  assert.deepEqual(excludeUsersPodiumFromList(users, []).map((user) => user._id), [
-    "gold",
-    "silver",
-    "bronze",
-    "rest",
-  ]);
+  assert.deepEqual(
+    excludeUsersPodiumFromList(users, []).map((user) => user._id),
+    ["gold", "silver", "bronze", "rest"],
+  );
 });

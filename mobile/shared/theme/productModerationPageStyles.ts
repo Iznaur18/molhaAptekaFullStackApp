@@ -3,8 +3,6 @@ import { StyleSheet } from "react-native";
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-
-
 export const useProductModerationPageStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,

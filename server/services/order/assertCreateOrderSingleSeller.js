@@ -9,9 +9,7 @@ export const CREATE_ORDER_MULTI_SELLER_MESSAGE =
  */
 export function assertCreateOrderSingleSeller(productById) {
   const sellerIds = [
-    ...new Set(
-      Object.values(productById).map((row) => String(row?.sellerId ?? "")),
-    ),
+    ...new Set(Object.values(productById).map((row) => String(row?.sellerId ?? ""))),
   ].filter(Boolean);
 
   if (sellerIds.length > 1) {

@@ -7,13 +7,8 @@ export const usePatchUserProfileMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      userId,
-      body,
-    }: {
-      userId: string;
-      body: Record<string, unknown>;
-    }) => patchUserProfile(userId, body),
+    mutationFn: ({ userId, body }: { userId: string; body: Record<string, unknown> }) =>
+      patchUserProfile(userId, body),
     onSuccess: (user) => {
       queryClient.setQueryData(authMeQueryKeys.all, (old) => {
         if (!old || typeof old !== "object") {

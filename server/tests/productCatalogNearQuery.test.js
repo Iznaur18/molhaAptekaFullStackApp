@@ -8,13 +8,10 @@ import {
 
 describe("productCatalogNearQuery match builders", () => {
   it("geo query requires pickup-eligible products", () => {
-    assert.deepEqual(
-      buildNearGeoQuery({ productModerationStatus: "approved" }),
-      {
-        productModerationStatus: "approved",
-        productPickupEnabled: { $ne: false },
-      },
-    );
+    assert.deepEqual(buildNearGeoQuery({ productModerationStatus: "approved" }), {
+      productModerationStatus: "approved",
+      productPickupEnabled: { $ne: false },
+    });
   });
 
   it("no-location bucket requires viewer region + no pickup point", () => {

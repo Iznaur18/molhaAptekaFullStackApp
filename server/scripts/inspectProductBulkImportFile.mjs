@@ -9,9 +9,8 @@ if (!fileArg) {
 }
 
 const serverRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const { parseProductBulkImportExcel } = await import(
-  "../services/product/bulkImport/parseProductBulkImportExcel.js"
-);
+const { parseProductBulkImportExcel } =
+  await import("../services/product/bulkImport/parseProductBulkImportExcel.js");
 
 const filePath = path.resolve(fileArg);
 const buffer = await readFile(filePath);

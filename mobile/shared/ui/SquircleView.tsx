@@ -43,9 +43,7 @@ const resolveCornerRadii = (
 ): SquircleCornerRadii => {
   // Web + corner-shape: базовый radius как в CSS. Native: +12% под визуальный squircle.
   const resolveRadius =
-    Platform.OS === "web"
-      ? (value: number) => value
-      : resolveSquircleRadius;
+    Platform.OS === "web" ? (value: number) => value : resolveSquircleRadius;
 
   if (cornerRadii) {
     return {

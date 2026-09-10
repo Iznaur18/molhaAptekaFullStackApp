@@ -160,9 +160,7 @@ export function CartFulfillmentSection({
         <div className="cart-fulfillment__dock-top">
           <div className="cart-page__dock-total">
             <div className="cart-page__dock-total-row cart-page__dock-total-row--meta">
-              <span className="cart-page__total-label">
-                {CART_PAGE_UI.TOTAL_LABEL}
-              </span>
+              <span className="cart-page__total-label">{CART_PAGE_UI.TOTAL_LABEL}</span>
               <span className="cart-page__items-count">
                 {CART_PAGE_UI.ITEMS_COUNT(selectedItemsCount)}
               </span>
@@ -229,9 +227,7 @@ export function CartFulfillmentSection({
                 tariff={sellerDelivery.tariff}
                 origin={sellerDelivery.origin ?? null}
                 deliveryGeo={deliveryGeo}
-                goodsTotalRub={
-                  sellerDelivery.goodsTotalRub ?? summary.selectedTotal
-                }
+                goodsTotalRub={sellerDelivery.goodsTotalRub ?? summary.selectedTotal}
               />
             ) : (
               <div className="cart-page__dock-total-row">
@@ -249,9 +245,7 @@ export function CartFulfillmentSection({
         {showCheckoutActions ? (
           <>
             {!canCheckout && summary.checkoutBlockReason ? (
-              <p className="cart-page__checkout-hint">
-                {summary.checkoutBlockReason}
-              </p>
+              <p className="cart-page__checkout-hint">{summary.checkoutBlockReason}</p>
             ) : null}
 
             {checkoutFormId ? (

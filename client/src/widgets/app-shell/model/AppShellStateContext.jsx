@@ -9,7 +9,9 @@ const AppShellStateContext = createContext(null);
  */
 export function AppShellStateProvider({ children, value }) {
   return (
-    <AppShellStateContext.Provider value={value}>{children}</AppShellStateContext.Provider>
+    <AppShellStateContext.Provider value={value}>
+      {children}
+    </AppShellStateContext.Provider>
   );
 }
 

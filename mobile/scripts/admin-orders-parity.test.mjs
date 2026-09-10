@@ -11,7 +11,9 @@ const readMobileFile = (relativePath) =>
 
 test("admin orders page mirrors web toolbar, filters and compact cards", () => {
   const page = readMobileFile("features/admin-orders-page/ui/AdminOrdersPage.tsx");
-  const toolbar = readMobileFile("features/admin-orders-page/ui/AdminOrdersPageToolbar.tsx");
+  const toolbar = readMobileFile(
+    "features/admin-orders-page/ui/AdminOrdersPageToolbar.tsx",
+  );
 
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /ProfileMobileNavSheet/);

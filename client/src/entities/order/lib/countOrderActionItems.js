@@ -38,7 +38,10 @@ export function countMySalesActionItemsFromOrders(orders) {
 
   for (const order of orders ?? []) {
     for (const item of order.items ?? []) {
-      if (item.status === ORDER_STATUS_PENDING || item.status === ORDER_STATUS_SHIPPED) {
+      if (
+        item.status === ORDER_STATUS_PENDING ||
+        item.status === ORDER_STATUS_SHIPPED
+      ) {
         count += 1;
       }
     }

@@ -14,9 +14,8 @@ vi.mock("../../shipping/model/shippingCarrierQueries.js", () => ({
   }),
 }));
 
-const { ProductPickupLocationFields } = await import(
-  "./ProductPickupLocationFields.jsx"
-);
+const { ProductPickupLocationFields } =
+  await import("./ProductPickupLocationFields.jsx");
 
 describe("выключенная админом служба", () => {
   it("не предлагается продавцу", () => {

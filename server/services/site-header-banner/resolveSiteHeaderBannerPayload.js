@@ -71,8 +71,7 @@ export const resolvePaidSiteHeaderBannerCampaignLinkPath = (row) => {
   if (raw) {
     return raw;
   }
-  const advertiserId =
-    row.advertiserId == null ? "" : String(row.advertiserId).trim();
+  const advertiserId = row.advertiserId == null ? "" : String(row.advertiserId).trim();
   return advertiserId ? `/seller/${advertiserId}` : null;
 };
 

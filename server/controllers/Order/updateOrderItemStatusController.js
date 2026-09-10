@@ -127,8 +127,7 @@ export const markOrderItemReturnedController = async (req, res) => {
   });
 };
 
-export const markOrderItemReturnedBySellerController =
-  markOrderItemReturnedController;
+export const markOrderItemReturnedBySellerController = markOrderItemReturnedController;
 
 /** `PATCH /order/:orderId/items/:itemIndex/confirm` — покупатель подтверждает доставленную позицию. */
 export const confirmOrderItemByBuyerController = async (req, res) => {

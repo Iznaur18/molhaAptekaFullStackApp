@@ -12,7 +12,11 @@ import { isProductRaffleParticipant } from "@/entities/raffle/lib/isProductRaffl
 import { resolveProductLoyaltyPointsPerUnit } from "@/entities/product/lib/resolveProductLoyaltyPointsPerUnit";
 import { ProductManageToggleRow } from "@/entities/product/ui/ProductManageToggleRow";
 import { PRODUCT_MODERATION_APPROVED } from "@/entities/product/model/productModerationConstants";
-import { CREATE_PRODUCT_UI, PRODUCT_CARD_UI, PRODUCT_FLASH_SALE_UI } from "@/shared/config";
+import {
+  CREATE_PRODUCT_UI,
+  PRODUCT_CARD_UI,
+  PRODUCT_FLASH_SALE_UI,
+} from "@/shared/config";
 import { hasProductManualCatalogDiscount } from "@/entities/product/lib/hasProductManualCatalogDiscount";
 import { useProductEditManageSectionStyles } from "@/shared/theme/modalChromeStyles";
 import { semanticColors } from "@/shared/theme/semanticColors";
@@ -21,13 +25,34 @@ type CatalogProduct = Record<string, unknown> & { _id: string };
 
 type ProductEditManageSectionProps = {
   product: CatalogProduct;
-  onSetAvailability?: (productId: string, productIsAvailable: boolean) => void | Promise<void>;
-  onSetAuction?: (productId: string, productAuctionEnabled: boolean) => void | Promise<void>;
-  onSetOriginality?: (productId: string, productIsOriginal: boolean) => void | Promise<void>;
-  onSetOutOfStock?: (productId: string, productOutOfStock: boolean) => void | Promise<void>;
-  onSetWholesale?: (productId: string, productWholesaleEnabled: boolean) => void | Promise<void>;
-  onSetBuyNFree?: (productId: string, productBuyNFreeEnabled: boolean) => void | Promise<void>;
-  onSetRental?: (productId: string, productRentalEnabled: boolean) => void | Promise<void>;
+  onSetAvailability?: (
+    productId: string,
+    productIsAvailable: boolean,
+  ) => void | Promise<void>;
+  onSetAuction?: (
+    productId: string,
+    productAuctionEnabled: boolean,
+  ) => void | Promise<void>;
+  onSetOriginality?: (
+    productId: string,
+    productIsOriginal: boolean,
+  ) => void | Promise<void>;
+  onSetOutOfStock?: (
+    productId: string,
+    productOutOfStock: boolean,
+  ) => void | Promise<void>;
+  onSetWholesale?: (
+    productId: string,
+    productWholesaleEnabled: boolean,
+  ) => void | Promise<void>;
+  onSetBuyNFree?: (
+    productId: string,
+    productBuyNFreeEnabled: boolean,
+  ) => void | Promise<void>;
+  onSetRental?: (
+    productId: string,
+    productRentalEnabled: boolean,
+  ) => void | Promise<void>;
   onSetAffiliate?: (
     productId: string,
     affiliateEnabled: boolean,
@@ -167,28 +192,33 @@ export const ProductEditManageSection = ({
   );
   const affiliateConfigured = isProductAffiliateConfigured(product);
   const showWholesale =
-    typeof onOpenWholesaleSettings === "function" || typeof onSetWholesale === "function";
+    typeof onOpenWholesaleSettings === "function" ||
+    typeof onSetWholesale === "function";
   const showBuyNFree =
     typeof onOpenBuyNFreeSettings === "function" || typeof onSetBuyNFree === "function";
   const showRental =
     typeof onOpenRentalSettings === "function" || typeof onSetRental === "function";
   const showFlashSale =
-    typeof onOpenFlashSaleSettings === "function" || typeof onSetFlashSale === "function";
+    typeof onOpenFlashSaleSettings === "function" ||
+    typeof onSetFlashSale === "function";
   const isFlashSaleEnabled = product.productFlashSaleEnabled === true;
   /** Сервер запрещает совмещать горящую скидку с аукционом и ручной скидкой. */
   const flashSaleBlockedByAuction = product.productAuctionEnabled === true;
   const flashSaleBlockedByManualDiscount = hasProductManualCatalogDiscount(product);
   const showAffiliate =
-    typeof onOpenAffiliateSettings === "function" || typeof onSetAffiliate === "function";
+    typeof onOpenAffiliateSettings === "function" ||
+    typeof onSetAffiliate === "function";
   const showLoyalty =
-    typeof onOpenLoyaltySettings === "function" || typeof onSetLoyaltyPoints === "function";
+    typeof onOpenLoyaltySettings === "function" ||
+    typeof onSetLoyaltyPoints === "function";
   const showPromoCodes = typeof onOpenPromoCodesSettings === "function" && canEdit;
   const showQaToggle = typeof onSetQa === "function" && canEdit;
   const isQaEnabled = product.productQaEnabled === true;
   const showRaffleToggle =
     sellerRaffleActive && typeof onToggleRaffleParticipation === "function";
   const showInstallmentButton =
-    typeof onOpenInstallmentProgram === "function" || typeof onSetInstallment === "function";
+    typeof onOpenInstallmentProgram === "function" ||
+    typeof onSetInstallment === "function";
   const showDelete = canDelete && typeof onDelete === "function";
   const isRaffleParticipant = isProductRaffleParticipant(product);
   const canOpenInstallment =
@@ -236,8 +266,14 @@ export const ProductEditManageSection = ({
       ) : null}
       {showOpenSalesHint ? (
         <View style={styles.warningBanner} accessibilityRole="alert">
-          <MaterialIcons name="info-outline" size={20} color={semanticColors.warningText} />
-          <Text style={styles.warningBannerText}>{PRODUCT_CARD_UI.OPEN_SALES_LOCKED_HINT}</Text>
+          <MaterialIcons
+            name="info-outline"
+            size={20}
+            color={semanticColors.warningText}
+          />
+          <Text style={styles.warningBannerText}>
+            {PRODUCT_CARD_UI.OPEN_SALES_LOCKED_HINT}
+          </Text>
         </View>
       ) : null}
       <View style={styles.toggles}>
@@ -443,7 +479,9 @@ export const ProductEditManageSection = ({
             }
             checked={isFlashSaleEnabled}
             disabled={
-              actionsLocked || flashSaleBlockedByAuction || flashSaleBlockedByManualDiscount
+              actionsLocked ||
+              flashSaleBlockedByAuction ||
+              flashSaleBlockedByManualDiscount
             }
             pending={isFlashSaleTogglePending}
             pendingLabel={PRODUCT_FLASH_SALE_UI.TOGGLE_PENDING}
@@ -452,7 +490,10 @@ export const ProductEditManageSection = ({
               if (product._id == null || actionsLocked) {
                 return { revert: true };
               }
-              if (next && (flashSaleBlockedByAuction || flashSaleBlockedByManualDiscount)) {
+              if (
+                next &&
+                (flashSaleBlockedByAuction || flashSaleBlockedByManualDiscount)
+              ) {
                 return { revert: true };
               }
               // Включение всегда через модалку: нужны цена и длительность.
@@ -580,7 +621,9 @@ export const ProductEditManageSection = ({
       {showDelete ? (
         <View style={styles.deleteBlock}>
           {isDeletePending ? (
-            <Text style={styles.deletePending}>{PRODUCT_CARD_UI.DELETE_PRODUCT_PENDING}</Text>
+            <Text style={styles.deletePending}>
+              {PRODUCT_CARD_UI.DELETE_PRODUCT_PENDING}
+            </Text>
           ) : isDeleteConfirmOpen ? (
             <View style={styles.deleteConfirm}>
               <Text style={styles.deleteConfirmQuestion}>
@@ -618,14 +661,21 @@ export const ProductEditManageSection = ({
             <Pressable
               style={({ pressed }) => [
                 styles.deleteBtn,
-                pressed && !hasOpenSalesLocked && !disabled && styles.deleteConfirmPressed,
+                pressed &&
+                  !hasOpenSalesLocked &&
+                  !disabled &&
+                  styles.deleteConfirmPressed,
                 (disabled || hasOpenSalesLocked) && styles.deleteBtnDisabled,
               ]}
               disabled={disabled || hasOpenSalesLocked}
               onPress={() => setIsDeleteConfirmOpen(true)}
             >
-              <Text style={styles.deleteBtnTitle}>{CREATE_PRODUCT_UI.MANAGE_DELETE_TITLE}</Text>
-              <Text style={styles.deleteBtnHint}>{CREATE_PRODUCT_UI.MANAGE_DELETE_HINT}</Text>
+              <Text style={styles.deleteBtnTitle}>
+                {CREATE_PRODUCT_UI.MANAGE_DELETE_TITLE}
+              </Text>
+              <Text style={styles.deleteBtnHint}>
+                {CREATE_PRODUCT_UI.MANAGE_DELETE_HINT}
+              </Text>
             </Pressable>
           )}
         </View>

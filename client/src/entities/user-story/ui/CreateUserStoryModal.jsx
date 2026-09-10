@@ -168,7 +168,10 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
     try {
       const mediaUrl =
         mediaType === USER_STORY_MEDIA_TYPE_VIDEO
-          ? await uploadVideoMutation.mutateAsync({ file: selectedFile, purpose: "story" })
+          ? await uploadVideoMutation.mutateAsync({
+              file: selectedFile,
+              purpose: "story",
+            })
           : await uploadImageMutation.mutateAsync(selectedFile);
 
       await createMutation.mutateAsync({
@@ -263,7 +266,11 @@ export function CreateUserStoryModal({ isOpen, onClose, onPublished }) {
                     aria-hidden="true"
                     draggable={false}
                   />
-                  <img className="create-user-story-modal__media" src={previewUrl} alt="" />
+                  <img
+                    className="create-user-story-modal__media"
+                    src={previewUrl}
+                    alt=""
+                  />
                 </>
               )
             ) : (

@@ -42,5 +42,8 @@ test("profile nav tones: custom uses photo orange palette", () => {
 });
 
 test("profile nav tones: moderation uses amber", () => {
-  assert.equal(resolveProfileNavSectionTone(PROFILE_SECTION_PRODUCT_MODERATION), "amber");
+  assert.equal(
+    resolveProfileNavSectionTone(PROFILE_SECTION_PRODUCT_MODERATION),
+    "amber",
+  );
 });

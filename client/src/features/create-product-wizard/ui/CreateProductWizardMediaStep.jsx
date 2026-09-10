@@ -19,9 +19,10 @@ import "./CreateProductWizardMediaStep.css";
  * }} props
  */
 export function CreateProductWizardMediaStep({ form, setForm, isSubmitting }) {
-  const rows = /** @type {import('../../../entities/product/lib/productImageRowHelpers.js').ProductImageRow[]} */ (
-    form.productImageRows
-  );
+  const rows =
+    /** @type {import('../../../entities/product/lib/productImageRowHelpers.js').ProductImageRow[]} */ (
+      form.productImageRows
+    );
 
   const urls = useMemo(() => urlsFromImageRows(rows), [rows]);
 

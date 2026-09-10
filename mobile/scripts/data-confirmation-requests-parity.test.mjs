@@ -29,7 +29,9 @@ test("data confirmation requests page mirrors web hub chrome and queue", () => {
 });
 
 test("data confirmation request card mirrors web passport and actions", () => {
-  const card = readMobileFile("entities/user-data-confirmation/ui/DataConfirmationRequestCard.tsx");
+  const card = readMobileFile(
+    "entities/user-data-confirmation/ui/DataConfirmationRequestCard.tsx",
+  );
 
   assert.match(card, /UserPremiumDisplayName/);
   assert.match(card, /formatPassportFullName/);

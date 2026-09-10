@@ -81,10 +81,7 @@ test("настройки продавца: PUT → GET возвращает со
   const saved = await parseSuccessData(await putDefaults(cookie));
   assert.equal(saved.defaults.fulfillmentConfigured, true);
   assert.equal(saved.defaults.pickupLocations.length, 1);
-  assert.deepEqual(saved.defaults.paymentMethods, [
-    "cashOnDelivery",
-    "cardOnDelivery",
-  ]);
+  assert.deepEqual(saved.defaults.paymentMethods, ["cashOnDelivery", "cardOnDelivery"]);
 
   const read = await parseSuccessData(
     await request("/sellers/commerce-defaults/me", { headers: { Cookie: cookie } }),

@@ -1,6 +1,10 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Pressable, Text, View } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
 import { MY_PROFILE_PAGE_UI } from "@/shared/config";
 import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
@@ -27,7 +31,9 @@ export const ProfileMobileSectionToggle = ({
   const { theme } = useAppThemeSettings();
   const { isDrawerLayout } = useProfileAdaptiveLayout();
   const scale = useSharedValue(1);
-  const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
   const isTablet = appearance === "tablet";
 
   // web: toggle только ≤900; >900 постоянный sidebar.
@@ -69,7 +75,11 @@ export const ProfileMobileSectionToggle = ({
             </Text>
           </View>
           {isTablet ? null : (
-            <MaterialIcons name="expand-more" size={24} color={theme.colors.onContrast} />
+            <MaterialIcons
+              name="expand-more"
+              size={24}
+              color={theme.colors.onContrast}
+            />
           )}
         </SquircleView>
       </Pressable>

@@ -29,9 +29,9 @@ test("meta fields stay visible without detailsHideWhenEmpty", () => {
 
 test("filterProductDetailsVisibleFieldKeys drops empty description block", () => {
   expect(
-    filterProductDetailsVisibleFieldKeys(
-      ["productDescription", "createdAt"],
-      { ...product, productDescription: "" },
-    ),
+    filterProductDetailsVisibleFieldKeys(["productDescription", "createdAt"], {
+      ...product,
+      productDescription: "",
+    }),
   ).toEqual(["createdAt"]);
 });

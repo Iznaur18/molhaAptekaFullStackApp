@@ -33,7 +33,9 @@ export const getProductCardMineStatusBadge = ({
   }
 
   if (isCatalogPromotionActive(product)) {
-    const tierLabel = getProductPromotionTierLabel(Number(product.catalogPromotionTier) || 0);
+    const tierLabel = getProductPromotionTierLabel(
+      Number(product.catalogPromotionTier) || 0,
+    );
     const until = formatPromotionExpiresAt(
       product.catalogPromotionExpiresAt as string | null | undefined,
     );

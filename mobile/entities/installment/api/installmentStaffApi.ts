@@ -37,7 +37,10 @@ export const resolveInstallmentDispute = async (
   body: { action: string; resolutionNote?: string; partialRefundRub?: number },
 ) => {
   try {
-    const { data } = await apiClient.patch(`/installment/disputes/${disputeId}/resolve`, body);
+    const { data } = await apiClient.patch(
+      `/installment/disputes/${disputeId}/resolve`,
+      body,
+    );
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

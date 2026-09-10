@@ -136,7 +136,9 @@ export function ProductDetailsFlashSaleCountdown({ product, onExpired }) {
         <span
           className={[
             "product-flash-sale-countdown__icon",
-            borderProgress == null ? "product-flash-sale-countdown__icon--static-border" : "",
+            borderProgress == null
+              ? "product-flash-sale-countdown__icon--static-border"
+              : "",
           ]
             .filter(Boolean)
             .join(" ")}
@@ -154,7 +156,9 @@ export function ProductDetailsFlashSaleCountdown({ product, onExpired }) {
               {PRODUCT_FLASH_SALE_UI.DETAILS_TITLE}
             </span>
             {discountPercent != null && discountPercent >= 1 ? (
-              <span className="product-flash-sale-countdown__discount">−{discountPercent}%</span>
+              <span className="product-flash-sale-countdown__discount">
+                −{discountPercent}%
+              </span>
             ) : null}
           </div>
           <span className="product-flash-sale-countdown__caption" aria-hidden="true">

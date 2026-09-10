@@ -135,8 +135,7 @@ export function setOneCExchangeCookie(res, sessionId) {
  * @param {import('mongoose').HydratedDocument<any> | { sessionId: string; uploadDir?: string }} session
  */
 export async function destroyOneCExchangeSession(session) {
-  const uploadDir =
-    session.uploadDir || buildOneCExchangeSessionDir(session.sessionId);
+  const uploadDir = session.uploadDir || buildOneCExchangeSessionDir(session.sessionId);
   try {
     await rm(uploadDir, { recursive: true, force: true });
   } catch (error) {
@@ -163,9 +162,9 @@ export async function purgeExpiredOneCExchangeDirs() {
   }
 
   const alive = new Set(
-    (
-      await OneCExchangeSessionModel.find({}).select("sessionId").lean()
-    ).map((row) => row.sessionId),
+    (await OneCExchangeSessionModel.find({}).select("sessionId").lean()).map(
+      (row) => row.sessionId,
+    ),
   );
   const staleBefore = Date.now() - ONEC_EXCHANGE_SESSION_TTL_SECONDS * 1000;
   let removed = 0;

@@ -21,7 +21,9 @@ type GalleryDotProps = {
 
 const GalleryDot = ({ active }: GalleryDotProps) => {
   const styles = useProductCardGalleryDotsStyles();
-  const width = useSharedValue(active ? PRODUCT_CARD_GALLERY_DOT_ACTIVE_WIDTH : PRODUCT_CARD_GALLERY_DOT_WIDTH);
+  const width = useSharedValue(
+    active ? PRODUCT_CARD_GALLERY_DOT_ACTIVE_WIDTH : PRODUCT_CARD_GALLERY_DOT_WIDTH,
+  );
 
   useEffect(() => {
     width.value = withSpring(
@@ -57,7 +59,10 @@ export const ProductCardGalleryDots = ({
     <View
       style={styles.root}
       accessibilityRole="text"
-      accessibilityLabel={PRODUCT_CARD_UI.GALLERY_COUNTER_ARIA(slideIndex + 1, slideCount)}
+      accessibilityLabel={PRODUCT_CARD_UI.GALLERY_COUNTER_ARIA(
+        slideIndex + 1,
+        slideCount,
+      )}
     >
       {Array.from({ length: slideCount }, (_, index) => (
         <GalleryDot key={index} active={index === slideIndex} />

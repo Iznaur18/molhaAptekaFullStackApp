@@ -121,7 +121,9 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
   }, []);
 
   const patchOrders = useCallback(
-    (/** @type {(orders: import('../../../entities/order/model/types.js').Order[]) => import('../../../entities/order/model/types.js').Order[]} */ updater) => {
+    (
+      /** @type {(orders: import('../../../entities/order/model/types.js').Order[]) => import('../../../entities/order/model/types.js').Order[]} */ updater,
+    ) => {
       queryClient.setQueryData(orderQueryKeys.my(), (old) => {
         if (!Array.isArray(old)) {
           return old;
@@ -151,10 +153,11 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
     );
 
     try {
-      const { order: updatedOrder, pointsEarned } = await confirmItemMutation.mutateAsync({
-        orderId,
-        itemIndex,
-      });
+      const { order: updatedOrder, pointsEarned } =
+        await confirmItemMutation.mutateAsync({
+          orderId,
+          itemIndex,
+        });
       if (pointsEarned > 0) {
         setLoyaltyFlash(MY_ORDERS_PAGE_UI.LOYALTY_POINTS_EARNED(pointsEarned));
       }
@@ -275,7 +278,9 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
 
   const attentionFilterHint =
     totalVisible > 0 && attentionOnly ? (
-      <p className="my-orders-page__filter-hint">{MY_ORDERS_PAGE_UI.ATTENTION_FILTER_HINT}</p>
+      <p className="my-orders-page__filter-hint">
+        {MY_ORDERS_PAGE_UI.ATTENTION_FILTER_HINT}
+      </p>
     ) : null;
 
   const toolbar = (

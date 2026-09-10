@@ -1,6 +1,9 @@
 import { ProductImageUrlSortableList } from "../ProductImageUrlSortableList.jsx";
 import { ProductPreviewVideoField } from "../ProductPreviewVideoField.jsx";
-import { CREATE_PRODUCT_MODAL_UI, PRODUCT_PREVIEW_VIDEO_UI } from "../../../../shared/config/appUiCopy.js";
+import {
+  CREATE_PRODUCT_MODAL_UI,
+  PRODUCT_PREVIEW_VIDEO_UI,
+} from "../../../../shared/config/appUiCopy.js";
 import { FormFieldLabel } from "../../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
 
 /**
@@ -11,10 +14,17 @@ import { FormFieldLabel } from "../../../../shared/ui/FormFieldLabel/FormFieldLa
  *   className?: string;
  * }} props
  */
-export function CreateProductMediaSection({ form, setForm, isSubmitting, className = "" }) {
+export function CreateProductMediaSection({
+  form,
+  setForm,
+  isSubmitting,
+  className = "",
+}) {
   return (
     <div className={["create-product-section", className].filter(Boolean).join(" ")}>
-      <p className="create-product-section__lead">{CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_LEAD}</p>
+      <p className="create-product-section__lead">
+        {CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_LEAD}
+      </p>
       <ProductImageUrlSortableList
         rows={form.productImageRows}
         onRowsChange={(productImageRows) =>

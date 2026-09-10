@@ -41,7 +41,9 @@ export const OrderStatusSelect = ({
               disabled={isPending}
               onPress={() => onChange(status)}
             >
-              <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
+              <Text
+                style={[styles.optionText, isSelected && styles.optionTextSelected]}
+              >
                 {ORDER_STATUS_LABEL_RU[status]}
               </Text>
             </Pressable>

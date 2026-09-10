@@ -14,7 +14,9 @@ const COPY_FEEDBACK_MS = 2000;
  */
 export function ProductDetailIdCopyButton({ productId }) {
   const [isCopied, setIsCopied] = useState(false);
-  const feedbackTimerRef = useRef(/** @type {ReturnType<typeof setTimeout> | null} */ (null));
+  const feedbackTimerRef = useRef(
+    /** @type {ReturnType<typeof setTimeout> | null} */ (null),
+  );
 
   useEffect(() => {
     return () => {

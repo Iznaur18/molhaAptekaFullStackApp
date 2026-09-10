@@ -13,7 +13,9 @@ test("seller personal category moderation page mirrors web queue and hub chrome"
   const page = readMobileFile(
     "features/seller-personal-category-moderation-page/ui/SellerPersonalCategoryModerationPage.tsx",
   );
-  const styles = readMobileFile("shared/theme/sellerPersonalCategoryModerationPageStyles.ts");
+  const styles = readMobileFile(
+    "shared/theme/sellerPersonalCategoryModerationPageStyles.ts",
+  );
 
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /ProfileMobileNavSheet/);

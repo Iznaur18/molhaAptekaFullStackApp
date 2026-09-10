@@ -120,12 +120,15 @@ export function useProductDetailsModalTabs({
     const showCompare = product._id != null;
     const showAuction =
       product._id != null &&
-      (isSellerView ? auctionUi.showSellerAuctionTab : product.productAuctionEnabled === true);
+      (isSellerView
+        ? auctionUi.showSellerAuctionTab
+        : product.productAuctionEnabled === true);
     const showInstallment =
       product._id != null &&
       (isSellerView
         ? installmentUi.showInstallmentTab
-        : product.productInstallmentEnabled === true || installmentUi.installmentActive);
+        : product.productInstallmentEnabled === true ||
+          installmentUi.installmentActive);
 
     if (detailsTab === "reviews" && !showReviews) setDetailsTab("details");
     if (detailsTab === "qa" && !showQa) setDetailsTab("details");

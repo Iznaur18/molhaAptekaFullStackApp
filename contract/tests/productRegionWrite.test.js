@@ -1,10 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import {
-  catalogProductsQuerySchema,
-  patchMyProductBodySchema,
-} from "../src/index.js";
+import { catalogProductsQuerySchema, patchMyProductBodySchema } from "../src/index.js";
 
 describe("productRegionCode + legacy category write", () => {
   it("принимает underscore slug и регион в PATCH body", () => {

@@ -31,8 +31,13 @@ export const useRaffleStaffMutations = () => {
   });
 
   const patchStaffMutation = useMutation({
-    mutationFn: ({ raffleId, body }: { raffleId: string; body: Partial<CreateRaffleBody> }) =>
-      patchRaffleByStaff(raffleId, body),
+    mutationFn: ({
+      raffleId,
+      body,
+    }: {
+      raffleId: string;
+      body: Partial<CreateRaffleBody>;
+    }) => patchRaffleByStaff(raffleId, body),
   });
 
   return { approveMutation, rejectMutation, deleteStaffMutation, patchStaffMutation };

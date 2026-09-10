@@ -9,9 +9,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  */
 export async function fetchUserPhone(userId) {
   try {
-    const { data } = await apiClient.get(
-      `/user/${encodeURIComponent(userId)}/phone`,
-    );
+    const { data } = await apiClient.get(`/user/${encodeURIComponent(userId)}/phone`);
 
     const phone = data?.data?.userPhoneNumber;
     if (!data?.success || typeof phone !== "string" || !phone.trim()) {

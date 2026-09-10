@@ -7,10 +7,7 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  */
 export async function askProductQuestion(productId, payload) {
   try {
-    const { data } = await apiClient.post(
-      `/product/${productId}/questions`,
-      payload,
-    );
+    const { data } = await apiClient.post(`/product/${productId}/questions`, payload);
 
     if (!data?.success || data.data?.question == null) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);

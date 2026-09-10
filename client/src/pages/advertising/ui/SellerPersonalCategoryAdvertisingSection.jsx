@@ -323,9 +323,7 @@ export function SellerPersonalCategoryAdvertisingSection({
                         streakDiscountPercent,
                       )}{" "}
                       баллов
-                      {streakDiscountPercent > 0
-                        ? ` (было ${item.pricePoints})`
-                        : ""}
+                      {streakDiscountPercent > 0 ? ` (было ${item.pricePoints})` : ""}
                     </span>
                   </label>
                 ))}

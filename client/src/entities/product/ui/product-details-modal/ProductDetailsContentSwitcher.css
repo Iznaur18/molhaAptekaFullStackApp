@@ -36,15 +36,21 @@
   color: var(--iz-color-on-contrast);
 }
 
-:root[data-theme="dark"] .product-details-content-switcher__header .modal-section-tabs__tab {
+:root[data-theme="dark"]
+  .product-details-content-switcher__header
+  .modal-section-tabs__tab {
   color: var(--iz-color-text-secondary);
 }
 
-:root[data-theme="dark"] .product-details-content-switcher__header .modal-section-tabs__tab:hover {
+:root[data-theme="dark"]
+  .product-details-content-switcher__header
+  .modal-section-tabs__tab:hover {
   color: var(--iz-color-text);
 }
 
-:root[data-theme="dark"] .product-details-content-switcher__header .modal-section-tabs__tab_active,
+:root[data-theme="dark"]
+  .product-details-content-switcher__header
+  .modal-section-tabs__tab_active,
 :root[data-theme="dark"]
   .product-details-content-switcher__header
   .modal-section-tabs__tab_active:hover {

@@ -53,7 +53,12 @@ export const mapProductToProfileThumbItem = (product) => ({
  * @param {number} limit
  * @param {{ shelfId?: string | null; viewerUserId?: string | null }} [opts]
  */
-export const getSellerCatalogProductsPage = async (sellerId, page, limit, opts = {}) => {
+export const getSellerCatalogProductsPage = async (
+  sellerId,
+  page,
+  limit,
+  opts = {},
+) => {
   const productsQuery = buildSellerCatalogProductsQuery(sellerId, opts);
   const skip = (page - 1) * limit;
 
@@ -68,8 +73,7 @@ export const getSellerCatalogProductsPage = async (sellerId, page, limit, opts =
   );
 
   const sellerIdStr = String(sellerId);
-  const viewerUserId =
-    opts.viewerUserId != null ? String(opts.viewerUserId) : "";
+  const viewerUserId = opts.viewerUserId != null ? String(opts.viewerUserId) : "";
   const isBlockedBySeller =
     viewerUserId.length > 0 &&
     viewerUserId !== sellerIdStr &&

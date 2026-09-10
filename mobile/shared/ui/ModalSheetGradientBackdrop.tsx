@@ -32,7 +32,13 @@ export const ModalSheetGradientBackdrop = () => {
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       <Svg width="100%" height="100%" preserveAspectRatio="none">
         <Defs>
-          <LinearGradient id={MODAL_SHEET_BACKDROP_GRADIENT_ID} x1="0" y1="0" x2="0" y2="1">
+          <LinearGradient
+            id={MODAL_SHEET_BACKDROP_GRADIENT_ID}
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
             {MODAL_SHEET_BACKDROP_STOPS.map(({ offset, opacity }) => (
               <Stop
                 key={offset}
@@ -43,7 +49,11 @@ export const ModalSheetGradientBackdrop = () => {
             ))}
           </LinearGradient>
         </Defs>
-        <Rect width="100%" height="100%" fill={`url(#${MODAL_SHEET_BACKDROP_GRADIENT_ID})`} />
+        <Rect
+          width="100%"
+          height="100%"
+          fill={`url(#${MODAL_SHEET_BACKDROP_GRADIENT_ID})`}
+        />
       </Svg>
     </View>
   );

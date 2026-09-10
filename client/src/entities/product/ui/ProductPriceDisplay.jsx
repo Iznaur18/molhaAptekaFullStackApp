@@ -108,9 +108,7 @@ export function ProductDiscountBadge({
 
   const percent = Math.floor(discountPercent);
   const badgeText =
-    variant === "banner"
-      ? `-${percent}%`
-      : PRODUCT_CARD_UI.DISCOUNT_BADGE(percent);
+    variant === "banner" ? `-${percent}%` : PRODUCT_CARD_UI.DISCOUNT_BADGE(percent);
   const ariaLabel = PRODUCT_CARD_UI.DISCOUNT_BADGE(percent);
 
   const rootClassName = [

@@ -63,9 +63,7 @@ export function MyProductsCatalogToolbar({
         <ListPageFilter label={HOME_PAGE_UI.MODERATION_STATUS_FILTER_LABEL}>
           <ListPageFilterSelect
             value={myProductsModerationFilter}
-            onChange={(event) =>
-              onMyProductsModerationFilterChange(event.target.value)
-            }
+            onChange={(event) => onMyProductsModerationFilterChange(event.target.value)}
           >
             {MY_PRODUCTS_MODERATION_FILTER_OPTIONS.map((filterKey) => (
               <option key={filterKey || "all"} value={filterKey}>

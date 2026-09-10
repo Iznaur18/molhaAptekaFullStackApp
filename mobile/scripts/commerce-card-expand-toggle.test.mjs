@@ -24,9 +24,15 @@ test("commerce cards use CommerceCardExpandToggle instead of chevron glyph", () 
   const toggle = readMobileFile("shared/ui/CommerceCardExpandToggle.tsx");
   const toggleStyles = readMobileFile("shared/theme/commerceCardExpandToggleStyles.ts");
   const orderCard = readMobileFile("entities/order/ui/OrderCard.tsx");
-  const buyerBid = readMobileFile("entities/product-price-offer/ui/AuctionBuyerBidRow.tsx");
-  const sellerOffer = readMobileFile("entities/product-price-offer/ui/AuctionSellerOfferRow.tsx");
-  const installmentCard = readMobileFile("entities/installment/ui/InstallmentContractCard.tsx");
+  const buyerBid = readMobileFile(
+    "entities/product-price-offer/ui/AuctionBuyerBidRow.tsx",
+  );
+  const sellerOffer = readMobileFile(
+    "entities/product-price-offer/ui/AuctionSellerOfferRow.tsx",
+  );
+  const installmentCard = readMobileFile(
+    "entities/installment/ui/InstallmentContractCard.tsx",
+  );
 
   assert.match(toggle, /COMMERCE_CARD_UI\.EXPAND_TOGGLE_LABEL/);
   assert.match(toggleStyles, /fontSize: 11/);

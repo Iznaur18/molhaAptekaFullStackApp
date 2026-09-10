@@ -59,9 +59,12 @@ export const SellerPersonalCategoryModerationCampaignCard = ({
   const sellerName = resolveSellerPersonalCategorySellerName(campaign);
   const title = sellerName || String(campaign.sellerId ?? "—");
   const imageSrc = campaign.imageUrl ? resolveUploadedMediaUrl(campaign.imageUrl) : "";
-  const needsAttention = mode === "pending" && campaignModerationNeedsAttention(campaign);
+  const needsAttention =
+    mode === "pending" && campaignModerationNeedsAttention(campaign);
   const collapsedPreview = resolveModerationCampaignCollapsedPreview(campaign);
-  const createdLabel = campaign.createdAt ? formatIsoDateTime(campaign.createdAt) : null;
+  const createdLabel = campaign.createdAt
+    ? formatIsoDateTime(campaign.createdAt)
+    : null;
 
   const cardBody = (
     <View style={styles.card}>
@@ -76,7 +79,9 @@ export const SellerPersonalCategoryModerationCampaignCard = ({
         {sellerName || campaign.sellerId || "—"}
       </Text>
 
-      <Text style={styles.meta}>{formatSellerPersonalCategoryCampaignSummary(campaign)}</Text>
+      <Text style={styles.meta}>
+        {formatSellerPersonalCategoryCampaignSummary(campaign)}
+      </Text>
 
       {mode === "managed" && campaign.activeUntil ? (
         <Text style={styles.meta}>
@@ -101,7 +106,9 @@ export const SellerPersonalCategoryModerationCampaignCard = ({
           multiline
           numberOfLines={3}
           editable={!isPending}
-          placeholder={SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.REJECT_REASON_PLACEHOLDER}
+          placeholder={
+            SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.REJECT_REASON_PLACEHOLDER
+          }
           onChangeText={onRejectReasonChange}
         />
       ) : null}

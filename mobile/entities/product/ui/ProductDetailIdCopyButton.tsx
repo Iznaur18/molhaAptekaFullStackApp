@@ -14,7 +14,9 @@ type ProductDetailIdCopyButtonProps = {
   productId: string;
 };
 
-export const ProductDetailIdCopyButton = ({ productId }: ProductDetailIdCopyButtonProps) => {
+export const ProductDetailIdCopyButton = ({
+  productId,
+}: ProductDetailIdCopyButtonProps) => {
   const styles = useProductDetailFieldStyles();
   const theme = useAppTheme();
   const [isCopied, setIsCopied] = useState(false);

@@ -2,7 +2,10 @@ import type {
   IncomingPriceOffer,
   MyPriceOfferBid,
 } from "@/entities/product-price-offer/api/incomingPriceOffersApi";
-import { bidNeedsAttention, offerNeedsAttention } from "@/entities/product-price-offer/lib/auctionDashboardAttention";
+import {
+  bidNeedsAttention,
+  offerNeedsAttention,
+} from "@/entities/product-price-offer/lib/auctionDashboardAttention";
 
 export const summarizeAuctionDashboard = (
   buyerBids: MyPriceOfferBid[],

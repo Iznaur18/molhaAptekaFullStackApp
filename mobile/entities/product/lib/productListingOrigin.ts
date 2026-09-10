@@ -7,8 +7,7 @@ import {
 
 import { CREATE_PRODUCT_UI, PRODUCT_DETAILS_MODAL_UI } from "@/shared/config";
 
-export type ProductListingOrigin =
-  (typeof PRODUCT_LISTING_ORIGIN_VALUES)[number];
+export type ProductListingOrigin = (typeof PRODUCT_LISTING_ORIGIN_VALUES)[number];
 
 /** MaterialIcons name for listing-origin chip. */
 export type ProductListingOriginIconName =
@@ -39,9 +38,7 @@ export const PRODUCT_LISTING_ORIGIN_OPTIONS: ReadonlyArray<{
   },
 ];
 
-export const isProductListingOrigin = (
-  value: unknown,
-): value is ProductListingOrigin =>
+export const isProductListingOrigin = (value: unknown): value is ProductListingOrigin =>
   typeof value === "string" &&
   (PRODUCT_LISTING_ORIGIN_VALUES as readonly string[]).includes(value);
 

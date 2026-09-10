@@ -71,7 +71,9 @@ export const usePopularCategoriesAdminPage = () => {
   }, [lists, searchQuery]);
 
   const updateListsCache = useCallback(
-    (updater: (rows: CuratedCategoryListAdminRow[]) => CuratedCategoryListAdminRow[]) => {
+    (
+      updater: (rows: CuratedCategoryListAdminRow[]) => CuratedCategoryListAdminRow[],
+    ) => {
       queryClient.setQueryData(
         curatedCategoryListQueryKeys.admin(),
         (old: CuratedCategoryListAdminRow[] | undefined) => updater(old ?? []),
@@ -89,7 +91,9 @@ export const usePopularCategoriesAdminPage = () => {
       await invalidateCuratedCategoryLists(queryClient);
     } catch (error) {
       setActionError(
-        error instanceof Error ? error.message : POPULAR_CATEGORIES_ADMIN_PAGE_UI.LOAD_ERROR,
+        error instanceof Error
+          ? error.message
+          : POPULAR_CATEGORIES_ADMIN_PAGE_UI.LOAD_ERROR,
       );
     }
   }, [queryClient, refetchLists]);
@@ -107,7 +111,10 @@ export const usePopularCategoriesAdminPage = () => {
     }
 
     try {
-      const created = await createMutation.mutateAsync({ title, regionCode: newRegionCode });
+      const created = await createMutation.mutateAsync({
+        title,
+        regionCode: newRegionCode,
+      });
       updateListsCache((rows) => [...rows, created]);
       setNewTitle("");
       setNewRegionCode(DEFAULT_VIEWER_REGION_CODE);
@@ -115,7 +122,9 @@ export const usePopularCategoriesAdminPage = () => {
       await invalidateCuratedCategoryLists(queryClient);
     } catch (error) {
       setActionError(
-        error instanceof Error ? error.message : POPULAR_CATEGORIES_ADMIN_PAGE_UI.CREATE_ERROR,
+        error instanceof Error
+          ? error.message
+          : POPULAR_CATEGORIES_ADMIN_PAGE_UI.CREATE_ERROR,
       );
     }
   }, [createMutation, newRegionCode, newTitle, queryClient, updateListsCache]);
@@ -143,7 +152,9 @@ export const usePopularCategoriesAdminPage = () => {
         await invalidateCuratedCategoryLists(queryClient);
       } catch (error) {
         setActionError(
-          error instanceof Error ? error.message : POPULAR_CATEGORIES_ADMIN_PAGE_UI.REORDER_ERROR,
+          error instanceof Error
+            ? error.message
+            : POPULAR_CATEGORIES_ADMIN_PAGE_UI.REORDER_ERROR,
         );
       } finally {
         setPendingListId(null);
@@ -162,7 +173,9 @@ export const usePopularCategoriesAdminPage = () => {
         await invalidateCuratedCategoryLists(queryClient);
       } catch (error) {
         setActionError(
-          error instanceof Error ? error.message : POPULAR_CATEGORIES_ADMIN_PAGE_UI.DELETE_ERROR,
+          error instanceof Error
+            ? error.message
+            : POPULAR_CATEGORIES_ADMIN_PAGE_UI.DELETE_ERROR,
         );
       } finally {
         setPendingListId(null);
@@ -179,7 +192,9 @@ export const usePopularCategoriesAdminPage = () => {
           listId,
           body: { title: payload.title.trim(), regionCode: payload.regionCode },
         });
-        updateListsCache((rows) => rows.map((list) => (list._id === listId ? updated : list)));
+        updateListsCache((rows) =>
+          rows.map((list) => (list._id === listId ? updated : list)),
+        );
         await invalidateCuratedCategoryLists(queryClient);
       } finally {
         setPendingListId(null);
@@ -197,7 +212,9 @@ export const usePopularCategoriesAdminPage = () => {
           kind: payload.kind,
           refId: payload.refId,
         });
-        updateListsCache((rows) => rows.map((list) => (list._id === listId ? updated : list)));
+        updateListsCache((rows) =>
+          rows.map((list) => (list._id === listId ? updated : list)),
+        );
         await invalidateCuratedCategoryLists(queryClient);
       } finally {
         setPendingListId(null);
@@ -211,7 +228,9 @@ export const usePopularCategoriesAdminPage = () => {
       setPendingListId(listId);
       try {
         const updated = await removeItemMutation.mutateAsync({ listId, itemKey });
-        updateListsCache((rows) => rows.map((list) => (list._id === listId ? updated : list)));
+        updateListsCache((rows) =>
+          rows.map((list) => (list._id === listId ? updated : list)),
+        );
         await invalidateCuratedCategoryLists(queryClient);
       } finally {
         setPendingListId(null);

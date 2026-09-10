@@ -15,7 +15,9 @@ type ProductPickupDetailsPanelProps = {
   product: Record<string, unknown>;
 };
 
-export const ProductPickupDetailsPanel = ({ product }: ProductPickupDetailsPanelProps) => {
+export const ProductPickupDetailsPanel = ({
+  product,
+}: ProductPickupDetailsPanelProps) => {
   const detailStyles = useProductDetailScreenStyles();
   const styles = useProductPickupDetailsPanelStyles();
   const { colorScheme } = useAppThemeSettings();
@@ -26,11 +28,19 @@ export const ProductPickupDetailsPanel = ({ product }: ProductPickupDetailsPanel
   const locations = productPickupLocationsFromProduct(product);
 
   if (!pickupOn && !deliveryOn) {
-    return <Text style={detailStyles.descriptionText}>{PRODUCT_PICKUP_UI.DETAILS_NO_ADDRESS}</Text>;
+    return (
+      <Text style={detailStyles.descriptionText}>
+        {PRODUCT_PICKUP_UI.DETAILS_NO_ADDRESS}
+      </Text>
+    );
   }
 
   if (pickupOn && locations.length === 0 && !deliveryOn) {
-    return <Text style={detailStyles.descriptionText}>{PRODUCT_PICKUP_UI.DETAILS_NO_ADDRESS}</Text>;
+    return (
+      <Text style={detailStyles.descriptionText}>
+        {PRODUCT_PICKUP_UI.DETAILS_NO_ADDRESS}
+      </Text>
+    );
   }
 
   return (
@@ -55,7 +65,9 @@ export const ProductPickupDetailsPanel = ({ product }: ProductPickupDetailsPanel
               : PRODUCT_PICKUP_UI.DETAILS_TITLE;
             const subtitle = [
               address,
-              location.isDefault ? ` · ${PRODUCT_PICKUP_UI.DETAILS_LOCATION_DEFAULT}` : "",
+              location.isDefault
+                ? ` · ${PRODUCT_PICKUP_UI.DETAILS_LOCATION_DEFAULT}`
+                : "",
             ].join("");
 
             return (
@@ -79,7 +91,9 @@ export const ProductPickupDetailsPanel = ({ product }: ProductPickupDetailsPanel
                   />
                 </View>
                 <View style={styles.textWrap}>
-                  <Text style={[styles.title, isDark && styles.titleDark]}>{title}</Text>
+                  <Text style={[styles.title, isDark && styles.titleDark]}>
+                    {title}
+                  </Text>
                   <Text style={styles.subtitle}>{subtitle}</Text>
                 </View>
                 <View style={styles.action}>

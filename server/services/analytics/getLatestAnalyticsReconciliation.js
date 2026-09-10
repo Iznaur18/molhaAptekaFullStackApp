@@ -2,9 +2,7 @@ import { AnalyticsReconciliationModel } from "../../models/index.js";
 
 /** @returns {Promise<object | null>} */
 export async function getLatestAnalyticsReconciliation() {
-  const doc = await AnalyticsReconciliationModel.findOne({})
-    .sort({ ranAt: -1 })
-    .lean();
+  const doc = await AnalyticsReconciliationModel.findOne({}).sort({ ranAt: -1 }).lean();
 
   if (!doc) {
     return null;

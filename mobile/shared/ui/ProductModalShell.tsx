@@ -1,11 +1,5 @@
 import { type ReactNode } from "react";
-import {
-  Pressable,
-  ScrollView,
-  Text,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, Text, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CREATE_RAFFLE_MODAL_UI } from "@/shared/config";
@@ -74,11 +68,11 @@ export const ProductModalShell = ({
         <>
           <ModalSheetGradientBackdrop />
           <Pressable
-          style={styles.backdropDismiss}
-          onPress={onClose}
-          accessibilityRole="button"
-          accessibilityLabel={CREATE_RAFFLE_MODAL_UI.ARIA_CLOSE}
-        />
+            style={styles.backdropDismiss}
+            onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel={CREATE_RAFFLE_MODAL_UI.ARIA_CLOSE}
+          />
         </>
       ) : null}
       <View
@@ -96,7 +90,10 @@ export const ProductModalShell = ({
               {title}
             </Text>
             <Pressable
-              style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}
+              style={({ pressed }) => [
+                styles.closeButton,
+                pressed && styles.closeButtonPressed,
+              ]}
               onPress={onClose}
               accessibilityRole="button"
               accessibilityLabel={CREATE_RAFFLE_MODAL_UI.ARIA_CLOSE}

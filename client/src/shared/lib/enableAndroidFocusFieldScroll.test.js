@@ -9,12 +9,8 @@ import {
 
 describe("isAndroidUserAgent", () => {
   it("detects Android", () => {
-    expect(isAndroidUserAgent("Mozilla/5.0 (Linux; Android 14; SM-A156B)")).toBe(
-      true,
-    );
-    expect(isAndroidUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0)")).toBe(
-      false,
-    );
+    expect(isAndroidUserAgent("Mozilla/5.0 (Linux; Android 14; SM-A156B)")).toBe(true);
+    expect(isAndroidUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0)")).toBe(false);
   });
 });
 
@@ -53,7 +49,10 @@ describe("scrollAndroidFieldIntoView", () => {
     scroller.appendChild(input);
     document.body.appendChild(scroller);
 
-    Object.defineProperty(scroller, "scrollHeight", { value: 1200, configurable: true });
+    Object.defineProperty(scroller, "scrollHeight", {
+      value: 1200,
+      configurable: true,
+    });
     Object.defineProperty(scroller, "clientHeight", { value: 400, configurable: true });
     Object.defineProperty(scroller, "scrollTop", {
       value: 0,

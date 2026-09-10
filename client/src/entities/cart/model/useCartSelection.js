@@ -14,10 +14,7 @@ const EMPTY_DESELECTION = new Set();
 export function useCartSelection(purchasableIds) {
   const [deselectedIds, setDeselectedIds] = useState(EMPTY_DESELECTION);
 
-  const purchasableIdSet = useMemo(
-    () => new Set(purchasableIds),
-    [purchasableIds],
-  );
+  const purchasableIdSet = useMemo(() => new Set(purchasableIds), [purchasableIds]);
 
   useEffect(() => {
     setDeselectedIds((prev) => pruneCartDeselection(prev, purchasableIdSet));

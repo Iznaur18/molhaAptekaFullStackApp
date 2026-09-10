@@ -25,6 +25,8 @@ export const patchProductCategoryDisplay = async (
     }
     return data.data.display as ProductCategoryDisplayFromApi;
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.PATCH_CATEGORY_DISPLAY_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.PATCH_CATEGORY_DISPLAY_FALLBACK),
+    );
   }
 };

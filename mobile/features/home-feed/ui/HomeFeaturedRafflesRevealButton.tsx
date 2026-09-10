@@ -27,7 +27,10 @@ export const HomeFeaturedRafflesRevealButton = ({
       accessibilityRole="button"
       accessibilityLabel={label}
     >
-      <SquircleView radius={RAFFLE_REVEAL_BUTTON_BORDER_RADIUS} style={styles.revealButton}>
+      <SquircleView
+        radius={RAFFLE_REVEAL_BUTTON_BORDER_RADIUS}
+        style={styles.revealButton}
+      >
         <Text style={styles.revealButtonText}>{label}</Text>
       </SquircleView>
     </Pressable>

@@ -28,7 +28,9 @@ describe("resolveOrderActiveAmountRub", () => {
   });
 
   it("falls back to totalAmount when items missing", () => {
-    expect(resolveOrderActiveAmountRub({ status: "pending", totalAmount: 1500 })).toBe(1500);
+    expect(resolveOrderActiveAmountRub({ status: "pending", totalAmount: 1500 })).toBe(
+      1500,
+    );
   });
 });
 

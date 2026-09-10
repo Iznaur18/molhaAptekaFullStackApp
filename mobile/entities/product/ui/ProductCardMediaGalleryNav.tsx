@@ -22,7 +22,10 @@ export const ProductCardMediaGalleryCounter = ({
     <Text
       style={styles.counter}
       accessibilityRole="text"
-      accessibilityLabel={PRODUCT_CARD_UI.GALLERY_COUNTER_ARIA(slideIndex + 1, slideCount)}
+      accessibilityLabel={PRODUCT_CARD_UI.GALLERY_COUNTER_ARIA(
+        slideIndex + 1,
+        slideCount,
+      )}
     >
       {slideIndex + 1} / {slideCount}
     </Text>

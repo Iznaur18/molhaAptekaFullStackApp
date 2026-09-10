@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  pruneProductPickupLocationsToSelection,
-} from "./productPickupLocationsForm.js";
+import { pruneProductPickupLocationsToSelection } from "./productPickupLocationsForm.js";
 
 describe("pruneProductPickupLocationsToSelection", () => {
   const profileAddresses = [

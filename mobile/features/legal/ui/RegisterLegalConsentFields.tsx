@@ -28,7 +28,12 @@ type ConsentCheckboxProps = {
   children: ReactNode;
 };
 
-const ConsentCheckbox = ({ checked, disabled = false, onToggle, children }: ConsentCheckboxProps) => {
+const ConsentCheckbox = ({
+  checked,
+  disabled = false,
+  onToggle,
+  children,
+}: ConsentCheckboxProps) => {
   const styles = useLoginScreenStyles();
   const { theme } = useAppThemeSettings();
 
@@ -60,7 +65,9 @@ export const RegisterLegalConsentFields = ({
   const router = useRouter();
   const styles = useLoginScreenStyles();
 
-  const openLegalRoute = (pathname: "/legal/terms" | "/legal/privacy" | "/legal/listing") => {
+  const openLegalRoute = (
+    pathname: "/legal/terms" | "/legal/privacy" | "/legal/listing",
+  ) => {
     router.push(pathname);
   };
 
@@ -104,7 +111,9 @@ export const RegisterLegalConsentFields = ({
       <ConsentCheckbox
         checked={personalDataConsentAccepted}
         disabled={disabled}
-        onToggle={() => onPersonalDataConsentAcceptedChange(!personalDataConsentAccepted)}
+        onToggle={() =>
+          onPersonalDataConsentAcceptedChange(!personalDataConsentAccepted)
+        }
       >
         <Text style={styles.consentText}>
           {AUTH_UI.REGISTER_PRIVACY_CONSENT_PREFIX}
@@ -128,10 +137,18 @@ export const RegisterLegalConsentFields = ({
             {AUTH_UI.REGISTER_PRIVACY_LINK}
           </Text>
         </Text>
-        <Text style={styles.consentSummary}>{REGISTRATION_PERSONAL_DATA_CONSENT_SUMMARY}</Text>
-        <Text style={styles.consentSummary}>{REGISTRATION_PERSONAL_DATA_CONSENT_PURPOSES}</Text>
-        <Text style={styles.consentSummary}>{REGISTRATION_PERSONAL_DATA_CONSENT_OPERATOR}</Text>
-        <Text style={styles.consentSummary}>{REGISTRATION_PERSONAL_DATA_CONSENT_WITHDRAWAL}</Text>
+        <Text style={styles.consentSummary}>
+          {REGISTRATION_PERSONAL_DATA_CONSENT_SUMMARY}
+        </Text>
+        <Text style={styles.consentSummary}>
+          {REGISTRATION_PERSONAL_DATA_CONSENT_PURPOSES}
+        </Text>
+        <Text style={styles.consentSummary}>
+          {REGISTRATION_PERSONAL_DATA_CONSENT_OPERATOR}
+        </Text>
+        <Text style={styles.consentSummary}>
+          {REGISTRATION_PERSONAL_DATA_CONSENT_WITHDRAWAL}
+        </Text>
       </ConsentCheckbox>
     </View>
   );

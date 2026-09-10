@@ -14,13 +14,10 @@ const {
   PRODUCT_FULFILLMENT_SOURCE_CUSTOM,
   PRODUCT_FULFILLMENT_SOURCE_PROFILE,
 } = await import("@molha/api-contract");
-const {
-  getSellerCommerceDefaults,
-  saveSellerCommerceDefaults,
-} = await import("../services/seller/sellerCommerceDefaults.js");
-const { buildProductPatchSet } = await import(
-  "../services/product/buildProductPatchSet.js"
-);
+const { getSellerCommerceDefaults, saveSellerCommerceDefaults } =
+  await import("../services/seller/sellerCommerceDefaults.js");
+const { buildProductPatchSet } =
+  await import("../services/product/buildProductPatchSet.js");
 
 const GROZNY = {
   address: "г Грозный, ул Мира, 1",

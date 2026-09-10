@@ -57,9 +57,7 @@ export function AffiliatePercentModal({ isOpen, product, onClose, onSaved }) {
     const existing = Math.floor(Number(product.affiliatePercent) || 0);
     setPercent(
       String(
-        existing >= AFFILIATE_PERCENT_MIN
-          ? existing
-          : AFFILIATE_MANAGE_DEFAULT_PERCENT,
+        existing >= AFFILIATE_PERCENT_MIN ? existing : AFFILIATE_MANAGE_DEFAULT_PERCENT,
       ),
     );
   }, [isOpen, product]);

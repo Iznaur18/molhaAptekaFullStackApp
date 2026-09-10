@@ -16,7 +16,11 @@ import {
   getPendingSellerPersonalCategoryCampaignsCountController,
   rejectSellerPersonalCategoryCampaignController,
 } from "../controllers/SellerPersonalCategory/sellerPersonalCategoryStaffControllers.js";
-import { checkAuthMW, checkProductModeratorMW, advertisingSubmitRateLimiter } from "../middlewares/index.js";
+import {
+  checkAuthMW,
+  checkProductModeratorMW,
+  advertisingSubmitRateLimiter,
+} from "../middlewares/index.js";
 import {
   rejectSellerPersonalCategoryCampaignValidation,
   sellerPersonalCategoryCampaignIdParamValidation,

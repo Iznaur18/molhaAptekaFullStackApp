@@ -25,7 +25,10 @@ import { MapPointPicker } from "@/entities/maps/ui/MapPointPicker";
 import { ADDRESS_DELIVERY_UI } from "@/shared/config";
 import { textInputFocusScrollProps } from "@/shared/lib/scrollTextInputIntoViewOnFocus";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import { useAddressSuggestStyles, useFormFieldStyles } from "@/shared/theme/formChromeStyles";
+import {
+  useAddressSuggestStyles,
+  useFormFieldStyles,
+} from "@/shared/theme/formChromeStyles";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 
@@ -108,8 +111,7 @@ export const AddressSuggestInput = ({
 
   const suggestionsQuery = useAddressSuggestionsQuery({
     query: activeQuery,
-    enabled:
-      suggestEnabled && activeQuery.length >= ADDRESS_SUGGEST_MIN_QUERY_LENGTH,
+    enabled: suggestEnabled && activeQuery.length >= ADDRESS_SUGGEST_MIN_QUERY_LENGTH,
   });
 
   const suggestions = suggestEnabled ? (suggestionsQuery.data ?? []) : [];
@@ -325,7 +327,9 @@ export const AddressSuggestInput = ({
             },
           ]}
         >
-          <Text style={[styles.serviceBannerText, { color: theme.colors.textSecondary }]}>
+          <Text
+            style={[styles.serviceBannerText, { color: theme.colors.textSecondary }]}
+          >
             {ADDRESS_DELIVERY_UI.SERVICE_UNAVAILABLE}
           </Text>
           <Pressable
@@ -343,7 +347,9 @@ export const AddressSuggestInput = ({
               },
             ]}
           >
-            <Text style={{ color: theme.colors.action, fontWeight: "600", fontSize: 13 }}>
+            <Text
+              style={{ color: theme.colors.action, fontWeight: "600", fontSize: 13 }}
+            >
               {ADDRESS_DELIVERY_UI.SERVICE_RETRY}
             </Text>
           </Pressable>
@@ -395,17 +401,23 @@ export const AddressSuggestInput = ({
               opacity: disabled ? 0.6 : 1,
             }}
           >
-            <Text style={{ color: theme.colors.action, fontWeight: "600", fontSize: 14 }}>
+            <Text
+              style={{ color: theme.colors.action, fontWeight: "600", fontSize: 14 }}
+            >
               {ADDRESS_DELIVERY_UI.MAP_OPEN}
             </Text>
           </Pressable>
           {showMapStatusHints ? (
             <>
               {mapStatus === "loading" ? (
-                <Text style={fieldStyles.hint}>{ADDRESS_DELIVERY_UI.MAP_GEOLOCATE_LOADING}</Text>
+                <Text style={fieldStyles.hint}>
+                  {ADDRESS_DELIVERY_UI.MAP_GEOLOCATE_LOADING}
+                </Text>
               ) : null}
               {mapError ? (
-                <Text style={[fieldStyles.hint, { color: theme.colors.danger }]}>{mapError}</Text>
+                <Text style={[fieldStyles.hint, { color: theme.colors.danger }]}>
+                  {mapError}
+                </Text>
               ) : null}
             </>
           ) : null}
@@ -415,10 +427,14 @@ export const AddressSuggestInput = ({
       {showMap && displayOnly && showMapStatusHints ? (
         <View style={styles.mapBlock}>
           {mapStatus === "loading" ? (
-            <Text style={fieldStyles.hint}>{ADDRESS_DELIVERY_UI.MAP_GEOLOCATE_LOADING}</Text>
+            <Text style={fieldStyles.hint}>
+              {ADDRESS_DELIVERY_UI.MAP_GEOLOCATE_LOADING}
+            </Text>
           ) : null}
           {mapError ? (
-            <Text style={[fieldStyles.hint, { color: theme.colors.danger }]}>{mapError}</Text>
+            <Text style={[fieldStyles.hint, { color: theme.colors.danger }]}>
+              {mapError}
+            </Text>
           ) : null}
         </View>
       ) : null}
@@ -457,12 +473,21 @@ export const AddressSuggestInput = ({
               </Text>
             ) : null}
             {mapError ? (
-              <Text style={[fieldStyles.hint, styles.overlayCard, { color: theme.colors.danger }]}>
+              <Text
+                style={[
+                  fieldStyles.hint,
+                  styles.overlayCard,
+                  { color: theme.colors.danger },
+                ]}
+              >
                 {mapError}
               </Text>
             ) : null}
             {value.line ? (
-              <Text style={[styles.overlayCard, { color: theme.colors.ink }]} numberOfLines={2}>
+              <Text
+                style={[styles.overlayCard, { color: theme.colors.ink }]}
+                numberOfLines={2}
+              >
                 {value.line}
               </Text>
             ) : null}
@@ -480,7 +505,13 @@ export const AddressSuggestInput = ({
                 elevation: 4,
               }}
             >
-              <Text style={{ color: theme.colors.onContrast, fontWeight: "700", fontSize: 16 }}>
+              <Text
+                style={{
+                  color: theme.colors.onContrast,
+                  fontWeight: "700",
+                  fontSize: 16,
+                }}
+              >
                 {ADDRESS_DELIVERY_UI.MAP_DONE}
               </Text>
             </Pressable>

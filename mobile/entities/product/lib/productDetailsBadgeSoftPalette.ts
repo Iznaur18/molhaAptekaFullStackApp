@@ -1,6 +1,4 @@
-import {
-  PRODUCT_CARD_DETAIL_BADGE_LAYOUT as BDETAIL,
-} from "@/entities/product/lib/productCardBadgePalette";
+import { PRODUCT_CARD_DETAIL_BADGE_LAYOUT as BDETAIL } from "@/entities/product/lib/productCardBadgePalette";
 import type { ProductStatusBadgeVariant } from "@/entities/product/lib/productStatusBadgeStyles";
 
 /** Мягкая палитра бейджей details (без «Статус цены»). */

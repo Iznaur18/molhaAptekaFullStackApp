@@ -17,7 +17,10 @@ type CuratedProductCompactCardProps = {
   width: number;
 };
 
-export const CuratedProductCompactCard = ({ product, width }: CuratedProductCompactCardProps) => {
+export const CuratedProductCompactCard = ({
+  product,
+  width,
+}: CuratedProductCompactCardProps) => {
   const router = useRouter();
   const styles = useCuratedProductCompactCardStyles();
   const imageUrls = resolveProductImageUrls(product);
@@ -40,7 +43,9 @@ export const CuratedProductCompactCard = ({ product, width }: CuratedProductComp
         {imageUrl ? (
           <Image source={{ uri: imageUrl }} style={styles.image} contentFit="cover" />
         ) : (
-          <Text style={styles.imageFallback}>{CURATED_PRODUCT_COMPACT_CARD_UI.NO_IMAGE}</Text>
+          <Text style={styles.imageFallback}>
+            {CURATED_PRODUCT_COMPACT_CARD_UI.NO_IMAGE}
+          </Text>
         )}
       </Pressable>
       <Pressable

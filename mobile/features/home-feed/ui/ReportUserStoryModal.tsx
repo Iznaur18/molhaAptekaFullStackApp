@@ -9,10 +9,7 @@ import {
 } from "react-native";
 
 import { useUserStoryMutations } from "@/entities/user-story/model/useUserStoryMutations";
-import {
-  PRODUCT_REPORT_TEXT_MAX_CHARS,
-  USER_STORY_UI,
-} from "@/shared/config";
+import { PRODUCT_REPORT_TEXT_MAX_CHARS, USER_STORY_UI } from "@/shared/config";
 import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 import { useBottomSheetReportModalStyles } from "@/shared/theme/modalChromeStyles";
 
@@ -72,7 +69,12 @@ export const ReportUserStoryModal = ({
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      onRequestClose={handleClose}
+    >
       <View style={styles.overlay}>
         <ModalSheetGradientBackdrop />
         <View style={styles.card}>
@@ -94,7 +96,11 @@ export const ReportUserStoryModal = ({
           {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
 
           <View style={styles.actions}>
-            <Pressable style={styles.cancelButton} onPress={handleClose} disabled={isSubmitting}>
+            <Pressable
+              style={styles.cancelButton}
+              onPress={handleClose}
+              disabled={isSubmitting}
+            >
               <Text style={styles.cancelButtonText}>{USER_STORY_UI.CLOSE}</Text>
             </Pressable>
             <Pressable
@@ -105,7 +111,9 @@ export const ReportUserStoryModal = ({
               {isSubmitting ? (
                 <ActivityIndicator color={theme.colors.onContrast} />
               ) : (
-                <Text style={styles.submitButtonText}>{USER_STORY_UI.STORY_REPORT_SUBMIT}</Text>
+                <Text style={styles.submitButtonText}>
+                  {USER_STORY_UI.STORY_REPORT_SUBMIT}
+                </Text>
               )}
             </Pressable>
           </View>

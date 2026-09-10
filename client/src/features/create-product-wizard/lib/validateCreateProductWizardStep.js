@@ -60,7 +60,9 @@ export function validateCreateProductWizardStep(stepId, form, context = {}) {
       if (urls.length === 0) {
         return CREATE_PRODUCT_MODAL_UI.ERROR_IMAGE_REQUIRED;
       }
-      const instagramError = validateInstagramPostUrlInput(form.productInstagramPostUrl);
+      const instagramError = validateInstagramPostUrlInput(
+        form.productInstagramPostUrl,
+      );
       if (instagramError) {
         return instagramError;
       }
@@ -159,6 +161,8 @@ export function validateCreateProductWizardStep(stepId, form, context = {}) {
 /** @param {string} stepId */
 export function isCreateProductWizardStepId(stepId) {
   return CREATE_PRODUCT_WIZARD_STEP_IDS.includes(
-    /** @type {import('./createProductWizardSteps.js').CreateProductWizardStepId} */ (stepId),
+    /** @type {import('./createProductWizardSteps.js').CreateProductWizardStepId} */ (
+      stepId
+    ),
   );
 }

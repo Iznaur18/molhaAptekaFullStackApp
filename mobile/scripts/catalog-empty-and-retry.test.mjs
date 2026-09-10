@@ -105,7 +105,11 @@ test("тексты совпадают с вебом дословно", () => {
   // Ровно столько причин, сколько текстов — новая причина без текста не пройдёт.
   const lib = readMobileFile("entities/product/lib/resolveCatalogEmptyReason.ts");
   const reasons = [...lib.matchAll(/^\s{2}\| "([a-zA-Z]+)"$/gm)].map((m) => m[1]);
-  assert.equal(reasons.length + 1, pairs.length, "число причин разошлось с числом текстов");
+  assert.equal(
+    reasons.length + 1,
+    pairs.length,
+    "число причин разошлось с числом текстов",
+  );
 });
 
 test("упавшая догрузка показывает ошибку и «Повторить»", () => {

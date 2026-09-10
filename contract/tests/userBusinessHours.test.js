@@ -23,7 +23,12 @@ describe("userBusinessHours", () => {
   it("returns true outside working hours on working day", () => {
     assert.equal(
       isSellerScheduleClosedNow(
-        { enabled: true, weekdays: [0, 1, 2, 3, 4], openTime: "09:00", closeTime: "18:00" },
+        {
+          enabled: true,
+          weekdays: [0, 1, 2, 3, 4],
+          openTime: "09:00",
+          closeTime: "18:00",
+        },
         "RU-MOW",
         new Date("2026-08-31T05:00:00.000Z"),
       ),
@@ -34,7 +39,12 @@ describe("userBusinessHours", () => {
   it("returns false inside working hours", () => {
     assert.equal(
       isSellerScheduleClosedNow(
-        { enabled: true, weekdays: [0, 1, 2, 3, 4], openTime: "09:00", closeTime: "18:00" },
+        {
+          enabled: true,
+          weekdays: [0, 1, 2, 3, 4],
+          openTime: "09:00",
+          closeTime: "18:00",
+        },
         "RU-MOW",
         new Date("2026-08-31T08:00:00.000Z"),
       ),
@@ -45,7 +55,12 @@ describe("userBusinessHours", () => {
   it("resolves opens-at time before opening on working day", () => {
     assert.equal(
       resolveSellerScheduleOpensAtTime(
-        { enabled: true, weekdays: [0, 1, 2, 3, 4], openTime: "09:00", closeTime: "18:00" },
+        {
+          enabled: true,
+          weekdays: [0, 1, 2, 3, 4],
+          openTime: "09:00",
+          closeTime: "18:00",
+        },
         "RU-MOW",
         new Date("2026-08-31T05:00:00.000Z"),
       ),
@@ -56,7 +71,12 @@ describe("userBusinessHours", () => {
   it("resolves opens-at time after close on working day", () => {
     assert.equal(
       resolveSellerScheduleOpensAtTime(
-        { enabled: true, weekdays: [0, 1, 2, 3, 4], openTime: "09:00", closeTime: "18:00" },
+        {
+          enabled: true,
+          weekdays: [0, 1, 2, 3, 4],
+          openTime: "09:00",
+          closeTime: "18:00",
+        },
         "RU-MOW",
         new Date("2026-08-31T16:00:00.000Z"),
       ),

@@ -201,7 +201,9 @@ export function LoginModal({ isOpen, onClose, onSuccess, onRegisterClick }) {
           </p>
         ) : null}
         {successMessage ? (
-          <p className="login-modal__message login-modal__message_success">{successMessage}</p>
+          <p className="login-modal__message login-modal__message_success">
+            {successMessage}
+          </p>
         ) : null}
 
         <button type="submit" className="login-modal__submit" disabled={isLoading}>

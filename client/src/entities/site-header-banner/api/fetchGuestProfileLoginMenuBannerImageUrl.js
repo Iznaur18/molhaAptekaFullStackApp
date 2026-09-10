@@ -1,7 +1,6 @@
 import { apiClient } from "../../../shared/api/apiClient.js";
 
-const FETCH_GUEST_BANNER_FALLBACK =
-  "Не удалось загрузить баннер входа профиля";
+const FETCH_GUEST_BANNER_FALLBACK = "Не удалось загрузить баннер входа профиля";
 
 /**
  * @returns {Promise<string | null>}

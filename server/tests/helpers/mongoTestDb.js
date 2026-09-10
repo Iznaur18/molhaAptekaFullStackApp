@@ -17,9 +17,7 @@ export const connectMongoTestReplSet = async () => {
   // вставить обе записи до появления индекса и падал через раз — так плавал
   // partial unique в кампаниях личной категории. `init()` — штатный способ
   // дождаться сборки; ждём только те модели, которые набор уже импортировал.
-  await Promise.all(
-    mongoose.modelNames().map((name) => mongoose.model(name).init()),
-  );
+  await Promise.all(mongoose.modelNames().map((name) => mongoose.model(name).init()));
 };
 
 export const disconnectMongoTestReplSet = async () => {

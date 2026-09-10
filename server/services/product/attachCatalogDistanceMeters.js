@@ -91,7 +91,9 @@ export function attachCatalogDistanceMeters(products, viewerGeo) {
       product &&
       typeof product === "object" &&
       Object.prototype.hasOwnProperty.call(product, "distanceMeters") &&
-      Number.isFinite(Number(/** @type {{ distanceMeters?: unknown }} */ (product).distanceMeters))
+      Number.isFinite(
+        Number(/** @type {{ distanceMeters?: unknown }} */ (product).distanceMeters),
+      )
     ) {
       return product;
     }

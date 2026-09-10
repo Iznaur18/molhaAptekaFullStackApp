@@ -23,8 +23,8 @@ export function WebPushSettingsToggle({ isAuthorized }) {
   const [enabled, setEnabled] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [permission, setPermission] = useState(
-    () => (typeof Notification !== "undefined" ? Notification.permission : "default"),
+  const [permission, setPermission] = useState(() =>
+    typeof Notification !== "undefined" ? Notification.permission : "default",
   );
 
   const refreshState = useCallback(async () => {
@@ -107,10 +107,16 @@ export function WebPushSettingsToggle({ isAuthorized }) {
     <div className="web-push-settings-toggle">
       <p className="web-push-settings-toggle__label">{WEB_PUSH_SETTINGS_UI.LABEL}</p>
       {!supported ? (
-        <p className="web-push-settings-toggle__hint">{WEB_PUSH_SETTINGS_UI.UNSUPPORTED}</p>
+        <p className="web-push-settings-toggle__hint">
+          {WEB_PUSH_SETTINGS_UI.UNSUPPORTED}
+        </p>
       ) : (
         <>
-          <div className="web-push-settings-toggle__row" role="group" aria-label={WEB_PUSH_SETTINGS_UI.LABEL}>
+          <div
+            className="web-push-settings-toggle__row"
+            role="group"
+            aria-label={WEB_PUSH_SETTINGS_UI.LABEL}
+          >
             <button
               type="button"
               className={[

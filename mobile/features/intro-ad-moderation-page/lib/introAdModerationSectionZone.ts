@@ -44,7 +44,11 @@ export function resolveIntroAdModerationListPanelStyles(
     return [styles.list];
   }
 
-  return [styles.list, styles.listContentPanel, styles[LIST_PANEL_ZONE_STYLE_KEYS[section]]];
+  return [
+    styles.list,
+    styles.listContentPanel,
+    styles[LIST_PANEL_ZONE_STYLE_KEYS[section]],
+  ];
 }
 
 type IntroAdModerationOverviewStyles = {
@@ -163,12 +167,16 @@ export function resolveIntroAdModerationSectionChipStyles(
   sectionValue: string,
   isActive: boolean,
   styles: IntroAdModerationSectionChipStyles,
-): { chip: StyleProp<ViewStyle & TextStyle>[]; text: StyleProp<ViewStyle & TextStyle>[] } {
+): {
+  chip: StyleProp<ViewStyle & TextStyle>[];
+  text: StyleProp<ViewStyle & TextStyle>[];
+} {
   const chipStyles: StyleProp<ViewStyle & TextStyle>[] = [styles.sectionChip];
   const textStyles: StyleProp<ViewStyle & TextStyle>[] = [styles.sectionChipText];
 
   if (sectionValue) {
-    const zoneStyles = SECTION_CHIP_ZONE_STYLE_KEYS[sectionValue as IntroAdModerationSectionZoneId];
+    const zoneStyles =
+      SECTION_CHIP_ZONE_STYLE_KEYS[sectionValue as IntroAdModerationSectionZoneId];
     if (zoneStyles) {
       chipStyles.push(styles[zoneStyles.chip]);
       textStyles.push(styles[zoneStyles.text]);

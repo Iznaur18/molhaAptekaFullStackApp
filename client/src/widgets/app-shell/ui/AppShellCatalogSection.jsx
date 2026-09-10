@@ -21,14 +21,14 @@ const LazyRaffleFeaturedHomeSection = lazy(() =>
   ),
 );
 const LazyUserStoriesStrip = lazy(() =>
-  import("../../../entities/user-story/ui/UserStoriesStrip.jsx").then(
-    (module) => ({ default: module.UserStoriesStrip }),
-  ),
+  import("../../../entities/user-story/ui/UserStoriesStrip.jsx").then((module) => ({
+    default: module.UserStoriesStrip,
+  })),
 );
 const LazyMyProductsCatalogSection = lazy(() =>
-  import("../../my-products-page/ui/MyProductsCatalogSection.jsx").then(
-    (module) => ({ default: module.MyProductsCatalogSection }),
-  ),
+  import("../../my-products-page/ui/MyProductsCatalogSection.jsx").then((module) => ({
+    default: module.MyProductsCatalogSection,
+  })),
 );
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
 
@@ -241,9 +241,7 @@ export function AppShellCatalogGridSection({
         <CuratedCategoryListCarouselSkeleton />
       ) : null}
       {isHomeCatalogMainView ? (
-        <h2 className="home-feed-section-title">
-          {HOME_PAGE_UI.CATALOG_HOME_SECTION}
-        </h2>
+        <h2 className="home-feed-section-title">{HOME_PAGE_UI.CATALOG_HOME_SECTION}</h2>
       ) : null}
       {isCatalogInitialLoading ? (
         <CatalogGridSkeleton />

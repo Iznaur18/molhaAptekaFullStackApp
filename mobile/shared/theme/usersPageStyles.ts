@@ -1,7 +1,5 @@
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import {
-  SCREEN_CONTENT_PADDING_HORIZONTAL,
-} from "@/shared/theme/screenContentLayout";
+import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 
 export const useUsersPageStyles = createThemedStyles((theme) => ({
   screen: {

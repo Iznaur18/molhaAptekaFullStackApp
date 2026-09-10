@@ -1,15 +1,18 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { excludeUsersPodiumFromList, rankUsersForPodium } from "@izibuy/shared-lib";
 import {
-  excludeUsersPodiumFromList,
-  rankUsersForPodium,
-} from "@izibuy/shared-lib";
-import { USER_SEARCH_MIN_LENGTH, isUsersSearchInputTooShort } from "@molha/api-contract";
+  USER_SEARCH_MIN_LENGTH,
+  isUsersSearchInputTooShort,
+} from "@molha/api-contract";
 
 import { useUsersMonthlyLoyaltyPointsQuery } from "../../../entities/user/model/useUsersMonthlyLoyaltyPointsQuery.js";
 import { useUsersSearchQuery } from "../../../entities/user/model/useUsersSearchQuery.js";
 import { UserListRow } from "../../../entities/user/ui/UserListRow.jsx";
-import { USER_SEARCH_INPUT_UI, USERS_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  USER_SEARCH_INPUT_UI,
+  USERS_PAGE_UI,
+} from "../../../shared/config/appUiCopy.js";
 import { AUTH_LOGIN_PATH } from "../../../shared/lib/authPaths.js";
 import { isAuthSessionError } from "../../../shared/lib/isAuthSessionError.js";
 import { SearchInput } from "../../../shared/ui/SearchInput/SearchInput.jsx";

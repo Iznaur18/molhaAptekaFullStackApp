@@ -198,7 +198,11 @@ for (const root of targetRoots) {
   }
 
   for (const filePath of walk(root)) {
-    if (root.includes("entities") && !filePath.includes(`${path.sep}lib${path.sep}`) && !filePath.includes(`${path.sep}ui${path.sep}`)) {
+    if (
+      root.includes("entities") &&
+      !filePath.includes(`${path.sep}lib${path.sep}`) &&
+      !filePath.includes(`${path.sep}ui${path.sep}`)
+    ) {
       continue;
     }
 

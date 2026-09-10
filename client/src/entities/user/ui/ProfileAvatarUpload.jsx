@@ -33,12 +33,8 @@ export function ProfileAvatarUpload({
 }) {
   const fileInputRef = useRef(/** @type {HTMLInputElement | null} */ (null));
   const { uploadImageMutation } = useUploadAssetMutations();
-  const {
-    cropFile,
-    transformFileBeforeUpload,
-    handleCropConfirm,
-    handleCropCancel,
-  } = useSquareImageCropBeforeUpload();
+  const { cropFile, transformFileBeforeUpload, handleCropConfirm, handleCropCancel } =
+    useSquareImageCropBeforeUpload();
   const [localError, setLocalError] = useState("");
 
   const isBusy = uploadImageMutation.isPending;
@@ -80,7 +76,9 @@ export function ProfileAvatarUpload({
 
   return (
     <div className="profile-avatar-upload">
-      <p className="profile-avatar-upload__label">{EDIT_PROFILE_MODAL_UI.LABEL_AVATAR}</p>
+      <p className="profile-avatar-upload__label">
+        {EDIT_PROFILE_MODAL_UI.LABEL_AVATAR}
+      </p>
       <div className="profile-avatar-upload__preview" aria-hidden={!displayUrl}>
         {displayUrl ? (
           <img
@@ -97,7 +95,9 @@ export function ProfileAvatarUpload({
         onClick={handlePick}
         disabled={isDisabled}
       >
-        {isBusy ? EDIT_PROFILE_MODAL_UI.UPLOAD_LOADING : EDIT_PROFILE_MODAL_UI.UPLOAD_BUTTON}
+        {isBusy
+          ? EDIT_PROFILE_MODAL_UI.UPLOAD_LOADING
+          : EDIT_PROFILE_MODAL_UI.UPLOAD_BUTTON}
       </button>
       <p className="profile-avatar-upload__hint">{EDIT_PROFILE_MODAL_UI.UPLOAD_HINT}</p>
       {localError ? (

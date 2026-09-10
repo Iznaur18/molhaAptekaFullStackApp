@@ -22,7 +22,9 @@ export async function isUserBlockedBy(blockerId, blockedId) {
   if (!blockerId || !blockedId || blockerId === blockedId) {
     return false;
   }
-  const row = await UserBlockModel.findOne({ blockerId, blockedId }).select("_id").lean();
+  const row = await UserBlockModel.findOne({ blockerId, blockedId })
+    .select("_id")
+    .lean();
   return Boolean(row);
 }
 
@@ -64,7 +66,11 @@ async function purgeFollowRelationsBetween(blockerId, blockedId) {
 /**
  * @param {{ blockerId: string; blockedId: string; blockerName?: string | null }} params
  */
-export function scheduleUserBlockSideEffects({ blockerId, blockedId, blockerName = null }) {
+export function scheduleUserBlockSideEffects({
+  blockerId,
+  blockedId,
+  blockerName = null,
+}) {
   setImmediate(() => {
     void (async () => {
       try {
@@ -105,7 +111,9 @@ export async function blockUser(blockerId, blockedId) {
     return { ok: false, status: 404, message: "NOT_FOUND" };
   }
 
-  const existing = await UserBlockModel.findOne({ blockerId, blockedId }).select("_id").lean();
+  const existing = await UserBlockModel.findOne({ blockerId, blockedId })
+    .select("_id")
+    .lean();
   if (existing) {
     return {
       ok: true,
@@ -184,7 +192,8 @@ export async function listUsersBlockedBy({
     .map((user) => ({
       ...user,
       _id: String(user._id),
-      blockedAt: rows.find((row) => String(row.blockedId?._id) === String(user._id))?.createdAt,
+      blockedAt: rows.find((row) => String(row.blockedId?._id) === String(user._id))
+        ?.createdAt,
     }));
 
   return {

@@ -34,10 +34,25 @@ export const CATALOG_FEED_TILES: CatalogFeedTile[] = [
     label: "Бесплатно от",
   },
   { key: "sort:views", kind: "sort", value: CATALOG_SORT_VIEWS, label: "Популярные" },
-  { key: "sort:purchases", kind: "sort", value: CATALOG_SORT_PURCHASES, label: "Покупают" },
-  { key: "sort:reviews", kind: "sort", value: CATALOG_SORT_REVIEWS, label: "По отзывам" },
+  {
+    key: "sort:purchases",
+    kind: "sort",
+    value: CATALOG_SORT_PURCHASES,
+    label: "Покупают",
+  },
+  {
+    key: "sort:reviews",
+    kind: "sort",
+    value: CATALOG_SORT_REVIEWS,
+    label: "По отзывам",
+  },
   { key: "sort:premium", kind: "sort", value: CATALOG_SORT_PREMIUM, label: "Premium" },
-  { key: "sort:confirmed", kind: "sort", value: CATALOG_SORT_CONFIRMED, label: "Проверенные" },
+  {
+    key: "sort:confirmed",
+    kind: "sort",
+    value: CATALOG_SORT_CONFIRMED,
+    label: "Проверенные",
+  },
   {
     key: `filter:${CATALOG_FILTER_FLASH_SALE_ONLY}`,
     kind: "filter",

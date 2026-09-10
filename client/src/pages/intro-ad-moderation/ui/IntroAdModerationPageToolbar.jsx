@@ -14,8 +14,14 @@ import { INTRO_AD_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js
 function buildSectionFilterOptions({ showUsersRaffleSection = false } = {}) {
   const options = [
     { value: "", label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_ALL },
-    { value: INTRO_AD_MODERATION_SECTION_INTRO, label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_INTRO },
-    { value: INTRO_AD_MODERATION_SECTION_BANNER, label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_BANNER },
+    {
+      value: INTRO_AD_MODERATION_SECTION_INTRO,
+      label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_INTRO,
+    },
+    {
+      value: INTRO_AD_MODERATION_SECTION_BANNER,
+      label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_BANNER,
+    },
     {
       value: INTRO_AD_MODERATION_SECTION_PERSONAL,
       label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_PERSONAL,
@@ -59,7 +65,9 @@ export function IntroAdModerationPageToolbar({
   return (
     <div className="intro-ad-moderation-page__toolbar">
       <div className="intro-ad-moderation-page__toolbar-head">
-        <h3 className="intro-ad-moderation-page__heading">{INTRO_AD_MODERATION_PAGE_UI.TITLE}</h3>
+        <h3 className="intro-ad-moderation-page__heading">
+          {INTRO_AD_MODERATION_PAGE_UI.TITLE}
+        </h3>
         <div className="intro-ad-moderation-page__toolbar-meta">
           <span className="intro-ad-moderation-page__count">{summaryCountLabel}</span>
           {onRefresh ? (

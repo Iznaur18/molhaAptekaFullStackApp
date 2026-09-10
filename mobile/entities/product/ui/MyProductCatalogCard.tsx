@@ -23,7 +23,11 @@ import { ProductCompactCardStatusPill } from "@/entities/product/ui/ProductCompa
 import { ProductCardSellerToolbar } from "@/entities/product/ui/ProductCardSellerToolbar";
 import { ProductPriceDisplay } from "@/entities/product/ui/ProductPriceDisplay";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
-import { PRODUCT_CARD_UI, PRODUCT_MODERATION_PAGE_UI, PRODUCT_UI } from "@/shared/config";
+import {
+  PRODUCT_CARD_UI,
+  PRODUCT_MODERATION_PAGE_UI,
+  PRODUCT_UI,
+} from "@/shared/config";
 import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 import { useProductCompactCardStyles } from "@/shared/theme/productCompactCardStyles";
 
@@ -54,7 +58,10 @@ export const MyProductCatalogCard = ({
 
   const name = product.productName?.trim() || "Без названия";
   const openProductLabel = PRODUCT_UI.OPEN_ARIA(name);
-  const reviewLine = formatProductReviewRatingLine(product.averageRating, product.reviewCount);
+  const reviewLine = formatProductReviewRatingLine(
+    product.averageRating,
+    product.reviewCount,
+  );
   const hasDiscount = hasProductCatalogDiscount(product);
   const discountPercent = resolveProductDiscountPercent(product);
   const moderationVariant = getProductModerationBadgeVariant(product);

@@ -60,9 +60,7 @@ export async function estimateShipmentDelivery({
 
   const first = external[0];
   const regionCode = String(first.productRegionCode ?? "").trim();
-  if (
-    !isDeliveryCarrierAvailableInRegion(PRODUCT_DELIVERY_CARRIER_LOBO, regionCode)
-  ) {
+  if (!isDeliveryCarrierAvailableInRegion(PRODUCT_DELIVERY_CARRIER_LOBO, regionCode)) {
     return { available: false, reason: "region" };
   }
 

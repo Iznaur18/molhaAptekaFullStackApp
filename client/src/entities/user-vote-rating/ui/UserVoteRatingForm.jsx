@@ -62,7 +62,9 @@ function VoteRatingCollapsible({ children, averageLabel, hasAverage, votesCaptio
             <span className="user-vote-rating-form__summary-of">
               {USER_VOTE_RATING_UI.OUT_OF_MAX}
             </span>
-            <span className="user-vote-rating-form__summary-votes">· {votesCaption}</span>
+            <span className="user-vote-rating-form__summary-votes">
+              · {votesCaption}
+            </span>
           </span>
         </span>
       </summary>
@@ -171,7 +173,10 @@ export function UserVoteRatingForm({
       });
       onRated(snapshot);
       onVotePersisted?.();
-      queryClient.setQueryData(userVoteQueryKeys.myForTarget(String(targetUser._id)), score);
+      queryClient.setQueryData(
+        userVoteQueryKeys.myForTarget(String(targetUser._id)),
+        score,
+      );
       setVoteSubmitted(true);
       setFlash(USER_VOTE_RATING_UI.SUCCESS);
     } catch (e) {
@@ -196,7 +201,9 @@ export function UserVoteRatingForm({
     <div className="user-vote-rating-form__hero">
       <p className="user-vote-rating-form__hero-value">{aggregate.averageLabel}</p>
       <div className="user-vote-rating-form__hero-meta">
-        <p className="user-vote-rating-form__hero-of">{USER_VOTE_RATING_UI.OUT_OF_MAX}</p>
+        <p className="user-vote-rating-form__hero-of">
+          {USER_VOTE_RATING_UI.OUT_OF_MAX}
+        </p>
         <p className="user-vote-rating-form__hero-votes">{votesCaption}</p>
       </div>
     </div>
@@ -276,7 +283,11 @@ export function UserVoteRatingForm({
             <span>{USER_VOTE_RATING_UI.SCALE_LOW}</span>
             <span>{USER_VOTE_RATING_UI.SCALE_HIGH}</span>
           </div>
-          <div className="user-vote-rating-form__chips" role="group" aria-label={USER_VOTE_RATING_UI.RANGE_LABEL}>
+          <div
+            className="user-vote-rating-form__chips"
+            role="group"
+            aria-label={USER_VOTE_RATING_UI.RANGE_LABEL}
+          >
             {SCORE_OPTIONS.map((value) => {
               const selected = value === score;
               return (

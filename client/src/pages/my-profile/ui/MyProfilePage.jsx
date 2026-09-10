@@ -19,7 +19,13 @@ import { MyProductsCatalogToolbar } from "../../../widgets/my-products-catalog-t
 import { MyProductsShelvesPanel } from "../../../entities/seller-shelf/ui/MyProductsShelvesPanel.jsx";
 import { useMyProfileNav } from "../model/useMyProfileNav.js";
 import { useMyProfilePageUi } from "../model/useMyProfilePageUi.js";
-import { AppIcon, Bell, ChevronDown, Menu, Pencil } from "../../../shared/ui/icon/index.js";
+import {
+  AppIcon,
+  Bell,
+  ChevronDown,
+  Menu,
+  Pencil,
+} from "../../../shared/ui/icon/index.js";
 import { buildSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
 import { UserProfileInfoPanel } from "../../../entities/user/ui/UserProfileInfoPanel.jsx";
 import { GuestProfilePanel } from "./GuestProfilePanel.jsx";
@@ -226,7 +232,7 @@ export function MyProfilePage({
     onCourierClick,
     onCourierModerationClick,
     onShipmentDisputesClick,
-  onShippingCarriersClick,
+    onShippingCarriersClick,
     onCourierOverviewClick,
     onDataConfirmationQueueClick,
     onInstallmentDisputesClick,
@@ -274,51 +280,51 @@ export function MyProfilePage({
         .join(" ")}
     >
       <div className="my-profile-page__layout">
-        {isDrawerLayout
-          ? isMobileNavMounted
-            ? createPortal(
-                <div
-                  className={[
-                    "my-profile-page__mobile-nav-portal",
-                    isMobileNavVisible && "my-profile-page__mobile-nav-portal--open",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  role="presentation"
-                >
-                  <button
-                    type="button"
-                    className="my-profile-page__mobile-nav-backdrop"
-                    aria-label={MY_PROFILE_PAGE_UI.MOBILE_NAV_CLOSE_ARIA}
-                    tabIndex={isMobileNavVisible ? 0 : -1}
-                    onClick={closeMobileNav}
-                  />
-                  <div className="my-profile-page__sidebar-wrap">
-                    <ProfileSidebar
-                      id="my-profile-mobile-nav"
-                      groups={navGroups}
-                      activeTab={activeTab}
-                      onItemSelect={closeMobileNav}
-                      onLogout={onLogout}
-                      user={user}
-                    />
-                  </div>
-                </div>,
-                document.body,
-              )
-            : null
-          : (
-              <div className="my-profile-page__sidebar-wrap">
-                <ProfileSidebar
-                  id="my-profile-mobile-nav"
-                  groups={navGroups}
-                  activeTab={activeTab}
-                  onItemSelect={closeMobileNav}
-                  onLogout={onLogout}
-                  user={user}
+        {isDrawerLayout ? (
+          isMobileNavMounted ? (
+            createPortal(
+              <div
+                className={[
+                  "my-profile-page__mobile-nav-portal",
+                  isMobileNavVisible && "my-profile-page__mobile-nav-portal--open",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                role="presentation"
+              >
+                <button
+                  type="button"
+                  className="my-profile-page__mobile-nav-backdrop"
+                  aria-label={MY_PROFILE_PAGE_UI.MOBILE_NAV_CLOSE_ARIA}
+                  tabIndex={isMobileNavVisible ? 0 : -1}
+                  onClick={closeMobileNav}
                 />
-              </div>
-            )}
+                <div className="my-profile-page__sidebar-wrap">
+                  <ProfileSidebar
+                    id="my-profile-mobile-nav"
+                    groups={navGroups}
+                    activeTab={activeTab}
+                    onItemSelect={closeMobileNav}
+                    onLogout={onLogout}
+                    user={user}
+                  />
+                </div>
+              </div>,
+              document.body,
+            )
+          ) : null
+        ) : (
+          <div className="my-profile-page__sidebar-wrap">
+            <ProfileSidebar
+              id="my-profile-mobile-nav"
+              groups={navGroups}
+              activeTab={activeTab}
+              onItemSelect={closeMobileNav}
+              onLogout={onLogout}
+              user={user}
+            />
+          </div>
+        )}
 
         <div className="my-profile-page__main">
           <button
@@ -329,16 +335,24 @@ export function MyProfilePage({
             aria-controls="my-profile-mobile-nav"
             onClick={openMobileNav}
           >
-            <span className="my-profile-page__mobile-nav-toggle-icon" aria-hidden="true">
+            <span
+              className="my-profile-page__mobile-nav-toggle-icon"
+              aria-hidden="true"
+            >
               <Menu size={20} strokeWidth={2.25} />
             </span>
             <span className="my-profile-page__mobile-nav-toggle-text">
               <span className="my-profile-page__mobile-nav-toggle-caption">
                 {MY_PROFILE_PAGE_UI.MOBILE_NAV_CURRENT_SECTION}
               </span>
-              <span className="my-profile-page__mobile-nav-toggle-label">{activeNavLabel}</span>
+              <span className="my-profile-page__mobile-nav-toggle-label">
+                {activeNavLabel}
+              </span>
             </span>
-            <span className="my-profile-page__mobile-nav-toggle-chevron" aria-hidden="true">
+            <span
+              className="my-profile-page__mobile-nav-toggle-chevron"
+              aria-hidden="true"
+            >
               <ChevronDown size={24} strokeWidth={2.25} />
             </span>
           </button>

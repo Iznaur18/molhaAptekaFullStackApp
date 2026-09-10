@@ -30,15 +30,16 @@ export type InstallmentProgramPlanDraft = {
 
 export const validateInstallmentProgramPlans = (
   plans: InstallmentProgramPlanDraft[],
-):
-  | { ok: true }
-  | { ok: false; message: string } => {
+): { ok: true } | { ok: false; message: string } => {
   if (!Array.isArray(plans) || plans.length === 0) {
     return { ok: false, message: INSTALLMENT_UI.PROGRAM_MODAL_ERROR_NO_PLANS };
   }
 
   if (plans.length > INSTALLMENT_PLANS_MAX) {
-    return { ok: false, message: INSTALLMENT_UI.PROGRAM_MODAL_MAX_PLANS(INSTALLMENT_PLANS_MAX) };
+    return {
+      ok: false,
+      message: INSTALLMENT_UI.PROGRAM_MODAL_MAX_PLANS(INSTALLMENT_PLANS_MAX),
+    };
   }
 
   for (let index = 0; index < plans.length; index += 1) {
@@ -47,7 +48,10 @@ export const validateInstallmentProgramPlans = (
     const title = String(plan.title ?? "").trim();
 
     if (!title) {
-      return { ok: false, message: INSTALLMENT_UI.PROGRAM_MODAL_ERROR_PLAN_TITLE(planNumber) };
+      return {
+        ok: false,
+        message: INSTALLMENT_UI.PROGRAM_MODAL_ERROR_PLAN_TITLE(planNumber),
+      };
     }
 
     if (title.length > INSTALLMENT_PLAN_TITLE_MAX_LENGTH) {

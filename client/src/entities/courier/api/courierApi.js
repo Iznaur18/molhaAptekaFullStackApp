@@ -64,10 +64,10 @@ export async function fetchCourierApplications(params = {}) {
  */
 export async function reviewCourierApplication({ userId, nextStatus, comment = "" }) {
   try {
-    const { data } = await apiClient.patch(
-      `/staff/couriers/${userId}/moderation`,
-      { nextStatus, comment },
-    );
+    const { data } = await apiClient.patch(`/staff/couriers/${userId}/moderation`, {
+      nextStatus,
+      comment,
+    });
     if (!data?.success || !data.data?.courier) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

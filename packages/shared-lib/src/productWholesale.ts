@@ -54,7 +54,10 @@ export const resolveProductUnitPrice = (
 export const formatProductWholesaleBadgeLabel = (
   product: ProductWholesaleLike | null | undefined,
 ): string | null => {
-  if (product?.productWholesaleEnabled !== true || !isProductWholesaleConfigured(product)) {
+  if (
+    product?.productWholesaleEnabled !== true ||
+    !isProductWholesaleConfigured(product)
+  ) {
     return null;
   }
   const minQty = toNonNegInt(product.productWholesaleMinQty);
@@ -73,7 +76,10 @@ export type ProductWholesaleOffer = {
 export const resolveProductWholesaleOffer = (
   product: ProductWholesaleLike | null | undefined,
 ): ProductWholesaleOffer | null => {
-  if (product?.productWholesaleEnabled !== true || !isProductWholesaleConfigured(product)) {
+  if (
+    product?.productWholesaleEnabled !== true ||
+    !isProductWholesaleConfigured(product)
+  ) {
     return null;
   }
   const retailPrice = toNonNegInt(product.productPrice);

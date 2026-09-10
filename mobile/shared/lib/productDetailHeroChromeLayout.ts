@@ -29,5 +29,6 @@ const withHexAlpha = (hex: string, alpha: number): string => {
 export const resolveProductDetailHeroChromeBackground = (colors: ThemeColors): string =>
   withHexAlpha(colors.surface, PRODUCT_DETAIL_HERO_CHROME.surfaceMix);
 
-export const resolveProductDetailHeroWishlistActiveBackground = (colors: ThemeColors): string =>
-  withHexAlpha(colors.danger, PRODUCT_DETAIL_HERO_CHROME.wishlistActiveMix);
+export const resolveProductDetailHeroWishlistActiveBackground = (
+  colors: ThemeColors,
+): string => withHexAlpha(colors.danger, PRODUCT_DETAIL_HERO_CHROME.wishlistActiveMix);

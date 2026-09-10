@@ -1,7 +1,4 @@
-import {
-  CATALOG_FEED_TILES,
-  type CatalogFeedTile,
-} from "./catalogFeedTiles";
+import { CATALOG_FEED_TILES, type CatalogFeedTile } from "./catalogFeedTiles";
 
 export type ProductCatalogFeedTileDisplayFromApi = {
   tileKey: string;
@@ -49,5 +46,7 @@ export const buildResolvedCatalogFeedTileDisplays = (
   displays: ProductCatalogFeedTileDisplayFromApi[],
 ): ResolvedCatalogFeedTileDisplay[] => {
   const overridesByKey = new Map(displays.map((row) => [row.tileKey, row]));
-  return CATALOG_FEED_TILES.map((tile) => resolveCatalogFeedTileDisplay(tile, overridesByKey));
+  return CATALOG_FEED_TILES.map((tile) =>
+    resolveCatalogFeedTileDisplay(tile, overridesByKey),
+  );
 };

@@ -33,7 +33,9 @@ export const AdminOrdersPageToolbar = ({
     <View style={styles.toolbar}>
       <View style={styles.toolbarHead}>
         <Text style={styles.toolbarHeading}>{ADMIN_ORDERS_PAGE_UI.TITLE}</Text>
-        <Text style={styles.ordersCount}>{ADMIN_ORDERS_PAGE_UI.COUNT(ordersCount)}</Text>
+        <Text style={styles.ordersCount}>
+          {ADMIN_ORDERS_PAGE_UI.COUNT(ordersCount)}
+        </Text>
       </View>
 
       <ScrollView
@@ -65,7 +67,9 @@ export const AdminOrdersPageToolbar = ({
               ]}
               onPress={() => onStatusFilterChange(option.value)}
             >
-              <Text style={[styles.statusChipText, isActive && styles.statusChipTextActive]}>
+              <Text
+                style={[styles.statusChipText, isActive && styles.statusChipTextActive]}
+              >
                 {option.label}
               </Text>
             </Pressable>

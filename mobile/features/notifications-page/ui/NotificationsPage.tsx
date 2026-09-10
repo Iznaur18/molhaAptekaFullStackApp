@@ -72,8 +72,7 @@ export const NotificationsPage = () => {
     }, [markReadMutation, sessionQuery]),
   );
 
-  const notifications =
-    sessionItems.length > 0 ? sessionItems : liveNotifications;
+  const notifications = sessionItems.length > 0 ? sessionItems : liveNotifications;
 
   const handleRefresh = useCallback(async () => {
     await sessionQuery.refetch();
@@ -99,7 +98,10 @@ export const NotificationsPage = () => {
     return (
       <View style={styles.centered}>
         <Text style={styles.empty}>{NOTIFICATIONS_PAGE_UI.AUTH_REQUIRED}</Text>
-        <Pressable style={styles.loginButton} onPress={() => router.push("/(auth)/login")}>
+        <Pressable
+          style={styles.loginButton}
+          onPress={() => router.push("/(auth)/login")}
+        >
           <Text style={styles.loginButtonText}>{AUTH_UI.LOGIN_BUTTON}</Text>
         </Pressable>
       </View>
@@ -113,7 +115,9 @@ export const NotificationsPage = () => {
   return (
     <View style={[styles.root, centeredContentStyle]}>
       <View style={styles.toolbar}>
-        <Text style={styles.count}>{NOTIFICATIONS_PAGE_UI.COUNT(notifications.length)}</Text>
+        <Text style={styles.count}>
+          {NOTIFICATIONS_PAGE_UI.COUNT(notifications.length)}
+        </Text>
         <Pressable
           style={styles.clearButton}
           onPress={() => void handleClear()}
@@ -167,7 +171,9 @@ export const NotificationsPage = () => {
                 disabled={!isClickable}
               >
                 <Text style={styles.message}>{item.message}</Text>
-                <Text style={styles.createdAt}>{formatIsoDateTime(item.createdAt)}</Text>
+                <Text style={styles.createdAt}>
+                  {formatIsoDateTime(item.createdAt)}
+                </Text>
               </Pressable>
             );
           }}

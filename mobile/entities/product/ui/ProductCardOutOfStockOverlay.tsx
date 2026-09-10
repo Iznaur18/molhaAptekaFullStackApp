@@ -7,7 +7,9 @@ type ProductCardOutOfStockOverlayProps = {
   product: Record<string, unknown>;
 };
 
-export const ProductCardOutOfStockOverlay = ({ product }: ProductCardOutOfStockOverlayProps) => {
+export const ProductCardOutOfStockOverlay = ({
+  product,
+}: ProductCardOutOfStockOverlayProps) => {
   const styles = useProductCardOutOfStockOverlayStyles();
   const label = resolveProductOutOfStockOverlayLabel(product);
 

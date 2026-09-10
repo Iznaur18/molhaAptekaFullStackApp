@@ -5,18 +5,12 @@ process.env.NODE_ENV = process.env.NODE_ENV ?? "test";
 process.env.JWT_SECRET =
   process.env.JWT_SECRET ?? "integration-test-jwt-secret-min-32-chars";
 
-const {
-  connectMongoTestReplSet,
-  disconnectMongoTestReplSet,
-  clearMongoCollections,
-} = await import("./helpers/mongoTestDb.js");
+const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollections } =
+  await import("./helpers/mongoTestDb.js");
 
-const { OrderModel, ProductModel, UserModel } = await import(
-  "../models/index.js"
-);
-const { up } = await import(
-  "../scripts/migrations/20260903-onec-products-without-images-and-stock.js"
-);
+const { OrderModel, ProductModel, UserModel } = await import("../models/index.js");
+const { up } =
+  await import("../scripts/migrations/20260903-onec-products-without-images-and-stock.js");
 
 /** @type {any} */
 let seller;
@@ -138,9 +132,8 @@ describe("миграция: товары 1С без картинок и без �
   });
 
   it("scope=unavailable удаляет недоступные 1С даже с картинкой", async () => {
-    const { cleanupOneCProductsWithoutImagesAndStock } = await import(
-      "../services/onec/cleanupOneCProductsWithoutImagesAndStock.js"
-    );
+    const { cleanupOneCProductsWithoutImagesAndStock } =
+      await import("../services/onec/cleanupOneCProductsWithoutImagesAndStock.js");
 
     const doomed = await createProduct({
       product1cGuid: "unavail",

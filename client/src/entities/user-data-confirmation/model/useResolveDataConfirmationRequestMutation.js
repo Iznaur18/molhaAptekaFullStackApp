@@ -7,7 +7,8 @@ export function useResolveDataConfirmationRequestMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ requestId, body }) => resolveDataConfirmationRequest(requestId, body),
+    mutationFn: ({ requestId, body }) =>
+      resolveDataConfirmationRequest(requestId, body),
     onSuccess: () => {
       void invalidatePendingDataConfirmationRequests(queryClient);
     },

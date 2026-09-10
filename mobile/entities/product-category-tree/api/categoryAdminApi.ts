@@ -4,7 +4,9 @@ import { formatApiErrorMessage } from "@/shared/lib";
 
 import type { ProductCategoryAdminRow } from "../model/adminTypes";
 
-export const fetchProductCategoriesAdmin = async (): Promise<ProductCategoryAdminRow[]> => {
+export const fetchProductCategoriesAdmin = async (): Promise<
+  ProductCategoryAdminRow[]
+> => {
   try {
     const { data } = await apiClient.get("/product/admin/categories");
     if (!data?.success || !Array.isArray(data.data?.categories)) {
@@ -12,6 +14,8 @@ export const fetchProductCategoriesAdmin = async (): Promise<ProductCategoryAdmi
     }
     return data.data.categories as ProductCategoryAdminRow[];
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, CATEGORY_TREE_ADMIN_PAGE_UI.LOAD_ERROR));
+    throw new Error(
+      formatApiErrorMessage(error, CATEGORY_TREE_ADMIN_PAGE_UI.LOAD_ERROR),
+    );
   }
 };

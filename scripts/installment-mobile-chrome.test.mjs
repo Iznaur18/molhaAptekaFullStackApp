@@ -11,7 +11,9 @@ const readClientFile = (relativePath) =>
   readFileSync(join(CLIENT, relativePath), "utf8");
 
 test("installment contract card uses compact summary and folded payments", () => {
-  const card = readClientFile("src/entities/installment/ui/InstallmentContractCard.jsx");
+  const card = readClientFile(
+    "src/entities/installment/ui/InstallmentContractCard.jsx",
+  );
   const payments = readClientFile(
     "src/entities/installment/ui/InstallmentContractCardPayments.jsx",
   );
@@ -40,9 +42,14 @@ test("installment mobile chrome styles target 640px breakpoint", () => {
   const ordersPage = readClientFile("src/pages/my-orders/ui/MyOrdersPage.jsx");
   const salesPage = readClientFile("src/pages/my-sales/ui/MySalesPage.jsx");
 
-  const layout = readClientFile("src/entities/installment/ui/InstallmentPageLayout.jsx");
+  const layout = readClientFile(
+    "src/entities/installment/ui/InstallmentPageLayout.jsx",
+  );
 
-  assert.match(panelCss, /\.profile-queue-content-panel[\s\S]*--iz-color-surface-subtle/);
+  assert.match(
+    panelCss,
+    /\.profile-queue-content-panel[\s\S]*--iz-color-surface-subtle/,
+  );
   assert.doesNotMatch(layout, /profile-queue-content-panel/);
   assert.match(
     readClientFile("src/entities/installment/ui/InstallmentPageLayout.css"),
@@ -50,11 +57,20 @@ test("installment mobile chrome styles target 640px breakpoint", () => {
   );
   assert.match(ordersPage, /my-orders-page__list/);
   assert.doesNotMatch(ordersPage, /profile-queue-content-panel/);
-  assert.doesNotMatch(panelCss, /\.my-orders-page__list[\s\S]*--iz-color-surface-subtle/);
+  assert.doesNotMatch(
+    panelCss,
+    /\.my-orders-page__list[\s\S]*--iz-color-surface-subtle/,
+  );
   assert.match(salesPage, /my-sales-page__list/);
   assert.doesNotMatch(salesPage, /profile-queue-content-panel/);
-  assert.doesNotMatch(panelCss, /\.my-sales-page__list[\s\S]*--iz-color-surface-subtle/);
-  assert.match(buyerMobile, /installment-buyer-block__form[\s\S]*background: transparent/);
+  assert.doesNotMatch(
+    panelCss,
+    /\.my-sales-page__list[\s\S]*--iz-color-surface-subtle/,
+  );
+  assert.match(
+    buyerMobile,
+    /installment-buyer-block__form[\s\S]*background: transparent/,
+  );
 
   const auctionPage = readClientFile("src/pages/auction/ui/AuctionPage.jsx");
   const dashboardCss = readClientFile(
@@ -72,8 +88,12 @@ test("installment mobile chrome styles target 640px breakpoint", () => {
     /AuctionDashboardBuyerPriceEditor/,
   );
 
-  const subscriptionsPage = readClientFile("src/pages/subscriptions/ui/SubscriptionsPage.jsx");
-  const subscriptionsCss = readClientFile("src/pages/subscriptions/ui/SubscriptionsPage.css");
+  const subscriptionsPage = readClientFile(
+    "src/pages/subscriptions/ui/SubscriptionsPage.jsx",
+  );
+  const subscriptionsCss = readClientFile(
+    "src/pages/subscriptions/ui/SubscriptionsPage.css",
+  );
   const wishlistCss = readClientFile("src/pages/wishlist/ui/WishlistPage.css");
 
   assert.match(subscriptionsPage, /className="subscriptions-page"/);

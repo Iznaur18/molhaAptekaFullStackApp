@@ -7,5 +7,8 @@ export const siteHeaderBannerCampaignQueryKeys = {
     "moderation-pending",
     limit,
   ],
-  moderationManaged: () => [...siteHeaderBannerCampaignQueryKeys.all, "moderation-managed"],
+  moderationManaged: () => [
+    ...siteHeaderBannerCampaignQueryKeys.all,
+    "moderation-managed",
+  ],
 };

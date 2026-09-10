@@ -15,7 +15,14 @@ vi.mock("../../../shared/lib/useScrollLock.js", () => ({
 
 describe("useMyProfilePageUi mobile nav", () => {
   beforeEach(() => {
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "requestAnimationFrame", "cancelAnimationFrame"] });
+    vi.useFakeTimers({
+      toFake: [
+        "setTimeout",
+        "clearTimeout",
+        "requestAnimationFrame",
+        "cancelAnimationFrame",
+      ],
+    });
     vi.mocked(useScrollLock).mockClear();
   });
 

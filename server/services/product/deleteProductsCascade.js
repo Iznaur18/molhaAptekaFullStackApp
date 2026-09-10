@@ -31,9 +31,7 @@ async function removeProductIdsFromAllCarts(productIds) {
   const idSet = new Set(productIds.map(String).filter(Boolean));
   if (idSet.size === 0) return 0;
 
-  const carts = await CartModel.find({})
-    .select("userId items")
-    .lean();
+  const carts = await CartModel.find({}).select("userId items").lean();
   let updatedCarts = 0;
 
   for (const cart of carts) {

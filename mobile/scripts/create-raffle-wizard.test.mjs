@@ -11,11 +11,17 @@ const CONTRACT = join(ROOT, "..", "contract");
 const read = (from, relativePath) => readFileSync(join(from, relativePath), "utf8");
 
 test("create raffle wizard: 3 steps + per-step validate (mobile)", () => {
-  const steps = read(ROOT, "features/create-raffle-page/lib/createRaffleWizardSteps.ts");
+  const steps = read(
+    ROOT,
+    "features/create-raffle-page/lib/createRaffleWizardSteps.ts",
+  );
   const form = read(ROOT, "features/create-raffle-page/lib/createRaffleForm.ts");
   const page = read(ROOT, "features/create-raffle-page/ui/CreateRafflePage.tsx");
   const body = read(ROOT, "features/create-raffle-page/ui/CreateRaffleFormBody.tsx");
-  const progress = read(ROOT, "features/create-raffle-page/ui/CreateRaffleWizardProgress.tsx");
+  const progress = read(
+    ROOT,
+    "features/create-raffle-page/ui/CreateRaffleWizardProgress.tsx",
+  );
   const editModal = read(ROOT, "features/create-raffle-page/ui/CreateRaffleModal.tsx");
   const copy = read(ROOT, "shared/config/appUiCopy.ts");
 
@@ -64,7 +70,10 @@ test("create raffle wizard: create-mode only on web modal", () => {
 });
 
 test("create raffle wizard: instagram optional on conditions step", () => {
-  const steps = read(ROOT, "features/create-raffle-page/lib/createRaffleWizardSteps.ts");
+  const steps = read(
+    ROOT,
+    "features/create-raffle-page/lib/createRaffleWizardSteps.ts",
+  );
   const webWizard = read(CLIENT, "src/entities/raffle/lib/createRaffleWizard.js");
   const body = read(ROOT, "features/create-raffle-page/ui/CreateRaffleFormBody.tsx");
   const contract = read(CONTRACT, "src/raffle.js");
@@ -89,7 +98,10 @@ test("create raffle: block notice + withdraw pending on step 1", () => {
     "features/create-raffle-page/ui/CreateRaffleBlockNotice.tsx",
   );
   const mobileDelete = read(ROOT, "entities/raffle/api/deleteMyRaffle.ts");
-  const webNotice = read(CLIENT, "src/entities/raffle/lib/resolveCreateRaffleBlockNotice.js");
+  const webNotice = read(
+    CLIENT,
+    "src/entities/raffle/lib/resolveCreateRaffleBlockNotice.js",
+  );
   const webModal = read(CLIENT, "src/entities/raffle/ui/CreateRaffleModal.jsx");
   const webDelete = read(CLIENT, "src/entities/raffle/api/deleteMyRaffle.js");
   const mobileCopy = read(ROOT, "shared/config/appUiCopy.ts");

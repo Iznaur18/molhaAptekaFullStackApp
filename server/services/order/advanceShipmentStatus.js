@@ -161,9 +161,8 @@ async function handOverShipmentIfExternalCarrier({ orderId, sellerId, order }) {
   }
 
   try {
-    const { handOverShipmentToLobo } = await import(
-      "../shipping/lobo/loboShipmentOrders.js"
-    );
+    const { handOverShipmentToLobo } =
+      await import("../shipping/lobo/loboShipmentOrders.js");
     return await handOverShipmentToLobo({ orderId, sellerId });
   } catch (error) {
     logServerEvent("error", {

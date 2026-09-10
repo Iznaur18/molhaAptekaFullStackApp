@@ -12,5 +12,7 @@ export function filterPendingModerationCampaigns(
   if (!attentionOnly) {
     return campaigns;
   }
-  return campaigns.filter((campaign) => campaignModerationNeedsAttention(campaign, nowMs));
+  return campaigns.filter((campaign) =>
+    campaignModerationNeedsAttention(campaign, nowMs),
+  );
 }

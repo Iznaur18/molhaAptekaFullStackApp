@@ -13,17 +13,20 @@ const ensureLibraryPermission = async (): Promise<void> => {
   }
 };
 
-export const pickGalleryImageAsset = async (): Promise<UploadImageFilePayload | null> => {
-  await ensureLibraryPermission();
+export const pickGalleryImageAsset =
+  async (): Promise<UploadImageFilePayload | null> => {
+    await ensureLibraryPermission();
 
-  const result = await ImagePicker.launchImageLibraryAsync(IMAGE_PICKER_GALLERY_OPTIONS);
+    const result = await ImagePicker.launchImageLibraryAsync(
+      IMAGE_PICKER_GALLERY_OPTIONS,
+    );
 
-  if (result.canceled || !result.assets[0]) {
-    return null;
-  }
+    if (result.canceled || !result.assets[0]) {
+      return null;
+    }
 
-  return prepareImageAssetForUpload(result.assets[0]);
-};
+    return prepareImageAssetForUpload(result.assets[0]);
+  };
 
 export const pickGalleryImageAssets = async (
   selectionLimit: number,
@@ -42,6 +45,8 @@ export const pickGalleryImageAssets = async (
   }
 
   return Promise.all(
-    result.assets.slice(0, selectionLimit).map((asset) => prepareImageAssetForUpload(asset)),
+    result.assets
+      .slice(0, selectionLimit)
+      .map((asset) => prepareImageAssetForUpload(asset)),
   );
 };

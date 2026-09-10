@@ -23,8 +23,7 @@ export const OrderCardLineItemThumb = ({
   const src = failed
     ? PRODUCT_IMAGE_PLACEHOLDER_URL
     : resolveOrderLineItemProductImageUrl(item);
-  const isClickable =
-    Boolean(onProductClick) && isOrderLineItemProductClickable(item);
+  const isClickable = Boolean(onProductClick) && isOrderLineItemProductClickable(item);
 
   const image = (
     <Image

@@ -32,7 +32,10 @@ const resolveContentBelowImageHeight = (layout) =>
   layout.sellerRowHeight;
 
 const resolveTotalHeight = (tileWidth, layout = LAYOUT) =>
-  tileWidth + 2 * layout.contentInsetX + resolveContentBelowImageHeight(layout) + layout.bottomPadding;
+  tileWidth +
+  2 * layout.contentInsetX +
+  resolveContentBelowImageHeight(layout) +
+  layout.bottomPadding;
 
 test("product media display aspect ratio is square", () => {
   assert.equal(PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO, 1);
@@ -66,7 +69,10 @@ test("catalogProductStyles uses shared product media aspect ratio for catalog gr
   assert.match(source, /contentPressableCatalogGrid:[\s\S]*gap: MCL\.bodyGap/);
   assert.match(source, /cardRootCatalogGrid:[\s\S]*maxHeight: MCL\.priceHeight/);
   assert.match(source, /cardCurrentCatalogGrid:[\s\S]*lineHeight: MCL\.priceHeight/);
-  assert.match(source, /contentCatalogGrid:[\s\S]*height: resolveProductCardCatalogGridContentBelowImageHeight/);
+  assert.match(
+    source,
+    /contentCatalogGrid:[\s\S]*height: resolveProductCardCatalogGridContentBelowImageHeight/,
+  );
   assert.match(source, /contentPressableCatalogGrid:[\s\S]*alignItems: "flex-start"/);
   assert.match(source, /cardRootCatalogGrid:[\s\S]*flexDirection: "row"/);
   assert.doesNotMatch(source, /cardRootCatalogGrid:\s*\{[^}]*overflow:/);

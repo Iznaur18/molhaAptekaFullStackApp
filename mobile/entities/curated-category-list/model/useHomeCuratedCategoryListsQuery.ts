@@ -14,6 +14,7 @@ export const useHomeCuratedCategoryListsQuery = ({
 }: HomeCuratedCategoryListsQueryOptions = {}) =>
   useQuery({
     queryKey: curatedCategoryListQueryKeys.home(regionCode),
-    queryFn: () => fetchHomeCuratedCategoryLists({ regionCode: regionCode || undefined }),
+    queryFn: () =>
+      fetchHomeCuratedCategoryLists({ regionCode: regionCode || undefined }),
     enabled,
   });

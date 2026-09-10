@@ -19,7 +19,8 @@ import "./ProductPickupDetailsPanel.css";
  * }} props
  */
 export function ProductDetailsContentSwitcher({ product, contentPanels }) {
-  const { hasDescription, hasCharacteristics, showSwitcher, defaultPanel } = contentPanels;
+  const { hasDescription, hasCharacteristics, showSwitcher, defaultPanel } =
+    contentPanels;
   const [activePanel, setActivePanel] = useProductDetailsContentPanel(
     defaultPanel,
     product._id,
@@ -54,7 +55,8 @@ export function ProductDetailsContentSwitcher({ product, contentPanels }) {
   const returnTerms = Array.isArray(product.productReturnTerms)
     ? product.productReturnTerms
     : [];
-  const hasReturnTerms = product.productReturnEnabled === true && returnTerms.length > 0;
+  const hasReturnTerms =
+    product.productReturnEnabled === true && returnTerms.length > 0;
   const showDescription =
     activePanel === PRODUCT_DETAILS_CONTENT_PANEL.DESCRIPTION && hasDescription;
   const showCharacteristics =
@@ -105,10 +107,7 @@ export function ProductDetailsContentSwitcher({ product, contentPanels }) {
         ) : null}
         {showReturns ? (
           hasReturnTerms ? (
-            <ProductCharacteristicsDetails
-              items={returnTerms}
-              showTitle={false}
-            />
+            <ProductCharacteristicsDetails items={returnTerms} showTitle={false} />
           ) : (
             <p className="product-details-content-switcher__description">
               {product.productReturnEnabled === true

@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   FlatList,
   View,
@@ -10,7 +18,10 @@ import {
 
 import { useRaffleFeaturedSlideLayout } from "@/entities/raffle/lib/useRaffleFeaturedSlideLayout";
 import { RaffleFeaturedBanner } from "@/entities/raffle/ui/RaffleFeaturedBanner";
-import type { FeaturedRaffleManage, RaffleFromApi } from "@/entities/raffle/model/types";
+import type {
+  FeaturedRaffleManage,
+  RaffleFromApi,
+} from "@/entities/raffle/model/types";
 import { RAFFLE_FEATURED_CAROUSEL_UI } from "@/shared/config";
 import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
 import {
@@ -121,7 +132,10 @@ export const RaffleFeaturedCarousel = ({
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const offsetX = event.nativeEvent.contentOffset.x;
       const nextIndex = Math.round(offsetX / snapInterval);
-      const clampedIndex = Math.min(Math.max(nextIndex, 0), Math.max(raffles.length - 1, 0));
+      const clampedIndex = Math.min(
+        Math.max(nextIndex, 0),
+        Math.max(raffles.length - 1, 0),
+      );
       if (activeIndexRef.current === clampedIndex) {
         return;
       }

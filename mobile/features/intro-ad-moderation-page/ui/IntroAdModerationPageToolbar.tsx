@@ -14,8 +14,14 @@ import { useIntroAdModerationPageStyles } from "@/shared/theme/introAdModeration
 const buildSectionFilterOptions = (showUsersRaffleSection: boolean) => {
   const options: Array<{ value: string; label: string }> = [
     { value: "", label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_ALL },
-    { value: INTRO_AD_MODERATION_SECTION_INTRO, label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_INTRO },
-    { value: INTRO_AD_MODERATION_SECTION_BANNER, label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_BANNER },
+    {
+      value: INTRO_AD_MODERATION_SECTION_INTRO,
+      label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_INTRO,
+    },
+    {
+      value: INTRO_AD_MODERATION_SECTION_BANNER,
+      label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_BANNER,
+    },
     {
       value: INTRO_AD_MODERATION_SECTION_PERSONAL,
       label: INTRO_AD_MODERATION_PAGE_UI.SECTION_FILTER_PERSONAL,
@@ -71,7 +77,9 @@ export const IntroAdModerationPageToolbar = ({
             {isRefreshing ? (
               <ActivityIndicator size="small" />
             ) : (
-              <Text style={styles.refreshText}>{INTRO_AD_MODERATION_PAGE_UI.REFRESH}</Text>
+              <Text style={styles.refreshText}>
+                {INTRO_AD_MODERATION_PAGE_UI.REFRESH}
+              </Text>
             )}
           </Pressable>
         </View>
@@ -86,7 +94,11 @@ export const IntroAdModerationPageToolbar = ({
       >
         {sectionFilterOptions.map((option) => {
           const isActive = sectionFilter === option.value;
-          const chipStyles = resolveIntroAdModerationSectionChipStyles(option.value, isActive, styles);
+          const chipStyles = resolveIntroAdModerationSectionChipStyles(
+            option.value,
+            isActive,
+            styles,
+          );
 
           return (
             <Pressable

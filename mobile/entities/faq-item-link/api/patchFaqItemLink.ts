@@ -20,6 +20,8 @@ export const patchFaqItemLink = async (
     }
     return data.data.link as FaqItemLinkFromApi;
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.PATCH_FAQ_ITEM_LINK_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.PATCH_FAQ_ITEM_LINK_FALLBACK),
+    );
   }
 };

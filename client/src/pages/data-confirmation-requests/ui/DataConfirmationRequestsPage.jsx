@@ -64,7 +64,11 @@ export function DataConfirmationRequestsPage({ onApplicantClick, onQueueChanged 
   return (
     <ul className="data-confirmation-requests-page__list" role="list">
       {requests.map((request) => (
-        <li key={request._id} className="data-confirmation-requests-page__item" role="listitem">
+        <li
+          key={request._id}
+          className="data-confirmation-requests-page__item"
+          role="listitem"
+        >
           <DataConfirmationRequestCard
             request={request}
             onOpenUser={onApplicantClick}

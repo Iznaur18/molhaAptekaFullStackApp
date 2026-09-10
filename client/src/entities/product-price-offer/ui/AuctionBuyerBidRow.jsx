@@ -182,7 +182,9 @@ export function AuctionBuyerBidRow({
         <span className="auction-dashboard-row__price-label">
           {AUCTION_PAGE_UI.BID_PRICE_LABEL}
         </span>
-        <span className="auction-dashboard-row__price">{formatPriceRub(bid.offerPrice)}</span>
+        <span className="auction-dashboard-row__price">
+          {formatPriceRub(bid.offerPrice)}
+        </span>
       </div>
 
       {collapsedPreview ? (

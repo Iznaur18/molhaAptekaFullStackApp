@@ -91,7 +91,11 @@ router.delete(
   removePushTokenValidation,
   removePushTokenController,
 );
-router.get("/me/web-push/vapid-public-key", checkAuthMW, getWebPushVapidPublicKeyController);
+router.get(
+  "/me/web-push/vapid-public-key",
+  checkAuthMW,
+  getWebPushVapidPublicKeyController,
+);
 router.put(
   "/me/web-push-subscription",
   checkAuthMW,

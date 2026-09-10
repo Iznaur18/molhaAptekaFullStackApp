@@ -11,12 +11,18 @@ export const staffBroadcastNotificationBodySchema = z
       .string()
       .trim()
       .min(1, "Укажите заголовок")
-      .max(STAFF_BROADCAST_TITLE_MAX, `Заголовок до ${STAFF_BROADCAST_TITLE_MAX} символов`),
+      .max(
+        STAFF_BROADCAST_TITLE_MAX,
+        `Заголовок до ${STAFF_BROADCAST_TITLE_MAX} символов`,
+      ),
     message: z
       .string()
       .trim()
       .min(1, "Укажите текст")
-      .max(STAFF_BROADCAST_MESSAGE_MAX, `Текст до ${STAFF_BROADCAST_MESSAGE_MAX} символов`),
+      .max(
+        STAFF_BROADCAST_MESSAGE_MAX,
+        `Текст до ${STAFF_BROADCAST_MESSAGE_MAX} символов`,
+      ),
   })
   .superRefine((value, ctx) => {
     const combined = `${value.title}\n${value.message}`;

@@ -23,14 +23,19 @@ export const fetchPendingSellerPersonalCategoryCampaigns = async (limit = 50) =>
     return parsed.campaigns;
   } catch (error) {
     throw new Error(
-      formatApiErrorMessage(error, SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.FETCH_FALLBACK),
+      formatApiErrorMessage(
+        error,
+        SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.FETCH_FALLBACK,
+      ),
     );
   }
 };
 
 export const fetchManagedSellerPersonalCategoryCampaigns = async () => {
   try {
-    const { data } = await apiClient.get("/seller-personal-category/moderation/managed");
+    const { data } = await apiClient.get(
+      "/seller-personal-category/moderation/managed",
+    );
     const parsed = parseApiContractData(
       data,
       managedSellerPersonalCategoryCampaignsDataSchema,
@@ -82,7 +87,9 @@ export const rejectSellerPersonalCategoryCampaign = async (
   }
 };
 
-export const cancelSellerPersonalCategoryCampaignByStaff = async (campaignId: string) => {
+export const cancelSellerPersonalCategoryCampaignByStaff = async (
+  campaignId: string,
+) => {
   try {
     const { data } = await apiClient.post(
       `/seller-personal-category/moderation/${campaignId}/cancel`,
@@ -98,7 +105,9 @@ export const cancelSellerPersonalCategoryCampaignByStaff = async (campaignId: st
   }
 };
 
-export const deleteSellerPersonalCategoryCampaignByStaff = async (campaignId: string) => {
+export const deleteSellerPersonalCategoryCampaignByStaff = async (
+  campaignId: string,
+) => {
   try {
     const { data } = await apiClient.delete(
       `/seller-personal-category/moderation/${campaignId}/staff`,

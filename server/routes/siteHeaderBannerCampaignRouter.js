@@ -14,7 +14,11 @@ import {
   getPendingSiteHeaderBannerCampaignsCountController,
   rejectSiteHeaderBannerCampaignController,
 } from "../controllers/SiteHeaderBannerCampaign/siteHeaderBannerCampaignStaffControllers.js";
-import { checkAuthMW, checkProductModeratorMW, advertisingSubmitRateLimiter } from "../middlewares/index.js";
+import {
+  checkAuthMW,
+  checkProductModeratorMW,
+  advertisingSubmitRateLimiter,
+} from "../middlewares/index.js";
 import {
   rejectSiteHeaderBannerCampaignValidation,
   siteHeaderBannerCampaignIdParamValidation,

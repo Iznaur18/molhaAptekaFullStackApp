@@ -91,7 +91,10 @@ export function ProductDetailsAdminFooter({
             {PRODUCT_CARD_UI.OPEN_SALES_LOCKED_HINT}
           </p>
         ) : isDeletePending ? (
-          <p className="product-details-admin-footer__delete-pending" aria-live="polite">
+          <p
+            className="product-details-admin-footer__delete-pending"
+            aria-live="polite"
+          >
             {PRODUCT_CARD_UI.DELETE_PRODUCT_PENDING}
           </p>
         ) : isDeleteConfirmOpen ? (

@@ -49,7 +49,9 @@ export const pickVideoAsset = async ({
   }
 
   if (asset.fileSize && asset.fileSize > maxBytes) {
-    throw new Error(VIDEO_URL_FIELD_UI.ERROR_SIZE(Math.floor(maxBytes / (1024 * 1024))));
+    throw new Error(
+      VIDEO_URL_FIELD_UI.ERROR_SIZE(Math.floor(maxBytes / (1024 * 1024))),
+    );
   }
 
   return {

@@ -113,7 +113,10 @@ export const ProductSimilarTab = ({
   if (catalogQuery.isError && catalogGridRows.length === 0) {
     return (
       <ScreenErrorState
-        message={formatApiErrorMessage(catalogQuery.error, PRODUCT_SIMILAR_UI.FETCH_FALLBACK)}
+        message={formatApiErrorMessage(
+          catalogQuery.error,
+          PRODUCT_SIMILAR_UI.FETCH_FALLBACK,
+        )}
         onRetry={() => {
           void catalogQuery.refetch();
         }}

@@ -99,14 +99,20 @@ export const AdminPanelShell = ({
 
         <View style={styles.toolbarActions}>
           <Pressable
-            style={[styles.toolbarButton, (isLoading || isRefreshing) && styles.toolbarButtonDisabled]}
+            style={[
+              styles.toolbarButton,
+              (isLoading || isRefreshing) && styles.toolbarButtonDisabled,
+            ]}
             disabled={isLoading || isRefreshing}
             onPress={onRefresh}
           >
             <Text style={styles.toolbarButtonText}>{ADMIN_PANEL_UI.REFRESH}</Text>
           </Pressable>
 
-          <Pressable style={[styles.toolbarButton, styles.toolbarButtonPrimary]} onPress={onToggleCreate}>
+          <Pressable
+            style={[styles.toolbarButton, styles.toolbarButtonPrimary]}
+            onPress={onToggleCreate}
+          >
             <Text style={[styles.toolbarButtonText, styles.toolbarButtonPrimaryText]}>
               {isCreateOpen ? ADMIN_PANEL_UI.HIDE_CREATE : ADMIN_PANEL_UI.SHOW_CREATE}
             </Text>

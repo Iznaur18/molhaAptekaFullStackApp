@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { USER_SAVED_ADDRESSES_MAX, USER_SAVED_ADDRESS_LABEL_MAX_LENGTH } from "@molha/api-contract";
+import {
+  USER_SAVED_ADDRESSES_MAX,
+  USER_SAVED_ADDRESS_LABEL_MAX_LENGTH,
+} from "@molha/api-contract";
 
 import { AddressDeliveryFields } from "./AddressDeliveryFields.jsx";
 import { createUserSavedAddressId } from "../lib/createUserSavedAddressId.js";

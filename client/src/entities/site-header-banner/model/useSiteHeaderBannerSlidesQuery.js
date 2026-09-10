@@ -6,7 +6,10 @@ import { siteHeaderBannerQueryKeys } from "./siteHeaderBannerQueryKeys.js";
 /**
  * @param {{ enabled?: boolean; regionCode?: string }} [options]
  */
-export function useSiteHeaderBannerSlidesQuery({ enabled = true, regionCode = "" } = {}) {
+export function useSiteHeaderBannerSlidesQuery({
+  enabled = true,
+  regionCode = "",
+} = {}) {
   return useQuery({
     queryKey: siteHeaderBannerQueryKeys.slides(regionCode),
     queryFn: () => fetchSiteHeaderBannerSlides({ regionCode: regionCode || undefined }),

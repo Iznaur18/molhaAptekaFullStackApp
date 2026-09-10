@@ -41,7 +41,9 @@ export function SafeDealModerationPage({ onQueueChanged, onApplicantClick }) {
   const [status, setStatus] = useState("pending");
   const [comments, setComments] = useState(/** @type {Record<string, string>} */ ({}));
   const [rowError, setRowError] = useState(/** @type {Record<string, string>} */ ({}));
-  const [pendingUserId, setPendingUserId] = useState(/** @type {string | null} */ (null));
+  const [pendingUserId, setPendingUserId] = useState(
+    /** @type {string | null} */ (null),
+  );
   const [copiedUserId, setCopiedUserId] = useState(/** @type {string | null} */ (null));
 
   const queueQuery = useSafeDealApplicationsQuery({ status });
@@ -110,7 +112,9 @@ export function SafeDealModerationPage({ onQueueChanged, onApplicantClick }) {
       <p className="safe-deal-moderation__hint">{SAFE_DEAL_MODERATION_UI.HINT}</p>
 
       {queueQuery.isPending ? (
-        <p className="safe-deal-moderation__loading">{SAFE_DEAL_MODERATION_UI.LOADING}</p>
+        <p className="safe-deal-moderation__loading">
+          {SAFE_DEAL_MODERATION_UI.LOADING}
+        </p>
       ) : queueQuery.isError ? (
         <p className="safe-deal-moderation__error" role="alert">
           {queueQuery.error instanceof Error

@@ -13,10 +13,7 @@ const sellerB = { _id: "seller-b", userName: "B" };
 
 test("buildOrderStatusFromItems uses completed-tier rollup like server", () => {
   assert.equal(
-    buildOrderStatusFromItems([
-      { status: "confirmed" },
-      { status: "shipped" },
-    ]),
+    buildOrderStatusFromItems([{ status: "confirmed" }, { status: "shipped" }]),
     "shipped",
   );
   assert.equal(

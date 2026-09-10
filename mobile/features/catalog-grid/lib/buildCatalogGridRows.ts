@@ -92,7 +92,11 @@ export const buildCatalogGridRows = (
   if (options.catalogNear && !options.isMineMode) {
     const { withDistance, withoutDistance } = splitCatalogNearProducts(products);
     const baseOptions = { ...options, catalogNear: false };
-    const nearRows = buildCatalogGridRowsInternal(withDistance, columnCount, baseOptions);
+    const nearRows = buildCatalogGridRowsInternal(
+      withDistance,
+      columnCount,
+      baseOptions,
+    );
     if (withoutDistance.length === 0) {
       return nearRows;
     }

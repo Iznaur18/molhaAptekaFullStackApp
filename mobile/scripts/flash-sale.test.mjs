@@ -67,10 +67,7 @@ test("без даты окончания скидки нет", () => {
 test("прогресс рамки — доля оставшегося времени", () => {
   // осталась 1 минута из 2 → половина
   assert.equal(resolveProductFlashSaleBorderProgress(activeProduct(), NOW), 0.5);
-  assert.equal(
-    resolveProductFlashSaleBorderProgress(activeProduct(), NOW + 60_000),
-    0,
-  );
+  assert.equal(resolveProductFlashSaleBorderProgress(activeProduct(), NOW + 60_000), 0);
   // без длительности прогресс не посчитать — рисуется статичная рамка
   assert.equal(
     resolveProductFlashSaleBorderProgress(
@@ -135,7 +132,10 @@ test("активная скидка нормализацию переживае�
 });
 
 test("ручная скидка не считается ручной во время горящей", () => {
-  assert.equal(hasProductManualCatalogDiscount({ productOldPrice: 1000, productPrice: 700 }), true);
+  assert.equal(
+    hasProductManualCatalogDiscount({ productOldPrice: 1000, productPrice: 700 }),
+    true,
+  );
   assert.equal(hasProductManualCatalogDiscount(activeProduct()), false);
   assert.equal(hasProductManualCatalogDiscount({ productPrice: 700 }), false);
 });

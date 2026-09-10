@@ -40,7 +40,10 @@ test("navigateBackOrHome falls back to home", () => {
 test("resolveScreenBackContentPaddingTop reserves button + safe area", () => {
   assert.equal(
     resolveScreenBackContentPaddingTop(20),
-    20 + SCREEN_BACK_BUTTON_EDGE + SCREEN_BACK_BUTTON_SIZE + SCREEN_BACK_BUTTON_GAP_BELOW,
+    20 +
+      SCREEN_BACK_BUTTON_EDGE +
+      SCREEN_BACK_BUTTON_SIZE +
+      SCREEN_BACK_BUTTON_GAP_BELOW,
   );
 });
 
@@ -50,7 +53,10 @@ test("screen back overlay matches auth-page__back chrome", () => {
   const backButton = readMobileFile("shared/ui/ScreenBackButton.tsx");
   const authLayout = readMobileFile("shared/lib/authPageLayout.ts");
   const webCss = readFileSync(
-    join(dirname(fileURLToPath(import.meta.url)), "../../client/src/pages/auth/ui/AuthPage.css"),
+    join(
+      dirname(fileURLToPath(import.meta.url)),
+      "../../client/src/pages/auth/ui/AuthPage.css",
+    ),
     "utf8",
   );
 
@@ -64,7 +70,10 @@ test("screen back overlay matches auth-page__back chrome", () => {
   assert.match(backButton, /Math\.max\(insets\.left, SCREEN_BACK_BUTTON_LEFT_INSET\)/);
   assert.match(backButton, /Feather/);
   assert.match(backButton, /theme\.colors\.link/);
-  assert.match(webCss, /\.auth-page__back[\s\S]*background: rgba\(255, 255, 255, 0\.14\)/);
+  assert.match(
+    webCss,
+    /\.auth-page__back[\s\S]*background: rgba\(255, 255, 255, 0\.14\)/,
+  );
   assert.match(webCss, /border-radius: var\(--iz-control-btn-radius, 10px\)/);
 });
 
@@ -79,7 +88,9 @@ test("stack screens hide native header and wire ScreenWithBack / ScreenBackButto
   const userEdit = readMobileFile("app/user/[id]/edit.tsx");
   const profileEdit = readMobileFile("app/profile/edit.tsx");
   const legal = readMobileFile("features/legal/ui/LegalDocumentsScreen.tsx");
-  const userHeader = readMobileFile("features/user-details-page/ui/UserDetailsHeader.tsx");
+  const userHeader = readMobileFile(
+    "features/user-details-page/ui/UserDetailsHeader.tsx",
+  );
   const backButton = readMobileFile("shared/ui/ScreenBackButton.tsx");
 
   assert.match(layout, /headerShown:\s*false/);

@@ -12,7 +12,11 @@ import {
   USER_ROLE_USER,
 } from "../model/userConstants.js";
 import { isUserBackgroundPresetId } from "../model/userBackgroundPresets.js";
-import { assertUserNameFormat, isRuRegionCode, USER_FULL_NAME_MAX_LENGTH } from "@molha/api-contract";
+import {
+  assertUserNameFormat,
+  isRuRegionCode,
+  USER_FULL_NAME_MAX_LENGTH,
+} from "@molha/api-contract";
 import { EDIT_PROFILE_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { validateUserBusinessHoursForm } from "./userBusinessHoursForm.js";
 

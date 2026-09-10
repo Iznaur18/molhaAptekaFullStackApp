@@ -1,4 +1,7 @@
-import { userSavedAddressesFromProfile, userSavedAddressDuplicateKey } from "@molha/api-contract";
+import {
+  userSavedAddressesFromProfile,
+  userSavedAddressDuplicateKey,
+} from "@molha/api-contract";
 
 import { ensureSingleDefaultUserSavedAddress } from "./ensureSingleDefaultUserSavedAddress.js";
 

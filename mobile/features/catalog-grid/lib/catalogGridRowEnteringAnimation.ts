@@ -32,7 +32,10 @@ export const createCatalogGridRowEntering = (
         ],
       },
       animations: {
-        opacity: withDelay(staggerMs, withTiming(1, { duration: CATALOG_ROW_ENTER_OPACITY_MS })),
+        opacity: withDelay(
+          staggerMs,
+          withTiming(1, { duration: CATALOG_ROW_ENTER_OPACITY_MS }),
+        ),
         transform: [
           {
             translateY: withDelay(

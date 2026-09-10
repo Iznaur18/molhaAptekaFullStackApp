@@ -1,5 +1,11 @@
 import { parseProductDescriptionBlocks } from "@izibuy/shared-lib";
-import { Text, View, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
+import {
+  Text,
+  View,
+  type StyleProp,
+  type TextStyle,
+  type ViewStyle,
+} from "react-native";
 
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 

@@ -34,20 +34,13 @@ export const INSTALLMENT_DISPUTE_ACTIONS = [
 ];
 
 const installmentPlanSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(1)
-    .max(INSTALLMENT_PLAN_TITLE_MAX_LENGTH),
+  title: z.string().trim().min(1).max(INSTALLMENT_PLAN_TITLE_MAX_LENGTH),
   monthsCount: z.coerce
     .number()
     .int()
     .min(INSTALLMENT_MONTHS_MIN)
     .max(INSTALLMENT_MONTHS_MAX),
-  monthlyAmountRub: z.coerce
-    .number()
-    .int()
-    .min(INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB),
+  monthlyAmountRub: z.coerce.number().int().min(INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB),
   firstPaymentRequiredNow: z.boolean().optional(),
 });
 
@@ -71,12 +64,7 @@ export const createInstallmentContractBodySchema = z.object({
     .trim()
     .min(1, "Адрес доставки обязателен")
     .max(ADDRESS_LINE_MAX_LENGTH),
-  deliveryAddressFlat: z
-    .string()
-    .trim()
-    .max(20)
-    .optional()
-    .default(""),
+  deliveryAddressFlat: z.string().trim().max(20).optional().default(""),
   paymentMethod: z.enum(ORDER_PAYMENT_METHODS),
   passportShareConsent: z.literal(true, {
     errorMap: () => ({

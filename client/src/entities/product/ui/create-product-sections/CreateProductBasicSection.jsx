@@ -39,7 +39,11 @@ export function CreateProductBasicSection({
     }
     const start = el.selectionStart ?? 0;
     const end = el.selectionEnd ?? 0;
-    const result = toggleProductDescriptionH1(String(form.productDescription ?? ""), start, end);
+    const result = toggleProductDescriptionH1(
+      String(form.productDescription ?? ""),
+      start,
+      end,
+    );
     setForm((prev) => ({
       ...prev,
       productDescription: result.value,
@@ -57,7 +61,9 @@ export function CreateProductBasicSection({
   return (
     <div className={["create-product-section", className].filter(Boolean).join(" ")}>
       <label className="create-product-section__label">
-        <FormFieldLabel required>{getProductFieldEditLabel("productName")}</FormFieldLabel>
+        <FormFieldLabel required>
+          {getProductFieldEditLabel("productName")}
+        </FormFieldLabel>
         <input
           className="create-product-section__input"
           type="text"
@@ -73,8 +79,14 @@ export function CreateProductBasicSection({
       </label>
 
       <div className="create-product-section__label">
-        <FormFieldLabel required>{getProductFieldEditLabel("productDescription")}</FormFieldLabel>
-        <div className="create-product-section__desc-toolbar" role="toolbar" aria-label={CREATE_PRODUCT_MODAL_UI.DESCRIPTION_TOOLBAR_ARIA}>
+        <FormFieldLabel required>
+          {getProductFieldEditLabel("productDescription")}
+        </FormFieldLabel>
+        <div
+          className="create-product-section__desc-toolbar"
+          role="toolbar"
+          aria-label={CREATE_PRODUCT_MODAL_UI.DESCRIPTION_TOOLBAR_ARIA}
+        >
           <button
             type="button"
             className="create-product-section__desc-toolbar-btn"
@@ -104,7 +116,10 @@ export function CreateProductBasicSection({
               : "create-product-section__char-meter"
           }
         >
-          {CREATE_PRODUCT_MODAL_UI.CHARS_USED(descriptionChars, PRODUCT_DESCRIPTION_MAX_CHARS)}
+          {CREATE_PRODUCT_MODAL_UI.CHARS_USED(
+            descriptionChars,
+            PRODUCT_DESCRIPTION_MAX_CHARS,
+          )}
         </span>
       </div>
       <ProductCharacteristicsEditor

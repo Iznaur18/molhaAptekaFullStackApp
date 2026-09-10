@@ -69,7 +69,12 @@ export const CheckoutSheetModal = ({
   }
 
   return (
-    <Modal visible={modalVisible} animationType="none" transparent onRequestClose={onClose}>
+    <Modal
+      visible={modalVisible}
+      animationType="none"
+      transparent
+      onRequestClose={onClose}
+    >
       <View style={sheetStyles.backdrop}>
         <BackdropContainer
           style={[StyleSheet.absoluteFillObject, backdropAnimatedStyle]}

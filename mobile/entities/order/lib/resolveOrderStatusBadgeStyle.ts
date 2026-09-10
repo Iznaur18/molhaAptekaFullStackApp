@@ -57,6 +57,7 @@ export const resolveOrderStatusBadgeStyle = (
   }
 
   return (
-    ORDER_STATUS_BADGE_PALETTE[status as OrderStatus] ?? ORDER_STATUS_BADGE_PALETTE.default
+    ORDER_STATUS_BADGE_PALETTE[status as OrderStatus] ??
+    ORDER_STATUS_BADGE_PALETTE.default
   );
 };

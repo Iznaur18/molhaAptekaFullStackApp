@@ -1,9 +1,6 @@
 import { summarizeOrderItems } from "@izibuy/shared-lib";
 
-import {
-  ORDER_STATUS_CANCELLED,
-  ORDER_STATUS_RETURNED,
-} from "../model/constants.js";
+import { ORDER_STATUS_CANCELLED, ORDER_STATUS_RETURNED } from "../model/constants.js";
 
 /**
  * Сумма заказа без отменённых и возвращённых позиций.

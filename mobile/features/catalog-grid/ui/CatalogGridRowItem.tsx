@@ -22,69 +22,74 @@ type CatalogGridRowItemProps = {
   highlightRaffleProduct?: boolean;
 };
 
-export const CatalogGridRowItem = memo(({
-  row,
-  columns,
-  gap,
-  contentWidth,
-  tileWidth,
-  rowIndex = 0,
-  disableEntering = false,
-  highlightRaffleProduct = false,
-}: CatalogGridRowItemProps) => {
-  const theme = useAppTheme();
+export const CatalogGridRowItem = memo(
+  ({
+    row,
+    columns,
+    gap,
+    contentWidth,
+    tileWidth,
+    rowIndex = 0,
+    disableEntering = false,
+    highlightRaffleProduct = false,
+  }: CatalogGridRowItemProps) => {
+    const theme = useAppTheme();
 
-  if (!row) {
-    return null;
-  }
+    if (!row) {
+      return null;
+    }
 
-  const cellWidthStyle =
-    columns <= 1
-      ? { width: "100%" as const, minWidth: 0 }
-      : resolveFlexGridItemWidthStyle({ contentWidth, columns, gap });
+    const cellWidthStyle =
+      columns <= 1
+        ? { width: "100%" as const, minWidth: 0 }
+        : resolveFlexGridItemWidthStyle({ contentWidth, columns, gap });
 
-  const content =
-    row.kind === "section-header" ? (
-      <AppText
-        style={{
-          marginTop: 16,
-          marginBottom: 8,
-          fontSize: 17,
-          fontWeight: "700",
-          lineHeight: 22,
-          color: theme.colors.ink,
-        }}
-        accessibilityRole="header"
+    const content =
+      row.kind === "section-header" ? (
+        <AppText
+          style={{
+            marginTop: 16,
+            marginBottom: 8,
+            fontSize: 17,
+            fontWeight: "700",
+            lineHeight: 22,
+            color: theme.colors.ink,
+          }}
+          accessibilityRole="header"
+        >
+          {row.title}
+        </AppText>
+      ) : row.kind === "tier3-banner" ? (
+        <ProductCardBanner product={row.product} />
+      ) : (
+        <View style={[catalogGridRowStyles.row, { gap }]}>
+          {row.products.map((product) => (
+            <View key={product._id} style={cellWidthStyle}>
+              <ProductCard
+                product={product}
+                layout="catalog-grid"
+                catalogGridTileWidth={tileWidth}
+                highlightRaffleProduct={highlightRaffleProduct}
+              />
+            </View>
+          ))}
+          {columns > 1 && row.products.length < columns
+            ? Array.from({ length: columns - row.products.length }, (_, index) => (
+                <View key={`catalog-grid-pad-${index}`} style={cellWidthStyle} />
+              ))
+            : null}
+        </View>
+      );
+
+    return (
+      <CatalogGridRowEnteringShell
+        rowIndex={rowIndex}
+        disableEntering={disableEntering}
       >
-        {row.title}
-      </AppText>
-    ) : row.kind === "tier3-banner" ? (
-      <ProductCardBanner product={row.product} />
-    ) : (
-      <View style={[catalogGridRowStyles.row, { gap }]}>
-        {row.products.map((product) => (
-          <View key={product._id} style={cellWidthStyle}>
-            <ProductCard
-              product={product}
-              layout="catalog-grid"
-              catalogGridTileWidth={tileWidth}
-              highlightRaffleProduct={highlightRaffleProduct}
-            />
-          </View>
-        ))}
-        {columns > 1 && row.products.length < columns
-          ? Array.from({ length: columns - row.products.length }, (_, index) => (
-              <View key={`catalog-grid-pad-${index}`} style={cellWidthStyle} />
-            ))
-          : null}
-      </View>
+        {content}
+      </CatalogGridRowEnteringShell>
     );
-
-  return (
-    <CatalogGridRowEnteringShell rowIndex={rowIndex} disableEntering={disableEntering}>
-      {content}
-    </CatalogGridRowEnteringShell>
-  );
-});
+  },
+);
 
 CatalogGridRowItem.displayName = "CatalogGridRowItem";

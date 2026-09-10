@@ -87,13 +87,18 @@ export const upsertProductInstallmentProgram = async (
   body: UpsertInstallmentProgramBody,
 ) => {
   try {
-    const { data } = await apiClient.put(`/product/${productId}/installment-program`, body);
+    const { data } = await apiClient.put(
+      `/product/${productId}/installment-program`,
+      body,
+    );
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
     return data.data as { message?: string; product?: Record<string, unknown> };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.UPSERT_INSTALLMENT_PROGRAM_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.UPSERT_INSTALLMENT_PROGRAM_FALLBACK),
+    );
   }
 };
 
@@ -109,7 +114,10 @@ export const createInstallmentContract = async (
   },
 ) => {
   try {
-    const { data } = await apiClient.post(`/product/${productId}/installment-contracts`, body);
+    const { data } = await apiClient.post(
+      `/product/${productId}/installment-contracts`,
+      body,
+    );
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
@@ -244,7 +252,9 @@ export const markInstallmentEarlyPayoff = async (
     }
     return data.data as { contract?: InstallmentContract };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, "Не удалось оформить досрочное погашение"));
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось оформить досрочное погашение"),
+    );
   }
 };
 
@@ -266,7 +276,9 @@ export const confirmInstallmentEarlyPayoff = async (
     }
     return data.data as { contract?: InstallmentContract };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, "Не удалось подтвердить досрочное погашение"));
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось подтвердить досрочное погашение"),
+    );
   }
 };
 
@@ -288,7 +300,9 @@ export const cancelInstallmentEarlyPayoff = async (
     }
     return data.data as { contract?: InstallmentContract };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, "Не удалось отменить досрочное погашение"));
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось отменить досрочное погашение"),
+    );
   }
 };
 
@@ -310,15 +324,20 @@ export const rejectInstallmentEarlyPayoff = async (
     }
     return data.data as { contract?: InstallmentContract };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, "Не удалось отклонить досрочное погашение"));
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось отклонить досрочное погашение"),
+    );
   }
 };
 
 export const openInstallmentDispute = async (contractId: string, reason: string) => {
   try {
-    const { data } = await apiClient.post(`/installment/contracts/${contractId}/dispute`, {
-      reason,
-    });
+    const { data } = await apiClient.post(
+      `/installment/contracts/${contractId}/dispute`,
+      {
+        reason,
+      },
+    );
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

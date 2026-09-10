@@ -213,7 +213,4 @@ export const parseUserProfileByIdData = (payload: unknown) =>
   parseApiContractData(payload, userProfileEnvelopeSchema).user;
 
 export const parseUserSellerProductsPageData = (payload: unknown) =>
-  parseSharedUserSellerProductsPageData(
-    payload,
-    API_CLIENT_UI.INVALID_SERVER_RESPONSE,
-  );
+  parseSharedUserSellerProductsPageData(payload, API_CLIENT_UI.INVALID_SERVER_RESPONSE);

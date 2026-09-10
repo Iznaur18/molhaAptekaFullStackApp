@@ -107,7 +107,9 @@ export function CreateRaffleModal({
   const cancelCreateMutation = useCancelRaffleCreateMutation();
   const isEdit = mode === "edit" && raffleToEdit != null;
   const myRaffleQuery = useMyRaffleQuery({ enabled: isOpen && !isEdit });
-  const createAccessQuery = useRaffleCreateAdvertisingQuery({ enabled: isOpen && !isEdit });
+  const createAccessQuery = useRaffleCreateAdvertisingQuery({
+    enabled: isOpen && !isEdit,
+  });
   const [form, setForm] = useState(INITIAL_FORM);
   const [status, setStatus] = useState({ kind: "idle", message: "" });
   const [stepIndex, setStepIndex] = useState(0);
@@ -157,7 +159,8 @@ export function CreateRaffleModal({
     : isEdit
       ? CREATE_RAFFLE_MODAL_UI.SUBMIT_EDIT
       : CREATE_RAFFLE_MODAL_UI.SUBMIT;
-  const primaryLabel = !isEdit && !isLastStep ? CREATE_RAFFLE_MODAL_UI.BTN_NEXT : submitLabel;
+  const primaryLabel =
+    !isEdit && !isLastStep ? CREATE_RAFFLE_MODAL_UI.BTN_NEXT : submitLabel;
   const hintText =
     isEdit && raffleToEdit?.status === "active"
       ? CREATE_RAFFLE_MODAL_UI.HINT_EDIT_ACTIVE
@@ -403,7 +406,11 @@ export function CreateRaffleModal({
             <ModalCloseIcon />
           </button>
         </header>
-        <form className="create-raffle-modal__form" onSubmit={handleFormSubmit} noValidate>
+        <form
+          className="create-raffle-modal__form"
+          onSubmit={handleFormSubmit}
+          noValidate
+        >
           {!isEdit ? (
             <div className="create-raffle-modal__wizard">
               <ProductWizardProgress
@@ -421,7 +428,9 @@ export function CreateRaffleModal({
 
           {!isEdit && isFirstStep && blockNotice ? (
             <div className="create-raffle-modal__block-notice" role="alert">
-              <p className="create-raffle-modal__block-notice-text">{blockNotice.message}</p>
+              <p className="create-raffle-modal__block-notice-text">
+                {blockNotice.message}
+              </p>
               {blockNotice.canWithdraw ? (
                 <button
                   type="button"
@@ -452,7 +461,9 @@ export function CreateRaffleModal({
                       value={form.title}
                       required
                       maxLength={RAFFLE_TITLE_MAX_LENGTH}
-                      onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
+                      onChange={(e) =>
+                        setForm((prev) => ({ ...prev, title: e.target.value }))
+                      }
                     />
                   </FormFieldLabel>
                   <p className="create-raffle-modal__field-hint">
@@ -509,7 +520,9 @@ export function CreateRaffleModal({
                       name="prizeMediaType"
                       value={RAFFLE_PRIZE_MEDIA_TYPE_IMAGE}
                       checked={form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_IMAGE}
-                      onChange={() => handleMediaTypeChange(RAFFLE_PRIZE_MEDIA_TYPE_IMAGE)}
+                      onChange={() =>
+                        handleMediaTypeChange(RAFFLE_PRIZE_MEDIA_TYPE_IMAGE)
+                      }
                       disabled={isSubmitting}
                     />
                     {CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_MEDIA_TYPE_IMAGE}
@@ -520,7 +533,9 @@ export function CreateRaffleModal({
                       name="prizeMediaType"
                       value={RAFFLE_PRIZE_MEDIA_TYPE_VIDEO}
                       checked={form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_VIDEO}
-                      onChange={() => handleMediaTypeChange(RAFFLE_PRIZE_MEDIA_TYPE_VIDEO)}
+                      onChange={() =>
+                        handleMediaTypeChange(RAFFLE_PRIZE_MEDIA_TYPE_VIDEO)
+                      }
                       disabled={isSubmitting}
                     />
                     {CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_MEDIA_TYPE_VIDEO}

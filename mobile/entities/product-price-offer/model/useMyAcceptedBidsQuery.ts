@@ -2,7 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 
 import { priceOfferQueryKeys } from "@/shared/api";
 
-import { fetchMyPriceOfferBids, type MyPriceOfferBid } from "../api/incomingPriceOffersApi";
+import {
+  fetchMyPriceOfferBids,
+  type MyPriceOfferBid,
+} from "../api/incomingPriceOffersApi";
 
 const PRICE_OFFER_STATUS_ACCEPTED = "accepted";
 

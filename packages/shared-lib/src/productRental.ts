@@ -6,8 +6,7 @@ export const PRODUCT_RENTAL_PRICE_UNIT_VALUES = [
   PRODUCT_RENTAL_PRICE_UNIT_DAY,
 ] as const;
 
-export type ProductRentalPriceUnit =
-  (typeof PRODUCT_RENTAL_PRICE_UNIT_VALUES)[number];
+export type ProductRentalPriceUnit = (typeof PRODUCT_RENTAL_PRICE_UNIT_VALUES)[number];
 
 export type ProductRentalLike = {
   productRentalEnabled?: boolean | null;
@@ -23,8 +22,7 @@ const toPositiveInt = (value: unknown): number => {
 export const isProductRentalPriceUnit = (
   value: unknown,
 ): value is ProductRentalPriceUnit =>
-  value === PRODUCT_RENTAL_PRICE_UNIT_HOUR ||
-  value === PRODUCT_RENTAL_PRICE_UNIT_DAY;
+  value === PRODUCT_RENTAL_PRICE_UNIT_HOUR || value === PRODUCT_RENTAL_PRICE_UNIT_DAY;
 
 export const isProductRentalConfigured = (
   product: ProductRentalLike | null | undefined,

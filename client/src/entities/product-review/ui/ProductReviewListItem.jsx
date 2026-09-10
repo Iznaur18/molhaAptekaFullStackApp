@@ -11,7 +11,9 @@ import "./ProductReviewListItem.css";
  */
 export function ProductReviewListItem({ review }) {
   const authorName = review.author?.userName?.trim() || "Покупатель";
-  const createdAtMs = review.createdAt ? new Date(review.createdAt).getTime() : Number.NaN;
+  const createdAtMs = review.createdAt
+    ? new Date(review.createdAt).getTime()
+    : Number.NaN;
   const hasValidDate = Number.isFinite(createdAtMs);
   const dateLabel = hasValidDate
     ? new Date(createdAtMs).toLocaleDateString("ru-RU")
@@ -29,7 +31,10 @@ export function ProductReviewListItem({ review }) {
           ) : null}
         </div>
         {hasValidDate ? (
-          <time className="product-review-item__date" dateTime={String(review.createdAt)}>
+          <time
+            className="product-review-item__date"
+            dateTime={String(review.createdAt)}
+          >
             {dateLabel}
           </time>
         ) : null}

@@ -8,9 +8,8 @@ process.env.JWT_SECRET =
 const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollections } =
   await import("./helpers/mongoTestDb.js");
 const { PrivateUploadModel } = await import("../models/index.js");
-const { isForeignPrivateUpload, isPrivateUploadOwnedBy } = await import(
-  "../services/upload/privateUploadOwnership.js"
-);
+const { isForeignPrivateUpload, isPrivateUploadOwnedBy } =
+  await import("../services/upload/privateUploadOwnership.js");
 
 const OWNER = "aaaaaaaaaaaaaaaaaaaaaaaa";
 const STRANGER = "bbbbbbbbbbbbbbbbbbbbbbbb";

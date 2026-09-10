@@ -67,7 +67,10 @@ export const AdminOrdersPage = () => {
     setStatusError((prev) => ({ ...prev, [orderId]: "" }));
 
     try {
-      const updated = await updateStatusMutation.mutateAsync({ orderId, status: nextStatus });
+      const updated = await updateStatusMutation.mutateAsync({
+        orderId,
+        status: nextStatus,
+      });
       queryClient.setQueryData<{
         orders: AdminOrder[];
         total: number;
@@ -79,13 +82,18 @@ export const AdminOrdersPage = () => {
         }
         return {
           ...old,
-          orders: old.orders.map((order) => (String(order._id) === orderId ? updated : order)),
+          orders: old.orders.map((order) =>
+            String(order._id) === orderId ? updated : order,
+          ),
         };
       });
     } catch (error) {
       setStatusError((prev) => ({
         ...prev,
-        [orderId]: formatApiErrorMessage(error, API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK),
+        [orderId]: formatApiErrorMessage(
+          error,
+          API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK,
+        ),
       }));
     } finally {
       setPendingOrderId(null);
@@ -139,7 +147,10 @@ export const AdminOrdersPage = () => {
       ) : null}
       {ordersQuery.isError ? (
         <Text style={[styles.state, styles.stateError]} accessibilityRole="alert">
-          {formatApiErrorMessage(ordersQuery.error, API_CLIENT_UI.FETCH_ALL_ORDERS_FALLBACK)}
+          {formatApiErrorMessage(
+            ordersQuery.error,
+            API_CLIENT_UI.FETCH_ALL_ORDERS_FALLBACK,
+          )}
         </Text>
       ) : null}
       {!ordersQuery.isPending && !ordersQuery.isError && orders.length === 0 ? (

@@ -7,10 +7,7 @@ import { pickUserProfilePhotoUrl } from "../../../entities/user/lib/pickUserProf
 import { DEFAULT_USER_AVATAR_URL } from "../../../entities/user/model/userConstants.js";
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
 import { UserPremiumDisplayName } from "../../../entities/user/ui/UserPremiumDisplayName.jsx";
-import {
-  USER_LIST_ROW_UI,
-  USERS_PODIUM_UI,
-} from "../../../shared/config/appUiCopy.js";
+import { USER_LIST_ROW_UI, USERS_PODIUM_UI } from "../../../shared/config/appUiCopy.js";
 import { AppIcon, Trophy } from "../../../shared/ui/icon/index.js";
 
 import "./UsersPodium.css";
@@ -147,10 +144,7 @@ function UsersPodiumSlot({ entry, onUserPress }) {
  * }} props
  */
 export function UsersPodium({ entries, onUserPress }) {
-  const displayEntries = useMemo(
-    () => orderUsersPodiumForDisplay(entries),
-    [entries],
-  );
+  const displayEntries = useMemo(() => orderUsersPodiumForDisplay(entries), [entries]);
 
   if (displayEntries.length === 0) {
     return null;

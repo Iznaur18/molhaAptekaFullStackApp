@@ -138,9 +138,19 @@ function MobileBottomNavItem({
     .join(" ");
 
   return (
-    <button type="button" className={itemClassName} aria-label={ariaLabel} onClick={onClick}>
+    <button
+      type="button"
+      className={itemClassName}
+      aria-label={ariaLabel}
+      onClick={onClick}
+    >
       <span className="mobile-bottom-nav__icon-wrap">
-        <AppIcon icon={icon} size="xl" strokeWidth={2.25} className="mobile-bottom-nav__icon" />
+        <AppIcon
+          icon={icon}
+          size="xl"
+          strokeWidth={2.25}
+          className="mobile-bottom-nav__icon"
+        />
         {badgeContent != null ? (
           <span
             className="mobile-bottom-nav__badge"

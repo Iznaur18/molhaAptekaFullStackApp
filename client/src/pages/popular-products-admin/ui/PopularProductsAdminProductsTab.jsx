@@ -70,7 +70,9 @@ export function PopularProductsAdminProductsTab() {
     (
       /** @type {(rows: import('../../../entities/curated-product-list/model/types.js').CuratedProductListFromApi[]) => import('../../../entities/curated-product-list/model/types.js').CuratedProductListFromApi[]} */ updater,
     ) => {
-      queryClient.setQueryData(curatedProductListQueryKeys.admin(), (old) => updater(old ?? []));
+      queryClient.setQueryData(curatedProductListQueryKeys.admin(), (old) =>
+        updater(old ?? []),
+      );
     },
     [queryClient],
   );
@@ -272,7 +274,9 @@ export function PopularProductsAdminProductsTab() {
       }
     >
       {phase === "success" && filteredLists.length === 0 ? (
-        <p className="popular-products-admin__empty">{POPULAR_PRODUCTS_ADMIN_PAGE_UI.EMPTY}</p>
+        <p className="popular-products-admin__empty">
+          {POPULAR_PRODUCTS_ADMIN_PAGE_UI.EMPTY}
+        </p>
       ) : null}
       <div className="popular-products-admin__lists">
         {filteredLists.map((list) => (

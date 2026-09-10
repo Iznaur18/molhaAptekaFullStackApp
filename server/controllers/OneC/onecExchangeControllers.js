@@ -115,10 +115,7 @@ async function handleCheckAuth(req, res, type) {
   setOneCExchangeCookie(res, session.sessionId);
   // Третья строка — значение cookie: часть конфигураций 1С берёт его отсюда,
   // а не из заголовка Set-Cookie.
-  return sendPlain(
-    res,
-    `success\n${ONEC_EXCHANGE_COOKIE_NAME}\n${session.sessionId}`,
-  );
+  return sendPlain(res, `success\n${ONEC_EXCHANGE_COOKIE_NAME}\n${session.sessionId}`);
 }
 
 /**
@@ -199,9 +196,7 @@ async function handleImport(req, res, session) {
  * @param {import('mongoose').HydratedDocument<any>} session
  */
 async function handleQuery(res, session) {
-  const { xml, pushIds, orders } = await buildOneCOrdersXml(
-    String(session.sellerId),
-  );
+  const { xml, pushIds, orders } = await buildOneCOrdersXml(String(session.sellerId));
 
   session.queriedPushIds = pushIds;
   await session.save();

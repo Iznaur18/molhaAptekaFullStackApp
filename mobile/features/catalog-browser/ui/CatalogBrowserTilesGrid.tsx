@@ -28,9 +28,7 @@ export const CatalogBrowserTilesGrid = ({
       accessibilityLabel={accessibilityLabel}
       accessible={Boolean(accessibilityLabel)}
     >
-      <Text
-        style={[styles.sectionTitle, !isFeed && styles.sectionTitleCategories]}
-      >
+      <Text style={[styles.sectionTitle, !isFeed && styles.sectionTitleCategories]}>
         {title}
       </Text>
       <View style={[styles.grid, { gap }]}>{children}</View>

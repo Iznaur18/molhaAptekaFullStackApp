@@ -36,7 +36,13 @@ describe("selectCartLines flash sale", () => {
       productFlashSaleEndsAt: "2099-01-01T00:00:00.000Z",
     };
     const nowMs = Date.parse("2026-01-01T00:00:00.000Z");
-    const { lines } = selectCartLines({ p1: 1 }, [activeProduct], {}, { p1: 700 }, nowMs);
+    const { lines } = selectCartLines(
+      { p1: 1 },
+      [activeProduct],
+      {},
+      { p1: 700 },
+      nowMs,
+    );
 
     expect(lines[0].unitPrice).toBe(700);
     expect(lines[0].priceIncreasedSinceAdd).toBe(false);

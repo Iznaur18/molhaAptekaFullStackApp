@@ -36,7 +36,9 @@ export function ProductPromotionsStaffPage({ onQueueChanged }) {
   const queueQuery = usePendingProductPromotionsQuery();
   const { approveMutation, rejectMutation } = useProductPromotionStaffMutations();
   const [pendingId, setPendingId] = useState(null);
-  const [rowErrors, setRowErrors] = useState(/** @type {Record<string, string>} */ ({}));
+  const [rowErrors, setRowErrors] = useState(
+    /** @type {Record<string, string>} */ ({}),
+  );
 
   const promotions = queueQuery.data ?? [];
 
@@ -69,7 +71,9 @@ export function ProductPromotionsStaffPage({ onQueueChanged }) {
       setRowErrors((prev) => ({
         ...prev,
         [promotionId]:
-          e instanceof Error ? e.message : API_CLIENT_UI.APPROVE_PRODUCT_PROMOTION_FALLBACK,
+          e instanceof Error
+            ? e.message
+            : API_CLIENT_UI.APPROVE_PRODUCT_PROMOTION_FALLBACK,
       }));
     } finally {
       setPendingId(null);
@@ -88,7 +92,9 @@ export function ProductPromotionsStaffPage({ onQueueChanged }) {
       setRowErrors((prev) => ({
         ...prev,
         [promotionId]:
-          e instanceof Error ? e.message : API_CLIENT_UI.REJECT_PRODUCT_PROMOTION_FALLBACK,
+          e instanceof Error
+            ? e.message
+            : API_CLIENT_UI.REJECT_PRODUCT_PROMOTION_FALLBACK,
       }));
     } finally {
       setPendingId(null);
@@ -143,7 +149,8 @@ export function ProductPromotionsStaffPage({ onQueueChanged }) {
                 {promotion.tariffTitle ?? "—"}
               </p>
               <p className="product-promotions-staff-page__meta">
-                {PRODUCT_PROMOTIONS_STAFF_PAGE_UI.ROW_PRICE}: {promotion.amountRub ?? "—"}
+                {PRODUCT_PROMOTIONS_STAFF_PAGE_UI.ROW_PRICE}:{" "}
+                {promotion.amountRub ?? "—"}
               </p>
               {promotion.paymentMethod === PAYMENT_METHOD_POINTS ? (
                 <p className="product-promotions-staff-page__meta">

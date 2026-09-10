@@ -232,9 +232,7 @@ export function ProductPromotionModal({
 
   const streakQuery = useMyPromoReturnStreakQuery({ enabled: isOpen });
   const streakDiscountPercent =
-    streakQuery.data?.claimedToday === true
-      ? streakQuery.data.discountPercent
-      : 0;
+    streakQuery.data?.claimedToday === true ? streakQuery.data.discountPercent : 0;
   const chargeAmountRub = useMemo(
     () => applyPromoReturnStreakDiscount(selectedAmountRub, streakDiscountPercent),
     [selectedAmountRub, streakDiscountPercent],
@@ -329,9 +327,7 @@ export function ProductPromotionModal({
             selectedDuration={selectedDuration}
             selectedTierMeta={selectedTierMeta}
             selectedAmountRub={chargeAmountRub}
-            listAmountRub={
-              streakDiscountPercent > 0 ? selectedAmountRub : null
-            }
+            listAmountRub={streakDiscountPercent > 0 ? selectedAmountRub : null}
             streakDiscountPercent={streakDiscountPercent}
             payWithPoints={payWithPoints}
             loyaltyPointsAvailable={loyaltyPointsAvailable}

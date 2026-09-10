@@ -6,7 +6,10 @@ import { catalogQueryKeys } from "@/shared/api";
 
 import { fetchCatalogProductsPage } from "../api/fetchCatalogProductsPage";
 import { flattenCatalogProducts } from "../lib/flattenCatalogProducts";
-import { buildCatalogListQueryKey, type CatalogListFilters } from "./catalogListFilters";
+import {
+  buildCatalogListQueryKey,
+  type CatalogListFilters,
+} from "./catalogListFilters";
 
 export const useCatalogProductsInfiniteQuery = (
   filters: CatalogListFilters,
@@ -60,10 +63,7 @@ export const useCatalogProductsInfiniteQuery = (
     },
   });
 
-  const products = useMemo(
-    () => flattenCatalogProducts(query.data),
-    [query.data],
-  );
+  const products = useMemo(() => flattenCatalogProducts(query.data), [query.data]);
 
   return {
     ...query,

@@ -60,11 +60,7 @@ export const useInstallmentMutations = () => {
       contractId: string;
       paymentIndex: number;
     }) =>
-      confirmInstallmentPayment(
-        contractId,
-        paymentIndex,
-        createClientIdempotencyKey(),
-      ),
+      confirmInstallmentPayment(contractId, paymentIndex, createClientIdempotencyKey()),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: installmentQueryKeys.all });
     },
@@ -78,11 +74,7 @@ export const useInstallmentMutations = () => {
       contractId: string;
       paymentIndex: number;
     }) =>
-      rejectInstallmentPayment(
-        contractId,
-        paymentIndex,
-        createClientIdempotencyKey(),
-      ),
+      rejectInstallmentPayment(contractId, paymentIndex, createClientIdempotencyKey()),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: installmentQueryKeys.all });
     },
@@ -98,7 +90,9 @@ export const useInstallmentMutations = () => {
     }) => upsertProductInstallmentProgram(productId, body),
     onSuccess: (_data, { productId }) => {
       void queryClient.invalidateQueries({ queryKey: installmentQueryKeys.all });
-      void queryClient.invalidateQueries({ queryKey: installmentQueryKeys.program(productId) });
+      void queryClient.invalidateQueries({
+        queryKey: installmentQueryKeys.program(productId),
+      });
       void queryClient.invalidateQueries({ queryKey: catalogQueryKeys.all });
     },
   });

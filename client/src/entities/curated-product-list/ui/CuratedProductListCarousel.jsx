@@ -52,10 +52,7 @@ export function CuratedProductListCarousel({ title, products, onOpenProduct }) {
           <ul className="curated-product-list-carousel__track" role="list">
             {products.map((product) => (
               <li key={product._id} className="curated-product-list-carousel__item">
-                <CuratedProductCompactCard
-                  product={product}
-                  onOpen={onOpenProduct}
-                />
+                <CuratedProductCompactCard product={product} onOpen={onOpenProduct} />
               </li>
             ))}
           </ul>

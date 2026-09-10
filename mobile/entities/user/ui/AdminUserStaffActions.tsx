@@ -9,6 +9,10 @@ type AdminUserStaffActionsProps = {
 
 export const AdminUserStaffActions = ({ onEditPress }: AdminUserStaffActionsProps) => (
   <View>
-    <AppButton label={ADMIN_EDIT_USER_UI.EDIT_BUTTON} variant="outline" onPress={onEditPress} />
+    <AppButton
+      label={ADMIN_EDIT_USER_UI.EDIT_BUTTON}
+      variant="outline"
+      onPress={onEditPress}
+    />
   </View>
 );

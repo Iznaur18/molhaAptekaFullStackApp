@@ -11,7 +11,8 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.65rem 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-accent) 24%, var(--iz-color-border));
+  border: 1px solid
+    color-mix(in srgb, var(--iz-color-accent) 24%, var(--iz-color-border));
   border-radius: 0.65rem;
   background: linear-gradient(
     135deg,
@@ -115,7 +116,8 @@
 
 .intro-ad-moderation-campaign-frame_attention {
   border-radius: 0.65rem;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--iz-color-warning) 45%, transparent);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--iz-color-warning) 45%, transparent);
 }
 
 .intro-ad-moderation-campaign-frame__toggle {

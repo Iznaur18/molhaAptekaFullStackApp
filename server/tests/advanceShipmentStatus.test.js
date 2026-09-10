@@ -10,15 +10,12 @@ const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollectio
 const { createOrderLoyaltyFixture, createOrderWithReserveTransaction } =
   await import("./helpers/orderLoyaltyTestHelpers.js");
 const { OrderModel, UserInAppNotificationModel } = await import("../models/index.js");
-const { advanceOrderShipmentStatus, resolveNextShipmentStatus } = await import(
-  "../services/order/advanceShipmentStatus.js"
-);
-const { markOrderItemDeliveredBySeller, markOrderItemShippedBySeller } = await import(
-  "../services/order/updateOrderItemStatus.js"
-);
-const { markOrderItemCancelled } = await import(
-  "../services/order/cancelOrderItems.js"
-);
+const { advanceOrderShipmentStatus, resolveNextShipmentStatus } =
+  await import("../services/order/advanceShipmentStatus.js");
+const { markOrderItemDeliveredBySeller, markOrderItemShippedBySeller } =
+  await import("../services/order/updateOrderItemStatus.js");
+const { markOrderItemCancelled } =
+  await import("../services/order/cancelOrderItems.js");
 
 /** @param {any} order @param {string} sellerId @param {string} nextStatus */
 const advance = (order, sellerId, nextStatus) =>
@@ -44,10 +41,7 @@ describe("следующая ступень отправления", () => {
   it("самовывоз ведёт к «Готов к выдаче»", () => {
     assert.equal(resolveNextShipmentStatus("pending", "pickup"), "accepted");
     assert.equal(resolveNextShipmentStatus("accepted", "pickup"), "assembling");
-    assert.equal(
-      resolveNextShipmentStatus("assembling", "pickup"),
-      "ready_for_pickup",
-    );
+    assert.equal(resolveNextShipmentStatus("assembling", "pickup"), "ready_for_pickup");
   });
 
   it("доставка ведёт к «Готов к отгрузке»", () => {

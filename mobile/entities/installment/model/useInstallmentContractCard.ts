@@ -48,12 +48,16 @@ export const useInstallmentContractCard = ({
   const remainingRub = getInstallmentRemainingAmountRub(contract);
   const remainingDays = getInstallmentRemainingDays(contract);
   const statusLabel =
-    INSTALLMENT_UI.CONTRACT_STATUS_LABEL[contract.status ?? ""] ?? contract.status ?? "—";
+    INSTALLMENT_UI.CONTRACT_STATUS_LABEL[contract.status ?? ""] ??
+    contract.status ??
+    "—";
   const paidPercent =
     (contract.totalAmountRub ?? 0) > 0
       ? Math.min(
           100,
-          Math.round(((contract.paidAmountRub ?? 0) / (contract.totalAmountRub ?? 1)) * 100),
+          Math.round(
+            ((contract.paidAmountRub ?? 0) / (contract.totalAmountRub ?? 1)) * 100,
+          ),
         )
       : 0;
 
@@ -94,7 +98,11 @@ export const useInstallmentContractCard = ({
       await action();
       onUpdated?.();
     } catch (actionError) {
-      setError(actionError instanceof Error ? actionError.message : INSTALLMENT_UI.ERROR_GENERIC);
+      setError(
+        actionError instanceof Error
+          ? actionError.message
+          : INSTALLMENT_UI.ERROR_GENERIC,
+      );
     } finally {
       setPendingKey(null);
     }
@@ -116,7 +124,9 @@ export const useInstallmentContractCard = ({
     disputeReason,
     setDisputeReason,
     handleMarkPaid: (paymentIndex: number) => {
-      void runAction(`mark:${paymentIndex}`, () => markPaidMutation.mutateAsync(paymentIndex));
+      void runAction(`mark:${paymentIndex}`, () =>
+        markPaidMutation.mutateAsync(paymentIndex),
+      );
     },
     handleConfirmPayment: (paymentIndex: number) => {
       void runAction(`confirm:${paymentIndex}`, () =>

@@ -40,7 +40,9 @@ export const fetchUsersSearchPage = async (
       params: {
         page: params.page ?? 1,
         limit: Math.min(maxLimit, Math.max(1, params.limit ?? maxLimit)),
-        ...(params.search != null && params.search !== "" ? { search: params.search } : {}),
+        ...(params.search != null && params.search !== ""
+          ? { search: params.search }
+          : {}),
       },
     });
 
@@ -58,6 +60,8 @@ export const fetchUsersSearchPage = async (
       limit: Number(limit) || maxLimit,
     };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_USERS_SEARCH_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_USERS_SEARCH_FALLBACK),
+    );
   }
 };

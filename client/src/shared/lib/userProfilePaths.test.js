@@ -26,9 +26,7 @@ describe("userProfilePaths", () => {
 
   it("Accept: HTML document → SPA, JSON → API", () => {
     expect(isHtmlDocumentAccept("text/html,application/xhtml+xml")).toBe(true);
-    expect(
-      isHtmlDocumentAccept("application/json, text/plain, */*"),
-    ).toBe(false);
+    expect(isHtmlDocumentAccept("application/json, text/plain, */*")).toBe(false);
     expect(
       shouldServeUserProfileAsSpa(
         `/user/${USER_ID}`,

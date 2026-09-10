@@ -10,7 +10,9 @@ const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
 test("intro ad moderation page mirrors web hub chrome and filters", () => {
-  const page = readMobileFile("features/intro-ad-moderation-page/ui/IntroAdModerationPage.tsx");
+  const page = readMobileFile(
+    "features/intro-ad-moderation-page/ui/IntroAdModerationPage.tsx",
+  );
   const styles = readMobileFile("shared/theme/introAdModerationPageStyles.ts");
 
   assert.match(page, /ProfileMobileSectionToggle/);
@@ -54,7 +56,9 @@ test("intro ad moderation campaign card supports collapsible queue rows", () => 
 });
 
 test("intro ad moderation sub-sections support attention filter and expand state", () => {
-  const page = readMobileFile("features/intro-ad-moderation-page/ui/IntroAdModerationPage.tsx");
+  const page = readMobileFile(
+    "features/intro-ad-moderation-page/ui/IntroAdModerationPage.tsx",
+  );
   const raffleSection = readMobileFile(
     "features/intro-ad-moderation-page/ui/RaffleModerationSection.tsx",
   );

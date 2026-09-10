@@ -5,9 +5,7 @@ import { fetchCurrentUserProfile } from "../api/fetchCurrentUserProfile.js";
 import { isPremiumActive } from "../lib/isPremiumActive.js";
 import { AUTH_ME_STALE_TIME_MS } from "../../../shared/api/queryClient.js";
 import { clearDeadAuthSession } from "../../../shared/api/apiClient.js";
-import {
-  clearAuthMeCache,
-} from "../lib/authMeQueryCache.js";
+import { clearAuthMeCache } from "../lib/authMeQueryCache.js";
 import { subscribeAuthSessionDead } from "../../../shared/lib/authSessionEvents.js";
 import { authMeQueryKeys } from "./authMeQueryKeys.js";
 
@@ -60,7 +58,10 @@ export function useAuthSession() {
   // на них нельзя звать clearDeadAuthSession (POST /auth/logout гасил бы живую
   // httpOnly-cookie и выкидывал пользователя после перезагрузки).
 
-  useEffect(() => subscribeAuthSessionDead(() => clearAuthMeCache(queryClient)), [queryClient]);
+  useEffect(
+    () => subscribeAuthSessionDead(() => clearAuthMeCache(queryClient)),
+    [queryClient],
+  );
 
   const patchAuthMeUser = useCallback(
     /** @param {Partial<UserPublicProfile>} updates */
@@ -132,7 +133,9 @@ export function useAuthSession() {
       // после ближайшего refetch»), чтобы isPremiumActive сразу видел премиум и
       // не опирался на устаревшую (возможно, прошедшую) дату в кэше.
       patchAuthMeUser(
-        value ? { isPremiumUser: true, premiumExpiresAt: null } : { isPremiumUser: false },
+        value
+          ? { isPremiumUser: true, premiumExpiresAt: null }
+          : { isPremiumUser: false },
       );
     },
     [patchAuthMeUser],

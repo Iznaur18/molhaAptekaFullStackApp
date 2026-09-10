@@ -77,6 +77,8 @@ export const fetchCatalogProductsPage = async ({
       pagination: parsed.pagination,
     };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_PRODUCTS_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_PRODUCTS_FALLBACK),
+    );
   }
 };

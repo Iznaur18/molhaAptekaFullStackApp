@@ -10,7 +10,9 @@ const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
 test("data confirmation page mirrors web plan panel and status blocks", () => {
-  const page = readMobileFile("features/data-confirmation-page/ui/DataConfirmationPage.tsx");
+  const page = readMobileFile(
+    "features/data-confirmation-page/ui/DataConfirmationPage.tsx",
+  );
   const styles = readMobileFile("shared/theme/dataConfirmationPageStyles.ts");
 
   assert.match(page, /ProfileMobileSectionToggle/);

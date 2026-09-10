@@ -10,12 +10,14 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.65rem 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-primary) 28%, var(--iz-color-border));
+  border: 1px solid
+    color-mix(in srgb, var(--iz-color-primary) 28%, var(--iz-color-border));
   border-radius: 0.65rem;
   background: linear-gradient(
     135deg,
     var(--iz-color-surface) 0%,
-    color-mix(in srgb, var(--iz-color-primary) 6%, var(--iz-color-surface-elevated)) 140%
+    color-mix(in srgb, var(--iz-color-primary) 6%, var(--iz-color-surface-elevated))
+      140%
   );
 }
 

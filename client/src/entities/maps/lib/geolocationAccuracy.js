@@ -12,7 +12,10 @@ export const GEOLOCATION_WATCH_MAX_MS = 10_000;
  * @param {number} accuracyMeters
  */
 export function isGeolocationAccuracyLow(accuracyMeters) {
-  return !Number.isFinite(accuracyMeters) || accuracyMeters > GEOLOCATION_LOW_ACCURACY_THRESHOLD_M;
+  return (
+    !Number.isFinite(accuracyMeters) ||
+    accuracyMeters > GEOLOCATION_LOW_ACCURACY_THRESHOLD_M
+  );
 }
 
 /**

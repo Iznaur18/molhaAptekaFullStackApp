@@ -12,6 +12,8 @@ export const fetchFaqItemLinks = async (): Promise<FaqItemLinkFromApi[]> => {
     }
     return data.data.links as FaqItemLinkFromApi[];
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_FAQ_ITEM_LINKS_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_FAQ_ITEM_LINKS_FALLBACK),
+    );
   }
 };

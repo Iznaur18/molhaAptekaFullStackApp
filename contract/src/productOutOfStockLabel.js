@@ -9,9 +9,12 @@ export const PRODUCT_OUT_OF_STOCK_LABEL_VALUES = [
   PRODUCT_OUT_OF_STOCK_LABEL_COMING_SOON,
 ];
 
-export const PRODUCT_OUT_OF_STOCK_LABEL_DEFAULT = PRODUCT_OUT_OF_STOCK_LABEL_OUT_OF_STOCK;
+export const PRODUCT_OUT_OF_STOCK_LABEL_DEFAULT =
+  PRODUCT_OUT_OF_STOCK_LABEL_OUT_OF_STOCK;
 
-export const productOutOfStockLabelFieldSchema = z.enum(PRODUCT_OUT_OF_STOCK_LABEL_VALUES);
+export const productOutOfStockLabelFieldSchema = z.enum(
+  PRODUCT_OUT_OF_STOCK_LABEL_VALUES,
+);
 
 /**
  * @param {unknown} raw

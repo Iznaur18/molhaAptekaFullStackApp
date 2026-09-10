@@ -104,7 +104,9 @@ describe("AddressDeliveryFields", () => {
     );
 
     expect(screen.getByText("Кастомный адрес")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(ADDRESS_DELIVERY_UI.PLACEHOLDER_LINE)).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(ADDRESS_DELIVERY_UI.PLACEHOLDER_LINE),
+    ).toBeInTheDocument();
   });
 
   it("requests browser geolocation from fullscreen map", async () => {

@@ -8,7 +8,10 @@ type UseUserPurchasesQueryOptions = {
   enabled?: boolean;
 };
 
-export const useUserPurchasesQuery = ({ userId, enabled = true }: UseUserPurchasesQueryOptions) => {
+export const useUserPurchasesQuery = ({
+  userId,
+  enabled = true,
+}: UseUserPurchasesQueryOptions) => {
   const normalizedUserId = userId.trim();
 
   return useQuery({

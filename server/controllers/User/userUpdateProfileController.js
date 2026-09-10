@@ -185,7 +185,10 @@ export const userUpdateProfileController = async (req, res) => {
     }
 
     // Владелец: телефон только через /auth/phone/bind/* (OTP). Staff — может PATCH.
-    if (isCurrentUserOwner && Object.prototype.hasOwnProperty.call(updateData, "userPhoneNumber")) {
+    if (
+      isCurrentUserOwner &&
+      Object.prototype.hasOwnProperty.call(updateData, "userPhoneNumber")
+    ) {
       return errorRes(res, 403, PHONE_CHANGE_REQUIRES_OTP_MESSAGE);
     }
 

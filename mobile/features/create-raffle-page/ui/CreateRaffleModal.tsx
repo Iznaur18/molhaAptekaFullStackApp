@@ -46,11 +46,17 @@ export const CreateRaffleModal = ({
     if (!visible) {
       return;
     }
-    setForm(isEdit && raffleToEdit ? formFromRaffle(raffleToEdit) : INITIAL_CREATE_RAFFLE_FORM);
+    setForm(
+      isEdit && raffleToEdit
+        ? formFromRaffle(raffleToEdit)
+        : INITIAL_CREATE_RAFFLE_FORM,
+    );
     setErrorMessage("");
   }, [visible, isEdit, raffleToEdit]);
 
-  const modalTitle = isEdit ? CREATE_RAFFLE_MODAL_UI.TITLE_EDIT : CREATE_RAFFLE_MODAL_UI.TITLE;
+  const modalTitle = isEdit
+    ? CREATE_RAFFLE_MODAL_UI.TITLE_EDIT
+    : CREATE_RAFFLE_MODAL_UI.TITLE;
   const ariaDialog = isEdit
     ? CREATE_RAFFLE_MODAL_UI.ARIA_DIALOG_EDIT
     : CREATE_RAFFLE_MODAL_UI.ARIA_DIALOG;
@@ -95,7 +101,10 @@ export const CreateRaffleModal = ({
     try {
       const body = buildCreateRaffleSubmitBody(form);
       if (useStaffApi) {
-        await patchStaffMutation.mutateAsync({ raffleId: String(raffleToEdit._id), body });
+        await patchStaffMutation.mutateAsync({
+          raffleId: String(raffleToEdit._id),
+          body,
+        });
       } else {
         await patchMyMutation.mutateAsync({ raffleId: String(raffleToEdit._id), body });
       }
@@ -122,7 +131,11 @@ export const CreateRaffleModal = ({
     >
       <View style={styles.overlay}>
         <ModalSheetGradientBackdrop />
-        <Pressable style={styles.backdropPressable} onPress={handleClose} accessibilityRole="button" />
+        <Pressable
+          style={styles.backdropPressable}
+          onPress={handleClose}
+          accessibilityRole="button"
+        />
         <View style={styles.card} accessibilityLabel={ariaDialog}>
           <View style={styles.header}>
             <Text style={styles.title}>{modalTitle}</Text>
@@ -146,7 +159,9 @@ export const CreateRaffleModal = ({
               form={form}
               onFormChange={(patch) => setForm((prev) => ({ ...prev, ...patch }))}
               onMediaTypeChange={(prizeMediaType: PrizeMediaType) =>
-                setForm((prev) => applyCreateRaffleMediaTypeChange(prev, prizeMediaType))
+                setForm((prev) =>
+                  applyCreateRaffleMediaTypeChange(prev, prizeMediaType),
+                )
               }
               isSubmitting={isSubmitting}
               hintText={hintText}

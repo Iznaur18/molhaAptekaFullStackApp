@@ -20,11 +20,17 @@ export const registerPhoneUserValidation = [
   validateRuDeliveryAddress(),
 ];
 
-export const loginPhonePasswordValidation = validateBodyZod(loginPhonePasswordBodySchema);
+export const loginPhonePasswordValidation = validateBodyZod(
+  loginPhonePasswordBodySchema,
+);
 
-export const loginPhoneOtpRequestValidation = validateBodyZod(loginPhoneOtpRequestBodySchema);
+export const loginPhoneOtpRequestValidation = validateBodyZod(
+  loginPhoneOtpRequestBodySchema,
+);
 
-export const loginPhoneOtpConfirmValidation = validateBodyZod(loginPhoneOtpConfirmBodySchema);
+export const loginPhoneOtpConfirmValidation = validateBodyZod(
+  loginPhoneOtpConfirmBodySchema,
+);
 
 export const phoneBindRequestValidation = validateBodyZod(phoneBindRequestBodySchema);
 
@@ -34,8 +40,12 @@ export const emailBindRequestValidation = validateBodyZod(emailBindRequestBodySc
 
 export const emailBindConfirmValidation = validateBodyZod(emailBindConfirmBodySchema);
 
-export const passwordResetRequestValidation = validateBodyZod(passwordResetRequestBodySchema);
+export const passwordResetRequestValidation = validateBodyZod(
+  passwordResetRequestBodySchema,
+);
 
-export const passwordResetConfirmValidation = validateBodyZod(passwordResetConfirmBodySchema);
+export const passwordResetConfirmValidation = validateBodyZod(
+  passwordResetConfirmBodySchema,
+);
 
 export const passwordChangeValidation = validateBodyZod(passwordChangeBodySchema);

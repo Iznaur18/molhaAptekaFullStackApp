@@ -8,7 +8,11 @@
   --adv-accent: var(--iz-color-action);
   --adv-accent-soft: var(--iz-color-action-soft);
   --adv-accent-strong: var(--iz-color-action);
-  --adv-accent-border: color-mix(in srgb, var(--iz-color-action) 35%, var(--iz-color-border));
+  --adv-accent-border: color-mix(
+    in srgb,
+    var(--iz-color-action) 35%,
+    var(--iz-color-border)
+  );
   --adv-accent-ring: color-mix(in srgb, var(--iz-color-action) 18%, transparent);
 }
 

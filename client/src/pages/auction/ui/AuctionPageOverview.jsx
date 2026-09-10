@@ -21,14 +21,30 @@ export function AuctionPageOverview({
   onAttentionFilterChange,
 }) {
   return (
-    <div className="auction-page__overview" role="region" aria-label={AUCTION_PAGE_UI.TITLE}>
-      <button type="button" className="auction-page__overview-tile" onClick={onBuyerFilterClick}>
-        <span className="auction-page__overview-label">{AUCTION_PAGE_UI.OVERVIEW_BUYER_BIDS}</span>
+    <div
+      className="auction-page__overview"
+      role="region"
+      aria-label={AUCTION_PAGE_UI.TITLE}
+    >
+      <button
+        type="button"
+        className="auction-page__overview-tile"
+        onClick={onBuyerFilterClick}
+      >
+        <span className="auction-page__overview-label">
+          {AUCTION_PAGE_UI.OVERVIEW_BUYER_BIDS}
+        </span>
         <strong className="auction-page__overview-value">{buyerCount}</strong>
       </button>
 
-      <button type="button" className="auction-page__overview-tile" onClick={onSellerFilterClick}>
-        <span className="auction-page__overview-label">{AUCTION_PAGE_UI.OVERVIEW_INCOMING}</span>
+      <button
+        type="button"
+        className="auction-page__overview-tile"
+        onClick={onSellerFilterClick}
+      >
+        <span className="auction-page__overview-label">
+          {AUCTION_PAGE_UI.OVERVIEW_INCOMING}
+        </span>
         <strong className="auction-page__overview-value">{sellerCount}</strong>
       </button>
 
@@ -44,7 +60,9 @@ export function AuctionPageOverview({
         aria-pressed={attentionOnly}
         onClick={() => onAttentionFilterChange(!attentionOnly)}
       >
-        <span className="auction-page__overview-label">{AUCTION_PAGE_UI.OVERVIEW_ATTENTION}</span>
+        <span className="auction-page__overview-label">
+          {AUCTION_PAGE_UI.OVERVIEW_ATTENTION}
+        </span>
         <strong className="auction-page__overview-value">{attentionCount}</strong>
       </button>
     </div>

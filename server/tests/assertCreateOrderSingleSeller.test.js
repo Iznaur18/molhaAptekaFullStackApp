@@ -3,10 +3,8 @@ import { describe, it } from "node:test";
 
 process.env.NODE_ENV = process.env.NODE_ENV ?? "test";
 
-const {
-  assertCreateOrderSingleSeller,
-  CREATE_ORDER_MULTI_SELLER_MESSAGE,
-} = await import("../services/order/assertCreateOrderSingleSeller.js");
+const { assertCreateOrderSingleSeller, CREATE_ORDER_MULTI_SELLER_MESSAGE } =
+  await import("../services/order/assertCreateOrderSingleSeller.js");
 const { AppError } = await import("../errors/AppError.js");
 
 const SELLER_A = "aaaaaaaaaaaaaaaaaaaaaaaa";

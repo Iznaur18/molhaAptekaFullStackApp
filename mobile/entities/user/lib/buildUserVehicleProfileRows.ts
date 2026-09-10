@@ -8,7 +8,9 @@ type UserWithCourierProfile = {
   courierProfile?: Record<string, unknown> | null;
 };
 
-export const buildUserVehicleProfileRows = (user: UserWithCourierProfile): ProfileRow[] => {
+export const buildUserVehicleProfileRows = (
+  user: UserWithCourierProfile,
+): ProfileRow[] => {
   const vehicle = getCourierVehiclePublicFields(user?.courierProfile);
   if (!vehicle) {
     return [];

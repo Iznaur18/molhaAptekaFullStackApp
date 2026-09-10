@@ -48,7 +48,9 @@ export function useCreateProductWizard({ isOpen, form, draftEnabled = false }) {
       return false;
     }
 
-    setStepIndex((current) => Math.min(current + 1, CREATE_PRODUCT_WIZARD_STEP_COUNT - 1));
+    setStepIndex((current) =>
+      Math.min(current + 1, CREATE_PRODUCT_WIZARD_STEP_COUNT - 1),
+    );
     setStepError("");
     return true;
   }, [validateCurrentStep]);
@@ -59,7 +61,10 @@ export function useCreateProductWizard({ isOpen, form, draftEnabled = false }) {
   }, []);
 
   const goToStep = useCallback((index) => {
-    const safeIndex = Math.max(0, Math.min(index, CREATE_PRODUCT_WIZARD_STEP_COUNT - 1));
+    const safeIndex = Math.max(
+      0,
+      Math.min(index, CREATE_PRODUCT_WIZARD_STEP_COUNT - 1),
+    );
     setStepIndex(safeIndex);
     setStepError("");
   }, []);

@@ -6,12 +6,10 @@ process.env.JWT_SECRET =
   process.env.JWT_SECRET ?? "integration-test-jwt-secret-min-32-chars";
 
 // Доступность службы читается из базы: без неё проверка просто зависает.
-const { connectMongoTestReplSet, disconnectMongoTestReplSet } = await import(
-  "./helpers/mongoTestDb.js"
-);
-const { buildProductPatchSet } = await import(
-  "../services/product/buildProductPatchSet.js"
-);
+const { connectMongoTestReplSet, disconnectMongoTestReplSet } =
+  await import("./helpers/mongoTestDb.js");
+const { buildProductPatchSet } =
+  await import("../services/product/buildProductPatchSet.js");
 
 /** Товар, который возят курьеры Gitorg. */
 const courierProduct = {

@@ -46,12 +46,13 @@ export async function fetchPendingIntroAdCampaignsOnlyCount() {
  * @returns {Promise<number>}
  */
 export async function fetchPendingAdModerationNavBadgeCount() {
-  const [introCount, bannerCount, personalCategoryCount, raffleCount] = await Promise.all([
-    fetchPendingIntroAdCampaignsOnlyCount(),
-    fetchPendingSiteHeaderBannerCampaignsCount().catch(() => 0),
-    fetchPendingSellerPersonalCategoryCampaignsCount().catch(() => 0),
-    fetchPendingRafflesCount().catch(() => 0),
-  ]);
+  const [introCount, bannerCount, personalCategoryCount, raffleCount] =
+    await Promise.all([
+      fetchPendingIntroAdCampaignsOnlyCount(),
+      fetchPendingSiteHeaderBannerCampaignsCount().catch(() => 0),
+      fetchPendingSellerPersonalCategoryCampaignsCount().catch(() => 0),
+      fetchPendingRafflesCount().catch(() => 0),
+    ]);
   return introCount + bannerCount + personalCategoryCount + raffleCount;
 }
 

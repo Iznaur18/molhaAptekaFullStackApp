@@ -117,7 +117,9 @@ export const ProductPromoCodesModal = ({
 
   const activeCount = rows.filter((row) => row.enabled).length;
   const patchRow = (index: number, patch: Partial<PromoRow>) => {
-    setRows((prev) => prev.map((item, i) => (i === index ? { ...item, ...patch } : item)));
+    setRows((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, ...patch } : item)),
+    );
   };
 
   const handleSave = async () => {
@@ -224,7 +226,10 @@ export const ProductPromoCodesModal = ({
               key={`promo-row-${index}`}
               style={[
                 localStyles.card,
-                { borderColor: theme.colors.border, backgroundColor: theme.colors.surfaceMuted },
+                {
+                  borderColor: theme.colors.border,
+                  backgroundColor: theme.colors.surfaceMuted,
+                },
               ]}
             >
               <Text style={styles.fieldLabel}>
@@ -232,7 +237,9 @@ export const ProductPromoCodesModal = ({
               </Text>
 
               <View style={styles.rowField}>
-                <Text style={styles.fieldLabel}>{PRODUCT_PROMO_CODE_UI.FIELD_CODE}</Text>
+                <Text style={styles.fieldLabel}>
+                  {PRODUCT_PROMO_CODE_UI.FIELD_CODE}
+                </Text>
                 <TextInput
                   style={styles.input}
                   value={row.code}
@@ -254,17 +261,23 @@ export const ProductPromoCodesModal = ({
                     value={row.discountPercent}
                     keyboardType="number-pad"
                     editable={!isBusy}
-                    onChangeText={(discountPercent) => patchRow(index, { discountPercent })}
+                    onChangeText={(discountPercent) =>
+                      patchRow(index, { discountPercent })
+                    }
                   />
                 </View>
                 <View style={[styles.rowField, localStyles.pairItem]}>
-                  <Text style={styles.fieldLabel}>{PRODUCT_PROMO_CODE_UI.FIELD_MAX}</Text>
+                  <Text style={styles.fieldLabel}>
+                    {PRODUCT_PROMO_CODE_UI.FIELD_MAX}
+                  </Text>
                   <TextInput
                     style={styles.input}
                     value={row.maxActivations}
                     keyboardType="number-pad"
                     editable={!isBusy}
-                    onChangeText={(maxActivations) => patchRow(index, { maxActivations })}
+                    onChangeText={(maxActivations) =>
+                      patchRow(index, { maxActivations })
+                    }
                   />
                 </View>
               </View>
@@ -308,7 +321,13 @@ export const ProductPromoCodesModal = ({
           ) : null}
         </ScrollView>
 
-        <View style={[styles.footer, localStyles.footerSplit, { paddingBottom: footerInsetBottom }]}>
+        <View
+          style={[
+            styles.footer,
+            localStyles.footerSplit,
+            { paddingBottom: footerInsetBottom },
+          ]}
+        >
           <Pressable
             accessibilityRole="button"
             disabled={activeCount >= PRODUCT_PROMO_CODES_MAX_ACTIVE || isBusy}

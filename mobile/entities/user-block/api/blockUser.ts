@@ -10,7 +10,8 @@ export async function blockUser(userId: string) {
     return data.data;
   } catch (error) {
     const message =
-      (error as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+      (error as { response?: { data?: { message?: string } } })?.response?.data
+        ?.message ??
       (error instanceof Error ? error.message : API_CLIENT_UI.BLOCK_USER_FALLBACK);
     throw new Error(message);
   }

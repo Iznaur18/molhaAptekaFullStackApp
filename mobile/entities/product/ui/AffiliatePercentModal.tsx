@@ -64,9 +64,7 @@ export const AffiliatePercentModal = ({
     const existing = Math.floor(Number(product.affiliatePercent) || 0);
     setPercent(
       String(
-        existing >= AFFILIATE_PERCENT_MIN
-          ? existing
-          : AFFILIATE_MANAGE_DEFAULT_PERCENT,
+        existing >= AFFILIATE_PERCENT_MIN ? existing : AFFILIATE_MANAGE_DEFAULT_PERCENT,
       ),
     );
   }, [product, visible]);
@@ -139,7 +137,9 @@ export const AffiliatePercentModal = ({
           keyboardShouldPersistTaps="handled"
         >
           <Text style={styles.info}>{CREATE_PRODUCT_UI.AFFILIATE_MODAL_HINT}</Text>
-          <Text style={styles.info}>{CREATE_PRODUCT_UI.AFFILIATE_MODAL_BUDGET_HINT}</Text>
+          <Text style={styles.info}>
+            {CREATE_PRODUCT_UI.AFFILIATE_MODAL_BUDGET_HINT}
+          </Text>
 
           <View style={styles.rowField}>
             <Text style={styles.fieldLabel}>
@@ -164,7 +164,10 @@ export const AffiliatePercentModal = ({
 
         <View style={[styles.footer, { paddingBottom: footerInsetBottom }]}>
           <Pressable
-            style={[styles.saveButton, (isSubmitting || !productId) && styles.buttonDisabled]}
+            style={[
+              styles.saveButton,
+              (isSubmitting || !productId) && styles.buttonDisabled,
+            ]}
             accessibilityRole="button"
             disabled={isSubmitting || !productId}
             onPress={() => void handleSave()}
@@ -172,7 +175,9 @@ export const AffiliatePercentModal = ({
             {isSubmitting ? (
               <ActivityIndicator color={theme.colors.onContrast} />
             ) : (
-              <Text style={styles.saveButtonText}>{CREATE_PRODUCT_UI.AFFILIATE_MODAL_SAVE}</Text>
+              <Text style={styles.saveButtonText}>
+                {CREATE_PRODUCT_UI.AFFILIATE_MODAL_SAVE}
+              </Text>
             )}
           </Pressable>
         </View>

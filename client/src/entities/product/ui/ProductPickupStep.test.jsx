@@ -27,15 +27,19 @@ vi.mock("../../user/model/useAuthSession.js", () => ({
           geo: { lat: 43.3145, lon: 45.7125 },
           isDefault: true,
         },
-        { id: "a2", label: "Точка на юге", line: "г Грозный, ул Победы, 7", isDefault: false },
+        {
+          id: "a2",
+          label: "Точка на юге",
+          line: "г Грозный, ул Победы, 7",
+          isDefault: false,
+        },
       ],
     },
   }),
 }));
 
-const { CreateProductPickupSection } = await import(
-  "./create-product-sections/CreateProductPickupSection.jsx"
-);
+const { CreateProductPickupSection } =
+  await import("./create-product-sections/CreateProductPickupSection.jsx");
 
 /** Форма шага 5 с настоящим состоянием: как в браузере, с перерисовкой. */
 function Harness({ initial, onFormChange }) {
@@ -74,7 +78,13 @@ describe("пятый шаг товара: способы получения", ()
           productDeliveryCarrier: "gitorg_courier",
           productRegionCode: "RU-CE",
           productPickupLocations: [
-            { id: "loc-1", address: "г Грозный, ул Мира, 1", lat: 43.31, lon: 45.69, isDefault: true },
+            {
+              id: "loc-1",
+              address: "г Грозный, ул Мира, 1",
+              lat: 43.31,
+              lon: 45.69,
+              isDefault: true,
+            },
           ],
         }}
       />,
@@ -99,7 +109,13 @@ describe("пятый шаг товара: способы получения", ()
           productDeliveryCarrier: "",
           productRegionCode: "RU-CE",
           productPickupLocations: [
-            { id: "loc-1", address: "г Грозный, ул Мира, 1", lat: 43.31, lon: 45.69, isDefault: true },
+            {
+              id: "loc-1",
+              address: "г Грозный, ул Мира, 1",
+              lat: 43.31,
+              lon: 45.69,
+              isDefault: true,
+            },
           ],
         }}
       />,
@@ -109,7 +125,11 @@ describe("пятый шаг товара: способы получения", ()
     fireEvent.click(screen.getByRole("checkbox", { name: /Склад/u }));
 
     expect(state()).toContain("points=1");
-    expect(screen.getByRole("checkbox", { name: /Точка на юге/u }).getAttribute("aria-checked")).toBe("true");
+    expect(
+      screen
+        .getByRole("checkbox", { name: /Точка на юге/u })
+        .getAttribute("aria-checked"),
+    ).toBe("true");
   });
 
   it("при доставке продавцом склад можно сменить на не-дефолтный адрес", () => {
@@ -123,7 +143,13 @@ describe("пятый шаг товара: способы получения", ()
           productDeliveryCarrier: "seller",
           productRegionCode: "RU-CE",
           productPickupLocations: [
-            { id: "loc-1", address: "г Грозный, ул Мира, 1", lat: 43.31, lon: 45.69, isDefault: true },
+            {
+              id: "loc-1",
+              address: "г Грозный, ул Мира, 1",
+              lat: 43.31,
+              lon: 45.69,
+              isDefault: true,
+            },
           ],
         }}
       />,
@@ -131,7 +157,11 @@ describe("пятый шаг товара: способы получения", ()
 
     fireEvent.click(screen.getByRole("checkbox", { name: /Точка на юге/u }));
 
-    expect(screen.getByRole("checkbox", { name: /Точка на юге/u }).getAttribute("aria-checked")).toBe("true");
+    expect(
+      screen
+        .getByRole("checkbox", { name: /Точка на юге/u })
+        .getAttribute("aria-checked"),
+    ).toBe("true");
     expect(state()).toContain("points=1");
   });
 
@@ -146,7 +176,13 @@ describe("пятый шаг товара: способы получения", ()
           productDeliveryCarrier: "",
           productRegionCode: "RU-CE",
           productPickupLocations: [
-            { id: "loc-1", address: "г Грозный, ул Мира, 1", lat: 43.31, lon: 45.69, isDefault: true },
+            {
+              id: "loc-1",
+              address: "г Грозный, ул Мира, 1",
+              lat: 43.31,
+              lon: 45.69,
+              isDefault: true,
+            },
           ],
         }}
       />,

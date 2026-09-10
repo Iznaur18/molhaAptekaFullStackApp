@@ -10,8 +10,12 @@ const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
 test("catalog category change drops placeholder data to avoid card mass-swap", () => {
-  const queryHook = readMobileFile("entities/product/model/useCatalogProductsInfiniteQuery.ts");
-  const helper = readMobileFile("entities/product/lib/shouldRetainCatalogListPlaceholderData.ts");
+  const queryHook = readMobileFile(
+    "entities/product/model/useCatalogProductsInfiniteQuery.ts",
+  );
+  const helper = readMobileFile(
+    "entities/product/lib/shouldRetainCatalogListPlaceholderData.ts",
+  );
 
   assert.match(queryHook, /shouldRetainCatalogListPlaceholderData/);
   assert.doesNotMatch(queryHook, /keepPreviousData/);
@@ -22,7 +26,9 @@ test("catalog category change drops placeholder data to avoid card mass-swap", (
 
 test("filtered catalog list disables entering animations and uses perf props", () => {
   const index = readMobileFile("app/(tabs)/index.tsx");
-  const perf = readMobileFile("features/catalog-grid/lib/catalogGridListPerformanceProps.ts");
+  const perf = readMobileFile(
+    "features/catalog-grid/lib/catalogGridListPerformanceProps.ts",
+  );
 
   assert.match(index, /renderCatalogGridRow/);
   assert.match(index, /disableEntering/);

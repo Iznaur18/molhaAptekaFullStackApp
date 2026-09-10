@@ -116,10 +116,7 @@ function AppIntroSplashContent({ config, onDismiss }) {
 
   useEffect(() => {
     if (!isClosing) return undefined;
-    const fallbackTimer = setTimeout(
-      completeDismiss,
-      config.fadeOutMs + 80,
-    );
+    const fallbackTimer = setTimeout(completeDismiss, config.fadeOutMs + 80);
     return () => clearTimeout(fallbackTimer);
   }, [completeDismiss, config.fadeOutMs, isClosing]);
 
@@ -289,9 +286,7 @@ export function AppIntroSplash() {
   }
 
   const settingsReady =
-    previewSettings != null ||
-    settingsQuery.data != null ||
-    settingsQuery.isError;
+    previewSettings != null || settingsQuery.data != null || settingsQuery.isError;
 
   if (!settingsReady && settingsQuery.isPending) {
     return null;

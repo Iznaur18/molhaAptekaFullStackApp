@@ -119,9 +119,9 @@ export const ProductPickupLocationFields = ({
   const commitToggle = (id: string, addresses: SavedAddressPickerItem[]) => {
     const nextIds = selectedPointIds.includes(id)
       ? selectedPointIds.filter((item) => item !== id)
-      // При лимите в одну точку выбор не добавляется, а заменяет прежний:
-      // иначе normalizePickupLocations молча срезал бы только что отмеченное.
-      : locationsLimit === 1
+      : // При лимите в одну точку выбор не добавляется, а заменяет прежний:
+        // иначе normalizePickupLocations молча срезал бы только что отмеченное.
+        locationsLimit === 1
         ? [id]
         : [...selectedPointIds, id];
     const fromBook = pickupLocationsFromSelectedAddresses(
@@ -339,7 +339,10 @@ export const ProductPickupLocationFields = ({
                         style={styles.manualPointAction}
                       >
                         <Text
-                          style={[styles.manualPointHint, { color: theme.colors.action }]}
+                          style={[
+                            styles.manualPointHint,
+                            { color: theme.colors.action },
+                          ]}
                         >
                           {PRODUCT_PICKUP_UI.SET_DEFAULT_LOCATION}
                         </Text>

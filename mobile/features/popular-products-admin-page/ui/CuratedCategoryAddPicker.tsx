@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { ActivityIndicator, Modal, Pressable, ScrollView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import type { CuratedCategoryKind } from "@/entities/curated-category-list/api/curatedCategoryListAdminApi";
@@ -60,7 +67,9 @@ export const CuratedCategoryAddPicker = ({
         accessibilityRole="button"
         accessibilityState={{ selected: active }}
       >
-        <Text style={[styles.toolbarButtonText, active && styles.toolbarButtonPrimaryText]}>
+        <Text
+          style={[styles.toolbarButtonText, active && styles.toolbarButtonPrimaryText]}
+        >
           {label}
         </Text>
       </Pressable>
@@ -69,10 +78,15 @@ export const CuratedCategoryAddPicker = ({
 
   return (
     <View style={styles.field}>
-      <Text style={styles.fieldLabel}>{POPULAR_CATEGORIES_ADMIN_PAGE_UI.CATEGORY_KIND_LABEL}</Text>
+      <Text style={styles.fieldLabel}>
+        {POPULAR_CATEGORIES_ADMIN_PAGE_UI.CATEGORY_KIND_LABEL}
+      </Text>
       <View style={styles.toolbarActions}>
         {renderKindChip("tree", POPULAR_CATEGORIES_ADMIN_PAGE_UI.CATEGORY_KIND_TREE)}
-        {renderKindChip("personal", POPULAR_CATEGORIES_ADMIN_PAGE_UI.CATEGORY_KIND_PERSONAL)}
+        {renderKindChip(
+          "personal",
+          POPULAR_CATEGORIES_ADMIN_PAGE_UI.CATEGORY_KIND_PERSONAL,
+        )}
       </View>
 
       {kind === "tree" ? (
@@ -152,7 +166,11 @@ export const CuratedCategoryAddPicker = ({
                         pressed && sheet.rowPressed,
                       ]}
                       onPress={() => {
-                        onSelect({ kind: "personal", refId: tile._id, label: tile.labelRu });
+                        onSelect({
+                          kind: "personal",
+                          refId: tile._id,
+                          label: tile.labelRu,
+                        });
                         setPersonalSheetOpen(false);
                       }}
                     >

@@ -52,7 +52,11 @@ export const InstallmentSalesPage = () => {
     [allContracts],
   );
   const contracts = useMemo(
-    () => filterInstallmentSellerContracts(allContracts, { status: statusFilter, attentionOnly }),
+    () =>
+      filterInstallmentSellerContracts(allContracts, {
+        status: statusFilter,
+        attentionOnly,
+      }),
     [allContracts, statusFilter, attentionOnly],
   );
 
@@ -164,13 +168,19 @@ export const InstallmentSalesPage = () => {
       {contracts.length > 0 ? (
         <View style={styles.listActions}>
           <Pressable style={styles.listAction} onPress={expandAll}>
-            <Text style={styles.listActionText}>{INSTALLMENT_UI.PAYMENTS_EXPAND_ALL}</Text>
+            <Text style={styles.listActionText}>
+              {INSTALLMENT_UI.PAYMENTS_EXPAND_ALL}
+            </Text>
           </Pressable>
           <Pressable style={styles.listAction} onPress={collapseAll}>
-            <Text style={styles.listActionText}>{INSTALLMENT_UI.PAYMENTS_COLLAPSE_ALL}</Text>
+            <Text style={styles.listActionText}>
+              {INSTALLMENT_UI.PAYMENTS_COLLAPSE_ALL}
+            </Text>
           </Pressable>
           {attentionOnly ? (
-            <Text style={styles.filterHint}>{INSTALLMENT_UI.SALES_ATTENTION_FILTER_HINT}</Text>
+            <Text style={styles.filterHint}>
+              {INSTALLMENT_UI.SALES_ATTENTION_FILTER_HINT}
+            </Text>
           ) : null}
         </View>
       ) : null}

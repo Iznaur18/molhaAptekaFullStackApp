@@ -63,7 +63,10 @@ export function persistRegisterFormDraft(draft) {
     return;
   }
   try {
-    window.sessionStorage.setItem(REGISTER_FORM_DRAFT_STORAGE_KEY, JSON.stringify(draft));
+    window.sessionStorage.setItem(
+      REGISTER_FORM_DRAFT_STORAGE_KEY,
+      JSON.stringify(draft),
+    );
   } catch {
     // ignore quota / private mode
   }

@@ -14,8 +14,7 @@ export default function EditProfileScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ focus?: string | string[] }>();
   const focusRaw = params.focus;
-  const focusAddress =
-    (Array.isArray(focusRaw) ? focusRaw[0] : focusRaw) === "address";
+  const focusAddress = (Array.isArray(focusRaw) ? focusRaw[0] : focusRaw) === "address";
   const styles = useAuthGateStyles();
   const sessionQuery = useAuthSessionQuery();
   const user = sessionQuery.data?.user;

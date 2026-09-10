@@ -27,7 +27,9 @@ export const mixHexColors = (a: string, b: string, ratioOfA: number): string => 
 };
 
 const parseHexColor = (value: string): [number, number, number] | null => {
-  const raw = String(value ?? "").trim().replace(/^#/, "");
+  const raw = String(value ?? "")
+    .trim()
+    .replace(/^#/, "");
   const full =
     raw.length === 3
       ? raw

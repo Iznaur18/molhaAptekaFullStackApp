@@ -169,9 +169,7 @@ export function useMyProfileNav({
   const canUsePartnerProgram = isProfileReady && Boolean(onPartnerProgramClick);
   const canUseAdvertising = isProfileReady && Boolean(onAdvertisingClick);
   const canUseOneCIntegration =
-    IS_ONEC_INTEGRATION_ENABLED &&
-    isProfileReady &&
-    Boolean(onOneCIntegrationClick);
+    IS_ONEC_INTEGRATION_ENABLED && isProfileReady && Boolean(onOneCIntegrationClick);
   // Безопасную сделку подключает любой авторизованный: подтверждение ИП или
   // ООО и есть фильтр, отдельного признака продавца в профиле нет.
   const canUseDeliveryPayment = isProfileReady && Boolean(onDeliveryPaymentClick);
@@ -286,7 +284,7 @@ export function useMyProfileNav({
         onDataConfirmationQueueClick,
         onInstallmentDisputesClick,
         onShipmentDisputesClick,
-  onShippingCarriersClick,
+        onShippingCarriersClick,
         onAdminOrdersClick,
         onSearchSynonymsAdminClick,
         onCategoryTreeAdminClick,
@@ -360,7 +358,7 @@ export function useMyProfileNav({
       onEditProfileClick,
       onInstallmentDisputesClick,
       onShipmentDisputesClick,
-  onShippingCarriersClick,
+      onShippingCarriersClick,
       onInstallmentPaymentsClick,
       onInstallmentSalesClick,
       onLoyaltyPointsClick,

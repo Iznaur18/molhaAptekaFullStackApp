@@ -93,10 +93,7 @@ describe("подсказка DaData → координаты", () => {
   });
 
   it("дом не из ФИАС всё равно даёт координаты", () => {
-    assert.equal(
-      pickAddressSuggestionForGeo([HOUSE_WITHOUT_FIAS]),
-      HOUSE_WITHOUT_FIAS,
-    );
+    assert.equal(pickAddressSuggestionForGeo([HOUSE_WITHOUT_FIAS]), HOUSE_WITHOUT_FIAS);
   });
 
   it("адрес до улицы не берём — это центр улицы, а не дом", () => {

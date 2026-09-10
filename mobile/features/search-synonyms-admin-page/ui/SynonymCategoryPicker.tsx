@@ -1,6 +1,9 @@
 import { Pressable, Text, View } from "react-native";
 
-import { PRODUCT_CATEGORIES, PRODUCT_CATEGORY_LABEL_RU } from "@/entities/product/lib/productCategoryLabels";
+import {
+  PRODUCT_CATEGORIES,
+  PRODUCT_CATEGORY_LABEL_RU,
+} from "@/entities/product/lib/productCategoryLabels";
 import { useStaffFilterChipStyles } from "@/shared/theme/staffQueueStyles";
 
 type SynonymCategoryPickerProps = {
@@ -34,7 +37,11 @@ export const SynonymCategoryPicker = ({
         return (
           <Pressable
             key={slug}
-            style={[styles.chip, isSelected && styles.chipSelected, disabled && styles.disabled]}
+            style={[
+              styles.chip,
+              isSelected && styles.chipSelected,
+              disabled && styles.disabled,
+            ]}
             onPress={() => toggleSlug(slug)}
             disabled={disabled}
           >

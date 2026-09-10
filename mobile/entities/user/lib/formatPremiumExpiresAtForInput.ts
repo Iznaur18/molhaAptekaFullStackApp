@@ -1,4 +1,6 @@
-export const formatPremiumExpiresAtForInput = (value: string | Date | null | undefined): string => {
+export const formatPremiumExpiresAtForInput = (
+  value: string | Date | null | undefined,
+): string => {
   if (!value) {
     return "";
   }

@@ -5,10 +5,14 @@ import { fileURLToPath } from "node:url";
 import mongoose from "mongoose";
 
 const skipImages = process.argv.includes("--skip-images");
-const fileArg = process.argv.find((arg) => !arg.startsWith("-") && arg.endsWith(".xlsx"));
+const fileArg = process.argv.find(
+  (arg) => !arg.startsWith("-") && arg.endsWith(".xlsx"),
+);
 
 if (!fileArg) {
-  console.error("Usage: node scripts/validateProductBulkImportFile.mjs <file.xlsx> [--skip-images]");
+  console.error(
+    "Usage: node scripts/validateProductBulkImportFile.mjs <file.xlsx> [--skip-images]",
+  );
   process.exit(1);
 }
 
@@ -19,15 +23,12 @@ const dotenv = await import("dotenv");
 dotenv.config({ path: path.join(serverRoot, ".env") });
 
 const { connectMongo } = await import("../utils/connectMongo.js");
-const { parseProductBulkImportExcel } = await import(
-  "../services/product/bulkImport/parseProductBulkImportExcel.js"
-);
-const { validateProductBulkImportRows } = await import(
-  "../services/product/bulkImport/validateProductBulkImportRows.js"
-);
-const { resolveSellerDefaultPickupFromUser } = await import(
-  "../services/product/bulkImport/resolveSellerDefaultPickupFromUser.js"
-);
+const { parseProductBulkImportExcel } =
+  await import("../services/product/bulkImport/parseProductBulkImportExcel.js");
+const { validateProductBulkImportRows } =
+  await import("../services/product/bulkImport/validateProductBulkImportRows.js");
+const { resolveSellerDefaultPickupFromUser } =
+  await import("../services/product/bulkImport/resolveSellerDefaultPickupFromUser.js");
 const { UserModel } = await import("../models/index.js");
 
 const filePath = path.resolve(fileArg);
@@ -45,7 +46,9 @@ console.log("---");
 
 const sellerId = process.env.BULK_IMPORT_VALIDATE_SELLER_ID?.trim();
 if (!sellerId) {
-  console.log("Set BULK_IMPORT_VALIDATE_SELLER_ID in .env to validate categories/articles against DB.");
+  console.log(
+    "Set BULK_IMPORT_VALIDATE_SELLER_ID in .env to validate categories/articles against DB.",
+  );
   for (const row of parsedRows) {
     console.log(`Row ${row.__rowNumber}:`, JSON.stringify(row, null, 0));
   }
@@ -63,14 +66,16 @@ let sellerPickup;
 try {
   sellerPickup = resolveSellerDefaultPickupFromUser(user);
 } catch (error) {
-  console.error("Pickup profile error:", error instanceof Error ? error.message : error);
+  console.error(
+    "Pickup profile error:",
+    error instanceof Error ? error.message : error,
+  );
   process.exit(1);
 }
 
 if (skipImages) {
-  const original = await import(
-    "../services/product/bulkImport/prevalidateBulkImportImageUrl.js"
-  );
+  const original =
+    await import("../services/product/bulkImport/prevalidateBulkImportImageUrl.js");
   original.prevalidateBulkImportImageUrl = async (url) => url;
 }
 

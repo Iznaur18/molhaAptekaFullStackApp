@@ -106,9 +106,7 @@ export function AffiliateListingsPage({
                 </span>
                 <span>
                   {AFFILIATE_LISTINGS_PAGE_UI.EARNINGS_DATE}:{" "}
-                  {row.paidAt
-                    ? new Date(row.paidAt).toLocaleString("ru-RU")
-                    : "—"}
+                  {row.paidAt ? new Date(row.paidAt).toLocaleString("ru-RU") : "—"}
                 </span>
               </li>
             ))}

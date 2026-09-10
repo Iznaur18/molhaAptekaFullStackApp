@@ -1,4 +1,10 @@
-import { Pressable, Text, type PressableProps, type StyleProp, type ViewStyle } from "react-native";
+import {
+  Pressable,
+  Text,
+  type PressableProps,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,

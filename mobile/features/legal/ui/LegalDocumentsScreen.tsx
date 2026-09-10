@@ -15,7 +15,9 @@ type LegalDocumentsScreenProps = {
   initialKind?: LegalDocumentKind;
 };
 
-export const LegalDocumentsScreen = ({ initialKind = "terms" }: LegalDocumentsScreenProps) => {
+export const LegalDocumentsScreen = ({
+  initialKind = "terms",
+}: LegalDocumentsScreenProps) => {
   const scrollRef = useRef<ScrollView>(null);
   // Как web `.app-shell`: на планшете колонка ограничена и центрируется.
   const { centeredContentStyle } = useScreenLayout();

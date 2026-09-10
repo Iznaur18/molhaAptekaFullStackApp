@@ -43,7 +43,9 @@
   color: var(--iz-color-on-contrast);
 }
 
-.web-push-settings-toggle__chip:hover:not(:disabled):not(.web-push-settings-toggle__chip--active) {
+.web-push-settings-toggle__chip:hover:not(:disabled):not(
+    .web-push-settings-toggle__chip--active
+  ) {
   border-color: var(--iz-color-action);
   background: var(--iz-color-action-soft);
 }

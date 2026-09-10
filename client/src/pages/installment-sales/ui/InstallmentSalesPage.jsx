@@ -41,7 +41,11 @@ export function InstallmentSalesPage({
     [allContracts],
   );
   const contracts = useMemo(
-    () => filterInstallmentSellerContracts(allContracts, { status: statusFilter, attentionOnly }),
+    () =>
+      filterInstallmentSellerContracts(allContracts, {
+        status: statusFilter,
+        attentionOnly,
+      }),
     [allContracts, statusFilter, attentionOnly],
   );
 
@@ -149,14 +153,24 @@ export function InstallmentSalesPage({
   const listActions =
     contracts.length > 0 ? (
       <div className="installment-page__list-actions">
-        <button type="button" className="installment-page__list-action" onClick={expandAll}>
+        <button
+          type="button"
+          className="installment-page__list-action"
+          onClick={expandAll}
+        >
           {INSTALLMENT_UI.PAYMENTS_EXPAND_ALL}
         </button>
-        <button type="button" className="installment-page__list-action" onClick={collapseAll}>
+        <button
+          type="button"
+          className="installment-page__list-action"
+          onClick={collapseAll}
+        >
           {INSTALLMENT_UI.PAYMENTS_COLLAPSE_ALL}
         </button>
         {attentionOnly ? (
-          <p className="installment-page__filter-hint">{INSTALLMENT_UI.SALES_ATTENTION_FILTER_HINT}</p>
+          <p className="installment-page__filter-hint">
+            {INSTALLMENT_UI.SALES_ATTENTION_FILTER_HINT}
+          </p>
         ) : null}
       </div>
     ) : null;
@@ -174,7 +188,10 @@ export function InstallmentSalesPage({
     return (
       <InstallmentPageLayout {...layoutProps}>
         {overview}
-        <p className="installment-page__state installment-page__state_error" role="alert">
+        <p
+          className="installment-page__state installment-page__state_error"
+          role="alert"
+        >
           {error}
         </p>
       </InstallmentPageLayout>

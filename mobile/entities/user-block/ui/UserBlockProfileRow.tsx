@@ -74,7 +74,9 @@ export const UserBlockProfileRow = ({
   }
 
   const isBusy = blockMutation.isPending || unblockMutation.isPending;
-  const label = isBlockedByMe ? USER_BLOCK_BUTTON_UI.UNBLOCK : USER_BLOCK_BUTTON_UI.BLOCK;
+  const label = isBlockedByMe
+    ? USER_BLOCK_BUTTON_UI.UNBLOCK
+    : USER_BLOCK_BUTTON_UI.BLOCK;
 
   const handlePress = async () => {
     if (!isAuthorized) {

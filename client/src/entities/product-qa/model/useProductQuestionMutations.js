@@ -12,8 +12,7 @@ import { invalidateAllProductQuestionQueries } from "../lib/productQuestionQuery
 export function useProductQuestionMutations(productId) {
   const queryClient = useQueryClient();
 
-  const invalidate = () =>
-    invalidateAllProductQuestionQueries(queryClient, productId);
+  const invalidate = () => invalidateAllProductQuestionQueries(queryClient, productId);
 
   const askMutation = useMutation({
     mutationFn: (payload) => askProductQuestion(productId, payload),

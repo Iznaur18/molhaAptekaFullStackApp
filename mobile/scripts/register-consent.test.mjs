@@ -11,9 +11,15 @@ const readMobileFile = (relativePath) =>
 
 test("register screen requires legal consent before submit", () => {
   const registerScreen = readMobileFile("app/(auth)/register.tsx");
-  const consentFields = readMobileFile("features/legal/ui/RegisterLegalConsentFields.tsx");
-  const consentContent = readMobileFile("features/legal/model/registrationConsentContent.ts");
-  const consentValidation = readMobileFile("features/legal/lib/isRegisterConsentComplete.ts");
+  const consentFields = readMobileFile(
+    "features/legal/ui/RegisterLegalConsentFields.tsx",
+  );
+  const consentContent = readMobileFile(
+    "features/legal/model/registrationConsentContent.ts",
+  );
+  const consentValidation = readMobileFile(
+    "features/legal/lib/isRegisterConsentComplete.ts",
+  );
   const styles = readMobileFile("shared/theme/formChromeStyles.ts");
   const layout = readMobileFile("app/_layout.tsx");
 
@@ -26,7 +32,10 @@ test("register screen requires legal consent before submit", () => {
   assert.match(consentFields, /\/legal\/listing/);
   assert.match(consentFields, /\/legal\/privacy/);
   assert.match(consentContent, /REGISTRATION_PERSONAL_DATA_CONSENT_SUMMARY/);
-  assert.match(consentValidation, /consent\.termsAccepted && consent\.personalDataConsentAccepted/);
+  assert.match(
+    consentValidation,
+    /consent\.termsAccepted && consent\.personalDataConsentAccepted/,
+  );
   assert.match(styles, /consentBlock/);
   assert.match(layout, /legal\/listing/);
 });

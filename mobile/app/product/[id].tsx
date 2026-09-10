@@ -17,7 +17,10 @@ import { resolveProductImageUrls } from "@/entities/product/lib/resolveProductIm
 import { resolveProductPreviewVideoUrl } from "@/entities/product/lib/resolveProductPreviewVideoUrl";
 import { getProductSellerId } from "@/entities/product/lib/getProductSellerId";
 import { setProductInstallmentEnabled } from "@/entities/installment/lib/setProductInstallmentEnabled";
-import { buildAffiliateManageToggleBody, resolveAffiliateEnableLoyaltyGate } from "@izibuy/shared-lib";
+import {
+  buildAffiliateManageToggleBody,
+  resolveAffiliateEnableLoyaltyGate,
+} from "@izibuy/shared-lib";
 import {
   canSellerDeleteProduct,
   canSellerEditProduct,
@@ -41,8 +44,14 @@ import { ProductDetailPurchaseActions } from "@/features/product-detail/ui/Produ
 import { ProductDetailMediaSection } from "@/features/product-detail/ui/ProductDetailMediaSection";
 import { ProductDetailTabBar } from "@/features/product-detail/ui/ProductDetailTabBar";
 import { ProductDetailsDetailsTab } from "@/features/product-detail/ui/ProductDetailsDetailsTab";
-import { ProductAuctionTab, type ProductAuctionDockFooter } from "@/features/product-detail/ui/ProductAuctionTab";
-import { ProductInstallmentTab, type ProductInstallmentDockFooter } from "@/features/product-detail/ui/ProductInstallmentTab";
+import {
+  ProductAuctionTab,
+  type ProductAuctionDockFooter,
+} from "@/features/product-detail/ui/ProductAuctionTab";
+import {
+  ProductInstallmentTab,
+  type ProductInstallmentDockFooter,
+} from "@/features/product-detail/ui/ProductInstallmentTab";
 import { ProductCompareTab } from "@/features/product-detail/ui/ProductCompareTab";
 import { ProductQaTab } from "@/features/product-detail/ui/ProductQaTab";
 import { ProductReviewsTab } from "@/features/product-detail/ui/ProductReviewsTab";
@@ -55,7 +64,11 @@ import { ProductPromotionModal } from "@/features/product-promotion/ui/ProductPr
 import { SquircleView } from "@/shared/ui/SquircleView";
 import { useProductPromotionManageSupport } from "@/features/product-promotion/model/useProductPromotionManageSupport";
 import { ReportProductModal } from "@/features/product-report/ui/ReportProductModal";
-import { catalogQueryKeys, loyaltyPointsQueryKeys, myProductsQueryKeys } from "@/shared/api";
+import {
+  catalogQueryKeys,
+  loyaltyPointsQueryKeys,
+  myProductsQueryKeys,
+} from "@/shared/api";
 import {
   API_CLIENT_UI,
   INSTALLMENT_UI,
@@ -68,7 +81,10 @@ import { formatApiErrorMessage } from "@/shared/lib";
 import { useVisualViewportKeyboardBottomInset } from "@/shared/lib/useVisualViewportKeyboardBottomInset";
 import { useProductDetailPageLayout } from "@/shared/model/useProductDetailPageLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
-import { PRODUCT_DETAIL_PURCHASE_DOCK_TOP_RADIUS, useProductDetailScreenStyles } from "@/shared/theme/catalogProductStyles";
+import {
+  PRODUCT_DETAIL_PURCHASE_DOCK_TOP_RADIUS,
+  useProductDetailScreenStyles,
+} from "@/shared/theme/catalogProductStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
@@ -81,7 +97,7 @@ export default function ProductDetailScreen() {
   const queryClient = useQueryClient();
   const keyboardBottomInset = useVisualViewportKeyboardBottomInset();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const productId = Array.isArray(id) ? id[0] : id ?? "";
+  const productId = Array.isArray(id) ? id[0] : (id ?? "");
   const productQuery = useCatalogProductQuery(productId);
   const isAuthorized = useIsAuthorized();
   const sessionQuery = useAuthSessionQuery();
@@ -97,9 +113,8 @@ export default function ProductDetailScreen() {
   });
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [promotionModalVisible, setPromotionModalVisible] = useState(false);
-  const [installmentDock, setInstallmentDock] = useState<ProductInstallmentDockFooter | null>(
-    null,
-  );
+  const [installmentDock, setInstallmentDock] =
+    useState<ProductInstallmentDockFooter | null>(null);
   const [auctionDock, setAuctionDock] = useState<ProductAuctionDockFooter | null>(null);
   const [promotionErrorMessage, setPromotionErrorMessage] = useState("");
   const [manageErrorMessage, setManageErrorMessage] = useState("");
@@ -129,7 +144,9 @@ export default function ProductDetailScreen() {
   const syncPromotionProduct = useCallback(
     (updated: Record<string, unknown> & { _id: string }) => {
       queryClient.setQueryData(catalogQueryKeys.product(productId), (prev) =>
-        prev && typeof prev === "object" ? { ...(prev as Record<string, unknown>), ...updated } : prev,
+        prev && typeof prev === "object"
+          ? { ...(prev as Record<string, unknown>), ...updated }
+          : prev,
       );
     },
     [productId, queryClient],
@@ -178,29 +195,43 @@ export default function ProductDetailScreen() {
     });
   }, [isAuthorized, isOwnProduct, productId]);
 
-  const handleInstallmentDockChange = useCallback((footer: ProductInstallmentDockFooter | null) => {
-    setInstallmentDock((prev) => {
-      if (footer === null) {
-        return prev === null ? prev : null;
-      }
-      if (prev !== null && prev.disabled === footer.disabled && prev.label === footer.label) {
-        return prev;
-      }
-      return footer;
-    });
-  }, []);
+  const handleInstallmentDockChange = useCallback(
+    (footer: ProductInstallmentDockFooter | null) => {
+      setInstallmentDock((prev) => {
+        if (footer === null) {
+          return prev === null ? prev : null;
+        }
+        if (
+          prev !== null &&
+          prev.disabled === footer.disabled &&
+          prev.label === footer.label
+        ) {
+          return prev;
+        }
+        return footer;
+      });
+    },
+    [],
+  );
 
-  const handleAuctionDockChange = useCallback((footer: ProductAuctionDockFooter | null) => {
-    setAuctionDock((prev) => {
-      if (footer === null) {
-        return prev === null ? prev : null;
-      }
-      if (prev !== null && prev.disabled === footer.disabled && prev.label === footer.label) {
-        return prev;
-      }
-      return footer;
-    });
-  }, []);
+  const handleAuctionDockChange = useCallback(
+    (footer: ProductAuctionDockFooter | null) => {
+      setAuctionDock((prev) => {
+        if (footer === null) {
+          return prev === null ? prev : null;
+        }
+        if (
+          prev !== null &&
+          prev.disabled === footer.disabled &&
+          prev.label === footer.label
+        ) {
+          return prev;
+        }
+        return footer;
+      });
+    },
+    [],
+  );
 
   useEffect(() => {
     if (activeTab !== "installment") {
@@ -295,7 +326,8 @@ export default function ProductDetailScreen() {
   const productPrice = Number(productRecord.productPrice) || 0;
   const purchaseLimit = getProductPurchaseLimit(productRecord);
   const isProductOutOfStock = productRecord.productOutOfStock === true;
-  const { isPurchaseBlocked, blockedLabel } = resolveProductPurchaseBlockState(productRecord);
+  const { isPurchaseBlocked, blockedLabel } =
+    resolveProductPurchaseBlockState(productRecord);
   const { isSellerClosed, closedLabel: sellerClosedLabel } =
     resolveProductSellerClosedPurchaseState(productRecord);
   const canShowAddToCart =
@@ -325,13 +357,9 @@ export default function ProductDetailScreen() {
     showMobilePurchaseDock,
   );
   const showInstallmentDock =
-    !pageLayout.isPageSplit &&
-    activeTab === "installment" &&
-    installmentDock != null;
+    !pageLayout.isPageSplit && activeTab === "installment" && installmentDock != null;
   const showAuctionDock =
-    !pageLayout.isPageSplit &&
-    activeTab === "auction" &&
-    auctionDock != null;
+    !pageLayout.isPageSplit && activeTab === "auction" && auctionDock != null;
   const isAltTab =
     activeTab === "reviews" ||
     activeTab === "qa" ||
@@ -427,7 +455,9 @@ export default function ProductDetailScreen() {
       syncPromotionProduct(updated as Record<string, unknown> & { _id: string });
     } catch (error) {
       setManageErrorMessage(
-        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        error instanceof Error
+          ? error.message
+          : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
       );
     } finally {
       setIsAvailabilityTogglePending(false);
@@ -448,7 +478,9 @@ export default function ProductDetailScreen() {
       syncPromotionProduct(updated as Record<string, unknown> & { _id: string });
     } catch (error) {
       setManageErrorMessage(
-        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        error instanceof Error
+          ? error.message
+          : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
       );
     } finally {
       setIsAuctionTogglePending(false);
@@ -469,7 +501,9 @@ export default function ProductDetailScreen() {
       syncPromotionProduct(updated as Record<string, unknown> & { _id: string });
     } catch (error) {
       setManageErrorMessage(
-        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        error instanceof Error
+          ? error.message
+          : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
       );
     } finally {
       setIsOriginalityTogglePending(false);
@@ -490,7 +524,9 @@ export default function ProductDetailScreen() {
       syncPromotionProduct(updated as Record<string, unknown> & { _id: string });
     } catch (error) {
       setManageErrorMessage(
-        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        error instanceof Error
+          ? error.message
+          : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
       );
     } finally {
       setIsOutOfStockTogglePending(false);
@@ -511,7 +547,9 @@ export default function ProductDetailScreen() {
       syncPromotionProduct(updated as Record<string, unknown> & { _id: string });
     } catch (error) {
       setManageErrorMessage(
-        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        error instanceof Error
+          ? error.message
+          : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
       );
     } finally {
       setIsWholesaleTogglePending(false);
@@ -532,7 +570,9 @@ export default function ProductDetailScreen() {
       syncPromotionProduct(updated as Record<string, unknown> & { _id: string });
     } catch (error) {
       setManageErrorMessage(
-        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        error instanceof Error
+          ? error.message
+          : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
       );
     } finally {
       setIsBuyNFreeTogglePending(false);
@@ -566,7 +606,9 @@ export default function ProductDetailScreen() {
       syncPromotionProduct(updated as Record<string, unknown> & { _id: string });
     } catch (error) {
       setManageErrorMessage(
-        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        error instanceof Error
+          ? error.message
+          : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
       );
     } finally {
       setIsAffiliateTogglePending(false);
@@ -588,7 +630,9 @@ export default function ProductDetailScreen() {
       syncPromotionProduct(updated as Record<string, unknown> & { _id: string });
     } catch (error) {
       setManageErrorMessage(
-        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        error instanceof Error
+          ? error.message
+          : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
       );
     } finally {
       setIsLoyaltyTogglePending(false);
@@ -606,7 +650,10 @@ export default function ProductDetailScreen() {
     setIsInstallmentTogglePending(true);
     setManageErrorMessage("");
     try {
-      const result = await setProductInstallmentEnabled(targetProductId, installmentEnabled);
+      const result = await setProductInstallmentEnabled(
+        targetProductId,
+        installmentEnabled,
+      );
       if (result.needsSetup) {
         return { needsSetup: true };
       }
@@ -619,7 +666,9 @@ export default function ProductDetailScreen() {
       return { productInstallmentEnabled: nextEnabled };
     } catch (error) {
       setManageErrorMessage(
-        error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+        error instanceof Error
+          ? error.message
+          : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
       );
       return undefined;
     } finally {
@@ -682,9 +731,7 @@ export default function ProductDetailScreen() {
           dockSubmit={!pageLayout.isPageSplit}
           onDockFooterChange={handleAuctionDockChange}
           isPurchaseBlocked={isPurchaseBlocked || showSellerClosedPurchaseButton}
-          blockedPurchaseLabel={
-            isPurchaseBlocked ? blockedLabel : sellerClosedLabel
-          }
+          blockedPurchaseLabel={isPurchaseBlocked ? blockedLabel : sellerClosedLabel}
         />
       ) : null}
       {activeTab === "installment" ? (
@@ -700,9 +747,7 @@ export default function ProductDetailScreen() {
           dockSubmit={!pageLayout.isPageSplit}
           onDockFooterChange={handleInstallmentDockChange}
           isPurchaseBlocked={isPurchaseBlocked || showSellerClosedPurchaseButton}
-          blockedPurchaseLabel={
-            isPurchaseBlocked ? blockedLabel : sellerClosedLabel
-          }
+          blockedPurchaseLabel={isPurchaseBlocked ? blockedLabel : sellerClosedLabel}
         />
       ) : null}
     </>
@@ -743,13 +788,17 @@ export default function ProductDetailScreen() {
           />
         ) : null}
         {hasOpenSalesLocked && isAdmin ? (
-          <Text style={styles.reportSuccess}>{PRODUCT_CARD_UI.OPEN_SALES_LOCKED_HINT}</Text>
+          <Text style={styles.reportSuccess}>
+            {PRODUCT_CARD_UI.OPEN_SALES_LOCKED_HINT}
+          </Text>
         ) : null}
       </View>
     ) : null;
 
   return (
-    <View style={[styles.screen, { paddingTop: insets.top }, pageLayout.pageShellStyle]}>
+    <View
+      style={[styles.screen, { paddingTop: insets.top }, pageLayout.pageShellStyle]}
+    >
       <View style={[styles.scrollArea, centeredContentStyle]}>
         <KeyboardAvoidingView
           style={styles.scrollArea}
@@ -791,7 +840,10 @@ export default function ProductDetailScreen() {
                     />
                   </View>
                   <View style={styles.pageWideRail}>
-                    <ProductDetailsDetailsTab {...detailsTabProps} presentation="split-rail" />
+                    <ProductDetailsDetailsTab
+                      {...detailsTabProps}
+                      presentation="split-rail"
+                    />
                   </View>
                 </View>
 
@@ -807,7 +859,13 @@ export default function ProductDetailScreen() {
                 ) : null}
 
                 {isAltTab ? (
-                  <View style={[styles.tabPanel, styles.pageWideAltPanel, styles.tabPanelSplit]}>
+                  <View
+                    style={[
+                      styles.tabPanel,
+                      styles.pageWideAltPanel,
+                      styles.tabPanelSplit,
+                    ]}
+                  >
                     {isSimilarTab ? (
                       <ProductSimilarTab
                         product={productRecord}
@@ -823,7 +881,10 @@ export default function ProductDetailScreen() {
                 ) : null}
 
                 {activeTab === "details" ? (
-                  <ProductDetailsDetailsTab {...detailsTabProps} presentation="split-rest" />
+                  <ProductDetailsDetailsTab
+                    {...detailsTabProps}
+                    presentation="split-rest"
+                  />
                 ) : null}
 
                 {renderManageActions()}
@@ -845,7 +906,11 @@ export default function ProductDetailScreen() {
                   heroSize={pageLayout.heroSize}
                 />
                 {showTabs ? (
-                  <ProductDetailTabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+                  <ProductDetailTabBar
+                    tabs={tabs}
+                    activeTab={activeTab}
+                    onTabChange={setActiveTab}
+                  />
                 ) : null}
 
                 {isAltTab ? (
@@ -864,7 +929,10 @@ export default function ProductDetailScreen() {
                   </View>
                 ) : (
                   <View style={styles.tabPanel}>
-                    <ProductDetailsDetailsTab {...detailsTabProps} presentation="default" />
+                    <ProductDetailsDetailsTab
+                      {...detailsTabProps}
+                      presentation="default"
+                    />
                   </View>
                 )}
 
@@ -882,7 +950,10 @@ export default function ProductDetailScreen() {
           <SquircleView
             radius={PRODUCT_DETAIL_PURCHASE_DOCK_TOP_RADIUS}
             outerStyle={styles.purchaseDock}
-            style={[styles.purchaseDockInner, { paddingBottom: Math.max(insets.bottom, 10.4) }]}
+            style={[
+              styles.purchaseDockInner,
+              { paddingBottom: Math.max(insets.bottom, 10.4) },
+            ]}
           >
             <ProductDetailPurchaseActions
               productId={productId}
@@ -899,7 +970,12 @@ export default function ProductDetailScreen() {
         ) : null}
 
         {showInstallmentDock && installmentDock && keyboardBottomInset === 0 ? (
-          <View style={[styles.installmentDock, { paddingBottom: Math.max(insets.bottom, 10.4) }]}>
+          <View
+            style={[
+              styles.installmentDock,
+              { paddingBottom: Math.max(insets.bottom, 10.4) },
+            ]}
+          >
             <AppButton
               label={installmentDock.label}
               variant="primary"
@@ -912,7 +988,12 @@ export default function ProductDetailScreen() {
         ) : null}
 
         {showAuctionDock && auctionDock && keyboardBottomInset === 0 ? (
-          <View style={[styles.installmentDock, { paddingBottom: Math.max(insets.bottom, 10.4) }]}>
+          <View
+            style={[
+              styles.installmentDock,
+              { paddingBottom: Math.max(insets.bottom, 10.4) },
+            ]}
+          >
             <AppButton
               label={auctionDock.label}
               variant="contrast"
@@ -936,28 +1017,38 @@ export default function ProductDetailScreen() {
 
       <ProductPromotionModal
         visible={promotionModalVisible}
-        product={isOwnProduct ? (productRecord as Record<string, unknown> & { _id: string }) : null}
+        product={
+          isOwnProduct
+            ? (productRecord as Record<string, unknown> & { _id: string })
+            : null
+        }
         productName={name}
         productPrice={productPrice}
         tiers={promotionTariffsQuery.data?.tiers ?? []}
         durations={promotionTariffsQuery.data?.durations ?? []}
         isTariffsLoading={promotionTariffsQuery.isPending}
         tariffsError={
-          promotionTariffsQuery.error instanceof Error ? promotionTariffsQuery.error : null
+          promotionTariffsQuery.error instanceof Error
+            ? promotionTariffsQuery.error
+            : null
         }
         isSubmitting={requestPromotionMutation.isPending}
         errorMessage={promotionErrorMessage}
         onRetryTariffs={() => void promotionTariffsQuery.refetch()}
         onClose={handleClosePromotionModal}
         onSubmit={handleSubmitPromotion}
-        onSetProductAvailability={isOwnProduct ? handleSetMyProductAvailability : undefined}
+        onSetProductAvailability={
+          isOwnProduct ? handleSetMyProductAvailability : undefined
+        }
         onSetProductAuction={isOwnProduct ? handleSetProductAuction : undefined}
         onSetProductOriginality={isOwnProduct ? handleSetProductOriginality : undefined}
         onSetProductOutOfStock={isOwnProduct ? handleSetProductOutOfStock : undefined}
         onSetProductWholesale={isOwnProduct ? handleSetProductWholesale : undefined}
         onSetProductBuyNFree={isOwnProduct ? handleSetProductBuyNFree : undefined}
         onSetProductAffiliate={isOwnProduct ? handleSetProductAffiliate : undefined}
-        onSetProductLoyaltyPoints={isOwnProduct ? handleSetProductLoyaltyPoints : undefined}
+        onSetProductLoyaltyPoints={
+          isOwnProduct ? handleSetProductLoyaltyPoints : undefined
+        }
         onSetProductInstallment={isOwnProduct ? handleSetProductInstallment : undefined}
         onWholesaleSaved={isOwnProduct ? handleWholesaleSaved : undefined}
         onDeleteProduct={
@@ -973,7 +1064,10 @@ export default function ProductDetailScreen() {
                   }
                 } catch (error) {
                   setManageErrorMessage(
-                    formatApiErrorMessage(error, API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK),
+                    formatApiErrorMessage(
+                      error,
+                      API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK,
+                    ),
                   );
                 }
               }
@@ -994,7 +1088,8 @@ export default function ProductDetailScreen() {
           (isOwnProduct || isAdmin) && (isAdmin || canSellerEditProduct(productRecord))
         }
         canManageDelete={
-          (isOwnProduct || isAdmin) && (isAdmin || canSellerDeleteProduct(productRecord))
+          (isOwnProduct || isAdmin) &&
+          (isAdmin || canSellerDeleteProduct(productRecord))
         }
         canManageToggleVisibility={
           isOwnProduct && (isAdmin || canSellerToggleCatalogVisibility(productRecord))

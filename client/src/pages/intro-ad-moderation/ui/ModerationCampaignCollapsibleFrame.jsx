@@ -40,7 +40,9 @@ export function ModerationCampaignCollapsibleFrame({
           type="button"
           className={[
             "intro-ad-moderation-campaign-frame__toggle",
-            needsAttention ? "intro-ad-moderation-campaign-frame__toggle_attention" : "",
+            needsAttention
+              ? "intro-ad-moderation-campaign-frame__toggle_attention"
+              : "",
           ]
             .filter(Boolean)
             .join(" ")}
@@ -48,16 +50,25 @@ export function ModerationCampaignCollapsibleFrame({
           onClick={onExpandedChange}
         >
           <span className="intro-ad-moderation-campaign-frame__main">
-            <strong className="intro-ad-moderation-campaign-frame__title">{title}</strong>
+            <strong className="intro-ad-moderation-campaign-frame__title">
+              {title}
+            </strong>
             {collapsedPreview && !isExpanded ? (
-              <span className="intro-ad-moderation-campaign-frame__preview">{collapsedPreview}</span>
+              <span className="intro-ad-moderation-campaign-frame__preview">
+                {collapsedPreview}
+              </span>
             ) : null}
           </span>
           <span className="intro-ad-moderation-campaign-frame__meta">
             {createdLabel ? (
-              <span className="intro-ad-moderation-campaign-frame__created">{createdLabel}</span>
+              <span className="intro-ad-moderation-campaign-frame__created">
+                {createdLabel}
+              </span>
             ) : null}
-            <span className="intro-ad-moderation-campaign-frame__chevron" aria-hidden="true">
+            <span
+              className="intro-ad-moderation-campaign-frame__chevron"
+              aria-hidden="true"
+            >
               {isExpanded ? "▾" : "▸"}
             </span>
             <span className="intro-ad-moderation-campaign-frame__expand-label">

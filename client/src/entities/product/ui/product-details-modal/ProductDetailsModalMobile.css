@@ -6,7 +6,8 @@
     padding: 0;
   }
 
-  .product-modal-shell__backdrop:has(.product-details-modal) .product-modal-shell__panel {
+  .product-modal-shell__backdrop:has(.product-details-modal)
+    .product-modal-shell__panel {
     width: 100%;
     max-width: 100%;
     height: 100%;
@@ -330,8 +331,10 @@
     padding: 0.25rem var(--iz-space-4) 0.75rem;
   }
 
-  .product-details-modal__mobile-inline-actions .product-details-modal__footer-btn--edit,
-  .product-details-modal__mobile-inline-actions .product-details-modal__footer-btn--promote {
+  .product-details-modal__mobile-inline-actions
+    .product-details-modal__footer-btn--edit,
+  .product-details-modal__mobile-inline-actions
+    .product-details-modal__footer-btn--promote {
     flex: 1 1 auto;
     min-width: min(100%, 9rem);
     box-shadow: none;

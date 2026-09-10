@@ -48,7 +48,11 @@ export function countFilledProductImageRows(rows) {
  * @param {number} selectedIndex
  * @param {number} nextLength
  */
-export function resolveProductImageSelectionAfterRemove(removeIndex, selectedIndex, nextLength) {
+export function resolveProductImageSelectionAfterRemove(
+  removeIndex,
+  selectedIndex,
+  nextLength,
+) {
   if (nextLength <= 0) {
     return 0;
   }
@@ -69,7 +73,11 @@ export function resolveProductImageSelectionAfterRemove(removeIndex, selectedInd
 }
 
 /** @param {number} oldIndex @param {number} newIndex @param {number} selectedIndex */
-export function resolveProductImageSelectionAfterReorder(oldIndex, newIndex, selectedIndex) {
+export function resolveProductImageSelectionAfterReorder(
+  oldIndex,
+  newIndex,
+  selectedIndex,
+) {
   if (selectedIndex === oldIndex) {
     return newIndex;
   }

@@ -51,7 +51,9 @@ describe("сумма курьеру в карточке покупателя", (
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: ORDER_CARD_UI.SHIPMENT_FEE_RAISE }));
+    fireEvent.click(
+      screen.getByRole("button", { name: ORDER_CARD_UI.SHIPMENT_FEE_RAISE }),
+    );
 
     expect(onRaiseDeliveryFee).toHaveBeenCalledWith({
       orderId: "order-1",

@@ -33,7 +33,9 @@ export function ProductAffiliateShareButton({
     sellerId != null &&
     String(currentUserId) === String(sellerId);
   const [copied, setCopied] = useState(false);
-  const resetTimerRef = useRef(/** @type {ReturnType<typeof setTimeout> | null} */ (null));
+  const resetTimerRef = useRef(
+    /** @type {ReturnType<typeof setTimeout> | null} */ (null),
+  );
 
   useEffect(() => {
     return () => {

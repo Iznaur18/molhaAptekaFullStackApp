@@ -17,23 +17,33 @@ export const DEFAULT_USER_BACKGROUND_FOCUS: ProfileImageFocus = {
   y: PROFILE_IMAGE_FOCUS_DEFAULT,
 };
 
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value));
 
 export const normalizeProfileImageFocus = (
   raw: unknown,
   fallback: ProfileImageFocus,
 ): ProfileImageFocus => {
-  const source = raw != null && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+  const source =
+    raw != null && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
   const record = source as { x?: unknown; y?: unknown };
   const x = Number(record.x ?? fallback.x);
   const y = Number(record.y ?? fallback.y);
 
   return {
     x: Math.round(
-      clamp(Number.isFinite(x) ? x : fallback.x, PROFILE_IMAGE_FOCUS_MIN, PROFILE_IMAGE_FOCUS_MAX),
+      clamp(
+        Number.isFinite(x) ? x : fallback.x,
+        PROFILE_IMAGE_FOCUS_MIN,
+        PROFILE_IMAGE_FOCUS_MAX,
+      ),
     ),
     y: Math.round(
-      clamp(Number.isFinite(y) ? y : fallback.y, PROFILE_IMAGE_FOCUS_MIN, PROFILE_IMAGE_FOCUS_MAX),
+      clamp(
+        Number.isFinite(y) ? y : fallback.y,
+        PROFILE_IMAGE_FOCUS_MIN,
+        PROFILE_IMAGE_FOCUS_MAX,
+      ),
     ),
   };
 };
@@ -46,5 +56,7 @@ export const formatProfileImageContentPosition = (focus: ProfileImageFocus) => (
 export const getUserAvatarFocus = (user: Record<string, unknown> | null | undefined) =>
   normalizeProfileImageFocus(user?.userAvatarFocus, DEFAULT_USER_AVATAR_FOCUS);
 
-export const getUserBackgroundFocus = (user: Record<string, unknown> | null | undefined) =>
+export const getUserBackgroundFocus = (
+  user: Record<string, unknown> | null | undefined,
+) =>
   normalizeProfileImageFocus(user?.userBackgroundFocus, DEFAULT_USER_BACKGROUND_FOCUS);

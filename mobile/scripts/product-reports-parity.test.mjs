@@ -10,8 +10,12 @@ const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
 test("product reports page mirrors web sections toolbar and hub chrome", () => {
-  const page = readMobileFile("features/product-reports-page/ui/ProductReportsPage.tsx");
-  const toolbar = readMobileFile("features/product-reports-page/ui/ProductReportsToolbar.tsx");
+  const page = readMobileFile(
+    "features/product-reports-page/ui/ProductReportsPage.tsx",
+  );
+  const toolbar = readMobileFile(
+    "features/product-reports-page/ui/ProductReportsToolbar.tsx",
+  );
 
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /ProfileMobileNavSheet/);

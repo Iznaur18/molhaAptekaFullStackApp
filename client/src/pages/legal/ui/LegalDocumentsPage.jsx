@@ -41,7 +41,11 @@ export function LegalDocumentsPage() {
 
   return (
     <section className="legal-docs-page">
-      <div className="legal-docs-page__tabs" role="tablist" aria-label={LEGAL_UI.TERMS_TITLE}>
+      <div
+        className="legal-docs-page__tabs"
+        role="tablist"
+        aria-label={LEGAL_UI.TERMS_TITLE}
+      >
         {LEGAL_DOCUMENT_TABS.map((tab) => {
           const isActive = tab.id === activeKind;
 

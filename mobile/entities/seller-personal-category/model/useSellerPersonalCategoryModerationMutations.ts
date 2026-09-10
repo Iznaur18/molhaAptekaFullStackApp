@@ -33,7 +33,8 @@ export const useManagedSellerPersonalCategoryCampaignsQuery = (enabled = true) =
 
 export const useSellerPersonalCategoryModerationMutations = () => {
   const approveMutation = useMutation({
-    mutationFn: (campaignId: string) => approveSellerPersonalCategoryCampaign(campaignId),
+    mutationFn: (campaignId: string) =>
+      approveSellerPersonalCategoryCampaign(campaignId),
   });
 
   const rejectMutation = useMutation({
@@ -42,11 +43,13 @@ export const useSellerPersonalCategoryModerationMutations = () => {
   });
 
   const staffUnpublishMutation = useMutation({
-    mutationFn: (campaignId: string) => cancelSellerPersonalCategoryCampaignByStaff(campaignId),
+    mutationFn: (campaignId: string) =>
+      cancelSellerPersonalCategoryCampaignByStaff(campaignId),
   });
 
   const staffDeleteMutation = useMutation({
-    mutationFn: (campaignId: string) => deleteSellerPersonalCategoryCampaignByStaff(campaignId),
+    mutationFn: (campaignId: string) =>
+      deleteSellerPersonalCategoryCampaignByStaff(campaignId),
   });
 
   return {

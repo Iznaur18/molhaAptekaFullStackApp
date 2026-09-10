@@ -30,7 +30,10 @@ test("cart line renders a selection checkbox in the card corner", () => {
   assert.match(lineItem, /AppCheckbox/);
   assert.match(lineItem, /checked=\{selected\}/);
   assert.match(lineItem, /onToggleSelected\(line\.productId\)/);
-  assert.match(styles, /selectCheckbox: \{\s*position: "absolute",\s*top: 12,\s*right: 12,/);
+  assert.match(
+    styles,
+    /selectCheckbox: \{\s*position: "absolute",\s*top: 12,\s*right: 12,/,
+  );
 });
 
 test("checkout orders only the selected lines and keeps the rest in the cart", () => {
@@ -59,9 +62,14 @@ test("toggleAll selects everything unless everything is already selected", () =>
   const selection = readMobileFile("entities/cart/model/useCartSelection.ts");
 
   // Снято всё -> выбрать всё; выбрано частично -> выбрать всё; выбрано всё -> снять всё.
+  //
+  // Пробелы и переносы в шаблоне намеренно свободные: тест проверяет исходный
+  // текст файла, а его раскладку задаёт prettier. С жёстким шаблоном тест
+  // ломался от одного лишь переформатирования — так и вышло 10.09.2026, когда
+  // репозиторий первый раз прогнали prettier'ом целиком.
   assert.match(
     selection,
-    /setDeselectedIds\(\(prev\) => \(prev\.size === 0 \? new Set\(purchasableIdSet\) : EMPTY_DESELECTION\)\)/,
+    /setDeselectedIds\(\s*\(prev\)\s*=>\s*\(?\s*prev\.size\s*===\s*0\s*\?\s*new Set\(purchasableIdSet\)\s*:\s*EMPTY_DESELECTION/,
   );
   assert.match(selection, /toggleAllIn/);
 });
@@ -70,7 +78,10 @@ test("cart totals follow the selection", () => {
   const cartScreen = readMobileFile("app/(tabs)/cart.tsx");
   const fulfillment = readMobileFile("entities/cart/ui/CartFulfillmentSection.tsx");
 
-  assert.match(cartScreen, /canCheckoutActive = activeSummary\.selectedLines\.length > 0/);
+  assert.match(
+    cartScreen,
+    /canCheckoutActive = activeSummary\.selectedLines\.length > 0/,
+  );
   assert.match(fulfillment, /formatPriceRub\(summary\.selectedTotal\)/);
   assert.doesNotMatch(cartScreen, /displayTotal/);
 });

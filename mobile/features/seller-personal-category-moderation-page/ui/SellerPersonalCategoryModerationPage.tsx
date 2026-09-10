@@ -72,7 +72,9 @@ export const SellerPersonalCategoryModerationPage = () => {
       <>
         <View style={[styles.container, centeredContentStyle, styles.centered]}>
           <View style={styles.header}>{sectionToggle}</View>
-          <Text style={styles.state}>{SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.LOADING}</Text>
+          <Text style={styles.state}>
+            {SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.LOADING}
+          </Text>
         </View>
         {navSheet}
       </>
@@ -105,7 +107,9 @@ export const SellerPersonalCategoryModerationPage = () => {
       <>
         <View style={[styles.container, centeredContentStyle, styles.centered]}>
           {listHeader}
-          <Text style={styles.empty}>{SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.EMPTY}</Text>
+          <Text style={styles.empty}>
+            {SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.EMPTY}
+          </Text>
         </View>
         {navSheet}
       </>

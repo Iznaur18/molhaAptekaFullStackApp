@@ -31,7 +31,8 @@ export const usePlaceProductPress = () => {
 
   const hasPersonalOverride =
     !isAdmin &&
-    normalizeSellerProductsLimitOverride(authUser?.sellerProductsLimitOverride) !== null;
+    normalizeSellerProductsLimitOverride(authUser?.sellerProductsLimitOverride) !==
+      null;
 
   const myProductsTotal = myProductsTotalQuery.myProductsTotal;
   const isAtSellerProductsLimit = isSellerProductsLimitReached(

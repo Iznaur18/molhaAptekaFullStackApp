@@ -33,8 +33,7 @@ export function haversineKm(a, b) {
   const lat2 = toRad(b.lat);
 
   const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+    Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
   return 2 * EARTH_RADIUS_KM * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 
@@ -86,7 +85,12 @@ const resolvePickupPoint = (products, seller) => {
  *   limit?: number;
  * }} input
  */
-export async function listCourierOverview({ courierId, lat = null, lon = null, limit = 30 }) {
+export async function listCourierOverview({
+  courierId,
+  lat = null,
+  lon = null,
+  limit = 30,
+}) {
   const courier = await UserModel.findById(courierId)
     .select("courierProfile.moderationStatus userRegionCode userAddressGeo")
     .lean();
@@ -110,9 +114,7 @@ export async function listCourierOverview({ courierId, lat = null, lon = null, l
       },
     },
   })
-    .select(
-      "items shipments deliveryAddress deliveryAddressFlat createdAt userBuyerId",
-    )
+    .select("items shipments deliveryAddress deliveryAddressFlat createdAt userBuyerId")
     .sort({ createdAt: -1 })
     .limit(safeLimit * 5)
     .lean();
@@ -148,8 +150,7 @@ export async function listCourierOverview({ courierId, lat = null, lon = null, l
 
       const sellerId = String(shipment.sellerId);
       const items = (order.items ?? []).filter(
-        (item) =>
-          resolveItemSellerId(item) === sellerId && !TERMINAL.has(item.status),
+        (item) => resolveItemSellerId(item) === sellerId && !TERMINAL.has(item.status),
       );
       if (items.length === 0) continue;
       if (buildOrderStatusFromItems(items) !== ORDER_STATUS_READY_TO_SHIP) continue;
@@ -294,8 +295,7 @@ export async function listMyCourierDeliveries({ courierId }) {
 
       const sellerId = String(shipment.sellerId);
       const items = (order.items ?? []).filter(
-        (item) =>
-          resolveItemSellerId(item) === sellerId && !TERMINAL.has(item.status),
+        (item) => resolveItemSellerId(item) === sellerId && !TERMINAL.has(item.status),
       );
       if (items.length === 0) continue;
 
@@ -318,7 +318,9 @@ export async function listMyCourierDeliveries({ courierId }) {
       .select("userName userAddress userAddressGeo userPhoneNumber")
       .lean(),
     ProductModel.find({ _id: { $in: [...productIds] } })
-      .select("productName productImageUrls productPickupAddress productPickupLat productPickupLon")
+      .select(
+        "productName productImageUrls productPickupAddress productPickupLat productPickupLon",
+      )
       .lean(),
   ]);
   const sellerById = new Map(sellers.map((row) => [String(row._id), row]));
@@ -348,17 +350,18 @@ export async function listMyCourierDeliveries({ courierId }) {
       buyerName: buyer?.userName ?? "",
       buyerPhone: contactsUnlocked ? (buyer?.userPhoneNumber ?? "") : "",
       deliveryAddress: contactsUnlocked
-        ? [order.deliveryAddress, order.deliveryAddressFlat]
-            .filter(Boolean)
-            .join(", ")
-        : String(order.deliveryAddress ?? "").split(",").slice(0, 2).join(",").trim(),
+        ? [order.deliveryAddress, order.deliveryAddressFlat].filter(Boolean).join(", ")
+        : String(order.deliveryAddress ?? "")
+            .split(",")
+            .slice(0, 2)
+            .join(",")
+            .trim(),
       contactsUnlocked,
       items: items.map((item) => ({
         productId: String(item.productId ?? ""),
         name: item.productNameAtOrder,
         quantity: item.quantity,
-        imageUrl:
-          productById.get(String(item.productId))?.productImageUrls?.[0] ?? "",
+        imageUrl: productById.get(String(item.productId))?.productImageUrls?.[0] ?? "",
       })),
     };
   });

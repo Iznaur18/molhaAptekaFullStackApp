@@ -59,11 +59,7 @@ const STAFF_MODERATOR_QUERY_OPTIONS = {
  *   mainView: string;
  * }} params
  */
-export function useStaffBadgeQueries({
-  isAuthorized,
-  canModerateProducts,
-  mainView,
-}) {
+export function useStaffBadgeQueries({ isAuthorized, canModerateProducts, mainView }) {
   const queryClient = useQueryClient();
   const staffEnabled = isAuthorized && canModerateProducts;
   const userActionsEnabled = isAuthorized;
@@ -245,8 +241,7 @@ export function useStaffBadgeQueries({
     pendingRafflesCount: rafflesQuery.data ?? 0,
     pendingProductPromotionsCount: productPromotionsQuery.data ?? 0,
     pendingInstallmentDisputesCount: installmentDisputesQuery.data ?? 0,
-    pendingIncomingPriceOffersCount:
-      userProfileActions.pendingIncomingPriceOffersCount,
+    pendingIncomingPriceOffersCount: userProfileActions.pendingIncomingPriceOffersCount,
     pendingMySalesActionCount: userProfileActions.pendingMySalesActionCount,
     pendingMyOrdersActionCount: userProfileActions.pendingMyOrdersActionCount,
     pendingInstallmentBuyerActionCount:

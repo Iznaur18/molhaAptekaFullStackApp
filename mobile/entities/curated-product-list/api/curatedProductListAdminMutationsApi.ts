@@ -24,7 +24,10 @@ export const patchCuratedProductListAdmin = async (
   body: { title?: string; regionCode?: string },
 ): Promise<CuratedListAdminRow> => {
   try {
-    const { data } = await apiClient.patch(`/product/admin/curated-lists/${listId}`, body);
+    const { data } = await apiClient.patch(
+      `/product/admin/curated-lists/${listId}`,
+      body,
+    );
     if (!data?.success || !data.data?.list) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
@@ -57,7 +60,9 @@ export const reorderCuratedProductListsAdmin = async (
     }
     return data.data.lists as CuratedListAdminRow[];
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, "Не удалось изменить порядок списков"));
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось изменить порядок списков"),
+    );
   }
 };
 
@@ -66,9 +71,12 @@ export const addCuratedProductListItemAdmin = async (
   productId: string,
 ): Promise<CuratedListAdminRow> => {
   try {
-    const { data } = await apiClient.post(`/product/admin/curated-lists/${listId}/products`, {
-      productId,
-    });
+    const { data } = await apiClient.post(
+      `/product/admin/curated-lists/${listId}/products`,
+      {
+        productId,
+      },
+    );
     if (!data?.success || !data.data?.list) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

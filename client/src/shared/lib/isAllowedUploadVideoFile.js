@@ -23,7 +23,9 @@ export function normalizeUploadVideoMime(rawMime) {
  * @param {string} fileName
  */
 export function getUploadVideoFileExtension(fileName) {
-  const normalized = String(fileName ?? "").trim().toLowerCase();
+  const normalized = String(fileName ?? "")
+    .trim()
+    .toLowerCase();
   const dotIndex = normalized.lastIndexOf(".");
   if (dotIndex < 0) {
     return "";

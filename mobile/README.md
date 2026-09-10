@@ -45,34 +45,34 @@ npm start
 
 ## Структура (FSD-lite)
 
-| Папка | Назначение |
-| ----- | ---------- |
-| `app/` | Expo Router — экраны и навигация |
-| `entities/session/` | auth API, mutations, `useAuthSessionQuery` |
-| `entities/product/` | каталог API, `ProductCard`, infinite query |
-| `entities/cart/` | `GET/PUT /cart`, server-only, badge |
-| `features/cart-add/` | `AddToCartButton` на карточке товара |
-| `features/checkout/` | оформление заказа в корзине |
-| `features/catalog-filter/` | поиск и chips категорий |
-| `entities/address/` | DaData suggest |
-| `entities/order/` | `POST /order`, `GET /order` (мои заказы) |
-| `features/email-verify/` | подтверждение email in-app |
-| `app/orders/` | экран «Мои заказы» |
-| `shared/api/` | `apiClient`, SecureStore, query keys |
-| `shared/lib/` | `@izibuy/shared-lib` (formatters, upload URL) + `resolveUploadedMediaUrl` |
-| `shared/config/` | env, тексты ошибок, staleTime |
+| Папка                      | Назначение                                                                |
+| -------------------------- | ------------------------------------------------------------------------- |
+| `app/`                     | Expo Router — экраны и навигация                                          |
+| `entities/session/`        | auth API, mutations, `useAuthSessionQuery`                                |
+| `entities/product/`        | каталог API, `ProductCard`, infinite query                                |
+| `entities/cart/`           | `GET/PUT /cart`, server-only, badge                                       |
+| `features/cart-add/`       | `AddToCartButton` на карточке товара                                      |
+| `features/checkout/`       | оформление заказа в корзине                                               |
+| `features/catalog-filter/` | поиск и chips категорий                                                   |
+| `entities/address/`        | DaData suggest                                                            |
+| `entities/order/`          | `POST /order`, `GET /order` (мои заказы)                                  |
+| `features/email-verify/`   | подтверждение email in-app                                                |
+| `app/orders/`              | экран «Мои заказы»                                                        |
+| `shared/api/`              | `apiClient`, SecureStore, query keys                                      |
+| `shared/lib/`              | `@izibuy/shared-lib` (formatters, upload URL) + `resolveUploadedMediaUrl` |
+| `shared/config/`           | env, тексты ошибок, staleTime                                             |
 
 ## Buyer-critical path (G.3)
 
 Приоритет mobile: **каталог → карточка → корзина → заказ → профиль**. Staff — web only (§ Staff inventory).
 
-| Шаг | Route | Ключевой код |
-| --- | ----- | ------------ |
-| Каталог | `/(tabs)/index`, `/(tabs)/catalog` | `fetchCatalogProductsPage`, `ProductCard` |
-| Карточка | `/product/[id]` | `fetchCatalogProductById`, `AddToCartButton` |
-| Корзина | `/(tabs)/cart` | `fetchMyCart`, `replaceMyCart`, `CheckoutForm` |
-| Заказ | `/orders` (после checkout) | `createOrder`, `fetchMyOrders` |
-| Профиль | `/(tabs)/profile`, `/profile/edit` | `fetchAuthMe`, `useAuthSessionQuery` |
+| Шаг      | Route                              | Ключевой код                                   |
+| -------- | ---------------------------------- | ---------------------------------------------- |
+| Каталог  | `/(tabs)/index`, `/(tabs)/catalog` | `fetchCatalogProductsPage`, `ProductCard`      |
+| Карточка | `/product/[id]`                    | `fetchCatalogProductById`, `AddToCartButton`   |
+| Корзина  | `/(tabs)/cart`                     | `fetchMyCart`, `replaceMyCart`, `CheckoutForm` |
+| Заказ    | `/orders` (после checkout)         | `createOrder`, `fetchMyOrders`                 |
+| Профиль  | `/(tabs)/profile`, `/profile/edit` | `fetchAuthMe`, `useAuthSessionQuery`           |
 
 Подробно: [`docs/BUYER-CRITICAL-PATH.md`](docs/BUYER-CRITICAL-PATH.md)
 
@@ -85,47 +85,47 @@ npm run smoke:buyer-path     # API smoke (server + e2e seed)
 
 С **G.1** пункты staff в hub-меню открывают **web SPA** (`openProfileStaffWebSection`). Код ниже — **legacy in-app**, не расширять; баги — P3, фикс только если ломает buyer-path. Новые staff-фичи — только `client/`.
 
-| Section ID | Feature / экран | Роль | Web path (G.1) |
-| ---------- | ---------------- | ---- | -------------- |
-| `create-raffle` | `features/create-raffle-page` | moderator | **in-app** (`/hub/create-raffle`) |
-| `product-moderation` | `features/product-moderation-page` | moderator | `/moderation-products` |
-| `intro-ad-moderation` | `features/intro-ad-moderation-page` | moderator | `/moderation-intro-ad` |
-| `seller-personal-category-moderation` | `features/seller-personal-category-moderation-page` | moderator | `/moderation-seller-categories` |
-| `product-reports` | `features/product-reports-page` (+ story reports) | moderator | `/product-reports` |
-| `product-promotions` | `features/product-promotions-staff-page` | moderator | `/product-promotions` |
-| `raffles` | `features/raffles-staff-page` | moderator | `/staff-raffles` |
-| `data-confirmation-requests` | `features/data-confirmation-requests-page` | moderator | `/data-confirmation-requests` |
-| `installment-disputes` | `features/installment-disputes-page` | moderator | `/installment-disputes` |
-| `admin-orders` | `features/admin-orders-page` | admin | `/admin-orders` |
-| `search-synonyms-admin` | `features/search-synonyms-admin-page` | admin | `/search-synonyms-admin` |
-| `category-tree-admin` | `features/category-tree-admin-page` | admin | `/category-tree-admin` |
-| `app-intro-admin` | `features/app-intro-admin-page` | admin | `/app-intro-admin` |
-| `popular-products-admin` | `features/popular-products-admin-page` | admin | `/profile/popular-products-admin` |
+| Section ID                            | Feature / экран                                     | Роль      | Web path (G.1)                    |
+| ------------------------------------- | --------------------------------------------------- | --------- | --------------------------------- |
+| `create-raffle`                       | `features/create-raffle-page`                       | moderator | **in-app** (`/hub/create-raffle`) |
+| `product-moderation`                  | `features/product-moderation-page`                  | moderator | `/moderation-products`            |
+| `intro-ad-moderation`                 | `features/intro-ad-moderation-page`                 | moderator | `/moderation-intro-ad`            |
+| `seller-personal-category-moderation` | `features/seller-personal-category-moderation-page` | moderator | `/moderation-seller-categories`   |
+| `product-reports`                     | `features/product-reports-page` (+ story reports)   | moderator | `/product-reports`                |
+| `product-promotions`                  | `features/product-promotions-staff-page`            | moderator | `/product-promotions`             |
+| `raffles`                             | `features/raffles-staff-page`                       | moderator | `/staff-raffles`                  |
+| `data-confirmation-requests`          | `features/data-confirmation-requests-page`          | moderator | `/data-confirmation-requests`     |
+| `installment-disputes`                | `features/installment-disputes-page`                | moderator | `/installment-disputes`           |
+| `admin-orders`                        | `features/admin-orders-page`                        | admin     | `/admin-orders`                   |
+| `search-synonyms-admin`               | `features/search-synonyms-admin-page`               | admin     | `/search-synonyms-admin`          |
+| `category-tree-admin`                 | `features/category-tree-admin-page`                 | admin     | `/category-tree-admin`            |
+| `app-intro-admin`                     | `features/app-intro-admin-page`                     | admin     | `/app-intro-admin`                |
+| `popular-products-admin`              | `features/popular-products-admin-page`              | admin     | `/profile/popular-products-admin` |
 
 **Связанный legacy-код (не hub, тоже maintenance):**
 
-| Область | Путь | Назначение |
-| ------- | ---- | ---------- |
-| Hub wiring | `features/profile-hub/ui/HubSectionContent.tsx` | switch staff → legacy pages (обходится G.1 redirect) |
-| Badge API | `features/profile-hub/api/staffBadgeApi.ts` | счётчики staff в меню |
-| Каталог admin UI | `features/catalog-browser/ui/EditCategoryDisplayModal.tsx`, `EditFeedTileDisplayModal.tsx` | правка отображения категорий/плиток (admin) |
-| Shared UI | `shared/ui/StaffModerationActions.tsx`, `shared/theme/staffQueueStyles.ts` | кнопки очередей |
-| Entities | `entities/*/…Staff*.ts`, `*Moderation*.ts`, `*Admin*.ts` | API + mutations для таблиц выше |
+| Область          | Путь                                                                                       | Назначение                                           |
+| ---------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------- |
+| Hub wiring       | `features/profile-hub/ui/HubSectionContent.tsx`                                            | switch staff → legacy pages (обходится G.1 redirect) |
+| Badge API        | `features/profile-hub/api/staffBadgeApi.ts`                                                | счётчики staff в меню                                |
+| Каталог admin UI | `features/catalog-browser/ui/EditCategoryDisplayModal.tsx`, `EditFeedTileDisplayModal.tsx` | правка отображения категорий/плиток (admin)          |
+| Shared UI        | `shared/ui/StaffModerationActions.tsx`, `shared/theme/staffQueueStyles.ts`                 | кнопки очередей                                      |
+| Entities         | `entities/*/…Staff*.ts`, `*Moderation*.ts`, `*Admin*.ts`                                   | API + mutations для таблиц выше                      |
 
 **Активная разработка mobile:** buyer/seller trade (`my-products`, `create-product`, корзина, заказы, каталог, профиль) — см. §6 audit [`docs/quality/client-mobile-consolidation-audit.md`](../docs/quality/client-mobile-consolidation-audit.md).
 
 ## Скрипты
 
-| Команда | Описание |
-| ------- | -------- |
-| `npm start` | Metro (Expo Go / web) |
-| `npm run start:dev` | Metro для **dev client** после EAS build |
-| `npm run android:install` | Сборка + установка на Samsung по USB (Android Studio) |
-| `npm run build:dev:android` | EAS APK → sideload на Samsung |
-| `npm run android` | эмулятор / устройство Android |
-| `npm run lint` | ESLint |
-| `npm run regression:wf72` | static regression (routes, hub, deep links, upload wiring) |
-| `npm run smoke:buyer-path` | API smoke buyer path (G.3) |
+| Команда                     | Описание                                                   |
+| --------------------------- | ---------------------------------------------------------- |
+| `npm start`                 | Metro (Expo Go / web)                                      |
+| `npm run start:dev`         | Metro для **dev client** после EAS build                   |
+| `npm run android:install`   | Сборка + установка на Samsung по USB (Android Studio)      |
+| `npm run build:dev:android` | EAS APK → sideload на Samsung                              |
+| `npm run android`           | эмулятор / устройство Android                              |
+| `npm run lint`              | ESLint                                                     |
+| `npm run regression:wf72`   | static regression (routes, hub, deep links, upload wiring) |
+| `npm run smoke:buyer-path`  | API smoke buyer path (G.3)                                 |
 
 ## Dev-заметки
 

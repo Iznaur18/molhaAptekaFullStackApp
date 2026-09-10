@@ -53,9 +53,7 @@ export function CuratedListViewAllSheet({
   const { mounted, isVisible } = useWholesalePriceSheetAnimation(isOpen);
   const showProducts = products.length > 0 && typeof onOpenProduct === "function";
   const showCategories =
-    !showProducts &&
-    categories.length > 0 &&
-    typeof onOpenCategory === "function";
+    !showProducts && categories.length > 0 && typeof onOpenCategory === "function";
   const cardGapPx = showCategories
     ? CURATED_CATEGORY_LIST_HOME_CARD_GAP_PX
     : CURATED_PRODUCT_LIST_HOME_CARD_GAP_PX;
@@ -135,11 +133,11 @@ export function CuratedListViewAllSheet({
           {showProducts ? (
             <ul className="curated-list-view-all-sheet__grid" role="list">
               {products.map((product) => (
-                <li key={product._id} className="curated-list-view-all-sheet__grid-item">
-                  <CuratedProductCompactCard
-                    product={product}
-                    onOpen={onOpenProduct}
-                  />
+                <li
+                  key={product._id}
+                  className="curated-list-view-all-sheet__grid-item"
+                >
+                  <CuratedProductCompactCard product={product} onOpen={onOpenProduct} />
                 </li>
               ))}
             </ul>

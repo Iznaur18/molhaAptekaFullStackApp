@@ -16,8 +16,7 @@ export const PASSWORD_RESET_INVALID_CODE_MESSAGE =
 export const PASSWORD_RESET_ATTEMPTS_EXCEEDED_MESSAGE =
   "Превышено число попыток. Запросите код повторно";
 
-export const PASSWORD_RESET_SUCCESS_MESSAGE =
-  "Пароль изменён. Войдите с новым паролем";
+export const PASSWORD_RESET_SUCCESS_MESSAGE = "Пароль изменён. Войдите с новым паролем";
 
 export const PASSWORD_CHANGE_SUCCESS_MESSAGE = "Пароль успешно изменён";
 

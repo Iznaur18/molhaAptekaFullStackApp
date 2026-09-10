@@ -18,7 +18,9 @@ const REMAINING_PRODUCT_FILES = [
   "productWishlistCount.js",
 ];
 
-const MOVED_FILES = [...new Set([...EXISTING_PRODUCT_FILES, ...REMAINING_PRODUCT_FILES])];
+const MOVED_FILES = [
+  ...new Set([...EXISTING_PRODUCT_FILES, ...REMAINING_PRODUCT_FILES]),
+];
 
 const RAFFLE_IMPORTS = new Set(["raffleHelpers.js"]);
 
@@ -29,18 +31,15 @@ const rewriteImports = (source) => {
     .replaceAll('from "../errors/', 'from "../../errors/')
     .replaceAll('from "../db/', 'from "../../db/');
 
-  next = next.replace(
-    /from "\.\/([^"]+\.js)"/g,
-    (_match, relPath) => {
-      if (MOVED_FILES.includes(relPath)) {
-        return `from "./${relPath}"`;
-      }
-      if (RAFFLE_IMPORTS.has(relPath)) {
-        return `from "../raffle/${relPath}"`;
-      }
-      return `from "../../utils/${relPath}"`;
-    },
-  );
+  next = next.replace(/from "\.\/([^"]+\.js)"/g, (_match, relPath) => {
+    if (MOVED_FILES.includes(relPath)) {
+      return `from "./${relPath}"`;
+    }
+    if (RAFFLE_IMPORTS.has(relPath)) {
+      return `from "../raffle/${relPath}"`;
+    }
+    return `from "../../utils/${relPath}"`;
+  });
 
   return next;
 };
@@ -55,4 +54,6 @@ for (const fileName of REMAINING_PRODUCT_FILES) {
   fs.writeFileSync(path.join(UTILS_DIR, fileName), shim, "utf8");
 }
 
-console.log(`Migrated ${REMAINING_PRODUCT_FILES.length} product utils → services/product/`);
+console.log(
+  `Migrated ${REMAINING_PRODUCT_FILES.length} product utils → services/product/`,
+);

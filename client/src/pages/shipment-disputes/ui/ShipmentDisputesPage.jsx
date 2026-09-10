@@ -64,7 +64,9 @@ export function ShipmentDisputesPage({ onQueueChanged }) {
       </header>
 
       {queueQuery.isPending ? (
-        <p className="shipment-disputes__loading">{SHIPMENT_DISPUTE_UI.QUEUE_LOADING}</p>
+        <p className="shipment-disputes__loading">
+          {SHIPMENT_DISPUTE_UI.QUEUE_LOADING}
+        </p>
       ) : queueQuery.isError ? (
         <p className="shipment-disputes__error" role="alert">
           {queueQuery.error instanceof Error

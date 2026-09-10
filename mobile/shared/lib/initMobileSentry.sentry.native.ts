@@ -26,9 +26,7 @@ const resolveBuildNumber = (): string | undefined => {
   return Constants.nativeBuildVersion ?? undefined;
 };
 
-const scrubSentryRequestHeaders = (
-  event: Sentry.ErrorEvent,
-): Sentry.ErrorEvent => {
+const scrubSentryRequestHeaders = (event: Sentry.ErrorEvent): Sentry.ErrorEvent => {
   if (!event.request?.headers) {
     return event;
   }
@@ -73,8 +71,7 @@ export function initMobileSentry(): boolean {
   );
   const release = process.env.EXPO_PUBLIC_GIT_COMMIT_SHA?.trim() || undefined;
   const environment =
-    process.env.EXPO_PUBLIC_APP_ENV?.trim() ||
-    (__DEV__ ? "development" : "production");
+    process.env.EXPO_PUBLIC_APP_ENV?.trim() || (__DEV__ ? "development" : "production");
 
   Sentry.init({
     dsn,

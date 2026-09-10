@@ -1,10 +1,5 @@
 import { Children, isValidElement, useMemo } from "react";
-import {
-  ScrollView,
-  View,
-  type StyleProp,
-  type ViewStyle,
-} from "react-native";
+import { ScrollView, View, type StyleProp, type ViewStyle } from "react-native";
 
 import { isReactNativeWeb } from "@/shared/lib/isReactNativeWeb";
 import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";

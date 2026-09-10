@@ -69,7 +69,9 @@ export function buildPatchUserProfileBody(form, options = {}) {
 
   body.userGender = form.userGender;
 
-  const addressBaseline = Array.isArray(initialSavedAddresses) ? initialSavedAddresses : [];
+  const addressBaseline = Array.isArray(initialSavedAddresses)
+    ? initialSavedAddresses
+    : [];
   if (!isUserSavedAddressesEqual(form.savedAddresses, addressBaseline)) {
     appendUserAddressesToPayload(body, form.savedAddresses);
   }
@@ -100,7 +102,9 @@ export function buildPatchUserProfileBody(form, options = {}) {
   } else {
     body.userBackgroundUrl = serializeUserBackgroundForForm(backgroundMode, {
       presetId: form.backgroundPresetId,
-      imageUrl: normalizeUploadUrlForStorage(String(form.backgroundImageUrl ?? "").trim()),
+      imageUrl: normalizeUploadUrlForStorage(
+        String(form.backgroundImageUrl ?? "").trim(),
+      ),
     });
   }
 

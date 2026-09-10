@@ -65,10 +65,22 @@ test("shouldSkipAccessLogPath: health and uploads", () => {
 });
 
 test("shouldSampleAccessLog", () => {
-  assert.equal(shouldSampleAccessLog(1, () => 0.99), true);
-  assert.equal(shouldSampleAccessLog(0, () => 0), false);
-  assert.equal(shouldSampleAccessLog(0.5, () => 0.4), true);
-  assert.equal(shouldSampleAccessLog(0.5, () => 0.6), false);
+  assert.equal(
+    shouldSampleAccessLog(1, () => 0.99),
+    true,
+  );
+  assert.equal(
+    shouldSampleAccessLog(0, () => 0),
+    false,
+  );
+  assert.equal(
+    shouldSampleAccessLog(0.5, () => 0.4),
+    true,
+  );
+  assert.equal(
+    shouldSampleAccessLog(0.5, () => 0.6),
+    false,
+  );
 });
 
 test("GET /product: emits http.access JSON when sampling on", async () => {
@@ -80,7 +92,9 @@ test("GET /product: emits http.access JSON when sampling on", async () => {
 
   try {
     const response = await request("/product?limit=1");
-    assert.ok(response.status === 200 || response.status === 400 || response.status === 401);
+    assert.ok(
+      response.status === 200 || response.status === 400 || response.status === 401,
+    );
     // finish is sync after await fetch resolves
     const accessLines = lines
       .map((line) => {

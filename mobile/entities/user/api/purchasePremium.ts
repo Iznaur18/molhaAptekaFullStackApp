@@ -20,10 +20,14 @@ export const purchasePremium = async ({
         typeof data.data.message === "string"
           ? data.data.message
           : API_CLIENT_UI.PREMIUM_PURCHASE_SUCCESS,
-      loyaltyPointsBalance: Number.isFinite(loyaltyPointsBalance) ? loyaltyPointsBalance : 0,
+      loyaltyPointsBalance: Number.isFinite(loyaltyPointsBalance)
+        ? loyaltyPointsBalance
+        : 0,
       isActive: Boolean(data.data.isActive),
     };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.PURCHASE_PREMIUM_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.PURCHASE_PREMIUM_FALLBACK),
+    );
   }
 };

@@ -29,9 +29,7 @@ export async function fetchMyFavorites() {
     };
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      API_CLIENT_UI.FETCH_WISHLIST_FALLBACK;
+      e?.response?.data?.message ?? e?.message ?? API_CLIENT_UI.FETCH_WISHLIST_FALLBACK;
     throw new Error(message);
   }
 }

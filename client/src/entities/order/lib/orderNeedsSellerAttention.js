@@ -1,7 +1,4 @@
-import {
-  ORDER_STATUS_PENDING,
-  ORDER_STATUS_SHIPPED,
-} from "../model/constants.js";
+import { ORDER_STATUS_PENDING, ORDER_STATUS_SHIPPED } from "../model/constants.js";
 import { MY_SALES_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 /**

@@ -15,7 +15,9 @@ type ThemePreferenceToggleProps = {
   centered?: boolean;
 };
 
-export const ThemePreferenceToggle = ({ centered = false }: ThemePreferenceToggleProps) => {
+export const ThemePreferenceToggle = ({
+  centered = false,
+}: ThemePreferenceToggleProps) => {
   const styles = useThemePreferenceToggleStyles();
   const { preference, setPreference } = useAppThemeSettings();
 
@@ -33,7 +35,12 @@ export const ThemePreferenceToggle = ({ centered = false }: ThemePreferenceToggl
               style={[styles.chip, isActive ? styles.chipActive : styles.chipIdle]}
               onPress={() => setPreference(option.value)}
             >
-              <Text style={[styles.chipText, isActive ? styles.chipTextActive : styles.chipTextIdle]}>
+              <Text
+                style={[
+                  styles.chipText,
+                  isActive ? styles.chipTextActive : styles.chipTextIdle,
+                ]}
+              >
                 {option.label}
               </Text>
             </Pressable>

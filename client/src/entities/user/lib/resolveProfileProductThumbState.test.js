@@ -11,7 +11,9 @@ describe("isProfileProductThumbUnavailable", () => {
   };
 
   it("returns true when not viewable", () => {
-    expect(isProfileProductThumbUnavailable({ ...baseItem, viewable: false })).toBe(true);
+    expect(isProfileProductThumbUnavailable({ ...baseItem, viewable: false })).toBe(
+      true,
+    );
   });
 
   it("skips purchase gates for profile owner", () => {

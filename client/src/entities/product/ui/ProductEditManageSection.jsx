@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
 
-import { isProductAffiliateConfigured, isProductWholesaleConfigured, isProductRentalConfigured, isProductBuyNFreeConfigured } from "@izibuy/shared-lib";
+import {
+  isProductAffiliateConfigured,
+  isProductWholesaleConfigured,
+  isProductRentalConfigured,
+  isProductBuyNFreeConfigured,
+} from "@izibuy/shared-lib";
 
 import { isProductRaffleParticipant } from "../../raffle/lib/isProductRaffleParticipant.js";
 import { hasProductManualCatalogDiscount } from "../lib/hasProductManualCatalogDiscount.js";
-import { PRODUCT_CARD_UI, CREATE_PRODUCT_MODAL_UI, PRODUCT_FLASH_SALE_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  PRODUCT_CARD_UI,
+  CREATE_PRODUCT_MODAL_UI,
+  PRODUCT_FLASH_SALE_UI,
+} from "../../../shared/config/appUiCopy.js";
 import { PRODUCT_MODERATION_APPROVED } from "../model/productModerationConstants.js";
 import { resolveProductAffiliateOffer } from "../lib/resolveProductAffiliateOffer.js";
 import { resolveProductLoyaltyPointsPerUnit } from "../lib/resolveProductLoyaltyPointsPerUnit.js";
@@ -145,11 +154,9 @@ export function ProductEditManageSection({
     typeof onOpenWholesaleSettings === "function" ||
     typeof onSetWholesale === "function";
   const showBuyNFree =
-    typeof onOpenBuyNFreeSettings === "function" ||
-    typeof onSetBuyNFree === "function";
+    typeof onOpenBuyNFreeSettings === "function" || typeof onSetBuyNFree === "function";
   const showRental =
-    typeof onOpenRentalSettings === "function" ||
-    typeof onSetRental === "function";
+    typeof onOpenRentalSettings === "function" || typeof onSetRental === "function";
   const showAffiliate =
     typeof onOpenAffiliateSettings === "function" ||
     typeof onSetAffiliate === "function";
@@ -160,7 +167,8 @@ export function ProductEditManageSection({
   const isLoyaltyEnabled = loyaltyPointsPerUnit > 0;
   const showPromoCodes = typeof onOpenPromoCodesSettings === "function" && canEdit;
   const showFlashSale =
-    typeof onOpenFlashSaleSettings === "function" || typeof onSetFlashSale === "function";
+    typeof onOpenFlashSaleSettings === "function" ||
+    typeof onSetFlashSale === "function";
   const isFlashSaleEnabled = product.productFlashSaleEnabled === true;
   const flashSaleBlockedByAuction = product.productAuctionEnabled === true;
   const flashSaleBlockedByManualDiscount = hasProductManualCatalogDiscount(product);
@@ -410,16 +418,16 @@ export function ProductEditManageSection({
             title={PRODUCT_FLASH_SALE_UI.MANAGE_TITLE}
             description={
               flashSaleBlockedByAuction
-                ? PRODUCT_FLASH_SALE_UI.MANAGE_HINT +
-                  " (отключите аукцион)"
+                ? PRODUCT_FLASH_SALE_UI.MANAGE_HINT + " (отключите аукцион)"
                 : flashSaleBlockedByManualDiscount
-                  ? PRODUCT_FLASH_SALE_UI.MANAGE_HINT +
-                    " (уберите ручную скидку)"
+                  ? PRODUCT_FLASH_SALE_UI.MANAGE_HINT + " (уберите ручную скидку)"
                   : PRODUCT_FLASH_SALE_UI.MANAGE_HINT
             }
             checked={isFlashSaleEnabled}
             disabled={
-              actionsLocked || flashSaleBlockedByAuction || flashSaleBlockedByManualDiscount
+              actionsLocked ||
+              flashSaleBlockedByAuction ||
+              flashSaleBlockedByManualDiscount
             }
             pending={isFlashSaleTogglePending}
             pendingLabel={PRODUCT_FLASH_SALE_UI.TOGGLE_PENDING}
@@ -493,7 +501,9 @@ export function ProductEditManageSection({
             title={CREATE_PRODUCT_MODAL_UI.MANAGE_AFFILIATE_TITLE}
             description={
               isAffiliateEnabled
-                ? CREATE_PRODUCT_MODAL_UI.MANAGE_AFFILIATE_HINT_ON(affiliateOffer.percent)
+                ? CREATE_PRODUCT_MODAL_UI.MANAGE_AFFILIATE_HINT_ON(
+                    affiliateOffer.percent,
+                  )
                 : CREATE_PRODUCT_MODAL_UI.MANAGE_AFFILIATE_HINT
             }
             checked={isAffiliateEnabled}

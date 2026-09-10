@@ -12,7 +12,10 @@ const findScrollableAncestor = (start: HTMLElement): HTMLElement | null => {
   let node: HTMLElement | null = start.parentElement;
   while (node && node !== document.body) {
     const style = window.getComputedStyle(node);
-    if (isScrollableOverflowY(style.overflowY) && node.scrollHeight > node.clientHeight + 1) {
+    if (
+      isScrollableOverflowY(style.overflowY) &&
+      node.scrollHeight > node.clientHeight + 1
+    ) {
       return node;
     }
     node = node.parentElement;
@@ -39,7 +42,8 @@ export const ensureTextInputVisibleAboveKeyboard = (target: HTMLElement) => {
     return;
   }
 
-  const visibleBottom = visualViewport.offsetTop + visualViewport.height - KEYBOARD_FIELD_COMFORT_GAP_PX;
+  const visibleBottom =
+    visualViewport.offsetTop + visualViewport.height - KEYBOARD_FIELD_COMFORT_GAP_PX;
   const overflow = rect.bottom - visibleBottom;
   if (overflow <= 0) {
     return;

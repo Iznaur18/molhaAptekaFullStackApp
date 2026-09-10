@@ -1,10 +1,10 @@
-import {
-  USER_ROLE_USER,
-  type UserRole,
-} from "@izibuy/shared-lib";
+import { USER_ROLE_USER, type UserRole } from "@izibuy/shared-lib";
 
 import { formatPremiumExpiresAtForInput } from "./formatPremiumExpiresAtForInput";
-import { mapUserToEditProfileForm, type EditProfileFormState } from "./mapUserToEditProfileForm";
+import {
+  mapUserToEditProfileForm,
+  type EditProfileFormState,
+} from "./mapUserToEditProfileForm";
 
 export type AdminEditProfileFormState = EditProfileFormState & {
   notesAboutUser: string;

@@ -76,4 +76,8 @@ export function listCheckoutShippingServiceOptions() {
   return CHECKOUT_SHIPPING_SERVICE_OPTIONS.filter((option) => option.live);
 }
 
-export { SHIPPING_SERVICE_TYPES, SHIPPING_SERVICE_COURIER, SHIPPING_SERVICE_PICKUP_POINT };
+export {
+  SHIPPING_SERVICE_TYPES,
+  SHIPPING_SERVICE_COURIER,
+  SHIPPING_SERVICE_PICKUP_POINT,
+};

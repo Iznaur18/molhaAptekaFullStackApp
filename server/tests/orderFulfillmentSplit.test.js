@@ -3,9 +3,8 @@ import { describe, it } from "node:test";
 
 process.env.NODE_ENV = process.env.NODE_ENV ?? "test";
 
-const { resolveOrderFulfillmentSplit } = await import(
-  "../services/order/resolveOrderFulfillmentSplit.js"
-);
+const { resolveOrderFulfillmentSplit } =
+  await import("../services/order/resolveOrderFulfillmentSplit.js");
 const { createOrderBodySchema } = await import("@molha/api-contract");
 
 const SELLER_A = "aaaaaaaaaaaaaaaaaaaaaaaa";

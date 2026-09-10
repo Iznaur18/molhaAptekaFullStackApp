@@ -7,15 +7,17 @@ import { test } from "node:test";
 const MOBILE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CLIENT_ROOT = join(MOBILE_ROOT, "..", "client");
 
-const readFile = (root, relativePath) =>
-  readFileSync(join(root, relativePath), "utf8");
+const readFile = (root, relativePath) => readFileSync(join(root, relativePath), "utf8");
 
 test("product pickup details panel matches web method row layout", () => {
   const layout = readFile(
     MOBILE_ROOT,
     "entities/product/lib/productPickupDetailsPanelLayout.ts",
   );
-  const panel = readFile(MOBILE_ROOT, "features/product-detail/ui/ProductPickupDetailsPanel.tsx");
+  const panel = readFile(
+    MOBILE_ROOT,
+    "features/product-detail/ui/ProductPickupDetailsPanel.tsx",
+  );
   const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
   const webCss = readFile(
     CLIENT_ROOT,

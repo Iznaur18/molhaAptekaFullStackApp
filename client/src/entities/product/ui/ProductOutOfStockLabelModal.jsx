@@ -29,7 +29,9 @@ const TITLE_ID = "product-out-of-stock-label-modal-title";
  */
 export function ProductOutOfStockLabelModal({ isOpen, product, onClose, onSaved }) {
   const { patchMutation } = useMyProductMutations();
-  const [selectedLabel, setSelectedLabel] = useState(PRODUCT_OUT_OF_STOCK_LABEL_OUT_OF_STOCK);
+  const [selectedLabel, setSelectedLabel] = useState(
+    PRODUCT_OUT_OF_STOCK_LABEL_OUT_OF_STOCK,
+  );
   const [error, setError] = useState("");
   const panelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const closeButtonRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
@@ -153,10 +155,14 @@ export function ProductOutOfStockLabelModal({ isOpen, product, onClose, onSaved 
                   name="productOutOfStockLabel"
                   value={PRODUCT_OUT_OF_STOCK_LABEL_OUT_OF_STOCK}
                   checked={selectedLabel === PRODUCT_OUT_OF_STOCK_LABEL_OUT_OF_STOCK}
-                  onChange={() => setSelectedLabel(PRODUCT_OUT_OF_STOCK_LABEL_OUT_OF_STOCK)}
+                  onChange={() =>
+                    setSelectedLabel(PRODUCT_OUT_OF_STOCK_LABEL_OUT_OF_STOCK)
+                  }
                 />
                 <span className="rental-manage-modal__unit-face">
-                  <span>{CREATE_PRODUCT_MODAL_UI.OUT_OF_STOCK_LABEL_OPTION_OUT_OF_STOCK}</span>
+                  <span>
+                    {CREATE_PRODUCT_MODAL_UI.OUT_OF_STOCK_LABEL_OPTION_OUT_OF_STOCK}
+                  </span>
                 </span>
               </label>
               <label className="rental-manage-modal__unit-option">
@@ -166,10 +172,14 @@ export function ProductOutOfStockLabelModal({ isOpen, product, onClose, onSaved 
                   name="productOutOfStockLabel"
                   value={PRODUCT_OUT_OF_STOCK_LABEL_COMING_SOON}
                   checked={selectedLabel === PRODUCT_OUT_OF_STOCK_LABEL_COMING_SOON}
-                  onChange={() => setSelectedLabel(PRODUCT_OUT_OF_STOCK_LABEL_COMING_SOON)}
+                  onChange={() =>
+                    setSelectedLabel(PRODUCT_OUT_OF_STOCK_LABEL_COMING_SOON)
+                  }
                 />
                 <span className="rental-manage-modal__unit-face">
-                  <span>{CREATE_PRODUCT_MODAL_UI.OUT_OF_STOCK_LABEL_OPTION_COMING_SOON}</span>
+                  <span>
+                    {CREATE_PRODUCT_MODAL_UI.OUT_OF_STOCK_LABEL_OPTION_COMING_SOON}
+                  </span>
                 </span>
               </label>
             </div>

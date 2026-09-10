@@ -42,8 +42,16 @@ export function IntroAdModerationPageOverview({
   onAttentionFilterChange,
 }) {
   return (
-    <div className="intro-ad-moderation-overview" role="region" aria-label={INTRO_AD_MODERATION_PAGE_UI.TITLE}>
-      <button type="button" className="intro-ad-moderation-overview__tile" onClick={onPendingFilterClick}>
+    <div
+      className="intro-ad-moderation-overview"
+      role="region"
+      aria-label={INTRO_AD_MODERATION_PAGE_UI.TITLE}
+    >
+      <button
+        type="button"
+        className="intro-ad-moderation-overview__tile"
+        onClick={onPendingFilterClick}
+      >
         <span className="intro-ad-moderation-overview__label">
           {INTRO_AD_MODERATION_PAGE_UI.OVERVIEW_PENDING}
         </span>
@@ -52,41 +60,55 @@ export function IntroAdModerationPageOverview({
 
       <button
         type="button"
-        className={buildIntroAdModerationOverviewTileClass(INTRO_AD_MODERATION_SECTION_INTRO)}
+        className={buildIntroAdModerationOverviewTileClass(
+          INTRO_AD_MODERATION_SECTION_INTRO,
+        )}
         onClick={onIntroFilterClick}
       >
         <span className="intro-ad-moderation-overview__label">
           {INTRO_AD_MODERATION_PAGE_UI.OVERVIEW_INTRO}
         </span>
-        <strong className="intro-ad-moderation-overview__value">{introPendingCount}</strong>
+        <strong className="intro-ad-moderation-overview__value">
+          {introPendingCount}
+        </strong>
       </button>
 
       <button
         type="button"
-        className={buildIntroAdModerationOverviewTileClass(INTRO_AD_MODERATION_SECTION_BANNER)}
+        className={buildIntroAdModerationOverviewTileClass(
+          INTRO_AD_MODERATION_SECTION_BANNER,
+        )}
         onClick={onBannerFilterClick}
       >
         <span className="intro-ad-moderation-overview__label">
           {INTRO_AD_MODERATION_PAGE_UI.OVERVIEW_BANNER}
         </span>
-        <strong className="intro-ad-moderation-overview__value">{bannerPendingCount}</strong>
+        <strong className="intro-ad-moderation-overview__value">
+          {bannerPendingCount}
+        </strong>
       </button>
 
       <button
         type="button"
-        className={buildIntroAdModerationOverviewTileClass(INTRO_AD_MODERATION_SECTION_RAFFLE)}
+        className={buildIntroAdModerationOverviewTileClass(
+          INTRO_AD_MODERATION_SECTION_RAFFLE,
+        )}
         onClick={onRaffleFilterClick}
       >
         <span className="intro-ad-moderation-overview__label">
           {INTRO_AD_MODERATION_PAGE_UI.OVERVIEW_RAFFLE}
         </span>
-        <strong className="intro-ad-moderation-overview__value">{rafflePendingCount}</strong>
+        <strong className="intro-ad-moderation-overview__value">
+          {rafflePendingCount}
+        </strong>
       </button>
 
       {showUsersRaffleOverview && onUsersRaffleFilterClick ? (
         <button
           type="button"
-          className={buildIntroAdModerationOverviewTileClass(INTRO_AD_MODERATION_SECTION_USERS_RAFFLE)}
+          className={buildIntroAdModerationOverviewTileClass(
+            INTRO_AD_MODERATION_SECTION_USERS_RAFFLE,
+          )}
           onClick={onUsersRaffleFilterClick}
         >
           <span className="intro-ad-moderation-overview__label">
@@ -110,7 +132,9 @@ export function IntroAdModerationPageOverview({
         <span className="intro-ad-moderation-overview__label">
           {INTRO_AD_MODERATION_PAGE_UI.OVERVIEW_ATTENTION}
         </span>
-        <strong className="intro-ad-moderation-overview__value">{attentionCount}</strong>
+        <strong className="intro-ad-moderation-overview__value">
+          {attentionCount}
+        </strong>
       </button>
     </div>
   );

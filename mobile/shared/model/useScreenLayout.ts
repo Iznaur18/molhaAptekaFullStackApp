@@ -55,9 +55,12 @@ export const useScreenLayout = (): ScreenLayout => {
     const layoutWidth = resolveLayoutContentWidth(viewportWidth);
     const contentMaxWidth = resolveContentMaxWidth(viewportWidth);
     const profileContentMaxWidth = resolveProfileContentMaxWidth(viewportWidth);
-    const contentPaddingHorizontal = resolveScreenContentPaddingHorizontal(safeAreaInsets);
+    const contentPaddingHorizontal =
+      resolveScreenContentPaddingHorizontal(safeAreaInsets);
     const contentPaddingTop = safeAreaInsets.top;
-    const contentPaddingBottom = resolveScreenContentPaddingBottom(safeAreaInsets.bottom);
+    const contentPaddingBottom = resolveScreenContentPaddingBottom(
+      safeAreaInsets.bottom,
+    );
 
     const centeredContentStyle = resolveAppShellMaxWidthStyle(width);
 

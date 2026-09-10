@@ -17,7 +17,10 @@ export function buildMyProductCompactCardFeatureBadges({
   const badges = [];
   const { auctionActive } = resolveAuctionUiState(product);
 
-  if (Boolean(product.activeRaffleId) && Boolean(product.raffleParticipationEnabledAt)) {
+  if (
+    Boolean(product.activeRaffleId) &&
+    Boolean(product.raffleParticipationEnabledAt)
+  ) {
     badges.push({
       key: "raffle",
       label: PRODUCT_CARD_UI.RAFFLE_BADGE,

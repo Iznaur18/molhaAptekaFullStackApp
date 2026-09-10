@@ -188,7 +188,8 @@
   margin: 0;
   padding: 0.625rem 0.75rem;
   border-radius: 0.625rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-action) 25%, var(--iz-color-border));
+  border: 1px solid
+    color-mix(in srgb, var(--iz-color-action) 25%, var(--iz-color-border));
   background: var(--iz-color-action-soft);
   color: var(--iz-color-info-deep);
   font-size: 0.875rem;

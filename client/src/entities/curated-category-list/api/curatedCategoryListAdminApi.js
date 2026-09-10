@@ -7,7 +7,10 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  */
 export async function createCuratedCategoryListAdmin(body) {
   try {
-    const { data } = await apiClient.post("/product/admin/curated-category-lists", body);
+    const { data } = await apiClient.post(
+      "/product/admin/curated-category-lists",
+      body,
+    );
     if (!data?.success || !data.data?.list) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
@@ -64,9 +67,12 @@ export async function deleteCuratedCategoryListAdmin(listId) {
  */
 export async function reorderCuratedCategoryListsAdmin(orderedListIds) {
   try {
-    const { data } = await apiClient.patch("/product/admin/curated-category-lists/reorder", {
-      orderedListIds,
-    });
+    const { data } = await apiClient.patch(
+      "/product/admin/curated-category-lists/reorder",
+      {
+        orderedListIds,
+      },
+    );
     if (!data?.success || !Array.isArray(data.data?.lists)) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

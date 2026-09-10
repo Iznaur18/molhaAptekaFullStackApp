@@ -28,9 +28,9 @@ test("Query UI: профиль → вкладки на TanStack Query", async ({
   await loginViaApiCookies(page, request, E2E_BUYER);
   await page.goto("/me");
   await page.getByRole("button", { name: "Мои покупки", exact: true }).click();
-  await expect(
-    page.getByText(/У вас пока нет покупок|Загрузка покупок/),
-  ).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText(/У вас пока нет покупок|Загрузка покупок/)).toBeVisible({
+    timeout: 15_000,
+  });
 
   await page.getByRole("button", { name: "Премиум", exact: true }).click();
   await expect(page.getByLabel("Премиум")).toBeVisible({ timeout: 15_000 });
@@ -44,12 +44,20 @@ test("derive badges: action-count совпадает с list API", async ({ requ
   const sellerCookie = await loginAndGetCookieHeader(request, E2E_SELLER);
 
   const buyerOrdersData = await getJsonWithCookie(request, buyerCookie, "/order");
-  const buyerCountData = await getJsonWithCookie(request, buyerCookie, "/order/action-count");
+  const buyerCountData = await getJsonWithCookie(
+    request,
+    buyerCookie,
+    "/order/action-count",
+  );
   expect(buyerCountData.count).toBe(
     countMyOrdersActionItemsFromOrders(buyerOrdersData.orders),
   );
 
-  const sellerSalesData = await getJsonWithCookie(request, sellerCookie, "/order/sales");
+  const sellerSalesData = await getJsonWithCookie(
+    request,
+    sellerCookie,
+    "/order/sales",
+  );
   const sellerCountData = await getJsonWithCookie(
     request,
     sellerCookie,

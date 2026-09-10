@@ -31,7 +31,9 @@ const StoryRingItem = memo(({ ring, onOpen }: StoryRingItemProps) => {
           <Image source={{ uri: avatarUrl }} style={styles.avatar} contentFit="cover" />
         ) : (
           <View style={styles.avatarFallback}>
-            <Text style={styles.avatarFallbackText}>{authorName.slice(0, 1).toUpperCase()}</Text>
+            <Text style={styles.avatarFallbackText}>
+              {authorName.slice(0, 1).toUpperCase()}
+            </Text>
           </View>
         )}
         {ring.activeCount != null && ring.activeCount > 1 ? (

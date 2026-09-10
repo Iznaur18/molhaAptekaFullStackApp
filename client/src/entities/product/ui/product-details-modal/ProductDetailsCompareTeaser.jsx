@@ -11,11 +11,7 @@ import { ProductDetailsFeatureCard } from "./ProductDetailsFeatureCard.jsx";
  *   onPress: () => void;
  * }} props
  */
-export function ProductDetailsCompareTeaser({
-  productId,
-  enabled = true,
-  onPress,
-}) {
+export function ProductDetailsCompareTeaser({ productId, enabled = true, onPress }) {
   const compareQuery = useComparableProductsQuery({
     productId,
     enabled: enabled && String(productId ?? "").trim().length > 0,

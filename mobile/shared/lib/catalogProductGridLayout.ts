@@ -35,8 +35,6 @@ export const resolveCatalogProductGridColumns = (viewportWidth: number): number 
   const gap = CATALOG_PRODUCT_GRID_GAP_DESKTOP_PX;
   return Math.max(
     CATALOG_PRODUCT_GRID_MIN_COLUMNS,
-    Math.floor(
-      (viewportWidth + gap) / (CATALOG_PRODUCT_GRID_MIN_COLUMN_PX + gap),
-    ),
+    Math.floor((viewportWidth + gap) / (CATALOG_PRODUCT_GRID_MIN_COLUMN_PX + gap)),
   );
 };

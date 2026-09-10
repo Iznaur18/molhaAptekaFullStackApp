@@ -53,7 +53,9 @@ export const PremiumPage = () => {
       setFeedback(result.message);
       void statusQuery.refetch();
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : PREMIUM_PAGE_UI.PURCHASE_FALLBACK);
+      setErrorMessage(
+        error instanceof Error ? error.message : PREMIUM_PAGE_UI.PURCHASE_FALLBACK,
+      );
     }
   };
 
@@ -61,7 +63,10 @@ export const PremiumPage = () => {
     return (
       <View style={styles.centered}>
         <Text style={styles.hint}>{PREMIUM_PAGE_UI.LOGIN_HINT}</Text>
-        <Pressable style={styles.loginButton} onPress={() => router.push("/(auth)/login")}>
+        <Pressable
+          style={styles.loginButton}
+          onPress={() => router.push("/(auth)/login")}
+        >
           <Text style={styles.loginButtonText}>{PREMIUM_PAGE_UI.LOGIN_BUTTON}</Text>
         </Pressable>
       </View>
@@ -83,7 +88,10 @@ export const PremiumPage = () => {
   if (statusQuery.isError && !pricePoints) {
     return (
       <ScreenErrorState
-        message={formatApiErrorMessage(statusQuery.error, PREMIUM_PAGE_UI.FETCH_FALLBACK)}
+        message={formatApiErrorMessage(
+          statusQuery.error,
+          PREMIUM_PAGE_UI.FETCH_FALLBACK,
+        )}
         onRetry={() => statusQuery.refetch()}
       />
     );
@@ -208,12 +216,17 @@ export const PremiumPage = () => {
                     importantForAccessibility="no"
                   />
                   <Text style={styles.error}>
-                    {PREMIUM_PAGE_UI.INSUFFICIENT_POINTS(pricePoints, loyaltyPointsBalance)}
+                    {PREMIUM_PAGE_UI.INSUFFICIENT_POINTS(
+                      pricePoints,
+                      loyaltyPointsBalance,
+                    )}
                   </Text>
                 </View>
               ) : null}
               <AppButton
-                label={isSubmitting ? PREMIUM_PAGE_UI.SUBMIT_PENDING : PREMIUM_PAGE_UI.SUBMIT}
+                label={
+                  isSubmitting ? PREMIUM_PAGE_UI.SUBMIT_PENDING : PREMIUM_PAGE_UI.SUBMIT
+                }
                 variant="primary"
                 style={styles.submitButton}
                 disabled={isSubmitting || !hasEnoughPoints}

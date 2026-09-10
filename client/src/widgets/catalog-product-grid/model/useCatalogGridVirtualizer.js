@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import {
-  CATALOG_VIRTUAL_ROW_HEIGHT_PX,
-} from "../lib/catalogGridVirtualizationConstants.js";
+import { CATALOG_VIRTUAL_ROW_HEIGHT_PX } from "../lib/catalogGridVirtualizationConstants.js";
 import {
   computeCatalogVirtualWindow,
   getCatalogHostTop,
@@ -93,8 +91,14 @@ export function useCatalogGridVirtualizer({
       window.removeEventListener("scroll", onScrollWithEndSync);
       window.removeEventListener("resize", scheduleViewportMetricsUpdate);
       window.removeEventListener("orientationchange", scheduleViewportMetricsUpdate);
-      window.visualViewport?.removeEventListener("resize", scheduleViewportMetricsUpdate);
-      window.visualViewport?.removeEventListener("scroll", scheduleViewportMetricsUpdate);
+      window.visualViewport?.removeEventListener(
+        "resize",
+        scheduleViewportMetricsUpdate,
+      );
+      window.visualViewport?.removeEventListener(
+        "scroll",
+        scheduleViewportMetricsUpdate,
+      );
       if (scrollEndTimer != null) {
         clearTimeout(scrollEndTimer);
       }
@@ -150,7 +154,11 @@ export function useCatalogGridVirtualizer({
     };
 
     const measureGridRow = () => {
-      const measured = measureCatalogGridRowHeight(grid, columnCount, ROW_HEIGHT_MIN_PX);
+      const measured = measureCatalogGridRowHeight(
+        grid,
+        columnCount,
+        ROW_HEIGHT_MIN_PX,
+      );
       if (measured != null) {
         applyMeasuredHeight(measured);
       }
@@ -168,7 +176,11 @@ export function useCatalogGridVirtualizer({
       });
     });
 
-    for (let index = 0; index < Math.min(columnCount, grid.children.length); index += 1) {
+    for (
+      let index = 0;
+      index < Math.min(columnCount, grid.children.length);
+      index += 1
+    ) {
       const child = grid.children.item(index);
       if (child) {
         observer.observe(child);

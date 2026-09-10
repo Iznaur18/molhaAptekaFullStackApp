@@ -26,7 +26,8 @@
 .account-requirement-modal__badge--confirm {
   color: var(--iz-color-success-text);
   background: var(--iz-color-success-surface);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--iz-color-success) 30%, var(--iz-color-border));
+  box-shadow: 0 0 0 1px
+    color-mix(in srgb, var(--iz-color-success) 30%, var(--iz-color-border));
 }
 
 .account-requirement-modal__intro {

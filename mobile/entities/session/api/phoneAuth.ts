@@ -27,7 +27,9 @@ export type PhonePasswordCredentials = {
   password: string;
 };
 
-export const loginUserByPhonePassword = async (credentials: PhonePasswordCredentials) => {
+export const loginUserByPhonePassword = async (
+  credentials: PhonePasswordCredentials,
+) => {
   try {
     const { data } = await apiClient.post("/auth/login/phone", credentials);
     return persistAuthSession(data);
@@ -107,7 +109,9 @@ export const requestPhoneBind = async (payload: { phoneNumber?: string } = {}) =
     }
     return data.data as { phoneNumber?: string; message?: string };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, EDIT_PROFILE_UI.PHONE_VERIFY_REQUEST_ERROR));
+    throw new Error(
+      formatApiErrorMessage(error, EDIT_PROFILE_UI.PHONE_VERIFY_REQUEST_ERROR),
+    );
   }
 };
 

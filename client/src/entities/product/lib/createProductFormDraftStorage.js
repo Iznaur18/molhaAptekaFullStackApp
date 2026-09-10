@@ -89,7 +89,12 @@ export function readCreateProductFormDraft() {
       return null;
     }
     const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object" || !parsed.form || typeof parsed.form !== "object") {
+    if (
+      !parsed ||
+      typeof parsed !== "object" ||
+      !parsed.form ||
+      typeof parsed.form !== "object"
+    ) {
       return null;
     }
     if (!isCreateProductFormDraftMeaningful(parsed.form)) {

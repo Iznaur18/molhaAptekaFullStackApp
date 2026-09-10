@@ -20,7 +20,9 @@ export function ViewerRegionProvider({ children }: { children: ReactNode }) {
   const value = useViewerRegionController(profileRegionCode);
 
   return (
-    <ViewerRegionContext.Provider value={value}>{children}</ViewerRegionContext.Provider>
+    <ViewerRegionContext.Provider value={value}>
+      {children}
+    </ViewerRegionContext.Provider>
   );
 }
 

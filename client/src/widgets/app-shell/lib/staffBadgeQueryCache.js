@@ -1,5 +1,9 @@
 import { invalidateInstallmentUserActionCounts } from "../../../entities/installment/lib/installmentQueryCache.js";
-import { invalidateOrderActionCounts, invalidateMyOrders, invalidateMySalesOrders } from "../../../entities/order/lib/orderQueryCache.js";
+import {
+  invalidateOrderActionCounts,
+  invalidateMyOrders,
+  invalidateMySalesOrders,
+} from "../../../entities/order/lib/orderQueryCache.js";
 import { invalidateIncomingPriceOffers } from "../../../entities/product-price-offer/lib/priceOfferQueryCache.js";
 import { installmentQueryKeys } from "../../../entities/installment/model/installmentQueryKeys.js";
 import { moderationQueryKeys } from "../../../entities/product/model/moderationQueryKeys.js";
@@ -21,7 +25,9 @@ export function invalidateAllStaffBadges(queryClient) {
     queryClient.invalidateQueries({ queryKey: staffBadgeQueryKeys.dataConfirmation }),
     queryClient.invalidateQueries({ queryKey: staffBadgeQueryKeys.productPromotions }),
     queryClient.invalidateQueries({ queryKey: staffBadgeQueryKeys.raffles }),
-    queryClient.invalidateQueries({ queryKey: staffBadgeQueryKeys.installmentDisputes }),
+    queryClient.invalidateQueries({
+      queryKey: staffBadgeQueryKeys.installmentDisputes,
+    }),
     queryClient.invalidateQueries({ queryKey: staffBadgeQueryKeys.userProfileActions }),
   ]);
 }
@@ -37,14 +43,18 @@ export function invalidateModerationStaffBadge(queryClient) {
  * @param {import('@tanstack/react-query').QueryClient} queryClient
  */
 export function invalidateProductReportsStaffBadge(queryClient) {
-  return queryClient.invalidateQueries({ queryKey: staffBadgeQueryKeys.productReports });
+  return queryClient.invalidateQueries({
+    queryKey: staffBadgeQueryKeys.productReports,
+  });
 }
 
 /**
  * @param {import('@tanstack/react-query').QueryClient} queryClient
  */
 export function invalidateDataConfirmationStaffBadge(queryClient) {
-  return queryClient.invalidateQueries({ queryKey: staffBadgeQueryKeys.dataConfirmation });
+  return queryClient.invalidateQueries({
+    queryKey: staffBadgeQueryKeys.dataConfirmation,
+  });
 }
 
 /**
@@ -58,7 +68,9 @@ export function invalidateRafflesStaffBadge(queryClient) {
  * @param {import('@tanstack/react-query').QueryClient} queryClient
  */
 export function invalidateProductPromotionsStaffBadge(queryClient) {
-  return queryClient.invalidateQueries({ queryKey: staffBadgeQueryKeys.productPromotions });
+  return queryClient.invalidateQueries({
+    queryKey: staffBadgeQueryKeys.productPromotions,
+  });
 }
 
 /**
@@ -125,7 +137,9 @@ export async function syncRafflesStaffQueueCaches(queryClient) {
  */
 export async function syncProductPromotionsStaffQueueCaches(queryClient) {
   await Promise.all([
-    queryClient.invalidateQueries({ queryKey: productPromotionQueryKeys.staffPending() }),
+    queryClient.invalidateQueries({
+      queryKey: productPromotionQueryKeys.staffPending(),
+    }),
     invalidateProductPromotionsStaffBadge(queryClient),
   ]);
 }

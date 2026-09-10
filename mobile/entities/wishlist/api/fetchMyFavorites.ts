@@ -16,6 +16,8 @@ export const fetchMyFavorites = async (): Promise<WishlistFromApi> => {
       products: parsed.products,
     };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_WISHLIST_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_WISHLIST_FALLBACK),
+    );
   }
 };

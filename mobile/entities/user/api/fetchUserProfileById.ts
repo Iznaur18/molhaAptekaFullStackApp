@@ -7,6 +7,8 @@ export const fetchUserProfileById = async (userId: string) => {
     const { data } = await apiClient.get(`/user/${encodeURIComponent(userId)}`);
     return parseUserProfileByIdData(data);
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_USER_PROFILE_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_USER_PROFILE_FALLBACK),
+    );
   }
 };

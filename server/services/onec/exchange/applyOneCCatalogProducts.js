@@ -23,10 +23,7 @@ import {
   normalizeCharacteristics,
 } from "./onecProductFields.js";
 
-const MAX_IMAGES = Math.min(
-  PRODUCT_IMAGE_URLS_MAX,
-  ONEC_IMPORT_MAX_IMAGES_PER_PRODUCT,
-);
+const MAX_IMAGES = Math.min(PRODUCT_IMAGE_URLS_MAX, ONEC_IMPORT_MAX_IMAGES_PER_PRODUCT);
 
 /** Поля существующей карточки, которые нужны при обновлении и при удалении. */
 const EXISTING_PRODUCT_FIELDS = [
@@ -230,9 +227,7 @@ export function createOneCCatalogApplier({
     })
       .select(EXISTING_PRODUCT_FIELDS)
       .lean();
-    const existingByGuid = new Map(
-      existingRows.map((row) => [row.product1cGuid, row]),
-    );
+    const existingByGuid = new Map(existingRows.map((row) => [row.product1cGuid, row]));
     const heldByGuid = await findHeldOneCProducts({ sellerId, externalIds });
 
     /** Карточки, у которых поменялось хоть что-то, — пишем одной пачкой. */
@@ -340,7 +335,8 @@ export function createOneCCatalogApplier({
         // карточки создались без адреса и сами бы его никогда не получили,
         // потому что дефолты применялись только при создании.
         const needsPickupDefaults =
-          !existing.productPickupAddress && Boolean(sellerDefaults.productPickupAddress);
+          !existing.productPickupAddress &&
+          Boolean(sellerDefaults.productPickupAddress);
         // Снятие с витрины при потере категории: иначе карточка остаётся
         // «видимой», но недостижимой ни одним фильтром каталога.
         const needsUnlist = !mapped && existing.productIsAvailable !== false;
@@ -381,9 +377,7 @@ export function createOneCCatalogApplier({
         images,
         price: held?.lastKnownPrice ?? 0,
         stock: held?.lastKnownStock ?? 0,
-        ...(moderationTrusted
-          ? { moderationStatus: PRODUCT_MODERATION_APPROVED }
-          : {}),
+        ...(moderationTrusted ? { moderationStatus: PRODUCT_MODERATION_APPROVED } : {}),
       });
       stats.created += 1;
 

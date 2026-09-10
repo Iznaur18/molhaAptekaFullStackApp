@@ -18,6 +18,8 @@ export const replaceMyFavorites = async (
       products: parsed.products,
     };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.REPLACE_WISHLIST_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.REPLACE_WISHLIST_FALLBACK),
+    );
   }
 };

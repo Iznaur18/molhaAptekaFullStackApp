@@ -2,9 +2,7 @@ import {
   PRODUCT_BUY_N_FREE_THRESHOLD_MAX,
   PRODUCT_BUY_N_FREE_THRESHOLD_MIN,
 } from "@molha/api-contract";
-import {
-  PRODUCT_MODERATION_APPROVED,
-} from "../../constants/productModerationConstants.js";
+import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import {
   PRODUCT_CATALOG_REVIEWS_MIN_REVIEW_COUNT,
   PRODUCT_SORT_CONFIRMED,
@@ -74,11 +72,8 @@ export async function getCatalogProducts({ userId, query }) {
 
   const includeHidden = String(query.includeHidden).toLowerCase() === "true";
   const nearEnabled = parseTruthyQueryFlag(query.near);
-  const nearContext = nearEnabled
-    ? await resolveCatalogNearContext(userId)
-    : null;
-  const viewerGeo =
-    nearContext ?? (await resolveOptionalViewerCatalogGeo(userId));
+  const nearContext = nearEnabled ? await resolveCatalogNearContext(userId) : null;
+  const viewerGeo = nearContext ?? (await resolveOptionalViewerCatalogGeo(userId));
   const cacheKey = buildCatalogProductsCacheKey({
     userId,
     query,
@@ -158,7 +153,7 @@ async function loadCatalogProducts({
   }
 
   const resolvedNearContext = nearEnabled
-    ? nearContext ?? (await resolveCatalogNearContext(userId))
+    ? (nearContext ?? (await resolveCatalogNearContext(userId)))
     : null;
 
   const hiddenSellerIds = await getHiddenSellerIds();
@@ -222,9 +217,8 @@ async function loadCatalogProducts({
     catalogBaseQuery.productIsOriginal = true;
   }
   if (flashSaleOnly) {
-    const { buildProductFlashSaleActiveCatalogMatch } = await import(
-      "./productFlashSaleExpiry.js"
-    );
+    const { buildProductFlashSaleActiveCatalogMatch } =
+      await import("./productFlashSaleExpiry.js");
     Object.assign(catalogBaseQuery, buildProductFlashSaleActiveCatalogMatch());
   }
   if (reviewsOnly) {
@@ -303,11 +297,7 @@ async function loadCatalogProducts({
       viewerRegionCode,
       resolvedNearContext,
     ),
-    countCatalogProducts(
-      catalogSearchResult,
-      resolvedNearContext,
-      viewerRegionCode,
-    ),
+    countCatalogProducts(catalogSearchResult, resolvedNearContext, viewerRegionCode),
   ]);
 
   let productsPayload = await attachProductAvailablePurchaseQuantity(products);

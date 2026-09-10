@@ -13,7 +13,9 @@ const readRepoFile = (relativePath) =>
   readFileSync(resolve(repoRoot, relativePath), "utf8");
 
 test("эндпоинт и ключ запроса совпадают с вебом", () => {
-  const web = readRepoFile("client/src/entities/product/api/fetchComparableProducts.js");
+  const web = readRepoFile(
+    "client/src/entities/product/api/fetchComparableProducts.js",
+  );
   const mobile = readMobileFile("entities/product/api/fetchComparableProducts.ts");
 
   for (const source of [web, mobile]) {
@@ -83,7 +85,9 @@ test("экран товара рендерит вкладку и учитыва�
 });
 
 test("тизер показывается только когда есть что сравнивать", () => {
-  const teaser = readMobileFile("features/product-detail/ui/ProductDetailsCompareTeaser.tsx");
+  const teaser = readMobileFile(
+    "features/product-detail/ui/ProductDetailsCompareTeaser.tsx",
+  );
   assert.match(teaser, /\(compareQuery\.data \?\? \[\]\)\.length === 0/);
   assert.match(teaser, /return null;/);
 
@@ -92,7 +96,9 @@ test("тизер показывается только когда есть чт�
   );
   assert.match(web, /products\.length === 0/);
 
-  const detailsTab = readMobileFile("features/product-detail/ui/ProductDetailsDetailsTab.tsx");
+  const detailsTab = readMobileFile(
+    "features/product-detail/ui/ProductDetailsDetailsTab.tsx",
+  );
   assert.match(detailsTab, /onOpenCompareTab/);
 });
 

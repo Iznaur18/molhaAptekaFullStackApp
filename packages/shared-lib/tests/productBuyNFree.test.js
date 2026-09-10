@@ -42,8 +42,14 @@ test("free units and line total", () => {
     1,
   );
   assert.equal(resolveBuyNFreePaidQuantity(3, 1), 2);
-  assert.equal(resolveBuyNFreeLineTotal({ unitPrice: 100, quantity: 3, freeUnits: 1 }), 200);
-  assert.equal(resolveBuyNFreeLineTotal({ unitPrice: 100, quantity: 1, freeUnits: 1 }), 0);
+  assert.equal(
+    resolveBuyNFreeLineTotal({ unitPrice: 100, quantity: 3, freeUnits: 1 }),
+    200,
+  );
+  assert.equal(
+    resolveBuyNFreeLineTotal({ unitPrice: 100, quantity: 1, freeUnits: 1 }),
+    0,
+  );
 });
 
 test("order total accounts for free units", () => {

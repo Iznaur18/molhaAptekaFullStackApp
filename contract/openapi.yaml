@@ -456,7 +456,8 @@ components:
         _id: { type: string }
         productName: { type: string }
         productPrice: { type: number }
-        productModerationStatus: { $ref: "#/components/schemas/ProductModerationStatus" }
+        productModerationStatus:
+          { $ref: "#/components/schemas/ProductModerationStatus" }
         productModerationComment: { type: string }
         productIsAvailable: { type: boolean }
       additionalProperties: true

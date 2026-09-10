@@ -79,9 +79,7 @@ const isBlockedIpv6 = (ip) => {
   if (mappedHex) {
     const high = Number.parseInt(mappedHex[1], 16);
     const low = Number.parseInt(mappedHex[2], 16);
-    return isBlockedIpv4(
-      [high >> 8, high & 0xff, low >> 8, low & 0xff].join("."),
-    );
+    return isBlockedIpv4([high >> 8, high & 0xff, low >> 8, low & 0xff].join("."));
   }
   const firstHextet = normalized.split(":")[0];
   const head = Number.parseInt(firstHextet || "0", 16);

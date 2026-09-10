@@ -28,7 +28,12 @@ export const CheckboxBox = ({
 
   return (
     <View
-      style={[styles.box, isFilled && styles.boxChecked, disabled && styles.boxDisabled, style]}
+      style={[
+        styles.box,
+        isFilled && styles.boxChecked,
+        disabled && styles.boxDisabled,
+        style,
+      ]}
     >
       {isFilled ? (
         <Feather

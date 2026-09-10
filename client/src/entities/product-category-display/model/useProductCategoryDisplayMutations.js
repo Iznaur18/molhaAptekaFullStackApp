@@ -12,17 +12,20 @@ export function useProductCategoryDisplayMutations() {
     void invalidateAllProductCategoryDisplayQueries(queryClient);
 
   const patchCategoryMutation = useMutation({
-    mutationFn: ({ categorySlug, body }) => patchProductCategoryDisplay(categorySlug, body),
+    mutationFn: ({ categorySlug, body }) =>
+      patchProductCategoryDisplay(categorySlug, body),
     onSuccess: invalidateDisplays,
   });
 
   const patchCategoryNodeMutation = useMutation({
-    mutationFn: ({ categoryId, body }) => patchProductCategoryNodeDisplay(categoryId, body),
+    mutationFn: ({ categoryId, body }) =>
+      patchProductCategoryNodeDisplay(categoryId, body),
     onSuccess: invalidateDisplays,
   });
 
   const patchFeedTileMutation = useMutation({
-    mutationFn: ({ tileKey, body }) => patchProductCatalogFeedTileDisplay(tileKey, body),
+    mutationFn: ({ tileKey, body }) =>
+      patchProductCatalogFeedTileDisplay(tileKey, body),
     onSuccess: invalidateDisplays,
   });
 

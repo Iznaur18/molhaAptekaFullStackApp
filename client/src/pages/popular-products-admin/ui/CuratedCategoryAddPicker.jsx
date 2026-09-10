@@ -42,7 +42,9 @@ export function CuratedCategoryAddPicker({
   disabled = false,
 }) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [trail, setTrail] = useState(/** @type {{ id: string; labelRu: string }[]} */ ([]));
+  const [trail, setTrail] = useState(
+    /** @type {{ id: string; labelRu: string }[]} */ ([]),
+  );
 
   const searchQueryResult = useProductCategorySearchQuery({
     query: searchQuery,
@@ -70,12 +72,14 @@ export function CuratedCategoryAddPicker({
 
   const treeTiles = useMemo(() => {
     if (activeParentId == null) {
-      return buildResolvedProductCategoryDisplaysFromRoots(treeOptions, displays).map((item) => ({
-        key: item.categoryId ?? item.displaySlug,
-        label: item.label,
-        imageUrl: item.imageUrl,
-        categoryId: item.categoryId ?? undefined,
-      }));
+      return buildResolvedProductCategoryDisplaysFromRoots(treeOptions, displays).map(
+        (item) => ({
+          key: item.categoryId ?? item.displaySlug,
+          label: item.label,
+          imageUrl: item.imageUrl,
+          categoryId: item.categoryId ?? undefined,
+        }),
+      );
     }
 
     const parent = trail[trail.length - 1];
@@ -141,7 +145,9 @@ export function CuratedCategoryAddPicker({
           }}
           disabled={disabled}
         >
-          <option value="tree">{POPULAR_CATEGORIES_ADMIN_PAGE_UI.CATEGORY_KIND_TREE}</option>
+          <option value="tree">
+            {POPULAR_CATEGORIES_ADMIN_PAGE_UI.CATEGORY_KIND_TREE}
+          </option>
           <option value="personal">
             {POPULAR_CATEGORIES_ADMIN_PAGE_UI.CATEGORY_KIND_PERSONAL}
           </option>
@@ -183,7 +189,10 @@ export function CuratedCategoryAddPicker({
               {searchResults.length > 0 ? (
                 <ul className="curated-category-add-picker__results-list" role="list">
                   {searchResults.map((node) => (
-                    <li key={node.id} className="curated-category-add-picker__results-item">
+                    <li
+                      key={node.id}
+                      className="curated-category-add-picker__results-item"
+                    >
                       <button
                         type="button"
                         className={[
@@ -241,7 +250,10 @@ export function CuratedCategoryAddPicker({
                   const canDrill = Boolean(node && !node.isLeaf);
 
                   return (
-                    <li key={item.key} className="curated-category-add-picker__tree-item">
+                    <li
+                      key={item.key}
+                      className="curated-category-add-picker__tree-item"
+                    >
                       <button
                         type="button"
                         className={[

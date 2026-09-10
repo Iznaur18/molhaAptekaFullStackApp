@@ -97,18 +97,15 @@ export function ProductPickupLocationFields({
   onChange,
 }) {
   const carriersQuery = useShippingCarriersQuery();
-  const list = useMemo(
-    () => (Array.isArray(locations) ? locations : []),
-    [locations],
-  );
+  const list = useMemo(() => (Array.isArray(locations) ? locations : []), [locations]);
 
   const profileAddresses = useMemo(
     () => (Array.isArray(savedAddresses) ? savedAddresses : []),
     [savedAddresses],
   );
 
-  const [selectedProfileIds, setSelectedProfileIds] = useState(() =>
-    new Set(selectedProfileAddressIdsFromLocations(profileAddresses, list)),
+  const [selectedProfileIds, setSelectedProfileIds] = useState(
+    () => new Set(selectedProfileAddressIdsFromLocations(profileAddresses, list)),
   );
   const [confirmedCustomLocationIds, setConfirmedCustomLocationIds] = useState(
     () => new Set(),
@@ -238,8 +235,12 @@ export function ProductPickupLocationFields({
       (item) =>
         !customLocations.some(
           (custom) =>
-            String(custom.address ?? "").trim().toLowerCase() ===
-            String(item.address ?? "").trim().toLowerCase(),
+            String(custom.address ?? "")
+              .trim()
+              .toLowerCase() ===
+            String(item.address ?? "")
+              .trim()
+              .toLowerCase(),
         ),
     );
 
@@ -262,7 +263,10 @@ export function ProductPickupLocationFields({
   const enrichSavedAddressGeo = (saved) => {
     const addressKey = savedAddressPickupLine(saved).toLowerCase();
     const currentLocation = listRef.current.find(
-      (item) => String(item?.address ?? "").trim().toLowerCase() === addressKey,
+      (item) =>
+        String(item?.address ?? "")
+          .trim()
+          .toLowerCase() === addressKey,
     );
     if (
       currentLocation &&
@@ -278,7 +282,10 @@ export function ProductPickupLocationFields({
 
       const currentList = listRef.current;
       const hasTarget = currentList.some(
-        (item) => String(item?.address ?? "").trim().toLowerCase() === addressKey,
+        (item) =>
+          String(item?.address ?? "")
+            .trim()
+            .toLowerCase() === addressKey,
       );
       if (!hasTarget) {
         return;
@@ -287,7 +294,9 @@ export function ProductPickupLocationFields({
       commitLocations(
         ensureSingleDefaultProductPickupLocation(
           currentList.map((item) =>
-            String(item?.address ?? "").trim().toLowerCase() === addressKey
+            String(item?.address ?? "")
+              .trim()
+              .toLowerCase() === addressKey
               ? { ...item, lat: geo.lat, lon: geo.lon }
               : item,
           ),
@@ -303,7 +312,10 @@ export function ProductPickupLocationFields({
       }
       const line = savedAddressPickupLine(saved).toLowerCase();
       const location = list.find(
-        (item) => String(item?.address ?? "").trim().toLowerCase() === line,
+        (item) =>
+          String(item?.address ?? "")
+            .trim()
+            .toLowerCase() === line,
       );
       if (!location || hasValidPickupGeo({ lat: location.lat, lon: location.lon })) {
         return;
@@ -326,8 +338,12 @@ export function ProductPickupLocationFields({
         (item) =>
           !customLocations.some(
             (custom) =>
-              String(custom.address ?? "").trim().toLowerCase() ===
-              String(item.address ?? "").trim().toLowerCase(),
+              String(custom.address ?? "")
+                .trim()
+                .toLowerCase() ===
+              String(item.address ?? "")
+                .trim()
+                .toLowerCase(),
           ),
       ),
     ];
@@ -454,7 +470,10 @@ export function ProductPickupLocationFields({
   };
 
   const deliverySelectable = PRODUCT_DELIVERY_FULFILLMENT_ENABLED && !disabled;
-  const selectedProfileIdSet = buildSelectedProfileIdSet(profileAddresses, selectedProfileIds);
+  const selectedProfileIdSet = buildSelectedProfileIdSet(
+    profileAddresses,
+    selectedProfileIds,
+  );
 
   // Едет ли товар до покупателя — вопрос к перевозчику, а не к двум старым
   // флагам: у товара с ЛОБО оба false, и раздел доставки пропадал целиком.
@@ -579,7 +598,9 @@ export function ProductPickupLocationFields({
                   />
                   <span className="saved-address-picker__option-body">
                     {item.label ? (
-                      <span className="saved-address-picker__option-label">{item.label}</span>
+                      <span className="saved-address-picker__option-label">
+                        {item.label}
+                      </span>
                     ) : null}
                     <span className="saved-address-picker__option-line">
                       {USER_SAVED_ADDRESSES_UI.FORMAT_LINE(item.line, item.flat ?? "")}
@@ -705,125 +726,126 @@ export function ProductPickupLocationFields({
             {PRODUCT_PICKUP_UI.FULFILLMENT_DELIVERY_ANY}
           </span>
         </label>
-
       </div>
 
       {shipsToBuyer ? (
         <>
-      <p className="product-pickup-location-fields__sublegend">
-        {PRODUCT_PICKUP_UI.CARRIERS_LEGEND}
-      </p>
-      <div
-        className="product-pickup-location-fields__methods product-pickup-location-fields__methods_carriers"
-        role="radiogroup"
-        aria-label={PRODUCT_PICKUP_UI.CARRIERS_LEGEND}
-      >
-        {availableCarriers.includes(PRODUCT_DELIVERY_CARRIER_GITORG) ? (
-        <label
-          className={[
-            "product-pickup-location-fields__check",
-            courierDeliveryEnabled
-              ? "product-pickup-location-fields__check_on"
-              : "",
-            disabled ? "product-pickup-location-fields__check_disabled" : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-        >
-          <input
-            type="radio"
-            name="product-delivery-carrier"
-            className="product-pickup-location-fields__checkbox"
-            checked={currentCarrier === PRODUCT_DELIVERY_CARRIER_GITORG}
-            disabled={disabled}
-            onChange={() => chooseCarrier(PRODUCT_DELIVERY_CARRIER_GITORG)}
-          />
-          <span className="product-pickup-location-fields__check-label">
-            {PRODUCT_PICKUP_UI.FULFILLMENT_COURIER}
-          </span>
-        </label>
-        ) : null}
-
-        {availableCarriers.includes(PRODUCT_DELIVERY_CARRIER_SELLER) ? (
-        <label
-          className={[
-            "product-pickup-location-fields__check",
-            deliveryEnabled ? "product-pickup-location-fields__check_on" : "",
-            !PRODUCT_DELIVERY_FULFILLMENT_ENABLED
-              ? "product-pickup-location-fields__check_soon"
-              : "",
-            !deliverySelectable ? "product-pickup-location-fields__check_disabled" : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-        >
-          <input
-            type="radio"
-            name="product-delivery-carrier"
-            className="product-pickup-location-fields__checkbox"
-            checked={currentCarrier === PRODUCT_DELIVERY_CARRIER_SELLER}
-            disabled={!deliverySelectable}
-            onChange={() => chooseCarrier(PRODUCT_DELIVERY_CARRIER_SELLER)}
-          />
-          <span className="product-pickup-location-fields__check-label">
-            {PRODUCT_PICKUP_UI.FULFILLMENT_DELIVERY}
-            {!PRODUCT_DELIVERY_FULFILLMENT_ENABLED
-              ? PRODUCT_PICKUP_UI.SOON_BADGE
-              : null}
-          </span>
-        </label>
-        ) : null}
-
-        {availableCarriers.includes(PRODUCT_DELIVERY_CARRIER_LOBO) ? (
-          <label
-            className={[
-              "product-pickup-location-fields__check",
-              currentCarrier === PRODUCT_DELIVERY_CARRIER_LOBO
-                ? "product-pickup-location-fields__check_on"
-                : "",
-              disabled ? "product-pickup-location-fields__check_disabled" : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
+          <p className="product-pickup-location-fields__sublegend">
+            {PRODUCT_PICKUP_UI.CARRIERS_LEGEND}
+          </p>
+          <div
+            className="product-pickup-location-fields__methods product-pickup-location-fields__methods_carriers"
+            role="radiogroup"
+            aria-label={PRODUCT_PICKUP_UI.CARRIERS_LEGEND}
           >
-            <input
-              type="radio"
-              name="product-delivery-carrier"
-              className="product-pickup-location-fields__checkbox"
-              checked={currentCarrier === PRODUCT_DELIVERY_CARRIER_LOBO}
-              disabled={disabled}
-              onChange={() => chooseCarrier(PRODUCT_DELIVERY_CARRIER_LOBO)}
-            />
-            <span className="product-pickup-location-fields__check-label">
-              {PRODUCT_DELIVERY_CARRIER_LABEL_RU[PRODUCT_DELIVERY_CARRIER_LOBO]}
-            </span>
-          </label>
-        ) : null}
+            {availableCarriers.includes(PRODUCT_DELIVERY_CARRIER_GITORG) ? (
+              <label
+                className={[
+                  "product-pickup-location-fields__check",
+                  courierDeliveryEnabled
+                    ? "product-pickup-location-fields__check_on"
+                    : "",
+                  disabled ? "product-pickup-location-fields__check_disabled" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                <input
+                  type="radio"
+                  name="product-delivery-carrier"
+                  className="product-pickup-location-fields__checkbox"
+                  checked={currentCarrier === PRODUCT_DELIVERY_CARRIER_GITORG}
+                  disabled={disabled}
+                  onChange={() => chooseCarrier(PRODUCT_DELIVERY_CARRIER_GITORG)}
+                />
+                <span className="product-pickup-location-fields__check-label">
+                  {PRODUCT_PICKUP_UI.FULFILLMENT_COURIER}
+                </span>
+              </label>
+            ) : null}
 
-        {SHIPPING_PROVIDERS.filter(
-          (providerId) => providerId !== PRODUCT_DELIVERY_CARRIER_LOBO,
-        ).map((providerId) => (
-          <label
-            key={providerId}
-            className="product-pickup-location-fields__check product-pickup-location-fields__check_soon product-pickup-location-fields__check_disabled"
-          >
-            <input
-              type="checkbox"
-              className="product-pickup-location-fields__checkbox"
-              checked={false}
-              disabled
-              readOnly
-            />
-            <span className="product-pickup-location-fields__check-label">
-              {SHIPPING_PROVIDER_LABEL_RU[providerId] ?? providerId}
-              {PRODUCT_PICKUP_UI.SOON_BADGE}
-            </span>
-          </label>
-        ))}
-      </div>
-      <p className="product-pickup-location-fields__hint">
-        {PRODUCT_PICKUP_UI.CARRIERS_HINT}
-      </p>
+            {availableCarriers.includes(PRODUCT_DELIVERY_CARRIER_SELLER) ? (
+              <label
+                className={[
+                  "product-pickup-location-fields__check",
+                  deliveryEnabled ? "product-pickup-location-fields__check_on" : "",
+                  !PRODUCT_DELIVERY_FULFILLMENT_ENABLED
+                    ? "product-pickup-location-fields__check_soon"
+                    : "",
+                  !deliverySelectable
+                    ? "product-pickup-location-fields__check_disabled"
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                <input
+                  type="radio"
+                  name="product-delivery-carrier"
+                  className="product-pickup-location-fields__checkbox"
+                  checked={currentCarrier === PRODUCT_DELIVERY_CARRIER_SELLER}
+                  disabled={!deliverySelectable}
+                  onChange={() => chooseCarrier(PRODUCT_DELIVERY_CARRIER_SELLER)}
+                />
+                <span className="product-pickup-location-fields__check-label">
+                  {PRODUCT_PICKUP_UI.FULFILLMENT_DELIVERY}
+                  {!PRODUCT_DELIVERY_FULFILLMENT_ENABLED
+                    ? PRODUCT_PICKUP_UI.SOON_BADGE
+                    : null}
+                </span>
+              </label>
+            ) : null}
+
+            {availableCarriers.includes(PRODUCT_DELIVERY_CARRIER_LOBO) ? (
+              <label
+                className={[
+                  "product-pickup-location-fields__check",
+                  currentCarrier === PRODUCT_DELIVERY_CARRIER_LOBO
+                    ? "product-pickup-location-fields__check_on"
+                    : "",
+                  disabled ? "product-pickup-location-fields__check_disabled" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                <input
+                  type="radio"
+                  name="product-delivery-carrier"
+                  className="product-pickup-location-fields__checkbox"
+                  checked={currentCarrier === PRODUCT_DELIVERY_CARRIER_LOBO}
+                  disabled={disabled}
+                  onChange={() => chooseCarrier(PRODUCT_DELIVERY_CARRIER_LOBO)}
+                />
+                <span className="product-pickup-location-fields__check-label">
+                  {PRODUCT_DELIVERY_CARRIER_LABEL_RU[PRODUCT_DELIVERY_CARRIER_LOBO]}
+                </span>
+              </label>
+            ) : null}
+
+            {SHIPPING_PROVIDERS.filter(
+              (providerId) => providerId !== PRODUCT_DELIVERY_CARRIER_LOBO,
+            ).map((providerId) => (
+              <label
+                key={providerId}
+                className="product-pickup-location-fields__check product-pickup-location-fields__check_soon product-pickup-location-fields__check_disabled"
+              >
+                <input
+                  type="checkbox"
+                  className="product-pickup-location-fields__checkbox"
+                  checked={false}
+                  disabled
+                  readOnly
+                />
+                <span className="product-pickup-location-fields__check-label">
+                  {SHIPPING_PROVIDER_LABEL_RU[providerId] ?? providerId}
+                  {PRODUCT_PICKUP_UI.SOON_BADGE}
+                </span>
+              </label>
+            ))}
+          </div>
+          <p className="product-pickup-location-fields__hint">
+            {PRODUCT_PICKUP_UI.CARRIERS_HINT}
+          </p>
         </>
       ) : null}
 

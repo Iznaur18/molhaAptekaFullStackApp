@@ -19,7 +19,10 @@ export const ModerationSectionTitle = ({
     <View style={styles.sectionTitleRow}>
       <Text style={styles.sectionTitle}>{title}</Text>
       {showBadge ? (
-        <View style={styles.sectionBadge} accessibilityLabel={`${pendingCount} на модерации`}>
+        <View
+          style={styles.sectionBadge}
+          accessibilityLabel={`${pendingCount} на модерации`}
+        >
           <Text style={styles.sectionBadgeText}>
             {INTRO_AD_MODERATION_PAGE_UI.PENDING_BADGE(pendingCount)}
           </Text>

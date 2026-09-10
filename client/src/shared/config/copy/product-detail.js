@@ -177,7 +177,8 @@ export const PRODUCT_PROMO_CODE_UI = {
   /** @param {number} percent */
   APPLIED: (percent) => `Промокод активен: −${percent}%`,
   MODAL_TITLE: "Промокоды товара",
-  MODAL_LEAD: "До 10 активных кодов. Скидка только в процентах. Лимит активаций — от 1 до 1000.",
+  MODAL_LEAD:
+    "До 10 активных кодов. Скидка только в процентах. Лимит активаций — от 1 до 1000.",
   /** @param {number} n */
   CARD_TITLE: (n) => `Промокод ${n}`,
   ADD: "Добавить промокод",
@@ -237,8 +238,7 @@ export const PRODUCT_BUY_N_FREE_UI = {
   DETAILS_TITLE: (n) => `${n} ${buyNFreeOrdersWord(n)} → 1 бесплатно`,
   DETAILS_GUEST: (n) =>
     `Соберите ${n} ${buyNFreeOrdersWord(n)} с этим товаром — следующая 1 шт. будет за 0 ₽`,
-  DETAILS_PROGRESS: (bought, n) =>
-    `${bought} из ${n} ${buyNFreeOrdersWord(n)}`,
+  DETAILS_PROGRESS: (bought, n) => `${bought} из ${n} ${buyNFreeOrdersWord(n)}`,
   DETAILS_REMAINING: (left) => {
     if (left === 1) return "Остался 1 заказ";
     return `Осталось ${left} ${buyNFreeOrdersWord(left)}`;
@@ -276,18 +276,13 @@ export const PRODUCT_BADGE_EXPLAIN_UI = {
       "По этому товару доступна партнёрская комиссия. Процент указан на бейдже.",
     listing_origin_own:
       "Продавец указал, что продаёт собственную вещь, а не товар для перепродажи.",
-    listing_origin_resale:
-      "Продавец указал, что товар приобретён для перепродажи.",
+    listing_origin_resale: "Продавец указал, что товар приобретён для перепродажи.",
     listing_origin_manufacturer:
       "Продавец указал, что является производителем этого товара.",
-    listing_origin_unspecified:
-      "Продавец не указал статус происхождения товара.",
-    price_market_above:
-      "По оценке продавца цена выше типичной рыночной стоимости.",
-    price_market_at:
-      "По оценке продавца цена соответствует рыночной стоимости.",
-    price_market_below:
-      "По оценке продавца цена ниже типичной рыночной стоимости.",
+    listing_origin_unspecified: "Продавец не указал статус происхождения товара.",
+    price_market_above: "По оценке продавца цена выше типичной рыночной стоимости.",
+    price_market_at: "По оценке продавца цена соответствует рыночной стоимости.",
+    price_market_below: "По оценке продавца цена ниже типичной рыночной стоимости.",
     discount: "На товар действует скидка относительно старой цены.",
     loyalty:
       "За покупку можно получить баллы лояльности. Баллы даёт продавец; получает подтверждённый покупатель.",

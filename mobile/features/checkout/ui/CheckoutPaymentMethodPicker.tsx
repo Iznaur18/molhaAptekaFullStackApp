@@ -82,9 +82,7 @@ export const CheckoutPaymentMethodPicker = ({
                 ]}
               >
                 {ORDER_PAYMENT_METHOD_LABEL_RU[method]}
-                {isLocked
-                  ? ` (${CHECKOUT_FORM_UI.PAYMENT_METHOD_CARD_SOON})`
-                  : ""}
+                {isLocked ? ` (${CHECKOUT_FORM_UI.PAYMENT_METHOD_CARD_SOON})` : ""}
               </Text>
             </Pressable>
           );

@@ -62,7 +62,8 @@ export const HomeCatalogIntroVideoBackdrop = ({
     if (isSingle || hasVideo) {
       return;
     }
-    const ms = current?.maxMs && current.maxMs > 0 ? current.maxMs : POSTER_ADVANCE_FALLBACK_MS;
+    const ms =
+      current?.maxMs && current.maxMs > 0 ? current.maxMs : POSTER_ADVANCE_FALLBACK_MS;
     const timer = setTimeout(advance, ms);
     return () => clearTimeout(timer);
   }, [advance, current, hasVideo, isSingle]);
@@ -89,7 +90,10 @@ export const HomeCatalogIntroVideoBackdrop = ({
     >
       <View
         pointerEvents="none"
-        style={[styles.topBleed, { backgroundColor: HOME_CATALOG_PRIMARY_BACKDROP_COLOR }]}
+        style={[
+          styles.topBleed,
+          { backgroundColor: HOME_CATALOG_PRIMARY_BACKDROP_COLOR },
+        ]}
       />
 
       {hasVideo && current ? (

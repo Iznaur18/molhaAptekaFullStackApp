@@ -33,7 +33,13 @@ export const EditProfileSocialLinksFields = ({
         return (
           <View key={field.id} style={styles.field}>
             <Text style={styles.label}>{field.labelRu}</Text>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: theme.spacing[2] }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: theme.spacing[2],
+              }}
+            >
               <TextInput
                 style={[styles.input, { flex: 1 }]}
                 value={value}
@@ -48,7 +54,9 @@ export const EditProfileSocialLinksFields = ({
                 editable={!disabled}
                 autoCapitalize="none"
                 autoCorrect={false}
-                keyboardType={field.id === "socialWhatsappUrl" ? "phone-pad" : "default"}
+                keyboardType={
+                  field.id === "socialWhatsappUrl" ? "phone-pad" : "default"
+                }
               />
               {value.trim() !== "" ? (
                 <Pressable

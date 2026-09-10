@@ -51,7 +51,9 @@ test("catalog browser grid: 3 columns at iPhone 16 Pro Max width", () => {
 });
 
 test("catalog browser tile card uses fluid width on web", () => {
-  const source = readRepoFile("mobile/features/catalog-browser/ui/CatalogBrowserTileCard.tsx");
+  const source = readRepoFile(
+    "mobile/features/catalog-browser/ui/CatalogBrowserTileCard.tsx",
+  );
 
   assert.match(source, /resolveFlexGridItemWidthStyle/);
   assert.match(source, /Platform\.OS === "web"/);

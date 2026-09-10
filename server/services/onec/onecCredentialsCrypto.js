@@ -12,9 +12,7 @@ function resolveKek() {
   const hex = process.env.ONEC_CREDENTIALS_KEK?.trim();
   if (hex) {
     if (!/^[0-9a-fA-F]{64}$/.test(hex)) {
-      throw new Error(
-        "ONEC_CREDENTIALS_KEK должен быть 64 hex-символа (32 байта)",
-      );
+      throw new Error("ONEC_CREDENTIALS_KEK должен быть 64 hex-символа (32 байта)");
     }
     return Buffer.from(hex, "hex");
   }
@@ -85,10 +83,7 @@ export function openOneCSecret(stored) {
   const ciphertext = Buffer.from(stored.ciphertext, "base64");
   const decipher = createDecipheriv(ALGORITHM, key, iv);
   decipher.setAuthTag(tag);
-  const decrypted = Buffer.concat([
-    decipher.update(ciphertext),
-    decipher.final(),
-  ]);
+  const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
   return decrypted.toString("utf8");
 }
 

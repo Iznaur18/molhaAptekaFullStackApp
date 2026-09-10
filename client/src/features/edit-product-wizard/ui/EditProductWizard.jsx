@@ -99,9 +99,13 @@ export function EditProductWizard({
   };
 
   const stepCopy = resolveEditProductWizardStepCopy(wizard.stepId);
-  const showStepHeadline = !["basic", "originality", "pickup", "commerce", "returns"].includes(
-    wizard.stepId,
-  );
+  const showStepHeadline = ![
+    "basic",
+    "originality",
+    "pickup",
+    "commerce",
+    "returns",
+  ].includes(wizard.stepId);
 
   return (
     <ProductModalShell
@@ -165,7 +169,9 @@ export function EditProductWizard({
               subtitle={stepCopy.subtitle}
             />
           ) : null}
-          {wizard.stepId === "basic" ? <CreateProductBasicSection {...sectionProps} /> : null}
+          {wizard.stepId === "basic" ? (
+            <CreateProductBasicSection {...sectionProps} />
+          ) : null}
           {wizard.stepId === "originality" ? (
             <CreateProductOriginalitySection {...sectionProps} />
           ) : null}

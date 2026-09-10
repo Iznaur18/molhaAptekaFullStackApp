@@ -136,6 +136,7 @@ export function createProductFormStateFromCopiedProduct(product) {
     affiliateEnabled: false,
     affiliatePercent: CREATE_PRODUCT_INITIAL_FORM.affiliatePercent,
     productIsAvailable: true,
-    productStockQuantity: Number.isFinite(stockRaw) && stockRaw > 0 ? String(stockRaw) : "1",
+    productStockQuantity:
+      Number.isFinite(stockRaw) && stockRaw > 0 ? String(stockRaw) : "1",
   };
 }

@@ -101,14 +101,8 @@
 .cart-page__dock {
   position: fixed;
   z-index: 40;
-  left: max(
-    var(--cart-page-dock-float-inset),
-    env(safe-area-inset-left, 0px)
-  );
-  right: max(
-    var(--cart-page-dock-float-inset),
-    env(safe-area-inset-right, 0px)
-  );
+  left: max(var(--cart-page-dock-float-inset), env(safe-area-inset-left, 0px));
+  right: max(var(--cart-page-dock-float-inset), env(safe-area-inset-right, 0px));
   bottom: calc(
     var(--app-shell-mobile-bottom-nav-height, 3.1rem) +
       var(--app-shell-mobile-bottom-nav-float-offset, 0.625rem) +
@@ -353,5 +347,3 @@
     margin-inline: var(--cart-page-content-inset);
   }
 }
-
-

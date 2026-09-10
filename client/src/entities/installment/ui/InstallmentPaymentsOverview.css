@@ -45,7 +45,9 @@
   background: var(--iz-color-success-surface);
 }
 
-.installment-payments-overview__tile_attention:not(.installment-payments-overview__tile_active) {
+.installment-payments-overview__tile_attention:not(
+  .installment-payments-overview__tile_active
+) {
   border-color: color-mix(in srgb, var(--iz-color-warning) 45%, var(--iz-color-border));
 }
 

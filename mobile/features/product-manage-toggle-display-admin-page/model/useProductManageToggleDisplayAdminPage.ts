@@ -15,7 +15,11 @@ export const useProductManageToggleDisplayAdminPage = () => {
 
   return {
     displaysByKey,
-    phase: displaysQuery.isPending ? "loading" : displaysQuery.isError ? "error" : "ready",
+    phase: displaysQuery.isPending
+      ? "loading"
+      : displaysQuery.isError
+        ? "error"
+        : "ready",
     queryError: displaysQuery.error,
     refetchDisplays: displaysQuery.refetch,
   };

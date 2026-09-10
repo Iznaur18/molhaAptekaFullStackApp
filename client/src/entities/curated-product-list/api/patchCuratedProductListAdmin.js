@@ -8,7 +8,10 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  */
 export async function patchCuratedProductListAdmin(listId, body) {
   try {
-    const { data } = await apiClient.patch(`/product/admin/curated-lists/${listId}`, body);
+    const { data } = await apiClient.patch(
+      `/product/admin/curated-lists/${listId}`,
+      body,
+    );
     if (!data?.success || !data.data?.list) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

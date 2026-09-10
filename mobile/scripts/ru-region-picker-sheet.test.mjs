@@ -12,8 +12,12 @@ const readMobileFile = (relativePath) =>
 test("RuRegionPickerSheet: Squircle shadow outer has bounded height (sheetFill)", () => {
   const sheet = readMobileFile("entities/region/ui/RuRegionPickerSheet.tsx");
   const squircle = readMobileFile("shared/ui/SquircleView.tsx");
-  const animation = readMobileFile("entities/region/model/useViewerRegionPickerSheetAnimation.ts");
-  const timing = readMobileFile("entities/region/lib/viewerRegionPickerSheetAnimation.ts");
+  const animation = readMobileFile(
+    "entities/region/model/useViewerRegionPickerSheetAnimation.ts",
+  );
+  const timing = readMobileFile(
+    "entities/region/lib/viewerRegionPickerSheetAnimation.ts",
+  );
 
   assert.match(squircle, /if \(outerStyle != null \|\| shadowStyle != null\)/);
   assert.match(sheet, /sheetFill:/);

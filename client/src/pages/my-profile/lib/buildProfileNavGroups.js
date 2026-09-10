@@ -144,132 +144,140 @@ export function buildProfileNavGroups({
     {
       id: "trade",
       label: MY_PROFILE_PAGE_UI.NAV_SECTION_TRADE,
-      items: orderNavItems([
-        {
-          tab: "my-products",
-          label: MY_PROFILE_PAGE_UI.TAB_MY_PRODUCTS,
-          disabled: !canUseMyProducts,
-          onClick: () => selectTab("my-products", onMyProductsClick),
-        },
-        {
-          tab: "my-sales",
-          label: MY_PROFILE_PAGE_UI.TAB_MY_SALES,
-          badgeCount: pendingMySalesActionCount,
-          disabled: !canUseMySales,
-          onClick: () => selectTab("my-sales", onMySalesClick),
-        },
-        {
-          tab: "my-orders",
-          label: MY_PROFILE_PAGE_UI.TAB_MY_ORDERS,
-          badgeCount: pendingMyOrdersActionCount,
-          disabled: !canUseMyOrders,
-          onClick: () => selectTab("my-orders", onMyOrdersClick),
-        },
-        ...(canUseAuction
-          ? [
-              {
-                tab: "auction",
-                label: MY_PROFILE_PAGE_UI.TAB_AUCTION,
-                badgeCount: pendingIncomingPriceOffersCount,
-                onClick: () => selectTab("auction", onAuctionClick),
-              },
-            ]
-          : []),
-        ...(canUseInstallmentPayments
-          ? [
-              {
-                tab: "installment-payments",
-                label: MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_PAYMENTS,
-                badgeCount: pendingInstallmentBuyerActionCount,
-                onClick: () =>
-                  selectTab("installment-payments", onInstallmentPaymentsClick),
-              },
-            ]
-          : []),
-        ...(canUseInstallmentSales
-          ? [
-              {
-                tab: "installment-sales",
-                label: MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_SALES,
-                badgeCount: pendingInstallmentSellerActionCount,
-                onClick: () => selectTab("installment-sales", onInstallmentSalesClick),
-              },
-            ]
-          : []),
-      ], PROFILE_TRADE_SECTION_ORDER),
+      items: orderNavItems(
+        [
+          {
+            tab: "my-products",
+            label: MY_PROFILE_PAGE_UI.TAB_MY_PRODUCTS,
+            disabled: !canUseMyProducts,
+            onClick: () => selectTab("my-products", onMyProductsClick),
+          },
+          {
+            tab: "my-sales",
+            label: MY_PROFILE_PAGE_UI.TAB_MY_SALES,
+            badgeCount: pendingMySalesActionCount,
+            disabled: !canUseMySales,
+            onClick: () => selectTab("my-sales", onMySalesClick),
+          },
+          {
+            tab: "my-orders",
+            label: MY_PROFILE_PAGE_UI.TAB_MY_ORDERS,
+            badgeCount: pendingMyOrdersActionCount,
+            disabled: !canUseMyOrders,
+            onClick: () => selectTab("my-orders", onMyOrdersClick),
+          },
+          ...(canUseAuction
+            ? [
+                {
+                  tab: "auction",
+                  label: MY_PROFILE_PAGE_UI.TAB_AUCTION,
+                  badgeCount: pendingIncomingPriceOffersCount,
+                  onClick: () => selectTab("auction", onAuctionClick),
+                },
+              ]
+            : []),
+          ...(canUseInstallmentPayments
+            ? [
+                {
+                  tab: "installment-payments",
+                  label: MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_PAYMENTS,
+                  badgeCount: pendingInstallmentBuyerActionCount,
+                  onClick: () =>
+                    selectTab("installment-payments", onInstallmentPaymentsClick),
+                },
+              ]
+            : []),
+          ...(canUseInstallmentSales
+            ? [
+                {
+                  tab: "installment-sales",
+                  label: MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_SALES,
+                  badgeCount: pendingInstallmentSellerActionCount,
+                  onClick: () =>
+                    selectTab("installment-sales", onInstallmentSalesClick),
+                },
+              ]
+            : []),
+        ],
+        PROFILE_TRADE_SECTION_ORDER,
+      ),
     },
     {
       id: "account",
       label: MY_PROFILE_PAGE_UI.NAV_SECTION_ACCOUNT,
-      items: orderNavItems([
-        {
-          tab: "subscriptions",
-          label: MY_PROFILE_PAGE_UI.TAB_SUBSCRIPTIONS,
-          disabled: !canUseSubscriptions,
-          onClick: () => selectTab("subscriptions", onSubscriptionsClick),
-        },
-        {
-          tab: "wishlist",
-          label: MY_PROFILE_PAGE_UI.TAB_WISHLIST,
-          disabled: !canUseWishlist,
-          onClick: () => selectTab("wishlist", onWishlistClick),
-        },
-        ...(canUseDataConfirmation
-          ? [
-              {
-                tab: "data-confirmation",
-                label: MY_PROFILE_PAGE_UI.TAB_DATA_CONFIRMATION,
-                showAlert: !isUserDataConfirmed,
-                onClick: () => selectTab("data-confirmation", onDataConfirmationClick),
-              },
-            ]
-          : []),
-        ...(canUsePremium
-          ? [
-              {
-                tab: "premium",
-                label: MY_PROFILE_PAGE_UI.TAB_PREMIUM,
-                onClick: () => selectTab("premium", onPremiumClick),
-              },
-            ]
-          : []),
-        ...(canUseLoyaltyPoints
-          ? [
-              {
-                tab: "loyalty-points",
-                label: MY_PROFILE_PAGE_UI.TAB_LOYALTY_POINTS,
-                onClick: () => selectTab("loyalty-points", onLoyaltyPointsClick),
-              },
-            ]
-          : []),
-        ...(canUsePartnerProgram
-          ? [
-              {
-                tab: "partner-program",
-                label: MY_PROFILE_PAGE_UI.TAB_PARTNER_PROGRAM,
-                onClick: () => selectTab("partner-program", onPartnerProgramClick),
-              },
-            ]
-          : []),
-        ...(canUseAdvertising
-          ? [
-              {
-                tab: "advertising",
-                label: MY_PROFILE_PAGE_UI.TAB_ADVERTISING,
-                onClick: () => selectTab("advertising", onAdvertisingClick),
-              },
-            ]
-          : []),
-        ...(canUseEditProfile && !showEditOnBanner
-          ? [
-              {
-                tab: "edit-profile",
-                label: MY_PROFILE_PAGE_UI.EDIT_PROFILE,
-                onClick: () => selectTab("edit-profile", onEditProfileClick),
-              },
-            ]
-          : []),
-      ], PROFILE_ACCOUNT_SECTION_ORDER),
+      items: orderNavItems(
+        [
+          {
+            tab: "subscriptions",
+            label: MY_PROFILE_PAGE_UI.TAB_SUBSCRIPTIONS,
+            disabled: !canUseSubscriptions,
+            onClick: () => selectTab("subscriptions", onSubscriptionsClick),
+          },
+          {
+            tab: "wishlist",
+            label: MY_PROFILE_PAGE_UI.TAB_WISHLIST,
+            disabled: !canUseWishlist,
+            onClick: () => selectTab("wishlist", onWishlistClick),
+          },
+          ...(canUseDataConfirmation
+            ? [
+                {
+                  tab: "data-confirmation",
+                  label: MY_PROFILE_PAGE_UI.TAB_DATA_CONFIRMATION,
+                  showAlert: !isUserDataConfirmed,
+                  onClick: () =>
+                    selectTab("data-confirmation", onDataConfirmationClick),
+                },
+              ]
+            : []),
+          ...(canUsePremium
+            ? [
+                {
+                  tab: "premium",
+                  label: MY_PROFILE_PAGE_UI.TAB_PREMIUM,
+                  onClick: () => selectTab("premium", onPremiumClick),
+                },
+              ]
+            : []),
+          ...(canUseLoyaltyPoints
+            ? [
+                {
+                  tab: "loyalty-points",
+                  label: MY_PROFILE_PAGE_UI.TAB_LOYALTY_POINTS,
+                  onClick: () => selectTab("loyalty-points", onLoyaltyPointsClick),
+                },
+              ]
+            : []),
+          ...(canUsePartnerProgram
+            ? [
+                {
+                  tab: "partner-program",
+                  label: MY_PROFILE_PAGE_UI.TAB_PARTNER_PROGRAM,
+                  onClick: () => selectTab("partner-program", onPartnerProgramClick),
+                },
+              ]
+            : []),
+          ...(canUseAdvertising
+            ? [
+                {
+                  tab: "advertising",
+                  label: MY_PROFILE_PAGE_UI.TAB_ADVERTISING,
+                  onClick: () => selectTab("advertising", onAdvertisingClick),
+                },
+              ]
+            : []),
+          ...(canUseEditProfile && !showEditOnBanner
+            ? [
+                {
+                  tab: "edit-profile",
+                  label: MY_PROFILE_PAGE_UI.EDIT_PROFILE,
+                  onClick: () => selectTab("edit-profile", onEditProfileClick),
+                },
+              ]
+            : []),
+        ],
+        PROFILE_ACCOUNT_SECTION_ORDER,
+      ),
     },
   ];
 
@@ -298,8 +306,7 @@ export function buildProfileNavGroups({
             {
               tab: "delivery-payment",
               label: MY_PROFILE_PAGE_UI.TAB_DELIVERY_PAYMENT,
-              onClick: () =>
-                selectTab("delivery-payment", onDeliveryPaymentClick),
+              onClick: () => selectTab("delivery-payment", onDeliveryPaymentClick),
             },
           ]
         : []),
@@ -365,8 +372,7 @@ export function buildProfileNavGroups({
           {
             tab: "safe-deal-moderation",
             label: "Безопасная сделка (модерация)",
-            onClick: () =>
-              selectTab("safe-deal-moderation", onSafeDealModerationClick),
+            onClick: () => selectTab("safe-deal-moderation", onSafeDealModerationClick),
           },
         ]
       : []),
@@ -375,8 +381,7 @@ export function buildProfileNavGroups({
           {
             tab: "courier-moderation",
             label: "Курьеры (модерация)",
-            onClick: () =>
-              selectTab("courier-moderation", onCourierModerationClick),
+            onClick: () => selectTab("courier-moderation", onCourierModerationClick),
           },
         ]
       : []),
@@ -397,7 +402,8 @@ export function buildProfileNavGroups({
             tab: "installment-disputes",
             label: "Споры (модерация)",
             badgeCount: pendingInstallmentDisputesCount,
-            onClick: () => selectTab("installment-disputes", onInstallmentDisputesClick),
+            onClick: () =>
+              selectTab("installment-disputes", onInstallmentDisputesClick),
           },
         ]
       : []),
@@ -418,8 +424,7 @@ export function buildProfileNavGroups({
           {
             tab: "shipping-carriers",
             label: "Службы доставки",
-            onClick: () =>
-              selectTab("shipping-carriers", onShippingCarriersClick),
+            onClick: () => selectTab("shipping-carriers", onShippingCarriersClick),
           },
         ]
       : []),
@@ -466,7 +471,8 @@ export function buildProfileNavGroups({
           {
             tab: "search-synonyms-admin",
             label: MY_PROFILE_PAGE_UI.TAB_SEARCH_SYNONYMS_ADMIN,
-            onClick: () => selectTab("search-synonyms-admin", onSearchSynonymsAdminClick),
+            onClick: () =>
+              selectTab("search-synonyms-admin", onSearchSynonymsAdminClick),
           },
         ]
       : []),
@@ -511,9 +517,10 @@ export function buildProfileNavGroups({
 
   const managementSectionIds = new Set(PROFILE_MANAGEMENT_SECTION_ORDER);
 
-  const orderedStaffItems = orderNavItems(staffItems, PROFILE_STAFF_SECTION_ORDER).filter(
-    (item) => !managementSectionIds.has(item.tab),
-  );
+  const orderedStaffItems = orderNavItems(
+    staffItems,
+    PROFILE_STAFF_SECTION_ORDER,
+  ).filter((item) => !managementSectionIds.has(item.tab));
   const orderedManagementItems = orderNavItems(
     managementItems,
     PROFILE_MANAGEMENT_SECTION_ORDER,

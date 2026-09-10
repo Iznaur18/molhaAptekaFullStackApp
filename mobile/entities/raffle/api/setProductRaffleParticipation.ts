@@ -7,9 +7,12 @@ export const setProductRaffleParticipation = async (
   enabled: boolean,
 ): Promise<Record<string, unknown>> => {
   try {
-    const { data } = await apiClient.patch(`/product/${productId}/raffle-participation`, {
-      enabled,
-    });
+    const { data } = await apiClient.patch(
+      `/product/${productId}/raffle-participation`,
+      {
+        enabled,
+      },
+    );
     if (!data?.success || !data.data?.product) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

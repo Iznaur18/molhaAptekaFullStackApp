@@ -55,7 +55,9 @@ export const MyProductsCatalogGridRowItem = ({
 
   return (
     <CatalogGridRowEnteringShell rowIndex={rowIndex}>
-      <View style={[catalogGridRowStyles.row, { gap, width: "100%", alignSelf: "stretch" }]}>
+      <View
+        style={[catalogGridRowStyles.row, { gap, width: "100%", alignSelf: "stretch" }]}
+      >
         {row.products.map((product) => (
           <View key={product._id} style={cellWidthStyle}>
             <MyProductCatalogCard
@@ -69,7 +71,10 @@ export const MyProductsCatalogGridRowItem = ({
         ))}
         {columns > 1 && row.products.length < columns
           ? Array.from({ length: columns - row.products.length }, (_, index) => (
-              <View key={`my-products-grid-pad-${index}`} style={{ width: tileWidth }} />
+              <View
+                key={`my-products-grid-pad-${index}`}
+                style={{ width: tileWidth }}
+              />
             ))
           : null}
       </View>

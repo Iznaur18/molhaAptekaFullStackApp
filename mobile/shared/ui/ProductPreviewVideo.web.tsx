@@ -12,7 +12,10 @@ type ProductPreviewVideoProps = {
  * Web: `<video>` перехватывает pointer events на Android tablet —
  * `pointerEvents: none`, чтобы тап открывал карточку товара.
  */
-export const ProductPreviewVideo = ({ uri, onPlaybackFailed }: ProductPreviewVideoProps) => {
+export const ProductPreviewVideo = ({
+  uri,
+  onPlaybackFailed,
+}: ProductPreviewVideoProps) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {

@@ -52,7 +52,11 @@ export const InstallmentPaymentsPage = () => {
     [allContracts],
   );
   const contracts = useMemo(
-    () => filterInstallmentBuyerContracts(allContracts, { status: statusFilter, attentionOnly }),
+    () =>
+      filterInstallmentBuyerContracts(allContracts, {
+        status: statusFilter,
+        attentionOnly,
+      }),
     [allContracts, statusFilter, attentionOnly],
   );
 
@@ -163,13 +167,19 @@ export const InstallmentPaymentsPage = () => {
       {contracts.length > 0 ? (
         <View style={styles.listActions}>
           <Pressable style={styles.listAction} onPress={expandAll}>
-            <Text style={styles.listActionText}>{INSTALLMENT_UI.PAYMENTS_EXPAND_ALL}</Text>
+            <Text style={styles.listActionText}>
+              {INSTALLMENT_UI.PAYMENTS_EXPAND_ALL}
+            </Text>
           </Pressable>
           <Pressable style={styles.listAction} onPress={collapseAll}>
-            <Text style={styles.listActionText}>{INSTALLMENT_UI.PAYMENTS_COLLAPSE_ALL}</Text>
+            <Text style={styles.listActionText}>
+              {INSTALLMENT_UI.PAYMENTS_COLLAPSE_ALL}
+            </Text>
           </Pressable>
           {attentionOnly ? (
-            <Text style={styles.filterHint}>{INSTALLMENT_UI.PAYMENTS_ATTENTION_FILTER_HINT}</Text>
+            <Text style={styles.filterHint}>
+              {INSTALLMENT_UI.PAYMENTS_ATTENTION_FILTER_HINT}
+            </Text>
           ) : null}
         </View>
       ) : null}
@@ -199,7 +209,10 @@ export const InstallmentPaymentsPage = () => {
   if (contractsQuery.isError) {
     return (
       <ScreenErrorState
-        message={formatApiErrorMessage(contractsQuery.error, INSTALLMENT_UI.ERROR_GENERIC)}
+        message={formatApiErrorMessage(
+          contractsQuery.error,
+          INSTALLMENT_UI.ERROR_GENERIC,
+        )}
         onRetry={() => {
           void handleRefresh();
         }}

@@ -18,7 +18,11 @@ const WEB_VIEWS_OUTSIDE_PROFILE_HUB = new Set([
   "cart",
 ]);
 
-const MOBILE_ONLY_PROFILE_SECTIONS = new Set(["overview", "create-raffle", "edit-profile"]);
+const MOBILE_ONLY_PROFILE_SECTIONS = new Set([
+  "overview",
+  "create-raffle",
+  "edit-profile",
+]);
 
 /** Legacy mobile section ids — redirect into merged hub screens on web. */
 const LEGACY_MOBILE_PROFILE_SECTIONS = new Set([
@@ -47,7 +51,9 @@ const webProfileSections = homeMainViewKeys
 const webProfileSectionSet = new Set(webProfileSections);
 const mobileProfileSectionSet = new Set(PROFILE_SECTION_IDS);
 
-const unknownInWeb = webProfileSections.filter((sectionId) => !mobileProfileSectionSet.has(sectionId));
+const unknownInWeb = webProfileSections.filter(
+  (sectionId) => !mobileProfileSectionSet.has(sectionId),
+);
 
 const missingInWeb = PROFILE_SECTION_IDS.filter(
   (sectionId) =>

@@ -11,7 +11,9 @@ type HomeFeaturedRafflesSectionProps = {
   raffles: RaffleFromApi[];
 };
 
-export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSectionProps) => {
+export const HomeFeaturedRafflesSection = ({
+  raffles,
+}: HomeFeaturedRafflesSectionProps) => {
   const sectionStyles = useRaffleFeaturedSectionStyles();
   const router = useRouter();
   const hasRaffles = raffles.length > 0;
@@ -29,7 +31,10 @@ export const HomeFeaturedRafflesSection = ({ raffles }: HomeFeaturedRafflesSecti
   }
 
   return (
-    <View style={sectionStyles.root} accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}>
+    <View
+      style={sectionStyles.root}
+      accessibilityLabel={HOME_FEED_UI.RAFFLES_SECTION_ARIA}
+    >
       <HomeFeaturedRafflesRevealButton onPress={openFirstRaffleProducts} />
     </View>
   );

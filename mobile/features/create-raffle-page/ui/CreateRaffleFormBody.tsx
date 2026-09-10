@@ -30,7 +30,12 @@ type MediaTypeOptionProps = {
   disabled?: boolean;
 };
 
-const MediaTypeOption = ({ label, selected, onPress, disabled = false }: MediaTypeOptionProps) => {
+const MediaTypeOption = ({
+  label,
+  selected,
+  onPress,
+  disabled = false,
+}: MediaTypeOptionProps) => {
   const styles = useCreateRafflePageStyles();
 
   return (
@@ -85,136 +90,158 @@ export const CreateRaffleFormBody = ({
   return (
     <View style={styles.form}>
       {showBasic ? (
-      <CreateRaffleFormSection title={CREATE_RAFFLE_MODAL_UI.SECTION_BASIC} hideTitle={step !== "all"}>
-        <View style={styles.field}>
-          <Text style={styles.fieldLabel}>{CREATE_RAFFLE_MODAL_UI.LABEL_TITLE} *</Text>
-          <TextInput
-            style={styles.input}
-            value={form.title}
-            maxLength={RAFFLE_TITLE_MAX_LENGTH}
-            onChangeText={(title) => onFormChange({ title })}
-            editable={!isSubmitting}
-          />
-          <Text style={styles.fieldHint}>{CREATE_RAFFLE_MODAL_UI.HINT_TITLE}</Text>
-        </View>
+        <CreateRaffleFormSection
+          title={CREATE_RAFFLE_MODAL_UI.SECTION_BASIC}
+          hideTitle={step !== "all"}
+        >
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>
+              {CREATE_RAFFLE_MODAL_UI.LABEL_TITLE} *
+            </Text>
+            <TextInput
+              style={styles.input}
+              value={form.title}
+              maxLength={RAFFLE_TITLE_MAX_LENGTH}
+              onChangeText={(title) => onFormChange({ title })}
+              editable={!isSubmitting}
+            />
+            <Text style={styles.fieldHint}>{CREATE_RAFFLE_MODAL_UI.HINT_TITLE}</Text>
+          </View>
 
-        <RuRegionSelect
-          value={form.regionCode}
-          disabled={isSubmitting}
-          required
-          label={CREATE_RAFFLE_MODAL_UI.LABEL_REGION}
-          onChange={(regionCode) => onFormChange({ regionCode })}
-        />
-        <Text style={styles.fieldHint}>{CREATE_RAFFLE_MODAL_UI.HINT_REGION}</Text>
-
-        <View style={styles.field}>
-          <Text style={styles.fieldLabel}>{CREATE_RAFFLE_MODAL_UI.LABEL_DESCRIPTION}</Text>
-          <TextInput
-            style={[styles.input, styles.textarea]}
-            value={form.description}
-            maxLength={RAFFLE_DESCRIPTION_MAX_LENGTH}
-            multiline
-            onChangeText={(description) => onFormChange({ description })}
-            editable={!isSubmitting}
+          <RuRegionSelect
+            value={form.regionCode}
+            disabled={isSubmitting}
+            required
+            label={CREATE_RAFFLE_MODAL_UI.LABEL_REGION}
+            onChange={(regionCode) => onFormChange({ regionCode })}
           />
-          <Text style={styles.fieldHint}>{CREATE_RAFFLE_MODAL_UI.HINT_DESCRIPTION}</Text>
-        </View>
-      </CreateRaffleFormSection>
+          <Text style={styles.fieldHint}>{CREATE_RAFFLE_MODAL_UI.HINT_REGION}</Text>
+
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>
+              {CREATE_RAFFLE_MODAL_UI.LABEL_DESCRIPTION}
+            </Text>
+            <TextInput
+              style={[styles.input, styles.textarea]}
+              value={form.description}
+              maxLength={RAFFLE_DESCRIPTION_MAX_LENGTH}
+              multiline
+              onChangeText={(description) => onFormChange({ description })}
+              editable={!isSubmitting}
+            />
+            <Text style={styles.fieldHint}>
+              {CREATE_RAFFLE_MODAL_UI.HINT_DESCRIPTION}
+            </Text>
+          </View>
+        </CreateRaffleFormSection>
       ) : null}
 
       {showPrize ? (
-      <CreateRaffleFormSection title={CREATE_RAFFLE_MODAL_UI.SECTION_PRIZE} hideTitle={step !== "all"}>
-        <View style={styles.mediaType}>
-          <Text style={styles.mediaTypeLegend}>{CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_MEDIA}</Text>
-          <View style={styles.mediaTypeOptions}>
-            <MediaTypeOption
-              label={CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_MEDIA_TYPE_IMAGE}
-              selected={form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_IMAGE}
-              onPress={() => onMediaTypeChange(RAFFLE_PRIZE_MEDIA_TYPE_IMAGE)}
-              disabled={isSubmitting}
-            />
-            <MediaTypeOption
-              label={CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_MEDIA_TYPE_VIDEO}
-              selected={form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_VIDEO}
-              onPress={() => onMediaTypeChange(RAFFLE_PRIZE_MEDIA_TYPE_VIDEO)}
-              disabled={isSubmitting}
-            />
+        <CreateRaffleFormSection
+          title={CREATE_RAFFLE_MODAL_UI.SECTION_PRIZE}
+          hideTitle={step !== "all"}
+        >
+          <View style={styles.mediaType}>
+            <Text style={styles.mediaTypeLegend}>
+              {CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_MEDIA}
+            </Text>
+            <View style={styles.mediaTypeOptions}>
+              <MediaTypeOption
+                label={CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_MEDIA_TYPE_IMAGE}
+                selected={form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_IMAGE}
+                onPress={() => onMediaTypeChange(RAFFLE_PRIZE_MEDIA_TYPE_IMAGE)}
+                disabled={isSubmitting}
+              />
+              <MediaTypeOption
+                label={CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_MEDIA_TYPE_VIDEO}
+                selected={form.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_VIDEO}
+                onPress={() => onMediaTypeChange(RAFFLE_PRIZE_MEDIA_TYPE_VIDEO)}
+                disabled={isSubmitting}
+              />
+            </View>
+            <Text style={styles.fieldHint}>
+              {CREATE_RAFFLE_MODAL_UI.HINT_PRIZE_MEDIA}
+            </Text>
           </View>
-          <Text style={styles.fieldHint}>{CREATE_RAFFLE_MODAL_UI.HINT_PRIZE_MEDIA}</Text>
-        </View>
 
-        <View style={styles.field}>
-          <Text style={styles.fieldLabel}>
-            {isVideoMedia
-              ? `${CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_VIDEO} *`
-              : `${CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_IMAGE} *`}
-          </Text>
-          {isVideoMedia ? (
-            <VideoUrlUploadField
-              label=""
-              value={form.prizeVideoUrl}
-              onChange={(prizeVideoUrl) => onFormChange({ prizeVideoUrl })}
-              disabled={isSubmitting}
-            />
-          ) : (
-            <ImageUrlUploadField
-              label=""
-              value={form.prizeImageUrl}
-              onChange={(prizeImageUrl) => {
-                const urlChanged = prizeImageUrl.trim() !== form.prizeImageUrl.trim();
-                onFormChange({
-                  prizeImageUrl,
-                  prizeImageFocus: urlChanged
-                    ? { ...DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS }
-                    : form.prizeImageFocus,
-                });
-              }}
-              disabled={isSubmitting}
-            />
-          )}
-          <Text style={styles.fieldHint}>
-            {isVideoMedia
-              ? CREATE_RAFFLE_MODAL_UI.HINT_PRIZE_VIDEO
-              : CREATE_RAFFLE_MODAL_UI.HINT_PRIZE_IMAGE}
-          </Text>
-        </View>
-      </CreateRaffleFormSection>
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>
+              {isVideoMedia
+                ? `${CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_VIDEO} *`
+                : `${CREATE_RAFFLE_MODAL_UI.LABEL_PRIZE_IMAGE} *`}
+            </Text>
+            {isVideoMedia ? (
+              <VideoUrlUploadField
+                label=""
+                value={form.prizeVideoUrl}
+                onChange={(prizeVideoUrl) => onFormChange({ prizeVideoUrl })}
+                disabled={isSubmitting}
+              />
+            ) : (
+              <ImageUrlUploadField
+                label=""
+                value={form.prizeImageUrl}
+                onChange={(prizeImageUrl) => {
+                  const urlChanged = prizeImageUrl.trim() !== form.prizeImageUrl.trim();
+                  onFormChange({
+                    prizeImageUrl,
+                    prizeImageFocus: urlChanged
+                      ? { ...DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS }
+                      : form.prizeImageFocus,
+                  });
+                }}
+                disabled={isSubmitting}
+              />
+            )}
+            <Text style={styles.fieldHint}>
+              {isVideoMedia
+                ? CREATE_RAFFLE_MODAL_UI.HINT_PRIZE_VIDEO
+                : CREATE_RAFFLE_MODAL_UI.HINT_PRIZE_IMAGE}
+            </Text>
+          </View>
+        </CreateRaffleFormSection>
       ) : null}
 
       {showConditions ? (
-      <CreateRaffleFormSection
-        title={CREATE_RAFFLE_MODAL_UI.SECTION_CONDITIONS}
-        hideTitle={step !== "all"}
-      >
-        <View style={styles.field}>
-          <Text style={styles.fieldLabel}>{CREATE_RAFFLE_MODAL_UI.LABEL_TARGET} *</Text>
-          <TextInput
-            style={styles.input}
-            value={form.targetSales}
-            keyboardType="number-pad"
-            onChangeText={(targetSales) =>
-              onFormChange({ targetSales: keepDigitsOnly(targetSales) })
-            }
-            editable={!isSubmitting}
-          />
-          <Text style={styles.fieldHint}>{CREATE_RAFFLE_MODAL_UI.HINT_TARGET}</Text>
-        </View>
+        <CreateRaffleFormSection
+          title={CREATE_RAFFLE_MODAL_UI.SECTION_CONDITIONS}
+          hideTitle={step !== "all"}
+        >
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>
+              {CREATE_RAFFLE_MODAL_UI.LABEL_TARGET} *
+            </Text>
+            <TextInput
+              style={styles.input}
+              value={form.targetSales}
+              keyboardType="number-pad"
+              onChangeText={(targetSales) =>
+                onFormChange({ targetSales: keepDigitsOnly(targetSales) })
+              }
+              editable={!isSubmitting}
+            />
+            <Text style={styles.fieldHint}>{CREATE_RAFFLE_MODAL_UI.HINT_TARGET}</Text>
+          </View>
 
-        <View style={styles.field}>
-          <Text style={styles.fieldLabel}>{CREATE_RAFFLE_MODAL_UI.LABEL_INSTAGRAM}</Text>
-          <TextInput
-            style={styles.input}
-            value={form.instagramUrl}
-            autoCapitalize="none"
-            keyboardType="url"
-            placeholder="https://instagram.com/..."
-            placeholderTextColor={theme.colors.textMuted}
-            onChangeText={(instagramUrl) => onFormChange({ instagramUrl })}
-            editable={!isSubmitting}
-          />
-          <Text style={styles.fieldHint}>{CREATE_RAFFLE_MODAL_UI.HINT_INSTAGRAM}</Text>
-        </View>
-      </CreateRaffleFormSection>
+          <View style={styles.field}>
+            <Text style={styles.fieldLabel}>
+              {CREATE_RAFFLE_MODAL_UI.LABEL_INSTAGRAM}
+            </Text>
+            <TextInput
+              style={styles.input}
+              value={form.instagramUrl}
+              autoCapitalize="none"
+              keyboardType="url"
+              placeholder="https://instagram.com/..."
+              placeholderTextColor={theme.colors.textMuted}
+              onChangeText={(instagramUrl) => onFormChange({ instagramUrl })}
+              editable={!isSubmitting}
+            />
+            <Text style={styles.fieldHint}>
+              {CREATE_RAFFLE_MODAL_UI.HINT_INSTAGRAM}
+            </Text>
+          </View>
+        </CreateRaffleFormSection>
       ) : null}
 
       {hintText ? <Text style={styles.pageHint}>{hintText}</Text> : null}
@@ -225,19 +252,19 @@ export const CreateRaffleFormBody = ({
       ) : null}
 
       {showFooter && onSubmit ? (
-      <View style={styles.actions}>
-        <Pressable
-          style={[styles.submit, isSubmitting && styles.submitDisabled]}
-          onPress={onSubmit}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color={theme.colors.onContrast} />
-          ) : (
-            <Text style={styles.submitText}>{submitLabel}</Text>
-          )}
-        </Pressable>
-      </View>
+        <View style={styles.actions}>
+          <Pressable
+            style={[styles.submit, isSubmitting && styles.submitDisabled]}
+            onPress={onSubmit}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <ActivityIndicator color={theme.colors.onContrast} />
+            ) : (
+              <Text style={styles.submitText}>{submitLabel}</Text>
+            )}
+          </Pressable>
+        </View>
       ) : null}
     </View>
   );

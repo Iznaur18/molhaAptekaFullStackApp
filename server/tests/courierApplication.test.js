@@ -7,9 +7,8 @@ process.env.JWT_SECRET =
 
 const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollections } =
   await import("./helpers/mongoTestDb.js");
-const { PrivateUploadModel, UserModel, UserInAppNotificationModel } = await import(
-  "../models/index.js"
-);
+const { PrivateUploadModel, UserModel, UserInAppNotificationModel } =
+  await import("../models/index.js");
 const {
   getMyCourierProfile,
   listCourierApplications,
@@ -86,7 +85,11 @@ describe("заявка курьера", () => {
     assert.equal(profile.moderationStatus, "pending");
     assert.equal(profile.vehiclePlate, "х123ум797");
     assert.ok(profile.submittedAt, "дата подачи проставлена");
-    assert.equal(profile.isApproved, false, "до решения модератора заказы брать нельзя");
+    assert.equal(
+      profile.isApproved,
+      false,
+      "до решения модератора заказы брать нельзя",
+    );
   });
 
   it("без адреса в профиле заявку не принять", async () => {
@@ -185,7 +188,11 @@ describe("модерация заявки курьера", () => {
     });
 
     assert.equal(profile.moderationStatus, "pending");
-    assert.equal(profile.moderationComment, "", "старая причина не висит на новой заявке");
+    assert.equal(
+      profile.moderationComment,
+      "",
+      "старая причина не висит на новой заявке",
+    );
     assert.equal(profile.reviewedAt, null);
   });
 
@@ -285,16 +292,12 @@ describe("документы курьера", () => {
   });
 
   it("курьер открывает свой же файл, чужой — нет", async () => {
-    const { canAccessPrivateUpload } = await import(
-      "../services/upload/canAccessPrivateUpload.js"
-    );
+    const { canAccessPrivateUpload } =
+      await import("../services/upload/canAccessPrivateUpload.js");
     const user = await makeUser();
     await submitWithDocs({ userId: String(user._id), ...VEHICLE });
 
-    assert.equal(
-      await canAccessPrivateUpload(String(user._id), "license.webp"),
-      true,
-    );
+    assert.equal(await canAccessPrivateUpload(String(user._id), "license.webp"), true);
     assert.equal(
       await canAccessPrivateUpload(String(user._id), "someone-else.webp"),
       false,
@@ -303,9 +306,8 @@ describe("документы курьера", () => {
   });
 
   it("модератору открыт любой private-файл", async () => {
-    const { canAccessPrivateUpload } = await import(
-      "../services/upload/canAccessPrivateUpload.js"
-    );
+    const { canAccessPrivateUpload } =
+      await import("../services/upload/canAccessPrivateUpload.js");
     const moderator = await makeUser({ role: "moderator" });
 
     assert.equal(
@@ -342,9 +344,8 @@ describe("чужие файлы в заявке", () => {
   });
 
   it("чужой файл не открывается по прямой ссылке", async () => {
-    const { canAccessPrivateUpload } = await import(
-      "../services/upload/canAccessPrivateUpload.js"
-    );
+    const { canAccessPrivateUpload } =
+      await import("../services/upload/canAccessPrivateUpload.js");
     const owner = await makeUser();
     const stranger = await makeUser();
     await PrivateUploadModel.create({

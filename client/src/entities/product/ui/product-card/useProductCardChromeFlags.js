@@ -67,15 +67,12 @@ export function useProductCardChromeFlags(props, currentUserId) {
     !isModerationQueue && product.productInstallmentEnabled === true;
   const affiliatePercent = Math.floor(Number(product.affiliatePercent) || 0);
   const showAffiliateBadge =
-    !isModerationQueue &&
-    product.affiliateEnabled === true &&
-    affiliatePercent > 0;
+    !isModerationQueue && product.affiliateEnabled === true && affiliatePercent > 0;
   const wholesaleBadgeLabel = !isModerationQueue
     ? formatProductWholesaleBadgeLabel(product)
     : null;
   const showWholesaleBadge = wholesaleBadgeLabel != null;
-  const showFlashSaleBadge =
-    !isModerationQueue && isProductFlashSaleActive(product);
+  const showFlashSaleBadge = !isModerationQueue && isProductFlashSaleActive(product);
   const flashSaleBadgeLabel = showFlashSaleBadge
     ? PRODUCT_FLASH_SALE_UI.CATALOG_BADGE(discountPercent)
     : null;
@@ -89,8 +86,7 @@ export function useProductCardChromeFlags(props, currentUserId) {
     !isMineMode && !isModerationQueue && !isProductSellerClosedNow(product);
   const showRaffleParticipantChrome =
     (highlightRaffleProduct || showRaffleBadge) && !isMineMode && !isModerationQueue;
-  const showOutOfStockChrome =
-    !isModerationQueue && isProductOutOfStock(product);
+  const showOutOfStockChrome = !isModerationQueue && isProductOutOfStock(product);
   const showSellerClosedChrome =
     !isModerationQueue && !showOutOfStockChrome && isProductSellerClosedNow(product);
 
@@ -122,7 +118,13 @@ export function useProductCardChromeFlags(props, currentUserId) {
       ]
         .filter(Boolean)
         .join(" "),
-    [isModerationQueue, showBannerLayout, showOutOfStockChrome, showSellerClosedChrome, showRaffleParticipantChrome],
+    [
+      isModerationQueue,
+      showBannerLayout,
+      showOutOfStockChrome,
+      showSellerClosedChrome,
+      showRaffleParticipantChrome,
+    ],
   );
 
   const frameClassName = useMemo(
@@ -177,4 +179,4 @@ export function useProductCardChromeFlags(props, currentUserId) {
     cardClassName,
     frameClassName,
   };
-};
+}

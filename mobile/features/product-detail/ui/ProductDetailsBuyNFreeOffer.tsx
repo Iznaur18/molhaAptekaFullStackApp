@@ -72,7 +72,9 @@ export const ProductDetailsBuyNFreeOffer = ({
     Math.min(filled, threshold),
     threshold,
   );
-  const accessibilityLabel = [PRODUCT_BUY_N_FREE_UI.DETAILS_ARIA, statusText].join(". ");
+  const accessibilityLabel = [PRODUCT_BUY_N_FREE_UI.DETAILS_ARIA, statusText].join(
+    ". ",
+  );
 
   const handleLogin = () => {
     if (typeof onRequestLogin === "function") {
@@ -143,7 +145,10 @@ export const ProductDetailsBuyNFreeOffer = ({
           ) : null}
         </View>
 
-        <View style={styles.buyNFreeTrack} importantForAccessibility="no-hide-descendants">
+        <View
+          style={styles.buyNFreeTrack}
+          importantForAccessibility="no-hide-descendants"
+        >
           {Array.from({ length: threshold }, (_, index) => {
             const step = index + 1;
             const done = step <= filled;

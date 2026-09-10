@@ -7,12 +7,9 @@ const {
   createOrderBodySchema,
   userSavedAddressPatchItemSchema,
 } = await import("@molha/api-contract");
-const { OrderModel, PendingRegistrationModel, UserModel } = await import(
-  "../models/index.js"
-);
-const { buildPickupSummaryAddress } = await import(
-  "../services/order/createOrder.js"
-);
+const { OrderModel, PendingRegistrationModel, UserModel } =
+  await import("../models/index.js");
+const { buildPickupSummaryAddress } = await import("../services/order/createOrder.js");
 
 /**
  * Настоящий адрес из выдачи DaData, 102 символа.

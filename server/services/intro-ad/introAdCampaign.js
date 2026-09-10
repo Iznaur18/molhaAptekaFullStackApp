@@ -23,11 +23,8 @@ import {
   resolveIntroAdCtaType,
   toIntroAdCampaignPayload,
 } from "./introAdCampaignHelpers.js";
-import {
-} from "../loyalty/loyaltyPointsReserve.js";
-import {
-  InsufficientLoyaltyPointsError,
-} from "../loyalty/loyaltyPointsSpend.js";
+import {} from "../loyalty/loyaltyPointsReserve.js";
+import { InsufficientLoyaltyPointsError } from "../loyalty/loyaltyPointsSpend.js";
 import {
   creditReferralCashbackFromSpend,
   notifyReferralCashbackCredited,
@@ -83,27 +80,24 @@ export async function submitIntroAdCampaign({ userId, body }) {
   const reservedAt = new Date();
 
   try {
-    const { campaign } = await runInTransaction(
-      async (session) => {
-        await assertNoOpenIntroAdCampaignForAdvertiser(userId, session);
+    const { campaign } = await runInTransaction(async (session) => {
+      await assertNoOpenIntroAdCampaignForAdvertiser(userId, session);
 
+      const [campaign] = await IntroAdCampaignModel.create(
+        [
+          {
+            advertiserId: userId,
+            status: INTRO_AD_CAMPAIGN_STATUS_PENDING,
+            ...media,
+            amountPoints: INTRO_AD_PRICE_POINTS,
+            pointsReservedAt: reservedAt,
+          },
+        ],
+        withMongoSession({}, session),
+      );
 
-        const [campaign] = await IntroAdCampaignModel.create(
-          [
-            {
-              advertiserId: userId,
-              status: INTRO_AD_CAMPAIGN_STATUS_PENDING,
-              ...media,
-              amountPoints: INTRO_AD_PRICE_POINTS,
-              pointsReservedAt: reservedAt,
-            },
-          ],
-          withMongoSession({}, session),
-        );
-
-        return { campaign };
-      },
-    );
+      return { campaign };
+    });
 
     return {
       // Деньги не берём и не резервируем: за отклонённую заявку
@@ -155,7 +149,6 @@ export async function cancelMyIntroAdCampaign({ userId, campaignId }) {
   const now = new Date();
 
   await runInTransaction(async (session) => {
-
     await IntroAdCampaignModel.updateOne(
       { _id: campaign._id },
       {

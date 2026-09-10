@@ -14,10 +14,7 @@ import { OrderModel } from "../../models/index.js";
  * двери запирал товар навсегда: подтвердить такую позицию уже некому, и
  * продавец до конца жизни товара не мог ни скрыть его, ни удалить.
  */
-const SALE_CLOSED_ITEM_STATUSES = [
-  ORDER_STATUS_CONFIRMED,
-  ...ORDER_TERMINAL_STATUSES,
-];
+const SALE_CLOSED_ITEM_STATUSES = [ORDER_STATUS_CONFIRMED, ...ORDER_TERMINAL_STATUSES];
 
 const SALE_CLOSED_STATUS_SET = new Set(SALE_CLOSED_ITEM_STATUSES);
 

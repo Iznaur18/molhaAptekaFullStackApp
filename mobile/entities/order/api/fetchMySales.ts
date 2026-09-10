@@ -26,6 +26,8 @@ export const fetchMySales = async ({
     });
     return parseMySalesData(data);
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_MY_SALES_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_MY_SALES_FALLBACK),
+    );
   }
 };

@@ -32,19 +32,16 @@ type InstallmentContractCardPaymentsProps = {
   onRejectPayment: (paymentIndex: number) => void;
 };
 
-const PaymentsFold = ({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) => {
+const PaymentsFold = ({ title, children }: { title: string; children: ReactNode }) => {
   const styles = useInstallmentContractCardChromeStyles();
   const [expanded, setExpanded] = useState(false);
 
   return (
     <View style={styles.fold}>
-      <Pressable style={styles.foldSummary} onPress={() => setExpanded((value) => !value)}>
+      <Pressable
+        style={styles.foldSummary}
+        onPress={() => setExpanded((value) => !value)}
+      >
         <Text style={styles.foldSummaryText}>
           {COMMERCE_CARD_UI.EXPAND_TOGGLE_LABEL(expanded)} · {title}
         </Text>
@@ -107,7 +104,9 @@ export const InstallmentContractCardPayments = ({
     <View style={styles.payments}>
       {focus.length > 0 ? (
         <View style={styles.fold}>
-          <Text style={styles.paymentsTitle}>{INSTALLMENT_UI.PAYMENTS_FOCUS_HEADING}</Text>
+          <Text style={styles.paymentsTitle}>
+            {INSTALLMENT_UI.PAYMENTS_FOCUS_HEADING}
+          </Text>
           {focus.map(renderRow)}
         </View>
       ) : null}

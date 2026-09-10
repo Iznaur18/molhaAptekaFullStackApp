@@ -23,14 +23,19 @@ export const fetchPendingProductPromotions = async () => {
     return data.data.promotions as StaffProductPromotionRow[];
   } catch (error) {
     throw new Error(
-      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_PRODUCT_PROMOTIONS_QUEUE_FALLBACK),
+      formatApiErrorMessage(
+        error,
+        API_CLIENT_UI.FETCH_PRODUCT_PROMOTIONS_QUEUE_FALLBACK,
+      ),
     );
   }
 };
 
 export const approveProductPromotion = async (promotionId: string) => {
   try {
-    const { data } = await apiClient.patch(`/product/promotions/${promotionId}/approve`);
+    const { data } = await apiClient.patch(
+      `/product/promotions/${promotionId}/approve`,
+    );
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

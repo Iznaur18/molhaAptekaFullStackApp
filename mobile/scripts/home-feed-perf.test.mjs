@@ -11,8 +11,12 @@ const readMobileFile = (relativePath) =>
 
 test("home feed decouples search input from FlatList renderItem", () => {
   const index = readMobileFile("app/(tabs)/index.tsx");
-  const context = readMobileFile("features/home-feed/model/HomeCatalogSearchContext.tsx");
-  const embeddedSearch = readMobileFile("features/home-feed/ui/HomeCatalogEmbeddedSearchRow.tsx");
+  const context = readMobileFile(
+    "features/home-feed/model/HomeCatalogSearchContext.tsx",
+  );
+  const embeddedSearch = readMobileFile(
+    "features/home-feed/ui/HomeCatalogEmbeddedSearchRow.tsx",
+  );
 
   assert.match(index, /HomeCatalogSearchProvider/);
   assert.match(index, /HomeCatalogEmbeddedSearchRow/);
@@ -23,8 +27,12 @@ test("home feed decouples search input from FlatList renderItem", () => {
 
 test("home feed pauses intro backdrop video when sheet covers hero", () => {
   const index = readMobileFile("app/(tabs)/index.tsx");
-  const transition = readMobileFile("features/home-feed/model/useHomeFeedIntroTransition.ts");
-  const backdrop = readMobileFile("features/home-feed/ui/HomeCatalogIntroVideoBackdrop.tsx");
+  const transition = readMobileFile(
+    "features/home-feed/model/useHomeFeedIntroTransition.ts",
+  );
+  const backdrop = readMobileFile(
+    "features/home-feed/ui/HomeCatalogIntroVideoBackdrop.tsx",
+  );
   const looping = readMobileFile("shared/ui/LoopingCoverVideo.tsx");
 
   assert.match(
@@ -58,8 +66,12 @@ test("raffle carousel plays only visible prize video", () => {
 test("home feed disables catalog row entering animations and clips off-screen rows", () => {
   const index = readMobileFile("app/(tabs)/index.tsx");
   const rowItem = readMobileFile("features/catalog-grid/ui/CatalogGridRowItem.tsx");
-  const scrollProps = readMobileFile("features/home-feed/lib/homeCatalogFeedListScrollProps.ts");
-  const flatList = readMobileFile("features/catalog-grid/ui/CatalogAnimatedFlatList.tsx");
+  const scrollProps = readMobileFile(
+    "features/home-feed/lib/homeCatalogFeedListScrollProps.ts",
+  );
+  const flatList = readMobileFile(
+    "features/catalog-grid/ui/CatalogAnimatedFlatList.tsx",
+  );
 
   assert.match(index, /disableEntering/);
   assert.match(index, /trackCatalogScroll=\{false\}/);
@@ -71,7 +83,9 @@ test("home feed disables catalog row entering animations and clips off-screen ro
 
 test("home feed opens sheet on first content ready for immediate scroll", () => {
   const index = readMobileFile("app/(tabs)/index.tsx");
-  const transition = readMobileFile("features/home-feed/model/useHomeFeedIntroTransition.ts");
+  const transition = readMobileFile(
+    "features/home-feed/model/useHomeFeedIntroTransition.ts",
+  );
 
   assert.match(index, /hasAutoOpenedHomeFeedRef/);
   assert.match(index, /openFeedSheet/);

@@ -36,7 +36,10 @@ test("isProductTier3BannerPromotion requires active tier-3 promotion", () => {
 
 test("isProductPromotionVisibleInViewerRegion requires exact region match", () => {
   assert.equal(
-    isProductPromotionVisibleInViewerRegion(banner("b1", undefined, "RU-MOW"), "RU-MOW"),
+    isProductPromotionVisibleInViewerRegion(
+      banner("b1", undefined, "RU-MOW"),
+      "RU-MOW",
+    ),
     true,
   );
   assert.equal(

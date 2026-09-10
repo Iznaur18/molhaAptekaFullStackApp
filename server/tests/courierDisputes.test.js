@@ -10,20 +10,16 @@ const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollectio
 const { createOrderLoyaltyFixture, createOrderWithReserveTransaction } =
   await import("./helpers/orderLoyaltyTestHelpers.js");
 const { OrderModel, UserModel } = await import("../models/index.js");
-const { ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY } = await import(
-  "../constants/orderConstants.js"
-);
-const { advanceOrderShipmentStatus } = await import(
-  "../services/order/advanceShipmentStatus.js"
-);
+const { ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY } =
+  await import("../constants/orderConstants.js");
+const { advanceOrderShipmentStatus } =
+  await import("../services/order/advanceShipmentStatus.js");
 const flow = await import("../services/courier/courierShipmentFlow.js");
 const disputes = await import("../services/courier/courierDisputes.js");
-const { processCourierStuckShipmentCronTasks } = await import(
-  "../services/courier/courierStuckShipmentsCron.js"
-);
-const { getReservedQuantityByProductIds } = await import(
-  "../services/product/productStock.js"
-);
+const { processCourierStuckShipmentCronTasks } =
+  await import("../services/courier/courierStuckShipmentsCron.js");
+const { getReservedQuantityByProductIds } =
+  await import("../services/product/productStock.js");
 
 /** Курьерское отправление, доведённое до нужной ступени. */
 async function shipmentAt(target = "courier_assigned") {

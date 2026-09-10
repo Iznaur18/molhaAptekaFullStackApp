@@ -20,7 +20,9 @@ const resolveRaffleStatusLabel = (status?: string | null) => {
   return "";
 };
 
-export const RaffleAdvertisingSection = ({ loyaltyBalance }: RaffleAdvertisingSectionProps) => {
+export const RaffleAdvertisingSection = ({
+  loyaltyBalance,
+}: RaffleAdvertisingSectionProps) => {
   const router = useRouter();
   const styles = useAdvertisingCardStyles();
   const statusQuery = useRaffleCreateAdvertisingQuery();
@@ -61,7 +63,10 @@ export const RaffleAdvertisingSection = ({ loyaltyBalance }: RaffleAdvertisingSe
       <View style={[styles.card, styles.cardCategory]}>
         <Text style={styles.cardTitle}>{RAFFLE_ADVERTISING_PAGE_UI.CARD_TITLE}</Text>
         <Text style={styles.error} accessibilityRole="alert">
-          {formatApiErrorMessage(statusQuery.error, RAFFLE_ADVERTISING_PAGE_UI.FETCH_FALLBACK)}
+          {formatApiErrorMessage(
+            statusQuery.error,
+            RAFFLE_ADVERTISING_PAGE_UI.FETCH_FALLBACK,
+          )}
         </Text>
       </View>
     );
@@ -74,7 +79,8 @@ export const RaffleAdvertisingSection = ({ loyaltyBalance }: RaffleAdvertisingSe
   const canOpenForm = status?.canOpenForm === true;
   const canPay = status?.canPay === true;
   const isSubmitting = unlockMutation.isPending;
-  const insufficientPoints = !hasOpenRaffle && !canOpenForm && loyaltyBalance < pricePoints;
+  const insufficientPoints =
+    !hasOpenRaffle && !canOpenForm && loyaltyBalance < pricePoints;
   const blockReason = status?.blockReason;
 
   return (
@@ -89,35 +95,54 @@ export const RaffleAdvertisingSection = ({ loyaltyBalance }: RaffleAdvertisingSe
       <View style={styles.meta}>
         <View style={styles.metaItem}>
           <Text style={styles.metaLabel}>{RAFFLE_ADVERTISING_PAGE_UI.COST_LABEL}</Text>
-          <Text style={styles.metaValue}>{RAFFLE_ADVERTISING_PAGE_UI.PRICE(pricePoints)}</Text>
+          <Text style={styles.metaValue}>
+            {RAFFLE_ADVERTISING_PAGE_UI.PRICE(pricePoints)}
+          </Text>
         </View>
         <View style={styles.metaItem}>
-          <Text style={styles.metaLabel}>{RAFFLE_ADVERTISING_PAGE_UI.MODERATION_LABEL}</Text>
-          <Text style={styles.metaValue}>{RAFFLE_ADVERTISING_PAGE_UI.MODERATION_VALUE}</Text>
+          <Text style={styles.metaLabel}>
+            {RAFFLE_ADVERTISING_PAGE_UI.MODERATION_LABEL}
+          </Text>
+          <Text style={styles.metaValue}>
+            {RAFFLE_ADVERTISING_PAGE_UI.MODERATION_VALUE}
+          </Text>
         </View>
       </View>
 
       {raffle ? (
-        <View style={resolvePersonalCategoryStatusPanelStyle(styles, String(raffle.status))}>
-          <Text style={styles.statusText}>{resolveRaffleStatusLabel(String(raffle.status))}</Text>
+        <View
+          style={resolvePersonalCategoryStatusPanelStyle(styles, String(raffle.status))}
+        >
+          <Text style={styles.statusText}>
+            {resolveRaffleStatusLabel(String(raffle.status))}
+          </Text>
         </View>
       ) : null}
 
-      {!hasOpenRaffle && blockReason ? <Text style={styles.state}>{blockReason}</Text> : null}
+      {!hasOpenRaffle && blockReason ? (
+        <Text style={styles.state}>{blockReason}</Text>
+      ) : null}
 
       {insufficientPoints && !blockReason ? (
-        <Text style={styles.state}>{RAFFLE_ADVERTISING_PAGE_UI.INSUFFICIENT_POINTS}</Text>
+        <Text style={styles.state}>
+          {RAFFLE_ADVERTISING_PAGE_UI.INSUFFICIENT_POINTS}
+        </Text>
       ) : null}
 
       {canOpenForm ? (
         <Pressable style={styles.primaryButton} onPress={openCreateForm}>
-          <Text style={styles.primaryButtonText}>{RAFFLE_ADVERTISING_PAGE_UI.CONTINUE_CREATE}</Text>
+          <Text style={styles.primaryButtonText}>
+            {RAFFLE_ADVERTISING_PAGE_UI.CONTINUE_CREATE}
+          </Text>
         </Pressable>
       ) : null}
 
       {canPay ? (
         <Pressable
-          style={[styles.primaryButton, (isSubmitting || insufficientPoints) && styles.primaryButtonDisabled]}
+          style={[
+            styles.primaryButton,
+            (isSubmitting || insufficientPoints) && styles.primaryButtonDisabled,
+          ]}
           onPress={() => {
             void handleUnlock();
           }}

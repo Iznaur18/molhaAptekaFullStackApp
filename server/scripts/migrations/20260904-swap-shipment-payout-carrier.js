@@ -54,10 +54,7 @@ export async function up({ db, isApply }) {
     });
 
     if (!dirty) continue;
-    const result = await orders.updateOne(
-      { _id: order._id },
-      { $set: { shipments } },
-    );
+    const result = await orders.updateOne({ _id: order._id }, { $set: { shipments } });
     modified += result.modifiedCount;
   }
 

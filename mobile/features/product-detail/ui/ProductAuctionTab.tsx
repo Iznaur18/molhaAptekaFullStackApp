@@ -60,7 +60,8 @@ export const ProductAuctionTab = ({
   const myOfferQueryEnabled = isAuthorized && !isOwnProduct;
   const offersQuery = useTopPriceOffersQuery(productId, auctionActive);
   const myOfferQuery = useMyPriceOfferQuery(productId, myOfferQueryEnabled);
-  const { submitMutation, patchMutation, cancelMutation } = usePriceOfferMutations(productId);
+  const { submitMutation, patchMutation, cancelMutation } =
+    usePriceOfferMutations(productId);
   const [priceInput, setPriceInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -248,7 +249,9 @@ export const ProductAuctionTab = ({
         <BlockedPurchaseButton label={blockedPurchaseLabel} variant="offer" />
       ) : showForm ? (
         <>
-          <Text style={styles.sectionLabel}>{PRODUCT_PRICE_OFFER_UI.SECTION_FORM_TITLE}</Text>
+          <Text style={styles.sectionLabel}>
+            {PRODUCT_PRICE_OFFER_UI.SECTION_FORM_TITLE}
+          </Text>
           <TextInput
             style={styles.input}
             value={priceInput}
@@ -285,7 +288,10 @@ export const ProductAuctionTab = ({
         </>
       ) : null}
 
-      {!isPurchaseBlocked && !isOwnProduct && !isAuthorized && !showDockPrimaryAction ? (
+      {!isPurchaseBlocked &&
+      !isOwnProduct &&
+      !isAuthorized &&
+      !showDockPrimaryAction ? (
         <AppButton
           label={PRODUCT_PRICE_OFFER_UI.SUBMIT}
           variant="contrast"
@@ -295,10 +301,14 @@ export const ProductAuctionTab = ({
       ) : null}
 
       {!isOwnProduct && isAuthorized && !isUserDataConfirmed ? (
-        <Text style={styles.hint}>{PRODUCT_PRICE_OFFER_UI.CONFIRMED_DATA_REQUIRED}</Text>
+        <Text style={styles.hint}>
+          {PRODUCT_PRICE_OFFER_UI.CONFIRMED_DATA_REQUIRED}
+        </Text>
       ) : null}
 
-      {statusText ? <Text style={[styles.status, statusStyle]}>{statusText}</Text> : null}
+      {statusText ? (
+        <Text style={[styles.status, statusStyle]}>{statusText}</Text>
+      ) : null}
 
       {!isPurchaseBlocked && showGoToCartButton ? (
         <AppButton
@@ -311,7 +321,9 @@ export const ProductAuctionTab = ({
 
       {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
 
-      <Text style={styles.sectionLabel}>{PRODUCT_PRICE_OFFER_UI.SECTION_TOP_TITLE}</Text>
+      <Text style={styles.sectionLabel}>
+        {PRODUCT_PRICE_OFFER_UI.SECTION_TOP_TITLE}
+      </Text>
       <ProductPriceOfferTopList
         top={offers}
         highlightedOfferId={myOffer?._id ?? null}

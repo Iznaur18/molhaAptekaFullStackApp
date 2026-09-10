@@ -7,8 +7,7 @@ import { test } from "node:test";
 const MOBILE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CLIENT_ROOT = join(MOBILE_ROOT, "..", "client");
 
-const readFile = (root, relativePath) =>
-  readFileSync(join(root, relativePath), "utf8");
+const readFile = (root, relativePath) => readFileSync(join(root, relativePath), "utf8");
 
 test("product detail section tabs sit below media inside scroll", () => {
   const screen = readFile(MOBILE_ROOT, "app/product/[id].tsx");
@@ -77,7 +76,10 @@ test("split wide product detail tabs drop root margin (parent gap only)", () => 
   );
 
   assert.match(layout, /wideRootMarginBottom:\s*0/);
-  assert.match(styles, /rootWide:[\s\S]*marginBottom:\s*PRODUCT_DETAIL_TAB_BAR_LAYOUT\.wideRootMarginBottom/);
+  assert.match(
+    styles,
+    /rootWide:[\s\S]*marginBottom:\s*PRODUCT_DETAIL_TAB_BAR_LAYOUT\.wideRootMarginBottom/,
+  );
   assert.match(tabBar, /layout === "wide" && styles\.rootWide/);
   assert.doesNotMatch(tabBar, /<View style=\{styles\.root\}/);
   assert.match(
@@ -106,7 +108,10 @@ test("web product details modal uses full viewport and dock without nav offset",
     "src/entities/product/ui/product-details-modal/productDetailsModalTokens.css",
   );
 
-  assert.match(mobileCss, /\.product-modal-shell__backdrop:has\(\.product-details-modal\)[\s\S]*inset:\s*0/);
+  assert.match(
+    mobileCss,
+    /\.product-modal-shell__backdrop:has\(\.product-details-modal\)[\s\S]*inset:\s*0/,
+  );
   assert.doesNotMatch(
     mobileCss,
     /product-details-modal[\s\S]*--app-shell-mobile-bottom-nav-height/,
@@ -121,8 +126,14 @@ test("web product details modal uses full viewport and dock without nav offset",
 
 test("mobile product detail stat rows match web modal stats grid layout", () => {
   const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
-  const fieldRows = readFile(MOBILE_ROOT, "entities/product/ui/ProductDetailFieldRows.tsx");
-  const registry = readFile(MOBILE_ROOT, "entities/product/lib/productFieldRegistry.ts");
+  const fieldRows = readFile(
+    MOBILE_ROOT,
+    "entities/product/ui/ProductDetailFieldRows.tsx",
+  );
+  const registry = readFile(
+    MOBILE_ROOT,
+    "entities/product/lib/productFieldRegistry.ts",
+  );
 
   const rowStatBlock = styles.match(/rowStat:\s*\{([^}]*)\}/)?.[1] ?? "";
   const keyStatBlock = styles.match(/keyStat:\s*\{([^}]*)\}/)?.[1] ?? "";
@@ -134,15 +145,27 @@ test("mobile product detail stat rows match web modal stats grid layout", () => 
   assert.doesNotMatch(keyStatBlock, /textTransform:\s*"uppercase"/);
   assert.match(styles, /valueStat:[\s\S]*textAlign:\s*"right"/);
   assert.match(fieldRows, /numberOfLines=\{clampStatValue \? 1 : undefined\}/);
-  assert.match(registry, /productPickupAddress:\s*CREATE_PRODUCT_UI\.LABEL_PICKUP_ADDRESS/);
+  assert.match(
+    registry,
+    /productPickupAddress:\s*CREATE_PRODUCT_UI\.LABEL_PICKUP_ADDRESS/,
+  );
   assert.match(registry, /productPickupAddress/);
   assert.match(registry, /isProductFieldMultilineRead[\s\S]*productPickupAddress/);
 });
 
 test("mobile product detail meta grid matches web modal meta rows layout", () => {
-  const layout = readFile(MOBILE_ROOT, "entities/product/lib/productDetailsMetaGridLayout.ts");
-  const fieldRows = readFile(MOBILE_ROOT, "entities/product/ui/ProductDetailFieldRows.tsx");
-  const detailsTab = readFile(MOBILE_ROOT, "features/product-detail/ui/ProductDetailsDetailsTab.tsx");
+  const layout = readFile(
+    MOBILE_ROOT,
+    "entities/product/lib/productDetailsMetaGridLayout.ts",
+  );
+  const fieldRows = readFile(
+    MOBILE_ROOT,
+    "entities/product/ui/ProductDetailFieldRows.tsx",
+  );
+  const detailsTab = readFile(
+    MOBILE_ROOT,
+    "features/product-detail/ui/ProductDetailsDetailsTab.tsx",
+  );
   const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
   const webCss = readFile(
     CLIENT_ROOT,
@@ -163,7 +186,10 @@ test("mobile product detail meta grid matches web modal meta rows layout", () =>
 });
 
 test("mobile product description panel matches web content-switcher chrome", () => {
-  const detailsTab = readFile(MOBILE_ROOT, "features/product-detail/ui/ProductDetailsDetailsTab.tsx");
+  const detailsTab = readFile(
+    MOBILE_ROOT,
+    "features/product-detail/ui/ProductDetailsDetailsTab.tsx",
+  );
   const layout = readFile(
     MOBILE_ROOT,
     "entities/product/lib/productDetailsContentSwitcherLayout.ts",
@@ -173,10 +199,14 @@ test("mobile product description panel matches web content-switcher chrome", () 
     CLIENT_ROOT,
     "src/entities/product/ui/product-details-modal/ProductDetailsContentSwitcher.css",
   );
-  const webTabsCss = readFile(CLIENT_ROOT, "src/shared/ui/ModalSectionTabs/ModalSectionTabs.css");
+  const webTabsCss = readFile(
+    CLIENT_ROOT,
+    "src/shared/ui/ModalSectionTabs/ModalSectionTabs.css",
+  );
   const panelBlock = styles.match(/contentSwitcherPanel:\s*\{([^}]*)\}/)?.[1] ?? "";
   const tabBlock = styles.match(/contentSwitcherTab:\s*\{([^}]*)\}/)?.[1] ?? "";
-  const tabActiveBlock = styles.match(/contentSwitcherTabActive:\s*\{([^}]*)\}/)?.[1] ?? "";
+  const tabActiveBlock =
+    styles.match(/contentSwitcherTabActive:\s*\{([^}]*)\}/)?.[1] ?? "";
 
   assert.match(layout, /tabMinHeight: 36/);
   assert.match(layout, /tabPaddingVertical: 6\.4/);
@@ -200,11 +230,19 @@ test("mobile product description panel matches web content-switcher chrome", () 
 });
 
 test("mobile product characteristics row matches web key-value layout", () => {
-  const component = readFile(MOBILE_ROOT, "entities/product/ui/ProductCharacteristicsDetails.tsx");
+  const component = readFile(
+    MOBILE_ROOT,
+    "entities/product/ui/ProductCharacteristicsDetails.tsx",
+  );
   const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
-  const webCss = readFile(CLIENT_ROOT, "src/entities/product/ui/ProductCharacteristicsDetails.css");
+  const webCss = readFile(
+    CLIENT_ROOT,
+    "src/entities/product/ui/ProductCharacteristicsDetails.css",
+  );
   const charStylesBlock =
-    styles.match(/export const useProductCharacteristicsDetailsStyles[\s\S]*?}\)\);/)?.[0] ?? "";
+    styles.match(
+      /export const useProductCharacteristicsDetailsStyles[\s\S]*?}\)\);/,
+    )?.[0] ?? "";
   const rowBlock = charStylesBlock.match(/row:\s*\{([^}]*)\}/)?.[1] ?? "";
   const valueBlock = charStylesBlock.match(/value:\s*\{([^}]*)\}/)?.[1] ?? "";
 
@@ -224,17 +262,31 @@ test("mobile seller preview matches web product-details-seller-preview chrome", 
     "entities/product/lib/productDetailsSellerPreviewLayout.ts",
   );
   const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
-  const preview = readFile(MOBILE_ROOT, "entities/product/ui/ProductDetailsSellerPreview.tsx");
-  const webCss = readFile(CLIENT_ROOT, "src/entities/product/ui/ProductDetailsSellerPreview.css");
-  const webPageCss = readFile(CLIENT_ROOT, "src/pages/product-details/ui/ProductDetailsPage.css");
+  const preview = readFile(
+    MOBILE_ROOT,
+    "entities/product/ui/ProductDetailsSellerPreview.tsx",
+  );
+  const webCss = readFile(
+    CLIENT_ROOT,
+    "src/entities/product/ui/ProductDetailsSellerPreview.css",
+  );
+  const webPageCss = readFile(
+    CLIENT_ROOT,
+    "src/pages/product-details/ui/ProductDetailsPage.css",
+  );
   const sellerStylesBlock =
-    styles.match(/export const useProductDetailsSellerPreviewStyles[\s\S]*?}\)\);/)?.[0] ?? "";
+    styles.match(
+      /export const useProductDetailsSellerPreviewStyles[\s\S]*?}\)\);/,
+    )?.[0] ?? "";
 
   assert.match(layout, /rootPadding: 14/);
   assert.match(layout, /avatarSize: 56/);
   assert.match(webCss, /padding: 0\.875rem/);
   assert.match(webCss, /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
-  assert.match(webPageCss, /product-details-modal--page-split \.product-details-seller-preview/);
+  assert.match(
+    webPageCss,
+    /product-details-modal--page-split \.product-details-seller-preview/,
+  );
   assert.match(sellerStylesBlock, /backgroundColor:\s*theme\.colors\.surfaceMuted/);
   assert.match(sellerStylesBlock, /rootSplit:/);
   assert.match(sellerStylesBlock, /marginHorizontal: 0/);
@@ -259,8 +311,14 @@ test("mobile premium display name aligns from start like web user-premium-name",
 });
 
 test("mobile product review item header matches web author name and badge", () => {
-  const item = readFile(MOBILE_ROOT, "entities/product-review/ui/ProductReviewListItem.tsx");
-  const webItem = readFile(CLIENT_ROOT, "src/entities/product-review/ui/ProductReviewListItem.jsx");
+  const item = readFile(
+    MOBILE_ROOT,
+    "entities/product-review/ui/ProductReviewListItem.tsx",
+  );
+  const webItem = readFile(
+    CLIENT_ROOT,
+    "src/entities/product-review/ui/ProductReviewListItem.jsx",
+  );
   const tabStyles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
   const itemHeaderBlock = tabStyles.match(/itemHeader:\s*\{([^}]*)\}/)?.[1] ?? "";
   const itemAuthorBlock = tabStyles.match(/itemAuthor:\s*\{([^}]*)\}/)?.[1] ?? "";
@@ -274,19 +332,31 @@ test("mobile product review item header matches web author name and badge", () =
   assert.match(itemHeaderBlock, /justifyContent:\s*"space-between"/);
   assert.match(itemAuthorBlock, /flexDirection:\s*"row"/);
 
-  const reviewsTab = readFile(MOBILE_ROOT, "features/product-detail/ui/ProductReviewsTab.tsx");
+  const reviewsTab = readFile(
+    MOBILE_ROOT,
+    "features/product-detail/ui/ProductReviewsTab.tsx",
+  );
   assert.match(reviewsTab, /ProductReviewListItem/);
   assert.doesNotMatch(reviewsTab, /ReviewCard/);
 });
 
 test("mobile product review summary matches web gradient chrome", () => {
-  const summary = readFile(MOBILE_ROOT, "entities/product-review/ui/ProductReviewSummary.tsx");
+  const summary = readFile(
+    MOBILE_ROOT,
+    "entities/product-review/ui/ProductReviewSummary.tsx",
+  );
   const background = readFile(
     MOBILE_ROOT,
     "entities/product-review/ui/ProductReviewSummaryBackground.tsx",
   );
-  const palette = readFile(MOBILE_ROOT, "entities/product-review/lib/productReviewSummaryPalette.ts");
-  const webCss = readFile(CLIENT_ROOT, "src/entities/product-review/ui/ProductReviewSummary.css");
+  const palette = readFile(
+    MOBILE_ROOT,
+    "entities/product-review/lib/productReviewSummaryPalette.ts",
+  );
+  const webCss = readFile(
+    CLIENT_ROOT,
+    "src/entities/product-review/ui/ProductReviewSummary.css",
+  );
   const tabStyles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
   const summaryCardBlock = tabStyles.match(/summaryCard:\s*\{([^}]*)\}/)?.[1] ?? "";
 
@@ -300,7 +370,10 @@ test("mobile product review summary matches web gradient chrome", () => {
   assert.match(summaryCardBlock, /overflow:\s*"hidden"/);
   assert.doesNotMatch(summaryCardBlock, /backgroundColor/);
 
-  const reviewsTab = readFile(MOBILE_ROOT, "features/product-detail/ui/ProductReviewsTab.tsx");
+  const reviewsTab = readFile(
+    MOBILE_ROOT,
+    "features/product-detail/ui/ProductReviewsTab.tsx",
+  );
   assert.match(reviewsTab, /ProductReviewSummary/);
   assert.doesNotMatch(reviewsTab, /styles\.summaryCard/);
 });
@@ -358,10 +431,16 @@ test("mobile product detail screen is outside tabs and uses dock-only scroll pad
 });
 
 test("mobile installment tab matches web buyer hint and docked submit", () => {
-  const tab = readFile(MOBILE_ROOT, "features/product-detail/ui/ProductInstallmentTab.tsx");
+  const tab = readFile(
+    MOBILE_ROOT,
+    "features/product-detail/ui/ProductInstallmentTab.tsx",
+  );
   const screen = readFile(MOBILE_ROOT, "app/product/[id].tsx");
   const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
-  const webCss = readFile(CLIENT_ROOT, "src/entities/installment/ui/InstallmentBuyerBlock.css");
+  const webCss = readFile(
+    CLIENT_ROOT,
+    "src/entities/installment/ui/InstallmentBuyerBlock.css",
+  );
 
   assert.match(webCss, /installment-buyer-block__hint/);
   assert.match(webCss, /--iz-color-surface-muted/);
@@ -384,10 +463,16 @@ test("mobile installment tab matches web buyer hint and docked submit", () => {
 
 test("mobile auction tab matches web price-offer layout and docked submit", () => {
   const tab = readFile(MOBILE_ROOT, "features/product-detail/ui/ProductAuctionTab.tsx");
-  const topList = readFile(MOBILE_ROOT, "features/product-detail/ui/ProductPriceOfferTopList.tsx");
+  const topList = readFile(
+    MOBILE_ROOT,
+    "features/product-detail/ui/ProductPriceOfferTopList.tsx",
+  );
   const screen = readFile(MOBILE_ROOT, "app/product/[id].tsx");
   const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
-  const webCss = readFile(CLIENT_ROOT, "src/entities/product-price-offer/ui/ProductPriceOffer.css");
+  const webCss = readFile(
+    CLIENT_ROOT,
+    "src/entities/product-price-offer/ui/ProductPriceOffer.css",
+  );
 
   assert.match(webCss, /product-price-offer__top-item/);
   assert.match(webCss, /product-price-offer__status--pending/);

@@ -10,6 +10,8 @@ export const deleteMyProduct = async (productId: string) => {
     }
     return data.data ?? {};
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK),
+    );
   }
 };

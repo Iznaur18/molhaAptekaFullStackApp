@@ -50,7 +50,9 @@ export const CuratedProductListAdminCard = ({
       await onSaveList({ title: titleDraft, regionCode: regionDraft });
     } catch (error) {
       setLocalError(
-        error instanceof Error ? error.message : POPULAR_PRODUCTS_ADMIN_PAGE_UI.SAVE_ERROR,
+        error instanceof Error
+          ? error.message
+          : POPULAR_PRODUCTS_ADMIN_PAGE_UI.SAVE_ERROR,
       );
     }
   }, [onSaveList, regionDraft, titleDraft]);
@@ -67,7 +69,9 @@ export const CuratedProductListAdminCard = ({
       setProductIdDraft("");
     } catch (error) {
       setLocalError(
-        error instanceof Error ? error.message : POPULAR_PRODUCTS_ADMIN_PAGE_UI.ADD_ITEM_ERROR,
+        error instanceof Error
+          ? error.message
+          : POPULAR_PRODUCTS_ADMIN_PAGE_UI.ADD_ITEM_ERROR,
       );
     }
   }, [onAddProduct, productIdDraft]);
@@ -79,7 +83,9 @@ export const CuratedProductListAdminCard = ({
         await onRemoveProduct(productId);
       } catch (error) {
         setLocalError(
-          error instanceof Error ? error.message : POPULAR_PRODUCTS_ADMIN_PAGE_UI.REMOVE_ITEM_ERROR,
+          error instanceof Error
+            ? error.message
+            : POPULAR_PRODUCTS_ADMIN_PAGE_UI.REMOVE_ITEM_ERROR,
         );
       }
     },
@@ -92,7 +98,10 @@ export const CuratedProductListAdminCard = ({
         <View style={styles.curatedCardHeader}>
           <View style={styles.orderRow}>
             <Pressable
-              style={[styles.orderButton, (isBusy || isFirst) && styles.orderButtonDisabled]}
+              style={[
+                styles.orderButton,
+                (isBusy || isFirst) && styles.orderButtonDisabled,
+              ]}
               onPress={onMoveUp}
               disabled={isBusy || isFirst}
               accessibilityRole="button"
@@ -101,7 +110,10 @@ export const CuratedProductListAdminCard = ({
               <Text style={styles.orderButtonText}>↑</Text>
             </Pressable>
             <Pressable
-              style={[styles.orderButton, (isBusy || isLast) && styles.orderButtonDisabled]}
+              style={[
+                styles.orderButton,
+                (isBusy || isLast) && styles.orderButtonDisabled,
+              ]}
               onPress={onMoveDown}
               disabled={isBusy || isLast}
               accessibilityRole="button"
@@ -110,13 +122,21 @@ export const CuratedProductListAdminCard = ({
               <Text style={styles.orderButtonText}>↓</Text>
             </Pressable>
           </View>
-          <Pressable style={styles.dangerButton} onPress={onDeleteList} disabled={isBusy}>
-            <Text style={styles.dangerButtonText}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.DELETE_LIST}</Text>
+          <Pressable
+            style={styles.dangerButton}
+            onPress={onDeleteList}
+            disabled={isBusy}
+          >
+            <Text style={styles.dangerButtonText}>
+              {POPULAR_PRODUCTS_ADMIN_PAGE_UI.DELETE_LIST}
+            </Text>
           </Pressable>
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.fieldLabel}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.LIST_TITLE_LABEL}</Text>
+          <Text style={styles.fieldLabel}>
+            {POPULAR_PRODUCTS_ADMIN_PAGE_UI.LIST_TITLE_LABEL}
+          </Text>
           <TextInput
             style={styles.fieldInput}
             value={titleDraft}
@@ -135,17 +155,22 @@ export const CuratedProductListAdminCard = ({
         <Pressable
           style={[
             styles.secondaryButton,
-            (isBusy || titleDraft.trim() === "" || !regionDraft) && styles.primaryButtonDisabled,
+            (isBusy || titleDraft.trim() === "" || !regionDraft) &&
+              styles.primaryButtonDisabled,
           ]}
           onPress={() => void handleSaveList()}
           disabled={isBusy || titleDraft.trim() === "" || !regionDraft}
         >
-          <Text style={styles.secondaryButtonText}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.SAVE_TITLE}</Text>
+          <Text style={styles.secondaryButtonText}>
+            {POPULAR_PRODUCTS_ADMIN_PAGE_UI.SAVE_TITLE}
+          </Text>
         </Pressable>
 
         <View style={styles.addProductRow}>
           <View style={[styles.field, styles.addProductField]}>
-            <Text style={styles.fieldLabel}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.PRODUCT_ID_LABEL}</Text>
+            <Text style={styles.fieldLabel}>
+              {POPULAR_PRODUCTS_ADMIN_PAGE_UI.PRODUCT_ID_LABEL}
+            </Text>
             <TextInput
               style={styles.fieldInput}
               value={productIdDraft}
@@ -161,7 +186,9 @@ export const CuratedProductListAdminCard = ({
             onPress={() => void handleAddProduct()}
             disabled={isBusy}
           >
-            <Text style={styles.primaryButtonText}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.ADD_PRODUCT}</Text>
+            <Text style={styles.primaryButtonText}>
+              {POPULAR_PRODUCTS_ADMIN_PAGE_UI.ADD_PRODUCT}
+            </Text>
           </Pressable>
         </View>
 
@@ -172,7 +199,9 @@ export const CuratedProductListAdminCard = ({
         ) : null}
 
         {list.productIds.length === 0 ? (
-          <Text style={styles.emptyList}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.EMPTY_LIST}</Text>
+          <Text style={styles.emptyList}>
+            {POPULAR_PRODUCTS_ADMIN_PAGE_UI.EMPTY_LIST}
+          </Text>
         ) : (
           <View style={styles.productItems}>
             {list.productIds.map((productId) => (

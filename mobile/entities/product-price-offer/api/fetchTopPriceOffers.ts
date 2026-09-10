@@ -14,7 +14,9 @@ export type TopPriceOffer = {
   } | null;
 };
 
-export const fetchTopPriceOffers = async (productId: string): Promise<TopPriceOffer[]> => {
+export const fetchTopPriceOffers = async (
+  productId: string,
+): Promise<TopPriceOffer[]> => {
   try {
     const { data } = await apiClient.get(`/product/${productId}/price-offers/top`);
     if (!data?.success || !Array.isArray(data.data?.top)) {
@@ -22,7 +24,9 @@ export const fetchTopPriceOffers = async (productId: string): Promise<TopPriceOf
     }
     return data.data.top;
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_TOP_PRICE_OFFERS_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_TOP_PRICE_OFFERS_FALLBACK),
+    );
   }
 };
 

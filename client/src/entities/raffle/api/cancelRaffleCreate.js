@@ -13,6 +13,8 @@ export async function cancelRaffleCreate() {
     }
     return data.data;
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.CANCEL_RAFFLE_CREATE_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.CANCEL_RAFFLE_CREATE_FALLBACK),
+    );
   }
 }

@@ -16,17 +16,23 @@ export const fetchProductSearchSynonymsAdmin = async () => {
     }
     return data.data.synonyms as SearchSynonymRow[];
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, SEARCH_SYNONYMS_ADMIN_PAGE_UI.LOAD_ERROR));
+    throw new Error(
+      formatApiErrorMessage(error, SEARCH_SYNONYMS_ADMIN_PAGE_UI.LOAD_ERROR),
+    );
   }
 };
 
 export const deleteProductSearchSynonymAdmin = async (synonymId: string) => {
   try {
-    const { data } = await apiClient.delete(`/product/admin/search-synonyms/${synonymId}`);
+    const { data } = await apiClient.delete(
+      `/product/admin/search-synonyms/${synonymId}`,
+    );
     if (!data?.success) {
       throw new Error(SEARCH_SYNONYMS_ADMIN_PAGE_UI.LOAD_ERROR);
     }
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, SEARCH_SYNONYMS_ADMIN_PAGE_UI.LOAD_ERROR));
+    throw new Error(
+      formatApiErrorMessage(error, SEARCH_SYNONYMS_ADMIN_PAGE_UI.LOAD_ERROR),
+    );
   }
 };

@@ -56,7 +56,9 @@ export const UsersLoyaltyRaffleAdminPanel = () => {
 
     try {
       await patchMutation.mutateAsync({
-        description: description.trim().slice(0, USERS_LOYALTY_RAFFLE_DESCRIPTION_MAX_LENGTH),
+        description: description
+          .trim()
+          .slice(0, USERS_LOYALTY_RAFFLE_DESCRIPTION_MAX_LENGTH),
         goal,
       });
       setSavedFlash(true);
@@ -69,7 +71,9 @@ export const UsersLoyaltyRaffleAdminPanel = () => {
     <View style={styles.root}>
       <Text style={styles.title}>{USERS_LOYALTY_RAFFLE_ADMIN_UI.TITLE}</Text>
 
-      <Text style={styles.label}>{USERS_LOYALTY_RAFFLE_ADMIN_UI.DESCRIPTION_LABEL}</Text>
+      <Text style={styles.label}>
+        {USERS_LOYALTY_RAFFLE_ADMIN_UI.DESCRIPTION_LABEL}
+      </Text>
       <TextInput
         style={styles.textarea}
         value={description}
@@ -89,7 +93,9 @@ export const UsersLoyaltyRaffleAdminPanel = () => {
       />
 
       {formError ? <Text style={styles.error}>{formError}</Text> : null}
-      {savedFlash ? <Text style={styles.success}>{USERS_LOYALTY_RAFFLE_ADMIN_UI.SAVED}</Text> : null}
+      {savedFlash ? (
+        <Text style={styles.success}>{USERS_LOYALTY_RAFFLE_ADMIN_UI.SAVED}</Text>
+      ) : null}
 
       <AppButton
         label={

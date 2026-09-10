@@ -16,7 +16,13 @@ import "./WishlistPage.css";
 
 function WishlistHeroIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -47,7 +53,9 @@ export function WishlistPage({
 
   const productsFromQuery = favoritesQuery.data?.products ?? [];
   const products = useMemo(() => {
-    const byId = new Map(productsFromQuery.map((product) => [String(product._id), product]));
+    const byId = new Map(
+      productsFromQuery.map((product) => [String(product._id), product]),
+    );
     return Object.entries(items)
       .sort(([, a], [, b]) => b - a)
       .map(([productId]) => byId.get(productId))
@@ -86,11 +94,7 @@ export function WishlistPage({
     return (
       <section className="wishlist-page wishlist-page_centered">
         <p className="wishlist-page__hint">{WISHLIST_PAGE_UI.LOGIN_HINT}</p>
-        <button
-          type="button"
-          className="wishlist-page__login"
-          onClick={onRequestLogin}
-        >
+        <button type="button" className="wishlist-page__login" onClick={onRequestLogin}>
           {WISHLIST_PAGE_UI.LOGIN_BUTTON}
         </button>
       </section>

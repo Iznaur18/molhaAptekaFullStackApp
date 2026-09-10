@@ -34,7 +34,9 @@ export const CreateRaffleBlockNotice = ({
           {isWithdrawing ? (
             <ActivityIndicator color={theme.colors.onContrast} />
           ) : (
-            <Text style={styles.blockNoticeBtnText}>{CREATE_RAFFLE_MODAL_UI.BTN_WITHDRAW}</Text>
+            <Text style={styles.blockNoticeBtnText}>
+              {CREATE_RAFFLE_MODAL_UI.BTN_WITHDRAW}
+            </Text>
           )}
         </Pressable>
       ) : null}

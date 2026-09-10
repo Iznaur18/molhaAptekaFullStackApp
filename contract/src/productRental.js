@@ -16,8 +16,7 @@ export const PRODUCT_RENTAL_PRICE_UNIT_DEFAULT = PRODUCT_RENTAL_PRICE_UNIT_DAY;
 
 export const PRODUCT_RENTAL_CONFIG_REQUIRED_MESSAGE =
   "Сначала укажите цену аренды и единицу (час или сутки)";
-export const PRODUCT_RENTAL_PRICE_REQUIRED_MESSAGE =
-  "Цена аренды должна быть больше 0";
+export const PRODUCT_RENTAL_PRICE_REQUIRED_MESSAGE = "Цена аренды должна быть больше 0";
 export const PRODUCT_RENTAL_UNIT_INVALID_MESSAGE =
   "Выберите единицу цены: час или сутки";
 

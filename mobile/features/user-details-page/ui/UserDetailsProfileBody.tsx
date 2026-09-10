@@ -37,7 +37,9 @@ export const UserDetailsProfileBody = ({
     <View style={styles.profileBody}>
       <ProfileOverviewBanner user={user} />
 
-      {showOtherUserPurchases ? <UserProfilePurchasesList targetUserId={userId} /> : null}
+      {showOtherUserPurchases ? (
+        <UserProfilePurchasesList targetUserId={userId} />
+      ) : null}
 
       {showOtherUserProducts ? (
         <UserProfileProductsList

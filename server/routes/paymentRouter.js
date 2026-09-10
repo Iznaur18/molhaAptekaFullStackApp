@@ -46,6 +46,11 @@ router.post(
 );
 
 // Ниже маршрутов с фиксированным префиксом: иначе `/config` уедет сюда.
-router.get("/:paymentId", checkAuthMW, paymentIdParamsValidation, getMyPaymentController);
+router.get(
+  "/:paymentId",
+  checkAuthMW,
+  paymentIdParamsValidation,
+  getMyPaymentController,
+);
 
 export { router as paymentRouter };

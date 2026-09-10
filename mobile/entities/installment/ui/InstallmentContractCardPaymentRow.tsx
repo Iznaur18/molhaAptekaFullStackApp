@@ -24,7 +24,10 @@ type InstallmentContractCardPaymentRowProps = {
   earlyPayoffPending: boolean;
   pendingKey: string | null;
   contract: InstallmentContract;
-  canBuyerMarkPayment: (contract: InstallmentContract, payment: InstallmentPayment) => boolean;
+  canBuyerMarkPayment: (
+    contract: InstallmentContract,
+    payment: InstallmentPayment,
+  ) => boolean;
   onMarkPaid: (paymentIndex: number) => void;
   onConfirmPayment: (paymentIndex: number) => void;
   onRejectPayment: (paymentIndex: number) => void;
@@ -83,9 +86,15 @@ export const InstallmentContractCardPaymentRow = ({
         ) : null}
       </View>
 
-      {role === "buyer" && isActiveContract && canBuyerMarkPayment(contract, payment) ? (
+      {role === "buyer" &&
+      isActiveContract &&
+      canBuyerMarkPayment(contract, payment) ? (
         <Pressable
-          style={[styles.btn, styles.btnPrimary, pendingKey != null ? styles.disabled : null]}
+          style={[
+            styles.btn,
+            styles.btnPrimary,
+            pendingKey != null ? styles.disabled : null,
+          ]}
           disabled={pendingKey != null}
           onPress={() => onMarkPaid(payment.paymentIndex)}
         >
@@ -102,7 +111,11 @@ export const InstallmentContractCardPaymentRow = ({
       payment.status === paymentStatuses.pendingConfirmation ? (
         <View style={styles.paymentActions}>
           <Pressable
-            style={[styles.btn, styles.btnPrimary, pendingKey != null ? styles.disabled : null]}
+            style={[
+              styles.btn,
+              styles.btnPrimary,
+              pendingKey != null ? styles.disabled : null,
+            ]}
             disabled={pendingKey != null}
             onPress={() => onConfirmPayment(payment.paymentIndex)}
           >
@@ -113,7 +126,11 @@ export const InstallmentContractCardPaymentRow = ({
             </Text>
           </Pressable>
           <Pressable
-            style={[styles.btn, styles.btnDanger, pendingKey != null ? styles.disabled : null]}
+            style={[
+              styles.btn,
+              styles.btnDanger,
+              pendingKey != null ? styles.disabled : null,
+            ]}
             disabled={pendingKey != null}
             onPress={() => onRejectPayment(payment.paymentIndex)}
           >

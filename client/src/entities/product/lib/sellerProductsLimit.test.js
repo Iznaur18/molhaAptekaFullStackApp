@@ -37,9 +37,9 @@ describe("getSellerProductsLimit (client)", () => {
   test("isSellerProductsLimitReached учитывает unlimited", () => {
     expect(isSellerProductsLimitReached(50, 50)).toBe(true);
     expect(isSellerProductsLimitReached(20000, 100)).toBe(false);
-    expect(
-      isSellerProductsLimitReached(SELLER_PRODUCTS_LIMIT_UNLIMITED, 99999),
-    ).toBe(false);
+    expect(isSellerProductsLimitReached(SELLER_PRODUCTS_LIMIT_UNLIMITED, 99999)).toBe(
+      false,
+    );
   });
 
   test("formatSellerProductsQuota для unlimited", () => {

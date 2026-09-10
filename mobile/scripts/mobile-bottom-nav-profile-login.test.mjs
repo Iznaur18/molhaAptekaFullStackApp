@@ -12,10 +12,7 @@ const readMobile = (relativePath) =>
 test("bottom nav profile: guest goes to /(auth)/login (web /login parity)", () => {
   const tabBar = readMobile("shared/ui/MobileBottomTabBar.tsx");
   const webNav = readFileSync(
-    join(
-      MOBILE_ROOT,
-      "../client/src/widgets/mobile-bottom-nav/ui/MobileBottomNav.jsx",
-    ),
+    join(MOBILE_ROOT, "../client/src/widgets/mobile-bottom-nav/ui/MobileBottomNav.jsx"),
     "utf8",
   );
 

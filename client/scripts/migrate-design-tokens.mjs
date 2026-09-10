@@ -442,11 +442,11 @@ const STRING_REPLACEMENTS = [
     "linear-gradient(180deg, var(--iz-color-primary-bright) 0%, var(--iz-color-action) 100%)",
     "var(--iz-gradient-header-btn)",
   ],
-  ["--admin-panel-surface: var(--iz-color-on-contrast)", "--admin-panel-surface: var(--iz-color-surface)"],
   [
-    "var(--color-surface, var(--iz-color-on-contrast))",
-    "var(--iz-color-surface)",
+    "--admin-panel-surface: var(--iz-color-on-contrast)",
+    "--admin-panel-surface: var(--iz-color-surface)",
   ],
+  ["var(--color-surface, var(--iz-color-on-contrast))", "var(--iz-color-surface)"],
   ["CanvasText", "var(--iz-color-canvas-text)"],
   ["Canvas", "var(--iz-color-canvas)"],
 ];
@@ -501,14 +501,22 @@ function migrateContent(content) {
     next = next.split(rgba).join(token);
   }
 
-  next = next.replace(/background:\s*var\(--iz-color-on-contrast\)/g, "background: var(--iz-color-surface)");
-  next = next.replace(/background-color:\s*var\(--iz-color-on-contrast\)/g, "background-color: var(--iz-color-surface)");
+  next = next.replace(
+    /background:\s*var\(--iz-color-on-contrast\)/g,
+    "background: var(--iz-color-surface)",
+  );
+  next = next.replace(
+    /background-color:\s*var\(--iz-color-on-contrast\)/g,
+    "background-color: var(--iz-color-surface)",
+  );
 
   for (const { from, to } of SHADOW_FIXES) {
     next = next.split(from).join(to);
   }
 
-  const sortedStrings = [...STRING_REPLACEMENTS].sort((a, b) => b[0].length - a[0].length);
+  const sortedStrings = [...STRING_REPLACEMENTS].sort(
+    (a, b) => b[0].length - a[0].length,
+  );
   for (const [from, to] of sortedStrings) {
     next = next.split(from).join(to);
   }

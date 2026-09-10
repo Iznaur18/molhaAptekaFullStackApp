@@ -49,10 +49,7 @@ export const getProductModerationRejectionComment = (
   product: ModerationProduct,
   isMineMode: boolean,
 ): string | null => {
-  if (
-    !isMineMode ||
-    product.productModerationStatus !== PRODUCT_MODERATION_REJECTED
-  ) {
+  if (!isMineMode || product.productModerationStatus !== PRODUCT_MODERATION_REJECTED) {
     return null;
   }
   const comment = String(product.productModerationComment ?? "").trim();
@@ -69,5 +66,4 @@ export const shouldShowProductModerationPendingOverlay = (
     isMineMode = false,
     isModerationQueue = false,
   }: { isMineMode?: boolean; isModerationQueue?: boolean } = {},
-): boolean =>
-  isProductModerationPending(product) && (isMineMode || isModerationQueue);
+): boolean => isProductModerationPending(product) && (isMineMode || isModerationQueue);

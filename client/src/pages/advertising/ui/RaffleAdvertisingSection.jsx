@@ -75,7 +75,9 @@ export function RaffleAdvertisingSection({
   if (statusQuery.isPending) {
     return (
       <article className="advertising-page__card advertising-page__card_category">
-        <h2 className="advertising-page__card-title">{RAFFLE_ADVERTISING_PAGE_UI.CARD_TITLE}</h2>
+        <h2 className="advertising-page__card-title">
+          {RAFFLE_ADVERTISING_PAGE_UI.CARD_TITLE}
+        </h2>
         <p className="advertising-page__state">{RAFFLE_ADVERTISING_PAGE_UI.LOADING}</p>
       </article>
     );
@@ -84,8 +86,13 @@ export function RaffleAdvertisingSection({
   if (statusQuery.isError) {
     return (
       <article className="advertising-page__card advertising-page__card_category">
-        <h2 className="advertising-page__card-title">{RAFFLE_ADVERTISING_PAGE_UI.CARD_TITLE}</h2>
-        <p className="advertising-page__state advertising-page__state_error" role="alert">
+        <h2 className="advertising-page__card-title">
+          {RAFFLE_ADVERTISING_PAGE_UI.CARD_TITLE}
+        </h2>
+        <p
+          className="advertising-page__state advertising-page__state_error"
+          role="alert"
+        >
           {statusQuery.error instanceof Error
             ? statusQuery.error.message
             : RAFFLE_ADVERTISING_PAGE_UI.FETCH_FALLBACK}
@@ -110,11 +117,17 @@ export function RaffleAdvertisingSection({
   return (
     <article className="advertising-page__card advertising-page__card_category">
       <div className="advertising-page__card-head">
-        <h2 className="advertising-page__card-title">{RAFFLE_ADVERTISING_PAGE_UI.CARD_TITLE}</h2>
-        <span className="advertising-page__card-badge">{RAFFLE_ADVERTISING_PAGE_UI.CARD_BADGE}</span>
+        <h2 className="advertising-page__card-title">
+          {RAFFLE_ADVERTISING_PAGE_UI.CARD_TITLE}
+        </h2>
+        <span className="advertising-page__card-badge">
+          {RAFFLE_ADVERTISING_PAGE_UI.CARD_BADGE}
+        </span>
       </div>
 
-      <p className="advertising-page__card-lead">{RAFFLE_ADVERTISING_PAGE_UI.DESCRIPTION}</p>
+      <p className="advertising-page__card-lead">
+        {RAFFLE_ADVERTISING_PAGE_UI.DESCRIPTION}
+      </p>
 
       <dl className="advertising-page__meta">
         <div className="advertising-page__meta-item">
@@ -148,11 +161,17 @@ export function RaffleAdvertisingSection({
       ) : null}
 
       {insufficientPoints && !blockReason ? (
-        <p className="advertising-page__hint">{RAFFLE_ADVERTISING_PAGE_UI.INSUFFICIENT_POINTS}</p>
+        <p className="advertising-page__hint">
+          {RAFFLE_ADVERTISING_PAGE_UI.INSUFFICIENT_POINTS}
+        </p>
       ) : null}
 
       {canOpenForm ? (
-        <button type="button" className="app-btn app-btn--primary" onClick={openCreateForm}>
+        <button
+          type="button"
+          className="app-btn app-btn--primary"
+          onClick={openCreateForm}
+        >
           {RAFFLE_ADVERTISING_PAGE_UI.CONTINUE_CREATE}
         </button>
       ) : null}
@@ -171,7 +190,10 @@ export function RaffleAdvertisingSection({
       ) : null}
 
       {actionError ? (
-        <p className="advertising-page__state advertising-page__state_error" role="alert">
+        <p
+          className="advertising-page__state advertising-page__state_error"
+          role="alert"
+        >
           {actionError}
         </p>
       ) : null}

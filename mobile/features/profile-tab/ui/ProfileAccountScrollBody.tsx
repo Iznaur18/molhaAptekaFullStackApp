@@ -36,7 +36,9 @@ export const ProfileAccountScrollBody = ({
   if (outerScrollOwns) {
     return (
       <View style={listStyle} accessibilityLabel={accessibilityLabel}>
-        <View style={[{ flexDirection: "column", width: "100%" }, contentContainerStyle]}>
+        <View
+          style={[{ flexDirection: "column", width: "100%" }, contentContainerStyle]}
+        >
           {children}
         </View>
       </View>

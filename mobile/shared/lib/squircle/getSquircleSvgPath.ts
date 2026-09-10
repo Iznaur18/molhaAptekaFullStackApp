@@ -81,7 +81,8 @@ const getPathParamsForCorner = ({
   }
 
   const arcMeasure = 90 * (1 - smoothing);
-  const arcSectionLength = Math.sin(toRadians(arcMeasure / 2)) * cornerRadius * Math.sqrt(2);
+  const arcSectionLength =
+    Math.sin(toRadians(arcMeasure / 2)) * cornerRadius * Math.sqrt(2);
   const angleAlpha = (90 - arcMeasure) / 2;
   const p3ToP4Distance = cornerRadius * Math.tan(toRadians(angleAlpha / 2));
   const angleBeta = 45 * smoothing;

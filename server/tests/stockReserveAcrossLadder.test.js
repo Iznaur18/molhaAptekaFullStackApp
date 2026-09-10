@@ -10,12 +10,10 @@ const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollectio
 const { createOrderLoyaltyFixture, createOrderWithReserveTransaction } =
   await import("./helpers/orderLoyaltyTestHelpers.js");
 const { OrderModel } = await import("../models/index.js");
-const { getReservedQuantityByProductIds } = await import(
-  "../services/product/productStock.js"
-);
-const { ORDER_STATUSES, ORDER_STOCK_RESERVING_STATUSES } = await import(
-  "../constants/orderConstants.js"
-);
+const { getReservedQuantityByProductIds } =
+  await import("../services/product/productStock.js");
+const { ORDER_STATUSES, ORDER_STOCK_RESERVING_STATUSES } =
+  await import("../constants/orderConstants.js");
 
 describe("какие статусы держат остаток", () => {
   it("держат все, кроме отменённого, вернувшегося и подтверждённого", () => {

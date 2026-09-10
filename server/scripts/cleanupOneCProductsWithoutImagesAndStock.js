@@ -62,9 +62,7 @@ async function main() {
     console.log("[cleanup-onec] scope=ALL productFromOneC");
   }
 
-  console.log(
-    `[cleanup-onec] filter=${scope} mode=${isApply ? "APPLY" : "DRY-RUN"}`,
-  );
+  console.log(`[cleanup-onec] filter=${scope} mode=${isApply ? "APPLY" : "DRY-RUN"}`);
 
   const result = await cleanupOneCProductsWithoutImagesAndStock({
     isApply,

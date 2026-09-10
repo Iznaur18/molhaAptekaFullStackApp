@@ -27,7 +27,8 @@ export const getWebPushVapidPublicKey = () => {
   return publicKey || null;
 };
 
-export const isWebPushConfigured = () => Boolean(getWebPushVapidPublicKey() && process.env.VAPID_PRIVATE_KEY?.trim());
+export const isWebPushConfigured = () =>
+  Boolean(getWebPushVapidPublicKey() && process.env.VAPID_PRIVATE_KEY?.trim());
 
 /**
  * @param {{
@@ -71,11 +72,16 @@ export function buildWebPushClickPath(params) {
   }
   if (
     kind.includes("installment") &&
-    (kind.includes("reminder") || kind.includes("overdue") || kind.includes("seller_message"))
+    (kind.includes("reminder") ||
+      kind.includes("overdue") ||
+      kind.includes("seller_message"))
   ) {
     return `/installment-payments`;
   }
-  if (kind.includes("installment") && (kind.includes("seller") || kind.includes("early"))) {
+  if (
+    kind.includes("installment") &&
+    (kind.includes("seller") || kind.includes("early"))
+  ) {
     return `/installment-sales`;
   }
   if (kind.includes("installment_dispute")) {
@@ -105,7 +111,8 @@ function normalizeSubscription(subscription) {
     return null;
   }
   const expirationTime =
-    typeof subscription?.expirationTime === "number" && Number.isFinite(subscription.expirationTime)
+    typeof subscription?.expirationTime === "number" &&
+    Number.isFinite(subscription.expirationTime)
       ? subscription.expirationTime
       : null;
   return { endpoint, keys: { p256dh, auth }, expirationTime };
@@ -129,8 +136,12 @@ export async function registerWebPushSubscriptionForUser(userId, subscription) {
   }
 
   const now = new Date();
-  const existing = Array.isArray(user.webPushSubscriptions) ? [...user.webPushSubscriptions] : [];
-  const withoutDuplicate = existing.filter((row) => row.endpoint !== normalized.endpoint);
+  const existing = Array.isArray(user.webPushSubscriptions)
+    ? [...user.webPushSubscriptions]
+    : [];
+  const withoutDuplicate = existing.filter(
+    (row) => row.endpoint !== normalized.endpoint,
+  );
   const nextRow = {
     endpoint: normalized.endpoint,
     keys: normalized.keys,

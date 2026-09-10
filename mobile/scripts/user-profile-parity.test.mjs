@@ -14,7 +14,9 @@ const readClientFile = (relativePath) =>
   readFileSync(join(CLIENT_ROOT, relativePath), "utf8");
 
 test("UserDetailsPage mirrors web modal section order", () => {
-  const body = readMobileFile("features/user-details-page/ui/UserDetailsProfileBody.tsx");
+  const body = readMobileFile(
+    "features/user-details-page/ui/UserDetailsProfileBody.tsx",
+  );
   const jsx = body.slice(body.indexOf("return ("));
 
   const bannerIndex = jsx.indexOf("ProfileOverviewBanner");
@@ -119,9 +121,13 @@ test("user profile info detail rows align label and value on one line", () => {
 });
 
 test("subscriptions and seller name open user profile", () => {
-  const subscriptions = readMobileFile("features/subscriptions-page/ui/SubscriptionsPage.tsx");
+  const subscriptions = readMobileFile(
+    "features/subscriptions-page/ui/SubscriptionsPage.tsx",
+  );
   const sellerRow = readMobileFile("entities/product/ui/ProductCardSellerRow.tsx");
-  const sellerPage = readMobileFile("features/seller-products-page/ui/SellerProductsPage.tsx");
+  const sellerPage = readMobileFile(
+    "features/seller-products-page/ui/SellerProductsPage.tsx",
+  );
 
   assert.match(subscriptions, /SubscriptionUserRow/);
   assert.match(subscriptions, /\/user\/\[id\]/);

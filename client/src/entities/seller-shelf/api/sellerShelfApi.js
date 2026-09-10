@@ -1,20 +1,13 @@
 import { apiClient } from "../../../shared/api/index.js";
 import { parseApiContractData } from "../../../shared/api/parseApiContract.js";
-import {
-  sellerShelfListDataSchema,
-  sellerShelfSchema,
-} from "@molha/api-contract";
+import { sellerShelfListDataSchema, sellerShelfSchema } from "@molha/api-contract";
 
 /**
  * @param {unknown} error
  * @param {string} fallback
  */
 function readApiError(error, fallback) {
-  return (
-    error?.response?.data?.message ??
-    error?.message ??
-    fallback
-  );
+  return error?.response?.data?.message ?? error?.message ?? fallback;
 }
 
 export async function fetchMySellerShelves() {

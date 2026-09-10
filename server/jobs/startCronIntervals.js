@@ -70,7 +70,11 @@ export function startCronIntervals() {
 
   logServerEvent("info", { event: "cron.started" });
 
-  scheduleCronJob("expire_stale_user_stories", USER_STORY_CLEANUP_INTERVAL_MS, expireStaleUserStories);
+  scheduleCronJob(
+    "expire_stale_user_stories",
+    USER_STORY_CLEANUP_INTERVAL_MS,
+    expireStaleUserStories,
+  );
   scheduleCronJob(
     "process_installment_cron_tasks",
     INSTALLMENT_CRON_INTERVAL_MS,
@@ -116,7 +120,11 @@ export function startCronIntervals() {
     PRODUCT_PRICE_MARKET_STATUS_CRON_INTERVAL_MS,
     processProductPriceMarketStatusCronTasks,
   );
-  scheduleCronJob("process_onec_cron_tasks", ONEC_SYNC_INTERVAL_MS, processOneCCronTasks);
+  scheduleCronJob(
+    "process_onec_cron_tasks",
+    ONEC_SYNC_INTERVAL_MS,
+    processOneCCronTasks,
+  );
   scheduleCronJob(
     "process_analytics_reconciliation",
     ANALYTICS_RECONCILIATION_CRON_INTERVAL_MS,
@@ -128,7 +136,11 @@ export function startCronIntervals() {
     processCourierStuckShipmentCronTasks,
   );
   // У ЛОБО нет вебхуков: статусы приходится спрашивать самим.
-  scheduleCronJob("process_lobo_cron_tasks", LOBO_POLL_INTERVAL_MS, processLoboCronTasks);
+  scheduleCronJob(
+    "process_lobo_cron_tasks",
+    LOBO_POLL_INTERVAL_MS,
+    processLoboCronTasks,
+  );
 
   return true;
 }

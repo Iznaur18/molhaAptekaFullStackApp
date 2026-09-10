@@ -48,7 +48,10 @@ export const LoopingCoverVideo = ({
 
     try {
       const playResult = player.play() as void | Promise<void>;
-      if (playResult != null && typeof (playResult as Promise<void>).catch === "function") {
+      if (
+        playResult != null &&
+        typeof (playResult as Promise<void>).catch === "function"
+      ) {
         void (playResult as Promise<void>).catch(() => {
           player.muted = true;
           onUnmuteRejected?.();

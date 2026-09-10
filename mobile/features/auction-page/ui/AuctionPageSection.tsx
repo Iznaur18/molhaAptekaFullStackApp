@@ -9,7 +9,11 @@ type AuctionPageSectionProps = {
   children?: ReactNode;
 };
 
-export const AuctionPageSection = ({ title, count, children }: AuctionPageSectionProps) => {
+export const AuctionPageSection = ({
+  title,
+  count,
+  children,
+}: AuctionPageSectionProps) => {
   const styles = useAuctionPageStyles();
 
   return (

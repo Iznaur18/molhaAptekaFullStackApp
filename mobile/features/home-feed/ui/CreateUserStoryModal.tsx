@@ -88,7 +88,9 @@ export const CreateUserStoryModal = ({
   useRegisterBlockingOverlay(modalVisible);
 
   const isBusy =
-    createMutation.isPending || uploadImageMutation.isPending || uploadVideoMutation.isPending;
+    createMutation.isPending ||
+    uploadImageMutation.isPending ||
+    uploadVideoMutation.isPending;
 
   const previewUri = imageFile?.uri ?? videoFile?.uri ?? null;
 
@@ -124,7 +126,9 @@ export const CreateUserStoryModal = ({
       setMediaType(USER_STORY_MEDIA_TYPE_IMAGE);
     } catch (error) {
       armDismissGuard();
-      setErrorMessage(error instanceof Error ? error.message : USER_STORY_UI.ERROR_IMAGE);
+      setErrorMessage(
+        error instanceof Error ? error.message : USER_STORY_UI.ERROR_IMAGE,
+      );
     }
   };
 
@@ -142,7 +146,9 @@ export const CreateUserStoryModal = ({
       setMediaType(USER_STORY_MEDIA_TYPE_VIDEO);
     } catch (error) {
       armDismissGuard();
-      setErrorMessage(error instanceof Error ? error.message : USER_STORY_UI.ERROR_GENERIC);
+      setErrorMessage(
+        error instanceof Error ? error.message : USER_STORY_UI.ERROR_GENERIC,
+      );
     }
   };
 
@@ -195,7 +201,9 @@ export const CreateUserStoryModal = ({
       onPublished?.();
       onClose();
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : USER_STORY_UI.ERROR_GENERIC);
+      setErrorMessage(
+        error instanceof Error ? error.message : USER_STORY_UI.ERROR_GENERIC,
+      );
     }
   };
 
@@ -216,7 +224,10 @@ export const CreateUserStoryModal = ({
       onRequestClose={handleClose}
     >
       <View style={styles.root} accessibilityViewIsModal>
-        <BackdropContainer style={[styles.backdrop, backdropAnimatedStyle]} pointerEvents="box-none">
+        <BackdropContainer
+          style={[styles.backdrop, backdropAnimatedStyle]}
+          pointerEvents="box-none"
+        >
           <ModalSheetGradientBackdrop />
           <Pressable
             style={StyleSheet.absoluteFillObject}
@@ -277,7 +288,9 @@ export const CreateUserStoryModal = ({
                 </>
               ) : null}
               {!previewUri ? (
-                <Text style={styles.placeholder}>{USER_STORY_UI.ERROR_MEDIA_REQUIRED}</Text>
+                <Text style={styles.placeholder}>
+                  {USER_STORY_UI.ERROR_MEDIA_REQUIRED}
+                </Text>
               ) : null}
             </Pressable>
 

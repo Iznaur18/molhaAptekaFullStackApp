@@ -146,8 +146,7 @@ export const CheckoutForm = ({
     setSelectedSavedAddressId(matchCheckoutSavedAddressId(nextAddress, savedAddresses));
   };
 
-  const deliverySelectable =
-    PRODUCT_DELIVERY_FULFILLMENT_ENABLED && deliveryAvailable;
+  const deliverySelectable = PRODUCT_DELIVERY_FULFILLMENT_ENABLED && deliveryAvailable;
   const pickupSelectable = pickupAvailable;
 
   useEffect(() => {
@@ -212,7 +211,9 @@ export const CheckoutForm = ({
       return;
     }
 
-    const validationError = validateRuDeliveryAddressForm(deliveryAddress, { required: true });
+    const validationError = validateRuDeliveryAddressForm(deliveryAddress, {
+      required: true,
+    });
     if (validationError) {
       setLocalError(validationError);
       return;
@@ -236,7 +237,9 @@ export const CheckoutForm = ({
           <Text style={checkoutStyles.heading}>{CHECKOUT_FORM_UI.HEADING}</Text>
         ) : null}
 
-        <Text style={checkoutStyles.fieldLabel}>{CHECKOUT_FORM_UI.LABEL_FULFILLMENT}</Text>
+        <Text style={checkoutStyles.fieldLabel}>
+          {CHECKOUT_FORM_UI.LABEL_FULFILLMENT}
+        </Text>
         <View style={checkoutStyles.fulfillmentRow}>
           <Pressable
             disabled={isDisabled || isSubmitting}
@@ -400,7 +403,10 @@ export const CheckoutForm = ({
                 </>
               ) : (
                 <Text
-                  style={[checkoutStyles.pickupAddressText, checkoutStyles.pickupAddressError]}
+                  style={[
+                    checkoutStyles.pickupAddressText,
+                    checkoutStyles.pickupAddressError,
+                  ]}
                 >
                   {CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED}
                 </Text>
@@ -444,11 +450,15 @@ export const CheckoutForm = ({
                 inputStyle={checkoutStyles.fieldInput}
               />
 
-              <Text style={checkoutStyles.fieldLabel}>{CHECKOUT_FORM_UI.LABEL_FLAT}</Text>
+              <Text style={checkoutStyles.fieldLabel}>
+                {CHECKOUT_FORM_UI.LABEL_FLAT}
+              </Text>
               <TextInput
                 style={checkoutStyles.fieldInput}
                 value={deliveryAddress.flat}
-                onChangeText={(flat) => setDeliveryAddress((prev) => ({ ...prev, flat }))}
+                onChangeText={(flat) =>
+                  setDeliveryAddress((prev) => ({ ...prev, flat }))
+                }
                 placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
                 placeholderTextColor={theme.colors.textMuted}
                 editable={!isDisabled && !isSubmitting}
@@ -466,8 +476,12 @@ export const CheckoutForm = ({
           disabled={isDisabled || isSubmitting}
         />
 
-        {displayError ? <Text style={checkoutStyles.feedbackError}>{displayError}</Text> : null}
-        {submitSuccess ? <Text style={checkoutStyles.feedbackSuccess}>{submitSuccess}</Text> : null}
+        {displayError ? (
+          <Text style={checkoutStyles.feedbackError}>{displayError}</Text>
+        ) : null}
+        {submitSuccess ? (
+          <Text style={checkoutStyles.feedbackSuccess}>{submitSuccess}</Text>
+        ) : null}
       </View>
 
       <AppButton

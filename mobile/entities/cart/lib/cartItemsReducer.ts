@@ -12,7 +12,10 @@ const clampLineQuantity = (value: number) =>
     Math.max(CART_LINE_ITEM_QUANTITY_MIN, Math.floor(value) || 0),
   );
 
-const removeKey = (items: CartItemsByProductId, productId: string): CartItemsByProductId => {
+const removeKey = (
+  items: CartItemsByProductId,
+  productId: string,
+): CartItemsByProductId => {
   const next = { ...items };
   delete next[productId];
   return next;

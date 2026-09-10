@@ -18,7 +18,9 @@ export const useVisualViewportKeyboardBottomInset = (): number => {
     const updateInset = () => {
       const covered = Math.max(
         0,
-        Math.round(window.innerHeight - visualViewport.height - visualViewport.offsetTop),
+        Math.round(
+          window.innerHeight - visualViewport.height - visualViewport.offsetTop,
+        ),
       );
       setBottomInset(covered);
     };

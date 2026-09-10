@@ -145,7 +145,9 @@ export function EditProfileModal({
                   />
                   <EmailBindControls
                     email={form.email}
-                    isEmailVerified={user?.isEmailVerified === true || contactVerified.email}
+                    isEmailVerified={
+                      user?.isEmailVerified === true || contactVerified.email
+                    }
                     baselineEmail={baselineEmail}
                     disabled={isSubmitting}
                     onVerified={handleEmailVerified}
@@ -226,7 +228,9 @@ export function EditProfileModal({
               {!adminMode ? (
                 <PhoneBindControls
                   phoneNumber={form.userPhoneNumber}
-                  isPhoneVerified={user?.isPhoneVerified === true || contactVerified.phone}
+                  isPhoneVerified={
+                    user?.isPhoneVerified === true || contactVerified.phone
+                  }
                   baselinePhone={baselinePhone}
                   disabled={isSubmitting}
                   onVerified={handlePhoneVerified}
@@ -534,9 +538,7 @@ export function EditProfileModal({
             <EditProfileSocialLinksFields
               form={form}
               onChange={handleChange}
-              onClear={(fieldId) =>
-                setForm((prev) => ({ ...prev, [fieldId]: "" }))
-              }
+              onClear={(fieldId) => setForm((prev) => ({ ...prev, [fieldId]: "" }))}
               disabled={isSubmitting}
             />
           </div>

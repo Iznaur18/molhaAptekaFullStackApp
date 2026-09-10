@@ -9,17 +9,18 @@ export const AFFILIATE_PERCENT_MAX = 50;
  * текущее состояние тумблера и цену (для лоялти-гейта при включении) —
  * держим их в типе, иначе mobile падает на `tsc`, а web молча работает.
  */
-type AffiliatePercentSource = {
-  _id?: unknown;
-  affiliatePercent?: unknown;
-  affiliateEnabled?: unknown;
-  productPrice?: unknown;
-} | null | undefined;
+type AffiliatePercentSource =
+  | {
+      _id?: unknown;
+      affiliatePercent?: unknown;
+      affiliateEnabled?: unknown;
+      productPrice?: unknown;
+    }
+  | null
+  | undefined;
 
 /** True when listing has a valid sharer payout %. */
-export function isProductAffiliateConfigured(
-  product: AffiliatePercentSource,
-): boolean {
+export function isProductAffiliateConfigured(product: AffiliatePercentSource): boolean {
   const percent = Math.floor(Number(product?.affiliatePercent) || 0);
   return (
     Number.isFinite(percent) &&

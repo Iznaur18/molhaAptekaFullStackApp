@@ -82,7 +82,10 @@ export const emailBindRequestController = async (req, res) => {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Не удалось отправить письмо";
-    if (message === "EMAIL_DELIVERY_UNAVAILABLE" || message.startsWith("EMAIL_DELIVERY_UNAVAILABLE")) {
+    if (
+      message === "EMAIL_DELIVERY_UNAVAILABLE" ||
+      message.startsWith("EMAIL_DELIVERY_UNAVAILABLE")
+    ) {
       return errorRes(res, 503, "Не удалось отправить письмо. Попробуйте позже");
     }
     return errorRes(res, 400, message);

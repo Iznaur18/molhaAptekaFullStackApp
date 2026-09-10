@@ -40,9 +40,9 @@ describe("canCancelOrderShipment", () => {
   });
 
   it("без продавца кнопки нет: сервер адресует отмену отправлением", () => {
-    expect(canCancelOrderShipment({ sellerId: "", items: [{ status: "pending" }] })).toBe(
-      false,
-    );
+    expect(
+      canCancelOrderShipment({ sellerId: "", items: [{ status: "pending" }] }),
+    ).toBe(false);
     expect(
       canCancelOrderShipment({
         sellerId: MY_ORDER_UNKNOWN_SELLER_ID,

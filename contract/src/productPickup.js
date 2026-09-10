@@ -21,8 +21,7 @@ export const ORDER_FULFILLMENT_METHODS = [
  */
 export const PRODUCT_DELIVERY_FULFILLMENT_ENABLED = true;
 
-export const PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE =
-  "Укажите адрес продажи";
+export const PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE = "Укажите адрес продажи";
 
 export const PRODUCT_PICKUP_COORDS_REQUIRED_MESSAGE =
   "Укажите точку на карте или выберите адрес из подсказки";
@@ -151,10 +150,7 @@ const productPickupLonSchema = productPickupLonFieldSchema;
 export const productPickupAddressFieldSchema = z
   .string()
   .trim()
-  .min(
-    PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
-    PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
-  )
+  .min(PRODUCT_PICKUP_ADDRESS_MIN_LENGTH, PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE)
   .max(
     PRODUCT_PICKUP_ADDRESS_MAX_LENGTH,
     `Адрес самовывоза не длиннее ${PRODUCT_PICKUP_ADDRESS_MAX_LENGTH} символов`,
@@ -178,7 +174,9 @@ export const assertPickupCoordsPair = (body, ctx, paths = {}) => {
   }
   ctx.addIssue({
     code: z.ZodIssueCode.custom,
-    path: hasLat ? paths.lonPath ?? ["productPickupLon"] : paths.latPath ?? ["productPickupLat"],
+    path: hasLat
+      ? (paths.lonPath ?? ["productPickupLon"])
+      : (paths.latPath ?? ["productPickupLat"]),
     message: "Укажите и широту, и долготу точки самовывоза",
   });
 };
@@ -195,8 +193,8 @@ export const assertPickupCoordsRequired = (body, ctx, paths = {}) => {
   ctx.addIssue({
     code: z.ZodIssueCode.custom,
     path: !hasLat
-      ? paths.latPath ?? ["productPickupLat"]
-      : paths.lonPath ?? ["productPickupLon"],
+      ? (paths.latPath ?? ["productPickupLat"])
+      : (paths.lonPath ?? ["productPickupLon"]),
     message: PRODUCT_PICKUP_COORDS_REQUIRED_MESSAGE,
   });
 };

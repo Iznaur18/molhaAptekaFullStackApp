@@ -42,14 +42,17 @@ export function useHomeFeaturedContent({
   refreshPendingRafflesCount,
 }) {
   const queryClient = useQueryClient();
-  const { deleteMyMutation, deleteStaffMutation, pauseMyMutation } = useRaffleMutations();
+  const { deleteMyMutation, deleteStaffMutation, pauseMyMutation } =
+    useRaffleMutations();
   const [isFeaturedRaffleBusy, setIsFeaturedRaffleBusy] = useState(false);
 
   const featuredQuery = useFeaturedRafflesQuery({
     enabled: isHomeCatalogMainView,
     regionCode: viewerRegionCode,
   });
-  const { userStoriesFeed } = useUserStoriesFeedQuery({ enabled: isHomeCatalogMainView });
+  const { userStoriesFeed } = useUserStoriesFeedQuery({
+    enabled: isHomeCatalogMainView,
+  });
 
   const shouldTrackSellerRaffle =
     isAuthorized && (mainView === "my-products" || mainView === "my-profile");

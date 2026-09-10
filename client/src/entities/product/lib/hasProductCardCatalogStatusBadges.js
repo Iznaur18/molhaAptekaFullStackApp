@@ -10,7 +10,11 @@ export function shouldShowProductCardStatusSlot(vm) {
     return true;
   }
 
-  if (!vm.isMineMode && !vm.isModerationQueue && vm.product.productIsAvailable === false) {
+  if (
+    !vm.isMineMode &&
+    !vm.isModerationQueue &&
+    vm.product.productIsAvailable === false
+  ) {
     return true;
   }
 

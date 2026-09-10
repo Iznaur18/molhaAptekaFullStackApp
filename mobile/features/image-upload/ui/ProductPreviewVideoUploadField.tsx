@@ -54,7 +54,9 @@ export const ProductPreviewVideoUploadField = ({
       onChange(storedUrl);
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : PRODUCT_PREVIEW_VIDEO_UPLOAD_UI.ERROR_GENERIC,
+        error instanceof Error
+          ? error.message
+          : PRODUCT_PREVIEW_VIDEO_UPLOAD_UI.ERROR_GENERIC,
       );
     }
   };
@@ -75,7 +77,9 @@ export const ProductPreviewVideoUploadField = ({
           {PRODUCT_PREVIEW_VIDEO_UPLOAD_UI.OPTIONAL_TAG}
         </Text>
       </Text>
-      <Text style={styles.fieldHint}>{PRODUCT_PREVIEW_VIDEO_UPLOAD_UI.DURATION_HINT}</Text>
+      <Text style={styles.fieldHint}>
+        {PRODUCT_PREVIEW_VIDEO_UPLOAD_UI.DURATION_HINT}
+      </Text>
       {hasVideo ? (
         <View style={[styles.previewWrap, styles.preview]}>
           <ProductPreviewVideo uri={previewUri} />

@@ -124,7 +124,9 @@ export function prependProductToAllCatalogCaches(queryClient, product) {
       }
 
       const [firstPage, ...restPages] = old.pages;
-      const filtered = firstPage.products.filter((row) => String(row._id) !== normalizedId);
+      const filtered = firstPage.products.filter(
+        (row) => String(row._id) !== normalizedId,
+      );
 
       return {
         ...old,

@@ -38,7 +38,9 @@ export function RaffleModerationSection({
   const { approveMutation, rejectMutation, deleteStaffMutation } = useRaffleMutations();
   const queueQuery = useStaffRafflesQueueQuery();
   const [pendingId, setPendingId] = useState(null);
-  const [rowErrors, setRowErrors] = useState(/** @type {Record<string, string>} */ ({}));
+  const [rowErrors, setRowErrors] = useState(
+    /** @type {Record<string, string>} */ ({}),
+  );
   const [clearedLiveRaffleId, setClearedLiveRaffleId] = useState(
     /** @type {string | null} */ (null),
   );
@@ -63,7 +65,9 @@ export function RaffleModerationSection({
         }
         return {
           ...old,
-          pendingRaffles: old.pendingRaffles.filter((row) => String(row._id) !== raffleId),
+          pendingRaffles: old.pendingRaffles.filter(
+            (row) => String(row._id) !== raffleId,
+          ),
         };
       },
     );
@@ -76,7 +80,9 @@ export function RaffleModerationSection({
 
   const refreshAfterAction = async () => {
     await syncRafflesStaffQueueCaches(queryClient);
-    await queryClient.invalidateQueries({ queryKey: introAdQueryKeys.moderationCount() });
+    await queryClient.invalidateQueries({
+      queryKey: introAdQueryKeys.moderationCount(),
+    });
     onQueueChanged?.();
   };
 
@@ -176,7 +182,8 @@ export function RaffleModerationSection({
               <div>
                 <p className="raffles-staff-page__title">{liveRaffle.title}</p>
                 <p className="raffles-staff-page__meta">
-                  {RAFFLES_STAFF_PAGE_UI.ROW_SELLER}: {liveRaffle.seller?.userName ?? "—"}
+                  {RAFFLES_STAFF_PAGE_UI.ROW_SELLER}:{" "}
+                  {liveRaffle.seller?.userName ?? "—"}
                 </p>
                 <p className="raffles-staff-page__meta">
                   {RAFFLES_STAFF_PAGE_UI.ROW_TARGET}: {liveRaffle.targetSales}
@@ -226,7 +233,8 @@ export function RaffleModerationSection({
                     <div>
                       <p className="raffles-staff-page__title">{raffle.title}</p>
                       <p className="raffles-staff-page__meta">
-                        {RAFFLES_STAFF_PAGE_UI.ROW_SELLER}: {raffle.seller?.userName ?? "—"}
+                        {RAFFLES_STAFF_PAGE_UI.ROW_SELLER}:{" "}
+                        {raffle.seller?.userName ?? "—"}
                       </p>
                       <p className="raffles-staff-page__meta">
                         {RAFFLES_STAFF_PAGE_UI.ROW_TARGET}: {raffle.targetSales}
@@ -245,7 +253,9 @@ export function RaffleModerationSection({
                       disabled={busy}
                       onClick={() => void handleApprove(raffle._id)}
                     >
-                      {busy ? RAFFLES_STAFF_PAGE_UI.PENDING : RAFFLES_STAFF_PAGE_UI.APPROVE}
+                      {busy
+                        ? RAFFLES_STAFF_PAGE_UI.PENDING
+                        : RAFFLES_STAFF_PAGE_UI.APPROVE}
                     </button>
                     <button
                       type="button"

@@ -31,7 +31,9 @@ export function SiteHeaderBannerAdminSlideList({
     <ul className="site-header-banner-admin__slide-list" role="list">
       {items.map((item, index) => {
         const isActive = item.id === selectedItemId;
-        const label = item.imageAlt.trim() || SITE_HEADER_BANNER_ADMIN_PAGE_UI.ITEM_TITLE(index + 1);
+        const label =
+          item.imageAlt.trim() ||
+          SITE_HEADER_BANNER_ADMIN_PAGE_UI.ITEM_TITLE(index + 1);
 
         return (
           <li key={item.id}>
@@ -47,9 +49,13 @@ export function SiteHeaderBannerAdminSlideList({
               aria-current={isActive ? "true" : undefined}
               onClick={() => onSelect(item.id)}
             >
-              <span className="site-header-banner-admin__slide-list-index">{index + 1}</span>
+              <span className="site-header-banner-admin__slide-list-index">
+                {index + 1}
+              </span>
               <span className="site-header-banner-admin__slide-list-body">
-                <span className="site-header-banner-admin__slide-list-label">{label}</span>
+                <span className="site-header-banner-admin__slide-list-label">
+                  {label}
+                </span>
                 {!item.enabled ? (
                   <span className="site-header-banner-admin__slide-list-badge">
                     {SITE_HEADER_BANNER_ADMIN_PAGE_UI.ITEM_DISABLED_BADGE}

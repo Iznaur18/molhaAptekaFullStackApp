@@ -71,7 +71,9 @@ export function ProductDetailsModalSimilarTab({
     products.length < PRODUCT_SIMILAR_MAX_ITEMS;
 
   if (filters == null) {
-    return <p className="product-details-similar-tab__empty">{PRODUCT_SIMILAR_UI.EMPTY}</p>;
+    return (
+      <p className="product-details-similar-tab__empty">{PRODUCT_SIMILAR_UI.EMPTY}</p>
+    );
   }
 
   if (catalogQuery.isPending && products.length === 0) {
@@ -104,7 +106,9 @@ export function ProductDetailsModalSimilarTab({
   }
 
   if (products.length === 0) {
-    return <p className="product-details-similar-tab__empty">{PRODUCT_SIMILAR_UI.EMPTY}</p>;
+    return (
+      <p className="product-details-similar-tab__empty">{PRODUCT_SIMILAR_UI.EMPTY}</p>
+    );
   }
 
   return (

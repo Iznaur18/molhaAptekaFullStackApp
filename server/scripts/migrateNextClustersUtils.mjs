@@ -143,16 +143,11 @@ const walkAndUpdateImports = (dir) => {
 
     for (const [fileName, serviceRel] of Object.entries(IMPORT_TARGETS)) {
       const escaped = fileName.replaceAll(".", "\\.");
-      const re = new RegExp(
-        `from "(\\.\\./)+utils/${escaped}"`,
-        "g",
-      );
+      const re = new RegExp(`from "(\\.\\./)+utils/${escaped}"`, "g");
       const relFromFile = path
         .relative(path.dirname(abs), path.join(SERVER_DIR, serviceRel))
         .replaceAll("\\", "/");
-      const normalized = relFromFile.startsWith(".")
-        ? relFromFile
-        : `./${relFromFile}`;
+      const normalized = relFromFile.startsWith(".") ? relFromFile : `./${relFromFile}`;
 
       if (re.test(source)) {
         source = source.replace(

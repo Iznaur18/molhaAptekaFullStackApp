@@ -4,7 +4,10 @@ import { validateProductPreviewVideoFile } from "../../../entities/product/lib/v
 import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { useUploadAssetMutations } from "../../../shared/model/useUploadAssetMutations.js";
 import { UPLOAD_VIDEO_FILE_INPUT_ACCEPT } from "../../../shared/config/uploadConstants.js";
-import { CREATE_PRODUCT_MODAL_UI, VIDEO_URL_FIELD_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  CREATE_PRODUCT_MODAL_UI,
+  VIDEO_URL_FIELD_UI,
+} from "../../../shared/config/appUiCopy.js";
 
 import "./CreateProductWizardMediaVideoCard.css";
 
@@ -17,7 +20,11 @@ import "./CreateProductWizardMediaVideoCard.css";
  *   disabled?: boolean;
  * }} props
  */
-export function CreateProductWizardMediaVideoCard({ value, onChange, disabled = false }) {
+export function CreateProductWizardMediaVideoCard({
+  value,
+  onChange,
+  disabled = false,
+}) {
   const fileInputRef = useRef(/** @type {HTMLInputElement | null} */ (null));
   const { uploadVideoMutation } = useUploadAssetMutations();
   const [errorMessage, setErrorMessage] = useState("");
@@ -76,7 +83,10 @@ export function CreateProductWizardMediaVideoCard({ value, onChange, disabled = 
   };
 
   return (
-    <section className="create-product-wizard-media-video" aria-label={CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_VIDEO_TITLE}>
+    <section
+      className="create-product-wizard-media-video"
+      aria-label={CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_VIDEO_TITLE}
+    >
       <h4 className="create-product-wizard-media-video__label">
         {CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_VIDEO_TITLE}{" "}
         <span className="create-product-wizard-media-video__optional">

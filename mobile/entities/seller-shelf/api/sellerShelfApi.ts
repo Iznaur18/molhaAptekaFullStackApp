@@ -26,7 +26,9 @@ export async function fetchPublicSellerShelves(sellerId: string) {
     );
     return parseApiContractData(data, sellerShelfListDataSchema);
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, "Не удалось загрузить полки продавца"));
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось загрузить полки продавца"),
+    );
   }
 }
 

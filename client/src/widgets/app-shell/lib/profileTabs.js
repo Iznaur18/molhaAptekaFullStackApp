@@ -21,7 +21,8 @@ export const PROFILE_TAB_EDIT_PROFILE = "edit-profile";
 export const PROFILE_TAB_ADMIN_ORDERS = "admin-orders";
 export const PROFILE_TAB_ADMIN_ANALYTICS = "admin-analytics";
 export const PROFILE_TAB_STAFF_AUDIT_LOG_ADMIN = "staff-audit-log-admin";
-export const PROFILE_TAB_BROADCAST_NOTIFICATIONS_ADMIN = "broadcast-notifications-admin";
+export const PROFILE_TAB_BROADCAST_NOTIFICATIONS_ADMIN =
+  "broadcast-notifications-admin";
 export const PROFILE_TAB_SEARCH_SYNONYMS_ADMIN = "search-synonyms-admin";
 export const PROFILE_TAB_CATEGORY_TREE_ADMIN = "category-tree-admin";
 export const PROFILE_TAB_APP_INTRO_ADMIN = "app-intro-admin";

@@ -10,7 +10,9 @@ const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
 test("installment payments page mirrors web toolbar and compact contract card", () => {
-  const page = readMobileFile("features/installment-payments-page/ui/InstallmentPaymentsPage.tsx");
+  const page = readMobileFile(
+    "features/installment-payments-page/ui/InstallmentPaymentsPage.tsx",
+  );
   const toolbar = readMobileFile(
     "features/installment-payments-page/ui/InstallmentPaymentsPageToolbar.tsx",
   );

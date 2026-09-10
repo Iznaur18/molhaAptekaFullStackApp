@@ -30,8 +30,7 @@ const EMPTY_DESELECTION = new Set();
  * @param {import("./selectCartLines.js").CartLine[]} lines
  * @returns {number}
  */
-const sumLineTotals = (lines) =>
-  lines.reduce((sum, line) => sum + line.lineTotal, 0);
+const sumLineTotals = (lines) => lines.reduce((sum, line) => sum + line.lineTotal, 0);
 
 /**
  * @param {import("./selectCartLines.js").CartLine[]} lines
@@ -54,9 +53,7 @@ const resolveCheckoutBlockReason = (
     return CART_PAGE_UI.CHECKOUT_BLOCKED_NOTHING_SELECTED;
   }
 
-  const reasons = lines.map((line) =>
-    getCartLineExclusionReason(line, currentUserId),
-  );
+  const reasons = lines.map((line) => getCartLineExclusionReason(line, currentUserId));
 
   if (reasons.every((reason) => reason === "own_product")) {
     return CART_PAGE_UI.CHECKOUT_BLOCKED_OWN_PRODUCTS_ONLY;
@@ -69,9 +66,7 @@ const resolveCheckoutBlockReason = (
   if (
     reasons.every(
       (reason) =>
-        reason === "missing" ||
-        reason === "unavailable" ||
-        reason === "missing_pickup",
+        reason === "missing" || reason === "unavailable" || reason === "missing_pickup",
     )
   ) {
     return CART_PAGE_UI.CHECKOUT_BLOCKED_ALL_UNAVAILABLE;

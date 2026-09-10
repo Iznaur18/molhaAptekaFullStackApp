@@ -45,14 +45,20 @@ test("assertUserNameFormat rejects invalid nicknames", () => {
 });
 
 test("assertUserNameFormat rejects trailing/leading dot with shared message", () => {
-  assert.throws(() => assertUserNameFormat(".abc"), (err) => {
-    assert.equal(err.message, USER_NAME_FORMAT_ERROR);
-    return true;
-  });
-  assert.throws(() => assertUserNameFormat("abc."), (err) => {
-    assert.equal(err.message, USER_NAME_FORMAT_ERROR);
-    return true;
-  });
+  assert.throws(
+    () => assertUserNameFormat(".abc"),
+    (err) => {
+      assert.equal(err.message, USER_NAME_FORMAT_ERROR);
+      return true;
+    },
+  );
+  assert.throws(
+    () => assertUserNameFormat("abc."),
+    (err) => {
+      assert.equal(err.message, USER_NAME_FORMAT_ERROR);
+      return true;
+    },
+  );
 });
 
 test("userNameFieldSchema normalizes and accepts dots/underscores", () => {

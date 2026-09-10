@@ -272,7 +272,9 @@ export default function ForgotPasswordScreen() {
                     />
                   </View>
                   <View style={styles.field}>
-                    <Text style={styles.label}>{AUTH_UI.FORGOT_NEW_PASSWORD_LABEL}</Text>
+                    <Text style={styles.label}>
+                      {AUTH_UI.FORGOT_NEW_PASSWORD_LABEL}
+                    </Text>
                     <PasswordTextInput
                       value={newPassword}
                       onChangeText={setNewPassword}

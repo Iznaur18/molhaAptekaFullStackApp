@@ -25,7 +25,10 @@ describe("createProductFormDraftStorage", () => {
 
   it("treats entered name/photo/price as meaningful", () => {
     expect(
-      isCreateProductFormDraftMeaningful({ ...CREATE_PRODUCT_INITIAL_FORM, productName: "iPhone" }),
+      isCreateProductFormDraftMeaningful({
+        ...CREATE_PRODUCT_INITIAL_FORM,
+        productName: "iPhone",
+      }),
     ).toBe(true);
     expect(
       isCreateProductFormDraftMeaningful({
@@ -37,7 +40,11 @@ describe("createProductFormDraftStorage", () => {
 
   it("round-trips a meaningful draft with its step", () => {
     persistCreateProductFormDraft({
-      form: { ...CREATE_PRODUCT_INITIAL_FORM, productName: "Товар", productPrice: "1 000" },
+      form: {
+        ...CREATE_PRODUCT_INITIAL_FORM,
+        productName: "Товар",
+        productPrice: "1 000",
+      },
       stepIndex: 3,
     });
 
@@ -51,7 +58,10 @@ describe("createProductFormDraftStorage", () => {
   });
 
   it("never writes an empty form", () => {
-    persistCreateProductFormDraft({ form: { ...CREATE_PRODUCT_INITIAL_FORM }, stepIndex: 0 });
+    persistCreateProductFormDraft({
+      form: { ...CREATE_PRODUCT_INITIAL_FORM },
+      stepIndex: 0,
+    });
     expect(readCreateProductFormDraft()).toBeNull();
   });
 
@@ -61,7 +71,10 @@ describe("createProductFormDraftStorage", () => {
       stepIndex: 1,
     });
     // First render after reopen sees the not-yet-hydrated empty form.
-    persistCreateProductFormDraft({ form: { ...CREATE_PRODUCT_INITIAL_FORM }, stepIndex: 0 });
+    persistCreateProductFormDraft({
+      form: { ...CREATE_PRODUCT_INITIAL_FORM },
+      stepIndex: 0,
+    });
     expect(readCreateProductFormDraft()?.form.productName).toBe("Товар");
   });
 

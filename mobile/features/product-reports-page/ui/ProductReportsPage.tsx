@@ -14,7 +14,11 @@ import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { staffBadgeQueryKeys } from "@/shared/api";
-import { API_CLIENT_UI, MY_PROFILE_PAGE_UI, PRODUCT_REPORTS_PAGE_UI } from "@/shared/config";
+import {
+  API_CLIENT_UI,
+  MY_PROFILE_PAGE_UI,
+  PRODUCT_REPORTS_PAGE_UI,
+} from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useProductReportsPageStyles } from "@/shared/theme/productReportsPageStyles";
@@ -167,7 +171,10 @@ export const ProductReportsPage = () => {
 
         {queryError ? (
           <Text style={[styles.state, styles.stateError]} accessibilityRole="alert">
-            {formatApiErrorMessage(queryError, API_CLIENT_UI.FETCH_PRODUCT_REPORTS_FALLBACK)}
+            {formatApiErrorMessage(
+              queryError,
+              API_CLIENT_UI.FETCH_PRODUCT_REPORTS_FALLBACK,
+            )}
           </Text>
         ) : null}
 
@@ -180,7 +187,9 @@ export const ProductReportsPage = () => {
                 style={styles.section}
                 accessibilityLabel={PRODUCT_REPORTS_PAGE_UI.SECTION_PRODUCTS}
               >
-                <Text style={styles.sectionTitle}>{PRODUCT_REPORTS_PAGE_UI.SECTION_PRODUCTS}</Text>
+                <Text style={styles.sectionTitle}>
+                  {PRODUCT_REPORTS_PAGE_UI.SECTION_PRODUCTS}
+                </Text>
                 <View style={styles.list}>
                   {visibleProductGroups.map((group) => (
                     <ProductReportGroupCard
@@ -200,7 +209,9 @@ export const ProductReportsPage = () => {
                 style={styles.section}
                 accessibilityLabel={PRODUCT_REPORTS_PAGE_UI.SECTION_STORIES}
               >
-                <Text style={styles.sectionTitle}>{PRODUCT_REPORTS_PAGE_UI.SECTION_STORIES}</Text>
+                <Text style={styles.sectionTitle}>
+                  {PRODUCT_REPORTS_PAGE_UI.SECTION_STORIES}
+                </Text>
                 <View style={styles.list}>
                   {visibleStoryGroups.map((group) => (
                     <UserStoryReportGroupCard

@@ -50,13 +50,14 @@ export const ProfileOverviewPage = () => {
       style={styles.container}
       contentContainerStyle={styles.content}
       refreshControl={
-        <ThemedRefreshControl refreshing={sessionQuery.isRefetching} onRefresh={sessionQuery.refetch} />
+        <ThemedRefreshControl
+          refreshing={sessionQuery.isRefetching}
+          onRefresh={sessionQuery.refetch}
+        />
       }
     >
       <View style={styles.bodyCard}>
-        <ProfileTabOverviewSection
-          onEditPress={() => router.push("/profile/edit")}
-        />
+        <ProfileTabOverviewSection onEditPress={() => router.push("/profile/edit")} />
       </View>
     </ScrollView>
   );

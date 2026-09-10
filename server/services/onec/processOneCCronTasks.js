@@ -53,8 +53,7 @@ export async function runSellerOneCSync(sellerId, opts = {}) {
 
     return summary;
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Ошибка обмена с 1С";
+    const message = error instanceof Error ? error.message : "Ошибка обмена с 1С";
 
     await UserModel.updateOne(
       { _id: sellerId },

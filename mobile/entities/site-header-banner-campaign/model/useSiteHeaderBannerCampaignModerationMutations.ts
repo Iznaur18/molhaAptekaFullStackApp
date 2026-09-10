@@ -18,7 +18,9 @@ export const usePendingSiteHeaderBannerCampaignsQuery = () =>
       SITE_HEADER_BANNER_CAMPAIGN_MODERATION_QUEUE_LIMIT,
     ),
     queryFn: () =>
-      fetchPendingSiteHeaderBannerCampaigns(SITE_HEADER_BANNER_CAMPAIGN_MODERATION_QUEUE_LIMIT),
+      fetchPendingSiteHeaderBannerCampaigns(
+        SITE_HEADER_BANNER_CAMPAIGN_MODERATION_QUEUE_LIMIT,
+      ),
   });
 
 export const useManagedSiteHeaderBannerCampaignsQuery = () =>
@@ -42,7 +44,9 @@ export const useSiteHeaderBannerCampaignModerationMutations = () => {
     void queryClient.invalidateQueries({
       queryKey: siteHeaderBannerCampaignQueryKeys.moderationCount(),
     });
-    void queryClient.invalidateQueries({ queryKey: introAdQueryKeys.moderationCount() });
+    void queryClient.invalidateQueries({
+      queryKey: introAdQueryKeys.moderationCount(),
+    });
   };
 
   const approveMutation = useMutation({

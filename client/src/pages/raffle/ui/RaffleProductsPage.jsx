@@ -24,13 +24,13 @@ import "./RaffleProductsPage.css";
  * @param {{
  *   raffleId: string;
  *   isAuthorized: boolean;
-  *   canModerateProducts: boolean;
+ *   canModerateProducts: boolean;
  *   currentUserId?: string | null;
  *   onRequestLoginAddToCart: () => void;
  *   onSellerNameClick: (userId: string) => void;
  *   onOpenProductDetails: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
-  *   setRaffleModal: (next: any) => void;
-  *   refreshRaffleSurfaces: () => void | Promise<void>;
+ *   setRaffleModal: (next: any) => void;
+ *   refreshRaffleSurfaces: () => void | Promise<void>;
  * }} props
  */
 export function RaffleProductsPage({
@@ -69,9 +69,12 @@ export function RaffleProductsPage({
     [raffle],
   );
 
-  const { deleteMyMutation, deleteStaffMutation, pauseMyMutation } = useRaffleMutations();
+  const { deleteMyMutation, deleteStaffMutation, pauseMyMutation } =
+    useRaffleMutations();
   const actionsBusy =
-    deleteMyMutation.isPending || deleteStaffMutation.isPending || pauseMyMutation.isPending;
+    deleteMyMutation.isPending ||
+    deleteStaffMutation.isPending ||
+    pauseMyMutation.isPending;
 
   const isOwner =
     currentUserId != null && raffle?.sellerId != null
@@ -136,14 +139,14 @@ export function RaffleProductsPage({
 
   const summaryHeaderContent = (
     <div className="raffle-products-page__copy">
-      <p className="raffle-products-page__eyebrow">
-        {RAFFLE_PRODUCTS_PAGE_UI.EYEBROW}
-      </p>
+      <p className="raffle-products-page__eyebrow">{RAFFLE_PRODUCTS_PAGE_UI.EYEBROW}</p>
       <h2 className="raffle-products-page__title">
         {raffle?.title ?? RAFFLE_PRODUCTS_PAGE_UI.TITLE}
       </h2>
       {raffle?.description?.trim() ? (
-        <p className="raffle-products-page__header-description">{raffle.description.trim()}</p>
+        <p className="raffle-products-page__header-description">
+          {raffle.description.trim()}
+        </p>
       ) : null}
       {canManage && raffle ? (
         <div className="raffle-products-page__manage">
@@ -187,7 +190,9 @@ export function RaffleProductsPage({
     if (!swipeApi || !hasCarousel) {
       return undefined;
     }
-    const index = carouselRaffles.findIndex((r) => String(r._id) === String(activeRaffleId));
+    const index = carouselRaffles.findIndex(
+      (r) => String(r._id) === String(activeRaffleId),
+    );
     const safeIndex = index < 0 ? 0 : index;
     setActiveSwipeIndex(safeIndex);
     if (index < 0) {
@@ -273,9 +278,7 @@ export function RaffleProductsPage({
                       type="button"
                       className={[
                         "raffle-products-page__swipe-dot",
-                        isActive
-                          ? "raffle-products-page__swipe-dot_active"
-                          : "",
+                        isActive ? "raffle-products-page__swipe-dot_active" : "",
                       ]
                         .filter(Boolean)
                         .join(" ")}
@@ -301,7 +304,10 @@ export function RaffleProductsPage({
             >
               <div className="raffle-products-page__swipe-track">
                 {carouselRaffles.map((r) => (
-                  <div key={String(r._id)} className="raffle-products-page__swipe-slide" />
+                  <div
+                    key={String(r._id)}
+                    className="raffle-products-page__swipe-slide"
+                  />
                 ))}
               </div>
             </div>

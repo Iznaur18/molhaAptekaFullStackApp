@@ -18,9 +18,8 @@ const {
   scheduleEscrowAutoRelease,
   summarizeEscrowState,
 } = await import("../services/payments/escrowLedger.js");
-const { processEscrowReleaseCronTasks } = await import(
-  "../services/payments/escrowReleaseCron.js"
-);
+const { processEscrowReleaseCronTasks } =
+  await import("../services/payments/escrowReleaseCron.js");
 const {
   ESCROW_AUTO_RELEASE_MS,
   ESCROW_REFUND_REASON_ITEM_CANCELLED,
@@ -152,7 +151,10 @@ describe("суммы эскроу по отправлению", () => {
   });
 
   it("строка на позицию и одна на доставку", () => {
-    const { lines } = buildEscrowAmountsForShipment(buildTwoItemOrder(), String(SELLER));
+    const { lines } = buildEscrowAmountsForShipment(
+      buildTwoItemOrder(),
+      String(SELLER),
+    );
 
     assert.deepEqual(
       lines.map((line) => [line.kind, line.itemIndex, line.totalRub]),
@@ -229,7 +231,10 @@ describe("открытие эскроу", () => {
 
     await openEscrowForPaidOrder({ order });
 
-    assert.equal(await EscrowLedgerEntryModel.countDocuments({ orderId: order._id }), 2);
+    assert.equal(
+      await EscrowLedgerEntryModel.countDocuments({ orderId: order._id }),
+      2,
+    );
     assert.equal((await readEntry(order._id, OTHER_SELLER)).goodsRub, 700);
   });
 
@@ -402,7 +407,10 @@ describe("разморозка по позициям", () => {
     });
 
     assert.equal(second, null, "фильтр по held — это и есть защита от гонки");
-    assert.equal(goodsLine(await readEntry(order._id), 0).releaseReason, "buyer_confirmed");
+    assert.equal(
+      goodsLine(await readEntry(order._id), 0).releaseReason,
+      "buyer_confirmed",
+    );
   });
 });
 
@@ -421,7 +429,11 @@ describe("отмена и возврат позиции", () => {
     const entry = await readEntry(order._id);
     assert.equal(goodsLine(entry, 1).state, "refundable");
     assert.equal(goodsLine(entry, 1).refundReason, ESCROW_REFUND_REASON_ITEM_CANCELLED);
-    assert.equal(goodsLine(entry, 0).state, "held", "соседнюю позицию отмена не трогает");
+    assert.equal(
+      goodsLine(entry, 0).state,
+      "held",
+      "соседнюю позицию отмена не трогает",
+    );
   });
 
   it("возврат снимает отсчёт до автоматической выплаты", async () => {

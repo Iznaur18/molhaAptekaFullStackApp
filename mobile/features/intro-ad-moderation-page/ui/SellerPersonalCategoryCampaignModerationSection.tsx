@@ -29,7 +29,9 @@ type SellerPersonalCategoryCampaignModerationSectionProps = {
   onToggleExpanded?: (rowId: string) => void;
 };
 
-const invalidateModerationQueries = async (queryClient: ReturnType<typeof useQueryClient>) => {
+const invalidateModerationQueries = async (
+  queryClient: ReturnType<typeof useQueryClient>,
+) => {
   await Promise.all([
     queryClient.invalidateQueries({
       queryKey: sellerPersonalCategoryQueryKeys.moderationPending(
@@ -70,7 +72,9 @@ export const SellerPersonalCategoryCampaignModerationSection = ({
 
   const campaigns = queueQuery.data ?? [];
   const managedCampaigns = managedQuery.data ?? [];
-  const filteredCampaigns = filterPendingModerationCampaigns(campaigns, { attentionOnly });
+  const filteredCampaigns = filterPendingModerationCampaigns(campaigns, {
+    attentionOnly,
+  });
   const isActionPending =
     approveMutation.isPending ||
     rejectMutation.isPending ||
@@ -223,21 +227,28 @@ export const SellerPersonalCategoryCampaignModerationSection = ({
           <ModerationSectionTitle
             title={SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.MANAGED_TITLE}
           />
-          <View style={resolveIntroAdModerationListPanelStyles(INTRO_AD_MODERATION_SECTION_PERSONAL, styles)}>
-            {managedCampaigns.map((campaign: SellerPersonalCategoryModerationCampaign) => {
-              const campaignId = String(campaign._id);
-              return (
-                <SellerPersonalCategoryModerationCampaignCard
-                  key={campaignId}
-                  campaign={campaign}
-                  mode="managed"
-                  isPending={pendingCampaignId === campaignId || isActionPending}
-                  onStaffUnpublish={() => handleStaffUnpublish(campaignId)}
-                  onStaffDelete={() => handleStaffDelete(campaignId)}
-                  errorMessage={cardErrors[campaignId] ?? ""}
-                />
-              );
-            })}
+          <View
+            style={resolveIntroAdModerationListPanelStyles(
+              INTRO_AD_MODERATION_SECTION_PERSONAL,
+              styles,
+            )}
+          >
+            {managedCampaigns.map(
+              (campaign: SellerPersonalCategoryModerationCampaign) => {
+                const campaignId = String(campaign._id);
+                return (
+                  <SellerPersonalCategoryModerationCampaignCard
+                    key={campaignId}
+                    campaign={campaign}
+                    mode="managed"
+                    isPending={pendingCampaignId === campaignId || isActionPending}
+                    onStaffUnpublish={() => handleStaffUnpublish(campaignId)}
+                    onStaffDelete={() => handleStaffDelete(campaignId)}
+                    errorMessage={cardErrors[campaignId] ?? ""}
+                  />
+                );
+              },
+            )}
           </View>
         </View>
       ) : null}
@@ -248,34 +259,41 @@ export const SellerPersonalCategoryCampaignModerationSection = ({
             title={SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.PENDING_TITLE}
             pendingCount={filteredCampaigns.length}
           />
-          <View style={resolveIntroAdModerationListPanelStyles(INTRO_AD_MODERATION_SECTION_PERSONAL, styles)}>
-            {filteredCampaigns.map((campaign: SellerPersonalCategoryModerationCampaign) => {
-              const campaignId = String(campaign._id);
-              const rowId = buildModerationCampaignRowId("personal", campaignId);
-              return (
-                <SellerPersonalCategoryModerationCampaignCard
-                  key={campaignId}
-                  campaign={campaign}
-                  mode="pending"
-                  isPending={pendingCampaignId === campaignId || isActionPending}
-                  collapsible
-                  expanded={expandedIds.has(rowId)}
-                  onExpandedChange={() => onToggleExpanded?.(rowId)}
-                  rejectReason={rejectReasonById[campaignId] ?? ""}
-                  onRejectReasonChange={(value) =>
-                    setRejectReasonById((prev) => ({ ...prev, [campaignId]: value }))
-                  }
-                  onApprove={() => {
-                    void handleApprove(campaignId);
-                  }}
-                  onReject={() => {
-                    void handleReject(campaignId);
-                  }}
-                  onStaffDelete={() => handleStaffDelete(campaignId)}
-                  errorMessage={cardErrors[campaignId] ?? ""}
-                />
-              );
-            })}
+          <View
+            style={resolveIntroAdModerationListPanelStyles(
+              INTRO_AD_MODERATION_SECTION_PERSONAL,
+              styles,
+            )}
+          >
+            {filteredCampaigns.map(
+              (campaign: SellerPersonalCategoryModerationCampaign) => {
+                const campaignId = String(campaign._id);
+                const rowId = buildModerationCampaignRowId("personal", campaignId);
+                return (
+                  <SellerPersonalCategoryModerationCampaignCard
+                    key={campaignId}
+                    campaign={campaign}
+                    mode="pending"
+                    isPending={pendingCampaignId === campaignId || isActionPending}
+                    collapsible
+                    expanded={expandedIds.has(rowId)}
+                    onExpandedChange={() => onToggleExpanded?.(rowId)}
+                    rejectReason={rejectReasonById[campaignId] ?? ""}
+                    onRejectReasonChange={(value) =>
+                      setRejectReasonById((prev) => ({ ...prev, [campaignId]: value }))
+                    }
+                    onApprove={() => {
+                      void handleApprove(campaignId);
+                    }}
+                    onReject={() => {
+                      void handleReject(campaignId);
+                    }}
+                    onStaffDelete={() => handleStaffDelete(campaignId)}
+                    errorMessage={cardErrors[campaignId] ?? ""}
+                  />
+                );
+              },
+            )}
           </View>
         </View>
       ) : null}

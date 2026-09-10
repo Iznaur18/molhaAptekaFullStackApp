@@ -7,33 +7,24 @@ process.env.JWT_SECRET =
 
 const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollections } =
   await import("./helpers/mongoTestDb.js");
-const { createOrderLoyaltyFixture } = await import(
-  "./helpers/orderLoyaltyTestHelpers.js"
-);
-const { OrderModel, ProductModel, UserInAppNotificationModel } = await import(
-  "../models/index.js"
-);
-const { PRODUCT_MODERATION_APPROVED } = await import(
-  "../constants/productModerationConstants.js"
-);
-const { ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY } = await import(
-  "../constants/orderConstants.js"
-);
-const { buildOrderLineLoyaltySnapshot, reserveLoyaltyPointsForNewOrder } = await import(
-  "../services/order/orderLoyaltyPoints.js"
-);
-const { runInTransaction, withMongoSession } = await import(
-  "../utils/mongoTransaction.js"
-);
-const { cancelOrderShipment, markOrderItemCancelled } = await import(
-  "../services/order/cancelOrderItems.js"
-);
-const { markOrderItemShippedBySeller } = await import(
-  "../services/order/updateOrderItemStatus.js"
-);
-const { advanceOrderShipmentStatus } = await import(
-  "../services/order/advanceShipmentStatus.js"
-);
+const { createOrderLoyaltyFixture } =
+  await import("./helpers/orderLoyaltyTestHelpers.js");
+const { OrderModel, ProductModel, UserInAppNotificationModel } =
+  await import("../models/index.js");
+const { PRODUCT_MODERATION_APPROVED } =
+  await import("../constants/productModerationConstants.js");
+const { ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY } =
+  await import("../constants/orderConstants.js");
+const { buildOrderLineLoyaltySnapshot, reserveLoyaltyPointsForNewOrder } =
+  await import("../services/order/orderLoyaltyPoints.js");
+const { runInTransaction, withMongoSession } =
+  await import("../utils/mongoTransaction.js");
+const { cancelOrderShipment, markOrderItemCancelled } =
+  await import("../services/order/cancelOrderItems.js");
+const { markOrderItemShippedBySeller } =
+  await import("../services/order/updateOrderItemStatus.js");
+const { advanceOrderShipmentStatus } =
+  await import("../services/order/advanceShipmentStatus.js");
 
 /**
  * Заказ из двух позиций одного продавца — корзина, собранная у одного магазина.
@@ -188,7 +179,11 @@ describe("отмена одной позиции в многопозиционн
     await cancelItem(order, 1, seller._id);
 
     const afterCancel = await OrderModel.findById(order._id).lean();
-    assert.equal(afterCancel.status, "accepted", "отменённая строка не сбросила ступень");
+    assert.equal(
+      afterCancel.status,
+      "accepted",
+      "отменённая строка не сбросила ступень",
+    );
 
     // Продавцу рисуют кнопку по статусу заказа: разойдись он с сервером —
     // клиент слал бы «accepted» и получал 409.

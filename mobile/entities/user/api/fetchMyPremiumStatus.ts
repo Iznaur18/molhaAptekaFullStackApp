@@ -20,12 +20,18 @@ export const fetchMyPremiumStatus = async (): Promise<MyPremiumStatus> => {
     return {
       isActive: Boolean(data.data.isActive),
       premiumExpiresAt:
-        typeof data.data.premiumExpiresAt === "string" ? data.data.premiumExpiresAt : null,
+        typeof data.data.premiumExpiresAt === "string"
+          ? data.data.premiumExpiresAt
+          : null,
       canPurchase: Boolean(data.data.canPurchase),
       pricePoints: Number(data.data.pricePoints) || 0,
-      loyaltyPointsBalance: Number.isFinite(loyaltyPointsBalance) ? loyaltyPointsBalance : 0,
+      loyaltyPointsBalance: Number.isFinite(loyaltyPointsBalance)
+        ? loyaltyPointsBalance
+        : 0,
     };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_PREMIUM_STATUS_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_PREMIUM_STATUS_FALLBACK),
+    );
   }
 };

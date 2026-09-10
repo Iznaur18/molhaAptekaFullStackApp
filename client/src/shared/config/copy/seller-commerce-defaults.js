@@ -39,8 +39,7 @@ export const SELLER_COMMERCE_DEFAULTS_UI = {
   SAVING: "Сохраняем…",
   SAVED: "Настройки сохранены",
   /** @param {number} count */
-  SAVED_WITH_SYNC: (count) =>
-    `Настройки сохранены, обновлено товаров: ${count}`,
+  SAVED_WITH_SYNC: (count) => `Настройки сохранены, обновлено товаров: ${count}`,
 
   /** @param {number} count */
   FOLLOWING_COUNT: (count) =>
@@ -58,8 +57,7 @@ export const PRODUCT_FULFILLMENT_SOURCE_UI = {
   OPTION_CUSTOM: "Задать для этого товара",
   PROFILE_HINT:
     "Товар берёт адрес и службу доставки из профиля. Поменяете там — изменится и здесь.",
-  CUSTOM_HINT:
-    "Товар живёт своими настройками: изменения в профиле его не затронут.",
+  CUSTOM_HINT: "Товар живёт своими настройками: изменения в профиле его не затронут.",
   PROFILE_MISSING:
     "В профиле пока нет настроек доставки — заполните их в разделе «Доставка и оплата» или задайте адрес для этого товара.",
   PROFILE_LINK: "Открыть настройки профиля",

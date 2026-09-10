@@ -10,6 +10,8 @@ export const patchUserProfile = async (
     const { data } = await apiClient.patch(`/user/${encodeURIComponent(userId)}`, body);
     return parsePatchUserProfileData(data);
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.UPDATE_PROFILE_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.UPDATE_PROFILE_FALLBACK),
+    );
   }
 };

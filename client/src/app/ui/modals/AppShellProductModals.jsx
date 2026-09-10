@@ -188,10 +188,12 @@ export function AppShellProductModals({
         }
         manageErrorMessage={myProductsCatalogError || productDetailsAdminError}
         canManageEdit={
-          promotionProduct != null && (isAdmin || canSellerEditProduct(promotionProduct))
+          promotionProduct != null &&
+          (isAdmin || canSellerEditProduct(promotionProduct))
         }
         canManageDelete={
-          promotionProduct != null && (isAdmin || canSellerDeleteProduct(promotionProduct))
+          promotionProduct != null &&
+          (isAdmin || canSellerDeleteProduct(promotionProduct))
         }
         canManageToggleVisibility={
           promotionProduct != null &&
@@ -199,7 +201,8 @@ export function AppShellProductModals({
         }
         onDeleteProduct={handleDeleteMyProduct}
         isDeletePending={
-          promotionProduct?._id != null && deletingProductId === String(promotionProduct._id)
+          promotionProduct?._id != null &&
+          deletingProductId === String(promotionProduct._id)
         }
         sellerRaffleActive={sellerRaffleActive}
         onToggleRaffleParticipation={handleToggleRaffleParticipation}

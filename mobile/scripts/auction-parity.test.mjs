@@ -13,8 +13,12 @@ test("auction page mirrors web toolbar and dashboard rows", () => {
   const page = readMobileFile("features/auction-page/ui/AuctionPage.tsx");
   const toolbar = readMobileFile("features/auction-page/ui/AuctionPageToolbar.tsx");
   const overview = readMobileFile("features/auction-page/ui/AuctionPageOverview.tsx");
-  const buyerRow = readMobileFile("entities/product-price-offer/ui/AuctionBuyerBidRow.tsx");
-  const sellerRow = readMobileFile("entities/product-price-offer/ui/AuctionSellerOfferRow.tsx");
+  const buyerRow = readMobileFile(
+    "entities/product-price-offer/ui/AuctionBuyerBidRow.tsx",
+  );
+  const sellerRow = readMobileFile(
+    "entities/product-price-offer/ui/AuctionSellerOfferRow.tsx",
+  );
 
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /AuctionPageToolbar/);
@@ -66,7 +70,9 @@ test("auction page mirrors web toolbar and dashboard rows", () => {
 
 test("auction page ui copy matches web auction dashboard", () => {
   const copy = readMobileFile("shared/config/appUiCopy.ts");
-  const auctionUi = copy.match(/export const AUCTION_PAGE_UI = \{[\s\S]*?\n\} as const;/);
+  const auctionUi = copy.match(
+    /export const AUCTION_PAGE_UI = \{[\s\S]*?\n\} as const;/,
+  );
 
   assert.ok(auctionUi);
   assert.match(auctionUi[0], /TITLE: "Аукцион"/);

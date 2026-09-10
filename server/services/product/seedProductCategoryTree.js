@@ -29,9 +29,7 @@ export const HARDCODED_PRODUCT_CATEGORY_TREE_SEED = [
 export const HARDCODED_PRODUCT_CATEGORY_SLUGS =
   HARDCODED_PRODUCT_CATEGORY_TREE_SEED.map((node) => node.slug);
 
-export const seedProductCategoryTree = async (
-  nodes = PRODUCT_CATEGORY_TREE_SEED,
-) => {
+export const seedProductCategoryTree = async (nodes = PRODUCT_CATEGORY_TREE_SEED) => {
   const slugToId = new Map();
 
   for (const node of nodes) {

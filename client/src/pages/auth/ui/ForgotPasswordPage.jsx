@@ -69,16 +69,14 @@ export function ForgotPasswordPage() {
   }, [isAuthorized, isSessionReady, navigate]);
 
   const contactPayload = () =>
-    channel === "email"
-      ? { email: email.trim() }
-      : { phoneNumber: phoneNumber.trim() };
+    channel === "email" ? { email: email.trim() } : { phoneNumber: phoneNumber.trim() };
 
   const errorMessage =
     localError ||
     (requestMutation.isError
       ? requestMutation.error instanceof Error
         ? requestMutation.error.message
-                : API_CLIENT_UI.INVALID_SERVER_RESPONSE
+        : API_CLIENT_UI.INVALID_SERVER_RESPONSE
       : "") ||
     (confirmMutation.isError
       ? confirmMutation.error instanceof Error
@@ -222,7 +220,11 @@ export function ForgotPasswordPage() {
                   name="code"
                   value={code}
                   onChange={(e) =>
-                    setCode(e.target.value.replace(/\D/g, "").slice(0, AUTH_UI.FORGOT_CODE_LENGTH))
+                    setCode(
+                      e.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, AUTH_UI.FORGOT_CODE_LENGTH),
+                    )
                   }
                   required
                   autoComplete="one-time-code"
@@ -231,7 +233,9 @@ export function ForgotPasswordPage() {
                 />
               </label>
               <label className="auth-page__field">
-                <span className="auth-page__label">{AUTH_UI.FORGOT_NEW_PASSWORD_LABEL}</span>
+                <span className="auth-page__label">
+                  {AUTH_UI.FORGOT_NEW_PASSWORD_LABEL}
+                </span>
                 <PasswordInputField
                   className="auth-page__input"
                   name="newPassword"

@@ -24,7 +24,10 @@ const THUMB_SIZE_PX = 64;
  *   excludeProductId?: string;
  * }} props
  */
-export function ProductDetailsSellerProductsCarousel({ sellerId, excludeProductId = "" }) {
+export function ProductDetailsSellerProductsCarousel({
+  sellerId,
+  excludeProductId = "",
+}) {
   const navigate = useNavigate();
   const { currentUserId } = useAuthSession();
   const isSelf =
@@ -74,7 +77,10 @@ export function ProductDetailsSellerProductsCarousel({ sellerId, excludeProductI
             const isUnavailable = isProfileProductThumbUnavailable(item, { isSelf });
 
             return (
-              <li key={item.productId} className="product-details-seller-products-carousel__item">
+              <li
+                key={item.productId}
+                className="product-details-seller-products-carousel__item"
+              >
                 <button
                   type="button"
                   className={[

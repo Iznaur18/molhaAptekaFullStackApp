@@ -1337,75 +1337,78 @@ export const useSellerProductsLimitModalStyles = createThemedStyles((theme) => (
   },
 }));
 
-export const useInstallmentPassportShareConsentModalStyles = createThemedStyles((theme) => ({
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 24,
-  },
-  card: {
-    borderRadius: theme.radius.md,
-    padding: 20,
-    gap: theme.spacing[3],
-    backgroundColor: theme.colors.surface,
-    maxHeight: "90%",
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: theme.colors.text,
-  },
-  bodyScroll: {
-    maxHeight: 280,
-  },
-  bodyScrollContent: {
-    gap: theme.spacing[2],
-    paddingBottom: theme.spacing[1],
-  },
-  body: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: theme.colors.textSecondary,
-  },
-  actions: {
-    flexDirection: "row",
-    alignItems: "stretch",
-    gap: theme.spacing[2],
-  },
-  button: {
-    borderRadius: 10,
-    paddingVertical: theme.spacing[3],
-    paddingHorizontal: theme.spacing[4],
-    minHeight: 44,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  cancelButton: {
-    flexShrink: 0,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
-  },
-  cancelButtonText: {
-    color: theme.colors.textSecondary,
-    fontWeight: "600",
-    fontSize: 14,
-  },
-  confirmButton: {
-    flex: 1,
-    backgroundColor: theme.colors.nearBlack,
-  },
-  confirmButtonText: {
-    /* Dark: onContrast тёмный (для серебряных action-кнопок) — на ink-кнопке нужен белый. */
-    color: theme.colors.onContrast === "#12151b" ? "#ffffff" : theme.colors.onContrast,
-    fontWeight: "600",
-    fontSize: 14,
-    textAlign: "center",
-  },
-  disabled: {
-    opacity: 0.65,
-  },
-}));
+export const useInstallmentPassportShareConsentModalStyles = createThemedStyles(
+  (theme) => ({
+    overlay: {
+      flex: 1,
+      justifyContent: "center",
+      padding: 24,
+    },
+    card: {
+      borderRadius: theme.radius.md,
+      padding: 20,
+      gap: theme.spacing[3],
+      backgroundColor: theme.colors.surface,
+      maxHeight: "90%",
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: theme.colors.text,
+    },
+    bodyScroll: {
+      maxHeight: 280,
+    },
+    bodyScrollContent: {
+      gap: theme.spacing[2],
+      paddingBottom: theme.spacing[1],
+    },
+    body: {
+      fontSize: 14,
+      lineHeight: 20,
+      color: theme.colors.textSecondary,
+    },
+    actions: {
+      flexDirection: "row",
+      alignItems: "stretch",
+      gap: theme.spacing[2],
+    },
+    button: {
+      borderRadius: 10,
+      paddingVertical: theme.spacing[3],
+      paddingHorizontal: theme.spacing[4],
+      minHeight: 44,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    cancelButton: {
+      flexShrink: 0,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.surface,
+    },
+    cancelButtonText: {
+      color: theme.colors.textSecondary,
+      fontWeight: "600",
+      fontSize: 14,
+    },
+    confirmButton: {
+      flex: 1,
+      backgroundColor: theme.colors.nearBlack,
+    },
+    confirmButtonText: {
+      /* Dark: onContrast тёмный (для серебряных action-кнопок) — на ink-кнопке нужен белый. */
+      color:
+        theme.colors.onContrast === "#12151b" ? "#ffffff" : theme.colors.onContrast,
+      fontWeight: "600",
+      fontSize: 14,
+      textAlign: "center",
+    },
+    disabled: {
+      opacity: 0.65,
+    },
+  }),
+);
 
 export const useProductModalShellStyles = createThemedStyles((theme) => ({
   backdrop: {

@@ -343,9 +343,7 @@ export function ProductDetailsModalDetailsTab({
       fullWidthCommerceFold && showSplitRest && splitRestHost
         ? createPortal(splitRest, splitRestHost)
         : null;
-    const inlineRest = fullWidthCommerceFold
-      ? null
-      : splitRest;
+    const inlineRest = fullWidthCommerceFold ? null : splitRest;
 
     return (
       <>

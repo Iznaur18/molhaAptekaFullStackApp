@@ -25,8 +25,12 @@ export function normalizeCharacteristics(raw) {
   const out = [];
   const seen = new Set();
   for (const item of raw ?? []) {
-    const key = String(item?.key ?? "").trim().slice(0, 60);
-    const value = String(item?.value ?? "").trim().slice(0, 300);
+    const key = String(item?.key ?? "")
+      .trim()
+      .slice(0, 60);
+    const value = String(item?.value ?? "")
+      .trim()
+      .slice(0, 300);
     if (!key || !value) continue;
     // Ключ дедупликации через JSON: пара («Цвет», «синий») не должна
     // схлопываться с («Цвет син», «ий») из-за склейки строк.

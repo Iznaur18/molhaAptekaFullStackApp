@@ -50,12 +50,24 @@ const PROFILE_ROW_SECTIONS: Array<{
   {
     id: "personal",
     title: "Личные данные",
-    rowIds: ["userFullName", "userBirthDate", "userGender", "userVehicleMake", "userVehicleColor", "userVehiclePlate"],
+    rowIds: [
+      "userFullName",
+      "userBirthDate",
+      "userGender",
+      "userVehicleMake",
+      "userVehicleColor",
+      "userVehiclePlate",
+    ],
   },
   {
     id: "account",
     title: "Аккаунт",
-    rowIds: ["isUserDataConfirmed", "isPremiumUser", "notificationsEnabled", "createdAt"],
+    rowIds: [
+      "isUserDataConfirmed",
+      "isPremiumUser",
+      "notificationsEnabled",
+      "createdAt",
+    ],
   },
   {
     id: "other",
@@ -82,4 +94,5 @@ export const groupProfileRows = (rows: ProfileRow[]): ProfileRowSection[] => {
   })).filter((section) => section.rows.length > 0);
 };
 
-export const isBooleanProfileRow = (rowId: string): boolean => BOOLEAN_ROW_IDS.has(rowId);
+export const isBooleanProfileRow = (rowId: string): boolean =>
+  BOOLEAN_ROW_IDS.has(rowId);

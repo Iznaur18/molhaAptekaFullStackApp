@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { CREATE_PRODUCT_INITIAL_FORM, createProductFormStateFromCopiedProduct } from "./createProductFormState.js";
+import {
+  CREATE_PRODUCT_INITIAL_FORM,
+  createProductFormStateFromCopiedProduct,
+} from "./createProductFormState.js";
 
 describe("createProductFormStateFromCopiedProduct", () => {
   it("copies listing fields and strips manage extras", () => {

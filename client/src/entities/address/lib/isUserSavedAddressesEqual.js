@@ -32,7 +32,9 @@ export function isUserSavedAddressesEqual(a, b) {
   const sortedLeft = sortById(left);
   const sortedRight = sortById(right);
 
-  return sortedLeft.every((item, index) => isUserSavedAddressEqual(item, sortedRight[index]));
+  return sortedLeft.every((item, index) =>
+    isUserSavedAddressEqual(item, sortedRight[index]),
+  );
 }
 
 /**

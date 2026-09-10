@@ -44,7 +44,9 @@ export const ProductPriceOfferTopList = ({
             {canOpen ? (
               <Pressable
                 style={styles.topBuyerPressable}
-                onPress={() => router.push({ pathname: "/user/[id]", params: { id: userId! } })}
+                onPress={() =>
+                  router.push({ pathname: "/user/[id]", params: { id: userId! } })
+                }
                 accessibilityRole="link"
               >
                 <UserPremiumDisplayName

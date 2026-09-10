@@ -5,7 +5,8 @@ const loadValidator = async (requireSuggest) => {
   vi.doMock("../../../shared/config/featureFlags.js", () => ({
     IS_REQUIRE_ADDRESS_FROM_DADATA_SUGGEST_ENABLED: requireSuggest,
   }));
-  const { validateRuDeliveryAddressForm } = await import("./validateRuDeliveryAddressForm.js");
+  const { validateRuDeliveryAddressForm } =
+    await import("./validateRuDeliveryAddressForm.js");
   return validateRuDeliveryAddressForm;
 };
 
@@ -30,20 +31,32 @@ describe("validateRuDeliveryAddressForm", () => {
   it("does not throw ReferenceError when line is filled (regression)", async () => {
     const validate = await loadValidator(false);
     expect(() =>
-      validate({ line: "Москва, ул. Ленина 1", selectedFromSuggest: false }, { required: true }),
+      validate(
+        { line: "Москва, ул. Ленина 1", selectedFromSuggest: false },
+        { required: true },
+      ),
     ).not.toThrow();
     expect(
-      validate({ line: "Москва, ул. Ленина 1", selectedFromSuggest: false }, { required: true }),
+      validate(
+        { line: "Москва, ул. Ленина 1", selectedFromSuggest: false },
+        { required: true },
+      ),
     ).toBeNull();
   });
 
   it("requires DaData pick when feature flag is on", async () => {
     const validate = await loadValidator(true);
     expect(
-      validate({ line: "Москва, ул. Ленина 1", selectedFromSuggest: false }, { required: true }),
+      validate(
+        { line: "Москва, ул. Ленина 1", selectedFromSuggest: false },
+        { required: true },
+      ),
     ).toBe("Выберите адрес из списка подсказок");
     expect(
-      validate({ line: "Москва, ул. Ленина 1", selectedFromSuggest: true }, { required: true }),
+      validate(
+        { line: "Москва, ул. Ленина 1", selectedFromSuggest: true },
+        { required: true },
+      ),
     ).toBeNull();
   });
 
@@ -54,7 +67,9 @@ describe("validateRuDeliveryAddressForm", () => {
     // превращало тест в проверку валидного адреса.
     const { ADDRESS_LINE_MAX_LENGTH } = await import("../model/constants.js");
     const longLine = "а".repeat(ADDRESS_LINE_MAX_LENGTH + 1);
-    expect(validate({ line: longLine, selectedFromSuggest: true })).toMatch(/не длиннее/);
+    expect(validate({ line: longLine, selectedFromSuggest: true })).toMatch(
+      /не длиннее/,
+    );
   });
 
   it("accepts a real address that used to be too long", async () => {

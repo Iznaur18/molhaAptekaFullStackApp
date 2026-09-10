@@ -80,7 +80,4 @@ OneCCategoryMappingSchema.index(
   { name: "onec_category_seller_mapped" },
 );
 
-export default mongoose.model(
-  "OneCCategoryMapping",
-  OneCCategoryMappingSchema,
-);
+export default mongoose.model("OneCCategoryMapping", OneCCategoryMappingSchema);

@@ -40,10 +40,16 @@ export const HomeCatalogSearchRow = ({
       floating={embeddedInForegroundSheet}
     >
       <View style={styles.topRow}>
-        <HomeCatalogHeaderSearch value={value} onChange={onChange} onSubmit={onSubmit} />
+        <HomeCatalogHeaderSearch
+          value={value}
+          onChange={onChange}
+          onSubmit={onSubmit}
+        />
         <View style={styles.authActions}>
           <ViewerRegionSelect value={viewerRegionCode} onChange={setViewerRegionCode} />
-          <HomeCatalogUsersButton embeddedInForegroundSheet={embeddedInForegroundSheet} />
+          <HomeCatalogUsersButton
+            embeddedInForegroundSheet={embeddedInForegroundSheet}
+          />
         </View>
       </View>
     </HomeCatalogHeaderPanel>

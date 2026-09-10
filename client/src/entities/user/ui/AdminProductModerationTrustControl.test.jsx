@@ -16,9 +16,8 @@ vi.mock("../api/patchSellerProductModerationTrust.js", () => ({
   patchSellerProductModerationTrust: (input) => patchTrustMock(input),
 }));
 
-const { AdminProductModerationTrustControl } = await import(
-  "./AdminProductModerationTrustControl.jsx"
-);
+const { AdminProductModerationTrustControl } =
+  await import("./AdminProductModerationTrustControl.jsx");
 
 const renderControl = ({ trusted }) => {
   const onChanged = vi.fn();

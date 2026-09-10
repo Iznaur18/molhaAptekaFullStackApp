@@ -62,8 +62,13 @@ export const PasswordTextInput = ({
   const theme = useAppTheme();
   const [isVisible, setIsVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const toggleAria = isVisible ? AUTH_UI.HIDE_PASSWORD_ARIA : AUTH_UI.SHOW_PASSWORD_ARIA;
-  const resolvedAutoComplete = resolvePasswordAutoComplete(textContentType, autoComplete);
+  const toggleAria = isVisible
+    ? AUTH_UI.HIDE_PASSWORD_ARIA
+    : AUTH_UI.SHOW_PASSWORD_ARIA;
+  const resolvedAutoComplete = resolvePasswordAutoComplete(
+    textContentType,
+    autoComplete,
+  );
 
   return (
     <View

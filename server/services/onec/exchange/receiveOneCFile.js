@@ -94,8 +94,7 @@ export async function receiveOneCFileChunk({ req, session, filename }) {
 
   let written = 0;
   const remainingForFile = ONEC_EXCHANGE_MAX_FILE_BYTES - alreadyOnDisk;
-  const remainingForSession =
-    ONEC_EXCHANGE_MAX_SESSION_BYTES - session.totalBytes;
+  const remainingForSession = ONEC_EXCHANGE_MAX_SESSION_BYTES - session.totalBytes;
   const budget = Math.min(remainingForFile, remainingForSession);
 
   if (budget <= 0) {

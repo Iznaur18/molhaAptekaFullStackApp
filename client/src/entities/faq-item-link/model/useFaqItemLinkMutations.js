@@ -7,10 +7,11 @@ export function useFaqItemLinkMutations() {
   const queryClient = useQueryClient();
 
   const patchLinkMutation = useMutation({
-    mutationFn: /** @param {{ itemId: string; body: { href?: string | null; resetHref?: boolean } }} vars */ ({
-      itemId,
-      body,
-    }) => patchFaqItemLink(itemId, body),
+    mutationFn:
+      /** @param {{ itemId: string; body: { href?: string | null; resetHref?: boolean } }} vars */ ({
+        itemId,
+        body,
+      }) => patchFaqItemLink(itemId, body),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: faqItemLinkQueryKeys.all });
     },

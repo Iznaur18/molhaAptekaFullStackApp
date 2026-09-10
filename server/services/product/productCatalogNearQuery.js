@@ -145,11 +145,7 @@ export const findProductsPageNear = async ({
       $addFields: {
         productSeller: { $arrayElemAt: ["$productSellerArr", 0] },
         distanceMeters: {
-          $cond: [
-            { $eq: ["$_nearBucket", 0] },
-            "$_distanceMeters",
-            "$$REMOVE",
-          ],
+          $cond: [{ $eq: ["$_nearBucket", 0] }, "$_distanceMeters", "$$REMOVE"],
         },
       },
     },

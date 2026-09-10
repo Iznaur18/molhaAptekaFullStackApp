@@ -5,10 +5,7 @@
  * @returns {string}
  */
 export function createClientIdempotencyKey() {
-  if (
-    typeof crypto !== "undefined" &&
-    typeof crypto.randomUUID === "function"
-  ) {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     try {
       return crypto.randomUUID();
     } catch {

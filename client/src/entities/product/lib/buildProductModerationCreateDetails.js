@@ -104,8 +104,7 @@ export function buildProductModerationCreateDetails(product) {
       {
         key: "category",
         label: CREATE_PRODUCT_MODAL_UI.LABEL_CATEGORY,
-        value:
-          categoryValue !== COMMON_UI.EM_DASH ? categoryValue : categoryFallback,
+        value: categoryValue !== COMMON_UI.EM_DASH ? categoryValue : categoryFallback,
       },
       {
         key: "region",

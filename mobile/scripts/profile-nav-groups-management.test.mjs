@@ -15,9 +15,8 @@ const readRepoFile = (relativePath) =>
 test("profile nav: site-header-banner-admin only in management order", async () => {
   execSync("npm run build", { cwd: SHARED_LIB_ROOT, stdio: "pipe" });
 
-  const { PROFILE_MANAGEMENT_SECTION_ORDER, PROFILE_STAFF_SECTION_ORDER } = await import(
-    pathToFileURL(join(SHARED_LIB_ROOT, "dist/profileSections.js")).href
-  );
+  const { PROFILE_MANAGEMENT_SECTION_ORDER, PROFILE_STAFF_SECTION_ORDER } =
+    await import(pathToFileURL(join(SHARED_LIB_ROOT, "dist/profileSections.js")).href);
 
   assert.equal(PROFILE_STAFF_SECTION_ORDER.includes("site-header-banner-admin"), false);
   assert.equal(
@@ -56,7 +55,9 @@ test("profile nav builders exclude management ids from staff group", () => {
   const mobileBuilder = readRepoFile(
     "mobile/features/profile-hub/model/buildProfileNavGroups.ts",
   );
-  const webBuilder = readRepoFile("client/src/pages/my-profile/lib/buildProfileNavGroups.js");
+  const webBuilder = readRepoFile(
+    "client/src/pages/my-profile/lib/buildProfileNavGroups.js",
+  );
 
   assert.match(mobileBuilder, /managementSectionIds/);
   assert.match(webBuilder, /managementSectionIds/);

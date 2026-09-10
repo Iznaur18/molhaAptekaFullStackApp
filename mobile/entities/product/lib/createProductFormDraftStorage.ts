@@ -122,7 +122,10 @@ export const isCreateProductFormDraftMeaningful = (form: unknown): boolean => {
   if (Array.isArray(record.imageUrls) && record.imageUrls.some((url) => trimmed(url))) {
     return true;
   }
-  if (Array.isArray(record.characteristicRows) && record.characteristicRows.some(rowHasText)) {
+  if (
+    Array.isArray(record.characteristicRows) &&
+    record.characteristicRows.some(rowHasText)
+  ) {
     return true;
   }
   if (Array.isArray(record.returnTermRows) && record.returnTermRows.some(rowHasText)) {
@@ -177,10 +180,7 @@ export const readCreateProductFormDraft = <TForm = Record<string, unknown>>(
  * оставлял бы файл, из-за которого следующий вход показывал бы баннер
  * восстановления ни о чём.
  */
-export const writeCreateProductFormDraft = (
-  form: unknown,
-  stepIndex: number,
-): void => {
+export const writeCreateProductFormDraft = (form: unknown, stepIndex: number): void => {
   if (!isCreateProductFormDraftMeaningful(form)) {
     clearCreateProductFormDraft();
     return;

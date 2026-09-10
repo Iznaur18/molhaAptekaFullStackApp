@@ -10,7 +10,9 @@ const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
 test("installment disputes page mirrors web layout and hub chrome", () => {
-  const page = readMobileFile("features/installment-disputes-page/ui/InstallmentDisputesPage.tsx");
+  const page = readMobileFile(
+    "features/installment-disputes-page/ui/InstallmentDisputesPage.tsx",
+  );
   const styles = readMobileFile("shared/theme/installmentDisputesPageStyles.ts");
 
   assert.match(page, /ProfileMobileSectionToggle/);
@@ -31,7 +33,9 @@ test("installment disputes page mirrors web layout and hub chrome", () => {
 });
 
 test("installment disputes queue card mirrors web fields and actions", () => {
-  const card = readMobileFile("entities/installment/ui/InstallmentDisputesQueueCard.tsx");
+  const card = readMobileFile(
+    "entities/installment/ui/InstallmentDisputesQueueCard.tsx",
+  );
 
   assert.match(card, /DISPUTE_CONTRACT_LABEL/);
   assert.match(card, /SELLER_LABEL/);

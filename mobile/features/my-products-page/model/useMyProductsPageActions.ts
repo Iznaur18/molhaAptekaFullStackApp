@@ -12,11 +12,12 @@ import { useMyProductMutations } from "@/entities/product/model/useMyProductMuta
 import { useRequestProductPromotionMutation } from "@/entities/product/model/useRequestProductPromotionMutation";
 import { useProductPromotionManageSupport } from "@/features/product-promotion/model/useProductPromotionManageSupport";
 import { useMyLoyaltyPointsStatusQuery } from "@/entities/user/model/useMyLoyaltyPointsStatusQuery";
+import { API_CLIENT_UI, PRODUCT_PROMOTION_UI } from "@/shared/config";
 import {
-  API_CLIENT_UI,
-  PRODUCT_PROMOTION_UI,
-} from "@/shared/config";
-import { catalogQueryKeys, loyaltyPointsQueryKeys, myProductsQueryKeys } from "@/shared/api";
+  catalogQueryKeys,
+  loyaltyPointsQueryKeys,
+  myProductsQueryKeys,
+} from "@/shared/api";
 
 type MyProductsCatalogProduct = Record<string, unknown> & { _id: string };
 
@@ -29,36 +30,45 @@ export const useMyProductsPageActions = () => {
 
   const [catalogNotice, setCatalogNotice] = useState("");
   const [catalogError, setCatalogError] = useState("");
-  const [promotionProduct, setPromotionProduct] = useState<MyProductsCatalogProduct | null>(null);
+  const [promotionProduct, setPromotionProduct] =
+    useState<MyProductsCatalogProduct | null>(null);
   const [promotionModalVisible, setPromotionModalVisible] = useState(false);
   const [promotionErrorMessage, setPromotionErrorMessage] = useState("");
   const [manageErrorMessage, setManageErrorMessage] = useState("");
-  const [togglingAvailabilityProductId, setTogglingAvailabilityProductId] = useState<string | null>(
+  const [togglingAvailabilityProductId, setTogglingAvailabilityProductId] = useState<
+    string | null
+  >(null);
+  const [togglingAuctionProductId, setTogglingAuctionProductId] = useState<
+    string | null
+  >(null);
+  const [togglingOriginalityProductId, setTogglingOriginalityProductId] = useState<
+    string | null
+  >(null);
+  const [togglingOutOfStockProductId, setTogglingOutOfStockProductId] = useState<
+    string | null
+  >(null);
+  const [togglingWholesaleProductId, setTogglingWholesaleProductId] = useState<
+    string | null
+  >(null);
+  const [togglingBuyNFreeProductId, setTogglingBuyNFreeProductId] = useState<
+    string | null
+  >(null);
+  const [togglingRentalProductId, setTogglingRentalProductId] = useState<string | null>(
     null,
   );
-  const [togglingAuctionProductId, setTogglingAuctionProductId] = useState<string | null>(null);
-  const [togglingOriginalityProductId, setTogglingOriginalityProductId] = useState<string | null>(
-    null,
-  );
-  const [togglingOutOfStockProductId, setTogglingOutOfStockProductId] = useState<string | null>(
-    null,
-  );
-  const [togglingWholesaleProductId, setTogglingWholesaleProductId] = useState<string | null>(
-    null,
-  );
-  const [togglingBuyNFreeProductId, setTogglingBuyNFreeProductId] = useState<string | null>(null);
-  const [togglingRentalProductId, setTogglingRentalProductId] = useState<string | null>(null);
   const [togglingQaProductId, setTogglingQaProductId] = useState<string | null>(null);
-  const [togglingFlashSaleProductId, setTogglingFlashSaleProductId] = useState<string | null>(
-    null,
-  );
-  const [togglingAffiliateProductId, setTogglingAffiliateProductId] = useState<string | null>(
-    null,
-  );
-  const [togglingLoyaltyProductId, setTogglingLoyaltyProductId] = useState<string | null>(null);
-  const [togglingInstallmentProductId, setTogglingInstallmentProductId] = useState<string | null>(
-    null,
-  );
+  const [togglingFlashSaleProductId, setTogglingFlashSaleProductId] = useState<
+    string | null
+  >(null);
+  const [togglingAffiliateProductId, setTogglingAffiliateProductId] = useState<
+    string | null
+  >(null);
+  const [togglingLoyaltyProductId, setTogglingLoyaltyProductId] = useState<
+    string | null
+  >(null);
+  const [togglingInstallmentProductId, setTogglingInstallmentProductId] = useState<
+    string | null
+  >(null);
 
   const syncPromotionProduct = useCallback((updated: MyProductsCatalogProduct) => {
     setPromotionProduct((prev) =>
@@ -150,7 +160,9 @@ export const useMyProductsPageActions = () => {
         syncPromotionProduct(updated as MyProductsCatalogProduct);
       } catch (error) {
         setManageErrorMessage(
-          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+          error instanceof Error
+            ? error.message
+            : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
         );
       } finally {
         setTogglingAvailabilityProductId(null);
@@ -176,7 +188,9 @@ export const useMyProductsPageActions = () => {
         syncPromotionProduct(updated as MyProductsCatalogProduct);
       } catch (error) {
         setManageErrorMessage(
-          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+          error instanceof Error
+            ? error.message
+            : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
         );
       } finally {
         setTogglingAuctionProductId(null);
@@ -202,7 +216,9 @@ export const useMyProductsPageActions = () => {
         syncPromotionProduct(updated as MyProductsCatalogProduct);
       } catch (error) {
         setManageErrorMessage(
-          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+          error instanceof Error
+            ? error.message
+            : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
         );
       } finally {
         setTogglingOriginalityProductId(null);
@@ -228,7 +244,9 @@ export const useMyProductsPageActions = () => {
         syncPromotionProduct(updated as MyProductsCatalogProduct);
       } catch (error) {
         setManageErrorMessage(
-          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+          error instanceof Error
+            ? error.message
+            : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
         );
       } finally {
         setTogglingOutOfStockProductId(null);
@@ -254,7 +272,9 @@ export const useMyProductsPageActions = () => {
         syncPromotionProduct(updated as MyProductsCatalogProduct);
       } catch (error) {
         setManageErrorMessage(
-          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+          error instanceof Error
+            ? error.message
+            : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
         );
       } finally {
         setTogglingWholesaleProductId(null);
@@ -280,7 +300,9 @@ export const useMyProductsPageActions = () => {
         syncPromotionProduct(updated as MyProductsCatalogProduct);
       } catch (error) {
         setManageErrorMessage(
-          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+          error instanceof Error
+            ? error.message
+            : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
         );
       } finally {
         setTogglingBuyNFreeProductId(null);
@@ -306,7 +328,9 @@ export const useMyProductsPageActions = () => {
         syncPromotionProduct(updated as MyProductsCatalogProduct);
       } catch (error) {
         setManageErrorMessage(
-          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+          error instanceof Error
+            ? error.message
+            : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
         );
       } finally {
         setTogglingRentalProductId(null);
@@ -336,7 +360,9 @@ export const useMyProductsPageActions = () => {
         syncPromotionProduct(updated as MyProductsCatalogProduct);
       } catch (error) {
         setManageErrorMessage(
-          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+          error instanceof Error
+            ? error.message
+            : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
         );
       } finally {
         setTogglingQaProductId(null);
@@ -362,7 +388,9 @@ export const useMyProductsPageActions = () => {
         syncPromotionProduct(updated as MyProductsCatalogProduct);
       } catch (error) {
         setManageErrorMessage(
-          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+          error instanceof Error
+            ? error.message
+            : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
         );
       } finally {
         setTogglingFlashSaleProductId(null);
@@ -409,7 +437,9 @@ export const useMyProductsPageActions = () => {
         syncPromotionProduct(updated as MyProductsCatalogProduct);
       } catch (error) {
         setManageErrorMessage(
-          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+          error instanceof Error
+            ? error.message
+            : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
         );
       } finally {
         setTogglingAffiliateProductId(null);
@@ -435,7 +465,9 @@ export const useMyProductsPageActions = () => {
         syncPromotionProduct(updated as MyProductsCatalogProduct);
       } catch (error) {
         setManageErrorMessage(
-          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+          error instanceof Error
+            ? error.message
+            : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
         );
       } finally {
         setTogglingLoyaltyProductId(null);
@@ -477,7 +509,9 @@ export const useMyProductsPageActions = () => {
         return { productInstallmentEnabled: nextEnabled };
       } catch (error) {
         setManageErrorMessage(
-          error instanceof Error ? error.message : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
+          error instanceof Error
+            ? error.message
+            : API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK,
         );
         return undefined;
       } finally {
@@ -506,7 +540,9 @@ export const useMyProductsPageActions = () => {
         setCatalogNotice("");
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK;
+          error instanceof Error
+            ? error.message
+            : API_CLIENT_UI.DELETE_MY_PRODUCT_FALLBACK;
         setManageErrorMessage(message);
         setCatalogError(message);
       }
@@ -514,7 +550,8 @@ export const useMyProductsPageActions = () => {
     [deleteMutation, handleClosePromotionModal],
   );
 
-  const promotionProductId = promotionProduct?._id != null ? String(promotionProduct._id) : null;
+  const promotionProductId =
+    promotionProduct?._id != null ? String(promotionProduct._id) : null;
 
   return {
     catalogNotice,
@@ -527,7 +564,8 @@ export const useMyProductsPageActions = () => {
     manageErrorMessage,
     isPromotionSubmitting: requestPromotionMutation.isPending,
     isAvailabilityTogglePending:
-      promotionProductId != null && togglingAvailabilityProductId === promotionProductId,
+      promotionProductId != null &&
+      togglingAvailabilityProductId === promotionProductId,
     isAuctionTogglePending:
       promotionProductId != null && togglingAuctionProductId === promotionProductId,
     isOriginalityTogglePending:

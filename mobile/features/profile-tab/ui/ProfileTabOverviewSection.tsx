@@ -19,7 +19,9 @@ type ProfileTabOverviewSectionProps = {
   onEditPress: () => void;
 };
 
-export const ProfileTabOverviewSection = ({ onEditPress }: ProfileTabOverviewSectionProps) => {
+export const ProfileTabOverviewSection = ({
+  onEditPress,
+}: ProfileTabOverviewSectionProps) => {
   const styles = useProfileOverviewSectionStyles();
   const theme = useAppTheme();
   const router = useRouter();
@@ -63,7 +65,10 @@ export const ProfileTabOverviewSection = ({ onEditPress }: ProfileTabOverviewSec
               pressed ? styles.storefrontBtnPressed : null,
             ]}
             onPress={() =>
-              router.push({ pathname: "/seller/[userId]", params: { userId: sellerId } })
+              router.push({
+                pathname: "/seller/[userId]",
+                params: { userId: sellerId },
+              })
             }
             accessibilityRole="button"
             accessibilityLabel={MY_PROFILE_PAGE_UI.MY_STOREFRONT}

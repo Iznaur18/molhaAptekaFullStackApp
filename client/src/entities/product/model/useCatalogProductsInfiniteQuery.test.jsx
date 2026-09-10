@@ -20,7 +20,8 @@ vi.mock("../../../shared/lib/useInfiniteScrollSentinel.js", () => ({
   useInfiniteScrollSentinel: () => {},
 }));
 
-const { useCatalogProductsInfiniteQuery } = await import("./useCatalogProductsInfiniteQuery.js");
+const { useCatalogProductsInfiniteQuery } =
+  await import("./useCatalogProductsInfiniteQuery.js");
 
 function createQueryWrapper(queryClient) {
   return function QueryWrapper({ children }) {

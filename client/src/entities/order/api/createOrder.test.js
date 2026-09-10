@@ -55,7 +55,9 @@ describe("createOrder", () => {
   });
 
   it("throws invalid response on broken envelope", async () => {
-    postMock.mockResolvedValue({ data: { success: true, data: { order: { _id: "x" } } } });
+    postMock.mockResolvedValue({
+      data: { success: true, data: { order: { _id: "x" } } },
+    });
 
     await expect(
       createOrder({

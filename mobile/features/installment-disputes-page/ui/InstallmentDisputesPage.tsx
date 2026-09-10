@@ -64,8 +64,12 @@ export const InstallmentDisputesPage = () => {
 
   const syncStaffQueueCaches = useCallback(async () => {
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: installmentQueryKeys.disputesPending() }),
-      queryClient.invalidateQueries({ queryKey: installmentQueryKeys.disputesPendingCount() }),
+      queryClient.invalidateQueries({
+        queryKey: installmentQueryKeys.disputesPending(),
+      }),
+      queryClient.invalidateQueries({
+        queryKey: installmentQueryKeys.disputesPendingCount(),
+      }),
       queryClient.invalidateQueries({
         queryKey: [...staffBadgeQueryKeys.all, "installment-disputes"],
       }),
@@ -135,7 +139,10 @@ export const InstallmentDisputesPage = () => {
             <InstallmentDisputesPageToolbar disputesCount={0} />
           </View>
           <ScreenErrorState
-            message={formatApiErrorMessage(disputesQuery.error, INSTALLMENT_UI.ERROR_GENERIC)}
+            message={formatApiErrorMessage(
+              disputesQuery.error,
+              INSTALLMENT_UI.ERROR_GENERIC,
+            )}
             onRetry={() => disputesQuery.refetch()}
           />
         </View>

@@ -87,7 +87,8 @@ export const resolveProductCardImageBadgeOverlay = (c: ThemeColors) =>
 export const PRODUCT_CARD_BADGE_COLORS = resolveProductCardBadgeColors(izColors);
 
 /** @deprecated light snapshot — prefer resolve* + theme */
-export const PRODUCT_CARD_IMAGE_BADGE_OVERLAY = resolveProductCardImageBadgeOverlay(izColors);
+export const PRODUCT_CARD_IMAGE_BADGE_OVERLAY =
+  resolveProductCardImageBadgeOverlay(izColors);
 
 /**
  * Компенсация image bleed (`marginHorizontal: -contentInsetX`): overlay с left:0

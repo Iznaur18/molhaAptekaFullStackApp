@@ -1,13 +1,13 @@
-import {
-  DEFAULT_VIEWER_REGION_CODE,
-  isRuRegionCode,
-} from "@molha/api-contract";
+import { DEFAULT_VIEWER_REGION_CODE, isRuRegionCode } from "@molha/api-contract";
 
 import {
   RAFFLE_PRIZE_MEDIA_TYPE_IMAGE,
   RAFFLE_PRIZE_MEDIA_TYPE_VIDEO,
 } from "@/entities/raffle/lib/raffleConstants";
-import { DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS, getRafflePrizeImageFocus } from "@/entities/raffle/lib/rafflePrizeImageFocus";
+import {
+  DEFAULT_RAFFLE_PRIZE_IMAGE_FOCUS,
+  getRafflePrizeImageFocus,
+} from "@/entities/raffle/lib/rafflePrizeImageFocus";
 import type { RaffleFromApi } from "@/entities/raffle/model/types";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 
@@ -49,7 +49,8 @@ export const formFromRaffle = (raffle: RaffleFromApi): CreateRaffleFormState => 
     raffle.prizeMediaType === RAFFLE_PRIZE_MEDIA_TYPE_VIDEO
       ? RAFFLE_PRIZE_MEDIA_TYPE_VIDEO
       : RAFFLE_PRIZE_MEDIA_TYPE_IMAGE;
-  const regionRaw = typeof raffle.regionCode === "string" ? raffle.regionCode.trim() : "";
+  const regionRaw =
+    typeof raffle.regionCode === "string" ? raffle.regionCode.trim() : "";
 
   return {
     title: raffle.title ?? "",
@@ -86,7 +87,9 @@ export const isCreateRaffleFormDirty = (form: CreateRaffleFormState): boolean =>
   form.prizeMediaType !== INITIAL_CREATE_RAFFLE_FORM.prizeMediaType ||
   (Boolean(form.regionCode) && form.regionCode !== DEFAULT_VIEWER_REGION_CODE);
 
-export const validateCreateRaffleForm = (form: CreateRaffleFormState): string | null => {
+export const validateCreateRaffleForm = (
+  form: CreateRaffleFormState,
+): string | null => {
   for (const stepId of CREATE_RAFFLE_WIZARD_STEPS) {
     const stepError = validateCreateRaffleFormStep(stepId, form);
     if (stepError) {

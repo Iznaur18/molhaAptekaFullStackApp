@@ -122,9 +122,7 @@ export function SearchSynonymsAdminPage() {
           categories: editCategories,
         },
       });
-      updateRows((prev) =>
-        prev.map((row) => (row._id === synonymId ? updated : row)),
-      );
+      updateRows((prev) => prev.map((row) => (row._id === synonymId ? updated : row)));
       cancelEdit();
     } catch (e) {
       setActionError(

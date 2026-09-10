@@ -21,67 +21,65 @@ type HomeFeedHeaderProps = {
   onOpenCuratedCategory: (category: HomeCuratedCategory) => void;
 };
 
-export const HomeFeedHeader = memo(({
-  enabled,
-  showCuratedLists,
-  onOpenCuratedCategory,
-}: HomeFeedHeaderProps) => {
-  const queryClient = useQueryClient();
-  const { viewerRegionCode } = useViewerRegion();
-  const sessionQuery = useAuthSessionQuery();
-  const storiesQuery = useUserStoriesFeedQuery(enabled);
-  const curatedQuery = useHomeCuratedProductListsQuery({
-    enabled: enabled && showCuratedLists,
-    regionCode: viewerRegionCode,
-  });
-  const curatedCategoriesQuery = useHomeCuratedCategoryListsQuery({
-    enabled: enabled && showCuratedLists,
-    regionCode: viewerRegionCode,
-  });
-  const rafflesQuery = useFeaturedRafflesQuery({
-    enabled,
-    regionCode: viewerRegionCode,
-  });
+export const HomeFeedHeader = memo(
+  ({ enabled, showCuratedLists, onOpenCuratedCategory }: HomeFeedHeaderProps) => {
+    const queryClient = useQueryClient();
+    const { viewerRegionCode } = useViewerRegion();
+    const sessionQuery = useAuthSessionQuery();
+    const storiesQuery = useUserStoriesFeedQuery(enabled);
+    const curatedQuery = useHomeCuratedProductListsQuery({
+      enabled: enabled && showCuratedLists,
+      regionCode: viewerRegionCode,
+    });
+    const curatedCategoriesQuery = useHomeCuratedCategoryListsQuery({
+      enabled: enabled && showCuratedLists,
+      regionCode: viewerRegionCode,
+    });
+    const rafflesQuery = useFeaturedRafflesQuery({
+      enabled,
+      regionCode: viewerRegionCode,
+    });
 
-  const feed = storiesQuery.data;
-  const isAuthorized = sessionQuery.data?.user != null;
-  const currentUserId =
-    sessionQuery.data?.user?._id != null ? String(sessionQuery.data.user._id) : null;
+    const feed = storiesQuery.data;
+    const isAuthorized = sessionQuery.data?.user != null;
+    const currentUserId =
+      sessionQuery.data?.user?._id != null ? String(sessionQuery.data.user._id) : null;
 
-  const handleStoriesChanged = useCallback(() => {
-    void queryClient.invalidateQueries({ queryKey: userStoriesQueryKeys.all });
-  }, [queryClient]);
+    const handleStoriesChanged = useCallback(() => {
+      void queryClient.invalidateQueries({ queryKey: userStoriesQueryKeys.all });
+    }, [queryClient]);
 
-  if (!enabled) {
-    return null;
-  }
+    if (!enabled) {
+      return null;
+    }
 
-  return (
-    <>
-      <HomeFeaturedRafflesSection raffles={rafflesQuery.data ?? []} />
-      <UserStoriesStrip
-        rings={feed?.rings ?? []}
-        showStrip={feed?.showStrip !== false}
-        canPublish={feed?.canPublish === true}
-        isAuthorized={isAuthorized}
-        currentUserId={currentUserId}
-        onPublished={handleStoriesChanged}
-      />
-      {showCuratedLists ? (
-        curatedQuery.isPending ? (
-          <HomeCuratedListsSectionSkeleton />
-        ) : (
-          <HomeCuratedListsSection lists={curatedQuery.data ?? []} />
-        )
-      ) : null}
-      {showCuratedLists && !curatedCategoriesQuery.isPending ? (
-        <HomeCuratedCategoryListsSection
-          lists={curatedCategoriesQuery.data ?? []}
-          onOpenCategory={onOpenCuratedCategory}
+    return (
+      <>
+        <HomeFeaturedRafflesSection raffles={rafflesQuery.data ?? []} />
+        <UserStoriesStrip
+          rings={feed?.rings ?? []}
+          showStrip={feed?.showStrip !== false}
+          canPublish={feed?.canPublish === true}
+          isAuthorized={isAuthorized}
+          currentUserId={currentUserId}
+          onPublished={handleStoriesChanged}
         />
-      ) : null}
-    </>
-  );
-});
+        {showCuratedLists ? (
+          curatedQuery.isPending ? (
+            <HomeCuratedListsSectionSkeleton />
+          ) : (
+            <HomeCuratedListsSection lists={curatedQuery.data ?? []} />
+          )
+        ) : null}
+        {showCuratedLists && !curatedCategoriesQuery.isPending ? (
+          <HomeCuratedCategoryListsSection
+            lists={curatedCategoriesQuery.data ?? []}
+            onOpenCategory={onOpenCuratedCategory}
+          />
+        ) : null}
+      </>
+    );
+  },
+);
 
 HomeFeedHeader.displayName = "HomeFeedHeader";

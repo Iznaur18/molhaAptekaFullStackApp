@@ -195,9 +195,7 @@ export function renderProfileTabPanel(mainView, props) {
           isAuthorized={isAuthorized}
           currentUserId={currentUserId}
           totalSalesCount={
-            myProfilePage.phase === "success"
-              ? myProfilePage.user?.totalSalesCount
-              : 0
+            myProfilePage.phase === "success" ? myProfilePage.user?.totalSalesCount : 0
           }
           onSellerNameClick={onSellerNameClick}
           onQueueChanged={refreshUserProfileActionBadgeCounts}
@@ -304,15 +302,9 @@ export function renderProfileTabPanel(mainView, props) {
     case "courier-overview":
       return <LazyCourierOverviewPage onUserClick={onSellerNameClick} />;
     case "safe-deal-moderation":
-      return (
-        <LazySafeDealModerationPage onApplicantClick={onSellerNameClick} />
-      );
+      return <LazySafeDealModerationPage onApplicantClick={onSellerNameClick} />;
     case "courier-moderation":
-      return (
-        <LazyCourierModerationPage
-          onApplicantClick={onSellerNameClick}
-        />
-      );
+      return <LazyCourierModerationPage onApplicantClick={onSellerNameClick} />;
     case "installment-disputes":
       return (
         <LazyInstallmentDisputesPage

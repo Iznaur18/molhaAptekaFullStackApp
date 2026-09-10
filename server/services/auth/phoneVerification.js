@@ -36,7 +36,10 @@ export async function deliverPhoneVerificationSms({ phoneNumber, code }) {
     await sendSmspilotSms({ to: phoneNumber, text });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    if (message === "SMS_DELIVERY_UNAVAILABLE" || message.startsWith("SMS_DELIVERY_UNAVAILABLE")) {
+    if (
+      message === "SMS_DELIVERY_UNAVAILABLE" ||
+      message.startsWith("SMS_DELIVERY_UNAVAILABLE")
+    ) {
       const detail =
         error?.smspilotDescription ||
         (message.includes(": ") ? message.slice(message.indexOf(": ") + 2) : "");

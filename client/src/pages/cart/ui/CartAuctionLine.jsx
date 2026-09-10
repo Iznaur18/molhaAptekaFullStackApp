@@ -24,9 +24,7 @@ export function CartAuctionLine({ bid, onCheckout }) {
 
   const resolvedImage = resolveProductImageUrl(bid.product);
   const imageUrl =
-    imageFailed || !resolvedImage
-      ? PRODUCT_IMAGE_PLACEHOLDER_URL
-      : resolvedImage;
+    imageFailed || !resolvedImage ? PRODUCT_IMAGE_PLACEHOLDER_URL : resolvedImage;
   const productName = bid.product?.productName ?? "";
 
   const handleRemove = async () => {

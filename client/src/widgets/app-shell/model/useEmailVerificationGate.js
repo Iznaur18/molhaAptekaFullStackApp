@@ -14,7 +14,8 @@ export function useEmailVerificationGate({
   isPhoneVerified,
   handleLogout,
 }) {
-  const [isEmailVerificationModalOpen, setIsEmailVerificationModalOpen] = useState(false);
+  const [isEmailVerificationModalOpen, setIsEmailVerificationModalOpen] =
+    useState(false);
 
   const needsEmailVerification =
     Boolean(String(currentUserEmail ?? "").trim()) && isEmailVerified !== true;

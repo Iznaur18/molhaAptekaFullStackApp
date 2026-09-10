@@ -165,9 +165,9 @@ describe("кнопка «Отгрузить»", () => {
 
     const shipmentRow = container.querySelector(".order-card__shipment-row");
     const itemRow = container.querySelector(".order-card__item-actions-row");
-    expect(
-      shipmentRow?.querySelector("button")?.textContent,
-    ).toContain(ORDER_CARD_UI.ACTION_SHIPPED);
+    expect(shipmentRow?.querySelector("button")?.textContent).toContain(
+      ORDER_CARD_UI.ACTION_SHIPPED,
+    );
     expect(itemRow?.textContent ?? "").not.toContain(ORDER_CARD_UI.ACTION_SHIPPED);
   });
 
@@ -220,9 +220,7 @@ describe("кнопка «Отгрузить»", () => {
     expect(
       screen.queryByRole("button", { name: ORDER_CARD_UI.ACTION_CONFIRM }),
     ).toBeNull();
-    expect(
-      screen.getByText(ORDER_CARD_UI.COURIER_CONFIRM_VIA_CODE_HINT),
-    ).toBeTruthy();
+    expect(screen.getByText(ORDER_CARD_UI.COURIER_CONFIRM_VIA_CODE_HINT)).toBeTruthy();
   });
 
   it("при поиске курьера Gitorg показывает «Ищем курьера»", () => {
@@ -239,7 +237,9 @@ describe("кнопка «Отгрузить»", () => {
       />,
     );
 
-    expect(screen.getAllByText(ORDER_CARD_UI.AWAITING_COURIER).length).toBeGreaterThanOrEqual(2);
+    expect(
+      screen.getAllByText(ORDER_CARD_UI.AWAITING_COURIER).length,
+    ).toBeGreaterThanOrEqual(2);
     expect(screen.getByText(ORDER_CARD_UI.AWAITING_COURIER_BUYER_HINT)).toBeTruthy();
   });
 
@@ -263,7 +263,9 @@ describe("кнопка «Отгрузить»", () => {
 
 describe("«Отгрузить» — последняя ступень, а не ярлык", () => {
   it("нет на «Принят»: сначала сборка", () => {
-    renderCard(makeOrder({ method: "delivery", carrier: "seller", status: "accepted" }));
+    renderCard(
+      makeOrder({ method: "delivery", carrier: "seller", status: "accepted" }),
+    );
 
     expect(shipButton()).toBeNull();
   });
@@ -285,10 +287,14 @@ describe("«Отгрузить» — последняя ступень, а не 
   });
 
   it("на ранних ступенях остаётся одно действие вперёд — ступень сборки", () => {
-    renderCard(makeOrder({ method: "delivery", carrier: "seller", status: "accepted" }));
+    renderCard(
+      makeOrder({ method: "delivery", carrier: "seller", status: "accepted" }),
+    );
 
     // Ради этого всё и затевалось: два «вперёд» рядом сбивали продавца.
     expect(shipButton()).toBeNull();
-    expect(screen.queryByRole("button", { name: ORDER_CARD_UI.ACTION_CANCEL })).not.toBeNull();
+    expect(
+      screen.queryByRole("button", { name: ORDER_CARD_UI.ACTION_CANCEL }),
+    ).not.toBeNull();
   });
 });

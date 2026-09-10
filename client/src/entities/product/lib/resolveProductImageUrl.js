@@ -14,9 +14,8 @@ export function resolveProductImageUrl(product) {
     return "";
   }
 
-  const source = /** @type {{ productImageUrls?: unknown; productImageUrl?: unknown }} */ (
-    product
-  );
+  const source =
+    /** @type {{ productImageUrls?: unknown; productImageUrl?: unknown }} */ (product);
   const fromArray = Array.isArray(source.productImageUrls)
     ? source.productImageUrls
     : [];

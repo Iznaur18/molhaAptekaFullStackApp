@@ -29,7 +29,10 @@ test("mobile ProductEditManageSection wires installment manage toggle", async ()
 
 test("mobile entity mirrors manage toggle display API", async () => {
   const fetchSource = readFileSync(
-    join(root, "entities/product-manage-toggle-display/api/fetchProductManageToggleDisplays.ts"),
+    join(
+      root,
+      "entities/product-manage-toggle-display/api/fetchProductManageToggleDisplays.ts",
+    ),
     "utf8",
   );
 

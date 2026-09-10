@@ -11,7 +11,9 @@ export const resolveProductImageUrls = (product: unknown): string[] => {
     productImageUrl?: unknown;
   };
 
-  const fromArray = Array.isArray(source.productImageUrls) ? source.productImageUrls : [];
+  const fromArray = Array.isArray(source.productImageUrls)
+    ? source.productImageUrls
+    : [];
   const cleaned = fromArray
     .map((value) => resolveUploadedMediaUrl(String(value ?? "").trim()))
     .filter((url) => isDisplayableMediaUrl(url))

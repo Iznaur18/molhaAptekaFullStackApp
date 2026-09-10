@@ -103,10 +103,7 @@ export function ProductBadgeExplainAdminCard({
         <h3 className="product-badge-explain-admin-card__title">{title}</h3>
         <p className="product-badge-explain-admin-card__hint">{hint}</p>
       </header>
-      <form
-        className="product-badge-explain-admin-card__form"
-        onSubmit={handleSave}
-      >
+      <form className="product-badge-explain-admin-card__form" onSubmit={handleSave}>
         <ImageUrlField
           label={PRODUCT_BADGE_EXPLAIN_ADMIN_UI.LABEL_IMAGE}
           value={draftImageUrl}

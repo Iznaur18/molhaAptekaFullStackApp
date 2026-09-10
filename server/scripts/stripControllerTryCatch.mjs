@@ -6,7 +6,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "controllers");
+const root = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "..",
+  "controllers",
+);
 
 const SKIP = new Set([
   "index.js",
@@ -123,7 +127,10 @@ function cleanupImports(source) {
     source = source.replace(/import \{ errorRes \} from "[^"]+";\n/g, "");
   }
   if (!source.includes("AppError") && source.includes("AppError.js")) {
-    source = source.replace(/\nimport \{ AppError \} from "[^"]+AppError\.js";\n/g, "\n");
+    source = source.replace(
+      /\nimport \{ AppError \} from "[^"]+AppError\.js";\n/g,
+      "\n",
+    );
   }
   return source;
 }

@@ -9,8 +9,6 @@ describe("groupProfileRows", () => {
       { id: "userName", label: "Имя", value: "tester" },
     ]);
 
-    expect(sections.find((section) => section.id === "stats")?.title).toBe(
-      "Основное",
-    );
+    expect(sections.find((section) => section.id === "stats")?.title).toBe("Основное");
   });
 });

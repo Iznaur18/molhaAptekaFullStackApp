@@ -25,10 +25,7 @@ test("isCorrelationWorthyApiFailure: 5xx and money/auth paths", () => {
   assert.equal(isCorrelationWorthyApiFailure("/product", 404), false);
   assert.equal(isCorrelationWorthyApiFailure("/auth/login", 401), true);
   assert.equal(isCorrelationWorthyApiFailure("/order", 400), true);
-  assert.equal(
-    isCorrelationWorthyApiFailure("/user/me/premium/purchase", 402),
-    true,
-  );
+  assert.equal(isCorrelationWorthyApiFailure("/user/me/premium/purchase", 402), true);
 });
 
 test("REQUEST_ID_HEADER constant", () => {

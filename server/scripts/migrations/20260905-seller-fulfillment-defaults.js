@@ -149,7 +149,11 @@ export async function up({ db, isApply }) {
     for (const [signature, count] of entry.counts) {
       // При равенстве побеждает лексикографически меньшая подпись: результат
       // миграции не должен зависеть от порядка обхода курсора.
-      if (!best || count > best.count || (count === best.count && signature < best.signature)) {
+      if (
+        !best ||
+        count > best.count ||
+        (count === best.count && signature < best.signature)
+      ) {
         best = { signature, count, sample: entry.samples.get(signature) };
       }
     }
@@ -176,7 +180,9 @@ export async function up({ db, isApply }) {
     userOps.push({
       updateOne: {
         filter: { _id: winner.sample.productSeller },
-        update: { $set: { sellerFulfillmentDefaults: sellerDefaultsFromProduct(winner.sample) } },
+        update: {
+          $set: { sellerFulfillmentDefaults: sellerDefaultsFromProduct(winner.sample) },
+        },
       },
     });
     if (userOps.length >= BULK_BATCH_SIZE) {

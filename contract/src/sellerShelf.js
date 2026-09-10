@@ -14,21 +14,12 @@ export const sellerShelfSellerIdParamsSchema = z.object({
 });
 
 export const createSellerShelfBodySchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1)
-    .max(SELLER_SHELF_NAME_MAX_CHARS),
+  name: z.string().trim().min(1).max(SELLER_SHELF_NAME_MAX_CHARS),
 });
 
 export const patchSellerShelfBodySchema = z
   .object({
-    name: z
-      .string()
-      .trim()
-      .min(1)
-      .max(SELLER_SHELF_NAME_MAX_CHARS)
-      .optional(),
+    name: z.string().trim().min(1).max(SELLER_SHELF_NAME_MAX_CHARS).optional(),
     sortOrder: z.coerce.number().int().min(0).max(1000).optional(),
   })
   .refine((body) => body.name != null || body.sortOrder != null, {

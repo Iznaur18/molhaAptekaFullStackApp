@@ -4,9 +4,13 @@ import { formatApiErrorMessage } from "@/shared/lib";
 
 import type { UserProfileThumbItem } from "../model/userProfileThumbTypes";
 
-export const fetchUserPurchases = async (userId: string): Promise<UserProfileThumbItem[]> => {
+export const fetchUserPurchases = async (
+  userId: string,
+): Promise<UserProfileThumbItem[]> => {
   try {
-    const { data } = await apiClient.get(`/user/${encodeURIComponent(userId)}/purchases`);
+    const { data } = await apiClient.get(
+      `/user/${encodeURIComponent(userId)}/purchases`,
+    );
 
     if (
       !data ||
@@ -23,6 +27,8 @@ export const fetchUserPurchases = async (userId: string): Promise<UserProfileThu
 
     return (data as { data: { items: UserProfileThumbItem[] } }).data.items;
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_USER_PURCHASES_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_USER_PURCHASES_FALLBACK),
+    );
   }
 };

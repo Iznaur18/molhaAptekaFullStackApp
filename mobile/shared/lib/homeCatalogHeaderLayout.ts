@@ -127,7 +127,8 @@ export const resolveHomeCatalogUsersStretchMenuHeight = (itemCount: number): num
 export const HOME_CATALOG_HEADER_USERS_MENU_GAP = 4;
 
 /** @deprecated */
-export const HOME_CATALOG_HEADER_USERS_MENU_MIN_WIDTH = HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE;
+export const HOME_CATALOG_HEADER_USERS_MENU_MIN_WIDTH =
+  HOME_CATALOG_HEADER_CIRCLE_BUTTON_SIZE;
 
 /** @deprecated */
 export const HOME_CATALOG_HEADER_USERS_MENU_BORDER_RADIUS = 8;
@@ -185,7 +186,9 @@ export const resolveHomeCatalogUsersMenuPortalTop = (
   embeddedInForegroundSheet = false,
 ): number =>
   embeddedInForegroundSheet
-    ? safeAreaTop + HOME_CATALOG_HEADER_STICKY_TOP_OFFSET + HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING.top
+    ? safeAreaTop +
+      HOME_CATALOG_HEADER_STICKY_TOP_OFFSET +
+      HOME_CATALOG_HEADER_PANEL_FLOATING_PADDING.top
     : resolveHomeCatalogHeaderPanelPaddingTop(safeAreaTop);
 
 const isStaleStickyMenuAnchorY = (anchorY: number, fallbackTop: number): boolean =>

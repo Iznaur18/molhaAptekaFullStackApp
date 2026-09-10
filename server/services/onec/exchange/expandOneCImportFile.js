@@ -142,11 +142,7 @@ export async function listFilesRecursive(dir) {
  * @param {{ filePath: string; filename: string; sessionDir: string }} params
  * @returns {Promise<{ xmlFiles: Array<{ filePath: string; filename: string; kind: string }>; rootDir: string }>}
  */
-export async function expandOneCImportFile({
-  filePath,
-  filename,
-  sessionDir,
-}) {
+export async function expandOneCImportFile({ filePath, filename, sessionDir }) {
   const info = await stat(filePath).catch(() => null);
   if (!info || !info.isFile() || info.size === 0) {
     throw new AppError(400, `Файл ${filename} не получен или пуст`);
@@ -184,7 +180,11 @@ export async function expandOneCImportFile({
   // Каталог обязан разобраться раньше предложений: цены и остатки ложатся
   // на карточки, которых до разбора `import.xml` ещё нет.
   xmlFiles.sort((a, b) =>
-    a.kind === b.kind ? a.filename.localeCompare(b.filename) : a.kind === ONEC_IMPORT_KIND_CATALOG ? -1 : 1,
+    a.kind === b.kind
+      ? a.filename.localeCompare(b.filename)
+      : a.kind === ONEC_IMPORT_KIND_CATALOG
+        ? -1
+        : 1,
   );
 
   return { rootDir: targetDir, xmlFiles };

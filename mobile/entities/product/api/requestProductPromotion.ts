@@ -13,7 +13,10 @@ export const requestProductPromotion = async (
   body: RequestProductPromotionBody,
 ) => {
   try {
-    const { data } = await apiClient.post(`/product/${productId}/promotions/request`, body);
+    const { data } = await apiClient.post(
+      `/product/${productId}/promotions/request`,
+      body,
+    );
     if (!data?.success || !data.data?.promotion) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

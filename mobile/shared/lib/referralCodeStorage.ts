@@ -76,9 +76,7 @@ export const clearPersistedReferralCode = async (): Promise<void> => {
 export const captureReferralCodeFromUrl = async (url: string): Promise<string> => {
   try {
     const parsed = new URL(url);
-    const code = normalizeReferralCode(
-      parsed.searchParams.get(REFERRAL_QUERY_PARAM),
-    );
+    const code = normalizeReferralCode(parsed.searchParams.get(REFERRAL_QUERY_PARAM));
     if (code) {
       await persistReferralCode(code);
     }

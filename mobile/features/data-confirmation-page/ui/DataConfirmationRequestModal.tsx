@@ -84,7 +84,11 @@ export const DataConfirmationRequestModal = ({
   const isSubmitting = submitMutation.isPending || uploadMutation.isPending;
 
   const status = statusQuery.data;
-  const phase = statusQuery.isPending ? "loading" : statusQuery.isError ? "error" : "ready";
+  const phase = statusQuery.isPending
+    ? "loading"
+    : statusQuery.isError
+      ? "error"
+      : "ready";
   const fetchError = formatApiErrorMessage(
     statusQuery.error,
     USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.FETCH_FALLBACK,
@@ -110,7 +114,10 @@ export const DataConfirmationRequestModal = ({
     !isUserDataConfirmed && requestStatus !== USER_DATA_CONFIRMATION_STATUS_PENDING;
   const displayError = errorMessage || (phase === "error" ? fetchError : "");
 
-  const updateField = <K extends keyof PassportSnapshot>(key: K, value: PassportSnapshot[K]) => {
+  const updateField = <K extends keyof PassportSnapshot>(
+    key: K,
+    value: PassportSnapshot[K],
+  ) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -189,7 +196,10 @@ export const DataConfirmationRequestModal = ({
       onClose();
     } catch (error) {
       setErrorMessage(
-        formatApiErrorMessage(error, DATA_CONFIRMATION_MODAL_UI.ERROR_PASSPORT_SELFIE_UPLOAD),
+        formatApiErrorMessage(
+          error,
+          DATA_CONFIRMATION_MODAL_UI.ERROR_PASSPORT_SELFIE_UPLOAD,
+        ),
       );
     }
   };
@@ -221,7 +231,9 @@ export const DataConfirmationRequestModal = ({
             </View>
 
             {phase === "loading" ? (
-              <ScreenLoadingState message={USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.LOADING} />
+              <ScreenLoadingState
+                message={USER_DATA_CONFIRMATION_PROFILE_PAGE_UI.LOADING}
+              />
             ) : null}
 
             {phase === "ready" && isUserDataConfirmed ? (
@@ -230,13 +242,15 @@ export const DataConfirmationRequestModal = ({
               </Text>
             ) : null}
 
-            {phase === "ready" && requestStatus === USER_DATA_CONFIRMATION_STATUS_PENDING ? (
+            {phase === "ready" &&
+            requestStatus === USER_DATA_CONFIRMATION_STATUS_PENDING ? (
               <Text style={[fieldStyles.statusPending, styles.statusPadding]}>
                 {DATA_CONFIRMATION_MODAL_UI.STATUS_PENDING}
               </Text>
             ) : null}
 
-            {phase === "ready" && requestStatus === USER_DATA_CONFIRMATION_STATUS_REJECTED ? (
+            {phase === "ready" &&
+            requestStatus === USER_DATA_CONFIRMATION_STATUS_REJECTED ? (
               <View style={styles.rejectBlock}>
                 <Text style={fieldStyles.statusRejected}>
                   {DATA_CONFIRMATION_MODAL_UI.STATUS_REJECTED_TITLE}
@@ -332,9 +346,14 @@ export const DataConfirmationRequestModal = ({
                       label={DATA_CONFIRMATION_MODAL_UI.LABEL_DEPARTMENT_CODE}
                       value={form.departmentCode}
                       onChangeText={(value) =>
-                        updateField("departmentCode", maskPassportDepartmentCodeInput(value))
+                        updateField(
+                          "departmentCode",
+                          maskPassportDepartmentCodeInput(value),
+                        )
                       }
-                      placeholder={DATA_CONFIRMATION_MODAL_UI.PLACEHOLDER_DEPARTMENT_CODE}
+                      placeholder={
+                        DATA_CONFIRMATION_MODAL_UI.PLACEHOLDER_DEPARTMENT_CODE
+                      }
                       keyboardType="number-pad"
                       maxLength={7}
                     />
@@ -355,14 +374,18 @@ export const DataConfirmationRequestModal = ({
                       onPress={() => void handlePickSelfie()}
                       disabled={isSubmitting}
                     />
-                    {selfieFile ? <Text style={styles.fileName}>{selfieFile.name}</Text> : null}
+                    {selfieFile ? (
+                      <Text style={styles.fileName}>{selfieFile.name}</Text>
+                    ) : null}
                     {selfieFile ? (
                       <Image source={{ uri: selfieFile.uri }} style={styles.preview} />
                     ) : null}
                   </View>
                 ) : null}
 
-                {displayError ? <Text style={fieldStyles.error}>{displayError}</Text> : null}
+                {displayError ? (
+                  <Text style={fieldStyles.error}>{displayError}</Text>
+                ) : null}
 
                 <View style={styles.stepActions}>
                   {step > PASSPORT_FORM_STEP_IDENTITY ? (

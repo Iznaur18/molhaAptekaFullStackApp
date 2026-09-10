@@ -82,11 +82,16 @@ export const WishlistToggleButton = ({
         isHeroInline ? heroChromeStyles.actionButton : styles.root,
         variant === "card" && styles.card,
         variant === "detailHero" && styles.detailHero,
-        active && (isHeroInline ? heroChromeStyles.wishlistActive : { backgroundColor: theme.colors.danger }),
+        active &&
+          (isHeroInline
+            ? heroChromeStyles.wishlistActive
+            : { backgroundColor: theme.colors.danger }),
       ]}
       onPress={handlePress}
       accessibilityRole="button"
-      accessibilityLabel={active ? WISHLIST_TOGGLE_UI.REMOVE_ARIA : WISHLIST_TOGGLE_UI.ADD_ARIA}
+      accessibilityLabel={
+        active ? WISHLIST_TOGGLE_UI.REMOVE_ARIA : WISHLIST_TOGGLE_UI.ADD_ARIA
+      }
       accessibilityState={{ selected: active }}
     >
       <MaterialIcons

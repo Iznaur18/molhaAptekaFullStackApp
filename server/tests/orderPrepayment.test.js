@@ -102,10 +102,7 @@ describe("предоплата заказа картой", () => {
   });
 
   it("свой продавец проходит, чужой — нет", () => {
-    assert.equal(
-      areAllSellersPlatformOwned([{ sellerId: PLATFORM_SELLER_ID }]),
-      true,
-    );
+    assert.equal(areAllSellersPlatformOwned([{ sellerId: PLATFORM_SELLER_ID }]), true);
     assert.equal(
       areAllSellersPlatformOwned([
         { sellerId: PLATFORM_SELLER_ID },
@@ -300,7 +297,11 @@ describe("чек по заказу", () => {
     });
 
     const body = JSON.parse(fetchCalls[0].init.body);
-    assert.equal(body.receipt.items[0].amount.value, "750.00", "нулевой цены быть не должно");
+    assert.equal(
+      body.receipt.items[0].amount.value,
+      "750.00",
+      "нулевой цены быть не должно",
+    );
     assert.equal(body.receipt.items[0].quantity, "2.00");
   });
 
@@ -333,7 +334,11 @@ describe("чек по заказу", () => {
     });
 
     const body = JSON.parse(fetchCalls[0].init.body);
-    assert.equal(body.receipt.items[0].quantity, "2.00", "бесплатная единица не оплачивается");
+    assert.equal(
+      body.receipt.items[0].quantity,
+      "2.00",
+      "бесплатная единица не оплачивается",
+    );
     assert.equal(body.amount.value, "200.00");
   });
 

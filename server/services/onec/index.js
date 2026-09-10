@@ -1,6 +1,4 @@
-export {
-  assertSellerManualProductCreateAllowed,
-} from "./assertSellerManualProductCreateAllowed.js";
+export { assertSellerManualProductCreateAllowed } from "./assertSellerManualProductCreateAllowed.js";
 export {
   enqueueOneCOrderPushesForOrder,
   pushPendingSellerOrders,
@@ -15,10 +13,7 @@ export {
 } from "./onecSettings.js";
 export { processOneCCronTasks, runSellerOneCSync } from "./processOneCCronTasks.js";
 export { syncSellerNomenclature } from "./syncSellerNomenclature.js";
-export {
-  normalizeNomenclatureItems,
-  normalizeOneCBaseUrl,
-} from "./onecHttpClient.js";
+export { normalizeNomenclatureItems, normalizeOneCBaseUrl } from "./onecHttpClient.js";
 export {
   maskOneCApiKey,
   openOneCSecret,

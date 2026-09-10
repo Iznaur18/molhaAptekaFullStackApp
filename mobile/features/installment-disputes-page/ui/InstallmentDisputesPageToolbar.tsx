@@ -16,7 +16,9 @@ export const InstallmentDisputesPageToolbar = ({
     <View style={styles.toolbar}>
       <View style={styles.toolbarHead}>
         <Text style={styles.toolbarHeading}>{INSTALLMENT_UI.DISPUTES_PAGE_TITLE}</Text>
-        <Text style={styles.disputesCount}>{INSTALLMENT_UI.COUNT_DISPUTES(disputesCount)}</Text>
+        <Text style={styles.disputesCount}>
+          {INSTALLMENT_UI.COUNT_DISPUTES(disputesCount)}
+        </Text>
       </View>
     </View>
   );

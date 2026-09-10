@@ -9,7 +9,9 @@ export const markInAppNotificationsRead = async (): Promise<void> => {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.MARK_NOTIFICATIONS_READ_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.MARK_NOTIFICATIONS_READ_FALLBACK),
+    );
   }
 };
 

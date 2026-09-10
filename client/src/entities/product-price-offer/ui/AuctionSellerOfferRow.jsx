@@ -59,7 +59,9 @@ export function AuctionSellerOfferRow({
   const isAccepted = offer.status === PRICE_OFFER_STATUS_ACCEPTED;
   const isExpanded = !collapsible || expanded;
   const needsAttention = offerNeedsAttention(offer);
-  const collapsedPreview = !isExpanded ? resolveSellerOfferCollapsedPreview(offer) : null;
+  const collapsedPreview = !isExpanded
+    ? resolveSellerOfferCollapsedPreview(offer)
+    : null;
 
   const toggleExpanded = () => {
     onExpandedChange?.(!expanded);

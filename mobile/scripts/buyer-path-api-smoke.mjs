@@ -72,7 +72,11 @@ const run = async () => {
       `server unreachable at ${API_BASE} — start server and run e2e seed (${path.relative(SCRIPT_DIR, path.resolve(SCRIPT_DIR, "../../server/scripts/e2ePlaywrightSeed.js"))})`,
     );
   }
-  if (health.response.status !== 200 || health.body?.status !== "ok" || health.body?.mongo !== "connected") {
+  if (
+    health.response.status !== 200 ||
+    health.body?.status !== "ok" ||
+    health.body?.mongo !== "connected"
+  ) {
     fail(`GET /health: unexpected body ${JSON.stringify(health.body)}`);
   }
   ok("GET /health");
@@ -84,7 +88,8 @@ const run = async () => {
     fail("GET /product: empty products — run e2e seed");
   }
   const fixtureProduct =
-    products.find((item) => item?.productName === E2E.catalogProductName) ?? products[0];
+    products.find((item) => item?.productName === E2E.catalogProductName) ??
+    products[0];
   const productId = String(fixtureProduct._id ?? "");
   if (!productId) {
     fail("GET /product: missing product id");

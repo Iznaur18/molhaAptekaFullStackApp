@@ -9,7 +9,9 @@ import {
 
 describe("geolocationAccuracy", () => {
   it("treats coarse readings as low accuracy", () => {
-    expect(isGeolocationAccuracyLow(GEOLOCATION_LOW_ACCURACY_THRESHOLD_M + 1)).toBe(true);
+    expect(isGeolocationAccuracyLow(GEOLOCATION_LOW_ACCURACY_THRESHOLD_M + 1)).toBe(
+      true,
+    );
     expect(isGeolocationAccuracyLow(25_000)).toBe(true);
     expect(isGeolocationAccuracyLow(Number.NaN)).toBe(true);
   });

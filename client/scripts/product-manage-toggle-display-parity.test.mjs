@@ -8,7 +8,10 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 test("client buildProductManageToggleImageByVariant maps keys to variants", async () => {
   const source = readFileSync(
-    join(root, "src/entities/product-manage-toggle-display/lib/buildProductManageToggleImageByVariant.js"),
+    join(
+      root,
+      "src/entities/product-manage-toggle-display/lib/buildProductManageToggleImageByVariant.js",
+    ),
     "utf8",
   );
 
@@ -52,7 +55,10 @@ test("admin page renders four manage toggle cards", async () => {
     "utf8",
   );
   const cards = readFileSync(
-    join(root, "src/entities/product-manage-toggle-display/lib/productManageToggleAdminCards.js"),
+    join(
+      root,
+      "src/entities/product-manage-toggle-display/lib/productManageToggleAdminCards.js",
+    ),
     "utf8",
   );
 

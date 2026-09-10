@@ -10,7 +10,8 @@ export function useProductSearchSynonymAdminMutations() {
   });
 
   const patchMutation = useMutation({
-    mutationFn: ({ synonymId, body }) => patchProductSearchSynonymAdmin(synonymId, body),
+    mutationFn: ({ synonymId, body }) =>
+      patchProductSearchSynonymAdmin(synonymId, body),
   });
 
   const deleteMutation = useMutation({

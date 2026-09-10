@@ -69,7 +69,10 @@ test("gap mutators have dedicated rate limiters wired", () => {
   const user = readFileSync(path.join(root, "routes/userRouter.js"), "utf8");
   assert.match(user, /moneyMutationRateLimiter/);
 
-  const installment = readFileSync(path.join(root, "routes/installmentRouter.js"), "utf8");
+  const installment = readFileSync(
+    path.join(root, "routes/installmentRouter.js"),
+    "utf8",
+  );
   assert.match(installment, /installmentActionRateLimiter/);
 });
 

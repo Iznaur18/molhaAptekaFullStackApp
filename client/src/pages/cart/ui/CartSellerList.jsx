@@ -84,8 +84,7 @@ function CartSellerRow({ group, summary, onOpen }) {
   const avatarObjectPosition = formatProfileImageObjectPosition(
     getUserAvatarFocus(sellerForPhoto),
   );
-  const displayName =
-    group.sellerName?.trim() || CART_PAGE_UI.SECTION_SELLER_FALLBACK;
+  const displayName = group.sellerName?.trim() || CART_PAGE_UI.SECTION_SELLER_FALLBACK;
   const itemsCount = summary.selectedLines.reduce(
     (sum, line) => sum + (Number(line?.quantity) || 0),
     0,
@@ -145,9 +144,7 @@ function CartSellerRow({ group, summary, onOpen }) {
         </button>
       </div>
 
-      {group.lines.length > 0 ? (
-        <CartSellerProductThumbs lines={group.lines} />
-      ) : null}
+      {group.lines.length > 0 ? <CartSellerProductThumbs lines={group.lines} /> : null}
     </div>
   );
 }
@@ -179,11 +176,7 @@ export function CartSellerList({ entries, onOpenSeller }) {
           className="cart-seller-list__item"
           role="listitem"
         >
-          <CartSellerRow
-            group={group}
-            summary={summary}
-            onOpen={onOpenSeller}
-          />
+          <CartSellerRow group={group} summary={summary} onOpen={onOpenSeller} />
         </li>
       ))}
     </ul>

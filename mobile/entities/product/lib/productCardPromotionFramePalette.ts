@@ -23,7 +23,8 @@ export const resolveProductCardSoftElevationShadow = (c: ThemeColors) =>
   }) as const;
 
 /** @deprecated light snapshot — prefer resolveProductCardSoftElevationShadow */
-export const PRODUCT_CARD_SOFT_ELEVATION_SHADOW = resolveProductCardSoftElevationShadow(izColors);
+export const PRODUCT_CARD_SOFT_ELEVATION_SHADOW =
+  resolveProductCardSoftElevationShadow(izColors);
 
 export type ProductCardPromotionFramePalette = {
   borderWidth: number;
@@ -134,7 +135,8 @@ export const PRODUCT_CARD_PROMOTION_COMPACT_FRAME =
   resolveProductCardPromotionCompactFrame(izColors);
 
 /** @deprecated light snapshot */
-export const PRODUCT_CARD_PREMIUM_ONLY_FRAME = resolveProductCardPremiumOnlyFrame(izColors);
+export const PRODUCT_CARD_PREMIUM_ONLY_FRAME =
+  resolveProductCardPremiumOnlyFrame(izColors);
 
 /** @deprecated light snapshot */
 export const PRODUCT_CARD_PROMOTION_PREMIUM_COMPACT_FRAME =

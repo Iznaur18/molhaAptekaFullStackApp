@@ -30,9 +30,7 @@ describe("resolveCategoryDefaultCharacteristicRowsPatch", () => {
       "Цвет",
       "ОЗУ",
     ]);
-    expect(patch.productCharacteristicRows.every((row) => row.value === "")).toBe(
-      true,
-    );
+    expect(patch.productCharacteristicRows.every((row) => row.value === "")).toBe(true);
   });
 
   it("skips when already applied for the same category", () => {

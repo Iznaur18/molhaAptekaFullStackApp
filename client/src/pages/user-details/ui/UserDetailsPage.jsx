@@ -91,17 +91,14 @@ export function UserDetailsPage() {
     () => formatProfileImageObjectPosition(getUserBackgroundFocus(user)),
     [user],
   );
-  const profileBackground = user
-    ? resolveUserProfileBackgroundFromUser(user)
-    : null;
+  const profileBackground = user ? resolveUserProfileBackgroundFromUser(user) : null;
 
   const canShowBackground =
     Boolean(profileBackground) &&
     (profileBackground.kind === "preset" ||
       (profileBackground.kind === "image" && !backgroundLoadFailed));
   const showProfileBanner =
-    Boolean(user) &&
-    (canShowBackground || (Boolean(photoUrl) && !avatarLoadFailed));
+    Boolean(user) && (canShowBackground || (Boolean(photoUrl) && !avatarLoadFailed));
 
   const staffCanEditPremium =
     user != null &&
@@ -113,7 +110,10 @@ export function UserDetailsPage() {
   if (!userId) {
     return (
       <div className="user-details-page">
-        <p className="user-details-page__state user-details-page__state_error" role="alert">
+        <p
+          className="user-details-page__state user-details-page__state_error"
+          role="alert"
+        >
           {USER_DETAILS_PAGE_UI.FETCH_FALLBACK}
         </p>
       </div>
@@ -123,7 +123,9 @@ export function UserDetailsPage() {
   if (isSelf) {
     return (
       <div className="user-details-page">
-        <p className="user-details-page__state">{USER_DETAILS_PAGE_UI.SELF_REDIRECT_HINT}</p>
+        <p className="user-details-page__state">
+          {USER_DETAILS_PAGE_UI.SELF_REDIRECT_HINT}
+        </p>
       </div>
     );
   }
@@ -139,7 +141,10 @@ export function UserDetailsPage() {
         : USER_DETAILS_PAGE_UI.FETCH_FALLBACK;
     return (
       <div className="user-details-page">
-        <p className="user-details-page__state user-details-page__state_error" role="alert">
+        <p
+          className="user-details-page__state user-details-page__state_error"
+          role="alert"
+        >
           {message}
         </p>
         <button

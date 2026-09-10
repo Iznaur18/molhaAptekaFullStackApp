@@ -9,21 +9,32 @@ import { formatApiErrorMessage } from "@/shared/lib";
 
 export const fetchPendingSiteHeaderBannerCampaigns = async (limit = 50) => {
   try {
-    const { data } = await apiClient.get("/site-header-banner-campaign/moderation/pending", {
-      params: { limit },
-    });
-    const parsed = parseApiContractData(data, siteHeaderBannerCampaignModerationListDataSchema);
+    const { data } = await apiClient.get(
+      "/site-header-banner-campaign/moderation/pending",
+      {
+        params: { limit },
+      },
+    );
+    const parsed = parseApiContractData(
+      data,
+      siteHeaderBannerCampaignModerationListDataSchema,
+    );
     return parsed.campaigns;
   } catch (error) {
     throw new Error(
-      formatApiErrorMessage(error, SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.FETCH_FALLBACK),
+      formatApiErrorMessage(
+        error,
+        SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.FETCH_FALLBACK,
+      ),
     );
   }
 };
 
 export const fetchPendingSiteHeaderBannerCampaignsCount = async () => {
   try {
-    const { data } = await apiClient.get("/site-header-banner-campaign/moderation/pending/count");
+    const { data } = await apiClient.get(
+      "/site-header-banner-campaign/moderation/pending/count",
+    );
     const parsed = parseApiContractData(
       data,
       siteHeaderBannerCampaignModerationCountDataSchema,
@@ -36,8 +47,13 @@ export const fetchPendingSiteHeaderBannerCampaignsCount = async () => {
 
 export const fetchManagedSiteHeaderBannerCampaigns = async () => {
   try {
-    const { data } = await apiClient.get("/site-header-banner-campaign/moderation/managed");
-    const parsed = parseApiContractData(data, siteHeaderBannerCampaignModerationListDataSchema);
+    const { data } = await apiClient.get(
+      "/site-header-banner-campaign/moderation/managed",
+    );
+    const parsed = parseApiContractData(
+      data,
+      siteHeaderBannerCampaignModerationListDataSchema,
+    );
     return parsed.campaigns;
   } catch (error) {
     throw new Error(
@@ -55,27 +71,38 @@ export const approveSiteHeaderBannerCampaign = async (campaignId: string) => {
       `/site-header-banner-campaign/moderation/${campaignId}/approve`,
     );
     return String(
-      data?.data?.message ?? SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.APPROVE_SUCCESS,
+      data?.data?.message ??
+        SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.APPROVE_SUCCESS,
     );
   } catch (error) {
     throw new Error(
-      formatApiErrorMessage(error, SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.APPROVE_FALLBACK),
+      formatApiErrorMessage(
+        error,
+        SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.APPROVE_FALLBACK,
+      ),
     );
   }
 };
 
-export const rejectSiteHeaderBannerCampaign = async (campaignId: string, reason = "") => {
+export const rejectSiteHeaderBannerCampaign = async (
+  campaignId: string,
+  reason = "",
+) => {
   try {
     const { data } = await apiClient.post(
       `/site-header-banner-campaign/moderation/${campaignId}/reject`,
       { reason: reason.trim() || null },
     );
     return String(
-      data?.data?.message ?? SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.REJECT_SUCCESS,
+      data?.data?.message ??
+        SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.REJECT_SUCCESS,
     );
   } catch (error) {
     throw new Error(
-      formatApiErrorMessage(error, SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.REJECT_FALLBACK),
+      formatApiErrorMessage(
+        error,
+        SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.REJECT_FALLBACK,
+      ),
     );
   }
 };
@@ -86,7 +113,8 @@ export const cancelSiteHeaderBannerCampaignByStaff = async (campaignId: string) 
       `/site-header-banner-campaign/moderation/${campaignId}`,
     );
     return String(
-      data?.data?.message ?? SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.STAFF_CANCEL_SUCCESS,
+      data?.data?.message ??
+        SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.STAFF_CANCEL_SUCCESS,
     );
   } catch (error) {
     throw new Error(

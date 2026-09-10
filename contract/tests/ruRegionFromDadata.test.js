@@ -12,10 +12,7 @@ describe("resolveRuRegionCodeFromDadataData", () => {
   });
 
   it("falls back to region label / city alias", () => {
-    assert.equal(
-      resolveRuRegionCodeFromDadataData({ region: "Москва" }),
-      "RU-MOW",
-    );
+    assert.equal(resolveRuRegionCodeFromDadataData({ region: "Москва" }), "RU-MOW");
     assert.equal(
       resolveRuRegionCodeFromDadataData({ city: "Санкт-Петербург" }),
       "RU-SPE",

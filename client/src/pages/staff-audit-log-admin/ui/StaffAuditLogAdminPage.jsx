@@ -12,7 +12,11 @@ export function StaffAuditLogAdminPage() {
   const [actionInput, setActionInput] = useState("");
   const [fromInput, setFromInput] = useState("");
   const [toInput, setToInput] = useState("");
-  const [filters, setFilters] = useState(/** @type {{ page: number; action?: string; from?: string; to?: string; actorUserId?: string }} */ ({ page: 1 }));
+  const [filters, setFilters] = useState(
+    /** @type {{ page: number; action?: string; from?: string; to?: string; actorUserId?: string }} */ ({
+      page: 1,
+    }),
+  );
 
   const query = useStaffAuditLogQuery(filters);
   const data = query.data;
@@ -28,8 +32,7 @@ export function StaffAuditLogAdminPage() {
     query.isError && query.error instanceof Error ? query.error.message : "";
 
   const hasActiveFilters = useMemo(
-    () =>
-      Boolean(filters.action || filters.from || filters.to || filters.actorUserId),
+    () => Boolean(filters.action || filters.from || filters.to || filters.actorUserId),
     [filters],
   );
 
@@ -130,14 +133,15 @@ export function StaffAuditLogAdminPage() {
       </div>
 
       {errorMessage ? (
-        <p className="staff-audit-page__alert staff-audit-page__alert--error" role="alert">
+        <p
+          className="staff-audit-page__alert staff-audit-page__alert--error"
+          role="alert"
+        >
           {errorMessage}
         </p>
       ) : null}
 
-      {query.isPending ? (
-        <p className="staff-audit-page__alert">{UI.LOADING}</p>
-      ) : null}
+      {query.isPending ? <p className="staff-audit-page__alert">{UI.LOADING}</p> : null}
 
       {!query.isPending && !errorMessage && items.length === 0 ? (
         <p className="staff-audit-page__alert">

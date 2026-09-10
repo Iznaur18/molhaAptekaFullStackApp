@@ -190,9 +190,7 @@ export function AccountMainContent({
         onCategoryTreeAdminClick={
           isAdmin ? handleCategoryTreeAdminFromProfile : undefined
         }
-        onAppIntroAdminClick={
-          isAdmin ? handleAppIntroAdminFromProfile : undefined
-        }
+        onAppIntroAdminClick={isAdmin ? handleAppIntroAdminFromProfile : undefined}
         onSiteHeaderBannerAdminClick={
           canModerateProducts ? handleSiteHeaderBannerAdminFromProfile : undefined
         }
@@ -231,7 +229,9 @@ export function AccountMainContent({
         }
         onPremiumClick={isAuthorized ? handlePremiumFromProfile : undefined}
         onLoyaltyPointsClick={isAuthorized ? handleLoyaltyPointsFromProfile : undefined}
-        onPartnerProgramClick={isAuthorized ? handlePartnerProgramFromProfile : undefined}
+        onPartnerProgramClick={
+          isAuthorized ? handlePartnerProgramFromProfile : undefined
+        }
         onAdvertisingClick={isAuthorized ? handleAdvertisingFromProfile : undefined}
         onOneCIntegrationClick={
           IS_ONEC_INTEGRATION_ENABLED && isAuthorized

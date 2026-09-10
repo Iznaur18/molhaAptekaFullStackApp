@@ -80,7 +80,12 @@ export const parseAuthSessionData = (
 export const parseCatalogProductsPageData = (
   payload: unknown,
   invalidServerResponseMessage: string,
-) => parseApiContractData(payload, catalogProductsPageDataSchema, invalidServerResponseMessage);
+) =>
+  parseApiContractData(
+    payload,
+    catalogProductsPageDataSchema,
+    invalidServerResponseMessage,
+  );
 
 export const parseReplaceCartData = (
   payload: unknown,
@@ -95,12 +100,14 @@ export const parseCreateOrderData = (
 export const parseCreateProductData = (
   payload: unknown,
   invalidServerResponseMessage: string,
-) => parseApiContractData(payload, productWriteDataSchema, invalidServerResponseMessage);
+) =>
+  parseApiContractData(payload, productWriteDataSchema, invalidServerResponseMessage);
 
 export const parsePatchMyProductData = (
   payload: unknown,
   invalidServerResponseMessage: string,
-) => parseApiContractData(payload, productWriteDataSchema, invalidServerResponseMessage);
+) =>
+  parseApiContractData(payload, productWriteDataSchema, invalidServerResponseMessage);
 
 export const parseUserSellerProductsPageData = (
   payload: unknown,
@@ -299,7 +306,9 @@ export const postMultipart = async <TResponse = unknown>(
         delete headers["Content-Type"];
       }
       if (typeof requestConfig?.transformRequest === "function") {
-        return (requestConfig.transformRequest as (data: unknown, headers: unknown) => unknown)(payload, headers);
+        return (
+          requestConfig.transformRequest as (data: unknown, headers: unknown) => unknown
+        )(payload, headers);
       }
       return payload;
     },

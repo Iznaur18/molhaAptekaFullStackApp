@@ -31,9 +31,7 @@ export function CartSelectAllRow({
         aria-checked={isIndeterminate ? "mixed" : areAllSelected}
         aria-label={CART_PAGE_UI.SELECT_ALL}
       >
-        <span className="cart-select-all__toggle-label">
-          {CART_PAGE_UI.SELECT_ALL}
-        </span>
+        <span className="cart-select-all__toggle-label">{CART_PAGE_UI.SELECT_ALL}</span>
         <span
           className={[
             "cart-select-all__box",

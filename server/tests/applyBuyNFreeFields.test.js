@@ -17,22 +17,20 @@ test("applyBuyNFreeFields enables with threshold", () => {
 
 test("applyBuyNFreeFields resets progress on disable", () => {
   const $set = {};
-  const result = applyBuyNFreeFields(
-    { productBuyNFreeEnabled: false },
-    $set,
-    { productBuyNFreeEnabled: true, productBuyNFreeThreshold: 3 },
-  );
+  const result = applyBuyNFreeFields({ productBuyNFreeEnabled: false }, $set, {
+    productBuyNFreeEnabled: true,
+    productBuyNFreeThreshold: 3,
+  });
   assert.equal($set.productBuyNFreeEnabled, false);
   assert.equal(result.shouldResetProgress, true);
 });
 
 test("applyBuyNFreeFields resets progress on threshold change", () => {
   const $set = {};
-  const result = applyBuyNFreeFields(
-    { productBuyNFreeThreshold: 5 },
-    $set,
-    { productBuyNFreeEnabled: true, productBuyNFreeThreshold: 3 },
-  );
+  const result = applyBuyNFreeFields({ productBuyNFreeThreshold: 5 }, $set, {
+    productBuyNFreeEnabled: true,
+    productBuyNFreeThreshold: 3,
+  });
   assert.equal($set.productBuyNFreeThreshold, 5);
   assert.equal(result.shouldResetProgress, true);
 });

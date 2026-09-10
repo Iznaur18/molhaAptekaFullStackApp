@@ -1,4 +1,9 @@
-import { apiClient, isCookieAuthWeb, parseAuthSessionData, setAuthTokens } from "@/shared/api";
+import {
+  apiClient,
+  isCookieAuthWeb,
+  parseAuthSessionData,
+  setAuthTokens,
+} from "@/shared/api";
 import { EMAIL_VERIFICATION_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 

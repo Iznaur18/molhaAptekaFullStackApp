@@ -8,12 +8,18 @@ const resolveLegalUrl = (envValue: string | undefined) => {
   return trimTrailingSlash(trimmed);
 };
 
-export const PRIVACY_POLICY_URL = resolveLegalUrl(process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL);
+export const PRIVACY_POLICY_URL = resolveLegalUrl(
+  process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL,
+);
 
-export const USER_AGREEMENT_URL = resolveLegalUrl(process.env.EXPO_PUBLIC_USER_AGREEMENT_URL);
+export const USER_AGREEMENT_URL = resolveLegalUrl(
+  process.env.EXPO_PUBLIC_USER_AGREEMENT_URL,
+);
 
 export const PRODUCT_LISTING_RULES_URL = resolveLegalUrl(
   process.env.EXPO_PUBLIC_PRODUCT_LISTING_RULES_URL,
 );
 
-export const PUBLIC_OFFER_URL = resolveLegalUrl(process.env.EXPO_PUBLIC_PUBLIC_OFFER_URL);
+export const PUBLIC_OFFER_URL = resolveLegalUrl(
+  process.env.EXPO_PUBLIC_PUBLIC_OFFER_URL,
+);

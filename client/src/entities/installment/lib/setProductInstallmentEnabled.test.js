@@ -5,10 +5,12 @@ const upsertProductInstallmentProgram = vi.fn();
 
 vi.mock("../api/installmentApi.js", () => ({
   fetchProductInstallmentProgram: (...args) => fetchProductInstallmentProgram(...args),
-  upsertProductInstallmentProgram: (...args) => upsertProductInstallmentProgram(...args),
+  upsertProductInstallmentProgram: (...args) =>
+    upsertProductInstallmentProgram(...args),
 }));
 
-const { setProductInstallmentEnabled } = await import("./setProductInstallmentEnabled.js");
+const { setProductInstallmentEnabled } =
+  await import("./setProductInstallmentEnabled.js");
 
 describe("setProductInstallmentEnabled", () => {
   beforeEach(() => {

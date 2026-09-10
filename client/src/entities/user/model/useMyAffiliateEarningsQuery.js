@@ -2,11 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { fetchMyAffiliateEarnings } from "../api/affiliateProgram.js";
 
-export const MY_AFFILIATE_EARNINGS_QUERY_KEY = [
-  "user",
-  "me",
-  "affiliate-earnings",
-];
+export const MY_AFFILIATE_EARNINGS_QUERY_KEY = ["user", "me", "affiliate-earnings"];
 
 /**
  * @param {{ enabled?: boolean }} [options]

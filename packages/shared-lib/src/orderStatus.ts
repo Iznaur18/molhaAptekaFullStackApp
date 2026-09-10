@@ -137,11 +137,14 @@ export function summarizeOrderItems(
  * Учитывает `buyNFreeUnitsAtOrder` (бесплатные шт. в цикле «Бесплатно от N»).
  */
 export function calculateOrderItemsTotalAmount(
-  items: Array<{
-    quantity?: number;
-    unitPriceAtOrder?: number;
-    buyNFreeUnitsAtOrder?: number;
-  }> | null | undefined,
+  items:
+    | Array<{
+        quantity?: number;
+        unitPriceAtOrder?: number;
+        buyNFreeUnitsAtOrder?: number;
+      }>
+    | null
+    | undefined,
 ): number {
   if (!Array.isArray(items) || items.length === 0) {
     return 0;

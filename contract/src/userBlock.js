@@ -15,7 +15,10 @@ export const userBlockListQuerySchema = z.object({
     .number()
     .int()
     .min(1)
-    .max(USER_BLOCK_LIST_MAX_LIMIT, `limit должен быть от 1 до ${USER_BLOCK_LIST_MAX_LIMIT}`)
+    .max(
+      USER_BLOCK_LIST_MAX_LIMIT,
+      `limit должен быть от 1 до ${USER_BLOCK_LIST_MAX_LIMIT}`,
+    )
     .optional(),
 });
 
@@ -26,7 +29,9 @@ export const userBlockListQuerySchema = z.object({
  * @returns {boolean}
  */
 export function isCatalogProductViewerBlockStateKnown(product) {
-  return product != null && typeof product === "object" && "isBlockedBySeller" in product;
+  return (
+    product != null && typeof product === "object" && "isBlockedBySeller" in product
+  );
 }
 
 /**
@@ -36,7 +41,9 @@ export function isCatalogProductViewerBlockStateKnown(product) {
  * @returns {boolean}
  */
 export function isCatalogProductSellerClosedStateKnown(product) {
-  return product != null && typeof product === "object" && "isSellerClosedNow" in product;
+  return (
+    product != null && typeof product === "object" && "isSellerClosedNow" in product
+  );
 }
 
 /**
@@ -55,5 +62,7 @@ export function isCatalogProductViewerPurchaseContextKnown(product) {
  * @returns {boolean}
  */
 export function isProductPurchaseBlockedBySeller(product) {
-  return product != null && typeof product === "object" && product.isBlockedBySeller === true;
+  return (
+    product != null && typeof product === "object" && product.isBlockedBySeller === true
+  );
 }

@@ -23,7 +23,10 @@ export const parseUserBackgroundFormFields = (
     return { presetId: presetFromStored, imageUrl: "" };
   }
   if (isDisplayableMediaUrl(stored)) {
-    return { presetId: DEFAULT_USER_BACKGROUND_PRESET_ID, imageUrl: String(stored).trim() };
+    return {
+      presetId: DEFAULT_USER_BACKGROUND_PRESET_ID,
+      imageUrl: String(stored).trim(),
+    };
   }
   return { presetId: DEFAULT_USER_BACKGROUND_PRESET_ID, imageUrl: "" };
 };

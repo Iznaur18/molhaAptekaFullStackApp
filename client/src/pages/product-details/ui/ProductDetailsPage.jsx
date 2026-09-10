@@ -3,7 +3,10 @@ import { Flag } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { canSellerDeleteProduct, canSellerEditProduct } from "../../../entities/product/lib/getProductModerationUi.js";
+import {
+  canSellerDeleteProduct,
+  canSellerEditProduct,
+} from "../../../entities/product/lib/getProductModerationUi.js";
 import { isCurrentUserProductSeller } from "../../../entities/product/lib/isCurrentUserProductSeller.js";
 import { patchProductInAllCatalogCaches } from "../../../entities/product/lib/catalogProductsQueryCache.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../../entities/product/model/productModerationConstants.js";
@@ -13,7 +16,10 @@ import { ProductDetailsModal } from "../../../entities/product/ui/ProductDetails
 import { productReportQueryKeys } from "../../../entities/product-report/model/productReportQueryKeys.js";
 import { useMyProductReportStatusQuery } from "../../../entities/product-report/model/useMyProductReportStatusQuery.js";
 import { ReportProductModal } from "../../../entities/product-report/ui/ReportProductModal.jsx";
-import { API_CLIENT_UI, PRODUCT_REPORT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  API_CLIENT_UI,
+  PRODUCT_REPORT_MODAL_UI,
+} from "../../../shared/config/appUiCopy.js";
 import { prefersReducedMotion } from "../../../shared/lib/scheduleOpenAfterPaint.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
@@ -44,7 +50,9 @@ export function ProductDetailsPage() {
   const queryClient = useQueryClient();
   const shell = useAppShellStateContext();
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [productPatch, setProductPatch] = useState(/** @type {Record<string, unknown>} */ ({}));
+  const [productPatch, setProductPatch] = useState(
+    /** @type {Record<string, unknown>} */ ({}),
+  );
   const [isClosing, setIsClosing] = useState(false);
   const isClosingRef = useRef(false);
 
@@ -85,7 +93,13 @@ export function ProductDetailsPage() {
       return false;
     }
     return isCurrentUserProductSeller(product, shell.currentUserId);
-  }, [product, shell.currentUserId, shell.isAdmin, shell.isAuthorized, shell.isMineMode]);
+  }, [
+    product,
+    shell.currentUserId,
+    shell.isAdmin,
+    shell.isAuthorized,
+    shell.isMineMode,
+  ]);
 
   const showAddToCart = useMemo(
     () =>
@@ -184,14 +198,19 @@ export function ProductDetailsPage() {
   }, [handleClose, product, shell]);
 
   const isOwnProduct = Boolean(
-    product && shell.currentUserId && isCurrentUserProductSeller(product, shell.currentUserId),
+    product &&
+    shell.currentUserId &&
+    isCurrentUserProductSeller(product, shell.currentUserId),
   );
   const canDeleteProduct =
     Boolean(shell.isAdmin) || (isOwnProduct && canSellerDeleteProduct(product));
 
   if (!productId) {
     return (
-      <p className="product-details-page__state product-details-page__state_error" role="alert">
+      <p
+        className="product-details-page__state product-details-page__state_error"
+        role="alert"
+      >
         {API_CLIENT_UI.FETCH_CATALOG_PRODUCT_FALLBACK}
       </p>
     );
@@ -213,12 +232,19 @@ export function ProductDetailsPage() {
           .join(" ")}
       >
         <div className="product-details-page__state-wrap">
-          <p className="product-details-page__state product-details-page__state_error" role="alert">
+          <p
+            className="product-details-page__state product-details-page__state_error"
+            role="alert"
+          >
             {productQuery.error instanceof Error
               ? productQuery.error.message
               : API_CLIENT_UI.FETCH_CATALOG_PRODUCT_FALLBACK}
           </p>
-          <button type="button" className="product-details-page__back" onClick={handleClose}>
+          <button
+            type="button"
+            className="product-details-page__back"
+            onClick={handleClose}
+          >
             Назад
           </button>
         </div>
@@ -307,9 +333,12 @@ export function ProductDetailsPage() {
         hasPendingReport={hasPendingReport}
         onClose={() => setIsReportModalOpen(false)}
         onSubmitted={() => {
-          queryClient.setQueryData(productReportQueryKeys.myStatus(String(product._id)), {
-            hasPendingReport: true,
-          });
+          queryClient.setQueryData(
+            productReportQueryKeys.myStatus(String(product._id)),
+            {
+              hasPendingReport: true,
+            },
+          );
         }}
       />
     </>

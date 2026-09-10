@@ -294,12 +294,14 @@ const fulfillmentSetChangesProduct = ($set, existing) => {
   // Точки сравниваем по адресам: id и подписи площадка может переставить сама.
   const keyOf = (list) =>
     (Array.isArray(list) ? list : [])
-      .map((item) => String(item?.address ?? "").trim().toLowerCase())
+      .map((item) =>
+        String(item?.address ?? "")
+          .trim()
+          .toLowerCase(),
+      )
       .sort()
       .join("~");
-  return (
-    keyOf($set.productPickupLocations) !== keyOf(existing?.productPickupLocations)
-  );
+  return keyOf($set.productPickupLocations) !== keyOf(existing?.productPickupLocations);
 };
 
 /**
@@ -371,8 +373,7 @@ const applyPickupFields = async (body, $set, $unset, existing) => {
     }
 
     if (touchesCourier) {
-      $set.productCourierDeliveryEnabled =
-        body.productCourierDeliveryEnabled === true;
+      $set.productCourierDeliveryEnabled = body.productCourierDeliveryEnabled === true;
     }
 
     if (touchesPickupEnabled) {
@@ -432,7 +433,9 @@ const applyPickupFields = async (body, $set, $unset, existing) => {
         nextPickupEnabled,
         touchesCarrier ? $set.productDeliveryEnabled : nextDeliveryEnabled,
         // ЛОБО везёт, хотя оба старых флага при ней выключены.
-        (touchesCarrier ? $set.productCourierDeliveryEnabled : nextCourierDeliveryEnabled) ||
+        (touchesCarrier
+          ? $set.productCourierDeliveryEnabled
+          : nextCourierDeliveryEnabled) ||
           nextCarrier === PRODUCT_DELIVERY_CARRIER_LOBO,
       );
     }
@@ -716,7 +719,10 @@ const applyModerationAndAvailability = (body, $set, existing, skipsModeration) =
 
   // Правка прошла без проверки — отпечаток обязан догнать новое содержимое,
   // иначе он описывает карточку, которой больше нет.
-  if (touchesContent && existing.productModerationStatus === PRODUCT_MODERATION_APPROVED) {
+  if (
+    touchesContent &&
+    existing.productModerationStatus === PRODUCT_MODERATION_APPROVED
+  ) {
     $set.productModerationApprovedHash = buildProductModerationFingerprint({
       ...existing,
       ...$set,

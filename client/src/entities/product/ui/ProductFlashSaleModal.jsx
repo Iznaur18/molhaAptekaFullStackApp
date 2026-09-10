@@ -46,7 +46,9 @@ export function ProductFlashSaleModal({ isOpen, product, onClose, onSaved }) {
   const { patchMutation } = useMyProductMutations();
   const [salePrice, setSalePrice] = useState("");
   const [durationValue, setDurationValue] = useState("60");
-  const [durationUnit, setDurationUnit] = useState(/** @type {"minutes"|"hours"|"days"} */ ("minutes"));
+  const [durationUnit, setDurationUnit] = useState(
+    /** @type {"minutes"|"hours"|"days"} */ ("minutes"),
+  );
   const [error, setError] = useState("");
   const panelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const closeButtonRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
@@ -82,8 +84,14 @@ export function ProductFlashSaleModal({ isOpen, product, onClose, onSaved }) {
         ? formatIntegerGroupRu(Math.floor(Number(product.productPrice) || 0))
         : "",
     );
-    const storedDurationMinutes = Math.floor(Number(product.productFlashSaleDurationMinutes));
-    if (isActive && Number.isFinite(storedDurationMinutes) && storedDurationMinutes > 0) {
+    const storedDurationMinutes = Math.floor(
+      Number(product.productFlashSaleDurationMinutes),
+    );
+    if (
+      isActive &&
+      Number.isFinite(storedDurationMinutes) &&
+      storedDurationMinutes > 0
+    ) {
       setDurationValue(String(storedDurationMinutes));
       setDurationUnit("minutes");
     } else {
@@ -217,7 +225,9 @@ export function ProductFlashSaleModal({ isOpen, product, onClose, onSaved }) {
           </button>
         </header>
         <div className="wholesale-price-modal__body">
-          <p className="wholesale-price-modal__hint">{PRODUCT_FLASH_SALE_UI.MODAL_HINT}</p>
+          <p className="wholesale-price-modal__hint">
+            {PRODUCT_FLASH_SALE_UI.MODAL_HINT}
+          </p>
           {basePrice > 0 ? (
             <p className="wholesale-price-modal__retail">
               {PRODUCT_FLASH_SALE_UI.MODAL_BASE_PRICE_LABEL}:{" "}
@@ -235,7 +245,9 @@ export function ProductFlashSaleModal({ isOpen, product, onClose, onSaved }) {
               {...INTEGER_INPUT_FIELD_PROPS}
               value={salePrice}
               disabled={isSubmitting}
-              onChange={(event) => setSalePrice(formatRubPriceInput(event.target.value))}
+              onChange={(event) =>
+                setSalePrice(formatRubPriceInput(event.target.value))
+              }
             />
           </label>
           <div className="wholesale-price-modal__field-row">

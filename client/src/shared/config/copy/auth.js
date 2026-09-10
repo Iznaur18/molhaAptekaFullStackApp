@@ -5,8 +5,7 @@
 export const AUTH_UI = {
   LOGIN_TITLE: "Вход",
   LOGIN_SUBTITLE: "Войдите, чтобы продолжить покупки",
-  EMAIL_AUTH_DISABLED_NOTICE:
-    "Почта временно недоступна — используйте телефон.",
+  EMAIL_AUTH_DISABLED_NOTICE: "Почта временно недоступна — используйте телефон.",
   REGISTER_TITLE: "Регистрация",
   REGISTER_SUBTITLE: "Создайте аккаунт за пару минут",
   EMAIL_LABEL: "Email",

@@ -8,7 +8,9 @@ export const resendEmailVerification = async () => {
     if (!data?.success) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
-    return typeof data.message === "string" ? data.message : EMAIL_VERIFICATION_UI.RESENT;
+    return typeof data.message === "string"
+      ? data.message
+      : EMAIL_VERIFICATION_UI.RESENT;
   } catch (error) {
     throw new Error(formatApiErrorMessage(error, EMAIL_VERIFICATION_UI.RESEND_ERROR));
   }

@@ -1,12 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { isSellerSafeDealApproved } from "@molha/api-contract";
-import {
-  ChevronRight,
-  Package,
-  Star,
-  Users,
-  Wallet,
-} from "lucide-react";
+import { ChevronRight, Package, Star, Users, Wallet } from "lucide-react";
 
 import { formatSearchRowRatingCompact } from "../../user/lib/formatSearchRowRating.js";
 import { formatSearchRowTotalSales } from "../../user/lib/formatSearchRowTotalSales.js";
@@ -184,7 +178,9 @@ export function ProductDetailsSellerPreview({
               <dd className="product-details-seller-preview__metric-value">
                 {row.value}
               </dd>
-              <dt className="product-details-seller-preview__metric-key">{row.label}</dt>
+              <dt className="product-details-seller-preview__metric-key">
+                {row.label}
+              </dt>
             </div>
           </div>
         ))}

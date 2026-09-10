@@ -103,7 +103,10 @@ export const WishlistPage = () => {
     return (
       <View style={styles.centered}>
         <Text style={styles.hint}>{WISHLIST_PAGE_UI.LOGIN_HINT}</Text>
-        <Pressable style={styles.loginButton} onPress={() => router.push("/(auth)/login")}>
+        <Pressable
+          style={styles.loginButton}
+          onPress={() => router.push("/(auth)/login")}
+        >
           <Text style={styles.loginButtonText}>{WISHLIST_PAGE_UI.LOGIN_BUTTON}</Text>
         </Pressable>
       </View>

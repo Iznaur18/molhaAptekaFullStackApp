@@ -1,10 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import {
-  projectMyOrderSellerBlocks,
-  resolveOrderLineSellerId,
-} from "../dist/index.js";
+import { projectMyOrderSellerBlocks, resolveOrderLineSellerId } from "../dist/index.js";
 
 const SELLER_A = "aaaaaaaaaaaaaaaaaaaaaaaa";
 const SELLER_B = "bbbbbbbbbbbbbbbbbbbbbbbb";

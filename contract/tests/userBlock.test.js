@@ -13,8 +13,14 @@ describe("userBlock", () => {
   });
 
   it("isCatalogProductViewerBlockStateKnown — true после GET /product/:id/catalog", () => {
-    assert.equal(isCatalogProductViewerBlockStateKnown({ isBlockedBySeller: false }), true);
-    assert.equal(isCatalogProductViewerBlockStateKnown({ isBlockedBySeller: true }), true);
+    assert.equal(
+      isCatalogProductViewerBlockStateKnown({ isBlockedBySeller: false }),
+      true,
+    );
+    assert.equal(
+      isCatalogProductViewerBlockStateKnown({ isBlockedBySeller: true }),
+      true,
+    );
   });
 
   it("isProductPurchaseBlockedBySeller — только explicit true", () => {

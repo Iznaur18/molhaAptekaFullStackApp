@@ -311,7 +311,11 @@
   padding: 0.75rem 0.8rem;
   border: 1px solid var(--iz-color-danger);
   border-radius: 0.7rem;
-  background: color-mix(in srgb, var(--iz-color-danger) 10%, var(--iz-color-surface) 90%);
+  background: color-mix(
+    in srgb,
+    var(--iz-color-danger) 10%,
+    var(--iz-color-surface) 90%
+  );
 }
 
 .create-raffle-modal__block-notice-text {

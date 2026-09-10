@@ -27,9 +27,15 @@ export function ProfileSidebarLogout({ onLogout }) {
       >
         <span className="my-profile-page__nav-button-main">
           <span className="my-profile-page__nav-icon" aria-hidden="true">
-            <AppIcon icon={PROFILE_NAV_ITEM_META.logout.icon} size="sm" strokeWidth={2.25} />
+            <AppIcon
+              icon={PROFILE_NAV_ITEM_META.logout.icon}
+              size="sm"
+              strokeWidth={2.25}
+            />
           </span>
-          <span className="my-profile-page__nav-button-label">{MY_PROFILE_PAGE_UI.LOGOUT}</span>
+          <span className="my-profile-page__nav-button-label">
+            {MY_PROFILE_PAGE_UI.LOGOUT}
+          </span>
         </span>
       </button>
     );
@@ -37,9 +43,15 @@ export function ProfileSidebarLogout({ onLogout }) {
 
   return (
     <div className="my-profile-page__logout-confirm">
-      <p className="my-profile-page__logout-question">{MY_PROFILE_PAGE_UI.LOGOUT_CONFIRM}</p>
+      <p className="my-profile-page__logout-question">
+        {MY_PROFILE_PAGE_UI.LOGOUT_CONFIRM}
+      </p>
       <div className="my-profile-page__logout-actions">
-        <button type="button" className="my-profile-page__logout-yes" onClick={handleConfirmLogout}>
+        <button
+          type="button"
+          className="my-profile-page__logout-yes"
+          onClick={handleConfirmLogout}
+        >
           {MY_PROFILE_PAGE_UI.LOGOUT_YES}
         </button>
         <button

@@ -24,7 +24,10 @@ export function SafeDealSellerBadge({ size = 18, className = "" }) {
       aria-hidden="true"
       focusable="false"
     >
-      <path fill={SAFE_DEAL_BADGE_GREEN} d="M12 1.5 3.5 5v6.2c0 5.3 3.6 9.7 8.5 11.3 4.9-1.6 8.5-6 8.5-11.3V5L12 1.5Z" />
+      <path
+        fill={SAFE_DEAL_BADGE_GREEN}
+        d="M12 1.5 3.5 5v6.2c0 5.3 3.6 9.7 8.5 11.3 4.9-1.6 8.5-6 8.5-11.3V5L12 1.5Z"
+      />
       <path
         fill="none"
         stroke="#fff"
@@ -40,7 +43,11 @@ export function SafeDealSellerBadge({ size = 18, className = "" }) {
 /**
  * @param {{ hasSafeDeal?: boolean; size?: number; className?: string }} props
  */
-export function SafeDealSellerBadgeMark({ hasSafeDeal = false, size = 18, className = "" }) {
+export function SafeDealSellerBadgeMark({
+  hasSafeDeal = false,
+  size = 18,
+  className = "",
+}) {
   if (!hasSafeDeal) {
     return null;
   }

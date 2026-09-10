@@ -17,7 +17,9 @@ export const computeProductDiscountPercent = (
   return Math.floor((1 - current / old) * 100);
 };
 
-export const resolveProductDiscountPercent = (product: DiscountProduct): number | null => {
+export const resolveProductDiscountPercent = (
+  product: DiscountProduct,
+): number | null => {
   if (product.discountPercent != null && Number.isFinite(product.discountPercent)) {
     const fromApi = Math.floor(Number(product.discountPercent));
     return fromApi > 0 ? fromApi : null;

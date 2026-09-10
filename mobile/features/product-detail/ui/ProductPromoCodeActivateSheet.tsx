@@ -115,7 +115,12 @@ export const ProductPromoCodeActivateSheet = ({
   const footerPaddingBottom = Math.max(insets.bottom, WS.footerPaddingHorizontal);
 
   return (
-    <Modal visible={modalVisible} transparent animationType="none" onRequestClose={onClose}>
+    <Modal
+      visible={modalVisible}
+      transparent
+      animationType="none"
+      onRequestClose={onClose}
+    >
       <View style={styles.backdrop}>
         <BackdropContainer
           style={[StyleSheet.absoluteFillObject, backdropAnimatedStyle]}

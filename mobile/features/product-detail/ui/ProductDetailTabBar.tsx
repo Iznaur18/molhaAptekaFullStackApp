@@ -77,7 +77,9 @@ const ProductDetailTabButton = ({
         accessibilityRole="tab"
         accessibilityState={{ selected: isActive }}
       >
-        <AppText style={[styles.tabText, isActive && styles.tabTextActive]}>{tab.label}</AppText>
+        <AppText style={[styles.tabText, isActive && styles.tabTextActive]}>
+          {tab.label}
+        </AppText>
       </Pressable>
     </Animated.View>
   );

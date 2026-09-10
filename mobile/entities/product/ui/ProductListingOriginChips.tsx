@@ -28,7 +28,14 @@ export const ProductListingOriginChips = ({
   return (
     <View style={style} accessibilityLabel={CREATE_PRODUCT_UI.LABEL_LISTING_ORIGIN}>
       {showLabel ? (
-        <Text style={{ color: theme.colors.text, fontSize: 15, fontWeight: "600", marginBottom: 8 }}>
+        <Text
+          style={{
+            color: theme.colors.text,
+            fontSize: 15,
+            fontWeight: "600",
+            marginBottom: 8,
+          }}
+        >
           {CREATE_PRODUCT_UI.LABEL_LISTING_ORIGIN}{" "}
           <Text style={{ color: theme.colors.danger }}>*</Text>
         </Text>
@@ -51,7 +58,9 @@ export const ProductListingOriginChips = ({
                 borderRadius: 10,
                 borderWidth: 1,
                 borderColor: selected ? theme.colors.action : theme.colors.border,
-                backgroundColor: selected ? theme.colors.action : theme.colors.surfaceMuted,
+                backgroundColor: selected
+                  ? theme.colors.action
+                  : theme.colors.surfaceMuted,
               }}
             >
               <Text

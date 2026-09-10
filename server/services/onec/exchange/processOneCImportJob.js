@@ -75,7 +75,9 @@ const MAX_ISSUES = 100;
  */
 export async function resolveSellerProductDefaults(sellerId) {
   const user = await UserModel.findById(sellerId)
-    .select(`${SELLER_COMMERCE_DEFAULTS_SELECT} userAddress userAddressFlat userAddressGeo`)
+    .select(
+      `${SELLER_COMMERCE_DEFAULTS_SELECT} userAddress userAddressFlat userAddressGeo`,
+    )
     .lean();
 
   const profileDefaults = await resolveSellerDefaultsForProductWrite(user);
@@ -240,18 +242,14 @@ async function waitForEarlierJobs(job) {
  * @param {string} jobId
  */
 export async function processOneCImportJob(jobId) {
-  const head = await OneCImportJobModel.findById(jobId)
-    .select("sellerId")
-    .lean();
+  const head = await OneCImportJobModel.findById(jobId).select("sellerId").lean();
   if (!head) {
     throw new Error(`OneCImportJob ${jobId} не найден`);
   }
 
   const key = String(head.sellerId);
   const previous = sellerImportQueues.get(key) ?? Promise.resolve();
-  const current = previous
-    .catch(() => {})
-    .then(() => runOneCImportJob(jobId));
+  const current = previous.catch(() => {}).then(() => runOneCImportJob(jobId));
 
   // В Map кладём «проглатывающую» обёртку, иначе падение одной задачи
   // оборвало бы цепочку для всех следующих файлов этого обмена.
@@ -494,10 +492,7 @@ async function runOneCImportJob(jobId) {
           ],
           $and: [
             {
-              $or: [
-                { productIsAvailable: true },
-                { productStockQuantity: { $gt: 0 } },
-              ],
+              $or: [{ productIsAvailable: true }, { productStockQuantity: { $gt: 0 } }],
             },
           ],
         },
@@ -543,8 +538,7 @@ async function runOneCImportJob(jobId) {
 
     return stats;
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Ошибка разбора файла 1С";
+    const message = error instanceof Error ? error.message : "Ошибка разбора файла 1С";
 
     job.status = ONEC_IMPORT_STATUS_FAILED;
     job.errorMessage = message.slice(0, 2000);

@@ -17,7 +17,9 @@ export const fetchMyPriceOffer = async (productId: string): Promise<MyPriceOffer
     }
     return data.data?.offer ?? null;
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_PRICE_OFFER_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_PRICE_OFFER_FALLBACK),
+    );
   }
 };
 
@@ -31,7 +33,9 @@ export const submitPriceOffer = async (productId: string, offerPrice: number) =>
     }
     return data.data.offer;
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.SUBMIT_PRICE_OFFER_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.SUBMIT_PRICE_OFFER_FALLBACK),
+    );
   }
 };
 
@@ -45,7 +49,9 @@ export const patchMyPriceOffer = async (productId: string, offerPrice: number) =
     }
     return data.data.offer;
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.SUBMIT_PRICE_OFFER_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.SUBMIT_PRICE_OFFER_FALLBACK),
+    );
   }
 };
 
@@ -56,6 +62,8 @@ export const cancelMyPriceOffer = async (productId: string) => {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.SUBMIT_PRICE_OFFER_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.SUBMIT_PRICE_OFFER_FALLBACK),
+    );
   }
 };

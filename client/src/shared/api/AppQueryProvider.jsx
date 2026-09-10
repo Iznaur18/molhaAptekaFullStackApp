@@ -8,7 +8,5 @@ const appQueryClient = createAppQueryClient();
  * @param {{ children: import('react').ReactNode }} props
  */
 export function AppQueryProvider({ children }) {
-  return (
-    <QueryClientProvider client={appQueryClient}>{children}</QueryClientProvider>
-  );
+  return <QueryClientProvider client={appQueryClient}>{children}</QueryClientProvider>;
 }

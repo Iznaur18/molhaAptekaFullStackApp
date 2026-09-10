@@ -9,8 +9,7 @@
   margin-right: calc(-1 * var(--product-card-image-bleed-x));
   padding: 0;
   border-radius: calc(var(--product-card-radius) - 2px)
-    calc(var(--product-card-radius) - 2px)
-    var(--product-card-inner-radius)
+    calc(var(--product-card-radius) - 2px) var(--product-card-inner-radius)
     var(--product-card-inner-radius);
   aspect-ratio: var(--product-card-image-aspect-ratio);
   min-height: 0;
@@ -105,7 +104,11 @@
 .product-card__promotion-ribbon--tier-3 {
   background: linear-gradient(
     120deg,
-    color-mix(in srgb, var(--product-card-banner-accent) 78%, var(--product-card-banner-accent-soft)),
+    color-mix(
+      in srgb,
+      var(--product-card-banner-accent) 78%,
+      var(--product-card-banner-accent-soft)
+    ),
     var(--product-card-banner-accent)
   );
 }
@@ -255,4 +258,3 @@
     opacity 0.15s ease,
     transform 0.2s ease;
 }
-

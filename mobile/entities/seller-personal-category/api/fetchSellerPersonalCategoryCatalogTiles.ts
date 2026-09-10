@@ -13,11 +13,17 @@ export const fetchSellerPersonalCategoryCatalogTiles = async ({
     const { data } = await apiClient.get("/seller-personal-category/catalog-tiles", {
       params: regionCode ? { regionCode } : undefined,
     });
-    const parsed = parseApiContractData(data, sellerPersonalCategoryCatalogTilesDataSchema);
+    const parsed = parseApiContractData(
+      data,
+      sellerPersonalCategoryCatalogTilesDataSchema,
+    );
     return parsed.tiles as SellerPersonalCategoryCatalogTile[];
   } catch (error) {
     throw new Error(
-      formatApiErrorMessage(error, SELLER_PERSONAL_CATEGORY_PAGE_UI.FETCH_TILES_FALLBACK),
+      formatApiErrorMessage(
+        error,
+        SELLER_PERSONAL_CATEGORY_PAGE_UI.FETCH_TILES_FALLBACK,
+      ),
     );
   }
 };

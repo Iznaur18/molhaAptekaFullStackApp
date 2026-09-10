@@ -19,10 +19,7 @@ import {
   openOneCSecret,
   sealOneCSecret,
 } from "./onecCredentialsCrypto.js";
-import {
-  normalizeOneCBaseUrl,
-  testOneCConnection,
-} from "./onecHttpClient.js";
+import { normalizeOneCBaseUrl, testOneCConnection } from "./onecHttpClient.js";
 
 /** @returns {Record<string, unknown>} */
 function emptyExchangeSettings() {
@@ -53,9 +50,7 @@ function readExchangeSettings(raw) {
     priceTypeIds: Array.isArray(raw.priceTypeIds) ? raw.priceTypeIds : [],
     warehouseIds: Array.isArray(raw.warehouseIds) ? raw.warehouseIds : [],
     knownPriceTypes: Array.isArray(raw.knownPriceTypes) ? raw.knownPriceTypes : [],
-    knownWarehouses: Array.isArray(raw.knownWarehouses)
-      ? raw.knownWarehouses
-      : [],
+    knownWarehouses: Array.isArray(raw.knownWarehouses) ? raw.knownWarehouses : [],
     lastExchangeAt: raw.lastExchangeAt ?? null,
   };
 }
@@ -111,9 +106,7 @@ export function getOneCIntegrationFromUser(user) {
  * @param {string} sellerId
  */
 export async function getSellerOneCSettings(sellerId) {
-  const user = await UserModel.findById(sellerId)
-    .select("oneCIntegration")
-    .lean();
+  const user = await UserModel.findById(sellerId).select("oneCIntegration").lean();
   if (!user) {
     throw new AppError(404, "Пользователь не найден");
   }
@@ -179,10 +172,7 @@ export async function saveSellerOneCSettings(sellerId, body) {
   // CommerceML — выданной пары логин/пароль, которую 1С вобьёт у себя.
   if (next.enabled && next.channel === ONEC_CHANNEL_COMMERCEML) {
     if (!next.exchange?.login || !next.exchange?.passwordHash) {
-      throw new AppError(
-        400,
-        "Сначала сгенерируйте логин и пароль для обмена с 1С",
-      );
+      throw new AppError(400, "Сначала сгенерируйте логин и пароль для обмена с 1С");
     }
   }
 
@@ -238,9 +228,7 @@ export async function disconnectSellerOneC(sellerId) {
  * @returns {Promise<{ baseUrl: string; apiKey: string }>}
  */
 export async function resolveSellerOneCCredentials(sellerId) {
-  const user = await UserModel.findById(sellerId)
-    .select("oneCIntegration")
-    .lean();
+  const user = await UserModel.findById(sellerId).select("oneCIntegration").lean();
   if (!user) {
     throw new AppError(404, "Пользователь не найден");
   }

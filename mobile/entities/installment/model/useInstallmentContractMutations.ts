@@ -14,7 +14,9 @@ import {
   rejectInstallmentPayment,
 } from "../api/installmentApi";
 
-const invalidateInstallmentQueues = (queryClient: ReturnType<typeof useQueryClient>) => {
+const invalidateInstallmentQueues = (
+  queryClient: ReturnType<typeof useQueryClient>,
+) => {
   void queryClient.invalidateQueries({ queryKey: installmentQueryKeys.all });
   void queryClient.invalidateQueries({
     queryKey: [...staffBadgeQueryKeys.all, "user-actions"],
@@ -38,21 +40,13 @@ export const useInstallmentContractMutations = (contractId: string) => {
 
   const confirmPaymentMutation = useMutation({
     mutationFn: (paymentIndex: number) =>
-      confirmInstallmentPayment(
-        contractId,
-        paymentIndex,
-        createClientIdempotencyKey(),
-      ),
+      confirmInstallmentPayment(contractId, paymentIndex, createClientIdempotencyKey()),
     onSuccess: invalidate,
   });
 
   const rejectPaymentMutation = useMutation({
     mutationFn: (paymentIndex: number) =>
-      rejectInstallmentPayment(
-        contractId,
-        paymentIndex,
-        createClientIdempotencyKey(),
-      ),
+      rejectInstallmentPayment(contractId, paymentIndex, createClientIdempotencyKey()),
     onSuccess: invalidate,
   });
 

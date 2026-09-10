@@ -27,7 +27,9 @@ function renderUsersPage() {
 
 /** Поисковые вызовы без учёта стартовой загрузки общего списка. */
 function searchCallsFor(term) {
-  return fetchUsersSearchPageMock.mock.calls.filter(([params]) => params?.search === term);
+  return fetchUsersSearchPageMock.mock.calls.filter(
+    ([params]) => params?.search === term,
+  );
 }
 
 describe("UsersPage: поиск только по «Найти»", () => {

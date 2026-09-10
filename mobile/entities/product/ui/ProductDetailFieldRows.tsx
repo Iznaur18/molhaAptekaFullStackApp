@@ -30,8 +30,7 @@ export const ProductDetailFieldRows = ({
   const styles = useProductDetailFieldStyles();
   const { width: viewportWidth } = useWindowDimensions();
   const isMetaLayout = layout === "meta";
-  const metaColumns =
-    viewportWidth >= MG.narrowBreakpoint ? MG.columns : 1;
+  const metaColumns = viewportWidth >= MG.narrowBreakpoint ? MG.columns : 1;
 
   const containerStyle = isMetaLayout
     ? [
@@ -43,7 +42,9 @@ export const ProductDetailFieldRows = ({
       : styles.statsGrid;
 
   const metaCellStyle =
-    metaColumns === MG.columns ? styles.metaGridCellThreeCol : styles.metaGridCellOneCol;
+    metaColumns === MG.columns
+      ? styles.metaGridCellThreeCol
+      : styles.metaGridCellOneCol;
 
   return (
     <View style={containerStyle}>

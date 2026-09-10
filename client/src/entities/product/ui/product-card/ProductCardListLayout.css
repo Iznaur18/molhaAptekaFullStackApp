@@ -122,11 +122,13 @@
     gap: 0.1rem;
   }
 
-  .product-card--list .product-moderation-details-footer__actions:has(.app-btn--danger) {
+  .product-card--list
+    .product-moderation-details-footer__actions:has(.app-btn--danger) {
     grid-template-columns: 1fr 1fr;
   }
 
-  .product-card--list .product-moderation-details-footer__actions:has(.app-btn--danger)
+  .product-card--list
+    .product-moderation-details-footer__actions:has(.app-btn--danger)
     > .app-btn--danger {
     grid-column: 1 / -1;
   }

@@ -1,6 +1,4 @@
-import {
-  resolveRuRegionCodeFromDadataData,
-} from "@molha/api-contract";
+import { resolveRuRegionCodeFromDadataData } from "@molha/api-contract";
 
 import {
   geolocateRuAddresses,

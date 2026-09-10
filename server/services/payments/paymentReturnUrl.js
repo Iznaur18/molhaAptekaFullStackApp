@@ -14,7 +14,10 @@ export function buildReturnUrl(relativePath) {
     .trim()
     .replace(/\/+$/, "");
   if (!origin) {
-    throw new AppError(500, "Не настроен FRONTEND_URL — некуда возвращать после оплаты");
+    throw new AppError(
+      500,
+      "Не настроен FRONTEND_URL — некуда возвращать после оплаты",
+    );
   }
   const path = String(relativePath ?? "").trim();
   if (!path.startsWith("/") || path.startsWith("//")) {

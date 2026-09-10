@@ -96,7 +96,10 @@ export function ProductPromotionManageSection({
     >
       {embeddedInTab ? null : (
         <>
-          <h3 id="product-promotion-manage-title" className="product-promotion-manage__title">
+          <h3
+            id="product-promotion-manage-title"
+            className="product-promotion-manage__title"
+          >
             {CREATE_PRODUCT_MODAL_UI.MANAGE_SECTION_TITLE}
           </h3>
           <p className="product-promotion-manage__lead">

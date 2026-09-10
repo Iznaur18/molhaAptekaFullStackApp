@@ -58,8 +58,7 @@ if (isProduction) {
 } else if (!process.env.FRONTEND_URL) {
   logServerEvent("warn", {
     event: "api.cors_open_dev",
-    message:
-      "FRONTEND_URL не задан — CORS разрешён для всех origin (только для dev)",
+    message: "FRONTEND_URL не задан — CORS разрешён для всех origin (только для dev)",
   });
 }
 

@@ -47,12 +47,16 @@ export const useCatalogSubcategoryPicker = ({
   onNavigateToProducts,
 }: UseCatalogSubcategoryPickerParams) => {
   const queryClient = useQueryClient();
-  const [pickerTrail, setPickerTrail] = useState<CatalogSubcategoryPickerTrailStep[]>([]);
-  const [pickerLoadError, setPickerLoadError] = useState<string | null>(null);
-  const [resolvingLandingCategoryKey, setResolvingLandingCategoryKey] = useState<string | null>(
-    null,
+  const [pickerTrail, setPickerTrail] = useState<CatalogSubcategoryPickerTrailStep[]>(
+    [],
   );
-  const [resolvingPickerCategoryId, setResolvingPickerCategoryId] = useState<string | null>(null);
+  const [pickerLoadError, setPickerLoadError] = useState<string | null>(null);
+  const [resolvingLandingCategoryKey, setResolvingLandingCategoryKey] = useState<
+    string | null
+  >(null);
+  const [resolvingPickerCategoryId, setResolvingPickerCategoryId] = useState<
+    string | null
+  >(null);
   const isResolvingLandingCategoryRef = useRef(false);
   const isResolvingPickerCategoryRef = useRef(false);
 
@@ -95,14 +99,19 @@ export const useCatalogSubcategoryPicker = ({
     [clearPickerTrail, onNavigateToProducts],
   );
 
-  const openPickerForCategory = useCallback((step: CatalogSubcategoryPickerTrailStep) => {
-    setPickerLoadError(null);
-    setPickerTrail([step]);
-  }, []);
+  const openPickerForCategory = useCallback(
+    (step: CatalogSubcategoryPickerTrailStep) => {
+      setPickerLoadError(null);
+      setPickerTrail([step]);
+    },
+    [],
+  );
 
   const reportChildrenLoadError = useCallback((error: unknown) => {
     const message =
-      error instanceof Error ? error.message : API_CLIENT_UI.FETCH_CATEGORY_CHILDREN_FALLBACK;
+      error instanceof Error
+        ? error.message
+        : API_CLIENT_UI.FETCH_CATEGORY_CHILDREN_FALLBACK;
     setPickerLoadError(message);
   }, []);
 
@@ -113,7 +122,8 @@ export const useCatalogSubcategoryPicker = ({
       }
 
       const rootId =
-        item.categoryId ?? findCategoryRootIdForLegacySlug(categoryRoots, item.categorySlug);
+        item.categoryId ??
+        findCategoryRootIdForLegacySlug(categoryRoots, item.categorySlug);
 
       if (!rootId) {
         onNavigateToProducts({

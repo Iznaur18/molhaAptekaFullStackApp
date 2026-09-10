@@ -27,7 +27,9 @@ export async function createCategoryBreadcrumbResolver() {
     const path = buildLeafCategoryBreadcrumbPath(leaf);
     byFullPathKey.set(normalizeCategoryBreadcrumbKey(path), leaf);
 
-    const labelKey = String(leaf.labelRu ?? "").trim().toLowerCase();
+    const labelKey = String(leaf.labelRu ?? "")
+      .trim()
+      .toLowerCase();
     if (!labelKey) {
       continue;
     }

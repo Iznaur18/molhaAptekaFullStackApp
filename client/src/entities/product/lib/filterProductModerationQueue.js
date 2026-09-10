@@ -25,7 +25,9 @@ export function filterProductModerationQueue(
   }
 
   if (attentionOnly) {
-    result = result.filter((product) => productModerationNeedsAttention(product, nowMs));
+    result = result.filter((product) =>
+      productModerationNeedsAttention(product, nowMs),
+    );
   }
 
   return result;

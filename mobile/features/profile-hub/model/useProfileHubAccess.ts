@@ -43,7 +43,8 @@ export type ProfileHubAccess = {
 };
 
 export const useProfileHubAccess = (): ProfileHubAccess => {
-  const { isAuthorized, role, isAdmin, canModerate, isUserDataConfirmed } = useUserAccess();
+  const { isAuthorized, role, isAdmin, canModerate, isUserDataConfirmed } =
+    useUserAccess();
   const isProfileReady = isAuthorized;
   const isRegularUser = role === USER_ROLE_USER;
 

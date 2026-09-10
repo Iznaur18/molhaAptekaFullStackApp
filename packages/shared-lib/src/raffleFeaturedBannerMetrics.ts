@@ -149,7 +149,9 @@ export const resolveRaffleFeaturedBannerInnerMinHeight = (
 
 export const resolveRaffleFeaturedBannerMetrics = (
   cardWidth: number,
-  layout: RaffleFeaturedBannerLayoutMode = resolveRaffleFeaturedBannerLayoutMode(cardWidth),
+  layout: RaffleFeaturedBannerLayoutMode = resolveRaffleFeaturedBannerLayoutMode(
+    cardWidth,
+  ),
   options: RaffleFeaturedBannerMetricsOptions = {},
 ): RaffleFeaturedBannerMetrics => {
   const visualWidth = resolveRaffleFeaturedVisualWidth(cardWidth, layout);
@@ -161,7 +163,11 @@ export const resolveRaffleFeaturedBannerMetrics = (
     visualWidth,
     visualHeight: resolveRaffleFeaturedVisualHeight(visualWidth, layout),
     bodyMinHeight: resolveRaffleFeaturedBodyMinHeight(layout, options),
-    innerMinHeight: resolveRaffleFeaturedBannerInnerMinHeight(cardWidth, layout, options),
+    innerMinHeight: resolveRaffleFeaturedBannerInnerMinHeight(
+      cardWidth,
+      layout,
+      options,
+    ),
     titleSlotHeight: resolveRaffleFeaturedTitleSlotHeight(),
     descriptionSlotHeight: resolveRaffleFeaturedDescriptionSlotHeight(),
     progressSlotHeight: resolveRaffleFeaturedProgressSlotHeight(),

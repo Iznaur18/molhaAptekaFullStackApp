@@ -5,8 +5,6 @@ import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentL
 import { cancelButtonStyleBlock } from "@/shared/theme/cancelButtonChromeStyles";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-
-
 export const useAdvertisingPageStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,

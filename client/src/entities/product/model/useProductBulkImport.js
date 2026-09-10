@@ -27,7 +27,9 @@ export function useProductBulkImport({ isOpen, onCompleted }) {
   const [totalRows, setTotalRows] = useState(0);
   const [processedRows, setProcessedRows] = useState(0);
   const [createdCount, setCreatedCount] = useState(0);
-  const pollTimerRef = useRef(/** @type {ReturnType<typeof setInterval> | null} */ (null));
+  const pollTimerRef = useRef(
+    /** @type {ReturnType<typeof setInterval> | null} */ (null),
+  );
 
   const clearPollTimer = useCallback(() => {
     if (pollTimerRef.current) {
@@ -101,7 +103,9 @@ export function useProductBulkImport({ isOpen, onCompleted }) {
     try {
       await downloadProductBulkImportTemplate();
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Не удалось скачать шаблон");
+      setErrorMessage(
+        error instanceof Error ? error.message : "Не удалось скачать шаблон",
+      );
     }
   }, []);
 
@@ -137,7 +141,9 @@ export function useProductBulkImport({ isOpen, onCompleted }) {
       startPolling(result.jobId);
     } catch (error) {
       setPhase("failed");
-      setErrorMessage(error instanceof Error ? error.message : "Не удалось импортировать товары");
+      setErrorMessage(
+        error instanceof Error ? error.message : "Не удалось импортировать товары",
+      );
     }
   }, [selectedFile, startPolling]);
 

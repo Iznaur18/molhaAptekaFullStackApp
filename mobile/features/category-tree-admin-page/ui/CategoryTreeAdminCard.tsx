@@ -42,13 +42,17 @@ export const CategoryTreeAdminCard = ({
   const indent = resolveCategoryTreeCardIndent(row.depth);
 
   return (
-    <View style={[styles.card, isEditing && styles.cardEditing, { marginLeft: indent }]}>
+    <View
+      style={[styles.card, isEditing && styles.cardEditing, { marginLeft: indent }]}
+    >
       <View style={styles.cardBody}>
         {isEditing ? (
           <>
             <View style={styles.editGrid}>
               <View style={styles.field}>
-                <Text style={styles.fieldLabel}>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_NAME}</Text>
+                <Text style={styles.fieldLabel}>
+                  {CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_NAME}
+                </Text>
                 <TextInput
                   style={styles.fieldInput}
                   value={String(editDraft.labelRu ?? "")}
@@ -57,7 +61,9 @@ export const CategoryTreeAdminCard = ({
                 />
               </View>
               <View style={styles.field}>
-                <Text style={styles.fieldLabel}>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_SLUG}</Text>
+                <Text style={styles.fieldLabel}>
+                  {CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_SLUG}
+                </Text>
                 <TextInput
                   style={styles.fieldInput}
                   value={String(editDraft.slug ?? "")}
@@ -66,7 +72,9 @@ export const CategoryTreeAdminCard = ({
                 />
               </View>
               <View style={[styles.field, styles.fieldFull]}>
-                <Text style={styles.fieldLabel}>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_PARENT}</Text>
+                <Text style={styles.fieldLabel}>
+                  {CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_PARENT}
+                </Text>
                 <CategoryTreeParentPicker
                   value={String(editDraft.parentId ?? "")}
                   options={parentOptions.filter((item) => item.id !== row._id)}
@@ -75,7 +83,9 @@ export const CategoryTreeAdminCard = ({
                 />
               </View>
               <View style={styles.switchRow}>
-                <Text style={styles.fieldLabel}>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_LEAF}</Text>
+                <Text style={styles.fieldLabel}>
+                  {CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_LEAF}
+                </Text>
                 <Switch
                   value={editDraft.isLeaf === true}
                   onValueChange={(value) => onDraftChange({ isLeaf: value })}
@@ -83,7 +93,9 @@ export const CategoryTreeAdminCard = ({
                 />
               </View>
               <View style={styles.field}>
-                <Text style={styles.fieldLabel}>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_LEGACY}</Text>
+                <Text style={styles.fieldLabel}>
+                  {CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_LEGACY}
+                </Text>
                 <CategoryTreeLegacyPicker
                   value={String(editDraft.legacyProductCategory ?? "")}
                   onChange={(value) => onDraftChange({ legacyProductCategory: value })}
@@ -91,7 +103,9 @@ export const CategoryTreeAdminCard = ({
                 />
               </View>
               <View style={[styles.field, styles.fieldFull]}>
-                <Text style={styles.fieldLabel}>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_KEYWORDS}</Text>
+                <Text style={styles.fieldLabel}>
+                  {CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_KEYWORDS}
+                </Text>
                 <TextInput
                   style={styles.fieldInput}
                   value={String(editDraft.keywordsCsv ?? "")}
@@ -103,13 +117,22 @@ export const CategoryTreeAdminCard = ({
             </View>
             <View style={styles.editActions}>
               <Pressable
-                style={[styles.primaryButton, isPending && styles.primaryButtonDisabled]}
+                style={[
+                  styles.primaryButton,
+                  isPending && styles.primaryButtonDisabled,
+                ]}
                 disabled={isPending}
                 onPress={onSave}
               >
-                <Text style={styles.primaryButtonText}>{CATEGORY_TREE_ADMIN_PAGE_UI.SAVE_BUTTON}</Text>
+                <Text style={styles.primaryButtonText}>
+                  {CATEGORY_TREE_ADMIN_PAGE_UI.SAVE_BUTTON}
+                </Text>
               </Pressable>
-              <Pressable style={styles.cancelButton} onPress={onCancelEdit} disabled={isPending}>
+              <Pressable
+                style={styles.cancelButton}
+                onPress={onCancelEdit}
+                disabled={isPending}
+              >
                 <Text style={styles.cancelButtonText}>
                   {CATEGORY_TREE_ADMIN_PAGE_UI.CANCEL_BUTTON}
                 </Text>
@@ -122,8 +145,18 @@ export const CategoryTreeAdminCard = ({
               <Text style={styles.path}>{pathLabel}</Text>
               <Text style={styles.slug}>{row.slug}</Text>
               <View style={styles.meta}>
-                <View style={[styles.chip, row.isLeaf ? styles.chipLeaf : styles.chipBranch]}>
-                  <Text style={[styles.chipText, row.isLeaf ? styles.chipLeafText : styles.chipBranchText]}>
+                <View
+                  style={[
+                    styles.chip,
+                    row.isLeaf ? styles.chipLeaf : styles.chipBranch,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.chipText,
+                      row.isLeaf ? styles.chipLeafText : styles.chipBranchText,
+                    ]}
+                  >
                     {row.isLeaf
                       ? CATEGORY_TREE_ADMIN_PAGE_UI.LEAF_BADGE
                       : CATEGORY_TREE_ADMIN_PAGE_UI.BRANCH_BADGE}
@@ -149,7 +182,11 @@ export const CategoryTreeAdminCard = ({
                   {CATEGORY_TREE_ADMIN_PAGE_UI.EDIT_BUTTON}
                 </Text>
               </Pressable>
-              <Pressable style={styles.dangerButton} disabled={isPending} onPress={onDelete}>
+              <Pressable
+                style={styles.dangerButton}
+                disabled={isPending}
+                onPress={onDelete}
+              >
                 <Text style={styles.dangerButtonText}>
                   {CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_BUTTON}
                 </Text>

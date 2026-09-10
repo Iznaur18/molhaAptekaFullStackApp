@@ -46,11 +46,7 @@ export function buildAddressCandidates({ rawLine, structuredLine }) {
  *
  * @param {{ rawLine: string; structuredLine: string; flat: string }} params
  */
-async function verifyStructuredAddressCandidates({
-  rawLine,
-  structuredLine,
-  flat,
-}) {
+async function verifyStructuredAddressCandidates({ rawLine, structuredLine, flat }) {
   const candidates = buildAddressCandidates({ rawLine, structuredLine });
 
   let fallback = null;

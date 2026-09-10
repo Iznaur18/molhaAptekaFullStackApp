@@ -15,6 +15,7 @@ export const useHomeCuratedProductListsQuery = ({
 }: HomeCuratedProductListsQueryOptions = {}) =>
   useQuery({
     queryKey: curatedProductListQueryKeys.home(regionCode),
-    queryFn: () => fetchHomeCuratedProductLists({ regionCode: regionCode || undefined }),
+    queryFn: () =>
+      fetchHomeCuratedProductLists({ regionCode: regionCode || undefined }),
     enabled,
   });

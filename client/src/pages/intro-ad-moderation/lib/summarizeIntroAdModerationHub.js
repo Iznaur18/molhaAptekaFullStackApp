@@ -1,4 +1,7 @@
-import { campaignModerationIsStale, campaignModerationNeedsAttention } from "../../../shared/lib/campaignModerationAttention.js";
+import {
+  campaignModerationIsStale,
+  campaignModerationNeedsAttention,
+} from "../../../shared/lib/campaignModerationAttention.js";
 
 /**
  * @param {{
@@ -10,7 +13,12 @@ import { campaignModerationIsStale, campaignModerationNeedsAttention } from "../
  * @param {number} [nowMs]
  */
 export function summarizeIntroAdModerationHub(
-  { introPending = [], bannerPending = [], personalPending = [], rafflePendingCount = 0 },
+  {
+    introPending = [],
+    bannerPending = [],
+    personalPending = [],
+    rafflePendingCount = 0,
+  },
   nowMs = Date.now(),
 ) {
   const allPending = [...introPending, ...bannerPending, ...personalPending];
@@ -29,6 +37,8 @@ export function summarizeIntroAdModerationHub(
     personalPendingCount: personalPending.length,
     rafflePendingCount,
     attentionCount,
-    staleCount: allPending.filter((campaign) => campaignModerationIsStale(campaign, nowMs)).length,
+    staleCount: allPending.filter((campaign) =>
+      campaignModerationIsStale(campaign, nowMs),
+    ).length,
   };
 }

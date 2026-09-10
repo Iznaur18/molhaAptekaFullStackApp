@@ -11,10 +11,7 @@ import { AuctionDashboardProductThumb } from "@/entities/product-price-offer/ui/
 import { AuctionDashboardRowBuyerMeta } from "@/entities/product-price-offer/ui/AuctionDashboardRowBuyerMeta";
 import { AuctionDashboardRowStatus } from "@/entities/product-price-offer/ui/AuctionDashboardRowStatus";
 import { AuctionDashboardSellerActions } from "@/entities/product-price-offer/ui/AuctionDashboardSellerActions";
-import {
-  AUCTION_PAGE_UI,
-  PRODUCT_PRICE_OFFER_UI,
-} from "@/shared/config";
+import { AUCTION_PAGE_UI, PRODUCT_PRICE_OFFER_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
 import { useAuctionDashboardRowStyles } from "@/shared/theme/auctionPageStyles";
 import { CommerceCardExpandToggle } from "@/shared/ui/CommerceCardExpandToggle";
@@ -42,7 +39,9 @@ export const AuctionSellerOfferRow = ({
   onExpandedChange,
 }: AuctionSellerOfferRowProps) => {
   const styles = useAuctionDashboardRowStyles();
-  const { acceptMutation, rejectMutation } = usePriceOfferSellerMutations(String(offer.productId));
+  const { acceptMutation, rejectMutation } = usePriceOfferSellerMutations(
+    String(offer.productId),
+  );
   const [error, setError] = useState("");
 
   const isBusy = acceptMutation.isPending || rejectMutation.isPending;
@@ -51,7 +50,9 @@ export const AuctionSellerOfferRow = ({
   const isAccepted = offer.status === PRICE_OFFER_STATUS_ACCEPTED;
   const isExpanded = !collapsible || expanded;
   const needsAttention = offerNeedsAttention(offer);
-  const collapsedPreview = !isExpanded ? resolveSellerOfferCollapsedPreview(offer) : null;
+  const collapsedPreview = !isExpanded
+    ? resolveSellerOfferCollapsedPreview(offer)
+    : null;
 
   const toggleExpanded = () => {
     onExpandedChange?.(!expanded);
@@ -63,7 +64,11 @@ export const AuctionSellerOfferRow = ({
       await acceptMutation.mutateAsync(offer._id);
       onChanged?.();
     } catch (acceptError) {
-      setError(acceptError instanceof Error ? acceptError.message : AUCTION_PAGE_UI.ERROR_GENERIC);
+      setError(
+        acceptError instanceof Error
+          ? acceptError.message
+          : AUCTION_PAGE_UI.ERROR_GENERIC,
+      );
     }
   };
 
@@ -73,7 +78,11 @@ export const AuctionSellerOfferRow = ({
       await rejectMutation.mutateAsync(offer._id);
       onChanged?.();
     } catch (rejectError) {
-      setError(rejectError instanceof Error ? rejectError.message : AUCTION_PAGE_UI.ERROR_GENERIC);
+      setError(
+        rejectError instanceof Error
+          ? rejectError.message
+          : AUCTION_PAGE_UI.ERROR_GENERIC,
+      );
     }
   };
 

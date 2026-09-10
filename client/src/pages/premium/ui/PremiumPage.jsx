@@ -10,7 +10,13 @@ import "./PremiumPage.css";
 
 function CheckIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      aria-hidden="true"
+    >
       <path strokeLinecap="round" strokeLinejoin="round" d="M20 6L9 17l-5-5" />
     </svg>
   );
@@ -18,16 +24,32 @@ function CheckIcon() {
 
 function AwardIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
       <circle cx="12" cy="8" r="6" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8.21 13.89L7 22l5-3 5 3-1.21-8.11" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M8.21 13.89L7 22l5-3 5 3-1.21-8.11"
+      />
     </svg>
   );
 }
 
 function StatusVerifiedIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -39,7 +61,13 @@ function StatusVerifiedIcon() {
 
 function InfoIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
       <circle cx="12" cy="12" r="10" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-4M12 8h.01" />
     </svg>
@@ -48,7 +76,13 @@ function InfoIcon() {
 
 function ErrorIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
       <circle cx="12" cy="12" r="10" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4M12 16h.01" />
     </svg>
@@ -154,7 +188,9 @@ export function PremiumPage({ isAuthorized, onRequestLogin, onPurchased }) {
           <p className="premium-page__hero-caption">{PREMIUM_PAGE_UI.PLAN_TITLE}</p>
           <p className="premium-page__hero-row">
             <span className="premium-page__hero-value">{pricePoints}</span>
-            <span className="premium-page__hero-unit">{pluralizeRuBall(pricePoints)}</span>
+            <span className="premium-page__hero-unit">
+              {pluralizeRuBall(pricePoints)}
+            </span>
           </p>
           <p className="premium-page__hero-info">{PREMIUM_PAGE_UI.PLAN_PERIOD}</p>
         </div>
@@ -164,7 +200,9 @@ export function PremiumPage({ isAuthorized, onRequestLogin, onPurchased }) {
       </div>
 
       <article className="premium-page__benefits-card">
-        <h3 className="premium-page__benefits-title">{PREMIUM_PAGE_UI.BENEFITS_TITLE}</h3>
+        <h3 className="premium-page__benefits-title">
+          {PREMIUM_PAGE_UI.BENEFITS_TITLE}
+        </h3>
         <ul className="premium-page__benefits">
           {PREMIUM_PAGE_UI.PLAN_BENEFITS.map((item) => (
             <li key={item} className="premium-page__benefit-row">
@@ -181,7 +219,9 @@ export function PremiumPage({ isAuthorized, onRequestLogin, onPurchased }) {
         <span className="premium-page__balance-icon" aria-hidden="true">
           <AwardIcon />
         </span>
-        <p className="premium-page__balance">{PREMIUM_PAGE_UI.BALANCE(loyaltyPointsBalance)}</p>
+        <p className="premium-page__balance">
+          {PREMIUM_PAGE_UI.BALANCE(loyaltyPointsBalance)}
+        </p>
       </div>
 
       {isActive ? (
@@ -214,7 +254,10 @@ export function PremiumPage({ isAuthorized, onRequestLogin, onPurchased }) {
       {canPurchase ? (
         <div className="premium-page__actions">
           {!hasEnoughPoints ? (
-            <div className="premium-page__banner premium-page__banner_danger" role="alert">
+            <div
+              className="premium-page__banner premium-page__banner_danger"
+              role="alert"
+            >
               <span className="premium-page__banner-icon" aria-hidden="true">
                 <ErrorIcon />
               </span>

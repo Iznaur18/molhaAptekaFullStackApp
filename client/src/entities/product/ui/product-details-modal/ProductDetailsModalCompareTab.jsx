@@ -61,7 +61,9 @@ export function ProductDetailsModalCompareTab({
   }
 
   if (products.length === 0) {
-    return <p className="product-details-compare-tab__empty">{PRODUCT_COMPARE_UI.EMPTY}</p>;
+    return (
+      <p className="product-details-compare-tab__empty">{PRODUCT_COMPARE_UI.EMPTY}</p>
+    );
   }
 
   return (

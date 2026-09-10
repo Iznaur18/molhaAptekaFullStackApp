@@ -32,7 +32,9 @@ export const useAppIntroAdminPage = () => {
   const patchMutation = usePatchAppIntroSettingsMutation();
   const { previewIntro, replayIntro } = useAppIntro();
 
-  const [form, setForm] = useState<AppIntroAdminForm>(() => mapAppIntroSettingsToForm(null));
+  const [form, setForm] = useState<AppIntroAdminForm>(() =>
+    mapAppIntroSettingsToForm(null),
+  );
   const [actionError, setActionError] = useState("");
   const [saveNotice, setSaveNotice] = useState(false);
 
@@ -79,7 +81,9 @@ export const useAppIntroAdminPage = () => {
     setActionError("");
     setSaveNotice(false);
     try {
-      const saved = await patchMutation.mutateAsync(buildPatchAppIntroSettingsBody(form));
+      const saved = await patchMutation.mutateAsync(
+        buildPatchAppIntroSettingsBody(form),
+      );
       setForm(mapAppIntroSettingsToForm(saved.settings));
       setSaveNotice(true);
     } catch (error) {

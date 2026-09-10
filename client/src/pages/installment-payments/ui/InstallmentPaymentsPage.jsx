@@ -41,7 +41,11 @@ export function InstallmentPaymentsPage({
     [allContracts],
   );
   const contracts = useMemo(
-    () => filterInstallmentBuyerContracts(allContracts, { status: statusFilter, attentionOnly }),
+    () =>
+      filterInstallmentBuyerContracts(allContracts, {
+        status: statusFilter,
+        attentionOnly,
+      }),
     [allContracts, statusFilter, attentionOnly],
   );
 
@@ -147,14 +151,24 @@ export function InstallmentPaymentsPage({
   const listActions =
     contracts.length > 0 ? (
       <div className="installment-page__list-actions">
-        <button type="button" className="installment-page__list-action" onClick={expandAll}>
+        <button
+          type="button"
+          className="installment-page__list-action"
+          onClick={expandAll}
+        >
           {INSTALLMENT_UI.PAYMENTS_EXPAND_ALL}
         </button>
-        <button type="button" className="installment-page__list-action" onClick={collapseAll}>
+        <button
+          type="button"
+          className="installment-page__list-action"
+          onClick={collapseAll}
+        >
           {INSTALLMENT_UI.PAYMENTS_COLLAPSE_ALL}
         </button>
         {attentionOnly ? (
-          <p className="installment-page__filter-hint">{INSTALLMENT_UI.PAYMENTS_ATTENTION_FILTER_HINT}</p>
+          <p className="installment-page__filter-hint">
+            {INSTALLMENT_UI.PAYMENTS_ATTENTION_FILTER_HINT}
+          </p>
         ) : null}
       </div>
     ) : null;
@@ -163,7 +177,9 @@ export function InstallmentPaymentsPage({
     return (
       <InstallmentPageLayout {...layoutProps}>
         {overview}
-        <p className="installment-page__state">{INSTALLMENT_UI.PAYMENTS_PAGE_LOADING}</p>
+        <p className="installment-page__state">
+          {INSTALLMENT_UI.PAYMENTS_PAGE_LOADING}
+        </p>
       </InstallmentPageLayout>
     );
   }
@@ -172,7 +188,10 @@ export function InstallmentPaymentsPage({
     return (
       <InstallmentPageLayout {...layoutProps}>
         {overview}
-        <p className="installment-page__state installment-page__state_error" role="alert">
+        <p
+          className="installment-page__state installment-page__state_error"
+          role="alert"
+        >
           {error}
         </p>
       </InstallmentPageLayout>

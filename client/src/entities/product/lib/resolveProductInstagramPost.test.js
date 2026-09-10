@@ -13,6 +13,8 @@ describe("resolveProductInstagramPost", () => {
 
   it("returns null for empty or invalid url", () => {
     expect(resolveProductInstagramPost({ productInstagramPostUrl: "" })).toBeNull();
-    expect(resolveProductInstagramPost({ productInstagramPostUrl: "https://example.com" })).toBeNull();
+    expect(
+      resolveProductInstagramPost({ productInstagramPostUrl: "https://example.com" }),
+    ).toBeNull();
   });
 });

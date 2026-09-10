@@ -45,14 +45,8 @@ const passportFieldsSchema = z.object({
     .max(PASSPORT_NAME_MAX_LENGTH, "Некорректное отчество")
     .optional()
     .default(""),
-  series: z
-    .string()
-    .trim()
-    .regex(PASSPORT_SERIES_RE, "Серия паспорта: 4 цифры"),
-  number: z
-    .string()
-    .trim()
-    .regex(PASSPORT_NUMBER_RE, "Номер паспорта: 6 цифр"),
+  series: z.string().trim().regex(PASSPORT_SERIES_RE, "Серия паспорта: 4 цифры"),
+  number: z.string().trim().regex(PASSPORT_NUMBER_RE, "Номер паспорта: 6 цифр"),
   issuedBy: z.string().trim().min(1, "Укажите, кем выдан паспорт"),
   departmentCode: z
     .string()
@@ -60,7 +54,10 @@ const passportFieldsSchema = z.object({
     .regex(PASSPORT_DEPARTMENT_CODE_RE, "Код подразделения: формат 000-000"),
   birthDate: z.coerce.date({ invalid_type_error: "Укажите дату рождения" }),
   issuedAt: z.coerce.date({ invalid_type_error: "Укажите дату выдачи" }),
-  passportSelfiePhotoUrl: z.string().trim().min(1, "Загрузите фото с паспортом в руках"),
+  passportSelfiePhotoUrl: z
+    .string()
+    .trim()
+    .min(1, "Загрузите фото с паспортом в руках"),
 });
 
 export const passportPayloadSchema = passportFieldsSchema.omit({
@@ -152,7 +149,11 @@ export const submitDataConfirmationBodySchema = z.preprocess((raw) => {
     return raw;
   }
   const body = /** @type {Record<string, unknown>} */ (raw);
-  if (body.passport && typeof body.passport === "object" && !Array.isArray(body.passport)) {
+  if (
+    body.passport &&
+    typeof body.passport === "object" &&
+    !Array.isArray(body.passport)
+  ) {
     return {
       ...body.passport,
       passportSelfiePhotoUrl: body.passportSelfiePhotoUrl,

@@ -7,15 +7,12 @@ process.env.JWT_SECRET =
 
 const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollections } =
   await import("./helpers/mongoTestDb.js");
-const { default: ProductCategoryModel } = await import(
-  "../models/ProductCategoryModel.js"
-);
-const { default: ProductCategoryDisplayModel } = await import(
-  "../models/ProductCategoryDisplayModel.js"
-);
-const { listProductCategoriesAdminController } = await import(
-  "../controllers/Product/productCategoryAdminControllers.js"
-);
+const { default: ProductCategoryModel } =
+  await import("../models/ProductCategoryModel.js");
+const { default: ProductCategoryDisplayModel } =
+  await import("../models/ProductCategoryDisplayModel.js");
+const { listProductCategoriesAdminController } =
+  await import("../controllers/Product/productCategoryAdminControllers.js");
 
 /** Заглушка res: контроллер отвечает через successRes. */
 const captureResponse = () => {

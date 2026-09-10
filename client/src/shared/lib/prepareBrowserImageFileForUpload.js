@@ -148,7 +148,9 @@ export async function prepareBrowserImageFileForUpload(file, options = {}) {
 
   const mimeType = resolveBrowserImageMimeType(file);
   const needsJpegConversion =
-    isBrowserHeicImageFile(file) || !mimeType || !isDirectlyUploadableMimeType(mimeType);
+    isBrowserHeicImageFile(file) ||
+    !mimeType ||
+    !isDirectlyUploadableMimeType(mimeType);
 
   if (!needsJpegConversion && file.size <= UPLOAD_IMAGE_COMPRESS_TARGET_BYTES) {
     return file;

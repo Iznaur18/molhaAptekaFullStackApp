@@ -1,11 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
 
 import {
   buildResolvedCatalogFeedTileDisplays,
@@ -112,7 +106,9 @@ export const EditFeedTileDisplayModal = ({
       handleClose();
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : PRODUCT_CATEGORY_DISPLAY_UI.FEED_SAVE_FALLBACK,
+        error instanceof Error
+          ? error.message
+          : PRODUCT_CATEGORY_DISPLAY_UI.FEED_SAVE_FALLBACK,
       );
     }
   };
@@ -135,7 +131,9 @@ export const EditFeedTileDisplayModal = ({
       handleClose();
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : PRODUCT_CATEGORY_DISPLAY_UI.FEED_SAVE_FALLBACK,
+        error instanceof Error
+          ? error.message
+          : PRODUCT_CATEGORY_DISPLAY_UI.FEED_SAVE_FALLBACK,
       );
     }
   };
@@ -159,7 +157,9 @@ export const EditFeedTileDisplayModal = ({
             {PRODUCT_CATEGORY_DISPLAY_UI.FEED_EDIT_TITLE(resolved.label)}
           </Text>
 
-          <Text style={styles.fieldLabel}>{PRODUCT_CATEGORY_DISPLAY_UI.LABEL_FIELD}</Text>
+          <Text style={styles.fieldLabel}>
+            {PRODUCT_CATEGORY_DISPLAY_UI.LABEL_FIELD}
+          </Text>
           <TextInput
             style={styles.input}
             value={label}
@@ -204,7 +204,9 @@ export const EditFeedTileDisplayModal = ({
           </View>
 
           <Pressable onPress={handleClose} style={styles.closeLink}>
-            <Text style={styles.closeLinkText}>{PRODUCT_CATEGORY_DISPLAY_UI.CLOSE_ARIA}</Text>
+            <Text style={styles.closeLinkText}>
+              {PRODUCT_CATEGORY_DISPLAY_UI.CLOSE_ARIA}
+            </Text>
           </Pressable>
         </>
       ) : null}

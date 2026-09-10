@@ -83,7 +83,9 @@ export function InstallmentDisputesPage({ onQueueChanged }) {
         title={INSTALLMENT_UI.DISPUTES_PAGE_TITLE}
         countLabel={INSTALLMENT_UI.COUNT_DISPUTES(0)}
       >
-        <p className="installment-page__state">{INSTALLMENT_UI.DISPUTES_PAGE_LOADING}</p>
+        <p className="installment-page__state">
+          {INSTALLMENT_UI.DISPUTES_PAGE_LOADING}
+        </p>
       </InstallmentPageLayout>
     );
   }
@@ -94,7 +96,10 @@ export function InstallmentDisputesPage({ onQueueChanged }) {
         title={INSTALLMENT_UI.DISPUTES_PAGE_TITLE}
         countLabel={INSTALLMENT_UI.COUNT_DISPUTES(0)}
       >
-        <p className="installment-page__state installment-page__state_error" role="alert">
+        <p
+          className="installment-page__state installment-page__state_error"
+          role="alert"
+        >
           {error}
         </p>
       </InstallmentPageLayout>
@@ -107,7 +112,10 @@ export function InstallmentDisputesPage({ onQueueChanged }) {
       countLabel={INSTALLMENT_UI.COUNT_DISPUTES(disputes.length)}
     >
       {actionError ? (
-        <p className="installment-page__state installment-page__state_error" role="alert">
+        <p
+          className="installment-page__state installment-page__state_error"
+          role="alert"
+        >
           {actionError}
         </p>
       ) : null}
@@ -124,7 +132,8 @@ export function InstallmentDisputesPage({ onQueueChanged }) {
                 <article className="installment-queue-card">
                   <div className="installment-queue-card__head">
                     <h3 className="installment-queue-card__title">
-                      {dispute.productName?.trim() || INSTALLMENT_UI.DISPUTE_CONTRACT_LABEL}
+                      {dispute.productName?.trim() ||
+                        INSTALLMENT_UI.DISPUTE_CONTRACT_LABEL}
                     </h3>
                   </div>
                   <p className="installment-queue-card__meta">

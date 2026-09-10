@@ -119,13 +119,17 @@ export const CategoryTreeAdminCard = memo(function CategoryTreeAdminCard({
               </label>
               {editDraft.isLeaf === true ? (
                 <label className="admin-panel__field admin-panel__field_full">
-                  <span>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_DEFAULT_CHARACTERISTICS}</span>
+                  <span>
+                    {CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_DEFAULT_CHARACTERISTICS}
+                  </span>
                   <textarea
                     value={String(editDraft.characteristicKeysText ?? "")}
                     onChange={(e) =>
                       onDraftChange({ characteristicKeysText: e.target.value })
                     }
-                    placeholder={CATEGORY_TREE_ADMIN_PAGE_UI.DEFAULT_CHARACTERISTICS_PLACEHOLDER}
+                    placeholder={
+                      CATEGORY_TREE_ADMIN_PAGE_UI.DEFAULT_CHARACTERISTICS_PLACEHOLDER
+                    }
                     rows={5}
                   />
                   <small className="admin-panel__field-hint">

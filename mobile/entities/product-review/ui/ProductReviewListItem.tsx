@@ -53,7 +53,9 @@ export const ProductReviewListItem = ({ review }: ProductReviewListItemProps) =>
           </Text>
         ))}
       </View>
-      {review.text?.trim() ? <Text style={styles.itemBody}>{review.text.trim()}</Text> : null}
+      {review.text?.trim() ? (
+        <Text style={styles.itemBody}>{review.text.trim()}</Text>
+      ) : null}
     </View>
   );
 };

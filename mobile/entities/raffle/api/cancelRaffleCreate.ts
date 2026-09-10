@@ -16,6 +16,8 @@ export const cancelRaffleCreate = async (): Promise<CancelRaffleCreateResult> =>
     }
     return data.data as CancelRaffleCreateResult;
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.CANCEL_RAFFLE_CREATE_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.CANCEL_RAFFLE_CREATE_FALLBACK),
+    );
   }
 };

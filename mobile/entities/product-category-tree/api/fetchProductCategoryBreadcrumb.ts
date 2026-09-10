@@ -18,7 +18,9 @@ export const fetchProductCategoryBreadcrumb = async (
   categoryId: string,
 ): Promise<{ breadcrumb: ProductCategoryBreadcrumb }> => {
   try {
-    const { data } = await apiClient.get(`/product/categories/${categoryId}/breadcrumb`);
+    const { data } = await apiClient.get(
+      `/product/categories/${categoryId}/breadcrumb`,
+    );
 
     if (!data?.success || !data.data?.breadcrumb) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);

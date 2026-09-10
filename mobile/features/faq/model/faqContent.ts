@@ -544,7 +544,6 @@ export const FAQ_SECTIONS: FaqSection[] = [
   },
 ];
 
-
 /** Flat list for search / tests */
 export const FAQ_ITEMS: FaqItem[] = FAQ_SECTIONS.flatMap((section) => section.items);
 

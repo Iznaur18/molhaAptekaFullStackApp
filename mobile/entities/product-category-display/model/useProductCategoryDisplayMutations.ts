@@ -52,8 +52,13 @@ export const useProductCategoryDisplayMutations = () => {
   });
 
   const patchFeedTileMutation = useMutation({
-    mutationFn: ({ tileKey, body }: { tileKey: string; body: PatchCategoryDisplayBody }) =>
-      patchProductCatalogFeedTileDisplay(tileKey, body),
+    mutationFn: ({
+      tileKey,
+      body,
+    }: {
+      tileKey: string;
+      body: PatchCategoryDisplayBody;
+    }) => patchProductCatalogFeedTileDisplay(tileKey, body),
     onSuccess: () => invalidateDisplays(queryClient),
   });
 

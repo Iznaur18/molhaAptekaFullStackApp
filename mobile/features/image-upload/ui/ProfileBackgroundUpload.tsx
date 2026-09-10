@@ -10,7 +10,10 @@ import {
   formatProfileImageContentPosition,
   type ProfileImageFocus,
 } from "@/entities/user/lib/profileImageFocus";
-import { resolveBackgroundForPreview, type BackgroundMode } from "@/entities/user/lib/userBackgroundValue";
+import {
+  resolveBackgroundForPreview,
+  type BackgroundMode,
+} from "@/entities/user/lib/userBackgroundValue";
 import { pickProfileBackgroundAsset } from "@/features/image-upload/lib/pickProfileBackgroundAsset";
 import { EDIT_PROFILE_UI, IMAGE_UPLOAD_UI } from "@/shared/config";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
@@ -60,7 +63,8 @@ export const ProfileBackgroundUpload = ({
       onImageUrlChange(storedUrl);
       onFocusChange(DEFAULT_USER_BACKGROUND_FOCUS);
     } catch (error) {
-      const message = error instanceof Error ? error.message : IMAGE_UPLOAD_UI.ERROR_GENERIC;
+      const message =
+        error instanceof Error ? error.message : IMAGE_UPLOAD_UI.ERROR_GENERIC;
       setLocalError(message);
       onError?.(message);
     }
@@ -89,11 +93,21 @@ export const ProfileBackgroundUpload = ({
                 styles.modeBtn,
                 i === 0 && styles.modeBtnFirst,
                 i === 1 && styles.modeBtnLast,
-                active && { backgroundColor: theme.colors.action, borderColor: theme.colors.action },
+                active && {
+                  backgroundColor: theme.colors.action,
+                  borderColor: theme.colors.action,
+                },
               ]}
             >
-              <Text style={[styles.modeBtnText, { color: active ? semanticColors.onContrast : theme.colors.text }]}>
-                {m === "preset" ? EDIT_PROFILE_UI.BG_MODE_PRESET : EDIT_PROFILE_UI.BG_MODE_IMAGE}
+              <Text
+                style={[
+                  styles.modeBtnText,
+                  { color: active ? semanticColors.onContrast : theme.colors.text },
+                ]}
+              >
+                {m === "preset"
+                  ? EDIT_PROFILE_UI.BG_MODE_PRESET
+                  : EDIT_PROFILE_UI.BG_MODE_IMAGE}
               </Text>
             </Pressable>
           );
@@ -134,9 +148,7 @@ export const ProfileBackgroundUpload = ({
                   ]}
                   accessibilityLabel={preset.labelRu}
                 >
-                  {selected ? (
-                    <View style={styles.swatchCheck} />
-                  ) : null}
+                  {selected ? <View style={styles.swatchCheck} /> : null}
                 </Pressable>
               );
             })}
@@ -147,7 +159,12 @@ export const ProfileBackgroundUpload = ({
                 key={preset.id}
                 style={[
                   styles.swatchLabel,
-                  { color: presetId === preset.id ? theme.colors.action : theme.colors.textMuted },
+                  {
+                    color:
+                      presetId === preset.id
+                        ? theme.colors.action
+                        : theme.colors.textMuted,
+                  },
                 ]}
                 numberOfLines={1}
               >

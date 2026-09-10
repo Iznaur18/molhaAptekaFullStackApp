@@ -7,8 +7,7 @@ import { test } from "node:test";
 const MOBILE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CLIENT_ROOT = join(MOBILE_ROOT, "..", "client");
 
-const readFile = (root, relativePath) =>
-  readFileSync(join(root, relativePath), "utf8");
+const readFile = (root, relativePath) => readFileSync(join(root, relativePath), "utf8");
 
 test("seller meta row matches web layout tokens", () => {
   const layout = readFile(
@@ -35,10 +34,7 @@ test("seller meta row matches web layout tokens", () => {
   assert.match(layout, /shareMetaSize: 34/);
   assert.match(page, /layout="sellerMeta"/);
   assert.match(page, /singleLine/);
-  assert.match(
-    readFile(MOBILE_ROOT, "shared/theme/userPremiumStyles.ts"),
-    /textClip:/,
-  );
+  assert.match(readFile(MOBILE_ROOT, "shared/theme/userPremiumStyles.ts"), /textClip:/);
   assert.match(
     readFile(MOBILE_ROOT, "shared/theme/userPremiumStyles.ts"),
     /textOverflow: "ellipsis"/,

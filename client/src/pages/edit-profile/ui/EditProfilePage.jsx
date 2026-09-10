@@ -34,7 +34,13 @@ const GENDER_OPTIONS = [USER_GENDER_MALE, USER_GENDER_FEMALE, USER_GENDER_NO_SEL
 
 function PencilIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -126,7 +132,11 @@ export function EditProfilePage({
     return (
       <section className="edit-profile-page edit-profile-page_centered">
         <p className="edit-profile-page__hint">{EDIT_PROFILE_MODAL_UI.AUTH_REQUIRED}</p>
-        <button type="button" className="edit-profile-page__login" onClick={onRequestLogin}>
+        <button
+          type="button"
+          className="edit-profile-page__login"
+          onClick={onRequestLogin}
+        >
           {EDIT_PROFILE_MODAL_UI.LOGIN_BUTTON}
         </button>
       </section>
@@ -145,8 +155,12 @@ export function EditProfilePage({
     <section ref={pageRef} className="edit-profile-page">
       <div className="edit-profile-page__hero">
         <div className="edit-profile-page__hero-text">
-          <h1 className="edit-profile-page__hero-title">{EDIT_PROFILE_MODAL_UI.TITLE}</h1>
-          <p className="edit-profile-page__hero-intro">{EDIT_PROFILE_MODAL_UI.HERO_INTRO}</p>
+          <h1 className="edit-profile-page__hero-title">
+            {EDIT_PROFILE_MODAL_UI.TITLE}
+          </h1>
+          <p className="edit-profile-page__hero-intro">
+            {EDIT_PROFILE_MODAL_UI.HERO_INTRO}
+          </p>
         </div>
         <div className="edit-profile-page__hero-icon" aria-hidden="true">
           <PencilIcon />
@@ -201,7 +215,9 @@ export function EditProfilePage({
               />
               <EmailBindControls
                 email={form.email}
-                isEmailVerified={user?.isEmailVerified === true || contactVerified.email}
+                isEmailVerified={
+                  user?.isEmailVerified === true || contactVerified.email
+                }
                 baselineEmail={baselineEmail}
                 disabled={isSubmitting}
                 onVerified={handleEmailVerified}
@@ -220,7 +236,9 @@ export function EditProfilePage({
                 placeholder="user.name"
                 autoComplete="username"
               />
-              <span className="edit-profile-modal__hint">{EDIT_PROFILE_MODAL_UI.USERNAME_HINT}</span>
+              <span className="edit-profile-modal__hint">
+                {EDIT_PROFILE_MODAL_UI.USERNAME_HINT}
+              </span>
             </label>
             {allowStaffLoyaltyEdit ? (
               <label className="edit-profile-modal__label">
@@ -291,7 +309,9 @@ export function EditProfilePage({
               />
               <PhoneBindControls
                 phoneNumber={form.userPhoneNumber}
-                isPhoneVerified={user?.isPhoneVerified === true || contactVerified.phone}
+                isPhoneVerified={
+                  user?.isPhoneVerified === true || contactVerified.phone
+                }
                 baselinePhone={baselinePhone}
                 disabled={isSubmitting}
                 onVerified={handlePhoneVerified}
@@ -389,7 +409,10 @@ export function EditProfilePage({
                     : "edit-profile-modal__word-meter"
                 }
               >
-                {EDIT_PROFILE_MODAL_UI.CHARS_USED(notesChars, NOTES_ABOUT_USER_MAX_CHARS)}
+                {EDIT_PROFILE_MODAL_UI.CHARS_USED(
+                  notesChars,
+                  NOTES_ABOUT_USER_MAX_CHARS,
+                )}
               </span>
             </label>
           </FormSection>
@@ -408,12 +431,18 @@ export function EditProfilePage({
         <div className="edit-profile-page__footer">
           <div className="edit-profile-page__feedback">
             {feedback.kind === "error" ? (
-              <p className="edit-profile-page__message edit-profile-page__message_error" role="alert">
+              <p
+                className="edit-profile-page__message edit-profile-page__message_error"
+                role="alert"
+              >
                 {feedback.message}
               </p>
             ) : null}
             {feedback.kind === "success" ? (
-              <p className="edit-profile-page__message edit-profile-page__message_success" role="status">
+              <p
+                className="edit-profile-page__message edit-profile-page__message_success"
+                role="status"
+              >
                 {feedback.message}
               </p>
             ) : null}
@@ -427,7 +456,11 @@ export function EditProfilePage({
             >
               {EDIT_PROFILE_MODAL_UI.CANCEL}
             </button>
-            <button type="submit" className="edit-profile-page__submit" disabled={isSubmitting}>
+            <button
+              type="submit"
+              className="edit-profile-page__submit"
+              disabled={isSubmitting}
+            >
               {isSubmitting
                 ? EDIT_PROFILE_MODAL_UI.SUBMIT_LOADING
                 : EDIT_PROFILE_MODAL_UI.SUBMIT_IDLE}

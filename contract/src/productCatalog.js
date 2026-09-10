@@ -19,12 +19,9 @@ export const PRODUCT_CATALOG_SORT_VALUES = [
  * 2) секция «В вашем регионе» — самовывоз без точки + `productRegionCode` зрителя.
  */
 export const PRODUCT_CATALOG_NEAR_RADIUS_KM = 30;
-export const PRODUCT_CATALOG_NEAR_RADIUS_METERS =
-  PRODUCT_CATALOG_NEAR_RADIUS_KM * 1000;
-export const PRODUCT_CATALOG_NEAR_AUTH_MESSAGE =
-  "Войдите, чтобы смотреть товары рядом";
-export const PRODUCT_CATALOG_NEAR_ADDRESS_REQUIRED_MESSAGE =
-  "Укажите адрес в профиле";
+export const PRODUCT_CATALOG_NEAR_RADIUS_METERS = PRODUCT_CATALOG_NEAR_RADIUS_KM * 1000;
+export const PRODUCT_CATALOG_NEAR_AUTH_MESSAGE = "Войдите, чтобы смотреть товары рядом";
+export const PRODUCT_CATALOG_NEAR_ADDRESS_REQUIRED_MESSAGE = "Укажите адрес в профиле";
 
 export const PRODUCT_CATALOG_NEAR_REGION_SECTION_TITLE = "В вашем регионе";
 
@@ -169,7 +166,9 @@ export const catalogProductsQuerySchema = z.object({
     (slug) =>
       slug === undefined ||
       slug === UNCATEGORIZED_PRODUCT_CATEGORY_SLUG ||
-      PRODUCT_CATEGORY_SLUGS.includes(/** @type {(typeof PRODUCT_CATEGORY_SLUGS)[number]} */ (slug)),
+      PRODUCT_CATEGORY_SLUGS.includes(
+        /** @type {(typeof PRODUCT_CATEGORY_SLUGS)[number]} */ (slug),
+      ),
     { message: "Указана неизвестная категория" },
   ),
   categoryId: optionalTrimmedString.refine(

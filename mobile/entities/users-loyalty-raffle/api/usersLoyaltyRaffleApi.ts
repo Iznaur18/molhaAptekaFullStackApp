@@ -8,25 +8,29 @@ export type UsersLoyaltyRaffleSettings = {
   updatedAt?: string | Date | null;
 };
 
-export const fetchUsersLoyaltyRaffleSettings = async (): Promise<UsersLoyaltyRaffleSettings> => {
-  try {
-    const { data } = await apiClient.get("/users-loyalty-raffle");
-    if (!data?.success || data.data?.settings == null) {
-      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
-    }
+export const fetchUsersLoyaltyRaffleSettings =
+  async (): Promise<UsersLoyaltyRaffleSettings> => {
+    try {
+      const { data } = await apiClient.get("/users-loyalty-raffle");
+      if (!data?.success || data.data?.settings == null) {
+        throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+      }
 
-    const settings = data.data.settings;
-    return {
-      description: String(settings.description ?? "").trim(),
-      goal: Math.max(1, Math.floor(Number(settings.goal) || 0)),
-      updatedAt: settings.updatedAt ?? null,
-    };
-  } catch (error) {
-    throw new Error(
-      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_USERS_LOYALTY_RAFFLE_SETTINGS_FALLBACK),
-    );
-  }
-};
+      const settings = data.data.settings;
+      return {
+        description: String(settings.description ?? "").trim(),
+        goal: Math.max(1, Math.floor(Number(settings.goal) || 0)),
+        updatedAt: settings.updatedAt ?? null,
+      };
+    } catch (error) {
+      throw new Error(
+        formatApiErrorMessage(
+          error,
+          API_CLIENT_UI.FETCH_USERS_LOYALTY_RAFFLE_SETTINGS_FALLBACK,
+        ),
+      );
+    }
+  };
 
 export type PatchUsersLoyaltyRaffleSettingsBody = {
   description?: string;
@@ -50,7 +54,10 @@ export const patchUsersLoyaltyRaffleSettings = async (
     };
   } catch (error) {
     throw new Error(
-      formatApiErrorMessage(error, API_CLIENT_UI.PATCH_USERS_LOYALTY_RAFFLE_SETTINGS_FALLBACK),
+      formatApiErrorMessage(
+        error,
+        API_CLIENT_UI.PATCH_USERS_LOYALTY_RAFFLE_SETTINGS_FALLBACK,
+      ),
     );
   }
 };

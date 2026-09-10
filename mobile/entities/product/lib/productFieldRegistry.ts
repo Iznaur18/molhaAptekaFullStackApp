@@ -33,7 +33,10 @@ export const PRODUCT_DETAILS_MODAL_BOTTOM_ROW_FIELD_KEYS = [
   "updatedAt",
 ] as const;
 
-export const PRODUCT_CARD_PREVIEW_FIELD_KEYS = ["productPrice", "productSeller"] as const;
+export const PRODUCT_CARD_PREVIEW_FIELD_KEYS = [
+  "productPrice",
+  "productSeller",
+] as const;
 
 export const PRODUCT_CARD_MODERATION_PREVIEW_FIELD_KEYS = [
   "productPrice",

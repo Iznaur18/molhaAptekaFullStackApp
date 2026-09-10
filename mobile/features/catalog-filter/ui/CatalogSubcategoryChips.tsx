@@ -30,13 +30,20 @@ export const CatalogSubcategoryChips = ({
 
   return (
     <View style={styles.wrap}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.row}
+      >
         <Pressable
           style={[styles.chip, selectedSubcategoryId === null && styles.chipActive]}
           onPress={() => onSelect(null)}
         >
           <Text
-            style={[styles.chipText, selectedSubcategoryId === null && styles.chipTextActive]}
+            style={[
+              styles.chipText,
+              selectedSubcategoryId === null && styles.chipTextActive,
+            ]}
           >
             {CATALOG_FILTER_UI.ALL_IN_CATEGORY}
           </Text>
@@ -49,7 +56,9 @@ export const CatalogSubcategoryChips = ({
               style={[styles.chip, isActive && styles.chipActive]}
               onPress={() => onSelect(chip.id)}
             >
-              <Text style={[styles.chipText, isActive && styles.chipTextActive]}>{chip.label}</Text>
+              <Text style={[styles.chipText, isActive && styles.chipTextActive]}>
+                {chip.label}
+              </Text>
             </Pressable>
           );
         })}

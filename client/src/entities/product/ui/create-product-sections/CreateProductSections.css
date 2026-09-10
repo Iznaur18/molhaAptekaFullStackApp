@@ -52,7 +52,8 @@
   gap: 0.55rem;
 }
 
-.create-product-section__originality-chips .create-product-section__listing-origin-chip {
+.create-product-section__originality-chips
+  .create-product-section__listing-origin-chip {
   flex: 1 1 8rem;
   min-width: 7rem;
 }
@@ -161,7 +162,8 @@
   color: var(--iz-color-text);
 }
 
-:root[data-theme="dark"] .create-product-section__desc-toolbar-btn:hover:not(:disabled) {
+:root[data-theme="dark"]
+  .create-product-section__desc-toolbar-btn:hover:not(:disabled) {
   border-color: var(--iz-color-border-strong);
 }
 
@@ -236,7 +238,11 @@
   padding: 0.65rem 0.75rem;
   border: 1px solid color-mix(in srgb, var(--iz-color-border) 80%, transparent);
   border-radius: 0.65rem;
-  background: color-mix(in srgb, var(--iz-color-surface-elevated) 55%, var(--iz-color-surface));
+  background: color-mix(
+    in srgb,
+    var(--iz-color-surface-elevated) 55%,
+    var(--iz-color-surface)
+  );
 }
 
 .create-product-review__term {

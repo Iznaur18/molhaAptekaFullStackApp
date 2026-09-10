@@ -29,7 +29,12 @@ export const ModerationCampaignCollapsibleFrame = ({
   const isExpanded = !collapsible || expanded;
 
   return (
-    <View style={[needsAttention ? styles.cardAttention : undefined, collapsible ? { gap: 8 } : undefined]}>
+    <View
+      style={[
+        needsAttention ? styles.cardAttention : undefined,
+        collapsible ? { gap: 8 } : undefined,
+      ]}
+    >
       {collapsible ? (
         <Pressable
           style={[
@@ -49,7 +54,9 @@ export const ModerationCampaignCollapsibleFrame = ({
             ) : null}
           </View>
           <View style={styles.collapsedMeta}>
-            {createdLabel ? <Text style={styles.collapsedCreated}>{createdLabel}</Text> : null}
+            {createdLabel ? (
+              <Text style={styles.collapsedCreated}>{createdLabel}</Text>
+            ) : null}
             <Text style={styles.collapsedChevron}>{isExpanded ? "▾" : "▸"}</Text>
             <Text style={styles.collapsedExpandLabel}>
               {INTRO_AD_MODERATION_PAGE_UI.EXPAND_TOGGLE(isExpanded)}

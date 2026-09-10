@@ -47,7 +47,9 @@ export const useSellerProductsInfiniteQuery = ({
     if (!query.data?.pages) {
       return [];
     }
-    return query.data.pages.flatMap((page) => mapSellerCatalogItemsToProducts(page.items));
+    return query.data.pages.flatMap((page) =>
+      mapSellerCatalogItemsToProducts(page.items),
+    );
   }, [query.data]);
 
   const phase = useMemo(() => {

@@ -197,7 +197,8 @@ export function useCatalogBrowserLanding({
     subcategoryPicker.clearPickerTrail,
   ]);
 
-  const handleCatalogCategoryGridClick = subcategoryPicker.handleCatalogCategoryGridClick;
+  const handleCatalogCategoryGridClick =
+    subcategoryPicker.handleCatalogCategoryGridClick;
 
   const handleSellerPersonalCategoryTileClick = useCallback(
     (tile) => {
@@ -252,7 +253,6 @@ export function useCatalogBrowserLanding({
       subcategoryPicker.clearPickerTrail,
     ],
   );
-
 
   const handleCategoryDisplaySaved = useCallback(
     (display) => {
@@ -349,13 +349,15 @@ export function useCatalogBrowserLanding({
     handleFeedTileDisplaySaved,
     selectedCategoryLabel,
     activeCatalogFeedLabel,
-    isCatalogSubcategoryPickerActive: subcategoryPicker.isCatalogSubcategoryPickerActive,
+    isCatalogSubcategoryPickerActive:
+      subcategoryPicker.isCatalogSubcategoryPickerActive,
     subcategoryPickerTrail: subcategoryPicker.pickerTrail,
     subcategoryPickerLoadError: subcategoryPicker.pickerLoadError,
     resolvingLandingCategoryKey: subcategoryPicker.resolvingLandingCategoryKey,
     resolvingPickerCategoryId: subcategoryPicker.resolvingPickerCategoryId,
     handleSubcategoryPickerBack: subcategoryPicker.handleSubcategoryPickerBack,
     handleSubcategoryPickerViewAll: subcategoryPicker.handleSubcategoryPickerViewAll,
-    handleSubcategoryPickerCategoryClick: subcategoryPicker.handleSubcategoryPickerCategoryClick,
+    handleSubcategoryPickerCategoryClick:
+      subcategoryPicker.handleSubcategoryPickerCategoryClick,
   };
 }

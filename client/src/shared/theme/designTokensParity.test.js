@@ -28,7 +28,9 @@ const readRootCssVars = () => {
   expect(end, "блок :root не закрыт").toBeGreaterThan(start);
 
   const vars = {};
-  for (const match of cssText.slice(start, end).matchAll(/(--iz-color-[a-z-]+):\s*([^;]+);/g)) {
+  for (const match of cssText
+    .slice(start, end)
+    .matchAll(/(--iz-color-[a-z-]+):\s*([^;]+);/g)) {
     vars[match[1]] = match[2].trim();
   }
   return vars;

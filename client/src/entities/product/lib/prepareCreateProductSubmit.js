@@ -1,6 +1,9 @@
 import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
 
-import { validateInstagramPostUrlInput, parseInstagramPostUrl } from "@molha/api-contract";
+import {
+  validateInstagramPostUrlInput,
+  parseInstagramPostUrl,
+} from "@molha/api-contract";
 
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import {
@@ -36,7 +39,10 @@ import {
   validateProductReturnTermRows,
 } from "./productReturnTermRows.js";
 import { urlsFromImageRows } from "./productImageRowHelpers.js";
-import { PRODUCT_STOCK_QUANTITY_MAX, PRODUCT_STOCK_QUANTITY_MIN } from "../model/productStockConstants.js";
+import {
+  PRODUCT_STOCK_QUANTITY_MAX,
+  PRODUCT_STOCK_QUANTITY_MIN,
+} from "../model/productStockConstants.js";
 
 /**
  * @typedef {{
@@ -115,7 +121,7 @@ export function prepareCreateProductSubmit({
     return { ok: false, message: instagramPostUrlError };
   }
   const productInstagramPostUrl = instagramPostUrlRaw
-    ? parseInstagramPostUrl(instagramPostUrlRaw)?.postUrl ?? ""
+    ? (parseInstagramPostUrl(instagramPostUrlRaw)?.postUrl ?? "")
     : "";
   if (previewVideoUrl && urls.length === 0) {
     return {
@@ -199,7 +205,11 @@ export function prepareCreateProductSubmit({
     return { ok: false, message: PRODUCT_FULFILLMENT_METHOD_REQUIRED_MESSAGE };
   }
   // Либо продавец везёт сам, либо отдаёт курьеру.
-  if (!followsSellerProfile && productDeliveryEnabled && productCourierDeliveryEnabled) {
+  if (
+    !followsSellerProfile &&
+    productDeliveryEnabled &&
+    productCourierDeliveryEnabled
+  ) {
     return { ok: false, message: PRODUCT_COURIER_DELIVERY_CONFLICT_MESSAGE };
   }
 

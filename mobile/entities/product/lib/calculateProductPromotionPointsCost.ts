@@ -43,5 +43,7 @@ export const formatProductPromotionTierRatePercent = (tier: number): string => {
     return "";
   }
   const percent = rate * 100;
-  return Number.isInteger(percent) ? String(percent) : percent.toFixed(1).replace(/\.0$/, "");
+  return Number.isInteger(percent)
+    ? String(percent)
+    : percent.toFixed(1).replace(/\.0$/, "");
 };

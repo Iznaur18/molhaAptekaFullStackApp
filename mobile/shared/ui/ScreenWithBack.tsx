@@ -18,7 +18,9 @@ export const ScreenWithBack = ({ children }: ScreenWithBackProps) => {
   return (
     <View style={styles.root}>
       <ScreenBackButton />
-      <View style={[styles.content, { paddingTop: contentPaddingTop }]}>{children}</View>
+      <View style={[styles.content, { paddingTop: contentPaddingTop }]}>
+        {children}
+      </View>
     </View>
   );
 };

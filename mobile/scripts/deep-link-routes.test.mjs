@@ -67,7 +67,10 @@ test("вложенный путь схлопывается к своему ра�
 
 test("легаси-пути веба ведут туда же, куда ведёт редирект в вебе", () => {
   assert.equal(resolveWebPathToMobileRoute("/users"), "/users");
-  assert.equal(resolveWebPathToMobileRoute("/affiliate-listings"), "/hub/partner-program");
+  assert.equal(
+    resolveWebPathToMobileRoute("/affiliate-listings"),
+    "/hub/partner-program",
+  );
   assert.equal(
     resolveWebPathToMobileRoute("/product-manage-toggle-display-admin"),
     "/hub/site-header-banner-admin",
@@ -120,7 +123,10 @@ test("deep link на наш домен не остаётся без навига
 
 test("баннер шапки и deep link читают одну таблицу", () => {
   const banner = readFileSync(
-    resolve(mobileRoot, "features/deep-linking/lib/resolveSiteHeaderBannerMobileRoute.ts"),
+    resolve(
+      mobileRoot,
+      "features/deep-linking/lib/resolveSiteHeaderBannerMobileRoute.ts",
+    ),
     "utf8",
   );
   assert.match(banner, /resolveWebPathToMobileRoute/);

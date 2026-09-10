@@ -30,8 +30,7 @@ import "./DeliveryPaymentPage.css";
 const PAYMENT_METHOD_HINT = {
   [ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY]:
     SELLER_COMMERCE_DEFAULTS_UI.PAYMENT_PAYOUT_HINT,
-  [ORDER_PAYMENT_METHOD_CARD_PREPAID]:
-    SELLER_COMMERCE_DEFAULTS_UI.PAYMENT_PREPAID_HINT,
+  [ORDER_PAYMENT_METHOD_CARD_PREPAID]: SELLER_COMMERCE_DEFAULTS_UI.PAYMENT_PREPAID_HINT,
 };
 
 /**
@@ -128,9 +127,7 @@ function buildCommerceDefaultsPayload({ locations, form, ownDelivery }) {
     deliveryTariff: ownDelivery
       ? form.deliveryTariff
       : { ...FREE_SELLER_DELIVERY_TARIFF },
-    ...(form.productRegionCode
-      ? { regionCode: String(form.productRegionCode) }
-      : {}),
+    ...(form.productRegionCode ? { regionCode: String(form.productRegionCode) } : {}),
   };
 }
 
@@ -220,8 +217,7 @@ export function DeliveryPaymentPage() {
         body: { sellerPayoutRequisites: trimmedPayout },
       });
       patchAuthMeUser({
-        sellerPayoutRequisites:
-          updatedUser?.sellerPayoutRequisites ?? trimmedPayout,
+        sellerPayoutRequisites: updatedUser?.sellerPayoutRequisites ?? trimmedPayout,
       });
 
       const saved = await saveMutation.mutateAsync(

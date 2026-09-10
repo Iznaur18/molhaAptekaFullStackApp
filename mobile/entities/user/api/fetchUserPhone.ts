@@ -4,9 +4,7 @@ import { API_CLIENT_UI } from "@/shared/config";
 /** `GET /user/:userId/phone` */
 export async function fetchUserPhone(userId: string): Promise<string> {
   try {
-    const { data } = await apiClient.get(
-      `/user/${encodeURIComponent(userId)}/phone`,
-    );
+    const { data } = await apiClient.get(`/user/${encodeURIComponent(userId)}/phone`);
 
     const phone = data?.data?.userPhoneNumber;
     if (!data?.success || typeof phone !== "string" || !phone.trim()) {

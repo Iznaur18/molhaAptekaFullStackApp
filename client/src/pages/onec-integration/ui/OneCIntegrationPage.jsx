@@ -171,9 +171,7 @@ export function OneCIntegrationPage({ isAuthorized = false, onRequestLogin }) {
     disconnectMutation.isPending;
 
   const toggleIn = (list, value) =>
-    list.includes(value)
-      ? list.filter((item) => item !== value)
-      : [...list, value];
+    list.includes(value) ? list.filter((item) => item !== value) : [...list, value];
 
   return (
     <section className="onec-page">
@@ -283,8 +281,7 @@ export function OneCIntegrationPage({ isAuthorized = false, onRequestLogin }) {
                   />
                   {settings?.hasApiKey ? (
                     <small>
-                      {UI.HINT_API_KEY_SET} {settings.apiKeyMasked}.{" "}
-                      {UI.HINT_LEAVE_KEY}
+                      {UI.HINT_API_KEY_SET} {settings.apiKeyMasked}. {UI.HINT_LEAVE_KEY}
                     </small>
                   ) : null}
                 </label>
@@ -414,9 +411,7 @@ export function OneCIntegrationPage({ isAuthorized = false, onRequestLogin }) {
                 <span className="onec-page__log-dir">{log.direction}</span>
                 <span className="onec-page__log-msg">{log.message}</span>
                 <time dateTime={log.createdAt}>
-                  {log.createdAt
-                    ? new Date(log.createdAt).toLocaleString("ru-RU")
-                    : ""}
+                  {log.createdAt ? new Date(log.createdAt).toLocaleString("ru-RU") : ""}
                 </time>
               </li>
             ))}

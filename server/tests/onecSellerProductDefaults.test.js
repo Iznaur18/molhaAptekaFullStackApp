@@ -8,9 +8,8 @@ process.env.JWT_SECRET =
 const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollections } =
   await import("./helpers/mongoTestDb.js");
 const { UserModel } = await import("../models/index.js");
-const { resolveSellerProductDefaults } = await import(
-  "../services/onec/exchange/processOneCImportJob.js"
-);
+const { resolveSellerProductDefaults } =
+  await import("../services/onec/exchange/processOneCImportJob.js");
 
 /** Боевой адрес продавца, на котором это и вскрылось. */
 const ADDRESS = "г Грозный, р-н Ахматовский, ул Субры Кишиевой, д 56";

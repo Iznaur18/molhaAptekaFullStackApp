@@ -15,10 +15,7 @@ export const hasValidPickupGeo = (
   const lat = Number(geo?.lat);
   const lon = Number(geo?.lon);
   return (
-    geo?.lat != null &&
-    geo?.lon != null &&
-    Number.isFinite(lat) &&
-    Number.isFinite(lon)
+    geo?.lat != null && geo?.lon != null && Number.isFinite(lat) && Number.isFinite(lon)
   );
 };
 
