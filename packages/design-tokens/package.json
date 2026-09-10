@@ -9,6 +9,6 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "test": "tsx --test tests/**/*.test.mjs"
+    "test": "tsx --test"
   }
 }

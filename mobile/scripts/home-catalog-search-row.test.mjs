@@ -123,9 +123,13 @@ test("HomeCatalogUsersButton opens stretch menu from circle", () => {
   );
   assert.match(menu, /useCssTransition \? View : Animated\.View/);
   assert.match(menu, /menuExpanded/);
+  // Пробелы и переносы свободные: тест проверяет исходный текст компонента, а
+  // его раскладку задаёт prettier. С жёстким шаблоном тест ломался от одного
+  // лишь переформатирования — так и вышло 10.09.2026, когда репозиторий первый
+  // раз прогнали prettier'ом целиком.
   assert.match(
     menu,
-    /portalVisible \? <View style=\{styles\.usersNavPillPlaceholder\}/,
+    /portalVisible\s*\?\s*\(?\s*<View style=\{styles\.usersNavPillPlaceholder\}/,
   );
   assert.match(menu, /closedBackgroundColor: theme\.colors\.action/);
   assert.match(menu, /openBackgroundColor: theme\.colors\.surface/);
