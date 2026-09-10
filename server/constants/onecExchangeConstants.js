@@ -43,8 +43,26 @@ export const ONEC_EXCHANGE_LOGIN_RANDOM_BYTES = 6;
 export const ONEC_EXCHANGE_PASSWORD_BYTES = 18;
 export const ONEC_EXCHANGE_LOGIN_MAX_LENGTH = 64;
 
-/** Живёт дольше самого долгого обмена, но не бесконечно. */
-export const ONEC_EXCHANGE_SESSION_TTL_SECONDS = 6 * 60 * 60;
+/**
+ * Живёт дольше самого долгого обмена, но не бесконечно.
+ *
+ * Два часа, а не шесть. TTL держит на диске ВСЮ папку сессии, а она сейчас
+ * весит ~950 МБ: 1С раз в час присылает архив на 462 МБ, и он лежит рядом с
+ * распакованным содержимым — архив нужен до конца сессии, потому что
+ * `resolveOneCImportTarget` распаковывает его заново на каждый `mode=import`.
+ * При шести часах на диске одновременно жили 6 таких папок — 5.7 ГБ на
+ * 20-гигабайтном диске, где свободно было 2.6 ГБ. Ещё немного, и переполнение
+ * остановило бы Mongo и загрузку файлов.
+ *
+ * Два часа с огромным запасом перекрывают реальный обмен: замеренный полный
+ * цикл (приём архива + разбор 4114 товаров и 3872 предложений) укладывается в
+ * полторы минуты. Переопределяется через `ONEC_EXCHANGE_SESSION_TTL_SECONDS`,
+ * если у продавца появится заметно более долгая выгрузка.
+ */
+export const ONEC_EXCHANGE_SESSION_TTL_SECONDS = (() => {
+  const raw = Number(process.env.ONEC_EXCHANGE_SESSION_TTL_SECONDS);
+  return Number.isFinite(raw) && raw >= 600 ? Math.floor(raw) : 2 * 60 * 60;
+})();
 
 /**
  * `file_limit` в ответе на `mode=init` — 1С режет файл на куски такого размера
