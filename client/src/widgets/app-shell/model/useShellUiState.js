@@ -6,6 +6,9 @@ import { CATALOG_SEARCH_QUERY_MAX_LENGTH } from "@molha/api-contract";
 export function useShellUiState() {
   const [productSearchTerm, setProductSearchTermState] = useState("");
   const [submittedProductSearchTerm, setSubmittedProductSearchTerm] = useState("");
+  const [myProductsSearchTerm, setMyProductsSearchTermState] = useState("");
+  const [submittedMyProductsSearchTerm, setSubmittedMyProductsSearchTerm] =
+    useState("");
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [isProductCategoryListOpen, setIsProductCategoryListOpen] = useState(false);
@@ -101,11 +104,28 @@ export function useShellUiState() {
     setSubmittedProductSearchTerm(productSearchTerm);
   }, [productSearchTerm]);
 
+  const setMyProductsSearchTerm = useCallback((next) => {
+    const capped =
+      typeof next === "string" ? next.slice(0, CATALOG_SEARCH_QUERY_MAX_LENGTH) : next;
+    setMyProductsSearchTermState(capped);
+    if (String(capped).trim() === "") {
+      setSubmittedMyProductsSearchTerm("");
+    }
+  }, []);
+
+  const submitMyProductsSearch = useCallback(() => {
+    setSubmittedMyProductsSearchTerm(myProductsSearchTerm);
+  }, [myProductsSearchTerm]);
+
   return {
     productSearchTerm,
     setProductSearchTerm,
     submittedProductSearchTerm,
     submitProductSearch,
+    myProductsSearchTerm,
+    setMyProductsSearchTerm,
+    submittedMyProductsSearchTerm,
+    submitMyProductsSearch,
     isLoginModalOpen,
     setIsLoginModalOpen,
     isRegisterModalOpen,

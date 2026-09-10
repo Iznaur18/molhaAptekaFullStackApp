@@ -66,6 +66,7 @@ export function useAppShellDomain(
     isAuthorized: shell.isAuthorized,
     setIsLoginModalOpen: shell.setIsLoginModalOpen,
     submittedProductSearchTerm: shell.submittedProductSearchTerm,
+    submittedMyProductsSearchTerm: shell.submittedMyProductsSearchTerm,
     myProductsModerationFilter: shell.myProductsModerationFilter,
     setMyProductsModerationFilter: shell.setMyProductsModerationFilter,
     setMyProductsCatalogError: shell.setMyProductsCatalogError,

@@ -67,6 +67,7 @@ export async function getMyProducts({ userId, query }) {
   const { query: productsQuery, searchRank } = await buildProductCatalogSearchQuery(
     query.search,
     myProductsBaseQuery,
+    { nameOnly: true },
   );
 
   const [products, total] = await Promise.all([

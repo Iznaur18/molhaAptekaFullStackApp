@@ -104,7 +104,7 @@ export function AppShellHeader({
 }) {
   /** @type {import('react').RefObject<HTMLDivElement | null>} */
   const productCategoryFilterRef = useRef(null);
-  const hideProductSearch = isCatalogBrowserLanding;
+  const hideProductSearch = isCatalogBrowserLanding || isMineMode;
 
   useEffect(() => {
     if (!isProductCategoryListOpen) return undefined;

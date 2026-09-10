@@ -26,7 +26,7 @@ import { resolveProductSearchIntent } from "./resolveProductSearchIntent.js";
 /**
  * @param {unknown} rawSearch
  * @param {Record<string, unknown>} baseQuery
- * @param {{ preferAtlas?: boolean }} [options]
+ * @param {{ preferAtlas?: boolean; nameOnly?: boolean }} [options]
  * @returns {Promise<ProductCatalogSearchResult>}
  */
 export const buildProductCatalogSearchQuery = async (
@@ -34,7 +34,7 @@ export const buildProductCatalogSearchQuery = async (
   baseQuery = {},
   options = {},
 ) => {
-  const { preferAtlas = false } = options;
+  const { preferAtlas = false, nameOnly = false } = options;
   const intent = await resolveProductSearchIntent(rawSearch);
 
   if (!intent.hasTextSearch) {
@@ -44,6 +44,22 @@ export const buildProductCatalogSearchQuery = async (
       baseQuery,
       intent,
       searchRank: null,
+      atlasSearch: null,
+    };
+  }
+
+  if (nameOnly) {
+    return {
+      mode: CATALOG_SEARCH_MODE_REGEX,
+      query: {
+        $and: [baseQuery, { productName: intent.regexCondition }],
+      },
+      baseQuery,
+      intent,
+      searchRank: {
+        escapedRegexPattern: intent.escapedRegexPattern,
+        categorySlugs: [],
+      },
       atlasSearch: null,
     };
   }

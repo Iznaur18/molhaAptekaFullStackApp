@@ -16,6 +16,7 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 import { PROFILE_TAB_OVERVIEW } from "../../../widgets/app-shell/lib/profileTabs.js";
 import { MyProductsCatalogToolbar } from "../../../widgets/my-products-catalog-toolbar/ui/MyProductsCatalogToolbar.jsx";
+import { MyProductsSearchBar } from "../../../widgets/my-products-search/ui/MyProductsSearchBar.jsx";
 import { MyProductsShelvesPanel } from "../../../entities/seller-shelf/ui/MyProductsShelvesPanel.jsx";
 import { useMyProfileNav } from "../model/useMyProfileNav.js";
 import { useMyProfilePageUi } from "../model/useMyProfilePageUi.js";
@@ -96,6 +97,7 @@ import "./MyProfilePage.css";
  * onTabChange?: (tab: string) => void;
  * tabContent?: import('react').ReactNode;
  * myProductsCatalogToolbarProps?: import('../../../widgets/my-products-catalog-toolbar/ui/MyProductsCatalogToolbar.jsx').MyProductsCatalogToolbar extends (props: infer P) => unknown ? P : never;
+ * myProductsSearchProps?: import('../../../widgets/my-products-search/ui/MyProductsSearchBar.jsx').MyProductsSearchBar extends (props: infer P) => unknown ? P : never | null;
  * }} props
  */
 export function MyProfilePage({
@@ -159,6 +161,7 @@ export function MyProfilePage({
   onTabChange,
   tabContent = null,
   myProductsCatalogToolbarProps = null,
+  myProductsSearchProps = null,
 }) {
   const navigate = useNavigate();
   const isGuestProfile =
@@ -360,6 +363,9 @@ export function MyProfilePage({
             <>
               {isMyProductsTab && myProductsCatalogToolbarProps ? (
                 <>
+                  {myProductsSearchProps ? (
+                    <MyProductsSearchBar {...myProductsSearchProps} />
+                  ) : null}
                   <MyProductsShelvesPanel />
                   <MyProductsCatalogToolbar {...myProductsCatalogToolbarProps} />
                 </>
