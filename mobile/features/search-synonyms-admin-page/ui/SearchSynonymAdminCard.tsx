@@ -41,7 +41,9 @@ export const SearchSynonymAdminCard = ({
         {isEditing ? (
           <>
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.LABEL_TOKEN}</Text>
+              <Text style={styles.fieldLabel}>
+                {SEARCH_SYNONYMS_ADMIN_PAGE_UI.LABEL_TOKEN}
+              </Text>
               <TextInput
                 style={styles.fieldInput}
                 value={editToken}
@@ -50,7 +52,9 @@ export const SearchSynonymAdminCard = ({
               />
             </View>
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.LABEL_CATEGORIES}</Text>
+              <Text style={styles.fieldLabel}>
+                {SEARCH_SYNONYMS_ADMIN_PAGE_UI.LABEL_CATEGORIES}
+              </Text>
               <SynonymCategoryPicker
                 selected={editCategories}
                 onChange={onEditCategoriesChange}
@@ -61,14 +65,21 @@ export const SearchSynonymAdminCard = ({
               <Pressable
                 style={[
                   styles.primaryButton,
-                  (isPending || editCategories.length === 0) && styles.primaryButtonDisabled,
+                  (isPending || editCategories.length === 0) &&
+                    styles.primaryButtonDisabled,
                 ]}
                 disabled={isPending || editCategories.length === 0}
                 onPress={onSave}
               >
-                <Text style={styles.primaryButtonText}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_BUTTON}</Text>
+                <Text style={styles.primaryButtonText}>
+                  {SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_BUTTON}
+                </Text>
               </Pressable>
-              <Pressable style={styles.cancelButton} onPress={onCancelEdit} disabled={isPending}>
+              <Pressable
+                style={styles.cancelButton}
+                onPress={onCancelEdit}
+                disabled={isPending}
+              >
                 <Text style={styles.cancelButtonText}>
                   {SEARCH_SYNONYMS_ADMIN_PAGE_UI.CANCEL_BUTTON}
                 </Text>
@@ -84,8 +95,9 @@ export const SearchSynonymAdminCard = ({
                   {row.categories.map((slug) => (
                     <View key={slug} style={styles.chip}>
                       <Text style={styles.chipText}>
-                        {PRODUCT_CATEGORY_LABEL_RU[slug as keyof typeof PRODUCT_CATEGORY_LABEL_RU] ??
-                          slug}
+                        {PRODUCT_CATEGORY_LABEL_RU[
+                          slug as keyof typeof PRODUCT_CATEGORY_LABEL_RU
+                        ] ?? slug}
                       </Text>
                     </View>
                   ))}
@@ -97,7 +109,11 @@ export const SearchSynonymAdminCard = ({
                     {SEARCH_SYNONYMS_ADMIN_PAGE_UI.EDIT_BUTTON}
                   </Text>
                 </Pressable>
-                <Pressable style={styles.dangerButton} disabled={isPending} onPress={onDelete}>
+                <Pressable
+                  style={styles.dangerButton}
+                  disabled={isPending}
+                  onPress={onDelete}
+                >
                   <Text style={styles.dangerButtonText}>
                     {SEARCH_SYNONYMS_ADMIN_PAGE_UI.DELETE_BUTTON}
                   </Text>

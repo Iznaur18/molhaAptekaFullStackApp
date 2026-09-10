@@ -13,7 +13,11 @@ type ProfileHubNavItemProps = {
   onPress: () => void;
 };
 
-export const ProfileHubNavItem = ({ item, isActive, onPress }: ProfileHubNavItemProps) => {
+export const ProfileHubNavItem = ({
+  item,
+  isActive,
+  onPress,
+}: ProfileHubNavItemProps) => {
   const { theme, colorScheme } = useAppThemeSettings();
   const styles = useProfileHubMenuStyles();
   const isCta = item.variant === "cta";
@@ -27,11 +31,7 @@ export const ProfileHubNavItem = ({ item, isActive, onPress }: ProfileHubNavItem
 
   return (
     <Pressable
-      style={[
-        styles.item,
-        presentation.container,
-        isDisabled && styles.itemDisabled,
-      ]}
+      style={[styles.item, presentation.container, isDisabled && styles.itemDisabled]}
       onPress={onPress}
       disabled={isDisabled}
       accessibilityState={{ selected: isActive }}

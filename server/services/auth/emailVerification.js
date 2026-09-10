@@ -285,7 +285,9 @@ export async function requestEmailBindForUser(userId, rawEmail) {
     throw new Error(EMAIL_NOT_SET_MESSAGE);
   }
 
-  const user = await UserModel.findById(userId).select("email isEmailVerified userName");
+  const user = await UserModel.findById(userId).select(
+    "email isEmailVerified userName",
+  );
   if (!user) {
     throw new Error(EMAIL_VERIFICATION_INVALID_CODE_MESSAGE);
   }

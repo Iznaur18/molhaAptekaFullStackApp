@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useMemo } from "react";
 
-import {
-  PROFILE_TAB_OVERVIEW,
-  normalizeProfileTab,
-} from "../lib/profileTabs.js";
+import { PROFILE_TAB_OVERVIEW, normalizeProfileTab } from "../lib/profileTabs.js";
 
 import {
   mainViewToProfileTab,

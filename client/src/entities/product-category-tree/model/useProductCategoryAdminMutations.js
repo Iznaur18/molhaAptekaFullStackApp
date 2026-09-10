@@ -10,7 +10,9 @@ export function useProductCategoryAdminMutations() {
   const queryClient = useQueryClient();
 
   const invalidateCatalogCategorySurfaces = () => {
-    void queryClient.invalidateQueries({ queryKey: productCategoryTreeQueryKeys.roots() });
+    void queryClient.invalidateQueries({
+      queryKey: productCategoryTreeQueryKeys.roots(),
+    });
     void queryClient.invalidateQueries({
       queryKey: productCategoryDisplayQueryKeys.categories(),
     });

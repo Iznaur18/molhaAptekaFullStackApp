@@ -14,7 +14,11 @@ import {
   getPendingIntroAdCampaignsCountController,
   rejectIntroAdCampaignController,
 } from "../controllers/IntroAd/introAdCampaignStaffControllers.js";
-import { checkAuthMW, checkProductModeratorMW, advertisingSubmitRateLimiter } from "../middlewares/index.js";
+import {
+  checkAuthMW,
+  checkProductModeratorMW,
+  advertisingSubmitRateLimiter,
+} from "../middlewares/index.js";
 import {
   introAdCampaignIdParamValidation,
   rejectIntroAdCampaignValidation,

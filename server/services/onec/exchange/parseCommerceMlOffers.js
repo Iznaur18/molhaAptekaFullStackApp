@@ -19,7 +19,10 @@ import { childList, childText, streamXmlElements } from "./streamXmlElements.js"
  */
 
 /** @param {string} value @param {number} max */
-const clamp = (value, max) => String(value ?? "").trim().slice(0, max);
+const clamp = (value, max) =>
+  String(value ?? "")
+    .trim()
+    .slice(0, max);
 
 /**
  * 1С пишет дробные с запятой при некоторых региональных настройках, а разряды
@@ -79,9 +82,7 @@ function toOffer(node) {
   const warehouseQuantities = [];
   for (const row of childList(node, "Склад")) {
     const warehouseId = attr(row, ["ИдСклада", "Ид"]);
-    const quantity = parseOneCNumber(
-      attr(row, ["КоличествоНаСкладе", "Количество"]),
-    );
+    const quantity = parseOneCNumber(attr(row, ["КоличествоНаСкладе", "Количество"]));
     if (!warehouseId || quantity === null) continue;
     warehouseQuantities.push({ warehouseId, quantity: Math.max(0, quantity) });
   }
@@ -117,11 +118,7 @@ function toOffer(node) {
  * }} params
  * @returns {Promise<{ priceTypes: number; warehouses: number; offers: number }>}
  */
-export async function parseCommerceMlOffers({
-  filePath,
-  onDictionaries,
-  onOffers,
-}) {
+export async function parseCommerceMlOffers({ filePath, onDictionaries, onOffers }) {
   /** @type {OneCDictionaryEntry[]} */
   const priceTypes = [];
   /** @type {OneCDictionaryEntry[]} */

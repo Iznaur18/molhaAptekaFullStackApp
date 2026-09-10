@@ -6,7 +6,8 @@ import { test } from "node:test";
 
 const MOBILE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-const readMobileFile = (relativePath) => readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
+const readMobileFile = (relativePath) =>
+  readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
 test("product image shows blurhash placeholder to prevent layout shift", () => {
   const image = readMobileFile("shared/ui/CachedProductImage.tsx");
@@ -51,7 +52,10 @@ test("catalog screen wires viewability + focus + app state into row visibility",
   assert.match(index, /useVisibleRowsController\(isFocused && appActive\)/);
   assert.match(index, /VisibleRowsProvider/);
   assert.match(index, /RowVisibilityBoundary rowKey=\{item\.key\}/);
-  assert.match(index, /onViewableItemsChanged=\{rowVisibility\.onViewableItemsChanged\}/);
+  assert.match(
+    index,
+    /onViewableItemsChanged=\{rowVisibility\.onViewableItemsChanged\}/,
+  );
 });
 
 test("app lifecycle gates heavy media and trims image memory in background", () => {
@@ -71,7 +75,9 @@ test("app lifecycle gates heavy media and trims image memory in background", () 
 
 test("skeletons animate with a shimmer instead of staying static", () => {
   const shimmer = readMobileFile("shared/ui/SkeletonShimmer.tsx");
-  const catalogSkeleton = readMobileFile("features/catalog-grid/ui/CatalogGridSkeleton.tsx");
+  const catalogSkeleton = readMobileFile(
+    "features/catalog-grid/ui/CatalogGridSkeleton.tsx",
+  );
   const bannerSlot = readMobileFile("features/home-feed/ui/SiteHeaderBannerSlot.tsx");
 
   assert.match(shimmer, /withRepeat/);

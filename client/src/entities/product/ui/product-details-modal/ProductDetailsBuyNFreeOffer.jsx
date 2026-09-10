@@ -16,11 +16,7 @@ import "./ProductDetailsBuyNFreeOffer.css";
  *   onRequestLogin: () => void;
  * }} props
  */
-export function ProductDetailsBuyNFreeOffer({
-  product,
-  isAuthorized,
-  onRequestLogin,
-}) {
+export function ProductDetailsBuyNFreeOffer({ product, isAuthorized, onRequestLogin }) {
   const [isExplainOpen, setIsExplainOpen] = useState(false);
   const isActive = isProductBuyNFreeActive(product);
   const productId = isActive ? String(product._id ?? "") : "";
@@ -110,10 +106,7 @@ export function ProductDetailsBuyNFreeOffer({
           ) : null}
         </div>
 
-        <div
-          className="product-details-buy-n-free__track"
-          aria-hidden="true"
-        >
+        <div className="product-details-buy-n-free__track" aria-hidden="true">
           {Array.from({ length: threshold }, (_, index) => {
             const step = index + 1;
             const done = step <= filled;
@@ -138,9 +131,7 @@ export function ProductDetailsBuyNFreeOffer({
           <span
             className={[
               "product-details-buy-n-free__gift",
-              isReady || isPending
-                ? "product-details-buy-n-free__gift--unlocked"
-                : "",
+              isReady || isPending ? "product-details-buy-n-free__gift--unlocked" : "",
             ]
               .filter(Boolean)
               .join(" ")}

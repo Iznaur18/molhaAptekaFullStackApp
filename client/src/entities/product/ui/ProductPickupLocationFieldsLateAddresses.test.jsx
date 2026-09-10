@@ -3,9 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "../../../test/renderWithProviders.jsx";
 
-const { ProductPickupLocationFields } = await import(
-  "./ProductPickupLocationFields.jsx"
-);
+const { ProductPickupLocationFields } =
+  await import("./ProductPickupLocationFields.jsx");
 
 const SAVED_ADDRESS = {
   id: "037bb089-9632-4c53-ba80-cac4c587c500",

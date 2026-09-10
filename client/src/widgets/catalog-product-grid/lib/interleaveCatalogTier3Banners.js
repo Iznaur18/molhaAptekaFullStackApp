@@ -34,8 +34,7 @@ export function interleaveCatalogTier3Banners(
   }
 
   const safeColumnCount = Math.max(1, Math.floor(Number(columnCount)) || 1);
-  const cardsPerBannerSlot =
-    safeColumnCount * CATALOG_TIER3_BANNER_ROW_INTERVAL;
+  const cardsPerBannerSlot = safeColumnCount * CATALOG_TIER3_BANNER_ROW_INTERVAL;
 
   /** @type {import('../../../entities/product/model/types.js').ProductFromApi[]} */
   const banners = [];

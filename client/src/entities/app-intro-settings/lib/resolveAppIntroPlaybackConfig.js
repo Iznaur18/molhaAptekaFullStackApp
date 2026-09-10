@@ -73,7 +73,9 @@ export function resolveAppIntroPlaybackConfig(settings, meta = {}) {
     minMs: Number(settings?.minMs) > 0 ? Number(settings.minMs) : APP_INTRO_MIN_MS,
     maxMs: Number(settings?.maxMs) > 0 ? Number(settings.maxMs) : APP_INTRO_MAX_MS,
     fadeOutMs:
-      Number(settings?.fadeOutMs) > 0 ? Number(settings.fadeOutMs) : APP_INTRO_FADE_OUT_MS,
+      Number(settings?.fadeOutMs) > 0
+        ? Number(settings.fadeOutMs)
+        : APP_INTRO_FADE_OUT_MS,
     isPaidIntro: meta.isPaidIntro === true,
     advertiserId: meta.advertiserId ?? null,
     ctaType: meta.ctaType ?? null,

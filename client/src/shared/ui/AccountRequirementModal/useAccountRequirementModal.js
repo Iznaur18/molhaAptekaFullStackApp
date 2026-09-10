@@ -25,7 +25,9 @@ import { useCallback, useMemo, useState } from "react";
  */
 export function useAccountRequirementModal() {
   const [state, setState] = useState(
-    /** @type {{ requirement: AccountRequirement; actionLabel?: string } | null} */ (null),
+    /** @type {{ requirement: AccountRequirement; actionLabel?: string } | null} */ (
+      null
+    ),
   );
 
   const require = useCallback((requirement, actionLabel) => {

@@ -19,7 +19,10 @@ test("normalizeUploadUrlForStorage: keeps canonical /uploads path", () => {
     normalizeUploadUrlForStorage("http://127.0.0.1:5173/uploads/image.webp?x=1"),
     "/uploads/image.webp",
   );
-  assert.equal(normalizeUploadUrlForStorage("/uploads/photo.png"), "/uploads/photo.png");
+  assert.equal(
+    normalizeUploadUrlForStorage("/uploads/photo.png"),
+    "/uploads/photo.png",
+  );
   assert.equal(
     normalizeUploadUrlForStorage("https://cdn.example.com/image.jpg"),
     "https://cdn.example.com/image.jpg",

@@ -3,12 +3,10 @@ import { describe, it } from "node:test";
 
 import mongoose from "mongoose";
 
-const { buildProductModerationFingerprint, hashStableValue } = await import(
-  "../services/product/productContentFingerprint.js"
-);
-const { buildOneCContentHash } = await import(
-  "../services/onec/exchange/onecProductFields.js"
-);
+const { buildProductModerationFingerprint, hashStableValue } =
+  await import("../services/product/productContentFingerprint.js");
+const { buildOneCContentHash } =
+  await import("../services/onec/exchange/onecProductFields.js");
 
 describe("отпечаток содержимого", () => {
   it("не зависит от порядка ключей", () => {

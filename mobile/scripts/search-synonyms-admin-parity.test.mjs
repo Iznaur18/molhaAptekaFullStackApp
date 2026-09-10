@@ -10,7 +10,9 @@ const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
 test("search synonyms admin page mirrors web admin panel shell", () => {
-  const page = readMobileFile("features/search-synonyms-admin-page/ui/SearchSynonymsAdminPage.tsx");
+  const page = readMobileFile(
+    "features/search-synonyms-admin-page/ui/SearchSynonymsAdminPage.tsx",
+  );
   const shell = readMobileFile("shared/ui/AdminPanelShell.tsx");
 
   assert.match(page, /ProfileMobileSectionToggle/);
@@ -31,7 +33,9 @@ test("search synonyms admin page mirrors web admin panel shell", () => {
 });
 
 test("search synonym admin card mirrors web token and category chips", () => {
-  const card = readMobileFile("features/search-synonyms-admin-page/ui/SearchSynonymAdminCard.tsx");
+  const card = readMobileFile(
+    "features/search-synonyms-admin-page/ui/SearchSynonymAdminCard.tsx",
+  );
 
   assert.match(card, /PRODUCT_CATEGORY_LABEL_RU/);
   assert.match(card, /SynonymCategoryPicker/);

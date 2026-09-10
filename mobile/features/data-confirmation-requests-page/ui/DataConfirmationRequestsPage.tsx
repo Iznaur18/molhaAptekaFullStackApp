@@ -12,7 +12,11 @@ import { useProfileAccountNestedListScroll } from "@/features/profile-tab/model/
 import { ProfileMobileNavSheet } from "@/features/profile-tab/ui/ProfileMobileNavSheet";
 import { ProfileMobileSectionToggle } from "@/features/profile-tab/ui/ProfileMobileSectionToggle";
 import { dataConfirmationStaffQueryKeys, staffBadgeQueryKeys } from "@/shared/api";
-import { API_CLIENT_UI, DATA_CONFIRMATION_PAGE_UI, MY_PROFILE_PAGE_UI } from "@/shared/config";
+import {
+  API_CLIENT_UI,
+  DATA_CONFIRMATION_PAGE_UI,
+  MY_PROFILE_PAGE_UI,
+} from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useDataConfirmationRequestsPageStyles } from "@/shared/theme/dataConfirmationRequestsPageStyles";
@@ -53,8 +57,12 @@ export const DataConfirmationRequestsPage = () => {
 
   const syncStaffQueueCaches = useCallback(async () => {
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: dataConfirmationStaffQueryKeys.pending() }),
-      queryClient.invalidateQueries({ queryKey: [...staffBadgeQueryKeys.all, "data-confirmation"] }),
+      queryClient.invalidateQueries({
+        queryKey: dataConfirmationStaffQueryKeys.pending(),
+      }),
+      queryClient.invalidateQueries({
+        queryKey: [...staffBadgeQueryKeys.all, "data-confirmation"],
+      }),
     ]);
   }, [queryClient]);
 

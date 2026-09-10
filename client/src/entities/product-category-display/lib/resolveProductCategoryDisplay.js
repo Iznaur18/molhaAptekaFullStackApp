@@ -12,7 +12,8 @@ export function mapCategoryDisplaysBySlug(displays) {
   return new Map(
     displays
       .filter(
-        (row) => typeof row.categorySlug === "string" && row.categorySlug.trim().length > 0,
+        (row) =>
+          typeof row.categorySlug === "string" && row.categorySlug.trim().length > 0,
       )
       .map((row) => [row.categorySlug, row]),
   );
@@ -107,7 +108,8 @@ export function buildResolvedProductCategoryDisplaysFromRoots(roots, displays) {
 
   return roots.map((root) => {
     const legacySlug =
-      typeof root.legacyProductCategory === "string" && root.legacyProductCategory.trim()
+      typeof root.legacyProductCategory === "string" &&
+      root.legacyProductCategory.trim()
         ? root.legacyProductCategory.trim()
         : null;
     const fields = resolveCatalogCategoryDisplayFields(

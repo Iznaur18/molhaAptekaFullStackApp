@@ -13,11 +13,7 @@ import { buildSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
  *   goToMainView: (view: import('../../../shared/lib/homeMainViewPaths.js').HomeMainView) => void;
  * }} params
  */
-export const useHomeSellerModal = ({
-  currentUserId,
-  navigate,
-  goToMainView,
-}) => {
+export const useHomeSellerModal = ({ currentUserId, navigate, goToMainView }) => {
   /** @param {string} userId */
   const goToSellerProducts = useCallback(
     (userId) => {

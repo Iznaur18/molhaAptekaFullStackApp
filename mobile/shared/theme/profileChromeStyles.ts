@@ -11,7 +11,10 @@ import {
 import { PRODUCT_DETAILS_SELLER_PRODUCTS_CAROUSEL_LAYOUT as SPC } from "@/entities/product/lib/productDetailsSellerProductsCarouselLayout";
 import { PROFILE_CONTENT_MAX_WIDTH_PHONE } from "@/shared/lib/screenBreakpoints";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
-import { SCREEN_CONTENT_PADDING_BOTTOM, SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
+import {
+  SCREEN_CONTENT_PADDING_BOTTOM,
+  SCREEN_CONTENT_PADDING_HORIZONTAL,
+} from "@/shared/theme/screenContentLayout";
 
 /** @deprecated используйте resolveProfileContentMaxWidth / useScreenLayout */
 export const PROFILE_CONTENT_MAX_WIDTH = PROFILE_CONTENT_MAX_WIDTH_PHONE;

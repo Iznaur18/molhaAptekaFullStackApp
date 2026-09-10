@@ -37,14 +37,17 @@ export const ModalSectionTabs = ({
         style={({ pressed }) => [
           isSegment ? styles.segmentTab : styles.tab,
           isActive && (isSegment ? styles.segmentTabActive : styles.tabActive),
-          pressed && !isActive && (isSegment ? styles.segmentTabPressed : styles.tabPressed),
+          pressed &&
+            !isActive &&
+            (isSegment ? styles.segmentTabPressed : styles.tabPressed),
         ]}
         onPress={() => onTabChange(tab.id)}
       >
         <Text
           style={[
             isSegment ? styles.segmentTabLabel : styles.tabLabel,
-            isActive && (isSegment ? styles.segmentTabLabelActive : styles.tabLabelActive),
+            isActive &&
+              (isSegment ? styles.segmentTabLabelActive : styles.tabLabelActive),
           ]}
           numberOfLines={1}
         >

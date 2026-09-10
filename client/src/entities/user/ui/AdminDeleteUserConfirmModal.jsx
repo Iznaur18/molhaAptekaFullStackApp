@@ -100,9 +100,7 @@ export function AdminDeleteUserConfirmModal({
         <h2 id="admin-delete-user-title" className="admin-delete-user__title">
           {copy.DELETE_CONFIRM_TITLE}
         </h2>
-        <p className="admin-delete-user__hint">
-          {copy.DELETE_CONFIRM_HINT(token)}
-        </p>
+        <p className="admin-delete-user__hint">{copy.DELETE_CONFIRM_HINT(token)}</p>
         <form className="admin-delete-user__form" onSubmit={handleSubmit}>
           <input
             className="admin-delete-user__input"
@@ -132,9 +130,7 @@ export function AdminDeleteUserConfirmModal({
               className="admin-delete-user__btn admin-delete-user__btn_danger"
               disabled={!canSubmit || phase === "loading"}
             >
-              {phase === "loading"
-                ? copy.DELETE_LOADING
-                : copy.DELETE_SUBMIT}
+              {phase === "loading" ? copy.DELETE_LOADING : copy.DELETE_SUBMIT}
             </button>
           </div>
         </form>

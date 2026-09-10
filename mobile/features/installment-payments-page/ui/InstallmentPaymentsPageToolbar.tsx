@@ -55,7 +55,9 @@ export const InstallmentPaymentsPageToolbar = ({
               ]}
               onPress={() => onStatusFilterChange(option.value)}
             >
-              <Text style={[styles.statusChipText, isActive && styles.statusChipTextActive]}>
+              <Text
+                style={[styles.statusChipText, isActive && styles.statusChipTextActive]}
+              >
                 {label}
               </Text>
             </Pressable>

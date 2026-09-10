@@ -117,15 +117,8 @@ function SortableImageRow({
  * }} props
  */
 export function ProductImageUrlSortableList({ rows, onRowsChange, disabled = false }) {
-  const {
-    sensors,
-    rowIds,
-    canAddRow,
-    handleDragEnd,
-    updateRowUrl,
-    removeRow,
-    addRow,
-  } = useProductImageUrlRows(rows, onRowsChange);
+  const { sensors, rowIds, canAddRow, handleDragEnd, updateRowUrl, removeRow, addRow } =
+    useProductImageUrlRows(rows, onRowsChange);
 
   return (
     <fieldset className="product-image-sortable" disabled={disabled}>
@@ -135,7 +128,11 @@ export function ProductImageUrlSortableList({ rows, onRowsChange, disabled = fal
       <p className="product-image-sortable__hint">
         {CREATE_PRODUCT_MODAL_UI.IMAGE_ORDER_HINT}
       </p>
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
         <SortableContext items={rowIds} strategy={verticalListSortingStrategy}>
           <ul className="product-image-sortable__list">
             {rows.map((row, index) => (

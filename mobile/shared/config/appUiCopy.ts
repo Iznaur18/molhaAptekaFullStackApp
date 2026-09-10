@@ -70,7 +70,8 @@ export const API_CLIENT_UI = {
   PURCHASE_PREMIUM_FALLBACK: "Не удалось оформить премиум",
   PREMIUM_PURCHASE_SUCCESS: "Премиум оформлен",
   FETCH_LOYALTY_POINTS_STATUS_FALLBACK: "Не удалось загрузить баллы",
-  FETCH_MONTHLY_LOYALTY_POINTS_FALLBACK: "Не удалось загрузить прогресс баллов за месяц",
+  FETCH_MONTHLY_LOYALTY_POINTS_FALLBACK:
+    "Не удалось загрузить прогресс баллов за месяц",
   LOYALTY_POINTS_PURCHASE_SUCCESS: "Баллы зачислены",
   ADMIN_FREE_CREDIT_LOYALTY_POINTS_FALLBACK: "Не удалось начислить баллы",
   FETCH_USERS_LOYALTY_RAFFLE_SETTINGS_FALLBACK:
@@ -158,11 +159,11 @@ export const EDIT_PROFILE_UI = {
   SECTION_ABOUT: "О себе",
   SECTION_SOCIAL: "Соцсети",
   LABEL_FULL_NAME: "Имя и фамилия",
-  HINT_FULL_NAME: "Как вас видят другие пользователи. Можно указать имя, фамилию или название.",
+  HINT_FULL_NAME:
+    "Как вас видят другие пользователи. Можно указать имя, фамилию или название.",
   LABEL_EMAIL: "Email",
   LABEL_USERNAME: "Никнейм",
-  USERNAME_HINT:
-    "a–z, 0–9, . и _; точка не с краёв и не подряд (..); 3–30 символов",
+  USERNAME_HINT: "a–z, 0–9, . и _; точка не с краёв и не подряд (..); 3–30 символов",
   LABEL_PHONE: "Телефон",
   PHONE_VERIFY_BUTTON: "Подтвердить SMS",
   PHONE_VERIFY_SEND: "Получить код",
@@ -187,8 +188,10 @@ export const EDIT_PROFILE_UI = {
   EMAIL_VERIFY_ERROR: "Не удалось подтвердить email",
   EMAIL_VERIFY_REQUEST_ERROR: "Не удалось отправить письмо",
   EMAIL_VERIFY_CODE_REQUIRED: "Введите 6-значный код из письма",
-  EMAIL_CHANGE_PENDING: "Подтвердите новый email кодом из письма перед сохранением профиля",
-  EMAIL_CLEAR_FORBIDDEN: "Очистка email недоступна. Смените адрес через код подтверждения",
+  EMAIL_CHANGE_PENDING:
+    "Подтвердите новый email кодом из письма перед сохранением профиля",
+  EMAIL_CLEAR_FORBIDDEN:
+    "Очистка email недоступна. Смените адрес через код подтверждения",
   EMAIL_VERIFIED: "Email подтверждён",
   EMAIL_NOT_VERIFIED: "Email не подтверждён",
   SECTION_PASSWORD: "Смена пароля",
@@ -341,7 +344,8 @@ export const CART_PAGE_UI = {
   REMOVE_LINE_ARIA: "Удалить из корзины",
   SELECT_LINE_ARIA: "Выбрать товар для оформления",
   SELECT_ALL: "Выбрать все",
-  SELECTED_COUNT: (selected: number, total: number) => `Выбрано ${selected} из ${total}`,
+  SELECTED_COUNT: (selected: number, total: number) =>
+    `Выбрано ${selected} из ${total}`,
   CLEAR_ALL: "Очистить корзину",
   GO_TO_CATALOG: "Перейти в каталог",
   AUTH_REQUIRED: "Войдите, чтобы пользоваться корзиной",
@@ -527,7 +531,8 @@ export const PRODUCT_CARD_UI = {
     `Продвижение «${tierLabel}» до ${until}`,
   LOYALTY_POINTS_OVERCOMMITTED_BADGE: "Бонус выше доступного остатка баллов",
   GALLERY_REGION_ARIA: "Галерея фото товара",
-  GALLERY_COUNTER_ARIA: (current: number, total: number) => `Фото ${current} из ${total}`,
+  GALLERY_COUNTER_ARIA: (current: number, total: number) =>
+    `Фото ${current} из ${total}`,
   DOUBLE_TAP_WISHLIST_HINT: "Двойное нажатие добавит товар в избранное",
   GALLERY_PREV: "Предыдущее фото",
   GALLERY_NEXT: "Следующее фото",
@@ -1111,7 +1116,8 @@ export const INSTALLMENT_UI = {
   PAYMENTS_EXPAND_ALL: "Развернуть все",
   PAYMENTS_COLLAPSE_ALL: "Свернуть все",
   PAYMENTS_REFRESH: "Обновить",
-  PAYMENTS_NEXT_DUE: (amount: string, date: string) => `След. платёж: ${amount} · ${date}`,
+  PAYMENTS_NEXT_DUE: (amount: string, date: string) =>
+    `След. платёж: ${amount} · ${date}`,
   PAYMENTS_ATTENTION_FILTER_HINT: "Показаны договоры, где нужно ваше действие",
   PAYMENTS_EXPAND_TOGGLE: (expanded: boolean) => (expanded ? "Свернуть" : "Развернуть"),
   SALES_PAGE_TITLE: "Продажи - Рассрочка",
@@ -1130,7 +1136,8 @@ export const INSTALLMENT_UI = {
   LOGIN_BUTTON: "Войти",
   PROGRAM_MODAL_REJECTED_HINT:
     "Программа была отклонена ранее. Исправьте планы и сохраните снова — рассрочка сразу станет доступна покупателям.",
-  PROGRAM_MODAL_APPROVED_HINT: "Рассрочка активна — покупатели могут оформить её на этот товар.",
+  PROGRAM_MODAL_APPROVED_HINT:
+    "Рассрочка активна — покупатели могут оформить её на этот товар.",
   PROGRAM_MODAL_TITLE: "Рассрочка на товар",
   PROGRAM_MODAL_PLAN_NUMBER: (n: number) => `План ${n}`,
   PROGRAM_MODAL_PLAN_TITLE: "Название плана",
@@ -1220,8 +1227,7 @@ export const PRODUCT_PICKUP_UI = {
   LOCATION_DEFAULT: "Основная точка",
   SET_DEFAULT_LOCATION: "Сделать основной",
   LOCATIONS_LIST_LABEL: "Выбранные точки",
-  DEFAULT_LOCATION_HINT:
-    "Основная точка — адрес товара в карточке и в заказе",
+  DEFAULT_LOCATION_HINT: "Основная точка — адрес товара в карточке и в заказе",
   LOCATION_RESOLVING: "Определяем координаты…",
   /** Показываем, только когда подсказки координат так и не дали. */
   LOCATION_NEEDS_COORDS: "Уточните адрес на карте, чтобы использовать его как точку",
@@ -1339,7 +1345,8 @@ export const ORDER_CARD_UI = {
   SELLER_CANCEL_CONFIRM: "Отменить заказ покупателя?",
   ITEM_CANCELLED_BADGE: "Отмена",
   DELETED_PRODUCT_NAME: "Товар удалён",
-  LOYALTY_POINTS_LINE: (points: number) => `+${points} баллов за шт. (подтверждённому покупателю)`,
+  LOYALTY_POINTS_LINE: (points: number) =>
+    `+${points} баллов за шт. (подтверждённому покупателю)`,
   AFFILIATE_LINE_ARIA: "Партнёрская атрибуция",
 } as const;
 
@@ -1439,8 +1446,7 @@ export const LEGAL_UI = {
 export const AUTH_UI = {
   LOGIN_TITLE: "Вход",
   LOGIN_SUBTITLE: "Войдите, чтобы продолжить покупки",
-  EMAIL_AUTH_DISABLED_NOTICE:
-    "Почта временно недоступна — используйте телефон.",
+  EMAIL_AUTH_DISABLED_NOTICE: "Почта временно недоступна — используйте телефон.",
   REGISTER_TITLE: "Регистрация",
   REGISTER_SUBTITLE: "Создайте аккаунт за пару минут",
   CHANNEL_EMAIL: "Email",
@@ -1863,7 +1869,8 @@ export const SUBSCRIPTIONS_PAGE_UI = {
   LOGIN_BUTTON: "Войти",
   HERO_CAPTION: "Подписки",
   HERO_UNIT_FORMS: ["продавец", "продавца", "продавцов"],
-  HERO_INFO: "Продавцы, за которыми вы следите. Их товары — в фильтре «Подписки» на главной.",
+  HERO_INFO:
+    "Продавцы, за которыми вы следите. Их товары — в фильтре «Подписки» на главной.",
 } as const;
 
 export const USER_FOLLOW_BUTTON_UI = {
@@ -1921,7 +1928,8 @@ export const PRODUCT_CATEGORY_DISPLAY_UI = {
   SUBCATEGORY_PICKER_ARIA: "Подкатегории",
   SUBCATEGORY_BACK: "Назад",
   SUBCATEGORY_BACK_ARIA: "Назад к предыдущему уровню категорий",
-  SUBCATEGORY_NODE_EDIT_ARIA: (label: string) => `Редактировать подкатегорию «${label}»`,
+  SUBCATEGORY_NODE_EDIT_ARIA: (label: string) =>
+    `Редактировать подкатегорию «${label}»`,
 } as const;
 
 export const MY_PRODUCTS_PAGE_UI = {
@@ -2039,8 +2047,7 @@ export const CREATE_PRODUCT_UI = {
   LISTING_ORIGIN_RESALE: "Приобретен на продажу",
   LISTING_ORIGIN_MANUFACTURER: "Являюсь производителем",
   ERROR_LISTING_ORIGIN: "Выберите статус товара",
-  ORIGINALITY_STATEMENT:
-    "Подтверждаю, что товар подлинный (оригинал), а не подделка",
+  ORIGINALITY_STATEMENT: "Подтверждаю, что товар подлинный (оригинал), а не подделка",
   ORIGINALITY_YES: "Да",
   ORIGINALITY_NO: "Нет",
   ERROR_ORIGINALITY: "Выберите: оригинал или нет",
@@ -2052,7 +2059,8 @@ export const CREATE_PRODUCT_UI = {
   DRAFT_RESTORED_DISCARD: "Начать заново",
   WIZARD_STEP_ORIGINALITY_SUBTITLE:
     "Выберите, откуда товар: своё, куплено на перепродажу или вы производитель. Покупатели увидят это в карточке.",
-  WIZARD_STEP_ORIGINALITY_MANAGE_SUBTITLE: "Подтвердите, что продаёте официальный товар",
+  WIZARD_STEP_ORIGINALITY_MANAGE_SUBTITLE:
+    "Подтвердите, что продаёте официальный товар",
   WIZARD_STEP_RETURNS_SUBTITLE: "Есть ли возврат и какие условия",
   LABEL_PRICE: "Цена, ₽",
   LABEL_OLD_PRICE: "Старая цена, ₽",
@@ -2075,7 +2083,8 @@ export const CREATE_PRODUCT_UI = {
   CATEGORY_SHEET_TITLE: "Категория",
   CATEGORY_SHEET_CLOSE: "Закрыть",
   CATEGORY_SEARCH_PLACEHOLDER: "Поиск: например, смартфоны",
-  CATEGORY_SEARCH_EMPTY: "Ничего не найдено. Попробуйте другое слово или выберите из списка",
+  CATEGORY_SEARCH_EMPTY:
+    "Ничего не найдено. Попробуйте другое слово или выберите из списка",
   CATEGORY_SEARCH_LOADING: "Ищем…",
   CATEGORY_ROOT_CRUMB: "Все категории",
   CATEGORY_EMPTY_LEVEL: "Подкатегории не найдены",
@@ -2167,7 +2176,8 @@ export const CREATE_PRODUCT_UI = {
   MANAGE_RENTAL_PENDING: "Сохраняем аренду…",
   RENTAL_TOGGLE_PENDING: "Обновляем аренду…",
   RENTAL_MODAL_TITLE: "Аренда / Прокат",
-  RENTAL_MODAL_HINT: "Укажите цену аренды и единицу. Дальше настройки добавим отдельно.",
+  RENTAL_MODAL_HINT:
+    "Укажите цену аренды и единицу. Дальше настройки добавим отдельно.",
   RENTAL_MODAL_PRICE_LABEL: "Цена аренды, ₽",
   RENTAL_MODAL_UNIT_LABEL: "Единица цены",
   RENTAL_MODAL_UNIT_DAY: "Сутки",
@@ -2178,8 +2188,7 @@ export const CREATE_PRODUCT_UI = {
   RENTAL_MODAL_CLOSE: "Закрыть",
   RENTAL_MODAL_ERROR_REQUIRED: "Укажите цену аренды и единицу",
   MANAGE_AFFILIATE_TITLE: "Партнёрская услуга",
-  MANAGE_AFFILIATE_HINT:
-    "Пользователи делятся ссылкой и получают % с покупки",
+  MANAGE_AFFILIATE_HINT: "Пользователи делятся ссылкой и получают % с покупки",
   MANAGE_AFFILIATE_HINT_ON: (percent: number) =>
     `Сейчас ${percent}%. Пользователи делятся ссылкой и получают % с покупки`,
   AFFILIATE_TOGGLE_PENDING: "Обновляем партнёрку…",
@@ -2228,7 +2237,8 @@ export const CREATE_PRODUCT_UI = {
   MANAGE_OUT_OF_STOCK_HINT:
     "Товар временно отсутствует, карточка останется в каталоге, но будет серого цвета. Пользователи будут в курсе, что товар скоро появится в наличии",
   OUT_OF_STOCK_LABEL_MODAL_TITLE: "Надпись на карточке",
-  OUT_OF_STOCK_LABEL_MODAL_HINT: "Выберите текст, который увидят покупатели на серой карточке",
+  OUT_OF_STOCK_LABEL_MODAL_HINT:
+    "Выберите текст, который увидят покупатели на серой карточке",
   OUT_OF_STOCK_LABEL_OPTION_OUT_OF_STOCK: "Нет в наличии",
   OUT_OF_STOCK_LABEL_OPTION_COMING_SOON: "Скоро поступление",
   OUT_OF_STOCK_LABEL_MODAL_SAVE: "Сохранить",
@@ -2529,8 +2539,7 @@ export const CREATE_RAFFLE_MODAL_UI = {
   HINT_PRIZE_MEDIA: "Выберите, чем показать приз в баннере розыгрыша — фото или видео.",
   HINT_PRIZE_IMAGE:
     "Загрузите файл или вставьте ссылку http/https либо путь /uploads/… с сервера.",
-  HINT_PRIZE_VIDEO:
-    "Прямая ссылка на MP4/WebM или видеофайл, загруженный на сервер.",
+  HINT_PRIZE_VIDEO: "Прямая ссылка на MP4/WebM или видеофайл, загруженный на сервер.",
   HINT_TARGET:
     "Сколько подтверждённых продаж нужно для завершения розыгрыша. Целое число от 1 до 100 000.",
   HINT_INSTAGRAM:
@@ -2569,7 +2578,8 @@ export const LOYALTY_POINTS_PAGE_UI = {
   LOGIN_BUTTON: "Войти",
   LOADING: "Загрузка…",
   FETCH_FALLBACK: "Не удалось загрузить баллы",
-  BALANCE_POINTS: (balance: number) => `Ваш баланс: ${balance} ${pluralizeRuBall(balance)}`,
+  BALANCE_POINTS: (balance: number) =>
+    `Ваш баланс: ${balance} ${pluralizeRuBall(balance)}`,
   BALANCE_CAPTION: "Ваш баланс",
   INFO: "1 балл = 1 ₽. Продавец задаёт бонус за покупку; подтверждённый покупатель получает баллы после подтверждения получения.",
   USES_TITLE: "На что тратить баллы",
@@ -2664,8 +2674,7 @@ export const USER_DATA_CONFIRMATION_PROFILE_PAGE_UI = {
     "Бейдж подтверждения у имени в каталоге",
     "Баллы лояльности за покупки",
   ],
-  PLAN_NOTE:
-    `Не заменяет премиум: ${SELLER_PRODUCTS_LIMIT_PREMIUM} товаров, золотая обводка и сторис — отдельно.`,
+  PLAN_NOTE: `Не заменяет премиум: ${SELLER_PRODUCTS_LIMIT_PREMIUM} товаров, золотая обводка и сторис — отдельно.`,
   STATUS_CONFIRMED: "Данные уже подтверждены.",
   STATUS_PENDING: "Заявка на рассмотрении. Дождитесь решения модератора.",
   STATUS_REJECTED: (note: string) =>
@@ -2757,7 +2766,8 @@ export const INTRO_AD_MODERATION_PAGE_UI = {
   EXPAND_ALL: "Развернуть все",
   COLLAPSE_ALL: "Свернуть все",
   REFRESH: "Обновить",
-  ATTENTION_FILTER_HINT: "Показаны заявки, которые давно ждут или без обязательного медиа",
+  ATTENTION_FILTER_HINT:
+    "Показаны заявки, которые давно ждут или без обязательного медиа",
   COLLAPSED_STALE: "Давно в очереди",
   COLLAPSED_MISSING_MEDIA: "Нет медиа",
   EXPAND_TOGGLE: (expanded: boolean) => (expanded ? "Свернуть" : "Развернуть"),
@@ -3031,18 +3041,13 @@ export const PRODUCT_BADGE_EXPLAIN_UI = {
       "По этому товару доступна партнёрская комиссия. Процент указан на бейдже.",
     listing_origin_own:
       "Продавец указал, что продаёт собственную вещь, а не товар для перепродажи.",
-    listing_origin_resale:
-      "Продавец указал, что товар приобретён для перепродажи.",
+    listing_origin_resale: "Продавец указал, что товар приобретён для перепродажи.",
     listing_origin_manufacturer:
       "Продавец указал, что является производителем этого товара.",
-    listing_origin_unspecified:
-      "Продавец не указал статус происхождения товара.",
-    price_market_above:
-      "По оценке продавца цена выше типичной рыночной стоимости.",
-    price_market_at:
-      "По оценке продавца цена соответствует рыночной стоимости.",
-    price_market_below:
-      "По оценке продавца цена ниже типичной рыночной стоимости.",
+    listing_origin_unspecified: "Продавец не указал статус происхождения товара.",
+    price_market_above: "По оценке продавца цена выше типичной рыночной стоимости.",
+    price_market_at: "По оценке продавца цена соответствует рыночной стоимости.",
+    price_market_below: "По оценке продавца цена ниже типичной рыночной стоимости.",
     discount: "На товар действует скидка относительно старой цены.",
     loyalty:
       "За покупку можно получить баллы лояльности. Баллы даёт продавец; получает подтверждённый покупатель.",

@@ -5,10 +5,7 @@ import {
 
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
 import { AppError } from "../../errors/AppError.js";
-import {
-  ProductModel,
-  ProductPromoActivationModel,
-} from "../../models/index.js";
+import { ProductModel, ProductPromoActivationModel } from "../../models/index.js";
 import OrderModel from "../../models/OrderModel.js";
 import { isUserStaff } from "../access/adminUserGuard.js";
 import { runInTransaction, withMongoSession } from "../../utils/mongoTransaction.js";
@@ -93,10 +90,7 @@ export const mergePromoCodesForReplace = (incoming, existing) => {
     seen.add(code);
 
     const prev = existingByCode.get(code);
-    const activationsUsed = Math.max(
-      0,
-      Math.floor(Number(prev?.activationsUsed)) || 0,
-    );
+    const activationsUsed = Math.max(0, Math.floor(Number(prev?.activationsUsed)) || 0);
     const maxActivations = Math.floor(Number(item.maxActivations));
     let enabled = item.enabled === true;
     if (enabled && activationsUsed >= maxActivations) {
@@ -160,11 +154,7 @@ export async function listProductPromoCodesForOwner({ userId, productId }) {
  *   }>;
  * }} input
  */
-export async function replaceProductPromoCodes({
-  userId,
-  productId,
-  promoCodes,
-}) {
+export async function replaceProductPromoCodes({ userId, productId, promoCodes }) {
   const isStaff = await isUserStaff(userId);
   const filter = isStaff
     ? { _id: productId }
@@ -260,28 +250,19 @@ export async function activateProductPromoCode({ userId, productId, code }) {
       );
 
       if (!updated) {
-        throw new AppError(
-          409,
-          "Не удалось активировать промокод. Попробуйте снова",
-        );
+        throw new AppError(409, "Не удалось активировать промокод. Попробуйте снова");
       }
 
       const nextCodes = updated.productPromoCodes ?? [];
-      const nextMatch = nextCodes.find(
-        (row) => String(row._id) === String(match._id),
-      );
+      const nextMatch = nextCodes.find((row) => String(row._id) === String(match._id));
       const nextUsed = Math.floor(Number(nextMatch?.activationsUsed)) || 0;
       if (!nextMatch || nextUsed !== used + 1) {
-        throw new AppError(
-          409,
-          "Не удалось активировать промокод. Попробуйте снова",
-        );
+        throw new AppError(409, "Не удалось активировать промокод. Попробуйте снова");
       }
       if (nextUsed >= Math.floor(Number(nextMatch.maxActivations))) {
         nextMatch.enabled = false;
       }
-      updated.productHasActivePromoCodes =
-        computeProductHasActivePromoCodes(nextCodes);
+      updated.productHasActivePromoCodes = computeProductHasActivePromoCodes(nextCodes);
       await updated.save(withMongoSession({}, session));
 
       await ProductPromoActivationModel.create(
@@ -368,10 +349,7 @@ export async function consumeProductPromoActivationsForUser({
  * A newer re-activate after purchase must remain.
  * @param {{ activatedAt: number; orderAt: number }} input
  */
-export const isProductPromoActivationSpentByOrder = ({
-  activatedAt,
-  orderAt,
-}) => {
+export const isProductPromoActivationSpentByOrder = ({ activatedAt, orderAt }) => {
   if (!Number.isFinite(activatedAt) || activatedAt <= 0) {
     return false;
   }
@@ -387,10 +365,7 @@ export const isProductPromoActivationSpentByOrder = ({
  * after purchase must keep working while the seller still has capacity.
  * @param {{ userId: string; productIds?: string[] }} input
  */
-export async function purgeStaleProductPromoActivationsForUser({
-  userId,
-  productIds,
-}) {
+export async function purgeStaleProductPromoActivationsForUser({ userId, productIds }) {
   if (!userId) {
     return { deletedCount: 0 };
   }
@@ -456,9 +431,7 @@ export async function purgeStaleProductPromoActivationsForUser({
     if (spentUntil == null) {
       continue;
     }
-    const activatedAt = row?.createdAt
-      ? new Date(row.createdAt).getTime()
-      : 0;
+    const activatedAt = row?.createdAt ? new Date(row.createdAt).getTime() : 0;
     if (
       isProductPromoActivationSpentByOrder({
         activatedAt,

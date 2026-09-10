@@ -13,8 +13,7 @@ export const HANDOVER_CODE_LENGTH = 4;
  */
 export const HANDOVER_CODE_MAX_ATTEMPTS = 5;
 
-export const HANDOVER_CODE_EXPIRED_MESSAGE =
-  "Код исчерпан — попросите выдать новый";
+export const HANDOVER_CODE_EXPIRED_MESSAGE = "Код исчерпан — попросите выдать новый";
 export const HANDOVER_CODE_WRONG_MESSAGE = "Неверный код";
 export const HANDOVER_CODE_MISSING_MESSAGE = "Код ещё не выдан";
 

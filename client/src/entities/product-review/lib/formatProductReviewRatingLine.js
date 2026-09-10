@@ -27,10 +27,10 @@ export function formatProductReviewRatingLine(averageRating, reviewCount) {
   if (!parts) {
     return "";
   }
-  return PRODUCT_REVIEW_UI.RATING_LINE.replace("{rating}", String(parts.rating)).replace(
-    "{count}",
-    `${parts.count} ${pluralizeRuReview(parts.count)}`,
-  );
+  return PRODUCT_REVIEW_UI.RATING_LINE.replace(
+    "{rating}",
+    String(parts.rating),
+  ).replace("{count}", `${parts.count} ${pluralizeRuReview(parts.count)}`);
 }
 
 /**

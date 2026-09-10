@@ -13,9 +13,7 @@ test("productBadgeExplainKeyParamsSchema accepts known key", () => {
 });
 
 test("productBadgeExplainKeyParamsSchema rejects unknown key", () => {
-  assert.throws(() =>
-    productBadgeExplainKeyParamsSchema.parse({ badgeKey: "nope" }),
-  );
+  assert.throws(() => productBadgeExplainKeyParamsSchema.parse({ badgeKey: "nope" }));
 });
 
 test("adminProductBadgeExplainPatchBodySchema accepts description + imageUrl", () => {

@@ -44,7 +44,10 @@ export const ProductCardBanner = ({ product }: ProductCardBannerProps) => {
   const cardMedia = useProductCardMediaState(product);
   const bannerChrome = resolveProductCardBannerChrome(theme.colors);
   const name = product.productName?.trim() || "Без названия";
-  const reviewLine = formatProductReviewRatingLine(product.averageRating, product.reviewCount);
+  const reviewLine = formatProductReviewRatingLine(
+    product.averageRating,
+    product.reviewCount,
+  );
   const hasReviewRating = reviewLine.length > 0;
   const openProductLabel = PRODUCT_UI.OPEN_ARIA(name);
 
@@ -76,7 +79,9 @@ export const ProductCardBanner = ({ product }: ProductCardBannerProps) => {
         onPress={showSellerClosedOverlay ? undefined : handlePress}
         disabled={showSellerClosedOverlay}
         accessibilityRole={showSellerClosedOverlay ? "text" : "button"}
-        accessibilityLabel={showSellerClosedOverlay ? sellerClosedOverlayLabel : openProductLabel}
+        accessibilityLabel={
+          showSellerClosedOverlay ? sellerClosedOverlayLabel : openProductLabel
+        }
       >
         <ProductCardPromotionBackground
           tier={PRODUCT_CARD_PROMOTION_TIER.BANNER}
@@ -95,7 +100,9 @@ export const ProductCardBanner = ({ product }: ProductCardBannerProps) => {
 
         <View style={styles.content}>
           <View style={styles.tierBadge}>
-            <Text style={styles.tierBadgeText}>{PRODUCT_CARD_UI.PROMOTION_BANNER_BADGE}</Text>
+            <Text style={styles.tierBadgeText}>
+              {PRODUCT_CARD_UI.PROMOTION_BANNER_BADGE}
+            </Text>
           </View>
 
           <Text style={styles.name} numberOfLines={2}>
@@ -131,7 +138,11 @@ export const ProductCardBanner = ({ product }: ProductCardBannerProps) => {
 
       {!showSellerClosedOverlay ? (
         <View style={styles.wishlistSlot}>
-          <WishlistToggleButton productId={product._id} product={product} variant="card" />
+          <WishlistToggleButton
+            productId={product._id}
+            product={product}
+            variant="card"
+          />
         </View>
       ) : null}
     </View>

@@ -64,7 +64,10 @@ export const ProductCompareTab = ({
   if (compareQuery.isError && products.length === 0) {
     return (
       <ScreenErrorState
-        message={formatApiErrorMessage(compareQuery.error, PRODUCT_COMPARE_UI.FETCH_FALLBACK)}
+        message={formatApiErrorMessage(
+          compareQuery.error,
+          PRODUCT_COMPARE_UI.FETCH_FALLBACK,
+        )}
         onRetry={() => {
           void compareQuery.refetch();
         }}
@@ -75,7 +78,11 @@ export const ProductCompareTab = ({
   if (catalogGridRows.length === 0) {
     return (
       <Text
-        style={[styles.empty, localStyles.emptyPad, { paddingHorizontal: productGrid.padding }]}
+        style={[
+          styles.empty,
+          localStyles.emptyPad,
+          { paddingHorizontal: productGrid.padding },
+        ]}
       >
         {PRODUCT_COMPARE_UI.EMPTY}
       </Text>

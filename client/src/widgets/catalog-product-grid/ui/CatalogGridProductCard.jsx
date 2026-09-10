@@ -65,7 +65,9 @@ export function CatalogGridProductCard({
   return (
     <div
       className={
-        promotionFullWidth ? "app-shell__cell app-shell__cell--tier3-full-width" : "app-shell__cell"
+        promotionFullWidth
+          ? "app-shell__cell app-shell__cell--tier3-full-width"
+          : "app-shell__cell"
       }
       role="listitem"
     >
@@ -91,7 +93,9 @@ export function CatalogGridProductCard({
         viewerRegionCode={viewerRegionCode}
         highlightRaffleProduct={highlightRaffleProducts}
         sellerRaffleActive={isMineMode ? sellerRaffleActive : false}
-        onToggleRaffleParticipation={isMineMode ? onToggleRaffleParticipation : undefined}
+        onToggleRaffleParticipation={
+          isMineMode ? onToggleRaffleParticipation : undefined
+        }
         isRaffleParticipationPending={
           isMineMode &&
           product._id != null &&

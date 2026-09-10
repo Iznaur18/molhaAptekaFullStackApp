@@ -33,18 +33,15 @@ const rewriteImports = (source) => {
     .replaceAll('from "../errors/', 'from "../../errors/')
     .replaceAll('from "../db/', 'from "../../db/');
 
-  next = next.replace(
-    /from "\.\/([^"]+\.js)"/g,
-    (_match, relPath) => {
-      if (MOVED_FILES.includes(relPath)) {
-        return `from "./${relPath}"`;
-      }
-      if (RAFFLE_IMPORTS.has(relPath)) {
-        return `from "../raffle/${relPath}"`;
-      }
-      return `from "../../utils/${relPath}"`;
-    },
-  );
+  next = next.replace(/from "\.\/([^"]+\.js)"/g, (_match, relPath) => {
+    if (MOVED_FILES.includes(relPath)) {
+      return `from "./${relPath}"`;
+    }
+    if (RAFFLE_IMPORTS.has(relPath)) {
+      return `from "../raffle/${relPath}"`;
+    }
+    return `from "../../utils/${relPath}"`;
+  });
 
   return next;
 };
@@ -59,4 +56,6 @@ for (const fileName of CATEGORY_TREE_FILES) {
   fs.writeFileSync(path.join(UTILS_DIR, fileName), shim, "utf8");
 }
 
-console.log(`Migrated ${CATEGORY_TREE_FILES.length} category-tree utils → services/product/`);
+console.log(
+  `Migrated ${CATEGORY_TREE_FILES.length} category-tree utils → services/product/`,
+);

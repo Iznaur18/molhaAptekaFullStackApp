@@ -76,7 +76,8 @@ export const CatalogBrowserPage = () => {
   );
 
   const categoryItems = useMemo(
-    () => buildResolvedProductCategoryDisplaysFromRoots(categoryRoots, categoryDisplays),
+    () =>
+      buildResolvedProductCategoryDisplaysFromRoots(categoryRoots, categoryDisplays),
     [categoryDisplays, categoryRoots],
   );
 
@@ -213,7 +214,13 @@ export const CatalogBrowserPage = () => {
   return (
     <>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        <View style={[styles.container, centeredContentStyle, { paddingTop: contentPaddingTop + 16 }]}>
+        <View
+          style={[
+            styles.container,
+            centeredContentStyle,
+            { paddingTop: contentPaddingTop + 16 },
+          ]}
+        >
           <CatalogBrowserTilesGrid
             title={PRODUCT_CATEGORY_DISPLAY_UI.FEED_SECTION_TITLE}
             accessibilityLabel={PRODUCT_CATEGORY_DISPLAY_UI.FEED_GRID_ARIA}
@@ -271,7 +278,8 @@ export const CatalogBrowserPage = () => {
                 {...tileLayoutProps}
                 disabled={subcategoryPicker.resolvingLandingCategoryKey != null}
                 pending={
-                  subcategoryPicker.resolvingLandingCategoryKey === resolveCategoryTileKey(item)
+                  subcategoryPicker.resolvingLandingCategoryKey ===
+                  resolveCategoryTileKey(item)
                 }
                 onPress={() => handleCategoryPress(item)}
                 onEditPress={

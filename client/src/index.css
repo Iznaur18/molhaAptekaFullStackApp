@@ -130,7 +130,9 @@ html.app-portrait-lock-active::before {
   padding: 1.5rem;
   background: var(--iz-color-bg, #fff);
   color: var(--iz-color-text, #111);
-  font: 600 1.05rem/1.35 system-ui, sans-serif;
+  font:
+    600 1.05rem/1.35 system-ui,
+    sans-serif;
   text-align: center;
   pointer-events: auto;
 }

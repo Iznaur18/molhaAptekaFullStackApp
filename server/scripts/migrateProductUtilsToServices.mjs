@@ -55,18 +55,15 @@ const rewriteImports = (source) => {
     .replaceAll('from "../errors/', 'from "../../errors/')
     .replaceAll('from "../db/', 'from "../../db/');
 
-  next = next.replace(
-    /from "\.\/([^"]+\.js)"/g,
-    (match, relPath) => {
-      if (MOVED_FILES.includes(relPath)) {
-        return `from "./${relPath}"`;
-      }
-      if (RAFFLE_IMPORTS.has(relPath)) {
-        return `from "../raffle/${relPath}"`;
-      }
-      return `from "../../utils/${relPath}"`;
-    },
-  );
+  next = next.replace(/from "\.\/([^"]+\.js)"/g, (match, relPath) => {
+    if (MOVED_FILES.includes(relPath)) {
+      return `from "./${relPath}"`;
+    }
+    if (RAFFLE_IMPORTS.has(relPath)) {
+      return `from "../raffle/${relPath}"`;
+    }
+    return `from "../../utils/${relPath}"`;
+  });
 
   return next;
 };

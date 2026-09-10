@@ -16,5 +16,13 @@ export function buildFeaturedRaffleProgress(raffle) {
       ? base
       : `${base} ${RAFFLE_FEATURED_BANNER_UI.REMAINING(remaining)}`;
 
-  return { isCompleted, progress, target, remaining, percent, label, participantsCount };
+  return {
+    isCompleted,
+    progress,
+    target,
+    remaining,
+    percent,
+    label,
+    participantsCount,
+  };
 }

@@ -148,7 +148,10 @@ export const ProductBuyNFreeModal = ({
 
         <View style={[styles.footer, { paddingBottom: footerInsetBottom }]}>
           <Pressable
-            style={[styles.saveButton, (isSubmitting || !productId) && styles.buttonDisabled]}
+            style={[
+              styles.saveButton,
+              (isSubmitting || !productId) && styles.buttonDisabled,
+            ]}
             accessibilityRole="button"
             disabled={isSubmitting || !productId}
             onPress={() => void handleSave()}

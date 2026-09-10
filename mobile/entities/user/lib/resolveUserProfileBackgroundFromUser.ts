@@ -3,7 +3,10 @@ import {
   getUserBackgroundPresetById,
   parseUserBackgroundPresetId,
 } from "@/entities/user/model/userBackgroundPresets";
-import { isDisplayableMediaUrl, resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
+import {
+  isDisplayableMediaUrl,
+  resolveUploadedMediaUrl,
+} from "@/shared/lib/resolveMediaUrl";
 
 export type UserProfileBackground =
   | { kind: "preset"; color: string }

@@ -1,10 +1,4 @@
-import {
-  useCallback,
-  useMemo,
-  useReducer,
-  useRef,
-  type ReactNode,
-} from "react";
+import { useCallback, useMemo, useReducer, useRef, type ReactNode } from "react";
 
 import { useReplaceMyFavoritesMutation } from "./useReplaceMyFavoritesMutation";
 import {
@@ -61,7 +55,8 @@ export const WishlistProvider = ({ children }: WishlistProviderProps) => {
   }, [replaceWishlistMutation]);
 
   const isInWishlist = useCallback(
-    (productId: string) => Object.prototype.hasOwnProperty.call(items, String(productId)),
+    (productId: string) =>
+      Object.prototype.hasOwnProperty.call(items, String(productId)),
     [items],
   );
 

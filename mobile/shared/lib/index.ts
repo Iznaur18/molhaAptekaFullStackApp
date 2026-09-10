@@ -4,7 +4,4 @@ export {
   formatPriceRub,
   normalizeUploadUrlForStorage,
 } from "@izibuy/shared-lib";
-export {
-  isDisplayableMediaUrl,
-  resolveUploadedMediaUrl,
-} from "./resolveMediaUrl";
+export { isDisplayableMediaUrl, resolveUploadedMediaUrl } from "./resolveMediaUrl";

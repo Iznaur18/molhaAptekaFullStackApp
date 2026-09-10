@@ -180,9 +180,7 @@ export const SellerProfileQuickStats = ({
     }
 
     return (
-      <Text
-        style={[styles.value, row.key === "phone" && styles.valuePhone]}
-      >
+      <Text style={[styles.value, row.key === "phone" && styles.valuePhone]}>
         {row.value || EM_DASH}
       </Text>
     );

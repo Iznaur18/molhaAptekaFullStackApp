@@ -57,7 +57,10 @@ export const AdminEditUserPage = () => {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.formScroll} keyboardShouldPersistTaps="handled">
+    <ScrollView
+      contentContainerStyle={styles.formScroll}
+      keyboardShouldPersistTaps="handled"
+    >
       <ProfileAvatarUpload
         avatarUrl={form.userAvatarUrl}
         disabled={isSubmitting}
@@ -65,14 +68,18 @@ export const AdminEditUserPage = () => {
         onError={reportError}
       />
 
-      <Text style={[styles.labelStrong, { marginTop: 16 }]}>{EDIT_PROFILE_UI.LABEL_EMAIL}</Text>
+      <Text style={[styles.labelStrong, { marginTop: 16 }]}>
+        {EDIT_PROFILE_UI.LABEL_EMAIL}
+      </Text>
       <TextInput
         style={[styles.input, styles.inputReadOnly]}
         value={typeof user.email === "string" ? user.email : ""}
         editable={false}
       />
 
-      <Text style={[styles.labelStrong, { marginTop: 16 }]}>{EDIT_PROFILE_UI.LABEL_USERNAME}</Text>
+      <Text style={[styles.labelStrong, { marginTop: 16 }]}>
+        {EDIT_PROFILE_UI.LABEL_USERNAME}
+      </Text>
       <Text style={styles.hint}>{EDIT_PROFILE_UI.USERNAME_HINT}</Text>
       <TextInput
         style={styles.input}
@@ -84,11 +91,15 @@ export const AdminEditUserPage = () => {
         placeholderTextColor={theme.colors.textMuted}
       />
 
-      <Text style={[styles.labelStrong, { marginTop: 16 }]}>{EDIT_PROFILE_UI.LABEL_PHONE}</Text>
+      <Text style={[styles.labelStrong, { marginTop: 16 }]}>
+        {EDIT_PROFILE_UI.LABEL_PHONE}
+      </Text>
       <TextInput
         style={styles.input}
         value={form.userPhoneNumber}
-        onChangeText={(value) => updateField("userPhoneNumber", maskRuPhoneInput(value))}
+        onChangeText={(value) =>
+          updateField("userPhoneNumber", maskRuPhoneInput(value))
+        }
         keyboardType="phone-pad"
         editable={!isSubmitting}
         placeholder="8 (912) 345-67-89"
@@ -110,13 +121,17 @@ export const AdminEditUserPage = () => {
       <TextInput
         style={styles.input}
         value={form.userLoyaltyPoints}
-        onChangeText={(value) => updateField("userLoyaltyPoints", value.replace(/\D/g, ""))}
+        onChangeText={(value) =>
+          updateField("userLoyaltyPoints", value.replace(/\D/g, ""))
+        }
         keyboardType="number-pad"
         editable={!isSubmitting}
         placeholderTextColor={theme.colors.textMuted}
       />
 
-      <Text style={[styles.labelStrong, { marginTop: 16 }]}>{ADMIN_EDIT_USER_UI.SECTION_ADMIN}</Text>
+      <Text style={[styles.labelStrong, { marginTop: 16 }]}>
+        {ADMIN_EDIT_USER_UI.SECTION_ADMIN}
+      </Text>
 
       {isAdmin ? (
         <>
@@ -133,7 +148,9 @@ export const AdminEditUserPage = () => {
           <TextInput
             style={styles.input}
             value={form.userDiscountPercent}
-            onChangeText={(value) => updateField("userDiscountPercent", value.replace(/\D/g, ""))}
+            onChangeText={(value) =>
+              updateField("userDiscountPercent", value.replace(/\D/g, ""))
+            }
             keyboardType="number-pad"
             maxLength={3}
             editable={!isSubmitting}
@@ -143,7 +160,9 @@ export const AdminEditUserPage = () => {
       ) : null}
 
       <View style={styles.switchRow}>
-        <Text style={styles.switchLabel}>{ADMIN_EDIT_USER_UI.LABEL_USER_DATA_CONFIRMED}</Text>
+        <Text style={styles.switchLabel}>
+          {ADMIN_EDIT_USER_UI.LABEL_USER_DATA_CONFIRMED}
+        </Text>
         <Switch
           value={form.isUserDataConfirmed}
           onValueChange={(value) => updateField("isUserDataConfirmed", value)}
@@ -161,7 +180,9 @@ export const AdminEditUserPage = () => {
       ) : null}
 
       <View style={styles.switchRow}>
-        <Text style={styles.switchLabel}>{ADMIN_EDIT_USER_UI.LABEL_ACCOUNT_ACTIVE}</Text>
+        <Text style={styles.switchLabel}>
+          {ADMIN_EDIT_USER_UI.LABEL_ACCOUNT_ACTIVE}
+        </Text>
         <Switch
           value={form.isActiveUser}
           onValueChange={(value) => updateField("isActiveUser", value)}
@@ -178,7 +199,9 @@ export const AdminEditUserPage = () => {
         />
       </View>
 
-      <Text style={[styles.labelStrong, { marginTop: 16 }]}>{EDIT_PROFILE_UI.LABEL_NOTES}</Text>
+      <Text style={[styles.labelStrong, { marginTop: 16 }]}>
+        {EDIT_PROFILE_UI.LABEL_NOTES}
+      </Text>
       <TextInput
         style={[styles.input, { minHeight: 96, textAlignVertical: "top" }]}
         value={form.notesAboutUser}
@@ -188,7 +211,9 @@ export const AdminEditUserPage = () => {
         placeholderTextColor={theme.colors.textMuted}
       />
 
-      {errorMessage ? <Text style={[styles.error, { marginTop: 16 }]}>{errorMessage}</Text> : null}
+      {errorMessage ? (
+        <Text style={[styles.error, { marginTop: 16 }]}>{errorMessage}</Text>
+      ) : null}
       {successMessage ? (
         <Text style={[styles.success, { marginTop: 16 }]}>{successMessage}</Text>
       ) : null}

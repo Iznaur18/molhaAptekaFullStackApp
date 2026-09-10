@@ -21,12 +21,15 @@ import {
 
 describe("shippingProvider scaffold", () => {
   it("ЛОБО живая, остальные ждут ключей", () => {
-    assert.deepEqual([...SHIPPING_PROVIDERS], [
-      SHIPPING_PROVIDER_LOBO,
-      SHIPPING_PROVIDER_CDEK,
-      SHIPPING_PROVIDER_YANDEX_DELIVERY,
-      SHIPPING_PROVIDER_RUSSIAN_POST,
-    ]);
+    assert.deepEqual(
+      [...SHIPPING_PROVIDERS],
+      [
+        SHIPPING_PROVIDER_LOBO,
+        SHIPPING_PROVIDER_CDEK,
+        SHIPPING_PROVIDER_YANDEX_DELIVERY,
+        SHIPPING_PROVIDER_RUSSIAN_POST,
+      ],
+    );
     assert.equal(SHIPPING_PROVIDERS_ENABLED, true);
     assert.equal(SHIPPING_PROVIDER_PRIMARY, SHIPPING_PROVIDER_LOBO);
     assert.equal(isShippingProviderLive(SHIPPING_PROVIDER_LOBO), true);
@@ -44,7 +47,10 @@ describe("shippingProvider scaffold", () => {
       "иначе обещаем доставку, которой в этом регионе нет",
     );
     // Регион неизвестен — службу с ограничением не предлагаем.
-    assert.equal(isShippingProviderAvailableInRegion(SHIPPING_PROVIDER_LOBO, ""), false);
+    assert.equal(
+      isShippingProviderAvailableInRegion(SHIPPING_PROVIDER_LOBO, ""),
+      false,
+    );
     // У службы без ограничений регион не спрашиваем.
     assert.equal(
       isShippingProviderAvailableInRegion(SHIPPING_PROVIDER_CDEK, "RU-MOW"),

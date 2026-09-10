@@ -67,8 +67,11 @@ function SellerPersonalCategoryCampaignModerationCard({
   onExpandedChange,
 }) {
   const sellerName = resolveSellerName(campaign.seller) || String(campaign.sellerId);
-  const imageSrc = campaign.imageUrl ? resolveUploadedImageUrl(String(campaign.imageUrl)) : null;
-  const needsAttention = mode === "pending" && campaignModerationNeedsAttention(campaign);
+  const imageSrc = campaign.imageUrl
+    ? resolveUploadedImageUrl(String(campaign.imageUrl))
+    : null;
+  const needsAttention =
+    mode === "pending" && campaignModerationNeedsAttention(campaign);
   const collapsedPreview = resolveModerationCampaignCollapsedPreview(campaign);
   const createdLabel =
     mode === "pending" && campaign.createdAt
@@ -92,12 +95,18 @@ function SellerPersonalCategoryCampaignModerationCard({
         </p>
       ) : null}
       {imageSrc ? (
-        <img className="intro-ad-moderation-page__banner-preview" src={imageSrc} alt="" />
+        <img
+          className="intro-ad-moderation-page__banner-preview"
+          src={imageSrc}
+          alt=""
+        />
       ) : null}
       {mode === "pending" && onRejectReasonChange ? (
         <textarea
           className="intro-ad-moderation-page__textarea"
-          placeholder={SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.REJECT_REASON_PLACEHOLDER}
+          placeholder={
+            SELLER_PERSONAL_CATEGORY_MODERATION_PAGE_UI.REJECT_REASON_PLACEHOLDER
+          }
           value={rejectReason}
           onChange={(event) => onRejectReasonChange(event.target.value)}
         />
@@ -208,7 +217,9 @@ export function SellerPersonalCategoryCampaignModerationSection({
     queryFn: fetchManagedSellerPersonalCategoryCampaigns,
   });
 
-  const approveMutation = useMutation({ mutationFn: approveSellerPersonalCategoryCampaign });
+  const approveMutation = useMutation({
+    mutationFn: approveSellerPersonalCategoryCampaign,
+  });
   const rejectMutation = useMutation({
     mutationFn: ({ campaignId, reason }) =>
       rejectSellerPersonalCategoryCampaign(campaignId, reason),

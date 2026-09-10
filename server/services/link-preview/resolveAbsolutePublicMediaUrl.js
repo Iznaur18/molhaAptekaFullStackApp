@@ -31,9 +31,10 @@ export function resolveAbsolutePublicMediaUrl(raw, options = {}) {
 
   const configured = process.env.PUBLIC_UPLOAD_BASE_URL?.trim();
   const pageOrigin =
-    options.pageOrigin?.trim() ||
-    resolveFrontendOrigin(process.env.FRONTEND_URL);
-  const base = configured ? trimTrailingSlash(configured) : trimTrailingSlash(pageOrigin);
+    options.pageOrigin?.trim() || resolveFrontendOrigin(process.env.FRONTEND_URL);
+  const base = configured
+    ? trimTrailingSlash(configured)
+    : trimTrailingSlash(pageOrigin);
   return `${base}${value}`;
 }
 

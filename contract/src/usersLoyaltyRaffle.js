@@ -41,10 +41,9 @@ export const patchUsersLoyaltyRaffleSettingsBodySchema = z
       .max(USERS_LOYALTY_RAFFLE_GOAL_MAX)
       .optional(),
   })
-  .refine(
-    (body) => body.description !== undefined || body.goal !== undefined,
-    { message: "Укажите description и/или goal" },
-  );
+  .refine((body) => body.description !== undefined || body.goal !== undefined, {
+    message: "Укажите description и/или goal",
+  });
 
 export const usersMonthlyLoyaltyAwardedDataSchema = z.object({
   pointsAwarded: z.number().int().min(0),

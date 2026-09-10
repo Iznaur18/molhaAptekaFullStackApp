@@ -61,8 +61,6 @@ export async function patchMyProduct(productId, body) {
       throw parseError;
     }
   } catch (e) {
-    throw new Error(
-      formatApiErrorMessage(e, API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK),
-    );
+    throw new Error(formatApiErrorMessage(e, API_CLIENT_UI.PATCH_MY_PRODUCT_FALLBACK));
   }
 }

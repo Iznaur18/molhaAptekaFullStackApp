@@ -6,15 +6,16 @@ type CatalogScrollAnimationContextValue = {
   scrollDirection: SharedValue<number>;
 };
 
-const CatalogScrollAnimationContext = createContext<CatalogScrollAnimationContextValue | null>(
-  null,
-);
+const CatalogScrollAnimationContext =
+  createContext<CatalogScrollAnimationContextValue | null>(null);
 
 type CatalogScrollAnimationProviderProps = {
   children: ReactNode;
 };
 
-export const CatalogScrollAnimationProvider = ({ children }: CatalogScrollAnimationProviderProps) => {
+export const CatalogScrollAnimationProvider = ({
+  children,
+}: CatalogScrollAnimationProviderProps) => {
   const scrollY = useSharedValue(0);
   const scrollDirection = useSharedValue(1);
   const value = useMemo(
@@ -32,5 +33,6 @@ export const CatalogScrollAnimationProvider = ({ children }: CatalogScrollAnimat
   );
 };
 
-export const useCatalogScrollAnimation = (): CatalogScrollAnimationContextValue | null =>
-  useContext(CatalogScrollAnimationContext);
+export const useCatalogScrollAnimation =
+  (): CatalogScrollAnimationContextValue | null =>
+    useContext(CatalogScrollAnimationContext);

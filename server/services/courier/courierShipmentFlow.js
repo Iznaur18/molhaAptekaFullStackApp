@@ -32,10 +32,7 @@ import {
 } from "../order/updateOrderItemStatus.js";
 import { buildOrderStatusFromItems } from "../order/orderStatus.js";
 
-import {
-  generateHandoverCode,
-  verifyHandoverCode,
-} from "./courierHandoverCodes.js";
+import { generateHandoverCode, verifyHandoverCode } from "./courierHandoverCodes.js";
 
 const TERMINAL = new Set(ORDER_TERMINAL_STATUSES);
 
@@ -130,9 +127,7 @@ export async function acceptShipmentByCourier({ orderId, sellerId, courierId }) 
     throw new AppError(409, "Заказ ещё не готов к отгрузке");
   }
   if (
-    (shipment.declinedCourierIds ?? []).some(
-      (id) => String(id) === String(courierId),
-    )
+    (shipment.declinedCourierIds ?? []).some((id) => String(id) === String(courierId))
   ) {
     throw new AppError(403, "По этому заказу вам отказали");
   }
@@ -174,12 +169,7 @@ export async function issueHandoverCode({ orderId, sellerId }) {
  *
  * @param {{ orderId: string; sellerId: string; courierId: string; code: string }} input
  */
-export async function confirmHandoverByCourier({
-  orderId,
-  sellerId,
-  courierId,
-  code,
-}) {
+export async function confirmHandoverByCourier({ orderId, sellerId, courierId, code }) {
   const order = await loadOrderWithItems(orderId);
   const { shipment, items, status } = locateShipment(order, sellerId);
 

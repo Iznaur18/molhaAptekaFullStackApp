@@ -18,10 +18,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { useSubmitProductReportMutation } from "@/entities/product-report/model/useSubmitProductReportMutation";
-import {
-  PRODUCT_REPORT_TEXT_MAX_CHARS,
-  PRODUCT_REPORT_UI,
-} from "@/shared/config";
+import { PRODUCT_REPORT_TEXT_MAX_CHARS, PRODUCT_REPORT_UI } from "@/shared/config";
 import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
 import {
   REPORT_PRODUCT_MODAL_ANIMATION,
@@ -155,9 +152,17 @@ export const ReportProductModal = ({
   }
 
   return (
-    <Modal visible={modalVisible} animationType="none" transparent onRequestClose={handleClose}>
+    <Modal
+      visible={modalVisible}
+      animationType="none"
+      transparent
+      onRequestClose={handleClose}
+    >
       <View style={[styles.root, { paddingBottom: sheetRestOffset }]}>
-        <Animated.View style={[styles.backdrop, backdropAnimatedStyle]} pointerEvents="box-none">
+        <Animated.View
+          style={[styles.backdrop, backdropAnimatedStyle]}
+          pointerEvents="box-none"
+        >
           <ModalSheetGradientBackdrop />
           <Pressable
             style={StyleSheet.absoluteFillObject}
@@ -194,14 +199,19 @@ export const ReportProductModal = ({
           )}
 
           <View style={styles.actions}>
-            <Pressable style={styles.cancelButton} onPress={handleClose} disabled={isSubmitting}>
+            <Pressable
+              style={styles.cancelButton}
+              onPress={handleClose}
+              disabled={isSubmitting}
+            >
               <Text style={styles.cancelButtonText}>{PRODUCT_REPORT_UI.CANCEL}</Text>
             </Pressable>
             {!hasPendingReport ? (
               <Pressable
                 style={[
                   styles.submitButton,
-                  (isSubmitting || isOverLimit || !reportText.trim()) && styles.submitDisabled,
+                  (isSubmitting || isOverLimit || !reportText.trim()) &&
+                    styles.submitDisabled,
                 ]}
                 onPress={handleSubmit}
                 disabled={isSubmitting || isOverLimit || !reportText.trim()}
@@ -209,7 +219,9 @@ export const ReportProductModal = ({
                 {isSubmitting ? (
                   <ActivityIndicator color={theme.colors.onContrast} />
                 ) : (
-                  <Text style={styles.submitButtonText}>{PRODUCT_REPORT_UI.SUBMIT}</Text>
+                  <Text style={styles.submitButtonText}>
+                    {PRODUCT_REPORT_UI.SUBMIT}
+                  </Text>
                 )}
               </Pressable>
             ) : null}

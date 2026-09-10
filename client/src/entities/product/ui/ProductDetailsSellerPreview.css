@@ -59,7 +59,8 @@
   flex-shrink: 0;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--iz-color-border) 70%, var(--iz-color-surface));
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--iz-color-border) 70%, var(--iz-color-surface));
 }
 
 .product-details-seller-preview__header-text {

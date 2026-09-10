@@ -70,8 +70,7 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
   const [error, setError] = useState("");
   const [step, setStep] = useState(PASSPORT_FORM_STEP_IDENTITY);
   const [isDraftHydrated, setIsDraftHydrated] = useState(false);
-  const isSubmitting =
-    submitRequestMutation.isPending || uploadImageMutation.isPending;
+  const isSubmitting = submitRequestMutation.isPending || uploadImageMutation.isPending;
   const selfieFileInputRef = useRef(/** @type {HTMLInputElement | null} */ (null));
 
   const status = statusQuery.data;
@@ -110,9 +109,7 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
     }
     setError("");
     setSelfieFile(null);
-    const draft = currentUserId
-      ? readDataConfirmationFormDraft(currentUserId)
-      : null;
+    const draft = currentUserId ? readDataConfirmationFormDraft(currentUserId) : null;
     if (draft) {
       setForm(draft.form);
       setStep(draft.step);
@@ -352,7 +349,9 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
                     PASSPORT_FORM_STEP_COUNT,
                   )}
                 </p>
-                <p className="data-confirmation-modal__step-title">{STEP_TITLES[step]}</p>
+                <p className="data-confirmation-modal__step-title">
+                  {STEP_TITLES[step]}
+                </p>
               </div>
 
               {step === PASSPORT_FORM_STEP_IDENTITY ? (
@@ -451,7 +450,9 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
                     <input
                       type="text"
                       inputMode="numeric"
-                      placeholder={DATA_CONFIRMATION_MODAL_UI.PLACEHOLDER_DEPARTMENT_CODE}
+                      placeholder={
+                        DATA_CONFIRMATION_MODAL_UI.PLACEHOLDER_DEPARTMENT_CODE
+                      }
                       maxLength={7}
                       value={form.departmentCode}
                       onChange={(e) =>
@@ -522,7 +523,11 @@ export function DataConfirmationRequestModal({ isOpen, onClose, onSubmitted }) {
                     {DATA_CONFIRMATION_MODAL_UI.BACK}
                   </button>
                 ) : (
-                  <button type="button" className="app-btn app-btn--cancel" onClick={onClose}>
+                  <button
+                    type="button"
+                    className="app-btn app-btn--cancel"
+                    onClick={onClose}
+                  >
                     {DATA_CONFIRMATION_MODAL_UI.CANCEL}
                   </button>
                 )}

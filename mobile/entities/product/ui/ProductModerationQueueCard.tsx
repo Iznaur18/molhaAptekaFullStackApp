@@ -64,7 +64,9 @@ export const ProductModerationQueueCard = ({
         <View style={styles.summary}>
           <View style={styles.statusRow}>
             <View style={[styles.statusPill, styles.statusPillPending]}>
-              <Text style={styles.statusPillText}>{PRODUCT_MODERATION_PAGE_UI.BADGE_PENDING}</Text>
+              <Text style={styles.statusPillText}>
+                {PRODUCT_MODERATION_PAGE_UI.BADGE_PENDING}
+              </Text>
             </View>
           </View>
 

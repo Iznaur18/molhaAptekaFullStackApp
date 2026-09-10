@@ -1,7 +1,9 @@
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-const SCRIPT = fileURLToPath(new URL("../../scripts/loboMockServer.mjs", import.meta.url));
+const SCRIPT = fileURLToPath(
+  new URL("../../scripts/loboMockServer.mjs", import.meta.url),
+);
 
 /**
  * Поднимает мок DMS ЛОБО на время тестов.

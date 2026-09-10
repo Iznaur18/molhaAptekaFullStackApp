@@ -10,7 +10,11 @@ type CatalogSearchBarProps = {
   embedded?: boolean;
 };
 
-export const CatalogSearchBar = ({ value, onChange, embedded = false }: CatalogSearchBarProps) => {
+export const CatalogSearchBar = ({
+  value,
+  onChange,
+  embedded = false,
+}: CatalogSearchBarProps) => {
   const styles = useCatalogSearchBarStyles();
   const theme = useAppTheme();
 

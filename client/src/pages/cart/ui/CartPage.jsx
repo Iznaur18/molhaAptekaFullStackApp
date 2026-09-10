@@ -150,7 +150,9 @@ export function CartPage({
   const buyNFreeProductIds = useMemo(() => {
     const products = productsQuery.data ?? [];
     return products
-      .filter((product) => isProductBuyNFreeActive(product) && items[String(product._id)])
+      .filter(
+        (product) => isProductBuyNFreeActive(product) && items[String(product._id)],
+      )
       .map((product) => String(product._id));
   }, [items, productsQuery.data]);
 
@@ -200,9 +202,7 @@ export function CartPage({
 
   const visibleLines = useMemo(
     () =>
-      lines.filter(
-        (line) => getCartLineExclusionReason(line, currentUserId) == null,
-      ),
+      lines.filter((line) => getCartLineExclusionReason(line, currentUserId) == null),
     [lines, currentUserId],
   );
 
@@ -249,11 +249,7 @@ export function CartPage({
     () =>
       sellerGroups.map((group) => ({
         group,
-        summary: selectCartCheckoutSummary(
-          group.lines,
-          currentUserId,
-          deselectedIds,
-        ),
+        summary: selectCartCheckoutSummary(group.lines, currentUserId, deselectedIds),
         productIds: group.lines.map((line) => line.productId),
       })),
     [sellerGroups, currentUserId, deselectedIds],
@@ -298,8 +294,7 @@ export function CartPage({
         (entry) => String(entry.group.sellerId) === String(checkoutSellerId),
       );
       return (
-        found?.summary ??
-        selectCartCheckoutSummary([], currentUserId, deselectedIds)
+        found?.summary ?? selectCartCheckoutSummary([], currentUserId, deselectedIds)
       );
     }
     if (activeSellerEntry) {
@@ -381,11 +376,7 @@ export function CartPage({
     // «доставке продавцом» их выкидывали — и при самовывозе чекаут мог
     // остаться с пустым списком («адреса нет»), хотя на товаре он есть.
     return buildCheckoutPickupLocations(activeSummary.selectedLines);
-  }, [
-    auctionCheckoutBid,
-    activeSummary.selectedLines,
-    productsQuery.data,
-  ]);
+  }, [auctionCheckoutBid, activeSummary.selectedLines, productsQuery.data]);
 
   const deliveryAvailable = useMemo(() => {
     if (auctionCheckoutBid) {
@@ -506,17 +497,14 @@ export function CartPage({
       } catch (e) {
         setSubmitState({
           isSubmitting: false,
-          error:
-            e instanceof Error ? e.message : CHECKOUT_FORM_UI.ERROR_GENERIC,
+          error: e instanceof Error ? e.message : CHECKOUT_FORM_UI.ERROR_GENERIC,
           success: "",
         });
       }
       return;
     }
 
-    const orderedProductIds = activeSummary.selectedLines.map(
-      (line) => line.productId,
-    );
+    const orderedProductIds = activeSummary.selectedLines.map((line) => line.productId);
     try {
       await createOrderMutation.mutateAsync({
         items: activeSummary.selectedLines.map((line) => ({
@@ -611,11 +599,7 @@ export function CartPage({
         <p className="cart-page__message">
           {CART_PAGE_UI.CHECKOUT_BLOCKED_ALL_UNAVAILABLE}
         </p>
-        <button
-          type="button"
-          className="cart-page__clear-button"
-          onClick={clearCart}
-        >
+        <button type="button" className="cart-page__clear-button" onClick={clearCart}>
           {CART_PAGE_UI.CLEAR_ALL}
         </button>
       </div>
@@ -670,14 +654,10 @@ export function CartPage({
                     courierDelivery={checkoutCourierDelivery}
                     deliveryProductIds={deliveryProductIds}
                     initialFulfillmentMethod={
-                      fulfillmentBySellerId[activeSellerCart.group.sellerId] ??
-                      "pickup"
+                      fulfillmentBySellerId[activeSellerCart.group.sellerId] ?? "pickup"
                     }
                     onFulfillmentMethodChange={(method) =>
-                      chooseSellerFulfillment(
-                        activeSellerCart.group.sellerId,
-                        method,
-                      )
+                      chooseSellerFulfillment(activeSellerCart.group.sellerId, method)
                     }
                     cardPrepaidAvailable={cardPrepaidAvailable}
                     allowedPaymentMethods={allowedPaymentMethods}
@@ -694,17 +674,13 @@ export function CartPage({
               }
               deliveryFee={
                 activeSellerCart.group.courierDelivery &&
-                fulfillmentBySellerId[activeSellerCart.group.sellerId] ===
-                  "delivery"
+                fulfillmentBySellerId[activeSellerCart.group.sellerId] === "delivery"
                   ? {
                       value:
                         deliveryFeeBySeller[activeSellerCart.group.sellerId] ??
                         CART_DELIVERY_FEE_UI.MIN_RUB,
                       onChange: (next) =>
-                        chooseDeliveryFee(
-                          activeSellerCart.group.sellerId,
-                          next,
-                        ),
+                        chooseDeliveryFee(activeSellerCart.group.sellerId, next),
                     }
                   : null
               }
@@ -722,10 +698,7 @@ export function CartPage({
               onCheckout={handleOpenAuctionCheckout}
             />
 
-            <CartSellerList
-              entries={groupSummaries}
-              onOpenSeller={openSellerCart}
-            />
+            <CartSellerList entries={groupSummaries} onOpenSeller={openSellerCart} />
           </>
         )}
       </div>

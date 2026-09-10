@@ -90,7 +90,9 @@ export const pickupLocationsFromSelectedAddresses = (
     return result;
   }
 
-  const defaultIndex = result.findIndex((item) => item.id === String(previousDefaultId ?? ""));
+  const defaultIndex = result.findIndex(
+    (item) => item.id === String(previousDefaultId ?? ""),
+  );
   const targetIndex = defaultIndex >= 0 ? defaultIndex : 0;
   return result.map((item, index) => ({ ...item, isDefault: index === targetIndex }));
 };
@@ -152,7 +154,9 @@ export const canAddPickupLocationAddress = (
     return false;
   }
   const key = productPickupLocationDuplicateKey(line);
-  return !points.some((item) => productPickupLocationDuplicateKey(item.address) === key);
+  return !points.some(
+    (item) => productPickupLocationDuplicateKey(item.address) === key,
+  );
 };
 
 /**
@@ -181,7 +185,9 @@ export const validateProductPickupLocationsList = (
 
   const keys = new Set<string>();
   for (const item of list) {
-    if (String(item.label ?? "").trim().length > PRODUCT_PICKUP_LOCATION_LABEL_MAX_LENGTH) {
+    if (
+      String(item.label ?? "").trim().length > PRODUCT_PICKUP_LOCATION_LABEL_MAX_LENGTH
+    ) {
       return `Метка не длиннее ${PRODUCT_PICKUP_LOCATION_LABEL_MAX_LENGTH} символов`;
     }
     const address = String(item.address ?? "").trim();

@@ -44,7 +44,9 @@ await mongoose.connect(mongoUri);
 console.log("\n=== 2) Users with webPushSubscriptions ===");
 
 const withSubs = await UserModel.find({ "webPushSubscriptions.0": { $exists: true } })
-  .select("userEmail userName notificationsEnabled isActiveUser isBlockedUser webPushSubscriptions")
+  .select(
+    "userEmail userName notificationsEnabled isActiveUser isBlockedUser webPushSubscriptions",
+  )
   .lean();
 
 if (withSubs.length === 0) {

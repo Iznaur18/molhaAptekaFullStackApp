@@ -32,10 +32,7 @@ export const CatalogGridSkeleton = ({
       {Array.from({ length: rows }, (_, rowIndex) => (
         <View key={rowIndex} style={[catalogGridRowStyles.row, { gap }]}>
           {Array.from({ length: columns }, (_, columnIndex) => (
-            <View
-              key={columnIndex}
-              style={{ width: tileWidth }}
-            >
+            <View key={columnIndex} style={{ width: tileWidth }}>
               <View
                 style={[
                   styles.catalogTile,

@@ -46,8 +46,12 @@ export function UserStoryViewer({
   const { deleteMutation, markViewedMutation } = useUserStoryMutations();
   const markStoryViewed = markViewedMutation.mutate;
   const markedViewedStoryIdsRef = useRef(/** @type {Set<string>} */ (new Set()));
-  const dimTimerRef = useRef(/** @type {ReturnType<typeof setTimeout> | null} */ (null));
-  const revealTimerRef = useRef(/** @type {ReturnType<typeof setTimeout> | null} */ (null));
+  const dimTimerRef = useRef(
+    /** @type {ReturnType<typeof setTimeout> | null} */ (null),
+  );
+  const revealTimerRef = useRef(
+    /** @type {ReturnType<typeof setTimeout> | null} */ (null),
+  );
   const revealRafRef = useRef(/** @type {number | null} */ (null));
   const [activeIndex, setActiveIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -508,11 +512,7 @@ export function UserStoryViewer({
                         onLoad={handleImageLoad}
                         onError={handleImageError}
                         ref={(node) => {
-                          if (
-                            node != null &&
-                            node.complete &&
-                            node.naturalWidth > 0
-                          ) {
+                          if (node != null && node.complete && node.naturalWidth > 0) {
                             handleImageLoad();
                           }
                         }}

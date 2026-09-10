@@ -50,7 +50,9 @@ export const InstallmentContractCounterparty = ({
           <Text style={styles.counterpartyName}>{displayName}</Text>
         </Pressable>
       ) : (
-        <Text style={[styles.counterpartyName, styles.counterpartyNameStatic]}>{displayName}</Text>
+        <Text style={[styles.counterpartyName, styles.counterpartyNameStatic]}>
+          {displayName}
+        </Text>
       )}
       {phoneHref ? (
         <Pressable onPress={() => openTelHref(phoneHref)}>

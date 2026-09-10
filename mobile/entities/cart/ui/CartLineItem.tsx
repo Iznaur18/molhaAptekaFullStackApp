@@ -27,7 +27,11 @@ type CartLineItemProps = {
   onToggleSelected: (productId: string) => void;
 };
 
-export const CartLineItem = ({ line, selected, onToggleSelected }: CartLineItemProps) => {
+export const CartLineItem = ({
+  line,
+  selected,
+  onToggleSelected,
+}: CartLineItemProps) => {
   const router = useRouter();
   const theme = useAppTheme();
   const styles = useCartLineItemStyles();

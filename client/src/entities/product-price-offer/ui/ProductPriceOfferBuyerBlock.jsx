@@ -245,7 +245,8 @@ export function ProductPriceOfferBuyerBlock({
                 onChange={(e) => setPriceInput(formatRubPriceInput(e.target.value))}
                 disabled={isBusy}
               />
-              {myOffer?.status === PRICE_OFFER_STATUS_PENDING || !showDockPrimaryAction ? (
+              {myOffer?.status === PRICE_OFFER_STATUS_PENDING ||
+              !showDockPrimaryAction ? (
                 <div className="product-price-offer__actions">
                   {!showDockPrimaryAction
                     ? renderPrimaryButton({
@@ -287,7 +288,10 @@ export function ProductPriceOfferBuyerBlock({
                   type="button"
                   className="app-btn app-btn--contrast product-price-offer__btn"
                   onClick={() =>
-                    confirmGate.require("data-confirmation", "сделать ставку на аукционе")
+                    confirmGate.require(
+                      "data-confirmation",
+                      "сделать ставку на аукционе",
+                    )
                   }
                 >
                   {PRODUCT_PRICE_OFFER_UI.CONFIRM_DATA_CTA}

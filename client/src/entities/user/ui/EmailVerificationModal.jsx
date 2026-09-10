@@ -29,7 +29,10 @@ export function EmailVerificationModal({ isOpen, email, onClose, onVerified }) {
   const isBusy = isSubmitting || isResending;
 
   const handleCodeChange = (event) => {
-    const nextCode = keepDigitsOnly(event.target.value).slice(0, EMAIL_VERIFICATION_CODE_LENGTH);
+    const nextCode = keepDigitsOnly(event.target.value).slice(
+      0,
+      EMAIL_VERIFICATION_CODE_LENGTH,
+    );
     setCode(nextCode);
     if (submitStatus.message) {
       setSubmitStatus({ kind: "idle", message: "" });

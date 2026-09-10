@@ -86,7 +86,9 @@ export const PopularProductsAdminProductsTab = ({
   const createPanel = (
     <>
       <View style={styles.field}>
-        <Text style={styles.fieldLabel}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.LIST_TITLE_LABEL}</Text>
+        <Text style={styles.fieldLabel}>
+          {POPULAR_PRODUCTS_ADMIN_PAGE_UI.LIST_TITLE_LABEL}
+        </Text>
         <TextInput
           style={styles.fieldInput}
           value={newTitle}
@@ -106,12 +108,15 @@ export const PopularProductsAdminProductsTab = ({
         <Pressable
           style={[
             styles.primaryButton,
-            (isBusy || newTitle.trim() === "" || !newRegionCode) && styles.primaryButtonDisabled,
+            (isBusy || newTitle.trim() === "" || !newRegionCode) &&
+              styles.primaryButtonDisabled,
           ]}
           disabled={isBusy || newTitle.trim() === "" || !newRegionCode}
           onPress={() => void handleCreateList()}
         >
-          <Text style={styles.primaryButtonText}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.CREATE_LIST}</Text>
+          <Text style={styles.primaryButtonText}>
+            {POPULAR_PRODUCTS_ADMIN_PAGE_UI.CREATE_LIST}
+          </Text>
         </Pressable>
       </View>
     </>
@@ -120,7 +125,9 @@ export const PopularProductsAdminProductsTab = ({
   const listContent = (() => {
     if (phase === "success" && filteredLists.length === 0) {
       return (
-        <Text style={[styles.alert, styles.alertInfo]}>{POPULAR_PRODUCTS_ADMIN_PAGE_UI.EMPTY}</Text>
+        <Text style={[styles.alert, styles.alertInfo]}>
+          {POPULAR_PRODUCTS_ADMIN_PAGE_UI.EMPTY}
+        </Text>
       );
     }
     return null;
@@ -153,7 +160,12 @@ export const PopularProductsAdminProductsTab = ({
   if (phase === "error" && lists.length === 0) {
     return (
       <View style={[...pageListStyle, centeredContentStyle]}>
-        <AdminPanelShell {...shellProps} count={0} isLoading={false} error={displayError}>
+        <AdminPanelShell
+          {...shellProps}
+          count={0}
+          isLoading={false}
+          error={displayError}
+        >
           <ScreenErrorState message={queryError} onRetry={() => void reloadLists()} />
         </AdminPanelShell>
       </View>
@@ -163,14 +175,19 @@ export const PopularProductsAdminProductsTab = ({
   return (
     <ProfileAccountList
       data={filteredLists}
-      keyExtractor={(item) => `${item._id}-${item.updatedAt ?? ""}-${item.productIds.length}`}
+      keyExtractor={(item) =>
+        `${item._id}-${item.updatedAt ?? ""}-${item.productIds.length}`
+      }
       style={[...pageListStyle, scrollEnabled ? centeredContentStyle : null]}
       contentContainerStyle={{
         paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom,
         gap: 8,
       }}
       refreshControl={
-        <ThemedRefreshControl refreshing={isRefreshing} onRefresh={() => void reloadLists()} />
+        <ThemedRefreshControl
+          refreshing={isRefreshing}
+          onRefresh={() => void reloadLists()}
+        />
       }
       ListHeaderComponent={
         <AdminPanelShell

@@ -94,7 +94,4 @@ OneCExchangeSessionSchema.index(
 export const buildOneCExchangeSessionExpiry = () =>
   new Date(Date.now() + ONEC_EXCHANGE_SESSION_TTL_SECONDS * 1000);
 
-export default mongoose.model(
-  "OneCExchangeSession",
-  OneCExchangeSessionSchema,
-);
+export default mongoose.model("OneCExchangeSession", OneCExchangeSessionSchema);

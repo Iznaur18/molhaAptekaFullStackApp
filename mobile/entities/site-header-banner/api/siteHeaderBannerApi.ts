@@ -39,19 +39,20 @@ export const fetchGuestProfileLoginMenuBannerImageUrl = async (): Promise<
   }
 };
 
-export const fetchSiteHeaderBannerSettings = async (): Promise<SiteHeaderBannerSettings> => {
-  try {
-    const { data } = await apiClient.get("/site-header-banner/settings");
-    const parsed = parseApiContractData(data, siteHeaderBannerSettingsDataSchema);
-    return parsed.settings;
-  } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Не удалось загрузить настройки баннера";
-    throw new Error(message);
-  }
-};
+export const fetchSiteHeaderBannerSettings =
+  async (): Promise<SiteHeaderBannerSettings> => {
+    try {
+      const { data } = await apiClient.get("/site-header-banner/settings");
+      const parsed = parseApiContractData(data, siteHeaderBannerSettingsDataSchema);
+      return parsed.settings;
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Не удалось загрузить настройки баннера";
+      throw new Error(message);
+    }
+  };
 
 export const patchSiteHeaderBannerSettings = async (
   body: Record<string, unknown>,

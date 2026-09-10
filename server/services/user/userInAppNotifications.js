@@ -4,10 +4,7 @@ import {
   buildExpoPushDataPayload,
   sendExpoPushToUser,
 } from "./expoPushNotifications.js";
-import {
-  buildWebPushClickPath,
-  sendWebPushToUser,
-} from "./webPushNotifications.js";
+import { buildWebPushClickPath, sendWebPushToUser } from "./webPushNotifications.js";
 
 const NOTIFICATION_LIST_LIMIT = 50;
 

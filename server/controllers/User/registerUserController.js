@@ -146,7 +146,9 @@ export const resendRegistrationCodeController = async (req, res) => {
 
   const isPhone = Boolean(result?.phoneNumber);
   return successRes(res, {
-    message: isPhone ? PHONE_VERIFICATION_SENT_MESSAGE : EMAIL_VERIFICATION_SENT_MESSAGE,
+    message: isPhone
+      ? PHONE_VERIFICATION_SENT_MESSAGE
+      : EMAIL_VERIFICATION_SENT_MESSAGE,
     ...(isPhone ? { phoneNumber: result.phoneNumber } : { email: result.email }),
   });
 };

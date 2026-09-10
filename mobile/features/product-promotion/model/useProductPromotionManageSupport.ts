@@ -21,9 +21,8 @@ export const useProductPromotionManageSupport = ({
 }: UseProductPromotionManageSupportParams) => {
   const myRaffleQuery = useMyRaffleQuery({ enabled });
   const setParticipationMutation = useSetProductRaffleParticipationMutation();
-  const [raffleParticipationPendingProductId, setRaffleParticipationPendingProductId] = useState<
-    string | null
-  >(null);
+  const [raffleParticipationPendingProductId, setRaffleParticipationPendingProductId] =
+    useState<string | null>(null);
 
   const sellerRaffleActive = myRaffleQuery.data?.raffle?.status === "active";
   const productId = product?._id != null ? String(product._id) : null;

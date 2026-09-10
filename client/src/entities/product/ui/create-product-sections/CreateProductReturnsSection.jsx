@@ -63,26 +63,33 @@ export function CreateProductReturnsSection({
   const handleRemoveRow = (rowId) => {
     setForm((prev) => ({
       ...prev,
-      returnTermRows: (Array.isArray(prev.returnTermRows) ? prev.returnTermRows : []).filter(
-        (row) => row.id !== rowId,
-      ),
+      returnTermRows: (Array.isArray(prev.returnTermRows)
+        ? prev.returnTermRows
+        : []
+      ).filter((row) => row.id !== rowId),
     }));
   };
 
   const handleFieldChange = (rowId, field, nextValue) => {
     setForm((prev) => ({
       ...prev,
-      returnTermRows: (Array.isArray(prev.returnTermRows) ? prev.returnTermRows : []).map((row) =>
-        row.id === rowId ? { ...row, [field]: nextValue } : row,
-      ),
+      returnTermRows: (Array.isArray(prev.returnTermRows)
+        ? prev.returnTermRows
+        : []
+      ).map((row) => (row.id === rowId ? { ...row, [field]: nextValue } : row)),
     }));
   };
 
   return (
     <div className={["create-product-section", className].filter(Boolean).join(" ")}>
-      <fieldset className="create-product-section__listing-origin" disabled={isSubmitting}>
+      <fieldset
+        className="create-product-section__listing-origin"
+        disabled={isSubmitting}
+      >
         <legend className="create-product-section__listing-origin-legend">
-          <FormFieldLabel required>{CREATE_PRODUCT_MODAL_UI.LABEL_RETURN_ENABLED}</FormFieldLabel>
+          <FormFieldLabel required>
+            {CREATE_PRODUCT_MODAL_UI.LABEL_RETURN_ENABLED}
+          </FormFieldLabel>
         </legend>
         <p className="create-product-section__hint">
           {CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_RETURNS_SUBTITLE}
@@ -144,7 +151,9 @@ export function CreateProductReturnsSection({
                     className="create-product-section__input product-characteristics-editor__input"
                     type="text"
                     value={row.key}
-                    onChange={(event) => handleFieldChange(row.id, "key", event.target.value)}
+                    onChange={(event) =>
+                      handleFieldChange(row.id, "key", event.target.value)
+                    }
                     placeholder={CREATE_PRODUCT_MODAL_UI.PLACEHOLDER_RETURN_TERM_KEY}
                     maxLength={PRODUCT_RETURN_TERM_KEY_MAX}
                     disabled={isSubmitting}
@@ -154,7 +163,9 @@ export function CreateProductReturnsSection({
                     className="create-product-section__input product-characteristics-editor__input"
                     type="text"
                     value={row.value}
-                    onChange={(event) => handleFieldChange(row.id, "value", event.target.value)}
+                    onChange={(event) =>
+                      handleFieldChange(row.id, "value", event.target.value)
+                    }
                     placeholder={CREATE_PRODUCT_MODAL_UI.PLACEHOLDER_RETURN_TERM_VALUE}
                     maxLength={PRODUCT_RETURN_TERM_VALUE_MAX}
                     disabled={isSubmitting}
@@ -165,7 +176,9 @@ export function CreateProductReturnsSection({
                     className="product-characteristics-editor__remove"
                     onClick={() => handleRemoveRow(row.id)}
                     disabled={isSubmitting}
-                    aria-label={CREATE_PRODUCT_MODAL_UI.REMOVE_RETURN_TERM_ROW_ARIA(index + 1)}
+                    aria-label={CREATE_PRODUCT_MODAL_UI.REMOVE_RETURN_TERM_ROW_ARIA(
+                      index + 1,
+                    )}
                   >
                     ×
                   </button>

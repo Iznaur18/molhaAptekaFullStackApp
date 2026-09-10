@@ -30,7 +30,9 @@ export const computeStaffPremiumExpiresAtInput = (
   return formatPremiumExpiresAtForInput(addCalendarMonths(base, months));
 };
 
-export const isPremiumExpiresAtInputActive = (premiumExpiresAt: string | null | undefined): boolean => {
+export const isPremiumExpiresAtInputActive = (
+  premiumExpiresAt: string | null | undefined,
+): boolean => {
   const raw = String(premiumExpiresAt ?? "").trim();
   if (!raw) {
     return false;
@@ -39,7 +41,9 @@ export const isPremiumExpiresAtInputActive = (premiumExpiresAt: string | null | 
   return Number.isFinite(expiresAt) && expiresAt > Date.now();
 };
 
-export const formatPremiumExpiresAtDisplay = (value: string | Date | null | undefined): string => {
+export const formatPremiumExpiresAtDisplay = (
+  value: string | Date | null | undefined,
+): string => {
   if (!value) {
     return "";
   }

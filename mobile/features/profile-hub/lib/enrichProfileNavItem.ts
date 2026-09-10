@@ -1,4 +1,7 @@
-import { resolveProfileNavSectionTone, type ProfileNavToneId } from "@izibuy/shared-lib";
+import {
+  resolveProfileNavSectionTone,
+  type ProfileNavToneId,
+} from "@izibuy/shared-lib";
 
 import { resolveProfileNavIconName } from "@/features/profile-hub/lib/profileNavIcons";
 

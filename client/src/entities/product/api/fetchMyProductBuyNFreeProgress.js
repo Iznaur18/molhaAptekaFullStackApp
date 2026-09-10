@@ -25,7 +25,9 @@ export async function fetchMyProductBuyNFreeProgress(productId) {
     throw new Error(API_CLIENT_UI.FETCH_CATALOG_PRODUCT_FALLBACK);
   }
   try {
-    const { data } = await apiClient.get(`/product/${encodeURIComponent(id)}/buy-n-free/me`);
+    const { data } = await apiClient.get(
+      `/product/${encodeURIComponent(id)}/buy-n-free/me`,
+    );
     if (data?.success !== true || data?.data == null || typeof data.data !== "object") {
       throw new Error(API_CLIENT_UI.FETCH_CATALOG_PRODUCT_FALLBACK);
     }

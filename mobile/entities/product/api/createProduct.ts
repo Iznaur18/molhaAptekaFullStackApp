@@ -91,7 +91,10 @@ export const createProduct = async (body: CreateProductBody) => {
     }
     // Точки самовывоза шлём только когда они заданы: пустой массив контракт
     // трактует как «точек нет», а не как «не менять».
-    if (Array.isArray(parsedBody.productPickupLocations) && parsedBody.productPickupLocations.length > 0) {
+    if (
+      Array.isArray(parsedBody.productPickupLocations) &&
+      parsedBody.productPickupLocations.length > 0
+    ) {
       payload.productPickupLocations = parsedBody.productPickupLocations;
     }
     payload.productDeliveryEnabled = parsedBody.productDeliveryEnabled === true;
@@ -101,6 +104,8 @@ export const createProduct = async (body: CreateProductBody) => {
     const parsed = parseCreateProductData(data);
     return parsed.product;
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.CREATE_PRODUCT_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.CREATE_PRODUCT_FALLBACK),
+    );
   }
 };

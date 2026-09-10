@@ -35,15 +35,22 @@ const optionalTrimmedText = (maxLength) =>
     return String(value).trim();
   }, z.string().max(maxLength).nullable().optional());
 
-const hexColorSchema = z.preprocess((value) => {
-  if (value === undefined) {
-    return undefined;
-  }
-  if (value == null || String(value).trim() === "") {
-    return null;
-  }
-  return String(value).trim();
-}, z.string().regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/).nullable().optional());
+const hexColorSchema = z.preprocess(
+  (value) => {
+    if (value === undefined) {
+      return undefined;
+    }
+    if (value == null || String(value).trim() === "") {
+      return null;
+    }
+    return String(value).trim();
+  },
+  z
+    .string()
+    .regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/)
+    .nullable()
+    .optional(),
+);
 
 export const submitSiteHeaderBannerCampaignBodySchema = z.object({
   imageUrl: z.string().trim().min(1).max(2048),

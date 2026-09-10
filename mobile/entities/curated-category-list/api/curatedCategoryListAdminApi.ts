@@ -71,7 +71,10 @@ export const createCuratedCategoryListAdmin = async (body: {
   regionCode: string;
 }): Promise<CuratedCategoryListAdminRow> => {
   try {
-    const { data } = await apiClient.post("/product/admin/curated-category-lists", body);
+    const { data } = await apiClient.post(
+      "/product/admin/curated-category-lists",
+      body,
+    );
     if (!data?.success || !data.data?.list) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

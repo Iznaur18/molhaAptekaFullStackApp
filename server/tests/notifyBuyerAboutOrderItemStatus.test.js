@@ -35,7 +35,8 @@ describe("текст уведомления покупателю", () => {
   it("режет длинное название — в пуше его всё равно обрежет система", () => {
     const message = buildBuyerOrderStatusMessage({
       status: "shipped",
-      productName: "Клубника в молочном шоколаде SCHOFRULADE 8х130гр. подарочная упаковка",
+      productName:
+        "Клубника в молочном шоколаде SCHOFRULADE 8х130гр. подарочная упаковка",
     });
     assert.ok(message.length < 90, message);
     assert.ok(message.endsWith("…"), message);

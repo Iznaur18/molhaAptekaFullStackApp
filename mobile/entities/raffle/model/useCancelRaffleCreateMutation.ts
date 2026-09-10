@@ -17,7 +17,9 @@ export const useCancelRaffleCreateMutation = () => {
         }));
       }
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: raffleQueryKeys.createAdvertising() }),
+        queryClient.invalidateQueries({
+          queryKey: raffleQueryKeys.createAdvertising(),
+        }),
         queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.all }),
       ]);
     },

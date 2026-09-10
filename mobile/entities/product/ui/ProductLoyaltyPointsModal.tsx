@@ -57,7 +57,11 @@ export const ProductLoyaltyPointsModal = ({
   const isSubmitting = patchMutation.isPending;
 
   useEffect(() => {
-    if (!visible || !sellerProductsQuery.hasNextPage || sellerProductsQuery.isFetchingNextPage) {
+    if (
+      !visible ||
+      !sellerProductsQuery.hasNextPage ||
+      sellerProductsQuery.isFetchingNextPage
+    ) {
       return;
     }
     void sellerProductsQuery.fetchNextPage();
@@ -188,7 +192,10 @@ export const ProductLoyaltyPointsModal = ({
 
         <View style={[styles.footer, { paddingBottom: footerInsetBottom }]}>
           <Pressable
-            style={[styles.saveButton, (isSubmitting || !productId) && styles.buttonDisabled]}
+            style={[
+              styles.saveButton,
+              (isSubmitting || !productId) && styles.buttonDisabled,
+            ]}
             accessibilityRole="button"
             disabled={isSubmitting || !productId}
             onPress={() => void handleSave()}
@@ -196,7 +203,9 @@ export const ProductLoyaltyPointsModal = ({
             {isSubmitting ? (
               <ActivityIndicator color={theme.colors.onContrast} />
             ) : (
-              <Text style={styles.saveButtonText}>{CREATE_PRODUCT_UI.LOYALTY_MODAL_SAVE}</Text>
+              <Text style={styles.saveButtonText}>
+                {CREATE_PRODUCT_UI.LOYALTY_MODAL_SAVE}
+              </Text>
             )}
           </Pressable>
         </View>

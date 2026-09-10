@@ -128,8 +128,7 @@ export function AppShellHeader({
   const isCartNavActive = mainView === "cart";
   const isMyProfileNavActive = isProfileTabMainView(mainView);
   const isHomeNavActive = mainView === "catalog";
-  const isCatalogNavActive =
-    isCatalogBrowserMainView(mainView) || isCatalogMenuActive;
+  const isCatalogNavActive = isCatalogBrowserMainView(mainView) || isCatalogMenuActive;
 
   const slidesQuery = useSiteHeaderBannerSlidesQuery({
     enabled: showSiteHeaderBanner,

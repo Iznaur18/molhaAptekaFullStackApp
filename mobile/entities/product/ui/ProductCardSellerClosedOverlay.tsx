@@ -6,7 +6,9 @@ type ProductCardSellerClosedOverlayProps = {
   label: string;
 };
 
-export const ProductCardSellerClosedOverlay = ({ label }: ProductCardSellerClosedOverlayProps) => {
+export const ProductCardSellerClosedOverlay = ({
+  label,
+}: ProductCardSellerClosedOverlayProps) => {
   const styles = useProductCardOutOfStockOverlayStyles();
 
   return (

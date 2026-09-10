@@ -23,10 +23,7 @@ import {
 } from "../../../entities/courier/model/courierQueries.js";
 import { OrderCard } from "../../../entities/order/ui/OrderCard.jsx";
 import { useCatalogProductDetailsOpener } from "../../../entities/product/lib/useCatalogProductDetailsOpener.js";
-import {
-  API_CLIENT_UI,
-  MY_SALES_PAGE_UI,
-} from "../../../shared/config/appUiCopy.js";
+import { API_CLIENT_UI, MY_SALES_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
 import { useRefetchOnVisible } from "../../../shared/lib/useRefetchOnVisible.js";
 import { SearchInput } from "../../../shared/ui/SearchInput/SearchInput.jsx";
@@ -160,7 +157,9 @@ export function MySalesPage({
   }, []);
 
   const patchOrders = useCallback(
-    (/** @type {(orders: import('../../../entities/order/model/types.js').Order[]) => import('../../../entities/order/model/types.js').Order[]} */ updater) => {
+    (
+      /** @type {(orders: import('../../../entities/order/model/types.js').Order[]) => import('../../../entities/order/model/types.js').Order[]} */ updater,
+    ) => {
       queryClient.setQueryData(orderQueryKeys.sales(salesParams), (old) => {
         const page = Array.isArray(old)
           ? {
@@ -182,7 +181,11 @@ export function MySalesPage({
         }
         return {
           ...old,
-          orders: updater(/** @type {{ orders: import('../../../entities/order/model/types.js').Order[] }} */ (old).orders),
+          orders: updater(
+            /** @type {{ orders: import('../../../entities/order/model/types.js').Order[] }} */ (
+              old
+            ).orders,
+          ),
         };
       });
     },
@@ -247,7 +250,10 @@ export function MySalesPage({
     );
 
     try {
-      const updatedOrder = await deliverItemMutation.mutateAsync({ orderId, itemIndex });
+      const updatedOrder = await deliverItemMutation.mutateAsync({
+        orderId,
+        itemIndex,
+      });
       patchOrders((prev) =>
         prev.map((order) => (order._id === orderId ? updatedOrder : order)),
       );
@@ -398,7 +404,7 @@ export function MySalesPage({
         sellerId: resolveSaleSellerId(order),
       });
       patchOrders((prev) =>
-        prev.map((row) => (row._id === orderId ? updatedOrder.order ?? row : row)),
+        prev.map((row) => (row._id === orderId ? (updatedOrder.order ?? row) : row)),
       );
       void reloadSales();
     } catch (e) {
@@ -426,7 +432,7 @@ export function MySalesPage({
         sellerId,
       });
       patchOrders((prev) =>
-        prev.map((row) => (row._id === orderId ? updatedOrder.order ?? row : row)),
+        prev.map((row) => (row._id === orderId ? (updatedOrder.order ?? row) : row)),
       );
       void reloadSales();
     } catch (e) {
@@ -506,7 +512,9 @@ export function MySalesPage({
 
   const attentionFilterHint =
     totalVisible > 0 && attentionOnly ? (
-      <p className="my-sales-page__filter-hint">{MY_SALES_PAGE_UI.ATTENTION_FILTER_HINT}</p>
+      <p className="my-sales-page__filter-hint">
+        {MY_SALES_PAGE_UI.ATTENTION_FILTER_HINT}
+      </p>
     ) : null;
 
   const toolbar = (

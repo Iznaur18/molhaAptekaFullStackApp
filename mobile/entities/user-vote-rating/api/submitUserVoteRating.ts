@@ -2,7 +2,10 @@ import { apiClient } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
-export const submitUserVoteRating = async (targetUserId: string, userVoteValueClient: number) => {
+export const submitUserVoteRating = async (
+  targetUserId: string,
+  userVoteValueClient: number,
+) => {
   try {
     const { data } = await apiClient.post(`/vote/${encodeURIComponent(targetUserId)}`, {
       userVoteValueClient,

@@ -18,7 +18,9 @@ export function isAndroidUserAgent(userAgent = "") {
  * @returns {boolean}
  */
 function isAndroidRuntime() {
-  return typeof navigator !== "undefined" && isAndroidUserAgent(navigator.userAgent || "");
+  return (
+    typeof navigator !== "undefined" && isAndroidUserAgent(navigator.userAgent || "")
+  );
 }
 
 /**

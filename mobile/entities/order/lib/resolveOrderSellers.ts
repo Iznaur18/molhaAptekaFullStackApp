@@ -23,11 +23,12 @@ type OrderLike = {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
 
-const readString = (value: unknown): string =>
-  typeof value === "string" ? value : "";
+const readString = (value: unknown): string => (typeof value === "string" ? value : "");
 
 /** Уникальные продавцы по позициям заказа (после populate productSeller). */
-export function resolveOrderSellers(order: OrderLike | null | undefined): OrderSeller[] {
+export function resolveOrderSellers(
+  order: OrderLike | null | undefined,
+): OrderSeller[] {
   const byId = new Map<string, OrderSeller>();
 
   for (const item of order?.items ?? []) {

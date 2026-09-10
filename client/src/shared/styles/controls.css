@@ -26,8 +26,17 @@
  * checkbox/radio/file/range/color исключены — у них своя механика.
  */
 input:where(
-    :not([type="checkbox"], [type="radio"], [type="file"], [type="range"], [type="color"], [type="submit"], [type="button"], [type="reset"])
-  ),
+  :not(
+    [type="checkbox"],
+    [type="radio"],
+    [type="file"],
+    [type="range"],
+    [type="color"],
+    [type="submit"],
+    [type="button"],
+    [type="reset"]
+  )
+),
 textarea,
 select {
   box-sizing: border-box;
@@ -46,7 +55,16 @@ select {
 }
 
 input:where(
-    :not([type="checkbox"], [type="radio"], [type="file"], [type="range"], [type="color"], [type="submit"], [type="button"], [type="reset"])
+    :not(
+      [type="checkbox"],
+      [type="radio"],
+      [type="file"],
+      [type="range"],
+      [type="color"],
+      [type="submit"],
+      [type="button"],
+      [type="reset"]
+    )
   ):focus,
 textarea:focus,
 select:focus {
@@ -61,7 +79,13 @@ textarea::placeholder {
 }
 
 /* inputReadOnly: bg surfaceMuted, color textMuted */
-:where(input:disabled, input[readonly], textarea:disabled, textarea[readonly], select:disabled) {
+:where(
+  input:disabled,
+  input[readonly],
+  textarea:disabled,
+  textarea[readonly],
+  select:disabled
+) {
   background: var(--iz-color-surface-muted);
   color: var(--iz-color-text-muted);
   cursor: not-allowed;

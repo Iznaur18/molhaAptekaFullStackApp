@@ -23,7 +23,10 @@ import {
   AUTH_UI,
   LOGIN_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
-import { AUTH_REGISTER_PATH, AUTH_FORGOT_PASSWORD_PATH } from "../../../shared/lib/authPaths.js";
+import {
+  AUTH_REGISTER_PATH,
+  AUTH_FORGOT_PASSWORD_PATH,
+} from "../../../shared/lib/authPaths.js";
 import { isAuthSessionError } from "../../../shared/lib/isAuthSessionError.js";
 import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { useStableAuthHeroHeight } from "../../../shared/lib/useStableAuthHeroHeight.js";

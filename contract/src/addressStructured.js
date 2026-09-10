@@ -51,7 +51,9 @@ export const productSaleCityFieldSchema = z
   })
   .refine(
     (value) =>
-      value === undefined || value === null || value.length <= PRODUCT_SALE_CITY_MAX_LENGTH,
+      value === undefined ||
+      value === null ||
+      value.length <= PRODUCT_SALE_CITY_MAX_LENGTH,
     `Город продажи не длиннее ${PRODUCT_SALE_CITY_MAX_LENGTH} символов`,
   );
 

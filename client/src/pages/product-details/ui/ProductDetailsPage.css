@@ -23,7 +23,8 @@
   overscroll-behavior-x: none;
   overscroll-behavior-y: none;
   background: var(--iz-color-surface);
-  animation: product-details-page-enter var(--product-details-page-enter-ms) ease-out both;
+  animation: product-details-page-enter var(--product-details-page-enter-ms) ease-out
+    both;
 }
 
 .product-details-page--closing {
@@ -336,7 +337,9 @@
   margin: 0;
 }
 
-.product-details-modal--page .product-details-modal__price-display .product-price-display__label {
+.product-details-modal--page
+  .product-details-modal__price-display
+  .product-price-display__label {
   display: none;
 }
 
@@ -359,7 +362,8 @@
 }
 
 /* Nested chrome + horizontal scroll — do not flatten (keep track/scroll structure). */
-.product-details-modal.product-details-modal--page .product-details-modal__price-badge-row {
+.product-details-modal.product-details-modal--page
+  .product-details-modal__price-badge-row {
   display: block;
   align-self: stretch;
   width: 100%;
@@ -458,7 +462,8 @@
   width: 100%;
 }
 
-.product-details-page__docked-footer .product-details-modal__price-actions--mobile-dock {
+.product-details-page__docked-footer
+  .product-details-modal__price-actions--mobile-dock {
   display: grid;
   width: 100%;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -513,9 +518,13 @@
   box-shadow: none;
 }
 
-.product-details-page .installment-buyer-block__docked-footer .installment-buyer-block__submit,
+.product-details-page
+  .installment-buyer-block__docked-footer
+  .installment-buyer-block__submit,
 .product-details-page .product-price-offer__docked-footer .app-btn--contrast,
-.product-details-page .product-price-offer__docked-footer .product-price-offer__btn--primary,
+.product-details-page
+  .product-price-offer__docked-footer
+  .product-price-offer__btn--primary,
 .product-details-page .checkout-form__docked-footer .checkout-form__submit {
   box-sizing: border-box;
   width: 100%;
@@ -677,8 +686,7 @@ body:has(.product-details-page) .app-shell {
   min-width: 0;
 }
 
-.product-details-modal--page-split
-  .product-details-modal__price-block--inline-actions {
+.product-details-modal--page-split .product-details-modal__price-block--inline-actions {
   padding-top: 0;
   width: 100%;
   min-width: 0;

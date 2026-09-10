@@ -1,7 +1,4 @@
-import {
-  PRODUCT_NAME_MAX_LENGTH,
-  PRODUCT_NAME_MIN_LENGTH,
-} from "@molha/api-contract";
+import { PRODUCT_NAME_MAX_LENGTH, PRODUCT_NAME_MIN_LENGTH } from "@molha/api-contract";
 
 export const validateProductName = (raw: unknown): string | null => {
   const trimmed = String(raw ?? "").trim();

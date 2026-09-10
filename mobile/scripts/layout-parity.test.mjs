@@ -73,10 +73,7 @@ test("экраны ограничивают ширину колонки на п�
   ];
   for (const path of screens) {
     const source = readMobileFile(path);
-    assert.ok(
-      source.includes("useScreenLayout"),
-      `${path} не берёт лейаут экрана`,
-    );
+    assert.ok(source.includes("useScreenLayout"), `${path} не берёт лейаут экрана`);
     assert.ok(
       source.includes("centeredContentStyle"),
       `${path} не применяет ограничение ширины`,
@@ -108,7 +105,9 @@ test("мастер товара ограничен своими 40rem, а не �
 });
 
 test("шторка чекаута: высота и ширина как в вебе", () => {
-  const webSheet = readRepoFile("client/src/features/checkout/ui/CheckoutSheetModal.css");
+  const webSheet = readRepoFile(
+    "client/src/features/checkout/ui/CheckoutSheetModal.css",
+  );
   const styles = readMobileFile("shared/theme/formChromeStyles.ts");
   const sheet = readMobileFile("features/checkout/ui/CheckoutSheetModal.tsx");
 
@@ -130,7 +129,9 @@ test("шторка чекаута: высота и ширина как в веб
   assert.match(webSheet, /--checkout-sheet-radius: 2rem/);
   assert.ok(styles.includes("borderTopLeftRadius: 32"));
 
-  const animation = readMobileFile("features/checkout/model/useCheckoutSheetModalAnimation.ts");
+  const animation = readMobileFile(
+    "features/checkout/model/useCheckoutSheetModalAnimation.ts",
+  );
   const timing = readMobileFile("features/checkout/lib/checkoutSheetModalAnimation.ts");
   assert.match(sheet, /useCheckoutSheetModalAnimation/);
   assert.match(sheet, /useCssTransition \? View : Animated\.View/);
@@ -146,13 +147,18 @@ test("шторка чекаута: высота и ширина как в веб
 test("пропорция и вписывание картинок берутся из общего пакета токенов", () => {
   const token = readRepoFile("packages/design-tokens/src/productMedia.ts");
   assert.match(token, /PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO = 1;/);
-  const webToken = readRepoFile("client/src/entities/product/ui/productImageTokens.css");
+  const webToken = readRepoFile(
+    "client/src/entities/product/ui/productImageTokens.css",
+  );
   assert.match(webToken, /--product-card-image-aspect-ratio: 1 \/ 1;/);
 
   // `contain` в мобилке ровно там же, где `object-fit: contain` в вебе.
   const pairs = [
     ["entities/product/ui/ProductImageLightbox.tsx", "ProductImageLightbox.css"],
-    ["entities/product/ui/ProductMediaSlideContent.tsx", "ProductMediaSlideContent.css"],
+    [
+      "entities/product/ui/ProductMediaSlideContent.tsx",
+      "ProductMediaSlideContent.css",
+    ],
   ];
   for (const [mobilePath, webCss] of pairs) {
     assert.ok(
@@ -169,6 +175,9 @@ test("пропорция и вписывание картинок берутся
 
 test("catalog-product-shell: сетка не выходит за catalog wrapper (без edge-bleed)", () => {
   const css = readRepoFile("client/src/app/routes/CatalogProductShellLayout.css");
-  assert.match(css, /\.catalog-product-shell__catalog \.app-shell__grid[\s\S]*margin-inline: 0/);
+  assert.match(
+    css,
+    /\.catalog-product-shell__catalog \.app-shell__grid[\s\S]*margin-inline: 0/,
+  );
   assert.match(css, /overflow-x: clip/);
 });

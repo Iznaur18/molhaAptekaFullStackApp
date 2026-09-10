@@ -63,7 +63,9 @@ test("нечитаемые url отсеиваются до показа", () => 
 
 test("стартовый индекс считает фото, пропуская слайд с видео", () => {
   const mobile = readMobileFile("entities/product/lib/buildProductMediaSlides.ts");
-  const web = readRepoFile("client/src/entities/product/lib/buildProductMediaSlides.js");
+  const web = readRepoFile(
+    "client/src/entities/product/lib/buildProductMediaSlides.js",
+  );
 
   for (const source of [mobile, web]) {
     assert.match(source, /resolveProductImageIndexForLightbox/);
@@ -89,6 +91,6 @@ test("тап по видео не открывает просмотр фото",
   const slide = readMobileFile("entities/product/ui/ProductMediaSlideContent.tsx");
   // Видео возвращается раньше, чем создаётся обёртка-Pressable.
   assert.ok(
-    slide.indexOf("slide.type === \"video\"") < slide.indexOf("const withPressable"),
+    slide.indexOf('slide.type === "video"') < slide.indexOf("const withPressable"),
   );
 });

@@ -19,8 +19,7 @@ export {
   PROMO_RETURN_STREAK_TIME_ZONE,
 };
 
-const STREAK_SELECT =
-  "promoReturnStreakDay promoReturnStreakLastClaimDate";
+const STREAK_SELECT = "promoReturnStreakDay promoReturnStreakLastClaimDate";
 
 /**
  * @param {Date} [now]
@@ -126,13 +125,9 @@ export function resolvePromoReturnStreakState(user, now = new Date()) {
  * }} input
  */
 function toClaimableStreakState({ nextClaimDay, today, storedDay = 0 }) {
-  const claimDay = Math.min(
-    PROMO_RETURN_STREAK_MAX_DAY,
-    Math.max(1, nextClaimDay),
-  );
+  const claimDay = Math.min(PROMO_RETURN_STREAK_MAX_DAY, Math.max(1, nextClaimDay));
   const claimPercent = getPromoReturnStreakDiscountPercent(claimDay);
-  const tomorrowDay =
-    claimDay >= PROMO_RETURN_STREAK_MAX_DAY ? 1 : claimDay + 1;
+  const tomorrowDay = claimDay >= PROMO_RETURN_STREAK_MAX_DAY ? 1 : claimDay + 1;
   return {
     day: storedDay,
     discountPercent: 0,

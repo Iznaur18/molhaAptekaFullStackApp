@@ -107,10 +107,7 @@ export async function declineShipmentByCourier({ orderId, sellerId, courierId })
   shipment.courierAssignedAt = null;
   shipment.handoverCode = "";
   shipment.handoverAttempts = 0;
-  shipment.declinedCourierIds = [
-    ...(shipment.declinedCourierIds ?? []),
-    courierId,
-  ];
+  shipment.declinedCourierIds = [...(shipment.declinedCourierIds ?? []), courierId];
 
   for (const item of items) {
     item.status = ORDER_STATUS_READY_TO_SHIP;
@@ -243,8 +240,7 @@ export async function findStuckCourierShipments({
 
       const sellerId = String(shipment.sellerId);
       const items = (order.items ?? []).filter(
-        (item) =>
-          resolveItemSellerId(item) === sellerId && !TERMINAL.has(item.status),
+        (item) => resolveItemSellerId(item) === sellerId && !TERMINAL.has(item.status),
       );
       if (items.length === 0) continue;
       if (!DISPUTABLE_STATUSES.has(buildOrderStatusFromItems(items))) continue;
@@ -401,16 +397,13 @@ export async function resolveShipmentDispute({
   shipment.disputeResolvedBy = moderatorId ?? null;
   shipment.disputeOutcome = outcome;
 
-  const { markOrderItemReturned } = await import(
-    "../order/updateOrderItemStatus.js"
-  );
-  const { confirmOrderItemByBuyer } = await import(
-    "../order/updateOrderItemStatus.js"
-  );
+  const { markOrderItemReturned } = await import("../order/updateOrderItemStatus.js");
+  const { confirmOrderItemByBuyer } = await import("../order/updateOrderItemStatus.js");
 
   // Возвращаем позиции в состояние, из которого штатные сервисы умеют
   // работать: они несут снятие резерва, баллы и счётчик продаж.
-  const bridgeStatus = outcome === "confirmed" ? ORDER_STATUS_DELIVERED : ORDER_STATUS_IN_DELIVERY;
+  const bridgeStatus =
+    outcome === "confirmed" ? ORDER_STATUS_DELIVERED : ORDER_STATUS_IN_DELIVERY;
   for (const item of items) {
     item.status = bridgeStatus;
   }

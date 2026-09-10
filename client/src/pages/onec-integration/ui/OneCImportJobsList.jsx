@@ -91,9 +91,7 @@ export function OneCImportJobsList() {
             </span>
             <span className="onec-page__log-dir">{job.filename}</span>
             <time dateTime={job.createdAt}>
-              {job.createdAt
-                ? new Date(job.createdAt).toLocaleString("ru-RU")
-                : ""}
+              {job.createdAt ? new Date(job.createdAt).toLocaleString("ru-RU") : ""}
             </time>
           </div>
 

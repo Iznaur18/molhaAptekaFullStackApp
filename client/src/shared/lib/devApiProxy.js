@@ -55,9 +55,7 @@ const SELLER_OG_PATH_RE = /^\/seller\/[a-f\d]{24}$/i;
  */
 export function shouldProxyToApi(prefix, pathname, acceptHeader, userAgent) {
   if (prefix === "/seller") {
-    return (
-      isLinkPreviewBotUserAgent(userAgent) && SELLER_OG_PATH_RE.test(pathname)
-    );
+    return isLinkPreviewBotUserAgent(userAgent) && SELLER_OG_PATH_RE.test(pathname);
   }
   if (prefix === "/user") {
     if (/^\/users-loyalty-raffle(?:\/|$)/.test(pathname)) {

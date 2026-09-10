@@ -32,7 +32,9 @@ test("подписи тумблера совпадают с вебом", () => {
 
 test("гейт строки — как в вебе: есть обработчик и право на правку", () => {
   const mobile = readMobileFile("entities/product/ui/ProductEditManageSection.tsx");
-  const web = readRepoFile("client/src/entities/product/ui/ProductEditManageSection.jsx");
+  const web = readRepoFile(
+    "client/src/entities/product/ui/ProductEditManageSection.jsx",
+  );
 
   for (const source of [mobile, web]) {
     assert.match(source, /showQaToggle = typeof onSetQa === "function" && canEdit/);
@@ -41,15 +43,23 @@ test("гейт строки — как в вебе: есть обработчи�
 });
 
 test("тумблер шлёт productQaEnabled и блокируется на время запроса", () => {
-  const actions = readMobileFile("features/my-products-page/model/useMyProductsPageActions.ts");
+  const actions = readMobileFile(
+    "features/my-products-page/model/useMyProductsPageActions.ts",
+  );
   assert.match(actions, /body: \{ productQaEnabled: qaEnabled \}/);
   assert.match(actions, /setTogglingQaProductId\(normalizedProductId\)/);
   assert.match(actions, /setTogglingQaProductId\(null\)/);
 
   const section = readMobileFile("entities/product/ui/ProductEditManageSection.tsx");
-  assert.match(section, /isQaTogglePending \|\|/, "pending участвует в общей блокировке");
+  assert.match(
+    section,
+    /isQaTogglePending \|\|/,
+    "pending участвует в общей блокировке",
+  );
 
-  const web = readRepoFile("client/src/widgets/app-shell/model/useHomeProductActions.js");
+  const web = readRepoFile(
+    "client/src/widgets/app-shell/model/useHomeProductActions.js",
+  );
   assert.match(web, /body: \{ productQaEnabled: qaEnabled \}/);
 });
 
@@ -60,7 +70,9 @@ test("строка стоит между аукционом и розыгрыш�
     raffle: source.indexOf("MANAGE_RAFFLE_TITLE"),
   });
 
-  const mobile = orderIn(readMobileFile("entities/product/ui/ProductEditManageSection.tsx"));
+  const mobile = orderIn(
+    readMobileFile("entities/product/ui/ProductEditManageSection.tsx"),
+  );
   const web = orderIn(
     readRepoFile("client/src/entities/product/ui/ProductEditManageSection.jsx"),
   );
@@ -80,7 +92,9 @@ test("проводка доходит от страницы «мои товар�
   assert.match(page, /onSetProductQa=\{pageActions\.handleSetProductQa\}/);
   assert.match(page, /isQaTogglePending=\{pageActions\.isQaTogglePending\}/);
 
-  const modal = readMobileFile("features/product-promotion/ui/ProductPromotionModal.tsx");
+  const modal = readMobileFile(
+    "features/product-promotion/ui/ProductPromotionModal.tsx",
+  );
   assert.match(modal, /onSetQa=\{onSetProductQa\}/);
   assert.match(modal, /isQaTogglePending=\{isQaTogglePending\}/);
 });

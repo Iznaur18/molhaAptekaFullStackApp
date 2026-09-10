@@ -25,7 +25,9 @@ export const CategoryTreeParentPicker = ({
         disabled={disabled}
         onPress={() => onChange("")}
       >
-        <Text style={styles.pickerChipText}>{CATEGORY_TREE_ADMIN_PAGE_UI.PARENT_ROOT}</Text>
+        <Text style={styles.pickerChipText}>
+          {CATEGORY_TREE_ADMIN_PAGE_UI.PARENT_ROOT}
+        </Text>
       </Pressable>
       {options.map((option) => (
         <Pressable

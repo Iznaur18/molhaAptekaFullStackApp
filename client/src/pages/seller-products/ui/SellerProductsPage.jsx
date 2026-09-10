@@ -69,10 +69,15 @@ export function SellerProductsPage({
   const queryClient = useQueryClient();
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
   const [backgroundLoadFailed, setBackgroundLoadFailed] = useState(false);
-  const [selectedShelfId, setSelectedShelfId] = useState(/** @type {string | null} */ (null));
+  const [selectedShelfId, setSelectedShelfId] = useState(
+    /** @type {string | null} */ (null),
+  );
 
   const catalogEnabled = isSessionReady;
-  const profileQuery = useUserProfileQuery({ userId: sellerId, enabled: catalogEnabled });
+  const profileQuery = useUserProfileQuery({
+    userId: sellerId,
+    enabled: catalogEnabled,
+  });
   const shelvesQuery = usePublicSellerShelvesQuery({
     sellerId,
     enabled: catalogEnabled,
@@ -123,7 +128,9 @@ export function SellerProductsPage({
     () => formatProfileImageObjectPosition(getUserBackgroundFocus(seller)),
     [seller],
   );
-  const profileBackground = seller ? resolveUserProfileBackgroundFromUser(seller) : null;
+  const profileBackground = seller
+    ? resolveUserProfileBackgroundFromUser(seller)
+    : null;
   const canShowBackground =
     Boolean(profileBackground) &&
     (profileBackground.kind === "preset" ||
@@ -195,7 +202,9 @@ export function SellerProductsPage({
         >
           <AppIcon icon={ChevronLeft} size="md" strokeWidth={2.25} />
         </button>
-        <h1 className="seller-products-page__nav-title">{SELLER_PRODUCTS_PAGE_UI.TITLE}</h1>
+        <h1 className="seller-products-page__nav-title">
+          {SELLER_PRODUCTS_PAGE_UI.TITLE}
+        </h1>
       </header>
 
       {seller ? (

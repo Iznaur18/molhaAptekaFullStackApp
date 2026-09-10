@@ -14,9 +14,13 @@ const validationContext = {
 
 describe("validateCreateProductWizardStep", () => {
   it("requires name and description on basic step", () => {
-    expect(validateCreateProductWizardStep("basic", CREATE_PRODUCT_INITIAL_FORM, validationContext)).toBe(
-      validateProductName(""),
-    );
+    expect(
+      validateCreateProductWizardStep(
+        "basic",
+        CREATE_PRODUCT_INITIAL_FORM,
+        validationContext,
+      ),
+    ).toBe(validateProductName(""));
 
     const validBasic = {
       ...CREATE_PRODUCT_INITIAL_FORM,
@@ -24,7 +28,9 @@ describe("validateCreateProductWizardStep", () => {
       productDescription: "Описание товара достаточной длины для проверки.",
     };
 
-    expect(validateCreateProductWizardStep("basic", validBasic, validationContext)).toBeNull();
+    expect(
+      validateCreateProductWizardStep("basic", validBasic, validationContext),
+    ).toBeNull();
   });
 
   it("requires listing origin on originality step", () => {
@@ -60,7 +66,11 @@ describe("validateCreateProductWizardStep", () => {
 
   it("requires return choice on returns step", () => {
     expect(
-      validateCreateProductWizardStep("returns", CREATE_PRODUCT_INITIAL_FORM, validationContext),
+      validateCreateProductWizardStep(
+        "returns",
+        CREATE_PRODUCT_INITIAL_FORM,
+        validationContext,
+      ),
     ).toBe(CREATE_PRODUCT_MODAL_UI.ERROR_RETURN_CHOICE);
 
     expect(
@@ -75,7 +85,11 @@ describe("validateCreateProductWizardStep", () => {
   it("covers all wizard steps", () => {
     for (const stepId of CREATE_PRODUCT_WIZARD_STEP_IDS) {
       assert.doesNotThrow(() => {
-        validateCreateProductWizardStep(stepId, CREATE_PRODUCT_INITIAL_FORM, validationContext);
+        validateCreateProductWizardStep(
+          stepId,
+          CREATE_PRODUCT_INITIAL_FORM,
+          validationContext,
+        );
       });
     }
   });

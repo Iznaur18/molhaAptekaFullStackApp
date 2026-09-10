@@ -17,10 +17,7 @@ export async function up({ db, isApply }) {
   const needsBackfill = {
     items: {
       $elemMatch: {
-        $or: [
-          { sellerIdAtOrder: { $exists: false } },
-          { sellerIdAtOrder: null },
-        ],
+        $or: [{ sellerIdAtOrder: { $exists: false } }, { sellerIdAtOrder: null }],
       },
     },
   };

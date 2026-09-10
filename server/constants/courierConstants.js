@@ -43,8 +43,7 @@ export const COURIER_NOT_APPROVED_MESSAGE =
   "Принимать заказы могут только подтверждённые курьеры";
 
 /** In-app: модератор принял решение по заявке курьера. */
-export const IN_APP_NOTIFICATION_KIND_COURIER_MODERATION =
-  "courier_moderation";
+export const IN_APP_NOTIFICATION_KIND_COURIER_MODERATION = "courier_moderation";
 export const COURIER_MODERATION_MESSAGES = Object.freeze({
   [COURIER_MODERATION_APPROVED]: "Заявка курьера одобрена — можно брать заказы",
   [COURIER_MODERATION_REJECTED]: "Заявка курьера отклонена",
@@ -77,8 +76,7 @@ export const COURIER_REPLACED_MESSAGE =
 
 export const COURIER_REPLACE_TOO_LATE_MESSAGE =
   "Товар уже у курьера — это возврат, а не смена курьера";
-export const COURIER_REPLACE_NO_COURIER_MESSAGE =
-  "Курьер ещё не принял отправление";
+export const COURIER_REPLACE_NO_COURIER_MESSAGE = "Курьер ещё не принял отправление";
 
 /**
  * Сторона сделки не возит собственный заказ.

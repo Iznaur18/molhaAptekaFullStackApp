@@ -5,9 +5,7 @@ import "./ListPageFilterBar.css";
  */
 export function ListPageFilterBar({ children, className = "" }) {
   return (
-    <div
-      className={["list-page-filter-bar", className].filter(Boolean).join(" ")}
-    >
+    <div className={["list-page-filter-bar", className].filter(Boolean).join(" ")}>
       {children}
     </div>
   );

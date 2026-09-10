@@ -62,7 +62,10 @@ export const UserDetailsPage = () => {
     return (
       <ScreenWithBack>
         <ScreenErrorState
-          message={formatApiErrorMessage(profileQuery.error, USER_DETAILS_PAGE_UI.FETCH_FALLBACK)}
+          message={formatApiErrorMessage(
+            profileQuery.error,
+            USER_DETAILS_PAGE_UI.FETCH_FALLBACK,
+          )}
           onRetry={() => profileQuery.refetch()}
         />
       </ScreenWithBack>
@@ -78,7 +81,10 @@ export const UserDetailsPage = () => {
           style={styles.screen}
           contentContainerStyle={styles.scrollContent}
           refreshControl={
-            <ThemedRefreshControl refreshing={profileQuery.isRefetching} onRefresh={profileQuery.refetch} />
+            <ThemedRefreshControl
+              refreshing={profileQuery.isRefetching}
+              onRefresh={profileQuery.refetch}
+            />
           }
         >
           <UserDetailsHeader
@@ -102,7 +108,9 @@ export const UserDetailsPage = () => {
             onBlockedChange={handleBlockChange}
           />
 
-          {canModerate && !isSelf ? <AdminUserStaffActions onEditPress={handleEditUser} /> : null}
+          {canModerate && !isSelf ? (
+            <AdminUserStaffActions onEditPress={handleEditUser} />
+          ) : null}
 
           {isAdmin && !isSelf ? (
             <AdminProductModerationTrustControl

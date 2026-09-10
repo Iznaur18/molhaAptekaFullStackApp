@@ -37,7 +37,14 @@ import { ProfileSidebarDeleteAccount } from "./ProfileSidebarDeleteAccount.jsx";
  *   id?: string;
  * }} props
  */
-export function ProfileSidebar({ groups, activeTab, onItemSelect, onLogout, user, id }) {
+export function ProfileSidebar({
+  groups,
+  activeTab,
+  onItemSelect,
+  onLogout,
+  user,
+  id,
+}) {
   const handleItemClick = (onClick) => {
     onClick();
     onItemSelect?.();
@@ -72,7 +79,9 @@ export function ProfileSidebar({ groups, activeTab, onItemSelect, onLogout, user
                         "my-profile-page__nav-button",
                         isActive ? "my-profile-page__nav-button_active" : "",
                         item.variant === "cta" ? "my-profile-page__nav-button_cta" : "",
-                        item.variant === "danger" ? "my-profile-page__nav-button_danger" : "",
+                        item.variant === "danger"
+                          ? "my-profile-page__nav-button_danger"
+                          : "",
                         hasBadge || hasAlert ? "my-profile-page__nav-button_badge" : "",
                       ]
                         .filter(Boolean)
@@ -84,11 +93,16 @@ export function ProfileSidebar({ groups, activeTab, onItemSelect, onLogout, user
                     >
                       <span className="my-profile-page__nav-button-main">
                         {item.icon ? (
-                          <span className="my-profile-page__nav-icon" aria-hidden="true">
+                          <span
+                            className="my-profile-page__nav-icon"
+                            aria-hidden="true"
+                          >
                             <AppIcon icon={item.icon} size="sm" strokeWidth={2.25} />
                           </span>
                         ) : null}
-                        <span className="my-profile-page__nav-button-label">{item.label}</span>
+                        <span className="my-profile-page__nav-button-label">
+                          {item.label}
+                        </span>
                       </span>
                       <ProfileTabAlert show={hasAlert} />
                       <ProfileTabBadge count={item.badgeCount ?? 0} />

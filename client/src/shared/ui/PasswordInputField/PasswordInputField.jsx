@@ -34,7 +34,9 @@ export function PasswordInputField({
   const [isVisible, setIsVisible] = useState(false);
   const toggleId = useId();
   const toggleAria = isVisible ? hidePasswordAria : showPasswordAria;
-  const inputClassName = ["password-input-field__input", className].filter(Boolean).join(" ");
+  const inputClassName = ["password-input-field__input", className]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className="password-input-field">

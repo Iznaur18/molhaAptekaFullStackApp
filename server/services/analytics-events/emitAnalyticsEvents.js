@@ -127,11 +127,7 @@ export function emitOrderItemSoldEvent({
   const qty = Math.max(0, Number(quantity) || 0);
   const price = Math.max(0, Number(unitPriceAtOrder) || 0);
   const fraudReasons = [];
-  if (
-    buyerUserId &&
-    sellerUserId &&
-    String(buyerUserId) === String(sellerUserId)
-  ) {
+  if (buyerUserId && sellerUserId && String(buyerUserId) === String(sellerUserId)) {
     fraudReasons.push("buyer_is_seller");
   }
 

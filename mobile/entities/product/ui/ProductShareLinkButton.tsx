@@ -19,9 +19,7 @@ const COPIED_ICON_MS = 1600;
  * Иконка «Ссылка» в chrome галереи.
  * Паритет с affiliate share: clipboard → системный Share sheet.
  */
-export const ProductShareLinkButton = ({
-  product,
-}: ProductShareLinkButtonProps) => {
+export const ProductShareLinkButton = ({ product }: ProductShareLinkButtonProps) => {
   const theme = useAppTheme();
   const styles = useProductDetailHeroChromeStyles();
   const [copied, setCopied] = useState(false);

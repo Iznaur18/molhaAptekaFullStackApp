@@ -8,8 +8,6 @@
  * @returns {ReadonlySet<string>}
  */
 export function pruneCartDeselection(deselectedIds, purchasableIds) {
-  const kept = [...deselectedIds].filter((productId) =>
-    purchasableIds.has(productId),
-  );
+  const kept = [...deselectedIds].filter((productId) => purchasableIds.has(productId));
   return kept.length === deselectedIds.size ? deselectedIds : new Set(kept);
 }

@@ -8,7 +8,9 @@ import { PopularProductsAdminProductsTab } from "./PopularProductsAdminProductsT
 import "./PopularProductsAdminPage.css";
 
 export function PopularProductsAdminPage() {
-  const [activeTab, setActiveTab] = useState(/** @type {"products" | "categories"} */ ("products"));
+  const [activeTab, setActiveTab] = useState(
+    /** @type {"products" | "categories"} */ ("products"),
+  );
 
   return (
     <div className="popular-products-admin">

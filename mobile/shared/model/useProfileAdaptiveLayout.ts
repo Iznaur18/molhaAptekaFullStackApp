@@ -15,7 +15,9 @@ export type ProfileAdaptiveLayout = {
   isPhoneLayout: boolean;
 };
 
-export const resolveProfileAdaptiveLayout = (windowWidth: number): ProfileAdaptiveLayout => {
+export const resolveProfileAdaptiveLayout = (
+  windowWidth: number,
+): ProfileAdaptiveLayout => {
   const layoutWidth = resolveViewportLayoutWidth(windowWidth);
   const isDrawerLayout = layoutWidth <= MY_PROFILE_DRAWER_LAYOUT_MAX_PX;
   const isPhoneLayout = layoutWidth <= MY_PROFILE_PHONE_LAYOUT_MAX_PX;

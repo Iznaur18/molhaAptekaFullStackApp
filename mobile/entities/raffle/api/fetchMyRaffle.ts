@@ -24,6 +24,8 @@ export const fetchMyRaffle = async (): Promise<MyRafflePayload> => {
       archive: Array.isArray(data.data?.archive) ? data.data.archive : [],
     };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_MY_RAFFLE_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_MY_RAFFLE_FALLBACK),
+    );
   }
 };

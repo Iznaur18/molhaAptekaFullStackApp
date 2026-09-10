@@ -67,7 +67,8 @@ test("повтор ловится по паре «улица + квартира�
     findDuplicateUserSavedAddressKey([address({ id: "a" }), address({ id: "b" })]),
   );
   assert.ok(
-    findDuplicateUserSavedAddressKey([address({ id: "a" }), address({ id: "b" })]) != null,
+    findDuplicateUserSavedAddressKey([address({ id: "a" }), address({ id: "b" })]) !=
+      null,
   );
   assert.equal(
     findDuplicateUserSavedAddressKey([
@@ -175,8 +176,13 @@ test("подписи редактора совпадают с вебом", () =>
 
 test("первый адрес в книге сразу становится основным", () => {
   const editor = readMobileFile("entities/address/ui/UserSavedAddressesEditor.tsx");
-  assert.match(editor, /isDefault: isNew \? addresses\.length === 0 : draft\.isDefault/);
+  assert.match(
+    editor,
+    /isDefault: isNew \? addresses\.length === 0 : draft\.isDefault/,
+  );
 
-  const web = readRepoFile("client/src/entities/address/ui/UserSavedAddressesEditor.jsx");
+  const web = readRepoFile(
+    "client/src/entities/address/ui/UserSavedAddressesEditor.jsx",
+  );
   assert.match(web, /addresses\.length === 0 : draft\.isDefault/);
 });

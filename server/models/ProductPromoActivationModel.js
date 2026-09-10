@@ -49,7 +49,4 @@ ProductPromoActivationSchema.index(
   { unique: true, name: "promo_activation_user_product_unique" },
 );
 
-export default mongoose.model(
-  "ProductPromoActivation",
-  ProductPromoActivationSchema,
-);
+export default mongoose.model("ProductPromoActivation", ProductPromoActivationSchema);

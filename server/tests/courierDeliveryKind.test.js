@@ -3,9 +3,7 @@ import { describe, it } from "node:test";
 
 process.env.NODE_ENV = process.env.NODE_ENV ?? "test";
 
-const { buildStoredShipments } = await import(
-  "../services/order/orderShipments.js"
-);
+const { buildStoredShipments } = await import("../services/order/orderShipments.js");
 const { createProductBodySchema } = await import("@molha/api-contract");
 
 const SELLER_A = "aaaaaaaaaaaaaaaaaaaaaaaa";
@@ -90,7 +88,8 @@ describe("вид доставки на отправлении", () => {
 describe("взаимоисключение способов на товаре", () => {
   const base = {
     productName: "Тестовый товар для проверки правил",
-    productDescription: "Описание достаточной длины для прохождения валидации схемы товара",
+    productDescription:
+      "Описание достаточной длины для прохождения валидации схемы товара",
     productPrice: 1000,
     productImageUrls: ["/uploads/test.webp"],
     productPickupAddress: "г Москва, ул Тестовая, д 1",
@@ -108,9 +107,7 @@ describe("взаимоисключение способов на товаре", 
 
     assert.equal(result.success, false);
     assert.ok(
-      result.error.issues.some((i) =>
-        i.path.includes("productCourierDeliveryEnabled"),
-      ),
+      result.error.issues.some((i) => i.path.includes("productCourierDeliveryEnabled")),
       "смешение сделало бы непонятным, кому предлагать отправление",
     );
   });

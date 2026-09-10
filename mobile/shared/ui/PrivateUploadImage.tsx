@@ -1,11 +1,6 @@
 import { createElement, useMemo } from "react";
 import { Image as ExpoImage } from "expo-image";
-import {
-  Platform,
-  StyleSheet,
-  type ImageStyle,
-  type StyleProp,
-} from "react-native";
+import { Platform, StyleSheet, type ImageStyle, type StyleProp } from "react-native";
 
 type PrivateUploadImageProps = {
   uri: string;

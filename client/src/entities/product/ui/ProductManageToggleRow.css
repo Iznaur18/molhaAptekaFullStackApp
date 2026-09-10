@@ -155,7 +155,8 @@
   pointer-events: none;
 }
 
-.product-manage-toggle-row__switch-input:checked + .product-manage-toggle-row__switch-track {
+.product-manage-toggle-row__switch-input:checked
+  + .product-manage-toggle-row__switch-track {
   background: var(--iz-color-action);
 }
 

@@ -133,7 +133,10 @@ const tryExtractHandleFromHttpUrl = (raw, hosts) => {
  * @returns {string | null}
  */
 const extractYoutubeHandleFromPath = (pathname) => {
-  const parts = pathname.replace(/^\/+|\/+$/g, "").split("/").filter(Boolean);
+  const parts = pathname
+    .replace(/^\/+|\/+$/g, "")
+    .split("/")
+    .filter(Boolean);
   if (parts.length === 0) return null;
   if (parts[0].startsWith("@")) return parts[0];
   if ((parts[0] === "c" || parts[0] === "user") && parts[1]) {
@@ -189,7 +192,9 @@ export function normalizeSocialLinkToStoredUrl(fieldId, raw) {
   if (fieldId === "socialWhatsappUrl") {
     let digits = "";
     if (isHttpUrl(trimmed) || /^(?:www\.)?wa\.me\//i.test(trimmed)) {
-      const rawUrl = isHttpUrl(trimmed) ? trimmed : `https://${trimmed.replace(/^\/+/, "")}`;
+      const rawUrl = isHttpUrl(trimmed)
+        ? trimmed
+        : `https://${trimmed.replace(/^\/+/, "")}`;
       try {
         const parsed = new URL(rawUrl);
         if (stripWww(parsed.hostname) !== "wa.me") {
@@ -298,8 +303,7 @@ export function normalizeSocialLinkToStoredUrl(fieldId, raw) {
       };
     }
   } else {
-    handle =
-      tryExtractHandleFromHostPath(trimmed, network.hosts) ?? stripAt(trimmed);
+    handle = tryExtractHandleFromHostPath(trimmed, network.hosts) ?? stripAt(trimmed);
   }
 
   handle = String(handle ?? "").trim();
@@ -440,6 +444,5 @@ export const userSocialLinksBodyShape = Object.fromEntries(
 );
 
 /** @deprecated use createSocialLinkBodySchema — оставлено для совместимости импортов */
-export const clearableSocialHttpUrlSchema = createSocialLinkBodySchema(
-  "socialWebsiteUrl",
-);
+export const clearableSocialHttpUrlSchema =
+  createSocialLinkBodySchema("socialWebsiteUrl");

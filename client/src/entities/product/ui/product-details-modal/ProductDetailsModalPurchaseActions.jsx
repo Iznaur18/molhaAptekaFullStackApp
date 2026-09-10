@@ -63,7 +63,11 @@ export function ProductDetailsModalPurchaseActions({
     return (
       <div className={rootClassName}>
         <div className="product-details-modal__price-actions-cart">
-          <button type="button" className="add-to-cart add-to-cart--out-of-stock" disabled>
+          <button
+            type="button"
+            className="add-to-cart add-to-cart--out-of-stock"
+            disabled
+          >
             {outOfStockPurchaseLabel}
           </button>
         </div>
@@ -75,7 +79,11 @@ export function ProductDetailsModalPurchaseActions({
     return (
       <div className={rootClassName}>
         <div className="product-details-modal__price-actions-cart">
-          <button type="button" className="add-to-cart add-to-cart--out-of-stock" disabled>
+          <button
+            type="button"
+            className="add-to-cart add-to-cart--out-of-stock"
+            disabled
+          >
             {sellerClosedPurchaseLabel}
           </button>
         </div>

@@ -257,7 +257,9 @@ const assertBuyerNotBlockedForProducts = async (buyerUserId, productById) => {
  * @param {Record<string, { sellerId: string }>} productById
  */
 const assertSellersOpenForProducts = async (productById) => {
-  const sellerIds = [...new Set(Object.values(productById).map((snapshot) => snapshot.sellerId))];
+  const sellerIds = [
+    ...new Set(Object.values(productById).map((snapshot) => snapshot.sellerId)),
+  ];
   if (sellerIds.length === 0) {
     return;
   }
@@ -547,8 +549,8 @@ export async function createOrder({
         productPickupLocations: product.productPickupLocations,
         pickupEnabled: product.productPickupEnabled !== false,
         deliveryEnabled: product.productDeliveryEnabled === true,
-      courierDeliveryEnabled: product.productCourierDeliveryEnabled === true,
-      deliveryCarrier: resolveProductDeliveryCarrier(product),
+        courierDeliveryEnabled: product.productCourierDeliveryEnabled === true,
+        deliveryCarrier: resolveProductDeliveryCarrier(product),
         wholesaleEnabled: false,
         wholesaleMinQty: null,
         wholesalePrice: null,
@@ -585,9 +587,9 @@ export async function createOrder({
   assertCreateOrderSingleSeller(productById);
 
   await assertSellersAcceptPaymentMethod(
-    [...new Set(Object.values(productById).map((row) => String(row?.sellerId ?? "")))].filter(
-      Boolean,
-    ),
+    [
+      ...new Set(Object.values(productById).map((row) => String(row?.sellerId ?? ""))),
+    ].filter(Boolean),
     paymentMethod,
   );
 
@@ -651,7 +653,8 @@ export async function createOrder({
     if (paymentMethod === ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY) {
       throw new AppError(400, COURIER_DELIVERY_CASH_FORBIDDEN_MESSAGE);
     }
-    payoutRequisitesBySeller = await assertSellersHavePayoutRequisites(courierSellerIds);
+    payoutRequisitesBySeller =
+      await assertSellersHavePayoutRequisites(courierSellerIds);
   }
   assertProductsSupportPickup(productById, fulfillmentSplit.pickupProductIds);
 
@@ -874,9 +877,8 @@ export async function createOrder({
     });
 
     try {
-      const { emitOrderCreatedEvent } = await import(
-        "../analytics-events/emitAnalyticsEvents.js"
-      );
+      const { emitOrderCreatedEvent } =
+        await import("../analytics-events/emitAnalyticsEvents.js");
       const sellerUserIds = [
         ...new Set(
           Object.values(productById)
@@ -903,8 +905,7 @@ export async function createOrder({
       logServerEvent("error", {
         event: "order_notify_sellers_failed",
         orderId: String(created._id),
-        error:
-          notifyError instanceof Error ? notifyError.message : String(notifyError),
+        error: notifyError instanceof Error ? notifyError.message : String(notifyError),
       });
     });
 

@@ -16,7 +16,10 @@ export const buildAttentionOrderIdsKey = <T extends OrderWithId>(
     .join(",");
 };
 
-export const mergeExpandedIdsFromKey = (prev: Set<string>, idsKey: string): Set<string> => {
+export const mergeExpandedIdsFromKey = (
+  prev: Set<string>,
+  idsKey: string,
+): Set<string> => {
   if (!idsKey) {
     return prev;
   }

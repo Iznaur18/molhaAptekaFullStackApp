@@ -15,7 +15,11 @@ const ACCOUNT_REQUIREMENT_MODAL_TITLE_ID = "account-requirement-modal-title";
 /** @type {Record<AccountRequirement, { icon: import("lucide-react").LucideIcon; view: string; tone: string }>} */
 const REQUIREMENT_META = {
   premium: { icon: Crown, view: "premium", tone: "premium" },
-  "data-confirmation": { icon: ShieldCheck, view: "data-confirmation", tone: "confirm" },
+  "data-confirmation": {
+    icon: ShieldCheck,
+    view: "data-confirmation",
+    tone: "confirm",
+  },
 };
 
 /**

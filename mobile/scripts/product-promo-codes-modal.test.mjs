@@ -36,9 +36,13 @@ test("ключи запросов совпадают с вебом", () => {
 });
 
 test("sheet активации промокода совпадает с web wholesale-price-modal", () => {
-  const sheet = readMobileFile("features/product-detail/ui/ProductPromoCodeActivateSheet.tsx");
+  const sheet = readMobileFile(
+    "features/product-detail/ui/ProductPromoCodeActivateSheet.tsx",
+  );
   const styles = readMobileFile("shared/theme/wholesalePriceSheetStyles.ts");
-  const animation = readMobileFile("entities/product/model/useWholesalePriceSheetAnimation.ts");
+  const animation = readMobileFile(
+    "entities/product/model/useWholesalePriceSheetAnimation.ts",
+  );
   const layout = readMobileFile("entities/product/lib/wholesalePriceSheetLayout.ts");
   const webCss = readRepoFile("client/src/entities/product/ui/WholesalePriceModal.css");
 
@@ -110,7 +114,9 @@ test("строка управления стоит после горящей с�
     loyalty: source.indexOf("MANAGE_LOYALTY_TITLE"),
   });
 
-  const mobile = orderIn(readMobileFile("entities/product/ui/ProductEditManageSection.tsx"));
+  const mobile = orderIn(
+    readMobileFile("entities/product/ui/ProductEditManageSection.tsx"),
+  );
   const web = orderIn(
     readRepoFile("client/src/entities/product/ui/ProductEditManageSection.jsx"),
   );
@@ -126,9 +132,14 @@ test("строка управления стоит после горящей с�
 });
 
 test("сохранение обновляет признак активных кодов у товара", () => {
-  const promotion = readMobileFile("features/product-promotion/ui/ProductPromotionModal.tsx");
+  const promotion = readMobileFile(
+    "features/product-promotion/ui/ProductPromotionModal.tsx",
+  );
   assert.match(promotion, /<ProductPromoCodesModal/);
-  assert.match(promotion, /productHasActivePromoCodes: payload\.productHasActivePromoCodes/);
+  assert.match(
+    promotion,
+    /productHasActivePromoCodes: payload\.productHasActivePromoCodes/,
+  );
 
   const web = readRepoFile("client/src/entities/product/ui/ProductPromotionModal.jsx");
   assert.match(web, /productHasActivePromoCodes: payload\.productHasActivePromoCodes/);

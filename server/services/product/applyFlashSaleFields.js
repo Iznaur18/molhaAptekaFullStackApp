@@ -82,7 +82,9 @@ export const applyFlashSaleFields = (body, $set, $unset, existing) => {
       throw new AppError(400, "У товара должна быть цена больше 0");
     }
 
-    const salePriceRaw = touchesPrice ? body.productFlashSalePrice : existing.productPrice;
+    const salePriceRaw = touchesPrice
+      ? body.productFlashSalePrice
+      : existing.productPrice;
     const salePrice = Math.floor(Number(salePriceRaw));
     if (!Number.isFinite(salePrice) || salePrice < 1) {
       throw new AppError(400, PRODUCT_FLASH_SALE_PRICE_REQUIRED_MESSAGE);
@@ -92,12 +94,19 @@ export const applyFlashSaleFields = (body, $set, $unset, existing) => {
     }
 
     const discountPercent = computeProductDiscountPercent(basePrice, salePrice);
-    if (discountPercent == null || discountPercent > PRODUCT_FLASH_SALE_MAX_DISCOUNT_PERCENT) {
+    if (
+      discountPercent == null ||
+      discountPercent > PRODUCT_FLASH_SALE_MAX_DISCOUNT_PERCENT
+    ) {
       throw new AppError(400, PRODUCT_FLASH_SALE_MAX_DISCOUNT_MESSAGE);
     }
 
-    const durationValue = touchesDurationValue ? body.productFlashSaleDurationValue : null;
-    const durationUnit = touchesDurationUnit ? body.productFlashSaleDurationUnit : "minutes";
+    const durationValue = touchesDurationValue
+      ? body.productFlashSaleDurationValue
+      : null;
+    const durationUnit = touchesDurationUnit
+      ? body.productFlashSaleDurationUnit
+      : "minutes";
     if (durationValue == null) {
       throw new AppError(400, PRODUCT_FLASH_SALE_DURATION_REQUIRED_MESSAGE);
     }
@@ -136,8 +145,10 @@ export const applyFlashSaleFields = (body, $set, $unset, existing) => {
   return {
     flashSaleEnabledChanged:
       touchesEnabled &&
-      Boolean(existing.productFlashSaleEnabled) !== Boolean(body.productFlashSaleEnabled),
-    flashSaleNowEnabled: wantsEnable && touchesEnabled && body.productFlashSaleEnabled === true,
+      Boolean(existing.productFlashSaleEnabled) !==
+        Boolean(body.productFlashSaleEnabled),
+    flashSaleNowEnabled:
+      wantsEnable && touchesEnabled && body.productFlashSaleEnabled === true,
   };
 };
 

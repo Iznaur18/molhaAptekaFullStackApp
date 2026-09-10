@@ -139,10 +139,7 @@ async function main() {
             },
             {
               userAddress: { $nin: [null, ""] },
-              $or: [
-                { userAddressGeo: null },
-                { userAddressGeo: { $exists: false } },
-              ],
+              $or: [{ userAddressGeo: null }, { userAddressGeo: { $exists: false } }],
             },
           ],
         },
@@ -250,10 +247,7 @@ async function main() {
 
     let written = 0;
     for (const update of updates) {
-      const result = await users.updateOne(
-        { _id: update._id },
-        { $set: update.patch },
-      );
+      const result = await users.updateOne({ _id: update._id }, { $set: update.patch });
       written += result.modifiedCount;
     }
     console.log(`Документов обновлено: ${written}`);

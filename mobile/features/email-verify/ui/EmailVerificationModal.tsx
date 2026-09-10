@@ -142,7 +142,9 @@ export const EmailVerificationModal = ({
       onVerified?.();
     } catch (error) {
       setSuccessMessage("");
-      setErrorMessage(error instanceof Error ? error.message : EMAIL_VERIFICATION_UI.CONFIRM_ERROR);
+      setErrorMessage(
+        error instanceof Error ? error.message : EMAIL_VERIFICATION_UI.CONFIRM_ERROR,
+      );
     }
   };
 
@@ -154,7 +156,9 @@ export const EmailVerificationModal = ({
       setSuccessMessage(message || EMAIL_VERIFICATION_UI.RESENT);
     } catch (error) {
       setSuccessMessage("");
-      setErrorMessage(error instanceof Error ? error.message : EMAIL_VERIFICATION_UI.RESEND_ERROR);
+      setErrorMessage(
+        error instanceof Error ? error.message : EMAIL_VERIFICATION_UI.RESEND_ERROR,
+      );
     }
   };
 
@@ -170,7 +174,12 @@ export const EmailVerificationModal = ({
   }
 
   return (
-    <Modal visible={modalVisible} animationType="none" transparent onRequestClose={handleClose}>
+    <Modal
+      visible={modalVisible}
+      animationType="none"
+      transparent
+      onRequestClose={handleClose}
+    >
       <View style={sheetStyles.emailVerifyRoot}>
         <Animated.View
           style={[sheetStyles.emailVerifyBackdropLayer, backdropAnimatedStyle]}
@@ -185,7 +194,9 @@ export const EmailVerificationModal = ({
           />
         </Animated.View>
 
-        <View style={[sheetStyles.emailVerifySheetHost, { paddingBottom: sheetRestOffset }]}>
+        <View
+          style={[sheetStyles.emailVerifySheetHost, { paddingBottom: sheetRestOffset }]}
+        >
           <Animated.View
             style={[sheetStyles.emailVerifySheetAnimated, sheetAnimatedStyle]}
             pointerEvents="box-none"
@@ -194,50 +205,58 @@ export const EmailVerificationModal = ({
               radius={EMAIL_VERIFY_MODAL_CORNER_RADIUS}
               style={sheetStyles.emailVerifyCard}
             >
-            <View style={sheetStyles.emailVerifyCardContent}>
-              <Text style={sheetStyles.emailVerifyTitle}>
-                {EMAIL_VERIFICATION_UI.MODAL_TITLE}
-              </Text>
-              <Text style={sheetStyles.modalText}>{EMAIL_VERIFICATION_UI.MODAL_TEXT(email)}</Text>
-
-              <Text style={fieldStyles.label}>{EMAIL_VERIFICATION_UI.LABEL_CODE}</Text>
-              <TextInput
-                style={[fieldStyles.input, fieldStyles.inputCode]}
-                value={code}
-                onChangeText={handleCodeChange}
-                keyboardType="number-pad"
-                maxLength={CODE_LENGTH}
-                placeholder={EMAIL_VERIFICATION_UI.CODE_PLACEHOLDER}
-                placeholderTextColor={theme.colors.textMuted}
-                editable={!isBusy}
-              />
-
-              {errorMessage ? <Text style={fieldStyles.error}>{errorMessage}</Text> : null}
-              {successMessage ? <Text style={fieldStyles.success}>{successMessage}</Text> : null}
-
-              <AppButton
-                label={EMAIL_VERIFICATION_UI.CONFIRM_BUTTON}
-                variant="primary"
-                onPress={handleVerify}
-                disabled={isBusy}
-              />
-
-              <Pressable
-                style={sheetStyles.secondaryAction}
-                onPress={handleResend}
-                disabled={isBusy}
-              >
-                <Text style={sheetStyles.secondaryActionText}>
-                  {resendMutation.isPending
-                    ? EMAIL_VERIFICATION_UI.RESEND_LOADING
-                    : EMAIL_VERIFICATION_UI.RESEND_BUTTON}
+              <View style={sheetStyles.emailVerifyCardContent}>
+                <Text style={sheetStyles.emailVerifyTitle}>
+                  {EMAIL_VERIFICATION_UI.MODAL_TITLE}
                 </Text>
-              </Pressable>
+                <Text style={sheetStyles.modalText}>
+                  {EMAIL_VERIFICATION_UI.MODAL_TEXT(email)}
+                </Text>
 
-              <Pressable onPress={handleClose} disabled={isBusy}>
-                <Text style={sheetStyles.dismiss}>{EMAIL_VERIFICATION_UI.CLOSE}</Text>
-              </Pressable>
-            </View>
+                <Text style={fieldStyles.label}>
+                  {EMAIL_VERIFICATION_UI.LABEL_CODE}
+                </Text>
+                <TextInput
+                  style={[fieldStyles.input, fieldStyles.inputCode]}
+                  value={code}
+                  onChangeText={handleCodeChange}
+                  keyboardType="number-pad"
+                  maxLength={CODE_LENGTH}
+                  placeholder={EMAIL_VERIFICATION_UI.CODE_PLACEHOLDER}
+                  placeholderTextColor={theme.colors.textMuted}
+                  editable={!isBusy}
+                />
+
+                {errorMessage ? (
+                  <Text style={fieldStyles.error}>{errorMessage}</Text>
+                ) : null}
+                {successMessage ? (
+                  <Text style={fieldStyles.success}>{successMessage}</Text>
+                ) : null}
+
+                <AppButton
+                  label={EMAIL_VERIFICATION_UI.CONFIRM_BUTTON}
+                  variant="primary"
+                  onPress={handleVerify}
+                  disabled={isBusy}
+                />
+
+                <Pressable
+                  style={sheetStyles.secondaryAction}
+                  onPress={handleResend}
+                  disabled={isBusy}
+                >
+                  <Text style={sheetStyles.secondaryActionText}>
+                    {resendMutation.isPending
+                      ? EMAIL_VERIFICATION_UI.RESEND_LOADING
+                      : EMAIL_VERIFICATION_UI.RESEND_BUTTON}
+                  </Text>
+                </Pressable>
+
+                <Pressable onPress={handleClose} disabled={isBusy}>
+                  <Text style={sheetStyles.dismiss}>{EMAIL_VERIFICATION_UI.CLOSE}</Text>
+                </Pressable>
+              </View>
             </SquircleView>
           </Animated.View>
         </View>

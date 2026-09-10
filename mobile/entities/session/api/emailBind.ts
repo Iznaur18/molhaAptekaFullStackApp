@@ -10,7 +10,9 @@ export const requestEmailBind = async (payload: { email: string }) => {
     }
     return data.data as { email?: string; message?: string };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, EDIT_PROFILE_UI.EMAIL_VERIFY_REQUEST_ERROR));
+    throw new Error(
+      formatApiErrorMessage(error, EDIT_PROFILE_UI.EMAIL_VERIFY_REQUEST_ERROR),
+    );
   }
 };
 

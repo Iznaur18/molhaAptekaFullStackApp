@@ -38,7 +38,8 @@ export const SearchSynonymsAdminPage = () => {
   const { outerScrollOwns, scrollEnabled } = useProfileAccountNestedListScroll();
   const queryClient = useQueryClient();
   const synonymsQuery = useProductSearchSynonymsAdminQuery();
-  const { createMutation, patchMutation, deleteMutation } = useProductSearchSynonymAdminMutations();
+  const { createMutation, patchMutation, deleteMutation } =
+    useProductSearchSynonymAdminMutations();
 
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -78,10 +79,13 @@ export const SearchSynonymsAdminPage = () => {
 
   const updateRows = useCallback(
     (updater: (prev: SearchSynonymRow[]) => SearchSynonymRow[]) => {
-      queryClient.setQueryData(searchSynonymAdminQueryKeys.all, (old: SearchSynonymRow[] | undefined) => {
-        const next = updater(old ?? []);
-        return sortSynonymRows(next);
-      });
+      queryClient.setQueryData(
+        searchSynonymAdminQueryKeys.all,
+        (old: SearchSynonymRow[] | undefined) => {
+          const next = updater(old ?? []);
+          return sortSynonymRows(next);
+        },
+      );
     },
     [queryClient],
   );
@@ -92,7 +96,9 @@ export const SearchSynonymsAdminPage = () => {
       await synonymsQuery.refetch();
     } catch (error) {
       setActionError(
-        error instanceof Error ? error.message : SEARCH_SYNONYMS_ADMIN_PAGE_UI.LOAD_ERROR,
+        error instanceof Error
+          ? error.message
+          : SEARCH_SYNONYMS_ADMIN_PAGE_UI.LOAD_ERROR,
       );
     }
   }, [synonymsQuery.refetch]);
@@ -133,7 +139,9 @@ export const SearchSynonymsAdminPage = () => {
       setIsCreateOpen(false);
     } catch (error) {
       setActionError(
-        error instanceof Error ? error.message : SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_ERROR,
+        error instanceof Error
+          ? error.message
+          : SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_ERROR,
       );
     } finally {
       setPendingId(null);
@@ -160,7 +168,9 @@ export const SearchSynonymsAdminPage = () => {
       cancelEdit();
     } catch (error) {
       setActionError(
-        error instanceof Error ? error.message : SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_ERROR,
+        error instanceof Error
+          ? error.message
+          : SEARCH_SYNONYMS_ADMIN_PAGE_UI.SAVE_ERROR,
       );
     } finally {
       setPendingId(null);
@@ -207,7 +217,9 @@ export const SearchSynonymsAdminPage = () => {
   const createPanel = (
     <>
       <View style={styles.field}>
-        <Text style={styles.fieldLabel}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.LABEL_TOKEN}</Text>
+        <Text style={styles.fieldLabel}>
+          {SEARCH_SYNONYMS_ADMIN_PAGE_UI.LABEL_TOKEN}
+        </Text>
         <TextInput
           style={styles.fieldInput}
           value={newToken}
@@ -216,7 +228,9 @@ export const SearchSynonymsAdminPage = () => {
         />
       </View>
       <View style={styles.field}>
-        <Text style={styles.fieldLabel}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.CATEGORIES_HINT}</Text>
+        <Text style={styles.fieldLabel}>
+          {SEARCH_SYNONYMS_ADMIN_PAGE_UI.CATEGORIES_HINT}
+        </Text>
         <SynonymCategoryPicker
           selected={newCategories}
           onChange={setNewCategories}
@@ -227,12 +241,15 @@ export const SearchSynonymsAdminPage = () => {
         <Pressable
           style={[
             styles.primaryButton,
-            (pendingId === "create" || newCategories.length === 0) && styles.primaryButtonDisabled,
+            (pendingId === "create" || newCategories.length === 0) &&
+              styles.primaryButtonDisabled,
           ]}
           disabled={pendingId === "create" || newCategories.length === 0}
           onPress={() => void handleCreate()}
         >
-          <Text style={styles.primaryButtonText}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.CREATE_BUTTON}</Text>
+          <Text style={styles.primaryButtonText}>
+            {SEARCH_SYNONYMS_ADMIN_PAGE_UI.CREATE_BUTTON}
+          </Text>
         </Pressable>
       </View>
     </>
@@ -241,7 +258,9 @@ export const SearchSynonymsAdminPage = () => {
   const listContent = (() => {
     if (phase === "success" && rows.length === 0) {
       return (
-        <Text style={[styles.alert, styles.alertInfo]}>{SEARCH_SYNONYMS_ADMIN_PAGE_UI.EMPTY}</Text>
+        <Text style={[styles.alert, styles.alertInfo]}>
+          {SEARCH_SYNONYMS_ADMIN_PAGE_UI.EMPTY}
+        </Text>
       );
     }
     if (phase === "success" && filteredRows.length === 0) {
@@ -336,10 +355,7 @@ export const SearchSynonymsAdminPage = () => {
       <ProfileAccountList
         data={filteredRows}
         keyExtractor={(item) => item._id}
-        style={[
-          ...pageListStyle,
-          scrollEnabled ? centeredContentStyle : null,
-        ]}
+        style={[...pageListStyle, scrollEnabled ? centeredContentStyle : null]}
         contentContainerStyle={{
           paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom,
           gap: 8,

@@ -13,7 +13,8 @@ const EMPTY_DESELECTION: ReadonlySet<string> = new Set();
  * @param purchasableIds id доступных к покупке строк; ссылка должна быть стабильной.
  */
 export const useCartSelection = (purchasableIds: readonly string[]) => {
-  const [deselectedIds, setDeselectedIds] = useState<ReadonlySet<string>>(EMPTY_DESELECTION);
+  const [deselectedIds, setDeselectedIds] =
+    useState<ReadonlySet<string>>(EMPTY_DESELECTION);
 
   const purchasableIdSet = useMemo(() => new Set(purchasableIds), [purchasableIds]);
 
@@ -33,7 +34,9 @@ export const useCartSelection = (purchasableIds: readonly string[]) => {
 
   /** Выбрано всё — снимаем всё, иначе (выбрано частично или ничего) выбираем всё. */
   const toggleAll = useCallback(() => {
-    setDeselectedIds((prev) => (prev.size === 0 ? new Set(purchasableIdSet) : EMPTY_DESELECTION));
+    setDeselectedIds((prev) =>
+      prev.size === 0 ? new Set(purchasableIdSet) : EMPTY_DESELECTION,
+    );
   }, [purchasableIdSet]);
 
   /** Выбрать/снять все id секции (остальные секции не трогаем). */

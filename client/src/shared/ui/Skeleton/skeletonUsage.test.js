@@ -44,10 +44,9 @@ describe("скелетоны первой загрузки", () => {
       expect(source).toContain(`<${скелетон} />`);
 
       // Заглушка «Загрузка…» в ветке ожидания — то, от чего уходили.
-      expect(
-        source,
-        "ветка загрузки снова отдаёт абзац вместо скелетона",
-      ).not.toMatch(/return\s*\(?\s*<p className="[a-z-]+__state">\{[A-Z_]+\.LOADING\}/u);
+      expect(source, "ветка загрузки снова отдаёт абзац вместо скелетона").not.toMatch(
+        /return\s*\(?\s*<p className="[a-z-]+__state">\{[A-Z_]+\.LOADING\}/u,
+      );
     });
   }
 

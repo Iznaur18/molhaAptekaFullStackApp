@@ -33,6 +33,9 @@ test("installment program: no staff moderation queue", () => {
   assert.doesNotMatch(staffViews, /installment-moderation/);
   assert.doesNotMatch(homePaths, /installment-moderation/);
   assert.doesNotMatch(hub, /installment-moderation/);
-  assert.match(migration, /approve-pending-installment|INSTALLMENT_MODERATION_APPROVED/);
+  assert.match(
+    migration,
+    /approve-pending-installment|INSTALLMENT_MODERATION_APPROVED/,
+  );
   assert.match(migrationsIndex, /20260714-approve-pending-installment-programs/);
 });

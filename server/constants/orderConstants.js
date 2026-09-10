@@ -176,8 +176,7 @@ export const IN_APP_NOTIFICATION_KIND_BUYER_ORDER_STATUS = "buyer_order_status";
  * вовсе: уведомления о статусе адресованы покупателю и при его же действии
  * подавляются.
  */
-export const IN_APP_NOTIFICATION_KIND_SELLER_ORDER_RETURNED =
-  "seller_order_returned";
+export const IN_APP_NOTIFICATION_KIND_SELLER_ORDER_RETURNED = "seller_order_returned";
 export const IN_APP_NOTIFICATION_MESSAGE_SELLER_ORDER_RETURNED =
   "Покупатель отказался от заказа";
 

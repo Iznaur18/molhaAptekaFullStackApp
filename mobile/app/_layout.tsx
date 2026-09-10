@@ -74,30 +74,29 @@ function RootLayoutNav() {
     const timer = setTimeout(releaseColdStartSplash, COLD_START_SPLASH_MAX_WAIT_MS);
     return () => clearTimeout(timer);
   }, []);
-  const navigationTheme =
-    isDimColorScheme(colorScheme)
-      ? {
-          ...DarkTheme,
-          colors: {
-            ...DarkTheme.colors,
-            background: theme.colors.bg,
-            card: theme.colors.surface,
-            text: theme.colors.text,
-            border: theme.colors.border,
-            primary: theme.colors.action,
-          },
-        }
-      : {
-          ...DefaultTheme,
-          colors: {
-            ...DefaultTheme.colors,
-            background: theme.colors.bg,
-            card: theme.colors.surface,
-            text: theme.colors.text,
-            border: theme.colors.border,
-            primary: theme.colors.action,
-          },
-        };
+  const navigationTheme = isDimColorScheme(colorScheme)
+    ? {
+        ...DarkTheme,
+        colors: {
+          ...DarkTheme.colors,
+          background: theme.colors.bg,
+          card: theme.colors.surface,
+          text: theme.colors.text,
+          border: theme.colors.border,
+          primary: theme.colors.action,
+        },
+      }
+    : {
+        ...DefaultTheme,
+        colors: {
+          ...DefaultTheme.colors,
+          background: theme.colors.bg,
+          card: theme.colors.surface,
+          text: theme.colors.text,
+          border: theme.colors.border,
+          primary: theme.colors.action,
+        },
+      };
 
   return (
     <ThemeProvider value={navigationTheme}>

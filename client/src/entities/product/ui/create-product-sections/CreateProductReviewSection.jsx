@@ -64,7 +64,10 @@ export function CreateProductReviewSection({
     },
     {
       label: CREATE_PRODUCT_MODAL_UI.SECTION_MEDIA,
-      value: CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_MEDIA(imageCount, form.productPreviewVideoUrl),
+      value: CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_MEDIA(
+        imageCount,
+        form.productPreviewVideoUrl,
+      ),
       stepIndex: resolveCreateProductWizardStepIndex("media"),
     },
     {
@@ -101,9 +104,7 @@ export function CreateProductReviewSection({
     {
       label: getProductFieldEditLabel("productPrice"),
       value: `${String(form.productPrice ?? "").trim()} ₽${
-        discountPreviewPercent != null
-          ? ` (−${discountPreviewPercent}%)`
-          : ""
+        discountPreviewPercent != null ? ` (−${discountPreviewPercent}%)` : ""
       }`,
       stepIndex: 5,
     },
@@ -124,7 +125,9 @@ export function CreateProductReviewSection({
 
   return (
     <div className={["create-product-review", className].filter(Boolean).join(" ")}>
-      <p className="create-product-review__lead">{CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_LEAD}</p>
+      <p className="create-product-review__lead">
+        {CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_LEAD}
+      </p>
       <dl className="create-product-review__list">
         {rows.map((row) => (
           <div key={row.label} className="create-product-review__row">

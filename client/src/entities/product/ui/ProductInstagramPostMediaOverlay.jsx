@@ -26,7 +26,9 @@ export function ProductInstagramPostMediaOverlay({
 
   return (
     <div
-      className={["product-instagram-post-media-slot", className].filter(Boolean).join(" ")}
+      className={["product-instagram-post-media-slot", className]
+        .filter(Boolean)
+        .join(" ")}
     >
       <ProductInstagramPostMediaButton
         size={size}

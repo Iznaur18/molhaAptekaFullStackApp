@@ -10,7 +10,9 @@ const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
 test("promotion frame palette mirrors web tier accents", () => {
-  const palette = readMobileFile("entities/product/lib/productCardPromotionFramePalette.ts");
+  const palette = readMobileFile(
+    "entities/product/lib/productCardPromotionFramePalette.ts",
+  );
 
   assert.match(palette, /resolveProductCardPromotionCompactFrame/);
   assert.match(palette, /resolveProductCardPromotionBannerInnerFrame/);
@@ -20,7 +22,9 @@ test("promotion frame palette mirrors web tier accents", () => {
 
 test("ProductCard applies compact promotion gradient frame", () => {
   const card = readMobileFile("entities/product/ui/ProductCard.tsx");
-  const background = readMobileFile("entities/product/ui/ProductCardPromotionBackground.tsx");
+  const background = readMobileFile(
+    "entities/product/ui/ProductCardPromotionBackground.tsx",
+  );
 
   assert.match(card, /showPromotionChrome/);
   assert.match(card, /variant="compact"/);

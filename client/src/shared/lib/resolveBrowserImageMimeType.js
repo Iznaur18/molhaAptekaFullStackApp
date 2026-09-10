@@ -23,7 +23,9 @@ export function resolveBrowserImageMimeType(file) {
     return declaredType === "image/jpg" ? "image/jpeg" : declaredType;
   }
 
-  const name = String(file?.name ?? "").trim().toLowerCase();
+  const name = String(file?.name ?? "")
+    .trim()
+    .toLowerCase();
   const extension = name.includes(".") ? name.split(".").pop() : "";
   return EXTENSION_MIME_TYPES[extension] ?? "";
 }

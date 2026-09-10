@@ -4,8 +4,14 @@ import { test } from "node:test";
 import { isEmailAuthEnabled, resolveAuthContactChannel } from "../dist/index.js";
 
 test("явный EMAIL_AUTH_ENABLED=false рубит почту даже в test", () => {
-  assert.equal(isEmailAuthEnabled({ NODE_ENV: "test", EMAIL_AUTH_ENABLED: "false" }), false);
-  assert.equal(resolveAuthContactChannel("email", { EMAIL_AUTH_ENABLED: "false" }), "phone");
+  assert.equal(
+    isEmailAuthEnabled({ NODE_ENV: "test", EMAIL_AUTH_ENABLED: "false" }),
+    false,
+  );
+  assert.equal(
+    resolveAuthContactChannel("email", { EMAIL_AUTH_ENABLED: "false" }),
+    "phone",
+  );
 });
 
 test("явный EMAIL_AUTH_ENABLED=true включает почту", () => {

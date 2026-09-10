@@ -79,7 +79,9 @@ export const SubscriptionUserRow = ({ user, onRowClick }: SubscriptionUserRowPro
           </View>
           <View style={styles.metrics}>
             <View style={styles.metric}>
-              <Text style={styles.metricLabel}>{USER_LIST_ROW_UI.RATING_SCORE_LABEL}</Text>
+              <Text style={styles.metricLabel}>
+                {USER_LIST_ROW_UI.RATING_SCORE_LABEL}
+              </Text>
               <Text style={styles.metricValue}>{ratingText}</Text>
             </View>
             <View style={styles.metricSep} />
@@ -89,7 +91,9 @@ export const SubscriptionUserRow = ({ user, onRowClick }: SubscriptionUserRowPro
             </View>
             <View style={styles.metricSep} />
             <View style={styles.metric}>
-              <Text style={styles.metricLabel}>{USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL}</Text>
+              <Text style={styles.metricLabel}>
+                {USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL}
+              </Text>
               <Text style={styles.metricValue}>{loyaltyPointsText}</Text>
             </View>
           </View>

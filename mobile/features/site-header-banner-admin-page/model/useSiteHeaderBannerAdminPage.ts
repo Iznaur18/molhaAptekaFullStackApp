@@ -52,12 +52,16 @@ export const useSiteHeaderBannerAdminPage = () => {
     setActionError("");
     setSaveNotice(false);
     try {
-      const saved = await patchMutation.mutateAsync(buildPatchSiteHeaderBannerSettingsBody(form));
+      const saved = await patchMutation.mutateAsync(
+        buildPatchSiteHeaderBannerSettingsBody(form),
+      );
       setForm(mapSiteHeaderBannerSettingsToForm(saved));
       setSaveNotice(true);
     } catch (error) {
       setActionError(
-        error instanceof Error ? error.message : SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVE_ERROR,
+        error instanceof Error
+          ? error.message
+          : SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVE_ERROR,
       );
     }
   };
@@ -68,7 +72,9 @@ export const useSiteHeaderBannerAdminPage = () => {
       await settingsQuery.refetch();
     } catch (error) {
       setActionError(
-        error instanceof Error ? error.message : SITE_HEADER_BANNER_ADMIN_PAGE_UI.LOAD_ERROR,
+        error instanceof Error
+          ? error.message
+          : SITE_HEADER_BANNER_ADMIN_PAGE_UI.LOAD_ERROR,
       );
     }
   }, [settingsQuery]);

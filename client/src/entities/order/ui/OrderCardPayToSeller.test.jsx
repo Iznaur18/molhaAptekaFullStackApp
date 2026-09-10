@@ -50,12 +50,8 @@ describe("OrderCard: блок «Перевести продавцу»", () => {
       <OrderCard order={makeOrder()} attentionRole="buyer" compact />,
     );
 
-    expect(
-      screen.queryByText(ORDER_CARD_UI.SHIPMENT_PAY_TO("seller")),
-    ).toBeNull();
-    expect(
-      screen.queryByText(ORDER_CARD_UI.SHIPMENT_PAY_TO_HINT),
-    ).toBeNull();
+    expect(screen.queryByText(ORDER_CARD_UI.SHIPMENT_PAY_TO("seller"))).toBeNull();
+    expect(screen.queryByText(ORDER_CARD_UI.SHIPMENT_PAY_TO_HINT)).toBeNull();
   });
 
   it("показывает только курьер + картой при получении", () => {
@@ -75,8 +71,6 @@ describe("OrderCard: блок «Перевести продавцу»", () => {
     expect(
       screen.getByText(ORDER_CARD_UI.SHIPMENT_PAY_TO("+7 900 000-00-00")),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(ORDER_CARD_UI.SHIPMENT_PAY_TO_HINT),
-    ).toBeInTheDocument();
+    expect(screen.getByText(ORDER_CARD_UI.SHIPMENT_PAY_TO_HINT)).toBeInTheDocument();
   });
 });

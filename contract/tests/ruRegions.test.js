@@ -27,7 +27,10 @@ describe("ruRegions", () => {
 
   it("дефолт зрителя — Москва", () => {
     assert.equal(DEFAULT_VIEWER_REGION_CODE, "RU-MOW");
-    assert.equal(getRuRegionByCode("RU-MOW")?.name, "Город федерального значения Москва");
+    assert.equal(
+      getRuRegionByCode("RU-MOW")?.name,
+      "Город федерального значения Москва",
+    );
     assert.equal(resolveViewerRegionCode(null), "RU-MOW");
     assert.equal(resolveViewerRegionCode(""), "RU-MOW");
     assert.equal(resolveViewerRegionCode("RU-CE"), "RU-CE");

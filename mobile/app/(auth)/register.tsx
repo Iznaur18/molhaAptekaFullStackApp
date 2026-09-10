@@ -93,8 +93,7 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [personalDataConsentAccepted, setPersonalDataConsentAccepted] =
-    useState(false);
+  const [personalDataConsentAccepted, setPersonalDataConsentAccepted] = useState(false);
   const [consentError, setConsentError] = useState("");
   const [focusedField, setFocusedField] = useState<RegisterField | null>(null);
 
@@ -287,9 +286,7 @@ export default function RegisterScreen() {
                   ? AUTH_UI.REGISTER_CODE_SUBTITLE_PHONE(
                       pendingRegistration.phoneNumber || phoneNumber,
                     )
-                  : AUTH_UI.REGISTER_CODE_SUBTITLE(
-                      pendingRegistration.email || email,
-                    )}
+                  : AUTH_UI.REGISTER_CODE_SUBTITLE(pendingRegistration.email || email)}
               </Text>
 
               <View style={styles.form}>
@@ -339,7 +336,10 @@ export default function RegisterScreen() {
                   disabled={isCodeBusy}
                 />
                 <Pressable
-                  style={[styles.registerLink, isCodeBusy && styles.registerLinkDisabled]}
+                  style={[
+                    styles.registerLink,
+                    isCodeBusy && styles.registerLinkDisabled,
+                  ]}
                   onPress={handleResendCode}
                   disabled={isCodeBusy}
                 >
@@ -350,7 +350,10 @@ export default function RegisterScreen() {
                   </Text>
                 </Pressable>
                 <Pressable
-                  style={[styles.registerLink, isCodeBusy && styles.registerLinkDisabled]}
+                  style={[
+                    styles.registerLink,
+                    isCodeBusy && styles.registerLinkDisabled,
+                  ]}
                   onPress={handleBack}
                   disabled={isCodeBusy}
                 >
@@ -365,7 +368,9 @@ export default function RegisterScreen() {
               <Text style={styles.title}>{AUTH_UI.REGISTER_TITLE}</Text>
               <Text style={styles.subtitle}>{AUTH_UI.REGISTER_SUBTITLE}</Text>
               {isEmailAuthEnabled() ? null : (
-                <Text style={styles.subtitle}>{AUTH_UI.EMAIL_AUTH_DISABLED_NOTICE}</Text>
+                <Text style={styles.subtitle}>
+                  {AUTH_UI.EMAIL_AUTH_DISABLED_NOTICE}
+                </Text>
               )}
 
               <View style={styles.form}>
@@ -493,7 +498,10 @@ export default function RegisterScreen() {
                   disabled={isFormBusy || !isConsentComplete}
                 />
                 <Pressable
-                  style={[styles.registerLink, isFormBusy && styles.registerLinkDisabled]}
+                  style={[
+                    styles.registerLink,
+                    isFormBusy && styles.registerLinkDisabled,
+                  ]}
                   onPress={() => router.push("/(auth)/login")}
                   disabled={isFormBusy}
                 >

@@ -22,10 +22,11 @@ import {
 import { optionalRuRegionCodeFieldSchema } from "./ruRegions.js";
 import { isStoredMediaUrl } from "./storedMediaUrl.js";
 import { userSocialLinksBodyShape } from "./userSocialLinks.js";
-import { userAddressesPatchFieldSchema, USER_ADDRESS_PATCH_CONFLICT_MESSAGE } from "./userAddresses.js";
 import {
-  userBusinessHoursBodySchema,
-} from "./userBusinessHours.js";
+  userAddressesPatchFieldSchema,
+  USER_ADDRESS_PATCH_CONFLICT_MESSAGE,
+} from "./userAddresses.js";
+import { userBusinessHoursBodySchema } from "./userBusinessHours.js";
 
 /** Синхрон с `server/constants/profileImageFocusConstants.js`. */
 export const PROFILE_IMAGE_FOCUS_MIN = 0;
@@ -97,7 +98,9 @@ const clearableUserFullNameSchema = clearableOptionalString
   })
   .refine(
     (value) =>
-      value === undefined || value === null || value.length <= USER_FULL_NAME_MAX_LENGTH,
+      value === undefined ||
+      value === null ||
+      value.length <= USER_FULL_NAME_MAX_LENGTH,
     `Имя не длиннее ${USER_FULL_NAME_MAX_LENGTH} символов`,
   );
 
@@ -119,29 +122,28 @@ const clearableUserNameSchema = clearableOptionalString
     }
   });
 
-const clearableRuPhoneSchema = clearableOptionalString
-  .transform((raw, ctx) => {
-    if (raw === undefined) return undefined;
-    if (raw === null || raw === "") return null;
-    try {
-      const normalized = normalizeRuPhoneInput(raw);
-      if (!RU_PHONE_E164_REGEX.test(normalized)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message:
-            "Номер РФ: +7 9XX XXX XX XX (можно 8…, 9XXXXXXXXX или с пробелами/скобками)",
-        });
-        return z.NEVER;
-      }
-      return normalized;
-    } catch (error) {
+const clearableRuPhoneSchema = clearableOptionalString.transform((raw, ctx) => {
+  if (raw === undefined) return undefined;
+  if (raw === null || raw === "") return null;
+  try {
+    const normalized = normalizeRuPhoneInput(raw);
+    if (!RU_PHONE_E164_REGEX.test(normalized)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: error instanceof Error ? error.message : "Неверный номер телефона",
+        message:
+          "Номер РФ: +7 9XX XXX XX XX (можно 8…, 9XXXXXXXXX или с пробелами/скобками)",
       });
       return z.NEVER;
     }
-  });
+    return normalized;
+  } catch (error) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: error instanceof Error ? error.message : "Неверный номер телефона",
+    });
+    return z.NEVER;
+  }
+});
 
 const clearableBirthDateSchema = clearableOptionalString.superRefine((value, ctx) => {
   if (value === undefined || value === null || value === "") return;
@@ -172,27 +174,31 @@ const clearableAvatarUrlSchema = clearableOptionalString.superRefine((value, ctx
   });
 });
 
-const clearableBackgroundUrlSchema = clearableOptionalString.superRefine((value, ctx) => {
-  if (value === undefined || value === null || value === "") return;
-  if (parseUserBackgroundPresetId(value) || isHttpBackgroundImageUrl(value)) {
-    return;
-  }
-  ctx.addIssue({
-    code: z.ZodIssueCode.custom,
-    message: "Фон: пресет preset:<id> или URL (http/https, /uploads/...)",
-  });
-});
-
-const clearablePremiumExpiresAtSchema = clearableOptionalString.superRefine((value, ctx) => {
-  if (value === undefined || value === null || value === "") return;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
+const clearableBackgroundUrlSchema = clearableOptionalString.superRefine(
+  (value, ctx) => {
+    if (value === undefined || value === null || value === "") return;
+    if (parseUserBackgroundPresetId(value) || isHttpBackgroundImageUrl(value)) {
+      return;
+    }
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "premiumExpiresAt: некорректная дата",
+      message: "Фон: пресет preset:<id> или URL (http/https, /uploads/...)",
     });
-  }
-});
+  },
+);
+
+const clearablePremiumExpiresAtSchema = clearableOptionalString.superRefine(
+  (value, ctx) => {
+    if (value === undefined || value === null || value === "") return;
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "premiumExpiresAt: некорректная дата",
+      });
+    }
+  },
+);
 
 const clearableBooleanSchema = z.union([z.boolean(), z.null()]).optional();
 
@@ -203,112 +209,121 @@ export const sellerPayoutRequisitesFieldSchema = z
   .trim()
   .max(120, "Реквизиты не длиннее 120 символов");
 
-export const updateProfileBodySchema = z.object({
-  userName: clearableUserNameSchema,
-  userFullName: clearableUserFullNameSchema,
-  sellerPayoutRequisites: sellerPayoutRequisitesFieldSchema.optional(),
-  userBusinessHoursEnabled: clearableBooleanSchema,
-  userBusinessHours: userBusinessHoursBodySchema,
-  userBirthDate: clearableBirthDateSchema,
-  userGender: z.union([z.enum(USER_GENDER_VALUES), z.null()]).optional(),
-  userPhoneNumber: clearableRuPhoneSchema,
-  userAvatarUrl: clearableAvatarUrlSchema,
-  userAvatarFocus: clearableProfileImageFocusSchema,
-  userBackgroundFocus: clearableProfileImageFocusSchema,
-  userBackgroundUrl: clearableBackgroundUrlSchema,
-  userAddress: z
-    .union([z.string(), z.null(), z.literal("")])
-    .optional()
-    .transform((value) => {
-      if (value === undefined) return undefined;
-      if (value === null || value === "") return null;
-      return String(value).trim();
-    })
-    .refine(
-      (value) => value === undefined || value === null || value.length <= ADDRESS_LINE_MAX_LENGTH,
-      `Адрес не длиннее ${ADDRESS_LINE_MAX_LENGTH} символов`,
-    ),
-  userAddressFlat: z
-    .union([z.string(), z.null(), z.literal("")])
-    .optional()
-    .transform((value) => {
-      if (value === undefined) return undefined;
-      if (value === null || value === "") return null;
-      return String(value).trim();
-    }),
-  userAddressCity: userAddressCityFieldSchema,
-  userAddressDistrict: userAddressDistrictFieldSchema,
-  userAddressStreet: userAddressStreetFieldSchema,
-  userAddressHouse: userAddressHouseFieldSchema,
-  userAddresses: userAddressesPatchFieldSchema.optional(),
-  userRegionCode: optionalRuRegionCodeFieldSchema,
-  notificationsEnabled: clearableBooleanSchema,
-  userRole: z.union([z.enum(USER_ROLE_VALUES), z.null()]).optional(),
-  isActiveUser: clearableBooleanSchema,
-  isUserDataConfirmed: clearableBooleanSchema,
-  isBlockedUser: clearableBooleanSchema,
-  userDiscountPercent: z
-    .union([z.coerce.number(), z.null()])
-    .optional()
-    .refine(
-      (value) => value === undefined || value === null || (value >= 0 && value <= 100),
-      "Процент скидки должен быть числом от 0 до 100",
-    ),
-  /**
-   * Персональный лимит товаров: `null` — считать по премиуму, `-1` — без
-   * ограничений, иначе точное число.
-   */
-  sellerProductsLimitOverride: z
-    .union([z.coerce.number(), z.null()])
-    .optional()
-    .refine(
-      (value) =>
-        value === undefined ||
-        value === null ||
-        (Number.isInteger(value) &&
-          value >= SELLER_PRODUCTS_LIMIT_UNLIMITED &&
-          value <= SELLER_PRODUCTS_LIMIT_OVERRIDE_MAX),
-      `Лимит товаров: целое от 0 до ${SELLER_PRODUCTS_LIMIT_OVERRIDE_MAX} или -1 для «без ограничений»`,
-    ),
-  userLoyaltyPoints: z
-    .union([z.coerce.number().int(), z.null()])
-    .optional()
-    .refine(
-      (value) => value === undefined || value === null || value >= 0,
-      "Баллы лояльности должны быть целым числом не меньше 0",
-    ),
-  isPremiumUser: clearableBooleanSchema,
-  premiumExpiresAt: clearablePremiumExpiresAtSchema,
-  notesAboutUser: z
-    .union([z.string(), z.null(), z.literal("")])
-    .optional()
-    .transform((value) => {
-      if (value === undefined) return undefined;
-      if (value === null || value === "") return null;
-      return String(value).trim();
-    })
-    .refine(
-      (value) => value === undefined || value === null || value.length <= NOTES_ABOUT_USER_MAX_CHARS,
-      `Слишком длинный текст`,
-    ),
-  ...userSocialLinksBodyShape,
-}).superRefine((body, ctx) => {
-  if (body.userAddresses === undefined) {
-    return;
-  }
+export const updateProfileBodySchema = z
+  .object({
+    userName: clearableUserNameSchema,
+    userFullName: clearableUserFullNameSchema,
+    sellerPayoutRequisites: sellerPayoutRequisitesFieldSchema.optional(),
+    userBusinessHoursEnabled: clearableBooleanSchema,
+    userBusinessHours: userBusinessHoursBodySchema,
+    userBirthDate: clearableBirthDateSchema,
+    userGender: z.union([z.enum(USER_GENDER_VALUES), z.null()]).optional(),
+    userPhoneNumber: clearableRuPhoneSchema,
+    userAvatarUrl: clearableAvatarUrlSchema,
+    userAvatarFocus: clearableProfileImageFocusSchema,
+    userBackgroundFocus: clearableProfileImageFocusSchema,
+    userBackgroundUrl: clearableBackgroundUrlSchema,
+    userAddress: z
+      .union([z.string(), z.null(), z.literal("")])
+      .optional()
+      .transform((value) => {
+        if (value === undefined) return undefined;
+        if (value === null || value === "") return null;
+        return String(value).trim();
+      })
+      .refine(
+        (value) =>
+          value === undefined ||
+          value === null ||
+          value.length <= ADDRESS_LINE_MAX_LENGTH,
+        `Адрес не длиннее ${ADDRESS_LINE_MAX_LENGTH} символов`,
+      ),
+    userAddressFlat: z
+      .union([z.string(), z.null(), z.literal("")])
+      .optional()
+      .transform((value) => {
+        if (value === undefined) return undefined;
+        if (value === null || value === "") return null;
+        return String(value).trim();
+      }),
+    userAddressCity: userAddressCityFieldSchema,
+    userAddressDistrict: userAddressDistrictFieldSchema,
+    userAddressStreet: userAddressStreetFieldSchema,
+    userAddressHouse: userAddressHouseFieldSchema,
+    userAddresses: userAddressesPatchFieldSchema.optional(),
+    userRegionCode: optionalRuRegionCodeFieldSchema,
+    notificationsEnabled: clearableBooleanSchema,
+    userRole: z.union([z.enum(USER_ROLE_VALUES), z.null()]).optional(),
+    isActiveUser: clearableBooleanSchema,
+    isUserDataConfirmed: clearableBooleanSchema,
+    isBlockedUser: clearableBooleanSchema,
+    userDiscountPercent: z
+      .union([z.coerce.number(), z.null()])
+      .optional()
+      .refine(
+        (value) =>
+          value === undefined || value === null || (value >= 0 && value <= 100),
+        "Процент скидки должен быть числом от 0 до 100",
+      ),
+    /**
+     * Персональный лимит товаров: `null` — считать по премиуму, `-1` — без
+     * ограничений, иначе точное число.
+     */
+    sellerProductsLimitOverride: z
+      .union([z.coerce.number(), z.null()])
+      .optional()
+      .refine(
+        (value) =>
+          value === undefined ||
+          value === null ||
+          (Number.isInteger(value) &&
+            value >= SELLER_PRODUCTS_LIMIT_UNLIMITED &&
+            value <= SELLER_PRODUCTS_LIMIT_OVERRIDE_MAX),
+        `Лимит товаров: целое от 0 до ${SELLER_PRODUCTS_LIMIT_OVERRIDE_MAX} или -1 для «без ограничений»`,
+      ),
+    userLoyaltyPoints: z
+      .union([z.coerce.number().int(), z.null()])
+      .optional()
+      .refine(
+        (value) => value === undefined || value === null || value >= 0,
+        "Баллы лояльности должны быть целым числом не меньше 0",
+      ),
+    isPremiumUser: clearableBooleanSchema,
+    premiumExpiresAt: clearablePremiumExpiresAtSchema,
+    notesAboutUser: z
+      .union([z.string(), z.null(), z.literal("")])
+      .optional()
+      .transform((value) => {
+        if (value === undefined) return undefined;
+        if (value === null || value === "") return null;
+        return String(value).trim();
+      })
+      .refine(
+        (value) =>
+          value === undefined ||
+          value === null ||
+          value.length <= NOTES_ABOUT_USER_MAX_CHARS,
+        `Слишком длинный текст`,
+      ),
+    ...userSocialLinksBodyShape,
+  })
+  .superRefine((body, ctx) => {
+    if (body.userAddresses === undefined) {
+      return;
+    }
 
-  const hasLegacyAddress =
-    body.userAddress !== undefined ||
-    body.userAddressFlat !== undefined ||
-    body.userAddressCity !== undefined ||
-    body.userAddressDistrict !== undefined ||
-    body.userAddressStreet !== undefined ||
-    body.userAddressHouse !== undefined;
+    const hasLegacyAddress =
+      body.userAddress !== undefined ||
+      body.userAddressFlat !== undefined ||
+      body.userAddressCity !== undefined ||
+      body.userAddressDistrict !== undefined ||
+      body.userAddressStreet !== undefined ||
+      body.userAddressHouse !== undefined;
 
-  if (hasLegacyAddress) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: USER_ADDRESS_PATCH_CONFLICT_MESSAGE,
-    });
-  }
-});
+    if (hasLegacyAddress) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: USER_ADDRESS_PATCH_CONFLICT_MESSAGE,
+      });
+    }
+  });

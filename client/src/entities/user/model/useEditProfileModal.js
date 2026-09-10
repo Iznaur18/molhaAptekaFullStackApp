@@ -10,7 +10,11 @@ import { mapUserToEditProfileForm } from "../lib/mapUserToEditProfileForm.js";
 import { maskRuPhoneInput } from "../lib/ruPhone.js";
 import { keepDigitsOnly } from "../../../shared/lib/numericInput.js";
 import { validateEditProfileForm } from "../lib/validateEditProfileForm.js";
-import { ADMIN_EDIT_USER_UI, EDIT_PROFILE_MODAL_UI, USER_SAVED_ADDRESSES_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  ADMIN_EDIT_USER_UI,
+  EDIT_PROFILE_MODAL_UI,
+  USER_SAVED_ADDRESSES_UI,
+} from "../../../shared/config/appUiCopy.js";
 import { isHttpProfileImageUrl } from "../lib/profileImageFocus.js";
 import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { useBlockBackgroundScroll } from "../../../shared/lib/useBlockBackgroundScroll.js";
@@ -53,9 +57,7 @@ export function useEditProfileModal({
   });
   const wasOpenRef = useRef(false);
   const initialSavedAddressesRef = useRef(
-    /** @type {import('../../address/model/userSavedAddressTypes.js').UserSavedAddressFormValue[]} */ (
-      []
-    ),
+    /** @type {import('../../address/model/userSavedAddressTypes.js').UserSavedAddressFormValue[]} */ ([]),
   );
   const baselineEmailRef = useRef("");
   const baselinePhoneRef = useRef("");
@@ -151,8 +153,7 @@ export function useEditProfileModal({
     if (name === "userPhoneNumber" && typeof nextValue === "string") {
       setContactVerified((prev) => ({
         ...prev,
-        phone:
-          nextValue === baselinePhoneRef.current && user?.isPhoneVerified === true,
+        phone: nextValue === baselinePhoneRef.current && user?.isPhoneVerified === true,
       }));
     }
   };
@@ -205,20 +206,32 @@ export function useEditProfileModal({
       const phoneTrim = String(form.userPhoneNumber ?? "").trim();
 
       if (!emailTrim && baselineEmailRef.current) {
-        setFeedback({ kind: "error", message: EDIT_PROFILE_MODAL_UI.EMAIL_CLEAR_FORBIDDEN });
+        setFeedback({
+          kind: "error",
+          message: EDIT_PROFILE_MODAL_UI.EMAIL_CLEAR_FORBIDDEN,
+        });
         return;
       }
       if (emailTrim !== baselineEmailRef.current && contactVerified.email !== true) {
-        setFeedback({ kind: "error", message: EDIT_PROFILE_MODAL_UI.EMAIL_CHANGE_PENDING });
+        setFeedback({
+          kind: "error",
+          message: EDIT_PROFILE_MODAL_UI.EMAIL_CHANGE_PENDING,
+        });
         return;
       }
 
       if (!phoneTrim && baselinePhoneRef.current) {
-        setFeedback({ kind: "error", message: EDIT_PROFILE_MODAL_UI.PHONE_CLEAR_FORBIDDEN });
+        setFeedback({
+          kind: "error",
+          message: EDIT_PROFILE_MODAL_UI.PHONE_CLEAR_FORBIDDEN,
+        });
         return;
       }
       if (phoneTrim !== baselinePhoneRef.current && contactVerified.phone !== true) {
-        setFeedback({ kind: "error", message: EDIT_PROFILE_MODAL_UI.PHONE_CHANGE_PENDING });
+        setFeedback({
+          kind: "error",
+          message: EDIT_PROFILE_MODAL_UI.PHONE_CHANGE_PENDING,
+        });
         return;
       }
     }

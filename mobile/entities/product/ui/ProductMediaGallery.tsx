@@ -62,7 +62,10 @@ export const ProductMediaGallery = ({
     });
   }, [imageUrls, previewVideoUrl, previewVideoFailed]);
 
-  const safeSlideIndex = Math.min(activeSlideIndex, Math.max(0, mediaSlides.length - 1));
+  const safeSlideIndex = Math.min(
+    activeSlideIndex,
+    Math.max(0, mediaSlides.length - 1),
+  );
   const pagerSlideCount = Math.max(mediaSlides.length, 1);
   const hasMultipleSlides = mediaSlides.length > 1;
 
@@ -105,9 +108,12 @@ export const ProductMediaGallery = ({
     const thumbsContentStyle = isDetail
       ? [styles.detailThumbs, isSplitLayout && styles.detailThumbsSplit]
       : styles.thumbs;
-    const thumbVideoLabelStyle = isDetail ? styles.detailThumbVideoLabel : styles.thumbVideoLabel;
+    const thumbVideoLabelStyle = isDetail
+      ? styles.detailThumbVideoLabel
+      : styles.thumbVideoLabel;
 
-    const DetailThumbTouchable = isDetail && isReactNativeWeb() ? TouchableOpacity : Pressable;
+    const DetailThumbTouchable =
+      isDetail && isReactNativeWeb() ? TouchableOpacity : Pressable;
     const detailThumbActiveOpacity = isDetail && isReactNativeWeb() ? 0.85 : undefined;
 
     const thumbs = mediaSlides.map((slide, index) => (
@@ -117,7 +123,9 @@ export const ProductMediaGallery = ({
         onPress={() => setActiveSlideIndex(index)}
         accessibilityRole="tab"
         accessibilityState={{ selected: index === safeSlideIndex }}
-        {...(detailThumbActiveOpacity != null ? { activeOpacity: detailThumbActiveOpacity } : null)}
+        {...(detailThumbActiveOpacity != null
+          ? { activeOpacity: detailThumbActiveOpacity }
+          : null)}
       >
         {slide.type === "video" ? (
           <Text style={thumbVideoLabelStyle}>▶</Text>
@@ -186,7 +194,9 @@ export const ProductMediaGallery = ({
         {isDetail ? (
           <View style={styles.detailOverlay} pointerEvents="box-none">
             {heroOverlay}
-            {reportOverlay ? <View style={styles.detailReportSlot}>{reportOverlay}</View> : null}
+            {reportOverlay ? (
+              <View style={styles.detailReportSlot}>{reportOverlay}</View>
+            ) : null}
           </View>
         ) : null}
         {renderCounter()}

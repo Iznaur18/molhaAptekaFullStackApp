@@ -222,7 +222,8 @@ export const UserProfileThumbScrollRow = ({
     const isUnavailable = applySellerProductGates
       ? isProfileProductThumbUnavailable(item, { isSelf })
       : !item.viewable || item.product == null;
-    const isCurrent = currentProductId.length > 0 && String(item.productId) === currentProductId;
+    const isCurrent =
+      currentProductId.length > 0 && String(item.productId) === currentProductId;
     const thumbSrc = failedThumbIds.has(item.productId)
       ? null
       : getUserProfileThumbSrc(item.product);
@@ -300,7 +301,8 @@ export const UserProfileThumbSection = ({
   const isHorizontalChrome = layout === "horizontal";
   const useScrollRow = layout === "horizontal" || layout === "profile-scroll";
 
-  const showViewAll = typeof onViewAllPress === "function" && phase === "success" && items.length > 0;
+  const showViewAll =
+    typeof onViewAllPress === "function" && phase === "success" && items.length > 0;
 
   const handleItemPress = (item: UserProfileThumbItem) => {
     const isUnavailable = applySellerProductGates
@@ -335,12 +337,22 @@ export const UserProfileThumbSection = ({
             onPress={onHeadingPress}
             accessibilityRole="button"
           >
-            <Text style={[styles.headerTitle, isHorizontalChrome && styles.headerTitleHorizontal]}>
+            <Text
+              style={[
+                styles.headerTitle,
+                isHorizontalChrome && styles.headerTitleHorizontal,
+              ]}
+            >
               {heading}
             </Text>
           </Pressable>
         ) : (
-          <Text style={[styles.headerTitle, isHorizontalChrome && styles.headerTitleHorizontal]}>
+          <Text
+            style={[
+              styles.headerTitle,
+              isHorizontalChrome && styles.headerTitleHorizontal,
+            ]}
+          >
             {heading}
           </Text>
         )}

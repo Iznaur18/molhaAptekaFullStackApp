@@ -20,12 +20,17 @@ export async function fetchWebPushVapidPublicKey() {
  */
 export async function registerWebPushSubscription(subscription) {
   try {
-    const { data } = await apiClient.put("/auth/me/web-push-subscription", subscription);
+    const { data } = await apiClient.put(
+      "/auth/me/web-push-subscription",
+      subscription,
+    );
     if (!data?.success) {
       throw new Error("Не удалось включить push-уведомления");
     }
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, "Не удалось включить push-уведомления"));
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось включить push-уведомления"),
+    );
   }
 }
 
@@ -38,6 +43,8 @@ export async function removeWebPushSubscription(endpoint) {
       data: { endpoint },
     });
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, "Не удалось отключить push-уведомления"));
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось отключить push-уведомления"),
+    );
   }
 }

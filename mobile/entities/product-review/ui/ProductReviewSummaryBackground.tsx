@@ -1,10 +1,18 @@
-import { Platform, StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
+import {
+  Platform,
+  StyleSheet,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 
 import { resolveProductReviewSummaryPalette } from "@/entities/product-review/lib/productReviewSummaryPalette";
 import type { ColorScheme } from "@izibuy/design-tokens";
 
-type ProductReviewSummaryPalette = ReturnType<typeof resolveProductReviewSummaryPalette>;
+type ProductReviewSummaryPalette = ReturnType<
+  typeof resolveProductReviewSummaryPalette
+>;
 
 const GRADIENT_SVG_ID = "productReviewSummaryGradient";
 
@@ -43,7 +51,10 @@ export const ProductReviewSummaryBackground = ({
   }
 
   return (
-    <View style={[StyleSheet.absoluteFill, { borderRadius }, style]} pointerEvents="none">
+    <View
+      style={[StyleSheet.absoluteFill, { borderRadius }, style]}
+      pointerEvents="none"
+    >
       <Svg width="100%" height="100%" preserveAspectRatio="none">
         <Defs>
           <LinearGradient id={GRADIENT_SVG_ID} x1="0" y1="0" x2="0.72" y2="1">
@@ -51,7 +62,12 @@ export const ProductReviewSummaryBackground = ({
             <Stop offset="1" stopColor={palette.gradientEnd} />
           </LinearGradient>
         </Defs>
-        <Rect width="100%" height="100%" rx={borderRadius} fill={`url(#${GRADIENT_SVG_ID})`} />
+        <Rect
+          width="100%"
+          height="100%"
+          rx={borderRadius}
+          fill={`url(#${GRADIENT_SVG_ID})`}
+        />
       </Svg>
     </View>
   );

@@ -1,9 +1,6 @@
 /* Радиус карточек/панелей вкладок профиля = кнопке «РАЗДЕЛ» (см. --my-profile-surface-radius).
    Orders/Sales/Auction/Installment: radius как в app — не форсим 24. */
-.my-profile-page__tab-content :where(
-  .order-card:not(.order-card--compact),
-  .wishlist-row,
-  .subscription-user-row
-) {
+.my-profile-page__tab-content
+  :where(.order-card:not(.order-card--compact), .wishlist-row, .subscription-user-row) {
   border-radius: var(--my-profile-surface-radius);
 }

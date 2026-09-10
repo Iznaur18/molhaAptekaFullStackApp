@@ -192,7 +192,8 @@ export const ProductPromotionModal = ({
 }: ProductPromotionModalProps) => {
   const styles = useProductPromotionModalStyles();
   const theme = useAppTheme();
-  const resolvedProductName = String(product?.productName ?? productName).trim() || "Без названия";
+  const resolvedProductName =
+    String(product?.productName ?? productName).trim() || "Без названия";
   const resolvedProductPrice =
     product?.productPrice != null ? Number(product.productPrice) || 0 : productPrice;
   const showManageSection =
@@ -284,10 +285,7 @@ export const ProductPromotionModal = ({
 
     if (tariffsError) {
       return (
-        <ScreenErrorState
-          message={tariffsError.message}
-          onRetry={onRetryTariffs}
-        />
+        <ScreenErrorState message={tariffsError.message} onRetry={onRetryTariffs} />
       );
     }
 
@@ -295,7 +293,9 @@ export const ProductPromotionModal = ({
       <>
         <View style={[styles.overviewCard, styles.overviewCardOk]}>
           <View>
-            <Text style={styles.overviewProductLabel}>{PRODUCT_PROMOTION_UI.PRODUCT_LABEL}</Text>
+            <Text style={styles.overviewProductLabel}>
+              {PRODUCT_PROMOTION_UI.PRODUCT_LABEL}
+            </Text>
             <Text style={styles.overviewProductName} numberOfLines={2}>
               {resolvedProductName}
             </Text>
@@ -308,7 +308,10 @@ export const ProductPromotionModal = ({
             {tiers.map((tier) => {
               const isSelected = selectedTier === tier.tier;
               const ratePercent = formatProductPromotionTierRatePercent(tier.tier);
-              const tierStyle = resolveProductPromotionTierCardStyle(tier.tier, isSelected);
+              const tierStyle = resolveProductPromotionTierCardStyle(
+                tier.tier,
+                isSelected,
+              );
               const chrome = getProductPromotionTierChrome(tier.tier);
               return (
                 <Pressable
@@ -318,8 +321,14 @@ export const ProductPromotionModal = ({
                   onPress={() => setSelectedTier(tier.tier)}
                 >
                   {isSelected ? (
-                    <View style={[styles.tierCheck, { backgroundColor: chrome.accent }]}>
-                      <MaterialIcons name="check" size={14} color={theme.colors.onContrast} />
+                    <View
+                      style={[styles.tierCheck, { backgroundColor: chrome.accent }]}
+                    >
+                      <MaterialIcons
+                        name="check"
+                        size={14}
+                        color={theme.colors.onContrast}
+                      />
                     </View>
                   ) : null}
                   <Text
@@ -377,17 +386,23 @@ export const ProductPromotionModal = ({
             <>
               <View style={styles.planDivider} />
               <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>{PRODUCT_PROMOTION_UI.SUMMARY_TIER}</Text>
+                <Text style={styles.summaryLabel}>
+                  {PRODUCT_PROMOTION_UI.SUMMARY_TIER}
+                </Text>
                 <Text style={styles.summaryValueStrong}>{selectedTierMeta.title}</Text>
               </View>
               <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>{PRODUCT_PROMOTION_UI.SUMMARY_DURATION}</Text>
+                <Text style={styles.summaryLabel}>
+                  {PRODUCT_PROMOTION_UI.SUMMARY_DURATION}
+                </Text>
                 <Text style={styles.summaryValueStrong}>
                   {PRODUCT_PROMOTION_UI.TARIFF_DURATION(selectedDuration.durationHours)}
                 </Text>
               </View>
               <View style={[styles.summaryRow, styles.summaryTotalRow]}>
-                <Text style={styles.summaryValueBold}>{PRODUCT_PROMOTION_UI.TOTAL_LABEL}</Text>
+                <Text style={styles.summaryValueBold}>
+                  {PRODUCT_PROMOTION_UI.TOTAL_LABEL}
+                </Text>
                 <Text
                   style={[
                     styles.summaryTotalValue,
@@ -474,186 +489,188 @@ export const ProductPromotionModal = ({
   return (
     <>
       <Modal
-      visible={visible}
-      animationType={Platform.OS === "web" ? "none" : "slide"}
-      transparent
-      onRequestClose={onClose}
-    >
-      <View style={styles.overlay} pointerEvents="box-none">
-        <ModalSheetGradientBackdrop />
-        <View style={styles.card} pointerEvents="auto">
-          <View style={styles.headerRow}>
-            <Text style={styles.title}>{PRODUCT_PROMOTION_UI.MODAL_TITLE}</Text>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={PRODUCT_PROMOTION_UI.CLOSE}
-              disabled={isSubmitting}
-              style={({ pressed }) => [
-                styles.closeCircleButton,
-                pressed && styles.closeCircleButtonPressed,
-                isSubmitting && styles.buttonDisabled,
-              ]}
-              onPress={onClose}
-            >
-              <MaterialIcons name="close" size={18} color={theme.colors.textMuted} />
-            </Pressable>
-          </View>
-
-          {showManageSection ? (
-            <View style={styles.headerAddon}>
-              <ProductPromotionModalTabs
-                activeTabId={activeTabId}
-                onTabChange={(tabId) => setActiveTabId(tabId as typeof activeTabId)}
-                showManageTab={showManageSection}
-              />
-            </View>
-          ) : null}
-
-          {isPromotionTab ? (
-            <ScrollView
-              ref={bodyScrollRef}
-              style={styles.bodyScroll}
-              contentContainerStyle={styles.body}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator
-            >
-              {renderBody()}
-            </ScrollView>
-          ) : (
-            <ScrollView
-              style={styles.bodyScroll}
-              contentContainerStyle={styles.body}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator
-            >
-              {renderBody()}
-            </ScrollView>
-          )}
-
-          {isPromotionTab ? (
-            <View style={styles.footer}>
+        visible={visible}
+        animationType={Platform.OS === "web" ? "none" : "slide"}
+        transparent
+        onRequestClose={onClose}
+      >
+        <View style={styles.overlay} pointerEvents="box-none">
+          <ModalSheetGradientBackdrop />
+          <View style={styles.card} pointerEvents="auto">
+            <View style={styles.headerRow}>
+              <Text style={styles.title}>{PRODUCT_PROMOTION_UI.MODAL_TITLE}</Text>
               <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={PRODUCT_PROMOTION_UI.CLOSE}
+                disabled={isSubmitting}
                 style={({ pressed }) => [
-                  styles.primaryButton,
-                  styles.primaryButtonFull,
-                  pressed && styles.buttonPressed,
-                  (isTariffsLoading ||
+                  styles.closeCircleButton,
+                  pressed && styles.closeCircleButtonPressed,
+                  isSubmitting && styles.buttonDisabled,
+                ]}
+                onPress={onClose}
+              >
+                <MaterialIcons name="close" size={18} color={theme.colors.textMuted} />
+              </Pressable>
+            </View>
+
+            {showManageSection ? (
+              <View style={styles.headerAddon}>
+                <ProductPromotionModalTabs
+                  activeTabId={activeTabId}
+                  onTabChange={(tabId) => setActiveTabId(tabId as typeof activeTabId)}
+                  showManageTab={showManageSection}
+                />
+              </View>
+            ) : null}
+
+            {isPromotionTab ? (
+              <ScrollView
+                ref={bodyScrollRef}
+                style={styles.bodyScroll}
+                contentContainerStyle={styles.body}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator
+              >
+                {renderBody()}
+              </ScrollView>
+            ) : (
+              <ScrollView
+                style={styles.bodyScroll}
+                contentContainerStyle={styles.body}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator
+              >
+                {renderBody()}
+              </ScrollView>
+            )}
+
+            {isPromotionTab ? (
+              <View style={styles.footer}>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.primaryButton,
+                    styles.primaryButtonFull,
+                    pressed && styles.buttonPressed,
+                    (isTariffsLoading ||
+                      Boolean(tariffsError) ||
+                      !selectedDuration ||
+                      isSubmitting ||
+                      tiers.length === 0) &&
+                      styles.buttonDisabled,
+                  ]}
+                  onPress={handleSubmit}
+                  disabled={
+                    isTariffsLoading ||
                     Boolean(tariffsError) ||
                     !selectedDuration ||
                     isSubmitting ||
-                    tiers.length === 0) &&
-                    styles.buttonDisabled,
-                ]}
-                onPress={handleSubmit}
-                disabled={
-                  isTariffsLoading ||
-                  Boolean(tariffsError) ||
-                  !selectedDuration ||
-                  isSubmitting ||
-                  tiers.length === 0
+                    tiers.length === 0
+                  }
+                >
+                  {isSubmitting ? (
+                    <ActivityIndicator color={theme.colors.onContrast} />
+                  ) : (
+                    <Text style={styles.primaryButtonText}>
+                      {PRODUCT_PROMOTION_UI.SUBMIT_POINTS}
+                    </Text>
+                  )}
+                </Pressable>
+              </View>
+            ) : null}
+          </View>
+          {isInstallmentProgramOpen && product?._id != null ? (
+            <InstallmentProgramModal
+              embedded
+              visible
+              productId={String(product._id)}
+              productName={resolvedProductName}
+              productPrice={resolvedProductPrice}
+              onClose={() => setIsInstallmentProgramOpen(false)}
+              onSaved={onInstallmentProgramSaved}
+            />
+          ) : null}
+          {isWholesaleOpen ? (
+            <WholesalePriceModal
+              embedded
+              visible
+              product={product}
+              onClose={() => setIsWholesaleOpen(false)}
+              onSaved={onWholesaleSaved}
+            />
+          ) : null}
+          {isBuyNFreeOpen ? (
+            <ProductBuyNFreeModal
+              embedded
+              visible
+              product={product}
+              onClose={() => setIsBuyNFreeOpen(false)}
+              onSaved={onWholesaleSaved}
+            />
+          ) : null}
+          {isOutOfStockLabelOpen ? (
+            <ProductOutOfStockLabelModal
+              embedded
+              visible
+              product={product}
+              onClose={() => setIsOutOfStockLabelOpen(false)}
+              onSaved={onWholesaleSaved}
+            />
+          ) : null}
+          {isRentalOpen ? (
+            <ProductRentalManageModal
+              embedded
+              visible
+              product={product}
+              onClose={() => setIsRentalOpen(false)}
+              onSaved={onWholesaleSaved}
+            />
+          ) : null}
+          {isFlashSaleOpen ? (
+            <ProductFlashSaleModal
+              embedded
+              visible
+              product={product}
+              onClose={() => setIsFlashSaleOpen(false)}
+              onSaved={onWholesaleSaved}
+            />
+          ) : null}
+          {isPromoCodesOpen ? (
+            <ProductPromoCodesModal
+              embedded
+              visible
+              product={product}
+              onClose={() => setIsPromoCodesOpen(false)}
+              onSaved={(payload) => {
+                if (product) {
+                  onWholesaleSaved?.({
+                    ...product,
+                    productHasActivePromoCodes: payload.productHasActivePromoCodes,
+                  });
                 }
-              >
-                {isSubmitting ? (
-                  <ActivityIndicator color={theme.colors.onContrast} />
-                ) : (
-                  <Text style={styles.primaryButtonText}>{PRODUCT_PROMOTION_UI.SUBMIT_POINTS}</Text>
-                )}
-              </Pressable>
-            </View>
+              }}
+            />
+          ) : null}
+          {isAffiliateOpen ? (
+            <AffiliatePercentModal
+              embedded
+              visible
+              product={product}
+              onClose={() => setIsAffiliateOpen(false)}
+              onSaved={onWholesaleSaved}
+            />
+          ) : null}
+          {isLoyaltyOpen ? (
+            <ProductLoyaltyPointsModal
+              embedded
+              visible
+              product={product}
+              onClose={() => setIsLoyaltyOpen(false)}
+              onSaved={onWholesaleSaved}
+            />
           ) : null}
         </View>
-        {isInstallmentProgramOpen && product?._id != null ? (
-          <InstallmentProgramModal
-            embedded
-            visible
-            productId={String(product._id)}
-            productName={resolvedProductName}
-            productPrice={resolvedProductPrice}
-            onClose={() => setIsInstallmentProgramOpen(false)}
-            onSaved={onInstallmentProgramSaved}
-          />
-        ) : null}
-        {isWholesaleOpen ? (
-          <WholesalePriceModal
-            embedded
-            visible
-            product={product}
-            onClose={() => setIsWholesaleOpen(false)}
-            onSaved={onWholesaleSaved}
-          />
-        ) : null}
-        {isBuyNFreeOpen ? (
-          <ProductBuyNFreeModal
-            embedded
-            visible
-            product={product}
-            onClose={() => setIsBuyNFreeOpen(false)}
-            onSaved={onWholesaleSaved}
-          />
-        ) : null}
-        {isOutOfStockLabelOpen ? (
-          <ProductOutOfStockLabelModal
-            embedded
-            visible
-            product={product}
-            onClose={() => setIsOutOfStockLabelOpen(false)}
-            onSaved={onWholesaleSaved}
-          />
-        ) : null}
-        {isRentalOpen ? (
-          <ProductRentalManageModal
-            embedded
-            visible
-            product={product}
-            onClose={() => setIsRentalOpen(false)}
-            onSaved={onWholesaleSaved}
-          />
-        ) : null}
-        {isFlashSaleOpen ? (
-          <ProductFlashSaleModal
-            embedded
-            visible
-            product={product}
-            onClose={() => setIsFlashSaleOpen(false)}
-            onSaved={onWholesaleSaved}
-          />
-        ) : null}
-        {isPromoCodesOpen ? (
-          <ProductPromoCodesModal
-            embedded
-            visible
-            product={product}
-            onClose={() => setIsPromoCodesOpen(false)}
-            onSaved={(payload) => {
-              if (product) {
-                onWholesaleSaved?.({
-                  ...product,
-                  productHasActivePromoCodes: payload.productHasActivePromoCodes,
-                });
-              }
-            }}
-          />
-        ) : null}
-        {isAffiliateOpen ? (
-          <AffiliatePercentModal
-            embedded
-            visible
-            product={product}
-            onClose={() => setIsAffiliateOpen(false)}
-            onSaved={onWholesaleSaved}
-          />
-        ) : null}
-        {isLoyaltyOpen ? (
-          <ProductLoyaltyPointsModal
-            embedded
-            visible
-            product={product}
-            onClose={() => setIsLoyaltyOpen(false)}
-            onSaved={onWholesaleSaved}
-          />
-        ) : null}
-      </View>
-    </Modal>
+      </Modal>
     </>
   );
 };

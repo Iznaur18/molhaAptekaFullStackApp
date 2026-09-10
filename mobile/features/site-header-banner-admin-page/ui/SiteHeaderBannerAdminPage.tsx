@@ -34,9 +34,18 @@ import { useSiteHeaderBannerAdminPageStyles } from "@/shared/theme/siteHeaderBan
 import { ScreenErrorState } from "@/shared/ui/ScreenStates";
 
 const ADMIN_TABS = [
-  { id: SITE_HEADER_BANNER_ADMIN_TAB_SLIDES, label: SITE_HEADER_BANNER_ADMIN_PAGE_UI.TAB_SLIDES },
-  { id: SITE_HEADER_BANNER_ADMIN_TAB_BUTTONS, label: SITE_HEADER_BANNER_ADMIN_PAGE_UI.TAB_BUTTONS },
-  { id: SITE_HEADER_BANNER_ADMIN_TAB_GUEST, label: SITE_HEADER_BANNER_ADMIN_PAGE_UI.TAB_GUEST },
+  {
+    id: SITE_HEADER_BANNER_ADMIN_TAB_SLIDES,
+    label: SITE_HEADER_BANNER_ADMIN_PAGE_UI.TAB_SLIDES,
+  },
+  {
+    id: SITE_HEADER_BANNER_ADMIN_TAB_BUTTONS,
+    label: SITE_HEADER_BANNER_ADMIN_PAGE_UI.TAB_BUTTONS,
+  },
+  {
+    id: SITE_HEADER_BANNER_ADMIN_TAB_GUEST,
+    label: SITE_HEADER_BANNER_ADMIN_PAGE_UI.TAB_GUEST,
+  },
 ] as const;
 
 const resolveNextSelectedSlideId = (
@@ -101,7 +110,10 @@ export const SiteHeaderBannerAdminPage = () => {
     [form],
   );
 
-  const scrollBodyStyle = [styles.container, scrollEnabled ? centeredContentStyle : null];
+  const scrollBodyStyle = [
+    styles.container,
+    scrollEnabled ? centeredContentStyle : null,
+  ];
   const scrollContentStyle = [
     styles.scroll,
     styles.content,
@@ -114,8 +126,8 @@ export const SiteHeaderBannerAdminPage = () => {
     ? form.items.findIndex((item) => item.id === selectedSlide.id)
     : -1;
   const showFormSave =
-    activeTab === SITE_HEADER_BANNER_ADMIN_TAB_SLIDES
-    || activeTab === SITE_HEADER_BANNER_ADMIN_TAB_GUEST;
+    activeTab === SITE_HEADER_BANNER_ADMIN_TAB_SLIDES ||
+    activeTab === SITE_HEADER_BANNER_ADMIN_TAB_GUEST;
 
   const updateForm = (next: SiteHeaderBannerAdminForm) => {
     setFormState(next);
@@ -152,7 +164,11 @@ export const SiteHeaderBannerAdminPage = () => {
       {sectionToggle}
       <Text style={styles.title}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.TITLE}</Text>
       <Text style={styles.hint}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.HINT}</Text>
-      <SiteHeaderBannerAdminTabBar tabs={[...ADMIN_TABS]} activeTab={activeTab} onTabChange={setActiveTab} />
+      <SiteHeaderBannerAdminTabBar
+        tabs={[...ADMIN_TABS]}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
     </View>
   );
 
@@ -160,7 +176,9 @@ export const SiteHeaderBannerAdminPage = () => {
     <View style={styles.tabPanel}>
       <View style={[styles.panelSection, styles.toolbar]}>
         <View style={styles.switchRow}>
-          <Text style={styles.labelText}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_ENABLED}</Text>
+          <Text style={styles.labelText}>
+            {SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_ENABLED}
+          </Text>
           <Switch
             value={form.enabled}
             disabled={isSaving}
@@ -172,41 +190,68 @@ export const SiteHeaderBannerAdminPage = () => {
           disabled={isSaving}
           onPress={handleAddSlide}
         >
-          <Text style={styles.buttonTextSecondary}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.ADD_ITEM}</Text>
+          <Text style={styles.buttonTextSecondary}>
+            {SITE_HEADER_BANNER_ADMIN_PAGE_UI.ADD_ITEM}
+          </Text>
         </Pressable>
       </View>
 
       <View style={styles.previewCard}>
-        <Text style={styles.sectionTitle}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.SECTION_PREVIEW}</Text>
-        <Text style={styles.fieldHint}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.HINT_PREVIEW}</Text>
+        <Text style={styles.sectionTitle}>
+          {SITE_HEADER_BANNER_ADMIN_PAGE_UI.SECTION_PREVIEW}
+        </Text>
+        <Text style={styles.fieldHint}>
+          {SITE_HEADER_BANNER_ADMIN_PAGE_UI.HINT_PREVIEW}
+        </Text>
         {previewSlides.length > 0 ? (
           <View style={styles.preview}>
             <SiteHeaderBannerCarousel slides={previewSlides} />
           </View>
         ) : (
-          <Text style={styles.previewEmpty}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.PREVIEW_EMPTY}</Text>
+          <Text style={styles.previewEmpty}>
+            {SITE_HEADER_BANNER_ADMIN_PAGE_UI.PREVIEW_EMPTY}
+          </Text>
         )}
       </View>
 
       <View style={styles.slidePicker}>
-        <Text style={styles.sectionTitle}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.SECTION_ITEMS}</Text>
-        <Text style={styles.fieldHint}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.SELECT_SLIDE_HINT}</Text>
+        <Text style={styles.sectionTitle}>
+          {SITE_HEADER_BANNER_ADMIN_PAGE_UI.SECTION_ITEMS}
+        </Text>
+        <Text style={styles.fieldHint}>
+          {SITE_HEADER_BANNER_ADMIN_PAGE_UI.SELECT_SLIDE_HINT}
+        </Text>
         {form.items.length === 0 ? (
-          <Text style={styles.empty}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.EMPTY_ITEMS}</Text>
+          <Text style={styles.empty}>
+            {SITE_HEADER_BANNER_ADMIN_PAGE_UI.EMPTY_ITEMS}
+          </Text>
         ) : (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.slidePickerRow}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.slidePickerRow}
+          >
             {form.items.map((item, index) => {
               const isActive = item.id === selectedSlideId;
               const label =
-                item.imageAlt.trim() || SITE_HEADER_BANNER_ADMIN_PAGE_UI.ITEM_TITLE(index + 1);
+                item.imageAlt.trim() ||
+                SITE_HEADER_BANNER_ADMIN_PAGE_UI.ITEM_TITLE(index + 1);
               return (
                 <Pressable
                   key={item.id}
-                  style={[styles.slidePickerItem, isActive && styles.slidePickerItemActive]}
+                  style={[
+                    styles.slidePickerItem,
+                    isActive && styles.slidePickerItemActive,
+                  ]}
                   disabled={isSaving}
                   onPress={() => setSelectedSlideId(item.id)}
                 >
-                  <Text style={[styles.slidePickerIndex, isActive && styles.slidePickerIndexActive]}>
+                  <Text
+                    style={[
+                      styles.slidePickerIndex,
+                      isActive && styles.slidePickerIndexActive,
+                    ]}
+                  >
                     {index + 1}
                   </Text>
                   <Text style={styles.slidePickerLabel} numberOfLines={1}>
@@ -232,7 +277,9 @@ export const SiteHeaderBannerAdminPage = () => {
 
           <View style={styles.fieldBlock}>
             <View style={styles.switchRow}>
-              <Text style={styles.labelText}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_ITEM_ENABLED}</Text>
+              <Text style={styles.labelText}>
+                {SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_ITEM_ENABLED}
+              </Text>
               <Switch
                 value={selectedSlide.enabled}
                 disabled={isSaving}
@@ -262,12 +309,16 @@ export const SiteHeaderBannerAdminPage = () => {
                 })
               }
             />
-            <Text style={styles.fieldHint}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.HINT_IMAGE}</Text>
+            <Text style={styles.fieldHint}>
+              {SITE_HEADER_BANNER_ADMIN_PAGE_UI.HINT_IMAGE}
+            </Text>
           </View>
 
           <View style={styles.fieldBlock}>
             <View style={styles.label}>
-              <Text style={styles.labelText}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_IMAGE_ALT}</Text>
+              <Text style={styles.labelText}>
+                {SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_IMAGE_ALT}
+              </Text>
               <TextInput
                 style={styles.input}
                 value={selectedSlide.imageAlt}
@@ -287,7 +338,9 @@ export const SiteHeaderBannerAdminPage = () => {
 
           <View style={styles.fieldBlock}>
             <View style={styles.label}>
-              <Text style={styles.labelText}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_LINK_PATH}</Text>
+              <Text style={styles.labelText}>
+                {SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_LINK_PATH}
+              </Text>
               <TextInput
                 style={styles.input}
                 value={selectedSlide.linkPath}
@@ -304,12 +357,16 @@ export const SiteHeaderBannerAdminPage = () => {
                 autoCapitalize="none"
               />
             </View>
-            <Text style={styles.fieldHint}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.HINT_LINK_PATH}</Text>
+            <Text style={styles.fieldHint}>
+              {SITE_HEADER_BANNER_ADMIN_PAGE_UI.HINT_LINK_PATH}
+            </Text>
           </View>
 
           <View style={styles.fieldBlock}>
             <View style={styles.label}>
-              <Text style={styles.labelText}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_BACKGROUND_COLOR}</Text>
+              <Text style={styles.labelText}>
+                {SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_BACKGROUND_COLOR}
+              </Text>
               <View style={styles.colorField}>
                 <View
                   style={[
@@ -328,7 +385,8 @@ export const SiteHeaderBannerAdminPage = () => {
                   value={selectedSlide.backgroundColor}
                   editable={!isSaving}
                   onChangeText={(backgroundColor) => {
-                    const normalized = normalizeSiteHeaderBannerHexColor(backgroundColor);
+                    const normalized =
+                      normalizeSiteHeaderBannerHexColor(backgroundColor);
                     updateForm({
                       ...form,
                       items: form.items.map((entry) =>
@@ -350,20 +408,26 @@ export const SiteHeaderBannerAdminPage = () => {
               style={[styles.button, styles.buttonDanger, isSaving && { opacity: 0.7 }]}
               disabled={isSaving}
               onPress={() => {
-                const nextItems = form.items.filter((entry) => entry.id !== selectedSlide.id);
+                const nextItems = form.items.filter(
+                  (entry) => entry.id !== selectedSlide.id,
+                );
                 setSelectedSlideId((currentId) =>
                   resolveNextSelectedSlideId(nextItems, selectedSlide.id, currentId),
                 );
                 updateForm({ ...form, items: nextItems });
               }}
             >
-              <Text style={styles.buttonTextDanger}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.REMOVE_ITEM}</Text>
+              <Text style={styles.buttonTextDanger}>
+                {SITE_HEADER_BANNER_ADMIN_PAGE_UI.REMOVE_ITEM}
+              </Text>
             </Pressable>
           </View>
         </View>
       ) : (
         <View style={styles.slideEditorEmpty}>
-          <Text style={styles.empty}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.NO_SLIDE_SELECTED}</Text>
+          <Text style={styles.empty}>
+            {SITE_HEADER_BANNER_ADMIN_PAGE_UI.NO_SLIDE_SELECTED}
+          </Text>
         </View>
       )}
     </View>
@@ -372,10 +436,16 @@ export const SiteHeaderBannerAdminPage = () => {
   const renderGuestTab = () => (
     <View style={styles.tabPanel}>
       <View style={styles.standalonePanel}>
-        <Text style={styles.sectionTitle}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.TAB_GUEST}</Text>
-        <Text style={styles.fieldHint}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.HINT_GUEST_PROFILE}</Text>
+        <Text style={styles.sectionTitle}>
+          {SITE_HEADER_BANNER_ADMIN_PAGE_UI.TAB_GUEST}
+        </Text>
+        <Text style={styles.fieldHint}>
+          {SITE_HEADER_BANNER_ADMIN_PAGE_UI.HINT_GUEST_PROFILE}
+        </Text>
         <ImageUrlUploadField
-          label={SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_GUEST_PROFILE_LOGIN_MENU_BANNER_IMAGE}
+          label={
+            SITE_HEADER_BANNER_ADMIN_PAGE_UI.LABEL_GUEST_PROFILE_LOGIN_MENU_BANNER_IMAGE
+          }
           value={form.guestProfileLoginMenuBannerImageUrl}
           disabled={isSaving}
           onChange={(imageUrl) =>
@@ -408,7 +478,9 @@ export const SiteHeaderBannerAdminPage = () => {
             onPress={() => void handleSave()}
           >
             <Text style={styles.buttonTextPrimary}>
-              {isSaving ? SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVING : SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVE}
+              {isSaving
+                ? SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVING
+                : SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVE}
             </Text>
           </Pressable>
         </View>
@@ -419,7 +491,10 @@ export const SiteHeaderBannerAdminPage = () => {
   if (phase === "loading") {
     return (
       <>
-        <ProfileAccountScrollBody style={scrollBodyStyle} contentContainerStyle={scrollContentStyle}>
+        <ProfileAccountScrollBody
+          style={scrollBodyStyle}
+          contentContainerStyle={scrollContentStyle}
+        >
           {pageHeader}
           <Text style={styles.status}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.LOADING}</Text>
         </ProfileAccountScrollBody>
@@ -431,9 +506,15 @@ export const SiteHeaderBannerAdminPage = () => {
   if (phase === "error") {
     return (
       <>
-        <ProfileAccountScrollBody style={scrollBodyStyle} contentContainerStyle={scrollContentStyle}>
+        <ProfileAccountScrollBody
+          style={scrollBodyStyle}
+          contentContainerStyle={scrollContentStyle}
+        >
           {pageHeader}
-          <ScreenErrorState message={queryError} onRetry={() => void reloadSettings()} />
+          <ScreenErrorState
+            message={queryError}
+            onRetry={() => void reloadSettings()}
+          />
         </ProfileAccountScrollBody>
         {navSheet}
       </>
@@ -442,12 +523,17 @@ export const SiteHeaderBannerAdminPage = () => {
 
   return (
     <>
-      <ProfileAccountScrollBody style={scrollBodyStyle} contentContainerStyle={scrollContentStyle}>
+      <ProfileAccountScrollBody
+        style={scrollBodyStyle}
+        contentContainerStyle={scrollContentStyle}
+      >
         {pageHeader}
 
         {saveNotice ? (
           <View style={styles.notice}>
-            <Text style={styles.noticeText}>{SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVE_SUCCESS}</Text>
+            <Text style={styles.noticeText}>
+              {SITE_HEADER_BANNER_ADMIN_PAGE_UI.SAVE_SUCCESS}
+            </Text>
           </View>
         ) : null}
 

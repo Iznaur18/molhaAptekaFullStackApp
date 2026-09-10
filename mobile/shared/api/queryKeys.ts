@@ -111,18 +111,21 @@ export const raffleQueryKeys = {
 export const productPromotionQueryKeys = {
   all: ["product-promotions"] as const,
   staffPending: () => [...productPromotionQueryKeys.all, "staff", "pending"] as const,
-  pendingCount: () => [...productPromotionQueryKeys.all, "staff", "pending-count"] as const,
+  pendingCount: () =>
+    [...productPromotionQueryKeys.all, "staff", "pending-count"] as const,
 };
 
 export const userStoriesQueryKeys = {
   all: ["user-stories"] as const,
   feed: () => [...userStoriesQueryKeys.all, "feed"] as const,
-  author: (authorId: string) => [...userStoriesQueryKeys.all, "author", authorId] as const,
+  author: (authorId: string) =>
+    [...userStoriesQueryKeys.all, "author", authorId] as const,
 };
 
 export const installmentQueryKeys = {
   all: ["installment"] as const,
-  program: (productId: string) => [...installmentQueryKeys.all, "program", productId] as const,
+  program: (productId: string) =>
+    [...installmentQueryKeys.all, "program", productId] as const,
   myContracts: (status: string) =>
     [...installmentQueryKeys.all, "contracts", "my", status] as const,
   mySales: (status: string) => [...installmentQueryKeys.all, "sales", status] as const,
@@ -130,7 +133,8 @@ export const installmentQueryKeys = {
   disputesPendingCount: () =>
     [...installmentQueryKeys.all, "disputes", "pending-count"] as const,
   buyerActionCount: () => [...installmentQueryKeys.all, "buyer-action-count"] as const,
-  sellerActionCount: () => [...installmentQueryKeys.all, "seller-action-count"] as const,
+  sellerActionCount: () =>
+    [...installmentQueryKeys.all, "seller-action-count"] as const,
 };
 
 export const categoryTreeQueryKeys = {

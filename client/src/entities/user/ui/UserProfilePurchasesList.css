@@ -36,7 +36,9 @@
   text-align: left;
 }
 
-:root[data-theme="dark"] .user-profile-purchases-section > .user-profile-purchases__heading,
+:root[data-theme="dark"]
+  .user-profile-purchases-section
+  > .user-profile-purchases__heading,
 :root[data-theme="dark"]
   .user-profile-purchases-section
   > .user-profile-purchases__heading_action {

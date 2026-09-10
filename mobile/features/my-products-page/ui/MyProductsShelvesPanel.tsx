@@ -33,10 +33,7 @@ import { MY_PRODUCTS_PAGE_LAYOUT as L } from "@/shared/lib/guestProfileLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-if (
-  Platform.OS === "android" &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -143,9 +140,8 @@ export const MyProductsShelvesPanel = () => {
   const shelvesQuery = useQuery({
     queryKey: sellerShelfQueryKeys.mine(),
     queryFn: async () => {
-      const { fetchMySellerShelves } = await import(
-        "@/entities/seller-shelf/api/sellerShelfApi"
-      );
+      const { fetchMySellerShelves } =
+        await import("@/entities/seller-shelf/api/sellerShelfApi");
       return fetchMySellerShelves();
     },
   });
@@ -153,7 +149,8 @@ export const MyProductsShelvesPanel = () => {
   const shelves = shelvesQuery.data?.shelves ?? [];
   // Лимиты приходят с сервера — зашивать 10 и 30 в экран нельзя.
   const nameMaxChars = shelvesQuery.data?.nameMaxChars ?? SELLER_SHELF_NAME_MAX_CHARS;
-  const atLimit = shelves.length >= (shelvesQuery.data?.maxShelves ?? SELLER_SHELF_MAX_PER_SELLER);
+  const atLimit =
+    shelves.length >= (shelvesQuery.data?.maxShelves ?? SELLER_SHELF_MAX_PER_SELLER);
   const assignShelf = useMemo(
     () => shelves.find((s) => s._id === assignShelfId) ?? null,
     [assignShelfId, shelves],
@@ -221,8 +218,7 @@ export const MyProductsShelvesPanel = () => {
   });
 
   const assignMutation = useMutation({
-    mutationFn: () =>
-      setSellerShelfProducts(String(assignShelfId), [...selectedIds]),
+    mutationFn: () => setSellerShelfProducts(String(assignShelfId), [...selectedIds]),
     onSuccess: () => {
       setAssignShelfId(null);
       invalidate();
@@ -345,67 +341,80 @@ export const MyProductsShelvesPanel = () => {
                       setRenameValue("");
                     }}
                   >
-                    <Text style={styles.ghostText}>{SELLER_SHELF_UI.CANCEL_RENAME}</Text>
+                    <Text style={styles.ghostText}>
+                      {SELLER_SHELF_UI.CANCEL_RENAME}
+                    </Text>
                   </Pressable>
                 </View>
               </View>
             ) : (
-            <View key={shelf._id} style={styles.item}>
-              <Text style={styles.itemName}>
-                {shelf.name} · {SELLER_SHELF_UI.PRODUCT_COUNT(shelf.productCount)}
-              </Text>
-              <View style={styles.row}>
-                <Pressable
-                  style={styles.ghostBtn}
-                  onPress={() => {
-                    setRenamingId(shelf._id);
-                    setRenameValue(shelf.name);
-                  }}
-                >
-                  <Text style={styles.ghostText}>{SELLER_SHELF_UI.RENAME}</Text>
-                </Pressable>
-                <Pressable style={styles.ghostBtn} onPress={() => setAssignShelfId(shelf._id)}>
-                  <Text style={styles.ghostText}>{SELLER_SHELF_UI.ASSIGN}</Text>
-                </Pressable>
-                <Pressable
-                  style={styles.ghostBtn}
-                  disabled={index === 0}
-                  onPress={() => move(shelf._id, -1)}
-                >
-                  <Text style={styles.ghostText}>{SELLER_SHELF_UI.MOVE_UP}</Text>
-                </Pressable>
-                <Pressable
-                  style={styles.ghostBtn}
-                  disabled={index >= shelves.length - 1}
-                  onPress={() => move(shelf._id, 1)}
-                >
-                  <Text style={styles.ghostText}>{SELLER_SHELF_UI.MOVE_DOWN}</Text>
-                </Pressable>
-                <Pressable
-                  style={styles.ghostBtn}
-                  onPress={() => {
-                    Alert.alert(SELLER_SHELF_UI.DELETE, SELLER_SHELF_UI.DELETE_CONFIRM, [
-                      { text: "Отмена", style: "cancel" },
-                      {
-                        text: SELLER_SHELF_UI.DELETE,
-                        style: "destructive",
-                        onPress: () => deleteMutation.mutate(shelf._id),
-                      },
-                    ]);
-                  }}
-                >
-                  <Text style={[styles.ghostText, { color: theme.colors.danger }]}>
-                    {SELLER_SHELF_UI.DELETE}
-                  </Text>
-                </Pressable>
+              <View key={shelf._id} style={styles.item}>
+                <Text style={styles.itemName}>
+                  {shelf.name} · {SELLER_SHELF_UI.PRODUCT_COUNT(shelf.productCount)}
+                </Text>
+                <View style={styles.row}>
+                  <Pressable
+                    style={styles.ghostBtn}
+                    onPress={() => {
+                      setRenamingId(shelf._id);
+                      setRenameValue(shelf.name);
+                    }}
+                  >
+                    <Text style={styles.ghostText}>{SELLER_SHELF_UI.RENAME}</Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.ghostBtn}
+                    onPress={() => setAssignShelfId(shelf._id)}
+                  >
+                    <Text style={styles.ghostText}>{SELLER_SHELF_UI.ASSIGN}</Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.ghostBtn}
+                    disabled={index === 0}
+                    onPress={() => move(shelf._id, -1)}
+                  >
+                    <Text style={styles.ghostText}>{SELLER_SHELF_UI.MOVE_UP}</Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.ghostBtn}
+                    disabled={index >= shelves.length - 1}
+                    onPress={() => move(shelf._id, 1)}
+                  >
+                    <Text style={styles.ghostText}>{SELLER_SHELF_UI.MOVE_DOWN}</Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.ghostBtn}
+                    onPress={() => {
+                      Alert.alert(
+                        SELLER_SHELF_UI.DELETE,
+                        SELLER_SHELF_UI.DELETE_CONFIRM,
+                        [
+                          { text: "Отмена", style: "cancel" },
+                          {
+                            text: SELLER_SHELF_UI.DELETE,
+                            style: "destructive",
+                            onPress: () => deleteMutation.mutate(shelf._id),
+                          },
+                        ],
+                      );
+                    }}
+                  >
+                    <Text style={[styles.ghostText, { color: theme.colors.danger }]}>
+                      {SELLER_SHELF_UI.DELETE}
+                    </Text>
+                  </Pressable>
+                </View>
               </View>
-            </View>
             ),
           )}
         </View>
       ) : null}
 
-      <Modal visible={Boolean(assignShelf)} animationType="slide" onRequestClose={() => setAssignShelfId(null)}>
+      <Modal
+        visible={Boolean(assignShelf)}
+        animationType="slide"
+        onRequestClose={() => setAssignShelfId(null)}
+      >
         <View style={styles.modalCard}>
           <Text style={styles.title}>
             {assignShelf ? SELLER_SHELF_UI.ASSIGN_TITLE(assignShelf.name) : ""}

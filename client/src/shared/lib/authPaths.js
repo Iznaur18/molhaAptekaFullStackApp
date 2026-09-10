@@ -36,9 +36,7 @@ export function isForgotPasswordPath(pathname) {
  */
 export function isAuthPagePath(pathname) {
   return (
-    isLoginPath(pathname) ||
-    isRegisterPath(pathname) ||
-    isForgotPasswordPath(pathname)
+    isLoginPath(pathname) || isRegisterPath(pathname) || isForgotPasswordPath(pathname)
   );
 }
 

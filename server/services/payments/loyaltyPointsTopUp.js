@@ -34,10 +34,16 @@ const rublesToPoints = (rub) => Math.ceil(Number(rub));
 function normalizeTopUpAmountRub(raw) {
   const rub = Math.floor(Number(raw));
   if (!Number.isFinite(rub) || rub < LOYALTY_POINTS_TOPUP_MIN_RUB) {
-    throw new AppError(400, `Минимальная сумма пополнения — ${LOYALTY_POINTS_TOPUP_MIN_RUB} ₽`);
+    throw new AppError(
+      400,
+      `Минимальная сумма пополнения — ${LOYALTY_POINTS_TOPUP_MIN_RUB} ₽`,
+    );
   }
   if (rub > LOYALTY_POINTS_TOPUP_MAX_RUB) {
-    throw new AppError(400, `Максимальная сумма пополнения — ${LOYALTY_POINTS_TOPUP_MAX_RUB} ₽`);
+    throw new AppError(
+      400,
+      `Максимальная сумма пополнения — ${LOYALTY_POINTS_TOPUP_MAX_RUB} ₽`,
+    );
   }
   return rub;
 }
@@ -58,10 +64,7 @@ function buildLoyaltyPointsReceipt({ amountRub, email, phone }) {
   if (digits.length === 11) customer.phone = `7${digits.slice(1)}`;
 
   if (!customer.email && !customer.phone) {
-    throw new AppError(
-      400,
-      "Для чека нужен email или телефон — добавьте их в профиле",
-    );
+    throw new AppError(400, "Для чека нужен email или телефон — добавьте их в профиле");
   }
 
   const taxSystemCode =
@@ -85,7 +88,6 @@ function buildLoyaltyPointsReceipt({ amountRub, email, phone }) {
     ],
   };
 }
-
 
 /**
  * Создать платёж на пополнение баллов и вернуть ссылку на оплату.
@@ -243,7 +245,10 @@ export async function applyLoyaltyPointsTopUp({
 
   const points = rublesToPoints(payment.amountRub);
   try {
-    const balance = await creditLoyaltyPoints({ userId: payment.userId, amount: points });
+    const balance = await creditLoyaltyPoints({
+      userId: payment.userId,
+      amount: points,
+    });
     await PaymentModel.updateOne(
       { _id: payment._id },
       { $set: { appliedAmount: points } },

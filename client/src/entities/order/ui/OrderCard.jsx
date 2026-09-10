@@ -554,8 +554,7 @@ export function OrderCard({
 
   // Везёт ли этот товар сам продавец. Способ берём с отправления, а на
   // заказах до отправлений — с общего поля заказа.
-  const shipmentMethod =
-    shipmentOwn?.fulfillmentMethod ?? order.fulfillmentMethod;
+  const shipmentMethod = shipmentOwn?.fulfillmentMethod ?? order.fulfillmentMethod;
   const shipmentCarrier = resolveProductDeliveryCarrier({
     productDeliveryCarrier: shipmentOwn?.deliveryCarrier,
     productCourierDeliveryEnabled: shipmentOwn?.courierDelivery === true,
@@ -597,8 +596,7 @@ export function OrderCard({
   // Продавцу в «Мои продажи» приходят только его позиции, поэтому их свод и
   // есть статус его отправления. Способ получения берём с самого отправления,
   // а на заказах до отправлений — с общего поля.
-  const shipmentFulfillment =
-    shipmentOwn?.fulfillmentMethod ?? order.fulfillmentMethod;
+  const shipmentFulfillment = shipmentOwn?.fulfillmentMethod ?? order.fulfillmentMethod;
   const shipmentAdvanceCandidate =
     attentionRole === "seller" && onAdvanceShipment
       ? resolveShipmentAdvanceAction(shipmentStatusNow, shipmentFulfillment)
@@ -750,8 +748,7 @@ export function OrderCard({
   // просто меняют кнопкой выше.
   const canOpenDispute =
     Boolean(onOpenDispute) &&
-    (shipmentStatusNow === "courier_holding" ||
-      shipmentStatusNow === "in_delivery");
+    (shipmentStatusNow === "courier_holding" || shipmentStatusNow === "in_delivery");
   // Закрытый спор больше не спор: иначе строка про модератора висела бы на
   // заказе вечно.
   // Сумму поднимает покупатель — он за неё и платит, — и только пока никто
@@ -807,13 +804,13 @@ export function OrderCard({
           какую часть он забирает сам, а какую ему везут. Кнопка — только
           продавцу, и только пока есть куда двигать. */}
       <div className="order-card__shipment-row">
-          <span className="order-card__shipment-label">
-            {ORDER_CARD_UI.SHIPMENT_HEADING}:{" "}
-            {shipmentFulfillment === "delivery"
-              ? ORDER_CARD_UI.SHIPMENT_DELIVERY
-              : ORDER_CARD_UI.SHIPMENT_PICKUP}
-          </span>
-          <div className="order-card__shipment-actions">
+        <span className="order-card__shipment-label">
+          {ORDER_CARD_UI.SHIPMENT_HEADING}:{" "}
+          {shipmentFulfillment === "delivery"
+            ? ORDER_CARD_UI.SHIPMENT_DELIVERY
+            : ORDER_CARD_UI.SHIPMENT_PICKUP}
+        </span>
+        <div className="order-card__shipment-actions">
           {canCancelOrder ? (
             <ConfirmButton
               className="order-card__item-action-button order-card__item-action-button_cancel"
@@ -892,22 +889,22 @@ export function OrderCard({
             />
           ) : null}
           {shipmentAdvance ? (
-          <button
-            type="button"
-            className="order-card__item-action-button"
-            onClick={() =>
-              onAdvanceShipment({
-                orderId: order._id,
-                nextStatus: shipmentAdvance.nextStatus,
-              })
-            }
-            disabled={isShipmentActionPending}
-          >
-            {isShipmentActionPending
-              ? ORDER_CARD_UI.ACTION_PENDING
-              : shipmentAdvance.label}
-          </button>
-        ) : null}
+            <button
+              type="button"
+              className="order-card__item-action-button"
+              onClick={() =>
+                onAdvanceShipment({
+                  orderId: order._id,
+                  nextStatus: shipmentAdvance.nextStatus,
+                })
+              }
+              disabled={isShipmentActionPending}
+            >
+              {isShipmentActionPending
+                ? ORDER_CARD_UI.ACTION_PENDING
+                : shipmentAdvance.label}
+            </button>
+          ) : null}
           {canShipSellerDelivery ? (
             <button
               type="button"
@@ -969,7 +966,7 @@ export function OrderCard({
               {shipmentActionError}
             </span>
           ) : null}
-          </div>
+        </div>
       </div>
 
       {/* Кто приедет: имя, рейтинг и авто. Паспорта курьера тут нет и быть
@@ -1027,9 +1024,7 @@ export function OrderCard({
       {sellerDeliveryFeeRub > 0 ? (
         <div className="order-card__fee">
           <span>
-            {ORDER_CARD_UI.SELLER_DELIVERY_FEE(
-              formatPriceRub(sellerDeliveryFeeRub),
-            )}
+            {ORDER_CARD_UI.SELLER_DELIVERY_FEE(formatPriceRub(sellerDeliveryFeeRub))}
           </span>
         </div>
       ) : null}
@@ -1052,7 +1047,9 @@ export function OrderCard({
               ? ORDER_CARD_UI.ACTION_PENDING
               : ORDER_CARD_UI.SHIPMENT_FEE_RAISE}
           </button>
-          <span className="order-card__fee-hint">{ORDER_CARD_UI.SHIPMENT_FEE_HINT}</span>
+          <span className="order-card__fee-hint">
+            {ORDER_CARD_UI.SHIPMENT_FEE_HINT}
+          </span>
         </div>
       ) : null}
 
@@ -1215,10 +1212,14 @@ export function OrderCard({
               </span>
             ) : null}
             {isAuctionOrder ? (
-              <span className="order-card__auction-badge">{PRODUCT_CARD_UI.AUCTION_BADGE}</span>
+              <span className="order-card__auction-badge">
+                {PRODUCT_CARD_UI.AUCTION_BADGE}
+              </span>
             ) : null}
             {isInstallmentOrder ? (
-              <span className="order-card__installment-badge">{INSTALLMENT_UI.BADGE}</span>
+              <span className="order-card__installment-badge">
+                {INSTALLMENT_UI.BADGE}
+              </span>
             ) : null}
           </div>
           {collapsible ? (
@@ -1272,10 +1273,7 @@ export function OrderCard({
             </div>
           ) : null}
           <div
-            className={[
-              "order-card__fold",
-              isExpanded ? "order-card__fold_open" : "",
-            ]
+            className={["order-card__fold", isExpanded ? "order-card__fold_open" : ""]
               .filter(Boolean)
               .join(" ")}
             aria-hidden={!isExpanded}

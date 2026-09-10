@@ -12,7 +12,8 @@ export const MONGO_COMPOSE_SERVICE = "mongo";
 export const buildReplicaInitEvalScript = ({
   replicaSetName = MONGO_REPLICA_SET_NAME,
   memberHost = MONGO_DEV_MEMBER_HOST,
-} = {}) => `
+} = {}) =>
+  `
 const desiredHost = ${JSON.stringify(memberHost)};
 const replicaSetName = ${JSON.stringify(replicaSetName)};
 
@@ -49,7 +50,8 @@ quit(0);
  */
 export const buildReplicaStatusEvalScript = ({
   replicaSetName = MONGO_REPLICA_SET_NAME,
-} = {}) => `
+} = {}) =>
+  `
 const status = rs.status();
 if (status.ok !== 1 || status.set !== ${JSON.stringify(replicaSetName)}) {
   printjson(status);

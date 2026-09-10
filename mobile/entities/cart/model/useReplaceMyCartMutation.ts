@@ -12,7 +12,9 @@ export const useReplaceMyCartMutation = () => {
     mutationFn: replaceMyCart,
     onMutate: async (nextItems: CartItemsByProductId) => {
       await queryClient.cancelQueries({ queryKey: cartQueryKeys.all });
-      const previous = queryClient.getQueryData<CartItemsByProductId>(cartQueryKeys.all);
+      const previous = queryClient.getQueryData<CartItemsByProductId>(
+        cartQueryKeys.all,
+      );
       queryClient.setQueryData(cartQueryKeys.all, nextItems);
       return { previous };
     },

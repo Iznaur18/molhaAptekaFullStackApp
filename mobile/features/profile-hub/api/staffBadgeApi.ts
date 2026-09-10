@@ -34,28 +34,30 @@ export const fetchPendingIntroAdCampaignsOnlyCount = async (): Promise<number> =
   }
 };
 
-export const fetchPendingSellerPersonalCategoryCampaignsCount = async (): Promise<number> => {
-  try {
-    const { data } = await apiClient.get(
-      "/seller-personal-category/moderation/pending/count",
-    );
-    const parsed = parseApiContractData(
-      data,
-      pendingSellerPersonalCategoryCampaignsCountDataSchema,
-    );
-    return parsed.count;
-  } catch {
-    return 0;
-  }
-};
+export const fetchPendingSellerPersonalCategoryCampaignsCount =
+  async (): Promise<number> => {
+    try {
+      const { data } = await apiClient.get(
+        "/seller-personal-category/moderation/pending/count",
+      );
+      const parsed = parseApiContractData(
+        data,
+        pendingSellerPersonalCategoryCampaignsCountDataSchema,
+      );
+      return parsed.count;
+    } catch {
+      return 0;
+    }
+  };
 
 export const fetchPendingAdModerationNavBadgeCount = async (): Promise<number> => {
-  const [introCount, bannerCount, personalCategoryCount, raffleCount] = await Promise.all([
-    fetchPendingIntroAdCampaignsOnlyCount(),
-    fetchPendingSiteHeaderBannerCampaignsCount(),
-    fetchPendingSellerPersonalCategoryCampaignsCount(),
-    fetchPendingRafflesCount(),
-  ]);
+  const [introCount, bannerCount, personalCategoryCount, raffleCount] =
+    await Promise.all([
+      fetchPendingIntroAdCampaignsOnlyCount(),
+      fetchPendingSiteHeaderBannerCampaignsCount(),
+      fetchPendingSellerPersonalCategoryCampaignsCount(),
+      fetchPendingRafflesCount(),
+    ]);
   return introCount + bannerCount + personalCategoryCount + raffleCount;
 };
 
@@ -83,9 +85,11 @@ export const fetchPendingInstallmentDisputesCount = () =>
 export const fetchIncomingPriceOffersPendingCount = () =>
   fetchCount("/price-offers/incoming/pending-count", "count");
 
-export const fetchMySalesActionCount = () => fetchCount("/order/sales/action-count", "count");
+export const fetchMySalesActionCount = () =>
+  fetchCount("/order/sales/action-count", "count");
 
-export const fetchMyOrdersActionCount = () => fetchCount("/order/action-count", "count");
+export const fetchMyOrdersActionCount = () =>
+  fetchCount("/order/action-count", "count");
 
 export const fetchInstallmentBuyerActionCount = () =>
   fetchCount("/installment/contracts/my/action-count", "count");
@@ -101,6 +105,8 @@ export const fetchStaffProductReportsBadgeCount = async () => {
     ]);
     return productCount + storyCount;
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.INVALID_SERVER_RESPONSE));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.INVALID_SERVER_RESPONSE),
+    );
   }
 };

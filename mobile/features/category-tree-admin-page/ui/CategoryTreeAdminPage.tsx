@@ -85,7 +85,9 @@ export const CategoryTreeAdminPage = () => {
           onPress: () => {
             void runDelete(row).catch((error) => {
               setActionError(
-                error instanceof Error ? error.message : CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_ERROR,
+                error instanceof Error
+                  ? error.message
+                  : CATEGORY_TREE_ADMIN_PAGE_UI.DELETE_ERROR,
               );
             });
           },
@@ -98,7 +100,9 @@ export const CategoryTreeAdminPage = () => {
     <>
       <View style={styles.formGrid}>
         <View style={[styles.field, styles.fieldFull]}>
-          <Text style={styles.fieldLabel}>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_SLUG}</Text>
+          <Text style={styles.fieldLabel}>
+            {CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_SLUG}
+          </Text>
           <TextInput
             style={styles.fieldInput}
             value={newSlug}
@@ -110,7 +114,9 @@ export const CategoryTreeAdminPage = () => {
           <Text style={styles.fieldHint}>{CATEGORY_TREE_ADMIN_PAGE_UI.SLUG_HINT}</Text>
         </View>
         <View style={styles.field}>
-          <Text style={styles.fieldLabel}>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_NAME}</Text>
+          <Text style={styles.fieldLabel}>
+            {CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_NAME}
+          </Text>
           <TextInput
             style={styles.fieldInput}
             value={newLabelRu}
@@ -119,7 +125,9 @@ export const CategoryTreeAdminPage = () => {
           />
         </View>
         <View style={styles.field}>
-          <Text style={styles.fieldLabel}>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_PARENT}</Text>
+          <Text style={styles.fieldLabel}>
+            {CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_PARENT}
+          </Text>
           <CategoryTreeParentPicker
             value={newParentId}
             options={parentOptions}
@@ -130,7 +138,9 @@ export const CategoryTreeAdminPage = () => {
         {!isCreateRoot ? (
           <>
             <View style={styles.switchRow}>
-              <Text style={styles.fieldLabel}>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_LEAF}</Text>
+              <Text style={styles.fieldLabel}>
+                {CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_LEAF}
+              </Text>
               <Switch
                 value={newIsLeaf}
                 onValueChange={setNewIsLeaf}
@@ -138,7 +148,9 @@ export const CategoryTreeAdminPage = () => {
               />
             </View>
             <View style={[styles.field, styles.fieldFull]}>
-              <Text style={styles.fieldLabel}>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_KEYWORDS}</Text>
+              <Text style={styles.fieldLabel}>
+                {CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_KEYWORDS}
+              </Text>
               <TextInput
                 style={styles.fieldInput}
                 value={newKeywordsCsv}
@@ -148,7 +160,9 @@ export const CategoryTreeAdminPage = () => {
               />
             </View>
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_LEGACY}</Text>
+              <Text style={styles.fieldLabel}>
+                {CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_LEGACY}
+              </Text>
               <CategoryTreeLegacyPicker
                 value={newLegacySlug}
                 onChange={setNewLegacySlug}
@@ -160,11 +174,16 @@ export const CategoryTreeAdminPage = () => {
       </View>
       <View style={styles.createActions}>
         <Pressable
-          style={[styles.primaryButton, pendingId === "create" && styles.primaryButtonDisabled]}
+          style={[
+            styles.primaryButton,
+            pendingId === "create" && styles.primaryButtonDisabled,
+          ]}
           disabled={pendingId === "create"}
           onPress={() => void handleCreate()}
         >
-          <Text style={styles.primaryButtonText}>{CATEGORY_TREE_ADMIN_PAGE_UI.CREATE_BUTTON}</Text>
+          <Text style={styles.primaryButtonText}>
+            {CATEGORY_TREE_ADMIN_PAGE_UI.CREATE_BUTTON}
+          </Text>
         </Pressable>
       </View>
     </>
@@ -173,7 +192,9 @@ export const CategoryTreeAdminPage = () => {
   const listContent = (() => {
     if (phase === "success" && rows.length === 0) {
       return (
-        <Text style={[styles.alert, styles.alertInfo]}>{CATEGORY_TREE_ADMIN_PAGE_UI.EMPTY}</Text>
+        <Text style={[styles.alert, styles.alertInfo]}>
+          {CATEGORY_TREE_ADMIN_PAGE_UI.EMPTY}
+        </Text>
       );
     }
     if (phase === "success" && filteredRows.length === 0) {
@@ -226,12 +247,7 @@ export const CategoryTreeAdminPage = () => {
     return (
       <>
         <View style={[...pageListStyle, centeredContentStyle]}>
-          <AdminPanelShell
-            {...shellProps}
-            count={0}
-            isLoading
-            error={displayError}
-          >
+          <AdminPanelShell {...shellProps} count={0} isLoading error={displayError}>
             {null}
           </AdminPanelShell>
         </View>
@@ -263,10 +279,7 @@ export const CategoryTreeAdminPage = () => {
       <ProfileAccountList
         data={filteredRows}
         keyExtractor={(item) => item._id}
-        style={[
-          ...pageListStyle,
-          scrollEnabled ? centeredContentStyle : null,
-        ]}
+        style={[...pageListStyle, scrollEnabled ? centeredContentStyle : null]}
         contentContainerStyle={{
           paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom,
           gap: 8,

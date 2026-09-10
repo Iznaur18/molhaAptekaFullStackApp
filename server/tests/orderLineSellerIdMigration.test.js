@@ -8,9 +8,8 @@ process.env.JWT_SECRET =
 const mongoose = (await import("mongoose")).default;
 const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollections } =
   await import("./helpers/mongoTestDb.js");
-const { createOrderLoyaltyFixture } = await import(
-  "./helpers/orderLoyaltyTestHelpers.js"
-);
+const { createOrderLoyaltyFixture } =
+  await import("./helpers/orderLoyaltyTestHelpers.js");
 const { OrderModel } = await import("../models/index.js");
 const { up } = await import("../scripts/migrations/20260831-order-line-seller-id.js");
 
@@ -163,10 +162,6 @@ describe("миграция sellerIdAtOrder", () => {
     assert.equal(result.modified, undefined, "в dry-run записей не было");
 
     const raw = await db().collection("orders").findOne({ _id: orderId });
-    assert.equal(
-      raw.items[0].sellerIdAtOrder ?? null,
-      null,
-      "документ не изменился",
-    );
+    assert.equal(raw.items[0].sellerIdAtOrder ?? null, null, "документ не изменился");
   });
 });

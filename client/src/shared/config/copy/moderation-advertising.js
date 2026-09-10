@@ -31,7 +31,8 @@ export const INTRO_AD_MODERATION_PAGE_UI = {
   EXPAND_ALL: "Развернуть все",
   COLLAPSE_ALL: "Свернуть все",
   REFRESH: "Обновить",
-  ATTENTION_FILTER_HINT: "Показаны заявки, которые давно ждут или без обязательного медиа",
+  ATTENTION_FILTER_HINT:
+    "Показаны заявки, которые давно ждут или без обязательного медиа",
   COLLAPSED_STALE: "Давно в очереди",
   COLLAPSED_MISSING_MEDIA: "Нет медиа",
   /** @param {boolean} expanded */

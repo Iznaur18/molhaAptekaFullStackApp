@@ -116,12 +116,22 @@ export const SavedAddressPicker = ({
       () => (multiSelect ? onToggle?.(item.id) : onSelect(item.id)),
       <>
         {item.label ? (
-          <Text style={[styles.optionLabel, isCarousel && styles.optionLabelCarousel, { color: textColor }]}>
+          <Text
+            style={[
+              styles.optionLabel,
+              isCarousel && styles.optionLabelCarousel,
+              { color: textColor },
+            ]}
+          >
             {item.label}
           </Text>
         ) : null}
         <Text
-          style={[styles.optionLine, isCarousel && styles.optionLineCarousel, { color: textColor }]}
+          style={[
+            styles.optionLine,
+            isCarousel && styles.optionLineCarousel,
+            { color: textColor },
+          ]}
           numberOfLines={isCarousel ? 4 : undefined}
         >
           {USER_SAVED_ADDRESSES_UI.FORMAT_LINE(item.line, item.flat ?? "")}
@@ -131,7 +141,10 @@ export const SavedAddressPicker = ({
             style={[
               styles.optionBadge,
               {
-                color: active || !isCarousel ? theme.colors.textSecondary : theme.colors.action,
+                color:
+                  active || !isCarousel
+                    ? theme.colors.textSecondary
+                    : theme.colors.action,
               },
             ]}
           >
@@ -139,7 +152,9 @@ export const SavedAddressPicker = ({
           </Text>
         ) : null}
         {hint ? (
-          <Text style={[styles.optionBadge, { color: theme.colors.textMuted }]}>{hint}</Text>
+          <Text style={[styles.optionBadge, { color: theme.colors.textMuted }]}>
+            {hint}
+          </Text>
         ) : null}
       </>,
       item.label ?? USER_SAVED_ADDRESSES_UI.FORMAT_LINE(item.line, item.flat ?? ""),
@@ -147,25 +162,25 @@ export const SavedAddressPicker = ({
   });
 
   const otherOption =
-    multiSelect || !otherLabel ? null : renderOption(
-      CHECKOUT_SAVED_ADDRESS_CUSTOM_ID,
-      selectedId === CHECKOUT_SAVED_ADDRESS_CUSTOM_ID,
-      disabled,
-      () => onSelect(CHECKOUT_SAVED_ADDRESS_CUSTOM_ID),
-      (
-        <Text
-          style={[
-            styles.optionLine,
-            isCarousel && styles.optionLineCarousel,
-            { color: labelColor(selectedId === CHECKOUT_SAVED_ADDRESS_CUSTOM_ID) },
-          ]}
-          numberOfLines={isCarousel ? 4 : undefined}
-        >
-          {otherLabel}
-        </Text>
-      ),
-      otherLabel,
-    );
+    multiSelect || !otherLabel
+      ? null
+      : renderOption(
+          CHECKOUT_SAVED_ADDRESS_CUSTOM_ID,
+          selectedId === CHECKOUT_SAVED_ADDRESS_CUSTOM_ID,
+          disabled,
+          () => onSelect(CHECKOUT_SAVED_ADDRESS_CUSTOM_ID),
+          <Text
+            style={[
+              styles.optionLine,
+              isCarousel && styles.optionLineCarousel,
+              { color: labelColor(selectedId === CHECKOUT_SAVED_ADDRESS_CUSTOM_ID) },
+            ]}
+            numberOfLines={isCarousel ? 4 : undefined}
+          >
+            {otherLabel}
+          </Text>,
+          otherLabel,
+        );
 
   const listContent = (
     <>
@@ -189,7 +204,10 @@ export const SavedAddressPicker = ({
           {listContent}
         </ScrollView>
       ) : (
-        <View style={styles.list} accessibilityRole={multiSelect ? "list" : "radiogroup"}>
+        <View
+          style={styles.list}
+          accessibilityRole={multiSelect ? "list" : "radiogroup"}
+        >
           {listContent}
         </View>
       )}

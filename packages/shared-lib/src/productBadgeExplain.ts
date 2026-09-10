@@ -98,9 +98,7 @@ export function resolveProductBadgeExplainContent(input: {
       ? input.adminRow.description.trim()
       : "";
   const adminImageUrl =
-    typeof input.adminRow?.imageUrl === "string"
-      ? input.adminRow.imageUrl.trim()
-      : "";
+    typeof input.adminRow?.imageUrl === "string" ? input.adminRow.imageUrl.trim() : "";
 
   return {
     badgeKey: input.badgeKey,

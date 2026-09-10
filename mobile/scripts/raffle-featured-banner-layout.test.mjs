@@ -5,7 +5,10 @@ import { fileURLToPath } from "node:url";
 import { test } from "node:test";
 
 const MOBILE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const SHARED_LIB_DIST = join(MOBILE_ROOT, "../packages/shared-lib/dist/raffleFeaturedBannerMetrics.js");
+const SHARED_LIB_DIST = join(
+  MOBILE_ROOT,
+  "../packages/shared-lib/dist/raffleFeaturedBannerMetrics.js",
+);
 
 const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
@@ -25,7 +28,9 @@ const resolveInnerMinHeight = (cardWidth) => {
 test("RaffleFeaturedBanner: split-card layout with square visual", () => {
   const banner = readMobileFile("entities/raffle/ui/RaffleFeaturedBanner.tsx");
   const styles = readMobileFile("shared/theme/raffleFeaturedStyles.ts");
-  const section = readMobileFile("features/home-feed/ui/HomeFeaturedRafflesSection.tsx");
+  const section = readMobileFile(
+    "features/home-feed/ui/HomeFeaturedRafflesSection.tsx",
+  );
 
   assert.match(banner, /cardStack/);
   assert.match(banner, /visualCard/);

@@ -24,7 +24,9 @@ export function ProductMediaHorizontalPager({
 }) {
   const scrollerRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const skipScrollSyncRef = useRef(false);
-  const settleTimerRef = useRef(/** @type {ReturnType<typeof setTimeout> | null} */ (null));
+  const settleTimerRef = useRef(
+    /** @type {ReturnType<typeof setTimeout> | null} */ (null),
+  );
   const activeIndexRef = useRef(activeIndex);
 
   useEffect(() => {
@@ -131,7 +133,11 @@ export function ProductMediaHorizontalPager({
 
   if (slideCount <= 1) {
     return (
-      <div className={["product-media-horizontal-pager", className].filter(Boolean).join(" ")}>
+      <div
+        className={["product-media-horizontal-pager", className]
+          .filter(Boolean)
+          .join(" ")}
+      >
         <div className="product-media-horizontal-pager__slide">{renderSlide(0)}</div>
       </div>
     );

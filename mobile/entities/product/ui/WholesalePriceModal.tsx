@@ -152,7 +152,9 @@ export const WholesalePriceModal = ({
           ) : null}
 
           <View style={styles.rowField}>
-            <Text style={styles.fieldLabel}>{CREATE_PRODUCT_UI.WHOLESALE_MODAL_MIN_QTY_LABEL}</Text>
+            <Text style={styles.fieldLabel}>
+              {CREATE_PRODUCT_UI.WHOLESALE_MODAL_MIN_QTY_LABEL}
+            </Text>
             <TextInput
               style={styles.input}
               value={minQty}
@@ -163,7 +165,9 @@ export const WholesalePriceModal = ({
           </View>
 
           <View style={styles.rowField}>
-            <Text style={styles.fieldLabel}>{CREATE_PRODUCT_UI.WHOLESALE_MODAL_PRICE_LABEL}</Text>
+            <Text style={styles.fieldLabel}>
+              {CREATE_PRODUCT_UI.WHOLESALE_MODAL_PRICE_LABEL}
+            </Text>
             <TextInput
               style={styles.input}
               value={price}
@@ -182,7 +186,10 @@ export const WholesalePriceModal = ({
 
         <View style={[styles.footer, { paddingBottom: footerInsetBottom }]}>
           <Pressable
-            style={[styles.saveButton, (isSubmitting || !productId) && styles.buttonDisabled]}
+            style={[
+              styles.saveButton,
+              (isSubmitting || !productId) && styles.buttonDisabled,
+            ]}
             accessibilityRole="button"
             disabled={isSubmitting || !productId}
             onPress={() => void handleSave()}
@@ -190,7 +197,9 @@ export const WholesalePriceModal = ({
             {isSubmitting ? (
               <ActivityIndicator color={theme.colors.onContrast} />
             ) : (
-              <Text style={styles.saveButtonText}>{CREATE_PRODUCT_UI.WHOLESALE_MODAL_SAVE}</Text>
+              <Text style={styles.saveButtonText}>
+                {CREATE_PRODUCT_UI.WHOLESALE_MODAL_SAVE}
+              </Text>
             )}
           </Pressable>
         </View>

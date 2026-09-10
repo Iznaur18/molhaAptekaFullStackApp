@@ -17,9 +17,13 @@ export const formatPassportDate = (iso: string | Date | undefined | null) => {
   }
 };
 
-export const formatPassportFullName = (passport: Partial<PassportSnapshot> | undefined) => {
-  const parts = [passport?.lastName, passport?.firstName, passport?.middleName?.trim()].filter(
-    Boolean,
-  );
+export const formatPassportFullName = (
+  passport: Partial<PassportSnapshot> | undefined,
+) => {
+  const parts = [
+    passport?.lastName,
+    passport?.firstName,
+    passport?.middleName?.trim(),
+  ].filter(Boolean);
   return parts.length > 0 ? parts.join(" ") : EM_DASH;
 };

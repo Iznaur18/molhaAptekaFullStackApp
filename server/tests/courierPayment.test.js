@@ -9,16 +9,13 @@ const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollectio
   await import("./helpers/mongoTestDb.js");
 const { createOrderLoyaltyFixture, createOrderWithReserveTransaction } =
   await import("./helpers/orderLoyaltyTestHelpers.js");
-const { OrderModel, UserInAppNotificationModel, UserModel } = await import(
-  "../models/index.js"
-);
-const { advanceOrderShipmentStatus } = await import(
-  "../services/order/advanceShipmentStatus.js"
-);
+const { OrderModel, UserInAppNotificationModel, UserModel } =
+  await import("../models/index.js");
+const { advanceOrderShipmentStatus } =
+  await import("../services/order/advanceShipmentStatus.js");
 const flow = await import("../services/courier/courierShipmentFlow.js");
-const { stripShipmentCodes } = await import(
-  "../services/order/sanitizeShipmentCodes.js"
-);
+const { stripShipmentCodes } =
+  await import("../services/order/sanitizeShipmentCodes.js");
 
 const SELLER = "aaaaaaaaaaaaaaaaaaaaaaaa";
 
@@ -120,9 +117,8 @@ describe("третье рукопожатие: оплата", () => {
 
   it("в «Моих доставках» курьер видит флаг оплаты", async () => {
     const { courierId, order, args } = await deliveredShipment();
-    const { listMyCourierDeliveries } = await import(
-      "../services/courier/courierOverview.js"
-    );
+    const { listMyCourierDeliveries } =
+      await import("../services/courier/courierOverview.js");
 
     const before = await listMyCourierDeliveries({ courierId });
     const row = before.deliveries.find((d) => d.orderId === String(order._id));
@@ -201,7 +197,9 @@ describe("третье рукопожатие: оплата", () => {
       () => flow.setShipmentPaymentConfirmed({ ...args, confirmed: false }),
       /уже нельзя/i,
     );
-    assert.ok((await OrderModel.findById(order._id).lean()).shipments[0].paymentConfirmedAt);
+    assert.ok(
+      (await OrderModel.findById(order._id).lean()).shipments[0].paymentConfirmedAt,
+    );
   });
 });
 

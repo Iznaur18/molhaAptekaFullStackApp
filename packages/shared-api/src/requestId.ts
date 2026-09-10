@@ -25,7 +25,9 @@ export function generateClientRequestId(): string {
  * @param {string | undefined | null} raw
  * @returns {string | null}
  */
-export function normalizeClientRequestId(raw: string | null | undefined): string | null {
+export function normalizeClientRequestId(
+  raw: string | null | undefined,
+): string | null {
   if (typeof raw !== "string") {
     return null;
   }

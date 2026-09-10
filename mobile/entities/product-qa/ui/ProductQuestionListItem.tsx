@@ -94,7 +94,9 @@ export const ProductQuestionListItem = ({
       {answer ? (
         <View style={styles.qaAnswer}>
           <View style={styles.qaAnswerHead}>
-            <Text style={styles.qaAnswerLabel}>{PRODUCT_QA_UI.SELLER_ANSWER_LABEL}</Text>
+            <Text style={styles.qaAnswerLabel}>
+              {PRODUCT_QA_UI.SELLER_ANSWER_LABEL}
+            </Text>
             {answer.answeredAt ? (
               <Text style={styles.itemDate}>{formatQaDate(answer.answeredAt)}</Text>
             ) : null}
@@ -124,7 +126,9 @@ export const ProductQuestionListItem = ({
               disabled={isActionPending}
               onPress={handleDeletePress}
             >
-              <Text style={styles.qaActionDangerText}>{PRODUCT_QA_UI.DELETE_ACTION}</Text>
+              <Text style={styles.qaActionDangerText}>
+                {PRODUCT_QA_UI.DELETE_ACTION}
+              </Text>
             </Pressable>
           ) : null}
           {canAnswer ? (

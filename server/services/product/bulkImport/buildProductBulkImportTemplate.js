@@ -42,9 +42,7 @@ export async function buildProductBulkImportTemplateBuffer() {
     exampleRow.категория = buildLeafCategoryBreadcrumbPath(leaves[0]);
   }
 
-  sheet.addRow(
-    PRODUCT_BULK_IMPORT_COLUMNS.map((column) => exampleRow[column] ?? ""),
-  );
+  sheet.addRow(PRODUCT_BULK_IMPORT_COLUMNS.map((column) => exampleRow[column] ?? ""));
 
   sheet.getRow(1).font = { bold: true };
   sheet.views = [{ state: "frozen", ySplit: 1 }];

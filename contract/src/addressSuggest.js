@@ -44,9 +44,7 @@ export function dadataSuggestionObjectFiasId(data) {
  * @returns {boolean}
  */
 export function hasDadataSuggestionHouseNumber(data) {
-  return (
-    dadataField(data, "house").length > 0 || dadataField(data, "stead").length > 0
-  );
+  return dadataField(data, "house").length > 0 || dadataField(data, "stead").length > 0;
 }
 
 /**

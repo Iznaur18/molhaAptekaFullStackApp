@@ -92,7 +92,6 @@ import { resolveWizardFooterPaddingBottom } from "@/shared/theme/screenContentLa
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-
 /** Паритет web: `@container app-viewport (min-width: 40rem)` в CreateProductWizard.css. */
 const WIZARD_COLUMN_MAX_WIDTH = 640;
 
@@ -321,7 +320,9 @@ function validateStep(
           return "Цена не может превышать 999 999 999 ₽";
         }
       }
-      const stockRequired = showCatalogAvailabilityToggle ? form.productIsAvailable : true;
+      const stockRequired = showCatalogAvailabilityToggle
+        ? form.productIsAvailable
+        : true;
       if (stockRequired) {
         const stock = Math.floor(Number(form.productStockQuantity));
         if (
@@ -400,7 +401,11 @@ export const ProductWizardScreen = ({
   const insets = useSafeAreaInsets();
   // Мастер в вебе ограничен не общей лесенкой, а собственными 40rem
   // (`CreateProductWizard.css`: `calc((100vw - 40rem) / 2)`).
-  const wizardColumnStyle = { width: "100%" as const, maxWidth: WIZARD_COLUMN_MAX_WIDTH, alignSelf: "center" as const };
+  const wizardColumnStyle = {
+    width: "100%" as const,
+    maxWidth: WIZARD_COLUMN_MAX_WIDTH,
+    alignSelf: "center" as const,
+  };
   const { width: screenWidth } = useWindowDimensions();
   const createMutation = useCreateProductMutation();
   const { patchMutation } = useMyProductMutations();
@@ -439,9 +444,7 @@ export const ProductWizardScreen = ({
     // профильный подставлять нельзя.
     Boolean(user) || initialLaunch?.kind === "copy" || initialDraft != null,
   );
-  const appliedLaunchSeqRef = useRef(
-    initialLaunch ? getCreateProductLaunchSeq() : 0,
-  );
+  const appliedLaunchSeqRef = useRef(initialLaunch ? getCreateProductLaunchSeq() : 0);
   const editPrefilledRef = useRef(false);
 
   const applyCreateProductLaunch = useCallback(() => {
@@ -499,7 +502,9 @@ export const ProductWizardScreen = ({
     if (!isEdit || !productQuery.data || editPrefilledRef.current) {
       return;
     }
-    setForm(createProductWizardFormFromProduct(productQuery.data as Record<string, unknown>));
+    setForm(
+      createProductWizardFormFromProduct(productQuery.data as Record<string, unknown>),
+    );
     editPrefilledRef.current = true;
     setStepIndex(0);
     setStepError("");
@@ -609,7 +614,9 @@ export const ProductWizardScreen = ({
             productStockQuantity: Math.floor(Number(form.productStockQuantity)),
             productImageUrls: form.imageUrls.filter(Boolean),
             productPreviewVideoUrl: form.productPreviewVideoUrl.trim() || undefined,
-            productCharacteristics: serializeProductCharacteristicRows(form.characteristicRows),
+            productCharacteristics: serializeProductCharacteristicRows(
+              form.characteristicRows,
+            ),
             productReturnEnabled: form.productReturnEnabled === true,
             productReturnTerms:
               form.productReturnEnabled === true
@@ -802,7 +809,9 @@ export const ProductWizardScreen = ({
             disabled={isSubmitting}
             style={styles.draftBannerAction}
           >
-            <Text style={[styles.draftBannerActionText, { color: theme.colors.action }]}>
+            <Text
+              style={[styles.draftBannerActionText, { color: theme.colors.action }]}
+            >
               {CREATE_PRODUCT_UI.DRAFT_RESTORED_DISCARD}
             </Text>
           </Pressable>
@@ -1888,8 +1897,10 @@ function ReviewStep({
     {
       label: "Адрес самовывоза",
       value:
-        pickupLocationsSummary(form.productPickupLocations, form.productPickupAddress) ||
-        "—",
+        pickupLocationsSummary(
+          form.productPickupLocations,
+          form.productPickupAddress,
+        ) || "—",
       stepIndex: 4,
       multiline: true,
     },

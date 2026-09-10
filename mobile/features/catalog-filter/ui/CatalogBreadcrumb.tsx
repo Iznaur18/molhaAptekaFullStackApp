@@ -8,7 +8,10 @@ type CatalogBreadcrumbProps = {
   compactTop?: boolean;
 };
 
-export const CatalogBreadcrumb = ({ label, compactTop = false }: CatalogBreadcrumbProps) => {
+export const CatalogBreadcrumb = ({
+  label,
+  compactTop = false,
+}: CatalogBreadcrumbProps) => {
   const styles = useCatalogBreadcrumbStyles();
 
   if (!label) {

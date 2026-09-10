@@ -1,7 +1,14 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 
 import { useUserAccess } from "@/entities/access/model/useUserAccess";
 import { useCreateRaffleMutation } from "@/entities/raffle/model/useCreateRaffleMutation";
@@ -54,7 +61,9 @@ export const CreateRafflePage = () => {
   const createAccessQuery = useRaffleCreateAdvertisingQuery({
     enabled: isAuthorized && isUserDataConfirmed,
   });
-  const myRaffleQuery = useMyRaffleQuery({ enabled: isAuthorized && isUserDataConfirmed });
+  const myRaffleQuery = useMyRaffleQuery({
+    enabled: isAuthorized && isUserDataConfirmed,
+  });
   const { deleteMyMutation } = useMyRaffleMutations();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [form, setForm] = useState<CreateRaffleFormState>(INITIAL_CREATE_RAFFLE_FORM);
@@ -76,7 +85,8 @@ export const CreateRafflePage = () => {
     !isCreateBlocked && createAccessQuery.data?.canOpenForm !== true;
   const isWithdrawing = deleteMyMutation.isPending;
   const isCancelling = cancelCreateMutation.isPending;
-  const wizardActionsDisabled = isSubmitting || isWithdrawing || isCancelling || isCreateBlocked;
+  const wizardActionsDisabled =
+    isSubmitting || isWithdrawing || isCancelling || isCreateBlocked;
 
   useFocusEffect(
     useCallback(() => {
@@ -95,17 +105,21 @@ export const CreateRafflePage = () => {
       onConfirm();
       return;
     }
-    Alert.alert(CREATE_RAFFLE_MODAL_UI.DISCARD_TITLE, CREATE_RAFFLE_MODAL_UI.DISCARD_MESSAGE, [
-      { text: CREATE_RAFFLE_MODAL_UI.DISCARD_KEEP, style: "cancel" },
-      {
-        text: CREATE_RAFFLE_MODAL_UI.DISCARD_CONFIRM,
-        style: "destructive",
-        onPress: () => {
-          resetWizard();
-          onConfirm();
+    Alert.alert(
+      CREATE_RAFFLE_MODAL_UI.DISCARD_TITLE,
+      CREATE_RAFFLE_MODAL_UI.DISCARD_MESSAGE,
+      [
+        { text: CREATE_RAFFLE_MODAL_UI.DISCARD_KEEP, style: "cancel" },
+        {
+          text: CREATE_RAFFLE_MODAL_UI.DISCARD_CONFIRM,
+          style: "destructive",
+          onPress: () => {
+            resetWizard();
+            onConfirm();
+          },
         },
-      },
-    ]);
+      ],
+    );
   };
 
   const goNext = () => {
@@ -149,7 +163,9 @@ export const CreateRafflePage = () => {
       resetWizard();
       router.replace("/hub/advertising");
     } catch (error) {
-      setErrorMessage(formatApiErrorMessage(error, API_CLIENT_UI.DELETE_RAFFLE_FALLBACK));
+      setErrorMessage(
+        formatApiErrorMessage(error, API_CLIENT_UI.DELETE_RAFFLE_FALLBACK),
+      );
     }
   };
 
@@ -167,7 +183,9 @@ export const CreateRafflePage = () => {
       resetWizard();
       navigateToAdvertising();
     } catch (error) {
-      setErrorMessage(formatApiErrorMessage(error, API_CLIENT_UI.CANCEL_RAFFLE_CREATE_FALLBACK));
+      setErrorMessage(
+        formatApiErrorMessage(error, API_CLIENT_UI.CANCEL_RAFFLE_CREATE_FALLBACK),
+      );
     }
   };
 
@@ -266,8 +284,13 @@ export const CreateRafflePage = () => {
     return (
       <View style={styles.centered}>
         <Text style={styles.hint}>{CREATE_RAFFLE_PAGE_UI.LOGIN_HINT}</Text>
-        <Pressable style={styles.loginButton} onPress={() => router.push("/(auth)/login")}>
-          <Text style={styles.loginButtonText}>{CREATE_RAFFLE_PAGE_UI.LOGIN_BUTTON}</Text>
+        <Pressable
+          style={styles.loginButton}
+          onPress={() => router.push("/(auth)/login")}
+        >
+          <Text style={styles.loginButtonText}>
+            {CREATE_RAFFLE_PAGE_UI.LOGIN_BUTTON}
+          </Text>
         </Pressable>
       </View>
     );
@@ -283,7 +306,9 @@ export const CreateRafflePage = () => {
               onPress={() => setNavSheetVisible(true)}
             />
           </View>
-          <Text style={styles.state}>{CREATE_RAFFLE_PAGE_UI.CONFIRMED_DATA_REQUIRED}</Text>
+          <Text style={styles.state}>
+            {CREATE_RAFFLE_PAGE_UI.CONFIRMED_DATA_REQUIRED}
+          </Text>
         </View>
         {hubChrome}
       </>
@@ -316,7 +341,9 @@ export const CreateRafflePage = () => {
             style={styles.loginButton}
             onPress={() => router.push("/hub/advertising")}
           >
-            <Text style={styles.loginButtonText}>{CREATE_RAFFLE_PAGE_UI.GO_TO_ADVERTISING}</Text>
+            <Text style={styles.loginButtonText}>
+              {CREATE_RAFFLE_PAGE_UI.GO_TO_ADVERTISING}
+            </Text>
           </Pressable>
         </View>
         {hubChrome}
@@ -393,12 +420,17 @@ export const CreateRafflePage = () => {
               onPress={goBack}
               disabled={isSubmitting || isWithdrawing || isCancelling}
             >
-              <Text style={styles.wizardSecondaryBtnText}>{CREATE_RAFFLE_MODAL_UI.BTN_BACK}</Text>
+              <Text style={styles.wizardSecondaryBtnText}>
+                {CREATE_RAFFLE_MODAL_UI.BTN_BACK}
+              </Text>
             </Pressable>
           )}
 
           <Pressable
-            style={[styles.wizardPrimaryBtn, wizardActionsDisabled && styles.submitDisabled]}
+            style={[
+              styles.wizardPrimaryBtn,
+              wizardActionsDisabled && styles.submitDisabled,
+            ]}
             onPress={() => {
               if (isLastStep) {
                 void handleSubmit();
@@ -412,7 +444,9 @@ export const CreateRafflePage = () => {
               <ActivityIndicator color={theme.colors.onContrast} />
             ) : (
               <Text style={styles.wizardPrimaryBtnText}>
-                {isLastStep ? CREATE_RAFFLE_MODAL_UI.SUBMIT : CREATE_RAFFLE_MODAL_UI.BTN_NEXT}
+                {isLastStep
+                  ? CREATE_RAFFLE_MODAL_UI.SUBMIT
+                  : CREATE_RAFFLE_MODAL_UI.BTN_NEXT}
               </Text>
             )}
           </Pressable>

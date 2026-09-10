@@ -56,10 +56,9 @@ export const productPromoCodeItemSchema = z.object({
 });
 
 export const replaceProductPromoCodesBodySchema = z.object({
-  promoCodes: z.array(productPromoCodeItemSchema).max(
-    PRODUCT_PROMO_CODES_MAX_ACTIVE * 2,
-    `Слишком много промокодов`,
-  ),
+  promoCodes: z
+    .array(productPromoCodeItemSchema)
+    .max(PRODUCT_PROMO_CODES_MAX_ACTIVE * 2, `Слишком много промокодов`),
 });
 
 export const activateProductPromoCodeBodySchema = z.object({

@@ -51,10 +51,13 @@ export const IntroAdModerationCampaignCard = ({
 }: IntroAdModerationCampaignCardProps) => {
   const styles = useIntroAdModerationCampaignCardStyles();
   const advertiserName = resolveIntroAdAdvertiserName(campaign);
-  const needsAttention = mode === "pending" && campaignModerationNeedsAttention(campaign);
+  const needsAttention =
+    mode === "pending" && campaignModerationNeedsAttention(campaign);
   const collapsedPreview = resolveModerationCampaignCollapsedPreview(campaign);
   const createdLabel =
-    mode === "pending" && campaign.createdAt ? formatIsoDateTime(campaign.createdAt) : null;
+    mode === "pending" && campaign.createdAt
+      ? formatIsoDateTime(campaign.createdAt)
+      : null;
 
   const cardBody = (
     <View style={styles.card}>
@@ -80,7 +83,9 @@ export const IntroAdModerationCampaignCard = ({
           onPress={onPreview}
           disabled={isPending}
         >
-          <Text style={styles.secondaryButtonText}>{INTRO_AD_MODERATION_PAGE_UI.PREVIEW}</Text>
+          <Text style={styles.secondaryButtonText}>
+            {INTRO_AD_MODERATION_PAGE_UI.PREVIEW}
+          </Text>
         </Pressable>
 
         {mode === "pending" && onApprove ? (
@@ -103,7 +108,9 @@ export const IntroAdModerationCampaignCard = ({
             onPress={onStaffCancel}
             disabled={isPending}
           >
-            <Text style={styles.cancelButtonText}>{INTRO_AD_MODERATION_PAGE_UI.STAFF_CANCEL}</Text>
+            <Text style={styles.cancelButtonText}>
+              {INTRO_AD_MODERATION_PAGE_UI.STAFF_CANCEL}
+            </Text>
           </Pressable>
         ) : null}
       </View>
@@ -127,7 +134,9 @@ export const IntroAdModerationCampaignCard = ({
             onPress={onReject}
             disabled={isPending}
           >
-            <Text style={styles.dangerButtonText}>{INTRO_AD_MODERATION_PAGE_UI.REJECT}</Text>
+            <Text style={styles.dangerButtonText}>
+              {INTRO_AD_MODERATION_PAGE_UI.REJECT}
+            </Text>
           </Pressable>
         </>
       ) : null}

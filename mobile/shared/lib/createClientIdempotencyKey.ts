@@ -3,10 +3,7 @@
  * (https / localhost) — на LAN HTTP / части RN нужен fallback.
  */
 export function createClientIdempotencyKey(): string {
-  if (
-    typeof crypto !== "undefined" &&
-    typeof crypto.randomUUID === "function"
-  ) {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     try {
       return crypto.randomUUID();
     } catch {

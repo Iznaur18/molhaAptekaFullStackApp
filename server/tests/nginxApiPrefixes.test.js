@@ -45,14 +45,16 @@ const readMountedPrefixes = () => {
 
 const readNginxPrefixes = () => {
   const source = readFileSync(NGINX_PATH, "utf8");
-  return source
-    // Файл живёт и с CRLF: при split("\n") в конце строки остаётся \r, а он для
-    // регулярки — конец строки, и вырезание комментария молча срывалось —
-    // комментарии приезжали в список префиксов.
-    .split(/\r?\n/)
-    .map((line) => line.replace(/#.*$/, "").trim())
-    .filter(Boolean)
-    .sort();
+  return (
+    source
+      // Файл живёт и с CRLF: при split("\n") в конце строки остаётся \r, а он для
+      // регулярки — конец строки, и вырезание комментария молча срывалось —
+      // комментарии приезжали в список префиксов.
+      .split(/\r?\n/)
+      .map((line) => line.replace(/#.*$/, "").trim())
+      .filter(Boolean)
+      .sort()
+  );
 };
 
 describe("API-префиксы и nginx", () => {

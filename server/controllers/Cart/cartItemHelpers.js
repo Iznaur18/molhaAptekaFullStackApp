@@ -65,7 +65,10 @@ export const parseReplaceCartBodyItems = (raw) => {
  * @param {string | null | undefined} [buyerUserId]
  * @returns {Promise<Record<string, number>>}
  */
-export const filterCartItemsToPurchasableProducts = async (items, buyerUserId = null) => {
+export const filterCartItemsToPurchasableProducts = async (
+  items,
+  buyerUserId = null,
+) => {
   const ids = Object.keys(items);
   if (ids.length === 0) return {};
 

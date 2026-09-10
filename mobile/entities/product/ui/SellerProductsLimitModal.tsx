@@ -61,7 +61,9 @@ export const SellerProductsLimitModal = ({
           <Text style={styles.title}>{SELLER_PRODUCTS_LIMIT_MODAL_UI.TITLE}</Text>
           <Text style={styles.body}>{body}</Text>
           <Pressable style={styles.button} onPress={onClose}>
-            <Text style={styles.buttonText}>{SELLER_PRODUCTS_LIMIT_MODAL_UI.CLOSE}</Text>
+            <Text style={styles.buttonText}>
+              {SELLER_PRODUCTS_LIMIT_MODAL_UI.CLOSE}
+            </Text>
           </Pressable>
         </View>
       </View>

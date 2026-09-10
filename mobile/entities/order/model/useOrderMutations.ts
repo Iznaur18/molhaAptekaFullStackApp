@@ -21,24 +21,14 @@ export const useOrderMutations = () => {
   };
 
   const confirmItemMutation = useMutation({
-    mutationFn: ({
-      orderId,
-      itemIndex,
-    }: {
-      orderId: string;
-      itemIndex: number;
-    }) => confirmOrderItem(orderId, itemIndex),
+    mutationFn: ({ orderId, itemIndex }: { orderId: string; itemIndex: number }) =>
+      confirmOrderItem(orderId, itemIndex),
     onSuccess: invalidateOrders,
   });
 
   const cancelItemMutation = useMutation({
-    mutationFn: ({
-      orderId,
-      itemIndex,
-    }: {
-      orderId: string;
-      itemIndex: number;
-    }) => markOrderItemCancelled(orderId, itemIndex),
+    mutationFn: ({ orderId, itemIndex }: { orderId: string; itemIndex: number }) =>
+      markOrderItemCancelled(orderId, itemIndex),
     onSuccess: () => {
       invalidateOrders();
       invalidateSales();
@@ -46,24 +36,14 @@ export const useOrderMutations = () => {
   });
 
   const shipItemMutation = useMutation({
-    mutationFn: ({
-      orderId,
-      itemIndex,
-    }: {
-      orderId: string;
-      itemIndex: number;
-    }) => markOrderItemShipped(orderId, itemIndex),
+    mutationFn: ({ orderId, itemIndex }: { orderId: string; itemIndex: number }) =>
+      markOrderItemShipped(orderId, itemIndex),
     onSuccess: invalidateSales,
   });
 
   const deliverItemMutation = useMutation({
-    mutationFn: ({
-      orderId,
-      itemIndex,
-    }: {
-      orderId: string;
-      itemIndex: number;
-    }) => markOrderItemDelivered(orderId, itemIndex),
+    mutationFn: ({ orderId, itemIndex }: { orderId: string; itemIndex: number }) =>
+      markOrderItemDelivered(orderId, itemIndex),
     onSuccess: invalidateSales,
   });
 

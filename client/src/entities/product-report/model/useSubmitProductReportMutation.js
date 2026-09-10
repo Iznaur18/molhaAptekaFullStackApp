@@ -4,6 +4,7 @@ import { submitProductReport } from "../api/submitProductReport.js";
 
 export function useSubmitProductReportMutation() {
   return useMutation({
-    mutationFn: ({ productId, reportText }) => submitProductReport(productId, reportText),
+    mutationFn: ({ productId, reportText }) =>
+      submitProductReport(productId, reportText),
   });
 }

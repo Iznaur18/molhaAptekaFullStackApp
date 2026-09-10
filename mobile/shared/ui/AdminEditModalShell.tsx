@@ -58,8 +58,14 @@ export const AdminEditModalShell = ({
           />
         </Animated.View>
 
-        <Animated.View style={[styles.sheet, sheetAnimatedStyle]} pointerEvents="box-none">
-          <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+        <Animated.View
+          style={[styles.sheet, sheetAnimatedStyle]}
+          pointerEvents="box-none"
+        >
+          <ScrollView
+            contentContainerStyle={styles.scroll}
+            keyboardShouldPersistTaps="handled"
+          >
             <View style={styles.card}>{children}</View>
           </ScrollView>
         </Animated.View>

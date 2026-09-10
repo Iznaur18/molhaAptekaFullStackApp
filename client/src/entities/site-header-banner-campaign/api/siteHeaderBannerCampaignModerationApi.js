@@ -12,9 +12,12 @@ import { SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI } from "../../../shared/
  */
 export async function fetchPendingSiteHeaderBannerCampaigns(params = {}) {
   try {
-    const { data } = await apiClient.get("/site-header-banner-campaign/moderation/pending", {
-      params: { limit: params.limit ?? 50 },
-    });
+    const { data } = await apiClient.get(
+      "/site-header-banner-campaign/moderation/pending",
+      {
+        params: { limit: params.limit ?? 50 },
+      },
+    );
     return parseApiContractData(data, siteHeaderBannerCampaignModerationListDataSchema);
   } catch (e) {
     const message =
@@ -30,7 +33,9 @@ export async function fetchPendingSiteHeaderBannerCampaigns(params = {}) {
  */
 export async function fetchPendingSiteHeaderBannerCampaignsCount() {
   try {
-    const { data } = await apiClient.get("/site-header-banner-campaign/moderation/pending/count");
+    const { data } = await apiClient.get(
+      "/site-header-banner-campaign/moderation/pending/count",
+    );
     const parsed = parseApiContractData(
       data,
       siteHeaderBannerCampaignModerationCountDataSchema,
@@ -50,7 +55,9 @@ export async function fetchPendingSiteHeaderBannerCampaignsCount() {
  */
 export async function fetchManagedSiteHeaderBannerCampaigns() {
   try {
-    const { data } = await apiClient.get("/site-header-banner-campaign/moderation/managed");
+    const { data } = await apiClient.get(
+      "/site-header-banner-campaign/moderation/managed",
+    );
     return parseApiContractData(data, siteHeaderBannerCampaignModerationListDataSchema);
   } catch (e) {
     const message =
@@ -69,7 +76,9 @@ export async function approveSiteHeaderBannerCampaign(campaignId) {
     const { data } = await apiClient.post(
       `/site-header-banner-campaign/moderation/${campaignId}/approve`,
     );
-    return String(data?.message ?? SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.APPROVE_SUCCESS);
+    return String(
+      data?.message ?? SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.APPROVE_SUCCESS,
+    );
   } catch (e) {
     const message =
       e?.response?.data?.message ??
@@ -88,7 +97,8 @@ export async function cancelSiteHeaderBannerCampaignByStaff(campaignId) {
       `/site-header-banner-campaign/moderation/${campaignId}`,
     );
     return String(
-      data?.message ?? SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.STAFF_CANCEL_SUCCESS,
+      data?.message ??
+        SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.STAFF_CANCEL_SUCCESS,
     );
   } catch (e) {
     const message =
@@ -111,7 +121,9 @@ export async function rejectSiteHeaderBannerCampaign(campaignId, reason = "") {
         reason: reason.trim() || null,
       },
     );
-    return String(data?.message ?? SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.REJECT_SUCCESS);
+    return String(
+      data?.message ?? SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.REJECT_SUCCESS,
+    );
   } catch (e) {
     const message =
       e?.response?.data?.message ??

@@ -66,8 +66,7 @@ export const ProductManageToggleRow = ({
   const control = resolveControl(variant, onPress, onCheckedChange);
   const isDanger = variant === "danger";
   const isLocked = disabled || pending;
-  const statusLabel =
-    pending && pendingLabel ? pendingLabel : (ariaLabel ?? title);
+  const statusLabel = pending && pendingLabel ? pendingLabel : (ariaLabel ?? title);
   const [displayChecked, setDisplayChecked] = useState(checked);
 
   useEffect(() => {
@@ -119,7 +118,11 @@ export const ProductManageToggleRow = ({
       <View
         style={styles.row}
         accessibilityRole="switch"
-        accessibilityState={{ disabled: isLocked, checked: displayChecked, busy: pending }}
+        accessibilityState={{
+          disabled: isLocked,
+          checked: displayChecked,
+          busy: pending,
+        }}
         accessibilityLabel={statusLabel}
       >
         <Pressable

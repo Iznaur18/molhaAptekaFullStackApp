@@ -35,7 +35,9 @@ test("продавец: разместить товар через пошаго�
   await dialog.locator('input[name="productPrice"]').fill("250");
   await dialog.getByRole("button", { name: "Далее", exact: true }).click();
 
-  await dialog.getByRole("button", { name: "Отправить на проверку", exact: true }).click();
+  await dialog
+    .getByRole("button", { name: "Отправить на проверку", exact: true })
+    .click();
 
   await expect(page).toHaveURL(/\/my-products/, { timeout: 20_000 });
   await expect(

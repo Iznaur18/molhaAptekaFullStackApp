@@ -22,7 +22,9 @@ describe("ProfileSidebarLogout", () => {
     render(<ProfileSidebarLogout onLogout={onLogout} />);
 
     await user.click(screen.getByRole("button", { name: MY_PROFILE_PAGE_UI.LOGOUT }));
-    await user.click(screen.getByRole("button", { name: MY_PROFILE_PAGE_UI.LOGOUT_YES }));
+    await user.click(
+      screen.getByRole("button", { name: MY_PROFILE_PAGE_UI.LOGOUT_YES }),
+    );
 
     expect(onLogout).toHaveBeenCalledTimes(1);
   });
@@ -50,7 +52,9 @@ describe("ProfileSidebar", () => {
     );
 
     const navGroups = document.querySelectorAll(".my-profile-page__nav-group");
-    expect(navGroups[navGroups.length - 1]).toHaveClass("my-profile-page__nav-group_logout");
+    expect(navGroups[navGroups.length - 1]).toHaveClass(
+      "my-profile-page__nav-group_logout",
+    );
     expect(
       screen.getByRole("button", { name: MY_PROFILE_PAGE_UI.LOGOUT }),
     ).toBeInTheDocument();

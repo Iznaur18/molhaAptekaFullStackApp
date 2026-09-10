@@ -13,7 +13,9 @@ const readClientFile = (relativePath) =>
   readFileSync(join(REPO_ROOT, "client", relativePath), "utf8");
 
 test("product card rating row matches web structure and colors", () => {
-  const webCss = readClientFile("src/entities/product/ui/product-card/ProductCardBadges.css");
+  const webCss = readClientFile(
+    "src/entities/product/ui/product-card/ProductCardBadges.css",
+  );
   const webContent = readClientFile(
     "src/entities/product/ui/product-card/ProductCardStandardContent.jsx",
   );
@@ -21,7 +23,10 @@ test("product card rating row matches web structure and colors", () => {
   const palette = readMobileFile("entities/product/lib/productCardBadgePalette.ts");
   const card = readMobileFile("entities/product/ui/ProductCard.tsx");
 
-  assert.match(webCss, /product-card__rating[\s\S]*color:\s*var\(--iz-color-text-muted\)/);
+  assert.match(
+    webCss,
+    /product-card__rating[\s\S]*color:\s*var\(--iz-color-text-muted\)/,
+  );
   assert.match(webContent, /product-card__rating-score/);
   assert.match(webContent, /MessageSquare/);
   assert.match(webContent, /reviewRatingParts\.count/);

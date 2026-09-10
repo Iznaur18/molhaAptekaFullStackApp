@@ -30,8 +30,7 @@ export async function parseProductBulkImportExcel(fileBuffer) {
   await workbook.xlsx.load(fileBuffer);
 
   const sheet =
-    workbook.getWorksheet(PRODUCT_BULK_IMPORT_SHEET_NAME) ??
-    workbook.worksheets[0];
+    workbook.getWorksheet(PRODUCT_BULK_IMPORT_SHEET_NAME) ?? workbook.worksheets[0];
 
   if (!sheet) {
     throw new Error("Лист с товарами не найден");
@@ -48,9 +47,7 @@ export async function parseProductBulkImportExcel(fileBuffer) {
     (column) => !headers.includes(column),
   );
   if (missingColumns.length > 0) {
-    throw new Error(
-      `В шаблоне не хватает колонок: ${missingColumns.join(", ")}`,
-    );
+    throw new Error(`В шаблоне не хватает колонок: ${missingColumns.join(", ")}`);
   }
 
   /** @type {Array<Record<string, string> & { __rowNumber: number }>} */

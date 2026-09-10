@@ -38,7 +38,9 @@ test("curated home layout uses web card gap", () => {
 test("home catalog screen wires home-feed refresh", () => {
   const index = readMobileFile("app/(tabs)/index.tsx");
   const header = readMobileFile("features/home-feed/ui/HomeFeedHeader.tsx");
-  const invalidate = readMobileFile("features/home-feed/model/invalidateHomeFeedQueries.ts");
+  const invalidate = readMobileFile(
+    "features/home-feed/model/invalidateHomeFeedQueries.ts",
+  );
 
   assert.match(index, /invalidateHomeFeedQueries/);
   assert.match(index, /ThemedRefreshControl/);
@@ -62,9 +64,18 @@ test("home feed sections share one vertical gap constant", () => {
   assert.match(layout, /HOME_FEED_SECTION_GAP = 8/);
   assert.match(catalogStyles, /listHeader:[\s\S]*gap: HOME_FEED_SECTION_GAP/);
   assert.match(catalogStyles, /toolbarCompactTop:[\s\S]*marginBottom: 0/);
-  assert.match(catalogStyles, /toolbarCompactTop:[\s\S]*marginTop: -HOME_CATALOG_SECTION_TITLE_COMPACT_PULL_UP/);
-  assert.match(catalogStyles, /titleCompactTop:[\s\S]*HOME_CATALOG_SECTION_TITLE_MARGIN_TOP/);
-  assert.match(curated, /CURATED_PRODUCT_LIST_HOME_SECTION_MARGIN_BOTTOM = HOME_FEED_SECTION_GAP/);
+  assert.match(
+    catalogStyles,
+    /toolbarCompactTop:[\s\S]*marginTop: -HOME_CATALOG_SECTION_TITLE_COMPACT_PULL_UP/,
+  );
+  assert.match(
+    catalogStyles,
+    /titleCompactTop:[\s\S]*HOME_CATALOG_SECTION_TITLE_MARGIN_TOP/,
+  );
+  assert.match(
+    curated,
+    /CURATED_PRODUCT_LIST_HOME_SECTION_MARGIN_BOTTOM = HOME_FEED_SECTION_GAP/,
+  );
   assert.match(header, /bannerBelowPanel:[\s\S]*marginTop: 0/);
   assert.match(header, /bannerBelowPanel:[\s\S]*marginBottom: 0/);
   assert.match(stories, /marginBottom: 0/);
@@ -74,7 +85,10 @@ test("home feed sections share one vertical gap constant", () => {
   const display = readMobileFile("shared/theme/displayTypography.ts");
   assert.match(display, /marginTop: 11/);
   assert.match(display, /marginBottom: 6/);
-  assert.match(catalogStyles, /homeFeedSearchHeader:[\s\S]*marginBottom: HOME_FEED_SECTION_GAP/);
+  assert.match(
+    catalogStyles,
+    /homeFeedSearchHeader:[\s\S]*marginBottom: HOME_FEED_SECTION_GAP/,
+  );
 });
 
 test("stories strip section title matches curated list title chrome", () => {
@@ -92,17 +106,16 @@ test("stories strip section title matches curated list title chrome", () => {
   assert.match(copy, /STORIES_SECTION_TITLE: "История"/);
   assert.match(strip, /HOME_FEED_UI\.STORIES_SECTION_TITLE/);
   assert.match(strip, /styles\.title/);
-  assert.match(
-    strip,
-    /styles\.title[\s\S]*SquircleView[\s\S]*styles\.scrollWrapper/,
-  );
+  assert.match(strip, /styles\.title[\s\S]*SquircleView[\s\S]*styles\.scrollWrapper/);
   assert.match(display, /DISPLAY_FONT_FAMILY = "Intro"/);
   assert.match(display, /textTransform: "uppercase"/);
   assert.match(storiesTitle, /HOME_FEED_DISPLAY_TITLE/);
   assert.match(curatedTitle, /HOME_FEED_DISPLAY_TITLE/);
   assert.match(styles, /CATALOG_BROWSER_DISPLAY_TITLE/);
 
-  const curatedSection = readMobileFile("features/home-feed/ui/HomeCuratedListsSection.tsx");
+  const curatedSection = readMobileFile(
+    "features/home-feed/ui/HomeCuratedListsSection.tsx",
+  );
   assert.match(
     curatedSection,
     /styles\.title[\s\S]*SquircleView[\s\S]*styles\.listBlock/,
@@ -118,9 +131,15 @@ test("stories strip section title matches curated list title chrome", () => {
 
 test("raffle section opens /raffle/:id from reveal button (web parity)", () => {
   const styles = readMobileFile("shared/theme/raffleFeaturedStyles.ts");
-  const section = readMobileFile("features/home-feed/ui/HomeFeaturedRafflesSection.tsx");
-  const reveal = readMobileFile("features/home-feed/ui/HomeFeaturedRafflesRevealButton.tsx");
-  const page = readMobileFile("features/raffle-products-page/ui/RaffleProductsPage.tsx");
+  const section = readMobileFile(
+    "features/home-feed/ui/HomeFeaturedRafflesSection.tsx",
+  );
+  const reveal = readMobileFile(
+    "features/home-feed/ui/HomeFeaturedRafflesRevealButton.tsx",
+  );
+  const page = readMobileFile(
+    "features/raffle-products-page/ui/RaffleProductsPage.tsx",
+  );
 
   assert.match(styles, /revealButton/);
   assert.match(styles, /theme\.colors\.action/);
@@ -142,8 +161,12 @@ test("raffle section opens /raffle/:id from reveal button (web parity)", () => {
 });
 
 test("create story modal matches web animation and layout tokens", () => {
-  const layout = readMobileFile("entities/user-story/lib/createUserStoryModalLayout.ts");
-  const animation = readMobileFile("entities/user-story/model/useCreateUserStoryModalAnimation.ts");
+  const layout = readMobileFile(
+    "entities/user-story/lib/createUserStoryModalLayout.ts",
+  );
+  const animation = readMobileFile(
+    "entities/user-story/model/useCreateUserStoryModalAnimation.ts",
+  );
   const modal = readMobileFile("features/home-feed/ui/CreateUserStoryModal.tsx");
   const strip = readMobileFile("features/home-feed/ui/UserStoriesStrip.tsx");
   const chrome = readMobileFile("shared/theme/modalChromeStyles.ts");
@@ -153,7 +176,10 @@ test("create story modal matches web animation and layout tokens", () => {
   assert.match(layout, /borderRadius: 32/);
   assert.match(layout, /backdropScrim: "rgba\(0,0,0,0\.62\)"/);
   assert.match(layout, /captionHeight: 180/);
-  assert.match(layout, /sheetEnterEasingCss: "cubic-bezier\(0\.215, 0\.61, 0\.355, 1\)"/);
+  assert.match(
+    layout,
+    /sheetEnterEasingCss: "cubic-bezier\(0\.215, 0\.61, 0\.355, 1\)"/,
+  );
 
   assert.match(animation, /useAdminEditModalAnimation/);
   assert.match(animation, /deferEnterUntilPaint: true/);

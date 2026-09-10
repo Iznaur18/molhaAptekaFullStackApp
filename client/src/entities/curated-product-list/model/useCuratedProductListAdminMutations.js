@@ -25,7 +25,8 @@ export function useCuratedProductListAdminMutations() {
   });
 
   const addItemMutation = useMutation({
-    mutationFn: ({ listId, productId }) => addCuratedProductListItemAdmin(listId, productId),
+    mutationFn: ({ listId, productId }) =>
+      addCuratedProductListItemAdmin(listId, productId),
   });
 
   const removeItemMutation = useMutation({

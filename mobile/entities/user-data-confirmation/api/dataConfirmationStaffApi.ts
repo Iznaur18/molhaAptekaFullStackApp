@@ -21,7 +21,10 @@ export const fetchPendingDataConfirmationRequests = async () => {
     return data.data.requests as DataConfirmationRequest[];
   } catch (error) {
     throw new Error(
-      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_DATA_CONFIRMATION_QUEUE_FALLBACK),
+      formatApiErrorMessage(
+        error,
+        API_CLIENT_UI.FETCH_DATA_CONFIRMATION_QUEUE_FALLBACK,
+      ),
     );
   }
 };

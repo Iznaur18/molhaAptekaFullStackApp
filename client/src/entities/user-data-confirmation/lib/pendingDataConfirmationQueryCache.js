@@ -4,5 +4,7 @@ import { pendingDataConfirmationQueryKeys } from "../model/pendingDataConfirmati
  * @param {import('@tanstack/react-query').QueryClient} queryClient
  */
 export function invalidatePendingDataConfirmationRequests(queryClient) {
-  return queryClient.invalidateQueries({ queryKey: pendingDataConfirmationQueryKeys.all });
+  return queryClient.invalidateQueries({
+    queryKey: pendingDataConfirmationQueryKeys.all,
+  });
 }

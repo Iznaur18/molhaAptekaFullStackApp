@@ -9,11 +9,7 @@ import {
 } from "@izibuy/shared-api";
 import { Platform } from "react-native";
 
-import {
-  API_BASE_URL,
-  API_CLIENT_UI,
-  API_REQUEST_TIMEOUT_MS,
-} from "@/shared/config";
+import { API_BASE_URL, API_CLIENT_UI, API_REQUEST_TIMEOUT_MS } from "@/shared/config";
 import { isMobileSentryEnabled, Sentry } from "@/shared/lib/initMobileSentry";
 
 import {
@@ -46,11 +42,9 @@ const refreshAuthSession = async (): Promise<void> => {
     throw new Error("Refresh token required");
   }
 
-  const { data } = await apiClient.post(
-    "/auth/refresh",
-    { refreshToken },
-    { _skipAuthRefresh: true } as AuthAwareRequestConfig,
-  );
+  const { data } = await apiClient.post("/auth/refresh", { refreshToken }, {
+    _skipAuthRefresh: true,
+  } as AuthAwareRequestConfig);
 
   const session = parseAuthSessionData(data);
   if (!session.accessToken || !session.refreshToken) {

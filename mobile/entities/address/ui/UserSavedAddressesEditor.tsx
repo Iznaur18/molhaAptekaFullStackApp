@@ -209,7 +209,10 @@ export const UserSavedAddressesEditor = ({
                 >
                   {item.isDefault ? (
                     <View
-                      style={[styles.radioDot, { backgroundColor: theme.colors.action }]}
+                      style={[
+                        styles.radioDot,
+                        { backgroundColor: theme.colors.action },
+                      ]}
                     />
                   ) : null}
                 </View>
@@ -314,7 +317,9 @@ export const UserSavedAddressesEditor = ({
                 disabled && styles.actionDisabled,
               ]}
             >
-              <Text style={[styles.primaryButtonText, { color: theme.colors.onContrast }]}>
+              <Text
+                style={[styles.primaryButtonText, { color: theme.colors.onContrast }]}
+              >
                 {USER_SAVED_ADDRESSES_UI.SAVE}
               </Text>
             </Pressable>

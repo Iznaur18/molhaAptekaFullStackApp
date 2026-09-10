@@ -56,10 +56,13 @@ export const SiteHeaderBannerCampaignModerationCard = ({
   const styles = useIntroAdModerationCampaignCardStyles();
   const [showPreview, setShowPreview] = useState(false);
   const advertiserName = resolveIntroAdAdvertiserName(campaign);
-  const needsAttention = mode === "pending" && campaignModerationNeedsAttention(campaign);
+  const needsAttention =
+    mode === "pending" && campaignModerationNeedsAttention(campaign);
   const collapsedPreview = resolveModerationCampaignCollapsedPreview(campaign);
   const createdLabel =
-    mode === "pending" && campaign.createdAt ? formatIsoDateTime(campaign.createdAt) : null;
+    mode === "pending" && campaign.createdAt
+      ? formatIsoDateTime(campaign.createdAt)
+      : null;
   const previewSlides = useMemo(
     () => campaignToSiteHeaderBannerPreviewSlides(campaign),
     [campaign],
@@ -69,7 +72,8 @@ export const SiteHeaderBannerCampaignModerationCard = ({
   const cardBody = (
     <View style={styles.card}>
       <Text style={styles.meta}>
-        {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.ADVERTISER_LABEL}: {advertiserName}
+        {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.ADVERTISER_LABEL}:{" "}
+        {advertiserName}
       </Text>
 
       {mode === "managed" ? (
@@ -139,7 +143,9 @@ export const SiteHeaderBannerCampaignModerationCard = ({
             style={styles.rejectInput}
             value={rejectReason}
             onChangeText={onRejectReasonChange}
-            placeholder={SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.REJECT_REASON_PLACEHOLDER}
+            placeholder={
+              SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.REJECT_REASON_PLACEHOLDER
+            }
             multiline
           />
           <Pressable

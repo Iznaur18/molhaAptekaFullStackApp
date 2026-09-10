@@ -41,7 +41,10 @@ const WORK = {
 };
 
 test("без адресов выбран пункт «другой»", () => {
-  assert.equal(resolveInitialCheckoutSavedAddressId([]), CHECKOUT_SAVED_ADDRESS_CUSTOM_ID);
+  assert.equal(
+    resolveInitialCheckoutSavedAddressId([]),
+    CHECKOUT_SAVED_ADDRESS_CUSTOM_ID,
+  );
   assert.equal(
     resolveInitialCheckoutSavedAddressId(undefined),
     CHECKOUT_SAVED_ADDRESS_CUSTOM_ID,
@@ -96,10 +99,15 @@ test("ручная правка переводит подсветку на со�
 });
 
 test("логика повторяет веб один в один", () => {
-  const web = readRepoFile("client/src/entities/address/lib/deliveryAddressFromSaved.js");
+  const web = readRepoFile(
+    "client/src/entities/address/lib/deliveryAddressFromSaved.js",
+  );
   assert.match(web, /CHECKOUT_SAVED_ADDRESS_CUSTOM_ID = "__custom__"/);
   assert.equal(CHECKOUT_SAVED_ADDRESS_CUSTOM_ID, "__custom__");
-  assert.match(web, /addresses\.find\(\(item\) => item\.isDefault\) \?\? addresses\[0\]/);
+  assert.match(
+    web,
+    /addresses\.find\(\(item\) => item\.isDefault\) \?\? addresses\[0\]/,
+  );
 });
 
 test("подписи чекаута совпадают с вебом", () => {
@@ -126,7 +134,10 @@ test("поля чекаута совпадают с web checkout-form__input", (
   assert.match(layout, /paddingVertical: 9/);
   assert.match(layout, /fontSize: 15/);
   assert.match(styles, /CHECKOUT_FORM_INPUT_LAYOUT/);
-  assert.match(styles, /fieldInput:[\s\S]*backgroundColor: theme\.colors\.surfaceMuted/);
+  assert.match(
+    styles,
+    /fieldInput:[\s\S]*backgroundColor: theme\.colors\.surfaceMuted/,
+  );
   assert.match(styles, /fieldInput:[\s\S]*color: theme\.colors\.text/);
 });
 

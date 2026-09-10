@@ -155,7 +155,11 @@ export function MyProductsCatalogSection({
       {catalogLoadMoreError ? (
         <div className="my-products-catalog-section__load-more-error">
           <InlineErrorBanner>{catalogLoadMoreError}</InlineErrorBanner>
-          <button type="button" className="app-btn app-btn--ghost" onClick={onRetryCatalogLoadMore}>
+          <button
+            type="button"
+            className="app-btn app-btn--ghost"
+            onClick={onRetryCatalogLoadMore}
+          >
             {HOME_PAGE_UI.CATALOG_LOAD_MORE_RETRY}
           </button>
         </div>

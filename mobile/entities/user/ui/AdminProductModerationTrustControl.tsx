@@ -59,7 +59,8 @@ export const AdminProductModerationTrustControl = ({
 }: AdminProductModerationTrustControlProps) => {
   const styles = useStyles();
   const trustMutation = useMutation({
-    mutationFn: (trusted: boolean) => patchSellerProductModerationTrust({ userId, trusted }),
+    mutationFn: (trusted: boolean) =>
+      patchSellerProductModerationTrust({ userId, trusted }),
     onSuccess: (seller) => onChanged(seller),
   });
 

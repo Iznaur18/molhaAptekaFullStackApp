@@ -42,4 +42,7 @@ export const E2E_KYC_BUYER = {
   password: E2E_FIXTURE.password,
 };
 
-export const E2E_SAMPLE_IMAGE_PATH = path.join(__dirname, "../fixtures/sample-upload.png");
+export const E2E_SAMPLE_IMAGE_PATH = path.join(
+  __dirname,
+  "../fixtures/sample-upload.png",
+);

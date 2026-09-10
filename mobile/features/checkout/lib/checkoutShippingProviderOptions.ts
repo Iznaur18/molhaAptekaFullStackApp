@@ -38,9 +38,10 @@ export function resolveCheckoutShippingProviderLabel(
   if (providerId === CHECKOUT_SHIPPING_PROVIDER_SELLER) {
     return labels.sellerLabel;
   }
-  return SHIPPING_PROVIDER_LABEL_RU[
-    providerId as keyof typeof SHIPPING_PROVIDER_LABEL_RU
-  ] ?? providerId;
+  return (
+    SHIPPING_PROVIDER_LABEL_RU[providerId as keyof typeof SHIPPING_PROVIDER_LABEL_RU] ??
+    providerId
+  );
 }
 
 export const CHECKOUT_SHIPPING_SERVICE_OPTIONS = [

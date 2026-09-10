@@ -4,7 +4,8 @@ const INTEGER_GROUP_FORMAT = new Intl.NumberFormat("ru-RU", {
 
 export const RUB_PRICE_INPUT_MAX_DIGITS = 9;
 
-export const keepDigitsOnly = (raw: unknown): string => String(raw ?? "").replace(/\D/g, "");
+export const keepDigitsOnly = (raw: unknown): string =>
+  String(raw ?? "").replace(/\D/g, "");
 
 export const formatIntegerGroupRu = (raw: unknown): string => {
   const digits = keepDigitsOnly(raw);

@@ -12,7 +12,9 @@ const readMobileFile = (relativePath) =>
 test("my orders page mirrors web toolbar and compact buyer order card", () => {
   const page = readMobileFile("features/my-orders-page/ui/MyOrdersPage.tsx");
   const toolbar = readMobileFile("features/my-orders-page/ui/MyOrdersPageToolbar.tsx");
-  const overview = readMobileFile("features/my-orders-page/ui/MyOrdersPageOverview.tsx");
+  const overview = readMobileFile(
+    "features/my-orders-page/ui/MyOrdersPageOverview.tsx",
+  );
   const orderCard = readMobileFile("entities/order/ui/OrderCard.tsx");
 
   assert.match(page, /ProfileMobileSectionToggle/);
@@ -66,7 +68,9 @@ test("my orders page mirrors web toolbar and compact buyer order card", () => {
 
 test("my orders page ui copy matches web purchases wording", () => {
   const copy = readMobileFile("shared/config/appUiCopy.ts");
-  const ordersUi = copy.match(/export const MY_ORDERS_PAGE_UI = \{[\s\S]*?\n\} as const;/);
+  const ordersUi = copy.match(
+    /export const MY_ORDERS_PAGE_UI = \{[\s\S]*?\n\} as const;/,
+  );
 
   assert.ok(ordersUi);
   assert.match(ordersUi[0], /TITLE: "Мои покупки"/);

@@ -3,7 +3,8 @@ import { canBuyerMarkInstallmentPayment } from "@/entities/installment/lib/canBu
 import { isEarlyPayoffPendingConfirmation } from "@/entities/installment/lib/isEarlyPayoffPendingConfirmation";
 
 export const contractNeedsBuyerAttention = (contract: InstallmentContract): boolean => {
-  const isActive = contract.status === "active" || contract.status === "pending_first_payment";
+  const isActive =
+    contract.status === "active" || contract.status === "pending_first_payment";
 
   if (!isActive) {
     return false;

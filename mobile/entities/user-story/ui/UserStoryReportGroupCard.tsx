@@ -23,7 +23,10 @@ type UserStoryReportGroupCardProps = {
   onResolved: () => void;
 };
 
-export const UserStoryReportGroupCard = ({ group, onResolved }: UserStoryReportGroupCardProps) => {
+export const UserStoryReportGroupCard = ({
+  group,
+  onResolved,
+}: UserStoryReportGroupCardProps) => {
   const router = useRouter();
   const styles = useStaffReportGroupCardStyles();
   const resolveReportsMutation = useResolveUserStoryReportsMutation();
@@ -51,7 +54,9 @@ export const UserStoryReportGroupCard = ({ group, onResolved }: UserStoryReportG
       onResolved();
     } catch (resolveError) {
       setError(
-        resolveError instanceof Error ? resolveError.message : USER_STORY_UI.ERROR_GENERIC,
+        resolveError instanceof Error
+          ? resolveError.message
+          : USER_STORY_UI.ERROR_GENERIC,
       );
     }
   };
@@ -77,7 +82,11 @@ export const UserStoryReportGroupCard = ({ group, onResolved }: UserStoryReportG
       </View>
 
       <View style={styles.links}>
-        <Pressable onPress={() => router.push({ pathname: "/user/[id]", params: { id: authorId } })}>
+        <Pressable
+          onPress={() =>
+            router.push({ pathname: "/user/[id]", params: { id: authorId } })
+          }
+        >
           <Text style={styles.link}>{USER_STORY_UI.STORY_REPORTS_OPEN_AUTHOR}</Text>
         </Pressable>
       </View>
@@ -97,9 +106,13 @@ export const UserStoryReportGroupCard = ({ group, onResolved }: UserStoryReportG
                   )}
                 </Text>
                 <Pressable
-                  onPress={() => router.push({ pathname: "/user/[id]", params: { id: reporterId } })}
+                  onPress={() =>
+                    router.push({ pathname: "/user/[id]", params: { id: reporterId } })
+                  }
                 >
-                  <Text style={styles.link}>{PRODUCT_REPORTS_PAGE_UI.OPEN_REPORTER}</Text>
+                  <Text style={styles.link}>
+                    {PRODUCT_REPORTS_PAGE_UI.OPEN_REPORTER}
+                  </Text>
                 </Pressable>
               </View>
               <Text style={styles.reportText}>{report.reportText}</Text>
@@ -148,7 +161,9 @@ export const UserStoryReportGroupCard = ({ group, onResolved }: UserStoryReportG
             void handleResolve(USER_STORY_REPORT_RESOLUTION_HIDE);
           }}
         >
-          <Text style={styles.actionButtonText}>{USER_STORY_UI.STORY_REPORTS_ACTION_HIDE}</Text>
+          <Text style={styles.actionButtonText}>
+            {USER_STORY_UI.STORY_REPORTS_ACTION_HIDE}
+          </Text>
         </Pressable>
       </View>
     </View>

@@ -8,9 +8,12 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
  */
 export async function fetchCuratedCategoryListItemPreviewAdmin(kind, refId) {
   try {
-    const { data } = await apiClient.get("/product/admin/curated-category-lists/item-preview", {
-      params: { kind, refId },
-    });
+    const { data } = await apiClient.get(
+      "/product/admin/curated-category-lists/item-preview",
+      {
+        params: { kind, refId },
+      },
+    );
     if (!data?.success || !data.data?.preview) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }

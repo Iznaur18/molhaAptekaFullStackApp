@@ -126,7 +126,11 @@ export function ReportProductModal({
             {PRODUCT_REPORT_MODAL_UI.ALREADY_REPORTED}
           </p>
         ) : (
-          <form id={FORM_ID} className="report-product-modal__form" onSubmit={handleSubmit}>
+          <form
+            id={FORM_ID}
+            className="report-product-modal__form"
+            onSubmit={handleSubmit}
+          >
             <label className="report-product-modal__label" htmlFor={`${FORM_ID}-text`}>
               {PRODUCT_REPORT_MODAL_UI.LABEL_TEXT}
             </label>

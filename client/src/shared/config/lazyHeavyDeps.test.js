@@ -4,7 +4,10 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-const clientRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
+const clientRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../../..",
+);
 const read = (relative) => readFileSync(path.join(clientRoot, relative), "utf8");
 
 /**
@@ -23,10 +26,9 @@ describe("тяжёлые зависимости остаются ленивым�
 
     expect(source).toMatch(/lazy\(\s*\(\)\s*=>\s*\n?\s*import\(/u);
     expect(source).toContain("maps/ui/MapPointPicker.jsx");
-    expect(
-      source,
-      "статический импорт вернёт leaflet в стартовый граф",
-    ).not.toMatch(/^import\s*\{[^}]*MapPointPicker[^}]*\}\s*from/mu);
+    expect(source, "статический импорт вернёт leaflet в стартовый граф").not.toMatch(
+      /^import\s*\{[^}]*MapPointPicker[^}]*\}\s*from/mu,
+    );
   });
 
   it("карта отрисована внутри Suspense", () => {
@@ -47,7 +49,7 @@ describe("тяжёлые зависимости остаются ленивым�
 
   it("исключение стоит выше общего vendor-misc", () => {
     const config = read("vite.config.js");
-    const exclusion = config.indexOf("id.includes(\"@sentry\")");
+    const exclusion = config.indexOf('id.includes("@sentry")');
     const catchAll = config.indexOf('return "vendor-misc"');
 
     expect(exclusion).toBeGreaterThan(-1);

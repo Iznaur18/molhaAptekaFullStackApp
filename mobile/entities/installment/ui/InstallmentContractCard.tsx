@@ -168,7 +168,10 @@ export const InstallmentContractCard = ({
         {collapsible ? (
           <View style={styles.headerToggle}>
             {handleProductClick && productId ? (
-              <Pressable style={styles.titlePressable} onPress={() => handleProductClick(productId)}>
+              <Pressable
+                style={styles.titlePressable}
+                onPress={() => handleProductClick(productId)}
+              >
                 <Text style={styles.title}>{productName}</Text>
               </Pressable>
             ) : (
@@ -181,7 +184,10 @@ export const InstallmentContractCard = ({
             />
           </View>
         ) : handleProductClick && productId ? (
-          <Pressable style={styles.titlePressable} onPress={() => handleProductClick(productId)}>
+          <Pressable
+            style={styles.titlePressable}
+            onPress={() => handleProductClick(productId)}
+          >
             <Text style={styles.title}>{productName}</Text>
           </Pressable>
         ) : (
@@ -189,11 +195,15 @@ export const InstallmentContractCard = ({
         )}
         <View style={styles.headerBadges}>
           <View style={[styles.statusPill, statusPillStyle.pill]}>
-            <Text style={[styles.statusPillText, statusPillStyle.text]}>{card.statusLabel}</Text>
+            <Text style={[styles.statusPillText, statusPillStyle.text]}>
+              {card.statusLabel}
+            </Text>
           </View>
           {contract.hasOverduePayment ? (
             <View style={styles.overdueBadge}>
-              <Text style={styles.overdueBadgeText}>{INSTALLMENT_UI.OVERDUE_BADGE}</Text>
+              <Text style={styles.overdueBadgeText}>
+                {INSTALLMENT_UI.OVERDUE_BADGE}
+              </Text>
             </View>
           ) : null}
         </View>
@@ -210,144 +220,161 @@ export const InstallmentContractCard = ({
 
       {isExpanded ? (
         <>
-      {role === "buyer" ? (
-        <InstallmentContractCounterparty
-          label={INSTALLMENT_UI.SELLER_LABEL}
-          counterparty={contract.seller}
-          onUserClick={onCounterpartyClick}
-        />
-      ) : (
-        <InstallmentContractCounterparty
-          label={INSTALLMENT_UI.BUYER_LABEL}
-          counterparty={contract.buyer}
-          onUserClick={onCounterpartyClick}
-        />
-      )}
-
-      {role === "seller" && contract.buyerPassportShare ? (
-        <BuyerPassportSharePanel share={contract.buyerPassportShare} />
-      ) : null}
-
-      <InstallmentContractCardSummary
-        contract={contract}
-        remainingRub={card.remainingRub}
-        remainingDays={card.remainingDays}
-        paidPercent={card.paidPercent}
-      />
-
-      <InstallmentContractCardPayments
-        contract={contract}
-        role={role}
-        compact
-        paymentStatusLabels={card.paymentStatusLabels}
-        paymentStatuses={card.paymentStatuses}
-        isActiveContract={card.isActiveContract}
-        earlyPayoffPending={card.earlyPayoffPending}
-        pendingKey={card.pendingKey}
-        canBuyerMarkPayment={card.canBuyerMarkPayment}
-        onMarkPaid={card.handleMarkPaid}
-        onConfirmPayment={card.handleConfirmPayment}
-        onRejectPayment={card.handleRejectPayment}
-      />
-
-      {card.error ? (
-        <Text style={styles.error} accessibilityRole="alert">
-          {card.error}
-        </Text>
-      ) : null}
-
-      {card.isActiveContract ? (
-        <View style={styles.cardActions}>
-          {role === "buyer" && card.earlyPayoffPending ? (
-            <Pressable
-              style={[
-                styles.btn,
-                styles.btnCancel,
-                card.pendingKey != null ? styles.disabled : null,
-              ]}
-              disabled={card.pendingKey != null}
-              onPress={card.handleCancelEarlyPayoff}
-            >
-              <Text style={[styles.btnText, styles.btnTextPrimary]}>
-                {card.pendingKey === "early-cancel"
-                  ? INSTALLMENT_UI.ACTION_PENDING
-                  : INSTALLMENT_UI.CANCEL_EARLY_PAYOFF}
-              </Text>
-            </Pressable>
-          ) : null}
-          {role === "buyer" && !card.earlyPayoffPending && card.nextPayablePayment != null ? (
-            <Pressable
-              style={[styles.btn, card.pendingKey != null ? styles.disabled : null]}
-              disabled={card.pendingKey != null}
-              onPress={card.handleEarlyPayoff}
-            >
-              <Text style={styles.btnText}>
-                {card.pendingKey === "early"
-                  ? INSTALLMENT_UI.ACTION_PENDING
-                  : INSTALLMENT_UI.EARLY_PAYOFF}
-              </Text>
-            </Pressable>
-          ) : null}
-          {role === "seller" && card.earlyPayoffPending ? (
-            <>
-              <Pressable
-                style={[styles.btn, styles.btnSuccess, card.pendingKey != null ? styles.disabled : null]}
-                disabled={card.pendingKey != null}
-                onPress={card.handleConfirmEarlyPayoff}
-              >
-                <Text style={[styles.btnText, styles.btnTextPrimary]}>
-                  {card.pendingKey === "early-confirm"
-                    ? INSTALLMENT_UI.ACTION_PENDING
-                    : INSTALLMENT_UI.CONFIRM_EARLY_PAYOFF}
-                </Text>
-              </Pressable>
-              <Pressable
-                style={[styles.btn, styles.btnDanger, card.pendingKey != null ? styles.disabled : null]}
-                disabled={card.pendingKey != null}
-                onPress={card.handleRejectEarlyPayoff}
-              >
-                <Text style={styles.btnTextDanger}>
-                  {card.pendingKey === "early-reject"
-                    ? INSTALLMENT_UI.ACTION_PENDING
-                    : INSTALLMENT_UI.REJECT_EARLY_PAYOFF}
-                </Text>
-              </Pressable>
-            </>
-          ) : null}
           {role === "buyer" ? (
-            !card.showDisputeForm ? (
-              <Pressable
-                style={[styles.btn, card.pendingKey != null ? styles.disabled : null]}
-                disabled={card.pendingKey != null}
-                onPress={() => card.setShowDisputeForm(true)}
-              >
-                <Text style={styles.btnText}>{INSTALLMENT_UI.OPEN_DISPUTE}</Text>
-              </Pressable>
-            ) : (
-              <View style={styles.disputeForm}>
-                <TextInput
-                  style={styles.textarea}
-                  value={card.disputeReason}
-                  onChangeText={card.setDisputeReason}
-                  placeholder={INSTALLMENT_UI.DISPUTE_REASON_PLACEHOLDER}
-                  multiline
-                />
+            <InstallmentContractCounterparty
+              label={INSTALLMENT_UI.SELLER_LABEL}
+              counterparty={contract.seller}
+              onUserClick={onCounterpartyClick}
+            />
+          ) : (
+            <InstallmentContractCounterparty
+              label={INSTALLMENT_UI.BUYER_LABEL}
+              counterparty={contract.buyer}
+              onUserClick={onCounterpartyClick}
+            />
+          )}
+
+          {role === "seller" && contract.buyerPassportShare ? (
+            <BuyerPassportSharePanel share={contract.buyerPassportShare} />
+          ) : null}
+
+          <InstallmentContractCardSummary
+            contract={contract}
+            remainingRub={card.remainingRub}
+            remainingDays={card.remainingDays}
+            paidPercent={card.paidPercent}
+          />
+
+          <InstallmentContractCardPayments
+            contract={contract}
+            role={role}
+            compact
+            paymentStatusLabels={card.paymentStatusLabels}
+            paymentStatuses={card.paymentStatuses}
+            isActiveContract={card.isActiveContract}
+            earlyPayoffPending={card.earlyPayoffPending}
+            pendingKey={card.pendingKey}
+            canBuyerMarkPayment={card.canBuyerMarkPayment}
+            onMarkPaid={card.handleMarkPaid}
+            onConfirmPayment={card.handleConfirmPayment}
+            onRejectPayment={card.handleRejectPayment}
+          />
+
+          {card.error ? (
+            <Text style={styles.error} accessibilityRole="alert">
+              {card.error}
+            </Text>
+          ) : null}
+
+          {card.isActiveContract ? (
+            <View style={styles.cardActions}>
+              {role === "buyer" && card.earlyPayoffPending ? (
                 <Pressable
-                  style={[styles.btn, styles.btnPrimary, card.pendingKey != null ? styles.disabled : null]}
+                  style={[
+                    styles.btn,
+                    styles.btnCancel,
+                    card.pendingKey != null ? styles.disabled : null,
+                  ]}
                   disabled={card.pendingKey != null}
-                  onPress={card.handleOpenDispute}
+                  onPress={card.handleCancelEarlyPayoff}
                 >
                   <Text style={[styles.btnText, styles.btnTextPrimary]}>
-                    {card.pendingKey === "dispute"
+                    {card.pendingKey === "early-cancel"
                       ? INSTALLMENT_UI.ACTION_PENDING
-                      : INSTALLMENT_UI.OPEN_DISPUTE}
+                      : INSTALLMENT_UI.CANCEL_EARLY_PAYOFF}
                   </Text>
                 </Pressable>
-              </View>
-            )
+              ) : null}
+              {role === "buyer" &&
+              !card.earlyPayoffPending &&
+              card.nextPayablePayment != null ? (
+                <Pressable
+                  style={[styles.btn, card.pendingKey != null ? styles.disabled : null]}
+                  disabled={card.pendingKey != null}
+                  onPress={card.handleEarlyPayoff}
+                >
+                  <Text style={styles.btnText}>
+                    {card.pendingKey === "early"
+                      ? INSTALLMENT_UI.ACTION_PENDING
+                      : INSTALLMENT_UI.EARLY_PAYOFF}
+                  </Text>
+                </Pressable>
+              ) : null}
+              {role === "seller" && card.earlyPayoffPending ? (
+                <>
+                  <Pressable
+                    style={[
+                      styles.btn,
+                      styles.btnSuccess,
+                      card.pendingKey != null ? styles.disabled : null,
+                    ]}
+                    disabled={card.pendingKey != null}
+                    onPress={card.handleConfirmEarlyPayoff}
+                  >
+                    <Text style={[styles.btnText, styles.btnTextPrimary]}>
+                      {card.pendingKey === "early-confirm"
+                        ? INSTALLMENT_UI.ACTION_PENDING
+                        : INSTALLMENT_UI.CONFIRM_EARLY_PAYOFF}
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    style={[
+                      styles.btn,
+                      styles.btnDanger,
+                      card.pendingKey != null ? styles.disabled : null,
+                    ]}
+                    disabled={card.pendingKey != null}
+                    onPress={card.handleRejectEarlyPayoff}
+                  >
+                    <Text style={styles.btnTextDanger}>
+                      {card.pendingKey === "early-reject"
+                        ? INSTALLMENT_UI.ACTION_PENDING
+                        : INSTALLMENT_UI.REJECT_EARLY_PAYOFF}
+                    </Text>
+                  </Pressable>
+                </>
+              ) : null}
+              {role === "buyer" ? (
+                !card.showDisputeForm ? (
+                  <Pressable
+                    style={[
+                      styles.btn,
+                      card.pendingKey != null ? styles.disabled : null,
+                    ]}
+                    disabled={card.pendingKey != null}
+                    onPress={() => card.setShowDisputeForm(true)}
+                  >
+                    <Text style={styles.btnText}>{INSTALLMENT_UI.OPEN_DISPUTE}</Text>
+                  </Pressable>
+                ) : (
+                  <View style={styles.disputeForm}>
+                    <TextInput
+                      style={styles.textarea}
+                      value={card.disputeReason}
+                      onChangeText={card.setDisputeReason}
+                      placeholder={INSTALLMENT_UI.DISPUTE_REASON_PLACEHOLDER}
+                      multiline
+                    />
+                    <Pressable
+                      style={[
+                        styles.btn,
+                        styles.btnPrimary,
+                        card.pendingKey != null ? styles.disabled : null,
+                      ]}
+                      disabled={card.pendingKey != null}
+                      onPress={card.handleOpenDispute}
+                    >
+                      <Text style={[styles.btnText, styles.btnTextPrimary]}>
+                        {card.pendingKey === "dispute"
+                          ? INSTALLMENT_UI.ACTION_PENDING
+                          : INSTALLMENT_UI.OPEN_DISPUTE}
+                      </Text>
+                    </Pressable>
+                  </View>
+                )
+              ) : null}
+            </View>
           ) : null}
-        </View>
-      ) : null}
         </>
       ) : null}
     </View>

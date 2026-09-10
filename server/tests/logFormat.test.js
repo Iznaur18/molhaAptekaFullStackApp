@@ -1,10 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import {
-  formatPrettyServerLogLine,
-  resolveLogFormat,
-} from "../utils/logFormat.js";
+import { formatPrettyServerLogLine, resolveLogFormat } from "../utils/logFormat.js";
 
 test("resolveLogFormat: defaults and overrides", () => {
   assert.equal(resolveLogFormat({ NODE_ENV: "development" }), "pretty");

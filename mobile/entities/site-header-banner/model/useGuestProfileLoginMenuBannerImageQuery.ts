@@ -10,4 +10,3 @@ export const useGuestProfileLoginMenuBannerImageQuery = ({ enabled = true } = {}
     enabled,
     staleTime: 60_000,
   });
-

@@ -1,4 +1,9 @@
-import { USER_SOCIAL_LINK_FIELD_IDS, storedSocialUrlToInputValue, DEFAULT_VIEWER_REGION_CODE, isRuRegionCode } from "@molha/api-contract";
+import {
+  USER_SOCIAL_LINK_FIELD_IDS,
+  storedSocialUrlToInputValue,
+  DEFAULT_VIEWER_REGION_CODE,
+  isRuRegionCode,
+} from "@molha/api-contract";
 import { addressValueFromUser } from "@/entities/address/lib/addressValueFromUser";
 import type { RuDeliveryAddressValue } from "@/entities/address/model/types";
 import type { UserSavedAddressFormValue } from "@/entities/address/model/userSavedAddressTypes";
@@ -13,7 +18,10 @@ import {
   type BackgroundMode,
 } from "@/entities/user/lib/userBackgroundValue";
 import { mapUserBusinessHoursFromUser } from "./userBusinessHoursForm";
-import { DEFAULT_USER_AVATAR_URL, USER_GENDER_NO_SELECTED } from "@/entities/user/model/constants";
+import {
+  DEFAULT_USER_AVATAR_URL,
+  USER_GENDER_NO_SELECTED,
+} from "@/entities/user/model/constants";
 import { DEFAULT_USER_BACKGROUND_PRESET_ID } from "@/entities/user/model/userBackgroundPresets";
 
 export type EditProfileFormState = {
@@ -75,7 +83,8 @@ export const EMPTY_STRUCTURED_ADDRESS: StructuredAddress = {
 export const mapUserToEditProfileForm = (
   user: Record<string, unknown>,
 ): EditProfileFormState => {
-  const stored = typeof user.userBackgroundUrl === "string" ? user.userBackgroundUrl : null;
+  const stored =
+    typeof user.userBackgroundUrl === "string" ? user.userBackgroundUrl : null;
   const bgFields = parseUserBackgroundFormFields(stored);
   const bgMode = resolveBackgroundModeFromUser(stored);
   const regionRaw =

@@ -63,7 +63,9 @@ test("home catalog feed renders banner in scrollable list header", () => {
   );
   const searchRow = readMobileFile("features/home-feed/ui/HomeCatalogSearchRow.tsx");
   const slot = readMobileFile("features/home-feed/ui/SiteHeaderBannerSlot.tsx");
-  const carousel = readMobileFile("entities/site-header-banner/ui/SiteHeaderBannerCarousel.tsx");
+  const carousel = readMobileFile(
+    "entities/site-header-banner/ui/SiteHeaderBannerCarousel.tsx",
+  );
 
   assert.match(catalogScreen, /HomeFeedListHeader/);
   assert.match(catalogScreen, /ListHeaderComponent=\{listHeader\}/);
@@ -116,9 +118,11 @@ test("web header renders carousel after glass header panel", () => {
   );
   assert.match(shellCss, /\.app-shell--header-v1 \.app-shell__header-panel/);
   const headerV1Rule =
-    shellCss.match(/\.app-shell--header-v1 \.app-shell__header--v1 \{[^}]+\}/)?.[0] ?? "";
+    shellCss.match(/\.app-shell--header-v1 \.app-shell__header--v1 \{[^}]+\}/)?.[0] ??
+    "";
   const headerPanelRule =
-    shellCss.match(/\.app-shell--header-v1 \.app-shell__header-panel \{[^}]+\}/)?.[0] ?? "";
+    shellCss.match(/\.app-shell--header-v1 \.app-shell__header-panel \{[^}]+\}/)?.[0] ??
+    "";
   assert.doesNotMatch(headerV1Rule, /position:\s*sticky/);
   assert.match(headerPanelRule, /position:\s*sticky/);
   assert.match(carousel, /AUTOPLAY_MS/);
@@ -150,7 +154,9 @@ test("shared staff section and api routes exist", () => {
   assert.match(contract, /SITE_HEADER_BANNER_CAROUSEL_SLIDE_GAP_PX = 8/);
   assert.match(contract, /SITE_HEADER_BANNER_CAROUSEL_PEEK_PX = 28/);
 
-  const carousel = readMobileFile("entities/site-header-banner/ui/SiteHeaderBannerCarousel.tsx");
+  const carousel = readMobileFile(
+    "entities/site-header-banner/ui/SiteHeaderBannerCarousel.tsx",
+  );
   assert.match(carousel, /resolveSiteHeaderBannerHeightPx/);
   assert.match(carousel, /useWindowDimensions/);
 

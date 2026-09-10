@@ -24,8 +24,6 @@ export async function submitUserStoryReport(storyId, payload) {
 
     return data.data;
   } catch (e) {
-    throw new Error(
-      resolveApiClientErrorMessage(e, "Не удалось отправить жалобу"),
-    );
+    throw new Error(resolveApiClientErrorMessage(e, "Не удалось отправить жалобу"));
   }
 }

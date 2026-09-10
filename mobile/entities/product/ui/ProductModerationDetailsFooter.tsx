@@ -48,7 +48,9 @@ export const ProductModerationDetailsFooter = ({
         </Text>
       ) : null}
       <View style={styles.rejectLabel}>
-        {isCompact ? null : <Text>{PRODUCT_MODERATION_PAGE_UI.REJECT_COMMENT_LABEL}</Text>}
+        {isCompact ? null : (
+          <Text>{PRODUCT_MODERATION_PAGE_UI.REJECT_COMMENT_LABEL}</Text>
+        )}
         <TextInput
           style={[styles.rejectInput, isCompact && styles.rejectInputCompact]}
           value={rejectComment}
@@ -61,7 +63,9 @@ export const ProductModerationDetailsFooter = ({
       </View>
       {canDelete && typeof onDelete === "function" ? (
         hasOpenSales ? (
-          <Text style={styles.openSalesHint}>{PRODUCT_CARD_UI.OPEN_SALES_LOCKED_HINT}</Text>
+          <Text style={styles.openSalesHint}>
+            {PRODUCT_CARD_UI.OPEN_SALES_LOCKED_HINT}
+          </Text>
         ) : isDeleteConfirmOpen ? (
           <View style={styles.deleteConfirm}>
             <Text style={styles.deleteConfirmQuestion}>
@@ -69,28 +73,44 @@ export const ProductModerationDetailsFooter = ({
             </Text>
             <View style={[styles.actions, isCompact && styles.actionsCompact]}>
               <Pressable
-                style={[styles.deleteButton, styles.rowButton, isBusy && styles.buttonDisabled]}
+                style={[
+                  styles.deleteButton,
+                  styles.rowButton,
+                  isBusy && styles.buttonDisabled,
+                ]}
                 onPress={() => {
                   setIsDeleteConfirmOpen(false);
                   onDelete();
                 }}
                 disabled={isBusy}
               >
-                <Text style={styles.deleteText}>{PRODUCT_CARD_UI.DELETE_CONFIRM_YES}</Text>
+                <Text style={styles.deleteText}>
+                  {PRODUCT_CARD_UI.DELETE_CONFIRM_YES}
+                </Text>
               </Pressable>
               <Pressable
-                style={[styles.rejectButton, styles.rowButton, isBusy && styles.buttonDisabled]}
+                style={[
+                  styles.rejectButton,
+                  styles.rowButton,
+                  isBusy && styles.buttonDisabled,
+                ]}
                 onPress={() => setIsDeleteConfirmOpen(false)}
                 disabled={isBusy}
               >
-                <Text style={styles.rejectText}>{PRODUCT_CARD_UI.DELETE_CONFIRM_CANCEL}</Text>
+                <Text style={styles.rejectText}>
+                  {PRODUCT_CARD_UI.DELETE_CONFIRM_CANCEL}
+                </Text>
               </Pressable>
             </View>
           </View>
         ) : (
           <View style={[styles.actions, isCompact && styles.actionsCompact]}>
             <Pressable
-              style={[styles.deleteButton, styles.rowButton, isBusy && styles.buttonDisabled]}
+              style={[
+                styles.deleteButton,
+                styles.rowButton,
+                isBusy && styles.buttonDisabled,
+              ]}
               onPress={() => setIsDeleteConfirmOpen(true)}
               disabled={isBusy}
             >
@@ -121,7 +141,9 @@ export const ProductModerationDetailsFooter = ({
             disabled={isBusy}
           >
             <Text style={styles.approveText}>
-              {isBusy ? PRODUCT_MODERATION_PAGE_UI.ACTION_PENDING : PRODUCT_MODERATION_PAGE_UI.APPROVE}
+              {isBusy
+                ? PRODUCT_MODERATION_PAGE_UI.ACTION_PENDING
+                : PRODUCT_MODERATION_PAGE_UI.APPROVE}
             </Text>
           </Pressable>
           <Pressable
@@ -148,7 +170,9 @@ export const ProductModerationDetailsFooter = ({
           disabled={isBusy || isDeleteConfirmOpen}
         >
           <Text style={styles.approveText}>
-            {isBusy ? PRODUCT_MODERATION_PAGE_UI.ACTION_PENDING : PRODUCT_MODERATION_PAGE_UI.APPROVE}
+            {isBusy
+              ? PRODUCT_MODERATION_PAGE_UI.ACTION_PENDING
+              : PRODUCT_MODERATION_PAGE_UI.APPROVE}
           </Text>
         </Pressable>
       ) : null}

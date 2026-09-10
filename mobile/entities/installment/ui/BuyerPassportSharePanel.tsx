@@ -52,7 +52,9 @@ export const BuyerPassportSharePanel = ({ share }: BuyerPassportSharePanelProps)
       return <Text style={styles.selfieMissing}>Загрузка фото…</Text>;
     }
     return (
-      <Text style={styles.selfieMissing}>{INSTALLMENT_UI.PASSPORT_SHARE_SELFIE_MISSING}</Text>
+      <Text style={styles.selfieMissing}>
+        {INSTALLMENT_UI.PASSPORT_SHARE_SELFIE_MISSING}
+      </Text>
     );
   };
 
@@ -85,7 +87,9 @@ export const BuyerPassportSharePanel = ({ share }: BuyerPassportSharePanelProps)
         <Text style={styles.label}>Код подразделения</Text>
         <Text style={styles.value}>{passport.departmentCode}</Text>
       </View>
-      <Text style={styles.selfieTitle}>{INSTALLMENT_UI.PASSPORT_SHARE_SELFIE_SECTION}</Text>
+      <Text style={styles.selfieTitle}>
+        {INSTALLMENT_UI.PASSPORT_SHARE_SELFIE_SECTION}
+      </Text>
       {renderSelfie()}
     </View>
   );

@@ -168,7 +168,7 @@ const ProfileDetailValue = ({
     (Boolean(row.href) || Boolean(row.needsPhoneReveal));
 
   const displayHref =
-    revealedPhone != null ? toRuPhoneTelHref(revealedPhone) ?? undefined : row.href;
+    revealedPhone != null ? (toRuPhoneTelHref(revealedPhone) ?? undefined) : row.href;
   const displayValue =
     revealedPhone != null ? formatRuPhoneDisplayOrEmpty(revealedPhone) : row.value;
 
@@ -285,7 +285,11 @@ export const UserProfileInfoPanel = ({
                 <View style={styles.detailLabelRow}>
                   {icon ? (
                     <View style={styles.detailIconWrap}>
-                      <Feather name={icon} size={13} color={theme.colors.textSecondary} />
+                      <Feather
+                        name={icon}
+                        size={13}
+                        color={theme.colors.textSecondary}
+                      />
                     </View>
                   ) : null}
                   <Text style={styles.detailLabel}>{row.label}</Text>

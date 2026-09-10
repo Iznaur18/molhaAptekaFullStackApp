@@ -16,7 +16,9 @@ describe("GuestProfilePanel mobile parity", () => {
     expect(css).toMatch(/\.guest-profile__action[\s\S]*?width:\s*100%/);
     expect(css).toMatch(/\.app-shell__header[\s\S]*?display:\s*none/);
     expect(css).not.toMatch(/mobile-bottom-nav[\s\S]*?display:\s*none/);
-    expect(css).toMatch(/body:has\(\.guest-profile\)[\s\S]*?background:\s*var\(--iz-color-surface\)/);
+    expect(css).toMatch(
+      /body:has\(\.guest-profile\)[\s\S]*?background:\s*var\(--iz-color-surface\)/,
+    );
   });
 
   it("keeps guest CTA + privacy wiring", () => {

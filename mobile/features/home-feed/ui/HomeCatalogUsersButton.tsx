@@ -17,7 +17,8 @@ export const HomeCatalogUsersButton = ({
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuItems = useMemo(() => buildHomeCatalogUsersMenuItems(), []);
-  const isUsersActive = pathname === USERS_ROUTE || pathname.startsWith(`${USERS_ROUTE}/`);
+  const isUsersActive =
+    pathname === USERS_ROUTE || pathname.startsWith(`${USERS_ROUTE}/`);
   const isTermsActive = pathname === "/legal/terms";
   const isFaqActive = pathname === "/faq";
 

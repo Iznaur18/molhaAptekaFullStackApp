@@ -36,7 +36,9 @@ export function CourierModerationPage({ onQueueChanged, onApplicantClick }) {
   const [status, setStatus] = useState("pending");
   const [comments, setComments] = useState(/** @type {Record<string, string>} */ ({}));
   const [rowError, setRowError] = useState(/** @type {Record<string, string>} */ ({}));
-  const [pendingUserId, setPendingUserId] = useState(/** @type {string | null} */ (null));
+  const [pendingUserId, setPendingUserId] = useState(
+    /** @type {string | null} */ (null),
+  );
 
   const queueQuery = useCourierApplicationsQuery({ status });
   const reviewMutation = useReviewCourierApplicationMutation();
@@ -62,8 +64,7 @@ export function CourierModerationPage({ onQueueChanged, onApplicantClick }) {
     } catch (e) {
       setRowError((prev) => ({
         ...prev,
-        [userId]:
-          e instanceof Error ? e.message : COURIER_MODERATION_UI.ERROR_GENERIC,
+        [userId]: e instanceof Error ? e.message : COURIER_MODERATION_UI.ERROR_GENERIC,
       }));
     } finally {
       setPendingUserId(null);

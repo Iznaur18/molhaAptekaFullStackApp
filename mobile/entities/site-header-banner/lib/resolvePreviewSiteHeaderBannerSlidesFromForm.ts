@@ -39,6 +39,8 @@ export const normalizeSiteHeaderBannerHexColor = (raw: string): string | null =>
   return null;
 };
 
-export const resolveSiteHeaderBannerColorPreview = (raw: string): string | undefined => {
+export const resolveSiteHeaderBannerColorPreview = (
+  raw: string,
+): string | undefined => {
   return normalizeSiteHeaderBannerHexColor(raw) ?? undefined;
 };

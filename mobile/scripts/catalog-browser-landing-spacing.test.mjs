@@ -11,7 +11,9 @@ const readMobile = (p) => readFileSync(join(ROOT, p), "utf8");
 const readClient = (p) => readFileSync(join(CLIENT, p), "utf8");
 
 test("catalog browser landing section gaps match web CSS", () => {
-  const layout = readMobile("features/catalog-browser/lib/catalogBrowserLandingLayout.ts");
+  const layout = readMobile(
+    "features/catalog-browser/lib/catalogBrowserLandingLayout.ts",
+  );
   const styles = readMobile("shared/theme/catalogProductStyles.ts");
   const grid = readMobile("features/catalog-browser/ui/CatalogBrowserTilesGrid.tsx");
   const page = readMobile("features/catalog-browser/ui/CatalogBrowserPage.tsx");

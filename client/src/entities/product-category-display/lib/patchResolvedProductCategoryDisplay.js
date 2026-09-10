@@ -12,7 +12,10 @@ import { patchProductCategoryNodeDisplay } from "../api/patchProductCategoryNode
  */
 export async function patchResolvedProductCategoryDisplay(resolved, body) {
   if (resolved.categoryId) {
-    const { display } = await patchProductCategoryNodeDisplay(resolved.categoryId, body);
+    const { display } = await patchProductCategoryNodeDisplay(
+      resolved.categoryId,
+      body,
+    );
     return display;
   }
 

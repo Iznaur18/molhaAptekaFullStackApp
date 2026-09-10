@@ -78,7 +78,9 @@ export const ProductReviewsTab = ({
       void summaryQuery.refetch();
       void reviewsQuery.refetch();
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : PRODUCT_REVIEW_UI.SUBMIT);
+      setErrorMessage(
+        error instanceof Error ? error.message : PRODUCT_REVIEW_UI.SUBMIT,
+      );
     }
   };
 
@@ -94,7 +96,9 @@ export const ProductReviewsTab = ({
       );
     }
     if (!isUserDataConfirmed) {
-      return <Text style={styles.hint}>{PRODUCT_REVIEW_UI.CONFIRMED_DATA_REQUIRED}</Text>;
+      return (
+        <Text style={styles.hint}>{PRODUCT_REVIEW_UI.CONFIRMED_DATA_REQUIRED}</Text>
+      );
     }
     if (!summary.canReview) {
       return <Text style={styles.hint}>{PRODUCT_REVIEW_UI.NOT_DELIVERED}</Text>;

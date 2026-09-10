@@ -1,6 +1,13 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Modal, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import {
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { isDisplayableMediaUrl } from "@/shared/lib";
@@ -81,7 +88,8 @@ export const ProductImageLightbox = ({
   }
 
   const availableWidth = windowWidth - LIGHTBOX_PADDING * 2;
-  const availableHeight = windowHeight - LIGHTBOX_PADDING * 2 - insets.top - insets.bottom - 96;
+  const availableHeight =
+    windowHeight - LIGHTBOX_PADDING * 2 - insets.top - insets.bottom - 96;
   const viewport = Math.max(
     120,
     Math.min(
@@ -118,7 +126,10 @@ export const ProductImageLightbox = ({
           <Pressable
             style={[
               styles.close,
-              { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+              {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+              },
             ]}
             onPress={onClose}
             hitSlop={10}
@@ -133,14 +144,21 @@ export const ProductImageLightbox = ({
               <Pressable
                 style={[
                   styles.nav,
-                  { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
                 ]}
                 onPress={goPrev}
                 hitSlop={8}
                 accessibilityRole="button"
                 accessibilityLabel={PRODUCT_CARD_UI.GALLERY_PREV}
               >
-                <MaterialIcons name="chevron-left" size={24} color={theme.colors.text} />
+                <MaterialIcons
+                  name="chevron-left"
+                  size={24}
+                  color={theme.colors.text}
+                />
               </Pressable>
             ) : null}
 
@@ -157,14 +175,21 @@ export const ProductImageLightbox = ({
               <Pressable
                 style={[
                   styles.nav,
-                  { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
                 ]}
                 onPress={goNext}
                 hitSlop={8}
                 accessibilityRole="button"
                 accessibilityLabel={PRODUCT_CARD_UI.GALLERY_NEXT}
               >
-                <MaterialIcons name="chevron-right" size={24} color={theme.colors.text} />
+                <MaterialIcons
+                  name="chevron-right"
+                  size={24}
+                  color={theme.colors.text}
+                />
               </Pressable>
             ) : null}
           </View>
@@ -173,7 +198,10 @@ export const ProductImageLightbox = ({
             <Text
               style={styles.counter}
               accessibilityLiveRegion="polite"
-              accessibilityLabel={PRODUCT_CARD_UI.GALLERY_COUNTER_ARIA(safeIndex + 1, len)}
+              accessibilityLabel={PRODUCT_CARD_UI.GALLERY_COUNTER_ARIA(
+                safeIndex + 1,
+                len,
+              )}
             >
               {safeIndex + 1} / {len}
             </Text>

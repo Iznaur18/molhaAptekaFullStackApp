@@ -28,7 +28,9 @@ export const InstallmentPaymentsOverview = ({
   return (
     <View style={styles.overview} accessibilityRole="summary">
       <Pressable style={styles.overviewTile} onPress={onActiveFilterClick}>
-        <Text style={styles.overviewLabel}>{INSTALLMENT_UI.PAYMENTS_OVERVIEW_ACTIVE}</Text>
+        <Text style={styles.overviewLabel}>
+          {INSTALLMENT_UI.PAYMENTS_OVERVIEW_ACTIVE}
+        </Text>
         <Text style={styles.overviewValue}>{activeCount}</Text>
       </Pressable>
 
@@ -42,7 +44,9 @@ export const InstallmentPaymentsOverview = ({
         accessibilityState={{ selected: attentionOnly }}
         onPress={() => onAttentionFilterChange(!attentionOnly)}
       >
-        <Text style={styles.overviewLabel}>{INSTALLMENT_UI.PAYMENTS_OVERVIEW_ATTENTION}</Text>
+        <Text style={styles.overviewLabel}>
+          {INSTALLMENT_UI.PAYMENTS_OVERVIEW_ATTENTION}
+        </Text>
         <Text
           style={[
             styles.overviewValue,

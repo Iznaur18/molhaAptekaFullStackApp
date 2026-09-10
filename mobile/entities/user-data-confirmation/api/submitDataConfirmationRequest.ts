@@ -19,6 +19,8 @@ export const submitDataConfirmationRequest = async (
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.SUBMIT_DATA_CONFIRMATION_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.SUBMIT_DATA_CONFIRMATION_FALLBACK),
+    );
   }
 };

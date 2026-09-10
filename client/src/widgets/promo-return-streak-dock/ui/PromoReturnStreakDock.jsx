@@ -50,8 +50,7 @@ function StreakDayTrack({ currentDay, maxDay }) {
     <ol className="promo-return-streak-dock__track">
       {Array.from({ length: maxDay }, (_, index) => {
         const dayNumber = index + 1;
-        const percent =
-          PROMO_RETURN_STREAK_DISCOUNT_PERCENT_BY_DAY[dayNumber] ?? 0;
+        const percent = PROMO_RETURN_STREAK_DISCOUNT_PERCENT_BY_DAY[dayNumber] ?? 0;
         const isCurrent = dayNumber === safeDay;
         const isDone = dayNumber < safeDay;
 
@@ -59,9 +58,7 @@ function StreakDayTrack({ currentDay, maxDay }) {
           "promo-return-streak-dock__tick",
           isDone ? "promo-return-streak-dock__tick_done" : "",
           isCurrent ? "promo-return-streak-dock__tick_current" : "",
-          !isDone && !isCurrent
-            ? "promo-return-streak-dock__tick_pending"
-            : "",
+          !isDone && !isCurrent ? "promo-return-streak-dock__tick_pending" : "",
         ]
           .filter(Boolean)
           .join(" ");
@@ -181,10 +178,7 @@ export function PromoReturnStreakDock() {
 
       <div className="promo-return-streak-dock__rule" aria-hidden="true" />
 
-      <StreakDayTrack
-        currentDay={shownDay}
-        maxDay={PROMO_RETURN_STREAK_MAX_DAY}
-      />
+      <StreakDayTrack currentDay={shownDay} maxDay={PROMO_RETURN_STREAK_MAX_DAY} />
 
       {errorMessage ? (
         <p className="promo-return-streak-dock__error" role="alert">

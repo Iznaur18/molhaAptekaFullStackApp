@@ -13,8 +13,7 @@ export const USER_PROFILE_PRODUCTS_API_LIMIT_MAX = 20;
  * позиций, а превью показывает первые несколько — настоящее количество берётся
  * из `pagination.total`, докачивать остальные страницы незачем.
  */
-export const USER_PROFILE_PRODUCTS_PREVIEW_LIMIT =
-  USER_PROFILE_PRODUCTS_API_LIMIT_MAX;
+export const USER_PROFILE_PRODUCTS_PREVIEW_LIMIT = USER_PROFILE_PRODUCTS_API_LIMIT_MAX;
 
 /**
  * `GET /user/:userId/products` — товары продавца в каталоге (JWT опционален).
@@ -26,8 +25,7 @@ export async function fetchUserProducts(userId, params = {}) {
   try {
     const page = params.page ?? 1;
     const limit = params.limit ?? USER_PROFILE_PRODUCTS_PAGE_SIZE;
-    const shelfId =
-      params.shelfId != null ? String(params.shelfId).trim() : "";
+    const shelfId = params.shelfId != null ? String(params.shelfId).trim() : "";
 
     const { data } = await apiClient.get(
       `/user/${encodeURIComponent(userId)}/products`,

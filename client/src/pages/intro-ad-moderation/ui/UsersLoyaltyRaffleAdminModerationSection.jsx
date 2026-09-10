@@ -5,7 +5,11 @@ import { UsersLoyaltyRaffleAdminPanel } from "../../raffles-staff/ui/UsersLoyalt
 export function UsersLoyaltyRaffleAdminModerationSection() {
   return (
     <section className="intro-ad-moderation-page__section">
-      <div className={buildIntroAdModerationZonePanelClass(INTRO_AD_MODERATION_SECTION_USERS_RAFFLE)}>
+      <div
+        className={buildIntroAdModerationZonePanelClass(
+          INTRO_AD_MODERATION_SECTION_USERS_RAFFLE,
+        )}
+      >
         <UsersLoyaltyRaffleAdminPanel />
       </div>
     </section>

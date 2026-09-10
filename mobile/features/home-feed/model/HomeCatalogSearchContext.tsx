@@ -7,7 +7,9 @@ type HomeCatalogSearchContextValue = {
   onSubmit: () => void;
 };
 
-const HomeCatalogSearchContext = createContext<HomeCatalogSearchContextValue | null>(null);
+const HomeCatalogSearchContext = createContext<HomeCatalogSearchContextValue | null>(
+  null,
+);
 
 type HomeCatalogSearchProviderProps = {
   value: string;
@@ -41,7 +43,9 @@ export const HomeCatalogSearchProvider = ({
 export const useHomeCatalogSearch = (): HomeCatalogSearchContextValue => {
   const context = useContext(HomeCatalogSearchContext);
   if (context == null) {
-    throw new Error("useHomeCatalogSearch must be used within HomeCatalogSearchProvider");
+    throw new Error(
+      "useHomeCatalogSearch must be used within HomeCatalogSearchProvider",
+    );
   }
   return context;
 };

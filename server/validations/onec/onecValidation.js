@@ -8,13 +8,9 @@ import {
 import { validateBodyZod } from "../../middlewares/validateBodyZod.js";
 import { validateQueryZod } from "../../middlewares/validateQueryZod.js";
 
-export const putOneCSettingsValidation = [
-  validateBodyZod(putOneCSettingsBodySchema),
-];
+export const putOneCSettingsValidation = [validateBodyZod(putOneCSettingsBodySchema)];
 
-export const getOneCLogsValidation = [
-  validateQueryZod(getOneCLogsQuerySchema),
-];
+export const getOneCLogsValidation = [validateQueryZod(getOneCLogsQuerySchema)];
 
 export const putOneCCategoryMappingsValidation = [
   validateBodyZod(putOneCCategoryMappingsBodySchema),

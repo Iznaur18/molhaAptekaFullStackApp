@@ -159,10 +159,11 @@ export const MyOrdersPage = () => {
     );
 
     try {
-      const { order: updatedOrder, pointsEarned } = await confirmItemMutation.mutateAsync({
-        orderId,
-        itemIndex,
-      });
+      const { order: updatedOrder, pointsEarned } =
+        await confirmItemMutation.mutateAsync({
+          orderId,
+          itemIndex,
+        });
       if (pointsEarned > 0) {
         setLoyaltyFlash(MY_ORDERS_PAGE_UI.LOYALTY_POINTS_EARNED(pointsEarned));
       }
@@ -172,7 +173,10 @@ export const MyOrdersPage = () => {
       await invalidateOrderQueues();
       void ordersQuery.refetch();
     } catch (error) {
-      const message = formatApiErrorMessage(error, API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK);
+      const message = formatApiErrorMessage(
+        error,
+        API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK,
+      );
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
       void ordersQuery.refetch();
     } finally {
@@ -233,7 +237,10 @@ export const MyOrdersPage = () => {
       await invalidateOrderQueues();
       void ordersQuery.refetch();
     } catch (error) {
-      const message = formatApiErrorMessage(error, API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK);
+      const message = formatApiErrorMessage(
+        error,
+        API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK,
+      );
       setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
       void ordersQuery.refetch();
     } finally {

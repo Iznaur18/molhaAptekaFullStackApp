@@ -7,9 +7,7 @@ import {
 import { userSavedAddressesFromUser } from "../../../address/lib/userSavedAddressesFromUser.js";
 import { useAuthSession } from "../../../user/model/useAuthSession.js";
 import { useMySellerCommerceDefaultsQuery } from "../../../seller-commerce-defaults/model/sellerCommerceDefaultsQueries.js";
-import {
-  legacyPickupFieldsFromLocations,
-} from "../../lib/productPickupLocationsForm.js";
+import { legacyPickupFieldsFromLocations } from "../../lib/productPickupLocationsForm.js";
 import { ProductPickupLocationFields } from "../ProductPickupLocationFields.jsx";
 import { ProductFulfillmentSourceSwitch } from "./ProductFulfillmentSourceSwitch.jsx";
 

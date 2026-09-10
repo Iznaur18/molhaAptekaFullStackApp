@@ -151,9 +151,7 @@ export function ProductPromoCodesModal({ isOpen, product, onClose, onSaved }) {
       });
       onClose();
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : PRODUCT_PROMO_CODE_UI.SAVE_FALLBACK,
-      );
+      setError(e instanceof Error ? e.message : PRODUCT_PROMO_CODE_UI.SAVE_FALLBACK);
     }
   };
 
@@ -198,7 +196,9 @@ export function ProductPromoCodesModal({ isOpen, product, onClose, onSaved }) {
           </button>
         </header>
         <div className="wholesale-price-modal__body">
-          <p className="wholesale-price-modal__hint">{PRODUCT_PROMO_CODE_UI.MODAL_LEAD}</p>
+          <p className="wholesale-price-modal__hint">
+            {PRODUCT_PROMO_CODE_UI.MODAL_LEAD}
+          </p>
           {listQuery.isPending ? <p>Загрузка…</p> : null}
           {listQuery.isError ? (
             <p className="wholesale-price-modal__error" role="alert">
@@ -245,9 +245,7 @@ export function ProductPromoCodesModal({ isOpen, product, onClose, onSaved }) {
                         const value = event.target.value;
                         setRows((prev) =>
                           prev.map((item, i) =>
-                            i === index
-                              ? { ...item, discountPercent: value }
-                              : item,
+                            i === index ? { ...item, discountPercent: value } : item,
                           ),
                         );
                       }}
@@ -265,9 +263,7 @@ export function ProductPromoCodesModal({ isOpen, product, onClose, onSaved }) {
                         const value = event.target.value;
                         setRows((prev) =>
                           prev.map((item, i) =>
-                            i === index
-                              ? { ...item, maxActivations: value }
-                              : item,
+                            i === index ? { ...item, maxActivations: value } : item,
                           ),
                         );
                       }}
@@ -295,9 +291,7 @@ export function ProductPromoCodesModal({ isOpen, product, onClose, onSaved }) {
                 <button
                   type="button"
                   className="app-btn app-btn--danger"
-                  onClick={() =>
-                    setRows((prev) => prev.filter((_, i) => i !== index))
-                  }
+                  onClick={() => setRows((prev) => prev.filter((_, i) => i !== index))}
                 >
                   {PRODUCT_PROMO_CODE_UI.REMOVE}
                 </button>
@@ -315,8 +309,7 @@ export function ProductPromoCodesModal({ isOpen, product, onClose, onSaved }) {
             type="button"
             className="app-btn app-btn--secondary"
             disabled={
-              activeCount >= PRODUCT_PROMO_CODES_MAX_ACTIVE ||
-              saveMutation.isPending
+              activeCount >= PRODUCT_PROMO_CODES_MAX_ACTIVE || saveMutation.isPending
             }
             onClick={() => {
               if (activeCount >= PRODUCT_PROMO_CODES_MAX_ACTIVE) {

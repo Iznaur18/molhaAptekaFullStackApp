@@ -10,7 +10,9 @@ const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
 test("faq screen is wired from header menu and stack route", () => {
-  const items = readMobileFile("features/home-feed/lib/buildHomeCatalogUsersMenuItems.ts");
+  const items = readMobileFile(
+    "features/home-feed/lib/buildHomeCatalogUsersMenuItems.ts",
+  );
   const button = readMobileFile("features/home-feed/ui/HomeCatalogUsersButton.tsx");
   const route = readMobileFile("app/faq.tsx");
   const layout = readMobileFile("app/_layout.tsx");

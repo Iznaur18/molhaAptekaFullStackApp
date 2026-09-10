@@ -38,7 +38,8 @@ const PRE_SHIPMENT = new Set(ORDER_PRE_SHIPMENT_STATUSES);
 const TOO_LATE_MESSAGE = "Отменить можно, только пока товар у продавца";
 
 /** @param {import('mongoose').Document} order */
-const resolveBuyerId = (order) => normalizeId(order.userBuyerId?._id ?? order.userBuyerId);
+const resolveBuyerId = (order) =>
+  normalizeId(order.userBuyerId?._id ?? order.userBuyerId);
 
 /**
  * Что именно отменяем: индекс, продавец строки и название для уведомления.
@@ -168,9 +169,8 @@ const cancelExternalShipmentIfNeeded = async ({ order, sellerId }) => {
   if (stillAlive) return;
 
   try {
-    const { cancelShipmentInLobo } = await import(
-      "../shipping/lobo/loboShipmentOrders.js"
-    );
+    const { cancelShipmentInLobo } =
+      await import("../shipping/lobo/loboShipmentOrders.js");
     await cancelShipmentInLobo({
       orderId: String(order._id),
       sellerId: String(sellerId),

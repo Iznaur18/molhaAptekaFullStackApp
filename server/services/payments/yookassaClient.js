@@ -116,7 +116,10 @@ async function callYookassa({ method, path, body, idempotenceKey }) {
       description,
     });
     // Наружу отдаём общий текст: описание от банка адресовано нам, не покупателю.
-    throw new AppError(response.status === 400 ? 400 : 502, YOOKASSA_UNAVAILABLE_MESSAGE);
+    throw new AppError(
+      response.status === 400 ? 400 : 502,
+      YOOKASSA_UNAVAILABLE_MESSAGE,
+    );
   }
 
   try {

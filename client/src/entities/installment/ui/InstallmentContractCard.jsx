@@ -20,7 +20,9 @@ import "./InstallmentContractCard.css";
  */
 function renderProductTitle(contract, onProductClick) {
   const title = contract.productNameAtContract;
-  const resolved = resolveImageUrlForDisplay(String(contract.productImageUrl ?? "").trim());
+  const resolved = resolveImageUrlForDisplay(
+    String(contract.productImageUrl ?? "").trim(),
+  );
   const imageUrl = resolved || PRODUCT_IMAGE_PLACEHOLDER_URL;
   const titleClass = onProductClick
     ? "installment-contract-card__title installment-contract-card__title_link"
@@ -223,7 +225,9 @@ export function InstallmentContractCard({
                 : INSTALLMENT_UI.CANCEL_EARLY_PAYOFF}
             </button>
           ) : null}
-          {role === "buyer" && !card.earlyPayoffPending && card.nextPayablePayment != null ? (
+          {role === "buyer" &&
+          !card.earlyPayoffPending &&
+          card.nextPayablePayment != null ? (
             <button
               type="button"
               className="installment-contract-card__btn"
@@ -368,16 +372,16 @@ export function InstallmentContractCard({
       {collapsible ? (
         <div className="installment-contract-card__collapsible-region">
           {nextDuePreview ? (
-          <div
-            className={[
-              "installment-contract-card__fold",
-              !isExpanded ? "installment-contract-card__fold_open" : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-            aria-hidden={isExpanded}
-            inert={isExpanded ? true : undefined}
-          >
+            <div
+              className={[
+                "installment-contract-card__fold",
+                !isExpanded ? "installment-contract-card__fold_open" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              aria-hidden={isExpanded}
+              inert={isExpanded ? true : undefined}
+            >
               <div className="installment-contract-card__fold-inner">
                 <p className="installment-contract-card__next-due">{nextDuePreview}</p>
               </div>

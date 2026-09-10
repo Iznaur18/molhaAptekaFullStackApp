@@ -76,10 +76,13 @@ export function useProductCardViewModel(props) {
   const sellerCanDelete = !isMineMode || canSellerDeleteProduct(product);
   const sellerCanToggleVisibility =
     !isMineMode || canSellerToggleCatalogVisibility(product);
-  const showModerationPendingOverlay = shouldShowProductModerationPendingOverlay(product, {
-    isMineMode,
-    isModerationQueue,
-  });
+  const showModerationPendingOverlay = shouldShowProductModerationPendingOverlay(
+    product,
+    {
+      isMineMode,
+      isModerationQueue,
+    },
+  );
   const rejectionComment =
     isMineMode &&
     product.productModerationStatus === PRODUCT_MODERATION_REJECTED &&
@@ -149,7 +152,8 @@ export function useProductCardViewModel(props) {
     statusBadgesRowRef,
     statusBadgesDragScrollProps,
     getPromotionTierLabel: () => getProductPromotionTierLabel(chrome.promotionTier),
-    getPromotionUntil: () => formatPromotionExpiresAt(product.catalogPromotionExpiresAt),
+    getPromotionUntil: () =>
+      formatPromotionExpiresAt(product.catalogPromotionExpiresAt),
     ...chrome,
   };
 }

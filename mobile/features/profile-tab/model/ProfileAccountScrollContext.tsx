@@ -44,7 +44,11 @@ export const useProfileAccountNestedListScroll = () => {
         return fillStyle;
       }
       // Outer shell ScrollView owns scroll — list must size to content, not flex:1 viewport.
-      return [{ width: "100%", alignSelf: "stretch" }, fillStyle, { flexGrow: 0, flex: 0 }];
+      return [
+        { width: "100%", alignSelf: "stretch" },
+        fillStyle,
+        { flexGrow: 0, flex: 0 },
+      ];
     },
     [outerScrollOwns],
   );

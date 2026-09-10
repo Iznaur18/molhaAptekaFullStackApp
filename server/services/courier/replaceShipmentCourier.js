@@ -70,7 +70,10 @@ export async function replaceShipmentCourier({ orderId, sellerId, requestUserId 
 
   const declined = (shipment.declinedCourierIds ?? []).map(String);
   if (!declined.includes(previousCourierId)) {
-    shipment.declinedCourierIds = [...(shipment.declinedCourierIds ?? []), previousCourierId];
+    shipment.declinedCourierIds = [
+      ...(shipment.declinedCourierIds ?? []),
+      previousCourierId,
+    ];
   }
   shipment.courierId = null;
   shipment.courierAssignedAt = null;

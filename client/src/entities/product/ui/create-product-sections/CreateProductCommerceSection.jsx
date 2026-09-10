@@ -30,7 +30,9 @@ export function CreateProductCommerceSection({
     <div className={["create-product-section", className].filter(Boolean).join(" ")}>
       <div className="create-product-section__price-grid">
         <label className="create-product-section__label">
-          <FormFieldLabel required>{getProductFieldEditLabel("productPrice")}</FormFieldLabel>
+          <FormFieldLabel required>
+            {getProductFieldEditLabel("productPrice")}
+          </FormFieldLabel>
           <input
             {...INTEGER_INPUT_FIELD_PROPS}
             className="create-product-section__input create-product-section__input_price"
@@ -43,7 +45,9 @@ export function CreateProductCommerceSection({
         </label>
         <label className="create-product-section__label">
           <FormFieldLabel>{getProductFieldEditLabel("productOldPrice")}</FormFieldLabel>
-          <p className="create-product-section__lead">{CREATE_PRODUCT_MODAL_UI.WIZARD_COMMERCE_LEAD}</p>
+          <p className="create-product-section__lead">
+            {CREATE_PRODUCT_MODAL_UI.WIZARD_COMMERCE_LEAD}
+          </p>
           <input
             {...INTEGER_INPUT_FIELD_PROPS}
             className="create-product-section__input create-product-section__input_price"
@@ -74,7 +78,9 @@ export function CreateProductCommerceSection({
       {form.productIsAvailable || isEdit ? (
         <label className="create-product-section__label">
           <FormFieldLabel
-            required={form.productIsAvailable === true || !showCatalogAvailabilityToggle}
+            required={
+              form.productIsAvailable === true || !showCatalogAvailabilityToggle
+            }
           >
             {getProductFieldEditLabel("productStockQuantity")}
           </FormFieldLabel>

@@ -4,7 +4,10 @@ import { FlatList, Text, View } from "react-native";
 
 import type { UserStoryRing } from "@/entities/user-story/api/userStoryApi";
 import { CreateUserStoryModal } from "@/features/home-feed/ui/CreateUserStoryModal";
-import { StoryAddButton, StoryRingItem } from "@/features/home-feed/ui/UserStoryStripItems";
+import {
+  StoryAddButton,
+  StoryRingItem,
+} from "@/features/home-feed/ui/UserStoryStripItems";
 import { UserStoryViewerModal } from "@/features/home-feed/ui/UserStoryViewerModal";
 import { USER_STORY_STRIP_LAYOUT } from "@/entities/user-story/lib/userStoryStripLayout";
 import { HOME_FEED_UI } from "@/shared/config";
@@ -39,7 +42,9 @@ export const UserStoriesStrip = ({
   const styles = useUserStoriesStripStyles();
   const storyGate = useAccountRequirementModal();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [viewerAuthor, setViewerAuthor] = useState<UserStoryRing["author"] | null>(null);
+  const [viewerAuthor, setViewerAuthor] = useState<UserStoryRing["author"] | null>(
+    null,
+  );
 
   const sortedRings = useMemo(
     () =>

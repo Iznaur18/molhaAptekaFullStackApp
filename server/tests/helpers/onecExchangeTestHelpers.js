@@ -1,5 +1,9 @@
 import { ONEC_CHANNEL_COMMERCEML } from "../../constants/onecExchangeConstants.js";
-import { OneCImportJobModel, ProductCategoryModel, UserModel } from "../../models/index.js";
+import {
+  OneCImportJobModel,
+  ProductCategoryModel,
+  UserModel,
+} from "../../models/index.js";
 import { regenerateOneCExchangeCredentials } from "../../services/onec/exchange/index.js";
 import { buildStoredZip, tinyPngBuffer } from "./zipTestHelpers.js";
 
@@ -259,7 +263,9 @@ export async function waitForImportJobs(sellerId, expectedCount = 2) {
 export function latestJobOfKind(jobs, kind) {
   const found = jobs.find((job) => job.kind === kind);
   if (!found) {
-    throw new Error(`Нет задачи разбора вида ${kind}: ${jobs.map((j) => j.filename + ":" + j.kind).join(", ")}`);
+    throw new Error(
+      `Нет задачи разбора вида ${kind}: ${jobs.map((j) => j.filename + ":" + j.kind).join(", ")}`,
+    );
   }
   return found;
 }

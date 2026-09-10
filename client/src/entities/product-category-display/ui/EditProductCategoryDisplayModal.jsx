@@ -86,8 +86,7 @@ export function EditProductCategoryDisplayModal({
       setErrorMessage("");
 
       const trimmedLabel = label.trim();
-      const trimmedImage =
-        normalizeUploadUrlForStorage(imageUrl.trim()) || null;
+      const trimmedImage = normalizeUploadUrlForStorage(imageUrl.trim()) || null;
       setIsSaving(true);
       const display = await patchResolvedProductCategoryDisplay(resolved, {
         customLabel: trimmedLabel || null,

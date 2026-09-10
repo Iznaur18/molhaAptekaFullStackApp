@@ -16,9 +16,15 @@ export function BlockedPurchaseButton({
 }) {
   const rootClassName = [
     variant === "cart" ? "add-to-cart add-to-cart--blocked" : "",
-    variant === "teaser" ? "product-details-teaser__go product-details-teaser__go--blocked" : "",
-    variant === "installment" ? "installment-buyer-block__submit installment-buyer-block__submit--blocked" : "",
-    variant === "offer" ? "app-btn app-btn--contrast product-price-offer__btn product-price-offer__btn--blocked" : "",
+    variant === "teaser"
+      ? "product-details-teaser__go product-details-teaser__go--blocked"
+      : "",
+    variant === "installment"
+      ? "installment-buyer-block__submit installment-buyer-block__submit--blocked"
+      : "",
+    variant === "offer"
+      ? "app-btn app-btn--contrast product-price-offer__btn product-price-offer__btn--blocked"
+      : "",
     className,
   ]
     .filter(Boolean)

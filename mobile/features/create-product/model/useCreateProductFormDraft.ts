@@ -31,7 +31,7 @@ type UseCreateProductFormDraftOptions<TForm> = {
  *   момент, когда мы ещё живы гарантированно);
  * — немедленно при уходе с экрана.
  */
-export const useCreateProductFormDraft = <TForm,>({
+export const useCreateProductFormDraft = <TForm>({
   enabled,
   form,
   stepIndex,

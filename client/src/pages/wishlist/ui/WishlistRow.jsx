@@ -29,13 +29,14 @@ export function WishlistRow({ product, onProductClick, onProductStatsUpdate }) {
   const priceText = formatPriceRub(product.productPrice);
   const resolvedImage = resolveProductImageUrl(product);
   const imageUrl =
-    imageFailed || !resolvedImage
-      ? PRODUCT_IMAGE_PLACEHOLDER_URL
-      : resolvedImage;
+    imageFailed || !resolvedImage ? PRODUCT_IMAGE_PLACEHOLDER_URL : resolvedImage;
 
   const handleRemove = () => {
     const productId = String(product._id);
-    const baseCount = Math.max(0, Math.floor(Number(product.productWishlistCount) || 0));
+    const baseCount = Math.max(
+      0,
+      Math.floor(Number(product.productWishlistCount) || 0),
+    );
     patchProductWishlistCount(queryClient, productId, -1);
     removeItem(productId);
     onProductStatsUpdate?.(productId, {

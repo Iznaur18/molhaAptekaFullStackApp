@@ -16,10 +16,7 @@ import {
   summarizeOrderItems,
 } from "@izibuy/shared-lib";
 
-if (
-  Platform.OS === "android" &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -50,7 +47,12 @@ import {
   ORDER_STATUS_SHIPPED,
   type OrderPaymentMethod,
 } from "@/entities/order/model/constants";
-import { INSTALLMENT_UI, MY_ORDERS_PAGE_UI, ORDER_CARD_UI, PRODUCT_CARD_UI } from "@/shared/config";
+import {
+  INSTALLMENT_UI,
+  MY_ORDERS_PAGE_UI,
+  ORDER_CARD_UI,
+  PRODUCT_CARD_UI,
+} from "@/shared/config";
 import { formatIsoDateTime, formatPriceRub } from "@/shared/lib";
 import { useOrderCardStyles } from "@/shared/theme/commerceScreenStyles";
 import { CommerceCardExpandToggle } from "@/shared/ui/CommerceCardExpandToggle";
@@ -64,7 +66,11 @@ type OrderItemActionContext = {
   itemIndex: number;
 };
 
-type OrderBuyer = { _id?: string; userName?: string; email?: string; userPhoneNumber?: string } | string | null | undefined;
+type OrderBuyer =
+  | { _id?: string; userName?: string; email?: string; userPhoneNumber?: string }
+  | string
+  | null
+  | undefined;
 
 type OrderCardOrder = {
   _id: string;
@@ -194,9 +200,7 @@ const OrderCardMeta = ({
   const styles = useOrderCardStyles();
   const sellers = showSeller ? resolveOrderSellers(order) : [];
   const trackingNumber = String(order.shippingTrackingNumber ?? "").trim();
-  const trackingUrl = trackingNumber
-    ? resolveOrderShippingTrackingUrl(order)
-    : null;
+  const trackingUrl = trackingNumber ? resolveOrderShippingTrackingUrl(order) : null;
 
   return (
     <View>
@@ -251,7 +255,8 @@ const OrderCardMeta = ({
         <View style={styles.metaRow}>
           <Text style={styles.metaLabel}>{INSTALLMENT_UI.CONTRACT_PLAN}:</Text>
           <Text style={styles.metaValue}>
-            {order.installmentContract.planTitle} · {order.installmentContract.monthsCount} мес ×{" "}
+            {order.installmentContract.planTitle} ·{" "}
+            {order.installmentContract.monthsCount} мес ×{" "}
             {formatPriceRub(order.installmentContract.monthlyPaymentRub)}
           </Text>
         </View>
@@ -322,8 +327,12 @@ export const OrderCard = ({
     const productName = resolveOrderLineItemName(item);
     const loyaltyPerUnit = formatLoyaltyPoints(source.loyaltyPointsPerUnitAtOrder);
     const loyaltyReservedTotal = formatLoyaltyPoints(source.loyaltyPointsReservedTotal);
-    const deliveredAtText = source.deliveredAt ? formatIsoDateTime(source.deliveredAt) : "";
-    const confirmedAtText = source.confirmedAt ? formatIsoDateTime(source.confirmedAt) : "";
+    const deliveredAtText = source.deliveredAt
+      ? formatIsoDateTime(source.deliveredAt)
+      : "";
+    const confirmedAtText = source.confirmedAt
+      ? formatIsoDateTime(source.confirmedAt)
+      : "";
     const affiliateSellerLine = resolveOrderLineAffiliateSellerLine({
       item: source,
       attentionRole,
@@ -349,7 +358,8 @@ export const OrderCard = ({
           </Text>
         ) : null}
         <Text style={styles.itemStatus}>
-          {ORDER_CARD_UI.ITEM_STATUS_LABEL}: {resolveOrderStatusLabelRu(source.status, attentionRole)}
+          {ORDER_CARD_UI.ITEM_STATUS_LABEL}:{" "}
+          {resolveOrderStatusLabelRu(source.status, attentionRole)}
         </Text>
         {deliveredAtText ? (
           <Text style={styles.itemTimestamp}>
@@ -386,16 +396,24 @@ export const OrderCard = ({
     const isActionPending = pendingActionKey === actionKey;
     const actionError = itemActionErrors[actionKey] ?? "";
     const canCancel = source.status === ORDER_STATUS_PENDING && Boolean(onCancelItem);
-    const canConfirm = source.status === ORDER_STATUS_DELIVERED && Boolean(onConfirmDelivered);
-    const canMarkShipped = source.status === ORDER_STATUS_PENDING && Boolean(onMarkShipped);
-    const canMarkDelivered = source.status === ORDER_STATUS_SHIPPED && Boolean(onMarkDelivered);
+    const canConfirm =
+      source.status === ORDER_STATUS_DELIVERED && Boolean(onConfirmDelivered);
+    const canMarkShipped =
+      source.status === ORDER_STATUS_PENDING && Boolean(onMarkShipped);
+    const canMarkDelivered =
+      source.status === ORDER_STATUS_SHIPPED && Boolean(onMarkDelivered);
     const key = source._id ?? `item-${index}`;
     const productName = resolveOrderLineItemName(item);
-    const isProductClickable = Boolean(onProductClick) && isOrderLineItemProductClickable(item);
+    const isProductClickable =
+      Boolean(onProductClick) && isOrderLineItemProductClickable(item);
     const loyaltyPerUnit = formatLoyaltyPoints(source.loyaltyPointsPerUnitAtOrder);
     const loyaltyReservedTotal = formatLoyaltyPoints(source.loyaltyPointsReservedTotal);
-    const deliveredAtText = source.deliveredAt ? formatIsoDateTime(source.deliveredAt) : "";
-    const confirmedAtText = source.confirmedAt ? formatIsoDateTime(source.confirmedAt) : "";
+    const deliveredAtText = source.deliveredAt
+      ? formatIsoDateTime(source.deliveredAt)
+      : "";
+    const confirmedAtText = source.confirmedAt
+      ? formatIsoDateTime(source.confirmedAt)
+      : "";
     const affiliateSellerLine = resolveOrderLineAffiliateSellerLine({
       item: source,
       attentionRole,
@@ -407,7 +425,8 @@ export const OrderCard = ({
     const hasItemActions =
       (canMarkShipped && (onMarkShipped || onCancelItem)) ||
       (canMarkDelivered && onMarkDelivered) ||
-      (canConfirm || (canCancel && !onMarkShipped));
+      canConfirm ||
+      (canCancel && !onMarkShipped);
 
     return (
       <View
@@ -427,7 +446,10 @@ export const OrderCard = ({
           <View style={styles.itemBody}>
             <View style={styles.itemMain}>
               {isProductClickable ? (
-                <Pressable onPress={() => onProductClick?.(item)} style={styles.itemNamePressable}>
+                <Pressable
+                  onPress={() => onProductClick?.(item)}
+                  style={styles.itemNamePressable}
+                >
                   <Text
                     style={[
                       styles.itemNameLink,
@@ -440,7 +462,10 @@ export const OrderCard = ({
                 </Pressable>
               ) : (
                 <Text
-                  style={[styles.itemLine, isCancelled ? styles.itemTextCancelled : undefined]}
+                  style={[
+                    styles.itemLine,
+                    isCancelled ? styles.itemTextCancelled : undefined,
+                  ]}
                   numberOfLines={2}
                 >
                   {productName}
@@ -452,12 +477,18 @@ export const OrderCard = ({
                 </Text>
               ) : null}
               <Text
-                style={[styles.itemQuantity, isCancelled ? styles.itemTextCancelled : undefined]}
+                style={[
+                  styles.itemQuantity,
+                  isCancelled ? styles.itemTextCancelled : undefined,
+                ]}
               >
                 ×{source.quantity ?? 1}
               </Text>
               <Text
-                style={[styles.itemPrice, isCancelled ? styles.itemTextCancelled : undefined]}
+                style={[
+                  styles.itemPrice,
+                  isCancelled ? styles.itemTextCancelled : undefined,
+                ]}
               >
                 {formatPriceRub(source.unitPriceAtOrder)}
               </Text>
@@ -481,7 +512,8 @@ export const OrderCard = ({
 
             {showSecondaryInline ? (
               <Text style={styles.itemStatus}>
-                {ORDER_CARD_UI.ITEM_STATUS_LABEL}: {resolveOrderStatusLabelRu(source.status, attentionRole)}
+                {ORDER_CARD_UI.ITEM_STATUS_LABEL}:{" "}
+                {resolveOrderStatusLabelRu(source.status, attentionRole)}
               </Text>
             ) : null}
 
@@ -513,19 +545,28 @@ export const OrderCard = ({
                     onPress={() => onCancelItem({ orderId: order._id, itemIndex })}
                     disabled={isActionPending}
                   >
-                    <Text style={[styles.actionButtonText, styles.actionButtonTextCancel]}>
-                      {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_CANCEL}
+                    <Text
+                      style={[styles.actionButtonText, styles.actionButtonTextCancel]}
+                    >
+                      {isActionPending
+                        ? ORDER_CARD_UI.ACTION_PENDING
+                        : ORDER_CARD_UI.ACTION_CANCEL}
                     </Text>
                   </Pressable>
                 ) : null}
                 {onMarkShipped ? (
                   <Pressable
-                    style={[styles.actionButton, isActionPending && styles.actionDisabled]}
+                    style={[
+                      styles.actionButton,
+                      isActionPending && styles.actionDisabled,
+                    ]}
                     onPress={() => onMarkShipped({ orderId: order._id, itemIndex })}
                     disabled={isActionPending}
                   >
                     <Text style={styles.actionButtonText}>
-                      {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_SHIPPED}
+                      {isActionPending
+                        ? ORDER_CARD_UI.ACTION_PENDING
+                        : ORDER_CARD_UI.ACTION_SHIPPED}
                     </Text>
                   </Pressable>
                 ) : null}
@@ -538,7 +579,9 @@ export const OrderCard = ({
                 disabled={isActionPending}
               >
                 <Text style={styles.actionButtonText}>
-                  {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_DELIVERED}
+                  {isActionPending
+                    ? ORDER_CARD_UI.ACTION_PENDING
+                    : ORDER_CARD_UI.ACTION_DELIVERED}
                 </Text>
               </Pressable>
             ) : null}
@@ -554,19 +597,30 @@ export const OrderCard = ({
                     onPress={() => onCancelItem?.({ orderId: order._id, itemIndex })}
                     disabled={isActionPending}
                   >
-                    <Text style={[styles.actionButtonText, styles.actionButtonTextCancel]}>
-                      {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_CANCEL}
+                    <Text
+                      style={[styles.actionButtonText, styles.actionButtonTextCancel]}
+                    >
+                      {isActionPending
+                        ? ORDER_CARD_UI.ACTION_PENDING
+                        : ORDER_CARD_UI.ACTION_CANCEL}
                     </Text>
                   </Pressable>
                 ) : null}
                 {canConfirm ? (
                   <Pressable
-                    style={[styles.actionButton, isActionPending && styles.actionDisabled]}
-                    onPress={() => onConfirmDelivered?.({ orderId: order._id, itemIndex })}
+                    style={[
+                      styles.actionButton,
+                      isActionPending && styles.actionDisabled,
+                    ]}
+                    onPress={() =>
+                      onConfirmDelivered?.({ orderId: order._id, itemIndex })
+                    }
                     disabled={isActionPending}
                   >
                     <Text style={styles.actionButtonText}>
-                      {isActionPending ? ORDER_CARD_UI.ACTION_PENDING : ORDER_CARD_UI.ACTION_CONFIRM}
+                      {isActionPending
+                        ? ORDER_CARD_UI.ACTION_PENDING
+                        : ORDER_CARD_UI.ACTION_CONFIRM}
                     </Text>
                   </Pressable>
                 ) : null}
@@ -615,7 +669,9 @@ export const OrderCard = ({
         </Text>
       </View>
 
-      {collapsedPreview ? <Text style={styles.collapsedPreview}>{collapsedPreview}</Text> : null}
+      {collapsedPreview ? (
+        <Text style={styles.collapsedPreview}>{collapsedPreview}</Text>
+      ) : null}
 
       {isExpanded ? (
         <>

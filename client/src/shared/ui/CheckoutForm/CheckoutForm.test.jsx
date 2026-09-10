@@ -41,13 +41,17 @@ describe("CheckoutForm", () => {
   it("disables submit when pickup address missing", () => {
     renderWithProviders(<CheckoutForm {...baseProps} pickupLocations={[]} />);
 
-    expect(screen.getByRole("button", { name: CHECKOUT_FORM_UI.SUBMIT_IDLE })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: CHECKOUT_FORM_UI.SUBMIT_IDLE }),
+    ).toBeDisabled();
   });
 
   it("shows pickup validation error on empty pickup submit", async () => {
     renderWithProviders(<CheckoutForm {...baseProps} pickupLocations={[]} />);
 
-    const form = screen.getByRole("heading", { name: CHECKOUT_FORM_UI.HEADING }).closest("form");
+    const form = screen
+      .getByRole("heading", { name: CHECKOUT_FORM_UI.HEADING })
+      .closest("form");
     fireEvent.submit(form);
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
@@ -102,7 +106,9 @@ describe("CheckoutForm", () => {
 
     renderWithProviders(<CheckoutForm {...baseProps} onSubmit={onSubmit} />);
 
-    await user.click(screen.getByRole("button", { name: CHECKOUT_FORM_UI.SUBMIT_IDLE }));
+    await user.click(
+      screen.getByRole("button", { name: CHECKOUT_FORM_UI.SUBMIT_IDLE }),
+    );
 
     expect(onSubmit).toHaveBeenCalledWith({
       fulfillmentMethod: "pickup",
@@ -159,9 +165,7 @@ describe("CheckoutForm", () => {
     );
     expect(screen.getByRole("alert")).toHaveTextContent("Ошибка оплаты");
 
-    rerender(
-      <CheckoutForm {...baseProps} submitSuccess={CHECKOUT_FORM_UI.SUCCESS} />,
-    );
+    rerender(<CheckoutForm {...baseProps} submitSuccess={CHECKOUT_FORM_UI.SUCCESS} />);
     expect(screen.getByRole("status")).toHaveTextContent(CHECKOUT_FORM_UI.SUCCESS);
   });
 });

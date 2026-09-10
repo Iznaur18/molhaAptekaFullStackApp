@@ -2,10 +2,7 @@ import { useEffect, useState } from "react";
 import { Platform } from "react-native";
 
 import { apiClient } from "@/shared/api/apiClient";
-import {
-  getAccessToken,
-  isCookieAuthWeb,
-} from "@/shared/api/mobile-auth-storage";
+import { getAccessToken, isCookieAuthWeb } from "@/shared/api/mobile-auth-storage";
 import { API_BASE_URL } from "@/shared/config";
 import { resolveUploadedMediaUrl } from "@/shared/lib/resolveMediaUrl";
 
@@ -41,16 +38,10 @@ const assertImageMagicBytes = (buffer: ArrayBuffer): void => {
   }
   const isJpeg = bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
   const isPng =
-    bytes[0] === 0x89 &&
-    bytes[1] === 0x50 &&
-    bytes[2] === 0x4e &&
-    bytes[3] === 0x47;
+    bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47;
   const isGif = bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46;
   const isWebp =
-    bytes[0] === 0x52 &&
-    bytes[1] === 0x49 &&
-    bytes[2] === 0x46 &&
-    bytes[3] === 0x46;
+    bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46;
   if (!isJpeg && !isPng && !isGif && !isWebp) {
     throw new Error("Ответ сервера не является изображением");
   }
@@ -165,9 +156,7 @@ export const usePrivateUploadDisplayUrl = (
     if (!privatePath) {
       const legacyUrl = rawUrl ? resolveUploadedMediaUrl(rawUrl) : "";
       setState(
-        legacyUrl
-          ? { status: "ready", url: legacyUrl, error: "" }
-          : INITIAL_STATE,
+        legacyUrl ? { status: "ready", url: legacyUrl, error: "" } : INITIAL_STATE,
       );
       return undefined;
     }

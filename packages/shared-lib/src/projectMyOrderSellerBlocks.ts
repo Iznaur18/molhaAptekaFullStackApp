@@ -43,7 +43,9 @@ function resolveBlockFulfillment(
   return candidate === "delivery" ? "delivery" : "pickup";
 }
 
-export type MyOrderSellerBlock<T extends MyOrderSellerBlockSource = MyOrderSellerBlockSource> = {
+export type MyOrderSellerBlock<
+  T extends MyOrderSellerBlockSource = MyOrderSellerBlockSource,
+> = {
   blockKey: string;
   sellerId: string;
   order: T;

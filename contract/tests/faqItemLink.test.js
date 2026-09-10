@@ -22,9 +22,7 @@ test("faqItemLinkPatchBodySchema validates href and resetHref", () => {
     faqItemLinkPatchBodySchema.safeParse({ href: "https://example.com" }).success,
   );
   assert.ok(faqItemLinkPatchBodySchema.safeParse({ resetHref: true }).success);
-  assert.ok(
-    faqItemLinkPatchBodySchema.safeParse({ href: null }).success,
-  );
+  assert.ok(faqItemLinkPatchBodySchema.safeParse({ href: null }).success);
   assert.equal(
     faqItemLinkPatchBodySchema.safeParse({ href: "javascript:x" }).success,
     false,

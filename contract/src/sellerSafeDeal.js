@@ -105,7 +105,8 @@ export function isInnLengthValidForLegalForm(legalForm, inn) {
  */
 export function isSellerSafeDealApproved(userLike) {
   if (!userLike || typeof userLike !== "object") return false;
-  const safeDeal = /** @type {{ sellerSafeDeal?: unknown }} */ (userLike).sellerSafeDeal;
+  const safeDeal = /** @type {{ sellerSafeDeal?: unknown }} */ (userLike)
+    .sellerSafeDeal;
   if (!safeDeal || typeof safeDeal !== "object") return false;
   return (
     /** @type {{ moderationStatus?: unknown }} */ (safeDeal).moderationStatus ===
@@ -120,14 +121,10 @@ export const SAFE_DEAL_INN_LENGTH_MESSAGE_OOO = "У ООО ИНН из 10 циф
 /** Body `POST /sellers/safe-deal/application`. */
 export const safeDealApplicationBodySchema = z
   .object({
-    legalForm: z.enum(
-      /** @type {[string, ...string[]]} */ (SELLER_LEGAL_FORMS),
-      { required_error: "Выберите форму: ИП или ООО" },
-    ),
-    inn: z
-      .string({ required_error: "Укажите ИНН" })
-      .trim()
-      .min(1, "Укажите ИНН"),
+    legalForm: z.enum(/** @type {[string, ...string[]]} */ (SELLER_LEGAL_FORMS), {
+      required_error: "Выберите форму: ИП или ООО",
+    }),
+    inn: z.string({ required_error: "Укажите ИНН" }).trim().min(1, "Укажите ИНН"),
   })
   .superRefine((value, ctx) => {
     if (!isInnLengthValidForLegalForm(value.legalForm, value.inn)) {

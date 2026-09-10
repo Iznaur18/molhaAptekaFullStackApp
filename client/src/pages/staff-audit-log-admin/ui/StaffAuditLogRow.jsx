@@ -40,9 +40,7 @@ export function StaffAuditLogRow({ entry, onFilterActor }) {
           <span className="staff-audit-row__method">{entry.method}</span>
           {entry.action}
         </span>
-        <span
-          className={`staff-audit-row__status staff-audit-row__status--${tone}`}
-        >
+        <span className={`staff-audit-row__status staff-audit-row__status--${tone}`}>
           {entry.statusCode}
         </span>
       </div>

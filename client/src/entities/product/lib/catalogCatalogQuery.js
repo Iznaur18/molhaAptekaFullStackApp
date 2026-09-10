@@ -26,10 +26,7 @@ export const CATALOG_QUERY_PARAM_SELLER_PERSONAL_CATEGORY_ID =
  * @param {string | null | undefined} raw
  */
 const parseCatalogSort = (raw) => {
-  if (
-    raw &&
-    (CATALOG_SORT_OPTIONS.includes(raw) || raw === CATALOG_SORT_REVIEWS)
-  ) {
+  if (raw && (CATALOG_SORT_OPTIONS.includes(raw) || raw === CATALOG_SORT_REVIEWS)) {
     return raw;
   }
   return CATALOG_SORT_NEWEST;
@@ -70,14 +67,10 @@ export function parseCatalogQueryFromSearchParams(searchParams) {
     searchParams.get(CATALOG_QUERY_PARAM_INSTALLMENT_ONLY) === "true";
   const saleOnly = searchParams.get(CATALOG_QUERY_PARAM_SALE_ONLY) === "true";
   const rentalOnly = searchParams.get(CATALOG_QUERY_PARAM_RENTAL_ONLY) === "true";
-  const affiliateOnly =
-    searchParams.get(CATALOG_QUERY_PARAM_AFFILIATE_ONLY) === "true";
-  const wholesaleOnly =
-    searchParams.get(CATALOG_QUERY_PARAM_WHOLESALE_ONLY) === "true";
-  const buyNFreeOnly =
-    searchParams.get(CATALOG_QUERY_PARAM_BUY_N_FREE_ONLY) === "true";
-  const originalOnly =
-    searchParams.get(CATALOG_QUERY_PARAM_ORIGINAL_ONLY) === "true";
+  const affiliateOnly = searchParams.get(CATALOG_QUERY_PARAM_AFFILIATE_ONLY) === "true";
+  const wholesaleOnly = searchParams.get(CATALOG_QUERY_PARAM_WHOLESALE_ONLY) === "true";
+  const buyNFreeOnly = searchParams.get(CATALOG_QUERY_PARAM_BUY_N_FREE_ONLY) === "true";
+  const originalOnly = searchParams.get(CATALOG_QUERY_PARAM_ORIGINAL_ONLY) === "true";
   const near = searchParams.get(CATALOG_QUERY_PARAM_NEAR) === "true";
   const flashSaleOnly =
     searchParams.get(CATALOG_QUERY_PARAM_FLASH_SALE_ONLY) === "true";

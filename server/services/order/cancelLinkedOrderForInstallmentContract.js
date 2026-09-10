@@ -70,7 +70,12 @@ export const cancelLinkedOrderForInstallmentContract = async (
     }
     const productId = resolveProductIdFromItem(item.productId);
     const freeUnits = Math.floor(Number(item.buyNFreeUnitsAtOrder) || 0);
-    if (previousStatus === ORDER_STATUS_PENDING && freeUnits > 0 && buyerId && productId) {
+    if (
+      previousStatus === ORDER_STATUS_PENDING &&
+      freeUnits > 0 &&
+      buyerId &&
+      productId
+    ) {
       await releaseBuyNFreeRedemptionClaim({
         buyerId,
         productId,

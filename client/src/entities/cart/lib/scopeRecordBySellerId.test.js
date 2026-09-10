@@ -9,9 +9,9 @@ describe("scopeRecordBySellerId", () => {
   });
 
   it("оставляет только выбранного продавца", () => {
-    expect(
-      scopeRecordBySellerId({ a: "pickup", b: "delivery" }, "b"),
-    ).toEqual({ b: "delivery" });
+    expect(scopeRecordBySellerId({ a: "pickup", b: "delivery" }, "b")).toEqual({
+      b: "delivery",
+    });
   });
 
   it("пустой объект, если ключа нет", () => {

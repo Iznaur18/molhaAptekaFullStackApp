@@ -24,5 +24,8 @@ test("custom keeps light status colors", () => {
 test("custom is not dim and resolves dedicated theme", () => {
   assert.equal(isDimColorScheme("custom"), false);
   assert.equal(resolveIzTheme("custom").colors.action, "#F25623");
-  assert.notEqual(resolveIzTheme("custom").colors.bg, resolveIzTheme("light").colors.bg);
+  assert.notEqual(
+    resolveIzTheme("custom").colors.bg,
+    resolveIzTheme("light").colors.bg,
+  );
 });

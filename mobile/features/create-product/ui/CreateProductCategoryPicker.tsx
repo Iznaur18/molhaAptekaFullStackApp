@@ -68,7 +68,9 @@ const normalizeNode = (raw: Record<string, unknown>): CategoryNode => ({
 });
 
 const buildFullPath = (pathLabelRu: string[], labelRu: string): string[] =>
-  pathLabelRu[pathLabelRu.length - 1] === labelRu ? pathLabelRu : [...pathLabelRu, labelRu];
+  pathLabelRu[pathLabelRu.length - 1] === labelRu
+    ? pathLabelRu
+    : [...pathLabelRu, labelRu];
 
 export const CreateProductCategoryPicker = ({
   selectedCategoryId,
@@ -94,9 +96,13 @@ export const CreateProductCategoryPicker = ({
   const activeParentId = isRoot ? null : trail[trail.length - 1].id;
 
   const rootsQuery = useProductCategoryRootsQuery(sheetOpen);
-  const childrenQuery = useProductCategoryChildrenQuery(sheetOpen ? activeParentId : null);
+  const childrenQuery = useProductCategoryChildrenQuery(
+    sheetOpen ? activeParentId : null,
+  );
   const displaysQuery = useProductCategoryDisplaysQuery();
-  const searchResultsQuery = useProductCategorySearchQuery(sheetOpen ? searchQuery : "");
+  const searchResultsQuery = useProductCategorySearchQuery(
+    sheetOpen ? searchQuery : "",
+  );
 
   const options = useMemo<CategoryNode[]>(() => {
     if (isRoot) {
@@ -104,9 +110,9 @@ export const CreateProductCategoryPicker = ({
         normalizeNode(n as unknown as Record<string, unknown>),
       );
     }
-    return ((childrenQuery.data as { categories?: unknown[] } | null)?.categories ?? []).map(
-      (n) => normalizeNode(n as Record<string, unknown>),
-    );
+    return (
+      (childrenQuery.data as { categories?: unknown[] } | null)?.categories ?? []
+    ).map((n) => normalizeNode(n as Record<string, unknown>));
   }, [isRoot, rootsQuery.data, childrenQuery.data]);
 
   const displays = displaysQuery.data ?? [];
@@ -254,7 +260,9 @@ export const CreateProductCategoryPicker = ({
             searchResultsQuery.isPending ? (
               <View style={s.statusWrap}>
                 <ActivityIndicator size="small" color={theme.colors.textMuted} />
-                <Text style={s.statusText}>{CREATE_PRODUCT_UI.CATEGORY_SEARCH_LOADING}</Text>
+                <Text style={s.statusText}>
+                  {CREATE_PRODUCT_UI.CATEGORY_SEARCH_LOADING}
+                </Text>
               </View>
             ) : searchError ? (
               <View style={s.statusWrap}>
@@ -262,7 +270,9 @@ export const CreateProductCategoryPicker = ({
               </View>
             ) : (searchResultsQuery.data ?? []).length === 0 ? (
               <View style={s.statusWrap}>
-                <Text style={s.statusText}>{CREATE_PRODUCT_UI.CATEGORY_SEARCH_EMPTY}</Text>
+                <Text style={s.statusText}>
+                  {CREATE_PRODUCT_UI.CATEGORY_SEARCH_EMPTY}
+                </Text>
               </View>
             ) : (
               <ScrollView

@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
-import {
-  confirmPhoneBind,
-  requestPhoneBind,
-} from "../api/registerUserByPhone.js";
+import { confirmPhoneBind, requestPhoneBind } from "../api/registerUserByPhone.js";
 import { maskRuPhoneInput } from "../lib/ruPhone.js";
 import { authMeQueryKeys } from "../model/authMeQueryKeys.js";
 import { EDIT_PROFILE_MODAL_UI } from "../../../shared/config/appUiCopy.js";
@@ -36,12 +33,13 @@ export function PhoneBindControls({
   const maskedBaseline = maskRuPhoneInput(baselinePhone ?? "");
   const phoneTrim = String(phoneNumber ?? "").trim();
   const needsVerify =
-    Boolean(phoneTrim) &&
-    (isPhoneVerified !== true || phoneTrim !== maskedBaseline);
+    Boolean(phoneTrim) && (isPhoneVerified !== true || phoneTrim !== maskedBaseline);
 
   if (!needsVerify && isPhoneVerified) {
     return (
-      <span className="edit-profile-modal__hint">{EDIT_PROFILE_MODAL_UI.PHONE_VERIFIED}</span>
+      <span className="edit-profile-modal__hint">
+        {EDIT_PROFILE_MODAL_UI.PHONE_VERIFIED}
+      </span>
     );
   }
 
@@ -139,11 +137,15 @@ export function PhoneBindControls({
         </>
       )}
       {status.kind === "error" ? (
-        <span className="edit-profile-modal__hint edit-profile-modal__hint_error" role="alert">
+        <span
+          className="edit-profile-modal__hint edit-profile-modal__hint_error"
+          role="alert"
+        >
           {status.message}
         </span>
       ) : null}
-      {status.kind === "success" && status.message === EDIT_PROFILE_MODAL_UI.PHONE_BIND_SUCCESS ? (
+      {status.kind === "success" &&
+      status.message === EDIT_PROFILE_MODAL_UI.PHONE_BIND_SUCCESS ? (
         <span className="edit-profile-modal__hint">{status.message}</span>
       ) : null}
     </div>

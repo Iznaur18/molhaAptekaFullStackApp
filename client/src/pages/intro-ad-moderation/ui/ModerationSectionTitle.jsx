@@ -10,7 +10,10 @@ export function ModerationSectionTitle({ title, pendingCount = 0 }) {
     <div className="intro-ad-moderation-page__section-title-row">
       <h3 className="intro-ad-moderation-page__section-title">{title}</h3>
       {showBadge ? (
-        <span className="intro-ad-moderation-page__section-badge" aria-label={`${pendingCount} на модерации`}>
+        <span
+          className="intro-ad-moderation-page__section-badge"
+          aria-label={`${pendingCount} на модерации`}
+        >
           {INTRO_AD_MODERATION_PAGE_UI.PENDING_BADGE(pendingCount)}
         </span>
       ) : null}

@@ -25,7 +25,9 @@ export function SellerShareLinkButton({
   variant = "banner",
 }) {
   const [copied, setCopied] = useState(false);
-  const resetTimerRef = useRef(/** @type {ReturnType<typeof setTimeout> | null} */ (null));
+  const resetTimerRef = useRef(
+    /** @type {ReturnType<typeof setTimeout> | null} */ (null),
+  );
 
   useEffect(() => {
     return () => {
@@ -54,8 +56,7 @@ export function SellerShareLinkButton({
   const handleClick = (event) => {
     event.stopPropagation();
     event.preventDefault();
-    const origin =
-      typeof window !== "undefined" ? window.location.origin : "";
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
     const path = buildSellerProductsPath(id);
     const url = `${origin}${path}`;
     const title = String(sellerName ?? "").trim();

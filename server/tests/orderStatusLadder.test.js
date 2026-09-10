@@ -3,9 +3,7 @@ import { describe, it } from "node:test";
 
 process.env.NODE_ENV = process.env.NODE_ENV ?? "test";
 
-const { buildOrderStatusFromItems } = await import(
-  "../services/order/orderStatus.js"
-);
+const { buildOrderStatusFromItems } = await import("../services/order/orderStatus.js");
 
 /** @param {...string} statuses */
 const rollup = (...statuses) =>

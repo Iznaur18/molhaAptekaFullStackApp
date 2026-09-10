@@ -16,7 +16,9 @@ export function useCuratedCarouselImageDragScroll() {
   );
 
   const isImageDragTarget = useCallback((target) => {
-    return target instanceof Element && Boolean(target.closest(IMAGE_DRAG_HANDLE_SELECTOR));
+    return (
+      target instanceof Element && Boolean(target.closest(IMAGE_DRAG_HANDLE_SELECTOR))
+    );
   }, []);
 
   const finishDrag = useCallback((event) => {

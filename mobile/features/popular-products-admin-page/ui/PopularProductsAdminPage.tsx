@@ -26,7 +26,9 @@ export const PopularProductsAdminPage = () => {
         accessibilityRole="tab"
         accessibilityState={{ selected: active }}
       >
-        <Text style={[styles.toolbarButtonText, active && styles.toolbarButtonPrimaryText]}>
+        <Text
+          style={[styles.toolbarButtonText, active && styles.toolbarButtonPrimaryText]}
+        >
           {label}
         </Text>
       </Pressable>

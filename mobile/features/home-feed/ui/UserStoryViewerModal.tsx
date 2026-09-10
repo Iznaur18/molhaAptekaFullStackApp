@@ -70,9 +70,12 @@ export const UserStoryViewerModal = ({
 
   const authorKey = authorId ?? "";
   const isOwn =
-    currentUserId != null && authorKey.length > 0 && authorKey === String(currentUserId);
+    currentUserId != null &&
+    authorKey.length > 0 &&
+    authorKey === String(currentUserId);
   const activeStory = stories[activeIndex] ?? null;
-  const canReport = isAuthorized && !isOwn && activeStory != null && !storiesQuery.isPending;
+  const canReport =
+    isAuthorized && !isOwn && activeStory != null && !storiesQuery.isPending;
   const isDeleting = deleteMutation.isPending;
   const hasMultiple = stories.length > 1;
   const showFooter = isOwn || canReport;
@@ -203,7 +206,9 @@ export const UserStoryViewerModal = ({
       onStoryDeleted?.();
       onClose();
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : USER_STORY_UI.ERROR_GENERIC);
+      setActionError(
+        error instanceof Error ? error.message : USER_STORY_UI.ERROR_GENERIC,
+      );
     }
   };
 
@@ -281,7 +286,8 @@ export const UserStoryViewerModal = ({
                       onPress={handleNext}
                       style={[
                         styles.edgeNext,
-                        (isReportOpen || activeIndex >= stories.length - 1) && styles.edgeDisabled,
+                        (isReportOpen || activeIndex >= stories.length - 1) &&
+                          styles.edgeDisabled,
                       ]}
                     />
                   </>
@@ -303,7 +309,11 @@ export const UserStoryViewerModal = ({
                     style={styles.authorButton}
                   >
                     {avatarUrl ? (
-                      <Image source={{ uri: avatarUrl }} style={styles.avatar} contentFit="cover" />
+                      <Image
+                        source={{ uri: avatarUrl }}
+                        style={styles.avatar}
+                        contentFit="cover"
+                      />
                     ) : (
                       <View style={styles.avatarFallback}>
                         <Text style={styles.avatarFallbackText}>
@@ -320,13 +330,17 @@ export const UserStoryViewerModal = ({
                 {isMediaLoading && !keepPreviousFrame ? (
                   <View style={styles.mediaState}>
                     <ActivityIndicator color={theme.colors.onContrast} size="small" />
-                    <Text style={styles.mediaStateText}>{USER_STORY_UI.MEDIA_LOADING}</Text>
+                    <Text style={styles.mediaStateText}>
+                      {USER_STORY_UI.MEDIA_LOADING}
+                    </Text>
                   </View>
                 ) : null}
 
                 {hasMediaError ? (
                   <View style={styles.mediaState}>
-                    <Text style={styles.mediaStateText}>{USER_STORY_UI.MEDIA_LOAD_ERROR}</Text>
+                    <Text style={styles.mediaStateText}>
+                      {USER_STORY_UI.MEDIA_LOAD_ERROR}
+                    </Text>
                   </View>
                 ) : null}
 

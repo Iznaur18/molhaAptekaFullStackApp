@@ -5,7 +5,10 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-const shellSource = readFileSync(join(root, "shared/ui/AdminEditModalShell.tsx"), "utf8");
+const shellSource = readFileSync(
+  join(root, "shared/ui/AdminEditModalShell.tsx"),
+  "utf8",
+);
 const animationSource = readFileSync(
   join(root, "shared/model/useAdminEditModalAnimation.ts"),
   "utf8",

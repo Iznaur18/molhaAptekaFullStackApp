@@ -20,13 +20,7 @@ const VIEWER_REGION_SHEET_EXIT_MS = 260;
  *   id?: string;
  * }} props
  */
-export function ViewerRegionPickerSheet({
-  isOpen,
-  value,
-  onClose,
-  onSelect,
-  id,
-}) {
+export function ViewerRegionPickerSheet({ isOpen, value, onClose, onSelect, id }) {
   const generatedId = useId();
   const sheetId = id || generatedId;
   const titleId = `${sheetId}-title`;
@@ -126,7 +120,9 @@ export function ViewerRegionPickerSheet({
         <ul className="viewer-region-picker-sheet__list" role="listbox">
           {filtered.length === 0 ? (
             <li>
-              <p className="viewer-region-picker-sheet__empty">{REGION_UI.SEARCH_EMPTY}</p>
+              <p className="viewer-region-picker-sheet__empty">
+                {REGION_UI.SEARCH_EMPTY}
+              </p>
             </li>
           ) : (
             filtered.map((region) => {
@@ -139,9 +135,7 @@ export function ViewerRegionPickerSheet({
                     aria-selected={isSelected}
                     className={[
                       "viewer-region-picker-sheet__option",
-                      isSelected
-                        ? "viewer-region-picker-sheet__option--selected"
-                        : "",
+                      isSelected ? "viewer-region-picker-sheet__option--selected" : "",
                     ]
                       .filter(Boolean)
                       .join(" ")}

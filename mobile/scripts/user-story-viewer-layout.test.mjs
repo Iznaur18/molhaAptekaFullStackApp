@@ -30,7 +30,10 @@ test("story viewer modal is fullscreen with web-like frame", () => {
   assert.match(source, /styles\.edgeNext/);
   assert.match(source, /pointerEvents="none"/);
   assert.match(source, /styles\.footer/);
-  assert.match(source, /<View style=\{\[styles\.frame, frameSize\]\}>[\s\S]*styles\.edgePrev/);
+  assert.match(
+    source,
+    /<View style=\{\[styles\.frame, frameSize\]\}>[\s\S]*styles\.edgePrev/,
+  );
   assert.match(styles, /footer:[\s\S]*zIndex: 4/);
   assert.match(styles, /edgePrev:[\s\S]*zIndex: 1/);
 });

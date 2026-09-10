@@ -27,7 +27,9 @@ export function useCatalogSubcategoryPicker({
   const [pickerTrail, setPickerTrail] = useState(
     /** @type {CatalogSubcategoryPickerTrailStep[]} */ ([]),
   );
-  const [pickerLoadError, setPickerLoadError] = useState(/** @type {string | null} */ (null));
+  const [pickerLoadError, setPickerLoadError] = useState(
+    /** @type {string | null} */ (null),
+  );
   const [resolvingLandingCategoryKey, setResolvingLandingCategoryKey] = useState(
     /** @type {string | null} */ (null),
   );
@@ -242,4 +244,4 @@ export function useCatalogSubcategoryPicker({
     handleSubcategoryPickerViewAll,
     handleSubcategoryPickerCategoryClick,
   };
-};
+}

@@ -34,7 +34,9 @@ describe("productInstagramPostUrl", () => {
   test("productInstagramPostUrlFieldSchema accepts empty and valid url", () => {
     assert.equal(productInstagramPostUrlFieldSchema.parse(""), "");
     assert.equal(
-      productInstagramPostUrlFieldSchema.parse("https://www.instagram.com/p/ABC123_xYz/"),
+      productInstagramPostUrlFieldSchema.parse(
+        "https://www.instagram.com/p/ABC123_xYz/",
+      ),
       "https://www.instagram.com/p/ABC123_xYz/",
     );
   });

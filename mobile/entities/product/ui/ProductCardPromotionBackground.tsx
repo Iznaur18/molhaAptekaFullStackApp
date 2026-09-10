@@ -31,7 +31,10 @@ export const ProductCardPromotionBackground = ({
     const palette = resolveProductCardPromotionBannerInnerFrame(theme.colors);
 
     return (
-      <View style={[StyleSheet.absoluteFill, { borderRadius }, style]} pointerEvents="none">
+      <View
+        style={[StyleSheet.absoluteFill, { borderRadius }, style]}
+        pointerEvents="none"
+      >
         <Svg width="100%" height="100%" preserveAspectRatio="none">
           <Defs>
             <LinearGradient id={gradientId} x1="0" y1="0" x2="1" y2="0.25">
@@ -40,7 +43,12 @@ export const ProductCardPromotionBackground = ({
               <Stop offset="1" stopColor={palette.gradientEnd} />
             </LinearGradient>
           </Defs>
-          <Rect width="100%" height="100%" rx={borderRadius} fill={`url(#${gradientId})`} />
+          <Rect
+            width="100%"
+            height="100%"
+            rx={borderRadius}
+            fill={`url(#${gradientId})`}
+          />
         </Svg>
       </View>
     );
@@ -51,7 +59,10 @@ export const ProductCardPromotionBackground = ({
     : resolveProductCardPromotionCompactFrame(theme.colors)[tier];
 
   return (
-    <View style={[StyleSheet.absoluteFill, { borderRadius }, style]} pointerEvents="none">
+    <View
+      style={[StyleSheet.absoluteFill, { borderRadius }, style]}
+      pointerEvents="none"
+    >
       <Svg width="100%" height="100%" preserveAspectRatio="none">
         <Defs>
           <LinearGradient id={gradientId} x1="0" y1="0" x2="0.25" y2="1">
@@ -59,7 +70,12 @@ export const ProductCardPromotionBackground = ({
             <Stop offset="1" stopColor={palette.gradientEnd} />
           </LinearGradient>
         </Defs>
-        <Rect width="100%" height="100%" rx={borderRadius} fill={`url(#${gradientId})`} />
+        <Rect
+          width="100%"
+          height="100%"
+          rx={borderRadius}
+          fill={`url(#${gradientId})`}
+        />
       </Svg>
     </View>
   );

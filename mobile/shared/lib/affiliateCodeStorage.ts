@@ -104,9 +104,7 @@ export const clearPersistedAffiliateCode = async (): Promise<void> => {
 export const captureAffiliateCodeFromUrl = async (url: string): Promise<string> => {
   try {
     const parsed = new URL(url);
-    const code = normalizeAffiliateCode(
-      parsed.searchParams.get(AFFILIATE_QUERY_PARAM),
-    );
+    const code = normalizeAffiliateCode(parsed.searchParams.get(AFFILIATE_QUERY_PARAM));
     if (code) {
       await persistAffiliateCode(code);
     }

@@ -149,8 +149,7 @@ export const approveProductModerationController = async (req, res) => {
   // Снимок того, что человек сейчас посмотрел и одобрил: по нему потом видно,
   // изменилось ли с тех пор содержимое карточки, или приезжали только цена и
   // остаток из обмена.
-  product.productModerationApprovedHash =
-    buildProductModerationFingerprint(product);
+  product.productModerationApprovedHash = buildProductModerationFingerprint(product);
 
   await product.save();
   await product.populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT);

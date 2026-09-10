@@ -17,7 +17,10 @@ type ProductCardWishlistBurstProps = {
   active: boolean;
 };
 
-export const ProductCardWishlistBurst = ({ burstToken, active }: ProductCardWishlistBurstProps) => {
+export const ProductCardWishlistBurst = ({
+  burstToken,
+  active,
+}: ProductCardWishlistBurstProps) => {
   const theme = useAppTheme();
   const styles = useProductCardWishlistBurstStyles();
   const scale = useSharedValue(0);
@@ -34,7 +37,10 @@ export const ProductCardWishlistBurst = ({ burstToken, active }: ProductCardWish
       withSpring(1.18, { damping: 11, stiffness: 360 }),
       withSpring(1, { damping: 16, stiffness: 280 }),
     );
-    opacity.value = withSequence(withTiming(1, { duration: 80 }), withTiming(0, { duration: 420 }));
+    opacity.value = withSequence(
+      withTiming(1, { duration: 80 }),
+      withTiming(0, { duration: 420 }),
+    );
   }, [burstToken, opacity, scale]);
 
   const burstStyle = useAnimatedStyle(() => ({
@@ -47,7 +53,10 @@ export const ProductCardWishlistBurst = ({ burstToken, active }: ProductCardWish
   }
 
   return (
-    <Animated.View style={[StyleSheet.absoluteFill, styles.root, burstStyle]} pointerEvents="none">
+    <Animated.View
+      style={[StyleSheet.absoluteFill, styles.root, burstStyle]}
+      pointerEvents="none"
+    >
       <MaterialIcons
         name={active ? "favorite" : "favorite-border"}
         size={56}

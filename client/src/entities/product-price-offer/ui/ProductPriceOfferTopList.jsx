@@ -14,7 +14,11 @@ import "./ProductPriceOffer.css";
  *   highlightedOfferId?: string | null;
  * }} props
  */
-export function ProductPriceOfferTopList({ top, onOpenBuyer, highlightedOfferId = null }) {
+export function ProductPriceOfferTopList({
+  top,
+  onOpenBuyer,
+  highlightedOfferId = null,
+}) {
   if (top.length === 0) {
     return (
       <p className="product-price-offer__empty">{PRODUCT_PRICE_OFFER_UI.EMPTY_TOP}</p>

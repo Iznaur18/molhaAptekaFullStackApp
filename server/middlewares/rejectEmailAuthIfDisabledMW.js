@@ -1,7 +1,4 @@
-import {
-  EMAIL_AUTH_DISABLED_MESSAGE,
-  isEmailAuthEnabled,
-} from "@izibuy/shared-lib";
+import { EMAIL_AUTH_DISABLED_MESSAGE, isEmailAuthEnabled } from "@izibuy/shared-lib";
 
 import { errorRes } from "../services/http/index.js";
 

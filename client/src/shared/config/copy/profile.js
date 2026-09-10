@@ -125,12 +125,14 @@ export const EDIT_PROFILE_MODAL_UI = {
   LABEL_BUSINESS_HOURS_DAYS: "Рабочие дни",
   LABEL_BUSINESS_HOURS_OPEN: "Открытие",
   LABEL_BUSINESS_HOURS_CLOSE: "Закрытие",
-  HINT_BUSINESS_HOURS: "Вне рабочего времени ваши товары видны, но покупка недоступна. Часовой пояс — по региону профиля.",
+  HINT_BUSINESS_HOURS:
+    "Вне рабочего времени ваши товары видны, но покупка недоступна. Часовой пояс — по региону профиля.",
   SECTION_NOTIFICATIONS: "Уведомления",
   SECTION_ABOUT: "О себе",
   SECTION_SOCIAL: "Соцсети",
   LABEL_FULL_NAME: "Имя и фамилия",
-  HINT_FULL_NAME: "Как вас видят другие пользователи. Можно указать имя, фамилию или название.",
+  HINT_FULL_NAME:
+    "Как вас видят другие пользователи. Можно указать имя, фамилию или название.",
   LABEL_EMAIL: "Email",
   LABEL_USERNAME: "Никнейм",
   USERNAME_HINT:
@@ -156,8 +158,10 @@ export const EDIT_PROFILE_MODAL_UI = {
   EMAIL_CODE_LABEL: "Код из письма",
   EMAIL_CODE_PLACEHOLDER: "000000",
   EMAIL_BIND_SUCCESS: "Email подтверждён",
-  EMAIL_CHANGE_PENDING: "Подтвердите новый email кодом из письма перед сохранением профиля",
-  EMAIL_CLEAR_FORBIDDEN: "Очистка email недоступна. Смените адрес через код подтверждения",
+  EMAIL_CHANGE_PENDING:
+    "Подтвердите новый email кодом из письма перед сохранением профиля",
+  EMAIL_CLEAR_FORBIDDEN:
+    "Очистка email недоступна. Смените адрес через код подтверждения",
   SECTION_PASSWORD: "Смена пароля",
   LABEL_CURRENT_PASSWORD: "Текущий пароль",
   LABEL_NEW_PASSWORD: "Новый пароль",

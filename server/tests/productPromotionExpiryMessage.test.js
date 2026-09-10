@@ -3,10 +3,8 @@ import { describe, it } from "node:test";
 
 process.env.NODE_ENV = process.env.NODE_ENV ?? "test";
 
-const {
-  buildProductPromotionAlreadyActiveMessage,
-  formatProductPromotionExpiryLabel,
-} = await import("../services/product/productPromotionHelpers.js");
+const { buildProductPromotionAlreadyActiveMessage, formatProductPromotionExpiryLabel } =
+  await import("../services/product/productPromotionHelpers.js");
 
 describe("дата окончания продвижения в отказе", () => {
   it("называет дату и время, до которых ждать", () => {

@@ -165,8 +165,14 @@ export const SiteHeaderBannerCarousel = ({
         return;
       }
 
-      const loopIndex = resolveSiteHeaderBannerCarouselLoopIndexFromOffset(offsetX, stride);
-      const jumpTarget = resolveSiteHeaderBannerCarouselLoopJumpTarget(loopIndex, slides.length);
+      const loopIndex = resolveSiteHeaderBannerCarouselLoopIndexFromOffset(
+        offsetX,
+        stride,
+      );
+      const jumpTarget = resolveSiteHeaderBannerCarouselLoopJumpTarget(
+        loopIndex,
+        slides.length,
+      );
 
       if (jumpTarget != null) {
         isJumpingRef.current = true;
@@ -180,7 +186,9 @@ export const SiteHeaderBannerCarousel = ({
         return;
       }
 
-      setActiveIndex(resolveSiteHeaderBannerCarouselLoopLogicalIndex(loopIndex, slides.length));
+      setActiveIndex(
+        resolveSiteHeaderBannerCarouselLoopLogicalIndex(loopIndex, slides.length),
+      );
     },
     [loopEnabled, scrollToLoopIndex, slides.length, stride],
   );
@@ -193,7 +201,8 @@ export const SiteHeaderBannerCarousel = ({
     let settleTimerId: ReturnType<typeof setTimeout> | undefined;
 
     const timerId = setInterval(() => {
-      const currentLoopIndex = resolveSiteHeaderBannerCarouselLoopIndexFromLogical(activeIndex);
+      const currentLoopIndex =
+        resolveSiteHeaderBannerCarouselLoopIndexFromLogical(activeIndex);
       const nextLoopIndex = currentLoopIndex + 1;
       scrollToLoopIndex(nextLoopIndex, true);
 
@@ -327,7 +336,12 @@ export const SiteHeaderBannerCarousel = ({
   if (slides.length === 1) {
     const singleSlideContent = (
       <View
-        style={[rootStyle, styles.singleSlide, edgeStyles.singleSlide, bannerHeightStyle]}
+        style={[
+          rootStyle,
+          styles.singleSlide,
+          edgeStyles.singleSlide,
+          bannerHeightStyle,
+        ]}
         onLayout={handleViewportLayout}
         accessibilityLabel={SITE_HEADER_BANNER_UI.CAROUSEL_ARIA}
       >
@@ -440,7 +454,9 @@ export const SiteHeaderBannerCarousel = ({
       onTouchEnd={() => setIsPaused(false)}
       onTouchCancel={() => setIsPaused(false)}
     >
-      <SquircleView radius={SITE_HEADER_BANNER_LAYOUT.radius}>{carouselBody}</SquircleView>
+      <SquircleView radius={SITE_HEADER_BANNER_LAYOUT.radius}>
+        {carouselBody}
+      </SquircleView>
     </View>
   );
 };

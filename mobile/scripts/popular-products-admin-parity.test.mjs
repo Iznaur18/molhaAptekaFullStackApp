@@ -10,8 +10,12 @@ const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
 test("popular products admin page mirrors web admin panel shell", () => {
-  const page = readMobileFile("features/popular-products-admin-page/ui/PopularProductsAdminPage.tsx");
-  const hook = readMobileFile("features/popular-products-admin-page/model/usePopularProductsAdminPage.ts");
+  const page = readMobileFile(
+    "features/popular-products-admin-page/ui/PopularProductsAdminPage.tsx",
+  );
+  const hook = readMobileFile(
+    "features/popular-products-admin-page/model/usePopularProductsAdminPage.ts",
+  );
 
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /ProfileMobileNavSheet/);
@@ -35,7 +39,9 @@ test("popular products admin page mirrors web admin panel shell", () => {
 });
 
 test("curated product list admin card mirrors web reorder and product rows", () => {
-  const card = readMobileFile("features/popular-products-admin-page/ui/CuratedProductListAdminCard.tsx");
+  const card = readMobileFile(
+    "features/popular-products-admin-page/ui/CuratedProductListAdminCard.tsx",
+  );
 
   assert.match(card, /MOVE_UP_ARIA/);
   assert.match(card, /MOVE_DOWN_ARIA/);

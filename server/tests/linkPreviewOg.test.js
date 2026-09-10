@@ -3,7 +3,10 @@ import test from "node:test";
 
 import { isLinkPreviewBotUserAgent } from "@izibuy/shared-lib";
 
-import { buildLinkPreviewHtml, escapeHtmlAttr } from "../services/link-preview/buildLinkPreviewHtml.js";
+import {
+  buildLinkPreviewHtml,
+  escapeHtmlAttr,
+} from "../services/link-preview/buildLinkPreviewHtml.js";
 import {
   appendMediaCacheBust,
   resolveAbsolutePublicMediaUrl,
@@ -11,14 +14,8 @@ import {
 } from "../services/link-preview/resolveAbsolutePublicMediaUrl.js";
 
 test("isLinkPreviewBotUserAgent: WhatsApp / Telegram / browser", () => {
-  assert.equal(
-    isLinkPreviewBotUserAgent("WhatsApp/2.0"),
-    true,
-  );
-  assert.equal(
-    isLinkPreviewBotUserAgent("TelegramBot (like TwitterBot)"),
-    true,
-  );
+  assert.equal(isLinkPreviewBotUserAgent("WhatsApp/2.0"), true);
+  assert.equal(isLinkPreviewBotUserAgent("TelegramBot (like TwitterBot)"), true);
   assert.equal(
     isLinkPreviewBotUserAgent(
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0",
@@ -75,7 +72,10 @@ test("appendMediaCacheBust + resolveSiteOgImageUrl", () => {
   try {
     assert.equal(resolveSiteOgImageUrl(), "https://gitorg.ru/og-image.png");
     assert.equal(
-      appendMediaCacheBust("https://gitorg.ru/og-image.png", new Date("2020-01-01T00:00:00.000Z")),
+      appendMediaCacheBust(
+        "https://gitorg.ru/og-image.png",
+        new Date("2020-01-01T00:00:00.000Z"),
+      ),
       "https://gitorg.ru/og-image.png?v=1577836800000",
     );
   } finally {

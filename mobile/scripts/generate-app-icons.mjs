@@ -12,12 +12,7 @@ const ICON_SIZE = 1024;
 const BRAND_BACKGROUND = "#F25623";
 const FAVICON_SIZE = 48;
 
-const createSquarePng = async ({
-  outputName,
-  size,
-  logoScale,
-  background,
-}) => {
+const createSquarePng = async ({ outputName, size, logoScale, background }) => {
   const padding = Math.round(size * 0.1);
   const maxLogoWidth = Math.round((size - padding * 2) * logoScale);
   const resizedLogo = await sharp(LOGO_PATH)

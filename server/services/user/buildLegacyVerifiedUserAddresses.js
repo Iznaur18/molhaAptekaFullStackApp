@@ -78,7 +78,9 @@ export function mapLegacyVerifiedDeliveryAddress(verified, meta = {}) {
  * @param {Awaited<ReturnType<import("../utils/dadata/verifyRuDeliveryAddress.js").verifyRuDeliveryAddress>>} verified
  */
 export function buildLegacyVerifiedUserAddresses(existingAddresses, verified) {
-  const stored = existingAddresses.map(mapStoredUserSavedAddressItem).filter((item) => item.line);
+  const stored = existingAddresses
+    .map(mapStoredUserSavedAddressItem)
+    .filter((item) => item.line);
 
   if (stored.length > 1) {
     const defaultIndex = Math.max(
@@ -119,7 +121,9 @@ export function buildLegacyVerifiedUserAddresses(existingAddresses, verified) {
  * @param {Array<Record<string, unknown>>} existingAddresses
  */
 export function buildLegacyClearUserAddresses(existingAddresses) {
-  const stored = existingAddresses.map(mapStoredUserSavedAddressItem).filter((item) => item.line);
+  const stored = existingAddresses
+    .map(mapStoredUserSavedAddressItem)
+    .filter((item) => item.line);
 
   if (stored.length <= 1) {
     return [];

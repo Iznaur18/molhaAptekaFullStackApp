@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { updateProfileBodySchema, USER_FULL_NAME_MAX_LENGTH } from "../src/userProfile.js";
+import {
+  updateProfileBodySchema,
+  USER_FULL_NAME_MAX_LENGTH,
+} from "../src/userProfile.js";
 
 describe("userFullName", () => {
   it("accepts trimmed display name", () => {

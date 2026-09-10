@@ -1,5 +1,12 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useRef, useState, type ComponentProps } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentProps,
+} from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -28,7 +35,10 @@ import { useRaffleStaffMutations } from "@/entities/raffle/model/useRaffleStaffM
 import type { RaffleFromApi } from "@/entities/raffle/model/types";
 import { FeaturedRaffleWinnerCard } from "@/entities/raffle/ui/FeaturedRaffleWinnerCard";
 import { RaffleManageActions } from "@/entities/raffle/ui/RaffleManageActions";
-import { RafflePrizeMedia, RafflePrizeMediaSoundToggle } from "@/entities/raffle/ui/RafflePrizeMedia";
+import {
+  RafflePrizeMedia,
+  RafflePrizeMediaSoundToggle,
+} from "@/entities/raffle/ui/RafflePrizeMedia";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { buildCatalogGridRows } from "@/features/catalog-grid/lib/buildCatalogGridRows";
 import { CatalogScrollAnimationProvider } from "@/features/catalog-grid/model/CatalogScrollAnimationContext";
@@ -96,7 +106,10 @@ const RaffleProductsProgressBlock = ({
       accessibilityLabel={progressUi.label}
     >
       <View
-        style={[styles.progressBar, progressUi.isCompleted && styles.progressBarCompleted]}
+        style={[
+          styles.progressBar,
+          progressUi.isCompleted && styles.progressBarCompleted,
+        ]}
       >
         <View
           style={[
@@ -122,7 +135,9 @@ const RaffleProductsProgressBlock = ({
           </Text>
         </View>
         <View style={[styles.stat, isWide && styles.statWide]}>
-          <Text style={styles.statLabel}>{RAFFLE_FEATURED_BANNER_UI.STAT_PARTICIPANTS}</Text>
+          <Text style={styles.statLabel}>
+            {RAFFLE_FEATURED_BANNER_UI.STAT_PARTICIPANTS}
+          </Text>
           <Text style={styles.statValue}>{progressUi.participantsCount}</Text>
         </View>
         <View style={[styles.stat, isWide && styles.statWide]}>
@@ -256,7 +271,9 @@ export const RaffleProductsPage = () => {
       if (!hasCarousel || mediaWidth <= 0) {
         return;
       }
-      const index = carouselRaffles.findIndex((item) => String(item._id) === String(raffleId));
+      const index = carouselRaffles.findIndex(
+        (item) => String(item._id) === String(raffleId),
+      );
       const safeIndex = index < 0 ? 0 : index;
       setActiveSwipeIndex(safeIndex);
       if (index < 0) {

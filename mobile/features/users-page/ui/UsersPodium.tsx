@@ -95,8 +95,7 @@ const UsersPodiumSlot = ({ entry, onUserPress }: UsersPodiumSlotProps) => {
       : place === 2
         ? styles.placeBadge2
         : styles.placeBadge3;
-  const avatarStyle =
-    place === 1 ? styles.avatarPlace1 : styles.avatarPlaceOther;
+  const avatarStyle = place === 1 ? styles.avatarPlace1 : styles.avatarPlaceOther;
 
   return (
     <Pressable
@@ -152,10 +151,7 @@ const UsersPodiumSlot = ({ entry, onUserPress }: UsersPodiumSlotProps) => {
 
 export const UsersPodium = ({ entries, onUserPress }: UsersPodiumProps) => {
   const styles = useUsersPodiumStyles();
-  const displayEntries = useMemo(
-    () => orderUsersPodiumForDisplay(entries),
-    [entries],
-  );
+  const displayEntries = useMemo(() => orderUsersPodiumForDisplay(entries), [entries]);
 
   if (displayEntries.length === 0) {
     return null;

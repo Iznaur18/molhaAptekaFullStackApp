@@ -11,11 +11,18 @@ const readMobileFile = (relativePath) =>
 
 test("admin toggles product moderation trust from user details", () => {
   const api = readMobileFile("entities/user/api/patchSellerProductModerationTrust.ts");
-  const control = readMobileFile("entities/user/ui/AdminProductModerationTrustControl.tsx");
+  const control = readMobileFile(
+    "entities/user/ui/AdminProductModerationTrustControl.tsx",
+  );
   const page = readMobileFile("features/user-details-page/ui/UserDetailsPage.tsx");
-  const pageModel = readMobileFile("features/user-details-page/model/useUserDetailsPage.ts");
+  const pageModel = readMobileFile(
+    "features/user-details-page/model/useUserDetailsPage.ts",
+  );
 
-  assert.match(api, /\/staff\/sellers\/\$\{encodeURIComponent\(userId\)\}\/product-moderation-trust/);
+  assert.match(
+    api,
+    /\/staff\/sellers\/\$\{encodeURIComponent\(userId\)\}\/product-moderation-trust/,
+  );
   assert.match(api, /productModerationTrusted/);
 
   assert.match(control, /Alert\.alert/);

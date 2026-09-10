@@ -1,4 +1,7 @@
-import { USER_BUSINESS_HOURS_WEEKDAY_LABELS_RU, USER_FULL_NAME_MAX_LENGTH } from "@molha/api-contract";
+import {
+  USER_BUSINESS_HOURS_WEEKDAY_LABELS_RU,
+  USER_FULL_NAME_MAX_LENGTH,
+} from "@molha/api-contract";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
 import { sanitizeUserNameInputLive } from "@molha/api-contract";
@@ -28,7 +31,12 @@ import { ProfileAvatarUpload } from "@/features/image-upload/ui/ProfileAvatarUpl
 import { ProfileBackgroundUpload } from "@/features/image-upload/ui/ProfileBackgroundUpload";
 import { DeleteAccountSection } from "@/features/profile-edit/ui/DeleteAccountSection";
 import { EditProfileSocialLinksFields } from "@/features/profile-edit/ui/EditProfileSocialLinksFields";
-import { ADDRESS_STRUCTURED_UI, AUTH_UI, EDIT_PROFILE_UI, USER_SAVED_ADDRESSES_UI } from "@/shared/config";
+import {
+  ADDRESS_STRUCTURED_UI,
+  AUTH_UI,
+  EDIT_PROFILE_UI,
+  USER_SAVED_ADDRESSES_UI,
+} from "@/shared/config";
 import { keepDigitsOnly } from "@/shared/lib/rubPriceInput";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
@@ -36,7 +44,11 @@ import { useEditProfileFormStyles } from "@/shared/theme/editProfileFormStyles";
 import { AppButton } from "@/shared/ui/AppButton";
 import { PasswordTextInput } from "@/shared/ui/PasswordTextInput";
 
-const GENDER_OPTIONS = [USER_GENDER_MALE, USER_GENDER_FEMALE, USER_GENDER_NO_SELECTED] as const;
+const GENDER_OPTIONS = [
+  USER_GENDER_MALE,
+  USER_GENDER_FEMALE,
+  USER_GENDER_NO_SELECTED,
+] as const;
 const BIND_CODE_LENGTH = 6;
 
 type EditProfileFormProps = {
@@ -50,7 +62,11 @@ type EditProfileFormProps = {
   focusAddress?: boolean;
 };
 
-export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditProfileFormProps) => {
+export const EditProfileForm = ({
+  user,
+  onSaved,
+  focusAddress = false,
+}: EditProfileFormProps) => {
   const theme = useAppTheme();
   const styles = useEditProfileFormStyles();
   const initialForm = useMemo(() => mapUserToEditProfileForm(user), [user]);
@@ -63,12 +79,16 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
   const [phoneBindOtpSent, setPhoneBindOtpSent] = useState(false);
   const [phoneBindLoading, setPhoneBindLoading] = useState(false);
   const [phoneBindNotice, setPhoneBindNotice] = useState("");
-  const [phoneLocalVerified, setPhoneLocalVerified] = useState(user.isPhoneVerified === true);
+  const [phoneLocalVerified, setPhoneLocalVerified] = useState(
+    user.isPhoneVerified === true,
+  );
   const [emailBindCode, setEmailBindCode] = useState("");
   const [emailBindOtpSent, setEmailBindOtpSent] = useState(false);
   const [emailBindLoading, setEmailBindLoading] = useState(false);
   const [emailBindNotice, setEmailBindNotice] = useState("");
-  const [emailLocalVerified, setEmailLocalVerified] = useState(user.isEmailVerified === true);
+  const [emailLocalVerified, setEmailLocalVerified] = useState(
+    user.isEmailVerified === true,
+  );
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
@@ -156,7 +176,9 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
       onSaved?.();
     } catch (error) {
       setSuccessMessage("");
-      setErrorMessage(error instanceof Error ? error.message : EDIT_PROFILE_UI.SAVE_ERROR);
+      setErrorMessage(
+        error instanceof Error ? error.message : EDIT_PROFILE_UI.SAVE_ERROR,
+      );
     }
   };
 
@@ -169,7 +191,8 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
   const isEmailVerified = user.isEmailVerified === true || emailLocalVerified;
   const showEmailVerify =
     form.email.trim() !== "" &&
-    (!isEmailVerified || form.email.trim().toLowerCase() !== baselineForm.email.trim().toLowerCase());
+    (!isEmailVerified ||
+      form.email.trim().toLowerCase() !== baselineForm.email.trim().toLowerCase());
 
   const handleRequestPhoneBind = async () => {
     setPhoneBindLoading(true);
@@ -182,7 +205,9 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
       setPhoneBindNotice(EDIT_PROFILE_UI.PHONE_VERIFY_SENT);
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : EDIT_PROFILE_UI.PHONE_VERIFY_REQUEST_ERROR,
+        error instanceof Error
+          ? error.message
+          : EDIT_PROFILE_UI.PHONE_VERIFY_REQUEST_ERROR,
       );
     } finally {
       setPhoneBindLoading(false);
@@ -227,7 +252,9 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
       setEmailBindNotice(EDIT_PROFILE_UI.EMAIL_VERIFY_SENT);
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : EDIT_PROFILE_UI.EMAIL_VERIFY_REQUEST_ERROR,
+        error instanceof Error
+          ? error.message
+          : EDIT_PROFILE_UI.EMAIL_VERIFY_REQUEST_ERROR,
       );
     } finally {
       setEmailBindLoading(false);
@@ -395,7 +422,9 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
                       style={styles.input}
                       value={emailBindCode}
                       onChangeText={(value) =>
-                        setEmailBindCode(keepDigitsOnly(value).slice(0, BIND_CODE_LENGTH))
+                        setEmailBindCode(
+                          keepDigitsOnly(value).slice(0, BIND_CODE_LENGTH),
+                        )
                       }
                       keyboardType="number-pad"
                       textContentType="oneTimeCode"
@@ -413,7 +442,9 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
                   </>
                 )}
                 {emailBindNotice ? (
-                  <Text style={[styles.feedback, styles.feedbackSuccess]}>{emailBindNotice}</Text>
+                  <Text style={[styles.feedback, styles.feedbackSuccess]}>
+                    {emailBindNotice}
+                  </Text>
                 ) : null}
               </View>
             ) : isEmailVerified ? (
@@ -425,7 +456,9 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
             <TextInput
               style={styles.input}
               value={form.userName}
-              onChangeText={(value) => updateField("userName", sanitizeUserNameInputLive(value))}
+              onChangeText={(value) =>
+                updateField("userName", sanitizeUserNameInputLive(value))
+              }
               autoCapitalize="none"
               autoCorrect={false}
               editable={!isSubmitting}
@@ -447,7 +480,9 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
               onChangeText={setNewPassword}
               textContentType="newPassword"
             />
-            <Text style={styles.label}>{EDIT_PROFILE_UI.LABEL_NEW_PASSWORD_CONFIRM}</Text>
+            <Text style={styles.label}>
+              {EDIT_PROFILE_UI.LABEL_NEW_PASSWORD_CONFIRM}
+            </Text>
             <PasswordTextInput
               value={newPasswordConfirm}
               onChangeText={setNewPasswordConfirm}
@@ -478,10 +513,14 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
         <>
           <View style={styles.field}>
             <View style={styles.switchRow}>
-              <Text style={styles.label}>{EDIT_PROFILE_UI.LABEL_BUSINESS_HOURS_ENABLED}</Text>
+              <Text style={styles.label}>
+                {EDIT_PROFILE_UI.LABEL_BUSINESS_HOURS_ENABLED}
+              </Text>
               <Switch
                 value={form.userBusinessHoursEnabled}
-                onValueChange={(value) => updateField("userBusinessHoursEnabled", value)}
+                onValueChange={(value) =>
+                  updateField("userBusinessHoursEnabled", value)
+                }
                 disabled={isSubmitting}
               />
             </View>
@@ -489,19 +528,28 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
           {form.userBusinessHoursEnabled ? (
             <>
               <View style={styles.field}>
-                <Text style={styles.label}>{EDIT_PROFILE_UI.LABEL_BUSINESS_HOURS_DAYS}</Text>
+                <Text style={styles.label}>
+                  {EDIT_PROFILE_UI.LABEL_BUSINESS_HOURS_DAYS}
+                </Text>
                 <View style={styles.weekdayRow}>
                   {USER_BUSINESS_HOURS_WEEKDAY_LABELS_RU.map((label, index) => {
                     const selected = form.userBusinessHoursWeekdays.includes(index);
                     return (
                       <Pressable
                         key={label}
-                        style={[styles.weekdayChip, selected ? styles.weekdayChipSelected : null]}
+                        style={[
+                          styles.weekdayChip,
+                          selected ? styles.weekdayChipSelected : null,
+                        ]}
                         disabled={isSubmitting}
                         onPress={() => {
                           const next = selected
-                            ? form.userBusinessHoursWeekdays.filter((day) => day !== index)
-                            : [...form.userBusinessHoursWeekdays, index].sort((a, b) => a - b);
+                            ? form.userBusinessHoursWeekdays.filter(
+                                (day) => day !== index,
+                              )
+                            : [...form.userBusinessHoursWeekdays, index].sort(
+                                (a, b) => a - b,
+                              );
                           updateField("userBusinessHoursWeekdays", next);
                         }}
                       >
@@ -519,22 +567,30 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
                 </View>
               </View>
               <View style={styles.field}>
-                <Text style={styles.label}>{EDIT_PROFILE_UI.LABEL_BUSINESS_HOURS_OPEN}</Text>
+                <Text style={styles.label}>
+                  {EDIT_PROFILE_UI.LABEL_BUSINESS_HOURS_OPEN}
+                </Text>
                 <TextInput
                   style={styles.input}
                   value={form.userBusinessHoursOpenTime}
-                  onChangeText={(value) => updateField("userBusinessHoursOpenTime", value)}
+                  onChangeText={(value) =>
+                    updateField("userBusinessHoursOpenTime", value)
+                  }
                   editable={!isSubmitting}
                   placeholder="09:00"
                   placeholderTextColor={theme.colors.textMuted}
                 />
               </View>
               <View style={styles.field}>
-                <Text style={styles.label}>{EDIT_PROFILE_UI.LABEL_BUSINESS_HOURS_CLOSE}</Text>
+                <Text style={styles.label}>
+                  {EDIT_PROFILE_UI.LABEL_BUSINESS_HOURS_CLOSE}
+                </Text>
                 <TextInput
                   style={styles.input}
                   value={form.userBusinessHoursCloseTime}
-                  onChangeText={(value) => updateField("userBusinessHoursCloseTime", value)}
+                  onChangeText={(value) =>
+                    updateField("userBusinessHoursCloseTime", value)
+                  }
                   editable={!isSubmitting}
                   placeholder="18:00"
                   placeholderTextColor={theme.colors.textMuted}
@@ -599,7 +655,9 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
                       style={styles.input}
                       value={phoneBindCode}
                       onChangeText={(value) =>
-                        setPhoneBindCode(keepDigitsOnly(value).slice(0, BIND_CODE_LENGTH))
+                        setPhoneBindCode(
+                          keepDigitsOnly(value).slice(0, BIND_CODE_LENGTH),
+                        )
                       }
                       keyboardType="number-pad"
                       textContentType="oneTimeCode"
@@ -617,7 +675,9 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
                   </>
                 )}
                 {phoneBindNotice ? (
-                  <Text style={[styles.feedback, styles.feedbackSuccess]}>{phoneBindNotice}</Text>
+                  <Text style={[styles.feedback, styles.feedbackSuccess]}>
+                    {phoneBindNotice}
+                  </Text>
                 ) : null}
               </View>
             ) : null}
@@ -627,7 +687,9 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
             <TextInput
               style={styles.input}
               value={form.userBirthDate}
-              onChangeText={(value) => updateField("userBirthDate", maskBirthDateInput(value))}
+              onChangeText={(value) =>
+                updateField("userBirthDate", maskBirthDateInput(value))
+              }
               placeholder={EDIT_PROFILE_UI.PLACEHOLDER_BIRTH_DATE}
               placeholderTextColor={theme.colors.textMuted}
               editable={!isSubmitting}
@@ -650,7 +712,9 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
                       selected && styles.segmentBtnActive,
                     ]}
                   >
-                    <Text style={[styles.segmentText, selected && styles.segmentTextActive]}>
+                    <Text
+                      style={[styles.segmentText, selected && styles.segmentTextActive]}
+                    >
                       {USER_GENDER_LABEL_RU[option]}
                     </Text>
                   </Pressable>
@@ -708,7 +772,9 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
         EDIT_PROFILE_UI.SECTION_NOTIFICATIONS,
         <View style={styles.switchRow}>
           <View style={styles.switchTextWrap}>
-            <Text style={styles.switchLabel}>{EDIT_PROFILE_UI.LABEL_NOTIFICATIONS}</Text>
+            <Text style={styles.switchLabel}>
+              {EDIT_PROFILE_UI.LABEL_NOTIFICATIONS}
+            </Text>
           </View>
           <Switch
             value={form.notificationsEnabled}
@@ -733,7 +799,10 @@ export const EditProfileForm = ({ user, onSaved, focusAddress = false }: EditPro
             placeholderTextColor={theme.colors.textMuted}
           />
           <Text
-            style={[styles.charMeter, notesChars > NOTES_ABOUT_USER_MAX_CHARS && styles.charMeterOver]}
+            style={[
+              styles.charMeter,
+              notesChars > NOTES_ABOUT_USER_MAX_CHARS && styles.charMeterOver,
+            ]}
           >
             {EDIT_PROFILE_UI.CHARS_USED(notesChars, NOTES_ABOUT_USER_MAX_CHARS)}
           </Text>

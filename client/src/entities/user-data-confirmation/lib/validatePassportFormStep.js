@@ -14,7 +14,8 @@ export function validatePassportFormStep(form, step) {
   if (step === 0) {
     if (!form.lastName.trim()) return "Укажите фамилию";
     if (!form.firstName.trim()) return "Укажите имя";
-    if (!isPassportDateInputComplete(form.birthDate)) return "Дата рождения: ДД.ММ.ГГГГ";
+    if (!isPassportDateInputComplete(form.birthDate))
+      return "Дата рождения: ДД.ММ.ГГГГ";
     return null;
   }
 

@@ -18,7 +18,10 @@ export const ProductPromotionModalTabs = ({
   showManageTab,
 }: ProductPromotionModalTabsProps) => {
   const tabs: { id: string; label: string }[] = [
-    { id: PRODUCT_PROMOTION_MODAL_TAB_PROMOTION, label: PRODUCT_PROMOTION_UI.TAB_PROMOTION },
+    {
+      id: PRODUCT_PROMOTION_MODAL_TAB_PROMOTION,
+      label: PRODUCT_PROMOTION_UI.TAB_PROMOTION,
+    },
   ];
 
   if (showManageTab) {

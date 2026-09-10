@@ -21,23 +21,27 @@ export const CartAuctionLine = ({ bid, onCheckout }: CartAuctionLineProps) => {
   const productName = bid.product?.productName ?? "Товар";
 
   const handleRemove = () => {
-    Alert.alert(CART_AUCTION_UI.REMOVE_CONFIRM_TITLE, CART_AUCTION_UI.REMOVE_CONFIRM_MESSAGE, [
-      { text: CART_AUCTION_UI.REMOVE_CONFIRM_CANCEL, style: "cancel" },
-      {
-        text: CART_AUCTION_UI.REMOVE_CONFIRM_OK,
-        style: "destructive",
-        onPress: () => {
-          cancelMutation.mutate(undefined, {
-            onError: (error) => {
-              Alert.alert(
-                CART_AUCTION_UI.ERROR_GENERIC,
-                error instanceof Error ? error.message : "",
-              );
-            },
-          });
+    Alert.alert(
+      CART_AUCTION_UI.REMOVE_CONFIRM_TITLE,
+      CART_AUCTION_UI.REMOVE_CONFIRM_MESSAGE,
+      [
+        { text: CART_AUCTION_UI.REMOVE_CONFIRM_CANCEL, style: "cancel" },
+        {
+          text: CART_AUCTION_UI.REMOVE_CONFIRM_OK,
+          style: "destructive",
+          onPress: () => {
+            cancelMutation.mutate(undefined, {
+              onError: (error) => {
+                Alert.alert(
+                  CART_AUCTION_UI.ERROR_GENERIC,
+                  error instanceof Error ? error.message : "",
+                );
+              },
+            });
+          },
         },
-      },
-    ]);
+      ],
+    );
   };
 
   return (
@@ -55,7 +59,8 @@ export const CartAuctionLine = ({ bid, onCheckout }: CartAuctionLineProps) => {
           </View>
           {bid.paymentDeadlineAt ? (
             <Text style={styles.meta}>
-              {CART_AUCTION_UI.DEADLINE_LABEL}: {formatIsoDateTime(bid.paymentDeadlineAt)}
+              {CART_AUCTION_UI.DEADLINE_LABEL}:{" "}
+              {formatIsoDateTime(bid.paymentDeadlineAt)}
             </Text>
           ) : null}
         </View>
@@ -70,12 +75,17 @@ export const CartAuctionLine = ({ bid, onCheckout }: CartAuctionLineProps) => {
           onPress={() => onCheckout(bid)}
         />
         <Pressable
-          style={[styles.removeButton, cancelMutation.isPending && styles.buttonDisabled]}
+          style={[
+            styles.removeButton,
+            cancelMutation.isPending && styles.buttonDisabled,
+          ]}
           disabled={cancelMutation.isPending}
           onPress={handleRemove}
         >
           <Text style={styles.removeButtonText}>
-            {cancelMutation.isPending ? CART_AUCTION_UI.REMOVE_PENDING : CART_AUCTION_UI.REMOVE}
+            {cancelMutation.isPending
+              ? CART_AUCTION_UI.REMOVE_PENDING
+              : CART_AUCTION_UI.REMOVE}
           </Text>
         </Pressable>
       </View>

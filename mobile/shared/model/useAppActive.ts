@@ -11,9 +11,12 @@ export const useAppActive = (): boolean => {
   const [active, setActive] = useState(() => AppState.currentState === "active");
 
   useEffect(() => {
-    const subscription = AppState.addEventListener("change", (state: AppStateStatus) => {
-      setActive(state === "active");
-    });
+    const subscription = AppState.addEventListener(
+      "change",
+      (state: AppStateStatus) => {
+        setActive(state === "active");
+      },
+    );
     return () => subscription.remove();
   }, []);
 
@@ -28,11 +31,14 @@ export const useAppActive = (): boolean => {
  */
 export const useTrimImageMemoryOnBackground = (): void => {
   useEffect(() => {
-    const subscription = AppState.addEventListener("change", (state: AppStateStatus) => {
-      if (state === "background") {
-        void Image.clearMemoryCache();
-      }
-    });
+    const subscription = AppState.addEventListener(
+      "change",
+      (state: AppStateStatus) => {
+        if (state === "background") {
+          void Image.clearMemoryCache();
+        }
+      },
+    );
     return () => subscription.remove();
   }, []);
 };

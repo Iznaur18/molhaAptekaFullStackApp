@@ -15,26 +15,22 @@ import "./PartnerProgramPage.css";
  *   onRequestLogin: () => void;
  * }} props
  */
-export function PartnerProgramPage({
-  isAuthorized,
-  onRequestLogin,
-}) {
+export function PartnerProgramPage({ isAuthorized, onRequestLogin }) {
   const query = useMyReferralProgramQuery({ enabled: isAuthorized });
   const [copyFeedback, setCopyFeedback] = useState("");
 
   const data = query.data;
   const inviteUrl = useMemo(
-    () =>
-      data
-        ? resolvePartnerInviteUrl(data.referralCode, data.inviteUrl)
-        : "",
+    () => (data ? resolvePartnerInviteUrl(data.referralCode, data.inviteUrl) : ""),
     [data],
   );
 
   if (!isAuthorized) {
     return (
       <section className="partner-program-page partner-program-page_centered">
-        <p className="partner-program-page__hint">{PARTNER_PROGRAM_PAGE_UI.LOGIN_HINT}</p>
+        <p className="partner-program-page__hint">
+          {PARTNER_PROGRAM_PAGE_UI.LOGIN_HINT}
+        </p>
         <button
           type="button"
           className="partner-program-page__login app-btn app-btn--primary"
@@ -57,7 +53,10 @@ export function PartnerProgramPage({
   if (query.isError || !data) {
     return (
       <section className="partner-program-page">
-        <p className="partner-program-page__state partner-program-page__state_error" role="alert">
+        <p
+          className="partner-program-page__state partner-program-page__state_error"
+          role="alert"
+        >
           {query.error instanceof Error
             ? query.error.message
             : PARTNER_PROGRAM_PAGE_UI.LOAD_ERROR}
@@ -102,41 +101,61 @@ export function PartnerProgramPage({
       </p>
 
       <div className="partner-program-page__card">
-        <h3 className="partner-program-page__card-title">{PARTNER_PROGRAM_PAGE_UI.STATS_TITLE}</h3>
+        <h3 className="partner-program-page__card-title">
+          {PARTNER_PROGRAM_PAGE_UI.STATS_TITLE}
+        </h3>
         <div className="partner-program-page__stats">
           <div className="partner-program-page__stat">
             <span className="partner-program-page__stat-label">
               {PARTNER_PROGRAM_PAGE_UI.STAT_REFERRALS}
             </span>
-            <span className="partner-program-page__stat-value">{data.totalReferrals}</span>
+            <span className="partner-program-page__stat-value">
+              {data.totalReferrals}
+            </span>
           </div>
           <div className="partner-program-page__stat">
             <span className="partner-program-page__stat-label">
               {PARTNER_PROGRAM_PAGE_UI.STAT_SPEND}
             </span>
-            <span className="partner-program-page__stat-value">{data.totalReferralsSpend}</span>
+            <span className="partner-program-page__stat-value">
+              {data.totalReferralsSpend}
+            </span>
           </div>
           <div className="partner-program-page__stat">
             <span className="partner-program-page__stat-label">
               {PARTNER_PROGRAM_PAGE_UI.STAT_EARNED}
             </span>
-            <span className="partner-program-page__stat-value">{data.totalCashbackEarned}</span>
+            <span className="partner-program-page__stat-value">
+              {data.totalCashbackEarned}
+            </span>
           </div>
         </div>
       </div>
 
       <div className="partner-program-page__card">
-        <h3 className="partner-program-page__card-title">{PARTNER_PROGRAM_PAGE_UI.INVITE_TITLE}</h3>
-        <p className="partner-program-page__card-hint">{PARTNER_PROGRAM_PAGE_UI.INVITE_HINT}</p>
+        <h3 className="partner-program-page__card-title">
+          {PARTNER_PROGRAM_PAGE_UI.INVITE_TITLE}
+        </h3>
+        <p className="partner-program-page__card-hint">
+          {PARTNER_PROGRAM_PAGE_UI.INVITE_HINT}
+        </p>
         <div className="partner-program-page__invite-row">
           <span className="partner-program-page__invite-url" title={inviteUrl}>
             {inviteUrl}
           </span>
           <div className="partner-program-page__invite-actions">
-            <button type="button" className="app-btn app-btn--secondary" onClick={handleCopy}>
+            <button
+              type="button"
+              className="app-btn app-btn--secondary"
+              onClick={handleCopy}
+            >
               {PARTNER_PROGRAM_PAGE_UI.COPY_BUTTON}
             </button>
-            <button type="button" className="app-btn app-btn--primary" onClick={handleShare}>
+            <button
+              type="button"
+              className="app-btn app-btn--primary"
+              onClick={handleShare}
+            >
               {PARTNER_PROGRAM_PAGE_UI.SHARE_BUTTON}
             </button>
           </div>
@@ -149,9 +168,13 @@ export function PartnerProgramPage({
       </div>
 
       <div className="partner-program-page__card">
-        <h3 className="partner-program-page__card-title">{PARTNER_PROGRAM_PAGE_UI.LIST_TITLE}</h3>
+        <h3 className="partner-program-page__card-title">
+          {PARTNER_PROGRAM_PAGE_UI.LIST_TITLE}
+        </h3>
         {data.referrals.length === 0 ? (
-          <p className="partner-program-page__empty">{PARTNER_PROGRAM_PAGE_UI.LIST_EMPTY}</p>
+          <p className="partner-program-page__empty">
+            {PARTNER_PROGRAM_PAGE_UI.LIST_EMPTY}
+          </p>
         ) : (
           <>
             <div className="partner-program-page__row partner-program-page__row-head">
@@ -168,8 +191,12 @@ export function PartnerProgramPage({
                     ? new Date(row.registeredAt).toLocaleDateString("ru-RU")
                     : "—"}
                 </span>
-                <span className="partner-program-page__row-meta">{row.pointsSpentTotal}</span>
-                <span className="partner-program-page__row-meta">{row.cashbackEarnedTotal}</span>
+                <span className="partner-program-page__row-meta">
+                  {row.pointsSpentTotal}
+                </span>
+                <span className="partner-program-page__row-meta">
+                  {row.cashbackEarnedTotal}
+                </span>
               </div>
             ))}
           </>

@@ -41,7 +41,9 @@ function PaymentsFold({ summary, children }) {
         inert={!open ? true : undefined}
       >
         <div className="installment-contract-card__payments-fold-panel-inner">
-          <div className="installment-contract-card__payments-fold-body">{children}</div>
+          <div className="installment-contract-card__payments-fold-body">
+            {children}
+          </div>
         </div>
       </div>
     </div>
@@ -133,7 +135,9 @@ export function InstallmentContractCardPayments({
       ) : null}
 
       {upcoming.length > 0 ? (
-        <PaymentsFold summary={INSTALLMENT_UI.PAYMENTS_UPCOMING_SUMMARY(upcoming.length)}>
+        <PaymentsFold
+          summary={INSTALLMENT_UI.PAYMENTS_UPCOMING_SUMMARY(upcoming.length)}
+        >
           {upcoming.map(renderRow)}
         </PaymentsFold>
       ) : null}

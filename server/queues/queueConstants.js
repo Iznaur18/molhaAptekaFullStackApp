@@ -22,8 +22,7 @@ export const JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_PEERS =
   "processProductPriceMarketStatusPeers";
 export const JOB_PROCESS_ONEC_SYNC_CRON = "processOneCSyncCronTasks";
 export const JOB_PROCESS_ONEC_COMMERCEML_IMPORT = "processOneCCommerceMlImport";
-export const JOB_PROCESS_ANALYTICS_RECONCILIATION =
-  "processAnalyticsReconciliation";
+export const JOB_PROCESS_ANALYTICS_RECONCILIATION = "processAnalyticsReconciliation";
 export const JOB_PROCESS_LOBO_CRON = "processLoboCronTasks";
 /** Разморозка эскроу по сроку после вручения. */
 export const JOB_PROCESS_ESCROW_RELEASE = "process-escrow-release";

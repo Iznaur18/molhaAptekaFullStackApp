@@ -19,7 +19,9 @@ const COPIED_ICON_MS = 1600;
  */
 export function ProductShareLinkButton({ product }) {
   const [copied, setCopied] = useState(false);
-  const resetTimerRef = useRef(/** @type {ReturnType<typeof setTimeout> | null} */ (null));
+  const resetTimerRef = useRef(
+    /** @type {ReturnType<typeof setTimeout> | null} */ (null),
+  );
 
   useEffect(() => {
     return () => {
@@ -48,8 +50,7 @@ export function ProductShareLinkButton({ product }) {
   const handleClick = (event) => {
     event.stopPropagation();
     event.preventDefault();
-    const origin =
-      typeof window !== "undefined" ? window.location.origin : "";
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
     const url = `${origin}/product/${encodeURIComponent(productId)}`;
     const title = String(product.productName ?? "").trim();
 

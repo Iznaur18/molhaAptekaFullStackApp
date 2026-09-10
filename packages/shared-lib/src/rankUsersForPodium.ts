@@ -54,7 +54,8 @@ const compareUsersForPodium = (
   right: UsersPodiumCandidate,
 ): number => {
   const pointsDiff =
-    toNonNegativeInt(right.userLoyaltyPoints) - toNonNegativeInt(left.userLoyaltyPoints);
+    toNonNegativeInt(right.userLoyaltyPoints) -
+    toNonNegativeInt(left.userLoyaltyPoints);
   if (pointsDiff !== 0) {
     return pointsDiff;
   }
@@ -136,9 +137,7 @@ export const excludeUsersPodiumFromList = <T extends UsersPodiumCandidate>(
     return [...users];
   }
 
-  const podiumIds = new Set(
-    podiumEntries.map((entry) => String(entry.user._id)),
-  );
+  const podiumIds = new Set(podiumEntries.map((entry) => String(entry.user._id)));
 
   return users.filter((user) => !podiumIds.has(String(user._id)));
 };

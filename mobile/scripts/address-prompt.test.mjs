@@ -28,7 +28,9 @@ test("address prompt catalog paths match home and catalog tabs", () => {
     assert.equal(isAddressPromptCatalogPath(path), false, path);
   }
 
-  const session = readMobileFile("features/address-prompt/model/addressPromptSession.ts");
+  const session = readMobileFile(
+    "features/address-prompt/model/addressPromptSession.ts",
+  );
   assert.match(session, /\/\(tabs\)\/catalog/);
   assert.match(session, /profile_address/);
   assert.match(session, /seenByUserId/);
@@ -41,7 +43,9 @@ test("address prompt host, CTA focus and CMS fallback are wired", () => {
   const editScreen = readMobileFile("app/profile/edit.tsx");
   const editForm = readMobileFile("features/profile-edit/ui/EditProfileForm.tsx");
   const copy = readMobileFile("shared/config/appUiCopy.ts");
-  const cardsHint = readMobileFile("entities/product-badge-explain/ui/ProductBadgeExplainSheet.tsx");
+  const cardsHint = readMobileFile(
+    "entities/product-badge-explain/ui/ProductBadgeExplainSheet.tsx",
+  );
 
   assert.match(layout, /AddressPromptHost/);
   assert.match(host, /ADDRESS_PROMPT_DELAY_MS/);

@@ -43,8 +43,7 @@ export function InstallmentContractCardPaymentRow({
 }) {
   const dueDate = new Date(payment.dueAt).toLocaleDateString("ru-RU");
   const isOverdue = payment.status === paymentStatuses.overdue;
-  const isPendingConfirmation =
-    payment.status === paymentStatuses.pendingConfirmation;
+  const isPendingConfirmation = payment.status === paymentStatuses.pendingConfirmation;
   const isPaid = payment.status === paymentStatuses.paid;
   const isRemaining = !isPaid && !isOverdue && !isPendingConfirmation;
 
@@ -90,7 +89,9 @@ export function InstallmentContractCardPaymentRow({
           </span>
         ) : null}
       </div>
-      {role === "buyer" && isActiveContract && canBuyerMarkPayment(contract, payment) ? (
+      {role === "buyer" &&
+      isActiveContract &&
+      canBuyerMarkPayment(contract, payment) ? (
         <button
           type="button"
           className="installment-contract-card__btn installment-contract-card__btn_primary"

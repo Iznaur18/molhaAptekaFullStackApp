@@ -59,12 +59,20 @@ const convertProfileFieldValue = (field, value) => {
       return value;
     }
     const weekdays = Array.isArray(value.weekdays)
-      ? [...new Set(value.weekdays.map((day) => Math.floor(Number(day))).filter(Number.isFinite))]
+      ? [
+          ...new Set(
+            value.weekdays
+              .map((day) => Math.floor(Number(day)))
+              .filter(Number.isFinite),
+          ),
+        ]
       : [];
     return {
       weekdays,
-      openTime: typeof value.openTime === "string" ? value.openTime.trim() : value.openTime,
-      closeTime: typeof value.closeTime === "string" ? value.closeTime.trim() : value.closeTime,
+      openTime:
+        typeof value.openTime === "string" ? value.openTime.trim() : value.openTime,
+      closeTime:
+        typeof value.closeTime === "string" ? value.closeTime.trim() : value.closeTime,
     };
   }
   if (

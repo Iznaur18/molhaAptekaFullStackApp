@@ -101,7 +101,10 @@ export const RafflePrizeMedia = ({
   const isVideo = isRafflePrizeVideo(raffle);
   const imageSrc = useMemo(() => resolveRafflePrizeImageUrl(raffle), [raffle]);
   const videoSrc = useMemo(() => resolveRafflePrizeVideoUrl(raffle), [raffle]);
-  const contentPosition = useMemo(() => formatRafflePrizeContentPosition(raffle), [raffle]);
+  const contentPosition = useMemo(
+    () => formatRafflePrizeContentPosition(raffle),
+    [raffle],
+  );
 
   if (isVideo && videoSrc) {
     return (

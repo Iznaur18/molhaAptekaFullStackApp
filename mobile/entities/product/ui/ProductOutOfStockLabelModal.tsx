@@ -106,7 +106,9 @@ export const ProductOutOfStockLabelModal = ({
     <View style={styles.overlay}>
       <View style={styles.card}>
         <View style={[styles.header, { paddingTop: headerInsetTop }]}>
-          <Text style={styles.title}>{CREATE_PRODUCT_UI.OUT_OF_STOCK_LABEL_MODAL_TITLE}</Text>
+          <Text style={styles.title}>
+            {CREATE_PRODUCT_UI.OUT_OF_STOCK_LABEL_MODAL_TITLE}
+          </Text>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={CREATE_PRODUCT_UI.OUT_OF_STOCK_LABEL_MODAL_CLOSE}
@@ -122,8 +124,12 @@ export const ProductOutOfStockLabelModal = ({
           contentContainerStyle={styles.body}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.info}>{CREATE_PRODUCT_UI.OUT_OF_STOCK_LABEL_MODAL_HINT}</Text>
-          <Text style={styles.fieldLabel}>{CREATE_PRODUCT_UI.OUT_OF_STOCK_LABEL_MODAL_TITLE}</Text>
+          <Text style={styles.info}>
+            {CREATE_PRODUCT_UI.OUT_OF_STOCK_LABEL_MODAL_HINT}
+          </Text>
+          <Text style={styles.fieldLabel}>
+            {CREATE_PRODUCT_UI.OUT_OF_STOCK_LABEL_MODAL_TITLE}
+          </Text>
           <View
             style={[
               localStyles.unitTrack,
@@ -157,7 +163,9 @@ export const ProductOutOfStockLabelModal = ({
                     style={[
                       localStyles.unitTitle,
                       {
-                        color: selected ? theme.colors.text : theme.colors.textSecondary,
+                        color: selected
+                          ? theme.colors.text
+                          : theme.colors.textSecondary,
                       },
                       selected && localStyles.unitTitleActive,
                     ]}
@@ -177,7 +185,10 @@ export const ProductOutOfStockLabelModal = ({
 
         <View style={[styles.footer, { paddingBottom: footerInsetBottom }]}>
           <Pressable
-            style={[styles.saveButton, (isSubmitting || !productId) && styles.buttonDisabled]}
+            style={[
+              styles.saveButton,
+              (isSubmitting || !productId) && styles.buttonDisabled,
+            ]}
             accessibilityRole="button"
             disabled={isSubmitting || !productId}
             onPress={() => void handleSave()}

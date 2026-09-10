@@ -11,9 +11,7 @@ const {
   buildLegacyDeliveryFlags,
   productShipsToBuyer,
 } = await import("@molha/api-contract");
-const { isLoboConfigured } = await import(
-  "../services/shipping/lobo/loboClient.js"
-);
+const { isLoboConfigured } = await import("../services/shipping/lobo/loboClient.js");
 
 describe("ЛОБО на товаре: доступность", () => {
   it("вне Чечни служба недоступна", () => {

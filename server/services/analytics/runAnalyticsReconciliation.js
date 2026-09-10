@@ -57,8 +57,7 @@ export async function runAnalyticsReconciliation() {
       }
     }
 
-    const ok =
-      soldQuantityMismatches === 0 && uniqueViewerCountMismatches === 0;
+    const ok = soldQuantityMismatches === 0 && uniqueViewerCountMismatches === 0;
 
     const snapshot = {
       dayKey,

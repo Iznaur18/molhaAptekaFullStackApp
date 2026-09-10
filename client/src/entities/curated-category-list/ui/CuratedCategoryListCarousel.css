@@ -63,7 +63,8 @@
       (
           100cqi - 2 * var(--curated-scroll-pad-x) -
             (var(--curated-visible-cards) - 1) * var(--curated-card-gap)
-        ) / var(--curated-visible-cards)
+        ) /
+        var(--curated-visible-cards)
     ),
     var(--curated-card-max-width)
   );

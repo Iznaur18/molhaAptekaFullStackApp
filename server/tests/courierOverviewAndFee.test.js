@@ -10,20 +10,14 @@ const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollectio
 const { createOrderLoyaltyFixture, createOrderWithReserveTransaction } =
   await import("./helpers/orderLoyaltyTestHelpers.js");
 const { OrderModel, ProductModel, UserModel } = await import("../models/index.js");
-const { advanceOrderShipmentStatus } = await import(
-  "../services/order/advanceShipmentStatus.js"
-);
-const {
-  normalizeDeliveryFee,
-  raiseShipmentDeliveryFee,
-  resolveDeliveryFeesBySeller,
-} = await import("../services/courier/courierDeliveryFee.js");
-const { haversineKm, listCourierOverview } = await import(
-  "../services/courier/courierOverview.js"
-);
-const { acceptShipmentByCourier } = await import(
-  "../services/courier/courierShipmentFlow.js"
-);
+const { advanceOrderShipmentStatus } =
+  await import("../services/order/advanceShipmentStatus.js");
+const { normalizeDeliveryFee, raiseShipmentDeliveryFee, resolveDeliveryFeesBySeller } =
+  await import("../services/courier/courierDeliveryFee.js");
+const { haversineKm, listCourierOverview } =
+  await import("../services/courier/courierOverview.js");
+const { acceptShipmentByCourier } =
+  await import("../services/courier/courierShipmentFlow.js");
 
 describe("сумма доставки", () => {
   it("минимум сто рублей", () => {
@@ -62,7 +56,10 @@ describe("сумма доставки", () => {
 
 describe("расстояние", () => {
   it("до себя — ноль", () => {
-    assert.equal(haversineKm({ lat: 55.75, lon: 37.62 }, { lat: 55.75, lon: 37.62 }), 0);
+    assert.equal(
+      haversineKm({ lat: 55.75, lon: 37.62 }, { lat: 55.75, lon: 37.62 }),
+      0,
+    );
   });
 
   it("Москва — Петербург около 630 км", () => {
@@ -85,7 +82,12 @@ describe("покупатель поднимает сумму", () => {
         $set: {
           fulfillmentMethod: "delivery",
           shipments: [
-            { sellerId: seller._id, fulfillmentMethod: "delivery", courierDelivery: true, deliveryFeeRub: 100 },
+            {
+              sellerId: seller._id,
+              fulfillmentMethod: "delivery",
+              courierDelivery: true,
+              deliveryFeeRub: 100,
+            },
           ],
         },
       },
@@ -290,14 +292,23 @@ describe("обзор курьера", () => {
   it("не показывает недособранные заказы", async () => {
     const courier = await makeCourier();
     const { seller, buyer, product } = await createOrderLoyaltyFixture();
-    await UserModel.updateOne({ _id: seller._id }, { $set: { userRegionCode: "RU-MOW" } });
+    await UserModel.updateOne(
+      { _id: seller._id },
+      { $set: { userRegionCode: "RU-MOW" } },
+    );
     const order = await createOrderWithReserveTransaction({ buyer, seller, product });
     await OrderModel.updateOne(
       { _id: order._id },
       {
         $set: {
           fulfillmentMethod: "delivery",
-          shipments: [{ sellerId: seller._id, fulfillmentMethod: "delivery", courierDelivery: true }],
+          shipments: [
+            {
+              sellerId: seller._id,
+              fulfillmentMethod: "delivery",
+              courierDelivery: true,
+            },
+          ],
         },
       },
     );

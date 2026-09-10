@@ -141,7 +141,11 @@ export const prepareImageAssetForUpload = async (
   const exceedsMaxDimension =
     Math.max(asset.width || 0, asset.height || 0) > UPLOAD_IMAGE_COMPRESS_MAX_DIMENSION;
 
-  if (needsJpegConversion(mimeType, asset) || exceedsTargetSize || exceedsMaxDimension) {
+  if (
+    needsJpegConversion(mimeType, asset) ||
+    exceedsTargetSize ||
+    exceedsMaxDimension
+  ) {
     return compressImageAssetToJpeg(asset, namePrefix);
   }
 

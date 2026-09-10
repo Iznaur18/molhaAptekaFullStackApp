@@ -24,12 +24,19 @@ export function UsersLoyaltyRaffleAdminPanel() {
   }, [settingsQuery.data]);
 
   if (settingsQuery.isPending && !settingsQuery.data) {
-    return <p className="users-loyalty-raffle-admin__state">{USERS_LOYALTY_RAFFLE_ADMIN_UI.LOADING}</p>;
+    return (
+      <p className="users-loyalty-raffle-admin__state">
+        {USERS_LOYALTY_RAFFLE_ADMIN_UI.LOADING}
+      </p>
+    );
   }
 
   if (settingsQuery.isError && !settingsQuery.data) {
     return (
-      <p className="users-loyalty-raffle-admin__state users-loyalty-raffle-admin__state_error" role="alert">
+      <p
+        className="users-loyalty-raffle-admin__state users-loyalty-raffle-admin__state_error"
+        role="alert"
+      >
         {settingsQuery.error instanceof Error
           ? settingsQuery.error.message
           : USERS_LOYALTY_RAFFLE_ADMIN_UI.LOADING}
@@ -48,7 +55,9 @@ export function UsersLoyaltyRaffleAdminPanel() {
 
     try {
       await patchMutation.mutateAsync({
-        description: description.trim().slice(0, USERS_LOYALTY_RAFFLE_DESCRIPTION_MAX_LENGTH),
+        description: description
+          .trim()
+          .slice(0, USERS_LOYALTY_RAFFLE_DESCRIPTION_MAX_LENGTH),
         goal,
       });
       setSavedFlash(true);
@@ -59,9 +68,14 @@ export function UsersLoyaltyRaffleAdminPanel() {
 
   return (
     <section className="users-loyalty-raffle-admin">
-      <h3 className="users-loyalty-raffle-admin__title">{USERS_LOYALTY_RAFFLE_ADMIN_UI.TITLE}</h3>
+      <h3 className="users-loyalty-raffle-admin__title">
+        {USERS_LOYALTY_RAFFLE_ADMIN_UI.TITLE}
+      </h3>
 
-      <label className="users-loyalty-raffle-admin__label" htmlFor="users-loyalty-raffle-description">
+      <label
+        className="users-loyalty-raffle-admin__label"
+        htmlFor="users-loyalty-raffle-description"
+      >
         {USERS_LOYALTY_RAFFLE_ADMIN_UI.DESCRIPTION_LABEL}
       </label>
       <textarea
@@ -74,7 +88,10 @@ export function UsersLoyaltyRaffleAdminPanel() {
         rows={5}
       />
 
-      <label className="users-loyalty-raffle-admin__label" htmlFor="users-loyalty-raffle-goal">
+      <label
+        className="users-loyalty-raffle-admin__label"
+        htmlFor="users-loyalty-raffle-goal"
+      >
         {USERS_LOYALTY_RAFFLE_ADMIN_UI.GOAL_LABEL}
       </label>
       <input
@@ -93,7 +110,9 @@ export function UsersLoyaltyRaffleAdminPanel() {
         </p>
       ) : null}
       {savedFlash ? (
-        <p className="users-loyalty-raffle-admin__success">{USERS_LOYALTY_RAFFLE_ADMIN_UI.SAVED}</p>
+        <p className="users-loyalty-raffle-admin__success">
+          {USERS_LOYALTY_RAFFLE_ADMIN_UI.SAVED}
+        </p>
       ) : null}
 
       <button

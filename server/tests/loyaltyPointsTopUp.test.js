@@ -11,9 +11,8 @@ process.env.YOOKASSA_SECRET_KEY = "test-secret";
 const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollections } =
   await import("./helpers/mongoTestDb.js");
 const { PaymentModel, UserModel } = await import("../models/index.js");
-const { applyLoyaltyPointsTopUp, createLoyaltyPointsTopUp } = await import(
-  "../services/payments/loyaltyPointsTopUp.js"
-);
+const { applyLoyaltyPointsTopUp, createLoyaltyPointsTopUp } =
+  await import("../services/payments/loyaltyPointsTopUp.js");
 
 const realFetch = globalThis.fetch;
 /** @type {{ url: string; init: RequestInit }[]} */

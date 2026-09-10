@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
 
 import { useIntroAdMutations } from "@/entities/intro-ad/model/useIntroAdMutations";
 import { useMyIntroAdCampaignQuery } from "@/entities/intro-ad/model/useMyIntroAdCampaignQuery";
@@ -40,7 +34,9 @@ const resolveStatusLabel = (status?: string | null) => {
   return "";
 };
 
-export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertisingSectionProps) => {
+export const IntroAdAdvertisingSection = ({
+  loyaltyBalance,
+}: IntroAdAdvertisingSectionProps) => {
   const theme = useAppTheme();
   const styles = useAdvertisingCardStyles();
   const { previewIntro } = useAppIntro();
@@ -58,7 +54,10 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
   const isSubmitting = submitMutation.isPending || cancelMutation.isPending;
   const isStatusActive = campaign?.status === "active";
 
-  const updateField = <K extends keyof IntroAdFormState>(key: K, value: IntroAdFormState[K]) => {
+  const updateField = <K extends keyof IntroAdFormState>(
+    key: K,
+    value: IntroAdFormState[K],
+  ) => {
     setActionError("");
     setFeedback("");
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -87,7 +86,9 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
       setShowForm(false);
       setFeedback(INTRO_AD_PAGE_UI.SUBMIT_SUCCESS);
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : INTRO_AD_PAGE_UI.SUBMIT_FALLBACK);
+      setActionError(
+        error instanceof Error ? error.message : INTRO_AD_PAGE_UI.SUBMIT_FALLBACK,
+      );
     }
   };
 
@@ -102,7 +103,9 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
       await cancelMutation.mutateAsync(campaign._id);
       setFeedback(INTRO_AD_PAGE_UI.CANCEL_SUCCESS);
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : INTRO_AD_PAGE_UI.CANCEL_FALLBACK);
+      setActionError(
+        error instanceof Error ? error.message : INTRO_AD_PAGE_UI.CANCEL_FALLBACK,
+      );
     }
   };
 
@@ -118,7 +121,9 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
             {INTRO_AD_PAGE_UI.TEMPORARILY_UNAVAILABLE}
           </Text>
         </View>
-        <Text style={styles.unavailableNotice}>{INTRO_AD_PAGE_UI.TEMPORARILY_UNAVAILABLE}</Text>
+        <Text style={styles.unavailableNotice}>
+          {INTRO_AD_PAGE_UI.TEMPORARILY_UNAVAILABLE}
+        </Text>
       </View>
     );
   }
@@ -184,7 +189,9 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
               disabled={isSubmitting}
             />
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>{INTRO_AD_PAGE_UI.LABEL_FALLBACK_TITLE}</Text>
+              <Text style={styles.fieldLabel}>
+                {INTRO_AD_PAGE_UI.LABEL_FALLBACK_TITLE}
+              </Text>
               <TextInput
                 style={styles.input}
                 value={form.fallbackTitle}
@@ -192,7 +199,9 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
               />
             </View>
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>{INTRO_AD_PAGE_UI.LABEL_FALLBACK_HINT}</Text>
+              <Text style={styles.fieldLabel}>
+                {INTRO_AD_PAGE_UI.LABEL_FALLBACK_HINT}
+              </Text>
               <TextInput
                 style={styles.input}
                 value={form.fallbackHint}
@@ -207,16 +216,22 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
 
             <View style={styles.actions}>
               <Pressable
-                style={[styles.secondaryButton, isSubmitting && styles.secondaryButtonDisabled]}
+                style={[
+                  styles.secondaryButton,
+                  isSubmitting && styles.secondaryButtonDisabled,
+                ]}
                 onPress={handlePreview}
                 disabled={isSubmitting}
               >
-                <Text style={styles.secondaryButtonText}>{INTRO_AD_PAGE_UI.PREVIEW}</Text>
+                <Text style={styles.secondaryButtonText}>
+                  {INTRO_AD_PAGE_UI.PREVIEW}
+                </Text>
               </Pressable>
               <Pressable
                 style={[
                   styles.primaryButton,
-                  (isSubmitting || loyaltyBalance < pricePoints) && styles.primaryButtonDisabled,
+                  (isSubmitting || loyaltyBalance < pricePoints) &&
+                    styles.primaryButtonDisabled,
                 ]}
                 onPress={() => {
                   void handleSubmit();
@@ -226,7 +241,9 @@ export const IntroAdAdvertisingSection = ({ loyaltyBalance }: IntroAdAdvertising
                 {isSubmitting ? (
                   <ActivityIndicator color={theme.colors.onContrast} />
                 ) : (
-                  <Text style={styles.primaryButtonText}>{INTRO_AD_PAGE_UI.SUBMIT}</Text>
+                  <Text style={styles.primaryButtonText}>
+                    {INTRO_AD_PAGE_UI.SUBMIT}
+                  </Text>
                 )}
               </Pressable>
             </View>

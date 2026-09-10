@@ -73,7 +73,10 @@ test("users grid gap matches web breakpoints", () => {
   assert.match(body, /styles\.list/);
   assert.match(body, /gap: grid\.gap/);
   assert.match(body, /paddingBottom: contentPaddingBottom/);
-  assert.match(body, /columnWrapperStyle=\{grid\.columns > 1 \? \{ gap: grid\.gap \} : undefined\}/);
+  assert.match(
+    body,
+    /columnWrapperStyle=\{grid\.columns > 1 \? \{ gap: grid\.gap \} : undefined\}/,
+  );
 });
 
 test("users route stays inside tabs for bottom nav", () => {

@@ -134,7 +134,10 @@ export async function markOrderItemDeliveredBySeller({
     targetItem.status !== ORDER_STATUS_IN_DELIVERY &&
     !isPickupHandover
   ) {
-    throw new AppError(409, "Позицию можно отметить доставленной, только пока она в пути");
+    throw new AppError(
+      409,
+      "Позицию можно отметить доставленной, только пока она в пути",
+    );
   }
 
   const previousStatus = targetItem.status;
@@ -505,11 +508,7 @@ export async function confirmOrderItemByBuyer({
  *   requestUserId: string;
  * }} input
  */
-export async function markOrderItemReturned({
-  orderId,
-  itemIndex,
-  requestUserId,
-}) {
+export async function markOrderItemReturned({ orderId, itemIndex, requestUserId }) {
   const preview = await loadOrderWithItems(orderId);
   const previewItem = getPopulatedOrderItemOrThrow(preview, itemIndex);
 
@@ -536,10 +535,7 @@ export async function markOrderItemReturned({
     previewItem.status !== ORDER_STATUS_IN_DELIVERY &&
     previewItem.status !== ORDER_STATUS_DELIVERED
   ) {
-    throw new AppError(
-      409,
-      "Возврат оформляется, только пока товар в пути или вручён",
-    );
+    throw new AppError(409, "Возврат оформляется, только пока товар в пути или вручён");
   }
 
   await runInTransaction(async (session) => {

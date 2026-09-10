@@ -84,7 +84,9 @@ export function ProductDescriptionField({
               borderRadius: 8,
               borderWidth: 1,
               borderColor: theme.colors.border,
-              backgroundColor: pressed ? theme.colors.surfaceMuted : theme.colors.surface,
+              backgroundColor: pressed
+                ? theme.colors.surfaceMuted
+                : theme.colors.surface,
               alignItems: "center",
               justifyContent: "center",
               opacity: disabled ? 0.55 : 1,

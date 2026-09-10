@@ -10,7 +10,10 @@ import { validateUserSavedAddressesForm } from "@/entities/address/lib/validateU
 import { EDIT_PROFILE_UI } from "@/shared/config";
 import { validateUserBusinessHoursForm } from "@/entities/user/lib/userBusinessHoursForm";
 
-import { isBirthDateInputComplete, parseBirthDateInputToIsoDate } from "./birthDateInputMask";
+import {
+  isBirthDateInputComplete,
+  parseBirthDateInputToIsoDate,
+} from "./birthDateInputMask";
 import { validateRuPhoneField } from "./ruPhone";
 import type { EditProfileFormState } from "./mapUserToEditProfileForm";
 

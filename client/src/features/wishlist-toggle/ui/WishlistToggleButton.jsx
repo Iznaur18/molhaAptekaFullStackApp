@@ -43,10 +43,7 @@ export function WishlistToggleButton({
   }
 
   const active = isInWishlist(id);
-  const baseCount = Math.max(
-    0,
-    Math.floor(Number(product?.productWishlistCount) || 0),
-  );
+  const baseCount = Math.max(0, Math.floor(Number(product?.productWishlistCount) || 0));
 
   const handleClick = (event) => {
     event.stopPropagation();
@@ -83,7 +80,12 @@ export function WishlistToggleButton({
       onClick={handleClick}
     >
       {/* size lg = 20px — как в мобильном WishlistToggleButton */}
-      <AppIcon icon={Heart} size="lg" strokeWidth={2.1} className="wishlist-toggle__icon" />
+      <AppIcon
+        icon={Heart}
+        size="lg"
+        strokeWidth={2.1}
+        className="wishlist-toggle__icon"
+      />
     </button>
   );
 }

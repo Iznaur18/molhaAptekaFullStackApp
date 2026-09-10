@@ -105,10 +105,7 @@ export async function syncSellerNomenclature(sellerId, opts = {}) {
     }
 
     if (existing) {
-      await ProductModel.updateOne(
-        { _id: existing._id },
-        { $set: setFields },
-      );
+      await ProductModel.updateOne({ _id: existing._id }, { $set: setFields });
       updated += 1;
     } else {
       await ProductModel.create({

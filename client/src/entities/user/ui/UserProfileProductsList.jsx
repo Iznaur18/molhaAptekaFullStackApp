@@ -165,9 +165,7 @@ export function UserProfileProductsList({
                     type="button"
                     className={[
                       "user-profile-purchases__row",
-                      isUnavailable
-                        ? "user-profile-purchases__row_unavailable"
-                        : "",
+                      isUnavailable ? "user-profile-purchases__row_unavailable" : "",
                     ]
                       .filter(Boolean)
                       .join(" ")}

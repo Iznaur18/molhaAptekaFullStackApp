@@ -35,7 +35,9 @@ export const resetAddressServiceUnavailable = (): void => {
   notify();
 };
 
-export const subscribeAddressServiceAvailability = (listener: () => void): (() => void) => {
+export const subscribeAddressServiceAvailability = (
+  listener: () => void,
+): (() => void) => {
   listeners.add(listener);
   return () => {
     listeners.delete(listener);

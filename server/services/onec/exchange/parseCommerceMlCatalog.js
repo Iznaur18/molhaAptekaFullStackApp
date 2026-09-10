@@ -40,7 +40,10 @@ import { childList, childText, streamXmlElements } from "./streamXmlElements.js"
  */
 
 /** @param {string} value @param {number} max */
-const clamp = (value, max) => String(value ?? "").trim().slice(0, max);
+const clamp = (value, max) =>
+  String(value ?? "")
+    .trim()
+    .slice(0, max);
 
 /**
  * `<Группа>` рекурсивна: развернуть в плоский список с путём от корня.
@@ -51,14 +54,8 @@ const clamp = (value, max) => String(value ?? "").trim().slice(0, max);
  * @param {OneCGroup[]} out
  */
 function flattenGroup(node, parentExternalId, parentPath, out) {
-  const externalId = clamp(
-    childText(node, "Ид"),
-    ONEC_CATEGORY_EXTERNAL_ID_MAX_LENGTH,
-  );
-  const name = clamp(
-    childText(node, "Наименование"),
-    ONEC_CATEGORY_NAME_MAX_LENGTH,
-  );
+  const externalId = clamp(childText(node, "Ид"), ONEC_CATEGORY_EXTERNAL_ID_MAX_LENGTH);
+  const name = clamp(childText(node, "Наименование"), ONEC_CATEGORY_NAME_MAX_LENGTH);
   if (!externalId) return;
 
   const pathNames = [...parentPath, name || externalId];
@@ -84,8 +81,7 @@ function flattenGroup(node, parentExternalId, parentPath, out) {
  * @param {Record<string, unknown>} node
  */
 function isDeleted(node) {
-  const attrStatus = /** @type {{ $?: Record<string, string> }} */ (node).$
-    ?.Статус;
+  const attrStatus = /** @type {{ $?: Record<string, string> }} */ (node).$?.Статус;
   const tagStatus = childText(node, "Статус");
   return /удал/i.test(String(attrStatus ?? "")) || /удал/i.test(tagStatus);
 }
@@ -159,10 +155,7 @@ function toCatalogProduct(node, propertyDict) {
     externalId,
     article: clamp(childText(node, "Артикул"), ONEC_ARTICLE_MAX_LENGTH),
     name: clamp(childText(node, "Наименование"), ONEC_NAME_MAX_LENGTH),
-    description: clamp(
-      childText(node, "Описание"),
-      ONEC_DESCRIPTION_MAX_LENGTH,
-    ),
+    description: clamp(childText(node, "Описание"), ONEC_DESCRIPTION_MAX_LENGTH),
     groupIds,
     imagePaths,
     characteristics: collectCharacteristics(node, propertyDict),
@@ -184,11 +177,7 @@ function toCatalogProduct(node, propertyDict) {
  * }} params
  * @returns {Promise<{ groups: number; products: number; onlyChanges: boolean }>}
  */
-export async function parseCommerceMlCatalog({
-  filePath,
-  onGroups,
-  onProducts,
-}) {
+export async function parseCommerceMlCatalog({ filePath, onGroups, onProducts }) {
   /** @type {Map<string, { name: string; values: Map<string, string> }>} */
   const propertyDict = new Map();
   /** @type {OneCGroup[]} */

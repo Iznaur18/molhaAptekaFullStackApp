@@ -46,7 +46,9 @@ export const UsersPage = () => {
 
   return (
     <View style={styles.screen}>
-      <View style={[styles.screen, centeredContentStyle, { paddingTop: contentPaddingTop }]}>
+      <View
+        style={[styles.screen, centeredContentStyle, { paddingTop: contentPaddingTop }]}
+      >
         <UsersPageSearchBar
           value={searchTerm}
           onChange={handleSearchTermChange}

@@ -7,22 +7,17 @@ process.env.JWT_SECRET =
 
 const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollections } =
   await import("./helpers/mongoTestDb.js");
-const { createOrderLoyaltyFixture } = await import(
-  "./helpers/orderLoyaltyTestHelpers.js"
-);
+const { createOrderLoyaltyFixture } =
+  await import("./helpers/orderLoyaltyTestHelpers.js");
 const { OrderModel, ProductModel } = await import("../models/index.js");
-const { PRODUCT_MODERATION_APPROVED } = await import(
-  "../constants/productModerationConstants.js"
-);
-const { ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY } = await import(
-  "../constants/orderConstants.js"
-);
-const { getMySalesController } = await import(
-  "../controllers/Order/getMySalesController.js"
-);
-const { markOrderItemCancelled } = await import(
-  "../services/order/cancelOrderItems.js"
-);
+const { PRODUCT_MODERATION_APPROVED } =
+  await import("../constants/productModerationConstants.js");
+const { ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY } =
+  await import("../constants/orderConstants.js");
+const { getMySalesController } =
+  await import("../controllers/Order/getMySalesController.js");
+const { markOrderItemCancelled } =
+  await import("../services/order/cancelOrderItems.js");
 
 const UNIT_PRICE = 1000;
 

@@ -4,12 +4,8 @@ import { describe, it } from "node:test";
 process.env.JWT_SECRET =
   process.env.JWT_SECRET ?? "integration-test-jwt-secret-min-32-chars";
 
-const {
-  normalizeNomenclatureItems,
-  sealOneCSecret,
-  openOneCSecret,
-  maskOneCApiKey,
-} = await import("../services/onec/index.js");
+const { normalizeNomenclatureItems, sealOneCSecret, openOneCSecret, maskOneCApiKey } =
+  await import("../services/onec/index.js");
 
 describe("onec nomenclature normalize", () => {
   it("parses items envelope", () => {

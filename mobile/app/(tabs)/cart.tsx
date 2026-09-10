@@ -66,7 +66,9 @@ export default function CartScreen() {
   const [checkoutSection, setCheckoutSection] = useState<"pickup" | "delivery" | null>(
     null,
   );
-  const [auctionCheckoutBid, setAuctionCheckoutBid] = useState<MyPriceOfferBid | null>(null);
+  const [auctionCheckoutBid, setAuctionCheckoutBid] = useState<MyPriceOfferBid | null>(
+    null,
+  );
   const [submitState, setSubmitState] = useState({
     isSubmitting: false,
     error: "",
@@ -83,7 +85,10 @@ export default function CartScreen() {
     staleTime: 0,
     refetchOnMount: "always",
   });
-  const auctionBids = useMemo(() => acceptedBidsQuery.data ?? [], [acceptedBidsQuery.data]);
+  const auctionBids = useMemo(
+    () => acceptedBidsQuery.data ?? [],
+    [acceptedBidsQuery.data],
+  );
   const currentUserId = sessionQuery.data?.user?._id;
 
   const buyNFreeProductIds = useMemo(() => {
@@ -150,9 +155,7 @@ export default function CartScreen() {
 
   const visibleLines = useMemo(
     () =>
-      lines.filter(
-        (line) => getCartLineExclusionReason(line, currentUserId) == null,
-      ),
+      lines.filter((line) => getCartLineExclusionReason(line, currentUserId) == null),
     [lines, currentUserId],
   );
 
@@ -229,10 +232,12 @@ export default function CartScreen() {
         (item) => String(item._id) === String(auctionCheckoutBid.productId),
       );
       return doProductsSupportPickup([
-        product as {
-          productPickupEnabled?: boolean | null;
-          productPickupAddress?: string | null;
-        } | undefined,
+        product as
+          | {
+              productPickupEnabled?: boolean | null;
+              productPickupAddress?: string | null;
+            }
+          | undefined,
       ]);
     }
     return doProductsSupportPickup(
@@ -241,7 +246,11 @@ export default function CartScreen() {
   }, [auctionCheckoutBid, activeSummary.selectedLines, productsQuery.products]);
 
   const handleRefresh = useCallback(async () => {
-    await Promise.all([cartQuery.refetch(), productsQuery.refetch(), acceptedBidsQuery.refetch()]);
+    await Promise.all([
+      cartQuery.refetch(),
+      productsQuery.refetch(),
+      acceptedBidsQuery.refetch(),
+    ]);
   }, [acceptedBidsQuery, cartQuery, productsQuery]);
 
   const handleOpenAuctionCheckout = (bid: MyPriceOfferBid) => {
@@ -278,7 +287,11 @@ export default function CartScreen() {
         pickupSelections: payload.pickupSelections,
       });
       setAuctionCheckoutBid(null);
-      setSubmitState({ isSubmitting: false, error: "", success: CART_AUCTION_UI.ORDER_PLACED });
+      setSubmitState({
+        isSubmitting: false,
+        error: "",
+        success: CART_AUCTION_UI.ORDER_PLACED,
+      });
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: priceOfferQueryKeys.myBids() }),
         queryClient.invalidateQueries({ queryKey: orderQueryKeys.my() }),
@@ -325,8 +338,7 @@ export default function CartScreen() {
     } catch (error) {
       setSubmitState({
         isSubmitting: false,
-        error:
-          error instanceof Error ? error.message : CHECKOUT_FORM_UI.ERROR_GENERIC,
+        error: error instanceof Error ? error.message : CHECKOUT_FORM_UI.ERROR_GENERIC,
         success: "",
       });
     }
@@ -352,7 +364,10 @@ export default function CartScreen() {
   if (cartQuery.isError) {
     return (
       <ScreenErrorState
-        message={formatApiErrorMessage(cartQuery.error, API_CLIENT_UI.FETCH_CART_FALLBACK)}
+        message={formatApiErrorMessage(
+          cartQuery.error,
+          API_CLIENT_UI.FETCH_CART_FALLBACK,
+        )}
         onRetry={() => cartQuery.refetch()}
       />
     );
@@ -386,7 +401,9 @@ export default function CartScreen() {
   if (visibleLines.length === 0 && auctionBids.length === 0) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.message}>{CART_PAGE_UI.CHECKOUT_BLOCKED_ALL_UNAVAILABLE}</Text>
+        <Text style={styles.message}>
+          {CART_PAGE_UI.CHECKOUT_BLOCKED_ALL_UNAVAILABLE}
+        </Text>
         <AppButton
           label={CART_PAGE_UI.CLEAR_ALL}
           variant="contrast"
@@ -420,7 +437,10 @@ export default function CartScreen() {
             />
           }
         >
-          <CartAuctionSection bids={auctionBids} onCheckout={handleOpenAuctionCheckout} />
+          <CartAuctionSection
+            bids={auctionBids}
+            onCheckout={handleOpenAuctionCheckout}
+          />
 
           <CartFulfillmentSection
             title={CART_PAGE_UI.SECTION_PICKUP}

@@ -217,7 +217,11 @@ export function SafeDealPage() {
         ) : null}
 
         {!isApproved ? (
-          <button type="submit" className="safe-deal-page__submit" disabled={!canSubmit}>
+          <button
+            type="submit"
+            className="safe-deal-page__submit"
+            disabled={!canSubmit}
+          >
             {submitMutation.isPending
               ? SAFE_DEAL_UI.SUBMITTING
               : status === "rejected"

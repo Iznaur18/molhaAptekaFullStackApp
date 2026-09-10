@@ -29,6 +29,8 @@ export async function fetchMyReferralProgram() {
     }
     return data.data;
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, "Не удалось загрузить партнёрскую программу"));
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось загрузить партнёрскую программу"),
+    );
   }
 }

@@ -148,18 +148,22 @@ export function useCategoryTreeAdminPage() {
       setPendingId("create");
       setActionError("");
       setActionNotice("");
-      const { category: created, movedProductCount } = await createMutation.mutateAsync({
-        slug,
-        labelRu: newLabelRu.trim(),
-        parentId: newParentId.trim() || null,
-        isLeaf: newParentId.trim() ? newIsLeaf : false,
-        searchKeywords: newParentId.trim() ? parseKeywordsCsv(newKeywordsCsv) : [],
-        defaultCharacteristicKeys:
-          newParentId.trim() && newIsLeaf
-            ? parseCharacteristicKeysLines(newCharacteristicKeysText)
-            : [],
-        legacyProductCategory: newParentId.trim() ? newLegacySlug.trim() || null : null,
-      });
+      const { category: created, movedProductCount } = await createMutation.mutateAsync(
+        {
+          slug,
+          labelRu: newLabelRu.trim(),
+          parentId: newParentId.trim() || null,
+          isLeaf: newParentId.trim() ? newIsLeaf : false,
+          searchKeywords: newParentId.trim() ? parseKeywordsCsv(newKeywordsCsv) : [],
+          defaultCharacteristicKeys:
+            newParentId.trim() && newIsLeaf
+              ? parseCharacteristicKeysLines(newCharacteristicKeysText)
+              : [],
+          legacyProductCategory: newParentId.trim()
+            ? newLegacySlug.trim() || null
+            : null,
+        },
+      );
       if (movedProductCount > 0) {
         // Родитель перестал быть листом, а товары сменили категорию: локальной
         // вставкой одной строки это не описать, перечитываем дерево целиком.
@@ -194,7 +198,9 @@ export function useCategoryTreeAdminPage() {
           searchKeywords: parseKeywordsCsv(String(editDraft.keywordsCsv ?? "")),
           defaultCharacteristicKeys:
             editDraft.isLeaf === true
-              ? parseCharacteristicKeysLines(String(editDraft.characteristicKeysText ?? ""))
+              ? parseCharacteristicKeysLines(
+                  String(editDraft.characteristicKeysText ?? ""),
+                )
               : [],
           legacyProductCategory:
             String(editDraft.legacyProductCategory ?? "").trim() || null,

@@ -43,8 +43,12 @@ export const ProductDetailsSellerStorefrontButton = ({
         <MaterialIcons name="storefront" size={20} color={theme.colors.action} />
       </View>
       <View style={styles.copy}>
-        <Text style={styles.title}>{PRODUCT_SELLER_PREVIEW_UI.SELLER_STOREFRONT_BUTTON}</Text>
-        <Text style={styles.hint}>{PRODUCT_SELLER_PREVIEW_UI.SELLER_STOREFRONT_HINT}</Text>
+        <Text style={styles.title}>
+          {PRODUCT_SELLER_PREVIEW_UI.SELLER_STOREFRONT_BUTTON}
+        </Text>
+        <Text style={styles.hint}>
+          {PRODUCT_SELLER_PREVIEW_UI.SELLER_STOREFRONT_HINT}
+        </Text>
       </View>
       <MaterialIcons
         name="chevron-right"

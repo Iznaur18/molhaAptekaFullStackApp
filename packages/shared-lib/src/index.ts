@@ -266,10 +266,7 @@ export {
   isProductRentalConfigured,
   isProductRentalPriceUnit,
 } from "./productRental.js";
-export type {
-  ProductRentalLike,
-  ProductRentalPriceUnit,
-} from "./productRental.js";
+export type { ProductRentalLike, ProductRentalPriceUnit } from "./productRental.js";
 export {
   buildUsersPodiumPlaceById,
   excludeUsersPodiumFromList,

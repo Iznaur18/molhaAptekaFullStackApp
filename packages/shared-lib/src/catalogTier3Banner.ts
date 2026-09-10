@@ -63,7 +63,10 @@ export const shouldShowProductTier3BannerFullWidth = (
   return showFullWidthTier3Banners;
 };
 
-const compareTier3BannerActivationOrder = (a: CatalogTier3Product, b: CatalogTier3Product) => {
+const compareTier3BannerActivationOrder = (
+  a: CatalogTier3Product,
+  b: CatalogTier3Product,
+) => {
   const aTime = Date.parse(String(a.catalogPromotionActivatedAt ?? "")) || 0;
   const bTime = Date.parse(String(b.catalogPromotionActivatedAt ?? "")) || 0;
   if (bTime !== aTime) {

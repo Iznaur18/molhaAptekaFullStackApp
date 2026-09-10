@@ -1,8 +1,6 @@
 import { formatCatalogNearDistanceLabel } from "@molha/api-contract";
 import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
-import {
-  getProductPromotionTierLabel,
-} from "../lib/calculateProductPromotionPointsCost.js";
+import { getProductPromotionTierLabel } from "../lib/calculateProductPromotionPointsCost.js";
 import { getProductPurchaseLimit } from "../lib/getProductPurchaseLimit.js";
 import { formatPromotionExpiresAt } from "../lib/productPromotionStatus.js";
 import { ProductCardStatusSlot } from "./product-card/ProductCardStatusSlot.jsx";
@@ -60,7 +58,8 @@ export function ProductCatalogStatusBadges({
     isPromotionActive: flags.isPromotionActive,
     isLoyaltyPointsOvercommitted,
     getPromotionTierLabel: () => getProductPromotionTierLabel(flags.promotionTier),
-    getPromotionUntil: () => formatPromotionExpiresAt(product.catalogPromotionExpiresAt),
+    getPromotionUntil: () =>
+      formatPromotionExpiresAt(product.catalogPromotionExpiresAt),
   };
 
   const rootClassName = ["product-catalog-status-badges", className]

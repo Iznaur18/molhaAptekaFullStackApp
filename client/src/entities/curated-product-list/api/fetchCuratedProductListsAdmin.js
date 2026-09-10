@@ -13,9 +13,7 @@ export async function fetchCuratedProductListsAdmin() {
     return data.data.lists;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      "Не удалось загрузить подборки";
+      e?.response?.data?.message ?? e?.message ?? "Не удалось загрузить подборки";
     throw new Error(message);
   }
 }

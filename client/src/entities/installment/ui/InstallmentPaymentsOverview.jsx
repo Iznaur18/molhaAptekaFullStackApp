@@ -26,7 +26,11 @@ export function InstallmentPaymentsOverview({
   regionAriaLabel = INSTALLMENT_UI.PAYMENTS_PAGE_TITLE,
 }) {
   return (
-    <div className="installment-payments-overview" role="region" aria-label={regionAriaLabel}>
+    <div
+      className="installment-payments-overview"
+      role="region"
+      aria-label={regionAriaLabel}
+    >
       <button
         type="button"
         className="installment-payments-overview__tile"
@@ -53,13 +57,13 @@ export function InstallmentPaymentsOverview({
         <span className="installment-payments-overview__label">
           {INSTALLMENT_UI.PAYMENTS_OVERVIEW_ATTENTION}
         </span>
-        <strong className="installment-payments-overview__value">{attentionCount}</strong>
+        <strong className="installment-payments-overview__value">
+          {attentionCount}
+        </strong>
       </button>
 
       <div className="installment-payments-overview__tile installment-payments-overview__tile_static">
-        <span className="installment-payments-overview__label">
-          {remainingLabel}
-        </span>
+        <span className="installment-payments-overview__label">{remainingLabel}</span>
         <strong className="installment-payments-overview__value">
           {formatPriceRub(totalRemainingRub)}
         </strong>

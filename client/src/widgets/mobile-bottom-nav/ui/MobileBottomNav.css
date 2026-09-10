@@ -31,7 +31,8 @@
   padding: 0.35rem 0.45rem;
   overflow: hidden;
   isolation: isolate;
-  border: 1px solid color-mix(in srgb, var(--iz-color-on-contrast) 42%, var(--iz-color-border));
+  border: 1px solid
+    color-mix(in srgb, var(--iz-color-on-contrast) 42%, var(--iz-color-border));
   border-radius: var(--iz-radius-pill);
   background:
     linear-gradient(
@@ -76,7 +77,11 @@
 
 .mobile-bottom-nav__item--active {
   color: var(--iz-color-action);
-  background: color-mix(in srgb, var(--iz-color-on-contrast) 42%, var(--iz-color-action-soft));
+  background: color-mix(
+    in srgb,
+    var(--iz-color-on-contrast) 42%,
+    var(--iz-color-action-soft)
+  );
   box-shadow: none;
 }
 

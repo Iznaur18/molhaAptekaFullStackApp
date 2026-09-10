@@ -305,7 +305,9 @@ export const buildCuratedListProductPreview = async (productId) => {
   }
 
   const product = await ProductModel.findById(productId)
-    .select("productName productRegionCode productModerationStatus productIsAvailable productStockQuantity productSeller")
+    .select(
+      "productName productRegionCode productModerationStatus productIsAvailable productStockQuantity productSeller",
+    )
     .lean();
   if (!product) {
     throw new AppError(404, "Товар не найден");

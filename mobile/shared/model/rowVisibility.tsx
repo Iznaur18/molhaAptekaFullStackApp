@@ -8,7 +8,10 @@ import {
 } from "react";
 import type { ViewToken } from "react-native";
 
-import { createVisibleKeysStore, type VisibleKeysStore } from "@/shared/model/visibleKeysStore";
+import {
+  createVisibleKeysStore,
+  type VisibleKeysStore,
+} from "@/shared/model/visibleKeysStore";
 
 /**
  * Видимость текущей строки списка. По умолчанию `true` — вне ленты (детальный
@@ -66,7 +69,9 @@ export const VisibleRowsProvider = ({
   store: VisibleKeysStore;
   children: ReactNode;
 }) => (
-  <VisibleRowsStoreContext.Provider value={store}>{children}</VisibleRowsStoreContext.Provider>
+  <VisibleRowsStoreContext.Provider value={store}>
+    {children}
+  </VisibleRowsStoreContext.Provider>
 );
 
 /**
@@ -88,5 +93,9 @@ export const RowVisibilityBoundary = ({
     store ? () => store.isVisible(rowKey) : () => true,
   );
 
-  return <RowVisibilityContext.Provider value={visible}>{children}</RowVisibilityContext.Provider>;
+  return (
+    <RowVisibilityContext.Provider value={visible}>
+      {children}
+    </RowVisibilityContext.Provider>
+  );
 };

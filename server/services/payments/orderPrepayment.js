@@ -180,8 +180,9 @@ export async function createOrderPrepayment({
   // Доставка по тарифу продавца — часть того, что покупатель платит картой.
   // Курьерская `deliveryFeeRub` сюда не входит: те деньги покупатель отдаёт
   // курьеру из рук в руки, площадка их не проводит.
-  const deliveryTotalRub = (Array.isArray(order.shipments) ? order.shipments : [])
-    .reduce((sum, row) => sum + (Number(row?.sellerDeliveryFeeRub) || 0), 0);
+  const deliveryTotalRub = (
+    Array.isArray(order.shipments) ? order.shipments : []
+  ).reduce((sum, row) => sum + (Number(row?.sellerDeliveryFeeRub) || 0), 0);
   const amountRub = (Number(order.totalAmount) || 0) + deliveryTotalRub;
   if (amountRub <= 0) {
     throw new AppError(400, "Сумма заказа должна быть больше 0");

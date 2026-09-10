@@ -19,7 +19,11 @@ import {
   getPendingInstallmentDisputesCountController,
   resolveInstallmentDisputeController,
 } from "../controllers/index.js";
-import { checkAuthMW, checkProductModeratorMW, installmentActionRateLimiter } from "../middlewares/index.js";
+import {
+  checkAuthMW,
+  checkProductModeratorMW,
+  installmentActionRateLimiter,
+} from "../middlewares/index.js";
 import {
   installmentContractIdParamValidation,
   installmentPaymentIndexParamValidation,

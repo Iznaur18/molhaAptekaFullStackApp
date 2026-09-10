@@ -114,10 +114,10 @@ export function useAppShellState(location, navigate) {
     hasPersonalSellerProductsLimit,
     isAtSellerProductsLimit,
   } = useHomeSellerAccess({
-      currentUserRole,
-      authUser,
-      myProductsTotal,
-    });
+    currentUserRole,
+    authUser,
+    myProductsTotal,
+  });
 
   useHomeRouteGuards({
     location,

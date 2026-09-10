@@ -1,5 +1,11 @@
 import { BlurView } from "expo-blur";
-import { Platform, StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
+import {
+  Platform,
+  StyleSheet,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 import { isDimColorScheme } from "@izibuy/design-tokens";
 
 import {
@@ -12,7 +18,9 @@ type HomeCatalogHeaderGlassLayerProps = {
   style?: StyleProp<ViewStyle>;
 };
 
-export const HomeCatalogHeaderGlassLayer = ({ style }: HomeCatalogHeaderGlassLayerProps = {}) => {
+export const HomeCatalogHeaderGlassLayer = ({
+  style,
+}: HomeCatalogHeaderGlassLayerProps = {}) => {
   const theme = useAppTheme();
   const { colorScheme } = useAppThemeSettings();
   const glassTint = resolveHomeCatalogHeaderGlassTint(theme.colors.onContrast);

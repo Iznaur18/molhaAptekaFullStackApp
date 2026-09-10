@@ -56,7 +56,9 @@ function isShipmentDelivered(order, sellerId) {
   const items = (order.items ?? []).filter(
     (item) => resolveItemSellerId(item) === String(sellerId),
   );
-  return items.length > 0 && buildOrderStatusFromItems(items) === ORDER_STATUS_DELIVERED;
+  return (
+    items.length > 0 && buildOrderStatusFromItems(items) === ORDER_STATUS_DELIVERED
+  );
 }
 
 /**
@@ -73,5 +75,7 @@ function isShipmentUnderway(order, sellerId) {
 
   const status = buildOrderStatusFromItems(items);
   const rank = ORDER_STATUS_LADDER_RANK[status];
-  return rank !== undefined && rank >= ORDER_STATUS_LADDER_RANK[ORDER_STATUS_COURIER_HOLDING];
+  return (
+    rank !== undefined && rank >= ORDER_STATUS_LADDER_RANK[ORDER_STATUS_COURIER_HOLDING]
+  );
 }

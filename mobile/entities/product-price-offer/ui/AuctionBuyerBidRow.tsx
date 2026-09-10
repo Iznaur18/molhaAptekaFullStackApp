@@ -11,10 +11,7 @@ import { usePriceOfferMutations } from "@/entities/product-price-offer/model/use
 import { AuctionDashboardBuyerPriceEditor } from "@/entities/product-price-offer/ui/AuctionDashboardBuyerPriceEditor";
 import { AuctionDashboardProductThumb } from "@/entities/product-price-offer/ui/AuctionDashboardProductThumb";
 import { AuctionDashboardRowStatus } from "@/entities/product-price-offer/ui/AuctionDashboardRowStatus";
-import {
-  AUCTION_PAGE_UI,
-  PRODUCT_PRICE_OFFER_UI,
-} from "@/shared/config";
+import { AUCTION_PAGE_UI, PRODUCT_PRICE_OFFER_UI } from "@/shared/config";
 import { formatIsoDateTime, formatPriceRub } from "@/shared/lib";
 import {
   formatIntegerGroupRu,
@@ -49,7 +46,9 @@ export const AuctionBuyerBidRow = ({
 }: AuctionBuyerBidRowProps) => {
   const styles = useAuctionDashboardRowStyles();
   const router = useRouter();
-  const [priceInput, setPriceInput] = useState(() => formatIntegerGroupRu(bid.offerPrice ?? ""));
+  const [priceInput, setPriceInput] = useState(() =>
+    formatIntegerGroupRu(bid.offerPrice ?? ""),
+  );
   const [error, setError] = useState("");
   const { patchMutation, cancelMutation } = usePriceOfferMutations(bid.productId);
   const isBusy = patchMutation.isPending || cancelMutation.isPending;
@@ -85,7 +84,11 @@ export const AuctionBuyerBidRow = ({
       await patchMutation.mutateAsync(price);
       onChanged?.();
     } catch (patchError) {
-      setError(patchError instanceof Error ? patchError.message : AUCTION_PAGE_UI.ERROR_GENERIC);
+      setError(
+        patchError instanceof Error
+          ? patchError.message
+          : AUCTION_PAGE_UI.ERROR_GENERIC,
+      );
     }
   };
 
@@ -95,7 +98,11 @@ export const AuctionBuyerBidRow = ({
       await cancelMutation.mutateAsync();
       onChanged?.();
     } catch (cancelError) {
-      setError(cancelError instanceof Error ? cancelError.message : AUCTION_PAGE_UI.ERROR_GENERIC);
+      setError(
+        cancelError instanceof Error
+          ? cancelError.message
+          : AUCTION_PAGE_UI.ERROR_GENERIC,
+      );
     }
   };
 
@@ -145,7 +152,8 @@ export const AuctionBuyerBidRow = ({
               </AuctionDashboardRowStatus>
               {isAccepted && bid.paymentDeadlineAt ? (
                 <Text style={styles.meta}>
-                  {AUCTION_PAGE_UI.PAY_DEADLINE_LABEL}: {formatIsoDateTime(bid.paymentDeadlineAt)}
+                  {AUCTION_PAGE_UI.PAY_DEADLINE_LABEL}:{" "}
+                  {formatIsoDateTime(bid.paymentDeadlineAt)}
                 </Text>
               ) : null}
             </>

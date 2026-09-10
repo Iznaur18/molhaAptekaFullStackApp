@@ -85,7 +85,9 @@ export function ProductModerationCreateDetailsModal({
           </div>
 
           <header className="product-moderation-create-details__heading-block">
-            <h3 className="product-moderation-create-details__name">{details.heading}</h3>
+            <h3 className="product-moderation-create-details__name">
+              {details.heading}
+            </h3>
             {origin ? (
               <p className="product-moderation-create-details__origin">
                 <AppIcon icon={origin.Icon} size="sm" strokeWidth={2.25} />
@@ -149,7 +151,8 @@ export function ProductModerationCreateDetailsModal({
                   key: "coords",
                   label: PRODUCT_MODERATION_PAGE_UI.COORDS_LABEL,
                   value:
-                    details.pickup.coordsText ?? PRODUCT_MODERATION_PAGE_UI.COORDS_EMPTY,
+                    details.pickup.coordsText ??
+                    PRODUCT_MODERATION_PAGE_UI.COORDS_EMPTY,
                 },
               ]}
             />
@@ -200,7 +203,9 @@ export function ProductModerationCreateDetailsModal({
             />
             <FactList rows={details.sellerFactRows} />
             {details.seller == null ? (
-              <p className="product-moderation-create-details__empty">{COMMON_UI.EM_DASH}</p>
+              <p className="product-moderation-create-details__empty">
+                {COMMON_UI.EM_DASH}
+              </p>
             ) : null}
           </section>
         </>

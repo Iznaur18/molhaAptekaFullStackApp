@@ -54,7 +54,11 @@ export const ScreenErrorState = ({ message, onRetry }: ScreenErrorStateProps) =>
     <View style={styles.centered}>
       <Text style={styles.error}>{message}</Text>
       {onRetry ? (
-        <AppButton label={SCREEN_STATE_UI.RETRY} onPress={onRetry} style={styles.retryButton} />
+        <AppButton
+          label={SCREEN_STATE_UI.RETRY}
+          onPress={onRetry}
+          style={styles.retryButton}
+        />
       ) : null}
     </View>
   );

@@ -32,10 +32,7 @@ export async function fetchUsersMonthlyLoyaltyPoints() {
     };
   } catch (error) {
     throw new Error(
-      formatApiErrorMessage(
-        error,
-        API_CLIENT_UI.FETCH_MONTHLY_LOYALTY_POINTS_FALLBACK,
-      ),
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_MONTHLY_LOYALTY_POINTS_FALLBACK),
     );
   }
 }

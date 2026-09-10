@@ -8,7 +8,10 @@ import {
   CART_ACTION_SET_QUANTITY,
   cartReducer,
 } from "./cartReducer.js";
-import { CART_LINE_ITEM_QUANTITY_MAX, CART_MAX_DISTINCT_PRODUCTS } from "./cartConstants.js";
+import {
+  CART_LINE_ITEM_QUANTITY_MAX,
+  CART_MAX_DISTINCT_PRODUCTS,
+} from "./cartConstants.js";
 
 describe("cartReducer", () => {
   it("adds quantity and clamps to max per line", () => {
@@ -35,11 +38,14 @@ describe("cartReducer", () => {
   });
 
   it("clamps setQuantity to minimum of 1", () => {
-    const next = cartReducer({ p1: 2 }, {
-      type: CART_ACTION_SET_QUANTITY,
-      productId: "p1",
-      quantity: 0,
-    });
+    const next = cartReducer(
+      { p1: 2 },
+      {
+        type: CART_ACTION_SET_QUANTITY,
+        productId: "p1",
+        quantity: 0,
+      },
+    );
     expect(next).toEqual({ p1: 1 });
   });
 
@@ -48,8 +54,8 @@ describe("cartReducer", () => {
       cartReducer({ p1: 1, p2: 2 }, { type: CART_ACTION_REMOVE, productId: "p1" }),
     ).toEqual({ p2: 2 });
     expect(cartReducer({ p1: 1 }, { type: CART_ACTION_CLEAR })).toEqual({});
-    expect(
-      cartReducer({}, { type: CART_ACTION_HYDRATE, payload: { p9: 3 } }),
-    ).toEqual({ p9: 3 });
+    expect(cartReducer({}, { type: CART_ACTION_HYDRATE, payload: { p9: 3 } })).toEqual({
+      p9: 3,
+    });
   });
 });

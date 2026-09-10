@@ -95,12 +95,18 @@ export const ProductFlashSaleModal = ({
     }
     setError("");
     setSalePrice(
-      isActive ? formatIntegerGroupRu(Math.floor(Number(product.productPrice) || 0)) : "",
+      isActive
+        ? formatIntegerGroupRu(Math.floor(Number(product.productPrice) || 0))
+        : "",
     );
     const storedDurationMinutes = Math.floor(
       Number(product.productFlashSaleDurationMinutes),
     );
-    if (isActive && Number.isFinite(storedDurationMinutes) && storedDurationMinutes > 0) {
+    if (
+      isActive &&
+      Number.isFinite(storedDurationMinutes) &&
+      storedDurationMinutes > 0
+    ) {
       setDurationValue(String(storedDurationMinutes));
     } else {
       setDurationValue(DEFAULT_DURATION_VALUE);

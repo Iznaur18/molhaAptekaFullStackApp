@@ -26,10 +26,9 @@ describe("myProductsListFilter", () => {
     assert.deepEqual(buildMyProductsListFilterQuery({ listFilter: "hidden" }), {
       productIsAvailable: false,
     });
-    assert.deepEqual(
-      buildMyProductsListFilterQuery({ listFilter: "promoted", now }),
-      { catalogPromotionExpiresAt: { $gt: now } },
-    );
+    assert.deepEqual(buildMyProductsListFilterQuery({ listFilter: "promoted", now }), {
+      catalogPromotionExpiresAt: { $gt: now },
+    });
     assert.deepEqual(
       buildMyProductsListFilterQuery({ listFilter: "not_promoted", now }),
       {

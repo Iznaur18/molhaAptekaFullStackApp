@@ -31,7 +31,9 @@ export function ProductModerationPage({
   const queryClient = useQueryClient();
   const { approveMutation, rejectMutation } = useProductModerationMutations();
   const { deleteMutation } = useMyProductMutations();
-  const queueQuery = usePendingModerationProductsQuery({ limit: MODERATION_QUEUE_LIMIT });
+  const queueQuery = usePendingModerationProductsQuery({
+    limit: MODERATION_QUEUE_LIMIT,
+  });
   const [actionError, setActionError] = useState("");
   const [pendingProductId, setPendingProductId] = useState(null);
   const [rejectComments, setRejectComments] = useState(
@@ -40,7 +42,9 @@ export function ProductModerationPage({
   const [cardErrors, setCardErrors] = useState(
     /** @type {Record<string, string>} */ ({}),
   );
-  const [openProductId, setOpenProductId] = useState(/** @type {string | null} */ (null));
+  const [openProductId, setOpenProductId] = useState(
+    /** @type {string | null} */ (null),
+  );
 
   const products = queueQuery.data?.products ?? [];
   const openProduct =

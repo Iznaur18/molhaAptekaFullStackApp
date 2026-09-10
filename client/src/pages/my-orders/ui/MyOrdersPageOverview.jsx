@@ -22,13 +22,19 @@ export function MyOrdersPageOverview({
   onAttentionFilterChange,
 }) {
   return (
-    <div className="my-orders-overview" role="region" aria-label={MY_ORDERS_PAGE_UI.TITLE}>
+    <div
+      className="my-orders-overview"
+      role="region"
+      aria-label={MY_ORDERS_PAGE_UI.TITLE}
+    >
       <button
         type="button"
         className="my-orders-overview__tile"
         onClick={onInProgressFilterClick}
       >
-        <span className="my-orders-overview__label">{MY_ORDERS_PAGE_UI.OVERVIEW_IN_PROGRESS}</span>
+        <span className="my-orders-overview__label">
+          {MY_ORDERS_PAGE_UI.OVERVIEW_IN_PROGRESS}
+        </span>
         <strong className="my-orders-overview__value">{inProgressCount}</strong>
       </button>
 
@@ -44,13 +50,19 @@ export function MyOrdersPageOverview({
         aria-pressed={attentionOnly}
         onClick={() => onAttentionFilterChange(!attentionOnly)}
       >
-        <span className="my-orders-overview__label">{MY_ORDERS_PAGE_UI.OVERVIEW_ATTENTION}</span>
+        <span className="my-orders-overview__label">
+          {MY_ORDERS_PAGE_UI.OVERVIEW_ATTENTION}
+        </span>
         <strong className="my-orders-overview__value">{attentionCount}</strong>
       </button>
 
       <div className="my-orders-overview__tile my-orders-overview__tile_static">
-        <span className="my-orders-overview__label">{MY_ORDERS_PAGE_UI.OVERVIEW_TOTAL}</span>
-        <strong className="my-orders-overview__value">{formatPriceRub(totalAmountRub)}</strong>
+        <span className="my-orders-overview__label">
+          {MY_ORDERS_PAGE_UI.OVERVIEW_TOTAL}
+        </span>
+        <strong className="my-orders-overview__value">
+          {formatPriceRub(totalAmountRub)}
+        </strong>
       </div>
     </div>
   );

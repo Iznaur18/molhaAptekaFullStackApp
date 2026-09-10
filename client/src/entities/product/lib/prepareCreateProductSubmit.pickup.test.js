@@ -104,9 +104,9 @@ describe("prepareCreateProductSubmit pickup", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.createBody?.productPickupLocations).toHaveLength(1);
-      expect(result.createBody?.productPickupLocations?.[0]?.address.length).toBeGreaterThanOrEqual(
-        PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
-      );
+      expect(
+        result.createBody?.productPickupLocations?.[0]?.address.length,
+      ).toBeGreaterThanOrEqual(PRODUCT_PICKUP_ADDRESS_MIN_LENGTH);
       expect(result.createBody?.productPickupLocations?.[0]?.lat).toBe(55.75);
       expect(result.createBody?.productPickupLocations?.[0]?.lon).toBe(37.62);
       expect(result.createBody?.productPickupAddress).toBeUndefined();

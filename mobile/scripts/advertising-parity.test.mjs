@@ -29,7 +29,9 @@ test("advertising page mirrors web hub chrome and balance bar", () => {
 });
 
 test("intro ad section mirrors web card layout", () => {
-  const section = readMobileFile("features/advertising-page/ui/IntroAdAdvertisingSection.tsx");
+  const section = readMobileFile(
+    "features/advertising-page/ui/IntroAdAdvertisingSection.tsx",
+  );
 
   assert.match(section, /cardHead/);
   assert.match(section, /metaItem/);
@@ -61,7 +63,9 @@ test("advertising ui copy matches web page", () => {
 
 test("raffle advertising section is wired on advertising page", () => {
   const page = readMobileFile("features/advertising-page/ui/AdvertisingPage.tsx");
-  const section = readMobileFile("features/advertising-page/ui/RaffleAdvertisingSection.tsx");
+  const section = readMobileFile(
+    "features/advertising-page/ui/RaffleAdvertisingSection.tsx",
+  );
 
   assert.match(page, /RaffleAdvertisingSection/);
   assert.match(section, /useUnlockRaffleCreateMutation/);

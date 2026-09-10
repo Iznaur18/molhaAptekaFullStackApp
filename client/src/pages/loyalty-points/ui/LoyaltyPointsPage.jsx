@@ -37,16 +37,32 @@ const USE_ICON_KEYS = ["award", "trending-up", "play-circle", "gift"];
 
 function AwardIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
       <circle cx="12" cy="8" r="6" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8.21 13.89L7 22l5-3 5 3-1.21-8.11" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M8.21 13.89L7 22l5-3 5 3-1.21-8.11"
+      />
     </svg>
   );
 }
 
 function TrendingUpIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
       <path strokeLinecap="round" strokeLinejoin="round" d="M23 6l-9.5 9.5-5-5L1 18" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M17 6h6v6" />
     </svg>
@@ -55,7 +71,13 @@ function TrendingUpIcon() {
 
 function PlayCircleIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
       <circle cx="12" cy="12" r="10" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M10 8l6 4-6 4V8z" />
     </svg>
@@ -64,7 +86,13 @@ function PlayCircleIcon() {
 
 function GiftIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
       <rect x="3" y="8" width="18" height="4" rx="1" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13M19 12v9H5v-9" />
       <path
@@ -135,7 +163,9 @@ export function LoyaltyPointsPage({
     }
   }, []);
 
-  const watchedPaymentQuery = useMyPaymentQuery({ paymentId: watchedPaymentId || null });
+  const watchedPaymentQuery = useMyPaymentQuery({
+    paymentId: watchedPaymentId || null,
+  });
   const watchedPayment = watchedPaymentQuery.data;
 
   // Платёж дошёл до конца — больше следить не за чем.
@@ -250,19 +280,25 @@ export function LoyaltyPointsPage({
     setAdminSuccessMessage("");
     if (adminAmountPoints == null) {
       setAdminValidationError(
-        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MIN(LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN),
+        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MIN(
+          LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN,
+        ),
       );
       return;
     }
     if (adminAmountPoints < LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN) {
       setAdminValidationError(
-        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MIN(LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN),
+        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MIN(
+          LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN,
+        ),
       );
       return;
     }
     if (adminAmountPoints > LOYALTY_POINTS_ADMIN_FREE_CREDIT_MAX) {
       setAdminValidationError(
-        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MAX(LOYALTY_POINTS_ADMIN_FREE_CREDIT_MAX),
+        LOYALTY_POINTS_PAGE_UI.ADMIN_FREE_AMOUNT_MAX(
+          LOYALTY_POINTS_ADMIN_FREE_CREDIT_MAX,
+        ),
       );
       return;
     }
@@ -348,12 +384,16 @@ export function LoyaltyPointsPage({
             {LOYALTY_POINTS_PAGE_UI.BALANCE_CAPTION}
           </p>
           <p className="loyalty-points-page__hero-row">
-            <span className="loyalty-points-page__hero-value">{loyaltyPointsBalance}</span>
+            <span className="loyalty-points-page__hero-value">
+              {loyaltyPointsBalance}
+            </span>
             <span className="loyalty-points-page__hero-unit">
               {pluralizeRuBall(loyaltyPointsBalance)}
             </span>
           </p>
-          <p className="loyalty-points-page__hero-info">{LOYALTY_POINTS_PAGE_UI.INFO}</p>
+          <p className="loyalty-points-page__hero-info">
+            {LOYALTY_POINTS_PAGE_UI.INFO}
+          </p>
         </div>
         <div className="loyalty-points-page__hero-icon" aria-hidden="true">
           <AwardIcon />
@@ -473,7 +513,9 @@ export function LoyaltyPointsPage({
       ) : null}
 
       <article className="loyalty-points-page__uses-card">
-        <h3 className="loyalty-points-page__uses-title">{LOYALTY_POINTS_PAGE_UI.USES_TITLE}</h3>
+        <h3 className="loyalty-points-page__uses-title">
+          {LOYALTY_POINTS_PAGE_UI.USES_TITLE}
+        </h3>
         <ul className="loyalty-points-page__uses">
           {LOYALTY_POINTS_PAGE_UI.USES.map((item, index) => (
             <li key={item} className="loyalty-points-page__use-row">

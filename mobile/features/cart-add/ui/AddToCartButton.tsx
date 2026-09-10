@@ -27,9 +27,7 @@ type AddToCartButtonProps = {
 
 const showCartError = (error: unknown) => {
   const message =
-    error instanceof Error && error.message
-      ? error.message
-      : ADD_TO_CART_UI.ADD_FAILED;
+    error instanceof Error && error.message ? error.message : ADD_TO_CART_UI.ADD_FAILED;
   Alert.alert(ADD_TO_CART_UI.ADD_FAILED, message);
 };
 
@@ -54,7 +52,9 @@ export const AddToCartButton = ({
     product as Record<string, unknown> | null | undefined,
   );
   const { isSellerClosed, closedLabel: sellerClosedLabel } =
-    resolveProductSellerClosedPurchaseState(product as Record<string, unknown> | null | undefined);
+    resolveProductSellerClosedPurchaseState(
+      product as Record<string, unknown> | null | undefined,
+    );
 
   useEffect(() => {
     if (!hasStockLimit || quantity <= purchaseLimit) {
@@ -91,9 +91,7 @@ export const AddToCartButton = ({
 
   const handleDecrease = () => {
     const run =
-      quantity <= 1
-        ? removeItem(productId)
-        : setItemQuantity(productId, quantity - 1);
+      quantity <= 1 ? removeItem(productId) : setItemQuantity(productId, quantity - 1);
     void run.catch(showCartError);
   };
 
@@ -122,7 +120,10 @@ export const AddToCartButton = ({
 
     return (
       <Pressable style={styles.loginButtonPressable} onPress={handleLogin}>
-        <SquircleView radius={ADD_TO_CART_BUTTON_LAYOUT.borderRadius} style={styles.loginButton}>
+        <SquircleView
+          radius={ADD_TO_CART_BUTTON_LAYOUT.borderRadius}
+          style={styles.loginButton}
+        >
           <Text style={styles.loginButtonText} {...fixedFontProps}>
             {ADD_TO_CART_UI.LOGIN_TO_ADD}
           </Text>

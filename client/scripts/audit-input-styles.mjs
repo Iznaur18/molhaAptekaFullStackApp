@@ -67,7 +67,14 @@ for (const file of collect(SRC)) {
     const font = grab("font-size");
     const border = grab("border");
     if (!padding && !radius && !font && !border) continue;
-    rows.push({ rel, sel: sel.slice(0, 58), padding, radius, font, border: border.slice(0, 40) });
+    rows.push({
+      rel,
+      sel: sel.slice(0, 58),
+      padding,
+      radius,
+      font,
+      border: border.slice(0, 40),
+    });
   }
 }
 

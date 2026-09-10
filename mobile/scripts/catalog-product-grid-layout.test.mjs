@@ -38,16 +38,17 @@ const resolveCatalogProductGridColumns = (viewportWidth) => {
   const gap = CATALOG_PRODUCT_GRID_GAP_DESKTOP_PX;
   return Math.max(
     CATALOG_PRODUCT_GRID_MIN_COLUMNS,
-    Math.floor(
-      (viewportWidth + gap) / (CATALOG_PRODUCT_GRID_MIN_COLUMN_PX + gap),
-    ),
+    Math.floor((viewportWidth + gap) / (CATALOG_PRODUCT_GRID_MIN_COLUMN_PX + gap)),
   );
 };
 
 test("mobile catalog grid: min 3 columns enforced in source", () => {
   const mobileSource = readRepoFile("mobile/shared/lib/catalogProductGridLayout.ts");
 
-  assert.match(mobileSource, /CATALOG_PRODUCT_GRID_MIN_COLUMNS = CATALOG_PRODUCT_GRID_MOBILE_COLUMNS/);
+  assert.match(
+    mobileSource,
+    /CATALOG_PRODUCT_GRID_MIN_COLUMNS = CATALOG_PRODUCT_GRID_MOBILE_COLUMNS/,
+  );
   assert.doesNotMatch(mobileSource, /NARROW_COLUMNS = 2/);
 });
 
@@ -62,7 +63,10 @@ test("web catalog grid constants: 903 breakpoint + min column width", () => {
     "CATALOG_GRID_MIN_COLUMN_PX = 200",
     "CATALOG_GRID_GAP_PX = 16",
   ]) {
-    assert.match(webConstants, new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+    assert.match(
+      webConstants,
+      new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
+    );
   }
 });
 

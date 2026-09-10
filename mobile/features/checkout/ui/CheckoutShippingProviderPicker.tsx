@@ -60,8 +60,12 @@ export const CheckoutShippingProviderPicker = ({
               style={[
                 styles.card,
                 {
-                  borderColor: isSelected ? theme.colors.action : theme.colors.actionSoft,
-                  backgroundColor: isSelected ? theme.colors.surface : theme.colors.actionSoft,
+                  borderColor: isSelected
+                    ? theme.colors.action
+                    : theme.colors.actionSoft,
+                  backgroundColor: isSelected
+                    ? theme.colors.surface
+                    : theme.colors.actionSoft,
                 },
               ]}
             >
@@ -113,7 +117,9 @@ export const CheckoutShippingProviderPicker = ({
                     },
                   ]}
                 >
-                  <Text style={[styles.chipLabel, { color: theme.colors.text }]}>{label}</Text>
+                  <Text style={[styles.chipLabel, { color: theme.colors.text }]}>
+                    {label}
+                  </Text>
                 </Pressable>
               );
             })}

@@ -45,7 +45,9 @@ describe("fetchAddressSuggestions", () => {
       response: { data: { message: "DaData недоступен" } },
     });
 
-    await expect(fetchAddressSuggestions("Москва")).rejects.toThrow("DaData недоступен");
+    await expect(fetchAddressSuggestions("Москва")).rejects.toThrow(
+      "DaData недоступен",
+    );
   });
 
   it("returns empty list on 503 and stops further requests until reset/TTL", async () => {

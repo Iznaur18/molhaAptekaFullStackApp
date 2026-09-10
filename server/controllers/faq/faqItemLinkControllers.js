@@ -6,8 +6,7 @@ import { successRes } from "../../services/http/index.js";
  */
 const toFaqItemLinkPayload = (row) => ({
   itemId: String(row?.itemId ?? ""),
-  href:
-    typeof row?.href === "string" && row.href.trim() ? row.href.trim() : null,
+  href: typeof row?.href === "string" && row.href.trim() ? row.href.trim() : null,
   updatedAt: row?.updatedAt ?? null,
 });
 

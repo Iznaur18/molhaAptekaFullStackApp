@@ -13,7 +13,11 @@ import {
   parseKeywordsCsv,
   sortCategoryRows,
 } from "@/features/category-tree-admin-page/lib/categoryTreeAdminUtils";
-import { categoryAdminQueryKeys, categoryDisplayQueryKeys, categoryTreeQueryKeys } from "@/shared/api";
+import {
+  categoryAdminQueryKeys,
+  categoryDisplayQueryKeys,
+  categoryTreeQueryKeys,
+} from "@/shared/api";
 import { CATEGORY_TREE_ADMIN_PAGE_UI } from "@/shared/config";
 
 type EditDraft = Record<string, string | boolean>;
@@ -21,7 +25,8 @@ type EditDraft = Record<string, string | boolean>;
 export const useCategoryTreeAdminPage = () => {
   const queryClient = useQueryClient();
   const categoriesQuery = useProductCategoriesAdminQuery();
-  const { createMutation, patchMutation, deleteMutation } = useProductCategoryAdminMutations();
+  const { createMutation, patchMutation, deleteMutation } =
+    useProductCategoryAdminMutations();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -53,10 +58,13 @@ export const useCategoryTreeAdminPage = () => {
 
   const updateRows = useCallback(
     (updater: (prev: ProductCategoryAdminRow[]) => ProductCategoryAdminRow[]) => {
-      queryClient.setQueryData(categoryAdminQueryKeys.all, (old: ProductCategoryAdminRow[] | undefined) => {
-        const next = updater(old ?? []);
-        return sortCategoryRows(next);
-      });
+      queryClient.setQueryData(
+        categoryAdminQueryKeys.all,
+        (old: ProductCategoryAdminRow[] | undefined) => {
+          const next = updater(old ?? []);
+          return sortCategoryRows(next);
+        },
+      );
     },
     [queryClient],
   );
@@ -73,7 +81,9 @@ export const useCategoryTreeAdminPage = () => {
         await refetchCategories();
       } catch (error) {
         setActionError(
-          error instanceof Error ? error.message : CATEGORY_TREE_ADMIN_PAGE_UI.LOAD_ERROR,
+          error instanceof Error
+            ? error.message
+            : CATEGORY_TREE_ADMIN_PAGE_UI.LOAD_ERROR,
         );
       }
       return undefined;
@@ -168,14 +178,17 @@ export const useCategoryTreeAdminPage = () => {
           parentId: String(editDraft.parentId ?? "").trim() || null,
           isLeaf: editDraft.isLeaf === true,
           searchKeywords: parseKeywordsCsv(String(editDraft.keywordsCsv ?? "")),
-          legacyProductCategory: String(editDraft.legacyProductCategory ?? "").trim() || null,
+          legacyProductCategory:
+            String(editDraft.legacyProductCategory ?? "").trim() || null,
         },
       });
 
       if (isCategoryStructureChanged(row, editDraft)) {
         await reloadRows({ silent: true });
       } else {
-        updateRows((prev) => prev.map((item) => (item._id === categoryId ? updated : item)));
+        updateRows((prev) =>
+          prev.map((item) => (item._id === categoryId ? updated : item)),
+        );
       }
       cancelEdit();
     } catch (error) {
@@ -199,7 +212,9 @@ export const useCategoryTreeAdminPage = () => {
   );
 
   const invalidateCatalogCategorySurfaces = useCallback(() => {
-    void queryClient.invalidateQueries({ queryKey: [...categoryTreeQueryKeys.all, "roots"] });
+    void queryClient.invalidateQueries({
+      queryKey: [...categoryTreeQueryKeys.all, "roots"],
+    });
     void queryClient.invalidateQueries({ queryKey: categoryTreeQueryKeys.all });
     void queryClient.invalidateQueries({ queryKey: categoryDisplayQueryKeys.all });
   }, [queryClient]);

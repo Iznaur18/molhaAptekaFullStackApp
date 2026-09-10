@@ -17,8 +17,7 @@ const BCRYPT_ROUNDS = 10;
  * Пароль без символов, которые 1С экранирует в строке подключения
  * (`:` разделяет пару в Basic, кавычки ломают ввод в форме узла обмена).
  */
-const PASSWORD_ALPHABET =
-  "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const PASSWORD_ALPHABET = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 /** @returns {string} */
 export function generateOneCExchangeLogin() {
@@ -54,10 +53,7 @@ export async function regenerateOneCExchangeCredentials(sellerId) {
   // без нужды значит заставлять продавца править настройки во всех базах.
   const login = existingLogin || generateOneCExchangeLogin();
   const password = generateOneCExchangePassword();
-  const passwordHash = await bcrypt.hash(
-    password,
-    await bcrypt.genSalt(BCRYPT_ROUNDS),
-  );
+  const passwordHash = await bcrypt.hash(password, await bcrypt.genSalt(BCRYPT_ROUNDS));
 
   await UserModel.updateOne(
     { _id: sellerId },
@@ -117,7 +113,9 @@ export async function verifyOneCExchangeCredentials({ login, password }) {
   const user = await UserModel.findOne({
     "oneCIntegration.exchange.login": normalizedLogin,
   })
-    .select("_id oneCIntegration.enabled oneCIntegration.channel oneCIntegration.exchange.passwordHash")
+    .select(
+      "_id oneCIntegration.enabled oneCIntegration.channel oneCIntegration.exchange.passwordHash",
+    )
     .lean();
 
   const passwordHash =

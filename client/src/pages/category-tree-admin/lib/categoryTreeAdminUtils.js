@@ -127,9 +127,7 @@ export const findSiblingLeafForReassign = (row, rows) => {
 
   const siblings = rows.filter(
     (item) =>
-      item._id !== row._id &&
-      item.parentId === row.parentId &&
-      item.isLeaf === true,
+      item._id !== row._id && item.parentId === row.parentId && item.isLeaf === true,
   );
   if (siblings.length === 0) {
     return null;

@@ -2,7 +2,10 @@ import { useMemo } from "react";
 
 import { buildCatalogSubcategoryPickerTiles } from "../lib/buildCatalogSubcategoryPickerTiles.js";
 import { useProductCategoryChildrenQuery } from "../../product-category-tree/model/useProductCategoryChildrenQuery.js";
-import { PRODUCT_CATEGORY_DISPLAY_UI, PRODUCT_CATEGORY_TREE_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  PRODUCT_CATEGORY_DISPLAY_UI,
+  PRODUCT_CATEGORY_TREE_UI,
+} from "../../../shared/config/appUiCopy.js";
 import { CatalogCategoryTilesGrid } from "./CatalogCategoryTilesGrid.jsx";
 import { CatalogCategoryTilesGridSkeleton } from "./CatalogCategoryTilesGridSkeleton.jsx";
 
@@ -37,13 +40,22 @@ export function CatalogSubcategoryPicker({
   onEditCategoryClick,
 }) {
   const activeParent = trail[trail.length - 1];
-  const { data: categories = [], isLoading, isError, error } = useProductCategoryChildrenQuery({
+  const {
+    data: categories = [],
+    isLoading,
+    isError,
+    error,
+  } = useProductCategoryChildrenQuery({
     parentId: activeParent.id,
     enabled: Boolean(activeParent?.id),
   });
 
   const queryErrorMessage =
-    error instanceof Error ? error.message : isError ? PRODUCT_CATEGORY_TREE_UI.LOAD_ERROR : "";
+    error instanceof Error
+      ? error.message
+      : isError
+        ? PRODUCT_CATEGORY_TREE_UI.LOAD_ERROR
+        : "";
   const errorMessage = loadError ?? queryErrorMessage;
 
   const tiles = useMemo(() => {

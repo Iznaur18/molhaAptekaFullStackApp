@@ -7,7 +7,10 @@ import { createTestQueryClient } from "./createTestQueryClient.js";
  * @param {import('react').ReactElement} ui
  * @param {{ queryClient?: import('@tanstack/react-query').QueryClient }} [options]
  */
-export function renderWithProviders(ui, { queryClient = createTestQueryClient() } = {}) {
+export function renderWithProviders(
+  ui,
+  { queryClient = createTestQueryClient() } = {},
+) {
   function Wrapper({ children }) {
     return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
   }

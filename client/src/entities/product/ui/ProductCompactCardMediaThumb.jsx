@@ -29,9 +29,7 @@ export function ProductCompactCardMediaThumb({
 
   const showPreviousSlide = (event) => {
     event.stopPropagation();
-    cardMedia.setCardSlideIndex(
-      (index) => (index - 1 + slideCount) % slideCount,
-    );
+    cardMedia.setCardSlideIndex((index) => (index - 1 + slideCount) % slideCount);
   };
 
   const showNextSlide = (event) => {

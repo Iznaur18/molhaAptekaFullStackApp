@@ -11,7 +11,9 @@ export const resolveProductImageUrl = (product: unknown): string => {
   }
 
   const source = product as ProductImageSource;
-  const fromArray = Array.isArray(source.productImageUrls) ? source.productImageUrls : [];
+  const fromArray = Array.isArray(source.productImageUrls)
+    ? source.productImageUrls
+    : [];
   for (const raw of fromArray) {
     const url = resolveUploadedMediaUrl(String(raw ?? ""));
     if (url) {

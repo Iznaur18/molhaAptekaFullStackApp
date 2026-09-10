@@ -9,7 +9,10 @@ import {
 
 test("hasProductDescriptionContent ignores blank description", () => {
   assert.equal(hasProductDescriptionContent({ productDescription: "   " }), false);
-  assert.equal(hasProductDescriptionContent({ productDescription: "Новый компьютер" }), true);
+  assert.equal(
+    hasProductDescriptionContent({ productDescription: "Новый компьютер" }),
+    true,
+  );
 });
 
 test("getProductNonEmptyCharacteristics filters incomplete rows", () => {

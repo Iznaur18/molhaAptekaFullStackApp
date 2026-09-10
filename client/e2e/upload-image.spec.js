@@ -35,5 +35,7 @@ test("auth user: upload image returns /uploads/ url", async ({ page, request }) 
   const uploadedUrl = String(uploadBody?.data?.url ?? "");
 
   expect(uploadedUrl).toMatch(/\/uploads\/.+/);
-  await expect(dialog.getByLabel("Аватар (ссылка или файл)")).toHaveValue(/\/uploads\/.+/);
+  await expect(dialog.getByLabel("Аватар (ссылка или файл)")).toHaveValue(
+    /\/uploads\/.+/,
+  );
 });

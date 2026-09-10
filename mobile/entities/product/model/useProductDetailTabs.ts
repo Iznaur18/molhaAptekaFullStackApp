@@ -31,13 +31,20 @@ type UseProductDetailTabsOptions = {
   currentUserId: string | null;
 };
 
-export const useProductDetailTabs = ({ product, currentUserId }: UseProductDetailTabsOptions) => {
+export const useProductDetailTabs = ({
+  product,
+  currentUserId,
+}: UseProductDetailTabsOptions) => {
   const [activeTab, setActiveTab] = useState<ProductDetailTabId>("details");
 
-  const isOwnProduct = product != null && isCurrentUserProductSeller(product, currentUserId);
+  const isOwnProduct =
+    product != null && isCurrentUserProductSeller(product, currentUserId);
   const auctionUi = useMemo(() => resolveAuctionUiState(product), [product]);
   const installmentActive = product?.productInstallmentEnabled === true;
-  const similarFilters = useMemo(() => resolveProductSimilarCatalogFilters(product), [product]);
+  const similarFilters = useMemo(
+    () => resolveProductSimilarCatalogFilters(product),
+    [product],
+  );
 
   const showReviewsTab =
     product?._id != null &&
@@ -53,10 +60,11 @@ export const useProductDetailTabs = ({ product, currentUserId }: UseProductDetai
   const showCompareTab = product?._id != null;
   const showAuctionTab =
     product?._id != null &&
-    (isOwnProduct ? auctionUi.showSellerAuctionTab : product.productAuctionEnabled === true);
+    (isOwnProduct
+      ? auctionUi.showSellerAuctionTab
+      : product.productAuctionEnabled === true);
   const showInstallmentTab =
-    product?._id != null &&
-    (isOwnProduct ? installmentActive : installmentActive);
+    product?._id != null && (isOwnProduct ? installmentActive : installmentActive);
   const showTabs =
     showReviewsTab ||
     showQaTab ||
@@ -105,7 +113,9 @@ export const useProductDetailTabs = ({ product, currentUserId }: UseProductDetai
   ]);
 
   const topStatFieldKeys = useMemo(() => {
-    const keys = PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS.filter((key) => key !== "productPrice");
+    const keys = PRODUCT_DETAILS_MODAL_TOP_ROW_FIELD_KEYS.filter(
+      (key) => key !== "productPrice",
+    );
     if (isOwnProduct) {
       return keys.filter((key) => key !== "productWishlistCount");
     }

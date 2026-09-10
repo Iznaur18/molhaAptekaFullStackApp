@@ -19,6 +19,8 @@ export const fetchCuratedProductListsAdmin = async () => {
     }
     return data.data.lists as CuratedListAdminRow[];
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, POPULAR_PRODUCTS_ADMIN_PAGE_UI.LOAD_ERROR));
+    throw new Error(
+      formatApiErrorMessage(error, POPULAR_PRODUCTS_ADMIN_PAGE_UI.LOAD_ERROR),
+    );
   }
 };

@@ -71,7 +71,10 @@ export const SiteHeaderBannerAdvertisingSection = ({
     [form],
   );
 
-  const updateField = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) => {
+  const updateField = <K extends keyof typeof form>(
+    key: K,
+    value: (typeof form)[K],
+  ) => {
     setActionError("");
     setFeedback("");
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -122,7 +125,9 @@ export const SiteHeaderBannerAdvertisingSection = ({
   if (campaignQuery.isPending) {
     return (
       <View style={[styles.card, styles.cardBanner]}>
-        <Text style={styles.cardTitle}>{SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.CARD_TITLE}</Text>
+        <Text style={styles.cardTitle}>
+          {SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.CARD_TITLE}
+        </Text>
         <Text style={styles.state}>{SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.LOADING}</Text>
       </View>
     );
@@ -131,7 +136,9 @@ export const SiteHeaderBannerAdvertisingSection = ({
   if (campaignQuery.isError) {
     return (
       <View style={[styles.card, styles.cardBanner]}>
-        <Text style={styles.cardTitle}>{SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.CARD_TITLE}</Text>
+        <Text style={styles.cardTitle}>
+          {SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.CARD_TITLE}
+        </Text>
         <Text style={styles.error} accessibilityRole="alert">
           {formatApiErrorMessage(
             campaignQuery.error,
@@ -145,7 +152,9 @@ export const SiteHeaderBannerAdvertisingSection = ({
   return (
     <View style={[styles.card, styles.cardBanner]}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>{SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.CARD_TITLE}</Text>
+        <Text style={styles.cardTitle}>
+          {SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.CARD_TITLE}
+        </Text>
         <Text style={styles.cardBadge}>{DURATION_BADGE}</Text>
       </View>
 
@@ -221,7 +230,9 @@ export const SiteHeaderBannerAdvertisingSection = ({
             label={SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.LABEL_REGION}
             onChange={(regionCode) => updateField("regionCode", regionCode)}
           />
-          <Text style={styles.timingHint}>{SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.HINT_REGION}</Text>
+          <Text style={styles.timingHint}>
+            {SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.HINT_REGION}
+          </Text>
           {showPreview && previewSlides.length > 0 ? (
             <SiteHeaderBannerCarousel slides={previewSlides} />
           ) : null}
@@ -232,7 +243,10 @@ export const SiteHeaderBannerAdvertisingSection = ({
           ) : null}
           <View style={styles.actions}>
             <Pressable
-              style={[styles.secondaryButton, isSubmitting && styles.secondaryButtonDisabled]}
+              style={[
+                styles.secondaryButton,
+                isSubmitting && styles.secondaryButtonDisabled,
+              ]}
               onPress={() => {
                 const validationError = validateSiteHeaderBannerCampaignForm(form);
                 if (validationError) {
@@ -250,7 +264,8 @@ export const SiteHeaderBannerAdvertisingSection = ({
             <Pressable
               style={[
                 styles.primaryButton,
-                (isSubmitting || loyaltyBalance < pricePoints) && styles.primaryButtonDisabled,
+                (isSubmitting || loyaltyBalance < pricePoints) &&
+                  styles.primaryButtonDisabled,
               ]}
               onPress={() => {
                 void handleSubmit();

@@ -32,19 +32,13 @@ const categoryLabelRuFieldSchema = z
   .max(PRODUCT_CATEGORY_LABEL_RU_MAX_LENGTH);
 
 const searchKeywordsFieldSchema = z
-  .array(
-    z.string().trim().max(PRODUCT_CATEGORY_SEARCH_KEYWORD_MAX_LENGTH),
-  )
+  .array(z.string().trim().max(PRODUCT_CATEGORY_SEARCH_KEYWORD_MAX_LENGTH))
   .max(PRODUCT_CATEGORY_SEARCH_KEYWORDS_MAX_COUNT)
   .optional();
 
 const defaultCharacteristicKeysFieldSchema = z
   .array(
-    z
-      .string()
-      .trim()
-      .min(1)
-      .max(PRODUCT_CATEGORY_DEFAULT_CHARACTERISTIC_KEY_MAX_CHARS),
+    z.string().trim().min(1).max(PRODUCT_CATEGORY_DEFAULT_CHARACTERISTIC_KEY_MAX_CHARS),
   )
   .max(PRODUCT_CHARACTERISTICS_MAX_ITEMS)
   .optional();

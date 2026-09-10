@@ -34,9 +34,7 @@ export const applyPromoPercentToRetailPrice = (
 /**
  * Опт и промо независимо от розницы; итог — меньшая цена за единицу.
  */
-export const resolveProductUnitPriceWithPromo = (
-  input: ProductPromoLike,
-): number => {
+export const resolveProductUnitPriceWithPromo = (input: ProductPromoLike): number => {
   const retail = toNonNegInt(input.productPrice);
   const baseOrWholesale = resolveProductUnitPrice(input);
   const percent = toPercent(input.promoDiscountPercent);

@@ -73,7 +73,12 @@
   background: linear-gradient(
     180deg,
     var(--iz-color-action) 0%,
-    color-mix(in srgb, var(--iz-color-action) 55%, var(--iz-color-accent, var(--iz-color-primary))) 100%
+    color-mix(
+        in srgb,
+        var(--iz-color-action) 55%,
+        var(--iz-color-accent, var(--iz-color-primary))
+      )
+      100%
   );
 }
 
@@ -132,7 +137,10 @@
   padding: 14px 16px;
   border: 1px solid color-mix(in srgb, var(--iz-color-ink) 8%, transparent);
   border-radius: 16px;
-  background: var(--iz-color-surface-elevated, var(--iz-color-surface, var(--iz-color-bg)));
+  background: var(
+    --iz-color-surface-elevated,
+    var(--iz-color-surface, var(--iz-color-bg))
+  );
   box-sizing: border-box;
 }
 

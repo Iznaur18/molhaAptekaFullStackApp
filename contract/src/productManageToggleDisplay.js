@@ -27,7 +27,9 @@ export const adminManageToggleDisplayPatchBodySchema = z.object({
     .optional()
     .refine(
       (value) =>
-        value === undefined || value === null || value.length <= ADMIN_DISPLAY_IMAGE_URL_MAX_LENGTH,
+        value === undefined ||
+        value === null ||
+        value.length <= ADMIN_DISPLAY_IMAGE_URL_MAX_LENGTH,
       "imageUrl слишком длинный",
     ),
   resetImageUrl: z.boolean().optional(),

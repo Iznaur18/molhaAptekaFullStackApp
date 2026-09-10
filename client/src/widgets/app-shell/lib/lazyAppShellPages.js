@@ -26,7 +26,8 @@ export const LazyProductReportsPage = lazyNamedExport(
 );
 
 export const LazyDataConfirmationRequestsPage = lazyNamedExport(
-  () => import("../../../pages/data-confirmation-requests/ui/DataConfirmationRequestsPage.jsx"),
+  () =>
+    import("../../../pages/data-confirmation-requests/ui/DataConfirmationRequestsPage.jsx"),
   "DataConfirmationRequestsPage",
 );
 
@@ -107,9 +108,7 @@ export const LazyStaffAuditLogAdminPage = lazyNamedExport(
 
 export const LazyStaffBroadcastNotificationsAdminPage = lazyNamedExport(
   () =>
-    import(
-      "../../../pages/staff-broadcast-notifications-admin/ui/StaffBroadcastNotificationsAdminPage.jsx"
-    ),
+    import("../../../pages/staff-broadcast-notifications-admin/ui/StaffBroadcastNotificationsAdminPage.jsx"),
   "StaffBroadcastNotificationsAdminPage",
 );
 
@@ -129,7 +128,8 @@ export const LazyAppIntroAdminPage = lazyNamedExport(
 );
 
 export const LazySiteHeaderBannerAdminPage = lazyNamedExport(
-  () => import("../../../pages/site-header-banner-admin/ui/SiteHeaderBannerAdminPage.jsx"),
+  () =>
+    import("../../../pages/site-header-banner-admin/ui/SiteHeaderBannerAdminPage.jsx"),
   "SiteHeaderBannerAdminPage",
 );
 

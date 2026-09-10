@@ -1,7 +1,8 @@
 /**
  * @param {string | null | undefined} value
  */
-export const isExternalHttpUrl = (value) => /^https?:\/\//i.test(String(value ?? "").trim());
+export const isExternalHttpUrl = (value) =>
+  /^https?:\/\//i.test(String(value ?? "").trim());
 
 /**
  * Bare host → https://…; relative path without leading / → /…

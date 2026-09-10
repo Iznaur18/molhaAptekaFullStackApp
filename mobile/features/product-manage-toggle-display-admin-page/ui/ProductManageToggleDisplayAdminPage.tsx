@@ -32,7 +32,12 @@ export const ProductManageToggleDisplayAdminPage = () => {
 
   if (phase === "loading") {
     return (
-      <View style={[{ flex: 1, justifyContent: "center", padding: 16 }, centeredContentStyle]}>
+      <View
+        style={[
+          { flex: 1, justifyContent: "center", padding: 16 },
+          centeredContentStyle,
+        ]}
+      >
         <Text style={{ color: theme.colors.textMuted }}>
           {PRODUCT_MANAGE_TOGGLE_DISPLAY_ADMIN_PAGE_UI.LOADING}
         </Text>

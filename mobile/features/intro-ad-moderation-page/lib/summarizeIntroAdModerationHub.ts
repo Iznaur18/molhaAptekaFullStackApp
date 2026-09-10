@@ -40,6 +40,8 @@ export const summarizeIntroAdModerationHub = (
     personalPendingCount: personalPending.length,
     rafflePendingCount,
     attentionCount,
-    staleCount: allPending.filter((campaign) => campaignModerationIsStale(campaign, nowMs)).length,
+    staleCount: allPending.filter((campaign) =>
+      campaignModerationIsStale(campaign, nowMs),
+    ).length,
   };
 };

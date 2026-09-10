@@ -90,22 +90,22 @@ npm run start:dev
 1. Открой на Samsung **iziBuy (dev build)** — не Expo Go.
 2. Отсканируй QR из терминала или введи URL Metro вручную.
 
-| Команда | Для чего |
-| -------- | -------- |
-| `npm start` | Metro + web (`w`) |
+| Команда             | Для чего                                 |
+| ------------------- | ---------------------------------------- |
+| `npm start`         | Metro + web (`w`)                        |
 | `npm run start:dev` | Metro для **dev client** + QR на телефон |
-| `npm run web` | Сразу в браузер |
+| `npm run web`       | Сразу в браузер                          |
 
 ---
 
 ## Если не работает
 
-| Симптом | Что проверить |
-| -------- | --------------- |
-| API недоступен с телефона | `.env` → LAN IP; server запущен; та же Wi‑Fi |
-| QR не подключается | `npm run start:dev`, не `npm start`; открыт dev build, не Expo Go |
-| Завис EAS upload | VPN off; Node 20 LTS; подождать >5 мин после keystore |
-| `adb` не найден | `%LOCALAPPDATA%\Android\Sdk\platform-tools` в PATH |
+| Симптом                   | Что проверить                                                     |
+| ------------------------- | ----------------------------------------------------------------- |
+| API недоступен с телефона | `.env` → LAN IP; server запущен; та же Wi‑Fi                      |
+| QR не подключается        | `npm run start:dev`, не `npm start`; открыт dev build, не Expo Go |
+| Завис EAS upload          | VPN off; Node 20 LTS; подождать >5 мин после keystore             |
+| `adb` не найден           | `%LOCALAPPDATA%\Android\Sdk\platform-tools` в PATH                |
 
 ---
 

@@ -62,7 +62,10 @@ export function AdminOrdersPage() {
     setPendingOrderId(orderId);
     setStatusError((prev) => ({ ...prev, [orderId]: "" }));
     try {
-      const updated = await updateStatusMutation.mutateAsync({ orderId, status: nextStatus });
+      const updated = await updateStatusMutation.mutateAsync({
+        orderId,
+        status: nextStatus,
+      });
       queryClient.setQueryData(orderQueryKeys.admin(queryParams), (old) => {
         if (!old?.orders) {
           return old;
@@ -175,7 +178,10 @@ function AdminOrdersBody({
 
   if (phase === "error") {
     return (
-      <p className="admin-orders-page__state admin-orders-page__state_error" role="alert">
+      <p
+        className="admin-orders-page__state admin-orders-page__state_error"
+        role="alert"
+      >
         {error}
       </p>
     );

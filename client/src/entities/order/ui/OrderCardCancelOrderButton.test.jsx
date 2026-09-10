@@ -2,10 +2,7 @@ import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
-import {
-  FORMAT_BOOLEAN_RU,
-  ORDER_CARD_UI,
-} from "../../../shared/config/appUiCopy.js";
+import { FORMAT_BOOLEAN_RU, ORDER_CARD_UI } from "../../../shared/config/appUiCopy.js";
 import { renderWithProviders } from "../../../test/renderWithProviders.jsx";
 import { SHIPMENT_ADVANCE_BUTTON_LABEL_RU } from "../model/constants.js";
 

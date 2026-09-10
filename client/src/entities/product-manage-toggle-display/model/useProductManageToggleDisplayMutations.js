@@ -7,7 +7,8 @@ export function useProductManageToggleDisplayMutations() {
   const queryClient = useQueryClient();
 
   const patchToggleMutation = useMutation({
-    mutationFn: ({ toggleKey, body }) => patchProductManageToggleDisplay(toggleKey, body),
+    mutationFn: ({ toggleKey, body }) =>
+      patchProductManageToggleDisplay(toggleKey, body),
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: productManageToggleDisplayQueryKeys.all,

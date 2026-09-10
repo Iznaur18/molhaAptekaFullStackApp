@@ -7,7 +7,11 @@ export const ProductCardModerationPendingOverlay = () => {
   const styles = useProductCardMediaStyles();
 
   return (
-    <View style={styles.moderationPendingOverlay} pointerEvents="none" accessibilityRole="text">
+    <View
+      style={styles.moderationPendingOverlay}
+      pointerEvents="none"
+      accessibilityRole="text"
+    >
       <Text style={styles.moderationPendingOverlayText}>
         {PRODUCT_MODERATION_PAGE_UI.BADGE_PENDING}
       </Text>

@@ -61,7 +61,11 @@ const RAFFLE_PATH_RE = /\/raffle\/([^/?#]+)/i;
 const SELLER_PATH_RE = /\/seller\/([^/?#]+)/i;
 const USER_PROFILE_PATH_RE = /^\/user\/([^/?#]+)$/i;
 const HUB_PATH_RE = /\/hub\/([^/?#]+)/i;
-const RESERVED_USER_PATH_SEGMENTS = new Set(["search", "me", "data-confirmation-requests"]);
+const RESERVED_USER_PATH_SEGMENTS = new Set([
+  "search",
+  "me",
+  "data-confirmation-requests",
+]);
 
 const normalizePath = (rawPath) => {
   const trimmed = rawPath.trim();
@@ -91,7 +95,8 @@ const matchNamedRoute = (pathname) => {
   if (pathname === "/orders" || pathname.startsWith("/orders/")) return "/orders";
   if (pathname === "/notifications" || pathname.startsWith("/notifications/"))
     return "/notifications";
-  if (pathname === "/catalog" || pathname === "/catalog-browser") return "/catalog-browser";
+  if (pathname === "/catalog" || pathname === "/catalog-browser")
+    return "/catalog-browser";
   if (pathname === "/user-list" || pathname === "/users") return "/users";
   if (pathname === "/login") return "/(auth)/login";
   if (pathname === "/" || pathname === "/(tabs)") return "/(tabs)";
@@ -118,9 +123,7 @@ const parseAppDeepLink = (url) => {
       return matchNamedRoute(normalizePath(parsed.pathname));
     }
   } catch {
-    const normalized = normalizePath(
-      url.replace(/^(?:gitorg|izibuy):\/\//i, "/"),
-    );
+    const normalized = normalizePath(url.replace(/^(?:gitorg|izibuy):\/\//i, "/"));
     return matchNamedRoute(normalized);
   }
   return null;
@@ -163,7 +166,11 @@ const UPLOAD_SOURCE_CHECKS = [
   },
   {
     file: "entities/upload/model/constants.ts",
-    mustInclude: ["@molha/api-contract", "UPLOAD_IMAGE_MAX_BYTES", "UPLOAD_IMAGE_MIME_TYPES"],
+    mustInclude: [
+      "@molha/api-contract",
+      "UPLOAD_IMAGE_MAX_BYTES",
+      "UPLOAD_IMAGE_MIME_TYPES",
+    ],
   },
   {
     file: "shared/lib/index.ts",
@@ -198,7 +205,13 @@ const BUYER_CRITICAL_ROUTES = [
 const HUB_TAB_BAR_CHECKS = [
   {
     file: "app/(tabs)/_layout.tsx",
-    mustInclude: ['name="hub/[section]"', 'name="orders"', 'name="users"', 'name="me"', "href: null"],
+    mustInclude: [
+      'name="hub/[section]"',
+      'name="orders"',
+      'name="users"',
+      'name="me"',
+      "href: null",
+    ],
   },
   {
     file: "shared/ui/MobileBottomTabBar.tsx",
@@ -220,7 +233,10 @@ const HUB_TAB_BAR_CHECKS = [
   },
   {
     file: "shared/lib/isProfileTabBarRoute.ts",
-    mustInclude: ['normalized.startsWith("/hub/")', 'normalized.startsWith("/orders/")'],
+    mustInclude: [
+      'normalized.startsWith("/hub/")',
+      'normalized.startsWith("/orders/")',
+    ],
   },
   {
     file: "features/profile-hub/ui/HubSectionContent.tsx",
@@ -228,7 +244,7 @@ const HUB_TAB_BAR_CHECKS = [
   },
   {
     file: "features/profile-hub/model/profileSections.ts",
-    mustNotInclude: ["[PROFILE_SECTION_MY_ORDERS]: \"/orders\""],
+    mustNotInclude: ['[PROFILE_SECTION_MY_ORDERS]: "/orders"'],
   },
 ];
 
@@ -311,7 +327,7 @@ const SCREEN_LAYOUT_CHECKS = [
   },
   {
     file: "shared/theme/raffleFeaturedStyles.ts",
-    mustInclude: ["maxWidth: \"100%\"", "overflow: \"hidden\""],
+    mustInclude: ['maxWidth: "100%"', 'overflow: "hidden"'],
   },
 ];
 
@@ -402,12 +418,19 @@ const PRODUCT_PREVIEW_VIDEO_CHECKS = [
   },
   {
     file: "shared/theme/catalogProductStyles.ts",
-    mustInclude: ["PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO", "aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO"],
+    mustInclude: [
+      "PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO",
+      "aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO",
+    ],
   },
   {
     file: "entities/product/ui/ProductMediaGallery.tsx",
     mustInclude: ["styles.detailHero"],
-    mustNotInclude: ["useWindowDimensions", "minHeight: detailHeroMinHeight", "DETAIL_HERO_MIN_HEIGHT"],
+    mustNotInclude: [
+      "useWindowDimensions",
+      "minHeight: detailHeroMinHeight",
+      "DETAIL_HERO_MIN_HEIGHT",
+    ],
   },
 ];
 
@@ -545,9 +568,17 @@ const run = () => {
 
   let hubTabBarFailed = 0;
   for (const check of HUB_TAB_BAR_CHECKS) {
-    hubTabBarFailed += assertSourceContains(check.file, check.mustInclude ?? [], "profile tab bar");
+    hubTabBarFailed += assertSourceContains(
+      check.file,
+      check.mustInclude ?? [],
+      "profile tab bar",
+    );
     if (check.mustNotInclude) {
-      hubTabBarFailed += assertSourceExcludes(check.file, check.mustNotInclude, "profile tab bar");
+      hubTabBarFailed += assertSourceExcludes(
+        check.file,
+        check.mustNotInclude,
+        "profile tab bar",
+      );
     }
   }
   hubTabBarFailed += assertSourceExcludes(
@@ -566,29 +597,34 @@ const run = () => {
   for (const [pathname, expected] of PROFILE_TAB_BAR_ROUTE_CASES) {
     const actual = isProfileTabBarRoute(pathname);
     if (actual !== expected) {
-      console.error(`✗ isProfileTabBarRoute(${pathname}) expected ${expected}, got ${actual}`);
+      console.error(
+        `✗ isProfileTabBarRoute(${pathname}) expected ${expected}, got ${actual}`,
+      );
       hubTabBarFailed += 1;
     }
   }
   for (const [pathname, expected] of HOME_TAB_BAR_ROUTE_CASES) {
     const actual = isHomeTabBarRoute(pathname);
     if (actual !== expected) {
-      console.error(`✗ isHomeTabBarRoute(${pathname}) expected ${expected}, got ${actual}`);
+      console.error(
+        `✗ isHomeTabBarRoute(${pathname}) expected ${expected}, got ${actual}`,
+      );
       hubTabBarFailed += 1;
     }
   }
   if (hubTabBarFailed > 0) {
     failed += hubTabBarFailed;
   } else {
-    console.log(`✓ profile tab bar wiring (${HUB_TAB_BAR_CHECKS.length} checks + route helper)`);
+    console.log(
+      `✓ profile tab bar wiring (${HUB_TAB_BAR_CHECKS.length} checks + route helper)`,
+    );
   }
 
   let profileNavChromeFailed = 0;
   for (const check of PROFILE_NAV_CHROME_CHECKS) {
-    const resolved =
-      check.file.startsWith("../")
-        ? path.join(MOBILE_ROOT, check.file)
-        : path.join(MOBILE_ROOT, check.file);
+    const resolved = check.file.startsWith("../")
+      ? path.join(MOBILE_ROOT, check.file)
+      : path.join(MOBILE_ROOT, check.file);
     if (!fs.existsSync(resolved)) {
       console.error(`✗ missing profile nav chrome file: ${check.file}`);
       profileNavChromeFailed += 1;
@@ -603,7 +639,9 @@ const run = () => {
   if (profileNavChromeFailed > 0) {
     failed += profileNavChromeFailed;
   } else {
-    console.log(`✓ profile nav chrome (${PROFILE_NAV_CHROME_CHECKS.length} wiring files)`);
+    console.log(
+      `✓ profile nav chrome (${PROFILE_NAV_CHROME_CHECKS.length} wiring files)`,
+    );
   }
 
   let screenLayoutFailed = 0;
@@ -613,9 +651,17 @@ const run = () => {
       screenLayoutFailed += 1;
       continue;
     }
-    screenLayoutFailed += assertSourceContains(check.file, check.mustInclude, "screen layout");
+    screenLayoutFailed += assertSourceContains(
+      check.file,
+      check.mustInclude,
+      "screen layout",
+    );
     if (check.mustNotInclude) {
-      screenLayoutFailed += assertSourceExcludes(check.file, check.mustNotInclude, "screen layout");
+      screenLayoutFailed += assertSourceExcludes(
+        check.file,
+        check.mustNotInclude,
+        "screen layout",
+      );
     }
   }
   if (screenLayoutFailed > 0) {
@@ -642,14 +688,18 @@ const run = () => {
   for (const [src, expectedMime] of PREVIEW_VIDEO_MIME_CASES) {
     const actualMime = resolvePreviewVideoMimeType(src);
     if (actualMime !== expectedMime) {
-      console.error(`✗ resolvePreviewVideoMimeType(${src}) expected ${expectedMime}, got ${actualMime}`);
+      console.error(
+        `✗ resolvePreviewVideoMimeType(${src}) expected ${expectedMime}, got ${actualMime}`,
+      );
       productVideoFailed += 1;
     }
   }
   if (productVideoFailed > 0) {
     failed += productVideoFailed;
   } else {
-    console.log(`✓ product preview video (${PRODUCT_PREVIEW_VIDEO_CHECKS.length} checks + mime helper)`);
+    console.log(
+      `✓ product preview video (${PRODUCT_PREVIEW_VIDEO_CHECKS.length} checks + mime helper)`,
+    );
   }
 
   let storyMediaFailed = 0;
@@ -686,10 +736,13 @@ const run = () => {
     console.error(`✗ HubSectionContent missing cases: ${missingHub.join(", ")}`);
     failed += missingHub.length;
   } else {
-    console.log(`✓ hub sections wired (${sectionIds.length - HUB_EXTERNAL_SECTIONS.size})`);
+    console.log(
+      `✓ hub sections wired (${sectionIds.length - HUB_EXTERNAL_SECTIONS.size})`,
+    );
   }
 
-  const staffPage = "features/product-promotions-staff-page/ui/ProductPromotionsStaffPage.tsx";
+  const staffPage =
+    "features/product-promotions-staff-page/ui/ProductPromotionsStaffPage.tsx";
   if (!fileExists(staffPage)) {
     console.error(`✗ missing ${staffPage}`);
     failed += 1;
@@ -743,15 +796,16 @@ const run = () => {
   if (uploadFailed > 0) {
     failed += uploadFailed;
   } else {
-    console.log(`✓ upload stack (${UPLOAD_SOURCE_CHECKS.length} files, no dead lib copies)`);
+    console.log(
+      `✓ upload stack (${UPLOAD_SOURCE_CHECKS.length} files, no dead lib copies)`,
+    );
   }
 
   let staffWebFailed = 0;
   for (const relativePath of STAFF_WEB_FILES) {
-    const resolved =
-      relativePath.startsWith("../")
-        ? path.join(MOBILE_ROOT, relativePath)
-        : path.join(MOBILE_ROOT, relativePath);
+    const resolved = relativePath.startsWith("../")
+      ? path.join(MOBILE_ROOT, relativePath)
+      : path.join(MOBILE_ROOT, relativePath);
     if (!fs.existsSync(resolved)) {
       console.error(`✗ missing staff-web file: ${relativePath}`);
       staffWebFailed += 1;
@@ -763,7 +817,11 @@ const run = () => {
     console.error("✗ staff web helper must use isProfileStaffWebOnlySection");
     staffWebFailed += 1;
   }
-  if (!read("features/profile-hub/ui/ProfileHubMenu.tsx").includes("openProfileStaffWebSection")) {
+  if (
+    !read("features/profile-hub/ui/ProfileHubMenu.tsx").includes(
+      "openProfileStaffWebSection",
+    )
+  ) {
     console.error("✗ ProfileHubMenu must call openProfileStaffWebSection");
     staffWebFailed += 1;
   }
@@ -790,8 +848,14 @@ const run = () => {
     console.error("✗ PROFILE_STAFF_IN_APP_SECTION_IDS must include all staff sections");
     staffWebFailed += 1;
   }
-  if (!read("features/profile-hub/ui/ProfileHubMenu.tsx").includes("resolveProfileSectionRoute")) {
-    console.error("✗ ProfileHubMenu must route in-app sections via resolveProfileSectionRoute");
+  if (
+    !read("features/profile-hub/ui/ProfileHubMenu.tsx").includes(
+      "resolveProfileSectionRoute",
+    )
+  ) {
+    console.error(
+      "✗ ProfileHubMenu must route in-app sections via resolveProfileSectionRoute",
+    );
     staffWebFailed += 1;
   }
 
@@ -811,7 +875,9 @@ const run = () => {
     console.error("✗ missing admin edit user route: app/user/[id]/edit.tsx");
     buyerPathFailed += 1;
   }
-  const adminEditUserForm = read("features/admin-edit-user-page/model/useAdminEditUserForm.ts");
+  const adminEditUserForm = read(
+    "features/admin-edit-user-page/model/useAdminEditUserForm.ts",
+  );
   if (!adminEditUserForm.includes("router.back()")) {
     console.error("✗ admin edit user form must navigate back after successful save");
     buyerPathFailed += 1;
@@ -873,7 +939,9 @@ const run = () => {
   console.log("PASS — static WF-7.2");
   console.log("API smoke: npm run smoke:buyer-path (G.3, needs server + e2e seed)");
   console.log("Manual: Samsung smoke → docs/mobile-development.md § WF-7.2");
-  console.log("  adb shell am start -a android.intent.action.VIEW -d \"gitorg://product/<id>\"");
+  console.log(
+    '  adb shell am start -a android.intent.action.VIEW -d "gitorg://product/<id>"',
+  );
 };
 
 run();

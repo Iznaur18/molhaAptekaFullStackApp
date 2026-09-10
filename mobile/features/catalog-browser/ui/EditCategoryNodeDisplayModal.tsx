@@ -1,11 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
 
 import type { ProductCategoryDisplayFromApi } from "@/entities/product-category-display/lib/resolveProductCategoryDisplay";
 import { resolveProductCategoryNodeDisplay } from "@/entities/product-category-display/lib/resolveProductCategoryNodeDisplay";
@@ -42,7 +36,9 @@ export const EditCategoryNodeDisplayModal = ({
   const [errorMessage, setErrorMessage] = useState("");
   const [isImageFieldBusy, setIsImageFieldBusy] = useState(false);
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(categoryId);
-  const [activeFallbackLabel, setActiveFallbackLabel] = useState<string | null>(fallbackLabel);
+  const [activeFallbackLabel, setActiveFallbackLabel] = useState<string | null>(
+    fallbackLabel,
+  );
 
   useEffect(() => {
     if (categoryId) {
@@ -61,7 +57,11 @@ export const EditCategoryNodeDisplayModal = ({
       return null;
     }
 
-    return resolveProductCategoryNodeDisplay(activeCategoryId, activeFallbackLabel, displays);
+    return resolveProductCategoryNodeDisplay(
+      activeCategoryId,
+      activeFallbackLabel,
+      displays,
+    );
   }, [activeCategoryId, activeFallbackLabel, displays]);
 
   const syncFormFromResolved = useCallback(() => {
@@ -112,7 +112,9 @@ export const EditCategoryNodeDisplayModal = ({
       handleClose();
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : PRODUCT_CATEGORY_DISPLAY_UI.SAVE_FALLBACK,
+        error instanceof Error
+          ? error.message
+          : PRODUCT_CATEGORY_DISPLAY_UI.SAVE_FALLBACK,
       );
     }
   };
@@ -135,7 +137,9 @@ export const EditCategoryNodeDisplayModal = ({
       handleClose();
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : PRODUCT_CATEGORY_DISPLAY_UI.SAVE_FALLBACK,
+        error instanceof Error
+          ? error.message
+          : PRODUCT_CATEGORY_DISPLAY_UI.SAVE_FALLBACK,
       );
     }
   };
@@ -159,12 +163,16 @@ export const EditCategoryNodeDisplayModal = ({
             {PRODUCT_CATEGORY_DISPLAY_UI.EDIT_TITLE(resolved.label)}
           </Text>
 
-          <Text style={styles.fieldLabel}>{PRODUCT_CATEGORY_DISPLAY_UI.LABEL_FIELD}</Text>
+          <Text style={styles.fieldLabel}>
+            {PRODUCT_CATEGORY_DISPLAY_UI.LABEL_FIELD}
+          </Text>
           <TextInput
             style={styles.input}
             value={label}
             onChangeText={setLabel}
-            placeholder={PRODUCT_CATEGORY_DISPLAY_UI.LABEL_PLACEHOLDER(resolved.fallbackLabel)}
+            placeholder={PRODUCT_CATEGORY_DISPLAY_UI.LABEL_PLACEHOLDER(
+              resolved.fallbackLabel,
+            )}
             maxLength={120}
           />
           <Text style={styles.hint}>{PRODUCT_CATEGORY_DISPLAY_UI.LABEL_HINT}</Text>
@@ -204,7 +212,9 @@ export const EditCategoryNodeDisplayModal = ({
           </View>
 
           <Pressable onPress={handleClose} style={styles.closeLink}>
-            <Text style={styles.closeLinkText}>{PRODUCT_CATEGORY_DISPLAY_UI.CLOSE_ARIA}</Text>
+            <Text style={styles.closeLinkText}>
+              {PRODUCT_CATEGORY_DISPLAY_UI.CLOSE_ARIA}
+            </Text>
           </Pressable>
         </>
       ) : null}

@@ -145,7 +145,9 @@ export const registerBodySchema = z
   .object({
     email: z.string().email("Неверный email"),
     password: z.string().min(6, "Пароль должен быть не менее 6 символов"),
-    passwordConfirm: z.string({ required_error: "Повторите пароль" }).min(1, "Повторите пароль"),
+    passwordConfirm: z
+      .string({ required_error: "Повторите пароль" })
+      .min(1, "Повторите пароль"),
     userName: userNameFieldSchema,
     phoneNumber: ruPhoneOptionalFieldSchema,
     avatarUrl: z
@@ -160,7 +162,8 @@ export const registerBodySchema = z
       .union([z.string(), z.literal(""), z.null(), z.undefined()])
       .optional()
       .refine(
-        (value) => value == null || value === "" || !Number.isNaN(Date.parse(String(value))),
+        (value) =>
+          value == null || value === "" || !Number.isNaN(Date.parse(String(value))),
         "Неверная дата рождения",
       ),
     userGender: userGenderFieldSchema,
@@ -190,7 +193,9 @@ export const registerPhoneBodySchema = z
   .object({
     phoneNumber: ruPhoneRequiredFieldSchema,
     password: z.string().min(6, "Пароль должен быть не менее 6 символов"),
-    passwordConfirm: z.string({ required_error: "Повторите пароль" }).min(1, "Повторите пароль"),
+    passwordConfirm: z
+      .string({ required_error: "Повторите пароль" })
+      .min(1, "Повторите пароль"),
     userName: userNameFieldSchema,
     avatarUrl: z
       .string()
@@ -204,7 +209,8 @@ export const registerPhoneBodySchema = z
       .union([z.string(), z.literal(""), z.null(), z.undefined()])
       .optional()
       .refine(
-        (value) => value == null || value === "" || !Number.isNaN(Date.parse(String(value))),
+        (value) =>
+          value == null || value === "" || !Number.isNaN(Date.parse(String(value))),
         "Неверная дата рождения",
       ),
     userGender: userGenderFieldSchema,

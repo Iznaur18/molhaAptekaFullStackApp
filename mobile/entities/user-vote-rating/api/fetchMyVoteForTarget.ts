@@ -2,9 +2,13 @@ import { apiClient } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
-export const fetchMyVoteForTarget = async (targetUserId: string): Promise<number | null> => {
+export const fetchMyVoteForTarget = async (
+  targetUserId: string,
+): Promise<number | null> => {
   try {
-    const { data } = await apiClient.get(`/vote/me/${encodeURIComponent(targetUserId)}`);
+    const { data } = await apiClient.get(
+      `/vote/me/${encodeURIComponent(targetUserId)}`,
+    );
 
     if (!data?.success || data.data == null) {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);

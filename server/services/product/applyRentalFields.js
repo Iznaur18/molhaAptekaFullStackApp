@@ -53,7 +53,7 @@ export const applyRentalFields = (body, $set, existing) => {
     : existing.productRentalPriceRub;
   const nextUnit = hasBodyField($set, "productRentalPriceUnit")
     ? $set.productRentalPriceUnit
-    : existing.productRentalPriceUnit ?? PRODUCT_RENTAL_PRICE_UNIT_DEFAULT;
+    : (existing.productRentalPriceUnit ?? PRODUCT_RENTAL_PRICE_UNIT_DEFAULT);
 
   const configured = isProductRentalConfigured({
     productRentalPriceRub: nextPrice,

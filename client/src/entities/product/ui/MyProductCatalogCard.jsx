@@ -151,7 +151,9 @@ export function MyProductCatalogCard({
           <div className="my-product-compact-card__price-row">
             <ProductPriceDisplay product={product} showLabel={false} variant="inline" />
             {showLoyaltyPoints ? (
-              <span className="my-product-compact-card__loyalty-pill">{loyaltyLabel}</span>
+              <span className="my-product-compact-card__loyalty-pill">
+                {loyaltyLabel}
+              </span>
             ) : null}
           </div>
 

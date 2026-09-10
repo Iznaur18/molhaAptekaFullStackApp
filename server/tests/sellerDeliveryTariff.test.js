@@ -29,7 +29,13 @@ const createSeller = (tariff = TARIFF) =>
     userName: `tariff${Math.random().toString(36).slice(2, 9)}`,
     sellerFulfillmentDefaults: {
       pickupLocations: [
-        { id: "profile-1", label: "", address: "г Грозный, ул Мира, 1", ...ORIGIN, isDefault: true },
+        {
+          id: "profile-1",
+          label: "",
+          address: "г Грозный, ул Мира, 1",
+          ...ORIGIN,
+          isDefault: true,
+        },
       ],
       pickupEnabled: true,
       deliveryCarrier: "seller",
@@ -101,7 +107,12 @@ describe("тариф собственной доставки на заказе",
   });
 
   it("продавец без тарифа возит бесплатно", async () => {
-    const seller = await createSeller({ paid: false, baseFeeRub: 0, perKmRub: 0, freeFromRub: 0 });
+    const seller = await createSeller({
+      paid: false,
+      baseFeeRub: 0,
+      perKmRub: 0,
+      freeFromRub: 0,
+    });
     const fees = await resolveFees(String(seller._id));
 
     assert.equal(fees[String(seller._id)].feeRub, 0);

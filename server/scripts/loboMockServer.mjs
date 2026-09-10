@@ -21,14 +21,7 @@ const PASSWORD = process.env.LOBO_MOCK_PASSWORD || "mock";
 /** Сколько секунд держится каждый статус, прежде чем сменится следующим. */
 const STEP_SECONDS = Number(process.env.LOBO_MOCK_STEP_SECONDS || 20);
 
-const FLOW = [
-  "created",
-  "assigned",
-  "accepted",
-  "arrived",
-  "picked_up",
-  "delivered",
-];
+const FLOW = ["created", "assigned", "accepted", "arrived", "picked_up", "delivered"];
 
 /** @type {Map<string, Record<string, any>>} */
 const ordersByExternalId = new Map();

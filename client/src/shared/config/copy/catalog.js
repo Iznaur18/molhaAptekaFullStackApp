@@ -242,8 +242,7 @@ export const PRODUCT_CARD_UI = {
   GALLERY_NEXT: "Следующее фото",
   PROMOTED_BADGE: "Буст",
   /** @param {string} tierLabel @param {string} until */
-  PROMOTED_TIER_UNTIL: (tierLabel, until) =>
-    `Продвижение «${tierLabel}» до ${until}`,
+  PROMOTED_TIER_UNTIL: (tierLabel, until) => `Продвижение «${tierLabel}» до ${until}`,
   PROMOTION_TOP_BADGE: "Топ",
   PROMOTION_BANNER_BADGE: "Баннер",
   RAFFLE_BADGE: "Розыгрыш",
@@ -259,8 +258,7 @@ export const PRODUCT_CARD_UI = {
   /** @param {number} points */
   LOYALTY_POINTS_UNCONFIRMED: (points) => `+${points} ${pluralizeRuBall(points)}`,
   /** @param {number} points */
-  LOYALTY_POINTS_GUEST: (points) =>
-    `+${points} ${pluralizeRuBall(points)}`,
+  LOYALTY_POINTS_GUEST: (points) => `+${points} ${pluralizeRuBall(points)}`,
   /** @param {number} points */
   LOYALTY_POINTS_DETAIL: (points) => `+${points} Б`,
   LOYALTY_POINTS_OVERCOMMITTED_BADGE: "Бонус выше доступного остатка баллов",

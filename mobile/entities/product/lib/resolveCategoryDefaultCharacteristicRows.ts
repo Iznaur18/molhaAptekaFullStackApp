@@ -44,7 +44,11 @@ export const resolveCategoryDefaultCharacteristicRows = (
   }
 
   // Категории нет и подстановки не было — чистить нечего.
-  if (categoryId == null && appliedFor == null && state.characteristicRows.length === 0) {
+  if (
+    categoryId == null &&
+    appliedFor == null &&
+    state.characteristicRows.length === 0
+  ) {
     return null;
   }
 

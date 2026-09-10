@@ -1,9 +1,7 @@
 // Автосгенерировано из appUiCopy.js: домен «product-create».
 // Реэкспортируется через ../appUiCopy.js — импортируй оттуда, как раньше.
 
-import {
-  SELLER_PRODUCTS_LIMIT_PREMIUM,
-} from "@molha/api-contract";
+import { SELLER_PRODUCTS_LIMIT_PREMIUM } from "@molha/api-contract";
 
 /** Модалка при достижении лимита товаров продавца */
 export const SELLER_PRODUCTS_LIMIT_MODAL_UI = {
@@ -81,8 +79,7 @@ export const CREATE_PRODUCT_MODAL_UI = {
   LISTING_ORIGIN_RESALE: "Приобретен на продажу",
   LISTING_ORIGIN_MANUFACTURER: "Являюсь производителем",
   ERROR_LISTING_ORIGIN: "Выберите статус товара",
-  ORIGINALITY_STATEMENT:
-    "Подтверждаю, что товар подлинный (оригинал), а не подделка",
+  ORIGINALITY_STATEMENT: "Подтверждаю, что товар подлинный (оригинал), а не подделка",
   ORIGINALITY_YES: "Да",
   ORIGINALITY_NO: "Нет",
   ERROR_ORIGINALITY: "Выберите: оригинал или нет",
@@ -137,7 +134,8 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WHOLESALE_MODAL_PRICE_LABEL: "Оптовая цена, ₽",
   WHOLESALE_MODAL_SAVE: "Сохранить",
   WHOLESALE_MODAL_CLOSE: "Закрыть",
-  WHOLESALE_MODAL_HINT: "Покупатель получит эту цену за единицу, если возьмёт не меньше указанного количества",
+  WHOLESALE_MODAL_HINT:
+    "Покупатель получит эту цену за единицу, если возьмёт не меньше указанного количества",
   WHOLESALE_MODAL_ERROR_REQUIRED: "Укажите количество и оптовую цену",
   WHOLESALE_MODAL_ERROR_MIN_QTY: "Минимум 2 шт.",
   WHOLESALE_MODAL_ERROR_PRICE: "Оптовая цена должна быть меньше обычной",
@@ -145,8 +143,7 @@ export const CREATE_PRODUCT_MODAL_UI = {
   MANAGE_BUY_N_FREE_TITLE: "Бесплатно от N",
   MANAGE_BUY_N_FREE_HINT:
     "После N завершённых заказов покупатель получит 1 шт. бесплатно",
-  MANAGE_BUY_N_FREE_HINT_ON: (n) =>
-    `Сейчас от ${n} заказов. Следующая 1 шт. бесплатно`,
+  MANAGE_BUY_N_FREE_HINT_ON: (n) => `Сейчас от ${n} заказов. Следующая 1 шт. бесплатно`,
   BUY_N_FREE_TOGGLE_PENDING: "Обновляем «Бесплатно от N»…",
   BUY_N_FREE_MODAL_TITLE: "Бесплатно от N",
   BUY_N_FREE_MODAL_HINT:
@@ -164,7 +161,8 @@ export const CREATE_PRODUCT_MODAL_UI = {
   MANAGE_PROMO_CODES_PENDING: "Сохраняем промокоды…",
   RENTAL_TOGGLE_PENDING: "Обновляем аренду…",
   RENTAL_MODAL_TITLE: "Аренда / Прокат",
-  RENTAL_MODAL_HINT: "Укажите цену аренды и единицу. Дальше настройки добавим отдельно.",
+  RENTAL_MODAL_HINT:
+    "Укажите цену аренды и единицу. Дальше настройки добавим отдельно.",
   RENTAL_MODAL_PRICE_LABEL: "Цена аренды, ₽",
   RENTAL_MODAL_UNIT_LABEL: "Единица цены",
   RENTAL_MODAL_UNIT_DAY: "Сутки",
@@ -175,8 +173,7 @@ export const CREATE_PRODUCT_MODAL_UI = {
   RENTAL_MODAL_CLOSE: "Закрыть",
   RENTAL_MODAL_ERROR_REQUIRED: "Укажите цену аренды и единицу",
   MANAGE_AFFILIATE_TITLE: "Партнёрская услуга",
-  MANAGE_AFFILIATE_HINT:
-    "Пользователи делятся ссылкой и получают % с покупки",
+  MANAGE_AFFILIATE_HINT: "Пользователи делятся ссылкой и получают % с покупки",
   MANAGE_AFFILIATE_HINT_ON: (percent) =>
     `Сейчас ${percent}%. Пользователи делятся ссылкой и получают % с покупки`,
   AFFILIATE_TOGGLE_PENDING: "Обновляем партнёрку…",
@@ -211,7 +208,8 @@ export const CREATE_PRODUCT_MODAL_UI = {
   MANAGE_OUT_OF_STOCK_HINT:
     "Товар временно отсутствует, карточка останется в каталоге, но будет серого цвета. Пользователи будут в курсе, что товар скоро появится в наличии",
   OUT_OF_STOCK_LABEL_MODAL_TITLE: "Надпись на карточке",
-  OUT_OF_STOCK_LABEL_MODAL_HINT: "Выберите текст, который увидят покупатели на серой карточке",
+  OUT_OF_STOCK_LABEL_MODAL_HINT:
+    "Выберите текст, который увидят покупатели на серой карточке",
   OUT_OF_STOCK_LABEL_OPTION_OUT_OF_STOCK: "Нет в наличии",
   OUT_OF_STOCK_LABEL_OPTION_COMING_SOON: "Скоро поступление",
   OUT_OF_STOCK_LABEL_MODAL_SAVE: "Сохранить",
@@ -291,7 +289,8 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WIZARD_STEP_ORIGINALITY_TITLE: "Статус товара",
   WIZARD_STEP_ORIGINALITY_SUBTITLE:
     "Выберите, откуда товар: своё, куплено на перепродажу или вы производитель. Покупатели увидят это в карточке.",
-  WIZARD_STEP_ORIGINALITY_MANAGE_SUBTITLE: "Подтвердите, что продаёте официальный товар",
+  WIZARD_STEP_ORIGINALITY_MANAGE_SUBTITLE:
+    "Подтвердите, что продаёте официальный товар",
   WIZARD_STEP_MEDIA_TITLE: "Фото и видео",
   WIZARD_STEP_MEDIA_SUBTITLE:
     "До 5 фото, можно выбрать несколько сразу. Первое — обложка",
@@ -353,12 +352,10 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WIZARD_MEDIA_VIDEO_TOGGLE_CLOSE: "Скрыть блок видео",
   WIZARD_MEDIA_INSTAGRAM_TITLE: "Ссылка из Instagram",
   WIZARD_MEDIA_INSTAGRAM_OPTIONAL_TAG: "(необязательно)",
-  WIZARD_MEDIA_INSTAGRAM_LEAD:
-    "Можно вставить ссылку на пост или Reel из Instagram.",
+  WIZARD_MEDIA_INSTAGRAM_LEAD: "Можно вставить ссылку на пост или Reel из Instagram.",
   WIZARD_MEDIA_INSTAGRAM_LABEL: "Ссылка на пост Instagram",
   WIZARD_MEDIA_INSTAGRAM_PLACEHOLDER: "https://www.instagram.com/p/…",
-  ERROR_INSTAGRAM_POST_URL:
-    "Укажите ссылку на пост Instagram: /p/, /reel/ или /tv/",
+  ERROR_INSTAGRAM_POST_URL: "Укажите ссылку на пост Instagram: /p/, /reel/ или /tv/",
   WIZARD_MEDIA_FILLED_COUNT: (count, max) => `${count} из ${max} фото`,
   WIZARD_CATEGORY_LEAD: "Выберите самую точную подкатегорию.",
   WIZARD_COMMERCE_LEAD: "Старая цена покажет скидку, если она выше текущей.",
@@ -420,8 +417,7 @@ export const PRODUCT_CATEGORY_TREE_UI = {
   LEAF_BADGE: "конечная",
   LOADING: "Загрузка категорий…",
   LOAD_ERROR: "Не удалось загрузить категории",
-  EMPTY_TREE:
-    "Категории пока не добавлены. Можно опубликовать товар без категории.",
+  EMPTY_TREE: "Категории пока не добавлены. Можно опубликовать товар без категории.",
   TRAIL_ARIA: "Путь по категориям",
   CATALOG_FILTER_OPEN: "Фильтр по подкатегориям",
   CATALOG_FILTER_HINT:
@@ -501,8 +497,7 @@ export const CREATE_RAFFLE_MODAL_UI = {
   HINT_PRIZE_MEDIA: "Выберите, чем показать приз в баннере розыгрыша — фото или видео.",
   HINT_PRIZE_IMAGE:
     "Загрузите файл или вставьте ссылку http/https либо путь /uploads/… с сервера.",
-  HINT_PRIZE_VIDEO:
-    "Прямая ссылка на MP4/WebM или видеофайл, загруженный на сервер.",
+  HINT_PRIZE_VIDEO: "Прямая ссылка на MP4/WebM или видеофайл, загруженный на сервер.",
   HINT_TARGET:
     "Сколько подтверждённых продаж нужно для завершения розыгрыша. Целое число от 1 до 100 000.",
   HINT_INSTAGRAM:

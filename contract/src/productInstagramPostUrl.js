@@ -77,7 +77,9 @@ export function validateInstagramPostUrlInput(input) {
   if (!trimmed) {
     return null;
   }
-  return parseInstagramPostUrl(trimmed) ? null : PRODUCT_INSTAGRAM_POST_URL_INVALID_MESSAGE;
+  return parseInstagramPostUrl(trimmed)
+    ? null
+    : PRODUCT_INSTAGRAM_POST_URL_INVALID_MESSAGE;
 }
 
 export const productInstagramPostUrlFieldSchema = z

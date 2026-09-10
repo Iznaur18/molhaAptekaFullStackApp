@@ -31,19 +31,13 @@ export function normalizeDeliveryFee(raw) {
     throw new AppError(400, "Сумма доставки должна быть целым числом рублей");
   }
   if (value < COURIER_DELIVERY_FEE_MIN_RUB) {
-    throw new AppError(
-      400,
-      `Минимальная подача — ${COURIER_DELIVERY_FEE_MIN_RUB} ₽`,
-    );
+    throw new AppError(400, `Минимальная подача — ${COURIER_DELIVERY_FEE_MIN_RUB} ₽`);
   }
   if (value > COURIER_DELIVERY_FEE_MAX_RUB) {
     throw new AppError(400, "Сумма доставки слишком велика");
   }
   if ((value - COURIER_DELIVERY_FEE_MIN_RUB) % COURIER_DELIVERY_FEE_STEP_RUB !== 0) {
-    throw new AppError(
-      400,
-      `Сумма меняется шагом ${COURIER_DELIVERY_FEE_STEP_RUB} ₽`,
-    );
+    throw new AppError(400, `Сумма меняется шагом ${COURIER_DELIVERY_FEE_STEP_RUB} ₽`);
   }
   return value;
 }
@@ -87,12 +81,7 @@ export function resolveDeliveryFeesBySeller({
  *
  * @param {{ orderId: string; sellerId: string; buyerId: string; feeRub: unknown }} input
  */
-export async function raiseShipmentDeliveryFee({
-  orderId,
-  sellerId,
-  buyerId,
-  feeRub,
-}) {
+export async function raiseShipmentDeliveryFee({ orderId, sellerId, buyerId, feeRub }) {
   const nextFee = normalizeDeliveryFee(feeRub);
   const order = await loadOrderWithItems(orderId);
 
@@ -133,6 +122,4 @@ export async function raiseShipmentDeliveryFee({
 
 /** Есть ли в отправлении живые позиции этого продавца. */
 export const shipmentHasItems = (order, sellerId) =>
-  (order.items ?? []).some(
-    (item) => resolveItemSellerId(item) === String(sellerId),
-  );
+  (order.items ?? []).some((item) => resolveItemSellerId(item) === String(sellerId));

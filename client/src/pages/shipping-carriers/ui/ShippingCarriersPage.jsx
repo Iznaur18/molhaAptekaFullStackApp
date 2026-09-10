@@ -47,9 +47,7 @@ export function ShippingCarriersPage() {
   return (
     <section className="shipping-carriers">
       <header className="shipping-carriers__header">
-        <h2 className="shipping-carriers__title">
-          {SHIPPING_CARRIERS_ADMIN_UI.TITLE}
-        </h2>
+        <h2 className="shipping-carriers__title">{SHIPPING_CARRIERS_ADMIN_UI.TITLE}</h2>
         <p className="shipping-carriers__intro">{SHIPPING_CARRIERS_ADMIN_UI.INTRO}</p>
       </header>
 

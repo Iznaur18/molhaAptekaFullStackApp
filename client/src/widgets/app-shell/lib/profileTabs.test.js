@@ -4,7 +4,9 @@ import * as profileTabs from "./profileTabs.js";
 import { profileTabToMainView } from "./profileTabToMainView.js";
 
 const declaredTabs = Object.entries(profileTabs)
-  .filter(([name, value]) => name.startsWith("PROFILE_TAB_") && typeof value === "string")
+  .filter(
+    ([name, value]) => name.startsWith("PROFILE_TAB_") && typeof value === "string",
+  )
   .map(([name, value]) => ({ name, value }));
 
 /**

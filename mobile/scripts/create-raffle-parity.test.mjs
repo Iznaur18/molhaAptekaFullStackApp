@@ -11,7 +11,9 @@ const readMobileFile = (relativePath) =>
 
 test("create raffle page mirrors web modal form and hub chrome", () => {
   const page = readMobileFile("features/create-raffle-page/ui/CreateRafflePage.tsx");
-  const formBody = readMobileFile("features/create-raffle-page/ui/CreateRaffleFormBody.tsx");
+  const formBody = readMobileFile(
+    "features/create-raffle-page/ui/CreateRaffleFormBody.tsx",
+  );
   const styles = readMobileFile("shared/theme/createRafflePageStyles.ts");
 
   assert.match(page, /ProfileMobileSectionToggle/);
@@ -40,7 +42,9 @@ test("create raffle page mirrors web modal form and hub chrome", () => {
 
 test("create raffle modal mirrors web edit flow", () => {
   const modal = readMobileFile("features/create-raffle-page/ui/CreateRaffleModal.tsx");
-  const formBody = readMobileFile("features/create-raffle-page/ui/CreateRaffleFormBody.tsx");
+  const formBody = readMobileFile(
+    "features/create-raffle-page/ui/CreateRaffleFormBody.tsx",
+  );
   const webModal = readFileSync(
     join(MOBILE_ROOT, "../client/src/entities/raffle/ui/CreateRaffleModal.jsx"),
     "utf8",

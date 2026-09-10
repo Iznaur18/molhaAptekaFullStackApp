@@ -103,8 +103,7 @@ test("валидный активный пользователь: /auth/me НЕ 
   const setCookies = res.headers.getSetCookie?.() ?? [];
   const clears = setCookies.filter(
     (c) =>
-      /^(access_token|refresh_token)=;/.test(c) ||
-      /expires=Thu, 01 Jan 1970/i.test(c),
+      /^(access_token|refresh_token)=;/.test(c) || /expires=Thu, 01 Jan 1970/i.test(c),
   );
   assert.deepEqual(
     clears,

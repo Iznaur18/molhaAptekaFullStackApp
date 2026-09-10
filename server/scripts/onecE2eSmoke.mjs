@@ -159,10 +159,7 @@ async function main() {
     if (!nom || nom.fetched < 1 || nom.created + nom.updated < 1) {
       fail("sync-summary", JSON.stringify(json?.data?.summary));
     }
-    ok(
-      "sync",
-      `fetched=${nom.fetched} created=${nom.created} updated=${nom.updated}`,
-    );
+    ok("sync", `fetched=${nom.fetched} created=${nom.created} updated=${nom.updated}`);
   }
 
   // 4) products from 1C visible
@@ -234,7 +231,11 @@ async function main() {
     const { status, json } = await api("/onec/logs?limit=10", {
       token: sellerToken,
     });
-    if (status !== 200 || !Array.isArray(json?.data?.logs) || json.data.logs.length < 1) {
+    if (
+      status !== 200 ||
+      !Array.isArray(json?.data?.logs) ||
+      json.data.logs.length < 1
+    ) {
       fail("logs", `${status} ${JSON.stringify(json)}`);
     }
     const dirs = json.data.logs.map((l) => `${l.direction}/${l.status}`).join(", ");

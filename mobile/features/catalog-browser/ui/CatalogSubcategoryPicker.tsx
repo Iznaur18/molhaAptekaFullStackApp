@@ -108,12 +108,17 @@ export const CatalogSubcategoryPicker = ({
     >
       <View style={styles.header}>
         <Pressable
-          style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}
+          style={({ pressed }) => [
+            styles.backButton,
+            pressed && styles.backButtonPressed,
+          ]}
           accessibilityRole="button"
           accessibilityLabel={PRODUCT_CATEGORY_DISPLAY_UI.SUBCATEGORY_BACK_ARIA}
           onPress={onBack}
         >
-          <Text style={styles.backButtonText}>{PRODUCT_CATEGORY_DISPLAY_UI.SUBCATEGORY_BACK}</Text>
+          <Text style={styles.backButtonText}>
+            {PRODUCT_CATEGORY_DISPLAY_UI.SUBCATEGORY_BACK}
+          </Text>
         </Pressable>
         <Text style={styles.title} accessibilityRole="header">
           {activeParent.labelRu}
@@ -135,7 +140,8 @@ export const CatalogSubcategoryPicker = ({
         <View style={[styles.grid, { gap: gridLayout.gap }]}>
           {tiles.map((item) => {
             const fallbackLabel =
-              categories.find((row) => row.id === item.categoryId)?.labelRu ?? item.label;
+              categories.find((row) => row.id === item.categoryId)?.labelRu ??
+              item.label;
 
             return (
               <CatalogBrowserTileCard
@@ -152,7 +158,9 @@ export const CatalogSubcategoryPicker = ({
                     ? () => onEditCategoryPress(item.categoryId, fallbackLabel)
                     : undefined
                 }
-                editAriaLabel={PRODUCT_CATEGORY_DISPLAY_UI.SUBCATEGORY_NODE_EDIT_ARIA(item.label)}
+                editAriaLabel={PRODUCT_CATEGORY_DISPLAY_UI.SUBCATEGORY_NODE_EDIT_ARIA(
+                  item.label,
+                )}
               />
             );
           })}

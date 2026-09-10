@@ -1,9 +1,6 @@
 import { z } from "zod";
 
-import {
-  ADDRESS_FLAT_MAX_LENGTH,
-  ADDRESS_LINE_MAX_LENGTH,
-} from "./userFields.js";
+import { ADDRESS_FLAT_MAX_LENGTH, ADDRESS_LINE_MAX_LENGTH } from "./userFields.js";
 
 export const USER_SAVED_ADDRESSES_MAX = 5;
 export const USER_SAVED_ADDRESS_LABEL_MAX_LENGTH = 30;
@@ -16,7 +13,11 @@ export const USER_ADDRESS_PATCH_CONFLICT_MESSAGE =
  * @param {string} flat
  */
 export function userSavedAddressDuplicateKey(line, flat) {
-  return `${String(line ?? "").trim().toLowerCase()}|${String(flat ?? "").trim().toLowerCase()}`;
+  return `${String(line ?? "")
+    .trim()
+    .toLowerCase()}|${String(flat ?? "")
+    .trim()
+    .toLowerCase()}`;
 }
 
 export const userSavedAddressPatchItemSchema = z.object({
@@ -38,7 +39,10 @@ export const userSavedAddressPatchItemSchema = z.object({
   line: z
     .string()
     .trim()
-    .max(ADDRESS_LINE_MAX_LENGTH, `Адрес не длиннее ${ADDRESS_LINE_MAX_LENGTH} символов`),
+    .max(
+      ADDRESS_LINE_MAX_LENGTH,
+      `Адрес не длиннее ${ADDRESS_LINE_MAX_LENGTH} символов`,
+    ),
   flat: z
     .string()
     .trim()
@@ -151,7 +155,9 @@ function normalizeStoredUserSavedAddress(item) {
 
   return {
     id: String(item?.id ?? "").trim() || "legacy-default",
-    label: String(item?.label ?? "").trim().slice(0, USER_SAVED_ADDRESS_LABEL_MAX_LENGTH),
+    label: String(item?.label ?? "")
+      .trim()
+      .slice(0, USER_SAVED_ADDRESS_LABEL_MAX_LENGTH),
     line,
     flat,
     fiasId,

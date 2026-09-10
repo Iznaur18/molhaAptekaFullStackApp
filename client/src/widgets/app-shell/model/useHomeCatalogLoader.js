@@ -33,8 +33,7 @@ export const useHomeCatalogLoader = ({
   viewerRegionCode,
 }) => {
   const isCompactLayout = useAppShellCompactLayout();
-  const nearAllowed =
-    isSessionReady && isAuthorized && userHasCatalogNearGeo(authUser);
+  const nearAllowed = isSessionReady && isAuthorized && userHasCatalogNearGeo(authUser);
 
   const filters = useCatalogFilterState({
     location,
@@ -210,7 +209,8 @@ export const useHomeCatalogLoader = ({
       browser.handleNavigateToFullCatalogFromBreadcrumb,
     handleCatalogMenuClick: browser.handleCatalogMenuClick,
     handleCatalogCategoryGridClick: browser.handleCatalogCategoryGridClick,
-    handleSellerPersonalCategoryTileClick: browser.handleSellerPersonalCategoryTileClick,
+    handleSellerPersonalCategoryTileClick:
+      browser.handleSellerPersonalCategoryTileClick,
     personalCategoryTiles: browser.personalCategoryTiles,
     handleCatalogFeedTileClick: browser.handleCatalogFeedTileClick,
     handleCategoryDisplaySaved: browser.handleCategoryDisplaySaved,

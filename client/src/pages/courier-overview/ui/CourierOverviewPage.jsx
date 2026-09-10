@@ -120,12 +120,17 @@ export function CourierOverviewPage({ onUserClick }) {
         </p>
       ) : rows.length === 0 ? (
         <p className="courier-overview__muted">
-          {tab === "free" ? COURIER_OVERVIEW_UI.EMPTY_FREE : COURIER_OVERVIEW_UI.EMPTY_MINE}
+          {tab === "free"
+            ? COURIER_OVERVIEW_UI.EMPTY_FREE
+            : COURIER_OVERVIEW_UI.EMPTY_MINE}
         </p>
       ) : tab === "free" ? (
         <ul className="courier-overview__list" role="list">
           {rows.map((row) => (
-            <li key={`${row.orderId}:${row.sellerId}`} className="courier-overview__card">
+            <li
+              key={`${row.orderId}:${row.sellerId}`}
+              className="courier-overview__card"
+            >
               <div className="courier-overview__row">
                 <span className="courier-overview__fee">
                   {formatPriceRub(row.deliveryFeeRub)}

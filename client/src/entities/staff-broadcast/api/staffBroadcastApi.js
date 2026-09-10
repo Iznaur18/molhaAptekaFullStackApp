@@ -3,7 +3,9 @@ import { formatApiErrorMessage } from "@izibuy/shared-lib";
 
 export async function fetchStaffBroadcastRecipientsCount() {
   try {
-    const { data } = await apiClient.get("/staff/broadcast-notifications/recipients-count");
+    const { data } = await apiClient.get(
+      "/staff/broadcast-notifications/recipients-count",
+    );
     const count = data?.data?.count;
     if (!data?.success || typeof count !== "number") {
       throw new Error("Не удалось получить число получателей");

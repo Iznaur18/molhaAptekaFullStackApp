@@ -39,7 +39,10 @@ test("ProductCard shows promotion ribbon from badge flags like web ProductCardMe
 
   assert.match(card, /promotionRibbonTier/);
   assert.match(card, /showPromotionBoostBadge/);
-  assert.match(card, /ProductCardPromotionCornerFlag[\s\S]*tier=\{promotionRibbonTier\}/);
+  assert.match(
+    card,
+    /ProductCardPromotionCornerFlag[\s\S]*tier=\{promotionRibbonTier\}/,
+  );
   assert.match(card, /insetLeft=\{imageOverlayInsetX\}/);
   assert.match(card, /resolveProductCardImageOverlayInsetX/);
   assert.match(media, /showPromotionBoostBadge/);

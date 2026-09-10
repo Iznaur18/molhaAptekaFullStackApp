@@ -3,7 +3,10 @@ import {
   isSellerSafeDealApproved,
   PRODUCT_PRICE_MARKET_STATUS_UNKNOWN,
 } from "@molha/api-contract";
-import { isProductRentalConfigured, isProductWholesaleConfigured } from "@izibuy/shared-lib";
+import {
+  isProductRentalConfigured,
+  isProductWholesaleConfigured,
+} from "@izibuy/shared-lib";
 
 import {
   PRODUCT_CARD_UI,
@@ -126,10 +129,7 @@ export function buildProductDetailsBadgeItems({ product }) {
     });
   }
 
-  if (
-    product.productRentalEnabled === true &&
-    isProductRentalConfigured(product)
-  ) {
+  if (product.productRentalEnabled === true && isProductRentalConfigured(product)) {
     items.push({
       key: "rental",
       kind: "rental",

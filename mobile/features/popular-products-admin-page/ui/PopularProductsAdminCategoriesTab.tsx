@@ -86,7 +86,9 @@ export const PopularProductsAdminCategoriesTab = ({
   const createPanel = (
     <>
       <View style={styles.field}>
-        <Text style={styles.fieldLabel}>{POPULAR_CATEGORIES_ADMIN_PAGE_UI.LIST_TITLE_LABEL}</Text>
+        <Text style={styles.fieldLabel}>
+          {POPULAR_CATEGORIES_ADMIN_PAGE_UI.LIST_TITLE_LABEL}
+        </Text>
         <TextInput
           style={styles.fieldInput}
           value={newTitle}
@@ -106,7 +108,8 @@ export const PopularProductsAdminCategoriesTab = ({
         <Pressable
           style={[
             styles.primaryButton,
-            (isBusy || newTitle.trim() === "" || !newRegionCode) && styles.primaryButtonDisabled,
+            (isBusy || newTitle.trim() === "" || !newRegionCode) &&
+              styles.primaryButtonDisabled,
           ]}
           disabled={isBusy || newTitle.trim() === "" || !newRegionCode}
           onPress={() => void handleCreateList()}
@@ -157,7 +160,12 @@ export const PopularProductsAdminCategoriesTab = ({
   if (phase === "error" && lists.length === 0) {
     return (
       <View style={[...pageListStyle, centeredContentStyle]}>
-        <AdminPanelShell {...shellProps} count={0} isLoading={false} error={displayError}>
+        <AdminPanelShell
+          {...shellProps}
+          count={0}
+          isLoading={false}
+          error={displayError}
+        >
           <ScreenErrorState message={queryError} onRetry={() => void reloadLists()} />
         </AdminPanelShell>
       </View>
@@ -167,14 +175,19 @@ export const PopularProductsAdminCategoriesTab = ({
   return (
     <ProfileAccountList
       data={filteredLists}
-      keyExtractor={(item) => `${item._id}-${item.updatedAt ?? ""}-${item.items.length}`}
+      keyExtractor={(item) =>
+        `${item._id}-${item.updatedAt ?? ""}-${item.items.length}`
+      }
       style={[...pageListStyle, scrollEnabled ? centeredContentStyle : null]}
       contentContainerStyle={{
         paddingBottom: outerScrollOwns ? 0 : contentPaddingBottom,
         gap: 8,
       }}
       refreshControl={
-        <ThemedRefreshControl refreshing={isRefreshing} onRefresh={() => void reloadLists()} />
+        <ThemedRefreshControl
+          refreshing={isRefreshing}
+          onRefresh={() => void reloadLists()}
+        />
       }
       ListHeaderComponent={
         <AdminPanelShell

@@ -42,7 +42,10 @@ export const CatalogBrowserTileCard = ({
 }: CatalogBrowserTileCardProps) => {
   const styles = useCatalogBrowserTileStyles();
   const { theme } = useAppThemeSettings();
-  const resolvedImageUrl = resolveCategoryDisplayTileImageUri(imageUrl, placeholderImageUrl);
+  const resolvedImageUrl = resolveCategoryDisplayTileImageUri(
+    imageUrl,
+    placeholderImageUrl,
+  );
   const widthStyle = resolveFlexGridItemWidthStyle({ contentWidth, columns, gap });
   const nativeHeightStyle = Platform.OS === "web" ? null : { height: tileWidth };
 

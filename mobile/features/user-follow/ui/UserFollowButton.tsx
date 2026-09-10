@@ -59,15 +59,14 @@ export const UserFollowButton = ({
     }
   };
 
-  const label = isFollowing ? USER_FOLLOW_BUTTON_UI.UNFOLLOW : USER_FOLLOW_BUTTON_UI.FOLLOW;
+  const label = isFollowing
+    ? USER_FOLLOW_BUTTON_UI.UNFOLLOW
+    : USER_FOLLOW_BUTTON_UI.FOLLOW;
   const isSellerMeta = layout === "sellerMeta";
 
   return (
     <View
-      style={[
-        styles.root,
-        (layout === "inline" || isSellerMeta) && styles.rootInline,
-      ]}
+      style={[styles.root, (layout === "inline" || isSellerMeta) && styles.rootInline]}
     >
       <Pressable
         style={[

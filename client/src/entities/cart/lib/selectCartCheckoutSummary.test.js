@@ -95,9 +95,7 @@ describe("groupCartLinesByFulfillment", () => {
       "pickup",
       "dual",
     ]);
-    expect(grouped.deliveryLines.map((line) => line.productId)).toEqual([
-      "delivery",
-    ]);
+    expect(grouped.deliveryLines.map((line) => line.productId)).toEqual(["delivery"]);
   });
 });
 

@@ -2,12 +2,7 @@ import * as Clipboard from "expo-clipboard";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import {
-  Pressable,
-  Share,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, Share, Text, View } from "react-native";
 
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { useMyReferralProgramQuery } from "@/entities/user/model/useMyReferralProgramQuery";
@@ -95,8 +90,7 @@ export const PartnerProgramPage = () => {
     } catch (error) {
       const isCancel =
         error instanceof Error &&
-        (error.name === "AbortError" ||
-          /cancel|dismiss/i.test(error.message));
+        (error.name === "AbortError" || /cancel|dismiss/i.test(error.message));
       if (isCancel) {
         return;
       }
@@ -150,7 +144,9 @@ export const PartnerProgramPage = () => {
             activeLabel={MY_PROFILE_PAGE_UI.TAB_PARTNER_PROGRAM}
             onPress={() => setNavSheetVisible(true)}
           />
-          <Text style={styles.intro}>{PARTNER_PROGRAM_PAGE_UI.INFO(data.cashbackPercent)}</Text>
+          <Text style={styles.intro}>
+            {PARTNER_PROGRAM_PAGE_UI.INFO(data.cashbackPercent)}
+          </Text>
         </View>
 
         <View style={styles.card}>

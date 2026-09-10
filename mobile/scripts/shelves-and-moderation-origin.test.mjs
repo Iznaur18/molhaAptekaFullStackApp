@@ -22,7 +22,10 @@ test("точка отправления показывается только п
 
   // Самовывоз включён — адрес и так виден покупателю, дублировать не нужно.
   assert.equal(
-    resolveProductModerationOriginPoint({ ...base, productPickupEnabled: true }, coords),
+    resolveProductModerationOriginPoint(
+      { ...base, productPickupEnabled: true },
+      coords,
+    ),
     null,
   );
   assert.equal(resolveProductModerationOriginPoint(base, coords), null);
@@ -36,7 +39,10 @@ test("точка отправления показывается только п
 });
 
 test("без адреса и координат открывать на карте нечего", () => {
-  assert.equal(resolveProductModerationOriginPoint({ productPickupEnabled: false }, coords), null);
+  assert.equal(
+    resolveProductModerationOriginPoint({ productPickupEnabled: false }, coords),
+    null,
+  );
   assert.equal(resolveProductModerationOriginPoint(null, coords), null);
 
   // Только адрес — точка есть, координат нет.
@@ -79,20 +85,30 @@ test("карточка модерации рисует точку и ссылк�
   assert.ok(card.includes("PRODUCT_MODERATION_PAGE_UI.OPEN_MAP"), "нет подписи ссылки");
 
   // Покупателю склад показывать нельзя — панель товара это не трогает.
-  const panel = readMobileFile("features/product-detail/ui/ProductPickupDetailsPanel.tsx");
+  const panel = readMobileFile(
+    "features/product-detail/ui/ProductPickupDetailsPanel.tsx",
+  );
   assert.ok(
     !panel.includes("resolveProductModerationOriginPoint"),
     "адрес склада не должен утекать на карточку товара",
   );
 
   const copy = readMobileFile("shared/config/appUiCopy.ts");
-  for (const key of ["ORIGIN_LABEL", "COORDS_LABEL", "COORDS_EMPTY", "COORDS_VALUE", "OPEN_MAP"]) {
+  for (const key of [
+    "ORIGIN_LABEL",
+    "COORDS_LABEL",
+    "COORDS_EMPTY",
+    "COORDS_VALUE",
+    "OPEN_MAP",
+  ]) {
     assert.ok(copy.includes(key), `нет ${key}`);
   }
 });
 
 test("полки умеют то же, что в вебе", () => {
-  const panel = readMobileFile("features/my-products-page/ui/MyProductsShelvesPanel.tsx");
+  const panel = readMobileFile(
+    "features/my-products-page/ui/MyProductsShelvesPanel.tsx",
+  );
   const webPanel = readRepoFile(
     "client/src/entities/seller-shelf/ui/MyProductsShelvesPanel.jsx",
   );
@@ -114,14 +130,25 @@ test("полки умеют то же, что в вебе", () => {
 });
 
 test("лимиты полок берутся с сервера, а не зашиты числом", () => {
-  const panel = readMobileFile("features/my-products-page/ui/MyProductsShelvesPanel.tsx");
-  assert.ok(panel.includes("shelvesQuery.data?.maxShelves"), "лимит полок не читается из ответа");
-  assert.ok(panel.includes("shelvesQuery.data?.nameMaxChars"), "длина имени не читается из ответа");
+  const panel = readMobileFile(
+    "features/my-products-page/ui/MyProductsShelvesPanel.tsx",
+  );
+  assert.ok(
+    panel.includes("shelvesQuery.data?.maxShelves"),
+    "лимит полок не читается из ответа",
+  );
+  assert.ok(
+    panel.includes("shelvesQuery.data?.nameMaxChars"),
+    "длина имени не читается из ответа",
+  );
   assert.ok(!panel.includes("shelves.length >= 10"), "лимит полок зашит числом");
   assert.ok(!/maxLength=\{30\}/.test(panel), "длина имени зашита числом");
 
   // Запасные значения обязаны идти из контракта.
-  assert.ok(panel.includes("SELLER_SHELF_MAX_PER_SELLER"), "нет запасного лимита из контракта");
+  assert.ok(
+    panel.includes("SELLER_SHELF_MAX_PER_SELLER"),
+    "нет запасного лимита из контракта",
+  );
   const contract = readRepoFile("contract/src/sellerShelf.js");
   assert.match(contract, /SELLER_SHELF_MAX_PER_SELLER = 10/);
   assert.match(contract, /SELLER_SHELF_NAME_MAX_CHARS = 30/);

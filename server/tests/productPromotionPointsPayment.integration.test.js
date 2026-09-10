@@ -216,10 +216,7 @@ test("staff может оплатить чужой товар баллами с�
 test("requestProductPromotion service rejects unknown paymentMethod as sbp", async () => {
   await ensureProductCategoryTreeSeeded();
   const { user } = await registerSeller("promo-svc");
-  await UserModel.updateOne(
-    { _id: user._id },
-    { $set: { userLoyaltyPoints: 100 } },
-  );
+  await UserModel.updateOne({ _id: user._id }, { $set: { userLoyaltyPoints: 100 } });
   const product = await ProductModel.create({
     productName: "Svc",
     productPrice: 1000,

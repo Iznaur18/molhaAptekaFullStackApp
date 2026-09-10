@@ -78,8 +78,9 @@ export async function resolveProductSaleLocation({
     throw new AppError(400, PRODUCT_PICKUP_COORDS_REQUIRED_MESSAGE);
   }
 
-  const fallback =
-    isRuRegionCode(fallbackRegionCode) ? String(fallbackRegionCode).trim() : null;
+  const fallback = isRuRegionCode(fallbackRegionCode)
+    ? String(fallbackRegionCode).trim()
+    : null;
 
   if (isDadataConfigured()) {
     try {

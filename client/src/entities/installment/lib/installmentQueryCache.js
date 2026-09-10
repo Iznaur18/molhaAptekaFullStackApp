@@ -21,8 +21,11 @@ export function invalidateInstallmentDisputesPending(queryClient) {
  */
 export function invalidateInstallmentUserActionCounts(queryClient) {
   return Promise.all([
-    queryClient.invalidateQueries({ queryKey: installmentQueryKeys.buyerActionCount() }),
-    queryClient.invalidateQueries({ queryKey: installmentQueryKeys.sellerActionCount() }),
+    queryClient.invalidateQueries({
+      queryKey: installmentQueryKeys.buyerActionCount(),
+    }),
+    queryClient.invalidateQueries({
+      queryKey: installmentQueryKeys.sellerActionCount(),
+    }),
   ]);
 }
-

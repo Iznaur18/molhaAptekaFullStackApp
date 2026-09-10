@@ -39,8 +39,7 @@ export const useProductDetailPageLayout = (): ProductDetailPageLayout => {
         ? ({
             borderRadius: 28,
             overflow: "hidden",
-            ...(typeof Platform !== "undefined" &&
-            Platform.OS === "ios"
+            ...(typeof Platform !== "undefined" && Platform.OS === "ios"
               ? { borderCurve: "continuous" as const }
               : null),
           } as ViewStyle)

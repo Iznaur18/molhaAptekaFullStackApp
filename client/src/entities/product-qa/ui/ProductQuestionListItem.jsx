@@ -166,7 +166,9 @@ export function ProductQuestionListItem({
         <div className="product-qa-item__answer-form">
           <ProductQuestionForm
             placeholder={PRODUCT_QA_UI.ANSWER_PLACEHOLDER}
-            submitLabel={answer ? PRODUCT_QA_UI.ANSWER_SAVE : PRODUCT_QA_UI.ANSWER_SUBMIT}
+            submitLabel={
+              answer ? PRODUCT_QA_UI.ANSWER_SAVE : PRODUCT_QA_UI.ANSWER_SUBMIT
+            }
             maxLength={PRODUCT_ANSWER_TEXT_MAX_LENGTH}
             initialText={answer?.text ?? ""}
             onSubmit={handleAnswerSubmit}

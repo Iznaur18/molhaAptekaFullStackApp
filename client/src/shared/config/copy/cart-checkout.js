@@ -58,8 +58,7 @@ export const CART_PAGE_UI = {
   CHECKOUT_SHEET_CLOSE: "Закрыть",
   CHECKOUT_SELLER_HINT:
     "Каждый продавец оформляется отдельно — свой заказ и своя оплата.",
-  SELLERS_LIST_HINT:
-    "Выберите продавца, чтобы открыть его корзину и оформить заказ.",
+  SELLERS_LIST_HINT: "Выберите продавца, чтобы открыть его корзину и оформить заказ.",
   BACK_TO_SELLERS: "К продавцам",
   CHECKOUT_LEGAL_HINT_PREFIX: "Нажимая на кнопку, вы соглашаетесь с ",
   CHECKOUT_LEGAL_PRIVACY_LINK: "Условиями обработки персональных данных",
@@ -230,8 +229,7 @@ export const PRODUCT_PICKUP_UI = {
   FULFILLMENT_COURIER: "Курьеры Gitorg",
   FULFILLMENT_COURIER_HINT:
     "Заказ заберёт свободный курьер. Сумму доставки назначает покупатель, вам платить не нужно.",
-  FULFILLMENT_CONFLICT_HINT:
-    "Выберите одно: везёте сами или отдаёте курьеру.",
+  FULFILLMENT_CONFLICT_HINT: "Выберите одно: везёте сами или отдаёте курьеру.",
   CARRIERS_LEGEND: "Выберите способ доставки",
   CARRIERS_HINT: "Одна служба на товар. Курьеры Gitorg работают уже сейчас.",
   SOON_BADGE: " · скоро",

@@ -14,23 +14,31 @@ type FetchUserProductsParams = {
   shelfId?: string | null;
 };
 
-export const fetchUserProducts = async (userId: string, params: FetchUserProductsParams = {}) => {
+export const fetchUserProducts = async (
+  userId: string,
+  params: FetchUserProductsParams = {},
+) => {
   try {
     const page = params.page ?? 1;
     const limit = params.limit ?? USER_PROFILE_PRODUCTS_PAGE_SIZE;
     const shelfId = params.shelfId != null ? String(params.shelfId).trim() : "";
 
-    const { data } = await apiClient.get(`/user/${encodeURIComponent(userId)}/products`, {
-      params: {
-        page,
-        limit,
-        ...(shelfId ? { shelfId } : {}),
+    const { data } = await apiClient.get(
+      `/user/${encodeURIComponent(userId)}/products`,
+      {
+        params: {
+          page,
+          limit,
+          ...(shelfId ? { shelfId } : {}),
+        },
       },
-    });
+    );
 
     return parseUserSellerProductsPageData(data);
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_USER_PRODUCTS_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_USER_PRODUCTS_FALLBACK),
+    );
   }
 };
 

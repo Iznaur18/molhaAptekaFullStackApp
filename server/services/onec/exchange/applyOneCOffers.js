@@ -115,12 +115,8 @@ export function createOneCOffersApplier({
   materializeHeld: _materializeHeld,
   seenAt = new Date(),
 }) {
-  const allowedPriceTypeIds = new Set(
-    (priceTypeIds ?? []).map(String).filter(Boolean),
-  );
-  const allowedWarehouseIds = new Set(
-    (warehouseIds ?? []).map(String).filter(Boolean),
-  );
+  const allowedPriceTypeIds = new Set((priceTypeIds ?? []).map(String).filter(Boolean));
+  const allowedWarehouseIds = new Set((warehouseIds ?? []).map(String).filter(Boolean));
 
   const stats = {
     matched: 0,
@@ -174,8 +170,7 @@ export function createOneCOffersApplier({
           onIssue({
             externalId: offer.externalId,
             name: offer.name,
-            message:
-              "Предложение без карточки — товара нет в import.xml этой выгрузки",
+            message: "Предложение без карточки — товара нет в import.xml этой выгрузки",
           });
           continue;
         }
@@ -228,9 +223,7 @@ export function createOneCOffersApplier({
       }
 
       const isAvailable =
-        Boolean(product.productCategoryId) &&
-        effectivePrice > 0 &&
-        effectiveStock > 0;
+        Boolean(product.productCategoryId) && effectivePrice > 0 && effectiveStock > 0;
 
       const outOfStock = effectiveStock <= 0;
       if (isAvailable !== product.productIsAvailable) {

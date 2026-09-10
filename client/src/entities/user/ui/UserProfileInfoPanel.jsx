@@ -7,10 +7,7 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { fetchUserPhone } from "../api/fetchUserPhone.js";
-import {
-  groupProfileRows,
-  isBooleanProfileRow,
-} from "../lib/groupProfileRows.js";
+import { groupProfileRows, isBooleanProfileRow } from "../lib/groupProfileRows.js";
 import { getProfileSectionTone } from "../lib/profileRowColors.js";
 import { getProfileRowIcon } from "../lib/profileRowIcons.js";
 import {
@@ -138,7 +135,9 @@ function ProfileDetailsSection({
  */
 function ProfileDetailValue({ row, hidePhoneUntilReveal, userId }) {
   const [phoneRevealed, setPhoneRevealed] = useState(false);
-  const [revealedPhone, setRevealedPhone] = useState(/** @type {string | null} */ (null));
+  const [revealedPhone, setRevealedPhone] = useState(
+    /** @type {string | null} */ (null),
+  );
   const [revealPending, setRevealPending] = useState(false);
   const [revealError, setRevealError] = useState("");
 
@@ -218,9 +217,7 @@ function ProfileDetailValue({ row, hidePhoneUntilReveal, userId }) {
       <a
         className="user-profile-info__detail-link"
         href={row.href}
-        {...(isExternalHttp
-          ? { target: "_blank", rel: "noopener noreferrer" }
-          : {})}
+        {...(isExternalHttp ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       >
         {row.value}
       </a>

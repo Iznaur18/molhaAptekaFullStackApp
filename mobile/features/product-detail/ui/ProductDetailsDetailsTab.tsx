@@ -38,9 +38,16 @@ import { ProductDetailsBuyNFreeOffer } from "@/features/product-detail/ui/Produc
 import { ProductDetailPurchaseActions } from "@/features/product-detail/ui/ProductDetailPurchaseActions";
 import { ProductPickupDetailsPanel } from "@/features/product-detail/ui/ProductPickupDetailsPanel";
 import { catalogQueryKeys } from "@/shared/api";
-import { PRODUCT_DETAILS_MODAL_UI, PRODUCT_RENTAL_UI, SELLER_PRODUCTS_PAGE_UI } from "@/shared/config";
+import {
+  PRODUCT_DETAILS_MODAL_UI,
+  PRODUCT_RENTAL_UI,
+  SELLER_PRODUCTS_PAGE_UI,
+} from "@/shared/config";
 import { nestedHorizontalScrollProps } from "@/shared/lib/nestedHorizontalScrollProps";
-import { useProductDetailScreenStyles, useProductDetailsSellerStackStyles } from "@/shared/theme/catalogProductStyles";
+import {
+  useProductDetailScreenStyles,
+  useProductDetailsSellerStackStyles,
+} from "@/shared/theme/catalogProductStyles";
 
 type ContentTabId = "description" | "characteristics" | "returns" | "delivery";
 
@@ -150,7 +157,8 @@ export const ProductDetailsDetailsTab = ({
     : [];
 
   const showDescription = hasDescription && resolvedContentTab === "description";
-  const showCharacteristics = hasCharacteristics && resolvedContentTab === "characteristics";
+  const showCharacteristics =
+    hasCharacteristics && resolvedContentTab === "characteristics";
   const showReturns = resolvedContentTab === "returns";
   const showDelivery = resolvedContentTab === "delivery";
 
@@ -197,7 +205,10 @@ export const ProductDetailsDetailsTab = ({
         }
       />
       {typeof onRequestLogin === "function" ? (
-        <ProductAffiliateShareButton product={product} onRequestLogin={onRequestLogin} />
+        <ProductAffiliateShareButton
+          product={product}
+          onRequestLogin={onRequestLogin}
+        />
       ) : null}
       {productId && onOpenInstallmentTab ? (
         <ProductDetailsInstallmentTeaser
@@ -213,7 +224,9 @@ export const ProductDetailsDetailsTab = ({
           onPress={onOpenAuctionTab}
         />
       ) : null}
-      {sellerId ? <ProductDetailsSaleTeaser product={product} sellerId={sellerId} /> : null}
+      {sellerId ? (
+        <ProductDetailsSaleTeaser product={product} sellerId={sellerId} />
+      ) : null}
     </View>
   );
 
@@ -234,7 +247,9 @@ export const ProductDetailsDetailsTab = ({
   );
 
   const priceRailBlock = (
-    <View style={[styles.priceBlock, presentation !== "default" && styles.priceBlockSplit]}>
+    <View
+      style={[styles.priceBlock, presentation !== "default" && styles.priceBlockSplit]}
+    >
       <ProductPriceDisplay
         product={product}
         showLabel={false}
@@ -256,7 +271,10 @@ export const ProductDetailsDetailsTab = ({
           variant="inline"
         />
       ) : null}
-      <ProductDetailsWholesaleOffer product={product} canShowAddToCart={canShowAddToCart} />
+      <ProductDetailsWholesaleOffer
+        product={product}
+        canShowAddToCart={canShowAddToCart}
+      />
       <ProductDetailsBuyNFreeOffer
         product={product}
         isAuthorized={isAuthorized}
@@ -297,7 +315,8 @@ export const ProductDetailsDetailsTab = ({
       {showReturns ? (
         product.productReturnEnabled === true &&
         Array.isArray(product.productReturnTerms) &&
-        (product.productReturnTerms as { key?: string; value?: string }[]).length > 0 ? (
+        (product.productReturnTerms as { key?: string; value?: string }[]).length >
+          0 ? (
           <ProductCharacteristicsDetails
             items={product.productReturnTerms as { key?: string; value?: string }[]}
             showTitle={!showContentTabs}
@@ -321,7 +340,10 @@ export const ProductDetailsDetailsTab = ({
   const detailsBelow = (
     <>
       <View
-        style={[styles.detailsSection, presentation !== "default" && styles.detailsSectionSplit]}
+        style={[
+          styles.detailsSection,
+          presentation !== "default" && styles.detailsSectionSplit,
+        ]}
         accessibilityLabel={PRODUCT_DETAILS_MODAL_UI.DETAILS_SECTION_ARIA}
       >
         {showContentTabs ? (
@@ -338,14 +360,16 @@ export const ProductDetailsDetailsTab = ({
                 <Pressable
                   style={[
                     styles.contentSwitcherTab,
-                    resolvedContentTab === "description" && styles.contentSwitcherTabActive,
+                    resolvedContentTab === "description" &&
+                      styles.contentSwitcherTabActive,
                   ]}
                   onPress={() => setContentTab("description")}
                 >
                   <Text
                     style={[
                       styles.contentSwitcherTabText,
-                      resolvedContentTab === "description" && styles.contentSwitcherTabTextActive,
+                      resolvedContentTab === "description" &&
+                        styles.contentSwitcherTabTextActive,
                     ]}
                   >
                     {getProductFieldLabel("productDescription")}
@@ -362,7 +386,8 @@ export const ProductDetailsDetailsTab = ({
                 <Text
                   style={[
                     styles.contentSwitcherTabText,
-                    resolvedContentTab === "delivery" && styles.contentSwitcherTabTextActive,
+                    resolvedContentTab === "delivery" &&
+                      styles.contentSwitcherTabTextActive,
                   ]}
                 >
                   {PRODUCT_DETAILS_MODAL_UI.DELIVERY_TITLE}
@@ -372,7 +397,8 @@ export const ProductDetailsDetailsTab = ({
                 <Pressable
                   style={[
                     styles.contentSwitcherTab,
-                    resolvedContentTab === "characteristics" && styles.contentSwitcherTabActive,
+                    resolvedContentTab === "characteristics" &&
+                      styles.contentSwitcherTabActive,
                   ]}
                   onPress={() => setContentTab("characteristics")}
                 >
@@ -397,7 +423,8 @@ export const ProductDetailsDetailsTab = ({
                 <Text
                   style={[
                     styles.contentSwitcherTabText,
-                    resolvedContentTab === "returns" && styles.contentSwitcherTabTextActive,
+                    resolvedContentTab === "returns" &&
+                      styles.contentSwitcherTabTextActive,
                   ]}
                 >
                   {PRODUCT_DETAILS_MODAL_UI.RETURNS_TITLE}
@@ -443,7 +470,9 @@ export const ProductDetailsDetailsTab = ({
       title={badgeExplain?.title ?? ""}
       badgeKey={badgeExplain?.badgeKey ?? null}
       fallbackKey={badgeExplain?.fallbackKey ?? "listing_origin_unspecified"}
-      contactSellerUserId={badgeExplain?.badgeKey === "rental" ? sellerId || null : null}
+      contactSellerUserId={
+        badgeExplain?.badgeKey === "rental" ? sellerId || null : null
+      }
       onClose={() => setBadgeExplain(null)}
     />
   );

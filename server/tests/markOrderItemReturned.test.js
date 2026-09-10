@@ -9,20 +9,16 @@ const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollectio
   await import("./helpers/mongoTestDb.js");
 const { createOrderLoyaltyFixture, createOrderWithReserveTransaction } =
   await import("./helpers/orderLoyaltyTestHelpers.js");
-const { OrderModel, ProductModel, UserInAppNotificationModel } = await import(
-  "../models/index.js"
-);
+const { OrderModel, ProductModel, UserInAppNotificationModel } =
+  await import("../models/index.js");
 const {
   markOrderItemDeliveredBySeller,
   markOrderItemReturned,
   markOrderItemShippedBySeller,
 } = await import("../services/order/updateOrderItemStatus.js");
-const { getReservedQuantityByProductIds } = await import(
-  "../services/product/productStock.js"
-);
-const { buildOrderStatusFromItems } = await import(
-  "../services/order/orderStatus.js"
-);
+const { getReservedQuantityByProductIds } =
+  await import("../services/product/productStock.js");
+const { buildOrderStatusFromItems } = await import("../services/order/orderStatus.js");
 
 /** @returns {Promise<{ seller: any; buyer: any; product: any; order: any }>} */
 async function makeOrder() {
@@ -88,9 +84,7 @@ describe("оформление возврата продавцом", () => {
     const { seller, product, order } = await makeOrder();
     await ship(order, seller._id);
 
-    const beforeReturn = await getReservedQuantityByProductIds([
-      String(product._id),
-    ]);
+    const beforeReturn = await getReservedQuantityByProductIds([String(product._id)]);
     assert.equal(beforeReturn[String(product._id)], 1, "отправленное занимает остаток");
 
     await doReturn(order, seller._id);
@@ -113,9 +107,7 @@ describe("оформление возврата продавцом", () => {
     await ship(order, seller._id);
     await deliver(order, seller._id);
 
-    const sold = await ProductModel.findById(product._id)
-      .select("soldQuantity")
-      .lean();
+    const sold = await ProductModel.findById(product._id).select("soldQuantity").lean();
     assert.equal(sold.soldQuantity, 1, "доставленное считается проданным");
 
     await doReturn(order, seller._id);
@@ -123,11 +115,7 @@ describe("оформление возврата продавцом", () => {
     const afterReturn = await ProductModel.findById(product._id)
       .select("soldQuantity")
       .lean();
-    assert.equal(
-      afterReturn.soldQuantity,
-      0,
-      "возврат снимает позицию из продаж",
-    );
+    assert.equal(afterReturn.soldQuantity, 0, "возврат снимает позицию из продаж");
   });
 
   it("не даёт оформить возврат из «В обработке» — там отмена", async () => {
@@ -173,7 +161,6 @@ describe("оформление возврата продавцом", () => {
     assert.match(rows[0].message, /передан в доставку/);
     assert.match(rows[1].message, /вернулся продавцу/);
   });
-
 
   it("покупатель может отказаться сам, и продавец узнаёт об этом", async () => {
     const { seller, buyer, product, order } = await makeOrder();

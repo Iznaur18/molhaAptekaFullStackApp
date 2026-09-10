@@ -50,7 +50,9 @@ export function isShippingProviderAvailableInRegion(providerId, regionCode) {
   if (providerId == null || providerId === "") return false;
   const regions = SHIPPING_PROVIDER_REGIONS[providerId];
   if (regions == null) return true;
-  const code = String(regionCode ?? "").trim().toUpperCase();
+  const code = String(regionCode ?? "")
+    .trim()
+    .toUpperCase();
   if (!code) return false;
   return regions.includes(code);
 }
@@ -86,8 +88,7 @@ export const SHIPPING_TRACKING_URL_MAX_LENGTH = 500;
 export const SHIPPING_EXTERNAL_ID_MAX_LENGTH = 128;
 export const SHIPPING_CARRIER_STATUS_MAX_LENGTH = 64;
 
-export const SHIPPING_NOT_AVAILABLE_MESSAGE =
-  "Доставка через службы пока недоступна";
+export const SHIPPING_NOT_AVAILABLE_MESSAGE = "Доставка через службы пока недоступна";
 
 export const SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT = `Скоро: ${SHIPPING_PROVIDERS.map(
   (id) => SHIPPING_PROVIDER_LABEL_RU[id],

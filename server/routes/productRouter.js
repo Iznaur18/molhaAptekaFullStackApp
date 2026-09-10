@@ -586,11 +586,7 @@ router.post(
   requestProductPromotionValidation,
   requestProductPromotionController,
 );
-router.get(
-  "/promo-activations/me",
-  checkAuthMW,
-  listMyAppliedProductPromosController,
-);
+router.get("/promo-activations/me", checkAuthMW, listMyAppliedProductPromosController);
 router.get(
   "/:productId/promo-codes",
   checkAuthMW,

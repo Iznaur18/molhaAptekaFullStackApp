@@ -10,8 +10,12 @@ const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
 test("category tree admin page mirrors web admin panel shell", () => {
-  const page = readMobileFile("features/category-tree-admin-page/ui/CategoryTreeAdminPage.tsx");
-  const hook = readMobileFile("features/category-tree-admin-page/model/useCategoryTreeAdminPage.ts");
+  const page = readMobileFile(
+    "features/category-tree-admin-page/ui/CategoryTreeAdminPage.tsx",
+  );
+  const hook = readMobileFile(
+    "features/category-tree-admin-page/model/useCategoryTreeAdminPage.ts",
+  );
 
   assert.match(page, /ProfileMobileSectionToggle/);
   assert.match(page, /ProfileMobileNavSheet/);
@@ -29,7 +33,9 @@ test("category tree admin page mirrors web admin panel shell", () => {
 });
 
 test("category tree admin card mirrors web tree indent and badges", () => {
-  const card = readMobileFile("features/category-tree-admin-page/ui/CategoryTreeAdminCard.tsx");
+  const card = readMobileFile(
+    "features/category-tree-admin-page/ui/CategoryTreeAdminCard.tsx",
+  );
 
   assert.match(card, /resolveCategoryTreeCardIndent/);
   assert.match(card, /LEAF_BADGE/);
@@ -51,9 +57,15 @@ test("category tree admin ui copy matches web page", () => {
 });
 
 test("category tree admin delete is cascade without reassign prompts", () => {
-  const page = readMobileFile("features/category-tree-admin-page/ui/CategoryTreeAdminPage.tsx");
-  const hook = readMobileFile("features/category-tree-admin-page/model/useCategoryTreeAdminPage.ts");
-  const utils = readMobileFile("features/category-tree-admin-page/lib/categoryTreeAdminUtils.ts");
+  const page = readMobileFile(
+    "features/category-tree-admin-page/ui/CategoryTreeAdminPage.tsx",
+  );
+  const hook = readMobileFile(
+    "features/category-tree-admin-page/model/useCategoryTreeAdminPage.ts",
+  );
+  const utils = readMobileFile(
+    "features/category-tree-admin-page/lib/categoryTreeAdminUtils.ts",
+  );
 
   assert.match(hook, /collectCategorySubtreeIdsFromRows/);
   assert.match(hook, /removeCategorySubtree/);

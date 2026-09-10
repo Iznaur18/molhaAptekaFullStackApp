@@ -8,7 +8,10 @@ import {
 
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import { getTopModalFocusLayer } from "../../../shared/lib/modalFocusStack.js";
-import { INTEGER_INPUT_FIELD_PROPS, keepDigitsOnly } from "../../../shared/lib/numericInput.js";
+import {
+  INTEGER_INPUT_FIELD_PROPS,
+  keepDigitsOnly,
+} from "../../../shared/lib/numericInput.js";
 import { useDialogFocusTrap } from "../../../shared/lib/useDialogFocusTrap.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { useMyProductMutations } from "../model/useMyProductMutations.js";

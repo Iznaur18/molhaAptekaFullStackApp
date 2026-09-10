@@ -26,7 +26,10 @@ const resolvePartyDisplayName = (
 
 const renderPartyRow = (
   label: string,
-  party: { _id: string; userName?: string | null; email?: string | null } | null | undefined,
+  party:
+    | { _id: string; userName?: string | null; email?: string | null }
+    | null
+    | undefined,
   ariaLabel: (name: string) => string,
   styles: ReturnType<typeof useInstallmentDisputesPageStyles>,
   onPress: (userId: string) => void,
@@ -121,28 +124,36 @@ export const InstallmentDisputesQueueCard = ({
           disabled={isBusy}
           onPress={() => onResolve("close")}
         >
-          <Text style={styles.actionPrimaryText}>{INSTALLMENT_UI.DISPUTE_ACTION_CLOSE}</Text>
+          <Text style={styles.actionPrimaryText}>
+            {INSTALLMENT_UI.DISPUTE_ACTION_CLOSE}
+          </Text>
         </Pressable>
         <Pressable
           style={[styles.actionCancel, isBusy && styles.actionDisabled]}
           disabled={isBusy}
           onPress={() => onResolve("cancel")}
         >
-          <Text style={styles.actionPrimaryText}>{INSTALLMENT_UI.DISPUTE_ACTION_CANCEL}</Text>
+          <Text style={styles.actionPrimaryText}>
+            {INSTALLMENT_UI.DISPUTE_ACTION_CANCEL}
+          </Text>
         </Pressable>
         <Pressable
           style={[styles.actionSecondary, isBusy && styles.actionDisabled]}
           disabled={isBusy}
           onPress={() => onResolve("adjust_schedule")}
         >
-          <Text style={styles.actionSecondaryText}>{INSTALLMENT_UI.DISPUTE_ACTION_ADJUST}</Text>
+          <Text style={styles.actionSecondaryText}>
+            {INSTALLMENT_UI.DISPUTE_ACTION_ADJUST}
+          </Text>
         </Pressable>
         <Pressable
           style={[styles.actionSecondary, isBusy && styles.actionDisabled]}
           disabled={isBusy}
           onPress={() => onResolve("partial_refund")}
         >
-          <Text style={styles.actionSecondaryText}>{INSTALLMENT_UI.DISPUTE_ACTION_REFUND}</Text>
+          <Text style={styles.actionSecondaryText}>
+            {INSTALLMENT_UI.DISPUTE_ACTION_REFUND}
+          </Text>
         </Pressable>
       </View>
     </View>

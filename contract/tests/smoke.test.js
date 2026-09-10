@@ -85,10 +85,7 @@ test("authSessionDataSchema includes optional bearer tokens", () => {
 
   assert.equal(refreshAuthBodySchema.parse({}).refreshToken, undefined);
   assert.deepEqual(refreshAuthBodySchema.parse(undefined), {});
-  assert.equal(
-    refreshAuthBodySchema.parse({ refreshToken: "rt" }).refreshToken,
-    "rt",
-  );
+  assert.equal(refreshAuthBodySchema.parse({ refreshToken: "rt" }).refreshToken, "rt");
 });
 
 test("registerBodySchema normalizes phone and userName", () => {
@@ -165,17 +162,12 @@ test("updateProfileBodySchema rejects invalid social handle", () => {
 
 test("formatSocialLinkDisplay strips protocol", async () => {
   const { formatSocialLinkDisplay } = await import("../src/userSocialLinks.js");
-  assert.equal(
-    formatSocialLinkDisplay("https://t.me/demo/"),
-    "t.me/demo",
-  );
+  assert.equal(formatSocialLinkDisplay("https://t.me/demo/"), "t.me/demo");
 });
 
 test("normalizeSocialLinkToStoredUrl builds whatsapp and reverses", async () => {
-  const {
-    normalizeSocialLinkToStoredUrl,
-    storedSocialUrlToInputValue,
-  } = await import("../src/userSocialLinks.js");
+  const { normalizeSocialLinkToStoredUrl, storedSocialUrlToInputValue } =
+    await import("../src/userSocialLinks.js");
   const wa = normalizeSocialLinkToStoredUrl("socialWhatsappUrl", "+7 (900) 111-22-33");
   assert.equal(wa.ok, true);
   assert.equal(wa.url, "https://wa.me/79001112233");
@@ -208,7 +200,11 @@ test("normalizeSocialLinkToStoredUrl builds whatsapp and reverses", async () => 
 });
 
 test("order query schemas coerce pagination", () => {
-  const parsed = getAllOrdersQuerySchema.parse({ page: "2", limit: "50", status: "pending" });
+  const parsed = getAllOrdersQuerySchema.parse({
+    page: "2",
+    limit: "50",
+    status: "pending",
+  });
   assert.equal(parsed.page, 2);
   assert.equal(parsed.limit, 50);
   assert.equal(parsed.status, "pending");
@@ -216,7 +212,9 @@ test("order query schemas coerce pagination", () => {
 
 test("getMySalesQuerySchema validates productIds filter", () => {
   const id = "507f1f77bcf86cd799439011";
-  const parsed = getMySalesQuerySchema.parse({ productIds: `${id},507f1f77bcf86cd799439012` });
+  const parsed = getMySalesQuerySchema.parse({
+    productIds: `${id},507f1f77bcf86cd799439012`,
+  });
   assert.equal(parsed.productIds, `${id},507f1f77bcf86cd799439012`);
 });
 
@@ -387,7 +385,9 @@ test("upsertProductInstallmentProgramBodySchema validates plans", () => {
 });
 
 test("getMyInstallmentContractsListQuerySchema filters status", () => {
-  const parsed = getMyInstallmentContractsListQuerySchema.parse({ status: "in_progress" });
+  const parsed = getMyInstallmentContractsListQuerySchema.parse({
+    status: "in_progress",
+  });
   assert.equal(parsed.status, "in_progress");
 });
 
@@ -499,18 +499,15 @@ test("catalogProductsQuerySchema accepts my-products list filters", () => {
     "not_promoted",
   );
   assert.equal(
-    catalogProductsQuerySchema.parse({ moderationStatus: "promoted" })
-      .moderationStatus,
+    catalogProductsQuerySchema.parse({ moderationStatus: "promoted" }).moderationStatus,
     "promoted",
   );
   assert.equal(
-    catalogProductsQuerySchema.parse({ moderationStatus: "hidden" })
-      .moderationStatus,
+    catalogProductsQuerySchema.parse({ moderationStatus: "hidden" }).moderationStatus,
     "hidden",
   );
   assert.equal(
-    catalogProductsQuerySchema.parse({ moderationStatus: "approved" })
-      .moderationStatus,
+    catalogProductsQuerySchema.parse({ moderationStatus: "approved" }).moderationStatus,
     "approved",
   );
 });
@@ -520,10 +517,7 @@ test("catalogProductsQuerySchema rejects unknown moderationStatus with RU messag
     moderationStatus: "garbage",
   });
   assert.equal(result.success, false);
-  assert.equal(
-    result.error.issues[0]?.message,
-    "Некорректный фильтр списка товаров",
-  );
+  assert.equal(result.error.issues[0]?.message, "Некорректный фильтр списка товаров");
 });
 
 test("catalogProductsQuerySchema accepts search up to CATALOG_SEARCH_QUERY_MAX_LENGTH", () => {
@@ -697,7 +691,11 @@ test("productCategoryDisplaySlugParamsSchema accepts hyphenated tree slugs", () 
 });
 
 test("openapi.yaml documents commerce and auth contract paths", () => {
-  const openapiPath = join(dirname(fileURLToPath(import.meta.url)), "..", "openapi.yaml");
+  const openapiPath = join(
+    dirname(fileURLToPath(import.meta.url)),
+    "..",
+    "openapi.yaml",
+  );
   const yaml = readFileSync(openapiPath, "utf8");
 
   const requiredPaths = [

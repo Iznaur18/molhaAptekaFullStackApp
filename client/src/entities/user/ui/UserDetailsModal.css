@@ -256,7 +256,8 @@
     border-radius: var(--modal-profile-banner-radius);
   }
 
-  .user-details-modal:not(.user-details-modal_register) .user-details-modal__footer-outer {
+  .user-details-modal:not(.user-details-modal_register)
+    .user-details-modal__footer-outer {
     margin-top: 0.65rem;
     padding-top: 0.65rem;
   }

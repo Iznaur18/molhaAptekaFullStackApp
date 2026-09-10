@@ -10,9 +10,7 @@ export const fetchAppIntroSettings = async (): Promise<AppIntroPublicResponse> =
     return parseApiContractData(data, appIntroSettingsDataSchema);
   } catch (error) {
     const message =
-      error instanceof Error
-        ? error.message
-        : "Не удалось загрузить настройки intro";
+      error instanceof Error ? error.message : "Не удалось загрузить настройки intro";
     throw new Error(message);
   }
 };

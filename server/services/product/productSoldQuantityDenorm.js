@@ -85,9 +85,8 @@ export const applySoldQuantityDeltaForItemStatusChange = async ({
 
   if (delta > 0 && analytics?.orderId != null && analytics?.itemIndex != null) {
     try {
-      const { emitOrderItemSoldEvent } = await import(
-        "../analytics-events/emitAnalyticsEvents.js"
-      );
+      const { emitOrderItemSoldEvent } =
+        await import("../analytics-events/emitAnalyticsEvents.js");
       emitOrderItemSoldEvent({
         orderId: String(analytics.orderId),
         itemIndex: Number(analytics.itemIndex),

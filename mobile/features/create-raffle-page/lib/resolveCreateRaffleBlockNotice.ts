@@ -5,13 +5,16 @@ const CREATE_BLOCKING_STATUSES = new Set(["pending_staff", "active", "paused"]);
 export const isRaffleBlockingCreate = (status: string | null | undefined): boolean =>
   Boolean(status && CREATE_BLOCKING_STATUSES.has(status));
 
-export const canWithdrawRaffleFromModeration = (status: string | null | undefined): boolean =>
-  status === "pending_staff";
+export const canWithdrawRaffleFromModeration = (
+  status: string | null | undefined,
+): boolean => status === "pending_staff";
 
-export const resolveCreateRaffleBlockNotice = (raffle: {
-  title?: string | null;
-  status?: string | null;
-} | null): { message: string; canWithdraw: boolean } | null => {
+export const resolveCreateRaffleBlockNotice = (
+  raffle: {
+    title?: string | null;
+    status?: string | null;
+  } | null,
+): { message: string; canWithdraw: boolean } | null => {
   if (!raffle || !isRaffleBlockingCreate(raffle.status)) {
     return null;
   }

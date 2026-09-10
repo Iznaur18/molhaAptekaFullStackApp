@@ -320,10 +320,7 @@ export function InstallmentProgramModal({
                   );
 
                   return (
-                    <fieldset
-                      key={index}
-                      className="installment-program-modal__plan"
-                    >
+                    <fieldset key={index} className="installment-program-modal__plan">
                       <div className="installment-program-modal__plan-head">
                         <legend className="installment-program-modal__plan-name">
                           {INSTALLMENT_UI.PROGRAM_MODAL_PLAN_NUMBER(index + 1)}
@@ -372,9 +369,7 @@ export function InstallmentProgramModal({
                               inputMode="numeric"
                               min={INSTALLMENT_MONTHS_MIN}
                               max={INSTALLMENT_MONTHS_MAX}
-                              value={
-                                plan.monthsCount === "" ? "" : plan.monthsCount
-                              }
+                              value={plan.monthsCount === "" ? "" : plan.monthsCount}
                               onFocus={(event) => {
                                 if (monthsCount === 0) {
                                   updatePlan(index, { monthsCount: "" });
@@ -432,9 +427,7 @@ export function InstallmentProgramModal({
                               type="number"
                               inputMode="numeric"
                               min={0}
-                              value={
-                                plan.markupPercent === "" ? "" : markupPercent
-                              }
+                              value={plan.markupPercent === "" ? "" : markupPercent}
                               onFocus={() => {
                                 if (markupPercent === 0) {
                                   updatePlan(index, { markupPercent: "" });
@@ -463,7 +456,7 @@ export function InstallmentProgramModal({
                                         monthsCount,
                                         0,
                                       ),
-                                });
+                                  });
                                   return;
                                 }
                                 const nextMarkupPercent = Math.max(
@@ -510,12 +503,11 @@ export function InstallmentProgramModal({
                                   INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB;
                                 updatePlan(index, {
                                   monthlyAmountRub: restoredMonthly,
-                                  markupPercent:
-                                    resolveInstallmentPlanPriceSummary(
-                                      productPrice,
-                                      monthsCount,
-                                      restoredMonthly,
-                                    ).markupPercent,
+                                  markupPercent: resolveInstallmentPlanPriceSummary(
+                                    productPrice,
+                                    monthsCount,
+                                    restoredMonthly,
+                                  ).markupPercent,
                                 });
                               }}
                               onChange={(event) => {
@@ -523,24 +515,22 @@ export function InstallmentProgramModal({
                                 if (raw === "") {
                                   updatePlan(index, {
                                     monthlyAmountRub: "",
-                                    markupPercent:
-                                      resolveInstallmentPlanPriceSummary(
-                                        productPrice,
-                                        monthsCount,
-                                        0,
-                                      ).markupPercent,
+                                    markupPercent: resolveInstallmentPlanPriceSummary(
+                                      productPrice,
+                                      monthsCount,
+                                      0,
+                                    ).markupPercent,
                                   });
                                   return;
                                 }
                                 const nextMonthly = Number(raw) || 0;
                                 updatePlan(index, {
                                   monthlyAmountRub: nextMonthly,
-                                  markupPercent:
-                                    resolveInstallmentPlanPriceSummary(
-                                      productPrice,
-                                      monthsCount,
-                                      nextMonthly,
-                                    ).markupPercent,
+                                  markupPercent: resolveInstallmentPlanPriceSummary(
+                                    productPrice,
+                                    monthsCount,
+                                    nextMonthly,
+                                  ).markupPercent,
                                 });
                               }}
                               disabled={isSubmitting}

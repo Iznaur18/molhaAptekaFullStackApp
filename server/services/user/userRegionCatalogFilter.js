@@ -127,9 +127,7 @@ export function withCatalogRegionPrioritySort(sortStages, viewerRegionCode) {
 
         return {
           $sort: {
-            ...(globalTop !== undefined
-              ? { _promotionGlobalTop: globalTop }
-              : {}),
+            ...(globalTop !== undefined ? { _promotionGlobalTop: globalTop } : {}),
             ...(globalTopActivatedAt !== undefined
               ? { _promotionGlobalTopActivatedAt: globalTopActivatedAt }
               : {}),

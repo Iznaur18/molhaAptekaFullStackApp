@@ -30,7 +30,9 @@ export const fetchPendingUserStoryReports = async () => {
       totalReports: Number(data.data.totalReports) || 0,
     };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, "Не удалось загрузить жалобы на сторисы"));
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось загрузить жалобы на сторисы"),
+    );
   }
 };
 

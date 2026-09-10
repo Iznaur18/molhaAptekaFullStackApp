@@ -41,7 +41,9 @@ export const fetchMyFollowing = async ({
       pagination: data.data.pagination,
     };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_MY_FOLLOWING_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_MY_FOLLOWING_FALLBACK),
+    );
   }
 };
 

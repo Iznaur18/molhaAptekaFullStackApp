@@ -31,7 +31,9 @@ export const blockUserController = async (req, res) => {
   }
 
   return successRes(res, {
-    message: result.alreadyBlocked ? "Пользователь уже заблокирован" : "Пользователь заблокирован",
+    message: result.alreadyBlocked
+      ? "Пользователь уже заблокирован"
+      : "Пользователь заблокирован",
     isBlockedByMe: true,
     blockedAt: result.blockedAt,
   });
@@ -44,8 +46,7 @@ export const unblockUserController = async (req, res) => {
   const viewerId = String(req.userId);
   const blockedId = String(req.params.userIdClient);
   const viewer = await UserModel.findById(viewerId).select("userRole").lean();
-  const isModerator =
-    viewer?.userRole === "admin" || viewer?.userRole === "moderator";
+  const isModerator = viewer?.userRole === "admin" || viewer?.userRole === "moderator";
 
   const blockerId =
     isModerator && req.query.asUserId && String(req.query.asUserId).trim()

@@ -178,21 +178,20 @@ export function ProductDetailsModal({
     .filter(Boolean)
     .join(" ");
 
-  const tabs =
-    ctrl.showProductDetailsTabs ? (
-      <ProductDetailsModalTabs
-        detailsTab={ctrl.detailsTab}
-        setDetailsTab={ctrl.setDetailsTab}
-        showAuctionTab={ctrl.showAuctionTab}
-        showInstallmentTab={ctrl.showInstallmentTab}
-        showReviewsTab={ctrl.showReviewsTab}
-        showQaTab={ctrl.showQaTab}
-        showSimilarTab={ctrl.showSimilarTab}
-        showCompareTab={ctrl.showCompareTab}
-        reviewsTabLabel={ctrl.reviewsTabLabel}
-        qaTabLabel={ctrl.qaTabLabel}
-      />
-    ) : null;
+  const tabs = ctrl.showProductDetailsTabs ? (
+    <ProductDetailsModalTabs
+      detailsTab={ctrl.detailsTab}
+      setDetailsTab={ctrl.setDetailsTab}
+      showAuctionTab={ctrl.showAuctionTab}
+      showInstallmentTab={ctrl.showInstallmentTab}
+      showReviewsTab={ctrl.showReviewsTab}
+      showQaTab={ctrl.showQaTab}
+      showSimilarTab={ctrl.showSimilarTab}
+      showCompareTab={ctrl.showCompareTab}
+      reviewsTabLabel={ctrl.reviewsTabLabel}
+      qaTabLabel={ctrl.qaTabLabel}
+    />
+  ) : null;
 
   const tabPanel = (
     <div
@@ -272,9 +271,7 @@ export function ProductDetailsModal({
           <div className="product-details-page__wide-gallery">{pinnedGallery}</div>
           <div className="product-details-page__wide-rail">{splitDetailsLead}</div>
         </div>
-        {tabs ? (
-          <div className="product-details-page__wide-tabs">{tabs}</div>
-        ) : null}
+        {tabs ? <div className="product-details-page__wide-tabs">{tabs}</div> : null}
         <div
           className="product-details-page__wide-rest"
           ref={setPageSplitRestHost}

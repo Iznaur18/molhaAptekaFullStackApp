@@ -18,7 +18,10 @@ import { getProductPurchaseLimit } from "../../lib/getProductPurchaseLimit.js";
 import { resolveProductOutOfStockOverlayLabel } from "../../lib/resolveProductOutOfStockOverlayLabel.js";
 import { resolveProductPurchaseBlockState } from "../../lib/resolveProductPurchaseBlockState.js";
 import { resolveProductSellerClosedPurchaseState } from "../../lib/resolveProductSellerClosedPurchaseState.js";
-import { PRODUCT_QA_UI, PRODUCT_REVIEW_UI } from "../../../../shared/config/appUiCopy.js";
+import {
+  PRODUCT_QA_UI,
+  PRODUCT_REVIEW_UI,
+} from "../../../../shared/config/appUiCopy.js";
 import { useProductDetailsModalQueries } from "./useProductDetailsModalQueries.js";
 import { useProductDetailsModalTabs } from "./useProductDetailsModalTabs.js";
 
@@ -82,7 +85,13 @@ export function useProductDetailsModalController({
     });
 
     return undefined;
-  }, [isOpen, isAuthorized, onProductStatsUpdate, product?._id, recordProductViewMutate]);
+  }, [
+    isOpen,
+    isAuthorized,
+    onProductStatsUpdate,
+    product?._id,
+    recordProductViewMutate,
+  ]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -115,8 +124,7 @@ export function useProductDetailsModalController({
       : undefined;
   const topStatFieldKeys = topRowFieldKeys.filter(
     (key) =>
-      key !== "productPrice" &&
-      !(tabs.isOwnProduct && key === "productWishlistCount"),
+      key !== "productPrice" && !(tabs.isOwnProduct && key === "productWishlistCount"),
   );
   const bottomBlockFieldKeys = useMemo(() => {
     if (!product) return [];

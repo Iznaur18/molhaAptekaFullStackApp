@@ -101,7 +101,8 @@ export const useHomeFeedIntroTransition = ({
   const dragStartProgress = useSharedValue(0);
 
   const [scrollEnabled, setScrollEnabled] = useState(initialOpen >= 0.5);
-  const [backdropPlaybackActive, setBackdropPlaybackActive] = useState(introBackdropEnabled);
+  const [backdropPlaybackActive, setBackdropPlaybackActive] =
+    useState(introBackdropEnabled);
 
   const applyScrollEnabledFromMode = useCallback((nextMode: number) => {
     const nextEnabled = nextMode >= 0.5;
@@ -191,7 +192,8 @@ export const useHomeFeedIntroTransition = ({
       dragActive.value = 0;
 
       const travel = dockOffset * COMMIT_TRAVEL;
-      const commit = -event.translationY >= travel || event.velocityY <= -SWIPE_VELOCITY;
+      const commit =
+        -event.translationY >= travel || event.velocityY <= -SWIPE_VELOCITY;
       const target = commit ? 1 : 0;
 
       progress.value = withSpring(target, SPRING_CONFIG, (finished) => {

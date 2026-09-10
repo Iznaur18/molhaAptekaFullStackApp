@@ -9,8 +9,18 @@ import "./DataConfirmationPage.css";
 
 function UserCheckIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+      />
       <circle cx="9" cy="7" r="4" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M16 11l2 2 4-4" />
     </svg>
@@ -19,7 +29,13 @@ function UserCheckIcon() {
 
 function CheckIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      aria-hidden="true"
+    >
       <path strokeLinecap="round" strokeLinejoin="round" d="M20 6L9 17l-5-5" />
     </svg>
   );
@@ -27,7 +43,13 @@ function CheckIcon() {
 
 function StatusOkIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
       <circle cx="12" cy="12" r="10" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
     </svg>
@@ -36,7 +58,13 @@ function StatusOkIcon() {
 
 function StatusPendingIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
       <circle cx="12" cy="12" r="10" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
     </svg>
@@ -45,7 +73,13 @@ function StatusPendingIcon() {
 
 function StatusRejectedIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
       <circle cx="12" cy="12" r="10" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4M12 16h.01" />
     </svg>
@@ -59,11 +93,7 @@ function StatusRejectedIcon() {
  *   onOpenRequest: () => void;
  * }} props
  */
-export function DataConfirmationPage({
-  isAuthorized,
-  onRequestLogin,
-  onOpenRequest,
-}) {
+export function DataConfirmationPage({ isAuthorized, onRequestLogin, onOpenRequest }) {
   const statusQuery = useMyDataConfirmationStatusQuery({ enabled: isAuthorized });
 
   if (!isAuthorized) {

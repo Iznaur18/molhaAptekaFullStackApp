@@ -9,16 +9,13 @@ const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollectio
   await import("./helpers/mongoTestDb.js");
 const { createOrderLoyaltyFixture, createOrderWithReserveTransaction } =
   await import("./helpers/orderLoyaltyTestHelpers.js");
-const { OrderModel, UserInAppNotificationModel, UserModel } = await import(
-  "../models/index.js"
-);
-const { advanceOrderShipmentStatus } = await import(
-  "../services/order/advanceShipmentStatus.js"
-);
+const { OrderModel, UserInAppNotificationModel, UserModel } =
+  await import("../models/index.js");
+const { advanceOrderShipmentStatus } =
+  await import("../services/order/advanceShipmentStatus.js");
 const flow = await import("../services/courier/courierShipmentFlow.js");
-const { replaceShipmentCourier } = await import(
-  "../services/courier/replaceShipmentCourier.js"
-);
+const { replaceShipmentCourier } =
+  await import("../services/courier/replaceShipmentCourier.js");
 
 /** @param {string} [name] */
 const makeCourier = (name = "courier") =>

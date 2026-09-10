@@ -226,7 +226,10 @@ export function RuRegionPickerSheet({
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        <BackdropContainer style={[styles.backdrop, backdropAnimatedStyle]} pointerEvents="box-none">
+        <BackdropContainer
+          style={[styles.backdrop, backdropAnimatedStyle]}
+          pointerEvents="box-none"
+        >
           <ModalSheetGradientBackdrop />
           <Pressable
             style={styles.backdropPressable}
@@ -283,7 +286,9 @@ export function RuRegionPickerSheet({
               style={styles.list}
               contentContainerStyle={listContentStyle}
               renderItem={renderOption}
-              ListEmptyComponent={<Text style={styles.empty}>{REGION_UI.SEARCH_EMPTY}</Text>}
+              ListEmptyComponent={
+                <Text style={styles.empty}>{REGION_UI.SEARCH_EMPTY}</Text>
+              }
             />
           </SquircleView>
         </SheetContainer>

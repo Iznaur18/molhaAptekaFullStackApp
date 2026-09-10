@@ -8,9 +8,7 @@ function isPlausiblePaScript(src) {
 
 test("plausible pa-script detector", () => {
   assert.equal(
-    isPlausiblePaScript(
-      "https://plausible.io/js/pa-bpk-uLbAhfVhsvkpa1DW3.js",
-    ),
+    isPlausiblePaScript("https://plausible.io/js/pa-bpk-uLbAhfVhsvkpa1DW3.js"),
     true,
   );
   assert.equal(isPlausiblePaScript("https://plausible.io/js/script.js"), false);

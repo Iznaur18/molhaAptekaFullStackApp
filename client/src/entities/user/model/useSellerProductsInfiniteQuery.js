@@ -13,11 +13,7 @@ import { useInfiniteScrollSentinel } from "../../../shared/lib/useInfiniteScroll
 /**
  * @param {{ sellerId: string; enabled: boolean; shelfId?: string | null }} params
  */
-export function useSellerProductsInfiniteQuery({
-  sellerId,
-  enabled,
-  shelfId = null,
-}) {
+export function useSellerProductsInfiniteQuery({ sellerId, enabled, shelfId = null }) {
   const sentinelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const shelfKey = shelfId != null ? String(shelfId).trim() : "";
 

@@ -20,8 +20,7 @@ import {
 const buildOwnerFilter = (productId, userId, isAdmin) =>
   isAdmin ? { _id: productId } : { _id: productId, productSeller: userId };
 
-const hasBodyField = (body, field) =>
-  Object.prototype.hasOwnProperty.call(body, field);
+const hasBodyField = (body, field) => Object.prototype.hasOwnProperty.call(body, field);
 
 /**
  * Замок незакрытых продаж сторожит ровно то, что названо в его сообщении:
@@ -86,11 +85,11 @@ export async function patchMyProduct({ userId, productId, body }) {
     flashSaleNowEnabled,
     shouldResetBuyNFreeProgress,
   } = await buildProductPatchSet({
-      existing,
-      body,
-      skipsModeration,
-      productId,
-    });
+    existing,
+    body,
+    skipsModeration,
+    productId,
+  });
 
   applyProductSearchBlobToSet($set, existing);
 
@@ -102,11 +101,10 @@ export async function patchMyProduct({ userId, productId, body }) {
     update.$unset = $unset;
   }
 
-  const product = await ProductModel.findOneAndUpdate(
-    ownerFilter,
-    update,
-    { returnDocument: "after", runValidators: true },
-  )
+  const product = await ProductModel.findOneAndUpdate(ownerFilter, update, {
+    returnDocument: "after",
+    runValidators: true,
+  })
     .populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT)
     .lean();
 
@@ -128,14 +126,20 @@ export async function patchMyProduct({ userId, productId, body }) {
     nextAuctionEnabled,
   });
 
-  if (flashSaleNowEnabled && product.productModerationStatus === PRODUCT_MODERATION_APPROVED) {
+  if (
+    flashSaleNowEnabled &&
+    product.productModerationStatus === PRODUCT_MODERATION_APPROVED
+  ) {
     const previousPercent =
       existing.productFlashSaleEnabled === true
         ? computeProductDiscountPercent(
             existing.productFlashSaleBasePrice,
             existing.productPrice,
           )
-        : computeProductDiscountPercent(existing.productOldPrice, existing.productPrice);
+        : computeProductDiscountPercent(
+            existing.productOldPrice,
+            existing.productPrice,
+          );
     try {
       await notifyFollowersOfSellerProductDiscount(product, previousPercent);
     } catch {

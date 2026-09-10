@@ -43,15 +43,20 @@ export const HomeCatalogUsersStretchMenu = ({
   const insets = useSafeAreaInsets();
   const anchorRef = useRef<View>(null);
   const [menuAnchor, setMenuAnchor] = useState<LayoutRectangle | null>(null);
-  const { portalVisible, menuExpanded, shellAnimatedStyle, itemsAnimatedStyle, useCssTransition } =
-    useHomeCatalogUsersStretchMenuAnimation({
-      open,
-      itemCount: items.length,
-      closedBackgroundColor: theme.colors.action,
-      openBackgroundColor: theme.colors.surface,
-      closedBorderColor: "transparent",
-      openBorderColor: theme.colors.border,
-    });
+  const {
+    portalVisible,
+    menuExpanded,
+    shellAnimatedStyle,
+    itemsAnimatedStyle,
+    useCssTransition,
+  } = useHomeCatalogUsersStretchMenuAnimation({
+    open,
+    itemCount: items.length,
+    closedBackgroundColor: theme.colors.action,
+    openBackgroundColor: theme.colors.surface,
+    closedBorderColor: "transparent",
+    openBorderColor: theme.colors.border,
+  });
   useRegisterBlockingOverlay(portalVisible);
 
   const measureAnchor = useCallback(() => {
@@ -125,7 +130,10 @@ export const HomeCatalogUsersStretchMenu = ({
           return (
             <Pressable
               key={item.key}
-              style={[styles.usersStretchItem, isActive && styles.usersStretchItemActive]}
+              style={[
+                styles.usersStretchItem,
+                isActive && styles.usersStretchItemActive,
+              ]}
               accessibilityRole="menuitem"
               accessibilityLabel={item.accessibilityLabel}
               onPress={() => handleItemPress(item)}
@@ -151,17 +159,30 @@ export const HomeCatalogUsersStretchMenu = ({
   const portalShellStyle =
     menuAnchor == null
       ? null
-      : resolveHomeCatalogUsersMenuPortalStyle(menuAnchor, Dimensions.get("window").width, {
-          safeAreaTop: insets.top,
-          embeddedInForegroundSheet,
-          safeAreaInsets: insets,
-          useStickyAnchorFallback: Platform.OS !== "web",
-        });
+      : resolveHomeCatalogUsersMenuPortalStyle(
+          menuAnchor,
+          Dimensions.get("window").width,
+          {
+            safeAreaTop: insets.top,
+            embeddedInForegroundSheet,
+            safeAreaInsets: insets,
+            useStickyAnchorFallback: Platform.OS !== "web",
+          },
+        );
 
   return (
     <>
-      <View ref={anchorRef} style={styles.usersNavPill} onLayout={measureAnchor} collapsable={false}>
-        {portalVisible ? <View style={styles.usersNavPillPlaceholder} /> : renderShell()}
+      <View
+        ref={anchorRef}
+        style={styles.usersNavPill}
+        onLayout={measureAnchor}
+        collapsable={false}
+      >
+        {portalVisible ? (
+          <View style={styles.usersNavPillPlaceholder} />
+        ) : (
+          renderShell()
+        )}
       </View>
 
       <Modal
@@ -176,7 +197,9 @@ export const HomeCatalogUsersStretchMenu = ({
           onPress={handleToggle}
           accessibilityLabel={HEADER_USERS_BUTTON_UI.MENU_CLOSE_ARIA}
         />
-        {portalShellStyle ? renderShell([styles.usersStretchShellPortal, portalShellStyle]) : null}
+        {portalShellStyle
+          ? renderShell([styles.usersStretchShellPortal, portalShellStyle])
+          : null}
       </Modal>
     </>
   );

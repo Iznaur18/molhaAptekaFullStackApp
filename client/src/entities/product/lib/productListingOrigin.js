@@ -6,7 +6,10 @@ import {
 } from "@molha/api-contract";
 import { Factory, HelpCircle, Store, User } from "lucide-react";
 
-import { CREATE_PRODUCT_MODAL_UI, PRODUCT_DETAILS_MODAL_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  CREATE_PRODUCT_MODAL_UI,
+  PRODUCT_DETAILS_MODAL_UI,
+} from "../../../shared/config/appUiCopy.js";
 
 /** @typedef {'own' | 'resale' | 'manufacturer'} ProductListingOrigin */
 
@@ -33,9 +36,7 @@ export const PRODUCT_LISTING_ORIGIN_OPTIONS = [
  * @returns {value is ProductListingOrigin}
  */
 export function isProductListingOrigin(value) {
-  return (
-    typeof value === "string" && PRODUCT_LISTING_ORIGIN_VALUES.includes(value)
-  );
+  return typeof value === "string" && PRODUCT_LISTING_ORIGIN_VALUES.includes(value);
 }
 
 /**

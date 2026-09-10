@@ -1,6 +1,6 @@
 type SellerCatalogItem = {
   viewable?: boolean;
-  product?: Record<string, unknown> & { _id: string } | null;
+  product?: (Record<string, unknown> & { _id: string }) | null;
 };
 
 export const mapSellerCatalogItemsToProducts = (

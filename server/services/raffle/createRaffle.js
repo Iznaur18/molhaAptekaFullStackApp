@@ -1,6 +1,4 @@
-import {
-  RAFFLE_STATUS_PENDING_STAFF,
-} from "../../constants/raffleConstants.js";
+import { RAFFLE_STATUS_PENDING_STAFF } from "../../constants/raffleConstants.js";
 import { AppError } from "../../errors/AppError.js";
 import { RaffleModel } from "../../models/index.js";
 import { runInTransaction } from "../../utils/mongoTransaction.js";

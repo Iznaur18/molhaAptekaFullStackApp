@@ -1,7 +1,12 @@
-import { resolveYandexMapsOpenCandidates, type YandexMapsPointInput } from "@izibuy/shared-lib";
+import {
+  resolveYandexMapsOpenCandidates,
+  type YandexMapsPointInput,
+} from "@izibuy/shared-lib";
 import { Linking } from "react-native";
 
-export const openYandexMapsRoute = async (point: YandexMapsPointInput): Promise<void> => {
+export const openYandexMapsRoute = async (
+  point: YandexMapsPointInput,
+): Promise<void> => {
   const candidates = resolveYandexMapsOpenCandidates(point);
   if (candidates.length === 0) {
     return;

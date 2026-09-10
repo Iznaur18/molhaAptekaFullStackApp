@@ -1,6 +1,14 @@
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { LayoutAnimation, Platform, Pressable, Text, TextInput, UIManager, View } from "react-native";
+import {
+  LayoutAnimation,
+  Platform,
+  Pressable,
+  Text,
+  TextInput,
+  UIManager,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { isEmailAuthEnabled, resolveAuthContactChannel } from "@izibuy/shared-lib";
@@ -33,7 +41,11 @@ if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental
 
 const animateChannelSwitch = () => {
   LayoutAnimation.configureNext(
-    LayoutAnimation.create(180, LayoutAnimation.Types.easeInEaseOut, LayoutAnimation.Properties.opacity),
+    LayoutAnimation.create(
+      180,
+      LayoutAnimation.Types.easeInEaseOut,
+      LayoutAnimation.Properties.opacity,
+    ),
   );
 };
 
@@ -68,14 +80,17 @@ export default function LoginScreen() {
     router.replace("/(tabs)/me");
   }, [router]);
 
-  const handleChannelChange = useCallback((next: AuthChannel) => {
-    if (next === channel) {
-      return;
-    }
-    animateChannelSwitch();
-    setChannel(next);
-    setLocalError("");
-  }, [channel]);
+  const handleChannelChange = useCallback(
+    (next: AuthChannel) => {
+      if (next === channel) {
+        return;
+      }
+      animateChannelSwitch();
+      setChannel(next);
+      setLocalError("");
+    },
+    [channel],
+  );
 
   const handleSubmit = async () => {
     setLocalError("");
@@ -110,9 +125,7 @@ export default function LoginScreen() {
       ? formatApiErrorMessage(mutationError, API_CLIENT_UI.LOGIN_FALLBACK)
       : "");
 
-  const submitLabel = isLoading
-    ? AUTH_UI.LOGIN_SUBMIT_LOADING
-    : AUTH_UI.LOGIN_BUTTON;
+  const submitLabel = isLoading ? AUTH_UI.LOGIN_SUBMIT_LOADING : AUTH_UI.LOGIN_BUTTON;
 
   return (
     <View style={styles.flex}>
@@ -159,7 +172,10 @@ export default function LoginScreen() {
                 <View style={styles.field}>
                   <Text style={styles.label}>{AUTH_UI.EMAIL_LABEL}</Text>
                   <TextInput
-                    style={[styles.input, focusedField === "email" && styles.inputFocused]}
+                    style={[
+                      styles.input,
+                      focusedField === "email" && styles.inputFocused,
+                    ]}
                     value={email}
                     onChangeText={setEmail}
                     onFocus={() => setFocusedField("email")}
@@ -178,7 +194,10 @@ export default function LoginScreen() {
                 <View style={styles.field}>
                   <Text style={styles.label}>{AUTH_UI.PHONE_LABEL}</Text>
                   <TextInput
-                    style={[styles.input, focusedField === "phone" && styles.inputFocused]}
+                    style={[
+                      styles.input,
+                      focusedField === "phone" && styles.inputFocused,
+                    ]}
                     value={phoneNumber}
                     onChangeText={(value) => setPhoneNumber(maskRuPhoneInput(value))}
                     onFocus={() => setFocusedField("phone")}
@@ -218,7 +237,9 @@ export default function LoginScreen() {
                 onPress={() => router.push("/(auth)/forgot-password")}
                 disabled={isLoading}
               >
-                <Text style={styles.registerLinkText}>{AUTH_UI.FORGOT_PASSWORD_LINK}</Text>
+                <Text style={styles.registerLinkText}>
+                  {AUTH_UI.FORGOT_PASSWORD_LINK}
+                </Text>
               </Pressable>
               <Pressable
                 style={[styles.registerLink, isLoading && styles.registerLinkDisabled]}
@@ -233,4 +254,4 @@ export default function LoginScreen() {
       </AuthScreenScroll>
     </View>
   );
-};
+}

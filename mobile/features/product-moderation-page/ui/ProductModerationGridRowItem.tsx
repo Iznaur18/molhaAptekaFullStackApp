@@ -37,7 +37,8 @@ const buildModerationActions = (
   onRejectCommentChange: (value) => props.onRejectCommentChange(productId, value),
   onApprove: () => props.onApprove(productId),
   onReject: () => props.onReject(productId),
-  onDelete: props.canDelete && props.onDelete ? () => props.onDelete?.(productId) : undefined,
+  onDelete:
+    props.canDelete && props.onDelete ? () => props.onDelete?.(productId) : undefined,
   canDelete: Boolean(props.canDelete),
   hasOpenSales: product.hasOpenSales === true,
   isBusy: props.pendingProductId === productId,
@@ -64,7 +65,9 @@ export const ProductModerationGridRowItem = ({
 
   return (
     <CatalogGridRowEnteringShell rowIndex={rowIndex}>
-      <View style={[catalogGridRowStyles.row, { gap, width: "100%", alignSelf: "stretch" }]}>
+      <View
+        style={[catalogGridRowStyles.row, { gap, width: "100%", alignSelf: "stretch" }]}
+      >
         {row.products.map((product) => {
           const productId = String(product._id);
 
@@ -83,7 +86,10 @@ export const ProductModerationGridRowItem = ({
         })}
         {columns > 1 && row.products.length < columns
           ? Array.from({ length: columns - row.products.length }, (_, index) => (
-              <View key={`product-moderation-grid-pad-${index}`} style={{ width: tileWidth }} />
+              <View
+                key={`product-moderation-grid-pad-${index}`}
+                style={{ width: tileWidth }}
+              />
             ))
           : null}
       </View>

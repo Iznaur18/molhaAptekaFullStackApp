@@ -50,9 +50,10 @@ export default function ProfileScreen() {
     user?.isEmailVerified !== true;
   const isSessionLoading = sessionQuery.isPending && sessionQuery.data === undefined;
 
-  const guestProfileLoginMenuBannerImageQuery = useGuestProfileLoginMenuBannerImageQuery({
-    enabled: !isLoggedIn && !isSessionLoading,
-  });
+  const guestProfileLoginMenuBannerImageQuery =
+    useGuestProfileLoginMenuBannerImageQuery({
+      enabled: !isLoggedIn && !isSessionLoading,
+    });
 
   useFocusEffect(
     useCallback(() => {

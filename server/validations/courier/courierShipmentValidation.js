@@ -22,9 +22,7 @@ export const courierHandoverCodeValidation = [
   validateBodyZod(courierHandoverCodeBodySchema),
 ];
 
-export const courierOverviewValidation = [
-  validateQueryZod(courierOverviewQuerySchema),
-];
+export const courierOverviewValidation = [validateQueryZod(courierOverviewQuerySchema)];
 
 export const shipmentDeliveryFeeValidation = [
   validateParamsZod(courierShipmentParamsSchema),

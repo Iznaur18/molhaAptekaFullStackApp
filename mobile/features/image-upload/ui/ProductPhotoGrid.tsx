@@ -49,11 +49,19 @@ export const ProductPhotoGrid = ({
   const isBusy = uploadingCount > 0;
 
   const tileSize = useMemo(
-    () => resolveGridTileWidth(gridWidth, PRODUCT_PHOTO_GRID_COLUMNS, PRODUCT_PHOTO_GRID_GAP),
+    () =>
+      resolveGridTileWidth(
+        gridWidth,
+        PRODUCT_PHOTO_GRID_COLUMNS,
+        PRODUCT_PHOTO_GRID_GAP,
+      ),
     [gridWidth],
   );
 
-  const tileHeight = useMemo(() => resolveProductMediaDisplayHeight(tileSize), [tileSize]);
+  const tileHeight = useMemo(
+    () => resolveProductMediaDisplayHeight(tileSize),
+    [tileSize],
+  );
 
   const tileDimensions =
     tileSize > 0 ? { width: tileSize, height: tileHeight } : { width: 0, height: 0 };
@@ -89,7 +97,9 @@ export const ProductPhotoGrid = ({
     try {
       assets = await pickGalleryImageAssets(remaining);
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : IMAGE_UPLOAD_UI.ERROR_GENERIC);
+      setErrorMessage(
+        error instanceof Error ? error.message : IMAGE_UPLOAD_UI.ERROR_GENERIC,
+      );
       return;
     }
     if (assets.length === 0) {
@@ -104,7 +114,9 @@ export const ProductPhotoGrid = ({
         next = [...next, storedUrl];
         onChange(next);
       } catch (error) {
-        setErrorMessage(error instanceof Error ? error.message : IMAGE_UPLOAD_UI.ERROR_GENERIC);
+        setErrorMessage(
+          error instanceof Error ? error.message : IMAGE_UPLOAD_UI.ERROR_GENERIC,
+        );
       } finally {
         setUploadingCount((count) => Math.max(0, count - 1));
       }
@@ -142,7 +154,9 @@ export const ProductPhotoGrid = ({
                 />
                 {index === 0 ? (
                   <View style={styles.coverBadge}>
-                    <Text style={styles.coverBadgeText}>{IMAGE_UPLOAD_UI.COVER_BADGE}</Text>
+                    <Text style={styles.coverBadgeText}>
+                      {IMAGE_UPLOAD_UI.COVER_BADGE}
+                    </Text>
                   </View>
                 ) : null}
                 <Pressable

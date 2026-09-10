@@ -38,7 +38,12 @@
   background: linear-gradient(
     180deg,
     var(--iz-color-action) 0%,
-    color-mix(in srgb, var(--iz-color-action) 55%, var(--iz-color-accent, var(--iz-color-primary))) 100%
+    color-mix(
+        in srgb,
+        var(--iz-color-action) 55%,
+        var(--iz-color-accent, var(--iz-color-primary))
+      )
+      100%
   );
 }
 

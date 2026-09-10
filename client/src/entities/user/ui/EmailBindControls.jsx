@@ -40,7 +40,9 @@ export function EmailBindControls({
 
   if (!needsVerify && isEmailVerified) {
     return (
-      <span className="edit-profile-modal__hint">{EDIT_PROFILE_MODAL_UI.EMAIL_VERIFIED}</span>
+      <span className="edit-profile-modal__hint">
+        {EDIT_PROFILE_MODAL_UI.EMAIL_VERIFIED}
+      </span>
     );
   }
 
@@ -138,7 +140,10 @@ export function EmailBindControls({
         </>
       )}
       {status.kind === "error" ? (
-        <span className="edit-profile-modal__hint edit-profile-modal__hint_error" role="alert">
+        <span
+          className="edit-profile-modal__hint edit-profile-modal__hint_error"
+          role="alert"
+        >
           {status.message}
         </span>
       ) : null}

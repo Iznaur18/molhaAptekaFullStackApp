@@ -21,9 +21,7 @@ export async function fetchStaffAuditLog(filters = {}) {
     return data.data;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      "Не удалось загрузить журнал аудита";
+      e?.response?.data?.message ?? e?.message ?? "Не удалось загрузить журнал аудита";
     throw new Error(message);
   }
 }

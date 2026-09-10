@@ -106,7 +106,9 @@ export function AddressDeliveryFields({
   const [myLocationStatus, setMyLocationStatus] = useState(
     /** @type {'idle' | 'loading'} */ ("idle"),
   );
-  const [myLocationError, setMyLocationError] = useState(/** @type {string | null} */ (null));
+  const [myLocationError, setMyLocationError] = useState(
+    /** @type {string | null} */ (null),
+  );
 
   const lineLabel = labels.line ?? ADDRESS_DELIVERY_UI.LABEL_LINE;
   const trimmedLine = value.line.trim();
@@ -176,7 +178,8 @@ export function AddressDeliveryFields({
 
   const suggestionsQuery = useAddressSuggestionsQuery({
     query: debouncedQuery,
-    enabled: suggestEnabled && debouncedQuery.length >= ADDRESS_SUGGEST_MIN_QUERY_LENGTH,
+    enabled:
+      suggestEnabled && debouncedQuery.length >= ADDRESS_SUGGEST_MIN_QUERY_LENGTH,
   });
   const suggestions = suggestEnabled ? (suggestionsQuery.data ?? []) : [];
   const isSuggestFetching = suggestionsQuery.fetchStatus === "fetching";
@@ -361,7 +364,9 @@ export function AddressDeliveryFields({
     value.line.trim().length >= ADDRESS_SUGGEST_MIN_QUERY_LENGTH;
 
   const showMapSuggestPanelNotes =
-    mapOpen && mapSuggestPanelOpen && debouncedQuery.length >= ADDRESS_SUGGEST_MIN_QUERY_LENGTH;
+    mapOpen &&
+    mapSuggestPanelOpen &&
+    debouncedQuery.length >= ADDRESS_SUGGEST_MIN_QUERY_LENGTH;
 
   const mapLat = value.geo?.lat ?? null;
   const mapLon = value.geo?.lon ?? null;
@@ -375,7 +380,10 @@ export function AddressDeliveryFields({
             aria-modal="true"
             aria-labelledby={mapTitleId}
           >
-            <h2 id={mapTitleId} className="address-delivery-fields__map-fullscreen-sr-title">
+            <h2
+              id={mapTitleId}
+              className="address-delivery-fields__map-fullscreen-sr-title"
+            >
               {ADDRESS_DELIVERY_UI.MAP_ARIA}
             </h2>
             <div className="address-delivery-fields__map-fullscreen-body">
@@ -442,7 +450,10 @@ export function AddressDeliveryFields({
                   </ul>
                 ) : null}
                 {showMapSuggestPanelNotes && isSuggestFetching ? (
-                  <p className="address-delivery-fields__map-fullscreen-note" role="status">
+                  <p
+                    className="address-delivery-fields__map-fullscreen-note"
+                    role="status"
+                  >
                     {ADDRESS_DELIVERY_UI.SUGGEST_LOADING}
                   </p>
                 ) : null}
@@ -477,7 +488,11 @@ export function AddressDeliveryFields({
                 <button
                   type="button"
                   className="address-delivery-fields__map-fullscreen-my-location"
-                  disabled={disabled || myLocationStatus === "loading" || mapStatus === "loading"}
+                  disabled={
+                    disabled ||
+                    myLocationStatus === "loading" ||
+                    mapStatus === "loading"
+                  }
                   onClick={handleMyLocationClick}
                   aria-label={ADDRESS_DELIVERY_UI.MAP_MY_LOCATION}
                   title={ADDRESS_DELIVERY_UI.MAP_MY_LOCATION}

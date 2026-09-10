@@ -41,7 +41,9 @@ const AppIntroSplashContent = ({ onDismiss }: AppIntroSplashContentProps) => {
     const platformConfig = resolveAppIntroPlaybackConfig(response?.settings ?? null, {
       isPaidIntro: false,
     });
-    const platformHasMedia = Boolean(platformConfig.videoMp4Src || platformConfig.posterSrc);
+    const platformHasMedia = Boolean(
+      platformConfig.videoMp4Src || platformConfig.posterSrc,
+    );
     if (platformHasMedia) {
       items.push(platformConfig);
     }
@@ -131,7 +133,11 @@ const AppIntroSplashContent = ({ onDismiss }: AppIntroSplashContentProps) => {
           style={styles.video}
         />
       ) : current?.posterSrc ? (
-        <Image source={{ uri: current.posterSrc }} style={styles.video} resizeMode="cover" />
+        <Image
+          source={{ uri: current.posterSrc }}
+          style={styles.video}
+          resizeMode="cover"
+        />
       ) : (
         <View style={styles.fallback}>
           <Text style={styles.fallbackTitle}>{current?.fallbackTitle}</Text>
@@ -169,7 +175,12 @@ export const AppIntroSplash = () => {
   }
 
   return (
-    <Modal visible animationType="fade" transparent={false} onRequestClose={preventBackDismiss}>
+    <Modal
+      visible
+      animationType="fade"
+      transparent={false}
+      onRequestClose={preventBackDismiss}
+    >
       <AppIntroSplashContent onDismiss={dismissIntro} />
     </Modal>
   );

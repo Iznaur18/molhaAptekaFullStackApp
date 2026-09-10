@@ -59,7 +59,8 @@ export function IntroAdModerationCampaignCard({
   onExpandedChange,
 }) {
   const advertiserName = resolveAdvertiserName(campaign);
-  const needsAttention = mode === "pending" && campaignModerationNeedsAttention(campaign);
+  const needsAttention =
+    mode === "pending" && campaignModerationNeedsAttention(campaign);
   const collapsedPreview = resolveModerationCampaignCollapsedPreview(campaign);
   const createdLabel =
     mode === "pending" && campaign.createdAt

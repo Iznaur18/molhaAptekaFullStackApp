@@ -106,7 +106,10 @@ export const AppIntroAdminPage = () => {
           ]}
         >
           {pageHeader}
-          <ScreenErrorState message={queryError} onRetry={() => void reloadSettings()} />
+          <ScreenErrorState
+            message={queryError}
+            onRetry={() => void reloadSettings()}
+          />
         </ScrollView>
         {navSheet}
       </>
@@ -131,9 +134,13 @@ export const AppIntroAdminPage = () => {
 
         {saveNotice ? (
           <View style={styles.notice} accessibilityRole="text">
-            <Text style={styles.noticeText}>{APP_INTRO_ADMIN_PAGE_UI.SAVE_SUCCESS}</Text>
+            <Text style={styles.noticeText}>
+              {APP_INTRO_ADMIN_PAGE_UI.SAVE_SUCCESS}
+            </Text>
             <Pressable style={styles.noticeButton} onPress={handleWatchSaved}>
-              <Text style={styles.noticeButtonText}>{APP_INTRO_ADMIN_PAGE_UI.WATCH_AFTER_SAVE}</Text>
+              <Text style={styles.noticeButtonText}>
+                {APP_INTRO_ADMIN_PAGE_UI.WATCH_AFTER_SAVE}
+              </Text>
             </Pressable>
           </View>
         ) : null}
@@ -158,10 +165,14 @@ export const AppIntroAdminPage = () => {
           </View>
 
           <View style={styles.fieldset} pointerEvents={isSaving ? "none" : "auto"}>
-            <Text style={styles.legend}>{APP_INTRO_ADMIN_PAGE_UI.SECTION_FALLBACK}</Text>
+            <Text style={styles.legend}>
+              {APP_INTRO_ADMIN_PAGE_UI.SECTION_FALLBACK}
+            </Text>
 
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_FALLBACK_TITLE}</Text>
+              <Text style={styles.fieldLabel}>
+                {APP_INTRO_ADMIN_PAGE_UI.LABEL_FALLBACK_TITLE}
+              </Text>
               <TextInput
                 style={styles.fieldInput}
                 value={form.fallbackTitle}
@@ -172,7 +183,9 @@ export const AppIntroAdminPage = () => {
             </View>
 
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>{APP_INTRO_ADMIN_PAGE_UI.LABEL_FALLBACK_HINT}</Text>
+              <Text style={styles.fieldLabel}>
+                {APP_INTRO_ADMIN_PAGE_UI.LABEL_FALLBACK_HINT}
+              </Text>
               <TextInput
                 style={styles.fieldInput}
                 value={form.fallbackHint}
@@ -184,7 +197,9 @@ export const AppIntroAdminPage = () => {
           </View>
 
           <View style={styles.fieldset} pointerEvents={isSaving ? "none" : "auto"}>
-            <Text style={styles.legend}>{APP_INTRO_ADMIN_PAGE_UI.SECTION_PRIORITY}</Text>
+            <Text style={styles.legend}>
+              {APP_INTRO_ADMIN_PAGE_UI.SECTION_PRIORITY}
+            </Text>
             <View style={styles.checkboxRow}>
               <Switch
                 value={form.prioritizePlatformIntro}
@@ -208,11 +223,16 @@ export const AppIntroAdminPage = () => {
 
           <View style={styles.actions}>
             <Pressable
-              style={[styles.secondaryButton, isSaving && styles.secondaryButtonDisabled]}
+              style={[
+                styles.secondaryButton,
+                isSaving && styles.secondaryButtonDisabled,
+              ]}
               onPress={handlePreview}
               disabled={isSaving}
             >
-              <Text style={styles.secondaryButtonText}>{APP_INTRO_ADMIN_PAGE_UI.PREVIEW}</Text>
+              <Text style={styles.secondaryButtonText}>
+                {APP_INTRO_ADMIN_PAGE_UI.PREVIEW}
+              </Text>
             </Pressable>
             <Pressable
               style={[styles.primaryButton, isSaving && styles.primaryButtonDisabled]}
@@ -220,7 +240,9 @@ export const AppIntroAdminPage = () => {
               disabled={isSaving}
             >
               <Text style={styles.primaryButtonText}>
-                {isSaving ? APP_INTRO_ADMIN_PAGE_UI.SAVING : APP_INTRO_ADMIN_PAGE_UI.SAVE}
+                {isSaving
+                  ? APP_INTRO_ADMIN_PAGE_UI.SAVING
+                  : APP_INTRO_ADMIN_PAGE_UI.SAVE}
               </Text>
             </Pressable>
           </View>

@@ -70,8 +70,7 @@ export async function approvePendingProductsForTrustedSeller({ sellerId }) {
               product.productOldPrice,
               product.productPrice,
             ),
-            productModerationApprovedHash:
-              buildProductModerationFingerprint(product),
+            productModerationApprovedHash: buildProductModerationFingerprint(product),
           },
         },
       },

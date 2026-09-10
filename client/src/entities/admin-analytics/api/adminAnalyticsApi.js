@@ -16,9 +16,7 @@ export async function fetchAdminAnalyticsOverview(params = {}) {
     return data.data;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      "Не удалось загрузить аналитику";
+      e?.response?.data?.message ?? e?.message ?? "Не удалось загрузить аналитику";
     throw new Error(message);
   }
 }
@@ -38,9 +36,7 @@ export async function fetchAdminAnalyticsExport(params = {}) {
     return data.data;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      "Не удалось скачать отчёт";
+      e?.response?.data?.message ?? e?.message ?? "Не удалось скачать отчёт";
     throw new Error(message);
   }
 }
@@ -55,9 +51,7 @@ export async function runAdminAnalyticsReconciliation() {
     return data.data;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      "Не удалось запустить сверку";
+      e?.response?.data?.message ?? e?.message ?? "Не удалось запустить сверку";
     throw new Error(message);
   }
 }

@@ -29,7 +29,11 @@ const toObjectId = (value) => {
  *   session?: import("mongoose").ClientSession | null;
  * }} input
  */
-export const getBuyNFreeProgressDoc = async ({ buyerId, productId, session = null }) => {
+export const getBuyNFreeProgressDoc = async ({
+  buyerId,
+  productId,
+  session = null,
+}) => {
   const buyerObjectId = toObjectId(buyerId);
   const productObjectId = toObjectId(productId);
   if (!buyerObjectId || !productObjectId) {

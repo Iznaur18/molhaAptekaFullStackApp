@@ -360,207 +360,207 @@ export const useProductCardStyles = createThemedStyles((theme) => {
   const BC = resolveProductCardBadgeColors(theme.colors);
   const soft = resolveProductCardSoftElevationShadow(theme.colors);
   return {
-  card: {
-    flex: 1,
-    position: "relative",
-    margin: 3,
-    paddingBottom: 7,
-    borderRadius: 16,
-    backgroundColor: theme.colors.surface,
-    shadowColor: soft.shadowColor,
-    shadowOffset: { width: 0, height: soft.shadowOffsetY },
-    shadowOpacity: soft.shadowOpacity,
-    shadowRadius: soft.shadowRadius,
-    elevation: soft.elevation,
-    overflow: "hidden",
-  },
-  cardCatalogGrid: {
-    flexGrow: 0,
-    flexShrink: 0,
-    width: "100%",
-    margin: 0,
-    paddingTop: 0,
-    paddingHorizontal: 0,
-    paddingBottom: MCL.bottomPadding,
-  },
-  cardCatalogGridModerationQueue: {
-    height: undefined,
-    minHeight: undefined,
-    maxHeight: undefined,
-  },
-  cardOutOfStock: {
-    opacity: OOS.cardOpacity,
-    ...(Platform.OS === "web" ? ({ filter: "grayscale(1)" } as const) : null),
-  },
-  imageWrapCatalogGrid: {
-    marginHorizontal: -MCL.contentInsetX,
-    aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
-    borderTopLeftRadius: MCL.imageTopRadius,
-    borderTopRightRadius: MCL.imageTopRadius,
-    borderBottomLeftRadius: MCL.imageBottomRadius,
-    borderBottomRightRadius: MCL.imageBottomRadius,
-  },
-  contentCatalogGrid: {
-    paddingHorizontal: MCL.contentInsetX,
-    paddingTop: MCL.bodyGap,
-    gap: MCL.bodyGap,
-    flexGrow: 0,
-    flexShrink: 0,
-    height: resolveProductCardCatalogGridContentBelowImageHeight(),
-  },
-  contentPressableCatalogGrid: {
-    alignSelf: "stretch",
-    alignItems: "flex-start",
-    gap: MCL.bodyGap,
-  },
-  nameCatalogGrid: {
-    fontSize: MCL.nameFontSize,
-    lineHeight: MCL.nameLineHeight,
-    maxHeight: MCL.headingHeight,
-    fontWeight: "500",
-  },
-  metaStripCatalogGrid: {
-    gap: 2,
-    maxHeight: MCL.metaHeight,
-    overflow: "visible",
-  },
-  ratingCatalogGrid: {
-    fontSize: MCL.ratingFontSize,
-    lineHeight: MCL.ratingLineHeight,
-    maxHeight: MCL.ratingLineHeight,
-  },
-  sellerRowCatalogGrid: {
-    minHeight: MCL.sellerRowHeight,
-    maxHeight: MCL.sellerRowHeight,
-    overflow: "hidden",
-  },
-  pressable: {
-    flex: 1,
-  },
-  imagePressable: {
-    width: "100%",
-    height: "100%",
-  },
-  contentPressable: {
-    alignSelf: "stretch",
-  },
-  cardPressed: {
-    opacity: 0.94,
-  },
-  wishlistSlot: {
-    position: "absolute",
-    top: 6,
-    right: 6,
-    zIndex: 3,
-  },
-  imageWrap: {
-    position: "relative",
-    marginHorizontal: -PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
-    aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
-    backgroundColor: "rgba(17, 24, 39, 0.05)",
-    overflow: "hidden",
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-  },
-  imageBadges: {
-    position: "absolute",
-    left: BOL.insetX,
-    bottom: BOL.insetBottom,
-    flexDirection: "column",
-    alignItems: "flex-start",
-    gap: BOL.gap,
-    maxWidth: "100%",
-    pointerEvents: "box-none",
-  },
-  content: {
-    paddingHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
-    paddingTop: PRODUCT_CARD_MOBILE_LAYOUT.bodyGap,
-    gap: PRODUCT_CARD_MOBILE_LAYOUT.bodyGap,
-  },
-  metaStrip: {
-    gap: PRODUCT_CARD_MOBILE_LAYOUT.metaStripGap,
-  },
-  name: {
-    fontSize: 14,
-    lineHeight: 17,
-    fontWeight: "400",
-    color: theme.colors.text,
-  },
-  rating: {
-    fontSize: 11.8,
-    lineHeight: 14.8,
-    fontWeight: "600",
-    color: BC.rating,
-  },
-  ratingPlaceholder: {
-    fontWeight: "500",
-    color: BC.ratingPlaceholder,
-  },
-  footerActions: {
-    marginTop: "auto",
-    paddingTop: 5.6,
-    paddingHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
-    paddingBottom: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
-    gap: 7.2,
-  },
-  moderationBadge: {
-    alignSelf: "flex-start",
-    marginTop: 4,
-    marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 999,
-    fontSize: 11.5,
-    fontWeight: "700",
-    overflow: "hidden",
-  },
-  moderationBadgePending: {
-    backgroundColor: theme.colors.warningSurface,
-    color: theme.colors.warningText,
-  },
-  moderationBadgeApproved: {
-    backgroundColor: `${theme.colors.success}1A`,
-    color: theme.colors.success,
-  },
-  moderationBadgeRejected: {
-    backgroundColor: `${theme.colors.danger}1A`,
-    color: theme.colors.danger,
-  },
-  moderationComment: {
-    marginTop: 4,
-    marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
-    fontSize: 12.5,
-    lineHeight: 18,
-    color: theme.colors.textSecondary,
-  },
-  moderationPreviewFields: {
-    marginTop: 8,
-    gap: 8,
-  },
-  moderationPreviewSellerRow: {
-    marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
-  },
-  moderationPreviewRow: {
-    gap: 4,
-    marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
-  },
-  moderationPreviewKey: {
-    fontSize: 12,
-    lineHeight: 16,
-    color: theme.colors.textSecondary,
-  },
-  moderationPreviewValue: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: theme.colors.text,
-  },
-  moderationPreviewValueMultiline: {
-    lineHeight: 20,
-  },
+    card: {
+      flex: 1,
+      position: "relative",
+      margin: 3,
+      paddingBottom: 7,
+      borderRadius: 16,
+      backgroundColor: theme.colors.surface,
+      shadowColor: soft.shadowColor,
+      shadowOffset: { width: 0, height: soft.shadowOffsetY },
+      shadowOpacity: soft.shadowOpacity,
+      shadowRadius: soft.shadowRadius,
+      elevation: soft.elevation,
+      overflow: "hidden",
+    },
+    cardCatalogGrid: {
+      flexGrow: 0,
+      flexShrink: 0,
+      width: "100%",
+      margin: 0,
+      paddingTop: 0,
+      paddingHorizontal: 0,
+      paddingBottom: MCL.bottomPadding,
+    },
+    cardCatalogGridModerationQueue: {
+      height: undefined,
+      minHeight: undefined,
+      maxHeight: undefined,
+    },
+    cardOutOfStock: {
+      opacity: OOS.cardOpacity,
+      ...(Platform.OS === "web" ? ({ filter: "grayscale(1)" } as const) : null),
+    },
+    imageWrapCatalogGrid: {
+      marginHorizontal: -MCL.contentInsetX,
+      aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
+      borderTopLeftRadius: MCL.imageTopRadius,
+      borderTopRightRadius: MCL.imageTopRadius,
+      borderBottomLeftRadius: MCL.imageBottomRadius,
+      borderBottomRightRadius: MCL.imageBottomRadius,
+    },
+    contentCatalogGrid: {
+      paddingHorizontal: MCL.contentInsetX,
+      paddingTop: MCL.bodyGap,
+      gap: MCL.bodyGap,
+      flexGrow: 0,
+      flexShrink: 0,
+      height: resolveProductCardCatalogGridContentBelowImageHeight(),
+    },
+    contentPressableCatalogGrid: {
+      alignSelf: "stretch",
+      alignItems: "flex-start",
+      gap: MCL.bodyGap,
+    },
+    nameCatalogGrid: {
+      fontSize: MCL.nameFontSize,
+      lineHeight: MCL.nameLineHeight,
+      maxHeight: MCL.headingHeight,
+      fontWeight: "500",
+    },
+    metaStripCatalogGrid: {
+      gap: 2,
+      maxHeight: MCL.metaHeight,
+      overflow: "visible",
+    },
+    ratingCatalogGrid: {
+      fontSize: MCL.ratingFontSize,
+      lineHeight: MCL.ratingLineHeight,
+      maxHeight: MCL.ratingLineHeight,
+    },
+    sellerRowCatalogGrid: {
+      minHeight: MCL.sellerRowHeight,
+      maxHeight: MCL.sellerRowHeight,
+      overflow: "hidden",
+    },
+    pressable: {
+      flex: 1,
+    },
+    imagePressable: {
+      width: "100%",
+      height: "100%",
+    },
+    contentPressable: {
+      alignSelf: "stretch",
+    },
+    cardPressed: {
+      opacity: 0.94,
+    },
+    wishlistSlot: {
+      position: "absolute",
+      top: 6,
+      right: 6,
+      zIndex: 3,
+    },
+    imageWrap: {
+      position: "relative",
+      marginHorizontal: -PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+      aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
+      backgroundColor: "rgba(17, 24, 39, 0.05)",
+      overflow: "hidden",
+      borderBottomLeftRadius: 10,
+      borderBottomRightRadius: 10,
+    },
+    image: {
+      width: "100%",
+      height: "100%",
+    },
+    imageBadges: {
+      position: "absolute",
+      left: BOL.insetX,
+      bottom: BOL.insetBottom,
+      flexDirection: "column",
+      alignItems: "flex-start",
+      gap: BOL.gap,
+      maxWidth: "100%",
+      pointerEvents: "box-none",
+    },
+    content: {
+      paddingHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+      paddingTop: PRODUCT_CARD_MOBILE_LAYOUT.bodyGap,
+      gap: PRODUCT_CARD_MOBILE_LAYOUT.bodyGap,
+    },
+    metaStrip: {
+      gap: PRODUCT_CARD_MOBILE_LAYOUT.metaStripGap,
+    },
+    name: {
+      fontSize: 14,
+      lineHeight: 17,
+      fontWeight: "400",
+      color: theme.colors.text,
+    },
+    rating: {
+      fontSize: 11.8,
+      lineHeight: 14.8,
+      fontWeight: "600",
+      color: BC.rating,
+    },
+    ratingPlaceholder: {
+      fontWeight: "500",
+      color: BC.ratingPlaceholder,
+    },
+    footerActions: {
+      marginTop: "auto",
+      paddingTop: 5.6,
+      paddingHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+      paddingBottom: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+      gap: 7.2,
+    },
+    moderationBadge: {
+      alignSelf: "flex-start",
+      marginTop: 4,
+      marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+      paddingVertical: 4,
+      paddingHorizontal: 8,
+      borderRadius: 999,
+      fontSize: 11.5,
+      fontWeight: "700",
+      overflow: "hidden",
+    },
+    moderationBadgePending: {
+      backgroundColor: theme.colors.warningSurface,
+      color: theme.colors.warningText,
+    },
+    moderationBadgeApproved: {
+      backgroundColor: `${theme.colors.success}1A`,
+      color: theme.colors.success,
+    },
+    moderationBadgeRejected: {
+      backgroundColor: `${theme.colors.danger}1A`,
+      color: theme.colors.danger,
+    },
+    moderationComment: {
+      marginTop: 4,
+      marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+      fontSize: 12.5,
+      lineHeight: 18,
+      color: theme.colors.textSecondary,
+    },
+    moderationPreviewFields: {
+      marginTop: 8,
+      gap: 8,
+    },
+    moderationPreviewSellerRow: {
+      marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+    },
+    moderationPreviewRow: {
+      gap: 4,
+      marginHorizontal: PRODUCT_CARD_MOBILE_LAYOUT.contentInsetX,
+    },
+    moderationPreviewKey: {
+      fontSize: 12,
+      lineHeight: 16,
+      color: theme.colors.textSecondary,
+    },
+    moderationPreviewValue: {
+      fontSize: 14,
+      lineHeight: 20,
+      color: theme.colors.text,
+    },
+    moderationPreviewValueMultiline: {
+      lineHeight: 20,
+    },
   };
 });
 
@@ -616,84 +616,84 @@ export const useProductCardRatingRowStyles = createThemedStyles((theme) => ({
 export const useProductCardBannerStyles = createThemedStyles((theme) => {
   const BANNER = resolveProductCardBannerChrome(theme.colors);
   return {
-  frame: {
-    width: "100%",
-  },
-  card: {
-    position: "relative",
-    borderRadius: BANNER.outerRadius,
-    overflow: "hidden",
-  },
-  cardPressed: {
-    opacity: 0.94,
-  },
-  imageWrap: {
-    width: "100%",
-    aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
-    backgroundColor: "rgba(17, 24, 39, 0.05)",
-  },
-  imagePressable: {
-    width: "100%",
-    height: "100%",
-  },
-  content: {
-    paddingHorizontal: BANNER.contentPaddingX,
-    paddingTop: BANNER.contentPaddingTop,
-    paddingBottom: BANNER.contentPaddingBottom,
-    gap: 8.8,
-  },
-  tierBadge: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 11,
-    paddingVertical: 4,
-    borderRadius: 999,
-    backgroundColor: BANNER.accent,
-  },
-  tierBadgeText: {
-    color: theme.colors.onContrast,
-    fontSize: 11.5,
-    fontWeight: "600",
-    lineHeight: 14,
-  },
-  name: {
-    fontSize: 20.5,
-    lineHeight: 25,
-    fontWeight: "600",
-    color: theme.colors.text,
-  },
-  priceRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    rowGap: 7.2,
-    columnGap: 8.8,
-  },
-  metaRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    gap: 6,
-  },
-  metaText: {
-    fontSize: 13.1,
-    lineHeight: 16,
-    color: theme.colors.textMuted,
-    fontWeight: "400",
-  },
-  metaSeparator: {
-    color: theme.colors.borderStrong,
-    fontSize: 13.1,
-    lineHeight: 16,
-  },
-  metaRating: {
-    color: theme.colors.textSecondary,
-  },
-  wishlistSlot: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    zIndex: 3,
-  },
+    frame: {
+      width: "100%",
+    },
+    card: {
+      position: "relative",
+      borderRadius: BANNER.outerRadius,
+      overflow: "hidden",
+    },
+    cardPressed: {
+      opacity: 0.94,
+    },
+    imageWrap: {
+      width: "100%",
+      aspectRatio: PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO,
+      backgroundColor: "rgba(17, 24, 39, 0.05)",
+    },
+    imagePressable: {
+      width: "100%",
+      height: "100%",
+    },
+    content: {
+      paddingHorizontal: BANNER.contentPaddingX,
+      paddingTop: BANNER.contentPaddingTop,
+      paddingBottom: BANNER.contentPaddingBottom,
+      gap: 8.8,
+    },
+    tierBadge: {
+      alignSelf: "flex-start",
+      paddingHorizontal: 11,
+      paddingVertical: 4,
+      borderRadius: 999,
+      backgroundColor: BANNER.accent,
+    },
+    tierBadgeText: {
+      color: theme.colors.onContrast,
+      fontSize: 11.5,
+      fontWeight: "600",
+      lineHeight: 14,
+    },
+    name: {
+      fontSize: 20.5,
+      lineHeight: 25,
+      fontWeight: "600",
+      color: theme.colors.text,
+    },
+    priceRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      alignItems: "center",
+      rowGap: 7.2,
+      columnGap: 8.8,
+    },
+    metaRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      alignItems: "center",
+      gap: 6,
+    },
+    metaText: {
+      fontSize: 13.1,
+      lineHeight: 16,
+      color: theme.colors.textMuted,
+      fontWeight: "400",
+    },
+    metaSeparator: {
+      color: theme.colors.borderStrong,
+      fontSize: 13.1,
+      lineHeight: 16,
+    },
+    metaRating: {
+      color: theme.colors.textSecondary,
+    },
+    wishlistSlot: {
+      position: "absolute",
+      top: 10,
+      right: 10,
+      zIndex: 3,
+    },
   };
 });
 
@@ -889,25 +889,25 @@ export const useProductCardMediaStyles = createThemedStyles((theme) => ({
 export const useProductCardOutOfStockOverlayStyles = createThemedStyles((theme) => {
   const O = resolveProductCardOutOfStockOverlayColors(theme.colors);
   return {
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: OOS.overlayPadding,
-    backgroundColor: O.overlayBackground,
-    zIndex: OOS.overlayZIndex,
-  },
-  label: {
-    paddingHorizontal: OOS.labelPaddingHorizontal,
-    paddingVertical: OOS.labelPaddingVertical,
-    borderRadius: 999,
-    backgroundColor: O.labelBackground,
-    color: O.labelColor,
-    fontSize: OOS.labelFontSize,
-    fontWeight: "700",
-    lineHeight: OOS.labelLineHeight,
-    textAlign: "center",
-  },
+    overlay: {
+      ...StyleSheet.absoluteFillObject,
+      alignItems: "center",
+      justifyContent: "center",
+      padding: OOS.overlayPadding,
+      backgroundColor: O.overlayBackground,
+      zIndex: OOS.overlayZIndex,
+    },
+    label: {
+      paddingHorizontal: OOS.labelPaddingHorizontal,
+      paddingVertical: OOS.labelPaddingVertical,
+      borderRadius: 999,
+      backgroundColor: O.labelBackground,
+      color: O.labelColor,
+      fontSize: OOS.labelFontSize,
+      fontWeight: "700",
+      lineHeight: OOS.labelLineHeight,
+      textAlign: "center",
+    },
   };
 });
 
@@ -1074,54 +1074,54 @@ export const useProductLoyaltyPointsBadgeStyles = createThemedStyles((theme) => 
   const BC = resolveProductCardBadgeColors(theme.colors);
   const BO = resolveProductCardImageBadgeOverlay(theme.colors);
   return {
-  badge: {
-    paddingHorizontal: BL.paddingHorizontal,
-    paddingVertical: BL.paddingVertical,
-    borderRadius: BL.borderRadius,
-    borderWidth: 1,
-    borderColor: BC.loyaltyBorder,
-    backgroundColor: BC.loyaltyBg,
-    maxWidth: 152,
-  },
-  badgeOverlay: {
-    paddingHorizontal: BOL.paddingHorizontal,
-    paddingVertical: BOL.paddingVertical,
-    borderRadius: BOL.borderRadius,
-    // флеш к левому краю фото — левые углы прямые (Ozon-стиль)
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
-    backgroundColor: BO.loyaltyBackground,
-    alignSelf: "flex-start",
-    flexShrink: 0,
-    maxWidth: "100%",
-  },
-  badgeText: {
-    color: BC.loyaltyText,
-    fontSize: BL.fontSize,
-    fontWeight: "700",
-    lineHeight: BL.lineHeight,
-  },
-  badgeOverlayText: {
-    color: BO.loyaltyText,
-    fontSize: BOL.fontSize,
-    lineHeight: BOL.lineHeight,
-    fontWeight: "800",
-    textAlign: "left",
-  },
-  detailBadge: {
-    paddingHorizontal: BDETAIL.paddingHorizontal,
-    paddingVertical: BDETAIL.paddingVertical,
-    borderRadius: BDETAIL.borderRadius,
-    borderWidth: 0,
-    backgroundColor: PRODUCT_DETAILS_BADGE_SOFT_COLORS.loyalty.backgroundColor,
-    flexShrink: 0,
-  },
-  detailBadgeText: {
-    color: PRODUCT_DETAILS_BADGE_SOFT_COLORS.loyalty.color,
-    fontSize: BDETAIL.fontSize,
-    lineHeight: BDETAIL.lineHeight,
-    fontWeight: "800",
-  },
+    badge: {
+      paddingHorizontal: BL.paddingHorizontal,
+      paddingVertical: BL.paddingVertical,
+      borderRadius: BL.borderRadius,
+      borderWidth: 1,
+      borderColor: BC.loyaltyBorder,
+      backgroundColor: BC.loyaltyBg,
+      maxWidth: 152,
+    },
+    badgeOverlay: {
+      paddingHorizontal: BOL.paddingHorizontal,
+      paddingVertical: BOL.paddingVertical,
+      borderRadius: BOL.borderRadius,
+      // флеш к левому краю фото — левые углы прямые (Ozon-стиль)
+      borderTopLeftRadius: 0,
+      borderBottomLeftRadius: 0,
+      backgroundColor: BO.loyaltyBackground,
+      alignSelf: "flex-start",
+      flexShrink: 0,
+      maxWidth: "100%",
+    },
+    badgeText: {
+      color: BC.loyaltyText,
+      fontSize: BL.fontSize,
+      fontWeight: "700",
+      lineHeight: BL.lineHeight,
+    },
+    badgeOverlayText: {
+      color: BO.loyaltyText,
+      fontSize: BOL.fontSize,
+      lineHeight: BOL.lineHeight,
+      fontWeight: "800",
+      textAlign: "left",
+    },
+    detailBadge: {
+      paddingHorizontal: BDETAIL.paddingHorizontal,
+      paddingVertical: BDETAIL.paddingVertical,
+      borderRadius: BDETAIL.borderRadius,
+      borderWidth: 0,
+      backgroundColor: PRODUCT_DETAILS_BADGE_SOFT_COLORS.loyalty.backgroundColor,
+      flexShrink: 0,
+    },
+    detailBadgeText: {
+      color: PRODUCT_DETAILS_BADGE_SOFT_COLORS.loyalty.color,
+      fontSize: BDETAIL.fontSize,
+      lineHeight: BDETAIL.lineHeight,
+      fontWeight: "800",
+    },
   };
 });
 
@@ -1129,185 +1129,185 @@ export const useProductPriceStyles = createThemedStyles((theme) => {
   const BC = resolveProductCardBadgeColors(theme.colors);
   const BO = resolveProductCardImageBadgeOverlay(theme.colors);
   return {
-  cardRoot: {
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    alignItems: "baseline",
-    gap: 6,
-    minHeight: 21,
-    columnGap: 6,
-    rowGap: 3,
-  },
-  cardRootCatalogGrid: {
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    alignItems: "center",
-    alignSelf: "flex-start",
-    minHeight: MCL.priceHeight,
-    maxHeight: MCL.priceHeight,
-    gap: 0,
-    columnGap: MCL.priceColumnGap,
-    rowGap: MCL.priceRowGap,
-  },
-  inlineRoot: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "baseline",
-    gap: theme.spacing[2],
-  },
-  label: {
-    fontSize: 11.5,
-    color: theme.colors.textMuted,
-    fontWeight: "600",
-  },
-  current: {
-    fontSize: 24,
-    fontWeight: "800",
-    color: theme.colors.action,
-  },
-  cardCurrent: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: BC.priceCurrent,
-    letterSpacing: -0.3,
-  },
-  cardCurrentCatalogGrid: {
-    lineHeight: MCL.priceHeight,
-    ...(Platform.OS === "android" ? { includeFontPadding: false } : null),
-  },
-  old: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: BC.priceOld,
-    textDecorationLine: "line-through",
-  },
-  cardOld: {
-    fontSize: 11.5,
-    fontWeight: "600",
-    color: BC.priceOld,
-  },
-  cardOldCatalogGrid: {
-    lineHeight: MCL.priceHeight,
-    ...(Platform.OS === "android" ? { includeFontPadding: false } : null),
-  },
-  badge: {
-    paddingHorizontal: BL.paddingHorizontal,
-    paddingVertical: BL.paddingVertical,
-    borderRadius: BL.borderRadius,
-    borderWidth: 1,
-    borderColor: BC.discountBorder,
-    backgroundColor: BC.discountBg,
-  },
-  badgeOverlay: {
-    paddingHorizontal: BOL.paddingHorizontal,
-    paddingVertical: BOL.paddingVertical,
-    borderRadius: BOL.borderRadius,
-    // флеш к левому краю фото — левые углы прямые (Ozon-стиль)
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
-    backgroundColor: BO.discountBackground,
-    alignSelf: "flex-start",
-    flexShrink: 0,
-    maxWidth: "100%",
-  },
-  badgeText: {
-    color: BC.discountText,
-    fontSize: BL.fontSize,
-    fontWeight: "700",
-    lineHeight: BL.lineHeight,
-  },
-  badgeOverlayText: {
-    color: BO.discountText,
-    fontSize: BOL.fontSize,
-    lineHeight: BOL.lineHeight,
-    fontWeight: "800",
-    textAlign: "left",
-  },
-  detailCurrent: {
-    fontSize: 29.6,
-    fontWeight: "800",
-    color: theme.colors.action,
-    letterSpacing: -0.9,
-  },
-  detailOld: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: BC.priceOld,
-    textDecorationLine: "line-through",
-  },
-  detailRoot: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    gap: 6,
-    rowGap: 6,
-    columnGap: 9,
-  },
-  detailDiscountBadge: {
-    paddingHorizontal: BDETAIL.paddingHorizontal,
-    paddingVertical: BDETAIL.paddingVertical,
-    borderRadius: BDETAIL.borderRadius,
-    borderWidth: 0,
-    backgroundColor: PRODUCT_DETAILS_BADGE_SOFT_COLORS.discount.backgroundColor,
-    flexShrink: 0,
-  },
-  detailDiscountText: {
-    color: PRODUCT_DETAILS_BADGE_SOFT_COLORS.discount.color,
-    fontSize: BDETAIL.fontSize,
-    lineHeight: BDETAIL.lineHeight,
-    fontWeight: "800",
-  },
-  bannerRoot: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    gap: 6,
-  },
-  bannerCurrent: {
-    fontSize: 23.2,
-    fontWeight: "600",
-    color: theme.colors.action,
-    letterSpacing: -0.7,
-  },
-  bannerOld: {
-    fontSize: 14.7,
-    fontWeight: "400",
-    color: theme.colors.textPlaceholder,
-    textDecorationLine: "line-through",
-  },
-  cartRoot: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "baseline",
-    gap: 6,
-    columnGap: 8,
-    rowGap: 2,
-  },
-  cartCurrent: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: theme.colors.link,
-    letterSpacing: -0.3,
-  },
-  cartOld: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: BC.priceOld,
-    textDecorationLine: "line-through",
-  },
-  bannerDiscountBadge: {
-    paddingHorizontal: 8.8,
-    paddingVertical: 3.5,
-    borderRadius: 999,
-    borderWidth: 0,
-    backgroundColor: theme.colors.dangerSurface,
-  },
-  bannerDiscountText: {
-    color: theme.colors.danger,
-    fontSize: 12.5,
-    fontWeight: "600",
-    lineHeight: 15,
-  },
+    cardRoot: {
+      flexDirection: "row",
+      flexWrap: "nowrap",
+      alignItems: "baseline",
+      gap: 6,
+      minHeight: 21,
+      columnGap: 6,
+      rowGap: 3,
+    },
+    cardRootCatalogGrid: {
+      flexDirection: "row",
+      flexWrap: "nowrap",
+      alignItems: "center",
+      alignSelf: "flex-start",
+      minHeight: MCL.priceHeight,
+      maxHeight: MCL.priceHeight,
+      gap: 0,
+      columnGap: MCL.priceColumnGap,
+      rowGap: MCL.priceRowGap,
+    },
+    inlineRoot: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      alignItems: "baseline",
+      gap: theme.spacing[2],
+    },
+    label: {
+      fontSize: 11.5,
+      color: theme.colors.textMuted,
+      fontWeight: "600",
+    },
+    current: {
+      fontSize: 24,
+      fontWeight: "800",
+      color: theme.colors.action,
+    },
+    cardCurrent: {
+      fontSize: 18,
+      fontWeight: "800",
+      color: BC.priceCurrent,
+      letterSpacing: -0.3,
+    },
+    cardCurrentCatalogGrid: {
+      lineHeight: MCL.priceHeight,
+      ...(Platform.OS === "android" ? { includeFontPadding: false } : null),
+    },
+    old: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: BC.priceOld,
+      textDecorationLine: "line-through",
+    },
+    cardOld: {
+      fontSize: 11.5,
+      fontWeight: "600",
+      color: BC.priceOld,
+    },
+    cardOldCatalogGrid: {
+      lineHeight: MCL.priceHeight,
+      ...(Platform.OS === "android" ? { includeFontPadding: false } : null),
+    },
+    badge: {
+      paddingHorizontal: BL.paddingHorizontal,
+      paddingVertical: BL.paddingVertical,
+      borderRadius: BL.borderRadius,
+      borderWidth: 1,
+      borderColor: BC.discountBorder,
+      backgroundColor: BC.discountBg,
+    },
+    badgeOverlay: {
+      paddingHorizontal: BOL.paddingHorizontal,
+      paddingVertical: BOL.paddingVertical,
+      borderRadius: BOL.borderRadius,
+      // флеш к левому краю фото — левые углы прямые (Ozon-стиль)
+      borderTopLeftRadius: 0,
+      borderBottomLeftRadius: 0,
+      backgroundColor: BO.discountBackground,
+      alignSelf: "flex-start",
+      flexShrink: 0,
+      maxWidth: "100%",
+    },
+    badgeText: {
+      color: BC.discountText,
+      fontSize: BL.fontSize,
+      fontWeight: "700",
+      lineHeight: BL.lineHeight,
+    },
+    badgeOverlayText: {
+      color: BO.discountText,
+      fontSize: BOL.fontSize,
+      lineHeight: BOL.lineHeight,
+      fontWeight: "800",
+      textAlign: "left",
+    },
+    detailCurrent: {
+      fontSize: 29.6,
+      fontWeight: "800",
+      color: theme.colors.action,
+      letterSpacing: -0.9,
+    },
+    detailOld: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: BC.priceOld,
+      textDecorationLine: "line-through",
+    },
+    detailRoot: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      alignItems: "center",
+      gap: 6,
+      rowGap: 6,
+      columnGap: 9,
+    },
+    detailDiscountBadge: {
+      paddingHorizontal: BDETAIL.paddingHorizontal,
+      paddingVertical: BDETAIL.paddingVertical,
+      borderRadius: BDETAIL.borderRadius,
+      borderWidth: 0,
+      backgroundColor: PRODUCT_DETAILS_BADGE_SOFT_COLORS.discount.backgroundColor,
+      flexShrink: 0,
+    },
+    detailDiscountText: {
+      color: PRODUCT_DETAILS_BADGE_SOFT_COLORS.discount.color,
+      fontSize: BDETAIL.fontSize,
+      lineHeight: BDETAIL.lineHeight,
+      fontWeight: "800",
+    },
+    bannerRoot: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      alignItems: "center",
+      gap: 6,
+    },
+    bannerCurrent: {
+      fontSize: 23.2,
+      fontWeight: "600",
+      color: theme.colors.action,
+      letterSpacing: -0.7,
+    },
+    bannerOld: {
+      fontSize: 14.7,
+      fontWeight: "400",
+      color: theme.colors.textPlaceholder,
+      textDecorationLine: "line-through",
+    },
+    cartRoot: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      alignItems: "baseline",
+      gap: 6,
+      columnGap: 8,
+      rowGap: 2,
+    },
+    cartCurrent: {
+      fontSize: 17,
+      fontWeight: "700",
+      color: theme.colors.link,
+      letterSpacing: -0.3,
+    },
+    cartOld: {
+      fontSize: 13,
+      fontWeight: "500",
+      color: BC.priceOld,
+      textDecorationLine: "line-through",
+    },
+    bannerDiscountBadge: {
+      paddingHorizontal: 8.8,
+      paddingVertical: 3.5,
+      borderRadius: 999,
+      borderWidth: 0,
+      backgroundColor: theme.colors.dangerSurface,
+    },
+    bannerDiscountText: {
+      color: theme.colors.danger,
+      fontSize: 12.5,
+      fontWeight: "600",
+      lineHeight: 15,
+    },
   };
 });
 
@@ -1327,7 +1327,10 @@ const PRODUCT_DETAIL_PURCHASE_DOCK_LOWER_RATIO = 0.1;
 export const PRODUCT_DETAIL_PURCHASE_DOCK_BOTTOM_INSET = Math.max(
   0,
   PRODUCT_DETAIL_PURCHASE_DOCK_INSET -
-    Math.round(PRODUCT_DETAIL_PURCHASE_DOCK_APPROX_HEIGHT * PRODUCT_DETAIL_PURCHASE_DOCK_LOWER_RATIO),
+    Math.round(
+      PRODUCT_DETAIL_PURCHASE_DOCK_APPROX_HEIGHT *
+        PRODUCT_DETAIL_PURCHASE_DOCK_LOWER_RATIO,
+    ),
 );
 
 /** Parity: client ProductDetailsModalFields.css `.product-details-modal__stats-grid` */
@@ -1612,63 +1615,65 @@ export const useProductDetailsSellerPreviewStyles = createThemedStyles((theme) =
   },
 }));
 
-export const useProductDetailsSellerStorefrontButtonStyles = createThemedStyles((theme) => ({
-  root: {
-    alignSelf: "stretch",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    minHeight: 62,
-    margin: 0,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: 16,
-    backgroundColor: theme.colors.surfaceMuted,
-    ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
-  },
-  rootPressed: {
-    borderColor: theme.colors.actionBorder,
-    backgroundColor: theme.colors.actionSoft,
-    transform: [{ scale: 0.985 }],
-  },
-  rootEmbedded: {
-    minHeight: 54,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 12,
-    backgroundColor: theme.colors.bg,
-  },
-  iconWrap: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: theme.colors.actionSoft,
-    flexShrink: 0,
-  },
-  copy: {
-    flex: 1,
-    minWidth: 0,
-  },
-  title: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: theme.colors.ink,
-    lineHeight: 19,
-  },
-  hint: {
-    fontSize: 13,
-    lineHeight: 17,
-    color: theme.colors.textMuted,
-  },
-  chevron: {
-    flexShrink: 0,
-    opacity: 0.88,
-  },
-}));
+export const useProductDetailsSellerStorefrontButtonStyles = createThemedStyles(
+  (theme) => ({
+    root: {
+      alignSelf: "stretch",
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+      minHeight: 62,
+      margin: 0,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: 16,
+      backgroundColor: theme.colors.surfaceMuted,
+      ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
+    },
+    rootPressed: {
+      borderColor: theme.colors.actionBorder,
+      backgroundColor: theme.colors.actionSoft,
+      transform: [{ scale: 0.985 }],
+    },
+    rootEmbedded: {
+      minHeight: 54,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      borderRadius: 12,
+      backgroundColor: theme.colors.bg,
+    },
+    iconWrap: {
+      width: 38,
+      height: 38,
+      borderRadius: 12,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.colors.actionSoft,
+      flexShrink: 0,
+    },
+    copy: {
+      flex: 1,
+      minWidth: 0,
+    },
+    title: {
+      fontSize: 15,
+      fontWeight: "700",
+      color: theme.colors.ink,
+      lineHeight: 19,
+    },
+    hint: {
+      fontSize: 13,
+      lineHeight: 17,
+      color: theme.colors.textMuted,
+    },
+    chevron: {
+      flexShrink: 0,
+      opacity: 0.88,
+    },
+  }),
+);
 
 export const useProductDetailsSellerStackStyles = createThemedStyles(() => ({
   root: {
@@ -2038,9 +2043,7 @@ export const useProductMediaGalleryStyles = createThemedStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     ...(Platform.OS === "ios" ? { borderCurve: "continuous" as const } : null),
-    ...(Platform.OS === "web"
-      ? ({ cornerShape: "squircle" } as const)
-      : null),
+    ...(Platform.OS === "web" ? ({ cornerShape: "squircle" } as const) : null),
   },
   detailThumbActive: {
     borderColor: theme.colors.link,
@@ -3725,41 +3728,41 @@ export const useCartScreenStyles = createThemedStyles((theme) => ({
 export const useCuratedProductCompactCardStyles = createThemedStyles((theme) => {
   const C = resolveCuratedCompactCardColors(theme.colors);
   return {
-  card: {
-    borderWidth: 1,
-    borderColor: C.border,
-    borderRadius: 16,
-    overflow: "hidden",
-    backgroundColor: "transparent",
-  },
-  imageWrap: {
-    aspectRatio: 1,
-    backgroundColor: C.imageBg,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-  },
-  imageFallback: {
-    fontSize: 13.5,
-    color: C.imageFallbackText,
-  },
-  priceWrap: {
-    minHeight: 32,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    justifyContent: "center",
-    backgroundColor: C.priceBg,
-  },
-  price: {
-    fontSize: 15.6,
-    fontWeight: "700",
-    lineHeight: 19,
-    color: C.priceText,
-  },
+    card: {
+      borderWidth: 1,
+      borderColor: C.border,
+      borderRadius: 16,
+      overflow: "hidden",
+      backgroundColor: "transparent",
+    },
+    imageWrap: {
+      aspectRatio: 1,
+      backgroundColor: C.imageBg,
+      alignItems: "center",
+      justifyContent: "center",
+      overflow: "hidden",
+    },
+    image: {
+      width: "100%",
+      height: "100%",
+    },
+    imageFallback: {
+      fontSize: 13.5,
+      color: C.imageFallbackText,
+    },
+    priceWrap: {
+      minHeight: 32,
+      paddingHorizontal: 8,
+      paddingVertical: 6,
+      justifyContent: "center",
+      backgroundColor: C.priceBg,
+    },
+    price: {
+      fontSize: 15.6,
+      fontWeight: "700",
+      lineHeight: 19,
+      color: C.priceText,
+    },
   };
 });
 

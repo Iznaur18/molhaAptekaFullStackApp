@@ -27,7 +27,9 @@ export const CategoryTreeLegacyPicker = ({
         disabled={disabled}
         onPress={() => onChange("")}
       >
-        <Text style={styles.pickerChipText}>{CATEGORY_TREE_ADMIN_PAGE_UI.LEGACY_NONE}</Text>
+        <Text style={styles.pickerChipText}>
+          {CATEGORY_TREE_ADMIN_PAGE_UI.LEGACY_NONE}
+        </Text>
       </Pressable>
       {PRODUCT_CATEGORIES.map((slug) => (
         <Pressable
@@ -37,7 +39,9 @@ export const CategoryTreeLegacyPicker = ({
           onPress={() => onChange(slug)}
         >
           <Text style={styles.pickerChipText}>
-            {PRODUCT_CATEGORY_LABEL_RU[slug as keyof typeof PRODUCT_CATEGORY_LABEL_RU] ?? slug}
+            {PRODUCT_CATEGORY_LABEL_RU[
+              slug as keyof typeof PRODUCT_CATEGORY_LABEL_RU
+            ] ?? slug}
           </Text>
         </Pressable>
       ))}

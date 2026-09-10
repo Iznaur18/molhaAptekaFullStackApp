@@ -10,7 +10,12 @@ export const UsersLoyaltyRaffleAdminModerationSection = () => {
 
   return (
     <View style={styles.section}>
-      <View style={resolveIntroAdModerationListPanelStyles(INTRO_AD_MODERATION_SECTION_USERS_RAFFLE, styles)}>
+      <View
+        style={resolveIntroAdModerationListPanelStyles(
+          INTRO_AD_MODERATION_SECTION_USERS_RAFFLE,
+          styles,
+        )}
+      >
         <UsersLoyaltyRaffleAdminPanel />
       </View>
     </View>

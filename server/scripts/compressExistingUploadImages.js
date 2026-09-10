@@ -88,9 +88,7 @@ function rewriteNode(node, renameMap) {
   }
 
   let changed = false;
-  const keys = Array.isArray(node)
-    ? node.map((_, index) => index)
-    : Object.keys(node);
+  const keys = Array.isArray(node) ? node.map((_, index) => index) : Object.keys(node);
 
   for (const key of keys) {
     const value = node[key];
@@ -212,8 +210,11 @@ async function main() {
     console.log(`Упомянуто в БД (uploads): ${referenced.size}`);
     console.log(`К конвертации в WebP: ${renameMap.size}`);
     if (renameMap.size > 0) {
-      const pct = bytesBefore > 0 ? (100 * (1 - bytesAfter / bytesBefore)).toFixed(1) : "0";
-      console.log(`  вес: ${formatMB(bytesBefore)} → ${formatMB(bytesAfter)} (−${pct}%)`);
+      const pct =
+        bytesBefore > 0 ? (100 * (1 - bytesAfter / bytesBefore)).toFixed(1) : "0";
+      console.log(
+        `  вес: ${formatMB(bytesBefore)} → ${formatMB(bytesAfter)} (−${pct}%)`,
+      );
     }
     if (skippedNotSmaller.length > 0) {
       console.log(`Пропуск (WebP не легче): ${skippedNotSmaller.length}`);
@@ -248,7 +249,9 @@ async function main() {
       }
     }
 
-    console.log(`\nДокументов ${isApply ? "обновлено" : "к обновлению"}: ${totalDocsToUpdate}`);
+    console.log(
+      `\nДокументов ${isApply ? "обновлено" : "к обновлению"}: ${totalDocsToUpdate}`,
+    );
     for (const [name, count] of perCollection.sort((a, b) => b[1] - a[1])) {
       console.log(`  ${name}: ${count}`);
     }

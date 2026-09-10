@@ -128,9 +128,7 @@ export async function uploadController(req, res) {
     logServerEvent("warn", {
       event: "uploadcontroller_compress",
       error:
-        compressError instanceof Error
-          ? compressError.message
-          : String(compressError),
+        compressError instanceof Error ? compressError.message : String(compressError),
     });
   }
 

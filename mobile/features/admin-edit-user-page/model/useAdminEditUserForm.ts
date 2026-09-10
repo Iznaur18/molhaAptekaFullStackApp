@@ -23,7 +23,10 @@ type UseAdminEditUserFormParams = {
   currentUserId: string | null;
 };
 
-export const useAdminEditUserForm = ({ userId, currentUserId }: UseAdminEditUserFormParams) => {
+export const useAdminEditUserForm = ({
+  userId,
+  currentUserId,
+}: UseAdminEditUserFormParams) => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { canModerate, isAdmin, role } = useUserAccess();
@@ -38,7 +41,9 @@ export const useAdminEditUserForm = ({ userId, currentUserId }: UseAdminEditUser
     [user],
   );
 
-  const [baselineForm, setBaselineForm] = useState<AdminEditProfileFormState | null>(null);
+  const [baselineForm, setBaselineForm] = useState<AdminEditProfileFormState | null>(
+    null,
+  );
   const [form, setForm] = useState<AdminEditProfileFormState | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -70,12 +75,17 @@ export const useAdminEditUserForm = ({ userId, currentUserId }: UseAdminEditUser
     }) => patchUserProfile(targetUserId, body),
     onSuccess: (updatedUser) => {
       queryClient.setQueryData(userProfileQueryKeys.byId(userId), updatedUser);
-      void queryClient.invalidateQueries({ queryKey: userProfileQueryKeys.byId(userId) });
+      void queryClient.invalidateQueries({
+        queryKey: userProfileQueryKeys.byId(userId),
+      });
     },
   });
 
   const updateField = useCallback(
-    <K extends keyof AdminEditProfileFormState>(key: K, value: AdminEditProfileFormState[K]) => {
+    <K extends keyof AdminEditProfileFormState>(
+      key: K,
+      value: AdminEditProfileFormState[K],
+    ) => {
       setForm((prev) => (prev ? { ...prev, [key]: value } : prev));
       setErrorMessage("");
       setSuccessMessage("");
@@ -104,7 +114,9 @@ export const useAdminEditUserForm = ({ userId, currentUserId }: UseAdminEditUser
         targetUserId: userId,
         body,
       });
-      const nextForm = mapUserToAdminEditProfileForm(updatedUser as Record<string, unknown>);
+      const nextForm = mapUserToAdminEditProfileForm(
+        updatedUser as Record<string, unknown>,
+      );
       setBaselineForm(nextForm);
       setForm(nextForm);
       router.back();
@@ -112,20 +124,32 @@ export const useAdminEditUserForm = ({ userId, currentUserId }: UseAdminEditUser
       setSuccessMessage("");
       setErrorMessage(formatApiErrorMessage(error, EDIT_PROFILE_UI.SAVE_ERROR));
     }
-  }, [baselineForm, form, isAdmin, patchMutation, router, staffCanEditPremium, user, userId]);
+  }, [
+    baselineForm,
+    form,
+    isAdmin,
+    patchMutation,
+    router,
+    staffCanEditPremium,
+    user,
+    userId,
+  ]);
 
   const handleSubmit = useCallback(async () => {
     if (!user || !form) {
       return;
     }
 
-    const validationError = validateAdminEditProfileForm(form, { includeRole: isAdmin });
+    const validationError = validateAdminEditProfileForm(form, {
+      includeRole: isAdmin,
+    });
     if (validationError) {
       setErrorMessage(validationError);
       return;
     }
 
-    const premiumWillBeDisabled = staffCanEditPremium && willFormDisablePremium(user, form);
+    const premiumWillBeDisabled =
+      staffCanEditPremium && willFormDisablePremium(user, form);
     if (premiumWillBeDisabled) {
       const userName = String(user.userName ?? "").trim() || "пользователя";
       Alert.alert(
@@ -133,7 +157,11 @@ export const useAdminEditUserForm = ({ userId, currentUserId }: UseAdminEditUser
         ADMIN_EDIT_USER_UI.DISABLE_PREMIUM_CONFIRM(userName),
         [
           { text: "Отмена", style: "cancel" },
-          { text: "Отключить", style: "destructive", onPress: () => void submitPatch() },
+          {
+            text: "Отключить",
+            style: "destructive",
+            onPress: () => void submitPatch(),
+          },
         ],
       );
       return;

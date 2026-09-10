@@ -10,7 +10,9 @@ const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
 test("RaffleProductsPage: web parity hero/swipe/progress/manage", () => {
-  const page = readMobileFile("features/raffle-products-page/ui/RaffleProductsPage.tsx");
+  const page = readMobileFile(
+    "features/raffle-products-page/ui/RaffleProductsPage.tsx",
+  );
   const styles = readMobileFile("shared/theme/commerceScreenStyles.ts");
   const layout = readMobileFile("entities/raffle/lib/raffleProductsPageLayout.ts");
   const media = readMobileFile("entities/raffle/ui/RafflePrizeMedia.tsx");

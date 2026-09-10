@@ -10,7 +10,12 @@ export const priceOfferQueryKeys = {
   /**
    * @param {string} productId
    */
-  sellerArchive: (productId) => [...priceOfferQueryKeys.all, "seller", productId, "archive"],
+  sellerArchive: (productId) => [
+    ...priceOfferQueryKeys.all,
+    "seller",
+    productId,
+    "archive",
+  ],
   /**
    * @param {string} productId
    */

@@ -37,7 +37,8 @@ export function useShellUiState() {
     useState(null);
   const [togglingAuctionProductId, setTogglingAuctionProductId] = useState(null);
   const [togglingQaProductId, setTogglingQaProductId] = useState(null);
-  const [togglingOriginalityProductId, setTogglingOriginalityProductId] = useState(null);
+  const [togglingOriginalityProductId, setTogglingOriginalityProductId] =
+    useState(null);
   const [togglingOutOfStockProductId, setTogglingOutOfStockProductId] = useState(null);
   const [togglingWholesaleProductId, setTogglingWholesaleProductId] = useState(null);
   const [togglingFlashSaleProductId, setTogglingFlashSaleProductId] = useState(null);
@@ -45,7 +46,8 @@ export function useShellUiState() {
   const [togglingAffiliateProductId, setTogglingAffiliateProductId] = useState(null);
   const [togglingLoyaltyProductId, setTogglingLoyaltyProductId] = useState(null);
   const [togglingBuyNFreeProductId, setTogglingBuyNFreeProductId] = useState(null);
-  const [togglingInstallmentProductId, setTogglingInstallmentProductId] = useState(null);
+  const [togglingInstallmentProductId, setTogglingInstallmentProductId] =
+    useState(null);
   const [isCreateProductModalOpen, setIsCreateProductModalOpen] = useState(false);
   const [isSellerProductsLimitModalOpen, setIsSellerProductsLimitModalOpen] =
     useState(false);

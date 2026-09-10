@@ -86,7 +86,10 @@ export async function submitCourierApplication({
     throw new AppError(404, "Пользователь не найден");
   }
 
-  if (!String(user.userAddress ?? "").trim() || !String(user.userRegionCode ?? "").trim()) {
+  if (
+    !String(user.userAddress ?? "").trim() ||
+    !String(user.userRegionCode ?? "").trim()
+  ) {
     throw new AppError(400, COURIER_ADDRESS_REQUIRED_MESSAGE);
   }
 

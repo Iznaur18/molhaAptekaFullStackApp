@@ -19,19 +19,20 @@ const ensureLibraryPermission = async (): Promise<void> => {
  * drag-редактор не нужен. `aspect` под шапку-баннер работает на Android; iOS,
  * как и для аватара, даёт квадратный кроп.
  */
-export const pickProfileBackgroundAsset = async (): Promise<UploadImageFilePayload | null> => {
-  await ensureLibraryPermission();
+export const pickProfileBackgroundAsset =
+  async (): Promise<UploadImageFilePayload | null> => {
+    await ensureLibraryPermission();
 
-  const result = await ImagePicker.launchImageLibraryAsync({
-    ...IMAGE_PICKER_GALLERY_OPTIONS,
-    allowsEditing: true,
-    aspect: [5, 3],
-    quality: 0.85,
-  });
+    const result = await ImagePicker.launchImageLibraryAsync({
+      ...IMAGE_PICKER_GALLERY_OPTIONS,
+      allowsEditing: true,
+      aspect: [5, 3],
+      quality: 0.85,
+    });
 
-  if (result.canceled || !result.assets[0]) {
-    return null;
-  }
+    if (result.canceled || !result.assets[0]) {
+      return null;
+    }
 
-  return prepareImageAssetForUpload(result.assets[0], { namePrefix: "background" });
-};
+    return prepareImageAssetForUpload(result.assets[0], { namePrefix: "background" });
+  };

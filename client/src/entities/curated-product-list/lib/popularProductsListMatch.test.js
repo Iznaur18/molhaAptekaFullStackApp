@@ -31,9 +31,7 @@ describe("popularProductsListMatch", () => {
         "6a5bf6539cfea35f316dd4fc",
       ),
     ).toBe(true);
-    expect(curatedListContainsProductId({ productIds: ["abc"] }, "zzz")).toBe(
-      false,
-    );
+    expect(curatedListContainsProductId({ productIds: ["abc"] }, "zzz")).toBe(false);
   });
 
   it("поднимает списки региона товара вверх", () => {

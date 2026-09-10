@@ -41,7 +41,10 @@ import {
   MY_PRODUCTS_PAGE_LAYOUT,
   resolveProfileHubMainReservedWidth,
 } from "@/shared/lib/guestProfileLayout";
-import { useProductGridLayout, type ProductGridLayoutResolvers } from "@/shared/model/useProductGridLayout";
+import {
+  useProductGridLayout,
+  type ProductGridLayoutResolvers,
+} from "@/shared/model/useProductGridLayout";
 import { useProfileAdaptiveLayout } from "@/shared/model/useProfileAdaptiveLayout";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { useMyProductsPageStyles } from "@/shared/theme/sellerFlowStyles";
@@ -59,11 +62,8 @@ export const MyProductsPage = () => {
   const router = useRouter();
   const styles = useMyProductsPageStyles();
   const { isDrawerLayout } = useProfileAdaptiveLayout();
-  const {
-    outerScrollOwns,
-    scrollEnabled,
-    registerNearEndHandler,
-  } = useProfileAccountNestedListScroll();
+  const { outerScrollOwns, scrollEnabled, registerNearEndHandler } =
+    useProfileAccountNestedListScroll();
   const productGrid = useProductGridLayout(undefined, myProductsGridResolvers, {
     reservedLeadingWidth: resolveProfileHubMainReservedWidth(isDrawerLayout),
   });
@@ -74,8 +74,10 @@ export const MyProductsPage = () => {
   const placeProduct = usePlaceProductPress();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
 
-  const [catalogSort, setCatalogSort] = useState<MyProductsCatalogSort>(CATALOG_SORT_NEWEST);
-  const [moderationFilter, setModerationFilter] = useState<MyProductsModerationFilter>("");
+  const [catalogSort, setCatalogSort] =
+    useState<MyProductsCatalogSort>(CATALOG_SORT_NEWEST);
+  const [moderationFilter, setModerationFilter] =
+    useState<MyProductsModerationFilter>("");
 
   const productsQuery = useMyProductsInfiniteQuery({
     enabled: isAuthorized,
@@ -113,15 +115,21 @@ export const MyProductsPage = () => {
     return getSellerProductsLimit(sessionQuery.data?.user);
   }, [isAdmin, sessionQuery.data?.user]);
 
-  const isModerationTrusted = sessionQuery.data?.user?.productModerationTrusted === true;
+  const isModerationTrusted =
+    sessionQuery.data?.user?.productModerationTrusted === true;
 
   const myProductsTotal = myProductsTotalQuery.myProductsTotal;
 
   const pageActions = useMyProductsPageActions();
-  const promotionTariffsQuery = useProductPromotionTariffsQuery(pageActions.promotionModalVisible);
+  const promotionTariffsQuery = useProductPromotionTariffsQuery(
+    pageActions.promotionModalVisible,
+  );
 
   const catalogGridRows = useMemo(
-    () => buildCatalogGridRows(productsQuery.products, productGrid.columns, { isMineMode: true }),
+    () =>
+      buildCatalogGridRows(productsQuery.products, productGrid.columns, {
+        isMineMode: true,
+      }),
     [productGrid.columns, productsQuery.products],
   );
 
@@ -144,7 +152,8 @@ export const MyProductsPage = () => {
       : MY_PRODUCTS_PAGE_UI.EMPTY;
 
   const promotionProduct = pageActions.promotionProduct;
-  const promotionProductName = String(promotionProduct?.productName ?? "").trim() || "Без названия";
+  const promotionProductName =
+    String(promotionProduct?.productName ?? "").trim() || "Без названия";
   const promotionProductPrice = Number(promotionProduct?.productPrice) || 0;
 
   if (!isAuthorized) {
@@ -202,7 +211,9 @@ export const MyProductsPage = () => {
 
             <MyProductsCatalogToolbar
               catalogSort={catalogSort}
-              onCatalogSortChange={(value) => setCatalogSort(value as MyProductsCatalogSort)}
+              onCatalogSortChange={(value) =>
+                setCatalogSort(value as MyProductsCatalogSort)
+              }
               moderationFilter={moderationFilter}
               onModerationFilterChange={(value) =>
                 setModerationFilter(value as MyProductsModerationFilter)
@@ -214,12 +225,18 @@ export const MyProductsPage = () => {
             />
 
             {pageActions.catalogNotice ? (
-              <Text style={[styles.banner, styles.noticeBanner]} accessibilityRole="text">
+              <Text
+                style={[styles.banner, styles.noticeBanner]}
+                accessibilityRole="text"
+              >
                 {pageActions.catalogNotice}
               </Text>
             ) : null}
             {pageActions.catalogError ? (
-              <Text style={[styles.banner, styles.errorBanner]} accessibilityRole="alert">
+              <Text
+                style={[styles.banner, styles.errorBanner]}
+                accessibilityRole="alert"
+              >
                 {pageActions.catalogError}
               </Text>
             ) : null}
@@ -247,7 +264,10 @@ export const MyProductsPage = () => {
         ListEmptyComponent={
           <View style={styles.centered}>
             <Text style={styles.hint}>{emptyMessage}</Text>
-            <Pressable style={styles.button} onPress={placeProduct.handlePlaceProductPress}>
+            <Pressable
+              style={styles.button}
+              onPress={placeProduct.handlePlaceProductPress}
+            >
               <Text style={styles.buttonText}>{MY_PRODUCTS_PAGE_UI.CREATE_BUTTON}</Text>
             </Pressable>
           </View>
@@ -289,7 +309,9 @@ export const MyProductsPage = () => {
         durations={promotionTariffsQuery.data?.durations ?? []}
         isTariffsLoading={promotionTariffsQuery.isPending}
         tariffsError={
-          promotionTariffsQuery.error instanceof Error ? promotionTariffsQuery.error : null
+          promotionTariffsQuery.error instanceof Error
+            ? promotionTariffsQuery.error
+            : null
         }
         isSubmitting={pageActions.isPromotionSubmitting}
         errorMessage={pageActions.promotionErrorMessage}
@@ -325,10 +347,12 @@ export const MyProductsPage = () => {
         isDeletePending={pageActions.isDeletePending}
         manageErrorMessage={pageActions.manageErrorMessage}
         canManageEdit={
-          promotionProduct != null && (isAdmin || canSellerEditProduct(promotionProduct))
+          promotionProduct != null &&
+          (isAdmin || canSellerEditProduct(promotionProduct))
         }
         canManageDelete={
-          promotionProduct != null && (isAdmin || canSellerDeleteProduct(promotionProduct))
+          promotionProduct != null &&
+          (isAdmin || canSellerDeleteProduct(promotionProduct))
         }
         canManageToggleVisibility={
           promotionProduct != null &&

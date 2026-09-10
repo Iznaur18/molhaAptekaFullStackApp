@@ -11,8 +11,12 @@ export const fetchMyLoyaltyPointsStatus = async () => {
     const loyaltyPointsBalance = Number(data.data.loyaltyPointsBalance);
     const loyaltyPointsReserved = Number(data.data.loyaltyPointsReserved);
     return {
-      loyaltyPointsBalance: Number.isFinite(loyaltyPointsBalance) ? loyaltyPointsBalance : 0,
-      loyaltyPointsReserved: Number.isFinite(loyaltyPointsReserved) ? loyaltyPointsReserved : 0,
+      loyaltyPointsBalance: Number.isFinite(loyaltyPointsBalance)
+        ? loyaltyPointsBalance
+        : 0,
+      loyaltyPointsReserved: Number.isFinite(loyaltyPointsReserved)
+        ? loyaltyPointsReserved
+        : 0,
     };
   } catch (error) {
     throw new Error(

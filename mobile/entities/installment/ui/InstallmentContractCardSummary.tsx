@@ -34,7 +34,10 @@ export const InstallmentContractCardSummary = ({
         <Text style={styles.summaryLabel}>{INSTALLMENT_UI.CONTRACT_PAID}</Text>
         <Text style={styles.summaryValue}>
           {formatPriceRub(contract.paidAmountRub)}
-          <Text style={styles.summaryMuted}> / {formatPriceRub(contract.totalAmountRub)}</Text>
+          <Text style={styles.summaryMuted}>
+            {" "}
+            / {formatPriceRub(contract.totalAmountRub)}
+          </Text>
         </Text>
         <Text style={styles.summaryFoot}>{paidPercent}%</Text>
       </View>
@@ -42,7 +45,9 @@ export const InstallmentContractCardSummary = ({
         <View style={styles.summaryTile}>
           <Text style={styles.summaryLabel}>{INSTALLMENT_UI.CONTRACT_REMAINING}</Text>
           <Text style={styles.summaryValue}>{formatPriceRub(remainingRub)}</Text>
-          <Text style={styles.summaryFoot}>{INSTALLMENT_UI.CONTRACT_DAYS_LEFT(remainingDays)}</Text>
+          <Text style={styles.summaryFoot}>
+            {INSTALLMENT_UI.CONTRACT_DAYS_LEFT(remainingDays)}
+          </Text>
         </View>
       ) : null}
     </View>

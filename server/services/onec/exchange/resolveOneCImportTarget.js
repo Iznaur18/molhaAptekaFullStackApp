@@ -2,9 +2,7 @@ import { existsSync } from "node:fs";
 import { stat } from "node:fs/promises";
 import path from "node:path";
 
-import {
-  ONEC_IMPORT_KIND_UNKNOWN,
-} from "../../../constants/onecExchangeConstants.js";
+import { ONEC_IMPORT_KIND_UNKNOWN } from "../../../constants/onecExchangeConstants.js";
 import {
   classifyOneCImportFile,
   extractOneCArchive,

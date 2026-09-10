@@ -15,7 +15,8 @@
   flex-wrap: wrap;
   gap: 0.75rem;
   padding: 1.125rem 1rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-action) 16%, var(--iz-color-border));
+  border: 1px solid
+    color-mix(in srgb, var(--iz-color-action) 16%, var(--iz-color-border));
   border-radius: 1.125rem;
   background:
     radial-gradient(
@@ -117,7 +118,8 @@
   margin: 0;
   padding: 0.65rem 0.75rem;
   border-radius: 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-danger) 28%, var(--iz-color-border));
+  border: 1px solid
+    color-mix(in srgb, var(--iz-color-danger) 28%, var(--iz-color-border));
   font-size: 0.875rem;
   line-height: 1.45;
   background: var(--iz-color-danger-surface);
@@ -128,7 +130,8 @@
   margin: 0;
   padding: 0.65rem 0.75rem;
   border-radius: 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--iz-color-success) 28%, var(--iz-color-border));
+  border: 1px solid
+    color-mix(in srgb, var(--iz-color-success) 28%, var(--iz-color-border));
   font-size: 0.875rem;
   line-height: 1.45;
   background: var(--iz-color-success-surface);

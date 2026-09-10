@@ -7,18 +7,13 @@ import { test } from "node:test";
 const MOBILE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CLIENT_ROOT = join(MOBILE_ROOT, "..", "client");
 
-const readFile = (root, relativePath) =>
-  readFileSync(join(root, relativePath), "utf8");
+const readFile = (root, relativePath) => readFileSync(join(root, relativePath), "utf8");
 
 const SCREEN_CONTENT_PADDING_HORIZONTAL = 16;
 const SCREEN_CONTENT_PADDING_BOTTOM = 18;
 
 const resolveScreenContentPaddingHorizontal = (insets = {}) =>
-  Math.max(
-    SCREEN_CONTENT_PADDING_HORIZONTAL,
-    insets.left ?? 0,
-    insets.right ?? 0,
-  );
+  Math.max(SCREEN_CONTENT_PADDING_HORIZONTAL, insets.left ?? 0, insets.right ?? 0);
 
 test("mobile content padding constants increased for edge safety", () => {
   const source = readFile(MOBILE_ROOT, "shared/theme/screenContentLayout.ts");

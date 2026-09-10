@@ -83,7 +83,9 @@ test("my sales query passes status and search filters", () => {
 
 test("my sales page ui copy matches web sales dashboard", () => {
   const copy = readMobileFile("shared/config/appUiCopy.ts");
-  const salesUi = copy.match(/export const MY_SALES_PAGE_UI = \{[\s\S]*?\n\} as const;/);
+  const salesUi = copy.match(
+    /export const MY_SALES_PAGE_UI = \{[\s\S]*?\n\} as const;/,
+  );
 
   assert.ok(salesUi);
   assert.match(salesUi[0], /TITLE: "Мои продажи"/);

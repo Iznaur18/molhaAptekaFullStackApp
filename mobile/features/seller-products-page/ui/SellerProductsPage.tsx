@@ -24,7 +24,11 @@ import { CatalogGridRowItem } from "@/features/catalog-grid/ui/CatalogGridRowIte
 import { CatalogAnimatedFlatList } from "@/features/catalog-grid/ui/CatalogAnimatedFlatList";
 import { CatalogScrollAnimationProvider } from "@/features/catalog-grid/model/CatalogScrollAnimationContext";
 import { useViewerRegion } from "@/entities/region/model/ViewerRegionProvider";
-import { SELLER_PRODUCTS_PAGE_UI, USER_LIST_ROW_UI, PRODUCT_CARD_UI } from "@/shared/config";
+import {
+  SELLER_PRODUCTS_PAGE_UI,
+  USER_LIST_ROW_UI,
+  PRODUCT_CARD_UI,
+} from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 import { navigateBackOrHome } from "@/shared/lib/navigateBackOrHome";
 import { useProductGridLayout } from "@/shared/model/useProductGridLayout";
@@ -131,18 +135,21 @@ export const SellerProductsPage = () => {
   }
 
   const isPageLoading =
-    profileQuery.isPending || (catalogQuery.phase === "loading" && catalogQuery.products.length === 0);
+    profileQuery.isPending ||
+    (catalogQuery.phase === "loading" && catalogQuery.products.length === 0);
 
   if (isPageLoading) {
     return <ScreenLoadingState message={SELLER_PRODUCTS_PAGE_UI.LOADING} />;
   }
 
-  const pageError =
-    profileQuery.isError
-      ? formatApiErrorMessage(profileQuery.error, SELLER_PRODUCTS_PAGE_UI.FETCH_PROFILE_FALLBACK)
-      : catalogQuery.phase === "error"
-        ? catalogQuery.error
-        : "";
+  const pageError = profileQuery.isError
+    ? formatApiErrorMessage(
+        profileQuery.error,
+        SELLER_PRODUCTS_PAGE_UI.FETCH_PROFILE_FALLBACK,
+      )
+    : catalogQuery.phase === "error"
+      ? catalogQuery.error
+      : "";
 
   if (pageError) {
     return (
@@ -160,7 +167,9 @@ export const SellerProductsPage = () => {
 
   return (
     <CatalogScrollAnimationProvider>
-      <View style={[styles.container, centeredContentStyle, { paddingTop: insets.top }]}>
+      <View
+        style={[styles.container, centeredContentStyle, { paddingTop: insets.top }]}
+      >
         <CatalogAnimatedFlatList
           key={productGrid.listKey}
           style={styles.listFlex}
@@ -187,7 +196,10 @@ export const SellerProductsPage = () => {
             <View style={styles.header}>
               <View style={styles.nav}>
                 <Pressable
-                  style={({ pressed }) => [styles.navBack, pressed ? styles.navBackPressed : null]}
+                  style={({ pressed }) => [
+                    styles.navBack,
+                    pressed ? styles.navBackPressed : null,
+                  ]}
                   onPress={() => navigateBackOrHome(router)}
                   accessibilityRole="button"
                   accessibilityLabel={SELLER_PRODUCTS_PAGE_UI.BACK_ARIA}
@@ -230,7 +242,9 @@ export const SellerProductsPage = () => {
                         ]}
                         onPress={() => router.push(`/user/${sellerId}`)}
                         accessibilityRole="button"
-                        accessibilityLabel={PRODUCT_CARD_UI.SELLER_PROFILE_ARIA(displayName)}
+                        accessibilityLabel={PRODUCT_CARD_UI.SELLER_PROFILE_ARIA(
+                          displayName,
+                        )}
                       >
                         <UserPremiumDisplayName
                           name={displayName}
@@ -292,7 +306,10 @@ export const SellerProductsPage = () => {
                           <Pressable
                             key={shelf._id}
                             onPress={() => setSelectedShelfId(shelf._id)}
-                            style={[styles.shelfChip, active ? styles.shelfChipActive : null]}
+                            style={[
+                              styles.shelfChip,
+                              active ? styles.shelfChipActive : null,
+                            ]}
                             accessibilityRole="button"
                             accessibilityState={{ selected: active }}
                           >
@@ -313,7 +330,9 @@ export const SellerProductsPage = () => {
               ) : null}
             </View>
           }
-          ListEmptyComponent={<Text style={styles.hint}>{SELLER_PRODUCTS_PAGE_UI.EMPTY}</Text>}
+          ListEmptyComponent={
+            <Text style={styles.hint}>{SELLER_PRODUCTS_PAGE_UI.EMPTY}</Text>
+          }
           ListFooterComponent={
             catalogQuery.isFetchingNextPage ? (
               <ActivityIndicator style={styles.footerLoader} />

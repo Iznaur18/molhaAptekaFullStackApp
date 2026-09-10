@@ -74,7 +74,9 @@ export function PopularProductsAdminCategoriesTab() {
     (
       /** @type {(rows: import('../../../entities/curated-category-list/model/types.js').CuratedCategoryListFromApi[]) => import('../../../entities/curated-category-list/model/types.js').CuratedCategoryListFromApi[]} */ updater,
     ) => {
-      queryClient.setQueryData(curatedCategoryListQueryKeys.admin(), (old) => updater(old ?? []));
+      queryClient.setQueryData(curatedCategoryListQueryKeys.admin(), (old) =>
+        updater(old ?? []),
+      );
     },
     [queryClient],
   );
@@ -136,7 +138,9 @@ export function PopularProductsAdminCategoriesTab() {
         await invalidateCuratedCategoryLists(queryClient);
       } catch (e) {
         setActionError(
-          e instanceof Error ? e.message : POPULAR_CATEGORIES_ADMIN_PAGE_UI.REORDER_ERROR,
+          e instanceof Error
+            ? e.message
+            : POPULAR_CATEGORIES_ADMIN_PAGE_UI.REORDER_ERROR,
         );
       } finally {
         setPendingListId(null);
@@ -159,7 +163,9 @@ export function PopularProductsAdminCategoriesTab() {
         await invalidateCuratedCategoryLists(queryClient);
       } catch (e) {
         setActionError(
-          e instanceof Error ? e.message : POPULAR_CATEGORIES_ADMIN_PAGE_UI.DELETE_ERROR,
+          e instanceof Error
+            ? e.message
+            : POPULAR_CATEGORIES_ADMIN_PAGE_UI.DELETE_ERROR,
         );
       } finally {
         setPendingListId(null);
@@ -174,7 +180,9 @@ export function PopularProductsAdminCategoriesTab() {
       setPendingListId(listId);
       try {
         const list = await patchMutation.mutateAsync({ listId, body: payload });
-        updateListsCache((rows) => rows.map((row) => (row._id === listId ? list : row)));
+        updateListsCache((rows) =>
+          rows.map((row) => (row._id === listId ? list : row)),
+        );
         await invalidateCuratedCategoryLists(queryClient);
       } finally {
         setPendingListId(null);
@@ -193,7 +201,9 @@ export function PopularProductsAdminCategoriesTab() {
           kind: payload.kind,
           refId: payload.refId,
         });
-        updateListsCache((rows) => rows.map((row) => (row._id === listId ? list : row)));
+        updateListsCache((rows) =>
+          rows.map((row) => (row._id === listId ? list : row)),
+        );
         await invalidateCuratedCategoryLists(queryClient);
       } finally {
         setPendingListId(null);
@@ -208,7 +218,9 @@ export function PopularProductsAdminCategoriesTab() {
       setPendingListId(listId);
       try {
         const list = await removeItemMutation.mutateAsync({ listId, itemKey });
-        updateListsCache((rows) => rows.map((row) => (row._id === listId ? list : row)));
+        updateListsCache((rows) =>
+          rows.map((row) => (row._id === listId ? list : row)),
+        );
         await invalidateCuratedCategoryLists(queryClient);
       } finally {
         setPendingListId(null);

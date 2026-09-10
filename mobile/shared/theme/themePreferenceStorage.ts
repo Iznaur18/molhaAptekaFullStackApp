@@ -28,7 +28,9 @@ export const loadThemePreference = async (): Promise<ThemePreference> => {
   return resolveThemePreferenceFromSystem();
 };
 
-export const saveThemePreference = async (preference: ThemePreference): Promise<void> => {
+export const saveThemePreference = async (
+  preference: ThemePreference,
+): Promise<void> => {
   if (!isThemePreference(preference)) {
     return;
   }

@@ -52,10 +52,7 @@ export function CuratedProductListAdminCard({
     listRegionCode,
   });
   const canAddProduct =
-    Boolean(preview) &&
-    !isPreviewLoading &&
-    !previewError &&
-    regionBlockReason == null;
+    Boolean(preview) && !isPreviewLoading && !previewError && regionBlockReason == null;
 
   const handleSaveList = useCallback(async () => {
     setLocalError("");
@@ -66,7 +63,9 @@ export function CuratedProductListAdminCard({
     try {
       await onSaveList({ title: titleDraft, regionCode: regionDraft });
     } catch (e) {
-      setLocalError(e instanceof Error ? e.message : POPULAR_PRODUCTS_ADMIN_PAGE_UI.SAVE_ERROR);
+      setLocalError(
+        e instanceof Error ? e.message : POPULAR_PRODUCTS_ADMIN_PAGE_UI.SAVE_ERROR,
+      );
     }
   }, [onSaveList, regionDraft, titleDraft]);
 
@@ -92,15 +91,11 @@ export function CuratedProductListAdminCard({
       await onAddProduct(productId);
       setProductIdDraft("");
     } catch (e) {
-      setLocalError(e instanceof Error ? e.message : POPULAR_PRODUCTS_ADMIN_PAGE_UI.ADD_ITEM_ERROR);
+      setLocalError(
+        e instanceof Error ? e.message : POPULAR_PRODUCTS_ADMIN_PAGE_UI.ADD_ITEM_ERROR,
+      );
     }
-  }, [
-    canAddProduct,
-    onAddProduct,
-    previewError,
-    productIdDraft,
-    regionBlockReason,
-  ]);
+  }, [canAddProduct, onAddProduct, previewError, productIdDraft, regionBlockReason]);
 
   const handleRemoveProduct = useCallback(
     async (productId) => {
@@ -109,7 +104,9 @@ export function CuratedProductListAdminCard({
         await onRemoveProduct(productId);
       } catch (e) {
         setLocalError(
-          e instanceof Error ? e.message : POPULAR_PRODUCTS_ADMIN_PAGE_UI.REMOVE_ITEM_ERROR,
+          e instanceof Error
+            ? e.message
+            : POPULAR_PRODUCTS_ADMIN_PAGE_UI.REMOVE_ITEM_ERROR,
         );
       }
     },
@@ -254,11 +251,17 @@ export function CuratedProductListAdminCard({
       ) : null}
 
       {list.productIds.length === 0 ? (
-        <p className="curated-list-admin-card__empty">{POPULAR_PRODUCTS_ADMIN_PAGE_UI.EMPTY_LIST}</p>
+        <p className="curated-list-admin-card__empty">
+          {POPULAR_PRODUCTS_ADMIN_PAGE_UI.EMPTY_LIST}
+        </p>
       ) : (
         <ul className="curated-list-admin-card__items" role="list">
           {list.productIds.map((productId) => (
-            <li key={productId} className="curated-list-admin-card__item" role="listitem">
+            <li
+              key={productId}
+              className="curated-list-admin-card__item"
+              role="listitem"
+            >
               <code className="curated-list-admin-card__product-id">{productId}</code>
               <button
                 type="button"

@@ -23,7 +23,9 @@ async function countCatalogCards(page) {
  */
 async function waitForVirtualCatalog(page) {
   await page.goto("/");
-  await page.getByRole("searchbox", { name: "Поиск товаров" }).fill(E2E_FIXTURE.virtualCatalogPrefix);
+  await page
+    .getByRole("searchbox", { name: "Поиск товаров" })
+    .fill(E2E_FIXTURE.virtualCatalogPrefix);
   await page.waitForTimeout(SEARCH_DEBOUNCE_MS);
 
   await expect(page.getByRole("list", { name: /товар/i })).toBeVisible({
@@ -78,7 +80,8 @@ async function readVirtualizerMetrics(page) {
     const host = document.querySelector(".app-shell__grid-virtual-host");
     const grid = document.querySelector(".app-shell__grid--virtual-window");
     const hostHeight = host instanceof HTMLElement ? host.offsetHeight : 0;
-    const gridTop = grid instanceof HTMLElement ? parseFloat(getComputedStyle(grid).top) : 0;
+    const gridTop =
+      grid instanceof HTMLElement ? parseFloat(getComputedStyle(grid).top) : 0;
     const cardCount = document.querySelectorAll(
       ".app-shell__grid--virtual-window .product-card",
     ).length;
@@ -93,7 +96,9 @@ async function readVirtualizerMetrics(page) {
   });
 }
 
-test("mobile QA: scroll + resize/orientation держит карточки в DOM", async ({ page }) => {
+test("mobile QA: scroll + resize/orientation держит карточки в DOM", async ({
+  page,
+}) => {
   await waitForVirtualCatalog(page);
   await expectVirtualCatalogHasVisibleCards(page);
 

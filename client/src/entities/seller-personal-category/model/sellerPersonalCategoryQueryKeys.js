@@ -6,8 +6,16 @@ export const sellerPersonalCategoryQueryKeys = {
     "catalog-tiles",
     { regionCode },
   ],
-  moderationPending: () => [...sellerPersonalCategoryQueryKeys.all, "moderation", "pending"],
-  moderationManaged: () => [...sellerPersonalCategoryQueryKeys.all, "moderation", "managed"],
+  moderationPending: () => [
+    ...sellerPersonalCategoryQueryKeys.all,
+    "moderation",
+    "pending",
+  ],
+  moderationManaged: () => [
+    ...sellerPersonalCategoryQueryKeys.all,
+    "moderation",
+    "managed",
+  ],
   moderationCount: () => [
     ...sellerPersonalCategoryQueryKeys.all,
     "moderation",

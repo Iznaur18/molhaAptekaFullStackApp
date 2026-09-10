@@ -53,7 +53,8 @@ function readMobile(/** @type {string} */ prop) {
 /** @param {string} raw @returns {number | null} */
 function toPx(raw) {
   const value = raw.trim();
-  if (/var\(|calc\(|%|inherit|initial|unset|clamp\(|min\(|max\(|\s|\//.test(value)) return null;
+  if (/var\(|calc\(|%|inherit|initial|unset|clamp\(|min\(|max\(|\s|\//.test(value))
+    return null;
   const rem = value.match(/^(-?[\d.]+)rem$/);
   if (rem) return Number.parseFloat(rem[1]) * REM_BASE;
   const px = value.match(/^(-?[\d.]+)px$/);
@@ -112,9 +113,7 @@ for (const [cssProp, rnProp] of [
   console.log(
     `В паритете (точный двойник в мобиле): ${inParity.length} значений / ${sum(inParity)} вхождений`,
   );
-  console.log(
-    `Расходится: ${diverged.length} значений / ${sum(diverged)} вхождений\n`,
-  );
+  console.log(`Расходится: ${diverged.length} значений / ${sum(diverged)} вхождений\n`);
   console.log("  РАСХОДЯЩИЕСЯ (web → ближайшее в мобиле):");
   for (const [raw, r] of diverged) {
     console.log(

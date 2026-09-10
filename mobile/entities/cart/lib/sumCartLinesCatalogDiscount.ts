@@ -11,11 +11,7 @@ export function sumCartLinesCatalogListTotal(lines: CartLine[]): number {
     if (quantity <= 0) {
       return sum;
     }
-    if (
-      Number.isFinite(oldPrice) &&
-      Number.isFinite(price) &&
-      oldPrice > price
-    ) {
+    if (Number.isFinite(oldPrice) && Number.isFinite(price) && oldPrice > price) {
       return sum + oldPrice * quantity;
     }
     if (Number.isFinite(price) && price >= 0) {

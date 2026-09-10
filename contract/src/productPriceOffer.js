@@ -7,5 +7,8 @@ export const productPriceOfferBodySchema = z.object({
     .number()
     .int(`offerPrice — целое число от 1 до ${PRODUCT_PRICE_RUB_MAX}`)
     .min(1, `offerPrice — целое число от 1 до ${PRODUCT_PRICE_RUB_MAX}`)
-    .max(PRODUCT_PRICE_RUB_MAX, `offerPrice — целое число от 1 до ${PRODUCT_PRICE_RUB_MAX}`),
+    .max(
+      PRODUCT_PRICE_RUB_MAX,
+      `offerPrice — целое число от 1 до ${PRODUCT_PRICE_RUB_MAX}`,
+    ),
 });

@@ -35,9 +35,7 @@ export function FaqItemLinkAdminField({ itemId, href }) {
         draft.trim() === "" ? FAQ_UI.ADMIN_LINK_CLEARED : FAQ_UI.ADMIN_LINK_SAVED,
       );
     } catch (saveError) {
-      setError(
-        saveError instanceof Error ? saveError.message : FAQ_UI.ADMIN_LINK_SAVE,
-      );
+      setError(saveError instanceof Error ? saveError.message : FAQ_UI.ADMIN_LINK_SAVE);
     }
   };
 

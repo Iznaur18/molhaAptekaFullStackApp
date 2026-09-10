@@ -8,7 +8,9 @@ export type ProductSellerProfile = {
   isUserDataConfirmed: boolean;
 };
 
-export const getProductSellerProfile = (product: unknown): ProductSellerProfile | null => {
+export const getProductSellerProfile = (
+  product: unknown,
+): ProductSellerProfile | null => {
   const displayName = getProductSellerDisplayName(product).trim();
   if (!displayName) {
     return null;

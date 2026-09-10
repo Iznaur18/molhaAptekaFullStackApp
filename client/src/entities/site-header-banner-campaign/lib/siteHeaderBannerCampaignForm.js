@@ -17,8 +17,7 @@ const DEFAULT_BANNER_IMAGE_ALT = "Рекламный баннер";
  */
 export const validateSiteHeaderBannerCampaignForm = (form) => {
   const imageUrl = String(form.imageUrl ?? "").trim();
-  const imageAlt =
-    String(form.imageAlt ?? "").trim() || DEFAULT_BANNER_IMAGE_ALT;
+  const imageAlt = String(form.imageAlt ?? "").trim() || DEFAULT_BANNER_IMAGE_ALT;
   const regionCode = String(form.regionCode ?? "").trim();
 
   if (!imageUrl) {

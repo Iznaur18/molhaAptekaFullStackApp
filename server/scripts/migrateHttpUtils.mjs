@@ -38,8 +38,7 @@ export { buildRegexSearchOr } from "./buildRegexSearchOr.js";
   "utf8",
 );
 
-const HTTP_IMPORT_RE =
-  /import\s*\{([^}]+)\}\s*from\s*"(?:\.\.\/)+utils\/index\.js";/g;
+const HTTP_IMPORT_RE = /import\s*\{([^}]+)\}\s*from\s*"(?:\.\.\/)+utils\/index\.js";/g;
 
 const splitSpecifiers = (raw) =>
   raw
@@ -90,9 +89,7 @@ const walkAndRewriteImports = (dir) => {
       const lines = [];
 
       if (httpSpecs.length > 0) {
-        lines.push(
-          formatImport(httpSpecs, relImport(abs, "services/http/index.js")),
-        );
+        lines.push(formatImport(httpSpecs, relImport(abs, "services/http/index.js")));
       }
       if (authSpecs.length > 0) {
         lines.push(
@@ -116,4 +113,6 @@ const walkAndRewriteImports = (dir) => {
 
 walkAndRewriteImports(SERVER_DIR);
 
-console.log(`Migrated ${HTTP_FILES.length} HTTP utils → services/http/; imports updated`);
+console.log(
+  `Migrated ${HTTP_FILES.length} HTTP utils → services/http/; imports updated`,
+);

@@ -648,8 +648,7 @@ export function initRateLimitMiddlewares(store) {
       keyGenerator: oneCExchangeAuthKey,
       validate: { ip: false, trustProxy: false, xForwardedForHeader: false },
       statusCode: 200,
-      message:
-        "failure\nСлишком много неудачных попыток авторизации обмена",
+      message: "failure\nСлишком много неудачных попыток авторизации обмена",
     },
     store,
   );

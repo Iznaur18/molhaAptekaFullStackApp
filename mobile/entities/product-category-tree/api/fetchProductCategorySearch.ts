@@ -11,7 +11,9 @@ export type ProductCategorySearchResult = {
   defaultCharacteristicKeys: string[];
 };
 
-const normalizeSearchNode = (raw: Record<string, unknown>): ProductCategorySearchResult => ({
+const normalizeSearchNode = (
+  raw: Record<string, unknown>,
+): ProductCategorySearchResult => ({
   id: String(raw.id ?? raw._id ?? ""),
   labelRu: String(raw.labelRu ?? raw.name ?? ""),
   pathLabelRu: Array.isArray(raw.pathLabelRu) ? raw.pathLabelRu.map(String) : [],

@@ -188,7 +188,9 @@ function ReportsToolbar({
   return (
     <div className="product-reports-page__toolbar">
       <div className="product-reports-page__toolbar-head">
-        <h3 className="product-reports-page__heading">{PRODUCT_REPORTS_PAGE_UI.TITLE}</h3>
+        <h3 className="product-reports-page__heading">
+          {PRODUCT_REPORTS_PAGE_UI.TITLE}
+        </h3>
         <span className="product-reports-page__count">
           {PRODUCT_REPORTS_PAGE_UI.COUNT(groupsCount)}
         </span>
@@ -209,7 +211,9 @@ function ReportsToolbar({
               className={[
                 "product-reports-page__section-chip",
                 isActive ? "product-reports-page__section-chip_active" : "",
-                option.value ? `product-reports-page__section-chip_${option.value}` : "",
+                option.value
+                  ? `product-reports-page__section-chip_${option.value}`
+                  : "",
               ]
                 .filter(Boolean)
                 .join(" ")}

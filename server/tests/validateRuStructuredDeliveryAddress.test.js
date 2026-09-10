@@ -96,7 +96,10 @@ describe("порядок строк-кандидатов", () => {
 
   it("не дублирует одинаковые строки", () => {
     assert.deepEqual(
-      buildAddressCandidates({ rawLine: "Грозный, д 1", structuredLine: "Грозный, д 1" }),
+      buildAddressCandidates({
+        rawLine: "Грозный, д 1",
+        structuredLine: "Грозный, д 1",
+      }),
       ["Грозный, д 1"],
     );
   });

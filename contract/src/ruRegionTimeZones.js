@@ -56,7 +56,10 @@ const WEEKDAY_SHORT_TO_INDEX = Object.freeze({
 export function resolveRuRegionIanaTimeZone(regionCode) {
   const code = String(regionCode ?? "").trim();
   if (!code) {
-    return RU_REGION_IANA_TIME_ZONE_OVERRIDES[DEFAULT_VIEWER_REGION_CODE] ?? DEFAULT_RU_IANA_TIME_ZONE;
+    return (
+      RU_REGION_IANA_TIME_ZONE_OVERRIDES[DEFAULT_VIEWER_REGION_CODE] ??
+      DEFAULT_RU_IANA_TIME_ZONE
+    );
   }
   return RU_REGION_IANA_TIME_ZONE_OVERRIDES[code] ?? DEFAULT_RU_IANA_TIME_ZONE;
 }

@@ -208,7 +208,9 @@ export function ProductPromotionFormPanel({
           {showStreakDiscount ? (
             <>
               <div className="product-promotion-modal__summary-row">
-                <span>{PRODUCT_PROMOTION_UI.STREAK_DISCOUNT_BADGE(streakDiscountPercent)}</span>
+                <span>
+                  {PRODUCT_PROMOTION_UI.STREAK_DISCOUNT_BADGE(streakDiscountPercent)}
+                </span>
                 <strong>
                   {payWithPoints
                     ? PRODUCT_PROMOTION_UI.STREAK_LIST_PRICE(listAmountRub, "баллов")

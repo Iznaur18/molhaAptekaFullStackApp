@@ -38,8 +38,17 @@ export type ProductDetailsBadgeItem = {
   | { kind: "rental" }
   | { kind: "promo" }
   | { kind: "nearDistance" }
-  | { kind: "listingOrigin"; origin: string | null; iconName: ProductListingOriginIconName }
-  | { kind: "priceMarket"; priceMarketStatus: string; backgroundColor: string; color: string }
+  | {
+      kind: "listingOrigin";
+      origin: string | null;
+      iconName: ProductListingOriginIconName;
+    }
+  | {
+      kind: "priceMarket";
+      priceMarketStatus: string;
+      backgroundColor: string;
+      color: string;
+    }
 );
 
 type BuildProductDetailsBadgeItemsInput = {
@@ -106,10 +115,7 @@ export const buildProductDetailsBadgeItems = ({
     });
   }
 
-  if (
-    product.productRentalEnabled === true &&
-    isProductRentalConfigured(product)
-  ) {
+  if (product.productRentalEnabled === true && isProductRentalConfigured(product)) {
     items.push({
       key: "rental",
       kind: "rental",

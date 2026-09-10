@@ -209,14 +209,12 @@ export const MIGRATIONS = [
   },
   {
     id: "20260803-product-pickup-location",
-    description:
-      "Backfill productPickupLocation GeoJSON Point + sparse 2dsphere index",
+    description: "Backfill productPickupLocation GeoJSON Point + sparse 2dsphere index",
     up: productPickupLocationUp,
   },
   {
     id: "20260804-product-region-from-pickup-geo",
-    description:
-      "Derive productRegionCode from pickup lat/lon via DaData geolocate",
+    description: "Derive productRegionCode from pickup lat/lon via DaData geolocate",
     up: productRegionFromPickupGeoUp,
   },
   {

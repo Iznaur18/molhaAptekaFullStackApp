@@ -59,8 +59,7 @@ export const ProfileOverviewBanner = ({
   const canShowBackground =
     profileBackground.kind === "preset" ||
     (profileBackground.kind === "image" && !backgroundLoadFailed);
-  const showBanner =
-    canShowBackground || (Boolean(photoUrl) && !avatarLoadFailed);
+  const showBanner = canShowBackground || (Boolean(photoUrl) && !avatarLoadFailed);
   const isPremium = isPremiumActive(user);
 
   if (!showBanner) {
@@ -94,7 +93,9 @@ export const ProfileOverviewBanner = ({
           />
         ) : null}
 
-        {canShowBackground ? <View style={styles.bannerScrim} pointerEvents="none" /> : null}
+        {canShowBackground ? (
+          <View style={styles.bannerScrim} pointerEvents="none" />
+        ) : null}
 
         {photoUrl && !avatarLoadFailed ? (
           <UserPremiumAvatar

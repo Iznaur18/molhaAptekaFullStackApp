@@ -53,7 +53,10 @@ export const AdvertisingPage = () => {
     return (
       <View style={styles.centered}>
         <Text style={styles.hint}>{INTRO_AD_PAGE_UI.LOGIN_HINT}</Text>
-        <Pressable style={styles.loginButton} onPress={() => router.push("/(auth)/login")}>
+        <Pressable
+          style={styles.loginButton}
+          onPress={() => router.push("/(auth)/login")}
+        >
           <Text style={styles.loginButtonText}>{INTRO_AD_PAGE_UI.LOGIN_BUTTON}</Text>
         </Pressable>
       </View>
@@ -67,7 +70,10 @@ export const AdvertisingPage = () => {
   if (campaignQuery.isError) {
     return (
       <ScreenErrorState
-        message={formatApiErrorMessage(campaignQuery.error, INTRO_AD_PAGE_UI.FETCH_FALLBACK)}
+        message={formatApiErrorMessage(
+          campaignQuery.error,
+          INTRO_AD_PAGE_UI.FETCH_FALLBACK,
+        )}
         onRetry={() => campaignQuery.refetch()}
       />
     );

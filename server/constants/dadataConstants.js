@@ -1,7 +1,4 @@
-import {
-  ADDRESS_FLAT_MAX_LENGTH,
-  ADDRESS_LINE_MAX_LENGTH,
-} from "@molha/api-contract";
+import { ADDRESS_FLAT_MAX_LENGTH, ADDRESS_LINE_MAX_LENGTH } from "@molha/api-contract";
 
 // Длина адреса живёт в контракте: её видят и схемы запросов, и модели, и обе
 // формы ввода. Своя копия здесь однажды разошлась бы с zod, и пользователь
@@ -18,4 +15,3 @@ export const DADATA_QC_COMPLETE_MAX = 1;
 export const DADATA_QC_GEO_MAX = 1;
 
 export const DADATA_SUGGEST_COUNT = 7;
-

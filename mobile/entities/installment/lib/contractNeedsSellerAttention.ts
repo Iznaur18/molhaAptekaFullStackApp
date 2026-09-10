@@ -1,8 +1,11 @@
 import type { InstallmentContract } from "@/entities/installment/api/installmentApi";
 import { isEarlyPayoffPendingConfirmation } from "@/entities/installment/lib/isEarlyPayoffPendingConfirmation";
 
-export const contractNeedsSellerAttention = (contract: InstallmentContract): boolean => {
-  const isActive = contract.status === "active" || contract.status === "pending_first_payment";
+export const contractNeedsSellerAttention = (
+  contract: InstallmentContract,
+): boolean => {
+  const isActive =
+    contract.status === "active" || contract.status === "pending_first_payment";
 
   if (!isActive) {
     return false;

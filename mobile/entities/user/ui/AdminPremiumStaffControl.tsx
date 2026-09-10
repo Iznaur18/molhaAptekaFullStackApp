@@ -116,7 +116,9 @@ export const AdminPremiumStaffControl = ({
   }, [user._id, user]);
 
   const statusText = isPremiumExpiresAtInputActive(premiumExpiresAt)
-    ? ADMIN_EDIT_USER_UI.PREMIUM_STATUS_ACTIVE(formatPremiumExpiresAtDisplay(premiumExpiresAt))
+    ? ADMIN_EDIT_USER_UI.PREMIUM_STATUS_ACTIVE(
+        formatPremiumExpiresAtDisplay(premiumExpiresAt),
+      )
     : ADMIN_EDIT_USER_UI.PREMIUM_STATUS_OFF;
 
   const handleToggle = (nextEnabled: boolean) => {
@@ -150,7 +152,9 @@ export const AdminPremiumStaffControl = ({
       </View>
 
       <View style={styles.toggleRow}>
-        <Text style={styles.toggleLabel}>{ADMIN_EDIT_USER_UI.PREMIUM_TOGGLE_LABEL}</Text>
+        <Text style={styles.toggleLabel}>
+          {ADMIN_EDIT_USER_UI.PREMIUM_TOGGLE_LABEL}
+        </Text>
         <Switch
           value={premiumEnabled}
           onValueChange={handleToggle}
@@ -179,7 +183,9 @@ export const AdminPremiumStaffControl = ({
             })}
           </View>
           <View>
-            <Text style={styles.customLabel}>{ADMIN_EDIT_USER_UI.PREMIUM_CUSTOM_DATE_LABEL}</Text>
+            <Text style={styles.customLabel}>
+              {ADMIN_EDIT_USER_UI.PREMIUM_CUSTOM_DATE_LABEL}
+            </Text>
             <TextInput
               style={styles.customInput}
               value={premiumExpiresAt}

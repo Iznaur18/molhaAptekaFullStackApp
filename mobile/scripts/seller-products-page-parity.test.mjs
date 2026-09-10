@@ -7,8 +7,7 @@ import { test } from "node:test";
 const MOBILE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CLIENT_ROOT = join(MOBILE_ROOT, "..", "client");
 
-const readFile = (root, relativePath) =>
-  readFileSync(join(root, relativePath), "utf8");
+const readFile = (root, relativePath) => readFileSync(join(root, relativePath), "utf8");
 
 test("seller products page includes web header blocks", () => {
   const page = readFile(

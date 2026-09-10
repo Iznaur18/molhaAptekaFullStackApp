@@ -6,7 +6,9 @@ import { InlineErrorBanner } from "./InlineErrorBanner.jsx";
 describe("InlineErrorBanner", () => {
   it("renders alert with message and mark", () => {
     render(
-      <InlineErrorBanner>Сервер временно недоступен. Попробуйте позже</InlineErrorBanner>,
+      <InlineErrorBanner>
+        Сервер временно недоступен. Попробуйте позже
+      </InlineErrorBanner>,
     );
 
     const alert = screen.getByRole("alert");

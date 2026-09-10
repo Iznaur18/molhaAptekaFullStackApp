@@ -62,7 +62,8 @@ export function useCatalogQuerySync({
       new URLSearchParams(location.search),
     );
     setCatalogSort((prev) => (prev === parsed.sort ? prev : parsed.sort));
-    const applyScopedFilters = catalogMainView === "catalog-browser" || catalogMainView === "catalog";
+    const applyScopedFilters =
+      catalogMainView === "catalog-browser" || catalogMainView === "catalog";
     if (applyScopedFilters) {
       setSelectedProductCategory((prev) =>
         prev === parsed.category ? prev : parsed.category,

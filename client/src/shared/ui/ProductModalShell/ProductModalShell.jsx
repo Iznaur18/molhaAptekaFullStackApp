@@ -59,8 +59,7 @@ export function ProductModalShell({
   useScrollLock(isOpen);
   useDialogFocusTrap(panelRef, {
     active: isOpen,
-    initialFocusRef:
-      hideHeader || hideCloseButton ? panelRef : closeButtonRef,
+    initialFocusRef: hideHeader || hideCloseButton ? panelRef : closeButtonRef,
   });
 
   useEffect(() => {

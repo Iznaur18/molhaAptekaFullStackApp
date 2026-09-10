@@ -10,9 +10,10 @@ import {
 } from "../dist/productManageToggleDisplay.js";
 
 test("product manage toggle keys match variant map", () => {
-  assert.deepEqual(Object.keys(PRODUCT_MANAGE_TOGGLE_VARIANT_BY_KEY).sort(), [
-    ...PRODUCT_MANAGE_TOGGLE_KEY_VALUES,
-  ].sort());
+  assert.deepEqual(
+    Object.keys(PRODUCT_MANAGE_TOGGLE_VARIANT_BY_KEY).sort(),
+    [...PRODUCT_MANAGE_TOGGLE_KEY_VALUES].sort(),
+  );
 });
 
 test("resolveProductManageTogglePalette returns checked background", () => {
@@ -22,7 +23,10 @@ test("resolveProductManageTogglePalette returns checked background", () => {
   assert.ok(unchecked);
   assert.ok(checked);
   assert.equal(unchecked.background, PRODUCT_MANAGE_TOGGLE_PALETTE.auction.background);
-  assert.equal(checked.background, PRODUCT_MANAGE_TOGGLE_PALETTE.auction.backgroundChecked);
+  assert.equal(
+    checked.background,
+    PRODUCT_MANAGE_TOGGLE_PALETTE.auction.backgroundChecked,
+  );
 });
 
 test("resolveProductManageToggleKeyFromVariant maps visibility to default", () => {

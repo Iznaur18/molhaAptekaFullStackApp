@@ -5,9 +5,7 @@ export function resolveAffiliateReferrerDisplayName(referrer: unknown): string {
   if (referrer == null || typeof referrer !== "object") {
     return "";
   }
-  const name = String(
-    (referrer as { userName?: unknown }).userName ?? "",
-  ).trim();
+  const name = String((referrer as { userName?: unknown }).userName ?? "").trim();
   return name;
 }
 
@@ -34,8 +32,7 @@ export function resolveOrderLineAffiliateSellerLine(input: {
     return null;
   }
   const name =
-    resolveAffiliateReferrerDisplayName(item.affiliateReferrerUserId) ||
-    "партнёр";
+    resolveAffiliateReferrerDisplayName(item.affiliateReferrerUserId) || "партнёр";
   const amount = Math.ceil(Number(item.affiliateAmount) || 0);
   const percent = Math.floor(Number(item.affiliatePercentUsed) || 0);
 

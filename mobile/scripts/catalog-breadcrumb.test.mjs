@@ -7,12 +7,14 @@ import { test } from "node:test";
 const MOBILE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CLIENT_ROOT = join(MOBILE_ROOT, "..", "client");
 
-const readFile = (root, relativePath) =>
-  readFileSync(join(root, relativePath), "utf8");
+const readFile = (root, relativePath) => readFileSync(join(root, relativePath), "utf8");
 
 test("catalog screen uses breadcrumb instead of category chips", () => {
   const catalogScreen = readFile(MOBILE_ROOT, "app/(tabs)/index.tsx");
-  const breadcrumb = readFile(MOBILE_ROOT, "features/catalog-filter/ui/CatalogBreadcrumb.tsx");
+  const breadcrumb = readFile(
+    MOBILE_ROOT,
+    "features/catalog-filter/ui/CatalogBreadcrumb.tsx",
+  );
   const styles = readFile(MOBILE_ROOT, "shared/theme/catalogProductStyles.ts");
   const webCss = readFile(
     CLIENT_ROOT,

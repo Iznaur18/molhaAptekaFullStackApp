@@ -12,9 +12,8 @@ const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollectio
 // только те коллекции, о которых знает mongoose, и без этого импорта тесты
 // начинают видеть данные друг друга.
 await import("../models/index.js");
-const { up } = await import(
-  "../scripts/migrations/20260905-seller-fulfillment-defaults.js"
-);
+const { up } =
+  await import("../scripts/migrations/20260905-seller-fulfillment-defaults.js");
 
 const db = () => mongoose.connection.db;
 

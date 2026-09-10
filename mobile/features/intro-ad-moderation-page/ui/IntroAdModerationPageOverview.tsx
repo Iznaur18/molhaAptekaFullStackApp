@@ -47,31 +47,48 @@ export const IntroAdModerationPageOverview = ({
   return (
     <View style={styles.overview} accessibilityRole="summary">
       <Pressable style={styles.overviewTile} onPress={onPendingFilterClick}>
-        <Text style={styles.overviewLabel}>{INTRO_AD_MODERATION_PAGE_UI.OVERVIEW_PENDING}</Text>
+        <Text style={styles.overviewLabel}>
+          {INTRO_AD_MODERATION_PAGE_UI.OVERVIEW_PENDING}
+        </Text>
         <Text style={styles.overviewValue}>{pendingTotal}</Text>
       </Pressable>
 
       <Pressable
-        style={resolveIntroAdModerationOverviewTileStyles(INTRO_AD_MODERATION_SECTION_INTRO, styles)}
+        style={resolveIntroAdModerationOverviewTileStyles(
+          INTRO_AD_MODERATION_SECTION_INTRO,
+          styles,
+        )}
         onPress={onIntroFilterClick}
       >
-        <Text style={styles.overviewLabel}>{INTRO_AD_MODERATION_PAGE_UI.OVERVIEW_INTRO}</Text>
+        <Text style={styles.overviewLabel}>
+          {INTRO_AD_MODERATION_PAGE_UI.OVERVIEW_INTRO}
+        </Text>
         <Text style={styles.overviewValue}>{introPendingCount}</Text>
       </Pressable>
 
       <Pressable
-        style={resolveIntroAdModerationOverviewTileStyles(INTRO_AD_MODERATION_SECTION_BANNER, styles)}
+        style={resolveIntroAdModerationOverviewTileStyles(
+          INTRO_AD_MODERATION_SECTION_BANNER,
+          styles,
+        )}
         onPress={onBannerFilterClick}
       >
-        <Text style={styles.overviewLabel}>{INTRO_AD_MODERATION_PAGE_UI.OVERVIEW_BANNER}</Text>
+        <Text style={styles.overviewLabel}>
+          {INTRO_AD_MODERATION_PAGE_UI.OVERVIEW_BANNER}
+        </Text>
         <Text style={styles.overviewValue}>{bannerPendingCount}</Text>
       </Pressable>
 
       <Pressable
-        style={resolveIntroAdModerationOverviewTileStyles(INTRO_AD_MODERATION_SECTION_RAFFLE, styles)}
+        style={resolveIntroAdModerationOverviewTileStyles(
+          INTRO_AD_MODERATION_SECTION_RAFFLE,
+          styles,
+        )}
         onPress={onRaffleFilterClick}
       >
-        <Text style={styles.overviewLabel}>{INTRO_AD_MODERATION_PAGE_UI.OVERVIEW_RAFFLE}</Text>
+        <Text style={styles.overviewLabel}>
+          {INTRO_AD_MODERATION_PAGE_UI.OVERVIEW_RAFFLE}
+        </Text>
         <Text style={styles.overviewValue}>{rafflePendingCount}</Text>
       </Pressable>
 
@@ -99,7 +116,9 @@ export const IntroAdModerationPageOverview = ({
         accessibilityState={{ selected: attentionOnly }}
         onPress={() => onAttentionFilterChange(!attentionOnly)}
       >
-        <Text style={styles.overviewLabel}>{INTRO_AD_MODERATION_PAGE_UI.OVERVIEW_ATTENTION}</Text>
+        <Text style={styles.overviewLabel}>
+          {INTRO_AD_MODERATION_PAGE_UI.OVERVIEW_ATTENTION}
+        </Text>
         <Text
           style={[
             styles.overviewValue,

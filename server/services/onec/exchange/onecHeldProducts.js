@@ -17,8 +17,7 @@ import {
  * позже в offers/rests: без картинок номенклатура лежит в `OneCPendingProduct`
  * и разворачивается в товар только когда в каталоге появятся файлы картинок.
  */
-export const ONEC_HOLD_RULE_MESSAGE =
-  "Нет картинок — карточка на сайте не заводится";
+export const ONEC_HOLD_RULE_MESSAGE = "Нет картинок — карточка на сайте не заводится";
 
 export const ONEC_HOLD_HIDDEN_MESSAGE =
   "Нет картинок — карточка снята с витрины до появления фото в выгрузке";

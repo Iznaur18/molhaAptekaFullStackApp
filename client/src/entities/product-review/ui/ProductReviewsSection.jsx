@@ -53,7 +53,9 @@ export function ProductReviewsSection({
   const summary = summaryQuery.data ?? null;
   const [errorMessage, setErrorMessage] = useState("");
   const isSubmitting = submitMutation.isPending;
-  const lastPushedStatsRef = useRef(/** @type {{ averageRating: number; reviewCount: number } | null} */ (null));
+  const lastPushedStatsRef = useRef(
+    /** @type {{ averageRating: number; reviewCount: number } | null} */ (null),
+  );
 
   const applyStats = useCallback(
     (averageRating, reviewCount) => {
@@ -139,7 +141,9 @@ export function ProductReviewsSection({
 
     if (!summary?.canReview) {
       return (
-        <p className="product-reviews-section__hint">{PRODUCT_REVIEW_UI.NOT_DELIVERED}</p>
+        <p className="product-reviews-section__hint">
+          {PRODUCT_REVIEW_UI.NOT_DELIVERED}
+        </p>
       );
     }
 

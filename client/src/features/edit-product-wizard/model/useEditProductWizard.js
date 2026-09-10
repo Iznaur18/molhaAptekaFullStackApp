@@ -38,7 +38,9 @@ export function useEditProductWizard({ isOpen, form }) {
       return false;
     }
 
-    setStepIndex((current) => Math.min(current + 1, EDIT_PRODUCT_WIZARD_STEP_COUNT - 1));
+    setStepIndex((current) =>
+      Math.min(current + 1, EDIT_PRODUCT_WIZARD_STEP_COUNT - 1),
+    );
     setStepError("");
     return true;
   }, [validateCurrentStep]);

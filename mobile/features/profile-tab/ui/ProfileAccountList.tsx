@@ -70,7 +70,9 @@ export const ProfileAccountList = <T,>({
 
     return (
       <View style={listStyle} accessibilityLabel={accessibilityLabel}>
-        <View style={[{ flexDirection: "column", width: "100%" }, contentContainerStyle]}>
+        <View
+          style={[{ flexDirection: "column", width: "100%" }, contentContainerStyle]}
+        >
           {ListHeaderComponent}
           {isEmpty
             ? ListEmptyComponent

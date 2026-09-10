@@ -49,8 +49,7 @@ export const up = async () => {
         filter: { _id: product._id },
         update: {
           $set: {
-            productModerationApprovedHash:
-              buildProductModerationFingerprint(product),
+            productModerationApprovedHash: buildProductModerationFingerprint(product),
           },
         },
       },

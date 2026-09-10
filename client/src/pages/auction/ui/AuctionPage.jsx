@@ -118,7 +118,9 @@ export function AuctionPage({
 
   const attentionFilterHint =
     totalVisible > 0 && attentionOnly ? (
-      <p className="auction-page__filter-hint">{AUCTION_PAGE_UI.ATTENTION_FILTER_HINT}</p>
+      <p className="auction-page__filter-hint">
+        {AUCTION_PAGE_UI.ATTENTION_FILTER_HINT}
+      </p>
     ) : null;
 
   const toolbar = (
@@ -181,7 +183,10 @@ export function AuctionPage({
       ) : (
         <div className="auction-dashboard">
           {showBuyerSection ? (
-            <AuctionPageSection title={AUCTION_PAGE_UI.BUYER_SECTION_TITLE} count={buyerBids.length}>
+            <AuctionPageSection
+              title={AUCTION_PAGE_UI.BUYER_SECTION_TITLE}
+              count={buyerBids.length}
+            >
               <ul className="auction-dashboard__list" role="list">
                 {buyerBids.map((bid) => (
                   <li key={bid._id} role="listitem">

@@ -18,7 +18,11 @@ export function ProductCardStatusSlot({ vm }) {
     );
   }
 
-  if (!vm.isMineMode && !vm.isModerationQueue && vm.product.productIsAvailable === false) {
+  if (
+    !vm.isMineMode &&
+    !vm.isModerationQueue &&
+    vm.product.productIsAvailable === false
+  ) {
     return (
       <p className="product-card__hidden-badge" role="status">
         {PRODUCT_CARD_UI.HIDDEN_FROM_CATALOG_BADGE}

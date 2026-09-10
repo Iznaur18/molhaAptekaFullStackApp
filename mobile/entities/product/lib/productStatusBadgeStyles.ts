@@ -153,7 +153,10 @@ export const useProductStatusBadgeVariantStyles = (
     const near = fill(BC.auctionBg, BC.auctionText);
     const installment = fill(BC.installmentBg, BC.installmentText);
     const wholesale = fill(BC.wholesaleBg, BC.wholesaleText);
-    const flashSaleColors = resolveProductCardFlashSaleBadgeColors(theme.colors, isDarkScheme);
+    const flashSaleColors = resolveProductCardFlashSaleBadgeColors(
+      theme.colors,
+      isDarkScheme,
+    );
     const flashSale = fill(flashSaleColors.backgroundColor, flashSaleColors.textColor);
     const raffle = fill(BC.raffleBg, BC.raffleText);
     const placeholder = fill(BC.statusPlaceholderBg, BC.statusPlaceholderText);
@@ -161,10 +164,17 @@ export const useProductStatusBadgeVariantStyles = (
     const promotionActive = fill(BC.promotionBoostBg, BC.promotionBoostText);
 
     return {
-      hidden: createBadge(layout, baseText, "transparent", hidden.backgroundColor, hidden.textColor, {
-        ...overlayInset,
-        fontWeight: "600",
-      }),
+      hidden: createBadge(
+        layout,
+        baseText,
+        "transparent",
+        hidden.backgroundColor,
+        hidden.textColor,
+        {
+          ...overlayInset,
+          fontWeight: "600",
+        },
+      ),
       promotionBoost: createBadge(
         layout,
         baseText,
@@ -224,14 +234,14 @@ export const useProductStatusBadgeVariantStyles = (
         flashSale.backgroundColor,
         flashSale.textColor,
       ),
-      raffle: createBadge(layout, baseText, BC.raffleBorder, raffle.backgroundColor, raffle.textColor),
-      affiliate: createBadge(
+      raffle: createBadge(
         layout,
         baseText,
-        "#6ee7b766",
-        "#ecfdf5",
-        "#047857",
+        BC.raffleBorder,
+        raffle.backgroundColor,
+        raffle.textColor,
       ),
+      affiliate: createBadge(layout, baseText, "#6ee7b766", "#ecfdf5", "#047857"),
       placeholder: createBadge(
         layout,
         baseText,
@@ -291,8 +301,9 @@ const detailScrollStyles = StyleSheet.create({
   },
 });
 
-export const getProductStatusBadgeScrollStyles = (size: ProductStatusBadgeSize = "compact") =>
-  size === "detail" ? detailScrollStyles : compactScrollStyles;
+export const getProductStatusBadgeScrollStyles = (
+  size: ProductStatusBadgeSize = "compact",
+) => (size === "detail" ? detailScrollStyles : compactScrollStyles);
 
 /** @deprecated use getProductStatusBadgeScrollStyles("compact") */
 export const productStatusBadgeScrollStyles = compactScrollStyles;

@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchProductReviewSummary, fetchProductReviewsPage } from "../api/productReviewApi";
+import {
+  fetchProductReviewSummary,
+  fetchProductReviewsPage,
+} from "../api/productReviewApi";
 import { productReviewQueryKeys } from "./productReviewQueryKeys";
 
 export const useProductReviewSummaryQuery = (productId: string, enabled = true) =>

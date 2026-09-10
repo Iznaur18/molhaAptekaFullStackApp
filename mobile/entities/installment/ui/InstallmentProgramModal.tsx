@@ -74,12 +74,17 @@ export const InstallmentProgramModal = ({
   const headerInsetTop = Math.max(insets.top, 16);
   const footerInsetBottom = Math.max(insets.bottom, 12);
   const { upsertProgramMutation } = useInstallmentMutations();
-  const [plans, setPlans] = useState<InstallmentProgramPlanDraft[]>([createEmptyPlan()]);
+  const [plans, setPlans] = useState<InstallmentProgramPlanDraft[]>([
+    createEmptyPlan(),
+  ]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const bodyScrollRef = useRef<ScrollView>(null);
 
-  const programQuery = useProductInstallmentProgramQuery(productId, visible && Boolean(productId));
+  const programQuery = useProductInstallmentProgramQuery(
+    productId,
+    visible && Boolean(productId),
+  );
   const isLoading = programQuery.isLoading;
   const isSubmitting = upsertProgramMutation.isPending;
   const programModerationStatus = programQuery.data?.moderationStatus;
@@ -148,11 +153,16 @@ export const InstallmentProgramModal = ({
     setPlans([buildDefaultPlan(1)]);
   }, [buildDefaultPlan, isLoading, productPrice, programQuery.data, visible]);
 
-  const updatePlan = useCallback((index: number, patch: Partial<InstallmentProgramPlanDraft>) => {
-    setPlans((prev) =>
-      prev.map((plan, planIndex) => (planIndex === index ? { ...plan, ...patch } : plan)),
-    );
-  }, []);
+  const updatePlan = useCallback(
+    (index: number, patch: Partial<InstallmentProgramPlanDraft>) => {
+      setPlans((prev) =>
+        prev.map((plan, planIndex) =>
+          planIndex === index ? { ...plan, ...patch } : plan,
+        ),
+      );
+    },
+    [],
+  );
 
   const addPlan = () => {
     if (plans.length >= INSTALLMENT_PLANS_MAX) {
@@ -217,7 +227,9 @@ export const InstallmentProgramModal = ({
       onSaved?.({ productInstallmentEnabled: isEnabled });
       onClose();
     } catch (saveError) {
-      setError(saveError instanceof Error ? saveError.message : INSTALLMENT_UI.ERROR_GENERIC);
+      setError(
+        saveError instanceof Error ? saveError.message : INSTALLMENT_UI.ERROR_GENERIC,
+      );
     }
   };
 
@@ -229,39 +241,39 @@ export const InstallmentProgramModal = ({
     <View style={styles.overlay}>
       <View style={styles.card}>
         <View style={[styles.header, { paddingTop: headerInsetTop }]}>
-            <Text style={styles.title}>
-              {INSTALLMENT_UI.PROGRAM_MODAL_TITLE}
-              {productName ? `: ${productName}` : ""}
-            </Text>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={INSTALLMENT_UI.PROGRAM_MODAL_CLOSE}
-              onPress={onClose}
-              style={styles.closeButton}
-            >
-              <Text style={styles.closeButtonText}>×</Text>
-            </Pressable>
-          </View>
+          <Text style={styles.title}>
+            {INSTALLMENT_UI.PROGRAM_MODAL_TITLE}
+            {productName ? `: ${productName}` : ""}
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={INSTALLMENT_UI.PROGRAM_MODAL_CLOSE}
+            onPress={onClose}
+            style={styles.closeButton}
+          >
+            <Text style={styles.closeButtonText}>×</Text>
+          </Pressable>
+        </View>
 
-          {isLoading ? (
-            <View style={styles.loadingWrap}>
-              <ActivityIndicator color={theme.colors.action} />
-            </View>
-          ) : (
-            <ScrollView
-              ref={bodyScrollRef}
-              style={styles.bodyScroll}
-              contentContainerStyle={[
-                styles.body,
-                { paddingBottom: footerInsetBottom + KEYBOARD_SCROLL_EXTRA_PADDING },
-              ]}
-              keyboardShouldPersistTaps="handled"
-              keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
-              automaticallyAdjustKeyboardInsets={Platform.OS !== "web"}
-              automaticallyAdjustsScrollIndicatorInsets={Platform.OS !== "web"}
-              showsVerticalScrollIndicator
-              nestedScrollEnabled
-            >
+        {isLoading ? (
+          <View style={styles.loadingWrap}>
+            <ActivityIndicator color={theme.colors.action} />
+          </View>
+        ) : (
+          <ScrollView
+            ref={bodyScrollRef}
+            style={styles.bodyScroll}
+            contentContainerStyle={[
+              styles.body,
+              { paddingBottom: footerInsetBottom + KEYBOARD_SCROLL_EXTRA_PADDING },
+            ]}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+            automaticallyAdjustKeyboardInsets={Platform.OS !== "web"}
+            automaticallyAdjustsScrollIndicatorInsets={Platform.OS !== "web"}
+            showsVerticalScrollIndicator
+            nestedScrollEnabled
+          >
             {error ? (
               <Text style={styles.error} accessibilityRole="alert">
                 {error}
@@ -285,11 +297,17 @@ export const InstallmentProgramModal = ({
                 );
               // Процент надбавки берём из черновика (что ввёл продавец), а не
               // пересчитываем из округлённого платежа — иначе значение «прыгает».
-              const markupPercent = Math.max(0, Math.floor(Number(plan.markupPercent) || 0));
+              const markupPercent = Math.max(
+                0,
+                Math.floor(Number(plan.markupPercent) || 0),
+              );
               const isLast = index === plans.length - 1;
 
               return (
-                <View key={`plan-${index}`} style={[styles.planCard, isLast && styles.planCardLast]}>
+                <View
+                  key={`plan-${index}`}
+                  style={[styles.planCard, isLast && styles.planCardLast]}
+                >
                   <View style={styles.planHeader}>
                     <Text style={styles.planTitle}>
                       {INSTALLMENT_UI.PROGRAM_MODAL_PLAN_NUMBER(index + 1)}
@@ -301,13 +319,17 @@ export const InstallmentProgramModal = ({
                         onPress={() => removePlan(index)}
                         disabled={isSubmitting}
                       >
-                        <Text style={styles.planRemove}>{INSTALLMENT_UI.PROGRAM_MODAL_REMOVE_PLAN}</Text>
+                        <Text style={styles.planRemove}>
+                          {INSTALLMENT_UI.PROGRAM_MODAL_REMOVE_PLAN}
+                        </Text>
                       </Pressable>
                     ) : null}
                   </View>
 
                   <View style={styles.planBody}>
-                    <Text style={styles.fieldLabel}>{INSTALLMENT_UI.PROGRAM_MODAL_PLAN_TITLE}</Text>
+                    <Text style={styles.fieldLabel}>
+                      {INSTALLMENT_UI.PROGRAM_MODAL_PLAN_TITLE}
+                    </Text>
                     <TextInput
                       style={styles.input}
                       value={String(plan.title ?? "")}
@@ -319,7 +341,9 @@ export const InstallmentProgramModal = ({
 
                     <View style={styles.rowFields}>
                       <View style={styles.rowField}>
-                        <Text style={styles.fieldLabel}>{INSTALLMENT_UI.PROGRAM_MODAL_MONTHS}</Text>
+                        <Text style={styles.fieldLabel}>
+                          {INSTALLMENT_UI.PROGRAM_MODAL_MONTHS}
+                        </Text>
                         <TextInput
                           style={styles.input}
                           value={
@@ -381,11 +405,7 @@ export const InstallmentProgramModal = ({
                         </Text>
                         <TextInput
                           style={styles.input}
-                          value={
-                            plan.markupPercent === ""
-                              ? ""
-                              : String(markupPercent)
-                          }
+                          value={plan.markupPercent === "" ? "" : String(markupPercent)}
                           keyboardType="number-pad"
                           editable={!isSubmitting && productPriceRub > 0}
                           onFocus={() => {
@@ -436,7 +456,9 @@ export const InstallmentProgramModal = ({
                         />
                       </View>
                       <View style={styles.rowField}>
-                        <Text style={styles.fieldLabel}>{INSTALLMENT_UI.PROGRAM_MODAL_MONTHLY}</Text>
+                        <Text style={styles.fieldLabel}>
+                          {INSTALLMENT_UI.PROGRAM_MODAL_MONTHLY}
+                        </Text>
                         <TextInput
                           style={styles.input}
                           value={
@@ -455,40 +477,36 @@ export const InstallmentProgramModal = ({
                           }}
                           onBlur={() => {
                             if (plan.monthlyAmountRub !== "") return;
-                            const restoredMonthly =
-                              INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB;
+                            const restoredMonthly = INSTALLMENT_MONTHLY_PAYMENT_MIN_RUB;
                             updatePlan(index, {
                               monthlyAmountRub: restoredMonthly,
-                              markupPercent:
-                                resolveInstallmentPlanPriceSummary(
-                                  productPrice,
-                                  monthsCount,
-                                  restoredMonthly,
-                                ).markupPercent,
+                              markupPercent: resolveInstallmentPlanPriceSummary(
+                                productPrice,
+                                monthsCount,
+                                restoredMonthly,
+                              ).markupPercent,
                             });
                           }}
                           onChangeText={(value) => {
                             if (value === "") {
                               updatePlan(index, {
                                 monthlyAmountRub: "",
-                                markupPercent:
-                                  resolveInstallmentPlanPriceSummary(
-                                    productPrice,
-                                    monthsCount,
-                                    0,
-                                  ).markupPercent,
+                                markupPercent: resolveInstallmentPlanPriceSummary(
+                                  productPrice,
+                                  monthsCount,
+                                  0,
+                                ).markupPercent,
                               });
                               return;
                             }
                             const nextMonthly = Number(value) || 0;
                             updatePlan(index, {
                               monthlyAmountRub: nextMonthly,
-                              markupPercent:
-                                resolveInstallmentPlanPriceSummary(
-                                  productPrice,
-                                  monthsCount,
-                                  nextMonthly,
-                                ).markupPercent,
+                              markupPercent: resolveInstallmentPlanPriceSummary(
+                                productPrice,
+                                monthsCount,
+                                nextMonthly,
+                              ).markupPercent,
                             });
                           }}
                         />
@@ -508,7 +526,9 @@ export const InstallmentProgramModal = ({
                         )}
                       </Text>
                       <Text style={styles.planTotalMain}>
-                        {INSTALLMENT_UI.PROGRAM_MODAL_PLAN_TOTAL(formatPriceRub(planTotalRub))}
+                        {INSTALLMENT_UI.PROGRAM_MODAL_PLAN_TOTAL(
+                          formatPriceRub(planTotalRub),
+                        )}
                       </Text>
                     </View>
 
@@ -536,7 +556,9 @@ export const InstallmentProgramModal = ({
                 disabled={isSubmitting}
                 onPress={addPlan}
               >
-                <Text style={styles.addPlanButtonText}>{INSTALLMENT_UI.PROGRAM_MODAL_ADD_PLAN}</Text>
+                <Text style={styles.addPlanButtonText}>
+                  {INSTALLMENT_UI.PROGRAM_MODAL_ADD_PLAN}
+                </Text>
               </Pressable>
             ) : (
               <Text style={styles.maxPlansHint}>
@@ -544,23 +566,25 @@ export const InstallmentProgramModal = ({
               </Text>
             )}
           </ScrollView>
-          )}
+        )}
 
-          <View style={[styles.footer, { paddingBottom: footerInsetBottom }]}>
-            <Pressable
-              style={[styles.saveButton, isSubmitting && styles.buttonDisabled]}
-              accessibilityRole="button"
-              disabled={isSubmitting || isLoading}
-              onPress={() => void handleSave()}
-            >
-              {isSubmitting ? (
-                <ActivityIndicator color={theme.colors.onContrast} />
-              ) : (
-                <Text style={styles.saveButtonText}>{INSTALLMENT_UI.PROGRAM_MODAL_SAVE}</Text>
-              )}
-            </Pressable>
-          </View>
+        <View style={[styles.footer, { paddingBottom: footerInsetBottom }]}>
+          <Pressable
+            style={[styles.saveButton, isSubmitting && styles.buttonDisabled]}
+            accessibilityRole="button"
+            disabled={isSubmitting || isLoading}
+            onPress={() => void handleSave()}
+          >
+            {isSubmitting ? (
+              <ActivityIndicator color={theme.colors.onContrast} />
+            ) : (
+              <Text style={styles.saveButtonText}>
+                {INSTALLMENT_UI.PROGRAM_MODAL_SAVE}
+              </Text>
+            )}
+          </Pressable>
         </View>
+      </View>
     </View>
   );
 

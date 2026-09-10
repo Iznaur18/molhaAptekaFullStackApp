@@ -26,7 +26,9 @@ export const MySalesPageOverview = ({
   return (
     <View style={styles.overview} accessibilityRole="summary">
       <Pressable style={styles.overviewTile} onPress={onInProgressFilterClick}>
-        <Text style={styles.overviewLabel}>{MY_SALES_PAGE_UI.OVERVIEW_IN_PROGRESS}</Text>
+        <Text style={styles.overviewLabel}>
+          {MY_SALES_PAGE_UI.OVERVIEW_IN_PROGRESS}
+        </Text>
         <Text style={styles.overviewValue}>{inProgressCount}</Text>
       </Pressable>
 

@@ -7,9 +7,8 @@ process.env.JWT_SECRET =
 
 const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollections } =
   await import("./helpers/mongoTestDb.js");
-const { createOrderLoyaltyFixture } = await import(
-  "./helpers/orderLoyaltyTestHelpers.js"
-);
+const { createOrderLoyaltyFixture } =
+  await import("./helpers/orderLoyaltyTestHelpers.js");
 const { EscrowLedgerEntryModel, OrderModel } = await import("../models/index.js");
 const {
   confirmOrderItemByBuyer,
@@ -17,18 +16,13 @@ const {
   markOrderItemReturned,
   markOrderItemShippedBySeller,
 } = await import("../services/order/updateOrderItemStatus.js");
-const { markOrderItemCancelled } = await import(
-  "../services/order/cancelOrderItems.js"
-);
-const { openEscrowForPaidOrder } = await import(
-  "../services/payments/escrowLedger.js"
-);
-const { reserveLoyaltyPointsForNewOrder } = await import(
-  "../services/order/orderLoyaltyPoints.js"
-);
-const { runInTransaction, withMongoSession } = await import(
-  "../utils/mongoTransaction.js"
-);
+const { markOrderItemCancelled } =
+  await import("../services/order/cancelOrderItems.js");
+const { openEscrowForPaidOrder } = await import("../services/payments/escrowLedger.js");
+const { reserveLoyaltyPointsForNewOrder } =
+  await import("../services/order/orderLoyaltyPoints.js");
+const { runInTransaction, withMongoSession } =
+  await import("../utils/mongoTransaction.js");
 
 /**
  * Предоплаченный заказ из двух позиций одного продавца.

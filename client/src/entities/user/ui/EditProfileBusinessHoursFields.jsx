@@ -53,7 +53,10 @@ export function EditProfileBusinessHoursFields({
       </label>
       {enabled ? (
         <>
-          <fieldset className="edit-profile-business-hours__weekdays" disabled={disabled}>
+          <fieldset
+            className="edit-profile-business-hours__weekdays"
+            disabled={disabled}
+          >
             <legend className="edit-profile-business-hours__legend">
               {EDIT_PROFILE_MODAL_UI.LABEL_BUSINESS_HOURS_DAYS}
             </legend>
@@ -95,7 +98,9 @@ export function EditProfileBusinessHoursFields({
               />
             </label>
           </div>
-          <p className="edit-profile-modal__hint">{EDIT_PROFILE_MODAL_UI.HINT_BUSINESS_HOURS}</p>
+          <p className="edit-profile-modal__hint">
+            {EDIT_PROFILE_MODAL_UI.HINT_BUSINESS_HOURS}
+          </p>
         </>
       ) : null}
     </div>

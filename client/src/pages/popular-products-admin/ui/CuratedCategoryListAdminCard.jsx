@@ -39,7 +39,9 @@ export function CuratedCategoryListAdminCard({
   const [regionDraft, setRegionDraft] = useState(
     list.regionCode || DEFAULT_VIEWER_REGION_CODE,
   );
-  const [kindDraft, setKindDraft] = useState(/** @type {"tree" | "personal"} */ ("tree"));
+  const [kindDraft, setKindDraft] = useState(
+    /** @type {"tree" | "personal"} */ ("tree"),
+  );
   const [refIdDraft, setRefIdDraft] = useState("");
   const [selectedLabel, setSelectedLabel] = useState("");
   const [localError, setLocalError] = useState("");
@@ -55,10 +57,7 @@ export function CuratedCategoryListAdminCard({
     listRegionCode,
   });
   const canAddCategory =
-    Boolean(preview) &&
-    !isPreviewLoading &&
-    !previewError &&
-    regionBlockReason == null;
+    Boolean(preview) && !isPreviewLoading && !previewError && regionBlockReason == null;
 
   const handleSaveList = useCallback(async () => {
     setLocalError("");
@@ -75,15 +74,12 @@ export function CuratedCategoryListAdminCard({
     }
   }, [onSaveList, regionDraft, titleDraft]);
 
-  const handleSelectCategory = useCallback(
-    ({ kind, refId, label }) => {
-      setKindDraft(kind);
-      setRefIdDraft(refId);
-      setSelectedLabel(label);
-      setLocalError("");
-    },
-    [],
-  );
+  const handleSelectCategory = useCallback(({ kind, refId, label }) => {
+    setKindDraft(kind);
+    setRefIdDraft(refId);
+    setSelectedLabel(label);
+    setLocalError("");
+  }, []);
 
   const handleAddCategory = useCallback(async () => {
     setLocalError("");
@@ -109,7 +105,9 @@ export function CuratedCategoryListAdminCard({
       setSelectedLabel("");
     } catch (e) {
       setLocalError(
-        e instanceof Error ? e.message : POPULAR_CATEGORIES_ADMIN_PAGE_UI.ADD_ITEM_ERROR,
+        e instanceof Error
+          ? e.message
+          : POPULAR_CATEGORIES_ADMIN_PAGE_UI.ADD_ITEM_ERROR,
       );
     }
   }, [
@@ -290,7 +288,11 @@ export function CuratedCategoryListAdminCard({
       ) : (
         <ul className="curated-list-admin-card__items" role="list">
           {list.items.map((item) => (
-            <li key={item.itemKey} className="curated-list-admin-card__item" role="listitem">
+            <li
+              key={item.itemKey}
+              className="curated-list-admin-card__item"
+              role="listitem"
+            >
               <code className="curated-list-admin-card__product-id">
                 {item.kind === "personal" ? "Личная" : "Дерево"} · {item.refId}
               </code>

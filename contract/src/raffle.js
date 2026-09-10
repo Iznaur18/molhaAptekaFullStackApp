@@ -5,7 +5,10 @@ import {
   optionalRuRegionCodeFieldSchema,
   requiredRuRegionCodeFieldSchema,
 } from "./ruRegions.js";
-import { nullableProfileImageFocusSchema, profileImageFocusSchema } from "./userProfile.js";
+import {
+  nullableProfileImageFocusSchema,
+  profileImageFocusSchema,
+} from "./userProfile.js";
 
 /** Синхрон с `server/constants/raffleConstants.js`. */
 export const RAFFLE_TARGET_SALES_MIN = 1;
@@ -35,7 +38,10 @@ function isHttpUrl(value) {
  * @param {unknown} value
  */
 function isMediaUrl(value) {
-  return isHttpUrl(value) || (typeof value === "string" && value.trim().startsWith("/uploads/"));
+  return (
+    isHttpUrl(value) ||
+    (typeof value === "string" && value.trim().startsWith("/uploads/"))
+  );
 }
 
 /**
@@ -146,63 +152,78 @@ export const createRaffleBodySchema = rafflePrizeFieldsSchema
       .union([z.string(), z.null()])
       .optional()
       .refine(
-        (value) => value === undefined || value === null || value.length <= RAFFLE_DESCRIPTION_MAX_LENGTH,
+        (value) =>
+          value === undefined ||
+          value === null ||
+          value.length <= RAFFLE_DESCRIPTION_MAX_LENGTH,
         `description не длиннее ${RAFFLE_DESCRIPTION_MAX_LENGTH} символов`,
       ),
     targetSales: z.coerce
       .number()
       .int(`Цель: от ${RAFFLE_TARGET_SALES_MIN} до ${RAFFLE_TARGET_SALES_MAX}`)
-      .min(RAFFLE_TARGET_SALES_MIN, `Цель: от ${RAFFLE_TARGET_SALES_MIN} до ${RAFFLE_TARGET_SALES_MAX}`)
-      .max(RAFFLE_TARGET_SALES_MAX, `Цель: от ${RAFFLE_TARGET_SALES_MIN} до ${RAFFLE_TARGET_SALES_MAX}`),
+      .min(
+        RAFFLE_TARGET_SALES_MIN,
+        `Цель: от ${RAFFLE_TARGET_SALES_MIN} до ${RAFFLE_TARGET_SALES_MAX}`,
+      )
+      .max(
+        RAFFLE_TARGET_SALES_MAX,
+        `Цель: от ${RAFFLE_TARGET_SALES_MIN} до ${RAFFLE_TARGET_SALES_MAX}`,
+      ),
     instagramUrl: z
       .string()
       .trim()
       .max(RAFFLE_INSTAGRAM_URL_MAX_LENGTH)
-      .refine((value) => value.length === 0 || isHttpUrl(value), "Укажите корректную ссылку Instagram")
+      .refine(
+        (value) => value.length === 0 || isHttpUrl(value),
+        "Укажите корректную ссылку Instagram",
+      )
       .default(""),
     regionCode: requiredRuRegionCodeFieldSchema,
   })
   .superRefine(assertCreatePrizeMedia);
 
-export const patchRaffleBodySchema = rafflePrizeFieldsSchema
-  .extend({
-    title: z
-      .string()
-      .trim()
-      .min(1)
-      .max(RAFFLE_TITLE_MAX_LENGTH)
-      .optional(),
-    description: z
-      .union([z.string(), z.null()])
-      .optional()
-      .refine(
-        (value) => value === undefined || value === null || value.length <= RAFFLE_DESCRIPTION_MAX_LENGTH,
-        `description не длиннее ${RAFFLE_DESCRIPTION_MAX_LENGTH} символов`,
-      ),
-    targetSales: z.coerce
-      .number()
-      .int()
-      .min(RAFFLE_TARGET_SALES_MIN)
-      .max(RAFFLE_TARGET_SALES_MAX)
-      .optional(),
-    instagramUrl: z
-      .string()
-      .trim()
-      .max(RAFFLE_INSTAGRAM_URL_MAX_LENGTH)
-      .refine((value) => value.length === 0 || isHttpUrl(value), "Укажите корректную ссылку Instagram")
-      .optional(),
-    prizeImageUrl: optionalHttpMediaUrl,
-    prizeVideoUrl: optionalHttpMediaUrl,
-    prizeImageFocus: z.union([profileImageFocusSchema, z.null()]).optional(),
-    regionCode: optionalRuRegionCodeFieldSchema,
-  });
+export const patchRaffleBodySchema = rafflePrizeFieldsSchema.extend({
+  title: z.string().trim().min(1).max(RAFFLE_TITLE_MAX_LENGTH).optional(),
+  description: z
+    .union([z.string(), z.null()])
+    .optional()
+    .refine(
+      (value) =>
+        value === undefined ||
+        value === null ||
+        value.length <= RAFFLE_DESCRIPTION_MAX_LENGTH,
+      `description не длиннее ${RAFFLE_DESCRIPTION_MAX_LENGTH} символов`,
+    ),
+  targetSales: z.coerce
+    .number()
+    .int()
+    .min(RAFFLE_TARGET_SALES_MIN)
+    .max(RAFFLE_TARGET_SALES_MAX)
+    .optional(),
+  instagramUrl: z
+    .string()
+    .trim()
+    .max(RAFFLE_INSTAGRAM_URL_MAX_LENGTH)
+    .refine(
+      (value) => value.length === 0 || isHttpUrl(value),
+      "Укажите корректную ссылку Instagram",
+    )
+    .optional(),
+  prizeImageUrl: optionalHttpMediaUrl,
+  prizeVideoUrl: optionalHttpMediaUrl,
+  prizeImageFocus: z.union([profileImageFocusSchema, z.null()]).optional(),
+  regionCode: optionalRuRegionCodeFieldSchema,
+});
 
 export const rejectRaffleBodySchema = z.object({
   comment: z
     .union([z.string(), z.null()])
     .optional()
     .refine(
-      (value) => value === undefined || value === null || value.length <= RAFFLE_REJECT_COMMENT_MAX_CHARS,
+      (value) =>
+        value === undefined ||
+        value === null ||
+        value.length <= RAFFLE_REJECT_COMMENT_MAX_CHARS,
       `comment не длиннее ${RAFFLE_REJECT_COMMENT_MAX_CHARS} символов`,
     ),
 });

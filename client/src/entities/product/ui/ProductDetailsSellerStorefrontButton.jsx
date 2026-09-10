@@ -32,7 +32,10 @@ export function ProductDetailsSellerStorefrontButton({ sellerId, embedded = fals
       aria-label={PRODUCT_SELLER_PREVIEW_UI.SELLER_STOREFRONT_ARIA}
       onClick={handleClick}
     >
-      <span className="product-details-seller-storefront-btn__icon-wrap" aria-hidden="true">
+      <span
+        className="product-details-seller-storefront-btn__icon-wrap"
+        aria-hidden="true"
+      >
         <AppIcon icon={Store} size="sm" strokeWidth={2.1} />
       </span>
       <span className="product-details-seller-storefront-btn__copy">

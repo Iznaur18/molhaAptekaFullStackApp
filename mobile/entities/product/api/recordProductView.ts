@@ -7,7 +7,9 @@ export type RecordProductViewResult = {
   uniqueViewerCount: number;
 };
 
-export const recordProductView = async (productId: string): Promise<RecordProductViewResult> => {
+export const recordProductView = async (
+  productId: string,
+): Promise<RecordProductViewResult> => {
   try {
     const { data } = await apiClient.post(`/product/${productId}/view`);
 
@@ -24,6 +26,8 @@ export const recordProductView = async (productId: string): Promise<RecordProduc
       uniqueViewerCount: Number(data.data.uniqueViewerCount) || 0,
     };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.RECORD_PRODUCT_VIEW_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.RECORD_PRODUCT_VIEW_FALLBACK),
+    );
   }
 };

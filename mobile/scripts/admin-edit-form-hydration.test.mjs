@@ -5,7 +5,10 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-const hookSource = readFileSync(join(root, "shared/model/useSyncAdminEditFormOnOpen.ts"), "utf8");
+const hookSource = readFileSync(
+  join(root, "shared/model/useSyncAdminEditFormOnOpen.ts"),
+  "utf8",
+);
 const uploadFieldSource = readFileSync(
   join(root, "features/image-upload/ui/ImageUrlUploadField.tsx"),
   "utf8",

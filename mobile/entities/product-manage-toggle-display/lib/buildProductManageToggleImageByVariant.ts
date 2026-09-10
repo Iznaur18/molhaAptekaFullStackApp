@@ -11,7 +11,8 @@ export const buildProductManageToggleImageByVariant = (
   return Object.entries(PRODUCT_MANAGE_TOGGLE_VARIANT_BY_KEY).reduce<
     Partial<Record<ProductManageToggleRowVariant, string | null>>
   >((acc, [toggleKey, variant]) => {
-    acc[variant] = byKey.get(toggleKey as keyof typeof PRODUCT_MANAGE_TOGGLE_VARIANT_BY_KEY) ?? null;
+    acc[variant] =
+      byKey.get(toggleKey as keyof typeof PRODUCT_MANAGE_TOGGLE_VARIANT_BY_KEY) ?? null;
     return acc;
   }, {});
 };

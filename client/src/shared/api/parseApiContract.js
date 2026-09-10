@@ -83,8 +83,5 @@ export function parseCreateProductData(payload) {
  * @returns {import('@molha/api-contract/types').ProductWriteDataContract}
  */
 export function parsePatchMyProductData(payload) {
-  return parseSharedPatchMyProductData(
-    payload,
-    API_CLIENT_UI.INVALID_SERVER_RESPONSE,
-  );
+  return parseSharedPatchMyProductData(payload, API_CLIENT_UI.INVALID_SERVER_RESPONSE);
 }

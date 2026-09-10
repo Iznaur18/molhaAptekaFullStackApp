@@ -53,7 +53,9 @@ export const ProductRentalManageModal = ({
   const { patchMutation } = useMyProductMutations();
 
   const [price, setPrice] = useState("");
-  const [unit, setUnit] = useState<ProductRentalPriceUnit>(PRODUCT_RENTAL_PRICE_UNIT_DAY);
+  const [unit, setUnit] = useState<ProductRentalPriceUnit>(
+    PRODUCT_RENTAL_PRICE_UNIT_DAY,
+  );
   const [error, setError] = useState("");
 
   const productId = product?._id != null ? String(product._id) : "";
@@ -139,7 +141,9 @@ export const ProductRentalManageModal = ({
           <Text style={styles.info}>{CREATE_PRODUCT_UI.RENTAL_MODAL_HINT}</Text>
 
           <View style={styles.rowField}>
-            <Text style={styles.fieldLabel}>{CREATE_PRODUCT_UI.RENTAL_MODAL_PRICE_LABEL}</Text>
+            <Text style={styles.fieldLabel}>
+              {CREATE_PRODUCT_UI.RENTAL_MODAL_PRICE_LABEL}
+            </Text>
             <TextInput
               style={styles.input}
               value={price}
@@ -149,7 +153,9 @@ export const ProductRentalManageModal = ({
             />
           </View>
 
-          <Text style={styles.fieldLabel}>{CREATE_PRODUCT_UI.RENTAL_MODAL_UNIT_LABEL}</Text>
+          <Text style={styles.fieldLabel}>
+            {CREATE_PRODUCT_UI.RENTAL_MODAL_UNIT_LABEL}
+          </Text>
           <View
             style={[
               localStyles.unitTrack,
@@ -192,7 +198,9 @@ export const ProductRentalManageModal = ({
               >
                 {CREATE_PRODUCT_UI.RENTAL_MODAL_UNIT_DAY}
               </Text>
-              <Text style={[localStyles.unitHint, { color: theme.colors.textSecondary }]}>
+              <Text
+                style={[localStyles.unitHint, { color: theme.colors.textSecondary }]}
+              >
                 {CREATE_PRODUCT_UI.RENTAL_MODAL_UNIT_DAY_HINT}
               </Text>
             </Pressable>
@@ -224,12 +232,15 @@ export const ProductRentalManageModal = ({
                         ? theme.colors.text
                         : theme.colors.textSecondary,
                   },
-                  unit === PRODUCT_RENTAL_PRICE_UNIT_HOUR && localStyles.unitTitleActive,
+                  unit === PRODUCT_RENTAL_PRICE_UNIT_HOUR &&
+                    localStyles.unitTitleActive,
                 ]}
               >
                 {CREATE_PRODUCT_UI.RENTAL_MODAL_UNIT_HOUR}
               </Text>
-              <Text style={[localStyles.unitHint, { color: theme.colors.textSecondary }]}>
+              <Text
+                style={[localStyles.unitHint, { color: theme.colors.textSecondary }]}
+              >
                 {CREATE_PRODUCT_UI.RENTAL_MODAL_UNIT_HOUR_HINT}
               </Text>
             </Pressable>
@@ -244,7 +255,10 @@ export const ProductRentalManageModal = ({
 
         <View style={[styles.footer, { paddingBottom: footerInsetBottom }]}>
           <Pressable
-            style={[styles.saveButton, (isSubmitting || !productId) && styles.buttonDisabled]}
+            style={[
+              styles.saveButton,
+              (isSubmitting || !productId) && styles.buttonDisabled,
+            ]}
             accessibilityRole="button"
             disabled={isSubmitting || !productId}
             onPress={() => void handleSave()}
@@ -252,7 +266,9 @@ export const ProductRentalManageModal = ({
             {isSubmitting ? (
               <ActivityIndicator color={theme.colors.onContrast} />
             ) : (
-              <Text style={styles.saveButtonText}>{CREATE_PRODUCT_UI.RENTAL_MODAL_SAVE}</Text>
+              <Text style={styles.saveButtonText}>
+                {CREATE_PRODUCT_UI.RENTAL_MODAL_SAVE}
+              </Text>
             )}
           </Pressable>
         </View>

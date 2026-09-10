@@ -30,7 +30,10 @@ test("cart line renders a selection checkbox in the card corner", () => {
   assert.match(lineItem, /AppCheckbox/);
   assert.match(lineItem, /checked=\{selected\}/);
   assert.match(lineItem, /onToggleSelected\(line\.productId\)/);
-  assert.match(styles, /selectCheckbox: \{\s*position: "absolute",\s*top: 12,\s*right: 12,/);
+  assert.match(
+    styles,
+    /selectCheckbox: \{\s*position: "absolute",\s*top: 12,\s*right: 12,/,
+  );
 });
 
 test("checkout orders only the selected lines and keeps the rest in the cart", () => {
@@ -70,7 +73,10 @@ test("cart totals follow the selection", () => {
   const cartScreen = readMobileFile("app/(tabs)/cart.tsx");
   const fulfillment = readMobileFile("entities/cart/ui/CartFulfillmentSection.tsx");
 
-  assert.match(cartScreen, /canCheckoutActive = activeSummary\.selectedLines\.length > 0/);
+  assert.match(
+    cartScreen,
+    /canCheckoutActive = activeSummary\.selectedLines\.length > 0/,
+  );
   assert.match(fulfillment, /formatPriceRub\(summary\.selectedTotal\)/);
   assert.doesNotMatch(cartScreen, /displayTotal/);
 });

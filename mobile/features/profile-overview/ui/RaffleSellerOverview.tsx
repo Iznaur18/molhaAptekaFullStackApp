@@ -74,7 +74,9 @@ export const RaffleSellerOverview = ({ enabled = true }: RaffleSellerOverviewPro
       setActionError("");
       await deleteMyMutation.mutateAsync(raffleId);
     } catch (error) {
-      setActionError(formatApiErrorMessage(error, API_CLIENT_UI.DELETE_RAFFLE_FALLBACK));
+      setActionError(
+        formatApiErrorMessage(error, API_CLIENT_UI.DELETE_RAFFLE_FALLBACK),
+      );
     }
   };
 
@@ -85,7 +87,10 @@ export const RaffleSellerOverview = ({ enabled = true }: RaffleSellerOverviewPro
   if (myRaffleQuery.isError) {
     return (
       <Text style={styles.stateError} accessibilityRole="alert">
-        {formatApiErrorMessage(myRaffleQuery.error, API_CLIENT_UI.FETCH_MY_RAFFLE_FALLBACK)}
+        {formatApiErrorMessage(
+          myRaffleQuery.error,
+          API_CLIENT_UI.FETCH_MY_RAFFLE_FALLBACK,
+        )}
       </Text>
     );
   }
@@ -137,7 +142,9 @@ export const RaffleSellerOverview = ({ enabled = true }: RaffleSellerOverviewPro
 
         {archive.length > 0 ? (
           <View style={styles.archive}>
-            <Text style={styles.archiveTitle}>{RAFFLE_SELLER_PANEL_UI.ARCHIVE_TITLE}</Text>
+            <Text style={styles.archiveTitle}>
+              {RAFFLE_SELLER_PANEL_UI.ARCHIVE_TITLE}
+            </Text>
             {archive.map((row) => (
               <Text key={row._id} style={styles.archiveItem}>
                 {row.title} — {STATUS_LABEL[row.status] ?? row.status}

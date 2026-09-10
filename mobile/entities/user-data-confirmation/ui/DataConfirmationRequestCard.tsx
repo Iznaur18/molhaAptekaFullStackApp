@@ -82,7 +82,9 @@ export const DataConfirmationRequestCard = ({
       return <Text style={styles.selfieMissing}>Загрузка фото…</Text>;
     }
     return (
-      <Text style={styles.selfieMissing}>{DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_MISSING}</Text>
+      <Text style={styles.selfieMissing}>
+        {DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_MISSING}
+      </Text>
     );
   };
 
@@ -104,7 +106,9 @@ export const DataConfirmationRequestCard = ({
         body: {
           resolution,
           staffNote:
-            resolution === USER_DATA_CONFIRMATION_RESOLUTION_REJECT ? staffNote.trim() : "",
+            resolution === USER_DATA_CONFIRMATION_RESOLUTION_REJECT
+              ? staffNote.trim()
+              : "",
         },
       });
       onResolved();
@@ -122,7 +126,8 @@ export const DataConfirmationRequestCard = ({
           isUserDataConfirmed={false}
         />
         <Text style={styles.cardMeta}>
-          {DATA_CONFIRMATION_PAGE_UI.SUBMITTED_LABEL}: {formatIsoDateTime(request.createdAt)}
+          {DATA_CONFIRMATION_PAGE_UI.SUBMITTED_LABEL}:{" "}
+          {formatIsoDateTime(request.createdAt)}
         </Text>
       </View>
 
@@ -130,24 +135,37 @@ export const DataConfirmationRequestCard = ({
         <Pressable
           style={styles.applicantLink}
           onPress={() =>
-            router.push({ pathname: "/user/[id]", params: { id: String(applicant._id) } })
+            router.push({
+              pathname: "/user/[id]",
+              params: { id: String(applicant._id) },
+            })
           }
         >
-          <Text style={styles.applicantLinkText}>{DATA_CONFIRMATION_PAGE_UI.OPEN_APPLICANT}</Text>
+          <Text style={styles.applicantLinkText}>
+            {DATA_CONFIRMATION_PAGE_UI.OPEN_APPLICANT}
+          </Text>
         </Pressable>
       ) : null}
 
       <View>
-        <Text style={styles.sectionTitle}>{DATA_CONFIRMATION_PAGE_UI.PASSPORT_SECTION}</Text>
+        <Text style={styles.sectionTitle}>
+          {DATA_CONFIRMATION_PAGE_UI.PASSPORT_SECTION}
+        </Text>
         <View style={styles.passportGrid}>
           <PassportField label="ФИО" value={formatPassportFullName(passport)} />
-          <PassportField label="Дата рождения" value={formatPassportDate(passport.birthDate)} />
+          <PassportField
+            label="Дата рождения"
+            value={formatPassportDate(passport.birthDate)}
+          />
           <PassportField
             label="Серия и номер"
             value={`${passport.series ?? ""} ${passport.number ?? ""}`.trim() || "—"}
           />
           <PassportField label="Кем выдан" value={passport.issuedBy?.trim() || "—"} />
-          <PassportField label="Дата выдачи" value={formatPassportDate(passport.issuedAt)} />
+          <PassportField
+            label="Дата выдачи"
+            value={formatPassportDate(passport.issuedAt)}
+          />
           <PassportField
             label="Код подразделения"
             value={passport.departmentCode?.trim() || "—"}
@@ -156,7 +174,9 @@ export const DataConfirmationRequestCard = ({
       </View>
 
       <View style={styles.selfieSection}>
-        <Text style={styles.sectionTitle}>{DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_SECTION}</Text>
+        <Text style={styles.sectionTitle}>
+          {DATA_CONFIRMATION_PAGE_UI.PASSPORT_SELFIE_SECTION}
+        </Text>
         {renderSelfieBlock()}
       </View>
 
@@ -195,7 +215,9 @@ export const DataConfirmationRequestCard = ({
           disabled={isBusy}
           onPress={() => void handleResolve(USER_DATA_CONFIRMATION_RESOLUTION_REJECT)}
         >
-          <Text style={styles.actionRejectText}>{DATA_CONFIRMATION_PAGE_UI.ACTION_REJECT}</Text>
+          <Text style={styles.actionRejectText}>
+            {DATA_CONFIRMATION_PAGE_UI.ACTION_REJECT}
+          </Text>
         </Pressable>
       </View>
     </View>

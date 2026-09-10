@@ -19,7 +19,11 @@ export const SiteHeaderBannerAdminTabBar = ({
 
   return (
     <View style={styles.root}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
         {tabs.map((tab) => {
           const isActive = tab.id === activeTab;
           return (
@@ -28,7 +32,9 @@ export const SiteHeaderBannerAdminTabBar = ({
               style={[styles.tab, isActive && styles.tabActive]}
               onPress={() => onTabChange(tab.id)}
             >
-              <AppText style={[styles.tabText, isActive && styles.tabTextActive]}>{tab.label}</AppText>
+              <AppText style={[styles.tabText, isActive && styles.tabTextActive]}>
+                {tab.label}
+              </AppText>
             </Pressable>
           );
         })}

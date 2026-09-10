@@ -162,7 +162,8 @@ export function useAppShellDomain(
     setLoyaltyPoints: shell.setLoyaltyPoints,
     refreshCatalogFeed,
     refreshRaffleSurfaces: shell.refreshRaffleSurfaces,
-    setRaffleParticipationPendingProductId: shell.setRaffleParticipationPendingProductId,
+    setRaffleParticipationPendingProductId:
+      shell.setRaffleParticipationPendingProductId,
   });
 
   const catalogProductDetailsState = useHomeCatalogProductDetails({

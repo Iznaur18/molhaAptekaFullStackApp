@@ -1,6 +1,7 @@
 export const CATEGORY_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-export const isValidCategorySlug = (slug: string): boolean => CATEGORY_SLUG_PATTERN.test(slug);
+export const isValidCategorySlug = (slug: string): boolean =>
+  CATEGORY_SLUG_PATTERN.test(slug);
 
 export const formatCategoryPath = (row: {
   pathLabelRu?: string[];
@@ -22,12 +23,14 @@ export const parseKeywordsCsv = (raw: string): string[] =>
 export const sortCategoryRows = <T extends { pathSlugs: string[] }>(rows: T[]): T[] =>
   [...rows].sort((a, b) => a.pathSlugs.join("/").localeCompare(b.pathSlugs.join("/")));
 
-export const filterCategoryRows = <T extends {
-  slug: string;
-  labelRu: string;
-  pathLabelRu?: string[];
-  searchKeywords?: string[];
-}>(
+export const filterCategoryRows = <
+  T extends {
+    slug: string;
+    labelRu: string;
+    pathLabelRu?: string[];
+    searchKeywords?: string[];
+  },
+>(
   rows: T[],
   query: string,
 ): T[] => {
@@ -106,7 +109,9 @@ export const findAnyLeafForReassign = <
     )[0];
   }
 
-  const otherLeaves = rows.filter((item) => item._id !== row._id && item.isLeaf === true);
+  const otherLeaves = rows.filter(
+    (item) => item._id !== row._id && item.isLeaf === true,
+  );
   if (otherLeaves.length === 0) {
     return null;
   }

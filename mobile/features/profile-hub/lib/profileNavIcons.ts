@@ -3,7 +3,9 @@ import type { ProfileSectionId } from "@izibuy/shared-lib";
 
 type ProfileNavIconName = keyof typeof MaterialIcons.glyphMap;
 
-const PROFILE_NAV_ICON_MAP: Partial<Record<ProfileSectionId | "logout", ProfileNavIconName>> = {
+const PROFILE_NAV_ICON_MAP: Partial<
+  Record<ProfileSectionId | "logout", ProfileNavIconName>
+> = {
   overview: "dashboard",
   "my-products": "inventory-2",
   "my-sales": "store",

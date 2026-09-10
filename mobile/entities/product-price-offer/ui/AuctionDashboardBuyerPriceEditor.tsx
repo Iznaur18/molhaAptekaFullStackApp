@@ -45,7 +45,9 @@ export const AuctionDashboardBuyerPriceEditor = ({
           disabled={disabled}
           onPress={onSubmit}
         >
-          <Text style={styles.composerSubmitText}>{disabled ? pendingLabel : submitLabel}</Text>
+          <Text style={styles.composerSubmitText}>
+            {disabled ? pendingLabel : submitLabel}
+          </Text>
         </Pressable>
       </View>
       <Pressable

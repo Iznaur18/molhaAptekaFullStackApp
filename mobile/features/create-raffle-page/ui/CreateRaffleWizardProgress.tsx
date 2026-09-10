@@ -12,7 +12,9 @@ type CreateRaffleWizardProgressProps = {
   stepIndex: number;
 };
 
-export const CreateRaffleWizardProgress = ({ stepIndex }: CreateRaffleWizardProgressProps) => {
+export const CreateRaffleWizardProgress = ({
+  stepIndex,
+}: CreateRaffleWizardProgressProps) => {
   const styles = useCreateRafflePageStyles();
 
   return (
@@ -21,11 +23,16 @@ export const CreateRaffleWizardProgress = ({ stepIndex }: CreateRaffleWizardProg
       accessibilityLabel={CREATE_RAFFLE_MODAL_UI.WIZARD_PROGRESS_ARIA}
     >
       <Text style={styles.wizardCaption}>
-        {CREATE_RAFFLE_MODAL_UI.WIZARD_STEP_OF(stepIndex + 1, CREATE_RAFFLE_WIZARD_STEPS.length)}
+        {CREATE_RAFFLE_MODAL_UI.WIZARD_STEP_OF(
+          stepIndex + 1,
+          CREATE_RAFFLE_WIZARD_STEPS.length,
+        )}
       </Text>
       <View style={styles.wizardSteps}>
         {CREATE_RAFFLE_WIZARD_STEPS.map((stepId, index) => {
-          const copy = resolveCreateRaffleWizardStepCopy(stepId as CreateRaffleWizardStepId);
+          const copy = resolveCreateRaffleWizardStepCopy(
+            stepId as CreateRaffleWizardStepId,
+          );
           const isActive = index === stepIndex;
           const isComplete = index < stepIndex;
 

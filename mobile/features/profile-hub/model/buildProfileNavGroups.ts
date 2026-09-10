@@ -7,10 +7,7 @@ import {
   PROFILE_TRADE_SECTION_ORDER,
 } from "@izibuy/shared-lib";
 
-import {
-  PROFILE_SECTION_OVERVIEW,
-  type ProfileSectionId,
-} from "./profileSections";
+import { PROFILE_SECTION_OVERVIEW, type ProfileSectionId } from "./profileSections";
 import type { ProfileHubAccess } from "./useProfileHubAccess";
 
 export type ProfileNavItem = {
@@ -54,7 +51,10 @@ const resolveProfileStaffNavItem = (
       badgeCount: badgeCounts["product-reports"],
     };
   }
-  if (sectionId === "data-confirmation-requests" && access.canUseDataConfirmationQueue) {
+  if (
+    sectionId === "data-confirmation-requests" &&
+    access.canUseDataConfirmationQueue
+  ) {
     return {
       sectionId,
       label: "Подтверждение (модерация)",
@@ -127,142 +127,150 @@ export const buildProfileNavGroups = (
     return count > 0 ? count : undefined;
   };
 
-  const tradeItems: ProfileNavItem[] = PROFILE_TRADE_SECTION_ORDER.flatMap((sectionId): ProfileNavItem[] => {
-    if (sectionId === "my-products") {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_MY_PRODUCTS,
-          disabled: !access.canUseMyProducts,
-        },
-      ];
-    }
-    if (sectionId === "my-sales") {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_MY_SALES,
-          disabled: !access.canUseMySales,
-          badgeCount: badgeCounts[sectionId],
-        },
-      ];
-    }
-    if (sectionId === "my-orders") {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_MY_ORDERS,
-          disabled: !access.canUseMyOrders,
-          badgeCount: badgeCounts[sectionId],
-        },
-      ];
-    }
-    if (sectionId === "auction" && access.canUseAuction) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_AUCTION,
-          badgeCount: badgeCounts.auction,
-        },
-      ];
-    }
-    if (sectionId === "installment-payments" && access.canUseInstallmentPayments) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_PAYMENTS,
-          badgeCount: badgeCounts["installment-payments"],
-        },
-      ];
-    }
-    if (sectionId === "installment-sales" && access.canUseInstallmentSales) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_SALES,
-          badgeCount: badgeCounts["installment-sales"],
-        },
-      ];
-    }
-    return [];
-  });
-
-  const accountItems: ProfileNavItem[] = PROFILE_ACCOUNT_SECTION_ORDER.flatMap((sectionId): ProfileNavItem[] => {
-    if (sectionId === "subscriptions") {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_SUBSCRIPTIONS,
-          disabled: !access.canUseSubscriptions,
-        },
-      ];
-    }
-    if (sectionId === "wishlist") {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_WISHLIST,
-          disabled: !access.canUseWishlist,
-        },
-      ];
-    }
-    if (sectionId === "data-confirmation" && access.canUseDataConfirmation) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_DATA_CONFIRMATION,
-          showAlert: !access.isUserDataConfirmed,
-        },
-      ];
-    }
-    if (sectionId === "premium" && access.canUsePremium) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_PREMIUM,
-        },
-      ];
-    }
-    if (sectionId === "loyalty-points" && access.canUseLoyaltyPoints) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_LOYALTY_POINTS,
-        },
-      ];
-    }
-    if (sectionId === "partner-program" && access.canUsePartnerProgram) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_PARTNER_PROGRAM,
-        },
-      ];
-    }
-    if (sectionId === "advertising" && access.canUseAdvertising) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.TAB_ADVERTISING,
-        },
-      ];
-    }
-    if (sectionId === "edit-profile" && access.canUseEditProfile) {
-      return [
-        {
-          sectionId,
-          label: MY_PROFILE_PAGE_UI.EDIT_PROFILE,
-        },
-      ];
-    }
-    return [];
-  });
-
-  const managementSectionIds = new Set<ProfileSectionId>(PROFILE_MANAGEMENT_SECTION_ORDER);
-
-  const staffItems = resolveProfileNavItems(PROFILE_STAFF_SECTION_ORDER, access, badgeCounts).filter(
-    (item) => !managementSectionIds.has(item.sectionId),
+  const tradeItems: ProfileNavItem[] = PROFILE_TRADE_SECTION_ORDER.flatMap(
+    (sectionId): ProfileNavItem[] => {
+      if (sectionId === "my-products") {
+        return [
+          {
+            sectionId,
+            label: MY_PROFILE_PAGE_UI.TAB_MY_PRODUCTS,
+            disabled: !access.canUseMyProducts,
+          },
+        ];
+      }
+      if (sectionId === "my-sales") {
+        return [
+          {
+            sectionId,
+            label: MY_PROFILE_PAGE_UI.TAB_MY_SALES,
+            disabled: !access.canUseMySales,
+            badgeCount: badgeCounts[sectionId],
+          },
+        ];
+      }
+      if (sectionId === "my-orders") {
+        return [
+          {
+            sectionId,
+            label: MY_PROFILE_PAGE_UI.TAB_MY_ORDERS,
+            disabled: !access.canUseMyOrders,
+            badgeCount: badgeCounts[sectionId],
+          },
+        ];
+      }
+      if (sectionId === "auction" && access.canUseAuction) {
+        return [
+          {
+            sectionId,
+            label: MY_PROFILE_PAGE_UI.TAB_AUCTION,
+            badgeCount: badgeCounts.auction,
+          },
+        ];
+      }
+      if (sectionId === "installment-payments" && access.canUseInstallmentPayments) {
+        return [
+          {
+            sectionId,
+            label: MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_PAYMENTS,
+            badgeCount: badgeCounts["installment-payments"],
+          },
+        ];
+      }
+      if (sectionId === "installment-sales" && access.canUseInstallmentSales) {
+        return [
+          {
+            sectionId,
+            label: MY_PROFILE_PAGE_UI.TAB_INSTALLMENT_SALES,
+            badgeCount: badgeCounts["installment-sales"],
+          },
+        ];
+      }
+      return [];
+    },
   );
+
+  const accountItems: ProfileNavItem[] = PROFILE_ACCOUNT_SECTION_ORDER.flatMap(
+    (sectionId): ProfileNavItem[] => {
+      if (sectionId === "subscriptions") {
+        return [
+          {
+            sectionId,
+            label: MY_PROFILE_PAGE_UI.TAB_SUBSCRIPTIONS,
+            disabled: !access.canUseSubscriptions,
+          },
+        ];
+      }
+      if (sectionId === "wishlist") {
+        return [
+          {
+            sectionId,
+            label: MY_PROFILE_PAGE_UI.TAB_WISHLIST,
+            disabled: !access.canUseWishlist,
+          },
+        ];
+      }
+      if (sectionId === "data-confirmation" && access.canUseDataConfirmation) {
+        return [
+          {
+            sectionId,
+            label: MY_PROFILE_PAGE_UI.TAB_DATA_CONFIRMATION,
+            showAlert: !access.isUserDataConfirmed,
+          },
+        ];
+      }
+      if (sectionId === "premium" && access.canUsePremium) {
+        return [
+          {
+            sectionId,
+            label: MY_PROFILE_PAGE_UI.TAB_PREMIUM,
+          },
+        ];
+      }
+      if (sectionId === "loyalty-points" && access.canUseLoyaltyPoints) {
+        return [
+          {
+            sectionId,
+            label: MY_PROFILE_PAGE_UI.TAB_LOYALTY_POINTS,
+          },
+        ];
+      }
+      if (sectionId === "partner-program" && access.canUsePartnerProgram) {
+        return [
+          {
+            sectionId,
+            label: MY_PROFILE_PAGE_UI.TAB_PARTNER_PROGRAM,
+          },
+        ];
+      }
+      if (sectionId === "advertising" && access.canUseAdvertising) {
+        return [
+          {
+            sectionId,
+            label: MY_PROFILE_PAGE_UI.TAB_ADVERTISING,
+          },
+        ];
+      }
+      if (sectionId === "edit-profile" && access.canUseEditProfile) {
+        return [
+          {
+            sectionId,
+            label: MY_PROFILE_PAGE_UI.EDIT_PROFILE,
+          },
+        ];
+      }
+      return [];
+    },
+  );
+
+  const managementSectionIds = new Set<ProfileSectionId>(
+    PROFILE_MANAGEMENT_SECTION_ORDER,
+  );
+
+  const staffItems = resolveProfileNavItems(
+    PROFILE_STAFF_SECTION_ORDER,
+    access,
+    badgeCounts,
+  ).filter((item) => !managementSectionIds.has(item.sectionId));
   const managementItems = resolveProfileNavItems(
     PROFILE_MANAGEMENT_SECTION_ORDER,
     access,

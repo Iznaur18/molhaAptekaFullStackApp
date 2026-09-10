@@ -105,10 +105,7 @@ export const sellerFulfillmentLocationInputSchema = z.object({
 export const sellerFulfillmentLocationsFieldSchema = z
   .array(sellerFulfillmentLocationInputSchema)
   .min(1, SELLER_FULFILLMENT_LOCATIONS_REQUIRED_MESSAGE)
-  .max(
-    PRODUCT_PICKUP_LOCATIONS_MAX,
-    `Не больше ${PRODUCT_PICKUP_LOCATIONS_MAX} точек`,
-  )
+  .max(PRODUCT_PICKUP_LOCATIONS_MAX, `Не больше ${PRODUCT_PICKUP_LOCATIONS_MAX} точек`)
   .superRefine((items, ctx) => {
     const keys = new Set();
     for (const item of items) {

@@ -27,10 +27,7 @@ export function parseMyProductsListFilter(raw) {
  * }} input
  * @returns {Record<string, unknown>}
  */
-export function buildMyProductsListFilterQuery({
-  listFilter,
-  now = new Date(),
-} = {}) {
+export function buildMyProductsListFilterQuery({ listFilter, now = new Date() } = {}) {
   if (!listFilter) {
     return {};
   }

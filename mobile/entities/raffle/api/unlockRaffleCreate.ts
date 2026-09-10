@@ -16,6 +16,8 @@ export const unlockRaffleCreate = async (): Promise<UnlockRaffleCreateResult> =>
     }
     return data.data as UnlockRaffleCreateResult;
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.UNLOCK_RAFFLE_CREATE_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.UNLOCK_RAFFLE_CREATE_FALLBACK),
+    );
   }
 };

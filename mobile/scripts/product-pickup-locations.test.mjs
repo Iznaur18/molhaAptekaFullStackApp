@@ -161,14 +161,20 @@ test("ручная точка переживает переключение ад
     [...fromBook, ...manualPickupLocations(current, book)],
     "a",
   );
-  assert.deepEqual(next.map((item) => item.id), ["a", "b", "manual-1"]);
+  assert.deepEqual(
+    next.map((item) => item.id),
+    ["a", "b", "manual-1"],
+  );
 
   // И снятие галочки со всей книги её тоже не трогает.
   const cleared = normalizePickupLocations(
     [...pickupLocationsFromSelectedAddresses(book, [], "a"), manual],
     "a",
   );
-  assert.deepEqual(cleared.map((item) => item.id), ["manual-1"]);
+  assert.deepEqual(
+    cleared.map((item) => item.id),
+    ["manual-1"],
+  );
   assert.equal(cleared[0].isDefault, true);
 });
 
@@ -178,7 +184,10 @@ test("normalizePickupLocations держит ровно одну основную
   );
   const next = normalizePickupLocations(many, "p3");
   assert.equal(next.length, PRODUCT_PICKUP_LOCATIONS_MAX);
-  assert.deepEqual(next.filter((item) => item.isDefault).map((item) => item.id), ["p3"]);
+  assert.deepEqual(
+    next.filter((item) => item.isDefault).map((item) => item.id),
+    ["p3"],
+  );
 
   // Прежней основной в наборе нет — основной становится первая.
   assert.equal(normalizePickupLocations(many, "нет-такой")[0].isDefault, true);
@@ -196,7 +205,10 @@ test("дубль адреса и адрес без координат добав
     canAddPickupLocationAddress(current, "  Г МОСКВА, УЛ АРБАТ, Д 5 ", 55.75, 37.59),
     false,
   );
-  assert.equal(canAddPickupLocationAddress(current, "г Тула, ул Мира, д 3", null, 37.6), false);
+  assert.equal(
+    canAddPickupLocationAddress(current, "г Тула, ул Мира, д 3", null, 37.6),
+    false,
+  );
   assert.equal(canAddPickupLocationAddress(current, "   ", 55.7, 37.6), false);
 
   const full = Array.from({ length: PRODUCT_PICKUP_LOCATIONS_MAX }, (_, index) =>
@@ -208,9 +220,15 @@ test("дубль адреса и адрес без координат добав
 test("шаг мастера рисует кнопку добавления и удаление точки", () => {
   const source = readMobileFile("entities/product/ui/ProductPickupLocationFields.tsx");
   assert.ok(source.includes("PRODUCT_PICKUP_UI.ADD_LOCATION"), "нет кнопки добавления");
-  assert.ok(source.includes("onPress={addTypedAddressAsPoint}"), "кнопка не подключена");
+  assert.ok(
+    source.includes("onPress={addTypedAddressAsPoint}"),
+    "кнопка не подключена",
+  );
   assert.ok(source.includes("disabled={!canAddTypedAddress}"), "кнопка не блокируется");
-  assert.ok(source.includes("removePickupPoint(point.id)"), "нет удаления ручной точки");
+  assert.ok(
+    source.includes("removePickupPoint(point.id)"),
+    "нет удаления ручной точки",
+  );
   assert.ok(
     source.includes("PRODUCT_PICKUP_UI.LOCATIONS_MAX(locationsLimit)"),
     "нет подсказки про лимит",
@@ -225,7 +243,10 @@ test("validateProductPickupLocationsList повторяет правила ко�
   // заворачивает в единственную точку.
   assert.equal(validateProductPickupLocationsList([]), null);
 
-  const ok = [point({ id: "p1", isDefault: true }), point({ id: "p2", address: "г Тула, ул Мира, д 3" })];
+  const ok = [
+    point({ id: "p1", isDefault: true }),
+    point({ id: "p2", address: "г Тула, ул Мира, д 3" }),
+  ];
   assert.equal(validateProductPickupLocationsList(ok), null);
 
   assert.equal(
@@ -241,7 +262,11 @@ test("validateProductPickupLocationsList повторяет правила ко�
   );
 
   const tooMany = Array.from({ length: PRODUCT_PICKUP_LOCATIONS_MAX + 1 }, (_, index) =>
-    point({ id: `p${index}`, address: `г Тула, ул Мира, д ${index}`, isDefault: index === 0 }),
+    point({
+      id: `p${index}`,
+      address: `г Тула, ул Мира, д ${index}`,
+      isDefault: index === 0,
+    }),
   );
   assert.match(validateProductPickupLocationsList(tooMany), /Не больше/);
 
@@ -261,7 +286,9 @@ test("validateProductPickupLocationsList повторяет правила ко�
     /уже добавлен/,
   );
   assert.match(
-    validateProductPickupLocationsList([point({ isDefault: true, label: "я".repeat(31) })]),
+    validateProductPickupLocationsList([
+      point({ isDefault: true, label: "я".repeat(31) }),
+    ]),
     /Метка не длиннее/,
   );
 });
@@ -269,7 +296,10 @@ test("validateProductPickupLocationsList повторяет правила ко�
 test("набранный адрес виден среди точек без оглядки на регистр", () => {
   const points = [point({ isDefault: true })];
   assert.equal(isPickupAddressAmongLocations("г Москва, ул Арбат, д 5", points), true);
-  assert.equal(isPickupAddressAmongLocations("  Г МОСКВА, УЛ АРБАТ, Д 5 ", points), true);
+  assert.equal(
+    isPickupAddressAmongLocations("  Г МОСКВА, УЛ АРБАТ, Д 5 ", points),
+    true,
+  );
   assert.equal(isPickupAddressAmongLocations("г Тула, ул Мира, д 3", points), false);
   assert.equal(isPickupAddressAmongLocations("   ", points), false);
 });
@@ -311,10 +341,16 @@ test("основная точка меняется тапом и не размн
   ];
 
   const next = setDefaultPickupLocation(points, "p3");
-  assert.deepEqual(next.filter((item) => item.isDefault).map((item) => item.id), ["p3"]);
+  assert.deepEqual(
+    next.filter((item) => item.isDefault).map((item) => item.id),
+    ["p3"],
+  );
   assert.equal(validateProductPickupLocationsList(next), null);
   // Порядок и содержимое точек тап не трогает.
-  assert.deepEqual(next.map((item) => item.address), points.map((item) => item.address));
+  assert.deepEqual(
+    next.map((item) => item.address),
+    points.map((item) => item.address),
+  );
 
   // Неизвестный id ничего не переносит: молчаливая смена основной хуже отказа.
   assert.deepEqual(setDefaultPickupLocation(points, "нет-такой"), points);
@@ -327,7 +363,10 @@ test("основная точка меняется тапом и не размн
 
 test("шаг мастера даёт выбрать основную точку", () => {
   const source = readMobileFile("entities/product/ui/ProductPickupLocationFields.tsx");
-  assert.ok(source.includes("setDefaultPoint(point.id)"), "нет тапа по «сделать основной»");
+  assert.ok(
+    source.includes("setDefaultPoint(point.id)"),
+    "нет тапа по «сделать основной»",
+  );
   assert.ok(
     source.includes("setDefaultPickupLocation(pickupLocations, id)"),
     "смена основной идёт мимо чистой функции",
@@ -355,17 +394,26 @@ test("шаг мастера даёт выбрать основную точку"
 test("экран проверки показывает все точки, а не одну", () => {
   assert.equal(
     pickupLocationsSummary(
-      [point({ id: "p1", isDefault: true }), point({ id: "p2", address: "г Тула, ул Мира, д 3" })],
+      [
+        point({ id: "p1", isDefault: true }),
+        point({ id: "p2", address: "г Тула, ул Мира, д 3" }),
+      ],
       "г Тверь, ул Софьи, д 8",
     ),
     "г Москва, ул Арбат, д 5; г Тула, ул Мира, д 3",
   );
   // Точек нет — показываем легаси-адрес, его сервер завернёт в единственную точку.
-  assert.equal(pickupLocationsSummary([], "  г Тверь, ул Софьи, д 8 "), "г Тверь, ул Софьи, д 8");
+  assert.equal(
+    pickupLocationsSummary([], "  г Тверь, ул Софьи, д 8 "),
+    "г Тверь, ул Софьи, д 8",
+  );
   assert.equal(pickupLocationsSummary([], ""), "");
   // Пустые адреса в списке не дают висячих «; ».
   assert.equal(
-    pickupLocationsSummary([point({ id: "p1", address: "  " }), point({ id: "p2" })], "запас"),
+    pickupLocationsSummary(
+      [point({ id: "p1", address: "  " }), point({ id: "p2" })],
+      "запас",
+    ),
     "г Москва, ул Арбат, д 5",
   );
 
@@ -380,7 +428,9 @@ test("адрес книги без координат догеокодирует
   const source = readMobileFile("entities/product/ui/ProductPickupLocationFields.tsx");
   // Раньше опция гасилась просто из-за отсутствия geo — веб так не делает.
   assert.ok(
-    !/isOptionDisabled=\{\(id\) => \{[\s\S]{0,300}!canUseSavedAddressAsPickupLocation/.test(source),
+    !/isOptionDisabled=\{\(id\) => \{[\s\S]{0,300}!canUseSavedAddressAsPickupLocation/.test(
+      source,
+    ),
     "адрес без координат не должен блокироваться сам по себе",
   );
   assert.ok(
@@ -393,7 +443,9 @@ test("адрес книги без координат догеокодирует
     "нет подсказки на время запроса",
   );
 
-  const resolver = readMobileFile("entities/product/lib/resolvePickupGeoForSavedAddress.ts");
+  const resolver = readMobileFile(
+    "entities/product/lib/resolvePickupGeoForSavedAddress.ts",
+  );
   // Ошибка подсказок не должна ронять шаг — адрес просто останется без точки.
   assert.ok(resolver.includes("} catch {"), "резолвер обязан глотать ошибку подсказок");
   assert.ok(
@@ -444,7 +496,10 @@ test("склад без самовывоза ограничен одной то�
     "шаг не учитывает режим склада",
   );
   // При лимите в одну точку выбор обязан заменять прежний, а не срезаться.
-  assert.ok(source.includes("locationsLimit === 1"), "нет замены выбора при лимите в одну точку");
+  assert.ok(
+    source.includes("locationsLimit === 1"),
+    "нет замены выбора при лимите в одну точку",
+  );
   assert.ok(
     !source.includes("PRODUCT_PICKUP_LOCATIONS_MAX"),
     "лимит в шаге должен идти только через pickupLocationsLimit",

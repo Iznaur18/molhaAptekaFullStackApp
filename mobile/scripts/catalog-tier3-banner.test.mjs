@@ -27,7 +27,9 @@ const tier3Product = (id, region = "RU-MOW") => ({
 const regularProduct = (id) => ({ _id: id });
 
 test("catalog tier3 banners enabled only on home main view", () => {
-  const source = readMobileFile("features/catalog-grid/lib/shouldShowCatalogTier3Banners.ts");
+  const source = readMobileFile(
+    "features/catalog-grid/lib/shouldShowCatalogTier3Banners.ts",
+  );
 
   assert.match(source, /showHomeFeed/);
   assert.match(source, /!isMineMode && showHomeFeed/);
@@ -72,8 +74,12 @@ test("catalog screen wires tier3 banner grid rows", () => {
 
 test("ProductCardBanner mirrors web banner chrome", () => {
   const bannerSource = readMobileFile("entities/product/ui/ProductCardBanner.tsx");
-  const flagsSource = readMobileFile("entities/product/lib/useProductCardChromeFlags.ts");
-  const palette = readMobileFile("entities/product/lib/productCardPromotionFramePalette.ts");
+  const flagsSource = readMobileFile(
+    "entities/product/lib/useProductCardChromeFlags.ts",
+  );
+  const palette = readMobileFile(
+    "entities/product/lib/productCardPromotionFramePalette.ts",
+  );
   const cardSource = readMobileFile("entities/product/ui/ProductCard.tsx");
 
   assert.match(bannerSource, /PROMOTION_BANNER_BADGE/);

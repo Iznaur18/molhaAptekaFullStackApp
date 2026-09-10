@@ -10,7 +10,9 @@ const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
 test("raffle seller overview mirrors web panel and manage actions", () => {
-  const overview = readMobileFile("features/profile-overview/ui/RaffleSellerOverview.tsx");
+  const overview = readMobileFile(
+    "features/profile-overview/ui/RaffleSellerOverview.tsx",
+  );
   const styles = readMobileFile("shared/theme/raffleSellerOverviewStyles.ts");
 
   assert.match(overview, /RaffleManageActions/);
@@ -28,7 +30,9 @@ test("raffle seller overview mirrors web panel and manage actions", () => {
 });
 
 test("profile overview section no longer embeds raffle seller overview", () => {
-  const section = readMobileFile("features/profile-tab/ui/ProfileTabOverviewSection.tsx");
+  const section = readMobileFile(
+    "features/profile-tab/ui/ProfileTabOverviewSection.tsx",
+  );
 
   assert.doesNotMatch(section, /RaffleSellerOverview/);
   assert.doesNotMatch(section, /raffleSection/);

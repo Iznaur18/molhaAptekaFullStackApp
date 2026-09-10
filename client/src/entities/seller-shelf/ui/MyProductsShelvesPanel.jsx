@@ -26,8 +26,12 @@ export function MyProductsShelvesPanel() {
   const [errorMessage, setErrorMessage] = useState("");
   const [editName, setEditName] = useState("");
   const [isAssignRenaming, setIsAssignRenaming] = useState(false);
-  const [assignShelfId, setAssignShelfId] = useState(/** @type {string | null} */ (null));
-  const [selectedIds, setSelectedIds] = useState(/** @type {Set<string>} */ (new Set()));
+  const [assignShelfId, setAssignShelfId] = useState(
+    /** @type {string | null} */ (null),
+  );
+  const [selectedIds, setSelectedIds] = useState(
+    /** @type {Set<string>} */ (new Set()),
+  );
   const [isExpanded, setIsExpanded] = useState(false);
   const bodyId = "my-products-shelves-body";
 
@@ -62,7 +66,9 @@ export function MyProductsShelvesPanel() {
       invalidateShelves();
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : SELLER_SHELF_UI.LOAD_ERROR);
+      setErrorMessage(
+        error instanceof Error ? error.message : SELLER_SHELF_UI.LOAD_ERROR,
+      );
     },
   });
 
@@ -75,7 +81,9 @@ export function MyProductsShelvesPanel() {
       invalidateShelves();
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : SELLER_SHELF_UI.LOAD_ERROR);
+      setErrorMessage(
+        error instanceof Error ? error.message : SELLER_SHELF_UI.LOAD_ERROR,
+      );
     },
   });
 
@@ -88,7 +96,9 @@ export function MyProductsShelvesPanel() {
       invalidateShelves();
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : SELLER_SHELF_UI.LOAD_ERROR);
+      setErrorMessage(
+        error instanceof Error ? error.message : SELLER_SHELF_UI.LOAD_ERROR,
+      );
     },
   });
 
@@ -99,7 +109,9 @@ export function MyProductsShelvesPanel() {
       invalidateShelves();
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : SELLER_SHELF_UI.LOAD_ERROR);
+      setErrorMessage(
+        error instanceof Error ? error.message : SELLER_SHELF_UI.LOAD_ERROR,
+      );
     },
   });
 
@@ -112,7 +124,9 @@ export function MyProductsShelvesPanel() {
       invalidateShelves();
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : SELLER_SHELF_UI.LOAD_ERROR);
+      setErrorMessage(
+        error instanceof Error ? error.message : SELLER_SHELF_UI.LOAD_ERROR,
+      );
     },
   });
 
@@ -243,7 +257,9 @@ export function MyProductsShelvesPanel() {
             <span className="my-products-shelves__assign-name-label">
               {SELLER_SHELF_UI.RENAME_LABEL}
             </span>
-            <span className="my-products-shelves__assign-name-value">{assignShelf.name}</span>
+            <span className="my-products-shelves__assign-name-value">
+              {assignShelf.name}
+            </span>
           </span>
           <span className="my-products-shelves__assign-name-action" aria-hidden="true">
             {SELLER_SHELF_UI.RENAME_TAP_HINT}
@@ -295,112 +311,118 @@ export function MyProductsShelvesPanel() {
       >
         <div className="my-products-shelves__fold-clip">
           <div className="my-products-shelves__fold-inner">
-          <p className="my-products-shelves__hint">{SELLER_SHELF_UI.HINT}</p>
+            <p className="my-products-shelves__hint">{SELLER_SHELF_UI.HINT}</p>
 
-          <form
-            className="my-products-shelves__create"
-            onSubmit={(event) => {
-              event.preventDefault();
-              if (!newName.trim() || atLimit || createMutation.isPending) return;
-              createMutation.mutate();
-            }}
-          >
-            <input
-              className="my-products-shelves__input"
-              type="text"
-              maxLength={nameMaxChars}
-              placeholder={SELLER_SHELF_UI.CREATE_PLACEHOLDER}
-              value={newName}
-              disabled={atLimit || createMutation.isPending}
-              onChange={(event) => setNewName(event.target.value)}
-            />
-            <button
-              type="submit"
-              className="app-btn app-btn--secondary my-products-shelves__create-btn"
-              disabled={atLimit || !newName.trim() || createMutation.isPending}
+            <form
+              className="my-products-shelves__create"
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (!newName.trim() || atLimit || createMutation.isPending) return;
+                createMutation.mutate();
+              }}
             >
-              {createMutation.isPending
-                ? SELLER_SHELF_UI.CREATE_PENDING
-                : SELLER_SHELF_UI.CREATE}
-            </button>
-          </form>
-          {atLimit ? (
-            <p className="my-products-shelves__limit">{SELLER_SHELF_UI.LIMIT_REACHED}</p>
-          ) : null}
+              <input
+                className="my-products-shelves__input"
+                type="text"
+                maxLength={nameMaxChars}
+                placeholder={SELLER_SHELF_UI.CREATE_PLACEHOLDER}
+                value={newName}
+                disabled={atLimit || createMutation.isPending}
+                onChange={(event) => setNewName(event.target.value)}
+              />
+              <button
+                type="submit"
+                className="app-btn app-btn--secondary my-products-shelves__create-btn"
+                disabled={atLimit || !newName.trim() || createMutation.isPending}
+              >
+                {createMutation.isPending
+                  ? SELLER_SHELF_UI.CREATE_PENDING
+                  : SELLER_SHELF_UI.CREATE}
+              </button>
+            </form>
+            {atLimit ? (
+              <p className="my-products-shelves__limit">
+                {SELLER_SHELF_UI.LIMIT_REACHED}
+              </p>
+            ) : null}
 
-          {shelvesQuery.isLoading ? (
-            <p className="my-products-shelves__state">{SELLER_SHELF_UI.LOADING}</p>
-          ) : null}
-          {shelvesQuery.isError ? (
-            <p
-              className="my-products-shelves__state my-products-shelves__state_error"
-              role="alert"
-            >
-              {shelvesQuery.error instanceof Error
-                ? shelvesQuery.error.message
-                : SELLER_SHELF_UI.LOAD_ERROR}
-            </p>
-          ) : null}
-          {errorMessage ? (
-            <p
-              className="my-products-shelves__state my-products-shelves__state_error"
-              role="alert"
-            >
-              {errorMessage}
-            </p>
-          ) : null}
+            {shelvesQuery.isLoading ? (
+              <p className="my-products-shelves__state">{SELLER_SHELF_UI.LOADING}</p>
+            ) : null}
+            {shelvesQuery.isError ? (
+              <p
+                className="my-products-shelves__state my-products-shelves__state_error"
+                role="alert"
+              >
+                {shelvesQuery.error instanceof Error
+                  ? shelvesQuery.error.message
+                  : SELLER_SHELF_UI.LOAD_ERROR}
+              </p>
+            ) : null}
+            {errorMessage ? (
+              <p
+                className="my-products-shelves__state my-products-shelves__state_error"
+                role="alert"
+              >
+                {errorMessage}
+              </p>
+            ) : null}
 
-          {!shelvesQuery.isLoading && shelves.length === 0 ? (
-            <p className="my-products-shelves__state">{SELLER_SHELF_UI.EMPTY}</p>
-          ) : null}
+            {!shelvesQuery.isLoading && shelves.length === 0 ? (
+              <p className="my-products-shelves__state">{SELLER_SHELF_UI.EMPTY}</p>
+            ) : null}
 
-          {shelves.length > 0 ? (
-            <ul className="my-products-shelves__list" role="list">
-              {shelves.map((shelf, index) => (
-                <li key={shelf._id} className="my-products-shelves__item">
-                  <div
-                    className="my-products-shelves__item-main"
-                    role="button"
-                    tabIndex={0}
-                    aria-label={SELLER_SHELF_UI.ASSIGN_TITLE(shelf.name)}
-                    onClick={() => openAssign(shelf._id)}
-                    onKeyDown={(event) => openAssignFromKeyboard(event, shelf._id)}
-                  >
-                    <span className="my-products-shelves__count">
-                      {SELLER_SHELF_UI.PRODUCT_COUNT(shelf.productCount)}
-                    </span>
-                    <span className="my-products-shelves__name-text">{shelf.name}</span>
-                  </div>
-                  <div
-                    className="my-products-shelves__item-actions"
-                    onClick={(event) => event.stopPropagation()}
-                    onKeyDown={(event) => event.stopPropagation()}
-                  >
-                    <div className="my-products-shelves__item-tools">
-                      <button
-                        type="button"
-                        className="my-products-shelves__tool-btn"
-                        aria-label={SELLER_SHELF_UI.MOVE_LEFT_ARIA}
-                        disabled={index === 0 || reorderMutation.isPending}
-                        onClick={() => moveShelf(shelf._id, -1)}
-                      >
-                        ←
-                      </button>
-                      <button
-                        type="button"
-                        className="my-products-shelves__tool-btn"
-                        aria-label={SELLER_SHELF_UI.MOVE_RIGHT_ARIA}
-                        disabled={index >= shelves.length - 1 || reorderMutation.isPending}
-                        onClick={() => moveShelf(shelf._id, 1)}
-                      >
-                        →
-                      </button>
+            {shelves.length > 0 ? (
+              <ul className="my-products-shelves__list" role="list">
+                {shelves.map((shelf, index) => (
+                  <li key={shelf._id} className="my-products-shelves__item">
+                    <div
+                      className="my-products-shelves__item-main"
+                      role="button"
+                      tabIndex={0}
+                      aria-label={SELLER_SHELF_UI.ASSIGN_TITLE(shelf.name)}
+                      onClick={() => openAssign(shelf._id)}
+                      onKeyDown={(event) => openAssignFromKeyboard(event, shelf._id)}
+                    >
+                      <span className="my-products-shelves__count">
+                        {SELLER_SHELF_UI.PRODUCT_COUNT(shelf.productCount)}
+                      </span>
+                      <span className="my-products-shelves__name-text">
+                        {shelf.name}
+                      </span>
                     </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : null}
+                    <div
+                      className="my-products-shelves__item-actions"
+                      onClick={(event) => event.stopPropagation()}
+                      onKeyDown={(event) => event.stopPropagation()}
+                    >
+                      <div className="my-products-shelves__item-tools">
+                        <button
+                          type="button"
+                          className="my-products-shelves__tool-btn"
+                          aria-label={SELLER_SHELF_UI.MOVE_LEFT_ARIA}
+                          disabled={index === 0 || reorderMutation.isPending}
+                          onClick={() => moveShelf(shelf._id, -1)}
+                        >
+                          ←
+                        </button>
+                        <button
+                          type="button"
+                          className="my-products-shelves__tool-btn"
+                          aria-label={SELLER_SHELF_UI.MOVE_RIGHT_ARIA}
+                          disabled={
+                            index >= shelves.length - 1 || reorderMutation.isPending
+                          }
+                          onClick={() => moveShelf(shelf._id, 1)}
+                        >
+                          →
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
         </div>
       </div>
@@ -414,8 +436,12 @@ export function MyProductsShelvesPanel() {
         bodyClassName="my-products-shelves__assign-modal-body"
         footerClassName="my-products-shelves__assign-footer-wrap"
         onClose={closeAssign}
-        title={assignShelf ? SELLER_SHELF_UI.ASSIGN_MODAL_TITLE : SELLER_SHELF_UI.ASSIGN}
-        ariaLabel={assignShelf ? SELLER_SHELF_UI.ASSIGN_TITLE(assignShelf.name) : undefined}
+        title={
+          assignShelf ? SELLER_SHELF_UI.ASSIGN_MODAL_TITLE : SELLER_SHELF_UI.ASSIGN
+        }
+        ariaLabel={
+          assignShelf ? SELLER_SHELF_UI.ASSIGN_TITLE(assignShelf.name) : undefined
+        }
         titleId="seller-shelf-assign-title"
         footer={
           <div className="my-products-shelves__assign-footer">
@@ -481,11 +507,15 @@ export function MyProductsShelvesPanel() {
           ) : null}
           {productsQuery.isLoading ? (
             <li className="my-products-shelves__assign-item">
-              <p className="my-products-shelves__assign-state">{SELLER_SHELF_UI.LOADING}</p>
+              <p className="my-products-shelves__assign-state">
+                {SELLER_SHELF_UI.LOADING}
+              </p>
             </li>
           ) : (productsQuery.data?.length ?? 0) === 0 ? (
             <li className="my-products-shelves__assign-item">
-              <p className="my-products-shelves__assign-state">{SELLER_SHELF_UI.ASSIGN_EMPTY}</p>
+              <p className="my-products-shelves__assign-state">
+                {SELLER_SHELF_UI.ASSIGN_EMPTY}
+              </p>
             </li>
           ) : (
             (productsQuery.data ?? []).map((product) => {
@@ -494,8 +524,7 @@ export function MyProductsShelvesPanel() {
               const otherShelf =
                 product.sellerShelfId &&
                 String(product.sellerShelfId) !== String(assignShelfId);
-              const productName =
-                String(product.productName ?? "").trim() || "Товар";
+              const productName = String(product.productName ?? "").trim() || "Товар";
 
               return (
                 <li key={id} className="my-products-shelves__assign-item">
@@ -514,7 +543,9 @@ export function MyProductsShelvesPanel() {
                       onChange={() => toggleProduct(id)}
                     />
                     <span className="my-products-shelves__assign-row-body">
-                      <span className="my-products-shelves__assign-product-name">{productName}</span>
+                      <span className="my-products-shelves__assign-product-name">
+                        {productName}
+                      </span>
                       {otherShelf ? (
                         <span className="my-products-shelves__assign-badge">
                           {SELLER_SHELF_UI.ASSIGN_OTHER_SHELF}

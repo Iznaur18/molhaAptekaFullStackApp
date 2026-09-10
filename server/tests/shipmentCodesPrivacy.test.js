@@ -3,9 +3,8 @@ import { describe, it } from "node:test";
 
 process.env.NODE_ENV = process.env.NODE_ENV ?? "test";
 
-const { stripShipmentCodes } = await import(
-  "../services/order/sanitizeShipmentCodes.js"
-);
+const { stripShipmentCodes } =
+  await import("../services/order/sanitizeShipmentCodes.js");
 
 const SELLER = "aaaaaaaaaaaaaaaaaaaaaaaa";
 

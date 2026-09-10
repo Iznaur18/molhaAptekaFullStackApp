@@ -42,21 +42,21 @@ export function useAddressPromptSheet() {
   const isCatalogPath = isCatalogMainViewPath(location.pathname);
   const blockingUi = Boolean(
     overlayCount > 0 ||
-      isIntroVisible ||
-      shell.isLoginModalOpen ||
-      shell.isRegisterModalOpen ||
-      shell.isEmailVerificationModalOpen ||
-      shell.isCreateProductModalOpen ||
-      shell.productToEdit ||
-      shell.productToCopy ||
-      shell.isDataConfirmationModalOpen ||
-      shell.raffleModal ||
-      shell.promotionProduct ||
-      shell.isSellerProductsLimitModalOpen ||
-      shell.isProductCategoryListOpen ||
-      shell.editingFeedTileKey ||
-      shell.editingCategorySlug ||
-      shell.editingCategoryNode,
+    isIntroVisible ||
+    shell.isLoginModalOpen ||
+    shell.isRegisterModalOpen ||
+    shell.isEmailVerificationModalOpen ||
+    shell.isCreateProductModalOpen ||
+    shell.productToEdit ||
+    shell.productToCopy ||
+    shell.isDataConfirmationModalOpen ||
+    shell.raffleModal ||
+    shell.promotionProduct ||
+    shell.isSellerProductsLimitModalOpen ||
+    shell.isProductCategoryListOpen ||
+    shell.editingFeedTileKey ||
+    shell.editingCategorySlug ||
+    shell.editingCategoryNode,
   );
 
   useEffect(() => {
@@ -78,7 +78,10 @@ export function useAddressPromptSheet() {
     if (!cookieAccepted || !userId || !isAuthorized || hasAddress || seenThisSession) {
       return undefined;
     }
-    const timer = window.setTimeout(() => setDelayElapsed(true), ADDRESS_PROMPT_DELAY_MS);
+    const timer = window.setTimeout(
+      () => setDelayElapsed(true),
+      ADDRESS_PROMPT_DELAY_MS,
+    );
     return () => window.clearTimeout(timer);
   }, [cookieAccepted, hasAddress, isAuthorized, seenThisSession, userId]);
 

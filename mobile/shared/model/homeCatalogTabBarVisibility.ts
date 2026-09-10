@@ -26,7 +26,8 @@ export const resolveHomeCatalogTabBarRevealProgress = (
 };
 
 export const syncHomeCatalogTabBarRevealDistance = (safeAreaBottom = 0): void => {
-  homeCatalogTabBarRevealDistance.value = resolveMobileBottomNavLayoutHeight(safeAreaBottom);
+  homeCatalogTabBarRevealDistance.value =
+    resolveMobileBottomNavLayoutHeight(safeAreaBottom);
 };
 
 export const setHomeCatalogTabBarScrollLinked = (linked: boolean): void => {

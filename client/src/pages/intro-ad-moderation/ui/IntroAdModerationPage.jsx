@@ -13,9 +13,7 @@ import { formToIntroAdPreviewSettings } from "../../../entities/intro-ad/lib/ind
 import { useStaffRafflesQueueQuery } from "../../../entities/raffle/model/useStaffRafflesQueueQuery.js";
 import { fetchPendingSellerPersonalCategoryCampaigns } from "../../../entities/seller-personal-category/api/sellerPersonalCategoryApi.js";
 import { sellerPersonalCategoryQueryKeys } from "../../../entities/seller-personal-category/model/sellerPersonalCategoryQueryKeys.js";
-import {
-  fetchPendingSiteHeaderBannerCampaigns,
-} from "../../../entities/site-header-banner-campaign/api/siteHeaderBannerCampaignModerationApi.js";
+import { fetchPendingSiteHeaderBannerCampaigns } from "../../../entities/site-header-banner-campaign/api/siteHeaderBannerCampaignModerationApi.js";
 import { siteHeaderBannerCampaignQueryKeys } from "../../../entities/site-header-banner-campaign/model/siteHeaderBannerCampaignQueryKeys.js";
 import { useAuthSession } from "../../../entities/user/model/useAuthSession.js";
 import { useAppIntro } from "../../../features/app-intro/model/AppIntroContext.jsx";
@@ -83,8 +81,10 @@ export function IntroAdModerationPage({ onQueueChanged, onEditRaffle }) {
   });
 
   const bannerPendingQuery = useQuery({
-    queryKey: siteHeaderBannerCampaignQueryKeys.moderationPending(MODERATION_QUEUE_LIMIT),
-    queryFn: () => fetchPendingSiteHeaderBannerCampaigns({ limit: MODERATION_QUEUE_LIMIT }),
+    queryKey:
+      siteHeaderBannerCampaignQueryKeys.moderationPending(MODERATION_QUEUE_LIMIT),
+    queryFn: () =>
+      fetchPendingSiteHeaderBannerCampaigns({ limit: MODERATION_QUEUE_LIMIT }),
   });
 
   const personalPendingQuery = useQuery({
@@ -105,7 +105,8 @@ export function IntroAdModerationPage({ onQueueChanged, onEditRaffle }) {
   const pendingCampaigns = queueQuery.data?.campaigns ?? EMPTY_CAMPAIGNS;
   const managedCampaigns = managedQuery.data?.campaigns ?? EMPTY_CAMPAIGNS;
   const bannerPendingCampaigns = bannerPendingQuery.data?.campaigns ?? EMPTY_CAMPAIGNS;
-  const personalPendingCampaigns = personalPendingQuery.data?.campaigns ?? EMPTY_CAMPAIGNS;
+  const personalPendingCampaigns =
+    personalPendingQuery.data?.campaigns ?? EMPTY_CAMPAIGNS;
   const rafflePendingCount = raffleQueueQuery.data?.pendingRaffles?.length ?? 0;
 
   const summary = useMemo(
@@ -116,7 +117,12 @@ export function IntroAdModerationPage({ onQueueChanged, onEditRaffle }) {
         personalPending: personalPendingCampaigns,
         rafflePendingCount,
       }),
-    [bannerPendingCampaigns, pendingCampaigns, personalPendingCampaigns, rafflePendingCount],
+    [
+      bannerPendingCampaigns,
+      pendingCampaigns,
+      personalPendingCampaigns,
+      rafflePendingCount,
+    ],
   );
 
   const filteredIntroPending = useMemo(
@@ -142,16 +148,21 @@ export function IntroAdModerationPage({ onQueueChanged, onEditRaffle }) {
   );
   const showUsersRaffleSection =
     isAdmin &&
-    isIntroAdModerationSectionVisible(sectionFilter, INTRO_AD_MODERATION_SECTION_USERS_RAFFLE);
+    isIntroAdModerationSectionVisible(
+      sectionFilter,
+      INTRO_AD_MODERATION_SECTION_USERS_RAFFLE,
+    );
 
   const totalPendingAll = summary.pendingTotal;
   const visiblePendingCount =
     (showIntroSection ? filteredIntroPending.length : 0) +
     (showBannerSection
-      ? filterPendingModerationCampaigns(bannerPendingCampaigns, { attentionOnly }).length
+      ? filterPendingModerationCampaigns(bannerPendingCampaigns, { attentionOnly })
+          .length
       : 0) +
     (showPersonalSection
-      ? filterPendingModerationCampaigns(personalPendingCampaigns, { attentionOnly }).length
+      ? filterPendingModerationCampaigns(personalPendingCampaigns, { attentionOnly })
+          .length
       : 0) +
     (showRaffleSection && !attentionOnly ? rafflePendingCount : 0);
 
@@ -192,15 +203,13 @@ export function IntroAdModerationPage({ onQueueChanged, onEditRaffle }) {
       const next = new Set(prev);
       let changed = false;
       const register = (prefix, campaigns) => {
-        campaigns
-          .filter(campaignModerationNeedsAttention)
-          .forEach((campaign) => {
-            const rowId = buildModerationCampaignRowId(prefix, String(campaign._id));
-            if (!next.has(rowId)) {
-              next.add(rowId);
-              changed = true;
-            }
-          });
+        campaigns.filter(campaignModerationNeedsAttention).forEach((campaign) => {
+          const rowId = buildModerationCampaignRowId(prefix, String(campaign._id));
+          if (!next.has(rowId)) {
+            next.add(rowId);
+            changed = true;
+          }
+        });
       };
       register("intro", pendingCampaigns);
       register("banner", bannerPendingCampaigns);
@@ -227,13 +236,17 @@ export function IntroAdModerationPage({ onQueueChanged, onEditRaffle }) {
       next.add(buildModerationCampaignRowId("intro", String(campaign._id))),
     );
     if (showBannerSection) {
-      filterPendingModerationCampaigns(bannerPendingCampaigns, { attentionOnly }).forEach(
-        (campaign) => next.add(buildModerationCampaignRowId("banner", String(campaign._id))),
+      filterPendingModerationCampaigns(bannerPendingCampaigns, {
+        attentionOnly,
+      }).forEach((campaign) =>
+        next.add(buildModerationCampaignRowId("banner", String(campaign._id))),
       );
     }
     if (showPersonalSection) {
-      filterPendingModerationCampaigns(personalPendingCampaigns, { attentionOnly }).forEach(
-        (campaign) => next.add(buildModerationCampaignRowId("personal", String(campaign._id))),
+      filterPendingModerationCampaigns(personalPendingCampaigns, {
+        attentionOnly,
+      }).forEach((campaign) =>
+        next.add(buildModerationCampaignRowId("personal", String(campaign._id))),
       );
     }
     setExpandedIds(next);
@@ -449,7 +462,9 @@ export function IntroAdModerationPage({ onQueueChanged, onEditRaffle }) {
     return (
       <div className="intro-ad-moderation-page">
         {toolbar}
-        <p className="intro-ad-moderation-page__state">{INTRO_AD_MODERATION_PAGE_UI.LOADING}</p>
+        <p className="intro-ad-moderation-page__state">
+          {INTRO_AD_MODERATION_PAGE_UI.LOADING}
+        </p>
       </div>
     );
   }
@@ -482,13 +497,16 @@ export function IntroAdModerationPage({ onQueueChanged, onEditRaffle }) {
 
   const introHasVisibleContent =
     showIntroSection &&
-    (( !attentionOnly && managedCampaigns.length > 0) || filteredIntroPending.length > 0);
+    ((!attentionOnly && managedCampaigns.length > 0) ||
+      filteredIntroPending.length > 0);
 
   const moderationSections = (
     <>
       {showIntroSection && !attentionOnly && managedCampaigns.length > 0 ? (
         <section className="intro-ad-moderation-page__section">
-          <ModerationSectionTitle title={INTRO_AD_MODERATION_PAGE_UI.INTRO_MANAGED_TITLE} />
+          <ModerationSectionTitle
+            title={INTRO_AD_MODERATION_PAGE_UI.INTRO_MANAGED_TITLE}
+          />
           <ul
             className={`intro-ad-moderation-page__list ${buildIntroAdModerationZonePanelClass(INTRO_AD_MODERATION_SECTION_INTRO)}`}
           >
@@ -584,10 +602,16 @@ export function IntroAdModerationPage({ onQueueChanged, onEditRaffle }) {
       !showUsersRaffleSection &&
       totalPendingAll === 0 &&
       isIntroEmpty ? (
-        <p className="intro-ad-moderation-page__state">{INTRO_AD_MODERATION_PAGE_UI.EMPTY}</p>
+        <p className="intro-ad-moderation-page__state">
+          {INTRO_AD_MODERATION_PAGE_UI.EMPTY}
+        </p>
       ) : null}
 
-      {hasFilters && visiblePendingCount === 0 && !attentionOnly && !showUsersRaffleSection && totalPendingAll > 0 ? (
+      {hasFilters &&
+      visiblePendingCount === 0 &&
+      !attentionOnly &&
+      !showUsersRaffleSection &&
+      totalPendingAll > 0 ? (
         <p className="intro-ad-moderation-page__state">{emptyMessage}</p>
       ) : null}
 

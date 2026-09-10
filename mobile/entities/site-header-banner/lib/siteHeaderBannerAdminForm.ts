@@ -23,7 +23,8 @@ export const mapSiteHeaderBannerSettingsToForm = (
 
   return {
     enabled: Boolean(source.enabled),
-    guestProfileLoginMenuBannerImageUrl: source.guestProfileLoginMenuBannerImageUrl ?? "",
+    guestProfileLoginMenuBannerImageUrl:
+      source.guestProfileLoginMenuBannerImageUrl ?? "",
     items: Array.isArray(source.items)
       ? source.items.map((item) => ({
           id: item.id,
@@ -37,7 +38,9 @@ export const mapSiteHeaderBannerSettingsToForm = (
   };
 };
 
-export const buildPatchSiteHeaderBannerSettingsBody = (form: SiteHeaderBannerAdminForm) => ({
+export const buildPatchSiteHeaderBannerSettingsBody = (
+  form: SiteHeaderBannerAdminForm,
+) => ({
   enabled: Boolean(form.enabled),
   guestProfileLoginMenuBannerImageUrl:
     String(form.guestProfileLoginMenuBannerImageUrl ?? "").trim() || null,
@@ -77,7 +80,10 @@ export const validateSiteHeaderBannerAdminForm = (
       return "Внутренний путь должен начинаться с /";
     }
 
-    if (backgroundColor && !/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(backgroundColor)) {
+    if (
+      backgroundColor &&
+      !/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(backgroundColor)
+    ) {
       return "Цвет фона: формат #RGB или #RRGGBB";
     }
   }

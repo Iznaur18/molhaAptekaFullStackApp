@@ -8,7 +8,10 @@ type UseUserProfileQueryOptions = {
   enabled?: boolean;
 };
 
-export const useUserProfileQuery = ({ userId, enabled = true }: UseUserProfileQueryOptions) => {
+export const useUserProfileQuery = ({
+  userId,
+  enabled = true,
+}: UseUserProfileQueryOptions) => {
   return useQuery({
     queryKey: userProfileQueryKeys.byId(userId),
     enabled: enabled && Boolean(userId),

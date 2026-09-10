@@ -45,7 +45,8 @@ export const isProfileStaffInAppSection = (
 export const PROFILE_SECTION_WEB_PATH = {
   [PROFILE_SECTION_PRODUCT_MODERATION]: "/moderation-products",
   [PROFILE_SECTION_INTRO_AD_MODERATION]: "/moderation-intro-ad",
-  [PROFILE_SECTION_SELLER_PERSONAL_CATEGORY_MODERATION]: "/moderation-seller-categories",
+  [PROFILE_SECTION_SELLER_PERSONAL_CATEGORY_MODERATION]:
+    "/moderation-seller-categories",
   [PROFILE_SECTION_PRODUCT_REPORTS]: "/product-reports",
   [PROFILE_SECTION_PRODUCT_PROMOTIONS]: "/product-promotions",
   [PROFILE_SECTION_RAFFLES]: "/staff-raffles",

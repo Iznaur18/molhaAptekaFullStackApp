@@ -11,16 +11,12 @@ process.env.YOOKASSA_SECRET_KEY = "test-secret";
 
 const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollections } =
   await import("./helpers/mongoTestDb.js");
-const { PaymentModel, ProductPromotionModel, UserModel } = await import(
-  "../models/index.js"
-);
-const {
-  applyPlatformServicePayment,
-  createPlatformServicePayment,
-} = await import("../services/payments/platformServiceInvoice.js");
-const { registerPlatformServices } = await import(
-  "../services/payments/registerPlatformServices.js"
-);
+const { PaymentModel, ProductPromotionModel, UserModel } =
+  await import("../models/index.js");
+const { applyPlatformServicePayment, createPlatformServicePayment } =
+  await import("../services/payments/platformServiceInvoice.js");
+const { registerPlatformServices } =
+  await import("../services/payments/registerPlatformServices.js");
 
 registerPlatformServices();
 

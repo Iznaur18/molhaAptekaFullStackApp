@@ -21,6 +21,8 @@ export const fetchHomeCuratedProductLists = async ({
     }
     return data.data.lists as HomeCuratedProductList[];
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, "Не удалось загрузить подборки товаров"));
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось загрузить подборки товаров"),
+    );
   }
 };

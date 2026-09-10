@@ -10,7 +10,9 @@ export const registerPushToken = async (token: string, platform: PushTokenPlatfo
       throw new Error("Не удалось зарегистрировать push token");
     }
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, "Не удалось зарегистрировать push token"));
+    throw new Error(
+      formatApiErrorMessage(error, "Не удалось зарегистрировать push token"),
+    );
   }
 };
 

@@ -24,8 +24,9 @@ export function normalizeTotalSalesAmount(totalSalesAmount) {
 function formatCompactAmountPart(amount, divisor, suffix) {
   const scaled = amount / divisor;
   const rounded = Math.round(scaled * 10) / 10;
-  const text =
-    Number.isInteger(rounded) ? String(rounded) : String(rounded).replace(/\.0$/, "");
+  const text = Number.isInteger(rounded)
+    ? String(rounded)
+    : String(rounded).replace(/\.0$/, "");
 
   return `${text}${suffix}`;
 }

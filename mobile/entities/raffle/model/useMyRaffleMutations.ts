@@ -32,8 +32,13 @@ export const useMyRaffleMutations = () => {
   });
 
   const patchMyMutation = useMutation({
-    mutationFn: ({ raffleId, body }: { raffleId: string; body: Partial<CreateRaffleBody> }) =>
-      patchMyRaffle(raffleId, body),
+    mutationFn: ({
+      raffleId,
+      body,
+    }: {
+      raffleId: string;
+      body: Partial<CreateRaffleBody>;
+    }) => patchMyRaffle(raffleId, body),
     onSuccess: () => void invalidateMyRaffle(),
   });
 

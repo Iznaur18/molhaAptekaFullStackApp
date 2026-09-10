@@ -18,8 +18,13 @@ export const useMyProductMutations = () => {
   };
 
   const patchMutation = useMutation({
-    mutationFn: ({ productId, body }: { productId: string; body: PatchMyProductBody }) =>
-      patchMyProduct(productId, body),
+    mutationFn: ({
+      productId,
+      body,
+    }: {
+      productId: string;
+      body: PatchMyProductBody;
+    }) => patchMyProduct(productId, body),
     onSuccess: (_product, variables) => invalidateProducts(variables.productId),
   });
 

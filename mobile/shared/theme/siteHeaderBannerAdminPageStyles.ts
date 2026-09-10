@@ -4,8 +4,6 @@ import { PROFILE_ACCOUNT_STACK_PAGE_LAYOUT as L } from "@/shared/lib/guestProfil
 import { SCREEN_CONTENT_PADDING_HORIZONTAL } from "@/shared/theme/screenContentLayout";
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-
-
 export const useSiteHeaderBannerAdminPageStyles = createThemedStyles((theme) => ({
   container: {
     flex: 1,

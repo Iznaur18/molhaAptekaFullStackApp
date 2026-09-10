@@ -80,14 +80,12 @@ export function UserStoriesStrip({
             className="user-stories-strip__item user-stories-strip__item_add"
             onClick={handleAddClick}
           >
-              <span className="user-stories-strip__ring user-stories-strip__ring_add">
-                <span className="user-stories-strip__plus" aria-hidden>
-                  +
-                </span>
+            <span className="user-stories-strip__ring user-stories-strip__ring_add">
+              <span className="user-stories-strip__plus" aria-hidden>
+                +
               </span>
-              <span className="user-stories-strip__label">
-              {USER_STORY_UI.ADD_LABEL}
             </span>
+            <span className="user-stories-strip__label">{USER_STORY_UI.ADD_LABEL}</span>
           </button>
 
           {sortedRings.map((ring) => {

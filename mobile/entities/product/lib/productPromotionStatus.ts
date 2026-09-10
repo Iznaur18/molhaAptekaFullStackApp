@@ -2,7 +2,9 @@ type PromotionProduct = {
   catalogPromotionExpiresAt?: string | null;
 };
 
-export const isCatalogPromotionActive = (product: PromotionProduct | null | undefined): boolean => {
+export const isCatalogPromotionActive = (
+  product: PromotionProduct | null | undefined,
+): boolean => {
   const raw = product?.catalogPromotionExpiresAt;
   if (!raw) {
     return false;
@@ -12,7 +14,9 @@ export const isCatalogPromotionActive = (product: PromotionProduct | null | unde
 
 const PROMOTION_DATE_LOCALE = "ru-RU";
 
-export const formatPromotionExpiresAt = (expiresAt: string | null | undefined): string => {
+export const formatPromotionExpiresAt = (
+  expiresAt: string | null | undefined,
+): string => {
   if (!expiresAt) {
     return "";
   }

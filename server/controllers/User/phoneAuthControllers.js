@@ -106,7 +106,10 @@ export const registerPhoneUserController = async (req, res) => {
     });
   } catch (registrationError) {
     const message = mapSmsDeliveryError(registrationError);
-    if (isSmsDeliveryFailure(message) || isSmsDeliveryFailure(String(registrationError?.message ?? ""))) {
+    if (
+      isSmsDeliveryFailure(message) ||
+      isSmsDeliveryFailure(String(registrationError?.message ?? ""))
+    ) {
       return errorRes(res, 503, message);
     }
     return errorRes(res, 400, message || "Не удалось начать регистрацию");
@@ -185,7 +188,10 @@ export const loginPhoneOtpRequestController = async (req, res) => {
     await requestPhoneLoginOtp(phoneNumber);
   } catch (error) {
     const message = mapSmsDeliveryError(error);
-    if (isSmsDeliveryFailure(message) || isSmsDeliveryFailure(String(error?.message ?? ""))) {
+    if (
+      isSmsDeliveryFailure(message) ||
+      isSmsDeliveryFailure(String(error?.message ?? ""))
+    ) {
       return errorRes(res, 503, message);
     }
     return errorRes(res, 400, message);
@@ -242,7 +248,10 @@ export const phoneBindRequestController = async (req, res) => {
     });
   } catch (error) {
     const message = mapSmsDeliveryError(error);
-    if (isSmsDeliveryFailure(message) || isSmsDeliveryFailure(String(error?.message ?? ""))) {
+    if (
+      isSmsDeliveryFailure(message) ||
+      isSmsDeliveryFailure(String(error?.message ?? ""))
+    ) {
       return errorRes(res, 503, message);
     }
     return errorRes(res, 400, message);

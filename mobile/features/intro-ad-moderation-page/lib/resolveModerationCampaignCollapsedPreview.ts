@@ -1,5 +1,8 @@
 import { resolveIntroAdAdvertiserName } from "@/entities/intro-ad/lib/resolveIntroAdAdvertiserName";
-import { campaignModerationIsStale, campaignModerationNeedsAttention } from "@/shared/lib/campaignModerationAttention";
+import {
+  campaignModerationIsStale,
+  campaignModerationNeedsAttention,
+} from "@/shared/lib/campaignModerationAttention";
 import { INTRO_AD_MODERATION_PAGE_UI } from "@/shared/config";
 
 export function resolveModerationCampaignCollapsedPreview(

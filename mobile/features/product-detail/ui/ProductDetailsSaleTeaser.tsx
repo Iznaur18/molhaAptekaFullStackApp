@@ -32,7 +32,10 @@ export const ProductDetailsSaleTeaser = ({
       subtitle={PRODUCT_SALE_UI.DETAILS_TEASER_REMAINING(remainingCount)}
       ariaLabel={PRODUCT_SALE_UI.DETAILS_TEASER_ARIA}
       onPress={() => {
-        router.push({ pathname: "/seller/[userId]", params: { userId: trimmedSellerId } });
+        router.push({
+          pathname: "/seller/[userId]",
+          params: { userId: trimmedSellerId },
+        });
       }}
     />
   );

@@ -1,6 +1,4 @@
-import {
-  resolveMobileBottomNavOverlayContentInset,
-} from "@/shared/lib/mobileBottomNavLayout";
+import { resolveMobileBottomNavOverlayContentInset } from "@/shared/lib/mobileBottomNavLayout";
 import { resolveIsTabletScreen } from "@/shared/lib/screenBreakpoints";
 
 /** Базовый горизонтальный inset контента — паритет с web `app-shell` mobile (1rem). */
@@ -46,8 +44,4 @@ type ScreenSafeAreaInsets = {
 export const resolveScreenContentPaddingHorizontal = (
   insets: ScreenSafeAreaInsets = {},
 ): number =>
-  Math.max(
-    SCREEN_CONTENT_PADDING_HORIZONTAL,
-    insets.left ?? 0,
-    insets.right ?? 0,
-  );
+  Math.max(SCREEN_CONTENT_PADDING_HORIZONTAL, insets.left ?? 0, insets.right ?? 0);

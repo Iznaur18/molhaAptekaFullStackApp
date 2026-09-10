@@ -82,7 +82,9 @@ export const usePopularProductsAdminPage = () => {
       await invalidateCuratedProductLists(queryClient);
     } catch (error) {
       setActionError(
-        error instanceof Error ? error.message : POPULAR_PRODUCTS_ADMIN_PAGE_UI.LOAD_ERROR,
+        error instanceof Error
+          ? error.message
+          : POPULAR_PRODUCTS_ADMIN_PAGE_UI.LOAD_ERROR,
       );
     }
   }, [queryClient, refetchLists]);
@@ -111,7 +113,9 @@ export const usePopularProductsAdminPage = () => {
       await invalidateCuratedProductLists(queryClient);
     } catch (error) {
       setActionError(
-        error instanceof Error ? error.message : POPULAR_PRODUCTS_ADMIN_PAGE_UI.CREATE_ERROR,
+        error instanceof Error
+          ? error.message
+          : POPULAR_PRODUCTS_ADMIN_PAGE_UI.CREATE_ERROR,
       );
     }
   }, [createMutation, newRegionCode, newTitle, queryClient, updateListsCache]);
@@ -140,7 +144,9 @@ export const usePopularProductsAdminPage = () => {
         await invalidateCuratedProductLists(queryClient);
       } catch (error) {
         setActionError(
-          error instanceof Error ? error.message : POPULAR_PRODUCTS_ADMIN_PAGE_UI.REORDER_ERROR,
+          error instanceof Error
+            ? error.message
+            : POPULAR_PRODUCTS_ADMIN_PAGE_UI.REORDER_ERROR,
         );
       } finally {
         setPendingListId(null);
@@ -159,7 +165,9 @@ export const usePopularProductsAdminPage = () => {
         await invalidateCuratedProductLists(queryClient);
       } catch (error) {
         setActionError(
-          error instanceof Error ? error.message : POPULAR_PRODUCTS_ADMIN_PAGE_UI.DELETE_ERROR,
+          error instanceof Error
+            ? error.message
+            : POPULAR_PRODUCTS_ADMIN_PAGE_UI.DELETE_ERROR,
         );
       } finally {
         setPendingListId(null);
@@ -179,7 +187,9 @@ export const usePopularProductsAdminPage = () => {
             regionCode: payload.regionCode,
           },
         });
-        updateListsCache((rows) => rows.map((list) => (list._id === listId ? updated : list)));
+        updateListsCache((rows) =>
+          rows.map((list) => (list._id === listId ? updated : list)),
+        );
         await invalidateCuratedProductLists(queryClient);
       } finally {
         setPendingListId(null);
@@ -193,7 +203,9 @@ export const usePopularProductsAdminPage = () => {
       setPendingListId(listId);
       try {
         const updated = await addItemMutation.mutateAsync({ listId, productId });
-        updateListsCache((rows) => rows.map((list) => (list._id === listId ? updated : list)));
+        updateListsCache((rows) =>
+          rows.map((list) => (list._id === listId ? updated : list)),
+        );
         await invalidateCuratedProductLists(queryClient);
       } finally {
         setPendingListId(null);
@@ -207,7 +219,9 @@ export const usePopularProductsAdminPage = () => {
       setPendingListId(listId);
       try {
         const updated = await removeItemMutation.mutateAsync({ listId, productId });
-        updateListsCache((rows) => rows.map((list) => (list._id === listId ? updated : list)));
+        updateListsCache((rows) =>
+          rows.map((list) => (list._id === listId ? updated : list)),
+        );
         await invalidateCuratedProductLists(queryClient);
       } finally {
         setPendingListId(null);

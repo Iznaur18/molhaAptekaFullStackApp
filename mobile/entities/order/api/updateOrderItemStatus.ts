@@ -37,7 +37,9 @@ export const markOrderItemCancelled = async (orderId: string, itemIndex: number)
 
 export const markOrderItemShipped = async (orderId: string, itemIndex: number) => {
   try {
-    const { data } = await apiClient.patch(`/order/${orderId}/items/${itemIndex}/shipped`);
+    const { data } = await apiClient.patch(
+      `/order/${orderId}/items/${itemIndex}/shipped`,
+    );
     return parseUpdateOrderItemData(data);
   } catch (error) {
     throw new Error(formatApiErrorMessage(error, FALLBACK));

@@ -295,10 +295,7 @@ export async function postProduct({
   // Служба без ключей ничего не умеет, а выключенную админом предлагать
   // нельзя: и то и другое обернулось бы заказом, который молча зависнет на
   // «Готов к отгрузке».
-  if (
-    productDeliveryCarrier === PRODUCT_DELIVERY_CARRIER_LOBO &&
-    !isLoboConfigured()
-  ) {
+  if (productDeliveryCarrier === PRODUCT_DELIVERY_CARRIER_LOBO && !isLoboConfigured()) {
     throw new AppError(503, LOBO_NOT_CONFIGURED_MESSAGE);
   }
   if (productDeliveryCarrier && !(await isCarrierAvailable(productDeliveryCarrier))) {
@@ -316,7 +313,9 @@ export async function postProduct({
   const productArticleRaw =
     productArticleOverride ??
     (typeof body?.productArticle === "string" ? body.productArticle : "");
-  const productArticle = String(productArticleRaw ?? "").trim().slice(0, 64);
+  const productArticle = String(productArticleRaw ?? "")
+    .trim()
+    .slice(0, 64);
 
   const product = await ProductModel.create({
     productName,

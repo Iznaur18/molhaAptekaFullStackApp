@@ -253,7 +253,8 @@ export const ADMIN_ANALYTICS_PAGE_UI = {
   METRIC_GMV: "GMV ₽",
   METRIC_VIEWS: "Просмотры",
   INTEGRITY_TITLE: "Integrity",
-  INTEGRITY_EMPTY: "Сверка ещё не запускалась. Нажмите «Сверить integrity» или дождитесь nightly job.",
+  INTEGRITY_EMPTY:
+    "Сверка ещё не запускалась. Нажмите «Сверить integrity» или дождитесь nightly job.",
   INTEGRITY_OK: "Integrity OK",
   INTEGRITY_BAD: "Integrity: есть расхождения",
   /** @param {{ ranAt?: string|null; soldQuantityMismatches?: number; uniqueViewerCountMismatches?: number; productsChecked?: number }} r */
@@ -348,8 +349,7 @@ export const CATEGORY_TREE_ADMIN_PAGE_UI = {
   /** @param {string} path */
   PARENT_LEAF_OPTION: (path) => `${path} — сейчас лист, товары переедут в новую`,
   /** @param {number} count */
-  MOVED_PRODUCTS: (count) =>
-    `Категория создана. Товаров переехало в неё: ${count}`,
+  MOVED_PRODUCTS: (count) => `Категория создана. Товаров переехало в неё: ${count}`,
   LOADING: "Загрузка…",
   LOAD_ERROR: "Не удалось загрузить категории",
   SAVE_ERROR: "Не удалось сохранить",

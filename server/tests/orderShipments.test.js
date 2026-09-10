@@ -15,9 +15,8 @@ const {
 
 const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollections } =
   await import("./helpers/mongoTestDb.js");
-const { up: shipmentsMigrationUp } = await import(
-  "../scripts/migrations/20260831-order-shipments.js"
-);
+const { up: shipmentsMigrationUp } =
+  await import("../scripts/migrations/20260831-order-shipments.js");
 /**
  * Импорт нужен ради регистрации коллекции: `clearMongoCollections` чистит
  * только то, о чём знает mongoose, а вставляем мы сырым драйвером.
@@ -80,7 +79,10 @@ describe("способ получения отправления", () => {
   });
 
   it("неизвестное значение считает самовывозом", () => {
-    assert.equal(resolveShipmentFulfillment({ fulfillmentMethod: "wat" }, SELLER_A), "pickup");
+    assert.equal(
+      resolveShipmentFulfillment({ fulfillmentMethod: "wat" }, SELLER_A),
+      "pickup",
+    );
     assert.equal(resolveShipmentFulfillment({}, null), "pickup");
   });
 
@@ -230,7 +232,11 @@ describe("миграция orders.shipments", () => {
 
     const second = await up({ db: db(), isApply: true });
 
-    assert.equal(second.matched, 0, "заказ уже с отправлениями под миграцию не попадает");
+    assert.equal(
+      second.matched,
+      0,
+      "заказ уже с отправлениями под миграцию не попадает",
+    );
   });
 
   it("dry-run не пишет", async () => {

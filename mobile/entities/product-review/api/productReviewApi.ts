@@ -66,7 +66,10 @@ export const fetchProductReviewsPage = async (
   productId: string,
   page = 1,
   limit = 20,
-): Promise<{ reviews: ProductReview[]; pagination?: { page: number; totalPages: number } }> => {
+): Promise<{
+  reviews: ProductReview[];
+  pagination?: { page: number; totalPages: number };
+}> => {
   try {
     const { data } = await apiClient.get(`/product/${productId}/reviews`, {
       params: { page, limit },
@@ -79,6 +82,8 @@ export const fetchProductReviewsPage = async (
       pagination: data.data.pagination,
     };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_PRODUCT_REVIEWS_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_PRODUCT_REVIEWS_FALLBACK),
+    );
   }
 };

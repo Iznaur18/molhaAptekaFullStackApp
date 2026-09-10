@@ -1,9 +1,6 @@
 import { expect, test } from "vitest";
 
-import {
-  formatRubPriceInput,
-  parseRubPriceInput,
-} from "./numericInput.js";
+import { formatRubPriceInput, parseRubPriceInput } from "./numericInput.js";
 
 test("formatRubPriceInput groups thousands for create-product price fields", () => {
   expect(formatRubPriceInput("1000")).toBe("1\u00a0000");

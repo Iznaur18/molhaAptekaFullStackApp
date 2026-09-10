@@ -24,7 +24,8 @@ export const UserDetailsHeader = ({
   onFollowChange,
 }: UserDetailsHeaderProps) => {
   const styles = useUserDetailsPageStyles();
-  const displayName = String(user.userName ?? "").trim() || USER_LIST_ROW_UI.MISSING_NAME;
+  const displayName =
+    String(user.userName ?? "").trim() || USER_LIST_ROW_UI.MISSING_NAME;
 
   return (
     <View style={styles.header}>

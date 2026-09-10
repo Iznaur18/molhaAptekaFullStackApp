@@ -1,12 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-const { resolveOrderDeliveryGeo } = await import(
-  "../services/order/resolveOrderDeliveryGeo.js"
-);
-const { buildAddressQueryForClean, buildAddressQueryForSuggest } = await import(
-  "../utils/dadata/verifyRuDeliveryAddress.js"
-);
+const { resolveOrderDeliveryGeo } =
+  await import("../services/order/resolveOrderDeliveryGeo.js");
+const { buildAddressQueryForClean, buildAddressQueryForSuggest } =
+  await import("../utils/dadata/verifyRuDeliveryAddress.js");
 
 /** Грозный: склад продавца и настоящий адрес покупателя километрах в 11. */
 const VERIFIED = { lat: 43.4, lon: 45.7 };

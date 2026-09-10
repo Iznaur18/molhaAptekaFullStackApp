@@ -28,9 +28,7 @@ export const createProductReturnTermRow = (
   value,
 });
 
-export const mapProductReturnTermsToRows = (
-  terms: unknown,
-): ProductReturnTermRow[] => {
+export const mapProductReturnTermsToRows = (terms: unknown): ProductReturnTermRow[] => {
   if (!Array.isArray(terms)) {
     return [];
   }

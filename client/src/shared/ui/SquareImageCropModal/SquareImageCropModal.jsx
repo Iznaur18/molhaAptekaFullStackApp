@@ -162,7 +162,12 @@ export function SquareImageCropModal({ file, onConfirm, onCancel }) {
   const scale = coverScale * zoom;
 
   return createPortal(
-    <div className="square-image-crop-modal" role="dialog" aria-modal="true" aria-label={SQUARE_IMAGE_CROP_UI.TITLE}>
+    <div
+      className="square-image-crop-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label={SQUARE_IMAGE_CROP_UI.TITLE}
+    >
       <div className="square-image-crop-modal__backdrop" aria-hidden="true" />
       <div className="square-image-crop-modal__card">
         <h2 className="square-image-crop-modal__title">{SQUARE_IMAGE_CROP_UI.TITLE}</h2>
@@ -239,7 +244,9 @@ export function SquareImageCropModal({ file, onConfirm, onCancel }) {
             onClick={() => void handleConfirm()}
             disabled={isExporting || !imageSize.width}
           >
-            {isExporting ? SQUARE_IMAGE_CROP_UI.CONFIRM_LOADING : SQUARE_IMAGE_CROP_UI.CONFIRM}
+            {isExporting
+              ? SQUARE_IMAGE_CROP_UI.CONFIRM_LOADING
+              : SQUARE_IMAGE_CROP_UI.CONFIRM}
           </button>
         </div>
       </div>

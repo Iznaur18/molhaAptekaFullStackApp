@@ -137,9 +137,13 @@ export function CreateProductWizard({
   };
 
   const stepCopy = resolveCreateProductWizardStepCopy(wizard.stepId);
-  const showStepHeadline = !["basic", "originality", "pickup", "commerce", "returns"].includes(
-    wizard.stepId,
-  );
+  const showStepHeadline = ![
+    "basic",
+    "originality",
+    "pickup",
+    "commerce",
+    "returns",
+  ].includes(wizard.stepId);
 
   return (
     <ProductModalShell
@@ -258,7 +262,9 @@ export function CreateProductWizard({
               subtitle={stepCopy.subtitle}
             />
           ) : null}
-          {wizard.stepId === "basic" ? <CreateProductBasicSection {...sectionProps} /> : null}
+          {wizard.stepId === "basic" ? (
+            <CreateProductBasicSection {...sectionProps} />
+          ) : null}
           {wizard.stepId === "originality" ? (
             <CreateProductOriginalitySection {...sectionProps} />
           ) : null}
@@ -269,7 +275,9 @@ export function CreateProductWizard({
               isSubmitting={isSubmitting}
             />
           ) : null}
-          {wizard.stepId === "category" ? <CreateProductCategorySection {...sectionProps} /> : null}
+          {wizard.stepId === "category" ? (
+            <CreateProductCategorySection {...sectionProps} />
+          ) : null}
           {wizard.stepId === "pickup" ? (
             <CreateProductPickupSection
               form={form}
@@ -277,8 +285,12 @@ export function CreateProductWizard({
               isSubmitting={isSubmitting}
             />
           ) : null}
-          {wizard.stepId === "commerce" ? <CreateProductCommerceSection {...sectionProps} /> : null}
-          {wizard.stepId === "returns" ? <CreateProductReturnsSection {...sectionProps} /> : null}
+          {wizard.stepId === "commerce" ? (
+            <CreateProductCommerceSection {...sectionProps} />
+          ) : null}
+          {wizard.stepId === "returns" ? (
+            <CreateProductReturnsSection {...sectionProps} />
+          ) : null}
           {wizard.stepId === "review" ? (
             <CreateProductReviewSection
               form={form}

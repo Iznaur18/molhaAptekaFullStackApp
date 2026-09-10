@@ -18,10 +18,7 @@ export const ProductDetailsRentalTeaser = ({
   product,
   onPress,
 }: ProductDetailsRentalTeaserProps) => {
-  if (
-    product.productRentalEnabled !== true ||
-    !isProductRentalConfigured(product)
-  ) {
+  if (product.productRentalEnabled !== true || !isProductRentalConfigured(product)) {
     return null;
   }
 

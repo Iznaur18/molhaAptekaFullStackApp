@@ -7,15 +7,17 @@ import { test } from "node:test";
 const MOBILE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CLIENT_ROOT = join(MOBILE_ROOT, "..", "client");
 
-const readFile = (root, relativePath) =>
-  readFileSync(join(root, relativePath), "utf8");
+const readFile = (root, relativePath) => readFileSync(join(root, relativePath), "utf8");
 
 test("product details feature cards match web chrome and lucide icons", () => {
   const layout = readFile(
     MOBILE_ROOT,
     "entities/product/lib/productDetailsFeatureCardLayout.ts",
   );
-  const card = readFile(MOBILE_ROOT, "entities/product/ui/ProductDetailsFeatureCard.tsx");
+  const card = readFile(
+    MOBILE_ROOT,
+    "entities/product/ui/ProductDetailsFeatureCard.tsx",
+  );
   const compare = readFile(
     MOBILE_ROOT,
     "features/product-detail/ui/ProductDetailsCompareTeaser.tsx",

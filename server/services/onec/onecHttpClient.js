@@ -15,7 +15,9 @@ import { AppError } from "../../errors/AppError.js";
  * @param {string} baseUrl
  */
 export function normalizeOneCBaseUrl(baseUrl) {
-  const trimmed = String(baseUrl ?? "").trim().replace(/\/+$/, "");
+  const trimmed = String(baseUrl ?? "")
+    .trim()
+    .replace(/\/+$/, "");
   if (!trimmed) {
     throw new AppError(400, "Укажите URL HTTP-сервиса 1С");
   }
@@ -103,10 +105,7 @@ async function oneCFetch({
         response,
         `1С ответила ${response.status}`,
       );
-      throw new AppError(
-        response.status >= 500 ? 502 : 400,
-        message,
-      );
+      throw new AppError(response.status >= 500 ? 502 : 400, message);
     }
 
     if (response.status === 204) {
@@ -130,8 +129,7 @@ async function oneCFetch({
     if (error?.name === "AbortError") {
       throw new AppError(504, "Таймаут ответа 1С");
     }
-    const message =
-      error instanceof Error ? error.message : "Ошибка соединения с 1С";
+    const message = error instanceof Error ? error.message : "Ошибка соединения с 1С";
     throw new AppError(502, message);
   } finally {
     clearTimeout(timer);
@@ -154,11 +152,7 @@ export async function testOneCConnection(creds) {
  * @param {unknown} raw
  */
 export function normalizeNomenclatureItems(raw) {
-  const list = Array.isArray(raw?.items)
-    ? raw.items
-    : Array.isArray(raw)
-      ? raw
-      : null;
+  const list = Array.isArray(raw?.items) ? raw.items : Array.isArray(raw) ? raw : null;
 
   if (!list) {
     throw new AppError(502, "1С: ожидался JSON { items: [...] }");
@@ -181,7 +175,9 @@ export function normalizeNomenclatureItems(raw) {
     const guid = String(row.guid ?? row.GUID ?? "").trim();
     if (!guid || guid.length > ONEC_GUID_MAX_LENGTH) continue;
 
-    const name = String(row.name ?? row.Name ?? "").trim().slice(0, ONEC_NAME_MAX_LENGTH);
+    const name = String(row.name ?? row.Name ?? "")
+      .trim()
+      .slice(0, ONEC_NAME_MAX_LENGTH);
     if (!name) continue;
 
     const price = Number(row.price ?? row.Price);

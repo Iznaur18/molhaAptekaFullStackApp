@@ -123,12 +123,18 @@ export function ChangePasswordControls({ disabled = false }) {
         />
       </label>
       {localError ? (
-        <p className="edit-profile-modal__feedback edit-profile-modal__feedback--error" role="alert">
+        <p
+          className="edit-profile-modal__feedback edit-profile-modal__feedback--error"
+          role="alert"
+        >
           {localError}
         </p>
       ) : null}
       {success ? (
-        <p className="edit-profile-modal__feedback edit-profile-modal__feedback--ok" role="status">
+        <p
+          className="edit-profile-modal__feedback edit-profile-modal__feedback--ok"
+          role="status"
+        >
           {success}
         </p>
       ) : null}

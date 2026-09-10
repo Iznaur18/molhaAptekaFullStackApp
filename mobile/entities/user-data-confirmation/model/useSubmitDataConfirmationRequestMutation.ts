@@ -10,7 +10,9 @@ export const useSubmitDataConfirmationRequestMutation = () => {
   return useMutation({
     mutationFn: submitDataConfirmationRequest,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: dataConfirmationQueryKeys.myStatus() });
+      await queryClient.invalidateQueries({
+        queryKey: dataConfirmationQueryKeys.myStatus(),
+      });
     },
   });
 };

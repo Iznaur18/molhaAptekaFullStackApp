@@ -89,8 +89,7 @@ export function InstallmentBuyerBlock({
   const qty = Math.max(1, Math.floor(Number(quantityRaw)) || 1);
   const baseTotalRub = (priceSummary?.productPriceRub ?? 0) * qty;
   const markupTotalRub = (priceSummary?.markupRub ?? 0) * qty;
-  const monthlyTotal =
-    selectedPlan != null ? selectedPlan.monthlyAmountRub * qty : 0;
+  const monthlyTotal = selectedPlan != null ? selectedPlan.monthlyAmountRub * qty : 0;
   const contractTotal =
     selectedPlan != null ? monthlyTotal * selectedPlan.monthsCount : 0;
 
@@ -98,10 +97,7 @@ export function InstallmentBuyerBlock({
     () => buildCheckoutPickupLocations([{ product }]),
     [product],
   );
-  const pickupAvailable = useMemo(
-    () => doProductsSupportPickup([product]),
-    [product],
-  );
+  const pickupAvailable = useMemo(() => doProductsSupportPickup([product]), [product]);
   const deliveryAvailable = useMemo(
     () => doProductsSupportSellerDelivery([product]),
     [product],
@@ -254,10 +250,7 @@ export function InstallmentBuyerBlock({
   const renderSubmitButton = (linkedToForm) => {
     if (isPurchaseBlocked) {
       return (
-        <BlockedPurchaseButton
-          label={blockedPurchaseLabel}
-          variant="installment"
-        />
+        <BlockedPurchaseButton label={blockedPurchaseLabel} variant="installment" />
       );
     }
 

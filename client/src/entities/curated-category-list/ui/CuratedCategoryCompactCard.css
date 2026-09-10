@@ -73,7 +73,8 @@
   white-space: nowrap;
 }
 
-.curated-category-compact-card__details--row .curated-category-compact-card__seller-name {
+.curated-category-compact-card__details--row
+  .curated-category-compact-card__seller-name {
   flex: 1 1 auto;
   min-width: 0;
 }

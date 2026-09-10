@@ -27,11 +27,13 @@ export function useCuratedCategoryListAdminMutations() {
   });
 
   const addItemMutation = useMutation({
-    mutationFn: ({ listId, kind, refId }) => addCuratedCategoryListItemAdmin(listId, kind, refId),
+    mutationFn: ({ listId, kind, refId }) =>
+      addCuratedCategoryListItemAdmin(listId, kind, refId),
   });
 
   const removeItemMutation = useMutation({
-    mutationFn: ({ listId, itemKey }) => removeCuratedCategoryListItemAdmin(listId, itemKey),
+    mutationFn: ({ listId, itemKey }) =>
+      removeCuratedCategoryListItemAdmin(listId, itemKey),
   });
 
   return {

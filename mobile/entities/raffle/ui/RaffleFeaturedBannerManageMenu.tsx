@@ -140,7 +140,11 @@ export const RaffleFeaturedBannerManageMenu = ({
   const toggle = (
     <Pressable
       ref={toggleRef}
-      style={[styles.toggle, menuOpen && styles.toggleOpen, busy && styles.toggleDisabled]}
+      style={[
+        styles.toggle,
+        menuOpen && styles.toggleOpen,
+        busy && styles.toggleDisabled,
+      ]}
       accessibilityRole="button"
       accessibilityLabel={RAFFLE_MANAGE_UI.GROUP_LABEL}
       accessibilityState={{ expanded: menuOpen, disabled: busy }}
@@ -190,8 +194,7 @@ export const RaffleFeaturedBannerManageMenu = ({
               styles.menu,
               {
                 top: menuAnchor.y + menuAnchor.height + MENU_GAP,
-                right:
-                  Dimensions.get("window").width - menuAnchor.x - menuAnchor.width,
+                right: Dimensions.get("window").width - menuAnchor.x - menuAnchor.width,
               },
             ]}
           >

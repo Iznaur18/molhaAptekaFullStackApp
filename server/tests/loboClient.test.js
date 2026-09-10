@@ -56,7 +56,13 @@ describe("клиент ЛОБО", () => {
     };
 
     await assert.rejects(
-      () => client.estimateLoboDelivery({ pickupLat: 43.3, pickupLon: 45.7, deliveryLat: 43.4, deliveryLon: 45.8 }),
+      () =>
+        client.estimateLoboDelivery({
+          pickupLat: 43.3,
+          pickupLon: 45.7,
+          deliveryLat: 43.4,
+          deliveryLon: 45.8,
+        }),
       /не настроена/i,
     );
     assert.equal(touched, false, "иначе шлём запрос без авторизации");
@@ -131,7 +137,9 @@ describe("клиент ЛОБО", () => {
   });
 
   it("наш номер заказа уходит в external_id и им же читается", async () => {
-    stubFetch({ body: { id: 77, external_id: "order-1:seller-1", status: "assigned" } });
+    stubFetch({
+      body: { id: 77, external_id: "order-1:seller-1", status: "assigned" },
+    });
 
     const order = await client.getLoboOrderByExternalId("order-1:seller-1");
 

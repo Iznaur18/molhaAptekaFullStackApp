@@ -13,13 +13,11 @@ import "./CuratedCategoryCompactCard.css";
  *   showDetails?: boolean;
  * }} props
  */
-export function CuratedCategoryCompactCard({
-  category,
-  onOpen,
-  showDetails = false,
-}) {
+export function CuratedCategoryCompactCard({ category, onOpen, showDetails = false }) {
   const [failed, setFailed] = useState(false);
-  const resolved = category.imageUrl ? resolveUploadedImageUrl(category.imageUrl) : null;
+  const resolved = category.imageUrl
+    ? resolveUploadedImageUrl(category.imageUrl)
+    : null;
   const imageUrl =
     failed || !resolved ? PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE : resolved;
 

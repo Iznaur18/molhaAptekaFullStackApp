@@ -44,12 +44,15 @@ export function AppShellRoot() {
   const navigate = useNavigate();
 
   const shell = useAppShellState(location, navigate);
-  const domain = useAppShellDomain(shell, flushRemoteCart, flushRemoteWishlist, location, navigate);
-
-  const appShellStateValue = useMemo(
-    () => ({ ...shell, ...domain }),
-    [shell, domain],
+  const domain = useAppShellDomain(
+    shell,
+    flushRemoteCart,
+    flushRemoteWishlist,
+    location,
+    navigate,
   );
+
+  const appShellStateValue = useMemo(() => ({ ...shell, ...domain }), [shell, domain]);
 
   return (
     <AppShellStateProvider value={appShellStateValue}>

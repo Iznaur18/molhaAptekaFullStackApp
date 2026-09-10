@@ -111,10 +111,7 @@ export async function setShippingCarrierEnabled({ carrierId, enabled, adminId })
   // Включать ненастроенную бессмысленно: заказы по ней зависнут, а админ
   // будет думать, что всё работает.
   if (enabled && !isCarrierConfigured(carrierId)) {
-    throw new AppError(
-      409,
-      "Служба не настроена: нет ключей API. Включать нечего",
-    );
+    throw new AppError(409, "Служба не настроена: нет ключей API. Включать нечего");
   }
 
   await ShippingCarrierSettingModel.updateOne(

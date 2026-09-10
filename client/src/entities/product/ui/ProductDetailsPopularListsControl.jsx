@@ -37,21 +37,16 @@ export function ProductDetailsPopularListsControl({
   );
 
   const listsQuery = useCuratedProductListsAdminQuery({ enabled: true });
-  const { addItemMutation, removeItemMutation } =
-    useCuratedProductListAdminMutations();
+  const { addItemMutation, removeItemMutation } = useCuratedProductListAdminMutations();
 
   const curatedLists = useMemo(
     () =>
-      sortCuratedListsForProductRegion(
-        listsQuery.data ?? [],
-        productRegionCode ?? "",
-      ),
+      sortCuratedListsForProductRegion(listsQuery.data ?? [], productRegionCode ?? ""),
     [listsQuery.data, productRegionCode],
   );
 
   const isInAnyPopularList = useMemo(
-    () =>
-      curatedLists.some((list) => curatedListContainsProductId(list, productId)),
+    () => curatedLists.some((list) => curatedListContainsProductId(list, productId)),
     [curatedLists, productId],
   );
 
@@ -276,10 +271,7 @@ function PopularListsBody({
                   : "product-details-popular-lists__row-action--add",
               ].join(" ")}
               disabled={
-                disabled ||
-                isPending ||
-                pendingListId != null ||
-                regionMismatch
+                disabled || isPending || pendingListId != null || regionMismatch
               }
               onClick={() => void onAction(list, isMember)}
             >

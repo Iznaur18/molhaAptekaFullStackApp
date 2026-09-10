@@ -169,7 +169,11 @@ export function RafflePrizeMedia({
       <img
         src={imageSrc}
         alt=""
-        className={["raffle-prize-media raffle-prize-media__image-fg", imageClassName, className]
+        className={[
+          "raffle-prize-media raffle-prize-media__image-fg",
+          imageClassName,
+          className,
+        ]
           .filter(Boolean)
           .join(" ")}
         loading="lazy"
@@ -179,4 +183,3 @@ export function RafflePrizeMedia({
     </div>
   );
 }
-

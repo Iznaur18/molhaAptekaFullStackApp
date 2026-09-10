@@ -251,7 +251,10 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
   const feedback = (
     <div className="register-modal__feedback" aria-live="polite">
       {status.kind === "error" ? (
-        <p className="register-modal__message register-modal__message_error" role="alert">
+        <p
+          className="register-modal__message register-modal__message_error"
+          role="alert"
+        >
           {status.message}
         </p>
       ) : status.kind === "success" && status.message ? (
@@ -310,7 +313,9 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
               onClick={() => void handleResend()}
               disabled={isLoading}
             >
-              {isLoading ? REGISTER_MODAL_UI.RESEND_LOADING : REGISTER_MODAL_UI.RESEND_BUTTON}
+              {isLoading
+                ? REGISTER_MODAL_UI.RESEND_LOADING
+                : REGISTER_MODAL_UI.RESEND_BUTTON}
             </button>
             <button
               type="button"
@@ -323,7 +328,11 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
           </div>
           <div className="register-modal__footer">
             {feedback}
-            <button type="submit" className="register-modal__submit" disabled={isLoading}>
+            <button
+              type="submit"
+              className="register-modal__submit"
+              disabled={isLoading}
+            >
               {isLoading
                 ? REGISTER_MODAL_UI.CONFIRM_LOADING
                 : isPhonePending
@@ -335,7 +344,11 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
       ) : (
         <form className="register-modal__body" onSubmit={handleSubmit} noValidate>
           <div className="register-modal__scroll">
-            <div className="register-modal__channel" role="group" aria-label="Способ регистрации">
+            <div
+              className="register-modal__channel"
+              role="group"
+              aria-label="Способ регистрации"
+            >
               <button
                 type="button"
                 className={
@@ -370,7 +383,9 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
                   invalidFields,
                 )}
               >
-                <FormFieldLabel required>{REGISTER_MODAL_UI.LABEL_EMAIL}</FormFieldLabel>
+                <FormFieldLabel required>
+                  {REGISTER_MODAL_UI.LABEL_EMAIL}
+                </FormFieldLabel>
                 <input
                   className={withInvalidFieldClass(
                     "register-modal__input",
@@ -394,7 +409,9 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
                   invalidFields,
                 )}
               >
-                <FormFieldLabel required>{REGISTER_MODAL_UI.LABEL_PHONE}</FormFieldLabel>
+                <FormFieldLabel required>
+                  {REGISTER_MODAL_UI.LABEL_PHONE}
+                </FormFieldLabel>
                 <input
                   className={withInvalidFieldClass(
                     "register-modal__input",
@@ -419,7 +436,9 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
                 invalidFields,
               )}
             >
-              <FormFieldLabel required>{REGISTER_MODAL_UI.LABEL_PASSWORD}</FormFieldLabel>
+              <FormFieldLabel required>
+                {REGISTER_MODAL_UI.LABEL_PASSWORD}
+              </FormFieldLabel>
               <PasswordInputField
                 className={withInvalidFieldClass(
                   "register-modal__input",
@@ -469,7 +488,9 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
                 invalidFields,
               )}
             >
-              <FormFieldLabel required>{REGISTER_MODAL_UI.LABEL_USERNAME}</FormFieldLabel>
+              <FormFieldLabel required>
+                {REGISTER_MODAL_UI.LABEL_USERNAME}
+              </FormFieldLabel>
               <input
                 className={withInvalidFieldClass(
                   "register-modal__input",
@@ -495,7 +516,11 @@ export function RegisterModal({ isOpen, onClose, onSuccess }) {
           </div>
           <div className="register-modal__footer">
             {feedback}
-            <button type="submit" className="register-modal__submit" disabled={isLoading}>
+            <button
+              type="submit"
+              className="register-modal__submit"
+              disabled={isLoading}
+            >
               {isLoading
                 ? REGISTER_MODAL_UI.SUBMIT_LOADING
                 : REGISTER_MODAL_UI.SUBMIT_IDLE}

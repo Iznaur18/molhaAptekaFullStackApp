@@ -56,7 +56,9 @@ export const UsersPageBody = ({
   const grid = useUsersGridLayout();
 
   const showPodium = !hasActiveFilters && !isSearchInputTooShort;
-  const monthlyLoyaltyQuery = useUsersMonthlyLoyaltyPointsQuery({ enabled: showPodium });
+  const monthlyLoyaltyQuery = useUsersMonthlyLoyaltyPointsQuery({
+    enabled: showPodium,
+  });
 
   const podiumEntries = useMemo(
     () => (showPodium ? rankUsersForPodium(users) : []),

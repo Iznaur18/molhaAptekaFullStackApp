@@ -98,7 +98,9 @@ export const ProductReturnTermsEditor = ({
             disabled={disabled}
             accessibilityLabel="Удалить условие возврата"
           >
-            <Text style={[styles.charRemoveText, { color: theme.colors.danger }]}>✕</Text>
+            <Text style={[styles.charRemoveText, { color: theme.colors.danger }]}>
+              ✕
+            </Text>
           </Pressable>
         </View>
       ))}
@@ -108,7 +110,9 @@ export const ProductReturnTermsEditor = ({
             styles.charAddButton,
             {
               borderColor: pressed ? theme.colors.action : theme.colors.actionBorder,
-              backgroundColor: pressed ? theme.colors.actionSoft : theme.colors.actionSurface,
+              backgroundColor: pressed
+                ? theme.colors.actionSoft
+                : theme.colors.actionSurface,
             },
           ]}
           onPress={addRow}

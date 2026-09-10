@@ -109,7 +109,9 @@ export function ProductPromoCodeActivateSheet({
       await queryClient.invalidateQueries({
         queryKey: productPromoCodeQueryKeys.appliedMine(),
       });
-      setSuccess(result.message || PRODUCT_PROMO_CODE_UI.APPLIED(result.discountPercent));
+      setSuccess(
+        result.message || PRODUCT_PROMO_CODE_UI.APPLIED(result.discountPercent),
+      );
       onActivated?.({
         code: result.code,
         discountPercent: result.discountPercent,
@@ -162,12 +164,11 @@ export function ProductPromoCodeActivateSheet({
           </button>
         </header>
         <div className="wholesale-price-modal__body">
-          <p className="wholesale-price-modal__hint">{PRODUCT_PROMO_CODE_UI.SHEET_LEAD}</p>
+          <p className="wholesale-price-modal__hint">
+            {PRODUCT_PROMO_CODE_UI.SHEET_LEAD}
+          </p>
           {applied ? (
-            <div
-              className="wholesale-price-modal__promo-applied"
-              role="status"
-            >
+            <div className="wholesale-price-modal__promo-applied" role="status">
               <span className="wholesale-price-modal__promo-applied-label">
                 {PRODUCT_PROMO_CODE_UI.APPLIED_LABEL}
               </span>
@@ -194,10 +195,7 @@ export function ProductPromoCodeActivateSheet({
             </p>
           ) : null}
           {success ? (
-            <div
-              className="wholesale-price-modal__promo-applied"
-              role="status"
-            >
+            <div className="wholesale-price-modal__promo-applied" role="status">
               {success}
             </div>
           ) : null}

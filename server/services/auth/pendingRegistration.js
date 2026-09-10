@@ -1,7 +1,4 @@
-import {
-  EMAIL_AUTH_DISABLED_MESSAGE,
-  isEmailAuthEnabled,
-} from "@izibuy/shared-lib";
+import { EMAIL_AUTH_DISABLED_MESSAGE, isEmailAuthEnabled } from "@izibuy/shared-lib";
 
 import { PendingRegistrationModel, UserModel } from "../../models/index.js";
 import {
@@ -355,9 +352,8 @@ export async function confirmPendingRegistration(registrationId, rawCode) {
   }
 
   try {
-    const { emitUserRegisteredEvent } = await import(
-      "../analytics-events/emitAnalyticsEvents.js"
-    );
+    const { emitUserRegisteredEvent } =
+      await import("../analytics-events/emitAnalyticsEvents.js");
     emitUserRegisteredEvent({
       userId: String(user._id),
       channel: isPhoneChannel ? "phone" : "email",

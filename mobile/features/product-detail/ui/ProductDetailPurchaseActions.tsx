@@ -70,7 +70,10 @@ export const ProductDetailPurchaseActions = ({
     return (
       <View style={variant === "dock" ? styles.dockRoot : styles.inlineRoot}>
         <View style={variant === "dock" ? styles.cartSlot : undefined}>
-          <BlockedPurchaseButton label={sellerClosedPurchaseLabel} variant={buttonVariant} />
+          <BlockedPurchaseButton
+            label={sellerClosedPurchaseLabel}
+            variant={buttonVariant}
+          />
         </View>
       </View>
     );
@@ -79,7 +82,11 @@ export const ProductDetailPurchaseActions = ({
   return (
     <View style={variant === "dock" ? styles.dockRoot : styles.inlineRoot}>
       <View style={variant === "dock" ? styles.cartSlot : undefined}>
-        <AddToCartButton productId={productId} product={product} variant={buttonVariant} />
+        <AddToCartButton
+          productId={productId}
+          product={product}
+          variant={buttonVariant}
+        />
       </View>
     </View>
   );

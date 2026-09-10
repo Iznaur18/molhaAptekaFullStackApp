@@ -116,7 +116,12 @@ export const ProfileMobileNavSheet = ({
   const isFromLeft = side === "left";
 
   return (
-    <Modal visible={modalVisible} animationType="none" transparent onRequestClose={onClose}>
+    <Modal
+      visible={modalVisible}
+      animationType="none"
+      transparent
+      onRequestClose={onClose}
+    >
       <Animated.View
         style={[
           styles.backdrop,

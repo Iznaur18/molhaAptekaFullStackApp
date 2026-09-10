@@ -166,7 +166,9 @@ export const ProductCatalogStatusBadges = ({
         style={variantStyle.badge}
         accessibilityRole="text"
         accessibilityLabel={
-          badge.variant === "placeholder" ? PRODUCT_CARD_UI.NO_STATUS_BADGE : badge.label
+          badge.variant === "placeholder"
+            ? PRODUCT_CARD_UI.NO_STATUS_BADGE
+            : badge.label
         }
       >
         <AppText style={variantStyle.text}>{badge.label}</AppText>
@@ -176,7 +178,10 @@ export const ProductCatalogStatusBadges = ({
 
   if (!scrollable) {
     return (
-      <View style={scrollStyles.content} accessibilityLabel={PRODUCT_CARD_UI.STATUS_BADGES_ARIA}>
+      <View
+        style={scrollStyles.content}
+        accessibilityLabel={PRODUCT_CARD_UI.STATUS_BADGES_ARIA}
+      >
         {badgeNodes}
       </View>
     );

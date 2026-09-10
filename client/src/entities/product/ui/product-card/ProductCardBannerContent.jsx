@@ -14,7 +14,10 @@ export function ProductCardBannerContent({ vm, renderSellerValue, statusSlot }) 
       <p className="product-card__banner-tier-badge" role="status">
         {PRODUCT_CARD_UI.PROMOTION_BANNER_BADGE}
       </p>
-      <h2 id={vm.headingId} className="product-card__heading product-card__heading--banner">
+      <h2
+        id={vm.headingId}
+        className="product-card__heading product-card__heading--banner"
+      >
         {vm.heading}
       </h2>
       <div className="product-card__banner-price-row">
@@ -24,10 +27,7 @@ export function ProductCardBannerContent({ vm, renderSellerValue, statusSlot }) 
           showLabel={false}
         />
         {vm.showDiscountBadge ? (
-          <ProductDiscountBadge
-            discountPercent={vm.discountPercent}
-            variant="banner"
-          />
+          <ProductDiscountBadge discountPercent={vm.discountPercent} variant="banner" />
         ) : null}
       </div>
       {!vm.isModerationQueue ? (

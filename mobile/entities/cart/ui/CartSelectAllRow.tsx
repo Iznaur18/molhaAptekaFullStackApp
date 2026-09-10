@@ -24,7 +24,9 @@ export const CartSelectAllRow = ({
 
   return (
     <View style={styles.row}>
-      <Text style={styles.count}>{CART_PAGE_UI.SELECTED_COUNT(selectedCount, totalCount)}</Text>
+      <Text style={styles.count}>
+        {CART_PAGE_UI.SELECTED_COUNT(selectedCount, totalCount)}
+      </Text>
 
       <Pressable
         style={styles.toggle}

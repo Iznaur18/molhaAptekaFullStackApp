@@ -163,7 +163,10 @@ export const ProductFlashSaleCountdown = ({
             <FlashSaleIconBorder progress={borderProgress} color={accentColor} />
           ) : (
             <View
-              style={[styles.iconStaticBorder, { borderColor: styles.tokens.borderTrack }]}
+              style={[
+                styles.iconStaticBorder,
+                { borderColor: styles.tokens.borderTrack },
+              ]}
               pointerEvents="none"
             />
           )}

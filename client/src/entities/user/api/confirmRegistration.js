@@ -1,6 +1,9 @@
 import { apiClient } from "../../../shared/api/index.js";
 import { resetAuthSessionState } from "../../../shared/api/apiClient.js";
-import { API_CLIENT_UI, EMAIL_VERIFICATION_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  API_CLIENT_UI,
+  EMAIL_VERIFICATION_UI,
+} from "../../../shared/config/appUiCopy.js";
 import { formatApiErrorMessage } from "@izibuy/shared-lib";
 
 /**

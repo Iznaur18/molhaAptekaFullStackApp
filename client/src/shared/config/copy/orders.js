@@ -63,12 +63,10 @@ export const ORDER_CARD_UI = {
   AWAITING_COURIER: "Ищем курьера",
   AWAITING_COURIER_BUYER_HINT:
     "Ищем курьера. Можно поднять оплату за доставку — так заказ быстрее возьмут.",
-  AWAITING_COURIER_SELLER_HINT:
-    "Ждём, пока курьер примет заказ в «Свободные заказы».",
+  AWAITING_COURIER_SELLER_HINT: "Ждём, пока курьер примет заказ в «Свободные заказы».",
   PAY_NOW: "Оплатить",
   PAY_NOW_PENDING: "Открываем оплату…",
-  SHIPMENT_PAY_TO_HINT:
-    "Курьер отдаст заказ, когда продавец подтвердит перевод.",
+  SHIPMENT_PAY_TO_HINT: "Курьер отдаст заказ, когда продавец подтвердит перевод.",
   SHIPMENT_PAYMENT_RECEIVED_BY_SELLER: "Продавец подтвердил, что перевод дошёл",
   SHIPMENT_PAYMENT_RECEIVED_HINT: "Больше переводить ничего не нужно.",
   /** @param {string} fee */
@@ -102,7 +100,8 @@ export const ORDER_CARD_UI = {
   ITEM_CANCELLED_BADGE: "Отмена",
   DELETED_PRODUCT_NAME: "Товар удалён",
   /** @param {number} points */
-  LOYALTY_POINTS_LINE: (points) => `+${points} баллов за шт. (подтверждённому покупателю)`,
+  LOYALTY_POINTS_LINE: (points) =>
+    `+${points} баллов за шт. (подтверждённому покупателю)`,
   AFFILIATE_LINE_ARIA: "Партнёрская атрибуция",
 };
 

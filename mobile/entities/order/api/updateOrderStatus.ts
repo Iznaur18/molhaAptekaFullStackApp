@@ -12,6 +12,8 @@ export const updateOrderStatus = async (orderId: string, status: string) => {
     }
     return data.data.order as AdminOrder;
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK),
+    );
   }
 };

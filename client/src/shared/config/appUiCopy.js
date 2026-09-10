@@ -112,14 +112,8 @@ export {
   PRODUCT_FULFILLMENT_SOURCE_UI,
 } from "./copy/seller-commerce-defaults.js";
 export { PROMO_RETURN_STREAK_DOCK_UI } from "./copy/promo-return-streak.js";
-export {
-  AUCTION_PAGE_UI,
-} from "./copy/auction.js";
-export {
-  AUTH_UI,
-  LOGIN_MODAL_UI,
-  REGISTER_MODAL_UI,
-} from "./copy/auth.js";
+export { AUCTION_PAGE_UI } from "./copy/auction.js";
+export { AUTH_UI, LOGIN_MODAL_UI, REGISTER_MODAL_UI } from "./copy/auth.js";
 export {
   MY_PROFILE_PAGE_UI,
   THEME_SETTINGS_UI,
@@ -165,9 +159,7 @@ export {
   RAFFLE_PRODUCTS_PAGE_UI,
   RAFFLE_ADVERTISING_PAGE_UI,
 } from "./copy/raffle.js";
-export {
-  INSTALLMENT_UI,
-} from "./copy/installment.js";
+export { INSTALLMENT_UI } from "./copy/installment.js";
 export {
   DATA_CONFIRMATION_PAGE_UI,
   USER_DATA_CONFIRMATION_PROFILE_PAGE_UI,
@@ -205,7 +197,4 @@ export {
   PRODUCT_BADGE_EXPLAIN_ADMIN_PAGE_UI,
   PRODUCT_BADGE_EXPLAIN_ADMIN_UI,
 } from "./copy/admin.js";
-export {
-  FAQ_UI,
-  LEGAL_UI,
-} from "./copy/faq-legal.js";
+export { FAQ_UI, LEGAL_UI } from "./copy/faq-legal.js";

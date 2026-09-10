@@ -42,7 +42,8 @@ export const RafflesStaffPage = () => {
   const { isAdmin } = useUserAccess();
   const queryClient = useQueryClient();
   const queueQuery = useStaffRafflesQueueQuery();
-  const { approveMutation, rejectMutation, deleteStaffMutation } = useRaffleStaffMutations();
+  const { approveMutation, rejectMutation, deleteStaffMutation } =
+    useRaffleStaffMutations();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [activeTabId, setActiveTabId] = useState(TAB_MODERATION);
   const [pendingId, setPendingId] = useState<string | null>(null);
@@ -55,7 +56,10 @@ export const RafflesStaffPage = () => {
       isAdmin
         ? [
             { id: TAB_MODERATION, label: USERS_LOYALTY_RAFFLE_ADMIN_UI.TAB_MODERATION },
-            { id: TAB_USERS_RAFFLE, label: USERS_LOYALTY_RAFFLE_ADMIN_UI.TAB_USERS_RAFFLE },
+            {
+              id: TAB_USERS_RAFFLE,
+              label: USERS_LOYALTY_RAFFLE_ADMIN_UI.TAB_USERS_RAFFLE,
+            },
           ]
         : [{ id: TAB_MODERATION, label: USERS_LOYALTY_RAFFLE_ADMIN_UI.TAB_MODERATION }],
     [isAdmin],
@@ -80,15 +84,20 @@ export const RafflesStaffPage = () => {
 
   const removePendingRow = useCallback(
     (raffleId: string) => {
-      queryClient.setQueryData(raffleQueryKeys.staffQueue(), (old: StaffRafflesQueueData | undefined) => {
-        if (!old) {
-          return old;
-        }
-        return {
-          ...old,
-          pendingRaffles: old.pendingRaffles.filter((row) => String(row._id) !== raffleId),
-        };
-      });
+      queryClient.setQueryData(
+        raffleQueryKeys.staffQueue(),
+        (old: StaffRafflesQueueData | undefined) => {
+          if (!old) {
+            return old;
+          }
+          return {
+            ...old,
+            pendingRaffles: old.pendingRaffles.filter(
+              (row) => String(row._id) !== raffleId,
+            ),
+          };
+        },
+      );
       setRowErrors((prev) => {
         const next = { ...prev };
         delete next[raffleId];
@@ -104,7 +113,9 @@ export const RafflesStaffPage = () => {
       queryClient.invalidateQueries({
         queryKey: [...raffleQueryKeys.all, "featured"],
       }),
-      queryClient.invalidateQueries({ queryKey: [...staffBadgeQueryKeys.all, "raffles"] }),
+      queryClient.invalidateQueries({
+        queryKey: [...staffBadgeQueryKeys.all, "raffles"],
+      }),
     ]);
   }, [queryClient]);
 
@@ -149,7 +160,10 @@ export const RafflesStaffPage = () => {
     ]);
   };
 
-  const handleDelete = (raffleId: string, { clearLive = false }: { clearLive?: boolean } = {}) => {
+  const handleDelete = (
+    raffleId: string,
+    { clearLive = false }: { clearLive?: boolean } = {},
+  ) => {
     confirmDelete(() => {
       void (async () => {
         try {
@@ -164,7 +178,10 @@ export const RafflesStaffPage = () => {
         } catch (error) {
           setRowErrors((prev) => ({
             ...prev,
-            [raffleId]: formatApiErrorMessage(error, API_CLIENT_UI.DELETE_RAFFLE_FALLBACK),
+            [raffleId]: formatApiErrorMessage(
+              error,
+              API_CLIENT_UI.DELETE_RAFFLE_FALLBACK,
+            ),
           }));
         } finally {
           setPendingId(null);
@@ -265,13 +282,17 @@ export const RafflesStaffPage = () => {
           <>
             {liveRaffle ? (
               <View style={styles.liveSection}>
-                <Text style={styles.sectionTitle}>{RAFFLE_MANAGE_UI.LIVE_SECTION_TITLE}</Text>
+                <Text style={styles.sectionTitle}>
+                  {RAFFLE_MANAGE_UI.LIVE_SECTION_TITLE}
+                </Text>
                 <RafflesStaffLiveRow
                   raffle={liveRaffle}
                   busy={liveBusy}
                   errorMessage={rowErrors[String(liveRaffle._id)] ?? ""}
                   onEdit={() => setEditingRaffle(liveRaffle)}
-                  onDelete={() => handleDelete(String(liveRaffle._id), { clearLive: true })}
+                  onDelete={() =>
+                    handleDelete(String(liveRaffle._id), { clearLive: true })
+                  }
                 />
               </View>
             ) : null}

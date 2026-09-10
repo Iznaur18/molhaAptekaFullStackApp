@@ -34,12 +34,17 @@ export const HomeCuratedListsSectionSkeleton = () => {
     <SkeletonShimmer style={styles.listBlock}>
       <View style={skeletonStyles.curatedTitleLine} />
       <View style={[styles.row, { flexDirection: "row", overflow: "hidden" }]}>
-        {Array.from({ length: CURATED_PRODUCT_LIST_HOME_VISIBLE_CARD_MAX }, (_, index) => (
-          <View key={index} style={[cardStyles.card, { width: compactCardWidth }]}>
-            <View style={cardStyles.imageWrap} />
-            <View style={[cardStyles.priceWrap, skeletonStyles.curatedPricePlaceholder]} />
-          </View>
-        ))}
+        {Array.from(
+          { length: CURATED_PRODUCT_LIST_HOME_VISIBLE_CARD_MAX },
+          (_, index) => (
+            <View key={index} style={[cardStyles.card, { width: compactCardWidth }]}>
+              <View style={cardStyles.imageWrap} />
+              <View
+                style={[cardStyles.priceWrap, skeletonStyles.curatedPricePlaceholder]}
+              />
+            </View>
+          ),
+        )}
       </View>
     </SkeletonShimmer>
   );

@@ -28,11 +28,20 @@ const formatPaymentLabel = (paymentMethod?: string) => {
 type RowProps = {
   promotion: StaffProductPromotionRow;
   onChanged: () => void;
-  approveMutation: ReturnType<typeof useProductPromotionStaffMutations>["approveMutation"];
-  rejectMutation: ReturnType<typeof useProductPromotionStaffMutations>["rejectMutation"];
+  approveMutation: ReturnType<
+    typeof useProductPromotionStaffMutations
+  >["approveMutation"];
+  rejectMutation: ReturnType<
+    typeof useProductPromotionStaffMutations
+  >["rejectMutation"];
 };
 
-const PromotionRow = ({ promotion, onChanged, approveMutation, rejectMutation }: RowProps) => {
+const PromotionRow = ({
+  promotion,
+  onChanged,
+  approveMutation,
+  rejectMutation,
+}: RowProps) => {
   const styles = useStaffQueueStyles();
   const [errorMessage, setErrorMessage] = useState("");
   const promotionId = String(promotion._id);
@@ -45,7 +54,9 @@ const PromotionRow = ({ promotion, onChanged, approveMutation, rejectMutation }:
       onChanged();
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : PRODUCT_PROMOTIONS_STAFF_PAGE_UI.PENDING,
+        error instanceof Error
+          ? error.message
+          : PRODUCT_PROMOTIONS_STAFF_PAGE_UI.PENDING,
       );
     }
   };
@@ -57,7 +68,9 @@ const PromotionRow = ({ promotion, onChanged, approveMutation, rejectMutation }:
       onChanged();
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : PRODUCT_PROMOTIONS_STAFF_PAGE_UI.PENDING,
+        error instanceof Error
+          ? error.message
+          : PRODUCT_PROMOTIONS_STAFF_PAGE_UI.PENDING,
       );
     }
   };
@@ -79,7 +92,8 @@ const PromotionRow = ({ promotion, onChanged, approveMutation, rejectMutation }:
         </Text>
       ) : null}
       <Text style={styles.meta}>
-        {PRODUCT_PROMOTIONS_STAFF_PAGE_UI.ROW_PAYMENT}: {formatPaymentLabel(promotion.paymentMethod)}
+        {PRODUCT_PROMOTIONS_STAFF_PAGE_UI.ROW_PAYMENT}:{" "}
+        {formatPaymentLabel(promotion.paymentMethod)}
       </Text>
       <Text style={styles.meta}>Продавец: {promotion.seller?.userName ?? "—"}</Text>
       <StaffModerationActions
@@ -124,9 +138,14 @@ export const ProductPromotionsStaffPage = () => {
       keyExtractor={(item) => String(item._id)}
       contentContainerStyle={styles.list}
       refreshControl={
-        <ThemedRefreshControl refreshing={queueQuery.isFetching} onRefresh={() => void queueQuery.refetch()} />
+        <ThemedRefreshControl
+          refreshing={queueQuery.isFetching}
+          onRefresh={() => void queueQuery.refetch()}
+        />
       }
-      ListEmptyComponent={<Text style={styles.empty}>{PRODUCT_PROMOTIONS_STAFF_PAGE_UI.EMPTY}</Text>}
+      ListEmptyComponent={
+        <Text style={styles.empty}>{PRODUCT_PROMOTIONS_STAFF_PAGE_UI.EMPTY}</Text>
+      }
       renderItem={({ item }) => (
         <PromotionRow
           promotion={item}

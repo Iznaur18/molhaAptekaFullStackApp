@@ -50,13 +50,18 @@ export const ProductDetailMediaSection = ({
         <View style={styles.heroActions}>
           {!isOwnProduct ? (
             <Pressable
-              style={[styles.detailReportButton, reportDisabled && styles.detailReportButtonDisabled]}
+              style={[
+                styles.detailReportButton,
+                reportDisabled && styles.detailReportButtonDisabled,
+              ]}
               onPress={onReportPress}
               disabled={reportDisabled}
               hitSlop={10}
               accessibilityRole="button"
               accessibilityLabel={
-                reportDisabled ? PRODUCT_REPORT_UI.ALREADY_REPORTED : PRODUCT_REPORT_UI.REPORT_BUTTON
+                reportDisabled
+                  ? PRODUCT_REPORT_UI.ALREADY_REPORTED
+                  : PRODUCT_REPORT_UI.REPORT_BUTTON
               }
             >
               <MaterialIcons

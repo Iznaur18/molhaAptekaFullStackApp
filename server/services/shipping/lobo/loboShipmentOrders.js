@@ -91,7 +91,11 @@ export async function collectLoboOrderPayload({ order, sellerId }) {
   }
 
   const pickup = await resolvePickupPoint(order, sellerId);
-  if (!pickup?.address || !Number.isFinite(pickup.lat) || !Number.isFinite(pickup.lon)) {
+  if (
+    !pickup?.address ||
+    !Number.isFinite(pickup.lat) ||
+    !Number.isFinite(pickup.lon)
+  ) {
     return { ok: false, reason: "У точки отправления нет координат" };
   }
 
@@ -118,7 +122,10 @@ export async function collectLoboOrderPayload({ order, sellerId }) {
   // после того, как продавец нажал кнопку.
   const clientPhone = String(seller?.userPhoneNumber ?? "").trim();
   if (!clientPhone) {
-    return { ok: false, reason: "У продавца не указан телефон — служба без него заказ не примет" };
+    return {
+      ok: false,
+      reason: "У продавца не указан телефон — служба без него заказ не примет",
+    };
   }
 
   return {
@@ -234,7 +241,11 @@ export async function handOverShipmentToLobo({ orderId, sellerId }) {
     cost,
   });
 
-  return { ok: true, externalId: collected.payload.externalId, status: created?.status };
+  return {
+    ok: true,
+    externalId: collected.payload.externalId,
+    status: created?.status,
+  };
 }
 
 /**

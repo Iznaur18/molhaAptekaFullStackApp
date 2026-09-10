@@ -19,9 +19,12 @@ export const CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_BOTTOM = 0;
 export const CURATED_PRODUCT_LIST_HOME_SCROLL_PADDING_HORIZONTAL = 12;
 
 /** Синхронизировано с CuratedProductListCarousel.css clamp() */
-export const resolveCuratedCompactCardWidth = (scrollContainerWidth: number): number => {
+export const resolveCuratedCompactCardWidth = (
+  scrollContainerWidth: number,
+): number => {
   const gapTotal =
-    CURATED_PRODUCT_LIST_HOME_CARD_GAP * (CURATED_PRODUCT_LIST_HOME_VISIBLE_CARD_MAX - 1);
+    CURATED_PRODUCT_LIST_HOME_CARD_GAP *
+    (CURATED_PRODUCT_LIST_HOME_VISIBLE_CARD_MAX - 1);
   const fromVisible =
     (scrollContainerWidth - gapTotal) / CURATED_PRODUCT_LIST_HOME_VISIBLE_CARD_MAX;
 
@@ -30,4 +33,3 @@ export const resolveCuratedCompactCardWidth = (scrollContainerWidth: number): nu
     Math.max(CURATED_PRODUCT_LIST_HOME_CARD_MIN_WIDTH, fromVisible),
   );
 };
-

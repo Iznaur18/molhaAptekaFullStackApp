@@ -3,17 +3,16 @@ import { useRouter } from "expo-router";
 import { useUserPurchasesQuery } from "@/entities/user/model/useUserPurchasesQuery";
 import type { UserProfileThumbItem } from "@/entities/user/model/userProfileThumbTypes";
 import { UserProfileThumbSection } from "@/entities/user/ui/UserProfileThumbSection";
-import {
-  API_CLIENT_UI,
-  USER_PROFILE_PURCHASES_UI,
-} from "@/shared/config";
+import { API_CLIENT_UI, USER_PROFILE_PURCHASES_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
 type UserProfilePurchasesListProps = {
   targetUserId: string;
 };
 
-export const UserProfilePurchasesList = ({ targetUserId }: UserProfilePurchasesListProps) => {
+export const UserProfilePurchasesList = ({
+  targetUserId,
+}: UserProfilePurchasesListProps) => {
   const router = useRouter();
   const purchasesQuery = useUserPurchasesQuery({ userId: targetUserId });
 
@@ -32,7 +31,10 @@ export const UserProfilePurchasesList = ({ targetUserId }: UserProfilePurchasesL
     if (!item.product?._id) {
       return;
     }
-    router.push({ pathname: "/product/[id]", params: { id: String(item.product._id) } });
+    router.push({
+      pathname: "/product/[id]",
+      params: { id: String(item.product._id) },
+    });
   };
 
   return (

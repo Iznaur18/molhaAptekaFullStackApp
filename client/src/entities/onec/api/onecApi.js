@@ -24,9 +24,7 @@ function unwrapApiData(payload) {
  */
 function rethrowApiError(error) {
   const message =
-    error?.response?.data?.message ??
-    error?.message ??
-    "Ошибка запроса к 1С API";
+    error?.response?.data?.message ?? error?.message ?? "Ошибка запроса к 1С API";
   throw new Error(message);
 }
 

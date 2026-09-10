@@ -1,4 +1,8 @@
-import { STAFF_SECTION_IDS, isStaffSectionAllowed, isStaffSectionId } from "@izibuy/shared-lib";
+import {
+  STAFF_SECTION_IDS,
+  isStaffSectionAllowed,
+  isStaffSectionId,
+} from "@izibuy/shared-lib";
 
 export const STAFF_STANDALONE_MAIN_VIEWS = STAFF_SECTION_IDS;
 export const STAFF_STANDALONE_MAIN_VIEW_SET = new Set(STAFF_STANDALONE_MAIN_VIEWS);
@@ -20,8 +24,10 @@ export function getStaffMainViewAccess(view) {
   }
 
   return {
-    requireAdmin: isStaffSectionAllowed(view, { isAdmin: false, canModerate: true }) === false,
-    requireModerator: isStaffSectionAllowed(view, { isAdmin: true, canModerate: false }) === false,
+    requireAdmin:
+      isStaffSectionAllowed(view, { isAdmin: false, canModerate: true }) === false,
+    requireModerator:
+      isStaffSectionAllowed(view, { isAdmin: true, canModerate: false }) === false,
   };
 }
 

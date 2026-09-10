@@ -15,7 +15,10 @@ test("пустые строки характеристик не ошибка, п
   // Заготовка, добавленная кнопкой и не заполненная, шаг не блокирует.
   assert.equal(validateProductCharacteristicsRows([{ key: "", value: "" }]), null);
   assert.equal(validateProductCharacteristicsRows([{ key: " ", value: "  " }]), null);
-  assert.equal(validateProductCharacteristicsRows([{ key: "Цвет", value: "синий" }]), null);
+  assert.equal(
+    validateProductCharacteristicsRows([{ key: "Цвет", value: "синий" }]),
+    null,
+  );
 
   assert.match(
     validateProductCharacteristicsRows([{ key: "Цвет", value: "" }]),
@@ -47,7 +50,9 @@ test("длина ключа и значения ограничена контр�
     /Значение характеристики не длиннее/,
   );
 
-  const lib = readMobileFile("entities/product/lib/validateProductCharacteristicsRows.ts");
+  const lib = readMobileFile(
+    "entities/product/lib/validateProductCharacteristicsRows.ts",
+  );
   assert.ok(
     lib.includes("PRODUCT_CHARACTERISTIC_KEY_MAX_CHARS"),
     "лимиты обязаны браться из контракта, а не числом",
@@ -58,7 +63,9 @@ test("длина ключа и значения ограничена контр�
 test("шаг «О товаре» проверяет характеристики", () => {
   const source = readMobileFile("features/create-product/ui/CreateProductScreen.tsx");
   assert.ok(
-    source.includes("return validateProductCharacteristicsRows(form.characteristicRows);"),
+    source.includes(
+      "return validateProductCharacteristicsRows(form.characteristicRows);",
+    ),
     "шаг молча теряет половинчатые строки",
   );
 });
@@ -146,7 +153,9 @@ test("ключи категории доезжают от API до мастер�
     "выбор категории поиском теряет ключи",
   );
 
-  const picker = readMobileFile("features/create-product/ui/CreateProductCategoryPicker.tsx");
+  const picker = readMobileFile(
+    "features/create-product/ui/CreateProductCategoryPicker.tsx",
+  );
   assert.ok(
     picker.includes("onSelect(categoryId, fullLabel, defaultCharacteristicKeys)"),
     "пикер не отдаёт ключи наверх",

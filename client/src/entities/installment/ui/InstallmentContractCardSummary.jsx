@@ -19,7 +19,10 @@ export function InstallmentContractCardSummary({
   const isCompleted = contract.status === INSTALLMENT_CONTRACT_STATUS_COMPLETED;
 
   return (
-    <div className="installment-contract-card__summary" aria-label={INSTALLMENT_UI.CONTRACT_PAID}>
+    <div
+      className="installment-contract-card__summary"
+      aria-label={INSTALLMENT_UI.CONTRACT_PAID}
+    >
       <div className="installment-contract-card__summary-tile">
         <span className="installment-contract-card__summary-label">
           {INSTALLMENT_UI.CONTRACT_PLAN}

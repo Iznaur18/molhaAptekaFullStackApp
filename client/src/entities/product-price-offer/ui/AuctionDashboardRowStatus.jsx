@@ -5,7 +5,11 @@
  *   children: import("react").ReactNode;
  * }} props
  */
-export function AuctionDashboardRowStatus({ isPending = false, isAccepted = false, children }) {
+export function AuctionDashboardRowStatus({
+  isPending = false,
+  isAccepted = false,
+  children,
+}) {
   if (!children) {
     return null;
   }

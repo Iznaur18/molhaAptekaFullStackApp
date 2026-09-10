@@ -21,10 +21,7 @@ import { getLoboOrderByExternalId, isLoboConfigured } from "./loboClient.js";
 const TERMINAL = new Set(ORDER_TERMINAL_STATUSES);
 
 /** Статусы службы, после которых опрашивать больше нечего. */
-const FINAL_CARRIER_STATUSES = new Set([
-  LOBO_STATUS_DELIVERED,
-  LOBO_STATUS_CANCELLED,
-]);
+const FINAL_CARRIER_STATUSES = new Set([LOBO_STATUS_DELIVERED, LOBO_STATUS_CANCELLED]);
 
 /**
  * Сколько отправлений опрашиваем за проход.
@@ -107,9 +104,8 @@ async function applyLadderStatus({ orderId, sellerId, ladderStatus }) {
       ladderStatus: ORDER_STATUS_IN_DELIVERY,
     });
 
-    const { markOrderItemDeliveredBySeller } = await import(
-      "../../order/updateOrderItemStatus.js"
-    );
+    const { markOrderItemDeliveredBySeller } =
+      await import("../../order/updateOrderItemStatus.js");
     const order = await OrderModel.findById(orderId).select("items").lean();
     // Номер позиции берём по месту в массиве: поле itemIndex проставляет
     // нормализация при чтении через сервисы, а в сыром документе его нет.

@@ -70,9 +70,7 @@ export function AdminAnalyticsPage() {
         queryKey: adminAnalyticsQueryKeys.all,
       });
     } catch (error) {
-      setReconcileError(
-        error instanceof Error ? error.message : UI.RECONCILE_ERROR,
-      );
+      setReconcileError(error instanceof Error ? error.message : UI.RECONCILE_ERROR);
     } finally {
       setIsReconciling(false);
     }
@@ -153,19 +151,28 @@ export function AdminAnalyticsPage() {
       ) : null}
 
       {errorMessage ? (
-        <p className="admin-analytics-page__state admin-analytics-page__state_error" role="alert">
+        <p
+          className="admin-analytics-page__state admin-analytics-page__state_error"
+          role="alert"
+        >
           {errorMessage}
         </p>
       ) : null}
 
       {exportError ? (
-        <p className="admin-analytics-page__state admin-analytics-page__state_error" role="alert">
+        <p
+          className="admin-analytics-page__state admin-analytics-page__state_error"
+          role="alert"
+        >
           {exportError}
         </p>
       ) : null}
 
       {reconcileError ? (
-        <p className="admin-analytics-page__state admin-analytics-page__state_error" role="alert">
+        <p
+          className="admin-analytics-page__state admin-analytics-page__state_error"
+          role="alert"
+        >
           {reconcileError}
         </p>
       ) : null}
@@ -180,10 +187,7 @@ export function AdminAnalyticsPage() {
           <MetricTile label={UI.METRIC_ORDERS} value={metrics.ordersCreated} />
           <MetricTile label={UI.METRIC_SOLD_UNITS} value={metrics.soldUnits} />
           <MetricTile label={UI.METRIC_GMV} value={formatRub(metrics.gmvRub)} />
-          <MetricTile
-            label={UI.METRIC_VIEWS}
-            value={metrics.productViewsUnique}
-          />
+          <MetricTile label={UI.METRIC_VIEWS} value={metrics.productViewsUnique} />
         </div>
       ) : null}
 

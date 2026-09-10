@@ -49,7 +49,9 @@ type CatalogFeedQuery = {
   near?: boolean;
 };
 
-export const resolveActiveCatalogFeedLabel = (query: CatalogFeedQuery): string | null => {
+export const resolveActiveCatalogFeedLabel = (
+  query: CatalogFeedQuery,
+): string | null => {
   if (query.near) {
     return CATALOG_SORT_LABEL_RU[CATALOG_FILTER_NEAR];
   }

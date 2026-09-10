@@ -11,7 +11,9 @@ export const useCreateRaffleMutation = () => {
     mutationFn: createRaffle,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: raffleQueryKeys.all });
-      void queryClient.invalidateQueries({ queryKey: raffleQueryKeys.createAdvertising() });
+      void queryClient.invalidateQueries({
+        queryKey: raffleQueryKeys.createAdvertising(),
+      });
       void queryClient.invalidateQueries({ queryKey: loyaltyPointsQueryKeys.all });
     },
   });

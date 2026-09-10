@@ -24,7 +24,12 @@ export function CourierOrderItem({ item, onProductClick }) {
   const body = (
     <>
       {imageUrl ? (
-        <img className="courier-overview__item-image" src={imageUrl} alt="" loading="lazy" />
+        <img
+          className="courier-overview__item-image"
+          src={imageUrl}
+          alt=""
+          loading="lazy"
+        />
       ) : (
         <span className="courier-overview__item-image" />
       )}

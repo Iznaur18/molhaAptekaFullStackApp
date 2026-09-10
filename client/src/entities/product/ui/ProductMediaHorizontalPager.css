@@ -40,7 +40,8 @@
   overflow: hidden;
 }
 
-.product-media-horizontal-pager__slide .product-media-gallery-readonly__image--fill-hero {
+.product-media-horizontal-pager__slide
+  .product-media-gallery-readonly__image--fill-hero {
   position: absolute;
   inset: 0;
   width: 100%;

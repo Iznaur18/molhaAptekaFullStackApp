@@ -139,7 +139,11 @@ export function isSellerScheduleClosedNow(schedule, regionCode, at = new Date())
  * @param {Date} [at]
  * @returns {string | null}
  */
-export function resolveSellerScheduleOpensAtTime(schedule, regionCode, at = new Date()) {
+export function resolveSellerScheduleOpensAtTime(
+  schedule,
+  regionCode,
+  at = new Date(),
+) {
   const normalized = normalizeSellerBusinessHoursSchedule(schedule);
   if (normalized == null) {
     return null;
@@ -184,7 +188,11 @@ export function formatSellerClosedUntilLabel(opensAtTime) {
  * @returns {string | null}
  */
 export function formatUserBusinessHoursForProfile(user) {
-  if (user == null || typeof user !== "object" || user.userBusinessHoursEnabled !== true) {
+  if (
+    user == null ||
+    typeof user !== "object" ||
+    user.userBusinessHoursEnabled !== true
+  ) {
     return null;
   }
 
@@ -269,7 +277,11 @@ export function formatBusinessHoursWeekdayRangesCompact(weekdays) {
  * @returns {string | null}
  */
 export function formatUserBusinessHoursCompactRange(user) {
-  if (user == null || typeof user !== "object" || user.userBusinessHoursEnabled !== true) {
+  if (
+    user == null ||
+    typeof user !== "object" ||
+    user.userBusinessHoursEnabled !== true
+  ) {
     return null;
   }
 
@@ -336,5 +348,7 @@ export function isUserSellerClosedNow(user, at = new Date()) {
  * @returns {boolean}
  */
 export function isProductSellerClosedNow(product) {
-  return product != null && typeof product === "object" && product.isSellerClosedNow === true;
+  return (
+    product != null && typeof product === "object" && product.isSellerClosedNow === true
+  );
 }

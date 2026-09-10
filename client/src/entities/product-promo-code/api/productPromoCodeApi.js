@@ -18,9 +18,7 @@ export async function fetchProductPromoCodes(productId) {
     const { data } = await apiClient.get(`/product/${productId}/promo-codes`);
     return parseApiContractData(data, listProductPromoCodesDataSchema);
   } catch (error) {
-    throw new Error(
-      formatApiErrorMessage(error, PRODUCT_PROMO_CODE_UI.FETCH_FALLBACK),
-    );
+    throw new Error(formatApiErrorMessage(error, PRODUCT_PROMO_CODE_UI.FETCH_FALLBACK));
   }
 }
 
@@ -40,9 +38,7 @@ export async function replaceProductPromoCodes(productId, promoCodes) {
     });
     return parseApiContractData(data, replaceProductPromoCodesDataSchema);
   } catch (error) {
-    throw new Error(
-      formatApiErrorMessage(error, PRODUCT_PROMO_CODE_UI.SAVE_FALLBACK),
-    );
+    throw new Error(formatApiErrorMessage(error, PRODUCT_PROMO_CODE_UI.SAVE_FALLBACK));
   }
 }
 
@@ -69,8 +65,6 @@ export async function fetchMyAppliedProductPromos() {
     const { data } = await apiClient.get("/product/promo-activations/me");
     return parseApiContractData(data, myAppliedProductPromosDataSchema);
   } catch (error) {
-    throw new Error(
-      formatApiErrorMessage(error, PRODUCT_PROMO_CODE_UI.FETCH_FALLBACK),
-    );
+    throw new Error(formatApiErrorMessage(error, PRODUCT_PROMO_CODE_UI.FETCH_FALLBACK));
   }
 }

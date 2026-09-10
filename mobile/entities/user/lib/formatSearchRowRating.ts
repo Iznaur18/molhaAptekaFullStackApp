@@ -26,7 +26,9 @@ const getSearchRowRatingParts = (raw: UserRatingByVotes | undefined) => {
   };
 };
 
-export const formatSearchRowRatingCompact = (raw: UserRatingByVotes | undefined): string => {
+export const formatSearchRowRatingCompact = (
+  raw: UserRatingByVotes | undefined,
+): string => {
   if (!raw || typeof raw !== "object") {
     return USER_PROFILE_COPY.RATING_NONE;
   }

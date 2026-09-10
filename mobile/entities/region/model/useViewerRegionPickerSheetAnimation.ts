@@ -6,12 +6,8 @@ import { VIEWER_REGION_PICKER_SHEET_ANIMATION } from "@/entities/region/lib/view
 import { useAdminEditModalAnimation } from "@/shared/model/useAdminEditModalAnimation";
 import { scheduleOpenAfterPaint } from "@/shared/lib/scheduleOpenAfterPaint";
 
-const {
-  enterMs,
-  exitMs,
-  enterEasingCss,
-  exitEasingCss,
-} = VIEWER_REGION_PICKER_SHEET_ANIMATION;
+const { enterMs, exitMs, enterEasingCss, exitEasingCss } =
+  VIEWER_REGION_PICKER_SHEET_ANIMATION;
 
 const enterEasing = Easing.bezierFn(0.215, 0.61, 0.355, 1);
 const exitEasing = Easing.bezierFn(0.55, 0.055, 0.675, 1);

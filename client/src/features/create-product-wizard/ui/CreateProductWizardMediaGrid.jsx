@@ -5,7 +5,10 @@ import { useUploadAssetMutations } from "../../../shared/model/useUploadAssetMut
 import { resolveImageUrlForDisplay } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { validateUploadImageFile } from "../../../shared/lib/validateUploadImageFile.js";
 import { UPLOAD_FILE_INPUT_ACCEPT } from "../../../shared/config/uploadConstants.js";
-import { CREATE_PRODUCT_MODAL_UI, IMAGE_URL_FIELD_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  CREATE_PRODUCT_MODAL_UI,
+  IMAGE_URL_FIELD_UI,
+} from "../../../shared/config/appUiCopy.js";
 
 import "./CreateProductWizardMediaGrid.css";
 
@@ -97,7 +100,10 @@ export function CreateProductWizardMediaGrid({
         style={{ "--product-photo-grid-columns": PRODUCT_PHOTO_GRID_COLUMNS }}
       >
         {urls.map((url, index) => (
-          <div key={`${url}-${index}`} className="create-product-wizard-media-grid__tile">
+          <div
+            key={`${url}-${index}`}
+            className="create-product-wizard-media-grid__tile"
+          >
             <button
               type="button"
               className="create-product-wizard-media-grid__tile-hit"
@@ -138,7 +144,10 @@ export function CreateProductWizardMediaGrid({
             className="create-product-wizard-media-grid__tile create-product-wizard-media-grid__tile_uploading"
             aria-busy="true"
           >
-            <span className="create-product-wizard-media-grid__spinner" aria-hidden="true" />
+            <span
+              className="create-product-wizard-media-grid__spinner"
+              aria-hidden="true"
+            />
           </div>
         ))}
 

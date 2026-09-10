@@ -66,8 +66,12 @@ function SiteHeaderBannerCampaignModerationCard({
   onExpandedChange,
 }) {
   const [showPreview, setShowPreview] = useState(false);
-  const advertiserName = resolveAdvertiserName(campaign.advertiser, String(campaign.advertiserId));
-  const needsAttention = mode === "pending" && campaignModerationNeedsAttention(campaign);
+  const advertiserName = resolveAdvertiserName(
+    campaign.advertiser,
+    String(campaign.advertiserId),
+  );
+  const needsAttention =
+    mode === "pending" && campaignModerationNeedsAttention(campaign);
   const collapsedPreview = resolveModerationCampaignCollapsedPreview(campaign);
   const createdLabel =
     mode === "pending" && campaign.createdAt
@@ -90,82 +94,83 @@ function SiteHeaderBannerCampaignModerationCard({
       onExpandedChange={onExpandedChange}
     >
       <div className="intro-ad-moderation-page__item">
-      <p className="intro-ad-moderation-page__meta">
-        {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.ADVERTISER_LABEL}: {advertiserName}
-      </p>
-      {mode === "managed" ? (
         <p className="intro-ad-moderation-page__meta">
-          {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.STATUS_LABEL}:{" "}
-          {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.STATUS_ACTIVE}
+          {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.ADVERTISER_LABEL}:{" "}
+          {advertiserName}
         </p>
-      ) : (
-        <p className="intro-ad-moderation-page__meta">
-          {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.SUBMITTED_LABEL}:{" "}
-          {campaign.createdAt
-            ? new Date(String(campaign.createdAt)).toLocaleString("ru-RU")
-            : "—"}
-        </p>
-      )}
-      {showPreview && canPreview ? (
-        <div className="intro-ad-moderation-page__banner-carousel-preview">
-          <SiteHeaderBannerCarousel slides={previewSlides} />
+        {mode === "managed" ? (
+          <p className="intro-ad-moderation-page__meta">
+            {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.STATUS_LABEL}:{" "}
+            {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.STATUS_ACTIVE}
+          </p>
+        ) : (
+          <p className="intro-ad-moderation-page__meta">
+            {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.SUBMITTED_LABEL}:{" "}
+            {campaign.createdAt
+              ? new Date(String(campaign.createdAt)).toLocaleString("ru-RU")
+              : "—"}
+          </p>
+        )}
+        {showPreview && canPreview ? (
+          <div className="intro-ad-moderation-page__banner-carousel-preview">
+            <SiteHeaderBannerCarousel slides={previewSlides} />
+          </div>
+        ) : null}
+        <div className="intro-ad-moderation-page__actions">
+          {canPreview ? (
+            <button
+              type="button"
+              className="app-btn app-btn--secondary"
+              disabled={isPending}
+              onClick={() => setShowPreview((prev) => !prev)}
+            >
+              {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.PREVIEW}
+            </button>
+          ) : null}
+          {mode === "pending" && onApprove ? (
+            <button
+              type="button"
+              className="app-btn app-btn--primary"
+              disabled={isPending}
+              onClick={onApprove}
+            >
+              {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.APPROVE}
+            </button>
+          ) : null}
+          {mode === "managed" && onStaffCancel ? (
+            <button
+              type="button"
+              className="app-btn app-btn--cancel"
+              disabled={isPending}
+              onClick={onStaffCancel}
+            >
+              {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.STAFF_CANCEL}
+            </button>
+          ) : null}
         </div>
-      ) : null}
-      <div className="intro-ad-moderation-page__actions">
-        {canPreview ? (
-          <button
-            type="button"
-            className="app-btn app-btn--secondary"
-            disabled={isPending}
-            onClick={() => setShowPreview((prev) => !prev)}
-          >
-            {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.PREVIEW}
-          </button>
+        {mode === "pending" && onReject && onRejectReasonChange ? (
+          <>
+            <label className="intro-ad-moderation-page__reject">
+              {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.REJECT_REASON_LABEL}
+              <textarea
+                className="intro-ad-moderation-page__textarea"
+                value={rejectReason}
+                onChange={(event) => onRejectReasonChange(event.target.value)}
+                placeholder={
+                  SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.REJECT_REASON_PLACEHOLDER
+                }
+              />
+            </label>
+            <button
+              type="button"
+              className="app-btn app-btn--danger"
+              disabled={isPending}
+              onClick={onReject}
+            >
+              {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.REJECT}
+            </button>
+          </>
         ) : null}
-        {mode === "pending" && onApprove ? (
-          <button
-            type="button"
-            className="app-btn app-btn--primary"
-            disabled={isPending}
-            onClick={onApprove}
-          >
-            {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.APPROVE}
-          </button>
-        ) : null}
-        {mode === "managed" && onStaffCancel ? (
-          <button
-            type="button"
-            className="app-btn app-btn--cancel"
-            disabled={isPending}
-            onClick={onStaffCancel}
-          >
-            {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.STAFF_CANCEL}
-          </button>
-        ) : null}
-      </div>
-      {mode === "pending" && onReject && onRejectReasonChange ? (
-        <>
-          <label className="intro-ad-moderation-page__reject">
-            {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.REJECT_REASON_LABEL}
-            <textarea
-              className="intro-ad-moderation-page__textarea"
-              value={rejectReason}
-              onChange={(event) => onRejectReasonChange(event.target.value)}
-              placeholder={
-                SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.REJECT_REASON_PLACEHOLDER
-              }
-            />
-          </label>
-          <button
-            type="button"
-            className="app-btn app-btn--danger"
-            disabled={isPending}
-            onClick={onReject}
-          >
-            {SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.REJECT}
-          </button>
-        </>
-      ) : null}
       </div>
     </ModerationCampaignCollapsibleFrame>
   );
@@ -192,11 +197,15 @@ export function SiteHeaderBannerCampaignModerationSection({
   const queryClient = useQueryClient();
   const [localActionError, setLocalActionError] = useState("");
   const [pendingCampaignId, setPendingCampaignId] = useState(null);
-  const [rejectReasons, setRejectReasons] = useState(/** @type {Record<string, string>} */ ({}));
+  const [rejectReasons, setRejectReasons] = useState(
+    /** @type {Record<string, string>} */ ({}),
+  );
 
   const queueQuery = useQuery({
-    queryKey: siteHeaderBannerCampaignQueryKeys.moderationPending(MODERATION_QUEUE_LIMIT),
-    queryFn: () => fetchPendingSiteHeaderBannerCampaigns({ limit: MODERATION_QUEUE_LIMIT }),
+    queryKey:
+      siteHeaderBannerCampaignQueryKeys.moderationPending(MODERATION_QUEUE_LIMIT),
+    queryFn: () =>
+      fetchPendingSiteHeaderBannerCampaigns({ limit: MODERATION_QUEUE_LIMIT }),
   });
 
   const managedQuery = useQuery({
@@ -206,7 +215,8 @@ export function SiteHeaderBannerCampaignModerationSection({
 
   const approveMutation = useMutation({ mutationFn: approveSiteHeaderBannerCampaign });
   const rejectMutation = useMutation({
-    mutationFn: ({ campaignId, reason }) => rejectSiteHeaderBannerCampaign(campaignId, reason),
+    mutationFn: ({ campaignId, reason }) =>
+      rejectSiteHeaderBannerCampaign(campaignId, reason),
   });
   const staffCancelMutation = useMutation({
     mutationFn: cancelSiteHeaderBannerCampaignByStaff,
@@ -222,7 +232,8 @@ export function SiteHeaderBannerCampaignModerationSection({
   const refreshModerationQueries = async () => {
     await Promise.all([
       queryClient.invalidateQueries({
-        queryKey: siteHeaderBannerCampaignQueryKeys.moderationPending(MODERATION_QUEUE_LIMIT),
+        queryKey:
+          siteHeaderBannerCampaignQueryKeys.moderationPending(MODERATION_QUEUE_LIMIT),
       }),
       queryClient.invalidateQueries({
         queryKey: siteHeaderBannerCampaignQueryKeys.moderationManaged(),

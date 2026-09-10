@@ -34,7 +34,8 @@ export const ListPageFilterField = ({
   const controlRef = useRef<View>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState<LayoutRectangle | null>(null);
-  const selectedLabel = options.find((option) => option.value === value)?.label ?? value;
+  const selectedLabel =
+    options.find((option) => option.value === value)?.label ?? value;
 
   const closeMenu = useCallback(() => {
     setMenuOpen(false);
@@ -86,7 +87,11 @@ export const ListPageFilterField = ({
         animationType="fade"
         onRequestClose={closeMenu}
       >
-        <Pressable style={styles.menuBackdrop} onPress={closeMenu} accessibilityLabel="Закрыть" />
+        <Pressable
+          style={styles.menuBackdrop}
+          onPress={closeMenu}
+          accessibilityLabel="Закрыть"
+        />
         {menuAnchor ? (
           <View
             style={[
@@ -113,7 +118,10 @@ export const ListPageFilterField = ({
                     onPress={() => handleSelect(option.value)}
                   >
                     <Text
-                      style={[styles.menuItemText, isActive && styles.menuItemTextActive]}
+                      style={[
+                        styles.menuItemText,
+                        isActive && styles.menuItemTextActive,
+                      ]}
                       numberOfLines={1}
                     >
                       {option.label}

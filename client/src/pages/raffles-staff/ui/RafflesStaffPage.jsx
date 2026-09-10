@@ -47,7 +47,10 @@ export function RafflesStaffPage({ onQueueChanged, onEditRaffle }) {
       isAdmin
         ? [
             { id: TAB_MODERATION, label: USERS_LOYALTY_RAFFLE_ADMIN_UI.TAB_MODERATION },
-            { id: TAB_USERS_RAFFLE, label: USERS_LOYALTY_RAFFLE_ADMIN_UI.TAB_USERS_RAFFLE },
+            {
+              id: TAB_USERS_RAFFLE,
+              label: USERS_LOYALTY_RAFFLE_ADMIN_UI.TAB_USERS_RAFFLE,
+            },
           ]
         : [{ id: TAB_MODERATION, label: USERS_LOYALTY_RAFFLE_ADMIN_UI.TAB_MODERATION }],
     [isAdmin],
@@ -172,7 +175,11 @@ export function RafflesStaffPage({ onQueueChanged, onEditRaffle }) {
   return (
     <div className="raffles-staff-page">
       {tabs.length > 1 ? (
-        <div className="raffles-staff-page__tabs" role="tablist" aria-label={RAFFLES_STAFF_PAGE_UI.TITLE}>
+        <div
+          className="raffles-staff-page__tabs"
+          role="tablist"
+          aria-label={RAFFLES_STAFF_PAGE_UI.TITLE}
+        >
           {tabs.map((tab) => {
             const isActive = tab.id === activeTabId;
             return (
@@ -221,7 +228,8 @@ export function RafflesStaffPage({ onQueueChanged, onEditRaffle }) {
                     </p>
                     <p className="raffles-staff-page__meta">
                       {RAFFLES_STAFF_PAGE_UI.ROW_TARGET}: {liveRaffle.targetSales}
-                      {liveRaffle.status === "active" || liveRaffle.status === "completed"
+                      {liveRaffle.status === "active" ||
+                      liveRaffle.status === "completed"
                         ? ` · ${liveRaffle.salesProgress} / ${liveRaffle.targetSales}`
                         : ""}
                     </p>
@@ -237,7 +245,9 @@ export function RafflesStaffPage({ onQueueChanged, onEditRaffle }) {
                   showEdit={Boolean(onEditRaffle)}
                   showDelete
                   onEdit={onEditRaffle ? () => onEditRaffle(liveRaffle) : undefined}
-                  onDelete={() => void handleDelete(liveRaffle._id, { clearLive: true })}
+                  onDelete={() =>
+                    void handleDelete(liveRaffle._id, { clearLive: true })
+                  }
                   busy={liveBusy}
                 />
               </div>

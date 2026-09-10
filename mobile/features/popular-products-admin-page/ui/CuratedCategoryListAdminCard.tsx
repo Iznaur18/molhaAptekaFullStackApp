@@ -22,7 +22,10 @@ type CuratedCategoryListAdminCardProps = {
   onMoveDown: () => void;
   onDeleteList: () => void;
   onSaveList: (payload: { title: string; regionCode: string }) => Promise<void>;
-  onAddCategory: (payload: { kind: CuratedCategoryKind; refId: string }) => Promise<void>;
+  onAddCategory: (payload: {
+    kind: CuratedCategoryKind;
+    refId: string;
+  }) => Promise<void>;
   onRemoveCategory: (itemKey: string) => Promise<void>;
 };
 
@@ -72,7 +75,9 @@ export const CuratedCategoryListAdminCard = ({
       await onSaveList({ title: titleDraft, regionCode: regionDraft });
     } catch (error) {
       setLocalError(
-        error instanceof Error ? error.message : POPULAR_CATEGORIES_ADMIN_PAGE_UI.SAVE_ERROR,
+        error instanceof Error
+          ? error.message
+          : POPULAR_CATEGORIES_ADMIN_PAGE_UI.SAVE_ERROR,
       );
     }
   }, [onSaveList, regionDraft, titleDraft]);
@@ -100,10 +105,19 @@ export const CuratedCategoryListAdminCard = ({
       setSelectedLabel("");
     } catch (error) {
       setLocalError(
-        error instanceof Error ? error.message : POPULAR_CATEGORIES_ADMIN_PAGE_UI.ADD_ITEM_ERROR,
+        error instanceof Error
+          ? error.message
+          : POPULAR_CATEGORIES_ADMIN_PAGE_UI.ADD_ITEM_ERROR,
       );
     }
-  }, [canAddCategory, kindDraft, onAddCategory, previewError, refIdDraft, regionBlockReason]);
+  }, [
+    canAddCategory,
+    kindDraft,
+    onAddCategory,
+    previewError,
+    refIdDraft,
+    regionBlockReason,
+  ]);
 
   const handleRemoveCategory = useCallback(
     async (itemKey: string) => {
@@ -127,7 +141,10 @@ export const CuratedCategoryListAdminCard = ({
         <View style={styles.curatedCardHeader}>
           <View style={styles.orderRow}>
             <Pressable
-              style={[styles.orderButton, (isBusy || isFirst) && styles.orderButtonDisabled]}
+              style={[
+                styles.orderButton,
+                (isBusy || isFirst) && styles.orderButtonDisabled,
+              ]}
               onPress={onMoveUp}
               disabled={isBusy || isFirst}
               accessibilityRole="button"
@@ -136,7 +153,10 @@ export const CuratedCategoryListAdminCard = ({
               <Text style={styles.orderButtonText}>↑</Text>
             </Pressable>
             <Pressable
-              style={[styles.orderButton, (isBusy || isLast) && styles.orderButtonDisabled]}
+              style={[
+                styles.orderButton,
+                (isBusy || isLast) && styles.orderButtonDisabled,
+              ]}
               onPress={onMoveDown}
               disabled={isBusy || isLast}
               accessibilityRole="button"
@@ -145,7 +165,11 @@ export const CuratedCategoryListAdminCard = ({
               <Text style={styles.orderButtonText}>↓</Text>
             </Pressable>
           </View>
-          <Pressable style={styles.dangerButton} onPress={onDeleteList} disabled={isBusy}>
+          <Pressable
+            style={styles.dangerButton}
+            onPress={onDeleteList}
+            disabled={isBusy}
+          >
             <Text style={styles.dangerButtonText}>
               {POPULAR_CATEGORIES_ADMIN_PAGE_UI.DELETE_LIST}
             </Text>
@@ -153,7 +177,9 @@ export const CuratedCategoryListAdminCard = ({
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.fieldLabel}>{POPULAR_CATEGORIES_ADMIN_PAGE_UI.LIST_TITLE_LABEL}</Text>
+          <Text style={styles.fieldLabel}>
+            {POPULAR_CATEGORIES_ADMIN_PAGE_UI.LIST_TITLE_LABEL}
+          </Text>
           <TextInput
             style={styles.fieldInput}
             value={titleDraft}
@@ -172,7 +198,8 @@ export const CuratedCategoryListAdminCard = ({
         <Pressable
           style={[
             styles.secondaryButton,
-            (isBusy || titleDraft.trim() === "" || !regionDraft) && styles.primaryButtonDisabled,
+            (isBusy || titleDraft.trim() === "" || !regionDraft) &&
+              styles.primaryButtonDisabled,
           ]}
           onPress={() => void handleSaveList()}
           disabled={isBusy || titleDraft.trim() === "" || !regionDraft}
@@ -221,7 +248,8 @@ export const CuratedCategoryListAdminCard = ({
             </Text>
             {preview.kind === "personal" && preview.regionLabel ? (
               <Text style={styles.fieldLabel}>
-                {POPULAR_CATEGORIES_ADMIN_PAGE_UI.PREVIEW_REGION_LABEL}: {preview.regionLabel}
+                {POPULAR_CATEGORIES_ADMIN_PAGE_UI.PREVIEW_REGION_LABEL}:{" "}
+                {preview.regionLabel}
               </Text>
             ) : null}
             {regionBlockReason === "catalog" ? (
@@ -239,7 +267,10 @@ export const CuratedCategoryListAdminCard = ({
         ) : null}
 
         <Pressable
-          style={[styles.primaryButton, (isBusy || !canAddCategory) && styles.primaryButtonDisabled]}
+          style={[
+            styles.primaryButton,
+            (isBusy || !canAddCategory) && styles.primaryButtonDisabled,
+          ]}
           onPress={() => void handleAddCategory()}
           disabled={isBusy || !canAddCategory}
         >
@@ -255,7 +286,9 @@ export const CuratedCategoryListAdminCard = ({
         ) : null}
 
         {list.items.length === 0 ? (
-          <Text style={styles.emptyList}>{POPULAR_CATEGORIES_ADMIN_PAGE_UI.EMPTY_LIST}</Text>
+          <Text style={styles.emptyList}>
+            {POPULAR_CATEGORIES_ADMIN_PAGE_UI.EMPTY_LIST}
+          </Text>
         ) : (
           <View style={styles.productItems}>
             {list.items.map((item) => (

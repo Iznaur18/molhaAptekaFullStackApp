@@ -20,6 +20,8 @@ export const patchSellerProductModerationTrust = async ({
     }
     return { productModerationTrusted: seller.productModerationTrusted === true };
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.UPDATE_PROFILE_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.UPDATE_PROFILE_FALLBACK),
+    );
   }
 };

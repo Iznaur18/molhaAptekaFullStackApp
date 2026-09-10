@@ -36,11 +36,7 @@ export async function enqueueOneCOrderPushesForOrder(order) {
     .lean();
 
   const sellerIds = [
-    ...new Set(
-      products
-        .map((p) => String(p.productSeller))
-        .filter(Boolean),
-    ),
+    ...new Set(products.map((p) => String(p.productSeller)).filter(Boolean)),
   ];
 
   if (sellerIds.length === 0) return { enqueued: 0 };
@@ -194,8 +190,7 @@ export async function pushPendingSellerOrders(sellerId, opts = {}) {
         triggeredBy,
       });
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Ошибка выгрузки заказа";
+      const message = error instanceof Error ? error.message : "Ошибка выгрузки заказа";
       push.status = ONEC_ORDER_PUSH_FAILED;
       push.lastError = message.slice(0, 2000);
       push.attempts += 1;

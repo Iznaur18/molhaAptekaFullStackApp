@@ -2,8 +2,6 @@ import { StyleSheet } from "react-native";
 
 import { createThemedStyles } from "@/shared/theme/createThemedStyles";
 
-
-
 const PAYMENTS_FOLD_SUMMARY_PADDING_VERTICAL = 9;
 const PAYMENTS_FOLD_SUMMARY_MIN_HEIGHT = 47;
 

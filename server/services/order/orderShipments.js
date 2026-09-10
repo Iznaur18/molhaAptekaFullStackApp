@@ -178,8 +178,7 @@ export const buildStoredShipments = (items, options = {}) => {
       courierDelivery:
         method === ORDER_FULFILLMENT_DELIVERY &&
         courierDeliveryBySellerId?.[bucket.sellerId] === true,
-      sellerPayoutRequisites:
-        payoutRequisitesBySellerId?.[bucket.sellerId] ?? "",
+      sellerPayoutRequisites: payoutRequisitesBySellerId?.[bucket.sellerId] ?? "",
       // Кто именно везёт: продавец, курьеры Gitorg или внешняя служба.
       // У самовывоза перевозчика нет.
       deliveryCarrier:

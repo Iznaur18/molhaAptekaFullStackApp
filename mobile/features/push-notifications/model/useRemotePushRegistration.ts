@@ -90,9 +90,12 @@ const parsePushData = (raw: unknown): PushNotificationData | null => {
 };
 
 const resolveRouteFromNotificationResponse = (
-  response: {
-    notification: { request: { content: { data: unknown } } };
-  } | null | undefined,
+  response:
+    | {
+        notification: { request: { content: { data: unknown } } };
+      }
+    | null
+    | undefined,
 ) => {
   if (!response) {
     return null;

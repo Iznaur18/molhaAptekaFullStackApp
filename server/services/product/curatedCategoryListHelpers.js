@@ -87,10 +87,7 @@ const resolveTreeCategoryFields = (category, displaysById, displaysBySlug) => {
     refId: categoryId,
     itemKey: buildCuratedCategoryItemKey("tree", categoryId),
     categorySlug: legacySlug ?? String(category.slug ?? ""),
-    label:
-      customLabel ||
-      String(category.labelRu ?? "").trim() ||
-      "Категория",
+    label: customLabel || String(category.labelRu ?? "").trim() || "Категория",
     imageUrl: customImage,
   };
 };
@@ -208,9 +205,7 @@ const collectCuratedCategoryRefIds = (lists) => {
  */
 const fetchCuratedCategoryEntities = async (treeIds, personalIds) => {
   const [categories, personalRows, displays] = await Promise.all([
-    treeIds.length
-      ? ProductCategoryModel.find({ _id: { $in: treeIds } }).lean()
-      : [],
+    treeIds.length ? ProductCategoryModel.find({ _id: { $in: treeIds } }).lean() : [],
     personalIds.length
       ? SellerPersonalCategoryModel.find({ _id: { $in: personalIds } }).lean()
       : [],
@@ -219,7 +214,8 @@ const fetchCuratedCategoryEntities = async (treeIds, personalIds) => {
 
   const categoriesById = new Map(categories.map((row) => [String(row._id), row]));
   const personalById = new Map(personalRows.map((row) => [String(row._id), row]));
-  const { byId: displaysById, bySlug: displaysBySlug } = buildCategoryDisplayMaps(displays);
+  const { byId: displaysById, bySlug: displaysBySlug } =
+    buildCategoryDisplayMaps(displays);
 
   return { categoriesById, personalById, displaysById, displaysBySlug };
 };
@@ -335,9 +331,7 @@ const attachSellerMetaToHomeCuratedCategories = async (lists) => {
   }
 
   const sellers = await UserModel.find({ _id: { $in: [...sellerIds] } })
-    .select(
-      "userFullName userRatingByVotes userBusinessHoursEnabled userBusinessHours",
-    )
+    .select("userFullName userRatingByVotes userBusinessHoursEnabled userBusinessHours")
     .lean();
   const sellerById = new Map(sellers.map((row) => [String(row._id), row]));
 
@@ -349,9 +343,7 @@ const attachSellerMetaToHomeCuratedCategories = async (lists) => {
       }
       return {
         ...category,
-        ...toCuratedCategorySellerMeta(
-          sellerById.get(String(category.sellerId ?? "")),
-        ),
+        ...toCuratedCategorySellerMeta(sellerById.get(String(category.sellerId ?? ""))),
       };
     }),
   }));

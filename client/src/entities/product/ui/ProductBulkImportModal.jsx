@@ -102,7 +102,9 @@ export function ProductBulkImportModal({ isOpen, onClose, onCompleted }) {
       </div>
 
       {bulkImport.selectedFile ? (
-        <p className="product-bulk-import-modal__file-name">{bulkImport.selectedFile.name}</p>
+        <p className="product-bulk-import-modal__file-name">
+          {bulkImport.selectedFile.name}
+        </p>
       ) : null}
 
       {bulkImport.phase === "processing" ? (
@@ -130,7 +132,8 @@ export function ProductBulkImportModal({ isOpen, onClose, onCompleted }) {
       {bulkImport.phase === "validation_failed" ? (
         <>
           <p className="product-bulk-import-modal__error" role="alert">
-            {bulkImport.errorMessage || CREATE_PRODUCT_MODAL_UI.BULK_IMPORT_VALIDATION_TITLE}
+            {bulkImport.errorMessage ||
+              CREATE_PRODUCT_MODAL_UI.BULK_IMPORT_VALIDATION_TITLE}
           </p>
           {bulkImport.validationErrors.length > 0 ? (
             <ul className="product-bulk-import-modal__errors">

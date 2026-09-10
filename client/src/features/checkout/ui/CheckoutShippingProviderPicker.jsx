@@ -43,8 +43,7 @@ export function CheckoutShippingProviderPicker({
 
   const isCourierSelected =
     courierDelivery === "courier" || courierDelivery === "mixed";
-  const isSellerSelected =
-    courierDelivery === "seller" || courierDelivery === "mixed";
+  const isSellerSelected = courierDelivery === "seller" || courierDelivery === "mixed";
 
   const cards = [
     {
@@ -102,9 +101,7 @@ export function CheckoutShippingProviderPicker({
             card.selected
               ? "checkout-shipping-provider-picker__card--selected"
               : "checkout-shipping-provider-picker__card--idle",
-            card.locked
-              ? "checkout-shipping-provider-picker__card--locked"
-              : "",
+            card.locked ? "checkout-shipping-provider-picker__card--locked" : "",
           ]
             .filter(Boolean)
             .join(" ");

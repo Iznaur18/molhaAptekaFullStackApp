@@ -9,9 +9,8 @@ process.env.JWT_SECRET =
 const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollections } =
   await import("./helpers/mongoTestDb.js");
 const { PaymentModel } = await import("../models/index.js");
-const { resolveReusablePayment, PAYMENT_INTENT_CONFLICT_MESSAGE } = await import(
-  "../services/payments/paymentIdempotency.js"
-);
+const { resolveReusablePayment, PAYMENT_INTENT_CONFLICT_MESSAGE } =
+  await import("../services/payments/paymentIdempotency.js");
 
 const USER = new mongoose.Types.ObjectId();
 const ORDER = new mongoose.Types.ObjectId();
@@ -102,7 +101,9 @@ describe("ключ идемпотентности привязан к цели",
     await createPayment({ idempotenceKey: "same-key" });
 
     await assert.rejects(() =>
-      resolveReusablePayment(orderIntent({ idempotenceKey: "same-key", amountRub: 10 })),
+      resolveReusablePayment(
+        orderIntent({ idempotenceKey: "same-key", amountRub: 10 }),
+      ),
     );
   });
 
@@ -234,7 +235,10 @@ describe("индекс как последняя линия обороны", () 
     };
     await createPayment(service);
 
-    await assert.rejects(() => createPayment(service), (error) => error.code === 11000);
+    await assert.rejects(
+      () => createPayment(service),
+      (error) => error.code === 11000,
+    );
   });
 
   it("пополнения баллов индекс не ограничивает", async () => {

@@ -166,7 +166,9 @@ describe("productPickup + order fulfillment", () => {
       false,
     );
     assert.equal(
-      doProductsSupportPickup([{ productPickupEnabled: true, productPickupAddress: "" }]),
+      doProductsSupportPickup([
+        { productPickupEnabled: true, productPickupAddress: "" },
+      ]),
       false,
     );
   });

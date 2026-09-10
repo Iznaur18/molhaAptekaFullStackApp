@@ -64,9 +64,10 @@ export async function processProductBulkImportJob(jobId) {
     await job.save();
   } catch (error) {
     job.status = PRODUCT_BULK_IMPORT_JOB_STATUS_FAILED;
-    job.errorMessage = (
-      error instanceof Error ? error.message : String(error)
-    ).slice(0, 2000);
+    job.errorMessage = (error instanceof Error ? error.message : String(error)).slice(
+      0,
+      2000,
+    );
     await job.save();
 
     logServerEvent("error", {

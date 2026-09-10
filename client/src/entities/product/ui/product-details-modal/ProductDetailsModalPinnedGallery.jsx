@@ -42,7 +42,9 @@ export function ProductDetailsModalPinnedGallery({
       heroOverlay={
         <div className="product-media-gallery-readonly__hero-actions">
           {reportOverlay ? (
-            <div className="product-media-gallery-readonly__report-slot">{reportOverlay}</div>
+            <div className="product-media-gallery-readonly__report-slot">
+              {reportOverlay}
+            </div>
           ) : null}
           <ProductShareLinkButton product={product} />
           {!isOwnProduct ? (

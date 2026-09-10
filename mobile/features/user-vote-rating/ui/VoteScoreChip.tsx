@@ -22,7 +22,12 @@ type VoteScoreChipProps = {
   onPress: (value: number) => void;
 };
 
-export const VoteScoreChip = ({ value, selected, disabled, onPress }: VoteScoreChipProps) => {
+export const VoteScoreChip = ({
+  value,
+  selected,
+  disabled,
+  onPress,
+}: VoteScoreChipProps) => {
   const theme = useAppTheme();
   const styles = useUserVoteRatingStyles();
   const scale = useSharedValue(1);

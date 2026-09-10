@@ -67,7 +67,9 @@ describe("панель служб доставки", () => {
   it("региональная служба подписана своим регионом", () => {
     renderWithProviders(<ShippingCarriersPage />);
 
-    expect(screen.getByText(SHIPPING_CARRIERS_ADMIN_UI.REGIONS(["RU-CE"]))).toBeTruthy();
+    expect(
+      screen.getByText(SHIPPING_CARRIERS_ADMIN_UI.REGIONS(["RU-CE"])),
+    ).toBeTruthy();
     expect(screen.getAllByText(SHIPPING_CARRIERS_ADMIN_UI.REGIONS_ALL).length).toBe(2);
   });
 

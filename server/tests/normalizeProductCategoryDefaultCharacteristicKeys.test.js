@@ -51,7 +51,10 @@ test("normalizeProductCategoryDefaultCharacteristicKeys rejects keys over the li
 });
 
 test("normalizeProductCategoryDefaultCharacteristicKeys accepts exactly the limit", () => {
-  const keys = Array.from({ length: PRODUCT_CHARACTERISTICS_MAX_ITEMS }, (_, i) => `K${i}`);
+  const keys = Array.from(
+    { length: PRODUCT_CHARACTERISTICS_MAX_ITEMS },
+    (_, i) => `K${i}`,
+  );
   assert.equal(
     normalizeProductCategoryDefaultCharacteristicKeys(keys).length,
     PRODUCT_CHARACTERISTICS_MAX_ITEMS,

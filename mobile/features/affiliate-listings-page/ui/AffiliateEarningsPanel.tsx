@@ -10,7 +10,9 @@ type AffiliateEarningsPanelProps = {
   enabled?: boolean;
 };
 
-export const AffiliateEarningsPanel = ({ enabled = true }: AffiliateEarningsPanelProps) => {
+export const AffiliateEarningsPanel = ({
+  enabled = true,
+}: AffiliateEarningsPanelProps) => {
   const theme = useAppTheme();
 
   const earningsQuery = useQuery({

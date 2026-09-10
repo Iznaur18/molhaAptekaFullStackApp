@@ -124,18 +124,13 @@ test("applyFlashSaleFields updates active flash sale without stored base price",
 test("applyFlashSaleFields disables flash sale", () => {
   const $set = {};
   const $unset = {};
-  applyFlashSaleFields(
-    { productFlashSaleEnabled: false },
-    $set,
-    $unset,
-    {
-      productPrice: 800,
-      productOldPrice: 1000,
-      productFlashSaleEnabled: true,
-      productFlashSaleBasePrice: 1000,
-      productFlashSaleEndsAt: new Date(Date.now() + 60_000),
-    },
-  );
+  applyFlashSaleFields({ productFlashSaleEnabled: false }, $set, $unset, {
+    productPrice: 800,
+    productOldPrice: 1000,
+    productFlashSaleEnabled: true,
+    productFlashSaleBasePrice: 1000,
+    productFlashSaleEndsAt: new Date(Date.now() + 60_000),
+  });
   assert.equal($set.productFlashSaleEnabled, false);
   assert.equal($set.productPrice, 1000);
   assert.equal($set.productOldPrice, null);

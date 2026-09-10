@@ -53,7 +53,9 @@ const LISTING_ORIGIN_ALIASES = new Map([
  * @param {boolean} defaultValue
  */
 const parseYesNoCell = (raw, defaultValue) => {
-  const value = String(raw ?? "").trim().toLowerCase();
+  const value = String(raw ?? "")
+    .trim()
+    .toLowerCase();
   if (value === "") {
     return defaultValue;
   }
@@ -70,7 +72,9 @@ const parseYesNoCell = (raw, defaultValue) => {
  * @param {string | undefined} raw
  */
 const parseListingOriginCell = (raw) => {
-  const value = String(raw ?? "").trim().toLowerCase();
+  const value = String(raw ?? "")
+    .trim()
+    .toLowerCase();
   const mapped = LISTING_ORIGIN_ALIASES.get(value);
   if (mapped) {
     return mapped;
@@ -197,9 +201,7 @@ export async function validateProductBulkImportRows(input) {
 
       const productDescription = String(row.описание ?? "").trim();
       if (productDescription.length < PRODUCT_DESCRIPTION_MIN_CHARS) {
-        throw new Error(
-          `Описание не короче ${PRODUCT_DESCRIPTION_MIN_CHARS} символов`,
-        );
+        throw new Error(`Описание не короче ${PRODUCT_DESCRIPTION_MIN_CHARS} символов`);
       }
       if (productDescription.length > PRODUCT_DESCRIPTION_MAX_CHARS) {
         throw new Error(
@@ -329,7 +331,11 @@ export async function validateProductBulkImportRows(input) {
 
     const existingSet = new Set(
       existingArticles
-        .map((item) => String(item.productArticle ?? "").trim().toLowerCase())
+        .map((item) =>
+          String(item.productArticle ?? "")
+            .trim()
+            .toLowerCase(),
+        )
         .filter(Boolean),
     );
 

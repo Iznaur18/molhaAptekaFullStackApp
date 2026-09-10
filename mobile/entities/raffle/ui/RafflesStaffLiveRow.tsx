@@ -22,8 +22,7 @@ export const RafflesStaffLiveRow = ({
   onEdit,
 }: RafflesStaffLiveRowProps) => {
   const styles = useRafflesStaffPageStyles();
-  const showProgress =
-    raffle.status === "active" || raffle.status === "completed";
+  const showProgress = raffle.status === "active" || raffle.status === "completed";
 
   return (
     <View style={[styles.row, styles.rowLive]}>

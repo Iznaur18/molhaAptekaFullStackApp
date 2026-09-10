@@ -2,9 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import mongoose from "mongoose";
 
-const { default: ProductCategoryDisplayModel } = await import(
-  "../models/ProductCategoryDisplayModel.js"
-);
+const { default: ProductCategoryDisplayModel } =
+  await import("../models/ProductCategoryDisplayModel.js");
 
 /**
  * Хук был написан под `next`, а mongoose 9 его не передаёт: на успешном пути

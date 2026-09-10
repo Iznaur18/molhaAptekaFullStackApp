@@ -30,13 +30,9 @@ export const ProductAffiliateShareButton = ({
   const percent = Math.floor(Number(product.affiliatePercent) || 0);
   const sellerId = getProductSellerId(product);
   const currentUserId =
-    sessionQuery.data?.user?._id != null
-      ? String(sessionQuery.data.user._id)
-      : null;
+    sessionQuery.data?.user?._id != null ? String(sessionQuery.data.user._id) : null;
   const isOwn =
-    currentUserId != null &&
-    sellerId != null &&
-    currentUserId === String(sellerId);
+    currentUserId != null && sellerId != null && currentUserId === String(sellerId);
   const [copied, setCopied] = useState(false);
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 

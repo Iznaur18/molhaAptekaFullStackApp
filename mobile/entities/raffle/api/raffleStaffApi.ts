@@ -19,7 +19,9 @@ export const fetchPendingRaffles = async (): Promise<RaffleFromApi[]> => {
     }
     return data.data.raffles as RaffleFromApi[];
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.FETCH_RAFFLES_QUEUE_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.FETCH_RAFFLES_QUEUE_FALLBACK),
+    );
   }
 };
 
@@ -30,7 +32,9 @@ export const approveRaffle = async (raffleId: string) => {
       throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
     }
   } catch (error) {
-    throw new Error(formatApiErrorMessage(error, API_CLIENT_UI.APPROVE_RAFFLE_FALLBACK));
+    throw new Error(
+      formatApiErrorMessage(error, API_CLIENT_UI.APPROVE_RAFFLE_FALLBACK),
+    );
   }
 };
 
@@ -63,7 +67,9 @@ export const fetchStaffRafflesQueue = async (): Promise<StaffRafflesQueueData> =
   ]);
   const liveRaffle =
     featuredList.find((row) => row.status === "active") ??
-    featuredList.find((row) => ["active", "paused", "completed"].includes(String(row.status))) ??
+    featuredList.find((row) =>
+      ["active", "paused", "completed"].includes(String(row.status)),
+    ) ??
     null;
   return { pendingRaffles, liveRaffle };
 };

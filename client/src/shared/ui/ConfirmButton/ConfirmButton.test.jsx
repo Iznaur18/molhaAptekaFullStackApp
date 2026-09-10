@@ -7,11 +7,7 @@ const { ConfirmButton } = await import("./ConfirmButton.jsx");
 
 const setup = (onConfirm) =>
   renderWithProviders(
-    <ConfirmButton
-      label="Отменить"
-      question="Точно отменить?"
-      onConfirm={onConfirm}
-    />,
+    <ConfirmButton label="Отменить" question="Точно отменить?" onConfirm={onConfirm} />,
   );
 
 describe("подтверждение прямо в кнопке", () => {

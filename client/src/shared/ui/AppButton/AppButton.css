@@ -132,7 +132,11 @@ button:not([class]):hover:not(:disabled) {
 }
 
 .app-btn--contrast:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--iz-color-ink) 85%, var(--iz-color-on-contrast));
+  border-color: color-mix(
+    in srgb,
+    var(--iz-color-ink) 85%,
+    var(--iz-color-on-contrast)
+  );
   background: color-mix(in srgb, var(--iz-color-ink) 85%, var(--iz-color-on-contrast));
 }
 

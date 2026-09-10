@@ -16,8 +16,7 @@ export function validateRuDeliveryAddressForm(value, options = {}) {
   }
 
   const requireSuggest =
-    IS_REQUIRE_ADDRESS_FROM_DADATA_SUGGEST_ENABLED &&
-    !isAddressServiceUnavailable();
+    IS_REQUIRE_ADDRESS_FROM_DADATA_SUGGEST_ENABLED && !isAddressServiceUnavailable();
 
   if (requireSuggest && !value.selectedFromSuggest) {
     return "Выберите адрес из списка подсказок";

@@ -16,8 +16,11 @@ test("server userNameRules rejects edge cases", () => {
   for (const name of [".user", "user.", "a..b", "___", "ab"]) {
     assert.throws(() => assertUserNameFormat(name), Error, name);
   }
-  assert.throws(() => assertUserNameFormat(".x."), (err) => {
-    assert.equal(err.message, USER_NAME_FORMAT_ERROR);
-    return true;
-  });
+  assert.throws(
+    () => assertUserNameFormat(".x."),
+    (err) => {
+      assert.equal(err.message, USER_NAME_FORMAT_ERROR);
+      return true;
+    },
+  );
 });

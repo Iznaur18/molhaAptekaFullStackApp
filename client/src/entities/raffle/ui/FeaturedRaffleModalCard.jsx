@@ -149,7 +149,9 @@ export function FeaturedRaffleModalCard({
             <span className="featured-raffle-modal-card__stat-label">
               {RAFFLE_FEATURED_BANNER_UI.STAT_PARTICIPANTS}
             </span>
-            <strong className="featured-raffle-modal-card__stat-value">{participantsCount}</strong>
+            <strong className="featured-raffle-modal-card__stat-value">
+              {participantsCount}
+            </strong>
           </div>
         </div>
 

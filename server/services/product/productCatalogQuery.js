@@ -161,9 +161,7 @@ export const buildCatalogSortPipeline = (
   }
 
   if (sort === PRODUCT_SORT_NEWEST) {
-    stages.push(
-      buildCatalogPromotionSortBoostAddFieldsStage(viewerRegionCode),
-    );
+    stages.push(buildCatalogPromotionSortBoostAddFieldsStage(viewerRegionCode));
   }
 
   stages.push(
@@ -194,11 +192,7 @@ export const findProductsPage = async (
   _buyerCity = null,
   viewerRegionCode = null,
 ) => {
-  const sortPipeline = buildCatalogSortPipeline(
-    sort,
-    searchRank,
-    viewerRegionCode,
-  );
+  const sortPipeline = buildCatalogSortPipeline(sort, searchRank, viewerRegionCode);
 
   const Product = getCatalogProductModel();
 

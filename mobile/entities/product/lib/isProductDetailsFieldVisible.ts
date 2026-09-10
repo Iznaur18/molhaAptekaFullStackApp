@@ -13,7 +13,9 @@ export const isProductDetailsFieldVisible = (
   if (key === "productDescription") {
     return hasProductDescriptionContent({
       productDescription:
-        typeof product.productDescription === "string" ? product.productDescription : "",
+        typeof product.productDescription === "string"
+          ? product.productDescription
+          : "",
     });
   }
 

@@ -6,10 +6,7 @@ import {
   countCatalogProductsAtlas,
   findCatalogProductsPageAtlas,
 } from "./productCatalogAtlasSearch.js";
-import {
-  countProductsNear,
-  findProductsPageNear,
-} from "./productCatalogNearQuery.js";
+import { countProductsNear, findProductsPageNear } from "./productCatalogNearQuery.js";
 import { countProducts, findProductsPage } from "./productCatalogQuery.js";
 
 /**
@@ -44,8 +41,7 @@ export const findCatalogProductsPage = async (
   viewerRegionCode = null,
   near = null,
 ) => {
-  const searchRank =
-    searchResult.searchRank ?? regexSearchRankFromIntent(searchResult);
+  const searchRank = searchResult.searchRank ?? regexSearchRankFromIntent(searchResult);
 
   if (near) {
     return findProductsPageNear({

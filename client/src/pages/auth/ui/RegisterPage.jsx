@@ -196,10 +196,7 @@ export function RegisterPage() {
     }
     setInvalidFields(new Set());
 
-    const passwordError = validatePasswordConfirm(
-      form.password,
-      form.passwordConfirm,
-    );
+    const passwordError = validatePasswordConfirm(form.password, form.passwordConfirm);
     if (passwordError) {
       setInvalidFields(new Set(["password", "passwordConfirm"]));
       setStatus({ kind: "error", message: passwordError });
@@ -318,9 +315,7 @@ export function RegisterPage() {
       setStatus({
         kind: "error",
         message:
-          error instanceof Error
-            ? error.message
-            : API_CLIENT_UI.REGISTER_FALLBACK,
+          error instanceof Error ? error.message : API_CLIENT_UI.REGISTER_FALLBACK,
       });
     }
   };
@@ -475,7 +470,9 @@ export function RegisterPage() {
               </label>
             ) : (
               <label className="auth-page__field">
-                <span className="auth-page__label">{REGISTER_MODAL_UI.LABEL_PHONE}</span>
+                <span className="auth-page__label">
+                  {REGISTER_MODAL_UI.LABEL_PHONE}
+                </span>
                 <input
                   className={withInvalidFieldClass(
                     "auth-page__input",
@@ -533,9 +530,7 @@ export function RegisterPage() {
             </label>
 
             <label className="auth-page__field">
-              <span className="auth-page__label">
-                {AUTH_UI.PASSWORD_CONFIRM_LABEL}
-              </span>
+              <span className="auth-page__label">{AUTH_UI.PASSWORD_CONFIRM_LABEL}</span>
               <PasswordInputField
                 className={withInvalidFieldClass(
                   "auth-page__input",
@@ -572,9 +567,7 @@ export function RegisterPage() {
               className="app-btn app-btn--primary auth-page__submit"
               disabled={isPending || !canSubmitRegister}
             >
-              {isPending
-                ? REGISTER_MODAL_UI.SUBMIT_LOADING
-                : AUTH_UI.REGISTER_BUTTON}
+              {isPending ? REGISTER_MODAL_UI.SUBMIT_LOADING : AUTH_UI.REGISTER_BUTTON}
             </button>
 
             <button

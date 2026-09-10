@@ -8,11 +8,7 @@
     "scheme": "gitorg",
     "userInterfaceStyle": "automatic",
     "linking": {
-      "prefixes": [
-        "gitorg://",
-        "https://gitorg.ru",
-        "https://www.gitorg.ru"
-      ]
+      "prefixes": ["gitorg://", "https://gitorg.ru", "https://www.gitorg.ru"]
     },
     "ios": {
       "supportsTablet": true,

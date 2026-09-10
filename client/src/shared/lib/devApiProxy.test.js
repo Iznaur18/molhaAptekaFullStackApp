@@ -39,9 +39,7 @@ describe("shouldProxyToApi", () => {
   it("proxies /seller/:id only for link-preview bots", () => {
     const path = "/seller/6a871e02e4b218aa47757078";
     expect(shouldProxyToApi("/seller", path, "text/html")).toBe(false);
-    expect(shouldProxyToApi("/seller", path, "text/html", "WhatsApp/2.0")).toBe(
-      true,
-    );
+    expect(shouldProxyToApi("/seller", path, "text/html", "WhatsApp/2.0")).toBe(true);
     expect(
       shouldProxyToApi("/seller", "/seller-shelf/me", "text/html", "WhatsApp/2.0"),
     ).toBe(false);

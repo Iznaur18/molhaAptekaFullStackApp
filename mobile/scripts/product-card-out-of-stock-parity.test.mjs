@@ -13,7 +13,9 @@ const readClientFile = (relativePath) =>
   readFileSync(join(REPO_ROOT, "client", relativePath), "utf8");
 
 test("out-of-stock overlay tokens match web ProductCardOutOfStock.css", () => {
-  const webCss = readClientFile("src/entities/product/ui/product-card/ProductCardOutOfStock.css");
+  const webCss = readClientFile(
+    "src/entities/product/ui/product-card/ProductCardOutOfStock.css",
+  );
   const layout = readMobileFile("entities/product/lib/productCardOutOfStockLayout.ts");
   const styles = readMobileFile("shared/theme/catalogProductStyles.ts");
 

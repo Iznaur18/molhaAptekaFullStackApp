@@ -13,7 +13,9 @@ type UserPremiumVerifiedBadgeProps = {
   size?: number;
 };
 
-export const UserPremiumVerifiedBadge = ({ size = 18 }: UserPremiumVerifiedBadgeProps) => (
+export const UserPremiumVerifiedBadge = ({
+  size = 18,
+}: UserPremiumVerifiedBadgeProps) => (
   <Svg width={size} height={size} viewBox="0 0 40 40" {...decorativeSvgA11yProps}>
     <Path
       d={PREMIUM_STAR_PATH}

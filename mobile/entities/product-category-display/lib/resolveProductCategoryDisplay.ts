@@ -90,7 +90,8 @@ export const buildResolvedProductCategoryDisplaysFromRoots = (
 
   return roots.map((root) => {
     const legacySlug =
-      typeof root.legacyProductCategory === "string" && root.legacyProductCategory.trim()
+      typeof root.legacyProductCategory === "string" &&
+      root.legacyProductCategory.trim()
         ? root.legacyProductCategory.trim()
         : null;
     const fields = resolveCatalogCategoryDisplayFields(

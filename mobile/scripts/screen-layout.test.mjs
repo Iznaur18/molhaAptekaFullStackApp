@@ -116,9 +116,18 @@ test("resolveContentMaxWidth: four ascending tiers + wide", () => {
 
 test("resolveProfileContentMaxWidth: four ascending tiers", () => {
   assert.equal(resolveProfileContentMaxWidth(390), PROFILE_CONTENT_MAX_WIDTH_PHONE);
-  assert.equal(resolveProfileContentMaxWidth(600), PROFILE_CONTENT_MAX_WIDTH_SMALL_TABLET);
-  assert.equal(resolveProfileContentMaxWidth(768), PROFILE_CONTENT_MAX_WIDTH_MEDIUM_TABLET);
-  assert.equal(resolveProfileContentMaxWidth(1024), PROFILE_CONTENT_MAX_WIDTH_LARGE_TABLET);
+  assert.equal(
+    resolveProfileContentMaxWidth(600),
+    PROFILE_CONTENT_MAX_WIDTH_SMALL_TABLET,
+  );
+  assert.equal(
+    resolveProfileContentMaxWidth(768),
+    PROFILE_CONTENT_MAX_WIDTH_MEDIUM_TABLET,
+  );
+  assert.equal(
+    resolveProfileContentMaxWidth(1024),
+    PROFILE_CONTENT_MAX_WIDTH_LARGE_TABLET,
+  );
 });
 
 test("resolveLayoutContentWidth: caps on tablet", () => {

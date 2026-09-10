@@ -88,11 +88,7 @@ export async function fetchMyPayment(paymentId) {
  * }} payload
  * @returns {Promise<{ paymentId: string; confirmationUrl: string; amountRub: number }>}
  */
-export async function createPlatformServicePayment({
-  serviceKind,
-  targetId,
-  ...body
-}) {
+export async function createPlatformServicePayment({ serviceKind, targetId, ...body }) {
   try {
     const { data } = await apiClient.post(
       `/payments/service/${serviceKind}/${targetId}`,

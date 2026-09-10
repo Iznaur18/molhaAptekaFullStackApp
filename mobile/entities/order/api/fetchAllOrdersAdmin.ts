@@ -7,11 +7,13 @@ import { formatApiErrorMessage } from "@/shared/lib";
 
 export type AdminOrder = z.infer<typeof orderFromApiSchema>;
 
-export const fetchAllOrdersAdmin = async (params: {
-  page?: number;
-  limit?: number;
-  status?: string;
-} = {}) => {
+export const fetchAllOrdersAdmin = async (
+  params: {
+    page?: number;
+    limit?: number;
+    status?: string;
+  } = {},
+) => {
   try {
     const { data } = await apiClient.get("/order/all", { params });
     if (!data?.success || !Array.isArray(data.data?.orders)) {

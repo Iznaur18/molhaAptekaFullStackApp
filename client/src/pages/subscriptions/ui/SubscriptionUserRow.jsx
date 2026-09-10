@@ -72,9 +72,7 @@ export function SubscriptionUserRow({ user, onRowClick }) {
             <span className="subscription-user-row__metric-label">
               {USER_LIST_ROW_UI.RATING_SCORE_LABEL}
             </span>
-            <span className="subscription-user-row__metric-value">
-              {ratingText}
-            </span>
+            <span className="subscription-user-row__metric-value">{ratingText}</span>
           </span>
           <span className="subscription-user-row__metric-sep" aria-hidden="true" />
           <span
@@ -84,9 +82,7 @@ export function SubscriptionUserRow({ user, onRowClick }) {
             <span className="subscription-user-row__metric-label">
               {USER_LIST_ROW_UI.FOLLOWERS_LABEL}
             </span>
-            <span className="subscription-user-row__metric-value">
-              {followersText}
-            </span>
+            <span className="subscription-user-row__metric-value">{followersText}</span>
           </span>
           <span className="subscription-user-row__metric-sep" aria-hidden="true" />
           <span

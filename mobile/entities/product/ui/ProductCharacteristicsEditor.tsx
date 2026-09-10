@@ -101,7 +101,9 @@ export const ProductCharacteristicsEditor = ({
             disabled={disabled}
             accessibilityLabel={CREATE_PRODUCT_UI.REMOVE_CHARACTERISTIC}
           >
-            <Text style={[styles.charRemoveText, { color: theme.colors.danger }]}>✕</Text>
+            <Text style={[styles.charRemoveText, { color: theme.colors.danger }]}>
+              ✕
+            </Text>
           </Pressable>
         </View>
       ))}
@@ -111,7 +113,9 @@ export const ProductCharacteristicsEditor = ({
             styles.charAddButton,
             {
               borderColor: pressed ? theme.colors.action : theme.colors.actionBorder,
-              backgroundColor: pressed ? theme.colors.actionSoft : theme.colors.actionSurface,
+              backgroundColor: pressed
+                ? theme.colors.actionSoft
+                : theme.colors.actionSurface,
             },
           ]}
           onPress={addRow}

@@ -49,7 +49,10 @@ export function useInstallmentContractCard({ contract, role, onUpdated }) {
     INSTALLMENT_UI.CONTRACT_STATUS_LABEL[contract.status] ?? contract.status;
   const paidPercent =
     contract.totalAmountRub > 0
-      ? Math.min(100, Math.round((contract.paidAmountRub / contract.totalAmountRub) * 100))
+      ? Math.min(
+          100,
+          Math.round((contract.paidAmountRub / contract.totalAmountRub) * 100),
+        )
       : 0;
 
   const nextPayablePayment = useMemo(

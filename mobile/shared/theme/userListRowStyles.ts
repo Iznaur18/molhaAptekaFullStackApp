@@ -10,7 +10,8 @@ export const USER_LIST_ROW_METRICS_STACK_MAX_CARD_WIDTH = 240;
 export const resolveUserListRowMetricsStacked = (cardWidth: number): boolean =>
   cardWidth > 0 && cardWidth <= USER_LIST_ROW_METRICS_STACK_MAX_CARD_WIDTH;
 
-export const useUserListRowStyles = createThemedStyles((theme) => ({  row: {
+export const useUserListRowStyles = createThemedStyles((theme) => ({
+  row: {
     flex: 1,
     flexDirection: "column",
     alignItems: "stretch",

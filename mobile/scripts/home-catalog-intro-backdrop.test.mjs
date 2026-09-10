@@ -10,12 +10,16 @@ const readMobileFile = (relativePath) =>
   readFileSync(join(MOBILE_ROOT, relativePath), "utf8");
 
 test("HomeCatalogIntroVideoBackdrop: intro playlist, muted toggle, poster fallback", () => {
-  const backdrop = readMobileFile("features/home-feed/ui/HomeCatalogIntroVideoBackdrop.tsx");
+  const backdrop = readMobileFile(
+    "features/home-feed/ui/HomeCatalogIntroVideoBackdrop.tsx",
+  );
   const playlist = readMobileFile(
     "entities/app-intro-settings/model/useIntroBackdropPlaylist.ts",
   );
   const styles = readMobileFile("shared/theme/homeCatalogBackdropStyles.ts");
-  const reExport = readMobileFile("features/home-feed/ui/HomeCatalogPrimaryBackdrop.tsx");
+  const reExport = readMobileFile(
+    "features/home-feed/ui/HomeCatalogPrimaryBackdrop.tsx",
+  );
 
   assert.match(playlist, /playlist/);
 
@@ -66,7 +70,9 @@ test("LoopingCoverVideo shared by splash and product preview", () => {
 
 test("home feed tab bar reveals on scroll past intro hero", () => {
   const index = readMobileFile("app/(tabs)/index.tsx");
-  const scrollHandler = readMobileFile("features/catalog-grid/lib/useCatalogScrollHandler.ts");
+  const scrollHandler = readMobileFile(
+    "features/catalog-grid/lib/useCatalogScrollHandler.ts",
+  );
   const visibility = readMobileFile("shared/model/homeCatalogTabBarVisibility.ts");
   const tabBar = readMobileFile("shared/ui/MobileBottomTabBar.tsx");
 
@@ -82,8 +88,12 @@ test("home feed tab bar reveals on scroll past intro hero", () => {
 
 test("home feed index enables bounce for pull-to-refresh", () => {
   const index = readMobileFile("app/(tabs)/index.tsx");
-  const scrollProps = readMobileFile("features/home-feed/lib/homeCatalogFeedListScrollProps.ts");
-  const invalidate = readMobileFile("features/home-feed/model/invalidateHomeFeedQueries.ts");
+  const scrollProps = readMobileFile(
+    "features/home-feed/lib/homeCatalogFeedListScrollProps.ts",
+  );
+  const invalidate = readMobileFile(
+    "features/home-feed/model/invalidateHomeFeedQueries.ts",
+  );
 
   assert.match(index, /homeCatalogFeedListScrollProps/);
   assert.match(index, /ThemedRefreshControl/);

@@ -163,7 +163,12 @@ export const SiteHeaderBannerCampaignModerationSection = ({
             title={SITE_HEADER_BANNER_CAMPAIGN_MODERATION_PAGE_UI.PENDING_TITLE}
             pendingCount={filteredPendingCampaigns.length}
           />
-          <View style={resolveIntroAdModerationListPanelStyles(INTRO_AD_MODERATION_SECTION_BANNER, styles)}>
+          <View
+            style={resolveIntroAdModerationListPanelStyles(
+              INTRO_AD_MODERATION_SECTION_BANNER,
+              styles,
+            )}
+          >
             {filteredPendingCampaigns.map((campaign) => {
               const campaignId = String(campaign._id);
               const rowId = buildModerationCampaignRowId("banner", campaignId);

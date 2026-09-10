@@ -11,7 +11,9 @@ import "./StaffBroadcastNotificationsAdminPage.css";
 export function StaffBroadcastNotificationsAdminPage() {
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
-  const [recipientsCount, setRecipientsCount] = useState(/** @type {number | null} */ (null));
+  const [recipientsCount, setRecipientsCount] = useState(
+    /** @type {number | null} */ (null),
+  );
   const [countError, setCountError] = useState("");
   const [submitError, setSubmitError] = useState("");
   const [successText, setSuccessText] = useState("");
@@ -123,12 +125,18 @@ export function StaffBroadcastNotificationsAdminPage() {
         </label>
 
         {submitError ? (
-          <p className="staff-broadcast-page__alert staff-broadcast-page__alert--error" role="alert">
+          <p
+            className="staff-broadcast-page__alert staff-broadcast-page__alert--error"
+            role="alert"
+          >
             {submitError}
           </p>
         ) : null}
         {successText ? (
-          <p className="staff-broadcast-page__alert staff-broadcast-page__alert--ok" role="status">
+          <p
+            className="staff-broadcast-page__alert staff-broadcast-page__alert--ok"
+            role="status"
+          >
             {successText}
           </p>
         ) : null}

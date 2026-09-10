@@ -69,7 +69,10 @@ export function CatalogCategoryTilesGrid({
                 </span>
                 <span className="catalog-categories-grid__label">{item.label}</span>
               </button>
-              {isAdmin && onEditTileClick && item.isEditable !== false && item.categoryId ? (
+              {isAdmin &&
+              onEditTileClick &&
+              item.isEditable !== false &&
+              item.categoryId ? (
                 <button
                   type="button"
                   className="catalog-categories-grid__edit"
