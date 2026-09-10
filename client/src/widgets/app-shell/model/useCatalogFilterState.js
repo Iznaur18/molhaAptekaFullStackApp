@@ -28,6 +28,7 @@ export function useCatalogFilterState({
   isCatalogBrowserMainViewActive,
   isCatalogShellView,
   submittedProductSearchTerm,
+  submittedMyProductsSearchTerm = "",
   initialCatalogQuery,
   authUser = null,
   isAuthorized,
@@ -89,9 +90,12 @@ export function useCatalogFilterState({
   );
 
   // Каталог фильтруется отправленным запросом («Найти»), а не текстом в поле.
-  const appliedProductSearchTerm = submittedProductSearchTerm;
-  const hasProductSearchQuery = appliedProductSearchTerm.trim() !== "";
+  // «Мои товары» — отдельное поле над полками (только название).
   const isMineMode = isMyProductsRoute;
+  const appliedProductSearchTerm = isMineMode
+    ? submittedMyProductsSearchTerm
+    : submittedProductSearchTerm;
+  const hasProductSearchQuery = appliedProductSearchTerm.trim() !== "";
   const isCatalogUrlFilterSurface =
     catalogMainView === "catalog-browser" || catalogMainView === "catalog";
   const activeCatalogBrowserCategory = isCatalogUrlFilterSurface

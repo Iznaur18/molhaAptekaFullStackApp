@@ -61,6 +61,15 @@ export const SELLER_SHELF_UI = {
     `${count} ${pluralizeRu(count, SELLER_SHELF_UI.SHELF_UNIT_FORMS)}`,
 };
 
+/** Поиск в «Мои товары» (только название, Enter / «Найти») */
+export const MY_PRODUCTS_SEARCH_UI = {
+  PLACEHOLDER: "Поиск по названию…",
+  ARIA_LABEL: "Поиск моих товаров по названию",
+  CLEAR_ARIA: "Очистить поле поиска",
+  PENDING_ARIA: "Идёт поиск",
+  SUBMIT: "Найти",
+};
+
 export const PRODUCT_PROMOTIONS_STAFF_PAGE_UI = {
   TITLE: "Продвижение товаров",
   EMPTY: "Нет заявок на продвижение.",

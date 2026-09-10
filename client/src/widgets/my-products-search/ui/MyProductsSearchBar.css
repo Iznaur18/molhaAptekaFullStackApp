@@ -1,0 +1,22 @@
+.my-products-search-bar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 0.5rem;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 0.75rem;
+}
+
+.my-products-search-bar .search-input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.my-products-search-bar__submit {
+  flex: 0 0 auto;
+  align-self: stretch;
+  white-space: nowrap;
+}

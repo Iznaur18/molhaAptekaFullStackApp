@@ -30,6 +30,7 @@ import "./MyProductsCatalogSection.css";
  *   catalogLoadMoreError: string | null;
  *   onRetryCatalogLoadMore: () => void;
  *   myProductsModerationFilter?: string;
+ *   hasProductSearchQuery?: boolean;
  *   sellerLoyaltyPointsBalance?: number;
  *   sellerLoyaltyPointsReserved?: number;
  *   onPlaceProductClick?: () => void;
@@ -56,6 +57,7 @@ export function MyProductsCatalogSection({
   catalogLoadMoreError,
   onRetryCatalogLoadMore,
   myProductsModerationFilter = "",
+  hasProductSearchQuery = false,
   sellerLoyaltyPointsBalance = 0,
   sellerLoyaltyPointsReserved = 0,
   onPlaceProductClick,
@@ -71,8 +73,9 @@ export function MyProductsCatalogSection({
     return <CatalogGridSkeleton />;
   }
 
-  const emptyMessage =
-    myProductsModerationFilter !== ""
+  const emptyMessage = hasProductSearchQuery
+    ? HOME_PAGE_UI.EMPTY_BY_QUERY
+    : myProductsModerationFilter !== ""
       ? HOME_PAGE_UI.EMPTY_MY_BY_MODERATION_STATUS
       : HOME_PAGE_UI.EMPTY_MY_PRODUCTS;
 

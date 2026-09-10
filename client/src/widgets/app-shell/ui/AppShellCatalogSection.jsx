@@ -184,6 +184,7 @@ export function AppShellCatalogGridSection({
           catalogLoadMoreError={catalogLoadMoreError}
           onRetryCatalogLoadMore={onRetryCatalogLoadMore}
           myProductsModerationFilter={myProductsModerationFilter}
+          hasProductSearchQuery={hasProductSearchQuery}
           sellerLoyaltyPointsBalance={sellerLoyaltyPointsBalance}
           sellerLoyaltyPointsReserved={sellerLoyaltyPointsReserved}
           onPlaceProductClick={onPlaceProductClick}

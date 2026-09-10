@@ -60,13 +60,31 @@ const normalizeObjectIdMatchField = (fieldValue) => {
  * @param {Record<string, unknown>} productsQuery
  */
 export const normalizeProductsQueryForAggregate = (productsQuery) => {
+  if (productsQuery == null || typeof productsQuery !== "object") {
+    return productsQuery;
+  }
+
   const normalized = { ...productsQuery };
+
   if ("productSeller" in normalized) {
     normalized.productSeller = normalizeObjectIdMatchField(normalized.productSeller);
   }
   if ("_id" in normalized) {
     normalized._id = normalizeObjectIdMatchField(normalized._id);
   }
+
+  for (const key of /** @type {const} */ (["$and", "$or", "$nor"])) {
+    const branch = normalized[key];
+    if (!Array.isArray(branch)) {
+      continue;
+    }
+    normalized[key] = branch.map((clause) =>
+      clause != null && typeof clause === "object" && !Array.isArray(clause)
+        ? normalizeProductsQueryForAggregate(/** @type {Record<string, unknown>} */ (clause))
+        : clause,
+    );
+  }
+
   return normalized;
 };
 

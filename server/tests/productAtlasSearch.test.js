@@ -125,6 +125,24 @@ test("buildProductCatalogSearchQuery: regex mode by default", async () => {
   assert.ok(Array.isArray(result.query.$and));
 });
 
+test("buildProductCatalogSearchQuery: nameOnly → только productName", async () => {
+  const result = await buildProductCatalogSearchQuery(
+    "витамин",
+    { productSeller: "seller-1" },
+    { nameOnly: true },
+  );
+
+  assert.equal(result.mode, CATALOG_SEARCH_MODE_REGEX);
+  assert.equal(result.atlasSearch, null);
+  assert.deepEqual(result.searchRank?.categorySlugs, []);
+  assert.deepEqual(result.query, {
+    $and: [
+      { productSeller: "seller-1" },
+      { productName: result.intent.regexCondition },
+    ],
+  });
+});
+
 test("buildProductCatalogSearchQuery: atlas mode when preferAtlas", async () => {
   const result = await buildProductCatalogSearchQuery(
     "витамин",
