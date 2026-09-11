@@ -1,4 +1,5 @@
 import {
+  assignSellerShelfProductBodySchema,
   createSellerShelfBodySchema,
   patchSellerShelfBodySchema,
   reorderSellerShelvesBodySchema,
@@ -30,6 +31,11 @@ export const sellerShelfIdParamValidation = [
 export const setSellerShelfProductsValidation = [
   validateParamsZod(sellerShelfIdParamsSchema),
   validateBodyZod(setSellerShelfProductsBodySchema),
+];
+
+export const assignSellerShelfProductValidation = [
+  validateParamsZod(sellerShelfIdParamsSchema),
+  validateBodyZod(assignSellerShelfProductBodySchema),
 ];
 
 export const sellerShelfSellerIdParamValidation = [

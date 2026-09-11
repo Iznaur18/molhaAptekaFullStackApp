@@ -1,16 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { fetchAllMyProducts } from "../../product/api/fetchMyProducts.js";
 import {
   createSellerShelf,
   deleteSellerShelf,
   patchSellerShelf,
   reorderSellerShelves,
-  setSellerShelfProducts,
 } from "../api/sellerShelfApi.js";
 import { useMySellerShelvesQuery } from "../model/useMySellerShelvesQuery.js";
 import { sellerShelfQueryKeys } from "../model/sellerShelfQueryKeys.js";
+import { SELLER_SHELVES_EXPAND_EVENT } from "../lib/sellerShelvesPanelEvents.js";
 import { SELLER_SHELF_UI } from "../../../shared/config/appUiCopy.js";
 import { ProductModalShell } from "../../../shared/ui/ProductModalShell/ProductModalShell.jsx";
 
@@ -29,16 +28,25 @@ export function MyProductsShelvesPanel() {
   const [assignShelfId, setAssignShelfId] = useState(
     /** @type {string | null} */ (null),
   );
-  const [selectedIds, setSelectedIds] = useState(
-    /** @type {Set<string>} */ (new Set()),
-  );
   const [isExpanded, setIsExpanded] = useState(false);
   const bodyId = "my-products-shelves-body";
+  const sectionRef = useRef(/** @type {HTMLElement | null} */ (null));
 
   const shelves = shelvesQuery.data?.shelves ?? [];
   const maxShelves = shelvesQuery.data?.maxShelves ?? 10;
   const nameMaxChars = shelvesQuery.data?.nameMaxChars ?? 30;
   const atLimit = shelves.length >= maxShelves;
+
+  useEffect(() => {
+    const onExpandRequest = () => {
+      setIsExpanded(true);
+      sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    window.addEventListener(SELLER_SHELVES_EXPAND_EVENT, onExpandRequest);
+    return () => {
+      window.removeEventListener(SELLER_SHELVES_EXPAND_EVENT, onExpandRequest);
+    };
+  }, []);
 
   const assignShelf = useMemo(
     () =>
@@ -46,13 +54,6 @@ export function MyProductsShelvesPanel() {
       null,
     [assignShelfId, shelves],
   );
-
-  const productsQuery = useQuery({
-    queryKey: [...sellerShelfQueryKeys.all, "assign-products"],
-    queryFn: () => fetchAllMyProducts(),
-    enabled: Boolean(assignShelfId),
-    staleTime: 15_000,
-  });
 
   const invalidateShelves = () => {
     void queryClient.invalidateQueries({ queryKey: sellerShelfQueryKeys.mine() });
@@ -87,6 +88,12 @@ export function MyProductsShelvesPanel() {
     },
   });
 
+  const closeAssign = () => {
+    setAssignShelfId(null);
+    setIsAssignRenaming(false);
+    setEditName("");
+  };
+
   const deleteMutation = useMutation({
     mutationFn: (/** @type {string} */ shelfId) => deleteSellerShelf(shelfId),
     onSuccess: (_data, shelfId) => {
@@ -115,32 +122,9 @@ export function MyProductsShelvesPanel() {
     },
   });
 
-  const assignMutation = useMutation({
-    mutationFn: (/** @type {{ shelfId: string; productIds: string[] }} */ input) =>
-      setSellerShelfProducts(input.shelfId, input.productIds),
-    onSuccess: () => {
-      setAssignShelfId(null);
-      setSelectedIds(new Set());
-      invalidateShelves();
-    },
-    onError: (error) => {
-      setErrorMessage(
-        error instanceof Error ? error.message : SELLER_SHELF_UI.LOAD_ERROR,
-      );
-    },
-  });
-
   const openAssign = (shelfId) => {
     setErrorMessage("");
     setAssignShelfId(String(shelfId));
-    setSelectedIds(new Set());
-    setIsAssignRenaming(false);
-    setEditName("");
-  };
-
-  const closeAssign = () => {
-    setAssignShelfId(null);
-    setSelectedIds(new Set());
     setIsAssignRenaming(false);
     setEditName("");
   };
@@ -180,19 +164,6 @@ export function MyProductsShelvesPanel() {
     });
   };
 
-  useEffect(() => {
-    if (!assignShelfId || !productsQuery.data) {
-      return;
-    }
-    const next = new Set();
-    for (const product of productsQuery.data) {
-      if (String(product.sellerShelfId ?? "") === String(assignShelfId)) {
-        next.add(String(product._id));
-      }
-    }
-    setSelectedIds(next);
-  }, [assignShelfId, productsQuery.data]);
-
   const moveShelf = (shelfId, direction) => {
     const index = shelves.findIndex((s) => s._id === shelfId);
     if (index < 0) return;
@@ -210,15 +181,6 @@ export function MyProductsShelvesPanel() {
     }
     event.preventDefault();
     openAssign(shelfId);
-  };
-
-  const toggleProduct = (productId) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(productId)) next.delete(productId);
-      else next.add(productId);
-      return next;
-    });
   };
 
   const assignShelfNameBlock = assignShelf ? (
@@ -250,8 +212,8 @@ export function MyProductsShelvesPanel() {
         <button
           type="button"
           className="my-products-shelves__assign-name-btn"
-          aria-label={SELLER_SHELF_UI.RENAME_NAME_ARIA}
           onClick={startShelfRename}
+          aria-label={SELLER_SHELF_UI.RENAME_NAME_ARIA}
         >
           <span className="my-products-shelves__assign-name-main">
             <span className="my-products-shelves__assign-name-label">
@@ -271,6 +233,7 @@ export function MyProductsShelvesPanel() {
 
   return (
     <section
+      ref={sectionRef}
       className={[
         "my-products-shelves",
         isExpanded ? "my-products-shelves_expanded" : "my-products-shelves_collapsed",
@@ -429,7 +392,7 @@ export function MyProductsShelvesPanel() {
 
       <ProductModalShell
         isOpen={Boolean(assignShelfId)}
-        size="fullHeight"
+        size="md"
         hideCloseButton
         closeOnEscape={!isAssignRenaming}
         panelClassName="my-products-shelves__assign-panel"
@@ -451,7 +414,6 @@ export function MyProductsShelvesPanel() {
               disabled={
                 !assignShelfId ||
                 deleteMutation.isPending ||
-                assignMutation.isPending ||
                 patchMutation.isPending
               }
               onClick={() => {
@@ -466,98 +428,15 @@ export function MyProductsShelvesPanel() {
             <button
               type="button"
               className="app-btn app-btn--secondary"
-              disabled={
-                assignMutation.isPending ||
-                deleteMutation.isPending ||
-                patchMutation.isPending
-              }
+              disabled={deleteMutation.isPending || patchMutation.isPending}
               onClick={closeAssign}
             >
               {SELLER_SHELF_UI.ASSIGN_CANCEL}
             </button>
-            <button
-              type="button"
-              className="app-btn app-btn--primary my-products-shelves__assign-footer-save"
-              disabled={
-                assignMutation.isPending ||
-                deleteMutation.isPending ||
-                patchMutation.isPending ||
-                productsQuery.isLoading
-              }
-              onClick={() => {
-                if (!assignShelfId) return;
-                assignMutation.mutate({
-                  shelfId: assignShelfId,
-                  productIds: [...selectedIds],
-                });
-              }}
-            >
-              {assignMutation.isPending
-                ? SELLER_SHELF_UI.ASSIGN_PENDING
-                : SELLER_SHELF_UI.ASSIGN_SAVE}
-            </button>
           </div>
         }
       >
-        <ul className="my-products-shelves__assign-list" role="list">
-          {assignShelf ? (
-            <li className="my-products-shelves__assign-item my-products-shelves__assign-item_name">
-              {assignShelfNameBlock}
-            </li>
-          ) : null}
-          {productsQuery.isLoading ? (
-            <li className="my-products-shelves__assign-item">
-              <p className="my-products-shelves__assign-state">
-                {SELLER_SHELF_UI.LOADING}
-              </p>
-            </li>
-          ) : (productsQuery.data?.length ?? 0) === 0 ? (
-            <li className="my-products-shelves__assign-item">
-              <p className="my-products-shelves__assign-state">
-                {SELLER_SHELF_UI.ASSIGN_EMPTY}
-              </p>
-            </li>
-          ) : (
-            (productsQuery.data ?? []).map((product) => {
-              const id = String(product._id);
-              const checked = selectedIds.has(id);
-              const otherShelf =
-                product.sellerShelfId &&
-                String(product.sellerShelfId) !== String(assignShelfId);
-              const productName = String(product.productName ?? "").trim() || "Товар";
-
-              return (
-                <li key={id} className="my-products-shelves__assign-item">
-                  <label
-                    className={[
-                      "my-products-shelves__assign-row",
-                      checked ? "my-products-shelves__assign-row_selected" : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                  >
-                    <input
-                      type="checkbox"
-                      className="my-products-shelves__assign-check"
-                      checked={checked}
-                      onChange={() => toggleProduct(id)}
-                    />
-                    <span className="my-products-shelves__assign-row-body">
-                      <span className="my-products-shelves__assign-product-name">
-                        {productName}
-                      </span>
-                      {otherShelf ? (
-                        <span className="my-products-shelves__assign-badge">
-                          {SELLER_SHELF_UI.ASSIGN_OTHER_SHELF}
-                        </span>
-                      ) : null}
-                    </span>
-                  </label>
-                </li>
-              );
-            })
-          )}
-        </ul>
+        {assignShelfNameBlock}
       </ProductModalShell>
     </section>
   );

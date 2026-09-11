@@ -1,4 +1,4 @@
-.my-products-shelves {
+﻿.my-products-shelves {
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -368,18 +368,6 @@
   color: var(--iz-color-danger-text);
 }
 
-.my-products-shelves__assign-state {
-  margin: 0;
-  padding: 1rem 0.875rem;
-  border: 1px dashed var(--iz-color-border);
-  border-radius: 0.875rem;
-  background: var(--iz-color-surface-muted);
-  font-size: 0.875rem;
-  line-height: 1.45;
-  color: var(--iz-color-text-muted);
-  text-align: center;
-}
-
 .my-products-shelves__assign-footer-wrap {
   padding-top: var(--iz-space-3);
 }
@@ -396,13 +384,8 @@
   flex: 0 0 auto;
 }
 
-.my-products-shelves__assign-footer-save {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.my-products-shelves__assign-panel.product-modal-shell__panel_full-height {
-  padding-top: env(safe-area-inset-top, 0px);
+.my-products-shelves__assign-footer .app-btn--secondary {
+  margin-left: auto;
 }
 
 .my-products-shelves__assign-panel .product-modal-shell__header {
@@ -411,39 +394,12 @@
   background: var(--iz-color-surface);
 }
 
-.my-products-shelves__assign-panel .product-modal-shell__body {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
-}
-
 .my-products-shelves__assign-panel .product-modal-shell__footer {
   padding-bottom: max(var(--iz-space-4), env(safe-area-inset-bottom, 0px));
 }
 
 .my-products-shelves__assign-modal-body {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  min-height: 0;
   padding: var(--iz-space-3) var(--iz-space-4);
-  overflow: hidden;
-}
-
-.my-products-shelves__assign-item_name {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  margin-bottom: 0.15rem;
-  background: var(--iz-color-surface);
-  transform: translateZ(0);
-}
-
-.my-products-shelves__assign-item_name .my-products-shelves__assign-state {
-  width: 100%;
 }
 
 .my-products-shelves__assign-shelf-name {
@@ -549,96 +505,4 @@
 
 .my-products-shelves__assign-name-input:disabled {
   opacity: 0.65;
-}
-
-.my-products-shelves__assign-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  gap: 0.5rem;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-.my-products-shelves__assign-item {
-  margin: 0;
-}
-
-.my-products-shelves__assign-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 0.75rem 0.875rem;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 1rem;
-  background: var(--iz-color-surface-muted);
-  cursor: pointer;
-  transition:
-    border-color var(--iz-transition-base),
-    background var(--iz-transition-base),
-    box-shadow var(--iz-transition-base);
-}
-
-.my-products-shelves__assign-row:hover {
-  border-color: color-mix(in srgb, var(--iz-color-action) 35%, var(--iz-color-border));
-  background: color-mix(
-    in srgb,
-    var(--iz-color-action) 4%,
-    var(--iz-color-surface-muted)
-  );
-}
-
-.my-products-shelves__assign-row_selected {
-  border-color: var(--iz-color-action);
-  background: color-mix(in srgb, var(--iz-color-action) 8%, var(--iz-color-surface));
-  box-shadow: inset 3px 0 0 var(--iz-color-action);
-}
-
-.my-products-shelves__assign-check {
-  flex: 0 0 auto;
-  width: 1.125rem;
-  height: 1.125rem;
-  margin-top: 0.125rem;
-  accent-color: var(--iz-color-action);
-  cursor: pointer;
-}
-
-.my-products-shelves__assign-row-body {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.35rem;
-  min-width: 0;
-  flex: 1 1 auto;
-}
-
-.my-products-shelves__assign-product-name {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  line-height: 1.35;
-  color: var(--iz-color-text);
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  overflow-wrap: anywhere;
-}
-
-.my-products-shelves__assign-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-  background: var(--iz-color-warning-surface);
-  color: var(--iz-color-warning-text);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  line-height: 1.2;
 }

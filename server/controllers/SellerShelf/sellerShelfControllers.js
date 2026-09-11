@@ -1,4 +1,5 @@
 import {
+  assignProductToSellerShelf,
   createSellerShelf,
   deleteSellerShelf,
   listMySellerShelves,
@@ -60,6 +61,15 @@ export const setSellerShelfProductsController = async (req, res) => {
     userId: String(req.userId),
     shelfId: String(req.params.shelfId),
     productIds: req.body.productIds ?? [],
+  });
+  return successRes(res, data);
+};
+
+export const assignProductToSellerShelfController = async (req, res) => {
+  const data = await assignProductToSellerShelf({
+    userId: String(req.userId),
+    shelfId: String(req.params.shelfId),
+    productId: String(req.body.productId),
   });
   return successRes(res, data);
 };

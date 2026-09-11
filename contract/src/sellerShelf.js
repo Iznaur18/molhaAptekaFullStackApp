@@ -34,6 +34,10 @@ export const setSellerShelfProductsBodySchema = z.object({
   productIds: z.array(mongoIdSchema).max(500),
 });
 
+export const assignSellerShelfProductBodySchema = z.object({
+  productId: mongoIdSchema,
+});
+
 export const sellerShelfSchema = z.object({
   _id: z.string(),
   sellerId: z.string(),

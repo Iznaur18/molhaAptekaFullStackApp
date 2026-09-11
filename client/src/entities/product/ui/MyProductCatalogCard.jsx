@@ -37,6 +37,7 @@ import "./MyProductCatalogCard.css";
  *   onEditProduct?: () => void;
  *   onCopyProduct?: () => void;
  *   onDeleteProduct?: () => void;
+ *   onAssignToShelf?: () => void;
  *   onPromoteProduct?: () => void;
  *   isDeletePending?: boolean;
  *   isAvailabilityTogglePending?: boolean;
@@ -52,6 +53,7 @@ export function MyProductCatalogCard({
   onEditProduct,
   onCopyProduct,
   onDeleteProduct,
+  onAssignToShelf,
   onPromoteProduct,
   isDeletePending = false,
   isAvailabilityTogglePending = false,
@@ -87,7 +89,8 @@ export function MyProductCatalogCard({
   const showEdit = typeof onEditProduct === "function" && canEdit;
   const showCopy = typeof onCopyProduct === "function";
   const showDelete = typeof onDeleteProduct === "function";
-  const showMore = showCopy || showDelete;
+  const showAssignToShelf = typeof onAssignToShelf === "function";
+  const showMore = showCopy || showDelete || showAssignToShelf;
   const showToolbar = showPromote || showEdit || showMore;
   const promoteDisabled = isProductPromoteButtonDisabled({
     isDeletePending,
@@ -202,11 +205,13 @@ export function MyProductCatalogCard({
               <MyProductCompactCardOverflowMenu
                 showCopy={showCopy}
                 showDelete={showDelete}
+                showAssignToShelf={showAssignToShelf}
                 isDeletePending={isDeletePending}
                 hasOpenSales={product.hasOpenSales === true}
                 disabled={isDeletePending}
                 onCopyProduct={onCopyProduct}
                 onDeleteProduct={onDeleteProduct}
+                onAssignToShelf={onAssignToShelf}
               />
             ) : null}
           </div>

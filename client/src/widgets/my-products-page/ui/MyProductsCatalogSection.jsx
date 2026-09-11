@@ -1,7 +1,12 @@
-import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { useState } from "react";
+
+import { HOME_PAGE_UI, SELLER_SHELF_UI } from "../../../shared/config/appUiCopy.js";
 import { InlineErrorBanner } from "../../../shared/ui/InlineErrorBanner/InlineErrorBanner.jsx";
 import { isSellerProductLoyaltyPointsOvercommitted } from "../../../entities/product/lib/isSellerProductLoyaltyPointsOvercommitted.js";
 import { MyProductCatalogCard } from "../../../entities/product/ui/MyProductCatalogCard.jsx";
+import { AssignProductToSellerShelfModal } from "../../../entities/seller-shelf/ui/AssignProductToSellerShelfModal.jsx";
+import { useMySellerShelvesQuery } from "../../../entities/seller-shelf/model/useMySellerShelvesQuery.js";
+import { requestSellerShelvesPanelExpand } from "../../../entities/seller-shelf/lib/sellerShelvesPanelEvents.js";
 import { CatalogGridSkeleton } from "../../catalog-product-grid/ui/CatalogGridSkeleton.jsx";
 
 import "./MyProductsCatalogSection.css";
@@ -21,6 +26,8 @@ import "./MyProductsCatalogSection.css";
  *   onPromoteMyProduct: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
  *   myProductsCatalogError: string;
  *   myProductsCatalogNotice?: string;
+ *   onMyProductsCatalogNotice?: (message: string) => void;
+ *   onMyProductsCatalogError?: (message: string) => void;
  *   onOpenProductDetails: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
  *   togglingAvailabilityProductId: string | null;
  *   togglingAuctionProductId?: string | null;
@@ -48,6 +55,8 @@ export function MyProductsCatalogSection({
   onPromoteMyProduct,
   myProductsCatalogError,
   myProductsCatalogNotice = "",
+  onMyProductsCatalogNotice,
+  onMyProductsCatalogError,
   onOpenProductDetails,
   togglingAvailabilityProductId,
   togglingAuctionProductId = null,
@@ -62,8 +71,26 @@ export function MyProductsCatalogSection({
   sellerLoyaltyPointsReserved = 0,
   onPlaceProductClick,
 }) {
+  const shelvesQuery = useMySellerShelvesQuery();
+  const [productForShelfAssign, setProductForShelfAssign] = useState(
+    /** @type {import('../../../entities/product/model/types.js').ProductFromApi | null} */ (
+      null
+    ),
+  );
+
   const isCatalogInitialLoading =
     catalogStatus.kind === "loading" && products.length === 0;
+
+  const handleAssignToShelf = (product) => {
+    const shelves = shelvesQuery.data?.shelves ?? [];
+    if (!shelvesQuery.isLoading && shelves.length === 0) {
+      requestSellerShelvesPanelExpand();
+      onMyProductsCatalogError?.("");
+      onMyProductsCatalogNotice?.(SELLER_SHELF_UI.EMPTY);
+      return;
+    }
+    setProductForShelfAssign(product);
+  };
 
   if (catalogStatus.kind === "error" && products.length === 0) {
     return <InlineErrorBanner>{catalogStatus.message}</InlineErrorBanner>;
@@ -128,6 +155,7 @@ export function MyProductsCatalogSection({
                   onEditProduct={() => onEditMyProduct(product)}
                   onCopyProduct={() => onCopyMyProduct(product)}
                   onDeleteProduct={() => onDeleteMyProduct(productId)}
+                  onAssignToShelf={() => handleAssignToShelf(product)}
                   onPromoteProduct={() => onPromoteMyProduct(product)}
                   isDeletePending={deletingProductId === productId}
                   isAvailabilityTogglePending={
@@ -167,6 +195,19 @@ export function MyProductsCatalogSection({
           </button>
         </div>
       ) : null}
+
+      <AssignProductToSellerShelfModal
+        product={productForShelfAssign}
+        onClose={() => setProductForShelfAssign(null)}
+        onSuccess={(message) => {
+          onMyProductsCatalogError?.("");
+          onMyProductsCatalogNotice?.(message);
+        }}
+        onError={(message) => {
+          onMyProductsCatalogNotice?.("");
+          onMyProductsCatalogError?.(message);
+        }}
+      />
     </div>
   );
 }

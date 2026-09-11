@@ -1,28 +1,32 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { EllipsisVertical } from "lucide-react";
 
-import { PRODUCT_CARD_UI } from "../../../shared/config/appUiCopy.js";
+import { PRODUCT_CARD_UI, SELLER_SHELF_UI } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/AppIcon.jsx";
 
 /**
  * @param {{
  *   showCopy: boolean;
  *   showDelete: boolean;
+ *   showAssignToShelf?: boolean;
  *   isDeletePending?: boolean;
  *   hasOpenSales?: boolean;
  *   disabled?: boolean;
  *   onCopyProduct?: () => void;
  *   onDeleteProduct?: () => void;
+ *   onAssignToShelf?: () => void;
  * }} props
  */
 export function MyProductCompactCardOverflowMenu({
   showCopy,
   showDelete,
+  showAssignToShelf = false,
   isDeletePending = false,
   hasOpenSales = false,
   disabled = false,
   onCopyProduct,
   onDeleteProduct,
+  onAssignToShelf,
 }) {
   const menuId = useId();
   const rootRef = useRef(/** @type {HTMLDivElement | null} */ (null));
@@ -60,7 +64,7 @@ export function MyProductCompactCardOverflowMenu({
     };
   }, [isOpen]);
 
-  if (!showCopy && !showDelete) {
+  if (!showCopy && !showDelete && !showAssignToShelf) {
     return null;
   }
 
@@ -81,6 +85,11 @@ export function MyProductCompactCardOverflowMenu({
   const handleCopy = () => {
     closeMenu();
     onCopyProduct?.();
+  };
+
+  const handleAssignToShelf = () => {
+    closeMenu();
+    onAssignToShelf?.();
   };
 
   const handleDeleteIntent = () => {
@@ -149,6 +158,16 @@ export function MyProductCompactCardOverflowMenu({
             </div>
           ) : (
             <>
+              {showAssignToShelf ? (
+                <button
+                  type="button"
+                  className="my-product-compact-card__menu-item"
+                  role="menuitem"
+                  onClick={handleAssignToShelf}
+                >
+                  {SELLER_SHELF_UI.ASSIGN_PRODUCT_MENU}
+                </button>
+              ) : null}
               {showCopy ? (
                 <button
                   type="button"

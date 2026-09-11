@@ -709,6 +709,7 @@ export {
   patchSellerShelfBodySchema,
   reorderSellerShelvesBodySchema,
   setSellerShelfProductsBodySchema,
+  assignSellerShelfProductBodySchema,
   sellerShelfSchema,
   sellerShelfListDataSchema,
 } from "./sellerShelf.js";
