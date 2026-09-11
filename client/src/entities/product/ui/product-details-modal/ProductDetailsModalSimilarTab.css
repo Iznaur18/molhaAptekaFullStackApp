@@ -5,12 +5,6 @@
   padding: 0.5rem 0 1rem;
 }
 
-.product-details-similar-tab__grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.125rem;
-}
-
 .product-details-similar-tab__empty,
 .product-details-similar-tab__state {
   margin: 0;

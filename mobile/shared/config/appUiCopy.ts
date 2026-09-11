@@ -1744,7 +1744,7 @@ export const SELLER_PRODUCTS_PAGE_UI = {
 
 export const SELLER_SHELF_UI = {
   TITLE: "Полки",
-  HINT: "Группируйте товары для фильтров на витрине. До 10 полок.",
+  HINT: "Группируйте товары для фильтров на витрине. До 20 полок.",
   CREATE_PLACEHOLDER: "Название полки",
   CREATE: "Создать",
   CREATE_PENDING: "Создаём…",
@@ -1763,7 +1763,7 @@ export const SELLER_SHELF_UI = {
   ASSIGN_EMPTY: "Нет товаров для назначения.",
   PRODUCT_COUNT: (count: number) => `${count}`,
   EMPTY: "Полок пока нет — создайте первую.",
-  LIMIT_REACHED: "Достигнут лимит 10 полок",
+  LIMIT_REACHED: "Достигнут лимит 20 полок",
   ASSIGN_SAVE: "Сохранить",
   ASSIGN_TITLE: (name: string) => `Полка «${name}»`,
   EXPAND_TOGGLE: (expanded: boolean) => (expanded ? "Свернуть" : "Развернуть"),

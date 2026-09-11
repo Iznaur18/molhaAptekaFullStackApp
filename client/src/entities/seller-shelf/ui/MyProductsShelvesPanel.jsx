@@ -33,7 +33,7 @@ export function MyProductsShelvesPanel() {
   const sectionRef = useRef(/** @type {HTMLElement | null} */ (null));
 
   const shelves = shelvesQuery.data?.shelves ?? [];
-  const maxShelves = shelvesQuery.data?.maxShelves ?? 10;
+  const maxShelves = shelvesQuery.data?.maxShelves ?? 20;
   const nameMaxChars = shelvesQuery.data?.nameMaxChars ?? 30;
   const atLimit = shelves.length >= maxShelves;
 

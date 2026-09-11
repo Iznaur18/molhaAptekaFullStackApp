@@ -113,16 +113,21 @@ export function ProductDetailsModalSimilarTab({
 
   return (
     <div className="product-details-similar-tab">
-      <div className="product-details-similar-tab__grid">
+      <div className="app-shell__grid" role="list">
         {products.map((item) => (
-          <ProductCard
+          <div
             key={String(item._id)}
-            product={item}
-            isAuthorized={isAuthorized}
-            currentUserId={currentUserId}
-            onRequestLoginAddToCart={onRequestLoginAddToCart}
-            onOpenDetails={() => navigateToProductDetails(navigate, item)}
-          />
+            className="app-shell__cell"
+            role="listitem"
+          >
+            <ProductCard
+              product={item}
+              isAuthorized={isAuthorized}
+              currentUserId={currentUserId}
+              onRequestLoginAddToCart={onRequestLoginAddToCart}
+              onOpenDetails={() => navigateToProductDetails(navigate, item)}
+            />
+          </div>
         ))}
       </div>
       {canFetchMore ? (

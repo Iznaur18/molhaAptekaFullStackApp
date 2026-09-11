@@ -23,7 +23,7 @@ export const SELLER_PRODUCTS_PAGE_UI = {
 
 export const SELLER_SHELF_UI = {
   TITLE: "Полки",
-  HINT: "Группируйте товары для фильтров на витрине. До 10 полок. Товары — через «⋯» на карточке.",
+  HINT: "Группируйте товары для фильтров на витрине. До 20 полок. Товары — через «⋯» на карточке.",
   CREATE_PLACEHOLDER: "Название полки",
   CREATE: "Создать",
   CREATE_PENDING: "Создаём…",
@@ -60,7 +60,7 @@ export const SELLER_SHELF_UI = {
   /** @param {number} count */
   PRODUCT_COUNT: (count) => `${count}`,
   NAME_TOO_LONG: "Максимум 30 символов",
-  LIMIT_REACHED: "Достигнут лимит 10 полок",
+  LIMIT_REACHED: "Достигнут лимит 20 полок",
   /** @param {boolean} expanded */
   EXPAND_TOGGLE: (expanded) => (expanded ? "Свернуть" : "Развернуть"),
   SHELF_UNIT_FORMS: /** @type {const} */ (["полка", "полки", "полок"]),
