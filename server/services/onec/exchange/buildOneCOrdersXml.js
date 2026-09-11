@@ -22,6 +22,9 @@ const UNIT_CODE = "796";
 const UNIT_SHORT = "шт";
 const UNIT_FULL = "Штука";
 const UNIT_INTL = "PCE";
+/** Стабильный склад «сайта» — у маркетплейса нет 1С-склада продавца. */
+const SITE_WAREHOUSE_ID = "00000000-0000-4000-8000-000000000001";
+const SITE_WAREHOUSE_NAME = "Склад сайта";
 
 /**
  * @param {unknown} value
@@ -83,6 +86,12 @@ function buildOrderProductXml(line) {
         <Ид>${escapeXml(line.guid)}</Ид>
         <Наименование>${escapeXml(line.name)}</Наименование>
         <БазоваяЕдиница Код="${UNIT_CODE}" НаименованиеПолное="${UNIT_FULL}" МеждународноеСокращение="${UNIT_INTL}">${UNIT_SHORT}</БазоваяЕдиница>
+        <СтавкиНалогов>
+          <СтавкаНалога>
+            <Наименование>НДС</Наименование>
+            <Ставка>0</Ставка>
+          </СтавкаНалога>
+        </СтавкиНалогов>
         <ЗначенияРеквизитов>
 ${requisitesRow("ВидНоменклатуры", "Товар")}
 ${requisitesRow("ТипНоменклатуры", "Товар")}
@@ -103,6 +112,7 @@ ${requisitesRow("ТипНоменклатуры", "Товар")}
             <Наименование>НДС</Наименование>
             <УчтеноВСумме>true</УчтеноВСумме>
             <Сумма>0</Сумма>
+            <Ставка>0</Ставка>
           </Налог>
         </Налоги>
       </Товар>`;
@@ -131,6 +141,8 @@ export function buildOrderDocument({ order, lines, buyer }) {
   const deliveryLabel =
     order.fulfillmentMethod === "delivery" ? "Доставка" : "Самовывоз";
 
+  const buyerName = buyer?.userName || "Покупатель маркетплейса";
+
   const contacts = [];
   if (buyer?.userPhoneNumber) {
     contacts.push(
@@ -151,6 +163,7 @@ export function buildOrderDocument({ order, lines, buyer }) {
 
   return `  <Документ>
     <Ид>${escapeXml(documentId)}</Ид>
+    <ПометкаУдаления>${isCancelled ? "true" : "false"}</ПометкаУдаления>
     <Номер>${escapeXml(documentId)}</Номер>
     <Дата>${formatDate(createdAt)}</Дата>
     <Время>${formatTime(createdAt)}</Время>
@@ -158,9 +171,12 @@ export function buildOrderDocument({ order, lines, buyer }) {
     <Контрагенты>
       <Контрагент>
         <Ид>${escapeXml(String(order.userBuyerId ?? ""))}</Ид>
-        <Наименование>${escapeXml(buyer?.userName || "Покупатель маркетплейса")}</Наименование>
-        <ПолноеНаименование>${escapeXml(buyer?.userName || "Покупатель маркетплейса")}</ПолноеНаименование>
+        <Наименование>${escapeXml(buyerName)}</Наименование>
+        <ПолноеНаименование>${escapeXml(buyerName)}</ПолноеНаименование>
         <Роль>Покупатель</Роль>
+        <ИНН></ИНН>
+        <КПП></КПП>
+        <КодПоОКПО></КодПоОКПО>
         <Адрес>
           <Представление>${escapeXml(address)}</Представление>
         </Адрес>
@@ -170,6 +186,12 @@ ${
     : ""
 }      </Контрагент>
     </Контрагенты>
+    <Склады>
+      <Склад>
+        <Ид>${SITE_WAREHOUSE_ID}</Ид>
+        <Наименование>${SITE_WAREHOUSE_NAME}</Наименование>
+      </Склад>
+    </Склады>
     <Валюта>руб</Валюта>
     <Курс>1.0000</Курс>
     <Сумма>${formatMoney(total)}</Сумма>

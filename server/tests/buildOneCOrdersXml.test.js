@@ -45,6 +45,10 @@ describe("buildOneCOrdersXml Bitrix shape", () => {
 
     assert.match(xml, /<Ид>6aa0160770c1f477e255b2b3<\/Ид>/);
     assert.doesNotMatch(xml, /<Ид>[^<]*:[^<]*<\/Ид>/);
+    assert.match(xml, /<ПометкаУдаления>true<\/ПометкаУдаления>/);
+    assert.match(xml, /<ИНН><\/ИНН>/);
+    assert.match(xml, /<Склады>/);
+    assert.match(xml, /<СтавкиНалогов>/);
     assert.match(xml, /<Тип>Телефон рабочий<\/Тип>/);
     assert.match(xml, /<Тип>Электронная почта<\/Тип>/);
     assert.match(xml, /<Значение>Картой при получении<\/Значение>/);

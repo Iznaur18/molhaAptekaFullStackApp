@@ -24,6 +24,7 @@ const {
 
 const {
   OneCCategoryMappingModel,
+  OneCImportJobModel,
   OneCOrderPushModel,
   OneCPendingProductModel,
   OrderModel,
@@ -672,6 +673,9 @@ describe("CommerceML обмен: заказы", () => {
     assert.doesNotMatch(xml, new RegExp(`<Ид>${String(order._id)}:`));
     assert.match(xml, /<Единица>/);
     assert.match(xml, /<Коэффициент>1<\/Коэффициент>/);
+    assert.match(xml, /<ПометкаУдаления>/);
+    assert.match(xml, /<СтавкиНалогов>/);
+    assert.match(xml, /<Склады>/);
 
     // До подтверждения заказ ещё не считается переданным.
     const midway = await OneCOrderPushModel.findById(push._id).lean();
@@ -685,5 +689,37 @@ describe("CommerceML обмен: заказы", () => {
     const confirmed = await OneCOrderPushModel.findById(push._id).lean();
     assert.equal(confirmed.status, "synced");
     assert.ok(confirmed.syncedAt);
+  });
+
+  it("type=sale mode=file/import отвечает success и не создаёт import job", async () => {
+    const { seller, credentials } = await createExchangeSeller();
+    const basic = Buffer.from(
+      `${credentials.login}:${credentials.password}`,
+      "utf8",
+    ).toString("base64");
+    const checkAuth = await http.request("/onec/exchange?type=sale&mode=checkauth", {
+      headers: { Authorization: `Basic ${basic}` },
+    });
+    const [, cookieName, cookieValue] = (await checkAuth.text()).split("\n");
+    const cookie = `${cookieName}=${cookieValue}`;
+
+    const upload = await http.request(
+      "/onec/exchange?type=sale&mode=file&filename=v8_orders.zip",
+      {
+        method: "POST",
+        headers: { Cookie: cookie, "Content-Type": "application/octet-stream" },
+        body: Buffer.from("fake-orders-zip"),
+      },
+    );
+    assert.equal(await upload.text(), "success");
+
+    const imported = await http.request(
+      "/onec/exchange?type=sale&mode=import&filename=orders.xml",
+      { headers: { Cookie: cookie } },
+    );
+    assert.equal(await imported.text(), "success");
+
+    const jobs = await OneCImportJobModel.find({ sellerId: seller._id }).lean();
+    assert.equal(jobs.length, 0);
   });
 });
