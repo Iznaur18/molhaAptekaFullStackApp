@@ -13,6 +13,24 @@ test("details top row shows pickup address instead of region", () => {
   expect(isProductFieldMultilineRead("productPickupAddress")).toBe(true);
 });
 
+test("productCategory shows leaf from categoryBreadcrumbRu", () => {
+  expect(
+    formatProductFieldForDisplay("productCategory", {
+      productCategory: "food",
+      categoryBreadcrumbRu: "Продукты питания › Напитки › Энергетики",
+    }),
+  ).toBe("Энергетики");
+});
+
+test("productCategory falls back to legacy slug label", () => {
+  expect(
+    formatProductFieldForDisplay("productCategory", {
+      productCategory: "food",
+      categoryBreadcrumbRu: "",
+    }),
+  ).toBe("Продукты");
+});
+
 test("productPickupAddress formats address and empty placeholder", () => {
   expect(
     formatProductFieldForDisplay("productPickupAddress", {

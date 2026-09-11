@@ -1,4 +1,7 @@
-import { formatProductDescriptionPlainText } from "@izibuy/shared-lib";
+import {
+  formatProductDescriptionPlainText,
+  resolveProductCategoryLeafLabel,
+} from "@izibuy/shared-lib";
 import { getRuRegionByCode } from "@molha/api-contract";
 
 import { PRODUCT_DETAILS_MODAL_UI } from "@/shared/config/appUiCopy";
@@ -27,6 +30,8 @@ export const formatProductFieldForDisplay = (
     case "productSeller":
       return getProductSellerDisplayName(product) || EM_DASH;
     case "productCategory": {
+      const leaf = resolveProductCategoryLeafLabel(product.categoryBreadcrumbRu);
+      if (leaf) return leaf;
       const slug = raw == null ? "" : String(raw);
       return PRODUCT_CATEGORY_LABEL_RU[slug] ?? (slug || EM_DASH);
     }

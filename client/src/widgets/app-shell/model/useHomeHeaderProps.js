@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
 
 import { isCatalogHeaderMainView } from "../../../shared/lib/homeMainViewPaths.js";
+import { scrollWindowToTopAnimated } from "../../../shared/lib/scrollWindowToTopAnimated.js";
 import { useAppShellStateContext } from "./AppShellStateContext.jsx";
 
 export const useHomeHeaderProps = () => {
@@ -61,16 +62,28 @@ export const useHomeHeaderProps = () => {
 
   const handleMobileHomeClick = useCallback(() => {
     closeCatalogProductDetails();
-    // С профиля/рекламы — явный уход на `/`, затем сброс фильтров ленты.
+    setIsProductCategoryListOpen(false);
+
+    const alreadyOnHomeFeed = mainView === "catalog" && Boolean(showHomeCatalogFeed);
+    if (alreadyOnHomeFeed) {
+      scrollWindowToTopAnimated();
+      return;
+    }
+
     if (mainView !== "catalog") {
       goToMainView("catalog");
     }
     handleNavigateToFullCatalogFromBreadcrumb();
+    requestAnimationFrame(() => {
+      scrollWindowToTopAnimated();
+    });
   }, [
     closeCatalogProductDetails,
     goToMainView,
     handleNavigateToFullCatalogFromBreadcrumb,
     mainView,
+    setIsProductCategoryListOpen,
+    showHomeCatalogFeed,
   ]);
 
   const handleMobileCatalogClick = useCallback(() => {

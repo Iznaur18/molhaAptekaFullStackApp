@@ -39,6 +39,11 @@ export const useHomeMainContentProps = () => {
     setMyProductsModerationFilter,
     isProductModerationTrusted,
     setIsLoginModalOpen,
+    myProductsSearchTerm,
+    setMyProductsSearchTerm,
+    submitMyProductsSearch,
+    isProductSearchPending,
+    isMineMode,
     handleSellerNameClick,
     handleCatalogProductClick,
     handleOpenCatalogProductDetails,
@@ -125,6 +130,25 @@ export const useHomeMainContentProps = () => {
     ],
   );
 
+  const myProductsSearchProps = useMemo(
+    () =>
+      isMineMode
+        ? {
+            value: myProductsSearchTerm,
+            onChange: setMyProductsSearchTerm,
+            onSubmit: submitMyProductsSearch,
+            isPending: isProductSearchPending,
+          }
+        : null,
+    [
+      isMineMode,
+      myProductsSearchTerm,
+      setMyProductsSearchTerm,
+      submitMyProductsSearch,
+      isProductSearchPending,
+    ],
+  );
+
   /** Столько же непрочитанных, сколько показывает колокольчик в шапке. */
   const unreadNotificationsCount = inAppNotifications.length;
 
@@ -200,6 +224,7 @@ export const useHomeMainContentProps = () => {
       pendingProductReportsCount,
       pendingDataConfirmationCount,
       myProductsCatalogToolbarProps,
+      myProductsSearchProps,
       onRequestLogin,
       onSellerNameClick: handleSellerNameClick,
       onCatalogProductClick: handleCatalogProductClick,
@@ -290,6 +315,7 @@ export const useHomeMainContentProps = () => {
       pendingProductReportsCount,
       pendingDataConfirmationCount,
       myProductsCatalogToolbarProps,
+      myProductsSearchProps,
       onRequestLogin,
       handleSellerNameClick,
       handleCatalogProductClick,

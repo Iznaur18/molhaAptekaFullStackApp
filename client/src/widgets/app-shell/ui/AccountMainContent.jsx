@@ -19,6 +19,7 @@ import { renderProfileTabPanel } from "../lib/renderProfileTabPanel.jsx";
  * @param {object} props
  * @param {import('react').ReactNode} [props.myProductsCatalogSection]
  * @param {import('../../my-products-catalog-toolbar/ui/MyProductsCatalogToolbar.jsx').MyProductsCatalogToolbar extends (props: infer P) => unknown ? P : never} [props.myProductsCatalogToolbarProps]
+ * @param {import('../../my-products-search/ui/MyProductsSearchBar.jsx').MyProductsSearchBar extends (props: infer P) => unknown ? P : never | null} [props.myProductsSearchProps]
  */
 export function AccountMainContent({
   isAuthorized,
@@ -110,6 +111,7 @@ export function AccountMainContent({
   onOpenProductDetails,
   myProductsCatalogSection = null,
   myProductsCatalogToolbarProps = null,
+  myProductsSearchProps = null,
 }) {
   if (isAuthorized && !isSessionReady && isRoleRestrictedMainView(mainView)) {
     return <p className="app-shell__state">{HOME_PAGE_UI.LOADING_SESSION}</p>;
@@ -275,6 +277,7 @@ export function AccountMainContent({
         onTabChange={setMyProfileTab}
         tabContent={tabContent}
         myProductsCatalogToolbarProps={myProductsCatalogToolbarProps}
+        myProductsSearchProps={myProductsSearchProps}
       />
     );
   }
