@@ -231,6 +231,10 @@ export type {
   ToggleProductDescriptionH1Result,
 } from "./productDescriptionMarkup.js";
 export {
+  PRODUCT_CATEGORY_BREADCRUMB_SEPARATOR,
+  resolveProductCategoryLeafLabel,
+} from "./resolveProductCategoryLeafLabel.js";
+export {
   PRODUCT_WHOLESALE_MIN_QTY_MIN,
   formatProductWholesaleBadgeLabel,
   isProductWholesaleConfigured,
