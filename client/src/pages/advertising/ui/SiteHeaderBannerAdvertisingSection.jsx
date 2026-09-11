@@ -229,7 +229,6 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
             {pricePoints} баллов
             {streakDiscountPercent > 0 ? (
               <span className="advertising-page__meta-list">
-                {" "}
                 (было {pricePointsList})
               </span>
             ) : null}
@@ -277,6 +276,7 @@ export function SiteHeaderBannerAdvertisingSection({ isAuthorized, loyaltyBalanc
               label="Изображение"
               value={form.imageUrl}
               onChange={(value) => updateField("imageUrl", value)}
+              showHint={false}
             />
             <label className="advertising-page__field">
               {SITE_HEADER_BANNER_CAMPAIGN_PAGE_UI.LABEL_REGION}

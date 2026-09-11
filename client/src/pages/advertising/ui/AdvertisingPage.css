@@ -230,9 +230,15 @@
   color: var(--iz-color-ink);
   font-variant-numeric: tabular-nums;
   line-height: 1.25;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.advertising-page__meta-list {
+  display: block;
+  font-weight: 600;
+  color: var(--iz-color-text-muted);
 }
 
 :root[data-theme="dark"] .advertising-page__meta-value,
