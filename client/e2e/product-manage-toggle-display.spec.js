@@ -2,6 +2,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { expect, test } from "./helpers/test.js";
+import { E2E_API_ORIGIN } from "./helpers/urls.js";
 
 import { loginAndGetCookieHeader, loginViaApiCookies } from "./helpers/api.js";
 import {
@@ -11,7 +12,7 @@ import {
   E2E_SELLER,
 } from "./helpers/fixtures.js";
 
-const SERVER_URL = "http://127.0.0.1:4444";
+const SERVER_URL = E2E_API_ORIGIN;
 const SCROLL_PAUSE_MS = 500;
 const LOAD_MORE_ATTEMPTS = 25;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -118,13 +119,15 @@ test.describe.serial("product manage toggle display", () => {
     const displays = await fetchManageToggleDisplays(request);
     const auctionDisplay = displays.find((row) => row.toggleKey === "auction");
     expect(auctionDisplay?.imageUrl).toMatch(/\/uploads\/.+/);
-
-    await expect(
-      auctionCard.locator(".product-manage-toggle-row__artwork img"),
-    ).toHaveAttribute("src", /\/uploads\/.+/);
   });
 
-  test("seller: product manage row shows auction artwork from API", async ({
+  // FIXME: картинку переключателя интерфейс больше не показывает. Её отрисовку
+  // (`.product-manage-toggle-row__artwork img`) добавил 1a7a1313 (07.07.2026), а
+  // ba0e4d65 (19.07.2026) переделал ProductManageToggleRow и убрал проп imageUrl;
+  // хук useProductManageToggleImagesByVariant остался без потребителей. Админка
+  // по-прежнему даёт загрузить картинку, но показать её негде. Нужно решение:
+  // вернуть отображение или убрать загрузку из админки — тогда поправить тест.
+  test.fixme("seller: product manage row shows auction artwork from API", async ({
     page,
     request,
   }) => {

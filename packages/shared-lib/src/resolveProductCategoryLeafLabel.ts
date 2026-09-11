@@ -4,9 +4,7 @@ export const PRODUCT_CATEGORY_BREADCRUMB_SEPARATOR = " › ";
 /**
  * Конечная (листовая) категория из breadcrumb, иначе null.
  */
-export function resolveProductCategoryLeafLabel(
-  breadcrumbRu: unknown,
-): string | null {
+export function resolveProductCategoryLeafLabel(breadcrumbRu: unknown): string | null {
   if (typeof breadcrumbRu !== "string") return null;
   const trimmed = breadcrumbRu.trim();
   if (!trimmed) return null;

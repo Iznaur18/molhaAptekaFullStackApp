@@ -64,6 +64,24 @@ describe("validateCreateProductWizardStep", () => {
     );
   });
 
+  it("requires pickup points only when the product does not follow the profile", () => {
+    expect(
+      validateCreateProductWizardStep(
+        "pickup",
+        { ...CREATE_PRODUCT_INITIAL_FORM, productFulfillmentSource: "custom" },
+        validationContext,
+      ),
+    ).not.toBeNull();
+
+    expect(
+      validateCreateProductWizardStep(
+        "pickup",
+        { ...CREATE_PRODUCT_INITIAL_FORM, productFulfillmentSource: "profile" },
+        validationContext,
+      ),
+    ).toBeNull();
+  });
+
   it("requires return choice on returns step", () => {
     expect(
       validateCreateProductWizardStep(

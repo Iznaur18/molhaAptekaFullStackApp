@@ -1,6 +1,8 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./helpers/test.js";
+import { E2E_API_ORIGIN } from "./helpers/urls.js";
 
 import {
+  claimPromoReturnStreak,
   loginAndGetCookieHeader,
   loginViaApiCookies,
   replaceCartItems,
@@ -13,7 +15,7 @@ import {
   E2E_SAMPLE_IMAGE_PATH,
 } from "./helpers/fixtures.js";
 
-const SERVER_URL = "http://127.0.0.1:4444";
+const SERVER_URL = E2E_API_ORIGIN;
 
 /**
  * @param {import('@playwright/test').APIRequestContext} request
@@ -21,7 +23,10 @@ const SERVER_URL = "http://127.0.0.1:4444";
  * @param {string} productName
  */
 async function findProductIdByName(request, cookie, productName) {
-  const response = await request.get(`${SERVER_URL}/product`, {
+  // Ищем по названию: без фильтра GET /product отдаёт одну первую страницу, а
+  // сид создаёт 106 одобренных товаров того же продавца — нужный туда не попадал.
+  const params = new URLSearchParams({ search: productName, limit: "100" });
+  const response = await request.get(`${SERVER_URL}/product?${params}`, {
     headers: { Cookie: cookie },
   });
   if (!response.ok()) {
@@ -46,17 +51,29 @@ test("checkout: корзина → оформление заказа", async ({ 
     E2E_FIXTURE.catalogProductName,
   );
   await replaceCartItems(request, cookie, { [productId]: 1 });
+  // Иначе плашка «Скидка за возвращение» закрывает кнопку «Оформить».
+  await claimPromoReturnStreak(request, cookie);
 
   await loginViaApiCookies(page, request, E2E_BUYER);
   await page.goto("/basket");
 
-  await expect(page.getByText(E2E_FIXTURE.catalogProductName)).toBeVisible({
+  // Корзина сначала показывает список продавцов; оформление — внутри корзины
+  // продавца. Сид даёт товару одну точку самовывоза, она выбирается сама.
+  await page.locator(".cart-seller-row__checkout").first().click();
+  await expect(page.getByText(E2E_FIXTURE.catalogProductName).first()).toBeVisible({
     timeout: 15_000,
   });
 
-  await page.getByLabel("Адрес доставки").fill("Москва, ул. E2E, д. 1");
-  await page.getByRole("button", { name: "Оформить заказ", exact: true }).click();
+  const orderResponsePromise = page.waitForResponse(
+    (response) =>
+      new URL(response.url()).pathname.endsWith("/order") &&
+      response.request().method() === "POST",
+  );
+  await page.getByRole("button", { name: "Оформить", exact: true }).click();
+  const orderResponse = await orderResponsePromise;
+  expect(orderResponse.status(), await orderResponse.text()).toBeLessThan(300);
 
+  // После успеха приложение уводит в «Мои заказы».
   await expect(page.getByText(E2E_FIXTURE.catalogProductName).first()).toBeVisible({
     timeout: 20_000,
   });
@@ -66,7 +83,7 @@ test("moderation: одобрить товар из очереди", async ({ pag
   await loginViaApiCookies(page, request, E2E_MODERATOR);
   await page.goto("/me");
 
-  await page.getByRole("button", { name: "На модерации", exact: true }).click();
+  await page.getByRole("button", { name: "Товар (модерация)", exact: true }).click();
   const pendingHeading = page.getByRole("heading", {
     name: E2E_FIXTURE.pendingProductName,
     exact: true,
@@ -90,7 +107,6 @@ test("story upload: модератор публикует фото-сторис"
   const dialog = page.getByRole("dialog", { name: "Новый сторис" });
   await expect(dialog).toBeVisible();
 
-  await dialog.getByRole("button", { name: "Фото", exact: true }).click();
   await dialog
     .locator('input[type="file"]')
     .first()
@@ -120,12 +136,17 @@ test("KYC submit: покупатель подаёт заявку на подтв
   await dialog.getByLabel("Фамилия").fill("Иванов");
   await dialog.getByLabel("Имя").fill("Иван");
   await dialog.getByLabel("Отчество").fill("Иванович");
-  await dialog.getByLabel("Дата рождения").fill("1990-01-15");
+  // Даты вводятся маской ДД.ММ.ГГГГ: ISO-строку форма не принимает и не пускает дальше.
+  await dialog.getByLabel("Дата рождения").fill("15.01.1990");
+  // Форма пошаговая: ФИО и дата рождения → паспорт → фото с паспортом.
+  await dialog.getByRole("button", { name: "Далее", exact: true }).click();
+
   await dialog.getByLabel("Серия").fill("1234");
   await dialog.getByLabel("Номер").fill("567890");
   await dialog.getByLabel("Кем выдан").fill("ОВД E2E города Москвы");
-  await dialog.getByLabel("Дата выдачи").fill("2010-06-20");
+  await dialog.getByLabel("Дата выдачи").fill("20.06.2010");
   await dialog.getByLabel("Код подразделения").fill("770-001");
+  await dialog.getByRole("button", { name: "Далее", exact: true }).click();
 
   await dialog
     .getByLabel("Выбрать изображение с устройства")

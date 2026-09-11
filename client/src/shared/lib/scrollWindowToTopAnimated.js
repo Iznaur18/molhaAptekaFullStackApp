@@ -8,10 +8,7 @@ let activeFrameId = null;
 function readScrollY() {
   if (typeof window === "undefined") return 0;
   return (
-    window.scrollY ||
-    document.documentElement.scrollTop ||
-    document.body.scrollTop ||
-    0
+    window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0
   );
 }
 
