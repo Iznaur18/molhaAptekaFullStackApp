@@ -80,7 +80,9 @@ export const normalizeProductsQueryForAggregate = (productsQuery) => {
     }
     normalized[key] = branch.map((clause) =>
       clause != null && typeof clause === "object" && !Array.isArray(clause)
-        ? normalizeProductsQueryForAggregate(/** @type {Record<string, unknown>} */ (clause))
+        ? normalizeProductsQueryForAggregate(
+            /** @type {Record<string, unknown>} */ (clause),
+          )
         : clause,
     );
   }
