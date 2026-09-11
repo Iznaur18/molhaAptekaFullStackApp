@@ -214,49 +214,12 @@ UNIT
 
   systemctl restart gitorg-worker
 
-  # ── Ежедневный дамп Mongo с ротацией ──
-  #
-  # Юниты пишем на каждом выкате по той же причине, что и gitorg-api2: то, что
-  # заведено руками один раз, разъезжается с репозиторием и тихо протухает.
-  # Сам скрипт лежит в репозитории и запускается прямо оттуда, поэтому всегда
-  # соответствует выкаченному коду.
-  #
-  # ВАЖНО: это дамп на ТОТ ЖЕ диск той же машины. Спасает от кривой миграции и
-  # случайного удаления, но не от потери VPS — для этого нужно увозить архивы
-  # в объектное хранилище.
-  cat > /etc/systemd/system/gitorg-mongo-backup.service <<'UNIT'
-# Файл генерирует scripts/deploy-prod.sh — править руками бесполезно.
-[Unit]
-Description=Gitorg: дамп MongoDB с ротацией
-After=network.target mongod.service
-
-[Service]
-Type=oneshot
-ExecStart=/bin/bash /var/www/gitorg/scripts/backup-mongo.sh
-# Дамп содержит все персональные данные, поэтому только root.
-User=root
-Nice=10
-IOSchedulingClass=idle
-UNIT
-
-  cat > /etc/systemd/system/gitorg-mongo-backup.timer <<'UNIT'
-# Файл генерирует scripts/deploy-prod.sh — править руками бесполезно.
-[Unit]
-Description=Ежедневный дамп MongoDB
-
-[Timer]
-OnCalendar=*-*-* 03:30:00
-# Разброс, чтобы дамп не совпадал с часовым обменом 1С в :26.
-RandomizedDelaySec=600
-# Пропущенный запуск (машина была выключена) догоняем.
-Persistent=true
-
-[Install]
-WantedBy=timers.target
-UNIT
-
-  systemctl daemon-reload
-  systemctl enable --now gitorg-mongo-backup.timer >/dev/null 2>&1 || true
+  # Бэкапы Mongo этот скрипт НЕ трогает. Они настроены с 21.08.2026 отдельно и
+  # работают: /etc/cron.d/gitorg-mongo-backup в 03:30 запускает
+  # /usr/local/bin/gitorg-mongo-backup.sh (локальный дамп, 7 копий в
+  # /var/backups/gitorg-mongo) и следом /usr/local/bin/gitorg-backup-offsite.sh
+  # (GPG AES256 + rclone в selectel:gitorg-backups/mongo, 30 копий).
+  # Настройки offsite — /etc/gitorg-backup.conf.
 REMOTE
 
 echo "==> [5/6] заливка свежего client/dist на сервер"
