@@ -554,6 +554,10 @@ export {
   UNCATEGORIZED_PRODUCT_CATEGORY_SLUG,
 } from "./productCatalog.js";
 export {
+  CATALOG_PRODUCTS_BY_IDS_MAX,
+  catalogProductsByIdsQuerySchema,
+} from "./productCatalogByIds.js";
+export {
   PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
   PRODUCT_PICKUP_ADDRESS_MAX_LENGTH,
   ORDER_FULFILLMENT_PICKUP,

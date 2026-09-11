@@ -24,7 +24,7 @@ import { useCart } from "../../../entities/cart/model/useCart.js";
 import { useCartSelection } from "../../../entities/cart/model/useCartSelection.js";
 import { useCartFlashSalePriceTick } from "../../../entities/cart/model/useCartFlashSalePriceTick.js";
 import { useCreateOrderMutation } from "../../../entities/order/model/useCreateOrderMutation.js";
-import { useAllProductsQuery } from "../../../entities/product/model/useAllProductsQuery.js";
+import { useCartProductsQuery } from "../../../entities/product/model/useCartProductsQuery.js";
 import { navigateToProductDetails } from "../../../entities/product/lib/navigateToProductDetails.js";
 import { fetchMyProductBuyNFreeProgress } from "../../../entities/product/api/fetchMyProductBuyNFreeProgress.js";
 import { fetchMyAppliedProductPromos } from "../../../entities/product-promo-code/api/productPromoCodeApi.js";
@@ -72,24 +72,27 @@ export function CartPage({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const createOrderMutation = useCreateOrderMutation();
-  const productsQuery = useAllProductsQuery();
+  const cartProductIds = useMemo(() => Object.keys(items), [items]);
+  const productsQuery = useCartProductsQuery({ productIds: cartProductIds });
   const cartPriceNowMs = useCartFlashSalePriceTick(items, productsQuery.data ?? []);
   const acceptedBidsQuery = useMyAcceptedBidsQuery({ enabled: isAuthorized });
   const appliedPromosQuery = useQuery({
     queryKey: productPromoCodeQueryKeys.appliedMine(),
     queryFn: fetchMyAppliedProductPromos,
     enabled: isAuthorized,
-    staleTime: 0,
-    refetchOnMount: "always",
+    staleTime: 60_000,
   });
   const { user } = useAuthSession();
 
   const auctionBids = acceptedBidsQuery.data ?? [];
-  const phase = productsQuery.isPending
-    ? "loading"
-    : productsQuery.isError
-      ? "error"
-      : "success";
+  const phase =
+    cartProductIds.length === 0
+      ? "success"
+      : productsQuery.isLoading
+        ? "loading"
+        : productsQuery.isError
+          ? "error"
+          : "success";
   const error =
     productsQuery.error instanceof Error
       ? productsQuery.error.message

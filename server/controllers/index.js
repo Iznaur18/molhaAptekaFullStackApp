@@ -184,6 +184,7 @@ import {
   getMyProductsController,
 } from "./Product/getProducts.js";
 import { getCatalogProductByIdController } from "./Product/getCatalogProductByIdController.js";
+import { getCatalogProductsByIdsController } from "./Product/getCatalogProductsByIdsController.js";
 import { getComparableProductsController } from "./Product/getComparableProductsController.js";
 import { deleteMyProductController } from "./Product/deleteMyProductController.js";
 import { patchMyProductController } from "./Product/patchMyProductController.js";
@@ -487,6 +488,7 @@ export {
   getProductsController,
   getMyProductsController,
   getCatalogProductByIdController,
+  getCatalogProductsByIdsController,
   getComparableProductsController,
   deleteMyProductController,
   patchMyProductController,
