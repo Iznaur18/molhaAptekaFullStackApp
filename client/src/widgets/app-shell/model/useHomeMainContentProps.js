@@ -146,25 +146,6 @@ export const useHomeMainContentProps = () => {
     ],
   );
 
-  const myProductsSearchProps = useMemo(
-    () =>
-      isMineMode
-        ? {
-            value: myProductsSearchTerm,
-            onChange: setMyProductsSearchTerm,
-            onSubmit: submitMyProductsSearch,
-            isPending: isProductSearchPending,
-          }
-        : null,
-    [
-      isMineMode,
-      myProductsSearchTerm,
-      setMyProductsSearchTerm,
-      submitMyProductsSearch,
-      isProductSearchPending,
-    ],
-  );
-
   /** Столько же непрочитанных, сколько показывает колокольчик в шапке. */
   const unreadNotificationsCount = inAppNotifications.length;
 
