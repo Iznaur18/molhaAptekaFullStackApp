@@ -18,6 +18,11 @@ import {
 /** Сколько заказов отдаём за один `mode=query`. */
 const ORDERS_PER_QUERY = 100;
 
+const UNIT_CODE = "796";
+const UNIT_SHORT = "шт";
+const UNIT_FULL = "Штука";
+const UNIT_INTL = "PCE";
+
 /**
  * @param {unknown} value
  */
@@ -45,80 +50,148 @@ const formatTime = (date) => date.toISOString().slice(11, 19);
 const formatMoney = (value) => (Math.round(Number(value) * 100) / 100).toFixed(2);
 
 /**
+ * Ид документа для 1С: без `:`, иначе XDTO/Bitrix часто валит весь пакет.
+ * Для одного продавца orderId уникален; чужие позиции в документ не попадают.
+ *
+ * @param {unknown} orderId
+ */
+export function buildOneCOrderDocumentId(orderId) {
+  return String(orderId ?? "").trim();
+}
+
+/**
+ * @param {string} name
+ * @param {string} value
+ */
+const requisitesRow = (name, value) => `      <ЗначениеРеквизита>
+        <Наименование>${escapeXml(name)}</Наименование>
+        <Значение>${escapeXml(value)}</Значение>
+      </ЗначениеРеквизита>`;
+
+/**
+ * @param {{
+ *   guid: string;
+ *   name: string;
+ *   quantity: number;
+ *   price: number;
+ * }} line
+ */
+function buildOrderProductXml(line) {
+  const sum = formatMoney(line.price * line.quantity);
+  const price = formatMoney(line.price);
+  return `      <Товар>
+        <Ид>${escapeXml(line.guid)}</Ид>
+        <Наименование>${escapeXml(line.name)}</Наименование>
+        <БазоваяЕдиница Код="${UNIT_CODE}" НаименованиеПолное="${UNIT_FULL}" МеждународноеСокращение="${UNIT_INTL}">${UNIT_SHORT}</БазоваяЕдиница>
+        <ЗначенияРеквизитов>
+${requisitesRow("ВидНоменклатуры", "Товар")}
+${requisitesRow("ТипНоменклатуры", "Товар")}
+        </ЗначенияРеквизитов>
+        <Единица>
+          <Ид>${UNIT_CODE}</Ид>
+          <НаименованиеКраткое>${UNIT_SHORT}</НаименованиеКраткое>
+          <Код>${UNIT_CODE}</Код>
+          <НаименованиеПолное>${UNIT_FULL}</НаименованиеПолное>
+        </Единица>
+        <Коэффициент>1</Коэффициент>
+        <Количество>${line.quantity}</Количество>
+        <Цена>${price}</Цена>
+        <ЦенаЗаЕдиницу>${price}</ЦенаЗаЕдиницу>
+        <Сумма>${sum}</Сумма>
+        <Налоги>
+          <Налог>
+            <Наименование>НДС</Наименование>
+            <УчтеноВСумме>true</УчтеноВСумме>
+            <Сумма>0</Сумма>
+          </Налог>
+        </Налоги>
+      </Товар>`;
+}
+
+/**
  * @param {{
  *   order: Record<string, any>;
  *   lines: Array<{ guid: string; name: string; quantity: number; price: number }>;
  *   buyer: Record<string, any> | null;
- *   sellerId: string;
  * }} params
  */
-function buildOrderDocument({ order, lines, buyer, sellerId }) {
+export function buildOrderDocument({ order, lines, buyer }) {
   const createdAt = order.createdAt ? new Date(order.createdAt) : new Date();
   const total = lines.reduce((sum, row) => sum + row.price * row.quantity, 0);
-  const externalId = `${String(order._id)}:${String(sellerId)}`;
+  const documentId = buildOneCOrderDocumentId(order._id);
+  const isCancelled = String(order.status ?? "") === "cancelled";
+  const address = [order.deliveryAddress, order.deliveryAddressFlat]
+    .filter(Boolean)
+    .join(", ");
+  const paymentLabel =
+    ONEC_PAYMENT_METHOD_LABELS[order.paymentMethod] ??
+    String(order.paymentMethod ?? "");
+  const statusLabel =
+    ONEC_ORDER_STATUS_LABELS[order.status] ?? String(order.status ?? "");
+  const deliveryLabel =
+    order.fulfillmentMethod === "delivery" ? "Доставка" : "Самовывоз";
 
   const contacts = [];
   if (buyer?.userPhoneNumber) {
     contacts.push(
-      `        <Контакт><Тип>ТелефонРабочий</Тип><Значение>${escapeXml(buyer.userPhoneNumber)}</Значение></Контакт>`,
+      `          <Контакт>
+            <Тип>Телефон рабочий</Тип>
+            <Значение>${escapeXml(buyer.userPhoneNumber)}</Значение>
+          </Контакт>`,
     );
   }
   if (buyer?.email) {
     contacts.push(
-      `        <Контакт><Тип>Почта</Тип><Значение>${escapeXml(buyer.email)}</Значение></Контакт>`,
+      `          <Контакт>
+            <Тип>Электронная почта</Тип>
+            <Значение>${escapeXml(buyer.email)}</Значение>
+          </Контакт>`,
     );
   }
 
-  const address = [order.deliveryAddress, order.deliveryAddressFlat]
-    .filter(Boolean)
-    .join(", ");
-
   return `  <Документ>
-    <Ид>${escapeXml(externalId)}</Ид>
-    <Номер>${escapeXml(String(order._id))}</Номер>
+    <Ид>${escapeXml(documentId)}</Ид>
+    <Номер>${escapeXml(documentId)}</Номер>
     <Дата>${formatDate(createdAt)}</Дата>
     <Время>${formatTime(createdAt)}</Время>
     <ХозОперация>Заказ товара</ХозОперация>
-    <Роль>Продавец</Роль>
-    <Валюта>руб</Валюта>
-    <Курс>1</Курс>
-    <Сумма>${formatMoney(total)}</Сумма>
     <Контрагенты>
       <Контрагент>
         <Ид>${escapeXml(String(order.userBuyerId ?? ""))}</Ид>
         <Наименование>${escapeXml(buyer?.userName || "Покупатель маркетплейса")}</Наименование>
-        <Роль>Покупатель</Роль>
         <ПолноеНаименование>${escapeXml(buyer?.userName || "Покупатель маркетплейса")}</ПолноеНаименование>
-        <Адрес><Представление>${escapeXml(address)}</Представление></Адрес>
-${contacts.length > 0 ? `        <Контакты>\n${contacts.join("\n")}\n        </Контакты>\n` : ""}      </Контрагент>
+        <Роль>Покупатель</Роль>
+        <Адрес>
+          <Представление>${escapeXml(address)}</Представление>
+        </Адрес>
+${
+  contacts.length > 0
+    ? `        <Контакты>\n${contacts.join("\n")}\n        </Контакты>\n`
+    : ""
+}      </Контрагент>
     </Контрагенты>
+    <Валюта>руб</Валюта>
+    <Курс>1.0000</Курс>
+    <Сумма>${formatMoney(total)}</Сумма>
+    <Роль>Продавец</Роль>
+    <Комментарий></Комментарий>
+    <Налоги>
+      <Налог>
+        <Наименование>НДС</Наименование>
+        <УчтеноВСумме>true</УчтеноВСумме>
+        <Сумма>0</Сумма>
+      </Налог>
+    </Налоги>
     <Товары>
-${lines
-  .map(
-    (line) => `      <Товар>
-        <Ид>${escapeXml(line.guid)}</Ид>
-        <Наименование>${escapeXml(line.name)}</Наименование>
-        <БазоваяЕдиница Код="796" НаименованиеПолное="Штука" МеждународноеСокращение="PCE">шт</БазоваяЕдиница>
-        <ЦенаЗаЕдиницу>${formatMoney(line.price)}</ЦенаЗаЕдиницу>
-        <Количество>${line.quantity}</Количество>
-        <Сумма>${formatMoney(line.price * line.quantity)}</Сумма>
-      </Товар>`,
-  )
-  .join("\n")}
+${lines.map((line) => buildOrderProductXml(line)).join("\n")}
     </Товары>
     <ЗначенияРеквизитов>
-      <ЗначениеРеквизита>
-        <Наименование>Способ получения</Наименование>
-        <Значение>${order.fulfillmentMethod === "delivery" ? "Доставка" : "Самовывоз"}</Значение>
-      </ЗначениеРеквизита>
-      <ЗначениеРеквизита>
-        <Наименование>Метод оплаты</Наименование>
-        <Значение>${escapeXml(ONEC_PAYMENT_METHOD_LABELS[order.paymentMethod] ?? order.paymentMethod ?? "")}</Значение>
-      </ЗначениеРеквизита>
-      <ЗначениеРеквизита>
-        <Наименование>Статус заказа</Наименование>
-        <Значение>${escapeXml(ONEC_ORDER_STATUS_LABELS[order.status] ?? order.status ?? "")}</Значение>
-      </ЗначениеРеквизита>
+${requisitesRow("Отменен", isCancelled ? "true" : "false")}
+${requisitesRow("Проведен", "true")}
+${requisitesRow("Адрес доставки", address)}
+${requisitesRow("Способ доставки", deliveryLabel)}
+${requisitesRow("Метод оплаты", paymentLabel)}
+${requisitesRow("Статус заказа", statusLabel)}
     </ЗначенияРеквизитов>
   </Документ>`;
 }
@@ -144,8 +217,9 @@ export async function buildOneCOrdersXml(sellerId) {
     .limit(ORDERS_PER_QUERY)
     .lean();
 
+  const formedAt = new Date().toISOString().slice(0, 19);
   const header = `<?xml version="1.0" encoding="UTF-8"?>
-<КоммерческаяИнформация ВерсияСхемы="2.05" ДатаФормирования="${new Date().toISOString().slice(0, 19)}">`;
+<КоммерческаяИнформация ВерсияСхемы="2.05" ДатаФормирования="${formedAt}">`;
 
   if (pending.length === 0) {
     return { xml: `${header}\n</КоммерческаяИнформация>`, pushIds: [], orders: 0 };
@@ -209,7 +283,6 @@ export async function buildOneCOrdersXml(sellerId) {
         order,
         lines,
         buyer: buyerById.get(String(order.userBuyerId)) ?? null,
-        sellerId,
       }),
     );
     pushIds.push(String(push._id));
