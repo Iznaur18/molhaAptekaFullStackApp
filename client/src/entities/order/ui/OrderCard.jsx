@@ -435,6 +435,7 @@ function OrderCardLineItem({
               question={ORDER_CARD_UI.ITEM_CANCEL_CONFIRM}
               onConfirm={() => onCancelItem({ orderId, itemIndex })}
               disabled={isActionPending}
+              variant="popover"
             />
           ) : null}
           {canMarkReturned && onMarkReturned ? (
@@ -454,6 +455,7 @@ function OrderCardLineItem({
               }
               onConfirm={() => onMarkReturned({ orderId, itemIndex })}
               disabled={isActionPending}
+              variant="popover"
             />
           ) : null}
           {actionError ? (
@@ -826,6 +828,7 @@ export function OrderCard({
                 onCancelOrder({ orderId: order._id, sellerId: cardSellerId })
               }
               disabled={isShipmentActionPending}
+              variant="popover"
             />
           ) : null}
           {canConfirmPayment ? (
@@ -853,6 +856,7 @@ export function OrderCard({
               question={ORDER_CARD_UI.SHIPMENT_REPLACE_CONFIRM}
               onConfirm={() => onReplaceCourier({ orderId: order._id })}
               disabled={isShipmentActionPending}
+              variant="popover"
             />
           ) : null}
           {canIssueCode ? (
@@ -886,6 +890,7 @@ export function OrderCard({
               question={SHIPMENT_DISPUTE_UI.OPEN_CONFIRM}
               onConfirm={() => onOpenDispute({ orderId: order._id })}
               disabled={isShipmentActionPending}
+              variant="popover"
             />
           ) : null}
           {shipmentAdvance ? (

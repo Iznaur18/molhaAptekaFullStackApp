@@ -23,17 +23,6 @@
   opacity: 0.85;
 }
 
-.my-products-catalog-toolbar__trust {
-  margin: 0;
-  padding: 0.15rem 0.5rem;
-  border: 1px solid var(--iz-color-border);
-  border-radius: 999px;
-  background: var(--iz-color-surface-muted);
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--iz-color-success, #047857);
-}
-
 @container app-viewport (max-width: 640px) {
   .my-products-catalog-toolbar {
     flex-wrap: wrap;
@@ -54,8 +43,7 @@
     width: 100%;
   }
 
-  .my-products-catalog-toolbar__quota,
-  .my-products-catalog-toolbar__trust {
+  .my-products-catalog-toolbar__quota {
     flex: 1 1 100%;
     white-space: normal;
     font-size: 0.8rem;

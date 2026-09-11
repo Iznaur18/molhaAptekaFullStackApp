@@ -692,10 +692,6 @@ export function CartPage({
           </>
         ) : (
           <>
-            <p className="cart-page__seller-checkout-hint">
-              {CART_PAGE_UI.SELLERS_LIST_HINT}
-            </p>
-
             <CartAuctionSection
               bids={auctionBids}
               onCheckout={handleOpenAuctionCheckout}

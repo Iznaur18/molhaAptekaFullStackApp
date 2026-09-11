@@ -192,6 +192,7 @@
   border: 1px solid var(--iz-color-border);
   border-radius: var(--iz-radius-sm, 6px);
   background: var(--iz-color-bg-subtle, transparent);
+  overflow: visible;
 }
 
 .order-card__shipment-actions {
@@ -201,6 +202,8 @@
   justify-content: flex-end;
   gap: 0.5rem;
   margin-left: auto;
+  position: relative;
+  z-index: 1;
 }
 
 .order-card__shipment-label {

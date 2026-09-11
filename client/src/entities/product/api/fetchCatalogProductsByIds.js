@@ -1,8 +1,23 @@
 import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
+import { fetchCatalogProductById } from "./fetchCatalogProductById.js";
+
+/**
+ * @param {string[]} ids
+ */
+async function fetchCatalogProductsByIdsFallback(ids) {
+  const rows = await Promise.all(
+    ids.map((id) =>
+      fetchCatalogProductById(id).catch(() => /** @type {null} */ (null)),
+    ),
+  );
+  return rows.filter(Boolean);
+}
+
 /**
  * `GET /product/catalog-by-ids?ids=…` — карточки только для id из корзины.
+ * Если batch-ручки ещё нет на API (404) — fallback по одному `/catalog`.
  *
  * @param {string[]} productIds
  * @returns {Promise<import('../model/types.js').ProductFromApi[]>}
@@ -33,6 +48,10 @@ export async function fetchCatalogProductsByIds(productIds) {
       data.data.products
     );
   } catch (e) {
+    const status = e?.response?.status;
+    if (status === 404 || status === 400) {
+      return fetchCatalogProductsByIdsFallback(ids);
+    }
     const message =
       e?.response?.data?.message ??
       e?.message ??

@@ -158,10 +158,6 @@ export function CheckoutShippingProviderPicker({
           </div>
         </>
       ) : null}
-
-      <p className="checkout-shipping-provider-picker__hint">
-        {CHECKOUT_FORM_UI.SHIPPING_PROVIDER_CHOSEN_BY_SELLER}
-      </p>
     </div>
   );
 }

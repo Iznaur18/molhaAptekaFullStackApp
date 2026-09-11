@@ -252,7 +252,6 @@ export const PRODUCT_MODERATION_PAGE_UI = {
   SELLER_LABEL: "Продавец",
   CREATED_LABEL: "Создан",
   REJECTION_COMMENT_PREFIX: "Комментарий модератора:",
-  SELLER_TRUSTED_NOTICE: "Ваши товары публикуются без проверки",
   PRODUCTS_LIST_ARIA: "Очередь товаров на модерации",
   DETAILS_TITLE: "Данные создания",
   DETAILS_ARIA: "Полные данные создания товара",

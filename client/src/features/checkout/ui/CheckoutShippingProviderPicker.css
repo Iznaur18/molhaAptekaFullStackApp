@@ -139,10 +139,3 @@
   opacity: 0.85;
   color: inherit;
 }
-
-.checkout-shipping-provider-picker__hint {
-  margin: 0;
-  font-size: var(--iz-font-sm);
-  line-height: 1.35;
-  color: var(--iz-color-text-muted);
-}
