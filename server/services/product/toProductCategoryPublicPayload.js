@@ -26,12 +26,17 @@ export const toProductCategoryPublicPayload = (row) => ({
 export const toProductCategoryBreadcrumbPayload = (row) => {
   const pathSlugs = Array.isArray(row.pathSlugs) ? row.pathSlugs.map(String) : [];
   const pathLabelRu = Array.isArray(row.pathLabelRu) ? row.pathLabelRu.map(String) : [];
+  const ancestorIds = Array.isArray(row.pathIds)
+    ? row.pathIds.map((id) => String(id))
+    : [];
+  const pathIds = [...ancestorIds, String(row._id)];
 
   return {
     categoryId: String(row._id),
     slug: String(row.slug ?? ""),
     labelRu: String(row.labelRu ?? ""),
     items: pathSlugs.map((slug, index) => ({
+      categoryId: pathIds[index] ?? String(row._id),
       slug,
       labelRu: pathLabelRu[index] ?? slug,
     })),

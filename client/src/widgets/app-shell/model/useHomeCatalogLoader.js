@@ -219,6 +219,8 @@ export const useHomeCatalogLoader = ({
     handleFeedTileDisplaySaved: browser.handleFeedTileDisplaySaved,
     selectedCategoryLabel: browser.selectedCategoryLabel,
     activeCatalogFeedLabel: browser.activeCatalogFeedLabel,
+    catalogBreadcrumbItems: browser.catalogBreadcrumbItems,
+    handleCatalogBreadcrumbItemClick: browser.handleCatalogBreadcrumbItemClick,
     isCatalogSubcategoryPickerActive: browser.isCatalogSubcategoryPickerActive,
     subcategoryPickerTrail: browser.subcategoryPickerTrail,
     subcategoryPickerLoadError: browser.subcategoryPickerLoadError,

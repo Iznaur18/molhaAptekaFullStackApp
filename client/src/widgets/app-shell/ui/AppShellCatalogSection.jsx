@@ -329,7 +329,9 @@ export function AppShellCatalogGridSection({
  *   onEditFeedTileClick: (tileKey: string) => void;
  *   selectedCategoryLabel: string | null;
  *   activeCatalogFeedLabel: string | null;
+ *   catalogBreadcrumbItems?: Array<{ categoryId?: string; slug?: string; labelRu: string }> | null;
  *   onCatalogRootClick?: (() => void) | null;
+ *   onCatalogBreadcrumbItemClick?: ((item: { categoryId?: string; slug?: string; labelRu: string }) => void) | null;
  *   catalogGridSectionProps: import('./AppShellCatalogSection.jsx').AppShellCatalogGridSection extends never ? never : Parameters<typeof AppShellCatalogGridSection>[0];
  * }} props
  */
@@ -357,7 +359,9 @@ export function AppShellCatalogSection({
   onEditFeedTileClick,
   selectedCategoryLabel,
   activeCatalogFeedLabel,
+  catalogBreadcrumbItems = null,
   onCatalogRootClick = null,
+  onCatalogBreadcrumbItemClick = null,
   catalogGridSectionProps,
 }) {
   if (isCatalogSubcategoryPickerActive) {
@@ -406,8 +410,10 @@ export function AppShellCatalogSection({
     <>
       {breadcrumbCurrentLabel ? (
         <CatalogBrowserBreadcrumb
+          items={catalogBreadcrumbItems}
           label={breadcrumbCurrentLabel}
           onCatalogRootClick={onCatalogRootClick}
+          onItemClick={onCatalogBreadcrumbItemClick}
         />
       ) : null}
       <AppShellCatalogGridSection {...catalogGridSectionProps} />
