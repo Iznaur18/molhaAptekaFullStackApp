@@ -19,9 +19,15 @@ import { shouldServeUserProfileAsSpa } from "./src/shared/lib/userProfilePaths.j
  * - (опционально) убери "/address" из DEV_API_PROXY_PREFIXES
  */
 const DEV_SERVER_HOST = true;
-const DEV_CLIENT_ORIGIN = "http://127.0.0.1:5173";
+/**
+ * Порты dev-сервера и API, в которые смотрит прокси. По умолчанию 5173 и 4444;
+ * E2E переопределяет их через VITE_DEV_PORT / VITE_DEV_API_PORT, чтобы Playwright
+ * мог поднять свою пару серверов, не трогая уже запущенный dev.
+ */
+const DEV_CLIENT_PORT = Number(process.env.VITE_DEV_PORT ?? 5173);
+const DEV_CLIENT_ORIGIN = `http://127.0.0.1:${DEV_CLIENT_PORT}`;
 const LOCAL_API_PROXY_TARGET = "127.0.0.1";
-const LOCAL_API_PORT = 4444;
+const LOCAL_API_PORT = Number(process.env.VITE_DEV_API_PORT ?? 4444);
 const LOCAL_API_ORIGIN = `http://${LOCAL_API_PROXY_TARGET}:${LOCAL_API_PORT}`;
 
 /** В dev cookie для localhost и 127.0.0.1 разные — редирект на один origin. */
@@ -31,8 +37,8 @@ function devLocalhostRedirectPlugin() {
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         const host = req.headers.host ?? "";
-        if (host.startsWith("localhost:5173")) {
-          const target = `http://127.0.0.1:5173${req.url ?? "/"}`;
+        if (host.startsWith(`localhost:${DEV_CLIENT_PORT}`)) {
+          const target = `${DEV_CLIENT_ORIGIN}${req.url ?? "/"}`;
           res.writeHead(301, { Location: target });
           res.end();
           return;
@@ -194,7 +200,7 @@ export default defineConfig({
   },
   server: {
     host: DEV_SERVER_HOST,
-    port: 5173,
+    port: DEV_CLIENT_PORT,
     strictPort: true,
     allowedHosts: [".loca.lt", ".ngrok-free.app", ".ngrok.io"],
     open: DEV_CLIENT_ORIGIN,

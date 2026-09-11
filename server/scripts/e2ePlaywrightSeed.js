@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { SELLER_PRODUCTS_LIMIT_UNLIMITED } from "@molha/api-contract";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 
@@ -28,6 +29,16 @@ export const E2E_PLAYWRIGHT = {
 
 const BCRYPT_ROUNDS = 10;
 
+/** Одна точка самовывоза: схема товара требует адрес и координаты. */
+const E2E_PICKUP_LOCATION = {
+  id: "e2e-pickup",
+  label: "",
+  address: "Москва, ул. E2E, д. 1",
+  lat: 55.751244,
+  lon: 37.618423,
+  isDefault: true,
+};
+
 const hashPassword = async (password) => bcrypt.hash(String(password), BCRYPT_ROUNDS);
 
 /**
@@ -56,6 +67,9 @@ const upsertVerifiedUser = async ({
         isActiveUser: true,
         isUserDataConfirmed,
         userRole,
+        // Сид кладёт продавцу 107 товаров — больше обычного лимита (50), и
+        // «Разместить товар» открывал окно лимита вместо мастера создания.
+        sellerProductsLimitOverride: SELLER_PRODUCTS_LIMIT_UNLIMITED,
       },
       $unset: {
         emailVerificationTokenHash: "",
@@ -96,6 +110,12 @@ const upsertSellerProduct = async (
   });
 
   const payload = {
+    // Самовывоз включён по умолчанию, а без точки корзина прячет строку как
+    // «нет адреса самовывоза» — оформить заказ было бы нечего. Доставку в E2E
+    // не берём: адрес доставки выбирается только на карте (DaData/геокодер).
+    productPickupEnabled: true,
+    productDeliveryEnabled: false,
+    productPickupLocations: [E2E_PICKUP_LOCATION],
     productName,
     productDescription,
     productSearchBlob: buildProductSearchBlobFromFields({
@@ -134,6 +154,30 @@ async function main() {
       email: E2E_PLAYWRIGHT.sellerEmail,
       userName: "e2eSellerNew",
     });
+    // Товары, созданные тестом seller-create через мастер, остаются в очереди
+    // модерации и ломают проверку «Нет товаров, ожидающих проверки» на
+    // следующем прогоне — убираем их, как и остальные следы прошлых запусков.
+    await ProductModel.deleteMany({
+      productSeller: seller._id,
+      productName: { $regex: "^E2E UI Product " },
+    });
+
+    // «Доставка и оплата» продавца: новый товар по умолчанию следует профилю,
+    // и адрес с регионом сервер берёт отсюда. Свой адрес в мастере выбирается
+    // только на карте, а регион по нему определяет DaData — в E2E её нет.
+    await UserModel.updateOne(
+      { _id: seller._id },
+      {
+        $set: {
+          sellerFulfillmentDefaults: {
+            pickupLocations: [{ ...E2E_PICKUP_LOCATION, id: "profile-1" }],
+            pickupEnabled: true,
+            deliveryCarrier: "",
+            regionCode: "RU-MOW",
+          },
+        },
+      },
+    );
     await upsertVerifiedUser({
       email: E2E_PLAYWRIGHT.buyerEmail,
       userName: "e2eBuyer",

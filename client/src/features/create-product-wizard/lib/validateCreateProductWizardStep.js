@@ -19,6 +19,7 @@ import {
 import { validateProductReturnTermRows } from "../../../entities/product/lib/productReturnTermRows.js";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../shared/config/appUiCopy.js";
 import {
+  PRODUCT_FULFILLMENT_SOURCE_PROFILE,
   PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
   PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
 } from "@molha/api-contract";
@@ -74,6 +75,12 @@ export function validateCreateProductWizardStep(stepId, form, context = {}) {
     }
 
     case "pickup": {
+      // «Как в профиле»: адрес и доставку подставит сервер из настроек продавца,
+      // поля точек на шаге скрыты. Требовать их здесь — значит не пустить
+      // продавца с заведёнными настройками дальше пятого шага.
+      if (form.productFulfillmentSource === PRODUCT_FULFILLMENT_SOURCE_PROFILE) {
+        return null;
+      }
       const locations = Array.isArray(form.productPickupLocations)
         ? form.productPickupLocations
         : [];

@@ -1,4 +1,14 @@
-const API_BASE = "http://127.0.0.1:4444";
+import { E2E_API_ORIGIN, E2E_CLIENT_ORIGIN } from "./urls.js";
+
+const API_BASE = E2E_API_ORIGIN;
+
+/**
+ * Мутации с cookie-сессией сервер пропускает только с Origin из FRONTEND_URL
+ * (csrfCookieOriginCheckMW). Браузер шлёт Origin сам, а APIRequestContext
+ * Playwright — нет: без этого заголовка PUT /cart получал 403 «Запрос
+ * отклонён (origin)», и E2E падал на подготовке данных, не дойдя до UI.
+ */
+const BROWSER_ORIGIN_HEADERS = { Origin: E2E_CLIENT_ORIGIN };
 
 const DEV_ACCESS_TOKEN_KEY = "dev_access_token";
 const DEV_REFRESH_TOKEN_KEY = "dev_refresh_token";
@@ -42,6 +52,7 @@ function readDevAuthTokensFromLoginBody(authData) {
  */
 export async function loginAndGetAuthSession(request, credentials) {
   const response = await request.post(`${API_BASE}/auth/login`, {
+    headers: BROWSER_ORIGIN_HEADERS,
     data: credentials,
   });
   if (!response.ok()) {
@@ -115,12 +126,33 @@ export async function loginViaApiCookies(page, request, credentials) {
 }
 
 /**
+ * Забирает дневную скидку «за возвращение», как это сделал бы покупатель.
+ *
+ * Пока скидка не забрана, внизу экрана висит fixed-плашка на ~220px и
+ * перекрывает кнопки страницы (например «Оформить» в корзине) — Playwright
+ * не может по ним кликнуть. 409 значит «сегодня уже забрали», это нормально.
+ *
+ * @param {import('@playwright/test').APIRequestContext} request
+ * @param {string} cookieHeader
+ */
+export async function claimPromoReturnStreak(request, cookieHeader) {
+  const response = await request.post(`${API_BASE}/user/me/promo-return-streak/claim`, {
+    headers: { ...BROWSER_ORIGIN_HEADERS, Cookie: cookieHeader },
+  });
+  if (!response.ok() && response.status() !== 409) {
+    throw new Error(
+      `POST /user/me/promo-return-streak/claim failed: ${response.status()} ${await response.text()}`,
+    );
+  }
+}
+
+/**
  * @param {import('@playwright/test').APIRequestContext} request
  * @param {string} cookieHeader
  */
 export async function replaceCartItems(request, cookieHeader, items = {}) {
   const response = await request.put(`${API_BASE}/cart`, {
-    headers: { Cookie: cookieHeader },
+    headers: { ...BROWSER_ORIGIN_HEADERS, Cookie: cookieHeader },
     data: { items },
   });
   if (!response.ok()) {
