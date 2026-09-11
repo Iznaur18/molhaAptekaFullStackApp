@@ -20,6 +20,7 @@ import {
   buildOneCOrdersXml,
   markOneCOrderPushesSynced,
 } from "../../services/onec/exchange/buildOneCOrdersXml.js";
+import { encodeOneCOrdersXmlForExchange } from "../../services/onec/exchange/encodeOneCOrdersXmlForExchange.js";
 import { classifyOneCImportFile } from "../../services/onec/exchange/expandOneCImportFile.js";
 import { enqueueOneCImportJob } from "../../services/onec/exchange/enqueueOneCImportJob.js";
 import {
@@ -208,10 +209,11 @@ async function handleQuery(res, session) {
     orders,
   });
 
+  const body = encodeOneCOrdersXmlForExchange(xml);
   res.status(200);
-  res.setHeader("Content-Type", "text/xml; charset=utf-8");
+  res.setHeader("Content-Type", "application/xml; charset=windows-1251");
   res.setHeader("Cache-Control", "no-store");
-  return res.send(xml);
+  return res.send(body);
 }
 
 /**

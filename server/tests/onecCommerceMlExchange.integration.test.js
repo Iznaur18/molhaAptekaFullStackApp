@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { after, before, beforeEach, describe, it } from "node:test";
 
+import iconv from "iconv-lite";
+
 process.env.NODE_ENV = process.env.NODE_ENV ?? "test";
 process.env.JWT_SECRET =
   process.env.JWT_SECRET ?? "integration-test-jwt-secret-min-32-chars";
@@ -659,12 +661,14 @@ describe("CommerceML обмен: заказы", () => {
     const query = await http.request("/onec/exchange?type=sale&mode=query", {
       headers: { Cookie: cookie },
     });
-    const xml = await query.text();
+    const xml = iconv.decode(Buffer.from(await query.arrayBuffer()), "windows-1251");
 
+    assert.match(xml, /encoding="windows-1251"/);
     assert.match(xml, /<КоммерческаяИнформация/);
     assert.match(xml, new RegExp(`<Ид>${OFFER_GUID_SIMPLE}</Ид>`));
     assert.match(xml, /<Количество>2<\/Количество>/);
     assert.match(xml, /<Сумма>241\.00<\/Сумма>/);
+    assert.match(xml, /<Валюта>руб\.<\/Валюта>/);
     // Реквизиты читает человек в 1С — сырые enum'ы ему ничего не скажут.
     assert.match(xml, /<Значение>Наличными при получении<\/Значение>/);
     assert.match(xml, /<Значение>Новый<\/Значение>/);
