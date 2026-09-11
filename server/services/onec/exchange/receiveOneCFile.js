@@ -132,3 +132,19 @@ export async function receiveOneCFileChunk({ req, session, filename }) {
     totalBytes: session.totalBytes,
   };
 }
+
+/**
+ * Слить тело запроса в никуда. Нужно для noop `type=sale&mode=file`:
+ * 1С всё равно шлёт zip заказов «на сайт», а мы его не храним и не разбираем —
+ * но поток обязан быть прочитан, иначе соединение зависает.
+ *
+ * @param {import('express').Request} req
+ * @returns {Promise<number>} сколько байт выкинули
+ */
+export async function drainOneCRequestBody(req) {
+  let bytes = 0;
+  for await (const chunk of req) {
+    bytes += chunk.length;
+  }
+  return bytes;
+}
