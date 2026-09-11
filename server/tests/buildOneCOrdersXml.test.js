@@ -57,6 +57,7 @@ describe("buildOneCOrdersXml Bitrix shape", () => {
     assert.match(xml, /<Коэффициент>1<\/Коэффициент>/);
     assert.match(xml, /<Цена>265\.00<\/Цена>/);
     assert.match(xml, /<Курс>1\.0000<\/Курс>/);
+    assert.match(xml, /<Валюта>руб\.<\/Валюта>/);
     assert.match(xml, /<Наименование>ВидНоменклатуры<\/Наименование>/);
   });
 });
