@@ -554,6 +554,10 @@ export {
   UNCATEGORIZED_PRODUCT_CATEGORY_SLUG,
 } from "./productCatalog.js";
 export {
+  CATALOG_PRODUCTS_BY_IDS_MAX,
+  catalogProductsByIdsQuerySchema,
+} from "./productCatalogByIds.js";
+export {
   PRODUCT_PICKUP_ADDRESS_MIN_LENGTH,
   PRODUCT_PICKUP_ADDRESS_MAX_LENGTH,
   ORDER_FULFILLMENT_PICKUP,
@@ -641,6 +645,9 @@ export {
   SELLER_DELIVERY_PER_KM_MAX_RUB,
   SELLER_DELIVERY_FREE_FROM_MAX_RUB,
   SELLER_DELIVERY_MAX_DISTANCE_KM,
+  SELLER_DELIVERY_DISTANCE_SOURCE_ROAD,
+  SELLER_DELIVERY_DISTANCE_SOURCE_ESTIMATE,
+  SELLER_DELIVERY_DISTANCE_SOURCES,
   SELLER_DELIVERY_TARIFF_EMPTY_MESSAGE,
   SELLER_DELIVERY_TARIFF_CARRIER_MESSAGE,
   FREE_SELLER_DELIVERY_TARIFF,
@@ -651,6 +658,7 @@ export {
   sellerDeliveryDistanceKm,
   normalizeGeoCoord,
 } from "./sellerDeliveryTariff.js";
+export { sellerDeliveryQuoteBodySchema } from "./order.js";
 export {
   PLATFORM_COMMISSION_PERCENT_DEFAULT,
   PLATFORM_COMMISSION_PERCENT_MAX,
@@ -705,6 +713,7 @@ export {
   patchSellerShelfBodySchema,
   reorderSellerShelvesBodySchema,
   setSellerShelfProductsBodySchema,
+  assignSellerShelfProductBodySchema,
   sellerShelfSchema,
   sellerShelfListDataSchema,
 } from "./sellerShelf.js";

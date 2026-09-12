@@ -35,6 +35,19 @@
   color: var(--iz-color-text-secondary);
 }
 
+.checkout-seller-delivery__hint--error {
+  color: var(--iz-color-danger, #d93025);
+}
+
+/* Маршрут строится по данным OSM — лицензия ODbL требует указать источник. */
+.checkout-seller-delivery__attribution {
+  margin: 0.2rem 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.3;
+  color: var(--iz-color-text-secondary);
+  opacity: 0.8;
+}
+
 .checkout-seller-delivery__totals {
   display: flex;
   flex-direction: column;

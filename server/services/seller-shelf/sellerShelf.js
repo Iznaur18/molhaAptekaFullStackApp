@@ -216,6 +216,36 @@ export async function deleteSellerShelf({ userId, shelfId }) {
 }
 
 /**
+ * Переместить один товар на полку (без replace-all набора).
+ * @param {{ userId: string; shelfId: string; productId: string }} input
+ */
+export async function assignProductToSellerShelf({ userId, shelfId, productId }) {
+  const shelf = await SellerShelfModel.findById(shelfId).lean();
+  if (!shelf) {
+    throw new AppError(404, "Полка не найдена");
+  }
+  if (String(shelf.sellerId) !== String(userId)) {
+    throw new AppError(403, "Можно менять только свои полки");
+  }
+
+  const product = await ProductModel.findOne({
+    _id: productId,
+    productSeller: userId,
+  });
+  if (!product) {
+    throw new AppError(404, "Товар не найден");
+  }
+
+  if (String(product.sellerShelfId ?? "") !== String(shelf._id)) {
+    product.sellerShelfId = shelf._id;
+    await product.save();
+  }
+
+  const counts = await countProductsByShelfIds(userId, [shelf._id]);
+  return toSellerShelfPayload(shelf, counts.get(String(shelf._id)) ?? 0);
+}
+
+/**
  * Назначить товары на полку (ровно этот набор). Остальные с этой полки снимаются.
  * @param {{ userId: string; shelfId: string; productIds: string[] }} input
  */

@@ -1,6 +1,7 @@
 import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 import { checkAuthMW } from "../middlewares/index.js";
 import {
+  assignProductToSellerShelfController,
   createSellerShelfController,
   deleteSellerShelfController,
   listMySellerShelvesController,
@@ -10,6 +11,7 @@ import {
   setSellerShelfProductsController,
 } from "../controllers/SellerShelf/sellerShelfControllers.js";
 import {
+  assignSellerShelfProductValidation,
   createSellerShelfValidation,
   patchSellerShelfValidation,
   reorderSellerShelvesValidation,
@@ -45,6 +47,12 @@ router.put(
   checkAuthMW,
   setSellerShelfProductsValidation,
   setSellerShelfProductsController,
+);
+router.post(
+  "/:shelfId/assign-product",
+  checkAuthMW,
+  assignSellerShelfProductValidation,
+  assignProductToSellerShelfController,
 );
 router.get(
   "/seller/:sellerId",

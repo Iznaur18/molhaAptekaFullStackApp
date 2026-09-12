@@ -22,8 +22,8 @@ import { resolveOrderFulfillmentSplit } from "./resolveOrderFulfillmentSplit.js"
 import { resolveDeliveryFeesBySeller } from "../courier/courierDeliveryFee.js";
 import { resolveOrderDeliveryGeo } from "./resolveOrderDeliveryGeo.js";
 import {
-  buildDeliveryOriginBySeller,
   buildGoodsTotalBySeller,
+  prepareSellerDeliveryBySeller,
   resolveSellerDeliveryFeesBySeller,
 } from "./sellerDeliveryFee.js";
 import {
@@ -192,7 +192,7 @@ const buildItemsWithPriceSnapshot = (
 /**
  * @param {string[]} productIds
  */
-const fetchAvailableProductsForOrder = async (productIds) => {
+export const fetchAvailableProductsForOrder = async (productIds) => {
   const products = await ProductModel.find({
     _id: { $in: productIds },
     productModerationStatus: PRODUCT_MODERATION_APPROVED,
@@ -685,6 +685,18 @@ export async function createOrder({
     clientGeo: deliveryAddressGeo,
   });
 
+  // Тариф и расстояние по дорогам для доставки продавцом — до транзакции:
+  // это походы во внешние геосервисы, держать ради них открытую транзакцию
+  // Mongo нельзя. Путь тот же, что у котировки в корзине, и кэш общий —
+  // поэтому покупатель платит ровно ту сумму, которую видел.
+  const sellerDeliveryPrepared = await prepareSellerDeliveryBySeller({
+    fulfillmentBySellerId: fulfillmentSplit.fulfillmentBySellerId,
+    deliveryCarrierBySellerId: deliveryCarrierBySeller,
+    productById,
+    deliveryAddress: addressForOrder,
+    clientGeo: deliveryAddressGeo,
+  });
+
   const referrerUserId = await resolveAffiliateReferrerUserId(affiliateCode);
   const appliedPromos = await listAppliedProductPromosForUser({
     userId: String(userId),
@@ -753,17 +765,13 @@ export async function createOrder({
         pickupByProductId,
       );
       const totalAmount = calculateTotalAmount(pricedItems);
-      // Доставку по тарифу продавца считаем на сервере от позиций заказа:
-      // порог «бесплатно от суммы» должен смотреть на то, что реально
-      // заказано, а не на корзину, которая с тех пор могла измениться.
-      // Километраж — только по проверенным координатам: почему, написано в
-      // resolveOrderDeliveryGeo.
-      const sellerDeliveryBySeller = await resolveSellerDeliveryFeesBySeller({
-        fulfillmentBySellerId: fulfillmentSplit.fulfillmentBySellerId,
-        deliveryCarrierBySellerId: deliveryCarrierBySeller,
+      // Сумму доставки по тарифу продавца считаем от позиций заказа: порог
+      // «бесплатно от суммы» должен смотреть на то, что реально заказано, а
+      // не на корзину, которая с тех пор могла измениться. Расстояние уже
+      // посчитано по дорогам выше.
+      const sellerDeliveryBySeller = resolveSellerDeliveryFeesBySeller({
+        preparedBySellerId: sellerDeliveryPrepared,
         goodsTotalBySellerId: buildGoodsTotalBySeller(pricedItems),
-        originBySellerId: buildDeliveryOriginBySeller(productById),
-        deliveryAddressGeo: orderGeo.tariffGeo,
       });
       const orderStatus = buildOrderStatusFromItems(pricedItems);
       const reserveLines = pricedItems.map((line, index) => ({
@@ -785,8 +793,9 @@ export async function createOrder({
             deliveryAddressFlat: addressForOrder.flat ?? "",
             deliveryAddressFiasId: addressForOrder.fiasId ?? "",
             // Точка для службы доставки: клиентская точнее (подъезд, а не
-            // улица), а на деньги она больше не влияет — см.
-            // resolveOrderDeliveryGeo.
+            // улица). Расстояние для тарифа продавца ищется отдельно и
+            // клиентской точке доверяет лишь в пределах погрешности — см.
+            // resolveDeliveryPoints.
             deliveryAddressGeo: orderGeo.storedGeo,
             fulfillmentMethod: resolvedFulfillment,
             shipments: buildStoredShipments(pricedItems, {

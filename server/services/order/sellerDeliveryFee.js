@@ -3,42 +3,67 @@ import {
   ORDER_FULFILLMENT_DELIVERY,
   PRODUCT_DELIVERY_CARRIER_SELLER,
   calculateSellerDeliveryFee,
-  normalizeGeoCoord,
   resolveSellerDeliveryTariff,
-  sellerDeliveryDistanceKm,
 } from "@molha/api-contract";
 
+import { AppError } from "../../errors/AppError.js";
 import { UserModel } from "../../models/index.js";
+import { resolveRoadDistanceKm } from "../shipping/geo/roadRouter.js";
+
+import {
+  resolveDeliveryDestination,
+  resolveDeliveryOrigin,
+} from "./resolveDeliveryPoints.js";
+
+export const SELLER_DELIVERY_DISTANCE_UNAVAILABLE_MESSAGE =
+  "Не удалось посчитать расстояние доставки — попробуйте оформить заказ ещё раз";
 
 /**
  * Стоимость доставки по тарифу продавца — на каждое отправление.
  *
- * Считается на сервере заново, а не принимается с клиента: корзина показывает
- * ту же формулу из контракта, но платит покупатель по серверному счёту.
- * Иначе сумму доставки можно было бы обнулить, подправив запрос.
+ * Считается на сервере заново, а не принимается с клиента: иначе сумму
+ * доставки можно было бы обнулить, подправив запрос.
  *
  * Тариф работает только у собственной доставки: у курьеров Gitorg сумму
  * называет покупатель (`deliveryFeeRub`), у внешней службы — сама служба.
  *
+ * Расчёт в два шага. Расстояние по дорогам требует походов во внешние
+ * геосервисы, и держать ради них открытую транзакцию Mongo нельзя, — поэтому
+ * `prepareSellerDeliveryBySeller` зовётся до транзакции. Сумма зависит ещё и
+ * от стоимости товаров (порог «бесплатно от»), которая известна только внутри
+ * неё, — это `resolveSellerDeliveryFeesBySeller`.
+ */
+
+/**
+ * @typedef {{
+ *   tariff: typeof FREE_SELLER_DELIVERY_TARIFF;
+ *   distanceKm: number | null;
+ *   distanceSource: string | null;
+ * }} PreparedSellerDelivery
+ */
+
+/**
+ * Тариф и расстояние по дорогам — по продавцам, которые везут сами.
+ *
+ * Расстояние считаем, только когда за километр берут деньги: у тарифа «только
+ * вызов» и у бесплатной доставки оно на сумму не влияет, и ходить за ним во
+ * внешние сервисы незачем.
+ *
  * @param {{
  *   fulfillmentBySellerId: Record<string, string>;
  *   deliveryCarrierBySellerId: Record<string, string>;
- *   goodsTotalBySellerId: Record<string, number>;
- *   originBySellerId: Record<string, { lat: number | null; lon: number | null } | null>;
- *   deliveryAddressGeo?: { lat: number; lon: number } | null;
+ *   productById: Record<string, { sellerId?: string; productPickupLat?: unknown; productPickupLon?: unknown; productPickupAddress?: unknown }>;
+ *   deliveryAddress: Parameters<typeof resolveDeliveryDestination>[0]["verifiedAddress"];
+ *   clientGeo?: { lat?: unknown; lon?: unknown } | null;
  * }} input
- * @returns {Promise<Record<string, {
- *   feeRub: number;
- *   distanceKm: number | null;
- *   tariff: typeof FREE_SELLER_DELIVERY_TARIFF;
- * }>>}
+ * @returns {Promise<Record<string, PreparedSellerDelivery>>}
  */
-export async function resolveSellerDeliveryFeesBySeller({
+export async function prepareSellerDeliveryBySeller({
   fulfillmentBySellerId,
   deliveryCarrierBySellerId,
-  goodsTotalBySellerId,
-  originBySellerId,
-  deliveryAddressGeo = null,
+  productById,
+  deliveryAddress,
+  clientGeo = null,
 }) {
   const sellerIds = Object.entries(fulfillmentBySellerId ?? {})
     .filter(
@@ -62,30 +87,77 @@ export async function resolveSellerDeliveryFeesBySeller({
     tariffBySeller[String(seller._id)] = resolveSellerDeliveryTariff(seller);
   }
 
-  /** @type {Record<string, { feeRub: number; distanceKm: number | null; tariff: any }>} */
+  /** Адрес покупателя один на заказ — ищем его один раз. */
+  let destination = null;
+  /** @type {Record<string, PreparedSellerDelivery>} */
   const result = {};
+
   for (const sellerId of sellerIds) {
     const tariff = tariffBySeller[sellerId] ?? { ...FREE_SELLER_DELIVERY_TARIFF };
-    // Расстояние по прямой от точки продажи до адреса покупателя. Нет
-    // координат — километраж не начисляем: брать его «примерно» значит
-    // выставить счёт по догадке.
-    const distanceKm = sellerDeliveryDistanceKm(
-      originBySellerId?.[sellerId] ?? null,
-      deliveryAddressGeo,
-    );
-    const calculated = calculateSellerDeliveryFee({
-      tariff,
-      goodsTotalRub: goodsTotalBySellerId?.[sellerId] ?? 0,
-      distanceKm,
-    });
+    /** @type {PreparedSellerDelivery} */
+    const entry = { tariff, distanceKm: null, distanceSource: null };
 
-    result[sellerId] = {
-      feeRub: calculated.feeRub,
-      distanceKm: calculated.distanceKm,
-      tariff,
-    };
+    if (tariff.paid && tariff.perKmRub > 0) {
+      destination ??= await resolveDeliveryDestination({
+        verifiedAddress: deliveryAddress,
+        clientGeo,
+      });
+      const origin = await resolveDeliveryOrigin({
+        sellerId,
+        productRows: Object.entries(productById ?? {})
+          .filter(([, row]) => String(row?.sellerId ?? "") === sellerId)
+          .map(([id, row]) => ({ ...row, id })),
+      });
+      const route = await resolveRoadDistanceKm(origin.point, destination.point);
+      entry.distanceKm = route.distanceKm;
+      entry.distanceSource = route.source;
+    }
+
+    result[sellerId] = entry;
   }
 
+  return result;
+}
+
+/**
+ * Сумма доставки по подготовленным тарифу и расстоянию.
+ *
+ * @param {{
+ *   preparedBySellerId: Record<string, PreparedSellerDelivery>;
+ *   goodsTotalBySellerId: Record<string, number>;
+ * }} input
+ * @returns {Record<string, {
+ *   feeRub: number;
+ *   distanceKm: number | null;
+ *   distanceSource: string | null;
+ *   tariff: typeof FREE_SELLER_DELIVERY_TARIFF;
+ * }>}
+ */
+export function resolveSellerDeliveryFeesBySeller({
+  preparedBySellerId,
+  goodsTotalBySellerId,
+}) {
+  /** @type {ReturnType<typeof resolveSellerDeliveryFeesBySeller>} */
+  const result = {};
+  for (const [sellerId, prepared] of Object.entries(preparedBySellerId ?? {})) {
+    const calculated = calculateSellerDeliveryFee({
+      tariff: prepared.tariff,
+      goodsTotalRub: goodsTotalBySellerId?.[sellerId] ?? 0,
+      distanceKm: prepared.distanceKm,
+    });
+    // «От N ₽» годится корзине, пока адрес не выбран, но не счёту: к этому
+    // месту расстояние обязано быть посчитано. Молча выставить одну цену за
+    // вызов — ровно та ошибка, из-за которой это переписывалось.
+    if (calculated.isEstimate) {
+      throw new AppError(400, SELLER_DELIVERY_DISTANCE_UNAVAILABLE_MESSAGE);
+    }
+    result[sellerId] = {
+      feeRub: calculated.feeRub,
+      distanceKm: prepared.distanceKm,
+      distanceSource: prepared.distanceSource,
+      tariff: prepared.tariff,
+    };
+  }
   return result;
 }
 
@@ -115,28 +187,4 @@ export function buildGoodsTotalBySeller(pricedItems) {
       (totals[sellerId] ?? 0) + unitPrice * Math.max(0, quantity - freeUnits);
   }
   return totals;
-}
-
-/**
- * Точка отправления по продавцу — из товаров заказа.
- *
- * У продавца может быть несколько точек; берём ту, что стоит на товаре, —
- * именно она синхронизирована с профилем и именно от неё он поедет.
- *
- * @param {Record<string, { sellerId?: string; productPickupLat?: unknown; productPickupLon?: unknown }>} productById
- * @returns {Record<string, { lat: number; lon: number } | null>}
- */
-export function buildDeliveryOriginBySeller(productById) {
-  /** @type {Record<string, { lat: number; lon: number } | null>} */
-  const origins = {};
-  for (const row of Object.values(productById ?? {})) {
-    const sellerId = row?.sellerId == null ? "" : String(row.sellerId);
-    if (!sellerId || origins[sellerId]) continue;
-    // `Number(null)` === 0: без явной проверки на пустое значение товар без
-    // координат получал бы точку 0,0 и километраж через полмира.
-    const lat = normalizeGeoCoord(row.productPickupLat);
-    const lon = normalizeGeoCoord(row.productPickupLon);
-    origins[sellerId] = lat != null && lon != null ? { lat, lon } : null;
-  }
-  return origins;
 }

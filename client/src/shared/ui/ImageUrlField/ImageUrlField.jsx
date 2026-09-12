@@ -17,6 +17,7 @@ import "./ImageUrlField.css";
  *   disabled?: boolean;
  *   canUpload?: boolean;
  *   compact?: boolean;
+ *   showHint?: boolean;
  *   inputClassName?: string;
  *   placeholder?: string;
  *   name?: string;
@@ -33,6 +34,7 @@ export function ImageUrlField({
   disabled = false,
   canUpload = true,
   compact = false,
+  showHint = true,
   inputClassName = "",
   placeholder = "https://",
   name,
@@ -130,11 +132,11 @@ export function ImageUrlField({
           </button>
         ) : null}
       </div>
-      {!canUpload && !compact ? (
+      {!showHint || compact ? null : !canUpload ? (
         <p className="image-url-field__hint">
           {IMAGE_URL_FIELD_UI.UPLOAD_DISABLED_HINT}
         </p>
-      ) : compact ? null : (
+      ) : (
         <p className="image-url-field__hint">{IMAGE_URL_FIELD_UI.UPLOAD_HINT}</p>
       )}
       {uploadError ? (

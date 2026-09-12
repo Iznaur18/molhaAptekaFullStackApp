@@ -94,6 +94,7 @@ import {
 } from "./Courier/courierDisputeController.js";
 import { getAllOrdersController } from "./Order/getAllOrdersController.js";
 import { postShippingEstimateController } from "./Order/shippingEstimateController.js";
+import { postSellerDeliveryQuoteController } from "./Order/sellerDeliveryQuoteController.js";
 import {
   getShippingCarriersController,
   getStaffShippingCarriersController,
@@ -184,6 +185,7 @@ import {
   getMyProductsController,
 } from "./Product/getProducts.js";
 import { getCatalogProductByIdController } from "./Product/getCatalogProductByIdController.js";
+import { getCatalogProductsByIdsController } from "./Product/getCatalogProductsByIdsController.js";
 import { getComparableProductsController } from "./Product/getComparableProductsController.js";
 import { deleteMyProductController } from "./Product/deleteMyProductController.js";
 import { patchMyProductController } from "./Product/patchMyProductController.js";
@@ -399,6 +401,7 @@ export {
   getMySalesActionCountController,
   getAllOrdersController,
   postShippingEstimateController,
+  postSellerDeliveryQuoteController,
   getShippingCarriersController,
   getStaffShippingCarriersController,
   patchStaffShippingCarrierController,
@@ -487,6 +490,7 @@ export {
   getProductsController,
   getMyProductsController,
   getCatalogProductByIdController,
+  getCatalogProductsByIdsController,
   getComparableProductsController,
   deleteMyProductController,
   patchMyProductController,

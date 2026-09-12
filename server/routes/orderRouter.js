@@ -3,6 +3,7 @@ import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 import {
   makeOrderController,
   postShippingEstimateController,
+  postSellerDeliveryQuoteController,
   getShippingCarriersController,
   getMyOrdersController,
   getMySalesController,
@@ -22,11 +23,13 @@ import {
 import {
   checkAuthMW,
   checkAdminMW,
+  addressSuggestRateLimiter,
   orderCreateRateLimiter,
   orderItemActionRateLimiter,
 } from "../middlewares/index.js";
 import {
   makeOrderValidation,
+  sellerDeliveryQuoteValidation,
   shippingEstimateValidation,
   updateOrderStatusValidation,
   getAllOrdersValidation,
@@ -64,6 +67,16 @@ router.post(
   orderCreateRateLimiter,
   shippingEstimateValidation,
   postShippingEstimateController,
+);
+// Доставка продавцом: тариф и расстояние по дорогам тем же расчётом, что и
+// в заказе. Лимит как у подсказок адреса — корзина пересчитывает при каждой
+// смене адреса, а заказ ещё не создаётся.
+router.post(
+  "/seller-delivery-quote",
+  checkAuthMW,
+  addressSuggestRateLimiter,
+  sellerDeliveryQuoteValidation,
+  postSellerDeliveryQuoteController,
 );
 router.post(
   "/",

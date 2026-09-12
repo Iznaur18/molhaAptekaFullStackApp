@@ -3,7 +3,7 @@ import { z } from "zod";
 import { mongoIdSchema } from "./mongoId.js";
 
 export const SELLER_SHELF_NAME_MAX_CHARS = 30;
-export const SELLER_SHELF_MAX_PER_SELLER = 10;
+export const SELLER_SHELF_MAX_PER_SELLER = 20;
 
 export const sellerShelfIdParamsSchema = z.object({
   shelfId: mongoIdSchema,
@@ -32,6 +32,10 @@ export const reorderSellerShelvesBodySchema = z.object({
 
 export const setSellerShelfProductsBodySchema = z.object({
   productIds: z.array(mongoIdSchema).max(500),
+});
+
+export const assignSellerShelfProductBodySchema = z.object({
+  productId: mongoIdSchema,
 });
 
 export const sellerShelfSchema = z.object({

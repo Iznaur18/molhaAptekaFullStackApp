@@ -16,7 +16,7 @@
 }
 
 .user-stories-strip__title {
-  margin: 1.2rem 0 0.4rem;
+  margin: 0.8rem 0 0.4rem;
   padding: 0 0.15rem 0 16px;
   font-size: clamp(1.08rem, 1rem + 0.35vw, 1.28rem);
   font-family: var(--iz-font-display);

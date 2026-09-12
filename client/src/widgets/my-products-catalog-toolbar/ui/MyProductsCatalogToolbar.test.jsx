@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { PRODUCT_MODERATION_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { renderWithProviders } from "../../../test/renderWithProviders.jsx";
 
 import { MyProductsCatalogToolbar } from "./MyProductsCatalogToolbar.jsx";
@@ -19,19 +19,17 @@ const renderToolbar = (props = {}) =>
   );
 
 describe("тулбар «Мои товары»", () => {
-  it("доверенному продавцу объясняет, что проверки нет", () => {
-    renderToolbar({ isModerationTrusted: true });
-
-    expect(
-      screen.getByText(PRODUCT_MODERATION_PAGE_UI.SELLER_TRUSTED_NOTICE),
-    ).toBeTruthy();
-  });
-
-  it("обычному продавцу пометку не показывает", () => {
+  it("показывает квоту товаров", () => {
     renderToolbar();
 
     expect(
-      screen.queryByText(PRODUCT_MODERATION_PAGE_UI.SELLER_TRUSTED_NOTICE),
-    ).toBeNull();
+      screen.getByLabelText(`${HOME_PAGE_UI.MY_PRODUCTS_QUOTA_LABEL}: 12 / 50`),
+    ).toBeTruthy();
+  });
+
+  it("админу квоту не показывает", () => {
+    renderToolbar({ isAdmin: true });
+
+    expect(screen.queryByLabelText(/лимит/i)).toBeNull();
   });
 });

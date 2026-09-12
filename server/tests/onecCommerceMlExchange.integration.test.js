@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { after, before, beforeEach, describe, it } from "node:test";
 
+import iconv from "iconv-lite";
+
 process.env.NODE_ENV = process.env.NODE_ENV ?? "test";
 process.env.JWT_SECRET =
   process.env.JWT_SECRET ?? "integration-test-jwt-secret-min-32-chars";
@@ -24,6 +26,7 @@ const {
 
 const {
   OneCCategoryMappingModel,
+  OneCImportJobModel,
   OneCOrderPushModel,
   OneCPendingProductModel,
   OrderModel,
@@ -658,16 +661,28 @@ describe("CommerceML обмен: заказы", () => {
     const query = await http.request("/onec/exchange?type=sale&mode=query", {
       headers: { Cookie: cookie },
     });
-    const xml = await query.text();
+    const xml = iconv.decode(Buffer.from(await query.arrayBuffer()), "windows-1251");
 
+    assert.match(xml, /encoding="windows-1251"/);
     assert.match(xml, /<КоммерческаяИнформация/);
     assert.match(xml, new RegExp(`<Ид>${OFFER_GUID_SIMPLE}</Ид>`));
     assert.match(xml, /<Количество>2<\/Количество>/);
     assert.match(xml, /<Сумма>241\.00<\/Сумма>/);
+    assert.match(xml, /<Валюта>руб\.<\/Валюта>/);
     // Реквизиты читает человек в 1С — сырые enum'ы ему ничего не скажут.
     assert.match(xml, /<Значение>Наличными при получении<\/Значение>/);
     assert.match(xml, /<Значение>Новый<\/Значение>/);
     assert.match(xml, /<Значение>Самовывоз<\/Значение>/);
+    assert.match(
+      xml,
+      /<Тип>Телефон рабочий<\/Тип>|<Тип>Электронная почта<\/Тип>|<Роль>Продавец<\/Роль>/,
+    );
+    assert.doesNotMatch(xml, new RegExp(`<Ид>${String(order._id)}:`));
+    assert.match(xml, /<Единица>/);
+    assert.match(xml, /<Коэффициент>1<\/Коэффициент>/);
+    assert.match(xml, /<ПометкаУдаления>/);
+    assert.match(xml, /<СтавкиНалогов>/);
+    assert.match(xml, /<Склады>/);
 
     // До подтверждения заказ ещё не считается переданным.
     const midway = await OneCOrderPushModel.findById(push._id).lean();
@@ -681,5 +696,37 @@ describe("CommerceML обмен: заказы", () => {
     const confirmed = await OneCOrderPushModel.findById(push._id).lean();
     assert.equal(confirmed.status, "synced");
     assert.ok(confirmed.syncedAt);
+  });
+
+  it("type=sale mode=file/import отвечает success и не создаёт import job", async () => {
+    const { seller, credentials } = await createExchangeSeller();
+    const basic = Buffer.from(
+      `${credentials.login}:${credentials.password}`,
+      "utf8",
+    ).toString("base64");
+    const checkAuth = await http.request("/onec/exchange?type=sale&mode=checkauth", {
+      headers: { Authorization: `Basic ${basic}` },
+    });
+    const [, cookieName, cookieValue] = (await checkAuth.text()).split("\n");
+    const cookie = `${cookieName}=${cookieValue}`;
+
+    const upload = await http.request(
+      "/onec/exchange?type=sale&mode=file&filename=v8_orders.zip",
+      {
+        method: "POST",
+        headers: { Cookie: cookie, "Content-Type": "application/octet-stream" },
+        body: Buffer.from("fake-orders-zip"),
+      },
+    );
+    assert.equal(await upload.text(), "success");
+
+    const imported = await http.request(
+      "/onec/exchange?type=sale&mode=import&filename=orders.xml",
+      { headers: { Cookie: cookie } },
+    );
+    assert.equal(await imported.text(), "success");
+
+    const jobs = await OneCImportJobModel.find({ sellerId: seller._id }).lean();
+    assert.equal(jobs.length, 0);
   });
 });

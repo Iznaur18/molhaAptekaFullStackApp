@@ -20,6 +20,7 @@ import {
   buildOneCOrdersXml,
   markOneCOrderPushesSynced,
 } from "../../services/onec/exchange/buildOneCOrdersXml.js";
+import { encodeOneCOrdersXmlForExchange } from "../../services/onec/exchange/encodeOneCOrdersXmlForExchange.js";
 import { classifyOneCImportFile } from "../../services/onec/exchange/expandOneCImportFile.js";
 import { enqueueOneCImportJob } from "../../services/onec/exchange/enqueueOneCImportJob.js";
 import {
@@ -34,6 +35,7 @@ import {
   touchOneCExchangeSession,
 } from "../../services/onec/exchange/onecExchangeSession.js";
 import {
+  drainOneCRequestBody,
   receiveOneCFileChunk,
   sanitizeOneCFilename,
 } from "../../services/onec/exchange/receiveOneCFile.js";
@@ -207,10 +209,11 @@ async function handleQuery(res, session) {
     orders,
   });
 
+  const body = encodeOneCOrdersXmlForExchange(xml);
   res.status(200);
-  res.setHeader("Content-Type", "text/xml; charset=utf-8");
+  res.setHeader("Content-Type", "application/xml; charset=windows-1251");
   res.setHeader("Cache-Control", "no-store");
-  return res.send(xml);
+  return res.send(body);
 }
 
 /**
@@ -270,12 +273,34 @@ export async function oneCExchangeController(req, res) {
         return handleInit(res);
 
       case ONEC_EXCHANGE_MODE_FILE:
+        // Bitrix/УТ в обмене заказами сначала льёт zip «на сайт». Нам обратная
+        // выгрузка не нужна — отвечаем success, тело сливаем, на диск не пишем.
+        if (type === ONEC_EXCHANGE_TYPE_SALE) {
+          const discardedBytes = await drainOneCRequestBody(req);
+          logServerEvent("info", {
+            event: "onec.exchange_sale_file_ignored",
+            sellerId: String(session.sellerId),
+            filename: readParam(req, "filename").slice(0, 128),
+            discardedBytes,
+          });
+          await touchOneCExchangeSession(session);
+          return sendPlain(res, "success");
+        }
         if (type !== ONEC_EXCHANGE_TYPE_CATALOG) {
           return sendFailure(res, "mode=file допустим только для type=catalog");
         }
         return await handleFile(req, res, session);
 
       case ONEC_EXCHANGE_MODE_IMPORT:
+        if (type === ONEC_EXCHANGE_TYPE_SALE) {
+          logServerEvent("info", {
+            event: "onec.exchange_sale_import_ignored",
+            sellerId: String(session.sellerId),
+            filename: readParam(req, "filename").slice(0, 128),
+          });
+          await touchOneCExchangeSession(session);
+          return sendPlain(res, "success");
+        }
         if (type !== ONEC_EXCHANGE_TYPE_CATALOG) {
           return sendFailure(res, "mode=import допустим только для type=catalog");
         }

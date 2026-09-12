@@ -150,6 +150,6 @@ test("лимиты полок берутся с сервера, а не заши
     "нет запасного лимита из контракта",
   );
   const contract = readRepoFile("contract/src/sellerShelf.js");
-  assert.match(contract, /SELLER_SHELF_MAX_PER_SELLER = 10/);
+  assert.match(contract, /SELLER_SHELF_MAX_PER_SELLER = 20/);
   assert.match(contract, /SELLER_SHELF_NAME_MAX_CHARS = 30/);
 });

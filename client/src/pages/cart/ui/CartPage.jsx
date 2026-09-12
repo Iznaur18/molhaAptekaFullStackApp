@@ -11,6 +11,7 @@ import { ChevronLeft } from "lucide-react";
 import { buildCheckoutPickupLocations } from "../../../entities/cart/lib/buildCheckoutPickupLocations.js";
 import { resolveCartAllowedPaymentMethods } from "../../../entities/cart/lib/resolveCartAllowedPaymentMethods.js";
 import { resolveCartSellerDelivery } from "../../../entities/cart/lib/resolveCartSellerDelivery.js";
+import { fetchSellerDeliveryQuote } from "../../../entities/cart/api/sellerDeliveryQuote.js";
 import { getCartLineExclusionReason } from "../../../entities/cart/lib/getCartLineExclusionReason.js";
 import {
   groupCartLinesBySeller,
@@ -24,7 +25,7 @@ import { useCart } from "../../../entities/cart/model/useCart.js";
 import { useCartSelection } from "../../../entities/cart/model/useCartSelection.js";
 import { useCartFlashSalePriceTick } from "../../../entities/cart/model/useCartFlashSalePriceTick.js";
 import { useCreateOrderMutation } from "../../../entities/order/model/useCreateOrderMutation.js";
-import { useAllProductsQuery } from "../../../entities/product/model/useAllProductsQuery.js";
+import { useCartProductsQuery } from "../../../entities/product/model/useCartProductsQuery.js";
 import { navigateToProductDetails } from "../../../entities/product/lib/navigateToProductDetails.js";
 import { fetchMyProductBuyNFreeProgress } from "../../../entities/product/api/fetchMyProductBuyNFreeProgress.js";
 import { fetchMyAppliedProductPromos } from "../../../entities/product-promo-code/api/productPromoCodeApi.js";
@@ -42,6 +43,7 @@ import {
   CHECKOUT_FORM_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
+import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
 
 import { CartAuctionSection } from "./CartAuctionSection.jsx";
 import { CartFulfillmentSection } from "./CartFulfillmentSection.jsx";
@@ -72,24 +74,27 @@ export function CartPage({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const createOrderMutation = useCreateOrderMutation();
-  const productsQuery = useAllProductsQuery();
+  const cartProductIds = useMemo(() => Object.keys(items), [items]);
+  const productsQuery = useCartProductsQuery({ productIds: cartProductIds });
   const cartPriceNowMs = useCartFlashSalePriceTick(items, productsQuery.data ?? []);
   const acceptedBidsQuery = useMyAcceptedBidsQuery({ enabled: isAuthorized });
   const appliedPromosQuery = useQuery({
     queryKey: productPromoCodeQueryKeys.appliedMine(),
     queryFn: fetchMyAppliedProductPromos,
     enabled: isAuthorized,
-    staleTime: 0,
-    refetchOnMount: "always",
+    staleTime: 60_000,
   });
   const { user } = useAuthSession();
 
   const auctionBids = acceptedBidsQuery.data ?? [];
-  const phase = productsQuery.isPending
-    ? "loading"
-    : productsQuery.isError
-      ? "error"
-      : "success";
+  const phase =
+    cartProductIds.length === 0
+      ? "success"
+      : productsQuery.isLoading
+        ? "loading"
+        : productsQuery.isError
+          ? "error"
+          : "success";
   const error =
     productsQuery.error instanceof Error
       ? productsQuery.error.message
@@ -339,8 +344,8 @@ export function CartPage({
     [checkoutSellerGroups],
   );
 
-  // Тариф собственной доставки продавца: считается той же функцией контракта,
-  // что и на сервере, поэтому сумма в корзине совпадает с суммой заказа.
+  // Тариф собственной доставки продавца. Сумму собирает функция контракта,
+  // расстояние по дорогам приходит котировкой с сервера — ниже.
   const sellerDelivery = useMemo(
     () =>
       resolveCartSellerDelivery({
@@ -351,19 +356,15 @@ export function CartPage({
     [checkoutSellerGroups, fulfillmentBySellerId, activeSummary.selectedTotal],
   );
 
-  const [checkoutDeliveryGeo, setCheckoutDeliveryGeo] = useState(
-    /** @type {{ lat: number; lon: number } | null} */ (null),
+  const [checkoutDeliveryAddress, setCheckoutDeliveryAddress] = useState(
+    /** @type {{ line: string; flat: string; geo: { lat: number; lon: number } | null; isValid: boolean } | null} */ (
+      null
+    ),
   );
 
-  const handleDeliveryGeoChange = useCallback((geo) => {
-    setCheckoutDeliveryGeo(geo);
+  const handleDeliveryAddressChange = useCallback((address) => {
+    setCheckoutDeliveryAddress(address);
   }, []);
-
-  useEffect(() => {
-    if (!sellerDelivery) {
-      setCheckoutDeliveryGeo(null);
-    }
-  }, [sellerDelivery]);
 
   const pickupLocations = useMemo(() => {
     if (auctionCheckoutBid) {
@@ -431,6 +432,77 @@ export function CartPage({
       .map((line) => String(line.productId))
       .filter(Boolean);
   }, [auctionCheckoutBid, activeSummary.selectedLines, fulfillmentBySellerId]);
+
+  // Расстояние по дорогам для тарифа продавца считает сервер — тем же путём,
+  // что и заказ. Раньше корзина мерила его сама по своей точке, заказ — по
+  // точке DaData, и покупатель видел 180 ₽, а платил 210 ₽.
+  const debouncedDeliveryAddress = useDebouncedValue(checkoutDeliveryAddress, 500);
+  const sellerDeliveryNeedsDistance = Boolean(
+    sellerDelivery && sellerDelivery.tariff.perKmRub > 0,
+  );
+  const quoteProductIdsKey = useMemo(
+    () => [...deliveryProductIds].sort().join(","),
+    [deliveryProductIds],
+  );
+  const quoteGeoLat = debouncedDeliveryAddress?.geo?.lat ?? null;
+  const quoteGeoLon = debouncedDeliveryAddress?.geo?.lon ?? null;
+  const sellerDeliveryQuoteQuery = useQuery({
+    queryKey: [
+      "seller-delivery-quote",
+      quoteProductIdsKey,
+      debouncedDeliveryAddress?.line ?? "",
+      debouncedDeliveryAddress?.flat ?? "",
+      quoteGeoLat,
+      quoteGeoLon,
+    ],
+    queryFn: () =>
+      fetchSellerDeliveryQuote({
+        productIds: quoteProductIdsKey.split(","),
+        deliveryAddress: debouncedDeliveryAddress?.line ?? "",
+        deliveryAddressFlat: debouncedDeliveryAddress?.flat ?? "",
+        deliveryAddressGeo:
+          quoteGeoLat != null && quoteGeoLon != null
+            ? { lat: quoteGeoLat, lon: quoteGeoLon }
+            : null,
+      }),
+    enabled:
+      sellerDeliveryNeedsDistance &&
+      quoteProductIdsKey.length > 0 &&
+      debouncedDeliveryAddress?.isValid === true,
+    staleTime: 5 * 60_000,
+    retry: false,
+  });
+
+  const sellerDeliveryDistance = useMemo(() => {
+    if (!sellerDeliveryNeedsDistance) {
+      return null;
+    }
+    const addressReady = checkoutDeliveryAddress?.isValid === true;
+    const entry = (sellerDeliveryQuoteQuery.data?.sellers ?? []).find(
+      (row) => String(row.sellerId) === String(sellerDelivery?.sellerId),
+    );
+    const km = Number(entry?.distanceKm);
+    return {
+      distanceKm: addressReady && entry && Number.isFinite(km) ? km : null,
+      distanceSource: entry?.distanceSource ?? null,
+      isLoading:
+        addressReady &&
+        (sellerDeliveryQuoteQuery.isFetching ||
+          checkoutDeliveryAddress !== debouncedDeliveryAddress),
+      errorMessage:
+        addressReady && sellerDeliveryQuoteQuery.error instanceof Error
+          ? sellerDeliveryQuoteQuery.error.message
+          : "",
+    };
+  }, [
+    sellerDeliveryNeedsDistance,
+    checkoutDeliveryAddress,
+    debouncedDeliveryAddress,
+    sellerDelivery,
+    sellerDeliveryQuoteQuery.data,
+    sellerDeliveryQuoteQuery.isFetching,
+    sellerDeliveryQuoteQuery.error,
+  ]);
 
   const closeAuctionCheckout = () => {
     setAuctionCheckoutBid(null);
@@ -640,7 +712,7 @@ export function CartPage({
               checkoutFormId={SELLER_CHECKOUT_FORM_ID}
               isCheckoutSubmitting={submitState.isSubmitting}
               sellerDelivery={sellerDelivery}
-              deliveryGeo={checkoutDeliveryGeo}
+              sellerDeliveryDistance={sellerDeliveryDistance}
               checkoutBeforeDock={
                 <div className="cart-fulfillment__checkout">
                   <CheckoutForm
@@ -661,7 +733,7 @@ export function CartPage({
                     }
                     cardPrepaidAvailable={cardPrepaidAvailable}
                     allowedPaymentMethods={allowedPaymentMethods}
-                    onDeliveryGeoChange={handleDeliveryGeoChange}
+                    onDeliveryAddressChange={handleDeliveryAddressChange}
                     isSubmitting={submitState.isSubmitting}
                     submitError={submitState.error}
                     submitSuccess={submitState.success}
@@ -689,10 +761,6 @@ export function CartPage({
           </>
         ) : (
           <>
-            <p className="cart-page__seller-checkout-hint">
-              {CART_PAGE_UI.SELLERS_LIST_HINT}
-            </p>
-
             <CartAuctionSection
               bids={auctionBids}
               onCheckout={handleOpenAuctionCheckout}

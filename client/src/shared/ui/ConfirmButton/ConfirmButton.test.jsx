@@ -62,4 +62,32 @@ describe("подтверждение прямо в кнопке", () => {
     expect(onConfirm).toHaveBeenCalledTimes(1);
     spy.mockRestore();
   });
+
+  it("popover: кнопка остаётся, вопрос во всплывающей панели", () => {
+    const onConfirm = vi.fn();
+    renderWithProviders(
+      <ConfirmButton
+        label="Отменить"
+        question="Точно отменить?"
+        onConfirm={onConfirm}
+        variant="popover"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Отменить" }));
+
+    expect(screen.getByRole("button", { name: "Отменить" })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+    expect(screen.getByRole("dialog", { name: "Точно отменить?" })).toBeTruthy();
+    expect(screen.getAllByRole("button").map((b) => b.textContent)).toEqual([
+      "Отменить",
+      "Нет",
+      "Да",
+    ]);
+
+    fireEvent.click(screen.getByRole("button", { name: "Да" }));
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+  });
 });

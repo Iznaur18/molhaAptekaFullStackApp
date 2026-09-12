@@ -23,7 +23,7 @@ export const SELLER_PRODUCTS_PAGE_UI = {
 
 export const SELLER_SHELF_UI = {
   TITLE: "Полки",
-  HINT: "Группируйте товары для фильтров на витрине. До 10 полок.",
+  HINT: "Группируйте товары для фильтров на витрине. До 20 полок. Товары — через «⋯» на карточке.",
   CREATE_PLACEHOLDER: "Название полки",
   CREATE: "Создать",
   CREATE_PENDING: "Создаём…",
@@ -46,13 +46,21 @@ export const SELLER_SHELF_UI = {
   ASSIGN_PENDING: "Сохраняем…",
   ASSIGN_EMPTY: "Нет товаров для назначения.",
   ASSIGN_OTHER_SHELF: "В другой полке",
+  ASSIGN_PRODUCT_MENU: "В полку…",
+  ASSIGN_PRODUCT_MODAL_TITLE: "Выберите полку",
+  ASSIGN_PRODUCT_CURRENT: "Текущая",
+  ASSIGN_PRODUCT_PENDING: "Сохраняем…",
+  ASSIGN_PRODUCT_ERROR: "Не удалось добавить товар на полку",
+  /** @param {string} name */
+  ASSIGN_PRODUCT_SUCCESS: (name) =>
+    name ? `Товар добавлен в полку «${name}»` : "Товар добавлен в полку",
   LOADING: "Загрузка полок…",
   LOAD_ERROR: "Не удалось загрузить полки",
   EMPTY: "Полок пока нет — создайте первую.",
   /** @param {number} count */
   PRODUCT_COUNT: (count) => `${count}`,
   NAME_TOO_LONG: "Максимум 30 символов",
-  LIMIT_REACHED: "Достигнут лимит 10 полок",
+  LIMIT_REACHED: "Достигнут лимит 20 полок",
   /** @param {boolean} expanded */
   EXPAND_TOGGLE: (expanded) => (expanded ? "Свернуть" : "Развернуть"),
   SHELF_UNIT_FORMS: /** @type {const} */ (["полка", "полки", "полок"]),

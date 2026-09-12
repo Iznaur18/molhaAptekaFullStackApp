@@ -3,6 +3,7 @@ import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
 
 export type ProductCategoryBreadcrumbItem = {
+  categoryId: string;
   slug: string;
   labelRu: string;
 };

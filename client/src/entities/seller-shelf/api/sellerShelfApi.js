@@ -101,3 +101,19 @@ export async function setSellerShelfProducts(shelfId, productIds) {
     throw new Error(readApiError(error, "Не удалось сохранить товары полки"));
   }
 }
+
+/**
+ * @param {string} shelfId
+ * @param {string} productId
+ */
+export async function assignProductToSellerShelf(shelfId, productId) {
+  try {
+    const { data } = await apiClient.post(
+      `/seller-shelf/${encodeURIComponent(shelfId)}/assign-product`,
+      { productId },
+    );
+    return parseApiContractData(data, sellerShelfSchema);
+  } catch (error) {
+    throw new Error(readApiError(error, "Не удалось добавить товар на полку"));
+  }
+}

@@ -22,7 +22,7 @@ const buildGroups = (productOverrides = {}) => [
 ];
 
 describe("доставка продавца в корзине", () => {
-  it("отдаёт тариф и точку отправления", () => {
+  it("отдаёт продавца и тариф — расстояние считает сервер", () => {
     const result = resolveCartSellerDelivery({
       sellerGroups: buildGroups(),
       fulfillmentBySellerId: { s1: "delivery" },
@@ -30,8 +30,8 @@ describe("доставка продавца в корзине", () => {
     });
 
     expect(result).toEqual({
+      sellerId: "s1",
       tariff: TARIFF,
-      origin: { lat: 43.3, lon: 45.7 },
       goodsTotalRub: 1000,
     });
   });
@@ -78,18 +78,5 @@ describe("доставка продавца в корзине", () => {
         fulfillmentBySellerId: { s1: "delivery", s2: "delivery" },
       }),
     ).toBeNull();
-  });
-
-  it("товар без координат оставляет точку пустой, а не нулевой", () => {
-    const result = resolveCartSellerDelivery({
-      sellerGroups: buildGroups({
-        productPickupLat: null,
-        productPickupLon: null,
-      }),
-      fulfillmentBySellerId: { s1: "delivery" },
-      goodsTotalRub: 100,
-    });
-
-    expect(result?.origin).toBeNull();
   });
 });

@@ -15,6 +15,7 @@
 
 /**
  * @typedef {Object} ProductCategoryBreadcrumbItem
+ * @property {string} categoryId
  * @property {string} slug
  * @property {string} labelRu
  */

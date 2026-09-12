@@ -12,11 +12,16 @@ import {
   DADATA_QC_GEO_MAX,
 } from "../../constants/dadataConstants.js";
 import {
+  GEO_PRECISION_HOUSE,
+  GEO_PRECISION_STREET,
+} from "../../constants/geoRoutingConstants.js";
+import {
   cleanRuAddress,
   isDadataConfigured,
   isDadataSuggestConfigured,
   suggestRuAddresses,
 } from "./dadataClient.js";
+import { dadataQcGeoPrecision } from "./dadataGeocode.js";
 
 /**
  * @param {string} line
@@ -94,6 +99,8 @@ function softAcceptVerifiedAddress(line, flatInput) {
     flat: flatInput,
     fiasId: "",
     geo: null,
+    /** @type {string | null} */
+    geoPrecision: null,
     city: "",
     district: "",
     street: "",
@@ -141,6 +148,12 @@ export function mapSuggestionToVerifiedAddress(suggestion, { line, flatInput }) 
     flat: pickFlatFromCleaned(data) ?? flatInput,
     fiasId,
     geo,
+    // Дом без ФИАС приходит с координатами улицы — расстояние доставки
+    // тогда уточняется по OpenStreetMap, и ему нужно знать, насколько точка
+    // грубая.
+    geoPrecision:
+      dadataQcGeoPrecision(data.qc_geo) ??
+      (fiasId ? GEO_PRECISION_HOUSE : GEO_PRECISION_STREET),
     city: structured.city,
     district: structured.district,
     street: structured.street,
@@ -188,6 +201,7 @@ async function resolveFromSuggestions(line, flatInput) {
  *   flat: string;
  *   fiasId: string;
  *   geo: { lat: number; lon: number } | null;
+ *   geoPrecision: string | null;
  *   city: string;
  *   district: string;
  *   street: string;
@@ -266,6 +280,9 @@ export async function verifyRuDeliveryAddress({ addressLine, flat = "" }) {
     flat: cleanedFlat,
     fiasId,
     geo,
+    geoPrecision: geo
+      ? (dadataQcGeoPrecision(cleaned.qc_geo) ?? GEO_PRECISION_HOUSE)
+      : null,
     city: structured.city,
     district: structured.district,
     street: structured.street,

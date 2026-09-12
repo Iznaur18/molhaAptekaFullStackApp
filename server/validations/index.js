@@ -25,6 +25,7 @@ import { makeProductValidation } from "./product/makeProductValidation.js";
 import { productBulkImportJobIdParamValidation } from "./product/productBulkImportValidation.js";
 import { productIdParamValidation } from "./product/productIdParamValidation.js";
 import { productsSearchValidation } from "./product/productsSearchValidation.js";
+import { catalogProductsByIdsValidation } from "./product/catalogProductsByIdsValidation.js";
 import { patchMyProductValidation } from "./product/patchMyProductValidation.js";
 import { rejectProductModerationValidation } from "./product/rejectProductModerationValidation.js";
 import { productModerationTrustValidation } from "./product/productModerationTrustValidation.js";
@@ -101,6 +102,7 @@ import {
   staffDisputeListValidation,
 } from "./courier/courierShipmentValidation.js";
 import { shippingEstimateValidation } from "./order/shippingEstimateValidation.js";
+import { sellerDeliveryQuoteValidation } from "./order/sellerDeliveryQuoteValidation.js";
 import { shippingCarrierToggleValidation } from "./order/shippingCarrierValidation.js";
 import { replaceMyCartValidation } from "./cart/replaceMyCartValidation.js";
 import { replaceMyFavoritesValidation } from "./favorites/replaceMyFavoritesValidation.js";
@@ -199,6 +201,7 @@ export {
   productBulkImportJobIdParamValidation,
   productIdParamValidation,
   productsSearchValidation,
+  catalogProductsByIdsValidation,
   patchMyProductValidation,
   rejectProductModerationValidation,
   productModerationTrustValidation,
@@ -255,6 +258,7 @@ export {
   staffResolveDisputeValidation,
   staffDisputeListValidation,
   shippingEstimateValidation,
+  sellerDeliveryQuoteValidation,
   shippingCarrierToggleValidation,
   replaceMyCartValidation,
   replaceMyFavoritesValidation,

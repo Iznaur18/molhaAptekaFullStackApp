@@ -117,6 +117,17 @@ export function useCatalogSubcategoryPicker({
     setPickerTrail([step]);
   }, []);
 
+  const openPickerTrail = useCallback((steps) => {
+    const normalized = (Array.isArray(steps) ? steps : [])
+      .map((step) => ({
+        id: String(step?.id ?? "").trim(),
+        labelRu: String(step?.labelRu ?? "").trim(),
+      }))
+      .filter((step) => step.id.length > 0 && step.labelRu.length > 0);
+    setPickerLoadError(null);
+    setPickerTrail(normalized);
+  }, []);
+
   const navigateWithLegacyCategorySlug = useCallback(
     (categorySlug) => {
       const nextQuery = {
@@ -239,6 +250,9 @@ export function useCatalogSubcategoryPicker({
     resolvingLandingCategoryKey,
     resolvingPickerCategoryId,
     clearPickerTrail,
+    openPickerTrail,
+    navigateToCategoryProducts,
+    fetchCategoryChildren,
     handleCatalogCategoryGridClick,
     handleSubcategoryPickerBack,
     handleSubcategoryPickerViewAll,

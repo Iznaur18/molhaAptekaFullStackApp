@@ -1,2 +1,2 @@
 export const SELLER_SHELF_NAME_MAX_CHARS = 30;
-export const SELLER_SHELF_MAX_PER_SELLER = 10;
+export const SELLER_SHELF_MAX_PER_SELLER = 20;

@@ -136,6 +136,7 @@ export const buildOrderShipments = (order) => {
  *   sellerDeliveryBySellerId?: Record<string, {
  *     feeRub: number;
  *     distanceKm: number | null;
+ *     distanceSource?: string | null;
  *     tariff: { paid: boolean; baseFeeRub: number; perKmRub: number; freeFromRub: number };
  *   }> | null;
  * }} [options]
@@ -190,6 +191,7 @@ export const buildStoredShipments = (items, options = {}) => {
       // Тариф собственной доставки продавца — снимком, вместе с суммой.
       sellerDeliveryFeeRub: sellerDelivery?.feeRub ?? 0,
       sellerDeliveryDistanceKm: sellerDelivery?.distanceKm ?? null,
+      sellerDeliveryDistanceSource: sellerDelivery?.distanceSource ?? null,
       ...(sellerDelivery?.tariff
         ? { sellerDeliveryTariffAtOrder: sellerDelivery.tariff }
         : {}),

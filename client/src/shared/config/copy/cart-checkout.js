@@ -58,7 +58,6 @@ export const CART_PAGE_UI = {
   CHECKOUT_SHEET_CLOSE: "Закрыть",
   CHECKOUT_SELLER_HINT:
     "Каждый продавец оформляется отдельно — свой заказ и своя оплата.",
-  SELLERS_LIST_HINT: "Выберите продавца, чтобы открыть его корзину и оформить заказ.",
   BACK_TO_SELLERS: "К продавцам",
   CHECKOUT_LEGAL_HINT_PREFIX: "Нажимая на кнопку, вы соглашаетесь с ",
   CHECKOUT_LEGAL_PRIVACY_LINK: "Условиями обработки персональных данных",
@@ -168,11 +167,16 @@ export const CHECKOUT_FORM_UI = {
   /** @param {string} price */
   SELLER_DELIVERY_FROM: (price) => `от ${price}`,
   SELLER_DELIVERY_NEED_ADDRESS:
-    "Точная сумма появится, когда выберете адрес: она зависит от расстояния",
+    "Точная сумма появится, когда выберете адрес: она зависит от расстояния по дорогам",
+  SELLER_DELIVERY_CALCULATING: "Считаем расстояние по дорогам…",
   /** @param {string} price */
   SELLER_DELIVERY_FREE_FROM: (price) => `Бесплатно от ${price}`,
-  /** @param {string} km */
-  SELLER_DELIVERY_DISTANCE: (km) => `${km} км по прямой`,
+  /** @param {number} km */
+  SELLER_DELIVERY_DISTANCE: (km) => `${km} км по дорогам`,
+  /** @param {number} km */
+  SELLER_DELIVERY_DISTANCE_ESTIMATE: (km) =>
+    `≈ ${km} км по дорогам — маршрут сейчас не построился, расстояние оценено по карте`,
+  SELLER_DELIVERY_MAP_ATTRIBUTION: "Маршрут по данным © участники OpenStreetMap",
   TOTAL_GOODS: "Товары",
   TOTAL_DELIVERY: "Доставка",
   TOTAL_TO_PAY: "Итого",
@@ -205,8 +209,6 @@ export const CHECKOUT_FORM_UI = {
   SHIPPING_ESTIMATE_HINT: "Точную сумму назовёт курьер при получении.",
   SHIPPING_ESTIMATE_UNAVAILABLE:
     "Стоимость доставки посчитаем позже — её назовёт курьер.",
-  SHIPPING_PROVIDER_CHOSEN_BY_SELLER:
-    "Службу выбирает продавец на товаре — здесь видно, кто повезёт.",
   SHIPPING_PROVIDER_SOON: "Скоро",
   LABEL_SHIPPING_SERVICE: "Тип доставки",
   SHIPPING_SERVICE_COURIER: "Курьер",

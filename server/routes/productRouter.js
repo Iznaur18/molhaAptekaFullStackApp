@@ -43,6 +43,7 @@ import {
   getProductBadgeExplainsController,
   patchProductBadgeExplainController,
   getCatalogProductByIdController,
+  getCatalogProductsByIdsController,
   getComparableProductsController,
   deleteMyProductController,
   patchMyProductController,
@@ -134,6 +135,7 @@ import {
   makeProductValidation,
   productIdParamValidation,
   productsSearchValidation,
+  catalogProductsByIdsValidation,
   patchMyProductValidation,
   rejectProductModerationValidation,
   submitProductReportValidation,
@@ -587,6 +589,13 @@ router.post(
   requestProductPromotionController,
 );
 router.get("/promo-activations/me", checkAuthMW, listMyAppliedProductPromosController);
+router.get(
+  "/catalog-by-ids",
+  catalogListRateLimiter,
+  catalogProductsByIdsValidation,
+  checkOptionalAuthMW,
+  getCatalogProductsByIdsController,
+);
 router.get(
   "/:productId/promo-codes",
   checkAuthMW,

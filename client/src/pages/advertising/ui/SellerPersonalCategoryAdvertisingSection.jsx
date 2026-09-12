@@ -223,7 +223,6 @@ export function SellerPersonalCategoryAdvertisingSection({
               {pricePoints} баллов
               {streakDiscountPercent > 0 ? (
                 <span className="advertising-page__meta-list">
-                  {" "}
                   (было {listPricePoints})
                 </span>
               ) : null}
@@ -278,11 +277,12 @@ export function SellerPersonalCategoryAdvertisingSection({
           <p className="advertising-page__panel-title">Заявка на личную категорию</p>
           <form className="advertising-page__form" onSubmit={handleSubmit}>
             <label className="advertising-page__field">
-              {SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_NAME}
               <input
                 className="advertising-page__input"
                 value={labelRu}
                 maxLength={80}
+                placeholder={SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_NAME}
+                aria-label={SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_NAME}
                 onChange={(event) => setLabelRu(event.target.value)}
               />
             </label>
@@ -290,6 +290,7 @@ export function SellerPersonalCategoryAdvertisingSection({
               label={SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_IMAGE}
               value={imageUrl}
               onChange={setImageUrl}
+              showHint={false}
             />
             <label className="advertising-page__field">
               {SELLER_PERSONAL_CATEGORY_PAGE_UI.LABEL_REGION}
