@@ -7,6 +7,17 @@ import "./ConfirmButton.css";
 
 /** Через столько секунд вопрос снимается сам. */
 const AUTO_CANCEL_MS = 8000;
+/** Окно скрывается сразу; scrim доигрывает после. */
+const POPOVER_EXIT_MS = 0;
+const SCRIM_EXIT_MS = 250;
+const EXIT_MS = POPOVER_EXIT_MS + SCRIM_EXIT_MS;
+
+function getExitMs() {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+    return EXIT_MS;
+  }
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : EXIT_MS;
+}
 
 /**
  * Кнопка, которая спрашивает подтверждение прямо на месте.
@@ -38,6 +49,8 @@ export function ConfirmButton({
   variant = "inline",
 }) {
   const [asking, setAsking] = useState(false);
+  const [portalMounted, setPortalMounted] = useState(false);
+  const [exiting, setExiting] = useState(false);
   const rootRef = useRef(/** @type {HTMLSpanElement | null} */ (null));
   const panelRef = useRef(/** @type {HTMLSpanElement | null} */ (null));
   const timerRef = useRef(/** @type {ReturnType<typeof setTimeout> | null} */ (null));
@@ -51,6 +64,26 @@ export function ConfirmButton({
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [asking]);
+
+  useEffect(() => {
+    if (!isPopover) return undefined;
+
+    if (asking) {
+      setPortalMounted(true);
+      setExiting(false);
+      return undefined;
+    }
+
+    if (!portalMounted) return undefined;
+
+    setExiting(true);
+    const exitTimer = setTimeout(() => {
+      setPortalMounted(false);
+      setExiting(false);
+    }, getExitMs());
+
+    return () => clearTimeout(exitTimer);
+  }, [asking, isPopover, portalMounted]);
 
   useEffect(() => {
     if (!asking || !isPopover) return undefined;
@@ -74,6 +107,7 @@ export function ConfirmButton({
     };
   }, [asking, isPopover]);
 
+  const closeAsking = () => setAsking(false);
   const triggerLabel = isPending && pendingLabel ? pendingLabel : label;
 
   const actions = (
@@ -81,8 +115,8 @@ export function ConfirmButton({
       <button
         type="button"
         className="confirm-button__no"
-        onClick={() => setAsking(false)}
-        disabled={disabled}
+        onClick={closeAsking}
+        disabled={disabled || exiting}
       >
         {FORMAT_BOOLEAN_RU.NO}
       </button>
@@ -90,10 +124,10 @@ export function ConfirmButton({
         type="button"
         className="confirm-button__yes"
         onClick={() => {
-          setAsking(false);
+          closeAsking();
           onConfirm();
         }}
-        disabled={disabled}
+        disabled={disabled || exiting}
       >
         {FORMAT_BOOLEAN_RU.YES}
       </button>
@@ -101,6 +135,16 @@ export function ConfirmButton({
   );
 
   if (isPopover) {
+    const portalClass = exiting
+      ? "confirm-button__portal confirm-button__portal--out"
+      : "confirm-button__portal";
+    const scrimClass = exiting
+      ? "confirm-button__scrim confirm-button__scrim--out"
+      : "confirm-button__scrim";
+    const popoverClass = exiting
+      ? "confirm-button__popover confirm-button__popover--out"
+      : "confirm-button__popover";
+
     return (
       <span
         ref={rootRef}
@@ -112,23 +156,23 @@ export function ConfirmButton({
           onClick={() => setAsking((open) => !open)}
           disabled={disabled}
           aria-expanded={asking}
-          aria-controls={asking ? panelId : undefined}
+          aria-controls={portalMounted ? panelId : undefined}
           aria-haspopup="dialog"
         >
           {triggerLabel}
         </button>
-        {asking
+        {portalMounted
           ? createPortal(
-              <span className="confirm-button__portal" role="presentation">
+              <span className={portalClass} role="presentation">
                 <span
-                  className="confirm-button__scrim"
+                  className={scrimClass}
                   aria-hidden="true"
-                  onClick={() => setAsking(false)}
+                  onClick={closeAsking}
                 />
                 <span
                   ref={panelRef}
                   id={panelId}
-                  className="confirm-button__popover"
+                  className={popoverClass}
                   role="dialog"
                   aria-modal="true"
                   aria-label={question}

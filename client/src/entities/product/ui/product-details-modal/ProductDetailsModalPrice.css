@@ -87,7 +87,7 @@
 .product-details-modal__seller-extras {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--product-details-section-gap);
   width: 100%;
   min-width: 0;
   margin: 0;
@@ -97,7 +97,7 @@
 .product-details-modal__feature-cards {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--product-details-section-gap);
   width: 100%;
   min-width: 0;
   margin: 0;
@@ -410,8 +410,47 @@
   width: 100%;
 }
 
+.product-details-modal__price-actions--with-back {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0.45rem;
+}
+
+.product-details-modal__price-actions-back {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 5.5rem;
+  min-height: 3rem;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 1.25rem;
+  corner-shape: squircle;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: 1.02rem;
+  font-weight: var(--iz-weight-semibold, 600);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.product-details-modal__price-actions-back:hover {
+  background: var(--iz-color-surface-muted, var(--iz-color-surface));
+}
+
+.product-details-modal__price-actions-back:focus-visible {
+  outline: 2px solid var(--iz-color-link);
+  outline-offset: 2px;
+}
+
 .product-details-modal__price-actions-cart {
   display: flex;
+  flex: 1 1 auto;
   min-width: 0;
 }
 

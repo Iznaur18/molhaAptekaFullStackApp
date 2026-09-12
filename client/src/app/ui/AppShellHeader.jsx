@@ -1,9 +1,10 @@
-import { lazy, Suspense, useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useId, useRef, useState } from "react";
 
 import { useNavigate, useLocation } from "react-router-dom";
 import { CATALOG_SEARCH_QUERY_MAX_LENGTH } from "@molha/api-contract";
 
 import { HeaderUsersStretchMenu } from "../../widgets/header-users-stretch-menu/ui/HeaderUsersStretchMenu.jsx";
+import { CatalogFiltersSheet } from "../../widgets/catalog-filters-sheet/ui/CatalogFiltersSheet.jsx";
 import {
   HOME_PAGE_UI,
   PRODUCT_SEARCH_INPUT_UI,
@@ -18,8 +19,9 @@ import { MobileBottomNav } from "../../widgets/mobile-bottom-nav/ui/MobileBottom
 import { useScrollLock } from "../../shared/lib/useScrollLock.js";
 import { useRegisterBlockingOverlay } from "../../shared/lib/useBlockingOverlayOccupancy.js";
 import { SearchInput } from "../../shared/ui/SearchInput/SearchInput.jsx";
+import { HeaderCircleIconButton } from "../../shared/ui/HeaderCircleIconButton/index.js";
+import { SlidersHorizontal } from "../../shared/ui/icon/index.js";
 import { useSiteHeaderBannerSlidesQuery } from "../../entities/site-header-banner/model/useSiteHeaderBannerSlidesQuery.js";
-import { ViewerRegionSelect } from "../../entities/region/ui/ViewerRegionSelect.jsx";
 import {
   isFaqPath,
   parseLegalKindFromPathname,
@@ -30,6 +32,7 @@ const LazySiteHeaderBannerCarousel = lazy(() =>
     (module) => ({ default: module.SiteHeaderBannerCarousel }),
   ),
 );
+
 /**
  * Единый topbar для всех ширин веба (mobile chrome: search + region + stretch).
  *
@@ -218,7 +221,7 @@ export function AppShellHeader({
 }
 
 /**
- * Topbar actions: region + stretch menu (единый chrome).
+ * Topbar actions: filters stub + stretch menu (region — 4-й пункт внутри).
  * @param {{
  *   isUsersNavActive: boolean;
  *   onSetMainView: (view: import('../../shared/lib/homeMainViewPaths.js').HomeMainView) => void;
@@ -236,6 +239,8 @@ function HeaderNavActions({
 }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const filtersSheetId = useId();
+  const [isFiltersSheetOpen, setIsFiltersSheetOpen] = useState(false);
   const isTermsNavActive = parseLegalKindFromPathname(location.pathname) === "terms";
   const isFaqNavActive = isFaqPath(location.pathname);
   const stretchActiveItemKey = isUsersNavActive
@@ -260,23 +265,41 @@ function HeaderNavActions({
     }
   };
 
+  const showRegionInMenu =
+    showViewerRegionPicker && typeof onViewerRegionChange === "function";
+  const closeFiltersSheet = () => setIsFiltersSheetOpen(false);
+
   return (
     <nav
       className="app-shell__auth-actions app-shell__auth-actions--mobile-top"
       aria-label={HOME_PAGE_UI.NAV_AUTH_ARIA}
     >
-      {showViewerRegionPicker && typeof onViewerRegionChange === "function" ? (
-        <ViewerRegionSelect
-          className="app-shell__viewer-region"
-          value={viewerRegionCode}
-          onChange={onViewerRegionChange}
+      {showViewerRegionPicker ? (
+        <HeaderCircleIconButton
+          icon={SlidersHorizontal}
+          ariaLabel={HOME_PAGE_UI.CATALOG_FILTER_BUTTON_ARIA}
+          className="header-circle-button--cta"
+          isActive={isFiltersSheetOpen}
+          ariaExpanded={isFiltersSheetOpen}
+          ariaControls={isFiltersSheetOpen ? filtersSheetId : undefined}
+          onClick={() => setIsFiltersSheetOpen(true)}
         />
       ) : null}
       <HeaderUsersStretchMenu
         variant="cta"
         activeItemKey={stretchActiveItemKey}
         onItemAction={handleStretchItemAction}
+        showViewerRegion={showRegionInMenu}
+        viewerRegionCode={viewerRegionCode}
+        onViewerRegionChange={onViewerRegionChange}
       />
+      {showViewerRegionPicker ? (
+        <CatalogFiltersSheet
+          id={filtersSheetId}
+          isOpen={isFiltersSheetOpen}
+          onClose={closeFiltersSheet}
+        />
+      ) : null}
     </nav>
   );
 }

@@ -23,7 +23,7 @@ export const USERS_PODIUM_UI = {
 
 /** Прогресс-бар месячных баллов на странице пользователей */
 export const USERS_MONTHLY_LOYALTY_LOADBAR_UI = {
-  TITLE: "Баллы необходимые достигнуть",
+  TITLE: "Всего собрано денег",
   DONATE: "Пожертвовать",
   DONATE_ARIA: "Пожертвовать на месячный прогресс",
   DONATE_MODAL_TITLE: "Пожертвование",

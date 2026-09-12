@@ -141,6 +141,14 @@ export function CartPage({
     error: "",
     success: "",
   });
+  /** Хост для «Способа оплаты» вне карточки получения. */
+  const [paymentMethodHostEl, setPaymentMethodHostEl] = useState(
+    /** @type {HTMLDivElement | null} */ (null),
+  );
+  /** Хост для «Способа получения» вне карточки деталей. */
+  const [fulfillmentMethodHostEl, setFulfillmentMethodHostEl] = useState(
+    /** @type {HTMLDivElement | null} */ (null),
+  );
 
   /** Оформление обычной корзины — на странице продавца; sheet только у аукциона. */
   const checkoutSellerId = auctionCheckoutBid ? null : activeSellerCartId;
@@ -714,35 +722,51 @@ export function CartPage({
               sellerDelivery={sellerDelivery}
               sellerDeliveryDistance={sellerDeliveryDistance}
               checkoutBeforeDock={
-                <div className="cart-fulfillment__checkout">
-                  <CheckoutForm
-                    id={SELLER_CHECKOUT_FORM_ID}
-                    defaultDeliveryAddress={defaultAddress}
-                    savedDeliveryAddresses={savedDeliveryAddresses}
-                    pickupLocations={pickupLocations}
-                    deliveryAvailable={deliveryAvailable}
-                    pickupAvailable={pickupAvailable}
-                    fulfillmentMode={null}
-                    courierDelivery={checkoutCourierDelivery}
-                    deliveryProductIds={deliveryProductIds}
-                    initialFulfillmentMethod={
-                      fulfillmentBySellerId[activeSellerCart.group.sellerId] ?? "pickup"
-                    }
-                    onFulfillmentMethodChange={(method) =>
-                      chooseSellerFulfillment(activeSellerCart.group.sellerId, method)
-                    }
-                    cardPrepaidAvailable={cardPrepaidAvailable}
-                    allowedPaymentMethods={allowedPaymentMethods}
-                    onDeliveryAddressChange={handleDeliveryAddressChange}
-                    isSubmitting={submitState.isSubmitting}
-                    submitError={submitState.error}
-                    submitSuccess={submitState.success}
-                    isDisabled={!activeSellerCart.canCheckout}
-                    showHeading={false}
-                    showSubmitButton={false}
-                    onSubmit={handleCheckoutSubmit}
+                <>
+                  <div
+                    ref={setFulfillmentMethodHostEl}
+                    className="cart-fulfillment__method-card"
                   />
-                </div>
+                  <div className="cart-fulfillment__details">
+                    <CheckoutForm
+                      id={SELLER_CHECKOUT_FORM_ID}
+                      defaultDeliveryAddress={defaultAddress}
+                      savedDeliveryAddresses={savedDeliveryAddresses}
+                      pickupLocations={pickupLocations}
+                      deliveryAvailable={deliveryAvailable}
+                      pickupAvailable={pickupAvailable}
+                      fulfillmentMode={null}
+                      courierDelivery={checkoutCourierDelivery}
+                      deliveryProductIds={deliveryProductIds}
+                      initialFulfillmentMethod={
+                        fulfillmentBySellerId[activeSellerCart.group.sellerId] ??
+                        "pickup"
+                      }
+                      onFulfillmentMethodChange={(method) =>
+                        chooseSellerFulfillment(
+                          activeSellerCart.group.sellerId,
+                          method,
+                        )
+                      }
+                      cardPrepaidAvailable={cardPrepaidAvailable}
+                      allowedPaymentMethods={allowedPaymentMethods}
+                      onDeliveryAddressChange={handleDeliveryAddressChange}
+                      isSubmitting={submitState.isSubmitting}
+                      submitError={submitState.error}
+                      submitSuccess={submitState.success}
+                      isDisabled={!activeSellerCart.canCheckout}
+                      showHeading={false}
+                      showSubmitButton={false}
+                      fulfillmentMethodPortalTarget={fulfillmentMethodHostEl}
+                      paymentMethodPortalTarget={paymentMethodHostEl}
+                      onSubmit={handleCheckoutSubmit}
+                    />
+                  </div>
+                  <div
+                    ref={setPaymentMethodHostEl}
+                    className="cart-fulfillment__payment"
+                  />
+                </>
               }
               deliveryFee={
                 activeSellerCart.group.courierDelivery &&

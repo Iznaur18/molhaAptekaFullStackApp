@@ -12,6 +12,14 @@
 .my-products-search-bar .search-input {
   flex: 1 1 auto;
   min-width: 0;
+  align-self: stretch;
+  align-items: stretch;
+}
+
+.my-products-search-bar .search-input__field {
+  height: 100%;
+  min-height: 100%;
+  padding-block: 0;
 }
 
 .my-products-search-bar__submit {

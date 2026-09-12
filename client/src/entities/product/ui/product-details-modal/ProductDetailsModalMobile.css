@@ -199,7 +199,7 @@
   .product-details-modal__price-block--inline-actions {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--product-details-section-gap);
     padding: 5.6px 0 0;
     border: none;
     border-radius: 0;
@@ -224,7 +224,7 @@
 
   .product-details-modal__price-block--inline-actions
     .product-details-modal__seller-extras {
-    gap: 12px;
+    gap: var(--product-details-section-gap);
     padding: 0;
   }
 
@@ -280,7 +280,7 @@
   .product-details-modal .product-details-seller-stack {
     box-sizing: border-box;
     width: calc(100% - 2 * var(--iz-space-4));
-    margin: var(--iz-space-2) var(--iz-space-4) 0;
+    margin: 0 var(--iz-space-4);
   }
 
   .product-details-modal .product-details-seller-stack .product-details-seller-preview {
@@ -341,13 +341,16 @@
   }
 
   .product-details-modal__price-actions--mobile-dock {
-    display: block;
+    display: flex;
     width: 100%;
+    align-items: stretch;
+    gap: 0.45rem;
   }
 
   .product-details-modal__price-actions--mobile-dock
     .product-details-modal__price-actions-cart {
-    grid-column: auto;
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .product-details-modal__price-actions--mobile-dock .add-to-cart,

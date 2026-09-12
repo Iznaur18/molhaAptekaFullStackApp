@@ -1,9 +1,12 @@
-import { BadgeHelp, Newspaper, Users } from "../../../shared/ui/icon/index.js";
-import { HEADER_USERS_BUTTON_UI } from "../../../shared/config/appUiCopy.js";
+import { BadgeHelp, MapPin, Newspaper, Users } from "../../../shared/ui/icon/index.js";
+import {
+  HEADER_USERS_BUTTON_UI,
+  REGION_UI,
+} from "../../../shared/config/appUiCopy.js";
 
 /**
- * @typedef {"users" | "terms" | "faq"} HeaderUsersMenuItemKey
- * @typedef {"users" | "terms" | "faq"} HeaderUsersMenuItemAction
+ * @typedef {"users" | "terms" | "faq" | "region"} HeaderUsersMenuItemKey
+ * @typedef {"users" | "terms" | "faq" | "region"} HeaderUsersMenuItemAction
  *
  * @typedef {{
  *   key: HeaderUsersMenuItemKey;
@@ -13,9 +16,13 @@ import { HEADER_USERS_BUTTON_UI } from "../../../shared/config/appUiCopy.js";
  * }} HeaderUsersMenuItem
  */
 
-/** @returns {HeaderUsersMenuItem[]} */
-export function buildHeaderUsersMenuItems() {
-  return [
+/**
+ * @param {{ includeRegion?: boolean }} [options]
+ * @returns {HeaderUsersMenuItem[]}
+ */
+export function buildHeaderUsersMenuItems({ includeRegion = false } = {}) {
+  /** @type {HeaderUsersMenuItem[]} */
+  const items = [
     {
       key: "users",
       icon: Users,
@@ -35,4 +42,15 @@ export function buildHeaderUsersMenuItems() {
       action: "faq",
     },
   ];
+
+  if (includeRegion) {
+    items.push({
+      key: "region",
+      icon: MapPin,
+      accessibilityLabel: REGION_UI.VIEWER_ARIA,
+      action: "region",
+    });
+  }
+
+  return items;
 }

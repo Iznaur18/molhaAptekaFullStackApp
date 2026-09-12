@@ -39,6 +39,12 @@
   color: var(--iz-color-danger, #d93025);
 }
 
+.checkout-seller-delivery__hint--under-delivery {
+  margin: -0.05rem 0 0.15rem;
+  padding-left: 0;
+  text-align: right;
+}
+
 /* Маршрут строится по данным OSM — лицензия ODbL требует указать источник. */
 .checkout-seller-delivery__attribution {
   margin: 0.2rem 0 0;
@@ -53,8 +59,8 @@
   flex-direction: column;
   gap: 0.2rem;
   margin: 0.4rem 0 0;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--iz-color-border);
+  padding-top: 0;
+  border-top: none;
   font-size: 0.875rem;
 }
 
@@ -73,6 +79,7 @@
 
 .checkout-seller-delivery__total-row--sum dt,
 .checkout-seller-delivery__total-row--sum dd {
-  font-weight: 700;
+  font-size: 1.0625rem;
+  font-weight: 800;
   color: var(--iz-color-text);
 }

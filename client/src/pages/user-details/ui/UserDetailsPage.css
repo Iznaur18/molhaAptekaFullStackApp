@@ -14,7 +14,7 @@
   --user-details-screen-padding-x: var(--iz-space-4);
   --user-details-screen-padding-top: var(--iz-space-3);
   --user-details-screen-padding-bottom: 18px;
-  --user-details-screen-gap: var(--iz-space-2);
+  --user-details-screen-gap: 6px;
 
   box-sizing: border-box;
   width: 100%;
@@ -67,10 +67,11 @@
 
 .user-details-page__title-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--user-details-screen-gap);
+  min-width: 0;
 }
 
 .user-details-page__title-leading {
@@ -89,6 +90,23 @@
   font-weight: 700;
   line-height: 1.25;
   color: var(--iz-color-text);
+  overflow: hidden;
+}
+
+.user-details-page__title .user-premium-name {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.user-details-page__title .user-premium-name__text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.user-details-page__title-row > .user-follow-button {
+  flex-shrink: 0;
 }
 
 .user-details-page__body {
@@ -128,11 +146,16 @@
   border-radius: var(--modal-profile-banner-radius);
 }
 
-/* Gap родителя уже spacing[2] — без лишних margin как в app */
+/* Gap родителя уже spacing — без лишних margin как в app */
 .user-details-page .user-profile-purchases-section {
   margin-bottom: 0;
 }
 
 .user-details-page .user-profile-info {
   margin-top: 0;
+  gap: var(--user-details-screen-gap);
+}
+
+.user-details-page .user-vote-rating-form__details {
+  margin: 0;
 }

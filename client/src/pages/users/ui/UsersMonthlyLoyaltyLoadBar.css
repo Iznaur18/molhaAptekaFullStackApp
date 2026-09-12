@@ -29,8 +29,7 @@
   min-width: 0;
   font-size: 0.8125rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   color: var(--iz-color-text-muted);
 }
 

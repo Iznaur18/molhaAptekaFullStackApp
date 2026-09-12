@@ -11,6 +11,7 @@ import { CheckoutSellerDeliveryCost } from "../../../features/checkout/ui/Checko
 import { CartLineItem } from "./CartLineItem.jsx";
 import { CartSelectAllRow } from "./CartSelectAllRow.jsx";
 
+import "../../../features/checkout/ui/CheckoutFulfillmentCards.css";
 import "./CartFulfillmentSection.css";
 
 /**

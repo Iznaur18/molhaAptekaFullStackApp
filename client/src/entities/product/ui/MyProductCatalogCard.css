@@ -292,13 +292,17 @@
 .my-product-compact-card__menu-confirm {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 8px;
   padding: 4px;
+  text-align: center;
 }
 
 .my-product-compact-card__menu-confirm-actions {
   display: flex;
+  justify-content: center;
   gap: 6px;
+  width: 100%;
 }
 
 .my-product-compact-card__menu-confirm-yes,
