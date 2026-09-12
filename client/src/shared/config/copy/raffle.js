@@ -82,6 +82,12 @@ export const USERS_LOYALTY_RAFFLE_ADMIN_UI = {
   SAVING: "Сохраняем…",
   SAVED: "Сохранено",
   LOADING: "Загрузка…",
+  RESET_PROGRESS: "Обнулить сумму",
+  RESET_PROGRESS_CONFIRM:
+    "Обнулить текущую сумму прогресс-бара? Заказы и пожертвования не удаляются — бар начнёт считать заново с нуля до конца месяца.",
+  RESET_PROGRESS_PENDING: "Обнуляем…",
+  RESET_PROGRESS_DONE: "Сумма обнулена",
+  RESET_PROGRESS_ERROR: "Не удалось обнулить сумму",
 };
 
 export const RAFFLE_PRODUCTS_PAGE_UI = {

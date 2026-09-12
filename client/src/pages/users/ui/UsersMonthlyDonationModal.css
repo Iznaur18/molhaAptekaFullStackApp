@@ -1,0 +1,122 @@
+.users-monthly-donation-modal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--iz-z-modal-shell, 1200);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+
+.users-monthly-donation-modal__scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: rgb(0 0 0 / 45%);
+  cursor: pointer;
+  animation: users-monthly-donation-modal-scrim-in 0.28s ease-out;
+}
+
+.users-monthly-donation-modal__panel {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  width: min(100%, 32rem);
+  max-height: min(90vh, 36rem);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  border-radius: 1rem 1rem 0 0;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  box-shadow: 0 -8px 32px rgb(0 0 0 / 18%);
+  animation: users-monthly-donation-modal-sheet-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.users-monthly-donation-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.users-monthly-donation-modal__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.users-monthly-donation-modal__close {
+  flex-shrink: 0;
+}
+
+.users-monthly-donation-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.users-monthly-donation-modal__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.users-monthly-donation-modal__input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.5rem;
+  background: var(--iz-color-surface);
+  color: inherit;
+  font: inherit;
+}
+
+.users-monthly-donation-modal__error {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--iz-color-danger, #b42318);
+}
+
+.users-monthly-donation-modal__footer {
+  display: flex;
+  justify-content: stretch;
+}
+
+.users-monthly-donation-modal__footer .app-btn {
+  width: 100%;
+}
+
+@keyframes users-monthly-donation-modal-scrim-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes users-monthly-donation-modal-sheet-in {
+  from {
+    transform: translate3d(0, 100%, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .users-monthly-donation-modal__scrim,
+  .users-monthly-donation-modal__panel {
+    animation: none;
+  }
+}

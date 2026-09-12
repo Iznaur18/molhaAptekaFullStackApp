@@ -29,6 +29,22 @@ const UsersLoyaltyRaffleSettingsSchema = new mongoose.Schema(
       min: USERS_LOYALTY_RAFFLE_GOAL_MIN,
       max: USERS_LOYALTY_RAFFLE_GOAL_MAX,
     },
+    /** Сырая сумма на момент мягкого обнуления бара (заказы+донаты). */
+    progressBaseline: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    progressBaselineYear: {
+      type: Number,
+      default: null,
+    },
+    progressBaselineMonth: {
+      type: Number,
+      default: null,
+      min: 1,
+      max: 12,
+    },
     updatedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

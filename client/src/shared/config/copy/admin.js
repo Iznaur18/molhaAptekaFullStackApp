@@ -24,6 +24,20 @@ export const USERS_PODIUM_UI = {
 /** Прогресс-бар месячных баллов на странице пользователей */
 export const USERS_MONTHLY_LOYALTY_LOADBAR_UI = {
   TITLE: "Баллы необходимые достигнуть",
+  DONATE: "Пожертвовать",
+  DONATE_ARIA: "Пожертвовать на месячный прогресс",
+  DONATE_MODAL_TITLE: "Пожертвование",
+  DONATE_AMOUNT_LABEL: "Сумма, ₽",
+  DONATE_SUBMIT: "Перейти к оплате",
+  DONATE_CANCEL: "Отмена",
+  DONATE_SUCCESS: "Спасибо! Пожертвование учтено в прогрессе.",
+  DONATE_PENDING: "Оплата обрабатывается…",
+  DONATE_PAY_ERROR: "Не удалось создать платёж",
+  DONATE_COMING_SOON: "Оплата картой пока недоступна",
+  /** @param {number} min */
+  DONATE_AMOUNT_MIN: (min) => `Минимум ${min} ₽`,
+  /** @param {number} max */
+  DONATE_AMOUNT_MAX: (max) => `Максимум ${max.toLocaleString("ru-RU")} ₽`,
   /** @param {string} pointsLabel @param {string} goalLabel */
   PROGRESS_ARIA: (pointsLabel, goalLabel) =>
     `Начислено покупателям ${pointsLabel} из ${goalLabel} баллов за месяц`,

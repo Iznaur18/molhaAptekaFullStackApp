@@ -24,6 +24,9 @@ export const usersLoyaltyRaffleSettingsSchema = z.object({
     .int()
     .min(USERS_LOYALTY_RAFFLE_GOAL_MIN)
     .max(USERS_LOYALTY_RAFFLE_GOAL_MAX),
+  progressBaseline: z.number().int().min(0).optional(),
+  progressBaselineYear: z.number().int().nullable().optional(),
+  progressBaselineMonth: z.number().int().min(1).max(12).nullable().optional(),
   updatedAt: z.union([z.string(), z.date(), z.null()]).optional().nullable(),
 });
 

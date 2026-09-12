@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { FORMAT_BOOLEAN_RU } from "../../config/appUiCopy.js";
 
@@ -38,6 +39,7 @@ export function ConfirmButton({
 }) {
   const [asking, setAsking] = useState(false);
   const rootRef = useRef(/** @type {HTMLSpanElement | null} */ (null));
+  const panelRef = useRef(/** @type {HTMLSpanElement | null} */ (null));
   const timerRef = useRef(/** @type {ReturnType<typeof setTimeout> | null} */ (null));
   const panelId = useId();
   const isPopover = variant === "popover";
@@ -54,9 +56,11 @@ export function ConfirmButton({
     if (!asking || !isPopover) return undefined;
 
     const onPointerDown = (event) => {
+      if (!(event.target instanceof Node)) return;
       const root = rootRef.current;
-      if (!root || !(event.target instanceof Node)) return;
-      if (!root.contains(event.target)) setAsking(false);
+      const panel = panelRef.current;
+      if (root?.contains(event.target) || panel?.contains(event.target)) return;
+      setAsking(false);
     };
     const onKeyDown = (event) => {
       if (event.key === "Escape") setAsking(false);
@@ -113,17 +117,29 @@ export function ConfirmButton({
         >
           {triggerLabel}
         </button>
-        {asking ? (
-          <span
-            id={panelId}
-            className="confirm-button__popover"
-            role="dialog"
-            aria-label={question}
-          >
-            <span className="confirm-button__question">{question}</span>
-            {actions}
-          </span>
-        ) : null}
+        {asking
+          ? createPortal(
+              <span className="confirm-button__portal" role="presentation">
+                <span
+                  className="confirm-button__scrim"
+                  aria-hidden="true"
+                  onClick={() => setAsking(false)}
+                />
+                <span
+                  ref={panelRef}
+                  id={panelId}
+                  className="confirm-button__popover"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label={question}
+                >
+                  <span className="confirm-button__question">{question}</span>
+                  {actions}
+                </span>
+              </span>,
+              document.body,
+            )
+          : null}
       </span>
     );
   }

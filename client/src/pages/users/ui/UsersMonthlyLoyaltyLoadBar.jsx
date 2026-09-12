@@ -13,6 +13,8 @@ import "./UsersMonthlyLoyaltyLoadBar.css";
  *   goal: number;
  *   description?: string;
  *   isLoading?: boolean;
+ *   onDonateClick?: () => void;
+ *   feedbackMessage?: string;
  * }} props
  */
 export function UsersMonthlyLoyaltyLoadBar({
@@ -20,12 +22,15 @@ export function UsersMonthlyLoyaltyLoadBar({
   goal,
   description = "",
   isLoading = false,
+  onDonateClick,
+  feedbackMessage = "",
 }) {
   const pointsLabel = formatLoyaltyPointsCount(pointsAwarded);
   const goalLabel = formatLoyaltyPointsCount(goal);
   const percent = resolveLoyaltyPointsProgressPercent(pointsAwarded, goal);
   const counter = USERS_MONTHLY_LOYALTY_LOADBAR_UI.COUNTER(pointsLabel, goalLabel);
   const trimmedDescription = description.trim();
+  const trimmedFeedback = feedbackMessage.trim();
 
   return (
     <div
@@ -39,6 +44,18 @@ export function UsersMonthlyLoyaltyLoadBar({
         goalLabel,
       )}
     >
+      {typeof onDonateClick === "function" ? (
+        <div className="users-monthly-loyalty-loadbar__actions">
+          <button
+            type="button"
+            className="app-btn app-btn--primary users-monthly-loyalty-loadbar__donate"
+            aria-label={USERS_MONTHLY_LOYALTY_LOADBAR_UI.DONATE_ARIA}
+            onClick={onDonateClick}
+          >
+            {USERS_MONTHLY_LOYALTY_LOADBAR_UI.DONATE}
+          </button>
+        </div>
+      ) : null}
       <div className="users-monthly-loyalty-loadbar__title-row">
         <p className="users-monthly-loyalty-loadbar__title">
           {USERS_MONTHLY_LOYALTY_LOADBAR_UI.TITLE}
@@ -56,6 +73,11 @@ export function UsersMonthlyLoyaltyLoadBar({
       {trimmedDescription ? (
         <p className="users-monthly-loyalty-loadbar__description">
           {trimmedDescription}
+        </p>
+      ) : null}
+      {trimmedFeedback ? (
+        <p className="users-monthly-loyalty-loadbar__feedback" role="status">
+          {trimmedFeedback}
         </p>
       ) : null}
     </div>

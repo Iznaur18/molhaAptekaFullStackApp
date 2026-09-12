@@ -45,10 +45,14 @@ export const PAYMENT_PURPOSE_ORDER = "order";
  */
 export const PAYMENT_PURPOSE_PLATFORM_SERVICE = "platform_service";
 
+/** Пожертвование в месячный прогресс на странице пользователей (1 ₽ = +1 к бару). */
+export const PAYMENT_PURPOSE_USERS_MONTHLY_DONATION = "users_monthly_donation";
+
 export const PAYMENT_PURPOSES = Object.freeze([
   PAYMENT_PURPOSE_LOYALTY_POINTS,
   PAYMENT_PURPOSE_ORDER,
   PAYMENT_PURPOSE_PLATFORM_SERVICE,
+  PAYMENT_PURPOSE_USERS_MONTHLY_DONATION,
 ]);
 
 /** Услуги, которые продавец оплачивает по счёту. */
@@ -148,6 +152,12 @@ export const YOOKASSA_UNAVAILABLE_MESSAGE =
 /** Сколько минимально можно пополнить: ниже комиссия съедает платёж. */
 export const LOYALTY_POINTS_TOPUP_MIN_RUB = 1;
 export const LOYALTY_POINTS_TOPUP_MAX_RUB = 999_999;
+
+export {
+  USERS_MONTHLY_DONATION_MIN_RUB,
+  USERS_MONTHLY_DONATION_MAX_RUB,
+  USERS_MONTHLY_DONATION_DAILY_LIMIT,
+} from "@molha/api-contract";
 
 /**
  * Уведомления ЮKassa приходят без подписи, поэтому телу письма мы не верим:
