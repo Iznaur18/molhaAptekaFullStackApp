@@ -412,9 +412,7 @@ export function MyProductsShelvesPanel() {
               type="button"
               className="app-btn app-btn--danger"
               disabled={
-                !assignShelfId ||
-                deleteMutation.isPending ||
-                patchMutation.isPending
+                !assignShelfId || deleteMutation.isPending || patchMutation.isPending
               }
               onClick={() => {
                 if (!assignShelfId) return;

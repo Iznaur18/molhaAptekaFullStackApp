@@ -105,16 +105,13 @@ export function AssignProductToSellerShelfModal({
       }));
       void queryClient.invalidateQueries({ queryKey: sellerShelfQueryKeys.mine() });
       const shelfName =
-        shelves.find((shelf) => String(shelf._id) === String(shelfId))?.name ??
-        "";
+        shelves.find((shelf) => String(shelf._id) === String(shelfId))?.name ?? "";
       onSuccess?.(SELLER_SHELF_UI.ASSIGN_PRODUCT_SUCCESS(shelfName));
       onClose();
     },
     onError: (error) => {
       onError?.(
-        error instanceof Error
-          ? error.message
-          : SELLER_SHELF_UI.ASSIGN_PRODUCT_ERROR,
+        error instanceof Error ? error.message : SELLER_SHELF_UI.ASSIGN_PRODUCT_ERROR,
       );
     },
     onSettled: () => {
@@ -193,9 +190,7 @@ export function AssignProductToSellerShelfModal({
                       type="button"
                       className={[
                         "assign-product-to-shelf-modal__item",
-                        isCurrent
-                          ? "assign-product-to-shelf-modal__item--current"
-                          : "",
+                        isCurrent ? "assign-product-to-shelf-modal__item--current" : "",
                       ]
                         .filter(Boolean)
                         .join(" ")}

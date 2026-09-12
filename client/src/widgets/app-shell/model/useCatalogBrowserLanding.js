@@ -19,7 +19,11 @@ import { useProductCategoryBreadcrumbQuery } from "../../../entities/product-cat
 import { useProductCategoryRootsQuery } from "../../../entities/product-category-tree/model/useProductCategoryRootsQuery.js";
 import { useSellerPersonalCategoryCatalogTilesQuery } from "../../../entities/seller-personal-category/model/useSellerPersonalCategoryCatalogTilesQuery.js";
 import { userHasCatalogNearGeo } from "../../../entities/product/lib/userHasCatalogNearGeo.js";
-import { API_CLIENT_UI, HOME_PAGE_UI, PRODUCT_CATEGORY_TREE_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  API_CLIENT_UI,
+  HOME_PAGE_UI,
+  PRODUCT_CATEGORY_TREE_UI,
+} from "../../../shared/config/appUiCopy.js";
 import { catalogMainViewToPathname } from "../../../shared/lib/catalogMainViewPaths.js";
 import { mainViewToPathname } from "../../../shared/lib/homeMainViewPaths.js";
 import { buildSellerProductsPath } from "../../../shared/lib/sellerPaths.js";

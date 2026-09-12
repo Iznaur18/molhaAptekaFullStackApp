@@ -30,8 +30,6 @@ describe("тулбар «Мои товары»", () => {
   it("админу квоту не показывает", () => {
     renderToolbar({ isAdmin: true });
 
-    expect(
-      screen.queryByLabelText(/лимит/i),
-    ).toBeNull();
+    expect(screen.queryByLabelText(/лимит/i)).toBeNull();
   });
 });

@@ -14,7 +14,10 @@ describe("buildOneCOrdersXml Bitrix shape", () => {
   });
 
   it("document id is plain order id without seller suffix", () => {
-    assert.equal(buildOneCOrderDocumentId("6aa0160770c1f477e255b2b3"), "6aa0160770c1f477e255b2b3");
+    assert.equal(
+      buildOneCOrderDocumentId("6aa0160770c1f477e255b2b3"),
+      "6aa0160770c1f477e255b2b3",
+    );
   });
 
   it("buildOrderDocument matches Bitrix-facing CommerceML cues", () => {
@@ -52,7 +55,10 @@ describe("buildOneCOrdersXml Bitrix shape", () => {
     assert.match(xml, /<Тип>Телефон рабочий<\/Тип>/);
     assert.match(xml, /<Тип>Электронная почта<\/Тип>/);
     assert.match(xml, /<Значение>Картой при получении<\/Значение>/);
-    assert.match(xml, /<Наименование>Отменен<\/Наименование>\s*<Значение>true<\/Значение>/);
+    assert.match(
+      xml,
+      /<Наименование>Отменен<\/Наименование>\s*<Значение>true<\/Значение>/,
+    );
     assert.match(xml, /<Единица>/);
     assert.match(xml, /<Коэффициент>1<\/Коэффициент>/);
     assert.match(xml, /<Цена>265\.00<\/Цена>/);

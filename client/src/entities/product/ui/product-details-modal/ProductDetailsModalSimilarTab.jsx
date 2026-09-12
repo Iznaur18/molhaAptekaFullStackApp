@@ -115,11 +115,7 @@ export function ProductDetailsModalSimilarTab({
     <div className="product-details-similar-tab">
       <div className="app-shell__grid" role="list">
         {products.map((item) => (
-          <div
-            key={String(item._id)}
-            className="app-shell__cell"
-            role="listitem"
-          >
+          <div key={String(item._id)} className="app-shell__cell" role="listitem">
             <ProductCard
               product={item}
               isAuthorized={isAuthorized}

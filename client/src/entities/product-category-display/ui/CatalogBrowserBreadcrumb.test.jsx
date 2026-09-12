@@ -23,7 +23,9 @@ describe("CatalogBrowserBreadcrumb", () => {
 
     expect(screen.getByRole("button", { name: "торты" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "с кремом" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "без сахара" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "без сахара" }),
+    ).not.toBeInTheDocument();
     expect(screen.getByText("без сахара")).toHaveAttribute("aria-current", "page");
 
     await user.click(screen.getByRole("button", { name: "торты" }));

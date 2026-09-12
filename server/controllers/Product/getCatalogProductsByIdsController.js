@@ -35,10 +35,7 @@ export const getCatalogProductsByIdsController = async (req, res) => {
 
   const products = await findCatalogProductsByIds(ids);
   const withStock = await attachProductAvailablePurchaseQuantity(products);
-  const withViewerState = await attachProductSellerClosedState(
-    withStock,
-    viewerUserId,
-  );
+  const withViewerState = await attachProductSellerClosedState(withStock, viewerUserId);
 
   return successRes(res, { products: withViewerState });
 };
