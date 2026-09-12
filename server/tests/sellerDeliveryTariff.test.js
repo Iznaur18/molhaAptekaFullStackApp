@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { after, before, beforeEach, describe, it } from "node:test";
+import { after, afterEach, before, beforeEach, describe, it } from "node:test";
 
 process.env.NODE_ENV = process.env.NODE_ENV ?? "test";
 process.env.JWT_SECRET =
@@ -9,17 +9,56 @@ const { connectMongoTestReplSet, disconnectMongoTestReplSet, clearMongoCollectio
   await import("./helpers/mongoTestDb.js");
 const { UserModel } = await import("../models/index.js");
 const {
-  buildDeliveryOriginBySeller,
   buildGoodsTotalBySeller,
+  prepareSellerDeliveryBySeller,
   resolveSellerDeliveryFeesBySeller,
 } = await import("../services/order/sellerDeliveryFee.js");
 const { buildStoredShipments } = await import("../services/order/orderShipments.js");
 
-/** Грозный → точка примерно в 11 км севернее. */
+/** Грозный → точка примерно в 11,1 км севернее по прямой. */
 const ORIGIN = { lat: 43.3, lon: 45.7 };
 const BUYER_GEO = { lat: 43.4, lon: 45.7 };
 
 const TARIFF = { paid: true, baseFeeRub: 200, perKmRub: 30, freeFromRub: 5000 };
+
+/** Адрес, уже проверенный DaData до дома. */
+const VERIFIED_ADDRESS = {
+  displayAddress: "г Грозный, ул Мира, д 19",
+  flat: "",
+  fiasId: "fias-house",
+  geo: BUYER_GEO,
+  geoPrecision: "house",
+};
+
+const REAL_FETCH = globalThis.fetch;
+/** @type {string[]} */
+let fetchedUrls = [];
+
+/**
+ * Подменяет внешние геосервисы.
+ *
+ * @param {(url: string) => { status?: number; body: unknown }} handler
+ */
+const stubGeoFetch = (handler) => {
+  process.env.GEO_EXTERNAL_TEST = "1";
+  process.env.GEO_NOMINATIM_INTERVAL_MS = "0";
+  globalThis.fetch = async (input) => {
+    const url = String(input);
+    fetchedUrls.push(url);
+    const { status = 200, body } = handler(url);
+    return new Response(JSON.stringify(body), {
+      status,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+};
+
+/** @param {number} meters */
+const osrmRoute = (meters) => ({
+  code: "Ok",
+  routes: [{ distance: meters }],
+  waypoints: [{ distance: 0 }, { distance: 0 }],
+});
 
 /** @param {Record<string, unknown>} [tariff] */
 const createSeller = (tariff = TARIFF) =>
@@ -46,15 +85,33 @@ const createSeller = (tariff = TARIFF) =>
 
 /**
  * @param {string} sellerId
- * @param {{ goods?: number; geo?: unknown; carrier?: string }} [options]
+ * @param {{ carrier?: string; clientGeo?: unknown }} [options]
  */
-const resolveFees = (sellerId, options = {}) =>
-  resolveSellerDeliveryFeesBySeller({
+const prepare = (sellerId, options = {}) =>
+  prepareSellerDeliveryBySeller({
     fulfillmentBySellerId: { [sellerId]: "delivery" },
     deliveryCarrierBySellerId: { [sellerId]: options.carrier ?? "seller" },
-    goodsTotalBySellerId: { [sellerId]: options.goods ?? 1000 },
-    originBySellerId: { [sellerId]: ORIGIN },
-    deliveryAddressGeo: options.geo === undefined ? BUYER_GEO : options.geo,
+    productById: {
+      p1: {
+        sellerId,
+        productPickupLat: ORIGIN.lat,
+        productPickupLon: ORIGIN.lon,
+        productPickupAddress: "г Грозный, ул Мира, 1",
+      },
+    },
+    deliveryAddress: VERIFIED_ADDRESS,
+    clientGeo: options.clientGeo ?? null,
+  });
+
+/**
+ * @param {string} sellerId
+ * @param {Awaited<ReturnType<typeof prepare>>} prepared
+ * @param {number} [goods]
+ */
+const fees = (sellerId, prepared, goods = 1000) =>
+  resolveSellerDeliveryFeesBySeller({
+    preparedBySellerId: prepared,
+    goodsTotalBySellerId: { [sellerId]: goods },
   });
 
 before(async () => {
@@ -66,44 +123,105 @@ after(async () => {
 });
 
 beforeEach(async () => {
+  fetchedUrls = [];
   await clearMongoCollections();
 });
 
-describe("тариф собственной доставки на заказе", () => {
-  it("вызов плюс километраж", async () => {
-    const seller = await createSeller();
-    const fees = await resolveFees(String(seller._id));
+afterEach(() => {
+  globalThis.fetch = REAL_FETCH;
+  delete process.env.GEO_EXTERNAL_TEST;
+  delete process.env.GEO_NOMINATIM_INTERVAL_MS;
+});
 
-    // ~11.1 км → 12 полных км: 200 + 12 * 30
-    assert.equal(fees[String(seller._id)].feeRub, 560);
-    assert.ok(fees[String(seller._id)].distanceKm > 11);
+describe("тариф собственной доставки на заказе", () => {
+  it("километраж считается по дорогам, а не по прямой", async () => {
+    stubGeoFetch(() => ({ body: osrmRoute(15_200) }));
+    const seller = await createSeller();
+    const sellerId = String(seller._id);
+    const prepared = await prepare(sellerId);
+
+    assert.equal(prepared[sellerId].distanceKm, 15.2);
+    assert.equal(prepared[sellerId].distanceSource, "road");
+    // 15,2 км по дорогам → 16 полных: 200 + 16 * 30. По прямой было бы 560.
+    assert.equal(fees(sellerId, prepared)[sellerId].feeRub, 680);
+  });
+
+  it("маршрутизаторы легли — сумма всё равно есть, по прямой с поправкой", async () => {
+    stubGeoFetch(() => ({ status: 503, body: {} }));
+    const seller = await createSeller();
+    const sellerId = String(seller._id);
+    const prepared = await prepare(sellerId);
+
+    assert.equal(prepared[sellerId].distanceSource, "estimate");
+    // ~11,12 км * 1,3 = 14,46 → 15 полных км: 200 + 15 * 30.
+    assert.equal(fees(sellerId, prepared)[sellerId].feeRub, 650);
+  });
+
+  it("заказ получает то же расстояние, что и котировка: маршрут из кэша", async () => {
+    stubGeoFetch(() => ({ body: osrmRoute(15_200) }));
+    const seller = await createSeller();
+    const sellerId = String(seller._id);
+    await prepare(sellerId);
+
+    // Маршрутизатор «передумал» между корзиной и оформлением.
+    stubGeoFetch(() => ({ body: osrmRoute(40_000) }));
+    const again = await prepare(sellerId);
+
+    assert.equal(again[sellerId].distanceKm, 15.2);
+    assert.equal(
+      fetchedUrls.filter((url) => url.includes("/route/")).length,
+      1,
+      "второй расчёт в маршрутизатор не ходит",
+    );
+  });
+
+  it("клиентская точка у склада не обнуляет километраж", async () => {
+    stubGeoFetch((url) => {
+      // Маршрут от склада до самого склада сервер не просит: точка
+      // покупателя берётся проверенная, а не присланная.
+      assert.ok(
+        !url.includes(`${ORIGIN.lon},${ORIGIN.lat};${ORIGIN.lon},${ORIGIN.lat}`),
+      );
+      return { body: osrmRoute(15_200) };
+    });
+    const seller = await createSeller();
+    const sellerId = String(seller._id);
+    const prepared = await prepare(sellerId, { clientGeo: ORIGIN });
+
+    assert.equal(fees(sellerId, prepared)[sellerId].feeRub, 680);
   });
 
   it("порог бесплатной доставки обнуляет сумму", async () => {
     const seller = await createSeller();
-    const fees = await resolveFees(String(seller._id), { goods: 5000 });
+    const sellerId = String(seller._id);
+    const prepared = await prepare(sellerId);
 
-    assert.equal(fees[String(seller._id)].feeRub, 0);
+    assert.equal(fees(sellerId, prepared, 5000)[sellerId].feeRub, 0);
   });
 
-  it("без координат покупателя километраж не начисляется", async () => {
-    const seller = await createSeller();
-    const fees = await resolveFees(String(seller._id), { geo: null });
+  it("тариф без цены за километр расстояние не считает вовсе", async () => {
+    stubGeoFetch(() => {
+      throw new Error("внешний сервис не нужен");
+    });
+    const seller = await createSeller({
+      paid: true,
+      baseFeeRub: 300,
+      perKmRub: 0,
+      freeFromRub: 0,
+    });
+    const sellerId = String(seller._id);
+    const prepared = await prepare(sellerId);
 
-    assert.equal(
-      fees[String(seller._id)].feeRub,
-      200,
-      "остаётся только цена за вызов — счёт по догадке выставлять нельзя",
-    );
+    assert.equal(prepared[sellerId].distanceKm, null);
+    assert.equal(fees(sellerId, prepared)[sellerId].feeRub, 300);
+    assert.equal(fetchedUrls.length, 0);
   });
 
   it("у курьеров Gitorg тариф продавца не применяется", async () => {
     const seller = await createSeller();
-    const fees = await resolveFees(String(seller._id), {
-      carrier: "gitorg_courier",
-    });
+    const prepared = await prepare(String(seller._id), { carrier: "gitorg_courier" });
 
-    assert.deepEqual(fees, {}, "там сумму называет покупатель");
+    assert.deepEqual(prepared, {}, "там сумму называет покупатель");
   });
 
   it("продавец без тарифа возит бесплатно", async () => {
@@ -113,45 +231,61 @@ describe("тариф собственной доставки на заказе",
       perKmRub: 0,
       freeFromRub: 0,
     });
-    const fees = await resolveFees(String(seller._id));
+    const sellerId = String(seller._id);
+    const prepared = await prepare(sellerId);
 
-    assert.equal(fees[String(seller._id)].feeRub, 0);
+    assert.equal(fees(sellerId, prepared)[sellerId].feeRub, 0);
   });
 
-  it("сумма и тариф ложатся в отправление снимком", async () => {
+  it("сумма, тариф и источник расстояния ложатся в отправление снимком", async () => {
+    stubGeoFetch(() => ({ body: osrmRoute(15_200) }));
     const seller = await createSeller();
     const sellerId = String(seller._id);
-    const fees = await resolveFees(sellerId);
+    const resolved = fees(sellerId, await prepare(sellerId));
 
     const [shipment] = buildStoredShipments(
       [{ sellerIdAtOrder: sellerId, status: "pending" }],
       {
         fulfillmentBySellerId: { [sellerId]: "delivery" },
         deliveryCarrierBySellerId: { [sellerId]: "seller" },
-        sellerDeliveryBySellerId: fees,
+        sellerDeliveryBySellerId: resolved,
       },
     );
 
-    assert.equal(shipment.sellerDeliveryFeeRub, 560);
+    assert.equal(shipment.sellerDeliveryFeeRub, 680);
+    assert.equal(shipment.sellerDeliveryDistanceKm, 15.2);
+    assert.equal(shipment.sellerDeliveryDistanceSource, "road");
     assert.equal(shipment.sellerDeliveryTariffAtOrder.baseFeeRub, 200);
     assert.equal(shipment.sellerDeliveryTariffAtOrder.perKmRub, 30);
-    assert.ok(shipment.sellerDeliveryDistanceKm > 11);
   });
 
   it("самовывозное отправление тариф не получает", async () => {
     const seller = await createSeller();
     const sellerId = String(seller._id);
-    const fees = await resolveFees(sellerId);
+    const resolved = fees(sellerId, await prepare(sellerId));
 
     const [shipment] = buildStoredShipments(
       [{ sellerIdAtOrder: sellerId, status: "pending" }],
       {
         fulfillmentBySellerId: { [sellerId]: "pickup" },
-        sellerDeliveryBySellerId: fees,
+        sellerDeliveryBySellerId: resolved,
       },
     );
 
     assert.equal(shipment.sellerDeliveryFeeRub, 0);
+  });
+
+  it("счёт без посчитанного расстояния не выставляется", () => {
+    assert.throws(
+      () =>
+        resolveSellerDeliveryFeesBySeller({
+          preparedBySellerId: {
+            s1: { tariff: TARIFF, distanceKm: null, distanceSource: null },
+          },
+          goodsTotalBySellerId: { s1: 1000 },
+        }),
+      /расстояние доставки/,
+    );
   });
 });
 
@@ -171,15 +305,5 @@ describe("исходные данные для тарифа", () => {
       2000,
       "иначе акция сама себе открывала бы бесплатную доставку",
     );
-  });
-
-  it("точка отправления берётся с товара продавца", () => {
-    const origins = buildDeliveryOriginBySeller({
-      p1: { sellerId: "s1", productPickupLat: 43.3, productPickupLon: 45.7 },
-      p2: { sellerId: "s2", productPickupLat: null, productPickupLon: null },
-    });
-
-    assert.deepEqual(origins.s1, { lat: 43.3, lon: 45.7 });
-    assert.equal(origins.s2, null);
   });
 });

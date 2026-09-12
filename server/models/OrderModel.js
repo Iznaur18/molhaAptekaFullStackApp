@@ -272,8 +272,18 @@ const OrderShipmentSchema = new mongoose.Schema(
      * Здесь наоборот — цена продавца, и торга по ней нет.
      */
     sellerDeliveryFeeRub: { type: Number, default: 0, min: 0 },
-    /** Километраж, по которому посчитали тариф (по прямой). */
+    /** Километраж по дорогам, по которому посчитали тариф. */
     sellerDeliveryDistanceKm: { type: Number, default: null },
+    /**
+     * Откуда километраж: `road` — маршрут по дорогам, `estimate` — прямая с
+     * поправкой, когда ни один маршрутизатор не ответил. Нужен при споре о
+     * сумме: видно, чем именно её посчитали.
+     */
+    sellerDeliveryDistanceSource: {
+      type: String,
+      enum: ["road", "estimate", null],
+      default: null,
+    },
     /**
      * Ставка комиссии площадки снимком на момент заказа.
      *

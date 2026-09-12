@@ -1,7 +1,6 @@
 import {
   ORDER_FULFILLMENT_DELIVERY,
   PRODUCT_DELIVERY_CARRIER_SELLER,
-  normalizeGeoCoord,
   normalizeSellerDeliveryTariff,
   resolveProductDeliveryCarrier,
 } from "@molha/api-contract";
@@ -13,9 +12,8 @@ import {
  * не продавец, либо продавец возит бесплатно. Во всех трёх случаях блок с
  * ценой на чекауте показывать нечего.
  *
- * Точку отправления берём с товара, а не из профиля продавца: именно она
- * синхронизирована с профилем и именно от неё продавец поедет, а у товара с
- * индивидуальным адресом она своя.
+ * Точку отправления и расстояние по дорогам корзина больше не считает: это
+ * делает сервер котировкой, тем же путём, что и заказ.
  *
  * @param {{
  *   sellerGroups: Array<{
@@ -65,12 +63,9 @@ export function resolveCartSellerDelivery({
     return null;
   }
 
-  const lat = normalizeGeoCoord(carrierProduct.productPickupLat);
-  const lon = normalizeGeoCoord(carrierProduct.productPickupLon);
-
   return {
+    sellerId: String(group.sellerId),
     tariff,
-    origin: lat != null && lon != null ? { lat, lon } : null,
     goodsTotalRub: Number(goodsTotalRub) || 0,
   };
 }

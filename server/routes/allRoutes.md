@@ -115,6 +115,7 @@
 | GET   | `/order/all`                                      | 👑     | Все заказы                                                  |
 | GET   | `/order/shipping-carriers`                        | 🔑     | Список служб доставки                                       |
 | POST  | `/order/shipping-estimate`                        | 🔑 ⏱   | Расчёт доставки до оформления                               |
+| POST  | `/order/seller-delivery-quote`                    | 🔑 ⏱   | Тариф продавца и расстояние по дорогам до оформления        |
 | POST  | `/order`                                          | 🔑 ⏱   | Создать заказ                                               |
 | PATCH | `/order/:orderId/status`                          | 👑     | Сменить статус заказа                                       |
 | PATCH | `/order/:orderId/shipment/status`                 | 🔑 ⏱   | Продвинуть статус своего отправления                        |

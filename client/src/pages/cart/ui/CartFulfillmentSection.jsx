@@ -43,10 +43,11 @@ import "./CartFulfillmentSection.css";
  *   showDeliveryFeeNote?: boolean;
  *   sellerDelivery?: {
  *     tariff: unknown;
- *     origin?: { lat: number; lon: number } | null;
  *     goodsTotalRub?: number;
  *   } | null;
- *   deliveryGeo?: { lat: number; lon: number } | null;
+ *   sellerDeliveryDistance?: import('react').ComponentProps<
+ *     typeof CheckoutSellerDeliveryCost
+ *   >['distance'];
  *   deliveryFee?: {
  *     value: number;
  *     onChange: (next: number) => void;
@@ -72,7 +73,7 @@ export function CartFulfillmentSection({
   deliveryFee = null,
   showDeliveryFeeNote = false,
   sellerDelivery = null,
-  deliveryGeo = null,
+  sellerDeliveryDistance = null,
 }) {
   if (lines.length === 0) {
     return null;
@@ -225,9 +226,8 @@ export function CartFulfillmentSection({
             {showSellerDeliveryCost ? (
               <CheckoutSellerDeliveryCost
                 tariff={sellerDelivery.tariff}
-                origin={sellerDelivery.origin ?? null}
-                deliveryGeo={deliveryGeo}
                 goodsTotalRub={sellerDelivery.goodsTotalRub ?? summary.selectedTotal}
+                distance={sellerDeliveryDistance}
               />
             ) : (
               <div className="cart-page__dock-total-row">

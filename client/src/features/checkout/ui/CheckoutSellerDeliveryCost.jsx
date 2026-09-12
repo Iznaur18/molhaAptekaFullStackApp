@@ -1,7 +1,7 @@
 import { formatPriceRub } from "@izibuy/shared-lib";
 import {
+  SELLER_DELIVERY_DISTANCE_SOURCE_ESTIMATE,
   normalizeSellerDeliveryTariff,
-  sellerDeliveryDistanceKm,
 } from "@molha/api-contract";
 
 import { quoteCartSellerDelivery } from "../../../entities/cart/lib/quoteCartSellerDelivery.js";
@@ -12,35 +12,40 @@ import "./CheckoutSellerDeliveryCost.css";
 /**
  * Стоимость доставки по тарифу продавца — в dock корзины / оформлении.
  *
- * Считает та же функция контракта, что и сервер при создании заказа.
+ * Расстояние по дорогам приходит котировкой с сервера, сумму собирает та же
+ * функция контракта, что и сервер при создании заказа.
  *
  * @param {{
  *   tariff: unknown;
- *   origin?: { lat: number; lon: number } | null;
- *   deliveryGeo?: { lat: number; lon: number } | null;
  *   goodsTotalRub: number;
+ *   distance?: {
+ *     distanceKm: number | null;
+ *     distanceSource: string | null;
+ *     isLoading: boolean;
+ *     errorMessage: string;
+ *   } | null;
  * }} props
  */
 export function CheckoutSellerDeliveryCost({
   tariff,
-  origin = null,
-  deliveryGeo = null,
   goodsTotalRub = 0,
+  distance = null,
 }) {
-  const quote = quoteCartSellerDelivery({
-    tariff,
-    origin,
-    deliveryGeo,
-    goodsTotalRub,
-  });
   const normalized = normalizeSellerDeliveryTariff(tariff);
-  const distanceKm = sellerDeliveryDistanceKm(origin, deliveryGeo);
+  const distanceKm = distance?.distanceKm ?? null;
+  const quote = quoteCartSellerDelivery({ tariff, distanceKm, goodsTotalRub });
 
   if (!quote) {
     return null;
   }
 
   const { feeRub, isFree, isEstimate, goodsTotalRub: goods, payableRub } = quote;
+  // Расстояние влияет на сумму, только когда продавец берёт за километр.
+  const needsDistance = normalized.perKmRub > 0;
+  const isCalculating = needsDistance && isEstimate && distance?.isLoading === true;
+  const errorMessage =
+    needsDistance && isEstimate ? String(distance?.errorMessage ?? "") : "";
+  const billableKm = distanceKm == null ? null : Math.ceil(distanceKm);
 
   return (
     <div className="checkout-seller-delivery">
@@ -57,17 +62,32 @@ export function CheckoutSellerDeliveryCost({
         </span>
       </div>
 
-      {isEstimate ? (
+      {isCalculating ? (
+        <p className="checkout-seller-delivery__hint" role="status">
+          {CHECKOUT_FORM_UI.SELLER_DELIVERY_CALCULATING}
+        </p>
+      ) : null}
+
+      {errorMessage ? (
+        <p
+          className="checkout-seller-delivery__hint checkout-seller-delivery__hint--error"
+          role="alert"
+        >
+          {errorMessage}
+        </p>
+      ) : null}
+
+      {isEstimate && !isCalculating && !errorMessage ? (
         <p className="checkout-seller-delivery__hint">
           {CHECKOUT_FORM_UI.SELLER_DELIVERY_NEED_ADDRESS}
         </p>
       ) : null}
 
-      {!isFree && distanceKm != null ? (
+      {!isFree && billableKm != null ? (
         <p className="checkout-seller-delivery__hint">
-          {CHECKOUT_FORM_UI.SELLER_DELIVERY_DISTANCE(
-            Math.max(1, Math.ceil(distanceKm)),
-          )}
+          {distance?.distanceSource === SELLER_DELIVERY_DISTANCE_SOURCE_ESTIMATE
+            ? CHECKOUT_FORM_UI.SELLER_DELIVERY_DISTANCE_ESTIMATE(billableKm)
+            : CHECKOUT_FORM_UI.SELLER_DELIVERY_DISTANCE(billableKm)}
         </p>
       ) : null}
 
@@ -99,6 +119,12 @@ export function CheckoutSellerDeliveryCost({
             </dd>
           </div>
         </dl>
+      ) : null}
+
+      {!isFree && billableKm != null ? (
+        <p className="checkout-seller-delivery__attribution">
+          {CHECKOUT_FORM_UI.SELLER_DELIVERY_MAP_ATTRIBUTION}
+        </p>
       ) : null}
     </div>
   );

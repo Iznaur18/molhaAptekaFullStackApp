@@ -94,6 +94,7 @@ import {
 } from "./Courier/courierDisputeController.js";
 import { getAllOrdersController } from "./Order/getAllOrdersController.js";
 import { postShippingEstimateController } from "./Order/shippingEstimateController.js";
+import { postSellerDeliveryQuoteController } from "./Order/sellerDeliveryQuoteController.js";
 import {
   getShippingCarriersController,
   getStaffShippingCarriersController,
@@ -400,6 +401,7 @@ export {
   getMySalesActionCountController,
   getAllOrdersController,
   postShippingEstimateController,
+  postSellerDeliveryQuoteController,
   getShippingCarriersController,
   getStaffShippingCarriersController,
   patchStaffShippingCarrierController,

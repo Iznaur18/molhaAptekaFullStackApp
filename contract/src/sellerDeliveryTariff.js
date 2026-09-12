@@ -15,8 +15,30 @@ export const SELLER_DELIVERY_BASE_FEE_MAX_RUB = 100_000;
 export const SELLER_DELIVERY_PER_KM_MAX_RUB = 10_000;
 export const SELLER_DELIVERY_FREE_FROM_MAX_RUB = 10_000_000;
 
-/** Дальше этого расстояния тариф не считаем: почти всегда это мусорные координаты. */
-export const SELLER_DELIVERY_MAX_DISTANCE_KM = 1000;
+/**
+ * Длиннее этого маршрута в России не бывает (Калининград — Магадан короче).
+ *
+ * Раньше здесь стояла тысяча «против мусорных координат», и покупатель из
+ * Москвы у продавца из Грозного платил только за вызов: 999,5 км — 30 180 ₽,
+ * 1000,2 км — 180 ₽. Теперь расстояние считает сервер по дорогам от точек,
+ * которые он нашёл сам, так что граница защищает лишь от явной ошибки в числе.
+ */
+export const SELLER_DELIVERY_MAX_DISTANCE_KM = 20_000;
+
+/** Маршрут построен по дорогам. */
+export const SELLER_DELIVERY_DISTANCE_SOURCE_ROAD = "road";
+
+/**
+ * Ни один маршрутизатор не ответил: прямая с поправкой на извилистость дорог.
+ * Сумма всё равно считается — оставить заказ без неё хуже.
+ */
+export const SELLER_DELIVERY_DISTANCE_SOURCE_ESTIMATE = "estimate";
+
+/** @type {readonly ["road", "estimate"]} */
+export const SELLER_DELIVERY_DISTANCE_SOURCES = [
+  SELLER_DELIVERY_DISTANCE_SOURCE_ROAD,
+  SELLER_DELIVERY_DISTANCE_SOURCE_ESTIMATE,
+];
 
 export const SELLER_DELIVERY_TARIFF_EMPTY_MESSAGE =
   "Укажите цену за вызов или цену за километр — иначе доставка бесплатная";
@@ -26,8 +48,16 @@ export const SELLER_DELIVERY_TARIFF_CARRIER_MESSAGE =
 
 export const sellerDeliveryTariffSchema = z
   .object({
-    /** false — доставка бесплатная, остальные поля не участвуют. */
-    paid: z.coerce.boolean(),
+    /**
+     * false — доставка бесплатная, остальные поля не участвуют.
+     *
+     * Не `z.coerce.boolean()`: тот делает `Boolean("false") === true`, и
+     * клиент, приславший флаг строкой, включил бы платную доставку, выключая её.
+     */
+    paid: z.preprocess(
+      (value) => (value === "false" ? false : value === "true" ? true : value),
+      z.boolean(),
+    ),
     /** Цена за вызов: берётся всегда, сколько бы ни было километров. */
     baseFeeRub: z.coerce
       .number()
@@ -122,9 +152,11 @@ export function resolveSellerDeliveryTariff(user) {
 /**
  * Сколько покупатель платит за доставку.
  *
- * `distanceKm` неизвестно, пока покупатель не выбрал адрес: тогда километраж
- * не считаем и отдаём цену за вызов как нижнюю границу — показать «от N ₽»
- * честнее, чем показать ноль и удивить человека на оформлении.
+ * `distanceKm` — расстояние по дорогам, его считает сервер (корзина получает
+ * его котировкой). Пока покупатель не выбрал адрес, расстояния нет: тогда
+ * отдаём цену за вызов как нижнюю границу — показать «от N ₽» честнее, чем
+ * показать ноль и удивить человека на оформлении. В заказ оценка не попадает:
+ * сервер к этому моменту расстояние уже посчитал.
  *
  * @param {{
  *   tariff: unknown;
@@ -206,11 +238,11 @@ export function normalizeGeoCoord(raw) {
 const EARTH_RADIUS_KM = 6371;
 
 /**
- * Расстояние по прямой между точкой продажи и адресом покупателя.
+ * Расстояние по прямой между двумя точками.
  *
- * По прямой, а не по дорогам: маршрутизатора у площадки нет, а тариф должен
- * считаться одинаково в корзине и на сервере, без похода во внешний сервис на
- * каждый пересчёт корзины.
+ * Для тарифа не используется напрямую — тариф считается по дорогам на сервере.
+ * Нужно как запасная оценка, когда маршрутизаторы не отвечают, и чтобы понять,
+ * насколько клиентская точка отстоит от найденной по адресу.
  *
  * @param {{ lat?: unknown; lon?: unknown } | null | undefined} from
  * @param {{ lat?: unknown; lon?: unknown } | null | undefined} to

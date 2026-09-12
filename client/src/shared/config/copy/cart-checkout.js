@@ -167,11 +167,16 @@ export const CHECKOUT_FORM_UI = {
   /** @param {string} price */
   SELLER_DELIVERY_FROM: (price) => `от ${price}`,
   SELLER_DELIVERY_NEED_ADDRESS:
-    "Точная сумма появится, когда выберете адрес: она зависит от расстояния",
+    "Точная сумма появится, когда выберете адрес: она зависит от расстояния по дорогам",
+  SELLER_DELIVERY_CALCULATING: "Считаем расстояние по дорогам…",
   /** @param {string} price */
   SELLER_DELIVERY_FREE_FROM: (price) => `Бесплатно от ${price}`,
-  /** @param {string} km */
-  SELLER_DELIVERY_DISTANCE: (km) => `${km} км по прямой`,
+  /** @param {number} km */
+  SELLER_DELIVERY_DISTANCE: (km) => `${km} км по дорогам`,
+  /** @param {number} km */
+  SELLER_DELIVERY_DISTANCE_ESTIMATE: (km) =>
+    `≈ ${km} км по дорогам — маршрут сейчас не построился, расстояние оценено по карте`,
+  SELLER_DELIVERY_MAP_ATTRIBUTION: "Маршрут по данным © участники OpenStreetMap",
   TOTAL_GOODS: "Товары",
   TOTAL_DELIVERY: "Доставка",
   TOTAL_TO_PAY: "Итого",

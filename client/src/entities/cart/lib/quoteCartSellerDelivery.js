@@ -1,18 +1,18 @@
 import {
   calculateSellerDeliveryFee,
   normalizeSellerDeliveryTariff,
-  sellerDeliveryDistanceKm,
 } from "@molha/api-contract";
 
 /**
  * Котировка доставки продавца для dock / блока на оформлении.
  *
- * Без geo — оценка «от»; с geo — финальная сумма. Одна формула с сервером.
+ * Расстояние по дорогам приходит с сервера (`POST /order/seller-delivery-quote`)
+ * — тем же расчётом, что и в заказе. Здесь из него, тарифа и стоимости товаров
+ * собирается сумма функцией контракта. Пока расстояния нет — оценка «от».
  *
  * @param {{
  *   tariff: unknown;
- *   origin?: { lat: number; lon: number } | null;
- *   deliveryGeo?: { lat: number; lon: number } | null;
+ *   distanceKm?: number | null;
  *   goodsTotalRub?: number;
  * }} input
  * @returns {{
@@ -25,8 +25,7 @@ import {
  */
 export function quoteCartSellerDelivery({
   tariff,
-  origin = null,
-  deliveryGeo = null,
+  distanceKm = null,
   goodsTotalRub = 0,
 }) {
   const normalized = normalizeSellerDeliveryTariff(tariff);
@@ -35,7 +34,6 @@ export function quoteCartSellerDelivery({
   }
 
   const goods = Number(goodsTotalRub) || 0;
-  const distanceKm = sellerDeliveryDistanceKm(origin, deliveryGeo);
   const { feeRub, isFree, isEstimate } = calculateSellerDeliveryFee({
     tariff: normalized,
     goodsTotalRub: goods,

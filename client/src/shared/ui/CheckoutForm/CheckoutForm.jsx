@@ -84,7 +84,12 @@ const EMPTY_SAVED_DELIVERY_ADDRESSES = [];
  *   isDisabled?: boolean;
  *   cardPrepaidAvailable?: boolean;
  *   allowedPaymentMethods?: string[] | null;
- *   onDeliveryGeoChange?: (geo: { lat: number; lon: number } | null) => void;
+ *   onDeliveryAddressChange?: (address: {
+ *     line: string;
+ *     flat: string;
+ *     geo: { lat: number; lon: number } | null;
+ *     isValid: boolean;
+ *   }) => void;
  *   dockSubmit?: boolean;
  *   pinSubmitToBottom?: boolean;
  *   showHeading?: boolean;
@@ -110,7 +115,7 @@ export function CheckoutForm({
   isDisabled = false,
   cardPrepaidAvailable = false,
   allowedPaymentMethods = null,
-  onDeliveryGeoChange = null,
+  onDeliveryAddressChange = null,
   dockSubmit = false,
   pinSubmitToBottom = false,
   showHeading = true,
@@ -184,10 +189,6 @@ export function CheckoutForm({
     }
     setDeliveryAddress(addressValueFromUser(defaultDeliveryAddress));
   }, [defaultDeliveryAddress, savedAddresses]);
-
-  useEffect(() => {
-    onDeliveryGeoChange?.(deliveryAddress.geo ?? null);
-  }, [onDeliveryGeoChange, deliveryAddress.geo?.lat, deliveryAddress.geo?.lon]);
 
   const handleSavedAddressSelect = (nextId) => {
     setSelectedSavedAddressId(nextId);
@@ -301,6 +302,36 @@ export function CheckoutForm({
     needsPickup,
     pickupReady,
     pickupSelectable,
+  ]);
+
+  // Корзине нужен адрес целиком, а не только точка: расстояние доставки
+  // продавца сервер ищет по тексту адреса, точку лишь сверяет с ним.
+  const isDeliveryAddressReady =
+    needsDelivery &&
+    validateRuDeliveryAddressForm(deliveryAddress, { required: true }) === null;
+  const deliveryGeoLat = Number(deliveryAddress.geo?.lat);
+  const deliveryGeoLon = Number(deliveryAddress.geo?.lon);
+
+  useEffect(() => {
+    onDeliveryAddressChange?.({
+      line: String(deliveryAddress.line ?? "").trim(),
+      flat: String(deliveryAddress.flat ?? "").trim(),
+      geo:
+        deliveryAddress.geo &&
+        Number.isFinite(deliveryGeoLat) &&
+        Number.isFinite(deliveryGeoLon)
+          ? { lat: deliveryGeoLat, lon: deliveryGeoLon }
+          : null,
+      isValid: isDeliveryAddressReady,
+    });
+  }, [
+    onDeliveryAddressChange,
+    deliveryAddress.line,
+    deliveryAddress.flat,
+    deliveryAddress.geo,
+    deliveryGeoLat,
+    deliveryGeoLon,
+    isDeliveryAddressReady,
   ]);
 
   const deliveryOptionHint = !PRODUCT_DELIVERY_FULFILLMENT_ENABLED

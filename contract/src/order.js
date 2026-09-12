@@ -65,6 +65,31 @@ const orderPickupSelectionSchema = z.object({
   pickupLocationId: z.string().trim().min(1).max(PRODUCT_PICKUP_LOCATION_ID_MAX_LENGTH),
 });
 
+/**
+ * Тело `POST /order/seller-delivery-quote` — тариф продавца и расстояние по
+ * дорогам до оформления.
+ *
+ * Адрес — те же поля, что у заказа: сервер проверяет его тем же middleware,
+ * иначе котировка и заказ увидели бы разные точки и разные суммы.
+ */
+export const sellerDeliveryQuoteBodySchema = z.object({
+  productIds: z.array(mongoIdSchema).min(1).max(ORDER_ITEMS_MAX),
+  deliveryAddress: z.string().trim().min(1).max(ORDER_DELIVERY_ADDRESS_MAX_LENGTH),
+  deliveryAddressFlat: z
+    .string()
+    .trim()
+    .max(ORDER_DELIVERY_FLAT_MAX_LENGTH)
+    .optional()
+    .default(""),
+  deliveryAddressGeo: z
+    .object({
+      lat: z.coerce.number().min(-90).max(90),
+      lon: z.coerce.number().min(-180).max(180),
+    })
+    .nullable()
+    .optional(),
+});
+
 /** Тело `POST /order` (структура; DaData — отдельно на сервере для delivery). */
 export const createOrderBodySchema = z
   .object({

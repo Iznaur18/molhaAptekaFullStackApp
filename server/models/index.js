@@ -57,6 +57,7 @@ import OneCImportJobModel from "./OneCImportJobModel.js";
 import OneCPendingProductModel from "./OneCPendingProductModel.js";
 import ProductPromoActivationModel from "./ProductPromoActivationModel.js";
 import ProductBulkImportJobModel from "./ProductBulkImportJobModel.js";
+import { GeoCacheModel } from "./GeoCacheModel.js";
 
 export {
   UserModel,
@@ -118,4 +119,5 @@ export {
   OneCPendingProductModel,
   ProductPromoActivationModel,
   ProductBulkImportJobModel,
+  GeoCacheModel,
 };

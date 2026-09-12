@@ -108,6 +108,18 @@ describe("расчёт стоимости доставки", () => {
     assert.equal(result.isEstimate, false);
   });
 
+  it("дальняя доставка считается целиком, а не только вызов", () => {
+    // Раньше после 1000 км оставалась лишь цена за вызов: Грозный — Москва
+    // обходился покупателю в 200 ₽.
+    const result = calculateSellerDeliveryFee({
+      tariff: PAID,
+      goodsTotalRub: 1000,
+      distanceKm: 1857.9,
+    });
+    assert.equal(result.feeRub, 200 + 1858 * 30);
+    assert.equal(result.isEstimate, false);
+  });
+
   it("абсурдное расстояние не превращается в счёт", () => {
     const result = calculateSellerDeliveryFee({
       tariff: PAID,
@@ -169,6 +181,17 @@ describe("тариф в настройках продавца", () => {
       deliveryTariff: FREE_SELLER_DELIVERY_TARIFF,
     });
     assert.equal(parsed.success, true);
+  });
+
+  it("строка «false» выключает платную доставку, а не включает", () => {
+    const parsed = sellerDeliveryTariffSchema.safeParse({
+      paid: "false",
+      baseFeeRub: 0,
+      perKmRub: 0,
+      freeFromRub: 0,
+    });
+    assert.equal(parsed.success, true);
+    assert.equal(parsed.data.paid, false);
   });
 
   it("платный тариф без единой цены отклоняется схемой", () => {
