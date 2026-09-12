@@ -7,6 +7,7 @@
   --my-profile-mobile-nav-z-index: calc(var(--iz-z-dropdown) + 20);
   --my-profile-nav-accent-width: 3px;
   --my-profile-surface-radius: 24px;
+  --my-profile-section-gap: 6px;
   --modal-avatar-lead-size: 4.5rem;
   --modal-profile-banner-height-mult: 3;
   --modal-banner-avatar-inset: 0.75rem;
@@ -283,11 +284,14 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--my-profile-section-gap);
 }
 
 .my-profile-page__body {
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--my-profile-section-gap);
   width: 100%;
   max-width: 100%;
   padding: 0;
@@ -536,6 +540,7 @@
 
 .my-profile-page__body > .user-profile-info {
   margin-top: 0;
+  gap: var(--my-profile-section-gap);
 }
 
 .my-profile-page__quick-actions + .my-profile-page__tab-content_lead {
@@ -546,7 +551,7 @@
   display: flex;
   align-items: stretch;
   gap: var(--iz-space-1);
-  margin: 0.75rem 0;
+  margin: 0;
   width: 100%;
 }
 
