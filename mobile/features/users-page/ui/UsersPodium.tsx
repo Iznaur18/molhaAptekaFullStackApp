@@ -2,11 +2,12 @@ import { useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import type { UsersPodiumEntry, UsersPodiumPlace } from "@izibuy/shared-lib";
-import { orderUsersPodiumForDisplay } from "@izibuy/shared-lib";
+import {
+  formatLoyaltyPointsCount,
+  orderUsersPodiumForDisplay,
+} from "@izibuy/shared-lib";
 
 import type { UserSearchListItem } from "@/entities/user/api/fetchUsersSearchPage";
-import { formatSearchRowRatingCompact } from "@/entities/user/lib/formatSearchRowRating";
-import { formatSearchRowTotalSalesCount } from "@/entities/user/lib/formatSearchRowTotalSales";
 import { pickUserProfilePhotoUrl } from "@/entities/user/lib/pickUserProfilePhotoUrl";
 import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
 import { UserPremiumAvatar } from "@/entities/user/ui/UserPremiumAvatar";
@@ -28,14 +29,10 @@ const PLACE_LABEL: Record<UsersPodiumPlace, string> = {
   3: USERS_PODIUM_UI.PLACE_3,
 };
 
-const formatFollowers = (value: unknown): string => {
+const formatDonationsRub = (value: unknown): string => {
   const parsed = Number(value);
-  return Number.isFinite(parsed) ? String(Math.max(0, Math.floor(parsed))) : "0";
-};
-
-const formatLoyaltyPoints = (value: unknown): string => {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? String(Math.max(0, Math.floor(parsed))) : "0";
+  const safe = Number.isFinite(parsed) ? Math.max(0, Math.floor(parsed)) : 0;
+  return `${formatLoyaltyPointsCount(safe)} ₽`;
 };
 
 type UsersPodiumSlotProps = {
@@ -56,31 +53,9 @@ const UsersPodiumSlot = ({ entry, onUserPress }: UsersPodiumSlotProps) => {
     String(user.userName ?? "").trim() || USER_LIST_ROW_UI.MISSING_NAME;
   const isPremium = user.isPremiumUser === true;
   const isConfirmed = user.isUserDataConfirmed === true;
-
-  const metrics = useMemo(
-    () => [
-      {
-        key: "points",
-        label: USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL,
-        value: formatLoyaltyPoints(user.userLoyaltyPoints),
-      },
-      {
-        key: "sales",
-        label: USER_LIST_ROW_UI.TOTAL_SALES_COUNT_LABEL,
-        value: formatSearchRowTotalSalesCount(user.totalSalesCount),
-      },
-      {
-        key: "rating",
-        label: USER_LIST_ROW_UI.RATING_SCORE_LABEL,
-        value: formatSearchRowRatingCompact(user.userRatingByVotes),
-      },
-      {
-        key: "followers",
-        label: USER_LIST_ROW_UI.FOLLOWERS_LABEL,
-        value: formatFollowers(user.followersCount),
-      },
-    ],
-    [user],
+  const donationsText = useMemo(
+    () => formatDonationsRub(user.totalDonatedRub),
+    [user.totalDonatedRub],
   );
 
   const slotToneStyle =
@@ -134,16 +109,14 @@ const UsersPodiumSlot = ({ entry, onUserPress }: UsersPodiumSlotProps) => {
       />
       <Text style={styles.placeLabel}>{PLACE_LABEL[place]}</Text>
       <View style={styles.metrics}>
-        {metrics.map((metric) => (
-          <View key={metric.key} style={styles.metricRow}>
-            <Text style={styles.metricLabel} numberOfLines={1}>
-              {metric.label}
-            </Text>
-            <Text style={styles.metricValue} numberOfLines={1}>
-              {metric.value}
-            </Text>
-          </View>
-        ))}
+        <View style={styles.metricRow}>
+          <Text style={styles.metricLabel} numberOfLines={1}>
+            {USER_LIST_ROW_UI.DONATIONS_LABEL}
+          </Text>
+          <Text style={styles.metricValue} numberOfLines={1}>
+            {donationsText}
+          </Text>
+        </View>
       </View>
     </Pressable>
   );

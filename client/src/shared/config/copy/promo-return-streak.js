@@ -1,6 +1,6 @@
 export const PROMO_RETURN_STREAK_DOCK_UI = {
   TITLE: "Скидка за возвращение",
-  EYEBROW: "Серия",
+  EYEBROW: "День",
   /** @param {number} day @param {number} maxDay */
   DAY: (day, maxDay) => `День ${day} из ${maxDay}`,
   /** @param {number} day @param {number} maxDay */

@@ -87,3 +87,55 @@ export const resolveMoscowCalendarMonthUtcRange = (referenceDate = new Date()) =
     month,
   };
 };
+
+/**
+ * Календарный день Europe/Moscow → [startUtc, endUtc).
+ * @param {Date} [referenceDate]
+ * @returns {{ startUtc: Date; endUtc: Date; year: number; month: number; day: number }}
+ */
+export const resolveMoscowCalendarDayUtcRange = (referenceDate = new Date()) => {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: MOSCOW_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(referenceDate);
+
+  const map = Object.fromEntries(
+    parts
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value]),
+  );
+
+  const year = Number(map.year);
+  const month = Number(map.month);
+  const day = Number(map.day);
+  const startUtc = moscowWallTimeToUtc(year, month, day, 0, 0, 0);
+  const nextInstant = new Date(startUtc.getTime() + 36 * 60 * 60 * 1000);
+  const nextParts = new Intl.DateTimeFormat("en-US", {
+    timeZone: MOSCOW_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(nextInstant);
+  const nextMap = Object.fromEntries(
+    nextParts
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value]),
+  );
+
+  return {
+    startUtc,
+    endUtc: moscowWallTimeToUtc(
+      Number(nextMap.year),
+      Number(nextMap.month),
+      Number(nextMap.day),
+      0,
+      0,
+      0,
+    ),
+    year,
+    month,
+    day,
+  };
+};

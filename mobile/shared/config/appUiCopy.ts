@@ -1694,6 +1694,7 @@ export const USER_LIST_ROW_UI = {
   TOTAL_SALES_COUNT_LABEL: "Продаж",
   FOLLOWERS_LABEL: "Подписчики",
   LOYALTY_POINTS_LABEL: "Баллы",
+  DONATIONS_LABEL: "Донаты",
 } as const;
 
 export const USER_DETAILS_PAGE_UI = {

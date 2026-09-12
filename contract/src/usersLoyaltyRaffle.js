@@ -3,6 +3,7 @@ import { z } from "zod";
 /** Синхрон с `server/constants/usersLoyaltyRaffleSettingsConstants.js`. */
 export const USERS_LOYALTY_RAFFLE_SETTINGS_KEY = "default";
 export const USERS_LOYALTY_RAFFLE_DESCRIPTION_MAX_LENGTH = 2000;
+export const USERS_LOYALTY_RAFFLE_DONATION_IMAGE_URL_MAX_LENGTH = 2048;
 export const USERS_LOYALTY_RAFFLE_GOAL_MIN = 1;
 export const USERS_LOYALTY_RAFFLE_GOAL_MAX = 10_000_000;
 export const USERS_LOYALTY_RAFFLE_GOAL_DEFAULT = 50_000;
@@ -17,13 +18,31 @@ const optionalTrimmedDescription = z.preprocess((value) => {
   return String(value).trim();
 }, z.string().max(USERS_LOYALTY_RAFFLE_DESCRIPTION_MAX_LENGTH).optional());
 
+const optionalTrimmedDonationImageUrl = z.preprocess((value) => {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (value == null || String(value).trim() === "") {
+    return "";
+  }
+  return String(value).trim();
+}, z.string().max(USERS_LOYALTY_RAFFLE_DONATION_IMAGE_URL_MAX_LENGTH).optional());
+
 export const usersLoyaltyRaffleSettingsSchema = z.object({
   description: z.string().max(USERS_LOYALTY_RAFFLE_DESCRIPTION_MAX_LENGTH),
+  donationImageUrl: z
+    .string()
+    .max(USERS_LOYALTY_RAFFLE_DONATION_IMAGE_URL_MAX_LENGTH)
+    .optional()
+    .default(""),
   goal: z
     .number()
     .int()
     .min(USERS_LOYALTY_RAFFLE_GOAL_MIN)
     .max(USERS_LOYALTY_RAFFLE_GOAL_MAX),
+  progressBaseline: z.number().int().min(0).optional(),
+  progressBaselineYear: z.number().int().nullable().optional(),
+  progressBaselineMonth: z.number().int().min(1).max(12).nullable().optional(),
   updatedAt: z.union([z.string(), z.date(), z.null()]).optional().nullable(),
 });
 
@@ -34,6 +53,7 @@ export const usersLoyaltyRaffleSettingsDataSchema = z.object({
 export const patchUsersLoyaltyRaffleSettingsBodySchema = z
   .object({
     description: optionalTrimmedDescription,
+    donationImageUrl: optionalTrimmedDonationImageUrl,
     goal: z.coerce
       .number()
       .int()
@@ -41,9 +61,15 @@ export const patchUsersLoyaltyRaffleSettingsBodySchema = z
       .max(USERS_LOYALTY_RAFFLE_GOAL_MAX)
       .optional(),
   })
-  .refine((body) => body.description !== undefined || body.goal !== undefined, {
-    message: "Укажите description и/или goal",
-  });
+  .refine(
+    (body) =>
+      body.description !== undefined ||
+      body.goal !== undefined ||
+      body.donationImageUrl !== undefined,
+    {
+      message: "Укажите description, goal и/или donationImageUrl",
+    },
+  );
 
 export const usersMonthlyLoyaltyAwardedDataSchema = z.object({
   pointsAwarded: z.number().int().min(0),

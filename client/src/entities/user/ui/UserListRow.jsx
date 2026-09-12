@@ -1,12 +1,11 @@
 import { useMemo, useState } from "react";
+import { formatLoyaltyPointsCount } from "@izibuy/shared-lib";
 
-import { formatSearchRowRatingCompact } from "../lib/formatSearchRowRating.js";
-import { formatSearchRowTotalSalesCount } from "../lib/formatSearchRowTotalSalesCount.js";
+import { pickUserProfilePhotoUrl } from "../lib/pickUserProfilePhotoUrl.js";
 import {
   formatProfileImageObjectPosition,
   getUserAvatarFocus,
 } from "../lib/profileImageFocus.js";
-import { pickUserProfilePhotoUrl } from "../lib/pickUserProfilePhotoUrl.js";
 import { UserPremiumAvatar } from "./UserPremiumAvatar.jsx";
 import { UserPremiumDisplayName } from "./UserPremiumDisplayName.jsx";
 import { DEFAULT_USER_AVATAR_URL } from "../model/userConstants.js";
@@ -31,23 +30,12 @@ export function UserListRow({ user, onRowClick }) {
     getUserAvatarFocus(user),
   );
   const showEmail = email.length > 0 && email !== userName;
-  const ratingText = useMemo(
-    () => formatSearchRowRatingCompact(user.userRatingByVotes),
-    [user.userRatingByVotes],
-  );
-  const totalSalesCountText = useMemo(
-    () => formatSearchRowTotalSalesCount(user.totalSalesCount),
-    [user.totalSalesCount],
-  );
   const isUserDataConfirmed = user.isUserDataConfirmed === true;
-  const followersText = useMemo(() => {
-    const n = Number(user.followersCount);
-    return Number.isFinite(n) ? String(Math.max(0, Math.floor(n))) : "0";
-  }, [user.followersCount]);
-  const loyaltyPointsText = useMemo(() => {
-    const n = Number(user.userLoyaltyPoints);
-    return Number.isFinite(n) ? String(Math.max(0, Math.floor(n))) : "0";
-  }, [user.userLoyaltyPoints]);
+  const donationsText = useMemo(() => {
+    const n = Number(user.totalDonatedRub);
+    const safe = Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+    return `${formatLoyaltyPointsCount(safe)} ₽`;
+  }, [user.totalDonatedRub]);
   const metaBadges = useMemo(() => {
     if (!user.isBlockedUser) {
       return [];
@@ -94,44 +82,14 @@ export function UserListRow({ user, onRowClick }) {
       ) : null}
       <span className="user-list-row__metrics">
         <span
-          className="user-list-row__metric user-list-row__metric_sales"
-          aria-label={`${USER_LIST_ROW_UI.TOTAL_SALES_COUNT_LABEL} ${totalSalesCountText}`}
+          className="user-list-row__metric user-list-row__metric_donations"
+          aria-label={`${USER_LIST_ROW_UI.DONATIONS_LABEL} ${donationsText}`}
         >
           <span className="user-list-row__metric-label">
-            {USER_LIST_ROW_UI.TOTAL_SALES_COUNT_LABEL}
+            {USER_LIST_ROW_UI.DONATIONS_LABEL}
           </span>
           <span className="user-list-row__metric-value user-list-row__metric-value_amount">
-            {totalSalesCountText}
-          </span>
-        </span>
-        <span
-          className="user-list-row__metric user-list-row__metric_rating"
-          title={USER_LIST_ROW_UI.RATING_TITLE}
-        >
-          <span className="user-list-row__metric-label">
-            {USER_LIST_ROW_UI.RATING_SCORE_LABEL}
-          </span>
-          <span className="user-list-row__metric-value user-list-row__metric-value_muted">
-            {ratingText}
-          </span>
-        </span>
-        <span className="user-list-row__metric user-list-row__metric_followers">
-          <span className="user-list-row__metric-label">
-            {USER_LIST_ROW_UI.FOLLOWERS_LABEL}
-          </span>
-          <span className="user-list-row__metric-value user-list-row__metric-value_amount">
-            {followersText}
-          </span>
-        </span>
-        <span
-          className="user-list-row__metric user-list-row__metric_loyalty"
-          aria-label={`${USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL} ${loyaltyPointsText}`}
-        >
-          <span className="user-list-row__metric-label">
-            {USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL}
-          </span>
-          <span className="user-list-row__metric-value user-list-row__metric-value_amount">
-            {loyaltyPointsText}
+            {donationsText}
           </span>
         </span>
       </span>

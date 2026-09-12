@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createLoyaltyPointsPayment,
   createOrderPayment,
+  createUsersMonthlyDonationPayment,
   fetchMyPayment,
   fetchPaymentConfig,
 } from "../api/paymentApi.js";
@@ -26,6 +27,10 @@ export function usePaymentConfigQuery({ enabled = true } = {}) {
 
 export function useCreateLoyaltyPointsPaymentMutation() {
   return useMutation({ mutationFn: createLoyaltyPointsPayment });
+}
+
+export function useCreateUsersMonthlyDonationPaymentMutation() {
+  return useMutation({ mutationFn: createUsersMonthlyDonationPayment });
 }
 
 export function useCreateOrderPaymentMutation() {
@@ -69,6 +74,7 @@ export function useMyPaymentQuery({ paymentId }) {
         // Баланс в шапке и на странице обновится сам.
         void queryClient.invalidateQueries({ queryKey: ["loyalty-points"] });
         void queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
+        void queryClient.invalidateQueries({ queryKey: ["users-monthly-loyalty"] });
       }
       return payment;
     },

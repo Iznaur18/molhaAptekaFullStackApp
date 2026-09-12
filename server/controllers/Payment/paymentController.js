@@ -10,6 +10,7 @@ import {
 import { resolvePlatformSellerUserIds } from "../../constants/yookassaConstants.js";
 import { isYookassaConfigured } from "../../services/payments/yookassaClient.js";
 import { createPlatformServicePayment } from "../../services/payments/platformServiceInvoice.js";
+import { createUsersMonthlyDonation } from "../../services/payments/usersMonthlyDonation.js";
 import { successRes } from "../../services/http/index.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
@@ -56,6 +57,17 @@ export const createPlatformServicePaymentController = async (req, res) => {
 /** `POST /payments/loyalty-points` — создать платёж на пополнение баллов. */
 export const createLoyaltyPointsPaymentController = async (req, res) => {
   const result = await createLoyaltyPointsTopUp({
+    userId: String(req.userId),
+    amountRub: req.body.amountRub,
+    returnUrl: req.body.returnUrl,
+    idempotencyKey: req.body.idempotencyKey,
+  });
+  return successRes(res, { payment: result });
+};
+
+/** `POST /payments/users-monthly-donation` — пожертвование в месячный прогресс. */
+export const createUsersMonthlyDonationPaymentController = async (req, res) => {
+  const result = await createUsersMonthlyDonation({
     userId: String(req.userId),
     amountRub: req.body.amountRub,
     returnUrl: req.body.returnUrl,

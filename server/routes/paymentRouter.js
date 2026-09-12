@@ -2,6 +2,7 @@ import {
   createLoyaltyPointsPaymentController,
   createOrderPaymentController,
   createPlatformServicePaymentController,
+  createUsersMonthlyDonationPaymentController,
   getMyPaymentController,
   getPaymentConfigController,
   postYookassaWebhookController,
@@ -12,6 +13,7 @@ import {
   orderPaymentValidation,
   paymentIdParamsValidation,
   platformServicePaymentValidation,
+  usersMonthlyDonationPaymentValidation,
 } from "../validations/index.js";
 import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 
@@ -29,6 +31,13 @@ router.post(
   checkAuthMW,
   loyaltyPointsPaymentValidation,
   createLoyaltyPointsPaymentController,
+);
+
+router.post(
+  "/users-monthly-donation",
+  checkAuthMW,
+  usersMonthlyDonationPaymentValidation,
+  createUsersMonthlyDonationPaymentController,
 );
 
 router.post(

@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
-import { orderUsersPodiumForDisplay } from "@izibuy/shared-lib";
+import {
+  formatLoyaltyPointsCount,
+  orderUsersPodiumForDisplay,
+} from "@izibuy/shared-lib";
 
-import { formatSearchRowRatingCompact } from "../../../entities/user/lib/formatSearchRowRating.js";
-import { formatSearchRowTotalSalesCount } from "../../../entities/user/lib/formatSearchRowTotalSalesCount.js";
 import { pickUserProfilePhotoUrl } from "../../../entities/user/lib/pickUserProfilePhotoUrl.js";
 import { DEFAULT_USER_AVATAR_URL } from "../../../entities/user/model/userConstants.js";
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
@@ -22,9 +23,10 @@ const PLACE_LABEL = {
  * @param {unknown} value
  * @returns {string}
  */
-function formatCount(value) {
+function formatDonationsRub(value) {
   const parsed = Number(value);
-  return Number.isFinite(parsed) ? String(Math.max(0, Math.floor(parsed))) : "0";
+  const safe = Number.isFinite(parsed) ? Math.max(0, Math.floor(parsed)) : 0;
+  return `${formatLoyaltyPointsCount(safe)} ₽`;
 }
 
 /**
@@ -45,31 +47,9 @@ function UsersPodiumSlot({ entry, onUserPress }) {
     String(user.userName ?? "").trim() || USER_LIST_ROW_UI.MISSING_NAME;
   const isPremium = user.isPremiumUser === true;
   const isConfirmed = user.isUserDataConfirmed === true;
-
-  const metrics = useMemo(
-    () => [
-      {
-        key: "points",
-        label: USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL,
-        value: formatCount(user.userLoyaltyPoints),
-      },
-      {
-        key: "sales",
-        label: USER_LIST_ROW_UI.TOTAL_SALES_COUNT_LABEL,
-        value: formatSearchRowTotalSalesCount(user.totalSalesCount),
-      },
-      {
-        key: "rating",
-        label: USER_LIST_ROW_UI.RATING_SCORE_LABEL,
-        value: formatSearchRowRatingCompact(user.userRatingByVotes),
-      },
-      {
-        key: "followers",
-        label: USER_LIST_ROW_UI.FOLLOWERS_LABEL,
-        value: formatCount(user.followersCount),
-      },
-    ],
-    [user],
+  const donationsText = useMemo(
+    () => formatDonationsRub(user.totalDonatedRub),
+    [user.totalDonatedRub],
   );
 
   const slotClassName = [
@@ -124,12 +104,12 @@ function UsersPodiumSlot({ entry, onUserPress }) {
       />
       <span className="users-podium__place-label">{PLACE_LABEL[place]}</span>
       <span className="users-podium__metrics">
-        {metrics.map((metric) => (
-          <span key={metric.key} className="users-podium__metric-row">
-            <span className="users-podium__metric-label">{metric.label}</span>
-            <span className="users-podium__metric-value">{metric.value}</span>
+        <span className="users-podium__metric-row">
+          <span className="users-podium__metric-label">
+            {USER_LIST_ROW_UI.DONATIONS_LABEL}
           </span>
-        ))}
+          <span className="users-podium__metric-value">{donationsText}</span>
+        </span>
       </span>
     </button>
   );

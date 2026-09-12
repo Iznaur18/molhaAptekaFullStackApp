@@ -129,15 +129,19 @@
 .users-podium__metrics {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  align-items: center;
+  gap: 0.2rem;
   width: 100%;
+  text-align: center;
 }
 
 .users-podium__metric-row {
   display: flex;
-  justify-content: space-between;
-  gap: 0.25rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
   min-width: 0;
+  width: 100%;
 }
 
 .users-podium__metric-label {
@@ -146,18 +150,19 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.5625rem;
+  font-size: 0.68rem;
   font-weight: 600;
   color: var(--iz-color-text-muted);
-  text-align: left;
+  text-align: center;
 }
 
 .users-podium__metric-value {
   flex-shrink: 0;
-  font-size: 0.625rem;
+  font-size: 1.2rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--iz-color-text);
+  text-align: center;
 }
 
 @container app-viewport (max-width: 640px) {
@@ -178,5 +183,9 @@
   .users-podium__avatar_place-other {
     width: 2.75rem;
     height: 2.75rem;
+  }
+
+  .users-podium__metric-value {
+    font-size: 1.05rem;
   }
 }

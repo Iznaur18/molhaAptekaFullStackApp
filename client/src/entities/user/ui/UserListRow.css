@@ -99,7 +99,7 @@
 
 .user-list-row__metrics {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 0.45rem;
   margin-top: auto;
   padding-top: 0.55rem;
@@ -114,6 +114,11 @@
   padding: 0.45rem 0.5rem;
   border-radius: 0.5rem;
   background: color-mix(in srgb, var(--iz-color-text) 4%, transparent);
+}
+
+.user-list-row__metric_donations {
+  align-items: center;
+  text-align: center;
 }
 
 .user-list-row__metric-label {
@@ -135,62 +140,12 @@
   color: var(--iz-color-text);
 }
 
-.user-list-row__metric_sales {
-  grid-column: 1;
-  grid-row: 1;
-}
-
-.user-list-row__metric_rating {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-.user-list-row__metric_followers {
-  grid-column: 1;
-  grid-row: 2;
-}
-
-.user-list-row__metric_loyalty {
-  grid-column: 2;
-  grid-row: 2;
-}
-
-.user-list-row__metric-label_long {
-  line-height: 1.15;
-  white-space: normal;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.user-list-row__metric-label_secondary {
-  margin-top: 0.08rem;
-  font-size: 0.58rem;
-}
-
-.user-list-row__metric-value_secondary {
-  font-size: 0.76rem;
-}
-
-.user-list-row__metric-value_confirmed-yes {
-  color: var(--iz-color-success);
-}
-
-.user-list-row__metric-value_confirmed-no {
-  color: var(--iz-color-danger);
+.user-list-row__metric_donations .user-list-row__metric-value {
+  justify-content: center;
 }
 
 .user-list-row__metric-value_amount {
-  font-size: 0.88rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.user-list-row__metric-value_muted {
-  display: block;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 1.35rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -260,7 +215,7 @@
   }
 
   .user-list-row__metric-value_amount {
-    font-size: 0.7rem;
+    font-size: 1.15rem;
   }
 
   .user-list-row__metric-value_muted {

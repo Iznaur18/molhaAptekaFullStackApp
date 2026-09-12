@@ -6,6 +6,11 @@ import { mongoIdSchema } from "./mongoId.js";
 export const LOYALTY_POINTS_TOPUP_MIN_RUB = 1;
 export const LOYALTY_POINTS_TOPUP_MAX_RUB = 999_999;
 
+/** Пожертвование в месячный прогресс на странице пользователей. */
+export const USERS_MONTHLY_DONATION_MIN_RUB = 1;
+export const USERS_MONTHLY_DONATION_MAX_RUB = 1_000_000;
+export const USERS_MONTHLY_DONATION_DAILY_LIMIT = 5;
+
 export const PAYMENT_STATUS_CREATED = "created";
 export const PAYMENT_STATUS_SUCCEEDED = "succeeded";
 export const PAYMENT_STATUS_CANCELED = "canceled";
@@ -36,6 +41,23 @@ export const loyaltyPointsPaymentBodySchema = z.object({
     .int("Сумма пополнения — целое число рублей")
     .min(LOYALTY_POINTS_TOPUP_MIN_RUB, `Минимум ${LOYALTY_POINTS_TOPUP_MIN_RUB} ₽`)
     .max(LOYALTY_POINTS_TOPUP_MAX_RUB, `Максимум ${LOYALTY_POINTS_TOPUP_MAX_RUB} ₽`),
+  returnUrl: returnUrlSchema,
+  idempotencyKey: z.string().trim().min(1).max(64).optional(),
+});
+
+/** Body `POST /payments/users-monthly-donation`. */
+export const usersMonthlyDonationPaymentBodySchema = z.object({
+  amountRub: z
+    .number({ required_error: "Укажите сумму пожертвования" })
+    .int("Сумма пожертвования — целое число рублей")
+    .min(
+      USERS_MONTHLY_DONATION_MIN_RUB,
+      `Минимум ${USERS_MONTHLY_DONATION_MIN_RUB} ₽`,
+    )
+    .max(
+      USERS_MONTHLY_DONATION_MAX_RUB,
+      `Максимум ${USERS_MONTHLY_DONATION_MAX_RUB} ₽`,
+    ),
   returnUrl: returnUrlSchema,
   idempotencyKey: z.string().trim().min(1).max(64).optional(),
 });

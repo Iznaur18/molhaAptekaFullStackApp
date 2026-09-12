@@ -1,21 +1,31 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { excludeUsersPodiumFromList, rankUsersForPodium } from "@izibuy/shared-lib";
 import {
   USER_SEARCH_MIN_LENGTH,
   isUsersSearchInputTooShort,
 } from "@molha/api-contract";
 
+import {
+  forgetPendingPaymentId,
+  readPendingPaymentId,
+} from "../../../entities/payment/lib/pendingPaymentStorage.js";
+import { useMyPaymentQuery } from "../../../entities/payment/model/paymentQueries.js";
+import { invalidateUsersSearch } from "../../../entities/user/lib/usersSearchQueryCache.js";
 import { useUsersMonthlyLoyaltyPointsQuery } from "../../../entities/user/model/useUsersMonthlyLoyaltyPointsQuery.js";
+import { usersMonthlyLoyaltyQueryKeys } from "../../../entities/user/model/usersMonthlyLoyaltyQueryKeys.js";
 import { useUsersSearchQuery } from "../../../entities/user/model/useUsersSearchQuery.js";
 import { UserListRow } from "../../../entities/user/ui/UserListRow.jsx";
 import {
   USER_SEARCH_INPUT_UI,
+  USERS_MONTHLY_LOYALTY_LOADBAR_UI,
   USERS_PAGE_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { AUTH_LOGIN_PATH } from "../../../shared/lib/authPaths.js";
 import { isAuthSessionError } from "../../../shared/lib/isAuthSessionError.js";
 import { SearchInput } from "../../../shared/ui/SearchInput/SearchInput.jsx";
+import { UsersMonthlyDonationModal } from "./UsersMonthlyDonationModal.jsx";
 import { UsersMonthlyLoyaltyLoadBar } from "./UsersMonthlyLoyaltyLoadBar.jsx";
 import { UsersPodium } from "./UsersPodium.jsx";
 
@@ -41,27 +51,102 @@ function UsersPageAuthPrompt() {
 
 /**
  * @param {{
+ *   pointsAwarded: number;
+ *   goal: number;
+ *   description: string;
+ *   isLoading: boolean;
+ *   onDonateClick: () => void;
+ *   feedbackMessage: string;
+ * }} props
+ */
+function buildUsersMonthlyLoadBar(props) {
+  return (
+    <UsersMonthlyLoyaltyLoadBar
+      pointsAwarded={props.pointsAwarded}
+      goal={props.goal}
+      description={props.description}
+      isLoading={props.isLoading}
+      onDonateClick={props.onDonateClick}
+      feedbackMessage={props.feedbackMessage}
+    />
+  );
+}
+
+/**
+ * @param {{
  *   onUserRowClick?: (userId: string) => void;
  *   isAdminViewer?: boolean;
  *   isAuthorized?: boolean;
  * }} props
  */
 export function UsersPage({ onUserRowClick, isAuthorized = true }) {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [submittedSearch, setSubmittedSearch] = useState("");
+  const [isDonateModalOpen, setIsDonateModalOpen] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [watchedPaymentId, setWatchedPaymentId] = useState("");
   const hasSearchQuery = submittedSearch.trim().length >= USER_SEARCH_MIN_LENGTH;
   const isSearchInputTooShort = isUsersSearchInputTooShort(submittedSearch);
 
-  // Гостю сервер отвечает 401, и страница вставала на «Загрузка…» навсегда:
-  // запрос до неё не доходит, а показать нечего. Спрашиваем только своих.
   const { phase, users, error } = useUsersSearchQuery({
     search: submittedSearch,
     enabled: isAuthorized,
   });
   const isSearchPending = hasSearchQuery && phase === "loading";
 
-  // Ввод не ищет сам по себе — запрос уходит по «Найти». Пустое поле не поиск,
-  // а отмена: список возвращается к общему сразу.
+  const monthlyLoyaltyQuery = useUsersMonthlyLoyaltyPointsQuery({ enabled: true });
+  const paymentQuery = useMyPaymentQuery({ paymentId: watchedPaymentId || null });
+
+  useEffect(() => {
+    if (!isAuthorized) return;
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has("donated")) return;
+    const pendingId =
+      String(params.get("paymentId") ?? "").trim() || readPendingPaymentId();
+    if (!pendingId) return;
+    setWatchedPaymentId(pendingId);
+    setFeedbackMessage(USERS_MONTHLY_LOYALTY_LOADBAR_UI.DONATE_PENDING);
+  }, [isAuthorized]);
+
+  useEffect(() => {
+    const status = paymentQuery.data?.status;
+    if (!status || status === "created") return;
+    forgetPendingPaymentId();
+    if (status === "succeeded") {
+      setFeedbackMessage(USERS_MONTHLY_LOYALTY_LOADBAR_UI.DONATE_SUCCESS);
+      void queryClient.invalidateQueries({
+        queryKey: usersMonthlyLoyaltyQueryKeys.all,
+      });
+      void invalidateUsersSearch(queryClient);
+    } else {
+      setFeedbackMessage("");
+    }
+    setWatchedPaymentId("");
+    const url = new URL(window.location.href);
+    let changed = false;
+    if (url.searchParams.has("donated")) {
+      url.searchParams.delete("donated");
+      changed = true;
+    }
+    if (url.searchParams.has("paymentId")) {
+      url.searchParams.delete("paymentId");
+      changed = true;
+    }
+    if (changed) {
+      window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+    }
+  }, [paymentQuery.data?.status, queryClient]);
+
+  const handleDonateClick = () => {
+    if (!isAuthorized) {
+      navigate(AUTH_LOGIN_PATH);
+      return;
+    }
+    setIsDonateModalOpen(true);
+  };
+
   const handleSearchTermChange = (next) => {
     setSearchTerm(next);
     if (next.trim() === "") {
@@ -73,9 +158,20 @@ export function UsersPage({ onUserRowClick, isAuthorized = true }) {
     setSubmittedSearch(searchTerm);
   };
 
+  const loadBar = buildUsersMonthlyLoadBar({
+    pointsAwarded: monthlyLoyaltyQuery.data?.pointsAwarded ?? 0,
+    goal: monthlyLoyaltyQuery.data?.goal ?? 0,
+    description: monthlyLoyaltyQuery.data?.description ?? "",
+    isLoading:
+      monthlyLoyaltyQuery.isPending && monthlyLoyaltyQuery.data == null,
+    onDonateClick: handleDonateClick,
+    feedbackMessage,
+  });
+
   if (!isAuthorized) {
     return (
       <div className="users-page">
+        <div className="users-page__list-header">{loadBar}</div>
         <UsersPageAuthPrompt />
       </div>
     );
@@ -100,6 +196,11 @@ export function UsersPage({ onUserRowClick, isAuthorized = true }) {
         hasActiveFilters={hasSearchQuery}
         isSearchInputTooShort={isSearchInputTooShort}
         onUserRowClick={onUserRowClick}
+        loadBar={loadBar}
+      />
+      <UsersMonthlyDonationModal
+        isOpen={isDonateModalOpen}
+        onClose={() => setIsDonateModalOpen(false)}
       />
     </div>
   );
@@ -113,6 +214,7 @@ export function UsersPage({ onUserRowClick, isAuthorized = true }) {
  *   hasActiveFilters: boolean;
  *   isSearchInputTooShort?: boolean;
  *   onUserRowClick?: (userId: string) => void;
+ *   loadBar: import('react').ReactNode;
  * }} props
  */
 function UsersPageBody({
@@ -122,11 +224,9 @@ function UsersPageBody({
   hasActiveFilters,
   isSearchInputTooShort = false,
   onUserRowClick,
+  loadBar,
 }) {
   const showPodium = !hasActiveFilters && !isSearchInputTooShort;
-  const monthlyLoyaltyQuery = useUsersMonthlyLoyaltyPointsQuery({
-    enabled: showPodium,
-  });
 
   const podiumEntries = useMemo(
     () => (showPodium ? rankUsersForPodium(users) : []),
@@ -138,7 +238,12 @@ function UsersPageBody({
   );
 
   if (phase === "loading") {
-    return <p className="users-page__state">{USERS_PAGE_UI.LOADING}</p>;
+    return (
+      <div className="users-page__body">
+        <div className="users-page__list-header">{loadBar}</div>
+        <p className="users-page__state">{USERS_PAGE_UI.LOADING}</p>
+      </div>
+    );
   }
 
   if (phase === "error") {
@@ -158,12 +263,13 @@ function UsersPageBody({
       : hasActiveFilters
         ? USERS_PAGE_UI.EMPTY_BY_QUERY
         : USERS_PAGE_UI.EMPTY;
-    return <p className="users-page__state">{emptyMessage}</p>;
+    return (
+      <div className="users-page__body">
+        {showPodium ? <div className="users-page__list-header">{loadBar}</div> : null}
+        <p className="users-page__state">{emptyMessage}</p>
+      </div>
+    );
   }
-
-  const pointsAwarded = monthlyLoyaltyQuery.data?.pointsAwarded ?? 0;
-  const goal = monthlyLoyaltyQuery.data?.goal ?? 0;
-  const description = monthlyLoyaltyQuery.data?.description ?? "";
 
   return (
     <div className="users-page__body">
@@ -172,14 +278,7 @@ function UsersPageBody({
           {podiumEntries.length > 0 ? (
             <UsersPodium entries={podiumEntries} onUserPress={onUserRowClick} />
           ) : null}
-          <UsersMonthlyLoyaltyLoadBar
-            pointsAwarded={pointsAwarded}
-            goal={goal}
-            description={description}
-            isLoading={
-              monthlyLoyaltyQuery.isPending && monthlyLoyaltyQuery.data == null
-            }
-          />
+          {loadBar}
         </div>
       ) : null}
       {listUsers.length > 0 ? (
