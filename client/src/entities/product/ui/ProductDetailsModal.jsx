@@ -112,7 +112,8 @@ export function ProductDetailsModal({
     (ctrl.canShowAddToCart ||
       ctrl.showOutOfStockPurchaseButton ||
       ctrl.showBlockedPurchaseButton ||
-      ctrl.showSellerClosedPurchaseButton);
+      ctrl.showSellerClosedPurchaseButton ||
+      ctrl.showOwnProductPurchaseButton);
   const showMobileInstallmentDock =
     isMobileNav &&
     ctrl.detailsTab === "installment" &&
@@ -138,8 +139,10 @@ export function ProductDetailsModal({
       blockedPurchaseLabel={ctrl.blockedPurchaseLabel}
       showSellerClosedPurchaseButton={ctrl.showSellerClosedPurchaseButton}
       sellerClosedPurchaseLabel={ctrl.sellerClosedPurchaseLabel}
+      showOwnProductPurchaseButton={ctrl.showOwnProductPurchaseButton}
       outOfStockPurchaseLabel={ctrl.outOfStockPurchaseLabel}
       unitPriceSnapshot={Math.floor(Number(product.productPrice)) || 0}
+      onBack={onClose}
       className="product-details-modal__price-actions--mobile-dock"
     />
   ) : null;

@@ -157,4 +157,9 @@ paymentSchema.index(
   },
 );
 
+paymentSchema.index(
+  { userId: 1, purpose: 1, status: 1, appliedAt: 1 },
+  { name: "payment_user_purpose_applied_at" },
+);
+
 export const PaymentModel = mongoose.model("Payment", paymentSchema);

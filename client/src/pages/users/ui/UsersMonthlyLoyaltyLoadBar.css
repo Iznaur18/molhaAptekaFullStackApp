@@ -5,6 +5,17 @@
   padding: 0.25rem 0;
 }
 
+.users-monthly-loyalty-loadbar__actions {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.users-monthly-loyalty-loadbar__donate {
+  width: 100%;
+  min-height: 2.25rem;
+}
+
 .users-monthly-loyalty-loadbar__title-row {
   display: flex;
   align-items: center;
@@ -18,8 +29,7 @@
   min-width: 0;
   font-size: 0.8125rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   color: var(--iz-color-text-muted);
 }
 
@@ -50,4 +60,12 @@
   font-size: 0.8125rem;
   line-height: 1.4;
   color: var(--iz-color-text-secondary);
+}
+
+.users-monthly-loyalty-loadbar__feedback {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--iz-color-action);
 }

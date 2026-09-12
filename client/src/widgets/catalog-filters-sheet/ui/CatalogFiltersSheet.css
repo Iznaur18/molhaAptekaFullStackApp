@@ -1,0 +1,140 @@
+/**
+ * Bottom sheet фильтров каталога (stub).
+ * Паритет анимации/радиуса/отступов с ViewerRegionPickerSheet.
+ */
+.catalog-filters-sheet__backdrop {
+  --catalog-filters-enter-ms: 300ms;
+  --catalog-filters-exit-ms: 240ms;
+  --catalog-filters-enter-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --catalog-filters-exit-ease: cubic-bezier(0.55, 0.055, 0.675, 1);
+  --catalog-filters-sheet-height: min(92vh, 36rem);
+  --catalog-filters-sheet-height: min(92svh, 36rem);
+  --catalog-filters-radius: 2rem;
+  --catalog-filters-max-width: 100%;
+  --catalog-filters-inline-padding: var(--iz-space-4);
+
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  box-sizing: border-box;
+  padding-inline: 0;
+  background: transparent;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+@media (min-width: 641px) {
+  .catalog-filters-sheet__backdrop {
+    --catalog-filters-max-width: min(26rem, 100%);
+  }
+}
+
+.catalog-filters-sheet__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--iz-color-ink) 55%, transparent);
+  opacity: 0;
+  transition: opacity var(--catalog-filters-exit-ms) var(--catalog-filters-exit-ease);
+}
+
+.catalog-filters-sheet__backdrop--open .catalog-filters-sheet__scrim {
+  opacity: 1;
+  transition: opacity var(--catalog-filters-enter-ms) var(--catalog-filters-enter-ease);
+}
+
+.catalog-filters-sheet__dismiss {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.catalog-filters-sheet {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--catalog-filters-max-width);
+  height: var(--catalog-filters-sheet-height);
+  max-height: var(--catalog-filters-sheet-height);
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--catalog-filters-radius) var(--catalog-filters-radius) 0 0;
+  corner-shape: squircle;
+  background: var(--iz-color-surface);
+  box-shadow: 0 -12px 40px color-mix(in srgb, var(--iz-color-text) 18%, transparent);
+  overflow: hidden;
+  transform: translate3d(0, 100%, 0);
+  transition: transform var(--catalog-filters-exit-ms) var(--catalog-filters-exit-ease);
+  will-change: transform;
+  overscroll-behavior: contain;
+}
+
+.catalog-filters-sheet__backdrop--open .catalog-filters-sheet {
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--catalog-filters-enter-ms)
+    var(--catalog-filters-enter-ease);
+}
+
+.catalog-filters-sheet__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: 16px var(--catalog-filters-inline-padding) 8px;
+}
+
+.catalog-filters-sheet__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.catalog-filters-sheet__close {
+  margin: 0;
+  padding: 0.25rem 0.15rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--iz-color-text-muted);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.catalog-filters-sheet__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0 var(--catalog-filters-inline-padding);
+}
+
+.catalog-filters-sheet__footer {
+  flex-shrink: 0;
+  padding: 12px var(--catalog-filters-inline-padding)
+    max(16px, env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--iz-color-border);
+}
+
+.catalog-filters-sheet__apply {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .catalog-filters-sheet__scrim,
+  .catalog-filters-sheet {
+    transition-duration: 90ms;
+  }
+}

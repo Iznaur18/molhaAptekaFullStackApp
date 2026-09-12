@@ -2,6 +2,7 @@ import {
   PAYMENT_PURPOSE_LOYALTY_POINTS,
   PAYMENT_PURPOSE_ORDER,
   PAYMENT_PURPOSE_PLATFORM_SERVICE,
+  PAYMENT_PURPOSE_USERS_MONTHLY_DONATION,
   YOOKASSA_WEBHOOK_EVENTS,
 } from "../../constants/yookassaConstants.js";
 import { PaymentModel } from "../../models/index.js";
@@ -9,6 +10,7 @@ import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { applyLoyaltyPointsTopUp } from "./loyaltyPointsTopUp.js";
 import { applyOrderPrepayment } from "./orderPrepayment.js";
 import { applyPlatformServicePayment } from "./platformServiceInvoice.js";
+import { applyUsersMonthlyDonation } from "./usersMonthlyDonation.js";
 import { getYookassaPayment } from "./yookassaClient.js";
 
 /**
@@ -22,6 +24,7 @@ const PAYMENT_APPLIERS = Object.freeze({
   [PAYMENT_PURPOSE_LOYALTY_POINTS]: applyLoyaltyPointsTopUp,
   [PAYMENT_PURPOSE_ORDER]: applyOrderPrepayment,
   [PAYMENT_PURPOSE_PLATFORM_SERVICE]: applyPlatformServicePayment,
+  [PAYMENT_PURPOSE_USERS_MONTHLY_DONATION]: applyUsersMonthlyDonation,
 });
 
 /** @param {string} purpose */

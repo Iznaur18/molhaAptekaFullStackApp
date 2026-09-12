@@ -1,0 +1,120 @@
+/* Shared checkout cards: cart page + checkout sheet (installment / auction). */
+.cart-fulfillment {
+  --cart-fulfillment-card-gap: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 16px;
+}
+
+.cart-fulfillment__method-card,
+.cart-fulfillment__details,
+.cart-fulfillment__payment,
+.cart-fulfillment__dock {
+  margin: var(--cart-fulfillment-card-gap) var(--cart-page-content-inset, 12px) 0;
+  box-sizing: border-box;
+}
+
+.cart-fulfillment__method-card,
+.cart-fulfillment__payment {
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--iz-color-ink) 8%, transparent);
+  border-radius: 16px;
+  background: var(--iz-color-surface-elevated);
+}
+
+.cart-fulfillment__payment .checkout-payment-method-picker {
+  margin-top: 0;
+}
+
+.cart-fulfillment__details .checkout-form__fields {
+  gap: var(--cart-fulfillment-card-gap);
+}
+
+.cart-fulfillment__details .checkout-form__fulfillment-section {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--iz-color-ink) 8%, transparent);
+  border-radius: 16px;
+  background: var(--iz-color-surface-elevated);
+}
+
+.cart-fulfillment__details .checkout-form__fulfillment-section--pickup,
+.cart-fulfillment__details .checkout-form__fulfillment-section--delivery {
+  background: color-mix(
+    in srgb,
+    var(--iz-color-action) 5%,
+    var(--iz-color-surface-elevated)
+  );
+  border-color: color-mix(in srgb, var(--iz-color-action) 18%, transparent);
+}
+
+.cart-fulfillment__details .checkout-form__fulfillment-split {
+  display: none;
+}
+
+.cart-fulfillment__details
+  .checkout-form__fulfillment-section
+  .checkout-shipping-provider-picker__scroll,
+.cart-fulfillment__details
+  .checkout-form__fulfillment-section
+  .saved-address-picker__list--carousel,
+.cart-fulfillment__payment .checkout-payment-method-picker__scroll {
+  width: auto;
+  max-width: none;
+  margin-inline: -16px;
+  padding-inline: 16px;
+  scroll-padding-inline: 16px;
+}
+
+.cart-fulfillment__payment
+  .checkout-payment-method-picker__card:not(
+    .checkout-payment-method-picker__card--selected
+  ):not(.checkout-payment-method-picker__card--locked) {
+  background: transparent;
+  border: 1px solid var(--iz-color-border);
+  color: var(--iz-color-text);
+}
+
+.cart-fulfillment__payment
+  .checkout-payment-method-picker__card--cardPrepaid:not(
+    .checkout-payment-method-picker__card--selected
+  ),
+.cart-fulfillment__payment
+  .checkout-payment-method-picker__card--cashOnDelivery:not(
+    .checkout-payment-method-picker__card--selected
+  ) {
+  background: transparent;
+  border-color: var(--iz-color-border);
+  color: var(--iz-color-text);
+}
+
+.cart-fulfillment__payment .checkout-payment-method-picker__card--selected {
+  background: #fff;
+  border: 2px solid var(--iz-color-action);
+  color: var(--iz-color-text);
+}
+
+:root[data-theme="dark"]
+  .cart-fulfillment__payment
+  .checkout-payment-method-picker__card--selected {
+  background: var(--iz-color-surface);
+}
+
+:root:not([data-theme="dark"]) .cart-fulfillment__details .checkout-form__pickup-group,
+:root:not([data-theme="dark"]) .cart-fulfillment__details .checkout-form__input {
+  background: var(--iz-color-surface);
+}
+
+.cart-fulfillment__dock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--iz-color-ink) 8%, transparent);
+  border-radius: 16px;
+  background: var(--iz-color-surface-elevated);
+  overflow: hidden;
+}

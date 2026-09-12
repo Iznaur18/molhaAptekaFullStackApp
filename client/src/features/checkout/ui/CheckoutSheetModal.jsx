@@ -1,5 +1,5 @@
 import { createPortal } from "react-dom";
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 import { CART_PAGE_UI, CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
 import { useDialogFocusTrap } from "../../../shared/lib/useDialogFocusTrap.js";
@@ -7,6 +7,7 @@ import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { CheckoutForm } from "../../../shared/ui/CheckoutForm/CheckoutForm.jsx";
 import { useCheckoutSheetModalAnimation } from "../model/useCheckoutSheetModalAnimation.js";
 
+import "./CheckoutFulfillmentCards.css";
 import "./CheckoutSheetModal.css";
 
 /**
@@ -57,9 +58,16 @@ export function CheckoutSheetModal({
   onSubmit,
 }) {
   const titleId = useId();
+  const checkoutFormId = useId();
   const panelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const closeButtonRef = useRef(/** @type {HTMLButtonElement | null} */ (null));
   const { mounted, isVisible } = useCheckoutSheetModalAnimation(isOpen);
+  /** @type {[HTMLElement | null, import('react').Dispatch<import('react').SetStateAction<HTMLElement | null>>]} */
+  const [fulfillmentMethodHostEl, setFulfillmentMethodHostEl] = useState(null);
+  /** @type {[HTMLElement | null, import('react').Dispatch<import('react').SetStateAction<HTMLElement | null>>]} */
+  const [paymentMethodHostEl, setPaymentMethodHostEl] = useState(null);
+  /** @type {[HTMLElement | null, import('react').Dispatch<import('react').SetStateAction<HTMLElement | null>>]} */
+  const [submitHostEl, setSubmitHostEl] = useState(null);
 
   useScrollLock(mounted);
   useDialogFocusTrap(panelRef, {
@@ -124,28 +132,46 @@ export function CheckoutSheetModal({
           </button>
         </header>
         <div className="checkout-sheet-modal__body">
-          <CheckoutForm
-            defaultDeliveryAddress={defaultDeliveryAddress}
-            savedDeliveryAddresses={savedDeliveryAddresses}
-            pickupLocations={pickupLocations}
-            deliveryAvailable={deliveryAvailable}
-            pickupAvailable={pickupAvailable}
-            fulfillmentMode={fulfillmentMode}
-            courierDelivery={courierDelivery}
-            deliveryProductIds={deliveryProductIds}
-            initialFulfillmentMethod={initialFulfillmentMethod}
-            onFulfillmentMethodChange={onFulfillmentMethodChange}
-            cardPrepaidAvailable={cardPrepaidAvailable}
-            allowedPaymentMethods={allowedPaymentMethods}
-            isSubmitting={isSubmitting}
-            submitError={submitError}
-            submitSuccess={submitSuccess}
-            isDisabled={isDisabled}
-            showHeading={false}
-            pinSubmitToBottom
-            onSubmit={onSubmit}
-          />
+          <div className="cart-fulfillment checkout-sheet-modal__fulfillment">
+            <div
+              ref={setFulfillmentMethodHostEl}
+              className="cart-fulfillment__method-card"
+            />
+            <div className="cart-fulfillment__details">
+              <CheckoutForm
+                id={checkoutFormId}
+                defaultDeliveryAddress={defaultDeliveryAddress}
+                savedDeliveryAddresses={savedDeliveryAddresses}
+                pickupLocations={pickupLocations}
+                deliveryAvailable={deliveryAvailable}
+                pickupAvailable={pickupAvailable}
+                fulfillmentMode={fulfillmentMode}
+                courierDelivery={courierDelivery}
+                deliveryProductIds={deliveryProductIds}
+                initialFulfillmentMethod={initialFulfillmentMethod}
+                onFulfillmentMethodChange={onFulfillmentMethodChange}
+                cardPrepaidAvailable={cardPrepaidAvailable}
+                allowedPaymentMethods={allowedPaymentMethods}
+                isSubmitting={isSubmitting}
+                submitError={submitError}
+                submitSuccess={submitSuccess}
+                isDisabled={isDisabled}
+                showHeading={false}
+                showSubmitButton
+                pinSubmitToBottom={false}
+                fulfillmentMethodPortalTarget={fulfillmentMethodHostEl}
+                paymentMethodPortalTarget={paymentMethodHostEl}
+                submitPortalTarget={submitHostEl}
+                onSubmit={onSubmit}
+              />
+            </div>
+            <div ref={setPaymentMethodHostEl} className="cart-fulfillment__payment" />
+          </div>
         </div>
+        <div
+          ref={setSubmitHostEl}
+          className="cart-fulfillment__dock checkout-sheet-modal__submit-dock"
+        />
       </div>
     </div>,
     document.body,

@@ -1,7 +1,7 @@
 .product-details-content-switcher {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--product-details-modal-gap) * 0.75);
+  gap: var(--product-details-section-gap);
   min-width: 0;
 }
 

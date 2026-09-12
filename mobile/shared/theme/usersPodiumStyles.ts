@@ -99,25 +99,29 @@ export const useUsersPodiumStyles = createThemedStyles((theme) => ({
   },
   metrics: {
     width: "100%",
-    gap: 4,
+    gap: 3,
+    alignItems: "center",
   },
   metricRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 4,
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 2,
+    width: "100%",
   },
   metricLabel: {
     flexShrink: 1,
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: "600",
     color: theme.colors.textMuted,
+    textAlign: "center",
   },
   metricValue: {
     flexShrink: 0,
-    fontSize: 10,
+    fontSize: 18,
     fontWeight: "700",
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
+    textAlign: "center",
   },
 }));
 

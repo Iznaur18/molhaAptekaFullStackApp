@@ -1,7 +1,8 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { HEADER_USERS_BUTTON_UI } from "../../../shared/config/appUiCopy.js";
+import { ViewerRegionPickerSheet } from "../../../entities/region/ui/ViewerRegionPickerSheet.jsx";
 import {
   prefersReducedMotion,
   scheduleOpenAfterPaint,
@@ -16,29 +17,43 @@ import {
 
 import "./HeaderUsersStretchMenu.css";
 
-const MENU_ITEMS = buildHeaderUsersMenuItems();
-const OPEN_HEIGHT_PX = resolveHeaderUsersStretchMenuHeight(MENU_ITEMS.length);
-
 /**
  * @param {{
  *   activeItemKey?: import("../lib/buildHeaderUsersMenuItems.js").HeaderUsersMenuItemKey | null;
- *   onItemAction: (action: import("../lib/buildHeaderUsersMenuItems.js").HeaderUsersMenuItemAction) => void;
+ *   onItemAction: (action: Exclude<
+ *     import("../lib/buildHeaderUsersMenuItems.js").HeaderUsersMenuItemAction,
+ *     "region"
+ *   >) => void;
  *   variant?: "default" | "cta";
+ *   showViewerRegion?: boolean;
+ *   viewerRegionCode?: string;
+ *   onViewerRegionChange?: (code: string) => void;
  * }} props
  */
 export function HeaderUsersStretchMenu({
   activeItemKey = null,
   onItemAction,
   variant = "default",
+  showViewerRegion = false,
+  viewerRegionCode = "",
+  onViewerRegionChange,
 }) {
   const menuId = useId();
+  const regionSheetId = useId();
   const anchorRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const [isOpen, setIsOpen] = useState(false);
   const [portalVisible, setPortalVisible] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [regionSheetOpen, setRegionSheetOpen] = useState(false);
   const [portalAnchor, setPortalAnchor] = useState(
     /** @type {{ top: number; left: number } | null} */ (null),
   );
+
+  const menuItems = useMemo(
+    () => buildHeaderUsersMenuItems({ includeRegion: showViewerRegion }),
+    [showViewerRegion],
+  );
+  const openHeightPx = resolveHeaderUsersStretchMenuHeight(menuItems.length);
 
   const measureAnchor = () => {
     const node = anchorRef.current;
@@ -133,6 +148,12 @@ export function HeaderUsersStretchMenu({
     }
 
     setIsOpen(false);
+
+    if (item.action === "region") {
+      setRegionSheetOpen(true);
+      return;
+    }
+
     onItemAction(item.action);
   };
 
@@ -149,7 +170,7 @@ export function HeaderUsersStretchMenu({
       className={[shellClassName, extraClassName].filter(Boolean).join(" ")}
       style={{
         ...style,
-        "--header-users-stretch-open-height": `${OPEN_HEIGHT_PX}px`,
+        "--header-users-stretch-open-height": `${openHeightPx}px`,
       }}
       role="menu"
       id={menuId}
@@ -172,7 +193,7 @@ export function HeaderUsersStretchMenu({
         )}
       </button>
       <div className="header-users-stretch__items" aria-hidden={!isExpanded}>
-        {MENU_ITEMS.map((item) => {
+        {menuItems.map((item) => {
           const isActive = item.key === activeItemKey;
           const itemClassName = [
             "header-users-stretch__item",
@@ -201,6 +222,8 @@ export function HeaderUsersStretchMenu({
   );
 
   const showPortal = portalVisible && portalAnchor != null;
+  const canChangeRegion =
+    showViewerRegion && typeof onViewerRegionChange === "function";
 
   return (
     <div className="header-users-stretch" ref={anchorRef}>
@@ -226,6 +249,18 @@ export function HeaderUsersStretchMenu({
             document.body,
           )
         : null}
+      {canChangeRegion ? (
+        <ViewerRegionPickerSheet
+          id={regionSheetId}
+          isOpen={regionSheetOpen}
+          value={viewerRegionCode}
+          onClose={() => setRegionSheetOpen(false)}
+          onSelect={(code) => {
+            onViewerRegionChange(code);
+            setRegionSheetOpen(false);
+          }}
+        />
+      ) : null}
     </div>
   );
 }

@@ -83,14 +83,6 @@ export function CheckoutSellerDeliveryCost({
         </p>
       ) : null}
 
-      {!isFree && billableKm != null ? (
-        <p className="checkout-seller-delivery__hint">
-          {distance?.distanceSource === SELLER_DELIVERY_DISTANCE_SOURCE_ESTIMATE
-            ? CHECKOUT_FORM_UI.SELLER_DELIVERY_DISTANCE_ESTIMATE(billableKm)
-            : CHECKOUT_FORM_UI.SELLER_DELIVERY_DISTANCE(billableKm)}
-        </p>
-      ) : null}
-
       {!isFree && normalized.freeFromRub > 0 ? (
         <p className="checkout-seller-delivery__hint">
           {CHECKOUT_FORM_UI.SELLER_DELIVERY_FREE_FROM(
@@ -111,6 +103,13 @@ export function CheckoutSellerDeliveryCost({
               {isFree ? CHECKOUT_FORM_UI.SELLER_DELIVERY_FREE : formatPriceRub(feeRub)}
             </dd>
           </div>
+          {!isFree && billableKm != null ? (
+            <div className="checkout-seller-delivery__hint checkout-seller-delivery__hint--under-delivery">
+              {distance?.distanceSource === SELLER_DELIVERY_DISTANCE_SOURCE_ESTIMATE
+                ? CHECKOUT_FORM_UI.SELLER_DELIVERY_DISTANCE_ESTIMATE(billableKm)
+                : CHECKOUT_FORM_UI.SELLER_DELIVERY_DISTANCE(billableKm)}
+            </div>
+          ) : null}
           <div className="checkout-seller-delivery__total-row checkout-seller-delivery__total-row--sum">
             <dt>{CHECKOUT_FORM_UI.TOTAL_TO_PAY}</dt>
             <dd>

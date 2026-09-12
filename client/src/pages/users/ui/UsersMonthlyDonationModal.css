@@ -1,0 +1,163 @@
+/**
+ * Bottom sheet — анимация и радиус как у ProductBadgeExplainSheet (2rem top).
+ */
+.users-monthly-donation-modal__backdrop {
+  --donation-sheet-enter-ms: 280ms;
+  --donation-sheet-exit-ms: 220ms;
+  --donation-sheet-enter-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --donation-sheet-exit-ease: cubic-bezier(0.55, 0.055, 0.675, 1);
+  --donation-sheet-radius: 2rem;
+
+  position: fixed;
+  inset: 0;
+  height: auto;
+  max-height: none;
+  z-index: var(--iz-z-modal-shell, 1200);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: transparent;
+  overflow: visible;
+  overscroll-behavior: none;
+}
+
+.users-monthly-donation-modal__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--iz-color-ink) 28%, transparent) 0%,
+    color-mix(in srgb, var(--iz-color-ink) 48%, transparent) 38%,
+    color-mix(in srgb, var(--iz-color-ink) 68%, transparent) 68%,
+    color-mix(in srgb, var(--iz-color-ink) 82%, transparent) 100%
+  );
+  opacity: 0;
+  transition: opacity var(--donation-sheet-exit-ms) var(--donation-sheet-exit-ease);
+}
+
+.users-monthly-donation-modal__backdrop--open .users-monthly-donation-modal__scrim {
+  opacity: 1;
+  transition: opacity var(--donation-sheet-enter-ms) var(--donation-sheet-enter-ease);
+}
+
+.users-monthly-donation-modal__dismiss {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.users-monthly-donation-modal__panel {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 30rem;
+  max-height: min(90dvh, 36rem);
+  margin: 0;
+  padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  border: none;
+  border-radius: var(--donation-sheet-radius) var(--donation-sheet-radius) 0 0;
+  corner-shape: squircle;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  box-shadow: 0 -12px 40px color-mix(in srgb, var(--iz-color-ink) 18%, transparent);
+  overflow: hidden;
+  isolation: isolate;
+  transform: translate3d(0, 100%, 0);
+  transition: transform var(--donation-sheet-exit-ms) var(--donation-sheet-exit-ease);
+  will-change: transform;
+}
+
+.users-monthly-donation-modal__backdrop--open .users-monthly-donation-modal__panel {
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--donation-sheet-enter-ms) var(--donation-sheet-enter-ease);
+}
+
+.users-monthly-donation-modal__media {
+  margin: -1rem -1rem 0;
+  overflow: hidden;
+  background: var(--iz-color-surface-muted, var(--iz-color-bg));
+}
+
+.users-monthly-donation-modal__image {
+  display: block;
+  width: 100%;
+  max-height: 12rem;
+  object-fit: cover;
+}
+
+.users-monthly-donation-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.users-monthly-donation-modal__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.users-monthly-donation-modal__close {
+  flex-shrink: 0;
+}
+
+.users-monthly-donation-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 0;
+  overflow: auto;
+}
+
+.users-monthly-donation-modal__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.users-monthly-donation-modal__input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.5rem;
+  background: var(--iz-color-surface);
+  color: inherit;
+  font: inherit;
+}
+
+.users-monthly-donation-modal__error {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--iz-color-danger, #b42318);
+}
+
+.users-monthly-donation-modal__footer {
+  display: flex;
+  justify-content: stretch;
+  flex-shrink: 0;
+}
+
+.users-monthly-donation-modal__footer .app-btn {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .users-monthly-donation-modal__scrim,
+  .users-monthly-donation-modal__panel {
+    transition: none;
+  }
+}

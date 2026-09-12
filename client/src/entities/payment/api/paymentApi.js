@@ -41,6 +41,24 @@ export async function createLoyaltyPointsPayment(payload) {
 }
 
 /**
+ * `POST /payments/users-monthly-donation` — пожертвование в месячный прогресс.
+ *
+ * @param {{ amountRub: number; returnUrl: string; idempotencyKey?: string }} payload
+ * @returns {Promise<{ paymentId: string; confirmationUrl: string; amountRub: number }>}
+ */
+export async function createUsersMonthlyDonationPayment(payload) {
+  try {
+    const { data } = await apiClient.post("/payments/users-monthly-donation", payload);
+    if (!data?.success || !data.data?.payment) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+    return data.data.payment;
+  } catch (e) {
+    throw new Error(toMessage(e));
+  }
+}
+
+/**
  * `POST /payments/order/:orderId` — предоплата заказа картой.
  *
  * @param {{ orderId: string; returnUrl: string; idempotencyKey?: string }} payload

@@ -93,6 +93,7 @@ export function ProductDetailsModalDetailsTab({
     blockedPurchaseLabel,
     showSellerClosedPurchaseButton,
     sellerClosedPurchaseLabel,
+    showOwnProductPurchaseButton,
     outOfStockPurchaseLabel,
     purchaseLimit,
     handleAuctionShortcutClick,
@@ -214,7 +215,8 @@ export function ProductDetailsModalDetailsTab({
       (canShowAddToCart ||
         showOutOfStockPurchaseButton ||
         showBlockedPurchaseButton ||
-        showSellerClosedPurchaseButton) ? (
+        showSellerClosedPurchaseButton ||
+        showOwnProductPurchaseButton) ? (
         <ProductDetailsModalPurchaseActions
           productId={productId}
           isAuthorized={isAuthorized}
@@ -226,6 +228,7 @@ export function ProductDetailsModalDetailsTab({
           blockedPurchaseLabel={blockedPurchaseLabel}
           showSellerClosedPurchaseButton={showSellerClosedPurchaseButton}
           sellerClosedPurchaseLabel={sellerClosedPurchaseLabel}
+          showOwnProductPurchaseButton={showOwnProductPurchaseButton}
           outOfStockPurchaseLabel={outOfStockPurchaseLabel}
           unitPriceSnapshot={unitPriceSnapshot}
         />

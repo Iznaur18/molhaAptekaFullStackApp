@@ -87,6 +87,7 @@ import {
 import { sellerCommerceDefaultsValidation } from "./seller/sellerCommerceDefaultsValidation.js";
 import {
   loyaltyPointsPaymentValidation,
+  usersMonthlyDonationPaymentValidation,
   orderPaymentValidation,
   platformServicePaymentValidation,
   paymentIdParamsValidation,
@@ -246,6 +247,7 @@ export {
   staffSafeDealModerationValidation,
   sellerCommerceDefaultsValidation,
   loyaltyPointsPaymentValidation,
+  usersMonthlyDonationPaymentValidation,
   orderPaymentValidation,
   platformServicePaymentValidation,
   paymentIdParamsValidation,

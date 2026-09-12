@@ -95,6 +95,9 @@ const EMPTY_SAVED_DELIVERY_ADDRESSES = [];
  *   showHeading?: boolean;
  *   showSubmitButton?: boolean;
  *   id?: string;
+ *   paymentMethodPortalTarget?: Element | null;
+ *   fulfillmentMethodPortalTarget?: Element | null;
+ *   submitPortalTarget?: Element | null;
  * }} props
  */
 export function CheckoutForm({
@@ -121,6 +124,9 @@ export function CheckoutForm({
   showHeading = true,
   showSubmitButton = true,
   id: formIdProp,
+  paymentMethodPortalTarget = null,
+  fulfillmentMethodPortalTarget = null,
+  submitPortalTarget = null,
 }) {
   const generatedFormId = useId();
   const formId = formIdProp || generatedFormId;
@@ -149,6 +155,7 @@ export function CheckoutForm({
   });
   const [paymentMethod, setPaymentMethod] = useState(ORDER_PAYMENT_METHOD_DEFAULT);
   const [localError, setLocalError] = useState("");
+  const [deliveryMapOpen, setDeliveryMapOpen] = useState(false);
 
   // Способы, которые реально уйдут на сервер: умеет площадка И принимает
   // продавец. Считаем здесь же, а не только в пикере, потому что дефолтный
@@ -193,17 +200,12 @@ export function CheckoutForm({
   const handleSavedAddressSelect = (nextId) => {
     setSelectedSavedAddressId(nextId);
     if (nextId === CHECKOUT_SAVED_ADDRESS_CUSTOM_ID) {
-      setDeliveryAddress({
-        line: "",
-        flat: "",
-        fiasId: "",
-        geo: null,
-        regionCode: null,
-        selectedFromSuggest: false,
-      });
+      // Текущий адрес остаётся в поле/на карте как стартовая точка.
+      setDeliveryMapOpen(true);
       return;
     }
 
+    setDeliveryMapOpen(false);
     const item = savedAddresses.find((address) => address.id === nextId);
     if (item) {
       setDeliveryAddress(deliveryAddressFromSaved(item));
@@ -428,8 +430,16 @@ export function CheckoutForm({
     </button>
   );
 
+  const portaledSubmit =
+    showSubmitButton && submitPortalTarget instanceof Element
+      ? createPortal(renderSubmitButton(true), submitPortalTarget)
+      : null;
+
   const dockedSubmit =
-    dockSubmit && !pinSubmitToBottom && typeof document !== "undefined"
+    !portaledSubmit &&
+    dockSubmit &&
+    !pinSubmitToBottom &&
+    typeof document !== "undefined"
       ? createPortal(
           <div className="product-modal-shell__docked-footer checkout-form__docked-footer">
             {renderSubmitButton(true)}
@@ -438,8 +448,106 @@ export function CheckoutForm({
         )
       : null;
 
+  const paymentMethodPicker = (
+    <CheckoutPaymentMethodPicker
+      value={paymentMethod}
+      onChange={setPaymentMethod}
+      disabled={isDisabled || isSubmitting}
+      legend={CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD}
+      cardPrepaidAvailable={cardPrepaidAvailable}
+      allowedMethods={allowedPaymentMethods}
+    />
+  );
+
+  const portaledPaymentMethod =
+    paymentMethodPortalTarget instanceof Element
+      ? createPortal(paymentMethodPicker, paymentMethodPortalTarget)
+      : null;
+
+  const fulfillmentMethodPicker =
+    fulfillmentMode == null ? (
+      <div className="checkout-form__fulfillment">
+        <span className="checkout-form__label" id={`${formId}-fulfillment-label`}>
+          {CHECKOUT_FORM_UI.LABEL_FULFILLMENT}
+        </span>
+        <div
+          className="checkout-form__fulfillment-row"
+          role="radiogroup"
+          aria-labelledby={`${formId}-fulfillment-label`}
+        >
+          <button
+            type="button"
+            role="radio"
+            aria-checked={isPickup}
+            aria-disabled={!pickupSelectable || isDisabled || isSubmitting}
+            className={[
+              "checkout-form__fulfillment-option",
+              isPickup ? "checkout-form__fulfillment-option--active" : "",
+              !pickupSelectable ? "checkout-form__fulfillment-option--disabled" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            disabled={isDisabled || isSubmitting}
+            onClick={() => {
+              if (!pickupSelectable) {
+                setLocalError(
+                  pickupOptionHint || CHECKOUT_FORM_UI.FULFILLMENT_PICKUP_UNAVAILABLE,
+                );
+                return;
+              }
+              setLocalError("");
+              applyFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
+            }}
+          >
+            <span className="checkout-form__fulfillment-option-title">
+              {CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}
+            </span>
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={!isPickup}
+            aria-disabled={!deliverySelectable || isDisabled || isSubmitting}
+            className={[
+              "checkout-form__fulfillment-option",
+              !isPickup ? "checkout-form__fulfillment-option--active" : "",
+              !deliverySelectable ? "checkout-form__fulfillment-option--disabled" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            disabled={isDisabled || isSubmitting}
+            onClick={() => {
+              if (!deliverySelectable) {
+                setLocalError(
+                  deliveryOptionHint ||
+                    CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_UNAVAILABLE,
+                );
+                return;
+              }
+              setLocalError("");
+              applyFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
+            }}
+          >
+            <span className="checkout-form__fulfillment-option-title">
+              {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
+            </span>
+          </button>
+        </div>
+      </div>
+    ) : null;
+
+  const portaledFulfillmentMethod =
+    fulfillmentMethodPicker && fulfillmentMethodPortalTarget instanceof Element
+      ? createPortal(fulfillmentMethodPicker, fulfillmentMethodPortalTarget)
+      : null;
+
+  // В корзине способ уже отдельной карточкой — неактивный шаг не дублируем.
+  const hideInactiveFulfillmentSections = Boolean(portaledFulfillmentMethod);
+
   return (
     <>
+      {portaledFulfillmentMethod}
+      {portaledPaymentMethod}
       <form id={formId} className={formClassName} onSubmit={handleSubmit}>
         <div className="checkout-form__fields">
           {showHeading ? (
@@ -449,83 +557,9 @@ export function CheckoutForm({
           {/* Способ уже выбран в корзине на каждого продавца — здесь
               переключателю делать нечего. Не hidden: у блока свой display,
               он перебил бы атрибут. */}
-          {fulfillmentMode == null ? (
-            <div className="checkout-form__fulfillment">
-              <span className="checkout-form__label" id={`${formId}-fulfillment-label`}>
-                {CHECKOUT_FORM_UI.LABEL_FULFILLMENT}
-              </span>
-              <div
-                className="checkout-form__fulfillment-row"
-                role="radiogroup"
-                aria-labelledby={`${formId}-fulfillment-label`}
-              >
-                <button
-                  type="button"
-                  role="radio"
-                  aria-checked={isPickup}
-                  aria-disabled={!pickupSelectable || isDisabled || isSubmitting}
-                  className={[
-                    "checkout-form__fulfillment-option",
-                    isPickup ? "checkout-form__fulfillment-option--active" : "",
-                    !pickupSelectable
-                      ? "checkout-form__fulfillment-option--disabled"
-                      : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  disabled={isDisabled || isSubmitting}
-                  onClick={() => {
-                    if (!pickupSelectable) {
-                      setLocalError(
-                        pickupOptionHint ||
-                          CHECKOUT_FORM_UI.FULFILLMENT_PICKUP_UNAVAILABLE,
-                      );
-                      return;
-                    }
-                    setLocalError("");
-                    applyFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
-                  }}
-                >
-                  <span className="checkout-form__fulfillment-option-title">
-                    {CHECKOUT_FORM_UI.FULFILLMENT_PICKUP}
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  role="radio"
-                  aria-checked={!isPickup}
-                  aria-disabled={!deliverySelectable || isDisabled || isSubmitting}
-                  className={[
-                    "checkout-form__fulfillment-option",
-                    !isPickup ? "checkout-form__fulfillment-option--active" : "",
-                    !deliverySelectable
-                      ? "checkout-form__fulfillment-option--disabled"
-                      : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  disabled={isDisabled || isSubmitting}
-                  onClick={() => {
-                    if (!deliverySelectable) {
-                      setLocalError(
-                        deliveryOptionHint ||
-                          CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY_UNAVAILABLE,
-                      );
-                      return;
-                    }
-                    setLocalError("");
-                    applyFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
-                  }}
-                >
-                  <span className="checkout-form__fulfillment-option-title">
-                    {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
-                  </span>
-                </button>
-              </div>
-            </div>
-          ) : null}
+          {portaledFulfillmentMethod ? null : fulfillmentMethodPicker}
 
-          {!needsPickup && pickupSelectable ? (
+          {!needsPickup && pickupSelectable && !hideInactiveFulfillmentSections ? (
             <section
               className="checkout-form__fulfillment-section checkout-form__fulfillment-section--pickup checkout-form__fulfillment-section--off checkout-form__block_off"
               aria-disabled="true"
@@ -639,7 +673,7 @@ export function CheckoutForm({
             </section>
           ) : null}
 
-          {isMixedFulfillment ? (
+          {isMixedFulfillment && !hideInactiveFulfillmentSections ? (
             <div
               className="checkout-form__fulfillment-split"
               role="separator"
@@ -647,7 +681,7 @@ export function CheckoutForm({
             />
           ) : null}
 
-          {!needsDelivery && deliverySelectable ? (
+          {!needsDelivery && deliverySelectable && !hideInactiveFulfillmentSections ? (
             <section
               className="checkout-form__fulfillment-section checkout-form__fulfillment-section--delivery checkout-form__fulfillment-section--off checkout-form__block_off"
               aria-disabled="true"
@@ -684,6 +718,8 @@ export function CheckoutForm({
                   disabled={isDisabled || isSubmitting}
                   displayOnly
                   lineInputClassName="checkout-form__input"
+                  mapOpen={deliveryMapOpen}
+                  onMapOpenChange={setDeliveryMapOpen}
                   labels={{
                     line: CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS,
                   }}
@@ -722,14 +758,7 @@ export function CheckoutForm({
             </section>
           ) : null}
 
-          <CheckoutPaymentMethodPicker
-            value={paymentMethod}
-            onChange={setPaymentMethod}
-            disabled={isDisabled || isSubmitting}
-            legend={CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD}
-            cardPrepaidAvailable={cardPrepaidAvailable}
-            allowedMethods={allowedPaymentMethods}
-          />
+          {portaledPaymentMethod ? null : paymentMethodPicker}
 
           {displayError ? (
             <p className="checkout-form__error" role="alert">
@@ -748,10 +777,11 @@ export function CheckoutForm({
           ) : null}
         </div>
 
-        {showSubmitButton && (!dockSubmit || pinSubmitToBottom)
+        {showSubmitButton && !portaledSubmit && (!dockSubmit || pinSubmitToBottom)
           ? renderSubmitButton(false)
           : null}
       </form>
+      {portaledSubmit}
       {dockedSubmit}
     </>
   );

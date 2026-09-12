@@ -46,6 +46,14 @@
   min-width: 0;
 }
 
+.product-details-modal__below-fold {
+  display: flex;
+  flex-direction: column;
+  gap: var(--product-details-section-gap);
+  width: 100%;
+  min-width: 0;
+}
+
 .product-details-modal__auction-section {
   scroll-margin-top: var(--product-details-modal-gap);
 }

@@ -1,5 +1,6 @@
 .product-details-modal {
   --product-details-modal-gap: var(--iz-space-3);
+  --product-details-section-gap: 6px;
   --product-details-modal-tabs-bg: var(--iz-color-surface-elevated);
   --product-details-modal-tabs-gap-bottom: var(--iz-space-3);
   --product-details-modal-mobile-dock-max-height: 7.25rem;

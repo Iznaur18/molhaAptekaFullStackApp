@@ -1,7 +1,7 @@
 .product-details-seller-stack {
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
+  gap: var(--product-details-section-gap);
   width: 100%;
   margin: 0;
 }

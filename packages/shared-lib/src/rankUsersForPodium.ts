@@ -1,6 +1,8 @@
 export type UsersPodiumCandidate = {
   _id: string;
   isBlockedUser?: boolean;
+  /** Lifetime-сумма успешных пожертвований (₽). */
+  totalDonatedRub?: number;
   totalSalesCount?: number;
   followersCount?: number;
   userLoyaltyPoints?: number;
@@ -53,30 +55,10 @@ const compareUsersForPodium = (
   left: UsersPodiumCandidate,
   right: UsersPodiumCandidate,
 ): number => {
-  const pointsDiff =
-    toNonNegativeInt(right.userLoyaltyPoints) -
-    toNonNegativeInt(left.userLoyaltyPoints);
-  if (pointsDiff !== 0) {
-    return pointsDiff;
-  }
-
-  const salesDiff =
-    toNonNegativeInt(right.totalSalesCount) - toNonNegativeInt(left.totalSalesCount);
-  if (salesDiff !== 0) {
-    return salesDiff;
-  }
-
-  const ratingDiff =
-    getUserPodiumAverageRating(right.userRatingByVotes) -
-    getUserPodiumAverageRating(left.userRatingByVotes);
-  if (ratingDiff !== 0) {
-    return ratingDiff > 0 ? 1 : -1;
-  }
-
-  const followersDiff =
-    toNonNegativeInt(right.followersCount) - toNonNegativeInt(left.followersCount);
-  if (followersDiff !== 0) {
-    return followersDiff;
+  const donatedDiff =
+    toNonNegativeInt(right.totalDonatedRub) - toNonNegativeInt(left.totalDonatedRub);
+  if (donatedDiff !== 0) {
+    return donatedDiff;
   }
 
   return String(left._id).localeCompare(String(right._id));

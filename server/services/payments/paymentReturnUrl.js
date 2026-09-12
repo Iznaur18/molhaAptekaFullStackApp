@@ -25,3 +25,22 @@ export function buildReturnUrl(relativePath) {
   }
   return `${origin}${path}`;
 }
+
+/**
+ * Добавляет paymentId в return path, чтобы после редиректа с ЮKassa sync
+ * работал без sessionStorage (другая вкладка / потеря storage).
+ *
+ * @param {string} relativePath
+ * @param {string} paymentId
+ * @returns {string}
+ */
+export function appendPaymentIdToReturnPath(relativePath, paymentId) {
+  const path = String(relativePath ?? "").trim();
+  const id = String(paymentId ?? "").trim();
+  if (!id) {
+    return path;
+  }
+  const url = new URL(path, "https://return.local");
+  url.searchParams.set("paymentId", id);
+  return `${url.pathname}${url.search}${url.hash}`;
+}

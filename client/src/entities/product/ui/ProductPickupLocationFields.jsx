@@ -843,17 +843,8 @@ export function ProductPickupLocationFields({
               </label>
             ))}
           </div>
-          <p className="product-pickup-location-fields__hint">
-            {PRODUCT_PICKUP_UI.CARRIERS_HINT}
-          </p>
         </>
       ) : null}
-
-      <p className="product-pickup-location-fields__hint">
-        {multiSelectEnabled
-          ? PRODUCT_PICKUP_UI.PICKUP_MULTI_HINT
-          : PRODUCT_PICKUP_UI.METHODS_REQUIRED_HINT}
-      </p>
     </div>
   );
 }

@@ -127,7 +127,7 @@
 }
 
 .product-details-modal--page .product-details-modal__tab-panel > * + * {
-  margin-top: var(--product-details-modal-gap);
+  margin-top: var(--product-details-section-gap);
 }
 
 .product-details-modal--page.product-details-modal--mobile-dock-active
@@ -302,7 +302,7 @@
 .product-details-modal--page .product-details-modal__price-block--inline-actions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--product-details-section-gap);
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -395,7 +395,7 @@
 .product-details-modal--page .product-details-modal__seller-extras {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--product-details-section-gap);
   width: 100%;
   min-width: 0;
   margin: 0;
@@ -405,7 +405,7 @@
 .product-details-modal--page .product-details-modal__commerce-fold {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--product-details-section-gap);
   width: 100%;
   min-width: 0;
   padding-inline: var(--iz-space-4);
@@ -424,7 +424,7 @@
 .product-details-modal--page .product-details-seller-preview {
   box-sizing: border-box;
   width: calc(100% - 2 * var(--iz-space-4));
-  margin: var(--iz-space-2) var(--iz-space-4) 0;
+  margin: 0 var(--iz-space-4);
 }
 
 .product-details-modal--page .product-details-modal__stats-grid--standalone {
@@ -464,16 +464,17 @@
 
 .product-details-page__docked-footer
   .product-details-modal__price-actions--mobile-dock {
-  display: grid;
+  display: flex;
   width: 100%;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
   gap: 0.45rem;
 }
 
 .product-details-page__docked-footer
   .product-details-modal__price-actions--mobile-dock
   .product-details-modal__price-actions-cart {
-  grid-column: 1 / -1;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .product-details-page__docked-footer .add-to-cart,
@@ -721,7 +722,7 @@ body:has(.product-details-page) .app-shell {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   align-items: stretch;
-  gap: 10px;
+  gap: var(--product-details-section-gap);
 }
 
 .product-details-modal--page-split
@@ -737,7 +738,7 @@ body:has(.product-details-page) .app-shell {
   .product-details-modal__below-fold {
   display: flex;
   flex-direction: column;
-  gap: var(--product-details-modal-gap);
+  gap: var(--product-details-section-gap);
   min-width: 0;
 }
 

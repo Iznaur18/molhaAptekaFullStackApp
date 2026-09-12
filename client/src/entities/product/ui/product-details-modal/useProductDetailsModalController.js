@@ -175,6 +175,7 @@ export function useProductDetailsModalController({
     isSellerClosed &&
     !isPurchaseBlocked &&
     !isProductOutOfStock;
+  const showOwnProductPurchaseButton = product?._id != null && tabs.isOwnProduct;
   const outOfStockPurchaseLabel = product
     ? resolveProductOutOfStockOverlayLabel(product)
     : "";
@@ -210,6 +211,7 @@ export function useProductDetailsModalController({
     blockedPurchaseLabel: blockedLabel,
     showSellerClosedPurchaseButton,
     sellerClosedPurchaseLabel: sellerClosedLabel,
+    showOwnProductPurchaseButton,
     isPurchaseBlocked,
     outOfStockPurchaseLabel,
     purchaseLimit,

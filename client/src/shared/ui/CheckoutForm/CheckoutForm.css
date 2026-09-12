@@ -104,7 +104,7 @@
   border: none;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 10px;
 }
 
 .checkout-form__fulfillment-row {

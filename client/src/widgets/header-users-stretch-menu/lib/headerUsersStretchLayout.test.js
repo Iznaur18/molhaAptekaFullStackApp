@@ -16,4 +16,9 @@ describe("resolveHeaderUsersStretchMenuHeight", () => {
     // 44 + 12 + 3*44 + 2*8 + 8 = 212
     expect(resolveHeaderUsersStretchMenuHeight(3)).toBe(212);
   });
+
+  it("matches formula for 4 items (with region)", () => {
+    // 44 + 12 + 4*44 + 3*8 + 8 = 264
+    expect(resolveHeaderUsersStretchMenuHeight(4)).toBe(264);
+  });
 });

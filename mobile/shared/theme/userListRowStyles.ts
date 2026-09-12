@@ -116,6 +116,7 @@ export const useUserListRowStyles = createThemedStyles((theme) => ({
     paddingVertical: 6,
     borderRadius: 8,
     backgroundColor: theme.colors.surfaceMuted,
+    alignItems: "center",
   },
   metricCellStacked: {
     width: "100%",
@@ -128,15 +129,17 @@ export const useUserListRowStyles = createThemedStyles((theme) => ({
     fontWeight: "600",
     color: theme.colors.textMuted,
     lineHeight: 13,
+    textAlign: "center",
   },
   metricValue: {
     fontSize: 13,
     fontWeight: "700",
     color: theme.colors.text,
     fontVariant: ["tabular-nums"],
+    textAlign: "center",
   },
   metricValueAmount: {
-    fontSize: 12,
+    fontSize: 20,
   },
   metricValueMuted: {
     fontSize: 11,

@@ -2,6 +2,7 @@ import {
   platformServicePaymentParamsSchema,
   platformServicePaymentBodySchema,
   loyaltyPointsPaymentBodySchema,
+  usersMonthlyDonationPaymentBodySchema,
   orderPaymentBodySchema,
   orderPaymentParamsSchema,
   paymentIdParamsSchema,
@@ -12,6 +13,10 @@ import { validateParamsZod } from "../../middlewares/validateParamsZod.js";
 
 export const loyaltyPointsPaymentValidation = [
   validateBodyZod(loyaltyPointsPaymentBodySchema),
+];
+
+export const usersMonthlyDonationPaymentValidation = [
+  validateBodyZod(usersMonthlyDonationPaymentBodySchema),
 ];
 
 export const paymentIdParamsValidation = [validateParamsZod(paymentIdParamsSchema)];

@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import { formatLoyaltyPointsCount } from "@izibuy/shared-lib";
 
-import { formatSearchRowRatingCompact } from "@/entities/user/lib/formatSearchRowRating";
-import { formatSearchRowTotalSalesCount } from "@/entities/user/lib/formatSearchRowTotalSales";
 import { pickUserProfilePhotoUrl } from "@/entities/user/lib/pickUserProfilePhotoUrl";
 import type { UserSearchListItem } from "@/entities/user/api/fetchUsersSearchPage";
 import { DEFAULT_USER_AVATAR_URL } from "@/entities/user/model/constants";
@@ -36,22 +35,11 @@ export const UserListRow = ({ user, onRowClick, podiumPlace }: UserListRowProps)
   const isPremium = user.isPremiumUser === true;
   const isUserDataConfirmed = user.isUserDataConfirmed === true;
 
-  const ratingText = useMemo(
-    () => formatSearchRowRatingCompact(user.userRatingByVotes),
-    [user.userRatingByVotes],
-  );
-  const totalSalesCountText = useMemo(
-    () => formatSearchRowTotalSalesCount(user.totalSalesCount),
-    [user.totalSalesCount],
-  );
-  const followersText = useMemo(() => {
-    const value = Number(user.followersCount);
-    return Number.isFinite(value) ? String(Math.max(0, Math.floor(value))) : "0";
-  }, [user.followersCount]);
-  const loyaltyPointsText = useMemo(() => {
-    const value = Number(user.userLoyaltyPoints);
-    return Number.isFinite(value) ? String(Math.max(0, Math.floor(value))) : "0";
-  }, [user.userLoyaltyPoints]);
+  const donationsText = useMemo(() => {
+    const value = Number(user.totalDonatedRub);
+    const safe = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
+    return `${formatLoyaltyPointsCount(safe)} ₽`;
+  }, [user.totalDonatedRub]);
 
   const metaBadges = useMemo(() => {
     const badges: string[] = [];
@@ -147,28 +135,10 @@ export const UserListRow = ({ user, onRowClick, podiumPlace }: UserListRowProps)
 
       <View style={[styles.metrics, metricsStacked && styles.metricsStacked]}>
         <UserListRowMetric
-          label={USER_LIST_ROW_UI.TOTAL_SALES_COUNT_LABEL}
-          value={totalSalesCountText}
+          label={USER_LIST_ROW_UI.DONATIONS_LABEL}
+          value={donationsText}
           stacked={metricsStacked}
-          accessibilityLabel={`${USER_LIST_ROW_UI.TOTAL_SALES_COUNT_LABEL} ${totalSalesCountText}`}
-        />
-        <UserListRowMetric
-          label={USER_LIST_ROW_UI.RATING_SCORE_LABEL}
-          value={ratingText}
-          variant="muted"
-          stacked={metricsStacked}
-          accessibilityLabel={`${USER_LIST_ROW_UI.RATING_SCORE_LABEL} ${ratingText}`}
-        />
-        <UserListRowMetric
-          label={USER_LIST_ROW_UI.FOLLOWERS_LABEL}
-          value={followersText}
-          stacked={metricsStacked}
-        />
-        <UserListRowMetric
-          label={USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL}
-          value={loyaltyPointsText}
-          stacked={metricsStacked}
-          accessibilityLabel={`${USER_LIST_ROW_UI.LOYALTY_POINTS_LABEL} ${loyaltyPointsText}`}
+          accessibilityLabel={`${USER_LIST_ROW_UI.DONATIONS_LABEL} ${donationsText}`}
         />
       </View>
     </Pressable>

@@ -1,3 +1,7 @@
+import {
+  PAYMENT_PURPOSE_USERS_MONTHLY_DONATION,
+  PAYMENT_STATUS_SUCCEEDED,
+} from "../../constants/yookassaConstants.js";
 import { UserModel } from "../../models/index.js";
 import { successRes } from "../../services/http/index.js";
 import { buildRegexSearchOr } from "../../utils/buildRegexSearchOr.js";
@@ -7,6 +11,7 @@ import {
   sanitizeUsersSearchList,
 } from "../../services/user/userProfileVisibility.js";
 import { attachUserListCommerceStats } from "../../services/user/attachUserListCommerceStats.js";
+import { attachUserListDonationTotals } from "../../services/user/attachUserListDonationTotals.js";
 import { attachFollowersCountToUsers } from "../../services/user/userFollowHelpers.js";
 
 const USER_SEARCH_FIELDS = ["userName"];
@@ -82,33 +87,44 @@ const fetchUsersByRatingAggregate = async ({ usersQuery, skip, limit }) =>
   ]);
 
 /**
- * Листинг без search: пагинация в Mongo (loyalty → rating), без find() всех users.
- * sales/followers — display-only после attach (не пересортировываем страницу).
+ * Листинг без search: пагинация по сумме успешных донатов (lifetime).
+ * totalDonatedRub дополнительно нормализуется в attachUserListDonationTotals.
  */
 const fetchUsersByPodiumAggregate = async ({ usersQuery, skip, limit }) =>
   UserModel.aggregate([
     { $match: usersQuery },
     {
-      $addFields: {
-        ratingAvg: {
-          $cond: [
-            { $gt: ["$userRatingByVotes.countVotes", 0] },
-            {
-              $divide: [
-                "$userRatingByVotes.totalRating",
-                "$userRatingByVotes.countVotes",
-              ],
+      $lookup: {
+        from: "payments",
+        let: { userId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$userId", "$$userId"] },
+              purpose: PAYMENT_PURPOSE_USERS_MONTHLY_DONATION,
+              status: PAYMENT_STATUS_SUCCEEDED,
             },
-            0,
-          ],
+          },
+          {
+            $group: {
+              _id: null,
+              total: { $sum: { $ifNull: ["$appliedAmount", 0] } },
+            },
+          },
+        ],
+        as: "donationAgg",
+      },
+    },
+    {
+      $addFields: {
+        totalDonatedRub: {
+          $ifNull: [{ $arrayElemAt: ["$donationAgg.total", 0] }, 0],
         },
       },
     },
     {
       $sort: {
-        userLoyaltyPoints: -1,
-        ratingAvg: -1,
-        "userRatingByVotes.countVotes": -1,
+        totalDonatedRub: -1,
         _id: 1,
       },
     },
@@ -135,7 +151,8 @@ export const userSearchController = async (req, res) => {
 
   const usersSanitized = sanitizeUsersSearchList(usersRaw, { viewer });
   const usersWithCommerce = await attachUserListCommerceStats(usersSanitized);
-  const users = await attachFollowersCountToUsers(usersWithCommerce);
+  const usersWithFollowers = await attachFollowersCountToUsers(usersWithCommerce);
+  const users = await attachUserListDonationTotals(usersWithFollowers);
 
   return successRes(res, { users, total, page, limit });
 };
