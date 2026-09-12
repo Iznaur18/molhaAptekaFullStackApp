@@ -165,10 +165,7 @@ export function CheckoutSheetModal({
                 onSubmit={onSubmit}
               />
             </div>
-            <div
-              ref={setPaymentMethodHostEl}
-              className="cart-fulfillment__payment"
-            />
+            <div ref={setPaymentMethodHostEl} className="cart-fulfillment__payment" />
           </div>
         </div>
         <div

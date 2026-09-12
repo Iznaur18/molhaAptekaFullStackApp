@@ -511,9 +511,7 @@ export function CheckoutForm({
             className={[
               "checkout-form__fulfillment-option",
               !isPickup ? "checkout-form__fulfillment-option--active" : "",
-              !deliverySelectable
-                ? "checkout-form__fulfillment-option--disabled"
-                : "",
+              !deliverySelectable ? "checkout-form__fulfillment-option--disabled" : "",
             ]
               .filter(Boolean)
               .join(" ")}
@@ -539,8 +537,7 @@ export function CheckoutForm({
     ) : null;
 
   const portaledFulfillmentMethod =
-    fulfillmentMethodPicker &&
-    fulfillmentMethodPortalTarget instanceof Element
+    fulfillmentMethodPicker && fulfillmentMethodPortalTarget instanceof Element
       ? createPortal(fulfillmentMethodPicker, fulfillmentMethodPortalTarget)
       : null;
 
@@ -684,9 +681,7 @@ export function CheckoutForm({
             />
           ) : null}
 
-          {!needsDelivery &&
-          deliverySelectable &&
-          !hideInactiveFulfillmentSections ? (
+          {!needsDelivery && deliverySelectable && !hideInactiveFulfillmentSections ? (
             <section
               className="checkout-form__fulfillment-section checkout-form__fulfillment-section--delivery checkout-form__fulfillment-section--off checkout-form__block_off"
               aria-disabled="true"
@@ -782,9 +777,7 @@ export function CheckoutForm({
           ) : null}
         </div>
 
-        {showSubmitButton &&
-        !portaledSubmit &&
-        (!dockSubmit || pinSubmitToBottom)
+        {showSubmitButton && !portaledSubmit && (!dockSubmit || pinSubmitToBottom)
           ? renderSubmitButton(false)
           : null}
       </form>

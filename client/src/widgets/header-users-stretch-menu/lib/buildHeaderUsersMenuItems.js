@@ -1,8 +1,5 @@
 import { BadgeHelp, MapPin, Newspaper, Users } from "../../../shared/ui/icon/index.js";
-import {
-  HEADER_USERS_BUTTON_UI,
-  REGION_UI,
-} from "../../../shared/config/appUiCopy.js";
+import { HEADER_USERS_BUTTON_UI, REGION_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
  * @typedef {"users" | "terms" | "faq" | "region"} HeaderUsersMenuItemKey

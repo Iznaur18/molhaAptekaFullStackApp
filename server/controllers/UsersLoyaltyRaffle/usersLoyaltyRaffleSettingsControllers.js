@@ -50,8 +50,7 @@ export const patchUsersLoyaltyRaffleSettingsController = async (req, res) => {
  * Платежи и заказы не трогаем: запоминаем текущую сырую сумму как baseline месяца.
  */
 export const resetUsersLoyaltyRaffleProgressController = async (req, res) => {
-  const { rawPointsAwarded, year, month } =
-    await getRawMonthlyLoyaltyPointsAwarded();
+  const { rawPointsAwarded, year, month } = await getRawMonthlyLoyaltyPointsAwarded();
 
   const saved = await UsersLoyaltyRaffleSettingsModel.findOneAndUpdate(
     { settingsKey: USERS_LOYALTY_RAFFLE_SETTINGS_KEY },

@@ -15,12 +15,7 @@ describe("buildHeaderUsersMenuItems", () => {
   it("appends region as 4th item when enabled", () => {
     const items = buildHeaderUsersMenuItems({ includeRegion: true });
 
-    expect(items.map((item) => item.key)).toEqual([
-      "users",
-      "terms",
-      "faq",
-      "region",
-    ]);
+    expect(items.map((item) => item.key)).toEqual(["users", "terms", "faq", "region"]);
     expect(items[3]?.action).toBe("region");
   });
 });

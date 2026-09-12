@@ -82,7 +82,8 @@
 
 .catalog-filters-sheet__backdrop--open .catalog-filters-sheet {
   transform: translate3d(0, 0, 0);
-  transition: transform var(--catalog-filters-enter-ms) var(--catalog-filters-enter-ease);
+  transition: transform var(--catalog-filters-enter-ms)
+    var(--catalog-filters-enter-ease);
 }
 
 .catalog-filters-sheet__header {

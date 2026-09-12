@@ -43,9 +43,7 @@ export const sumMonthlyLoyaltyPointsFromOrders = async ({ startUtc, endUtc }) =>
  * @param {Date} [referenceDate]
  * @returns {Promise<{ rawPointsAwarded: number; year: number; month: number; startUtc: Date; endUtc: Date }>}
  */
-export const getRawMonthlyLoyaltyPointsAwarded = async (
-  referenceDate = new Date(),
-) => {
+export const getRawMonthlyLoyaltyPointsAwarded = async (referenceDate = new Date()) => {
   const { startUtc, endUtc, year, month } =
     resolveMoscowCalendarMonthUtcRange(referenceDate);
   const pointsFromOrders = await sumMonthlyLoyaltyPointsFromOrders({

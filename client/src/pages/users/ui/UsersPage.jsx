@@ -162,8 +162,7 @@ export function UsersPage({ onUserRowClick, isAuthorized = true }) {
     pointsAwarded: monthlyLoyaltyQuery.data?.pointsAwarded ?? 0,
     goal: monthlyLoyaltyQuery.data?.goal ?? 0,
     description: monthlyLoyaltyQuery.data?.description ?? "",
-    isLoading:
-      monthlyLoyaltyQuery.isPending && monthlyLoyaltyQuery.data == null,
+    isLoading: monthlyLoyaltyQuery.isPending && monthlyLoyaltyQuery.data == null,
     onDonateClick: handleDonateClick,
     feedbackMessage,
   });

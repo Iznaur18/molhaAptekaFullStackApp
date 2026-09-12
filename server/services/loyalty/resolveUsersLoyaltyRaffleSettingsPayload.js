@@ -82,12 +82,7 @@ export const resolveUsersLoyaltyRaffleSettingsPayload = (row) => {
  * @param {number} month
  * @returns {number}
  */
-export const applyMonthlyProgressBaseline = (
-  rawPoints,
-  settings,
-  year,
-  month,
-) => {
+export const applyMonthlyProgressBaseline = (rawPoints, settings, year, month) => {
   const safeRaw = Math.max(0, Math.floor(Number(rawPoints) || 0));
   const baseline = Math.max(0, Math.floor(Number(settings?.progressBaseline) || 0));
   const baselineYear = Math.floor(Number(settings?.progressBaselineYear));

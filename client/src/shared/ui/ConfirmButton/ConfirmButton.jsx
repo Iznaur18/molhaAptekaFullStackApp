@@ -164,11 +164,7 @@ export function ConfirmButton({
         {portalMounted
           ? createPortal(
               <span className={portalClass} role="presentation">
-                <span
-                  className={scrimClass}
-                  aria-hidden="true"
-                  onClick={closeAsking}
-                />
+                <span className={scrimClass} aria-hidden="true" onClick={closeAsking} />
                 <span
                   ref={panelRef}
                   id={panelId}

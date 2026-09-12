@@ -103,12 +103,8 @@
   background: var(--iz-color-surface);
 }
 
-:root:not([data-theme="dark"])
-  .cart-fulfillment__details
-  .checkout-form__pickup-group,
-:root:not([data-theme="dark"])
-  .cart-fulfillment__details
-  .checkout-form__input {
+:root:not([data-theme="dark"]) .cart-fulfillment__details .checkout-form__pickup-group,
+:root:not([data-theme="dark"]) .cart-fulfillment__details .checkout-form__input {
   background: var(--iz-color-surface);
 }
 

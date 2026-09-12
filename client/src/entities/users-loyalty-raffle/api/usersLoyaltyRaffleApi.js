@@ -54,9 +54,7 @@ export async function resetUsersLoyaltyRaffleProgress() {
     return data.data;
   } catch (e) {
     const message =
-      e?.response?.data?.message ??
-      e?.message ??
-      USERS_LOYALTY_RAFFLE_RESET_FALLBACK;
+      e?.response?.data?.message ?? e?.message ?? USERS_LOYALTY_RAFFLE_RESET_FALLBACK;
     throw new Error(message);
   }
 }

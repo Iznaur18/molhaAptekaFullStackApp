@@ -22,10 +22,7 @@ import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { resolveMoscowCalendarDayUtcRange } from "../loyalty/moscowCalendarMonth.js";
 import { logMoneyEvent } from "../loyalty/logMoneyEvent.js";
 import { resolveReusablePayment } from "./paymentIdempotency.js";
-import {
-  appendPaymentIdToReturnPath,
-  buildReturnUrl,
-} from "./paymentReturnUrl.js";
+import { appendPaymentIdToReturnPath, buildReturnUrl } from "./paymentReturnUrl.js";
 import { createYookassaPayment, isYookassaConfigured } from "./yookassaClient.js";
 
 /**

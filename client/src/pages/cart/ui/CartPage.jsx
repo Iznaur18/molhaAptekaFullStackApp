@@ -743,10 +743,7 @@ export function CartPage({
                         "pickup"
                       }
                       onFulfillmentMethodChange={(method) =>
-                        chooseSellerFulfillment(
-                          activeSellerCart.group.sellerId,
-                          method,
-                        )
+                        chooseSellerFulfillment(activeSellerCart.group.sellerId, method)
                       }
                       cardPrepaidAvailable={cardPrepaidAvailable}
                       allowedPaymentMethods={allowedPaymentMethods}

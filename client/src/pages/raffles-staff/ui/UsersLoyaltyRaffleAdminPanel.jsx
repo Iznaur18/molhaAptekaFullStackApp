@@ -115,7 +115,10 @@ export function UsersLoyaltyRaffleAdminPanel() {
         rows={5}
       />
 
-      <label className="users-loyalty-raffle-admin__label" htmlFor="users-loyalty-raffle-image">
+      <label
+        className="users-loyalty-raffle-admin__label"
+        htmlFor="users-loyalty-raffle-image"
+      >
         {USERS_LOYALTY_RAFFLE_ADMIN_UI.DONATION_IMAGE_LABEL}
       </label>
       <ImageUrlField

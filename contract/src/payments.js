@@ -50,10 +50,7 @@ export const usersMonthlyDonationPaymentBodySchema = z.object({
   amountRub: z
     .number({ required_error: "Укажите сумму пожертвования" })
     .int("Сумма пожертвования — целое число рублей")
-    .min(
-      USERS_MONTHLY_DONATION_MIN_RUB,
-      `Минимум ${USERS_MONTHLY_DONATION_MIN_RUB} ₽`,
-    )
+    .min(USERS_MONTHLY_DONATION_MIN_RUB, `Минимум ${USERS_MONTHLY_DONATION_MIN_RUB} ₽`)
     .max(
       USERS_MONTHLY_DONATION_MAX_RUB,
       `Максимум ${USERS_MONTHLY_DONATION_MAX_RUB} ₽`,

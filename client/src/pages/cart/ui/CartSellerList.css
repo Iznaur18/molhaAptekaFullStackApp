@@ -137,7 +137,11 @@
   padding: 8px;
   border: 1px solid color-mix(in srgb, var(--iz-color-ink) 10%, var(--iz-color-border));
   border-radius: 12px;
-  background: color-mix(in srgb, var(--iz-color-ink) 2.5%, var(--iz-color-surface, var(--iz-color-bg)));
+  background: color-mix(
+    in srgb,
+    var(--iz-color-ink) 2.5%,
+    var(--iz-color-surface, var(--iz-color-bg))
+  );
   scrollbar-width: none;
   -ms-overflow-style: none;
   -webkit-overflow-scrolling: touch;
