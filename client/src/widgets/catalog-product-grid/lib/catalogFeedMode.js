@@ -10,10 +10,13 @@ export const CATALOG_FEED_MODE_LEGACY = "legacy";
 
 const CATALOG_FEED_MODE_STORAGE_KEY = "catalog-feed-mode";
 
-/** @returns {"blocks" | "legacy"} */
-export function resolveCatalogFeedMode() {
+/**
+ * Запомнить режим из адреса. Зовётся на старте (main.jsx): роутер убирает
+ * query с главной раньше, чем монтируется лента.
+ */
+export function rememberCatalogFeedModeFromUrl() {
   if (typeof window === "undefined") {
-    return CATALOG_FEED_MODE_BLOCKS;
+    return;
   }
   try {
     const requested = new URLSearchParams(window.location.search).get("feed");
@@ -22,14 +25,24 @@ export function resolveCatalogFeedMode() {
       requested === CATALOG_FEED_MODE_LEGACY
     ) {
       window.localStorage.setItem(CATALOG_FEED_MODE_STORAGE_KEY, requested);
-      return requested;
     }
+  } catch {
+    // Хранилище запрещено (приватный режим) — просто новая лента.
+  }
+}
+
+/** @returns {"blocks" | "legacy"} */
+export function resolveCatalogFeedMode() {
+  if (typeof window === "undefined") {
+    return CATALOG_FEED_MODE_BLOCKS;
+  }
+  rememberCatalogFeedModeFromUrl();
+  try {
     return window.localStorage.getItem(CATALOG_FEED_MODE_STORAGE_KEY) ===
       CATALOG_FEED_MODE_LEGACY
       ? CATALOG_FEED_MODE_LEGACY
       : CATALOG_FEED_MODE_BLOCKS;
   } catch {
-    // Хранилище запрещено (приватный режим) — просто новая лента.
     return CATALOG_FEED_MODE_BLOCKS;
   }
 }
