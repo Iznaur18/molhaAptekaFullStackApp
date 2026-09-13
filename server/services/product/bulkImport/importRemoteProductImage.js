@@ -6,6 +6,7 @@ import { buildUploadFilename } from "../../upload/buildUploadFilename.js";
 import { compressUploadedImageFile } from "../../upload/compressUploadedImageFile.js";
 import { finalizeUploadedFile } from "../../upload/finalizeUploadedFile.js";
 import { buildPublicUploadUrl } from "../../upload/buildPublicUploadUrl.js";
+import { createPublicUploadImageThumbnailSafe } from "../../upload/uploadImageThumbnail.js";
 import { UPLOADS_DIR } from "../../upload/uploadsDir.js";
 import { PRODUCT_BULK_IMPORT_IMAGE_URL_TIMEOUT_MS } from "../../../constants/productBulkImportConstants.js";
 import { logServerEvent } from "../../../utils/logServerEvent.js";
@@ -85,6 +86,12 @@ export async function importRemoteProductImage(url) {
     }
 
     const storedFilename = await finalizeUploadedFile(file);
+    // Превью для ленты; сбой не мешает импорту — клиент покажет оригинал.
+    await createPublicUploadImageThumbnailSafe({
+      filename: storedFilename,
+      buffer: file.buffer,
+      filePath: file.path,
+    });
     return buildPublicUploadUrl({ filename: storedFilename });
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {

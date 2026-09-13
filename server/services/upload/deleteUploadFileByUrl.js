@@ -9,6 +9,7 @@ import {
 } from "./objectStorageUpload.js";
 import { parseUploadFilenameFromMediaUrl } from "./parseUploadFilenameFromMediaUrl.js";
 import { parsePrivateUploadFilenameFromUrl } from "./privateUploadPaths.js";
+import { deletePublicUploadImageThumbnail } from "./uploadImageThumbnail.js";
 import { UPLOADS_DIR } from "./uploadsDir.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
@@ -62,6 +63,8 @@ export async function deleteUploadFileByUrl(mediaUrl) {
         error: error instanceof Error ? error.message : String(error),
       });
     }
+    // Превью ленты (`<имя>-w600.webp`) удаляем вместе с оригиналом.
+    await deletePublicUploadImageThumbnail(filename);
     return;
   }
 
@@ -83,4 +86,7 @@ export async function deleteUploadFileByUrl(mediaUrl) {
       });
     }
   }
+
+  // Превью ленты (`<имя>-w600.webp`) удаляем вместе с оригиналом.
+  await deletePublicUploadImageThumbnail(filename);
 }

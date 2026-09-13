@@ -15,6 +15,12 @@ export { isLinkPreviewBotUserAgent } from "./isLinkPreviewBotUserAgent.js";
 export { normalizeUploadUrlForStorage } from "./normalizeUploadUrlForStorage.js";
 export { resolveUploadedImageUrlForBrowser } from "./resolveUploadedImageUrlForBrowser.js";
 export {
+  UPLOAD_IMAGE_THUMBNAIL_MAX_DIM,
+  buildUploadImageThumbnailFilename,
+  isUploadImageThumbnailFilename,
+  toUploadImageThumbnailUrl,
+} from "./uploadImageThumbnail.js";
+export {
   REFERRAL_CODE_STORAGE_KEY,
   REFERRAL_QUERY_PARAM,
   normalizeReferralCode,

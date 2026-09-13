@@ -36,6 +36,8 @@
     "cleanup-onec-no-images-stock:apply": "node scripts/cleanupOneCProductsWithoutImagesAndStock.js --apply",
     "backfill:user-address-geo": "node scripts/backfillUserAddressGeo.js",
     "backfill:user-address-geo:apply": "node scripts/backfillUserAddressGeo.js --apply",
+    "backfill:upload-thumbnails": "node scripts/backfillUploadImageThumbnails.js",
+    "backfill:upload-thumbnails:apply": "node scripts/backfillUploadImageThumbnails.js --apply",
     "onec:commerceml-smoke": "node scripts/onecCommerceMlSmoke.mjs"
   },
   "devDependencies": {
