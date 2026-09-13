@@ -1,5 +1,5 @@
 import { toUploadImageThumbnailUrl } from "@izibuy/shared-lib";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useContext, useRef, useState } from "react";
 
 import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
 import {
@@ -10,11 +10,25 @@ import { resolveProductOutOfStockOverlayLabel } from "../../lib/resolveProductOu
 import { resolveProductSellerClosedOverlayLabel } from "../../lib/resolveProductSellerClosedOverlayLabel.js";
 import { ProductMediaHorizontalPager } from "../ProductMediaHorizontalPager.jsx";
 import { ProductMediaSlideContent } from "../ProductMediaSlideContent.jsx";
+import { ProductMediaSwipePager } from "../ProductMediaSwipePager.jsx";
 import { ProductDiscountBadge } from "../ProductPriceDisplay.jsx";
 import { ProductLoyaltyPointsBadge } from "../ProductLoyaltyPointsBadge.jsx";
 
 import { ProductCardGalleryDots } from "./ProductCardGalleryDots.jsx";
+import { ProductCardImageLoadingContext } from "./productCardImageLoadingContext.js";
 import { ProductInstagramPostMediaOverlay } from "../ProductInstagramPostMediaOverlay.jsx";
+
+/**
+ * На тач-устройствах фото карточки листаются свайпом на transform. Нативная
+ * горизонтальная прокрутка (scroll-snap) на iOS — отдельный системный
+ * прокручиваемый вид на каждую карточку: при прокрутке ленты они создавались
+ * и уничтожались пачками вместе с карточками, и лента дёргалась (13.09.2026).
+ * С мышью и тачпадом остаётся нативный pager — там листает тачпад.
+ */
+const USE_SWIPE_GALLERY =
+  typeof window !== "undefined" &&
+  typeof window.matchMedia === "function" &&
+  window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
 /**
  * @param {{
@@ -25,7 +39,9 @@ export function ProductCardMedia({ vm }) {
   const slideCount = Math.max(vm.mediaSlides.length, 0);
   const hasSlideMedia = slideCount > 0;
   const hasMultipleSlides = slideCount > 1;
+  const useSwipeGallery = hasMultipleSlides && USE_SWIPE_GALLERY;
   const setCardSlideIndex = vm.setCardSlideIndex;
+  const imageLoading = useContext(ProductCardImageLoadingContext);
   const suppressOpenAfterSwipeRef = useRef(false);
   // Превью, которые не загрузились (фото до бэкфила, чужие ссылки): для них
   // показываем оригинал, а заглушку — только если не загрузился и он.
@@ -66,6 +82,7 @@ export function ProductCardMedia({ vm }) {
         <ProductMediaSlideContent
           slide={showThumbnail ? { ...slide, url: thumbnailUrl } : slide}
           imageClassName="product-card__image"
+          loading={index === vm.cardSlideIndex ? imageLoading : "lazy"}
           onImageError={() => {
             if (showThumbnail) {
               setFailedThumbnailUrls((prev) => new Set(prev).add(thumbnailUrl));
@@ -79,7 +96,7 @@ export function ProductCardMedia({ vm }) {
         />
       );
     },
-    [failedThumbnailUrls, vm],
+    [failedThumbnailUrls, imageLoading, vm],
   );
 
   const promotionRibbon = vm.showPromotionBoostBadge
@@ -107,7 +124,18 @@ export function ProductCardMedia({ vm }) {
           }
         : {})}
     >
-      {hasSlideMedia ? (
+      {!hasSlideMedia ? (
+        <div className="product-card__image-placeholder" aria-hidden="true" />
+      ) : useSwipeGallery ? (
+        // Свайп-галерея сама гасит клик после свайпа, флаг выше ей не нужен.
+        <ProductMediaSwipePager
+          className="product-card__media-pager"
+          slideCount={slideCount}
+          activeIndex={vm.cardSlideIndex}
+          onIndexChange={setCardSlideIndex}
+          renderSlide={renderSlide}
+        />
+      ) : (
         <ProductMediaHorizontalPager
           className="product-card__media-pager"
           slideCount={slideCount}
@@ -115,8 +143,6 @@ export function ProductCardMedia({ vm }) {
           onIndexChange={handleIndexChange}
           renderSlide={renderSlide}
         />
-      ) : (
-        <div className="product-card__image-placeholder" aria-hidden="true" />
       )}
       {vm.showWishlistToggle ? (
         <WishlistToggleButton

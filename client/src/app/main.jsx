@@ -11,7 +11,9 @@ import { enablePortraitOrientationLock } from "../shared/lib/enablePortraitOrien
 import { enableSoftKeyboardOpenClass } from "../shared/lib/enableSoftKeyboardOpenClass.js";
 import { initRuntimeDesignTokens } from "../shared/theme/runtimeDesignTokens.js";
 import "../index.css";
+import { rememberCatalogFeedModeFromUrl } from "../widgets/catalog-product-grid/lib/catalogFeedMode.js";
 import App from "./App.jsx";
+import { startScrollJankProbe } from "./scrollJankProbe.js"; // [TEMP DIAG] плавность прокрутки на телефонах — удалить после
 
 if (isClientSentryEnabled()) {
   const bootSentry = () => {
@@ -44,6 +46,9 @@ disableDocumentPinchZoom();
 enableAndroidFocusFieldScroll();
 enablePortraitOrientationLock();
 enableSoftKeyboardOpenClass();
+startScrollJankProbe();
+// [TEMP A/B] До роутера: он убирает query с главной раньше, чем монтируется лента.
+rememberCatalogFeedModeFromUrl();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

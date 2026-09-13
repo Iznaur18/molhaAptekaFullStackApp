@@ -21,7 +21,13 @@ function applyCatalogGridColumnCount(width, setColumnCount) {
  * @returns {number}
  */
 export function useCatalogGridColumnCount(_containerRef, enabled) {
-  const [columnCount, setColumnCount] = useState(1);
+  // Сразу верное число колонок: с 1 на первом рендере лента блоками
+  // пересобрала бы блоки и перемонтировала все карточки сразу после старта.
+  const [columnCount, setColumnCount] = useState(() =>
+    typeof document === "undefined"
+      ? 1
+      : getCatalogGridColumnCount(document.documentElement.clientWidth),
+  );
 
   useLayoutEffect(() => {
     if (!enabled || typeof document === "undefined") {

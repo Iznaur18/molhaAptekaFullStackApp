@@ -12,6 +12,24 @@ export const CATALOG_VIRTUAL_ROW_HEIGHT_PX = 520;
 /** Дополнительные строки сверху/снизу видимой области. */
 export const CATALOG_VIRTUAL_OVERSCAN_ROWS = 2;
 
+/** Лента блоками: рядов сетки в одном блоке. */
+export const CATALOG_GRID_BLOCK_ROWS = 4;
+
+/** Блок монтируется, когда до экрана осталось меньше стольких высот экрана… */
+export const CATALOG_GRID_BLOCK_MOUNT_MARGIN_SCREENS = 1;
+
+/**
+ * …и сворачивается в заглушку, когда ушёл дальше этого. Разрыв между
+ * порогами не даёт блоку дребезжать на границе.
+ */
+export const CATALOG_GRID_BLOCK_UNMOUNT_MARGIN_SCREENS = 2.5;
+
+/**
+ * С какого блока (с нуля) текущее фото карточек грузится сразу, а не лениво.
+ * Первые экраны ленты грузятся лениво, чтобы не утяжелять старт.
+ */
+export const CATALOG_GRID_BLOCK_EAGER_IMAGES_FROM_BLOCK = 3;
+
 /**
  * Паритет с mobile `resolveProductGridColumns` / `screenBreakpoints.ts`.
  * ≤667 → 2 · ≤903 / <1280 → 3 · ≥1280 → 4.
