@@ -46,6 +46,17 @@
   color: var(--iz-color-on-contrast);
 }
 
+/* Тач-устройства: без backdrop-filter. На iOS Safari размытие под сердечком
+   каждой карточки перерисовывается при прокрутке ленты и тормозит её —
+   вместо него плотнее фон. Активное состояние (две класса) по-прежнему сильнее. */
+@media (hover: none), (pointer: coarse) {
+  .wishlist-toggle--card {
+    background: color-mix(in srgb, var(--iz-color-surface) 78%, transparent);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
 :root[data-theme="dark"] .wishlist-toggle--card,
 :root[data-theme="dark"] .wishlist-toggle--card.wishlist-toggle--active,
 :root[data-theme="dark"] .wishlist-toggle--active {
