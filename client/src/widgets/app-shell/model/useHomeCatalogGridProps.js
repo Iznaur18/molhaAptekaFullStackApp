@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import { useAppShellStateContext } from "./AppShellStateContext.jsx";
 
@@ -76,6 +76,13 @@ export const useHomeCatalogGridProps = () => {
     showCuratedCategoryLists && curatedCategoryListsQuery.isPending;
   const isUserDataConfirmed = authUser?.isUserDataConfirmed === true;
 
+  // Стабильная ссылка: уходит в каждую карточку ленты (memo). Стрелка прямо в
+  // useMemo ниже создавалась бы заново при любой догрузке страницы и
+  // перерисовывала бы все карточки.
+  const handleRequestLoginAddToCart = useCallback(() => {
+    setIsLoginModalOpen(true);
+  }, [setIsLoginModalOpen]);
+
   return useMemo(
     () => ({
       catalogStatus,
@@ -110,7 +117,7 @@ export const useHomeCatalogGridProps = () => {
       isPremiumUser,
       sellerLoyaltyPointsBalance: loyaltyPoints,
       sellerLoyaltyPointsReserved: loyaltyPointsReserved,
-      onRequestLoginAddToCart: () => setIsLoginModalOpen(true),
+      onRequestLoginAddToCart: handleRequestLoginAddToCart,
       catalogSentinelRef,
       catalogHasMore,
       isCatalogLoadingMore,
@@ -174,7 +181,7 @@ export const useHomeCatalogGridProps = () => {
       isPremiumUser,
       loyaltyPoints,
       loyaltyPointsReserved,
-      setIsLoginModalOpen,
+      handleRequestLoginAddToCart,
       catalogSentinelRef,
       catalogHasMore,
       isCatalogLoadingMore,
