@@ -63,6 +63,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  window.localStorage.removeItem("catalog-feed-mode");
 });
 
 test("догрузка страницы не перерисовывает уже показанные карточки", () => {
@@ -83,11 +84,24 @@ test("догрузка страницы не перерисовывает уже
   expect(productCardRenders.get("p47")).toBe(1);
 });
 
-test("виртуализация включается больше чем на 50 товарах", () => {
+test("лента по умолчанию разбита на блоки, без абсолютного окна", () => {
+  const { container } = render(
+    <HomeCatalogGrid {...baseProps} products={makeProducts(0, 51)} />,
+  );
+
+  expect(container.querySelector(".app-shell__grid-virtual-host")).toBeNull();
+  // jsdom: ширина 0 → 1 колонка, в блоке 4 ряда → 13 блоков на 51 товар
+  expect(container.querySelectorAll(".app-shell__grid-block")).toHaveLength(13);
+  expect(container.querySelectorAll("[data-product-id]")).toHaveLength(51);
+});
+
+test("?feed=legacy возвращает прежнее окно с порогом в 50 товаров", () => {
+  window.localStorage.setItem("catalog-feed-mode", "legacy");
   const { container, rerender } = render(
     <HomeCatalogGrid {...baseProps} products={makeProducts(0, 50)} />,
   );
   expect(container.querySelector(".app-shell__grid-virtual-host")).toBeNull();
+  expect(container.querySelector(".app-shell__grid-blocks")).toBeNull();
 
   rerender(<HomeCatalogGrid {...baseProps} products={makeProducts(0, 51)} />);
 

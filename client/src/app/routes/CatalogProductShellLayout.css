@@ -8,6 +8,7 @@
 
 /* Вложенная сетка: без home edge-bleed (AppShell.css ≤667). */
 .catalog-product-shell__catalog .app-shell__grid,
+.catalog-product-shell__catalog .app-shell__grid-blocks,
 .catalog-product-shell__catalog .app-shell__grid-virtual-host {
   box-sizing: border-box;
   margin-inline: 0;

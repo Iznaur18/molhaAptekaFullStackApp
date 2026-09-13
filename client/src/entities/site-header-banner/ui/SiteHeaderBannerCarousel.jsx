@@ -104,6 +104,34 @@ export function SiteHeaderBannerCarousel({ slides }) {
     };
   }, [emblaApi, slideCount]);
 
+  // Баннер уехал за экран — автопрокрутка стоит. Иначе глубоко в ленте он
+  // каждые несколько секунд перелистывал слайды (размытый фон + рендер React),
+  // и прокрутка ленты на телефоне подёргивалась (13.09.2026).
+  const sectionRef = useRef(/** @type {HTMLElement | null} */ (null));
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (
+      !hasCarousel ||
+      !emblaApi ||
+      !section ||
+      typeof IntersectionObserver === "undefined"
+    ) {
+      return undefined;
+    }
+    const autoplay = autoplayRef.current;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry?.isIntersecting) {
+        autoplay.play();
+      } else {
+        autoplay.stop();
+      }
+    });
+    observer.observe(section);
+    return () => {
+      observer.disconnect();
+    };
+  }, [emblaApi, hasCarousel]);
+
   const scrollTo = useCallback(
     (index) => {
       emblaApi?.scrollTo(index);
@@ -242,6 +270,7 @@ export function SiteHeaderBannerCarousel({ slides }) {
 
   return (
     <section
+      ref={sectionRef}
       className="site-header-banner-carousel"
       aria-roledescription="carousel"
       aria-label={SITE_HEADER_BANNER_UI.CAROUSEL_ARIA}

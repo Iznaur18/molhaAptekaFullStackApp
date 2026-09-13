@@ -175,7 +175,8 @@
   height: 100%;
 }
 
-.product-card__media-pager .product-media-horizontal-pager__slide {
+.product-card__media-pager .product-media-horizontal-pager__slide,
+.product-card__media-pager .product-media-swipe-pager__slide {
   background: color-mix(in srgb, currentColor 5%, transparent);
 }
 

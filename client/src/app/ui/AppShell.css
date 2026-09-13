@@ -322,6 +322,10 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.15rem;
   }
+
+  .app-shell__grid-blocks {
+    row-gap: 0.15rem;
+  }
 }
 
 /* ≤667: 2 колонки + edge bleed + место под bottom nav */
@@ -338,6 +342,7 @@
   }
 
   .app-shell__grid,
+  .app-shell__grid-blocks,
   .app-shell__grid-virtual-host {
     box-sizing: border-box;
     margin-inline: calc(
@@ -353,6 +358,10 @@
   .app-shell__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.1rem;
+  }
+
+  .app-shell__grid-blocks {
+    row-gap: 0.1rem;
   }
 }
 
@@ -441,6 +450,39 @@
   right: 0;
   bottom: 0;
   margin-top: 0;
+}
+
+/* Лента блоками (CatalogGridBlocks): по несколько рядов сетки в обычном потоке.
+   Далёкие от экрана блоки сворачиваются в заглушку ровно своей высоты, поэтому
+   на экране ничего не сдвигается и не перерисовывается. Зазор между блоками
+   равен зазору между рядами сетки (row-gap задан рядом с gap сетки выше). */
+.app-shell__grid-blocks {
+  display: flex;
+  flex-direction: column;
+  row-gap: 1rem;
+}
+
+.app-shell__grid.app-shell__grid-block {
+  margin-inline: 0;
+  width: 100%;
+}
+
+.app-shell__grid-block--collapsed {
+  grid-auto-rows: 1fr;
+  overflow: hidden;
+  /* Пустая заглушка не должна становиться якорем прокрутки. */
+  overflow-anchor: none;
+}
+
+.app-shell__grid-block-skeleton {
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--iz-color-text) 5%, transparent);
+}
+
+/* Фото в блоках грузятся заранее, плавного появления там не видно, а каждая
+   анимация прозрачности на время создаёт отдельный слой отрисовки. */
+.app-shell__grid-block .product-media-slide-content__image {
+  transition: none;
 }
 
 .app-shell__catalog-more {
@@ -642,6 +684,10 @@
   .app-shell__grid {
     /* Паритет mobile resolveProductGridGap(phone) = 2 */
     gap: 2px;
+  }
+
+  .app-shell__grid-blocks {
+    row-gap: 2px;
   }
 }
 

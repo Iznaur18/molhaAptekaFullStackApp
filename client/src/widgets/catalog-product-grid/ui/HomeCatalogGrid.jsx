@@ -1,14 +1,19 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { splitCatalogNearProducts } from "@molha/api-contract";
 
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { InlineErrorBanner } from "../../../shared/ui/InlineErrorBanner/InlineErrorBanner.jsx";
 import { shouldShowProductTier3BannerFullWidth } from "../../../entities/product/lib/shouldShowProductTier3BannerFullWidth.js";
 import { resolveClientViewerRegionCode } from "../../../entities/region/lib/viewerRegion.js";
+import {
+  CATALOG_FEED_MODE_LEGACY,
+  resolveCatalogFeedMode,
+} from "../lib/catalogFeedMode.js";
 import { CATALOG_VIRTUALIZATION_MIN_ITEM_COUNT } from "../lib/catalogGridVirtualizationConstants.js";
 import { interleaveCatalogTier3Banners } from "../lib/interleaveCatalogTier3Banners.js";
 import { useCatalogGridColumnCount } from "../model/useCatalogGridColumnCount.js";
 import { useCatalogGridVirtualizer } from "../model/useCatalogGridVirtualizer.js";
+import { CatalogGridBlocks } from "./CatalogGridBlocks.jsx";
 import { CatalogGridProductCard } from "./CatalogGridProductCard.jsx";
 
 /**
@@ -138,11 +143,16 @@ export function HomeCatalogGrid({
     nearSplit && nearSplit.withoutDistance.length > 0,
   );
 
+  // [TEMP A/B] ?feed=legacy — прежнее окно с абсолютным сдвигом (catalogFeedMode.js).
+  const [feedMode] = useState(resolveCatalogFeedMode);
+  const canWindowFeed = !hasTier3BannerInFeed && !hasNearRegionSection;
+  const shouldUseBlocks = canWindowFeed && feedMode !== CATALOG_FEED_MODE_LEGACY;
   const shouldVirtualize =
-    !hasTier3BannerInFeed &&
-    !hasNearRegionSection &&
+    canWindowFeed &&
+    feedMode === CATALOG_FEED_MODE_LEGACY &&
     products.length > CATALOG_VIRTUALIZATION_MIN_ITEM_COUNT;
-  const shouldMeasureGridColumns = shouldVirtualize || shouldInterleaveTier3Banners;
+  const shouldMeasureGridColumns =
+    shouldUseBlocks || shouldVirtualize || shouldInterleaveTier3Banners;
   const gridColumnMeasureRef = shouldVirtualize ? virtualHostRef : gridMeasureRef;
   const columnCount = useCatalogGridColumnCount(
     gridColumnMeasureRef,
@@ -261,7 +271,9 @@ export function HomeCatalogGrid({
     />
   );
 
-  const gridNodes = visibleProducts.map((product) => renderProductCard(product));
+  const gridNodes = shouldUseBlocks
+    ? null
+    : visibleProducts.map((product) => renderProductCard(product));
 
   return (
     <>
@@ -300,6 +312,13 @@ export function HomeCatalogGrid({
                 />
               ) : null}
             </div>
+          ) : shouldUseBlocks ? (
+            <CatalogGridBlocks
+              items={displayProducts}
+              columnCount={columnCount}
+              renderItem={renderProductCard}
+              ariaLabel={HOME_PAGE_UI.CATALOG_PRODUCTS_LIST_ARIA}
+            />
           ) : nearDisplaySplit ? (
             <div ref={gridMeasureRef}>
               {nearDisplaySplit.withDistance.length > 0 ? (

@@ -4,10 +4,13 @@
 @import "./shared/styles/cancelButton.css";
 @import "./shared/ui/AppButton/AppButton.css";
 
+/* Прокрутка — да, щипок и двойной тап (масштаб) — нет. Раньше масштаб гасил
+   непассивный touchmove на документе, а он на iOS тормозил прокрутку
+   (см. disableDocumentPinchZoom.js). */
 html,
 body,
 #root {
-  touch-action: manipulation;
+  touch-action: pan-x pan-y;
 }
 
 /* Смартфоны/планшеты: без long-press select/copy (инпуты — можно). */
