@@ -183,7 +183,9 @@ export function HomeCatalogGrid({
   }, [displayProducts, hasNearRegionSection]);
 
   const cardProps = {
-    products,
+    // Только в «Моих товарах» (проверка перерасхода баллов): в ленте новый
+    // массив на каждой догруженной странице перерисовывал бы все карточки (memo).
+    products: isMineMode ? products : undefined,
     isMineMode,
     deletingProductId,
     onSellerNameClick,

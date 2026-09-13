@@ -1,10 +1,18 @@
+import { memo } from "react";
+
 import { isSellerProductLoyaltyPointsOvercommitted } from "../../../entities/product/lib/isSellerProductLoyaltyPointsOvercommitted.js";
 import { ProductCard } from "../../../entities/product/ui/ProductCard.jsx";
 
 /**
+ * Карточка в сетке ленты. Обёрнута в memo: при догрузке страницы или смене
+ * флагов ленты уже показанные карточки не перерисовываются. Для этого все
+ * пропсы должны быть стабильными — обработчики через useCallback, а
+ * `products` передаётся только в режиме «Мои товары» (нужен для проверки
+ * перерасхода баллов), иначе новый массив на каждой странице ломал бы memo.
+ *
  * @param {{
  *   product: import('../../../entities/product/model/types.js').ProductFromApi;
- *   products: import('../../../entities/product/model/types.js').ProductFromApi[];
+ *   products?: import('../../../entities/product/model/types.js').ProductFromApi[];
  *   isMineMode: boolean;
  *   deletingProductId: string | null;
  *   onSellerNameClick: (userId: string) => void;
@@ -33,7 +41,7 @@ import { ProductCard } from "../../../entities/product/ui/ProductCard.jsx";
  *   sellerLoyaltyPointsReserved: number;
  * }} props
  */
-export function CatalogGridProductCard({
+export const CatalogGridProductCard = memo(function CatalogGridProductCard({
   product,
   products,
   isMineMode,
@@ -106,10 +114,10 @@ export function CatalogGridProductCard({
           isSellerProductLoyaltyPointsOvercommitted(product, {
             loyaltyPointsBalance: sellerLoyaltyPointsBalance,
             loyaltyPointsReserved: sellerLoyaltyPointsReserved,
-            sellerProducts: products,
+            sellerProducts: products ?? [],
           })
         }
       />
     </div>
   );
-}
+});
