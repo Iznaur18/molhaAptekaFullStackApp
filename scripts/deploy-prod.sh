@@ -80,7 +80,11 @@ ssh "$SERVER" bash -se <<REMOTE
   git checkout -- package-lock.json 2>/dev/null || true
   if [ -f "$REMOTE_BUNDLE" ]; then
     git bundle verify "$REMOTE_BUNDLE"
-    git fetch "$REMOTE_BUNDLE" "refs/heads/*:refs/remotes/deploybundle/*"
+    # «+» в refspec обязателен: deploybundle/* — служебные ссылки, их можно
+    # перезаписывать. Без него 13.09.2026 выкат упал на «rejected main ->
+    # deploybundle/main (non-fast-forward)»: ссылка застряла с прошлого выката
+    # другой веткой. Сам прод страхует merge --ff-only ниже, не этот fetch.
+    git fetch "$REMOTE_BUNDLE" "+refs/heads/*:refs/remotes/deploybundle/*"
     git merge --ff-only $LOCAL_SHA
     rm -f "$REMOTE_BUNDLE"
   fi
