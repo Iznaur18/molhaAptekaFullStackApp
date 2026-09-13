@@ -1,4 +1,5 @@
-import { useCallback, useRef } from "react";
+import { toUploadImageThumbnailUrl } from "@izibuy/shared-lib";
+import { useCallback, useRef, useState } from "react";
 
 import { WishlistToggleButton } from "../../../../features/wishlist-toggle/ui/WishlistToggleButton.jsx";
 import {
@@ -26,6 +27,11 @@ export function ProductCardMedia({ vm }) {
   const hasMultipleSlides = slideCount > 1;
   const setCardSlideIndex = vm.setCardSlideIndex;
   const suppressOpenAfterSwipeRef = useRef(false);
+  // Превью, которые не загрузились (фото до бэкфила, чужие ссылки): для них
+  // показываем оригинал, а заглушку — только если не загрузился и он.
+  const [failedThumbnailUrls, setFailedThumbnailUrls] = useState(
+    () => /** @type {Set<string>} */ (new Set()),
+  );
 
   const handleIndexChange = useCallback(
     (index) => {
@@ -51,11 +57,20 @@ export function ProductCardMedia({ vm }) {
         return <div className="product-card__image-placeholder" aria-hidden="true" />;
       }
 
+      const thumbnailUrl =
+        slide.type === "image" ? toUploadImageThumbnailUrl(slide.url) : slide.url;
+      const showThumbnail =
+        thumbnailUrl !== slide.url && !failedThumbnailUrls.has(thumbnailUrl);
+
       return (
         <ProductMediaSlideContent
-          slide={slide}
+          slide={showThumbnail ? { ...slide, url: thumbnailUrl } : slide}
           imageClassName="product-card__image"
           onImageError={() => {
+            if (showThumbnail) {
+              setFailedThumbnailUrls((prev) => new Set(prev).add(thumbnailUrl));
+              return;
+            }
             if (!vm.useFallbackImage) {
               vm.setUseFallbackImage(true);
             }
@@ -64,7 +79,7 @@ export function ProductCardMedia({ vm }) {
         />
       );
     },
-    [vm],
+    [failedThumbnailUrls, vm],
   );
 
   const promotionRibbon = vm.showPromotionBoostBadge

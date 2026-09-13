@@ -8,6 +8,7 @@ import { buildPublicUploadUrl } from "../../upload/buildPublicUploadUrl.js";
 import { buildUploadFilename } from "../../upload/buildUploadFilename.js";
 import { compressUploadedImageFile } from "../../upload/compressUploadedImageFile.js";
 import { finalizeUploadedFile } from "../../upload/finalizeUploadedFile.js";
+import { createPublicUploadImageThumbnailSafe } from "../../upload/uploadImageThumbnail.js";
 import { UPLOADS_DIR } from "../../upload/uploadsDir.js";
 import { logServerEvent } from "../../../utils/logServerEvent.js";
 
@@ -72,5 +73,11 @@ export async function importOneCLocalImage({ filePath }) {
   }
 
   const storedFilename = await finalizeUploadedFile(file);
+  // Превью для ленты; сбой не мешает импорту — клиент покажет оригинал.
+  await createPublicUploadImageThumbnailSafe({
+    filename: storedFilename,
+    buffer: file.buffer,
+    filePath: file.path,
+  });
   return { url: buildPublicUploadUrl({ filename: storedFilename }), hash };
 }

@@ -19,6 +19,7 @@ import {
   persistPrivateUploadToObjectStorage,
 } from "../../services/upload/objectStorageUpload.js";
 import { rememberPrivateUploadOwner } from "../../services/upload/privateUploadOwnership.js";
+import { createPublicUploadImageThumbnailSafe } from "../../services/upload/uploadImageThumbnail.js";
 import { successRes, errorRes } from "../../services/http/index.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
@@ -133,6 +134,13 @@ export async function uploadController(req, res) {
   }
 
   const filename = await finalizeUploadedFile(req.file);
+  // Превью для ленты — только здесь, в публичной ветке: приватные файлы выше
+  // тоже проходят через finalize, и их превью оказалось бы в открытом /uploads.
+  await createPublicUploadImageThumbnailSafe({
+    filename,
+    buffer: req.file.buffer,
+    filePath: req.file.path,
+  });
   const url = buildPublicUploadUrl({ filename });
   return successRes(res, {
     url,
