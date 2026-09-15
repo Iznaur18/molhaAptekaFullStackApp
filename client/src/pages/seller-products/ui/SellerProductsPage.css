@@ -35,7 +35,7 @@
 
 /* Без home edge-bleed (AppShell.css ≤667): сетка в границах shell. */
 .seller-products-page .app-shell__grid,
-.seller-products-page .app-shell__grid-virtual-host {
+.seller-products-page .app-shell__grid-blocks {
   box-sizing: border-box;
   margin-inline: 0;
   width: 100%;

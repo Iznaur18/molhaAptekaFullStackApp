@@ -55,12 +55,15 @@ const makeItems = (count) =>
 
 const renderItem = (item) => <div key={item.id} data-item={item.id} role="listitem" />;
 
+const getItemKey = (item) => String(item.id);
+
 /** @param {{ id: number }[]} items */
 const grid = (items) => (
   <CatalogGridBlocks
     items={items}
     columnCount={2}
     renderItem={renderItem}
+    getItemKey={getItemKey}
     ariaLabel="Лента"
   />
 );

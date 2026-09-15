@@ -437,10 +437,11 @@
     width: 100%;
   }
 
+  /* Блоки ленты — flex-колонка: тот же gap задаёт зазор между блоками. */
   .my-profile-page--catalog-grid-tab .my-profile-page__catalog-shell .app-shell__grid,
   .my-profile-page--catalog-grid-tab
     .my-profile-page__catalog-shell
-    .app-shell__grid--virtual-window {
+    .app-shell__grid-blocks {
     gap: var(--my-profile-catalog-grid-gap);
   }
 }

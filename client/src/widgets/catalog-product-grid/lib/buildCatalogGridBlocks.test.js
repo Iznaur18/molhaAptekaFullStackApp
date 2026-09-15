@@ -23,6 +23,27 @@ test("догрузка страницы сохраняет ключи уже п�
   );
 });
 
+test("баннер во всю ширину занимает свой ряд и закрывает неполный ряд перед собой", () => {
+  const items = ["a", "b", "c", "BANNER", "d", "e", "f", "g"];
+
+  const blocks = buildCatalogGridBlocks(items, 2, 2, {
+    isFullWidth: (item) => item === "BANNER",
+  });
+
+  expect(blocks.map((block) => block.items)).toEqual([
+    ["a", "b", "c"],
+    ["BANNER", "d", "e"],
+    ["f", "g"],
+  ]);
+  expect(blocks.map((block) => block.startIndex)).toEqual([0, 3, 6]);
+});
+
+test("префикс ключа разводит две ленты на одной странице", () => {
+  expect(buildCatalogGridBlocks([1, 2], 2, 4, { keyPrefix: "region-" })[0].key).toBe(
+    "region-2:0",
+  );
+});
+
 test("пустая лента и некорректные размеры", () => {
   expect(buildCatalogGridBlocks([], 2, 4)).toEqual([]);
   expect(buildCatalogGridBlocks([1, 2, 3], 0, 0).map((block) => block.items)).toEqual([

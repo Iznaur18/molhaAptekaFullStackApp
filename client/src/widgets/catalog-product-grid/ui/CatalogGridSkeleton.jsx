@@ -1,32 +1,39 @@
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 
 import "../../../entities/product/ui/productImageTokens.css";
+import "../../../shared/ui/Skeleton/skeleton.css";
 import "./CatalogGridSkeleton.css";
 
 const SKELETON_CARD_COUNT = 9;
 
 /**
- * Плейсхолдер сетки каталога на время первой загрузки товаров.
- * Повторяет геометрию `.app-shell__grid` / `.app-shell__cell`, чтобы
- * появление реальных карточек не сдвигало вёрстку (CLS).
+ * Плейсхолдер сетки каталога: первая загрузка и догрузка страницы внизу ленты.
+ * Карточка повторяет геометрию настоящей карточки ленты (фото, название,
+ * цена, отзывы, бейдж, продавец), поэтому замена скелетона карточками не
+ * сдвигает вёрстку (CLS).
  *
- * @param {{ cardCount?: number }} [props]
+ * @param {{ cardCount?: number; ariaLabel?: string }} [props]
  */
-export function CatalogGridSkeleton({ cardCount = SKELETON_CARD_COUNT }) {
+export function CatalogGridSkeleton({
+  cardCount = SKELETON_CARD_COUNT,
+  ariaLabel = HOME_PAGE_UI.LOADING_CATALOG,
+}) {
   return (
     <div
       className="app-shell__grid catalog-grid-skeleton"
       role="status"
-      aria-label={HOME_PAGE_UI.LOADING_CATALOG}
+      aria-label={ariaLabel}
     >
       {Array.from({ length: cardCount }, (_, index) => (
         <div key={index} className="app-shell__cell" aria-hidden="true">
           <div className="catalog-grid-skeleton__card">
-            <span className="catalog-grid-skeleton__image" />
+            <span className="iz-skeleton catalog-grid-skeleton__image" />
             <span className="catalog-grid-skeleton__content">
-              <span className="catalog-grid-skeleton__line catalog-grid-skeleton__line_wide" />
-              <span className="catalog-grid-skeleton__line" />
-              <span className="catalog-grid-skeleton__line catalog-grid-skeleton__line_short" />
+              <span className="iz-skeleton iz-skeleton_line catalog-grid-skeleton__title" />
+              <span className="iz-skeleton iz-skeleton_line catalog-grid-skeleton__price" />
+              <span className="iz-skeleton iz-skeleton_line catalog-grid-skeleton__rating" />
+              <span className="iz-skeleton catalog-grid-skeleton__badge" />
+              <span className="iz-skeleton iz-skeleton_line catalog-grid-skeleton__seller" />
             </span>
           </div>
         </div>
