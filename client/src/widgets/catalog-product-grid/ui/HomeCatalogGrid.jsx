@@ -1,18 +1,12 @@
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { splitCatalogNearProducts } from "@molha/api-contract";
 
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { InlineErrorBanner } from "../../../shared/ui/InlineErrorBanner/InlineErrorBanner.jsx";
 import { shouldShowProductTier3BannerFullWidth } from "../../../entities/product/lib/shouldShowProductTier3BannerFullWidth.js";
 import { resolveClientViewerRegionCode } from "../../../entities/region/lib/viewerRegion.js";
-import {
-  CATALOG_FEED_MODE_LEGACY,
-  resolveCatalogFeedMode,
-} from "../lib/catalogFeedMode.js";
-import { CATALOG_VIRTUALIZATION_MIN_ITEM_COUNT } from "../lib/catalogGridVirtualizationConstants.js";
 import { interleaveCatalogTier3Banners } from "../lib/interleaveCatalogTier3Banners.js";
 import { useCatalogGridColumnCount } from "../model/useCatalogGridColumnCount.js";
-import { useCatalogGridVirtualizer } from "../model/useCatalogGridVirtualizer.js";
 import { CatalogGridBlocks } from "./CatalogGridBlocks.jsx";
 import { CatalogGridProductCard } from "./CatalogGridProductCard.jsx";
 
@@ -115,22 +109,7 @@ export function HomeCatalogGrid({
     typeof viewerRegionCode === "string" && viewerRegionCode.trim()
       ? viewerRegionCode.trim()
       : resolveClientViewerRegionCode(null);
-  const virtualHostRef = useRef(/** @type {HTMLDivElement | null} */ (null));
-  const virtualGridRef = useRef(/** @type {HTMLDivElement | null} */ (null));
-  const gridMeasureRef = useRef(/** @type {HTMLDivElement | null} */ (null));
-
   const shouldInterleaveTier3Banners = showFullWidthTier3Banners && !isMineMode;
-
-  const hasTier3BannerInFeed = useMemo(
-    () =>
-      products.some((product) =>
-        shouldShowProductTier3BannerFullWidth(product, {
-          isMineMode,
-          showFullWidthTier3Banners,
-        }),
-      ),
-    [isMineMode, products, showFullWidthTier3Banners],
-  );
 
   const nearSplit = useMemo(() => {
     if (!catalogNear || isMineMode) {
@@ -143,21 +122,7 @@ export function HomeCatalogGrid({
     nearSplit && nearSplit.withoutDistance.length > 0,
   );
 
-  // [TEMP A/B] ?feed=legacy — прежнее окно с абсолютным сдвигом (catalogFeedMode.js).
-  const [feedMode] = useState(resolveCatalogFeedMode);
-  const canWindowFeed = !hasTier3BannerInFeed && !hasNearRegionSection;
-  const shouldUseBlocks = canWindowFeed && feedMode !== CATALOG_FEED_MODE_LEGACY;
-  const shouldVirtualize =
-    canWindowFeed &&
-    feedMode === CATALOG_FEED_MODE_LEGACY &&
-    products.length > CATALOG_VIRTUALIZATION_MIN_ITEM_COUNT;
-  const shouldMeasureGridColumns =
-    shouldUseBlocks || shouldVirtualize || shouldInterleaveTier3Banners;
-  const gridColumnMeasureRef = shouldVirtualize ? virtualHostRef : gridMeasureRef;
-  const columnCount = useCatalogGridColumnCount(
-    gridColumnMeasureRef,
-    shouldMeasureGridColumns,
-  );
+  const columnCount = useCatalogGridColumnCount(null, true);
   const displayProducts = useMemo(
     () =>
       interleaveCatalogTier3Banners(products, columnCount, {
@@ -165,25 +130,6 @@ export function HomeCatalogGrid({
       }),
     [columnCount, products, shouldInterleaveTier3Banners],
   );
-  const virtualWindow = useCatalogGridVirtualizer({
-    enabled: shouldVirtualize,
-    hostRef: virtualHostRef,
-    gridRef: virtualGridRef,
-    itemCount: displayProducts.length,
-    columnCount,
-  });
-
-  const visibleProducts = useMemo(() => {
-    if (!shouldVirtualize) {
-      return displayProducts;
-    }
-    return displayProducts.slice(virtualWindow.startIndex, virtualWindow.endIndex + 1);
-  }, [
-    displayProducts,
-    shouldVirtualize,
-    virtualWindow.endIndex,
-    virtualWindow.startIndex,
-  ]);
 
   const nearDisplaySplit = useMemo(() => {
     if (!hasNearRegionSection) {
@@ -191,6 +137,17 @@ export function HomeCatalogGrid({
     }
     return splitCatalogNearProducts(displayProducts);
   }, [displayProducts, hasNearRegionSection]);
+
+  // Стабильные: от них зависит нарезка ленты на блоки (CatalogGridBlocks).
+  const getProductKey = useCallback((product) => String(product._id), []);
+  const isFullWidthProduct = useCallback(
+    (product) =>
+      shouldShowProductTier3BannerFullWidth(product, {
+        isMineMode,
+        showFullWidthTier3Banners,
+      }),
+    [isMineMode, showFullWidthTier3Banners],
+  );
 
   const cardProps = {
     // Только в «Моих товарах» (проверка перерасхода баллов): в ленте новый
@@ -263,17 +220,26 @@ export function HomeCatalogGrid({
     <CatalogGridProductCard
       key={product._id}
       product={product}
-      promotionFullWidth={shouldShowProductTier3BannerFullWidth(product, {
-        isMineMode,
-        showFullWidthTier3Banners,
-      })}
+      promotionFullWidth={isFullWidthProduct(product)}
       {...cardProps}
     />
   );
 
-  const gridNodes = shouldUseBlocks
-    ? null
-    : visibleProducts.map((product) => renderProductCard(product));
+  /**
+   * @param {import('../../../entities/product/model/types.js').ProductFromApi[]} items
+   * @param {{ ariaLabel: string; keyPrefix: string }} options
+   */
+  const renderBlocks = (items, { ariaLabel, keyPrefix }) => (
+    <CatalogGridBlocks
+      items={items}
+      columnCount={columnCount}
+      renderItem={renderProductCard}
+      getItemKey={getProductKey}
+      isFullWidth={isFullWidthProduct}
+      keyPrefix={keyPrefix}
+      ariaLabel={ariaLabel}
+    />
+  );
 
   return (
     <>
@@ -289,71 +255,27 @@ export function HomeCatalogGrid({
         <p className="app-shell__state">{emptyMessage}</p>
       ) : (
         <>
-          {shouldVirtualize ? (
-            <div
-              ref={virtualHostRef}
-              className="app-shell__grid-virtual-host"
-              style={{ height: `${virtualWindow.totalHeight}px` }}
-            >
-              <div
-                ref={virtualGridRef}
-                className="app-shell__grid app-shell__grid--virtual-window"
-                role="list"
-                aria-label={HOME_PAGE_UI.CATALOG_PRODUCTS_LIST_ARIA}
-                style={{ top: `${virtualWindow.offsetTop}px` }}
-              >
-                {gridNodes}
-              </div>
-              {catalogHasMore && !catalogLoadMoreError ? (
-                <div
-                  ref={catalogSentinelRef}
-                  className="app-shell__catalog-sentinel app-shell__catalog-sentinel_virtual"
-                  aria-hidden
-                />
-              ) : null}
-            </div>
-          ) : shouldUseBlocks ? (
-            <CatalogGridBlocks
-              items={displayProducts}
-              columnCount={columnCount}
-              renderItem={renderProductCard}
-              ariaLabel={HOME_PAGE_UI.CATALOG_PRODUCTS_LIST_ARIA}
-            />
-          ) : nearDisplaySplit ? (
-            <div ref={gridMeasureRef}>
-              {nearDisplaySplit.withDistance.length > 0 ? (
-                <div
-                  className="app-shell__grid"
-                  role="list"
-                  aria-label={HOME_PAGE_UI.CATALOG_PRODUCTS_LIST_ARIA}
-                >
-                  {nearDisplaySplit.withDistance.map((product) =>
-                    renderProductCard(product),
-                  )}
-                </div>
-              ) : null}
+          {nearDisplaySplit ? (
+            <>
+              {nearDisplaySplit.withDistance.length > 0
+                ? renderBlocks(nearDisplaySplit.withDistance, {
+                    ariaLabel: HOME_PAGE_UI.CATALOG_PRODUCTS_LIST_ARIA,
+                    keyPrefix: "near-",
+                  })
+                : null}
               <h2 className="app-shell__catalog-near-region-title">
                 {HOME_PAGE_UI.NEAR_REGION_SECTION}
               </h2>
-              <div
-                className="app-shell__grid"
-                role="list"
-                aria-label={HOME_PAGE_UI.NEAR_REGION_SECTION}
-              >
-                {nearDisplaySplit.withoutDistance.map((product) =>
-                  renderProductCard(product),
-                )}
-              </div>
-            </div>
+              {renderBlocks(nearDisplaySplit.withoutDistance, {
+                ariaLabel: HOME_PAGE_UI.NEAR_REGION_SECTION,
+                keyPrefix: "region-",
+              })}
+            </>
           ) : (
-            <div
-              ref={gridMeasureRef}
-              className="app-shell__grid"
-              role="list"
-              aria-label={HOME_PAGE_UI.CATALOG_PRODUCTS_LIST_ARIA}
-            >
-              {gridNodes}
-            </div>
+            renderBlocks(displayProducts, {
+              ariaLabel: HOME_PAGE_UI.CATALOG_PRODUCTS_LIST_ARIA,
+              keyPrefix: "",
+            })
           )}
           {isCatalogLoadingMore ? (
             <p className="app-shell__catalog-more app-shell__state">
@@ -374,7 +296,7 @@ export function HomeCatalogGrid({
               </button>
             </div>
           ) : null}
-          {!shouldVirtualize && catalogHasMore && !catalogLoadMoreError ? (
+          {catalogHasMore && !catalogLoadMoreError ? (
             <div
               ref={catalogSentinelRef}
               className="app-shell__catalog-sentinel"

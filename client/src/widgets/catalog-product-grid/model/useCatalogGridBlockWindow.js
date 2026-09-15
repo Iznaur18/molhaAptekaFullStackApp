@@ -16,7 +16,7 @@ export const CATALOG_GRID_BLOCK_KEY_ATTRIBUTE = "data-catalog-block-key";
 
 const MIN_VIEWPORT_HEIGHT_PX = 600;
 
-/** @typedef {{ height: number; itemCount: number }} CollapsedCatalogGridBlock */
+/** @typedef {{ height: number; signature: string }} CollapsedCatalogGridBlock */
 
 /**
  * Какие блоки ленты держать смонтированными, а какие свернуть в заглушку.
@@ -32,11 +32,13 @@ const MIN_VIEWPORT_HEIGHT_PX = 600;
  * (startTransition): React монтирует карточки кусками между кадрами, пока
  * блок ещё за экраном.
  *
- * Прежнее окно с абсолютным сдвигом (useCatalogGridVirtualizer) на каждом ряду
- * перемонтировало карточки и двигало всё окно целиком, и на iPhone лента
- * дёргалась при глубокой прокрутке (13.09.2026).
+ * Прежнее окно с абсолютным сдвигом на каждом ряду перемонтировало карточки и
+ * двигало всё окно целиком, и на iPhone лента дёргалась при глубокой
+ * прокрутке (13.09.2026).
  *
- * @param {{ blocks: { key: string; items: unknown[] }[] }} params
+ * @param {{ blocks: { key: string; signature: string }[] }} params
+ *   signature — состав блока (ключи товаров): высота заглушки годится, только
+ *   пока он не поменялся.
  */
 export function useCatalogGridBlockWindow({ blocks }) {
   const [collapsed, setCollapsed] = useState(
@@ -46,7 +48,7 @@ export function useCatalogGridBlockWindow({ blocks }) {
   // дожидаясь фонового рендера. Иначе блок, свёрнутый и тут же снова
   // понадобившийся, остался бы заглушкой.
   const collapsedRef = useRef(collapsed);
-  const itemCountsRef = useRef(/** @type {Map<string, number>} */ (new Map()));
+  const signaturesRef = useRef(/** @type {Map<string, string>} */ (new Map()));
   const elementsRef = useRef(/** @type {Map<string, Element>} */ (new Map()));
   const refCallbacksRef = useRef(
     /** @type {Map<string, (element: Element | null) => void>} */ (new Map()),
@@ -107,7 +109,7 @@ export function useCatalogGridBlockWindow({ blocks }) {
             continue;
           }
           if (!next) next = new Map(collapsedRef.current);
-          next.set(key, { height, itemCount: itemCountsRef.current.get(key) ?? 0 });
+          next.set(key, { height, signature: signaturesRef.current.get(key) ?? "" });
         }
         if (next) commitCollapsed(next);
       },
@@ -128,15 +130,15 @@ export function useCatalogGridBlockWindow({ blocks }) {
   }, [commitCollapsed]);
 
   useLayoutEffect(() => {
-    const counts = new Map(blocks.map((block) => [block.key, block.items.length]));
-    itemCountsRef.current = counts;
+    const signatures = new Map(blocks.map((block) => [block.key, block.signature]));
+    signaturesRef.current = signatures;
 
-    // В свёрнутый хвостовой блок дописались товары: запомненная высота
-    // устарела. Блок уже отрисован целиком (см. getCollapsedHeight), просим
-    // дальний наблюдатель пересмотреть его с новой высотой.
+    // Состав свёрнутого блока поменялся (дописались товары, переставились
+    // баннеры): запомненная высота устарела. Блок уже отрисован целиком (см.
+    // getCollapsedHeight), просим дальний наблюдатель пересмотреть его.
     let next = null;
     for (const [key, entry] of collapsedRef.current) {
-      if (counts.get(key) === entry.itemCount) continue;
+      if (signatures.get(key) === entry.signature) continue;
       if (!next) next = new Map(collapsedRef.current);
       next.delete(key);
       const element = elementsRef.current.get(key);
@@ -146,7 +148,7 @@ export function useCatalogGridBlockWindow({ blocks }) {
       }
     }
     for (const key of refCallbacksRef.current.keys()) {
-      if (!counts.has(key)) refCallbacksRef.current.delete(key);
+      if (!signatures.has(key)) refCallbacksRef.current.delete(key);
     }
     if (next) {
       collapsedRef.current = next;
@@ -181,12 +183,12 @@ export function useCatalogGridBlockWindow({ blocks }) {
    * Высота заглушки или null, если блок нужно отрисовать с карточками.
    *
    * @param {string} key
-   * @param {number} itemCount
+   * @param {string} signature
    */
   const getCollapsedHeight = useCallback(
-    (key, itemCount) => {
+    (key, signature) => {
       const entry = collapsed.get(key);
-      return entry && entry.itemCount === itemCount ? entry.height : null;
+      return entry && entry.signature === signature ? entry.height : null;
     },
     [collapsed],
   );
