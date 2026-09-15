@@ -183,6 +183,7 @@ import {
 } from "./Product/productBulkImportControllers.js";
 import {
   getProductsController,
+  getProductFacetsController,
   getMyProductsController,
 } from "./Product/getProducts.js";
 import { getCatalogProductByIdController } from "./Product/getCatalogProductByIdController.js";
@@ -490,6 +491,7 @@ export {
   submitProductBulkImportController,
   getProductBulkImportJobStatusController,
   getProductsController,
+  getProductFacetsController,
   getMyProductsController,
   getCatalogProductByIdController,
   getCatalogProductsByIdsController,

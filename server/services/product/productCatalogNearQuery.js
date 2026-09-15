@@ -161,6 +161,7 @@ export const findProductsPageNear = async ({
         _regionSortPriority: 0,
         _nearBucket: 0,
         _distanceMeters: 0,
+        _discountPercent: 0,
       },
     },
   ]);

@@ -44,6 +44,7 @@ import { up as sellerFulfillmentDefaultsUp } from "./20260905-seller-fulfillment
 import { up as productPromotionMinAmountUp } from "./20260906-product-promotion-min-amount.js";
 import { up as productModerationFingerprintUp } from "./20260907-product-moderation-fingerprint.js";
 import { up as approvePendingForTrustedSellersUp } from "./20260909-approve-pending-for-trusted-sellers.js";
+import { up as catalogPriceIndexUp } from "./20260915-catalog-price-index.js";
 
 export const MIGRATIONS = [
   {
@@ -286,5 +287,11 @@ export const MIGRATIONS = [
     description:
       "Approve pending products for sellers who already have productModerationTrusted",
     up: approvePendingForTrustedSellersUp,
+  },
+  {
+    id: "20260915-catalog-price-index",
+    description:
+      "Create catalog_approved_price index for catalog price sorts and price range filter",
+    up: catalogPriceIndexUp,
   },
 ];

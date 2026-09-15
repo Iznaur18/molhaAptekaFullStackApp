@@ -2,6 +2,7 @@ import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 import {
   postProductController,
   getProductsController,
+  getProductFacetsController,
   getMyProductsController,
   getProductCategoryDisplaysController,
   patchProductCategoryDisplayController,
@@ -229,6 +230,13 @@ router.get(
   productsSearchValidation,
   checkOptionalAuthMW,
   getProductsController,
+);
+router.get(
+  "/facets",
+  catalogListRateLimiter,
+  productsSearchValidation,
+  checkOptionalAuthMW,
+  getProductFacetsController,
 );
 router.get("/category-displays", getProductCategoryDisplaysController);
 router.get("/categories/roots", getProductCategoryRootsController);

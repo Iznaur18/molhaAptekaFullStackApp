@@ -45,9 +45,24 @@ paths:
           schema: { $ref: "#/components/schemas/MongoId" }
         - in: query
           name: sort
+          description: |
+            premium / confirmed — устаревшие формы sellerPremium / sellerConfirmed.
+            price_asc, price_desc, rating, discount — без буста продвижения и приоритета региона.
           schema:
             type: string
-            enum: [newest, views, purchases, premium, confirmed]
+            enum:
+              [
+                newest,
+                views,
+                purchases,
+                premium,
+                confirmed,
+                reviews,
+                price_asc,
+                price_desc,
+                rating,
+                discount,
+              ]
         - in: query
           name: includeHidden
           schema: { type: boolean }
@@ -74,6 +89,37 @@ paths:
           schema: { type: boolean }
         - in: query
           name: originalOnly
+          schema: { type: boolean }
+        - in: query
+          name: priceMin
+          description: Цена «от», целые рубли по productPrice
+          schema: { type: integer, minimum: 0 }
+        - in: query
+          name: priceMax
+          description: Цена «до», не меньше priceMin
+          schema: { type: integer, minimum: 0 }
+        - in: query
+          name: delivery
+          description: Способы получения через запятую (seller, courier, carrier); внутри группы — «или»
+          schema: { type: string, example: "seller,courier" }
+        - in: query
+          name: pickupOnly
+          schema: { type: boolean }
+        - in: query
+          name: ratingMin
+          description: Рейтинг не ниже порога и хотя бы один отзыв
+          schema: { type: integer, enum: [3, 4, 5] }
+        - in: query
+          name: withReviews
+          schema: { type: boolean }
+        - in: query
+          name: returnOnly
+          schema: { type: boolean }
+        - in: query
+          name: sellerConfirmed
+          schema: { type: boolean }
+        - in: query
+          name: sellerPremium
           schema: { type: boolean }
       responses:
         "200":
@@ -109,6 +155,59 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/Forbidden"
+
+  /product/facets:
+    get:
+      tags: [catalog]
+      summary: Счётчики фильтров каталога
+      description: |
+        Принимает те же query, что GET /product. total совпадает с pagination.total выдачи.
+        Счётчик варианта — сколько товаров останется, если добавить его к текущим фильтрам;
+        способы получения внутри группы складываются через «или».
+        Zod-схема ответа — catalogProductFacetsDataSchema.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success: { type: boolean, const: true }
+                  data:
+                    type: object
+                    required: [total, price, categories, options]
+                    properties:
+                      total: { type: integer, minimum: 0 }
+                      price:
+                        type: [object, "null"]
+                        description: Цены выдачи без фильтра цены
+                        properties:
+                          min: { type: number }
+                          p25: { type: number }
+                          p50: { type: number }
+                          p75: { type: number }
+                          p90: { type: number }
+                          max: { type: number }
+                      categories:
+                        type: array
+                        maxItems: 8
+                        items:
+                          type: object
+                          required: [id, label, count]
+                          properties:
+                            id: { type: string }
+                            label: { type: string }
+                            count: { type: integer, minimum: 0 }
+                      options:
+                        type: object
+                        description: Счётчики вариантов; followingOnly и near — null, если зрителю недоступны
+                        additionalProperties: true
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /product/{productId}:
     patch:
