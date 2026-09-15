@@ -1,4 +1,8 @@
-import { PRODUCT_SORT_NEWEST } from "../../constants/productCatalogSort.js";
+import {
+  PRODUCT_SORT_DISCOUNT,
+  PRODUCT_SORT_NEWEST,
+  PRODUCT_SORTS_WITHOUT_BOOST,
+} from "../../constants/productCatalogSort.js";
 import { getCatalogProductModel } from "../../db/mongoReadConnection.js";
 import { withCatalogRegionPrioritySort } from "../user/userRegionCatalogFilter.js";
 
@@ -6,6 +10,8 @@ import { attachProductSellerSnapshots } from "./attachProductSellerSnapshots.js"
 import { buildProductAtlasSearchStage } from "./buildProductAtlasSearchStage.js";
 import { normalizeProductsQueryForAggregate } from "./productCatalogQuery.js";
 import {
+  CATALOG_DISCOUNT_PERCENT_FIELD,
+  buildCatalogDiscountPercentAddFieldsStage,
   buildCatalogPromotionSortStage,
   buildCatalogPromotionSortBoostAddFieldsStage,
 } from "./productCatalogPromotionSort.js";
@@ -40,6 +46,9 @@ const sortStagesForAtlasCatalog = (sort, viewerRegionCode = null) => {
   if (sort === PRODUCT_SORT_NEWEST) {
     stages.push(buildCatalogPromotionSortBoostAddFieldsStage(viewerRegionCode));
   }
+  if (sort === PRODUCT_SORT_DISCOUNT) {
+    stages.push(buildCatalogDiscountPercentAddFieldsStage());
+  }
 
   stages.push(
     buildCatalogPromotionSortStage(sort, {
@@ -48,6 +57,9 @@ const sortStagesForAtlasCatalog = (sort, viewerRegionCode = null) => {
     }),
   );
 
+  if (PRODUCT_SORTS_WITHOUT_BOOST.includes(sort)) {
+    return stages;
+  }
   return withCatalogRegionPrioritySort(stages, viewerRegionCode);
 };
 
@@ -90,6 +102,7 @@ export const findCatalogProductsPageAtlas = async (
         _promotionSortActivatedAt: 0,
         _citySortPriority: 0,
         _regionSortPriority: 0,
+        [CATALOG_DISCOUNT_PERCENT_FIELD]: 0,
       },
     },
   ]);

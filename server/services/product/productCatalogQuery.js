@@ -1,20 +1,38 @@
 import {
+  PRODUCT_SORT_DISCOUNT,
   PRODUCT_SORT_NEWEST,
+  PRODUCT_SORT_PRICE_ASC,
+  PRODUCT_SORT_PRICE_DESC,
   PRODUCT_SORT_PURCHASES,
+  PRODUCT_SORT_RATING,
   PRODUCT_SORT_REVIEWS,
   PRODUCT_SORT_VIEWS,
+  PRODUCT_SORTS_WITHOUT_BOOST,
 } from "../../constants/productCatalogSort.js";
 import { getCatalogProductModel } from "../../db/mongoReadConnection.js";
 import mongoose from "mongoose";
 
 import { attachProductSellerSnapshots } from "./attachProductSellerSnapshots.js";
 import {
+  CATALOG_DISCOUNT_PERCENT_FIELD,
+  buildCatalogDiscountPercentAddFieldsStage,
   buildCatalogPromotionSortStage,
   buildCatalogPromotionSortBoostAddFieldsStage,
 } from "./productCatalogPromotionSort.js";
 import { withCatalogRegionPrioritySort } from "../user/userRegionCatalogFilter.js";
 
 const { ObjectId } = mongoose.Types;
+
+/** Сортировки из query, кроме «новинок» по умолчанию. */
+const PARSEABLE_CATALOG_SORTS = new Set([
+  PRODUCT_SORT_VIEWS,
+  PRODUCT_SORT_PURCHASES,
+  PRODUCT_SORT_REVIEWS,
+  PRODUCT_SORT_PRICE_ASC,
+  PRODUCT_SORT_PRICE_DESC,
+  PRODUCT_SORT_RATING,
+  PRODUCT_SORT_DISCOUNT,
+]);
 
 /**
  * В aggregate `$match` строковый id не совпадает с ObjectId в БД (в отличие от countDocuments).
@@ -95,11 +113,7 @@ export const normalizeProductsQueryForAggregate = (productsQuery) => {
  */
 export const parseProductSortFromQuery = (query) => {
   const raw = query?.sort;
-  if (
-    raw === PRODUCT_SORT_VIEWS ||
-    raw === PRODUCT_SORT_PURCHASES ||
-    raw === PRODUCT_SORT_REVIEWS
-  ) {
+  if (typeof raw === "string" && PARSEABLE_CATALOG_SORTS.has(raw)) {
     return raw;
   }
   return PRODUCT_SORT_NEWEST;
@@ -164,6 +178,10 @@ const searchRankAddFieldsStage = (searchRank) => ({
 /**
  * Сортировка каталога (+ region priority, + search rank). Без $match / skip / limit.
  *
+ * Явные сортировки покупателя (цена, рейтинг, скидка) — без буста продвижения
+ * и приоритета региона; при поиске ступень релевантности всё равно первая:
+ * «дешевле» среди совпадений по названию, потом по описанию и категории.
+ *
  * @param {string} sort
  * @param {{ escapedRegexPattern: string; categorySlugs: string[] } | null} [searchRank]
  * @param {string | null} [viewerRegionCode]
@@ -183,6 +201,9 @@ export const buildCatalogSortPipeline = (
   if (sort === PRODUCT_SORT_NEWEST) {
     stages.push(buildCatalogPromotionSortBoostAddFieldsStage(viewerRegionCode));
   }
+  if (sort === PRODUCT_SORT_DISCOUNT) {
+    stages.push(buildCatalogDiscountPercentAddFieldsStage());
+  }
 
   stages.push(
     buildCatalogPromotionSortStage(sort, {
@@ -191,6 +212,9 @@ export const buildCatalogSortPipeline = (
     }),
   );
 
+  if (PRODUCT_SORTS_WITHOUT_BOOST.includes(sort)) {
+    return stages;
+  }
   return withCatalogRegionPrioritySort(stages, viewerRegionCode);
 };
 
@@ -231,6 +255,7 @@ export const findProductsPage = async (
         _promotionSortActivatedAt: 0,
         _citySortPriority: 0,
         _regionSortPriority: 0,
+        [CATALOG_DISCOUNT_PERCENT_FIELD]: 0,
       },
     },
   ]);

@@ -678,6 +678,18 @@ ProductSchema.index(
   { name: "catalog_approved_sold_quantity" },
 );
 
+/** Каталог sort=price_asc / price_desc и фильтр цены. */
+ProductSchema.index(
+  {
+    productModerationStatus: 1,
+    productIsAvailable: 1,
+    productStockQuantity: 1,
+    productPrice: 1,
+    createdAt: -1,
+  },
+  { name: "catalog_approved_price" },
+);
+
 /** Каталог sort=reviews — товары с отзывами по рейтингу. */
 ProductSchema.index(
   {
