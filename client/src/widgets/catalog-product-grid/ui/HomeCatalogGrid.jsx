@@ -8,6 +8,7 @@ import { resolveClientViewerRegionCode } from "../../../entities/region/lib/view
 import { interleaveCatalogTier3Banners } from "../lib/interleaveCatalogTier3Banners.js";
 import { useCatalogGridColumnCount } from "../model/useCatalogGridColumnCount.js";
 import { CatalogGridBlocks } from "./CatalogGridBlocks.jsx";
+import { CatalogGridSkeleton } from "./CatalogGridSkeleton.jsx";
 import { CatalogGridProductCard } from "./CatalogGridProductCard.jsx";
 
 /**
@@ -278,9 +279,11 @@ export function HomeCatalogGrid({
             })
           )}
           {isCatalogLoadingMore ? (
-            <p className="app-shell__catalog-more app-shell__state">
-              {HOME_PAGE_UI.CATALOG_LOADING_MORE}
-            </p>
+            // Два ряда карточек-скелетонов вместо текста «Подгружаем…».
+            <CatalogGridSkeleton
+              cardCount={columnCount * 2}
+              ariaLabel={HOME_PAGE_UI.CATALOG_LOADING_MORE}
+            />
           ) : null}
           {catalogLoadMoreError ? (
             <div className="app-shell__catalog-more app-shell__catalog-more_error">

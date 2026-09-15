@@ -95,6 +95,24 @@ test("лента разбита на блоки", () => {
   expect(container.querySelectorAll("[data-product-id]")).toHaveLength(51);
 });
 
+test("догрузка внизу ленты — скелетон из двух рядов карточек, а не текст", () => {
+  const { container, getByRole, queryByText } = render(
+    <HomeCatalogGrid
+      {...baseProps}
+      products={makeProducts(0, 24)}
+      isCatalogLoadingMore
+    />,
+  );
+
+  const skeleton = getByRole("status", { name: HOME_PAGE_UI.CATALOG_LOADING_MORE });
+  // jsdom: 1 колонка → два ряда = две карточки-скелетона
+  expect(skeleton.querySelectorAll(".catalog-grid-skeleton__card")).toHaveLength(2);
+  expect(
+    container.querySelector(".app-shell__grid-blocks + .catalog-grid-skeleton"),
+  ).toBe(skeleton);
+  expect(queryByText(HOME_PAGE_UI.CATALOG_LOADING_MORE)).toBeNull();
+});
+
 test("баннер во всю ширину — тоже в ленте блоками, в своём ряду", () => {
   const banner = {
     _id: "banner",
