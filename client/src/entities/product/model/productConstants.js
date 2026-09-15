@@ -140,6 +140,10 @@ export const CATALOG_SORT_PURCHASES = "purchases";
 export const CATALOG_SORT_PREMIUM = "premium";
 export const CATALOG_SORT_CONFIRMED = "confirmed";
 export const CATALOG_SORT_REVIEWS = "reviews";
+export const CATALOG_SORT_PRICE_ASC = "price_asc";
+export const CATALOG_SORT_PRICE_DESC = "price_desc";
+export const CATALOG_SORT_RATING = "rating";
+export const CATALOG_SORT_DISCOUNT = "discount";
 
 /** Значения `<select>` каталога (не уходят в query `sort`). */
 export const CATALOG_FILTER_FOLLOWING_ONLY = "__following_only__";
@@ -229,6 +233,10 @@ export const CATALOG_SORT_LABEL_RU = {
   [CATALOG_SORT_PREMIUM]: "Только премиум",
   [CATALOG_SORT_CONFIRMED]: "Подтверждённые продавцы",
   [CATALOG_SORT_REVIEWS]: "По отзывам",
+  [CATALOG_SORT_PRICE_ASC]: "Сначала дешевле",
+  [CATALOG_SORT_PRICE_DESC]: "Сначала дороже",
+  [CATALOG_SORT_RATING]: "С высоким рейтингом",
+  [CATALOG_SORT_DISCOUNT]: "С большой скидкой",
   [CATALOG_FILTER_NEAR]: "Рядом",
   [CATALOG_FILTER_FLASH_SALE_ONLY]: "Горящие скидки",
   [CATALOG_FILTER_FOLLOWING_ONLY]: "Только от подписок",

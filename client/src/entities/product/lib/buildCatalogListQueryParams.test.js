@@ -15,6 +15,18 @@ const baseInput = {
   viewerRegionCode: "RU-MOW",
 };
 
+const emptyExtraFilters = {
+  priceMin: null,
+  priceMax: null,
+  delivery: null,
+  pickupOnly: null,
+  ratingMin: null,
+  withReviews: null,
+  returnOnly: null,
+  sellerConfirmed: null,
+  sellerPremium: null,
+};
+
 describe("buildCatalogListQueryParams", () => {
   it("builds public catalog params with filters from URL + viewer region", () => {
     const params = buildCatalogListQueryParams({
@@ -48,6 +60,7 @@ describe("buildCatalogListQueryParams", () => {
       originalOnly: null,
       near: null,
       flashSaleOnly: null,
+      ...emptyExtraFilters,
       regionCode: "RU-CE",
     });
   });
@@ -80,8 +93,49 @@ describe("buildCatalogListQueryParams", () => {
       originalOnly: null,
       near: null,
       flashSaleOnly: null,
+      ...emptyExtraFilters,
       regionCode: null,
     });
+  });
+
+  it("passes price, delivery, rating and seller filters from URL", () => {
+    const params = buildCatalogListQueryParams({
+      ...baseInput,
+      catalogQueryFromUrl: {
+        sort: "newest",
+        priceMin: 100,
+        priceMax: 500,
+        delivery: ["courier", "seller"],
+        pickupOnly: true,
+        ratingMin: 4,
+        withReviews: true,
+        returnOnly: true,
+        sellerConfirmed: true,
+        sellerPremium: true,
+      },
+    });
+
+    expect(params).toMatchObject({
+      priceMin: 100,
+      priceMax: 500,
+      delivery: "seller,courier",
+      pickupOnly: true,
+      ratingMin: 4,
+      withReviews: true,
+      returnOnly: true,
+      sellerConfirmed: true,
+      sellerPremium: true,
+    });
+  });
+
+  it("ignores price and delivery filters in mine mode", () => {
+    const params = buildCatalogListQueryParams({
+      ...baseInput,
+      isMineMode: true,
+      catalogQueryFromUrl: { priceMax: 500, delivery: ["seller"] },
+    });
+
+    expect(params).toMatchObject(emptyExtraFilters);
   });
 
   it("passes near from URL", () => {

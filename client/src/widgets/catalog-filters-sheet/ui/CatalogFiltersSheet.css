@@ -1,5 +1,5 @@
 /**
- * Bottom sheet фильтров каталога (stub).
+ * Bottom sheet фильтров каталога.
  * Паритет анимации/радиуса/отступов с ViewerRegionPickerSheet.
  */
 .catalog-filters-sheet__backdrop {
@@ -102,7 +102,14 @@
   color: var(--iz-color-text);
 }
 
-.catalog-filters-sheet__close {
+.catalog-filters-sheet__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.catalog-filters-sheet__close,
+.catalog-filters-sheet__reset {
   margin: 0;
   padding: 0.25rem 0.15rem;
   border: none;
@@ -115,10 +122,143 @@
   cursor: pointer;
 }
 
+.catalog-filters-sheet__reset {
+  color: var(--iz-color-action);
+}
+
 .catalog-filters-sheet__body {
   flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   min-height: 0;
-  padding: 0 var(--catalog-filters-inline-padding);
+  padding: 4px var(--catalog-filters-inline-padding) 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.catalog-filters-sheet__section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.catalog-filters-sheet__section-title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.catalog-filters-sheet__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.catalog-filters-sheet__chips:empty {
+  display: none;
+}
+
+.catalog-filters-sheet__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 2.25rem;
+  margin: 0;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--iz-color-border) 85%, transparent);
+  border-radius: 999px;
+  background: var(
+    --iz-color-surface-muted,
+    color-mix(in srgb, var(--iz-color-ink) 5%, var(--iz-color-surface))
+  );
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.catalog-filters-sheet__chip:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--iz-color-action) 45%, transparent);
+}
+
+.catalog-filters-sheet__chip:focus-visible {
+  outline: 2px solid var(--iz-color-action-border);
+  outline-offset: 2px;
+}
+
+.catalog-filters-sheet__chip--selected,
+.catalog-filters-sheet__chip--selected:hover:not(:disabled) {
+  border-color: var(--iz-color-action);
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast, #fff);
+}
+
+.catalog-filters-sheet__chip:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.catalog-filters-sheet__chip-count {
+  color: var(--iz-color-text-muted);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.catalog-filters-sheet__price-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.catalog-filters-sheet__price-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--iz-color-border-strong);
+  border-radius: 10px;
+  background: var(--iz-color-surface);
+  cursor: text;
+}
+
+.catalog-filters-sheet__price-field:focus-within {
+  outline: 2px solid var(--iz-color-action-border);
+  outline-offset: 1px;
+  border-color: var(--iz-color-action);
+}
+
+.catalog-filters-sheet__price-prefix {
+  color: var(--iz-color-text-muted);
+  font-size: 0.875rem;
+}
+
+.catalog-filters-sheet__price-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  color: var(--iz-color-text);
+  font: inherit;
+  /* >=16px: iOS не зумит viewport при focus */
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+
+/* Фокус рисует рамка поля; глобальная тень у input внутри неё даёт белый прямоугольник. */
+.catalog-filters-sheet__price-input:focus {
+  box-shadow: none;
 }
 
 .catalog-filters-sheet__footer {
@@ -130,11 +270,17 @@
 
 .catalog-filters-sheet__apply {
   width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+.catalog-filters-sheet__apply--counting {
+  opacity: 0.8;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .catalog-filters-sheet__scrim,
-  .catalog-filters-sheet {
+  .catalog-filters-sheet,
+  .catalog-filters-sheet__chip {
     transition-duration: 90ms;
   }
 }

@@ -1,3 +1,5 @@
+import { hasCatalogExtraFilters } from "./catalogCatalogQuery.js";
+
 /**
  * Home-лента (сторис / raffles / curated), а не отфильтрованная выдача.
  * Паритет с mobile `isHomeCatalogMainView`.
@@ -19,6 +21,7 @@
  *   catalogOriginalOnly?: boolean;
  *   catalogNear?: boolean;
  *   catalogFlashSaleOnly?: boolean;
+ *   catalogExtraFilters?: Partial<import('./catalogCatalogQuery.js').CatalogExtraFilters> | null;
  * }} params
  */
 export function isHomeCatalogFeedVisible({
@@ -38,6 +41,7 @@ export function isHomeCatalogFeedVisible({
   catalogOriginalOnly = false,
   catalogNear = false,
   catalogFlashSaleOnly = false,
+  catalogExtraFilters = null,
 }) {
   return (
     isHomeCatalogMainView &&
@@ -55,6 +59,7 @@ export function isHomeCatalogFeedVisible({
     !catalogBuyNFreeOnly &&
     !catalogOriginalOnly &&
     !catalogNear &&
-    !catalogFlashSaleOnly
+    !catalogFlashSaleOnly &&
+    !hasCatalogExtraFilters(catalogExtraFilters)
   );
 }
