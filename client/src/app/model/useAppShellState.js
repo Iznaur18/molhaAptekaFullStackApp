@@ -164,6 +164,7 @@ export function useAppShellState(location, navigate) {
     catalogOriginalOnly: catalogQueryFromUrl.originalOnly,
     catalogNear: catalogQueryFromUrl.near,
     catalogFlashSaleOnly: catalogQueryFromUrl.flashSaleOnly,
+    catalogExtraFilters: catalogQueryFromUrl,
   });
 
   const featuredContent = useHomeFeaturedContent({

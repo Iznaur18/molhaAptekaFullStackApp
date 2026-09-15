@@ -36,4 +36,22 @@ describe("isHomeCatalogFeedVisible", () => {
       }),
     ).toBe(false);
   });
+
+  it("false when price filter from the filters sheet is active", () => {
+    expect(
+      isHomeCatalogFeedVisible({
+        isHomeCatalogMainView: true,
+        catalogExtraFilters: { priceMax: 500 },
+      }),
+    ).toBe(false);
+  });
+
+  it("true when extra filters are empty", () => {
+    expect(
+      isHomeCatalogFeedVisible({
+        isHomeCatalogMainView: true,
+        catalogExtraFilters: { priceMin: null, delivery: [] },
+      }),
+    ).toBe(true);
+  });
 });

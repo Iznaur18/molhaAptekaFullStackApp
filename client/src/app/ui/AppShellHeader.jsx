@@ -44,6 +44,7 @@ const LazySiteHeaderBannerCarousel = lazy(() =>
  *   onCatalogMenuClick: () => void;
  *   isCatalogMenuActive?: boolean;
  *   productSearchTerm: string;
+ *   appliedProductSearchTerm?: string;
  *   isProductSearchPending: boolean;
  *   isAuthorized: boolean;
  *   onSetMainView: (view: import('../../shared/lib/homeMainViewPaths.js').HomeMainView) => void;
@@ -79,6 +80,7 @@ export function AppShellHeader({
   onCatalogMenuClick,
   isCatalogMenuActive = false,
   productSearchTerm,
+  appliedProductSearchTerm = "",
   isProductSearchPending,
   isAuthorized,
   onSetMainView,
@@ -191,6 +193,7 @@ export function AppShellHeader({
                   showViewerRegionPicker={showViewerRegionPicker}
                   viewerRegionCode={viewerRegionCode}
                   onViewerRegionChange={onViewerRegionChange}
+                  catalogSearchTerm={appliedProductSearchTerm}
                 />
               </div>
             </div>
@@ -221,13 +224,14 @@ export function AppShellHeader({
 }
 
 /**
- * Topbar actions: filters stub + stretch menu (region — 4-й пункт внутри).
+ * Topbar actions: окно фильтров + stretch menu (region — 4-й пункт внутри).
  * @param {{
  *   isUsersNavActive: boolean;
  *   onSetMainView: (view: import('../../shared/lib/homeMainViewPaths.js').HomeMainView) => void;
  *   showViewerRegionPicker?: boolean;
  *   viewerRegionCode?: string;
  *   onViewerRegionChange?: (code: string) => void;
+ *   catalogSearchTerm?: string;
  * }} props
  */
 function HeaderNavActions({
@@ -236,6 +240,7 @@ function HeaderNavActions({
   showViewerRegionPicker = false,
   viewerRegionCode = "",
   onViewerRegionChange,
+  catalogSearchTerm = "",
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -298,6 +303,8 @@ function HeaderNavActions({
           id={filtersSheetId}
           isOpen={isFiltersSheetOpen}
           onClose={closeFiltersSheet}
+          searchTerm={catalogSearchTerm}
+          viewerRegionCode={viewerRegionCode}
         />
       ) : null}
     </nav>
