@@ -6,10 +6,13 @@ import { IS_CATALOG_BROWSER_SUBCATEGORY_FILTER_ENABLED } from "../../../entities
 import { CATALOG_SORT_NEWEST } from "../../../entities/product/model/productConstants.js";
 import { catalogMainViewToPathname } from "../../../shared/lib/catalogMainViewPaths.js";
 import {
+  areCatalogExtraFiltersEqual,
   areCatalogSearchParamsEqual,
   buildCatalogBrowserSearchParams,
   buildCatalogSearchParams,
+  hasCatalogExtraFilters,
   parseCatalogQueryFromSearchParams,
+  pickCatalogExtraFilters,
 } from "../../../entities/product/lib/catalogCatalogQuery.js";
 
 /**
@@ -35,8 +38,10 @@ export function useCatalogQuerySync({
   catalogOriginalOnly,
   catalogNear,
   catalogFlashSaleOnly,
+  catalogExtraFilters,
   catalogQueryFromUrl,
   setCatalogSort,
+  setCatalogExtraFilters,
   setSelectedProductCategory,
   setSelectedCategoryId,
   setSellerPersonalCategoryId,
@@ -114,6 +119,10 @@ export function useCatalogQuerySync({
     setCatalogFlashSaleOnly((prev) =>
       prev === parsed.flashSaleOnly ? prev : parsed.flashSaleOnly,
     );
+    const nextExtraFilters = pickCatalogExtraFilters(parsed);
+    setCatalogExtraFilters((prev) =>
+      areCatalogExtraFiltersEqual(prev, nextExtraFilters) ? prev : nextExtraFilters,
+    );
   }, [
     location.search,
     catalogMainView,
@@ -129,6 +138,7 @@ export function useCatalogQuerySync({
     setCatalogOriginalOnly,
     setCatalogNear,
     setCatalogFlashSaleOnly,
+    setCatalogExtraFilters,
     setCatalogSort,
     setCategoryTreeLabel,
     setSelectedCategoryId,
@@ -162,7 +172,8 @@ export function useCatalogQuerySync({
       !catalogBuyNFreeOnly &&
       !catalogOriginalOnly &&
       !catalogNear &&
-      !catalogFlashSaleOnly;
+      !catalogFlashSaleOnly &&
+      !hasCatalogExtraFilters(catalogExtraFilters);
     const omitDefaultSort =
       isDefaultNewestFeed && !isExplicitCatalogNewestFeedSearch(location.search);
     const queryPayload = {
@@ -181,6 +192,7 @@ export function useCatalogQuerySync({
       originalOnly: catalogOriginalOnly,
       near: catalogNear,
       flashSaleOnly: catalogFlashSaleOnly,
+      ...catalogExtraFilters,
     };
     const built =
       catalogMainView === "catalog-browser"
@@ -216,6 +228,7 @@ export function useCatalogQuerySync({
     catalogOriginalOnly,
     catalogNear,
     catalogFlashSaleOnly,
+    catalogExtraFilters,
     navigate,
   ]);
 

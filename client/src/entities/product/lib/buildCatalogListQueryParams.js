@@ -1,3 +1,8 @@
+import {
+  EMPTY_CATALOG_EXTRA_FILTERS,
+  pickCatalogExtraFilters,
+} from "./catalogCatalogQuery.js";
+
 /**
  * Сериализуемые параметры списка каталога / «мои товары» для queryKey.
  *
@@ -28,6 +33,10 @@ export function buildCatalogListQueryParams({
         (!isCatalogBrowserMainViewActive ? selectedProductCategory : null) ??
         null)
       : null;
+  // «Мои товары» эти фильтры не принимают.
+  const extra = isMineMode
+    ? EMPTY_CATALOG_EXTRA_FILTERS
+    : pickCatalogExtraFilters(catalogQueryFromUrl);
 
   return {
     scope: isMineMode ? "my" : "catalog",
@@ -48,6 +57,15 @@ export function buildCatalogListQueryParams({
     originalOnly: catalogQueryFromUrl.originalOnly ? true : null,
     near: catalogQueryFromUrl.near && nearAllowed ? true : null,
     flashSaleOnly: catalogQueryFromUrl.flashSaleOnly ? true : null,
+    priceMin: extra.priceMin,
+    priceMax: extra.priceMax,
+    delivery: extra.delivery.length > 0 ? extra.delivery.join(",") : null,
+    pickupOnly: extra.pickupOnly ? true : null,
+    ratingMin: extra.ratingMin,
+    withReviews: extra.withReviews ? true : null,
+    returnOnly: extra.returnOnly ? true : null,
+    sellerConfirmed: extra.sellerConfirmed ? true : null,
+    sellerPremium: extra.sellerPremium ? true : null,
     regionCode: isMineMode ? null : viewerRegionCode || null,
   };
 }

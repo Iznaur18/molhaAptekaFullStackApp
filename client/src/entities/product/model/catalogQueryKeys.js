@@ -8,4 +8,8 @@ export const catalogQueryKeys = {
    * @param {string} productId
    */
   byId: (productId) => [...catalogQueryKeys.all, "by-id", productId],
+  /**
+   * @param {Record<string, unknown>} params
+   */
+  facets: (params) => ["catalog", "facets", params],
 };
