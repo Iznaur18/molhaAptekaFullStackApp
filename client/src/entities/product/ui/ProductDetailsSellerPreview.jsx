@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { isSellerSafeDealApproved } from "@molha/api-contract";
+import { buildMarketplaceNotSellerNotice } from "@izibuy/shared-lib";
 import { ChevronRight, Package, Star, Users, Wallet } from "lucide-react";
 
 import { formatSearchRowRatingCompact } from "../../user/lib/formatSearchRowRating.js";
@@ -185,6 +186,10 @@ export function ProductDetailsSellerPreview({
           </div>
         ))}
       </dl>
+
+      <p className="product-details-seller-preview__not-seller">
+        {buildMarketplaceNotSellerNotice(userName)}
+      </p>
     </>
   );
 

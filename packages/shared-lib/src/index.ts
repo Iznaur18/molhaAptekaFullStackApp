@@ -302,3 +302,9 @@ export {
   resolveYandexMapsOpenCandidates,
 } from "./yandexMapsLinks.js";
 export type { YandexMapsPointInput } from "./yandexMapsLinks.js";
+export {
+  LEGAL_RANKING_RULES_SECTIONS,
+  LEGAL_RANKING_RULES_UPDATED_AT,
+  buildMarketplaceNotSellerNotice,
+} from "./legalRankingRules.js";
+export type { LegalRankingRulesSection } from "./legalRankingRules.js";

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import {
   areCatalogSearchParamsEqual,
@@ -319,7 +319,18 @@ function CatalogFiltersSheetContent({
         </div>
       </header>
       <div className="catalog-filters-sheet__body">
-        <CatalogFiltersSection title={HOME_PAGE_UI.CATALOG_FILTERS_SHEET_SORT}>
+        <CatalogFiltersSection
+          title={HOME_PAGE_UI.CATALOG_FILTERS_SHEET_SORT}
+          after={
+            <Link
+              to="/legal/ranking"
+              className="catalog-filters-sheet__rules-link"
+              onClick={onClose}
+            >
+              {HOME_PAGE_UI.CATALOG_FILTERS_SHEET_RANKING_RULES}
+            </Link>
+          }
+        >
           {CATALOG_FILTERS_SHEET_SORTS.map((sort) => (
             <CatalogFilterChip
               key={sort}
@@ -452,10 +463,11 @@ function CatalogFiltersSheetContent({
  * @param {{
  *   title: string;
  *   before?: import('react').ReactNode;
+ *   after?: import('react').ReactNode;
  *   children: import('react').ReactNode;
  * }} props
  */
-function CatalogFiltersSection({ title, before = null, children }) {
+function CatalogFiltersSection({ title, before = null, after = null, children }) {
   const titleId = useId();
   return (
     <section className="catalog-filters-sheet__section" aria-labelledby={titleId}>
@@ -464,6 +476,7 @@ function CatalogFiltersSection({ title, before = null, children }) {
       </h3>
       {before}
       <div className="catalog-filters-sheet__chips">{children}</div>
+      {after}
     </section>
   );
 }
