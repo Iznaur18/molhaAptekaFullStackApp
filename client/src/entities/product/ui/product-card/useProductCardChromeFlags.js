@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import { SHOW_ADD_TO_CART_ON_CATALOG_CARD } from "../../lib/catalogCardPurchasePolicy.js";
+import { resolveProductPurchaseButtonState } from "../../lib/resolveProductPurchaseButtonState.js";
 import { isProductOutOfStock } from "../../lib/isProductOutOfStock.js";
 import { isProductSellerClosedNow } from "@molha/api-contract";
 import { isProductRaffleParticipant } from "../../../raffle/lib/isProductRaffleParticipant.js";
@@ -90,13 +91,19 @@ export function useProductCardChromeFlags(props, currentUserId) {
   const showSellerClosedChrome =
     !isModerationQueue && !showOutOfStockChrome && isProductSellerClosedNow(product);
 
-  const showAddToCartButton =
-    SHOW_ADD_TO_CART_ON_CATALOG_CARD &&
+  // Кнопку включает конкретный список (главный экран), а не каждая карточка.
+  // Состояния — как в окне товара: свой товар, блокировка, нет в наличии,
+  // закрыто показываются неактивной кнопкой вместо «В корзину».
+  const purchaseButtonState =
+    (SHOW_ADD_TO_CART_ON_CATALOG_CARD || props.showAddToCart === true) &&
     !isModerationQueue &&
-    product.productIsAvailable !== false &&
-    product._id != null &&
-    !isCurrentUserProductSeller(product, currentUserId) &&
-    !isProductSellerClosedNow(product);
+    product.productIsAvailable !== false
+      ? resolveProductPurchaseButtonState({
+          product,
+          isOwnProduct: isCurrentUserProductSeller(product, currentUserId),
+        })
+      : null;
+  const showAddToCartButton = purchaseButtonState?.hasPurchaseButton === true;
 
   const hasSellerToolbar = onDeleteProduct != null;
   const showFooterActions =
@@ -170,6 +177,7 @@ export function useProductCardChromeFlags(props, currentUserId) {
     showImageOverlayBadges,
     showWishlistToggle,
     showAddToCartButton,
+    purchaseButtonState,
     showFooterActions,
     showBannerActions,
     showPromotionChrome,

@@ -12,12 +12,22 @@ const SKELETON_CARD_COUNT = 9;
  * цена, отзывы, бейдж, продавец), поэтому замена скелетона карточками не
  * сдвигает вёрстку (CLS).
  *
- * @param {{ cardCount?: number; ariaLabel?: string }} [props]
+ * @param {{
+ *   cardCount?: number;
+ *   ariaLabel?: string;
+ *   withActionButton?: boolean;
+ * }} [props] `withActionButton` — под карточками ленты есть «В корзину»
+ *   (главный экран), скелетон рисует место под неё.
  */
 export function CatalogGridSkeleton({
   cardCount = SKELETON_CARD_COUNT,
   ariaLabel = HOME_PAGE_UI.LOADING_CATALOG,
+  withActionButton = false,
 }) {
+  const cardClassName = withActionButton
+    ? "catalog-grid-skeleton__card catalog-grid-skeleton__card--with-action"
+    : "catalog-grid-skeleton__card";
+
   return (
     <div
       className="app-shell__grid catalog-grid-skeleton"
@@ -26,7 +36,7 @@ export function CatalogGridSkeleton({
     >
       {Array.from({ length: cardCount }, (_, index) => (
         <div key={index} className="app-shell__cell" aria-hidden="true">
-          <div className="catalog-grid-skeleton__card">
+          <div className={cardClassName}>
             <span className="iz-skeleton catalog-grid-skeleton__image" />
             <span className="catalog-grid-skeleton__content">
               <span className="iz-skeleton iz-skeleton_line catalog-grid-skeleton__title" />
@@ -35,6 +45,9 @@ export function CatalogGridSkeleton({
               <span className="iz-skeleton catalog-grid-skeleton__badge" />
               <span className="iz-skeleton iz-skeleton_line catalog-grid-skeleton__seller" />
             </span>
+            {withActionButton ? (
+              <span className="iz-skeleton catalog-grid-skeleton__action" />
+            ) : null}
           </div>
         </div>
       ))}

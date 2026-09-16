@@ -43,6 +43,12 @@
   width: 100%;
   border-radius: var(--product-card-banner-outer-radius)
     var(--product-card-banner-outer-radius) 0 0;
+  /* Галерея внутри — отдельный слой, и часть браузеров на планшетах не режет
+     его по border-radius + overflow: фото торчало за скруглённый угол. */
+  clip-path: inset(
+    0 round var(--product-card-banner-outer-radius)
+      var(--product-card-banner-outer-radius) 0 0
+  );
 }
 
 .product-card--banner-layout .product-card__banner-content {
@@ -314,6 +320,10 @@
     aspect-ratio: unset;
     border-radius: var(--product-card-banner-outer-radius) 0 0
       var(--product-card-banner-outer-radius);
+    clip-path: inset(
+      0 round var(--product-card-banner-outer-radius) 0 0
+        var(--product-card-banner-outer-radius)
+    );
     background: var(--iz-color-surface);
   }
 
@@ -326,4 +336,28 @@
   .product-card--banner-layout .product-card__banner-content {
     justify-content: center;
   }
+}
+
+/* Тёмная тема: --iz-color-on-contrast там тёмный, и на красном баннере текст
+   и блик сливались. Баннер красный в обеих темах — текст и блик белые. */
+:root[data-theme="dark"] .product-card__promotion-ribbon--tier-3,
+:root[data-theme="dark"] .product-card--banner-layout .product-card__banner-tier-badge,
+:root[data-theme="dark"]
+  .product-card--banner-layout
+  .product-card__banner-actions
+  .add-to-cart:not(:disabled),
+:root[data-theme="dark"]
+  .product-card--banner-layout
+  .product-card__banner-actions
+  .add-to-cart--login {
+  color: #fff;
+}
+
+:root[data-theme="dark"] .product-card__promotion-ribbon--tier-3::after {
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgb(255 255 255 / 42%) 50%,
+    transparent 62%
+  );
 }

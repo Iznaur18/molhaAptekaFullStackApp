@@ -23,6 +23,7 @@ import "./ProductCard.css";
  * @param {boolean} [isPremiumUser]
  * @param {string | null} [currentUserId]
  * @param {() => void} [onRequestLoginAddToCart]
+ * @param {boolean} [showAddToCart] — «В корзину» под карточкой (только главный экран)
  * @param {boolean} [isMineMode]
  * @param {boolean} [highlightCatalogPromotion]
  * @param {boolean} [promotionFullWidth]

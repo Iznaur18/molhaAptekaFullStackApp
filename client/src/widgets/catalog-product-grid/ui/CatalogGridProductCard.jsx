@@ -28,6 +28,7 @@ import { ProductCard } from "../../../entities/product/ui/ProductCard.jsx";
  *   isPremiumUser: boolean;
  *   currentUserId: string | null;
  *   onRequestLoginAddToCart: () => void;
+ *   showAddToCart?: boolean;
  *   promotionFullWidth?: boolean;
  *   viewerRegionCode?: string | null;
  *   highlightRaffleProducts: boolean;
@@ -59,6 +60,7 @@ export const CatalogGridProductCard = memo(function CatalogGridProductCard({
   isPremiumUser,
   currentUserId,
   onRequestLoginAddToCart,
+  showAddToCart = false,
   promotionFullWidth = false,
   viewerRegionCode = null,
   highlightRaffleProducts,
@@ -95,6 +97,7 @@ export const CatalogGridProductCard = memo(function CatalogGridProductCard({
         isPremiumUser={isPremiumUser}
         currentUserId={currentUserId}
         onRequestLoginAddToCart={onRequestLoginAddToCart}
+        showAddToCart={showAddToCart && !isMineMode}
         isMineMode={isMineMode}
         highlightCatalogPromotion={!isMineMode}
         promotionFullWidth={promotionFullWidth}

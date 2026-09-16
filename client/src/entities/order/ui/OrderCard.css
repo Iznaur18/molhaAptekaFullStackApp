@@ -108,6 +108,62 @@
   gap: 0.35rem;
 }
 
+.order-card__total-block {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.15;
+}
+
+.order-card__total-note {
+  color: var(--iz-color-text-secondary);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* Доставка продавцом и итог с ней — отдельной плашкой, чтобы сумма к оплате
+   не терялась среди строк отправления. */
+.order-card__delivery-total {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0.6rem 0 0;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--iz-color-action-border, var(--iz-color-border));
+  border-radius: 0.8rem;
+  background: var(--iz-color-action-soft, var(--iz-color-surface));
+}
+
+.order-card__delivery-total-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: var(--iz-color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.order-card__delivery-total-row dt,
+.order-card__delivery-total-row dd {
+  margin: 0;
+}
+
+.order-card__delivery-total-row_fee {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.order-card__delivery-total-row_fee dt {
+  color: var(--iz-color-action);
+}
+
+.order-card__delivery-total-row_sum {
+  padding-top: 0.35rem;
+  border-top: 1px dashed var(--iz-color-action-border, var(--iz-color-border));
+  font-size: 1rem;
+  font-weight: 800;
+}
+
 .order-card__quantity {
   color: var(--iz-color-text-secondary);
   font-size: 0.95rem;
@@ -360,6 +416,34 @@
   color: var(--iz-color-text);
   font-weight: 600;
   white-space: nowrap;
+}
+
+/* Компактная карточка: сумма позиции справа от названия. */
+.order-card__item-price-block {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  margin-left: auto;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.order-card--compact .order-card__item-price {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.order-card__item-price-unit {
+  color: var(--iz-color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.order-card__item_cancelled .order-card__item-price-unit {
+  color: var(--iz-color-text-muted);
+  text-decoration: line-through;
 }
 
 .order-card__item-loyalty {

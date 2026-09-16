@@ -22,6 +22,7 @@ import "./AddToCartButton.css";
  *   variant?: 'default' | 'detail';
  *   isPurchaseBlocked?: boolean;
  *   blockedPurchaseLabel?: string;
+ *   guestLabel?: string;
  * }} props
  */
 export function AddToCartButton({
@@ -33,6 +34,7 @@ export function AddToCartButton({
   variant = "default",
   isPurchaseBlocked = false,
   blockedPurchaseLabel = ADD_TO_CART_UI.BLOCKED,
+  guestLabel = ADD_TO_CART_UI.LOGIN_TO_ADD,
 }) {
   const navigate = useNavigate();
   const { items, addItem, setItemQuantity, removeItem } = useCart();
@@ -59,7 +61,7 @@ export function AddToCartButton({
         className="add-to-cart add-to-cart--login"
         onClick={onRequestLogin}
       >
-        {ADD_TO_CART_UI.LOGIN_TO_ADD}
+        {guestLabel}
       </button>
     );
   }

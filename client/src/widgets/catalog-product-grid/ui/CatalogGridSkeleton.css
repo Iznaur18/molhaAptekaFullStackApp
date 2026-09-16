@@ -53,6 +53,26 @@
   height: 0.625rem;
 }
 
+/* Главный экран: под текстом карточки — «В корзину» (замер 15.09.2026:
+   кнопка 34.4 px, по бокам и снизу 10 px, над ней без отступа). */
+.catalog-grid-skeleton__card--with-action .catalog-grid-skeleton__content {
+  padding-bottom: 0;
+}
+
+.catalog-grid-skeleton .catalog-grid-skeleton__action {
+  display: block;
+  height: 2.15rem;
+  margin: 0 0.625rem 0.625rem;
+  border-radius: 1rem;
+}
+
+/* До 1023 px над кнопкой отступ 0.5rem — как у карточки (ProductCardMobileCatalog.css). */
+@container app-viewport (max-width: 1023px) {
+  .catalog-grid-skeleton .catalog-grid-skeleton__action {
+    margin-top: 0.5rem;
+  }
+}
+
 /* Скелетон догрузки под лентой блоками: тот же зазор, что между рядами сетки
    (значения — как row-gap у .app-shell__grid-blocks в AppShell.css). */
 .app-shell__grid-blocks + .catalog-grid-skeleton {

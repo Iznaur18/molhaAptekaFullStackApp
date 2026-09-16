@@ -383,7 +383,8 @@
     flex: 0 0 auto;
     margin-top: 0;
     padding: 0 var(--product-card-mobile-content-inset-x);
-    padding-top: 0;
+    /* «В корзину» не липнет к строке продавца. */
+    padding-top: 0.5rem;
     gap: 0.35rem;
     overflow: hidden;
   }
