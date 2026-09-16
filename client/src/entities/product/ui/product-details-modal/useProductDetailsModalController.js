@@ -14,10 +14,7 @@ import { getProductFieldReadLayout } from "../../lib/productFieldRegistry.js";
 import { filterProductDetailsVisibleFieldKeys } from "../../lib/isProductDetailsFieldVisible.js";
 import { resolveProductDetailsContentPanels } from "../../lib/resolveProductDetailsContentPanels.js";
 import { useAuthSession } from "../../../user/model/useAuthSession.js";
-import { getProductPurchaseLimit } from "../../lib/getProductPurchaseLimit.js";
-import { resolveProductOutOfStockOverlayLabel } from "../../lib/resolveProductOutOfStockOverlayLabel.js";
-import { resolveProductPurchaseBlockState } from "../../lib/resolveProductPurchaseBlockState.js";
-import { resolveProductSellerClosedPurchaseState } from "../../lib/resolveProductSellerClosedPurchaseState.js";
+import { resolveProductPurchaseButtonState } from "../../lib/resolveProductPurchaseButtonState.js";
 import {
   PRODUCT_QA_UI,
   PRODUCT_REVIEW_UI,
@@ -152,33 +149,22 @@ export function useProductDetailsModalController({
       bottomMetaFieldKeys.length > 0
     );
   }, [bottomMetaFieldKeys, contentPanels, product]);
-  const purchaseLimit = product ? getProductPurchaseLimit(product) : 0;
-  const isProductOutOfStock = product?.productOutOfStock === true;
-  const { isPurchaseBlocked, blockedLabel } = resolveProductPurchaseBlockState(product);
-  const { isSellerClosed, closedLabel: sellerClosedLabel } =
-    resolveProductSellerClosedPurchaseState(product);
-  const canShowAddToCart =
-    showAddToCart &&
-    product?._id != null &&
-    !tabs.isOwnProduct &&
-    purchaseLimit > 0 &&
-    !isProductOutOfStock &&
-    !isPurchaseBlocked &&
-    !isSellerClosed;
-  const showOutOfStockPurchaseButton =
-    showAddToCart && product?._id != null && !tabs.isOwnProduct && isProductOutOfStock;
-  const showBlockedPurchaseButton =
-    product?._id != null && !tabs.isOwnProduct && isPurchaseBlocked;
-  const showSellerClosedPurchaseButton =
-    product?._id != null &&
-    !tabs.isOwnProduct &&
-    isSellerClosed &&
-    !isPurchaseBlocked &&
-    !isProductOutOfStock;
-  const showOwnProductPurchaseButton = product?._id != null && tabs.isOwnProduct;
-  const outOfStockPurchaseLabel = product
-    ? resolveProductOutOfStockOverlayLabel(product)
-    : "";
+  const {
+    purchaseLimit,
+    canShowAddToCart,
+    showOutOfStockPurchaseButton,
+    showBlockedPurchaseButton,
+    showSellerClosedPurchaseButton,
+    showOwnProductPurchaseButton,
+    isPurchaseBlocked,
+    outOfStockPurchaseLabel,
+    blockedPurchaseLabel: blockedLabel,
+    sellerClosedPurchaseLabel: sellerClosedLabel,
+  } = resolveProductPurchaseButtonState({
+    product,
+    isOwnProduct: tabs.isOwnProduct,
+    showAddToCart,
+  });
 
   const reviewCount = Number(product?.reviewCount) || 0;
   const reviewsTabLabel =

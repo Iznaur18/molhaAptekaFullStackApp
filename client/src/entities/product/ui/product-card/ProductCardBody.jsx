@@ -1,6 +1,6 @@
-import { AddToCartButton } from "../../../../features/cart-add/ui/AddToCartButton.jsx";
 import { PRODUCT_CARD_UI } from "../../../../shared/config/appUiCopy.js";
 import { ProductCardBannerContent } from "./ProductCardBannerContent.jsx";
+import { ProductCardPurchaseButton } from "./ProductCardPurchaseButton.jsx";
 import { ProductCardFooter } from "./ProductCardFooter.jsx";
 import { ProductCardMedia } from "./ProductCardMedia.jsx";
 import { ProductCardSellerToolbar } from "./ProductCardSellerToolbar.jsx";
@@ -60,14 +60,7 @@ export function ProductCardBody({ vm, detailsSurface }) {
                 onClick={detailsSurface.stopCardDetailsActivation}
                 onKeyDown={detailsSurface.stopCardDetailsActivation}
               >
-                {vm.showAddToCartButton ? (
-                  <AddToCartButton
-                    productId={String(vm.product._id)}
-                    isAuthorized={vm.isAuthorized}
-                    onRequestLogin={vm.onRequestLoginAddToCart}
-                    maxQuantity={vm.purchaseLimit}
-                  />
-                ) : null}
+                <ProductCardPurchaseButton vm={vm} />
                 {sellerToolbar}
               </div>
             ) : null}

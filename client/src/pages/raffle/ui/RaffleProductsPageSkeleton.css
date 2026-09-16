@@ -1,0 +1,39 @@
+/*
+ * Плашки скелетона страницы розыгрыша. Рамки (фото, шапка, прогресс,
+ * статистика) — классы живой страницы, здесь только размеры строк: высоты
+ * взяты из шрифтов RaffleProductsPage.css, чтобы подмена не дёргала вёрстку.
+ */
+
+.raffle-products-skeleton__media {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+.raffle-products-skeleton__eyebrow {
+  width: 5.5rem;
+  height: 0.72rem;
+}
+
+.raffle-products-skeleton__title {
+  width: 70%;
+  height: 1.35rem;
+}
+
+.raffle-products-skeleton__bar {
+  width: 100%;
+  height: 0.55rem;
+  border-radius: 999px;
+}
+
+.raffle-products-skeleton__stat-label {
+  align-self: center;
+  width: 60%;
+  height: 0.65rem;
+}
+
+.raffle-products-skeleton__stat-value {
+  align-self: center;
+  width: 40%;
+  height: 1.4rem;
+}

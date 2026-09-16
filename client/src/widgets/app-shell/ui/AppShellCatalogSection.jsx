@@ -251,7 +251,9 @@ export function AppShellCatalogGridSection({
         <h2 className="home-feed-section-title">{HOME_PAGE_UI.CATALOG_HOME_SECTION}</h2>
       ) : null}
       {isCatalogInitialLoading ? (
-        <CatalogGridSkeleton />
+        <CatalogGridSkeleton
+          withActionButton={catalogMainView === "catalog" && !isMineMode}
+        />
       ) : (
         <HomeCatalogGrid
           products={products}
@@ -280,6 +282,8 @@ export function AppShellCatalogGridSection({
           sellerLoyaltyPointsBalance={sellerLoyaltyPointsBalance}
           sellerLoyaltyPointsReserved={sellerLoyaltyPointsReserved}
           onRequestLoginAddToCart={onRequestLoginAddToCart}
+          // «В корзину» под карточками — только на главном экране.
+          showAddToCart={catalogMainView === "catalog" && !isMineMode}
           catalogSentinelRef={catalogSentinelRef}
           catalogHasMore={catalogHasMore}
           isCatalogLoadingMore={isCatalogLoadingMore}

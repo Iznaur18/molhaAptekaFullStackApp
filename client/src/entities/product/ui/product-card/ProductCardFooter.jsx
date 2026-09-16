@@ -1,6 +1,6 @@
-import { AddToCartButton } from "../../../../features/cart-add/ui/AddToCartButton.jsx";
 import { PRODUCT_CARD_UI } from "../../../../shared/config/appUiCopy.js";
 import { ProductModerationDetailsFooter } from "../ProductModerationDetailsFooter.jsx";
+import { ProductCardPurchaseButton } from "./ProductCardPurchaseButton.jsx";
 
 /**
  * @param {{
@@ -35,14 +35,7 @@ export function ProductCardFooter({ vm, sellerToolbar, stopCardDetailsActivation
         />
       ) : null}
       {sellerToolbar}
-      {vm.showAddToCartButton ? (
-        <AddToCartButton
-          productId={String(vm.product._id)}
-          isAuthorized={vm.isAuthorized}
-          onRequestLogin={vm.onRequestLoginAddToCart}
-          maxQuantity={vm.purchaseLimit}
-        />
-      ) : null}
+      <ProductCardPurchaseButton vm={vm} />
     </div>
   );
 }

@@ -273,6 +273,9 @@ function OrderCardLineItem({
   const deliveredAtText = item.deliveredAt ? formatIsoDateTime(item.deliveredAt) : "";
   const confirmedAtText = item.confirmedAt ? formatIsoDateTime(item.confirmedAt) : "";
   const loyaltyPoints = Math.floor(Number(item.loyaltyPointsPerUnitAtOrder));
+  const quantity = Math.max(0, Math.floor(Number(item.quantity) || 0));
+  const unitPriceRub = Number(item.unitPriceAtOrder) || 0;
+  const lineTotalRub = unitPriceRub * quantity;
   const productName = resolveOrderLineItemProductName(item);
   const affiliateSellerLine = resolveOrderLineAffiliateSellerLine({
     item,
@@ -286,11 +289,13 @@ function OrderCardLineItem({
   const isCancelled = item.status === ORDER_STATUS_CANCELLED;
 
   if (showSecondaryOnly) {
+    // Сами позиции уже видны выше. Название здесь — только подпись к
+    // дополнительным сведениям, одно оно было бы повтором списка товаров.
     const hasSecondary =
-      itemsCount > 1 ||
       loyaltyPoints > 0 ||
-      deliveredAtText ||
-      confirmedAtText ||
+      Boolean(deliveredAtText) ||
+      Boolean(confirmedAtText) ||
+      Boolean(returnedByLabel) ||
       Boolean(affiliateSellerLine);
 
     if (!hasSecondary) {
@@ -371,7 +376,23 @@ function OrderCardLineItem({
                 {ORDER_CARD_UI.ITEM_CANCELLED_BADGE}
               </span>
             ) : null}
-            {compact ? null : (
+            {compact ? (
+              // Сумма позиции напротив названия; при нескольких штуках — ещё
+              // «количество × цена за штуку», чтобы было видно, из чего она.
+              <span className="order-card__item-price-block">
+                <span className="order-card__item-price">
+                  {formatPriceRub(lineTotalRub)}
+                </span>
+                {quantity > 1 ? (
+                  <span className="order-card__item-price-unit">
+                    {ORDER_CARD_UI.ITEM_QUANTITY_UNIT_PRICE(
+                      quantity,
+                      formatPriceRub(unitPriceRub),
+                    )}
+                  </span>
+                ) : null}
+              </span>
+            ) : (
               <>
                 <span className="order-card__item-quantity">×{item.quantity}</span>
                 <span className="order-card__item-price">
@@ -759,6 +780,14 @@ export function OrderCard({
   // Тариф продавца: отдельная сумма и отдельная строка — её платят
   // продавцу, а не курьеру, и поднимать её покупатель не может.
   const sellerDeliveryFeeRub = Number(shipmentOwn?.sellerDeliveryFeeRub) || 0;
+  // Покупатель платит и за товары, и за доставку (продавцу или курьеру), а в
+  // `totalAmount` доставка не входит — складываем сами. Все позиции
+  // отменены — отправления нет, и доставку не показываем.
+  const courierDeliveryFeeRub =
+    shipmentOwn?.courierDelivery === true ? deliveryFeeRub : 0;
+  const orderDeliveryRub =
+    itemsSummary.totalAmount > 0 ? sellerDeliveryFeeRub + courierDeliveryFeeRub : 0;
+  const orderTotalWithDeliveryRub = itemsSummary.totalAmount + orderDeliveryRub;
   const awaitingGitorgCourier = isAwaitingGitorgCourier({
     status: shipmentStatusNow,
     shipment: shipmentOwn,
@@ -1026,12 +1055,17 @@ export function OrderCard({
         </div>
       ) : null}
 
-      {sellerDeliveryFeeRub > 0 ? (
-        <div className="order-card__fee">
-          <span>
-            {ORDER_CARD_UI.SELLER_DELIVERY_FEE(formatPriceRub(sellerDeliveryFeeRub))}
-          </span>
-        </div>
+      {sellerDeliveryFeeRub > 0 && orderDeliveryRub > 0 ? (
+        <dl className="order-card__delivery-total">
+          <div className="order-card__delivery-total-row order-card__delivery-total-row_fee">
+            <dt>{ORDER_CARD_UI.SELLER_DELIVERY_FEE_LABEL}</dt>
+            <dd>{formatPriceRub(sellerDeliveryFeeRub)}</dd>
+          </div>
+          <div className="order-card__delivery-total-row order-card__delivery-total-row_sum">
+            <dt>{ORDER_CARD_UI.TOTAL_WITH_DELIVERY_LABEL}</dt>
+            <dd>{formatPriceRub(orderTotalWithDeliveryRub)}</dd>
+          </div>
+        </dl>
       ) : null}
 
       {canRaiseFee ? (
@@ -1253,8 +1287,15 @@ export function OrderCard({
           {compact && itemsSummary.quantity > 0 ? (
             <span className="order-card__quantity">×{itemsSummary.quantity}</span>
           ) : null}
-          <span className="order-card__total">
-            {formatPriceRub(itemsSummary.totalAmount)}
+          <span className="order-card__total-block">
+            <span className="order-card__total">
+              {formatPriceRub(orderTotalWithDeliveryRub)}
+            </span>
+            {orderDeliveryRub > 0 ? (
+              <span className="order-card__total-note">
+                {ORDER_CARD_UI.TOTAL_WITH_DELIVERY_NOTE}
+              </span>
+            ) : null}
           </span>
         </div>
       </header>

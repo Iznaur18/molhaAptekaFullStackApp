@@ -33,6 +33,7 @@ import { CatalogGridProductCard } from "./CatalogGridProductCard.jsx";
  *   isPremiumUser?: boolean;
  *   currentUserId?: string | null;
  *   onRequestLoginAddToCart: () => void;
+ *   showAddToCart?: boolean;
  *   catalogSentinelRef: import('react').RefObject<HTMLDivElement | null>;
  *   catalogHasMore: boolean;
  *   isCatalogLoadingMore: boolean;
@@ -82,6 +83,7 @@ export function HomeCatalogGrid({
   isPremiumUser = false,
   currentUserId = null,
   onRequestLoginAddToCart,
+  showAddToCart = false,
   catalogSentinelRef,
   catalogHasMore,
   isCatalogLoadingMore,
@@ -169,6 +171,7 @@ export function HomeCatalogGrid({
     isPremiumUser,
     currentUserId,
     onRequestLoginAddToCart,
+    showAddToCart,
     highlightRaffleProducts,
     sellerRaffleActive,
     onToggleRaffleParticipation,
@@ -283,6 +286,7 @@ export function HomeCatalogGrid({
             <CatalogGridSkeleton
               cardCount={columnCount * 2}
               ariaLabel={HOME_PAGE_UI.CATALOG_LOADING_MORE}
+              withActionButton={showAddToCart && !isMineMode}
             />
           ) : null}
           {catalogLoadMoreError ? (

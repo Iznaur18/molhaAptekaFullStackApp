@@ -29,6 +29,11 @@ const PAGES = [
     скелетон: "UserDetailsPageSkeleton",
   },
   {
+    имя: "страница розыгрыша",
+    страница: "src/pages/raffle/ui/RaffleProductsPage.jsx",
+    скелетон: "RaffleProductsPageSkeleton",
+  },
+  {
     имя: "корзина",
     страница: "src/pages/cart/ui/CartPage.jsx",
     скелетон: "CartPageSkeleton",

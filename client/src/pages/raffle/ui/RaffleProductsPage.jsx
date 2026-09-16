@@ -18,6 +18,8 @@ import {
   RAFFLE_PRODUCTS_PAGE_UI,
 } from "../../../shared/config/appUiCopy.js";
 
+import { RaffleProductsPageSkeleton } from "./RaffleProductsPageSkeleton.jsx";
+
 import "./RaffleProductsPage.css";
 
 /**
@@ -233,9 +235,7 @@ export function RaffleProductsPage({
   }, [activeSwipeIndex]);
 
   if (phase === "loading") {
-    return (
-      <p className="raffle-products-page__state">{RAFFLE_PRODUCTS_PAGE_UI.LOADING}</p>
-    );
+    return <RaffleProductsPageSkeleton />;
   }
 
   if (phase === "error") {

@@ -15,6 +15,12 @@ export const ORDER_CARD_UI = {
   PAYMENT_LABEL: "Оплата",
   STATUS_LABEL: "Статус",
   ITEM_STATUS_LABEL: "Статус позиции",
+  /**
+   * Под суммой позиции: «4 × 34 333 ₽».
+   * @param {number} quantity
+   * @param {string} unitPrice
+   */
+  ITEM_QUANTITY_UNIT_PRICE: (quantity, unitPrice) => `${quantity} × ${unitPrice}`,
   ITEM_DELIVERED_AT_LABEL: "Доставлен",
   ITEM_CONFIRMED_AT_LABEL: "Подтверждён",
   CREATED_LABEL: "Создан",
@@ -72,7 +78,11 @@ export const ORDER_CARD_UI = {
   /** @param {string} fee */
   SHIPMENT_FEE: (fee) => `Курьеру за доставку: ${fee}`,
   /** Доставка по тарифу продавца — платится продавцу, а не курьеру. */
-  SELLER_DELIVERY_FEE: (fee) => `Доставка продавцом: ${fee}`,
+  SELLER_DELIVERY_FEE_LABEL: "Доставка продавцом",
+  /** Товары + доставка: столько покупатель платит за заказ. */
+  TOTAL_WITH_DELIVERY_LABEL: "Итого с доставкой",
+  /** Подпись под суммой в шапке, когда в неё вошла доставка. */
+  TOTAL_WITH_DELIVERY_NOTE: "с доставкой",
   SHIPMENT_FEE_RAISE: "+25 ₽",
   SHIPMENT_FEE_HINT:
     "Заказ долго никто не берёт? Поднимите сумму — снизить её потом нельзя.",

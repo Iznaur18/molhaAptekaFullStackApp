@@ -1,9 +1,8 @@
-import { AddToCartButton } from "../../../../features/cart-add/ui/AddToCartButton.jsx";
 import {
   ADD_TO_CART_UI,
   PRODUCT_DETAILS_MODAL_UI,
 } from "../../../../shared/config/appUiCopy.js";
-import { BlockedPurchaseButton } from "../../../../shared/ui/BlockedPurchaseButton.jsx";
+import { ProductPurchaseCartButton } from "../ProductPurchaseCartButton.jsx";
 
 /**
  * Dock / desktop purchase: только корзина (аукцион/рассрочка — через тизеры).
@@ -65,23 +64,6 @@ export function ProductDetailsModalPurchaseActions({
     .filter(Boolean)
     .join(" ");
 
-  const cartNode = resolveCartNode({
-    productId,
-    isAuthorized,
-    onRequestLogin,
-    purchaseLimit,
-    canShowAddToCart,
-    showOutOfStockPurchaseButton,
-    showBlockedPurchaseButton,
-    showSellerClosedPurchaseButton,
-    showOwnProductPurchaseButton,
-    outOfStockPurchaseLabel,
-    blockedPurchaseLabel,
-    sellerClosedPurchaseLabel,
-    ownProductPurchaseLabel,
-    unitPriceSnapshot,
-  });
-
   return (
     <div className={rootClassName}>
       {typeof onBack === "function" ? (
@@ -96,92 +78,24 @@ export function ProductDetailsModalPurchaseActions({
           {PRODUCT_DETAILS_MODAL_UI.BACK_ARIA}
         </button>
       ) : null}
-      <div className="product-details-modal__price-actions-cart">{cartNode}</div>
+      <div className="product-details-modal__price-actions-cart">
+        <ProductPurchaseCartButton
+          productId={productId}
+          isAuthorized={isAuthorized}
+          onRequestLogin={onRequestLogin}
+          purchaseLimit={purchaseLimit}
+          canShowAddToCart={canShowAddToCart}
+          showOutOfStockPurchaseButton={showOutOfStockPurchaseButton}
+          showBlockedPurchaseButton={showBlockedPurchaseButton}
+          showSellerClosedPurchaseButton={showSellerClosedPurchaseButton}
+          showOwnProductPurchaseButton={showOwnProductPurchaseButton}
+          outOfStockPurchaseLabel={outOfStockPurchaseLabel}
+          blockedPurchaseLabel={blockedPurchaseLabel}
+          sellerClosedPurchaseLabel={sellerClosedPurchaseLabel}
+          ownProductPurchaseLabel={ownProductPurchaseLabel}
+          unitPriceSnapshot={unitPriceSnapshot}
+        />
+      </div>
     </div>
-  );
-}
-
-/**
- * @param {{
- *   productId: string;
- *   isAuthorized: boolean;
- *   onRequestLogin: () => void;
- *   purchaseLimit?: number;
- *   canShowAddToCart: boolean;
- *   showOutOfStockPurchaseButton: boolean;
- *   showBlockedPurchaseButton: boolean;
- *   showSellerClosedPurchaseButton: boolean;
- *   showOwnProductPurchaseButton: boolean;
- *   outOfStockPurchaseLabel: string;
- *   blockedPurchaseLabel: string;
- *   sellerClosedPurchaseLabel: string;
- *   ownProductPurchaseLabel: string;
- *   unitPriceSnapshot?: number;
- * }} args
- */
-function resolveCartNode({
-  productId,
-  isAuthorized,
-  onRequestLogin,
-  purchaseLimit,
-  canShowAddToCart,
-  showOutOfStockPurchaseButton,
-  showBlockedPurchaseButton,
-  showSellerClosedPurchaseButton,
-  showOwnProductPurchaseButton,
-  outOfStockPurchaseLabel,
-  blockedPurchaseLabel,
-  sellerClosedPurchaseLabel,
-  ownProductPurchaseLabel,
-  unitPriceSnapshot,
-}) {
-  if (showOwnProductPurchaseButton) {
-    return (
-      <button
-        type="button"
-        className="add-to-cart add-to-cart--out-of-stock"
-        disabled
-        aria-disabled="true"
-      >
-        {ownProductPurchaseLabel}
-      </button>
-    );
-  }
-
-  if (showBlockedPurchaseButton) {
-    return <BlockedPurchaseButton label={blockedPurchaseLabel} variant="cart" />;
-  }
-
-  if (showOutOfStockPurchaseButton) {
-    return (
-      <button type="button" className="add-to-cart add-to-cart--out-of-stock" disabled>
-        {outOfStockPurchaseLabel}
-      </button>
-    );
-  }
-
-  if (showSellerClosedPurchaseButton) {
-    return (
-      <button type="button" className="add-to-cart add-to-cart--out-of-stock" disabled>
-        {sellerClosedPurchaseLabel}
-      </button>
-    );
-  }
-
-  if (!canShowAddToCart) {
-    return null;
-  }
-
-  return (
-    <AddToCartButton
-      productId={productId}
-      isAuthorized={isAuthorized}
-      onRequestLogin={onRequestLogin}
-      maxQuantity={purchaseLimit}
-      unitPriceSnapshot={unitPriceSnapshot}
-      variant="detail"
-      isPurchaseBlocked={showBlockedPurchaseButton}
-      blockedPurchaseLabel={blockedPurchaseLabel}
-    />
   );
 }
