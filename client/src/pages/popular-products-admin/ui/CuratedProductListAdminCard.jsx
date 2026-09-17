@@ -174,8 +174,8 @@ export function CuratedProductListAdminCard({
         {POPULAR_PRODUCTS_ADMIN_PAGE_UI.SAVE_TITLE}
       </button>
 
-      <div className="curated-list-admin-card__add">
-        <label className="curated-list-admin-card__label">
+      <div className="curated-list-admin-card__product-add">
+        <label className="curated-list-admin-card__label curated-list-admin-card__product-add-field">
           {POPULAR_PRODUCTS_ADMIN_PAGE_UI.PRODUCT_ID_LABEL}
           <input
             className="curated-list-admin-card__input"

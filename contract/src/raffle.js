@@ -236,3 +236,22 @@ export const raffleProductsQuerySchema = z.object({
 export const setProductRaffleParticipationBodySchema = z.object({
   enabled: z.boolean({ required_error: "Укажите enabled: true/false" }),
 });
+
+/** Сколько участников отдаёт `GET /product/raffles/:raffleId/participants`. */
+export const RAFFLE_PARTICIPANTS_LIST_MAX = 500;
+
+/**
+ * `GET /product/raffles/:raffleId/participants`: кто участвует и сколько купил
+ * (подтверждённые покупки товаров розыгрыша), по убыванию покупок.
+ */
+export const raffleParticipantsDataSchema = z.object({
+  participants: z.array(
+    z.object({
+      userId: z.string(),
+      userName: z.string(),
+      userAvatarUrl: z.string(),
+      ticketCount: z.number().int().nonnegative(),
+    }),
+  ),
+  total: z.number().int().nonnegative(),
+});

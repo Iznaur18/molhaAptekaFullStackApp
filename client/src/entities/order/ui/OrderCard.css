@@ -52,12 +52,15 @@
 .order-card__status {
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem 0.65rem;
+  padding: 0.25rem 0.7rem;
   border-radius: 999px;
-  background: var(--iz-color-border);
-  color: var(--iz-color-text);
+  background: var(--order-status-bg, #475569);
+  color: var(--order-status-fg, #fff);
+  box-shadow: 0 1px 3px
+    color-mix(in srgb, var(--order-status-bg, #475569) 45%, transparent);
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 .order-card__order-number {
@@ -70,29 +73,54 @@
   color: var(--iz-color-text-muted, var(--iz-color-text));
 }
 
+/* Статус — сплошная заливка: бледные тинты терялись на карточке. Цвета
+   одинаковые в обеих темах, текст белый (на жёлтом — тёмный). */
 .order-card__status_pending {
-  background: var(--iz-color-status-warning-soft);
-  color: var(--iz-color-warning-text);
+  --order-status-bg: #f59e0b;
+  --order-status-fg: #231500;
 }
 
-.order-card__status_confirmed {
-  background: var(--iz-color-action-soft);
-  color: var(--iz-color-action);
+.order-card__status_accepted,
+.order-card__status_assembling {
+  --order-status-bg: #0284c7;
 }
 
-.order-card__status_shipped {
-  background: var(--iz-color-status-purple-soft);
-  color: var(--iz-color-accent);
+.order-card__status_ready_for_pickup,
+.order-card__status_ready_to_ship {
+  --order-status-bg: #ea580c;
+}
+
+.order-card__status_shipped,
+.order-card__status_courier_assigned,
+.order-card__status_courier_holding,
+.order-card__status_in_delivery {
+  --order-status-bg: #7c3aed;
 }
 
 .order-card__status_delivered {
-  background: var(--iz-color-status-success-soft);
-  color: var(--iz-color-success);
+  --order-status-bg: #0d9488;
+}
+
+.order-card__status_confirmed {
+  --order-status-bg: #16a34a;
 }
 
 .order-card__status_cancelled {
-  background: var(--iz-color-status-danger-soft);
-  color: var(--iz-color-danger);
+  --order-status-bg: #dc2626;
+}
+
+.order-card__status_returned {
+  --order-status-bg: #64748b;
+}
+
+.order-card__status_disputed {
+  --order-status-bg: #be123c;
+}
+
+/* Идёт вместе со статусом отправления и должен его перекрыть — поэтому последним. */
+.order-card__status_awaiting-courier {
+  --order-status-bg: #f59e0b;
+  --order-status-fg: #231500;
 }
 
 .order-card__total {
@@ -121,8 +149,8 @@
   font-weight: 600;
 }
 
-/* Доставка продавцом и итог с ней — отдельной плашкой, чтобы сумма к оплате
-   не терялась среди строк отправления. */
+/* Доставка продавцом — отдельной плашкой, чтобы не терялась среди строк
+   отправления. */
 .order-card__delivery-total {
   display: flex;
   flex-direction: column;
@@ -155,13 +183,6 @@
 
 .order-card__delivery-total-row_fee dt {
   color: var(--iz-color-action);
-}
-
-.order-card__delivery-total-row_sum {
-  padding-top: 0.35rem;
-  border-top: 1px dashed var(--iz-color-action-border, var(--iz-color-border));
-  font-size: 1rem;
-  font-weight: 800;
 }
 
 .order-card__quantity {
@@ -970,7 +991,8 @@
   line-height: 1.45;
 }
 
-.order-card__status_awaiting-courier {
-  background: var(--iz-color-status-warning-soft);
-  color: var(--iz-color-warning-text);
+/* Комментарий покупателя к доставке (подъезд, этаж, кв). */
+.order-card__meta-comment {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }

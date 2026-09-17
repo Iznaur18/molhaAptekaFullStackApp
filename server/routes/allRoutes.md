@@ -235,6 +235,7 @@
 | POST   | `/product/raffles`                         | 🔑     | Создать розыгрыш             |
 | GET    | `/product/raffles/:raffleId`               | 🔓     | Розыгрыш по id               |
 | GET    | `/product/raffles/:raffleId/products`      | 🔓     | Товары розыгрыша             |
+| GET    | `/product/raffles/:raffleId/participants`  | 🔓     | Участники и их покупки       |
 | PATCH  | `/product/raffles/:raffleId`               | 🔑     | Правка розыгрыша             |
 | DELETE | `/product/raffles/my/:raffleId`            | 🔑     | Удалить свой розыгрыш        |
 | PATCH  | `/product/raffles/:raffleId/pause`         | 🔑     | Пауза розыгрыша              |

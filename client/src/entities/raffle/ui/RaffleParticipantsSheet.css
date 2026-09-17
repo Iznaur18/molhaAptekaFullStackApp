@@ -1,0 +1,257 @@
+/**
+ * Окно «Участники» розыгрыша. Анимация, радиус и ширина — как у
+ * ViewerRegionPickerSheet.
+ */
+.raffle-participants-sheet__backdrop {
+  --raffle-participants-enter-ms: 300ms;
+  --raffle-participants-exit-ms: 240ms;
+  --raffle-participants-enter-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --raffle-participants-exit-ease: cubic-bezier(0.55, 0.055, 0.675, 1);
+  --raffle-participants-sheet-height: min(92vh, 36rem);
+  --raffle-participants-sheet-height: min(92svh, 36rem);
+  --raffle-participants-radius: 2rem;
+  --raffle-participants-max-width: 100%;
+  --raffle-participants-inline-padding: var(--iz-space-4);
+
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  box-sizing: border-box;
+  background: transparent;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+@media (min-width: 641px) {
+  .raffle-participants-sheet__backdrop {
+    --raffle-participants-max-width: min(26rem, 100%);
+  }
+}
+
+.raffle-participants-sheet__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--iz-color-ink) 55%, transparent);
+  opacity: 0;
+  transition: opacity var(--raffle-participants-exit-ms)
+    var(--raffle-participants-exit-ease);
+}
+
+.raffle-participants-sheet__backdrop--open .raffle-participants-sheet__scrim {
+  opacity: 1;
+  transition: opacity var(--raffle-participants-enter-ms)
+    var(--raffle-participants-enter-ease);
+}
+
+.raffle-participants-sheet__dismiss {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.raffle-participants-sheet {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--raffle-participants-max-width);
+  height: var(--raffle-participants-sheet-height);
+  max-height: var(--raffle-participants-sheet-height);
+  border-radius: var(--raffle-participants-radius) var(--raffle-participants-radius) 0 0;
+  corner-shape: squircle;
+  background: var(--iz-color-surface);
+  box-shadow: 0 -12px 40px color-mix(in srgb, var(--iz-color-text) 18%, transparent);
+  overflow: hidden;
+  transform: translate3d(0, 100%, 0);
+  transition: transform var(--raffle-participants-exit-ms)
+    var(--raffle-participants-exit-ease);
+  will-change: transform;
+  overscroll-behavior: contain;
+}
+
+.raffle-participants-sheet__backdrop--open .raffle-participants-sheet {
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--raffle-participants-enter-ms)
+    var(--raffle-participants-enter-ease);
+}
+
+.raffle-participants-sheet__header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px var(--raffle-participants-inline-padding) 4px;
+}
+
+.raffle-participants-sheet__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  color: var(--iz-color-text);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.raffle-participants-sheet__total {
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.raffle-participants-sheet__close {
+  margin: 0;
+  padding: 0.25rem 0.15rem;
+  border: none;
+  background: transparent;
+  color: var(--iz-color-text-muted);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.raffle-participants-sheet__hint {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0 var(--raffle-participants-inline-padding) 10px;
+  color: var(--iz-color-text-muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.raffle-participants-sheet__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--iz-color-border);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.raffle-participants-sheet__list {
+  margin: 0;
+  padding: 4px 0 0;
+  list-style: none;
+}
+
+.raffle-participants-sheet__row {
+  display: grid;
+  grid-template-columns: 1.6rem 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 6px var(--raffle-participants-inline-padding);
+}
+
+.raffle-participants-sheet__row + .raffle-participants-sheet__row {
+  border-top: 1px solid color-mix(in srgb, var(--iz-color-border) 60%, transparent);
+}
+
+.raffle-participants-sheet__rank {
+  color: var(--iz-color-text-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.raffle-participants-sheet__avatar {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--iz-color-surface-muted, var(--iz-color-border));
+}
+
+.raffle-participants-sheet__name {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.raffle-participants-sheet__name:hover {
+  text-decoration: underline;
+}
+
+.raffle-participants-sheet__count {
+  color: var(--iz-color-action);
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.raffle-participants-sheet__rank-skeleton {
+  justify-self: center;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 4px;
+}
+
+.raffle-participants-sheet__name-skeleton {
+  width: 60%;
+}
+
+.raffle-participants-sheet__count-skeleton {
+  width: 3.5rem;
+}
+
+.raffle-participants-sheet__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 32px var(--raffle-participants-inline-padding);
+  color: var(--iz-color-text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.raffle-participants-sheet__state p {
+  margin: 0;
+}
+
+.raffle-participants-sheet__footnote {
+  margin: 0;
+  padding: 10px var(--raffle-participants-inline-padding) 0;
+  color: var(--iz-color-text-muted);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .raffle-participants-sheet__scrim,
+  .raffle-participants-sheet {
+    transition-duration: 90ms;
+  }
+}

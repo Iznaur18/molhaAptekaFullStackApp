@@ -111,6 +111,22 @@ const RaffleSchema = new Schema(
       default: 0,
       min: 0,
     },
+    /**
+     * Кто сколько купил на момент завершения. После завершения товары
+     * отвязываются от розыгрыша, и посчитать участников заново уже нельзя.
+     */
+    participantsSnapshot: {
+      type: [
+        new Schema(
+          {
+            userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+            ticketCount: { type: Number, required: true, min: 0 },
+          },
+          { _id: false },
+        ),
+      ],
+      default: [],
+    },
     winnerUserId: {
       type: Schema.Types.ObjectId,
       ref: "User",

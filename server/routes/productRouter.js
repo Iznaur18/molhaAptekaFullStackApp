@@ -92,6 +92,7 @@ import {
   listMyAppliedProductPromosController,
   getFeaturedRaffleController,
   getRaffleByIdController,
+  getRaffleParticipantsController,
   getRaffleProductsController,
   createRaffleController,
   getMyRaffleController,
@@ -501,6 +502,13 @@ router.get(
   "/raffles/:raffleId/products",
   raffleProductsValidation,
   getRaffleProductsController,
+);
+router.get(
+  "/raffles/:raffleId/participants",
+  catalogListRateLimiter,
+  raffleIdParamValidation,
+  checkOptionalAuthMW,
+  getRaffleParticipantsController,
 );
 router.get("/raffles/:raffleId", raffleIdParamValidation, getRaffleByIdController);
 router.delete(

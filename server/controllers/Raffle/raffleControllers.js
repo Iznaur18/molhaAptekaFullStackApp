@@ -8,6 +8,7 @@ import {
   getMyRaffleOverview,
   getRaffleById,
   getRaffleCreateAdvertisingStatus,
+  getRaffleParticipants,
   getRaffleProducts,
   listPendingRaffles,
   patchMyRaffle,
@@ -45,6 +46,15 @@ export const getRaffleProductsController = async (req, res) => {
     raffleId: req.params.raffleId,
     search: req.query.search,
     query: req.query,
+  });
+
+  return successRes(res, result);
+};
+
+export const getRaffleParticipantsController = async (req, res) => {
+  const result = await getRaffleParticipants({
+    raffleId: req.params.raffleId,
+    userId: req.userId,
   });
 
   return successRes(res, result);

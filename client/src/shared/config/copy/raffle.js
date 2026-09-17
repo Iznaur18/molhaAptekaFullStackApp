@@ -96,4 +96,22 @@ export const RAFFLE_PRODUCTS_PAGE_UI = {
   EYEBROW: "Розыгрыш",
   LOADING: "Загрузка…",
   EMPTY: "Нет товаров в этом розыгрыше.",
+  /** @param {number} count */
+  PARTICIPANTS_OPEN_ARIA: (count) => `Участники розыгрыша: ${count}. Открыть список`,
+};
+
+/** Окно «Участники» на странице розыгрыша */
+export const RAFFLE_PARTICIPANTS_SHEET_UI = {
+  TITLE: "Участники",
+  CLOSE: "Закрыть",
+  HINT: "Покупка засчитывается, когда покупатель подтвердил получение",
+  LOADING: "Загружаем участников",
+  EMPTY: "Пока никто не участвует — станьте первым.",
+  RETRY: "Повторить",
+  /** Формы для `pluralizeRu`: «1 товар / 2 товара / 5 товаров». */
+  ITEM_FORMS: /** @type {const} */ (["товар", "товара", "товаров"]),
+  /** @param {string} userName */
+  OPEN_PROFILE_ARIA: (userName) => `Открыть профиль: ${userName}`,
+  /** @param {number} shown @param {number} total */
+  SHOWN_OF_TOTAL: (shown, total) => `Показаны первые ${shown} из ${total}`,
 };

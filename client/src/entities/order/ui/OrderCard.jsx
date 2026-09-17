@@ -145,6 +145,13 @@ function OrderCardMeta({
   const shipmentAddress = isPickupShipment
     ? pickupAddresses.join("; ") || order.deliveryAddress
     : order.deliveryAddress;
+  // «Комментарий» из корзины хранится в `deliveryAddressFlat`. У старых заказов
+  // сервер подставлял туда весь адрес — такой дубль не показываем.
+  const rawComment = String(order.deliveryAddressFlat ?? "").trim();
+  const deliveryComment =
+    rawComment && rawComment !== String(order.deliveryAddress ?? "").trim()
+      ? rawComment
+      : "";
 
   return (
     <dl className="order-card__meta">
@@ -187,6 +194,12 @@ function OrderCardMeta({
         </dt>
         <dd>{shipmentAddress || COMMON_UI.EM_DASH}</dd>
       </div>
+      {deliveryComment ? (
+        <div className="order-card__meta-row">
+          <dt>{ORDER_CARD_UI.DELIVERY_COMMENT_LABEL}</dt>
+          <dd className="order-card__meta-comment">{deliveryComment}</dd>
+        </div>
+      ) : null}
       {order.shippingTrackingNumber ? (
         <div className="order-card__meta-row">
           <dt>{ORDER_CARD_UI.TRACKING_LABEL}</dt>
@@ -1060,10 +1073,6 @@ export function OrderCard({
           <div className="order-card__delivery-total-row order-card__delivery-total-row_fee">
             <dt>{ORDER_CARD_UI.SELLER_DELIVERY_FEE_LABEL}</dt>
             <dd>{formatPriceRub(sellerDeliveryFeeRub)}</dd>
-          </div>
-          <div className="order-card__delivery-total-row order-card__delivery-total-row_sum">
-            <dt>{ORDER_CARD_UI.TOTAL_WITH_DELIVERY_LABEL}</dt>
-            <dd>{formatPriceRub(orderTotalWithDeliveryRub)}</dd>
           </div>
         </dl>
       ) : null}

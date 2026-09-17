@@ -158,6 +158,7 @@ export {
   RAFFLES_STAFF_PAGE_UI,
   USERS_LOYALTY_RAFFLE_ADMIN_UI,
   RAFFLE_PRODUCTS_PAGE_UI,
+  RAFFLE_PARTICIPANTS_SHEET_UI,
   RAFFLE_ADVERTISING_PAGE_UI,
 } from "./copy/raffle.js";
 export { INSTALLMENT_UI } from "./copy/installment.js";

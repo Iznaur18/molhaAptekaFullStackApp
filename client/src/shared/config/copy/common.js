@@ -181,6 +181,7 @@ export const API_CLIENT_UI = {
   FETCH_FEATURED_RAFFLE_FALLBACK: "Не удалось загрузить розыгрыш",
   FETCH_RAFFLE_FALLBACK: "Не удалось загрузить розыгрыш",
   FETCH_RAFFLE_PRODUCTS_FALLBACK: "Не удалось загрузить товары розыгрыша",
+  FETCH_RAFFLE_PARTICIPANTS_FALLBACK: "Не удалось загрузить участников розыгрыша",
   CREATE_RAFFLE_FALLBACK: "Не удалось создать розыгрыш",
   FETCH_MY_RAFFLE_FALLBACK: "Не удалось загрузить ваш розыгрыш",
   FETCH_RAFFLE_CREATE_ADVERTISING_FALLBACK: "Не удалось загрузить услугу «Розыгрыш»",

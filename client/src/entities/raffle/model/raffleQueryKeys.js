@@ -11,6 +11,15 @@ export const raffleQueryKeys = {
   detail: (raffleId) => [...raffleQueryKeys.all, "detail", raffleId],
   /**
    * @param {string} raffleId
+   */
+  participants: (raffleId) => [
+    ...raffleQueryKeys.all,
+    "detail",
+    raffleId,
+    "participants",
+  ],
+  /**
+   * @param {string} raffleId
    * @param {{ limit?: number }} [params]
    */
   products: (raffleId, params = {}) => [

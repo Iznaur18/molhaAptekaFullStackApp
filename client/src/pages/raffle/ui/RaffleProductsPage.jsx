@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { buildFeaturedRaffleProgress } from "../../../entities/raffle/lib/buildFeaturedRaffleProgressLabel.js";
 import { canSellerEditRaffle } from "../../../entities/raffle/lib/canSellerEditRaffle.js";
@@ -8,6 +8,7 @@ import { useRaffleProductsQuery } from "../../../entities/raffle/model/useRaffle
 import { useFeaturedRafflesQuery } from "../../../entities/raffle/model/useFeaturedRafflesQuery.js";
 import { FeaturedRaffleWinnerCard } from "../../../entities/raffle/ui/FeaturedRaffleWinnerCard.jsx";
 import { RaffleManageActions } from "../../../entities/raffle/ui/RaffleManageActions.jsx";
+import { RaffleParticipantsSheet } from "../../../entities/raffle/ui/RaffleParticipantsSheet.jsx";
 import { RafflePrizeMedia } from "../../../entities/raffle/ui/RafflePrizeMedia.jsx";
 import { HomeCatalogGrid } from "../../../widgets/catalog-product-grid/ui/HomeCatalogGrid.jsx";
 import useEmblaCarousel from "embla-carousel-react";
@@ -186,6 +187,8 @@ export function RaffleProductsPage({
   );
   const [activeSwipeIndex, setActiveSwipeIndex] = useState(0);
   const [swipeDirection, setSwipeDirection] = useState("forward");
+  const [isParticipantsOpen, setIsParticipantsOpen] = useState(false);
+  const closeParticipants = useCallback(() => setIsParticipantsOpen(false), []);
 
   // Синхронизируем activeRaffleId с кареткой свайпа.
   useEffect(() => {
@@ -378,14 +381,22 @@ export function RaffleProductsPage({
                     )}
                   </strong>
                 </div>
-                <div className="raffle-products-page__stat">
+                <button
+                  type="button"
+                  className="raffle-products-page__stat raffle-products-page__stat_button"
+                  aria-haspopup="dialog"
+                  aria-label={RAFFLE_PRODUCTS_PAGE_UI.PARTICIPANTS_OPEN_ARIA(
+                    progressUi.participantsCount,
+                  )}
+                  onClick={() => setIsParticipantsOpen(true)}
+                >
                   <span className="raffle-products-page__stat-label">
                     {RAFFLE_FEATURED_BANNER_UI.STAT_PARTICIPANTS}
                   </span>
                   <strong className="raffle-products-page__stat-value">
                     {progressUi.participantsCount}
                   </strong>
-                </div>
+                </button>
                 <div className="raffle-products-page__stat">
                   <span className="raffle-products-page__stat-label">
                     {RAFFLE_FEATURED_BANNER_UI.STAT_GOAL}
@@ -463,6 +474,13 @@ export function RaffleProductsPage({
           highlightRaffleProducts
         />
       </div>
+
+      <RaffleParticipantsSheet
+        isOpen={isParticipantsOpen}
+        raffleId={activeRaffleId}
+        participantsCount={progressUi?.participantsCount ?? 0}
+        onClose={closeParticipants}
+      />
     </div>
   );
 }
