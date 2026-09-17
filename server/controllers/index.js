@@ -256,6 +256,7 @@ import {
 import {
   getFeaturedRaffleController,
   getRaffleByIdController,
+  getRaffleParticipantsController,
   getRaffleProductsController,
   createRaffleController,
   getMyRaffleController,
@@ -546,6 +547,7 @@ export {
   listMyAppliedProductPromosController,
   getFeaturedRaffleController,
   getRaffleByIdController,
+  getRaffleParticipantsController,
   getRaffleProductsController,
   createRaffleController,
   getMyRaffleController,

@@ -145,7 +145,7 @@ const resolveRaffleWinnerSnapshot = async (winnerUserId) => {
  * @param {Record<string, unknown>} raffle
  * @returns {Promise<Array<{ productId: import('mongoose').Types.ObjectId; participationStartAt: Date }>>}
  */
-const buildRaffleProductSaleWindows = async (raffle) => {
+export const buildRaffleProductSaleWindows = async (raffle) => {
   const activatedAt = raffle.approvedAt;
   if (!activatedAt) {
     return [];
@@ -234,6 +234,10 @@ export const completeRaffleById = async (
         status: RAFFLE_STATUS_COMPLETED,
         salesProgress: progress,
         participantsCount: participants,
+        participantsSnapshot: ticketEntries.map((entry) => ({
+          userId: new mongoose.Types.ObjectId(entry.userId),
+          ticketCount: entry.ticketCount,
+        })),
         completedAt: new Date(),
         winnerUserId: winnerSnapshot.winnerUserId,
         winnerUserName: winnerSnapshot.winnerUserName,

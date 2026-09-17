@@ -41,16 +41,16 @@ const makeOrder = (itemStatus = "pending") => ({
 });
 
 describe("сумма заказа с доставкой продавцом", () => {
-  it("в шапке сумма с доставкой, ниже — доставка и итог", () => {
+  it("в шапке сумма с доставкой, ниже — только доставка продавцом", () => {
     renderWithProviders(<OrderCard order={makeOrder()} attentionRole="buyer" />);
 
     expect(screen.getByText(ORDER_CARD_UI.TOTAL_WITH_DELIVERY_NOTE)).toBeTruthy();
     expect(screen.getByText(ORDER_CARD_UI.SELLER_DELIVERY_FEE_LABEL)).toBeTruthy();
-    expect(screen.getByText(ORDER_CARD_UI.TOTAL_WITH_DELIVERY_LABEL)).toBeTruthy();
+    expect(screen.queryByText("Итого с доставкой")).toBeNull();
     const rowValues = [
       ...document.querySelectorAll(".order-card__delivery-total dd"),
     ].map((node) => node.textContent);
-    expect(rowValues).toEqual([formatPriceRub(240), formatPriceRub(815)]);
+    expect(rowValues).toEqual([formatPriceRub(240)]);
     expect(document.querySelector(".order-card__total")?.textContent).toBe(
       formatPriceRub(815),
     );
@@ -62,6 +62,6 @@ describe("сумма заказа с доставкой продавцом", () 
     );
 
     expect(screen.queryByText(ORDER_CARD_UI.TOTAL_WITH_DELIVERY_NOTE)).toBeNull();
-    expect(screen.queryByText(ORDER_CARD_UI.TOTAL_WITH_DELIVERY_LABEL)).toBeNull();
+    expect(screen.queryByText(ORDER_CARD_UI.SELLER_DELIVERY_FEE_LABEL)).toBeNull();
   });
 });

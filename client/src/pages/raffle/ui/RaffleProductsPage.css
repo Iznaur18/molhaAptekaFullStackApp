@@ -304,6 +304,26 @@
   text-align: center;
 }
 
+/* «Участники» — кнопка: открывает окно со списком. */
+.raffle-products-page__stat_button {
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+
+.raffle-products-page__stat_button:hover {
+  border-color: var(--iz-color-action-border, var(--iz-color-action));
+}
+
+.raffle-products-page__stat_button:focus-visible {
+  outline: 2px solid var(--iz-color-action-border, var(--iz-color-action));
+  outline-offset: 2px;
+}
+
 .raffle-products-page__stat_accent {
   border-color: color-mix(
     in srgb,

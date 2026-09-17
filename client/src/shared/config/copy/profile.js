@@ -248,7 +248,7 @@ export const USER_PROFILE_COPY = {
     userRatingByVotes: "Рейтинг по голосам",
     followersCount: "Подписчики",
     followingCount: "Подписки",
-    totalSalesCount: "Продаж",
+    totalSalesCount: "Продажи",
     totalSalesAmount: "Продаж на сумму",
     totalPurchasesAmount: "Покупок на сумму",
     userBusinessHours: "Часы работы",

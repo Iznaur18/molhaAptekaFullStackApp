@@ -60,6 +60,46 @@
   border-bottom: none;
 }
 
+/* Строка-переход (свой профиль): «Продажи» → «Мои продажи» и т. п. */
+.user-profile-info__detail-row_action {
+  position: relative;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.user-profile-info__detail-row_action:hover,
+.user-profile-info__detail-row_action:active {
+  background: color-mix(in srgb, var(--iz-color-action) 7%, transparent);
+}
+
+.user-profile-info__detail-action {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.user-profile-info__detail-action::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.user-profile-info__detail-action:focus-visible {
+  outline: none;
+}
+
+.user-profile-info__detail-row_action:has(
+  .user-profile-info__detail-action:focus-visible
+) {
+  outline: 2px solid var(--iz-color-action-border, var(--iz-color-action));
+  outline-offset: -2px;
+}
+
 .user-profile-info__detail-label {
   display: flex;
   align-items: center;

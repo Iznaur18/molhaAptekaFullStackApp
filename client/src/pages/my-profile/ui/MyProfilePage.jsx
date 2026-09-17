@@ -499,7 +499,18 @@ export function MyProfilePage({
                       {tabContent}
                     </div>
                   ) : null}
-                  <UserProfileInfoPanel rows={rows} />
+                  <UserProfileInfoPanel
+                    rows={rows}
+                    rowActions={{
+                      ...(onMySalesClick ? { totalSalesCount: onMySalesClick } : {}),
+                      ...(onSubscriptionsClick
+                        ? { followingCount: onSubscriptionsClick }
+                        : {}),
+                      ...(onMyOrdersClick
+                        ? { totalPurchasesAmount: onMyOrdersClick }
+                        : {}),
+                    }}
+                  />
                   <div className="my-profile-page__overview-footer">
                     <ThemePreferenceToggle />
                     <WebPushSettingsToggle isAuthorized={Boolean(isProfileReady)} />

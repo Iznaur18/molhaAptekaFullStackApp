@@ -9,6 +9,8 @@ export const ORDER_CARD_UI = {
   DETAILS_FOLD_SUMMARY: "Подробности заказа",
   TOTAL_LABEL: "Итого",
   ADDRESS_LABEL: "Адрес доставки",
+  /** Поле «Комментарий» из корзины (подъезд, этаж, кв). */
+  DELIVERY_COMMENT_LABEL: "Комментарий",
   /** У отправления с самовывозом адрес другой — точка выдачи, а не адрес покупателя. */
   PICKUP_ADDRESS_LABEL: "Забрать по адресу",
   TRACKING_LABEL: "Трек-номер",
@@ -79,8 +81,6 @@ export const ORDER_CARD_UI = {
   SHIPMENT_FEE: (fee) => `Курьеру за доставку: ${fee}`,
   /** Доставка по тарифу продавца — платится продавцу, а не курьеру. */
   SELLER_DELIVERY_FEE_LABEL: "Доставка продавцом",
-  /** Товары + доставка: столько покупатель платит за заказ. */
-  TOTAL_WITH_DELIVERY_LABEL: "Итого с доставкой",
   /** Подпись под суммой в шапке, когда в неё вошла доставка. */
   TOTAL_WITH_DELIVERY_NOTE: "с доставкой",
   SHIPMENT_FEE_RAISE: "+25 ₽",

@@ -15,6 +15,7 @@ export {
   getFeaturedRaffles,
   getMyRaffleOverview,
   getRaffleById,
+  getRaffleParticipants,
   getRaffleProducts,
   listPendingRaffles,
 } from "./queryRaffles.js";

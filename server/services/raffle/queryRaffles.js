@@ -11,9 +11,13 @@ import { RaffleModel, UserModel } from "../../models/index.js";
 import { buildProductCatalogSearchQuery } from "../product/buildProductCatalogSearchQuery.js";
 import { countProducts, findProductsPage } from "../product/productCatalogQuery.js";
 import { PRODUCT_SORT_NEWEST } from "../../constants/productCatalogSort.js";
+import { RAFFLE_PARTICIPANTS_LIST_MAX } from "@molha/api-contract";
+
 import {
+  buildRaffleProductSaleWindows,
   getFeaturedSiteRaffles,
   getSellerActiveRaffle,
+  listRaffleBuyerTicketCounts,
   toPublicRafflePayload,
 } from "./raffleHelpers.js";
 
@@ -104,6 +108,60 @@ export async function getRaffleProducts({ raffleId, search, query }) {
       totalPages: Math.ceil(total / limit) || 0,
     },
   };
+}
+
+const RAFFLE_PARTICIPANT_FALLBACK_NAME = "Пользователь";
+
+/**
+ * Участники розыгрыша и сколько каждый купил. У активного (и на паузе)
+ * считаем по заказам; у завершённого — снимок, сохранённый при завершении:
+ * товары к тому моменту уже отвязаны от розыгрыша.
+ *
+ * @param {{ raffleId: string; userId?: string }} input
+ */
+export async function getRaffleParticipants({ raffleId, userId }) {
+  const raffle = await RaffleModel.findById(raffleId).lean();
+  if (!raffle) {
+    throw new AppError(404, "Розыгрыш не найден");
+  }
+  const isOwner = userId && String(raffle.sellerId) === String(userId);
+  if (!PUBLIC_RAFFLE_STATUSES.includes(raffle.status) && !isOwner) {
+    throw new AppError(404, "Розыгрыш не найден");
+  }
+
+  const entries =
+    raffle.status === RAFFLE_STATUS_COMPLETED
+      ? (raffle.participantsSnapshot ?? []).map((entry) => ({
+          userId: String(entry.userId),
+          ticketCount: Math.max(0, Math.floor(Number(entry.ticketCount) || 0)),
+        }))
+      : await listRaffleBuyerTicketCounts(await buildRaffleProductSaleWindows(raffle));
+
+  const sorted = entries
+    .filter((entry) => entry.userId && entry.ticketCount > 0)
+    .sort((a, b) => b.ticketCount - a.ticketCount);
+  const top = sorted.slice(0, RAFFLE_PARTICIPANTS_LIST_MAX);
+
+  const users = await UserModel.find({ _id: { $in: top.map((entry) => entry.userId) } })
+    .select("userName userAvatarUrl")
+    .lean();
+  const userById = new Map(users.map((user) => [String(user._id), user]));
+
+  const participants = top.map((entry) => {
+    const user = userById.get(entry.userId);
+    return {
+      userId: entry.userId,
+      userName:
+        typeof user?.userName === "string" && user.userName.trim()
+          ? user.userName.trim()
+          : RAFFLE_PARTICIPANT_FALLBACK_NAME,
+      userAvatarUrl:
+        typeof user?.userAvatarUrl === "string" ? user.userAvatarUrl.trim() : "",
+      ticketCount: entry.ticketCount,
+    };
+  });
+
+  return { participants, total: sorted.length };
 }
 
 /**

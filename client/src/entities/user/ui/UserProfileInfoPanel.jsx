@@ -27,7 +27,9 @@ const PHONE_ROW_ID = "userPhoneNumber";
  * hidePhoneUntilReveal?: boolean;
  * userId?: string | null;
  * accountSectionFooter?: import('react').ReactNode;
- * }} props
+ * rowActions?: Record<string, () => void>;
+ * }} props `rowActions` — строка с этим id нажимается целиком (свой профиль:
+ *   «Продажи» → «Мои продажи» и т. п.).
  */
 export function UserProfileInfoPanel({
   rows,
@@ -35,6 +37,7 @@ export function UserProfileInfoPanel({
   hidePhoneUntilReveal = false,
   userId = null,
   accountSectionFooter = null,
+  rowActions = null,
 }) {
   const sections = useMemo(() => groupProfileRows(rows), [rows]);
 
@@ -53,6 +56,7 @@ export function UserProfileInfoPanel({
           hidePhoneUntilReveal={hidePhoneUntilReveal}
           userId={userId}
           sectionFooter={section.id === "account" ? accountSectionFooter : null}
+          rowActions={rowActions}
         />
       ))}
     </div>
@@ -76,6 +80,7 @@ function ProfileDetailsSection({
   hidePhoneUntilReveal,
   userId,
   sectionFooter = null,
+  rowActions = null,
 }) {
   const sectionTone = getProfileSectionTone(sectionId);
 
@@ -87,16 +92,36 @@ function ProfileDetailsSection({
           const icon = getProfileRowIcon(row.id);
           const isEmpty =
             row.value === COMMON_UI.EM_DASH || row.value === RU_PHONE_EMPTY_LABEL;
+          const onRowAction = rowActions?.[row.id] ?? null;
 
           return (
-            <div key={row.id} className="user-profile-info__detail-row">
+            <div
+              key={row.id}
+              className={[
+                "user-profile-info__detail-row",
+                onRowAction ? "user-profile-info__detail-row_action" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
               <dt className="user-profile-info__detail-label">
                 {icon ? (
                   <span className="user-profile-info__detail-icon" aria-hidden="true">
                     <AppIcon icon={icon} size="sm" strokeWidth={2.1} />
                   </span>
                 ) : null}
-                <span>{row.label}</span>
+                {onRowAction ? (
+                  // Кнопка растянута на всю строку (::after), разметка dl не ломается.
+                  <button
+                    type="button"
+                    className="user-profile-info__detail-action"
+                    onClick={onRowAction}
+                  >
+                    {row.label}
+                  </button>
+                ) : (
+                  <span>{row.label}</span>
+                )}
               </dt>
               <dd
                 className={[
