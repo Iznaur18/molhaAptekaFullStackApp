@@ -1,0 +1,6 @@
+[Unit]
+Description=Алерт в Telegram: служба %i упала
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/gitorg-alert-unit-failed %i

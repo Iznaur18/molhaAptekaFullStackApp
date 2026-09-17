@@ -1,3 +1,5 @@
+import { notifyOps } from "../services/ops-alerts/notifyOps.js";
+import { resolveOpsAlertSeverity } from "../services/ops-alerts/opsAlertEvents.js";
 import { formatPrettyServerLogLine, resolveLogFormat } from "./logFormat.js";
 import { resolveHttpErrorStatus } from "./resolveHttpErrorStatus.js";
 import { scrubLogFieldsPii } from "./scrubLogFieldsPii.js";
@@ -58,6 +60,17 @@ export function logServerEvent(level, fields) {
   const { event, ...rest } = fields;
   const scrubbed = scrubLogFieldsPii(rest);
   const payload = { event, ...scrubbed };
+
+  // Дежурному — в Telegram (без токена в env это no-op). Поля уже без PII.
+  const alertSeverity = resolveOpsAlertSeverity(level, event);
+  if (alertSeverity) {
+    void notifyOps({
+      severity: alertSeverity,
+      key: event,
+      title: event,
+      details: scrubbed,
+    });
+  }
 
   if (resolveLogFormat() === "pretty") {
     writeLogLine(level, formatPrettyServerLogLine(level, payload));

@@ -144,8 +144,9 @@ Nodemailer включён: при заданных `SMTP_*` письмо ухо�
 
 ## 7. Мониторинг (рекомендация)
 
-- [ ] Uptime ping на `/health` каждые 1–5 мин
-- [ ] Алерт при `mongo: disconnected` или status ≠ ok
+- [ ] Внешний пинг `https://gitorg.ru` и `https://api.gitorg.ru/health` раз в минуту — [`docs/deploy/OPS-ALERTS.md`](../../docs/deploy/OPS-ALERTS.md)
+- [ ] Healthwatch на сервере (`scripts/ops/install-healthwatch.sh`): службы, диск, пульс воркера, бэкап, сертификат
+- [ ] `OPS_ALERT_TELEGRAM_*` в `server/.env`: деньги и падения процессов — сразу в Telegram
 - [x] Sentry (опционально, `docs/SENTRY.md`) + runbook (`docs/RUNBOOK.md`)
 - [x] Request ID + JSON-логи + access (`docs/OBSERVABILITY.md`)
 - [x] Центральные логи — док/пример Alloy (`docs/deploy/LOGGING-CENTRAL.md`)

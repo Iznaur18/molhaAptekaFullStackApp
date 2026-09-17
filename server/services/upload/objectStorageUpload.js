@@ -1,14 +1,19 @@
 import {
   DeleteObjectCommand,
+  HeadBucketCommand,
   HeadObjectCommand,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
 
 import {
+  OBJECT_STORAGE_HEALTH_TIMEOUT_MS,
+  OBJECT_STORAGE_HEALTH_TTL_MS,
+  PUBLIC_UPLOAD_CACHE_CONTROL,
   UPLOAD_OBJECT_KEY_PREFIX,
   UPLOAD_STORAGE_S3,
 } from "../../constants/uploadStorageConstants.js";
+import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { buildS3ServerSideEncryptionParams } from "./buildS3ServerSideEncryptionParams.js";
 import { buildUploadFilename } from "./buildUploadFilename.js";
 import { resolveUploadContentType } from "./resolveUploadContentType.js";
@@ -114,6 +119,7 @@ export const persistUploadToObjectStorage = async (file) => {
       Key: key,
       Body: body,
       ContentType: resolveUploadContentType(filename, file.mimetype),
+      CacheControl: PUBLIC_UPLOAD_CACHE_CONTROL,
       ...buildS3ServerSideEncryptionParams(),
     }),
   );
@@ -190,12 +196,84 @@ export const objectStorageHasUpload = async (filename) => {
   if (!bucket) {
     return false;
   }
+  return objectStorageHasObject(bucket, buildObjectStorageKey(filename));
+};
 
+/**
+ * Есть ли приватный файл в `S3_PRIVATE_BUCKET` (перенос селфи с диска).
+ * @param {string} filename
+ * @returns {Promise<boolean>}
+ */
+export const objectStorageHasPrivateUpload = async (filename) =>
+  objectStorageHasObject(
+    getPrivateUploadBucket(),
+    buildPrivateObjectStorageKey(filename),
+  );
+
+/** @type {{ checkedAt: number; state: "ok" | "error" } | null} */
+let objectStorageHealthCache = null;
+
+/**
+ * Доступность публичного бакета для `/health`. Результат кэшируется, чтобы
+ * внешний пинг раз в минуту не превращался в запрос к хранилищу на каждый
+ * вызов; зависшее хранилище отсекается таймаутом.
+ *
+ * @param {{ now?: () => number; send?: (command: HeadBucketCommand, options: { abortSignal: AbortSignal }) => Promise<unknown> }} [deps]
+ * @returns {Promise<"ok" | "error" | "disabled">}
+ */
+export const probeObjectStorageHealth = async (deps = {}) => {
+  if (!isObjectStorageUploadEnabled()) {
+    return "disabled";
+  }
+
+  const now = deps.now ?? Date.now;
+  const checkedAt = now();
+  if (
+    objectStorageHealthCache &&
+    checkedAt - objectStorageHealthCache.checkedAt < OBJECT_STORAGE_HEALTH_TTL_MS
+  ) {
+    return objectStorageHealthCache.state;
+  }
+
+  const send =
+    deps.send ?? ((command, options) => getS3Client().send(command, options));
+
+  /** @type {"ok" | "error"} */
+  let state = "ok";
+  try {
+    await send(new HeadBucketCommand({ Bucket: getPublicUploadBucket() }), {
+      abortSignal: AbortSignal.timeout(OBJECT_STORAGE_HEALTH_TIMEOUT_MS),
+    });
+  } catch (error) {
+    state = "error";
+    if (objectStorageHealthCache?.state !== "error") {
+      logServerEvent("warn", {
+        event: "object_storage.health_failed",
+        ...formatLogError(error),
+      });
+    }
+  }
+
+  objectStorageHealthCache = { checkedAt, state };
+  return state;
+};
+
+/** Только для тестов. */
+export const resetObjectStorageHealthCache = () => {
+  objectStorageHealthCache = null;
+};
+
+/**
+ * @param {string} bucket
+ * @param {string} key
+ * @returns {Promise<boolean>}
+ */
+const objectStorageHasObject = async (bucket, key) => {
   try {
     await getS3Client().send(
       new HeadObjectCommand({
         Bucket: bucket,
-        Key: buildObjectStorageKey(filename),
+        Key: key,
       }),
     );
     return true;
@@ -244,7 +322,7 @@ export const validateObjectStorageEnv = () => {
   const endpoint = process.env.S3_ENDPOINT?.trim();
   if (!endpoint) {
     const message =
-      "S3_ENDPOINT обязателен при UPLOAD_STORAGE=s3 (R2: https://<account>.r2.cloudflarestorage.com)";
+      "S3_ENDPOINT обязателен при UPLOAD_STORAGE=s3 (Selectel: адрес из панели, вида https://s3.ru-1.storage.selcloud.ru)";
     if (process.env.NODE_ENV === "production") {
       errors.push(message);
     } else {

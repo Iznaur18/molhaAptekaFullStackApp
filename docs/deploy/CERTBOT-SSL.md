@@ -202,7 +202,7 @@ sudo certbot renew --dry-run -v
 
 Для **API-домена** `gitorg.ru` — этот гайд.
 
-Отдельный сертификат на `cdn.gitorg.ru` обычно выдаёт **Cloudflare** (proxy) или R2 custom domain — не certbot на этом VPS. См. [`PROD-S3-CDN.md`](PROD-S3-CDN.md).
+Сертификат на `cdn.gitorg.ru` выпускает CDN (Selectel CDN — Let's Encrypt в панели ресурса), а не certbot на этом VPS. См. [`PROD-S3-CDN.md`](PROD-S3-CDN.md).
 
 ---
 
