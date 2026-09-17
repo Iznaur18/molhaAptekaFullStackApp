@@ -1,3 +1,5 @@
+import { summarizeMarketingTouch } from "@izibuy/shared-lib";
+
 import {
   ANALYTICS_EVENT_AD_CLICK,
   ANALYTICS_EVENT_AD_IMPRESSION,
@@ -12,9 +14,17 @@ import { AnalyticsEventModel } from "../../models/index.js";
 import { enqueueAnalyticsEvent } from "./insertAnalyticsEventIdempotent.js";
 
 /**
- * @param {{ userId: string; channel?: string }} params
+ * @param {{
+ *   userId: string;
+ *   channel?: string;
+ *   attribution?: import("@izibuy/shared-lib").MarketingAttribution | null;
+ * }} params
  */
-export function emitUserRegisteredEvent({ userId, channel = "unknown" }) {
+export function emitUserRegisteredEvent({
+  userId,
+  channel = "unknown",
+  attribution = null,
+}) {
   const id = String(userId);
   enqueueAnalyticsEvent({
     eventType: ANALYTICS_EVENT_USER_REGISTERED,
@@ -22,7 +32,11 @@ export function emitUserRegisteredEvent({ userId, channel = "unknown" }) {
     actorUserId: id,
     subjectType: "user",
     subjectId: id,
-    payload: { channel },
+    payload: {
+      channel,
+      firstTouch: summarizeMarketingTouch(attribution?.firstTouch),
+      lastTouch: summarizeMarketingTouch(attribution?.lastTouch),
+    },
   });
 }
 
@@ -72,6 +86,7 @@ export async function emitProductViewedEvent({
  *   totalAmount: number;
  *   itemCount: number;
  *   sellerUserIds?: string[];
+ *   attribution?: import("@izibuy/shared-lib").MarketingAttribution | null;
  * }} params
  */
 export function emitOrderCreatedEvent({
@@ -80,6 +95,7 @@ export function emitOrderCreatedEvent({
   totalAmount,
   itemCount,
   sellerUserIds = [],
+  attribution = null,
 }) {
   const fraudReasons = [];
   const buyer = String(buyerUserId);
@@ -96,6 +112,8 @@ export function emitOrderCreatedEvent({
     payload: {
       totalAmount: Number(totalAmount) || 0,
       itemCount: Number(itemCount) || 0,
+      firstTouch: summarizeMarketingTouch(attribution?.firstTouch),
+      lastTouch: summarizeMarketingTouch(attribution?.lastTouch),
     },
     suspectedFraud: fraudReasons.length > 0,
     fraudReasons,

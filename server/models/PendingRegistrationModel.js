@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { ADDRESS_LINE_MAX_LENGTH } from "../constants/dadataConstants.js";
+import { MarketingAttributionSchema } from "./MarketingAttributionSubschema.js";
 
 /**
  * Заявка на регистрацию до подтверждения email или SMS.
@@ -112,6 +113,11 @@ const PendingRegistrationSchema = new mongoose.Schema(
       default: null,
       trim: true,
       uppercase: true,
+    },
+    /** Откуда пришёл (UTM, реферер) — переносится в пользователя при confirm. */
+    marketingAttribution: {
+      type: MarketingAttributionSchema,
+      default: null,
     },
   },
   { timestamps: true },

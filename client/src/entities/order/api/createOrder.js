@@ -14,6 +14,7 @@ import { formatApiErrorMessage } from "@izibuy/shared-lib";
  *   paymentMethod: import('../model/constants.js').ORDER_PAYMENT_METHODS[number];
  *   priceOfferId?: string;
  *   affiliateCode?: string;
+ *   marketingAttribution?: import("@izibuy/shared-lib").MarketingAttribution;
  *   pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
  *   idempotencyKey: string;
  * }} payload

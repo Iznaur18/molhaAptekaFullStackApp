@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { MarketingAttributionSchema } from "./MarketingAttributionSubschema.js";
 import {
   SELLER_PRODUCTS_LIMIT_OVERRIDE_MAX,
   SELLER_PRODUCTS_LIMIT_UNLIMITED,
@@ -567,6 +568,15 @@ const UserSchema = new mongoose.Schema(
       ref: "User",
       default: null,
       index: true,
+    },
+    /**
+     * Откуда пришёл до регистрации (UTM, реферер). Только для отчётов:
+     * `select: false`, чтобы не попадать в ответы API.
+     */
+    marketingAttribution: {
+      type: MarketingAttributionSchema,
+      default: null,
+      select: false,
     },
     /** Партнёрский баланс (кэшбэк) — конвертация 1:1 в баллы. */
     partnerBalance: {
