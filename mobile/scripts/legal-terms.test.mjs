@@ -20,7 +20,8 @@ test("legal documents include public offer for platform services", () => {
   assert.match(presets, /LEGAL_UI\.OFFER_TAB/);
   assert.match(offerContent, /публичной офертой/i);
   assert.match(offerContent, /149 \(сто сорок девять\) баллов/);
-  assert.match(offerContent, /6 000 \(шесть тысяч\) баллов/);
+  assert.match(offerContent, /6 000 \(шесть тысяч\) рублей/);
+  assert.match(offerContent, /Систему быстрых платежей/);
   assert.match(offerContent, /не является продавцом таких товаров/);
   assert.match(offerScreen, /initialKind="offer"/);
   assert.match(layout, /legal\/offer/);
