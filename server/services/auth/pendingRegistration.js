@@ -1,3 +1,4 @@
+import { sanitizeMarketingAttribution } from "@izibuy/shared-lib";
 import { EMAIL_AUTH_DISABLED_MESSAGE, isEmailAuthEnabled } from "@izibuy/shared-lib";
 
 import { PendingRegistrationModel, UserModel } from "../../models/index.js";
@@ -78,6 +79,7 @@ function assertEmailRegistrationChannelAllowed(pending) {
  *   userAddressFiasId?: string;
  *   userAddressGeo?: { lat: number; lon: number } | null;
  *   referralCode?: string | null;
+ *   marketingAttribution?: import("@izibuy/shared-lib").MarketingAttribution | null;
  * }} fields
  * @returns {Promise<{ registrationId: string; email: string }>}
  */
@@ -146,6 +148,7 @@ export async function createPendingRegistration(fields) {
  *   userAddressFiasId?: string;
  *   userAddressGeo?: { lat: number; lon: number } | null;
  *   referralCode?: string | null;
+ *   marketingAttribution?: import("@izibuy/shared-lib").MarketingAttribution | null;
  * }} fields
  * @returns {Promise<{ registrationId: string; phoneNumber: string }>}
  */
@@ -290,6 +293,9 @@ export async function confirmPendingRegistration(registrationId, rawCode) {
   }
 
   const isPhoneChannel = isPendingPhoneChannel(pending);
+  const registrationAttribution = sanitizeMarketingAttribution(
+    pending.marketingAttribution?.toObject?.() ?? pending.marketingAttribution,
+  );
 
   const phone =
     pending.userPhoneNumber != null && pending.userPhoneNumber !== ""
@@ -317,6 +323,9 @@ export async function confirmPendingRegistration(registrationId, rawCode) {
           userAddressFiasId: pending.userAddressFiasId,
           userAddressGeo: pending.userAddressGeo,
         }
+      : {}),
+    ...(registrationAttribution
+      ? { marketingAttribution: registrationAttribution }
       : {}),
   });
 
@@ -357,6 +366,7 @@ export async function confirmPendingRegistration(registrationId, rawCode) {
     emitUserRegisteredEvent({
       userId: String(user._id),
       channel: isPhoneChannel ? "phone" : "email",
+      attribution: registrationAttribution,
     });
   } catch {
     // analytics must not block registration

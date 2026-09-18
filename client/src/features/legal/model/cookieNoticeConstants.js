@@ -1,4 +1,4 @@
 /** localStorage: пользователь ознакомился с уведомлением о cookie. */
-export const COOKIE_NOTICE_ACCEPTED_STORAGE_KEY = "izibuy_cookie_notice_accepted_v1";
+export const COOKIE_NOTICE_ACCEPTED_STORAGE_KEY = "izibuy_cookie_notice_accepted_v2";
 
 export const COOKIE_NOTICE_ACCEPTED_EVENT = "iz-cookie-notice-accepted";

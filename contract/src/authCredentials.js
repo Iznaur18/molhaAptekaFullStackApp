@@ -10,6 +10,7 @@ import {
   userNameFieldSchema,
 } from "./userFields.js";
 import { EMAIL_VERIFICATION_CODE_LENGTH } from "./emailVerification.js";
+import { marketingAttributionSchema } from "./marketingAttribution.js";
 
 export const loginBodySchema = z.object({
   email: z.string().email("Неверный email"),
@@ -178,6 +179,7 @@ export const registerBodySchema = z
       .or(z.literal(""))
       .or(z.null())
       .optional(),
+    marketingAttribution: marketingAttributionSchema,
   })
   .superRefine((data, ctx) => {
     if (data.passwordConfirm !== data.password) {
@@ -225,6 +227,7 @@ export const registerPhoneBodySchema = z
       .or(z.literal(""))
       .or(z.null())
       .optional(),
+    marketingAttribution: marketingAttributionSchema,
   })
   .superRefine((data, ctx) => {
     if (data.passwordConfirm !== data.password) {

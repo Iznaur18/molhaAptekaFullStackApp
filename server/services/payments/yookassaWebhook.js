@@ -1,3 +1,4 @@
+import { emitPaymentSucceededEvent } from "../analytics-events/funnelAnalyticsEvents.js";
 import {
   PAYMENT_PURPOSE_LOYALTY_POINTS,
   PAYMENT_PURPOSE_ORDER,
@@ -29,6 +30,25 @@ const PAYMENT_APPLIERS = Object.freeze({
 
 /** @param {string} purpose */
 const resolvePaymentApplier = (purpose) => PAYMENT_APPLIERS[purpose] ?? null;
+
+/**
+ * Событие воронки — только когда деньги действительно зачтены этим вызовом.
+ *
+ * @param {{ _id: unknown; userId?: unknown; purpose: string; amountRub?: number; orderId?: unknown }} payment
+ * @param {{ applied?: boolean } | null | undefined} result
+ */
+const trackAppliedPayment = (payment, result) => {
+  if (result?.applied !== true) {
+    return;
+  }
+  emitPaymentSucceededEvent({
+    paymentId: String(payment._id),
+    userId: payment.userId ? String(payment.userId) : null,
+    purpose: payment.purpose,
+    amountRub: Number(payment.amountRub) || 0,
+    orderId: payment.orderId ? String(payment.orderId) : null,
+  });
+};
 
 /**
  * Обработать уведомление ЮKassa.
@@ -90,6 +110,7 @@ export async function handleYookassaNotification(body) {
     providerStatus,
     providerAmountRub,
   });
+  trackAppliedPayment(payment, result);
   return { handled: true, ...result };
 }
 
@@ -112,11 +133,12 @@ export async function syncPaymentForUser({ userId, paymentId }) {
       const providerPayment = await getYookassaPayment(payment.providerPaymentId);
       const apply = resolvePaymentApplier(payment.purpose);
       if (apply) {
-        await apply({
+        const result = await apply({
           paymentId: String(payment._id),
           providerStatus: String(providerPayment?.status ?? ""),
           providerAmountRub: Number(providerPayment?.amount?.value ?? 0),
         });
+        trackAppliedPayment(payment, result);
       }
     } catch (error) {
       logServerEvent("warn", {

@@ -74,7 +74,65 @@ Append-only коллекция `AnalyticsEvent`. Пишется в фоне (о�
 | `order.item_sold` | `order.item_sold:{orderId}:{itemIndex}` | soldQuantity delta > 0 |
 | `ad.impression` | `ad.impression:{surface}:{subject}:{actor}:{minute}` | intro/banner show |
 | `ad.click` | `ad.click:{surface}:{subject}:{actor}:{minute}` | intro/banner click |
+| `search.performed` | `search.performed:{uuid}` | поиск в каталоге, только первая страница |
+| `cart.item_added` | `cart.item_added:{userId}:{productId}:{day}` | товара не было в корзине до `PUT /cart` |
+| `checkout.started` | `checkout.started:{userId}:{day}` | клиент открыл оформление (`POST /analytics/track`) |
+| `payment.succeeded` | `payment.succeeded:{paymentId}` | обработчик платежа вернул `applied: true` (вебхук или догоняющая синхронизация) |
+| `user.active` | `user.active:{userId}:{day}` | первый авторизованный запрос за сутки (UTC), `checkAuthMW` |
+| `seller.product_published` | `seller.product_published:{productId}` | одобрение модератором или создание без модерации |
+
+`{day}` — дата UTC `YYYY-MM-DD`. Массовое одобрение доверенного продавца и импорт 1С
+`seller.product_published` не пишут — иначе один импорт даёт тысячи событий.
 
 Fraud flags (минимальные): `own_product`, `view_velocity`, `buyer_is_seller` → `suspectedFraud` + `fraudReasons`.
 
 Клиентский трек рекламы: `POST /analytics/track-ad` (auth optional).
+Клиентские события воронки: `POST /analytics/track` (только вошедший пользователь, `kind: checkout.started`).
+
+### Что лежит в payload
+
+| Событие | Поля |
+| --- | --- |
+| `user.registered` | `channel`, `firstTouch`, `lastTouch` (`{ source, medium, campaign }` или `null`) |
+| `order.created` | `totalAmount`, `itemCount`, `firstTouch`, `lastTouch` |
+| `search.performed` | `query` (нижний регистр, ≤ 100 символов; пусто, если похоже на телефон, карту или email), `queryLength`, `resultCount`, `hasResults`, `near` |
+| `payment.succeeded` | `purpose`, `amountRub`, `paymentId` |
+| `checkout.started` | `platform` |
+| `user.active` | `day` |
+| `seller.product_published` | `autoApproved` |
+
+Телефонов, адресов и email в payload нет.
+
+## Атрибуция: откуда пришёл пользователь
+
+Веб (`shared/lib/marketingAttributionStorage.js`) при заходе читает `utm_*`, `yclid`,
+`gclid` и внешний реферер. В `localStorage` (`gitorg_marketing_attribution`) хранятся:
+
+- `firstTouch` — первое касание, не перезаписывается;
+- `lastTouch` — последнее касание с метками или внешним реферером; к отправке
+  берётся, только если ему не больше 30 дней.
+
+Прямой заход и переходы внутри сайта касание не создают. Переход с Яндекса, Google,
+Bing, go.mail.ru, DuckDuckGo — `medium: organic`, с остальных сайтов — `referral`,
+`yclid`/`gclid` без меток — `cpc`.
+
+Касания уходят в `POST /auth/register`, `POST /auth/register/phone` и `POST /order`
+(поле `marketingAttribution`, схема `marketingAttributionSchema` в контракте).
+Сервер нормализует их `sanitizeMarketingAttribution` (shared-lib) и сохраняет у
+пользователя в `User.marketingAttribution` (`select: false`). В заказ атрибуция не
+пишется — только в событие `order.created`.
+
+Мобильное приложение атрибуцию пока не отправляет: нужен разбор меток из deep link и
+Google Play Install Referrer.
+
+### Правило меток
+
+| Метка | Что значит | Значения |
+| --- | --- | --- |
+| `utm_source` | площадка | `telegram`, `vk`, `avito`, `yandex`, `qr`, `seller_invite` |
+| `utm_medium` | тип размещения | `post`, `cpc`, `story`, `offline`, `referral` |
+| `utm_campaign` | месяц и название | `2026-10_grozny_shops` |
+| `utm_content` | вариант креатива | свободно |
+
+Все значения — латиницей в нижнем регистре; сервер и клиент всё равно приводят
+`source`, `medium`, `campaign` к нижнему регистру.

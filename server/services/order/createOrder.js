@@ -487,6 +487,7 @@ const appendOrderToBuyList = async (userId, orderId, session) => {
  *   } | null;
  *   deliveryAddressGeo?: { lat: number; lon: number } | null;
  *   affiliateCode?: string | null;
+ *   marketingAttribution?: import("@izibuy/shared-lib").MarketingAttribution | null;
  * }} input
  */
 export async function createOrder({
@@ -501,6 +502,7 @@ export async function createOrder({
   verifiedDeliveryAddress = null,
   deliveryAddressGeo = null,
   affiliateCode = null,
+  marketingAttribution = null,
 }) {
   const emailCheck = await checkUserEmailVerified(userId);
   if (!emailCheck.ok) {
@@ -901,6 +903,7 @@ export async function createOrder({
         totalAmount: Number(created.totalAmount) || 0,
         itemCount: Array.isArray(created.items) ? created.items.length : 0,
         sellerUserIds,
+        attribution: marketingAttribution,
       });
     } catch {
       // analytics must not block order

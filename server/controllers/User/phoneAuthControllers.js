@@ -1,3 +1,4 @@
+import { sanitizeMarketingAttribution } from "@izibuy/shared-lib";
 import bcrypt from "bcrypt";
 
 import { UserModel } from "../../models/index.js";
@@ -80,6 +81,7 @@ export const registerPhoneUserController = async (req, res) => {
     userGender,
     notificationsEnabled,
     referralCode,
+    marketingAttribution,
   } = req.body;
 
   const normalizedUserName = String(userName).trim().toLowerCase();
@@ -103,6 +105,7 @@ export const registerPhoneUserController = async (req, res) => {
       userAddressFiasId: req.verifiedDeliveryAddress?.fiasId ?? "",
       userAddressGeo: req.verifiedDeliveryAddress?.geo ?? null,
       referralCode: referralCode ?? null,
+      marketingAttribution: sanitizeMarketingAttribution(marketingAttribution),
     });
   } catch (registrationError) {
     const message = mapSmsDeliveryError(registrationError);

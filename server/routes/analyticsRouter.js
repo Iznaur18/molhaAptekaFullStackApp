@@ -4,10 +4,12 @@ import {
   getAnalyticsOverviewController,
   runAnalyticsReconciliationController,
   trackAdAnalyticsController,
+  trackClientAnalyticsController,
 } from "../controllers/index.js";
 import {
   analyticsPeriodQueryValidation,
   trackAdAnalyticsValidation,
+  trackClientAnalyticsValidation,
 } from "../validations/index.js";
 import { emptyBodyValidation } from "../validations/common/emptyBodyValidation.js";
 import { checkAuthMW, checkAdminMW, optionalAuthMW } from "../middlewares/index.js";
@@ -19,6 +21,13 @@ router.post(
   optionalAuthMW,
   trackAdAnalyticsValidation,
   trackAdAnalyticsController,
+);
+
+router.post(
+  "/track",
+  checkAuthMW,
+  trackClientAnalyticsValidation,
+  trackClientAnalyticsController,
 );
 
 router.get(

@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { createClientIdempotencyKey } from "../../../shared/lib/createClientIdempotencyKey.js";
 import { readPersistedAffiliateCode } from "../../../shared/lib/affiliateCodeStorage.js";
+import { readMarketingAttributionForSubmit } from "../../../shared/lib/marketingAttributionStorage.js";
 import { productPromoCodeQueryKeys } from "../../product-promo-code/model/productPromoCodeQueryKeys.js";
 import { invalidateLoyaltyPointsBalances } from "../../user/lib/loyaltyPointsQueryCache.js";
 import { createOrder } from "../api/createOrder.js";
@@ -13,9 +14,11 @@ export function useCreateOrderMutation() {
   return useMutation({
     mutationFn: (payload) => {
       const affiliateCode = payload.affiliateCode ?? readPersistedAffiliateCode() ?? "";
+      const marketingAttribution = readMarketingAttributionForSubmit();
       return createOrder({
         ...payload,
         ...(affiliateCode ? { affiliateCode } : {}),
+        ...(marketingAttribution ? { marketingAttribution } : {}),
         idempotencyKey: payload.idempotencyKey ?? createClientIdempotencyKey(),
       });
     },

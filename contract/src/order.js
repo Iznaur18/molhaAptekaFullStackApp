@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { marketingAttributionSchema } from "./marketingAttribution.js";
 import { mongoIdSchema } from "./mongoId.js";
 import { ADDRESS_LINE_MAX_LENGTH } from "./userFields.js";
 import {
@@ -144,6 +145,8 @@ export const createOrderBodySchema = z
     priceOfferId: mongoIdSchema.optional(),
     /** Код шарера (`referralCode`) из `?aff=` — last-click attribution. */
     affiliateCode: z.string().trim().toUpperCase().max(32).optional(),
+    /** Откуда пришёл покупатель — только в событие аналитики, в заказ не пишется. */
+    marketingAttribution: marketingAttributionSchema,
     idempotencyKey: z
       .string({ required_error: "Укажите idempotencyKey" })
       .trim()
