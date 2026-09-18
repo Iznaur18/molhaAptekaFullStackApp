@@ -152,6 +152,18 @@
   color: var(--iz-color-text);
 }
 
+.catalog-filters-sheet__rules-link {
+  align-self: flex-start;
+  font-size: 0.8125rem;
+  color: var(--iz-color-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.catalog-filters-sheet__rules-link:hover {
+  color: var(--iz-color-text);
+}
+
 .catalog-filters-sheet__chips {
   display: flex;
   flex-wrap: wrap;

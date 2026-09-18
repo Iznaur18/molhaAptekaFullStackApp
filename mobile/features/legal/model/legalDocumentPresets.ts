@@ -1,4 +1,13 @@
 import {
+  LEGAL_RANKING_RULES_SECTIONS,
+  LEGAL_RANKING_RULES_UPDATED_AT,
+} from "@izibuy/shared-lib";
+
+import {
+  LEGAL_CONTACT_EMAIL,
+  LEGAL_OPERATOR_PLACEHOLDER,
+} from "@/features/legal/model/legalSharedConstants";
+import {
   PRIVACY_POLICY_CONTACT_EMAIL,
   PRIVACY_POLICY_OPERATOR_PLACEHOLDER,
   PRIVACY_POLICY_SECTIONS,
@@ -31,7 +40,7 @@ import {
   USER_AGREEMENT_URL,
 } from "@/shared/config";
 
-export type LegalDocumentKind = "terms" | "privacy" | "listing" | "offer";
+export type LegalDocumentKind = "terms" | "privacy" | "listing" | "offer" | "ranking";
 
 export type LegalDocumentPreset = {
   kind: LegalDocumentKind;
@@ -80,6 +89,14 @@ export const LEGAL_DOCUMENT_PRESETS: Record<LegalDocumentKind, LegalDocumentPres
     contactEmail: PUBLIC_OFFER_CONTACT_EMAIL,
     webUrl: PUBLIC_OFFER_URL || undefined,
   },
+  ranking: {
+    kind: "ranking",
+    title: LEGAL_UI.RANKING_TITLE,
+    updatedAt: LEGAL_RANKING_RULES_UPDATED_AT,
+    operatorPlaceholder: LEGAL_OPERATOR_PLACEHOLDER,
+    sections: LEGAL_RANKING_RULES_SECTIONS,
+    contactEmail: LEGAL_CONTACT_EMAIL,
+  },
 };
 
 export const LEGAL_DOCUMENT_TABS: { id: LegalDocumentKind; label: string }[] = [
@@ -87,4 +104,5 @@ export const LEGAL_DOCUMENT_TABS: { id: LegalDocumentKind; label: string }[] = [
   { id: "privacy", label: LEGAL_UI.PRIVACY_TAB },
   { id: "listing", label: LEGAL_UI.LISTING_TAB },
   { id: "offer", label: LEGAL_UI.OFFER_TAB },
+  { id: "ranking", label: LEGAL_UI.RANKING_TAB },
 ];

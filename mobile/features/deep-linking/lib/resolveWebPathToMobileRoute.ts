@@ -102,7 +102,7 @@ const RESERVED_USER_PATH_SEGMENTS = new Set([
   "data-confirmation-requests",
 ]);
 
-const LEGAL_KINDS = new Set(["terms", "privacy", "listing", "offer"]);
+const LEGAL_KINDS = new Set(["terms", "privacy", "listing", "offer", "ranking"]);
 
 const DYNAMIC_SEGMENT_ROUTES: { pattern: RegExp; build: (id: string) => string }[] = [
   { pattern: /^\/product\/([^/?#]+)$/i, build: (id) => `/product/${id}` },

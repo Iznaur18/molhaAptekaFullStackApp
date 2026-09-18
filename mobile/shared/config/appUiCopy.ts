@@ -1438,6 +1438,8 @@ export const LEGAL_UI = {
   LISTING_TAB: "Размещение",
   OFFER_TITLE: "Публичная оферта",
   OFFER_TAB: "Оферта",
+  RANKING_TITLE: "Как формируется выдача",
+  RANKING_TAB: "Выдача",
   UPDATED_PREFIX: "Обновлено:",
   CONTACT_PREFIX: "Контакты:",
   OPEN_WEB: "Открыть на сайте",

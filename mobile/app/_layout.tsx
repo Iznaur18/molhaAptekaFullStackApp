@@ -116,6 +116,7 @@ function RootLayoutNav() {
         <Stack.Screen name="legal/terms" />
         <Stack.Screen name="legal/listing" />
         <Stack.Screen name="legal/offer" />
+        <Stack.Screen name="legal/ranking" />
         <Stack.Screen name="faq" />
       </Stack>
       <AddressPromptHost />

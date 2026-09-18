@@ -159,3 +159,11 @@
 :root[data-theme="dark"] .product-details-seller-preview__metric-value {
   color: var(--iz-color-text);
 }
+
+/* 289-ФЗ: площадка не является продавцом */
+.product-details-seller-preview__not-seller {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--iz-color-text-muted);
+}
