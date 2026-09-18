@@ -96,7 +96,10 @@ export {
   UPLOAD_VIDEO_MIME_TYPES,
   UPLOAD_VIDEO_EXTENSIONS,
 } from "./uploadLimits.js";
-export { userFollowListQuerySchema } from "./userFollow.js";
+export {
+  userFollowListQuerySchema,
+  USER_FOLLOW_MAX_LIST_LIMIT,
+} from "./userFollow.js";
 export {
   USER_BLOCK_MAX_PER_USER,
   USER_BLOCK_LIST_MAX_LIMIT,
@@ -107,7 +110,14 @@ export {
   isCatalogProductViewerPurchaseContextKnown,
   isProductPurchaseBlockedBySeller,
 } from "./userBlock.js";
-export { voteBodySchema } from "./userVote.js";
+export {
+  voteBodySchema,
+  voteReceivedListQuerySchema,
+  USER_VOTE_RECEIVED_DEFAULT_LIST_LIMIT,
+  USER_VOTE_RECEIVED_MAX_LIST_LIMIT,
+  USER_VOTE_VALUE_MIN,
+  USER_VOTE_VALUE_MAX,
+} from "./userVote.js";
 export {
   submitProductReportBodySchema,
   resolveProductReportsBodySchema,

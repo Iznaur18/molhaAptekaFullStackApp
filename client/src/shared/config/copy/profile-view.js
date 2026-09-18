@@ -85,6 +85,24 @@ export const USER_VOTE_RATING_UI = {
   SUCCESS_FLASH_MS: 2800,
 };
 
+/** Sheet «Кто оценил» на своём профиле */
+export const USER_RATING_VOTES_SHEET_UI = {
+  TITLE: "Кто оценил",
+  CLOSE: "Закрыть",
+  /** @param {number} average @param {number} votes */
+  SUMMARY: (average, votes) =>
+    `Средняя оценка ${average.toFixed(1)} · голосов ${votes}`,
+  LOADING: "Загружаем голоса",
+  EMPTY: "Пока нет голосов.",
+  RETRY: "Повторить",
+  LOAD_MORE: "Ещё",
+  DELETED_USER: "Удалённый пользователь",
+  /** @param {string} userName */
+  OPEN_PROFILE_ARIA: (userName) => `Открыть профиль: ${userName}`,
+  /** @param {number} score */
+  SCORE_ARIA: (score) => `Оценка ${score} из 10`,
+};
+
 /** Модалка карточки пользователя (продавец / общий шаблон) */
 export const USER_DETAILS_MODAL_UI = {
   TITLE_LOADING: "Профиль: загрузка…",
@@ -111,6 +129,14 @@ export const USER_PROFILE_PURCHASES_UI = {
   LOADING: "Загрузка покупок…",
   EMPTY: "Покупок нет",
   UNAVAILABLE: "Товар недоступен или удален",
+};
+
+/** Тренд 24ч на карточках «Подписчики» / «Продажи» */
+export const PROFILE_STATS_TREND_UI = {
+  WINDOW_ARIA: "Динамика за 24 часа",
+  UP_ARIA: (label) => `${label}: рост`,
+  DOWN_ARIA: (label) => `${label}: спад`,
+  FLAT_ARIA: (label) => `${label}: без изменений`,
 };
 
 /** Блок товаров продавца в чужом профиле (авторизованный зритель). */

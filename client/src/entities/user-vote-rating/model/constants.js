@@ -2,6 +2,9 @@
 export const USER_VOTE_RATING_VALUE_MIN = 1;
 export const USER_VOTE_RATING_VALUE_MAX = 10;
 
+export const USER_RATING_VOTES_SHEET_EXIT_MS = 260;
+export const USER_RATING_VOTES_SHEET_SKELETON_ROWS = 6;
+
 /** Порядок полей для визуализации структуры (id + подписи имён). */
 export const USER_VOTE_RATING_STRUCTURE_KEYS = [
   "_id",

@@ -8,16 +8,26 @@ import {
 import { pluralizeRuBall } from "../../lib/pluralizeRuBall.js";
 
 export const SUBSCRIPTIONS_PAGE_UI = {
-  LOADING: "Загрузка подписок…",
+  LOADING: "Загрузка…",
   EMPTY: "Вы ни на кого не подписаны. Найдите продавцов в разделе «Пользователи».",
+  EMPTY_FOLLOWERS: "Пока никто на вас не подписан.",
   FETCH_FALLBACK: "Не удалось загрузить подписки",
+  FETCH_FOLLOWERS_FALLBACK: "Не удалось загрузить подписчиков",
+  RETRY: "Повторить",
   LOGIN_HINT: "Войдите, чтобы видеть список подписок.",
   LOGIN_BUTTON: "Войти",
+  TAB_FOLLOWING: "Подписки",
+  TAB_FOLLOWERS: "Подписчики",
+  TABS_ARIA: "Подписки и подписчики",
   HERO_CAPTION: "Подписки",
+  HERO_CAPTION_FOLLOWERS: "Подписчики",
   /** @type {readonly [string, string, string]} */
   HERO_UNIT_FORMS: ["продавец", "продавца", "продавцов"],
+  /** @type {readonly [string, string, string]} */
+  HERO_UNIT_FORMS_FOLLOWERS: ["подписчик", "подписчика", "подписчиков"],
   HERO_INFO:
     "Продавцы, за которыми вы следите. Их товары — в фильтре «Подписки» на главной.",
+  HERO_INFO_FOLLOWERS: "Пользователи, которые подписались на вас.",
 };
 
 /** Раздел «Баллы» в профиле */

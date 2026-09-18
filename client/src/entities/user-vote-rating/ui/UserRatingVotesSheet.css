@@ -1,0 +1,241 @@
+/**
+ * Sheet «Кто оценил» — анимация снизу вверх, как RaffleParticipantsSheet.
+ */
+.user-rating-votes-sheet__backdrop {
+  --urvs-enter-ms: 300ms;
+  --urvs-exit-ms: 240ms;
+  --urvs-enter-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --urvs-exit-ease: cubic-bezier(0.55, 0.055, 0.675, 1);
+  --urvs-sheet-height: min(92vh, 36rem);
+  --urvs-sheet-height: min(92svh, 36rem);
+  --urvs-radius: 2rem;
+  --urvs-max-width: 100%;
+  --urvs-inline-padding: var(--iz-space-4);
+
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  box-sizing: border-box;
+  background: transparent;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+@media (min-width: 641px) {
+  .user-rating-votes-sheet__backdrop {
+    --urvs-max-width: min(26rem, 100%);
+  }
+}
+
+.user-rating-votes-sheet__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--iz-color-ink) 55%, transparent);
+  opacity: 0;
+  transition: opacity var(--urvs-exit-ms) var(--urvs-exit-ease);
+}
+
+.user-rating-votes-sheet__backdrop--open .user-rating-votes-sheet__scrim {
+  opacity: 1;
+  transition: opacity var(--urvs-enter-ms) var(--urvs-enter-ease);
+}
+
+.user-rating-votes-sheet__dismiss {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.user-rating-votes-sheet {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--urvs-max-width);
+  height: var(--urvs-sheet-height);
+  max-height: var(--urvs-sheet-height);
+  border-radius: var(--urvs-radius) var(--urvs-radius) 0 0;
+  corner-shape: squircle;
+  background: var(--iz-color-surface);
+  box-shadow: 0 -12px 40px color-mix(in srgb, var(--iz-color-text) 18%, transparent);
+  overflow: hidden;
+  transform: translate3d(0, 100%, 0);
+  transition: transform var(--urvs-exit-ms) var(--urvs-exit-ease);
+  will-change: transform;
+  overscroll-behavior: contain;
+}
+
+.user-rating-votes-sheet__backdrop--open .user-rating-votes-sheet {
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--urvs-enter-ms) var(--urvs-enter-ease);
+}
+
+.user-rating-votes-sheet__header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px var(--urvs-inline-padding) 4px;
+}
+
+.user-rating-votes-sheet__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  color: var(--iz-color-text);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.user-rating-votes-sheet__total {
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.user-rating-votes-sheet__close {
+  margin: 0;
+  padding: 0.25rem 0.15rem;
+  border: none;
+  background: transparent;
+  color: var(--iz-color-text-muted);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.user-rating-votes-sheet__hint {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0 var(--urvs-inline-padding) 10px;
+  color: var(--iz-color-text-muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.user-rating-votes-sheet__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--iz-color-border);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.user-rating-votes-sheet__list {
+  margin: 0;
+  padding: 4px 0 0;
+  list-style: none;
+}
+
+.user-rating-votes-sheet__row {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 6px var(--urvs-inline-padding);
+}
+
+.user-rating-votes-sheet__row + .user-rating-votes-sheet__row {
+  border-top: 1px solid color-mix(in srgb, var(--iz-color-border) 60%, transparent);
+}
+
+.user-rating-votes-sheet__avatar {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--iz-color-surface-muted, var(--iz-color-border));
+}
+
+.user-rating-votes-sheet__name {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.user-rating-votes-sheet__name:disabled {
+  cursor: default;
+  color: var(--iz-color-text-muted);
+  font-weight: 500;
+}
+
+.user-rating-votes-sheet__name:not(:disabled):hover {
+  text-decoration: underline;
+}
+
+.user-rating-votes-sheet__score {
+  color: var(--iz-color-action);
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.user-rating-votes-sheet__name-skeleton {
+  width: 60%;
+}
+
+.user-rating-votes-sheet__score-skeleton {
+  width: 2.5rem;
+}
+
+.user-rating-votes-sheet__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 32px var(--urvs-inline-padding);
+  color: var(--iz-color-text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.user-rating-votes-sheet__state p {
+  margin: 0;
+}
+
+.user-rating-votes-sheet__footer {
+  display: flex;
+  justify-content: center;
+  padding: 12px var(--urvs-inline-padding) 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .user-rating-votes-sheet__scrim,
+  .user-rating-votes-sheet {
+    transition-duration: 90ms;
+  }
+}

@@ -5,7 +5,11 @@ import { loginUserValidation } from "./user/loginUserValidation.js";
 import { registerUserValidation } from "./user/registerUserValidation.js";
 import { updateProfileValidation } from "./user/updateProfileValidation.js";
 import { userIdParamValidation } from "./user/userIdParamValidation.js";
-import { voteValidation, voteTargetIdParamValidation } from "./user/voteValidation.js";
+import {
+  voteValidation,
+  voteTargetIdParamValidation,
+  voteReceivedListValidation,
+} from "./user/voteValidation.js";
 import { ratingUserIdParamValidation } from "./user/ratingValidation.js";
 import { userSearchValidation } from "./user/userSearchValidation.js";
 import { userSellerProductsValidation } from "./user/userSellerProductsValidation.js";
@@ -185,6 +189,7 @@ export {
   userIdParamValidation,
   voteValidation,
   voteTargetIdParamValidation,
+  voteReceivedListValidation,
   ratingUserIdParamValidation,
   userSearchValidation,
   userSellerProductsValidation,

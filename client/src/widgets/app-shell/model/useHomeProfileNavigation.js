@@ -39,6 +39,7 @@ import {
 } from "../lib/profileTabs.js";
 
 import { profileTabToMainView } from "../lib/profileTabToMainView.js";
+import { SUBSCRIPTIONS_FOLLOWERS_SEARCH } from "../../../entities/user-follow/model/constants.js";
 
 /**
 
@@ -219,6 +220,12 @@ export const useHomeProfileNavigation = ({
     navigateFromProfileTab(PROFILE_TAB_SUBSCRIPTIONS);
   }, [navigateFromProfileTab]);
 
+  const handleFollowersFromProfile = useCallback(() => {
+    goToMainView(profileTabToMainView(PROFILE_TAB_SUBSCRIPTIONS), {
+      search: SUBSCRIPTIONS_FOLLOWERS_SEARCH,
+    });
+  }, [goToMainView]);
+
   const handleWishlistFromProfile = useCallback(() => {
     navigateFromProfileTab(PROFILE_TAB_WISHLIST);
   }, [navigateFromProfileTab]);
@@ -298,6 +305,8 @@ export const useHomeProfileNavigation = ({
     handleSellerPersonalCategoryModerationFromProfile,
 
     handleSubscriptionsFromProfile,
+
+    handleFollowersFromProfile,
 
     handleWishlistFromProfile,
 

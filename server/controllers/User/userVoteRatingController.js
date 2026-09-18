@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import { UserVoteRatingModel, UserModel } from "../../models/index.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 import { USER_ME_RAITING } from "../../constants/constants.js";
+import { listReceivedUserVotes } from "../../services/user/listReceivedUserVotes.js";
+
 const VOTE_RESPONSE_USER_FIELDS = "_id userRatingByVotes userName email userAvatarUrl";
 
 /** @param {unknown} id */
@@ -119,6 +121,20 @@ export const userVoteRatingController = async (req, res) => {
     });
     throw errorAfterSave;
   }
+};
+
+/**
+ * Список голосов, полученных текущим пользователем.
+ * `GET /vote/me/received`
+ */
+export const listMyReceivedVotesController = async (req, res) => {
+  const data = await listReceivedUserVotes({
+    targetUserId: String(req.userId),
+    page: req.query.page,
+    limit: req.query.limit,
+  });
+
+  return successRes(res, data);
 };
 
 /** Получение рейтинга пользователя. GET /vote/rating/:userId */

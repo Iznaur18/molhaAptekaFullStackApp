@@ -21,8 +21,8 @@ const PROFILE_ROW_SECTIONS: Array<{
     title: "Основное",
     rowIds: [
       "followersCount",
-      "followingCount",
       "totalSalesCount",
+      "followingCount",
       "totalSalesAmount",
       "totalPurchasesAmount",
       "userBusinessHours",

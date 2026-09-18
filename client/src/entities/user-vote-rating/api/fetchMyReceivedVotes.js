@@ -1,18 +1,19 @@
+import { USER_VOTE_RECEIVED_DEFAULT_LIST_LIMIT } from "@molha/api-contract";
+
 import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
-import { MY_FOLLOW_LIST_DEFAULT_LIMIT } from "../model/constants.js";
 
 /**
- * `GET /user/me/following`
+ * `GET /vote/me/received`
  *
  * @param {{ page?: number; limit?: number }} [options]
  */
-export async function fetchMyFollowing({
+export async function fetchMyReceivedVotes({
   page = 1,
-  limit = MY_FOLLOW_LIST_DEFAULT_LIMIT,
+  limit = USER_VOTE_RECEIVED_DEFAULT_LIST_LIMIT,
 } = {}) {
   try {
-    const { data } = await apiClient.get("/user/me/following", {
+    const { data } = await apiClient.get("/vote/me/received", {
       params: { page, limit },
     });
 
@@ -21,14 +22,19 @@ export async function fetchMyFollowing({
     }
 
     return {
-      users: data.data.users ?? [],
+      votes: data.data.votes ?? [],
+      summary: data.data.summary ?? {
+        countVotes: 0,
+        totalRating: 0,
+        averageRating: 0,
+      },
       pagination: data.data.pagination,
     };
   } catch (e) {
     const message =
       e?.response?.data?.message ??
       e?.message ??
-      API_CLIENT_UI.FETCH_MY_FOLLOWING_FALLBACK;
+      API_CLIENT_UI.FETCH_MY_RECEIVED_VOTES_FALLBACK;
     throw new Error(message);
   }
 }

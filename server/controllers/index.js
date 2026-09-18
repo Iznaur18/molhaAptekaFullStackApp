@@ -37,6 +37,7 @@ import {
   userVoteRatingController,
   userGetRatingController,
   getMyVoteForTargetController,
+  listMyReceivedVotesController,
 } from "./User/userVoteRatingController.js";
 import { userSearchController } from "./User/userSearchController.js";
 import { getUserPurchasesController } from "./User/getUserPurchasesController.js";
@@ -316,6 +317,7 @@ import {
   listMyFollowingController,
   listMyFollowersController,
 } from "./User/userFollowControllers.js";
+import { getMyStatsTrendsController } from "./User/getMyStatsTrendsController.js";
 import {
   blockUserController,
   unblockUserController,
@@ -389,6 +391,7 @@ export {
   userVoteRatingController,
   userGetRatingController,
   getMyVoteForTargetController,
+  listMyReceivedVotesController,
   userGetProfileController,
   userMeController,
   userUpdateProfileController,
@@ -590,6 +593,7 @@ export {
   unfollowUserController,
   listMyFollowingController,
   listMyFollowersController,
+  getMyStatsTrendsController,
   blockUserController,
   unblockUserController,
   listMyBlockedUsersController,

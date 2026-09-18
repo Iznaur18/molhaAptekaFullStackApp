@@ -24,8 +24,13 @@ export function useAppShellNavigation(location, navigate) {
   }, [location.pathname]);
 
   const goToMainView = useCallback(
-    (/** @type {HomeMainView} */ view) => {
-      navigate(mainViewToPathname(view));
+    (/** @type {HomeMainView} */ view, options) => {
+      const pathname = mainViewToPathname(view);
+      if (options?.search != null) {
+        navigate({ pathname, search: options.search });
+        return;
+      }
+      navigate(pathname);
     },
     [navigate],
   );
