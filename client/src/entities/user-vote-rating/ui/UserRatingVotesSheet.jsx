@@ -81,20 +81,13 @@ export function UserRatingVotesSheet({ isOpen, onClose }) {
         role="status"
         aria-label={USER_RATING_VOTES_SHEET_UI.LOADING}
       >
-        {Array.from(
-          { length: USER_RATING_VOTES_SHEET_SKELETON_ROWS },
-          (_, index) => (
-          <li
-            key={index}
-            className="user-rating-votes-sheet__row"
-            aria-hidden="true"
-          >
+        {Array.from({ length: USER_RATING_VOTES_SHEET_SKELETON_ROWS }, (_, index) => (
+          <li key={index} className="user-rating-votes-sheet__row" aria-hidden="true">
             <span className="iz-skeleton iz-skeleton_circle user-rating-votes-sheet__avatar" />
             <span className="iz-skeleton iz-skeleton_line user-rating-votes-sheet__name-skeleton" />
             <span className="iz-skeleton iz-skeleton_line user-rating-votes-sheet__score-skeleton" />
           </li>
-        ),
-        )}
+        ))}
       </ul>
     );
   } else if (votesQuery.isError) {
@@ -152,9 +145,7 @@ export function UserRatingVotesSheet({ isOpen, onClose }) {
                 </button>
                 <span
                   className="user-rating-votes-sheet__score"
-                  aria-label={USER_RATING_VOTES_SHEET_UI.SCORE_ARIA(
-                    vote.userVoteValue,
-                  )}
+                  aria-label={USER_RATING_VOTES_SHEET_UI.SCORE_ARIA(vote.userVoteValue)}
                 >
                   {vote.userVoteValue}
                 </span>

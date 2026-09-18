@@ -1,7 +1,16 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { fireEvent, render as rtlRender, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
+import { createTestQueryClient } from "../../../test/createTestQueryClient.js";
 import { UserProfileInfoPanel } from "./UserProfileInfoPanel.jsx";
+
+// Панель читает тренды статистики через react-query.
+function render(ui) {
+  return rtlRender(
+    <QueryClientProvider client={createTestQueryClient()}>{ui}</QueryClientProvider>,
+  );
+}
 
 const rows = [
   { id: "followingCount", label: "Подписки", value: "7" },

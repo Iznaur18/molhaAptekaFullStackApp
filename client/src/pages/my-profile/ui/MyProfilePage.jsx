@@ -523,8 +523,7 @@ export function MyProfilePage({
                         : {}),
                       ...(onMyOrdersClick
                         ? {
-                            [PROFILE_ROW_ID.TOTAL_PURCHASES_AMOUNT]:
-                              onMyOrdersClick,
+                            [PROFILE_ROW_ID.TOTAL_PURCHASES_AMOUNT]: onMyOrdersClick,
                           }
                         : {}),
                       ...(onLoyaltyPointsClick
@@ -532,8 +531,7 @@ export function MyProfilePage({
                             [PROFILE_ROW_ID.LOYALTY_POINTS]: onLoyaltyPointsClick,
                           }
                         : {}),
-                      [PROFILE_ROW_ID.RATING]: () =>
-                        setIsRatingVotesSheetOpen(true),
+                      [PROFILE_ROW_ID.RATING]: () => setIsRatingVotesSheetOpen(true),
                     }}
                   />
                   <UserRatingVotesSheet

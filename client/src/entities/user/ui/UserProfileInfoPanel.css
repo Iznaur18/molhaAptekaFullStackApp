@@ -51,7 +51,11 @@
   min-width: 0;
   padding: var(--user-profile-block-pad) var(--user-profile-inline-pad);
   border-radius: var(--stat-card-radius);
-  background: color-mix(in srgb, var(--iz-color-surface-muted) 45%, var(--iz-color-surface) 55%);
+  background: color-mix(
+    in srgb,
+    var(--iz-color-surface-muted) 45%,
+    var(--iz-color-surface) 55%
+  );
   box-sizing: border-box;
 }
 
@@ -91,7 +95,11 @@
 
 :root:not([data-theme="dark"]) .user-profile-info__stat-card_action:hover,
 :root:not([data-theme="dark"]) .user-profile-info__stat-card_action:active {
-  background: color-mix(in srgb, var(--iz-color-action) 8%, var(--iz-color-surface-muted));
+  background: color-mix(
+    in srgb,
+    var(--iz-color-action) 8%,
+    var(--iz-color-surface-muted)
+  );
 }
 
 .user-profile-info__stat-card_action:has(
@@ -113,35 +121,43 @@
   background: linear-gradient(145deg, #6b8cff 0%, #3b6fd9 100%);
 }
 
-.user-profile-info__stat-card[data-row-id="followersCount"] .user-profile-info__stat-icon {
+.user-profile-info__stat-card[data-row-id="followersCount"]
+  .user-profile-info__stat-icon {
   background: linear-gradient(145deg, #6b9bff 0%, #3b6fd9 100%);
 }
 
-.user-profile-info__stat-card[data-row-id="followingCount"] .user-profile-info__stat-icon {
+.user-profile-info__stat-card[data-row-id="followingCount"]
+  .user-profile-info__stat-icon {
   background: linear-gradient(145deg, #9b7bff 0%, #6b4fd9 100%);
 }
 
-.user-profile-info__stat-card[data-row-id="totalSalesCount"] .user-profile-info__stat-icon {
+.user-profile-info__stat-card[data-row-id="totalSalesCount"]
+  .user-profile-info__stat-icon {
   background: linear-gradient(145deg, #ff7a8a 0%, #e8455a 100%);
 }
 
-.user-profile-info__stat-card[data-row-id="totalSalesAmount"] .user-profile-info__stat-icon {
+.user-profile-info__stat-card[data-row-id="totalSalesAmount"]
+  .user-profile-info__stat-icon {
   background: linear-gradient(145deg, #ffb35a 0%, #f08a24 100%);
 }
 
-.user-profile-info__stat-card[data-row-id="totalPurchasesAmount"] .user-profile-info__stat-icon {
+.user-profile-info__stat-card[data-row-id="totalPurchasesAmount"]
+  .user-profile-info__stat-icon {
   background: linear-gradient(145deg, #4fd9b0 0%, #1fad86 100%);
 }
 
-.user-profile-info__stat-card[data-row-id="userBusinessHours"] .user-profile-info__stat-icon {
+.user-profile-info__stat-card[data-row-id="userBusinessHours"]
+  .user-profile-info__stat-icon {
   background: linear-gradient(145deg, #7eb6ff 0%, #4a86d9 100%);
 }
 
-.user-profile-info__stat-card[data-row-id="userRatingByVotes"] .user-profile-info__stat-icon {
+.user-profile-info__stat-card[data-row-id="userRatingByVotes"]
+  .user-profile-info__stat-icon {
   background: linear-gradient(145deg, #c4a8ff 0%, #8b6fd9 100%);
 }
 
-.user-profile-info__stat-card[data-row-id="userLoyaltyPoints"] .user-profile-info__stat-icon {
+.user-profile-info__stat-card[data-row-id="userLoyaltyPoints"]
+  .user-profile-info__stat-icon {
   background: linear-gradient(145deg, #5ee0c8 0%, #2bb89a 100%);
 }
 

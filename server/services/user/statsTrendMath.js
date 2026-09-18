@@ -1,8 +1,7 @@
 /** Окно тренда карточек «Подписчики» / «Продажи». */
 export const STATS_TREND_WINDOW_HOURS = 24;
 export const STATS_TREND_BUCKET_COUNT = 24;
-export const STATS_TREND_WINDOW_MS =
-  STATS_TREND_WINDOW_HOURS * 60 * 60 * 1000;
+export const STATS_TREND_WINDOW_MS = STATS_TREND_WINDOW_HOURS * 60 * 60 * 1000;
 
 /**
  * @param {number} baseTotal

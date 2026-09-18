@@ -96,10 +96,7 @@ export {
   UPLOAD_VIDEO_MIME_TYPES,
   UPLOAD_VIDEO_EXTENSIONS,
 } from "./uploadLimits.js";
-export {
-  userFollowListQuerySchema,
-  USER_FOLLOW_MAX_LIST_LIMIT,
-} from "./userFollow.js";
+export { userFollowListQuerySchema, USER_FOLLOW_MAX_LIST_LIMIT } from "./userFollow.js";
 export {
   USER_BLOCK_MAX_PER_USER,
   USER_BLOCK_LIST_MAX_LIMIT,

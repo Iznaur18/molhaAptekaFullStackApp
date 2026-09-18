@@ -38,7 +38,6 @@ const STATS_TREND_ROW_IDS = new Set([
   PROFILE_ROW_ID.TOTAL_SALES_COUNT,
 ]);
 
-
 /**
  * @param {{
  * rows: { id: string; label: string; value: string; href?: string; needsPhoneReveal?: boolean }[];
@@ -237,8 +236,7 @@ function ProfileStatCard({ row, isWide, onRowAction, trend = null }) {
   const showTrend = Boolean(trend) && !isWide;
   const percentChange = trend?.percentChange ?? 0;
   const percentLabel = formatStatsTrendPercentLabel(percentChange);
-  const trendTone =
-    percentChange > 0 ? "up" : percentChange < 0 ? "down" : "flat";
+  const trendTone = percentChange > 0 ? "up" : percentChange < 0 ? "down" : "flat";
   const sparkPaths = showTrend
     ? buildSparklinePaths(trend.series, {
         width: SPARKLINE_WIDTH,

@@ -17,8 +17,7 @@ export function useMyReceivedVotesInfiniteQuery({
     queryKey: userVoteQueryKeys.receivedInfinite(params),
     enabled,
     initialPageParam: 1,
-    queryFn: ({ pageParam }) =>
-      fetchMyReceivedVotes({ page: pageParam, limit }),
+    queryFn: ({ pageParam }) => fetchMyReceivedVotes({ page: pageParam, limit }),
     getNextPageParam: (lastPage) => {
       const pagination = lastPage.pagination;
       if (!pagination) {
