@@ -11,8 +11,6 @@ import {
   useCatalogGridBlockWindow,
 } from "../model/useCatalogGridBlockWindow.js";
 
-const FULL_WIDTH_CELL_CLASS = "app-shell__cell--tier3-full-width";
-
 /**
  * Лента блоками: по несколько рядов сетки в обычном потоке. Блоки вдали от
  * экрана сворачиваются в заглушку своей высоты (см. useCatalogGridBlockWindow).
@@ -64,25 +62,21 @@ export function CatalogGridBlocks({
         };
 
         if (collapsedHeight != null) {
+          // Один пустой элемент, плитки рисует CSS по числу колонок. Раньше тут
+          // была пустышка на каждый товар, и за ~120 страниц ленты на странице
+          // копились тысячи лишних элементов (18.09.2026).
           return (
             <div
               key={block.key}
               {...blockProps}
               className="app-shell__grid app-shell__grid-block app-shell__grid-block--collapsed"
-              style={{ height: `${collapsedHeight}px` }}
-            >
-              {block.items.map((item) => (
-                <div
-                  key={getItemKey(item)}
-                  className={
-                    isFullWidth?.(item)
-                      ? `app-shell__grid-block-skeleton ${FULL_WIDTH_CELL_CLASS}`
-                      : "app-shell__grid-block-skeleton"
-                  }
-                  aria-hidden="true"
-                />
-              ))}
-            </div>
+              style={{
+                height: `${collapsedHeight}px`,
+                "--catalog-collapsed-columns": columnCount,
+              }}
+              data-catalog-block-count={block.items.length}
+              aria-hidden="true"
+            />
           );
         }
 

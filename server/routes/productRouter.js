@@ -129,6 +129,7 @@ import {
   productCreateRateLimiter,
   productBulkImportRateLimiter,
   catalogListRateLimiter,
+  catalogAuxRateLimiter,
   moneyMutationRateLimiter,
   installmentActionRateLimiter,
 } from "../middlewares/index.js";
@@ -227,16 +228,17 @@ router.get(
 );
 router.get(
   "/",
+  // Сначала вход: лимит считается по аккаунту, гости — по IP.
+  checkOptionalAuthMW,
   catalogListRateLimiter,
   productsSearchValidation,
-  checkOptionalAuthMW,
   getProductsController,
 );
 router.get(
   "/facets",
-  catalogListRateLimiter,
-  productsSearchValidation,
   checkOptionalAuthMW,
+  catalogAuxRateLimiter,
+  productsSearchValidation,
   getProductFacetsController,
 );
 router.get("/category-displays", getProductCategoryDisplaysController);
@@ -505,9 +507,9 @@ router.get(
 );
 router.get(
   "/raffles/:raffleId/participants",
+  checkOptionalAuthMW,
   catalogListRateLimiter,
   raffleIdParamValidation,
-  checkOptionalAuthMW,
   getRaffleParticipantsController,
 );
 router.get("/raffles/:raffleId", raffleIdParamValidation, getRaffleByIdController);
@@ -607,9 +609,9 @@ router.post(
 router.get("/promo-activations/me", checkAuthMW, listMyAppliedProductPromosController);
 router.get(
   "/catalog-by-ids",
-  catalogListRateLimiter,
-  catalogProductsByIdsValidation,
   checkOptionalAuthMW,
+  catalogAuxRateLimiter,
+  catalogProductsByIdsValidation,
   getCatalogProductsByIdsController,
 );
 router.get(

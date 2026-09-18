@@ -8,8 +8,8 @@ const PROFILE_ROW_SECTIONS = [
     title: "Основное",
     rowIds: [
       "followersCount",
-      "followingCount",
       "totalSalesCount",
+      "followingCount",
       "totalSalesAmount",
       "totalPurchasesAmount",
       "userBusinessHours",

@@ -15,6 +15,7 @@ import {
   unfollowUserController,
   listMyFollowingController,
   listMyFollowersController,
+  getMyStatsTrendsController,
   blockUserController,
   unblockUserController,
   listMyBlockedUsersController,
@@ -153,6 +154,7 @@ router.get(
   userFollowListValidation,
   listMyFollowersController,
 );
+router.get("/me/stats-trends", checkAuthMW, getMyStatsTrendsController);
 
 router.get(
   "/data-confirmation-requests/pending",

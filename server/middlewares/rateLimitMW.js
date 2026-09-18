@@ -12,6 +12,7 @@ import {
   ADDRESS_SUGGEST_RATE_LIMIT_PER_HOUR,
   ADVERTISING_SUBMIT_RATE_LIMIT_PER_HOUR,
   CATALOG_LIST_RATE_LIMIT_PER_15_MIN,
+  CATALOG_AUX_RATE_LIMIT_PER_15_MIN,
   INSTALLMENT_ACTION_RATE_LIMIT_PER_HOUR,
   MONEY_MUTATION_RATE_LIMIT_PER_HOUR,
   PRODUCT_CREATE_RATE_LIMIT_PER_HOUR,
@@ -613,7 +614,24 @@ export function initRateLimitMiddlewares(store) {
         success: false,
         message: "Слишком много запросов каталога. Попробуйте позже",
       },
-      keyGenerator: generalRateLimitKey,
+      // req.userId кладёт checkOptionalAuthMW — он стоит в маршруте раньше лимита.
+      keyGenerator: rateLimitKeyByUserOrIp,
+      validate: { ip: false, trustProxy: false, xForwardedForHeader: false },
+    },
+    store,
+  );
+
+  handlers.catalogAux = buildLimiter(
+    {
+      ...RATE_LIMIT_DEFAULTS,
+      limiterName: "catalog_aux",
+      windowMs: 15 * 60 * 1000,
+      max: CATALOG_AUX_RATE_LIMIT_PER_15_MIN,
+      message: {
+        success: false,
+        message: "Слишком много запросов каталога. Попробуйте позже",
+      },
+      keyGenerator: rateLimitKeyByUserOrIp,
       validate: { ip: false, trustProxy: false, xForwardedForHeader: false },
     },
     store,
@@ -780,6 +798,10 @@ export const installmentActionRateLimiter = (req, res, next) =>
 /** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
 export const catalogListRateLimiter = (req, res, next) =>
   handlers.catalogList(req, res, next);
+
+/** @param {import('express').Request} req @param {import('express').Response} res @param {import('express').NextFunction} next */
+export const catalogAuxRateLimiter = (req, res, next) =>
+  handlers.catalogAux(req, res, next);
 
 initRateLimitMiddlewares();
 

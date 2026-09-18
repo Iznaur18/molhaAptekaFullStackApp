@@ -92,6 +92,7 @@ export function AccountMainContent({
   handleIntroAdModerationFromProfile,
   handleSellerPersonalCategoryModerationFromProfile,
   handleSubscriptionsFromProfile,
+  handleFollowersFromProfile,
   handleWishlistFromProfile,
   refreshUserProfileActionBadgeCounts,
   refreshPendingModerationCount,
@@ -256,6 +257,7 @@ export function AccountMainContent({
             : undefined
         }
         onSubscriptionsClick={isAuthorized ? handleSubscriptionsFromProfile : undefined}
+        onFollowersClick={isAuthorized ? handleFollowersFromProfile : undefined}
         onWishlistClick={isAuthorized ? handleWishlistFromProfile : undefined}
         pendingModerationCount={pendingModerationCount}
         pendingIntroAdModerationCount={pendingIntroAdModerationCount}

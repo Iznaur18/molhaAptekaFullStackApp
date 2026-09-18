@@ -1,11 +1,13 @@
 import { createPortal } from "react-dom";
 import { Store } from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
 import { SellerShareLinkButton } from "../../../entities/user/ui/SellerShareLinkButton.jsx";
 import { isPremiumActive } from "../../../entities/user/lib/isPremiumActive.js";
 import { USER_ROLE_USER } from "../../../entities/user/model/userConstants.js";
+import { UserRatingVotesSheet } from "../../../entities/user-vote-rating/ui/UserRatingVotesSheet.jsx";
 import { ThemePreferenceToggle } from "../../../features/theme-settings/ui/ThemePreferenceToggle.jsx";
 import { WebPushSettingsToggle } from "../../../features/web-push/ui/WebPushSettingsToggle.jsx";
 import {
@@ -29,6 +31,7 @@ import {
 } from "../../../shared/ui/icon/index.js";
 import { buildSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
 import { UserProfileInfoPanel } from "../../../entities/user/ui/UserProfileInfoPanel.jsx";
+import { PROFILE_ROW_ID } from "../../../entities/user/lib/profileRowIds.js";
 import { GuestProfilePanel } from "./GuestProfilePanel.jsx";
 import { ProfileSidebar } from "./ProfileSidebar.jsx";
 
@@ -92,6 +95,7 @@ import "./MyProfilePage.css";
  * pendingDataConfirmationCount?: number;
  * unreadNotificationsCount?: number;
  * onSubscriptionsClick?: () => void;
+ * onFollowersClick?: () => void;
  * onWishlistClick?: () => void;
  * activeTab?: string;
  * onTabChange?: (tab: string) => void;
@@ -156,6 +160,7 @@ export function MyProfilePage({
   pendingDataConfirmationCount = 0,
   unreadNotificationsCount = 0,
   onSubscriptionsClick,
+  onFollowersClick,
   onWishlistClick,
   activeTab = "overview",
   onTabChange,
@@ -164,6 +169,7 @@ export function MyProfilePage({
   myProductsSearchProps = null,
 }) {
   const navigate = useNavigate();
+  const [isRatingVotesSheetOpen, setIsRatingVotesSheetOpen] = useState(false);
   const isGuestProfile =
     !user && !isLoading && !errorMessage && activeTab === PROFILE_TAB_OVERVIEW;
   const isGuestOtherTab = !user && !isLoading && !errorMessage && !isGuestProfile;
@@ -501,15 +507,36 @@ export function MyProfilePage({
                   ) : null}
                   <UserProfileInfoPanel
                     rows={rows}
+                    showStatsTrends
                     rowActions={{
-                      ...(onMySalesClick ? { totalSalesCount: onMySalesClick } : {}),
+                      ...(onMySalesClick
+                        ? {
+                            [PROFILE_ROW_ID.TOTAL_SALES_COUNT]: onMySalesClick,
+                            [PROFILE_ROW_ID.TOTAL_SALES_AMOUNT]: onMySalesClick,
+                          }
+                        : {}),
                       ...(onSubscriptionsClick
-                        ? { followingCount: onSubscriptionsClick }
+                        ? { [PROFILE_ROW_ID.FOLLOWING]: onSubscriptionsClick }
+                        : {}),
+                      ...(onFollowersClick
+                        ? { [PROFILE_ROW_ID.FOLLOWERS]: onFollowersClick }
                         : {}),
                       ...(onMyOrdersClick
-                        ? { totalPurchasesAmount: onMyOrdersClick }
+                        ? {
+                            [PROFILE_ROW_ID.TOTAL_PURCHASES_AMOUNT]: onMyOrdersClick,
+                          }
                         : {}),
+                      ...(onLoyaltyPointsClick
+                        ? {
+                            [PROFILE_ROW_ID.LOYALTY_POINTS]: onLoyaltyPointsClick,
+                          }
+                        : {}),
+                      [PROFILE_ROW_ID.RATING]: () => setIsRatingVotesSheetOpen(true),
                     }}
+                  />
+                  <UserRatingVotesSheet
+                    isOpen={isRatingVotesSheetOpen}
+                    onClose={() => setIsRatingVotesSheetOpen(false)}
                   />
                   <div className="my-profile-page__overview-footer">
                     <ThemePreferenceToggle />

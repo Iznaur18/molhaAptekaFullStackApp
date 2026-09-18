@@ -1,15 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchMyFollowing } from "../api/fetchMyFollowing.js";
+import { fetchMyFollowers } from "../api/fetchMyFollowers.js";
 import { MY_FOLLOW_LIST_DEFAULT_LIMIT } from "./constants.js";
-import { followingQueryKeys } from "./followingQueryKeys.js";
+import { followersQueryKeys } from "./followersQueryKeys.js";
 
 const DEFAULT_PAGE = 1;
 
 /**
  * @param {{ page?: number; limit?: number; enabled?: boolean }} [params]
  */
-export function useMyFollowingQuery({
+export function useMyFollowersQuery({
   page = DEFAULT_PAGE,
   limit = MY_FOLLOW_LIST_DEFAULT_LIMIT,
   enabled = true,
@@ -17,8 +17,8 @@ export function useMyFollowingQuery({
   const params = { page, limit };
 
   return useQuery({
-    queryKey: followingQueryKeys.list(params),
+    queryKey: followersQueryKeys.list(params),
     enabled,
-    queryFn: () => fetchMyFollowing(params),
+    queryFn: () => fetchMyFollowers(params),
   });
 }

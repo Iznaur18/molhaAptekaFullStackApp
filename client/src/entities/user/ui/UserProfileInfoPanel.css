@@ -1,5 +1,10 @@
 .user-profile-info {
   --user-profile-section-radius: 24px;
+  --stat-card-radius: 16px;
+  --stat-icon-radius: 10px;
+  --stat-grid-gap: 0.625rem;
+  --user-profile-inline-pad: 0.875rem;
+  --user-profile-block-pad: 0.7rem;
 
   display: flex;
   flex-direction: column;
@@ -26,9 +31,245 @@
   overflow: hidden;
 }
 
+.user-profile-info__section_stats {
+  overflow: hidden;
+}
+
+.user-profile-info__stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--stat-grid-gap);
+  margin: 0;
+  padding: var(--user-profile-block-pad) var(--user-profile-inline-pad);
+}
+
+.user-profile-info__stat-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
+  padding: var(--user-profile-block-pad) var(--user-profile-inline-pad);
+  border-radius: var(--stat-card-radius);
+  background: color-mix(
+    in srgb,
+    var(--iz-color-surface-muted) 45%,
+    var(--iz-color-surface) 55%
+  );
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] .user-profile-info__stat-card {
+  background: #2a2a2e;
+}
+
+.user-profile-info__stat-card_wide {
+  grid-column: 1 / -1;
+}
+
+.user-profile-info__stat-card_wide .user-profile-info__stat-text {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.user-profile-info__stat-card_wide .user-profile-info__stat-label {
+  flex: 1 1 auto;
+}
+
+.user-profile-info__stat-card_wide .user-profile-info__stat-value {
+  flex: 0 0 auto;
+  font-size: 0.9375rem;
+}
+
+.user-profile-info__stat-card_action {
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.user-profile-info__stat-card_action:hover,
+.user-profile-info__stat-card_action:active {
+  background: color-mix(in srgb, var(--iz-color-action) 10%, #2a2a2e);
+}
+
+:root:not([data-theme="dark"]) .user-profile-info__stat-card_action:hover,
+:root:not([data-theme="dark"]) .user-profile-info__stat-card_action:active {
+  background: color-mix(
+    in srgb,
+    var(--iz-color-action) 8%,
+    var(--iz-color-surface-muted)
+  );
+}
+
+.user-profile-info__stat-card_action:has(
+  .user-profile-info__detail-action:focus-visible
+) {
+  outline: 2px solid var(--iz-color-action-border, var(--iz-color-action));
+  outline-offset: 2px;
+}
+
+.user-profile-info__stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--stat-icon-radius);
+  color: #ffffff;
+  background: linear-gradient(145deg, #6b8cff 0%, #3b6fd9 100%);
+}
+
+.user-profile-info__stat-card[data-row-id="followersCount"]
+  .user-profile-info__stat-icon {
+  background: linear-gradient(145deg, #6b9bff 0%, #3b6fd9 100%);
+}
+
+.user-profile-info__stat-card[data-row-id="followingCount"]
+  .user-profile-info__stat-icon {
+  background: linear-gradient(145deg, #9b7bff 0%, #6b4fd9 100%);
+}
+
+.user-profile-info__stat-card[data-row-id="totalSalesCount"]
+  .user-profile-info__stat-icon {
+  background: linear-gradient(145deg, #ff7a8a 0%, #e8455a 100%);
+}
+
+.user-profile-info__stat-card[data-row-id="totalSalesAmount"]
+  .user-profile-info__stat-icon {
+  background: linear-gradient(145deg, #ffb35a 0%, #f08a24 100%);
+}
+
+.user-profile-info__stat-card[data-row-id="totalPurchasesAmount"]
+  .user-profile-info__stat-icon {
+  background: linear-gradient(145deg, #4fd9b0 0%, #1fad86 100%);
+}
+
+.user-profile-info__stat-card[data-row-id="userBusinessHours"]
+  .user-profile-info__stat-icon {
+  background: linear-gradient(145deg, #7eb6ff 0%, #4a86d9 100%);
+}
+
+.user-profile-info__stat-card[data-row-id="userRatingByVotes"]
+  .user-profile-info__stat-icon {
+  background: linear-gradient(145deg, #c4a8ff 0%, #8b6fd9 100%);
+}
+
+.user-profile-info__stat-card[data-row-id="userLoyaltyPoints"]
+  .user-profile-info__stat-icon {
+  background: linear-gradient(145deg, #5ee0c8 0%, #2bb89a 100%);
+}
+
+.user-profile-info__stat-card_trend {
+  align-items: flex-start;
+}
+
+.user-profile-info__stat-card_trend .user-profile-info__stat-text {
+  gap: 0.1rem;
+  padding-top: 0.1rem;
+}
+
+.user-profile-info__stat-card_trend .user-profile-info__stat-icon {
+  margin-top: 0.15rem;
+}
+
+.user-profile-info__stat-card_trend .user-profile-info__stat-chevron {
+  margin-top: 0.35rem;
+}
+
+.user-profile-info__stat-trend {
+  margin: 0.15rem 0 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.user-profile-info__stat-trend_up {
+  color: #16a34a;
+}
+
+.user-profile-info__stat-trend_down {
+  color: #dc2626;
+}
+
+.user-profile-info__stat-trend_flat {
+  color: var(--iz-color-text-muted);
+}
+
+.user-profile-info__stat-sparkline {
+  flex: 0 0 auto;
+  align-self: flex-end;
+  margin-left: auto;
+  margin-bottom: 0.1rem;
+  overflow: visible;
+}
+
+.user-profile-info__stat-sparkline-line {
+  stroke: var(--stat-spark-stroke, #3b6fd9);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.user-profile-info__stat-sparkline-area {
+  fill: var(--stat-spark-fill, color-mix(in srgb, #3b6fd9 22%, transparent));
+}
+
+.user-profile-info__stat-card[data-row-id="followersCount"] {
+  --stat-spark-stroke: #3b6fd9;
+  --stat-spark-fill: color-mix(in srgb, #3b6fd9 22%, transparent);
+}
+
+.user-profile-info__stat-card[data-row-id="totalSalesCount"] {
+  --stat-spark-stroke: #e8455a;
+  --stat-spark-fill: color-mix(in srgb, #e8455a 22%, transparent);
+}
+
+.user-profile-info__stat-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.user-profile-info__stat-label {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--iz-color-text-muted);
+}
+
+.user-profile-info__stat-value {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--iz-color-text);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.user-profile-info__stat-value_empty {
+  font-weight: 500;
+  color: var(--iz-color-text-muted);
+  opacity: 0.7;
+}
+
+.user-profile-info__stat-chevron {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--iz-color-text-muted);
+  opacity: 0.55;
+}
+
 .user-profile-info__section-title {
   margin: 0;
-  padding: 0.5rem 0.875rem;
+  padding: 0.5rem var(--user-profile-inline-pad);
   font-size: 0.6875rem;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -52,7 +293,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.7rem 0.875rem;
+  padding: var(--user-profile-block-pad) var(--user-profile-inline-pad);
   border-bottom: 1px solid color-mix(in srgb, var(--iz-color-border) 65%, transparent);
 }
 

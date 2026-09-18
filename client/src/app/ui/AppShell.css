@@ -295,7 +295,8 @@
   display: grid;
   /* ≥1280 viewport: 4 колонки (паритет с mobile) */
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
+  --app-shell-grid-gap: 1rem;
+  gap: var(--app-shell-grid-gap);
   align-items: stretch;
 }
 
@@ -312,7 +313,8 @@
 @container app-viewport (max-width: 1279px) {
   .app-shell__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
+    --app-shell-grid-gap: 1rem;
+    gap: var(--app-shell-grid-gap);
   }
 }
 
@@ -320,7 +322,8 @@
 @container app-viewport (max-width: 903px) {
   .app-shell__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.15rem;
+    --app-shell-grid-gap: 0.15rem;
+    gap: var(--app-shell-grid-gap);
   }
 
   .app-shell__grid-blocks {
@@ -356,7 +359,8 @@
 
   .app-shell__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.1rem;
+    --app-shell-grid-gap: 0.1rem;
+    gap: var(--app-shell-grid-gap);
   }
 
   .app-shell__grid-blocks {
@@ -441,16 +445,22 @@
   width: 100%;
 }
 
+/* Свёрнутый блок — один пустой элемент: колонки-плитки рисует фон, чтобы при
+   быстром броске прокрутки вместо пустоты был виден силуэт сетки. */
 .app-shell__grid-block--collapsed {
-  grid-auto-rows: 1fr;
   overflow: hidden;
   /* Пустая заглушка не должна становиться якорем прокрутки. */
   overflow-anchor: none;
-}
-
-.app-shell__grid-block-skeleton {
-  border-radius: 0.75rem;
-  background: color-mix(in srgb, var(--iz-color-text) 5%, transparent);
+  background-image: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--iz-color-text) 5%, transparent)
+      calc(100% - var(--app-shell-grid-gap)),
+    transparent 0
+  );
+  background-size: calc(
+      (100% + var(--app-shell-grid-gap)) / var(--catalog-collapsed-columns, 4)
+    )
+    100%;
 }
 
 /* Фото в блоках грузятся заранее, плавного появления там не видно, а каждая

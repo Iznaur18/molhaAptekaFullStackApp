@@ -3,11 +3,13 @@ import {
   userVoteRatingController,
   userGetRatingController,
   getMyVoteForTargetController,
+  listMyReceivedVotesController,
 } from "../controllers/index.js";
 import { checkAuthMW, voteRateLimiter } from "../middlewares/index.js";
 import {
   voteValidation,
   voteTargetIdParamValidation,
+  voteReceivedListValidation,
   ratingUserIdParamValidation,
 } from "../validations/index.js";
 
@@ -18,6 +20,13 @@ router.get(
   "/rating/:userIdClient",
   ratingUserIdParamValidation,
   userGetRatingController,
+);
+
+router.get(
+  "/me/received",
+  checkAuthMW,
+  voteReceivedListValidation,
+  listMyReceivedVotesController,
 );
 
 router.get(

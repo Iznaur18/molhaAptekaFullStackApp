@@ -1,4 +1,13 @@
+import { useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
+
+import { useMyFollowersQuery } from "../../../entities/user-follow/model/useMyFollowersQuery.js";
 import { useMyFollowingQuery } from "../../../entities/user-follow/model/useMyFollowingQuery.js";
+import {
+  SUBSCRIPTIONS_LIST_FOLLOWERS,
+  SUBSCRIPTIONS_LIST_FOLLOWING,
+  SUBSCRIPTIONS_LIST_QUERY_PARAM,
+} from "../../../entities/user-follow/model/constants.js";
 import { SUBSCRIPTIONS_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { pluralizeRu } from "../../../shared/lib/pluralizeRu.js";
 import { ProfileListHero } from "../../../shared/ui/ProfileListHero/ProfileListHero.jsx";
@@ -31,6 +40,17 @@ function SubscriptionsHeroIcon() {
 }
 
 /**
+ * @param {URLSearchParams} searchParams
+ * @returns {typeof SUBSCRIPTIONS_LIST_FOLLOWING | typeof SUBSCRIPTIONS_LIST_FOLLOWERS}
+ */
+function resolveListMode(searchParams) {
+  return searchParams.get(SUBSCRIPTIONS_LIST_QUERY_PARAM) ===
+    SUBSCRIPTIONS_LIST_FOLLOWERS
+    ? SUBSCRIPTIONS_LIST_FOLLOWERS
+    : SUBSCRIPTIONS_LIST_FOLLOWING;
+}
+
+/**
  * @param {{
  *   isAuthorized: boolean;
  *   onRequestLogin: () => void;
@@ -38,31 +58,111 @@ function SubscriptionsHeroIcon() {
  * }} props
  */
 export function SubscriptionsPage({ isAuthorized, onRequestLogin, onUserClick }) {
-  const followingQuery = useMyFollowingQuery({ enabled: isAuthorized });
-  const users = followingQuery.data?.users ?? [];
-  const status = !isAuthorized
-    ? { kind: "idle" }
-    : followingQuery.isPending
-      ? { kind: "loading" }
-      : followingQuery.isError
-        ? {
-            kind: "error",
-            message:
-              followingQuery.error instanceof Error
-                ? followingQuery.error.message
-                : SUBSCRIPTIONS_PAGE_UI.FETCH_FALLBACK,
-          }
-        : { kind: "idle" };
+  const [searchParams, setSearchParams] = useSearchParams();
+  const listMode = resolveListMode(searchParams);
+  const isFollowers = listMode === SUBSCRIPTIONS_LIST_FOLLOWERS;
+
+  const followingQuery = useMyFollowingQuery({
+    enabled: isAuthorized && !isFollowers,
+  });
+  const followersQuery = useMyFollowersQuery({
+    enabled: isAuthorized && isFollowers,
+  });
+
+  const activeQuery = isFollowers ? followersQuery : followingQuery;
+  const users = activeQuery.data?.users ?? [];
+
+  const status = useMemo(() => {
+    if (!isAuthorized) {
+      return { kind: "idle" };
+    }
+    if (activeQuery.isPending) {
+      return { kind: "loading" };
+    }
+    if (activeQuery.isError) {
+      return {
+        kind: "error",
+        message:
+          activeQuery.error instanceof Error
+            ? activeQuery.error.message
+            : isFollowers
+              ? SUBSCRIPTIONS_PAGE_UI.FETCH_FOLLOWERS_FALLBACK
+              : SUBSCRIPTIONS_PAGE_UI.FETCH_FALLBACK,
+      };
+    }
+    return { kind: "idle" };
+  }, [isAuthorized, activeQuery, isFollowers]);
+
+  const setListMode = (nextMode) => {
+    if (nextMode === SUBSCRIPTIONS_LIST_FOLLOWERS) {
+      setSearchParams(
+        { [SUBSCRIPTIONS_LIST_QUERY_PARAM]: SUBSCRIPTIONS_LIST_FOLLOWERS },
+        { replace: true },
+      );
+      return;
+    }
+    setSearchParams({}, { replace: true });
+  };
 
   const hero = (
     <ProfileListHero
       tone="action"
-      caption={SUBSCRIPTIONS_PAGE_UI.HERO_CAPTION}
+      caption={
+        isFollowers
+          ? SUBSCRIPTIONS_PAGE_UI.HERO_CAPTION_FOLLOWERS
+          : SUBSCRIPTIONS_PAGE_UI.HERO_CAPTION
+      }
       count={users.length}
-      unit={pluralizeRu(users.length, SUBSCRIPTIONS_PAGE_UI.HERO_UNIT_FORMS)}
-      info={SUBSCRIPTIONS_PAGE_UI.HERO_INFO}
+      unit={pluralizeRu(
+        users.length,
+        isFollowers
+          ? SUBSCRIPTIONS_PAGE_UI.HERO_UNIT_FORMS_FOLLOWERS
+          : SUBSCRIPTIONS_PAGE_UI.HERO_UNIT_FORMS,
+      )}
+      info={
+        isFollowers
+          ? SUBSCRIPTIONS_PAGE_UI.HERO_INFO_FOLLOWERS
+          : SUBSCRIPTIONS_PAGE_UI.HERO_INFO
+      }
       icon={<SubscriptionsHeroIcon />}
     />
+  );
+
+  const tabs = (
+    <div
+      className="subscriptions-page__tabs"
+      role="tablist"
+      aria-label={SUBSCRIPTIONS_PAGE_UI.TABS_ARIA}
+    >
+      <button
+        type="button"
+        role="tab"
+        aria-selected={!isFollowers}
+        className={[
+          "subscriptions-page__tab",
+          !isFollowers ? "subscriptions-page__tab_active" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        onClick={() => setListMode(SUBSCRIPTIONS_LIST_FOLLOWING)}
+      >
+        {SUBSCRIPTIONS_PAGE_UI.TAB_FOLLOWING}
+      </button>
+      <button
+        type="button"
+        role="tab"
+        aria-selected={isFollowers}
+        className={[
+          "subscriptions-page__tab",
+          isFollowers ? "subscriptions-page__tab_active" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        onClick={() => setListMode(SUBSCRIPTIONS_LIST_FOLLOWERS)}
+      >
+        {SUBSCRIPTIONS_PAGE_UI.TAB_FOLLOWERS}
+      </button>
+    </div>
   );
 
   if (!isAuthorized) {
@@ -83,6 +183,7 @@ export function SubscriptionsPage({ isAuthorized, onRequestLogin, onUserClick })
   if (status.kind === "loading") {
     return (
       <section className="subscriptions-page">
+        {tabs}
         <p className="subscriptions-page__state">{SUBSCRIPTIONS_PAGE_UI.LOADING}</p>
       </section>
     );
@@ -91,12 +192,19 @@ export function SubscriptionsPage({ isAuthorized, onRequestLogin, onUserClick })
   if (status.kind === "error") {
     return (
       <section className="subscriptions-page">
-        <p
-          className="subscriptions-page__state subscriptions-page__state_error"
-          role="alert"
-        >
-          {status.message}
-        </p>
+        {tabs}
+        <div className="subscriptions-page__error-block" role="alert">
+          <p className="subscriptions-page__state subscriptions-page__state_error">
+            {status.message}
+          </p>
+          <button
+            type="button"
+            className="subscriptions-page__retry"
+            onClick={() => void activeQuery.refetch()}
+          >
+            {SUBSCRIPTIONS_PAGE_UI.RETRY}
+          </button>
+        </div>
       </section>
     );
   }
@@ -104,9 +212,14 @@ export function SubscriptionsPage({ isAuthorized, onRequestLogin, onUserClick })
   if (users.length === 0) {
     return (
       <section className="subscriptions-page subscriptions-page_empty">
+        {tabs}
         <div className="subscriptions-page__header">{hero}</div>
         <div className="subscriptions-page__empty-body">
-          <p className="subscriptions-page__state">{SUBSCRIPTIONS_PAGE_UI.EMPTY}</p>
+          <p className="subscriptions-page__state">
+            {isFollowers
+              ? SUBSCRIPTIONS_PAGE_UI.EMPTY_FOLLOWERS
+              : SUBSCRIPTIONS_PAGE_UI.EMPTY}
+          </p>
         </div>
       </section>
     );
@@ -114,6 +227,7 @@ export function SubscriptionsPage({ isAuthorized, onRequestLogin, onUserClick })
 
   return (
     <section className="subscriptions-page">
+      {tabs}
       <div className="subscriptions-page__header">{hero}</div>
       <ul className="subscriptions-page__list" role="list">
         {users.map((user) => (
