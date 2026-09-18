@@ -137,6 +137,11 @@ export async function fetchCatalogProductsPage({
       },
     };
   } catch (e) {
-    throw new Error(formatApiErrorMessage(e, API_CLIENT_UI.FETCH_PRODUCTS_FALLBACK));
+    const error = new Error(
+      formatApiErrorMessage(e, API_CLIENT_UI.FETCH_PRODUCTS_FALLBACK),
+    );
+    // Статус нужен повтору запроса: на 429 повторять бессмысленно.
+    /** @type {Error & { status?: number }} */ (error).status = e?.response?.status;
+    throw error;
   }
 }

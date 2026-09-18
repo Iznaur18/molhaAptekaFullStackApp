@@ -20,9 +20,26 @@ test("legal documents include public offer for platform services", () => {
   assert.match(presets, /LEGAL_UI\.OFFER_TAB/);
   assert.match(offerContent, /публичной офертой/i);
   assert.match(offerContent, /149 \(сто сорок девять\) баллов/);
-  assert.match(offerContent, /6 000 \(шесть тысяч\) баллов/);
+  assert.match(offerContent, /6 000 \(шесть тысяч\) рублей/);
+  assert.match(offerContent, /Систему быстрых платежей/);
   assert.match(offerContent, /не является продавцом таких товаров/);
   assert.match(offerScreen, /initialKind="offer"/);
   assert.match(layout, /legal\/offer/);
   assert.match(userAgreement, /Публичной оферте/);
+});
+
+test("legal documents include ranking rules (289-ФЗ)", () => {
+  const presets = readMobileFile("features/legal/model/legalDocumentPresets.ts");
+  const rankingScreen = readMobileFile("app/legal/ranking.tsx");
+  const layout = readMobileFile("app/_layout.tsx");
+  const sellerPreview = readMobileFile(
+    "entities/product/ui/ProductDetailsSellerPreview.tsx",
+  );
+
+  assert.match(presets, /ranking:/);
+  assert.match(presets, /LEGAL_RANKING_RULES_SECTIONS/);
+  assert.match(presets, /LEGAL_UI\.RANKING_TAB/);
+  assert.match(rankingScreen, /initialKind="ranking"/);
+  assert.match(layout, /legal\/ranking/);
+  assert.match(sellerPreview, /buildMarketplaceNotSellerNotice/);
 });

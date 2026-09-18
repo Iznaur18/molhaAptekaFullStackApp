@@ -1,3 +1,4 @@
+import { sanitizeMarketingAttribution } from "@izibuy/shared-lib";
 import bcrypt from "bcrypt";
 import { EMAIL_AUTH_DISABLED_MESSAGE } from "@izibuy/shared-lib";
 import { errorRes, successRes } from "../../services/http/index.js";
@@ -46,6 +47,7 @@ export const registerUserController = async (req, res) => {
     userGender,
     notificationsEnabled,
     referralCode,
+    marketingAttribution,
   } = req.body;
 
   const normalizedUserName = String(userName).trim().toLowerCase();
@@ -76,6 +78,7 @@ export const registerUserController = async (req, res) => {
       userAddressFiasId: req.verifiedDeliveryAddress?.fiasId ?? "",
       userAddressGeo: req.verifiedDeliveryAddress?.geo ?? null,
       referralCode: referralCode ?? null,
+      marketingAttribution: sanitizeMarketingAttribution(marketingAttribution),
     });
   } catch (registrationError) {
     const message =

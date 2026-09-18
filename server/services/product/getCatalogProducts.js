@@ -30,6 +30,7 @@ import { getProductIdsWithOpenSales } from "./productOrderLocks.js";
 import { attachProductAvailablePurchaseQuantity } from "./productStock.js";
 import { resolveCatalogNearContext } from "./resolveCatalogNearContext.js";
 import { resolveOptionalViewerCatalogGeo } from "./resolveOptionalViewerCatalogGeo.js";
+import { emitSearchPerformedEvent } from "../analytics-events/funnelAnalyticsEvents.js";
 
 const emptyCatalogPage = (page, limit) => ({
   products: [],
@@ -61,6 +62,7 @@ export async function getCatalogProducts({ userId, query }) {
   if (!includeHidden) {
     const cached = getCachedCatalogProducts(cacheKey);
     if (cached) {
+      trackCatalogSearch({ userId, query, pagination: cached.pagination });
       return {
         ...cached,
         products: await attachProductSellerClosedState(cached.products, userId ?? null),
@@ -76,6 +78,7 @@ export async function getCatalogProducts({ userId, query }) {
   });
 
   if (!includeHidden) {
+    trackCatalogSearch({ userId, query, pagination: result.pagination });
     setCachedCatalogProducts(cacheKey, {
       ...result,
       products: stripProductSellerClosedState(result.products),
@@ -86,6 +89,28 @@ export async function getCatalogProducts({ userId, query }) {
     ...result,
     products: await attachProductSellerClosedState(result.products, userId ?? null),
   };
+}
+
+/**
+ * Поиск покупателя — только первая страница, без служебного `includeHidden`.
+ *
+ * @param {{
+ *   userId?: string;
+ *   query: Record<string, unknown>;
+ *   pagination?: { total?: number };
+ * }} input
+ */
+function trackCatalogSearch({ userId, query, pagination }) {
+  const search = String(query.search ?? "").trim();
+  if (!search || (Number(query.page) || 1) > 1) {
+    return;
+  }
+  emitSearchPerformedEvent({
+    userId: userId ?? null,
+    query: search,
+    resultCount: pagination?.total ?? 0,
+    near: String(query.near).toLowerCase() === "true",
+  });
 }
 
 /**

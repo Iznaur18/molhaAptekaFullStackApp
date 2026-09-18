@@ -7,6 +7,7 @@ import {
 import { verifyAccessToken } from "../services/auth/authTokens.js";
 import { isRefreshTokenVersionValid } from "../services/auth/userAuthTokenVersion.js";
 import { errorRes } from "../services/http/index.js";
+import { trackUserActiveDay } from "../services/analytics-events/funnelAnalyticsEvents.js";
 
 const BLOCKED_ACCOUNT_MESSAGE = "Аккаунт заблокирован";
 const DISABLED_ACCOUNT_MESSAGE = "Аккаунт отключён администратором";
@@ -69,6 +70,8 @@ async function attachUserIdFromAccessToken(req, res) {
   }
 
   req.userId = decoded._id;
+  // Удержание: первый запрос пользователя за сутки. Не ждём и не падаем.
+  trackUserActiveDay(decoded._id);
   return null;
 }
 

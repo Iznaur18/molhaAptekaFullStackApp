@@ -43,6 +43,7 @@ import {
 } from "./middlewares/index.js";
 import { buildApiHelmetOptions } from "./utils/buildApiHelmetOptions.js";
 import { buildHealthPayload } from "./utils/buildHealthPayload.js";
+import { probeObjectStorageHealth } from "./services/upload/objectStorageUpload.js";
 import { API_JSON_BODY_LIMIT } from "./constants/securityRateLimitConstants.js";
 import { resolveApiCorsMiddleware } from "./utils/resolveApiCorsMiddleware.js";
 import { resolveUploadContentType } from "./utils/resolveUploadContentType.js";
@@ -78,8 +79,9 @@ export const createApp = () => {
 
   app.use(generalRateLimiter);
 
-  app.get("/health", (_req, res) => {
-    const health = buildHealthPayload();
+  app.get("/health", async (_req, res) => {
+    const objectStorage = await probeObjectStorageHealth();
+    const health = buildHealthPayload({ objectStorage });
     const statusCode = health.status === "ok" ? 200 : 503;
     // Публично только status — internals (mongo/git/uptime) не светим даже в dev/LAN.
     return res.status(statusCode).json({ status: health.status });

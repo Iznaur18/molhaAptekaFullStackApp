@@ -87,7 +87,9 @@ test("блок вдали от экрана сворачивается в заг
 
   expect(blocks[0].style.height).toBe("1284px");
   expect(blocks[0].querySelectorAll("[data-item]")).toHaveLength(0);
-  expect(blocks[0].querySelectorAll(".app-shell__grid-block-skeleton")).toHaveLength(8);
+  // Заглушка — один пустой элемент, число товаров только в атрибуте.
+  expect(blocks[0].childElementCount).toBe(0);
+  expect(blocks[0].getAttribute("data-catalog-block-count")).toBe("8");
   expect(blocks[1].querySelectorAll("[data-item]")).toHaveLength(4);
 
   getObserver("near").fire([{ target: blocks[0], isIntersecting: true }]);

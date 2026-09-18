@@ -9,6 +9,7 @@ import { AppIntroSplash } from "../features/app-intro/ui/AppIntroSplash.jsx";
 import { CookieNoticeHost } from "../features/legal/ui/CookieNoticeHost.jsx";
 import { captureReferralCodeFromSearch } from "../shared/lib/referralCodeStorage.js";
 import { captureAffiliateCodeFromSearch } from "../shared/lib/affiliateCodeStorage.js";
+import { captureMarketingAttribution } from "../shared/lib/marketingAttributionStorage.js";
 import { clearStaleChunkReloadFlag } from "../shared/lib/reloadOnceOnStaleChunk.js";
 import { useReleaseStaleBodyScroll } from "../shared/lib/useReleaseStaleBodyScroll.js";
 import { AppErrorBoundary } from "../shared/ui/AppErrorBoundary/AppErrorBoundary.jsx";
@@ -23,6 +24,7 @@ function CaptureAttributionCodes() {
   useEffect(() => {
     captureReferralCodeFromSearch(location.search);
     captureAffiliateCodeFromSearch(location.search);
+    captureMarketingAttribution(location.search);
   }, [location.search]);
   return null;
 }

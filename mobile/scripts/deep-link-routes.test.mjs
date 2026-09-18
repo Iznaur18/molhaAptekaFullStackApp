@@ -34,6 +34,7 @@ test("пути, которые раньше молча не открывалис
     "/faq": "/faq",
     "/legal/privacy": "/legal/privacy",
     "/legal/offer": "/legal/offer",
+    "/legal/ranking": "/legal/ranking",
     "/partner-program": "/hub/partner-program",
     "/data-confirmation": "/hub/data-confirmation",
     "/profile": "/(tabs)/me",

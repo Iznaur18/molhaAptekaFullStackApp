@@ -9,3 +9,13 @@ export {
   emitOrderItemSoldEvent,
   emitAdEvent,
 } from "./emitAnalyticsEvents.js";
+export {
+  emitCartItemsAddedEvents,
+  emitCheckoutStartedEvent,
+  emitPaymentSucceededEvent,
+  emitProductPublishedEvent,
+  emitSearchPerformedEvent,
+  normalizeSearchQueryForAnalytics,
+  resetUserActiveDayCache,
+  trackUserActiveDay,
+} from "./funnelAnalyticsEvents.js";

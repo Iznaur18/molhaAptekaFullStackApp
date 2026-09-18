@@ -1,4 +1,5 @@
 import { CartModel } from "../../models/index.js";
+import { emitCartItemsAddedEvents } from "../../services/analytics-events/index.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 
 import {
@@ -20,11 +21,17 @@ export const replaceMyCartController = async (req, res) => {
 
   const purchasable = await filterCartItemsToPurchasableProducts(parsed.items, userId);
 
-  await CartModel.findOneAndUpdate(
+  const previous = await CartModel.findOneAndUpdate(
     { userId },
     { $set: { items: purchasable } },
-    { upsert: true, returnDocument: "after" },
+    { upsert: true, returnDocument: "before", lean: true },
   );
+
+  const previousIds = new Set(Object.keys(previous?.items ?? {}));
+  const addedIds = Object.keys(purchasable).filter((id) => !previousIds.has(id));
+  if (addedIds.length > 0) {
+    emitCartItemsAddedEvents({ userId: String(userId), productIds: addedIds });
+  }
 
   return successRes(res, { items: purchasable });
 };

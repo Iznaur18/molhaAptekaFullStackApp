@@ -19,6 +19,8 @@ export async function initClientSentry() {
     dsn: import.meta.env.VITE_SENTRY_DSN?.trim(),
     environment: import.meta.env.MODE,
     release,
+    // Без IP и cookie пользователя: Sentry хранит данные за границей (152-ФЗ).
+    sendDefaultPii: false,
     enabled: true,
     integrations: [
       Sentry.browserTracingIntegration({

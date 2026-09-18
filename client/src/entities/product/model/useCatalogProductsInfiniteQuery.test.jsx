@@ -88,4 +88,33 @@ describe("useCatalogProductsInfiniteQuery", () => {
     expect(fetchMyProductsPageMock).toHaveBeenCalled();
     expect(fetchCatalogProductsPageMock).not.toHaveBeenCalled();
   });
+
+  it("429 на догрузке оставляет ленту и не повторяет запрос", async () => {
+    const firstPage = buildCatalogProductsPage({
+      pagination: { page: 1, limit: 24, total: 48, totalPages: 2 },
+    });
+    const rateLimited = Object.assign(new Error("Слишком много запросов"), {
+      status: 429,
+    });
+    fetchCatalogProductsPageMock
+      .mockResolvedValueOnce(firstPage)
+      .mockRejectedValue(rateLimited);
+    const queryClient = createTestQueryClient();
+
+    const { result } = renderHook(() => useCatalogProductsInfiniteQuery(baseParams), {
+      wrapper: createQueryWrapper(queryClient),
+    });
+    await waitFor(() => {
+      expect(result.current.products).toHaveLength(1);
+    });
+
+    await result.current.query.fetchNextPage();
+
+    await waitFor(() => {
+      expect(result.current.catalogLoadMoreError).toBe("Слишком много запросов");
+    });
+    expect(result.current.catalogStatus.kind).toBe("idle");
+    expect(result.current.products).toEqual(firstPage.products);
+    expect(fetchCatalogProductsPageMock).toHaveBeenCalledTimes(2);
+  });
 });

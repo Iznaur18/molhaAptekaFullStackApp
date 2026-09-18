@@ -63,6 +63,16 @@ test("gap mutators have dedicated rate limiters wired", () => {
   const product = readFileSync(path.join(root, "routes/productRouter.js"), "utf8");
   assert.match(product, /productCreateRateLimiter/);
   assert.match(product, /catalogListRateLimiter/);
+  // Лимит каталога считается по аккаунту: вход должен стоять раньше лимита,
+  // иначе req.userId пуст и все за одним NAT делят один счётчик.
+  assert.match(
+    product,
+    /checkOptionalAuthMW,\s*catalogListRateLimiter,\s*productsSearchValidation/,
+  );
+  assert.match(
+    product,
+    /checkOptionalAuthMW,\s*catalogAuxRateLimiter,\s*productsSearchValidation/,
+  );
   assert.match(product, /moneyMutationRateLimiter/);
   assert.match(product, /installmentActionRateLimiter/);
 

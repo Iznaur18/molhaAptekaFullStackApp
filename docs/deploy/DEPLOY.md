@@ -9,7 +9,8 @@
 | Этот файл | первый выклад |
 | [`../architecture/ROADMAP-SCALING.md`](../architecture/ROADMAP-SCALING.md) | фазы роста, Redis, worker, staging |
 | [`LOGGING-CENTRAL.md`](LOGGING-CENTRAL.md) | journald → Loki / Grafana Cloud / Yandex Logging |
-| [`PROD-S3-CDN.md`](PROD-S3-CDN.md) | медиа на S3/R2 вместо диска |
+| [`PROD-S3-CDN.md`](PROD-S3-CDN.md) | медиа в Selectel S3 + CDN вместо диска |
+| [`OPS-ALERTS.md`](OPS-ALERTS.md) | алерты о падении в Telegram: внешний пинг, healthwatch, события приложения |
 | [`CERTBOT-SSL.md`](CERTBOT-SSL.md) | Let's Encrypt / продление / troubleshooting |
 | [`../../server/docs/production-checklist.md`](../../server/docs/production-checklist.md) | smoke после деплоя |
 | [`../../server/docs/RUNBOOK.md`](../../server/docs/RUNBOOK.md) | бэкап, rollback |

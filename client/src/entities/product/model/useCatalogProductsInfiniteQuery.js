@@ -11,6 +11,25 @@ import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { useInfiniteScrollSentinel } from "../../../shared/lib/useInfiniteScrollSentinel.js";
 
 /**
+ * Следующую страницу ленты просим за два экрана до конца: при 200 px человек
+ * каждый раз упирался в низ ленты и ждал ответа и картинок (18.09.2026).
+ */
+const CATALOG_SENTINEL_ROOT_MARGIN = "0px 0px 200% 0px";
+
+/**
+ * Один повтор при сбое, но не на 429: повтор только съедает лимит каталога.
+ *
+ * @param {number} failureCount
+ * @param {unknown} error
+ */
+function shouldRetryCatalogPage(failureCount, error) {
+  if (/** @type {{ status?: number } | null} */ (error)?.status === 429) {
+    return false;
+  }
+  return failureCount < 1;
+}
+
+/**
  * @param {object} params
  */
 export function useCatalogProductsInfiniteQuery({
@@ -63,7 +82,7 @@ export function useCatalogProductsInfiniteQuery({
     queryKey: catalogQueryKeys.list(listParams),
     enabled: isCatalogProductsView,
     initialPageParam: 1,
-    retry: 1,
+    retry: shouldRetryCatalogPage,
     queryFn: async ({ pageParam }) => {
       const pageNum = Number(pageParam) || 1;
       const search = listParams.search ?? undefined;
@@ -130,7 +149,10 @@ export function useCatalogProductsInfiniteQuery({
     if (query.isPending && !query.data) {
       return { kind: "loading" };
     }
-    if (query.isError) {
+    // Сбой догрузки или фонового обновления не стирает уже показанную ленту:
+    // для него внизу плашка «Повторить» (catalogLoadMoreError). Раньше ответ
+    // 429 на 119-й странице заменял всю ленту экраном ошибки и бросал наверх.
+    if (query.isError && !query.data) {
       const message =
         query.error instanceof Error
           ? query.error.message
@@ -165,6 +187,7 @@ export function useCatalogProductsInfiniteQuery({
     sentinelRef: catalogSentinelRef,
     onIntersect: loadNextCatalogPage,
     observeRevision: products.length,
+    rootMargin: CATALOG_SENTINEL_ROOT_MARGIN,
   });
 
   const handleRetryCatalogLoadMore = useCallback(() => {
