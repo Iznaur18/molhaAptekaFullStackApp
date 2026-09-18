@@ -1,15 +1,29 @@
-# Production: S3/R2 + CDN для медиа
+# Production: медиа в Selectel S3 + CDN
 
-Код уже поддерживает `UPLOAD_STORAGE=s3`. Этот чеклист — включение на prod без поломки старых URL.
+Код уже поддерживает `UPLOAD_STORAGE=s3`. Этот чеклист — перенос прода с диска
+VPS на объектное хранилище без поломки старых ссылок.
 
-## 1. Инфраструктура (Cloudflare R2)
+## Почему Selectel, а не Cloudflare R2
 
-1. Бакет `izibuy-media` (или своё имя → `S3_BUCKET`) — **публичный**, за CDN.
-2. **Отдельный** бакет `izibuy-media-private` (→ `S3_PRIVATE_BUCKET`) для PII
-   (селфи паспорта) — **без custom domain, без публичного доступа**. См. §1a.
-3. API token: Object Read & Write (на оба бакета).
-4. **Custom domain** только на публичном бакете: `cdn.gitorg.ru` → публичный HTTPS.
-5. CORS на публичном бакете (если браузер грузит напрямую с CDN):
+- С июня 2025 крупные российские провайдеры ограничивают трафик к сетям
+  Cloudflare: у части покупателей картинки просто не загрузятся.
+- В приватном бакете лежат селфи с паспортом. Хранение за границей нарушает
+  требование о локализации персональных данных (152-ФЗ).
+- Сервер уже в Selectel: трафик между VPS и хранилищем бесплатный.
+
+Совместимые запасные варианты с тем же S3 API: Yandex Object Storage, VK Cloud.
+
+## 1. Что создать в панели Selectel (делает владелец аккаунта)
+
+1. Объектное хранилище, регион **ru-1**.
+2. Контейнер `gitorg-media` — **публичный**, за CDN.
+3. Контейнер `gitorg-private` — **приватный**: без публичного доступа, без CDN.
+   Туда попадают селфи с паспортом и документы курьеров (§1a).
+4. Сервисный пользователь с S3-ключами и правами на чтение и запись в оба
+   контейнера. Ключи владелец сам вписывает в `server/.env` на сервере.
+5. CDN-ресурс над `gitorg-media` с доменом `cdn.gitorg.ru`, CNAME у
+   регистратора, сертификат Let's Encrypt в настройках ресурса.
+6. CORS на публичном контейнере (если браузер грузит напрямую с CDN):
 
 ```json
 [
@@ -22,81 +36,100 @@
 ]
 ```
 
-## 1a. Приватные файлы (PII) — отдельный непубличный бакет ⚠️
+## 1a. Приватные файлы — только в отдельном контейнере ⚠️
 
-Селфи паспорта пишутся с ключом `uploads/private/<file>`. Публичные медиа —
-`uploads/<file>`. Если оба лежат в **одном** бакете за CDN, приватный объект
-доступен по прямой ссылке `https://cdn.gitorg.ru/uploads/private/<file>` —
-**в обход auth+ACL приложения** (custom domain R2 публикует весь бакет). Это
-утечка ПДн.
+Селфи паспорта пишутся с ключом `uploads/private/<file>`, публичные медиа —
+`uploads/<file>`. Если оба лежат в **одном** контейнере за CDN, приватный объект
+открывается по прямой ссылке `https://cdn.gitorg.ru/uploads/private/<file>` —
+**в обход авторизации приложения**. Это утечка персональных данных.
 
-Поэтому:
-
-- Приватные файлы идут в **отдельный** бакет `S3_PRIVATE_BUCKET`, **не** за CDN.
-- Приложение отдаёт их только через gated-роут `GET /upload/private/:filename`
-  (`checkAuthMW` + ACL, стримит байты из приватного бакета).
-- `S3_PRIVATE_BUCKET` **обязателен в production** и **должен отличаться** от
-  `S3_BUCKET` — иначе `npm run preflight:prod` падает с ошибкой
-  (`validateObjectStorageEnv`).
-- Имена файлов — крипто-стойкие (`crypto.randomBytes`, 128 бит), но это лишь
-  defense-in-depth; безопасность держится на **разделении бакетов**, а не на
-  секретности имени.
+- Приватные файлы идут в `S3_PRIVATE_BUCKET`, который **не** подключён к CDN.
+- Приложение отдаёт их только через `GET /upload/private/:filename`
+  (`checkAuthMW` + ACL, байты стримятся из приватного контейнера).
+- `S3_PRIVATE_BUCKET` обязателен в production и **должен отличаться** от
+  `S3_BUCKET`, иначе `npm run preflight:prod` падает (`validateObjectStorageEnv`).
+  Скрипт переноса в этом случае тоже откажется копировать `private/`.
 
 ## 2. `server/.env` (production)
 
 ```env
 NODE_ENV=production
 UPLOAD_STORAGE=s3
-S3_BUCKET=izibuy-media
-S3_PRIVATE_BUCKET=izibuy-media-private   # отдельный НЕпубличный бакет для PII
+S3_BUCKET=gitorg-media
+S3_PRIVATE_BUCKET=gitorg-private
 S3_ACCESS_KEY_ID=...
 S3_SECRET_ACCESS_KEY=...
-S3_REGION=auto
-S3_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com
+S3_REGION=ru-1
+S3_ENDPOINT=https://s3.ru-1.storage.selcloud.ru   # точный адрес — из панели
 S3_FORCE_PATH_STYLE=true
 PUBLIC_UPLOAD_BASE_URL=https://cdn.gitorg.ru
 FRONTEND_URL=https://gitorg.ru
 ```
 
-`PUBLIC_UPLOAD_BASE_URL` — **origin CDN**, не API. Новые upload в БД: `https://cdn.gitorg.ru/uploads/<file>`.
+`PUBLIC_UPLOAD_BASE_URL` — адрес CDN, не API. Новые загрузки сохраняются в базе
+как `https://cdn.gitorg.ru/uploads/<file>`.
+
+Что делает код в S3-режиме:
+
+- публичные объекты получают `Cache-Control: public, max-age=31536000, immutable` —
+  имя файла случайное и не переиспользуется, поэтому CDN может кэшировать навсегда;
+- превью ленты `<имя>-w600.webp` пишутся в тот же контейнер
+  (`createPublicUploadImageThumbnail`);
+- `/health` раз в минуту проверяет доступность контейнера; недоступен — ответ
+  `degraded` (503), и внешний пинг поднимает тревогу (см. `OPS-ALERTS.md`);
+- временные архивы 1С остаются на диске: они распаковываются при каждом импорте.
 
 Проверка:
 
 ```bash
 cd server && npm run validate:prod
-curl -sS https://gitorg.ru/health | jq .uploadStorage
-# "s3"
+curl -sS -o /dev/null -w '%{http_code}\n' http://127.0.0.1:4444/health   # 200
 ```
 
-## 3. Миграция файлов с диска VPS
+## 3. Перенос файлов с диска
 
 ```bash
 cd server
-# dry-run
-npm run sync-uploads:s3
-# загрузка
-npm run sync-uploads:s3:apply
+npm run sync-uploads:s3          # пробный прогон: что и куда поедет
+npm run sync-uploads:s3:apply    # загрузка
 ```
 
-Альтернатива: `rclone copy ./uploads r2:izibuy-media/uploads`.
+Скрипт копирует:
 
-## 4. Nginx (вариант A, один домен для SPA+API)
+- файлы верхнего уровня `server/uploads/` (вместе с превью `-w600.webp`) —
+  в `S3_BUCKET` с кэш-заголовком;
+- `server/uploads/private/` — в `S3_PRIVATE_BUCKET` с ключом `uploads/private/<file>`.
 
-- **Новые медиа** отдаёт CDN — блок `/uploads/` на nginx **не обязателен** для них.
-- **Legacy** `/uploads/...` на старом домене: оставить proxy на API или alias на диск до полной миграции БД.
+Уже загруженные объекты пропускаются, повторный запуск безопасен.
 
-Клиент: полные CDN URL **не** переписываются на `gitorg.ru` (`resolveUploadedImageUrlForBrowser`).
+## 4. Порядок переключения
 
-## 5. Smoke после cutover
+1. Пробный прогон, сверить число файлов и объём с `du -sh server/uploads`.
+2. `sync-uploads:s3:apply`.
+3. Переключить переменные окружения, перезапустить `gitorg-api` и `gitorg-worker`.
+4. Старые ссылки `/uploads/...` в базе: nginx отвечает 301 на CDN для всего,
+   кроме `private/` (приватный путь приложение и так закрывает 404):
 
-1. Staff: upload фото товара → в ответе/БД URL начинается с `PUBLIC_UPLOAD_BASE_URL`.
-2. Открыть URL в инкогнито (без cookie) → 200.
-3. Карточка каталога показывает картинку.
-4. Удаление товара/смена фото — объект в бакете удаляется (`deleteUploadFileByUrl`).
-5. **PII-проверка:** оформить рассрочку (загружается селфи паспорта), затем
-   попробовать открыть `https://cdn.gitorg.ru/uploads/private/<любое>` в инкогнито
-   → должно быть **403/404** (приватного бакета нет за CDN). А `GET /upload/private/<file>`
-   без авторизации → **401/403**, со staff-токеном → **200**.
+   ```nginx
+   location ^~ /uploads/private/ { return 404; }
+   location ^~ /uploads/ { return 301 https://cdn.gitorg.ru$request_uri; }
+   ```
+
+   Затем — миграция, которая переписывает адреса в документах на CDN
+   (отдельная задача; до неё работает редирект).
+5. Проверки из §5.
+6. Папку `server/uploads` на диске не удалять 30 дней.
+
+## 5. Проверки после переключения
+
+1. Загрузить фото товара → в ответе и в базе адрес начинается с `PUBLIC_UPLOAD_BASE_URL`.
+2. Открыть адрес в режиме инкогнито → 200, заголовок `Cache-Control` с `immutable`.
+3. Карточка в каталоге показывает превью `-w600.webp`.
+4. Удалить товар или заменить фото → объект и превью исчезают из контейнера.
+5. **Приватные файлы:** оформить рассрочку (загружается селфи), затем открыть
+   `https://cdn.gitorg.ru/uploads/private/<любое>` в инкогнито → 403 или 404.
+   `GET /upload/private/<file>` без входа → 401/403, от сотрудника → 200.
+6. Старое селфи, загруженное до переноса, открывается у модератора.
 
 ## 6. Откат
 
@@ -105,6 +138,13 @@ UPLOAD_STORAGE=disk
 PUBLIC_UPLOAD_BASE_URL=https://gitorg.ru
 ```
 
-Перезапуск API. Файлы на диске должны остаться (не удалять после sync без бэкапа).
+Перезапуск API и воркера; убрать редирект из nginx. Файлы, загруженные после
+переключения, останутся только в контейнере — перед откатом скачать их
+(`rclone copy selectel:gitorg-media/uploads server/uploads`).
+
+## 7. Стоимость
+
+Хранение — от 2,29 ₽ за ГБ в месяц (стандартный класс). Основная статья —
+исходящий трафик CDN; оценивать по панели после первого месяца.
 
 Подробнее: `server/docs/MEDIA-OBJECT-STORAGE.md`, `server/docs/RUNBOOK.md`.

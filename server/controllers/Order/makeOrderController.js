@@ -1,3 +1,4 @@
+import { sanitizeMarketingAttribution } from "@izibuy/shared-lib";
 import { OrderModel } from "../../models/index.js";
 import { createOrder } from "../../services/order/createOrder.js";
 import { runMoneyIdempotentMutation } from "../../services/loyalty/runMoneyIdempotentMutation.js";
@@ -49,6 +50,9 @@ export const makeOrderController = async (req, res) => {
         verifiedDeliveryAddress: req.verifiedDeliveryAddress,
         deliveryAddressGeo: req.body?.deliveryAddressGeo ?? null,
         affiliateCode: req.body.affiliateCode,
+        marketingAttribution: sanitizeMarketingAttribution(
+          req.body.marketingAttribution,
+        ),
       });
 
       const orderId = String(order._id);

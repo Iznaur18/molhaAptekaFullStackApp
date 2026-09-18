@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import { buildMarketplaceNotSellerNotice } from "@izibuy/shared-lib";
 import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
@@ -177,6 +178,10 @@ export const ProductDetailsSellerPreview = ({
           </View>
         ))}
       </View>
+
+      <Text style={styles.notSeller}>
+        {buildMarketplaceNotSellerNotice(sellerObj.userName)}
+      </Text>
     </View>
   );
 };

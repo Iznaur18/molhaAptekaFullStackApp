@@ -1613,6 +1613,12 @@ export const useProductDetailsSellerPreviewStyles = createThemedStyles((theme) =
     color: theme.colors.textMuted,
     lineHeight: SP.metricKeyLineHeight,
   },
+  /** 289-ФЗ: площадка не является продавцом (как web `__not-seller`). */
+  notSeller: {
+    fontSize: 12,
+    lineHeight: 17,
+    color: theme.colors.textMuted,
+  },
 }));
 
 export const useProductDetailsSellerStorefrontButtonStyles = createThemedStyles(

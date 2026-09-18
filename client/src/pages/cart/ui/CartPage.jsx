@@ -36,6 +36,7 @@ import { useAuthSession } from "../../../entities/user/model/useAuthSession.js";
 import { userSavedAddressesFromUser } from "../../../entities/address/lib/userSavedAddressesFromUser.js";
 import { CheckoutForm } from "../../../shared/ui/CheckoutForm/CheckoutForm.jsx";
 import { CheckoutSheetModal } from "../../../features/checkout/ui/CheckoutSheetModal.jsx";
+import { useTrackCheckoutStarted } from "../../../features/checkout/model/useTrackCheckoutStarted.js";
 import {
   CART_AUCTION_UI,
   CART_DELIVERY_FEE_UI,
@@ -325,6 +326,10 @@ export function CartPage({
 
   const isCartEmpty = lines.length === 0 && auctionBids.length === 0;
   const isAuctionCheckoutOpen = auctionCheckoutBid != null;
+  useTrackCheckoutStarted(
+    Boolean(checkoutSellerId) || isAuctionCheckoutOpen,
+    currentUserId,
+  );
 
   const scopedFulfillmentBySellerId = useMemo(
     () => scopeRecordBySellerId(fulfillmentBySellerId, checkoutSellerId),

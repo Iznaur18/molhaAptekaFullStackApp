@@ -1,4 +1,5 @@
 import { ProductModel, UserModel } from "../../models/index.js";
+import { emitProductPublishedEvent } from "../analytics-events/funnelAnalyticsEvents.js";
 import { PRODUCT_SELLER_PUBLIC_SELECT } from "../../constants/productSellerPublicFields.js";
 import {
   PRODUCT_MODERATION_APPROVED,
@@ -380,6 +381,11 @@ export async function postProduct({
   let productPayload = await attachProductSellerSnapshot(product.toObject());
 
   if (productModerationStatus === PRODUCT_MODERATION_APPROVED) {
+    emitProductPublishedEvent({
+      productId: String(product._id),
+      sellerId: String(product.productSeller?._id ?? product.productSeller),
+      autoApproved: true,
+    });
     await notifyApprovedProductFollowers(productPayload);
     try {
       const marketStatus = await refreshProductPriceMarketStatus(String(product._id), {

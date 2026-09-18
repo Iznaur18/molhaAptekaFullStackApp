@@ -23,6 +23,7 @@ import {
 } from "../../utils/resolveProductCategoryWrite.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 import { refreshProductPriceMarketStatus } from "../../services/product/refreshProductPriceMarketStatus.js";
+import { emitProductPublishedEvent } from "../../services/analytics-events/index.js";
 import { setSellerProductModerationTrust } from "../../services/product/setSellerProductModerationTrust.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 const DEFAULT_PAGE = 1;
@@ -152,6 +153,10 @@ export const approveProductModerationController = async (req, res) => {
   product.productModerationApprovedHash = buildProductModerationFingerprint(product);
 
   await product.save();
+  emitProductPublishedEvent({
+    productId: String(product._id),
+    sellerId: String(product.productSeller),
+  });
   await product.populate("productSeller", PRODUCT_SELLER_PUBLIC_SELECT);
 
   let enriched = await attachProductSellerSnapshot(product.toObject());

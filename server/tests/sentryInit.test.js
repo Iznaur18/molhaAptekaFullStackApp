@@ -40,6 +40,31 @@ test("scrubSentryEventPii: filters cookie and authorization", () => {
   assert.equal(scrubbed?.request?.headers?.Accept, "application/json");
 });
 
+test("scrubSentryEventPii: drops the user's IP address", () => {
+  const scrubbed = scrubSentryEventPii({
+    user: { id: "u1", ip_address: "203.0.113.7" },
+    request: {
+      headers: { "X-Forwarded-For": "203.0.113.7", "X-Real-IP": "203.0.113.7" },
+      env: { REMOTE_ADDR: "203.0.113.7", NODE_ENV: "test" },
+    },
+  });
+  assert.deepEqual(scrubbed?.user, { id: "u1" });
+  assert.equal(scrubbed?.request?.headers?.["X-Forwarded-For"], "[Filtered]");
+  assert.equal(scrubbed?.request?.headers?.["X-Real-IP"], "[Filtered]");
+  assert.deepEqual(scrubbed?.request?.env, { NODE_ENV: "test" });
+  assert.doesNotMatch(JSON.stringify(scrubbed), /203\.0\.113\.7/);
+});
+
+test("scrubSentryEventPii: events without request keep other fields", () => {
+  const scrubbed = scrubSentryEventPii({
+    message: "boom",
+    user: { ip_address: "{{auto}}" },
+  });
+  assert.equal(scrubbed?.message, "boom");
+  assert.deepEqual(scrubbed?.user, {});
+  assert.equal(scrubbed?.request, undefined);
+});
+
 test("resolveHttpErrorStatus: AppError 400 is not sent to Sentry path", () => {
   const status = resolveHttpErrorStatus(new AppError(400, "bad"));
   assert.equal(status, 400);

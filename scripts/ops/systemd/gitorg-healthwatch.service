@@ -1,0 +1,9 @@
+[Unit]
+Description=Gitorg healthwatch: проверки сервера и алерты в Telegram
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/gitorg-healthwatch
+Nice=10

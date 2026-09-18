@@ -985,6 +985,13 @@ export {
   trackAdAnalyticsBodySchema,
 } from "./analyticsTrackAd.js";
 export {
+  ANALYTICS_CLIENT_EVENT_CHECKOUT_STARTED,
+  ANALYTICS_CLIENT_EVENT_KINDS,
+  marketingAttributionSchema,
+  marketingTouchSchema,
+  trackClientAnalyticsBodySchema,
+} from "./marketingAttribution.js";
+export {
   ONEC_CHANNEL_VALUES,
   getOneCImportJobsQuerySchema,
   getOneCLogsQuerySchema,

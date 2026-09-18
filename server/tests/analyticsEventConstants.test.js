@@ -15,7 +15,21 @@ import {
 test("analytics event types include core Level-2 set", () => {
   assert.ok(ANALYTICS_EVENT_TYPES.includes(ANALYTICS_EVENT_PRODUCT_VIEWED));
   assert.ok(ANALYTICS_EVENT_TYPES.includes(ANALYTICS_EVENT_ORDER_ITEM_SOLD));
-  assert.equal(ANALYTICS_EVENT_TYPES.length, 6);
+  assert.equal(ANALYTICS_EVENT_TYPES.length, 12);
+  assert.equal(new Set(ANALYTICS_EVENT_TYPES).size, ANALYTICS_EVENT_TYPES.length);
+});
+
+test("analytics event types include the funnel and retention set", () => {
+  for (const eventType of [
+    "search.performed",
+    "cart.item_added",
+    "checkout.started",
+    "payment.succeeded",
+    "user.active",
+    "seller.product_published",
+  ]) {
+    assert.ok(ANALYTICS_EVENT_TYPES.includes(eventType), eventType);
+  }
 });
 
 test("sold delta still increments shipped → delivered", () => {

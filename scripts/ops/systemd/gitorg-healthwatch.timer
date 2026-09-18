@@ -1,0 +1,11 @@
+[Unit]
+Description=Gitorg healthwatch каждые 2 минуты
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=2min
+AccuracySec=15s
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -3,12 +3,17 @@ import fs from "fs/promises";
 import path from "path";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 
+import { PRIVATE_UPLOAD_SUBDIR } from "../constants/privateUploadConstants.js";
+import { PUBLIC_UPLOAD_CACHE_CONTROL } from "../constants/uploadStorageConstants.js";
 import { buildS3ServerSideEncryptionParams } from "../services/upload/buildS3ServerSideEncryptionParams.js";
 
 import {
   buildObjectStorageKey,
+  buildPrivateObjectStorageKey,
+  getPrivateUploadBucket,
   getS3Client,
   isObjectStorageUploadEnabled,
+  objectStorageHasPrivateUpload,
   objectStorageHasUpload,
 } from "../services/upload/objectStorageUpload.js";
 import { UPLOADS_DIR } from "../services/upload/uploadsDir.js";
@@ -22,7 +27,11 @@ const MIME_BY_EXT = {
   ".webm": "video/webm",
   ".mov": "video/quicktime",
   ".m4v": "video/x-m4v",
+  ".pdf": "application/pdf",
 };
+
+/** Приватные файлы (селфи с паспортом, документы курьера) лежат здесь. */
+const PRIVATE_UPLOADS_DIR = path.join(UPLOADS_DIR, PRIVATE_UPLOAD_SUBDIR);
 
 /**
  * @param {string} filePath
@@ -33,6 +42,84 @@ const guessContentType = (filePath) => {
 };
 
 const isApply = process.argv.includes("--apply");
+
+/**
+ * Файлы верхнего уровня каталога; вложенные папки не читаются.
+ * @param {string} dir
+ * @returns {Promise<string[] | null>} null — каталога нет
+ */
+async function listFiles(dir) {
+  try {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    return entries.filter((e) => e.isFile()).map((e) => e.name);
+  } catch (error) {
+    if (/** @type {{ code?: string }} */ (error).code === "ENOENT") {
+      return null;
+    }
+    throw error;
+  }
+}
+
+/**
+ * @param {{
+ *   label: string;
+ *   dir: string;
+ *   files: string[];
+ *   bucket: string;
+ *   buildKey: (filename: string) => string;
+ *   hasObject: (filename: string) => Promise<boolean>;
+ *   extraParams: Record<string, string>;
+ * }} input
+ */
+async function syncFiles({
+  label,
+  dir,
+  files,
+  bucket,
+  buildKey,
+  hasObject,
+  extraParams,
+}) {
+  const client = getS3Client();
+  let uploaded = 0;
+  let skipped = 0;
+
+  for (const filename of files) {
+    const key = buildKey(filename);
+    if (await hasObject(filename)) {
+      skipped += 1;
+      continue;
+    }
+
+    const filePath = path.join(dir, filename);
+    const body = await fs.readFile(filePath);
+    const contentType = guessContentType(filePath);
+
+    if (!isApply) {
+      console.log(`[dry-run] ${label}: ${key} (${contentType}, ${body.length} bytes)`);
+      uploaded += 1;
+      continue;
+    }
+
+    await client.send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: body,
+        ContentType: contentType,
+        ...extraParams,
+        ...buildS3ServerSideEncryptionParams(),
+      }),
+    );
+    uploaded += 1;
+    console.log(`[ok] ${label}: ${key}`);
+  }
+
+  console.log(
+    `[sync-uploads] ${label} ${isApply ? "APPLY" : "DRY-RUN"}: +${uploaded}, уже в бакете ${skipped}, всего ${files.length}`,
+  );
+  return uploaded;
+}
 
 async function main() {
   if (!isObjectStorageUploadEnabled()) {
@@ -46,60 +133,44 @@ async function main() {
     process.exit(1);
   }
 
-  let entries;
-  try {
-    entries = await fs.readdir(UPLOADS_DIR, { withFileTypes: true });
-  } catch (error) {
-    console.error("Не удалось прочитать uploads:", error);
+  const publicFiles = await listFiles(UPLOADS_DIR);
+  if (publicFiles === null) {
+    console.error(`Нет каталога uploads: ${UPLOADS_DIR}`);
     process.exit(1);
   }
 
-  const files = entries.filter((e) => e.isFile()).map((e) => e.name);
-  if (files.length === 0) {
-    console.log("[sync-uploads] Папка uploads пуста");
-    return;
+  let pending = await syncFiles({
+    label: "public",
+    dir: UPLOADS_DIR,
+    files: publicFiles,
+    bucket,
+    buildKey: buildObjectStorageKey,
+    hasObject: objectStorageHasUpload,
+    extraParams: { CacheControl: PUBLIC_UPLOAD_CACHE_CONTROL },
+  });
+
+  const privateFiles = await listFiles(PRIVATE_UPLOADS_DIR);
+  if (privateFiles && privateFiles.length > 0) {
+    const privateBucket = getPrivateUploadBucket();
+    // Селфи с паспортом в публичном бакете за CDN открылись бы по прямой ссылке.
+    if (privateBucket === bucket) {
+      console.error(
+        "S3_PRIVATE_BUCKET не задан или совпадает с S3_BUCKET — приватные файлы не переносятся.",
+      );
+      process.exit(1);
+    }
+    pending += await syncFiles({
+      label: "private",
+      dir: PRIVATE_UPLOADS_DIR,
+      files: privateFiles,
+      bucket: privateBucket,
+      buildKey: buildPrivateObjectStorageKey,
+      hasObject: objectStorageHasPrivateUpload,
+      extraParams: {},
+    });
   }
 
-  const client = getS3Client();
-  let uploaded = 0;
-  let skipped = 0;
-
-  for (const filename of files) {
-    const key = buildObjectStorageKey(filename);
-    const exists = await objectStorageHasUpload(filename);
-    if (exists) {
-      skipped += 1;
-      console.log(`[skip] ${key} уже в бакете`);
-      continue;
-    }
-
-    const filePath = path.join(UPLOADS_DIR, filename);
-    const body = await fs.readFile(filePath);
-    const contentType = guessContentType(filePath);
-
-    if (!isApply) {
-      console.log(`[dry-run] upload ${key} (${contentType}, ${body.length} bytes)`);
-      uploaded += 1;
-      continue;
-    }
-
-    await client.send(
-      new PutObjectCommand({
-        Bucket: bucket,
-        Key: key,
-        Body: body,
-        ContentType: contentType,
-        ...buildS3ServerSideEncryptionParams(),
-      }),
-    );
-    uploaded += 1;
-    console.log(`[ok] ${key}`);
-  }
-
-  console.log(
-    `[sync-uploads] ${isApply ? "APPLY" : "DRY-RUN"}: +${uploaded}, skip ${skipped}, всего файлов ${files.length}`,
-  );
-  if (!isApply && uploaded > 0) {
+  if (!isApply && pending > 0) {
     console.log("Повторите с --apply для загрузки");
   }
 }

@@ -302,3 +302,29 @@ export {
   resolveYandexMapsOpenCandidates,
 } from "./yandexMapsLinks.js";
 export type { YandexMapsPointInput } from "./yandexMapsLinks.js";
+export {
+  LEGAL_RANKING_RULES_SECTIONS,
+  LEGAL_RANKING_RULES_UPDATED_AT,
+  buildMarketplaceNotSellerNotice,
+} from "./legalRankingRules.js";
+export type { LegalRankingRulesSection } from "./legalRankingRules.js";
+export {
+  MARKETING_ATTRIBUTION_STORAGE_KEY,
+  MARKETING_LAST_TOUCH_TTL_MS,
+  MARKETING_MEDIUM_CPC,
+  MARKETING_MEDIUM_ORGANIC,
+  MARKETING_MEDIUM_REFERRAL,
+  MARKETING_TOUCH_FIELD_MAX,
+  MARKETING_TOUCH_PATH_MAX,
+  MARKETING_UTM_PARAMS,
+  mergeMarketingAttribution,
+  readMarketingTouch,
+  sanitizeMarketingAttribution,
+  selectMarketingAttributionForSubmit,
+  summarizeMarketingTouch,
+} from "./marketingAttribution.js";
+export type {
+  MarketingAttribution,
+  MarketingTouch,
+  MarketingTouchSummary,
+} from "./marketingAttribution.js";

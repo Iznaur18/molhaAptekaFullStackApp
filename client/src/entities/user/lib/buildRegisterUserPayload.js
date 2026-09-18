@@ -2,6 +2,7 @@ import {
   DEFAULT_USER_BACKGROUND_PRESET_ID,
   USER_GENDER_NO_SELECTED,
 } from "../model/userConstants.js";
+import { readMarketingAttributionForSubmit } from "../../../shared/lib/marketingAttributionStorage.js";
 import { readPersistedReferralCode } from "../../../shared/lib/referralCodeStorage.js";
 
 /**
@@ -16,6 +17,7 @@ import { readPersistedReferralCode } from "../../../shared/lib/referralCodeStora
  */
 export function buildRegisterUserPayload(form, channel = "email") {
   const referralCode = readPersistedReferralCode();
+  const marketingAttribution = readMarketingAttributionForSubmit();
   const base = {
     password: form.password,
     passwordConfirm: form.passwordConfirm,
@@ -24,6 +26,7 @@ export function buildRegisterUserPayload(form, channel = "email") {
     userGender: USER_GENDER_NO_SELECTED,
     notificationsEnabled: true,
     ...(referralCode ? { referralCode } : {}),
+    ...(marketingAttribution ? { marketingAttribution } : {}),
   };
   if (channel === "phone") {
     return {
