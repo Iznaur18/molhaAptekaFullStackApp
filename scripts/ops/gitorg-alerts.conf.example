@@ -1,0 +1,39 @@
+# /etc/gitorg-alerts.conf — владелец root, права 600.
+# Читается scripts/ops/gitorg-healthwatch.sh и gitorg-alert-unit-failed.sh.
+
+# Бот из @BotFather и id закрытой группы дежурства (отрицательное число).
+TELEGRAM_BOT_TOKEN=""
+TELEGRAM_CHAT_ID=""
+
+# Подпись сервера в сообщениях.
+HOST_LABEL="gitorg.ru"
+
+# Повтор незакрытой тревоги, минут.
+REPEAT_MIN=60
+
+# Службы systemd, которые должны работать.
+UNITS="gitorg-api gitorg-worker mongod nginx redis-server"
+
+# Диски: предупреждение и критичный порог, проценты.
+DISK_PATHS="/ /var/lib/mongodb"
+DISK_WARN_PCT=80
+DISK_CRIT_PCT=90
+
+# API слушает только localhost.
+HEALTH_URL="http://127.0.0.1:4444/health"
+
+# Пульс воркера пишется раз в 5 минут.
+HEARTBEAT_UNIT="gitorg-worker"
+HEARTBEAT_MAX_MIN=15
+
+# Бэкапы Mongo из /etc/cron.d/gitorg-mongo-backup.
+BACKUP_DIR="/var/backups/gitorg-mongo"
+BACKUP_MAX_AGE_H=26
+
+# Сертификаты через пробел.
+CERT_FILES="/etc/letsencrypt/live/gitorg.ru/fullchain.pem"
+CERT_MIN_DAYS=14
+
+# Необязательно: строка подключения для db.hello() (нужен mongosh).
+# Пользователь torgum подходит — hello не требует прав.
+MONGO_HELLO_URI=""
