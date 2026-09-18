@@ -8,6 +8,7 @@ const INFINITE_SCROLL_SENTINEL_ROOT_MARGIN = "200px 0px";
  *   sentinelRef: import('react').RefObject<HTMLDivElement | null>;
  *   onIntersect: () => void | Promise<void>;
  *   observeRevision?: number;
+ *   rootMargin?: string;
  * }} params
  */
 export function useInfiniteScrollSentinel({
@@ -15,6 +16,7 @@ export function useInfiniteScrollSentinel({
   sentinelRef,
   onIntersect,
   observeRevision = 0,
+  rootMargin = INFINITE_SCROLL_SENTINEL_ROOT_MARGIN,
 }) {
   useEffect(() => {
     if (!enabled) {
@@ -34,10 +36,10 @@ export function useInfiniteScrollSentinel({
         }
         void onIntersect();
       },
-      { root: null, rootMargin: INFINITE_SCROLL_SENTINEL_ROOT_MARGIN, threshold: 0 },
+      { root: null, rootMargin, threshold: 0 },
     );
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [enabled, observeRevision, onIntersect, sentinelRef]);
+  }, [enabled, observeRevision, onIntersect, rootMargin, sentinelRef]);
 }

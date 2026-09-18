@@ -23,8 +23,16 @@ export const PRODUCT_BULK_IMPORT_RATE_LIMIT_PER_HOUR = 10;
  */
 export const INSTALLMENT_ACTION_RATE_LIMIT_PER_HOUR = 60;
 
-/** GET /product/ — каталог (scrape). */
-export const CATALOG_LIST_RATE_LIMIT_PER_15_MIN = 300;
+/**
+ * GET /product/ — лента каталога (защита от выкачивания). Одна страница ленты =
+ * 24 товара = 1 запрос, весь каталог сейчас ~160 страниц. Считаем по аккаунту,
+ * гостей — по IP: за общим NAT офиса или мобильного оператора сидят многие
+ * люди, и при 300 они выбивали лимит друг другу посреди ленты (18.09.2026).
+ */
+export const CATALOG_LIST_RATE_LIMIT_PER_15_MIN = 1500;
+
+/** GET /product/facets и /product/catalog-by-ids — свой счётчик, не отнимает у ленты. */
+export const CATALOG_AUX_RATE_LIMIT_PER_15_MIN = 1500;
 
 /** Лимит тела JSON для express.json(). */
 export const API_JSON_BODY_LIMIT = "512kb";

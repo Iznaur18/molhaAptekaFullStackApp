@@ -12,10 +12,16 @@ const SEARCH_DEBOUNCE_MS = 1200;
  * @param {import('@playwright/test').Page} page
  */
 async function countCatalogProducts(page) {
-  return page
-    .locator(".app-shell__grid-blocks")
-    .locator(".app-shell__cell, .app-shell__grid-block-skeleton")
-    .count();
+  return page.evaluate(() => {
+    const feed = document.querySelector(".app-shell__grid-blocks");
+    if (!feed) return 0;
+    const mounted = feed.querySelectorAll(".app-shell__cell").length;
+    const collapsed = [...feed.querySelectorAll("[data-catalog-block-count]")].reduce(
+      (sum, block) => sum + Number(block.getAttribute("data-catalog-block-count")),
+      0,
+    );
+    return mounted + collapsed;
+  });
 }
 
 /**
