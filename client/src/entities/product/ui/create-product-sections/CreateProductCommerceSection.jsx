@@ -95,6 +95,38 @@ export function CreateProductCommerceSection({
           />
         </label>
       ) : null}
+
+      {/* Вес и габариты нужны службам доставки. Поля необязательные: пустые
+          означают «не знаю», и тогда расчёт идёт по средней коробке. */}
+      <fieldset className="create-product-section__shipping">
+        <legend className="create-product-section__shipping-title">
+          {CREATE_PRODUCT_MODAL_UI.SHIPPING_DIMENSIONS_TITLE}
+        </legend>
+        <p className="create-product-section__shipping-hint">
+          {CREATE_PRODUCT_MODAL_UI.SHIPPING_DIMENSIONS_HINT}
+        </p>
+        <div className="create-product-section__shipping-grid">
+          {[
+            ["productWeightG", CREATE_PRODUCT_MODAL_UI.LABEL_WEIGHT_G],
+            ["productLengthCm", CREATE_PRODUCT_MODAL_UI.LABEL_LENGTH_CM],
+            ["productWidthCm", CREATE_PRODUCT_MODAL_UI.LABEL_WIDTH_CM],
+            ["productHeightCm", CREATE_PRODUCT_MODAL_UI.LABEL_HEIGHT_CM],
+          ].map(([name, label]) => (
+            <label key={name} className="create-product-section__label">
+              <FormFieldLabel>{label}</FormFieldLabel>
+              <input
+                {...INTEGER_INPUT_FIELD_PROPS}
+                className="create-product-section__input"
+                name={name}
+                value={String(form[name] ?? "")}
+                onChange={handleChange}
+                maxLength={6}
+                disabled={isSubmitting}
+              />
+            </label>
+          ))}
+        </div>
+      </fieldset>
     </div>
   );
 }

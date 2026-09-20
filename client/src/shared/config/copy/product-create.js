@@ -114,6 +114,13 @@ export const CREATE_PRODUCT_MODAL_UI = {
   ERROR_CATEGORY_LEAF: "Выберите конечную подкатегорию в дереве категорий",
   LABEL_AVAILABLE: "Товар в наличии",
   LABEL_STOCK_QUANTITY: "Количество в наличии (шт.)",
+  LABEL_WEIGHT_G: "Вес одной штуки, граммы",
+  LABEL_LENGTH_CM: "Длина, см",
+  LABEL_WIDTH_CM: "Ширина, см",
+  LABEL_HEIGHT_CM: "Высота, см",
+  SHIPPING_DIMENSIONS_TITLE: "Вес и габариты посылки",
+  SHIPPING_DIMENSIONS_HINT:
+    "Нужны службам доставки для расчёта. Без них цена считается по средней коробке (1 кг, 30×20×15 см) и может сильно отличаться от настоящей.",
   ERROR_STOCK: "Укажите количество от 1 до 9999",
   MANAGE_SECTION_TITLE: "Управление товаром",
   MANAGE_SECTION_ARIA: "Дополнительные действия с товаром",

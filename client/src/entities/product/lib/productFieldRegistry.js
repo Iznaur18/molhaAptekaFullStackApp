@@ -100,6 +100,26 @@ export const PRODUCT_FIELD_REGISTRY = {
     editLabel: CREATE_PRODUCT_MODAL_UI.LABEL_AVAILABLE,
     editKind: "boolean",
   },
+  productWeightG: {
+    labelRu: "Вес, г",
+    editLabel: CREATE_PRODUCT_MODAL_UI.LABEL_WEIGHT_G,
+    editKind: "number",
+  },
+  productLengthCm: {
+    labelRu: "Длина, см",
+    editLabel: CREATE_PRODUCT_MODAL_UI.LABEL_LENGTH_CM,
+    editKind: "number",
+  },
+  productWidthCm: {
+    labelRu: "Ширина, см",
+    editLabel: CREATE_PRODUCT_MODAL_UI.LABEL_WIDTH_CM,
+    editKind: "number",
+  },
+  productHeightCm: {
+    labelRu: "Высота, см",
+    editLabel: CREATE_PRODUCT_MODAL_UI.LABEL_HEIGHT_CM,
+    editKind: "number",
+  },
   productStockQuantity: {
     labelRu: "В наличии (шт.)",
     editLabel: CREATE_PRODUCT_MODAL_UI.LABEL_STOCK_QUANTITY,

@@ -68,10 +68,10 @@ describe("расчёт тарифов СДЭК", () => {
       ],
     }));
 
-    const options = await quoteCdekPickupTariffs(credentials, {
+    const { options } = await quoteCdekPickupTariffs(credentials, {
       from: { code: 44 },
       to: { code: 270 },
-      itemCount: 2,
+      products: [{}, {}],
     });
 
     assert.deepEqual(
@@ -84,10 +84,39 @@ describe("расчёт тарифов СДЭК", () => {
     assert.equal(options[1].deliverySumRub, 481);
   });
 
-  it("вес растёт с числом позиций", () => {
-    assert.equal(buildCdekPackages(1)[0].weight, 1000);
-    assert.equal(buildCdekPackages(3)[0].weight, 3000);
-    assert.equal(buildCdekPackages(0)[0].weight, 1000);
+  it("вес и габариты берутся у товара, иначе средняя коробка", () => {
+    const own = buildCdekPackages([
+      {
+        productWeightG: 2500,
+        productLengthCm: 40,
+        productWidthCm: 30,
+        productHeightCm: 20,
+      },
+    ]);
+    assert.equal(own.packages[0].weight, 2500);
+    assert.equal(own.packages[0].length, 40);
+    assert.equal(own.exact, true);
+
+    const mixed = buildCdekPackages([
+      {
+        productWeightG: 2500,
+        productLengthCm: 40,
+        productWidthCm: 30,
+        productHeightCm: 20,
+      },
+      {},
+    ]);
+    assert.equal(mixed.packages[0].weight, 3500, "вес позиций складывается");
+    assert.equal(mixed.packages[0].height, 35, "высоты складываются стопкой");
+    assert.equal(
+      mixed.exact,
+      false,
+      "без габаритов у части товаров цена приблизительная",
+    );
+
+    const fallback = buildCdekPackages([]);
+    assert.equal(fallback.packages[0].weight, 1000);
+    assert.equal(fallback.exact, false);
   });
 
   it("точку задаём кодом, индексом или адресом — в таком порядке", () => {
@@ -105,10 +134,10 @@ describe("расчёт тарифов СДЭК", () => {
 
   it("без обеих точек в СДЭК не ходим", async () => {
     const calls = mockCdek(() => ({ tariff_codes: [] }));
-    const options = await quoteCdekPickupTariffs(credentials, {
+    const { options } = await quoteCdekPickupTariffs(credentials, {
       from: {},
       to: { code: 270 },
-      itemCount: 1,
+      products: [{}],
     });
     assert.deepEqual(options, []);
     assert.equal(calls.length, 0);

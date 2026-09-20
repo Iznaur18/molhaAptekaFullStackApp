@@ -283,6 +283,17 @@ export function prepareCreateProductSubmit({
     return { ok: true, patchBody };
   }
 
+  // Вес и габариты необязательны: пустое поле означает «не знаю», и тогда
+  // расчёт доставки берёт среднюю коробку. null стирает прежнее значение.
+  const productShippingFields = Object.fromEntries(
+    ["productWeightG", "productLengthCm", "productWidthCm", "productHeightCm"].map(
+      (key) => {
+        const parsed = Math.floor(Number(String(form[key] ?? "").trim()));
+        return [key, Number.isFinite(parsed) && parsed > 0 ? parsed : null];
+      },
+    ),
+  );
+
   return {
     ok: true,
     createBody: {
@@ -298,6 +309,7 @@ export function prepareCreateProductSubmit({
       ...(productCategoryId ? { productCategoryId } : {}),
       productIsAvailable: form.productIsAvailable,
       productStockQuantity,
+      ...productShippingFields,
       loyaltyPointsPerUnit: 0,
       productCharacteristics,
       ...fulfillmentFields,

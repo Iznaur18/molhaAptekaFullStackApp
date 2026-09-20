@@ -269,6 +269,15 @@ const ProductSchema = new Schema(
       default: "",
       index: true,
     },
+    /**
+     * Вес и габариты для расчёта доставки службой. Пусто — берётся «средняя
+     * коробка» платформы, и цена в чекауте помечается приблизительной.
+     */
+    productWeightG: { type: Number, default: null, min: 1, max: 150000 },
+    productLengthCm: { type: Number, default: null, min: 1, max: 300 },
+    productWidthCm: { type: Number, default: null, min: 1, max: 300 },
+    productHeightCm: { type: Number, default: null, min: 1, max: 300 },
+
     /** Адрес точки самовывоза (текст). Sync из default в productPickupLocations. */
     productPickupAddress: {
       type: String,
