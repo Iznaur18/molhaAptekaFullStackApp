@@ -76,6 +76,18 @@ const resolveCreatePrices = (body) => {
   }
 };
 
+/**
+ * Вес и габариты необязательны: пусто и мусор дают null, и расчёт доставки
+ * берёт среднюю коробку. Ноль габаритом быть не может.
+ *
+ * @param {unknown} raw
+ * @returns {number | null}
+ */
+const normalizeShippingDimension = (raw) => {
+  const value = Math.floor(Number(raw));
+  return Number.isFinite(value) && value > 0 ? value : null;
+};
+
 const resolveCreateStock = (body, productIsAvailable) => {
   try {
     return resolveProductStockQuantityForWrite(
@@ -350,6 +362,10 @@ export async function postProduct({
     sellerPersonalCategoryId,
     productIsAvailable: visibleInCatalog,
     productStockQuantity,
+    productWeightG: normalizeShippingDimension(body.productWeightG),
+    productLengthCm: normalizeShippingDimension(body.productLengthCm),
+    productWidthCm: normalizeShippingDimension(body.productWidthCm),
+    productHeightCm: normalizeShippingDimension(body.productHeightCm),
     productAuctionEnabled: productAuctionEnabled === true,
     productAuctionCompletedOnce: false,
     productModerationStatus,
