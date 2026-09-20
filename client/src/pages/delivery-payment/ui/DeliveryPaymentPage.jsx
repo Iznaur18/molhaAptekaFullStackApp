@@ -22,6 +22,7 @@ import {
   useMySellerCommerceDefaultsQuery,
   useSaveSellerCommerceDefaultsMutation,
 } from "../../../entities/seller-commerce-defaults/model/sellerCommerceDefaultsQueries.js";
+import { CdekConnectionCard } from "../../../entities/cdek/ui/CdekConnectionCard.jsx";
 import { SELLER_COMMERCE_DEFAULTS_UI } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 
@@ -423,6 +424,10 @@ export function DeliveryPaymentPage() {
           </button>
         </div>
       </form>
+
+      {/* Ключи СДЭК сохраняются отдельно: их проверяет сама служба, и общий
+          «Сохранить» не должен зависеть от доступности чужого API. */}
+      <CdekConnectionCard />
     </section>
   );
 }

@@ -110,6 +110,8 @@ export const cdekDeliveryPointsQuerySchema = z.object({
   sellerId: mongoIdSchema,
   cityCode: z.coerce.number().int().positive().optional(),
   postalCode: z.string().trim().min(3).max(20).optional(),
+  /** Название города: код справочника СДЭК ищем по нему, если кода нет. */
+  city: z.string().trim().min(2).max(100).optional(),
 });
 
 /** Одна строка расчёта: тариф, цена и срок. */

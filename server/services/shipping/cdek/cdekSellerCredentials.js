@@ -24,8 +24,7 @@ export function readCdekConnectionState(raw) {
   const account = typeof raw?.account === "string" ? raw.account : "";
   return {
     connected: Boolean(account && raw?.secureSealed),
-    environment:
-      raw?.environment === "test" ? "test" : CDEK_ENVIRONMENT_PROD,
+    environment: raw?.environment === "test" ? "test" : CDEK_ENVIRONMENT_PROD,
     accountMasked: maskCdekAccount(account),
     validatedAt: raw?.validatedAt ?? null,
     lastError: typeof raw?.lastError === "string" ? raw.lastError : "",

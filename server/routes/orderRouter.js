@@ -3,6 +3,8 @@ import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 import {
   makeOrderController,
   postShippingEstimateController,
+  postCdekQuoteController,
+  getCdekDeliveryPointsController,
   postSellerDeliveryQuoteController,
   getShippingCarriersController,
   getMyOrdersController,
@@ -31,6 +33,8 @@ import {
   makeOrderValidation,
   sellerDeliveryQuoteValidation,
   shippingEstimateValidation,
+  cdekQuoteValidation,
+  cdekDeliveryPointsValidation,
   updateOrderStatusValidation,
   getAllOrdersValidation,
   getMyOrdersValidation,
@@ -61,6 +65,21 @@ router.get("/shipping-carriers", checkAuthMW, getShippingCarriersController);
 
 // Расчёт доставки внешней службой до оформления: покупатель должен знать
 // сумму заранее, а не узнавать её у двери.
+// СДЭК: расчёт по ключам самого продавца и его же справочник пунктов выдачи.
+router.post(
+  "/cdek-quote",
+  checkAuthMW,
+  orderCreateRateLimiter,
+  cdekQuoteValidation,
+  postCdekQuoteController,
+);
+router.get(
+  "/cdek-delivery-points",
+  checkAuthMW,
+  cdekDeliveryPointsValidation,
+  getCdekDeliveryPointsController,
+);
+
 router.post(
   "/shipping-estimate",
   checkAuthMW,

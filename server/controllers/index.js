@@ -97,6 +97,10 @@ import {
 import { getAllOrdersController } from "./Order/getAllOrdersController.js";
 import { postShippingEstimateController } from "./Order/shippingEstimateController.js";
 import {
+  postCdekQuoteController,
+  getCdekDeliveryPointsController,
+} from "./Order/cdekShipmentControllers.js";
+import {
   getCdekCredentialsController,
   putCdekCredentialsController,
   deleteCdekCredentialsController,
@@ -413,6 +417,8 @@ export {
   getMySalesActionCountController,
   getAllOrdersController,
   postShippingEstimateController,
+  postCdekQuoteController,
+  getCdekDeliveryPointsController,
   getCdekCredentialsController,
   putCdekCredentialsController,
   deleteCdekCredentialsController,
