@@ -730,6 +730,28 @@ const applyModerationAndAvailability = (body, $set, existing, skipsModeration) =
   }
 };
 
+/**
+ * Вес и габариты: пусто (null) означает «продавец не знает» — стираем прежнее
+ * значение, чтобы расчёт доставки снова брал среднюю коробку, а не старые
+ * размеры от другой ревизии товара.
+ */
+const applyShippingDimensionFields = (body, $set, $unset) => {
+  for (const field of [
+    "productWeightG",
+    "productLengthCm",
+    "productWidthCm",
+    "productHeightCm",
+  ]) {
+    if (!hasBodyField(body, field)) continue;
+    const value = Math.floor(Number(body[field]));
+    if (Number.isFinite(value) && value > 0) {
+      $set[field] = value;
+    } else {
+      $unset[field] = 1;
+    }
+  }
+};
+
 const applyStockField = async (body, $set, existing, productId) => {
   if (!hasBodyField(body, "productStockQuantity")) {
     return;
@@ -816,6 +838,7 @@ export async function buildProductPatchSet({
   applyInstagramPostUrlField(body, $set);
   applyModerationAndAvailability(body, $set, existing, skipsModeration);
   await applyStockField(body, $set, existing, productId);
+  applyShippingDimensionFields(body, $set, $unset);
 
   const auctionState = applyAuctionField(body, $set, existing);
   applyQaField(body, $set);
