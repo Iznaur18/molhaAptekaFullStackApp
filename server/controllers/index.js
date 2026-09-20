@@ -96,6 +96,15 @@ import {
 } from "./Courier/courierDisputeController.js";
 import { getAllOrdersController } from "./Order/getAllOrdersController.js";
 import { postShippingEstimateController } from "./Order/shippingEstimateController.js";
+import {
+  postCdekQuoteController,
+  getCdekDeliveryPointsController,
+} from "./Order/cdekShipmentControllers.js";
+import {
+  getCdekCredentialsController,
+  putCdekCredentialsController,
+  deleteCdekCredentialsController,
+} from "./Shipping/cdekCredentialsControllers.js";
 import { postSellerDeliveryQuoteController } from "./Order/sellerDeliveryQuoteController.js";
 import {
   getShippingCarriersController,
@@ -408,6 +417,11 @@ export {
   getMySalesActionCountController,
   getAllOrdersController,
   postShippingEstimateController,
+  postCdekQuoteController,
+  getCdekDeliveryPointsController,
+  getCdekCredentialsController,
+  putCdekCredentialsController,
+  deleteCdekCredentialsController,
   postSellerDeliveryQuoteController,
   getShippingCarriersController,
   getStaffShippingCarriersController,
