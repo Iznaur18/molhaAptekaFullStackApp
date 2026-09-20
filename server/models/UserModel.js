@@ -725,6 +725,25 @@ const UserSchema = new mongoose.Schema(
       _id: false,
     },
     /**
+     * Ключи СДЭК продавца (docs/product/cdek-per-seller-v1.md).
+     *
+     * Кабинет у каждого продавца свой: отправки идут по его договору и за его
+     * счёт, поэтому платформенного ключа здесь быть не может. Secure password
+     * хранится только зашифрованным, наружу отдаём маску Account.
+     */
+    cdekIntegration: {
+      /** Account из кабинета СДЭК = client_id для OAuth. */
+      account: { type: String, trim: true, default: "", maxlength: 128 },
+      /** AES-GCM blob; в публичные GET /user не попадает. */
+      secureSealed: { type: mongoose.Schema.Types.Mixed, default: null },
+      /** Тестовый контур СДЭК не создаёт реальных отправлений. */
+      environment: { type: String, enum: ["prod", "test"], default: "prod" },
+      /** Когда ключи последний раз приняли токен: пусто — не проверялись. */
+      validatedAt: { type: Date, default: null },
+      lastError: { type: String, default: "", trim: true, maxlength: 500 },
+      _id: false,
+    },
+    /**
      * Способы оплаты, которые принимает продавец.
      *
      * Пустой массив читается как «не настраивал» и означает все способы:

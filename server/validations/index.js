@@ -110,6 +110,7 @@ import {
 import { shippingEstimateValidation } from "./order/shippingEstimateValidation.js";
 import { sellerDeliveryQuoteValidation } from "./order/sellerDeliveryQuoteValidation.js";
 import { shippingCarrierToggleValidation } from "./order/shippingCarrierValidation.js";
+import { cdekCredentialsValidation } from "./shipping/cdekCredentialsValidation.js";
 import { replaceMyCartValidation } from "./cart/replaceMyCartValidation.js";
 import { replaceMyFavoritesValidation } from "./favorites/replaceMyFavoritesValidation.js";
 import {
@@ -321,4 +322,5 @@ export {
   analyticsPeriodQueryValidation,
   trackAdAnalyticsValidation,
   trackClientAnalyticsValidation,
+  cdekCredentialsValidation,
 };

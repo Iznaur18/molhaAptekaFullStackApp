@@ -16,6 +16,9 @@ import {
   listMyFollowingController,
   listMyFollowersController,
   getMyStatsTrendsController,
+  getCdekCredentialsController,
+  putCdekCredentialsController,
+  deleteCdekCredentialsController,
   blockUserController,
   unblockUserController,
   listMyBlockedUsersController,
@@ -61,6 +64,7 @@ import {
   submitDataConfirmationValidation,
   resolveDataConfirmationValidation,
   userFollowListValidation,
+  cdekCredentialsValidation,
   userBlockListValidation,
   userStoryIdParamValidation,
   createUserStoryValidation,
@@ -155,6 +159,16 @@ router.get(
   listMyFollowersController,
 );
 router.get("/me/stats-trends", checkAuthMW, getMyStatsTrendsController);
+
+// Ключи СДЭК продавца: свои у каждого, поэтому живут в профиле, а не в .env.
+router.get("/me/cdek-credentials", checkAuthMW, getCdekCredentialsController);
+router.put(
+  "/me/cdek-credentials",
+  checkAuthMW,
+  cdekCredentialsValidation,
+  putCdekCredentialsController,
+);
+router.delete("/me/cdek-credentials", checkAuthMW, deleteCdekCredentialsController);
 
 router.get(
   "/data-confirmation-requests/pending",

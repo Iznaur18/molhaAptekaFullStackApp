@@ -716,6 +716,24 @@ export {
   resolveOrderShippingTrackingUrl,
 } from "./shippingProvider.js";
 export {
+  CDEK_API_BASE_URL_PROD,
+  CDEK_API_BASE_URL_TEST,
+  CDEK_ENVIRONMENTS,
+  CDEK_ENVIRONMENT_PROD,
+  CDEK_ENVIRONMENT_TEST,
+  CDEK_ACCOUNT_MAX_LENGTH,
+  CDEK_SECURE_MAX_LENGTH,
+  CDEK_TOKEN_TTL_MS,
+  CDEK_HTTP_TIMEOUT_MS,
+  CDEK_NOT_CONNECTED_MESSAGE,
+  CDEK_INVALID_CREDENTIALS_MESSAGE,
+  CDEK_UNAVAILABLE_MESSAGE,
+  resolveCdekBaseUrl,
+  cdekCredentialsBodySchema,
+  cdekConnectionStateSchema,
+  maskCdekAccount,
+} from "./cdek.js";
+export {
   userSellerProductsQuerySchema,
   userSellerProductThumbItemSchema,
   userSellerProductsPageDataSchema,
