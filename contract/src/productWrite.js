@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { productShippingFieldsShape } from "./productShipping.js";
+
 import { requiredRuRegionCodeFieldSchema } from "./ruRegions.js";
 import { mongoIdSchema } from "./mongoId.js";
 import { PRODUCT_MODERATION_STATUSES, productFromApiSchema } from "./productFromApi.js";
@@ -330,6 +332,7 @@ export const createProductBodySchema = z
       .min(PRODUCT_STOCK_QUANTITY_MIN)
       .max(PRODUCT_STOCK_QUANTITY_MAX)
       .optional(),
+    ...productShippingFieldsShape,
     productAuctionEnabled: z.coerce.boolean().optional(),
     productQaEnabled: z.coerce.boolean().optional(),
     loyaltyPointsPerUnit: z.coerce.number().int().min(0).optional(),
@@ -436,6 +439,7 @@ const patchFieldShape = {
     .min(0)
     .max(PRODUCT_STOCK_QUANTITY_MAX)
     .optional(),
+  ...productShippingFieldsShape,
   productAuctionEnabled: z.coerce.boolean().optional(),
   productQaEnabled: z.coerce.boolean().optional(),
   ...productWholesalePatchFieldsShape,

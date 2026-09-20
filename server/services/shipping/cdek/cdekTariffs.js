@@ -1,9 +1,8 @@
 import {
   CDEK_CURRENCY_RUB,
-  CDEK_DEFAULT_ITEM_WEIGHT_G,
-  CDEK_DEFAULT_PACKAGE_CM,
   CDEK_ORDER_TYPE_SHOP,
   CDEK_PICKUP_DELIVERY_MODES,
+  buildShipmentPackage,
 } from "@molha/api-contract";
 
 import { cdekRequest } from "./cdekClient.js";
@@ -11,9 +10,9 @@ import { cdekRequest } from "./cdekClient.js";
 /**
  * Расчёт доставки СДЭК до пункта выдачи.
  *
- * Веса и габаритов у товара пока нет (docs/product/cdek-per-seller-v1.md),
- * поэтому берём значения платформы по умолчанию: лучше показать честную
- * оценку по «средней коробке», чем не показать ничего.
+ * Вес и габариты берём у товаров; где продавец их не заполнил, подставляется
+ * «средняя коробка» платформы, и расчёт возвращает `exact: false` — покупателю
+ * такую цену показываем как приблизительную.
  */
 
 /**
@@ -29,20 +28,26 @@ export function buildCdekLocation(location) {
 
 /**
  * Одна посылка на весь заказ: СДЭК считает по суммарному весу, а разбивать
- * на коробки без реальных габаритов — выдумывать точность, которой нет.
+ * на коробки без схемы упаковки — выдумывать точность, которой нет.
  *
- * @param {number} itemCount
+ * Вес и габариты берём у самих товаров; там, где продавец их не заполнил,
+ * подставляется «средняя коробка», и вызывающий помечает цену приблизительной.
+ *
+ * @param {import('@molha/api-contract').ProductShippingFields[]} products
  */
-export function buildCdekPackages(itemCount) {
-  const count = Math.max(1, Math.floor(itemCount) || 1);
-  return [
-    {
-      weight: count * CDEK_DEFAULT_ITEM_WEIGHT_G,
-      length: CDEK_DEFAULT_PACKAGE_CM.length,
-      width: CDEK_DEFAULT_PACKAGE_CM.width,
-      height: CDEK_DEFAULT_PACKAGE_CM.height,
-    },
-  ];
+export function buildCdekPackages(products) {
+  const box = buildShipmentPackage(products);
+  return {
+    packages: [
+      {
+        weight: box.weightG,
+        length: box.lengthCm,
+        width: box.widthCm,
+        height: box.heightCm,
+      },
+    ],
+    exact: box.exact,
+  };
 }
 
 /**
@@ -82,15 +87,17 @@ function readTariffOption(raw) {
  * @param {{
  *   from: { code?: number | null; postalCode?: string | null; address?: string | null };
  *   to: { code?: number | null; postalCode?: string | null; address?: string | null };
- *   itemCount: number;
+ *   products: import('@molha/api-contract').ProductShippingFields[];
  * }} params
+ * @returns {Promise<{ options: ReturnType<typeof readTariffOption>[]; exact: boolean }>}
  */
-export async function quoteCdekPickupTariffs(credentials, { from, to, itemCount }) {
+export async function quoteCdekPickupTariffs(credentials, { from, to, products }) {
   const fromLocation = buildCdekLocation(from);
   const toLocation = buildCdekLocation(to);
+  const { packages, exact } = buildCdekPackages(products);
   if (!fromLocation || !toLocation) {
     // Без обеих точек СДЭК вернёт ошибку; своя проверка даёт понятный текст.
-    return [];
+    return { options: [], exact };
   }
 
   const payload = await cdekRequest(credentials, {
@@ -101,7 +108,7 @@ export async function quoteCdekPickupTariffs(credentials, { from, to, itemCount 
       currency: CDEK_CURRENCY_RUB,
       from_location: fromLocation,
       to_location: toLocation,
-      packages: buildCdekPackages(itemCount),
+      packages,
     },
   });
 
@@ -111,7 +118,7 @@ export async function quoteCdekPickupTariffs(credentials, { from, to, itemCount 
     ? /** @type {{ tariff_codes: unknown[] }} */ (payload).tariff_codes
     : [];
 
-  return rows
+  const options = rows
     .map(readTariffOption)
     .filter(
       /** @returns {option is NonNullable<ReturnType<typeof readTariffOption>>} */
@@ -119,4 +126,6 @@ export async function quoteCdekPickupTariffs(credentials, { from, to, itemCount 
         option !== null && CDEK_PICKUP_DELIVERY_MODES.includes(option.deliveryMode),
     )
     .sort((a, b) => a.deliverySumRub - b.deliverySumRub);
+
+  return { options, exact };
 }

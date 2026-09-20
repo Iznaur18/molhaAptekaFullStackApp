@@ -20,7 +20,9 @@ import { quoteCdekPickupTariffs } from "./cdekTariffs.js";
  */
 async function resolveSingleSellerShipment(productIds) {
   const products = await ProductModel.find({ _id: { $in: productIds } })
-    .select("productSeller productPickupAddress productRegionCode")
+    .select(
+      "productSeller productPickupAddress productRegionCode productWeightG productLengthCm productWidthCm productHeightCm",
+    )
     .lean();
 
   if (products.length === 0) {
@@ -37,7 +39,7 @@ async function resolveSingleSellerShipment(productIds) {
 
   return {
     sellerId: [...sellerIds][0],
-    itemCount: products.length,
+    products,
     fromAddress: String(products[0].productPickupAddress ?? "").trim(),
   };
 }
@@ -73,14 +75,14 @@ export async function quoteCdekShipment({
     return { available: false, reason: "no_pickup_address", options: [] };
   }
 
-  const options = await quoteCdekPickupTariffs(credentials, {
+  const { options, exact } = await quoteCdekPickupTariffs(credentials, {
     from: { address: shipment.fromAddress },
     to: { code: toCityCode, postalCode: toPostalCode, address: toAddress },
-    itemCount: shipment.itemCount,
+    products: shipment.products,
   });
 
   if (options.length === 0) {
-    return { available: false, reason: "no_tariffs", options: [] };
+    return { available: false, reason: "no_tariffs", options: [], exact };
   }
 
   return {
@@ -89,6 +91,8 @@ export async function quoteCdekShipment({
     options,
     // Дешёвый вариант показываем по умолчанию, остальные — выбором.
     best: options[0],
+    // false — у части товаров нет веса и габаритов, цена приблизительная.
+    exact,
   };
 }
 

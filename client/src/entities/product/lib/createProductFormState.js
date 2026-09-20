@@ -29,6 +29,10 @@ export const CREATE_PRODUCT_INITIAL_FORM = {
   categoryBreadcrumbRu: "",
   productIsAvailable: true,
   productStockQuantity: "1",
+  productWeightG: "",
+  productLengthCm: "",
+  productWidthCm: "",
+  productHeightCm: "",
   loyaltyPointsPerUnit: "0",
   affiliateEnabled: false,
   affiliatePercent: "10",
@@ -89,6 +93,14 @@ export function createProductFormStateFromProduct(product) {
       product.productIsAvailable !== false && product.productStockQuantity != null
         ? String(Math.max(0, Math.floor(Number(product.productStockQuantity))))
         : "1",
+    productWeightG:
+      product.productWeightG != null ? String(product.productWeightG) : "",
+    productLengthCm:
+      product.productLengthCm != null ? String(product.productLengthCm) : "",
+    productWidthCm:
+      product.productWidthCm != null ? String(product.productWidthCm) : "",
+    productHeightCm:
+      product.productHeightCm != null ? String(product.productHeightCm) : "",
     loyaltyPointsPerUnit: "0",
     affiliateEnabled: product.affiliateEnabled === true,
     affiliatePercent: String(

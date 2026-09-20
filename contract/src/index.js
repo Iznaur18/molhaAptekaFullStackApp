@@ -746,6 +746,17 @@ export {
   cdekDeliveryPointSchema,
 } from "./cdek.js";
 export {
+  PRODUCT_WEIGHT_G_MIN,
+  PRODUCT_WEIGHT_G_MAX,
+  PRODUCT_DIMENSION_CM_MIN,
+  PRODUCT_DIMENSION_CM_MAX,
+  PRODUCT_DEFAULT_SHIPPING,
+  productShippingFieldsShape,
+  hasProductShippingDimensions,
+  resolveProductShipping,
+  buildShipmentPackage,
+} from "./productShipping.js";
+export {
   userSellerProductsQuerySchema,
   userSellerProductThumbItemSchema,
   userSellerProductsPageDataSchema,
