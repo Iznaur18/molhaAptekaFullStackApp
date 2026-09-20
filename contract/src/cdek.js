@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { mongoIdSchema } from "./mongoId.js";
+
 /**
  * СДЭК подключается per-seller: у каждого продавца свой договор и свои ключи
  * (docs/product/cdek-per-seller-v1.md). Платформа за его отправки не платит,
@@ -64,6 +66,73 @@ export const cdekConnectionStateSchema = z.object({
   accountMasked: z.string(),
   validatedAt: z.coerce.date().nullable(),
   lastError: z.string(),
+});
+
+/**
+ * Режимы доставки СДЭК. В v1 работаем только с выдачей в пункте:
+ * 2 — от двери продавца до пункта, 4 — от пункта до пункта.
+ */
+export const CDEK_DELIVERY_MODE_DOOR_TO_POINT = 2;
+export const CDEK_DELIVERY_MODE_POINT_TO_POINT = 4;
+
+/** @type {readonly [2, 4]} */
+export const CDEK_PICKUP_DELIVERY_MODES = [
+  CDEK_DELIVERY_MODE_DOOR_TO_POINT,
+  CDEK_DELIVERY_MODE_POINT_TO_POINT,
+];
+
+/** Тип заказа СДЭК: 1 — интернет-магазин. */
+export const CDEK_ORDER_TYPE_SHOP = 1;
+/** Валюта расчёта: 1 — рубли. */
+export const CDEK_CURRENCY_RUB = 1;
+
+/**
+ * Габариты и вес по умолчанию: у товара таких полей пока нет, а без них СДЭК
+ * не посчитает. Значения намеренно «средняя коробка», продавец уточнит их
+ * при создании накладной.
+ */
+export const CDEK_DEFAULT_ITEM_WEIGHT_G = 1000;
+export const CDEK_DEFAULT_PACKAGE_CM = { length: 30, width: 20, height: 15 };
+/** Больше этого в один расчёт не берём: корзина с сотней позиций — не посылка. */
+export const CDEK_QUOTE_MAX_ITEMS = 50;
+
+/** Body `POST /order/cdek-quote` — расчёт до оформления заказа. */
+export const cdekQuoteBodySchema = z.object({
+  productIds: z.array(mongoIdSchema).min(1).max(CDEK_QUOTE_MAX_ITEMS),
+  /** Код города получателя в справочнике СДЭК либо индекс. */
+  toCityCode: z.coerce.number().int().positive().optional(),
+  toPostalCode: z.string().trim().min(3).max(20).optional(),
+  toAddress: z.string().trim().min(3).max(200).optional(),
+});
+
+/** Query `GET /order/cdek-delivery-points`. */
+export const cdekDeliveryPointsQuerySchema = z.object({
+  sellerId: mongoIdSchema,
+  cityCode: z.coerce.number().int().positive().optional(),
+  postalCode: z.string().trim().min(3).max(20).optional(),
+});
+
+/** Одна строка расчёта: тариф, цена и срок. */
+export const cdekTariffOptionSchema = z.object({
+  tariffCode: z.number().int(),
+  tariffName: z.string(),
+  deliveryMode: z.number().int(),
+  deliverySumRub: z.number().nonnegative(),
+  periodMinDays: z.number().int().nonnegative().nullable(),
+  periodMaxDays: z.number().int().nonnegative().nullable(),
+});
+
+/** Пункт выдачи в том виде, в каком он нужен экрану выбора. */
+export const cdekDeliveryPointSchema = z.object({
+  code: z.string(),
+  name: z.string(),
+  address: z.string(),
+  cityCode: z.number().int().nullable(),
+  city: z.string(),
+  lat: z.number().nullable(),
+  lon: z.number().nullable(),
+  workTime: z.string(),
+  hasCashless: z.boolean(),
 });
 
 /**

@@ -732,6 +732,18 @@ export {
   cdekCredentialsBodySchema,
   cdekConnectionStateSchema,
   maskCdekAccount,
+  CDEK_DELIVERY_MODE_DOOR_TO_POINT,
+  CDEK_DELIVERY_MODE_POINT_TO_POINT,
+  CDEK_PICKUP_DELIVERY_MODES,
+  CDEK_ORDER_TYPE_SHOP,
+  CDEK_CURRENCY_RUB,
+  CDEK_DEFAULT_ITEM_WEIGHT_G,
+  CDEK_DEFAULT_PACKAGE_CM,
+  CDEK_QUOTE_MAX_ITEMS,
+  cdekQuoteBodySchema,
+  cdekDeliveryPointsQuerySchema,
+  cdekTariffOptionSchema,
+  cdekDeliveryPointSchema,
 } from "./cdek.js";
 export {
   userSellerProductsQuerySchema,
