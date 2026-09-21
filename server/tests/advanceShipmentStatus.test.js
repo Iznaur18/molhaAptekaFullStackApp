@@ -226,6 +226,49 @@ describe("ступени не ломают отгрузку и отмену", ()
     );
   });
 
+  it("СДЭК отгружает продавец, но только с накладной", async () => {
+    const { seller, buyer, product } = await createOrderLoyaltyFixture();
+    const order = await createOrderWithReserveTransaction({ buyer, seller, product });
+    const cdekShipment = {
+      sellerId: seller._id,
+      fulfillmentMethod: "delivery",
+      deliveryCarrier: "cdek",
+    };
+    await OrderModel.updateOne(
+      { _id: order._id },
+      { $set: { fulfillmentMethod: "delivery", shipments: [cdekShipment] } },
+    );
+    const ship = () =>
+      markOrderItemShippedBySeller({
+        orderId: String(order._id),
+        itemIndex: 0,
+        sellerId: String(seller._id),
+      });
+
+    await assert.rejects(ship, /Сначала создайте накладную СДЭК/);
+
+    await OrderModel.updateOne(
+      { _id: order._id },
+      {
+        $set: {
+          shipments: [
+            { ...cdekShipment, cdekWaybill: { uuid: "u-1", cdekNumber: "1" } },
+          ],
+        },
+      },
+    );
+    const { order: shipped } = await ship();
+    assert.equal(shipped.items[0].status, "shipped");
+
+    const { order: delivered } = await markOrderItemDeliveredBySeller({
+      orderId: String(order._id),
+      itemIndex: 0,
+      sellerId: String(seller._id),
+      userId: String(seller._id),
+    });
+    assert.equal(delivered.items[0].status, "delivered");
+  });
+
   it("самовывоз не отгружают: покупатель забирает сам", async () => {
     const { seller, buyer, product } = await createOrderLoyaltyFixture();
     const order = await createOrderWithReserveTransaction({ buyer, seller, product });

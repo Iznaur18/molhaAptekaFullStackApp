@@ -8,6 +8,8 @@ import {
   ORDER_STATUS_RETURNED,
   ORDER_STATUS_SHIPPED,
 } from "../../constants/orderConstants.js";
+import { SHIPPING_PROVIDER_CDEK } from "@molha/api-contract";
+
 import { AppError } from "../../errors/AppError.js";
 import { ESCROW_REFUND_REASON_ITEM_RETURNED } from "../../constants/escrowConstants.js";
 import {
@@ -192,18 +194,45 @@ export async function markOrderItemDeliveredBySeller({
  * @returns {"seller" | "courier" | "pickup"}
  */
 function resolveShipmentKindForItem(order, item) {
-  const sellerId = String(
+  if (!resolveItemSellerIdForShipment(item)) return "seller";
+  return resolveShipmentKind(order, findItemShipment(order, item));
+}
+
+/** @param {any} item */
+function resolveItemSellerIdForShipment(item) {
+  return String(
     item?.sellerIdAtOrder ??
       item?.productId?.productSeller?._id ??
       item?.productId?.productSeller ??
       "",
   );
-  if (!sellerId) return "seller";
-  const shipment = (order.shipments ?? []).find(
-    (row) => row?.sellerId != null && String(row.sellerId) === sellerId,
+}
+
+/**
+ * @param {any} order
+ * @param {any} item
+ */
+function findItemShipment(order, item) {
+  const sellerId = resolveItemSellerIdForShipment(item);
+  if (!sellerId) return null;
+  return (
+    (order.shipments ?? []).find(
+      (row) => row?.sellerId != null && String(row.sellerId) === sellerId,
+    ) ?? null
   );
+}
+
+/**
+ * @param {any} order
+ * @param {any} shipment
+ * @returns {"seller" | "courier" | "pickup"}
+ */
+function resolveShipmentKind(order, shipment) {
   const method = shipment?.fulfillmentMethod ?? order.fulfillmentMethod;
   if (method !== "delivery") return "pickup";
+  // СДЭК забирает посылку у продавца в пункте или у двери: отгружает продавец,
+  // курьеров Gitorg и кода у двери тут нет.
+  if (shipment?.deliveryCarrier === SHIPPING_PROVIDER_CDEK) return "seller";
   // Внешняя служба или курьеры Gitorg — товар отгружает не продавец.
   if (shipment?.courierDelivery === true || shipment?.deliveryCarrier) {
     return shipment?.deliveryCarrier === "seller" ? "seller" : "courier";
@@ -234,6 +263,16 @@ export async function markOrderItemShippedBySeller({ orderId, itemIndex, sellerI
   }
   if (shipmentKind === "pickup") {
     throw new AppError(409, "Это отправление покупатель забирает сам");
+  }
+  const shipment = findItemShipment(order, targetItem);
+  if (
+    shipment?.deliveryCarrier === SHIPPING_PROVIDER_CDEK &&
+    !shipment.cdekWaybill?.uuid
+  ) {
+    throw new AppError(
+      409,
+      "Сначала создайте накладную СДЭК — без неё посылку не примут в пункте",
+    );
   }
 
   targetItem.status = ORDER_STATUS_SHIPPED;
