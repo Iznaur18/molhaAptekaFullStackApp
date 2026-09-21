@@ -170,7 +170,19 @@ const cancelExternalShipmentIfNeeded = async ({ order, sellerId }) => {
   );
   if (stillAlive) return;
 
-  // У СДЭК тоже есть внешний номер, но снимать его надо у СДЭК, а не у ЛОБО.
+  // У Яндекса и СДЭК тоже есть внешний номер, но снимать его надо у них, а не у ЛОБО.
+  if (
+    shipment.yandexDeliveryRequest?.requestId ||
+    shipment.yandexDeliveryShipmentAtOrder
+  ) {
+    const { cancelYandexDeliveryRequest } =
+      await import("../shipping/yandex/yandexDeliveryRequest.js");
+    await cancelYandexDeliveryRequest({
+      orderId: String(order._id),
+      sellerId: String(sellerId),
+    });
+    return;
+  }
   if (
     shipment.deliveryCarrier === SHIPPING_PROVIDER_CDEK ||
     shipment.cdekWaybill?.uuid

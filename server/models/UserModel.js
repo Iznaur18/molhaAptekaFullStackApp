@@ -759,6 +759,16 @@ const UserSchema = new mongoose.Schema(
       tokenSealed: { type: mongoose.Schema.Types.Mixed, default: null },
       /** Последние символы токена — чтобы продавец узнал свой. */
       tokenTail: { type: String, default: "", trim: true, maxlength: 8 },
+      /**
+       * Пункт Яндекса, куда продавец сдаёт посылки. Без него Яндекс не считает
+       * цену: отправку он принимает только из своего пункта, не с адреса.
+       */
+      dropoffStation: {
+        id: { type: String, trim: true, default: "" },
+        name: { type: String, trim: true, default: "" },
+        address: { type: String, trim: true, default: "" },
+        geoId: { type: Number, default: null },
+      },
       environment: { type: String, enum: ["prod", "test"], default: "prod" },
       validatedAt: { type: Date, default: null },
       lastError: { type: String, default: "", trim: true, maxlength: 500 },

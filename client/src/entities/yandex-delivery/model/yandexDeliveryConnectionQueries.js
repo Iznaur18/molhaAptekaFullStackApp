@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchYandexDeliveryConnection,
   removeYandexDeliveryConnection,
+  saveYandexDropoff,
   saveYandexDeliveryConnection,
   toggleYandexDeliveryConnection,
 } from "../api/yandexDeliveryCredentialsApi.js";
@@ -39,3 +40,5 @@ export const useRemoveYandexDeliveryConnectionMutation = () =>
   useConnectionMutation(removeYandexDeliveryConnection);
 export const useToggleYandexDeliveryConnectionMutation = () =>
   useConnectionMutation(toggleYandexDeliveryConnection);
+export const useSaveYandexDropoffMutation = () =>
+  useConnectionMutation(saveYandexDropoff);

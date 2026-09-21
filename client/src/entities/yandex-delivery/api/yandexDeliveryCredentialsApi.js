@@ -56,3 +56,27 @@ export async function toggleYandexDeliveryConnection(enabled) {
     return rethrow(error);
   }
 }
+
+/** @param {string} city */
+export async function fetchYandexDropoffPoints(city) {
+  try {
+    const { data } = await apiClient.get("/user/me/yandex-delivery-dropoff-points", {
+      params: { city },
+    });
+    return Array.isArray(data?.data?.points) ? data.data.points : [];
+  } catch (error) {
+    return rethrow(error);
+  }
+}
+
+/** @param {string} stationId */
+export async function saveYandexDropoff(stationId) {
+  try {
+    const { data } = await apiClient.put("/user/me/yandex-delivery-dropoff", {
+      stationId,
+    });
+    return data?.data?.yandexDelivery ?? null;
+  } catch (error) {
+    return rethrow(error);
+  }
+}

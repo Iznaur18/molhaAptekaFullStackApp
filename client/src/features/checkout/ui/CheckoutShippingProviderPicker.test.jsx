@@ -43,13 +43,13 @@ describe("служба доставки в оформлении", () => {
   });
 
   it("две службы у продавца — покупатель переключается между ними", () => {
-    const onSelectCdek = vi.fn();
+    const onSelectCarrier = vi.fn();
     renderWithProviders(
       <CheckoutShippingProviderPicker
         courierDelivery="seller"
         cdekAvailable
         sellerDeliveryAvailable
-        onSelectCdek={onSelectCdek}
+        onSelectCarrier={onSelectCarrier}
       />,
     );
 
@@ -58,10 +58,10 @@ describe("служба доставки в оформлении", () => {
     });
     expect(cdek.getAttribute("aria-checked")).toBe("false");
     fireEvent.click(cdek);
-    expect(onSelectCdek).toHaveBeenLastCalledWith(true);
+    expect(onSelectCarrier).toHaveBeenLastCalledWith("cdek");
 
     fireEvent.click(sellerButton());
-    expect(onSelectCdek).toHaveBeenLastCalledWith(false);
+    expect(onSelectCarrier).toHaveBeenLastCalledWith(null);
   });
 
   it("нажимаемая служба выделена, недоступная — приглушена", () => {
@@ -70,7 +70,7 @@ describe("служба доставки в оформлении", () => {
         courierDelivery="seller"
         cdekAvailable
         sellerDeliveryAvailable
-        onSelectCdek={vi.fn()}
+        onSelectCarrier={vi.fn()}
       />,
     );
 
@@ -92,8 +92,8 @@ describe("служба доставки в оформлении", () => {
         courierDelivery={null}
         cdekAvailable
         sellerDeliveryAvailable={false}
-        cdekSelected
-        onSelectCdek={vi.fn()}
+        selectedCarrier="cdek"
+        onSelectCarrier={vi.fn()}
       />,
     );
 
@@ -102,5 +102,36 @@ describe("служба доставки в оформлении", () => {
     });
     expect(cdek.getAttribute("aria-checked")).toBe("true");
     expect(cdek.disabled).toBe(true);
+  });
+
+  it("СДЭК, Яндекс и своя доставка — три службы, выбранная одна", () => {
+    const onSelectCarrier = vi.fn();
+    renderWithProviders(
+      <CheckoutShippingProviderPicker
+        courierDelivery="seller"
+        cdekAvailable
+        yandexAvailable
+        sellerDeliveryAvailable
+        selectedCarrier="yandex_delivery"
+        onSelectCarrier={onSelectCarrier}
+      />,
+    );
+
+    const yandex = screen.getByRole("radio", {
+      name: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_YANDEX,
+    });
+    expect(yandex.getAttribute("aria-checked")).toBe("true");
+    expect(sellerButton().getAttribute("aria-checked")).toBe("false");
+
+    fireEvent.click(
+      screen.getByRole("radio", { name: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_CDEK }),
+    );
+    expect(onSelectCarrier).toHaveBeenLastCalledWith("cdek");
+  });
+
+  it("продавец без Яндекса — карточки «Яндекс Доставка — скоро» нет", () => {
+    renderWithProviders(<CheckoutShippingProviderPicker courierDelivery="seller" />);
+
+    expect(screen.queryByText(CHECKOUT_FORM_UI.SHIPPING_PROVIDER_YANDEX)).toBeNull();
   });
 });

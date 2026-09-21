@@ -9,7 +9,9 @@ import {
 import {
   PRODUCT_DELIVERY_CARRIER_GITORG,
   SHIPPING_PROVIDER_CDEK,
+  SHIPPING_PROVIDER_YANDEX_DELIVERY,
   SHIPPING_SERVICE_PICKUP_POINT,
+  YANDEX_DELIVERY_CARD_ONLY_MESSAGE,
   SELLER_PAYMENT_METHOD_NOT_ACCEPTED_MESSAGE,
   isPaymentMethodAcceptedBySeller,
   resolveProductDeliveryCarrier,
@@ -24,6 +26,7 @@ import { resolveOrderFulfillmentSplit } from "./resolveOrderFulfillmentSplit.js"
 import { resolveDeliveryFeesBySeller } from "../courier/courierDeliveryFee.js";
 import { resolveOrderDeliveryGeo } from "./resolveOrderDeliveryGeo.js";
 import { resolveCdekOrderShipment } from "../shipping/cdek/resolveCdekOrderShipment.js";
+import { resolveYandexDeliveryOrderShipment } from "../shipping/yandex/yandexDeliveryShipment.js";
 import {
   buildGoodsTotalBySeller,
   prepareSellerDeliveryBySeller,
@@ -31,6 +34,7 @@ import {
 } from "./sellerDeliveryFee.js";
 import {
   COURIER_DELIVERY_CASH_FORBIDDEN_MESSAGE,
+  ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
   ORDER_PAYMENT_METHOD_CARD_PREPAID,
   ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
   SELLER_PAYOUT_REQUISITES_REQUIRED_MESSAGE,
@@ -505,6 +509,7 @@ export async function createOrder({
   verifiedDeliveryAddress = null,
   deliveryAddressGeo = null,
   cdekShipment = null,
+  yandexDeliveryShipment = null,
   affiliateCode = null,
   marketingAttribution = null,
 }) {
@@ -612,15 +617,37 @@ export async function createOrder({
         selection: cdekShipment,
       })
     : null;
+  // Яндекс берёт в пункте только карту: и за товар, и за доставку
+  // (решение 22.09.2026). Наличные и предоплата с ним не сочетаются.
+  if (
+    yandexDeliveryShipment &&
+    paymentMethod !== ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY
+  ) {
+    throw new AppError(400, YANDEX_DELIVERY_CARD_ONLY_MESSAGE);
+  }
+  const yandexResolved = yandexDeliveryShipment
+    ? await resolveYandexDeliveryOrderShipment({
+        sellerId: orderSellerId,
+        items,
+        selection: yandexDeliveryShipment,
+      })
+    : null;
+  /** Внешняя служба продавца (СДЭК или Яндекс): везёт она, адрес — её пункт. */
+  const carrierResolved = cdekResolved ?? yandexResolved;
+  const carrierProvider = cdekResolved
+    ? SHIPPING_PROVIDER_CDEK
+    : yandexResolved
+      ? SHIPPING_PROVIDER_YANDEX_DELIVERY
+      : null;
 
   const fulfillmentSplit = resolveOrderFulfillmentSplit({
     productIds: uniqueProductIds,
     productById,
-    fulfillmentBySellerId: cdekResolved
+    fulfillmentBySellerId: carrierResolved
       ? { [orderSellerId]: "delivery" }
       : fulfillmentBySellerId,
     fallbackFulfillment:
-      cdekResolved || fulfillmentMethod === "delivery"
+      carrierResolved || fulfillmentMethod === "delivery"
         ? "delivery"
         : ORDER_FULFILLMENT_PICKUP,
   });
@@ -628,11 +655,11 @@ export async function createOrder({
 
   // Проверяем каждую половину своим правилом: в смешанном заказе товар
   // самовывозного продавца не обязан поддерживать доставку, и наоборот.
-  if (!cdekResolved) {
+  if (!carrierResolved) {
     assertProductsSupportDelivery(productById, fulfillmentSplit.deliveryProductIds);
   }
-  const deliveryCarrierBySeller = cdekResolved
-    ? { [orderSellerId]: SHIPPING_PROVIDER_CDEK }
+  const deliveryCarrierBySeller = carrierResolved
+    ? { [orderSellerId]: carrierProvider }
     : resolveDeliveryCarrierBySeller(productById, fulfillmentSplit.deliveryProductIds);
 
   // Выключенной службой заказ не оформить: товар с ней мог быть создан до
@@ -640,7 +667,13 @@ export async function createOrder({
   for (const carrier of new Set(Object.values(deliveryCarrierBySeller))) {
     // СДЭК подключается продавцом, а не админом: доступность уже проверил
     // resolveCdekOrderShipment — есть ли ключ и принимает ли его служба.
-    if (!carrier || carrier === SHIPPING_PROVIDER_CDEK) continue;
+    if (
+      !carrier ||
+      carrier === SHIPPING_PROVIDER_CDEK ||
+      carrier === SHIPPING_PROVIDER_YANDEX_DELIVERY
+    ) {
+      continue;
+    }
     if (!(await isCarrierAvailable(carrier))) {
       throw new AppError(409, SHIPPING_CARRIER_DISABLED_MESSAGE);
     }
@@ -687,8 +720,8 @@ export async function createOrder({
 
   /** @type {Record<string, { id: string; address: string; lat: number | null; lon: number | null }> | null} */
   let pickupByProductId = null;
-  let addressForOrder = cdekResolved
-    ? cdekResolved.addressForOrder
+  let addressForOrder = carrierResolved
+    ? carrierResolved.addressForOrder
     : verifiedDeliveryAddress;
 
   if (fulfillmentSplit.hasPickup) {
@@ -841,10 +874,13 @@ export async function createOrder({
               cdekShipmentBySellerId: cdekResolved
                 ? { [orderSellerId]: cdekResolved.snapshot }
                 : null,
+              yandexDeliveryShipmentBySellerId: yandexResolved
+                ? { [orderSellerId]: yandexResolved.snapshot }
+                : null,
             }),
-            ...(cdekResolved
+            ...(carrierResolved
               ? {
-                  shippingProvider: SHIPPING_PROVIDER_CDEK,
+                  shippingProvider: carrierProvider,
                   shippingServiceType: SHIPPING_SERVICE_PICKUP_POINT,
                 }
               : {}),

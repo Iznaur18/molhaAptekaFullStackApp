@@ -14,6 +14,9 @@ import { resolveCartSellerDelivery } from "../../../entities/cart/lib/resolveCar
 import { fetchSellerDeliveryQuote } from "../../../entities/cart/api/sellerDeliveryQuote.js";
 import { fetchCdekAvailability } from "../../../entities/cdek/api/cdekCheckoutApi.js";
 import { CdekPickupPointPicker } from "../../../features/checkout/ui/CdekPickupPointPicker.jsx";
+import { ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY } from "../../../entities/order/model/constants.js";
+import { fetchYandexDeliveryAvailability } from "../../../entities/yandex-delivery/api/yandexDeliveryCheckoutApi.js";
+import { YandexPickupPointPicker } from "../../../features/checkout/ui/YandexPickupPointPicker.jsx";
 import { getCartLineExclusionReason } from "../../../entities/cart/lib/getCartLineExclusionReason.js";
 import {
   groupCartLinesBySeller,
@@ -475,6 +478,23 @@ export function CartPage({
   useEffect(() => {
     setCdekSelection(null);
   }, [cdekSellerId]);
+  // Яндекс Доставка — так же по договору продавца. Платят с ней только картой
+  // в пункте, поэтому без «картой при получении» у продавца её не предлагаем.
+  const yandexAvailabilityQuery = useQuery({
+    queryKey: ["yandex-delivery-availability", cdekSellerId],
+    queryFn: () => fetchYandexDeliveryAvailability(cdekSellerId),
+    enabled: Boolean(cdekSellerId),
+    staleTime: 60_000,
+  });
+  const yandexAvailable =
+    yandexAvailabilityQuery.data === true &&
+    !auctionCheckoutBid &&
+    (!Array.isArray(allowedPaymentMethods) ||
+      allowedPaymentMethods.includes(ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY));
+  const [yandexSelection, setYandexSelection] = useState(null);
+  useEffect(() => {
+    setYandexSelection(null);
+  }, [cdekSellerId]);
 
   const sellerDeliveryQuoteQuery = useQuery({
     queryKey: [
@@ -575,6 +595,7 @@ export function CartPage({
     paymentMethod,
     pickupSelections,
     cdekShipment = null,
+    yandexDeliveryShipment = null,
   }) => {
     setSubmitState({ isSubmitting: true, error: "", success: "" });
 
@@ -617,15 +638,18 @@ export function CartPage({
         fulfillmentMethod,
         // СДЭК везёт по договору продавца: своя доставка и курьерская ставка
         // тут ни при чём, адрес сервер возьмёт из пункта выдачи.
-        fulfillmentBySellerId: cdekShipment
-          ? { [cdekSellerId]: "delivery" }
-          : scopedFulfillmentBySellerId,
-        deliveryFeeBySellerId: cdekShipment ? {} : scopedDeliveryFeeBySellerId,
+        fulfillmentBySellerId:
+          cdekShipment || yandexDeliveryShipment
+            ? { [cdekSellerId]: "delivery" }
+            : scopedFulfillmentBySellerId,
+        deliveryFeeBySellerId:
+          cdekShipment || yandexDeliveryShipment ? {} : scopedDeliveryFeeBySellerId,
         deliveryAddress,
         deliveryAddressFlat,
         paymentMethod,
         pickupSelections,
         ...(cdekShipment ? { cdekShipment } : {}),
+        ...(yandexDeliveryShipment ? { yandexDeliveryShipment } : {}),
       });
       removeItems(orderedProductIds);
       setActiveSellerCartId(null);
@@ -761,8 +785,10 @@ export function CartPage({
                       defaultDeliveryAddress={defaultAddress}
                       savedDeliveryAddresses={savedDeliveryAddresses}
                       pickupLocations={pickupLocations}
-                      // «Доставка» доступна и тогда, когда у продавца есть только СДЭК.
-                      deliveryAvailable={deliveryAvailable || cdekAvailable}
+                      // «Доставка» доступна и тогда, когда у продавца есть только СДЭК или Яндекс.
+                      deliveryAvailable={
+                        deliveryAvailable || cdekAvailable || yandexAvailable
+                      }
                       sellerDeliveryAvailable={deliveryAvailable}
                       pickupAvailable={pickupAvailable}
                       fulfillmentMode={null}
@@ -799,6 +825,21 @@ export function CartPage({
                           initialRecipientPhone={user?.userPhoneNumber ?? ""}
                           disabled={submitState.isSubmitting}
                           onChange={setCdekSelection}
+                        />
+                      }
+                      yandexAvailable={yandexAvailable}
+                      yandexSelection={yandexSelection}
+                      yandexPicker={
+                        <YandexPickupPointPicker
+                          sellerId={activeSellerCart.group.sellerId}
+                          items={activeSellerCart.summary.selectedLines.map((line) => ({
+                            productId: line.productId,
+                            quantity: line.quantity,
+                          }))}
+                          initialRecipientName={user?.userFullName ?? ""}
+                          initialRecipientPhone={user?.userPhoneNumber ?? ""}
+                          disabled={submitState.isSubmitting}
+                          onChange={setYandexSelection}
                         />
                       }
                     />

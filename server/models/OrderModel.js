@@ -323,6 +323,23 @@ const OrderShipmentSchema = new mongoose.Schema(
       default: undefined,
     },
     /**
+     * Яндекс Доставка до пункта выдачи — снимок: цена доставки для покупателя,
+     * комиссия Яндекса за приём оплаты (платит продавец), срок, пункт выдачи и
+     * пункт сдачи продавца. Покупатель платит Яндексу картой в пункте.
+     */
+    yandexDeliveryShipmentAtOrder: {
+      type: mongoose.Schema.Types.Mixed,
+      default: undefined,
+    },
+    /**
+     * Заявка в Яндекс Доставку, созданная продавцом: request_id, статус из
+     * Яндекса, ссылка отслеживания, отмена.
+     */
+    yandexDeliveryRequest: {
+      type: mongoose.Schema.Types.Mixed,
+      default: undefined,
+    },
+    /**
      * Продавец подтвердил, что перевод дошёл.
      *
      * Курьер не касается денег продавца, поэтому перед вручением нужно третье

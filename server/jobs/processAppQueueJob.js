@@ -24,7 +24,7 @@ import { sendEmailVerificationForUser } from "../services/auth/emailVerification
 import { processCourierStuckShipmentCronTasks } from "../services/courier/courierStuckShipmentsCron.js";
 import { processEscrowReleaseCronTasks } from "../services/payments/escrowReleaseCron.js";
 import { processLoboCronTasks } from "../services/shipping/lobo/loboStatusSync.js";
-import { syncCdekWaybillStatuses } from "../services/shipping/cdek/cdekWaybill.js";
+import { syncCarrierStatuses } from "../services/shipping/carrierStatusSync.js";
 import { processIntroAdCampaignCronTasks } from "../services/intro-ad/introAdCampaignHelpers.js";
 import { processInstallmentCronTasks } from "../utils/installmentHelpers.js";
 import { processPremiumCronTasks } from "../utils/premiumAccess.js";
@@ -85,7 +85,7 @@ export async function processAppQueueJob(job) {
     case JOB_PROCESS_LOBO_CRON:
       return processLoboCronTasks();
     case JOB_PROCESS_CDEK_STATUS_SYNC:
-      return syncCdekWaybillStatuses();
+      return syncCarrierStatuses();
     case JOB_PROCESS_PRODUCT_BULK_IMPORT:
       return processProductBulkImportJob(job.data.jobId);
     default:

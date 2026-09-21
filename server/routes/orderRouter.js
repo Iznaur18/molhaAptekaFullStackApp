@@ -7,6 +7,11 @@ import {
   getCdekDeliveryPointsController,
   getCdekAvailabilityController,
   getYandexDeliveryAvailabilityController,
+  getYandexDeliveryPointsController,
+  postYandexDeliveryQuoteController,
+  postYandexDeliveryRequestController,
+  getYandexDeliveryRequestController,
+  getYandexDeliveryLabelController,
   postCdekWaybillController,
   getCdekWaybillController,
   getCdekReceptionPointsController,
@@ -43,6 +48,8 @@ import {
   cdekQuoteValidation,
   cdekDeliveryPointsValidation,
   cdekAvailabilityValidation,
+  yandexDeliveryPointsValidation,
+  yandexDeliveryQuoteValidation,
   cdekWaybillValidation,
   cdekWaybillParamsValidation,
   cdekReceptionPointsValidation,
@@ -99,6 +106,18 @@ router.get(
   getYandexDeliveryAvailabilityController,
 );
 router.get(
+  "/yandex-delivery-points",
+  checkAuthMW,
+  yandexDeliveryPointsValidation,
+  getYandexDeliveryPointsController,
+);
+router.post(
+  "/yandex-delivery-quote",
+  checkAuthMW,
+  yandexDeliveryQuoteValidation,
+  postYandexDeliveryQuoteController,
+);
+router.get(
   "/cdek-reception-points",
   checkAuthMW,
   cdekReceptionPointsValidation,
@@ -117,6 +136,27 @@ router.get(
   checkAuthMW,
   cdekWaybillParamsValidation,
   getCdekWaybillController,
+);
+// Заявка в Яндекс Доставку — только продавец своей отправки (проверяет сервис).
+router.post(
+  "/:orderId/yandex-delivery-request",
+  checkAuthMW,
+  orderItemActionRateLimiter,
+  cdekWaybillParamsValidation,
+  postYandexDeliveryRequestController,
+);
+router.get(
+  "/:orderId/yandex-delivery-request",
+  checkAuthMW,
+  cdekWaybillParamsValidation,
+  getYandexDeliveryRequestController,
+);
+router.get(
+  "/:orderId/yandex-delivery-label",
+  checkAuthMW,
+  orderItemActionRateLimiter,
+  cdekWaybillParamsValidation,
+  getYandexDeliveryLabelController,
 );
 router.get(
   "/:orderId/cdek-label",

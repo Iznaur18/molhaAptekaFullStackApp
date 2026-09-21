@@ -8,12 +8,16 @@ const fetchMock = vi.fn();
 const saveMock = vi.fn();
 const removeMock = vi.fn();
 const toggleMock = vi.fn();
+const dropoffPointsMock = vi.fn();
+const saveDropoffMock = vi.fn();
 
 vi.mock("../api/yandexDeliveryCredentialsApi.js", () => ({
   fetchYandexDeliveryConnection: (...args) => fetchMock(...args),
   saveYandexDeliveryConnection: (...args) => saveMock(...args),
   removeYandexDeliveryConnection: (...args) => removeMock(...args),
   toggleYandexDeliveryConnection: (...args) => toggleMock(...args),
+  fetchYandexDropoffPoints: (...args) => dropoffPointsMock(...args),
+  saveYandexDropoff: (...args) => saveDropoffMock(...args),
 }));
 
 const { YandexDeliveryConnectionCard } =
@@ -42,6 +46,8 @@ describe("карточка подключения Яндекс Доставки"
     saveMock.mockReset();
     removeMock.mockReset();
     toggleMock.mockReset();
+    dropoffPointsMock.mockReset();
+    saveDropoffMock.mockReset();
   });
 
   it("без токена: инструкция и боевой контур по умолчанию", async () => {
@@ -111,5 +117,36 @@ describe("карточка подключения Яндекс Доставки"
 
     await screen.findByText("Яндекс Доставка скрыта от покупателей");
     expect(toggleMock.mock.calls[0][0]).toBe(false);
+  });
+
+  it("без пункта сдачи предупреждает и даёт выбрать пункт", async () => {
+    const connected = {
+      ...NOT_CONNECTED,
+      connected: true,
+      tokenMasked: "••••abcd",
+      dropoff: null,
+    };
+    fetchMock.mockResolvedValue(connected);
+    dropoffPointsMock.mockResolvedValue([
+      { id: "st-1", name: "ПВЗ", address: "Грозный, пр. Путина, 1" },
+    ]);
+    saveDropoffMock.mockResolvedValue({
+      ...connected,
+      dropoff: { id: "st-1", name: "ПВЗ", address: "Грозный, пр. Путина, 1" },
+      ready: true,
+    });
+    renderCard();
+
+    expect(await screen.findByText(/Пункт не выбран/)).toBeTruthy();
+    fireEvent.change(screen.getByLabelText("Город"), { target: { value: "Грозный" } });
+    fireEvent.click(screen.getByRole("button", { name: "Найти пункты" }));
+    fireEvent.change(await screen.findByLabelText("Пункт приёма"), {
+      target: { value: "st-1" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Сохранить пункт" }));
+
+    await screen.findByText(/Сейчас: Грозный, пр. Путина, 1/);
+    expect(dropoffPointsMock.mock.calls[0][0]).toBe("Грозный");
+    expect(saveDropoffMock.mock.calls[0][0]).toBe("st-1");
   });
 });

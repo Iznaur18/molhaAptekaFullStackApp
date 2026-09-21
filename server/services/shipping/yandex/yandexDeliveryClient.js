@@ -94,6 +94,49 @@ export async function yandexDeliveryRequest(
 }
 
 /**
+ * Запрос, который отвечает файлом (ярлык PDF), а не JSON.
+ *
+ * @param {YandexDeliveryCredentials} credentials
+ * @param {{ path: string; body: unknown }} request
+ * @returns {Promise<Buffer>}
+ */
+export async function yandexDeliveryRequestFile(credentials, { path, body }) {
+  const url = `${resolveYandexDeliveryBaseUrl(credentials.environment)}${path}`;
+  let response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${credentials.token}`,
+        "Content-Type": "application/json",
+        "Accept-Language": "ru",
+      },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(YANDEX_DELIVERY_HTTP_TIMEOUT_MS),
+    });
+  } catch (error) {
+    logServerEvent("yandex_delivery.file_network_error", {
+      path,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    throw new AppError(502, YANDEX_DELIVERY_UNAVAILABLE_MESSAGE);
+  }
+  if (response.status === 401 || response.status === 403) {
+    throw new AppError(400, YANDEX_DELIVERY_INVALID_TOKEN_MESSAGE);
+  }
+  if (!response.ok) {
+    const detail = await readErrorText(response);
+    logServerEvent("yandex_delivery.file_failed", {
+      path,
+      status: response.status,
+      detail,
+    });
+    throw new AppError(502, detail || YANDEX_DELIVERY_UNAVAILABLE_MESSAGE);
+  }
+  return Buffer.from(await response.arrayBuffer());
+}
+
+/**
  * Проверка токена: самый лёгкий метод, который требует авторизации.
  *
  * @param {YandexDeliveryCredentials} credentials

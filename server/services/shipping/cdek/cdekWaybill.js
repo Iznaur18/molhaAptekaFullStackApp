@@ -17,7 +17,10 @@ import { OrderModel, ProductModel } from "../../../models/index.js";
 import { logServerEvent } from "../../../utils/logServerEvent.js";
 
 import { assertOrderPrepaid } from "../../order/assertOrderPrepaid.js";
-import { resolveItemSellerId } from "../../order/orderShipments.js";
+import {
+  applyCarrierReturnToOrder,
+  applyCarrierStepToOrder,
+} from "../carrierOrderSteps.js";
 
 import { cdekRequest } from "./cdekClient.js";
 import { resolveSellerCdekCredentials } from "./cdekSellerCredentials.js";
@@ -386,21 +389,7 @@ export async function refreshCdekWaybill({ orderId, sellerId }) {
  * @returns {Promise<number>}
  */
 export async function applyCdekReturnToOrder({ orderId, sellerId }) {
-  const { markOrderItemReturned } =
-    await import("../../order/updateOrderItemStatus.js");
-  const order = await OrderModel.findById(orderId).select("items").lean();
-  const returnable = new Set([ORDER_STATUS_SHIPPED, ORDER_STATUS_DELIVERED]);
-  let moved = 0;
-  for (const [index, item] of (order?.items ?? []).entries()) {
-    if (resolveItemSellerId(item) !== String(sellerId)) continue;
-    if (!returnable.has(item.status)) continue;
-    await markOrderItemReturned({ orderId, itemIndex: index, requestUserId: sellerId });
-    moved += 1;
-  }
-  if (moved > 0) {
-    logServerEvent("cdek.order_returned", { orderId: String(orderId), moved });
-  }
-  return moved;
+  return applyCarrierReturnToOrder({ orderId, sellerId, carrier: "cdek" });
 }
 
 /**
@@ -483,57 +472,13 @@ export function resolveOrderStepForCdekStatus(statusCode) {
  * @returns {Promise<number>} сколько позиций сдвинули
  */
 export async function applyCdekStatusToOrder({ orderId, sellerId, statusCode }) {
-  const step = resolveOrderStepForCdekStatus(statusCode);
-  if (!step) return 0;
-
-  const { markOrderItemDeliveredBySeller, markOrderItemShippedBySeller } =
-    await import("../../order/updateOrderItemStatus.js");
-
-  const readSellerItems = async () => {
-    const order = await OrderModel.findById(orderId).select("items").lean();
-    // Номер позиции — место в массиве: в сыром документе itemIndex нет.
-    return (order?.items ?? [])
-      .map((item, index) => ({ item, index }))
-      .filter(({ item }) => resolveItemSellerId(item) === String(sellerId));
-  };
-
-  let moved = 0;
-  // Опрос редкий: СДЭК мог и принять, и вручить между двумя проходами —
-  // тогда сначала догоняем «Отгружен», иначе «Доставлен» не поставить.
-  for (const { item, index } of await readSellerItems()) {
-    if (!PRE_SHIPMENT.has(item.status)) continue;
-    await markOrderItemShippedBySeller({
-      orderId,
-      itemIndex: index,
-      sellerId,
-      viaCarrierSync: true,
-    });
-    moved += 1;
-  }
-
-  if (step === ORDER_STATUS_DELIVERED) {
-    for (const { item, index } of await readSellerItems()) {
-      if (item.status !== ORDER_STATUS_SHIPPED) continue;
-      await markOrderItemDeliveredBySeller({
-        orderId,
-        itemIndex: index,
-        sellerId,
-        userId: sellerId,
-        viaCarrierSync: true,
-      });
-      moved += 1;
-    }
-  }
-
-  if (moved > 0) {
-    logServerEvent("cdek.order_status_applied", {
-      orderId: String(orderId),
-      statusCode: String(statusCode),
-      step,
-      moved,
-    });
-  }
-  return moved;
+  return applyCarrierStepToOrder({
+    orderId,
+    sellerId,
+    step: resolveOrderStepForCdekStatus(statusCode),
+    carrier: "cdek",
+    statusCode,
+  });
 }
 
 /** Сколько накладных опрашиваем за проход. */

@@ -4,6 +4,8 @@ import {
   ORDER_FULFILLMENT_DELIVERY,
   ORDER_FULFILLMENT_PICKUP,
   PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
+  SHIPPING_PROVIDER_CDEK,
+  SHIPPING_PROVIDER_YANDEX_DELIVERY,
   SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT,
 } from "@molha/api-contract";
 
@@ -21,6 +23,7 @@ import {
 } from "../../../entities/address/lib/deliveryAddressFromSaved.js";
 import { validateRuDeliveryAddressForm } from "../../../entities/address/lib/validateRuDeliveryAddressForm.js";
 import {
+  ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
   ORDER_PAYMENT_METHOD_CARD_PREPAID,
   ORDER_PAYMENT_METHOD_DEFAULT,
   ORDER_PAYMENT_METHODS_SELECTABLE,
@@ -102,6 +105,9 @@ const EMPTY_SAVED_DELIVERY_ADDRESSES = [];
  *   sellerDeliveryAvailable?: boolean;
  *   cdekPicker?: import('react').ReactNode;
  *   cdekSelection?: { tariffCode: number; pickupPointCode: string; toCityCode: number } | null;
+ *   yandexAvailable?: boolean;
+ *   yandexPicker?: import('react').ReactNode;
+ *   yandexSelection?: { pickupPointId: string; recipient: { name: string; phone: string } } | null;
  * }} props
  */
 export function CheckoutForm({
@@ -135,9 +141,16 @@ export function CheckoutForm({
   sellerDeliveryAvailable = true,
   cdekPicker = null,
   cdekSelection = null,
+  yandexAvailable = false,
+  yandexPicker = null,
+  yandexSelection = null,
 }) {
   const generatedFormId = useId();
-  const [cdekChosenState, setCdekChosen] = useState(false);
+  // Служба внутри «Доставки», которую выбрал покупатель: null — своя
+  // доставка продавца, иначе СДЭК или Яндекс.
+  const [carrierChoice, setCarrierChoice] = useState(
+    /** @type {string | null} */ (null),
+  );
   const formId = formIdProp || generatedFormId;
   const [fulfillmentMethod, setFulfillmentMethod] = useState(() =>
     initialFulfillmentMethod === ORDER_FULFILLMENT_DELIVERY
@@ -165,30 +178,6 @@ export function CheckoutForm({
   const [paymentMethod, setPaymentMethod] = useState(ORDER_PAYMENT_METHOD_DEFAULT);
   const [localError, setLocalError] = useState("");
   const [deliveryMapOpen, setDeliveryMapOpen] = useState(false);
-
-  // Способы, которые реально уйдут на сервер: умеет площадка И принимает
-  // продавец. Считаем здесь же, а не только в пикере, потому что дефолтный
-  // «наличными» иначе остался бы выбранным у продавца, который наличные не
-  // берёт, — и заказ падал бы с 400 уже после нажатия кнопки.
-  const selectablePaymentMethods = useMemo(() => {
-    const platform = cardPrepaidAvailable
-      ? [...ORDER_PAYMENT_METHODS_SELECTABLE, ORDER_PAYMENT_METHOD_CARD_PREPAID]
-      : [...ORDER_PAYMENT_METHODS_SELECTABLE];
-    if (!Array.isArray(allowedPaymentMethods)) {
-      return platform;
-    }
-    return platform.filter((method) => allowedPaymentMethods.includes(method));
-  }, [cardPrepaidAvailable, allowedPaymentMethods]);
-
-  useEffect(() => {
-    if (selectablePaymentMethods.length === 0) {
-      return;
-    }
-    if (selectablePaymentMethods.includes(paymentMethod)) {
-      return;
-    }
-    setPaymentMethod(selectablePaymentMethods[0]);
-  }, [selectablePaymentMethods, paymentMethod]);
 
   const deliverySelectable = PRODUCT_DELIVERY_FULFILLMENT_ENABLED && deliveryAvailable;
   const pickupSelectable = pickupAvailable;
@@ -267,11 +256,53 @@ export function CheckoutForm({
   // Способ всегда один из двух — самовывоз или доставка. СДЭК — это служба
   // внутри доставки: вместо адреса покупателя нужен пункт выдачи. Если своей
   // доставки у продавца нет, СДЭК — единственная служба, и выбирать нечего.
-  const cdekChosen =
-    cdekAvailable &&
-    needsDelivery &&
-    !needsPickup &&
-    (cdekChosenState || !sellerDeliveryAvailable);
+  const carrierOptions = [
+    cdekAvailable ? SHIPPING_PROVIDER_CDEK : null,
+    yandexAvailable ? SHIPPING_PROVIDER_YANDEX_DELIVERY : null,
+  ].filter(Boolean);
+  const chosenCarrier =
+    !needsDelivery || needsPickup || carrierOptions.length === 0
+      ? null
+      : carrierOptions.includes(carrierChoice)
+        ? carrierChoice
+        : !sellerDeliveryAvailable
+          ? carrierOptions[0]
+          : null;
+  const cdekChosen = chosenCarrier === SHIPPING_PROVIDER_CDEK;
+  // Яндекс берёт в пункте только карту — и за товар, и за доставку.
+  const yandexChosen = chosenCarrier === SHIPPING_PROVIDER_YANDEX_DELIVERY;
+  const effectiveAllowedPaymentMethods = useMemo(() => {
+    if (!yandexChosen) return allowedPaymentMethods;
+    const base = Array.isArray(allowedPaymentMethods)
+      ? allowedPaymentMethods
+      : [ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY];
+    return base.filter((method) => method === ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY);
+  }, [yandexChosen, allowedPaymentMethods]);
+
+  // Способы, которые реально уйдут на сервер: умеет площадка И принимает
+  // продавец. Считаем здесь же, а не только в пикере, потому что дефолтный
+  // «наличными» иначе остался бы выбранным у продавца, который наличные не
+  // берёт, — и заказ падал бы с 400 уже после нажатия кнопки.
+  const selectablePaymentMethods = useMemo(() => {
+    const platform = cardPrepaidAvailable
+      ? [...ORDER_PAYMENT_METHODS_SELECTABLE, ORDER_PAYMENT_METHOD_CARD_PREPAID]
+      : [...ORDER_PAYMENT_METHODS_SELECTABLE];
+    if (!Array.isArray(effectiveAllowedPaymentMethods)) {
+      return platform;
+    }
+    return platform.filter((method) => effectiveAllowedPaymentMethods.includes(method));
+  }, [cardPrepaidAvailable, effectiveAllowedPaymentMethods]);
+
+  useEffect(() => {
+    if (selectablePaymentMethods.length === 0) {
+      return;
+    }
+    if (selectablePaymentMethods.includes(paymentMethod)) {
+      return;
+    }
+    setPaymentMethod(selectablePaymentMethods[0]);
+  }, [selectablePaymentMethods, paymentMethod]);
+
   const isPickup = needsPickup && !needsDelivery;
   const isMixedFulfillment = needsPickup && needsDelivery;
   const pickupGroups = useMemo(
@@ -365,6 +396,28 @@ export function CheckoutForm({
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    if (yandexChosen) {
+      if (!yandexSelection) {
+        setLocalError(CHECKOUT_FORM_UI.YANDEX_POINT_REQUIRED);
+        return;
+      }
+      if (paymentMethod !== ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY) {
+        setLocalError(CHECKOUT_FORM_UI.YANDEX_CARD_ONLY);
+        return;
+      }
+      setLocalError("");
+      void onSubmit({
+        fulfillmentMethod: ORDER_FULFILLMENT_DELIVERY,
+        deliveryAddress: "",
+        deliveryAddressFlat: "",
+        deliveryAddressGeo: null,
+        paymentMethod,
+        pickupSelections: [],
+        yandexDeliveryShipment: yandexSelection,
+      });
+      return;
+    }
 
     if (cdekChosen) {
       if (!cdekSelection) {
@@ -491,7 +544,7 @@ export function CheckoutForm({
       disabled={isDisabled || isSubmitting}
       legend={CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD}
       cardPrepaidAvailable={cardPrepaidAvailable}
-      allowedMethods={allowedPaymentMethods}
+      allowedMethods={effectiveAllowedPaymentMethods}
     />
   );
 
@@ -745,15 +798,23 @@ export function CheckoutForm({
                   disabled={isDisabled || isSubmitting}
                   courierDelivery={courierDelivery}
                   cdekAvailable={cdekAvailable}
+                  yandexAvailable={yandexAvailable}
                   sellerDeliveryAvailable={sellerDeliveryAvailable}
-                  cdekSelected={cdekChosen}
-                  onSelectCdek={(chosen) => {
+                  selectedCarrier={chosenCarrier}
+                  onSelectCarrier={(carrier) => {
                     setLocalError("");
-                    setCdekChosen(chosen);
+                    setCarrierChoice(carrier);
                   }}
                 />
 
-                {cdekChosen ? (
+                {yandexChosen ? (
+                  <>
+                    <p className="checkout-form__hint">
+                      {CHECKOUT_FORM_UI.YANDEX_CARD_ONLY_HINT}
+                    </p>
+                    {yandexPicker}
+                  </>
+                ) : cdekChosen ? (
                   cdekPicker
                 ) : (
                   <>

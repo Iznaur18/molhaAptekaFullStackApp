@@ -8,7 +8,10 @@ import {
   SHIPPING_SERVICE_COURIER,
   SHIPPING_SERVICE_PICKUP_POINT,
 } from "../lib/checkoutShippingProviderOptions.js";
-import { SHIPPING_PROVIDER_CDEK } from "@molha/api-contract";
+import {
+  SHIPPING_PROVIDER_CDEK,
+  SHIPPING_PROVIDER_YANDEX_DELIVERY,
+} from "@molha/api-contract";
 
 import { CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
 import { resolveClientViewerRegionCode } from "../../../entities/region/lib/viewerRegion.js";
@@ -27,25 +30,28 @@ const COURIER_OPTION_ID = "gitorg-courier";
  * Службы доставки в чекауте.
  *
  * Внутри «Доставки» покупатель выбирает службу из тех, что разрешил продавец:
- * его собственную доставку (или курьеров Gitorg) либо СДЭК, если продавец
- * подключил договор и включил тумблер. Остальные перевозчики пока «скоро».
+ * его собственную доставку (или курьеров Gitorg), СДЭК или Яндекс Доставку —
+ * те, по которым продавец подключил договор и включил тумблер. Остальные
+ * перевозчики пока «скоро».
  *
  * @param {{
  *   disabled?: boolean;
  *   courierDelivery?: "courier" | "seller" | "mixed" | null;
  *   cdekAvailable?: boolean;
+ *   yandexAvailable?: boolean;
  *   sellerDeliveryAvailable?: boolean;
- *   cdekSelected?: boolean;
- *   onSelectCdek?: (chosen: boolean) => void;
+ *   selectedCarrier?: string | null;
+ *   onSelectCarrier?: (carrier: string | null) => void;
  * }} props
  */
 export function CheckoutShippingProviderPicker({
   disabled = false,
   courierDelivery = null,
   cdekAvailable = false,
+  yandexAvailable = false,
   sellerDeliveryAvailable = true,
-  cdekSelected = false,
-  onSelectCdek = null,
+  selectedCarrier = null,
+  onSelectCarrier = null,
 }) {
   const { user } = useAuthSession();
   const scrollRef = useRef(/** @type {HTMLDivElement | null} */ (null));
@@ -61,21 +67,39 @@ export function CheckoutShippingProviderPicker({
     courierDelivery === "courier" || courierDelivery === "mixed";
   const isSellerSelected = courierDelivery === "seller" || courierDelivery === "mixed";
 
-  // Переключаться есть смысл, только когда у продавца две службы сразу.
-  const canSwitch =
-    cdekAvailable && sellerDeliveryAvailable && typeof onSelectCdek === "function";
+  // Службы продавца, помимо его собственной доставки.
+  const carrierCards = [
+    cdekAvailable
+      ? { id: SHIPPING_PROVIDER_CDEK, label: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_CDEK }
+      : null,
+    yandexAvailable
+      ? {
+          id: SHIPPING_PROVIDER_YANDEX_DELIVERY,
+          label: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_YANDEX,
+        }
+      : null,
+  ].filter(Boolean);
+  const carrierIds = new Set(carrierCards.map((card) => card.id));
+  const ownDeliverySelected = !selectedCarrier;
+  // Переключаться есть смысл, только когда у продавца больше одной службы.
+  const serviceCount = carrierCards.length + (sellerDeliveryAvailable ? 1 : 0);
+  const canSwitch = serviceCount > 1 && typeof onSelectCarrier === "function";
 
   const cards = [
     {
       id: COURIER_OPTION_ID,
       label: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_COURIER,
-      selected: !cdekSelected && isCourierSelected,
+      selected: ownDeliverySelected && isCourierSelected,
       locked: false,
       selectable: canSwitch && isCourierSelected,
     },
     ...providerOptions
-      // СДЭК решает продавец, а не общий список: ниже своя карточка.
-      .filter((option) => option.id !== SHIPPING_PROVIDER_CDEK)
+      // СДЭК и Яндекс решает продавец, а не общий список: ниже свои карточки.
+      .filter(
+        (option) =>
+          option.id !== SHIPPING_PROVIDER_CDEK &&
+          option.id !== SHIPPING_PROVIDER_YANDEX_DELIVERY,
+      )
       .map((option) => {
         const isSeller = option.id === CHECKOUT_SHIPPING_PROVIDER_SELLER;
         const label = resolveCheckoutShippingProviderLabel(option.id, {
@@ -84,23 +108,18 @@ export function CheckoutShippingProviderPicker({
         return {
           id: option.id,
           label,
-          selected: isSeller ? !cdekSelected && isSellerSelected : false,
+          selected: isSeller ? ownDeliverySelected && isSellerSelected : false,
           locked: !option.live,
           soon: !option.live,
           selectable: isSeller && canSwitch && isSellerSelected,
         };
       }),
-    ...(cdekAvailable
-      ? [
-          {
-            id: SHIPPING_PROVIDER_CDEK,
-            label: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_CDEK,
-            selected: cdekSelected,
-            locked: false,
-            selectable: canSwitch,
-          },
-        ]
-      : []),
+    ...carrierCards.map((card) => ({
+      ...card,
+      selected: selectedCarrier === card.id,
+      locked: false,
+      selectable: canSwitch,
+    })),
   ].sort((a, b) => Number(b.selected) - Number(a.selected));
 
   useEffect(() => {
@@ -158,7 +177,9 @@ export function CheckoutShippingProviderPicker({
               aria-checked={card.selected}
               aria-disabled={!card.selectable || disabled}
               disabled={!card.selectable || disabled}
-              onClick={() => onSelectCdek?.(card.id === SHIPPING_PROVIDER_CDEK)}
+              onClick={() =>
+                onSelectCarrier?.(carrierIds.has(card.id) ? card.id : null)
+              }
             >
               <span className="checkout-shipping-provider-picker__label">
                 {card.label}
