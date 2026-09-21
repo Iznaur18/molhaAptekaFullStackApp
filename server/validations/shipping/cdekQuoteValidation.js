@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  cdekIntakeBodySchema,
   cdekWaybillBodySchema,
   mongoIdSchema,
   cdekDeliveryPointsQuerySchema,
@@ -31,4 +32,9 @@ export const cdekWaybillParamsValidation = [
 
 export const cdekReceptionPointsValidation = [
   validateQueryZod(z.object({ city: z.string().trim().min(2).max(100) })),
+];
+
+export const cdekIntakeValidation = [
+  validateParamsZod(z.object({ orderId: mongoIdSchema })),
+  validateBodyZod(cdekIntakeBodySchema),
 ];

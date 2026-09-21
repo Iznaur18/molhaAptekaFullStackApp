@@ -10,11 +10,31 @@ import { CDEK_WAYBILL_UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import {
   createCdekWaybill,
+  fetchCdekLabel,
   fetchCdekReceptionPoints,
   refreshCdekWaybill,
 } from "../api/cdekWaybillApi.js";
 
+import { CdekIntakeSection } from "./CdekIntakeSection.jsx";
+
 import "./CdekWaybillPanel.css";
+
+/**
+ * Отдать файл пользователю: ссылка на blob и клик по ней.
+ *
+ * @param {Blob} blob
+ * @param {string} fileName
+ */
+function downloadBlob(blob, fileName) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
 
 /**
  * Накладная СДЭК в карточке продажи: куда едет посылка, кнопка создания и,
@@ -28,11 +48,18 @@ import "./CdekWaybillPanel.css";
  *   };
  *   onChanged?: () => void;
  *   closed?: boolean;
+ *   awaitingPayment?: boolean;
  * }} props
  *   closed: заказ закрыт (подтверждён, отменён или вернулся) — показываем
  *   только итог, без кнопок.
  */
-export function CdekWaybillPanel({ orderId, shipment, onChanged, closed = false }) {
+export function CdekWaybillPanel({
+  orderId,
+  shipment,
+  onChanged,
+  closed = false,
+  awaitingPayment = false,
+}) {
   const snapshot = shipment.cdekShipmentAtOrder ?? {};
   const [waybill, setWaybill] = useState(shipment.cdekWaybill ?? null);
   const pointToPoint = snapshot.deliveryMode === CDEK_DELIVERY_MODE_POINT_TO_POINT;
@@ -75,12 +102,20 @@ export function CdekWaybillPanel({ orderId, shipment, onChanged, closed = false 
 
       {waybill?.uuid ? (
         <WaybillState
+          orderId={orderId}
           waybill={waybill}
           closed={closed}
+          pointToPoint={pointToPoint}
+          onWaybillChange={(next) => {
+            setWaybill(next);
+            onChanged?.();
+          }}
           isRefreshing={refreshMutation.isPending}
           onRefresh={() => refreshMutation.mutate(orderId)}
         />
-      ) : closed ? null : (
+      ) : closed ? null : awaitingPayment ? (
+        <p className="cdek-waybill-panel__hint">{CDEK_WAYBILL_UI.AWAITING_PAYMENT}</p>
+      ) : (
         <WaybillCreateForm
           pointToPoint={pointToPoint}
           isPending={createMutation.isPending}
@@ -106,17 +141,36 @@ export function CdekWaybillPanel({ orderId, shipment, onChanged, closed = false 
 
 /**
  * @param {{
+ *   orderId: string;
  *   waybill: Record<string, any>;
  *   closed: boolean;
+ *   pointToPoint: boolean;
+ *   onWaybillChange: (waybill: Record<string, any>) => void;
  *   isRefreshing: boolean;
  *   onRefresh: () => void;
  * }} props
  */
-function WaybillState({ waybill, closed, isRefreshing, onRefresh }) {
+function WaybillState({
+  orderId,
+  waybill,
+  closed,
+  pointToPoint,
+  onWaybillChange,
+  isRefreshing,
+  onRefresh,
+}) {
   const returnDelivered =
     waybill.returnStatusCode === "DELIVERED" ||
     waybill.returnStatusCode === "POSTOMAT_RECEIVED";
   const canRefresh = !closed && !waybill.cancelledAt;
+  // Пока СДЭК посылку не принял: есть смысл в этикетке и курьере.
+  const beforeHandover =
+    canRefresh &&
+    ["", "ACCEPTED", "CREATED"].includes(String(waybill.statusCode ?? ""));
+  const labelMutation = useMutation({
+    mutationFn: fetchCdekLabel,
+    onSuccess: (blob) => downloadBlob(blob, `cdek-${waybill.cdekNumber}.pdf`),
+  });
   const trackingUrl = waybill.cdekNumber
     ? buildShippingTrackingUrl(SHIPPING_PROVIDER_CDEK, waybill.cdekNumber)
     : null;
@@ -171,6 +225,33 @@ function WaybillState({ waybill, closed, isRefreshing, onRefresh }) {
         <p className="cdek-waybill-panel__error" role="alert">
           {CDEK_WAYBILL_UI.REJECTED}: {waybill.error}
         </p>
+      ) : null}
+      {beforeHandover && waybill.cdekNumber ? (
+        <div className="cdek-waybill-panel__form">
+          <button
+            type="button"
+            className="cdek-waybill-panel__button cdek-waybill-panel__button--secondary"
+            onClick={() => labelMutation.mutate(orderId)}
+            disabled={labelMutation.isPending}
+          >
+            {labelMutation.isPending
+              ? CDEK_WAYBILL_UI.LABEL_PENDING
+              : CDEK_WAYBILL_UI.LABEL}
+          </button>
+          <p className="cdek-waybill-panel__hint">{CDEK_WAYBILL_UI.LABEL_HINT}</p>
+          {labelMutation.isError ? (
+            <p className="cdek-waybill-panel__error" role="alert">
+              {labelMutation.error.message}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+      {!pointToPoint && beforeHandover && waybill.cdekNumber ? (
+        <CdekIntakeSection
+          orderId={orderId}
+          intake={waybill.intake}
+          onBooked={onWaybillChange}
+        />
       ) : null}
       {canRefresh ? (
         <button

@@ -126,3 +126,11 @@
   font-size: 0.875rem;
   font-weight: 600;
 }
+
+.cdek-waybill-panel__field {
+  display: flex;
+  flex: 1 1 8rem;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}

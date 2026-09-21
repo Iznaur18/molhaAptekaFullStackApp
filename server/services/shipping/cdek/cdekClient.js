@@ -183,6 +183,41 @@ export async function cdekRequest(credentials, { method = "GET", path, query, bo
 }
 
 /**
+ * Скачать файл СДЭК (PDF этикетки) по абсолютной ссылке из ответа API.
+ * Ссылка отдаётся только под тем же токеном, поэтому качаем здесь.
+ *
+ * @param {CdekCredentials} credentials
+ * @param {string} fileUrl
+ * @returns {Promise<Buffer>}
+ */
+export async function cdekDownload(credentials, fileUrl) {
+  const baseUrl = resolveCdekBaseUrl(credentials.environment);
+  // Токен не отдаём на чужой хост, даже если СДЭК пришлёт такую ссылку.
+  if (new URL(fileUrl).host !== new URL(baseUrl).host) {
+    throw new AppError(502, CDEK_UNAVAILABLE_MESSAGE);
+  }
+  const token = await getCdekToken(credentials);
+  let response;
+  try {
+    response = await fetch(fileUrl, {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(CDEK_HTTP_TIMEOUT_MS),
+    });
+  } catch (error) {
+    logServerEvent("cdek.download_network_error", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    throw new AppError(502, CDEK_UNAVAILABLE_MESSAGE);
+  }
+  if (!response.ok) {
+    const detail = await readErrorText(response);
+    logServerEvent("cdek.download_failed", { status: response.status, detail });
+    throw new AppError(502, detail || CDEK_UNAVAILABLE_MESSAGE);
+  }
+  return Buffer.from(await response.arrayBuffer());
+}
+
+/**
  * Проверка ключей: если токен выдали — ключи рабочие.
  *
  * @param {CdekCredentials} credentials

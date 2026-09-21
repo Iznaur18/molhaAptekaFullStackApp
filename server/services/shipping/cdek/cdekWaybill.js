@@ -16,6 +16,7 @@ import { AppError } from "../../../errors/AppError.js";
 import { OrderModel, ProductModel } from "../../../models/index.js";
 import { logServerEvent } from "../../../utils/logServerEvent.js";
 
+import { assertOrderPrepaid } from "../../order/assertOrderPrepaid.js";
 import { resolveItemSellerId } from "../../order/orderShipments.js";
 
 import { cdekRequest } from "./cdekClient.js";
@@ -33,6 +34,10 @@ import { resolveSellerCdekCredentials } from "./cdekSellerCredentials.js";
  */
 
 const PRE_SHIPMENT = new Set(ORDER_PRE_SHIPMENT_STATUSES);
+
+/** @param {unknown} statusCode */
+const isBeforeCdekHandover = (statusCode) =>
+  !statusCode || CDEK_NOT_HANDED_OVER_STATUS_CODES.has(String(statusCode));
 
 /** Посылку забрал получатель — дальше опрашивать нечего. */
 const CDEK_DELIVERED_STATUS_CODES = new Set(["DELIVERED", "POSTOMAT_RECEIVED"]);
@@ -207,7 +212,7 @@ export function readCdekOrderState(payload) {
  * @param {string} sellerId
  * @param {Record<string, unknown>} waybill
  */
-async function saveWaybill(orderId, sellerId, waybill) {
+export async function saveWaybill(orderId, sellerId, waybill) {
   const set = { "shipments.$.cdekWaybill": waybill };
   if (waybill.cdekNumber) {
     set.shippingTrackingNumber = waybill.cdekNumber;
@@ -222,7 +227,7 @@ async function saveWaybill(orderId, sellerId, waybill) {
 /**
  * @param {{ orderId: string; sellerId: string }} params
  */
-async function loadSellerOrder({ orderId, sellerId }) {
+export async function loadSellerOrder({ orderId, sellerId }) {
   const order = await OrderModel.findById(orderId).lean();
   if (!order) {
     throw new AppError(404, "Заказ не найден");
@@ -244,6 +249,9 @@ export async function createCdekWaybill({
   shipmentPointCode = null,
 }) {
   const { order, shipment } = await loadSellerOrder({ orderId, sellerId });
+  // Предоплаченный заказ СДЭК везёт с нулевой оплатой за товар: создай мы
+  // накладную до оплаты — покупатель получил бы товар даром.
+  assertOrderPrepaid(order);
   if (shipment.cdekWaybill?.uuid) {
     throw new AppError(409, CDEK_WAYBILL_EXISTS_MESSAGE);
   }
@@ -345,6 +353,23 @@ export async function refreshCdekWaybill({ orderId, sellerId }) {
       returnState.statusCode ?? current.returnStatusCode ?? null;
   }
 
+  // Заявка на курьера — пока посылку не забрали. Её сбой не должен
+  // мешать главному: статусу самой накладной.
+  if (waybill.intake?.uuid && isBeforeCdekHandover(waybill.statusCode)) {
+    try {
+      const { refreshCdekIntake } = await import("./cdekIntake.js");
+      Object.assign(
+        waybill,
+        await refreshCdekIntake({ orderId, sellerId, waybill, credentials }),
+      );
+    } catch (error) {
+      logServerEvent("cdek.intake_refresh_failed", {
+        orderId: String(orderId),
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
   await saveWaybill(orderId, sellerId, waybill);
   await applyCdekStatusToOrder({ orderId, sellerId, statusCode: waybill.statusCode });
   if (CDEK_DELIVERED_STATUS_CODES.has(String(waybill.returnStatusCode ?? ""))) {
@@ -400,6 +425,14 @@ export async function cancelCdekWaybill({ orderId, sellerId }) {
       method: "DELETE",
       path: `/orders/${current.uuid}`,
     });
+    // Курьер без заказа приехал бы впустую. Сбой тут не важен: СДЭК снимает
+    // заявку вместе с удалённым заказом, это лишь подстраховка.
+    if (current.intake?.uuid) {
+      await cdekRequest(credentials, {
+        method: "DELETE",
+        path: `/intakes/${current.intake.uuid}`,
+      }).catch(() => null);
+    }
     await saveWaybill(orderId, sellerId, {
       ...current,
       cancelledAt: new Date(),

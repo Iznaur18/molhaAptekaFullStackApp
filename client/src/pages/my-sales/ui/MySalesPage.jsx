@@ -511,6 +511,7 @@ export function MySalesPage({
         ].join(":")}
         orderId={order._id}
         shipment={shipment}
+        awaitingPayment={order.paymentMethod === "cardPrepaid" && !order.prepaidPaidAt}
         closed={(order.items ?? []).every((item) =>
           CLOSED_ITEM_STATUSES.has(item.status),
         )}
