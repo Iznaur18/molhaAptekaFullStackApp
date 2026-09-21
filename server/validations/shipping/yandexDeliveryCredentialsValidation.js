@@ -30,4 +30,6 @@ export const yandexDeliveryPointsValidation = [
   validateQueryZod(yandexDeliveryPointsQuerySchema),
 ];
 
-export const yandexDeliveryQuoteValidation = [validateBodyZod(yandexDeliveryQuoteBodySchema)];
+export const yandexDeliveryQuoteValidation = [
+  validateBodyZod(yandexDeliveryQuoteBodySchema),
+];
