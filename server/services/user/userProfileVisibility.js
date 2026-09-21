@@ -5,6 +5,8 @@ import { sanitizeCourierProfileForViewer } from "@molha/api-contract";
  * Поля только для self/admin.
  * Баллы лояльности — публичны в карточке профиля.
  * Телефон чужим не отдаём в GET — только `hasPhoneNumber` + `GET .../phone` (rate limit).
+ * Почта — так же: `hasEmail` + `GET .../email` с тем же лимитом, чтобы её
+ * нельзя было выкачать списком.
  * Search по-прежнему режет телефон отдельно.
  */
 const USER_PRIVATE_PROFILE_FIELDS = [
@@ -100,6 +102,7 @@ export function sanitizeUserProfileForViewer(user, ctx) {
   }
 
   const hasPhoneNumber = Boolean(String(user.userPhoneNumber ?? "").trim());
+  const hasEmail = Boolean(String(user.email ?? "").trim());
   const out = stripPhoneNumber(stripPrivateProfileFields(user));
   delete out.userRole;
   delete out.isActiveUser;
@@ -110,6 +113,9 @@ export function sanitizeUserProfileForViewer(user, ctx) {
   delete out.notesAboutUser;
   if (hasPhoneNumber) {
     out.hasPhoneNumber = true;
+  }
+  if (hasEmail) {
+    out.hasEmail = true;
   }
 
   return applyCourierProfileVisibility(out, false);

@@ -43,6 +43,7 @@ import { userSearchController } from "./User/userSearchController.js";
 import { getUserPurchasesController } from "./User/getUserPurchasesController.js";
 import { getUserProductsController } from "./User/getUserProductsController.js";
 import { getUserPhoneController } from "./User/getUserPhoneController.js";
+import { getUserEmailController } from "./User/getUserEmailController.js";
 import { makeOrderController } from "./Order/makeOrderController.js";
 import { getMyOrdersController } from "./Order/getMyOrdersController.js";
 import { getMySalesController } from "./Order/getMySalesController.js";
@@ -419,6 +420,7 @@ export {
   getUserPurchasesController,
   getUserProductsController,
   getUserPhoneController,
+  getUserEmailController,
   makeOrderController,
   getMyOrdersController,
   getMySalesController,

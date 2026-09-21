@@ -261,6 +261,8 @@ export const USER_PROFILE_COPY = {
   SHOW_PHONE_NUMBER: "Показать номер",
   SHOW_PHONE_NUMBER_PENDING: "Загрузка…",
   SHOW_PHONE_NUMBER_ERROR: "Не удалось показать номер",
+  SHOW_EMAIL: "Показать почту",
+  SHOW_EMAIL_ERROR: "Не удалось показать почту",
   RATING_NONE: "Нет оценок",
   BACKGROUND_CUSTOM_IMAGE: "Своё изображение",
   DATE_FORMAT_OPTIONS: { dateStyle: "short", timeStyle: "short" },
