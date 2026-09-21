@@ -27,9 +27,12 @@ import "./CdekWaybillPanel.css";
  *     cdekWaybill?: Record<string, any> | null;
  *   };
  *   onChanged?: () => void;
+ *   closed?: boolean;
  * }} props
+ *   closed: заказ закрыт (подтверждён, отменён или вернулся) — показываем
+ *   только итог, без кнопок.
  */
-export function CdekWaybillPanel({ orderId, shipment, onChanged }) {
+export function CdekWaybillPanel({ orderId, shipment, onChanged, closed = false }) {
   const snapshot = shipment.cdekShipmentAtOrder ?? {};
   const [waybill, setWaybill] = useState(shipment.cdekWaybill ?? null);
   const pointToPoint = snapshot.deliveryMode === CDEK_DELIVERY_MODE_POINT_TO_POINT;
@@ -73,10 +76,11 @@ export function CdekWaybillPanel({ orderId, shipment, onChanged }) {
       {waybill?.uuid ? (
         <WaybillState
           waybill={waybill}
+          closed={closed}
           isRefreshing={refreshMutation.isPending}
           onRefresh={() => refreshMutation.mutate(orderId)}
         />
-      ) : (
+      ) : closed ? null : (
         <WaybillCreateForm
           pointToPoint={pointToPoint}
           isPending={createMutation.isPending}
@@ -86,7 +90,10 @@ export function CdekWaybillPanel({ orderId, shipment, onChanged }) {
         />
       )}
 
-      <p className="cdek-waybill-panel__hint">{CDEK_WAYBILL_UI.AUTO_STATUS_HINT}</p>
+      {/* У закрытого заказа статус уже не поменяется — подсказка лишняя. */}
+      {closed || waybill?.cancelledAt ? null : (
+        <p className="cdek-waybill-panel__hint">{CDEK_WAYBILL_UI.AUTO_STATUS_HINT}</p>
+      )}
 
       {error ? (
         <p className="cdek-waybill-panel__error" role="alert">
@@ -100,11 +107,16 @@ export function CdekWaybillPanel({ orderId, shipment, onChanged }) {
 /**
  * @param {{
  *   waybill: Record<string, any>;
+ *   closed: boolean;
  *   isRefreshing: boolean;
  *   onRefresh: () => void;
  * }} props
  */
-function WaybillState({ waybill, isRefreshing, onRefresh }) {
+function WaybillState({ waybill, closed, isRefreshing, onRefresh }) {
+  const returnDelivered =
+    waybill.returnStatusCode === "DELIVERED" ||
+    waybill.returnStatusCode === "POSTOMAT_RECEIVED";
+  const canRefresh = !closed && !waybill.cancelledAt;
   const trackingUrl = waybill.cdekNumber
     ? buildShippingTrackingUrl(SHIPPING_PROVIDER_CDEK, waybill.cdekNumber)
     : null;
@@ -135,19 +147,41 @@ function WaybillState({ waybill, isRefreshing, onRefresh }) {
           </div>
         ) : null}
       </dl>
+      {waybill.returnUuid ? (
+        <div className="cdek-waybill-panel__notice">
+          <p className="cdek-waybill-panel__notice-text">
+            {returnDelivered ? CDEK_WAYBILL_UI.RETURNED : CDEK_WAYBILL_UI.RETURNING}
+          </p>
+          {!returnDelivered && waybill.returnStatus ? (
+            <p className="cdek-waybill-panel__hint">
+              {CDEK_WAYBILL_UI.RETURN_STATUS}: {waybill.returnStatus}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+      {waybill.cancelledAt ? (
+        <p className="cdek-waybill-panel__hint">{CDEK_WAYBILL_UI.CANCELLED}</p>
+      ) : null}
+      {waybill.cancelError && !waybill.cancelledAt ? (
+        <p className="cdek-waybill-panel__error" role="alert">
+          {CDEK_WAYBILL_UI.CANCEL_FAILED(waybill.cancelError)}
+        </p>
+      ) : null}
       {waybill.error ? (
         <p className="cdek-waybill-panel__error" role="alert">
           {CDEK_WAYBILL_UI.REJECTED}: {waybill.error}
         </p>
       ) : null}
-      <button
-        type="button"
-        className="cdek-waybill-panel__button cdek-waybill-panel__button--secondary"
-        onClick={onRefresh}
-        disabled={isRefreshing}
-      >
-        {isRefreshing ? CDEK_WAYBILL_UI.REFRESH_PENDING : CDEK_WAYBILL_UI.REFRESH}
-      </button>
+      {canRefresh ? (
+        <button
+          type="button"
+          className="cdek-waybill-panel__button cdek-waybill-panel__button--secondary"
+          onClick={onRefresh}
+          disabled={isRefreshing}
+        >
+          {isRefreshing ? CDEK_WAYBILL_UI.REFRESH_PENDING : CDEK_WAYBILL_UI.REFRESH}
+        </button>
+      ) : null}
     </div>
   );
 }

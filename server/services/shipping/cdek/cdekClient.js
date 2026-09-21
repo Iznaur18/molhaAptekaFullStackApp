@@ -44,7 +44,17 @@ async function readErrorText(response) {
     if (!text) return "";
     try {
       const parsed = JSON.parse(text);
-      const errors = Array.isArray(parsed?.errors) ? parsed.errors : null;
+      // Методы заказов кладут ошибки в requests[].errors, остальные — в errors.
+      const requestErrors = Array.isArray(parsed?.requests)
+        ? parsed.requests.flatMap((row) =>
+            Array.isArray(row?.errors) ? row.errors : [],
+          )
+        : [];
+      const errors = Array.isArray(parsed?.errors)
+        ? parsed.errors
+        : requestErrors.length
+          ? requestErrors
+          : null;
       const detail =
         errors?.[0]?.message ?? parsed?.message ?? parsed?.error_description ?? null;
       if (typeof detail === "string") return detail.slice(0, 300);

@@ -23,10 +23,15 @@ const SNAPSHOT = {
   pickupPoint: { code: "KZN12", address: "Казань, ул. Баумана, 1" },
 };
 
-function renderPanel(shipment, onChanged = vi.fn()) {
+function renderPanel(shipment, onChanged = vi.fn(), closed = false) {
   render(
     <QueryClientProvider client={createTestQueryClient()}>
-      <CdekWaybillPanel orderId="order-1" shipment={shipment} onChanged={onChanged} />
+      <CdekWaybillPanel
+        orderId="order-1"
+        shipment={shipment}
+        onChanged={onChanged}
+        closed={closed}
+      />
     </QueryClientProvider>,
   );
   return { onChanged };
@@ -108,5 +113,45 @@ describe("накладная СДЭК в карточке продажи", () =>
     await screen.findByText("Принят на склад отправителя");
     expect(refreshCdekWaybillMock.mock.calls[0][0]).toBe("order-1");
     expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("закрытый заказ: только номер, без кнопок и подсказки", () => {
+    renderPanel(
+      {
+        cdekShipmentAtOrder: SNAPSHOT,
+        cdekWaybill: { uuid: "u-4", cdekNumber: "777" },
+      },
+      vi.fn(),
+      true,
+    );
+
+    expect(screen.getByText("777")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Обновить статус" })).toBeNull();
+    expect(screen.queryByText(/меняется сам/)).toBeNull();
+  });
+
+  it("отмена не прошла в СДЭК — просим отменить в кабинете", () => {
+    renderPanel({
+      cdekShipmentAtOrder: SNAPSHOT,
+      cdekWaybill: { uuid: "u-5", cdekNumber: "555", cancelError: "Заказ уже в пути" },
+    });
+
+    expect(screen.getByRole("alert").textContent).toContain("lk.cdek.ru");
+    expect(screen.getByRole("alert").textContent).toContain("Заказ уже в пути");
+  });
+
+  it("посылку везут обратно — говорим об этом и показываем статус возврата", () => {
+    renderPanel({
+      cdekShipmentAtOrder: SNAPSHOT,
+      cdekWaybill: {
+        uuid: "u-6",
+        cdekNumber: "666",
+        returnUuid: "r-6",
+        returnStatus: "Отправлен в г. транзит",
+      },
+    });
+
+    expect(screen.getByText(/везёт её обратно/)).toBeTruthy();
+    expect(screen.getByText(/Отправлен в г. транзит/)).toBeTruthy();
   });
 });

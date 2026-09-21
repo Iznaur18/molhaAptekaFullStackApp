@@ -37,6 +37,9 @@ import { resolveOrderLineSellerId } from "@izibuy/shared-lib";
 
 const EMPTY_ORDERS = [];
 
+/** Заказ, по которому уже ничего не произойдёт. */
+const CLOSED_ITEM_STATUSES = new Set(["confirmed", "cancelled", "returned"]);
+
 /**
  * Чей это заказ со стороны продавца.
  *
@@ -498,9 +501,19 @@ export function MySalesPage({
   const renderCdekWaybill = ({ order, shipment }) =>
     shipment?.cdekShipmentAtOrder ? (
       <CdekWaybillPanel
-        key={order._id}
+        // Накладная живёт в состоянии блока: свежие данные с сервера
+        // (опрос, отмена) пересоздают его.
+        key={[
+          order._id,
+          shipment.cdekWaybill?.syncedAt ?? "",
+          shipment.cdekWaybill?.cancelledAt ?? "",
+          shipment.cdekWaybill?.cancelError ?? "",
+        ].join(":")}
         orderId={order._id}
         shipment={shipment}
+        closed={(order.items ?? []).every((item) =>
+          CLOSED_ITEM_STATUSES.has(item.status),
+        )}
         onChanged={() => {
           void reloadSales();
         }}
