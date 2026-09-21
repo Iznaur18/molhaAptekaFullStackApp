@@ -298,3 +298,19 @@ describe("«Отгрузить» — последняя ступень, а не 
     ).not.toBeNull();
   });
 });
+
+describe("отправление СДЭК", () => {
+  it("«Отгрузить» нет: ступень ставит статус СДЭК", () => {
+    renderCard(makeOrder({ method: "delivery", carrier: "cdek" }));
+
+    expect(shipButton()).toBeNull();
+  });
+
+  it("«Доставлен» нет: вручение подтверждает СДЭК", () => {
+    renderCard(makeOrder({ method: "delivery", carrier: "cdek", status: "shipped" }));
+
+    expect(
+      screen.queryByRole("button", { name: ORDER_CARD_UI.ACTION_DELIVERED }),
+    ).toBeNull();
+  });
+});

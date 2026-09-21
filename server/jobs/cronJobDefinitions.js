@@ -10,6 +10,7 @@ import { ANALYTICS_RECONCILIATION_CRON_INTERVAL_MS } from "../constants/analytic
 import { COURIER_STUCK_SHIPMENT_CRON_INTERVAL_MS } from "../constants/courierConstants.js";
 import { ESCROW_CRON_INTERVAL_MS } from "../constants/escrowConstants.js";
 import { LOBO_POLL_INTERVAL_MS } from "../constants/loboConstants.js";
+import { CDEK_POLL_INTERVAL_MS } from "../constants/cdekConstants.js";
 import { SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS } from "../constants/sellerPersonalCategoryConstants.js";
 import { SITE_HEADER_BANNER_CAMPAIGN_CRON_INTERVAL_MS } from "../constants/siteHeaderBannerCampaignConstants.js";
 import {
@@ -23,6 +24,7 @@ import {
   JOB_PROCESS_COURIER_STUCK_SHIPMENTS,
   JOB_PROCESS_ESCROW_RELEASE,
   JOB_PROCESS_LOBO_CRON,
+  JOB_PROCESS_CDEK_STATUS_SYNC,
   JOB_PROCESS_PREMIUM_CRON,
   JOB_PROCESS_PRODUCT_PRICE_MARKET_STATUS_CRON,
   JOB_PROCESS_SELLER_PERSONAL_CATEGORY_CRON,
@@ -77,6 +79,10 @@ export const CRON_JOB_DEFINITIONS = [
   {
     name: JOB_PROCESS_LOBO_CRON,
     intervalMs: LOBO_POLL_INTERVAL_MS,
+  },
+  {
+    name: JOB_PROCESS_CDEK_STATUS_SYNC,
+    intervalMs: CDEK_POLL_INTERVAL_MS,
   },
   {
     name: JOB_PROCESS_ESCROW_RELEASE,

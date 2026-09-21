@@ -24,6 +24,7 @@ export const JOB_PROCESS_ONEC_SYNC_CRON = "processOneCSyncCronTasks";
 export const JOB_PROCESS_ONEC_COMMERCEML_IMPORT = "processOneCCommerceMlImport";
 export const JOB_PROCESS_ANALYTICS_RECONCILIATION = "processAnalyticsReconciliation";
 export const JOB_PROCESS_LOBO_CRON = "processLoboCronTasks";
+export const JOB_PROCESS_CDEK_STATUS_SYNC = "processCdekStatusSync";
 /** Разморозка эскроу по сроку после вручения. */
 export const JOB_PROCESS_ESCROW_RELEASE = "process-escrow-release";
 

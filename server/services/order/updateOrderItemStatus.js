@@ -56,6 +56,16 @@ import {
   resolveProductIdFromItem,
 } from "./orderItemStatusHelpers.js";
 
+/**
+ * Отправления СДЭК двигает опрос статусов: «Отгружен» — когда СДЭК принял
+ * посылку, «Доставлен» — когда вручил. Кнопкой продавец мог бы поставить то,
+ * чего не было.
+ */
+const CDEK_MANUAL_SHIP_MESSAGE =
+  "Заказ станет «Отгружен» сам, когда СДЭК примет посылку — нажмите «Обновить статус» в накладной";
+const CDEK_MANUAL_DELIVER_MESSAGE =
+  "Заказ станет «Доставлен» сам, когда СДЭК вручит посылку — нажмите «Обновить статус» в накладной";
+
 /** Товар ещё у продавца: отсюда можно и отменить, и отгрузить. */
 const PRE_SHIPMENT = new Set(ORDER_PRE_SHIPMENT_STATUSES);
 
@@ -112,6 +122,7 @@ const runConfirmItemSideEffects = async (order, targetItem, productId) => {
  *   itemIndex: number;
  *   sellerId: string;
  *   userId: string;
+ *   viaCarrierSync?: boolean;
  * }} input
  */
 export async function markOrderItemDeliveredBySeller({
@@ -119,11 +130,16 @@ export async function markOrderItemDeliveredBySeller({
   itemIndex,
   sellerId,
   userId,
+  viaCarrierSync = false,
 }) {
   const order = await loadOrderWithItems(orderId);
   assertOrderPrepaid(order);
   const targetItem = getPopulatedOrderItemOrThrow(order, itemIndex);
   assertSellerOwnsOrderItem(targetItem, sellerId);
+
+  if (!viaCarrierSync && isCdekShipment(order, targetItem)) {
+    throw new AppError(409, CDEK_MANUAL_DELIVER_MESSAGE);
+  }
 
   // Курьерская лестница приводит сюда из «На доставке», продавцовская — из
   // «Отправлен». Самовывоз — из «Готов к выдаче»: там ничего не везут, товар
@@ -224,6 +240,16 @@ function findItemShipment(order, item) {
 
 /**
  * @param {any} order
+ * @param {any} item
+ */
+function isCdekShipment(order, item) {
+  const shipment = findItemShipment(order, item);
+  const method = shipment?.fulfillmentMethod ?? order.fulfillmentMethod;
+  return method === "delivery" && shipment?.deliveryCarrier === SHIPPING_PROVIDER_CDEK;
+}
+
+/**
+ * @param {any} order
  * @param {any} shipment
  * @returns {"seller" | "courier" | "pickup"}
  */
@@ -240,7 +266,16 @@ function resolveShipmentKind(order, shipment) {
   return "seller";
 }
 
-export async function markOrderItemShippedBySeller({ orderId, itemIndex, sellerId }) {
+/**
+ * @param {{ orderId: string; itemIndex: number; sellerId: string; viaCarrierSync?: boolean }} input
+ *   viaCarrierSync: ступень ставит опрос службы доставки, а не кнопка продавца.
+ */
+export async function markOrderItemShippedBySeller({
+  orderId,
+  itemIndex,
+  sellerId,
+  viaCarrierSync = false,
+}) {
   const order = await loadOrderWithItems(orderId);
   assertOrderPrepaid(order);
   const targetItem = getPopulatedOrderItemOrThrow(order, itemIndex);
@@ -264,15 +299,8 @@ export async function markOrderItemShippedBySeller({ orderId, itemIndex, sellerI
   if (shipmentKind === "pickup") {
     throw new AppError(409, "Это отправление покупатель забирает сам");
   }
-  const shipment = findItemShipment(order, targetItem);
-  if (
-    shipment?.deliveryCarrier === SHIPPING_PROVIDER_CDEK &&
-    !shipment.cdekWaybill?.uuid
-  ) {
-    throw new AppError(
-      409,
-      "Сначала создайте накладную СДЭК — без неё посылку не примут в пункте",
-    );
+  if (!viaCarrierSync && isCdekShipment(order, targetItem)) {
+    throw new AppError(409, CDEK_MANUAL_SHIP_MESSAGE);
   }
 
   targetItem.status = ORDER_STATUS_SHIPPED;

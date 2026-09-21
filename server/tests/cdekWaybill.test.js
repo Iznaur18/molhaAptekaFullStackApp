@@ -189,3 +189,43 @@ describe("createCdekWaybill — проверки до обращения в СД
     );
   });
 });
+
+describe("статусы СДЭК → ступени заказа", () => {
+  it("созданная накладная заказ не двигает, приём — «Отгружен», вручение — «Доставлен»", async () => {
+    const { resolveOrderStepForCdekStatus } =
+      await import("../services/shipping/cdek/cdekWaybill.js");
+    assert.equal(resolveOrderStepForCdekStatus("CREATED"), null);
+    assert.equal(resolveOrderStepForCdekStatus("ACCEPTED"), null);
+    assert.equal(resolveOrderStepForCdekStatus("INVALID"), null);
+    assert.equal(
+      resolveOrderStepForCdekStatus("RECEIVED_AT_SHIPMENT_WAREHOUSE"),
+      "shipped",
+    );
+    assert.equal(resolveOrderStepForCdekStatus("ACCEPTED_AT_PICK_UP_POINT"), "shipped");
+    assert.equal(resolveOrderStepForCdekStatus("DELIVERED"), "delivered");
+    assert.equal(resolveOrderStepForCdekStatus("NOT_DELIVERED"), null);
+    assert.equal(resolveOrderStepForCdekStatus(""), null);
+  });
+
+  it("берёт самый свежий статус, а не первый в массиве", async () => {
+    const { readCdekOrderState } =
+      await import("../services/shipping/cdek/cdekWaybill.js");
+    const state = readCdekOrderState({
+      entity: {
+        cdek_number: "10323896114",
+        statuses: [
+          { code: "CREATED", name: "Создан", date_time: "2026-09-21T10:00:00+0000" },
+          {
+            code: "RECEIVED_AT_SHIPMENT_WAREHOUSE",
+            name: "Принят на склад отправителя",
+            date_time: "2026-09-22T09:00:00+0000",
+          },
+          { code: "ACCEPTED", name: "Принят", date_time: "2026-09-21T09:59:00+0000" },
+        ],
+      },
+    });
+    assert.equal(state.statusCode, "RECEIVED_AT_SHIPMENT_WAREHOUSE");
+    assert.equal(state.status, "Принят на склад отправителя");
+    assert.equal(state.cdekNumber, "10323896114");
+  });
+});
