@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
+  SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_LABEL_RU,
   SHIPPING_PROVIDERS,
 } from "@molha/api-contract";
@@ -82,6 +83,12 @@ function buildSelectedProfileIdSet(profileAddresses, selectedProfileIds) {
  *     productDeliveryEnabled: boolean;
  *     productRegionCode?: string | null;
  *   }) => void;
+ *   cdekControl?: {
+ *     connected: boolean;
+ *     enabled: boolean;
+ *     pending?: boolean;
+ *     onToggle: (enabled: boolean) => void;
+ *   } | null;
  * }} props
  */
 export function ProductPickupLocationFields({
@@ -95,6 +102,7 @@ export function ProductPickupLocationFields({
   disabled = false,
   savedAddresses = [],
   onChange,
+  cdekControl = null,
 }) {
   const carriersQuery = useShippingCarriersQuery();
   const list = useMemo(() => (Array.isArray(locations) ? locations : []), [locations]);
@@ -822,8 +830,41 @@ export function ProductPickupLocationFields({
               </label>
             ) : null}
 
+            {cdekControl ? (
+              // СДЭК — не вместо своей доставки, а рядом с ней: продавец может
+              // возить сам и отправлять СДЭК, покупатель выберет. Поэтому это
+              // отдельный флажок, а не ещё один вариант в радио-группе.
+              <label
+                className={[
+                  "product-pickup-location-fields__check",
+                  cdekControl.connected && cdekControl.enabled
+                    ? "product-pickup-location-fields__check_on"
+                    : "",
+                  !cdekControl.connected || disabled
+                    ? "product-pickup-location-fields__check_disabled"
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                <input
+                  type="checkbox"
+                  className="product-pickup-location-fields__checkbox"
+                  checked={cdekControl.connected && cdekControl.enabled}
+                  disabled={!cdekControl.connected || disabled || cdekControl.pending}
+                  onChange={(event) => cdekControl.onToggle(event.target.checked)}
+                />
+                <span className="product-pickup-location-fields__check-label">
+                  {SHIPPING_PROVIDER_LABEL_RU[SHIPPING_PROVIDER_CDEK]}
+                  {cdekControl.connected ? null : PRODUCT_PICKUP_UI.CDEK_NEEDS_KEYS}
+                </span>
+              </label>
+            ) : null}
+
             {SHIPPING_PROVIDERS.filter(
-              (providerId) => providerId !== PRODUCT_DELIVERY_CARRIER_LOBO,
+              (providerId) =>
+                providerId !== PRODUCT_DELIVERY_CARRIER_LOBO &&
+                !(cdekControl && providerId === SHIPPING_PROVIDER_CDEK),
             ).map((providerId) => (
               <label
                 key={providerId}

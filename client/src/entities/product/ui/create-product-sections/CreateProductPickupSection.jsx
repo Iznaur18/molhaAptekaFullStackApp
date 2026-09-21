@@ -9,6 +9,10 @@ import { useAuthSession } from "../../../user/model/useAuthSession.js";
 import { useMySellerCommerceDefaultsQuery } from "../../../seller-commerce-defaults/model/sellerCommerceDefaultsQueries.js";
 import { legacyPickupFieldsFromLocations } from "../../lib/productPickupLocationsForm.js";
 import { ProductPickupLocationFields } from "../ProductPickupLocationFields.jsx";
+import {
+  useMyCdekConnectionQuery,
+  useToggleCdekConnectionMutation,
+} from "../../../cdek/model/cdekConnectionQueries.js";
 import { ProductFulfillmentSourceSwitch } from "./ProductFulfillmentSourceSwitch.jsx";
 
 import "./CreateProductSections.css";
@@ -22,6 +26,8 @@ import "./CreateProductSections.css";
  */
 export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
   const { user } = useAuthSession();
+  const cdekConnectionQuery = useMyCdekConnectionQuery();
+  const cdekToggleMutation = useToggleCdekConnectionMutation();
   const defaultsQuery = useMySellerCommerceDefaultsQuery();
   const defaults = defaultsQuery.data ?? null;
 
@@ -72,6 +78,14 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
           sellerRegionCode={String(user?.userRegionCode ?? "")}
           disabled={isSubmitting}
           savedAddresses={savedAddresses}
+          // СДЭК включается на продавца целиком, а не на товар: это тот же
+          // тумблер, что в «Доставка и оплата», и действует на все товары.
+          cdekControl={{
+            connected: cdekConnectionQuery.data?.connected === true,
+            enabled: cdekConnectionQuery.data?.enabled !== false,
+            pending: cdekToggleMutation.isPending,
+            onToggle: (enabled) => cdekToggleMutation.mutate(enabled),
+          }}
           onChange={(next) => {
             const nextLocations = Array.isArray(next.productPickupLocations)
               ? next.productPickupLocations

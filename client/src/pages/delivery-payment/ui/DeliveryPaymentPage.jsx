@@ -23,6 +23,10 @@ import {
   useSaveSellerCommerceDefaultsMutation,
 } from "../../../entities/seller-commerce-defaults/model/sellerCommerceDefaultsQueries.js";
 import { CdekConnectionCard } from "../../../entities/cdek/ui/CdekConnectionCard.jsx";
+import {
+  useMyCdekConnectionQuery,
+  useToggleCdekConnectionMutation,
+} from "../../../entities/cdek/model/cdekConnectionQueries.js";
 import { SELLER_COMMERCE_DEFAULTS_UI } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 
@@ -143,6 +147,8 @@ export function DeliveryPaymentPage() {
   const defaultsQuery = useMySellerCommerceDefaultsQuery();
   const saveMutation = useSaveSellerCommerceDefaultsMutation();
   const { patchMutation } = useUserProfileMutations();
+  const cdekConnectionQuery = useMyCdekConnectionQuery();
+  const cdekToggleMutation = useToggleCdekConnectionMutation();
 
   const [form, setForm] = useState(() => formFromDefaults(undefined));
   const [sellerPayoutRequisites, setSellerPayoutRequisites] = useState("");
@@ -312,6 +318,14 @@ export function DeliveryPaymentPage() {
             sellerRegionCode={String(user?.userRegionCode ?? "")}
             disabled={isSubmitting}
             savedAddresses={savedAddresses}
+            // Флажок «СДЭК» — тот же тумблер, что в карточке ключей ниже:
+            // сохраняется сразу, без общей кнопки «Сохранить».
+            cdekControl={{
+              connected: cdekConnectionQuery.data?.connected === true,
+              enabled: cdekConnectionQuery.data?.enabled !== false,
+              pending: cdekToggleMutation.isPending,
+              onToggle: (enabled) => cdekToggleMutation.mutate(enabled),
+            }}
             onChange={(next) => {
               setSavedMessage("");
               setForm((prev) => ({
