@@ -750,6 +750,21 @@ const UserSchema = new mongoose.Schema(
       _id: false,
     },
     /**
+     * Яндекс Доставка «в другой день» по договору самого продавца — та же
+     * схема, что у СДЭК: токен из кабинета dostavka.yandex.ru и тумблер.
+     */
+    yandexDeliveryIntegration: {
+      enabled: { type: Boolean, default: true },
+      /** OAuth-токен из профиля компании; AES-GCM blob, наружу не отдаётся. */
+      tokenSealed: { type: mongoose.Schema.Types.Mixed, default: null },
+      /** Последние символы токена — чтобы продавец узнал свой. */
+      tokenTail: { type: String, default: "", trim: true, maxlength: 8 },
+      environment: { type: String, enum: ["prod", "test"], default: "prod" },
+      validatedAt: { type: Date, default: null },
+      lastError: { type: String, default: "", trim: true, maxlength: 500 },
+      _id: false,
+    },
+    /**
      * Способы оплаты, которые принимает продавец.
      *
      * Пустой массив читается как «не настраивал» и означает все способы:

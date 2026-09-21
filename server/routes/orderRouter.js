@@ -6,6 +6,7 @@ import {
   postCdekQuoteController,
   getCdekDeliveryPointsController,
   getCdekAvailabilityController,
+  getYandexDeliveryAvailabilityController,
   postCdekWaybillController,
   getCdekWaybillController,
   getCdekReceptionPointsController,
@@ -89,6 +90,13 @@ router.get(
   checkAuthMW,
   cdekAvailabilityValidation,
   getCdekAvailabilityController,
+);
+// Яндекс Доставка: предлагает ли её продавец (корзина спрашивает до расчёта).
+router.get(
+  "/yandex-delivery-availability",
+  checkAuthMW,
+  cdekAvailabilityValidation,
+  getYandexDeliveryAvailabilityController,
 );
 router.get(
   "/cdek-reception-points",

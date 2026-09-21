@@ -115,6 +115,10 @@ import {
   cdekToggleValidation,
 } from "./shipping/cdekCredentialsValidation.js";
 import {
+  yandexDeliveryCredentialsValidation,
+  yandexDeliveryToggleValidation,
+} from "./shipping/yandexDeliveryCredentialsValidation.js";
+import {
   cdekQuoteValidation,
   cdekDeliveryPointsValidation,
   cdekAvailabilityValidation,
@@ -343,4 +347,6 @@ export {
   cdekWaybillParamsValidation,
   cdekReceptionPointsValidation,
   cdekIntakeValidation,
+  yandexDeliveryCredentialsValidation,
+  yandexDeliveryToggleValidation,
 };

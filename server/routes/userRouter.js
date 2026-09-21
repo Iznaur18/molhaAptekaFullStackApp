@@ -20,6 +20,10 @@ import {
   putCdekCredentialsController,
   deleteCdekCredentialsController,
   patchCdekCredentialsController,
+  getYandexDeliveryCredentialsController,
+  putYandexDeliveryCredentialsController,
+  deleteYandexDeliveryCredentialsController,
+  patchYandexDeliveryCredentialsController,
   blockUserController,
   unblockUserController,
   listMyBlockedUsersController,
@@ -68,6 +72,8 @@ import {
   userFollowListValidation,
   cdekCredentialsValidation,
   cdekToggleValidation,
+  yandexDeliveryCredentialsValidation,
+  yandexDeliveryToggleValidation,
   userBlockListValidation,
   userStoryIdParamValidation,
   createUserStoryValidation,
@@ -177,6 +183,30 @@ router.patch(
   checkAuthMW,
   cdekToggleValidation,
   patchCdekCredentialsController,
+);
+
+// Токен Яндекс Доставки продавца — та же схема, что ключи СДЭК.
+router.get(
+  "/me/yandex-delivery-credentials",
+  checkAuthMW,
+  getYandexDeliveryCredentialsController,
+);
+router.put(
+  "/me/yandex-delivery-credentials",
+  checkAuthMW,
+  yandexDeliveryCredentialsValidation,
+  putYandexDeliveryCredentialsController,
+);
+router.delete(
+  "/me/yandex-delivery-credentials",
+  checkAuthMW,
+  deleteYandexDeliveryCredentialsController,
+);
+router.patch(
+  "/me/yandex-delivery-credentials",
+  checkAuthMW,
+  yandexDeliveryToggleValidation,
+  patchYandexDeliveryCredentialsController,
 );
 
 router.get(
