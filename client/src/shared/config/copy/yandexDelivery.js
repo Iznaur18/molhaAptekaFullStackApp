@@ -28,4 +28,17 @@ export const YANDEX_DELIVERY_CONNECTION_UI = {
   TOGGLE_LABEL: "Продавать через Яндекс Доставку",
   TOGGLE_ON_HINT: "Покупатели видят Яндекс Доставку среди служб доставки ваших товаров",
   TOGGLE_OFF_HINT: "Яндекс Доставка скрыта от покупателей",
+  DROPOFF_TITLE: "Куда вы сдаёте посылки",
+  DROPOFF_HINT:
+    "Яндекс принимает отправления только в своих пунктах: выберите тот, куда будете относить коробки. Цену доставки Яндекс считает от него.",
+  DROPOFF_MISSING: "Пункт не выбран — покупатели пока не видят Яндекс Доставку",
+  DROPOFF_CURRENT: "Сейчас",
+  DROPOFF_CITY_LABEL: "Город",
+  DROPOFF_CITY_PLACEHOLDER: "Например, Грозный",
+  DROPOFF_FIND: "Найти пункты",
+  DROPOFF_FIND_PENDING: "Ищем…",
+  DROPOFF_POINT_LABEL: "Пункт приёма",
+  DROPOFF_EMPTY: "В этом городе нет пунктов Яндекса, принимающих отправления",
+  DROPOFF_SAVE: "Сохранить пункт",
+  DROPOFF_SAVE_PENDING: "Сохраняем…",
 };

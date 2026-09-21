@@ -9,6 +9,8 @@ import {
   useToggleYandexDeliveryConnectionMutation,
 } from "../model/yandexDeliveryConnectionQueries.js";
 
+import { YandexDropoffPicker } from "./YandexDropoffPicker.jsx";
+
 // Оформление общее с карточкой СДЭК: две службы стоят рядом и должны
 // выглядеть одной системой.
 import "../../cdek/ui/CdekConnectionCard.css";
@@ -115,6 +117,10 @@ export function YandexDeliveryConnectionCard() {
           ))}
         </ol>
       )}
+
+      {isConnected ? (
+        <YandexDropoffPicker dropoff={connection.dropoff ?? null} />
+      ) : null}
 
       <form className="cdek-connection-card__form" onSubmit={handleSubmit}>
         <label className="cdek-connection-card__field" htmlFor={tokenId}>

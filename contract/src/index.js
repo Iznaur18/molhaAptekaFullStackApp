@@ -779,6 +779,15 @@ export {
   yandexDeliveryToggleBodySchema,
   yandexDeliveryConnectionStateSchema,
   maskYandexDeliveryToken,
+  YANDEX_DELIVERY_QUOTE_MAX_ITEMS,
+  yandexDeliveryCityQuerySchema,
+  yandexDeliveryPointsQuerySchema,
+  yandexDeliveryDropoffBodySchema,
+  yandexDeliveryQuoteBodySchema,
+  yandexDeliveryOrderSelectionSchema,
+  YANDEX_DELIVERY_CARD_ONLY_MESSAGE,
+  YANDEX_DELIVERY_POINT_GONE_MESSAGE,
+  YANDEX_DELIVERY_NO_DROPOFF_MESSAGE,
 } from "./yandexDelivery.js";
 export {
   PRODUCT_WEIGHT_G_MIN,

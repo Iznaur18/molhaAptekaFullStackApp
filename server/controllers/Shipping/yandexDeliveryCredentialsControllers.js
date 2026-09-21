@@ -5,7 +5,13 @@ import {
   removeSellerYandexDeliveryToken,
   saveSellerYandexDeliveryToken,
   setSellerYandexDeliveryEnabled,
+  listSellerYandexDropoffPoints,
+  setSellerYandexDropoffStation,
 } from "../../services/shipping/yandex/yandexDeliverySellerCredentials.js";
+import {
+  listYandexPointsForBuyer,
+  quoteYandexDeliveryShipment,
+} from "../../services/shipping/yandex/yandexDeliveryShipment.js";
 import { UserModel } from "../../models/index.js";
 
 /*
@@ -63,4 +69,40 @@ export const getYandexDeliveryAvailabilityController = async (req, res) => {
   return successRes(res, {
     available: isYandexDeliveryOfferedBySeller(seller?.yandexDeliveryIntegration),
   });
+};
+
+/** GET /user/me/yandex-delivery-dropoff-points?city= — куда продавец может сдавать посылки. */
+export const getYandexDeliveryDropoffPointsController = async (req, res) => {
+  const result = await listSellerYandexDropoffPoints({
+    sellerId: req.userId,
+    city: String(req.query.city),
+  });
+  return successRes(res, result);
+};
+
+/** PUT /user/me/yandex-delivery-dropoff — запомнить пункт сдачи. */
+export const putYandexDeliveryDropoffController = async (req, res) => {
+  const yandexDelivery = await setSellerYandexDropoffStation({
+    sellerId: req.userId,
+    stationId: req.body.stationId,
+  });
+  return successRes(res, { message: "Пункт сдачи сохранён", yandexDelivery });
+};
+
+/** GET /order/yandex-delivery-points?sellerId=&city= — пункты выдачи для покупателя. */
+export const getYandexDeliveryPointsController = async (req, res) => {
+  const result = await listYandexPointsForBuyer({
+    sellerId: String(req.query.sellerId),
+    city: String(req.query.city),
+  });
+  return successRes(res, result);
+};
+
+/** POST /order/yandex-delivery-quote — цена и срок до выбранного пункта. */
+export const postYandexDeliveryQuoteController = async (req, res) => {
+  const result = await quoteYandexDeliveryShipment({
+    items: req.body.items,
+    pickupPointId: req.body.pickupPointId,
+  });
+  return successRes(res, result);
 };

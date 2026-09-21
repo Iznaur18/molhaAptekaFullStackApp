@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { marketingAttributionSchema } from "./marketingAttribution.js";
 import { cdekOrderSelectionSchema } from "./cdek.js";
+import { yandexDeliveryOrderSelectionSchema } from "./yandexDelivery.js";
 import { mongoIdSchema } from "./mongoId.js";
 import { ADDRESS_LINE_MAX_LENGTH } from "./userFields.js";
 import {
@@ -148,6 +149,8 @@ export const createOrderBodySchema = z
      * Адрес заказа — адрес пункта, поэтому deliveryAddress тогда не нужен.
      */
     cdekShipment: cdekOrderSelectionSchema.nullable().optional(),
+    /** Яндекс Доставка до пункта выдачи — так же, как СДЭК: только выбор. */
+    yandexDeliveryShipment: yandexDeliveryOrderSelectionSchema.nullable().optional(),
     paymentMethod: z.enum(ORDER_PAYMENT_METHODS),
     priceOfferId: mongoIdSchema.optional(),
     /** Код шарера (`referralCode`) из `?aff=` — last-click attribution. */
@@ -198,9 +201,17 @@ export const createOrderBodySchema = z
       (method) => method === "delivery",
     );
     // У СДЭК адрес — это пункт выдачи, его подставит сервер.
+    if (body.cdekShipment && body.yandexDeliveryShipment) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["yandexDeliveryShipment"],
+        message: "Выберите одну службу доставки",
+      });
+    }
     if (
       (body.fulfillmentMethod === "delivery" || anySellerDelivery) &&
-      !body.cdekShipment
+      !body.cdekShipment &&
+      !body.yandexDeliveryShipment
     ) {
       const line = String(body.deliveryAddress ?? "").trim();
       if (!line) {

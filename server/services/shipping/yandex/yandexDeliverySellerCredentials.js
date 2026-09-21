@@ -10,6 +10,11 @@ import { logServerEvent } from "../../../utils/logServerEvent.js";
 
 import { verifyYandexDeliveryToken } from "./yandexDeliveryClient.js";
 import {
+  detectYandexGeoId,
+  findYandexPoint,
+  listYandexPoints,
+} from "./yandexDeliveryPoints.js";
+import {
   openYandexDeliveryToken,
   sealYandexDeliveryToken,
   yandexDeliveryTokenNeedsReseal,
@@ -31,13 +36,25 @@ const normalizeEnvironment = (environment) =>
  */
 export function readYandexDeliveryConnectionState(raw) {
   const tail = typeof raw?.tokenTail === "string" ? raw.tokenTail : "";
+  const dropoffId = String(raw?.dropoffStation?.id ?? "").trim();
+  const dropoff = dropoffId
+    ? {
+        id: dropoffId,
+        name: String(raw.dropoffStation.name ?? ""),
+        address: String(raw.dropoffStation.address ?? ""),
+      }
+    : null;
+  const connected = Boolean(raw?.tokenSealed);
   return {
-    connected: Boolean(raw?.tokenSealed),
+    connected,
     enabled: raw?.enabled !== false,
     environment: normalizeEnvironment(raw?.environment),
     tokenMasked: tail ? `••••${tail}` : "",
     validatedAt: raw?.validatedAt ?? null,
     lastError: typeof raw?.lastError === "string" ? raw.lastError : "",
+    dropoff,
+    // Готово к продажам: токен есть и пункт сдачи выбран.
+    ready: connected && dropoff !== null,
   };
 }
 
@@ -48,7 +65,7 @@ export function readYandexDeliveryConnectionState(raw) {
  */
 export function isYandexDeliveryOfferedBySeller(raw) {
   const state = readYandexDeliveryConnectionState(raw);
-  return state.connected && state.enabled;
+  return state.ready && state.enabled;
 }
 
 /**
@@ -95,7 +112,11 @@ export async function resolveSellerYandexDeliveryCredentials(
     ).catch(() => null);
   }
 
-  return { token, environment: normalizeEnvironment(raw.environment) };
+  return {
+    token,
+    environment: normalizeEnvironment(raw.environment),
+    dropoffStationId: String(raw.dropoffStation?.id ?? "").trim() || null,
+  };
 }
 
 /**
@@ -190,5 +211,51 @@ export async function setSellerYandexDeliveryEnabled({ sellerId, enabled }) {
     sellerId: String(sellerId),
     enabled: enabled === true,
   });
+  return readYandexDeliveryConnectionState(updated?.yandexDeliveryIntegration);
+}
+
+/**
+ * Пункты, куда продавец может сдать посылку, — ключом самого продавца.
+ *
+ * @param {{ sellerId: string; city: string }} params
+ */
+export async function listSellerYandexDropoffPoints({ sellerId, city }) {
+  const credentials = await resolveSellerYandexDeliveryCredentials(sellerId);
+  const geoId = await detectYandexGeoId(credentials, city);
+  if (!geoId) return { points: [], geoId: null };
+  const points = await listYandexPoints(credentials, { geoId, purpose: "dropoff" });
+  return { points, geoId };
+}
+
+/**
+ * Запомнить пункт сдачи. Проверяем у Яндекса, что он существует и принимает
+ * отправления: с неверным id ни один расчёт у покупателя не прошёл бы.
+ *
+ * @param {{ sellerId: string; stationId: string }} params
+ */
+export async function setSellerYandexDropoffStation({ sellerId, stationId }) {
+  const credentials = await resolveSellerYandexDeliveryCredentials(sellerId);
+  const point = await findYandexPoint(credentials, stationId);
+  if (!point || !point.availableForDropoff) {
+    throw new AppError(
+      409,
+      "Этот пункт Яндекса не принимает отправления — выберите другой",
+    );
+  }
+  const updated = await UserModel.findByIdAndUpdate(
+    sellerId,
+    {
+      $set: {
+        "yandexDeliveryIntegration.dropoffStation": {
+          id: point.id,
+          name: point.name,
+          address: point.address,
+          geoId: point.geoId,
+        },
+      },
+    },
+    { new: true, projection: "yandexDeliveryIntegration" },
+  ).lean();
+  logServerEvent("yandex_delivery.dropoff_set", { sellerId: String(sellerId) });
   return readYandexDeliveryConnectionState(updated?.yandexDeliveryIntegration);
 }

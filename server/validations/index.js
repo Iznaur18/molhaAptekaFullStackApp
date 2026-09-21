@@ -117,6 +117,10 @@ import {
 import {
   yandexDeliveryCredentialsValidation,
   yandexDeliveryToggleValidation,
+  yandexDeliveryDropoffPointsValidation,
+  yandexDeliveryDropoffValidation,
+  yandexDeliveryPointsValidation,
+  yandexDeliveryQuoteValidation,
 } from "./shipping/yandexDeliveryCredentialsValidation.js";
 import {
   cdekQuoteValidation,
@@ -349,4 +353,8 @@ export {
   cdekIntakeValidation,
   yandexDeliveryCredentialsValidation,
   yandexDeliveryToggleValidation,
+  yandexDeliveryDropoffPointsValidation,
+  yandexDeliveryDropoffValidation,
+  yandexDeliveryPointsValidation,
+  yandexDeliveryQuoteValidation,
 };

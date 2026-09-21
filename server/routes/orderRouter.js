@@ -7,6 +7,8 @@ import {
   getCdekDeliveryPointsController,
   getCdekAvailabilityController,
   getYandexDeliveryAvailabilityController,
+  getYandexDeliveryPointsController,
+  postYandexDeliveryQuoteController,
   postCdekWaybillController,
   getCdekWaybillController,
   getCdekReceptionPointsController,
@@ -43,6 +45,8 @@ import {
   cdekQuoteValidation,
   cdekDeliveryPointsValidation,
   cdekAvailabilityValidation,
+  yandexDeliveryPointsValidation,
+  yandexDeliveryQuoteValidation,
   cdekWaybillValidation,
   cdekWaybillParamsValidation,
   cdekReceptionPointsValidation,
@@ -97,6 +101,18 @@ router.get(
   checkAuthMW,
   cdekAvailabilityValidation,
   getYandexDeliveryAvailabilityController,
+);
+router.get(
+  "/yandex-delivery-points",
+  checkAuthMW,
+  yandexDeliveryPointsValidation,
+  getYandexDeliveryPointsController,
+);
+router.post(
+  "/yandex-delivery-quote",
+  checkAuthMW,
+  yandexDeliveryQuoteValidation,
+  postYandexDeliveryQuoteController,
 );
 router.get(
   "/cdek-reception-points",

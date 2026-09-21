@@ -151,6 +151,7 @@ export const buildStoredShipments = (items, options = {}) => {
     deliveryCarrierBySellerId = null,
     sellerDeliveryBySellerId = null,
     cdekShipmentBySellerId = null,
+    yandexDeliveryShipmentBySellerId = null,
   } = options ?? {};
 
   const grouped = groupOrderItemsBySellerId(items);
@@ -200,6 +201,12 @@ export const buildStoredShipments = (items, options = {}) => {
       // покупатель платит СДЭК при получении, в сумму заказа они не входят.
       ...(cdekShipmentBySellerId?.[bucket.sellerId]
         ? { cdekShipmentAtOrder: cdekShipmentBySellerId[bucket.sellerId] }
+        : {}),
+      ...(yandexDeliveryShipmentBySellerId?.[bucket.sellerId]
+        ? {
+            yandexDeliveryShipmentAtOrder:
+              yandexDeliveryShipmentBySellerId[bucket.sellerId],
+          }
         : {}),
     });
   }

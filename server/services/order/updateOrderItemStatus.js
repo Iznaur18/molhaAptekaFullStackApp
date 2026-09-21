@@ -8,7 +8,10 @@ import {
   ORDER_STATUS_RETURNED,
   ORDER_STATUS_SHIPPED,
 } from "../../constants/orderConstants.js";
-import { SHIPPING_PROVIDER_CDEK } from "@molha/api-contract";
+import {
+  SHIPPING_PROVIDER_CDEK,
+  SHIPPING_PROVIDER_YANDEX_DELIVERY,
+} from "@molha/api-contract";
 
 import { AppError } from "../../errors/AppError.js";
 import { ESCROW_REFUND_REASON_ITEM_RETURNED } from "../../constants/escrowConstants.js";
@@ -259,6 +262,9 @@ function resolveShipmentKind(order, shipment) {
   // СДЭК забирает посылку у продавца в пункте или у двери: отгружает продавец,
   // курьеров Gitorg и кода у двери тут нет.
   if (shipment?.deliveryCarrier === SHIPPING_PROVIDER_CDEK) return "seller";
+  // Яндекс Доставка: посылку продавец сдаёт в пункт сам, как со СДЭК. Пока
+  // заявок в Яндекс нет, ступени «Отгружен»/«Доставлен» продавец ставит сам.
+  if (shipment?.deliveryCarrier === SHIPPING_PROVIDER_YANDEX_DELIVERY) return "seller";
   // Внешняя служба или курьеры Gitorg — товар отгружает не продавец.
   if (shipment?.courierDelivery === true || shipment?.deliveryCarrier) {
     return shipment?.deliveryCarrier === "seller" ? "seller" : "courier";

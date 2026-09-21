@@ -186,6 +186,17 @@ export const CHECKOUT_FORM_UI = {
   FULFILLMENT_DELIVERY_SOON: "Скоро",
   FULFILLMENT_CDEK: "СДЭК: пункт выдачи",
   CDEK_POINT_REQUIRED: "Выберите пункт выдачи СДЭК и укажите получателя с телефоном",
+  YANDEX_POINT_REQUIRED:
+    "Выберите пункт выдачи Яндекса и укажите получателя с телефоном",
+  YANDEX_CARD_ONLY: "С Яндекс Доставкой оплата только картой в пункте выдачи",
+  YANDEX_POINT_LABEL: "Пункт выдачи Яндекса",
+  YANDEX_RECIPIENT_PHONE: "Телефон получателя — на него Яндекс пришлёт код получения",
+  YANDEX_NO_POINTS:
+    "В этом городе нет пунктов Яндекса с оплатой картой — выберите другую службу",
+  YANDEX_PRICE: (sumRub, days) => (days ? `${sumRub} ₽ · ${days} дн.` : `${sumRub} ₽`),
+  YANDEX_PRICING: "Считаем доставку…",
+  YANDEX_CARD_ONLY_HINT:
+    "Товар и доставку вы оплатите картой в пункте выдачи Яндекса, когда заберёте заказ",
   CDEK_CITY_LABEL: "Город получения",
   CDEK_CITY_PLACEHOLDER: "Например, Москва",
   CDEK_FIND_POINTS: "Найти пункты",
@@ -223,6 +234,7 @@ export const CHECKOUT_FORM_UI = {
   SHIPPING_PROVIDER_SELLER: "Доставка продавцом",
   SHIPPING_PROVIDER_COURIER: "Курьеры Gitorg",
   SHIPPING_PROVIDER_CDEK: "СДЭК",
+  SHIPPING_PROVIDER_YANDEX: "Яндекс Доставка",
   /** @param {string} cost @param {string} carrier */
   SHIPPING_ESTIMATE: (cost, carrier) => `${carrier}: примерно ${cost}`,
   SHIPPING_ESTIMATE_HINT: "Точную сумму назовёт курьер при получении.",
