@@ -22,6 +22,7 @@ import {
   useSetShipmentPaymentConfirmedMutation,
 } from "../../../entities/courier/model/courierQueries.js";
 import { OrderCard } from "../../../entities/order/ui/OrderCard.jsx";
+import { CdekWaybillPanel } from "../../../entities/cdek/ui/CdekWaybillPanel.jsx";
 import { useCatalogProductDetailsOpener } from "../../../entities/product/lib/useCatalogProductDetailsOpener.js";
 import { API_CLIENT_UI, MY_SALES_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
@@ -493,6 +494,19 @@ export function MySalesPage({
     }
   };
 
+  /** Накладная СДЭК — только у отправлений, которые покупатель заказал через СДЭК. */
+  const renderCdekWaybill = ({ order, shipment }) =>
+    shipment?.cdekShipmentAtOrder ? (
+      <CdekWaybillPanel
+        key={order._id}
+        orderId={order._id}
+        shipment={shipment}
+        onChanged={() => {
+          void reloadSales();
+        }}
+      />
+    ) : null;
+
   const emptyMessage = hasSearchQuery
     ? MY_SALES_PAGE_UI.EMPTY_BY_SEARCH
     : hasFilters
@@ -592,6 +606,7 @@ export function MySalesPage({
                 onCancelOrder={handleCancelOrder}
                 pendingActionKey={pendingActionKey}
                 itemActionErrors={itemActionErrors}
+                renderShipmentExtra={renderCdekWaybill}
               />
             </li>
           ))}

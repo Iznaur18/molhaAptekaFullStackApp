@@ -137,6 +137,13 @@ export function CheckoutShippingProviderPicker({
               ? "checkout-shipping-provider-picker__card--selected"
               : "checkout-shipping-provider-picker__card--idle",
             card.locked ? "checkout-shipping-provider-picker__card--locked" : "",
+            // Нажать можно — видно сразу; нельзя — карточка бледная и без рамки-акцента.
+            !card.selected && card.selectable && !disabled
+              ? "checkout-shipping-provider-picker__card--selectable"
+              : "",
+            !card.selected && !card.selectable
+              ? "checkout-shipping-provider-picker__card--static"
+              : "",
           ]
             .filter(Boolean)
             .join(" ");

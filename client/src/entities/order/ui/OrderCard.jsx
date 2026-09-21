@@ -525,6 +525,7 @@ function OrderCardLineItem({
  *   expanded?: boolean;
  *   onExpandedChange?: (expanded: boolean) => void;
  *   attentionRole?: "buyer" | "seller";
+ *   renderShipmentExtra?: (ctx: { order: import('../model/types.js').Order; shipment: Record<string, any> | null }) => import('react').ReactNode;
  * }} props
  */
 export function OrderCard({
@@ -558,6 +559,7 @@ export function OrderCard({
   expanded = true,
   onExpandedChange,
   attentionRole = "buyer",
+  renderShipmentExtra,
 }) {
   const [detailsExpanded, setDetailsExpanded] = useState(false);
   const isInstallmentOrder = Boolean(order.installmentContractId);
@@ -1015,6 +1017,7 @@ export function OrderCard({
           ) : null}
         </div>
       </div>
+      {renderShipmentExtra?.({ order, shipment: shipmentOwn }) ?? null}
 
       {/* Кто приедет: имя, рейтинг и авто. Паспорта курьера тут нет и быть
           не должно — сторонам сделки хватает того, что видно у машины. */}

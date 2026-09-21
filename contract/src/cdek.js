@@ -166,6 +166,19 @@ export const CDEK_TARIFF_GONE_MESSAGE =
 export const CDEK_POINT_GONE_MESSAGE =
   "Пункт выдачи СДЭК не найден или не выдаёт заказы — выберите другой";
 
+/**
+ * Body `POST /order/:orderId/cdek-waybill`. Пункт приёма нужен только для
+ * тарифов «склад-…»: продавец сам отвозит посылку в выбранный офис СДЭК.
+ */
+export const cdekWaybillBodySchema = z.object({
+  shipmentPointCode: z.string().trim().min(1).max(32).optional(),
+});
+
+export const CDEK_WAYBILL_EXISTS_MESSAGE =
+  "Накладная СДЭК для этого заказа уже создана";
+export const CDEK_SHIPMENT_POINT_REQUIRED_MESSAGE =
+  "Выберите пункт СДЭК, куда отвезёте посылку";
+
 /** Одна строка расчёта: тариф, цена и срок. */
 export const cdekTariffOptionSchema = z.object({
   tariffCode: z.number().int(),

@@ -6,6 +6,9 @@ import {
   postCdekQuoteController,
   getCdekDeliveryPointsController,
   getCdekAvailabilityController,
+  postCdekWaybillController,
+  getCdekWaybillController,
+  getCdekReceptionPointsController,
   postSellerDeliveryQuoteController,
   getShippingCarriersController,
   getMyOrdersController,
@@ -37,6 +40,9 @@ import {
   cdekQuoteValidation,
   cdekDeliveryPointsValidation,
   cdekAvailabilityValidation,
+  cdekWaybillValidation,
+  cdekWaybillParamsValidation,
+  cdekReceptionPointsValidation,
   updateOrderStatusValidation,
   getAllOrdersValidation,
   getMyOrdersValidation,
@@ -80,6 +86,26 @@ router.get(
   checkAuthMW,
   cdekAvailabilityValidation,
   getCdekAvailabilityController,
+);
+router.get(
+  "/cdek-reception-points",
+  checkAuthMW,
+  cdekReceptionPointsValidation,
+  getCdekReceptionPointsController,
+);
+// Накладная СДЭК — только продавец своей отправки (проверяет сервис).
+router.post(
+  "/:orderId/cdek-waybill",
+  checkAuthMW,
+  orderItemActionRateLimiter,
+  cdekWaybillValidation,
+  postCdekWaybillController,
+);
+router.get(
+  "/:orderId/cdek-waybill",
+  checkAuthMW,
+  cdekWaybillParamsValidation,
+  getCdekWaybillController,
 );
 router.get(
   "/cdek-delivery-points",

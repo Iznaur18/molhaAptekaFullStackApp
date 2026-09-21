@@ -25,3 +25,26 @@ export const CDEK_CONNECTION_UI = {
   TOGGLE_OFF_HINT:
     "СДЭК скрыт от покупателей. Уже оформленные заказы это не затрагивает",
 };
+
+/** Накладная СДЭК в карточке продажи. */
+export const CDEK_WAYBILL_UI = {
+  TITLE: "Накладная СДЭК",
+  PICKUP_POINT: "Покупатель заберёт в пункте",
+  DELIVERY_PAID_BY_BUYER: "Доставку покупатель оплатит в пункте",
+  RECEPTION_CITY_LABEL: "Город, где сдадите посылку",
+  RECEPTION_CITY_PLACEHOLDER: "Например, Грозный",
+  RECEPTION_SEARCH: "Найти пункты",
+  RECEPTION_SEARCH_PENDING: "Ищем…",
+  RECEPTION_POINT_LABEL: "Пункт СДЭК, куда отвезёте посылку",
+  RECEPTION_POINT_PLACEHOLDER: "Выберите пункт",
+  RECEPTION_EMPTY: "В этом городе СДЭК не нашёл пунктов приёма",
+  DOOR_HINT: "Курьер СДЭК заберёт посылку по адресу из карточки товара",
+  CREATE: "Создать накладную",
+  CREATE_PENDING: "Создаём…",
+  NUMBER: "Номер СДЭК",
+  NUMBER_PENDING: "СДЭК ещё присваивает номер — обновите через минуту",
+  STATUS: "Статус",
+  REFRESH: "Обновить статус",
+  REFRESH_PENDING: "Обновляем…",
+  REJECTED: "СДЭК отклонил накладную",
+};
