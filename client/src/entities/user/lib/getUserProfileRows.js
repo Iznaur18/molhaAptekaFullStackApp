@@ -128,7 +128,13 @@ export function getUserProfileRows(user, options = {}) {
       label: L.totalPurchasesAmount,
       value: formatSearchRowTotalSales(user.totalPurchasesAmount),
     },
-    { id: "email", label: L.email, value: dashIfEmpty(user.email) },
+    {
+      id: "email",
+      label: L.email,
+      value: dashIfEmpty(user.email),
+      // Чужой профиль: сама почта не приходит, только признак — покажем кнопку.
+      needsEmailReveal: Boolean(user.hasEmail) && isEmpty(user.email),
+    },
     {
       id: "userBirthDate",
       label: L.userBirthDate,

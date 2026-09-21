@@ -43,6 +43,7 @@ import {
   getMyAffiliateEarningsController,
   getMonthlyLoyaltyPointsAwardedController,
   getUserPhoneController,
+  getUserEmailController,
 } from "../controllers/index.js";
 import {
   checkAuthMW,
@@ -253,6 +254,13 @@ router.get(
   userPhoneRevealRateLimiter,
   userIdParamValidation,
   getUserPhoneController,
+);
+// Почта — по кнопке и под тем же лимитом, что телефон: лимит общий.
+router.get(
+  "/:userIdClient/email",
+  userPhoneRevealRateLimiter,
+  userIdParamValidation,
+  getUserEmailController,
 );
 router.get(
   "/:userIdClient/purchases",

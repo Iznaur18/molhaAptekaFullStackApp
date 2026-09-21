@@ -9,6 +9,7 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { fetchUserPhone } from "../api/fetchUserPhone.js";
+import { ProfileEmailReveal } from "./ProfileEmailReveal.jsx";
 import { groupProfileRows, isBooleanProfileRow } from "../lib/groupProfileRows.js";
 import { getProfileSectionTone } from "../lib/profileRowColors.js";
 import { getProfileRowIcon } from "../lib/profileRowIcons.js";
@@ -176,7 +177,7 @@ function ProfileDetailsSection({
               <dd
                 className={[
                   "user-profile-info__detail-value",
-                  isEmpty && !row.needsPhoneReveal
+                  isEmpty && !row.needsPhoneReveal && !row.needsEmailReveal
                     ? "user-profile-info__detail-value_empty"
                     : "",
                   isBooleanProfileRow(row.id)
@@ -335,12 +336,32 @@ function ProfileStatCard({ row, isWide, onRowAction, trend = null }) {
 
 /**
  * @param {{
- * row: { id: string; value: string; href?: string; needsPhoneReveal?: boolean };
+ * row: { id: string; value: string; href?: string; needsPhoneReveal?: boolean; needsEmailReveal?: boolean };
  * hidePhoneUntilReveal: boolean;
  * userId: string | null;
  * }} props
  */
 function ProfileDetailValue({ row, hidePhoneUntilReveal, userId }) {
+  if (row.needsEmailReveal) {
+    return <ProfileEmailReveal userId={userId} />;
+  }
+  return (
+    <ProfileDetailPlainValue
+      row={row}
+      hidePhoneUntilReveal={hidePhoneUntilReveal}
+      userId={userId}
+    />
+  );
+}
+
+/**
+ * @param {{
+ * row: { id: string; value: string; href?: string; needsPhoneReveal?: boolean };
+ * hidePhoneUntilReveal: boolean;
+ * userId: string | null;
+ * }} props
+ */
+function ProfileDetailPlainValue({ row, hidePhoneUntilReveal, userId }) {
   const [phoneRevealed, setPhoneRevealed] = useState(false);
   const [revealedPhone, setRevealedPhone] = useState(
     /** @type {string | null} */ (null),

@@ -136,3 +136,17 @@ test("sanitizeUserProfileForViewer: guest gets public vehicle only from courierP
   });
   assert.equal(out.courierProfile.vehiclePhotoFrontUrl, undefined);
 });
+
+test("sanitizeUserProfileForViewer: почту чужим не отдаём, но говорим, что она есть", () => {
+  const out = sanitizeUserProfileForViewer(TARGET, { viewer: null, viewerId: null });
+  assert.equal(out.email, undefined);
+  assert.equal(out.hasEmail, true);
+});
+
+test("sanitizeUserProfileForViewer: без почты (регистрация по телефону) — нет hasEmail", () => {
+  const out = sanitizeUserProfileForViewer(
+    { ...TARGET, email: "" },
+    { viewer: null, viewerId: null },
+  );
+  assert.equal(out.hasEmail, undefined);
+});
