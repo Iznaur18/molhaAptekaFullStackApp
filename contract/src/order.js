@@ -238,10 +238,14 @@ export const orderFromApiSchema = z
     /** Отправления заказа — по одному на продавца. */
     shipments: z
       .array(
-        z.object({
-          sellerId: z.string(),
-          fulfillmentMethod: z.enum(["pickup", "delivery"]),
-        }),
+        z
+          .object({
+            sellerId: z.string(),
+            fulfillmentMethod: z.enum(["pickup", "delivery"]),
+          })
+          // Снимок СДЭК и накладная живут в отправлении: без passthrough zod
+          // молча срезал бы их, и продавец не увидел бы кнопку накладной.
+          .passthrough(),
       )
       .optional(),
     shippingProvider: z.string().nullable().optional(),

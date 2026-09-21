@@ -35,15 +35,23 @@ function readDeliveryPoint(raw) {
 
 /**
  * @param {{ account: string; secure: string; environment?: string }} credentials
- * @param {{ cityCode?: number | null; postalCode?: string | null }} params
+ * @param {{
+ *   cityCode?: number | null;
+ *   postalCode?: string | null;
+ *   purpose?: "handout" | "reception";
+ * }} params
+ *   purpose: handout — где покупатель забирает, reception — куда продавец сдаёт.
  */
-export async function listCdekDeliveryPoints(credentials, { cityCode, postalCode }) {
+export async function listCdekDeliveryPoints(
+  credentials,
+  { cityCode, postalCode, purpose = "handout" },
+) {
   const payload = await cdekRequest(credentials, {
     path: "/deliverypoints",
     query: {
       country_code: "RU",
       type: "PVZ",
-      is_handout: true,
+      ...(purpose === "reception" ? { is_reception: true } : { is_handout: true }),
       city_code: cityCode ?? undefined,
       postal_code: postalCode ?? undefined,
     },

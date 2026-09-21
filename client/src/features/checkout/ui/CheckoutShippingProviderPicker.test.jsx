@@ -64,6 +64,28 @@ describe("служба доставки в оформлении", () => {
     expect(onSelectCdek).toHaveBeenLastCalledWith(false);
   });
 
+  it("нажимаемая служба выделена, недоступная — приглушена", () => {
+    renderWithProviders(
+      <CheckoutShippingProviderPicker
+        courierDelivery="seller"
+        cdekAvailable
+        sellerDeliveryAvailable
+        onSelectCdek={vi.fn()}
+      />,
+    );
+
+    const cdek = screen.getByRole("radio", {
+      name: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_CDEK,
+    });
+    expect(cdek.className).toContain(
+      "checkout-shipping-provider-picker__card--selectable",
+    );
+    expect(courierButton().className).toContain(
+      "checkout-shipping-provider-picker__card--static",
+    );
+    expect(sellerButton().className).not.toContain("--static");
+  });
+
   it("у продавца только СДЭК — он выбран и переключать нечего", () => {
     renderWithProviders(
       <CheckoutShippingProviderPicker

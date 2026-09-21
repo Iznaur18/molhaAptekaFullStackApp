@@ -1,0 +1,113 @@
+.cdek-waybill-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.75rem;
+  background: var(--iz-color-surface);
+}
+
+.cdek-waybill-panel__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.cdek-waybill-panel__facts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+}
+
+.cdek-waybill-panel__fact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.cdek-waybill-panel__fact dt {
+  color: var(--iz-color-text-muted);
+}
+
+.cdek-waybill-panel__fact dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.cdek-waybill-panel__state,
+.cdek-waybill-panel__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cdek-waybill-panel__label {
+  font-size: 0.85rem;
+  color: var(--iz-color-text-muted);
+}
+
+.cdek-waybill-panel__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cdek-waybill-panel__row .cdek-waybill-panel__input {
+  flex: 1 1 12rem;
+}
+
+.cdek-waybill-panel__input {
+  min-width: 0;
+  max-width: 100%;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.6rem;
+  background: var(--iz-color-bg);
+  color: inherit;
+  font: inherit;
+}
+
+.cdek-waybill-panel__button {
+  align-self: flex-start;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--iz-color-action);
+  border-radius: 0.6rem;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-action, #fff);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cdek-waybill-panel__button--secondary {
+  background: transparent;
+  color: var(--iz-color-action);
+}
+
+.cdek-waybill-panel__button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.cdek-waybill-panel__button:focus-visible,
+.cdek-waybill-panel__input:focus-visible {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 2px;
+}
+
+.cdek-waybill-panel__hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--iz-color-text-muted);
+}
+
+.cdek-waybill-panel__error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--iz-color-danger, #c0392b);
+}

@@ -139,3 +139,43 @@
   opacity: 0.85;
   color: inherit;
 }
+
+/*
+ * Три состояния, которые покупатель должен различать с первого взгляда:
+ * выбрано (заливка), можно выбрать (белая карточка с акцентной рамкой) и
+ * нельзя (бледная, пунктир). Раньше «можно» и «нельзя» были одинаково серыми.
+ */
+.checkout-shipping-provider-picker__card--selectable {
+  background: var(--iz-color-surface);
+  border: 1.5px solid var(--iz-color-action);
+  color: var(--iz-color-action);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--iz-color-action) 18%, transparent);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.checkout-shipping-provider-picker__card--selectable:hover,
+.checkout-shipping-provider-picker__card--selectable:focus-visible {
+  background: color-mix(in srgb, var(--iz-color-action) 10%, var(--iz-color-surface));
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--iz-color-action) 25%, transparent);
+  outline: none;
+}
+
+.checkout-shipping-provider-picker__card--static,
+.checkout-shipping-provider-picker__card--static:disabled {
+  cursor: default;
+  background: transparent;
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--iz-color-text) 18%, transparent);
+  color: var(--iz-color-text-muted);
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checkout-shipping-provider-picker__card--selectable {
+    transition: none;
+  }
+}

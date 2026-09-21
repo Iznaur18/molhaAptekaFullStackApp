@@ -102,6 +102,11 @@ import {
   getCdekAvailabilityController,
 } from "./Order/cdekShipmentControllers.js";
 import {
+  postCdekWaybillController,
+  getCdekWaybillController,
+  getCdekReceptionPointsController,
+} from "./Order/cdekWaybillControllers.js";
+import {
   getCdekCredentialsController,
   putCdekCredentialsController,
   deleteCdekCredentialsController,
@@ -422,6 +427,9 @@ export {
   postCdekQuoteController,
   getCdekDeliveryPointsController,
   getCdekAvailabilityController,
+  postCdekWaybillController,
+  getCdekWaybillController,
+  getCdekReceptionPointsController,
   getCdekCredentialsController,
   putCdekCredentialsController,
   deleteCdekCredentialsController,
