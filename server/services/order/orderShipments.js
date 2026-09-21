@@ -150,6 +150,7 @@ export const buildStoredShipments = (items, options = {}) => {
     payoutRequisitesBySellerId = null,
     deliveryCarrierBySellerId = null,
     sellerDeliveryBySellerId = null,
+    cdekShipmentBySellerId = null,
   } = options ?? {};
 
   const grouped = groupOrderItemsBySellerId(items);
@@ -194,6 +195,11 @@ export const buildStoredShipments = (items, options = {}) => {
       sellerDeliveryDistanceSource: sellerDelivery?.distanceSource ?? null,
       ...(sellerDelivery?.tariff
         ? { sellerDeliveryTariffAtOrder: sellerDelivery.tariff }
+        : {}),
+      // СДЭК до пункта выдачи — снимок тарифа и пункта. Деньги за доставку
+      // покупатель платит СДЭК при получении, в сумму заказа они не входят.
+      ...(cdekShipmentBySellerId?.[bucket.sellerId]
+        ? { cdekShipmentAtOrder: cdekShipmentBySellerId[bucket.sellerId] }
         : {}),
     });
   }

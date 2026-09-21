@@ -8,6 +8,8 @@ import {
 } from "@molha/api-contract";
 import {
   PRODUCT_DELIVERY_CARRIER_GITORG,
+  SHIPPING_PROVIDER_CDEK,
+  SHIPPING_SERVICE_PICKUP_POINT,
   SELLER_PAYMENT_METHOD_NOT_ACCEPTED_MESSAGE,
   isPaymentMethodAcceptedBySeller,
   resolveProductDeliveryCarrier,
@@ -21,6 +23,7 @@ import { buildStoredShipments } from "./orderShipments.js";
 import { resolveOrderFulfillmentSplit } from "./resolveOrderFulfillmentSplit.js";
 import { resolveDeliveryFeesBySeller } from "../courier/courierDeliveryFee.js";
 import { resolveOrderDeliveryGeo } from "./resolveOrderDeliveryGeo.js";
+import { resolveCdekOrderShipment } from "../shipping/cdek/resolveCdekOrderShipment.js";
 import {
   buildGoodsTotalBySeller,
   prepareSellerDeliveryBySeller,
@@ -501,6 +504,7 @@ export async function createOrder({
   pickupSelections = [],
   verifiedDeliveryAddress = null,
   deliveryAddressGeo = null,
+  cdekShipment = null,
   affiliateCode = null,
   marketingAttribution = null,
 }) {
@@ -595,27 +599,48 @@ export async function createOrder({
     paymentMethod,
   );
 
+  // СДЭК везёт по договору продавца: товару не нужна своя «доставка
+  // продавцом». Выбор проверяем до транзакции — это запросы во внешнюю службу.
+  const orderSellerId =
+    [
+      ...new Set(Object.values(productById).map((row) => String(row?.sellerId ?? ""))),
+    ].filter(Boolean)[0] ?? "";
+  const cdekResolved = cdekShipment
+    ? await resolveCdekOrderShipment({
+        sellerId: orderSellerId,
+        productIds: uniqueProductIds,
+        selection: cdekShipment,
+      })
+    : null;
+
   const fulfillmentSplit = resolveOrderFulfillmentSplit({
     productIds: uniqueProductIds,
     productById,
-    fulfillmentBySellerId,
+    fulfillmentBySellerId: cdekResolved
+      ? { [orderSellerId]: "delivery" }
+      : fulfillmentBySellerId,
     fallbackFulfillment:
-      fulfillmentMethod === "delivery" ? "delivery" : ORDER_FULFILLMENT_PICKUP,
+      cdekResolved || fulfillmentMethod === "delivery"
+        ? "delivery"
+        : ORDER_FULFILLMENT_PICKUP,
   });
   const resolvedFulfillment = fulfillmentSplit.orderFulfillmentMethod;
 
   // Проверяем каждую половину своим правилом: в смешанном заказе товар
   // самовывозного продавца не обязан поддерживать доставку, и наоборот.
-  assertProductsSupportDelivery(productById, fulfillmentSplit.deliveryProductIds);
-  const deliveryCarrierBySeller = resolveDeliveryCarrierBySeller(
-    productById,
-    fulfillmentSplit.deliveryProductIds,
-  );
+  if (!cdekResolved) {
+    assertProductsSupportDelivery(productById, fulfillmentSplit.deliveryProductIds);
+  }
+  const deliveryCarrierBySeller = cdekResolved
+    ? { [orderSellerId]: SHIPPING_PROVIDER_CDEK }
+    : resolveDeliveryCarrierBySeller(productById, fulfillmentSplit.deliveryProductIds);
 
   // Выключенной службой заказ не оформить: товар с ней мог быть создан до
   // того, как админ её погасил.
   for (const carrier of new Set(Object.values(deliveryCarrierBySeller))) {
-    if (!carrier) continue;
+    // СДЭК подключается продавцом, а не админом: доступность уже проверил
+    // resolveCdekOrderShipment — есть ли ключ и принимает ли его служба.
+    if (!carrier || carrier === SHIPPING_PROVIDER_CDEK) continue;
     if (!(await isCarrierAvailable(carrier))) {
       throw new AppError(409, SHIPPING_CARRIER_DISABLED_MESSAGE);
     }
@@ -662,7 +687,9 @@ export async function createOrder({
 
   /** @type {Record<string, { id: string; address: string; lat: number | null; lon: number | null }> | null} */
   let pickupByProductId = null;
-  let addressForOrder = verifiedDeliveryAddress;
+  let addressForOrder = cdekResolved
+    ? cdekResolved.addressForOrder
+    : verifiedDeliveryAddress;
 
   if (fulfillmentSplit.hasPickup) {
     const resolvedPickup = resolvePickupSelectionsByProductId(
@@ -811,7 +838,16 @@ export async function createOrder({
               payoutRequisitesBySellerId: payoutRequisitesBySeller,
               deliveryCarrierBySellerId: deliveryCarrierBySeller,
               sellerDeliveryBySellerId: sellerDeliveryBySeller,
+              cdekShipmentBySellerId: cdekResolved
+                ? { [orderSellerId]: cdekResolved.snapshot }
+                : null,
             }),
+            ...(cdekResolved
+              ? {
+                  shippingProvider: SHIPPING_PROVIDER_CDEK,
+                  shippingServiceType: SHIPPING_SERVICE_PICKUP_POINT,
+                }
+              : {}),
             paymentMethod,
             status: orderStatus,
             priceOfferId: linkedPriceOfferId,
