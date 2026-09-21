@@ -121,6 +121,7 @@ import {
   cdekWaybillValidation,
   cdekWaybillParamsValidation,
   cdekReceptionPointsValidation,
+  cdekIntakeValidation,
 } from "./shipping/cdekQuoteValidation.js";
 import { replaceMyCartValidation } from "./cart/replaceMyCartValidation.js";
 import { replaceMyFavoritesValidation } from "./favorites/replaceMyFavoritesValidation.js";
@@ -341,4 +342,5 @@ export {
   cdekWaybillValidation,
   cdekWaybillParamsValidation,
   cdekReceptionPointsValidation,
+  cdekIntakeValidation,
 };

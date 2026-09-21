@@ -7,6 +7,8 @@ import {
   INSTALLMENT_CONTRACT_STATUS_CANCELLED,
   INSTALLMENT_CONTRACT_STATUS_COMPLETED,
 } from "../../constants/installmentConstants.js";
+import { SHIPPING_PROVIDER_CDEK } from "@molha/api-contract";
+
 import { ESCROW_REFUND_REASON_ITEM_CANCELLED } from "../../constants/escrowConstants.js";
 import { AppError } from "../../errors/AppError.js";
 import { InstallmentContractModel } from "../../models/index.js";
@@ -167,6 +169,16 @@ const cancelExternalShipmentIfNeeded = async ({ order, sellerId }) => {
       item?.status !== ORDER_STATUS_RETURNED,
   );
   if (stillAlive) return;
+
+  // У СДЭК тоже есть внешний номер, но снимать его надо у СДЭК, а не у ЛОБО.
+  if (
+    shipment.deliveryCarrier === SHIPPING_PROVIDER_CDEK ||
+    shipment.cdekWaybill?.uuid
+  ) {
+    const { cancelCdekWaybill } = await import("../shipping/cdek/cdekWaybill.js");
+    await cancelCdekWaybill({ orderId: String(order._id), sellerId: String(sellerId) });
+    return;
+  }
 
   try {
     const { cancelShipmentInLobo } =

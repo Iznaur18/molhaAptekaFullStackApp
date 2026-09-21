@@ -181,6 +181,18 @@ describe("createCdekWaybill — проверки до обращения в СД
     );
   });
 
+  it("предоплата картой ещё не пришла — накладную не создаём", async () => {
+    mockOrder(makeOrder({ paymentMethod: "cardPrepaid", shipments: [makeShipment()] }));
+    await assert.rejects(
+      createCdekWaybill({
+        orderId: "650000000000000000000abc",
+        sellerId,
+        shipmentPointCode: "GRZ3",
+      }),
+      /ещё не оплачен/,
+    );
+  });
+
   it("склад-склад без пункта приёма — просим выбрать пункт", async () => {
     mockOrder(makeOrder({ shipments: [makeShipment()] }));
     await assert.rejects(

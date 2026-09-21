@@ -10,7 +10,11 @@ import { UserModel } from "../../../models/index.js";
 import { logServerEvent } from "../../../utils/logServerEvent.js";
 
 import { forgetCdekToken, verifyCdekCredentials } from "./cdekClient.js";
-import { openCdekSecret, sealCdekSecret } from "./cdekCredentialsCrypto.js";
+import {
+  cdekSecretNeedsReseal,
+  openCdekSecret,
+  sealCdekSecret,
+} from "./cdekCredentialsCrypto.js";
 
 /**
  * Подключение СДЭК у конкретного продавца: хранение ключей, проверка и снятие.
@@ -78,6 +82,23 @@ export async function resolveSellerCdekCredentials(
       error: error instanceof Error ? error.message : String(error),
     });
     throw new AppError(409, CDEK_NOT_CONNECTED_MESSAGE);
+  }
+
+  // Записано до появления CDEK_CREDENTIALS_KEK — перешифровываем на него.
+  // Сбой тут не мешает работе: запись по-прежнему открывается старым ключом.
+  if (cdekSecretNeedsReseal(raw.secureSealed)) {
+    try {
+      await UserModel.updateOne(
+        { _id: sellerId, "cdekIntegration.secureSealed": raw.secureSealed },
+        { $set: { "cdekIntegration.secureSealed": sealCdekSecret(secure) } },
+      );
+      logServerEvent("cdek.secret_resealed", { sellerId: String(sellerId) });
+    } catch (error) {
+      logServerEvent("cdek.secret_reseal_failed", {
+        sellerId: String(sellerId),
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   }
 
   return {

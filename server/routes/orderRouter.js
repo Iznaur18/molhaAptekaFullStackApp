@@ -9,6 +9,8 @@ import {
   postCdekWaybillController,
   getCdekWaybillController,
   getCdekReceptionPointsController,
+  getCdekLabelController,
+  postCdekIntakeController,
   postSellerDeliveryQuoteController,
   getShippingCarriersController,
   getMyOrdersController,
@@ -43,6 +45,7 @@ import {
   cdekWaybillValidation,
   cdekWaybillParamsValidation,
   cdekReceptionPointsValidation,
+  cdekIntakeValidation,
   updateOrderStatusValidation,
   getAllOrdersValidation,
   getMyOrdersValidation,
@@ -106,6 +109,20 @@ router.get(
   checkAuthMW,
   cdekWaybillParamsValidation,
   getCdekWaybillController,
+);
+router.get(
+  "/:orderId/cdek-label",
+  checkAuthMW,
+  orderItemActionRateLimiter,
+  cdekWaybillParamsValidation,
+  getCdekLabelController,
+);
+router.post(
+  "/:orderId/cdek-intake",
+  checkAuthMW,
+  orderItemActionRateLimiter,
+  cdekIntakeValidation,
+  postCdekIntakeController,
 );
 router.get(
   "/cdek-delivery-points",

@@ -16,6 +16,7 @@ import { AppError } from "../../../errors/AppError.js";
 import { OrderModel, ProductModel } from "../../../models/index.js";
 import { logServerEvent } from "../../../utils/logServerEvent.js";
 
+import { assertOrderPrepaid } from "../../order/assertOrderPrepaid.js";
 import { resolveItemSellerId } from "../../order/orderShipments.js";
 
 import { cdekRequest } from "./cdekClient.js";
@@ -34,6 +35,10 @@ import { resolveSellerCdekCredentials } from "./cdekSellerCredentials.js";
 
 const PRE_SHIPMENT = new Set(ORDER_PRE_SHIPMENT_STATUSES);
 
+/** @param {unknown} statusCode */
+const isBeforeCdekHandover = (statusCode) =>
+  !statusCode || CDEK_NOT_HANDED_OVER_STATUS_CODES.has(String(statusCode));
+
 /** Посылку забрал получатель — дальше опрашивать нечего. */
 const CDEK_DELIVERED_STATUS_CODES = new Set(["DELIVERED", "POSTOMAT_RECEIVED"]);
 
@@ -42,7 +47,8 @@ const CDEK_NOT_HANDED_OVER_STATUS_CODES = new Set(["ACCEPTED", "CREATED", "INVAL
 
 /**
  * Статусы, которые лестницу не двигают: отмена накладной, невручение и
- * возврат. Возврат товара продавец отмечает сам.
+ * возврат. «Вернулся» ставит вручение возвратного заказа продавцу
+ * (applyCdekReturnToOrder), а не эти статусы.
  */
 const CDEK_NO_LADDER_STATUS_CODES = new Set([
   "REMOVED",
@@ -181,10 +187,14 @@ export function readCdekOrderState(payload) {
   const errors = Array.isArray(invalid?.errors) ? invalid.errors : [];
   const statuses = Array.isArray(entity.statuses) ? entity.statuses : [];
   const latest = pickLatestCdekStatus(statuses);
+  // Не вручённую посылку СДЭК везёт обратно отдельным «возвратным» заказом.
+  const related = Array.isArray(entity.related_entities) ? entity.related_entities : [];
+  const returnOrder = related.find((row) => row?.type === "return_order" && row?.uuid);
   return {
     cdekNumber: entity.cdek_number ? String(entity.cdek_number) : null,
     status: latest?.name ? String(latest.name) : null,
     statusCode: latest?.code ? String(latest.code) : null,
+    returnUuid: returnOrder ? String(returnOrder.uuid) : null,
     error: errors.length
       ? errors
           .map((error) => error?.message ?? error?.code ?? "")
@@ -202,7 +212,7 @@ export function readCdekOrderState(payload) {
  * @param {string} sellerId
  * @param {Record<string, unknown>} waybill
  */
-async function saveWaybill(orderId, sellerId, waybill) {
+export async function saveWaybill(orderId, sellerId, waybill) {
   const set = { "shipments.$.cdekWaybill": waybill };
   if (waybill.cdekNumber) {
     set.shippingTrackingNumber = waybill.cdekNumber;
@@ -217,7 +227,7 @@ async function saveWaybill(orderId, sellerId, waybill) {
 /**
  * @param {{ orderId: string; sellerId: string }} params
  */
-async function loadSellerOrder({ orderId, sellerId }) {
+export async function loadSellerOrder({ orderId, sellerId }) {
   const order = await OrderModel.findById(orderId).lean();
   if (!order) {
     throw new AppError(404, "Заказ не найден");
@@ -239,6 +249,9 @@ export async function createCdekWaybill({
   shipmentPointCode = null,
 }) {
   const { order, shipment } = await loadSellerOrder({ orderId, sellerId });
+  // Предоплаченный заказ СДЭК везёт с нулевой оплатой за товар: создай мы
+  // накладную до оплаты — покупатель получил бы товар даром.
+  assertOrderPrepaid(order);
   if (shipment.cdekWaybill?.uuid) {
     throw new AppError(409, CDEK_WAYBILL_EXISTS_MESSAGE);
   }
@@ -325,12 +338,120 @@ export async function refreshCdekWaybill({ orderId, sellerId }) {
     cdekNumber: state.cdekNumber ?? current.cdekNumber ?? null,
     status: state.status ?? current.status ?? null,
     statusCode: state.statusCode ?? current.statusCode ?? null,
+    returnUuid: state.returnUuid ?? current.returnUuid ?? null,
     error: state.error,
     syncedAt: new Date(),
   };
+
+  if (waybill.returnUuid) {
+    const returnPayload = await cdekRequest(credentials, {
+      path: `/orders/${waybill.returnUuid}`,
+    });
+    const returnState = readCdekOrderState(returnPayload);
+    waybill.returnStatus = returnState.status ?? current.returnStatus ?? null;
+    waybill.returnStatusCode =
+      returnState.statusCode ?? current.returnStatusCode ?? null;
+  }
+
+  // Заявка на курьера — пока посылку не забрали. Её сбой не должен
+  // мешать главному: статусу самой накладной.
+  if (waybill.intake?.uuid && isBeforeCdekHandover(waybill.statusCode)) {
+    try {
+      const { refreshCdekIntake } = await import("./cdekIntake.js");
+      Object.assign(
+        waybill,
+        await refreshCdekIntake({ orderId, sellerId, waybill, credentials }),
+      );
+    } catch (error) {
+      logServerEvent("cdek.intake_refresh_failed", {
+        orderId: String(orderId),
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
   await saveWaybill(orderId, sellerId, waybill);
   await applyCdekStatusToOrder({ orderId, sellerId, statusCode: waybill.statusCode });
+  if (CDEK_DELIVERED_STATUS_CODES.has(String(waybill.returnStatusCode ?? ""))) {
+    await applyCdekReturnToOrder({ orderId, sellerId });
+  }
   return waybill;
+}
+
+/**
+ * Возвратный заказ СДЭК вручён продавцу — товар снова у него. Отмечаем
+ * «Вернулся» штатным сервисом: он вернёт остаток и снимет выплату продавцу.
+ *
+ * @param {{ orderId: string; sellerId: string }} input
+ * @returns {Promise<number>}
+ */
+export async function applyCdekReturnToOrder({ orderId, sellerId }) {
+  const { markOrderItemReturned } =
+    await import("../../order/updateOrderItemStatus.js");
+  const order = await OrderModel.findById(orderId).select("items").lean();
+  const returnable = new Set([ORDER_STATUS_SHIPPED, ORDER_STATUS_DELIVERED]);
+  let moved = 0;
+  for (const [index, item] of (order?.items ?? []).entries()) {
+    if (resolveItemSellerId(item) !== String(sellerId)) continue;
+    if (!returnable.has(item.status)) continue;
+    await markOrderItemReturned({ orderId, itemIndex: index, requestUserId: sellerId });
+    moved += 1;
+  }
+  if (moved > 0) {
+    logServerEvent("cdek.order_returned", { orderId: String(orderId), moved });
+  }
+  return moved;
+}
+
+/**
+ * Снять накладную в СДЭК, когда заказ у нас отменили. СДЭК удаляет заказ,
+ * только пока посылку не сдали; иначе оставляем пометку продавцу.
+ *
+ * Отмену заказа у нас это не блокирует — ошибка только записывается.
+ *
+ * @param {{ orderId: string; sellerId: string }} input
+ */
+export async function cancelCdekWaybill({ orderId, sellerId }) {
+  const order = await OrderModel.findById(orderId).select("shipments").lean();
+  const shipment = order ? findSellerCdekShipment(order, sellerId) : null;
+  const current = shipment?.cdekWaybill;
+  if (!current?.uuid || current.cancelledAt) {
+    return { ok: true, skipped: true };
+  }
+
+  try {
+    const credentials = await resolveSellerCdekCredentials(sellerId);
+    await cdekRequest(credentials, {
+      method: "DELETE",
+      path: `/orders/${current.uuid}`,
+    });
+    // Курьер без заказа приехал бы впустую. Сбой тут не важен: СДЭК снимает
+    // заявку вместе с удалённым заказом, это лишь подстраховка.
+    if (current.intake?.uuid) {
+      await cdekRequest(credentials, {
+        method: "DELETE",
+        path: `/intakes/${current.intake.uuid}`,
+      }).catch(() => null);
+    }
+    await saveWaybill(orderId, sellerId, {
+      ...current,
+      cancelledAt: new Date(),
+      cancelError: null,
+    });
+    logServerEvent("cdek.waybill_cancelled", { orderId: String(orderId) });
+    return { ok: true };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    await saveWaybill(orderId, sellerId, {
+      ...current,
+      cancelError: message.slice(0, 300),
+    });
+    logServerEvent("cdek.waybill_cancel_failed", {
+      orderId: String(orderId),
+      error: message,
+    });
+    return { ok: false, reason: message };
+  }
 }
 
 /**
@@ -430,6 +551,8 @@ export async function syncCdekWaybillStatuses({ limit = CDEK_SYNC_BATCH_LIMIT } 
       $elemMatch: {
         "cdekWaybill.uuid": { $exists: true, $nin: ["", null] },
         "cdekWaybill.statusCode": { $nin: finalCodes },
+        // Отменённую накладную СДЭК уже не повезёт — спрашивать нечего.
+        "cdekWaybill.cancelledAt": { $in: [null] },
       },
     },
     "items.status": { $in: [...PRE_SHIPMENT, ORDER_STATUS_SHIPPED] },
@@ -445,6 +568,7 @@ export async function syncCdekWaybillStatuses({ limit = CDEK_SYNC_BATCH_LIMIT } 
     for (const shipment of order.shipments ?? []) {
       if (!shipment?.cdekWaybill?.uuid) continue;
       if (finalCodes.includes(shipment.cdekWaybill.statusCode)) continue;
+      if (shipment.cdekWaybill.cancelledAt) continue;
       checked += 1;
       try {
         await refreshCdekWaybill({

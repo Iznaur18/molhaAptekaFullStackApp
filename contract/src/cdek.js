@@ -214,3 +214,63 @@ export function maskCdekAccount(value) {
   if (text.length <= 4) return "••••";
   return `••••${text.slice(-4)}`;
 }
+
+/**
+ * Вызов курьера СДЭК к продавцу (тарифы «от двери»). Окно — не меньше трёх
+ * часов в пределах рабочего дня курьера; день — сегодня и две недели вперёд.
+ */
+export const CDEK_INTAKE_DAY_START = "09:00";
+export const CDEK_INTAKE_DAY_END = "22:00";
+export const CDEK_INTAKE_MIN_WINDOW_HOURS = 3;
+export const CDEK_INTAKE_MAX_DAYS_AHEAD = 14;
+
+const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** @param {string} time «ЧЧ:ММ» */
+const toMinutes = (time) => {
+  const [hours, minutes] = time.split(":").map(Number);
+  return hours * 60 + minutes;
+};
+
+/**
+ * Что не так с окном курьера, или `null`, если всё в порядке.
+ *
+ * @param {{ intakeDate: string; timeFrom: string; timeTo: string }} input
+ * @param {string} today «ГГГГ-ММ-ДД» по Москве
+ * @returns {string | null}
+ */
+export function validateCdekIntakeWindow({ intakeDate, timeFrom, timeTo }, today) {
+  if (!DATE_RE.test(intakeDate)) return "Укажите день приезда курьера";
+  if (intakeDate < today) return "День приезда курьера уже прошёл";
+  const last = new Date(`${today}T00:00:00Z`);
+  last.setUTCDate(last.getUTCDate() + CDEK_INTAKE_MAX_DAYS_AHEAD);
+  if (intakeDate > last.toISOString().slice(0, 10)) {
+    return `Курьера можно вызвать не дальше чем на ${CDEK_INTAKE_MAX_DAYS_AHEAD} дней вперёд`;
+  }
+  if (!TIME_RE.test(timeFrom) || !TIME_RE.test(timeTo)) {
+    return "Укажите время в формате ЧЧ:ММ";
+  }
+  if (
+    toMinutes(timeFrom) < toMinutes(CDEK_INTAKE_DAY_START) ||
+    toMinutes(timeTo) > toMinutes(CDEK_INTAKE_DAY_END)
+  ) {
+    return `Курьер приезжает с ${CDEK_INTAKE_DAY_START} до ${CDEK_INTAKE_DAY_END}`;
+  }
+  if (toMinutes(timeTo) - toMinutes(timeFrom) < CDEK_INTAKE_MIN_WINDOW_HOURS * 60) {
+    return `Окно для курьера — не меньше ${CDEK_INTAKE_MIN_WINDOW_HOURS} часов`;
+  }
+  return null;
+}
+
+/** Body `POST /order/:orderId/cdek-intake`. */
+export const cdekIntakeBodySchema = z.object({
+  intakeDate: z.string().trim().regex(DATE_RE, "Укажите день приезда курьера"),
+  timeFrom: z.string().trim().regex(TIME_RE, "Укажите время в формате ЧЧ:ММ"),
+  timeTo: z.string().trim().regex(TIME_RE, "Укажите время в формате ЧЧ:ММ"),
+  /** Кому звонит курьер. СДЭК без телефона заявку не примет. */
+  phone: cdekRecipientSchema.shape.phone,
+  comment: z.string().trim().max(255).optional(),
+});
+
+export const CDEK_INTAKE_EXISTS_MESSAGE = "Курьер СДЭК по этому заказу уже вызван";

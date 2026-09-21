@@ -105,6 +105,8 @@ import {
   postCdekWaybillController,
   getCdekWaybillController,
   getCdekReceptionPointsController,
+  getCdekLabelController,
+  postCdekIntakeController,
 } from "./Order/cdekWaybillControllers.js";
 import {
   getCdekCredentialsController,
@@ -430,6 +432,8 @@ export {
   postCdekWaybillController,
   getCdekWaybillController,
   getCdekReceptionPointsController,
+  getCdekLabelController,
+  postCdekIntakeController,
   getCdekCredentialsController,
   putCdekCredentialsController,
   deleteCdekCredentialsController,

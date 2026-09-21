@@ -8,6 +8,8 @@ import {
   resolveCdekCityCode,
 } from "../../services/shipping/cdek/cdekDeliveryPoints.js";
 import { resolveSellerCdekCredentials } from "../../services/shipping/cdek/cdekSellerCredentials.js";
+import { getCdekLabelPdf } from "../../services/shipping/cdek/cdekLabel.js";
+import { createCdekIntake } from "../../services/shipping/cdek/cdekIntake.js";
 
 /** `POST /order/:orderId/cdek-waybill` — продавец создаёт накладную СДЭК. */
 export const postCdekWaybillController = async (req, res) => {
@@ -45,4 +47,30 @@ export const getCdekReceptionPointsController = async (req, res) => {
     purpose: "reception",
   });
   return successRes(res, { points, cityCode });
+};
+
+/** `GET /order/:orderId/cdek-label` — PDF этикетки для коробки. */
+export const getCdekLabelController = async (req, res) => {
+  const { pdf, fileName } = await getCdekLabelPdf({
+    orderId: String(req.params.orderId),
+    sellerId: String(req.userId),
+  });
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+  res.setHeader("Cache-Control", "no-store");
+  return res.send(pdf);
+};
+
+/** `POST /order/:orderId/cdek-intake` — вызвать курьера СДЭК к продавцу. */
+export const postCdekIntakeController = async (req, res) => {
+  const waybill = await createCdekIntake({
+    orderId: String(req.params.orderId),
+    sellerId: String(req.userId),
+    intakeDate: req.body.intakeDate,
+    timeFrom: req.body.timeFrom,
+    timeTo: req.body.timeTo,
+    phone: req.body.phone,
+    comment: req.body.comment ?? "",
+  });
+  return successRes(res, { waybill });
 };

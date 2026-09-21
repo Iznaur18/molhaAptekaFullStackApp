@@ -57,3 +57,54 @@ export async function fetchCdekReceptionPoints(city) {
     return rethrow(error);
   }
 }
+
+/**
+ * PDF этикетки. Качаем через apiClient, чтобы ушли куки авторизации.
+ *
+ * @param {string} orderId
+ * @returns {Promise<Blob>}
+ */
+export async function fetchCdekLabel(orderId) {
+  try {
+    const { data } = await apiClient.get(
+      `/order/${encodeURIComponent(orderId)}/cdek-label`,
+      { responseType: "blob" },
+    );
+    return data;
+  } catch (error) {
+    // Ошибка пришла blob'ом — достаём из него текст сервера.
+    const blob = error?.response?.data;
+    if (blob instanceof Blob) {
+      let message = "";
+      try {
+        message = JSON.parse(await blob.text())?.message ?? "";
+      } catch {
+        /* ответ не JSON — покажем общий текст */
+      }
+      throw new Error(message || "СДЭК сейчас не отвечает");
+    }
+    return rethrow(error);
+  }
+}
+
+/**
+ * @param {{
+ *   orderId: string;
+ *   intakeDate: string;
+ *   timeFrom: string;
+ *   timeTo: string;
+ *   phone: string;
+ *   comment?: string;
+ * }} params
+ */
+export async function createCdekIntake({ orderId, ...body }) {
+  try {
+    const { data } = await apiClient.post(
+      `/order/${encodeURIComponent(orderId)}/cdek-intake`,
+      body,
+    );
+    return data?.data?.waybill ?? null;
+  } catch (error) {
+    return rethrow(error);
+  }
+}
