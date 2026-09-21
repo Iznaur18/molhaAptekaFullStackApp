@@ -1,3 +1,4 @@
+import { UserModel } from "../../models/index.js";
 import { successRes } from "../../services/http/index.js";
 import {
   listCdekPointsForBuyer,
@@ -18,6 +19,22 @@ export const postCdekQuoteController = async (req, res) => {
     toAddress: req.body?.toAddress ?? null,
   });
   return successRes(res, result);
+};
+
+/**
+ * `GET /order/cdek-availability` — подключил ли продавец СДЭК.
+ *
+ * Корзина спрашивает до всякого расчёта: без этого кнопку «СДЭК» пришлось бы
+ * показывать всем и тратить запросы в службу на продавцов без договора.
+ */
+export const getCdekAvailabilityController = async (req, res) => {
+  const seller = await UserModel.findById(String(req.query.sellerId))
+    .select("cdekIntegration.account cdekIntegration.secureSealed")
+    .lean();
+  const available = Boolean(
+    seller?.cdekIntegration?.account && seller?.cdekIntegration?.secureSealed,
+  );
+  return successRes(res, { available });
 };
 
 /** `GET /order/cdek-delivery-points` — пункты выдачи в городе покупателя. */

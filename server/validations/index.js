@@ -114,6 +114,7 @@ import { cdekCredentialsValidation } from "./shipping/cdekCredentialsValidation.
 import {
   cdekQuoteValidation,
   cdekDeliveryPointsValidation,
+  cdekAvailabilityValidation,
 } from "./shipping/cdekQuoteValidation.js";
 import { replaceMyCartValidation } from "./cart/replaceMyCartValidation.js";
 import { replaceMyFavoritesValidation } from "./favorites/replaceMyFavoritesValidation.js";
@@ -329,4 +330,5 @@ export {
   cdekCredentialsValidation,
   cdekQuoteValidation,
   cdekDeliveryPointsValidation,
+  cdekAvailabilityValidation,
 };
