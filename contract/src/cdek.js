@@ -114,6 +114,18 @@ export const cdekDeliveryPointsQuerySchema = z.object({
   city: z.string().trim().min(2).max(100).optional(),
 });
 
+/** Выбор покупателя в заказе: тариф, пункт выдачи и город. Без цены — её считает сервер. */
+export const cdekOrderSelectionSchema = z.object({
+  tariffCode: z.coerce.number().int().positive(),
+  pickupPointCode: z.string().trim().min(1).max(32),
+  toCityCode: z.coerce.number().int().positive(),
+});
+
+export const CDEK_TARIFF_GONE_MESSAGE =
+  "Выбранный тариф СДЭК больше недоступен — выберите доставку заново";
+export const CDEK_POINT_GONE_MESSAGE =
+  "Пункт выдачи СДЭК не найден или не выдаёт заказы — выберите другой";
+
 /** Одна строка расчёта: тариф, цена и срок. */
 export const cdekTariffOptionSchema = z.object({
   tariffCode: z.number().int(),

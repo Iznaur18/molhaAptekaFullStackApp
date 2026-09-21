@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { marketingAttributionSchema } from "./marketingAttribution.js";
+import { cdekOrderSelectionSchema } from "./cdek.js";
 import { mongoIdSchema } from "./mongoId.js";
 import { ADDRESS_LINE_MAX_LENGTH } from "./userFields.js";
 import {
@@ -141,6 +142,12 @@ export const createOrderBodySchema = z
       .max(ORDER_ITEMS_MAX)
       .optional()
       .default([]),
+    /**
+     * Доставка СДЭК до пункта выдачи. Цену сервер пересчитывает сам по ключу
+     * продавца: присланной сумме не доверяем, клиент шлёт только выбор.
+     * Адрес заказа — адрес пункта, поэтому deliveryAddress тогда не нужен.
+     */
+    cdekShipment: cdekOrderSelectionSchema.nullable().optional(),
     paymentMethod: z.enum(ORDER_PAYMENT_METHODS),
     priceOfferId: mongoIdSchema.optional(),
     /** Код шарера (`referralCode`) из `?aff=` — last-click attribution. */
@@ -190,7 +197,11 @@ export const createOrderBodySchema = z
     const anySellerDelivery = Object.values(body.fulfillmentBySellerId ?? {}).some(
       (method) => method === "delivery",
     );
-    if (body.fulfillmentMethod === "delivery" || anySellerDelivery) {
+    // У СДЭК адрес — это пункт выдачи, его подставит сервер.
+    if (
+      (body.fulfillmentMethod === "delivery" || anySellerDelivery) &&
+      !body.cdekShipment
+    ) {
       const line = String(body.deliveryAddress ?? "").trim();
       if (!line) {
         ctx.addIssue({

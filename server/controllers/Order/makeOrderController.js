@@ -49,6 +49,7 @@ export const makeOrderController = async (req, res) => {
         pickupSelections: req.body.pickupSelections,
         verifiedDeliveryAddress: req.verifiedDeliveryAddress,
         deliveryAddressGeo: req.body?.deliveryAddressGeo ?? null,
+        cdekShipment: req.body?.cdekShipment ?? null,
         affiliateCode: req.body.affiliateCode,
         marketingAttribution: sanitizeMarketingAttribution(
           req.body.marketingAttribution,

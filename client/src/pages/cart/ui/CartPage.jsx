@@ -12,6 +12,8 @@ import { buildCheckoutPickupLocations } from "../../../entities/cart/lib/buildCh
 import { resolveCartAllowedPaymentMethods } from "../../../entities/cart/lib/resolveCartAllowedPaymentMethods.js";
 import { resolveCartSellerDelivery } from "../../../entities/cart/lib/resolveCartSellerDelivery.js";
 import { fetchSellerDeliveryQuote } from "../../../entities/cart/api/sellerDeliveryQuote.js";
+import { fetchCdekAvailability } from "../../../entities/cdek/api/cdekCheckoutApi.js";
+import { CdekPickupPointPicker } from "../../../features/checkout/ui/CdekPickupPointPicker.jsx";
 import { getCartLineExclusionReason } from "../../../entities/cart/lib/getCartLineExclusionReason.js";
 import {
   groupCartLinesBySeller,
@@ -459,6 +461,21 @@ export function CartPage({
   );
   const quoteGeoLat = debouncedDeliveryAddress?.geo?.lat ?? null;
   const quoteGeoLon = debouncedDeliveryAddress?.geo?.lon ?? null;
+  // СДЭК предлагаем, только если продавец подключил свой договор: спрашиваем
+  // дёшево, из базы, без похода в саму службу.
+  const cdekSellerId = activeSellerEntry?.group?.sellerId ?? "";
+  const cdekAvailabilityQuery = useQuery({
+    queryKey: ["cdek-availability", cdekSellerId],
+    queryFn: () => fetchCdekAvailability(cdekSellerId),
+    enabled: Boolean(cdekSellerId),
+    staleTime: 60_000,
+  });
+  const cdekAvailable = cdekAvailabilityQuery.data === true && !auctionCheckoutBid;
+  const [cdekSelection, setCdekSelection] = useState(null);
+  useEffect(() => {
+    setCdekSelection(null);
+  }, [cdekSellerId]);
+
   const sellerDeliveryQuoteQuery = useQuery({
     queryKey: [
       "seller-delivery-quote",
@@ -557,6 +574,7 @@ export function CartPage({
     deliveryAddressFlat,
     paymentMethod,
     pickupSelections,
+    cdekShipment = null,
   }) => {
     setSubmitState({ isSubmitting: true, error: "", success: "" });
 
@@ -597,12 +615,17 @@ export function CartPage({
           quantity: line.quantity,
         })),
         fulfillmentMethod,
-        fulfillmentBySellerId: scopedFulfillmentBySellerId,
-        deliveryFeeBySellerId: scopedDeliveryFeeBySellerId,
+        // СДЭК везёт по договору продавца: своя доставка и курьерская ставка
+        // тут ни при чём, адрес сервер возьмёт из пункта выдачи.
+        fulfillmentBySellerId: cdekShipment
+          ? { [cdekSellerId]: "delivery" }
+          : scopedFulfillmentBySellerId,
+        deliveryFeeBySellerId: cdekShipment ? {} : scopedDeliveryFeeBySellerId,
         deliveryAddress,
         deliveryAddressFlat,
         paymentMethod,
         pickupSelections,
+        ...(cdekShipment ? { cdekShipment } : {}),
       });
       removeItems(orderedProductIds);
       setActiveSellerCartId(null);
@@ -762,6 +785,18 @@ export function CartPage({
                       fulfillmentMethodPortalTarget={fulfillmentMethodHostEl}
                       paymentMethodPortalTarget={paymentMethodHostEl}
                       onSubmit={handleCheckoutSubmit}
+                      cdekAvailable={cdekAvailable}
+                      cdekSelection={cdekSelection}
+                      cdekPicker={
+                        <CdekPickupPointPicker
+                          sellerId={activeSellerCart.group.sellerId}
+                          productIds={activeSellerCart.summary.selectedLines.map(
+                            (line) => line.productId,
+                          )}
+                          disabled={submitState.isSubmitting}
+                          onChange={setCdekSelection}
+                        />
+                      }
                     />
                   </div>
                   <div

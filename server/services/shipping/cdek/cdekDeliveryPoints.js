@@ -54,6 +54,23 @@ export async function listCdekDeliveryPoints(credentials, { cityCode, postalCode
 }
 
 /**
+ * Один пункт по коду: при оформлении заказа проверяем, что пункт, выбранный
+ * покупателем, существует и до сих пор выдаёт заказы.
+ *
+ * @param {{ account: string; secure: string; environment?: string }} credentials
+ * @param {string} code
+ */
+export async function findCdekDeliveryPoint(credentials, code) {
+  const payload = await cdekRequest(credentials, {
+    path: "/deliverypoints",
+    query: { code, is_handout: true },
+  });
+  const rows = Array.isArray(payload) ? payload : [];
+  const point = rows.map(readDeliveryPoint).find((row) => row?.code === code);
+  return point ?? null;
+}
+
+/**
  * Код города в справочнике СДЭК: без него расчёт и список пунктов промахиваются
  * мимо нужного города, особенно в тёзках вроде двух Первомайских.
  *

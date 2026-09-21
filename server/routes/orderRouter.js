@@ -5,6 +5,7 @@ import {
   postShippingEstimateController,
   postCdekQuoteController,
   getCdekDeliveryPointsController,
+  getCdekAvailabilityController,
   postSellerDeliveryQuoteController,
   getShippingCarriersController,
   getMyOrdersController,
@@ -35,6 +36,7 @@ import {
   shippingEstimateValidation,
   cdekQuoteValidation,
   cdekDeliveryPointsValidation,
+  cdekAvailabilityValidation,
   updateOrderStatusValidation,
   getAllOrdersValidation,
   getMyOrdersValidation,
@@ -72,6 +74,12 @@ router.post(
   orderCreateRateLimiter,
   cdekQuoteValidation,
   postCdekQuoteController,
+);
+router.get(
+  "/cdek-availability",
+  checkAuthMW,
+  cdekAvailabilityValidation,
+  getCdekAvailabilityController,
 );
 router.get(
   "/cdek-delivery-points",

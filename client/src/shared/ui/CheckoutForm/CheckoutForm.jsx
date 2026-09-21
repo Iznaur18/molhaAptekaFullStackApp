@@ -98,6 +98,9 @@ const EMPTY_SAVED_DELIVERY_ADDRESSES = [];
  *   paymentMethodPortalTarget?: Element | null;
  *   fulfillmentMethodPortalTarget?: Element | null;
  *   submitPortalTarget?: Element | null;
+ *   cdekAvailable?: boolean;
+ *   cdekPicker?: import('react').ReactNode;
+ *   cdekSelection?: { tariffCode: number; pickupPointCode: string; toCityCode: number } | null;
  * }} props
  */
 export function CheckoutForm({
@@ -127,8 +130,12 @@ export function CheckoutForm({
   paymentMethodPortalTarget = null,
   fulfillmentMethodPortalTarget = null,
   submitPortalTarget = null,
+  cdekAvailable = false,
+  cdekPicker = null,
+  cdekSelection = null,
 }) {
   const generatedFormId = useId();
+  const [cdekChosenState, setCdekChosen] = useState(false);
   const formId = formIdProp || generatedFormId;
   const [fulfillmentMethod, setFulfillmentMethod] = useState(() =>
     initialFulfillmentMethod === ORDER_FULFILLMENT_DELIVERY
@@ -249,12 +256,19 @@ export function CheckoutForm({
   // Смешанный заказ: часть отправлений забирают, часть везут. Способ уже
   // выбран в корзине на каждого продавца, поэтому переключатель здесь не
   // нужен — форме остаётся собрать и точки самовывоза, и адрес.
-  const needsPickup = fulfillmentMode
-    ? fulfillmentMode !== "delivery"
-    : fulfillmentMethod === ORDER_FULFILLMENT_PICKUP;
-  const needsDelivery = fulfillmentMode
-    ? fulfillmentMode !== "pickup"
-    : fulfillmentMethod === ORDER_FULFILLMENT_DELIVERY;
+  // СДЭК до пункта выдачи — третий способ: ни точка продавца, ни адрес
+  // покупателя не нужны, вместо них пункт СДЭК.
+  const cdekChosen = cdekAvailable && cdekChosenState;
+  const needsPickup =
+    !cdekChosen &&
+    (fulfillmentMode
+      ? fulfillmentMode !== "delivery"
+      : fulfillmentMethod === ORDER_FULFILLMENT_PICKUP);
+  const needsDelivery =
+    !cdekChosen &&
+    (fulfillmentMode
+      ? fulfillmentMode !== "pickup"
+      : fulfillmentMethod === ORDER_FULFILLMENT_DELIVERY);
   const isPickup = needsPickup && !needsDelivery;
   const isMixedFulfillment = needsPickup && needsDelivery;
   const pickupGroups = useMemo(
@@ -348,6 +362,25 @@ export function CheckoutForm({
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    if (cdekChosen) {
+      if (!cdekSelection) {
+        setLocalError(CHECKOUT_FORM_UI.CDEK_POINT_REQUIRED);
+        return;
+      }
+      setLocalError("");
+      // Адрес заказа сервер возьмёт из пункта выдачи, цену пересчитает сам.
+      void onSubmit({
+        fulfillmentMethod: ORDER_FULFILLMENT_DELIVERY,
+        deliveryAddress: "",
+        deliveryAddressFlat: "",
+        deliveryAddressGeo: null,
+        paymentMethod,
+        pickupSelections: [],
+        cdekShipment: cdekSelection,
+      });
+      return;
+    }
 
     if (needsPickup && (!pickupSelectable || !pickupReady)) {
       setLocalError(pickupOptionHint || CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED);
@@ -478,11 +511,13 @@ export function CheckoutForm({
           <button
             type="button"
             role="radio"
-            aria-checked={isPickup}
+            aria-checked={isPickup && !cdekChosen}
             aria-disabled={!pickupSelectable || isDisabled || isSubmitting}
             className={[
               "checkout-form__fulfillment-option",
-              isPickup ? "checkout-form__fulfillment-option--active" : "",
+              isPickup && !cdekChosen
+                ? "checkout-form__fulfillment-option--active"
+                : "",
               !pickupSelectable ? "checkout-form__fulfillment-option--disabled" : "",
             ]
               .filter(Boolean)
@@ -496,6 +531,7 @@ export function CheckoutForm({
                 return;
               }
               setLocalError("");
+              setCdekChosen(false);
               applyFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
             }}
           >
@@ -506,11 +542,13 @@ export function CheckoutForm({
           <button
             type="button"
             role="radio"
-            aria-checked={!isPickup}
+            aria-checked={!isPickup && !cdekChosen}
             aria-disabled={!deliverySelectable || isDisabled || isSubmitting}
             className={[
               "checkout-form__fulfillment-option",
-              !isPickup ? "checkout-form__fulfillment-option--active" : "",
+              !isPickup && !cdekChosen
+                ? "checkout-form__fulfillment-option--active"
+                : "",
               !deliverySelectable ? "checkout-form__fulfillment-option--disabled" : "",
             ]
               .filter(Boolean)
@@ -525,6 +563,7 @@ export function CheckoutForm({
                 return;
               }
               setLocalError("");
+              setCdekChosen(false);
               applyFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
             }}
           >
@@ -532,6 +571,28 @@ export function CheckoutForm({
               {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
             </span>
           </button>
+          {cdekAvailable ? (
+            <button
+              type="button"
+              role="radio"
+              aria-checked={cdekChosen}
+              className={[
+                "checkout-form__fulfillment-option",
+                cdekChosen ? "checkout-form__fulfillment-option--active" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              disabled={isDisabled || isSubmitting}
+              onClick={() => {
+                setLocalError("");
+                setCdekChosen(true);
+              }}
+            >
+              <span className="checkout-form__fulfillment-option-title">
+                {CHECKOUT_FORM_UI.FULFILLMENT_CDEK}
+              </span>
+            </button>
+          ) : null}
         </div>
       </div>
     ) : null;
@@ -558,6 +619,19 @@ export function CheckoutForm({
               переключателю делать нечего. Не hidden: у блока свой display,
               он перебил бы атрибут. */}
           {portaledFulfillmentMethod ? null : fulfillmentMethodPicker}
+
+          {cdekChosen ? (
+            <section className="checkout-form__fulfillment-section checkout-form__fulfillment-section--cdek">
+              <header className="checkout-form__fulfillment-section-head">
+                <span className="checkout-form__fulfillment-section-badge">
+                  {CHECKOUT_FORM_UI.FULFILLMENT_CDEK}
+                </span>
+              </header>
+              <div className="checkout-form__fulfillment-section-body">
+                {cdekPicker}
+              </div>
+            </section>
+          ) : null}
 
           {!needsPickup && pickupSelectable && !hideInactiveFulfillmentSections ? (
             <section
