@@ -7,11 +7,13 @@ import { createTestQueryClient } from "../../../test/createTestQueryClient.js";
 const fetchCdekConnectionMock = vi.fn();
 const saveCdekConnectionMock = vi.fn();
 const removeCdekConnectionMock = vi.fn();
+const toggleCdekConnectionMock = vi.fn();
 
 vi.mock("../api/cdekCredentialsApi.js", () => ({
   fetchCdekConnection: (...args) => fetchCdekConnectionMock(...args),
   saveCdekConnection: (...args) => saveCdekConnectionMock(...args),
   removeCdekConnection: (...args) => removeCdekConnectionMock(...args),
+  toggleCdekConnection: (...args) => toggleCdekConnectionMock(...args),
 }));
 
 const { CdekConnectionCard } = await import("./CdekConnectionCard.jsx");
@@ -37,6 +39,7 @@ describe("карточка подключения СДЭК", () => {
     fetchCdekConnectionMock.mockReset();
     saveCdekConnectionMock.mockReset();
     removeCdekConnectionMock.mockReset();
+    toggleCdekConnectionMock.mockReset();
   });
 
   it("без ключей показывает «не подключён» и не даёт отправить пустую форму", async () => {
@@ -101,5 +104,34 @@ describe("карточка подключения СДЭК", () => {
         "СДЭК не принял ключи: проверьте Account и Secure password",
       ),
     ).toBeTruthy();
+  });
+
+  it("у подключённого продавца есть тумблер, и он выключает СДЭК для покупателей", async () => {
+    fetchCdekConnectionMock.mockResolvedValue({
+      connected: true,
+      enabled: true,
+      environment: "prod",
+      accountMasked: "••••2tyK",
+      validatedAt: null,
+      lastError: "",
+    });
+    toggleCdekConnectionMock.mockResolvedValue({
+      connected: true,
+      enabled: false,
+      environment: "prod",
+      accountMasked: "••••2tyK",
+      validatedAt: null,
+      lastError: "",
+    });
+    renderCard();
+
+    const toggle = await screen.findByRole("switch");
+    expect(toggle.checked).toBe(true);
+    fireEvent.click(toggle);
+
+    await waitFor(() => {
+      expect(toggleCdekConnectionMock.mock.calls[0]?.[0]).toBe(false);
+    });
+    expect(await screen.findByText(/СДЭК скрыт от покупателей/)).toBeTruthy();
   });
 });

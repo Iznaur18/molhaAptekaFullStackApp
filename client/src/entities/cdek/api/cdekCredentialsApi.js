@@ -44,3 +44,13 @@ export async function removeCdekConnection() {
     return rethrowCdekError(error);
   }
 }
+
+/** @param {boolean} enabled */
+export async function toggleCdekConnection(enabled) {
+  try {
+    const { data } = await apiClient.patch("/user/me/cdek-credentials", { enabled });
+    return data?.data?.cdek ?? null;
+  } catch (error) {
+    return rethrowCdekError(error);
+  }
+}

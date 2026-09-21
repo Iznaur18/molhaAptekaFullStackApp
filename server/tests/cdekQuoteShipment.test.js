@@ -34,7 +34,7 @@ function mockProducts({ sellers, pickupAddress = "Грозный, ул. Мира
 /**
  * @param {{ connected: boolean }} params
  */
-function mockSeller({ connected }) {
+function mockSeller({ connected, enabled }) {
   mock.method(UserModel, "findById", () => ({
     select: () => ({
       lean: async () =>
@@ -44,6 +44,7 @@ function mockSeller({ connected }) {
                 account: "acc",
                 secureSealed: sealCdekSecret("sec"),
                 environment: "test",
+                ...(enabled === undefined ? {} : { enabled }),
               },
             }
           : { cdekIntegration: null },
@@ -146,5 +147,20 @@ describe("расчёт СДЭК для корзины", () => {
     const result = await quoteCdekShipment({ productIds: ["a"], toCityCode: 270 });
     assert.equal(result.available, false);
     assert.equal(result.reason, "no_tariffs");
+  });
+
+  it("продавец выключил тумблер — СДЭК покупателю не предлагаем", async () => {
+    mockProducts({ sellers: ["seller-1"] });
+    mockSeller({ connected: true, enabled: false });
+    let called = false;
+    globalThis.fetch = async () => {
+      called = true;
+      return new Response("{}", { status: 200 });
+    };
+
+    const result = await quoteCdekShipment({ productIds: ["a"], toCityCode: 270 });
+    assert.equal(result.available, false);
+    assert.equal(result.reason, "disabled");
+    assert.equal(called, false, "в СДЭК за выключенного продавца не ходим");
   });
 });

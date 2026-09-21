@@ -3,6 +3,7 @@ import {
   readCdekConnectionState,
   removeSellerCdekCredentials,
   saveSellerCdekCredentials,
+  setSellerCdekEnabled,
 } from "../../services/shipping/cdek/cdekSellerCredentials.js";
 import { UserModel } from "../../models/index.js";
 
@@ -35,4 +36,18 @@ export const putCdekCredentialsController = async (req, res) => {
 export const deleteCdekCredentialsController = async (req, res) => {
   const cdek = await removeSellerCdekCredentials(req.userId);
   return successRes(res, { message: "СДЭК отключён", cdek });
+};
+
+/** PATCH /user/me/cdek-credentials — тумблер «продавать через СДЭК». */
+export const patchCdekCredentialsController = async (req, res) => {
+  const cdek = await setSellerCdekEnabled({
+    sellerId: req.userId,
+    enabled: req.body.enabled === true,
+  });
+  return successRes(res, {
+    message: cdek.enabled
+      ? "СДЭК включён для покупателей"
+      : "СДЭК выключен для покупателей",
+    cdek,
+  });
 };

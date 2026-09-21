@@ -185,7 +185,7 @@ export const CHECKOUT_FORM_UI = {
   FULFILLMENT_DELIVERY: "Доставка",
   FULFILLMENT_DELIVERY_SOON: "Скоро",
   FULFILLMENT_CDEK: "СДЭК: пункт выдачи",
-  CDEK_POINT_REQUIRED: "Выберите пункт выдачи СДЭК",
+  CDEK_POINT_REQUIRED: "Выберите пункт выдачи СДЭК и укажите получателя с телефоном",
   CDEK_CITY_LABEL: "Город получения",
   CDEK_CITY_PLACEHOLDER: "Например, Москва",
   CDEK_FIND_POINTS: "Найти пункты",
@@ -193,6 +193,10 @@ export const CHECKOUT_FORM_UI = {
   CDEK_NO_POINTS: "В этом городе пунктов СДЭК не нашлось — проверьте название",
   CDEK_POINT_LABEL: "Пункт выдачи",
   CDEK_TARIFF_LABEL: "Тариф",
+  CDEK_RECIPIENT_NAME: "Получатель (ФИО)",
+  CDEK_RECIPIENT_PHONE: "Телефон получателя — СДЭК позвонит, когда посылка придёт",
+  CDEK_RECIPIENT_REQUIRED:
+    "Укажите получателя и телефон — без них СДЭК не примет посылку",
   /** @param {number} min @param {number} max */
   CDEK_PERIOD: (min, max) => (min === max ? `${min} дн.` : `${min}–${max} дн.`),
   CDEK_PAY_ON_PICKUP:
@@ -218,6 +222,7 @@ export const CHECKOUT_FORM_UI = {
   LABEL_SHIPPING_PROVIDER: "Служба доставки",
   SHIPPING_PROVIDER_SELLER: "Доставка продавцом",
   SHIPPING_PROVIDER_COURIER: "Курьеры Gitorg",
+  SHIPPING_PROVIDER_CDEK: "СДЭК",
   /** @param {string} cost @param {string} carrier */
   SHIPPING_ESTIMATE: (cost, carrier) => `${carrier}: примерно ${cost}`,
   SHIPPING_ESTIMATE_HINT: "Точную сумму назовёт курьер при получении.",

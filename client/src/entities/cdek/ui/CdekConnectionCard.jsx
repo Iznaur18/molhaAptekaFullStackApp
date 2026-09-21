@@ -6,6 +6,7 @@ import {
   useMyCdekConnectionQuery,
   useRemoveCdekConnectionMutation,
   useSaveCdekConnectionMutation,
+  useToggleCdekConnectionMutation,
 } from "../model/cdekConnectionQueries.js";
 
 import "./CdekConnectionCard.css";
@@ -20,6 +21,7 @@ export function CdekConnectionCard() {
   const connectionQuery = useMyCdekConnectionQuery();
   const saveMutation = useSaveCdekConnectionMutation();
   const removeMutation = useRemoveCdekConnectionMutation();
+  const toggleMutation = useToggleCdekConnectionMutation();
 
   const [account, setAccount] = useState("");
   const [secure, setSecure] = useState("");
@@ -27,7 +29,12 @@ export function CdekConnectionCard() {
 
   const connection = connectionQuery.data;
   const isConnected = connection?.connected === true;
-  const error = saveMutation.error ?? removeMutation.error ?? connectionQuery.error;
+  const isOffered = isConnected && connection?.enabled !== false;
+  const error =
+    saveMutation.error ??
+    removeMutation.error ??
+    toggleMutation.error ??
+    connectionQuery.error;
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -67,6 +74,26 @@ export function CdekConnectionCard() {
       </header>
 
       <p className="cdek-connection-card__subtitle">{CDEK_CONNECTION_UI.SUBTITLE}</p>
+
+      {isConnected ? (
+        <label className="cdek-connection-card__toggle">
+          <input
+            type="checkbox"
+            role="switch"
+            checked={isOffered}
+            disabled={toggleMutation.isPending}
+            onChange={(event) => toggleMutation.mutate(event.target.checked)}
+          />
+          <span>
+            <strong>{CDEK_CONNECTION_UI.TOGGLE_LABEL}</strong>
+            <small>
+              {isOffered
+                ? CDEK_CONNECTION_UI.TOGGLE_ON_HINT
+                : CDEK_CONNECTION_UI.TOGGLE_OFF_HINT}
+            </small>
+          </span>
+        </label>
+      ) : null}
 
       {isConnected ? (
         <dl className="cdek-connection-card__facts">

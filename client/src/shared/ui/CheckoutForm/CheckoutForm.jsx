@@ -99,6 +99,7 @@ const EMPTY_SAVED_DELIVERY_ADDRESSES = [];
  *   fulfillmentMethodPortalTarget?: Element | null;
  *   submitPortalTarget?: Element | null;
  *   cdekAvailable?: boolean;
+ *   sellerDeliveryAvailable?: boolean;
  *   cdekPicker?: import('react').ReactNode;
  *   cdekSelection?: { tariffCode: number; pickupPointCode: string; toCityCode: number } | null;
  * }} props
@@ -131,6 +132,7 @@ export function CheckoutForm({
   fulfillmentMethodPortalTarget = null,
   submitPortalTarget = null,
   cdekAvailable = false,
+  sellerDeliveryAvailable = true,
   cdekPicker = null,
   cdekSelection = null,
 }) {
@@ -256,19 +258,20 @@ export function CheckoutForm({
   // Смешанный заказ: часть отправлений забирают, часть везут. Способ уже
   // выбран в корзине на каждого продавца, поэтому переключатель здесь не
   // нужен — форме остаётся собрать и точки самовывоза, и адрес.
-  // СДЭК до пункта выдачи — третий способ: ни точка продавца, ни адрес
-  // покупателя не нужны, вместо них пункт СДЭК.
-  const cdekChosen = cdekAvailable && cdekChosenState;
-  const needsPickup =
-    !cdekChosen &&
-    (fulfillmentMode
-      ? fulfillmentMode !== "delivery"
-      : fulfillmentMethod === ORDER_FULFILLMENT_PICKUP);
-  const needsDelivery =
-    !cdekChosen &&
-    (fulfillmentMode
-      ? fulfillmentMode !== "pickup"
-      : fulfillmentMethod === ORDER_FULFILLMENT_DELIVERY);
+  const needsPickup = fulfillmentMode
+    ? fulfillmentMode !== "delivery"
+    : fulfillmentMethod === ORDER_FULFILLMENT_PICKUP;
+  const needsDelivery = fulfillmentMode
+    ? fulfillmentMode !== "pickup"
+    : fulfillmentMethod === ORDER_FULFILLMENT_DELIVERY;
+  // Способ всегда один из двух — самовывоз или доставка. СДЭК — это служба
+  // внутри доставки: вместо адреса покупателя нужен пункт выдачи. Если своей
+  // доставки у продавца нет, СДЭК — единственная служба, и выбирать нечего.
+  const cdekChosen =
+    cdekAvailable &&
+    needsDelivery &&
+    !needsPickup &&
+    (cdekChosenState || !sellerDeliveryAvailable);
   const isPickup = needsPickup && !needsDelivery;
   const isMixedFulfillment = needsPickup && needsDelivery;
   const pickupGroups = useMemo(
@@ -511,13 +514,11 @@ export function CheckoutForm({
           <button
             type="button"
             role="radio"
-            aria-checked={isPickup && !cdekChosen}
+            aria-checked={isPickup}
             aria-disabled={!pickupSelectable || isDisabled || isSubmitting}
             className={[
               "checkout-form__fulfillment-option",
-              isPickup && !cdekChosen
-                ? "checkout-form__fulfillment-option--active"
-                : "",
+              isPickup ? "checkout-form__fulfillment-option--active" : "",
               !pickupSelectable ? "checkout-form__fulfillment-option--disabled" : "",
             ]
               .filter(Boolean)
@@ -531,7 +532,6 @@ export function CheckoutForm({
                 return;
               }
               setLocalError("");
-              setCdekChosen(false);
               applyFulfillmentMethod(ORDER_FULFILLMENT_PICKUP);
             }}
           >
@@ -542,13 +542,11 @@ export function CheckoutForm({
           <button
             type="button"
             role="radio"
-            aria-checked={!isPickup && !cdekChosen}
+            aria-checked={!isPickup}
             aria-disabled={!deliverySelectable || isDisabled || isSubmitting}
             className={[
               "checkout-form__fulfillment-option",
-              !isPickup && !cdekChosen
-                ? "checkout-form__fulfillment-option--active"
-                : "",
+              !isPickup ? "checkout-form__fulfillment-option--active" : "",
               !deliverySelectable ? "checkout-form__fulfillment-option--disabled" : "",
             ]
               .filter(Boolean)
@@ -563,7 +561,6 @@ export function CheckoutForm({
                 return;
               }
               setLocalError("");
-              setCdekChosen(false);
               applyFulfillmentMethod(ORDER_FULFILLMENT_DELIVERY);
             }}
           >
@@ -571,28 +568,6 @@ export function CheckoutForm({
               {CHECKOUT_FORM_UI.FULFILLMENT_DELIVERY}
             </span>
           </button>
-          {cdekAvailable ? (
-            <button
-              type="button"
-              role="radio"
-              aria-checked={cdekChosen}
-              className={[
-                "checkout-form__fulfillment-option",
-                cdekChosen ? "checkout-form__fulfillment-option--active" : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              disabled={isDisabled || isSubmitting}
-              onClick={() => {
-                setLocalError("");
-                setCdekChosen(true);
-              }}
-            >
-              <span className="checkout-form__fulfillment-option-title">
-                {CHECKOUT_FORM_UI.FULFILLMENT_CDEK}
-              </span>
-            </button>
-          ) : null}
         </div>
       </div>
     ) : null;
@@ -619,19 +594,6 @@ export function CheckoutForm({
               переключателю делать нечего. Не hidden: у блока свой display,
               он перебил бы атрибут. */}
           {portaledFulfillmentMethod ? null : fulfillmentMethodPicker}
-
-          {cdekChosen ? (
-            <section className="checkout-form__fulfillment-section checkout-form__fulfillment-section--cdek">
-              <header className="checkout-form__fulfillment-section-head">
-                <span className="checkout-form__fulfillment-section-badge">
-                  {CHECKOUT_FORM_UI.FULFILLMENT_CDEK}
-                </span>
-              </header>
-              <div className="checkout-form__fulfillment-section-body">
-                {cdekPicker}
-              </div>
-            </section>
-          ) : null}
 
           {!needsPickup && pickupSelectable && !hideInactiveFulfillmentSections ? (
             <section
@@ -779,55 +741,68 @@ export function CheckoutForm({
                 </span>
               </header>
               <div className="checkout-form__fulfillment-section-body checkout-form__delivery">
-                <CheckoutSavedAddressPicker
-                  addresses={savedAddresses}
-                  selectedId={selectedSavedAddressId}
-                  onSelect={handleSavedAddressSelect}
-                  disabled={isDisabled || isSubmitting}
-                />
-
-                <AddressDeliveryFields
-                  value={deliveryAddress}
-                  onChange={handleDeliveryAddressChange}
-                  disabled={isDisabled || isSubmitting}
-                  displayOnly
-                  lineInputClassName="checkout-form__input"
-                  mapOpen={deliveryMapOpen}
-                  onMapOpenChange={setDeliveryMapOpen}
-                  labels={{
-                    line: CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS,
-                  }}
-                />
-
-                <label className="checkout-form__field">
-                  <span className="checkout-form__label">
-                    {CHECKOUT_FORM_UI.LABEL_FLAT}
-                  </span>
-                  <input
-                    type="text"
-                    className="checkout-form__input"
-                    value={deliveryAddress.flat}
-                    onChange={(event) =>
-                      handleDeliveryAddressChange({
-                        ...deliveryAddress,
-                        flat: event.target.value,
-                      })
-                    }
-                    disabled={isDisabled || isSubmitting}
-                    placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
-                    autoComplete="address-line2"
-                  />
-                </label>
-
                 <CheckoutShippingProviderPicker
                   disabled={isDisabled || isSubmitting}
                   courierDelivery={courierDelivery}
+                  cdekAvailable={cdekAvailable}
+                  sellerDeliveryAvailable={sellerDeliveryAvailable}
+                  cdekSelected={cdekChosen}
+                  onSelectCdek={(chosen) => {
+                    setLocalError("");
+                    setCdekChosen(chosen);
+                  }}
                 />
 
-                <CheckoutShippingEstimate
-                  productIds={deliveryProductIds}
-                  deliveryGeo={deliveryAddress.geo ?? null}
-                />
+                {cdekChosen ? (
+                  cdekPicker
+                ) : (
+                  <>
+                    <CheckoutSavedAddressPicker
+                      addresses={savedAddresses}
+                      selectedId={selectedSavedAddressId}
+                      onSelect={handleSavedAddressSelect}
+                      disabled={isDisabled || isSubmitting}
+                    />
+
+                    <AddressDeliveryFields
+                      value={deliveryAddress}
+                      onChange={handleDeliveryAddressChange}
+                      disabled={isDisabled || isSubmitting}
+                      displayOnly
+                      lineInputClassName="checkout-form__input"
+                      mapOpen={deliveryMapOpen}
+                      onMapOpenChange={setDeliveryMapOpen}
+                      labels={{
+                        line: CHECKOUT_FORM_UI.LABEL_DELIVERY_ADDRESS,
+                      }}
+                    />
+
+                    <label className="checkout-form__field">
+                      <span className="checkout-form__label">
+                        {CHECKOUT_FORM_UI.LABEL_FLAT}
+                      </span>
+                      <input
+                        type="text"
+                        className="checkout-form__input"
+                        value={deliveryAddress.flat}
+                        onChange={(event) =>
+                          handleDeliveryAddressChange({
+                            ...deliveryAddress,
+                            flat: event.target.value,
+                          })
+                        }
+                        disabled={isDisabled || isSubmitting}
+                        placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
+                        autoComplete="address-line2"
+                      />
+                    </label>
+
+                    <CheckoutShippingEstimate
+                      productIds={deliveryProductIds}
+                      deliveryGeo={deliveryAddress.geo ?? null}
+                    />
+                  </>
+                )}
               </div>
             </section>
           ) : null}

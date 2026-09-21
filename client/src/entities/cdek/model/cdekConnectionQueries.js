@@ -4,6 +4,7 @@ import {
   fetchCdekConnection,
   removeCdekConnection,
   saveCdekConnection,
+  toggleCdekConnection,
 } from "../api/cdekCredentialsApi.js";
 
 export const cdekConnectionQueryKeys = {
@@ -37,6 +38,16 @@ export function useRemoveCdekConnectionMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: removeCdekConnection,
+    onSuccess: (cdek) => {
+      queryClient.setQueryData(cdekConnectionQueryKeys.mine, cdek);
+    },
+  });
+}
+
+export function useToggleCdekConnectionMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: toggleCdekConnection,
     onSuccess: (cdek) => {
       queryClient.setQueryData(cdekConnectionQueryKeys.mine, cdek);
     },

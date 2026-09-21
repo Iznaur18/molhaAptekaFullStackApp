@@ -732,6 +732,12 @@ const UserSchema = new mongoose.Schema(
      * хранится только зашифрованным, наружу отдаём маску Account.
      */
     cdekIntegration: {
+      /**
+       * Продаёт ли продавец через СДЭК прямо сейчас. Отдельно от ключей: ключ —
+       * подключённый договор, тумблер — решение продавца. Нет поля (записи до
+       * 21.09.2026) — считаем включённым.
+       */
+      enabled: { type: Boolean, default: true },
       /** Account из кабинета СДЭК = client_id для OAuth. */
       account: { type: String, trim: true, default: "", maxlength: 128 },
       /** AES-GCM blob; в публичные GET /user не попадает. */
