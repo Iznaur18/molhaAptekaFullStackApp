@@ -40,6 +40,7 @@ import {
 import { resolveOrderLineSellerId, summarizeOrderItems } from "@izibuy/shared-lib";
 import {
   PRODUCT_DELIVERY_CARRIER_SELLER,
+  SHIPPING_PROVIDER_CDEK,
   resolveProductDeliveryCarrier,
 } from "@molha/api-contract";
 import { ConfirmButton } from "../../../shared/ui/ConfirmButton/ConfirmButton.jsx";
@@ -598,9 +599,14 @@ export function OrderCard({
     productCourierDeliveryEnabled: shipmentOwn?.courierDelivery === true,
     productDeliveryEnabled: shipmentMethod === "delivery",
   });
+  // СДЭК: «Отгружен» и «Доставлен» ставит опрос статусов СДЭК, не продавец.
+  const cdekTracksThisShipment =
+    shipmentMethod === "delivery" &&
+    shipmentOwn?.deliveryCarrier === SHIPPING_PROVIDER_CDEK;
   const sellerDeliversThisShipment =
     shipmentMethod === "delivery" &&
-    shipmentCarrier === PRODUCT_DELIVERY_CARRIER_SELLER;
+    shipmentCarrier === PRODUCT_DELIVERY_CARRIER_SELLER &&
+    !cdekTracksThisShipment;
 
   const shipmentStatusNow = buildOrderStatusFromItems(order.items);
   // Заказ оформлен с предоплатой, а деньги не пришли: продавцу не показываем

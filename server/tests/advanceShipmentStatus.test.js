@@ -14,6 +14,8 @@ const { advanceOrderShipmentStatus, resolveNextShipmentStatus } =
   await import("../services/order/advanceShipmentStatus.js");
 const { markOrderItemDeliveredBySeller, markOrderItemShippedBySeller } =
   await import("../services/order/updateOrderItemStatus.js");
+const { applyCdekStatusToOrder } =
+  await import("../services/shipping/cdek/cdekWaybill.js");
 const { markOrderItemCancelled } =
   await import("../services/order/cancelOrderItems.js");
 
@@ -226,47 +228,77 @@ describe("ступени не ломают отгрузку и отмену", ()
     );
   });
 
-  it("СДЭК отгружает продавец, но только с накладной", async () => {
+  it("СДЭК: ступени ставит статус СДЭК, а не кнопка продавца", async () => {
     const { seller, buyer, product } = await createOrderLoyaltyFixture();
     const order = await createOrderWithReserveTransaction({ buyer, seller, product });
-    const cdekShipment = {
-      sellerId: seller._id,
-      fulfillmentMethod: "delivery",
-      deliveryCarrier: "cdek",
-    };
-    await OrderModel.updateOne(
-      { _id: order._id },
-      { $set: { fulfillmentMethod: "delivery", shipments: [cdekShipment] } },
-    );
-    const ship = () =>
-      markOrderItemShippedBySeller({
-        orderId: String(order._id),
-        itemIndex: 0,
-        sellerId: String(seller._id),
-      });
-
-    await assert.rejects(ship, /Сначала создайте накладную СДЭК/);
-
     await OrderModel.updateOne(
       { _id: order._id },
       {
         $set: {
+          fulfillmentMethod: "delivery",
           shipments: [
-            { ...cdekShipment, cdekWaybill: { uuid: "u-1", cdekNumber: "1" } },
+            {
+              sellerId: seller._id,
+              fulfillmentMethod: "delivery",
+              deliveryCarrier: "cdek",
+              cdekWaybill: { uuid: "u-1", cdekNumber: "1" },
+            },
           ],
         },
       },
     );
-    const { order: shipped } = await ship();
-    assert.equal(shipped.items[0].status, "shipped");
+    const ids = { orderId: String(order._id), sellerId: String(seller._id) };
 
-    const { order: delivered } = await markOrderItemDeliveredBySeller({
-      orderId: String(order._id),
-      itemIndex: 0,
-      sellerId: String(seller._id),
-      userId: String(seller._id),
+    await assert.rejects(
+      () => markOrderItemShippedBySeller({ ...ids, itemIndex: 0 }),
+      /когда СДЭК примет посылку/,
+    );
+
+    assert.equal(await applyCdekStatusToOrder({ ...ids, statusCode: "CREATED" }), 0);
+    await applyCdekStatusToOrder({
+      ...ids,
+      statusCode: "RECEIVED_AT_SHIPMENT_WAREHOUSE",
     });
-    assert.equal(delivered.items[0].status, "delivered");
+    let fresh = await OrderModel.findById(order._id).lean();
+    assert.equal(fresh.items[0].status, "shipped");
+
+    await assert.rejects(
+      () =>
+        markOrderItemDeliveredBySeller({ ...ids, itemIndex: 0, userId: ids.sellerId }),
+      /когда СДЭК вручит посылку/,
+    );
+
+    await applyCdekStatusToOrder({ ...ids, statusCode: "DELIVERED" });
+    fresh = await OrderModel.findById(order._id).lean();
+    assert.equal(fresh.items[0].status, "delivered");
+  });
+
+  it("СДЭК принял и вручил между опросами — заказ догоняет обе ступени", async () => {
+    const { seller, buyer, product } = await createOrderLoyaltyFixture();
+    const order = await createOrderWithReserveTransaction({ buyer, seller, product });
+    await OrderModel.updateOne(
+      { _id: order._id },
+      {
+        $set: {
+          fulfillmentMethod: "delivery",
+          shipments: [
+            {
+              sellerId: seller._id,
+              fulfillmentMethod: "delivery",
+              deliveryCarrier: "cdek",
+            },
+          ],
+        },
+      },
+    );
+
+    await applyCdekStatusToOrder({
+      orderId: String(order._id),
+      sellerId: String(seller._id),
+      statusCode: "DELIVERED",
+    });
+    const fresh = await OrderModel.findById(order._id).lean();
+    assert.equal(fresh.items[0].status, "delivered");
   });
 
   it("самовывоз не отгружают: покупатель забирает сам", async () => {

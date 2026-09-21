@@ -16,6 +16,7 @@ import {
   JOB_PROCESS_COURIER_STUCK_SHIPMENTS,
   JOB_PROCESS_ESCROW_RELEASE,
   JOB_PROCESS_LOBO_CRON,
+  JOB_PROCESS_CDEK_STATUS_SYNC,
   JOB_PROCESS_PRODUCT_BULK_IMPORT,
   JOB_SEND_EMAIL_VERIFICATION,
 } from "../queues/queueConstants.js";
@@ -23,6 +24,7 @@ import { sendEmailVerificationForUser } from "../services/auth/emailVerification
 import { processCourierStuckShipmentCronTasks } from "../services/courier/courierStuckShipmentsCron.js";
 import { processEscrowReleaseCronTasks } from "../services/payments/escrowReleaseCron.js";
 import { processLoboCronTasks } from "../services/shipping/lobo/loboStatusSync.js";
+import { syncCdekWaybillStatuses } from "../services/shipping/cdek/cdekWaybill.js";
 import { processIntroAdCampaignCronTasks } from "../services/intro-ad/introAdCampaignHelpers.js";
 import { processInstallmentCronTasks } from "../utils/installmentHelpers.js";
 import { processPremiumCronTasks } from "../utils/premiumAccess.js";
@@ -82,6 +84,8 @@ export async function processAppQueueJob(job) {
       return processEscrowReleaseCronTasks();
     case JOB_PROCESS_LOBO_CRON:
       return processLoboCronTasks();
+    case JOB_PROCESS_CDEK_STATUS_SYNC:
+      return syncCdekWaybillStatuses();
     case JOB_PROCESS_PRODUCT_BULK_IMPORT:
       return processProductBulkImportJob(job.data.jobId);
     default:

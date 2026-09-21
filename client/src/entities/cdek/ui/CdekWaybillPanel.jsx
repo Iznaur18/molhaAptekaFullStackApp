@@ -86,6 +86,8 @@ export function CdekWaybillPanel({ orderId, shipment, onChanged }) {
         />
       )}
 
+      <p className="cdek-waybill-panel__hint">{CDEK_WAYBILL_UI.AUTO_STATUS_HINT}</p>
+
       {error ? (
         <p className="cdek-waybill-panel__error" role="alert">
           {error.message}

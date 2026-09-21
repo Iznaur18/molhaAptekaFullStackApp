@@ -6,6 +6,7 @@ import { ONEC_SYNC_INTERVAL_MS } from "../constants/onecConstants.js";
 import { ANALYTICS_RECONCILIATION_CRON_INTERVAL_MS } from "../constants/analyticsConstants.js";
 import { COURIER_STUCK_SHIPMENT_CRON_INTERVAL_MS } from "../constants/courierConstants.js";
 import { LOBO_POLL_INTERVAL_MS } from "../constants/loboConstants.js";
+import { CDEK_POLL_INTERVAL_MS } from "../constants/cdekConstants.js";
 import { INSTALLMENT_CRON_INTERVAL_MS } from "../constants/installmentConstants.js";
 import { INTRO_AD_CRON_INTERVAL_MS } from "../constants/introAdCampaignConstants.js";
 import { PREMIUM_CRON_INTERVAL_MS } from "../constants/premiumConstants.js";
@@ -29,6 +30,7 @@ import { processOneCCronTasks } from "../services/onec/index.js";
 import { runAnalyticsReconciliation } from "../services/analytics/index.js";
 import { processCourierStuckShipmentCronTasks } from "../services/courier/courierStuckShipmentsCron.js";
 import { processLoboCronTasks } from "../services/shipping/lobo/loboStatusSync.js";
+import { syncCdekWaybillStatuses } from "../services/shipping/cdek/cdekWaybill.js";
 
 import { shouldRunCronOnThisProcess } from "./shouldRunCronOnThisProcess.js";
 
@@ -140,6 +142,13 @@ export function startCronIntervals() {
     "process_lobo_cron_tasks",
     LOBO_POLL_INTERVAL_MS,
     processLoboCronTasks,
+  );
+
+  // Статусы накладных СДЭК: «Отгружен» и «Доставлен» ставит их опрос.
+  scheduleCronJob(
+    "process_cdek_status_sync",
+    CDEK_POLL_INTERVAL_MS,
+    syncCdekWaybillStatuses,
   );
 
   return true;
