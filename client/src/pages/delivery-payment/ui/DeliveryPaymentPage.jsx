@@ -23,6 +23,7 @@ import {
   useSaveSellerCommerceDefaultsMutation,
 } from "../../../entities/seller-commerce-defaults/model/sellerCommerceDefaultsQueries.js";
 import { CdekConnectionCard } from "../../../entities/cdek/ui/CdekConnectionCard.jsx";
+import { YandexDeliveryConnectionCard } from "../../../entities/yandex-delivery/ui/YandexDeliveryConnectionCard.jsx";
 import {
   useMyCdekConnectionQuery,
   useToggleCdekConnectionMutation,
@@ -442,6 +443,7 @@ export function DeliveryPaymentPage() {
       {/* Ключи СДЭК сохраняются отдельно: их проверяет сама служба, и общий
           «Сохранить» не должен зависеть от доступности чужого API. */}
       <CdekConnectionCard />
+      <YandexDeliveryConnectionCard />
     </section>
   );
 }

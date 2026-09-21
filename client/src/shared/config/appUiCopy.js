@@ -109,6 +109,7 @@ export {
 } from "./copy/safe-deal.js";
 export { SHIPPING_CARRIERS_ADMIN_UI } from "./copy/shipping-carriers.js";
 export { CDEK_CONNECTION_UI, CDEK_WAYBILL_UI } from "./copy/cdek.js";
+export { YANDEX_DELIVERY_CONNECTION_UI } from "./copy/yandexDelivery.js";
 export {
   SELLER_COMMERCE_DEFAULTS_UI,
   PRODUCT_FULFILLMENT_SOURCE_UI,
