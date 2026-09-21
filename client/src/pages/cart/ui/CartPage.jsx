@@ -761,7 +761,9 @@ export function CartPage({
                       defaultDeliveryAddress={defaultAddress}
                       savedDeliveryAddresses={savedDeliveryAddresses}
                       pickupLocations={pickupLocations}
-                      deliveryAvailable={deliveryAvailable}
+                      // «Доставка» доступна и тогда, когда у продавца есть только СДЭК.
+                      deliveryAvailable={deliveryAvailable || cdekAvailable}
+                      sellerDeliveryAvailable={deliveryAvailable}
                       pickupAvailable={pickupAvailable}
                       fulfillmentMode={null}
                       courierDelivery={checkoutCourierDelivery}
@@ -793,6 +795,8 @@ export function CartPage({
                           productIds={activeSellerCart.summary.selectedLines.map(
                             (line) => line.productId,
                           )}
+                          initialRecipientName={user?.userFullName ?? ""}
+                          initialRecipientPhone={user?.userPhoneNumber ?? ""}
                           disabled={submitState.isSubmitting}
                           onChange={setCdekSelection}
                         />

@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { mongoIdSchema } from "./mongoId.js";
+import { assertRuPhoneFormat, normalizeRuPhoneInput } from "./userFields.js";
 
 /**
  * СДЭК подключается per-seller: у каждого продавца свой договор и свои ключи
@@ -56,12 +57,18 @@ export const cdekCredentialsBodySchema = z.object({
   environment: z.enum(CDEK_ENVIRONMENTS).optional(),
 });
 
+/** Body `PATCH /user/me/cdek-credentials` — тумблер «продавать через СДЭК». */
+export const cdekToggleBodySchema = z.object({ enabled: z.coerce.boolean() });
+
+export const CDEK_DISABLED_MESSAGE = "Продавец сейчас не отправляет через СДЭК";
+
 /**
  * Что отдаём наружу о подключении. Секрет не отдаём никогда — только признак
  * «подключено» и маска, чтобы продавец узнал свой ключ.
  */
 export const cdekConnectionStateSchema = z.object({
   connected: z.boolean(),
+  enabled: z.boolean(),
   environment: z.enum(CDEK_ENVIRONMENTS),
   accountMasked: z.string(),
   validatedAt: z.coerce.date().nullable(),
@@ -114,11 +121,44 @@ export const cdekDeliveryPointsQuerySchema = z.object({
   city: z.string().trim().min(2).max(100).optional(),
 });
 
+export const CDEK_RECIPIENT_NAME_MAX_LENGTH = 100;
+
+/**
+ * Получатель посылки. СДЭК без телефона отправление не примет и звонит по нему
+ * о прибытии в пункт, а телефон в профиле у нас необязательный — поэтому
+ * спрашиваем прямо при выборе СДЭК.
+ */
+export const cdekRecipientSchema = z.object({
+  name: z
+    .string({ required_error: "Укажите, кто получит посылку" })
+    .trim()
+    .min(2, "Укажите, кто получит посылку")
+    .max(CDEK_RECIPIENT_NAME_MAX_LENGTH),
+  phone: z
+    .string({ required_error: "Укажите телефон получателя" })
+    .trim()
+    .transform((raw, ctx) => {
+      try {
+        const normalized = normalizeRuPhoneInput(raw);
+        if (!normalized) throw new Error("Укажите телефон получателя");
+        assertRuPhoneFormat(normalized);
+        return normalized;
+      } catch (error) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: error instanceof Error ? error.message : "Неверный телефон",
+        });
+        return z.NEVER;
+      }
+    }),
+});
+
 /** Выбор покупателя в заказе: тариф, пункт выдачи и город. Без цены — её считает сервер. */
 export const cdekOrderSelectionSchema = z.object({
   tariffCode: z.coerce.number().int().positive(),
   pickupPointCode: z.string().trim().min(1).max(32),
   toCityCode: z.coerce.number().int().positive(),
+  recipient: cdekRecipientSchema,
 });
 
 export const CDEK_TARIFF_GONE_MESSAGE =

@@ -19,6 +19,7 @@ import {
   getCdekCredentialsController,
   putCdekCredentialsController,
   deleteCdekCredentialsController,
+  patchCdekCredentialsController,
   blockUserController,
   unblockUserController,
   listMyBlockedUsersController,
@@ -65,6 +66,7 @@ import {
   resolveDataConfirmationValidation,
   userFollowListValidation,
   cdekCredentialsValidation,
+  cdekToggleValidation,
   userBlockListValidation,
   userStoryIdParamValidation,
   createUserStoryValidation,
@@ -169,6 +171,12 @@ router.put(
   putCdekCredentialsController,
 );
 router.delete("/me/cdek-credentials", checkAuthMW, deleteCdekCredentialsController);
+router.patch(
+  "/me/cdek-credentials",
+  checkAuthMW,
+  cdekToggleValidation,
+  patchCdekCredentialsController,
+);
 
 router.get(
   "/data-confirmation-requests/pending",

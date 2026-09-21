@@ -22,11 +22,18 @@ import { quoteCdekPickupTariffs } from "./cdekTariffs.js";
  * @param {{
  *   sellerId: string;
  *   productIds: string[];
- *   selection: { tariffCode: number; pickupPointCode: string; toCityCode: number };
+ *   selection: {
+ *     tariffCode: number;
+ *     pickupPointCode: string;
+ *     toCityCode: number;
+ *     recipient?: { name: string; phone: string };
+ *   };
  * }} input
  */
 export async function resolveCdekOrderShipment({ sellerId, productIds, selection }) {
-  const credentials = await resolveSellerCdekCredentials(sellerId);
+  const credentials = await resolveSellerCdekCredentials(sellerId, {
+    requireEnabled: true,
+  });
 
   const products = await ProductModel.find({ _id: { $in: productIds } })
     .select(
@@ -67,6 +74,10 @@ export async function resolveCdekOrderShipment({ sellerId, productIds, selection
       // false — у части товаров нет веса и габаритов, цена была оценкой.
       exact: quote.exact,
       environment: credentials.environment,
+      // Кому СДЭК отдаст посылку и куда позвонит о прибытии.
+      recipient: selection.recipient
+        ? { name: selection.recipient.name, phone: selection.recipient.phone }
+        : null,
       pickupPoint: {
         code: point.code,
         name: point.name,

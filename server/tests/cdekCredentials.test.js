@@ -46,6 +46,19 @@ describe("состояние подключения СДЭК", () => {
     assert.equal(state.environment, "prod");
     assert.equal(state.accountMasked, "");
   });
+
+  it("тумблер: старые записи без поля считаются включёнными, выключенный виден", () => {
+    const sealed = sealCdekSecret("secret");
+    assert.equal(
+      readCdekConnectionState({ account: "acc1", secureSealed: sealed }).enabled,
+      true,
+    );
+    assert.equal(
+      readCdekConnectionState({ account: "acc1", secureSealed: sealed, enabled: false })
+        .enabled,
+      false,
+    );
+  });
 });
 
 describe("клиент СДЭК: токен", () => {

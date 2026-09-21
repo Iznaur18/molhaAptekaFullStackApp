@@ -1,4 +1,4 @@
-import { CDEK_NOT_CONNECTED_MESSAGE } from "@molha/api-contract";
+import { CDEK_DISABLED_MESSAGE, CDEK_NOT_CONNECTED_MESSAGE } from "@molha/api-contract";
 
 import { AppError } from "../../../errors/AppError.js";
 import { ProductModel } from "../../../models/index.js";
@@ -62,11 +62,16 @@ export async function quoteCdekShipment({
 
   let credentials;
   try {
-    credentials = await resolveSellerCdekCredentials(shipment.sellerId);
+    credentials = await resolveSellerCdekCredentials(shipment.sellerId, {
+      requireEnabled: true,
+    });
   } catch (error) {
     // Нет ключей — это не сбой: у покупателя просто не будет варианта СДЭК.
     if (error instanceof AppError && error.message === CDEK_NOT_CONNECTED_MESSAGE) {
       return { available: false, reason: "not_connected", options: [] };
+    }
+    if (error instanceof AppError && error.message === CDEK_DISABLED_MESSAGE) {
+      return { available: false, reason: "disabled", options: [] };
     }
     throw error;
   }
@@ -108,7 +113,9 @@ export async function quoteCdekShipment({
  * }} input
  */
 export async function listCdekPointsForBuyer({ sellerId, cityCode, postalCode, city }) {
-  const credentials = await resolveSellerCdekCredentials(sellerId);
+  const credentials = await resolveSellerCdekCredentials(sellerId, {
+    requireEnabled: true,
+  });
 
   let code = cityCode ?? null;
   if (!code) {

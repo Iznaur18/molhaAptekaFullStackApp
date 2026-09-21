@@ -68,11 +68,21 @@ describe("выбор пункта выдачи СДЭК", () => {
     const [, pointSelect] = container.querySelectorAll("select");
     fireEvent.change(pointSelect, { target: { value: "MSK180" } });
 
+    // Без получателя с телефоном СДЭК посылку не примет — выбора ещё нет.
+    expect(onChange).toHaveBeenLastCalledWith(null);
+    fireEvent.change(screen.getByLabelText(/Получатель/), {
+      target: { value: "Иван Петров" },
+    });
+    fireEvent.change(screen.getByLabelText(/Телефон получателя/), {
+      target: { value: "+7 999 123-45-67" },
+    });
+
     await waitFor(() => {
       expect(onChange).toHaveBeenLastCalledWith({
         tariffCode: 136,
         pickupPointCode: "MSK180",
         toCityCode: 44,
+        recipient: { name: "Иван Петров", phone: "+7 999 123-45-67" },
       });
     });
     expect(fetchCdekQuoteMock).toHaveBeenCalledWith({

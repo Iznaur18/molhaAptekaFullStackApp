@@ -1,5 +1,6 @@
 import { UserModel } from "../../models/index.js";
 import { successRes } from "../../services/http/index.js";
+import { isCdekOfferedBySeller } from "../../services/shipping/cdek/cdekSellerCredentials.js";
 import {
   listCdekPointsForBuyer,
   quoteCdekShipment,
@@ -29,11 +30,11 @@ export const postCdekQuoteController = async (req, res) => {
  */
 export const getCdekAvailabilityController = async (req, res) => {
   const seller = await UserModel.findById(String(req.query.sellerId))
-    .select("cdekIntegration.account cdekIntegration.secureSealed")
+    .select(
+      "cdekIntegration.account cdekIntegration.secureSealed cdekIntegration.enabled",
+    )
     .lean();
-  const available = Boolean(
-    seller?.cdekIntegration?.account && seller?.cdekIntegration?.secureSealed,
-  );
+  const available = isCdekOfferedBySeller(seller?.cdekIntegration);
   return successRes(res, { available });
 };
 

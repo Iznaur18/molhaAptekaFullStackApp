@@ -18,14 +18,23 @@ import "./CdekPickupPointPicker.css";
  *   sellerId: string;
  *   productIds: string[];
  *   initialCity?: string;
+ *   initialRecipientName?: string;
+ *   initialRecipientPhone?: string;
  *   disabled?: boolean;
- *   onChange: (selection: { tariffCode: number; pickupPointCode: string; toCityCode: number } | null) => void;
+ *   onChange: (selection: {
+ *     tariffCode: number;
+ *     pickupPointCode: string;
+ *     toCityCode: number;
+ *     recipient: { name: string; phone: string };
+ *   } | null) => void;
  * }} props
  */
 export function CdekPickupPointPicker({
   sellerId,
   productIds,
   initialCity = "",
+  initialRecipientName = "",
+  initialRecipientPhone = "",
   disabled = false,
   onChange,
 }) {
@@ -43,6 +52,9 @@ export function CdekPickupPointPicker({
   );
   const [pointCode, setPointCode] = useState("");
   const [tariffCode, setTariffCode] = useState(/** @type {number | null} */ (null));
+  // Телефон нужен СДЭК обязательно: без него отправление не создать.
+  const [recipientName, setRecipientName] = useState(initialRecipientName);
+  const [recipientPhone, setRecipientPhone] = useState(initialRecipientPhone);
 
   const productKey = productIds.join(",");
 
@@ -88,12 +100,19 @@ export function CdekPickupPointPicker({
   }, [productKey, sellerId]);
 
   useEffect(() => {
+    const name = recipientName.trim();
+    const phone = recipientPhone.trim();
     onChange(
-      pointCode && tariffCode && cityCode
-        ? { tariffCode, pickupPointCode: pointCode, toCityCode: cityCode }
+      pointCode && tariffCode && cityCode && name.length >= 2 && phone.length >= 10
+        ? {
+            tariffCode,
+            pickupPointCode: pointCode,
+            toCityCode: cityCode,
+            recipient: { name, phone },
+          }
         : null,
     );
-  }, [pointCode, tariffCode, cityCode, onChange]);
+  }, [pointCode, tariffCode, cityCode, recipientName, recipientPhone, onChange]);
 
   const selectedTariff = useMemo(
     () => quote?.options?.find((option) => option.tariffCode === tariffCode) ?? null,
@@ -176,6 +195,28 @@ export function CdekPickupPointPicker({
                 </option>
               ))}
             </select>
+          </label>
+
+          <label className="cdek-picker__field">
+            <span>{CHECKOUT_FORM_UI.CDEK_RECIPIENT_NAME}</span>
+            <input
+              type="text"
+              value={recipientName}
+              autoComplete="name"
+              onChange={(event) => setRecipientName(event.target.value)}
+              disabled={disabled}
+            />
+          </label>
+          <label className="cdek-picker__field">
+            <span>{CHECKOUT_FORM_UI.CDEK_RECIPIENT_PHONE}</span>
+            <input
+              type="tel"
+              value={recipientPhone}
+              autoComplete="tel"
+              placeholder="+7 9XX XXX-XX-XX"
+              onChange={(event) => setRecipientPhone(event.target.value)}
+              disabled={disabled}
+            />
           </label>
 
           {selectedPoint?.workTime ? (

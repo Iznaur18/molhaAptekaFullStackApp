@@ -105,6 +105,7 @@ import {
   getCdekCredentialsController,
   putCdekCredentialsController,
   deleteCdekCredentialsController,
+  patchCdekCredentialsController,
 } from "./Shipping/cdekCredentialsControllers.js";
 import { postSellerDeliveryQuoteController } from "./Order/sellerDeliveryQuoteController.js";
 import {
@@ -424,6 +425,7 @@ export {
   getCdekCredentialsController,
   putCdekCredentialsController,
   deleteCdekCredentialsController,
+  patchCdekCredentialsController,
   postSellerDeliveryQuoteController,
   getShippingCarriersController,
   getStaffShippingCarriersController,
