@@ -174,7 +174,8 @@ export const cdekWaybillBodySchema = z.object({
   shipmentPointCode: z.string().trim().min(1).max(32).optional(),
 });
 
-export const CDEK_WAYBILL_EXISTS_MESSAGE = "Накладная СДЭК для этого заказа уже создана";
+export const CDEK_WAYBILL_EXISTS_MESSAGE =
+  "Накладная СДЭК для этого заказа уже создана";
 export const CDEK_SHIPMENT_POINT_REQUIRED_MESSAGE =
   "Выберите пункт СДЭК, куда отвезёте посылку";
 

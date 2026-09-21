@@ -100,7 +100,9 @@ export function buildCdekOrderBody({
       ? { shipment_point: shipmentPointCode }
       : { from_location: { address: fromAddress } }),
     delivery_point: snapshot.pickupPoint?.code,
-    delivery_recipient_cost: { value: Math.max(0, Number(snapshot.deliverySumRub) || 0) },
+    delivery_recipient_cost: {
+      value: Math.max(0, Number(snapshot.deliverySumRub) || 0),
+    },
     recipient: {
       name: snapshot.recipient?.name ?? "",
       phones: [{ number: snapshot.recipient?.phone ?? "" }],
@@ -133,7 +135,10 @@ function readCdekOrderState(payload) {
     cdekNumber: entity.cdek_number ? String(entity.cdek_number) : null,
     status: statuses[0]?.name ? String(statuses[0].name) : null,
     error: errors.length
-      ? errors.map((error) => error?.message ?? error?.code ?? "").join("; ").slice(0, 500)
+      ? errors
+          .map((error) => error?.message ?? error?.code ?? "")
+          .join("; ")
+          .slice(0, 500)
       : null,
   };
 }
@@ -177,7 +182,11 @@ async function loadSellerOrder({ orderId, sellerId }) {
 /**
  * @param {{ orderId: string; sellerId: string; shipmentPointCode?: string | null }} params
  */
-export async function createCdekWaybill({ orderId, sellerId, shipmentPointCode = null }) {
+export async function createCdekWaybill({
+  orderId,
+  sellerId,
+  shipmentPointCode = null,
+}) {
   const { order, shipment } = await loadSellerOrder({ orderId, sellerId });
   if (shipment.cdekWaybill?.uuid) {
     throw new AppError(409, CDEK_WAYBILL_EXISTS_MESSAGE);
@@ -235,7 +244,10 @@ export async function createCdekWaybill({ orderId, sellerId, shipmentPointCode =
     error: null,
   };
   await saveWaybill(orderId, sellerId, waybill);
-  logServerEvent("cdek.waybill_created", { orderId: String(orderId), uuid: waybill.uuid });
+  logServerEvent("cdek.waybill_created", {
+    orderId: String(orderId),
+    uuid: waybill.uuid,
+  });
 
   // Номер СДЭК присваивает не сразу; первая попытка — сразу же, дальше по кнопке.
   return refreshCdekWaybill({ orderId, sellerId });
