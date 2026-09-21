@@ -69,6 +69,11 @@ const CDEK_MANUAL_SHIP_MESSAGE =
 const CDEK_MANUAL_DELIVER_MESSAGE =
   "Заказ станет «Доставлен» сам, когда СДЭК вручит посылку — нажмите «Обновить статус» в накладной";
 
+const YANDEX_MANUAL_SHIP_MESSAGE =
+  "Заказ станет «Отгружен» сам, когда Яндекс примет посылку — нажмите «Обновить статус» в заявке";
+const YANDEX_MANUAL_DELIVER_MESSAGE =
+  "Заказ станет «Доставлен» сам, когда Яндекс выдаст посылку — нажмите «Обновить статус» в заявке";
+
 /** Товар ещё у продавца: отсюда можно и отменить, и отгрузить. */
 const PRE_SHIPMENT = new Set(ORDER_PRE_SHIPMENT_STATUSES);
 
@@ -140,8 +145,8 @@ export async function markOrderItemDeliveredBySeller({
   const targetItem = getPopulatedOrderItemOrThrow(order, itemIndex);
   assertSellerOwnsOrderItem(targetItem, sellerId);
 
-  if (!viaCarrierSync && isCdekShipment(order, targetItem)) {
-    throw new AppError(409, CDEK_MANUAL_DELIVER_MESSAGE);
+  if (!viaCarrierSync) {
+    assertNotCarrierTracked(order, targetItem, "deliver");
   }
 
   // Курьерская лестница приводит сюда из «На доставке», продавцовская — из
@@ -242,13 +247,43 @@ function findItemShipment(order, item) {
 }
 
 /**
+ * Служба, чьи статусы двигают отправление: СДЭК или Яндекс. Ступени у таких
+ * отправлений ставит опрос службы, а не кнопка продавца.
+ *
  * @param {any} order
  * @param {any} item
+ * @returns {string | null}
  */
-function isCdekShipment(order, item) {
+function resolveTrackedCarrier(order, item) {
   const shipment = findItemShipment(order, item);
   const method = shipment?.fulfillmentMethod ?? order.fulfillmentMethod;
-  return method === "delivery" && shipment?.deliveryCarrier === SHIPPING_PROVIDER_CDEK;
+  if (method !== "delivery") return null;
+  const carrier = shipment?.deliveryCarrier;
+  return carrier === SHIPPING_PROVIDER_CDEK ||
+    carrier === SHIPPING_PROVIDER_YANDEX_DELIVERY
+    ? carrier
+    : null;
+}
+
+/**
+ * @param {any} order
+ * @param {any} item
+ * @param {"ship" | "deliver"} action
+ */
+function assertNotCarrierTracked(order, item, action) {
+  const carrier = resolveTrackedCarrier(order, item);
+  if (carrier === SHIPPING_PROVIDER_CDEK) {
+    throw new AppError(
+      409,
+      action === "ship" ? CDEK_MANUAL_SHIP_MESSAGE : CDEK_MANUAL_DELIVER_MESSAGE,
+    );
+  }
+  if (carrier === SHIPPING_PROVIDER_YANDEX_DELIVERY) {
+    throw new AppError(
+      409,
+      action === "ship" ? YANDEX_MANUAL_SHIP_MESSAGE : YANDEX_MANUAL_DELIVER_MESSAGE,
+    );
+  }
 }
 
 /**
@@ -262,8 +297,8 @@ function resolveShipmentKind(order, shipment) {
   // СДЭК забирает посылку у продавца в пункте или у двери: отгружает продавец,
   // курьеров Gitorg и кода у двери тут нет.
   if (shipment?.deliveryCarrier === SHIPPING_PROVIDER_CDEK) return "seller";
-  // Яндекс Доставка: посылку продавец сдаёт в пункт сам, как со СДЭК. Пока
-  // заявок в Яндекс нет, ступени «Отгружен»/«Доставлен» продавец ставит сам.
+  // Яндекс Доставка: посылку продавец сдаёт в пункт сам, как со СДЭК, а
+  // ступени дальше ставит опрос заявки Яндекса.
   if (shipment?.deliveryCarrier === SHIPPING_PROVIDER_YANDEX_DELIVERY) return "seller";
   // Внешняя служба или курьеры Gitorg — товар отгружает не продавец.
   if (shipment?.courierDelivery === true || shipment?.deliveryCarrier) {
@@ -305,8 +340,8 @@ export async function markOrderItemShippedBySeller({
   if (shipmentKind === "pickup") {
     throw new AppError(409, "Это отправление покупатель забирает сам");
   }
-  if (!viaCarrierSync && isCdekShipment(order, targetItem)) {
-    throw new AppError(409, CDEK_MANUAL_SHIP_MESSAGE);
+  if (!viaCarrierSync) {
+    assertNotCarrierTracked(order, targetItem, "ship");
   }
 
   targetItem.status = ORDER_STATUS_SHIPPED;

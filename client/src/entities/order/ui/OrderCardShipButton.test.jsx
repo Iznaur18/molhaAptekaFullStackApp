@@ -299,6 +299,13 @@ describe("«Отгрузить» — последняя ступень, а не 
   });
 });
 
+describe("отправление Яндекс Доставкой", () => {
+  it("ни «Отгрузить», ни «Доставлен»: ступени ставит Яндекс", () => {
+    renderCard(makeOrder({ method: "delivery", carrier: "yandex_delivery" }));
+    expect(shipButton()).toBeNull();
+  });
+});
+
 describe("отправление СДЭК", () => {
   it("«Отгрузить» нет: ступень ставит статус СДЭК", () => {
     renderCard(makeOrder({ method: "delivery", carrier: "cdek" }));

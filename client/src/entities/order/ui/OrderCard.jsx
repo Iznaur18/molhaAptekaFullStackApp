@@ -41,6 +41,7 @@ import { resolveOrderLineSellerId, summarizeOrderItems } from "@izibuy/shared-li
 import {
   PRODUCT_DELIVERY_CARRIER_SELLER,
   SHIPPING_PROVIDER_CDEK,
+  SHIPPING_PROVIDER_YANDEX_DELIVERY,
   resolveProductDeliveryCarrier,
 } from "@molha/api-contract";
 import { ConfirmButton } from "../../../shared/ui/ConfirmButton/ConfirmButton.jsx";
@@ -599,10 +600,11 @@ export function OrderCard({
     productCourierDeliveryEnabled: shipmentOwn?.courierDelivery === true,
     productDeliveryEnabled: shipmentMethod === "delivery",
   });
-  // СДЭК: «Отгружен» и «Доставлен» ставит опрос статусов СДЭК, не продавец.
+  // СДЭК и Яндекс: «Отгружен» и «Доставлен» ставит опрос статусов службы, не продавец.
   const cdekTracksThisShipment =
     shipmentMethod === "delivery" &&
-    shipmentOwn?.deliveryCarrier === SHIPPING_PROVIDER_CDEK;
+    (shipmentOwn?.deliveryCarrier === SHIPPING_PROVIDER_CDEK ||
+      shipmentOwn?.deliveryCarrier === SHIPPING_PROVIDER_YANDEX_DELIVERY);
   const sellerDeliversThisShipment =
     shipmentMethod === "delivery" &&
     shipmentCarrier === PRODUCT_DELIVERY_CARRIER_SELLER &&

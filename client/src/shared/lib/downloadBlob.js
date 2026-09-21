@@ -1,0 +1,16 @@
+/**
+ * Отдать файл пользователю: ссылка на blob и клик по ней.
+ *
+ * @param {Blob} blob
+ * @param {string} fileName
+ */
+export function downloadBlob(blob, fileName) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}

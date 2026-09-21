@@ -7,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useId, useState } from "react";
 
 import { CDEK_WAYBILL_UI } from "../../../shared/config/appUiCopy.js";
+import { downloadBlob } from "../../../shared/lib/downloadBlob.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import {
   createCdekWaybill,
@@ -18,23 +19,6 @@ import {
 import { CdekIntakeSection } from "./CdekIntakeSection.jsx";
 
 import "./CdekWaybillPanel.css";
-
-/**
- * Отдать файл пользователю: ссылка на blob и клик по ней.
- *
- * @param {Blob} blob
- * @param {string} fileName
- */
-function downloadBlob(blob, fileName) {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  document.body.append(link);
-  link.click();
-  link.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 60_000);
-}
 
 /**
  * Накладная СДЭК в карточке продажи: куда едет посылка, кнопка создания и,

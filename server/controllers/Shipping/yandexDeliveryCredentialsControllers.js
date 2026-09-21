@@ -12,6 +12,11 @@ import {
   listYandexPointsForBuyer,
   quoteYandexDeliveryShipment,
 } from "../../services/shipping/yandex/yandexDeliveryShipment.js";
+import {
+  createYandexDeliveryRequest,
+  getYandexDeliveryLabelPdf,
+  refreshYandexDeliveryRequest,
+} from "../../services/shipping/yandex/yandexDeliveryRequest.js";
 import { UserModel } from "../../models/index.js";
 
 /*
@@ -105,4 +110,34 @@ export const postYandexDeliveryQuoteController = async (req, res) => {
     pickupPointId: req.body.pickupPointId,
   });
   return successRes(res, result);
+};
+
+/** POST /order/:orderId/yandex-delivery-request — продавец создаёт заявку. */
+export const postYandexDeliveryRequestController = async (req, res) => {
+  const request = await createYandexDeliveryRequest({
+    orderId: String(req.params.orderId),
+    sellerId: String(req.userId),
+  });
+  return successRes(res, { request });
+};
+
+/** GET /order/:orderId/yandex-delivery-request — обновить статус заявки. */
+export const getYandexDeliveryRequestController = async (req, res) => {
+  const request = await refreshYandexDeliveryRequest({
+    orderId: String(req.params.orderId),
+    sellerId: String(req.userId),
+  });
+  return successRes(res, { request });
+};
+
+/** GET /order/:orderId/yandex-delivery-label — ярлык на коробку (PDF). */
+export const getYandexDeliveryLabelController = async (req, res) => {
+  const { pdf, fileName } = await getYandexDeliveryLabelPdf({
+    orderId: String(req.params.orderId),
+    sellerId: String(req.userId),
+  });
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+  res.setHeader("Cache-Control", "no-store");
+  return res.send(pdf);
 };

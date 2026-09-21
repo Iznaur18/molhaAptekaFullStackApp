@@ -9,6 +9,9 @@ import {
   getYandexDeliveryAvailabilityController,
   getYandexDeliveryPointsController,
   postYandexDeliveryQuoteController,
+  postYandexDeliveryRequestController,
+  getYandexDeliveryRequestController,
+  getYandexDeliveryLabelController,
   postCdekWaybillController,
   getCdekWaybillController,
   getCdekReceptionPointsController,
@@ -133,6 +136,27 @@ router.get(
   checkAuthMW,
   cdekWaybillParamsValidation,
   getCdekWaybillController,
+);
+// Заявка в Яндекс Доставку — только продавец своей отправки (проверяет сервис).
+router.post(
+  "/:orderId/yandex-delivery-request",
+  checkAuthMW,
+  orderItemActionRateLimiter,
+  cdekWaybillParamsValidation,
+  postYandexDeliveryRequestController,
+);
+router.get(
+  "/:orderId/yandex-delivery-request",
+  checkAuthMW,
+  cdekWaybillParamsValidation,
+  getYandexDeliveryRequestController,
+);
+router.get(
+  "/:orderId/yandex-delivery-label",
+  checkAuthMW,
+  orderItemActionRateLimiter,
+  cdekWaybillParamsValidation,
+  getYandexDeliveryLabelController,
 );
 router.get(
   "/:orderId/cdek-label",

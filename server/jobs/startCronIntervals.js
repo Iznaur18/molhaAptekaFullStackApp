@@ -30,7 +30,7 @@ import { processOneCCronTasks } from "../services/onec/index.js";
 import { runAnalyticsReconciliation } from "../services/analytics/index.js";
 import { processCourierStuckShipmentCronTasks } from "../services/courier/courierStuckShipmentsCron.js";
 import { processLoboCronTasks } from "../services/shipping/lobo/loboStatusSync.js";
-import { syncCdekWaybillStatuses } from "../services/shipping/cdek/cdekWaybill.js";
+import { syncCarrierStatuses } from "../services/shipping/carrierStatusSync.js";
 
 import { shouldRunCronOnThisProcess } from "./shouldRunCronOnThisProcess.js";
 
@@ -144,11 +144,11 @@ export function startCronIntervals() {
     processLoboCronTasks,
   );
 
-  // Статусы накладных СДЭК: «Отгружен» и «Доставлен» ставит их опрос.
+  // Статусы СДЭК и Яндекса: «Отгружен» и «Доставлен» ставит их опрос.
   scheduleCronJob(
     "process_cdek_status_sync",
     CDEK_POLL_INTERVAL_MS,
-    syncCdekWaybillStatuses,
+    syncCarrierStatuses,
   );
 
   return true;

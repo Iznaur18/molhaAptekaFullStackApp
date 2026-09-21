@@ -332,6 +332,14 @@ const OrderShipmentSchema = new mongoose.Schema(
       default: undefined,
     },
     /**
+     * Заявка в Яндекс Доставку, созданная продавцом: request_id, статус из
+     * Яндекса, ссылка отслеживания, отмена.
+     */
+    yandexDeliveryRequest: {
+      type: mongoose.Schema.Types.Mixed,
+      default: undefined,
+    },
+    /**
      * Продавец подтвердил, что перевод дошёл.
      *
      * Курьер не касается денег продавца, поэтому перед вручением нужно третье
