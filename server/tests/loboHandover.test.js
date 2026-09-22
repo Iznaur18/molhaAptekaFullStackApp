@@ -88,7 +88,12 @@ describe("передача отправления в ЛОБО", () => {
     const shipment = fresh.shipments[0];
     assert.equal(shipment.shippingProvider, "lobo");
     assert.equal(shipment.shippingExternalId, `${order._id}:${args.sellerId}`);
-    assert.equal(shipment.shippingCarrierStatus, "created");
+    assert.equal(shipment.shippingCarrierStatus, "new");
+    assert.ok(
+      shipment.shippingCarrierOrderId,
+      "по id Wayset потом читаем статус и отменяем",
+    );
+    assert.match(shipment.shippingTrackingUrl, /track/, "ссылка для покупателя");
     assert.ok(
       shipment.deliveryFeeRub > 0,
       "цену спрашиваем у службы: её назовёт курьер покупателю",

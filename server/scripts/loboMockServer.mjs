@@ -1,5 +1,5 @@
 /**
- * Mock DMS ЛОБО (Wayset) под docs/lobo-api-contract.md
+ * Mock API Wayset (ЛОБО) под https://services.wayset.ru/api/v1/external/docs
  *
  * Запуск:
  *   cd server && npm run lobo:mock
@@ -21,10 +21,12 @@ const PASSWORD = process.env.LOBO_MOCK_PASSWORD || "mock";
 /** Сколько секунд держится каждый статус, прежде чем сменится следующим. */
 const STEP_SECONDS = Number(process.env.LOBO_MOCK_STEP_SECONDS || 20);
 
-const FLOW = ["created", "assigned", "accepted", "arrived", "picked_up", "delivered"];
+const FLOW = ["new", "assigned", "accepted", "arrived", "in_progress", "done"];
 
 /** @type {Map<string, Record<string, any>>} */
 const ordersByExternalId = new Map();
+/** @type {Map<string, Record<string, any>>} */
+const ordersById = new Map();
 let nextId = 1000;
 
 /** @param {Record<string, any>} order */
@@ -38,25 +40,37 @@ function currentStatus(order) {
 /** @param {Record<string, any>} order */
 function present(order) {
   const status = currentStatus(order);
+  const assigned = status !== "new";
   return {
     id: order.id,
     external_id: order.external_id,
     status,
-    cost: order.cost,
-    final_cost: order.final_cost,
-    zone_id: 26,
-    is_suburban: false,
-    courier_id: status === "created" ? null : 501,
-    courier_name: status === "created" ? "" : "Курьер ЛОБО (mock)",
-    courier_phone: status === "created" ? "" : "+79280000000",
+    tariff: order.tariff,
+    total: order.total,
+    payment_method: order.payment_method,
+    is_paid: order.is_paid,
+    courier_name: assigned ? "Курьер ЛОБО (mock)" : "",
+    courier_phone: assigned ? "+79280000000" : "",
     distance_km: 5.2,
     duration_min: 15,
     created_at: new Date(order.created_ms).toISOString(),
-    assigned_at:
-      status === "created" ? null : new Date(order.created_ms + 1000).toISOString(),
     delivered_at:
-      status === "delivered" ? new Date(order.created_ms + 9000).toISOString() : null,
+      status === "done" ? new Date(order.created_ms + 9000).toISOString() : null,
   };
+}
+
+/**
+ * Простая формула тарифа «car»: 200 ₽ за первый километр, дальше 35 ₽/км
+ * по прямой.
+ *
+ * @param {Record<string, number>} body
+ */
+function estimate(body) {
+  const distanceKm =
+    Math.abs(body.pickup_lat - body.delivery_lat) * 111 +
+    Math.abs(body.pickup_lon - body.delivery_lon) * 62;
+  const total = Math.round(Math.max(200, 200 + (distanceKm - 1) * 35));
+  return { distanceKm: Math.round(distanceKm * 10) / 10, total };
 }
 
 /** @param {import('node:http').IncomingMessage} req */
@@ -90,6 +104,17 @@ function send(res, status, body) {
   res.end(payload);
 }
 
+const REQUIRED_ORDER_FIELDS = [
+  "client_name",
+  "client_phone",
+  "pickup_address",
+  "pickup_lat",
+  "pickup_lon",
+  "delivery_address",
+  "delivery_lat",
+  "delivery_lon",
+];
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url || "/", `http://127.0.0.1:${PORT}`);
   const path = url.pathname.replace(/^\/api\/v1\/external/, "");
@@ -98,116 +123,101 @@ const server = http.createServer(async (req, res) => {
     return send(res, 401, { detail: "Invalid API key or credentials" });
   }
 
-  if (req.method === "GET" && path === "/zones") {
-    return send(res, 200, {
-      zones: [
-        {
-          id: 26,
-          name: "Грозный",
-          city: "Грозный",
-          default_tariff_id: 1,
-          default_tariff: { id: 1, name: "Стандарт", base_price: 150 },
-          tariffs: [{ id: 1, name: "Стандарт", base_price: 150 }],
-        },
-      ],
-    });
+  if (req.method === "GET" && path === "/ping") {
+    return send(res, 200, { ok: true, merchant: { id: 1, name: "Mock" }, test: true });
   }
 
   if (req.method === "GET" && path === "/tariffs") {
     return send(res, 200, {
-      tariffs: [
-        {
-          id: 1,
-          name: "Стандарт",
-          base_price: 150,
-          price_per_km: 20,
-          price_per_min: 0,
-          min_price: 150,
-          point_price: 0,
-          zone_id: 26,
-          is_default: true,
-        },
-      ],
+      city_id: 1,
+      city_name: "Грозный",
+      tariffs: [{ tariff: "car", title: "Легковой", base_fare: 200, per_km: 35 }],
     });
   }
 
   if (req.method === "POST" && path === "/estimate") {
     const body = await readJson(req);
     if (!body) return send(res, 422, { detail: "Invalid JSON" });
-    const required = ["pickup_lat", "pickup_lon", "delivery_lat", "delivery_lon"];
-    for (const field of required) {
+    for (const field of ["pickup_lat", "pickup_lon", "delivery_lat", "delivery_lon"]) {
       if (typeof body[field] !== "number") {
         return send(res, 400, { detail: `Field ${field} is required` });
       }
     }
-    // Простая, но не выдуманная формула: база плюс расстояние по прямой.
-    const distanceKm =
-      Math.abs(body.pickup_lat - body.delivery_lat) * 111 +
-      Math.abs(body.pickup_lon - body.delivery_lon) * 62;
-    const cost = Math.round(150 + distanceKm * 20);
+    const { distanceKm, total } = estimate(body);
     return send(res, 200, {
-      cost,
-      subzone_fee: 0,
-      final_cost: cost,
-      zone: { id: 26, name: "Грозный" },
+      quote_token: `mock-quote-${total}`,
+      quote_valid_for_seconds: 300,
+      tariff: body.tariff || "car",
+      city_id: 1,
+      city_name: "Грозный",
       is_suburban: false,
-      distance_km: Math.round(distanceKm * 10) / 10,
+      distance_km: distanceKm,
       duration_min: Math.max(10, Math.round(distanceKm * 3)),
+      subzone_fee: 0,
+      total,
     });
+  }
+
+  if (req.method === "GET" && path === "/orders") {
+    return send(res, 200, [...ordersById.values()].map(present));
   }
 
   if (req.method === "POST" && path === "/orders") {
     const body = await readJson(req);
     if (!body) return send(res, 422, { detail: "Invalid JSON" });
-    for (const field of [
-      "client_name",
-      "client_phone",
-      "pickup_address",
-      "pickup_lat",
-      "pickup_lon",
-      "delivery_address",
-      "delivery_lat",
-      "delivery_lon",
-    ]) {
+    for (const field of REQUIRED_ORDER_FIELDS) {
       if (body[field] === undefined || body[field] === null || body[field] === "") {
         return send(res, 400, { detail: `Field ${field} is required` });
       }
     }
+    // Недоступный способ оплаты Wayset отклоняет — заказ не создаётся.
+    if (body.payment_method && !["cash", "online"].includes(body.payment_method)) {
+      return send(res, 400, { detail: "Payment method is not available" });
+    }
 
     const externalId = String(body.external_id || `mock-${nextId}`);
     const existing = ordersByExternalId.get(externalId);
-    // Повторный вызов с тем же номером не плодит заказы — так спокойнее
-    // отлаживать ретраи.
+    // Повтор с тем же номером возвращает уже созданный заказ, как у Wayset.
     if (existing) return send(res, 200, present(existing));
 
     const order = {
       id: nextId++,
       external_id: externalId,
-      cost: Number(body.cost) || 0,
-      final_cost: Number(body.cost) || 0,
+      tariff: body.tariff || "car",
+      total: estimate(body).total,
+      payment_method: body.payment_method || "cash",
+      is_paid: body.is_paid === true,
       created_ms: Date.now(),
       cancelled_at: null,
     };
     ordersByExternalId.set(externalId, order);
-    console.log(`[lobo-mock] создан заказ ${externalId}`);
+    ordersById.set(String(order.id), order);
+    console.log(`[lobo-mock] создан заказ ${order.id} (${externalId})`);
     return send(res, 200, present(order));
   }
 
-  const byNumber = path.match(/^\/orders\/by-number\/([^/]+)(\/cancel)?$/);
-  if (byNumber) {
-    const externalId = decodeURIComponent(byNumber[1]);
-    const order = ordersByExternalId.get(externalId);
+  const byId = path.match(/^\/orders\/([^/]+)(\/cancel|\/track)?$/);
+  if (byId) {
+    const order = ordersById.get(decodeURIComponent(byId[1]));
     if (!order) return send(res, 404, { detail: "Order not found" });
 
-    if (byNumber[2] === "/cancel") {
+    if (byId[2] === "/cancel") {
       if (req.method !== "POST") return send(res, 405, { detail: "Use POST" });
       const status = currentStatus(order);
-      if (status === "picked_up" || status === "delivered") {
+      if (status === "in_progress" || status === "done") {
         return send(res, 409, { detail: "Cannot cancel after pickup" });
       }
       order.cancelled_at = new Date().toISOString();
-      console.log(`[lobo-mock] отменён заказ ${externalId}`);
+      console.log(`[lobo-mock] отменён заказ ${order.id}`);
       return send(res, 200, present(order));
+    }
+
+    if (byId[2] === "/track") {
+      if (req.method !== "POST") return send(res, 405, { detail: "Use POST" });
+      return send(res, 200, {
+        code: String(order.id),
+        url: `https://wayset.ru/track/${order.id}`,
+      });
     }
 
     if (req.method !== "GET") return send(res, 405, { detail: "Use GET" });

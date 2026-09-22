@@ -8,10 +8,10 @@ import { LOBO_NOT_CONFIGURED_MESSAGE } from "../../../constants/loboConstants.js
 import { AppError } from "../../../errors/AppError.js";
 
 import {
-  cancelLoboOrderByExternalId,
+  cancelLoboOrder,
   createLoboOrder,
   estimateLoboDelivery,
-  getLoboOrderByExternalId,
+  getLoboOrder,
   isLoboConfigured,
 } from "./loboClient.js";
 
@@ -49,16 +49,16 @@ export function createLoboShippingProvider() {
       return createLoboOrder(payload);
     },
 
-    /** @param {{ externalId: string }} payload */
+    /** @param {{ carrierOrderId: string }} payload — id заказа в Wayset */
     getTracking: async (payload) => {
       assertReady();
-      return getLoboOrderByExternalId(String(payload?.externalId ?? ""));
+      return getLoboOrder(String(payload?.carrierOrderId ?? ""));
     },
 
-    /** @param {{ externalId: string }} payload */
+    /** @param {{ carrierOrderId: string }} payload — id заказа в Wayset */
     cancelShipment: async (payload) => {
       assertReady();
-      return cancelLoboOrderByExternalId(String(payload?.externalId ?? ""));
+      return cancelLoboOrder(String(payload?.carrierOrderId ?? ""));
     },
   };
 }

@@ -1,7 +1,9 @@
 import {
   LOBO_API_BASE_URL_DEFAULT,
+  LOBO_DEFAULT_TARIFF,
   LOBO_HTTP_TIMEOUT_MS,
   LOBO_NOT_CONFIGURED_MESSAGE,
+  LOBO_PAYMENT_METHOD,
   LOBO_UNAVAILABLE_MESSAGE,
 } from "../../../constants/loboConstants.js";
 import { AppError } from "../../../errors/AppError.js";
@@ -135,35 +137,51 @@ export async function loboRequest({ method, path, body, query }) {
   }
 }
 
-/** @param {any} data */
+/** @param {unknown} value */
+const toNumber = (value) => {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : 0;
+};
+
+/**
+ * Заказ Wayset в нашем виде.
+ *
+ * Форму ответа на заказ документация не описывает, поэтому читаем терпимо:
+ * цена бывает `total` (как в расчёте) или `cost`/`final_cost`, курьер —
+ * плоскими полями или вложенным объектом.
+ *
+ * @param {any} data
+ */
 export function normalizeLoboOrder(data) {
-  if (!data || typeof data !== "object") return null;
+  const row = data?.order && typeof data.order === "object" ? data.order : data;
+  if (!row || typeof row !== "object") return null;
+  const courier = row.courier && typeof row.courier === "object" ? row.courier : {};
   return {
-    id: data.id ?? null,
-    externalId: data.external_id ?? "",
-    status: String(data.status ?? ""),
-    cost: Number(data.cost) || 0,
-    finalCost: Number(data.final_cost) || 0,
-    courierName: data.courier_name ?? "",
-    courierPhone: data.courier_phone ?? "",
-    distanceKm: Number(data.distance_km) || 0,
-    durationMin: Number(data.duration_min) || 0,
-    createdAt: data.created_at ?? null,
-    assignedAt: data.assigned_at ?? null,
-    deliveredAt: data.delivered_at ?? null,
+    id: row.id == null ? null : String(row.id),
+    externalId: String(row.external_id ?? ""),
+    status: String(row.status ?? ""),
+    total: toNumber(row.total ?? row.final_cost ?? row.cost),
+    courierName: String(row.courier_name ?? courier.name ?? ""),
+    courierPhone: String(row.courier_phone ?? courier.phone ?? ""),
+    distanceKm: toNumber(row.distance_km),
+    durationMin: toNumber(row.duration_min),
+    createdAt: row.created_at ?? null,
+    deliveredAt: row.delivered_at ?? null,
   };
 }
 
 /**
  * Расчёт стоимости без создания заказа.
  *
+ * `quoteToken` закрепляет цену: передаём его при создании заказа, и курьер
+ * возьмёт ровно названную сумму. Живёт `quoteValidForSeconds` (сейчас 300).
+ *
  * @param {{
  *   pickupLat: number;
  *   pickupLon: number;
  *   deliveryLat: number;
  *   deliveryLon: number;
- *   tariffId?: number | null;
- *   zoneId?: number | null;
+ *   tariff?: string;
  * }} input
  */
 export async function estimateLoboDelivery({
@@ -171,8 +189,7 @@ export async function estimateLoboDelivery({
   pickupLon,
   deliveryLat,
   deliveryLon,
-  tariffId = null,
-  zoneId = null,
+  tariff = LOBO_DEFAULT_TARIFF,
 }) {
   const data = await loboRequest({
     method: "POST",
@@ -182,25 +199,27 @@ export async function estimateLoboDelivery({
       pickup_lon: pickupLon,
       delivery_lat: deliveryLat,
       delivery_lon: deliveryLon,
-      ...(tariffId == null ? {} : { tariff_id: tariffId }),
-      ...(zoneId == null ? {} : { zone_id: zoneId }),
+      tariff,
     },
   });
 
   return {
-    cost: Number(data?.cost) || 0,
-    subzoneFee: Number(data?.subzone_fee) || 0,
-    finalCost: Number(data?.final_cost) || 0,
-    zoneId: data?.zone?.id ?? null,
-    zoneName: data?.zone?.name ?? "",
+    finalCost: toNumber(data?.total),
+    subzoneFee: toNumber(data?.subzone_fee),
+    tariff: String(data?.tariff ?? tariff),
+    cityId: data?.city_id ?? null,
+    cityName: String(data?.city_name ?? ""),
     isSuburban: data?.is_suburban === true,
-    distanceKm: Number(data?.distance_km) || 0,
-    durationMin: Number(data?.duration_min) || 0,
+    distanceKm: toNumber(data?.distance_km),
+    durationMin: toNumber(data?.duration_min),
+    quoteToken: String(data?.quote_token ?? ""),
+    quoteValidForSeconds: toNumber(data?.quote_valid_for_seconds),
   };
 }
 
 /**
- * Создание заказа на доставку.
+ * Создание заказа на доставку. Идемпотентно по `external_id`: повтор с тем же
+ * номером вернёт уже созданный заказ.
  *
  * @param {{
  *   externalId: string;
@@ -214,8 +233,8 @@ export async function estimateLoboDelivery({
  *   deliveryLon: number;
  *   recipientName?: string;
  *   recipientPhone?: string;
- *   cost?: number | null;
- *   paymentMethod?: string | null;
+ *   tariff?: string;
+ *   quoteToken?: string;
  *   note?: string;
  * }} input
  */
@@ -235,11 +254,11 @@ export async function createLoboOrder(input) {
       delivery_lon: input.deliveryLon,
       ...(input.recipientName ? { recipient_name: input.recipientName } : {}),
       ...(input.recipientPhone ? { recipient_phone: input.recipientPhone } : {}),
-      // Платит покупатель при получении: службе нужна сумма и признак, что
-      // заказ ещё не оплачен.
-      ...(input.cost == null ? {} : { cost: input.cost }),
-      ...(input.paymentMethod ? { payment_method: input.paymentMethod } : {}),
+      tariff: input.tariff || LOBO_DEFAULT_TARIFF,
+      // Платит покупатель курьеру при получении.
+      payment_method: LOBO_PAYMENT_METHOD,
       is_paid: false,
+      ...(input.quoteToken ? { quote_token: input.quoteToken } : {}),
       ...(input.note ? { note: input.note } : {}),
     },
   });
@@ -247,24 +266,57 @@ export async function createLoboOrder(input) {
   return normalizeLoboOrder(data);
 }
 
-/** @param {string} externalId */
-export async function getLoboOrderByExternalId(externalId) {
+/** @param {string} id — id заказа в Wayset */
+export async function getLoboOrder(id) {
   const data = await loboRequest({
     method: "GET",
-    path: "/orders/by-number/" + encodeURIComponent(externalId),
+    path: "/orders/" + encodeURIComponent(id),
   });
   return normalizeLoboOrder(data);
 }
 
 /**
- * Отмена по нашему номеру. Повторная отмена у службы идемпотентна.
+ * Заказ по нашему номеру — для отправлений, у которых id Wayset не
+ * сохранился (служба создала заказ, а мы не успели записать ответ).
  *
  * @param {string} externalId
  */
-export async function cancelLoboOrderByExternalId(externalId) {
+export async function findLoboOrderByExternalId(externalId) {
+  const data = await loboRequest({ method: "GET", path: "/orders" });
+  const rows = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.orders)
+      ? data.orders
+      : [];
+  const match = rows.find((row) => String(row?.external_id ?? "") === externalId);
+  return match ? normalizeLoboOrder(match) : null;
+}
+
+/**
+ * Отмена до забора груза. Повторная отмена у службы идемпотентна.
+ *
+ * @param {string} id — id заказа в Wayset
+ */
+export async function cancelLoboOrder(id) {
   const data = await loboRequest({
     method: "POST",
-    path: "/orders/by-number/" + encodeURIComponent(externalId) + "/cancel",
+    path: "/orders/" + encodeURIComponent(id) + "/cancel",
   });
   return normalizeLoboOrder(data);
+}
+
+/**
+ * Код и ссылка отслеживания для покупателя.
+ *
+ * @param {string} id — id заказа в Wayset
+ */
+export async function getLoboTracking(id) {
+  const data = await loboRequest({
+    method: "POST",
+    path: "/orders/" + encodeURIComponent(id) + "/track",
+  });
+  return {
+    code: String(data?.code ?? data?.track_code ?? ""),
+    url: String(data?.url ?? data?.link ?? data?.track_url ?? ""),
+  };
 }

@@ -256,6 +256,10 @@ const OrderShipmentSchema = new mongoose.Schema(
      */
     shippingProvider: { type: String, trim: true, default: "" },
     shippingExternalId: { type: String, trim: true, default: "" },
+    /** id заказа у службы: по нему Wayset отдаёт статус и принимает отмену. */
+    shippingCarrierOrderId: { type: String, trim: true, default: "" },
+    /** Ссылка, по которой покупатель видит курьера. */
+    shippingTrackingUrl: { type: String, trim: true, default: "" },
     shippingCarrierStatus: { type: String, trim: true, default: "" },
     shippingSyncedAt: { type: Date, default: null },
     /**

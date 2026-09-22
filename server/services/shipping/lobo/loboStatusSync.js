@@ -2,8 +2,8 @@ import { PRODUCT_DELIVERY_CARRIER_LOBO } from "@molha/api-contract";
 
 import {
   LOBO_STATUS_CANCELLED,
-  LOBO_STATUS_DELIVERED,
-  LOBO_STATUS_PICKED_UP,
+  LOBO_STATUS_DONE,
+  LOBO_STATUS_IN_PROGRESS,
 } from "../../../constants/loboConstants.js";
 import {
   ORDER_STATUS_IN_DELIVERY,
@@ -16,12 +16,13 @@ import { notifyBuyerAboutOrderItemStatus } from "../../order/notifyBuyerAboutOrd
 import { resolveItemSellerId } from "../../order/orderShipments.js";
 import { buildOrderStatusFromItems } from "../../order/orderStatus.js";
 
-import { getLoboOrderByExternalId, isLoboConfigured } from "./loboClient.js";
+import { getLoboOrder, isLoboConfigured } from "./loboClient.js";
+import { resolveLoboCarrierOrderId } from "./loboShipmentOrders.js";
 
 const TERMINAL = new Set(ORDER_TERMINAL_STATUSES);
 
 /** Статусы службы, после которых опрашивать больше нечего. */
-const FINAL_CARRIER_STATUSES = new Set([LOBO_STATUS_DELIVERED, LOBO_STATUS_CANCELLED]);
+const FINAL_CARRIER_STATUSES = new Set([LOBO_STATUS_DONE, LOBO_STATUS_CANCELLED]);
 
 /**
  * Сколько отправлений опрашиваем за проход.
@@ -34,15 +35,15 @@ const BATCH_LIMIT = 20;
 /**
  * Наша ступень по статусу службы.
  *
- * Промежуточные статусы (`assigned`, `accepted`, `arrived`) ничего не меняют
+ * Промежуточные статусы (`new`, `merged`, `assigned`, `accepted`, `arrived`) не меняют
  * в лестнице: товар всё ещё у продавца, и покупателю сообщать нечего.
  *
  * @param {string} carrierStatus
  * @returns {string | null}
  */
 export function resolveLadderStatusForCarrier(carrierStatus) {
-  if (carrierStatus === LOBO_STATUS_PICKED_UP) return ORDER_STATUS_IN_DELIVERY;
-  if (carrierStatus === LOBO_STATUS_DELIVERED) return "delivered";
+  if (carrierStatus === LOBO_STATUS_IN_PROGRESS) return ORDER_STATUS_IN_DELIVERY;
+  if (carrierStatus === LOBO_STATUS_DONE) return "delivered";
   return null;
 }
 
@@ -76,6 +77,7 @@ export async function findLoboShipmentsToSync({ limit = BATCH_LIMIT } = {}) {
         orderId: String(order._id),
         sellerId: String(shipment.sellerId),
         externalId: String(shipment.shippingExternalId),
+        carrierOrderId: String(shipment.shippingCarrierOrderId ?? ""),
         carrierStatus: String(shipment.shippingCarrierStatus ?? ""),
       });
     }
@@ -170,7 +172,12 @@ export async function syncLoboShipmentStatuses() {
 
   for (const row of rows) {
     try {
-      const remote = await getLoboOrderByExternalId(row.externalId);
+      const carrierOrderId = await resolveLoboCarrierOrderId({
+        shippingCarrierOrderId: row.carrierOrderId,
+        shippingExternalId: row.externalId,
+      });
+      if (!carrierOrderId) continue;
+      const remote = await getLoboOrder(carrierOrderId);
       const carrierStatus = String(remote?.status ?? "");
       if (!carrierStatus || carrierStatus === row.carrierStatus) continue;
 
@@ -190,6 +197,7 @@ export async function syncLoboShipmentStatuses() {
         {
           $set: {
             "shipments.$.shippingCarrierStatus": carrierStatus,
+            "shipments.$.shippingCarrierOrderId": carrierOrderId,
             "shipments.$.shippingSyncedAt": new Date(),
           },
         },

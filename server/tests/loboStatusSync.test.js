@@ -83,7 +83,7 @@ describe("раскладка статусов ЛОБО на нашу лестн�
   it("«забрал» переводит заказ в «На доставке»", async () => {
     const { order } = await handedOverShipment();
     // Мок двигает статус по времени; здесь важна именно раскладка.
-    assert.equal(sync.resolveLadderStatusForCarrier("picked_up"), "in_delivery");
+    assert.equal(sync.resolveLadderStatusForCarrier("in_progress"), "in_delivery");
 
     await setCarrierStatus(order._id, "arrived");
     const before = await OrderModel.findById(order._id).lean();
@@ -91,7 +91,7 @@ describe("раскладка статусов ЛОБО на нашу лестн�
   });
 
   it("промежуточные статусы лестницу не двигают", () => {
-    for (const carrierStatus of ["created", "assigned", "accepted", "arrived"]) {
+    for (const carrierStatus of ["new", "merged", "assigned", "accepted", "arrived"]) {
       assert.equal(
         sync.resolveLadderStatusForCarrier(carrierStatus),
         null,
@@ -101,7 +101,7 @@ describe("раскладка статусов ЛОБО на нашу лестн�
   });
 
   it("«доставлен» ведёт к нашему «Доставлен», а не к закрытию сделки", () => {
-    assert.equal(sync.resolveLadderStatusForCarrier("delivered"), "delivered");
+    assert.equal(sync.resolveLadderStatusForCarrier("done"), "delivered");
   });
 
   it("в очередь опроса попадают только незавершённые отправления", async () => {
@@ -111,7 +111,7 @@ describe("раскладка статусов ЛОБО на нашу лестн�
     assert.equal(pending.length, 1);
     assert.equal(pending[0].orderId, String(order._id));
 
-    await setCarrierStatus(order._id, "delivered");
+    await setCarrierStatus(order._id, "done");
     assert.deepEqual(
       await sync.findLoboShipmentsToSync(),
       [],
