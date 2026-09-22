@@ -1,4 +1,7 @@
-import { productPickupLocationsFromProduct } from "@molha/api-contract";
+import {
+  productPickupLocationsFromProduct,
+  productShipsToBuyer,
+} from "@molha/api-contract";
 import { Pressable, Text, View } from "react-native";
 
 import { PRODUCT_PICKUP_DETAILS_PANEL_LAYOUT as PL } from "@/entities/product/lib/productPickupDetailsPanelLayout";
@@ -24,7 +27,8 @@ export const ProductPickupDetailsPanel = ({
   const isDark = colorScheme === "dark";
 
   const pickupOn = product.productPickupEnabled !== false;
-  const deliveryOn = product.productDeliveryEnabled === true;
+  // Перевозчик — из поля товара: у ЛОБО старые флаги доставки сняты.
+  const deliveryOn = productShipsToBuyer(product);
   const locations = productPickupLocationsFromProduct(product);
 
   if (!pickupOn && !deliveryOn) {
