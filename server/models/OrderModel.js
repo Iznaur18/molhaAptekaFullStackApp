@@ -260,6 +260,16 @@ const OrderShipmentSchema = new mongoose.Schema(
     shippingCarrierOrderId: { type: String, trim: true, default: "" },
     /** Ссылка, по которой покупатель видит курьера. */
     shippingTrackingUrl: { type: String, trim: true, default: "" },
+    /** Курьер службы: имя и машина. Телефон не храним — как и у своих курьеров. */
+    shippingCourier: {
+      type: {
+        name: { type: String, trim: true, default: "" },
+        vehicleMake: { type: String, trim: true, default: "" },
+        vehicleColor: { type: String, trim: true, default: "" },
+        vehiclePlate: { type: String, trim: true, default: "" },
+      },
+      default: null,
+    },
     shippingCarrierStatus: { type: String, trim: true, default: "" },
     shippingSyncedAt: { type: Date, default: null },
     /**

@@ -94,6 +94,7 @@ export {
   MY_ORDERS_PAGE_UI,
   MY_SALES_PAGE_UI,
   ADMIN_ORDERS_PAGE_UI,
+  ORDER_LOBO_UI,
 } from "./copy/orders.js";
 export {
   COURIER_UI,

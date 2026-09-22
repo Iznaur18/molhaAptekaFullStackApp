@@ -193,3 +193,26 @@ export const ADMIN_ORDERS_PAGE_UI = {
   CREATED_LABEL: "Создан",
   PAGE_LIMIT: 20,
 };
+
+/** Доставка ЛОБО в карточке заказа. Статусы — коды API Wayset. */
+export const ORDER_LOBO_UI = {
+  TITLE: "Доставка ЛОБО",
+  STATUS: {
+    draft: "Готовим вызов курьера",
+    new: "Ищем курьера",
+    merged: "Ищем курьера",
+    assigned: "Курьер назначен",
+    accepted: "Курьер едет за заказом",
+    arrived: "Курьер у продавца",
+    in_progress: "Курьер везёт заказ",
+    done: "Доставлен",
+    cancelled: "Отменена в службе",
+  },
+  STATUS_UNKNOWN: "Передан в службу",
+  NOT_HANDED_OVER: "ещё не вызван",
+  SELLER_HINT:
+    "Курьер ЛОБО будет вызван сам, когда вы отметите заказ «Готов к отгрузке».",
+  TRACKING_LINK: "Где курьер",
+  /** @param {string} price */
+  BUYER_PAYS: (price) => `Доставку оплатите курьеру наличными: ${price}`,
+};

@@ -82,6 +82,7 @@ export async function findLoboShipmentsToSync({ limit = BATCH_LIMIT } = {}) {
         carrierOrderId: String(shipment.shippingCarrierOrderId ?? ""),
         carrierStatus: String(shipment.shippingCarrierStatus ?? ""),
         trackingUrl: String(shipment.shippingTrackingUrl ?? ""),
+        courierName: String(shipment.shippingCourier?.name ?? ""),
       });
     }
   }
@@ -208,8 +209,21 @@ export async function syncLoboShipmentStatuses() {
       const carrierStatus = String(remote?.status ?? "");
       const trackingUrl = row.trackingUrl || (await fetchTrackingUrl(remote));
       if (!carrierStatus) continue;
-      if (carrierStatus === row.carrierStatus && trackingUrl === row.trackingUrl)
+      const courier = remote?.courierName
+        ? {
+            name: remote.courierName,
+            vehicleMake: remote.courierCarBrand,
+            vehicleColor: remote.courierCarColor,
+            vehiclePlate: remote.courierCarNumber,
+          }
+        : null;
+      if (
+        carrierStatus === row.carrierStatus &&
+        trackingUrl === row.trackingUrl &&
+        (courier?.name ?? "") === row.courierName
+      ) {
         continue;
+      }
 
       const ladderStatus = resolveLadderStatusForCarrier(carrierStatus);
       if (ladderStatus) {
@@ -229,6 +243,7 @@ export async function syncLoboShipmentStatuses() {
             "shipments.$.shippingCarrierStatus": carrierStatus,
             "shipments.$.shippingCarrierOrderId": carrierOrderId,
             "shipments.$.shippingTrackingUrl": trackingUrl,
+            "shipments.$.shippingCourier": courier,
             "shipments.$.shippingSyncedAt": new Date(),
           },
         },
