@@ -13,7 +13,6 @@ import {
   createLoboOrder,
   estimateLoboDelivery,
   findLoboOrderByExternalId,
-  getLoboTracking,
   isLoboConfigured,
 } from "./loboClient.js";
 
@@ -252,19 +251,8 @@ export async function handOverShipmentToLobo({ orderId, sellerId }) {
   if (carrierTotal > 0) {
     shipment.deliveryFeeRub = carrierTotal;
   }
-  // Ссылка для покупателя — приятное дополнение: без неё заказ всё равно едет.
-  if (created?.id) {
-    try {
-      const tracking = await getLoboTracking(created.id);
-      shipment.shippingTrackingUrl = tracking.url;
-    } catch (error) {
-      logServerEvent("error", {
-        event: "lobo_tracking_failed",
-        orderId: String(orderId),
-        error: error instanceof Error ? error.message : String(error),
-      });
-    }
-  }
+  // Ссылку отслеживания Wayset отдаёт только когда курьер уже на заказе —
+  // её берёт опрос статусов (loboStatusSync).
   await order.save();
 
   logServerEvent("info", {

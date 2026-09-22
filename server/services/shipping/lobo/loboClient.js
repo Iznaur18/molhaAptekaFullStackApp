@@ -160,6 +160,8 @@ export function normalizeLoboOrder(data) {
     id: row.id == null ? null : String(row.id),
     externalId: String(row.external_id ?? ""),
     status: String(row.status ?? ""),
+    // Wayset склеил заказ с другим в один рейс: дальше статус живёт там.
+    mergedInto: row.merged_into == null ? null : String(row.merged_into),
     total: toNumber(row.total ?? row.final_cost ?? row.cost),
     courierName: String(row.courier_name ?? courier.name ?? ""),
     courierPhone: String(row.courier_phone ?? courier.phone ?? ""),

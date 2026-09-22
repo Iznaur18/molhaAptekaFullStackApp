@@ -93,7 +93,11 @@ describe("передача отправления в ЛОБО", () => {
       shipment.shippingCarrierOrderId,
       "по id Wayset потом читаем статус и отменяем",
     );
-    assert.match(shipment.shippingTrackingUrl, /track/, "ссылка для покупателя");
+    assert.equal(
+      shipment.shippingTrackingUrl,
+      "",
+      "ссылку Wayset даёт только когда курьер на заказе — её берёт опрос",
+    );
     assert.ok(
       shipment.deliveryFeeRub > 0,
       "цену спрашиваем у службы: её назовёт курьер покупателю",

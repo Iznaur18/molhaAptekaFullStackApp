@@ -118,7 +118,17 @@ describe("клиент ЛОБО", () => {
   });
 
   it("заказ уходит неоплаченным, наличными курьеру и с токеном цены", async () => {
-    stubFetch({ body: { id: 77, external_id: "order-1", status: "new", total: 260 } });
+    // Так отвечает настоящий Wayset: в заказе цена — cost/final_cost, без total.
+    stubFetch({
+      body: {
+        id: 77,
+        external_id: "order-1",
+        status: "new",
+        cost: 260,
+        final_cost: 260,
+        merged_into: null,
+      },
+    });
 
     const order = await client.createLoboOrder({
       externalId: "order-1",

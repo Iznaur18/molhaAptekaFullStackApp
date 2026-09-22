@@ -48,6 +48,13 @@ export const LOBO_STATUSES = Object.freeze([
  * Отмена возможна, пока курьер не забрал груз, — дальше только через спор.
  * Список держим отдельно: это правило службы, а не наше.
  */
+/** Ссылку отслеживания Wayset отдаёт только в этих статусах, иначе 400. */
+export const LOBO_TRACKABLE_STATUSES = Object.freeze([
+  LOBO_STATUS_ACCEPTED,
+  LOBO_STATUS_ARRIVED,
+  LOBO_STATUS_IN_PROGRESS,
+]);
+
 export const LOBO_CANCELLABLE_STATUSES = Object.freeze([
   LOBO_STATUS_DRAFT,
   LOBO_STATUS_NEW,

@@ -4,6 +4,8 @@ import {
   LOBO_STATUS_CANCELLED,
   LOBO_STATUS_DONE,
   LOBO_STATUS_IN_PROGRESS,
+  LOBO_STATUS_MERGED,
+  LOBO_TRACKABLE_STATUSES,
 } from "../../../constants/loboConstants.js";
 import {
   ORDER_STATUS_IN_DELIVERY,
@@ -16,7 +18,7 @@ import { notifyBuyerAboutOrderItemStatus } from "../../order/notifyBuyerAboutOrd
 import { resolveItemSellerId } from "../../order/orderShipments.js";
 import { buildOrderStatusFromItems } from "../../order/orderStatus.js";
 
-import { getLoboOrder, isLoboConfigured } from "./loboClient.js";
+import { getLoboOrder, getLoboTracking, isLoboConfigured } from "./loboClient.js";
 import { resolveLoboCarrierOrderId } from "./loboShipmentOrders.js";
 
 const TERMINAL = new Set(ORDER_TERMINAL_STATUSES);
@@ -79,6 +81,7 @@ export async function findLoboShipmentsToSync({ limit = BATCH_LIMIT } = {}) {
         externalId: String(shipment.shippingExternalId),
         carrierOrderId: String(shipment.shippingCarrierOrderId ?? ""),
         carrierStatus: String(shipment.shippingCarrierStatus ?? ""),
+        trackingUrl: String(shipment.shippingTrackingUrl ?? ""),
       });
     }
   }
@@ -156,6 +159,26 @@ async function applyLadderStatus({ orderId, sellerId, ladderStatus }) {
 }
 
 /**
+ * Ссылка отслеживания для покупателя, когда курьер уже на заказе. Без неё
+ * заказ всё равно едет, поэтому ошибка только в лог.
+ *
+ * @param {{ id: string | null; status: string } | null} remote
+ */
+async function fetchTrackingUrl(remote) {
+  if (!remote?.id || !LOBO_TRACKABLE_STATUSES.includes(remote.status)) return "";
+  try {
+    return (await getLoboTracking(remote.id)).url;
+  } catch (error) {
+    logServerEvent("error", {
+      event: "lobo_tracking_failed",
+      carrierOrderId: remote.id,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return "";
+  }
+}
+
+/**
  * Один проход опроса статусов.
  *
  * Вебхуков у службы нет, поэтому спрашиваем сами. Ошибка по одному
@@ -177,9 +200,16 @@ export async function syncLoboShipmentStatuses() {
         shippingExternalId: row.externalId,
       });
       if (!carrierOrderId) continue;
-      const remote = await getLoboOrder(carrierOrderId);
+      let remote = await getLoboOrder(carrierOrderId);
+      // Склеенный заказ сам больше не движется: едет тот, в который его влили.
+      if (remote?.status === LOBO_STATUS_MERGED && remote.mergedInto) {
+        remote = await getLoboOrder(remote.mergedInto);
+      }
       const carrierStatus = String(remote?.status ?? "");
-      if (!carrierStatus || carrierStatus === row.carrierStatus) continue;
+      const trackingUrl = row.trackingUrl || (await fetchTrackingUrl(remote));
+      if (!carrierStatus) continue;
+      if (carrierStatus === row.carrierStatus && trackingUrl === row.trackingUrl)
+        continue;
 
       const ladderStatus = resolveLadderStatusForCarrier(carrierStatus);
       if (ladderStatus) {
@@ -198,6 +228,7 @@ export async function syncLoboShipmentStatuses() {
           $set: {
             "shipments.$.shippingCarrierStatus": carrierStatus,
             "shipments.$.shippingCarrierOrderId": carrierOrderId,
+            "shipments.$.shippingTrackingUrl": trackingUrl,
             "shipments.$.shippingSyncedAt": new Date(),
           },
         },

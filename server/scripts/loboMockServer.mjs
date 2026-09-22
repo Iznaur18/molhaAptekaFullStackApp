@@ -32,6 +32,7 @@ let nextId = 1000;
 /** @param {Record<string, any>} order */
 function currentStatus(order) {
   if (order.cancelled_at) return "cancelled";
+  if (order.merged_into != null) return "merged";
   const elapsed = (Date.now() - order.created_ms) / 1000;
   const index = Math.min(FLOW.length - 1, Math.floor(elapsed / STEP_SECONDS));
   return FLOW[index];
@@ -45,8 +46,11 @@ function present(order) {
     id: order.id,
     external_id: order.external_id,
     status,
+    merged_into: order.merged_into ?? null,
     tariff: order.tariff,
-    total: order.total,
+    // Как у настоящего Wayset: в заказе цена — cost/final_cost, total только в расчёте.
+    cost: order.total,
+    final_cost: order.total,
     payment_method: order.payment_method,
     is_paid: order.is_paid,
     courier_name: assigned ? "Курьер ЛОБО (mock)" : "",
@@ -196,6 +200,17 @@ const server = http.createServer(async (req, res) => {
     return send(res, 200, present(order));
   }
 
+  // Только для тестов: склеить заказ с другим, как это делает диспетчер Wayset.
+  if (req.method === "POST" && path === "/__test/merge") {
+    const body = await readJson(req);
+    const order = ordersById.get(String(body?.id));
+    if (!order || !ordersById.has(String(body?.into))) {
+      return send(res, 404, { detail: "Order not found" });
+    }
+    order.merged_into = Number(body.into);
+    return send(res, 200, present(order));
+  }
+
   const byId = path.match(/^\/orders\/([^/]+)(\/cancel|\/track)?$/);
   if (byId) {
     const order = ordersById.get(decodeURIComponent(byId[1]));
@@ -214,6 +229,12 @@ const server = http.createServer(async (req, res) => {
 
     if (byId[2] === "/track") {
       if (req.method !== "POST") return send(res, 405, { detail: "Use POST" });
+      if (!["accepted", "arrived", "in_progress"].includes(currentStatus(order))) {
+        return send(res, 400, {
+          detail:
+            "Отслеживание доступно, пока заказ везут: accepted, arrived, in_progress",
+        });
+      }
       return send(res, 200, {
         code: String(order.id),
         url: `https://wayset.ru/track/${order.id}`,
