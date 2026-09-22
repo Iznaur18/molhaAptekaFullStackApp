@@ -136,3 +136,54 @@ export const YANDEX_DELIVERY_POINT_GONE_MESSAGE =
   "Пункт выдачи Яндекса не найден или не принимает оплату картой — выберите другой";
 export const YANDEX_DELIVERY_NO_DROPOFF_MESSAGE =
   "Продавец ещё не выбрал пункт, куда сдаёт посылки Яндекса";
+
+/*
+ * Яндекс «Экспресс»: курьер забирает у продавца и везёт покупателю по городу
+ * за 1–2 часа. Другой API Яндекса (cargo claims), тот же токен продавца.
+ * Покупатель платит курьеру картой за товар и доставку (решение 22.09.2026);
+ * сам вызов Яндекс списывает с продавца.
+ */
+
+/** Перевозчик в отправлении. В заказе служба — yandex_delivery, вид — курьер. */
+export const SHIPPING_PROVIDER_YANDEX_EXPRESS = "yandex_express";
+
+export const YANDEX_EXPRESS_API_BASE_URL_PROD =
+  "https://b2b.taxi.yandex.net/b2b/cargo/integration/v2";
+export const YANDEX_EXPRESS_API_BASE_URL_TEST =
+  "https://b2b.taxi.tst.yandex.net/b2b/cargo/integration/v2";
+
+/**
+ * @param {string | null | undefined} environment
+ * @returns {string}
+ */
+export function resolveYandexExpressBaseUrl(environment) {
+  return environment === YANDEX_DELIVERY_ENVIRONMENT_TEST
+    ? YANDEX_EXPRESS_API_BASE_URL_TEST
+    : YANDEX_EXPRESS_API_BASE_URL_PROD;
+}
+
+/** Body `PATCH /user/me/yandex-express` — продавец включает «Экспресс». */
+export const yandexExpressSettingsBodySchema = z.object({
+  enabled: z.coerce.boolean(),
+  /** Кому звонит курьер при заборе и куда приходит код передачи. */
+  phone: cdekRecipientSchema.shape.phone.optional(),
+});
+
+/** Body `POST /order/yandex-express-quote`. */
+export const yandexExpressQuoteBodySchema = z.object({
+  items: yandexDeliveryQuoteBodySchema.shape.items,
+  toLat: z.coerce.number().min(-90).max(90),
+  toLon: z.coerce.number().min(-180).max(180),
+});
+
+/** Выбор «Экспресса» в заказе: только получатель — адрес идёт обычным путём. */
+export const yandexExpressOrderSelectionSchema = z.object({
+  recipient: cdekRecipientSchema,
+});
+
+export const YANDEX_EXPRESS_NOT_READY_MESSAGE =
+  "Продавец не настроил «Экспресс»: нет адреса забора или телефона";
+export const YANDEX_EXPRESS_UNAVAILABLE_MESSAGE =
+  "Яндекс не везёт «Экспрессом» по этому адресу — выберите другую службу";
+export const YANDEX_EXPRESS_GEO_REQUIRED_MESSAGE =
+  "Для курьера Яндекса выберите адрес из подсказок или отметьте точку на карте";

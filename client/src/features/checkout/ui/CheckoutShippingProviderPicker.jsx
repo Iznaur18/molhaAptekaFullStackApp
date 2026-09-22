@@ -11,6 +11,7 @@ import {
 import {
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_YANDEX_DELIVERY,
+  SHIPPING_PROVIDER_YANDEX_EXPRESS,
 } from "@molha/api-contract";
 
 import { CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
@@ -39,6 +40,7 @@ const COURIER_OPTION_ID = "gitorg-courier";
  *   courierDelivery?: "courier" | "seller" | "mixed" | null;
  *   cdekAvailable?: boolean;
  *   yandexAvailable?: boolean;
+ *   expressAvailable?: boolean;
  *   sellerDeliveryAvailable?: boolean;
  *   selectedCarrier?: string | null;
  *   onSelectCarrier?: (carrier: string | null) => void;
@@ -49,6 +51,7 @@ export function CheckoutShippingProviderPicker({
   courierDelivery = null,
   cdekAvailable = false,
   yandexAvailable = false,
+  expressAvailable = false,
   sellerDeliveryAvailable = true,
   selectedCarrier = null,
   onSelectCarrier = null,
@@ -76,6 +79,12 @@ export function CheckoutShippingProviderPicker({
       ? {
           id: SHIPPING_PROVIDER_YANDEX_DELIVERY,
           label: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_YANDEX,
+        }
+      : null,
+    expressAvailable
+      ? {
+          id: SHIPPING_PROVIDER_YANDEX_EXPRESS,
+          label: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_YANDEX_EXPRESS,
         }
       : null,
   ].filter(Boolean);

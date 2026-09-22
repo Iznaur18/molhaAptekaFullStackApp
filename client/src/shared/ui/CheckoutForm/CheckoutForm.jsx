@@ -6,6 +6,7 @@ import {
   PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_YANDEX_DELIVERY,
+  SHIPPING_PROVIDER_YANDEX_EXPRESS,
   SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT,
 } from "@molha/api-contract";
 
@@ -108,6 +109,9 @@ const EMPTY_SAVED_DELIVERY_ADDRESSES = [];
  *   yandexAvailable?: boolean;
  *   yandexPicker?: import('react').ReactNode;
  *   yandexSelection?: { pickupPointId: string; recipient: { name: string; phone: string } } | null;
+ *   expressAvailable?: boolean;
+ *   expressPanel?: ((geo: { lat: number; lon: number } | null) => import('react').ReactNode) | null;
+ *   expressSelection?: { recipient: { name: string; phone: string } } | null;
  * }} props
  */
 export function CheckoutForm({
@@ -144,6 +148,9 @@ export function CheckoutForm({
   yandexAvailable = false,
   yandexPicker = null,
   yandexSelection = null,
+  expressAvailable = false,
+  expressPanel = null,
+  expressSelection = null,
 }) {
   const generatedFormId = useId();
   // Служба внутри «Доставки», которую выбрал покупатель: null — своя
@@ -259,6 +266,7 @@ export function CheckoutForm({
   const carrierOptions = [
     cdekAvailable ? SHIPPING_PROVIDER_CDEK : null,
     yandexAvailable ? SHIPPING_PROVIDER_YANDEX_DELIVERY : null,
+    expressAvailable ? SHIPPING_PROVIDER_YANDEX_EXPRESS : null,
   ].filter(Boolean);
   const chosenCarrier =
     !needsDelivery || needsPickup || carrierOptions.length === 0
@@ -271,13 +279,16 @@ export function CheckoutForm({
   const cdekChosen = chosenCarrier === SHIPPING_PROVIDER_CDEK;
   // Яндекс берёт в пункте только карту — и за товар, и за доставку.
   const yandexChosen = chosenCarrier === SHIPPING_PROVIDER_YANDEX_DELIVERY;
+  // «Экспресс» везёт до двери: адрес покупательский, оплата — курьеру картой.
+  const expressChosen = chosenCarrier === SHIPPING_PROVIDER_YANDEX_EXPRESS;
+  const cardOnlyCarrier = yandexChosen || expressChosen;
   const effectiveAllowedPaymentMethods = useMemo(() => {
-    if (!yandexChosen) return allowedPaymentMethods;
+    if (!cardOnlyCarrier) return allowedPaymentMethods;
     const base = Array.isArray(allowedPaymentMethods)
       ? allowedPaymentMethods
       : [ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY];
     return base.filter((method) => method === ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY);
-  }, [yandexChosen, allowedPaymentMethods]);
+  }, [cardOnlyCarrier, allowedPaymentMethods]);
 
   // Способы, которые реально уйдут на сервер: умеет площадка И принимает
   // продавец. Считаем здесь же, а не только в пикере, потому что дефолтный
@@ -460,6 +471,17 @@ export function CheckoutForm({
       }
     }
 
+    if (expressChosen) {
+      if (!expressSelection) {
+        setLocalError(CHECKOUT_FORM_UI.YANDEX_EXPRESS_REQUIRED);
+        return;
+      }
+      if (paymentMethod !== ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY) {
+        setLocalError(CHECKOUT_FORM_UI.YANDEX_CARD_ONLY);
+        return;
+      }
+    }
+
     setLocalError("");
     // В смешанном заказе уезжает и адрес, и точки: сервер разложит их по
     // отправлениям сам, опираясь на выбор способа по продавцам.
@@ -484,6 +506,7 @@ export function CheckoutForm({
       pickupSelections: needsPickup
         ? buildPickupSelectionsPayload(selectedPickupByProductId)
         : [],
+      ...(expressChosen ? { yandexExpressShipment: expressSelection } : {}),
     });
   };
 
@@ -799,6 +822,7 @@ export function CheckoutForm({
                   courierDelivery={courierDelivery}
                   cdekAvailable={cdekAvailable}
                   yandexAvailable={yandexAvailable}
+                  expressAvailable={expressAvailable}
                   sellerDeliveryAvailable={sellerDeliveryAvailable}
                   selectedCarrier={chosenCarrier}
                   onSelectCarrier={(carrier) => {
@@ -858,10 +882,19 @@ export function CheckoutForm({
                       />
                     </label>
 
-                    <CheckoutShippingEstimate
-                      productIds={deliveryProductIds}
-                      deliveryGeo={deliveryAddress.geo ?? null}
-                    />
+                    {expressChosen ? (
+                      <>
+                        <p className="checkout-form__hint">
+                          {CHECKOUT_FORM_UI.YANDEX_EXPRESS_CARD_HINT}
+                        </p>
+                        {expressPanel?.(deliveryAddress.geo ?? null)}
+                      </>
+                    ) : (
+                      <CheckoutShippingEstimate
+                        productIds={deliveryProductIds}
+                        deliveryGeo={deliveryAddress.geo ?? null}
+                      />
+                    )}
                   </>
                 )}
               </div>

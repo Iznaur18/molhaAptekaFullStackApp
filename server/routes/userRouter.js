@@ -26,6 +26,7 @@ import {
   patchYandexDeliveryCredentialsController,
   getYandexDeliveryDropoffPointsController,
   putYandexDeliveryDropoffController,
+  patchYandexExpressController,
   blockUserController,
   unblockUserController,
   listMyBlockedUsersController,
@@ -78,6 +79,7 @@ import {
   yandexDeliveryToggleValidation,
   yandexDeliveryDropoffPointsValidation,
   yandexDeliveryDropoffValidation,
+  yandexExpressSettingsValidation,
   userBlockListValidation,
   userStoryIdParamValidation,
   createUserStoryValidation,
@@ -217,6 +219,12 @@ router.get(
   checkAuthMW,
   yandexDeliveryDropoffPointsValidation,
   getYandexDeliveryDropoffPointsController,
+);
+router.patch(
+  "/me/yandex-express",
+  checkAuthMW,
+  yandexExpressSettingsValidation,
+  patchYandexExpressController,
 );
 router.put(
   "/me/yandex-delivery-dropoff",

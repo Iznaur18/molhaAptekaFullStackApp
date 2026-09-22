@@ -5,6 +5,8 @@ import {
   yandexDeliveryPointsQuerySchema,
   yandexDeliveryQuoteBodySchema,
   yandexDeliveryToggleBodySchema,
+  yandexExpressQuoteBodySchema,
+  yandexExpressSettingsBodySchema,
 } from "@molha/api-contract";
 
 import { validateBodyZod } from "../../middlewares/validateBodyZod.js";
@@ -32,4 +34,12 @@ export const yandexDeliveryPointsValidation = [
 
 export const yandexDeliveryQuoteValidation = [
   validateBodyZod(yandexDeliveryQuoteBodySchema),
+];
+
+export const yandexExpressSettingsValidation = [
+  validateBodyZod(yandexExpressSettingsBodySchema),
+];
+
+export const yandexExpressQuoteValidation = [
+  validateBodyZod(yandexExpressQuoteBodySchema),
 ];

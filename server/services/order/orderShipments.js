@@ -152,6 +152,7 @@ export const buildStoredShipments = (items, options = {}) => {
     sellerDeliveryBySellerId = null,
     cdekShipmentBySellerId = null,
     yandexDeliveryShipmentBySellerId = null,
+    yandexExpressShipmentBySellerId = null,
   } = options ?? {};
 
   const grouped = groupOrderItemsBySellerId(items);
@@ -206,6 +207,12 @@ export const buildStoredShipments = (items, options = {}) => {
         ? {
             yandexDeliveryShipmentAtOrder:
               yandexDeliveryShipmentBySellerId[bucket.sellerId],
+          }
+        : {}),
+      ...(yandexExpressShipmentBySellerId?.[bucket.sellerId]
+        ? {
+            yandexExpressShipmentAtOrder:
+              yandexExpressShipmentBySellerId[bucket.sellerId],
           }
         : {}),
     });

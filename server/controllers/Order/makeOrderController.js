@@ -51,6 +51,7 @@ export const makeOrderController = async (req, res) => {
         deliveryAddressGeo: req.body?.deliveryAddressGeo ?? null,
         cdekShipment: req.body?.cdekShipment ?? null,
         yandexDeliveryShipment: req.body?.yandexDeliveryShipment ?? null,
+        yandexExpressShipment: req.body?.yandexExpressShipment ?? null,
         affiliateCode: req.body.affiliateCode,
         marketingAttribution: sanitizeMarketingAttribution(
           req.body.marketingAttribution,

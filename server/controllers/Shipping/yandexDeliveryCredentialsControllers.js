@@ -17,6 +17,13 @@ import {
   getYandexDeliveryLabelPdf,
   refreshYandexDeliveryRequest,
 } from "../../services/shipping/yandex/yandexDeliveryRequest.js";
+import {
+  createYandexExpressClaim,
+  quoteYandexExpress,
+  readYandexExpressState,
+  refreshYandexExpressClaim,
+  setSellerYandexExpress,
+} from "../../services/shipping/yandex/yandexExpress.js";
 import { UserModel } from "../../models/index.js";
 
 /*
@@ -27,12 +34,13 @@ import { UserModel } from "../../models/index.js";
 /** GET /user/me/yandex-delivery-credentials — состояние подключения. */
 export const getYandexDeliveryCredentialsController = async (req, res) => {
   const seller = await UserModel.findById(req.userId)
-    .select("yandexDeliveryIntegration")
+    .select("yandexDeliveryIntegration sellerFulfillmentDefaults.pickupLocations")
     .lean();
   return successRes(res, {
-    yandexDelivery: readYandexDeliveryConnectionState(
-      seller?.yandexDeliveryIntegration,
-    ),
+    yandexDelivery: {
+      ...readYandexDeliveryConnectionState(seller?.yandexDeliveryIntegration),
+      express: readYandexExpressState(seller),
+    },
   });
 };
 
@@ -69,10 +77,11 @@ export const patchYandexDeliveryCredentialsController = async (req, res) => {
 /** GET /order/yandex-delivery-availability — предлагает ли продавец Яндекс Доставку. */
 export const getYandexDeliveryAvailabilityController = async (req, res) => {
   const seller = await UserModel.findById(String(req.query.sellerId))
-    .select("yandexDeliveryIntegration")
+    .select("yandexDeliveryIntegration sellerFulfillmentDefaults.pickupLocations")
     .lean();
   return successRes(res, {
     available: isYandexDeliveryOfferedBySeller(seller?.yandexDeliveryIntegration),
+    expressAvailable: readYandexExpressState(seller).ready,
   });
 };
 
@@ -140,4 +149,42 @@ export const getYandexDeliveryLabelController = async (req, res) => {
   res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
   res.setHeader("Cache-Control", "no-store");
   return res.send(pdf);
+};
+
+/** PATCH /user/me/yandex-express — продавец включает «Экспресс» и телефон для курьера. */
+export const patchYandexExpressController = async (req, res) => {
+  const express = await setSellerYandexExpress({
+    sellerId: req.userId,
+    enabled: req.body.enabled === true,
+    phone: req.body.phone,
+  });
+  return successRes(res, { express });
+};
+
+/** POST /order/yandex-express-quote — цена и время курьера до адреса покупателя. */
+export const postYandexExpressQuoteController = async (req, res) => {
+  const result = await quoteYandexExpress({
+    items: req.body.items,
+    toLat: req.body.toLat,
+    toLon: req.body.toLon,
+  });
+  return successRes(res, result);
+};
+
+/** POST /order/:orderId/yandex-express-claim — продавец вызывает курьера. */
+export const postYandexExpressClaimController = async (req, res) => {
+  const claim = await createYandexExpressClaim({
+    orderId: String(req.params.orderId),
+    sellerId: String(req.userId),
+  });
+  return successRes(res, { claim });
+};
+
+/** GET /order/:orderId/yandex-express-claim — статус, код передачи, ссылка. */
+export const getYandexExpressClaimController = async (req, res) => {
+  const claim = await refreshYandexExpressClaim({
+    orderId: String(req.params.orderId),
+    sellerId: String(req.userId),
+  });
+  return successRes(res, { claim });
 };

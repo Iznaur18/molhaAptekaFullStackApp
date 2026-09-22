@@ -24,6 +24,7 @@ import {
 import { OrderCard } from "../../../entities/order/ui/OrderCard.jsx";
 import { CdekWaybillPanel } from "../../../entities/cdek/ui/CdekWaybillPanel.jsx";
 import { YandexShipmentPanel } from "../../../entities/yandex-delivery/ui/YandexShipmentPanel.jsx";
+import { YandexExpressPanel } from "../../../entities/yandex-delivery/ui/YandexExpressPanel.jsx";
 import { useCatalogProductDetailsOpener } from "../../../entities/product/lib/useCatalogProductDetailsOpener.js";
 import { API_CLIENT_UI, MY_SALES_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { useDebouncedValue } from "../../../shared/lib/useDebouncedValue.js";
@@ -500,7 +501,24 @@ export function MySalesPage({
 
   /** Накладная СДЭК — только у отправлений, которые покупатель заказал через СДЭК. */
   const renderCdekWaybill = ({ order, shipment }) =>
-    shipment?.yandexDeliveryShipmentAtOrder ? (
+    shipment?.yandexExpressShipmentAtOrder ? (
+      <YandexExpressPanel
+        key={[
+          order._id,
+          shipment.yandexExpressClaim?.syncedAt ?? "",
+          shipment.yandexExpressClaim?.cancelledAt ?? "",
+          shipment.yandexExpressClaim?.cancelError ?? "",
+        ].join(":")}
+        orderId={order._id}
+        shipment={shipment}
+        onChanged={() => {
+          void reloadSales();
+        }}
+        closed={(order.items ?? []).every((item) =>
+          CLOSED_ITEM_STATUSES.has(item.status),
+        )}
+      />
+    ) : shipment?.yandexDeliveryShipmentAtOrder ? (
       <YandexShipmentPanel
         key={[
           order._id,
