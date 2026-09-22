@@ -9,11 +9,28 @@ import { logServerEvent } from "../../../utils/logServerEvent.js";
 import { resolveItemSellerId } from "../../order/orderShipments.js";
 
 import {
-  cancelLoboOrderByExternalId,
+  cancelLoboOrder,
   createLoboOrder,
   estimateLoboDelivery,
+  findLoboOrderByExternalId,
   isLoboConfigured,
 } from "./loboClient.js";
+
+/**
+ * id заказа в Wayset. У отправлений, где он не записался (служба создала
+ * заказ, а мы упали до сохранения), ищем по нашему номеру.
+ *
+ * @param {{ shippingCarrierOrderId?: string; shippingExternalId?: string }} shipment
+ * @returns {Promise<string>}
+ */
+export async function resolveLoboCarrierOrderId(shipment) {
+  const known = String(shipment?.shippingCarrierOrderId ?? "").trim();
+  if (known) return known;
+  const externalId = String(shipment?.shippingExternalId ?? "").trim();
+  if (!externalId) return "";
+  const found = await findLoboOrderByExternalId(externalId);
+  return found?.id ?? "";
+}
 
 /**
  * Наш номер заказа в ЛОБО.
@@ -186,33 +203,34 @@ export async function handOverShipmentToLobo({ orderId, sellerId }) {
     return { ok: false, reason: collected.reason };
   }
 
-  let cost = Number(shipment.deliveryFeeRub) || 0;
-  if (cost <= 0) {
-    // Цену спрашиваем у службы: покупатель платит курьеру при получении, и
-    // сумма должна быть той, которую назовёт сам курьер.
-    try {
-      const quote = await estimateLoboDelivery({
-        pickupLat: collected.payload.pickupLat,
-        pickupLon: collected.payload.pickupLon,
-        deliveryLat: collected.payload.deliveryLat,
-        deliveryLon: collected.payload.deliveryLon,
-      });
-      cost = quote.finalCost;
-    } catch (error) {
-      logServerEvent("error", {
-        event: "lobo_estimate_failed",
-        orderId: String(orderId),
-        error: error instanceof Error ? error.message : String(error),
-      });
-    }
+  // Свежий расчёт перед заказом: его quote_token закрепляет цену, и курьер
+  // возьмёт с покупателя ровно ту сумму, что мы покажем. Токен живёт 5 минут,
+  // поэтому берём его здесь, а не при оформлении.
+  let cost = 0;
+  let quoteToken = "";
+  try {
+    const quote = await estimateLoboDelivery({
+      pickupLat: collected.payload.pickupLat,
+      pickupLon: collected.payload.pickupLon,
+      deliveryLat: collected.payload.deliveryLat,
+      deliveryLon: collected.payload.deliveryLon,
+    });
+    cost = quote.finalCost;
+    quoteToken = quote.quoteToken;
+  } catch (error) {
+    // Без токена служба посчитает сама — заказ от этого не теряется.
+    logServerEvent("error", {
+      event: "lobo_estimate_failed",
+      orderId: String(orderId),
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 
   let created;
   try {
     created = await createLoboOrder({
       ...collected.payload,
-      cost: cost > 0 ? cost : null,
-      paymentMethod: order.paymentMethod,
+      quoteToken,
     });
   } catch (error) {
     logServerEvent("error", {
@@ -226,10 +244,15 @@ export async function handOverShipmentToLobo({ orderId, sellerId }) {
 
   shipment.shippingProvider = PRODUCT_DELIVERY_CARRIER_LOBO;
   shipment.shippingExternalId = collected.payload.externalId;
+  shipment.shippingCarrierOrderId = created?.id ?? "";
   shipment.shippingCarrierStatus = created?.status ?? "";
-  if (cost > 0 && !(Number(shipment.deliveryFeeRub) > 0)) {
-    shipment.deliveryFeeRub = cost;
+  // Итог службы точнее нашего расчёта: он и есть сумма курьеру.
+  const carrierTotal = Number(created?.total) > 0 ? Number(created.total) : cost;
+  if (carrierTotal > 0) {
+    shipment.deliveryFeeRub = carrierTotal;
   }
+  // Ссылку отслеживания Wayset отдаёт только когда курьер уже на заказе —
+  // её берёт опрос статусов (loboStatusSync).
   await order.save();
 
   logServerEvent("info", {
@@ -238,7 +261,8 @@ export async function handOverShipmentToLobo({ orderId, sellerId }) {
     sellerId: String(sellerId),
     externalId: collected.payload.externalId,
     status: created?.status ?? "",
-    cost,
+    carrierOrderId: created?.id ?? "",
+    cost: carrierTotal,
   });
 
   return {
@@ -271,8 +295,13 @@ export async function cancelShipmentInLobo({ orderId, sellerId }) {
   }
 
   try {
-    const cancelled = await cancelLoboOrderByExternalId(externalId);
-    shipment.shippingCarrierStatus = cancelled?.status ?? LOBO_STATUS_CANCELLED;
+    const carrierOrderId = await resolveLoboCarrierOrderId(shipment);
+    if (!carrierOrderId) {
+      return { ok: false, reason: "Служба не нашла заказ по нашему номеру" };
+    }
+    const cancelled = await cancelLoboOrder(carrierOrderId);
+    shipment.shippingCarrierOrderId = carrierOrderId;
+    shipment.shippingCarrierStatus = cancelled?.status || LOBO_STATUS_CANCELLED;
     await order.save();
     logServerEvent("info", {
       event: "lobo_order_cancelled",

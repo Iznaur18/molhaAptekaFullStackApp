@@ -2,8 +2,10 @@ import { PRODUCT_DELIVERY_CARRIER_LOBO } from "@molha/api-contract";
 
 import {
   LOBO_STATUS_CANCELLED,
-  LOBO_STATUS_DELIVERED,
-  LOBO_STATUS_PICKED_UP,
+  LOBO_STATUS_DONE,
+  LOBO_STATUS_IN_PROGRESS,
+  LOBO_STATUS_MERGED,
+  LOBO_TRACKABLE_STATUSES,
 } from "../../../constants/loboConstants.js";
 import {
   ORDER_STATUS_IN_DELIVERY,
@@ -16,12 +18,13 @@ import { notifyBuyerAboutOrderItemStatus } from "../../order/notifyBuyerAboutOrd
 import { resolveItemSellerId } from "../../order/orderShipments.js";
 import { buildOrderStatusFromItems } from "../../order/orderStatus.js";
 
-import { getLoboOrderByExternalId, isLoboConfigured } from "./loboClient.js";
+import { getLoboOrder, getLoboTracking, isLoboConfigured } from "./loboClient.js";
+import { resolveLoboCarrierOrderId } from "./loboShipmentOrders.js";
 
 const TERMINAL = new Set(ORDER_TERMINAL_STATUSES);
 
 /** Статусы службы, после которых опрашивать больше нечего. */
-const FINAL_CARRIER_STATUSES = new Set([LOBO_STATUS_DELIVERED, LOBO_STATUS_CANCELLED]);
+const FINAL_CARRIER_STATUSES = new Set([LOBO_STATUS_DONE, LOBO_STATUS_CANCELLED]);
 
 /**
  * Сколько отправлений опрашиваем за проход.
@@ -34,15 +37,15 @@ const BATCH_LIMIT = 20;
 /**
  * Наша ступень по статусу службы.
  *
- * Промежуточные статусы (`assigned`, `accepted`, `arrived`) ничего не меняют
+ * Промежуточные статусы (`new`, `merged`, `assigned`, `accepted`, `arrived`) не меняют
  * в лестнице: товар всё ещё у продавца, и покупателю сообщать нечего.
  *
  * @param {string} carrierStatus
  * @returns {string | null}
  */
 export function resolveLadderStatusForCarrier(carrierStatus) {
-  if (carrierStatus === LOBO_STATUS_PICKED_UP) return ORDER_STATUS_IN_DELIVERY;
-  if (carrierStatus === LOBO_STATUS_DELIVERED) return "delivered";
+  if (carrierStatus === LOBO_STATUS_IN_PROGRESS) return ORDER_STATUS_IN_DELIVERY;
+  if (carrierStatus === LOBO_STATUS_DONE) return "delivered";
   return null;
 }
 
@@ -76,7 +79,9 @@ export async function findLoboShipmentsToSync({ limit = BATCH_LIMIT } = {}) {
         orderId: String(order._id),
         sellerId: String(shipment.sellerId),
         externalId: String(shipment.shippingExternalId),
+        carrierOrderId: String(shipment.shippingCarrierOrderId ?? ""),
         carrierStatus: String(shipment.shippingCarrierStatus ?? ""),
+        trackingUrl: String(shipment.shippingTrackingUrl ?? ""),
       });
     }
   }
@@ -154,6 +159,26 @@ async function applyLadderStatus({ orderId, sellerId, ladderStatus }) {
 }
 
 /**
+ * Ссылка отслеживания для покупателя, когда курьер уже на заказе. Без неё
+ * заказ всё равно едет, поэтому ошибка только в лог.
+ *
+ * @param {{ id: string | null; status: string } | null} remote
+ */
+async function fetchTrackingUrl(remote) {
+  if (!remote?.id || !LOBO_TRACKABLE_STATUSES.includes(remote.status)) return "";
+  try {
+    return (await getLoboTracking(remote.id)).url;
+  } catch (error) {
+    logServerEvent("error", {
+      event: "lobo_tracking_failed",
+      carrierOrderId: remote.id,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return "";
+  }
+}
+
+/**
  * Один проход опроса статусов.
  *
  * Вебхуков у службы нет, поэтому спрашиваем сами. Ошибка по одному
@@ -170,9 +195,21 @@ export async function syncLoboShipmentStatuses() {
 
   for (const row of rows) {
     try {
-      const remote = await getLoboOrderByExternalId(row.externalId);
+      const carrierOrderId = await resolveLoboCarrierOrderId({
+        shippingCarrierOrderId: row.carrierOrderId,
+        shippingExternalId: row.externalId,
+      });
+      if (!carrierOrderId) continue;
+      let remote = await getLoboOrder(carrierOrderId);
+      // Склеенный заказ сам больше не движется: едет тот, в который его влили.
+      if (remote?.status === LOBO_STATUS_MERGED && remote.mergedInto) {
+        remote = await getLoboOrder(remote.mergedInto);
+      }
       const carrierStatus = String(remote?.status ?? "");
-      if (!carrierStatus || carrierStatus === row.carrierStatus) continue;
+      const trackingUrl = row.trackingUrl || (await fetchTrackingUrl(remote));
+      if (!carrierStatus) continue;
+      if (carrierStatus === row.carrierStatus && trackingUrl === row.trackingUrl)
+        continue;
 
       const ladderStatus = resolveLadderStatusForCarrier(carrierStatus);
       if (ladderStatus) {
@@ -190,6 +227,8 @@ export async function syncLoboShipmentStatuses() {
         {
           $set: {
             "shipments.$.shippingCarrierStatus": carrierStatus,
+            "shipments.$.shippingCarrierOrderId": carrierOrderId,
+            "shipments.$.shippingTrackingUrl": trackingUrl,
             "shipments.$.shippingSyncedAt": new Date(),
           },
         },

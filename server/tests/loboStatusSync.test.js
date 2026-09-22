@@ -83,7 +83,7 @@ describe("раскладка статусов ЛОБО на нашу лестн�
   it("«забрал» переводит заказ в «На доставке»", async () => {
     const { order } = await handedOverShipment();
     // Мок двигает статус по времени; здесь важна именно раскладка.
-    assert.equal(sync.resolveLadderStatusForCarrier("picked_up"), "in_delivery");
+    assert.equal(sync.resolveLadderStatusForCarrier("in_progress"), "in_delivery");
 
     await setCarrierStatus(order._id, "arrived");
     const before = await OrderModel.findById(order._id).lean();
@@ -91,7 +91,7 @@ describe("раскладка статусов ЛОБО на нашу лестн�
   });
 
   it("промежуточные статусы лестницу не двигают", () => {
-    for (const carrierStatus of ["created", "assigned", "accepted", "arrived"]) {
+    for (const carrierStatus of ["new", "merged", "assigned", "accepted", "arrived"]) {
       assert.equal(
         sync.resolveLadderStatusForCarrier(carrierStatus),
         null,
@@ -101,7 +101,7 @@ describe("раскладка статусов ЛОБО на нашу лестн�
   });
 
   it("«доставлен» ведёт к нашему «Доставлен», а не к закрытию сделки", () => {
-    assert.equal(sync.resolveLadderStatusForCarrier("delivered"), "delivered");
+    assert.equal(sync.resolveLadderStatusForCarrier("done"), "delivered");
   });
 
   it("в очередь опроса попадают только незавершённые отправления", async () => {
@@ -111,7 +111,7 @@ describe("раскладка статусов ЛОБО на нашу лестн�
     assert.equal(pending.length, 1);
     assert.equal(pending[0].orderId, String(order._id));
 
-    await setCarrierStatus(order._id, "delivered");
+    await setCarrierStatus(order._id, "done");
     assert.deepEqual(
       await sync.findLoboShipmentsToSync(),
       [],
@@ -135,6 +135,54 @@ describe("раскладка статусов ЛОБО на нашу лестн�
     const fresh = await OrderModel.findById(order._id).lean();
     assert.ok(moved, `лестница не сдвинулась, статус заказа ${fresh.status}`);
     assert.ok(fresh.shipments[0].shippingSyncedAt, "отметка опроса проставлена");
+    assert.match(
+      fresh.shipments[0].shippingTrackingUrl,
+      /track/,
+      "ссылку для покупателя берём, как только курьер на заказе",
+    );
+  });
+
+  it("склеенный заказ читается по заказу, в который его влили", async () => {
+    const { order } = await handedOverShipment();
+    const ours = (await OrderModel.findById(order._id).lean()).shipments[0];
+
+    const base = process.env.LOBO_API_BASE_URL;
+    const headers = {
+      "X-API-Key": "dms_mock_key",
+      Authorization: "Basic " + Buffer.from("mock:mock").toString("base64"),
+      "Content-Type": "application/json",
+    };
+    const target = await fetch(base + "/orders", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        external_id: "other-trip",
+        client_name: "Другой",
+        client_phone: "+79280000002",
+        pickup_address: "Грозный",
+        pickup_lat: 43.31,
+        pickup_lon: 45.69,
+        delivery_address: "Грозный",
+        delivery_lat: 43.35,
+        delivery_lon: 45.72,
+      }),
+    }).then((res) => res.json());
+    await fetch(base + "/__test/merge", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ id: ours.shippingCarrierOrderId, into: target.id }),
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    await sync.syncLoboShipmentStatuses();
+
+    const fresh = (await OrderModel.findById(order._id).lean()).shipments[0];
+    assert.notEqual(
+      fresh.shippingCarrierStatus,
+      "merged",
+      "иначе заказ завис бы на «Объединён»",
+    );
+    assert.ok(fresh.shippingCarrierStatus, "статус взят у заказа-рейса");
   });
 
   it("пропущенный «забрал» не подвешивает отправление", async () => {
