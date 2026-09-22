@@ -136,4 +136,22 @@ describe("выбор способа по продавцам", () => {
 
     expect(resolveCartFulfillmentBySeller(broken, {})).toEqual({});
   });
+  it("товар с ЛОБО даёт доставку, хотя старые флаги сняты", () => {
+    const [group] = groupCartLinesBySeller([
+      {
+        productId: "p-lobo",
+        quantity: 1,
+        product: {
+          productSeller: { _id: "s1", userName: "Иван" },
+          productPickupEnabled: false,
+          productDeliveryEnabled: false,
+          productCourierDeliveryEnabled: false,
+          productDeliveryCarrier: "lobo",
+        },
+      },
+    ]);
+
+    expect(group.deliveryAvailable).toBe(true);
+    expect(group.courierDelivery).toBe(false);
+  });
 });

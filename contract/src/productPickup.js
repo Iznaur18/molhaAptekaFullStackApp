@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+import {
+  PRODUCT_DELIVERY_CARRIER_SELLER,
+  resolveProductDeliveryCarrier,
+} from "./productDeliveryCarrier.js";
 import { ADDRESS_LINE_MAX_LENGTH } from "./userFields.js";
 
 export const PRODUCT_PICKUP_ADDRESS_MIN_LENGTH = 5;
@@ -118,27 +122,30 @@ export function doProductsSupportSellerDelivery(products) {
 }
 
 /**
- * Товар вообще может доехать до покупателя — сам продавец или курьер Gitorg.
+ * Товар вообще может доехать до покупателя — сам продавец, курьер Gitorg или
+ * служба доставки (ЛОБО).
  *
  * Отдельно от `doProductsSupportSellerDelivery`: та отвечает на вопрос «везёт
  * ли продавец сам» и нужна там, где курьеров нет (рассрочка). На чекауте же
  * важно другое — есть ли у корзины хоть какая-то доставка; товар «только
  * курьеры Gitorg» иначе считался недоставляемым, и кнопка «Доставка» была
- * недоступна.
+ * недоступна. Перевозчика читаем из `productDeliveryCarrier`: у товара с ЛОБО
+ * оба старых флага сняты, и по ним он выглядел бы недоставляемым.
  *
- * @param {Array<{ productDeliveryEnabled?: boolean | null; productCourierDeliveryEnabled?: boolean | null } | null | undefined>} products
+ * @param {Array<Parameters<typeof resolveProductDeliveryCarrier>[0] | null | undefined>} products
  * @returns {boolean}
  */
 export function doProductsSupportAnyDelivery(products) {
   if (!Array.isArray(products) || products.length === 0) {
     return false;
   }
-  return products.every(
-    (product) =>
-      (PRODUCT_DELIVERY_FULFILLMENT_ENABLED &&
-        product?.productDeliveryEnabled === true) ||
-      product?.productCourierDeliveryEnabled === true,
-  );
+  return products.every((product) => {
+    const carrier = resolveProductDeliveryCarrier(product);
+    if (carrier === PRODUCT_DELIVERY_CARRIER_SELLER) {
+      return PRODUCT_DELIVERY_FULFILLMENT_ENABLED;
+    }
+    return carrier !== null;
+  });
 }
 
 export const productPickupLatFieldSchema = z.coerce.number().min(-90).max(90);

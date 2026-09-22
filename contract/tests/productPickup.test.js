@@ -7,6 +7,7 @@ import {
   PRODUCT_PICKUP_ADDRESS_REQUIRED_MESSAGE,
   createProductBodySchema,
   createOrderBodySchema,
+  doProductsSupportAnyDelivery,
   doProductsSupportPickup,
   doProductsSupportSellerDelivery,
   resolveCartLineFulfillmentSection,
@@ -192,5 +193,36 @@ describe("productPickup + order fulfillment", () => {
       resolveCartLineFulfillmentSection({}),
       CART_FULFILLMENT_SECTION_PICKUP,
     );
+  });
+});
+
+describe("doProductsSupportAnyDelivery — перевозчик из поля товара", () => {
+  it("товар с ЛОБО доставляется, хотя старые флаги сняты", () => {
+    assert.equal(
+      doProductsSupportAnyDelivery([
+        {
+          productDeliveryCarrier: "lobo",
+          productDeliveryEnabled: false,
+          productCourierDeliveryEnabled: false,
+        },
+      ]),
+      true,
+    );
+  });
+
+  it("курьеры Gitorg и доставка продавцом — как раньше", () => {
+    assert.equal(
+      doProductsSupportAnyDelivery([{ productCourierDeliveryEnabled: true }]),
+      true,
+    );
+    assert.equal(
+      doProductsSupportAnyDelivery([{ productDeliveryEnabled: true }]),
+      PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
+    );
+  });
+
+  it("товар только с самовывозом не доставляется", () => {
+    assert.equal(doProductsSupportAnyDelivery([{ productPickupEnabled: true }]), false);
+    assert.equal(doProductsSupportAnyDelivery([]), false);
   });
 });

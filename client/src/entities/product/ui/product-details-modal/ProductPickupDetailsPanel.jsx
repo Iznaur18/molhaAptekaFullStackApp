@@ -1,5 +1,12 @@
 import { MapPin, Truck } from "lucide-react";
-import { productPickupLocationsFromProduct } from "@molha/api-contract";
+import {
+  PRODUCT_DELIVERY_CARRIER_GITORG,
+  PRODUCT_DELIVERY_CARRIER_LABEL_RU,
+  PRODUCT_DELIVERY_CARRIER_LOBO,
+  productPickupLocationsFromProduct,
+  productShipsToBuyer,
+  resolveProductDeliveryCarrier,
+} from "@molha/api-contract";
 
 import { PRODUCT_PICKUP_UI } from "../../../../shared/config/appUiCopy.js";
 import { openYandexMapsRoute } from "../../../../shared/lib/openYandexMaps.js";
@@ -12,7 +19,9 @@ import { AppIcon } from "../../../../shared/ui/icon/index.js";
  */
 export function ProductPickupDetailsPanel({ product }) {
   const pickupOn = product.productPickupEnabled !== false;
-  const deliveryOn = product.productDeliveryEnabled === true;
+  // Перевозчик — из поля товара: у ЛОБО старые флаги доставки сняты.
+  const deliveryOn = productShipsToBuyer(product);
+  const carrier = resolveProductDeliveryCarrier(product);
   const locations = productPickupLocationsFromProduct(product);
 
   if (!pickupOn && !deliveryOn) {
@@ -86,10 +95,16 @@ export function ProductPickupDetailsPanel({ product }) {
           </span>
           <span className="product-pickup-details-panel__text">
             <span className="product-pickup-details-panel__title">
-              {PRODUCT_PICKUP_UI.FULFILLMENT_DELIVERY}
+              {carrier === PRODUCT_DELIVERY_CARRIER_LOBO
+                ? `${PRODUCT_PICKUP_UI.FULFILLMENT_DELIVERY_ANY} ${PRODUCT_DELIVERY_CARRIER_LABEL_RU[carrier]}`
+                : carrier === PRODUCT_DELIVERY_CARRIER_GITORG
+                  ? PRODUCT_PICKUP_UI.FULFILLMENT_COURIER
+                  : PRODUCT_PICKUP_UI.FULFILLMENT_DELIVERY}
             </span>
             <span className="product-pickup-details-panel__subtitle product-pickup-details-panel__subtitle--muted">
-              {PRODUCT_PICKUP_UI.DETAILS_DELIVERY_HINT}
+              {carrier === PRODUCT_DELIVERY_CARRIER_LOBO
+                ? PRODUCT_PICKUP_UI.DETAILS_LOBO_HINT
+                : PRODUCT_PICKUP_UI.DETAILS_DELIVERY_HINT}
             </span>
           </span>
         </div>

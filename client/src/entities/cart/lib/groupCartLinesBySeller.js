@@ -1,3 +1,5 @@
+import { productShipsToBuyer } from "@molha/api-contract";
+
 /**
  * Корзина по отправлениям: одно на продавца.
  *
@@ -95,10 +97,8 @@ export function groupCartLinesBySeller(visibleLines) {
     if (product.productPickupEnabled === false) {
       group.pickupAvailable = false;
     }
-    if (
-      product.productDeliveryEnabled !== true &&
-      product.productCourierDeliveryEnabled !== true
-    ) {
+    // Перевозчик — из поля товара: у ЛОБО старые флаги сняты.
+    if (!productShipsToBuyer(product)) {
       group.deliveryAvailable = false;
     }
     if (product.productCourierDeliveryEnabled !== true) {
