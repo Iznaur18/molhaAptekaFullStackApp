@@ -140,6 +140,24 @@ describe("раскладка статусов ЛОБО на нашу лестн�
       /track/,
       "ссылку для покупателя берём, как только курьер на заказе",
     );
+    assert.deepEqual(
+      {
+        name: fresh.shipments[0].shippingCourier?.name,
+        plate: fresh.shipments[0].shippingCourier?.vehiclePlate,
+      },
+      { name: "Курьер ЛОБО (mock)", plate: "А123ВС95" },
+      "кто приедет и на чём — видно сторонам сделки",
+    );
+
+    const { attachShipmentCourierInfo } =
+      await import("../services/order/attachShipmentCourierInfo.js");
+    const [shown] = await attachShipmentCourierInfo([fresh]);
+    assert.equal(shown.shipments[0].courier?.userName, "Курьер ЛОБО (mock)");
+    assert.equal(
+      "phone" in shown.shipments[0].courier,
+      false,
+      "телефон курьера не отдаём",
+    );
   });
 
   it("склеенный заказ читается по заказу, в который его влили", async () => {

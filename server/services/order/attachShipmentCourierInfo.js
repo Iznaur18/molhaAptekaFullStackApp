@@ -31,6 +31,20 @@ const resolveRating = (votes) => {
 export async function attachShipmentCourierInfo(orders) {
   if (!Array.isArray(orders) || orders.length === 0) return orders;
 
+  // Курьер внешней службы (ЛОБО) приходит из её API и уже лежит в отправлении.
+  for (const order of orders) {
+    for (const shipment of order?.shipments ?? []) {
+      if (shipment?.courierId || !shipment?.shippingCourier?.name) continue;
+      shipment.courier = {
+        userName: shipment.shippingCourier.name,
+        rating: null,
+        vehicleMake: shipment.shippingCourier.vehicleMake ?? "",
+        vehicleColor: shipment.shippingCourier.vehicleColor ?? "",
+        vehiclePlate: shipment.shippingCourier.vehiclePlate ?? "",
+      };
+    }
+  }
+
   const courierIds = new Set();
   for (const order of orders) {
     for (const shipment of order?.shipments ?? []) {

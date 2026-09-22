@@ -50,6 +50,7 @@ import {
   resolveOrderLineItemProductName,
 } from "../lib/resolveOrderLineItemProductName.js";
 import { OrderCardLineItemThumb } from "./OrderCardLineItemThumb.jsx";
+import { OrderCardLoboShipment } from "./OrderCardLoboShipment.jsx";
 import { resolveOrderLineAffiliateSellerLine } from "../lib/resolveOrderLineAffiliateSellerLine.js";
 import { formatOrderNumber } from "../lib/formatOrderNumber.js";
 import { isAwaitingGitorgCourier } from "../lib/isAwaitingGitorgCourier.js";
@@ -1067,6 +1068,8 @@ export function OrderCard({
           ) : null}
         </p>
       ) : null}
+
+      <OrderCardLoboShipment shipment={shipmentOwn} role={attentionRole} />
 
       {awaitingGitorgCourier ? (
         <div className="order-card__awaiting-courier">
