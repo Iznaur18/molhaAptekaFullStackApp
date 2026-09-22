@@ -17,6 +17,7 @@ import { CdekPickupPointPicker } from "../../../features/checkout/ui/CdekPickupP
 import { ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY } from "../../../entities/order/model/constants.js";
 import { fetchYandexDeliveryAvailability } from "../../../entities/yandex-delivery/api/yandexDeliveryCheckoutApi.js";
 import { YandexPickupPointPicker } from "../../../features/checkout/ui/YandexPickupPointPicker.jsx";
+import { YandexExpressPanel } from "../../../features/checkout/ui/YandexExpressPanel.jsx";
 import { getCartLineExclusionReason } from "../../../entities/cart/lib/getCartLineExclusionReason.js";
 import {
   groupCartLinesBySeller,
@@ -486,12 +487,20 @@ export function CartPage({
     enabled: Boolean(cdekSellerId),
     staleTime: 60_000,
   });
-  const yandexAvailable =
-    yandexAvailabilityQuery.data === true &&
+  // И пункты, и «Экспресс» у Яндекса — только оплата картой при получении.
+  const yandexCardAccepted =
     !auctionCheckoutBid &&
     (!Array.isArray(allowedPaymentMethods) ||
       allowedPaymentMethods.includes(ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY));
+  const yandexAvailable =
+    yandexAvailabilityQuery.data?.available === true && yandexCardAccepted;
+  const expressAvailable =
+    yandexAvailabilityQuery.data?.expressAvailable === true && yandexCardAccepted;
   const [yandexSelection, setYandexSelection] = useState(null);
+  const [expressSelection, setExpressSelection] = useState(null);
+  useEffect(() => {
+    setExpressSelection(null);
+  }, [cdekSellerId]);
   useEffect(() => {
     setYandexSelection(null);
   }, [cdekSellerId]);
@@ -596,6 +605,7 @@ export function CartPage({
     pickupSelections,
     cdekShipment = null,
     yandexDeliveryShipment = null,
+    yandexExpressShipment = null,
   }) => {
     setSubmitState({ isSubmitting: true, error: "", success: "" });
 
@@ -639,17 +649,20 @@ export function CartPage({
         // СДЭК везёт по договору продавца: своя доставка и курьерская ставка
         // тут ни при чём, адрес сервер возьмёт из пункта выдачи.
         fulfillmentBySellerId:
-          cdekShipment || yandexDeliveryShipment
+          cdekShipment || yandexDeliveryShipment || yandexExpressShipment
             ? { [cdekSellerId]: "delivery" }
             : scopedFulfillmentBySellerId,
         deliveryFeeBySellerId:
-          cdekShipment || yandexDeliveryShipment ? {} : scopedDeliveryFeeBySellerId,
+          cdekShipment || yandexDeliveryShipment || yandexExpressShipment
+            ? {}
+            : scopedDeliveryFeeBySellerId,
         deliveryAddress,
         deliveryAddressFlat,
         paymentMethod,
         pickupSelections,
         ...(cdekShipment ? { cdekShipment } : {}),
         ...(yandexDeliveryShipment ? { yandexDeliveryShipment } : {}),
+        ...(yandexExpressShipment ? { yandexExpressShipment } : {}),
       });
       removeItems(orderedProductIds);
       setActiveSellerCartId(null);
@@ -787,7 +800,10 @@ export function CartPage({
                       pickupLocations={pickupLocations}
                       // «Доставка» доступна и тогда, когда у продавца есть только СДЭК или Яндекс.
                       deliveryAvailable={
-                        deliveryAvailable || cdekAvailable || yandexAvailable
+                        deliveryAvailable ||
+                        cdekAvailable ||
+                        yandexAvailable ||
+                        expressAvailable
                       }
                       sellerDeliveryAvailable={deliveryAvailable}
                       pickupAvailable={pickupAvailable}
@@ -828,6 +844,21 @@ export function CartPage({
                         />
                       }
                       yandexAvailable={yandexAvailable}
+                      expressAvailable={expressAvailable}
+                      expressSelection={expressSelection}
+                      expressPanel={(geo) => (
+                        <YandexExpressPanel
+                          items={activeSellerCart.summary.selectedLines.map((line) => ({
+                            productId: line.productId,
+                            quantity: line.quantity,
+                          }))}
+                          geo={geo}
+                          initialRecipientName={user?.userFullName ?? ""}
+                          initialRecipientPhone={user?.userPhoneNumber ?? ""}
+                          disabled={submitState.isSubmitting}
+                          onChange={setExpressSelection}
+                        />
+                      )}
                       yandexSelection={yandexSelection}
                       yandexPicker={
                         <YandexPickupPointPicker

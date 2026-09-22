@@ -3,6 +3,7 @@ import {
   YANDEX_DELIVERY_INVALID_TOKEN_MESSAGE,
   YANDEX_DELIVERY_UNAVAILABLE_MESSAGE,
   resolveYandexDeliveryBaseUrl,
+  resolveYandexExpressBaseUrl,
 } from "@molha/api-contract";
 
 import { AppError } from "../../../errors/AppError.js";
@@ -16,6 +17,19 @@ import { logServerEvent } from "../../../utils/logServerEvent.js";
  *
  * @typedef {{ token: string; environment?: string }} YandexDeliveryCredentials
  */
+
+/** Кабинету не разрешён «Экспресс»: токен верный, но тариф не подключён. */
+export const YANDEX_EXPRESS_FORBIDDEN_MESSAGE =
+  "Яндекс не разрешает вашему кабинету «Экспресс» — подключите его в кабинете Яндекс Доставки или у менеджера";
+
+/**
+ * @param {YandexDeliveryCredentials} credentials
+ * @param {"platform" | "express"} api
+ */
+const resolveBaseUrl = (credentials, api) =>
+  api === "express"
+    ? resolveYandexExpressBaseUrl(credentials.environment)
+    : resolveYandexDeliveryBaseUrl(credentials.environment);
 
 /**
  * @param {Response} response
@@ -39,16 +53,21 @@ async function readErrorText(response) {
 
 /**
  * @param {YandexDeliveryCredentials} credentials
- * @param {{ method?: string; path: string; query?: Record<string, unknown>; body?: unknown }} request
+ * @param {{
+ *   method?: string;
+ *   path: string;
+ *   query?: Record<string, unknown>;
+ *   body?: unknown;
+ *   api?: "platform" | "express";
+ * }} request
+ *   api: platform — «в другой день», express — «Экспресс» (cargo claims).
  * @returns {Promise<unknown>}
  */
 export async function yandexDeliveryRequest(
   credentials,
-  { method = "POST", path, query, body },
+  { method = "POST", path, query, body, api = "platform" },
 ) {
-  const url = new URL(
-    `${resolveYandexDeliveryBaseUrl(credentials.environment)}${path}`,
-  );
+  const url = new URL(`${resolveBaseUrl(credentials, api)}${path}`);
   for (const [name, value] of Object.entries(query ?? {})) {
     if (value == null || value === "") continue;
     url.searchParams.set(name, String(value));
@@ -75,6 +94,10 @@ export async function yandexDeliveryRequest(
     throw new AppError(502, YANDEX_DELIVERY_UNAVAILABLE_MESSAGE);
   }
 
+  // «Экспресс» отвечает 403 и на верный токен, если тариф кабинету не открыт.
+  if (api === "express" && response.status === 403) {
+    throw new AppError(409, YANDEX_EXPRESS_FORBIDDEN_MESSAGE);
+  }
   // Чужой, отозванный или истёкший токен: так Яндекс отвечает на любой из них.
   if (response.status === 401 || response.status === 403) {
     throw new AppError(400, YANDEX_DELIVERY_INVALID_TOKEN_MESSAGE);
@@ -83,6 +106,7 @@ export async function yandexDeliveryRequest(
   if (!response.ok) {
     const detail = await readErrorText(response);
     logServerEvent("yandex_delivery.request_failed", {
+      api,
       path,
       status: response.status,
       detail,

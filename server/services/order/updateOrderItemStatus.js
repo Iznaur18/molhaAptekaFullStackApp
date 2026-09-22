@@ -11,6 +11,7 @@ import {
 import {
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_YANDEX_DELIVERY,
+  SHIPPING_PROVIDER_YANDEX_EXPRESS,
 } from "@molha/api-contract";
 
 import { AppError } from "../../errors/AppError.js";
@@ -260,7 +261,8 @@ function resolveTrackedCarrier(order, item) {
   if (method !== "delivery") return null;
   const carrier = shipment?.deliveryCarrier;
   return carrier === SHIPPING_PROVIDER_CDEK ||
-    carrier === SHIPPING_PROVIDER_YANDEX_DELIVERY
+    carrier === SHIPPING_PROVIDER_YANDEX_DELIVERY ||
+    carrier === SHIPPING_PROVIDER_YANDEX_EXPRESS
     ? carrier
     : null;
 }
@@ -278,7 +280,10 @@ function assertNotCarrierTracked(order, item, action) {
       action === "ship" ? CDEK_MANUAL_SHIP_MESSAGE : CDEK_MANUAL_DELIVER_MESSAGE,
     );
   }
-  if (carrier === SHIPPING_PROVIDER_YANDEX_DELIVERY) {
+  if (
+    carrier === SHIPPING_PROVIDER_YANDEX_DELIVERY ||
+    carrier === SHIPPING_PROVIDER_YANDEX_EXPRESS
+  ) {
     throw new AppError(
       409,
       action === "ship" ? YANDEX_MANUAL_SHIP_MESSAGE : YANDEX_MANUAL_DELIVER_MESSAGE,
@@ -299,7 +304,12 @@ function resolveShipmentKind(order, shipment) {
   if (shipment?.deliveryCarrier === SHIPPING_PROVIDER_CDEK) return "seller";
   // Яндекс Доставка: посылку продавец сдаёт в пункт сам, как со СДЭК, а
   // ступени дальше ставит опрос заявки Яндекса.
-  if (shipment?.deliveryCarrier === SHIPPING_PROVIDER_YANDEX_DELIVERY) return "seller";
+  if (
+    shipment?.deliveryCarrier === SHIPPING_PROVIDER_YANDEX_DELIVERY ||
+    shipment?.deliveryCarrier === SHIPPING_PROVIDER_YANDEX_EXPRESS
+  ) {
+    return "seller";
+  }
   // Внешняя служба или курьеры Gitorg — товар отгружает не продавец.
   if (shipment?.courierDelivery === true || shipment?.deliveryCarrier) {
     return shipment?.deliveryCarrier === "seller" ? "seller" : "courier";

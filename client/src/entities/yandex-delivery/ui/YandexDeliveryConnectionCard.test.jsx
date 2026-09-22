@@ -10,6 +10,7 @@ const removeMock = vi.fn();
 const toggleMock = vi.fn();
 const dropoffPointsMock = vi.fn();
 const saveDropoffMock = vi.fn();
+const expressMock = vi.fn();
 
 vi.mock("../api/yandexDeliveryCredentialsApi.js", () => ({
   fetchYandexDeliveryConnection: (...args) => fetchMock(...args),
@@ -18,6 +19,10 @@ vi.mock("../api/yandexDeliveryCredentialsApi.js", () => ({
   toggleYandexDeliveryConnection: (...args) => toggleMock(...args),
   fetchYandexDropoffPoints: (...args) => dropoffPointsMock(...args),
   saveYandexDropoff: (...args) => saveDropoffMock(...args),
+}));
+
+vi.mock("../api/yandexExpressClaimApi.js", () => ({
+  saveYandexExpressSettings: (...args) => expressMock(...args),
 }));
 
 const { YandexDeliveryConnectionCard } =
@@ -81,7 +86,9 @@ describe("карточка подключения Яндекс Доставки"
       environment: "prod",
     });
     expect(input.value).toBe("");
-    expect(screen.getByRole("switch").checked).toBe(true);
+    expect(
+      screen.getByRole("switch", { name: /Продавать через Яндекс Доставку/ }).checked,
+    ).toBe(true);
   });
 
   it("ошибку Яндекса показывает как есть", async () => {
@@ -113,7 +120,9 @@ describe("карточка подключения Яндекс Доставки"
     });
     renderCard();
 
-    fireEvent.click(await screen.findByRole("switch"));
+    fireEvent.click(
+      await screen.findByRole("switch", { name: /Продавать через Яндекс Доставку/ }),
+    );
 
     await screen.findByText("Яндекс Доставка скрыта от покупателей");
     expect(toggleMock.mock.calls[0][0]).toBe(false);
@@ -148,5 +157,48 @@ describe("карточка подключения Яндекс Доставки"
     await screen.findByText(/Сейчас: Грозный, пр. Путина, 1/);
     expect(dropoffPointsMock.mock.calls[0][0]).toBe("Грозный");
     expect(saveDropoffMock.mock.calls[0][0]).toBe("st-1");
+  });
+});
+
+describe("«Экспресс» в карточке подключения", () => {
+  it("показывает адрес точки продажи и включает «Экспресс» с телефоном", async () => {
+    fetchMock.mockResolvedValue({
+      connected: true,
+      enabled: true,
+      tokenMasked: "…abcd",
+      environment: "prod",
+      express: {
+        enabled: false,
+        phone: "",
+        pickupAddress: "Грозный, ул. Лорсанова, 5",
+        ready: false,
+      },
+    });
+    expressMock.mockResolvedValue({
+      enabled: true,
+      phone: "+79990001122",
+      pickupAddress: "Грозный, ул. Лорсанова, 5",
+      ready: true,
+    });
+    renderCard();
+
+    expect(await screen.findByText("Грозный, ул. Лорсанова, 5")).toBeTruthy();
+    fireEvent.change(
+      screen.getByLabelText("Телефон, по которому курьер вам позвонит"),
+      {
+        target: { value: " +79990001122 " },
+      },
+    );
+    fireEvent.click(screen.getByRole("switch", { name: /Экспресс/ }));
+
+    await waitFor(() =>
+      expect(expressMock).toHaveBeenCalledWith(
+        { enabled: true, phone: "+79990001122" },
+        expect.anything(),
+      ),
+    );
+    await waitFor(() =>
+      expect(screen.getByRole("switch", { name: /Экспресс/ }).checked).toBe(true),
+    );
   });
 });

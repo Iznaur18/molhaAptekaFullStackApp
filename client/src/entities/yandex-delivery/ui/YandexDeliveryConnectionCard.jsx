@@ -10,6 +10,7 @@ import {
 } from "../model/yandexDeliveryConnectionQueries.js";
 
 import { YandexDropoffPicker } from "./YandexDropoffPicker.jsx";
+import { YandexExpressSettings } from "./YandexExpressSettings.jsx";
 
 // Оформление общее с карточкой СДЭК: две службы стоят рядом и должны
 // выглядеть одной системой.
@@ -120,6 +121,14 @@ export function YandexDeliveryConnectionCard() {
 
       {isConnected ? (
         <YandexDropoffPicker dropoff={connection.dropoff ?? null} />
+      ) : null}
+
+      {isConnected ? (
+        <YandexExpressSettings
+          // Телефон в поле берётся из ответа сервера при каждом сохранении.
+          key={connection.express?.phone ?? ""}
+          express={connection.express}
+        />
       ) : null}
 
       <form className="cdek-connection-card__form" onSubmit={handleSubmit}>

@@ -2,6 +2,7 @@ import { logServerEvent } from "../../utils/logServerEvent.js";
 
 import { syncCdekWaybillStatuses } from "./cdek/cdekWaybill.js";
 import { syncYandexDeliveryRequests } from "./yandex/yandexDeliveryRequest.js";
+import { syncYandexExpressClaims } from "./yandex/yandexExpress.js";
 
 /**
  * Опрос статусов служб продавцов (СДЭК, Яндекс) одним заданием: интервал у
@@ -12,6 +13,7 @@ export async function syncCarrierStatuses() {
   for (const [name, run] of [
     ["cdek", syncCdekWaybillStatuses],
     ["yandexDelivery", syncYandexDeliveryRequests],
+    ["yandexExpress", syncYandexExpressClaims],
   ]) {
     try {
       result[name] = await run();

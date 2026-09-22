@@ -171,6 +171,15 @@ const cancelExternalShipmentIfNeeded = async ({ order, sellerId }) => {
   if (stillAlive) return;
 
   // У Яндекса и СДЭК тоже есть внешний номер, но снимать его надо у них, а не у ЛОБО.
+  if (shipment.yandexExpressClaim?.claimId || shipment.yandexExpressShipmentAtOrder) {
+    const { cancelYandexExpressClaim } =
+      await import("../shipping/yandex/yandexExpress.js");
+    await cancelYandexExpressClaim({
+      orderId: String(order._id),
+      sellerId: String(sellerId),
+    });
+    return;
+  }
   if (
     shipment.yandexDeliveryRequest?.requestId ||
     shipment.yandexDeliveryShipmentAtOrder

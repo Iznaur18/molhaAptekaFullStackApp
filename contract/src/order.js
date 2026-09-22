@@ -2,7 +2,10 @@ import { z } from "zod";
 
 import { marketingAttributionSchema } from "./marketingAttribution.js";
 import { cdekOrderSelectionSchema } from "./cdek.js";
-import { yandexDeliveryOrderSelectionSchema } from "./yandexDelivery.js";
+import {
+  yandexDeliveryOrderSelectionSchema,
+  yandexExpressOrderSelectionSchema,
+} from "./yandexDelivery.js";
 import { mongoIdSchema } from "./mongoId.js";
 import { ADDRESS_LINE_MAX_LENGTH } from "./userFields.js";
 import {
@@ -151,6 +154,8 @@ export const createOrderBodySchema = z
     cdekShipment: cdekOrderSelectionSchema.nullable().optional(),
     /** Яндекс Доставка до пункта выдачи — так же, как СДЭК: только выбор. */
     yandexDeliveryShipment: yandexDeliveryOrderSelectionSchema.nullable().optional(),
+    /** Яндекс «Экспресс» до двери: адрес покупателя идёт обычным путём, здесь — получатель. */
+    yandexExpressShipment: yandexExpressOrderSelectionSchema.nullable().optional(),
     paymentMethod: z.enum(ORDER_PAYMENT_METHODS),
     priceOfferId: mongoIdSchema.optional(),
     /** Код шарера (`referralCode`) из `?aff=` — last-click attribution. */
@@ -201,7 +206,13 @@ export const createOrderBodySchema = z
       (method) => method === "delivery",
     );
     // У СДЭК адрес — это пункт выдачи, его подставит сервер.
-    if (body.cdekShipment && body.yandexDeliveryShipment) {
+    if (
+      [
+        body.cdekShipment,
+        body.yandexDeliveryShipment,
+        body.yandexExpressShipment,
+      ].filter(Boolean).length > 1
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["yandexDeliveryShipment"],

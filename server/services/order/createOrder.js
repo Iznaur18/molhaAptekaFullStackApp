@@ -10,6 +10,8 @@ import {
   PRODUCT_DELIVERY_CARRIER_GITORG,
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_YANDEX_DELIVERY,
+  SHIPPING_PROVIDER_YANDEX_EXPRESS,
+  SHIPPING_SERVICE_COURIER,
   SHIPPING_SERVICE_PICKUP_POINT,
   YANDEX_DELIVERY_CARD_ONLY_MESSAGE,
   SELLER_PAYMENT_METHOD_NOT_ACCEPTED_MESSAGE,
@@ -27,6 +29,7 @@ import { resolveDeliveryFeesBySeller } from "../courier/courierDeliveryFee.js";
 import { resolveOrderDeliveryGeo } from "./resolveOrderDeliveryGeo.js";
 import { resolveCdekOrderShipment } from "../shipping/cdek/resolveCdekOrderShipment.js";
 import { resolveYandexDeliveryOrderShipment } from "../shipping/yandex/yandexDeliveryShipment.js";
+import { resolveYandexExpressOrderShipment } from "../shipping/yandex/yandexExpress.js";
 import {
   buildGoodsTotalBySeller,
   prepareSellerDeliveryBySeller,
@@ -510,6 +513,7 @@ export async function createOrder({
   deliveryAddressGeo = null,
   cdekShipment = null,
   yandexDeliveryShipment = null,
+  yandexExpressShipment = null,
   affiliateCode = null,
   marketingAttribution = null,
 }) {
@@ -620,7 +624,7 @@ export async function createOrder({
   // Яндекс берёт в пункте только карту: и за товар, и за доставку
   // (решение 22.09.2026). Наличные и предоплата с ним не сочетаются.
   if (
-    yandexDeliveryShipment &&
+    (yandexDeliveryShipment || yandexExpressShipment) &&
     paymentMethod !== ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY
   ) {
     throw new AppError(400, YANDEX_DELIVERY_CARD_ONLY_MESSAGE);
@@ -632,22 +636,30 @@ export async function createOrder({
         selection: yandexDeliveryShipment,
       })
     : null;
-  /** Внешняя служба продавца (СДЭК или Яндекс): везёт она, адрес — её пункт. */
+  /**
+   * Внешняя служба продавца. СДЭК и Яндекс «в другой день» везут в пункт — его
+   * адрес и становится адресом заказа. «Экспресс» везёт до двери: адрес
+   * покупательский, а цену посчитаем ниже, когда проверим его координаты.
+   */
   const carrierResolved = cdekResolved ?? yandexResolved;
+  const expressRequested = Boolean(yandexExpressShipment);
   const carrierProvider = cdekResolved
     ? SHIPPING_PROVIDER_CDEK
     : yandexResolved
       ? SHIPPING_PROVIDER_YANDEX_DELIVERY
-      : null;
+      : expressRequested
+        ? SHIPPING_PROVIDER_YANDEX_EXPRESS
+        : null;
+  const carrierChosen = Boolean(carrierResolved) || expressRequested;
 
   const fulfillmentSplit = resolveOrderFulfillmentSplit({
     productIds: uniqueProductIds,
     productById,
-    fulfillmentBySellerId: carrierResolved
+    fulfillmentBySellerId: carrierChosen
       ? { [orderSellerId]: "delivery" }
       : fulfillmentBySellerId,
     fallbackFulfillment:
-      carrierResolved || fulfillmentMethod === "delivery"
+      carrierChosen || fulfillmentMethod === "delivery"
         ? "delivery"
         : ORDER_FULFILLMENT_PICKUP,
   });
@@ -655,10 +667,10 @@ export async function createOrder({
 
   // Проверяем каждую половину своим правилом: в смешанном заказе товар
   // самовывозного продавца не обязан поддерживать доставку, и наоборот.
-  if (!carrierResolved) {
+  if (!carrierChosen) {
     assertProductsSupportDelivery(productById, fulfillmentSplit.deliveryProductIds);
   }
-  const deliveryCarrierBySeller = carrierResolved
+  const deliveryCarrierBySeller = carrierChosen
     ? { [orderSellerId]: carrierProvider }
     : resolveDeliveryCarrierBySeller(productById, fulfillmentSplit.deliveryProductIds);
 
@@ -670,7 +682,8 @@ export async function createOrder({
     if (
       !carrier ||
       carrier === SHIPPING_PROVIDER_CDEK ||
-      carrier === SHIPPING_PROVIDER_YANDEX_DELIVERY
+      carrier === SHIPPING_PROVIDER_YANDEX_DELIVERY ||
+      carrier === SHIPPING_PROVIDER_YANDEX_EXPRESS
     ) {
       continue;
     }
@@ -746,6 +759,17 @@ export async function createOrder({
     verifiedGeo: addressForOrder.geo,
     clientGeo: deliveryAddressGeo,
   });
+
+  // «Экспресс»: курьер едет в точку, которую указал покупатель, — по ней и цена.
+  const expressSnapshot = expressRequested
+    ? await resolveYandexExpressOrderShipment({
+        sellerId: orderSellerId,
+        items,
+        selection: yandexExpressShipment,
+        deliveryAddress: addressForOrder,
+        deliveryGeo: orderGeo.storedGeo,
+      })
+    : null;
 
   // Тариф и расстояние по дорогам для доставки продавцом — до транзакции:
   // это походы во внешние геосервисы, держать ради них открытую транзакцию
@@ -877,13 +901,22 @@ export async function createOrder({
               yandexDeliveryShipmentBySellerId: yandexResolved
                 ? { [orderSellerId]: yandexResolved.snapshot }
                 : null,
+              yandexExpressShipmentBySellerId: expressSnapshot
+                ? { [orderSellerId]: expressSnapshot }
+                : null,
             }),
             ...(carrierResolved
               ? {
                   shippingProvider: carrierProvider,
                   shippingServiceType: SHIPPING_SERVICE_PICKUP_POINT,
                 }
-              : {}),
+              : expressSnapshot
+                ? {
+                    // В заказе служба — Яндекс Доставка, вид — курьер до двери.
+                    shippingProvider: SHIPPING_PROVIDER_YANDEX_DELIVERY,
+                    shippingServiceType: SHIPPING_SERVICE_COURIER,
+                  }
+                : {}),
             paymentMethod,
             status: orderStatus,
             priceOfferId: linkedPriceOfferId,

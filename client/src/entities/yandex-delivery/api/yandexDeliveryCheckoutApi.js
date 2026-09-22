@@ -17,16 +17,24 @@ function rethrow(error) {
   throw new Error(message);
 }
 
-/** @param {string} sellerId */
+/**
+ * Что из Яндекса предлагает продавец: «в другой день» (пункты) и «Экспресс».
+ *
+ * @param {string} sellerId
+ * @returns {Promise<{ available: boolean; expressAvailable: boolean }>}
+ */
 export async function fetchYandexDeliveryAvailability(sellerId) {
   try {
     const { data } = await apiClient.get("/order/yandex-delivery-availability", {
       params: { sellerId },
     });
-    return data?.data?.available === true;
+    return {
+      available: data?.data?.available === true,
+      expressAvailable: data?.data?.expressAvailable === true,
+    };
   } catch {
     // Не узнали — просто не показываем вариант, оформление не ломаем.
-    return false;
+    return { available: false, expressAvailable: false };
   }
 }
 
@@ -50,6 +58,24 @@ export async function fetchYandexDeliveryQuote({ items, pickupPointId }) {
     const { data } = await apiClient.post("/order/yandex-delivery-quote", {
       items,
       pickupPointId,
+    });
+    return data?.data ?? { available: false };
+  } catch (error) {
+    return rethrow(error);
+  }
+}
+
+/**
+ * Цена «Экспресса» до точки покупателя.
+ *
+ * @param {{ items: Array<{ productId: string; quantity: number }>; toLat: number; toLon: number }} params
+ */
+export async function fetchYandexExpressQuote({ items, toLat, toLon }) {
+  try {
+    const { data } = await apiClient.post("/order/yandex-express-quote", {
+      items,
+      toLat,
+      toLon,
     });
     return data?.data ?? { available: false };
   } catch (error) {

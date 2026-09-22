@@ -128,6 +128,10 @@ import {
   postYandexDeliveryRequestController,
   getYandexDeliveryRequestController,
   getYandexDeliveryLabelController,
+  patchYandexExpressController,
+  postYandexExpressQuoteController,
+  postYandexExpressClaimController,
+  getYandexExpressClaimController,
 } from "./Shipping/yandexDeliveryCredentialsControllers.js";
 import { postSellerDeliveryQuoteController } from "./Order/sellerDeliveryQuoteController.js";
 import {
@@ -463,6 +467,10 @@ export {
   postYandexDeliveryRequestController,
   getYandexDeliveryRequestController,
   getYandexDeliveryLabelController,
+  patchYandexExpressController,
+  postYandexExpressQuoteController,
+  postYandexExpressClaimController,
+  getYandexExpressClaimController,
   putCdekCredentialsController,
   deleteCdekCredentialsController,
   patchCdekCredentialsController,

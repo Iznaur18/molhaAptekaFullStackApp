@@ -340,6 +340,19 @@ const OrderShipmentSchema = new mongoose.Schema(
       default: undefined,
     },
     /**
+     * Яндекс «Экспресс» до двери — снимок: цена доставки (покупатель платит
+     * курьеру картой вместе с товаром), откуда забирает курьер, куда везёт.
+     */
+    yandexExpressShipmentAtOrder: {
+      type: mongoose.Schema.Types.Mixed,
+      default: undefined,
+    },
+    /** Вызов курьера «Экспресса»: claim_id, статус, цена, код передачи. */
+    yandexExpressClaim: {
+      type: mongoose.Schema.Types.Mixed,
+      default: undefined,
+    },
+    /**
      * Продавец подтвердил, что перевод дошёл.
      *
      * Курьер не касается денег продавца, поэтому перед вручением нужно третье

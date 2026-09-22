@@ -42,6 +42,7 @@ import {
   PRODUCT_DELIVERY_CARRIER_SELLER,
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_YANDEX_DELIVERY,
+  SHIPPING_PROVIDER_YANDEX_EXPRESS,
   resolveProductDeliveryCarrier,
 } from "@molha/api-contract";
 import { ConfirmButton } from "../../../shared/ui/ConfirmButton/ConfirmButton.jsx";
@@ -600,11 +601,12 @@ export function OrderCard({
     productCourierDeliveryEnabled: shipmentOwn?.courierDelivery === true,
     productDeliveryEnabled: shipmentMethod === "delivery",
   });
-  // СДЭК и Яндекс: «Отгружен» и «Доставлен» ставит опрос статусов службы, не продавец.
+  // СДЭК, Яндекс и «Экспресс»: «Отгружен» и «Доставлен» ставит опрос статусов службы, не продавец.
   const cdekTracksThisShipment =
     shipmentMethod === "delivery" &&
     (shipmentOwn?.deliveryCarrier === SHIPPING_PROVIDER_CDEK ||
-      shipmentOwn?.deliveryCarrier === SHIPPING_PROVIDER_YANDEX_DELIVERY);
+      shipmentOwn?.deliveryCarrier === SHIPPING_PROVIDER_YANDEX_DELIVERY ||
+      shipmentOwn?.deliveryCarrier === SHIPPING_PROVIDER_YANDEX_EXPRESS);
   const sellerDeliversThisShipment =
     shipmentMethod === "delivery" &&
     shipmentCarrier === PRODUCT_DELIVERY_CARRIER_SELLER &&

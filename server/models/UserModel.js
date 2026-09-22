@@ -769,6 +769,15 @@ const UserSchema = new mongoose.Schema(
         address: { type: String, trim: true, default: "" },
         geoId: { type: Number, default: null },
       },
+      /**
+       * «Экспресс»: курьер Яндекса забирает у продавца и везёт по городу.
+       * Адрес забора — точка продажи продавца по умолчанию; телефон — кому
+       * звонит курьер и куда приходит код передачи.
+       */
+      express: {
+        enabled: { type: Boolean, default: false },
+        phone: { type: String, trim: true, default: "" },
+      },
       environment: { type: String, enum: ["prod", "test"], default: "prod" },
       validatedAt: { type: Date, default: null },
       lastError: { type: String, default: "", trim: true, maxlength: 500 },

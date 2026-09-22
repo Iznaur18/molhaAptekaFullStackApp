@@ -190,6 +190,17 @@ export const CHECKOUT_FORM_UI = {
     "Выберите пункт выдачи Яндекса и укажите получателя с телефоном",
   YANDEX_CARD_ONLY: "С Яндекс Доставкой оплата только картой в пункте выдачи",
   YANDEX_POINT_LABEL: "Пункт выдачи Яндекса",
+  YANDEX_EXPRESS_REQUIRED:
+    "Для курьера Яндекса укажите адрес с точкой на карте и получателя с телефоном",
+  YANDEX_EXPRESS_CARD_HINT:
+    "Курьер Яндекса привезёт заказ сегодня. Товар и доставку оплатите курьеру картой",
+  YANDEX_EXPRESS_NEED_GEO:
+    "Выберите адрес из подсказок или отметьте точку на карте — курьер едет по координатам",
+  YANDEX_EXPRESS_PRICING: "Считаем курьера…",
+  YANDEX_EXPRESS_UNAVAILABLE:
+    "Курьер Яндекса по этому адресу не едет — выберите другую службу",
+  YANDEX_EXPRESS_PRICE: (sumRub, minutes) =>
+    minutes ? `${sumRub} ₽ · курьер ~${minutes} мин в пути` : `${sumRub} ₽`,
   YANDEX_RECIPIENT_PHONE: "Телефон получателя — на него Яндекс пришлёт код получения",
   YANDEX_NO_POINTS:
     "В этом городе нет пунктов Яндекса с оплатой картой — выберите другую службу",
@@ -235,6 +246,7 @@ export const CHECKOUT_FORM_UI = {
   SHIPPING_PROVIDER_COURIER: "Курьеры Gitorg",
   SHIPPING_PROVIDER_CDEK: "СДЭК",
   SHIPPING_PROVIDER_YANDEX: "Яндекс Доставка",
+  SHIPPING_PROVIDER_YANDEX_EXPRESS: "Яндекс Экспресс",
   /** @param {string} cost @param {string} carrier */
   SHIPPING_ESTIMATE: (cost, carrier) => `${carrier}: примерно ${cost}`,
   SHIPPING_ESTIMATE_HINT: "Точную сумму назовёт курьер при получении.",

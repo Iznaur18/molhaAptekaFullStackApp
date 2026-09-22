@@ -12,6 +12,9 @@ import {
   postYandexDeliveryRequestController,
   getYandexDeliveryRequestController,
   getYandexDeliveryLabelController,
+  postYandexExpressQuoteController,
+  postYandexExpressClaimController,
+  getYandexExpressClaimController,
   postCdekWaybillController,
   getCdekWaybillController,
   getCdekReceptionPointsController,
@@ -50,6 +53,7 @@ import {
   cdekAvailabilityValidation,
   yandexDeliveryPointsValidation,
   yandexDeliveryQuoteValidation,
+  yandexExpressQuoteValidation,
   cdekWaybillValidation,
   cdekWaybillParamsValidation,
   cdekReceptionPointsValidation,
@@ -112,6 +116,12 @@ router.get(
   getYandexDeliveryPointsController,
 );
 router.post(
+  "/yandex-express-quote",
+  checkAuthMW,
+  yandexExpressQuoteValidation,
+  postYandexExpressQuoteController,
+);
+router.post(
   "/yandex-delivery-quote",
   checkAuthMW,
   yandexDeliveryQuoteValidation,
@@ -138,6 +148,20 @@ router.get(
   getCdekWaybillController,
 );
 // Заявка в Яндекс Доставку — только продавец своей отправки (проверяет сервис).
+// «Экспресс»: продавец вызывает курьера Яндекса и следит за ним.
+router.post(
+  "/:orderId/yandex-express-claim",
+  checkAuthMW,
+  orderItemActionRateLimiter,
+  cdekWaybillParamsValidation,
+  postYandexExpressClaimController,
+);
+router.get(
+  "/:orderId/yandex-express-claim",
+  checkAuthMW,
+  cdekWaybillParamsValidation,
+  getYandexExpressClaimController,
+);
 router.post(
   "/:orderId/yandex-delivery-request",
   checkAuthMW,
