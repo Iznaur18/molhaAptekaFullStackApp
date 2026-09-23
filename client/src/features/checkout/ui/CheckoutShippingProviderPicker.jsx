@@ -141,6 +141,17 @@ export function CheckoutShippingProviderPicker({
     })),
   ].sort((a, b) => Number(b.selected) - Number(a.selected));
 
+  // Службу задаёт продавец на товаре. Переключать нечего — показываем строкой,
+  // а не списком выключенных карточек: он выглядел как сломанный выбор.
+  const selectedCards = cards.filter((card) => card.selected);
+  const singleService = !canSwitch && selectedCards.length === 1;
+  const singleServiceText =
+    selectedCards[0]?.id === COURIER_OPTION_ID
+      ? CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SINGLE_COURIER
+      : selectedCards[0]?.id === CHECKOUT_SHIPPING_PROVIDER_SELLER
+        ? CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SINGLE_SELLER
+        : CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SINGLE(selectedCards[0]?.label ?? "");
+
   useEffect(() => {
     const node = selectedRef.current;
     if (!node || typeof node.scrollIntoView !== "function") {
@@ -156,6 +167,12 @@ export function CheckoutShippingProviderPicker({
       node.scrollIntoView();
     }
   }, [courierDelivery]);
+
+  if (singleService) {
+    return (
+      <p className="checkout-shipping-provider-picker__single">{singleServiceText}</p>
+    );
+  }
 
   return (
     <div className="checkout-shipping-provider-picker">

@@ -13,18 +13,22 @@ const sellerButton = () =>
   screen.getByRole("radio", { name: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SELLER });
 
 describe("служба доставки в оформлении", () => {
-  it("курьерский заказ отмечает курьеров Gitorg", () => {
+  it("служба одна — строка вместо списка: курьеры Gitorg", () => {
     renderWithProviders(<CheckoutShippingProviderPicker courierDelivery="courier" />);
 
-    expect(courierButton().getAttribute("aria-checked")).toBe("true");
-    expect(sellerButton().getAttribute("aria-checked")).toBe("false");
+    expect(
+      screen.getByText(CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SINGLE_COURIER),
+    ).toBeTruthy();
+    expect(screen.queryAllByRole("radio")).toHaveLength(0);
   });
 
-  it("заказ с доставкой продавца отмечает продавца", () => {
+  it("служба одна — строка вместо списка: продавец", () => {
     renderWithProviders(<CheckoutShippingProviderPicker courierDelivery="seller" />);
 
-    expect(sellerButton().getAttribute("aria-checked")).toBe("true");
-    expect(courierButton().getAttribute("aria-checked")).toBe("false");
+    expect(
+      screen.getByText(CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SINGLE_SELLER),
+    ).toBeTruthy();
+    expect(screen.queryAllByRole("radio")).toHaveLength(0);
   });
 
   it("смешанная корзина отмечает обе службы", () => {
@@ -97,11 +101,14 @@ describe("служба доставки в оформлении", () => {
       />,
     );
 
-    const cdek = screen.getByRole("radio", {
-      name: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_CDEK,
-    });
-    expect(cdek.getAttribute("aria-checked")).toBe("true");
-    expect(cdek.disabled).toBe(true);
+    expect(
+      screen.getByText(
+        CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SINGLE(
+          CHECKOUT_FORM_UI.SHIPPING_PROVIDER_CDEK,
+        ),
+      ),
+    ).toBeTruthy();
+    expect(screen.queryAllByRole("radio")).toHaveLength(0);
   });
 
   it("СДЭК, Яндекс и своя доставка — три службы, выбранная одна", () => {
@@ -147,20 +154,25 @@ describe("товар с локальной службой", () => {
     sessionStorage.clear();
   });
 
-  it("ЛОБО отмечена, а доставка продавцом — нет", () => {
+  it("товар возит ЛОБО — так и написано, без выбора", () => {
     renderWithProviders(
       <CheckoutShippingProviderPicker courierDelivery="seller" productCarrier="lobo" />,
     );
 
-    expect(loboButton()?.getAttribute("aria-checked")).toBe("true");
-    expect(sellerButton().getAttribute("aria-checked")).toBe("false");
-    expect(courierButton().getAttribute("aria-checked")).toBe("false");
+    expect(
+      screen.getByText(CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SINGLE("ЛОБО")),
+    ).toBeTruthy();
+    expect(loboButton()).toBeNull();
+    expect(
+      screen.queryByText(CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SINGLE_SELLER),
+    ).toBeNull();
   });
 
-  it("без такого товара ЛОБО остаётся невыбранной", () => {
+  it("без такого товара везёт продавец", () => {
     renderWithProviders(<CheckoutShippingProviderPicker courierDelivery="seller" />);
 
-    expect(loboButton()?.getAttribute("aria-checked")).toBe("false");
-    expect(sellerButton().getAttribute("aria-checked")).toBe("true");
+    expect(
+      screen.getByText(CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SINGLE_SELLER),
+    ).toBeTruthy();
   });
 });

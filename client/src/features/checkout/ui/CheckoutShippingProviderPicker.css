@@ -179,3 +179,11 @@
     transition: none;
   }
 }
+
+/* Служба одна: строка вместо списка выключенных карточек. */
+.checkout-shipping-provider-picker__single {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--iz-color-text);
+}
