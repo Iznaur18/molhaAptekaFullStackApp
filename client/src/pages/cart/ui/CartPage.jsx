@@ -508,6 +508,12 @@ export function CartPage({
   const expressAvailable =
     yandexAvailabilityQuery.data?.expressAvailable === true && yandexCardAccepted;
   const [yandexSelection, setYandexSelection] = useState(null);
+  /** Цена службы для итога корзины: её называет сама служба. */
+  const [carrierDeliveryCost, setCarrierDeliveryCost] = useState(
+    /** @type {{ feeRub: number; label: string; approximate: boolean } | null} */ (
+      null
+    ),
+  );
   const [expressSelection, setExpressSelection] = useState(null);
   useEffect(() => {
     setExpressSelection(null);
@@ -797,6 +803,7 @@ export function CartPage({
               isCheckoutSubmitting={submitState.isSubmitting}
               sellerDelivery={sellerDelivery}
               sellerDeliveryDistance={sellerDeliveryDistance}
+              carrierDeliveryCost={carrierDeliveryCost}
               checkoutBeforeDock={
                 <>
                   <div
@@ -821,6 +828,7 @@ export function CartPage({
                       fulfillmentMode={null}
                       courierDelivery={checkoutCourierDelivery}
                       productCarrier={checkoutProductCarrier}
+                      onCarrierCost={setCarrierDeliveryCost}
                       deliveryProductIds={deliveryProductIds}
                       initialFulfillmentMethod={
                         fulfillmentBySellerId[activeSellerCart.group.sellerId] ??
@@ -845,6 +853,7 @@ export function CartPage({
                       cdekSelection={cdekSelection}
                       cdekPicker={
                         <CdekPickupPointPicker
+                          onCost={setCarrierDeliveryCost}
                           sellerId={activeSellerCart.group.sellerId}
                           productIds={activeSellerCart.summary.selectedLines.map(
                             (line) => line.productId,
@@ -860,6 +869,7 @@ export function CartPage({
                       expressSelection={expressSelection}
                       expressPanel={(geo) => (
                         <YandexExpressPanel
+                          onCost={setCarrierDeliveryCost}
                           items={activeSellerCart.summary.selectedLines.map((line) => ({
                             productId: line.productId,
                             quantity: line.quantity,
@@ -874,6 +884,7 @@ export function CartPage({
                       yandexSelection={yandexSelection}
                       yandexPicker={
                         <YandexPickupPointPicker
+                          onCost={setCarrierDeliveryCost}
                           sellerId={activeSellerCart.group.sellerId}
                           items={activeSellerCart.summary.selectedLines.map((line) => ({
                             productId: line.productId,
@@ -931,6 +942,7 @@ export function CartPage({
         fulfillmentMode={null}
         courierDelivery={checkoutCourierDelivery}
         productCarrier={checkoutProductCarrier}
+        onCarrierCost={setCarrierDeliveryCost}
         deliveryProductIds={deliveryProductIds}
         initialFulfillmentMethod={null}
         onFulfillmentMethodChange={null}

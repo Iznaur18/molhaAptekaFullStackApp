@@ -123,6 +123,7 @@ export function CheckoutForm({
   fulfillmentMode = null,
   courierDelivery = null,
   productCarrier = null,
+  onCarrierCost = null,
   deliveryProductIds = [],
   initialFulfillmentMethod = null,
   onFulfillmentMethodChange = null,
@@ -895,6 +896,7 @@ export function CheckoutForm({
                       <CheckoutShippingEstimate
                         productIds={deliveryProductIds}
                         deliveryGeo={deliveryAddress.geo ?? null}
+                        onCost={onCarrierCost ?? undefined}
                       />
                     )}
                   </>

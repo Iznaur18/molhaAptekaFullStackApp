@@ -166,6 +166,11 @@ export const CHECKOUT_FORM_UI = {
   SELLER_DELIVERY_FREE: "Бесплатно",
   /** @param {string} price */
   SELLER_DELIVERY_FROM: (price) => `от ${price}`,
+  /** Цена службы ещё может измениться: у ЛОБО точную называет курьер. @param {string} price */
+  CARRIER_DELIVERY_APPROX: (price) => `≈ ${price}`,
+  /** Товары и доставку платят порознь. @param {string} label */
+  CARRIER_DELIVERY_SPLIT_HINT: (label) =>
+    `Товары оплачиваются продавцу, доставку — службе ${label}`,
   SELLER_DELIVERY_NEED_ADDRESS:
     "Точная сумма появится, когда выберете адрес: она зависит от расстояния по дорогам",
   SELLER_DELIVERY_CALCULATING: "Считаем расстояние по дорогам…",

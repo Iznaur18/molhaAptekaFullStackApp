@@ -16,9 +16,10 @@ import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
  * @param {{
  *   productIds: string[];
  *   deliveryGeo: { lat: number; lon: number } | null;
+ *   onCost?: (cost: { feeRub: number; label: string; approximate: boolean } | null) => void;
  * }} props
  */
-export function CheckoutShippingEstimate({ productIds, deliveryGeo }) {
+export function CheckoutShippingEstimate({ productIds, deliveryGeo, onCost }) {
   const [state, setState] = useState(/** @type {any} */ (null));
 
   const lat = Number(deliveryGeo?.lat);
@@ -50,6 +51,23 @@ export function CheckoutShippingEstimate({ productIds, deliveryGeo }) {
       cancelled = true;
     };
   }, [key, lat, lon]);
+
+  // Цену службы показывает и итог корзины: покупатель должен видеть, во
+  // сколько обойдётся заказ вместе с доставкой.
+  useEffect(() => {
+    if (!onCost) return undefined;
+    onCost(
+      state?.available
+        ? {
+            feeRub: Number(state.finalCost) || 0,
+            label:
+              PRODUCT_DELIVERY_CARRIER_LABEL_RU[state.carrier] ?? String(state.carrier),
+            approximate: true,
+          }
+        : null,
+    );
+    return () => onCost(null);
+  }, [state, onCost]);
 
   if (!state) return null;
   // Товар везёт продавец или курьеры Gitorg — считать нечего.
