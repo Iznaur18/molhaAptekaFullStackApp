@@ -14,7 +14,7 @@ export const USER_SELLER_PRODUCTS_PAGE_SIZE_MAX = 20;
 
 /**
  * @param {import('mongoose').Types.ObjectId | string} sellerId
- * @param {{ shelfId?: string | null }} [opts]
+ * @param {{ shelfId?: string | null; onecGroupIds?: string[] | null }} [opts]
  */
 export const buildSellerCatalogProductsQuery = (sellerId, opts = {}) => {
   const query = {
@@ -29,6 +29,12 @@ export const buildSellerCatalogProductsQuery = (sellerId, opts = {}) => {
   const shelfId = opts.shelfId != null ? String(opts.shelfId).trim() : "";
   if (shelfId && ObjectId.isValid(shelfId)) {
     query.sellerShelfId = new ObjectId(shelfId);
+  }
+
+  // Полка из 1С — это группа номенклатуры вместе с её подгруппами.
+  const onecGroupIds = Array.isArray(opts.onecGroupIds) ? opts.onecGroupIds : [];
+  if (onecGroupIds.length > 0) {
+    query.product1cGroupId = { $in: onecGroupIds };
   }
 
   return query;
@@ -51,7 +57,11 @@ export const mapProductToProfileThumbItem = (product) => ({
  * @param {import('mongoose').Types.ObjectId | string} sellerId
  * @param {number} page
  * @param {number} limit
- * @param {{ shelfId?: string | null; viewerUserId?: string | null }} [opts]
+ * @param {{
+ *   shelfId?: string | null;
+ *   onecGroupIds?: string[] | null;
+ *   viewerUserId?: string | null;
+ * }} [opts]
  */
 export const getSellerCatalogProductsPage = async (
   sellerId,

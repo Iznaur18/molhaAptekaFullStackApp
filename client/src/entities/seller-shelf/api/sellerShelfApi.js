@@ -34,6 +34,26 @@ export async function fetchPublicSellerShelves(sellerId) {
 }
 
 /**
+ * Полки витрины из групп номенклатуры 1С: дерево на два уровня.
+ *
+ * Схемы контракта тут нет намеренно — данные приходят из чужой выгрузки, и
+ * строгий разбор сломал бы витрину из-за одной кривой группы.
+ *
+ * @param {string} sellerId
+ */
+export async function fetchPublicSellerOneCShelves(sellerId) {
+  try {
+    const { data } = await apiClient.get(
+      `/seller-shelf/seller/${encodeURIComponent(sellerId)}/onec`,
+    );
+    const shelves = data?.data?.shelves;
+    return Array.isArray(shelves) ? shelves : [];
+  } catch (error) {
+    throw new Error(readApiError(error, "Не удалось загрузить категории продавца"));
+  }
+}
+
+/**
  * @param {{ name: string }} body
  */
 export async function createSellerShelf(body) {

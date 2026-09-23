@@ -19,13 +19,21 @@ export const USER_PROFILE_PRODUCTS_PREVIEW_LIMIT = USER_PROFILE_PRODUCTS_API_LIM
  * `GET /user/:userId/products` — товары продавца в каталоге (JWT опционален).
  *
  * @param {string} userId
- * @param {{ page?: number; limit?: number; shelfId?: string | null }} [params]
+ * @param {{
+ *   page?: number;
+ *   limit?: number;
+ *   shelfId?: string | null;
+ *   onecGroupId?: string | null;
+ * }} [params]
  */
 export async function fetchUserProducts(userId, params = {}) {
   try {
     const page = params.page ?? 1;
     const limit = params.limit ?? USER_PROFILE_PRODUCTS_PAGE_SIZE;
     const shelfId = params.shelfId != null ? String(params.shelfId).trim() : "";
+    // Полка из 1С: группа номенклатуры вместе с подгруппами.
+    const onecGroupId =
+      params.onecGroupId != null ? String(params.onecGroupId).trim() : "";
 
     const { data } = await apiClient.get(
       `/user/${encodeURIComponent(userId)}/products`,
@@ -34,6 +42,7 @@ export async function fetchUserProducts(userId, params = {}) {
           page,
           limit,
           ...(shelfId ? { shelfId } : {}),
+          ...(onecGroupId ? { onecGroupId } : {}),
         },
       },
     );

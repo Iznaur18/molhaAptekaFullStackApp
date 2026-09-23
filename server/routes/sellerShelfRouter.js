@@ -10,6 +10,7 @@ import {
   reorderSellerShelvesController,
   setSellerShelfProductsController,
 } from "../controllers/SellerShelf/sellerShelfControllers.js";
+import { listPublicSellerOneCShelvesController } from "../controllers/SellerShelf/sellerOneCShelvesController.js";
 import {
   assignSellerShelfProductValidation,
   createSellerShelfValidation,
@@ -58,6 +59,11 @@ router.get(
   "/seller/:sellerId",
   sellerShelfSellerIdParamValidation,
   listPublicSellerShelvesController,
+);
+router.get(
+  "/seller/:sellerId/onec",
+  sellerShelfSellerIdParamValidation,
+  listPublicSellerOneCShelvesController,
 );
 
 export default router;

@@ -916,6 +916,14 @@
   color: var(--iz-color-text-muted, var(--iz-color-text));
 }
 
+/* Телефон курьера службы: по нему звонят и продавец, и покупатель. */
+.order-card__courier-phone {
+  font-weight: 700;
+  color: var(--iz-color-accent, #f2542d);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .order-card__courier-rating,
 .order-card__courier-car {
   color: var(--iz-color-text-muted, var(--iz-color-text));

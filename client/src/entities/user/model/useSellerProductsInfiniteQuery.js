@@ -11,14 +11,25 @@ import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 import { useInfiniteScrollSentinel } from "../../../shared/lib/useInfiniteScrollSentinel.js";
 
 /**
- * @param {{ sellerId: string; enabled: boolean; shelfId?: string | null }} params
+ * @param {{
+ *   sellerId: string;
+ *   enabled: boolean;
+ *   shelfId?: string | null;
+ *   onecGroupId?: string | null;
+ * }} params
  */
-export function useSellerProductsInfiniteQuery({ sellerId, enabled, shelfId = null }) {
+export function useSellerProductsInfiniteQuery({
+  sellerId,
+  enabled,
+  shelfId = null,
+  onecGroupId = null,
+}) {
   const sentinelRef = useRef(/** @type {HTMLDivElement | null} */ (null));
   const shelfKey = shelfId != null ? String(shelfId).trim() : "";
+  const onecKey = onecGroupId != null ? String(onecGroupId).trim() : "";
 
   const query = useInfiniteQuery({
-    queryKey: sellerProductsQueryKeys.list(sellerId, shelfKey || null),
+    queryKey: sellerProductsQueryKeys.list(sellerId, shelfKey || null, onecKey || null),
     enabled: enabled && Boolean(sellerId),
     initialPageParam: 1,
     retry: 1,
@@ -28,6 +39,7 @@ export function useSellerProductsInfiniteQuery({ sellerId, enabled, shelfId = nu
         page,
         limit: USER_PROFILE_PRODUCTS_API_LIMIT_MAX,
         shelfId: shelfKey || null,
+        onecGroupId: onecKey || null,
       });
     },
     getNextPageParam: (lastPage) => {

@@ -83,6 +83,7 @@ export async function findLoboShipmentsToSync({ limit = BATCH_LIMIT } = {}) {
         carrierStatus: String(shipment.shippingCarrierStatus ?? ""),
         trackingUrl: String(shipment.shippingTrackingUrl ?? ""),
         courierName: String(shipment.shippingCourier?.name ?? ""),
+        courierPhone: String(shipment.shippingCourier?.phone ?? ""),
       });
     }
   }
@@ -212,6 +213,7 @@ export async function syncLoboShipmentStatuses() {
       const courier = remote?.courierName
         ? {
             name: remote.courierName,
+            phone: remote.courierPhone,
             vehicleMake: remote.courierCarBrand,
             vehicleColor: remote.courierCarColor,
             vehiclePlate: remote.courierCarNumber,
@@ -220,7 +222,8 @@ export async function syncLoboShipmentStatuses() {
       if (
         carrierStatus === row.carrierStatus &&
         trackingUrl === row.trackingUrl &&
-        (courier?.name ?? "") === row.courierName
+        (courier?.name ?? "") === row.courierName &&
+        (courier?.phone ?? "") === row.courierPhone
       ) {
         continue;
       }

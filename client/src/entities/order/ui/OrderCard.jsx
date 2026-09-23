@@ -1059,6 +1059,17 @@ export function OrderCard({
           ) : (
             <strong>{shipmentOwn.courier.userName}</strong>
           )}
+          {/* Телефон есть только у курьера внешней службы: своего курьера
+              стороны вызывают внутри заказа, чужому нужно звонить. */}
+          {toRuPhoneTelHref(shipmentOwn.courier.phone) ? (
+            <a
+              className="order-card__courier-phone"
+              href={toRuPhoneTelHref(shipmentOwn.courier.phone)}
+            >
+              {" "}
+              {formatRuPhoneDisplayOrEmpty(shipmentOwn.courier.phone)}
+            </a>
+          ) : null}
           {shipmentOwn.courier.rating != null ? (
             <span className="order-card__courier-rating">
               {" "}
