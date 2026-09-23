@@ -1,5 +1,5 @@
 import { fireEvent, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
 import { renderWithProviders } from "../../../test/renderWithProviders.jsx";
@@ -133,5 +133,34 @@ describe("служба доставки в оформлении", () => {
     renderWithProviders(<CheckoutShippingProviderPicker courierDelivery="seller" />);
 
     expect(screen.queryByText(CHECKOUT_FORM_UI.SHIPPING_PROVIDER_YANDEX)).toBeNull();
+  });
+});
+
+describe("товар с локальной службой", () => {
+  const loboButton = () => screen.queryByRole("radio", { name: "ЛОБО" });
+
+  beforeEach(() => {
+    // ЛОБО показывается только в своём регионе.
+    sessionStorage.setItem("molha.viewerRegionCode", "RU-CE");
+  });
+  afterEach(() => {
+    sessionStorage.clear();
+  });
+
+  it("ЛОБО отмечена, а доставка продавцом — нет", () => {
+    renderWithProviders(
+      <CheckoutShippingProviderPicker courierDelivery="seller" productCarrier="lobo" />,
+    );
+
+    expect(loboButton()?.getAttribute("aria-checked")).toBe("true");
+    expect(sellerButton().getAttribute("aria-checked")).toBe("false");
+    expect(courierButton().getAttribute("aria-checked")).toBe("false");
+  });
+
+  it("без такого товара ЛОБО остаётся невыбранной", () => {
+    renderWithProviders(<CheckoutShippingProviderPicker courierDelivery="seller" />);
+
+    expect(loboButton()?.getAttribute("aria-checked")).toBe("false");
+    expect(sellerButton().getAttribute("aria-checked")).toBe("true");
   });
 });

@@ -122,6 +122,7 @@ export function CheckoutForm({
   pickupAvailable = true,
   fulfillmentMode = null,
   courierDelivery = null,
+  productCarrier = null,
   deliveryProductIds = [],
   initialFulfillmentMethod = null,
   onFulfillmentMethodChange = null,
@@ -820,6 +821,7 @@ export function CheckoutForm({
                 <CheckoutShippingProviderPicker
                   disabled={isDisabled || isSubmitting}
                   courierDelivery={courierDelivery}
+                  productCarrier={productCarrier}
                   cdekAvailable={cdekAvailable}
                   yandexAvailable={yandexAvailable}
                   expressAvailable={expressAvailable}

@@ -1,4 +1,7 @@
-import { productShipsToBuyer } from "@molha/api-contract";
+import {
+  productShipsToBuyer,
+  resolveProductDeliveryCarrier,
+} from "@molha/api-contract";
 
 /**
  * Корзина по отправлениям: одно на продавца.
@@ -90,6 +93,8 @@ export function groupCartLinesBySeller(visibleLines) {
       // но у продавца могут быть товары обоих видов — тогда группа не
       // курьерская, и суммы курьеру в ней нет.
       courierDelivery: true,
+      /** Кто везёт товары группы: один перевозчик на всех или "mixed". */
+      deliveryCarrier: /** @type {string | null} */ (undefined),
       defaultMethod: /** @type {"pickup" | "delivery" | null} */ ("pickup"),
     };
 
@@ -100,6 +105,12 @@ export function groupCartLinesBySeller(visibleLines) {
     // Перевозчик — из поля товара: у ЛОБО старые флаги сняты.
     if (!productShipsToBuyer(product)) {
       group.deliveryAvailable = false;
+    }
+    const carrier = resolveProductDeliveryCarrier(product);
+    if (group.deliveryCarrier === undefined) {
+      group.deliveryCarrier = carrier;
+    } else if (group.deliveryCarrier !== carrier) {
+      group.deliveryCarrier = "mixed";
     }
     if (product.productCourierDeliveryEnabled !== true) {
       group.courierDelivery = false;

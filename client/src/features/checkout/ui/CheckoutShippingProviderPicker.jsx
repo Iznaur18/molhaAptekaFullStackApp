@@ -9,6 +9,7 @@ import {
   SHIPPING_SERVICE_PICKUP_POINT,
 } from "../lib/checkoutShippingProviderOptions.js";
 import {
+  PRODUCT_DELIVERY_CARRIER_LOBO,
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_YANDEX_DELIVERY,
   SHIPPING_PROVIDER_YANDEX_EXPRESS,
@@ -38,6 +39,7 @@ const COURIER_OPTION_ID = "gitorg-courier";
  * @param {{
  *   disabled?: boolean;
  *   courierDelivery?: "courier" | "seller" | "mixed" | null;
+ *   productCarrier?: string | null;
  *   cdekAvailable?: boolean;
  *   yandexAvailable?: boolean;
  *   expressAvailable?: boolean;
@@ -49,6 +51,7 @@ const COURIER_OPTION_ID = "gitorg-courier";
 export function CheckoutShippingProviderPicker({
   disabled = false,
   courierDelivery = null,
+  productCarrier = null,
   cdekAvailable = false,
   yandexAvailable = false,
   expressAvailable = false,
@@ -66,9 +69,15 @@ export function CheckoutShippingProviderPicker({
   const showCarrierServices =
     hasCheckoutLiveCarrierProviders(regionCode) && serviceOptions.length > 0;
 
+  // Локальную службу продавец задаёт на товаре: выбирать её покупателю не из
+  // чего, но видеть, кто повезёт, он должен.
+  const productCarrierFixed = productCarrier === PRODUCT_DELIVERY_CARRIER_LOBO;
   const isCourierSelected =
-    courierDelivery === "courier" || courierDelivery === "mixed";
-  const isSellerSelected = courierDelivery === "seller" || courierDelivery === "mixed";
+    !productCarrierFixed &&
+    (courierDelivery === "courier" || courierDelivery === "mixed");
+  const isSellerSelected =
+    !productCarrierFixed &&
+    (courierDelivery === "seller" || courierDelivery === "mixed");
 
   // Службы продавца, помимо его собственной доставки.
   const carrierCards = [
@@ -114,10 +123,11 @@ export function CheckoutShippingProviderPicker({
         const label = resolveCheckoutShippingProviderLabel(option.id, {
           sellerLabel: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SELLER,
         });
+        const isFixedCarrier = productCarrierFixed && option.id === productCarrier;
         return {
           id: option.id,
           label,
-          selected: isSeller ? ownDeliverySelected && isSellerSelected : false,
+          selected: isSeller ? ownDeliverySelected && isSellerSelected : isFixedCarrier,
           locked: !option.live,
           soon: !option.live,
           selectable: isSeller && canSwitch && isSellerSelected,

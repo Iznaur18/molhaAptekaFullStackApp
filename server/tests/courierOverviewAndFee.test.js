@@ -14,6 +14,7 @@ const { advanceOrderShipmentStatus } =
   await import("../services/order/advanceShipmentStatus.js");
 const { normalizeDeliveryFee, raiseShipmentDeliveryFee, resolveDeliveryFeesBySeller } =
   await import("../services/courier/courierDeliveryFee.js");
+const { COURIER_DELIVERY_FEE_MIN_RUB } = await import("@molha/api-contract");
 const { haversineKm, listCourierOverview } =
   await import("../services/courier/courierOverview.js");
 const { acceptShipmentByCourier } =
@@ -362,5 +363,27 @@ describe("обзор курьера", () => {
     assert.equal(row.buyerPhone, undefined);
     assert.equal(row.deliveryAddress, undefined, "до передачи товара — только район");
     assert.ok(typeof row.deliveryAreaHint === "string");
+  });
+});
+
+describe("сумма курьеру при внешней службе", () => {
+  it("ЛОБО: подача не подставляется — цену назовёт перевозчик", () => {
+    const fees = resolveDeliveryFeesBySeller({
+      fulfillmentBySellerId: { s1: "delivery" },
+      feeBySellerId: null,
+      carrierBySellerId: { s1: "lobo" },
+    });
+
+    assert.equal(fees.s1, 0);
+  });
+
+  it("курьеры Gitorg: без суммы остаётся минимальная подача", () => {
+    const fees = resolveDeliveryFeesBySeller({
+      fulfillmentBySellerId: { s1: "delivery" },
+      feeBySellerId: null,
+      carrierBySellerId: { s1: "gitorg_courier" },
+    });
+
+    assert.equal(fees.s1, COURIER_DELIVERY_FEE_MIN_RUB);
   });
 });

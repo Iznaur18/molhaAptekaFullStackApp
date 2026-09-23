@@ -438,6 +438,17 @@ export function CartPage({
     return "mixed";
   }, [checkoutSellerGroups, fulfillmentBySellerId]);
 
+  /** Перевозчик выбранного: его карточку чекаут показывает выбранной. */
+  const checkoutProductCarrier = useMemo(() => {
+    const carriers = new Set(
+      checkoutSellerGroups
+        .filter((group) => fulfillmentBySellerId[String(group.sellerId)] === "delivery")
+        .map((group) => group.deliveryCarrier ?? null),
+    );
+    if (carriers.size !== 1) return null;
+    return [...carriers][0];
+  }, [checkoutSellerGroups, fulfillmentBySellerId]);
+
   /** Товары, которые везут: по ним считается стоимость доставки. */
   const deliveryProductIds = useMemo(() => {
     if (auctionCheckoutBid) return [];
@@ -809,6 +820,7 @@ export function CartPage({
                       pickupAvailable={pickupAvailable}
                       fulfillmentMode={null}
                       courierDelivery={checkoutCourierDelivery}
+                      productCarrier={checkoutProductCarrier}
                       deliveryProductIds={deliveryProductIds}
                       initialFulfillmentMethod={
                         fulfillmentBySellerId[activeSellerCart.group.sellerId] ??
@@ -918,6 +930,7 @@ export function CartPage({
         pickupAvailable={pickupAvailable}
         fulfillmentMode={null}
         courierDelivery={checkoutCourierDelivery}
+        productCarrier={checkoutProductCarrier}
         deliveryProductIds={deliveryProductIds}
         initialFulfillmentMethod={null}
         onFulfillmentMethodChange={null}

@@ -890,6 +890,7 @@ export async function createOrder({
               deliveryFeeBySellerId: resolveDeliveryFeesBySeller({
                 fulfillmentBySellerId: fulfillmentSplit.fulfillmentBySellerId,
                 feeBySellerId: deliveryFeeBySellerId,
+                carrierBySellerId: deliveryCarrierBySeller,
               }),
               courierDeliveryBySellerId: courierDeliveryBySeller,
               payoutRequisitesBySellerId: payoutRequisitesBySeller,
