@@ -20,6 +20,7 @@ import { UserPremiumDisplayName } from "../../../entities/user/ui/UserPremiumDis
 import { SellerProfileQuickStats } from "../../../entities/user/ui/SellerProfileQuickStats.jsx";
 import { SellerShareLinkButton } from "../../../entities/user/ui/SellerShareLinkButton.jsx";
 import { usePublicSellerShelvesQuery } from "../../../entities/seller-shelf/model/usePublicSellerShelvesQuery.js";
+import { usePublicSellerOneCShelvesQuery } from "../../../entities/seller-shelf/model/usePublicSellerOneCShelvesQuery.js";
 import { HomeCatalogGrid } from "../../../widgets/catalog-product-grid/ui/HomeCatalogGrid.jsx";
 import { useSellerProductsCatalog } from "../model/useSellerProductsCatalog.js";
 import {
@@ -72,6 +73,15 @@ export function SellerProductsPage({
   const [selectedShelfId, setSelectedShelfId] = useState(
     /** @type {string | null} */ (null),
   );
+  /** Выбранная полка из 1С и, вторым уровнем, её подкатегория. */
+  const [selectedOnecRootId, setSelectedOnecRootId] = useState(
+    /** @type {string | null} */ (null),
+  );
+  const [selectedOnecChildId, setSelectedOnecChildId] = useState(
+    /** @type {string | null} */ (null),
+  );
+  // Товары показываем по подкатегории, а без неё — по всей ветке корня.
+  const selectedOnecGroupId = selectedOnecChildId ?? selectedOnecRootId;
 
   const catalogEnabled = isSessionReady;
   const profileQuery = useUserProfileQuery({
@@ -82,6 +92,15 @@ export function SellerProductsPage({
     sellerId,
     enabled: catalogEnabled,
   });
+  // Полки из 1С стоят в том же ряду: покупателю всё равно, откуда они взялись.
+  const onecShelvesQuery = usePublicSellerOneCShelvesQuery({
+    sellerId,
+    enabled: catalogEnabled,
+  });
+  /** @type {Array<{ id: string; name: string; children: Array<{ id: string; name: string }> }>} */
+  const onecShelves = onecShelvesQuery.data ?? [];
+  const openedOnecShelf =
+    onecShelves.find((shelf) => shelf.id === selectedOnecRootId) ?? null;
   const seller = profileQuery.data ?? null;
   const profilePhase = !catalogEnabled
     ? "idle"
@@ -108,10 +127,13 @@ export function SellerProductsPage({
     sellerId,
     enabled: catalogEnabled,
     shelfId: selectedShelfId,
+    onecGroupId: selectedOnecGroupId,
   });
 
   useEffect(() => {
     setSelectedShelfId(null);
+    setSelectedOnecRootId(null);
+    setSelectedOnecChildId(null);
   }, [sellerId]);
 
   useEffect(() => {
@@ -302,7 +324,7 @@ export function SellerProductsPage({
             ) : null}
           </div>
 
-          {(shelvesQuery.data?.shelves?.length ?? 0) > 0 ? (
+          {(shelvesQuery.data?.shelves?.length ?? 0) > 0 || onecShelves.length > 0 ? (
             <div
               className="seller-products-page__shelves"
               role="toolbar"
@@ -318,8 +340,12 @@ export function SellerProductsPage({
                 ]
                   .filter(Boolean)
                   .join(" ")}
-                aria-pressed={selectedShelfId == null}
-                onClick={() => setSelectedShelfId(null)}
+                aria-pressed={selectedShelfId == null && selectedOnecRootId == null}
+                onClick={() => {
+                  setSelectedShelfId(null);
+                  setSelectedOnecRootId(null);
+                  setSelectedOnecChildId(null);
+                }}
               >
                 {SELLER_PRODUCTS_PAGE_UI.SHELF_FILTER_ALL}
               </button>
@@ -336,9 +362,85 @@ export function SellerProductsPage({
                     .filter(Boolean)
                     .join(" ")}
                   aria-pressed={selectedShelfId === shelf._id}
-                  onClick={() => setSelectedShelfId(shelf._id)}
+                  onClick={() => {
+                    setSelectedShelfId(shelf._id);
+                    setSelectedOnecRootId(null);
+                    setSelectedOnecChildId(null);
+                  }}
                 >
                   {shelf.name}
+                </button>
+              ))}
+              {onecShelves.map((shelf) => (
+                <button
+                  key={shelf.id}
+                  type="button"
+                  className={[
+                    "seller-products-page__shelf-chip",
+                    selectedOnecRootId === shelf.id
+                      ? "seller-products-page__shelf-chip--active"
+                      : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  aria-pressed={selectedOnecRootId === shelf.id}
+                  onClick={() => {
+                    setSelectedShelfId(null);
+                    setSelectedOnecChildId(null);
+                    setSelectedOnecRootId(
+                      selectedOnecRootId === shelf.id ? null : shelf.id,
+                    );
+                  }}
+                >
+                  {shelf.name}
+                </button>
+              ))}
+            </div>
+          ) : null}
+
+          {/* Второй уровень: подкатегории выбранной полки из 1С. Товары всей
+              ветки показываются под ними, поэтому «Все» здесь — вся полка. */}
+          {openedOnecShelf && openedOnecShelf.children.length > 0 ? (
+            <div
+              className="seller-products-page__shelves seller-products-page__shelves--nested"
+              role="toolbar"
+              aria-label={openedOnecShelf.name}
+            >
+              <button
+                type="button"
+                className={[
+                  "seller-products-page__shelf-chip",
+                  selectedOnecChildId == null
+                    ? "seller-products-page__shelf-chip--active"
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                aria-pressed={selectedOnecChildId == null}
+                onClick={() => setSelectedOnecChildId(null)}
+              >
+                {SELLER_PRODUCTS_PAGE_UI.SHELF_FILTER_ALL}
+              </button>
+              {openedOnecShelf.children.map((child) => (
+                <button
+                  key={child.id}
+                  type="button"
+                  className={[
+                    "seller-products-page__shelf-chip",
+                    selectedOnecChildId === child.id
+                      ? "seller-products-page__shelf-chip--active"
+                      : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  aria-pressed={selectedOnecChildId === child.id}
+                  onClick={() =>
+                    setSelectedOnecChildId(
+                      selectedOnecChildId === child.id ? null : child.id,
+                    )
+                  }
+                >
+                  {child.name}
                 </button>
               ))}
             </div>

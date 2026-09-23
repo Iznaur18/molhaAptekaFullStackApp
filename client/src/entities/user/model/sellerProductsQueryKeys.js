@@ -3,10 +3,12 @@ export const sellerProductsQueryKeys = {
   /**
    * @param {string} sellerId
    * @param {string | null} [shelfId]
+   * @param {string | null} [onecGroupId]
    */
-  list: (sellerId, shelfId = null) => [
+  list: (sellerId, shelfId = null, onecGroupId = null) => [
     ...sellerProductsQueryKeys.all,
     sellerId,
     shelfId ? String(shelfId) : "all",
+    onecGroupId ? String(onecGroupId) : "all",
   ],
 };

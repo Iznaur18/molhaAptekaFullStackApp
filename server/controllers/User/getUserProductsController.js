@@ -2,6 +2,7 @@ import { UserModel } from "../../models/index.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 import { getOptionalViewerFromRequest } from "../../services/user/optionalViewerFromRequest.js";
 import { sanitizeUserProfileForViewer } from "../../services/user/userProfileVisibility.js";
+import { resolveOneCGroupBranchIds } from "../../services/seller-shelf/sellerOneCShelves.js";
 import {
   getSellerCatalogProductsPage,
   USER_SELLER_PRODUCTS_PAGE_SIZE_DEFAULT,
@@ -38,8 +39,15 @@ export const getUserProductsController = async (req, res) => {
 
   const { page, limit } = parsePageLimit(req.query);
   const shelfId = req.query.shelfId != null ? String(req.query.shelfId).trim() : "";
+  // Полка из 1С: фильтруем по группе вместе с её подгруппами.
+  const onecGroupId =
+    req.query.onecGroupId != null ? String(req.query.onecGroupId).trim() : "";
+  const onecGroupIds = onecGroupId
+    ? await resolveOneCGroupBranchIds(targetUserId, onecGroupId)
+    : null;
   const payload = await getSellerCatalogProductsPage(targetUserId, page, limit, {
     shelfId: shelfId || null,
+    onecGroupIds,
     viewerUserId: req.userId ?? null,
   });
 
