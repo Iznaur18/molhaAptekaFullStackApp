@@ -30,6 +30,7 @@ export function YandexExpressPanel({
   initialRecipientPhone = "",
   disabled = false,
   onChange,
+  onCost,
 }) {
   const nameId = useId();
   const phoneId = useId();
@@ -85,6 +86,16 @@ export function YandexExpressPanel({
         : null,
     );
   }, [quote, recipientName, recipientPhone, onChange]);
+
+  // Цену курьера показывает итог корзины.
+  useEffect(() => {
+    if (!onCost) return undefined;
+    const fee = quote?.available ? Number(quote.deliverySumRub) || 0 : 0;
+    onCost(
+      fee > 0 ? { feeRub: fee, label: "Яндекс Экспресс", approximate: false } : null,
+    );
+    return () => onCost(null);
+  }, [quote, onCost]);
 
   return (
     <div className="cdek-picker">

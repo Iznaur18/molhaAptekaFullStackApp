@@ -166,6 +166,11 @@ export const CHECKOUT_FORM_UI = {
   SELLER_DELIVERY_FREE: "Бесплатно",
   /** @param {string} price */
   SELLER_DELIVERY_FROM: (price) => `от ${price}`,
+  /** Цена службы ещё может измениться: у ЛОБО точную называет курьер. @param {string} price */
+  CARRIER_DELIVERY_APPROX: (price) => `≈ ${price}`,
+  /** Товары и доставку платят порознь. @param {string} label */
+  CARRIER_DELIVERY_SPLIT_HINT: (label) =>
+    `Товары оплачиваются продавцу, доставку — службе ${label}`,
   SELLER_DELIVERY_NEED_ADDRESS:
     "Точная сумма появится, когда выберете адрес: она зависит от расстояния по дорогам",
   SELLER_DELIVERY_CALCULATING: "Считаем расстояние по дорогам…",
@@ -242,6 +247,10 @@ export const CHECKOUT_FORM_UI = {
   /** Способ есть у площадки, но конкретный продавец его не принимает. */
   PAYMENT_METHOD_NOT_ACCEPTED: "Продавец не принимает",
   LABEL_SHIPPING_PROVIDER: "Служба доставки",
+  /** Служба одна — выбирать нечего. @param {string} label */
+  SHIPPING_PROVIDER_SINGLE: (label) => `Доставку выполняет ${label}`,
+  SHIPPING_PROVIDER_SINGLE_SELLER: "Доставку выполняет продавец",
+  SHIPPING_PROVIDER_SINGLE_COURIER: "Доставку выполняют курьеры Gitorg",
   SHIPPING_PROVIDER_SELLER: "Доставка продавцом",
   SHIPPING_PROVIDER_COURIER: "Курьеры Gitorg",
   SHIPPING_PROVIDER_CDEK: "СДЭК",

@@ -6,6 +6,7 @@ import {
   CART_PAGE_UI,
   CHECKOUT_FORM_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { CheckoutCarrierDeliveryCost } from "../../../features/checkout/ui/CheckoutCarrierDeliveryCost.jsx";
 import { CheckoutSellerDeliveryCost } from "../../../features/checkout/ui/CheckoutSellerDeliveryCost.jsx";
 
 import { CartLineItem } from "./CartLineItem.jsx";
@@ -75,6 +76,7 @@ export function CartFulfillmentSection({
   showDeliveryFeeNote = false,
   sellerDelivery = null,
   sellerDeliveryDistance = null,
+  carrierDeliveryCost = null,
 }) {
   if (lines.length === 0) {
     return null;
@@ -92,6 +94,9 @@ export function CartFulfillmentSection({
       : CART_PAGE_UI.CHECKOUT_SELLER);
   const ctaDisabled = !canCheckout || isCheckoutSubmitting;
   const showSellerDeliveryCost = Boolean(sellerDelivery);
+  // Служба назвала цену — показываем её и сумму вместе с товарами.
+  const showCarrierDeliveryCost =
+    !showSellerDeliveryCost && Number(carrierDeliveryCost?.feeRub) > 0;
 
   return (
     <section className="cart-fulfillment">
@@ -224,7 +229,12 @@ export function CartFulfillmentSection({
               </div>
             ) : null}
 
-            {showSellerDeliveryCost ? (
+            {showCarrierDeliveryCost ? (
+              <CheckoutCarrierDeliveryCost
+                cost={carrierDeliveryCost}
+                goodsTotalRub={summary.selectedTotal}
+              />
+            ) : showSellerDeliveryCost ? (
               <CheckoutSellerDeliveryCost
                 tariff={sellerDelivery.tariff}
                 goodsTotalRub={sellerDelivery.goodsTotalRub ?? summary.selectedTotal}

@@ -37,6 +37,7 @@ export function YandexPickupPointPicker({
   initialRecipientPhone = "",
   disabled = false,
   onChange,
+  onCost,
 }) {
   const ids = { city: useId(), point: useId(), name: useId(), phone: useId() };
   const [city, setCity] = useState(initialCity);
@@ -118,6 +119,16 @@ export function YandexPickupPointPicker({
         : null,
     );
   }, [pointId, quote, recipientName, recipientPhone, onChange]);
+
+  // Цену Яндекса показывает итог корзины.
+  useEffect(() => {
+    if (!onCost) return undefined;
+    const fee = quote?.available ? Number(quote.deliverySumRub) || 0 : 0;
+    onCost(
+      fee > 0 ? { feeRub: fee, label: "Яндекс Доставка", approximate: false } : null,
+    );
+    return () => onCost(null);
+  }, [quote, onCost]);
 
   const selectedPoint = points.find((point) => point.id === pointId) ?? null;
 

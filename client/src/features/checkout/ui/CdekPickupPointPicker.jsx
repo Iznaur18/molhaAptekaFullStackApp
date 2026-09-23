@@ -37,6 +37,7 @@ export function CdekPickupPointPicker({
   initialRecipientPhone = "",
   disabled = false,
   onChange,
+  onCost,
 }) {
   const [city, setCity] = useState(initialCity);
   const [status, setStatus] = useState(
@@ -119,6 +120,14 @@ export function CdekPickupPointPicker({
     [quote, tariffCode],
   );
   const selectedPoint = points.find((point) => point.code === pointCode) ?? null;
+
+  // Цену выбранного тарифа показывает итог корзины.
+  useEffect(() => {
+    if (!onCost) return undefined;
+    const fee = Number(selectedTariff?.deliverySumRub) || 0;
+    onCost(fee > 0 ? { feeRub: fee, label: "СДЭК", approximate: false } : null);
+    return () => onCost(null);
+  }, [selectedTariff, onCost]);
 
   return (
     <div className="cdek-picker">

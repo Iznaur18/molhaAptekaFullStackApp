@@ -1,4 +1,8 @@
-import { ORDER_FULFILLMENT_DELIVERY } from "@molha/api-contract";
+import {
+  ORDER_FULFILLMENT_DELIVERY,
+  PRODUCT_DELIVERY_CARRIER_GITORG,
+  PRODUCT_DELIVERY_CARRIER_SELLER,
+} from "@molha/api-contract";
 
 import {
   COURIER_DELIVERY_FEE_DECREASE_MESSAGE,
@@ -47,15 +51,21 @@ export function normalizeDeliveryFee(raw) {
  *
  * Самовывозные отправления остаются с нулём: платить курьеру там некому.
  *
+ * Ноль и у внешних служб (ЛОБО, СДЭК, Яндекс): там цену называет перевозчик,
+ * а не покупатель. Подстановка «минимальной подачи» показывала покупателю
+ * чужую сумму, пока служба не ответила своей.
+ *
  * @param {{
  *   fulfillmentBySellerId: Record<string, string>;
  *   feeBySellerId?: Record<string, unknown> | null;
+ *   carrierBySellerId?: Record<string, string> | null;
  * }} input
  * @returns {Record<string, number>}
  */
 export function resolveDeliveryFeesBySeller({
   fulfillmentBySellerId,
   feeBySellerId = null,
+  carrierBySellerId = null,
 }) {
   /** @type {Record<string, number>} */
   const fees = {};
@@ -65,9 +75,17 @@ export function resolveDeliveryFeesBySeller({
       fees[sellerId] = 0;
       continue;
     }
+    const carrier = String(carrierBySellerId?.[sellerId] ?? "");
+    const externalCarrier =
+      carrier !== "" &&
+      carrier !== PRODUCT_DELIVERY_CARRIER_SELLER &&
+      carrier !== PRODUCT_DELIVERY_CARRIER_GITORG;
     const raw = feeBySellerId?.[sellerId];
-    fees[sellerId] =
-      raw == null ? COURIER_DELIVERY_FEE_MIN_RUB : normalizeDeliveryFee(raw);
+    if (raw == null) {
+      fees[sellerId] = externalCarrier ? 0 : COURIER_DELIVERY_FEE_MIN_RUB;
+      continue;
+    }
+    fees[sellerId] = normalizeDeliveryFee(raw);
   }
 
   return fees;
