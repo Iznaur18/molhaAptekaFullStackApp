@@ -114,6 +114,7 @@ describe("клиент ЛОБО", () => {
     assert.equal(result.finalCost, 260);
     assert.equal(result.quoteToken, "quote-abc");
     assert.equal(result.cityName, "Грозный");
+    assert.equal(result.approximate, false, "служба посчитала точно");
     assert.equal(result.distanceKm, 2.6);
   });
 
@@ -215,5 +216,38 @@ describe("клиент ЛОБО", () => {
 
     assert.match(calls[0].url, /\/orders\/77\/track$/);
     assert.equal(tracking.url, "https://wayset.ru/t/abc");
+  });
+  it("прикидку службы не выдаём за точную цену", async () => {
+    stubFetch({
+      body: { total: 260, tariff: "car", approximate: true, warnings: [] },
+    });
+
+    const result = await client.estimateLoboDelivery({
+      pickupLat: 43.3,
+      pickupLon: 45.7,
+      deliveryLat: 43.4,
+      deliveryLon: 45.8,
+    });
+
+    assert.equal(result.approximate, true);
+  });
+
+  it("предупреждение службы тоже делает цену прикидкой", async () => {
+    stubFetch({
+      body: {
+        total: 260,
+        approximate: false,
+        warnings: [{ code: "address_unclear" }],
+      },
+    });
+
+    const result = await client.estimateLoboDelivery({
+      pickupLat: 43.3,
+      pickupLon: 45.7,
+      deliveryLat: 43.4,
+      deliveryLon: 45.8,
+    });
+
+    assert.equal(result.approximate, true, "иначе покажем точную сумму зря");
   });
 });

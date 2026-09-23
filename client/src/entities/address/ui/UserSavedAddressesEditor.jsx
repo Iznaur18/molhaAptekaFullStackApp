@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  ADDRESS_FLAT_MAX_LENGTH,
   USER_SAVED_ADDRESSES_MAX,
   USER_SAVED_ADDRESS_LABEL_MAX_LENGTH,
 } from "@molha/api-contract";
@@ -252,6 +253,7 @@ export function UserSavedAddressesEditor({
               disabled={disabled}
               autoComplete="address-line2"
               placeholder={ADDRESS_STRUCTURED_UI.PLACEHOLDER_FLAT}
+              maxLength={ADDRESS_FLAT_MAX_LENGTH}
               onChange={(event) => {
                 setDraft((prev) => ({ ...prev, flat: event.target.value }));
                 setDraftError("");

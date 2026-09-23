@@ -78,3 +78,99 @@ describe("выбор перевозчика на товаре", () => {
     expect(patch.productDeliveryEnabled).toBe(false);
   });
 });
+
+describe("адрес отправки у внешней службы", () => {
+  const SAVED = [
+    {
+      id: "addr-1",
+      label: "Склад",
+      address: "г Грозный, ул Мира, 1",
+      lat: 43.31,
+      lon: 45.69,
+    },
+  ];
+
+  /** @param {string} carrier */
+  const renderWithAddresses = (carrier) =>
+    renderWithProviders(
+      <ProductPickupLocationFields
+        locations={[LOCATION]}
+        pickupEnabled={false}
+        deliveryEnabled={carrier === "seller"}
+        courierDeliveryEnabled={carrier === "gitorg_courier"}
+        productDeliveryCarrier={carrier}
+        productRegionCode="RU-CE"
+        sellerRegionCode="RU-CE"
+        savedAddresses={SAVED}
+        onChange={vi.fn()}
+      />,
+    );
+
+  it("ЛОБО: адрес отправки виден и подписан, откуда заберут", () => {
+    renderWithAddresses("lobo");
+
+    expect(screen.getByText("Адрес отправки")).toBeTruthy();
+    expect(screen.getByText(/Отсюда курьер службы ЛОБО заберёт товар/)).toBeTruthy();
+  });
+
+  it("доставка продавцом: тот же раздел, со своей подписью", () => {
+    renderWithAddresses("seller");
+
+    expect(screen.getByText("Адрес отправки")).toBeTruthy();
+    expect(screen.getByText(/Отсюда вы повезёте товар покупателю/)).toBeTruthy();
+  });
+});
+
+describe("точка отправления не из книги адресов", () => {
+  it("предупреждаем, что курьер поедет именно туда", () => {
+    renderWithProviders(
+      <ProductPickupLocationFields
+        locations={[{ ...LOCATION, address: "г Грозный, ул Старая, 51" }]}
+        pickupEnabled={false}
+        deliveryEnabled={false}
+        courierDeliveryEnabled={false}
+        productDeliveryCarrier="lobo"
+        productRegionCode="RU-CE"
+        sellerRegionCode="RU-CE"
+        savedAddresses={[
+          {
+            id: "addr-1",
+            label: "Супермаркет",
+            address: "г Грозный, ул Новая, 58",
+            lat: 43.32,
+            lon: 45.71,
+          },
+        ]}
+        onChange={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText(/не совпадает ни с одним адресом из ваших/)).toBeTruthy();
+  });
+
+  it("точка из книги адресов предупреждения не даёт", () => {
+    renderWithProviders(
+      <ProductPickupLocationFields
+        locations={[{ ...LOCATION, address: "г Грозный, ул Новая, 58" }]}
+        pickupEnabled={false}
+        deliveryEnabled={false}
+        courierDeliveryEnabled={false}
+        productDeliveryCarrier="lobo"
+        productRegionCode="RU-CE"
+        sellerRegionCode="RU-CE"
+        savedAddresses={[
+          {
+            id: "addr-1",
+            label: "Супермаркет",
+            address: "г Грозный, ул Новая, 58",
+            lat: 43.32,
+            lon: 45.71,
+          },
+        ]}
+        onChange={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText(/не совпадает ни с одним адресом/)).toBeNull();
+  });
+});

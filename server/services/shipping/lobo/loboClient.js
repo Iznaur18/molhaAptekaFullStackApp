@@ -219,6 +219,11 @@ export async function estimateLoboDelivery({
     durationMin: toNumber(data?.duration_min),
     quoteToken: String(data?.quote_token ?? ""),
     quoteValidForSeconds: toNumber(data?.quote_valid_for_seconds),
+    // Служба сама помечает прикидку: без этого мы у каждой цены писали
+    // «примерно», хотя ЛОБО считает по тарифу и расстоянию точно.
+    approximate:
+      data?.approximate === true ||
+      (Array.isArray(data?.warnings) && data.warnings.length > 0),
   };
 }
 

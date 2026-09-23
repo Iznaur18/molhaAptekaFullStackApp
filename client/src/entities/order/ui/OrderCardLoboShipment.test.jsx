@@ -58,3 +58,31 @@ describe("доставка ЛОБО в карточке заказа", () => {
     expect(container.innerHTML).toBe("");
   });
 });
+
+describe("адрес забора в карточке продажи", () => {
+  it("продавец видит, откуда курьер заберёт заказ", () => {
+    render(
+      <OrderCardLoboShipment
+        shipment={{ deliveryCarrier: "lobo", deliveryFeeRub: 0 }}
+        role="seller"
+        pickupAddress="г Грозный, ул Субры Кишиевой, д 58"
+      />,
+    );
+
+    expect(screen.getByText("Курьер заберёт отсюда:")).toBeTruthy();
+    expect(screen.getByText("г Грозный, ул Субры Кишиевой, д 58")).toBeTruthy();
+    expect(screen.getByText(/Поменяйте точку отправления/)).toBeTruthy();
+  });
+
+  it("покупателю адрес продавца не показываем", () => {
+    render(
+      <OrderCardLoboShipment
+        shipment={{ ...HANDED_OVER }}
+        role="buyer"
+        pickupAddress="г Грозный, ул Субры Кишиевой, д 58"
+      />,
+    );
+
+    expect(screen.queryByText("г Грозный, ул Субры Кишиевой, д 58")).toBeNull();
+  });
+});

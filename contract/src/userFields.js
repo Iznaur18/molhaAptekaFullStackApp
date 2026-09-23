@@ -47,7 +47,14 @@ export const USER_BACKGROUND_PRESET_IDS = [
  * бы английскую ошибку схемы вместо человеческой.
  */
 export const ADDRESS_LINE_MAX_LENGTH = 200;
-export const ADDRESS_FLAT_MAX_LENGTH = 20;
+/**
+ * «Подъезд, этаж, кв» одной строкой. Двадцати символов не хватало на живую
+ * запись вроде «подъезд 2, этаж 5, кв 123»: форма её принимала, а сервер
+ * отвечал английской ошибкой схемы уже после «Оформить».
+ */
+export const ADDRESS_FLAT_MAX_LENGTH = 64;
+
+export const ADDRESS_FLAT_TOO_LONG_MESSAGE = `Подъезд, этаж и квартира — не длиннее ${ADDRESS_FLAT_MAX_LENGTH} символов`;
 
 /**
  * Цифры для маски ввода: ведущая `8`, максимум 11.
@@ -315,7 +322,7 @@ export const deliveryAddressLineFieldSchema = z
 export const deliveryAddressFlatFieldSchema = z
   .string()
   .trim()
-  .max(ADDRESS_FLAT_MAX_LENGTH)
+  .max(ADDRESS_FLAT_MAX_LENGTH, ADDRESS_FLAT_TOO_LONG_MESSAGE)
   .optional()
   .or(z.literal(""))
   .or(z.null())

@@ -62,7 +62,7 @@ export function CheckoutShippingEstimate({ productIds, deliveryGeo, onCost }) {
             feeRub: Number(state.finalCost) || 0,
             label:
               PRODUCT_DELIVERY_CARRIER_LABEL_RU[state.carrier] ?? String(state.carrier),
-            approximate: true,
+            approximate: state.approximate === true,
           }
         : null,
     );
@@ -84,12 +84,16 @@ export function CheckoutShippingEstimate({ productIds, deliveryGeo, onCost }) {
   return (
     <p className="checkout-form__hint">
       <strong>
-        {CHECKOUT_FORM_UI.SHIPPING_ESTIMATE(
+        {(state.approximate === true
+          ? CHECKOUT_FORM_UI.SHIPPING_ESTIMATE
+          : CHECKOUT_FORM_UI.SHIPPING_ESTIMATE_EXACT)(
           formatPriceRub(state.finalCost),
           PRODUCT_DELIVERY_CARRIER_LABEL_RU[state.carrier] ?? state.carrier,
         )}
       </strong>{" "}
-      {CHECKOUT_FORM_UI.SHIPPING_ESTIMATE_HINT}
+      {state.approximate === true
+        ? CHECKOUT_FORM_UI.SHIPPING_ESTIMATE_HINT
+        : CHECKOUT_FORM_UI.SHIPPING_ESTIMATE_EXACT_HINT}
     </p>
   );
 }

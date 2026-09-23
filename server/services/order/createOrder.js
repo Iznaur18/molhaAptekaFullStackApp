@@ -420,10 +420,21 @@ export const buildPickupSummaryAddress = (addresses) => {
   return `${head}${suffix}`;
 };
 
+/**
+ * Точки отправления по товарам.
+ *
+ * @param {Record<string, any>} productById
+ * @param {string[]} productIds
+ * @param {unknown} pickupSelections
+ * @param {{ required?: boolean }} [options] required=false — для доставки:
+ *   точка нужна как снимок «откуда забирать», но её отсутствие не повод
+ *   отказать в заказе.
+ */
 const resolvePickupSelectionsByProductId = (
   productById,
   productIds,
   pickupSelections,
+  { required = true } = {},
 ) => {
   /** @type {Map<string, string>} */
   const selectedIdByProduct = new Map();
@@ -446,7 +457,10 @@ const resolvePickupSelectionsByProductId = (
     );
     const address = String(selected.address ?? "").trim();
     if (!address) {
-      throw new AppError(400, PRODUCT_PICKUP_MISSING_FOR_ORDER_MESSAGE);
+      if (required) {
+        throw new AppError(400, PRODUCT_PICKUP_MISSING_FOR_ORDER_MESSAGE);
+      }
+      continue;
     }
     pickupByProductId[id] = {
       id: selected.id,
@@ -737,13 +751,27 @@ export async function createOrder({
     ? carrierResolved.addressForOrder
     : verifiedDeliveryAddress;
 
+  // Точку отправления запоминаем и у доставки: курьер поедет туда, где товар
+  // лежал на момент заказа, даже если продавец потом поменяет адрес.
+  if (fulfillmentSplit.hasDelivery) {
+    pickupByProductId = resolvePickupSelectionsByProductId(
+      productById,
+      fulfillmentSplit.deliveryProductIds,
+      pickupSelections,
+      { required: false },
+    ).pickupByProductId;
+  }
+
   if (fulfillmentSplit.hasPickup) {
     const resolvedPickup = resolvePickupSelectionsByProductId(
       productById,
       fulfillmentSplit.pickupProductIds,
       pickupSelections,
     );
-    pickupByProductId = resolvedPickup.pickupByProductId;
+    pickupByProductId = {
+      ...(pickupByProductId ?? {}),
+      ...resolvedPickup.pickupByProductId,
+    };
     // Адрес заказа — покупательский, как только хоть что-то едет к нему.
     // Точки самовывоза при этом никуда не деваются: они лежат на позициях.
     if (!fulfillmentSplit.hasDelivery) {

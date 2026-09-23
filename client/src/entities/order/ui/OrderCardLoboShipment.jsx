@@ -16,9 +16,10 @@ const TRACKABLE = new Set(["accepted", "arrived", "in_progress"]);
  * @param {{
  *   shipment: Record<string, any> | null | undefined;
  *   role: "buyer" | "seller" | null | undefined;
+ *   pickupAddress?: string;
  * }} props
  */
-export function OrderCardLoboShipment({ shipment, role }) {
+export function OrderCardLoboShipment({ shipment, role, pickupAddress = "" }) {
   if (shipment?.deliveryCarrier !== PRODUCT_DELIVERY_CARRIER_LOBO) return null;
 
   const handedOver = Boolean(shipment.shippingExternalId);
@@ -35,6 +36,15 @@ export function OrderCardLoboShipment({ shipment, role }) {
         <span className="order-card__courier-label">{UI.TITLE}:</span>{" "}
         <strong>{handedOver ? statusLabel : UI.NOT_HANDED_OVER}</strong>
       </p>
+      {role === "seller" && pickupAddress ? (
+        <p className="order-card__carrier-line">
+          <span className="order-card__courier-label">{UI.PICKUP_FROM}:</span>{" "}
+          {pickupAddress}
+        </p>
+      ) : null}
+      {role === "seller" && !handedOver && pickupAddress ? (
+        <p className="order-card__carrier-hint">{UI.PICKUP_FROM_HINT}</p>
+      ) : null}
       {!handedOver ? (
         <p className="order-card__carrier-hint">{UI.SELLER_HINT}</p>
       ) : null}

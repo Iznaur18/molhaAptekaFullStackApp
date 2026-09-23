@@ -10,6 +10,14 @@
   color: var(--iz-color-text);
 }
 
+/* Пояснение под заголовком: откуда именно заберут товар. */
+.saved-address-picker__hint {
+  margin: -4px 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
 .saved-address-picker__list {
   display: flex;
   flex-direction: column;

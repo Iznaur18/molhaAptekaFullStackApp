@@ -258,7 +258,11 @@ export const CHECKOUT_FORM_UI = {
   SHIPPING_PROVIDER_YANDEX_EXPRESS: "Яндекс Экспресс",
   /** @param {string} cost @param {string} carrier */
   SHIPPING_ESTIMATE: (cost, carrier) => `${carrier}: примерно ${cost}`,
+  /** Служба посчитала точно. @param {string} cost @param {string} carrier */
+  SHIPPING_ESTIMATE_EXACT: (cost, carrier) => `${carrier}: ${cost}`,
   SHIPPING_ESTIMATE_HINT: "Точную сумму назовёт курьер при получении.",
+  SHIPPING_ESTIMATE_EXACT_HINT:
+    "Сумму подтвердит служба, когда продавец вызовет курьера.",
   SHIPPING_ESTIMATE_UNAVAILABLE:
     "Стоимость доставки посчитаем позже — её назовёт курьер.",
   SHIPPING_PROVIDER_SOON: "Скоро",
@@ -295,6 +299,19 @@ export const PRODUCT_PICKUP_UI = {
   ADDRESS_LABEL: "Адрес продажи",
   ADDRESS_LABEL_WAREHOUSE: "Адрес точки отправления",
   SAVED_ADDRESSES_LABEL: "Ваши адреса",
+  /** Товар едет к покупателю: адрес — это место, откуда его заберут. */
+  SHIPPING_FROM_LABEL: "Адрес отправки",
+  /** Кто забирает товар — зависит от службы. @param {string} carrier */
+  SHIPPING_FROM_HINT: (carrier) =>
+    `Отсюда курьер службы ${carrier} заберёт товар. Выберите адрес ниже или добавьте новый.`,
+  SHIPPING_FROM_HINT_SELLER:
+    "Отсюда вы повезёте товар покупателю. Выберите адрес ниже или добавьте новый.",
+  SHIPPING_FROM_HINT_COURIER:
+    "Отсюда курьер Gitorg заберёт товар. Выберите адрес ниже или добавьте новый.",
+  /** Точка отправления не из книги адресов. @param {string} address */
+  SHIPPING_FROM_UNKNOWN: (address) =>
+    `Проверьте адрес отправки: «${address}» не совпадает ни с одним адресом из ваших. Курьер приедет именно туда.`,
+  SHIPPING_FROM_HINT_PICKUP: "Этот же адрес покупатель увидит как точку самовывоза.",
   SAVED_ADDRESS_OTHER: "Указать другой на карте",
   LOCATIONS_SECTION_LABEL: "Точки самовывоза / отправления",
   LOCATIONS_EMPTY: "Добавьте хотя бы одну точку",
