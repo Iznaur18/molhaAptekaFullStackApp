@@ -104,4 +104,26 @@ describe("полки витрины из групп 1С", () => {
 
     assert.deepEqual(await listSellerOneCShelves(String(seller._id)), []);
   });
+  it("третий уровень тоже приходит", async () => {
+    const { seller } = await createOrderLoyaltyFixture();
+    await seedGroups(seller._id);
+    await OneCCategoryMappingModel.create({
+      sellerId: seller._id,
+      externalId: "g-gel",
+      name: "Гелевые",
+      parentExternalId: "g-pens",
+      depth: 2,
+    });
+    await seedProduct(seller._id, "g-gel");
+
+    const [kanc] = await listSellerOneCShelves(String(seller._id));
+
+    assert.equal(kanc.productCount, 1, "товар глубокой подгруппы считается в корне");
+    const pens = kanc.children.find((child) => child.name === "Ручки");
+    assert.deepEqual(
+      pens.children.map((child) => child.name),
+      ["Гелевые"],
+      "вложенность не обрывается на двух уровнях",
+    );
+  });
 });

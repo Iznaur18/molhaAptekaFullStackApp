@@ -73,15 +73,14 @@ export function SellerProductsPage({
   const [selectedShelfId, setSelectedShelfId] = useState(
     /** @type {string | null} */ (null),
   );
-  /** Выбранная полка из 1С и, вторым уровнем, её подкатегория. */
-  const [selectedOnecRootId, setSelectedOnecRootId] = useState(
-    /** @type {string | null} */ (null),
-  );
-  const [selectedOnecChildId, setSelectedOnecChildId] = useState(
-    /** @type {string | null} */ (null),
-  );
-  // Товары показываем по подкатегории, а без неё — по всей ветке корня.
-  const selectedOnecGroupId = selectedOnecChildId ?? selectedOnecRootId;
+  /**
+   * Путь по категориям 1С: [корень, подкатегория, …]. Дерево в выгрузке
+   * бывает глубже двух уровней, поэтому храним не пару, а путь целиком.
+   */
+  const [onecPath, setOnecPath] = useState(/** @type {string[]} */ ([]));
+  // Товары — по самой глубокой выбранной категории вместе с её вложенными.
+  const selectedOnecGroupId =
+    onecPath.length > 0 ? onecPath[onecPath.length - 1] : null;
 
   const catalogEnabled = isSessionReady;
   const profileQuery = useUserProfileQuery({
@@ -97,10 +96,29 @@ export function SellerProductsPage({
     sellerId,
     enabled: catalogEnabled,
   });
-  /** @type {Array<{ id: string; name: string; children: Array<{ id: string; name: string }> }>} */
+  /** @type {Array<{ id: string; name: string; children: any[] }>} */
   const onecShelves = onecShelvesQuery.data ?? [];
-  const openedOnecShelf =
-    onecShelves.find((shelf) => shelf.id === selectedOnecRootId) ?? null;
+  /**
+   * Ряды категорий: корни, затем дети каждой выбранной по пути. Последний ряд
+   * рисуется, только если у выбранной категории есть вложенные.
+   *
+   * @type {Array<{ level: number; parentName: string; items: any[] }>}
+   */
+  const onecRows = [];
+  {
+    let level = 0;
+    let items = onecShelves;
+    let parentName = "";
+    while (items.length > 0) {
+      onecRows.push({ level, parentName, items });
+      const selectedId = onecPath[level];
+      const selected = selectedId ? items.find((item) => item.id === selectedId) : null;
+      if (!selected) break;
+      items = selected.children ?? [];
+      parentName = selected.name;
+      level += 1;
+    }
+  }
   const seller = profileQuery.data ?? null;
   const profilePhase = !catalogEnabled
     ? "idle"
@@ -132,8 +150,7 @@ export function SellerProductsPage({
 
   useEffect(() => {
     setSelectedShelfId(null);
-    setSelectedOnecRootId(null);
-    setSelectedOnecChildId(null);
+    setOnecPath([]);
   }, [sellerId]);
 
   useEffect(() => {
@@ -340,11 +357,10 @@ export function SellerProductsPage({
                 ]
                   .filter(Boolean)
                   .join(" ")}
-                aria-pressed={selectedShelfId == null && selectedOnecRootId == null}
+                aria-pressed={selectedShelfId == null && onecPath.length === 0}
                 onClick={() => {
                   setSelectedShelfId(null);
-                  setSelectedOnecRootId(null);
-                  setSelectedOnecChildId(null);
+                  setOnecPath([]);
                 }}
               >
                 {SELLER_PRODUCTS_PAGE_UI.SHELF_FILTER_ALL}
@@ -364,8 +380,7 @@ export function SellerProductsPage({
                   aria-pressed={selectedShelfId === shelf._id}
                   onClick={() => {
                     setSelectedShelfId(shelf._id);
-                    setSelectedOnecRootId(null);
-                    setSelectedOnecChildId(null);
+                    setOnecPath([]);
                   }}
                 >
                   {shelf.name}
@@ -377,19 +392,16 @@ export function SellerProductsPage({
                   type="button"
                   className={[
                     "seller-products-page__shelf-chip",
-                    selectedOnecRootId === shelf.id
+                    onecPath[0] === shelf.id
                       ? "seller-products-page__shelf-chip--active"
                       : "",
                   ]
                     .filter(Boolean)
                     .join(" ")}
-                  aria-pressed={selectedOnecRootId === shelf.id}
+                  aria-pressed={onecPath[0] === shelf.id}
                   onClick={() => {
                     setSelectedShelfId(null);
-                    setSelectedOnecChildId(null);
-                    setSelectedOnecRootId(
-                      selectedOnecRootId === shelf.id ? null : shelf.id,
-                    );
+                    setOnecPath(onecPath[0] === shelf.id ? [] : [shelf.id]);
                   }}
                 >
                   {shelf.name}
@@ -398,53 +410,56 @@ export function SellerProductsPage({
             </div>
           ) : null}
 
-          {/* Второй уровень: подкатегории выбранной полки из 1С. Товары всей
-              ветки показываются под ними, поэтому «Все» здесь — вся полка. */}
-          {openedOnecShelf && openedOnecShelf.children.length > 0 ? (
+          {/* Вложенные уровни: по ряду на каждую открытую категорию. Товары
+              всей ветки видны сразу, поэтому «Все» здесь — вся категория. */}
+          {onecRows.slice(1).map((row) => (
             <div
+              key={`onec-level-${row.level}`}
               className="seller-products-page__shelves seller-products-page__shelves--nested"
               role="toolbar"
-              aria-label={openedOnecShelf.name}
+              aria-label={row.parentName}
             >
               <button
                 type="button"
                 className={[
                   "seller-products-page__shelf-chip",
-                  selectedOnecChildId == null
+                  onecPath.length === row.level
                     ? "seller-products-page__shelf-chip--active"
                     : "",
                 ]
                   .filter(Boolean)
                   .join(" ")}
-                aria-pressed={selectedOnecChildId == null}
-                onClick={() => setSelectedOnecChildId(null)}
+                aria-pressed={onecPath.length === row.level}
+                onClick={() => setOnecPath(onecPath.slice(0, row.level))}
               >
                 {SELLER_PRODUCTS_PAGE_UI.SHELF_FILTER_ALL}
               </button>
-              {openedOnecShelf.children.map((child) => (
+              {row.items.map((item) => (
                 <button
-                  key={child.id}
+                  key={item.id}
                   type="button"
                   className={[
                     "seller-products-page__shelf-chip",
-                    selectedOnecChildId === child.id
+                    onecPath[row.level] === item.id
                       ? "seller-products-page__shelf-chip--active"
                       : "",
                   ]
                     .filter(Boolean)
                     .join(" ")}
-                  aria-pressed={selectedOnecChildId === child.id}
+                  aria-pressed={onecPath[row.level] === item.id}
                   onClick={() =>
-                    setSelectedOnecChildId(
-                      selectedOnecChildId === child.id ? null : child.id,
+                    setOnecPath(
+                      onecPath[row.level] === item.id
+                        ? onecPath.slice(0, row.level)
+                        : [...onecPath.slice(0, row.level), item.id],
                     )
                   }
                 >
-                  {child.name}
+                  {item.name}
                 </button>
               ))}
             </div>
-          ) : null}
+          ))}
         </div>
       ) : null}
 

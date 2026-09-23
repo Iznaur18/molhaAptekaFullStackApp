@@ -13,7 +13,7 @@ import { buildSellerCatalogProductsQuery } from "../user/userSellerCatalogProduc
  *   id: string;
  *   name: string;
  *   productCount: number;
- *   children: Array<{ id: string; name: string; productCount: number }>;
+ *   children: OneCShelf[];
  * }} OneCShelf
  */
 
@@ -21,6 +21,11 @@ import { buildSellerCatalogProductsQuery } from "../user/userSellerCatalogProduc
 const CHILDREN_MAX = 60;
 /** Столько корневых полок хватает даже большому каталогу. */
 const ROOTS_MAX = 60;
+/**
+ * Глубже покупатель не ныряет, а дерево в выгрузке бывает и на десять
+ * уровней: ограничиваем и ради экрана, и ради размера ответа.
+ */
+const DEPTH_MAX = 4;
 
 /**
  * Видимые товары продавца по группам 1С.
@@ -43,10 +48,10 @@ async function countVisibleProductsByGroup(sellerId) {
 }
 
 /**
- * Полки продавца из 1С: корневые группы и их подкатегории.
+ * Полки продавца из 1С: дерево групп любой глубины.
  *
- * Считаем «своими» товары самой группы, а в счётчике ветки — вместе с
- * подкатегориями: покупатель, нажав «Канцтовары», ждёт весь раздел.
+ * Считаем «своими» товары самой группы, а в счётчике ветки — вместе со всеми
+ * вложенными: покупатель, нажав «Канцтовары», ждёт весь раздел.
  *
  * @param {string} sellerId
  * @returns {Promise<OneCShelf[]>}
@@ -89,22 +94,36 @@ export async function listSellerOneCShelves(sellerId) {
   const branchCount = (node) =>
     node.own + node.children.reduce((sum, child) => sum + branchCount(child), 0);
 
+  /**
+   * Ветка наружу: пустое не отдаём, глубину и ширину ограничиваем — дерево
+   * приходит из чужой выгрузки, и «ещё один уровень» там стоит дёшево.
+   *
+   * @param {{ id: string; name: string; own: number; children: any[] }} node
+   * @param {number} level
+   * @param {Set<string>} seen циклы в выгрузке встречаются: Ид ссылается на предка
+   * @returns {OneCShelf | null}
+   */
+  const toShelf = (node, level, seen) => {
+    if (seen.has(node.id)) return null;
+    const productCount = branchCount(node);
+    if (productCount <= 0) return null;
+
+    const nextSeen = new Set(seen).add(node.id);
+    const children =
+      level >= DEPTH_MAX
+        ? []
+        : node.children
+            .map((child) => toShelf(child, level + 1, nextSeen))
+            .filter(Boolean)
+            .sort((a, b) => a.name.localeCompare(b.name, "ru"))
+            .slice(0, CHILDREN_MAX);
+
+    return { id: node.id, name: node.name, productCount, children };
+  };
+
   return roots
-    .map((root) => ({
-      id: root.id,
-      name: root.name,
-      productCount: branchCount(root),
-      children: root.children
-        .map((child) => ({
-          id: child.id,
-          name: child.name,
-          productCount: branchCount(child),
-        }))
-        .filter((child) => child.productCount > 0)
-        .sort((a, b) => a.name.localeCompare(b.name, "ru"))
-        .slice(0, CHILDREN_MAX),
-    }))
-    .filter((root) => root.productCount > 0)
+    .map((root) => toShelf(root, 0, new Set()))
+    .filter(Boolean)
     .sort((a, b) => a.name.localeCompare(b.name, "ru"))
     .slice(0, ROOTS_MAX);
 }
