@@ -21,8 +21,9 @@ const resolveRating = (votes) => {
  * Подставляет в отправления данные назначенного курьера.
  *
  * Продавец и покупатель должны понимать, кто к ним приедет: имя, рейтинг и
- * авто. Телефон сюда не кладём — до передачи товара стороны общаются через
- * заказ, а после неё курьеру звонят по номеру из карточки доставки.
+ * авто. У своих курьеров Gitorg телефона тут нет: стороны общаются через
+ * заказ. У внешней службы (ЛОБО) телефон есть — чужого курьера внутри
+ * заказа не вызвать, и без номера ни продавец, ни покупатель его не найдут.
  *
  * @template {{ shipments?: Array<Record<string, any>> | null }} T
  * @param {T[]} orders
@@ -37,6 +38,7 @@ export async function attachShipmentCourierInfo(orders) {
       if (shipment?.courierId || !shipment?.shippingCourier?.name) continue;
       shipment.courier = {
         userName: shipment.shippingCourier.name,
+        phone: shipment.shippingCourier.phone ?? "",
         rating: null,
         vehicleMake: shipment.shippingCourier.vehicleMake ?? "",
         vehicleColor: shipment.shippingCourier.vehicleColor ?? "",

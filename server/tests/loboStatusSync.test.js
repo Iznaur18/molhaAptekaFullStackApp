@@ -143,10 +143,11 @@ describe("раскладка статусов ЛОБО на нашу лестн�
     assert.deepEqual(
       {
         name: fresh.shipments[0].shippingCourier?.name,
+        phone: fresh.shipments[0].shippingCourier?.phone,
         plate: fresh.shipments[0].shippingCourier?.vehiclePlate,
       },
-      { name: "Курьер ЛОБО (mock)", plate: "А123ВС95" },
-      "кто приедет и на чём — видно сторонам сделки",
+      { name: "Курьер ЛОБО (mock)", phone: "+79280000000", plate: "А123ВС95" },
+      "кто приедет, на чём и по какому номеру звонить",
     );
 
     const { attachShipmentCourierInfo } =
@@ -154,9 +155,9 @@ describe("раскладка статусов ЛОБО на нашу лестн�
     const [shown] = await attachShipmentCourierInfo([fresh]);
     assert.equal(shown.shipments[0].courier?.userName, "Курьер ЛОБО (mock)");
     assert.equal(
-      "phone" in shown.shipments[0].courier,
-      false,
-      "телефон курьера не отдаём",
+      shown.shipments[0].courier?.phone,
+      "+79280000000",
+      "чужого курьера внутри заказа не вызвать — номер нужен сторонам",
     );
   });
 
