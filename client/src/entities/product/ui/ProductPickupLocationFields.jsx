@@ -565,6 +565,22 @@ export function ProductPickupLocationFields({
 
   // Кто заберёт товар — называем прямо: продавец ищет, где поменять адрес
   // отправки, а не «свои адреса».
+  /**
+   * Точки, которых нет в книге адресов. Сами по себе они законны (склад,
+   * цех), но именно так уезжает забытый старый адрес: продавец правит адрес
+   * в профиле, а точка отправления остаётся прежней.
+   */
+  const unknownLocations =
+    shipsToBuyer && profileAddresses.length > 0
+      ? list.filter((location) => {
+          const address = String(location?.address ?? "").trim();
+          if (!address) return false;
+          return !profileAddresses.some(
+            (saved) => String(saved?.address ?? saved?.line ?? "").trim() === address,
+          );
+        })
+      : [];
+
   const shippingFromHint =
     currentCarrier === PRODUCT_DELIVERY_CARRIER_SELLER
       ? PRODUCT_PICKUP_UI.SHIPPING_FROM_HINT_SELLER
@@ -701,6 +717,14 @@ export function ProductPickupLocationFields({
         >
           {PRODUCT_PICKUP_UI.ADD_LOCATION}
         </button>
+      ) : null}
+
+      {unknownLocations.length > 0 ? (
+        <p className="product-pickup-location-fields__warning" role="status">
+          {PRODUCT_PICKUP_UI.SHIPPING_FROM_UNKNOWN(
+            unknownLocations.map((location) => location.address).join("; "),
+          )}
+        </p>
       ) : null}
 
       <p className="product-pickup-location-fields__legend">

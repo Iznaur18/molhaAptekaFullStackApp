@@ -602,6 +602,17 @@ export function OrderCard({
     productCourierDeliveryEnabled: shipmentOwn?.courierDelivery === true,
     productDeliveryEnabled: shipmentMethod === "delivery",
   });
+  // Откуда курьер заберёт заказ — снимок с позиции: продавец должен видеть
+  // адрес до вызова, иначе ошибку в точке отправления замечают только по
+  // приезду курьера не туда.
+  const shipmentPickupAddress = String(
+    (order.items ?? []).find(
+      (item) =>
+        resolveOrderLineSellerId(item) === String(shipmentOwn?.sellerId ?? "") &&
+        String(item?.pickupAddressAtOrder ?? "").trim(),
+    )?.pickupAddressAtOrder ?? "",
+  ).trim();
+
   // СДЭК, Яндекс и «Экспресс»: «Отгружен» и «Доставлен» ставит опрос статусов службы, не продавец.
   const cdekTracksThisShipment =
     shipmentMethod === "delivery" &&
@@ -1071,7 +1082,11 @@ export function OrderCard({
         </p>
       ) : null}
 
-      <OrderCardLoboShipment shipment={shipmentOwn} role={attentionRole} />
+      <OrderCardLoboShipment
+        shipment={shipmentOwn}
+        role={attentionRole}
+        pickupAddress={shipmentPickupAddress}
+      />
 
       {awaitingGitorgCourier ? (
         <div className="order-card__awaiting-courier">

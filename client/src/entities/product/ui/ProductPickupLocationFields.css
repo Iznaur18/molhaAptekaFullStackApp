@@ -4,6 +4,19 @@
   gap: 0.75rem;
 }
 
+/* Точка отправления не из книги адресов: предупреждение, а не ошибка. */
+.product-pickup-location-fields__warning {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid
+    color-mix(in srgb, var(--iz-color-warning) 30%, var(--iz-color-border));
+  border-radius: 0.75rem;
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
 .product-pickup-location-fields__legend {
   margin: 0;
   font-size: 0.95rem;
