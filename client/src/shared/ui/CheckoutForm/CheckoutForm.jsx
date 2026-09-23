@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import {
+  ADDRESS_FLAT_MAX_LENGTH,
   ORDER_FULFILLMENT_DELIVERY,
   ORDER_FULFILLMENT_PICKUP,
   PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
@@ -881,6 +882,7 @@ export function CheckoutForm({
                         }
                         disabled={isDisabled || isSubmitting}
                         placeholder={CHECKOUT_FORM_UI.PLACEHOLDER_FLAT}
+                        maxLength={ADDRESS_FLAT_MAX_LENGTH}
                         autoComplete="address-line2"
                       />
                     </label>

@@ -7,7 +7,11 @@ import {
   yandexExpressOrderSelectionSchema,
 } from "./yandexDelivery.js";
 import { mongoIdSchema } from "./mongoId.js";
-import { ADDRESS_LINE_MAX_LENGTH } from "./userFields.js";
+import {
+  ADDRESS_FLAT_MAX_LENGTH,
+  ADDRESS_FLAT_TOO_LONG_MESSAGE,
+  ADDRESS_LINE_MAX_LENGTH,
+} from "./userFields.js";
 import {
   optionalLimitQuery,
   optionalPageQuery,
@@ -59,7 +63,8 @@ export const ORDER_ITEMS_MAX = 100;
 
 /** Адрес заказа — тот же адрес, что и везде. */
 export const ORDER_DELIVERY_ADDRESS_MAX_LENGTH = ADDRESS_LINE_MAX_LENGTH;
-export const ORDER_DELIVERY_FLAT_MAX_LENGTH = 20;
+/** Та же строка «подъезд, этаж, кв», что и в профиле. */
+export const ORDER_DELIVERY_FLAT_MAX_LENGTH = ADDRESS_FLAT_MAX_LENGTH;
 
 const orderLineItemInputSchema = z.object({
   productId: mongoIdSchema,

@@ -81,6 +81,7 @@ export async function estimateShipmentDelivery({
       available: true,
       carrier: PRODUCT_DELIVERY_CARRIER_LOBO,
       finalCost: quote.finalCost,
+      approximate: quote.approximate === true,
       distanceKm: quote.distanceKm,
       durationMin: quote.durationMin,
       isSuburban: quote.isSuburban,

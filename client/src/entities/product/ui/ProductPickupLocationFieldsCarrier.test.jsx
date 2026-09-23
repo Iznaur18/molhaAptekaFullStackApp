@@ -78,3 +78,45 @@ describe("выбор перевозчика на товаре", () => {
     expect(patch.productDeliveryEnabled).toBe(false);
   });
 });
+
+describe("адрес отправки у внешней службы", () => {
+  const SAVED = [
+    {
+      id: "addr-1",
+      label: "Склад",
+      address: "г Грозный, ул Мира, 1",
+      lat: 43.31,
+      lon: 45.69,
+    },
+  ];
+
+  /** @param {string} carrier */
+  const renderWithAddresses = (carrier) =>
+    renderWithProviders(
+      <ProductPickupLocationFields
+        locations={[LOCATION]}
+        pickupEnabled={false}
+        deliveryEnabled={carrier === "seller"}
+        courierDeliveryEnabled={carrier === "gitorg_courier"}
+        productDeliveryCarrier={carrier}
+        productRegionCode="RU-CE"
+        sellerRegionCode="RU-CE"
+        savedAddresses={SAVED}
+        onChange={vi.fn()}
+      />,
+    );
+
+  it("ЛОБО: адрес отправки виден и подписан, откуда заберут", () => {
+    renderWithAddresses("lobo");
+
+    expect(screen.getByText("Адрес отправки")).toBeTruthy();
+    expect(screen.getByText(/Отсюда курьер службы ЛОБО заберёт товар/)).toBeTruthy();
+  });
+
+  it("доставка продавцом: тот же раздел, со своей подписью", () => {
+    renderWithAddresses("seller");
+
+    expect(screen.getByText("Адрес отправки")).toBeTruthy();
+    expect(screen.getByText(/Отсюда вы повезёте товар покупателю/)).toBeTruthy();
+  });
+});

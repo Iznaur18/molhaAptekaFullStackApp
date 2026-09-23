@@ -124,10 +124,18 @@ export function ProductPickupLocationFields({
   const listRef = useRef(list);
   listRef.current = list;
 
+  // Едет ли товар к покупателю — по перевозчику: у ЛОБО старые флаги сняты,
+  // и раздел с адресом отправки пропадал целиком.
+  const shipsToBuyer = productShipsToBuyer({
+    productDeliveryCarrier,
+    productDeliveryEnabled: deliveryEnabled,
+    productCourierDeliveryEnabled: courierDeliveryEnabled,
+  });
+
   const multiSelectEnabled = pickupEnabled || courierDeliveryEnabled;
   const maxLocations = multiSelectEnabled ? PRODUCT_PICKUP_LOCATIONS_MAX : 1;
   const canAddMoreLocations = list.length < maxLocations;
-  const showAddressSection = pickupEnabled || deliveryEnabled || courierDeliveryEnabled;
+  const showAddressSection = pickupEnabled || shipsToBuyer;
 
   const customLocations = useMemo(
     () => findCustomPickupLocations(list, profileAddresses),
@@ -483,14 +491,6 @@ export function ProductPickupLocationFields({
     selectedProfileIds,
   );
 
-  // Едет ли товар до покупателя — вопрос к перевозчику, а не к двум старым
-  // флагам: у товара с ЛОБО оба false, и раздел доставки пропадал целиком.
-  const shipsToBuyer = productShipsToBuyer({
-    productDeliveryCarrier,
-    productDeliveryEnabled: deliveryEnabled,
-    productCourierDeliveryEnabled: courierDeliveryEnabled,
-  });
-
   const togglePickup = () => {
     if (disabled) {
       return;
@@ -563,13 +563,32 @@ export function ProductPickupLocationFields({
       productCourierDeliveryEnabled: courierDeliveryEnabled,
     }) ?? "";
 
+  // Кто заберёт товар — называем прямо: продавец ищет, где поменять адрес
+  // отправки, а не «свои адреса».
+  const shippingFromHint =
+    currentCarrier === PRODUCT_DELIVERY_CARRIER_SELLER
+      ? PRODUCT_PICKUP_UI.SHIPPING_FROM_HINT_SELLER
+      : currentCarrier === PRODUCT_DELIVERY_CARRIER_GITORG
+        ? PRODUCT_PICKUP_UI.SHIPPING_FROM_HINT_COURIER
+        : PRODUCT_PICKUP_UI.SHIPPING_FROM_HINT(
+            PRODUCT_DELIVERY_CARRIER_LABEL_RU[currentCarrier] ?? "доставки",
+          );
+
   return (
     <div className="product-pickup-location-fields">
       {showAddressSection && profileAddresses.length > 0 ? (
         <div className="saved-address-picker">
           <span className="saved-address-picker__label">
-            {PRODUCT_PICKUP_UI.SAVED_ADDRESSES_LABEL}
+            {shipsToBuyer
+              ? PRODUCT_PICKUP_UI.SHIPPING_FROM_LABEL
+              : PRODUCT_PICKUP_UI.SAVED_ADDRESSES_LABEL}
           </span>
+          {shipsToBuyer ? (
+            <p className="saved-address-picker__hint">
+              {shippingFromHint}
+              {pickupEnabled ? ` ${PRODUCT_PICKUP_UI.SHIPPING_FROM_HINT_PICKUP}` : ""}
+            </p>
+          ) : null}
           <div
             className="saved-address-picker__list"
             role="group"
