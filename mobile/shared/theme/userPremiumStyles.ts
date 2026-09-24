@@ -27,8 +27,9 @@ export const useUserPremiumDisplayNameStyles = createThemedStyles((theme) => ({
     minWidth: 0,
     overflow: "hidden",
   },
+  // Не растягиваем: значки идут сразу за ником, длинный ник сжимается в «…».
   textClip: {
-    flex: 1,
+    flexShrink: 1,
     minWidth: 0,
     overflow: "hidden",
   },

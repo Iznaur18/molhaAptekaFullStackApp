@@ -100,8 +100,9 @@
   min-width: 0;
 }
 
+/* Ник не растягивается: значки премиума/проверки идут сразу за ним, длинный — в «…». */
 .user-details-page__title .user-premium-name__text {
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-width: 0;
 }
 
