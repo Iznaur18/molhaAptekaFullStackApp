@@ -211,7 +211,7 @@
   display: none;
 }
 
-@container app-viewport (min-width: 40.0625rem) {
+@media (min-width: 40.0625rem) {
   .product-card__catalog-badges--web {
     display: flex;
   }

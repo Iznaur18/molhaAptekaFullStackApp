@@ -83,8 +83,9 @@ html {
   width: 100%;
   max-width: none;
   margin: 0;
-  container-type: inline-size;
-  container-name: app-viewport;
+  /* Без container-type: он включает layout containment, и Safari 17 делает <html>
+     рамкой для position: fixed — нижний навбар и шторки уезжают к низу документа.
+     Брейкпоинты по ширине экрана — обычные @media. */
   min-height: 100%;
   overflow-x: clip;
   background-color: var(--iz-color-bg);

@@ -67,7 +67,7 @@
 }
 
 /* До 1023 px над кнопкой отступ 0.5rem — как у карточки (ProductCardMobileCatalog.css). */
-@container app-viewport (max-width: 1023px) {
+@media (max-width: 1023px) {
   .catalog-grid-skeleton .catalog-grid-skeleton__action {
     margin-top: 0.5rem;
   }
@@ -79,19 +79,19 @@
   margin-top: 1rem;
 }
 
-@container app-viewport (max-width: 903px) {
+@media (max-width: 903px) {
   .app-shell__grid-blocks + .catalog-grid-skeleton {
     margin-top: 0.15rem;
   }
 }
 
-@container app-viewport (max-width: 667px) {
+@media (max-width: 667px) {
   .app-shell__grid-blocks + .catalog-grid-skeleton {
     margin-top: 0.1rem;
   }
 }
 
-@container app-viewport (max-width: 640px) {
+@media (max-width: 640px) {
   .app-shell__grid-blocks + .catalog-grid-skeleton {
     margin-top: 2px;
   }

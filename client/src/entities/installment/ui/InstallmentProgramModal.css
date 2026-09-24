@@ -47,7 +47,7 @@
   padding-top: env(safe-area-inset-top, 0px);
 }
 
-@container app-viewport (min-width: 40rem) {
+@media (min-width: 40rem) {
   .installment-program-modal__backdrop {
     padding-inline: max(0px, calc((100vw - 28rem) / 2));
   }

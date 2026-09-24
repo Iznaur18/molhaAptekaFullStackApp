@@ -1,4 +1,4 @@
-@container app-viewport (max-width: 640px) {
+@media (max-width: 640px) {
   .installment-page {
     --profile-queue-list-gap: 4px;
   }

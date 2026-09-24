@@ -46,7 +46,7 @@
   pointer-events: auto;
 }
 
-@container app-viewport (max-width: 640px) {
+@media (max-width: 640px) {
   .data-confirmation-modal__backdrop {
     align-items: stretch;
     justify-content: stretch;

@@ -304,7 +304,7 @@
   }
 }
 
-@container app-viewport (min-width: 48rem) {
+@media (min-width: 48rem) {
   .promo-return-streak-dock {
     left: max(
       calc((100vw - var(--app-shell-max-width, 60rem)) / 2 + var(--prs-inset)),

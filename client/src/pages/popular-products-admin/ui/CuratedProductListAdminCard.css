@@ -68,7 +68,7 @@
   white-space: nowrap;
 }
 
-@container app-viewport (max-width: 420px) {
+@media (max-width: 420px) {
   .curated-list-admin-card__product-add {
     grid-template-columns: minmax(0, 1fr);
   }

@@ -90,7 +90,7 @@
   text-decoration: underline;
 }
 
-@container app-viewport (max-width: 640px) {
+@media (max-width: 640px) {
   .product-moderation-create-details__facts {
     grid-template-columns: 1fr;
   }

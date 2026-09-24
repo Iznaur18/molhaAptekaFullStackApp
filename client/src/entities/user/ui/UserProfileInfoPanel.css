@@ -445,7 +445,7 @@
   text-decoration: underline;
 }
 
-@container app-viewport (max-width: 683px) {
+@media (max-width: 683px) {
   .user-profile-info__detail-row {
     flex-wrap: nowrap;
     flex-direction: row;

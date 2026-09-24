@@ -310,7 +310,7 @@
 }
 
 /* <1280: 3 колонки */
-@container app-viewport (max-width: 1279px) {
+@media (max-width: 1279px) {
   .app-shell__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     --app-shell-grid-gap: 1rem;
@@ -319,7 +319,7 @@
 }
 
 /* ≤903: 3 колонки, узкий gap */
-@container app-viewport (max-width: 903px) {
+@media (max-width: 903px) {
   .app-shell__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     --app-shell-grid-gap: 0.15rem;
@@ -332,7 +332,7 @@
 }
 
 /* ≤667: 2 колонки + edge bleed + место под bottom nav */
-@container app-viewport (max-width: 667px) {
+@media (max-width: 667px) {
   .app-shell {
     --app-shell-content-inline-padding: max(
       0.75rem,
@@ -651,7 +651,7 @@
   box-shadow: 0 12px 32px var(--iz-shadow-card-hover);
 }
 
-@container app-viewport (max-width: 640px) {
+@media (max-width: 640px) {
   .app-shell {
     /* Паритет mobile SCREEN_CONTENT_PADDING_HORIZONTAL = 16 */
     --app-shell-content-inline-padding: max(
