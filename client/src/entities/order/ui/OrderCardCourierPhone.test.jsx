@@ -60,7 +60,9 @@ describe("телефон курьера службы в карточке зак�
       />,
     );
 
-    const phone = screen.getByRole("link", { name: "8 (928) 893-64-49" });
+    // Кнопка «Позвонить курьеру» — с номером в подписи.
+    const phone = screen.getByRole("link", { name: /8 \(928\) 893-64-49/ });
+    expect(screen.getByText("8 (928) 893-64-49")).toBeTruthy();
     expect(phone.getAttribute("href")).toBe("tel:+79288936449");
     expect(screen.getByText("Рустам")).toBeTruthy();
   });

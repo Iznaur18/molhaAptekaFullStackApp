@@ -16,6 +16,11 @@ import {
   refreshCdekWaybill,
 } from "../api/cdekWaybillApi.js";
 
+import { resolveShipmentStatusTone } from "../../../shared/lib/shipmentStatusTone.js";
+import { AppIcon } from "../../../shared/ui/icon/index.js";
+import { ShipmentStatusPill } from "../../../shared/ui/ShipmentStatus/ShipmentStatus.jsx";
+import { Package } from "lucide-react";
+
 import { CdekIntakeSection } from "./CdekIntakeSection.jsx";
 
 import "./CdekWaybillPanel.css";
@@ -66,8 +71,17 @@ export function CdekWaybillPanel({
   const error = createMutation.error ?? refreshMutation.error;
 
   return (
-    <section className="cdek-waybill-panel" aria-label={CDEK_WAYBILL_UI.TITLE}>
-      <h4 className="cdek-waybill-panel__title">{CDEK_WAYBILL_UI.TITLE}</h4>
+    <section
+      className="cdek-waybill-panel"
+      data-carrier="cdek"
+      aria-label={CDEK_WAYBILL_UI.TITLE}
+    >
+      <h4 className="cdek-waybill-panel__title">
+        <span className="cdek-waybill-panel__title-icon" aria-hidden="true">
+          <AppIcon icon={Package} size="sm" strokeWidth={2.25} />
+        </span>
+        {CDEK_WAYBILL_UI.TITLE}
+      </h4>
 
       <dl className="cdek-waybill-panel__facts">
         {snapshot.pickupPoint?.address ? (
@@ -77,7 +91,7 @@ export function CdekWaybillPanel({
           </div>
         ) : null}
         {snapshot.deliverySumRub ? (
-          <div className="cdek-waybill-panel__fact">
+          <div className="cdek-waybill-panel__fact cdek-waybill-panel__fact--money">
             <dt>{CDEK_WAYBILL_UI.DELIVERY_PAID_BY_BUYER}</dt>
             <dd>{formatPriceRub(snapshot.deliverySumRub)}</dd>
           </div>
@@ -181,7 +195,15 @@ function WaybillState({
         {waybill.status ? (
           <div className="cdek-waybill-panel__fact">
             <dt>{CDEK_WAYBILL_UI.STATUS}</dt>
-            <dd>{waybill.status}</dd>
+            <dd>
+              <ShipmentStatusPill
+                tone={resolveShipmentStatusTone(waybill.statusCode, {
+                  cancelled: Boolean(waybill.cancelledAt),
+                })}
+              >
+                {waybill.status}
+              </ShipmentStatusPill>
+            </dd>
           </div>
         ) : null}
       </dl>

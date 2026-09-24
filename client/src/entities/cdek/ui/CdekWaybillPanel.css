@@ -1,42 +1,107 @@
+/* Панель службы доставки (СДЭК, Яндекс Доставка, Экспресс): цвет службы
+   полосой слева и значком, строки «подпись — значение», сумма и статус
+   выделены. */
 .cdek-waybill-panel {
+  --carrier-accent: var(--iz-color-action);
+  --carrier-accent-soft: var(--iz-color-action-soft);
+
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.7rem;
   margin-top: 0.5rem;
-  padding: 0.75rem;
+  padding: 0.8rem 0.8rem 0.8rem 0.95rem;
   border: 1px solid var(--iz-color-border);
-  border-radius: 0.75rem;
+  border-left: 4px solid var(--carrier-accent);
+  border-radius: 0.9rem;
   background: var(--iz-color-surface);
 }
 
+.cdek-waybill-panel[data-carrier="cdek"] {
+  --carrier-accent: #1ab248;
+  --carrier-accent-soft: color-mix(in srgb, #1ab248 14%, transparent);
+}
+
+.cdek-waybill-panel[data-carrier="yandex"],
+.cdek-waybill-panel[data-carrier="express"] {
+  --carrier-accent: #fc3f1d;
+  --carrier-accent-soft: color-mix(in srgb, #fc3f1d 12%, transparent);
+}
+
 .cdek-waybill-panel__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   margin: 0;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
+}
+
+.cdek-waybill-panel__title-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.6rem;
+  background: var(--carrier-accent-soft);
+  color: var(--carrier-accent);
 }
 
 .cdek-waybill-panel__facts {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.5rem;
   margin: 0;
 }
 
 .cdek-waybill-panel__fact {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem 0.5rem;
+  flex-direction: column;
+  gap: 0.1rem;
   font-size: 0.875rem;
 }
 
 .cdek-waybill-panel__fact dt {
+  font-size: 0.78rem;
   color: var(--iz-color-text-muted);
 }
 
 .cdek-waybill-panel__fact dd {
   margin: 0;
+  font-weight: 600;
   overflow-wrap: anywhere;
   font-variant-numeric: tabular-nums;
+}
+
+/* Трек-номер — ссылкой, заметно. */
+.cdek-waybill-panel__fact dd a {
+  color: var(--iz-color-link);
+  font-weight: 700;
+  text-underline-offset: 2px;
+}
+
+/* Сколько платит покупатель за доставку — строкой-плашкой с крупной суммой. */
+.cdek-waybill-panel__fact--money {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.7rem;
+  background: var(--iz-color-warning-surface);
+  color: var(--iz-color-warning-text);
+}
+
+.cdek-waybill-panel__fact--money dt {
+  font-size: 0.85rem;
+  color: inherit;
+}
+
+.cdek-waybill-panel__fact--money dd {
+  font-size: 1.05rem;
+  font-weight: 800;
 }
 
 .cdek-waybill-panel__state,

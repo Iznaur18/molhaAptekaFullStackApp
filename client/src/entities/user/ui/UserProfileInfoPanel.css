@@ -75,12 +75,15 @@
 }
 
 .user-profile-info__stat-card_wide .user-profile-info__stat-label {
-  flex: 1 1 auto;
+  flex: 1 0 auto;
 }
 
+/* Длинное значение (часы работы) переносится у правого края, а не вылезает. */
 .user-profile-info__stat-card_wide .user-profile-info__stat-value {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  min-width: 0;
   font-size: 0.9375rem;
+  text-align: right;
 }
 
 .user-profile-info__stat-card_action {

@@ -12,8 +12,9 @@ const PROFILE_ROW_SECTIONS = [
       "followingCount",
       "totalSalesAmount",
       "totalPurchasesAmount",
-      "userBusinessHours",
       "userRatingByVotes",
+      // Часы работы — растянутой карточкой прямо над баллами (см. UserProfileInfoPanel).
+      "userBusinessHours",
       "userLoyaltyPoints",
     ],
   },

@@ -46,6 +46,7 @@ export const ORDER_CARD_UI = {
   ITEM_RETURNED_BY_BUYER: "покупатель отказался",
   ITEM_RETURNED_BY_SELLER: "оформил продавец",
   SHIPMENT_COURIER: "Курьер",
+  SHIPMENT_COURIER_CALL: "Позвонить курьеру",
   /** @param {string} make @param {string} color @param {string} plate */
   SHIPMENT_COURIER_CAR: (make, color, plate) =>
     [make, color, plate].filter(Boolean).join(", "),
@@ -212,10 +213,11 @@ export const ORDER_LOBO_UI = {
   PICKUP_FROM: "Курьер заберёт отсюда",
   PICKUP_FROM_HINT:
     "Адрес неверный? Поменяйте точку отправления в профиле продавца, в «Доставке и оплате», до вызова курьера.",
-  NOT_HANDED_OVER: "ещё не вызван",
+  NOT_HANDED_OVER: "Не вызван",
   SELLER_HINT:
     "Курьер ЛОБО будет вызван сам, когда вы отметите заказ «Готов к отгрузке».",
   TRACKING_LINK: "Где курьер",
   /** @param {string} price */
   BUYER_PAYS: (price) => `Доставку оплатите курьеру наличными: ${price}`,
+  BUYER_PAYS_CASH: "Доставку оплатите курьеру наличными",
 };

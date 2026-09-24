@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { Bike, Store, Truck } from "lucide-react";
 import {
   listCheckoutShippingProviderOptions,
   listCheckoutShippingServiceOptions,
@@ -18,6 +19,7 @@ import {
 import { CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
 import { resolveClientViewerRegionCode } from "../../../entities/region/lib/viewerRegion.js";
 import { useAuthSession } from "../../../entities/user/model/useAuthSession.js";
+import { AppIcon } from "../../../shared/ui/icon/index.js";
 
 import "./CheckoutShippingProviderPicker.css";
 
@@ -27,6 +29,38 @@ const SERVICE_LABEL = {
 };
 
 const COURIER_OPTION_ID = "gitorg-courier";
+
+/**
+ * Плашка «кто везёт», когда выбирать нечего: иконка, мелкая подпись и имя
+ * службы. Полная фраза — для экранных читалок и тестов.
+ *
+ * @param {{ id: string; label: string } | undefined} card
+ */
+function resolveSingleServiceBadge(card) {
+  if (card?.id === COURIER_OPTION_ID) {
+    return {
+      icon: Bike,
+      caption: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_BADGE_CAPTION_PLURAL,
+      name: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_BADGE_COURIER,
+      sentence: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SINGLE_COURIER,
+    };
+  }
+  if (card?.id === CHECKOUT_SHIPPING_PROVIDER_SELLER) {
+    return {
+      icon: Store,
+      caption: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_BADGE_CAPTION,
+      name: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_BADGE_SELLER,
+      sentence: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SINGLE_SELLER,
+    };
+  }
+  const label = card?.label ?? "";
+  return {
+    icon: Truck,
+    caption: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_BADGE_CAPTION,
+    name: label,
+    sentence: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SINGLE(label),
+  };
+}
 
 /**
  * Службы доставки в чекауте.
@@ -145,12 +179,7 @@ export function CheckoutShippingProviderPicker({
   // а не списком выключенных карточек: он выглядел как сломанный выбор.
   const selectedCards = cards.filter((card) => card.selected);
   const singleService = !canSwitch && selectedCards.length === 1;
-  const singleServiceText =
-    selectedCards[0]?.id === COURIER_OPTION_ID
-      ? CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SINGLE_COURIER
-      : selectedCards[0]?.id === CHECKOUT_SHIPPING_PROVIDER_SELLER
-        ? CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SINGLE_SELLER
-        : CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SINGLE(selectedCards[0]?.label ?? "");
+  const singleBadge = resolveSingleServiceBadge(selectedCards[0]);
 
   useEffect(() => {
     const node = selectedRef.current;
@@ -170,7 +199,29 @@ export function CheckoutShippingProviderPicker({
 
   if (singleService) {
     return (
-      <p className="checkout-shipping-provider-picker__single">{singleServiceText}</p>
+      <div
+        className="checkout-shipping-provider-picker__single"
+        role="note"
+        aria-label={singleBadge.sentence}
+      >
+        <span
+          className="checkout-shipping-provider-picker__single-icon"
+          aria-hidden="true"
+        >
+          <AppIcon icon={singleBadge.icon} size="md" strokeWidth={2.1} />
+        </span>
+        <span
+          className="checkout-shipping-provider-picker__single-text"
+          aria-hidden="true"
+        >
+          <span className="checkout-shipping-provider-picker__single-caption">
+            {singleBadge.caption}
+          </span>
+          <span className="checkout-shipping-provider-picker__single-name">
+            {singleBadge.name}
+          </span>
+        </span>
+      </div>
     );
   }
 
