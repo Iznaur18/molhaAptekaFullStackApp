@@ -180,10 +180,55 @@
   }
 }
 
-/* Служба одна: строка вместо списка выключенных карточек. */
+/* Служба одна: плашка «кто везёт» вместо списка выключенных карточек. */
 .checkout-shipping-provider-picker__single {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  width: 100%;
   margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.45;
+  padding: 10px 14px 10px 10px;
+  border: 1px solid color-mix(in srgb, var(--iz-color-action) 28%, transparent);
+  border-radius: 14px;
+  background: var(--iz-color-surface);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--iz-color-ink, #000) 6%, transparent);
+}
+
+.checkout-shipping-provider-picker__single-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast, #fff);
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--iz-color-action) 35%, transparent);
+}
+
+.checkout-shipping-provider-picker__single-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.checkout-shipping-provider-picker__single-caption {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  color: var(--iz-color-text-muted);
+}
+
+.checkout-shipping-provider-picker__single-name {
+  overflow: hidden;
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--iz-color-text);
 }

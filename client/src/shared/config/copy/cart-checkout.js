@@ -168,9 +168,6 @@ export const CHECKOUT_FORM_UI = {
   SELLER_DELIVERY_FROM: (price) => `от ${price}`,
   /** Цена службы ещё может измениться: у ЛОБО точную называет курьер. @param {string} price */
   CARRIER_DELIVERY_APPROX: (price) => `≈ ${price}`,
-  /** Товары и доставку платят порознь. @param {string} label */
-  CARRIER_DELIVERY_SPLIT_HINT: (label) =>
-    `Товары оплачиваются продавцу, доставку — службе ${label}`,
   SELLER_DELIVERY_NEED_ADDRESS:
     "Точная сумма появится, когда выберете адрес: она зависит от расстояния по дорогам",
   SELLER_DELIVERY_CALCULATING: "Считаем расстояние по дорогам…",
@@ -251,18 +248,16 @@ export const CHECKOUT_FORM_UI = {
   SHIPPING_PROVIDER_SINGLE: (label) => `Доставку выполняет ${label}`,
   SHIPPING_PROVIDER_SINGLE_SELLER: "Доставку выполняет продавец",
   SHIPPING_PROVIDER_SINGLE_COURIER: "Доставку выполняют курьеры Gitorg",
+  /** Плашка «кто везёт»: мелкая подпись + крупное имя службы. */
+  SHIPPING_PROVIDER_BADGE_CAPTION: "Доставку выполняет",
+  SHIPPING_PROVIDER_BADGE_CAPTION_PLURAL: "Доставку выполняют",
+  SHIPPING_PROVIDER_BADGE_SELLER: "Продавец",
+  SHIPPING_PROVIDER_BADGE_COURIER: "Курьеры Gitorg",
   SHIPPING_PROVIDER_SELLER: "Доставка продавцом",
   SHIPPING_PROVIDER_COURIER: "Курьеры Gitorg",
   SHIPPING_PROVIDER_CDEK: "СДЭК",
   SHIPPING_PROVIDER_YANDEX: "Яндекс Доставка",
   SHIPPING_PROVIDER_YANDEX_EXPRESS: "Яндекс Экспресс",
-  /** @param {string} cost @param {string} carrier */
-  SHIPPING_ESTIMATE: (cost, carrier) => `${carrier}: примерно ${cost}`,
-  /** Служба посчитала точно. @param {string} cost @param {string} carrier */
-  SHIPPING_ESTIMATE_EXACT: (cost, carrier) => `${carrier}: ${cost}`,
-  SHIPPING_ESTIMATE_HINT: "Точную сумму назовёт курьер при получении.",
-  SHIPPING_ESTIMATE_EXACT_HINT:
-    "Сумму подтвердит служба, когда продавец вызовет курьера.",
   SHIPPING_ESTIMATE_UNAVAILABLE:
     "Стоимость доставки посчитаем позже — её назовёт курьер.",
   SHIPPING_PROVIDER_SOON: "Скоро",

@@ -4,7 +4,6 @@ import { PRODUCT_DELIVERY_CARRIER_LABEL_RU } from "@molha/api-contract";
 
 import { fetchShippingEstimate } from "../../../entities/cart/api/shippingEstimate.js";
 import { CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
-import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 
 /**
  * Примерная стоимость доставки внешней службой.
@@ -81,19 +80,7 @@ export function CheckoutShippingEstimate({ productIds, deliveryGeo, onCost }) {
     );
   }
 
-  return (
-    <p className="checkout-form__hint">
-      <strong>
-        {(state.approximate === true
-          ? CHECKOUT_FORM_UI.SHIPPING_ESTIMATE
-          : CHECKOUT_FORM_UI.SHIPPING_ESTIMATE_EXACT)(
-          formatPriceRub(state.finalCost),
-          PRODUCT_DELIVERY_CARRIER_LABEL_RU[state.carrier] ?? state.carrier,
-        )}
-      </strong>{" "}
-      {state.approximate === true
-        ? CHECKOUT_FORM_UI.SHIPPING_ESTIMATE_HINT
-        : CHECKOUT_FORM_UI.SHIPPING_ESTIMATE_EXACT_HINT}
-    </p>
-  );
+  // Посчитали — сумма уже в итоге корзины («Доставка» / «Итого»), отдельной
+  // строки под адресом не нужно.
+  return null;
 }

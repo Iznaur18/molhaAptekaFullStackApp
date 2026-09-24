@@ -16,7 +16,8 @@ describe("итог с доставкой внешней службы", () => {
     expect(screen.getByText("≈ 280 ₽")).toBeTruthy();
     expect(screen.getAllByText("≈ 200 ₽").length).toBeGreaterThan(0);
     expect(screen.getByText("80 ₽")).toBeTruthy();
-    expect(screen.getByText(/доставку — службе ЛОБО/)).toBeTruthy();
+    // Подсказку «товары — продавцу, доставку — службе» убрали: итог говорит сам.
+    expect(screen.queryByText(/доставку — службе/)).toBeNull();
   });
 
   it("СДЭК: цена точная, без «примерно»", () => {

@@ -59,10 +59,6 @@ export function CheckoutCarrierDeliveryCost({ cost, goodsTotalRub = 0 }) {
           </dd>
         </div>
       </dl>
-
-      <p className="checkout-seller-delivery__hint">
-        {CHECKOUT_FORM_UI.CARRIER_DELIVERY_SPLIT_HINT(cost.label)}
-      </p>
     </div>
   );
 }
