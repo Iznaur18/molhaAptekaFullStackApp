@@ -1,0 +1,168 @@
+.account-switcher {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.account-switcher__title {
+  margin: 0;
+  padding: 0 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--iz-color-text-muted);
+}
+
+.account-switcher__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.account-switcher__row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.account-switcher__account {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: 0.4rem 0.6rem;
+  border: none;
+  border-radius: 0.6rem;
+  background: transparent;
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.account-switcher__account:hover:not(:disabled) {
+  background: var(--iz-color-surface-elevated);
+}
+
+.account-switcher__account:focus-visible {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 2px;
+}
+
+.account-switcher__account:disabled {
+  cursor: default;
+}
+
+.account-switcher__account[aria-current="true"] {
+  background: color-mix(in srgb, var(--iz-color-action-soft) 70%, transparent);
+}
+
+.account-switcher__avatar {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.account-switcher__avatar_letter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+  font-weight: 700;
+}
+
+.account-switcher__meta {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.account-switcher__meta .user-premium-name__text {
+  font-weight: 600;
+}
+
+.account-switcher__hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--iz-color-text-muted);
+}
+
+.account-switcher__check {
+  flex-shrink: 0;
+  color: var(--iz-color-action);
+}
+
+.account-switcher__remove {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+}
+
+.account-switcher__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.25rem;
+}
+
+.account-switcher__actions .account-switcher__hint {
+  padding: 0 0.6rem;
+}
+
+.account-switcher__add {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: 0.4rem 0.6rem;
+  border: 1px dashed var(--iz-color-border);
+  border-radius: 0.6rem;
+  background: transparent;
+  color: var(--iz-color-action);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.account-switcher__add:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--iz-color-action-soft) 60%, transparent);
+}
+
+.account-switcher__add:focus-visible {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 2px;
+}
+
+.account-switcher__logout-all {
+  align-self: flex-start;
+  font-size: 0.82rem;
+}
+
+.account-switcher__error {
+  margin: 0;
+  padding: 0 0.6rem;
+  font-size: 0.8rem;
+  color: var(--iz-color-danger);
+}
+
+.account-switcher_login {
+  padding: 0.75rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 1rem;
+  background: var(--iz-color-surface);
+}

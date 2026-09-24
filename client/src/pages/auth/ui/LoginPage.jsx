@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import { isEmailAuthEnabled, resolveAuthContactChannel } from "@izibuy/shared-lib";
 
+import {
+  ADD_ACCOUNT_QUERY_PARAM,
+  ADD_ACCOUNT_RETURN_TO_PARAM,
+  attachBrowserPushToActiveAccount,
+  switchAccountAndReload,
+} from "../../../features/account-switcher/lib/accountTransition.js";
+import { AccountSwitcher } from "../../../features/account-switcher/ui/AccountSwitcher.jsx";
 import { useGuestProfileLoginMenuBannerImageQuery } from "../../../entities/site-header-banner/model/useGuestProfileLoginMenuBannerImageQuery.js";
 import {
   assertAuthenticatedProfile,
@@ -19,6 +26,7 @@ import { maskRuPhoneInput } from "../../../entities/user/lib/ruPhone.js";
 import { useAuthSession } from "../../../entities/user/model/useAuthSession.js";
 import { resetAuthSessionState } from "../../../shared/api/apiClient.js";
 import {
+  ACCOUNT_SWITCHER_UI,
   API_CLIENT_UI,
   AUTH_UI,
   LOGIN_MODAL_UI,
@@ -39,6 +47,11 @@ import "./AuthPage.css";
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isAddAccountMode = searchParams.get(ADD_ACCOUNT_QUERY_PARAM) === "1";
+  const returnToUserId = searchParams.get(ADD_ACCOUNT_RETURN_TO_PARAM);
+  const [cancelError, setCancelError] = useState("");
+  const [isCancelling, setIsCancelling] = useState(false);
   const queryClient = useQueryClient();
   const heroHeight = useStableAuthHeroHeight();
   const { isAuthorized, isSessionReady } = useAuthSession();
@@ -66,7 +79,12 @@ export function LoginPage() {
       } else {
         await loginUserByPhonePassword({ phoneNumber, password });
       }
-      return assertAuthenticatedProfile(await fetchCurrentUserProfile());
+      const profile = assertAuthenticatedProfile(await fetchCurrentUserProfile());
+      if (isAddAccountMode) {
+        // Push браузера сняли с прежнего аккаунта перед входом — вешаем на новый.
+        await attachBrowserPushToActiveAccount();
+      }
+      return profile;
     },
     onSuccess: (data) => {
       hydrateAuthMeCache(queryClient, data);
@@ -91,7 +109,33 @@ export function LoginPage() {
           : API_CLIENT_UI.LOGIN_FALLBACK
       : "");
 
+  /** Отмена добавления: вернуться в аккаунт, отложенный перед входом. */
+  const handleCancelAddAccount = async () => {
+    if (!returnToUserId) {
+      navigate("/", { replace: true });
+      return;
+    }
+    setCancelError("");
+    setIsCancelling(true);
+    try {
+      await switchAccountAndReload({
+        userId: returnToUserId,
+        prepare: async () => {},
+        targetPath: "/me",
+      });
+    } catch (error) {
+      setCancelError(
+        error instanceof Error ? error.message : ACCOUNT_SWITCHER_UI.ERROR_FALLBACK,
+      );
+      setIsCancelling(false);
+    }
+  };
+
   const handleBack = () => {
+    if (isAddAccountMode) {
+      void handleCancelAddAccount();
+      return;
+    }
     if (window.history.length > 1) {
       navigate(-1);
       return;
@@ -130,8 +174,16 @@ export function LoginPage() {
         <AuthHeroBanner height={heroHeight} imageUrl={bannerImageUrl} />
 
         <div className="auth-page__body">
-          <h1 className="auth-page__title">{AUTH_UI.LOGIN_TITLE}</h1>
-          <p className="auth-page__subtitle">{AUTH_UI.LOGIN_SUBTITLE}</p>
+          <h1 className="auth-page__title">
+            {isAddAccountMode
+              ? ACCOUNT_SWITCHER_UI.ADD_MODE_TITLE
+              : AUTH_UI.LOGIN_TITLE}
+          </h1>
+          <p className="auth-page__subtitle">
+            {isAddAccountMode
+              ? ACCOUNT_SWITCHER_UI.ADD_MODE_HINT
+              : AUTH_UI.LOGIN_SUBTITLE}
+          </p>
           {isEmailAuthEnabled() ? null : (
             <p className="auth-page__notice">{AUTH_UI.EMAIL_AUTH_DISABLED_NOTICE}</p>
           )}
@@ -224,7 +276,25 @@ export function LoginPage() {
             >
               {AUTH_UI.GO_TO_REGISTER}
             </button>
+
+            {isAddAccountMode ? (
+              <button
+                type="button"
+                className="auth-page__link"
+                disabled={isPending || isCancelling}
+                onClick={() => void handleCancelAddAccount()}
+              >
+                {ACCOUNT_SWITCHER_UI.ADD_MODE_CANCEL}
+              </button>
+            ) : null}
+            {cancelError ? (
+              <p className="auth-page__error" role="alert">
+                {cancelError}
+              </p>
+            ) : null}
           </form>
+
+          <AccountSwitcher variant="login" />
         </div>
       </div>
     </section>

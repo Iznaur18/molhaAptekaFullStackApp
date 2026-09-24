@@ -29,3 +29,10 @@ export const REFRESH_COOKIE_MAX_AGE_MS = REFRESH_TOKEN_TTL_DAYS * 24 * 60 * 60 *
  * прозрачно поднимает сессию через `/auth/refresh`.
  */
 export const ACCESS_TOKEN_MAX_AGE_MS = REFRESH_COOKIE_MAX_AGE_MS;
+
+/**
+ * httpOnly cookie с сохранёнными (неактивными) аккаунтами браузера:
+ * `userId:refreshJwt` через запятую. У аккаунтов персонала токена нет —
+ * переключение на них требует входа заново.
+ */
+export const LINKED_SESSIONS_COOKIE_NAME = "linked_sessions";

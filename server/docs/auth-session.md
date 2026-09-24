@@ -75,3 +75,12 @@ Native HTTP-клиенты (React Native) **не отправляют browser CO
 ## Legacy токены
 
 Access JWT без поля `typ` принимается `checkAuthMW` (обратная совместимость до истечения старых cookie).
+
+## Несколько аккаунтов в одном браузере (web)
+
+- Активная сессия — как обычно (`access_token` + `refresh_token`). Остальные аккаунты браузера — в httpOnly cookie `linked_sessions`: `userId:refreshJwt` через запятую, свежий первым, не больше `AUTH_LINKED_ACCOUNTS_MAX - 1` записей.
+- `POST /auth/accounts/stash` откладывает текущую сессию **без** bump `authTokenVersion` (в отличие от `/auth/logout`) и снимает активные cookie. Дальше работает любой обычный вход/регистрация; `issueAuthSession` убирает вошедший аккаунт из списка и пишет связь в `AccountDeviceLink`.
+- `POST /auth/accounts/switch` поднимает сохранённый аккаунт через `issueRotatedAuthSession`, а текущий кладёт в список.
+- Сохранённый аккаунт «требует входа», если его `tv` устарел (вход/refresh/выход на другом устройстве), он заблокирован/отключён, или это персонал (admin/moderator): для персонала токен в список не пишется вовсе.
+- `POST /auth/accounts/remove` — убрать с устройства без отзыва; `POST /auth/accounts/logout-all` — bump версии у всех аккаунтов браузера.
+- Mobile пока не поддерживает (cookie нет); API от этого не ломается.

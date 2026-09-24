@@ -2,6 +2,7 @@ import { USER_DATA } from "../../constants/constants.js";
 import { shouldIncludeAuthTokensInBody } from "../../constants/authClientConstants.js";
 import { setAuthCookie, setRefreshCookie } from "../../utils/authCookie.js";
 import { signAccessToken, signRefreshToken } from "./authTokens.js";
+import { syncLinkedSessionsOnLogin } from "./linkedSessionsLogin.js";
 import {
   bumpUserAuthTokenVersion,
   resolveUserAuthTokenVersion,
@@ -61,14 +62,16 @@ export const buildAuthSessionData = (user, accessToken, refreshToken, req) => {
  * @param {import('mongoose').Document} user
  * @param {import('express').Response} res
  * @param {import('express').Request | null | undefined} [req]
+ * @param {{ isRotation?: boolean }} [options] ротация — тот же аккаунт, не вход
  */
-export const issueAuthSession = (user, res, req) => {
+export const issueAuthSession = (user, res, req, { isRotation = false } = {}) => {
   const userId = user._id.toString();
   const authTokenVersion = resolveUserAuthTokenVersion(user);
   const accessToken = signAccessToken(userId, authTokenVersion);
   const refreshToken = signRefreshToken(userId, authTokenVersion);
   setAuthCookie(res, accessToken);
   setRefreshCookie(res, refreshToken);
+  syncLinkedSessionsOnLogin(req, res, userId, { recordLinks: !isRotation });
   return buildAuthSessionData(user, accessToken, refreshToken, req);
 };
 
@@ -86,5 +89,5 @@ export const issueRotatedAuthSession = async (user, res, req) => {
     typeof user.toObject === "function"
       ? { ...user.toObject(), authTokenVersion }
       : { ...user, authTokenVersion };
-  return issueAuthSession(userWithVersion, res, req);
+  return issueAuthSession(userWithVersion, res, req, { isRotation: true });
 };

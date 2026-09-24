@@ -129,6 +129,7 @@ export {
   DELETE_ACCOUNT_UI,
   USER_PREMIUM_UI,
   USER_DATA_CONFIRMED_UI,
+  ACCOUNT_SWITCHER_UI,
   formatUserProfileRatingLine,
   formatUserProfileRatingValue,
   formatUserProfileRatingVotesLabel,
