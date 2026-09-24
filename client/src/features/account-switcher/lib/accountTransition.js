@@ -6,6 +6,7 @@ import {
   stashActiveAccount,
   switchLinkedAccount,
 } from "../../../entities/user/api/linkedAccountsApi.js";
+import { clearDevAuthTokens } from "../../../shared/api/devAuthTokenStorage.js";
 import { isWebPushSupported } from "../../web-push/lib/webPushBrowser.js";
 import { notifyAccountChanged } from "./accountChangeBroadcast.js";
 
@@ -62,6 +63,7 @@ export async function attachBrowserPushToActiveAccount() {
  * @param {string} path
  */
 export function reloadIntoAccount(path) {
+  clearDevAuthTokens();
   notifyAccountChanged();
   window.location.assign(path);
 }
@@ -86,6 +88,9 @@ export async function switchAccountAndReload({
   }
   try {
     await switchLinkedAccount(userId);
+    // Vite DEV держит сессию ещё и Bearer-токенами во вкладке: без очистки
+    // они вернули бы прежний аккаунт поверх новых cookie.
+    clearDevAuthTokens();
   } catch (error) {
     // Остались в прежнем аккаунте — возвращаем ему push.
     await attachBrowserPushToActiveAccount();
@@ -107,6 +112,7 @@ export async function startAddAccount({ prepare, returnToUserId }) {
   await detachBrowserPush();
   try {
     await stashActiveAccount();
+    clearDevAuthTokens();
   } catch (error) {
     await attachBrowserPushToActiveAccount();
     throw error;

@@ -78,12 +78,15 @@ export function useAccountSwitcher({
       setPendingUserId(account.userId);
       try {
         if (account.requiresLogin) {
-          // «Войти снова» = добавочный вход; у гостя форма входа уже открыта.
+          // «Войти снова» = добавочный вход; без активного аккаунта — обычная
+          // форма входа (раньше клик здесь молча ничего не делал).
           if (activeAccount) {
             await startAddAccount({
               prepare: onPrepareAccountChange,
               returnToUserId: activeAccount.userId,
             });
+          } else {
+            reloadIntoAccount("/login");
           }
           return;
         }
