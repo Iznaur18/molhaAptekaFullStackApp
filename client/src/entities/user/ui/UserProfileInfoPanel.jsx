@@ -29,7 +29,11 @@ import "./UserProfileInfoPanel.css";
 
 const PHONE_ROW_ID = PROFILE_ROW_ID.PHONE;
 const STATS_SECTION_ID = PROFILE_SECTION_ID.STATS;
-const STATS_WIDE_ROW_ID = PROFILE_ROW_ID.LOYALTY_POINTS;
+/** Карточки на всю ширину сетки: часы работы (длинный текст) и баллы. */
+const STATS_WIDE_ROW_IDS = new Set([
+  PROFILE_ROW_ID.BUSINESS_HOURS,
+  PROFILE_ROW_ID.LOYALTY_POINTS,
+]);
 const SPARKLINE_WIDTH = 72;
 const SPARKLINE_HEIGHT = 28;
 
@@ -125,7 +129,7 @@ function ProfileDetailsSection({
             <ProfileStatCard
               key={row.id}
               row={row}
-              isWide={row.id === STATS_WIDE_ROW_ID}
+              isWide={STATS_WIDE_ROW_IDS.has(row.id)}
               onRowAction={rowActions?.[row.id] ?? null}
               trend={resolveRowTrend(row.id, trendsQuery.data)}
             />

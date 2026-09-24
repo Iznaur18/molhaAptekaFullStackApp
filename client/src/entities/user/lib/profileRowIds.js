@@ -7,6 +7,7 @@ export const PROFILE_ROW_ID = {
   TOTAL_SALES_AMOUNT: "totalSalesAmount",
   TOTAL_PURCHASES_AMOUNT: "totalPurchasesAmount",
   RATING: "userRatingByVotes",
+  BUSINESS_HOURS: "userBusinessHours",
   LOYALTY_POINTS: "userLoyaltyPoints",
 };
 
