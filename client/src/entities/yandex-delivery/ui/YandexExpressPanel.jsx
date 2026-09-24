@@ -2,6 +2,10 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
+import { resolveShipmentStatusTone } from "../../../shared/lib/shipmentStatusTone.js";
+import { AppIcon } from "../../../shared/ui/icon/index.js";
+import { ShipmentStatusPill } from "../../../shared/ui/ShipmentStatus/ShipmentStatus.jsx";
+import { Zap } from "lucide-react";
 import {
   createYandexExpressClaim,
   refreshYandexExpressClaim,
@@ -127,8 +131,17 @@ export function YandexExpressPanel({ orderId, shipment, closed = false, onChange
     .join(", кв. ");
 
   return (
-    <section className="cdek-waybill-panel" aria-label={UI.TITLE}>
-      <h4 className="cdek-waybill-panel__title">{UI.TITLE}</h4>
+    <section
+      className="cdek-waybill-panel"
+      data-carrier="express"
+      aria-label={UI.TITLE}
+    >
+      <h4 className="cdek-waybill-panel__title">
+        <span className="cdek-waybill-panel__title-icon" aria-hidden="true">
+          <AppIcon icon={Zap} size="sm" strokeWidth={2.25} />
+        </span>
+        {UI.TITLE}
+      </h4>
       <dl className="cdek-waybill-panel__facts">
         {snapshot.pickup?.address ? (
           <div className="cdek-waybill-panel__fact">
@@ -152,7 +165,7 @@ export function YandexExpressPanel({ orderId, shipment, closed = false, onChange
           </div>
         ) : null}
         {snapshot.deliverySumRub ? (
-          <div className="cdek-waybill-panel__fact">
+          <div className="cdek-waybill-panel__fact cdek-waybill-panel__fact--money">
             <dt>{UI.DELIVERY_PAID_BY_BUYER}</dt>
             <dd>{formatPriceRub(snapshot.deliverySumRub)}</dd>
           </div>
@@ -166,7 +179,15 @@ export function YandexExpressPanel({ orderId, shipment, closed = false, onChange
         {hasClaim ? (
           <div className="cdek-waybill-panel__fact">
             <dt>{UI.STATUS}</dt>
-            <dd>{STATUS_LABELS[status] ?? status}</dd>
+            <dd>
+              <ShipmentStatusPill
+                tone={resolveShipmentStatusTone(status, {
+                  cancelled: Boolean(claim?.cancelledAt),
+                })}
+              >
+                {STATUS_LABELS[status] ?? status}
+              </ShipmentStatusPill>
+            </dd>
           </div>
         ) : null}
         {active && claim?.pickupCode ? (

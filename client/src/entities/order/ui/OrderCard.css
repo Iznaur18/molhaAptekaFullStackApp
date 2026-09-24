@@ -905,28 +905,101 @@
   color: var(--iz-color-text-muted, var(--iz-color-text));
 }
 
-/* Кто приедет за заказом: строка спокойнее кодов — это справка, не действие. */
+/* Кто приедет за заказом: карточка — аватар, имя, машина, кнопка «Позвонить». */
 .order-card__courier {
-  margin: 0.4rem 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0.6rem 0 0;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.9rem;
+  background: var(--iz-color-surface);
   font-size: 0.9rem;
   color: var(--iz-color-text);
 }
 
+.order-card__courier-avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+}
+
+.order-card__courier-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
 .order-card__courier-label {
+  font-size: 0.75rem;
   color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
+.order-card__courier-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem;
+  font-size: 0.95rem;
+}
+
+.order-card__courier-rating {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--iz-color-warning-text, var(--iz-color-text-muted));
+}
+
+/* Машина — чтобы узнать курьера у подъезда. */
+.order-card__courier-car {
+  font-size: 0.82rem;
+  color: var(--iz-color-text-secondary, var(--iz-color-text-muted));
+  overflow-wrap: anywhere;
 }
 
 /* Телефон курьера службы: по нему звонят и продавец, и покупатель. */
 .order-card__courier-phone {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.5rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast, #fff);
+  font-size: 0.85rem;
   font-weight: 700;
-  color: var(--iz-color-accent, #f2542d);
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
-.order-card__courier-rating,
-.order-card__courier-car {
-  color: var(--iz-color-text-muted, var(--iz-color-text));
+.order-card__courier-phone:hover {
+  background: var(--iz-color-action-hover, var(--iz-color-action));
+}
+
+.order-card__courier-phone:focus-visible {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 2px;
+}
+
+/* На узком экране кнопка с номером уходит под имя, номер остаётся виден. */
+@media (max-width: 420px) {
+  .order-card__courier {
+    flex-wrap: wrap;
+  }
+
+  .order-card__courier-phone {
+    margin-left: calc(2.4rem + 0.65rem);
+  }
 }
 
 .order-card__courier-link {
@@ -999,36 +1072,105 @@
   line-height: 1.45;
 }
 
-/* Доставка ЛОБО: статус службы, «Где курьер», сумма курьеру. */
+/* Доставка ЛОБО: шапка со статусом, откуда заберут, плашки «требует
+   внимания» (деньги курьеру, вызов курьера) и «Где курьер». */
 .order-card__carrier {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 0.3rem;
+  align-items: stretch;
+  gap: 0.6rem;
   margin-top: 0.6rem;
-  padding: 0.65rem 0.75rem;
+  padding: 0.75rem;
   border: 1px solid var(--iz-color-border);
-  border-radius: 0.75rem;
+  border-radius: 0.9rem;
+  background: var(--iz-color-surface);
   font-size: 0.9rem;
   line-height: 1.45;
   color: var(--iz-color-text);
 }
 
-.order-card__carrier-line,
-.order-card__carrier-hint {
-  margin: 0;
+.order-card__carrier-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.order-card__carrier-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.6rem;
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+}
+
+.order-card__carrier-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.order-card__carrier-fact {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.order-card__carrier-fact-icon {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  color: var(--iz-color-text-muted);
+}
+
+.order-card__carrier-fact-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.order-card__carrier-fact-label {
+  font-size: 0.8rem;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
+.order-card__carrier-fact-value {
+  font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .order-card__carrier-hint {
-  font-size: 0.85rem;
+  margin: 0;
+  font-size: 0.8rem;
   color: var(--iz-color-text-muted, var(--iz-color-text));
 }
 
 .order-card__carrier-link {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.25rem;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--iz-color-action);
+  border-radius: 999px;
+  color: var(--iz-color-action);
   font-weight: 700;
-  color: var(--iz-color-accent, #f2542d);
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration: none;
+}
+
+.order-card__carrier-link:hover {
+  background: var(--iz-color-action-soft);
+}
+
+.order-card__carrier-link:focus-visible {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 2px;
 }
 
 /* Комментарий покупателя к доставке (подъезд, этаж, кв). */

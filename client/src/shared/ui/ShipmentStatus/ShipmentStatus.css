@@ -1,0 +1,117 @@
+/* Цветная метка статуса доставки. */
+.shipment-status-pill {
+  --pill-fg: var(--iz-color-text-secondary);
+  --pill-bg: var(--iz-color-surface-muted);
+  --pill-dot: var(--iz-color-text-muted);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+  padding: 0.2rem 0.6rem 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: var(--pill-bg);
+  color: var(--pill-fg);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.shipment-status-pill__dot {
+  flex-shrink: 0;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--pill-dot);
+}
+
+.shipment-status-pill[data-tone="success"] {
+  --pill-fg: var(--iz-color-success-text);
+  --pill-bg: var(--iz-color-success-surface);
+  --pill-dot: var(--iz-color-success);
+}
+
+.shipment-status-pill[data-tone="danger"] {
+  --pill-fg: var(--iz-color-danger-text);
+  --pill-bg: var(--iz-color-danger-surface);
+  --pill-dot: var(--iz-color-danger);
+}
+
+.shipment-status-pill[data-tone="warning"] {
+  --pill-fg: var(--iz-color-warning-text);
+  --pill-bg: var(--iz-color-warning-surface);
+  --pill-dot: var(--iz-color-warning);
+}
+
+.shipment-status-pill[data-tone="info"] {
+  --pill-fg: var(--iz-color-info-deep);
+  --pill-bg: var(--iz-color-info-soft);
+  --pill-dot: var(--iz-color-info);
+}
+
+/* Плашка «требует внимания». */
+.shipment-callout {
+  --callout-fg: var(--iz-color-text);
+  --callout-bg: var(--iz-color-surface-muted);
+  --callout-border: var(--iz-color-border);
+  --callout-icon-bg: var(--iz-color-text-secondary);
+
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--callout-border);
+  border-radius: 0.7rem;
+  background: var(--callout-bg);
+  color: var(--callout-fg);
+}
+
+.shipment-callout__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--callout-icon-bg);
+  color: var(--iz-color-on-contrast, #fff);
+}
+
+.shipment-callout__text {
+  align-self: center;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.shipment-callout__text strong {
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* Деньги: сколько отдать курьеру. */
+.shipment-callout[data-tone="warning"] {
+  --callout-fg: var(--iz-color-warning-text);
+  --callout-bg: var(--iz-color-warning-surface);
+  --callout-border: var(--iz-color-warning-border);
+  --callout-icon-bg: var(--iz-color-warning);
+}
+
+/* Что сделать продавцу. */
+.shipment-callout[data-tone="action"] {
+  --callout-fg: var(--iz-color-text);
+  --callout-bg: var(--iz-color-action-soft);
+  --callout-border: var(--iz-color-action-border);
+  --callout-icon-bg: var(--iz-color-action);
+}
+
+.shipment-callout[data-tone="info"] {
+  --callout-fg: var(--iz-color-info-deep);
+  --callout-bg: var(--iz-color-info-soft);
+  --callout-border: color-mix(in srgb, var(--iz-color-info) 30%, transparent);
+  --callout-icon-bg: var(--iz-color-info);
+}

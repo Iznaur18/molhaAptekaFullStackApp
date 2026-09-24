@@ -1,5 +1,6 @@
 import { resolveOrderShippingTrackingUrl } from "@molha/api-contract";
 import { useState } from "react";
+import { Bike, Phone } from "lucide-react";
 
 import {
   ORDER_STATUS_DELIVERED,
@@ -63,6 +64,7 @@ import {
   toRuPhoneTelHref,
 } from "../../user/lib/ruPhone.js";
 
+import { AppIcon } from "../../../shared/ui/icon/index.js";
 import "./OrderCard.css";
 
 const formatPaymentMethod = (method) =>
@@ -1044,53 +1046,59 @@ export function OrderCard({
       {/* Кто приедет: имя, рейтинг и авто. Паспорта курьера тут нет и быть
           не должно — сторонам сделки хватает того, что видно у машины. */}
       {shipmentOwn?.courier ? (
-        <p className="order-card__courier">
-          <span className="order-card__courier-label">
-            {ORDER_CARD_UI.SHIPMENT_COURIER}:
-          </span>{" "}
-          {onCourierNameClick && shipmentOwn.courierId ? (
-            <button
-              type="button"
-              className="order-card__courier-link"
-              onClick={() => onCourierNameClick(String(shipmentOwn.courierId))}
-            >
-              {shipmentOwn.courier.userName}
-            </button>
-          ) : (
-            <strong>{shipmentOwn.courier.userName}</strong>
-          )}
+        <div className="order-card__courier">
+          <span className="order-card__courier-avatar" aria-hidden="true">
+            <AppIcon icon={Bike} size="sm" strokeWidth={2.25} />
+          </span>
+          <div className="order-card__courier-body">
+            <span className="order-card__courier-label">
+              {ORDER_CARD_UI.SHIPMENT_COURIER}
+            </span>
+            <span className="order-card__courier-name">
+              {onCourierNameClick && shipmentOwn.courierId ? (
+                <button
+                  type="button"
+                  className="order-card__courier-link"
+                  onClick={() => onCourierNameClick(String(shipmentOwn.courierId))}
+                >
+                  {shipmentOwn.courier.userName}
+                </button>
+              ) : (
+                <strong>{shipmentOwn.courier.userName}</strong>
+              )}
+              {shipmentOwn.courier.rating != null ? (
+                <span className="order-card__courier-rating">
+                  {ORDER_CARD_UI.SHIPMENT_COURIER_RATING(shipmentOwn.courier.rating)}
+                </span>
+              ) : null}
+            </span>
+            {ORDER_CARD_UI.SHIPMENT_COURIER_CAR(
+              shipmentOwn.courier.vehicleMake,
+              shipmentOwn.courier.vehicleColor,
+              shipmentOwn.courier.vehiclePlate,
+            ) ? (
+              <span className="order-card__courier-car">
+                {ORDER_CARD_UI.SHIPMENT_COURIER_CAR(
+                  shipmentOwn.courier.vehicleMake,
+                  shipmentOwn.courier.vehicleColor,
+                  shipmentOwn.courier.vehiclePlate,
+                )}
+              </span>
+            ) : null}
+          </div>
           {/* Телефон есть только у курьера внешней службы: своего курьера
               стороны вызывают внутри заказа, чужому нужно звонить. */}
           {toRuPhoneTelHref(shipmentOwn.courier.phone) ? (
             <a
               className="order-card__courier-phone"
               href={toRuPhoneTelHref(shipmentOwn.courier.phone)}
+              aria-label={`${ORDER_CARD_UI.SHIPMENT_COURIER_CALL} ${formatRuPhoneDisplayOrEmpty(shipmentOwn.courier.phone)}`}
             >
-              {" "}
-              {formatRuPhoneDisplayOrEmpty(shipmentOwn.courier.phone)}
+              <AppIcon icon={Phone} size="sm" strokeWidth={2.25} />
+              <span>{formatRuPhoneDisplayOrEmpty(shipmentOwn.courier.phone)}</span>
             </a>
           ) : null}
-          {shipmentOwn.courier.rating != null ? (
-            <span className="order-card__courier-rating">
-              {" "}
-              {ORDER_CARD_UI.SHIPMENT_COURIER_RATING(shipmentOwn.courier.rating)}
-            </span>
-          ) : null}
-          {ORDER_CARD_UI.SHIPMENT_COURIER_CAR(
-            shipmentOwn.courier.vehicleMake,
-            shipmentOwn.courier.vehicleColor,
-            shipmentOwn.courier.vehiclePlate,
-          ) ? (
-            <span className="order-card__courier-car">
-              {" · "}
-              {ORDER_CARD_UI.SHIPMENT_COURIER_CAR(
-                shipmentOwn.courier.vehicleMake,
-                shipmentOwn.courier.vehicleColor,
-                shipmentOwn.courier.vehiclePlate,
-              )}
-            </span>
-          ) : null}
-        </p>
+        </div>
       ) : null}
 
       <OrderCardLoboShipment

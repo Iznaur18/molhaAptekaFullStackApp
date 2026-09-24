@@ -3,6 +3,10 @@ import { useState } from "react";
 
 import { downloadBlob } from "../../../shared/lib/downloadBlob.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
+import { resolveShipmentStatusTone } from "../../../shared/lib/shipmentStatusTone.js";
+import { AppIcon } from "../../../shared/ui/icon/index.js";
+import { ShipmentStatusPill } from "../../../shared/ui/ShipmentStatus/ShipmentStatus.jsx";
+import { Truck } from "lucide-react";
 import {
   createYandexDeliveryRequest,
   fetchYandexDeliveryLabel,
@@ -84,8 +88,13 @@ export function YandexShipmentPanel({ orderId, shipment, closed = false, onChang
   const error = createMutation.error ?? refreshMutation.error ?? labelMutation.error;
 
   return (
-    <section className="cdek-waybill-panel" aria-label={UI.TITLE}>
-      <h4 className="cdek-waybill-panel__title">{UI.TITLE}</h4>
+    <section className="cdek-waybill-panel" data-carrier="yandex" aria-label={UI.TITLE}>
+      <h4 className="cdek-waybill-panel__title">
+        <span className="cdek-waybill-panel__title-icon" aria-hidden="true">
+          <AppIcon icon={Truck} size="sm" strokeWidth={2.25} />
+        </span>
+        {UI.TITLE}
+      </h4>
       <dl className="cdek-waybill-panel__facts">
         {snapshot.pickupPoint?.address ? (
           <div className="cdek-waybill-panel__fact">
@@ -103,7 +112,7 @@ export function YandexShipmentPanel({ orderId, shipment, closed = false, onChang
           </div>
         ) : null}
         {snapshot.deliverySumRub ? (
-          <div className="cdek-waybill-panel__fact">
+          <div className="cdek-waybill-panel__fact cdek-waybill-panel__fact--money">
             <dt>{UI.DELIVERY_PAID_BY_BUYER}</dt>
             <dd>{formatPriceRub(snapshot.deliverySumRub)}</dd>
           </div>
@@ -117,7 +126,15 @@ export function YandexShipmentPanel({ orderId, shipment, closed = false, onChang
         {request?.requestId && (request.statusDescription || request.status) ? (
           <div className="cdek-waybill-panel__fact">
             <dt>{UI.STATUS}</dt>
-            <dd>{request.statusDescription || request.status}</dd>
+            <dd>
+              <ShipmentStatusPill
+                tone={resolveShipmentStatusTone(request.status, {
+                  cancelled: Boolean(request.cancelledAt),
+                })}
+              >
+                {request.statusDescription || request.status}
+              </ShipmentStatusPill>
+            </dd>
           </div>
         ) : null}
         {request?.sharingUrl ? (

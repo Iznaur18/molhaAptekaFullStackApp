@@ -42,7 +42,7 @@ describe("доставка ЛОБО в карточке заказа", () => {
       />,
     );
 
-    expect(screen.getByText("ещё не вызван")).toBeTruthy();
+    expect(screen.getByText("Не вызван")).toBeTruthy();
     expect(screen.getByText(/«Готов к отгрузке»/)).toBeTruthy();
   });
 
