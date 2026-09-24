@@ -92,7 +92,7 @@ import { resolveWizardFooterPaddingBottom } from "@/shared/theme/screenContentLa
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-/** Паритет web: `@container app-viewport (min-width: 40rem)` в CreateProductWizard.css. */
+/** Паритет web: `@media (min-width: 40rem)` в CreateProductWizard.css. */
 const WIZARD_COLUMN_MAX_WIDTH = 640;
 
 const WIZARD_STEPS = [

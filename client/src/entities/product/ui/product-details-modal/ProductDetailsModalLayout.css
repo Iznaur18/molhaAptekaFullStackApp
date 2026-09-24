@@ -58,7 +58,7 @@
   scroll-margin-top: var(--product-details-modal-gap);
 }
 
-@container app-viewport (max-width: 36rem) {
+@media (max-width: 36rem) {
   .product-details-modal__row-top {
     grid-template-columns: 1fr;
   }

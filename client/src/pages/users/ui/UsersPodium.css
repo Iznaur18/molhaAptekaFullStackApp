@@ -165,7 +165,7 @@
   text-align: center;
 }
 
-@container app-viewport (max-width: 640px) {
+@media (max-width: 640px) {
   .users-podium__row {
     gap: 0.35rem;
   }

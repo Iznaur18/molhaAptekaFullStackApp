@@ -404,7 +404,7 @@
   gap: 0.75rem;
 }
 
-@container app-viewport (max-width: 1023px) {
+@media (max-width: 1023px) {
   .my-profile-page--catalog-grid-tab {
     --my-profile-mobile-inline-inset: 0.1rem;
     --my-profile-shell-content-gutter: calc(
@@ -446,7 +446,7 @@
   }
 }
 
-@container app-viewport (max-width: 640px) {
+@media (max-width: 640px) {
   .my-profile-page--catalog-grid-tab {
     --my-profile-mobile-inline-inset: 0.05rem;
     --my-profile-catalog-grid-gap: 0.1rem;
@@ -875,7 +875,7 @@
   }
 }
 
-@container app-viewport (max-width: 900px) {
+@media (max-width: 900px) {
   .my-profile-page__layout {
     flex-direction: column;
   }
@@ -912,7 +912,7 @@
 }
 
 /* Phone ≤640: паритет Expo — filled toggle + sheet справа */
-@container app-viewport (max-width: 640px) {
+@media (max-width: 640px) {
   .my-profile-page {
     --modal-avatar-lead-size: 4.5rem;
   }
@@ -989,7 +989,7 @@
   }
 }
 
-@container app-viewport (max-width: 560px) {
+@media (max-width: 560px) {
   .my-profile-page__nav-button {
     font-size: 0.92rem;
     padding-top: 0.62rem;

@@ -73,11 +73,8 @@ test("web catalog grid constants: 903 breakpoint + min column width", () => {
 test("web AppShell.css: 3 cols up to 903px", () => {
   const css = readRepoFile("client/src/app/ui/AppShell.css");
 
-  assert.match(
-    css,
-    /@container app-viewport \(max-width: 903px\)[\s\S]*repeat\(3, minmax\(0, 1fr\)\)/,
-  );
-  assert.match(css, /@container app-viewport \(max-width: 903px\)[\s\S]*gap: 0\.15rem/);
+  assert.match(css, /@media \(max-width: 903px\)[\s\S]*repeat\(3, minmax\(0, 1fr\)\)/);
+  assert.match(css, /@media \(max-width: 903px\)[\s\S]*gap: 0\.15rem/);
 });
 
 test("resolveCatalogProductGridColumns: never below 3", () => {

@@ -1,4 +1,4 @@
-@container app-viewport (max-width: 640px) {
+@media (max-width: 640px) {
   .wishlist-page__state,
   .wishlist-page__hint {
     padding: 0.35rem 0.15rem;

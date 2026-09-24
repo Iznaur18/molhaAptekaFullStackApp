@@ -46,7 +46,7 @@
   pointer-events: auto;
 }
 
-@container app-viewport (min-width: 641px) {
+@media (min-width: 641px) {
   .create-raffle-modal__backdrop {
     align-items: center;
     justify-content: center;

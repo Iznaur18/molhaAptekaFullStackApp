@@ -23,14 +23,14 @@
   list-style: none;
 }
 
-@container app-viewport (min-width: 641px) {
+@media (min-width: 641px) {
   .catalog-categories-grid__list {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
 /* mobile: ≥900 → 6 колонок */
-@container app-viewport (min-width: 900px) {
+@media (min-width: 900px) {
   .catalog-categories-grid__list {
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }

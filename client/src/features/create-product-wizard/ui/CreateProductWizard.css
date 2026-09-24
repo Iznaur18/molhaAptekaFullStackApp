@@ -26,7 +26,7 @@
   background: var(--iz-color-surface);
 }
 
-@container app-viewport (min-width: 40rem) {
+@media (min-width: 40rem) {
   .product-modal-shell__backdrop:has(.create-product-wizard__panel) {
     padding-inline: max(0px, calc((100vw - 40rem) / 2));
   }
@@ -290,7 +290,7 @@
   cursor: not-allowed;
 }
 
-@container app-viewport (max-width: 560px) {
+@media (max-width: 560px) {
   .create-product-wizard__panel .product-modal-shell__header,
   .create-product-wizard__body,
   .create-product-wizard__footer {

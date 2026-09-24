@@ -214,7 +214,7 @@
   color: var(--iz-color-action-hover);
 }
 
-@container app-viewport (max-width: 36rem) {
+@media (max-width: 36rem) {
   .product-details-modal__meta-grid {
     grid-template-columns: 1fr;
   }

@@ -2,7 +2,7 @@
  * Компактные карточки каталога (mobile + tablet ≤1023px).
  * Фото 1:1 (--product-card-image-aspect-ratio); бейджи/цена — фиксированная сетка строк.
  */
-@container app-viewport (max-width: 1023px) {
+@media (max-width: 1023px) {
   .product-card:not(.product-card--banner-layout):not(.product-card--list),
   .app-shell__cell:not(.app-shell__cell--tier3-full-width) {
     /* Паритет с mobile PRODUCT_CARD_MOBILE_CATALOG_LAYOUT */
@@ -493,7 +493,7 @@
   }
 }
 
-@container app-viewport (max-width: 420px) {
+@media (max-width: 420px) {
   .app-shell__cell:not(.app-shell__cell--tier3-full-width):has(
       .product-card__seller-toolbar
     ),

@@ -1,4 +1,4 @@
-@container app-viewport (max-width: 640px) {
+@media (max-width: 640px) {
   .subscriptions-page__state {
     padding: 0.35rem 0.15rem;
   }

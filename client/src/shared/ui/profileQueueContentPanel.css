@@ -12,7 +12,7 @@
   padding-block: 0.15rem;
 }
 
-@container app-viewport (max-width: 640px) {
+@media (max-width: 640px) {
   .profile-queue-content-panel {
     --profile-queue-list-gap: 1.15rem;
     --profile-queue-content-padding-block: 1.1rem;
