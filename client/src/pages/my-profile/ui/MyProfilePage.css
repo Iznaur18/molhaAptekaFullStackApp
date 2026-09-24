@@ -653,6 +653,95 @@
   width: 100%;
 }
 
+/* Группа «Аккаунты»: строка = nav-button, аватар на месте иконки. */
+.my-profile-page__account-item {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.my-profile-page__account-button {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Текущий аккаунт не нажимается, но и не должен выглядеть «выключенным». */
+.my-profile-page__account-button[aria-current="true"]:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.my-profile-page__nav-icon_avatar {
+  overflow: hidden;
+  border-radius: 50%;
+  font-size: 0.8rem;
+}
+
+.my-profile-page__account-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.my-profile-page__account-label .user-premium-name {
+  max-width: 100%;
+}
+
+.my-profile-page__account-hint {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--iz-color-text-muted);
+}
+
+.my-profile-page__account-check {
+  flex-shrink: 0;
+  color: var(--iz-color-action);
+}
+
+.my-profile-page__account-remove {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0.6rem;
+  background: transparent;
+  color: var(--iz-color-text-muted);
+  cursor: pointer;
+}
+
+.my-profile-page__account-remove:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--iz-color-danger) 10%, transparent);
+  color: var(--iz-color-danger);
+}
+
+.my-profile-page__account-remove:focus-visible {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 2px;
+}
+
+.my-profile-page__account-remove:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.my-profile-page__account-note {
+  margin: 0.3rem 0 0;
+  padding: 0 0.55rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--iz-color-text-muted);
+}
+
+.my-profile-page__account-note_error {
+  color: var(--iz-color-danger);
+}
+
 .my-profile-page__logout-confirm {
   display: flex;
   flex-direction: column;

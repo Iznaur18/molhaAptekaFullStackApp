@@ -10,7 +10,8 @@ import {
   attachBrowserPushToActiveAccount,
   switchAccountAndReload,
 } from "../../../features/account-switcher/lib/accountTransition.js";
-import { AccountSwitcher } from "../../../features/account-switcher/ui/AccountSwitcher.jsx";
+import { notifyAccountChanged } from "../../../features/account-switcher/lib/accountChangeBroadcast.js";
+import { SavedAccountsList } from "../../../features/account-switcher/ui/SavedAccountsList.jsx";
 import { useGuestProfileLoginMenuBannerImageQuery } from "../../../entities/site-header-banner/model/useGuestProfileLoginMenuBannerImageQuery.js";
 import {
   assertAuthenticatedProfile,
@@ -83,6 +84,7 @@ export function LoginPage() {
       if (isAddAccountMode) {
         // Push браузера сняли с прежнего аккаунта перед входом — вешаем на новый.
         await attachBrowserPushToActiveAccount();
+        notifyAccountChanged();
       }
       return profile;
     },
@@ -294,7 +296,7 @@ export function LoginPage() {
             ) : null}
           </form>
 
-          <AccountSwitcher variant="login" />
+          <SavedAccountsList />
         </div>
       </div>
     </section>

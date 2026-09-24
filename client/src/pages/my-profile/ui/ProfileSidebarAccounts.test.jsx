@@ -1,16 +1,19 @@
 import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { ACCOUNT_SWITCHER_UI } from "../../../shared/config/appUiCopy.js";
 import { renderWithProviders } from "../../../test/renderWithProviders.jsx";
-import { AccountSwitcher } from "./AccountSwitcher.jsx";
+import { useAccountSwitcher } from "../../../features/account-switcher/model/useAccountSwitcher.js";
+import { ProfileSidebarAccounts } from "./ProfileSidebarAccounts.jsx";
 
 const fetchLinkedAccounts = vi.fn();
+const removeLinkedAccount = vi.fn(async () => ({ removedActive: false }));
 
 vi.mock("../../../entities/user/api/linkedAccountsApi.js", () => ({
   fetchLinkedAccounts: () => fetchLinkedAccounts(),
   logoutAllLinkedAccounts: vi.fn(),
-  removeLinkedAccount: vi.fn(),
+  removeLinkedAccount: (userId) => removeLinkedAccount(userId),
 }));
 
 /** @param {Partial<Record<string, unknown>>} overrides */
@@ -25,8 +28,13 @@ const account = (overrides) => ({
   ...overrides,
 });
 
-describe("AccountSwitcher", () => {
-  it("профиль: активный отмечен, остальные переключаемы, есть «Добавить»", async () => {
+function Harness() {
+  const switcher = useAccountSwitcher();
+  return <ProfileSidebarAccounts switcher={switcher} />;
+}
+
+describe("ProfileSidebarAccounts", () => {
+  it("текущий отмечен и не бледный, остальные переключаемы, есть «Добавить»", async () => {
     fetchLinkedAccounts.mockResolvedValue({
       accounts: [
         account({ userName: "alice", isActive: true }),
@@ -35,13 +43,13 @@ describe("AccountSwitcher", () => {
       ],
       maxAccounts: 5,
     });
-    renderWithProviders(<AccountSwitcher />);
+    renderWithProviders(<Harness />);
 
     const active = await screen.findByRole("button", {
       name: `${ACCOUNT_SWITCHER_UI.ACTIVE_ARIA}: alice`,
     });
-    expect(active).toBeDisabled();
     expect(active).toHaveAttribute("aria-current", "true");
+    expect(active).toHaveClass("my-profile-page__nav-button_active");
     expect(
       screen.getByRole("button", { name: ACCOUNT_SWITCHER_UI.SWITCH_ARIA("bob") }),
     ).toBeEnabled();
@@ -50,11 +58,38 @@ describe("AccountSwitcher", () => {
       screen.getByRole("button", { name: ACCOUNT_SWITCHER_UI.ADD }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: ACCOUNT_SWITCHER_UI.LOGOUT_ALL }),
-    ).toBeInTheDocument();
+      screen.queryByRole("button", { name: ACCOUNT_SWITCHER_UI.REMOVE_ARIA("alice") }),
+    ).toBeNull();
   });
 
-  it("профиль: на лимите вместо «Добавить» — подсказка", async () => {
+  it("«Убрать» спрашивает подтверждение на месте и только потом убирает", async () => {
+    const user = userEvent.setup();
+    fetchLinkedAccounts.mockResolvedValue({
+      accounts: [
+        account({ userName: "alice", isActive: true }),
+        account({ userId: "b".repeat(24), userName: "bob" }),
+      ],
+      maxAccounts: 5,
+    });
+    renderWithProviders(<Harness />);
+
+    await user.click(
+      await screen.findByRole("button", {
+        name: ACCOUNT_SWITCHER_UI.REMOVE_ARIA("bob"),
+      }),
+    );
+    expect(
+      screen.getByText(ACCOUNT_SWITCHER_UI.REMOVE_CONFIRM("bob")),
+    ).toBeInTheDocument();
+    expect(removeLinkedAccount).not.toHaveBeenCalled();
+
+    await user.click(
+      screen.getByRole("button", { name: ACCOUNT_SWITCHER_UI.REMOVE_YES }),
+    );
+    expect(removeLinkedAccount).toHaveBeenCalledWith("b".repeat(24));
+  });
+
+  it("на лимите вместо «Добавить» — подсказка", async () => {
     fetchLinkedAccounts.mockResolvedValue({
       accounts: Array.from({ length: 5 }, (_, index) =>
         account({
@@ -65,33 +100,11 @@ describe("AccountSwitcher", () => {
       ),
       maxAccounts: 5,
     });
-    renderWithProviders(<AccountSwitcher />);
+    renderWithProviders(<Harness />);
 
     expect(
       await screen.findByText(ACCOUNT_SWITCHER_UI.LIMIT_REACHED(5)),
     ).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: ACCOUNT_SWITCHER_UI.ADD })).toBeNull();
-  });
-
-  it("вход: без сохранённых аккаунтов ничего не рисует", async () => {
-    fetchLinkedAccounts.mockResolvedValue({ accounts: [], maxAccounts: 5 });
-    const { container } = renderWithProviders(<AccountSwitcher variant="login" />);
-    await Promise.resolve();
-    expect(container.querySelector(".account-switcher")).toBeNull();
-  });
-
-  it("вход: аккаунт, требующий пароля, нельзя выбрать", async () => {
-    fetchLinkedAccounts.mockResolvedValue({
-      accounts: [account({ userName: "bob", requiresLogin: true })],
-      maxAccounts: 5,
-    });
-    renderWithProviders(<AccountSwitcher variant="login" />);
-
-    expect(
-      await screen.findByRole("button", {
-        name: ACCOUNT_SWITCHER_UI.SWITCH_ARIA("bob"),
-      }),
-    ).toBeDisabled();
     expect(screen.queryByRole("button", { name: ACCOUNT_SWITCHER_UI.ADD })).toBeNull();
   });
 });

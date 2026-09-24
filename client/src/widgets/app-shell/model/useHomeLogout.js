@@ -4,7 +4,10 @@ import { CART_STORAGE_KEY } from "../../../entities/order/model/constants.js";
 import { clearAllDataConfirmationFormDrafts } from "../../../entities/user-data-confirmation/lib/dataConfirmationFormDraftStorage.js";
 import { fetchLinkedAccounts } from "../../../entities/user/api/linkedAccountsApi.js";
 import { useLogoutMutation } from "../../../entities/user/model/useLogoutMutation.js";
-import { switchAccountAndReload } from "../../../features/account-switcher/lib/accountTransition.js";
+import {
+  detachBrowserPush,
+  switchAccountAndReload,
+} from "../../../features/account-switcher/lib/accountTransition.js";
 import { EMPTY_MY_PROFILE_PAGE } from "../lib/catalogShellConstants.js";
 
 /**
@@ -62,17 +65,22 @@ export const useHomeLogout = ({
 
   return useCallback(async () => {
     await prepareAccountChange();
+    // «Выйти» — только из текущего: если на устройстве есть ещё аккаунт,
+    // переходим в него, а не в гостя. Ищем и снимаем push ДО выхода, пока
+    // сессия жива: иначе уведомления вышедшего аккаунта шли бы и дальше.
+    const nextUserId = await findResumableLinkedAccount();
+    if (nextUserId) {
+      await detachBrowserPush();
+    }
     await logoutMutation.mutateAsync();
 
-    // «Выйти» — только из текущего: если на устройстве есть ещё аккаунт,
-    // переходим в него, а не в гостя.
-    const nextUserId = await findResumableLinkedAccount();
     if (nextUserId) {
       try {
         await switchAccountAndReload({
           userId: nextUserId,
           prepare: async () => {},
           targetPath: "/",
+          pushAlreadyDetached: true,
         });
         return;
       } catch (error) {

@@ -7,6 +7,7 @@ import {
   switchLinkedAccount,
 } from "../../../entities/user/api/linkedAccountsApi.js";
 import { isWebPushSupported } from "../../web-push/lib/webPushBrowser.js";
+import { notifyAccountChanged } from "./accountChangeBroadcast.js";
 
 /** `/login?addAccount=1&returnTo=<userId>` — вход во второй аккаунт. */
 export const ADD_ACCOUNT_QUERY_PARAM = "addAccount";
@@ -27,9 +28,10 @@ async function readBrowserPushSubscription() {
 
 /**
  * Push приходят только активному аккаунту: перед уходом снимаем подписку
- * браузера с текущего. Сбой push не должен блокировать переключение.
+ * браузера с текущего. Звать, пока сессия текущего аккаунта ещё жива.
+ * Сбой push не должен блокировать переключение.
  */
-async function detachBrowserPush() {
+export async function detachBrowserPush() {
   try {
     const subscription = await readBrowserPushSubscription();
     if (subscription) {
@@ -55,10 +57,12 @@ export async function attachBrowserPushToActiveAccount() {
 /**
  * Полная перезагрузка вместо SPA-навигации: у каждого аккаунта свои корзина,
  * уведомления, кэш запросов — так ничего от прошлого аккаунта не просочится.
+ * Другие вкладки тоже перезагружаются (см. accountChangeBroadcast).
  *
  * @param {string} path
  */
-function reloadInto(path) {
+export function reloadIntoAccount(path) {
+  notifyAccountChanged();
   window.location.assign(path);
 }
 
@@ -67,11 +71,19 @@ function reloadInto(path) {
  *   userId: string;
  *   prepare: () => Promise<void>;
  *   targetPath?: string;
+ *   pushAlreadyDetached?: boolean;
  * }} params
  */
-export async function switchAccountAndReload({ userId, prepare, targetPath }) {
+export async function switchAccountAndReload({
+  userId,
+  prepare,
+  targetPath,
+  pushAlreadyDetached = false,
+}) {
   await prepare();
-  await detachBrowserPush();
+  if (!pushAlreadyDetached) {
+    await detachBrowserPush();
+  }
   try {
     await switchLinkedAccount(userId);
   } catch (error) {
@@ -80,7 +92,9 @@ export async function switchAccountAndReload({ userId, prepare, targetPath }) {
     throw error;
   }
   await attachBrowserPushToActiveAccount();
-  reloadInto(targetPath ?? `${window.location.pathname}${window.location.search}`);
+  reloadIntoAccount(
+    targetPath ?? `${window.location.pathname}${window.location.search}`,
+  );
 }
 
 /**
@@ -101,5 +115,5 @@ export async function startAddAccount({ prepare, returnToUserId }) {
   if (returnToUserId) {
     query.set(ADD_ACCOUNT_RETURN_TO_PARAM, returnToUserId);
   }
-  reloadInto(`/login?${query.toString()}`);
+  reloadIntoAccount(`/login?${query.toString()}`);
 }
