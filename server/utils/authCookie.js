@@ -1,5 +1,6 @@
 import {
   ACCESS_TOKEN_MAX_AGE_MS,
+  LINKED_SESSIONS_COOKIE_NAME,
   AUTH_COOKIE_NAME,
   REFRESH_COOKIE_MAX_AGE_MS,
   REFRESH_COOKIE_NAME,
@@ -108,3 +109,29 @@ export const getRefreshTokenFromRequest = (req) => {
 
   return readTrimmedRequestToken(req.cookies?.[REFRESH_COOKIE_NAME]);
 };
+
+/**
+ * @param {import('express').Response} res
+ * @param {string} value
+ */
+export const setLinkedSessionsCookie = (res, value) => {
+  res.cookie(
+    LINKED_SESSIONS_COOKIE_NAME,
+    value,
+    getCookieOptions(REFRESH_COOKIE_MAX_AGE_MS),
+  );
+};
+
+/**
+ * @param {import('express').Response} res
+ */
+export const clearLinkedSessionsCookie = (res) => {
+  res.clearCookie(LINKED_SESSIONS_COOKIE_NAME, getClearCookieOptions());
+};
+
+/**
+ * @param {import('express').Request} req
+ * @returns {string}
+ */
+export const getLinkedSessionsCookie = (req) =>
+  readTrimmedRequestToken(req.cookies?.[LINKED_SESSIONS_COOKIE_NAME]) ?? "";

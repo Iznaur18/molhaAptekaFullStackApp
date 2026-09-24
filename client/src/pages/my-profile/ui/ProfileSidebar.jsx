@@ -1,7 +1,12 @@
-import { MY_PROFILE_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { useAccountSwitcher } from "../../../features/account-switcher/model/useAccountSwitcher.js";
+import {
+  ACCOUNT_SWITCHER_UI,
+  MY_PROFILE_PAGE_UI,
+} from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { ProfileTabAlert } from "./ProfileTabAlert.jsx";
 import { ProfileTabBadge } from "./ProfileTabBadge.jsx";
+import { ProfileSidebarAccounts } from "./ProfileSidebarAccounts.jsx";
 import { ProfileSidebarLogout } from "./ProfileSidebarLogout.jsx";
 import { ProfileSidebarDeleteAccount } from "./ProfileSidebarDeleteAccount.jsx";
 
@@ -33,6 +38,7 @@ import { ProfileSidebarDeleteAccount } from "./ProfileSidebarDeleteAccount.jsx";
  *   activeTab: string;
  *   onItemSelect?: () => void;
  *   onLogout?: () => void | Promise<void>;
+ *   onPrepareAccountChange?: () => Promise<void>;
  *   user?: import('../../../entities/user/model/types.js').UserPublicProfile | null;
  *   id?: string;
  * }} props
@@ -42,9 +48,12 @@ export function ProfileSidebar({
   activeTab,
   onItemSelect,
   onLogout,
+  onPrepareAccountChange,
   user,
   id,
 }) {
+  const accountSwitcher = useAccountSwitcher({ onPrepareAccountChange });
+
   const handleItemClick = (onClick) => {
     onClick();
     onItemSelect?.();
@@ -113,12 +122,25 @@ export function ProfileSidebar({
             </ul>
           </div>
         ))}
+        {onLogout ? <ProfileSidebarAccounts switcher={accountSwitcher} /> : null}
         {onLogout ? (
           <div className="my-profile-page__nav-group my-profile-page__nav-group_logout">
             <ul className="my-profile-page__nav-list" role="list">
               <li className="my-profile-page__nav-item">
                 <ProfileSidebarLogout onLogout={onLogout} />
               </li>
+              {accountSwitcher.accounts.length > 1 ? (
+                <li className="my-profile-page__nav-item">
+                  <ProfileSidebarLogout
+                    onLogout={accountSwitcher.logoutAll}
+                    label={ACCOUNT_SWITCHER_UI.LOGOUT_ALL}
+                    question={ACCOUNT_SWITCHER_UI.LOGOUT_ALL_CONFIRM}
+                    confirmLabel={ACCOUNT_SWITCHER_UI.LOGOUT_ALL_YES}
+                    cancelLabel={ACCOUNT_SWITCHER_UI.LOGOUT_ALL_CANCEL}
+                    disabled={accountSwitcher.isBusy}
+                  />
+                </li>
+              ) : null}
               {user ? (
                 <li className="my-profile-page__nav-item">
                   <ProfileSidebarDeleteAccount user={user} />

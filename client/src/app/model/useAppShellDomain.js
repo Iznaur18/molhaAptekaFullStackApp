@@ -8,7 +8,10 @@ import { invalidateMyProductsTotal } from "../../entities/product/lib/myProducts
 import { useHomeCatalogLoader } from "../../widgets/app-shell/model/useHomeCatalogLoader.js";
 import { useHomeCatalogProductDetails } from "../../widgets/app-shell/model/useHomeCatalogProductDetails.js";
 import { useEmailVerificationGate } from "../../widgets/app-shell/model/useEmailVerificationGate.js";
-import { useHomeLogout } from "../../widgets/app-shell/model/useHomeLogout.js";
+import {
+  useHomeLogout,
+  usePrepareAccountChange,
+} from "../../widgets/app-shell/model/useHomeLogout.js";
 import { useHomeMyProfileSession } from "../../widgets/app-shell/model/useHomeMyProfileSession.js";
 import { useHomeNotifications } from "../../widgets/app-shell/model/useHomeNotifications.js";
 import { useHomeProductActions } from "../../widgets/app-shell/model/useHomeProductActions.js";
@@ -202,6 +205,11 @@ export function useAppShellDomain(
     authUser: shell.authUser,
   });
 
+  const handlePrepareAccountChange = usePrepareAccountChange({
+    flushRemoteCart,
+    flushRemoteWishlist,
+  });
+
   const handleLogout = useHomeLogout({
     flushRemoteCart,
     flushRemoteWishlist,
@@ -230,6 +238,7 @@ export function useAppShellDomain(
     ...catalogProductDetailsState,
     ...notifications,
     handleLogout,
+    handlePrepareAccountChange,
     refreshCatalogFeed,
     ...emailVerificationGate,
   };

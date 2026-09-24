@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { useCart } from "../../entities/cart/model/useCart.js";
+import { listenAccountChanges } from "../../features/account-switcher/lib/accountChangeBroadcast.js";
 import { useWishlist } from "../../entities/wishlist/model/useWishlist.js";
 import { useHomeCatalogSections } from "../../widgets/app-shell/model/useHomeCatalogSections.jsx";
 import { AppShellCatalogSectionsProvider } from "../../widgets/app-shell/model/AppShellCatalogSectionsContext.jsx";
@@ -38,6 +39,9 @@ function AppShellCatalogSectionsBridge({ children }) {
  * Route layout root: один контроллер на всё дерево маршрутов под shell.
  */
 export function AppShellRoot() {
+  // Аккаунт сменили в другой вкладке — cookie уже чужие, перезагружаемся.
+  useEffect(() => listenAccountChanges(), []);
+
   const { flushRemoteCart } = useCart();
   const { flushRemoteWishlist } = useWishlist();
   const location = useLocation();

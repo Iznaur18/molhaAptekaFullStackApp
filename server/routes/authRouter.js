@@ -58,6 +58,14 @@ import {
   removeWebPushSubscriptionValidation,
 } from "../validations/user/webPushSubscriptionValidation.js";
 import { emptyBodyValidation } from "../validations/common/emptyBodyValidation.js";
+import { authAccountUserIdValidation } from "../validations/user/linkedAccountsValidation.js";
+import {
+  listLinkedAccountsController,
+  logoutAllLinkedAccountsController,
+  removeLinkedAccountController,
+  stashActiveSessionController,
+  switchLinkedAccountController,
+} from "../controllers/User/linkedAccountsControllers.js";
 import {
   checkAuthMW,
   checkAuthMeMW,
@@ -210,6 +218,34 @@ router.post(
   passwordChangeController,
 );
 router.post("/logout", logoutUserController);
+
+// Несколько аккаунтов в одном браузере (web, httpOnly cookie linked_sessions).
+router.get("/accounts", listLinkedAccountsController);
+router.post(
+  "/accounts/stash",
+  refreshAuthRateLimiter,
+  emptyBodyValidation,
+  stashActiveSessionController,
+);
+router.post(
+  "/accounts/switch",
+  refreshAuthRateLimiter,
+  authAccountUserIdValidation,
+  switchLinkedAccountController,
+);
+router.post(
+  "/accounts/remove",
+  refreshAuthRateLimiter,
+  authAccountUserIdValidation,
+  removeLinkedAccountController,
+);
+router.post(
+  "/accounts/logout-all",
+  refreshAuthRateLimiter,
+  emptyBodyValidation,
+  logoutAllLinkedAccountsController,
+);
+
 router.post(
   "/refresh",
   refreshAuthRateLimiter,

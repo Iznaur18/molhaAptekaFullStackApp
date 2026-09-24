@@ -1100,3 +1100,9 @@ export {
   putOneCCategoryMappingsBodySchema,
   putOneCSettingsBodySchema,
 } from "./onec.js";
+export {
+  AUTH_LINKED_ACCOUNTS_MAX,
+  authAccountUserIdBodySchema,
+  authLinkedAccountSchema,
+  authLinkedAccountsDataSchema,
+} from "./authAccounts.js";

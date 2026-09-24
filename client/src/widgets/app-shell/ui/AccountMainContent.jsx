@@ -51,6 +51,7 @@ export function AccountMainContent({
   onCatalogProductClick,
   setMyProfileTab,
   handleLogout,
+  handlePrepareAccountChange,
   onEditProfileClick,
   onEditProfileCancel,
   onEditProfileSaved,
@@ -172,6 +173,7 @@ export function AccountMainContent({
         isLoading={myProfilePage.phase === "loading"}
         errorMessage={myProfilePage.phase === "error" ? myProfilePage.error : null}
         onLogout={handleLogout}
+        onPrepareAccountChange={handlePrepareAccountChange}
         onEditProfileClick={onEditProfileClick}
         onMyProductsClick={handleMyProductsFromProfile}
         onMySalesClick={handleMySalesFromProfile}

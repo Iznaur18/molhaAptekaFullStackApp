@@ -44,6 +44,7 @@ import "./MyProfilePage.css";
  * isLoading?: boolean;
  * errorMessage?: string | null;
  * onLogout: () => void | Promise<void>;
+ * onPrepareAccountChange?: () => Promise<void>;
  * onEditProfileClick?: () => void;
  * onMyProductsClick?: () => void;
  * onMySalesClick?: () => void;
@@ -109,6 +110,7 @@ export function MyProfilePage({
   isLoading = false,
   errorMessage = null,
   onLogout,
+  onPrepareAccountChange,
   onEditProfileClick,
   onMyProductsClick,
   onMySalesClick,
@@ -315,6 +317,7 @@ export function MyProfilePage({
                     activeTab={activeTab}
                     onItemSelect={closeMobileNav}
                     onLogout={onLogout}
+                    onPrepareAccountChange={onPrepareAccountChange}
                     user={user}
                   />
                 </div>
@@ -330,6 +333,7 @@ export function MyProfilePage({
               activeTab={activeTab}
               onItemSelect={closeMobileNav}
               onLogout={onLogout}
+              onPrepareAccountChange={onPrepareAccountChange}
               user={user}
             />
           </div>

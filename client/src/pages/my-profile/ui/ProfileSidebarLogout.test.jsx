@@ -3,8 +3,13 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { MY_PROFILE_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import { renderWithProviders } from "../../../test/renderWithProviders.jsx";
 import { ProfileSidebar } from "./ProfileSidebar.jsx";
 import { ProfileSidebarLogout } from "./ProfileSidebarLogout.jsx";
+
+vi.mock("../../../entities/user/api/linkedAccountsApi.js", () => ({
+  fetchLinkedAccounts: vi.fn(async () => ({ accounts: [], maxAccounts: 5 })),
+}));
 
 describe("ProfileSidebarLogout", () => {
   it("renders logout trigger", () => {
@@ -32,7 +37,7 @@ describe("ProfileSidebarLogout", () => {
 
 describe("ProfileSidebar", () => {
   it("renders logout as the last nav group", () => {
-    render(
+    renderWithProviders(
       <ProfileSidebar
         groups={[
           {
