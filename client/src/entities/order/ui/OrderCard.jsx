@@ -35,11 +35,13 @@ import {
   INSTALLMENT_UI,
   MY_ORDERS_PAGE_UI,
   ORDER_CARD_UI,
+  ORDER_LOBO_UI,
   PRODUCT_CARD_UI,
   SHIPMENT_DISPUTE_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { resolveOrderLineSellerId, summarizeOrderItems } from "@izibuy/shared-lib";
 import {
+  PRODUCT_DELIVERY_CARRIER_LOBO,
   PRODUCT_DELIVERY_CARRIER_SELLER,
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_YANDEX_DELIVERY,
@@ -122,6 +124,7 @@ function renderCounterpartyValue(user, onNameClick) {
  *   onBuyerNameClick?: (userId: string) => void;
  *   onSellerNameClick?: (userId: string) => void;
  *   isInstallmentOrder: boolean;
+ *   loboPickup?: { address: string; canChange: boolean } | null;
  * }} props
  */
 function OrderCardMeta({
@@ -131,6 +134,7 @@ function OrderCardMeta({
   onBuyerNameClick,
   onSellerNameClick,
   isInstallmentOrder,
+  loboPickup = null,
 }) {
   const trackingUrl = order.shippingTrackingNumber
     ? resolveOrderShippingTrackingUrl(order)
@@ -200,6 +204,20 @@ function OrderCardMeta({
         </dt>
         <dd>{shipmentAddress || COMMON_UI.EM_DASH}</dd>
       </div>
+      {/* Откуда курьер ЛОБО заберёт заказ — продавцу, в подробностях. */}
+      {loboPickup?.address ? (
+        <div className="order-card__meta-row">
+          <dt>{ORDER_LOBO_UI.PICKUP_FROM}</dt>
+          <dd>
+            {loboPickup.address}
+            {loboPickup.canChange ? (
+              <span className="order-card__meta-hint">
+                {ORDER_LOBO_UI.PICKUP_FROM_HINT}
+              </span>
+            ) : null}
+          </dd>
+        </div>
+      ) : null}
       {deliveryComment ? (
         <div className="order-card__meta-row">
           <dt>{ORDER_CARD_UI.DELIVERY_COMMENT_LABEL}</dt>
@@ -614,6 +632,16 @@ export function OrderCard({
         String(item?.pickupAddressAtOrder ?? "").trim(),
     )?.pickupAddressAtOrder ?? "",
   ).trim();
+  const loboPickup =
+    attentionRole === "seller" &&
+    shipmentOwn?.deliveryCarrier === PRODUCT_DELIVERY_CARRIER_LOBO &&
+    shipmentPickupAddress
+      ? {
+          address: shipmentPickupAddress,
+          // Точку отправления меняют до вызова курьера — потом поздно.
+          canChange: !shipmentOwn?.shippingExternalId,
+        }
+      : null;
 
   // СДЭК, Яндекс и «Экспресс»: «Отгружен» и «Доставлен» ставит опрос статусов службы, не продавец.
   const cdekTracksThisShipment =
@@ -863,6 +891,7 @@ export function OrderCard({
             onBuyerNameClick={onBuyerNameClick}
             onSellerNameClick={onSellerNameClick}
             isInstallmentOrder={isInstallmentOrder}
+            loboPickup={loboPickup}
           />
           {showBuyer && order.buyerPassportShare ? (
             <BuyerPassportSharePanel share={order.buyerPassportShare} />
@@ -1101,11 +1130,7 @@ export function OrderCard({
         </div>
       ) : null}
 
-      <OrderCardLoboShipment
-        shipment={shipmentOwn}
-        role={attentionRole}
-        pickupAddress={shipmentPickupAddress}
-      />
+      <OrderCardLoboShipment shipment={shipmentOwn} role={attentionRole} />
 
       {awaitingGitorgCourier ? (
         <div className="order-card__awaiting-courier">
@@ -1253,6 +1278,7 @@ export function OrderCard({
                   onBuyerNameClick={onBuyerNameClick}
                   onSellerNameClick={onSellerNameClick}
                   isInstallmentOrder={isInstallmentOrder}
+                  loboPickup={loboPickup}
                 />
                 {showBuyer && order.buyerPassportShare ? (
                   <BuyerPassportSharePanel share={order.buyerPassportShare} />

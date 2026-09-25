@@ -1,8 +1,4 @@
-import {
-  CDEK_DELIVERY_MODE_POINT_TO_POINT,
-  SHIPPING_PROVIDER_CDEK,
-  buildShippingTrackingUrl,
-} from "@molha/api-contract";
+import { CDEK_DELIVERY_MODE_POINT_TO_POINT } from "@molha/api-contract";
 import { useMutation } from "@tanstack/react-query";
 import { useId, useState } from "react";
 
@@ -13,7 +9,6 @@ import {
   createCdekWaybill,
   fetchCdekLabel,
   fetchCdekReceptionPoints,
-  refreshCdekWaybill,
 } from "../api/cdekWaybillApi.js";
 
 import { resolveShipmentStatusTone } from "../../../shared/lib/shipmentStatusTone.js";
@@ -60,15 +55,7 @@ export function CdekWaybillPanel({
       onChanged?.();
     },
   });
-  const refreshMutation = useMutation({
-    mutationFn: refreshCdekWaybill,
-    onSuccess: (next) => {
-      setWaybill(next);
-      onChanged?.();
-    },
-  });
-
-  const error = createMutation.error ?? refreshMutation.error;
+  const error = createMutation.error;
 
   return (
     <section
@@ -84,12 +71,6 @@ export function CdekWaybillPanel({
       </h4>
 
       <dl className="cdek-waybill-panel__facts">
-        {snapshot.pickupPoint?.address ? (
-          <div className="cdek-waybill-panel__fact">
-            <dt>{CDEK_WAYBILL_UI.PICKUP_POINT}</dt>
-            <dd>{snapshot.pickupPoint.address}</dd>
-          </div>
-        ) : null}
         {snapshot.deliverySumRub ? (
           <div className="cdek-waybill-panel__fact cdek-waybill-panel__fact--money">
             <dt>{CDEK_WAYBILL_UI.DELIVERY_PAID_BY_BUYER}</dt>
@@ -108,8 +89,6 @@ export function CdekWaybillPanel({
             setWaybill(next);
             onChanged?.();
           }}
-          isRefreshing={refreshMutation.isPending}
-          onRefresh={() => refreshMutation.mutate(orderId)}
         />
       ) : closed ? null : awaitingPayment ? (
         <p className="cdek-waybill-panel__hint">{CDEK_WAYBILL_UI.AWAITING_PAYMENT}</p>
@@ -121,11 +100,6 @@ export function CdekWaybillPanel({
             createMutation.mutate({ orderId, shipmentPointCode })
           }
         />
-      )}
-
-      {/* У закрытого заказа статус уже не поменяется — подсказка лишняя. */}
-      {closed || waybill?.cancelledAt ? null : (
-        <p className="cdek-waybill-panel__hint">{CDEK_WAYBILL_UI.AUTO_STATUS_HINT}</p>
       )}
 
       {error ? (
@@ -144,54 +118,24 @@ export function CdekWaybillPanel({
  *   closed: boolean;
  *   pointToPoint: boolean;
  *   onWaybillChange: (waybill: Record<string, any>) => void;
- *   isRefreshing: boolean;
- *   onRefresh: () => void;
  * }} props
  */
-function WaybillState({
-  orderId,
-  waybill,
-  closed,
-  pointToPoint,
-  onWaybillChange,
-  isRefreshing,
-  onRefresh,
-}) {
+function WaybillState({ orderId, waybill, closed, pointToPoint, onWaybillChange }) {
   const returnDelivered =
     waybill.returnStatusCode === "DELIVERED" ||
     waybill.returnStatusCode === "POSTOMAT_RECEIVED";
-  const canRefresh = !closed && !waybill.cancelledAt;
+  const isOpen = !closed && !waybill.cancelledAt;
   // Пока СДЭК посылку не принял: есть смысл в этикетке и курьере.
   const beforeHandover =
-    canRefresh &&
-    ["", "ACCEPTED", "CREATED"].includes(String(waybill.statusCode ?? ""));
+    isOpen && ["", "ACCEPTED", "CREATED"].includes(String(waybill.statusCode ?? ""));
   const labelMutation = useMutation({
     mutationFn: fetchCdekLabel,
     onSuccess: (blob) => downloadBlob(blob, `cdek-${waybill.cdekNumber}.pdf`),
   });
-  const trackingUrl = waybill.cdekNumber
-    ? buildShippingTrackingUrl(SHIPPING_PROVIDER_CDEK, waybill.cdekNumber)
-    : null;
 
   return (
     <div className="cdek-waybill-panel__state">
       <dl className="cdek-waybill-panel__facts">
-        <div className="cdek-waybill-panel__fact">
-          <dt>{CDEK_WAYBILL_UI.NUMBER}</dt>
-          <dd>
-            {waybill.cdekNumber ? (
-              <a
-                href={trackingUrl ?? undefined}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {waybill.cdekNumber}
-              </a>
-            ) : (
-              CDEK_WAYBILL_UI.NUMBER_PENDING
-            )}
-          </dd>
-        </div>
         {waybill.status ? (
           <div className="cdek-waybill-panel__fact">
             <dt>{CDEK_WAYBILL_UI.STATUS}</dt>
@@ -258,16 +202,6 @@ function WaybillState({
           intake={waybill.intake}
           onBooked={onWaybillChange}
         />
-      ) : null}
-      {canRefresh ? (
-        <button
-          type="button"
-          className="cdek-waybill-panel__button cdek-waybill-panel__button--secondary"
-          onClick={onRefresh}
-          disabled={isRefreshing}
-        >
-          {isRefreshing ? CDEK_WAYBILL_UI.REFRESH_PENDING : CDEK_WAYBILL_UI.REFRESH}
-        </button>
       ) : null}
     </div>
   );

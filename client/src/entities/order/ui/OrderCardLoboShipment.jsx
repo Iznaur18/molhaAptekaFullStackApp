@@ -1,5 +1,5 @@
 import { PRODUCT_DELIVERY_CARRIER_LOBO } from "@molha/api-contract";
-import { Banknote, MapPin, Navigation, PackageCheck, Truck } from "lucide-react";
+import { Banknote, Navigation, PackageCheck, Truck } from "lucide-react";
 
 import { ORDER_LOBO_UI as UI } from "../../../shared/config/appUiCopy.js";
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
@@ -14,20 +14,19 @@ import {
 const TRACKABLE = new Set(["accepted", "arrived", "in_progress"]);
 
 /**
- * Доставка ЛОБО в карточке заказа: статус цветной меткой, откуда заберут,
- * «Где курьер» и — плашками — то, что требует внимания: сколько отдать
+ * Доставка ЛОБО в карточке заказа: статус цветной меткой, «Где курьер» и — плашками — то, что требует внимания: сколько отдать
  * курьеру (покупателю) и когда вызовется курьер (продавцу).
  *
  * Статус приходит опросом службы раз в несколько минут; имя и машина курьера
- * показываются общим блоком «Курьер» в карточке.
+ * показываются общим блоком «Курьер» в карточке, адрес забора — в
+ * «Подробностях заказа».
  *
  * @param {{
  *   shipment: Record<string, any> | null | undefined;
  *   role: "buyer" | "seller" | null | undefined;
- *   pickupAddress?: string;
  * }} props
  */
-export function OrderCardLoboShipment({ shipment, role, pickupAddress = "" }) {
+export function OrderCardLoboShipment({ shipment, role }) {
   if (shipment?.deliveryCarrier !== PRODUCT_DELIVERY_CARRIER_LOBO) return null;
 
   const handedOver = Boolean(shipment.shippingExternalId);
@@ -50,24 +49,6 @@ export function OrderCardLoboShipment({ shipment, role, pickupAddress = "" }) {
         <span className="order-card__carrier-title">{UI.TITLE}</span>
         <ShipmentStatusPill tone={statusTone}>{statusLabel}</ShipmentStatusPill>
       </header>
-
-      {role === "seller" && pickupAddress ? (
-        <div className="order-card__carrier-fact">
-          <AppIcon
-            icon={MapPin}
-            size="sm"
-            strokeWidth={2.25}
-            className="order-card__carrier-fact-icon"
-          />
-          <span className="order-card__carrier-fact-body">
-            <span className="order-card__carrier-fact-label">{UI.PICKUP_FROM}:</span>
-            <span className="order-card__carrier-fact-value">{pickupAddress}</span>
-            {!handedOver ? (
-              <span className="order-card__carrier-hint">{UI.PICKUP_FROM_HINT}</span>
-            ) : null}
-          </span>
-        </div>
-      ) : null}
 
       {!handedOver ? (
         <ShipmentCallout tone="action" icon={PackageCheck}>
