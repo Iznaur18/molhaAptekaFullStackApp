@@ -98,26 +98,49 @@ export function CreateProductCommerceSection({
 
       {/* Вес и габариты нужны службам доставки. Поля необязательные: пустые
           означают «не знаю», и тогда расчёт идёт по средней коробке. */}
-      <fieldset className="create-product-section__shipping">
-        <legend className="create-product-section__shipping-title">
+      <div
+        className="create-product-section__label create-product-section__shipping"
+        role="group"
+        aria-label={CREATE_PRODUCT_MODAL_UI.SHIPPING_DIMENSIONS_TITLE}
+      >
+        <FormFieldLabel>
           {CREATE_PRODUCT_MODAL_UI.SHIPPING_DIMENSIONS_TITLE}
-        </legend>
-        <p className="create-product-section__shipping-hint">
+        </FormFieldLabel>
+        <p className="create-product-section__lead">
           {CREATE_PRODUCT_MODAL_UI.SHIPPING_DIMENSIONS_HINT}
         </p>
         <div className="create-product-section__shipping-grid">
           {[
-            ["productWeightG", CREATE_PRODUCT_MODAL_UI.LABEL_WEIGHT_G],
-            ["productLengthCm", CREATE_PRODUCT_MODAL_UI.LABEL_LENGTH_CM],
-            ["productWidthCm", CREATE_PRODUCT_MODAL_UI.LABEL_WIDTH_CM],
-            ["productHeightCm", CREATE_PRODUCT_MODAL_UI.LABEL_HEIGHT_CM],
-          ].map(([name, label]) => (
-            <label key={name} className="create-product-section__label">
-              <FormFieldLabel>{label}</FormFieldLabel>
+            [
+              "productWeightG",
+              CREATE_PRODUCT_MODAL_UI.SHIPPING_FIELD_WEIGHT,
+              CREATE_PRODUCT_MODAL_UI.LABEL_WEIGHT_G,
+            ],
+            [
+              "productLengthCm",
+              CREATE_PRODUCT_MODAL_UI.SHIPPING_FIELD_LENGTH,
+              CREATE_PRODUCT_MODAL_UI.LABEL_LENGTH_CM,
+            ],
+            [
+              "productWidthCm",
+              CREATE_PRODUCT_MODAL_UI.SHIPPING_FIELD_WIDTH,
+              CREATE_PRODUCT_MODAL_UI.LABEL_WIDTH_CM,
+            ],
+            [
+              "productHeightCm",
+              CREATE_PRODUCT_MODAL_UI.SHIPPING_FIELD_HEIGHT,
+              CREATE_PRODUCT_MODAL_UI.LABEL_HEIGHT_CM,
+            ],
+          ].map(([name, shortLabel, fullLabel]) => (
+            <label key={name} className="create-product-section__shipping-field">
+              <span className="create-product-section__shipping-field-label">
+                {shortLabel}
+              </span>
               <input
                 {...INTEGER_INPUT_FIELD_PROPS}
                 className="create-product-section__input"
                 name={name}
+                aria-label={fullLabel}
                 value={String(form[name] ?? "")}
                 onChange={handleChange}
                 maxLength={6}
@@ -126,7 +149,7 @@ export function CreateProductCommerceSection({
             </label>
           ))}
         </div>
-      </fieldset>
+      </div>
     </div>
   );
 }

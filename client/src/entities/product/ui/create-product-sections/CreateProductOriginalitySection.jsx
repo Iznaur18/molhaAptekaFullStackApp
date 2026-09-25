@@ -22,9 +22,6 @@ export function CreateProductOriginalitySection({
         title={CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_ORIGINALITY_TITLE}
         required
       />
-      <p className="create-product-section__hint">
-        {CREATE_PRODUCT_MODAL_UI.WIZARD_STEP_ORIGINALITY_SUBTITLE}
-      </p>
       <fieldset
         className="create-product-section__listing-origin"
         disabled={isSubmitting}

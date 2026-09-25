@@ -1115,35 +1115,6 @@
   font-weight: 700;
 }
 
-.order-card__carrier-fact {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-}
-
-.order-card__carrier-fact-icon {
-  flex-shrink: 0;
-  margin-top: 0.15rem;
-  color: var(--iz-color-text-muted);
-}
-
-.order-card__carrier-fact-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  min-width: 0;
-}
-
-.order-card__carrier-fact-label {
-  font-size: 0.8rem;
-  color: var(--iz-color-text-muted, var(--iz-color-text));
-}
-
-.order-card__carrier-fact-value {
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
 .order-card__carrier-hint {
   margin: 0;
   font-size: 0.8rem;
@@ -1174,6 +1145,16 @@
 }
 
 /* Комментарий покупателя к доставке (подъезд, этаж, кв). */
+/* Мелкая подсказка под значением в «Подробностях заказа». */
+.order-card__meta-hint {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
 .order-card__meta-comment {
   white-space: pre-wrap;
   overflow-wrap: anywhere;

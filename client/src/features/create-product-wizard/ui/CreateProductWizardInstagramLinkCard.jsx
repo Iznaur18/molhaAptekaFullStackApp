@@ -27,15 +27,10 @@ export function CreateProductWizardInstagramLinkCard({
           {CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_INSTAGRAM_OPTIONAL_TAG}
         </span>
       </h4>
-      <p className="create-product-wizard-instagram-link__hint">
-        {CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_INSTAGRAM_LEAD}
-      </p>
       <label className="create-product-wizard-instagram-link__field">
-        <span className="create-product-wizard-instagram-link__field-label">
-          {CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_INSTAGRAM_LABEL}
-        </span>
         <input
           type="url"
+          aria-label={CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_INSTAGRAM_LABEL}
           className="create-product-wizard-instagram-link__input"
           value={String(value ?? "")}
           onChange={(event) => onChange(event.target.value)}

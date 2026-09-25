@@ -67,7 +67,8 @@ describe("накладная СДЭК в карточке продажи", () =>
     });
     const { onChanged } = renderPanel({ cdekShipmentAtOrder: SNAPSHOT });
 
-    expect(screen.getByText("Казань, ул. Баумана, 1")).toBeTruthy();
+    // Адрес пункта и номер СДЭК — в «Подробностях заказа», не в панели.
+    expect(screen.queryByText("Казань, ул. Баумана, 1")).toBeNull();
     const createButton = screen.getByRole("button", { name: "Создать накладную" });
     expect(createButton.disabled).toBe(true);
 
@@ -82,15 +83,13 @@ describe("накладная СДЭК в карточке продажи", () =>
     expect(createButton.disabled).toBe(false);
     fireEvent.click(createButton);
 
-    await screen.findByText("1234567890");
+    await screen.findByText("Создан");
     expect(createCdekWaybillMock.mock.calls[0][0]).toEqual({
       orderId: "order-1",
       shipmentPointCode: "GRZ3",
     });
     expect(onChanged).toHaveBeenCalled();
-    expect(screen.getByText("1234567890").closest("a")?.getAttribute("href")).toContain(
-      "cdek.ru",
-    );
+    expect(screen.queryByText("1234567890")).toBeNull();
   });
 
   it("дверь-склад: пункт приёма не спрашиваем", async () => {
@@ -105,29 +104,20 @@ describe("накладная СДЭК в карточке продажи", () =>
         shipmentPointCode: null,
       }),
     );
-    await screen.findByText(/ещё присваивает номер/);
   });
 
-  it("готовая накладная: показывает ошибку СДЭК и обновляет статус", async () => {
-    refreshCdekWaybillMock.mockResolvedValue({
-      uuid: "u-3",
-      cdekNumber: "555",
-      status: "Принят на склад отправителя",
-      error: null,
-    });
+  it("готовая накладная: показывает ошибку СДЭК, кнопки обновления нет", () => {
     renderPanel({
       cdekShipmentAtOrder: SNAPSHOT,
       cdekWaybill: { uuid: "u-3", cdekNumber: null, error: "Неверный телефон" },
     });
 
     expect(screen.getByRole("alert").textContent).toContain("Неверный телефон");
-    fireEvent.click(screen.getByRole("button", { name: "Обновить статус" }));
-    await screen.findByText("Принят на склад отправителя");
-    expect(refreshCdekWaybillMock.mock.calls[0][0]).toBe("order-1");
-    expect(screen.queryByRole("alert")).toBeNull();
+    // Статус обновляется сам (опрос раз в полчаса) — кнопку убрали.
+    expect(screen.queryByRole("button", { name: "Обновить статус" })).toBeNull();
   });
 
-  it("закрытый заказ: только номер, без кнопок и подсказки", () => {
+  it("закрытый заказ: без кнопок и подсказки", () => {
     renderPanel(
       {
         cdekShipmentAtOrder: SNAPSHOT,
@@ -137,7 +127,7 @@ describe("накладная СДЭК в карточке продажи", () =>
       true,
     );
 
-    expect(screen.getByText("777")).toBeTruthy();
+    expect(screen.queryByText("777")).toBeNull();
     expect(screen.queryByRole("button", { name: "Обновить статус" })).toBeNull();
     expect(screen.queryByText(/меняется сам/)).toBeNull();
   });

@@ -16,23 +16,10 @@
   color: var(--iz-color-text-muted);
 }
 
-.create-product-wizard-instagram-link__hint {
-  margin: 0;
-  font-size: 0.8125rem;
-  line-height: 1.4;
-  color: var(--iz-color-text-muted);
-}
-
 .create-product-wizard-instagram-link__field {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-}
-
-.create-product-wizard-instagram-link__field-label {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--iz-color-text-secondary);
 }
 
 .create-product-wizard-instagram-link__input {

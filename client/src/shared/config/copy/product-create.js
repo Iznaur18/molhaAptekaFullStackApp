@@ -120,7 +120,12 @@ export const CREATE_PRODUCT_MODAL_UI = {
   LABEL_HEIGHT_CM: "Высота, см",
   SHIPPING_DIMENSIONS_TITLE: "Вес и габариты посылки",
   SHIPPING_DIMENSIONS_HINT:
-    "Нужны службам доставки для расчёта. Без них цена считается по средней коробке (1 кг, 30×20×15 см) и может сильно отличаться от настоящей.",
+    "Вес одной штуки в упаковке — для расчёта доставки. Не указали — считаем по средней коробке: 1 кг, 30×20×15 см.",
+  /** Короткие подписи полей в сетке «Вес и габариты». */
+  SHIPPING_FIELD_WEIGHT: "Вес, г",
+  SHIPPING_FIELD_LENGTH: "Длина, см",
+  SHIPPING_FIELD_WIDTH: "Ширина, см",
+  SHIPPING_FIELD_HEIGHT: "Высота, см",
   ERROR_STOCK: "Укажите количество от 1 до 9999",
   MANAGE_SECTION_TITLE: "Управление товаром",
   MANAGE_SECTION_ARIA: "Дополнительные действия с товаром",
@@ -294,8 +299,6 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WIZARD_STEP_BASIC_TITLE: "О товаре",
   WIZARD_STEP_BASIC_SUBTITLE: "Название и описание — первое, что видит покупатель",
   WIZARD_STEP_ORIGINALITY_TITLE: "Статус товара",
-  WIZARD_STEP_ORIGINALITY_SUBTITLE:
-    "Выберите, откуда товар: своё, куплено на перепродажу или вы производитель. Покупатели увидят это в карточке.",
   WIZARD_STEP_ORIGINALITY_MANAGE_SUBTITLE:
     "Подтвердите, что продаёте официальный товар",
   WIZARD_STEP_MEDIA_TITLE: "Фото и видео",
@@ -330,8 +333,6 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WIZARD_MEDIA_GALLERY_LABEL: "Галерея",
   WIZARD_MEDIA_GALLERY_HINT:
     "Листайте галерею и меняйте порядок стрелками. Первое фото — главное. В каталоге обложка показывается в квадрате — центр кадра попадёт в превью.",
-  WIZARD_MEDIA_CROP_HINT:
-    "В каталоге обложка показывается в квадрате — центр кадра попадёт в превью.",
   WIZARD_MEDIA_TAP_TO_COVER_HINT: "Нажмите на фото, чтобы сделать его обложкой",
   WIZARD_MEDIA_MOVE_EARLIER: "Левее",
   WIZARD_MEDIA_MOVE_EARLIER_ARIA: "Сдвинуть фото левее",
@@ -359,7 +360,6 @@ export const CREATE_PRODUCT_MODAL_UI = {
   WIZARD_MEDIA_VIDEO_TOGGLE_CLOSE: "Скрыть блок видео",
   WIZARD_MEDIA_INSTAGRAM_TITLE: "Ссылка из Instagram",
   WIZARD_MEDIA_INSTAGRAM_OPTIONAL_TAG: "(необязательно)",
-  WIZARD_MEDIA_INSTAGRAM_LEAD: "Можно вставить ссылку на пост или Reel из Instagram.",
   WIZARD_MEDIA_INSTAGRAM_LABEL: "Ссылка на пост Instagram",
   WIZARD_MEDIA_INSTAGRAM_PLACEHOLDER: "https://www.instagram.com/p/…",
   ERROR_INSTAGRAM_POST_URL: "Укажите ссылку на пост Instagram: /p/, /reel/ или /tv/",
