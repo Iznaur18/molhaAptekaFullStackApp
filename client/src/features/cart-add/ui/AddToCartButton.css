@@ -88,3 +88,10 @@
   font-size: 0.95rem;
   color: var(--iz-color-text);
 }
+
+/* Тёмная тема: --iz-color-on-contrast там тёмный, и на зелёной «Перейти в
+   корзину» и красной «Свой товар» (баннерная карточка) текст терялся. */
+:root[data-theme="dark"] .add-to-cart--in-cart,
+:root[data-theme="dark"] .product-card__banner-actions .add-to-cart {
+  color: #fff;
+}
