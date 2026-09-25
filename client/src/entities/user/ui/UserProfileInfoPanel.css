@@ -201,12 +201,64 @@
   color: var(--iz-color-text-muted);
 }
 
+/* Мини-график — в правом нижнем углу карточки, вне строки: иначе на узкой
+   карточке он съедал ширину текста, и число рвалось по цифре («12» → «1»/«2»). */
 .user-profile-info__stat-sparkline {
-  flex: 0 0 auto;
-  align-self: flex-end;
-  margin-left: auto;
-  margin-bottom: 0.1rem;
+  position: absolute;
+  right: 2.25rem;
+  bottom: var(--user-profile-block-pad);
+  max-width: calc(100% - 7.5rem);
   overflow: visible;
+  pointer-events: none;
+}
+
+/* Числа в карточках не рвём: «182.5K», «462.8K», «12» — одной строкой.
+   Длинный текст (часы работы) — только в широкой карточке, там перенос есть. */
+.user-profile-info__stat-card:not(.user-profile-info__stat-card_wide)
+  .user-profile-info__stat-value {
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+/* Телефон: карточка узкая, и в строке «иконка · текст · стрелка» тексту не
+   оставалось места — подпись в три строки, число рвалось, «Подписчики»
+   наезжали на стрелку. Здесь плитка: иконка и стрелка сверху, подпись и число
+   под ними на всю ширину, график — в правом нижнем углу. */
+@media (max-width: 683px) {
+  .user-profile-info__stat-card:not(.user-profile-info__stat-card_wide) {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "icon . chevron"
+      "text text text";
+    align-items: center;
+    row-gap: 0.55rem;
+  }
+
+  .user-profile-info__stat-card:not(.user-profile-info__stat-card_wide)
+    .user-profile-info__stat-icon {
+    grid-area: icon;
+    margin-top: 0;
+  }
+
+  .user-profile-info__stat-card:not(.user-profile-info__stat-card_wide)
+    .user-profile-info__stat-chevron {
+    grid-area: chevron;
+    margin-top: 0;
+  }
+
+  .user-profile-info__stat-card:not(.user-profile-info__stat-card_wide)
+    .user-profile-info__stat-text {
+    grid-area: text;
+    padding-top: 0;
+  }
+
+  .user-profile-info__stat-card:not(.user-profile-info__stat-card_wide)
+    .user-profile-info__stat-sparkline {
+    right: var(--user-profile-inline-pad);
+    max-width: 45%;
+  }
 }
 
 .user-profile-info__stat-sparkline-line {
