@@ -2,7 +2,6 @@
   "name": "Gitorg",
   "short_name": "Gitorg",
   "display": "standalone",
-  "orientation": "portrait",
   "start_url": "/",
   "background_color": "#ffffff",
   "theme_color": "#f25623",

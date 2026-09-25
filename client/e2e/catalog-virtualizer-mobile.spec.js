@@ -142,15 +142,13 @@ test("mobile QA: scroll + resize/orientation держит карточки на 
   await page.waitForTimeout(SCROLL_PAUSE_MS);
   await expectCardsOnScreen(page);
 
-  // На сенсорных устройствах ландшафт закрыт намеренно
-  // (enablePortraitOrientationLock): приложение прячется под подсказкой
-  // «поверните устройство». Проверяем блокировку и возвращаем портрет —
-  // лента должна пережить разворот туда и обратно.
+  // Горизонтальная ориентация больше не блокируется: в ландшафте лента
+  // видна, и после возврата в портрет — тоже.
   await page.setViewportSize({ width: 667, height: 375 });
-  await expect(page.locator("html.app-portrait-lock-active")).toHaveCount(1);
+  await page.waitForTimeout(SCROLL_PAUSE_MS);
+  await expectCardsOnScreen(page);
 
   await page.setViewportSize({ width: 375, height: 667 });
-  await expect(page.locator("html.app-portrait-lock-active")).toHaveCount(0);
   await page.waitForTimeout(SCROLL_PAUSE_MS);
   await expectCardsOnScreen(page);
 

@@ -15,11 +15,6 @@ export const APP_RUNTIME_UI = {
   CRASH_RELOAD: "Обновить",
 };
 
-/** Блокировка landscape на touch-устройствах (web) */
-export const APP_PORTRAIT_LOCK_UI = {
-  HINT: "Поверните устройство вертикально",
-};
-
 /** Поле URL изображения с загрузкой файла (`POST /upload`) */
 export const IMAGE_URL_FIELD_UI = {
   UPLOAD_BUTTON: "Выбрать файл",
