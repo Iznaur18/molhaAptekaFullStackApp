@@ -176,11 +176,6 @@ export function CreateProductWizardMediaGrid({
       <p className="create-product-wizard-media-grid__counter">
         {CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_FILLED_COUNT(urls.length, maxCount)}
       </p>
-      {urls.length > 0 ? (
-        <p className="create-product-wizard-media-grid__hint">
-          {CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_CROP_HINT}
-        </p>
-      ) : null}
       {urls.length > 1 ? (
         <p className="create-product-wizard-media-grid__hint">
           {CREATE_PRODUCT_MODAL_UI.WIZARD_MEDIA_TAP_TO_COVER_HINT}
