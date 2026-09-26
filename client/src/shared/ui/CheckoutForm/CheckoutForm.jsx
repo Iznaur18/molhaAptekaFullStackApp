@@ -75,6 +75,7 @@ const EMPTY_SAVED_DELIVERY_ADDRESSES = [];
  *   pickupAvailable?: boolean;
  *   fulfillmentMode?: "pickup" | "delivery" | "mixed" | null;
  *   courierDelivery?: "courier" | "seller" | "mixed" | null;
+ *   mixedDeliveryCarriers?: boolean;
  *   deliveryProductIds?: string[];
  *   initialFulfillmentMethod?: "pickup" | "delivery" | null;
  *   onFulfillmentMethodChange?: (method: "pickup" | "delivery") => void;
@@ -125,6 +126,7 @@ export function CheckoutForm({
   pickupAvailable = true,
   fulfillmentMode = null,
   courierDelivery = null,
+  mixedDeliveryCarriers = false,
   productCarrier = null,
   onCarrierCost = null,
   deliveryProductIds = [],
@@ -294,6 +296,10 @@ export function CheckoutForm({
     needsDelivery &&
     !chosenCarrier &&
     (courierDelivery === "courier" || courierDelivery === "mixed");
+  // Товары везут разные службы (свой курьер, курьеры Gitorg, ЛОБО): одной
+  // доставкой их не оформить — сервер отклонит. СДЭК и Яндекс везут всё
+  // отправление целиком, им это не мешает; самовывозу — тоже.
+  const mixedCarriersBlocked = needsDelivery && !chosenCarrier && mixedDeliveryCarriers;
   const effectiveAllowedPaymentMethods = useMemo(() => {
     if (cardOnlyCarrier) {
       const base = Array.isArray(allowedPaymentMethods)
@@ -471,6 +477,11 @@ export function CheckoutForm({
 
     if (needsPickup && (!pickupSelectable || !pickupReady)) {
       setLocalError(pickupOptionHint || CHECKOUT_FORM_UI.ERROR_PICKUP_REQUIRED);
+      return;
+    }
+
+    if (mixedCarriersBlocked) {
+      setLocalError(CHECKOUT_FORM_UI.MIXED_CARRIERS_BLOCKED);
       return;
     }
 
@@ -855,7 +866,11 @@ export function CheckoutForm({
                   }}
                 />
 
-                {gitorgCourierDelivery ? (
+                {mixedCarriersBlocked ? (
+                  <p className="checkout-form__hint checkout-form__hint--warning">
+                    {CHECKOUT_FORM_UI.MIXED_CARRIERS_BLOCKED}
+                  </p>
+                ) : gitorgCourierDelivery ? (
                   <p className="checkout-form__hint">
                     {CHECKOUT_FORM_UI.GITORG_COURIER_CARD_ONLY_HINT}
                   </p>

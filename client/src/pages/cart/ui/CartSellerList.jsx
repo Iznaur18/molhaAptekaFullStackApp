@@ -9,6 +9,7 @@ import { pickUserProfilePhotoUrl } from "../../../entities/user/lib/pickUserProf
 import { DEFAULT_USER_AVATAR_URL } from "../../../entities/user/model/userConstants.js";
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
 import { UserPremiumDisplayName } from "../../../entities/user/ui/UserPremiumDisplayName.jsx";
+import { hasMixedDeliveryCarriers } from "../../../entities/cart/lib/hasMixedDeliveryCarriers.js";
 import { resolveProductImageUrl } from "../../../entities/product/lib/resolveProductImageUrl.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
 import { CART_PAGE_UI } from "../../../shared/config/appUiCopy.js";
@@ -62,7 +63,7 @@ function CartSellerProductThumb({ line }) {
  * @param {{
  *   group: import('../../../entities/cart/lib/groupCartLinesBySeller.js').CartSellerGroup;
  *   summary: {
- *     selectedLines: Array<{ quantity?: number }>;
+ *     selectedLines: Array<{ quantity?: number; product?: Record<string, any> }>;
  *     selectedTotal: number;
  *   };
  *   onOpen: (sellerId: string) => void;
@@ -91,6 +92,10 @@ function CartSellerRow({ group, summary, onOpen }) {
   );
   const lineCount = group.lines.length;
   const countForLabel = itemsCount > 0 ? itemsCount : lineCount;
+  // Отмеченные товары везут разные службы — предупреждаем ещё до оформления.
+  const mixedCarriers = hasMixedDeliveryCarriers(
+    summary.selectedLines.map((line) => line.product),
+  );
 
   return (
     <div className="cart-seller-row">
@@ -145,6 +150,12 @@ function CartSellerRow({ group, summary, onOpen }) {
       </div>
 
       {group.lines.length > 0 ? <CartSellerProductThumbs lines={group.lines} /> : null}
+
+      {mixedCarriers ? (
+        <p className="cart-seller-row__note" role="note">
+          {CART_PAGE_UI.MIXED_CARRIERS_NOTE}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -156,7 +167,7 @@ function CartSellerRow({ group, summary, onOpen }) {
  *   entries: Array<{
  *     group: import('../../../entities/cart/lib/groupCartLinesBySeller.js').CartSellerGroup;
  *     summary: {
- *       selectedLines: Array<{ quantity?: number }>;
+ *       selectedLines: Array<{ quantity?: number; product?: Record<string, any> }>;
  *       selectedTotal: number;
  *     };
  *   }>;

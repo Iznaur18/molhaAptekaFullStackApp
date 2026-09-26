@@ -191,6 +191,43 @@ describe("CheckoutForm", () => {
     ).toBeNull();
   });
 
+  it("разные службы доставки: предупреждение и заказ не уходит", () => {
+    const onSubmit = vi.fn();
+    const { container } = renderWithProviders(
+      <CheckoutForm
+        {...baseProps}
+        onSubmit={onSubmit}
+        deliveryAvailable
+        courierDelivery="seller"
+        mixedDeliveryCarriers
+        initialFulfillmentMethod="delivery"
+      />,
+    );
+
+    expect(screen.getByText(CHECKOUT_FORM_UI.MIXED_CARRIERS_BLOCKED)).toBeTruthy();
+
+    fireEvent.submit(/** @type {HTMLFormElement} */ (container.querySelector("form")));
+
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      CHECKOUT_FORM_UI.MIXED_CARRIERS_BLOCKED,
+    );
+  });
+
+  it("разные службы доставки не мешают самовывозу", () => {
+    renderWithProviders(
+      <CheckoutForm
+        {...baseProps}
+        deliveryAvailable
+        courierDelivery="seller"
+        mixedDeliveryCarriers
+        initialFulfillmentMethod="pickup"
+      />,
+    );
+
+    expect(screen.queryByText(CHECKOUT_FORM_UI.MIXED_CARRIERS_BLOCKED)).toBeNull();
+  });
+
   it("shows submit error and success messages", () => {
     const { rerender } = renderWithProviders(
       <CheckoutForm {...baseProps} submitError="Ошибка оплаты" />,
