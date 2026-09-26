@@ -191,6 +191,7 @@ export const CHECKOUT_FORM_UI = {
   YANDEX_POINT_REQUIRED:
     "Выберите пункт выдачи Яндекса и укажите получателя с телефоном",
   YANDEX_CARD_ONLY: "С Яндекс Доставкой оплата только картой в пункте выдачи",
+  GITORG_COURIER_CARD_ONLY_HINT: "С курьером площадки — оплата картой при получении",
   YANDEX_POINT_LABEL: "Пункт выдачи Яндекса",
   YANDEX_EXPRESS_REQUIRED:
     "Для курьера Яндекса укажите адрес с точкой на карте и получателя с телефоном",

@@ -27,7 +27,9 @@ import { validateRuDeliveryAddressForm } from "../../../entities/address/lib/val
 import {
   ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
   ORDER_PAYMENT_METHOD_CARD_PREPAID,
+  ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
   ORDER_PAYMENT_METHOD_DEFAULT,
+  ORDER_PAYMENT_METHODS,
   ORDER_PAYMENT_METHODS_SELECTABLE,
 } from "../../../entities/order/model/constants.js";
 import {
@@ -285,13 +287,28 @@ export function CheckoutForm({
   // «Экспресс» везёт до двери: адрес покупательский, оплата — курьеру картой.
   const expressChosen = chosenCarrier === SHIPPING_PROVIDER_YANDEX_EXPRESS;
   const cardOnlyCarrier = yandexChosen || expressChosen;
+  // Курьер площадки: наличные остались бы у курьера, продавец их не видит и
+  // подтвердить оплату не может — сервер такой заказ отклоняет. Прячем
+  // «Наличными» сразу, а не после нажатия кнопки.
+  const gitorgCourierDelivery =
+    needsDelivery &&
+    !chosenCarrier &&
+    (courierDelivery === "courier" || courierDelivery === "mixed");
   const effectiveAllowedPaymentMethods = useMemo(() => {
-    if (!cardOnlyCarrier) return allowedPaymentMethods;
-    const base = Array.isArray(allowedPaymentMethods)
-      ? allowedPaymentMethods
-      : [ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY];
-    return base.filter((method) => method === ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY);
-  }, [cardOnlyCarrier, allowedPaymentMethods]);
+    if (cardOnlyCarrier) {
+      const base = Array.isArray(allowedPaymentMethods)
+        ? allowedPaymentMethods
+        : [ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY];
+      return base.filter((method) => method === ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY);
+    }
+    if (gitorgCourierDelivery) {
+      const base = Array.isArray(allowedPaymentMethods)
+        ? allowedPaymentMethods
+        : ORDER_PAYMENT_METHODS;
+      return base.filter((method) => method !== ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY);
+    }
+    return allowedPaymentMethods;
+  }, [cardOnlyCarrier, gitorgCourierDelivery, allowedPaymentMethods]);
 
   // Способы, которые реально уйдут на сервер: умеет площадка И принимает
   // продавец. Считаем здесь же, а не только в пикере, потому что дефолтный
@@ -571,6 +588,9 @@ export function CheckoutForm({
       legend={CHECKOUT_FORM_UI.LABEL_PAYMENT_METHOD}
       cardPrepaidAvailable={cardPrepaidAvailable}
       allowedMethods={effectiveAllowedPaymentMethods}
+      hiddenMethods={
+        gitorgCourierDelivery ? [ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY] : []
+      }
     />
   );
 
@@ -834,6 +854,12 @@ export function CheckoutForm({
                     setCarrierChoice(carrier);
                   }}
                 />
+
+                {gitorgCourierDelivery ? (
+                  <p className="checkout-form__hint">
+                    {CHECKOUT_FORM_UI.GITORG_COURIER_CARD_ONLY_HINT}
+                  </p>
+                ) : null}
 
                 {yandexChosen ? (
                   <>

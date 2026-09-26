@@ -18,6 +18,7 @@ const SELECTABLE_SET = new Set(ORDER_PAYMENT_METHODS_SELECTABLE);
  *   legend: string;
  *   cardPrepaidAvailable?: boolean;
  *   allowedMethods?: string[] | null;
+ *   hiddenMethods?: string[];
  * }} props
  */
 export function CheckoutPaymentMethodPicker({
@@ -27,6 +28,7 @@ export function CheckoutPaymentMethodPicker({
   legend,
   cardPrepaidAvailable = false,
   allowedMethods = null,
+  hiddenMethods = [],
 }) {
   const platformSelectable = cardPrepaidAvailable
     ? new Set([...SELECTABLE_SET, ORDER_PAYMENT_METHOD_CARD_PREPAID])
@@ -39,8 +41,12 @@ export function CheckoutPaymentMethodPicker({
       )
     : platformSelectable;
 
-  // Все способы на виду; активный — первым в горизонтальном ряду.
-  const orderedMethods = [...ORDER_PAYMENT_METHODS].sort((a, b) => {
+  // Все способы на виду; активный — первым в горизонтальном ряду. Скрытые
+  // (при курьере площадки — наличные) не показываем вовсе: «продавец не
+  // принимает» про них было бы неправдой.
+  const orderedMethods = ORDER_PAYMENT_METHODS.filter(
+    (method) => !hiddenMethods.includes(method),
+  ).sort((a, b) => {
     if (a === value) return -1;
     if (b === value) return 1;
     return 0;
