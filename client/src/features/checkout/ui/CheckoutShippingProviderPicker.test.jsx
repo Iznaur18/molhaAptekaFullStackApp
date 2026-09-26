@@ -37,6 +37,34 @@ describe("служба доставки в оформлении", () => {
     expect(sellerButton().getAttribute("aria-checked")).toBe("true");
   });
 
+  it("доступные службы идут перед неактивными и «скоро»", () => {
+    renderWithProviders(
+      <CheckoutShippingProviderPicker
+        courierDelivery="seller"
+        cdekAvailable
+        sellerDeliveryAvailable
+        onSelectCarrier={vi.fn()}
+      />,
+    );
+
+    const names = screen
+      .getAllByRole("radio")
+      .map((node) => node.getAttribute("aria-label") || node.textContent);
+    const sellerIndex = names.findIndex((name) =>
+      name.includes(CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SELLER),
+    );
+    const cdekIndex = names.findIndex((name) =>
+      name.includes(CHECKOUT_FORM_UI.SHIPPING_PROVIDER_CDEK),
+    );
+    const courierIndex = names.findIndex((name) =>
+      name.includes(CHECKOUT_FORM_UI.SHIPPING_PROVIDER_COURIER),
+    );
+
+    expect(sellerIndex).toBe(0);
+    expect(cdekIndex).toBe(1);
+    expect(courierIndex).toBeGreaterThan(cdekIndex);
+  });
+
   it("СДЭК не показываем, пока продавец его не разрешил", () => {
     renderWithProviders(<CheckoutShippingProviderPicker courierDelivery="seller" />);
 
