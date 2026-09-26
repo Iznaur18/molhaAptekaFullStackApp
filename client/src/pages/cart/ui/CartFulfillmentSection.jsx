@@ -18,6 +18,7 @@ import "./CartFulfillmentSection.css";
 /**
  * @param {{
  *   title: string;
+ *   note?: string | null;
  *   lines: import('../../../entities/cart/lib/selectCartLines.js').CartLine[];
  *   selectedCount: number;
  *   areAllSelected: boolean;
@@ -58,6 +59,7 @@ import "./CartFulfillmentSection.css";
  */
 export function CartFulfillmentSection({
   title,
+  note = null,
   lines,
   selectedCount,
   areAllSelected,
@@ -102,6 +104,7 @@ export function CartFulfillmentSection({
     <section className="cart-fulfillment">
       <header className="cart-fulfillment__header">
         <h2 className="cart-fulfillment__title">{title}</h2>
+        {note ? <p className="cart-fulfillment__note">{note}</p> : null}
       </header>
 
       {deliveryFee ? (

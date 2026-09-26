@@ -9,6 +9,7 @@ import { pickUserProfilePhotoUrl } from "../../../entities/user/lib/pickUserProf
 import { DEFAULT_USER_AVATAR_URL } from "../../../entities/user/model/userConstants.js";
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
 import { UserPremiumDisplayName } from "../../../entities/user/ui/UserPremiumDisplayName.jsx";
+import { formatCartGroupCarrierLabel } from "../../../entities/cart/lib/formatCartGroupTitle.js";
 import { resolveProductImageUrl } from "../../../entities/product/lib/resolveProductImageUrl.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
 import { CART_PAGE_UI } from "../../../shared/config/appUiCopy.js";
@@ -65,7 +66,7 @@ function CartSellerProductThumb({ line }) {
  *     selectedLines: Array<{ quantity?: number }>;
  *     selectedTotal: number;
  *   };
- *   onOpen: (sellerId: string) => void;
+ *   onOpen: (groupKey: string) => void;
  * }} props
  */
 function CartSellerRow({ group, summary, onOpen }) {
@@ -91,6 +92,8 @@ function CartSellerRow({ group, summary, onOpen }) {
   );
   const lineCount = group.lines.length;
   const countForLabel = itemsCount > 0 ? itemsCount : lineCount;
+  // Продавец разделён по службам доставки — у каждой строки своя служба.
+  const carrierLabel = formatCartGroupCarrierLabel(group);
 
   return (
     <div className="cart-seller-row">
@@ -98,7 +101,7 @@ function CartSellerRow({ group, summary, onOpen }) {
         <button
           type="button"
           className="cart-seller-row__main"
-          onClick={() => onOpen(group.sellerId)}
+          onClick={() => onOpen(group.groupKey)}
         >
           <UserPremiumAvatar
             className="cart-seller-row__avatar"
@@ -120,7 +123,9 @@ function CartSellerRow({ group, summary, onOpen }) {
               className="cart-seller-row__name"
             />
             <span className="cart-seller-row__meta">
-              {CART_PAGE_UI.ITEMS_COUNT(countForLabel)}
+              {carrierLabel
+                ? `${carrierLabel} · ${CART_PAGE_UI.ITEMS_COUNT(countForLabel)}`
+                : CART_PAGE_UI.ITEMS_COUNT(countForLabel)}
             </span>
           </span>
         </button>
@@ -128,7 +133,7 @@ function CartSellerRow({ group, summary, onOpen }) {
         <button
           type="button"
           className="cart-seller-row__checkout"
-          onClick={() => onOpen(group.sellerId)}
+          onClick={() => onOpen(group.groupKey)}
         >
           <span className="cart-seller-row__checkout-price">
             {formatPriceRub(summary.selectedTotal)}
@@ -160,7 +165,7 @@ function CartSellerRow({ group, summary, onOpen }) {
  *       selectedTotal: number;
  *     };
  *   }>;
- *   onOpenSeller: (sellerId: string) => void;
+ *   onOpenSeller: (groupKey: string) => void;
  * }} props
  */
 export function CartSellerList({ entries, onOpenSeller }) {
@@ -172,7 +177,7 @@ export function CartSellerList({ entries, onOpenSeller }) {
     <ul className="cart-seller-list" role="list">
       {entries.map(({ group, summary }) => (
         <li
-          key={group.sellerId || "unknown-seller"}
+          key={group.groupKey || "unknown-seller"}
           className="cart-seller-list__item"
           role="listitem"
         >

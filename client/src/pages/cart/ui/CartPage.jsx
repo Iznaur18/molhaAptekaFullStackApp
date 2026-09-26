@@ -21,8 +21,10 @@ import { YandexExpressPanel } from "../../../features/checkout/ui/YandexExpressP
 import { getCartLineExclusionReason } from "../../../entities/cart/lib/getCartLineExclusionReason.js";
 import {
   groupCartLinesBySeller,
-  resolveCartFulfillmentBySeller,
+  mapCartFulfillmentToSellers,
+  resolveCartFulfillmentByGroup,
 } from "../../../entities/cart/lib/groupCartLinesBySeller.js";
+import { formatCartGroupTitle } from "../../../entities/cart/lib/formatCartGroupTitle.js";
 import { scopeRecordBySellerId } from "../../../entities/cart/lib/scopeRecordBySellerId.js";
 import { useCardPrepaidAvailable } from "../../../entities/payment/model/paymentQueries.js";
 import { selectCartCheckoutSummary } from "../../../entities/cart/lib/selectCartCheckoutSummary.js";
@@ -126,7 +128,11 @@ export function CartPage({
     return userSavedAddressesFromUser(user);
   }, [isAuthorized, user]);
 
-  /** Внутренняя корзина продавца; null — общий список продавцов. */
+  /**
+   * Открытая группа корзины (`groupKey`); null — общий список продавцов.
+   * Обычно группа = продавец; продавец с товарами разных служб доставки
+   * делится на несколько групп.
+   */
   const [activeSellerCartId, setActiveSellerCartId] = useState(
     /** @type {string | null} */ (null),
   );
@@ -134,8 +140,8 @@ export function CartPage({
   const [deliveryFeeBySeller, setDeliveryFeeBySeller] = useState(
     /** @type {Record<string, number>} */ ({}),
   );
-  /** Выбор покупателя по продавцам; пустое значение = дефолт отправления. */
-  const [chosenFulfillmentBySeller, setChosenFulfillmentBySeller] = useState(
+  /** Выбор покупателя по группам корзины; пустое значение = дефолт отправления. */
+  const [chosenFulfillmentByGroup, setChosenFulfillmentByGroup] = useState(
     /** @type {Record<string, "pickup" | "delivery">} */ ({}),
   );
   const [auctionCheckoutBid, setAuctionCheckoutBid] = useState(
@@ -158,7 +164,7 @@ export function CartPage({
   );
 
   /** Оформление обычной корзины — на странице продавца; sheet только у аукциона. */
-  const checkoutSellerId = auctionCheckoutBid ? null : activeSellerCartId;
+  const checkoutGroupKey = auctionCheckoutBid ? null : activeSellerCartId;
 
   const handleProductClick = useCallback(
     (product) => {
@@ -234,6 +240,16 @@ export function CartPage({
     [visibleLines],
   );
 
+  /** Группа на оформлении; null — общий список или аукцион. */
+  const checkoutGroup = useMemo(
+    () =>
+      checkoutGroupKey
+        ? (sellerGroups.find((group) => group.groupKey === checkoutGroupKey) ?? null)
+        : null,
+    [checkoutGroupKey, sellerGroups],
+  );
+  const checkoutSellerId = checkoutGroup?.sellerId ?? null;
+
   // Предоплата картой — только товары площадки; в sheet смотрим активного продавца.
   const prepaidSellerIds = useMemo(() => {
     if (checkoutSellerId) {
@@ -280,9 +296,23 @@ export function CartPage({
    * от состояния: сохранившийся выбор мог стать недоступным, если покупатель
    * убрал из корзины товар, который его разрешал.
    */
+  const fulfillmentByGroupKey = useMemo(
+    () => resolveCartFulfillmentByGroup(sellerGroups, chosenFulfillmentByGroup),
+    [sellerGroups, chosenFulfillmentByGroup],
+  );
+
+  // Оформляется одна группа; в общем списке — все (их читает только аукцион).
+  const checkoutSellerGroups = useMemo(() => {
+    if (!checkoutGroupKey) {
+      return sellerGroups;
+    }
+    return checkoutGroup ? [checkoutGroup] : [];
+  }, [checkoutGroupKey, checkoutGroup, sellerGroups]);
+
+  /** Способы по продавцам — так их ждёт сервер. */
   const fulfillmentBySellerId = useMemo(
-    () => resolveCartFulfillmentBySeller(sellerGroups, chosenFulfillmentBySeller),
-    [sellerGroups, chosenFulfillmentBySeller],
+    () => mapCartFulfillmentToSellers(checkoutSellerGroups, fulfillmentByGroupKey),
+    [checkoutSellerGroups, fulfillmentByGroupKey],
   );
 
   useEffect(() => {
@@ -290,7 +320,7 @@ export function CartPage({
       return;
     }
     const stillThere = sellerGroups.some(
-      (group) => String(group.sellerId) === String(activeSellerCartId),
+      (group) => group.groupKey === activeSellerCartId,
     );
     if (!stillThere) {
       setActiveSellerCartId(null);
@@ -302,16 +332,15 @@ export function CartPage({
       return null;
     }
     return (
-      groupSummaries.find(
-        (entry) => String(entry.group.sellerId) === String(activeSellerCartId),
-      ) ?? null
+      groupSummaries.find((entry) => entry.group.groupKey === activeSellerCartId) ??
+      null
     );
   }, [activeSellerCartId, groupSummaries]);
 
   const activeSummary = useMemo(() => {
-    if (checkoutSellerId) {
+    if (checkoutGroupKey) {
       const found = groupSummaries.find(
-        (entry) => String(entry.group.sellerId) === String(checkoutSellerId),
+        (entry) => entry.group.groupKey === checkoutGroupKey,
       );
       return (
         found?.summary ?? selectCartCheckoutSummary([], currentUserId, deselectedIds)
@@ -322,7 +351,7 @@ export function CartPage({
     }
     return cartSummary;
   }, [
-    checkoutSellerId,
+    checkoutGroupKey,
     groupSummaries,
     activeSellerEntry,
     cartSummary,
@@ -346,15 +375,6 @@ export function CartPage({
     () => scopeRecordBySellerId(deliveryFeeBySeller, checkoutSellerId),
     [checkoutSellerId, deliveryFeeBySeller],
   );
-
-  const checkoutSellerGroups = useMemo(() => {
-    if (!checkoutSellerId) {
-      return sellerGroups;
-    }
-    return sellerGroups.filter(
-      (group) => String(group.sellerId) === String(checkoutSellerId),
-    );
-  }, [checkoutSellerId, sellerGroups]);
 
   // Покупатель видит только те оплаты, что принимает продавец этого
   // отправления. На аукционном чекауте групп нет — там остаются все.
@@ -585,10 +605,10 @@ export function CartPage({
     setSubmitState({ isSubmitting: false, error: "", success: "" });
   };
 
-  /** @param {string} sellerId */
-  const openSellerCart = (sellerId) => {
+  /** @param {string} groupKey */
+  const openSellerCart = (groupKey) => {
     setAuctionCheckoutBid(null);
-    setActiveSellerCartId(sellerId);
+    setActiveSellerCartId(groupKey);
     setSubmitState({ isSubmitting: false, error: "", success: "" });
   };
 
@@ -603,9 +623,9 @@ export function CartPage({
     setDeliveryFeeBySeller((prev) => ({ ...prev, [sellerId]: clamped }));
   };
 
-  /** @param {string} sellerId @param {"pickup" | "delivery"} method */
-  const chooseSellerFulfillment = (sellerId, method) => {
-    setChosenFulfillmentBySeller((prev) => ({ ...prev, [sellerId]: method }));
+  /** @param {string} groupKey @param {"pickup" | "delivery"} method */
+  const chooseGroupFulfillment = (groupKey, method) => {
+    setChosenFulfillmentByGroup((prev) => ({ ...prev, [groupKey]: method }));
   };
 
   const handleOpenAuctionCheckout = (bid) => {
@@ -785,10 +805,12 @@ export function CartPage({
             </div>
 
             <CartFulfillmentSection
-              key={activeSellerCart.group.sellerId || "unknown-seller"}
-              title={
-                activeSellerCart.group.sellerName ||
-                CART_PAGE_UI.SECTION_SELLER_FALLBACK
+              key={activeSellerCart.group.groupKey || "unknown-seller"}
+              title={formatCartGroupTitle(activeSellerCart.group)}
+              note={
+                activeSellerCart.group.splitCarrier
+                  ? CART_PAGE_UI.SPLIT_BY_CARRIER_NOTE
+                  : null
               }
               lines={activeSellerCart.group.lines}
               selectedCount={selectedCountIn(activeSellerCart.productIds)}
@@ -831,11 +853,11 @@ export function CartPage({
                       onCarrierCost={setCarrierDeliveryCost}
                       deliveryProductIds={deliveryProductIds}
                       initialFulfillmentMethod={
-                        fulfillmentBySellerId[activeSellerCart.group.sellerId] ??
+                        fulfillmentByGroupKey[activeSellerCart.group.groupKey] ??
                         "pickup"
                       }
                       onFulfillmentMethodChange={(method) =>
-                        chooseSellerFulfillment(activeSellerCart.group.sellerId, method)
+                        chooseGroupFulfillment(activeSellerCart.group.groupKey, method)
                       }
                       cardPrepaidAvailable={cardPrepaidAvailable}
                       allowedPaymentMethods={allowedPaymentMethods}
@@ -906,7 +928,7 @@ export function CartPage({
               }
               deliveryFee={
                 activeSellerCart.group.courierDelivery &&
-                fulfillmentBySellerId[activeSellerCart.group.sellerId] === "delivery"
+                fulfillmentByGroupKey[activeSellerCart.group.groupKey] === "delivery"
                   ? {
                       value:
                         deliveryFeeBySeller[activeSellerCart.group.sellerId] ??

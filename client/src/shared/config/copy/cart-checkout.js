@@ -48,6 +48,10 @@ export const CART_PAGE_UI = {
   SECTION_METHOD_UNAVAILABLE: "Продавец не подключил этот способ",
   /** Корзина группируется по продавцам — по одному отправлению на каждого. */
   SECTION_SELLER_FALLBACK: "Продавец",
+  /** Группа продавца без доставки — когда он разделён по службам. */
+  SPLIT_CARRIER_PICKUP_ONLY: "Только самовывоз",
+  SPLIT_BY_CARRIER_NOTE:
+    "Товары этого продавца везут разные службы доставки — каждая группа оформляется отдельным заказом.",
   SECTION_METHOD_LABEL: "Способ получения",
   /** @param {number} left */
   STOCK_REMAINING: (left) => `Осталось ${left} шт`,
@@ -191,6 +195,7 @@ export const CHECKOUT_FORM_UI = {
   YANDEX_POINT_REQUIRED:
     "Выберите пункт выдачи Яндекса и укажите получателя с телефоном",
   YANDEX_CARD_ONLY: "С Яндекс Доставкой оплата только картой в пункте выдачи",
+  GITORG_COURIER_CARD_ONLY_HINT: "С курьером площадки — оплата картой при получении",
   YANDEX_POINT_LABEL: "Пункт выдачи Яндекса",
   YANDEX_EXPRESS_REQUIRED:
     "Для курьера Яндекса укажите адрес с точкой на карте и получателя с телефоном",

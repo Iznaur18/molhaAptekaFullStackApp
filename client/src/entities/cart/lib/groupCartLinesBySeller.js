@@ -13,7 +13,9 @@ import {
  *
  * @typedef {import("./selectCartLines.js").CartLine} CartLine
  * @typedef {{
+ *   groupKey: string;
  *   sellerId: string;
+ *   splitCarrier: string | null;
  *   sellerName: string;
  *   sellerAvatarUrl: string;
  *   sellerAvatarFocus: { x?: number; y?: number } | null;
@@ -63,23 +65,65 @@ const resolveSellerProfile = (line) => {
   };
 };
 
+/** Ключ группы товаров продавца без службы доставки (только самовывоз). */
+const PICKUP_ONLY_BUCKET = "pickup";
+
+/**
+ * Службы доставки товаров каждого продавца.
+ *
+ * @param {CartLine[]} lines
+ * @returns {Map<string, Set<string>>}
+ */
+const collectCarriersBySeller = (lines) => {
+  /** @type {Map<string, Set<string>>} */
+  const result = new Map();
+  for (const line of lines) {
+    const carrier = resolveProductDeliveryCarrier(line?.product ?? {});
+    if (!carrier) continue;
+    const sellerId = resolveSellerId(line);
+    const set = result.get(sellerId) ?? new Set();
+    set.add(carrier);
+    result.set(sellerId, set);
+  }
+  return result;
+};
+
 /**
  * Отправление едет одним способом целиком, поэтому способ доступен, только
  * если его поддерживают ВСЕ товары продавца в корзине.
+ *
+ * Если товары одного продавца везут разные службы (свой курьер, курьеры
+ * Gitorg, ЛОБО), одним заказом их не оформить — сервер не знает, кому
+ * отдавать отправление. Тогда корзина сразу делит продавца на группы по
+ * службе: каждая оформляется своим заказом. Обычного продавца с одной
+ * службой это не касается — у него по-прежнему одна группа.
  *
  * @param {CartLine[]} visibleLines
  * @returns {CartSellerGroup[]}
  */
 export function groupCartLinesBySeller(visibleLines) {
+  const allLines = Array.isArray(visibleLines) ? visibleLines : [];
+  const carriersBySeller = collectCarriersBySeller(allLines);
   /** @type {Map<string, CartSellerGroup>} */
   const bySeller = new Map();
 
-  for (const line of Array.isArray(visibleLines) ? visibleLines : []) {
+  for (const line of allLines) {
     const sellerId = resolveSellerId(line);
     const product = line?.product ?? {};
     const profile = resolveSellerProfile(line);
-    const group = bySeller.get(sellerId) ?? {
+    const splitByCarrier = (carriersBySeller.get(sellerId)?.size ?? 0) > 1;
+    const lineCarrier = resolveProductDeliveryCarrier(product);
+    const groupKey = splitByCarrier
+      ? `${sellerId}:${lineCarrier ?? PICKUP_ONLY_BUCKET}`
+      : sellerId;
+    const group = bySeller.get(groupKey) ?? {
+      groupKey,
       sellerId,
+      /**
+       * Служба, по которой продавец разделён; `null` — не разделён.
+       * Для группы без доставки — `"pickup"`.
+       */
+      splitCarrier: splitByCarrier ? (lineCarrier ?? PICKUP_ONLY_BUCKET) : null,
       sellerName: profile.sellerName,
       sellerAvatarUrl: profile.sellerAvatarUrl,
       sellerAvatarFocus: profile.sellerAvatarFocus,
@@ -106,10 +150,9 @@ export function groupCartLinesBySeller(visibleLines) {
     if (!productShipsToBuyer(product)) {
       group.deliveryAvailable = false;
     }
-    const carrier = resolveProductDeliveryCarrier(product);
     if (group.deliveryCarrier === undefined) {
-      group.deliveryCarrier = carrier;
-    } else if (group.deliveryCarrier !== carrier) {
+      group.deliveryCarrier = lineCarrier;
+    } else if (group.deliveryCarrier !== lineCarrier) {
       group.deliveryCarrier = "mixed";
     }
     if (product.productCourierDeliveryEnabled !== true) {
@@ -135,7 +178,7 @@ export function groupCartLinesBySeller(visibleLines) {
       group.sellerPaymentMethods = profile.sellerPaymentMethods;
     }
 
-    bySeller.set(sellerId, group);
+    bySeller.set(groupKey, group);
   }
 
   for (const group of bySeller.values()) {
@@ -150,29 +193,54 @@ export function groupCartLinesBySeller(visibleLines) {
 }
 
 /**
- * Способ для каждого продавца: что выбрал покупатель, иначе дефолт группы.
+ * Способ для каждой группы корзины: что выбрал покупатель, иначе дефолт.
+ *
+ * Ключ — `groupKey`: у продавца, разделённого по службам, у каждой группы
+ * свой способ.
  *
  * Недоступный выбор игнорируем — иначе сохранённый в состоянии способ пережил
  * бы удаление товара, который его разрешал, и заказ ушёл бы с 400.
  *
  * @param {CartSellerGroup[]} groups
- * @param {Record<string, "pickup" | "delivery">} chosenBySellerId
+ * @param {Record<string, "pickup" | "delivery">} chosenByGroupKey
  * @returns {Record<string, "pickup" | "delivery">}
  */
-export function resolveCartFulfillmentBySeller(groups, chosenBySellerId = {}) {
+export function resolveCartFulfillmentByGroup(groups, chosenByGroupKey = {}) {
   /** @type {Record<string, "pickup" | "delivery">} */
   const result = {};
 
   for (const group of groups) {
     if (!group.sellerId || !group.defaultMethod) continue;
 
-    const chosen = chosenBySellerId[group.sellerId];
+    const chosen = chosenByGroupKey[group.groupKey];
     const allowed =
       (chosen === "pickup" && group.pickupAvailable) ||
       (chosen === "delivery" && group.deliveryAvailable);
 
-    result[group.sellerId] = allowed ? chosen : group.defaultMethod;
+    result[group.groupKey] = allowed ? chosen : group.defaultMethod;
   }
 
+  return result;
+}
+
+/**
+ * Способы групп по продавцам — в том виде, в каком их ждёт сервер.
+ *
+ * Оформляется всегда одна группа, поэтому столкновения ключей у разделённого
+ * продавца на оформлении нет; в общем списке берётся последняя группа.
+ *
+ * @param {CartSellerGroup[]} groups
+ * @param {Record<string, "pickup" | "delivery">} fulfillmentByGroupKey
+ * @returns {Record<string, "pickup" | "delivery">}
+ */
+export function mapCartFulfillmentToSellers(groups, fulfillmentByGroupKey) {
+  /** @type {Record<string, "pickup" | "delivery">} */
+  const result = {};
+  for (const group of groups) {
+    const method = fulfillmentByGroupKey[group.groupKey];
+    if (group.sellerId && method) {
+      result[group.sellerId] = method;
+    }
+  }
   return result;
 }

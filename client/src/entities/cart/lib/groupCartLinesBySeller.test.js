@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   groupCartLinesBySeller,
-  resolveCartFulfillmentBySeller,
+  mapCartFulfillmentToSellers,
+  resolveCartFulfillmentByGroup,
 } from "./groupCartLinesBySeller.js";
 
 /**
@@ -109,14 +110,14 @@ describe("выбор способа по продавцам", () => {
   ]);
 
   it("без выбора берёт дефолт группы", () => {
-    expect(resolveCartFulfillmentBySeller(groups, {})).toEqual({
+    expect(resolveCartFulfillmentByGroup(groups, {})).toEqual({
       s1: "pickup",
       s2: "pickup",
     });
   });
 
   it("смешанный заказ: у одного продавца доставка, у другого самовывоз", () => {
-    expect(resolveCartFulfillmentBySeller(groups, { s1: "delivery" })).toEqual({
+    expect(resolveCartFulfillmentByGroup(groups, { s1: "delivery" })).toEqual({
       s1: "delivery",
       s2: "pickup",
     });
@@ -124,7 +125,7 @@ describe("выбор способа по продавцам", () => {
 
   it("недоступный выбор откатывается на дефолт", () => {
     expect(
-      resolveCartFulfillmentBySeller(groups, { s2: "delivery" }).s2,
+      resolveCartFulfillmentByGroup(groups, { s2: "delivery" }).s2,
       "у s2 доставки нет — сохранившийся выбор не должен уйти на сервер",
     ).toBe("pickup");
   });
@@ -134,7 +135,7 @@ describe("выбор способа по продавцам", () => {
       line("s3", { pickup: false, delivery: false }),
     ]);
 
-    expect(resolveCartFulfillmentBySeller(broken, {})).toEqual({});
+    expect(resolveCartFulfillmentByGroup(broken, {})).toEqual({});
   });
   it("товар с ЛОБО даёт доставку, хотя старые флаги сняты", () => {
     const [group] = groupCartLinesBySeller([
@@ -153,5 +154,92 @@ describe("выбор способа по продавцам", () => {
 
     expect(group.deliveryAvailable).toBe(true);
     expect(group.courierDelivery).toBe(false);
+  });
+});
+
+describe("продавец с товарами разных служб доставки", () => {
+  /**
+   * @param {string} id
+   * @param {string} carrier
+   * @param {{ pickup?: boolean }} [options]
+   */
+  const carrierLine = (id, carrier, { pickup = true } = {}) => ({
+    productId: id,
+    quantity: 1,
+    product: {
+      productSeller: { _id: "s1", userName: "Иван" },
+      productPickupEnabled: pickup,
+      productDeliveryCarrier: carrier,
+      productDeliveryEnabled: carrier === "seller",
+      productCourierDeliveryEnabled: carrier === "gitorg_courier",
+    },
+  });
+
+  it("делится на группы по службе — каждая оформляется своим заказом", () => {
+    const groups = groupCartLinesBySeller([
+      carrierLine("p1", "seller"),
+      carrierLine("p2", "lobo"),
+      carrierLine("p3", "seller"),
+    ]);
+
+    expect(groups.map((group) => group.groupKey)).toEqual(["s1:seller", "s1:lobo"]);
+    expect(groups.map((group) => group.sellerId)).toEqual(["s1", "s1"]);
+    expect(groups[0].lines.map((row) => row.productId)).toEqual(["p1", "p3"]);
+    expect(groups[0].splitCarrier).toBe("seller");
+    expect(groups[1].deliveryCarrier).toBe("lobo");
+  });
+
+  it("курьерская группа остаётся курьерской, а не «mixed»", () => {
+    const groups = groupCartLinesBySeller([
+      carrierLine("p1", "gitorg_courier"),
+      carrierLine("p2", "lobo"),
+    ]);
+    const courier = groups.find((group) => group.splitCarrier === "gitorg_courier");
+
+    expect(courier?.courierDelivery).toBe(true);
+    expect(courier?.deliveryCarrier).toBe("gitorg_courier");
+  });
+
+  it("товары без доставки у разделённого продавца — отдельной группой самовывоза", () => {
+    const groups = groupCartLinesBySeller([
+      carrierLine("p1", "seller"),
+      carrierLine("p2", "lobo"),
+      {
+        productId: "p3",
+        quantity: 1,
+        product: {
+          productSeller: { _id: "s1", userName: "Иван" },
+          productPickupEnabled: true,
+        },
+      },
+    ]);
+    const pickupOnly = groups.find((group) => group.groupKey === "s1:pickup");
+
+    expect(pickupOnly?.splitCarrier).toBe("pickup");
+    expect(pickupOnly?.deliveryAvailable).toBe(false);
+  });
+
+  it("одна служба — продавец не делится", () => {
+    const groups = groupCartLinesBySeller([
+      carrierLine("p1", "lobo"),
+      carrierLine("p2", "lobo"),
+    ]);
+
+    expect(groups).toHaveLength(1);
+    expect(groups[0].groupKey).toBe("s1");
+    expect(groups[0].splitCarrier).toBeNull();
+  });
+
+  it("способ выбирается на группу, а на сервер уходит по продавцу", () => {
+    const groups = groupCartLinesBySeller([
+      carrierLine("p1", "seller"),
+      carrierLine("p2", "lobo"),
+    ]);
+    const byGroup = resolveCartFulfillmentByGroup(groups, { "s1:lobo": "delivery" });
+
+    expect(byGroup).toEqual({ "s1:seller": "pickup", "s1:lobo": "delivery" });
+    expect(mapCartFulfillmentToSellers([groups[1]], byGroup)).toEqual({
+      s1: "delivery",
+    });
   });
 });
