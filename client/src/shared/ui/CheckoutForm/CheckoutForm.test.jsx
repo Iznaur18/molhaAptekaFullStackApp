@@ -159,6 +159,75 @@ describe("CheckoutForm", () => {
     ).toHaveAttribute("aria-checked", "false");
   });
 
+  it("курьер площадки: «Наличными» нет, есть пометка про карту", () => {
+    renderWithProviders(
+      <CheckoutForm
+        {...baseProps}
+        deliveryAvailable
+        courierDelivery="courier"
+        initialFulfillmentMethod="delivery"
+      />,
+    );
+
+    expect(screen.queryByRole("radio", { name: /Наличными/ })).toBeNull();
+    expect(
+      screen.getByText(CHECKOUT_FORM_UI.GITORG_COURIER_CARD_ONLY_HINT),
+    ).toBeTruthy();
+  });
+
+  it("самовывоз у курьерского продавца: наличные остаются", () => {
+    renderWithProviders(
+      <CheckoutForm
+        {...baseProps}
+        deliveryAvailable
+        courierDelivery="courier"
+        initialFulfillmentMethod="pickup"
+      />,
+    );
+
+    expect(screen.getByRole("radio", { name: /Наличными/ })).toBeTruthy();
+    expect(
+      screen.queryByText(CHECKOUT_FORM_UI.GITORG_COURIER_CARD_ONLY_HINT),
+    ).toBeNull();
+  });
+
+  it("разные службы доставки: предупреждение и заказ не уходит", () => {
+    const onSubmit = vi.fn();
+    const { container } = renderWithProviders(
+      <CheckoutForm
+        {...baseProps}
+        onSubmit={onSubmit}
+        deliveryAvailable
+        courierDelivery="seller"
+        mixedDeliveryCarriers
+        initialFulfillmentMethod="delivery"
+      />,
+    );
+
+    expect(screen.getByText(CHECKOUT_FORM_UI.MIXED_CARRIERS_BLOCKED)).toBeTruthy();
+
+    fireEvent.submit(/** @type {HTMLFormElement} */ (container.querySelector("form")));
+
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      CHECKOUT_FORM_UI.MIXED_CARRIERS_BLOCKED,
+    );
+  });
+
+  it("разные службы доставки не мешают самовывозу", () => {
+    renderWithProviders(
+      <CheckoutForm
+        {...baseProps}
+        deliveryAvailable
+        courierDelivery="seller"
+        mixedDeliveryCarriers
+        initialFulfillmentMethod="pickup"
+      />,
+    );
+
+    expect(screen.queryByText(CHECKOUT_FORM_UI.MIXED_CARRIERS_BLOCKED)).toBeNull();
+  });
+
   it("shows submit error and success messages", () => {
     const { rerender } = renderWithProviders(
       <CheckoutForm {...baseProps} submitError="Ошибка оплаты" />,

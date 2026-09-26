@@ -23,6 +23,7 @@ import {
   groupCartLinesBySeller,
   resolveCartFulfillmentBySeller,
 } from "../../../entities/cart/lib/groupCartLinesBySeller.js";
+import { hasMixedDeliveryCarriers } from "../../../entities/cart/lib/hasMixedDeliveryCarriers.js";
 import { scopeRecordBySellerId } from "../../../entities/cart/lib/scopeRecordBySellerId.js";
 import { useCardPrepaidAvailable } from "../../../entities/payment/model/paymentQueries.js";
 import { selectCartCheckoutSummary } from "../../../entities/cart/lib/selectCartCheckoutSummary.js";
@@ -347,14 +348,43 @@ export function CartPage({
     [checkoutSellerId, deliveryFeeBySeller],
   );
 
+  /**
+   * Отправление продавца по ОТМЕЧЕННЫМ товарам: кто везёт, чей тариф.
+   *
+   * Покупатель снимает галочки с товаров другой службы, чтобы оформить
+   * остальное, — и оформление должно считать уже по оставшимся. Иначе
+   * курьерский товар, оставшийся один, считался бы «смешанным», и
+   * «Наличными» не пряталось бы, хотя сервер их отклонит.
+   */
+  const selectedCheckoutGroup = useMemo(() => {
+    if (!checkoutSellerId || activeSummary.selectedLines.length === 0) {
+      return null;
+    }
+    return (
+      groupCartLinesBySeller(activeSummary.selectedLines).find(
+        (group) => String(group.sellerId) === String(checkoutSellerId),
+      ) ?? null
+    );
+  }, [checkoutSellerId, activeSummary.selectedLines]);
+
   const checkoutSellerGroups = useMemo(() => {
     if (!checkoutSellerId) {
       return sellerGroups;
     }
+    if (selectedCheckoutGroup) {
+      return [selectedCheckoutGroup];
+    }
     return sellerGroups.filter(
       (group) => String(group.sellerId) === String(checkoutSellerId),
     );
-  }, [checkoutSellerId, sellerGroups]);
+  }, [checkoutSellerId, selectedCheckoutGroup, sellerGroups]);
+
+  /** Отмеченные товары везут разные службы — одной доставкой не оформить. */
+  const checkoutMixedCarriers = useMemo(
+    () =>
+      hasMixedDeliveryCarriers(activeSummary.selectedLines.map((line) => line.product)),
+    [activeSummary.selectedLines],
+  );
 
   // Покупатель видит только те оплаты, что принимает продавец этого
   // отправления. На аукционном чекауте групп нет — там остаются все.
@@ -790,6 +820,7 @@ export function CartPage({
                 activeSellerCart.group.sellerName ||
                 CART_PAGE_UI.SECTION_SELLER_FALLBACK
               }
+              note={checkoutMixedCarriers ? CART_PAGE_UI.MIXED_CARRIERS_NOTE : null}
               lines={activeSellerCart.group.lines}
               selectedCount={selectedCountIn(activeSellerCart.productIds)}
               areAllSelected={areAllSelectedIn(activeSellerCart.productIds)}
@@ -827,6 +858,7 @@ export function CartPage({
                       pickupAvailable={pickupAvailable}
                       fulfillmentMode={null}
                       courierDelivery={checkoutCourierDelivery}
+                      mixedDeliveryCarriers={checkoutMixedCarriers}
                       productCarrier={checkoutProductCarrier}
                       onCarrierCost={setCarrierDeliveryCost}
                       deliveryProductIds={deliveryProductIds}
@@ -905,7 +937,7 @@ export function CartPage({
                 </>
               }
               deliveryFee={
-                activeSellerCart.group.courierDelivery &&
+                (selectedCheckoutGroup ?? activeSellerCart.group).courierDelivery &&
                 fulfillmentBySellerId[activeSellerCart.group.sellerId] === "delivery"
                   ? {
                       value:

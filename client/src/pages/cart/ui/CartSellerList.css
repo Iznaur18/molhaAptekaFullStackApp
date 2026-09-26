@@ -84,6 +84,18 @@
   color: var(--iz-color-text-muted, var(--iz-color-muted));
 }
 
+/* Отмеченные товары везут разные службы доставки — одним заказом нельзя. */
+.cart-seller-row__note {
+  margin: 0;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--iz-color-status-warning-border);
+  border-radius: 0.6rem;
+  background: var(--iz-color-status-warning-surface);
+  color: var(--iz-color-text);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+
 .cart-seller-row__checkout {
   display: inline-flex;
   align-items: center;
