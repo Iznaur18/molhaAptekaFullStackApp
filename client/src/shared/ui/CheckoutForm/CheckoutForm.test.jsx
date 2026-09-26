@@ -159,6 +159,38 @@ describe("CheckoutForm", () => {
     ).toHaveAttribute("aria-checked", "false");
   });
 
+  it("курьер площадки: «Наличными» нет, есть пометка про карту", () => {
+    renderWithProviders(
+      <CheckoutForm
+        {...baseProps}
+        deliveryAvailable
+        courierDelivery="courier"
+        initialFulfillmentMethod="delivery"
+      />,
+    );
+
+    expect(screen.queryByRole("radio", { name: /Наличными/ })).toBeNull();
+    expect(
+      screen.getByText(CHECKOUT_FORM_UI.GITORG_COURIER_CARD_ONLY_HINT),
+    ).toBeTruthy();
+  });
+
+  it("самовывоз у курьерского продавца: наличные остаются", () => {
+    renderWithProviders(
+      <CheckoutForm
+        {...baseProps}
+        deliveryAvailable
+        courierDelivery="courier"
+        initialFulfillmentMethod="pickup"
+      />,
+    );
+
+    expect(screen.getByRole("radio", { name: /Наличными/ })).toBeTruthy();
+    expect(
+      screen.queryByText(CHECKOUT_FORM_UI.GITORG_COURIER_CARD_ONLY_HINT),
+    ).toBeNull();
+  });
+
   it("shows submit error and success messages", () => {
     const { rerender } = renderWithProviders(
       <CheckoutForm {...baseProps} submitError="Ошибка оплаты" />,
