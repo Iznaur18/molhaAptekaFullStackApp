@@ -31,6 +31,15 @@ const SERVICE_LABEL = {
 const COURIER_OPTION_ID = "gitorg-courier";
 
 /**
+ * Порядок карточек: выбранная, потом те, что можно выбрать, потом остальные.
+ * Иначе доступная служба (СДЭК) пряталась за неактивными и «скоро».
+ * Сортировка стабильная — внутри ранга порядок прежний.
+ *
+ * @param {{ selected: boolean; selectable: boolean }} card
+ */
+const rankCard = (card) => (card.selected ? 2 : card.selectable ? 1 : 0);
+
+/**
  * Плашка «кто везёт», когда выбирать нечего: иконка, мелкая подпись и имя
  * службы. Полная фраза — для экранных читалок и тестов.
  *
@@ -173,7 +182,7 @@ export function CheckoutShippingProviderPicker({
       locked: false,
       selectable: canSwitch,
     })),
-  ].sort((a, b) => Number(b.selected) - Number(a.selected));
+  ].sort((a, b) => rankCard(b) - rankCard(a));
 
   // Службу задаёт продавец на товаре. Переключать нечего — показываем строкой,
   // а не списком выключенных карточек: он выглядел как сломанный выбор.
