@@ -321,3 +321,36 @@ describe("отправление СДЭК", () => {
     ).toBeNull();
   });
 });
+
+describe("«Отказаться» / «Вернулся» у посылки в пути", () => {
+  /** @param {"buyer" | "seller"} role @param {string} carrier */
+  const renderShipped = (role, carrier) =>
+    renderWithProviders(
+      <OrderCard
+        order={makeOrder({ method: "delivery", carrier, status: "shipped" })}
+        attentionRole={role}
+        onMarkReturned={vi.fn()}
+      />,
+    );
+
+  it("своя доставка — кнопки есть", () => {
+    renderShipped("buyer", "seller");
+    expect(
+      screen.queryByRole("button", { name: ORDER_CARD_UI.ACTION_REFUSE }),
+    ).not.toBeNull();
+  });
+
+  it("СДЭК — возврат ставит сама служба, кнопок нет", () => {
+    renderShipped("buyer", "cdek");
+    expect(
+      screen.queryByRole("button", { name: ORDER_CARD_UI.ACTION_REFUSE }),
+    ).toBeNull();
+  });
+
+  it("Яндекс у продавца — «Вернулся» тоже нет", () => {
+    renderShipped("seller", "yandex_delivery");
+    expect(
+      screen.queryByRole("button", { name: ORDER_CARD_UI.ACTION_RETURN }),
+    ).toBeNull();
+  });
+});

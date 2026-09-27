@@ -9,6 +9,7 @@ import {
   ORDER_STATUS_SHIPPED,
 } from "../../constants/orderConstants.js";
 import {
+  CARRIER_MANAGED_RETURN_MESSAGE,
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_YANDEX_DELIVERY,
   SHIPPING_PROVIDER_YANDEX_EXPRESS,
@@ -620,13 +621,23 @@ export async function confirmOrderItemByBuyer({
  * принимает товар назад. Кто именно — пишем в `returnedBy`: для продавца это
  * разные ситуации (товар ещё едет обратно или уже на полке).
  *
+ * У СДЭК и Яндекса возврат ставит только опрос службы (`viaCarrierSync`),
+ * когда посылка вернулась к продавцу. Руками — нельзя: служба продолжала бы
+ * везти посылку, а заказ у нас закрылся бы, и опрос его больше не спросил бы.
+ *
  * @param {{
  *   orderId: string;
  *   itemIndex: number;
  *   requestUserId: string;
+ *   viaCarrierSync?: boolean;
  * }} input
  */
-export async function markOrderItemReturned({ orderId, itemIndex, requestUserId }) {
+export async function markOrderItemReturned({
+  orderId,
+  itemIndex,
+  requestUserId,
+  viaCarrierSync = false,
+}) {
   const preview = await loadOrderWithItems(orderId);
   const previewItem = getPopulatedOrderItemOrThrow(preview, itemIndex);
 
@@ -646,6 +657,10 @@ export async function markOrderItemReturned({ orderId, itemIndex, requestUserId 
   if (previewItem.status === ORDER_STATUS_RETURNED) {
     await populateOrderForResponse(preview);
     return { order: preview };
+  }
+
+  if (!viaCarrierSync && resolveTrackedCarrier(preview, previewItem)) {
+    throw new AppError(409, CARRIER_MANAGED_RETURN_MESSAGE);
   }
 
   if (

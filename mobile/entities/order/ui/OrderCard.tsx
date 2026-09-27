@@ -10,7 +10,13 @@ import {
   type StyleProp,
   type ViewStyle,
 } from "react-native";
-import { resolveOrderShippingTrackingUrl } from "@molha/api-contract";
+import {
+  SHIPPING_PROVIDER_CDEK,
+  formatCdekKeepFreeUntil,
+  formatCdekStageLabel,
+  isCdekAwaitingPickup,
+  resolveOrderShippingTrackingUrl,
+} from "@molha/api-contract";
 import {
   resolveOrderLineAffiliateSellerLine,
   summarizeOrderItems,
@@ -96,6 +102,39 @@ type OrderCardOrder = {
     consentAt?: string | null;
   } | null;
   items?: OrderLineLike[];
+  // Отправления приходят из API как есть (passthrough) — поля читаем бережно.
+  shipments?: Array<Record<string, unknown>>;
+};
+
+type CdekWaybillLike = {
+  uuid?: unknown;
+  status?: unknown;
+  statusCode?: unknown;
+  keepFreeUntil?: unknown;
+  cancelledAt?: unknown;
+};
+
+/**
+ * Посылка СДЭК: этап так, как его пишет сам СДЭК («Готов к выдаче»), и —
+ * пока она в пункте — до какого дня её забрать.
+ */
+const resolveCdekSummary = (order: OrderCardOrder) => {
+  const shipment = (order.shipments ?? []).find(
+    (row) =>
+      row?.deliveryCarrier === SHIPPING_PROVIDER_CDEK &&
+      Boolean((row.cdekWaybill as CdekWaybillLike | null | undefined)?.uuid),
+  );
+  const waybill = shipment?.cdekWaybill as CdekWaybillLike | undefined;
+  if (!waybill || waybill.cancelledAt) return null;
+  const statusCode = typeof waybill.statusCode === "string" ? waybill.statusCode : "";
+  const rawStatus = typeof waybill.status === "string" ? waybill.status : "";
+  const stage = formatCdekStageLabel(statusCode, rawStatus);
+  if (!stage) return null;
+  const keepFreeUntil =
+    isCdekAwaitingPickup(statusCode) && typeof waybill.keepFreeUntil === "string"
+      ? formatCdekKeepFreeUntil(waybill.keepFreeUntil)
+      : "";
+  return { stage, keepFreeUntil };
 };
 
 type OrderCardProps = {
@@ -201,6 +240,7 @@ const OrderCardMeta = ({
   const sellers = showSeller ? resolveOrderSellers(order) : [];
   const trackingNumber = String(order.shippingTrackingNumber ?? "").trim();
   const trackingUrl = trackingNumber ? resolveOrderShippingTrackingUrl(order) : null;
+  const cdek = resolveCdekSummary(order);
 
   return (
     <View>
@@ -245,6 +285,18 @@ const OrderCardMeta = ({
           ) : (
             <Text style={styles.metaValue}>{trackingNumber}</Text>
           )}
+        </View>
+      ) : null}
+      {cdek ? (
+        <View style={styles.metaRow}>
+          <Text style={styles.metaLabel}>{ORDER_CARD_UI.CDEK_STATUS_LABEL}:</Text>
+          <Text style={styles.metaValue}>{cdek.stage}</Text>
+        </View>
+      ) : null}
+      {cdek?.keepFreeUntil ? (
+        <View style={styles.metaRow}>
+          <Text style={styles.metaLabel}>{ORDER_CARD_UI.CDEK_PICK_UP_BY_LABEL}:</Text>
+          <Text style={styles.metaValue}>{cdek.keepFreeUntil}</Text>
         </View>
       ) : null}
       <View style={styles.metaRow}>

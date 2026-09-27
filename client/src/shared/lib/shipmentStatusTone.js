@@ -1,3 +1,5 @@
+import { isCdekAwaitingPickup } from "@molha/api-contract";
+
 /**
  * Цвет статуса доставки для любой службы (ЛОБО, СДЭК, Яндекс, Экспресс):
  * у каждой свои коды, а покупателю и продавцу важно одно — всё хорошо,
@@ -30,4 +32,20 @@ export function resolveShipmentStatusTone(
   if (SUCCESS_RE.test(code)) return "success";
   if (NEUTRAL_RE.test(code)) return "neutral";
   return "info";
+}
+
+/**
+ * Цвет этапа СДЭК: «Готов к выдаче» ждёт покупателя — это «внимание», а не
+ * «в пути»; остальное — как у всех служб.
+ *
+ * @param {{ statusCode?: string | null; cancelledAt?: unknown } | null | undefined} waybill
+ * @returns {ShipmentStatusTone}
+ */
+export function resolveCdekStatusTone(waybill) {
+  if (!waybill?.cancelledAt && isCdekAwaitingPickup(waybill?.statusCode)) {
+    return "warning";
+  }
+  return resolveShipmentStatusTone(waybill?.statusCode, {
+    cancelled: Boolean(waybill?.cancelledAt),
+  });
 }

@@ -1,4 +1,9 @@
-import { CDEK_DELIVERY_MODE_POINT_TO_POINT } from "@molha/api-contract";
+import {
+  CDEK_DELIVERY_MODE_POINT_TO_POINT,
+  formatCdekKeepFreeUntil,
+  formatCdekStageLabel,
+  isCdekAwaitingPickup,
+} from "@molha/api-contract";
 import { useMutation } from "@tanstack/react-query";
 import { useId, useState } from "react";
 
@@ -11,7 +16,7 @@ import {
   fetchCdekReceptionPoints,
 } from "../api/cdekWaybillApi.js";
 
-import { resolveShipmentStatusTone } from "../../../shared/lib/shipmentStatusTone.js";
+import { resolveCdekStatusTone } from "../../../shared/lib/shipmentStatusTone.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { ShipmentStatusPill } from "../../../shared/ui/ShipmentStatus/ShipmentStatus.jsx";
 import { Package } from "lucide-react";
@@ -128,6 +133,11 @@ function WaybillState({ orderId, waybill, closed, pointToPoint, onWaybillChange 
   // Пока СДЭК посылку не принял: есть смысл в этикетке и курьере.
   const beforeHandover =
     isOpen && ["", "ACCEPTED", "CREATED"].includes(String(waybill.statusCode ?? ""));
+  // Посылка в пункте — показываем, до какого дня она там бесплатно лежит.
+  const keepFreeUntil =
+    isOpen && isCdekAwaitingPickup(waybill.statusCode)
+      ? formatCdekKeepFreeUntil(waybill.keepFreeUntil)
+      : "";
   const labelMutation = useMutation({
     mutationFn: fetchCdekLabel,
     onSuccess: (blob) => downloadBlob(blob, `cdek-${waybill.cdekNumber}.pdf`),
@@ -136,18 +146,20 @@ function WaybillState({ orderId, waybill, closed, pointToPoint, onWaybillChange 
   return (
     <div className="cdek-waybill-panel__state">
       <dl className="cdek-waybill-panel__facts">
-        {waybill.status ? (
+        {waybill.status || waybill.statusCode ? (
           <div className="cdek-waybill-panel__fact">
             <dt>{CDEK_WAYBILL_UI.STATUS}</dt>
             <dd>
-              <ShipmentStatusPill
-                tone={resolveShipmentStatusTone(waybill.statusCode, {
-                  cancelled: Boolean(waybill.cancelledAt),
-                })}
-              >
-                {waybill.status}
+              <ShipmentStatusPill tone={resolveCdekStatusTone(waybill)}>
+                {formatCdekStageLabel(waybill.statusCode, waybill.status ?? "")}
               </ShipmentStatusPill>
             </dd>
+          </div>
+        ) : null}
+        {keepFreeUntil ? (
+          <div className="cdek-waybill-panel__fact">
+            <dt>{CDEK_WAYBILL_UI.KEEP_FREE_UNTIL_LABEL}</dt>
+            <dd>{CDEK_WAYBILL_UI.KEEP_FREE_UNTIL(keepFreeUntil)}</dd>
           </div>
         ) : null}
       </dl>

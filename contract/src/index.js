@@ -763,6 +763,27 @@ export {
   cdekDeliveryPointSchema,
 } from "./cdek.js";
 export {
+  CDEK_STAGE_CREATED,
+  CDEK_STAGE_IN_TRANSIT,
+  CDEK_STAGE_WITH_COURIER,
+  CDEK_STAGE_READY_FOR_PICKUP,
+  CDEK_STAGE_DELIVERED,
+  CDEK_STAGE_NOT_DELIVERED,
+  CDEK_STAGE_RETURNING,
+  CDEK_STAGE_CANCELLED,
+  CDEK_STAGE_INVALID,
+  CDEK_STAGE_LABEL_RU,
+  resolveCdekStage,
+  formatCdekStageLabel,
+  formatCdekKeepFreeUntil,
+  isCdekAwaitingPickup,
+} from "./cdekTracking.js";
+export {
+  SHIPPING_CARRIERS_WITH_STATUS_SYNC,
+  CARRIER_MANAGED_RETURN_MESSAGE,
+  isShipmentStatusManagedByCarrier,
+} from "./carrierManagedShipment.js";
+export {
   YANDEX_DELIVERY_API_BASE_URL_PROD,
   YANDEX_DELIVERY_API_BASE_URL_TEST,
   YANDEX_DELIVERY_ENVIRONMENTS,

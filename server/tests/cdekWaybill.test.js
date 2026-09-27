@@ -239,5 +239,26 @@ describe("статусы СДЭК → ступени заказа", () => {
     assert.equal(state.statusCode, "RECEIVED_AT_SHIPMENT_WAREHOUSE");
     assert.equal(state.status, "Принят на склад отправителя");
     assert.equal(state.cdekNumber, "10323896114");
+    assert.equal(state.keepFreeUntil, null);
+  });
+
+  it("срок бесплатного хранения в пункте берётся из keep_free_until", async () => {
+    const { readCdekOrderState } =
+      await import("../services/shipping/cdek/cdekWaybill.js");
+    const state = readCdekOrderState({
+      entity: {
+        keep_free_until: "2026-10-03T20:59:59Z",
+        statuses: [
+          {
+            code: "ACCEPTED_AT_PICK_UP_POINT",
+            name: "Принят на склад до востребования",
+            date_time: "2026-09-26T13:11:11+0000",
+          },
+        ],
+      },
+    });
+    assert.equal(state.statusCode, "ACCEPTED_AT_PICK_UP_POINT");
+    assert.ok(state.keepFreeUntil instanceof Date);
+    assert.equal(state.keepFreeUntil.toISOString(), "2026-10-03T20:59:59.000Z");
   });
 });
