@@ -69,4 +69,16 @@ export const CDEK_WAYBILL_UI = {
   INTAKE_STATUS: "Статус заявки",
   AUTO_STATUS_HINT:
     "Статус заказа меняется сам: «Отгружен» — когда СДЭК примет посылку, «Доставлен» — когда вручит покупателю. Проверяем раз в полчаса.",
+  KEEP_FREE_UNTIL_LABEL: "Хранится в пункте",
+  /** @param {string} date «3 октября» */
+  KEEP_FREE_UNTIL: (date) => `до ${date}`,
+};
+
+/** Доставка СДЭК в карточке заказа покупателя. */
+export const ORDER_CDEK_UI = {
+  TITLE: "Доставка СДЭК",
+  /** @param {string} date «3 октября» */
+  PICK_UP_BY: (date) => `Заберите до ${date}`,
+  PICKUP_POINT: "Пункт выдачи",
+  TRACKING_LINK: "Отследить на cdek.ru",
 };

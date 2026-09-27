@@ -1327,6 +1327,8 @@ export const ORDER_CARD_UI = {
   ITEMS_HEADING: "Позиции",
   ADDRESS_LABEL: "Адрес доставки",
   TRACKING_LABEL: "Трек-номер",
+  CDEK_STATUS_LABEL: "СДЭК",
+  CDEK_PICK_UP_BY_LABEL: "Забрать до",
   PAYMENT_LABEL: "Оплата",
   CREATED_LABEL: "Создан",
   BUYER_LABEL: "Покупатель",

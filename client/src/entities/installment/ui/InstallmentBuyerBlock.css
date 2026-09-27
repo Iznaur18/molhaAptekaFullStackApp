@@ -21,7 +21,7 @@
 .installment-buyer-block__form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   padding: 0;
   border: none;
   border-radius: 0;
@@ -35,15 +35,19 @@
   color: var(--iz-color-text-secondary);
 }
 
+/* Планы — плитками в ряд: главное в плитке — платёж в месяц. */
 .installment-buyer-block__plans {
   margin: 0;
   padding: 0;
   border: none;
+  min-width: 0;
 }
 
+/* По одному плану в ряд, на всю ширину: плитки по две резались по краю,
+   когда планов было больше двух. */
 .installment-buyer-block__plan-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   margin-top: 6px;
 }
@@ -51,16 +55,15 @@
 .installment-buyer-block__plan-card {
   position: relative;
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 12px;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
   margin: 0;
-  padding: 12px 14px;
+  padding: 10px 12px;
   border: 1px solid var(--iz-color-border);
-  border-radius: 1.25rem;
+  border-radius: 1rem;
   corner-shape: squircle;
   background: var(--iz-color-surface-muted);
-  box-shadow: 0 1px 0 color-mix(in srgb, var(--iz-color-ink) 4%, transparent);
   cursor: pointer;
   transition:
     border-color 0.15s ease,
@@ -74,8 +77,8 @@
 
 .installment-buyer-block__plan-card_selected {
   border-color: var(--iz-color-action);
-  background: var(--iz-color-surface-muted);
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--iz-color-action) 15%, transparent);
+  background: color-mix(in srgb, var(--iz-color-action) 7%, var(--iz-color-surface));
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--iz-color-action) 14%, transparent);
 }
 
 .installment-buyer-block__plan-input {
@@ -88,9 +91,21 @@
   overflow: hidden;
 }
 
+/* Видимый фокус с клавиатуры — на плитке, раз сам радио спрятан. */
+.installment-buyer-block__plan-card:has(
+  .installment-buyer-block__plan-input:focus-visible
+) {
+  outline: 2px solid var(--iz-color-action);
+  outline-offset: 2px;
+}
+
+/* Кружок выбора — в углу плитки: слева он съедал ширину, и на телефоне
+   текст плитки не помещался. */
 .installment-buyer-block__plan-radio {
   box-sizing: border-box;
-  flex-shrink: 0;
+  position: absolute;
+  top: 10px;
+  right: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -115,90 +130,189 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   min-width: 0;
 }
 
 .installment-buyer-block__plan-title {
-  font-size: 15px;
-  font-weight: 700;
+  /* Место под кружок выбора в углу. */
+  padding-right: 24px;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--iz-color-text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.installment-buyer-block__plan-monthly {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   color: var(--iz-color-text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.installment-buyer-block__plan-card_selected .installment-buyer-block__plan-monthly {
+  color: var(--iz-color-action);
 }
 
 .installment-buyer-block__plan-meta {
-  font-size: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  font-size: 12.5px;
   color: var(--iz-color-text-secondary);
 }
 
 .installment-buyer-block__plan-note {
-  font-size: 13px;
-  color: var(--iz-color-text-secondary);
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--iz-color-success) 14%, transparent);
+  color: var(--iz-color-success-text, var(--iz-color-success));
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  /* Узкая плитка на телефоне — метка переносится, а не вылезает за край.
+     border-box: иначе отступы прибавлялись к 100% и метка выступала. */
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
-.installment-buyer-block__field_quantity {
-  max-width: 8rem;
+/* Количество — одной строкой: подпись, степпер и остаток. */
+.installment-buyer-block__quantity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
 }
 
-.installment-buyer-block__qty-hint {
-  font-size: 0.78rem;
-  color: var(--iz-color-text-muted);
+.installment-buyer-block__quantity .installment-buyer-block__label {
+  margin-right: auto;
 }
 
-.installment-buyer-block__field {
+.installment-buyer-block__stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--iz-color-surface-muted);
+  border: 1px solid var(--iz-color-border);
+}
+
+.installment-buyer-block__stepper-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.installment-buyer-block__stepper-button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--iz-color-action) 12%, var(--iz-color-surface));
+}
+
+.installment-buyer-block__stepper-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.installment-buyer-block__stepper-input {
+  box-sizing: border-box;
+  width: 2.75rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--iz-color-text);
+  font: inherit;
+  /* 16px — чтобы iOS не зумил страницу при фокусе. */
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.installment-buyer-block__stepper-input:focus {
+  outline: none;
+}
+
+.installment-buyer-block__stepper:focus-within {
+  border-color: var(--iz-color-action);
+  box-shadow: var(--iz-shadow-input-focus);
+}
+
+/* Итоги — одной карточкой: строки «подпись — сумма», итог по договору ниже черты. */
+.installment-buyer-block__summary {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  min-width: 0;
-}
-
-.installment-buyer-block__input {
-  box-sizing: border-box;
-  width: 100%;
-  font: inherit;
-  font-size: var(--iz-control-input-font);
-  color: var(--iz-color-text);
-  background: var(--iz-color-surface-muted);
-}
-
-.installment-buyer-block__input:focus {
-  border-color: var(--iz-color-action);
-  outline: none;
-  box-shadow: var(--iz-shadow-input-focus);
-  background: var(--iz-color-surface);
-}
-
-.installment-buyer-block__input:disabled {
-  background: var(--iz-color-surface-muted);
-  color: var(--iz-color-text-muted);
-}
-
-.installment-buyer-block__totals {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.installment-buyer-block__total-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  padding: 0.55rem 0.65rem;
+  margin: 0;
+  padding: 12px 14px;
   border: 1px solid var(--iz-color-border);
-  border-radius: 1.25rem;
+  border-radius: 1rem;
   corner-shape: squircle;
   background: var(--iz-color-surface-muted);
 }
 
-.installment-buyer-block__total-label {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--iz-color-text-muted);
+.installment-buyer-block__summary-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.installment-buyer-block__total-value {
-  font-size: 0.95rem;
+.installment-buyer-block__summary-row dt {
+  font-size: 13.5px;
+  color: var(--iz-color-text-secondary);
+}
+
+.installment-buyer-block__summary-row dd {
+  margin: 0;
+  font-size: 14px;
   font-weight: 700;
   color: var(--iz-color-text);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.installment-buyer-block__summary-row dd.installment-buyer-block__summary-markup {
+  color: var(--iz-color-warning-text, var(--iz-color-text));
+}
+
+:root[data-theme="dark"]
+  .installment-buyer-block__summary-row
+  dd.installment-buyer-block__summary-markup {
+  color: var(--iz-color-warning);
+}
+
+.installment-buyer-block__summary-row_total {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--iz-color-border);
+}
+
+.installment-buyer-block__summary-row_total dt {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--iz-color-text);
+}
+
+.installment-buyer-block__summary-row_total dd {
+  font-size: 18px;
+  font-weight: 800;
 }
 
 .installment-buyer-block__error {

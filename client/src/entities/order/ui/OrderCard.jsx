@@ -55,6 +55,7 @@ import {
 } from "../lib/resolveOrderLineItemProductName.js";
 import { OrderCardLineItemThumb } from "./OrderCardLineItemThumb.jsx";
 import { OrderCardLoboShipment } from "./OrderCardLoboShipment.jsx";
+import { OrderCardCdekShipment } from "./OrderCardCdekShipment.jsx";
 import { resolveOrderLineAffiliateSellerLine } from "../lib/resolveOrderLineAffiliateSellerLine.js";
 import { formatOrderNumber } from "../lib/formatOrderNumber.js";
 import { isAwaitingGitorgCourier } from "../lib/isAwaitingGitorgCourier.js";
@@ -269,6 +270,7 @@ function OrderCardMeta({
  *   pendingActionKey?: string | null;
  *   itemActionErrors?: Record<string, string>;
  *   itemsCount?: number;
+ *   carrierTracksShipment?: boolean;
  * }} props
  */
 function OrderCardLineItem({
@@ -285,6 +287,7 @@ function OrderCardLineItem({
   pendingActionKey = null,
   itemActionErrors = {},
   attentionRole = "buyer",
+  carrierTracksShipment = false,
 }) {
   const itemIndex = typeof item.itemIndex === "number" ? item.itemIndex : index;
   const actionKey = `${orderId}:${itemIndex}`;
@@ -297,8 +300,12 @@ function OrderCardLineItem({
   // «Отгрузить» / «Доставлен» / «Выдал» / «Подтвердить» — в строке отправления.
   // Возврат оформляется, пока покупатель не подтвердил получение: товар уже
   // уехал, но сделка не состоялась — отказ у двери, неудачное вручение.
+  // СДЭК и Яндекс сами отмечают возврат, когда посылка вернулась к продавцу.
+  // Кнопка тут расходилась со службой: покупатель «отказался», а посылка
+  // продолжала ехать в пункт, и заказ застревал в «Возвращён».
   const canMarkReturned =
-    item.status === ORDER_STATUS_SHIPPED || item.status === ORDER_STATUS_DELIVERED;
+    !carrierTracksShipment &&
+    (item.status === ORDER_STATUS_SHIPPED || item.status === ORDER_STATUS_DELIVERED);
   // Для продавца «клиент отказался» и «я принял назад» — разные ситуации:
   // в первом случае товар ещё едет обратно.
   const returnedByLabel =
@@ -677,6 +684,7 @@ export function OrderCard({
     pendingActionKey,
     itemActionErrors,
     attentionRole,
+    carrierTracksShipment: cdekTracksThisShipment,
   };
 
   // Свод считаем по позициям, а не берём `order.totalAmount`: после отмены
@@ -1131,6 +1139,7 @@ export function OrderCard({
       ) : null}
 
       <OrderCardLoboShipment shipment={shipmentOwn} role={attentionRole} />
+      <OrderCardCdekShipment shipment={shipmentOwn} role={attentionRole} />
 
       {awaitingGitorgCourier ? (
         <div className="order-card__awaiting-courier">

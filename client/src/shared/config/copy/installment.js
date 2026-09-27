@@ -21,6 +21,12 @@ export const INSTALLMENT_UI = {
   QUANTITY_LABEL: "Количество",
   /** @param {number} max */
   QUANTITY_AVAILABLE: (max) => `Доступно: ${max}`,
+  QUANTITY_DECREASE: "Меньше",
+  QUANTITY_INCREASE: "Больше",
+  /** @param {string} formatted «2 969 ₽» */
+  PLAN_PER_MONTH: (formatted) => `${formatted}/мес`,
+  /** @param {number} months */
+  PLAN_MONTHS: (months) => `${months} мес`,
   /** @param {number} max */
   QUANTITY_EXCEEDS_STOCK: (max) => `В наличии только ${max} шт.`,
   MONTHLY_LABEL: "Ежемесячно",

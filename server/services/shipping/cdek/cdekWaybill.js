@@ -193,11 +193,14 @@ export function readCdekOrderState(payload) {
   // Не вручённую посылку СДЭК везёт обратно отдельным «возвратным» заказом.
   const related = Array.isArray(entity.related_entities) ? entity.related_entities : [];
   const returnOrder = related.find((row) => row?.type === "return_order" && row?.uuid);
+  // До какого момента посылка бесплатно лежит в пункте: «Заберите до 3 октября».
+  const keepFreeUntilMs = Date.parse(String(entity.keep_free_until ?? ""));
   return {
     cdekNumber: entity.cdek_number ? String(entity.cdek_number) : null,
     status: latest?.name ? String(latest.name) : null,
     statusCode: latest?.code ? String(latest.code) : null,
     returnUuid: returnOrder ? String(returnOrder.uuid) : null,
+    keepFreeUntil: Number.isFinite(keepFreeUntilMs) ? new Date(keepFreeUntilMs) : null,
     error: errors.length
       ? errors
           .map((error) => error?.message ?? error?.code ?? "")
@@ -342,6 +345,7 @@ export async function refreshCdekWaybill({ orderId, sellerId }) {
     status: state.status ?? current.status ?? null,
     statusCode: state.statusCode ?? current.statusCode ?? null,
     returnUuid: state.returnUuid ?? current.returnUuid ?? null,
+    keepFreeUntil: state.keepFreeUntil ?? current.keepFreeUntil ?? null,
     error: state.error,
     syncedAt: new Date(),
   };

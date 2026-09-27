@@ -11,7 +11,11 @@
   }
 
   .installment-buyer-block__plan-card {
-    padding: 12px 14px;
+    padding: 10px 12px;
+  }
+
+  .installment-buyer-block__plan-monthly {
+    font-size: 16px;
   }
 
   .installment-buyer-block__submit {

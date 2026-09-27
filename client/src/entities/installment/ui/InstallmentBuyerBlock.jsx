@@ -19,6 +19,8 @@ import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
 import { useAppShellCompactLayout } from "../../../shared/lib/useAppShellCompactLayout.js";
 import { useProductDetailsPageDockHost } from "../../../shared/lib/productDetailsPageDockHostContext.js";
 import { getProductPurchaseLimit } from "../../product/lib/getProductPurchaseLimit.js";
+import { Minus, Plus } from "lucide-react";
+import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { InstallmentPassportShareConsentModal } from "./InstallmentPassportShareConsentModal.jsx";
 
 import "./InstallmentBuyerBlock.css";
@@ -52,6 +54,7 @@ export function InstallmentBuyerBlock({
   const { createContractMutation } = useInstallmentMutations();
   const { user: authUser } = useAuthSession();
   const formId = useId();
+  const quantityInputId = useId();
   const isCompactLayout = useAppShellCompactLayout();
   const pageDockHost = useProductDetailsPageDockHost();
   const dockSubmit = dockSubmitProp ?? isCompactLayout;
@@ -125,6 +128,15 @@ export function InstallmentBuyerBlock({
   useEffect(() => {
     setSelectedPlanId(program.plans[0]?._id ?? "");
   }, [program.plans]);
+
+  /** @param {number} delta */
+  const stepQuantity = (delta) => {
+    let next = Math.max(1, qty + delta);
+    if (purchaseLimit > 0) {
+      next = Math.min(next, purchaseLimit);
+    }
+    setQuantityRaw(String(next));
+  };
 
   const normalizeQuantityRaw = () => {
     let next = Math.max(1, Math.floor(Number(quantityRaw)) || 1);
@@ -334,14 +346,19 @@ export function InstallmentBuyerBlock({
                     <span className="installment-buyer-block__plan-title">
                       {plan.title || "План"}
                     </span>
-                    <span className="installment-buyer-block__plan-meta">
-                      {plan.monthsCount} мес × {formatPriceRub(plan.monthlyAmountRub)}
+                    <span className="installment-buyer-block__plan-monthly">
+                      {INSTALLMENT_UI.PLAN_PER_MONTH(
+                        formatPriceRub(plan.monthlyAmountRub),
+                      )}
                     </span>
-                    {!plan.firstPaymentRequiredNow ? (
-                      <span className="installment-buyer-block__plan-note">
-                        {INSTALLMENT_UI.FIRST_PAYMENT_LATER}
-                      </span>
-                    ) : null}
+                    <span className="installment-buyer-block__plan-meta">
+                      {INSTALLMENT_UI.PLAN_MONTHS(plan.monthsCount)}
+                      {!plan.firstPaymentRequiredNow ? (
+                        <span className="installment-buyer-block__plan-note">
+                          {INSTALLMENT_UI.FIRST_PAYMENT_LATER}
+                        </span>
+                      ) : null}
+                    </span>
                   </span>
                 </label>
               );
@@ -349,70 +366,75 @@ export function InstallmentBuyerBlock({
           </div>
         </fieldset>
 
-        <label className="installment-buyer-block__field installment-buyer-block__field_quantity">
-          <span className="installment-buyer-block__label">
+        <div className="installment-buyer-block__quantity">
+          <label className="installment-buyer-block__label" htmlFor={quantityInputId}>
             {INSTALLMENT_UI.QUANTITY_LABEL}
-          </span>
-          <input
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            autoComplete="off"
-            className="installment-buyer-block__input"
-            value={quantityRaw}
-            onChange={(event) => {
-              const next = event.target.value;
-              if (next === "" || /^\d+$/.test(next)) {
-                setQuantityRaw(next);
-              }
-            }}
-            onBlur={() => {
-              normalizeQuantityRaw();
-            }}
-            disabled={isSubmitting}
-          />
-          {purchaseLimit > 0 ? (
-            <span className="installment-buyer-block__qty-hint">
-              {INSTALLMENT_UI.QUANTITY_AVAILABLE(purchaseLimit)}
-            </span>
-          ) : null}
-        </label>
+          </label>
+          <div className="installment-buyer-block__stepper">
+            <button
+              type="button"
+              className="installment-buyer-block__stepper-button"
+              aria-label={INSTALLMENT_UI.QUANTITY_DECREASE}
+              disabled={isSubmitting || qty <= 1}
+              onClick={() => stepQuantity(-1)}
+            >
+              <AppIcon icon={Minus} size="sm" strokeWidth={2.4} />
+            </button>
+            <input
+              id={quantityInputId}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              autoComplete="off"
+              className="installment-buyer-block__stepper-input"
+              value={quantityRaw}
+              onChange={(event) => {
+                const next = event.target.value;
+                if (next === "" || /^\d+$/.test(next)) {
+                  setQuantityRaw(next);
+                }
+              }}
+              onBlur={() => {
+                normalizeQuantityRaw();
+              }}
+              disabled={isSubmitting}
+            />
+            <button
+              type="button"
+              className="installment-buyer-block__stepper-button"
+              aria-label={INSTALLMENT_UI.QUANTITY_INCREASE}
+              disabled={isSubmitting || (purchaseLimit > 0 && qty >= purchaseLimit)}
+              onClick={() => stepQuantity(1)}
+            >
+              <AppIcon icon={Plus} size="sm" strokeWidth={2.4} />
+            </button>
+          </div>
+        </div>
 
         {selectedPlan != null ? (
-          <div className="installment-buyer-block__totals">
-            <div className="installment-buyer-block__total-item">
-              <span className="installment-buyer-block__total-label">
-                {INSTALLMENT_UI.BUYER_PRODUCT_PRICE_LABEL}
-              </span>
-              <strong className="installment-buyer-block__total-value">
-                {formatPriceRub(baseTotalRub)}
-              </strong>
+          <dl className="installment-buyer-block__summary">
+            <div className="installment-buyer-block__summary-row">
+              <dt>{INSTALLMENT_UI.BUYER_PRODUCT_PRICE_LABEL}</dt>
+              <dd>{formatPriceRub(baseTotalRub)}</dd>
             </div>
-            <div className="installment-buyer-block__total-item">
-              <span className="installment-buyer-block__total-label">
-                {INSTALLMENT_UI.BUYER_MARKUP_LABEL}
-              </span>
-              <strong className="installment-buyer-block__total-value">
+            <div className="installment-buyer-block__summary-row">
+              <dt>{INSTALLMENT_UI.BUYER_MARKUP_LABEL}</dt>
+              <dd className="installment-buyer-block__summary-markup">
                 +{formatPriceRub(markupTotalRub)}
-              </strong>
+              </dd>
             </div>
-            <div className="installment-buyer-block__total-item">
-              <span className="installment-buyer-block__total-label">
-                {INSTALLMENT_UI.MONTHLY_LABEL}
-              </span>
-              <strong className="installment-buyer-block__total-value">
-                {formatPriceRub(monthlyTotal)}
-              </strong>
+            <div className="installment-buyer-block__summary-row">
+              <dt>{INSTALLMENT_UI.MONTHLY_LABEL}</dt>
+              <dd>
+                {formatPriceRub(monthlyTotal)} ×{" "}
+                {INSTALLMENT_UI.PLAN_MONTHS(selectedPlan.monthsCount)}
+              </dd>
             </div>
-            <div className="installment-buyer-block__total-item">
-              <span className="installment-buyer-block__total-label">
-                {INSTALLMENT_UI.TOTAL_LABEL}
-              </span>
-              <strong className="installment-buyer-block__total-value">
-                {formatPriceRub(contractTotal)}
-              </strong>
+            <div className="installment-buyer-block__summary-row installment-buyer-block__summary-row_total">
+              <dt>{INSTALLMENT_UI.TOTAL_LABEL}</dt>
+              <dd>{formatPriceRub(contractTotal)}</dd>
             </div>
-          </div>
+          </dl>
         ) : null}
 
         {error ? (
