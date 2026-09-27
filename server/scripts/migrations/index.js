@@ -45,6 +45,7 @@ import { up as productPromotionMinAmountUp } from "./20260906-product-promotion-
 import { up as productModerationFingerprintUp } from "./20260907-product-moderation-fingerprint.js";
 import { up as approvePendingForTrustedSellersUp } from "./20260909-approve-pending-for-trusted-sellers.js";
 import { up as catalogPriceIndexUp } from "./20260915-catalog-price-index.js";
+import { up as restoreCdekOrder6ce3a1a8Up } from "./20260927-restore-cdek-order-6ce3a1a8.js";
 
 export const MIGRATIONS = [
   {
@@ -293,5 +294,11 @@ export const MIGRATIONS = [
     description:
       "Create catalog_approved_price index for catalog price sorts and price range filter",
     up: catalogPriceIndexUp,
+  },
+  {
+    id: "20260927-restore-cdek-order-6ce3a1a8",
+    description:
+      "Return CDEK order 6CE3A1A8 from buyer-marked returned back to shipped so CDEK status sync resumes",
+    up: restoreCdekOrder6ce3a1a8Up,
   },
 ];

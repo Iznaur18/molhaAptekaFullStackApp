@@ -224,6 +224,41 @@ describe("оформление возврата продавцом", () => {
     await assert.rejects(() => doReturn(order, stranger.buyer._id), /Нет прав/);
   });
 
+  it("посылку СДЭК руками вернуть нельзя — только опросом службы", async () => {
+    const { seller, buyer, order } = await makeOrder();
+    await ship(order, seller._id);
+    // Отправление везёт СДЭК: ступени дальше ставит опрос его статусов.
+    await OrderModel.updateOne(
+      { _id: order._id },
+      {
+        $set: {
+          fulfillmentMethod: "delivery",
+          shipments: [
+            {
+              sellerId: seller._id,
+              fulfillmentMethod: "delivery",
+              deliveryCarrier: "cdek",
+            },
+          ],
+        },
+      },
+    );
+
+    await assert.rejects(() => doReturn(order, buyer._id), /ведёт служба доставки/);
+    await assert.rejects(() => doReturn(order, seller._id), /ведёт служба доставки/);
+    const untouched = await OrderModel.findById(order._id).lean();
+    assert.equal(untouched.items[0].status, "shipped", "посылка всё ещё в пути");
+
+    await markOrderItemReturned({
+      orderId: String(order._id),
+      itemIndex: 0,
+      requestUserId: String(seller._id),
+      viaCarrierSync: true,
+    });
+    const returned = await OrderModel.findById(order._id).lean();
+    assert.equal(returned.items[0].status, "returned", "возврат от СДЭК проходит");
+  });
+
   it("освобождает зарезервированные баллы продавца", async () => {
     const { seller, order } = await makeOrder();
     const { UserModel } = await import("../models/index.js");

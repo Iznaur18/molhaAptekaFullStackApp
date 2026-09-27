@@ -103,7 +103,12 @@ export async function applyCarrierReturnToOrder({ orderId, sellerId, carrier }) 
   let moved = 0;
   for (const { item, index } of await readSellerItems({ orderId, sellerId })) {
     if (!returnable.has(item.status)) continue;
-    await markOrderItemReturned({ orderId, itemIndex: index, requestUserId: sellerId });
+    await markOrderItemReturned({
+      orderId,
+      itemIndex: index,
+      requestUserId: sellerId,
+      viaCarrierSync: true,
+    });
     moved += 1;
   }
   if (moved > 0) {

@@ -188,6 +188,40 @@ describe("накладная СДЭК в карточке продажи", () =>
     vi.unstubAllGlobals();
   });
 
+  it("статус как на cdek.ru и срок хранения, пока посылка в пункте", () => {
+    renderPanel({
+      cdekShipmentAtOrder: SNAPSHOT,
+      cdekWaybill: {
+        uuid: "u-11",
+        cdekNumber: "10325488383",
+        status: "Принят на склад до востребования",
+        statusCode: "ACCEPTED_AT_PICK_UP_POINT",
+        keepFreeUntil: "2026-10-03T20:59:59.000Z",
+      },
+    });
+
+    expect(screen.getByText("Готов к выдаче")).toBeTruthy();
+    expect(screen.queryByText("Принят на склад до востребования")).toBeNull();
+    expect(screen.getByText("Хранится в пункте")).toBeTruthy();
+    expect(screen.getByText("до 3 октября")).toBeTruthy();
+  });
+
+  it("в пути срок хранения не показываем", () => {
+    renderPanel({
+      cdekShipmentAtOrder: SNAPSHOT,
+      cdekWaybill: {
+        uuid: "u-12",
+        cdekNumber: "10325488384",
+        status: "Принят на склад транзита",
+        statusCode: "ACCEPTED_AT_TRANSIT_WAREHOUSE",
+        keepFreeUntil: "2026-10-03T20:59:59.000Z",
+      },
+    });
+
+    expect(screen.getByText("В пути")).toBeTruthy();
+    expect(screen.queryByText("Хранится в пункте")).toBeNull();
+  });
+
   it("посылка уже у СДЭК — ни этикетки, ни курьера", () => {
     renderPanel({
       cdekShipmentAtOrder: { ...SNAPSHOT, deliveryMode: 2 },
