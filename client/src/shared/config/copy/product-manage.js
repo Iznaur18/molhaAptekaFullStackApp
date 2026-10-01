@@ -18,7 +18,7 @@ export const SELLER_PRODUCTS_PAGE_UI = {
   SHELF_FILTER_ARIA: "Полки продавца",
   SHELF_FILTER_ALL: "Все",
   STATS_ARIA: "Статистика продавца",
-  STATS_VOTE_RATING: "Рейтинг голосов",
+  STATS_VOTE_RATING: "Оценка",
 };
 
 export const SELLER_SHELF_UI = {

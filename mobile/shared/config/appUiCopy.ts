@@ -522,7 +522,7 @@ export const PRODUCT_CARD_UI = {
   LOYALTY_POINTS_DETAIL: (points: number) => `+${points} Б`,
   SELLER_PROFILE_ARIA: (sellerName: string) => `Профиль продавца: ${sellerName}`,
   RATING_LINE: (rating: number, count: number) => `★ ${rating.toFixed(1)} (${count})`,
-  PROMOTION_BUTTON: "Управление",
+  PROMOTION_BUTTON: "Продвижение",
   EDIT_PRODUCT: "Изменить",
   COPY_PRODUCT_ARIA: "Копировать товар",
   FOOTER_ACTIONS_ARIA: "Действия с товаром",
@@ -1742,7 +1742,7 @@ export const SELLER_PRODUCTS_PAGE_UI = {
   SHELF_FILTER_ARIA: "Полки продавца",
   SHELF_FILTER_ALL: "Все",
   STATS_ARIA: "Статистика продавца",
-  STATS_VOTE_RATING: "Рейтинг голосов",
+  STATS_VOTE_RATING: "Оценка",
   /** @param userName seller display name */
   TITLE_FOR: (userName: string) => `Товары ${userName}`,
 } as const;
