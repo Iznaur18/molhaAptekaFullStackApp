@@ -275,7 +275,7 @@ export const PRODUCT_CARD_UI = {
   COPY_PRODUCT: "Скопировать",
   COPY_PRODUCT_ARIA: "Копировать товар",
   MORE_ACTIONS_ARIA: "Дополнительные действия",
-  PROMOTION_BUTTON: "Управление",
+  PROMOTION_BUTTON: "Продвижение",
   DELETE_PRODUCT: "Удалить товар",
   DELETE_PRODUCT_MENU: "Удалить",
   DELETE_PRODUCT_PENDING: "Удаление…",

@@ -158,7 +158,7 @@ test.describe.serial("product manage toggle display", () => {
     await productCard.first().scrollIntoViewIfNeeded();
     await productCard
       .first()
-      .getByRole("button", { name: "Управление", exact: true })
+      .getByRole("button", { name: "Продвижение", exact: true })
       .click();
 
     const dialog = page.getByRole("dialog", { name: "Продвижение товара" });

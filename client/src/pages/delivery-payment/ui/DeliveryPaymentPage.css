@@ -109,7 +109,13 @@
   box-shadow: 0 1px 0 color-mix(in srgb, var(--iz-color-ink) 4%, transparent);
 }
 
+/* Заголовок — первой строкой внутри карточки, а не на её рамке, как у
+   legend по умолчанию. float выводит legend из «рамочной» раскладки:
+   в flex-блоке он становится обычной строкой с общими отступами. */
 .delivery-payment-page__legend {
+  float: left;
+  width: 100%;
+  margin: 0;
   padding: 0;
   font-size: 1rem;
   font-weight: 800;
