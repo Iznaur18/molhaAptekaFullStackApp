@@ -167,13 +167,21 @@ export function CheckoutShippingProviderPicker({
           sellerLabel: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SELLER,
         });
         const isFixedCarrier = productCarrierFixed && option.id === productCarrier;
+        // Служба товара (ЛОБО) — это «своя доставка» отправления: выбрана,
+        // пока покупатель не ушёл на СДЭК или Яндекс, и на неё можно
+        // вернуться. Раньше она горела всегда и была неактивной: после
+        // выбора СДЭК подсвечивались обе службы, а назад на ЛОБО не нажать.
         return {
           id: option.id,
           label,
-          selected: isSeller ? ownDeliverySelected && isSellerSelected : isFixedCarrier,
+          selected: isSeller
+            ? ownDeliverySelected && isSellerSelected
+            : isFixedCarrier && ownDeliverySelected,
           locked: !option.live,
           soon: !option.live,
-          selectable: isSeller && canSwitch && isSellerSelected,
+          selectable: isSeller
+            ? canSwitch && isSellerSelected
+            : isFixedCarrier && canSwitch,
         };
       }),
     ...carrierCards.map((card) => ({

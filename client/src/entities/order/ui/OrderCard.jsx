@@ -46,6 +46,7 @@ import {
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_YANDEX_DELIVERY,
   SHIPPING_PROVIDER_YANDEX_EXPRESS,
+  resolveOrderPrepaymentAmountRub,
   resolveProductDeliveryCarrier,
 } from "@molha/api-contract";
 import { ConfirmButton } from "../../../shared/ui/ConfirmButton/ConfirmButton.jsx";
@@ -72,6 +73,26 @@ import "./OrderCard.css";
 
 const formatPaymentMethod = (method) =>
   ORDER_PAYMENT_METHOD_LABEL_RU[method] ?? method ?? COMMON_UI.EM_DASH;
+
+/**
+ * «4 октября, 15:30» — срок оплаты по СБП во времени устройства покупателя.
+ *
+ * @param {unknown} value
+ * @returns {string} пусто, если срока нет
+ */
+const formatPrepaymentDue = (value) => {
+  if (!value) return "";
+  const date = new Date(/** @type {string | number | Date} */ (value));
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "numeric",
+    month: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+    .format(date)
+    .replace(" в ", ", ");
+};
 
 const formatCounterparty = (user) => {
   if (user == null || typeof user === "string") return COMMON_UI.EM_DASH;
@@ -670,6 +691,10 @@ export function OrderCard({
   // что товар есть, и только потом покупатель платит.
   const acceptedBySeller = shipmentStatusNow !== "pending";
   const awaitingSellerAccept = awaitingPrepayment && !acceptedBySeller;
+  // Та же формула, что и счёт на сервере: на кнопке ровно то, что спишут.
+  const prepaymentAmountRub = resolveOrderPrepaymentAmountRub(order);
+  // Срок оплаты ставит сервер при подтверждении — после него заказ отменится.
+  const prepaymentDueText = formatPrepaymentDue(order.prepaymentDueAt);
   const awaitingPaymentAfterAccept = awaitingPrepayment && acceptedBySeller;
 
   const lineItemProps = {
@@ -1201,16 +1226,25 @@ export function OrderCard({
                 ? ORDER_CARD_UI.AWAITING_PREPAYMENT_SELLER_HINT
                 : ORDER_CARD_UI.AWAITING_PREPAYMENT_BUYER_HINT}
           </span>
+          {awaitingPaymentAfterAccept &&
+          attentionRole === "buyer" &&
+          prepaymentDueText ? (
+            <span className="order-card__prepayment-due">
+              {ORDER_CARD_UI.PREPAYMENT_DUE(prepaymentDueText)}
+            </span>
+          ) : null}
           {awaitingPaymentAfterAccept && attentionRole === "buyer" && onPayOrder ? (
             <button
               type="button"
-              className="order-card__item-action-button"
+              className="order-card__pay-now"
               onClick={() => onPayOrder({ orderId: order._id })}
               disabled={isPayOrderPending}
             >
               {isPayOrderPending
                 ? ORDER_CARD_UI.PAY_NOW_PENDING
-                : ORDER_CARD_UI.PAY_NOW}
+                : prepaymentAmountRub > 0
+                  ? ORDER_CARD_UI.PAY_NOW_AMOUNT(formatPriceRub(prepaymentAmountRub))
+                  : ORDER_CARD_UI.PAY_NOW}
             </button>
           ) : null}
         </div>

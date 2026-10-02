@@ -132,8 +132,10 @@
 }
 
 /* Сумму курьеру назначает покупатель — тарифа по километражу нет. */
+/* Стоит прямо над «Итого / Оформить» — с тем же шагом, что и карточки
+   оформления. */
 .cart-fulfillment__fee {
-  margin: 0 var(--cart-page-content-inset, 12px) 12px;
+  margin: var(--cart-fulfillment-card-gap, 6px) var(--cart-page-content-inset, 12px) 0;
   padding: 14px 16px;
   border: 1px solid color-mix(in srgb, var(--iz-color-ink) 8%, transparent);
   border-radius: 16px;
@@ -235,4 +237,31 @@
   .cart-fulfillment__fee-controls {
     align-self: flex-end;
   }
+}
+
+/* Частые суммы курьеру — ряд кнопок под степпером. */
+.cart-fulfillment__fee-presets {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.cart-fulfillment__fee-preset {
+  min-height: 36px;
+  padding: 0 6px;
+  border: 1.5px solid var(--iz-color-border-strong, var(--iz-color-border));
+  border-radius: 10px;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.cart-fulfillment__fee-preset--active {
+  border-color: var(--iz-color-action);
+  background: color-mix(in srgb, var(--iz-color-action) 8%, var(--iz-color-surface));
 }

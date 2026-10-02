@@ -205,6 +205,55 @@ describe("предоплата заказа картой", () => {
     assert.equal(String(fresh.prepaidPaymentId), created.paymentId);
   });
 
+  it("оплата после отмены — вся сумма с доставкой к возврату, покупатель знает", async () => {
+    const { EscrowLedgerEntryModel, UserInAppNotificationModel } =
+      await import("../models/index.js");
+    const buyer = await makeBuyer();
+    const order = await makeOrder({ userId: buyer._id, sellerId: PLATFORM_SELLER_ID });
+    await OrderModel.updateOne(
+      { _id: order._id },
+      {
+        $set: {
+          shipments: [
+            {
+              sellerId: PLATFORM_SELLER_ID,
+              fulfillmentMethod: "delivery",
+              sellerDeliveryFeeRub: 150,
+            },
+          ],
+        },
+      },
+    );
+    stubFetch(() => pendingPayment("2c8f-after-cancel"));
+    const created = await createOrderPrepayment({
+      userId: String(buyer._id),
+      orderId: String(order._id),
+      returnUrl: "/my-orders",
+    });
+    // Пока покупатель был в банке, заказ сняли за неоплату.
+    await OrderModel.updateOne(
+      { _id: order._id },
+      { $set: { status: "cancelled", "items.0.status": "cancelled" } },
+    );
+
+    const result = await applyOrderPrepayment({
+      paymentId: created.paymentId,
+      providerStatus: "succeeded",
+      providerAmountRub: 1650,
+    });
+
+    assert.equal(result.applied, true);
+    const entry = await EscrowLedgerEntryModel.findOne({ orderId: order._id }).lean();
+    assert.ok(entry, "долг записан");
+    assert.deepEqual(
+      entry.lines.map((line) => `${line.kind}:${line.state}`).sort(),
+      ["delivery:refundable", "goods:refundable"],
+      "и товар, и доставка причитаются покупателю",
+    );
+    const notes = await UserInAppNotificationModel.find({ userId: buyer._id }).lean();
+    assert.ok(notes.some((row) => /после отмены заказа/.test(row.message)));
+  });
+
   it("оплаченный заказ второй раз не оплачивается", async () => {
     const buyer = await makeBuyer();
     const order = await makeOrder({ userId: buyer._id, sellerId: PLATFORM_SELLER_ID });

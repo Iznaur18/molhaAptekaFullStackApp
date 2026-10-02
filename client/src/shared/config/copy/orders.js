@@ -61,7 +61,7 @@ export const ORDER_CARD_UI = {
   SHIPMENT_PAY_TO: (requisites) => `Перевести продавцу: ${requisites}`,
   AWAITING_ACCEPT: "Ждём подтверждения продавца",
   AWAITING_ACCEPT_BUYER_HINT:
-    "Продавец проверяет, что товар есть. Оплата откроется после подтверждения — так не придётся возвращать деньги, если товара не окажется.",
+    "Продавец проверяет, что товар есть. Оплата откроется после подтверждения.",
   AWAITING_ACCEPT_SELLER_HINT:
     "Подтвердите заказ, если товар есть — покупатель сможет оплатить. Если товара нет, отмените заказ: деньги ещё не списаны.",
   AWAITING_PREPAYMENT: "Ожидает оплаты",
@@ -73,7 +73,11 @@ export const ORDER_CARD_UI = {
   AWAITING_COURIER_BUYER_HINT:
     "Ищем курьера. Можно поднять оплату за доставку — так заказ быстрее возьмут.",
   AWAITING_COURIER_SELLER_HINT: "Ждём, пока курьер примет заказ в «Свободные заказы».",
+  /** @param {string} until «4 октября, 15:30» */
+  PREPAYMENT_DUE: (until) => `Оплатите до ${until} — иначе заказ отменится`,
   PAY_NOW: "Оплатить",
+  /** @param {string} formatted «2 ₽» */
+  PAY_NOW_AMOUNT: (formatted) => `Оплатить ${formatted} по СБП`,
   PAY_NOW_PENDING: "Открываем оплату…",
   SHIPMENT_PAY_TO_HINT: "Курьер отдаст заказ, когда продавец подтвердит перевод.",
   SHIPMENT_PAYMENT_RECEIVED_BY_SELLER: "Продавец подтвердил, что перевод дошёл",
@@ -127,6 +131,14 @@ export const MY_ORDERS_PAGE_UI = {
   COUNT_ITEMS: (count) => `${count} заказов`,
   STATUS_FILTER_LABEL: "Фильтр по статусу",
   STATUS_FILTER_ALL: "Все статусы",
+  /** Группы фильтра — вместо 14 кнопок-статусов. */
+  STATUS_GROUP_ALL: "Все",
+  STATUS_GROUP_ATTENTION: "Нужно действие",
+  STATUS_GROUP_IN_PROGRESS: "В работе",
+  STATUS_GROUP_DONE: "Завершённые",
+  STATUS_GROUP_CLOSED: "Отменённые",
+  STATUS_MORE: "Ещё статусы",
+  STATUS_LESS: "Свернуть",
   OVERVIEW_IN_PROGRESS: "В работе",
   OVERVIEW_ATTENTION: "Нужно действие",
   OVERVIEW_TOTAL: "Сумма покупок",

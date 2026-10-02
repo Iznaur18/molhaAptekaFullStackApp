@@ -9,6 +9,7 @@ import { ONEC_SYNC_INTERVAL_MS } from "../constants/onecConstants.js";
 import { ANALYTICS_RECONCILIATION_CRON_INTERVAL_MS } from "../constants/analyticsConstants.js";
 import { COURIER_STUCK_SHIPMENT_CRON_INTERVAL_MS } from "../constants/courierConstants.js";
 import { ESCROW_CRON_INTERVAL_MS } from "../constants/escrowConstants.js";
+import { ORDER_PREPAYMENT_CRON_INTERVAL_MS } from "../constants/orderConstants.js";
 import { LOBO_POLL_INTERVAL_MS } from "../constants/loboConstants.js";
 import { CDEK_POLL_INTERVAL_MS } from "../constants/cdekConstants.js";
 import { SELLER_PERSONAL_CATEGORY_CRON_INTERVAL_MS } from "../constants/sellerPersonalCategoryConstants.js";
@@ -23,6 +24,7 @@ import {
   JOB_PROCESS_ANALYTICS_RECONCILIATION,
   JOB_PROCESS_COURIER_STUCK_SHIPMENTS,
   JOB_PROCESS_ESCROW_RELEASE,
+  JOB_PROCESS_ORDER_PREPAYMENT_DEADLINES,
   JOB_PROCESS_LOBO_CRON,
   JOB_PROCESS_CDEK_STATUS_SYNC,
   JOB_PROCESS_PREMIUM_CRON,
@@ -87,5 +89,9 @@ export const CRON_JOB_DEFINITIONS = [
   {
     name: JOB_PROCESS_ESCROW_RELEASE,
     intervalMs: ESCROW_CRON_INTERVAL_MS,
+  },
+  {
+    name: JOB_PROCESS_ORDER_PREPAYMENT_DEADLINES,
+    intervalMs: ORDER_PREPAYMENT_CRON_INTERVAL_MS,
   },
 ];

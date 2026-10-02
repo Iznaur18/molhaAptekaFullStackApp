@@ -4,6 +4,8 @@ import {
 } from "@molha/api-contract";
 
 import {
+  ORDER_PAYMENT_METHOD_CARD_PREPAID,
+  ORDER_PREPAYMENT_DEADLINE_MS,
   ORDER_STATUS_ACCEPTED,
   ORDER_STATUS_ASSEMBLING,
   ORDER_STATUS_PENDING,
@@ -14,7 +16,11 @@ import {
 import { AppError } from "../../errors/AppError.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
-import { assertOrderPrepaid } from "./assertOrderPrepaid.js";
+import {
+  assertOrderPrepaid,
+  isOrderAcceptedBySeller,
+  isOrderAwaitingPrepayment,
+} from "./assertOrderPrepaid.js";
 import { notifyBuyerAboutOrderItemStatus } from "./notifyBuyerAboutOrderItemStatus.js";
 import {
   loadOrderWithItems,
@@ -111,6 +117,15 @@ export async function advanceOrderShipmentStatus({ orderId, sellerId, nextStatus
     item.status = nextStatus;
   }
   order.status = buildOrderStatusFromItems(order.items);
+  // Заказ по СБП стал доступен для оплаты — с этого момента идут сутки.
+  if (
+    nextStatus === ORDER_STATUS_ACCEPTED &&
+    !order.prepaymentDueAt &&
+    isOrderAwaitingPrepayment(order) &&
+    isOrderAcceptedBySeller(order)
+  ) {
+    order.prepaymentDueAt = new Date(Date.now() + ORDER_PREPAYMENT_DEADLINE_MS);
+  }
   await order.save();
   await populateOrderForResponse(order);
 
@@ -122,6 +137,9 @@ export async function advanceOrderShipmentStatus({ orderId, sellerId, nextStatus
     status: nextStatus,
     productName: items.length === 1 ? items[0].productNameAtOrder : "",
     orderId,
+    // Заказ по СБП ещё не оплачен: «продавец принял» значит «теперь оплатите».
+    awaitingPrepayment:
+      order.paymentMethod === ORDER_PAYMENT_METHOD_CARD_PREPAID && !order.prepaidPaidAt,
   });
 
   // Собранное отправление внешняя служба забирает сама — вызываем её здесь.

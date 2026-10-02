@@ -4,7 +4,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { orderMatchesMyOrdersFilters } from "../../../entities/order/lib/filterMyOrders.js";
 import { projectMyOrdersSellerBlocks } from "../../../entities/order/lib/projectMyOrdersSellerBlocks.js";
 import { summarizeMyOrders } from "../../../entities/order/lib/summarizeMyOrders.js";
-import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "../../../entities/order/model/myOrdersListFilters.js";
+import {
+  MY_ORDERS_LIST_FILTER_CLOSED,
+  MY_ORDERS_LIST_FILTER_DONE,
+  MY_ORDERS_LIST_FILTER_IN_PROGRESS,
+} from "../../../entities/order/model/myOrdersListFilters.js";
 import { useCreateOrderPaymentMutation } from "../../../entities/payment/model/paymentQueries.js";
 import { orderQueryKeys } from "../../../entities/order/model/orderQueryKeys.js";
 import { useMyOrdersQuery } from "../../../entities/order/model/useMyOrdersQuery.js";
@@ -115,9 +119,22 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
     return () => window.clearTimeout(timerId);
   }, [loyaltyFlash]);
 
+  // Повторное нажатие на плитку снимает фильтр.
   const handleInProgressFilterClick = useCallback(() => {
-    setStatusFilter(MY_ORDERS_LIST_FILTER_IN_PROGRESS);
+    setStatusFilter((current) =>
+      current === MY_ORDERS_LIST_FILTER_IN_PROGRESS
+        ? ""
+        : MY_ORDERS_LIST_FILTER_IN_PROGRESS,
+    );
     setAttentionOnly(false);
+  }, []);
+
+  /** «Нужно действие» — отдельно от статуса: включая его, статус сбрасываем. */
+  const handleAttentionOnlyChange = useCallback((value) => {
+    setAttentionOnly(value);
+    if (value) {
+      setStatusFilter("");
+    }
   }, []);
 
   const patchOrders = useCallback(
@@ -271,8 +288,9 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
       attentionCount={summary.attentionCount}
       totalAmountRub={summary.totalAmountRub}
       attentionOnly={attentionOnly}
+      inProgressActive={statusFilter === MY_ORDERS_LIST_FILTER_IN_PROGRESS}
       onInProgressFilterClick={handleInProgressFilterClick}
-      onAttentionFilterChange={setAttentionOnly}
+      onAttentionFilterChange={handleAttentionOnlyChange}
     />
   );
 
@@ -287,12 +305,12 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
     <OrdersToolbar
       summaryCountLabel={summaryCountLabel}
       statusFilter={statusFilter}
+      attentionOnly={attentionOnly}
       onStatusFilterChange={(value) => {
         setStatusFilter(value);
-        if (value) {
-          setAttentionOnly(false);
-        }
+        setAttentionOnly(false);
       }}
+      onAttentionOnlyChange={handleAttentionOnlyChange}
       onRefresh={() => {
         void reloadOrders();
       }}
@@ -463,19 +481,25 @@ export function MyOrdersPage({ isAuthorized, onSellerNameClick, onQueueChanged }
   );
 }
 
-const ORDERS_STATUS_FILTER_OPTIONS = [
-  { value: "", label: MY_ORDERS_PAGE_UI.STATUS_FILTER_ALL },
-  ...ORDER_STATUSES.map((status) => ({
-    value: status,
-    label: ORDER_STATUS_LABEL_RU[status],
-  })),
-];
+/** Подробные статусы — под «Ещё статусы»: 14 кнопок разом были шумом. */
+const ORDERS_STATUS_FILTER_OPTIONS = ORDER_STATUSES.map((status) => ({
+  value: status,
+  label: ORDER_STATUS_LABEL_RU[status],
+}));
+
+const ORDERS_STATUS_GROUP_VALUES = new Set([
+  MY_ORDERS_LIST_FILTER_IN_PROGRESS,
+  MY_ORDERS_LIST_FILTER_DONE,
+  MY_ORDERS_LIST_FILTER_CLOSED,
+]);
 
 /**
  * @param {{
  *   summaryCountLabel: string;
  *   statusFilter: string;
+ *   attentionOnly: boolean;
  *   onStatusFilterChange: (value: string) => void;
+ *   onAttentionOnlyChange: (value: boolean) => void;
  *   onRefresh?: () => void;
  *   isRefreshing?: boolean;
  * }} props
@@ -483,10 +507,39 @@ const ORDERS_STATUS_FILTER_OPTIONS = [
 function OrdersToolbar({
   summaryCountLabel,
   statusFilter,
+  attentionOnly,
   onStatusFilterChange,
+  onAttentionOnlyChange,
   onRefresh,
   isRefreshing = false,
 }) {
+  const exactStatusSelected =
+    Boolean(statusFilter) && !ORDERS_STATUS_GROUP_VALUES.has(statusFilter);
+  const [showAllStatuses, setShowAllStatuses] = useState(exactStatusSelected);
+  const groups = [
+    {
+      key: "all",
+      label: MY_ORDERS_PAGE_UI.STATUS_GROUP_ALL,
+      active: !statusFilter && !attentionOnly,
+      onSelect: () => onStatusFilterChange(""),
+    },
+    {
+      key: "attention",
+      label: MY_ORDERS_PAGE_UI.STATUS_GROUP_ATTENTION,
+      active: attentionOnly,
+      onSelect: () => onAttentionOnlyChange(true),
+    },
+    ...[
+      [MY_ORDERS_LIST_FILTER_IN_PROGRESS, MY_ORDERS_PAGE_UI.STATUS_GROUP_IN_PROGRESS],
+      [MY_ORDERS_LIST_FILTER_DONE, MY_ORDERS_PAGE_UI.STATUS_GROUP_DONE],
+      [MY_ORDERS_LIST_FILTER_CLOSED, MY_ORDERS_PAGE_UI.STATUS_GROUP_CLOSED],
+    ].map(([value, label]) => ({
+      key: value,
+      label,
+      active: statusFilter === value,
+      onSelect: () => onStatusFilterChange(value),
+    })),
+  ];
   return (
     <div className="my-orders-page__toolbar">
       <div className="my-orders-page__toolbar-head">
@@ -512,28 +565,63 @@ function OrdersToolbar({
         role="group"
         aria-label={MY_ORDERS_PAGE_UI.STATUS_FILTER_LABEL}
       >
-        {ORDERS_STATUS_FILTER_OPTIONS.map((option) => {
-          const isActive = statusFilter === option.value;
-
-          return (
-            <button
-              key={option.value || "all"}
-              type="button"
-              className={[
-                "my-orders-page__status-chip",
-                isActive ? "my-orders-page__status-chip_active" : "",
-                option.value ? `my-orders-page__status-chip_${option.value}` : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              aria-pressed={isActive}
-              onClick={() => onStatusFilterChange(option.value)}
-            >
-              {option.label}
-            </button>
-          );
-        })}
+        {groups.map((group) => (
+          <button
+            key={group.key}
+            type="button"
+            className={[
+              "my-orders-page__status-chip",
+              group.active ? "my-orders-page__status-chip_active" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            aria-pressed={group.active}
+            onClick={group.onSelect}
+          >
+            {group.label}
+          </button>
+        ))}
+        <button
+          type="button"
+          className="my-orders-page__status-more"
+          aria-expanded={showAllStatuses}
+          onClick={() => setShowAllStatuses((value) => !value)}
+        >
+          {showAllStatuses
+            ? MY_ORDERS_PAGE_UI.STATUS_LESS
+            : MY_ORDERS_PAGE_UI.STATUS_MORE}
+        </button>
       </div>
+
+      {showAllStatuses ? (
+        <div
+          className="my-orders-page__status-chips my-orders-page__status-chips_all"
+          role="group"
+          aria-label={MY_ORDERS_PAGE_UI.STATUS_FILTER_LABEL}
+        >
+          {ORDERS_STATUS_FILTER_OPTIONS.map((option) => {
+            const isActive = statusFilter === option.value;
+
+            return (
+              <button
+                key={option.value || "all"}
+                type="button"
+                className={[
+                  "my-orders-page__status-chip",
+                  isActive ? "my-orders-page__status-chip_active" : "",
+                  option.value ? `my-orders-page__status-chip_${option.value}` : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                aria-pressed={isActive}
+                onClick={() => onStatusFilterChange(option.value)}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -8,7 +8,10 @@ import {
   IN_APP_NOTIFICATION_KIND_FOLLOWED_SELLER_PRODUCT_DISCOUNT,
   IN_APP_NOTIFICATION_KIND_NEW_FOLLOWER,
 } from "../../../entities/user-follow/model/constants.js";
-import { IN_APP_NOTIFICATION_KIND_SELLER_NEW_ORDER } from "../../../entities/order/model/constants.js";
+import {
+  IN_APP_NOTIFICATION_KIND_BUYER_ORDER_STATUS,
+  IN_APP_NOTIFICATION_KIND_SELLER_NEW_ORDER,
+} from "../../../entities/order/model/constants.js";
 import { useInAppNotificationsPoll } from "../lib/useInAppNotificationsPoll.js";
 
 /** @typedef {import('../../../entities/product-report/model/types.js').UserInAppNotification} UserInAppNotification */
@@ -94,6 +97,11 @@ export const useHomeNotifications = ({
       }
       if (item.kind === IN_APP_NOTIFICATION_KIND_SELLER_NEW_ORDER) {
         goToMainView("my-sales");
+        return;
+      }
+      // «Оплатите», «отменён» и прочее о заказе — покупателю нужен его заказ.
+      if (item.kind === IN_APP_NOTIFICATION_KIND_BUYER_ORDER_STATUS) {
+        goToMainView("my-orders");
         return;
       }
       if (

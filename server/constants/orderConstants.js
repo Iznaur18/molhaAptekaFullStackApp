@@ -185,6 +185,40 @@ export const IN_APP_NOTIFICATION_MESSAGE_BUYER_ORDER_CANCELLED =
   "Продавец отменил заказ";
 
 /** Подписи статуса для покупателя: он читает «отправлен», а не `shipped`. */
+/**
+ * Срок оплаты по СБП после подтверждения продавцом.
+ *
+ * Неоплаченный заказ держит товар в резерве: без срока он висел бы так
+ * бесконечно. Через сутки заказ отменяется, за 3 часа покупателю напоминаем.
+ */
+export const ORDER_PREPAYMENT_DEADLINE_MS = 24 * 60 * 60 * 1000;
+export const ORDER_PREPAYMENT_REMINDER_BEFORE_MS = 3 * 60 * 60 * 1000;
+/**
+ * После последней попытки оплаты ждём ещё полчаса: покупатель мог как раз
+ * сейчас стоять в приложении банка, и отмена в эту минуту списала бы деньги
+ * за отменённый заказ.
+ */
+export const ORDER_PREPAYMENT_ATTEMPT_GRACE_MS = 30 * 60 * 1000;
+export const ORDER_PREPAYMENT_CRON_INTERVAL_MS = 10 * 60 * 1000;
+export const ORDER_PREPAYMENT_CRON_BATCH_SIZE = 100;
+
+/** @param {string} until «4 октября, 15:30» по Москве */
+export const BUYER_ORDER_PREPAYMENT_REMINDER_MESSAGE = (until) =>
+  `Оплатите заказ до ${until} — иначе он отменится`;
+export const BUYER_ORDER_PREPAYMENT_EXPIRED_MESSAGE =
+  "Заказ отменён: оплата не пришла за сутки после подтверждения";
+export const SELLER_ORDER_PREPAYMENT_EXPIRED_MESSAGE =
+  "Покупатель не оплатил заказ за сутки — заказ отменён, товар снова в продаже";
+export const BUYER_ORDER_PAID_AFTER_CANCEL_MESSAGE =
+  "Оплата пришла после отмены заказа — вернём деньги";
+
+/**
+ * Продавец подтвердил заказ с предоплатой — дальше ход покупателя: без
+ * этого он узнавал о необходимости заплатить, только зайдя в заказ сам.
+ */
+export const BUYER_ORDER_ACCEPTED_PAY_NOW_MESSAGE =
+  "Продавец подтвердил заказ — оплатите по СБП";
+
 export const BUYER_ORDER_STATUS_MESSAGES = Object.freeze({
   [ORDER_STATUS_ACCEPTED]: "Продавец принял заказ",
   [ORDER_STATUS_ASSEMBLING]: "Заказ собирают",

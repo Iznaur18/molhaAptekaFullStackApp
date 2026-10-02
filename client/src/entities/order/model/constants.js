@@ -123,3 +123,5 @@ export const ORDER_LINE_ITEM_QUANTITY_MIN = 1;
 export const CART_STORAGE_KEY = "rassro:cart";
 
 export const IN_APP_NOTIFICATION_KIND_SELLER_NEW_ORDER = "seller_new_order";
+/** Статус заказа покупателя: принят, «оплатите», отменён и т.п. */
+export const IN_APP_NOTIFICATION_KIND_BUYER_ORDER_STATUS = "buyer_order_status";

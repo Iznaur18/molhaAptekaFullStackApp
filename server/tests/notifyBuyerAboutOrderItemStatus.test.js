@@ -42,6 +42,21 @@ describe("текст уведомления покупателю", () => {
     assert.ok(message.endsWith("…"), message);
   });
 
+  it("заказ по СБП не оплачен — «принял» превращается в «оплатите»", () => {
+    assert.equal(
+      buildBuyerOrderStatusMessage({
+        status: "accepted",
+        productName: "айфон 16",
+        awaitingPrepayment: true,
+      }),
+      "Продавец подтвердил заказ — оплатите по СБП: айфон 16",
+    );
+    assert.equal(
+      buildBuyerOrderStatusMessage({ status: "accepted", awaitingPrepayment: false }),
+      "Продавец принял заказ",
+    );
+  });
+
   it("молчит на статусах, о которых покупателю знать нечего", () => {
     assert.equal(buildBuyerOrderStatusMessage({ status: "pending" }), "");
     assert.equal(buildBuyerOrderStatusMessage({ status: "confirmed" }), "");
