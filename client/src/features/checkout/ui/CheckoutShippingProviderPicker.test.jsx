@@ -191,6 +191,45 @@ describe("товар с локальной службой", () => {
     expect(queryBadge(CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SINGLE_SELLER)).toBeNull();
   });
 
+  it("ЛОБО и СДЭК у продавца: выбрана одна служба, переключаются в обе стороны", () => {
+    const onSelectCarrier = vi.fn();
+    const { rerender } = renderWithProviders(
+      <CheckoutShippingProviderPicker
+        courierDelivery="seller"
+        productCarrier="lobo"
+        cdekAvailable
+        sellerDeliveryAvailable
+        selectedCarrier={null}
+        onSelectCarrier={onSelectCarrier}
+      />,
+    );
+    const cdekButton = () =>
+      screen.getByRole("radio", { name: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_CDEK });
+
+    expect(loboButton()?.getAttribute("aria-checked")).toBe("true");
+    expect(cdekButton().getAttribute("aria-checked")).toBe("false");
+    fireEvent.click(cdekButton());
+    expect(onSelectCarrier).toHaveBeenLastCalledWith("cdek");
+
+    rerender(
+      <CheckoutShippingProviderPicker
+        courierDelivery="seller"
+        productCarrier="lobo"
+        cdekAvailable
+        sellerDeliveryAvailable
+        selectedCarrier="cdek"
+        onSelectCarrier={onSelectCarrier}
+      />,
+    );
+
+    // Раньше здесь горели обе, а ЛОБО была неактивной.
+    expect(cdekButton().getAttribute("aria-checked")).toBe("true");
+    expect(loboButton()?.getAttribute("aria-checked")).toBe("false");
+    expect(loboButton()?.hasAttribute("disabled")).toBe(false);
+    fireEvent.click(/** @type {HTMLElement} */ (loboButton()));
+    expect(onSelectCarrier).toHaveBeenLastCalledWith(null);
+  });
+
   it("без такого товара везёт продавец", () => {
     renderWithProviders(<CheckoutShippingProviderPicker courierDelivery="seller" />);
 

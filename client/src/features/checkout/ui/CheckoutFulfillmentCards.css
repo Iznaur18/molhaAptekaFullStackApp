@@ -69,40 +69,6 @@
   scroll-padding-inline: 16px;
 }
 
-.cart-fulfillment__payment
-  .checkout-payment-method-picker__card:not(
-    .checkout-payment-method-picker__card--selected
-  ):not(.checkout-payment-method-picker__card--locked) {
-  background: transparent;
-  border: 1px solid var(--iz-color-border);
-  color: var(--iz-color-text);
-}
-
-.cart-fulfillment__payment
-  .checkout-payment-method-picker__card--cardPrepaid:not(
-    .checkout-payment-method-picker__card--selected
-  ),
-.cart-fulfillment__payment
-  .checkout-payment-method-picker__card--cashOnDelivery:not(
-    .checkout-payment-method-picker__card--selected
-  ) {
-  background: transparent;
-  border-color: var(--iz-color-border);
-  color: var(--iz-color-text);
-}
-
-.cart-fulfillment__payment .checkout-payment-method-picker__card--selected {
-  background: #fff;
-  border: 2px solid var(--iz-color-action);
-  color: var(--iz-color-text);
-}
-
-:root[data-theme="dark"]
-  .cart-fulfillment__payment
-  .checkout-payment-method-picker__card--selected {
-  background: var(--iz-color-surface);
-}
-
 :root:not([data-theme="dark"]) .cart-fulfillment__details .checkout-form__pickup-group,
 :root:not([data-theme="dark"]) .cart-fulfillment__details .checkout-form__input {
   background: var(--iz-color-surface);

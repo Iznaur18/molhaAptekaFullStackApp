@@ -27,9 +27,18 @@ const CART_LINE_IMAGE_SIZE_PX = 72;
  *   selected: boolean;
  *   onToggleSelected: (productId: string) => void;
  *   onProductClick?: (product: import('../../../entities/product/model/types.js').ProductFromApi) => void;
+ *   carrierLabel?: string;
  * }} props
+ *   carrierLabel: служба доставки товара — показываем, когда товары продавца
+ *   едут разными службами, чтобы было видно, какой снять галочкой.
  */
-export function CartLineItem({ line, selected, onToggleSelected, onProductClick }) {
+export function CartLineItem({
+  line,
+  selected,
+  onToggleSelected,
+  onProductClick,
+  carrierLabel = "",
+}) {
   const { setItemQuantity, removeItem } = useCart();
   const [imageFailed, setImageFailed] = useState(false);
   const product = line.product;
@@ -158,6 +167,9 @@ export function CartLineItem({ line, selected, onToggleSelected, onProductClick 
             ) : (
               <p className="cart-line__name">{heading}</p>
             )}
+            {carrierLabel ? (
+              <span className="cart-line__carrier">{carrierLabel}</span>
+            ) : null}
           </div>
         </div>
 

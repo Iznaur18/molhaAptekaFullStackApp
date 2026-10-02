@@ -41,16 +41,28 @@ export function CheckoutPaymentMethodPicker({
       )
     : platformSelectable;
 
-  // Все способы на виду; активный — первым в горизонтальном ряду. Скрытые
-  // (при курьере площадки — наличные) не показываем вовсе: «продавец не
-  // принимает» про них было бы неправдой.
+  // Порядок постоянный: сначала доступные, потом недоступные, внутри — как
+  // в списке способов. Выбранный способ в начало не прыгает: ряд не
+  // перестраивается под пальцем при каждом нажатии. Скрытые (при курьере
+  // площадки — наличные) не показываем вовсе: «продавец не принимает» про
+  // них было бы неправдой.
   const orderedMethods = ORDER_PAYMENT_METHODS.filter(
     (method) => !hiddenMethods.includes(method),
-  ).sort((a, b) => {
-    if (a === value) return -1;
-    if (b === value) return 1;
-    return 0;
-  });
+  ).sort((a, b) => Number(selectableSet.has(b)) - Number(selectableSet.has(a)));
+
+  // Выбирать не из чего — одна строка вместо ряда, где половина карточек
+  // бледные «не принимает». Сам способ форма выставляет сама.
+  const availableMethods = orderedMethods.filter((method) => selectableSet.has(method));
+  if (availableMethods.length === 1) {
+    return (
+      <div className="checkout-payment-method-picker">
+        <div className="checkout-payment-method-picker__legend">{legend}</div>
+        <div className="checkout-payment-method-picker__single" role="note">
+          {ORDER_PAYMENT_METHOD_LABEL_RU[availableMethods[0]]}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="checkout-payment-method-picker">

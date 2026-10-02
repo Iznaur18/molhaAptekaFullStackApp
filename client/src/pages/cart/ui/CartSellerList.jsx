@@ -9,6 +9,7 @@ import { pickUserProfilePhotoUrl } from "../../../entities/user/lib/pickUserProf
 import { DEFAULT_USER_AVATAR_URL } from "../../../entities/user/model/userConstants.js";
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
 import { UserPremiumDisplayName } from "../../../entities/user/ui/UserPremiumDisplayName.jsx";
+import { formatCartGroupDeliveryHint } from "../../../entities/cart/lib/formatCartGroupDeliveryHint.js";
 import { hasMixedDeliveryCarriers } from "../../../entities/cart/lib/hasMixedDeliveryCarriers.js";
 import { resolveProductImageUrl } from "../../../entities/product/lib/resolveProductImageUrl.js";
 import { PRODUCT_IMAGE_PLACEHOLDER_URL } from "../../../entities/product/model/productConstants.js";
@@ -96,6 +97,10 @@ function CartSellerRow({ group, summary, onOpen }) {
   const mixedCarriers = hasMixedDeliveryCarriers(
     summary.selectedLines.map((line) => line.product),
   );
+  // Цена доставки — ещё в списке, а не только на оформлении.
+  const deliveryHint = mixedCarriers
+    ? ""
+    : formatCartGroupDeliveryHint(group, summary.selectedTotal);
 
   return (
     <div className="cart-seller-row">
@@ -126,6 +131,7 @@ function CartSellerRow({ group, summary, onOpen }) {
             />
             <span className="cart-seller-row__meta">
               {CART_PAGE_UI.ITEMS_COUNT(countForLabel)}
+              {deliveryHint ? ` · ${deliveryHint}` : null}
             </span>
           </span>
         </button>

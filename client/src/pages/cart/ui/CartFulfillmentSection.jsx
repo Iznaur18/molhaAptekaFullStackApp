@@ -1,3 +1,7 @@
+import {
+  PRODUCT_DELIVERY_CARRIER_LABEL_RU,
+  resolveProductDeliveryCarrier,
+} from "@molha/api-contract";
 import { Link } from "react-router-dom";
 
 import { formatPriceRub } from "../../../shared/lib/formatPriceRub.js";
@@ -9,11 +13,26 @@ import {
 import { CheckoutCarrierDeliveryCost } from "../../../features/checkout/ui/CheckoutCarrierDeliveryCost.jsx";
 import { CheckoutSellerDeliveryCost } from "../../../features/checkout/ui/CheckoutSellerDeliveryCost.jsx";
 
+import { hasMixedDeliveryCarriers } from "../../../entities/cart/lib/hasMixedDeliveryCarriers.js";
+
 import { CartLineItem } from "./CartLineItem.jsx";
 import { CartSelectAllRow } from "./CartSelectAllRow.jsx";
 
 import "../../../features/checkout/ui/CheckoutFulfillmentCards.css";
 import "./CartFulfillmentSection.css";
+
+/**
+ * Подпись службы у строки товара: «ЛОБО», «Курьеры Gitorg», «Доставка
+ * продавцом» или «Только самовывоз».
+ *
+ * @param {Record<string, any> | null | undefined} product
+ */
+function formatCartLineCarrierLabel(product) {
+  const carrier = resolveProductDeliveryCarrier(product ?? {});
+  return carrier
+    ? (PRODUCT_DELIVERY_CARRIER_LABEL_RU[carrier] ?? "")
+    : CART_PAGE_UI.LINE_PICKUP_ONLY;
+}
 
 /**
  * @param {{
@@ -80,6 +99,10 @@ export function CartFulfillmentSection({
   sellerDeliveryDistance = null,
   carrierDeliveryCost = null,
 }) {
+  // У товаров продавца разные службы — подписываем службу у каждой строки,
+  // иначе непонятно, с какого товара снять галочку.
+  const showLineCarriers = hasMixedDeliveryCarriers(lines.map((line) => line.product));
+
   if (lines.length === 0) {
     return null;
   }
@@ -111,6 +134,33 @@ export function CartFulfillmentSection({
         ) : null}
       </header>
 
+      <CartSelectAllRow
+        selectedCount={selectedCount}
+        totalCount={lines.length}
+        areAllSelected={areAllSelected}
+        onToggleAll={onToggleAll}
+      />
+
+      <ul className="cart-page__list" role="list">
+        {lines.map((line) => (
+          <li key={line.productId} className="cart-page__item" role="listitem">
+            <CartLineItem
+              line={line}
+              selected={isLineSelected(line.productId)}
+              onToggleSelected={onToggleSelected}
+              onProductClick={onProductClick}
+              carrierLabel={
+                showLineCarriers ? formatCartLineCarrierLabel(line.product) : ""
+              }
+            />
+          </li>
+        ))}
+      </ul>
+
+      {checkoutBeforeDock}
+
+      {/* Сумма курьеру Gitorg — прямо над «Оформить»: это часть итога, а не
+          настройка списка товаров. */}
       {deliveryFee ? (
         <div className="cart-fulfillment__fee">
           <div className="cart-fulfillment__fee-row">
@@ -145,30 +195,33 @@ export function CartFulfillmentSection({
               </button>
             </div>
           </div>
+          {/* Частые суммы — одним нажатием; степпер выше — для точной. */}
+          <div
+            className="cart-fulfillment__fee-presets"
+            role="group"
+            aria-label={CART_DELIVERY_FEE_UI.PRESETS_ARIA}
+          >
+            {CART_DELIVERY_FEE_UI.PRESETS_RUB.map((amount) => (
+              <button
+                key={amount}
+                type="button"
+                className={[
+                  "cart-fulfillment__fee-preset",
+                  deliveryFee.value === amount
+                    ? "cart-fulfillment__fee-preset--active"
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                aria-pressed={deliveryFee.value === amount}
+                onClick={() => deliveryFee.onChange(amount)}
+              >
+                {formatPriceRub(amount)}
+              </button>
+            ))}
+          </div>
         </div>
       ) : null}
-
-      <CartSelectAllRow
-        selectedCount={selectedCount}
-        totalCount={lines.length}
-        areAllSelected={areAllSelected}
-        onToggleAll={onToggleAll}
-      />
-
-      <ul className="cart-page__list" role="list">
-        {lines.map((line) => (
-          <li key={line.productId} className="cart-page__item" role="listitem">
-            <CartLineItem
-              line={line}
-              selected={isLineSelected(line.productId)}
-              onToggleSelected={onToggleSelected}
-              onProductClick={onProductClick}
-            />
-          </li>
-        ))}
-      </ul>
-
-      {checkoutBeforeDock}
 
       <div className="cart-fulfillment__dock">
         <div className="cart-fulfillment__dock-top">

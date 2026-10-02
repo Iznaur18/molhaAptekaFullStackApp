@@ -50,6 +50,16 @@ export const CART_PAGE_UI = {
   SECTION_SELLER_FALLBACK: "Продавец",
   /** Товары одного продавца везут разные службы — одним заказом с доставкой нельзя. */
   MIXED_CARRIERS_NOTE: "Товары едут разными службами — оформите по отдельности",
+  /** Подпись у строки товара без доставки, когда у продавца службы разные. */
+  LINE_PICKUP_ONLY: "Только самовывоз",
+  /** Доставка в строке продавца — до оформления. */
+  DELIVERY_HINT_FREE: "Доставка бесплатно",
+  /** @param {string} formatted «150 ₽» */
+  DELIVERY_HINT_FROM: (formatted) => `Доставка от ${formatted}`,
+  DELIVERY_HINT_BY_TARIFF: "Доставка по тарифу продавца",
+  /** @param {string} formatted «100 ₽» */
+  DELIVERY_HINT_COURIER: (formatted) => `Курьеру от ${formatted}`,
+  DELIVERY_HINT_LOBO: "Доставка ЛОБО, оплата курьеру",
   SECTION_METHOD_LABEL: "Способ получения",
   /** @param {number} left */
   STOCK_REMAINING: (left) => `Осталось ${left} шт`,
@@ -343,4 +353,7 @@ export const CART_DELIVERY_FEE_UI = {
   HINT: "Чем выше сумма, тем быстрее найдётся курьер.",
   MIN_RUB: 100,
   STEP_RUB: 25,
+  /** Частые суммы курьеру — кнопками рядом со степпером. */
+  PRESETS_RUB: [100, 150, 200, 300],
+  PRESETS_ARIA: "Быстро выбрать сумму курьеру",
 };
