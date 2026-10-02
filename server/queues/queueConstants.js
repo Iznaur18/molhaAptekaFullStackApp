@@ -27,6 +27,9 @@ export const JOB_PROCESS_LOBO_CRON = "processLoboCronTasks";
 export const JOB_PROCESS_CDEK_STATUS_SYNC = "processCdekStatusSync";
 /** Разморозка эскроу по сроку после вручения. */
 export const JOB_PROCESS_ESCROW_RELEASE = "process-escrow-release";
+/** Срок оплаты заказов по СБП: напоминание и отмена неоплаченных. */
+export const JOB_PROCESS_ORDER_PREPAYMENT_DEADLINES =
+  "process-order-prepayment-deadlines";
 
 export const JOB_PROCESS_COURIER_STUCK_SHIPMENTS =
   "processCourierStuckShipmentCronTasks";

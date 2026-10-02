@@ -778,6 +778,7 @@ export {
   formatCdekKeepFreeUntil,
   isCdekAwaitingPickup,
 } from "./cdekTracking.js";
+export { resolveOrderPrepaymentAmountRub } from "./orderPrepaymentAmount.js";
 export {
   SHIPPING_CARRIERS_WITH_STATUS_SYNC,
   CARRIER_MANAGED_RETURN_MESSAGE,

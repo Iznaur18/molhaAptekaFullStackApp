@@ -15,6 +15,7 @@ import {
   JOB_PROCESS_ANALYTICS_RECONCILIATION,
   JOB_PROCESS_COURIER_STUCK_SHIPMENTS,
   JOB_PROCESS_ESCROW_RELEASE,
+  JOB_PROCESS_ORDER_PREPAYMENT_DEADLINES,
   JOB_PROCESS_LOBO_CRON,
   JOB_PROCESS_CDEK_STATUS_SYNC,
   JOB_PROCESS_PRODUCT_BULK_IMPORT,
@@ -23,6 +24,7 @@ import {
 import { sendEmailVerificationForUser } from "../services/auth/emailVerification.js";
 import { processCourierStuckShipmentCronTasks } from "../services/courier/courierStuckShipmentsCron.js";
 import { processEscrowReleaseCronTasks } from "../services/payments/escrowReleaseCron.js";
+import { processOrderPrepaymentDeadlines } from "../services/payments/orderPrepaymentDeadline.js";
 import { processLoboCronTasks } from "../services/shipping/lobo/loboStatusSync.js";
 import { syncCarrierStatuses } from "../services/shipping/carrierStatusSync.js";
 import { processIntroAdCampaignCronTasks } from "../services/intro-ad/introAdCampaignHelpers.js";
@@ -82,6 +84,8 @@ export async function processAppQueueJob(job) {
       return processCourierStuckShipmentCronTasks();
     case JOB_PROCESS_ESCROW_RELEASE:
       return processEscrowReleaseCronTasks();
+    case JOB_PROCESS_ORDER_PREPAYMENT_DEADLINES:
+      return processOrderPrepaymentDeadlines();
     case JOB_PROCESS_LOBO_CRON:
       return processLoboCronTasks();
     case JOB_PROCESS_CDEK_STATUS_SYNC:

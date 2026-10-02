@@ -94,3 +94,21 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+/* Нажимаемые плитки — со стрелкой: на телефоне наведения нет, и без неё
+   они выглядели просто цифрами. */
+.my-orders-overview__value-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+}
+
+.my-orders-overview__go {
+  flex-shrink: 0;
+  color: var(--iz-color-text-muted);
+}
+
+.my-orders-overview__tile_active .my-orders-overview__go {
+  color: var(--iz-color-action);
+}

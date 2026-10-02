@@ -1072,6 +1072,42 @@
   line-height: 1.45;
 }
 
+/* «Оплатить» по СБП — главное действие покупателя в заказе: на всю ширину
+   плашки, крупно и с тенью, а не маленькой кнопкой в углу. */
+.order-card__pay-now {
+  align-self: stretch;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.875rem;
+  margin-top: 0.35rem;
+  padding: 0.7rem 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: var(--iz-color-action);
+  color: var(--iz-color-on-contrast, #fff);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--iz-color-action) 32%, transparent);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    transform 0.1s ease;
+}
+
+.order-card__pay-now:hover:not(:disabled) {
+  background: var(--iz-color-action-hover, var(--iz-color-action));
+}
+
+.order-card__pay-now:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.order-card__pay-now:disabled {
+  opacity: 0.65;
+  cursor: progress;
+}
+
 /* Доставка ЛОБО: шапка со статусом, откуда заберут, плашки «требует
    внимания» (деньги курьеру, вызов курьера) и «Где курьер». */
 .order-card__carrier {
@@ -1158,4 +1194,10 @@
 .order-card__meta-comment {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+/* Срок оплаты по СБП — заметно, но не громче кнопки «Оплатить». */
+.order-card__prepayment-due {
+  font-weight: 700;
+  color: var(--iz-color-warning-text);
 }

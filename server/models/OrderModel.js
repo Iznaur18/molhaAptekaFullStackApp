@@ -551,6 +551,14 @@ const OrderSchema = new mongoose.Schema(
       ref: "Payment",
       default: null,
     },
+    /**
+     * Срок оплаты по СБП: ставится, когда продавец подтвердил заказ. Не
+     * оплачен к сроку — крон отменяет заказ, за 3 часа напоминает покупателю.
+     */
+    prepaymentDueAt: { type: Date, default: null },
+    prepaymentReminderSentAt: { type: Date, default: null },
+    /** Заказ отменён кроном за неоплату. */
+    prepaymentExpiredAt: { type: Date, default: null },
     status: {
       type: String,
       required: true,
@@ -593,6 +601,12 @@ OrderSchema.index({ status: 1, createdAt: -1 });
 OrderSchema.index(
   { "items.productId": 1, createdAt: -1 },
   { name: "items_productId_created" },
+);
+
+/** Крон срока оплаты: неоплаченные заказы по СБП. */
+OrderSchema.index(
+  { paymentMethod: 1, prepaidPaidAt: 1, status: 1, prepaymentDueAt: 1 },
+  { name: "prepayment_deadline" },
 );
 
 export default mongoose.model("Order", OrderSchema);

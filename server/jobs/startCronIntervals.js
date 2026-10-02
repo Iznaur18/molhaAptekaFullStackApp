@@ -7,6 +7,7 @@ import { ANALYTICS_RECONCILIATION_CRON_INTERVAL_MS } from "../constants/analytic
 import { COURIER_STUCK_SHIPMENT_CRON_INTERVAL_MS } from "../constants/courierConstants.js";
 import { LOBO_POLL_INTERVAL_MS } from "../constants/loboConstants.js";
 import { CDEK_POLL_INTERVAL_MS } from "../constants/cdekConstants.js";
+import { ORDER_PREPAYMENT_CRON_INTERVAL_MS } from "../constants/orderConstants.js";
 import { INSTALLMENT_CRON_INTERVAL_MS } from "../constants/installmentConstants.js";
 import { INTRO_AD_CRON_INTERVAL_MS } from "../constants/introAdCampaignConstants.js";
 import { PREMIUM_CRON_INTERVAL_MS } from "../constants/premiumConstants.js";
@@ -31,6 +32,7 @@ import { runAnalyticsReconciliation } from "../services/analytics/index.js";
 import { processCourierStuckShipmentCronTasks } from "../services/courier/courierStuckShipmentsCron.js";
 import { processLoboCronTasks } from "../services/shipping/lobo/loboStatusSync.js";
 import { syncCarrierStatuses } from "../services/shipping/carrierStatusSync.js";
+import { processOrderPrepaymentDeadlines } from "../services/payments/orderPrepaymentDeadline.js";
 
 import { shouldRunCronOnThisProcess } from "./shouldRunCronOnThisProcess.js";
 
@@ -149,6 +151,13 @@ export function startCronIntervals() {
     "process_cdek_status_sync",
     CDEK_POLL_INTERVAL_MS,
     syncCarrierStatuses,
+  );
+
+  // Срок оплаты по СБП: напоминание за 3 часа и отмена неоплаченных.
+  scheduleCronJob(
+    "process_order_prepayment_deadlines",
+    ORDER_PREPAYMENT_CRON_INTERVAL_MS,
+    processOrderPrepaymentDeadlines,
   );
 
   return true;

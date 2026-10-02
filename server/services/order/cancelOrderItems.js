@@ -297,6 +297,50 @@ export async function cancelOrderItems({
 }
 
 /**
+ * Отмена от имени площадки — например, заказ по СБП не оплачен в срок.
+ *
+ * Те же шаги, что у ручной отмены (транзакция, резервы, эскроу, служба
+ * доставки), но без проверки прав: отменяет не покупатель и не продавец.
+ * Гасим только позиции, которые ещё у продавца; уведомления — на вызывающем:
+ * текст у такой отмены свой.
+ *
+ * @param {{ orderId: string }} input
+ * @returns {Promise<{ cancelledCount: number; order: any; sellerIds: string[] }>}
+ */
+export async function cancelOrderBySystem({ orderId }) {
+  const order = await loadOrderWithItems(orderId);
+  const buyerId = resolveBuyerId(order);
+  const targets = (order.items ?? [])
+    .map((item, itemIndex) => ({ item, itemIndex }))
+    .filter(({ item }) => PRE_SHIPMENT.has(item.status))
+    .map(({ item, itemIndex }) => ({
+      itemIndex,
+      sellerId: resolveOrderItemSellerId(item),
+      productName: item.productNameAtOrder ?? "",
+    }));
+  if (targets.length === 0) {
+    return { cancelledCount: 0, order, sellerIds: [] };
+  }
+
+  const cancelledCount = await runInTransaction((session) =>
+    applyCancelInTransaction({
+      orderId,
+      itemIndexes: targets.map((target) => target.itemIndex),
+      buyerId,
+      session,
+    }),
+  );
+  const updatedOrder = await reloadOrderWithItems(orderId);
+  await runCancelSideEffects({ order: updatedOrder, targets, orderId });
+
+  return {
+    cancelledCount,
+    order: updatedOrder,
+    sellerIds: [...new Set(targets.map((target) => target.sellerId))],
+  };
+}
+
+/**
  * @param {{
  *   orderId: string;
  *   itemIndex: number;

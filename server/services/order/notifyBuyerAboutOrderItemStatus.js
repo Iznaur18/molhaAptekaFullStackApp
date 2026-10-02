@@ -1,5 +1,7 @@
 import {
+  BUYER_ORDER_ACCEPTED_PAY_NOW_MESSAGE,
   BUYER_ORDER_STATUS_MESSAGES,
+  ORDER_STATUS_ACCEPTED,
   IN_APP_NOTIFICATION_KIND_BUYER_ORDER_STATUS,
   IN_APP_NOTIFICATION_MESSAGE_BUYER_ORDER_CANCELLED,
   ORDER_STATUS_CANCELLED,
@@ -11,11 +13,19 @@ import { createUserInAppNotification } from "../user/userInAppNotifications.js";
 const PRODUCT_NAME_MAX = 60;
 
 /**
- * @param {{ status: string; productName?: string }} params
+ * @param {{ status: string; productName?: string; awaitingPrepayment?: boolean }} params
+ *   awaitingPrepayment — заказ по СБП ещё не оплачен: «принял» значит «оплатите».
  * @returns {string}
  */
-export function buildBuyerOrderStatusMessage({ status, productName }) {
-  const base = BUYER_ORDER_STATUS_MESSAGES[status];
+export function buildBuyerOrderStatusMessage({
+  status,
+  productName,
+  awaitingPrepayment = false,
+}) {
+  const base =
+    awaitingPrepayment && status === ORDER_STATUS_ACCEPTED
+      ? BUYER_ORDER_ACCEPTED_PAY_NOW_MESSAGE
+      : BUYER_ORDER_STATUS_MESSAGES[status];
   if (!base) return "";
 
   const name = String(productName ?? "").trim();
@@ -45,6 +55,7 @@ export function buildBuyerOrderStatusMessage({ status, productName }) {
  *   status: string;
  *   productName?: string;
  *   orderId?: unknown;
+ *   awaitingPrepayment?: boolean;
  * }} params
  */
 export async function notifyBuyerAboutOrderItemStatus({
@@ -53,12 +64,13 @@ export async function notifyBuyerAboutOrderItemStatus({
   status,
   productName = "",
   orderId = null,
+  awaitingPrepayment = false,
 }) {
   await sendBuyerOrderNotification({
     buyerUserId,
     actorUserId,
     status,
-    message: buildBuyerOrderStatusMessage({ status, productName }),
+    message: buildBuyerOrderStatusMessage({ status, productName, awaitingPrepayment }),
     orderId,
   });
 }

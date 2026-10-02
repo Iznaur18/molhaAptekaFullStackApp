@@ -241,6 +241,15 @@ export async function openEscrowForPaidOrder({ order, paymentId = null }) {
       { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
     ).lean();
 
+    // Оплата пришла, когда все позиции уже отменены (например, заказ снят
+    // за неоплату, а банк провёл платёж позже): товары сразу «к возврату»,
+    // и доставку держать незачем — продавец никуда не ехал. Без товарных
+    // строк (все позиции бесплатные) решать нечего: «все к возврату» на
+    // пустом списке было бы ложной правдой.
+    if ((entry?.lines ?? []).some((line) => line.kind === ESCROW_LINE_KIND_GOODS)) {
+      await refundDeliveryLineIfNothingDelivered(entry);
+    }
+
     opened.push(entry);
     logMoneyEvent("info", "escrow_held", {
       orderId: String(order._id),

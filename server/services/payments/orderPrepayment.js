@@ -1,5 +1,7 @@
 import { randomUUID } from "node:crypto";
 
+import { resolveOrderPrepaymentAmountRub } from "@molha/api-contract";
+
 import {
   PAYMENT_PURPOSE_ORDER,
   PAYMENT_STATUS_CANCELED,
@@ -15,8 +17,14 @@ import {
   YOOKASSA_TAX_SYSTEM_CODE_DEFAULT,
   YOOKASSA_VAT_CODE_DEFAULT,
 } from "../../constants/yookassaConstants.js";
+import {
+  BUYER_ORDER_PAID_AFTER_CANCEL_MESSAGE,
+  IN_APP_NOTIFICATION_KIND_BUYER_ORDER_STATUS,
+  ORDER_STATUS_CANCELLED,
+} from "../../constants/orderConstants.js";
 import { AppError } from "../../errors/AppError.js";
 import { OrderModel, PaymentModel, UserModel } from "../../models/index.js";
+import { createUserInAppNotification } from "../user/userInAppNotifications.js";
 import { formatLogError, logServerEvent } from "../../utils/logServerEvent.js";
 import { assertOrderAcceptedBySeller } from "../order/assertOrderPrepaid.js";
 import { logMoneyEvent } from "../loyalty/logMoneyEvent.js";
@@ -179,11 +187,10 @@ export async function createOrderPrepayment({
 
   // Доставка по тарифу продавца — часть того, что покупатель платит картой.
   // Курьерская `deliveryFeeRub` сюда не входит: те деньги покупатель отдаёт
-  // курьеру из рук в руки, площадка их не проводит.
-  const deliveryTotalRub = (
-    Array.isArray(order.shipments) ? order.shipments : []
-  ).reduce((sum, row) => sum + (Number(row?.sellerDeliveryFeeRub) || 0), 0);
-  const amountRub = (Number(order.totalAmount) || 0) + deliveryTotalRub;
+  // курьеру из рук в руки, площадка их не проводит. Та же формула показывает
+  // сумму на кнопке «Оплатить».
+  const amountRub = resolveOrderPrepaymentAmountRub(order);
+  const deliveryTotalRub = amountRub - (Number(order.totalAmount) || 0);
   if (amountRub <= 0) {
     throw new AppError(400, "Сумма заказа должна быть больше 0");
   }
@@ -264,6 +271,39 @@ export async function createOrderPrepayment({
 }
 
 /**
+ * Деньги пришли по уже отменённому заказу (например, сняли за неоплату, а
+ * банк провёл платёж позже).
+ *
+ * Эскроу уже записал всю сумму «к возврату» покупателю. Возврата через
+ * провайдера у площадки пока нет — его делают вручную, поэтому отдельная
+ * запись в денежный лог (её ищет человек) и сообщение покупателю.
+ *
+ * @param {{ order: Record<string, any>; payment: Record<string, any> }} input
+ */
+async function reportPrepaymentAfterCancel({ order, payment }) {
+  logMoneyEvent("warn", "order_prepayment_after_cancel", {
+    userId: String(payment.userId),
+    orderId: String(order._id),
+    amount: payment.amountRub,
+    currency: "RUB",
+    paymentId: String(payment._id),
+  });
+  try {
+    await createUserInAppNotification({
+      userId: String(order.userBuyerId),
+      kind: IN_APP_NOTIFICATION_KIND_BUYER_ORDER_STATUS,
+      message: BUYER_ORDER_PAID_AFTER_CANCEL_MESSAGE,
+    });
+  } catch (error) {
+    logServerEvent("error", {
+      event: "payment.after_cancel_notify_failed",
+      orderId: String(order._id),
+      ...formatLogError(error),
+    });
+  }
+}
+
+/**
  * Отметить заказ оплаченным по результату платежа.
  *
  * Как и у баллов, отметка ровно одна: её сторожит атомарный переход
@@ -332,6 +372,9 @@ export async function applyOrderPrepayment({
       currency: "RUB",
       paymentId: String(payment._id),
     });
+    if (paidOrder?.status === ORDER_STATUS_CANCELLED) {
+      await reportPrepaymentAfterCancel({ order: paidOrder, payment });
+    }
     return { applied: true, orderId: String(payment.orderId) };
   } catch (error) {
     // Деньги у банка есть, а заказ не отмечен: возвращаем платёж в `created`,
