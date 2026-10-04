@@ -22,6 +22,7 @@ export const PROFILE_ROW_ICONS: Record<string, FeatherIconName> = {
   totalSalesCount: "shopping-bag",
   totalSalesAmount: "dollar-sign",
   totalPurchasesAmount: "shopping-cart",
+  wishlistCount: "heart",
   userBusinessHours: "clock",
   userRatingByVotes: "star",
   createdAt: "calendar",

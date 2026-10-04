@@ -5,10 +5,13 @@ import {
   runAnalyticsReconciliationController,
   trackAdAnalyticsController,
   trackClientAnalyticsController,
+  getMySellerQrStatsController,
+  trackSellerQrScanController,
 } from "../controllers/index.js";
 import {
   analyticsPeriodQueryValidation,
   trackAdAnalyticsValidation,
+  trackSellerQrScanValidation,
   trackClientAnalyticsValidation,
 } from "../validations/index.js";
 import { emptyBodyValidation } from "../validations/common/emptyBodyValidation.js";
@@ -22,6 +25,16 @@ router.post(
   trackAdAnalyticsValidation,
   trackAdAnalyticsController,
 );
+
+// Переход на витрину по QR-коду: сканирует чаще всего гость, поэтому вход
+// не обязателен.
+router.post(
+  "/track-seller-qr",
+  optionalAuthMW,
+  trackSellerQrScanValidation,
+  trackSellerQrScanController,
+);
+router.get("/seller-qr/me", checkAuthMW, getMySellerQrStatsController);
 
 router.post(
   "/track",

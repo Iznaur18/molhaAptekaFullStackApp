@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
 import { SellerShareLinkButton } from "../../../entities/user/ui/SellerShareLinkButton.jsx";
+import { SellerQrButton } from "../../../entities/user/ui/SellerQrButton.jsx";
 import { isPremiumActive } from "../../../entities/user/lib/isPremiumActive.js";
 import { USER_ROLE_USER } from "../../../entities/user/model/userConstants.js";
 import { UserRatingVotesSheet } from "../../../entities/user-vote-rating/ui/UserRatingVotesSheet.jsx";
@@ -32,6 +33,7 @@ import {
 import { buildSellerProductsPath } from "../../../shared/lib/sellerPaths.js";
 import { UserProfileInfoPanel } from "../../../entities/user/ui/UserProfileInfoPanel.jsx";
 import { PROFILE_ROW_ID } from "../../../entities/user/lib/profileRowIds.js";
+import { useWishlist } from "../../../entities/wishlist/model/useWishlist.js";
 import { GuestProfilePanel } from "./GuestProfilePanel.jsx";
 import { ProfileSidebar } from "./ProfileSidebar.jsx";
 
@@ -171,6 +173,7 @@ export function MyProfilePage({
   myProductsSearchProps = null,
 }) {
   const navigate = useNavigate();
+  const { totalCount: wishlistCount } = useWishlist();
   const [isRatingVotesSheetOpen, setIsRatingVotesSheetOpen] = useState(false);
   const isGuestProfile =
     !user && !isLoading && !errorMessage && activeTab === PROFILE_TAB_OVERVIEW;
@@ -472,6 +475,11 @@ export function MyProfilePage({
                         sellerName={String(user.userName ?? "").trim()}
                         variant="meta"
                       />
+                      <SellerQrButton
+                        sellerId={String(user._id)}
+                        sellerName={String(user.userName ?? "").trim()}
+                        avatarUrl={photoUrl && !avatarLoadFailed ? photoUrl : ""}
+                      />
                       <button
                         type="button"
                         className="my-profile-page__storefront-btn"
@@ -510,9 +518,20 @@ export function MyProfilePage({
                     </div>
                   ) : null}
                   <UserProfileInfoPanel
-                    rows={rows}
-                    showStatsTrends
+                    // Свои желания — из живого списка: число с сервера
+                    // (`/auth/me`) отстаёт после добавления товара.
+                    rows={[
+                      ...rows.filter((row) => row.id !== PROFILE_ROW_ID.WISHLIST),
+                      {
+                        id: PROFILE_ROW_ID.WISHLIST,
+                        label: MY_PROFILE_PAGE_UI.TAB_WISHLIST,
+                        value: String(wishlistCount),
+                      },
+                    ]}
                     rowActions={{
+                      ...(onWishlistClick
+                        ? { [PROFILE_ROW_ID.WISHLIST]: onWishlistClick }
+                        : {}),
                       ...(onMySalesClick
                         ? {
                             [PROFILE_ROW_ID.TOTAL_SALES_COUNT]: onMySalesClick,

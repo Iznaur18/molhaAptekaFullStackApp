@@ -97,3 +97,42 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Справка о службе: поля, которые увидят по кнопке «!». */
+.shipping-carriers__info-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.shipping-carriers__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.shipping-carriers__field-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--iz-color-text-muted, var(--iz-color-text));
+}
+
+.shipping-carriers__input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 10px;
+  background: var(--iz-color-surface, transparent);
+  color: var(--iz-color-text);
+  font: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+}
+
+.shipping-carriers__info-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}

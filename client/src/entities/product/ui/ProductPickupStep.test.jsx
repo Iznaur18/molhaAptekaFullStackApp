@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "../../../test/renderWithProviders.jsx";
 
 vi.mock("../../shipping/model/shippingCarrierQueries.js", () => ({
+  useShippingCarrierInfoQuery: () => ({ data: [] }),
   useShippingCarriersQuery: () => ({
     data: [
       { carrierId: "seller", available: true },

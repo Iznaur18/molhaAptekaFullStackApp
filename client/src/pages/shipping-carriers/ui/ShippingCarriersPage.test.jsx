@@ -5,6 +5,7 @@ import { SHIPPING_CARRIERS_ADMIN_UI } from "../../../shared/config/appUiCopy.js"
 import { renderWithProviders } from "../../../test/renderWithProviders.jsx";
 
 const toggleMock = vi.fn();
+const saveInfoMock = vi.fn();
 
 vi.mock("../../../entities/shipping/model/shippingCarrierQueries.js", () => ({
   useStaffShippingCarriersQuery: () => ({
@@ -38,6 +39,25 @@ vi.mock("../../../entities/shipping/model/shippingCarrierQueries.js", () => ({
     isError: false,
   }),
   useToggleShippingCarrierMutation: () => ({ mutateAsync: toggleMock }),
+  useStaffShippingCarrierInfoQuery: () => ({
+    data: [
+      {
+        carrierId: "cdek",
+        label: "СДЭК",
+        description: "",
+        workHours: "Тестовый график",
+        coverage: "",
+        phone: "",
+        website: "",
+      },
+    ],
+    isPending: false,
+    isError: false,
+  }),
+  useSaveShippingCarrierInfoMutation: () => ({
+    mutateAsync: saveInfoMock,
+    isPending: false,
+  }),
 }));
 
 const { ShippingCarriersPage } = await import("./ShippingCarriersPage.jsx");
@@ -87,5 +107,45 @@ describe("панель служб доставки", () => {
       carrierId: "seller",
       enabled: false,
     });
+  });
+
+  it("справка службы сохраняется целиком, пробелы срезаются", async () => {
+    saveInfoMock.mockClear();
+    saveInfoMock.mockResolvedValue([]);
+    renderWithProviders(<ShippingCarriersPage />);
+
+    fireEvent.change(screen.getByLabelText("Телефон"), {
+      target: { value: " 8 (800) 000-00-00 " },
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: SHIPPING_CARRIERS_ADMIN_UI.INFO_SAVE }),
+    );
+
+    expect(saveInfoMock).toHaveBeenCalledWith({
+      carrierId: "cdek",
+      info: {
+        description: "",
+        workHours: "Тестовый график",
+        coverage: "",
+        phone: "8 (800) 000-00-00",
+        website: "",
+      },
+    });
+    expect(await screen.findByText(SHIPPING_CARRIERS_ADMIN_UI.INFO_SAVED)).toBeTruthy();
+  });
+
+  it("кривой телефон в справке не уходит на сервер", () => {
+    saveInfoMock.mockClear();
+    renderWithProviders(<ShippingCarriersPage />);
+
+    fireEvent.change(screen.getByLabelText("Телефон"), {
+      target: { value: "звоните нам" },
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: SHIPPING_CARRIERS_ADMIN_UI.INFO_SAVE }),
+    );
+
+    expect(saveInfoMock).not.toHaveBeenCalled();
+    expect(screen.getByRole("alert")).toHaveTextContent("Телефон");
   });
 });

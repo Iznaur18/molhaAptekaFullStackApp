@@ -10,6 +10,7 @@ import {
   SHIPPING_SERVICE_PICKUP_POINT,
 } from "../lib/checkoutShippingProviderOptions.js";
 import {
+  PRODUCT_DELIVERY_CARRIER_GITORG,
   PRODUCT_DELIVERY_CARRIER_LOBO,
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_YANDEX_DELIVERY,
@@ -18,6 +19,7 @@ import {
 
 import { CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
 import { resolveClientViewerRegionCode } from "../../../entities/region/lib/viewerRegion.js";
+import { ShippingCarrierInfoButton } from "../../../entities/shipping/ui/ShippingCarrierInfoButton.jsx";
 import { useAuthSession } from "../../../entities/user/model/useAuthSession.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 
@@ -31,13 +33,27 @@ const SERVICE_LABEL = {
 const COURIER_OPTION_ID = "gitorg-courier";
 
 /**
- * Порядок карточек: выбранная, потом те, что можно выбрать, потом остальные.
- * Иначе доступная служба (СДЭК) пряталась за неактивными и «скоро».
+ * Id службы для справки «!». У «Доставки продавцом» справки нет: общего
+ * графика и телефона у неё не бывает.
+ *
+ * @param {string | undefined} cardId
+ * @returns {string | null}
+ */
+function resolveInfoCarrierId(cardId) {
+  if (!cardId || cardId === CHECKOUT_SHIPPING_PROVIDER_SELLER) return null;
+  return cardId === COURIER_OPTION_ID ? PRODUCT_DELIVERY_CARRIER_GITORG : cardId;
+}
+
+/**
+ * Порядок карточек: сначала службы, которые выбраны или которые можно выбрать,
+ * потом остальные. Иначе доступная служба (СДЭК) пряталась за неактивными и
+ * «скоро». Выбранную вперёд не выносим: от нажатия карточки менялись местами
+ * и «прыгали» под пальцем.
  * Сортировка стабильная — внутри ранга порядок прежний.
  *
  * @param {{ selected: boolean; selectable: boolean }} card
  */
-const rankCard = (card) => (card.selected ? 2 : card.selectable ? 1 : 0);
+const rankCard = (card) => (card.selected || card.selectable ? 1 : 0);
 
 /**
  * Плашка «кто везёт», когда выбирать нечего: иконка, мелкая подпись и имя
@@ -238,6 +254,10 @@ export function CheckoutShippingProviderPicker({
             {singleBadge.name}
           </span>
         </span>
+        <ShippingCarrierInfoButton
+          carrierId={resolveInfoCarrierId(selectedCards[0]?.id)}
+          className="checkout-shipping-provider-picker__single-info"
+        />
       </div>
     );
   }
@@ -272,28 +292,32 @@ export function CheckoutShippingProviderPicker({
             .join(" ");
 
           return (
-            <button
-              key={card.id}
-              ref={card.selected ? selectedRef : undefined}
-              type="button"
-              className={className}
-              role="radio"
-              aria-checked={card.selected}
-              aria-disabled={!card.selectable || disabled}
-              disabled={!card.selectable || disabled}
-              onClick={() =>
-                onSelectCarrier?.(carrierIds.has(card.id) ? card.id : null)
-              }
-            >
-              <span className="checkout-shipping-provider-picker__label">
-                {card.label}
-                {card.soon ? (
-                  <span className="checkout-shipping-provider-picker__soon">
-                    {CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SOON}
-                  </span>
-                ) : null}
-              </span>
-            </button>
+            // «!» — сосед карточки, а не её часть: кнопка в кнопке невалидна,
+            // и нажатие на справку не должно выбирать службу.
+            <div key={card.id} className="checkout-shipping-provider-picker__item">
+              <button
+                ref={card.selected ? selectedRef : undefined}
+                type="button"
+                className={className}
+                role="radio"
+                aria-checked={card.selected}
+                aria-disabled={!card.selectable || disabled}
+                disabled={!card.selectable || disabled}
+                onClick={() =>
+                  onSelectCarrier?.(carrierIds.has(card.id) ? card.id : null)
+                }
+              >
+                <span className="checkout-shipping-provider-picker__label">
+                  {card.label}
+                  {card.soon ? (
+                    <span className="checkout-shipping-provider-picker__soon">
+                      {CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SOON}
+                    </span>
+                  ) : null}
+                </span>
+              </button>
+              <ShippingCarrierInfoButton carrierId={resolveInfoCarrierId(card.id)} />
+            </div>
           );
         })}
       </div>

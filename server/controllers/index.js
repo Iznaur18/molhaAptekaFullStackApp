@@ -138,6 +138,9 @@ import {
   getShippingCarriersController,
   getStaffShippingCarriersController,
   patchStaffShippingCarrierController,
+  getShippingCarrierInfoController,
+  getStaffShippingCarrierInfoController,
+  putStaffShippingCarrierInfoController,
 } from "./Order/shippingCarriersController.js";
 import { updateOrderStatusController } from "./Order/updateOrderStatusController.js";
 import {
@@ -191,6 +194,10 @@ import {
   runAnalyticsReconciliationController,
 } from "./Analytics/analyticsControllers.js";
 import { trackAdAnalyticsController } from "./Analytics/trackAdAnalyticsController.js";
+import {
+  getMySellerQrStatsController,
+  trackSellerQrScanController,
+} from "./Analytics/sellerQrAnalyticsControllers.js";
 import { trackClientAnalyticsController } from "./Analytics/trackClientAnalyticsController.js";
 import {
   getHomeCuratedProductListsController,
@@ -478,6 +485,9 @@ export {
   getShippingCarriersController,
   getStaffShippingCarriersController,
   patchStaffShippingCarrierController,
+  getShippingCarrierInfoController,
+  getStaffShippingCarrierInfoController,
+  putStaffShippingCarrierInfoController,
   updateOrderStatusController,
   getMyCourierProfileController,
   submitCourierApplicationController,
@@ -703,5 +713,7 @@ export {
   getAnalyticsExportController,
   runAnalyticsReconciliationController,
   trackAdAnalyticsController,
+  getMySellerQrStatsController,
+  trackSellerQrScanController,
   trackClientAnalyticsController,
 };

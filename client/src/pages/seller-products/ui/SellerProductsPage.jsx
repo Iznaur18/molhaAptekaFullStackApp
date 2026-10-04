@@ -19,6 +19,8 @@ import { isSellerSafeDealApproved } from "@molha/api-contract";
 import { UserPremiumDisplayName } from "../../../entities/user/ui/UserPremiumDisplayName.jsx";
 import { SellerProfileQuickStats } from "../../../entities/user/ui/SellerProfileQuickStats.jsx";
 import { SellerShareLinkButton } from "../../../entities/user/ui/SellerShareLinkButton.jsx";
+import { SellerQrButton } from "../../../entities/user/ui/SellerQrButton.jsx";
+import { useTrackSellerQrScan } from "../../../entities/analytics/model/useSellerQrAnalytics.js";
 import { usePublicSellerShelvesQuery } from "../../../entities/seller-shelf/model/usePublicSellerShelvesQuery.js";
 import { usePublicSellerOneCShelvesQuery } from "../../../entities/seller-shelf/model/usePublicSellerOneCShelvesQuery.js";
 import { HomeCatalogGrid } from "../../../widgets/catalog-product-grid/ui/HomeCatalogGrid.jsx";
@@ -83,6 +85,12 @@ export function SellerProductsPage({
     onecPath.length > 0 ? onecPath[onecPath.length - 1] : null;
 
   const catalogEnabled = isSessionReady;
+  // Переход по QR-коду считаем, когда сессия известна: свои заходы не в счёт.
+  useTrackSellerQrScan({
+    sellerId,
+    isSelf: currentUserId != null && String(sellerId) === String(currentUserId),
+    enabled: isSessionReady,
+  });
   const profileQuery = useUserProfileQuery({
     userId: sellerId,
     enabled: catalogEnabled,
@@ -286,11 +294,19 @@ export function SellerProductsPage({
                 />
               ) : null}
               {isSelf ? (
-                <SellerShareLinkButton
-                  sellerId={sellerId}
-                  sellerName={displayName}
-                  variant="banner"
-                />
+                <>
+                  <SellerShareLinkButton
+                    sellerId={sellerId}
+                    sellerName={displayName}
+                    variant="banner"
+                  />
+                  <SellerQrButton
+                    sellerId={sellerId}
+                    sellerName={displayName}
+                    avatarUrl={photoUrl && !avatarLoadFailed ? photoUrl : ""}
+                    variant="banner"
+                  />
+                </>
               ) : null}
             </div>
           ) : null}
@@ -316,11 +332,18 @@ export function SellerProductsPage({
               />
             </button>
             {isSelf && !showProfileBanner ? (
-              <SellerShareLinkButton
-                sellerId={sellerId}
-                sellerName={displayName}
-                variant="meta"
-              />
+              <div className="seller-products-page__seller-actions">
+                <SellerShareLinkButton
+                  sellerId={sellerId}
+                  sellerName={displayName}
+                  variant="meta"
+                />
+                <SellerQrButton
+                  sellerId={sellerId}
+                  sellerName={displayName}
+                  avatarUrl={photoUrl && !avatarLoadFailed ? photoUrl : ""}
+                />
+              </div>
             ) : null}
             {!isSelf ? (
               <div className="seller-products-page__seller-actions">

@@ -4,6 +4,7 @@ import { USER_DATA } from "../../constants/constants.js";
 import { syncPremiumExpiryForUser } from "../../services/user/premiumAccess.js";
 import { attachFollowFieldsToPublicProfile } from "../../services/user/userFollowHelpers.js";
 import { attachUserCommerceStatsToUser } from "../../services/user/attachUserListCommerceStats.js";
+import { attachWishlistCountToUser } from "../../services/user/userWishlistCount.js";
 import { getUnreadInAppNotificationsForUser } from "../../services/user/userInAppNotifications.js";
 
 /** Получение данных текущего пользователя. GET /auth/me (JWT в httpOnly cookie) */
@@ -32,7 +33,9 @@ export const userMeController = async (req, res) => {
     viewerId: userIdClient,
   });
 
-  const userWithCommerce = await attachUserCommerceStatsToUser(userWithFollow);
+  const userWithCommerce = await attachWishlistCountToUser(
+    await attachUserCommerceStatsToUser(userWithFollow),
+  );
 
   const inAppNotifications = await getUnreadInAppNotificationsForUser(userIdClient);
 

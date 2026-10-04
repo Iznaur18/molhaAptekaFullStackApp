@@ -1,4 +1,7 @@
 import { useId, useState } from "react";
+import { SHIPPING_PROVIDER_YANDEX_EXPRESS } from "@molha/api-contract";
+
+import { ShippingCarrierInfoButton } from "../../shipping/ui/ShippingCarrierInfoButton.jsx";
 
 import { useSaveYandexExpressMutation } from "../model/yandexDeliveryConnectionQueries.js";
 
@@ -29,7 +32,10 @@ export function YandexExpressSettings({ express }) {
 
   return (
     <div className="cdek-connection-card__form" aria-label={UI.TITLE}>
-      <strong>{UI.TITLE}</strong>
+      <strong className="cdek-connection-card__name-with-info">
+        {UI.TITLE}
+        <ShippingCarrierInfoButton carrierId={SHIPPING_PROVIDER_YANDEX_EXPRESS} />
+      </strong>
       <p className="cdek-connection-card__hint">{UI.HINT}</p>
 
       <label className="cdek-connection-card__field" htmlFor={phoneId}>

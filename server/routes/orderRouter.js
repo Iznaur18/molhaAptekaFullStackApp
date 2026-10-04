@@ -22,6 +22,7 @@ import {
   postCdekIntakeController,
   postSellerDeliveryQuoteController,
   getShippingCarriersController,
+  getShippingCarrierInfoController,
   getMyOrdersController,
   getMySalesController,
   getMyOrdersActionCountController,
@@ -85,6 +86,8 @@ router.get("/sales", checkAuthMW, getMySalesValidation, getMySalesController);
 // Список служб задаёт админ, поэтому клиент спрашивает его у нас, а не
 // держит копию в константах.
 router.get("/shipping-carriers", checkAuthMW, getShippingCarriersController);
+// Справки по службам для кнопки «!» рядом с выбором доставки.
+router.get("/shipping-carriers/info", checkAuthMW, getShippingCarrierInfoController);
 
 // Расчёт доставки внешней службой до оформления: покупатель должен знать
 // сумму заранее, а не узнавать её у двери.

@@ -107,7 +107,11 @@ export {
   SAFE_DEAL_MODERATION_UI,
   SAFE_DEAL_REGISTRY_CHECK_URL,
 } from "./copy/safe-deal.js";
-export { SHIPPING_CARRIERS_ADMIN_UI } from "./copy/shipping-carriers.js";
+export { SELLER_QR_UI } from "./copy/seller-qr.js";
+export {
+  SHIPPING_CARRIERS_ADMIN_UI,
+  SHIPPING_CARRIER_INFO_UI,
+} from "./copy/shipping-carriers.js";
 export { CDEK_CONNECTION_UI, CDEK_WAYBILL_UI, ORDER_CDEK_UI } from "./copy/cdek.js";
 export { YANDEX_DELIVERY_CONNECTION_UI } from "./copy/yandexDelivery.js";
 export {

@@ -19,3 +19,7 @@ export {
   resetUserActiveDayCache,
   trackUserActiveDay,
 } from "./funnelAnalyticsEvents.js";
+export {
+  emitSellerQrScannedEvent,
+  getSellerQrScanStats,
+} from "./sellerQrAnalyticsEvents.js";

@@ -114,6 +114,7 @@
 | GET   | `/order/sales/action-count`                       | 🔑     | Счётчик действий по продажам                                |
 | GET   | `/order/all`                                      | 👑     | Все заказы                                                  |
 | GET   | `/order/shipping-carriers`                        | 🔑     | Список служб доставки                                       |
+| GET   | `/order/shipping-carriers/info`                   | 🔑     | Справки по службам (график, телефон) для кнопки «!»         |
 | POST  | `/order/shipping-estimate`                        | 🔑 ⏱   | Расчёт доставки до оформления                               |
 | POST  | `/order/seller-delivery-quote`                    | 🔑 ⏱   | Тариф продавца и расстояние по дорогам до оформления        |
 | POST  | `/order`                                          | 🔑 ⏱   | Создать заказ                                               |
@@ -389,7 +390,7 @@
 ## Staff — `/staff`
 
 | Метод | Путь                                                  | Доступ | Назначение                                |
-| ----- | ----------------------------------------------------- | ------ | ----------------------------------------- |
+| ----- | ----------------------------------------------------- | ------ | ----------------------------------------- | --- | --- | ------------------------------------------ | --- | ------------------------ |
 | GET   | `/staff/broadcast-notifications/recipients-count`     | 👑     | Сколько получит рассылка                  |
 | POST  | `/staff/broadcast-notifications`                      | 👑     | Разослать уведомление                     |
 | GET   | `/staff/couriers`                                     | 🛡     | Заявки курьеров                           |
@@ -400,4 +401,5 @@
 | POST  | `/staff/shipment-disputes/:orderId/:sellerId/resolve` | 🛡     | Решение по спору                          |
 | GET   | `/staff/shipping-carriers`                            | 👑     | Службы доставки                           |
 | PATCH | `/staff/shipping-carriers/:carrierId`                 | 👑     | Включить/выключить службу                 |
+| GET   | `/staff/shipping-carriers/info`                       | 👑     | Справки по службам, включая пустые        |     | PUT | `/staff/shipping-carriers/:carrierId/info` | 👑  | Сохранить справку службы |
 | PATCH | `/staff/sellers/:userId/product-moderation-trust`     | 👑     | Публикация товаров продавца без модерации |

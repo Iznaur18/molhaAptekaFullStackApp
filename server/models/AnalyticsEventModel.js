@@ -67,5 +67,7 @@ AnalyticsEventSchema.index({ idempotencyKey: 1 }, { unique: true });
 AnalyticsEventSchema.index({ eventType: 1, occurredAt: -1 });
 AnalyticsEventSchema.index({ actorUserId: 1, eventType: 1, occurredAt: -1 });
 AnalyticsEventSchema.index({ occurredAt: -1 });
+// Счётчики по объекту события: переходы по QR-коду витрины продавца.
+AnalyticsEventSchema.index({ eventType: 1, subjectId: 1, occurredAt: -1 });
 
 export default mongoose.model("AnalyticsEvent", AnalyticsEventSchema);

@@ -1,6 +1,7 @@
 import { staffAuditListValidation } from "./audit/staffAuditListValidation.js";
 import { analyticsPeriodQueryValidation } from "./analytics/analyticsPeriodQueryValidation.js";
 import { trackAdAnalyticsValidation } from "./analytics/trackAdAnalyticsValidation.js";
+import { trackSellerQrScanValidation } from "./analytics/trackSellerQrScanValidation.js";
 import { trackClientAnalyticsValidation } from "./analytics/trackClientAnalyticsValidation.js";
 import { loginUserValidation } from "./user/loginUserValidation.js";
 import { registerUserValidation } from "./user/registerUserValidation.js";
@@ -109,7 +110,10 @@ import {
 } from "./courier/courierShipmentValidation.js";
 import { shippingEstimateValidation } from "./order/shippingEstimateValidation.js";
 import { sellerDeliveryQuoteValidation } from "./order/sellerDeliveryQuoteValidation.js";
-import { shippingCarrierToggleValidation } from "./order/shippingCarrierValidation.js";
+import {
+  shippingCarrierInfoValidation,
+  shippingCarrierToggleValidation,
+} from "./order/shippingCarrierValidation.js";
 import {
   cdekCredentialsValidation,
   cdekToggleValidation,
@@ -291,6 +295,7 @@ export {
   shippingEstimateValidation,
   sellerDeliveryQuoteValidation,
   shippingCarrierToggleValidation,
+  shippingCarrierInfoValidation,
   replaceMyCartValidation,
   replaceMyFavoritesValidation,
   userStoryIdParamValidation,
@@ -343,6 +348,7 @@ export {
   staffAuditListValidation,
   analyticsPeriodQueryValidation,
   trackAdAnalyticsValidation,
+  trackSellerQrScanValidation,
   trackClientAnalyticsValidation,
   cdekCredentialsValidation,
   cdekToggleValidation,

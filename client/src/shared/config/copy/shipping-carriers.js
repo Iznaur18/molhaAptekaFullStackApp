@@ -15,4 +15,34 @@ export const SHIPPING_CARRIERS_ADMIN_UI = {
   REGIONS: (regions) => `Только: ${regions.join(", ")}`,
   REGIONS_ALL: "Вся страна",
   ERROR_GENERIC: "Не удалось выполнить действие. Попробуйте ещё раз.",
+  INFO_TITLE: "Справка для покупателей и продавцов",
+  INFO_INTRO:
+    "Показывается по кнопке «!» рядом со службой доставки. Службы не отдают это сами, поэтому текст заполняется здесь. Пустое поле не показывается; если пусто всё — кнопки у службы нет.",
+  INFO_SAVE: "Сохранить",
+  INFO_SAVED: "Сохранено",
+  INFO_FILLED: "Заполнено",
+  INFO_EMPTY: "Не заполнено",
+};
+
+/** Справка о службе доставки: кнопка «!» и окно снизу. */
+export const SHIPPING_CARRIER_INFO_UI = {
+  /** @param {string} label */
+  BUTTON_ARIA: (label) => `О службе «${label}»`,
+  CLOSE: "Закрыть",
+  FETCH_FALLBACK: "Не удалось загрузить справку о службе доставки",
+  SAVE_FALLBACK: "Не удалось сохранить справку о службе доставки",
+  FIELD_LABELS: {
+    description: "О службе",
+    workHours: "График работы",
+    coverage: "Где работает",
+    phone: "Телефон",
+    website: "Сайт",
+  },
+  FIELD_PLACEHOLDERS: {
+    description: "Коротко: что за служба и как доставляет",
+    workHours: "Например: Пн–Сб 9:00–20:00",
+    coverage: "Например: Грозный и пригороды",
+    phone: "Номер менеджера или горячей линии",
+    website: "https://…",
+  },
 };

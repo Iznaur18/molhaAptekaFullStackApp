@@ -29,6 +29,11 @@
   color: #ffffff;
 }
 
+/* Вторая кнопка на баннере (QR-код) — левее «Поделиться». */
+.seller-share-link--banner-second {
+  right: calc(var(--modal-banner-avatar-inset, 0.75rem) + 2.5rem);
+}
+
 .seller-share-link--banner:hover {
   opacity: 0.88;
 }

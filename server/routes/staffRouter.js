@@ -10,6 +10,8 @@ import {
   postStaffResolveDisputeController,
   getStaffShippingCarriersController,
   patchStaffShippingCarrierController,
+  getStaffShippingCarrierInfoController,
+  putStaffShippingCarrierInfoController,
   patchSellerProductModerationTrustController,
 } from "../controllers/index.js";
 import {
@@ -20,6 +22,7 @@ import {
   staffDisputeListValidation,
   staffResolveDisputeValidation,
   shippingCarrierToggleValidation,
+  shippingCarrierInfoValidation,
   productModerationTrustValidation,
 } from "../validations/index.js";
 import { checkProductModeratorMW } from "../middlewares/checkProductModeratorMW.js";
@@ -106,6 +109,20 @@ router.patch(
   checkAdminMW,
   shippingCarrierToggleValidation,
   patchStaffShippingCarrierController,
+);
+// Справку о службе (график, телефон) службы по API не отдают — её пишет админ.
+router.get(
+  "/shipping-carriers/info",
+  checkAuthMW,
+  checkAdminMW,
+  getStaffShippingCarrierInfoController,
+);
+router.put(
+  "/shipping-carriers/:carrierId/info",
+  checkAuthMW,
+  checkAdminMW,
+  shippingCarrierInfoValidation,
+  putStaffShippingCarrierInfoController,
 );
 
 // Публикацию без модерации выдаёт только админ: это отказ от проверки чужого

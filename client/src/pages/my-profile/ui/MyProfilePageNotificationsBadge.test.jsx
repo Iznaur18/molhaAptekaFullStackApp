@@ -6,6 +6,10 @@ import { HEADER_NOTIFICATIONS_BUTTON_UI } from "../../../shared/config/appUiCopy
 import { renderWithProviders } from "../../../test/renderWithProviders.jsx";
 import { MyProfilePage } from "./MyProfilePage.jsx";
 
+vi.mock("../../../entities/wishlist/model/useWishlist.js", () => ({
+  useWishlist: () => ({ totalCount: 3 }),
+}));
+
 const user = {
   _id: "6a871e02e4b218aa47757078",
   userName: "user.name",
@@ -59,5 +63,25 @@ describe("MyProfilePage: счётчик уведомлений на колоко
     expect(
       screen.getByRole("button", { name: HEADER_NOTIFICATIONS_BUTTON_UI.ARIA }),
     ).toHaveTextContent("");
+  });
+
+  it("«Основное»: подписки ↔ подписчики, суммы, желания ↔ голоса, баллы внизу", () => {
+    const { container } = renderProfile(0);
+
+    const ids = [...container.querySelectorAll("[data-row-id]")].map((node) =>
+      node.getAttribute("data-row-id"),
+    );
+    expect(ids).toEqual([
+      "followingCount",
+      "followersCount",
+      "totalSalesAmount",
+      "totalPurchasesAmount",
+      "wishlistCount",
+      "userRatingByVotes",
+      "userLoyaltyPoints",
+    ]);
+    expect(container.querySelector('[data-row-id="wishlistCount"]')).toHaveTextContent(
+      "3",
+    );
   });
 });

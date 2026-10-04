@@ -15,7 +15,7 @@ import {
 test("analytics event types include core Level-2 set", () => {
   assert.ok(ANALYTICS_EVENT_TYPES.includes(ANALYTICS_EVENT_PRODUCT_VIEWED));
   assert.ok(ANALYTICS_EVENT_TYPES.includes(ANALYTICS_EVENT_ORDER_ITEM_SOLD));
-  assert.equal(ANALYTICS_EVENT_TYPES.length, 12);
+  assert.equal(ANALYTICS_EVENT_TYPES.length, 13);
   assert.equal(new Set(ANALYTICS_EVENT_TYPES).size, ANALYTICS_EVENT_TYPES.length);
 });
 

@@ -30,6 +30,7 @@ import "../../address/ui/SavedAddressPicker.css";
 import "./ProductPickupLocationFields.css";
 import "./create-product-sections/CreateProductSections.css";
 import { useShippingCarriersQuery } from "../../shipping/model/shippingCarrierQueries.js";
+import { ShippingCarrierInfoButton } from "../../shipping/ui/ShippingCarrierInfoButton.jsx";
 import {
   PRODUCT_DELIVERY_CARRIER_GITORG,
   PRODUCT_DELIVERY_CARRIER_LABEL_RU,
@@ -812,6 +813,9 @@ export function ProductPickupLocationFields({
                 <span className="product-pickup-location-fields__check-label">
                   {PRODUCT_PICKUP_UI.FULFILLMENT_COURIER}
                 </span>
+                <ShippingCarrierInfoButton
+                  carrierId={PRODUCT_DELIVERY_CARRIER_GITORG}
+                />
               </label>
             ) : null}
 
@@ -870,6 +874,7 @@ export function ProductPickupLocationFields({
                 <span className="product-pickup-location-fields__check-label">
                   {PRODUCT_DELIVERY_CARRIER_LABEL_RU[PRODUCT_DELIVERY_CARRIER_LOBO]}
                 </span>
+                <ShippingCarrierInfoButton carrierId={PRODUCT_DELIVERY_CARRIER_LOBO} />
               </label>
             ) : null}
 
@@ -901,6 +906,7 @@ export function ProductPickupLocationFields({
                   {SHIPPING_PROVIDER_LABEL_RU[SHIPPING_PROVIDER_CDEK]}
                   {cdekControl.connected ? null : PRODUCT_PICKUP_UI.CDEK_NEEDS_KEYS}
                 </span>
+                <ShippingCarrierInfoButton carrierId={SHIPPING_PROVIDER_CDEK} />
               </label>
             ) : null}
 
@@ -924,6 +930,7 @@ export function ProductPickupLocationFields({
                   {SHIPPING_PROVIDER_LABEL_RU[providerId] ?? providerId}
                   {PRODUCT_PICKUP_UI.SOON_BADGE}
                 </span>
+                <ShippingCarrierInfoButton carrierId={providerId} />
               </label>
             ))}
           </div>

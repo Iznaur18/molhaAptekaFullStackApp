@@ -6,12 +6,15 @@ const PROFILE_ROW_SECTIONS = [
   {
     id: "stats",
     title: "Основное",
+    // Сетка в 2 колонки, пары — напротив друг друга: подписки ↔ подписчики,
+    // продажи ↔ покупки на сумму, желания ↔ голоса. Счётчика «Продажи» нет:
+    // в «Мои продажи» ведёт «Продаж на сумму». Порядок тот же в mobile.
     rowIds: [
-      "followersCount",
-      "totalSalesCount",
       "followingCount",
+      "followersCount",
       "totalSalesAmount",
       "totalPurchasesAmount",
+      "wishlistCount",
       "userRatingByVotes",
       // Часы работы — растянутой карточкой прямо над баллами (см. UserProfileInfoPanel).
       "userBusinessHours",
