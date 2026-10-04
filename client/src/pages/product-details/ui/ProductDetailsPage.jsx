@@ -20,7 +20,9 @@ import {
   API_CLIENT_UI,
   PRODUCT_REPORT_MODAL_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { parseProductIdFromPathname } from "../../../shared/lib/productDetailsPaths.js";
 import { prefersReducedMotion } from "../../../shared/lib/scheduleOpenAfterPaint.js";
+import { sendDiagBeacon } from "../../../shared/lib/sendDiagBeacon.js";
 import { useScrollLock } from "../../../shared/lib/useScrollLock.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { resolveCatalogDetailsShowAddToCart } from "../../../widgets/app-shell/lib/resolveCatalogDetailsShowAddToCart.js";
@@ -31,6 +33,22 @@ import { ProductDetailsPageSkeleton } from "./ProductDetailsPageSkeleton.jsx";
 
 /** Паритет с `--product-details-page-exit-ms`. */
 const PRODUCT_DETAILS_PAGE_EXIT_MS = 180;
+
+/**
+ * Сколько ждём размонтирования после шага назад, прежде чем считать, что
+ * страница застряла, и вернуть её на экран.
+ */
+const PRODUCT_DETAILS_PAGE_STUCK_MS = 400;
+
+/**
+ * Адрес в браузере уже не этой карточки (шаг назад сделан), хотя страница ещё
+ * может быть на экране.
+ *
+ * @param {string} productId
+ */
+function hasLeftProductUrl(productId) {
+  return parseProductIdFromPathname(window.location.pathname) !== productId;
+}
 
 function navigateBackOrHome(navigate) {
   if (typeof window !== "undefined" && window.history.length > 1) {
@@ -115,25 +133,49 @@ export function ProductDetailsPage() {
     if (isClosingRef.current) {
       return;
     }
+    // Адрес уже ушёл со страницы товара, а она ещё на экране (переход не
+    // дорисован): второй шаг назад увёл бы дальше, чем нужно.
+    if (hasLeftProductUrl(productId)) {
+      return;
+    }
     if (prefersReducedMotion()) {
       navigateBackOrHome(navigate);
       return;
     }
     isClosingRef.current = true;
     setIsClosing(true);
-  }, [navigate]);
+  }, [navigate, productId]);
 
   useEffect(() => {
     if (!isClosing) {
       return undefined;
     }
+    let stuckTimeoutId = 0;
     const timeoutId = window.setTimeout(() => {
+      const historyLengthBefore = window.history.length;
       navigateBackOrHome(navigate);
+      /*
+       * После шага назад страница обязана размонтироваться. Пока она в
+       * «закрытии», она прозрачна, а шапка и нижнее меню скрыты — если шаг
+       * назад не убрал её (переход завис или в истории оказалась эта же
+       * карточка), человек видит белый экран (жалоба 04.10.2026, iPhone,
+       * «Мои товары» → товар → «Назад»). Возвращаем карточку на экран и шлём
+       * маячок: так видно, что случилось, и «Назад» можно нажать ещё раз.
+       */
+      stuckTimeoutId = window.setTimeout(() => {
+        sendDiagBeacon(
+          "pdstuck",
+          `left=${hasLeftProductUrl(productId)} hist=${historyLengthBefore}>${window.history.length} at=${window.location.pathname}`,
+        );
+        isClosingRef.current = false;
+        setIsClosing(false);
+      }, PRODUCT_DETAILS_PAGE_STUCK_MS);
     }, PRODUCT_DETAILS_PAGE_EXIT_MS);
     return () => {
       window.clearTimeout(timeoutId);
+      window.clearTimeout(stuckTimeoutId);
     };
-  }, [isClosing, navigate]);
+  }, [isClosing, navigate, productId]);
 
   const handleSellerNameClick = useCallback(
     (userId) => {
