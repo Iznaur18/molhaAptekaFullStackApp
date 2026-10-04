@@ -50,6 +50,7 @@ import { MoneyIdempotencyRecordModel } from "./MoneyIdempotencyRecordModel.js";
 import { PaymentModel } from "./PaymentModel.js";
 import { PrivateUploadModel } from "./PrivateUploadModel.js";
 import { ShippingCarrierSettingModel } from "./ShippingCarrierSettingModel.js";
+import { ShippingCarrierInfoModel } from "./ShippingCarrierInfoModel.js";
 import OneCExchangeLogModel from "./OneCExchangeLogModel.js";
 import OneCOrderPushModel from "./OneCOrderPushModel.js";
 import OneCExchangeSessionModel from "./OneCExchangeSessionModel.js";
@@ -113,6 +114,7 @@ export {
   PaymentModel,
   PrivateUploadModel,
   ShippingCarrierSettingModel,
+  ShippingCarrierInfoModel,
   OneCExchangeLogModel,
   OneCOrderPushModel,
   OneCExchangeSessionModel,

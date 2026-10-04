@@ -9,6 +9,8 @@ export const PROFILE_ROW_ID = {
   RATING: "userRatingByVotes",
   BUSINESS_HOURS: "userBusinessHours",
   LOYALTY_POINTS: "userLoyaltyPoints",
+  /** Число товаров в списке желаний. */
+  WISHLIST: "wishlistCount",
 };
 
 export const PROFILE_SECTION_ID = {

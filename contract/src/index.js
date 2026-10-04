@@ -716,6 +716,23 @@ export {
   resolveOrderShippingTrackingUrl,
 } from "./shippingProvider.js";
 export {
+  SHIPPING_CARRIER_INFO_IDS,
+  SHIPPING_CARRIER_INFO_LABEL_RU,
+  SHIPPING_CARRIER_INFO_FIELDS,
+  SHIPPING_CARRIER_INFO_DESCRIPTION_MAX_LENGTH,
+  SHIPPING_CARRIER_INFO_WORK_HOURS_MAX_LENGTH,
+  SHIPPING_CARRIER_INFO_COVERAGE_MAX_LENGTH,
+  SHIPPING_CARRIER_INFO_PHONE_MAX_LENGTH,
+  SHIPPING_CARRIER_INFO_WEBSITE_MAX_LENGTH,
+  shippingCarrierInfoIdSchema,
+  shippingCarrierInfoBodySchema,
+  shippingCarrierInfoParamsSchema,
+  shippingCarrierInfoSchema,
+  shippingCarrierInfoListDataSchema,
+  hasShippingCarrierInfo,
+  buildShippingCarrierInfoTelHref,
+} from "./shippingCarrierInfo.js";
+export {
   CDEK_API_BASE_URL_PROD,
   CDEK_API_BASE_URL_TEST,
   CDEK_ENVIRONMENTS,
@@ -1108,6 +1125,16 @@ export {
   ANALYTICS_AD_SURFACES,
   trackAdAnalyticsBodySchema,
 } from "./analyticsTrackAd.js";
+export {
+  SELLER_QR_SOURCE_PARAM,
+  SELLER_QR_SOURCE_VALUE,
+  SELLER_QR_VISITOR_ID_MIN_LENGTH,
+  SELLER_QR_VISITOR_ID_MAX_LENGTH,
+  SELLER_QR_STATS_RECENT_DAYS,
+  trackSellerQrScanBodySchema,
+  sellerQrStatsDataSchema,
+  buildSellerQrPath,
+} from "./analyticsSellerQr.js";
 export {
   ANALYTICS_CLIENT_EVENT_CHECKOUT_STARTED,
   ANALYTICS_CLIENT_EVENT_KINDS,

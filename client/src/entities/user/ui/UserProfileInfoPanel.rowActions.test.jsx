@@ -14,7 +14,7 @@ function render(ui) {
 
 const rows = [
   { id: "followingCount", label: "Подписки", value: "7" },
-  { id: "totalSalesCount", label: "Продажи", value: "52" },
+  { id: "followersCount", label: "Подписчики", value: "6" },
   { id: "totalSalesAmount", label: "Продаж на сумму", value: "3.2M" },
   { id: "totalPurchasesAmount", label: "Покупок на сумму", value: "10K" },
 ];
@@ -29,21 +29,21 @@ describe("строки-переходы в профиле", () => {
       <UserProfileInfoPanel
         rows={rows}
         rowActions={{
-          totalSalesCount: onSales,
+          totalSalesAmount: onSales,
           followingCount: onSubscriptions,
           totalPurchasesAmount: onOrders,
         }}
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Продажи" }));
+    fireEvent.click(screen.getByRole("button", { name: "Продаж на сумму" }));
     fireEvent.click(screen.getByRole("button", { name: "Подписки" }));
     fireEvent.click(screen.getByRole("button", { name: "Покупок на сумму" }));
 
     expect(onSales).toHaveBeenCalledTimes(1);
     expect(onSubscriptions).toHaveBeenCalledTimes(1);
     expect(onOrders).toHaveBeenCalledTimes(1);
-    expect(screen.queryByRole("button", { name: "Продаж на сумму" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Подписчики" })).toBeNull();
   });
 
   it("без rowActions строки остаются текстом (чужой профиль)", () => {

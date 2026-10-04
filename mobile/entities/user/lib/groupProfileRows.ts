@@ -19,14 +19,16 @@ const PROFILE_ROW_SECTIONS: Array<{
   {
     id: "stats",
     title: "Основное",
+    // Порядок как на web: подписки, подписчики, суммы продаж и покупок,
+    // желания, голоса, затем часы работы и баллы. Счётчика «Продажи» нет.
     rowIds: [
-      "followersCount",
-      "totalSalesCount",
       "followingCount",
+      "followersCount",
       "totalSalesAmount",
       "totalPurchasesAmount",
-      "userBusinessHours",
+      "wishlistCount",
       "userRatingByVotes",
+      "userBusinessHours",
       "userLoyaltyPoints",
     ],
   },

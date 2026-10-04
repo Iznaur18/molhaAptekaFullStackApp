@@ -173,6 +173,16 @@ export const getUserProfileRows = (
       label: USER_PROFILE_COPY.LABELS.totalPurchasesAmount,
       value: formatSearchRowTotalSales(user.totalPurchasesAmount),
     },
+    // Сервер отдаёт только число: сам список желаний чужого профиля закрыт.
+    ...(user.wishlistCount == null
+      ? []
+      : [
+          {
+            id: "wishlistCount",
+            label: USER_PROFILE_COPY.LABELS.wishlistCount,
+            value: String(Math.max(0, Number(user.wishlistCount) || 0)),
+          },
+        ]),
     {
       id: "email",
       label: USER_PROFILE_COPY.LABELS.email,

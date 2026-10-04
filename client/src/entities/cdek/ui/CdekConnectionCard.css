@@ -16,7 +16,17 @@
   gap: 0.5rem;
 }
 
+.cdek-connection-card__name-with-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .cdek-connection-card__title {
+  /* Справа от названия — «!» со справкой о службе. */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   margin: 0;
   font-size: 1.05rem;
   font-weight: 600;

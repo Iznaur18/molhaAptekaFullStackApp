@@ -1,7 +1,10 @@
 import { useId, useState } from "react";
 import { CircleAlert, CircleCheck } from "lucide-react";
 
+import { SHIPPING_PROVIDER_YANDEX_DELIVERY } from "@molha/api-contract";
+
 import { YANDEX_DELIVERY_CONNECTION_UI as UI } from "../../../shared/config/appUiCopy.js";
+import { ShippingCarrierInfoButton } from "../../shipping/ui/ShippingCarrierInfoButton.jsx";
 import {
   useMyYandexDeliveryConnectionQuery,
   useRemoveYandexDeliveryConnectionMutation,
@@ -54,7 +57,10 @@ export function YandexDeliveryConnectionCard() {
   return (
     <section className="cdek-connection-card" aria-label={UI.TITLE}>
       <header className="cdek-connection-card__header">
-        <h3 className="cdek-connection-card__title">{UI.TITLE}</h3>
+        <h3 className="cdek-connection-card__title">
+          {UI.TITLE}
+          <ShippingCarrierInfoButton carrierId={SHIPPING_PROVIDER_YANDEX_DELIVERY} />
+        </h3>
         <span
           className={[
             "cdek-connection-card__status",

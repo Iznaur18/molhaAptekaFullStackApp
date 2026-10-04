@@ -12,6 +12,8 @@ export const ANALYTICS_EVENT_CHECKOUT_STARTED = "checkout.started";
 export const ANALYTICS_EVENT_PAYMENT_SUCCEEDED = "payment.succeeded";
 export const ANALYTICS_EVENT_USER_ACTIVE = "user.active";
 export const ANALYTICS_EVENT_PRODUCT_PUBLISHED = "seller.product_published";
+/** Переход на витрину по QR-коду продавца. */
+export const ANALYTICS_EVENT_SELLER_QR_SCANNED = "seller.qr_scanned";
 
 export const ANALYTICS_EVENT_TYPES = [
   ANALYTICS_EVENT_USER_REGISTERED,
@@ -26,6 +28,7 @@ export const ANALYTICS_EVENT_TYPES = [
   ANALYTICS_EVENT_PAYMENT_SUCCEEDED,
   ANALYTICS_EVENT_USER_ACTIVE,
   ANALYTICS_EVENT_PRODUCT_PUBLISHED,
+  ANALYTICS_EVENT_SELLER_QR_SCANNED,
 ];
 
 export const ANALYTICS_AD_SURFACE_INTRO = "intro_ad";

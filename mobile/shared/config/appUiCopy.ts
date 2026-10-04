@@ -1630,6 +1630,7 @@ export const USER_PROFILE_COPY = {
     totalSalesCount: "Продаж",
     totalSalesAmount: "Продаж на сумму",
     totalPurchasesAmount: "Покупок на сумму",
+    wishlistCount: "Желания",
     userBusinessHours: "Часы работы",
     userVehicleMake: "Марка и модель",
     userVehicleColor: "Цвет авто",

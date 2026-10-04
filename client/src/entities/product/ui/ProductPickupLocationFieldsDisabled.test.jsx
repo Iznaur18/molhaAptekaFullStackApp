@@ -5,6 +5,7 @@ import { renderWithProviders } from "../../../test/renderWithProviders.jsx";
 
 // Админ выключил курьеров Gitorg — служба должна исчезнуть с формы товара.
 vi.mock("../../shipping/model/shippingCarrierQueries.js", () => ({
+  useShippingCarrierInfoQuery: () => ({ data: [] }),
   useShippingCarriersQuery: () => ({
     data: [
       { carrierId: "seller", available: true },

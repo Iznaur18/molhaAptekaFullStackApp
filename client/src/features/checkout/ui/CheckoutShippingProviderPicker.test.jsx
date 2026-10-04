@@ -4,6 +4,21 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
 import { renderWithProviders } from "../../../test/renderWithProviders.jsx";
 
+// Справка «!» заполнена только у ЛОБО.
+vi.mock("../../../entities/shipping/api/shippingCarriersApi.js", () => ({
+  fetchShippingCarrierInfo: async () => [
+    {
+      carrierId: "lobo",
+      label: "ЛОБО",
+      description: "",
+      workHours: "Тестовый график",
+      coverage: "",
+      phone: "",
+      website: "",
+    },
+  ],
+}));
+
 const { CheckoutShippingProviderPicker } =
   await import("./CheckoutShippingProviderPicker.jsx");
 
@@ -191,7 +206,7 @@ describe("товар с локальной службой", () => {
     expect(queryBadge(CHECKOUT_FORM_UI.SHIPPING_PROVIDER_SINGLE_SELLER)).toBeNull();
   });
 
-  it("ЛОБО и СДЭК у продавца: выбрана одна служба, переключаются в обе стороны", () => {
+  it("ЛОБО и СДЭК у продавца: выбрана одна служба, переключаются в обе стороны", async () => {
     const onSelectCarrier = vi.fn();
     const { rerender } = renderWithProviders(
       <CheckoutShippingProviderPicker
@@ -205,6 +220,10 @@ describe("товар с локальной службой", () => {
     );
     const cdekButton = () =>
       screen.getByRole("radio", { name: CHECKOUT_FORM_UI.SHIPPING_PROVIDER_CDEK });
+
+    const cardOrder = () =>
+      screen.getAllByRole("radio").map((node) => node.textContent);
+    const orderBefore = cardOrder();
 
     expect(loboButton()?.getAttribute("aria-checked")).toBe("true");
     expect(cdekButton().getAttribute("aria-checked")).toBe("false");
@@ -221,6 +240,13 @@ describe("товар с локальной службой", () => {
         onSelectCarrier={onSelectCarrier}
       />,
     );
+
+    // Справка есть только у ЛОБО — «!» стоит у неё одной.
+    expect(await screen.findByRole("button", { name: "О службе «ЛОБО»" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "О службе «СДЭК»" })).toBeNull();
+
+    // Карточки остаются на местах: выбранная не перескакивает вперёд.
+    expect(cardOrder()).toEqual(orderBefore);
 
     // Раньше здесь горели обе, а ЛОБО была неактивной.
     expect(cdekButton().getAttribute("aria-checked")).toBe("true");

@@ -53,7 +53,7 @@ const STATS_TREND_ROW_IDS = new Set([
  * rowActions?: Record<string, () => void>;
  * showStatsTrends?: boolean;
  * }} props `rowActions` — строка с этим id нажимается целиком (свой профиль:
- *   «Продажи» → «Мои продажи» и т. п.).
+ *   «Продаж на сумму» → «Мои продажи» и т. п.).
  */
 export function UserProfileInfoPanel({
   rows,

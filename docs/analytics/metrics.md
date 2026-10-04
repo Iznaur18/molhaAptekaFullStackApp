@@ -80,6 +80,7 @@ Append-only коллекция `AnalyticsEvent`. Пишется в фоне (о�
 | `payment.succeeded` | `payment.succeeded:{paymentId}` | обработчик платежа вернул `applied: true` (вебхук или догоняющая синхронизация) |
 | `user.active` | `user.active:{userId}:{day}` | первый авторизованный запрос за сутки (UTC), `checkAuthMW` |
 | `seller.product_published` | `seller.product_published:{productId}` | одобрение модератором или создание без модерации |
+| `seller.qr_scanned` | `seller.qr_scanned:{sellerId}:{u:userId \| v:visitorId}:{day}` | витрина открыта по QR-коду (`/seller/:id?src=qr` → `POST /analytics/track-seller-qr`); сам продавец не считается |
 
 `{day}` — дата UTC `YYYY-MM-DD`. Массовое одобрение доверенного продавца и импорт 1С
 `seller.product_published` не пишут — иначе один импорт даёт тысячи событий.
@@ -87,6 +88,7 @@ Append-only коллекция `AnalyticsEvent`. Пишется в фоне (о�
 Fraud flags (минимальные): `own_product`, `view_velocity`, `buyer_is_seller` → `suspectedFraud` + `fraudReasons`.
 
 Клиентский трек рекламы: `POST /analytics/track-ad` (auth optional).
+Переход по QR-коду витрины: `POST /analytics/track-seller-qr` (auth optional); счётчик продавцу — `GET /analytics/seller-qr/me`.
 Клиентские события воронки: `POST /analytics/track` (только вошедший пользователь, `kind: checkout.started`).
 
 ### Что лежит в payload

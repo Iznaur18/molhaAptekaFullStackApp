@@ -128,6 +128,16 @@ export function getUserProfileRows(user, options = {}) {
       label: L.totalPurchasesAmount,
       value: formatSearchRowTotalSales(user.totalPurchasesAmount),
     },
+    // Сервер отдаёт только число: сам список желаний чужого профиля закрыт.
+    ...(user.wishlistCount == null
+      ? []
+      : [
+          {
+            id: "wishlistCount",
+            label: L.wishlistCount,
+            value: String(Math.max(0, Number(user.wishlistCount) || 0)),
+          },
+        ]),
     {
       id: "email",
       label: L.email,

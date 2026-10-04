@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { CircleAlert, CircleCheck } from "lucide-react";
 
+import { SHIPPING_PROVIDER_CDEK } from "@molha/api-contract";
+
 import { CDEK_CONNECTION_UI } from "../../../shared/config/appUiCopy.js";
+import { ShippingCarrierInfoButton } from "../../shipping/ui/ShippingCarrierInfoButton.jsx";
 import {
   useMyCdekConnectionQuery,
   useRemoveCdekConnectionMutation,
@@ -53,7 +56,10 @@ export function CdekConnectionCard() {
   return (
     <section className="cdek-connection-card">
       <header className="cdek-connection-card__header">
-        <h3 className="cdek-connection-card__title">{CDEK_CONNECTION_UI.TITLE}</h3>
+        <h3 className="cdek-connection-card__title">
+          {CDEK_CONNECTION_UI.TITLE}
+          <ShippingCarrierInfoButton carrierId={SHIPPING_PROVIDER_CDEK} />
+        </h3>
         <span
           className={[
             "cdek-connection-card__status",

@@ -57,6 +57,34 @@
   height: 0;
 }
 
+/* Карточка службы и «!» справа от названия — один элемент ряда. */
+.checkout-shipping-provider-picker__item {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+.checkout-shipping-provider-picker__item > .shipping-carrier-info-button {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+}
+
+/* Место под «!», чтобы название не уезжало под кнопку. */
+.checkout-shipping-provider-picker__item:has(> .shipping-carrier-info-button)
+  > .checkout-shipping-provider-picker__card {
+  padding-right: 2.25rem;
+  padding-left: 0.875rem;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.checkout-shipping-provider-picker__single-info {
+  margin-left: auto;
+}
+
 .checkout-shipping-provider-picker__card {
   box-sizing: border-box;
   flex: 0 0 auto;
@@ -65,7 +93,8 @@
   max-width: 11.5rem;
   min-height: 2.75rem;
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--iz-color-border);
+  /* Толщина рамки одна во всех состояниях — карточка не меняет размер при выборе. */
+  border: 1.5px solid var(--iz-color-border);
   border-radius: 0.75rem;
   display: inline-flex;
   align-items: center;

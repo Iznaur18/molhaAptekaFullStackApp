@@ -2,6 +2,10 @@ import {
   listShippingCarrierSettings,
   setShippingCarrierEnabled,
 } from "../../services/shipping/shippingCarrierSettings.js";
+import {
+  listShippingCarrierInfo,
+  saveShippingCarrierInfo,
+} from "../../services/shipping/shippingCarrierInfo.js";
 import { successRes } from "../../services/http/index.js";
 
 /**
@@ -35,4 +39,29 @@ export const patchStaffShippingCarrierController = async (req, res) => {
     adminId: String(req.userId),
   });
   return successRes(res, { carriers });
+};
+
+/**
+ * `GET /order/shipping-carriers/info` — справки по службам для кнопки «!».
+ * Только заполненные: пустую справку показывать нечем.
+ */
+export const getShippingCarrierInfoController = async (_req, res) => {
+  return successRes(res, { items: await listShippingCarrierInfo() });
+};
+
+/** `GET /staff/shipping-carriers/info` — все службы, включая незаполненные. */
+export const getStaffShippingCarrierInfoController = async (_req, res) => {
+  return successRes(res, {
+    items: await listShippingCarrierInfo({ includeEmpty: true }),
+  });
+};
+
+/** `PUT /staff/shipping-carriers/:carrierId/info` */
+export const putStaffShippingCarrierInfoController = async (req, res) => {
+  const items = await saveShippingCarrierInfo({
+    carrierId: String(req.params.carrierId),
+    info: req.body,
+    adminId: String(req.userId),
+  });
+  return successRes(res, { items });
 };

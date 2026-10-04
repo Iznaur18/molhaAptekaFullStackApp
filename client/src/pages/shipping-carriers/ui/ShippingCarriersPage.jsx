@@ -1,11 +1,14 @@
 import { useState } from "react";
 
 import {
+  useStaffShippingCarrierInfoQuery,
   useStaffShippingCarriersQuery,
   useToggleShippingCarrierMutation,
 } from "../../../entities/shipping/model/shippingCarrierQueries.js";
 import { SHIPPING_CARRIERS_ADMIN_UI } from "../../../shared/config/appUiCopy.js";
 import { ConfirmButton } from "../../../shared/ui/ConfirmButton/ConfirmButton.jsx";
+
+import { ShippingCarrierInfoForm } from "./ShippingCarrierInfoForm.jsx";
 
 import "./ShippingCarriersPage.css";
 
@@ -21,6 +24,7 @@ export function ShippingCarriersPage() {
 
   const carriersQuery = useStaffShippingCarriersQuery();
   const toggleMutation = useToggleShippingCarrierMutation();
+  const infoQuery = useStaffShippingCarrierInfoQuery();
 
   const carriers = carriersQuery.data ?? [];
 
@@ -122,6 +126,31 @@ export function ShippingCarriersPage() {
               </li>
             );
           })}
+        </ul>
+      )}
+
+      <header className="shipping-carriers__header">
+        <h2 className="shipping-carriers__title">
+          {SHIPPING_CARRIERS_ADMIN_UI.INFO_TITLE}
+        </h2>
+        <p className="shipping-carriers__intro">
+          {SHIPPING_CARRIERS_ADMIN_UI.INFO_INTRO}
+        </p>
+      </header>
+
+      {infoQuery.isPending ? (
+        <p className="shipping-carriers__muted">{SHIPPING_CARRIERS_ADMIN_UI.LOADING}</p>
+      ) : infoQuery.isError ? (
+        <p className="shipping-carriers__error" role="alert">
+          {infoQuery.error instanceof Error
+            ? infoQuery.error.message
+            : SHIPPING_CARRIERS_ADMIN_UI.ERROR_GENERIC}
+        </p>
+      ) : (
+        <ul className="shipping-carriers__list" role="list">
+          {(infoQuery.data ?? []).map((row) => (
+            <ShippingCarrierInfoForm key={row.carrierId} row={row} />
+          ))}
         </ul>
       )}
     </section>

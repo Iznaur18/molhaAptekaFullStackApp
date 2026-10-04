@@ -1,0 +1,229 @@
+/**
+ * QR-код витрины — окно снизу вверх, как UserRatingVotesSheet.
+ */
+.seller-qr-sheet__backdrop {
+  --sqs-enter-ms: 300ms;
+  --sqs-exit-ms: 240ms;
+  --sqs-enter-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --sqs-exit-ease: cubic-bezier(0.55, 0.055, 0.675, 1);
+  --sqs-max-height: 92vh;
+  --sqs-max-height: 92svh;
+  --sqs-radius: 2rem;
+  --sqs-max-width: 100%;
+  --sqs-inline-padding: var(--iz-space-4);
+
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  box-sizing: border-box;
+  background: transparent;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+@media (min-width: 641px) {
+  .seller-qr-sheet__backdrop {
+    --sqs-max-width: min(26rem, 100%);
+  }
+}
+
+.seller-qr-sheet__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--iz-color-ink) 55%, transparent);
+  opacity: 0;
+  transition: opacity var(--sqs-exit-ms) var(--sqs-exit-ease);
+}
+
+.seller-qr-sheet__backdrop--open .seller-qr-sheet__scrim {
+  opacity: 1;
+  transition: opacity var(--sqs-enter-ms) var(--sqs-enter-ease);
+}
+
+.seller-qr-sheet__dismiss {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.seller-qr-sheet {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--sqs-max-width);
+  max-height: var(--sqs-max-height);
+  border-radius: var(--sqs-radius) var(--sqs-radius) 0 0;
+  corner-shape: squircle;
+  background: var(--iz-color-surface);
+  box-shadow: 0 -12px 40px color-mix(in srgb, var(--iz-color-text) 18%, transparent);
+  overflow: hidden;
+  transform: translate3d(0, 100%, 0);
+  transition: transform var(--sqs-exit-ms) var(--sqs-exit-ease);
+  will-change: transform;
+  overscroll-behavior: contain;
+}
+
+.seller-qr-sheet__backdrop--open .seller-qr-sheet {
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--sqs-enter-ms) var(--sqs-enter-ease);
+}
+
+.seller-qr-sheet__header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px var(--sqs-inline-padding) 12px;
+}
+
+.seller-qr-sheet__title {
+  margin: 0;
+  color: var(--iz-color-text);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.seller-qr-sheet__close {
+  margin: 0;
+  padding: 0.25rem 0.15rem;
+  border: none;
+  background: transparent;
+  color: var(--iz-color-text-muted);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.seller-qr-sheet__body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  padding: 12px var(--sqs-inline-padding) max(16px, env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--iz-color-border);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Карточка светлая в любой теме: чёрный код на белом читается камерой всегда. */
+.seller-qr-sheet__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, #111111 10%, transparent);
+  border-radius: 20px;
+  background: #ffffff;
+  color: #111111;
+}
+
+.seller-qr-sheet__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.seller-qr-sheet__name {
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-size: 1.05rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-qr-sheet__code {
+  display: block;
+  width: min(100%, 15rem);
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.seller-qr-sheet__caption {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.seller-qr-sheet__brand {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.seller-qr-sheet__hint,
+.seller-qr-sheet__stats-text,
+.seller-qr-sheet__stats-note {
+  margin: 0;
+  color: var(--iz-color-text-muted);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.seller-qr-sheet__stats-note {
+  font-size: 0.78rem;
+}
+
+.seller-qr-sheet__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.seller-qr-sheet__error {
+  margin: 0;
+  color: var(--iz-color-danger, #d64545);
+  font-size: 0.85rem;
+}
+
+.seller-qr-sheet__stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 14px;
+}
+
+.seller-qr-sheet__stats-title {
+  margin: 0;
+  color: var(--iz-color-text);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.seller-qr-sheet__stats-value {
+  margin: 0;
+  color: var(--iz-color-text);
+  font-size: 1rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seller-qr-sheet__scrim,
+  .seller-qr-sheet {
+    transition-duration: 90ms;
+  }
+}

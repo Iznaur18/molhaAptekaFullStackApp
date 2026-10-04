@@ -6,6 +6,7 @@ import { sanitizeUserProfileForViewer } from "../../services/user/userProfileVis
 import { attachFollowFieldsToPublicProfile } from "../../services/user/userFollowHelpers.js";
 import { attachBlockFieldsToPublicProfile } from "../../services/user/userBlockHelpers.js";
 import { attachUserCommerceStatsToUser } from "../../services/user/attachUserListCommerceStats.js";
+import { attachWishlistCountToUser } from "../../services/user/userWishlistCount.js";
 
 /** Получение профиля другого пользователя по id. GET /user/:userId (публичный — без авторизации) */
 export const userGetProfileController = async (req, res) => {
@@ -43,6 +44,7 @@ export const userGetProfileController = async (req, res) => {
   });
 
   const userWithCommerce = await attachUserCommerceStatsToUser(userWithBlock);
+  const userWithWishlistCount = await attachWishlistCountToUser(userWithCommerce);
 
-  return successRes(res, { user: userWithCommerce });
+  return successRes(res, { user: userWithWishlistCount });
 };
