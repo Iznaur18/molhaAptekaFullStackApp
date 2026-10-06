@@ -4,7 +4,6 @@ import {
   PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE,
   buildResolvedProductCategoryDisplaysFromRoots,
 } from "../lib/resolveProductCategoryDisplay.js";
-import { useCategoryTileImagesMode } from "../model/useCategoryTileImages.js";
 import { PRODUCT_CATEGORY_DISPLAY_UI } from "../../../shared/config/appUiCopy.js";
 import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { Pencil } from "../../../shared/ui/icon/index.js";
@@ -39,7 +38,6 @@ export function CatalogCategoriesGrid({
     () => buildResolvedProductCategoryDisplaysFromRoots(categoryRoots, displays),
     [categoryRoots, displays],
   );
-  const tileImagesMode = useCategoryTileImagesMode();
 
   if (isLoading) {
     const loading = (
@@ -81,14 +79,9 @@ export function CatalogCategoriesGrid({
   }
 
   const grid = (
-    <ul
-      className={[
-        "catalog-categories-grid__list",
-        tileImagesMode === "off" && "catalog-categories-grid__list_text",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-    >
+    // Первый уровень каталога — всегда с картинками: переключатель админа
+    // «картинки плиток» прячет их только у вложенных категорий.
+    <ul className="catalog-categories-grid__list">
       {items.map((item) => {
         // Своей картинки нет — заглушку рисует CSS: её фон идёт за темой
         // (тёмный в тёмной), а зашитая в картинку светлая подложка — нет.
@@ -106,34 +99,30 @@ export function CatalogCategoriesGrid({
                   "catalog-categories-grid__card",
                   pendingCategoryKey === (item.categoryId ?? item.categorySlug) &&
                     "catalog-categories-grid__card_pending",
-                  tileImagesMode === "off" && "catalog-categories-grid__card_text",
                 ]
                   .filter(Boolean)
                   .join(" ")}
                 disabled={Boolean(pendingCategoryKey)}
                 onClick={() => onCategoryClick(item)}
               >
-                {tileImagesMode === "on" ? (
-                  <span
-                    className={[
-                      "catalog-categories-grid__image-wrap",
-                      isPlaceholder &&
-                        "catalog-categories-grid__image-wrap_placeholder",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                  >
-                    {isPlaceholder ? null : (
-                      <img
-                        className="catalog-categories-grid__image"
-                        src={imageSrc}
-                        alt=""
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    )}
-                  </span>
-                ) : null}
+                <span
+                  className={[
+                    "catalog-categories-grid__image-wrap",
+                    isPlaceholder && "catalog-categories-grid__image-wrap_placeholder",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                >
+                  {isPlaceholder ? null : (
+                    <img
+                      className="catalog-categories-grid__image"
+                      src={imageSrc}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  )}
+                </span>
                 <span className="catalog-categories-grid__label">{item.label}</span>
               </button>
               {isAdmin ? (

@@ -24,7 +24,9 @@ import "../ui/CatalogCategoriesGrid.css";
  *   getEditAriaLabel?: (item: CatalogCategoryTileItem) => string;
  *   pendingTileKey?: string | null;
  *   disabled?: boolean;
- * }} props
+ *   alwaysShowImages?: boolean;
+ * }} props `alwaysShowImages` — плитки первого уровня: переключатель админа
+ *   «картинки плиток» прячет картинки только у вложенных категорий.
  */
 export function CatalogCategoryTilesGrid({
   items,
@@ -34,9 +36,11 @@ export function CatalogCategoryTilesGrid({
   onEditTileClick,
   getEditAriaLabel = (item) => PRODUCT_CATEGORY_DISPLAY_UI.EDIT_ARIA(item.label),
   pendingTileKey = null,
+  alwaysShowImages = false,
 }) {
   const isInteractionLocked = Boolean(pendingTileKey) || disabled;
-  const tileImagesMode = useCategoryTileImagesMode();
+  const adminTileImagesMode = useCategoryTileImagesMode();
+  const tileImagesMode = alwaysShowImages ? "on" : adminTileImagesMode;
 
   return (
     <ul

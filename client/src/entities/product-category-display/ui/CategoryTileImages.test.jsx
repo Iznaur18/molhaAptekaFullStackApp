@@ -79,6 +79,21 @@ describe("картинки на плитках категорий", () => {
     expect(tile()).toHaveTextContent("Тестовая категория");
   });
 
+  it("выключены, но это первый уровень — картинка остаётся", async () => {
+    mockDisplays(false);
+    const { container } = renderWithProviders(
+      <CatalogCategoryTilesGrid
+        items={ITEMS}
+        alwaysShowImages
+        onTileClick={() => {}}
+      />,
+    );
+
+    await waitFor(() => expect(fetchProductCategoryDisplays).toHaveBeenCalled());
+    expect(container.querySelector("img")).not.toBeNull();
+    expect(tile().className).not.toContain("catalog-categories-grid__card_text");
+  });
+
   it("админ выключает картинки — плитки сразу без картинок", async () => {
     mockDisplays(true);
     vi.mocked(patchProductCategoryDisplaySettings).mockResolvedValue({
