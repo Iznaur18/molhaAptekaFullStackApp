@@ -47,6 +47,7 @@ import { up as approvePendingForTrustedSellersUp } from "./20260909-approve-pend
 import { up as catalogPriceIndexUp } from "./20260915-catalog-price-index.js";
 import { up as restoreCdekOrder6ce3a1a8Up } from "./20260927-restore-cdek-order-6ce3a1a8.js";
 import { up as catalogCategoryTreeUp } from "./20261006-catalog-category-tree.js";
+import { up as reassignDetachedAutoProductsUp } from "./20261006-reassign-detached-auto-products.js";
 
 export const MIGRATIONS = [
   {
@@ -307,5 +308,11 @@ export const MIGRATIONS = [
     description:
       "Replace subcategories of 19 catalog roots with the in-code tree (electronics, food, cafes, donat untouched)",
     up: catalogCategoryTreeUp,
+  },
+  {
+    id: "20261006-reassign-detached-auto-products",
+    description:
+      "Put 24 auto products left without a subcategory by the catalog tree migration into new leaves",
+    up: reassignDetachedAutoProductsUp,
   },
 ];
