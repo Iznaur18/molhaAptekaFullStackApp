@@ -183,6 +183,12 @@ export const HOME_PAGE_UI = {
 };
 
 /** Сетка категорий `/catalog` */
+/** Переключатель админа «картинки на плитках категорий». */
+export const CATEGORY_TILE_IMAGES_UI = {
+  LABEL: "Картинки плиток",
+  SAVE_FALLBACK: "Не удалось переключить картинки плиток",
+};
+
 export const PRODUCT_CATEGORY_DISPLAY_UI = {
   GRID_ARIA: "Категории товаров",
   FEED_GRID_ARIA: "Разделы каталога",

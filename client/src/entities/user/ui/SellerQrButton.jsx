@@ -12,14 +12,16 @@ const SellerQrSheet = lazy(() =>
 );
 
 /**
- * QR-код своей витрины — рядом с «Поделиться». Показывается только самому
- * продавцу; оформление общее с SellerShareLinkButton.
+ * QR-код витрины — рядом с «Поделиться». Виден всем; `isOwn` включает в окне
+ * то, что нужно только самому продавцу (счётчик переходов). Оформление общее
+ * с SellerShareLinkButton.
  *
  * @param {{
  *   sellerId: string;
  *   sellerName?: string;
  *   avatarUrl?: string;
  *   variant?: "banner" | "meta";
+ *   isOwn?: boolean;
  * }} props
  */
 export function SellerQrButton({
@@ -27,6 +29,7 @@ export function SellerQrButton({
   sellerName = "",
   avatarUrl = "",
   variant = "meta",
+  isOwn = true,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   // Окно остаётся в дереве после первого открытия — иначе не сыграет закрытие.
@@ -71,6 +74,7 @@ export function SellerQrButton({
             sellerId={id}
             sellerName={sellerName}
             avatarUrl={avatarUrl}
+            isOwn={isOwn}
           />
         </Suspense>
       ) : null}

@@ -116,6 +116,7 @@ export const USER_DETAILS_MODAL_UI = {
 export const USER_DETAILS_PAGE_UI = {
   TITLE: "Профиль",
   BACK_ARIA: "Назад",
+  SELLER_STOREFRONT: "Витрина продавца",
   LOADING: "Загрузка профиля…",
   FETCH_FALLBACK: "Не удалось загрузить профиль",
   SELF_REDIRECT_HINT: "Это ваш профиль",

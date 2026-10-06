@@ -30,6 +30,19 @@ describe("QR-код витрины", () => {
     expect(screen.getByText(SELLER_QR_UI.STATS_RECENT(5, 30))).toBeTruthy();
   });
 
+  it("гость видит код чужой витрины, но не счётчик переходов продавца", async () => {
+    renderWithProviders(
+      <SellerQrButton sellerId={SELLER_ID} sellerName="test.seller" isOwn={false} />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: SELLER_QR_UI.BUTTON_ARIA }));
+
+    await screen.findByRole("dialog", { name: SELLER_QR_UI.TITLE });
+    expect(screen.getByRole("img", { name: SELLER_QR_UI.QR_ALT })).toBeTruthy();
+    expect(screen.getByText(SELLER_QR_UI.HINT_VISITOR)).toBeTruthy();
+    expect(screen.queryByText(SELLER_QR_UI.STATS_TITLE)).toBeNull();
+  });
+
   it("без id продавца кнопки нет", () => {
     renderWithProviders(<SellerQrButton sellerId="" />);
 

@@ -34,6 +34,11 @@
   right: calc(var(--modal-banner-avatar-inset, 0.75rem) + 2.5rem);
 }
 
+/* Третья кнопка на баннере (соцсети) — левее QR-кода. */
+.seller-share-link--banner-third {
+  right: calc(var(--modal-banner-avatar-inset, 0.75rem) + 5rem);
+}
+
 .seller-share-link--banner:hover {
   opacity: 0.88;
 }
@@ -49,6 +54,12 @@
   border: 1px solid var(--color-accent, var(--iz-color-link));
   background: transparent;
   color: var(--color-accent, var(--iz-color-link));
+}
+
+/* Залитая — как «Подписаться» рядом с ней. */
+.seller-share-link--filled {
+  background: var(--color-accent, var(--iz-color-link));
+  color: var(--iz-color-on-contrast);
 }
 
 .seller-share-link--meta:hover {

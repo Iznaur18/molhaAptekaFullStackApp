@@ -20,6 +20,8 @@ import { UserPremiumDisplayName } from "../../../entities/user/ui/UserPremiumDis
 import { SellerProfileQuickStats } from "../../../entities/user/ui/SellerProfileQuickStats.jsx";
 import { SellerShareLinkButton } from "../../../entities/user/ui/SellerShareLinkButton.jsx";
 import { SellerQrButton } from "../../../entities/user/ui/SellerQrButton.jsx";
+import { SellerSocialLinksButton } from "../../../entities/user/ui/SellerSocialLinksButton.jsx";
+import { getSellerSocialLinks } from "../../../entities/user/lib/getSellerSocialLinks.js";
 import { useTrackSellerQrScan } from "../../../entities/analytics/model/useSellerQrAnalytics.js";
 import { usePublicSellerShelvesQuery } from "../../../entities/seller-shelf/model/usePublicSellerShelvesQuery.js";
 import { usePublicSellerOneCShelvesQuery } from "../../../entities/seller-shelf/model/usePublicSellerOneCShelvesQuery.js";
@@ -30,6 +32,7 @@ import {
   SELLER_PRODUCTS_PAGE_UI,
   USER_LIST_ROW_UI,
 } from "../../../shared/config/appUiCopy.js";
+import { HOME_MAIN_VIEW_PATH } from "../../../shared/lib/homeMainViewPaths.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 import { SellerProductsPageSkeleton } from "./SellerProductsPageSkeleton.jsx";
 
@@ -128,6 +131,7 @@ export function SellerProductsPage({
     }
   }
   const seller = profileQuery.data ?? null;
+  const socialLinks = useMemo(() => getSellerSocialLinks(seller), [seller]);
   const profilePhase = !catalogEnabled
     ? "idle"
     : profileQuery.isPending
@@ -195,6 +199,14 @@ export function SellerProductsPage({
       });
     },
     [queryClient, sellerId],
+  );
+
+  // Якорь — имя поля: страница профиля прокрутит к нему и поставит курсор.
+  const handleAddSocialLink = useCallback(
+    (fieldId) => {
+      navigate(`${HOME_MAIN_VIEW_PATH["edit-profile"]}#${fieldId}`);
+    },
+    [navigate],
   );
 
   const handleSellerProfileClick = useCallback(() => {
@@ -293,21 +305,25 @@ export function SellerProductsPage({
                   onError={() => setAvatarLoadFailed(true)}
                 />
               ) : null}
-              {isSelf ? (
-                <>
-                  <SellerShareLinkButton
-                    sellerId={sellerId}
-                    sellerName={displayName}
-                    variant="banner"
-                  />
-                  <SellerQrButton
-                    sellerId={sellerId}
-                    sellerName={displayName}
-                    avatarUrl={photoUrl && !avatarLoadFailed ? photoUrl : ""}
-                    variant="banner"
-                  />
-                </>
-              ) : null}
+              <SellerShareLinkButton
+                sellerId={sellerId}
+                sellerName={displayName}
+                variant="banner"
+              />
+              <SellerQrButton
+                sellerId={sellerId}
+                sellerName={displayName}
+                avatarUrl={photoUrl && !avatarLoadFailed ? photoUrl : ""}
+                variant="banner"
+                isOwn={isSelf}
+              />
+              <SellerSocialLinksButton
+                links={socialLinks}
+                isSelf={isSelf}
+                onAddLink={handleAddSocialLink}
+                variant="banner"
+                bannerSlot="third"
+              />
             </div>
           ) : null}
 
@@ -338,6 +354,11 @@ export function SellerProductsPage({
                   sellerName={displayName}
                   variant="meta"
                 />
+                <SellerSocialLinksButton
+                  links={socialLinks}
+                  isSelf
+                  onAddLink={handleAddSocialLink}
+                />
                 <SellerQrButton
                   sellerId={sellerId}
                   sellerName={displayName}
@@ -347,11 +368,46 @@ export function SellerProductsPage({
             ) : null}
             {!isSelf ? (
               <div className="seller-products-page__seller-actions">
-                <SellerShareLinkButton
-                  sellerId={sellerId}
-                  sellerName={displayName}
-                  variant="meta"
-                />
+                {/* С баннером эти три кнопки уже стоят на нём. */}
+                {!showProfileBanner ? (
+                  <>
+                    <SellerShareLinkButton
+                      sellerId={sellerId}
+                      sellerName={displayName}
+                      variant="meta"
+                    />
+                    <SellerSocialLinksButton links={socialLinks} />
+                    <SellerQrButton
+                      sellerId={sellerId}
+                      sellerName={displayName}
+                      avatarUrl={photoUrl && !avatarLoadFailed ? photoUrl : ""}
+                      isOwn={false}
+                    />
+                  </>
+                ) : null}
+                <button
+                  type="button"
+                  className="seller-share-link seller-share-link--meta seller-share-link--filled"
+                  aria-label={PRODUCT_CARD_UI.SELLER_PROFILE_ARIA(displayName)}
+                  onClick={handleSellerProfileClick}
+                >
+                  {/* Восклицательный знак без круга: в lucide такого значка нет. */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.6"
+                    strokeLinecap="round"
+                    className="seller-share-link__icon"
+                    aria-hidden="true"
+                  >
+                    <path d="M12 5v9" />
+                    <path d="M12 19h.01" />
+                  </svg>
+                </button>
                 <UserFollowButton
                   targetUserId={String(seller._id)}
                   isFollowing={seller.isFollowing === true}
