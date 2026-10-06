@@ -150,6 +150,7 @@ import {
   productCategorySlugParamValidation,
   patchProductCategoryDisplayValidation,
   patchProductCategoryNodeDisplayValidation,
+  patchProductCategoryDisplaySettingsValidation,
 } from "./product/productCategoryDisplayValidation.js";
 import { productCategoryIdParamValidation } from "./product/productCategoryTreeValidation.js";
 import {
@@ -305,6 +306,7 @@ export {
   productCategorySlugParamValidation,
   patchProductCategoryDisplayValidation,
   patchProductCategoryNodeDisplayValidation,
+  patchProductCategoryDisplaySettingsValidation,
   productCategoryIdParamValidation,
   createProductCategoryAdminValidation,
   deleteProductCategoryAdminValidation,

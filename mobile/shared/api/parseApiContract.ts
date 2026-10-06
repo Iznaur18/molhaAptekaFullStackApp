@@ -127,10 +127,18 @@ const categoryDisplaySchema = z
 
 const categoryDisplaysDataSchema = z.object({
   displays: z.array(categoryDisplaySchema),
+  // Общий переключатель админа «картинки на плитках категорий». Старый сервер
+  // поля не знает — тогда картинки показываем, как раньше.
+  tileImagesEnabled: z.boolean().optional(),
 });
 
-export const parseCategoryDisplaysData = (payload: unknown) =>
-  parseApiContractData(payload, categoryDisplaysDataSchema).displays;
+export const parseCategoryDisplaysData = (payload: unknown) => {
+  const data = parseApiContractData(payload, categoryDisplaysDataSchema);
+  return {
+    displays: data.displays,
+    tileImagesEnabled: data.tileImagesEnabled !== false,
+  };
+};
 
 const updateOrderItemDataSchema = z.object({
   order: orderFromApiSchema,

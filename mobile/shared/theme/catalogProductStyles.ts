@@ -4088,6 +4088,31 @@ export const useCatalogBrowserTileStyles = createThemedStyles((theme) => ({
   cardPending: {
     opacity: 0.55,
   },
+  // Плитка без картинки (админ выключил картинки): название по центру.
+  // Ширина и высота — от текста, поэтому ни ячейки сетки, ни квадрата.
+  wrapText: {
+    maxWidth: "100%",
+  },
+  cardText: {
+    width: "auto",
+    aspectRatio: undefined,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+  },
+  // Место под карандаш админа, чтобы он не закрывал название.
+  cardTextWithEdit: {
+    paddingRight: 40,
+  },
+  labelSlotText: {
+    maxWidth: "100%",
+  },
+  labelText: {
+    fontSize: 18,
+    lineHeight: 22,
+    textAlign: "center",
+  },
   image: {
     ...StyleSheet.absoluteFillObject,
     top: -1,

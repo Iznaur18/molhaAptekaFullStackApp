@@ -4,6 +4,10 @@ import {
   resolveProductCategoryDisplayPatchTarget,
   upsertProductCategoryDisplay,
 } from "../../services/product/productCategoryDisplayPatch.js";
+import {
+  getCategoryTileImagesEnabled,
+  setCategoryTileImagesEnabled,
+} from "../../services/product/productCategoryDisplaySettings.js";
 import { errorRes, successRes } from "../../services/http/index.js";
 import ProductCategoryDisplayModel from "../../models/ProductCategoryDisplayModel.js";
 import { normalizeUploadUrlForStorage } from "@izibuy/shared-lib";
@@ -76,10 +80,24 @@ const buildCategoryDisplayUpdate = async (existing, body, userId) => {
 
 /** GET /product/category-displays — публичные переопределения подписи/картинки категорий. */
 export async function getProductCategoryDisplaysController(_req, res) {
-  const rows = await ProductCategoryDisplayModel.find().lean();
+  const [rows, tileImagesEnabled] = await Promise.all([
+    ProductCategoryDisplayModel.find().lean(),
+    getCategoryTileImagesEnabled(),
+  ]);
   successRes(res, {
     displays: rows.map(toCategoryDisplayPayload),
+    // Общий переключатель админа: клиенты рисуют плитки без картинок.
+    tileImagesEnabled,
   });
+}
+
+/** PATCH /product/category-display-settings — только admin. */
+export async function patchProductCategoryDisplaySettingsController(req, res) {
+  const tileImagesEnabled = await setCategoryTileImagesEnabled({
+    tileImagesEnabled: req.body.tileImagesEnabled,
+    adminId: String(req.userId),
+  });
+  successRes(res, { tileImagesEnabled });
 }
 
 /** PATCH /product/category-displays/:categorySlug — только admin. */

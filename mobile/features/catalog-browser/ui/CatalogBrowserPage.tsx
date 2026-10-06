@@ -11,7 +11,10 @@ import {
   PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE,
 } from "@/entities/product-category-display/lib/resolveProductCategoryDisplay";
 import { useProductCatalogFeedTileDisplaysQuery } from "@/entities/product-category-display/model/useProductCatalogFeedTileDisplaysQuery";
-import { useProductCategoryDisplaysQuery } from "@/entities/product-category-display/model/useProductCategoryDisplaysQuery";
+import {
+  useCategoryTileImagesEnabled,
+  useProductCategoryDisplaysQuery,
+} from "@/entities/product-category-display/model/useProductCategoryDisplaysQuery";
 import { useProductCategoryRootsQuery } from "@/entities/product-category-tree/model/useProductCategoryRootsQuery";
 import { useViewerRegion } from "@/entities/region/model/ViewerRegionProvider";
 import { useSellerPersonalCategoryCatalogTilesQuery } from "@/entities/seller-personal-category/model/useSellerPersonalCategoryCatalogTilesQuery";
@@ -52,6 +55,7 @@ export const CatalogBrowserPage = () => {
   const { viewerRegionCode } = useViewerRegion();
 
   const categoryDisplaysQuery = useProductCategoryDisplaysQuery();
+  const tileImagesEnabled = useCategoryTileImagesEnabled();
   const feedTileDisplaysQuery = useProductCatalogFeedTileDisplaysQuery();
   const categoryRootsQuery = useProductCategoryRootsQuery();
   const personalCategoryTilesQuery = useSellerPersonalCategoryCatalogTilesQuery({
@@ -275,6 +279,7 @@ export const CatalogBrowserPage = () => {
                 label={item.label}
                 imageUrl={item.imageUrl}
                 placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
+                hideImage={!tileImagesEnabled}
                 {...tileLayoutProps}
                 disabled={subcategoryPicker.resolvingLandingCategoryKey != null}
                 pending={

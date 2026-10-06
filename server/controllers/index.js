@@ -156,6 +156,7 @@ import {
   getProductCategoryDisplaysController,
   patchProductCategoryDisplayController,
   patchProductCategoryNodeDisplayController,
+  patchProductCategoryDisplaySettingsController,
 } from "./Product/productCategoryDisplayControllers.js";
 import {
   getProductCatalogFeedTileDisplaysController,
@@ -531,6 +532,7 @@ export {
   getProductCategoryDisplaysController,
   patchProductCategoryDisplayController,
   patchProductCategoryNodeDisplayController,
+  patchProductCategoryDisplaySettingsController,
   getProductCatalogFeedTileDisplaysController,
   patchProductCatalogFeedTileDisplayController,
   getProductManageToggleDisplaysController,

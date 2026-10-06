@@ -7,6 +7,7 @@ import {
   getProductCategoryDisplaysController,
   patchProductCategoryDisplayController,
   patchProductCategoryNodeDisplayController,
+  patchProductCategoryDisplaySettingsController,
   getProductCategoryRootsController,
   getProductCategorySearchController,
   getProductCategoryChildrenController,
@@ -188,6 +189,7 @@ import {
   addCuratedCategoryListItemValidation,
   patchProductCategoryDisplayValidation,
   patchProductCategoryNodeDisplayValidation,
+  patchProductCategoryDisplaySettingsValidation,
   catalogFeedTileKeyParamValidation,
   patchProductCatalogFeedTileDisplayValidation,
   productManageToggleKeyParamValidation,
@@ -437,6 +439,14 @@ router.patch(
   checkAdminMW,
   patchProductCategoryDisplayValidation,
   patchProductCategoryDisplayController,
+);
+// Общий переключатель «картинки на плитках категорий» — только админ.
+router.patch(
+  "/category-display-settings",
+  checkAuthMW,
+  checkAdminMW,
+  patchProductCategoryDisplaySettingsValidation,
+  patchProductCategoryDisplaySettingsController,
 );
 router.patch(
   "/category-node-displays/:categoryId",

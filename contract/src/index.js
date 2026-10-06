@@ -276,7 +276,11 @@ export {
   pickAddressSuggestionForGeo,
 } from "./addressSuggest.js";
 export { addressGeolocateBodySchema } from "./addressGeolocate.js";
-export { adminCatalogDisplayPatchBodySchema } from "./adminDisplay.js";
+export {
+  adminCatalogDisplayPatchBodySchema,
+  categoryDisplaySettingsPatchBodySchema,
+  CATEGORY_TILE_IMAGES_ENABLED_DEFAULT,
+} from "./adminDisplay.js";
 export {
   adminCreditLoyaltyPointsBodySchema,
   LOYALTY_POINTS_ADMIN_FREE_CREDIT_MIN,
