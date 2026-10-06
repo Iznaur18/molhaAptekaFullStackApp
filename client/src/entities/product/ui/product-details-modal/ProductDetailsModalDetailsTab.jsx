@@ -317,7 +317,6 @@ export function ProductDetailsModalDetailsTab({
         <ProductDetailsSellerPreview
           seller={product.productSeller}
           onOpenProfile={handleOpenSellerProfile}
-          showStorefrontButton={Boolean(sellerId)}
         />
       </div>
 

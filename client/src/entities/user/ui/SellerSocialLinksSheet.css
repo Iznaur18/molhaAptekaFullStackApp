@@ -1,0 +1,163 @@
+/**
+ * Строки окна «Соцсети и сайт». Каркас окна — из SellerQrSheet.css.
+ */
+.seller-social-links__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--iz-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.seller-social-links__row {
+  display: flex;
+  align-items: center;
+  gap: var(--iz-space-3);
+  box-sizing: border-box;
+  min-height: 3.5rem;
+  padding: var(--iz-space-2) var(--iz-space-3);
+  border: 1px solid var(--iz-color-border);
+  border-radius: 16px;
+  background: var(--iz-color-bg);
+  color: var(--iz-color-text);
+  text-decoration: none;
+  transition:
+    transform var(--iz-transition-press),
+    border-color var(--iz-transition-base);
+}
+
+.seller-social-links__row:hover {
+  border-color: var(--iz-color-text-muted);
+}
+
+.seller-social-links__row:active {
+  transform: scale(var(--iz-state-pressed-scale));
+}
+
+/* Фирменные цвета сервисов: по ним ссылку узнают раньше, чем прочтут. */
+.seller-social-links__badge {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 12px;
+  background: var(--iz-color-text-muted);
+  color: #ffffff;
+}
+
+.seller-social-links__badge--socialInstagramUrl {
+  background: linear-gradient(45deg, #f9a03f 0%, #e1306c 50%, #833ab4 100%);
+}
+
+.seller-social-links__badge--socialWhatsappUrl {
+  background: #25d366;
+}
+
+.seller-social-links__badge--socialTelegramUrl {
+  background: #29a9eb;
+}
+
+.seller-social-links__badge--socialYoutubeUrl {
+  background: #ff0033;
+}
+
+.seller-social-links__badge--socialVkUrl {
+  background: #0077ff;
+}
+
+.seller-social-links__badge--socialWebsiteUrl {
+  background: var(--iz-color-primary, var(--iz-color-text));
+}
+
+.seller-social-links__text {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.seller-social-links__label {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.seller-social-links__value {
+  overflow: hidden;
+  color: var(--iz-color-text-muted);
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-social-links__chevron {
+  flex-shrink: 0;
+  color: var(--iz-color-text-muted);
+}
+
+/* Блок владельца: поля для того, что ещё не добавлено. */
+.seller-social-links__add {
+  display: flex;
+  flex-direction: column;
+  gap: var(--iz-space-2);
+}
+
+.seller-social-links__add-title {
+  margin: 0;
+  color: var(--iz-color-text);
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.seller-social-links__add-hint {
+  margin: 0;
+  color: var(--iz-color-text-muted);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.seller-social-links__add-row {
+  display: flex;
+  align-items: center;
+  gap: var(--iz-space-3);
+  box-sizing: border-box;
+  min-height: 3.5rem;
+  margin: 0;
+  padding: var(--iz-space-2) var(--iz-space-3);
+  width: 100%;
+  border: 1px dashed var(--iz-color-border);
+  border-radius: 16px;
+  background: transparent;
+  color: var(--iz-color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform var(--iz-transition-press),
+    border-color var(--iz-transition-base);
+}
+
+.seller-social-links__add-row:hover {
+  border-color: var(--iz-color-text-muted);
+}
+
+.seller-social-links__add-row:active {
+  transform: scale(var(--iz-state-pressed-scale));
+}
+
+/* Значок приглушён — видно, что ссылки ещё нет. */
+.seller-social-links__add-row .seller-social-links__badge {
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seller-social-links__row:active,
+  .seller-social-links__add-row:active {
+    transform: none;
+    opacity: var(--iz-state-pressed-opacity);
+  }
+}

@@ -51,9 +51,10 @@ export function CatalogFeedTilesGrid({
             return null;
           }
 
-          const imageSrc = item.imageUrl
-            ? resolveUploadedImageUrl(item.imageUrl)
-            : CATALOG_FEED_TILE_PLACEHOLDER_IMAGE;
+          // Своей картинки нет — заглушку рисует CSS, её фон идёт за темой.
+          const isPlaceholder =
+            !item.imageUrl || item.imageUrl === CATALOG_FEED_TILE_PLACEHOLDER_IMAGE;
+          const imageSrc = isPlaceholder ? "" : resolveUploadedImageUrl(item.imageUrl);
 
           return (
             <li key={item.tileKey} className="catalog-categories-grid__item">
@@ -63,14 +64,24 @@ export function CatalogFeedTilesGrid({
                   className="catalog-categories-grid__card catalog-feed-tiles__card"
                   onClick={() => onFeedTileClick(tile)}
                 >
-                  <span className="catalog-categories-grid__image-wrap">
-                    <img
-                      className="catalog-categories-grid__image"
-                      src={imageSrc}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                    />
+                  <span
+                    className={[
+                      "catalog-categories-grid__image-wrap",
+                      isPlaceholder &&
+                        "catalog-categories-grid__image-wrap_placeholder",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    {isPlaceholder ? null : (
+                      <img
+                        className="catalog-categories-grid__image"
+                        src={imageSrc}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    )}
                   </span>
                   <span className="catalog-categories-grid__label">{item.label}</span>
                 </button>

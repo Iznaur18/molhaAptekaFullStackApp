@@ -1,4 +1,7 @@
-import { USER_FULL_NAME_MAX_LENGTH } from "@molha/api-contract";
+import {
+  USER_FULL_NAME_MAX_LENGTH,
+  USER_SOCIAL_LINK_FIELD_IDS,
+} from "@molha/api-contract";
 import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -127,6 +130,25 @@ export function EditProfilePage({
     }, 150);
     return () => window.clearTimeout(timer);
   }, [location.hash, user]);
+
+  // С витрины («Соцсети и сайт» → ещё не добавлено) приходят с именем поля
+  // в якоре: показываем его и ставим курсор.
+  const hasUser = Boolean(user);
+  useEffect(() => {
+    const fieldId = location.hash.slice(1);
+    if (!hasUser || !USER_SOCIAL_LINK_FIELD_IDS.includes(fieldId)) {
+      return undefined;
+    }
+    const timer = window.setTimeout(() => {
+      const input = pageRef.current?.querySelector(`input[name="${fieldId}"]`);
+      if (!(input instanceof HTMLInputElement)) {
+        return;
+      }
+      input.scrollIntoView({ behavior: "smooth", block: "center" });
+      input.focus({ preventScroll: true });
+    }, 120);
+    return () => window.clearTimeout(timer);
+  }, [location.hash, hasUser]);
 
   if (!isAuthorized) {
     return (

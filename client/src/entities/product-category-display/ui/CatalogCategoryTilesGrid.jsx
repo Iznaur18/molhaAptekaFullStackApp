@@ -1,4 +1,5 @@
 import { PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE } from "../lib/resolveProductCategoryDisplay.js";
+import { useCategoryTileImagesMode } from "../model/useCategoryTileImages.js";
 import { PRODUCT_CATEGORY_DISPLAY_UI } from "../../../shared/config/appUiCopy.js";
 import { resolveUploadedImageUrl } from "../../../shared/lib/resolveUploadedImageUrl.js";
 import { Pencil } from "../../../shared/ui/icon/index.js";
@@ -35,13 +36,24 @@ export function CatalogCategoryTilesGrid({
   pendingTileKey = null,
 }) {
   const isInteractionLocked = Boolean(pendingTileKey) || disabled;
+  const tileImagesMode = useCategoryTileImagesMode();
 
   return (
-    <ul className="catalog-categories-grid__list">
+    <ul
+      className={[
+        "catalog-categories-grid__list",
+        tileImagesMode === "off" && "catalog-categories-grid__list_text",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       {items.map((item) => {
-        const imageSrc = item.imageUrl
-          ? resolveUploadedImageUrl(item.imageUrl)
-          : PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE;
+        // Своей картинки нет — заглушку рисует CSS: её фон идёт за темой
+        // (тёмный в тёмной), а зашитая в картинку светлая подложка — нет.
+        const isPlaceholder =
+          !item.imageUrl ||
+          item.imageUrl === PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE;
+        const imageSrc = isPlaceholder ? "" : resolveUploadedImageUrl(item.imageUrl);
         const isPending = pendingTileKey === item.categoryId;
 
         return (
@@ -52,21 +64,34 @@ export function CatalogCategoryTilesGrid({
                 className={[
                   "catalog-categories-grid__card",
                   isPending && "catalog-categories-grid__card_pending",
+                  tileImagesMode === "off" && "catalog-categories-grid__card_text",
                 ]
                   .filter(Boolean)
                   .join(" ")}
                 disabled={isInteractionLocked}
                 onClick={() => onTileClick(item)}
               >
-                <span className="catalog-categories-grid__image-wrap">
-                  <img
-                    className="catalog-categories-grid__image"
-                    src={imageSrc}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </span>
+                {tileImagesMode === "on" ? (
+                  <span
+                    className={[
+                      "catalog-categories-grid__image-wrap",
+                      isPlaceholder &&
+                        "catalog-categories-grid__image-wrap_placeholder",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    {isPlaceholder ? null : (
+                      <img
+                        className="catalog-categories-grid__image"
+                        src={imageSrc}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    )}
+                  </span>
+                ) : null}
                 <span className="catalog-categories-grid__label">{item.label}</span>
               </button>
               {isAdmin &&

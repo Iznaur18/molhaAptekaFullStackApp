@@ -23,6 +23,7 @@ export {
 export {
   HOME_PAGE_UI,
   PRODUCT_CATEGORY_DISPLAY_UI,
+  CATEGORY_TILE_IMAGES_UI,
   PRODUCT_CARD_UI,
   ADD_TO_CART_UI,
   PRODUCT_SIMILAR_UI,
@@ -108,6 +109,7 @@ export {
   SAFE_DEAL_REGISTRY_CHECK_URL,
 } from "./copy/safe-deal.js";
 export { SELLER_QR_UI } from "./copy/seller-qr.js";
+export { SELLER_SOCIAL_LINKS_UI } from "./copy/seller-social.js";
 export {
   SHIPPING_CARRIERS_ADMIN_UI,
   SHIPPING_CARRIER_INFO_UI,

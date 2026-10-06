@@ -27,3 +27,15 @@ export const adminCatalogDisplayPatchBodySchema = z.object({
   resetCustomLabel: z.boolean().optional(),
   resetImageUrl: z.boolean().optional(),
 });
+
+/**
+ * Body `PATCH /product/category-display-settings`.
+ * `tileImagesEnabled` — показывать ли картинки на плитках категорий. Сами
+ * картинки при выключении не удаляются.
+ */
+export const categoryDisplaySettingsPatchBodySchema = z.object({
+  tileImagesEnabled: z.boolean(),
+});
+
+/** Что действует, пока админ переключатель не трогал. */
+export const CATEGORY_TILE_IMAGES_ENABLED_DEFAULT = true;

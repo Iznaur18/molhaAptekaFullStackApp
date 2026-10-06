@@ -5,6 +5,7 @@ import {
 import { SellerPersonalCategoriesGrid } from "../../seller-personal-category/ui/SellerPersonalCategoriesGrid.jsx";
 import { CatalogCategoriesGrid } from "./CatalogCategoriesGrid.jsx";
 import { CatalogFeedTilesGrid } from "./CatalogFeedTilesGrid.jsx";
+import { CategoryTileImagesToggle } from "./CategoryTileImagesToggle.jsx";
 
 import "./CatalogFeedTilesGrid.css";
 
@@ -68,9 +69,12 @@ export function CatalogBrowserLanding({
         className="catalog-browser-landing__categories"
         aria-label={PRODUCT_CATEGORY_DISPLAY_UI.GRID_ARIA}
       >
-        <h2 className="catalog-browser-landing__categories-title">
-          {PRODUCT_CATEGORY_DISPLAY_UI.CATEGORIES_SECTION_TITLE}
-        </h2>
+        <div className="catalog-browser-landing__categories-head">
+          <h2 className="catalog-browser-landing__categories-title">
+            {PRODUCT_CATEGORY_DISPLAY_UI.CATEGORIES_SECTION_TITLE}
+          </h2>
+          {isAdmin ? <CategoryTileImagesToggle /> : null}
+        </div>
         <CatalogCategoriesGrid
           displays={displays}
           categoryRoots={categoryRoots}

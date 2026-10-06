@@ -85,6 +85,26 @@
   pointer-events: none;
 }
 
+/*
+ * Категория без своей картинки: значок-домик рисуем фоном, чтобы подложка шла
+ * за темой. Раньше это была картинка со светлой заливкой внутри — в тёмной теме
+ * плитка оставалась светлой, а белая подпись на ней не читалась.
+ */
+.catalog-categories-grid__image-wrap_placeholder {
+  background-color: #eef2ff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none'%3E%3Cpath d='M20 42V26l12-8 12 8v16' stroke='%236366f1' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+/* Тёмная тема: фон плитки с картинкой — чёрный, как у плитки без картинки. */
+:root[data-theme="dark"] .catalog-categories-grid__card,
+:root[data-theme="dark"] .catalog-categories-grid__image-wrap,
+:root[data-theme="dark"] .catalog-categories-grid__image-wrap_placeholder {
+  background-color: #000000;
+}
+
 .catalog-categories-grid__image {
   display: block;
   width: 100%;
@@ -117,6 +137,61 @@
 
 :root[data-theme="dark"] .catalog-categories-grid__label {
   color: #ffffff;
+}
+
+/*
+ * Админ выключил картинки плиток: плитка без картинки — название на чистом
+ * фоне, а её ширина и высота идут от текста. Поэтому вместо сетки квадратов —
+ * ряд с переносом. Фон белый в светлой теме и чёрный в тёмной (не
+ * surface-elevated: он сероватый и выглядит как «картинка не загрузилась»).
+ */
+.catalog-categories-grid__list_text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.catalog-categories-grid__list_text .catalog-categories-grid__item {
+  max-width: 100%;
+}
+
+/* Карандаш админа — рядом с плиткой, а не поверх: на узкой он закрыл бы текст. */
+.catalog-categories-grid__list_text .catalog-categories-grid__card-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  height: auto;
+}
+
+.catalog-categories-grid__list_text .catalog-categories-grid__edit {
+  position: static;
+  flex-shrink: 0;
+}
+
+.catalog-categories-grid__card_text {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  aspect-ratio: auto;
+  padding: 0.5rem 0.875rem;
+  background: #ffffff;
+}
+
+:root[data-theme="dark"] .catalog-categories-grid__card_text {
+  background: #000000;
+}
+
+/* Название целиком: без обрезки по строкам и без разрыва посреди слова. */
+.catalog-categories-grid__card_text .catalog-categories-grid__label {
+  position: static;
+  display: block;
+  max-width: 100%;
+  overflow: visible;
+  font-size: 1.125rem;
+  line-height: 1.35rem;
+  text-align: center;
+  word-break: normal;
+  overflow-wrap: anywhere;
 }
 
 .catalog-categories-grid__edit {

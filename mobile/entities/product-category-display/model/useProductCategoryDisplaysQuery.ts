@@ -10,5 +10,21 @@ export const useProductCategoryDisplaysQuery = () => {
     queryKey: categoryDisplayQueryKeys.all,
     queryFn: fetchProductCategoryDisplays,
     staleTime: DEFAULT_QUERY_STALE_TIME_MS,
+    select: (data) => data.displays,
   });
+};
+
+/**
+ * Показывать ли картинки на плитках категорий — общий переключатель админа
+ * (включается на сайте). Приезжает тем же запросом, что и сами плитки.
+ * Пока ответа нет — показываем, как раньше.
+ */
+export const useCategoryTileImagesEnabled = (): boolean => {
+  const query = useQuery({
+    queryKey: categoryDisplayQueryKeys.all,
+    queryFn: fetchProductCategoryDisplays,
+    staleTime: DEFAULT_QUERY_STALE_TIME_MS,
+    select: (data) => data.tileImagesEnabled,
+  });
+  return query.data !== false;
 };

@@ -15,7 +15,10 @@ import {
   buildResolvedProductCategoryDisplaysFromRoots,
   PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE,
 } from "@/entities/product-category-display/lib/resolveProductCategoryDisplay";
-import { useProductCategoryDisplaysQuery } from "@/entities/product-category-display/model/useProductCategoryDisplaysQuery";
+import {
+  useCategoryTileImagesEnabled,
+  useProductCategoryDisplaysQuery,
+} from "@/entities/product-category-display/model/useProductCategoryDisplaysQuery";
 import { useProductCategoryChildrenQuery } from "@/entities/product-category-tree/model/useProductCategoryChildrenQuery";
 import { useProductCategoryRootsQuery } from "@/entities/product-category-tree/model/useProductCategoryRootsQuery";
 import {
@@ -100,6 +103,7 @@ export const CreateProductCategoryPicker = ({
     sheetOpen ? activeParentId : null,
   );
   const displaysQuery = useProductCategoryDisplaysQuery();
+  const tileImagesEnabled = useCategoryTileImagesEnabled();
   const searchResultsQuery = useProductCategorySearchQuery(
     sheetOpen ? searchQuery : "",
   );
@@ -373,6 +377,7 @@ export const CreateProductCategoryPicker = ({
                         label={item.label}
                         imageUrl={item.imageUrl}
                         placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
+                        hideImage={!tileImagesEnabled}
                         {...tileLayoutProps}
                         onPress={() => handleTilePress(item.categoryId)}
                       />

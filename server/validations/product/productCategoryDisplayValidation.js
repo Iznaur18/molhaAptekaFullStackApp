@@ -1,5 +1,6 @@
 import {
   adminCatalogDisplayPatchBodySchema,
+  categoryDisplaySettingsPatchBodySchema,
   productCategoryDisplaySlugParamsSchema,
   productCategorySlugParamsSchema,
 } from "@molha/api-contract";
@@ -15,6 +16,10 @@ export const productCategorySlugParamValidation = [
 export const patchProductCategoryDisplayValidation = [
   validateParamsZod(productCategoryDisplaySlugParamsSchema),
   validateBodyZod(adminCatalogDisplayPatchBodySchema),
+];
+
+export const patchProductCategoryDisplaySettingsValidation = [
+  validateBodyZod(categoryDisplaySettingsPatchBodySchema),
 ];
 
 export const patchProductCategoryNodeDisplayValidation = [

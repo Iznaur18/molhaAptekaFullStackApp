@@ -10,6 +10,7 @@ import { useCatalogBrowserGridLayout } from "@/features/catalog-browser/lib/useC
 import { CatalogBrowserTileCard } from "@/features/catalog-browser/ui/CatalogBrowserTileCard";
 import { API_CLIENT_UI, PRODUCT_CATEGORY_DISPLAY_UI } from "@/shared/config";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
+import { useCategoryTileImagesEnabled } from "@/entities/product-category-display/model/useProductCategoryDisplaysQuery";
 import { useCatalogSubcategoryPickerStyles } from "@/shared/theme/catalogProductStyles";
 
 type CatalogSubcategoryPickerProps = {
@@ -36,6 +37,7 @@ export const CatalogSubcategoryPicker = ({
   onEditCategoryPress,
 }: CatalogSubcategoryPickerProps) => {
   const styles = useCatalogSubcategoryPickerStyles();
+  const tileImagesEnabled = useCategoryTileImagesEnabled();
   const gridLayout = useCatalogBrowserGridLayout();
   const { contentPaddingTop } = useScreenLayout();
   const activeParent = trail[trail.length - 1];
@@ -149,6 +151,7 @@ export const CatalogSubcategoryPicker = ({
                 label={item.label}
                 imageUrl={item.imageUrl}
                 placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
+                hideImage={!tileImagesEnabled}
                 {...tileLayoutProps}
                 disabled={resolvingCategoryId != null}
                 pending={resolvingCategoryId === item.categoryId}

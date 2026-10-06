@@ -20,7 +20,6 @@ import {
 } from "../../../shared/config/appUiCopy.js";
 import { AppIcon } from "../../../shared/ui/icon/index.js";
 
-import { ProductDetailsSellerStorefrontButton } from "./ProductDetailsSellerStorefrontButton.jsx";
 import "./ProductDetailsSellerPreview.css";
 
 /**
@@ -38,14 +37,9 @@ function formatFollowersCount(value) {
  * @param {{
  *   seller: import("../model/types.js").ProductSellerPopulated | string | null | undefined;
  *   onOpenProfile?: (userId: string) => void;
- *   showStorefrontButton?: boolean;
  * }} props
  */
-export function ProductDetailsSellerPreview({
-  seller,
-  onOpenProfile,
-  showStorefrontButton = false,
-}) {
+export function ProductDetailsSellerPreview({ seller, onOpenProfile }) {
   const [avatarFailed, setAvatarFailed] = useState(false);
 
   const sellerObj =
@@ -164,10 +158,6 @@ export function ProductDetailsSellerPreview({
       ) : (
         <span className="product-details-seller-preview__header">{header}</span>
       )}
-
-      {showStorefrontButton ? (
-        <ProductDetailsSellerStorefrontButton sellerId={sellerId} embedded />
-      ) : null}
 
       <dl className="product-details-seller-preview__metrics">
         {metrics.map((row) => (

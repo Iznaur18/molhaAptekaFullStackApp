@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight, Store } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -236,6 +236,18 @@ export function UserDetailsPage() {
           </div>
         ) : null}
 
+        <button
+          type="button"
+          className="user-details-page__storefront-btn"
+          onClick={handleViewAllSellerProducts}
+        >
+          <AppIcon icon={Store} size="md" strokeWidth={2.1} />
+          <span className="user-details-page__storefront-btn-text">
+            {USER_DETAILS_PAGE_UI.SELLER_STOREFRONT}
+          </span>
+          <AppIcon icon={ChevronRight} size="sm" strokeWidth={2.25} />
+        </button>
+
         {showOtherUserPurchases ? (
           <UserProfilePurchasesList
             targetUserId={userId}
@@ -247,7 +259,6 @@ export function UserDetailsPage() {
           <UserProfileProductsList
             targetUserId={userId}
             onProductClick={handleProductClick}
-            onViewAllProducts={handleViewAllSellerProducts}
           />
         ) : null}
 

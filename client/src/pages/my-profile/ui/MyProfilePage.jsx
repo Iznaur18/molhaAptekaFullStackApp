@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 import { UserPremiumAvatar } from "../../../entities/user/ui/UserPremiumAvatar.jsx";
 import { SellerShareLinkButton } from "../../../entities/user/ui/SellerShareLinkButton.jsx";
-import { SellerQrButton } from "../../../entities/user/ui/SellerQrButton.jsx";
 import { isPremiumActive } from "../../../entities/user/lib/isPremiumActive.js";
 import { USER_ROLE_USER } from "../../../entities/user/model/userConstants.js";
 import { UserRatingVotesSheet } from "../../../entities/user-vote-rating/ui/UserRatingVotesSheet.jsx";
@@ -474,11 +473,6 @@ export function MyProfilePage({
                         sellerId={String(user._id)}
                         sellerName={String(user.userName ?? "").trim()}
                         variant="meta"
-                      />
-                      <SellerQrButton
-                        sellerId={String(user._id)}
-                        sellerName={String(user.userName ?? "").trim()}
-                        avatarUrl={photoUrl && !avatarLoadFailed ? photoUrl : ""}
                       />
                       <button
                         type="button"

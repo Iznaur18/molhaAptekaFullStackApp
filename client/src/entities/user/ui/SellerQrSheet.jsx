@@ -44,6 +44,7 @@ function downloadBlob(blob, fileName) {
  *   sellerId: string;
  *   sellerName?: string;
  *   avatarUrl?: string;
+ *   isOwn?: boolean;
  * }} props
  */
 export function SellerQrSheet({
@@ -52,13 +53,14 @@ export function SellerQrSheet({
   sellerId,
   sellerName = "",
   avatarUrl = "",
+  isOwn = true,
 }) {
   const sheetId = useId();
   const titleId = `${sheetId}-title`;
   const { mounted, isVisible: visible } = useEnterExitMountAnimation(isOpen, {
     exitMs: SHEET_EXIT_MS,
   });
-  const statsQuery = useMySellerQrStatsQuery({ enabled: mounted });
+  const statsQuery = useMySellerQrStatsQuery({ enabled: mounted && isOwn });
   const [isBuilding, setIsBuilding] = useState(false);
   const [error, setError] = useState("");
   const [avatarFailed, setAvatarFailed] = useState(false);
@@ -208,7 +210,9 @@ export function SellerQrSheet({
             <p className="seller-qr-sheet__brand">{SELLER_QR_UI.BRAND}</p>
           </div>
 
-          <p className="seller-qr-sheet__hint">{SELLER_QR_UI.HINT}</p>
+          <p className="seller-qr-sheet__hint">
+            {isOwn ? SELLER_QR_UI.HINT : SELLER_QR_UI.HINT_VISITOR}
+          </p>
 
           <div className="seller-qr-sheet__actions">
             <button
@@ -235,35 +239,42 @@ export function SellerQrSheet({
             </p>
           ) : null}
 
-          <section
-            className="seller-qr-sheet__stats"
-            aria-label={SELLER_QR_UI.STATS_TITLE}
-          >
-            <h3 className="seller-qr-sheet__stats-title">{SELLER_QR_UI.STATS_TITLE}</h3>
-            {statsQuery.isPending ? (
-              <p className="seller-qr-sheet__stats-text">
-                {SELLER_QR_UI.STATS_LOADING}
-              </p>
-            ) : statsQuery.isError ? (
-              <p className="seller-qr-sheet__error" role="alert">
-                {statsQuery.error instanceof Error
-                  ? statsQuery.error.message
-                  : SELLER_QR_UI.STATS_FALLBACK}
-              </p>
-            ) : stats.total === 0 ? (
-              <p className="seller-qr-sheet__stats-text">{SELLER_QR_UI.STATS_EMPTY}</p>
-            ) : (
-              <>
-                <p className="seller-qr-sheet__stats-value">
-                  {SELLER_QR_UI.STATS_TOTAL(stats.total)}
-                </p>
+          {/* Переходы по коду — личная статистика продавца, гостю не показываем. */}
+          {isOwn ? (
+            <section
+              className="seller-qr-sheet__stats"
+              aria-label={SELLER_QR_UI.STATS_TITLE}
+            >
+              <h3 className="seller-qr-sheet__stats-title">
+                {SELLER_QR_UI.STATS_TITLE}
+              </h3>
+              {statsQuery.isPending ? (
                 <p className="seller-qr-sheet__stats-text">
-                  {SELLER_QR_UI.STATS_RECENT(stats.recent, stats.recentDays)}
+                  {SELLER_QR_UI.STATS_LOADING}
                 </p>
-              </>
-            )}
-            <p className="seller-qr-sheet__stats-note">{SELLER_QR_UI.STATS_NOTE}</p>
-          </section>
+              ) : statsQuery.isError ? (
+                <p className="seller-qr-sheet__error" role="alert">
+                  {statsQuery.error instanceof Error
+                    ? statsQuery.error.message
+                    : SELLER_QR_UI.STATS_FALLBACK}
+                </p>
+              ) : stats.total === 0 ? (
+                <p className="seller-qr-sheet__stats-text">
+                  {SELLER_QR_UI.STATS_EMPTY}
+                </p>
+              ) : (
+                <>
+                  <p className="seller-qr-sheet__stats-value">
+                    {SELLER_QR_UI.STATS_TOTAL(stats.total)}
+                  </p>
+                  <p className="seller-qr-sheet__stats-text">
+                    {SELLER_QR_UI.STATS_RECENT(stats.recent, stats.recentDays)}
+                  </p>
+                </>
+              )}
+              <p className="seller-qr-sheet__stats-note">{SELLER_QR_UI.STATS_NOTE}</p>
+            </section>
+          ) : null}
         </div>
       </div>
     </div>,

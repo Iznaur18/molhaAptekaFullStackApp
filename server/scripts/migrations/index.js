@@ -46,6 +46,7 @@ import { up as productModerationFingerprintUp } from "./20260907-product-moderat
 import { up as approvePendingForTrustedSellersUp } from "./20260909-approve-pending-for-trusted-sellers.js";
 import { up as catalogPriceIndexUp } from "./20260915-catalog-price-index.js";
 import { up as restoreCdekOrder6ce3a1a8Up } from "./20260927-restore-cdek-order-6ce3a1a8.js";
+import { up as catalogCategoryTreeUp } from "./20261006-catalog-category-tree.js";
 
 export const MIGRATIONS = [
   {
@@ -300,5 +301,11 @@ export const MIGRATIONS = [
     description:
       "Return CDEK order 6CE3A1A8 from buyer-marked returned back to shipped so CDEK status sync resumes",
     up: restoreCdekOrder6ce3a1a8Up,
+  },
+  {
+    id: "20261006-catalog-category-tree",
+    description:
+      "Replace subcategories of 19 catalog roots with the in-code tree (electronics, food, cafes, donat untouched)",
+    up: catalogCategoryTreeUp,
   },
 ];

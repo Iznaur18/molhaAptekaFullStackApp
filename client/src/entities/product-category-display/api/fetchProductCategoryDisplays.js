@@ -2,7 +2,10 @@ import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 
 /**
- * @returns {Promise<{ displays: import('../model/types.js').ProductCategoryDisplayFromApi[] }>}
+ * @returns {Promise<{
+ *   displays: import('../model/types.js').ProductCategoryDisplayFromApi[];
+ *   tileImagesEnabled: boolean;
+ * }>} `tileImagesEnabled` — общий переключатель админа «картинки на плитках».
  */
 export async function fetchProductCategoryDisplays() {
   try {
@@ -14,6 +17,8 @@ export async function fetchProductCategoryDisplays() {
 
     return {
       displays: Array.isArray(data.data.displays) ? data.data.displays : [],
+      // Старый сервер поля не знает — тогда картинки показываем, как раньше.
+      tileImagesEnabled: data.data.tileImagesEnabled !== false,
     };
   } catch (error) {
     const message =
