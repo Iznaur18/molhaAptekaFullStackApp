@@ -234,6 +234,8 @@ function ProductCategoryTreePicker({ value, onChange, disabled = false }) {
           <CatalogCategoryTilesGrid
             items={tiles}
             disabled={disabled}
+            // Корневые категории — всегда с картинками, как в каталоге.
+            alwaysShowImages={trail.length === 0}
             onTileClick={handleTileClick}
           />
         )}

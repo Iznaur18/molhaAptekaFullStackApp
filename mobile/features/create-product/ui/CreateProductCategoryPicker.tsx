@@ -377,7 +377,8 @@ export const CreateProductCategoryPicker = ({
                         label={item.label}
                         imageUrl={item.imageUrl}
                         placeholderImageUrl={PRODUCT_CATEGORY_DISPLAY_PLACEHOLDER_IMAGE}
-                        hideImage={!tileImagesEnabled}
+                        // Корневые категории — всегда с картинками.
+                        hideImage={!tileImagesEnabled && !isRoot}
                         {...tileLayoutProps}
                         onPress={() => handleTilePress(item.categoryId)}
                       />
