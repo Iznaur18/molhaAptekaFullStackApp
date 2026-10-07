@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { CURATED_LIST_CAROUSEL_UI } from "../../../shared/config/appUiCopy.js";
+
 import {
   CURATED_CATEGORY_LIST_HOME_CARD_GAP_PX,
   CURATED_CATEGORY_LIST_HOME_CARD_MAX_WIDTH_PX,
@@ -7,7 +9,6 @@ import {
   CURATED_CATEGORY_LIST_HOME_VISIBLE_CARD_MAX,
 } from "../lib/curatedCategoryListHomeLayout.js";
 import { useCuratedCarouselImageDragScroll } from "../../curated-product-list/lib/useCuratedCarouselImageDragScroll.js";
-import { CuratedListCarouselHeader } from "../../curated-product-list/ui/CuratedListCarouselHeader.jsx";
 import { CuratedListViewAllSheet } from "../../curated-product-list/ui/CuratedListViewAllSheet.jsx";
 import { CuratedCategoryCompactCard } from "./CuratedCategoryCompactCard.jsx";
 
@@ -30,10 +31,6 @@ export function CuratedCategoryListCarousel({ title, categories, onOpenCategory 
 
   return (
     <>
-      <CuratedListCarouselHeader
-        title={title}
-        onViewAll={() => setIsViewAllOpen(true)}
-      />
       <section
         className="curated-category-list-carousel"
         aria-label={title}
@@ -52,6 +49,22 @@ export function CuratedCategoryListCarousel({ title, categories, onOpenCategory 
           {...dragScrollProps}
         >
           <ul className="curated-category-list-carousel__track" role="list">
+            <li className="curated-category-list-carousel__item">
+              <button
+                type="button"
+                className="curated-category-list-carousel__title-tile"
+                aria-label={CURATED_LIST_CAROUSEL_UI.VIEW_ALL_ARIA(title)}
+                onClick={() => setIsViewAllOpen(true)}
+              >
+                <span className="curated-category-compact-card__image-wrap">
+                  <span className="curated-category-list-carousel__title-tile-body">
+                    <span className="curated-category-list-carousel__title-tile-name">
+                      {title}
+                    </span>
+                  </span>
+                </span>
+              </button>
+            </li>
             {categories.map((category) => (
               <li
                 key={category.itemKey}

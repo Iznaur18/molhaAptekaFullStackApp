@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { CURATED_LIST_CAROUSEL_UI } from "../../../shared/config/appUiCopy.js";
+
 import {
   CURATED_PRODUCT_LIST_HOME_CARD_GAP_PX,
   CURATED_PRODUCT_LIST_HOME_CARD_MAX_WIDTH_PX,
@@ -7,10 +9,10 @@ import {
   CURATED_PRODUCT_LIST_HOME_VISIBLE_CARD_MAX,
 } from "../lib/curatedProductListHomeLayout.js";
 import { useCuratedCarouselImageDragScroll } from "../lib/useCuratedCarouselImageDragScroll.js";
-import { CuratedListCarouselHeader } from "./CuratedListCarouselHeader.jsx";
 import { CuratedListViewAllSheet } from "./CuratedListViewAllSheet.jsx";
 import { CuratedProductCompactCard } from "./CuratedProductCompactCard.jsx";
 
+import "./CuratedProductCompactCard.css";
 import "./CuratedProductListCarousel.css";
 
 /**
@@ -30,10 +32,6 @@ export function CuratedProductListCarousel({ title, products, onOpenProduct }) {
 
   return (
     <>
-      <CuratedListCarouselHeader
-        title={title}
-        onViewAll={() => setIsViewAllOpen(true)}
-      />
       <section
         className="curated-product-list-carousel"
         aria-label={title}
@@ -50,6 +48,18 @@ export function CuratedProductListCarousel({ title, products, onOpenProduct }) {
           {...dragScrollProps}
         >
           <ul className="curated-product-list-carousel__track" role="list">
+            <li className="curated-product-list-carousel__item curated-product-list-carousel__item_title">
+              <button
+                type="button"
+                className="curated-product-compact-card curated-product-list-carousel__title-tile"
+                aria-label={CURATED_LIST_CAROUSEL_UI.VIEW_ALL_ARIA(title)}
+                onClick={() => setIsViewAllOpen(true)}
+              >
+                <span className="curated-product-list-carousel__title-tile-name">
+                  {title}
+                </span>
+              </button>
+            </li>
             {products.map((product) => (
               <li key={product._id} className="curated-product-list-carousel__item">
                 <CuratedProductCompactCard product={product} onOpen={onOpenProduct} />

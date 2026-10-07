@@ -1,13 +1,18 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { HomeCuratedProductListsSection } from "../../../entities/curated-product-list/ui/HomeCuratedProductListsSection.jsx";
 import { CuratedProductListCarouselSkeleton } from "../../../entities/curated-product-list/ui/CuratedProductListCarouselSkeleton.jsx";
+import { CuratedProductListCarousel } from "../../../entities/curated-product-list/ui/CuratedProductListCarousel.jsx";
+import { buildSellerStoreCuratedCategories } from "../../../entities/curated-category-list/lib/buildSellerStoreCuratedCategories.js";
+import { CuratedCategoryListCarousel } from "../../../entities/curated-category-list/ui/CuratedCategoryListCarousel.jsx";
 import { HomeCuratedCategoryListsSection } from "../../../entities/curated-category-list/ui/HomeCuratedCategoryListsSection.jsx";
 import { CuratedCategoryListCarouselSkeleton } from "../../../entities/curated-category-list/ui/CuratedCategoryListCarouselSkeleton.jsx";
 import { CatalogBrowserBreadcrumb } from "../../../entities/product-category-display/ui/CatalogBrowserBreadcrumb.jsx";
 import { CatalogBrowserLanding } from "../../../entities/product-category-display/ui/CatalogBrowserLanding.jsx";
 import { CatalogSubcategoryPicker } from "../../../entities/product-category-display/ui/CatalogSubcategoryPicker.jsx";
+import { useProductPromotionBoostProductsQuery } from "../../../entities/product/model/useProductPromotionBoostProductsQuery.js";
+import { useSellerPersonalCategoryCatalogTilesQuery } from "../../../entities/seller-personal-category/model/useSellerPersonalCategoryCatalogTilesQuery.js";
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { buildRafflePath } from "../../../shared/lib/rafflePaths.js";
 import { InlineErrorBanner } from "../../../shared/ui/InlineErrorBanner/InlineErrorBanner.jsx";
@@ -31,6 +36,12 @@ const LazyMyProductsCatalogSection = lazy(() =>
   })),
 );
 /** @typedef {import('../../../entities/product/model/types.js').ProductFromApi} ProductFromApi */
+
+/** Надписи-переключатели над лентой главного экрана. */
+const HOME_FEED_SECTION_TABS = [
+  { id: "home", label: HOME_PAGE_UI.CATALOG_HOME_SECTION },
+  { id: "categories", label: HOME_PAGE_UI.CATALOG_HOME_SECTION_CATEGORIES },
+];
 
 /**
  * @param {{
@@ -163,6 +174,28 @@ export function AppShellCatalogGridSection({
   onPlaceProductClick,
 }) {
   const navigate = useNavigate();
+  const [homeFeedSectionTab, setHomeFeedSectionTab] = useState("home");
+  // Ряд «Буст продвижение» живёт там же, где подборки товаров: на чистой главной.
+  const showBoostProductsRow =
+    !isMineMode && isHomeCatalogMainView && showCuratedProductLists;
+  const boostProductsQuery = useProductPromotionBoostProductsQuery({
+    enabled: showBoostProductsRow,
+    regionCode: viewerRegionCode ?? "",
+  });
+  const boostProducts = boostProductsQuery.data ?? [];
+  // Оплаченные плитки продавцов нужны только на вкладке «Категории».
+  const sellerStoreTilesQuery = useSellerPersonalCategoryCatalogTilesQuery({
+    enabled:
+      !isMineMode &&
+      isHomeCatalogMainView &&
+      showCuratedCategoryLists &&
+      homeFeedSectionTab === "categories",
+    regionCode: viewerRegionCode ?? "",
+  });
+  const sellerStoreCategories = useMemo(
+    () => buildSellerStoreCuratedCategories(sellerStoreTilesQuery.data ?? []),
+    [sellerStoreTilesQuery.data],
+  );
 
   if (isMineMode) {
     return (
@@ -206,6 +239,14 @@ export function AppShellCatalogGridSection({
     return <InlineErrorBanner>{catalogStatus.message}</InlineErrorBanner>;
   }
 
+  // «Категории» есть только там, где витрины категорий вообще показываются.
+  const canShowCategoriesTab = isHomeCatalogMainView && showCuratedCategoryLists;
+  const visibleHomeFeedSectionTabs = canShowCategoriesTab
+    ? HOME_FEED_SECTION_TABS
+    : HOME_FEED_SECTION_TABS.slice(0, 1);
+  const activeHomeFeedSectionTab = canShowCategoriesTab ? homeFeedSectionTab : "home";
+  const isCategoriesTabActive = activeHomeFeedSectionTab === "categories";
+
   return (
     <>
       {isHomeCatalogMainView && featuredRaffles.length > 0 ? (
@@ -231,6 +272,17 @@ export function AppShellCatalogGridSection({
           />
         </Suspense>
       ) : null}
+      {showBoostProductsRow && boostProductsQuery.isError ? (
+        <InlineErrorBanner>{boostProductsQuery.error.message}</InlineErrorBanner>
+      ) : null}
+      {/* Платное место — первым, над подборками админа. */}
+      {showBoostProductsRow ? (
+        <CuratedProductListCarousel
+          title={HOME_PAGE_UI.CATALOG_HOME_SECTION_BOOST_PRODUCTS}
+          products={boostProducts}
+          onOpenProduct={onOpenProductDetails}
+        />
+      ) : null}
       {showCuratedProductLists && homeCuratedProductLists.length > 0 ? (
         <HomeCuratedProductListsSection
           lists={homeCuratedProductLists}
@@ -239,73 +291,104 @@ export function AppShellCatalogGridSection({
       ) : showCuratedProductLists && isCuratedProductListsLoading ? (
         <CuratedProductListCarouselSkeleton />
       ) : null}
-      {showCuratedCategoryLists && homeCuratedCategoryLists.length > 0 ? (
-        <HomeCuratedCategoryListsSection
-          lists={homeCuratedCategoryLists}
-          onOpenCategory={onOpenCuratedCategory}
-        />
-      ) : showCuratedCategoryLists && isCuratedCategoryListsLoading ? (
-        <CuratedCategoryListCarouselSkeleton />
-      ) : null}
       {isHomeCatalogMainView ? (
-        <h2 className="home-feed-section-title">{HOME_PAGE_UI.CATALOG_HOME_SECTION}</h2>
+        <h2 className="home-feed-section-title home-feed-section-tabs">
+          {visibleHomeFeedSectionTabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              className="home-feed-section-tab"
+              aria-pressed={activeHomeFeedSectionTab === tab.id}
+              onClick={() => setHomeFeedSectionTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </h2>
       ) : null}
-      {isCatalogInitialLoading ? (
-        <CatalogGridSkeleton
-          withActionButton={catalogMainView === "catalog" && !isMineMode}
-        />
+      {isCategoriesTabActive && sellerStoreTilesQuery.isError ? (
+        <InlineErrorBanner>{sellerStoreTilesQuery.error.message}</InlineErrorBanner>
+      ) : null}
+      {!isCategoriesTabActive ? null : sellerStoreCategories.length > 0 ||
+        homeCuratedCategoryLists.length > 0 ? (
+        <>
+          {/* Платное место — первым, над витринами админа. */}
+          <CuratedCategoryListCarousel
+            title={HOME_PAGE_UI.CATALOG_HOME_SECTION_SELLER_STORES}
+            categories={sellerStoreCategories}
+            onOpenCategory={onOpenCuratedCategory}
+          />
+          <HomeCuratedCategoryListsSection
+            lists={homeCuratedCategoryLists}
+            onOpenCategory={onOpenCuratedCategory}
+          />
+        </>
+      ) : isCuratedCategoryListsLoading || sellerStoreTilesQuery.isPending ? (
+        <CuratedCategoryListCarouselSkeleton />
       ) : (
-        <HomeCatalogGrid
-          products={products}
-          selectedProductCategory={
-            catalogMainView === "catalog-browser"
-              ? activeCatalogBrowserCategory
-              : selectedProductCategory
-          }
-          hasQuery={hasProductSearchQuery}
-          isMineMode={isMineMode}
-          deletingProductId={deletingProductId}
-          onSellerNameClick={onSellerNameClick}
-          onDeleteMyProduct={onDeleteMyProduct}
-          onEditMyProduct={onEditMyProduct}
-          onPromoteMyProduct={onPromoteMyProduct}
-          myProductsCatalogError={myProductsCatalogError}
-          myProductsCatalogNotice={myProductsCatalogNotice}
-          onOpenProductDetails={onOpenProductDetails}
-          onSetMyProductAvailability={onSetMyProductAvailability}
-          onSetMyProductAuction={onSetMyProductAuction}
-          togglingAvailabilityProductId={togglingAvailabilityProductId}
-          togglingAuctionProductId={togglingAuctionProductId}
-          isAuthorized={isAuthorized}
-          isPremiumUser={isPremiumUser}
-          currentUserId={currentUserId}
-          sellerLoyaltyPointsBalance={sellerLoyaltyPointsBalance}
-          sellerLoyaltyPointsReserved={sellerLoyaltyPointsReserved}
-          onRequestLoginAddToCart={onRequestLoginAddToCart}
-          // «В корзину» под карточками — только на главном экране.
-          showAddToCart={catalogMainView === "catalog" && !isMineMode}
-          catalogSentinelRef={catalogSentinelRef}
-          catalogHasMore={catalogHasMore}
-          isCatalogLoadingMore={isCatalogLoadingMore}
-          catalogLoadMoreError={catalogLoadMoreError}
-          onRetryCatalogLoadMore={onRetryCatalogLoadMore}
-          myProductsModerationFilter={myProductsModerationFilter}
-          catalogFollowingOnly={catalogFollowingOnly}
-          catalogAuctionOnly={catalogAuctionOnly}
-          catalogInstallmentOnly={catalogInstallmentOnly}
-          catalogSaleOnly={catalogSaleOnly}
-          catalogRentalOnly={catalogRentalOnly}
-          catalogAffiliateOnly={catalogAffiliateOnly}
-          catalogWholesaleOnly={catalogWholesaleOnly}
-          catalogOriginalOnly={catalogOriginalOnly}
-          catalogNear={catalogNear}
-          showFullWidthTier3Banners={showFullWidthTier3Banners}
-          viewerRegionCode={viewerRegionCode}
-          sellerRaffleActive={sellerRaffleActive}
-          onToggleRaffleParticipation={onToggleRaffleParticipation}
-          raffleParticipationPendingProductId={raffleParticipationPendingProductId}
-        />
+        <p className="home-feed-section-empty">
+          {HOME_PAGE_UI.CATALOG_HOME_SECTION_CATEGORIES_EMPTY}
+        </p>
       )}
+      {/* Лента остаётся смонтированной: её дозагрузка привязана к sentinel-ref. */}
+      <div className="home-feed-section-panel" hidden={isCategoriesTabActive}>
+        {isCatalogInitialLoading ? (
+          <CatalogGridSkeleton
+            withActionButton={catalogMainView === "catalog" && !isMineMode}
+          />
+        ) : (
+          <HomeCatalogGrid
+            products={products}
+            selectedProductCategory={
+              catalogMainView === "catalog-browser"
+                ? activeCatalogBrowserCategory
+                : selectedProductCategory
+            }
+            hasQuery={hasProductSearchQuery}
+            isMineMode={isMineMode}
+            deletingProductId={deletingProductId}
+            onSellerNameClick={onSellerNameClick}
+            onDeleteMyProduct={onDeleteMyProduct}
+            onEditMyProduct={onEditMyProduct}
+            onPromoteMyProduct={onPromoteMyProduct}
+            myProductsCatalogError={myProductsCatalogError}
+            myProductsCatalogNotice={myProductsCatalogNotice}
+            onOpenProductDetails={onOpenProductDetails}
+            onSetMyProductAvailability={onSetMyProductAvailability}
+            onSetMyProductAuction={onSetMyProductAuction}
+            togglingAvailabilityProductId={togglingAvailabilityProductId}
+            togglingAuctionProductId={togglingAuctionProductId}
+            isAuthorized={isAuthorized}
+            isPremiumUser={isPremiumUser}
+            currentUserId={currentUserId}
+            sellerLoyaltyPointsBalance={sellerLoyaltyPointsBalance}
+            sellerLoyaltyPointsReserved={sellerLoyaltyPointsReserved}
+            onRequestLoginAddToCart={onRequestLoginAddToCart}
+            // «В корзину» под карточками — только на главном экране.
+            showAddToCart={catalogMainView === "catalog" && !isMineMode}
+            catalogSentinelRef={catalogSentinelRef}
+            catalogHasMore={catalogHasMore}
+            isCatalogLoadingMore={isCatalogLoadingMore}
+            catalogLoadMoreError={catalogLoadMoreError}
+            onRetryCatalogLoadMore={onRetryCatalogLoadMore}
+            myProductsModerationFilter={myProductsModerationFilter}
+            catalogFollowingOnly={catalogFollowingOnly}
+            catalogAuctionOnly={catalogAuctionOnly}
+            catalogInstallmentOnly={catalogInstallmentOnly}
+            catalogSaleOnly={catalogSaleOnly}
+            catalogRentalOnly={catalogRentalOnly}
+            catalogAffiliateOnly={catalogAffiliateOnly}
+            catalogWholesaleOnly={catalogWholesaleOnly}
+            catalogOriginalOnly={catalogOriginalOnly}
+            catalogNear={catalogNear}
+            showFullWidthTier3Banners={showFullWidthTier3Banners}
+            viewerRegionCode={viewerRegionCode}
+            sellerRaffleActive={sellerRaffleActive}
+            onToggleRaffleParticipation={onToggleRaffleParticipation}
+            raffleParticipationPendingProductId={raffleParticipationPendingProductId}
+          />
+        )}
+      </div>
     </>
   );
 }

@@ -46,6 +46,10 @@ export const HOME_PAGE_UI = {
   BREADCRUMB_HOME: "Главная",
   NAV_TO_HOME: "Главная",
   CATALOG_HOME_SECTION: "Главная",
+  CATALOG_HOME_SECTION_CATEGORIES: "Категории",
+  CATALOG_HOME_SECTION_CATEGORIES_EMPTY: "Здесь пока нет категорий",
+  CATALOG_HOME_SECTION_SELLER_STORES: "Магазины продавцов",
+  CATALOG_HOME_SECTION_BOOST_PRODUCTS: "Буст продвижение",
   TITLE_USERS: "Пользователи",
   TITLE_CART: "Корзина",
   TITLE_MY_ORDERS: "Мои покупки",
@@ -405,7 +409,6 @@ export const CURATED_PRODUCT_COMPACT_CARD_UI = {
 
 /** Заголовок карусели подборки на главной */
 export const CURATED_LIST_CAROUSEL_UI = {
-  VIEW_ALL: "Все",
   /** @param {string} listTitle */
   VIEW_ALL_ARIA: (listTitle) => `Все из подборки «${listTitle}»`,
   SHEET_CLOSE_ARIA: "Закрыть подборку",

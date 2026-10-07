@@ -1,20 +1,3 @@
-.curated-product-list-carousel-skeleton__title-line {
-  display: inline-block;
-  width: 9rem;
-  max-width: 60%;
-  height: 1em;
-  vertical-align: middle;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    var(--iz-color-surface-elevated) 0%,
-    var(--iz-color-border) 50%,
-    var(--iz-color-surface-elevated) 100%
-  );
-  background-size: 200% 100%;
-  animation: curated-carousel-skeleton-shimmer 1.2s ease-in-out infinite;
-}
-
 .curated-product-list-carousel-skeleton__shimmer {
   background: linear-gradient(
     90deg,

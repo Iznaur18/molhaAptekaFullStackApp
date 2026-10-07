@@ -7,7 +7,6 @@ import {
 
 import "./CuratedProductListCarousel.css";
 import "./CuratedProductCompactCard.css";
-import "./CuratedListCarouselHeader.css";
 import "./CuratedProductListCarouselSkeleton.css";
 
 /**
@@ -27,11 +26,6 @@ export function CuratedProductListCarouselSkeleton() {
         "--curated-card-max-width": `${CURATED_PRODUCT_LIST_HOME_CARD_MAX_WIDTH_PX}px`,
       }}
     >
-      <div className="curated-list-carousel-header">
-        <h2 className="curated-list-carousel-header__title">
-          <span className="curated-product-list-carousel-skeleton__title-line" />
-        </h2>
-      </div>
       <div className="curated-product-list-carousel__scroll">
         <ul className="curated-product-list-carousel__track" role="list">
           {Array.from(

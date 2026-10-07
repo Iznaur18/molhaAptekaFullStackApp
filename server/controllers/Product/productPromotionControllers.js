@@ -7,7 +7,9 @@ import {
   rejectProductPromotion,
   requestProductPromotion,
 } from "../../services/product/productPromotion.js";
+import { getProductPromotionBoostProducts } from "../../services/product/productPromotionBoostProducts.js";
 import { successRes } from "../../services/http/index.js";
+import { resolveViewerRegionCodeForRequest } from "../../services/user/userRegionCatalogFilter.js";
 
 export const getProductPromotionTariffsController = async (req, res) => {
   const result = getProductPromotionTariffs();
@@ -61,5 +63,14 @@ export const rejectProductPromotionController = async (req, res) => {
     promotionId: req.params.promotionId,
   });
 
+  return successRes(res, result);
+};
+
+export const getProductPromotionBoostProductsController = async (req, res) => {
+  const viewerRegionCode = await resolveViewerRegionCodeForRequest({
+    userId: req.userId,
+    queryRegionCode: req.query.regionCode,
+  });
+  const result = await getProductPromotionBoostProducts({ viewerRegionCode });
   return successRes(res, result);
 };

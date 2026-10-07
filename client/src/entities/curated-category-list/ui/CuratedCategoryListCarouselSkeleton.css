@@ -1,0 +1,7 @@
+.curated-category-list-carousel-skeleton .curated-category-compact-card {
+  cursor: default;
+}
+
+.curated-category-list-carousel-skeleton .curated-category-list-carousel__scroll {
+  overflow-x: hidden;
+}
