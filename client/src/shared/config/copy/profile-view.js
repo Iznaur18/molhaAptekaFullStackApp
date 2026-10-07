@@ -3,7 +3,6 @@
 
 /** Сторисы пользователей на главной */
 export const USER_STORY_UI = {
-  SECTION_TITLE: "История",
   ADD_LABEL: "Ваша история",
   LOADING: "Загрузка…",
   MEDIA_LOADING: "Загружаем медиа…",

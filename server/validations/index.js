@@ -56,6 +56,7 @@ import {
 import {
   requestProductPromotionValidation,
   myProductPromotionsValidation,
+  productPromotionBoostProductsValidation,
   promotionIdParamValidation,
   rejectProductPromotionValidation,
 } from "./product/productPromotionValidation.js";
@@ -254,6 +255,7 @@ export {
   productQuestionIdParamValidation,
   requestProductPromotionValidation,
   myProductPromotionsValidation,
+  productPromotionBoostProductsValidation,
   promotionIdParamValidation,
   rejectProductPromotionValidation,
   replaceProductPromoCodesValidation,

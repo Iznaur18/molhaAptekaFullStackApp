@@ -287,6 +287,7 @@ import {
 } from "./Product/productQuestionControllers.js";
 import {
   getProductPromotionTariffsController,
+  getProductPromotionBoostProductsController,
   requestProductPromotionController,
   getMyProductPromotionsController,
   getPendingProductPromotionsController,
@@ -617,6 +618,7 @@ export {
   patchMyProductReviewController,
   deleteMyProductReviewController,
   getProductPromotionTariffsController,
+  getProductPromotionBoostProductsController,
   requestProductPromotionController,
   getMyProductPromotionsController,
   getPendingProductPromotionsController,

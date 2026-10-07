@@ -1,5 +1,6 @@
 import {
   myProductPromotionsQuerySchema,
+  productPromotionBoostProductsQuerySchema,
   promotionIdParamsSchema,
   rejectProductPromotionBodySchema,
   requestProductPromotionBodySchema,
@@ -22,4 +23,8 @@ export const promotionIdParamValidation = [validateParamsZod(promotionIdParamsSc
 export const rejectProductPromotionValidation = [
   validateParamsZod(promotionIdParamsSchema),
   validateBodyZod(rejectProductPromotionBodySchema),
+];
+
+export const productPromotionBoostProductsValidation = [
+  validateQueryZod(productPromotionBoostProductsQuerySchema),
 ];

@@ -34,6 +34,8 @@ export {
   requestProductPromotionBodySchema,
   myProductPromotionsQuerySchema,
   rejectProductPromotionBodySchema,
+  PRODUCT_PROMOTION_BOOST_PRODUCTS_LIMIT,
+  productPromotionBoostProductsQuerySchema,
   PRODUCT_PROMOTION_STATUS_AWAITING_PAYMENT,
   PRODUCT_PROMOTION_STATUS_PENDING_STAFF,
   PRODUCT_PROMOTION_STATUS_ACTIVE,

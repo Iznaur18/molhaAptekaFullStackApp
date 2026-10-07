@@ -149,6 +149,17 @@ export const myProductPromotionsQuerySchema = z.object({
   status: z.enum(PRODUCT_PROMOTION_STATUSES).optional(),
 });
 
+/** Сколько товаров показывает ряд «Буст продвижение» на главной. */
+export const PRODUCT_PROMOTION_BOOST_PRODUCTS_LIMIT = 20;
+
+/**
+ * Ответ — `{ products }` с обычными каталожными карточками товара, как у
+ * `/product/curated-lists/home`; отдельной zod-схемы карточки в контракте нет.
+ */
+export const productPromotionBoostProductsQuerySchema = z.object({
+  regionCode: z.string().trim().max(16).optional(),
+});
+
 export const rejectProductPromotionBodySchema = z.object({
   comment: z
     .union([z.string(), z.null()])
