@@ -13,6 +13,7 @@ export const postShippingEstimateController = async (req, res) => {
     productIds: Array.isArray(req.body?.productIds) ? req.body.productIds : [],
     deliveryLat: Number(req.body?.deliveryLat),
     deliveryLon: Number(req.body?.deliveryLon),
+    deliveryAddress: req.body?.deliveryAddress,
   });
   return successRes(res, result);
 };

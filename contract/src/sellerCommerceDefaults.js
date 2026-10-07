@@ -23,10 +23,15 @@ import {
 } from "./productPickupLocations.js";
 import {
   PRODUCT_DELIVERY_CARRIERS,
+  PRODUCT_DELIVERY_CARRIER_GITORG,
   PRODUCT_DELIVERY_CARRIER_SELLER,
   productDeliveryCarrierWriteSchema,
   resolveProductDeliveryCarrier,
 } from "./productDeliveryCarrier.js";
+import {
+  SHIPPING_BUYER_REGION_BLOCK_UNKNOWN,
+  SHIPPING_BUYER_REGION_UNKNOWN_MESSAGE,
+} from "./shippingProvider.js";
 
 /**
  * Откуда товар берёт адрес продажи и перевозчика.
@@ -65,6 +70,82 @@ export const SELLER_PAYMENT_METHOD_NOT_ACCEPTED_MESSAGE =
 
 export const PRODUCT_FULFILLMENT_SOURCE_PROFILE_CONFLICT_MESSAGE =
   "Товар следует настройкам профиля — свой адрес и доставку для него задавать нельзя";
+
+export const SELLER_DELIVERY_OUT_OF_REGION_MESSAGE =
+  "Продавец не доставляет в ваш регион. Выберите самовывоз или другой адрес.";
+
+/** Адрес покупателя в другом регионе, а продавец туда не возит. */
+export const SELLER_DELIVERY_REGION_BLOCK_OUT_OF_REGION = "seller_region";
+
+/**
+ * Перевозчики, на которых действует «не возить в другие регионы»: своя
+ * доставка и курьеры Gitorg. У ЛОБО зона жёсткая и от продавца не зависит,
+ * СДЭК и Яндекс везут по стране по договору продавца.
+ */
+export const SELLER_DELIVERY_REGION_LIMITED_CARRIERS = [
+  PRODUCT_DELIVERY_CARRIER_SELLER,
+  PRODUCT_DELIVERY_CARRIER_GITORG,
+];
+
+/**
+ * Возит ли продавец за пределы своего региона.
+ *
+ * Поля нет у всех, кто настроил профиль раньше, и у тех, кто его не
+ * настраивал вовсе, — для них всё остаётся как было: возит.
+ *
+ * @param {{ sellerFulfillmentDefaults?: { deliveryOutsideRegionEnabled?: boolean | null } | null } | null | undefined} user
+ * @returns {boolean}
+ */
+export function isSellerDeliveryOutsideRegionEnabled(user) {
+  return user?.sellerFulfillmentDefaults?.deliveryOutsideRegionEnabled !== false;
+}
+
+/**
+ * Довезёт ли продавец до адреса покупателя. `null` — довезёт.
+ *
+ * Регион продажи неизвестен — не режем: запретить доставку из-за дыры в
+ * наших данных хуже, чем пропустить заказ, который продавец всё равно видит.
+ * А вот неизвестный регион покупателя при включённом ограничении — отказ:
+ * иначе ограничение обходится адресом, набранным мимо подсказок.
+ *
+ * @param {{
+ *   deliveryOutsideRegionEnabled: boolean;
+ *   carrier: string | null | undefined;
+ *   sellerRegionCode: string | null | undefined;
+ *   buyerRegionCode: string | null | undefined;
+ * }} input
+ * @returns {"seller_region" | "buyer_region_unknown" | null}
+ */
+export function resolveSellerDeliveryRegionBlock({
+  deliveryOutsideRegionEnabled,
+  carrier,
+  sellerRegionCode,
+  buyerRegionCode,
+}) {
+  if (deliveryOutsideRegionEnabled !== false) return null;
+  if (!SELLER_DELIVERY_REGION_LIMITED_CARRIERS.includes(String(carrier ?? ""))) {
+    return null;
+  }
+  const zone = String(sellerRegionCode ?? "")
+    .trim()
+    .toUpperCase();
+  if (!zone) return null;
+  const buyer = String(buyerRegionCode ?? "")
+    .trim()
+    .toUpperCase();
+  if (!buyer) return SHIPPING_BUYER_REGION_BLOCK_UNKNOWN;
+  return zone === buyer ? null : SELLER_DELIVERY_REGION_BLOCK_OUT_OF_REGION;
+}
+
+/**
+ * @param {string | null | undefined} block — причина из `resolveSellerDeliveryRegionBlock`
+ * @returns {string}
+ */
+export function buildSellerDeliveryRegionBlockMessage(block) {
+  return block === SHIPPING_BUYER_REGION_BLOCK_UNKNOWN
+    ? SHIPPING_BUYER_REGION_UNKNOWN_MESSAGE
+    : SELLER_DELIVERY_OUT_OF_REGION_MESSAGE;
+}
 
 /**
  * Продавец, который ничего не выбирал, принимает всё.
@@ -137,6 +218,11 @@ export const sellerCommerceDefaultsBodySchema = z
     regionCode: optionalRuRegionCodeFieldSchema,
     /** Тариф собственной доставки; у остальных перевозчиков не применяется. */
     deliveryTariff: sellerDeliveryTariffSchema.optional(),
+    /**
+     * Возить ли покупателям из других регионов. Не прислали (старый клиент,
+     * мобилка) — сервер оставляет прежнее значение.
+     */
+    deliveryOutsideRegionEnabled: z.boolean().optional(),
   })
   .superRefine((body, ctx) => {
     // Платный тариф при чужом перевозчике не сработал бы никогда: сумму
@@ -183,6 +269,7 @@ export const sellerCommerceDefaultsDataSchema = z.object({
     perKmRub: z.number(),
     freeFromRub: z.number(),
   }),
+  deliveryOutsideRegionEnabled: z.boolean().default(true),
   paymentMethods: z.array(z.enum(ORDER_PAYMENT_METHODS)),
   /** Сколько товаров сейчас следуют профилю — показываем в предупреждении. */
   followingProductCount: z.number().int().min(0).nullable(),

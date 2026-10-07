@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
+  SHIPPING_BUYER_REGION_UNKNOWN_MESSAGE,
   SHIPPING_PROVIDER_LOBO,
   SHIPPING_PROVIDER_CDEK,
   SHIPPING_PROVIDER_PRIMARY,
@@ -10,7 +11,9 @@ import {
   SHIPPING_PROVIDERS,
   SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT,
   SHIPPING_PROVIDERS_ENABLED,
+  buildShippingBuyerRegionBlockMessage,
   buildShippingTrackingUrl,
+  resolveShippingBuyerRegionBlock,
   isShippingProviderLive,
   isShippingProviderAvailableInRegion,
   listLiveShippingProvidersForRegion,
@@ -55,6 +58,42 @@ describe("shippingProvider scaffold", () => {
     assert.equal(
       isShippingProviderAvailableInRegion(SHIPPING_PROVIDER_CDEK, "RU-MOW"),
       true,
+    );
+  });
+
+  it("ЛОБО не везёт покупателю из другого региона", () => {
+    assert.equal(
+      resolveShippingBuyerRegionBlock(SHIPPING_PROVIDER_LOBO, "RU-CE"),
+      null,
+    );
+    assert.equal(
+      resolveShippingBuyerRegionBlock(SHIPPING_PROVIDER_LOBO, "RU-MOW"),
+      "buyer_region",
+      "товар из Грозного заказали с доставкой в Москву",
+    );
+    // Регион адреса не определился — с зональной службой не пускаем.
+    assert.equal(
+      resolveShippingBuyerRegionBlock(SHIPPING_PROVIDER_LOBO, null),
+      "buyer_region_unknown",
+    );
+    // Службы без зоны и доставка продавцом регион покупателя не проверяют.
+    assert.equal(
+      resolveShippingBuyerRegionBlock(SHIPPING_PROVIDER_CDEK, "RU-MOW"),
+      null,
+    );
+    assert.equal(resolveShippingBuyerRegionBlock("seller", ""), null);
+    assert.equal(resolveShippingBuyerRegionBlock(null, "RU-MOW"), null);
+
+    assert.match(
+      buildShippingBuyerRegionBlockMessage(SHIPPING_PROVIDER_LOBO, "buyer_region"),
+      /ЛОБО доставляет только по Чеченской Республике/,
+    );
+    assert.equal(
+      buildShippingBuyerRegionBlockMessage(
+        SHIPPING_PROVIDER_LOBO,
+        "buyer_region_unknown",
+      ),
+      SHIPPING_BUYER_REGION_UNKNOWN_MESSAGE,
     );
   });
 

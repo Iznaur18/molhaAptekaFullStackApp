@@ -15,10 +15,18 @@ import { CHECKOUT_FORM_UI } from "../../../shared/config/appUiCopy.js";
  * @param {{
  *   productIds: string[];
  *   deliveryGeo: { lat: number; lon: number } | null;
+ *   deliveryAddressLine?: string;
  *   onCost?: (cost: { feeRub: number; label: string; approximate: boolean } | null) => void;
+ *   onBlock?: (message: string) => void;
  * }} props
  */
-export function CheckoutShippingEstimate({ productIds, deliveryGeo, onCost }) {
+export function CheckoutShippingEstimate({
+  productIds,
+  deliveryGeo,
+  deliveryAddressLine = "",
+  onCost,
+  onBlock,
+}) {
   const [state, setState] = useState(/** @type {any} */ (null));
 
   const lat = Number(deliveryGeo?.lat);
@@ -38,6 +46,7 @@ export function CheckoutShippingEstimate({ productIds, deliveryGeo, onCost }) {
           productIds: key.split(","),
           deliveryLat: lat,
           deliveryLon: lon,
+          deliveryAddress: deliveryAddressLine,
         });
         if (!cancelled) setState(result);
       } catch {
@@ -49,7 +58,7 @@ export function CheckoutShippingEstimate({ productIds, deliveryGeo, onCost }) {
     return () => {
       cancelled = true;
     };
-  }, [key, lat, lon]);
+  }, [key, lat, lon, deliveryAddressLine]);
 
   // Цену службы показывает и итог корзины: покупатель должен видеть, во
   // сколько обойдётся заказ вместе с доставкой.
@@ -68,9 +77,28 @@ export function CheckoutShippingEstimate({ productIds, deliveryGeo, onCost }) {
     return () => onCost(null);
   }, [state, onCost]);
 
+  // Служба не возит по этому адресу — форма не должна дать оформить заказ.
+  const blockMessage =
+    state && !state.available && state.blocking === true
+      ? String(state.message ?? "") || CHECKOUT_FORM_UI.SHIPPING_ESTIMATE_OUT_OF_ZONE
+      : "";
+  useEffect(() => {
+    if (!onBlock) return undefined;
+    onBlock(blockMessage);
+    return () => onBlock("");
+  }, [blockMessage, onBlock]);
+
   if (!state) return null;
   // Товар везёт продавец или курьеры Gitorg — считать нечего.
   if (!state.available && state.reason === "not_external") return null;
+
+  if (blockMessage) {
+    return (
+      <p className="checkout-form__error" role="alert">
+        <span className="checkout-form__error-text">{blockMessage}</span>
+      </p>
+    );
+  }
 
   if (!state.available) {
     return (

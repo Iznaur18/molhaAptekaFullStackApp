@@ -7,6 +7,7 @@ import {
   SELLER_FULFILLMENT_DEFAULTS_NOT_SET_MESSAGE,
   SELLER_PAYMENT_METHODS_DEFAULT,
   buildLegacyDeliveryFlags,
+  isSellerDeliveryOutsideRegionEnabled,
   resolveSellerFulfillmentDefaults,
   normalizeSellerDeliveryTariff,
   resolveSellerPaymentMethods,
@@ -49,6 +50,7 @@ export function projectSellerCommerceDefaults(user, followingProductCount = null
     pickupLocations: fulfillment?.pickupLocations ?? [],
     regionCode: fulfillment?.regionCode ?? null,
     deliveryTariff: fulfillment?.deliveryTariff ?? { ...FREE_SELLER_DELIVERY_TARIFF },
+    deliveryOutsideRegionEnabled: isSellerDeliveryOutsideRegionEnabled(user),
     paymentMethods: resolveSellerPaymentMethods(user),
     followingProductCount,
   };
@@ -218,6 +220,7 @@ async function assertCarrierUsable(carrier) {
  *   paymentMethods: string[];
  *   regionCode?: string | null;
  *   deliveryTariff?: unknown;
+ *   deliveryOutsideRegionEnabled?: boolean;
  * }} input
  */
 export async function saveSellerCommerceDefaults({
@@ -228,6 +231,7 @@ export async function saveSellerCommerceDefaults({
   paymentMethods,
   regionCode = null,
   deliveryTariff = null,
+  deliveryOutsideRegionEnabled,
 }) {
   const carrier = String(deliveryCarrier ?? "").trim();
   // Схема ручки это уже проверила, но сервис зовут и мимо неё (миграции,
@@ -275,6 +279,12 @@ export async function saveSellerCommerceDefaults({
       carrier === PRODUCT_DELIVERY_CARRIER_SELLER
         ? normalizeSellerDeliveryTariff(deliveryTariff)
         : { ...FREE_SELLER_DELIVERY_TARIFF },
+    // Клиент, который про настройку не знает (мобилка, старая вкладка), её
+    // не присылает — и не должен молча снять чужой запрет.
+    deliveryOutsideRegionEnabled:
+      typeof deliveryOutsideRegionEnabled === "boolean"
+        ? deliveryOutsideRegionEnabled
+        : isSellerDeliveryOutsideRegionEnabled(before),
     updatedAt: new Date(),
   };
 

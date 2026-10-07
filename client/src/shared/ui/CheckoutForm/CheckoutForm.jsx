@@ -191,6 +191,7 @@ export function CheckoutForm({
   });
   const [paymentMethod, setPaymentMethod] = useState(ORDER_PAYMENT_METHOD_DEFAULT);
   const [localError, setLocalError] = useState("");
+  const [carrierZoneBlock, setCarrierZoneBlock] = useState("");
   const [deliveryMapOpen, setDeliveryMapOpen] = useState(false);
 
   const deliverySelectable = PRODUCT_DELIVERY_FULFILLMENT_ENABLED && deliveryAvailable;
@@ -500,6 +501,12 @@ export function CheckoutForm({
         setLocalError(validationError);
         return;
       }
+    }
+
+    // Служба сюда не возит — сервер заказ всё равно отклонит, говорим сразу.
+    if (needsDelivery && carrierZoneBlock) {
+      setLocalError(carrierZoneBlock);
+      return;
     }
 
     if (expressChosen) {
@@ -939,7 +946,9 @@ export function CheckoutForm({
                       <CheckoutShippingEstimate
                         productIds={deliveryProductIds}
                         deliveryGeo={deliveryAddress.geo ?? null}
+                        deliveryAddressLine={String(deliveryAddress.line ?? "").trim()}
                         onCost={onCarrierCost ?? undefined}
+                        onBlock={setCarrierZoneBlock}
                       />
                     )}
                   </>

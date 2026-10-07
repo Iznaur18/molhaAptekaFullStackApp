@@ -275,6 +275,8 @@ export const CHECKOUT_FORM_UI = {
   SHIPPING_PROVIDER_YANDEX_EXPRESS: "Яндекс Экспресс",
   SHIPPING_ESTIMATE_UNAVAILABLE:
     "Стоимость доставки посчитаем позже — её назовёт курьер.",
+  SHIPPING_ESTIMATE_OUT_OF_ZONE:
+    "Служба доставки не возит по этому адресу. Выберите самовывоз или другой адрес.",
   SHIPPING_PROVIDER_SOON: "Скоро",
   LABEL_SHIPPING_SERVICE: "Тип доставки",
   SHIPPING_SERVICE_COURIER: "Курьер",

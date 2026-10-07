@@ -1,14 +1,36 @@
 import {
   PRODUCT_DELIVERY_CARRIER_LOBO,
+  buildShippingBuyerRegionBlockMessage,
   isDeliveryCarrierAvailableInRegion,
   resolveProductDeliveryCarrier,
+  resolveShippingBuyerRegionBlock,
 } from "@molha/api-contract";
 
 import { AppError } from "../../errors/AppError.js";
 import { ProductModel, UserModel } from "../../models/index.js";
+import { findSellerDeliveryRegionBlock } from "../order/sellerDeliveryRegionGuard.js";
+import { verifyRuDeliveryAddress } from "../../utils/dadata/verifyRuDeliveryAddress.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 
 import { estimateLoboDelivery, isLoboConfigured } from "./lobo/loboClient.js";
+
+/**
+ * Регион адреса покупателя. Пустая строка — определить не удалось.
+ *
+ * @param {string} addressLine
+ */
+const resolveBuyerRegionCode = async (addressLine) => {
+  try {
+    const verified = await verifyRuDeliveryAddress({ addressLine });
+    return String(verified?.regionCode ?? "").trim();
+  } catch (error) {
+    logServerEvent("error", {
+      event: "shipping_estimate_buyer_region_failed",
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return "";
+  }
+};
 
 /**
  * Сколько будет стоить доставка этих товаров по этому адресу.
@@ -21,12 +43,14 @@ import { estimateLoboDelivery, isLoboConfigured } from "./lobo/loboClient.js";
  *   productIds: string[];
  *   deliveryLat: number;
  *   deliveryLon: number;
+ *   deliveryAddress?: string;
  * }} input
  */
 export async function estimateShipmentDelivery({
   productIds,
   deliveryLat,
   deliveryLon,
+  deliveryAddress = "",
 }) {
   if (!Array.isArray(productIds) || productIds.length === 0) {
     throw new AppError(400, "Не указаны товары");
@@ -43,6 +67,26 @@ export async function estimateShipmentDelivery({
 
   if (products.length === 0) {
     throw new AppError(404, "Товары не найдены");
+  }
+
+  // Старый клиент строку адреса не шлёт: его остановит сам createOrder.
+  const addressLine = String(deliveryAddress ?? "").trim();
+
+  // Продавец мог запретить доставку в чужие регионы. Говорим об этом здесь,
+  // до оформления: тот же запрет в createOrder покупатель увидел бы уже
+  // после кнопки.
+  if (addressLine) {
+    const sellerRegionBlock = await findSellerDeliveryRegionBlock({
+      items: products.map((product) => ({
+        sellerId: product.productSeller,
+        carrier: resolveProductDeliveryCarrier(product),
+        regionCode: product.productRegionCode,
+      })),
+      resolveBuyerRegionCode: () => resolveBuyerRegionCode(addressLine),
+    });
+    if (sellerRegionBlock) {
+      return { available: false, blocking: true, ...sellerRegionBlock };
+    }
   }
 
   // Считаем только то, что везёт внешняя служба: у доставки продавцом и
@@ -62,6 +106,26 @@ export async function estimateShipmentDelivery({
   const regionCode = String(first.productRegionCode ?? "").trim();
   if (!isDeliveryCarrierAvailableInRegion(PRODUCT_DELIVERY_CARRIER_LOBO, regionCode)) {
     return { available: false, reason: "region" };
+  }
+
+  // Зона службы касается и покупателя. Адрес разбираем тем же путём, что и
+  // при оформлении, — иначе корзина пообещает то, что заказ потом отклонит.
+  if (addressLine) {
+    const block = resolveShippingBuyerRegionBlock(
+      PRODUCT_DELIVERY_CARRIER_LOBO,
+      await resolveBuyerRegionCode(addressLine),
+    );
+    if (block) {
+      return {
+        available: false,
+        reason: block,
+        blocking: true,
+        message: buildShippingBuyerRegionBlockMessage(
+          PRODUCT_DELIVERY_CARRIER_LOBO,
+          block,
+        ),
+      };
+    }
   }
 
   const pickupLat = Number(first.productPickupLat);
