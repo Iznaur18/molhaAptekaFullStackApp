@@ -48,6 +48,7 @@ import { up as catalogPriceIndexUp } from "./20260915-catalog-price-index.js";
 import { up as restoreCdekOrder6ce3a1a8Up } from "./20260927-restore-cdek-order-6ce3a1a8.js";
 import { up as catalogCategoryTreeUp } from "./20261006-catalog-category-tree.js";
 import { up as reassignDetachedAutoProductsUp } from "./20261006-reassign-detached-auto-products.js";
+import { up as productCategoryBreadcrumbDedupeUp } from "./20261007-product-category-breadcrumb-dedupe.js";
 
 export const MIGRATIONS = [
   {
@@ -314,5 +315,11 @@ export const MIGRATIONS = [
     description:
       "Put 24 auto products left without a subcategory by the catalog tree migration into new leaves",
     up: reassignDetachedAutoProductsUp,
+  },
+  {
+    id: "20261007-product-category-breadcrumb-dedupe",
+    description:
+      "Remove the repeated last subcategory from product category breadcrumbs",
+    up: productCategoryBreadcrumbDedupeUp,
   },
 ];
