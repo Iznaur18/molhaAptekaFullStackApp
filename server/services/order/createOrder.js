@@ -15,7 +15,9 @@ import {
   SHIPPING_SERVICE_PICKUP_POINT,
   YANDEX_DELIVERY_CARD_ONLY_MESSAGE,
   SELLER_PAYMENT_METHOD_NOT_ACCEPTED_MESSAGE,
+  buildShippingBuyerRegionBlockMessage,
   isPaymentMethodAcceptedBySeller,
+  resolveShippingBuyerRegionBlock,
   resolveProductDeliveryCarrier,
 } from "@molha/api-contract";
 
@@ -27,6 +29,7 @@ import { buildStoredShipments } from "./orderShipments.js";
 import { resolveOrderFulfillmentSplit } from "./resolveOrderFulfillmentSplit.js";
 import { resolveDeliveryFeesBySeller } from "../courier/courierDeliveryFee.js";
 import { resolveOrderDeliveryGeo } from "./resolveOrderDeliveryGeo.js";
+import { findSellerDeliveryRegionBlock } from "./sellerDeliveryRegionGuard.js";
 import { resolveCdekOrderShipment } from "../shipping/cdek/resolveCdekOrderShipment.js";
 import { resolveYandexDeliveryOrderShipment } from "../shipping/yandex/yandexDeliveryShipment.js";
 import { resolveYandexExpressOrderShipment } from "../shipping/yandex/yandexExpress.js";
@@ -214,7 +217,7 @@ export const fetchAvailableProductsForOrder = async (productIds) => {
       // productDeliveryCarrier обязателен: у ЛОБО оба старых флага сняты,
       // и без явного поля resolveProductDeliveryCarrier возвращал null —
       // заказ падал с «Доставка недоступна для одного из товаров».
-      "_id productPrice productName loyaltyPointsPerUnit productSeller productPickupAddress productPickupLat productPickupLon productPickupLocations productPickupEnabled productDeliveryEnabled productCourierDeliveryEnabled productDeliveryCarrier productWholesaleEnabled productWholesaleMinQty productWholesalePrice affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
+      "_id productPrice productName loyaltyPointsPerUnit productSeller productPickupAddress productPickupLat productPickupLon productPickupLocations productPickupEnabled productDeliveryEnabled productCourierDeliveryEnabled productDeliveryCarrier productRegionCode productWholesaleEnabled productWholesaleMinQty productWholesalePrice affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
     )
     .lean();
 
@@ -239,6 +242,7 @@ export const fetchAvailableProductsForOrder = async (productIds) => {
       deliveryEnabled: product.productDeliveryEnabled === true,
       courierDeliveryEnabled: product.productCourierDeliveryEnabled === true,
       deliveryCarrier: resolveProductDeliveryCarrier(product),
+      regionCode: String(product.productRegionCode ?? "").trim(),
       wholesaleEnabled: product.productWholesaleEnabled === true,
       wholesaleMinQty: product.productWholesaleMinQty ?? null,
       wholesalePrice: product.productWholesalePrice ?? null,
@@ -558,7 +562,7 @@ export async function createOrder({
       );
       const product = await ProductModel.findById(productId)
         .select(
-          "loyaltyPointsPerUnit productSeller productPickupAddress productPickupLat productPickupLon productPickupLocations productPickupEnabled productDeliveryEnabled productCourierDeliveryEnabled affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
+          "loyaltyPointsPerUnit productSeller productPickupAddress productPickupLat productPickupLon productPickupLocations productPickupEnabled productDeliveryEnabled productCourierDeliveryEnabled productRegionCode affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",
         )
         .lean();
       if (!product) {
@@ -580,6 +584,7 @@ export async function createOrder({
         deliveryEnabled: product.productDeliveryEnabled === true,
         courierDeliveryEnabled: product.productCourierDeliveryEnabled === true,
         deliveryCarrier: resolveProductDeliveryCarrier(product),
+        regionCode: String(product.productRegionCode ?? "").trim(),
         wholesaleEnabled: false,
         wholesaleMinQty: null,
         wholesalePrice: null,
@@ -781,6 +786,38 @@ export async function createOrder({
 
   if (!addressForOrder?.displayAddress) {
     throw new AppError(400, "Адрес доставки обязателен");
+  }
+
+  // Служба с зоной (ЛОБО — только Чечня) должна доезжать и до покупателя:
+  // регион товара проверен при выборе службы, а адрес заказа — нигде. Пункты
+  // СДЭК и Яндекса сюда не попадают: у них зоны нет.
+  if (fulfillmentSplit.hasDelivery) {
+    for (const carrier of new Set(Object.values(deliveryCarrierBySeller))) {
+      const block = resolveShippingBuyerRegionBlock(
+        carrier,
+        addressForOrder.regionCode,
+      );
+      if (block) {
+        throw new AppError(400, buildShippingBuyerRegionBlockMessage(carrier, block));
+      }
+    }
+
+    // Продавец мог запретить доставку в чужие регионы — это его настройка в
+    // профиле, и корзина её показывает, но оформить можно и мимо корзины.
+    const sellerRegionBlock = await findSellerDeliveryRegionBlock({
+      items: fulfillmentSplit.deliveryProductIds.map((productId) => {
+        const snapshot = productById[String(productId)];
+        return {
+          sellerId: snapshot?.sellerId,
+          carrier: deliveryCarrierBySeller[String(snapshot?.sellerId ?? "")],
+          regionCode: snapshot?.regionCode,
+        };
+      }),
+      resolveBuyerRegionCode: () => addressForOrder.regionCode,
+    });
+    if (sellerRegionBlock) {
+      throw new AppError(400, sellerRegionBlock.message);
+    }
   }
 
   const orderGeo = resolveOrderDeliveryGeo({

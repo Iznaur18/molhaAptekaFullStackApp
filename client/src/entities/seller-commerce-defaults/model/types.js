@@ -15,6 +15,7 @@
  * @property {string} deliveryCarrier пусто — доставки нет, только самовывоз
  * @property {SellerFulfillmentPoint[]} pickupLocations
  * @property {string | null} regionCode
+ * @property {boolean} [deliveryOutsideRegionEnabled] возит ли в другие регионы; нет поля — возит
  * @property {string[]} paymentMethods
  * @property {number | null} followingProductCount сколько товаров сейчас следуют профилю
  * @property {number} [syncedProductCount] сколько задело последнее сохранение

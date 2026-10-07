@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { mongoIdSchema } from "./mongoId.js";
+import { ADDRESS_LINE_MAX_LENGTH } from "./userFields.js";
 
 /** Провайдеры доставки. Живой пока один — ЛОБО. */
 export const SHIPPING_PROVIDER_LOBO = "lobo";
@@ -57,6 +58,57 @@ export function isShippingProviderAvailableInRegion(providerId, regionCode) {
   return regions.includes(code);
 }
 
+/** Адрес покупателя вне зоны службы. */
+export const SHIPPING_BUYER_REGION_BLOCK_OUT_OF_ZONE = "buyer_region";
+/** Регион адреса покупателя определить не удалось. */
+export const SHIPPING_BUYER_REGION_BLOCK_UNKNOWN = "buyer_region_unknown";
+
+/** Куда служба возит — словами, для отказа покупателю. */
+const SHIPPING_PROVIDER_ZONE_LABEL_RU = {
+  [SHIPPING_PROVIDER_LOBO]: "по Чеченской Республике",
+};
+
+export const SHIPPING_BUYER_REGION_UNKNOWN_MESSAGE =
+  "Не удалось определить регион адреса доставки. Выберите адрес из подсказок или оформите самовывоз.";
+
+/**
+ * Довезёт ли служба до адреса покупателя.
+ *
+ * Регион товара проверяется при выборе службы продавцом, но этого мало:
+ * покупатель из другого региона видит тот же товар и ту же доставку. `null` —
+ * везёт; иначе причина отказа.
+ *
+ * @param {string | null | undefined} providerId
+ * @param {string | null | undefined} buyerRegionCode
+ * @returns {"buyer_region" | "buyer_region_unknown" | null}
+ */
+export function resolveShippingBuyerRegionBlock(providerId, buyerRegionCode) {
+  const regions = SHIPPING_PROVIDER_REGIONS[String(providerId ?? "")];
+  if (regions == null) return null;
+  const code = String(buyerRegionCode ?? "").trim();
+  if (!code) return SHIPPING_BUYER_REGION_BLOCK_UNKNOWN;
+  return isShippingProviderAvailableInRegion(providerId, code)
+    ? null
+    : SHIPPING_BUYER_REGION_BLOCK_OUT_OF_ZONE;
+}
+
+/**
+ * Текст отказа для причины из `resolveShippingBuyerRegionBlock`.
+ *
+ * @param {string | null | undefined} providerId
+ * @param {string | null | undefined} block
+ * @returns {string}
+ */
+export function buildShippingBuyerRegionBlockMessage(providerId, block) {
+  if (block === SHIPPING_BUYER_REGION_BLOCK_UNKNOWN) {
+    return SHIPPING_BUYER_REGION_UNKNOWN_MESSAGE;
+  }
+  const id = String(providerId ?? "");
+  const label = SHIPPING_PROVIDER_LABEL_RU[id] ?? "Служба доставки";
+  const zone = SHIPPING_PROVIDER_ZONE_LABEL_RU[id] ?? "в своём регионе";
+  return `${label} доставляет только ${zone}. Выберите самовывоз или другой адрес.`;
+}
+
 export const SHIPPING_SERVICE_PICKUP_POINT = "pickup_point";
 export const SHIPPING_SERVICE_COURIER = "courier";
 
@@ -104,6 +156,9 @@ export const shippingEstimateBodySchema = z.object({
   productIds: z.array(mongoIdSchema).min(1).max(50),
   deliveryLat: z.coerce.number().min(-90).max(90),
   deliveryLon: z.coerce.number().min(-180).max(180),
+  // По строке адреса сервер узнаёт регион покупателя: по одним координатам
+  // его не определить, а служба с зоной туда может не возить.
+  deliveryAddress: z.string().trim().max(ADDRESS_LINE_MAX_LENGTH).optional(),
 });
 
 /** Body `PATCH /staff/shipping-carriers/:carrierId`. */

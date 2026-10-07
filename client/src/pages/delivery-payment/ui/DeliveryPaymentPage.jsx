@@ -3,6 +3,7 @@ import { CircleAlert, CircleCheck } from "lucide-react";
 import {
   FREE_SELLER_DELIVERY_TARIFF,
   PRODUCT_DELIVERY_CARRIER_SELLER,
+  SELLER_DELIVERY_REGION_LIMITED_CARRIERS,
   SELLER_PAYOUT_REQUISITES_MAX_LENGTH,
   normalizeSellerDeliveryTariff,
 } from "@molha/api-contract";
@@ -63,6 +64,7 @@ function formFromDefaults(defaults) {
     productDeliveryCarrier: String(defaults?.deliveryCarrier ?? ""),
     productRegionCode: String(defaults?.regionCode ?? ""),
     deliveryTariff: normalizeSellerDeliveryTariff(defaults?.deliveryTariff),
+    deliveryOutsideRegionEnabled: defaults?.deliveryOutsideRegionEnabled !== false,
     paymentMethods:
       Array.isArray(defaults?.paymentMethods) && defaults.paymentMethods.length > 0
         ? defaults.paymentMethods
@@ -112,6 +114,7 @@ function validateDeliveryPaymentForm(input) {
  *     productDeliveryCarrier?: string;
  *     paymentMethods: string[];
  *     deliveryTariff: unknown;
+ *     deliveryOutsideRegionEnabled?: boolean;
  *     productRegionCode?: string;
  *   };
  *   ownDelivery: boolean;
@@ -133,6 +136,7 @@ function buildCommerceDefaultsPayload({ locations, form, ownDelivery }) {
     deliveryTariff: ownDelivery
       ? form.deliveryTariff
       : { ...FREE_SELLER_DELIVERY_TARIFF },
+    deliveryOutsideRegionEnabled: form.deliveryOutsideRegionEnabled !== false,
     ...(form.productRegionCode ? { regionCode: String(form.productRegionCode) } : {}),
   };
 }
@@ -176,6 +180,9 @@ export function DeliveryPaymentPage() {
   const isSubmitting = saveMutation.isPending || patchMutation.isPending;
   const ownDelivery =
     String(form.productDeliveryCarrier ?? "") === PRODUCT_DELIVERY_CARRIER_SELLER;
+  const regionLimitApplies = SELLER_DELIVERY_REGION_LIMITED_CARRIERS.includes(
+    String(form.productDeliveryCarrier ?? ""),
+  );
   const locations = Array.isArray(form.productPickupLocations)
     ? form.productPickupLocations
     : [];
@@ -345,6 +352,46 @@ export function DeliveryPaymentPage() {
             }}
           />
         </fieldset>
+
+        {regionLimitApplies ? (
+          <fieldset className="delivery-payment-page__block">
+            <legend className="delivery-payment-page__legend">
+              {SELLER_COMMERCE_DEFAULTS_UI.SECTION_DELIVERY_ZONE}
+            </legend>
+            <label
+              className={[
+                "delivery-payment-page__method",
+                form.deliveryOutsideRegionEnabled
+                  ? "delivery-payment-page__method--on"
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              <input
+                className="delivery-payment-page__method-input"
+                type="checkbox"
+                checked={form.deliveryOutsideRegionEnabled}
+                onChange={(event) => {
+                  setSavedMessage("");
+                  setForm((prev) => ({
+                    ...prev,
+                    deliveryOutsideRegionEnabled: event.target.checked,
+                  }));
+                }}
+                disabled={isSubmitting}
+              />
+              <span className="delivery-payment-page__method-copy">
+                <span className="delivery-payment-page__method-title">
+                  {SELLER_COMMERCE_DEFAULTS_UI.OUTSIDE_REGION_LABEL}
+                </span>
+                <span className="delivery-payment-page__method-hint">
+                  {SELLER_COMMERCE_DEFAULTS_UI.OUTSIDE_REGION_HINT}
+                </span>
+              </span>
+            </label>
+          </fieldset>
+        ) : null}
 
         {ownDelivery ? (
           <fieldset className="delivery-payment-page__block">
