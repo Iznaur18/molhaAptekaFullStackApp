@@ -51,6 +51,43 @@ describe("CuratedCategoryCompactCard", () => {
     expect(onOpen).toHaveBeenCalledTimes(1);
   });
 
+  it("personal без картинки показывает название вместо общей заглушки", () => {
+    const { container } = renderWithProviders(
+      <CuratedCategoryCompactCard
+        category={{
+          kind: "personal",
+          refId: "p1",
+          itemKey: "personal:p1",
+          label: "Мой магазин",
+          imageUrl: null,
+          sellerId: "s1",
+        }}
+        onOpen={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Мой магазин")).toBeTruthy();
+    expect(container.querySelector("img")).toBeNull();
+  });
+
+  it("tree без картинки остаётся с картинкой-заглушкой", () => {
+    const { container } = renderWithProviders(
+      <CuratedCategoryCompactCard
+        category={{
+          kind: "tree",
+          refId: "t1",
+          itemKey: "tree:t1",
+          label: "Электроника",
+          imageUrl: null,
+        }}
+        onOpen={vi.fn()}
+      />,
+    );
+
+    expect(container.querySelector("img")).not.toBeNull();
+    expect(screen.queryByText("Электроника")).toBeNull();
+  });
+
   it("без showDetails мета не рендерится", () => {
     renderWithProviders(
       <CuratedCategoryCompactCard

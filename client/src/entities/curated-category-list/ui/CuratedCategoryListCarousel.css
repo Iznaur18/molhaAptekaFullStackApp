@@ -17,6 +17,57 @@
   }
 }
 
+/*
+ * Название витрины — первая плитка в ряду, той же формы, что картинки.
+ * Нажатие открывает весь список («Все»).
+ */
+.curated-category-list-carousel__title-tile {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: var(--iz-color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Рамку и пропорции даёт image-wrap карточки; текст лежит поверх, как на картинке. */
+.curated-category-list-carousel__title-tile-body {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.curated-category-list-carousel__title-tile-name {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-size: clamp(0.85rem, 0.8rem + 0.25vw, 1rem);
+  font-family: var(--iz-font-display);
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.curated-category-list-carousel__title-tile:focus-visible
+  .curated-category-compact-card__image-wrap {
+  outline: 2px solid var(--iz-color-text);
+  outline-offset: -2px;
+}
+
 .curated-category-list-carousel__scroll {
   --curated-visible-cards: 5;
   --curated-card-gap: 12px;

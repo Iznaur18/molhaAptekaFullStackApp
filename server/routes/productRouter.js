@@ -81,6 +81,7 @@ import {
   hideProductQuestionController,
   deleteMyProductQuestionController,
   getProductPromotionTariffsController,
+  getProductPromotionBoostProductsController,
   requestProductPromotionController,
   getMyProductPromotionsController,
   getPendingProductPromotionsController,
@@ -156,6 +157,7 @@ import {
   productQuestionIdParamValidation,
   requestProductPromotionValidation,
   myProductPromotionsValidation,
+  productPromotionBoostProductsValidation,
   promotionIdParamValidation,
   rejectProductPromotionValidation,
   replaceProductPromoCodesValidation,
@@ -576,6 +578,11 @@ router.patch(
   setProductRaffleParticipationController,
 );
 router.get("/promotions/tariffs", getProductPromotionTariffsController);
+router.get(
+  "/promotions/boost-products",
+  productPromotionBoostProductsValidation,
+  getProductPromotionBoostProductsController,
+);
 router.get(
   "/promotions/pending/count",
   checkAuthMW,

@@ -49,6 +49,8 @@ import { up as restoreCdekOrder6ce3a1a8Up } from "./20260927-restore-cdek-order-
 import { up as catalogCategoryTreeUp } from "./20261006-catalog-category-tree.js";
 import { up as reassignDetachedAutoProductsUp } from "./20261006-reassign-detached-auto-products.js";
 import { up as productCategoryBreadcrumbDedupeUp } from "./20261007-product-category-breadcrumb-dedupe.js";
+import { up as categoryDefaultCharacteristicsUp } from "./20261009-category-default-characteristics.js";
+import { up as categoryDefaultCharacteristicsAdminRootsUp } from "./20261010-category-default-characteristics-admin-roots.js";
 
 export const MIGRATIONS = [
   {
@@ -321,5 +323,17 @@ export const MIGRATIONS = [
     description:
       "Remove the repeated last subcategory from product category breadcrumbs",
     up: productCategoryBreadcrumbDedupeUp,
+  },
+  {
+    id: "20261009-category-default-characteristics",
+    description:
+      "Fill empty default characteristics of leaf categories from the in-code lists (lists entered in admin untouched)",
+    up: categoryDefaultCharacteristicsUp,
+  },
+  {
+    id: "20261010-category-default-characteristics-admin-roots",
+    description:
+      "Fill empty default characteristics of leaf categories in electronics, food, cafes and donat roots",
+    up: categoryDefaultCharacteristicsAdminRootsUp,
   },
 ];

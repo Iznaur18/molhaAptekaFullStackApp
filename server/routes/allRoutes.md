@@ -253,6 +253,7 @@
 | Метод | Путь                                       | Доступ | Назначение                |
 | ----- | ------------------------------------------ | ------ | ------------------------- |
 | GET   | `/product/promotions/tariffs`              | 🔓     | Тарифы продвижения        |
+| GET   | `/product/promotions/boost-products`       | 🔓     | Товары с «Бустом»         |
 | GET   | `/product/promotions/my`                   | 🔑     | Мои заявки на продвижение |
 | POST  | `/product/:productId/promotions/request`   | 🔑     | Заявка на продвижение     |
 | GET   | `/product/promotions/pending`              | 🛡     | Очередь модерации         |

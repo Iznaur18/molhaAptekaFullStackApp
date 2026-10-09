@@ -28,6 +28,9 @@ export function CuratedCategoryCompactCard({ category, onOpen, showDetails = fal
       : null;
   const businessHours = String(category.sellerBusinessHoursLabel ?? "").trim();
   const isPersonal = category.kind === "personal";
+  // У плитки продавца без своей картинки показываем название, а не общую заглушку:
+  // иначе оплаченные плитки разных продавцов выглядят одинаково.
+  const showLabelInsteadOfImage = isPersonal && (failed || !resolved);
   const showTreeLabel = showDetails && !isPersonal;
   const showSellerMeta = showDetails && isPersonal;
   const showRating = showSellerMeta && ratingAverage != null;
@@ -49,15 +52,23 @@ export function CuratedCategoryCompactCard({ category, onOpen, showDetails = fal
       aria-label={category.label}
     >
       <span className="curated-category-compact-card__image-wrap">
-        <img
-          className="curated-category-compact-card__image"
-          src={imageUrl}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          draggable={false}
-          onError={() => setFailed(true)}
-        />
+        {showLabelInsteadOfImage ? (
+          <span className="curated-category-compact-card__label-fallback">
+            <span className="curated-category-compact-card__label-fallback-text">
+              {category.label}
+            </span>
+          </span>
+        ) : (
+          <img
+            className="curated-category-compact-card__image"
+            src={imageUrl}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            draggable={false}
+            onError={() => setFailed(true)}
+          />
+        )}
       </span>
       {hasDetails ? (
         <span

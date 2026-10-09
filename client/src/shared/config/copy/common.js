@@ -170,6 +170,8 @@ export const API_CLIENT_UI = {
   DELETE_PRODUCT_QUESTION_FALLBACK: "Не удалось удалить вопрос",
   HIDE_PRODUCT_QUESTION_FALLBACK: "Не удалось скрыть вопрос",
   FETCH_PRODUCT_PROMOTION_TARIFFS_FALLBACK: "Не удалось загрузить пакеты продвижения",
+  FETCH_PRODUCT_PROMOTION_BOOST_PRODUCTS_FALLBACK:
+    "Не удалось загрузить товары с продвижением",
   REQUEST_PRODUCT_PROMOTION_FALLBACK: "Не удалось отправить заявку на продвижение",
   FETCH_MY_PRODUCT_PROMOTIONS_FALLBACK: "Не удалось загрузить продвижения",
   FETCH_PRODUCT_PROMOTIONS_QUEUE_FALLBACK: "Не удалось загрузить очередь продвижения",

@@ -70,11 +70,7 @@
   margin: 0;
   padding: 0 var(--curated-scroll-pad-x);
   list-style: none;
-}
-
-.curated-product-list-carousel__item {
-  flex: 0 0 auto;
-  width: clamp(
+  --curated-card-width: clamp(
     var(--curated-card-min-width),
     calc(
       (
@@ -85,6 +81,55 @@
     ),
     var(--curated-card-max-width)
   );
+}
+
+.curated-product-list-carousel__item {
+  flex: 0 0 auto;
+  width: var(--curated-card-width);
+}
+
+/*
+ * Название подборки — первая плитка в ряду, высотой с карточку товара.
+ * Ширина фиксированная при любой длине названия: текст переносится по строкам,
+ * слишком длинное слово рвётся, лишние строки обрезаются. Нажатие открывает
+ * весь список.
+ */
+.curated-product-list-carousel__item_title {
+  align-self: stretch;
+  width: 140px;
+}
+
+.curated-product-list-carousel__item > .curated-product-list-carousel__title-tile {
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 8px;
+  background: var(--curated-card-image-bg);
+  font: inherit;
+  color: var(--iz-color-text);
+  text-align: center;
+}
+
+.curated-product-list-carousel__title-tile:focus-visible {
+  outline: var(--iz-border-selected) solid var(--iz-color-action);
+  outline-offset: -2px;
+}
+
+.curated-product-list-carousel__title-tile-name {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+  /* Размер не растёт с экраном: ширина плитки тоже постоянная. */
+  font-size: 0.85rem;
+  font-family: var(--iz-font-display);
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 
 .curated-product-list-carousel__item > .curated-product-compact-card {

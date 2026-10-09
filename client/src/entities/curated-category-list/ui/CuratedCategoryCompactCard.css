@@ -43,6 +43,29 @@
   object-position: center;
 }
 
+.curated-category-compact-card__label-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  color: var(--iz-color-text);
+  text-align: center;
+}
+
+.curated-category-compact-card__label-fallback-text {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-size: 0.92rem;
+  font-weight: 650;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
 .curated-category-compact-card--detailed {
   text-align: left;
 }
