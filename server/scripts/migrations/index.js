@@ -48,6 +48,7 @@ import { up as catalogPriceIndexUp } from "./20260915-catalog-price-index.js";
 import { up as restoreCdekOrder6ce3a1a8Up } from "./20260927-restore-cdek-order-6ce3a1a8.js";
 import { up as catalogCategoryTreeUp } from "./20261006-catalog-category-tree.js";
 import { up as reassignDetachedAutoProductsUp } from "./20261006-reassign-detached-auto-products.js";
+import { up as categoryDefaultCharacteristicsUp } from "./20261009-category-default-characteristics.js";
 
 export const MIGRATIONS = [
   {
@@ -314,5 +315,11 @@ export const MIGRATIONS = [
     description:
       "Put 24 auto products left without a subcategory by the catalog tree migration into new leaves",
     up: reassignDetachedAutoProductsUp,
+  },
+  {
+    id: "20261009-category-default-characteristics",
+    description:
+      "Fill empty default characteristics of leaf categories from the in-code lists (lists entered in admin untouched)",
+    up: categoryDefaultCharacteristicsUp,
   },
 ];

@@ -383,7 +383,7 @@ export const CATEGORY_TREE_ADMIN_PAGE_UI = {
   KEYWORDS_PLACEHOLDER: "телефон, смартфон",
   LABEL_DEFAULT_CHARACTERISTICS: "Характеристики по умолчанию",
   DEFAULT_CHARACTERISTICS_HINT:
-    "По одной на строку. Подставляются продавцу при создании товара (можно удалить). Макс. 10.",
+    "По одной на строку. Подставляются продавцу при создании товара (можно удалить). Макс. 20.",
   DEFAULT_CHARACTERISTICS_PLACEHOLDER: "Состояние\nЦвет\nПамять\nОЗУ",
   LABEL_LEGACY: "Legacy productCategory",
   LEGACY_NONE: "—",
