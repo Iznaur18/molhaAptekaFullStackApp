@@ -1,3 +1,5 @@
+import { EyeOff } from "lucide-react";
+
 import { SELLER_STORE_PAUSE_UI } from "../../../shared/config/appUiCopy.js";
 import {
   useMySellerStorePauseQuery,
@@ -68,6 +70,7 @@ export function SellerStorePauseControl() {
         disabled={mutation.isPending}
         onClick={toggle}
       >
+        <EyeOff size={15} strokeWidth={2.2} aria-hidden="true" />
         {mutation.isPending
           ? SELLER_STORE_PAUSE_UI.PAUSE_PENDING
           : SELLER_STORE_PAUSE_UI.PAUSE_BUTTON}

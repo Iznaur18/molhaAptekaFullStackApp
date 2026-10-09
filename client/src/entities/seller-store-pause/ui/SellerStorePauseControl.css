@@ -6,23 +6,27 @@
   min-width: 0;
 }
 
+/* Ссылка, а не кнопка-таблетка: редкое действие не должно спорить с фильтрами. */
 .seller-store-pause__pause {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   margin: 0;
-  padding: 6px 12px;
-  border: 1px solid var(--iz-color-border-strong, #d1d5db);
-  border-radius: 14px;
-  background: var(--iz-color-surface);
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
   font: inherit;
   font-size: 13px;
   font-weight: 600;
   line-height: 1.2;
-  color: var(--iz-color-text);
+  color: var(--iz-color-action);
   white-space: nowrap;
   cursor: pointer;
 }
 
 .seller-store-pause__pause:hover:not(:disabled) {
-  border-color: var(--iz-color-text-muted);
+  text-decoration: underline;
 }
 
 .seller-store-pause_active {

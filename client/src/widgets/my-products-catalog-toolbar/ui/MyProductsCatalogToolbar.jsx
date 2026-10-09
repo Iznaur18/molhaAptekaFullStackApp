@@ -43,48 +43,54 @@ export function MyProductsCatalogToolbar({
 
   return (
     <ListPageFilterBar className="my-products-catalog-toolbar">
-      <ListPageFilter label={HOME_PAGE_UI.SORT_LABEL}>
-        <ListPageFilterSelect
-          value={catalogSort}
-          onChange={(event) => onCatalogSortChange(event.target.value)}
-        >
-          {CATALOG_SORT_OPTIONS_MY_PRODUCTS.map((sortKey) => (
-            <option key={sortKey} value={sortKey}>
-              {CATALOG_SORT_LABEL_RU[sortKey]}
-            </option>
-          ))}
-        </ListPageFilterSelect>
-      </ListPageFilter>
-      {typeof onMyProductsModerationFilterChange === "function" ? (
-        <ListPageFilter label={HOME_PAGE_UI.MODERATION_STATUS_FILTER_LABEL}>
+      <div className="my-products-catalog-toolbar__filters">
+        <ListPageFilter label={HOME_PAGE_UI.SORT_LABEL}>
           <ListPageFilterSelect
-            value={myProductsModerationFilter}
-            onChange={(event) => onMyProductsModerationFilterChange(event.target.value)}
+            value={catalogSort}
+            onChange={(event) => onCatalogSortChange(event.target.value)}
           >
-            {MY_PRODUCTS_MODERATION_FILTER_OPTIONS.map((filterKey) => (
-              <option key={filterKey || "all"} value={filterKey}>
-                {filterKey
-                  ? MY_PRODUCTS_MODERATION_FILTER_LABEL_RU[filterKey]
-                  : HOME_PAGE_UI.MY_PRODUCTS_FILTER_ALL_OPTION}
+            {CATALOG_SORT_OPTIONS_MY_PRODUCTS.map((sortKey) => (
+              <option key={sortKey} value={sortKey}>
+                {CATALOG_SORT_LABEL_RU[sortKey]}
               </option>
             ))}
           </ListPageFilterSelect>
         </ListPageFilter>
-      ) : null}
-      {productsQuotaText ? (
-        <p
-          className="my-products-catalog-toolbar__quota"
-          aria-label={`${HOME_PAGE_UI.MY_PRODUCTS_QUOTA_LABEL}: ${productsQuotaText}`}
-        >
-          <span className="my-products-catalog-toolbar__quota-label">
-            {HOME_PAGE_UI.MY_PRODUCTS_QUOTA_LABEL}:
-          </span>{" "}
-          <span className="my-products-catalog-toolbar__quota-value">
-            {productsQuotaText}
-          </span>
-        </p>
-      ) : null}
-      <SellerStorePauseControl />
+        {typeof onMyProductsModerationFilterChange === "function" ? (
+          <ListPageFilter label={HOME_PAGE_UI.MODERATION_STATUS_FILTER_LABEL}>
+            <ListPageFilterSelect
+              value={myProductsModerationFilter}
+              onChange={(event) =>
+                onMyProductsModerationFilterChange(event.target.value)
+              }
+            >
+              {MY_PRODUCTS_MODERATION_FILTER_OPTIONS.map((filterKey) => (
+                <option key={filterKey || "all"} value={filterKey}>
+                  {filterKey
+                    ? MY_PRODUCTS_MODERATION_FILTER_LABEL_RU[filterKey]
+                    : HOME_PAGE_UI.MY_PRODUCTS_FILTER_ALL_OPTION}
+                </option>
+              ))}
+            </ListPageFilterSelect>
+          </ListPageFilter>
+        ) : null}
+      </div>
+      <div className="my-products-catalog-toolbar__meta">
+        {productsQuotaText ? (
+          <p
+            className="my-products-catalog-toolbar__quota"
+            aria-label={`${HOME_PAGE_UI.MY_PRODUCTS_QUOTA_LABEL}: ${productsQuotaText}`}
+          >
+            <span className="my-products-catalog-toolbar__quota-label">
+              {HOME_PAGE_UI.MY_PRODUCTS_QUOTA_LABEL}:
+            </span>{" "}
+            <span className="my-products-catalog-toolbar__quota-value">
+              {productsQuotaText}
+            </span>
+          </p>
+        ) : null}
+        <SellerStorePauseControl />
+      </div>
     </ListPageFilterBar>
   );
 }
