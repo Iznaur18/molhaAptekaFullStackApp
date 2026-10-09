@@ -13,6 +13,8 @@ const { PRODUCT_CATEGORY_CATALOG_SEED } =
   await import("../constants/productCategoryCatalogSeed.js");
 const { PRODUCT_CATEGORY_DEFAULT_CHARACTERISTICS_SEED } =
   await import("../constants/productCategoryDefaultCharacteristicsSeed.js");
+const { PRODUCT_CATEGORY_ADMIN_ROOTS_DEFAULT_CHARACTERISTICS_SEED } =
+  await import("../constants/productCategoryAdminRootsDefaultCharacteristicsSeed.js");
 const { default: ProductCategoryModel } =
   await import("../models/ProductCategoryModel.js");
 const {
@@ -32,10 +34,25 @@ describe("встроенные характеристики категорий �
     }
   });
 
-  it("списки укладываются в лимиты и не содержат повторов", () => {
-    for (const [slug, keys] of Object.entries(
-      PRODUCT_CATEGORY_DEFAULT_CHARACTERISTICS_SEED,
+  it("слаги корней вне дерева не пересекаются с зашитым деревом", () => {
+    const treeSlugs = new Set(
+      PRODUCT_CATEGORY_CATALOG_SEED.flatMap(({ rootSlug, nodes }) => [
+        rootSlug,
+        ...nodes.map((node) => node.slug),
+      ]),
+    );
+    for (const slug of Object.keys(
+      PRODUCT_CATEGORY_ADMIN_ROOTS_DEFAULT_CHARACTERISTICS_SEED,
     )) {
+      assert.ok(!treeSlugs.has(slug), `слаг ${slug} занят деревом`);
+    }
+  });
+
+  it("списки укладываются в лимиты и не содержат повторов", () => {
+    for (const [slug, keys] of Object.entries({
+      ...PRODUCT_CATEGORY_DEFAULT_CHARACTERISTICS_SEED,
+      ...PRODUCT_CATEGORY_ADMIN_ROOTS_DEFAULT_CHARACTERISTICS_SEED,
+    })) {
       assert.ok(keys.length > 0, slug);
       assert.ok(keys.length <= PRODUCT_CHARACTERISTICS_MAX_ITEMS, slug);
       assert.equal(
