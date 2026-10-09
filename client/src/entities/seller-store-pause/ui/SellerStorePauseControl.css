@@ -6,27 +6,29 @@
   min-width: 0;
 }
 
-/* Ссылка, а не кнопка-таблетка: редкое действие не должно спорить с фильтрами. */
+/* Пункт меню «⋯» тулбара: на всю ширину меню, без рамки. */
 .seller-store-pause__pause {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
+  width: 100%;
   margin: 0;
-  padding: 2px 4px;
+  padding: 10px 12px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 10px;
   background: none;
   font: inherit;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
-  color: var(--iz-color-action);
+  color: var(--iz-color-text);
+  text-align: left;
   white-space: nowrap;
   cursor: pointer;
 }
 
 .seller-store-pause__pause:hover:not(:disabled) {
-  text-decoration: underline;
+  background: color-mix(in srgb, var(--iz-color-action) 8%, transparent);
 }
 
 .seller-store-pause_active {
@@ -92,6 +94,7 @@
 .seller-store-pause__error {
   flex: 1 1 100%;
   margin: 4px 0 0;
+  padding-inline: 12px;
   font-size: 12px;
   color: var(--iz-color-danger-text, var(--iz-color-danger));
 }

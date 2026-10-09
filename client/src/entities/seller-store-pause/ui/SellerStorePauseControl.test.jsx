@@ -22,6 +22,15 @@ const storePause = (overrides = {}) => ({
   ...overrides,
 });
 
+/** Пункт меню и плашка живут в разных местах тулбара — рендерим оба. */
+const renderControl = () =>
+  renderWithProviders(
+    <>
+      <SellerStorePauseControl mode="action" />
+      <SellerStorePauseControl mode="banner" />
+    </>,
+  );
+
 afterEach(() => {
   vi.restoreAllMocks();
   api.fetchMySellerStorePause.mockReset();
@@ -36,7 +45,7 @@ describe("пауза магазина в «Моих товарах»", () => {
     );
     const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
 
-    renderWithProviders(<SellerStorePauseControl />);
+    renderControl();
     fireEvent.click(
       await screen.findByRole("button", { name: SELLER_STORE_PAUSE_UI.PAUSE_BUTTON }),
     );
@@ -51,7 +60,7 @@ describe("пауза магазина в «Моих товарах»", () => {
     api.fetchMySellerStorePause.mockResolvedValue(storePause());
     vi.spyOn(window, "confirm").mockReturnValue(false);
 
-    renderWithProviders(<SellerStorePauseControl />);
+    renderControl();
     fireEvent.click(
       await screen.findByRole("button", { name: SELLER_STORE_PAUSE_UI.PAUSE_BUTTON }),
     );
@@ -66,7 +75,7 @@ describe("пауза магазина в «Моих товарах»", () => {
     api.setMySellerStorePause.mockResolvedValue(storePause({ visibleProductCount: 2 }));
     vi.spyOn(window, "confirm").mockReturnValue(true);
 
-    renderWithProviders(<SellerStorePauseControl />);
+    renderControl();
     fireEvent.click(
       await screen.findByRole("button", { name: SELLER_STORE_PAUSE_UI.RESUME_BUTTON }),
     );
@@ -82,7 +91,7 @@ describe("пауза магазина в «Моих товарах»", () => {
       storePause({ visibleProductCount: 0 }),
     );
 
-    const { container } = renderWithProviders(<SellerStorePauseControl />);
+    const { container } = renderControl();
 
     await waitFor(() => expect(api.fetchMySellerStorePause).toHaveBeenCalled());
     expect(container.querySelector(".seller-store-pause")).toBeNull();
@@ -93,7 +102,7 @@ describe("пауза магазина в «Моих товарах»", () => {
     api.setMySellerStorePause.mockRejectedValue(new Error("Сервер недоступен"));
     vi.spyOn(window, "confirm").mockReturnValue(true);
 
-    renderWithProviders(<SellerStorePauseControl />);
+    renderControl();
     fireEvent.click(
       await screen.findByRole("button", { name: SELLER_STORE_PAUSE_UI.PAUSE_BUTTON }),
     );
