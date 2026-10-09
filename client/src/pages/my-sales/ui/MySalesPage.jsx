@@ -1,9 +1,16 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
 
-import { filterMySales } from "../../../entities/order/lib/filterMySales.js";
+import {
+  filterMySales,
+  isMySalesGroupFilter,
+} from "../../../entities/order/lib/filterMySales.js";
 import { summarizeMySales } from "../../../entities/order/lib/summarizeMySales.js";
-import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "../../../entities/order/model/myOrdersListFilters.js";
+import {
+  MY_ORDERS_LIST_FILTER_CLOSED,
+  MY_ORDERS_LIST_FILTER_DONE,
+  MY_ORDERS_LIST_FILTER_IN_PROGRESS,
+} from "../../../entities/order/model/myOrdersListFilters.js";
 import { orderQueryKeys } from "../../../entities/order/model/orderQueryKeys.js";
 import { normalizeTotalSalesCount } from "../../../entities/user/lib/formatSearchRowTotalSalesCount.js";
 import { useMySalesQuery } from "../../../entities/order/model/useMySalesQuery.js";
@@ -104,8 +111,9 @@ export function MySalesPage({
     [totalSalesCount],
   );
 
-  const serverStatusFilter =
-    statusFilter === MY_ORDERS_LIST_FILTER_IN_PROGRESS ? "" : statusFilter;
+  // Группу статусов считает сайт, серверу уходит только точный статус.
+  const isGroupFilter = isMySalesGroupFilter(statusFilter);
+  const serverStatusFilter = isGroupFilter ? "" : statusFilter;
 
   const salesParams = useMemo(
     () => ({
@@ -132,8 +140,7 @@ export function MySalesPage({
 
   const totalServer = serverOrders.length;
   const totalVisible = filteredOrders.length;
-  const hasClientFilters =
-    statusFilter === MY_ORDERS_LIST_FILTER_IN_PROGRESS || attentionOnly;
+  const hasClientFilters = isGroupFilter || attentionOnly;
   const hasFilters = Boolean(serverStatusFilter) || hasSearchQuery || hasClientFilters;
   const summaryCountLabel = hasFilters
     ? MY_SALES_PAGE_UI.COUNT_FILTERED(totalVisible, totalServer)
@@ -160,6 +167,14 @@ export function MySalesPage({
   const handleInProgressFilterClick = useCallback(() => {
     setStatusFilter(MY_ORDERS_LIST_FILTER_IN_PROGRESS);
     setAttentionOnly(false);
+  }, []);
+
+  /** «Нужно действие» — отдельно от статуса: включая его, статус сбрасываем. */
+  const handleAttentionOnlyChange = useCallback((value) => {
+    setAttentionOnly(value);
+    if (value) {
+      setStatusFilter("");
+    }
   }, []);
 
   const patchOrders = useCallback(
@@ -570,7 +585,7 @@ export function MySalesPage({
       totalAmountRub={summary.totalAmountRub}
       attentionOnly={attentionOnly}
       onInProgressFilterClick={handleInProgressFilterClick}
-      onAttentionFilterChange={setAttentionOnly}
+      onAttentionFilterChange={handleAttentionOnlyChange}
     />
   );
 
@@ -586,12 +601,12 @@ export function MySalesPage({
       summaryCountLabel={summaryCountLabel}
       totalSalesCount={sellerTotalSalesCount}
       statusFilter={statusFilter}
+      attentionOnly={attentionOnly}
       onStatusFilterChange={(value) => {
         setStatusFilter(value);
-        if (value) {
-          setAttentionOnly(false);
-        }
+        setAttentionOnly(false);
       }}
+      onAttentionOnlyChange={handleAttentionOnlyChange}
       searchTerm={searchTerm}
       onSearchTermChange={setSearchTerm}
       isSearchPending={isSearchPending}
@@ -666,20 +681,20 @@ export function MySalesPage({
   );
 }
 
-const SALES_STATUS_FILTER_OPTIONS = [
-  { value: "", label: MY_SALES_PAGE_UI.STATUS_FILTER_ALL },
-  ...ORDER_STATUSES.map((status) => ({
-    value: status,
-    label: SALES_ORDER_STATUS_LABEL_RU[status],
-  })),
-];
+/** Подробные статусы — под «Ещё статусы», как в «Моих покупках». */
+const SALES_STATUS_FILTER_OPTIONS = ORDER_STATUSES.map((status) => ({
+  value: status,
+  label: SALES_ORDER_STATUS_LABEL_RU[status],
+}));
 
 /**
  * @param {{
  *   summaryCountLabel: string;
  *   totalSalesCount: number;
  *   statusFilter: string;
+ *   attentionOnly: boolean;
  *   onStatusFilterChange: (value: string) => void;
+ *   onAttentionOnlyChange: (value: boolean) => void;
  *   searchTerm: string;
  *   onSearchTermChange: (value: string) => void;
  *   isSearchPending: boolean;
@@ -691,13 +706,43 @@ function SalesToolbar({
   summaryCountLabel,
   totalSalesCount,
   statusFilter,
+  attentionOnly,
   onStatusFilterChange,
+  onAttentionOnlyChange,
   searchTerm,
   onSearchTermChange,
   isSearchPending,
   onRefresh,
   isRefreshing = false,
 }) {
+  const exactStatusSelected =
+    Boolean(statusFilter) && !isMySalesGroupFilter(statusFilter);
+  const [showAllStatuses, setShowAllStatuses] = useState(exactStatusSelected);
+  const groups = [
+    {
+      key: "all",
+      label: MY_SALES_PAGE_UI.STATUS_GROUP_ALL,
+      active: !statusFilter && !attentionOnly,
+      onSelect: () => onStatusFilterChange(""),
+    },
+    {
+      key: "attention",
+      label: MY_SALES_PAGE_UI.STATUS_GROUP_ATTENTION,
+      active: attentionOnly,
+      onSelect: () => onAttentionOnlyChange(true),
+    },
+    ...[
+      [MY_ORDERS_LIST_FILTER_IN_PROGRESS, MY_SALES_PAGE_UI.STATUS_GROUP_IN_PROGRESS],
+      [MY_ORDERS_LIST_FILTER_DONE, MY_SALES_PAGE_UI.STATUS_GROUP_DONE],
+      [MY_ORDERS_LIST_FILTER_CLOSED, MY_SALES_PAGE_UI.STATUS_GROUP_CLOSED],
+    ].map(([value, label]) => ({
+      key: value,
+      label,
+      active: statusFilter === value,
+      onSelect: () => onStatusFilterChange(value),
+    })),
+  ];
+
   return (
     <div className="my-sales-page__toolbar">
       <div className="my-sales-page__toolbar-head">
@@ -728,28 +773,63 @@ function SalesToolbar({
         role="group"
         aria-label={MY_SALES_PAGE_UI.STATUS_FILTER_LABEL}
       >
-        {SALES_STATUS_FILTER_OPTIONS.map((option) => {
-          const isActive = statusFilter === option.value;
-
-          return (
-            <button
-              key={option.value || "all"}
-              type="button"
-              className={[
-                "my-sales-page__status-chip",
-                isActive ? "my-sales-page__status-chip_active" : "",
-                option.value ? `my-sales-page__status-chip_${option.value}` : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              aria-pressed={isActive}
-              onClick={() => onStatusFilterChange(option.value)}
-            >
-              {option.label}
-            </button>
-          );
-        })}
+        {groups.map((group) => (
+          <button
+            key={group.key}
+            type="button"
+            className={[
+              "my-sales-page__status-chip",
+              group.active ? "my-sales-page__status-chip_active" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            aria-pressed={group.active}
+            onClick={group.onSelect}
+          >
+            {group.label}
+          </button>
+        ))}
+        <button
+          type="button"
+          className="my-sales-page__status-more"
+          aria-expanded={showAllStatuses}
+          onClick={() => setShowAllStatuses((value) => !value)}
+        >
+          {showAllStatuses
+            ? MY_SALES_PAGE_UI.STATUS_LESS
+            : MY_SALES_PAGE_UI.STATUS_MORE}
+        </button>
       </div>
+
+      {showAllStatuses ? (
+        <div
+          className="my-sales-page__status-chips my-sales-page__status-chips_all"
+          role="group"
+          aria-label={MY_SALES_PAGE_UI.STATUS_FILTER_LABEL}
+        >
+          {SALES_STATUS_FILTER_OPTIONS.map((option) => {
+            const isActive = statusFilter === option.value;
+
+            return (
+              <button
+                key={option.value}
+                type="button"
+                className={[
+                  "my-sales-page__status-chip",
+                  isActive ? "my-sales-page__status-chip_active" : "",
+                  `my-sales-page__status-chip_${option.value}`,
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                aria-pressed={isActive}
+                onClick={() => onStatusFilterChange(option.value)}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
 
       <div className="my-sales-page__search">
         <SearchInput
