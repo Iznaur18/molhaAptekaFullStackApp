@@ -70,15 +70,39 @@ const resolveLegacyProductCategorySlug = async (leaf) => {
 };
 
 /**
+ * Названия от корня до листа включительно.
+ *
+ * `pathLabelRu` узла уже заканчивается его собственным названием (так его
+ * пишут и админка дерева, и сид). Раньше название листа дописывалось ещё раз,
+ * и у каждого товара хлебные крошки кончались повтором: «… › Пицца › Пицца».
+ * Дописываем, только если путь им не заканчивается (старые узлы без себя в пути).
+ *
+ * @param {{ pathLabelRu?: unknown; labelRu?: unknown } | null | undefined} leaf
+ * @returns {string[]}
+ */
+export const buildLeafCategoryPathLabels = (leaf) => {
+  const labels = (Array.isArray(leaf?.pathLabelRu) ? leaf.pathLabelRu : [])
+    .map((part) => String(part ?? "").trim())
+    .filter(Boolean);
+  const labelRu = String(leaf?.labelRu ?? "").trim();
+  const last = labels[labels.length - 1];
+
+  if (labelRu && (last === undefined || last.toLowerCase() !== labelRu.toLowerCase())) {
+    labels.push(labelRu);
+  }
+  return labels;
+};
+
+/**
  * @param {string | import('mongoose').Types.ObjectId} categoryId
  */
 export const resolveProductCategoryWriteFromId = async (categoryId) => {
   const leaf = await loadLeafProductCategoryOrThrow(categoryId);
   const pathIds = [...(Array.isArray(leaf.pathIds) ? leaf.pathIds : []), leaf._id];
-  const pathLabelRu = Array.isArray(leaf.pathLabelRu) ? leaf.pathLabelRu : [];
-  const categoryBreadcrumbRu = [...pathLabelRu, leaf.labelRu]
-    .filter(Boolean)
-    .join(PRODUCT_CATEGORY_BREADCRUMB_SEPARATOR);
+  const categoryPathLabelRu = buildLeafCategoryPathLabels(leaf);
+  const categoryBreadcrumbRu = categoryPathLabelRu.join(
+    PRODUCT_CATEGORY_BREADCRUMB_SEPARATOR,
+  );
 
   const productCategory = await resolveLegacyProductCategorySlug(leaf);
 
@@ -90,7 +114,7 @@ export const resolveProductCategoryWriteFromId = async (categoryId) => {
     categorySearchKeywords: Array.isArray(leaf.searchKeywords)
       ? leaf.searchKeywords
       : [],
-    categoryPathLabelRu: [...pathLabelRu, leaf.labelRu].filter(Boolean),
+    categoryPathLabelRu,
   };
 };
 
