@@ -4,6 +4,7 @@ import {
 } from "../../constants/productModerationConstants.js";
 import { ProductModel } from "../../models/index.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
+import { enforceSellerStorePause } from "../seller/sellerStorePause.js";
 import { invalidateCatalogProductsCache } from "./catalogProductsResponseCache.js";
 import { buildProductModerationFingerprint } from "./productContentFingerprint.js";
 import { computeProductDiscountPercent } from "./productDiscount.js";
@@ -79,6 +80,10 @@ export async function approvePendingProductsForTrustedSeller({ sellerId }) {
   }
 
   await flush();
+
+  if (approved > 0) {
+    await enforceSellerStorePause(sellerId);
+  }
 
   if (approved > 0) {
     invalidateCatalogProductsCache();

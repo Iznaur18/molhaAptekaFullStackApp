@@ -36,6 +36,7 @@ import {
   resolveSellerDefaultsForProductWrite,
   SELLER_COMMERCE_DEFAULTS_SELECT,
 } from "../../seller/sellerCommerceDefaults.js";
+import { enforceSellerStorePause } from "../../seller/sellerStorePause.js";
 import { createOneCCatalogApplier } from "./applyOneCCatalogProducts.js";
 import { createOneCOffersApplier } from "./applyOneCOffers.js";
 import {
@@ -507,6 +508,9 @@ async function runOneCImportJob(jobId) {
         before: exchangeStartedAt,
       });
     }
+
+    // Магазин на паузе: остатки из 1С не должны вернуть товары на витрину.
+    await enforceSellerStorePause(sellerId);
 
     job.status = ONEC_IMPORT_STATUS_COMPLETED;
     job.stats = stats;

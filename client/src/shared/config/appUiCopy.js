@@ -109,6 +109,7 @@ export {
   SAFE_DEAL_REGISTRY_CHECK_URL,
 } from "./copy/safe-deal.js";
 export { SELLER_QR_UI } from "./copy/seller-qr.js";
+export { SELLER_STORE_PAUSE_UI } from "./copy/seller-store-pause.js";
 export { SELLER_SOCIAL_LINKS_UI } from "./copy/seller-social.js";
 export {
   SHIPPING_CARRIERS_ADMIN_UI,

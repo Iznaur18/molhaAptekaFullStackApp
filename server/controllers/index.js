@@ -68,6 +68,10 @@ import {
   putMySellerCommerceDefaultsController,
 } from "./Seller/sellerCommerceDefaultsController.js";
 import {
+  getMySellerStorePauseController,
+  putMySellerStorePauseController,
+} from "./Seller/sellerStorePauseController.js";
+import {
   getPaymentConfigController,
   createPlatformServicePaymentController,
   createLoyaltyPointsPaymentController,
@@ -501,6 +505,8 @@ export {
   patchStaffSafeDealModerationController,
   getMySellerCommerceDefaultsController,
   putMySellerCommerceDefaultsController,
+  getMySellerStorePauseController,
+  putMySellerStorePauseController,
   getPaymentConfigController,
   createPlatformServicePaymentController,
   createLoyaltyPointsPaymentController,

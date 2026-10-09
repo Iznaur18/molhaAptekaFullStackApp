@@ -8,6 +8,7 @@ import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationCo
 import { OneCExchangeLogModel, ProductModel } from "../../models/index.js";
 import { buildProductSearchBlobFromFields } from "../product/buildProductSearchBlob.js";
 import { productHasImages } from "../product/productImagePresence.js";
+import { enforceSellerStorePause } from "../seller/sellerStorePause.js";
 import { fetchOneCNomenclature } from "./onecHttpClient.js";
 import { resolveSellerOneCCredentials } from "./onecSettings.js";
 
@@ -135,6 +136,9 @@ export async function syncSellerNomenclature(sellerId, opts = {}) {
     },
   });
   deactivated = staleResult.modifiedCount ?? 0;
+
+  // Магазин на паузе: остатки из 1С не должны вернуть товары на витрину.
+  await enforceSellerStorePause(sellerId);
 
   const summary = {
     fetched: items.length,

@@ -30,6 +30,7 @@ import { useSellerProductsCatalog } from "../model/useSellerProductsCatalog.js";
 import {
   PRODUCT_CARD_UI,
   SELLER_PRODUCTS_PAGE_UI,
+  SELLER_STORE_PAUSE_UI,
   USER_LIST_ROW_UI,
 } from "../../../shared/config/appUiCopy.js";
 import { HOME_MAIN_VIEW_PATH } from "../../../shared/lib/homeMainViewPaths.js";
@@ -419,6 +420,12 @@ export function SellerProductsPage({
               </div>
             ) : null}
           </div>
+
+          {seller.sellerStorePaused === true ? (
+            <p className="seller-products-page__store-paused" role="status">
+              {SELLER_STORE_PAUSE_UI.SELLER_PAGE_NOTICE}
+            </p>
+          ) : null}
 
           {(shelvesQuery.data?.shelves?.length ?? 0) > 0 || onecShelves.length > 0 ? (
             <div

@@ -971,6 +971,12 @@ export {
   staffSafeDealModerationBodySchema,
 } from "./sellerSafeDeal.js";
 export {
+  SELLER_STORE_PAUSED_PRODUCT_MESSAGE,
+  sellerStorePauseBodySchema,
+  sellerStorePauseSchema,
+  sellerStorePauseDataSchema,
+} from "./sellerStorePause.js";
+export {
   LOYALTY_POINTS_TOPUP_MIN_RUB,
   LOYALTY_POINTS_TOPUP_MAX_RUB,
   USERS_MONTHLY_DONATION_MIN_RUB,

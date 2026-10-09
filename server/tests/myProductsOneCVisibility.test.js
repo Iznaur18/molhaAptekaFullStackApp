@@ -8,7 +8,11 @@ describe("myProductsExcludeHiddenOneCFilter", () => {
   it("исключает held и unavailable только для 1С", () => {
     assert.deepEqual(myProductsExcludeHiddenOneCFilter.$nor, [
       { productFromOneC: true, product1cHeld: true },
-      { productFromOneC: true, productIsAvailable: false },
+      {
+        productFromOneC: true,
+        productIsAvailable: false,
+        productPausedWithStore: { $ne: true },
+      },
     ]);
   });
 });

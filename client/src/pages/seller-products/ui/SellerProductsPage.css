@@ -234,3 +234,18 @@
   font: inherit;
   cursor: pointer;
 }
+
+.seller-products-page__store-paused {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid color-mix(in srgb, var(--iz-color-action) 35%, transparent);
+  border-radius: 14px;
+  background: color-mix(
+    in srgb,
+    var(--iz-color-action) 8%,
+    var(--iz-color-surface, #fff)
+  );
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--iz-color-text);
+}

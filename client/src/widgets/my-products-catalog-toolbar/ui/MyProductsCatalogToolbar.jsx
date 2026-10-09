@@ -5,6 +5,7 @@ import {
   MY_PRODUCTS_MODERATION_FILTER_OPTIONS,
   MY_PRODUCTS_MODERATION_FILTER_LABEL_RU,
 } from "../../../entities/product/model/productConstants.js";
+import { SellerStorePauseControl } from "../../../entities/seller-store-pause/ui/SellerStorePauseControl.jsx";
 import { HOME_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import {
   ListPageFilter,
@@ -62,7 +63,9 @@ export function MyProductsCatalogToolbar({
           >
             {MY_PRODUCTS_MODERATION_FILTER_OPTIONS.map((filterKey) => (
               <option key={filterKey || "all"} value={filterKey}>
-                {MY_PRODUCTS_MODERATION_FILTER_LABEL_RU[filterKey]}
+                {filterKey
+                  ? MY_PRODUCTS_MODERATION_FILTER_LABEL_RU[filterKey]
+                  : HOME_PAGE_UI.MY_PRODUCTS_FILTER_ALL_OPTION}
               </option>
             ))}
           </ListPageFilterSelect>
@@ -81,6 +84,7 @@ export function MyProductsCatalogToolbar({
           </span>
         </p>
       ) : null}
+      <SellerStorePauseControl />
     </ListPageFilterBar>
   );
 }

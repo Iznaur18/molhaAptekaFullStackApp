@@ -1,7 +1,13 @@
 import { ProductModel } from "../../models/index.js";
 import { PRODUCT_SELLER_PUBLIC_SELECT } from "../../constants/productSellerPublicFields.js";
 import { PRODUCT_MODERATION_APPROVED } from "../../constants/productModerationConstants.js";
+import { SELLER_STORE_PAUSED_PRODUCT_MESSAGE } from "@molha/api-contract";
+
 import { AppError } from "../../errors/AppError.js";
+import {
+  enforceSellerStorePause,
+  isSellerStorePaused,
+} from "../seller/sellerStorePause.js";
 import { hasProductOpenSales, OPEN_SALES_BLOCK_MESSAGE } from "./productOrderLocks.js";
 import { loadProductWriteAccess } from "./productModerationTrust.js";
 import { applyProductSearchBlobToSet } from "./applyProductSearchBlobToProductWrite.js";
@@ -77,6 +83,17 @@ export async function patchMyProduct({ userId, productId, body }) {
     throw new AppError(409, OPEN_SALES_BLOCK_MESSAGE);
   }
 
+  // Поштучно включить товар во время паузы нельзя: иначе витрина окажется
+  // наполовину открытой, а продавец будет считать, что магазин закрыт.
+  if (
+    hasBodyField(body, "productIsAvailable") &&
+    body.productIsAvailable === true &&
+    existing.productIsAvailable === false &&
+    (await isSellerStorePaused(existing.productSeller))
+  ) {
+    throw new AppError(409, SELLER_STORE_PAUSED_PRODUCT_MESSAGE);
+  }
+
   const {
     $set,
     $unset,
@@ -110,6 +127,16 @@ export async function patchMyProduct({ userId, productId, body }) {
 
   if (!product) {
     throw new AppError(404, "Товар не найден или нет прав на изменение");
+  }
+
+  // Пополнение остатка само возвращает товар на витрину — во время паузы
+  // он должен остаться скрытым.
+  if (
+    product.productIsAvailable !== false &&
+    (await enforceSellerStorePause(existing.productSeller)) > 0
+  ) {
+    product.productIsAvailable = false;
+    product.productPausedWithStore = true;
   }
 
   if (shouldResetBuyNFreeProgress) {

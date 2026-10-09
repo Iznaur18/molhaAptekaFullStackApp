@@ -92,6 +92,7 @@ import {
   staffSafeDealModerationValidation,
 } from "./seller/sellerSafeDealValidation.js";
 import { sellerCommerceDefaultsValidation } from "./seller/sellerCommerceDefaultsValidation.js";
+import { sellerStorePauseValidation } from "./seller/sellerStorePauseValidation.js";
 import {
   loyaltyPointsPaymentValidation,
   usersMonthlyDonationPaymentValidation,
@@ -282,6 +283,7 @@ export {
   staffSafeDealListValidation,
   staffSafeDealModerationValidation,
   sellerCommerceDefaultsValidation,
+  sellerStorePauseValidation,
   loyaltyPointsPaymentValidation,
   usersMonthlyDonationPaymentValidation,
   orderPaymentValidation,
