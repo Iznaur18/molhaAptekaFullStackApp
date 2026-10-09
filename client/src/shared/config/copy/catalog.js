@@ -166,8 +166,7 @@ export const HOME_PAGE_UI = {
     `Фильтр по категории: ${categoryLabel}`,
   SORT_LABEL: "Сортировка",
   MODERATION_STATUS_FILTER_LABEL: "Фильтр",
-  /** Подпись «Фильтр» в тулбаре скрыта — пункт «Все» должен читаться сам. */
-  MY_PRODUCTS_FILTER_ALL_OPTION: "Все товары",
+  MY_PRODUCTS_MORE_MENU_ARIA: "Ещё: счётчик товаров и скрытие",
   CATEGORY_ALL: "Все категории",
   EMPTY_MY_BY_MODERATION_STATUS: "Нет товаров с выбранным статусом.",
   MY_PRODUCTS_QUOTA_LABEL: "Товаров",

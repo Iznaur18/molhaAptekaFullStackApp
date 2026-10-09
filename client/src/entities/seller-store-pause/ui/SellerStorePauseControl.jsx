@@ -1,3 +1,5 @@
+import { EyeOff } from "lucide-react";
+
 import { SELLER_STORE_PAUSE_UI } from "../../../shared/config/appUiCopy.js";
 import {
   useMySellerStorePauseQuery,
@@ -7,18 +9,22 @@ import {
 import "./SellerStorePauseControl.css";
 
 /**
- * Пауза магазина в «Моих товарах»: кнопка «Скрыть все товары», а пока пауза
- * включена — плашка с кнопкой возврата.
+ * Пауза магазина в «Моих товарах».
+ *
+ * `mode="action"` — пункт «Скрыть все товары» (пока пауза выключена и есть что
+ * скрывать). `mode="banner"` — плашка «Магазин на паузе» с кнопкой возврата
+ * (пока пауза включена). Живут в разных местах тулбара: действие редкое и
+ * прячется в меню, а включённую паузу продавец должен видеть всегда.
+ *
+ * @param {{ mode: "action" | "banner" }} props
  */
-export function SellerStorePauseControl() {
+export function SellerStorePauseControl({ mode }) {
   const { data: storePause } = useMySellerStorePauseQuery();
   const mutation = useSetMySellerStorePauseMutation();
 
   if (!storePause) return null;
 
   const { paused, visibleProductCount, pausedProductCount } = storePause;
-  // Скрывать нечего и пауза не включена — кнопка только шумела бы.
-  if (!paused && visibleProductCount === 0) return null;
 
   const toggle = () => {
     const confirmText = paused
@@ -34,7 +40,8 @@ export function SellerStorePauseControl() {
     </p>
   ) : null;
 
-  if (paused) {
+  if (mode === "banner") {
+    if (!paused) return null;
     return (
       <div className="seller-store-pause seller-store-pause_active" role="status">
         <div className="seller-store-pause__body">
@@ -60,6 +67,9 @@ export function SellerStorePauseControl() {
     );
   }
 
+  // Скрывать нечего или пауза уже включена — пункт только шумел бы.
+  if (paused || visibleProductCount === 0) return null;
+
   return (
     <div className="seller-store-pause">
       <button
@@ -68,6 +78,7 @@ export function SellerStorePauseControl() {
         disabled={mutation.isPending}
         onClick={toggle}
       >
+        <EyeOff size={16} strokeWidth={2.2} aria-hidden="true" />
         {mutation.isPending
           ? SELLER_STORE_PAUSE_UI.PAUSE_PENDING
           : SELLER_STORE_PAUSE_UI.PAUSE_BUTTON}
