@@ -1,13 +1,16 @@
 import {
   getMySellerCommerceDefaultsController,
   getMySellerSafeDealController,
+  getMySellerStorePauseController,
   putMySellerCommerceDefaultsController,
+  putMySellerStorePauseController,
   submitSellerSafeDealApplicationController,
 } from "../controllers/index.js";
 import { checkAuthMW } from "../middlewares/index.js";
 import {
   safeDealApplicationValidation,
   sellerCommerceDefaultsValidation,
+  sellerStorePauseValidation,
 } from "../validations/index.js";
 import { createAsyncRouter } from "../utils/createAsyncRouter.js";
 
@@ -31,6 +34,15 @@ router.put(
   checkAuthMW,
   sellerCommerceDefaultsValidation,
   putMySellerCommerceDefaultsController,
+);
+
+// Пауза магазина: скрыть все товары разом и так же вернуть.
+router.get("/store-pause/me", checkAuthMW, getMySellerStorePauseController);
+router.put(
+  "/store-pause",
+  checkAuthMW,
+  sellerStorePauseValidation,
+  putMySellerStorePauseController,
 );
 
 export { router as sellerRouter };

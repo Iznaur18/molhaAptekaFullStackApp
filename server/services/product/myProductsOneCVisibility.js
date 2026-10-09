@@ -6,6 +6,11 @@
 export const myProductsExcludeHiddenOneCFilter = {
   $nor: [
     { productFromOneC: true, product1cHeld: true },
-    { productFromOneC: true, productIsAvailable: false },
+    // Скрытое паузой магазина продавец должен видеть: это его живые товары.
+    {
+      productFromOneC: true,
+      productIsAvailable: false,
+      productPausedWithStore: { $ne: true },
+    },
   ],
 };

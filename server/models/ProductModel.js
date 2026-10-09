@@ -423,6 +423,14 @@ const ProductSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    /**
+     * Товар был на витрине и скрыт паузой магазина, а не самим продавцом
+     * поштучно. По этой метке «включить магазин» возвращает на витрину ровно
+     * то, что было видно до паузы. Поля нет — пауза товар не трогала.
+     */
+    productPausedWithStore: {
+      type: Boolean,
+    },
     productStockQuantity: {
       type: Number,
       default: 0,

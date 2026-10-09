@@ -801,6 +801,24 @@ const UserSchema = new mongoose.Schema(
       default: [],
     },
 
+    // - - - Пауза магазина - - -
+    /**
+     * Продавец разом скрыл все свои товары от покупателей (отпуск, переучёт).
+     *
+     * Сами товары при этом получают `productIsAvailable: false` и метку
+     * `productPausedWithStore` — см. `services/seller/sellerStorePause.js`.
+     * Флаг здесь нужен, чтобы товары, ставшие видимыми во время паузы (новые,
+     * одобренные модератором, пришедшие из 1С), тоже не попадали на витрину.
+     */
+    sellerStorePaused: {
+      type: Boolean,
+      default: false,
+    },
+    sellerStorePausedAt: {
+      type: Date,
+      default: null,
+    },
+
     // - - - Безопасная сделка - - -
     /**
      * Заявка продавца на безопасную сделку: правовая форма + ИНН + модерация.

@@ -6,6 +6,11 @@ import { renderWithProviders } from "../../../test/renderWithProviders.jsx";
 
 import { MyProductsCatalogToolbar } from "./MyProductsCatalogToolbar.jsx";
 
+// Пауза магазина ходит в сеть — у неё свой тест.
+vi.mock("../../../entities/seller-store-pause/ui/SellerStorePauseControl.jsx", () => ({
+  SellerStorePauseControl: () => null,
+}));
+
 const renderToolbar = (props = {}) =>
   renderWithProviders(
     <MyProductsCatalogToolbar

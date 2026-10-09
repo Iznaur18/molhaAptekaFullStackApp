@@ -166,6 +166,8 @@ export const HOME_PAGE_UI = {
     `Фильтр по категории: ${categoryLabel}`,
   SORT_LABEL: "Сортировка",
   MODERATION_STATUS_FILTER_LABEL: "Фильтр",
+  /** Подпись «Фильтр» в тулбаре скрыта — пункт «Все» должен читаться сам. */
+  MY_PRODUCTS_FILTER_ALL_OPTION: "Все товары",
   CATEGORY_ALL: "Все категории",
   EMPTY_MY_BY_MODERATION_STATUS: "Нет товаров с выбранным статусом.",
   MY_PRODUCTS_QUOTA_LABEL: "Товаров",
@@ -237,6 +239,7 @@ export const ADD_TO_CART_UI = {
   OWN_PRODUCT: "Свой товар",
   GO_TO_CART: "Перейти в корзину",
   LOGIN_TO_ADD: "Войти, чтобы купить",
+  TEMPORARILY_UNAVAILABLE: "Товар временно недоступен",
   DECREASE_ARIA: "Уменьшить количество",
   INCREASE_ARIA: "Увеличить количество",
   QUANTITY_ARIA: "Количество в корзине",

@@ -16,6 +16,7 @@ import {
 } from "../../utils/productDiscount.js";
 import { buildProductSearchBlobFromFields } from "../../utils/buildProductSearchBlob.js";
 import { buildProductModerationFingerprint } from "../../services/product/productContentFingerprint.js";
+import { isSellerStorePaused } from "../../services/seller/sellerStorePause.js";
 import { resolveActiveSellerPersonalCategoryId } from "../../services/seller-personal-category/sellerPersonalCategoryHelpers.js";
 import {
   resolveDefaultLeafIdForLegacyCategory,
@@ -93,6 +94,15 @@ export const approveProductModerationController = async (req, res) => {
   product.productIsAvailable = stock > 0;
   if (stock === 0) {
     product.productStockQuantity = 0;
+  }
+  // Магазин на паузе: одобренный товар ждёт скрытым и вернётся на витрину
+  // вместе с остальными.
+  if (
+    product.productIsAvailable &&
+    (await isSellerStorePaused(product.productSeller))
+  ) {
+    product.productIsAvailable = false;
+    product.productPausedWithStore = true;
   }
   product.productLastApprovedDiscountPercent = computeProductDiscountPercent(
     product.productOldPrice,

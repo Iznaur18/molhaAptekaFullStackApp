@@ -60,6 +60,7 @@ import {
 import { resolveProductPickupWriteFields } from "./productPickupLocations.js";
 import { logServerEvent } from "../../utils/logServerEvent.js";
 import { assertSellerManualProductCreateAllowed } from "../onec/assertSellerManualProductCreateAllowed.js";
+import { isSellerStorePaused } from "../seller/sellerStorePause.js";
 
 const throwFieldError = (error, fallback) => {
   throw new AppError(400, error instanceof Error ? error.message : fallback);
@@ -230,7 +231,11 @@ export async function postProduct({
     : PRODUCT_MODERATION_PENDING;
 
   const productStockQuantity = resolveCreateStock(body, productIsAvailable);
-  const visibleInCatalog = skipsModeration && productStockQuantity > 0;
+  const readyForCatalog = skipsModeration && productStockQuantity > 0;
+  // Магазин на паузе: товар заводится скрытым и вернётся на витрину вместе
+  // с остальными, когда продавец снимет паузу.
+  const heldByStorePause = readyForCatalog && (await isSellerStorePaused(userId));
+  const visibleInCatalog = readyForCatalog && !heldByStorePause;
 
   const loyaltyPointsPerUnit = await resolveCreateLoyaltyPoints(userId, body);
   const productCharacteristics = resolveCreateCharacteristics(body);
@@ -361,6 +366,7 @@ export async function postProduct({
     categoryBreadcrumbRu: categoryWrite.categoryBreadcrumbRu,
     sellerPersonalCategoryId,
     productIsAvailable: visibleInCatalog,
+    ...(heldByStorePause ? { productPausedWithStore: true } : {}),
     productStockQuantity,
     productWeightG: normalizeShippingDimension(body.productWeightG),
     productLengthCm: normalizeShippingDimension(body.productLengthCm),
