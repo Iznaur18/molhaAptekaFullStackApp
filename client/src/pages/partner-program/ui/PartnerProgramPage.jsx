@@ -2,12 +2,24 @@ import { useMemo, useState } from "react";
 
 import { useMyReferralProgramQuery } from "../../../entities/user/model/useMyReferralProgramQuery.js";
 import { AffiliateListingsPage } from "../../affiliate-listings/ui/AffiliateListingsPage.jsx";
+import { AffiliateSalesPanel } from "../../affiliate-listings/ui/AffiliateSalesPanel.jsx";
+import { ModalSectionTabs } from "../../../shared/ui/ModalSectionTabs/ModalSectionTabs.jsx";
 import { PARTNER_PROGRAM_PAGE_UI } from "../../../shared/config/appUiCopy.js";
 import { copyTextToClipboard } from "../../../shared/lib/copyTextToClipboard.js";
 import { shareOrCopyUrl } from "../../../shared/lib/shareOrCopyUrl.js";
 import { resolvePartnerInviteUrl } from "../lib/resolvePartnerInviteUrl.js";
 
 import "./PartnerProgramPage.css";
+
+const TAB_REFERRALS = "referrals";
+const TAB_EARNINGS = "earnings";
+const TAB_SALES = "sales";
+
+const PARTNER_PROGRAM_TABS = [
+  { id: TAB_REFERRALS, label: PARTNER_PROGRAM_PAGE_UI.TAB_REFERRALS },
+  { id: TAB_EARNINGS, label: PARTNER_PROGRAM_PAGE_UI.TAB_EARNINGS },
+  { id: TAB_SALES, label: PARTNER_PROGRAM_PAGE_UI.TAB_SALES },
+];
 
 /**
  * @param {{
@@ -18,6 +30,7 @@ import "./PartnerProgramPage.css";
 export function PartnerProgramPage({ isAuthorized, onRequestLogin }) {
   const query = useMyReferralProgramQuery({ enabled: isAuthorized });
   const [copyFeedback, setCopyFeedback] = useState("");
+  const [activeTabId, setActiveTabId] = useState(TAB_REFERRALS);
 
   const data = query.data;
   const inviteUrl = useMemo(
@@ -167,43 +180,56 @@ export function PartnerProgramPage({ isAuthorized, onRequestLogin }) {
         ) : null}
       </div>
 
-      <div className="partner-program-page__card">
-        <h3 className="partner-program-page__card-title">
-          {PARTNER_PROGRAM_PAGE_UI.LIST_TITLE}
-        </h3>
-        {data.referrals.length === 0 ? (
-          <p className="partner-program-page__empty">
-            {PARTNER_PROGRAM_PAGE_UI.LIST_EMPTY}
-          </p>
-        ) : (
-          <>
-            <div className="partner-program-page__row partner-program-page__row-head">
-              <span>{PARTNER_PROGRAM_PAGE_UI.COL_NAME}</span>
-              <span>{PARTNER_PROGRAM_PAGE_UI.COL_DATE}</span>
-              <span>{PARTNER_PROGRAM_PAGE_UI.COL_SPEND}</span>
-              <span>{PARTNER_PROGRAM_PAGE_UI.COL_CASHBACK}</span>
-            </div>
-            {data.referrals.map((row) => (
-              <div key={row.userId} className="partner-program-page__row">
-                <span className="partner-program-page__row-name">{row.userName}</span>
-                <span className="partner-program-page__row-meta">
-                  {row.registeredAt
-                    ? new Date(row.registeredAt).toLocaleDateString("ru-RU")
-                    : "—"}
-                </span>
-                <span className="partner-program-page__row-meta">
-                  {row.pointsSpentTotal}
-                </span>
-                <span className="partner-program-page__row-meta">
-                  {row.cashbackEarnedTotal}
-                </span>
-              </div>
-            ))}
-          </>
-        )}
-      </div>
+      <ModalSectionTabs
+        tabs={PARTNER_PROGRAM_TABS}
+        activeTabId={activeTabId}
+        onTabChange={setActiveTabId}
+        ariaLabel={PARTNER_PROGRAM_PAGE_UI.TABS_ARIA}
+      />
 
-      <AffiliateListingsPage isAuthorized embedded />
+      {activeTabId === TAB_REFERRALS ? (
+        <div className="partner-program-page__card">
+          <h3 className="partner-program-page__card-title">
+            {PARTNER_PROGRAM_PAGE_UI.LIST_TITLE}
+          </h3>
+          {data.referrals.length === 0 ? (
+            <p className="partner-program-page__empty">
+              {PARTNER_PROGRAM_PAGE_UI.LIST_EMPTY}
+            </p>
+          ) : (
+            <>
+              <div className="partner-program-page__row partner-program-page__row-head">
+                <span>{PARTNER_PROGRAM_PAGE_UI.COL_NAME}</span>
+                <span>{PARTNER_PROGRAM_PAGE_UI.COL_DATE}</span>
+                <span>{PARTNER_PROGRAM_PAGE_UI.COL_SPEND}</span>
+                <span>{PARTNER_PROGRAM_PAGE_UI.COL_CASHBACK}</span>
+              </div>
+              {data.referrals.map((row) => (
+                <div key={row.userId} className="partner-program-page__row">
+                  <span className="partner-program-page__row-name">{row.userName}</span>
+                  <span className="partner-program-page__row-meta">
+                    {row.registeredAt
+                      ? new Date(row.registeredAt).toLocaleDateString("ru-RU")
+                      : "—"}
+                  </span>
+                  <span className="partner-program-page__row-meta">
+                    {row.pointsSpentTotal}
+                  </span>
+                  <span className="partner-program-page__row-meta">
+                    {row.cashbackEarnedTotal}
+                  </span>
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+      ) : null}
+
+      {activeTabId === TAB_EARNINGS ? (
+        <AffiliateListingsPage isAuthorized embedded />
+      ) : null}
+
+      {activeTabId === TAB_SALES ? <AffiliateSalesPanel isAuthorized /> : null}
     </section>
   );
 }

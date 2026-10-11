@@ -62,14 +62,21 @@ export async function getMyAffiliateEarnings(userId) {
   const byItemId = new Map();
   /** @type {Map<string, Array<{ productName: string; itemIndex: number; affiliateReferrerUserId: string }>>} */
   const byOrderId = new Map();
+  /** @type {Map<string, string>} */
+  const buyerIdByOrderId = new Map();
 
   if (orderIds.length > 0) {
     const orders = await OrderModel.find({ _id: { $in: orderIds } })
-      .select("items.productNameAtOrder items._id items.affiliateReferrerUserId")
+      .select(
+        "userBuyerId items.productNameAtOrder items._id items.affiliateReferrerUserId",
+      )
       .lean();
 
     for (const order of orders) {
       const oid = String(order._id);
+      if (order.userBuyerId) {
+        buyerIdByOrderId.set(oid, String(order.userBuyerId));
+      }
       const list = [];
       const items = Array.isArray(order.items) ? order.items : [];
       for (let itemIndex = 0; itemIndex < items.length; itemIndex += 1) {
@@ -95,6 +102,25 @@ export async function getMyAffiliateEarnings(userId) {
     }
   }
 
+  // Партнёр видит обе стороны сделки: кто продал и кто купил по его ссылке.
+  const partyIds = [
+    ...new Set(
+      [
+        ...payouts.map((row) => (row.sellerUserId ? String(row.sellerUserId) : "")),
+        ...buyerIdByOrderId.values(),
+      ].filter(Boolean),
+    ),
+  ];
+  const parties =
+    partyIds.length > 0
+      ? await UserModel.find({ _id: { $in: partyIds } })
+          .select("userName")
+          .lean()
+      : [];
+  const userNameById = new Map(
+    parties.map((row) => [String(row._id), String(row.userName ?? "").trim()]),
+  );
+
   return {
     loyaltyPointsBalance: Number(user?.userLoyaltyPoints) || 0,
     rows: payouts.map((row) => {
@@ -116,6 +142,9 @@ export async function getMyAffiliateEarnings(userId) {
         createdAt: row.createdAt ? new Date(row.createdAt).toISOString() : null,
         paidAt: row.createdAt ? new Date(row.createdAt).toISOString() : null,
         sourceId: String(row.sourceId ?? ""),
+        sellerName: userNameById.get(String(row.sellerUserId ?? "")) ?? "",
+        buyerName:
+          userNameById.get(buyerIdByOrderId.get(String(row.orderId ?? "")) ?? "") ?? "",
       };
     }),
   };

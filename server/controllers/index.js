@@ -360,7 +360,10 @@ import {
   getMyPromoReturnStreakController,
 } from "./User/promoReturnStreakControllers.js";
 import { getMyReferralProgramController } from "./User/referralControllers.js";
-import { getMyAffiliateEarningsController } from "./User/affiliateControllers.js";
+import {
+  getMyAffiliateEarningsController,
+  getMyAffiliateSalesController,
+} from "./User/affiliateControllers.js";
 import { getMonthlyLoyaltyPointsAwardedController } from "./User/monthlyLoyaltyPointsControllers.js";
 import {
   followUserController,
@@ -675,6 +678,7 @@ export {
   claimMyPromoReturnStreakController,
   getMyReferralProgramController,
   getMyAffiliateEarningsController,
+  getMyAffiliateSalesController,
   getMonthlyLoyaltyPointsAwardedController,
   followUserController,
   unfollowUserController,

@@ -48,6 +48,7 @@ import {
   claimMyPromoReturnStreakController,
   getMyReferralProgramController,
   getMyAffiliateEarningsController,
+  getMyAffiliateSalesController,
   getMonthlyLoyaltyPointsAwardedController,
   getUserPhoneController,
   getUserEmailController,
@@ -300,6 +301,8 @@ router.post(
 router.get("/me/referral", checkAuthMW, getMyReferralProgramController);
 
 router.get("/me/affiliate/earnings", checkAuthMW, getMyAffiliateEarningsController);
+
+router.get("/me/affiliate/sales", checkAuthMW, getMyAffiliateSalesController);
 
 router.get("/loyalty-points/monthly-awarded", getMonthlyLoyaltyPointsAwardedController);
 
