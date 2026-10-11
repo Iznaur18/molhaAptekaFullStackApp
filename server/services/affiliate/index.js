@@ -1,4 +1,5 @@
 export { getMyAffiliateEarnings } from "./getMyAffiliateEarnings.js";
+export { getMyAffiliateSales } from "./getMyAffiliateSales.js";
 export { migrateAffiliateBudgetToLoyaltyPoints } from "./migrateAffiliateBudgetToLoyaltyPoints.js";
 export {
   resolveAffiliateReferrerUserId,

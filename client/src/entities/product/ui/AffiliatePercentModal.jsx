@@ -169,12 +169,6 @@ export function AffiliatePercentModal({ isOpen, product, onClose, onSaved }) {
           </button>
         </header>
         <div className="wholesale-price-modal__body">
-          <p className="wholesale-price-modal__hint">
-            {CREATE_PRODUCT_MODAL_UI.AFFILIATE_MODAL_HINT}
-          </p>
-          <p className="wholesale-price-modal__hint">
-            {CREATE_PRODUCT_MODAL_UI.AFFILIATE_MODAL_BUDGET_HINT}
-          </p>
           <label className="wholesale-price-modal__field">
             <span className="wholesale-price-modal__label">
               {CREATE_PRODUCT_MODAL_UI.AFFILIATE_MODAL_PERCENT_LABEL}
@@ -193,6 +187,12 @@ export function AffiliatePercentModal({ isOpen, product, onClose, onSaved }) {
               {error}
             </p>
           ) : null}
+          <p className="wholesale-price-modal__hint">
+            {CREATE_PRODUCT_MODAL_UI.AFFILIATE_MODAL_HINT}
+          </p>
+          <p className="wholesale-price-modal__hint">
+            {CREATE_PRODUCT_MODAL_UI.AFFILIATE_MODAL_BUDGET_HINT}
+          </p>
         </div>
         <footer className="wholesale-price-modal__footer">
           <button

@@ -168,9 +168,6 @@ export function ProductRentalManageModal({ isOpen, product, onClose, onSaved }) 
           </button>
         </header>
         <div className="wholesale-price-modal__body">
-          <p className="wholesale-price-modal__hint">
-            {CREATE_PRODUCT_MODAL_UI.RENTAL_MODAL_HINT}
-          </p>
           <label className="wholesale-price-modal__field">
             <span className="wholesale-price-modal__label">
               {CREATE_PRODUCT_MODAL_UI.RENTAL_MODAL_PRICE_LABEL}
@@ -225,6 +222,9 @@ export function ProductRentalManageModal({ isOpen, product, onClose, onSaved }) 
               {error}
             </p>
           ) : null}
+          <p className="wholesale-price-modal__hint">
+            {CREATE_PRODUCT_MODAL_UI.RENTAL_MODAL_HINT}
+          </p>
         </div>
         <footer className="wholesale-price-modal__footer">
           <button

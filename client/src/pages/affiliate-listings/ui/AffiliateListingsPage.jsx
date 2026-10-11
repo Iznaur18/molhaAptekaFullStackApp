@@ -1,5 +1,10 @@
 import { useMyAffiliateEarningsQuery } from "../../../entities/user/model/useMyAffiliateEarningsQuery.js";
-import { AFFILIATE_LISTINGS_PAGE_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  AFFILIATE_LISTINGS_PAGE_UI,
+  AFFILIATE_SALES_UI,
+} from "../../../shared/config/appUiCopy.js";
+
+import { AffiliateDealCard } from "./AffiliateDealCard.jsx";
 
 import "./AffiliateListingsPage.css";
 
@@ -88,27 +93,39 @@ export function AffiliateListingsPage({
         ) : (
           <ul className="affiliate-listings-page__list">
             {earnings.rows.map((row) => (
-              <li
+              <AffiliateDealCard
                 key={row.sourceId ?? `${row.orderId}-${row.paidAt}`}
-                className="affiliate-listings-page__row"
-              >
-                {row.productName ? (
-                  <span className="affiliate-listings-page__row-title">
-                    {row.productName}
-                  </span>
-                ) : null}
-                <span className="affiliate-listings-page__row-amount">
-                  {AFFILIATE_LISTINGS_PAGE_UI.EARNINGS_AMOUNT}: {row.amount}
-                </span>
-                <span>
-                  {AFFILIATE_LISTINGS_PAGE_UI.EARNINGS_PERCENT}:{" "}
-                  {row.percentUsed ?? "—"}%
-                </span>
-                <span>
-                  {AFFILIATE_LISTINGS_PAGE_UI.EARNINGS_DATE}:{" "}
-                  {row.paidAt ? new Date(row.paidAt).toLocaleString("ru-RU") : "—"}
-                </span>
-              </li>
+                title={row.productName || AFFILIATE_LISTINGS_PAGE_UI.EARNINGS_PRODUCT}
+                status="paid"
+                statusLabel={AFFILIATE_SALES_UI.STATUS.paid}
+                facts={[
+                  {
+                    label: AFFILIATE_SALES_UI.SELLER,
+                    value: row.sellerName || AFFILIATE_SALES_UI.NAME_FALLBACK,
+                  },
+                  {
+                    label: AFFILIATE_SALES_UI.BUYER,
+                    value: row.buyerName || AFFILIATE_SALES_UI.NAME_FALLBACK,
+                  },
+                  {
+                    label: AFFILIATE_LISTINGS_PAGE_UI.EARNINGS_AMOUNT,
+                    value: String(row.amount),
+                    accent: true,
+                  },
+                  {
+                    label: AFFILIATE_LISTINGS_PAGE_UI.EARNINGS_PERCENT,
+                    value:
+                      row.percentUsed == null
+                        ? AFFILIATE_SALES_UI.NAME_FALLBACK
+                        : `${row.percentUsed}%`,
+                  },
+                ]}
+                dateLabel={
+                  row.paidAt
+                    ? new Date(row.paidAt).toLocaleString("ru-RU")
+                    : AFFILIATE_SALES_UI.NAME_FALLBACK
+                }
+              />
             ))}
           </ul>
         )}

@@ -103,6 +103,30 @@ export const affiliateEarningsRowSchema = z.object({
   createdAt: z.string().nullable(),
   paidAt: z.string().nullable(),
   sourceId: z.string().optional(),
+  /** Кто продал и кто купил — партнёр видит обе стороны своей сделки. */
+  sellerName: z.string().optional(),
+  buyerName: z.string().optional(),
+});
+
+/** Сколько последних продаж через партнёров отдаём продавцу. */
+export const AFFILIATE_SALES_LIST_LIMIT = 100;
+
+/** Строка «продажа через партнёра» в кабинете продавца. */
+export const affiliateSaleRowSchema = z.object({
+  orderId: z.string(),
+  orderItemId: z.string(),
+  productName: z.string(),
+  partnerName: z.string(),
+  buyerName: z.string(),
+  status: z.enum(AFFILIATE_LINE_STATUSES),
+  amount: z.number(),
+  percentUsed: z.number().nullable(),
+  createdAt: z.string().nullable(),
+  paidAt: z.string().nullable(),
+});
+
+export const myAffiliateSalesDataSchema = z.object({
+  rows: z.array(affiliateSaleRowSchema),
 });
 
 export const myAffiliateEarningsDataSchema = z.object({

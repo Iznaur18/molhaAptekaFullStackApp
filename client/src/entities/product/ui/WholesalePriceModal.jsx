@@ -173,17 +173,6 @@ export function WholesalePriceModal({ isOpen, product, onClose, onSaved }) {
           </button>
         </header>
         <div className="wholesale-price-modal__body">
-          <p className="wholesale-price-modal__hint">
-            {CREATE_PRODUCT_MODAL_UI.WHOLESALE_MODAL_HINT}
-          </p>
-          {retailPrice > 0 ? (
-            <p className="wholesale-price-modal__retail">
-              Обычная цена:{" "}
-              <span className="wholesale-price-modal__retail-price">
-                {retailPrice.toLocaleString("ru-RU")} ₽
-              </span>
-            </p>
-          ) : null}
           <label className="wholesale-price-modal__field">
             <span className="wholesale-price-modal__label">
               {CREATE_PRODUCT_MODAL_UI.WHOLESALE_MODAL_MIN_QTY_LABEL}
@@ -214,6 +203,17 @@ export function WholesalePriceModal({ isOpen, product, onClose, onSaved }) {
           {error ? (
             <p className="wholesale-price-modal__error" role="alert">
               {error}
+            </p>
+          ) : null}
+          <p className="wholesale-price-modal__hint">
+            {CREATE_PRODUCT_MODAL_UI.WHOLESALE_MODAL_HINT}
+          </p>
+          {retailPrice > 0 ? (
+            <p className="wholesale-price-modal__retail">
+              Обычная цена:{" "}
+              <span className="wholesale-price-modal__retail-price">
+                {retailPrice.toLocaleString("ru-RU")} ₽
+              </span>
             </p>
           ) : null}
         </div>

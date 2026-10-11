@@ -307,6 +307,9 @@ export {
   affiliateBudgetStatusDataSchema,
   affiliateEarningsRowSchema,
   myAffiliateEarningsDataSchema,
+  AFFILIATE_SALES_LIST_LIMIT,
+  affiliateSaleRowSchema,
+  myAffiliateSalesDataSchema,
 } from "./productAffiliate.js";
 export {
   productCategorySlugParamsSchema,

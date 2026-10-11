@@ -225,17 +225,6 @@ export function ProductFlashSaleModal({ isOpen, product, onClose, onSaved }) {
           </button>
         </header>
         <div className="wholesale-price-modal__body">
-          <p className="wholesale-price-modal__hint">
-            {PRODUCT_FLASH_SALE_UI.MODAL_HINT}
-          </p>
-          {basePrice > 0 ? (
-            <p className="wholesale-price-modal__retail">
-              {PRODUCT_FLASH_SALE_UI.MODAL_BASE_PRICE_LABEL}:{" "}
-              <span className="wholesale-price-modal__retail-price">
-                {basePrice.toLocaleString("ru-RU")} ₽
-              </span>
-            </p>
-          ) : null}
           <label className="wholesale-price-modal__field">
             <span className="wholesale-price-modal__label">
               {PRODUCT_FLASH_SALE_UI.MODAL_SALE_PRICE_LABEL}
@@ -291,6 +280,17 @@ export function ProductFlashSaleModal({ isOpen, product, onClose, onSaved }) {
           {error ? (
             <p className="wholesale-price-modal__error" role="alert">
               {error}
+            </p>
+          ) : null}
+          <p className="wholesale-price-modal__hint">
+            {PRODUCT_FLASH_SALE_UI.MODAL_HINT}
+          </p>
+          {basePrice > 0 ? (
+            <p className="wholesale-price-modal__retail">
+              {PRODUCT_FLASH_SALE_UI.MODAL_BASE_PRICE_LABEL}:{" "}
+              <span className="wholesale-price-modal__retail-price">
+                {basePrice.toLocaleString("ru-RU")} ₽
+              </span>
             </p>
           ) : null}
         </div>

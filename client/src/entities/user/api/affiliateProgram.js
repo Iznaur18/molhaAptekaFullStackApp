@@ -1,7 +1,24 @@
 import { apiClient } from "../../../shared/api/index.js";
 import { API_CLIENT_UI } from "../../../shared/config/appUiCopy.js";
 import { formatApiErrorMessage } from "@izibuy/shared-lib";
-import { myAffiliateEarningsDataSchema } from "@molha/api-contract";
+import {
+  myAffiliateEarningsDataSchema,
+  myAffiliateSalesDataSchema,
+} from "@molha/api-contract";
+
+export async function fetchMyAffiliateSales() {
+  try {
+    const { data } = await apiClient.get("/user/me/affiliate/sales");
+    if (!data?.success) {
+      throw new Error(API_CLIENT_UI.INVALID_SERVER_RESPONSE);
+    }
+    return myAffiliateSalesDataSchema.parse(data.data);
+  } catch (e) {
+    throw new Error(
+      formatApiErrorMessage(e, "Не удалось загрузить продажи через партнёров"),
+    );
+  }
+}
 
 export async function fetchMyAffiliateEarnings() {
   try {
