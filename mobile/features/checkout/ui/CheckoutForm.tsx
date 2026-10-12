@@ -7,6 +7,7 @@ import {
   PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
   SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT,
 } from "@molha/api-contract";
+import { resolveCheckoutPaymentMethodOptions } from "@izibuy/shared-lib";
 
 import { addressValueFromUser } from "@/entities/address/lib/addressValueFromUser";
 import { validateRuDeliveryAddressForm } from "@/entities/address/lib/validateRuDeliveryAddressForm";
@@ -42,6 +43,10 @@ type CheckoutFormProps = {
   pickupGroups?: CheckoutProductPickupGroup[];
   deliveryAvailable?: boolean;
   pickupAvailable?: boolean;
+  /** Что принимают продавцы оформляемых товаров; `null` — ограничений нет. */
+  allowedPaymentMethods?: readonly string[] | null;
+  /** Продавцы входят в список предоплаты площадки — доступна СБП. */
+  cardPrepaidAvailable?: boolean;
   isSubmitting: boolean;
   submitError: string;
   submitSuccess: string;
@@ -62,6 +67,8 @@ export const CheckoutForm = ({
   pickupGroups = [],
   deliveryAvailable = false,
   pickupAvailable = true,
+  allowedPaymentMethods = null,
+  cardPrepaidAvailable = false,
   isSubmitting,
   submitError,
   submitSuccess,
@@ -97,6 +104,24 @@ export const CheckoutForm = ({
   const [paymentMethod, setPaymentMethod] = useState<OrderPaymentMethod>(
     ORDER_PAYMENT_METHOD_DEFAULT,
   );
+  const availablePaymentMethods = useMemo(
+    () =>
+      resolveCheckoutPaymentMethodOptions({
+        cardPrepaidAvailable,
+        allowedMethods: allowedPaymentMethods,
+      }).availableMethods,
+    [allowedPaymentMethods, cardPrepaidAvailable],
+  );
+  // Выбранный способ продавец мог не принимать (или он единственный и
+  // показан строкой) — тогда форма сама встаёт на первый доступный.
+  useEffect(() => {
+    if (
+      availablePaymentMethods.length > 0 &&
+      !availablePaymentMethods.includes(paymentMethod)
+    ) {
+      setPaymentMethod(availablePaymentMethods[0]);
+    }
+  }, [availablePaymentMethods, paymentMethod]);
   const [localError, setLocalError] = useState("");
   const [selectedPickupByProductId, setSelectedPickupByProductId] = useState<
     Record<string, string>
@@ -227,7 +252,10 @@ export const CheckoutForm = ({
     });
   };
 
-  const isFormDisabled = isDisabled || isSubmitting || !isAddressValid;
+  // Ни одного общего способа у продавцов — заказ сервер всё равно отклонит.
+  const hasPaymentMethod = availablePaymentMethods.includes(paymentMethod);
+  const isFormDisabled =
+    isDisabled || isSubmitting || !isAddressValid || !hasPaymentMethod;
   const displayError = localError || submitError;
 
   return (
@@ -474,6 +502,8 @@ export const CheckoutForm = ({
           value={paymentMethod}
           onChange={setPaymentMethod}
           disabled={isDisabled || isSubmitting}
+          cardPrepaidAvailable={cardPrepaidAvailable}
+          allowedMethods={allowedPaymentMethods}
         />
 
         {displayError ? (

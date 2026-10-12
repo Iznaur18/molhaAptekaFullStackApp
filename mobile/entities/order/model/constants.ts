@@ -1,37 +1,21 @@
-export const ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY = "cashOnDelivery" as const;
-export const ORDER_PAYMENT_METHOD_CARD_PREPAID = "cardPrepaid" as const;
-
-export const ORDER_PAYMENT_METHODS = [
-  ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
-  ORDER_PAYMENT_METHOD_CARD_PREPAID,
-] as const;
-
-export type OrderPaymentMethod = (typeof ORDER_PAYMENT_METHODS)[number];
-
 /**
- * Реально доступные покупателю. `cardPrepaid` заблокирован до эквайринга.
- */
-export const ORDER_PAYMENT_METHODS_SELECTABLE: readonly OrderPaymentMethod[] = [
-  ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
-];
-
-export const ORDER_PAYMENT_METHOD_DEFAULT: OrderPaymentMethod =
-  ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY;
-
-export const ORDER_PAYMENT_METHOD_LABEL_RU: Record<OrderPaymentMethod, string> = {
-  [ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY]: "Наличными",
-  // Значение в базе осталось `cardPrepaid`; способ у провайдера — СБП.
-  [ORDER_PAYMENT_METHOD_CARD_PREPAID]: "СБП",
-};
-
-/**
- * Статусы заказа и их подписи — одни для сайта и приложения, источник в
- * `@izibuy/shared-lib`. Здесь реэкспорт, чтобы импорты по приложению не менялись.
+ * Способы оплаты, статусы заказа и ступени отправления — одни для сайта и
+ * приложения, источник в `@izibuy/shared-lib`. Здесь реэкспорт, чтобы
+ * импорты по приложению не менялись.
  */
 export {
+  ORDER_PAYMENT_METHODS,
+  ORDER_PAYMENT_METHODS_SELECTABLE,
+  ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
+  ORDER_PAYMENT_METHOD_CARD_PREPAID,
+  ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
+  ORDER_PAYMENT_METHOD_DEFAULT,
+  ORDER_PAYMENT_METHOD_LABEL_RU,
+  ORDER_PRE_SHIPMENT_STATUSES,
   ORDER_STATUSES,
   ORDER_STATUS_LABEL_RU,
   SALES_ORDER_STATUS_LABEL_RU,
+  SHIPMENT_ADVANCE_BUTTON_LABEL_RU,
   ORDER_STATUS_ACCEPTED,
   ORDER_STATUS_ASSEMBLING,
   ORDER_STATUS_CANCELLED,
@@ -47,4 +31,4 @@ export {
   ORDER_STATUS_RETURNED,
   ORDER_STATUS_SHIPPED,
 } from "@izibuy/shared-lib";
-export type { OrderStatus } from "@izibuy/shared-lib";
+export type { OrderPaymentMethod, OrderStatus } from "@izibuy/shared-lib";

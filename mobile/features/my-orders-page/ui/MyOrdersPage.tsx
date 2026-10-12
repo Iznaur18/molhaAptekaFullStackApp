@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { z } from "zod";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Alert, AppState, Linking, Pressable, Text, View } from "react-native";
 import { ThemedRefreshControl } from "@/shared/ui/ThemedRefreshControl";
 
 import { getOrderItemIndex } from "@/entities/order/lib/getOrderItemIndex";
@@ -19,7 +19,8 @@ import {
 import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "@/entities/order/model/myOrdersListFilters";
 import { useMyOrdersQuery } from "@/entities/order/model/useMyOrdersQuery";
 import { useOrderMutations } from "@/entities/order/model/useOrderMutations";
-import { OrderCard } from "@/entities/order/ui/OrderCard";
+import { OrderCard, orderShipmentActionKey } from "@/entities/order/ui/OrderCard";
+import { useCreateOrderPaymentMutation } from "@/entities/payment/model/useCreateOrderPaymentMutation";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { MyOrdersPageOverview } from "@/features/my-orders-page/ui/MyOrdersPageOverview";
 import { MyOrdersPageToolbar } from "@/features/my-orders-page/ui/MyOrdersPageToolbar";
@@ -34,6 +35,7 @@ import {
   MY_ORDERS_PAGE_UI,
   MY_PROFILE_PAGE_UI,
   ORDER_CARD_UI,
+  PAYMENT_UI,
   PRODUCT_REPORT_UI,
 } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
@@ -46,6 +48,12 @@ type OrderRecord = z.infer<typeof orderFromApiSchema>;
 
 const EMPTY_ORDERS: OrderRecord[] = [];
 
+/**
+ * Куда банк вернёт покупателя после оплаты. Сервер принимает только путь
+ * сайта; ссылку gitorg.ru/my-orders открывает приложение (таблица deep link'ов).
+ */
+const MY_ORDERS_WEB_PATH = "/my-orders";
+
 export const MyOrdersPage = () => {
   const router = useRouter();
   const styles = useMyOrdersPageStyles();
@@ -56,6 +64,7 @@ export const MyOrdersPage = () => {
   const isAuthorized = useIsAuthorized();
   const ordersQuery = useMyOrdersQuery();
   const { confirmItemMutation, cancelItemMutation } = useOrderMutations();
+  const createOrderPaymentMutation = useCreateOrderPaymentMutation();
   const [navSheetVisible, setNavSheetVisible] = useState(false);
   const [statusFilter, setStatusFilter] = useState("");
   const [attentionOnly, setAttentionOnly] = useState(false);
@@ -105,6 +114,50 @@ export const MyOrdersPage = () => {
       }
     }, [isAuthorized, ordersQuery.refetch]),
   );
+
+  // Оплата идёт в браузере телефона. Когда покупатель возвращается в
+  // приложение — по ссылке банка или сам — заказ мог уже стать оплаченным.
+  useEffect(() => {
+    if (!isAuthorized) {
+      return undefined;
+    }
+    const subscription = AppState.addEventListener("change", (nextState) => {
+      if (nextState === "active") {
+        void ordersQuery.refetch();
+      }
+    });
+    return () => subscription.remove();
+  }, [isAuthorized, ordersQuery.refetch]);
+
+  // Оплата неоплаченного заказа: счёт создаёт сервер, форму банка открывает
+  // браузер. Без этой кнопки заказ с предоплатой остаётся мёртвым.
+  const handlePayOrder = async ({ orderId }: { orderId: string }) => {
+    const actionKey = orderShipmentActionKey(orderId, "pay");
+    setPendingActionKey(actionKey);
+    setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+    try {
+      const payment = await createOrderPaymentMutation.mutateAsync({
+        orderId,
+        returnUrl: MY_ORDERS_WEB_PATH,
+      });
+      if (!payment.confirmationUrl) {
+        throw new Error(PAYMENT_UI.CREATE_FALLBACK);
+      }
+      try {
+        await Linking.openURL(payment.confirmationUrl);
+      } catch (openError) {
+        console.warn("[payment] open confirmation url failed", openError);
+        throw new Error(PAYMENT_UI.OPEN_URL_ERROR);
+      }
+    } catch (error) {
+      setItemActionErrors((prev) => ({
+        ...prev,
+        [actionKey]: formatApiErrorMessage(error, PAYMENT_UI.CREATE_FALLBACK),
+      }));
+    } finally {
+      setPendingActionKey(null);
+    }
+  };
 
   const patchOrders = useCallback(
     (updater: (orders: OrderRecord[]) => OrderRecord[]) => {
@@ -375,6 +428,7 @@ export const MyOrdersPage = () => {
               onProductClick={handleProductClick}
               onConfirmDelivered={handleConfirmDelivered}
               onCancelItem={handleCancelItem}
+              onPayOrder={handlePayOrder}
               pendingActionKey={pendingActionKey}
               itemActionErrors={itemActionErrors}
             />

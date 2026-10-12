@@ -1201,6 +1201,7 @@ export const CHECKOUT_FORM_UI = {
   PLACEHOLDER_FLAT: "подъезд, этаж, кв",
   LABEL_PAYMENT_METHOD: "Способ оплаты",
   PAYMENT_METHOD_CARD_SOON: "Скоро",
+  PAYMENT_METHOD_NOT_ACCEPTED: "Продавец не принимает",
   LABEL_SHIPPING_PROVIDER: "Служба доставки",
   SHIPPING_PROVIDER_SELLER: "Продавцом",
   SHIPPING_PROVIDER_SOON: "Скоро",
@@ -1323,6 +1324,12 @@ export const COMMERCE_CARD_UI = {
   EXPAND_TOGGLE_ARIA: (expanded: boolean) => (expanded ? "Свернуть" : "Раскрыть"),
 } as const;
 
+export const PAYMENT_UI = {
+  CONFIG_FALLBACK: "Не удалось узнать доступные способы оплаты",
+  CREATE_FALLBACK: "Не удалось открыть оплату",
+  OPEN_URL_ERROR: "Не удалось открыть страницу оплаты. Попробуйте ещё раз.",
+} as const;
+
 export const ORDER_CARD_UI = {
   ITEMS_HEADING: "Позиции",
   ADDRESS_LABEL: "Адрес доставки",
@@ -1341,6 +1348,21 @@ export const ORDER_CARD_UI = {
   ACTION_CANCEL: "Отменить",
   ACTION_SHIPPED: "Отгрузить",
   ACTION_DELIVERED: "Доставлен",
+  ACTION_HANDED_TO_BUYER: "Выдал покупателю",
+  AWAITING_ACCEPT: "Ждём подтверждения продавца",
+  AWAITING_ACCEPT_BUYER_HINT:
+    "Продавец проверяет, что товар есть. Оплата откроется после подтверждения.",
+  AWAITING_ACCEPT_SELLER_HINT:
+    "Подтвердите заказ, если товар есть — покупатель сможет оплатить. Если товара нет, отмените заказ: деньги ещё не списаны.",
+  AWAITING_PREPAYMENT: "Ожидает оплаты",
+  AWAITING_PREPAYMENT_BUYER_HINT:
+    "Продавец подтвердил заказ. Оплатите — и он начнёт собирать.",
+  AWAITING_PREPAYMENT_SELLER_HINT:
+    "Заказ подтверждён, ждём оплату от покупателя. Собирать и отгружать его пока рано.",
+  PREPAYMENT_DUE: (until: string) => `Оплатите до ${until} — иначе заказ отменится`,
+  PAY_NOW: "Оплатить",
+  PAY_NOW_AMOUNT: (formatted: string) => `Оплатить ${formatted} по СБП`,
+  PAY_NOW_PENDING: "Открываем оплату…",
   ACTION_PENDING: "Сохраняем…",
   CANCEL_CONFIRM: "Отменить заказ покупателя?",
   BUYER_CANCEL_CONFIRM: "Отменить заказ?",

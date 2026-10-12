@@ -9,11 +9,16 @@ import {
   doProductsSupportPickup,
   doProductsSupportSellerDelivery,
 } from "@molha/api-contract";
-import { isProductBuyNFreeActive } from "@izibuy/shared-lib";
+import {
+  isProductBuyNFreeActive,
+  resolveCartAllowedPaymentMethods,
+} from "@izibuy/shared-lib";
 
 import { buildCheckoutPickupGroups } from "@/entities/cart/lib/buildCheckoutPickupLocations";
 import { getCartLineExclusionReason } from "@/entities/cart/lib/getCartLineExclusionReason";
 import { groupCartLinesByFulfillment } from "@/entities/cart/lib/groupCartLinesByFulfillment";
+import { resolveCheckoutSellers } from "@/entities/cart/lib/resolveCheckoutSellers";
+import { useCardPrepaidAvailable } from "@/entities/payment/model/usePaymentConfigQuery";
 import { selectCartCheckoutSummary } from "@/entities/cart/lib/selectCartCheckoutSummary";
 import { selectCartLines } from "@/entities/cart/lib/selectCartLines";
 import { useCartFlashSalePriceTick } from "@/entities/cart/model/useCartFlashSalePriceTick";
@@ -244,6 +249,32 @@ export default function CartScreen() {
       activeSummary.selectedLines.map((line) => line.product),
     );
   }, [auctionCheckoutBid, activeSummary.selectedLines, productsQuery.products]);
+
+  // Покупатель видит только то, что принимают продавцы оформляемых товаров:
+  // способ, которого у продавца нет, сервер отклонит.
+  const checkoutSellers = useMemo(() => {
+    if (auctionCheckoutBid) {
+      const product = (productsQuery.products ?? []).find(
+        (item) => String(item._id) === String(auctionCheckoutBid.productId),
+      );
+      return resolveCheckoutSellers([product]);
+    }
+    return resolveCheckoutSellers(
+      activeSummary.selectedLines.map((line) => line.product),
+    );
+  }, [auctionCheckoutBid, activeSummary.selectedLines, productsQuery.products]);
+  const allowedPaymentMethods = useMemo(
+    () => resolveCartAllowedPaymentMethods(checkoutSellers),
+    [checkoutSellers],
+  );
+  const checkoutSellerIds = useMemo(
+    () => checkoutSellers.map((seller) => seller.sellerId),
+    [checkoutSellers],
+  );
+  const cardPrepaidAvailable = useCardPrepaidAvailable({
+    sellerIds: checkoutSellerIds,
+    enabled: isAuthorized,
+  });
 
   const handleRefresh = useCallback(async () => {
     await Promise.all([
@@ -479,6 +510,8 @@ export default function CartScreen() {
         pickupGroups={pickupGroups}
         deliveryAvailable={deliveryAvailable}
         pickupAvailable={pickupAvailable}
+        allowedPaymentMethods={allowedPaymentMethods}
+        cardPrepaidAvailable={cardPrepaidAvailable}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}
         submitSuccess={submitState.success}
@@ -493,6 +526,8 @@ export default function CartScreen() {
         pickupGroups={pickupGroups}
         deliveryAvailable={deliveryAvailable}
         pickupAvailable={pickupAvailable}
+        allowedPaymentMethods={allowedPaymentMethods}
+        cardPrepaidAvailable={cardPrepaidAvailable}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}
         submitSuccess={submitState.success}

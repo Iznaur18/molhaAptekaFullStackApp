@@ -92,3 +92,26 @@ export const orderPaymentBodySchema = z.object({
   returnUrl: returnUrlSchema,
   idempotencyKey: z.string().trim().min(1).max(64).optional(),
 });
+
+/** `data` ответа `GET /payments/config`. */
+export const paymentConfigDataSchema = z
+  .object({
+    cardPaymentEnabled: z.boolean(),
+    /** Продавцы, за чей товар площадка принимает предоплату по СБП. */
+    cardPrepaidSellerIds: z.array(z.string()).optional().default([]),
+  })
+  .passthrough();
+
+/**
+ * `data` ответа ручек, создающих платёж (`POST /payments/order/:orderId` и
+ * остальные): куда вести покупателя и сколько спишут.
+ */
+export const createdPaymentDataSchema = z.object({
+  payment: z
+    .object({
+      paymentId: z.string(),
+      confirmationUrl: z.string(),
+      amountRub: z.number(),
+    })
+    .passthrough(),
+});

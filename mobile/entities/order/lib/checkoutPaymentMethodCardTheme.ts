@@ -1,5 +1,6 @@
 import { semanticColors } from "@/shared/theme/semanticColors";
 import {
+  ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY,
   ORDER_PAYMENT_METHOD_CARD_PREPAID,
   ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY,
   type OrderPaymentMethod,
@@ -30,5 +31,10 @@ export const CHECKOUT_PAYMENT_METHOD_CARD_THEME: Record<
   [ORDER_PAYMENT_METHOD_CASH_ON_DELIVERY]: {
     surface: semanticColors.successSurface,
     label: semanticColors.successText,
+  },
+  // На сайте у способа нет своей заливки — обычная карточка на поверхности.
+  [ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY]: {
+    surface: semanticColors.surfaceMuted,
+    label: semanticColors.text,
   },
 };

@@ -997,6 +997,8 @@ export {
   PLATFORM_SERVICE_KINDS,
   platformServicePaymentParamsSchema,
   platformServicePaymentBodySchema,
+  paymentConfigDataSchema,
+  createdPaymentDataSchema,
 } from "./payments.js";
 export {
   PROMO_RETURN_STREAK_TIME_ZONE,

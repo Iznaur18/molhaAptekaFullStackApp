@@ -1,3 +1,4 @@
+import { isCardPrepaidAvailableForSellers } from "@izibuy/shared-lib";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
@@ -47,12 +48,10 @@ export function useCreateOrderPaymentMutation() {
  */
 export function useCardPrepaidAvailable({ sellerIds }) {
   const configQuery = usePaymentConfigQuery();
-  const allowed = configQuery.data?.cardPrepaidSellerIds ?? [];
-  if (allowed.length === 0 || sellerIds.length === 0) {
-    return false;
-  }
-  const allowedSet = new Set(allowed.map(String));
-  return sellerIds.every((id) => allowedSet.has(String(id)));
+  return isCardPrepaidAvailableForSellers(
+    configQuery.data?.cardPrepaidSellerIds,
+    sellerIds,
+  );
 }
 
 /**

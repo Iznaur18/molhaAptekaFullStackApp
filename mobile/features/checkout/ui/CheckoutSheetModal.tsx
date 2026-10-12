@@ -27,6 +27,8 @@ type CheckoutSheetModalProps = {
   pickupGroups?: CheckoutProductPickupGroup[];
   deliveryAvailable?: boolean;
   pickupAvailable?: boolean;
+  allowedPaymentMethods?: readonly string[] | null;
+  cardPrepaidAvailable?: boolean;
   isSubmitting: boolean;
   submitError: string;
   submitSuccess: string;
@@ -47,6 +49,8 @@ export const CheckoutSheetModal = ({
   pickupGroups = [],
   deliveryAvailable = false,
   pickupAvailable = true,
+  allowedPaymentMethods = null,
+  cardPrepaidAvailable = false,
   isSubmitting,
   submitError,
   submitSuccess,
@@ -116,6 +120,8 @@ export const CheckoutSheetModal = ({
               pickupGroups={pickupGroups}
               deliveryAvailable={deliveryAvailable}
               pickupAvailable={pickupAvailable}
+              allowedPaymentMethods={allowedPaymentMethods}
+              cardPrepaidAvailable={cardPrepaidAvailable}
               isSubmitting={isSubmitting}
               submitError={submitError}
               submitSuccess={submitSuccess}

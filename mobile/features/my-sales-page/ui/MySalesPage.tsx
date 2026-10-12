@@ -19,7 +19,7 @@ import {
 import { MY_ORDERS_LIST_FILTER_IN_PROGRESS } from "@/entities/order/model/myOrdersListFilters";
 import { useMySalesQuery } from "@/entities/order/model/useMySalesQuery";
 import { useOrderMutations } from "@/entities/order/model/useOrderMutations";
-import { OrderCard } from "@/entities/order/ui/OrderCard";
+import { OrderCard, orderShipmentActionKey } from "@/entities/order/ui/OrderCard";
 import { useAuthSessionQuery } from "@/entities/session/model/useAuthSessionQuery";
 import { useIsAuthorized } from "@/entities/session/model/useIsAuthorized";
 import { normalizeTotalSalesCount } from "@/entities/user/lib/formatSearchRowTotalSales";
@@ -85,8 +85,12 @@ export const MySalesPage = () => {
     search: salesParams.search,
     enabled: isAuthorized,
   });
-  const { cancelItemMutation, shipItemMutation, deliverItemMutation } =
-    useOrderMutations();
+  const {
+    cancelItemMutation,
+    shipItemMutation,
+    deliverItemMutation,
+    advanceShipmentMutation,
+  } = useOrderMutations();
   const [pendingActionKey, setPendingActionKey] = useState<string | null>(null);
   const [itemActionErrors, setItemActionErrors] = useState<Record<string, string>>({});
 
@@ -211,12 +215,46 @@ export const MySalesPage = () => {
     orderId: string;
     itemIndex: number;
   }) => {
-    void runSellerAction({
+    // Возвращаем промис: карточка двигает отправление позиция за позицией.
+    return runSellerAction({
       orderId,
       itemIndex,
       optimisticStatus: ORDER_STATUS_SHIPPED,
       mutate: () => shipItemMutation.mutateAsync({ orderId, itemIndex }),
     });
+  };
+
+  /** Следующая ступень сборки для отправления целиком: «Принять» → «Готов…». */
+  const handleAdvanceShipment = async ({
+    orderId,
+    nextStatus,
+  }: {
+    orderId: string;
+    nextStatus: string;
+  }) => {
+    const actionKey = orderShipmentActionKey(orderId, "advance");
+    setPendingActionKey(actionKey);
+    setItemActionErrors((prev) => ({ ...prev, [actionKey]: "" }));
+    try {
+      const updatedOrder = await advanceShipmentMutation.mutateAsync({
+        orderId,
+        nextStatus,
+      });
+      patchSalesCaches((prev) =>
+        prev.map((order) => (order._id === orderId ? updatedOrder : order)),
+      );
+      await invalidateSalesQueues();
+      void handleRefresh();
+    } catch (error) {
+      const message = formatApiErrorMessage(
+        error,
+        API_CLIENT_UI.UPDATE_ORDER_STATUS_FALLBACK,
+      );
+      setItemActionErrors((prev) => ({ ...prev, [actionKey]: message }));
+      void handleRefresh();
+    } finally {
+      setPendingActionKey(null);
+    }
   };
 
   const handleMarkDelivered = ({
@@ -226,7 +264,7 @@ export const MySalesPage = () => {
     orderId: string;
     itemIndex: number;
   }) => {
-    void runSellerAction({
+    return runSellerAction({
       orderId,
       itemIndex,
       optimisticStatus: ORDER_STATUS_DELIVERED,
@@ -384,6 +422,7 @@ export const MySalesPage = () => {
               onProductClick={handleProductClick}
               onMarkShipped={handleMarkShipped}
               onMarkDelivered={handleMarkDelivered}
+              onAdvanceShipment={handleAdvanceShipment}
               onCancelItem={handleCancelItem}
               pendingActionKey={pendingActionKey}
               itemActionErrors={itemActionErrors}

@@ -71,6 +71,61 @@ export const SALES_ORDER_STATUS_LABEL_RU: Record<OrderStatus, string> = {
   [ORDER_STATUS_SHIPPED]: "Отгружен",
 };
 
+/**
+ * Ступени, которые продавец двигает кнопкой. Совпадает с
+ * `ORDER_SHIPMENT_ADVANCE_STATUSES` в контракте.
+ */
+export const SHIPMENT_ADVANCE_BUTTON_LABEL_RU: Record<string, string> = {
+  [ORDER_STATUS_ACCEPTED]: "Принять",
+  [ORDER_STATUS_ASSEMBLING]: "На сборку",
+  [ORDER_STATUS_READY_FOR_PICKUP]: "Готов к выдаче",
+  [ORDER_STATUS_READY_TO_SHIP]: "Готов к отгрузке",
+};
+
+/** Товар ещё у продавца: отсюда можно и отменить, и отгрузить. */
+export const ORDER_PRE_SHIPMENT_STATUSES: readonly string[] = [
+  ORDER_STATUS_PENDING,
+  ORDER_STATUS_ACCEPTED,
+  ORDER_STATUS_ASSEMBLING,
+  ORDER_STATUS_READY_FOR_PICKUP,
+  ORDER_STATUS_READY_TO_SHIP,
+];
+
+type OrderShipmentFulfillment = "pickup" | "delivery" | null | undefined;
+
+/**
+ * Следующая ступень отправления, или `null` если двигать некуда.
+ *
+ * Совпадает с `NEXT_STATUS_BY_CURRENT` в
+ * `server/services/order/advanceShipmentStatus.js`. Сервер всё равно
+ * проверяет переход сам — здесь только чтобы нарисовать нужную кнопку.
+ */
+export function resolveNextShipmentStatus(
+  currentStatus: string | null | undefined,
+  fulfillmentMethod: OrderShipmentFulfillment,
+): string | null {
+  if (currentStatus === ORDER_STATUS_PENDING) return ORDER_STATUS_ACCEPTED;
+  if (currentStatus === ORDER_STATUS_ACCEPTED) return ORDER_STATUS_ASSEMBLING;
+  if (currentStatus === ORDER_STATUS_ASSEMBLING) {
+    return fulfillmentMethod === "delivery"
+      ? ORDER_STATUS_READY_TO_SHIP
+      : ORDER_STATUS_READY_FOR_PICKUP;
+  }
+  return null;
+}
+
+/** Подпись кнопки перехода, или `null` если кнопку показывать не нужно. */
+export function resolveShipmentAdvanceAction(
+  currentStatus: string | null | undefined,
+  fulfillmentMethod: OrderShipmentFulfillment,
+): { nextStatus: string; label: string } | null {
+  const nextStatus = resolveNextShipmentStatus(currentStatus, fulfillmentMethod);
+  if (!nextStatus) return null;
+
+  const label = SHIPMENT_ADVANCE_BUTTON_LABEL_RU[nextStatus];
+  return label ? { nextStatus, label } : null;
+}
+
 /** Совпадает с `ORDER_STATUS_LADDER_RANK` в `server/constants/orderConstants.js`. */
 const LADDER_RANK: Record<string, number> = {
   [ORDER_STATUS_PENDING]: 0,

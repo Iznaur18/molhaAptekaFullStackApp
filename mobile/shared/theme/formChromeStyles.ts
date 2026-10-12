@@ -735,6 +735,35 @@ export const useCheckoutPaymentMethodPickerStyles = createThemedStyles((theme) =
   cardLabelSelected: {
     color: theme.colors.text,
   },
+  // Web: `.checkout-payment-method-picker__card--locked` — пунктир без заливки.
+  cardLocked: {
+    backgroundColor: "transparent",
+    borderColor: theme.colors.border,
+    borderStyle: "dashed",
+    opacity: 0.7,
+  },
+  cardLockReason: {
+    marginTop: 2,
+    fontSize: 11,
+    lineHeight: 13,
+    fontWeight: "500",
+    textAlign: "center",
+    color: theme.colors.textMuted,
+  },
+  // Web: `.checkout-payment-method-picker__single` — один способ строкой.
+  single: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderWidth: 1.5,
+    borderColor: theme.colors.action,
+    borderRadius: 12,
+    backgroundColor: theme.colors.actionSoft,
+    color: theme.colors.text,
+    fontSize: 14,
+    fontWeight: "600",
+    overflow: "hidden",
+  },
 }));
 
 export const useAddressSuggestStyles = createThemedStyles((theme) => ({
