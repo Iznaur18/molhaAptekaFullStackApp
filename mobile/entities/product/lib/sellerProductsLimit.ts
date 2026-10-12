@@ -14,7 +14,7 @@ type SellerProductsLimitUser = {
 
 export const getSellerProductsLimit = (
   user: SellerProductsLimitUser | null | undefined,
-): number => resolveSellerProductsLimit(user, isPremiumActive(user));
+): number => resolveSellerProductsLimit(user ?? {}, isPremiumActive(user));
 
 export const formatSellerProductsQuota = (
   used: number | null | undefined,

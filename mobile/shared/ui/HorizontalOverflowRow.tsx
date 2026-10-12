@@ -38,20 +38,21 @@ const shellBaseStyle = (height: number): ViewStyle => ({
   overflow: "hidden",
 });
 
-const domTrackBaseStyle = (height: number): ViewStyle => ({
-  height,
-  maxHeight: height,
-  width: "100%",
-  flexDirection: "row",
-  flexWrap: "nowrap",
-  alignItems: "center",
-  flexGrow: 0,
-  flexShrink: 0,
-  overflowX: "auto",
-  overflowY: "hidden",
-  overscrollBehaviorX: "contain",
-  scrollbarWidth: "none",
-});
+const domTrackBaseStyle = (height: number): ViewStyle =>
+  ({
+    height,
+    maxHeight: height,
+    width: "100%",
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    alignItems: "center",
+    flexGrow: 0,
+    flexShrink: 0,
+    overflowX: "auto",
+    overflowY: "hidden",
+    overscrollBehaviorX: "contain",
+    scrollbarWidth: "none",
+  }) as unknown as ViewStyle;
 
 const nativeScrollStyle = (height: number): ViewStyle => ({
   height,

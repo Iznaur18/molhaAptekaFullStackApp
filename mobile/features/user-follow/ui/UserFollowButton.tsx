@@ -78,7 +78,7 @@ export const UserFollowButton = ({
         ]}
         onPress={() => void handlePress()}
         disabled={isBusy}
-        accessibilityState={{ pressed: isFollowing }}
+        accessibilityState={{ selected: isFollowing }}
       >
         <Text
           style={[

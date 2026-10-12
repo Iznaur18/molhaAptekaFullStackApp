@@ -1,4 +1,4 @@
-import { Platform, StyleSheet } from "react-native";
+import { Platform, StyleSheet, type ViewStyle } from "react-native";
 
 import { PRODUCT_MEDIA_DISPLAY_ASPECT_RATIO } from "@izibuy/design-tokens";
 
@@ -1450,7 +1450,7 @@ export const useProductDetailFieldStyles = createThemedStyles((theme) => ({
       ? ({
           display: "grid",
           gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-        } as const)
+        } as unknown as ViewStyle)
       : {
           flexDirection: "row",
           flexWrap: "wrap",
@@ -1565,7 +1565,7 @@ export const useProductDetailsSellerPreviewStyles = createThemedStyles((theme) =
           gap: SP.metricsGap,
           width: "100%",
           minWidth: 0,
-        } as const)
+        } as unknown as ViewStyle)
       : {
           flexDirection: "row",
           flexWrap: "wrap",
@@ -2146,8 +2146,8 @@ export const useProductDetailScreenStyles = createThemedStyles((theme) => ({
           display: "grid",
           gridTemplateColumns: `repeat(auto-fit, minmax(${FC.gridSplitMinCellWidth}px, 1fr))`,
           alignItems: "stretch",
-        } as const)
-      : null,
+        } as unknown as ViewStyle)
+      : {},
   detailsSectionSplit: {
     paddingHorizontal: 0,
   },

@@ -11,6 +11,7 @@ import {
 import { useUserStoryMutations } from "@/entities/user-story/model/useUserStoryMutations";
 import { PRODUCT_REPORT_TEXT_MAX_CHARS, USER_STORY_UI } from "@/shared/config";
 import { ModalSheetGradientBackdrop } from "@/shared/ui/ModalSheetGradientBackdrop";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
 import { useBottomSheetReportModalStyles } from "@/shared/theme/modalChromeStyles";
 
 type ReportUserStoryModalProps = {
