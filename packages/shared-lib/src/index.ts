@@ -54,7 +54,18 @@ export {
   resolveOrderLineAffiliateSellerLine,
 } from "./resolveOrderLineAffiliateSellerLine.js";
 export {
+  ORDER_STATUSES,
+  ORDER_STATUS_LABEL_RU,
+  SALES_ORDER_STATUS_LABEL_RU,
+  ORDER_STATUS_ACCEPTED,
+  ORDER_STATUS_ASSEMBLING,
   ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_COURIER_ASSIGNED,
+  ORDER_STATUS_COURIER_HOLDING,
+  ORDER_STATUS_DISPUTED,
+  ORDER_STATUS_IN_DELIVERY,
+  ORDER_STATUS_READY_FOR_PICKUP,
+  ORDER_STATUS_READY_TO_SHIP,
   ORDER_STATUS_RETURNED,
   ORDER_STATUS_CONFIRMED,
   ORDER_STATUS_DELIVERED,
@@ -64,7 +75,7 @@ export {
   calculateOrderItemsTotalAmount,
   summarizeOrderItems,
 } from "./orderStatus.js";
-export type { OrderItemsSummary } from "./orderStatus.js";
+export type { OrderItemsSummary, OrderStatus } from "./orderStatus.js";
 export {
   MY_ORDER_UNKNOWN_SELLER_ID,
   projectMyOrderSellerBlocks,

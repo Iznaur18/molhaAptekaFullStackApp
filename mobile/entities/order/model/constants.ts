@@ -24,32 +24,27 @@ export const ORDER_PAYMENT_METHOD_LABEL_RU: Record<OrderPaymentMethod, string> =
   [ORDER_PAYMENT_METHOD_CARD_PREPAID]: "СБП",
 };
 
-export const ORDER_STATUS_PENDING = "pending" as const;
-export const ORDER_STATUS_CONFIRMED = "confirmed" as const;
-export const ORDER_STATUS_SHIPPED = "shipped" as const;
-export const ORDER_STATUS_DELIVERED = "delivered" as const;
-export const ORDER_STATUS_CANCELLED = "cancelled" as const;
-
-export const ORDER_STATUSES = [
-  ORDER_STATUS_PENDING,
-  ORDER_STATUS_CONFIRMED,
-  ORDER_STATUS_SHIPPED,
-  ORDER_STATUS_DELIVERED,
+/**
+ * Статусы заказа и их подписи — одни для сайта и приложения, источник в
+ * `@izibuy/shared-lib`. Здесь реэкспорт, чтобы импорты по приложению не менялись.
+ */
+export {
+  ORDER_STATUSES,
+  ORDER_STATUS_LABEL_RU,
+  SALES_ORDER_STATUS_LABEL_RU,
+  ORDER_STATUS_ACCEPTED,
+  ORDER_STATUS_ASSEMBLING,
   ORDER_STATUS_CANCELLED,
-] as const;
-
-export type OrderStatus = (typeof ORDER_STATUSES)[number];
-
-export const ORDER_STATUS_LABEL_RU: Record<OrderStatus, string> = {
-  [ORDER_STATUS_PENDING]: "В обработке",
-  [ORDER_STATUS_CONFIRMED]: "Подтверждён",
-  [ORDER_STATUS_SHIPPED]: "Отправлен",
-  [ORDER_STATUS_DELIVERED]: "Доставлен",
-  [ORDER_STATUS_CANCELLED]: "Отменён",
-};
-
-/** Лейблы статусов в «Мои продажи» (seller): shipped → «Принят». */
-export const SALES_ORDER_STATUS_LABEL_RU: Record<OrderStatus, string> = {
-  ...ORDER_STATUS_LABEL_RU,
-  [ORDER_STATUS_SHIPPED]: "Принят",
-};
+  ORDER_STATUS_CONFIRMED,
+  ORDER_STATUS_COURIER_ASSIGNED,
+  ORDER_STATUS_COURIER_HOLDING,
+  ORDER_STATUS_DELIVERED,
+  ORDER_STATUS_DISPUTED,
+  ORDER_STATUS_IN_DELIVERY,
+  ORDER_STATUS_PENDING,
+  ORDER_STATUS_READY_FOR_PICKUP,
+  ORDER_STATUS_READY_TO_SHIP,
+  ORDER_STATUS_RETURNED,
+  ORDER_STATUS_SHIPPED,
+} from "@izibuy/shared-lib";
+export type { OrderStatus } from "@izibuy/shared-lib";

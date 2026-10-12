@@ -18,6 +18,59 @@ export const ORDER_STATUS_IN_DELIVERY = "in_delivery";
 /** Товар вне контроля: разбирается модератором. */
 export const ORDER_STATUS_DISPUTED = "disputed";
 
+/**
+ * Все статусы в порядке показа (фильтры, селекты). Значения совпадают с
+ * `ORDER_STATUSES` в контракте и `server/constants/orderConstants.js`.
+ */
+export const ORDER_STATUSES = [
+  ORDER_STATUS_PENDING,
+  ORDER_STATUS_ACCEPTED,
+  ORDER_STATUS_ASSEMBLING,
+  ORDER_STATUS_READY_FOR_PICKUP,
+  ORDER_STATUS_READY_TO_SHIP,
+  ORDER_STATUS_COURIER_ASSIGNED,
+  ORDER_STATUS_COURIER_HOLDING,
+  ORDER_STATUS_IN_DELIVERY,
+  ORDER_STATUS_CONFIRMED,
+  ORDER_STATUS_SHIPPED,
+  ORDER_STATUS_DELIVERED,
+  ORDER_STATUS_CANCELLED,
+  ORDER_STATUS_RETURNED,
+  ORDER_STATUS_DISPUTED,
+] as const;
+
+export type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+/** Подписи статусов — одни для сайта и приложения. */
+export const ORDER_STATUS_LABEL_RU: Record<OrderStatus, string> = {
+  [ORDER_STATUS_PENDING]: "В обработке",
+  [ORDER_STATUS_ACCEPTED]: "Принят",
+  [ORDER_STATUS_ASSEMBLING]: "На сборке",
+  [ORDER_STATUS_READY_FOR_PICKUP]: "Готов к выдаче",
+  [ORDER_STATUS_READY_TO_SHIP]: "Готов к отгрузке",
+  [ORDER_STATUS_COURIER_ASSIGNED]: "Принят курьером",
+  [ORDER_STATUS_COURIER_HOLDING]: "У курьера",
+  [ORDER_STATUS_IN_DELIVERY]: "На доставке",
+  [ORDER_STATUS_CONFIRMED]: "Подтверждён",
+  [ORDER_STATUS_SHIPPED]: "Отправлен",
+  [ORDER_STATUS_DELIVERED]: "Доставлен",
+  [ORDER_STATUS_CANCELLED]: "Отменён",
+  [ORDER_STATUS_RETURNED]: "Возвращён",
+  [ORDER_STATUS_DISPUTED]: "Спор",
+};
+
+/**
+ * Подписи статусов в «Мои продажи».
+ *
+ * Раньше продавцу `shipped` показывался как «Принят» — теперь «Принят» это
+ * настоящая ступень лестницы, и два разных статуса под одной подписью
+ * путали бы продавца.
+ */
+export const SALES_ORDER_STATUS_LABEL_RU: Record<OrderStatus, string> = {
+  ...ORDER_STATUS_LABEL_RU,
+  [ORDER_STATUS_SHIPPED]: "Отгружен",
+};
+
 /** Совпадает с `ORDER_STATUS_LADDER_RANK` в `server/constants/orderConstants.js`. */
 const LADDER_RANK: Record<string, number> = {
   [ORDER_STATUS_PENDING]: 0,

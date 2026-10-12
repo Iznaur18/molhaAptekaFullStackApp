@@ -1339,7 +1339,7 @@ export const ORDER_CARD_UI = {
   DETAILS_FOLD_SUMMARY: "Подробности заказа",
   ACTION_CONFIRM: "Подтвердить получение",
   ACTION_CANCEL: "Отменить",
-  ACTION_SHIPPED: "Принять",
+  ACTION_SHIPPED: "Отгрузить",
   ACTION_DELIVERED: "Доставлен",
   ACTION_PENDING: "Сохраняем…",
   CANCEL_CONFIRM: "Отменить заказ покупателя?",
