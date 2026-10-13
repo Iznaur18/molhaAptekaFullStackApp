@@ -1,3 +1,4 @@
+import { normalizeCategoryOwnDealType } from "@molha/api-contract";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
 
@@ -99,6 +100,12 @@ export function useCategoryTreeAdminPage() {
     [rows],
   );
 
+  /** Итоговый тип сделки по id — подсказка «как у родителя» в форме узла. */
+  const effectiveDealTypeById = useMemo(
+    () => new Map(rows.map((row) => [row._id, row.effectiveDealType ?? ""])),
+    [rows],
+  );
+
   const filteredRows = useMemo(
     () => filterCategoryRows(rows, searchQuery),
     [rows, searchQuery],
@@ -123,6 +130,7 @@ export function useCategoryTreeAdminPage() {
       keywordsCsv: (row.searchKeywords ?? []).join(", "),
       characteristicKeysText: (row.defaultCharacteristicKeys ?? []).join("\n"),
       legacyProductCategory: row.legacyProductCategory ?? "",
+      dealType: row.dealType ?? "",
     });
     setActionError("");
   }, []);
@@ -204,10 +212,15 @@ export function useCategoryTreeAdminPage() {
               : [],
           legacyProductCategory:
             String(editDraft.legacyProductCategory ?? "").trim() || null,
+          dealType: normalizeCategoryOwnDealType(editDraft.dealType),
         },
       });
 
-      if (isCategoryStructureChanged(row, editDraft)) {
+      // Тип сделки наследуется: правка одного узла меняет итог у всей ветки.
+      const dealTypeChanged =
+        normalizeCategoryOwnDealType(editDraft.dealType) !== (row.dealType ?? null);
+
+      if (isCategoryStructureChanged(row, editDraft) || dealTypeChanged) {
         await reloadRows({ silent: true });
       } else {
         updateRows((prev) =>
@@ -287,6 +300,7 @@ export function useCategoryTreeAdminPage() {
     actionNotice,
     isCreateRoot,
     parentOptions,
+    effectiveDealTypeById,
     filteredRows,
     patchDraft,
     cancelEdit,

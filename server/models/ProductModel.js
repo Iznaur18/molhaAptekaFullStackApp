@@ -1,4 +1,8 @@
 import mongoose from "mongoose";
+import {
+  CATEGORY_DEAL_TYPE_DEFAULT,
+  CATEGORY_DEAL_TYPE_VALUES,
+} from "@molha/api-contract";
 
 import {
   PRODUCT_DESCRIPTION_MAX_CHARS,
@@ -395,6 +399,17 @@ const ProductSchema = new Schema(
       ref: "ProductCategory",
       default: null,
       index: true,
+    },
+    /**
+     * Тип сделки, снятый с категории: товар, осмотр или услуга.
+     *
+     * Копия на товаре, чтобы лента и корзина не ходили за категорией на
+     * каждую карточку. Пусто у старых товаров — читается как обычный товар.
+     */
+    productDealType: {
+      type: String,
+      enum: CATEGORY_DEAL_TYPE_VALUES,
+      default: CATEGORY_DEAL_TYPE_DEFAULT,
     },
     sellerPersonalCategoryId: {
       type: Schema.Types.ObjectId,

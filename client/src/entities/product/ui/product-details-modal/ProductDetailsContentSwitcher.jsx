@@ -1,3 +1,4 @@
+import { isCartDealType, normalizeCategoryDealType } from "@molha/api-contract";
 import { useMemo } from "react";
 
 import { PRODUCT_DETAILS_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
@@ -26,6 +27,12 @@ export function ProductDetailsContentSwitcher({ product, contentPanels }) {
     product._id,
   );
 
+  const dealType = normalizeCategoryDealType(product.productDealType);
+  const isCartDeal = isCartDealType(dealType);
+  const deliveryTabLabel = isCartDeal
+    ? PRODUCT_DETAILS_MODAL_UI.DELIVERY_TITLE
+    : PRODUCT_DETAILS_MODAL_UI.DEAL_TAB_TITLE[dealType];
+
   const tabs = useMemo(() => {
     const items = [];
     if (hasDescription) {
@@ -36,7 +43,7 @@ export function ProductDetailsContentSwitcher({ product, contentPanels }) {
     }
     items.push({
       id: PRODUCT_DETAILS_CONTENT_PANEL.DELIVERY,
-      label: PRODUCT_DETAILS_MODAL_UI.DELIVERY_TITLE,
+      label: deliveryTabLabel,
     });
     if (hasCharacteristics) {
       items.push({
@@ -49,7 +56,7 @@ export function ProductDetailsContentSwitcher({ product, contentPanels }) {
       label: PRODUCT_DETAILS_MODAL_UI.RETURNS_TITLE,
     });
     return items;
-  }, [hasCharacteristics, hasDescription]);
+  }, [deliveryTabLabel, hasCharacteristics, hasDescription]);
 
   const descriptionText = String(product.productDescription ?? "").trim();
   const returnTerms = Array.isArray(product.productReturnTerms)
@@ -65,7 +72,9 @@ export function ProductDetailsContentSwitcher({ product, contentPanels }) {
   const showDelivery = activePanel === PRODUCT_DETAILS_CONTENT_PANEL.DELIVERY;
 
   const panelAriaLabel = showDelivery
-    ? PRODUCT_DETAILS_MODAL_UI.DELIVERY_SECTION_ARIA
+    ? isCartDeal
+      ? PRODUCT_DETAILS_MODAL_UI.DELIVERY_SECTION_ARIA
+      : PRODUCT_DETAILS_MODAL_UI.DEAL_SECTION_ARIA[dealType]
     : showReturns
       ? PRODUCT_DETAILS_MODAL_UI.RETURNS_SECTION_ARIA
       : showCharacteristics

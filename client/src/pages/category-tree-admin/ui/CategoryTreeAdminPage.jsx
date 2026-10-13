@@ -37,6 +37,7 @@ export function CategoryTreeAdminPage() {
     actionNotice,
     isCreateRoot,
     parentOptions,
+    effectiveDealTypeById,
     filteredRows,
     patchDraft,
     cancelEdit,
@@ -175,6 +176,7 @@ export function CategoryTreeAdminPage() {
               key={row._id}
               row={row}
               parentOptions={parentOptions}
+              effectiveDealTypeById={effectiveDealTypeById}
               isEditing={editingId === row._id}
               isPending={pendingId === row._id}
               editDraft={editDraft}

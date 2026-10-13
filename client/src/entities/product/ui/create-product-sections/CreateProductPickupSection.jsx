@@ -2,7 +2,11 @@ import { useEffect, useMemo } from "react";
 import {
   PRODUCT_FULFILLMENT_SOURCE_CUSTOM,
   PRODUCT_FULFILLMENT_SOURCE_PROFILE,
+  isCartDealType,
+  normalizeCategoryDealType,
 } from "@molha/api-contract";
+
+import { PRODUCT_PICKUP_UI } from "../../../../shared/config/appUiCopy.js";
 
 import { userSavedAddressesFromUser } from "../../../address/lib/userSavedAddressesFromUser.js";
 import { useAuthSession } from "../../../user/model/useAuthSession.js";
@@ -36,11 +40,26 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
     [user],
   );
 
+  // Авто, недвижимость, услуги: способов получения нет, нужен только адрес.
+  const dealType = normalizeCategoryDealType(form.categoryDealType);
+  const addressOnly = !isCartDealType(dealType);
+
   const source = String(form.productFulfillmentSource ?? "");
 
   // Пустой источник — товар, который ещё не выбирал. Настройки профиля есть →
   // берём их: ради этого всё и затевалось. Нет → форма спросит адрес сама.
   useEffect(() => {
+    // Профиль продавца описывает доставку и самовывоз — объявлению без корзины
+    // он не подходит, адрес встречи продавец указывает прямо здесь.
+    if (addressOnly) {
+      if (source !== PRODUCT_FULFILLMENT_SOURCE_CUSTOM) {
+        setForm((prev) => ({
+          ...prev,
+          productFulfillmentSource: PRODUCT_FULFILLMENT_SOURCE_CUSTOM,
+        }));
+      }
+      return;
+    }
     if (source || !defaultsQuery.isSuccess) {
       return;
     }
@@ -48,9 +67,9 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
       ? PRODUCT_FULFILLMENT_SOURCE_PROFILE
       : PRODUCT_FULFILLMENT_SOURCE_CUSTOM;
     setForm((prev) => ({ ...prev, productFulfillmentSource: next }));
-  }, [source, defaults, defaultsQuery.isSuccess, setForm]);
+  }, [addressOnly, source, defaults, defaultsQuery.isSuccess, setForm]);
 
-  const followsProfile = source === PRODUCT_FULFILLMENT_SOURCE_PROFILE;
+  const followsProfile = !addressOnly && source === PRODUCT_FULFILLMENT_SOURCE_PROFILE;
 
   const locations = Array.isArray(form.productPickupLocations)
     ? form.productPickupLocations
@@ -58,18 +77,25 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
 
   return (
     <div className="create-product-section">
-      <ProductFulfillmentSourceSwitch
-        value={source}
-        disabled={isSubmitting}
-        defaults={defaults}
-        onChange={(next) =>
-          setForm((prev) => ({ ...prev, productFulfillmentSource: next }))
-        }
-      />
+      {addressOnly ? (
+        <p className="create-product-section__lead" role="note">
+          {PRODUCT_PICKUP_UI.DEAL_FORM_NOTICE[dealType]}
+        </p>
+      ) : (
+        <ProductFulfillmentSourceSwitch
+          value={source}
+          disabled={isSubmitting}
+          defaults={defaults}
+          onChange={(next) =>
+            setForm((prev) => ({ ...prev, productFulfillmentSource: next }))
+          }
+        />
+      )}
 
       {followsProfile ? null : (
         <ProductPickupLocationFields
           locations={locations}
+          addressOnly={addressOnly}
           pickupEnabled={form.productPickupEnabled !== false}
           deliveryEnabled={form.productDeliveryEnabled === true}
           courierDeliveryEnabled={form.productCourierDeliveryEnabled === true}

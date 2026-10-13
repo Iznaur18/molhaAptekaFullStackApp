@@ -44,6 +44,7 @@ export const syncProductsDenormForCategorySubtree = async (rootCategoryId) => {
       /** @type {Record<string, unknown>} */
       const $set = {
         productCategory: categoryWrite.productCategory,
+        productDealType: categoryWrite.productDealType,
         categoryPathIds: categoryWrite.categoryPathIds,
         categoryBreadcrumbRu: categoryWrite.categoryBreadcrumbRu,
       };

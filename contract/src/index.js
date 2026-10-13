@@ -312,6 +312,22 @@ export {
   myAffiliateSalesDataSchema,
 } from "./productAffiliate.js";
 export {
+  CATEGORY_DEAL_TYPE_GOODS,
+  CATEGORY_DEAL_TYPE_VIEWING,
+  CATEGORY_DEAL_TYPE_SERVICE,
+  CATEGORY_DEAL_TYPE_VALUES,
+  CATEGORY_DEAL_TYPE_DEFAULT,
+  CATEGORY_DEAL_TYPES_WITHOUT_CART,
+  CATEGORY_DEAL_TYPE_LABELS_RU,
+  CATEGORY_DEAL_TYPE_NOT_PURCHASABLE_MESSAGE,
+  categoryDealTypeSchema,
+  categoryOwnDealTypeSchema,
+  normalizeCategoryDealType,
+  normalizeCategoryOwnDealType,
+  isCartDealType,
+  isProductPurchasableViaCart,
+} from "./categoryDealType.js";
+export {
   productCategorySlugParamsSchema,
   productCategoryDisplaySlugParamsSchema,
   productCategoryIdParamsSchema,

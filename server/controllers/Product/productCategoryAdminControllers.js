@@ -1,4 +1,8 @@
 import mongoose from "mongoose";
+import {
+  normalizeCategoryDealType,
+  normalizeCategoryOwnDealType,
+} from "@molha/api-contract";
 
 import { PRODUCT_CATEGORY_VALUES } from "../../constants/productConstants.js";
 import {
@@ -13,6 +17,10 @@ import { ensureProductCategoryDisplayForSlug } from "../../services/product/ensu
 import { computeProductCategoryNodePaths } from "../../services/product/computeProductCategoryNodePaths.js";
 import { normalizeProductCategorySearchKeywords } from "../../services/product/normalizeProductCategorySearchKeywords.js";
 import { normalizeProductCategoryDefaultCharacteristicKeys } from "../../services/product/normalizeProductCategoryDefaultCharacteristicKeys.js";
+import {
+  rebuildCategoryDealTypeSubtree,
+  resolveCategoryEffectiveDealType,
+} from "../../services/product/categoryDealType.js";
 import { rebuildProductCategorySubtreePaths } from "../../services/product/rebuildProductCategorySubtreePaths.js";
 import { syncProductsDenormForCategorySubtree } from "../../services/product/syncProductsDenormForCategorySubtree.js";
 import {
@@ -58,6 +66,9 @@ const toCategoryAdminPayload = (row, storefrontLabel = null) => ({
   legacyProductCategory:
     typeof row.legacyProductCategory === "string" ? row.legacyProductCategory : null,
   sortOrder: Number(row.sortOrder) || 0,
+  // Свой выбор узла (`null` — наследует) и то, что получилось в итоге.
+  dealType: normalizeCategoryOwnDealType(row.dealType),
+  effectiveDealType: normalizeCategoryDealType(row.effectiveDealType),
   updatedAt: row.updatedAt ?? null,
   // `null`, когда плитку не переименовывали: витрина показывает `labelRu`.
   storefrontLabel: storefrontLabel || null,
@@ -220,9 +231,17 @@ export async function createProductCategoryAdminController(req, res) {
     parentId,
   });
 
+  const dealType = normalizeCategoryOwnDealType(req.body?.dealType);
+  const effectiveDealType = await resolveCategoryEffectiveDealType({
+    ownDealType: dealType,
+    parentId,
+  });
+
   const doc = await ProductCategoryModel.create({
     slug,
     labelRu,
+    dealType,
+    effectiveDealType,
     parentId: paths.parentId,
     depth: paths.depth,
     pathSlugs: paths.pathSlugs,
@@ -376,10 +395,26 @@ export async function patchProductCategoryAdminController(req, res) {
     doc.pathLabelRu = paths.pathLabelRu;
   }
 
+  if (req.body?.dealType !== undefined) {
+    doc.dealType = normalizeCategoryOwnDealType(req.body.dealType);
+  }
+  // Пересчёт и при переносе: под другим родителем наследуется другой тип.
+  const previousEffectiveDealType = normalizeCategoryDealType(doc.effectiveDealType);
+  doc.effectiveDealType = await resolveCategoryEffectiveDealType({
+    ownDealType: doc.dealType,
+    parentId: doc.parentId,
+  });
+  const dealTypeChanged = doc.effectiveDealType !== previousEffectiveDealType;
+
   await doc.save();
 
   if (structureChanged) {
     await rebuildProductCategorySubtreePaths(doc._id);
+  }
+  if (dealTypeChanged) {
+    await rebuildCategoryDealTypeSubtree(doc._id);
+  }
+  if (structureChanged || dealTypeChanged) {
     await syncProductsDenormForCategorySubtree(doc._id);
   }
 

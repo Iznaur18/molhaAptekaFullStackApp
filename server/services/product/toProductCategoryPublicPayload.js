@@ -1,3 +1,5 @@
+import { normalizeCategoryDealType } from "@molha/api-contract";
+
 /**
  * @param {import('mongoose').LeanDocument<import('../models/ProductCategoryModel.js').default> | Record<string, unknown>} row
  */
@@ -18,6 +20,8 @@ export const toProductCategoryPublicPayload = (row) => ({
   defaultCharacteristicKeys: Array.isArray(row.defaultCharacteristicKeys)
     ? row.defaultCharacteristicKeys.map(String)
     : [],
+  // Итоговый тип с наследованием: форме товара незачем знать, чей он.
+  dealType: normalizeCategoryDealType(row.effectiveDealType),
 });
 
 /**

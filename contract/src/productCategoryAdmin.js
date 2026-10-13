@@ -5,6 +5,7 @@ import {
   PRODUCT_CHARACTERISTICS_MAX_ITEMS,
   PRODUCT_CATEGORY_VALUES,
 } from "./productWrite.js";
+import { categoryOwnDealTypeSchema } from "./categoryDealType.js";
 import { mongoIdSchema } from "./mongoId.js";
 /** Синхрон с `server/constants/productCategoryTreeConstants.js`. */
 export const PRODUCT_CATEGORY_SLUG_MAX_LENGTH = 80;
@@ -67,6 +68,8 @@ export const createProductCategoryAdminBodySchema = z.object({
   legacyProductCategory: categorySlugFieldSchema.nullable().optional(),
   searchKeywords: searchKeywordsFieldSchema,
   defaultCharacteristicKeys: defaultCharacteristicKeysFieldSchema,
+  /** `null` — наследовать тип сделки от родителя. */
+  dealType: categoryOwnDealTypeSchema.optional(),
 });
 
 export const deleteProductCategoryAdminBodySchema = z
@@ -87,4 +90,6 @@ export const patchProductCategoryAdminBodySchema = z.object({
     .optional(),
   searchKeywords: searchKeywordsFieldSchema,
   defaultCharacteristicKeys: defaultCharacteristicKeysFieldSchema,
+  /** `null` — наследовать тип сделки от родителя. */
+  dealType: categoryOwnDealTypeSchema.optional(),
 });

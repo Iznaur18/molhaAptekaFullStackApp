@@ -1,4 +1,8 @@
 import mongoose from "mongoose";
+import {
+  CATEGORY_DEAL_TYPE_DEFAULT,
+  CATEGORY_DEAL_TYPE_VALUES,
+} from "@molha/api-contract";
 
 import {
   PRODUCT_CHARACTERISTIC_KEY_MAX_CHARS,
@@ -81,6 +85,24 @@ const ProductCategorySchema = new Schema(
     sortOrder: {
       type: Number,
       default: 0,
+    },
+    /**
+     * Собственный тип сделки узла; `null` — как у родителя.
+     *
+     * Хранится отдельно от `effectiveDealType`, чтобы смена типа у родителя
+     * доходила до подкатегорий, где админ ничего не выбирал, и не трогала те,
+     * где он выбрал явно.
+     */
+    dealType: {
+      type: String,
+      enum: [...CATEGORY_DEAL_TYPE_VALUES, null],
+      default: null,
+    },
+    /** Итоговый тип с учётом наследования; пересчитывается по поддереву. */
+    effectiveDealType: {
+      type: String,
+      enum: CATEGORY_DEAL_TYPE_VALUES,
+      default: CATEGORY_DEAL_TYPE_DEFAULT,
     },
     /** Подсказки ключей характеристик для продавца при создании товара (только leaf). */
     defaultCharacteristicKeys: {

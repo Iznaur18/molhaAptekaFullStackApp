@@ -12,6 +12,8 @@
  * @property {boolean} isLeaf
  * @property {string | null} [legacyProductCategory]
  * @property {number} sortOrder
+ * @property {"goods" | "viewing" | "service" | null} [dealType] свой тип сделки; `null` — как у родителя
+ * @property {"goods" | "viewing" | "service"} [effectiveDealType] итог с учётом наследования
  * @property {string | null} [storefrontLabel] подпись плитки, если её меняли на витрине
  */
 
@@ -24,6 +26,7 @@
  * @property {string | null} [legacyProductCategory]
  * @property {string[]} [searchKeywords]
  * @property {string[]} [defaultCharacteristicKeys]
+ * @property {"goods" | "viewing" | "service" | null} [dealType]
  * @property {number} [sortOrder]
  */
 

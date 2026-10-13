@@ -558,6 +558,7 @@ const applyCategoryFields = async (body, $set, existing) => {
     $set.categoryPathIds = categoryWrite.categoryPathIds;
     $set.categoryBreadcrumbRu = categoryWrite.categoryBreadcrumbRu;
     $set.productCategory = categoryWrite.productCategory;
+    $set.productDealType = categoryWrite.productDealType;
   } catch (error) {
     throwFieldError(error, "Некорректная категория товара");
   }

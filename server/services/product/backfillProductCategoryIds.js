@@ -62,6 +62,7 @@ export const backfillProductCategoryIds = async () => {
       $set.categoryPathIds = categoryWrite.categoryPathIds;
       $set.categoryBreadcrumbRu = categoryWrite.categoryBreadcrumbRu;
       $set.productCategory = categoryWrite.productCategory;
+      $set.productDealType = categoryWrite.productDealType;
     }
 
     const needsUpdate =

@@ -117,6 +117,7 @@ export const approveProductModerationController = async (req, res) => {
         product.categoryPathIds = categoryWrite.categoryPathIds;
         product.categoryBreadcrumbRu = categoryWrite.categoryBreadcrumbRu;
         product.productCategory = categoryWrite.productCategory;
+        product.productDealType = categoryWrite.productDealType;
       } catch {
         /* keep legacy only */
       }

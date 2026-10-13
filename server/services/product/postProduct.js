@@ -362,6 +362,7 @@ export async function postProduct({
     productDeliveryCarrier,
     productCategory: categoryWrite.productCategory,
     productCategoryId: categoryWrite.productCategoryId,
+    productDealType: categoryWrite.productDealType,
     categoryPathIds: categoryWrite.categoryPathIds,
     categoryBreadcrumbRu: categoryWrite.categoryBreadcrumbRu,
     sellerPersonalCategoryId,

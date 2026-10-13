@@ -1,3 +1,5 @@
+import { isProductPurchasableViaCart } from "@molha/api-contract";
+
 import { getProductPurchaseLimit } from "./getProductPurchaseLimit.js";
 import { resolveProductOutOfStockOverlayLabel } from "./resolveProductOutOfStockOverlayLabel.js";
 import { resolveProductPurchaseBlockState } from "./resolveProductPurchaseBlockState.js";
@@ -26,8 +28,13 @@ export function resolveProductPurchaseButtonState({
   const { isSellerClosed, closedLabel } =
     resolveProductSellerClosedPurchaseState(product);
 
+  // Авто, недвижимость и услуги в корзину не кладут: кнопки покупки у них нет
+  // вовсе, в том числе «Нет в наличии» и «У нас закрыто» — они про заказ.
+  const viaCart = isProductPurchasableViaCart(product);
+
   const canShowAddToCart =
     showAddToCart &&
+    viaCart &&
     hasProduct &&
     !isOwnProduct &&
     purchaseLimit > 0 &&
@@ -35,9 +42,10 @@ export function resolveProductPurchaseButtonState({
     !isPurchaseBlocked &&
     !isSellerClosed;
   const showOutOfStockPurchaseButton =
-    showAddToCart && hasProduct && !isOwnProduct && isOutOfStock;
+    showAddToCart && viaCart && hasProduct && !isOwnProduct && isOutOfStock;
   const showBlockedPurchaseButton = hasProduct && !isOwnProduct && isPurchaseBlocked;
   const showSellerClosedPurchaseButton =
+    viaCart &&
     hasProduct &&
     !isOwnProduct &&
     isSellerClosed &&

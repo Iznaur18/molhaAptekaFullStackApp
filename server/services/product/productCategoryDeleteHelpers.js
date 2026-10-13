@@ -166,6 +166,7 @@ export const reassignProductsFromCategoryLeaf = async (
     const $set = {
       productCategoryId: categoryWrite.productCategoryId,
       productCategory: categoryWrite.productCategory,
+      productDealType: categoryWrite.productDealType,
       categoryPathIds: categoryWrite.categoryPathIds,
       categoryBreadcrumbRu: categoryWrite.categoryBreadcrumbRu,
     };
@@ -231,6 +232,7 @@ export const detachProductsFromCategoryLeaf = async (doc) => {
     const $set = {
       productCategoryId: categoryWrite.productCategoryId,
       productCategory: categoryWrite.productCategory,
+      productDealType: categoryWrite.productDealType,
       categoryPathIds: categoryWrite.categoryPathIds,
       categoryBreadcrumbRu: categoryWrite.categoryBreadcrumbRu,
     };

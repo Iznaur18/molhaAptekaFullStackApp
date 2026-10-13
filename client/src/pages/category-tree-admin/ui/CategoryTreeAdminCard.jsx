@@ -1,3 +1,9 @@
+import {
+  CATEGORY_DEAL_TYPE_GOODS,
+  CATEGORY_DEAL_TYPE_LABELS_RU,
+  CATEGORY_DEAL_TYPE_VALUES,
+  normalizeCategoryDealType,
+} from "@molha/api-contract";
 import { memo } from "react";
 
 import {
@@ -11,6 +17,7 @@ import { formatCategoryPath } from "../lib/categoryTreeAdminUtils.js";
  * @param {{
  *   row: import('../../../entities/product-category-tree/model/adminTypes.js').ProductCategoryAdminRow;
  *   parentOptions: { id: string; label: string }[];
+ *   effectiveDealTypeById: Map<string, string>;
  *   isEditing: boolean;
  *   isPending: boolean;
  *   editDraft: Record<string, string | boolean>;
@@ -24,6 +31,7 @@ import { formatCategoryPath } from "../lib/categoryTreeAdminUtils.js";
 export const CategoryTreeAdminCard = memo(function CategoryTreeAdminCard({
   row,
   parentOptions,
+  effectiveDealTypeById,
   isEditing,
   isPending,
   editDraft,
@@ -43,6 +51,13 @@ export const CategoryTreeAdminCard = memo(function CategoryTreeAdminCard({
       : "";
   const keywords = row.searchKeywords ?? [];
   const defaultCharacteristicKeys = row.defaultCharacteristicKeys ?? [];
+  const effectiveDealType = normalizeCategoryDealType(row.effectiveDealType);
+  // По родителю из черновика: при переносе узла наследуется уже новый тип.
+  const parentDealType = normalizeCategoryDealType(
+    effectiveDealTypeById.get(
+      String((isEditing ? editDraft.parentId : row.parentId) ?? ""),
+    ),
+  );
 
   return (
     <li
@@ -108,6 +123,27 @@ export const CategoryTreeAdminCard = memo(function CategoryTreeAdminCard({
                     </option>
                   ))}
                 </select>
+              </label>
+              <label className="admin-panel__field admin-panel__field_full">
+                <span>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_DEAL_TYPE}</span>
+                <select
+                  value={String(editDraft.dealType ?? "")}
+                  onChange={(e) => onDraftChange({ dealType: e.target.value })}
+                >
+                  <option value="">
+                    {CATEGORY_TREE_ADMIN_PAGE_UI.DEAL_TYPE_INHERIT(
+                      CATEGORY_DEAL_TYPE_LABELS_RU[parentDealType],
+                    )}
+                  </option>
+                  {CATEGORY_DEAL_TYPE_VALUES.map((value) => (
+                    <option key={value} value={value}>
+                      {CATEGORY_DEAL_TYPE_LABELS_RU[value]}
+                    </option>
+                  ))}
+                </select>
+                <small className="admin-panel__field-hint">
+                  {CATEGORY_TREE_ADMIN_PAGE_UI.DEAL_TYPE_HINT}
+                </small>
               </label>
               <label className="admin-panel__field admin-panel__field_full">
                 <span>{CATEGORY_TREE_ADMIN_PAGE_UI.LABEL_KEYWORDS}</span>
@@ -182,6 +218,11 @@ export const CategoryTreeAdminCard = memo(function CategoryTreeAdminCard({
                         ? CATEGORY_TREE_ADMIN_PAGE_UI.LEAF_BADGE
                         : CATEGORY_TREE_ADMIN_PAGE_UI.BRANCH_BADGE}
                     </span>
+                    {effectiveDealType !== CATEGORY_DEAL_TYPE_GOODS ? (
+                      <span className="admin-panel__chip">
+                        {CATEGORY_DEAL_TYPE_LABELS_RU[effectiveDealType]}
+                      </span>
+                    ) : null}
                     {row.legacyProductCategory ? (
                       <span className="admin-panel__chip">
                         {PRODUCT_CATEGORY_LABEL_RU[row.legacyProductCategory] ??
