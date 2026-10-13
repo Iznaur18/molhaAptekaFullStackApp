@@ -101,7 +101,7 @@ const CartSellerRow = ({
               textStyle={styles.name}
               singleLine
             />
-            <Text style={styles.meta} numberOfLines={2}>
+            <Text style={styles.meta}>
               {CART_PAGE_UI.ITEMS_COUNT(countForLabel)}
               {deliveryHint ? ` · ${deliveryHint}` : ""}
             </Text>

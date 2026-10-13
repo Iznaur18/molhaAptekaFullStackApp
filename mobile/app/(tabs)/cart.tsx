@@ -371,11 +371,12 @@ export default function CartScreen() {
       activeSummary.selectedTotal,
     );
     if (!hint) return "";
-    if (hint.kind === "free") return CART_PAGE_UI.DELIVERY_HINT_FREE;
+    // Строка итога уже подписана «Доставка» — здесь только значение.
+    if (hint.kind === "free") return CART_PAGE_UI.DELIVERY_VALUE_FREE;
     if (hint.kind === "from") {
-      return CART_PAGE_UI.DELIVERY_HINT_FROM(formatPriceRub(hint.baseFeeRub));
+      return CART_PAGE_UI.DELIVERY_VALUE_FROM(formatPriceRub(hint.baseFeeRub));
     }
-    return CART_PAGE_UI.DELIVERY_HINT_BY_TARIFF;
+    return CART_PAGE_UI.DELIVERY_VALUE_BY_TARIFF;
   }, [activeSellerEntry, checkoutMixedCarriers, activeSummary.selectedTotal]);
 
   const handleOpenAuctionCheckout = (bid: MyPriceOfferBid) => {

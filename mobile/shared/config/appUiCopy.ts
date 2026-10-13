@@ -368,6 +368,10 @@ export const CART_PAGE_UI = {
   DELIVERY_HINT_FREE: "Доставка бесплатно",
   DELIVERY_HINT_FROM: (formatted: string) => `Доставка от ${formatted}`,
   DELIVERY_HINT_BY_TARIFF: "Доставка по тарифу продавца",
+  /** То же в строке итога, где подпись «Доставка» уже стоит слева. */
+  DELIVERY_VALUE_FREE: "Бесплатно",
+  DELIVERY_VALUE_FROM: (formatted: string) => `от ${formatted}`,
+  DELIVERY_VALUE_BY_TARIFF: "По тарифу продавца",
   SELLER_ROW_OPEN: "Перейти",
   BACK_TO_SELLERS: "К продавцам",
   STOCK_REMAINING: (left: number) => `Осталось ${left} шт`,
