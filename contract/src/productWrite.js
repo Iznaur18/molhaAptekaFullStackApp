@@ -21,6 +21,7 @@ import {
 import { productBuyNFreePatchFieldsShape } from "./productBuyNFree.js";
 import { productWholesalePatchFieldsShape } from "./productWholesale.js";
 import { productRentalPatchFieldsShape } from "./productRental.js";
+import { productDealTermsFieldsShape } from "./productDealTerms.js";
 import {
   assertAffiliatePatchPair,
   productAffiliatePatchFieldsShape,
@@ -368,6 +369,7 @@ export const createProductBodySchema = z
      */
     productFulfillmentSource: productFulfillmentSourceSchema.optional(),
     productArticle: z.string().trim().max(64).optional(),
+    ...productDealTermsFieldsShape,
   })
   .superRefine(assertCreateProductRequiresPhoto)
   .superRefine((body, ctx) => assertOldPricePair(body, ctx, true))
@@ -445,6 +447,7 @@ const patchFieldShape = {
   ...productWholesalePatchFieldsShape,
   ...productBuyNFreePatchFieldsShape,
   ...productRentalPatchFieldsShape,
+  ...productDealTermsFieldsShape,
   ...productAffiliatePatchFieldsShape,
   ...productFlashSalePatchFieldsShape,
   loyaltyPointsPerUnit: z.coerce.number().int().min(0).optional(),

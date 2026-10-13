@@ -10,6 +10,7 @@ import {
   DEAL_REQUEST_OUTCOME_COMPLETED,
   DEAL_REQUEST_OUTCOMES,
   DEAL_REQUEST_ROLE_SELLER,
+  DEAL_REQUEST_STATUS_COMPLETED,
   DEAL_REQUEST_STATUS_LABELS_RU,
   isDealRequestContactOpen,
 } from "@molha/api-contract";
@@ -291,6 +292,17 @@ export function DealRequestCard({ request, isPending, error = "", onAction }) {
             </p>
           ) : null}
         </>
+      ) : null}
+
+      {!isSeller && request.status === DEAL_REQUEST_STATUS_COMPLETED ? (
+        <div className="deal-request-card__actions">
+          <a
+            className="app-btn app-btn--secondary"
+            href={`/product/${request.product.id}`}
+          >
+            {DEAL_REQUESTS_PAGE_UI.LEAVE_REVIEW}
+          </a>
+        </div>
       ) : null}
 
       {error ? (

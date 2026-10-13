@@ -21,6 +21,7 @@ import "./ProductFulfillmentSourceSwitch.css";
  *   onChange: (next: string) => void;
  *   disabled?: boolean;
  *   defaults?: import("../../../seller-commerce-defaults/model/types.js").SellerCommerceDefaults | null;
+ *   addressOnly?: boolean; объявление без корзины: из профиля берётся только адрес
  * }} props
  */
 export function ProductFulfillmentSourceSwitch({
@@ -28,6 +29,7 @@ export function ProductFulfillmentSourceSwitch({
   onChange,
   disabled = false,
   defaults = null,
+  addressOnly = false,
 }) {
   const configured = defaults?.fulfillmentConfigured === true;
   const isProfile = value === PRODUCT_FULFILLMENT_SOURCE_PROFILE;
@@ -35,7 +37,9 @@ export function ProductFulfillmentSourceSwitch({
   return (
     <div className="product-fulfillment-source">
       <div className="product-fulfillment-source__legend">
-        {PRODUCT_FULFILLMENT_SOURCE_UI.LEGEND}
+        {addressOnly
+          ? PRODUCT_FULFILLMENT_SOURCE_UI.LEGEND_ADDRESS_ONLY
+          : PRODUCT_FULFILLMENT_SOURCE_UI.LEGEND}
       </div>
 
       <div className="product-fulfillment-source__options" role="radiogroup">
@@ -80,7 +84,9 @@ export function ProductFulfillmentSourceSwitch({
       ) : (
         <p className="product-fulfillment-source__hint">
           {isProfile
-            ? PRODUCT_FULFILLMENT_SOURCE_UI.PROFILE_HINT
+            ? addressOnly
+              ? PRODUCT_FULFILLMENT_SOURCE_UI.PROFILE_HINT_ADDRESS_ONLY
+              : PRODUCT_FULFILLMENT_SOURCE_UI.PROFILE_HINT
             : PRODUCT_FULFILLMENT_SOURCE_UI.CUSTOM_HINT}
         </p>
       )}
@@ -90,16 +96,18 @@ export function ProductFulfillmentSourceSwitch({
           {defaults.pickupLocations.map((point) => (
             <li key={point.id}>{point.address}</li>
           ))}
-          <li className="product-fulfillment-source__summary-meta">
-            {defaults.pickupEnabled
-              ? PRODUCT_FULFILLMENT_SOURCE_UI.SUMMARY_PICKUP_ON
-              : PRODUCT_FULFILLMENT_SOURCE_UI.SUMMARY_PICKUP_OFF}
-            {" · "}
-            {defaults.deliveryCarrier
-              ? (PRODUCT_DELIVERY_CARRIER_LABEL_RU[defaults.deliveryCarrier] ??
-                defaults.deliveryCarrier)
-              : PRODUCT_FULFILLMENT_SOURCE_UI.SUMMARY_NO_DELIVERY}
-          </li>
+          {addressOnly ? null : (
+            <li className="product-fulfillment-source__summary-meta">
+              {defaults.pickupEnabled
+                ? PRODUCT_FULFILLMENT_SOURCE_UI.SUMMARY_PICKUP_ON
+                : PRODUCT_FULFILLMENT_SOURCE_UI.SUMMARY_PICKUP_OFF}
+              {" · "}
+              {defaults.deliveryCarrier
+                ? (PRODUCT_DELIVERY_CARRIER_LABEL_RU[defaults.deliveryCarrier] ??
+                  defaults.deliveryCarrier)
+                : PRODUCT_FULFILLMENT_SOURCE_UI.SUMMARY_NO_DELIVERY}
+            </li>
+          )}
         </ul>
       ) : null}
     </div>

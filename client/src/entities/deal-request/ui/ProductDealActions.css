@@ -5,6 +5,23 @@
   width: 100%;
 }
 
+.product-deal-actions__terms {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+}
+
+.product-deal-actions__terms dt {
+  font-size: 0.8125rem;
+  color: var(--iz-color-text-muted);
+}
+
+.product-deal-actions__terms dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
 .product-deal-actions__row {
   display: flex;
   flex-wrap: wrap;

@@ -17,6 +17,7 @@ import {
   useMyCdekConnectionQuery,
   useToggleCdekConnectionMutation,
 } from "../../../cdek/model/cdekConnectionQueries.js";
+import { CreateProductDealTermsFields } from "./CreateProductDealTermsFields.jsx";
 import { ProductFulfillmentSourceSwitch } from "./ProductFulfillmentSourceSwitch.jsx";
 
 import "./CreateProductSections.css";
@@ -49,17 +50,6 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
   // Пустой источник — товар, который ещё не выбирал. Настройки профиля есть →
   // берём их: ради этого всё и затевалось. Нет → форма спросит адрес сама.
   useEffect(() => {
-    // Профиль продавца описывает доставку и самовывоз — объявлению без корзины
-    // он не подходит, адрес встречи продавец указывает прямо здесь.
-    if (addressOnly) {
-      if (source !== PRODUCT_FULFILLMENT_SOURCE_CUSTOM) {
-        setForm((prev) => ({
-          ...prev,
-          productFulfillmentSource: PRODUCT_FULFILLMENT_SOURCE_CUSTOM,
-        }));
-      }
-      return;
-    }
     if (source || !defaultsQuery.isSuccess) {
       return;
     }
@@ -67,9 +57,9 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
       ? PRODUCT_FULFILLMENT_SOURCE_PROFILE
       : PRODUCT_FULFILLMENT_SOURCE_CUSTOM;
     setForm((prev) => ({ ...prev, productFulfillmentSource: next }));
-  }, [addressOnly, source, defaults, defaultsQuery.isSuccess, setForm]);
+  }, [source, defaults, defaultsQuery.isSuccess, setForm]);
 
-  const followsProfile = !addressOnly && source === PRODUCT_FULFILLMENT_SOURCE_PROFILE;
+  const followsProfile = source === PRODUCT_FULFILLMENT_SOURCE_PROFILE;
 
   const locations = Array.isArray(form.productPickupLocations)
     ? form.productPickupLocations
@@ -81,16 +71,27 @@ export function CreateProductPickupSection({ form, setForm, isSubmitting }) {
         <p className="create-product-section__lead" role="note">
           {PRODUCT_PICKUP_UI.DEAL_FORM_NOTICE[dealType]}
         </p>
-      ) : (
-        <ProductFulfillmentSourceSwitch
-          value={source}
+      ) : null}
+      {/* Адрес из профиля годится и для встречи: заставлять продавца заново
+          ставить точку на карте ради осмотра незачем. */}
+      <ProductFulfillmentSourceSwitch
+        value={source}
+        disabled={isSubmitting}
+        defaults={defaults}
+        addressOnly={addressOnly}
+        onChange={(next) =>
+          setForm((prev) => ({ ...prev, productFulfillmentSource: next }))
+        }
+      />
+
+      {addressOnly ? (
+        <CreateProductDealTermsFields
+          dealType={dealType}
+          form={form}
+          setForm={setForm}
           disabled={isSubmitting}
-          defaults={defaults}
-          onChange={(next) =>
-            setForm((prev) => ({ ...prev, productFulfillmentSource: next }))
-          }
         />
-      )}
+      ) : null}
 
       {followsProfile ? null : (
         <ProductPickupLocationFields

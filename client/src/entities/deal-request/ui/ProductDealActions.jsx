@@ -3,12 +3,18 @@ import {
   DEAL_REQUEST_COMMENT_MAX_LENGTH,
   ADDRESS_LINE_MAX_LENGTH,
   isCartDealType,
+  PRODUCT_SERVICE_LOCATION_LABELS_RU,
   isSellerPhoneOpenBeforeRequest,
   normalizeCategoryDealType,
+  normalizeProductServiceLocations,
+  resolveProductViewingSchedule,
 } from "@molha/api-contract";
 import { useId, useState } from "react";
 
-import { PRODUCT_DEAL_ACTIONS_UI } from "../../../shared/config/appUiCopy.js";
+import {
+  PRODUCT_DEAL_ACTIONS_UI,
+  PRODUCT_DEAL_TERMS_UI,
+} from "../../../shared/config/appUiCopy.js";
 import { HOME_MAIN_VIEW_PATH } from "../../../shared/lib/homeMainViewPaths.js";
 import { fetchDealRequestSellerPhone } from "../api/dealRequestApi.js";
 import {
@@ -25,7 +31,12 @@ import "./ProductDealActions.css";
  * оставляет заявку на услугу, а у осмотра ещё и видит телефон продавца.
  *
  * @param {{
- *   product: { _id: unknown; productDealType?: unknown };
+ *   product: {
+ *     _id: unknown;
+ *     productDealType?: unknown;
+ *     productServiceLocations?: unknown;
+ *     productViewingSchedule?: unknown;
+ *   };
  *   isAuthorized: boolean;
  *   isOwnProduct: boolean;
  *   onRequestLogin: () => void;
@@ -61,6 +72,10 @@ export function ProductDealActions({
   }
 
   const isService = dealType === CATEGORY_DEAL_TYPE_SERVICE;
+  const serviceLocations = isService
+    ? normalizeProductServiceLocations(product.productServiceLocations)
+    : [];
+  const viewingSchedule = resolveProductViewingSchedule(product);
   const canShowPhone = isSellerPhoneOpenBeforeRequest(dealType);
 
   const requireLogin = () => {
@@ -145,6 +160,26 @@ export function ProductDealActions({
 
   return (
     <div className="product-deal-actions">
+      {serviceLocations.length > 0 || viewingSchedule ? (
+        <dl className="product-deal-actions__terms">
+          {serviceLocations.length > 0 ? (
+            <div>
+              <dt>{PRODUCT_DEAL_TERMS_UI.VIEW_LOCATIONS}</dt>
+              <dd>
+                {serviceLocations
+                  .map((value) => PRODUCT_SERVICE_LOCATION_LABELS_RU[value])
+                  .join(", ")}
+              </dd>
+            </div>
+          ) : null}
+          {viewingSchedule ? (
+            <div>
+              <dt>{PRODUCT_DEAL_TERMS_UI.VIEW_SCHEDULE}</dt>
+              <dd>{viewingSchedule}</dd>
+            </div>
+          ) : null}
+        </dl>
+      ) : null}
       {isFormOpen ? (
         <form
           className="product-deal-actions__form"

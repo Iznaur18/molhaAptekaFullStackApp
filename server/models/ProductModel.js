@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 import {
   CATEGORY_DEAL_TYPE_DEFAULT,
   CATEGORY_DEAL_TYPE_VALUES,
+  PRODUCT_SERVICE_LOCATIONS,
+  PRODUCT_SERVICE_PRICE_MODE_DEFAULT,
+  PRODUCT_SERVICE_PRICE_MODES,
+  PRODUCT_SERVICE_PRICE_UNIT_DEFAULT,
+  PRODUCT_SERVICE_PRICE_UNITS,
+  PRODUCT_VIEWING_SCHEDULE_MAX_LENGTH,
 } from "@molha/api-contract";
 
 import {
@@ -410,6 +416,30 @@ const ProductSchema = new Schema(
       type: String,
       enum: CATEGORY_DEAL_TYPE_VALUES,
       default: CATEGORY_DEAL_TYPE_DEFAULT,
+    },
+    /** Услуга: цена точная, «от» или договорная (тогда число не показываем). */
+    productServicePriceMode: {
+      type: String,
+      enum: PRODUCT_SERVICE_PRICE_MODES,
+      default: PRODUCT_SERVICE_PRICE_MODE_DEFAULT,
+    },
+    /** Услуга: за что цена — за всю услугу, час или квадратный метр. */
+    productServicePriceUnit: {
+      type: String,
+      enum: PRODUCT_SERVICE_PRICE_UNITS,
+      default: PRODUCT_SERVICE_PRICE_UNIT_DEFAULT,
+    },
+    /** Услуга: где оказывается — у клиента, у исполнителя, онлайн. */
+    productServiceLocations: {
+      type: [{ type: String, enum: PRODUCT_SERVICE_LOCATIONS }],
+      default: [],
+    },
+    /** Осмотр: когда можно приехать, словами продавца. */
+    productViewingSchedule: {
+      type: String,
+      trim: true,
+      default: "",
+      maxlength: PRODUCT_VIEWING_SCHEDULE_MAX_LENGTH,
     },
     sellerPersonalCategoryId: {
       type: Schema.Types.ObjectId,

@@ -65,6 +65,7 @@ import { applyWholesaleFields } from "./applyWholesaleFields.js";
 import { applyBuyNFreeFields } from "./applyBuyNFreeFields.js";
 import { applyFlashSaleFields } from "./applyFlashSaleFields.js";
 import { applyRentalFields } from "./applyRentalFields.js";
+import { resolveProductDealTermsWrite } from "./productDealTermsFields.js";
 import { PRODUCT_FLASH_SALE_ACTIVE_PRICE_LOCKED_MESSAGE } from "@molha/api-contract";
 import {
   AFFILIATE_PERCENT_MAX,
@@ -846,6 +847,7 @@ export async function buildProductPatchSet({
   applyWholesaleFields(body, $set, existing);
   const buyNFreeState = applyBuyNFreeFields(body, $set, existing);
   applyRentalFields(body, $set, existing);
+  Object.assign($set, resolveProductDealTermsWrite(body));
   const flashSaleState = applyFlashSaleFields(body, $set, $unset, existing);
 
   const availabilityBecameHidden =

@@ -18,6 +18,7 @@ import {
   DEAL_REQUEST_STATUS_DONE,
   DEAL_REQUEST_STATUS_PENDING,
   isDealRequestContactOpen,
+  isProductServicePriceFixed,
   isSellerPhoneOpenBeforeRequest,
   normalizeCategoryDealType,
   resolveDealRequestActions,
@@ -214,7 +215,9 @@ export const createDealRequest = async ({
     productModerationStatus: PRODUCT_MODERATION_APPROVED,
     productIsAvailable: { $ne: false },
   })
-    .select("productName productPrice productImageUrls productSeller productDealType")
+    .select(
+      "productName productPrice productImageUrls productSeller productDealType productServicePriceMode",
+    )
     .lean();
   if (!product) {
     throw new AppError(404, PRODUCT_UNAVAILABLE_MESSAGE);
@@ -255,8 +258,13 @@ export const createDealRequest = async ({
       expiresAt: new Date(Date.now() + DEAL_REQUEST_RESPONSE_TTL_MS),
       productNameAtRequest: String(product.productName ?? ""),
       productImageUrlAtRequest: String(product.productImageUrls?.[0] ?? ""),
+      // «От 1 500 ₽» и «договорная» — не цена сделки: её назовёт исполнитель,
+      // принимая заявку. Число из объявления в заявке только сбивало бы с толку.
       productPriceRubAtRequest:
-        typeof product.productPrice === "number" ? product.productPrice : null,
+        typeof product.productPrice === "number" &&
+        (kind !== CATEGORY_DEAL_TYPE_SERVICE || isProductServicePriceFixed(product))
+          ? product.productPrice
+          : null,
     });
   } catch (error) {
     // Уникальный индекс ловит гонку двух одновременных отправок формы.

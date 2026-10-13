@@ -33,6 +33,19 @@ export const PRODUCT_DEAL_ACTIONS_UI = {
   OPEN_REQUESTS: "Мои заявки",
 };
 
+/** Условия сделки: поля в форме объявления и строки в самом объявлении. */
+export const PRODUCT_DEAL_TERMS_UI = {
+  PRICE_MODE_LABEL: "Как показать цену",
+  PRICE_UNIT_LABEL: "За что цена",
+  PRICE_NEGOTIABLE_HINT:
+    "Покупатель увидит «Договорная». Число из поля цены никому не показывается — итог вы назовёте, принимая заявку.",
+  LOCATIONS_LABEL: "Где оказываете услугу",
+  SCHEDULE_LABEL: "Когда можно посмотреть",
+  SCHEDULE_PLACEHOLDER: "Например: будни после 18:00, выходные весь день",
+  VIEW_LOCATIONS: "Где",
+  VIEW_SCHEDULE: "Когда можно посмотреть",
+};
+
 /** Страница «Заявки» в профиле. */
 export const DEAL_REQUESTS_PAGE_UI = {
   TITLE: "Заявки",
@@ -64,6 +77,7 @@ export const DEAL_REQUESTS_PAGE_UI = {
   /** @param {string} time */
   EXPIRES_BUYER: (time) => `Продавец ответит до ${time}`,
   OPEN_PRODUCT: "Открыть объявление",
+  LEAVE_REVIEW: "Оставить отзыв",
   ACTION: {
     accept: "Принять",
     decline: "Отклонить",

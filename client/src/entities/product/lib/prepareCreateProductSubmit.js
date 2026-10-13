@@ -26,6 +26,7 @@ import {
   parseProductPriceInput,
   validateProductOldPricePair,
 } from "./computeProductDiscountPercent.js";
+import { buildProductDealTermsFields } from "./buildProductDealTermsFields.js";
 import { getProductPriceRubMaxError } from "./productPriceRubValidation.js";
 import { validateProductDescription } from "./validateProductDescription.js";
 import { validateProductName } from "./validateProductName.js";
@@ -253,6 +254,8 @@ export function prepareCreateProductSubmit({
         productFulfillmentSource: PRODUCT_FULFILLMENT_SOURCE_CUSTOM,
       };
 
+  const dealTermsFields = buildProductDealTermsFields(form);
+
   if (isEdit) {
     const patchBody = {
       productName: String(form.productName).trim(),
@@ -265,6 +268,7 @@ export function prepareCreateProductSubmit({
       productOldPrice,
       productCharacteristics,
       ...fulfillmentFields,
+      ...dealTermsFields,
       productReturnEnabled,
       productReturnTerms,
     };
@@ -313,6 +317,7 @@ export function prepareCreateProductSubmit({
       loyaltyPointsPerUnit: 0,
       productCharacteristics,
       ...fulfillmentFields,
+      ...dealTermsFields,
       productReturnEnabled,
       productReturnTerms,
     },
