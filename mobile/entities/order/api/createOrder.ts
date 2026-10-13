@@ -3,7 +3,10 @@ import {
   ORDER_FULFILLMENT_PICKUP,
 } from "@molha/api-contract";
 
-import type { CdekOrderSelection } from "@izibuy/shared-lib";
+import type {
+  CdekOrderSelection,
+  YandexDeliveryOrderSelection,
+} from "@izibuy/shared-lib";
 
 import { apiClient, parseCreateOrderData } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
@@ -31,6 +34,8 @@ export type CreateOrderPayload = {
    * пересчитывает сам, адрес заказа берёт из пункта.
    */
   cdekShipment?: CdekOrderSelection;
+  /** Яндекс Доставка до пункта выдачи — так же, как СДЭК: только выбор. */
+  yandexDeliveryShipment?: YandexDeliveryOrderSelection;
   idempotencyKey: string;
 };
 

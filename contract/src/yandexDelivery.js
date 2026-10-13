@@ -130,6 +130,50 @@ export const yandexDeliveryOrderSelectionSchema = z.object({
   recipient: cdekRecipientSchema,
 });
 
+/**
+ * `data` ответа `GET /order/yandex-delivery-availability`: что из Яндекса
+ * предлагает продавец — «в другой день» (пункты) и «Экспресс».
+ */
+export const yandexDeliveryAvailabilityDataSchema = z
+  .object({
+    available: z.boolean(),
+    expressAvailable: z.boolean().optional().default(false),
+  })
+  .passthrough();
+
+/** Пункт выдачи Яндекса в том виде, в каком он нужен экрану выбора. */
+export const yandexDeliveryPointSchema = z
+  .object({
+    id: z.string(),
+    name: z.string().optional().default(""),
+    address: z.string().optional().default(""),
+    /** Как найти пункт — показываем под выбранным. */
+    instruction: z.string().optional().default(""),
+  })
+  .passthrough();
+
+/** `data` ответа `GET /order/yandex-delivery-points` — пункты в городе. */
+export const yandexDeliveryPointsDataSchema = z
+  .object({
+    points: z.array(yandexDeliveryPointSchema).optional().default([]),
+  })
+  .passthrough();
+
+/**
+ * `data` ответа `POST /order/yandex-delivery-quote` — цена под выбранный пункт.
+ *
+ * Цена только для показа: при оформлении сервер пересчитывает её сам.
+ */
+export const yandexDeliveryQuoteDataSchema = z
+  .object({
+    available: z.boolean(),
+    deliverySumRub: z.number().nonnegative().optional(),
+    deliveryDays: z.number().nullable().optional(),
+    /** false — у части товаров нет веса и габаритов, цена — оценка. */
+    exact: z.boolean().optional(),
+  })
+  .passthrough();
+
 export const YANDEX_DELIVERY_CARD_ONLY_MESSAGE =
   "Яндекс Доставка принимает оплату только картой в пункте выдачи — выберите «Картой при получении»";
 export const YANDEX_DELIVERY_POINT_GONE_MESSAGE =

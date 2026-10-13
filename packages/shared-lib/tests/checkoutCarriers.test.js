@@ -105,3 +105,56 @@ describe("formatCarrierPeriodDays", () => {
     assert.equal(formatCarrierPeriodDays(null, null), "");
   });
 });
+
+describe("Яндекс Доставка до пункта", () => {
+  const full = {
+    pointId: "ya-point-1",
+    quoteAvailable: true,
+    recipientName: "Иван Петров",
+    recipientPhone: "+79001234567",
+  };
+
+  it("полный выбор уходит в заказ без цены", async () => {
+    const { buildYandexDeliveryOrderSelection } = await import("../dist/index.js");
+    assert.deepEqual(buildYandexDeliveryOrderSelection(full), {
+      pickupPointId: "ya-point-1",
+      recipient: { name: "Иван Петров", phone: "+79001234567" },
+    });
+  });
+
+  it("пункт без посчитанной цены выбранным не считается", async () => {
+    const { buildYandexDeliveryOrderSelection } = await import("../dist/index.js");
+    for (const patch of [
+      { pointId: "" },
+      // Яндекс не довезёт в этот пункт или там нет оплаты картой.
+      { quoteAvailable: false },
+      { quoteAvailable: undefined },
+      { recipientName: "" },
+      { recipientPhone: "123" },
+    ]) {
+      assert.equal(
+        buildYandexDeliveryOrderSelection({ ...full, ...patch }),
+        null,
+        JSON.stringify(patch),
+      );
+    }
+  });
+
+  it("служба «только карта» оставляет один способ оплаты", async () => {
+    const { isCardOnDeliveryAccepted, resolveCardOnlyAllowedPaymentMethods } =
+      await import("../dist/index.js");
+    // Продавец способы не ограничивал — карта при получении доступна.
+    assert.equal(isCardOnDeliveryAccepted(null), true);
+    assert.deepEqual(resolveCardOnlyAllowedPaymentMethods(null), ["cardOnDelivery"]);
+
+    assert.equal(isCardOnDeliveryAccepted(["cashOnDelivery", "cardOnDelivery"]), true);
+    assert.deepEqual(
+      resolveCardOnlyAllowedPaymentMethods(["cashOnDelivery", "cardOnDelivery"]),
+      ["cardOnDelivery"],
+    );
+
+    // Продавец карту отключил — Яндекс у него предлагать незачем.
+    assert.equal(isCardOnDeliveryAccepted(["cashOnDelivery"]), false);
+    assert.deepEqual(resolveCardOnlyAllowedPaymentMethods(["cashOnDelivery"]), []);
+  });
+});

@@ -10,7 +10,10 @@ import {
   SHIPPING_PROVIDER_YANDEX_EXPRESS,
   SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT,
 } from "@molha/api-contract";
-import { resolveCheckoutChosenCarrier } from "@izibuy/shared-lib";
+import {
+  resolveCardOnlyAllowedPaymentMethods,
+  resolveCheckoutChosenCarrier,
+} from "@izibuy/shared-lib";
 
 import { AddressDeliveryFields } from "../../../entities/address/ui/AddressDeliveryFields.jsx";
 import { CheckoutSavedAddressPicker } from "../../../features/checkout/ui/CheckoutSavedAddressPicker.jsx";
@@ -304,10 +307,8 @@ export function CheckoutForm({
   const mixedCarriersBlocked = needsDelivery && !chosenCarrier && mixedDeliveryCarriers;
   const effectiveAllowedPaymentMethods = useMemo(() => {
     if (cardOnlyCarrier) {
-      const base = Array.isArray(allowedPaymentMethods)
-        ? allowedPaymentMethods
-        : [ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY];
-      return base.filter((method) => method === ORDER_PAYMENT_METHOD_CARD_ON_DELIVERY);
+      // Правило одно для сайта и приложения — в shared-lib.
+      return resolveCardOnlyAllowedPaymentMethods(allowedPaymentMethods);
     }
     if (gitorgCourierDelivery) {
       const base = Array.isArray(allowedPaymentMethods)

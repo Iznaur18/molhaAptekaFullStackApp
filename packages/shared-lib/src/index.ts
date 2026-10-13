@@ -375,7 +375,13 @@ export type {
 } from "./cartSellerGroups.js";
 export {
   buildCdekOrderSelection,
+  buildYandexDeliveryOrderSelection,
   formatCarrierPeriodDays,
+  isCardOnDeliveryAccepted,
+  resolveCardOnlyAllowedPaymentMethods,
   resolveCheckoutChosenCarrier,
 } from "./checkoutCarriers.js";
-export type { CdekOrderSelection } from "./checkoutCarriers.js";
+export type {
+  CdekOrderSelection,
+  YandexDeliveryOrderSelection,
+} from "./checkoutCarriers.js";

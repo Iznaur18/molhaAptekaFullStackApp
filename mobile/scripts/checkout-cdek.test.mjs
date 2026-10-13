@@ -98,7 +98,7 @@ test("форма оформления: СДЭК — служба внутри д
   assert.match(cart, /useCdekAvailabilityQuery\(cdekSellerId/);
   assert.match(cart, /cdekShipment: payload\.cdekShipment/);
   // «Доставка» доступна и тогда, когда у продавца есть только СДЭК.
-  assert.match(cart, /deliveryAvailable=\{deliveryAvailable \|\| cdekAvailable\}/);
+  assert.match(cart, /deliveryAvailable=\{deliveryAvailable \|\| cdekAvailable/);
 });
 
 test("ошибка СДЭК не глотается молча", () => {

@@ -16,7 +16,9 @@ import {
   resolveCartAllowedPaymentMethods,
   resolveCartFulfillmentBySeller,
   resolveCartSellerDelivery,
+  isCardOnDeliveryAccepted,
   type CdekOrderSelection,
+  type YandexDeliveryOrderSelection,
 } from "@izibuy/shared-lib";
 
 import { buildCheckoutPickupGroups } from "@/entities/cart/lib/buildCheckoutPickupLocations";
@@ -24,6 +26,7 @@ import { getCartLineExclusionReason } from "@/entities/cart/lib/getCartLineExclu
 import { resolveCartGroupDeliveryHint } from "@/entities/cart/lib/resolveCartGroupDeliveryHint";
 import { resolveCheckoutSellers } from "@/entities/cart/lib/resolveCheckoutSellers";
 import { useCdekAvailabilityQuery } from "@/entities/cdek/model/useCdekAvailabilityQuery";
+import { useYandexDeliveryAvailabilityQuery } from "@/entities/yandex-delivery/model/useYandexDeliveryAvailabilityQuery";
 import {
   CartSellerList,
   type CartSellerEntry,
@@ -365,6 +368,38 @@ export default function CartScreen() {
     ],
   );
 
+  // Яндекс Доставка — так же по договору продавца. Платят с ней только
+  // картой в пункте, поэтому без «картой при получении» у продавца её не
+  // предлагаем: заказ всё равно не оформить.
+  const yandexAvailabilityQuery = useYandexDeliveryAvailabilityQuery(cdekSellerId, {
+    enabled: isAuthorized,
+  });
+  const yandexAvailable =
+    yandexAvailabilityQuery.data?.available === true &&
+    !auctionCheckoutBid &&
+    isCardOnDeliveryAccepted(allowedPaymentMethods);
+  const yandexConfig = useMemo(
+    () =>
+      yandexAvailable && cdekSellerId
+        ? {
+            sellerId: cdekSellerId,
+            items: activeSummary.selectedLines.map((line) => ({
+              productId: line.productId,
+              quantity: line.quantity,
+            })),
+            recipientName: String(sessionUser?.userFullName ?? ""),
+            recipientPhone: String(sessionUser?.userPhoneNumber ?? ""),
+          }
+        : null,
+    [
+      yandexAvailable,
+      cdekSellerId,
+      activeSummary.selectedLines,
+      sessionUser?.userFullName,
+      sessionUser?.userPhoneNumber,
+    ],
+  );
+
   // Тариф собственной доставки продавца. Считаем так, будто выбрана доставка:
   // блок с ценой форма показывает только в этом режиме. Сумму собирает функция
   // контракта, расстояние по дорогам приходит котировкой с сервера.
@@ -494,6 +529,7 @@ export default function CartScreen() {
     paymentMethod: OrderPaymentMethod;
     pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
     cdekShipment?: CdekOrderSelection;
+    yandexDeliveryShipment?: YandexDeliveryOrderSelection;
   }) => {
     setSubmitState({ isSubmitting: true, error: "", success: "" });
     const orderedProductIds = activeSummary.selectedLines.map((line) => line.productId);
@@ -519,6 +555,9 @@ export default function CartScreen() {
         pickupSelections: payload.pickupSelections,
         // СДЭК везёт по договору продавца: адрес сервер возьмёт из пункта.
         ...(payload.cdekShipment ? { cdekShipment: payload.cdekShipment } : {}),
+        ...(payload.yandexDeliveryShipment
+          ? { yandexDeliveryShipment: payload.yandexDeliveryShipment }
+          : {}),
       });
       await removeItems(orderedProductIds);
       setIsSellerCheckoutOpen(false);
@@ -682,12 +721,13 @@ export default function CartScreen() {
         defaultUser={sessionQuery.data?.user}
         pickupGroups={pickupGroups}
         // «Доставка» доступна и тогда, когда у продавца есть только СДЭК.
-        deliveryAvailable={deliveryAvailable || cdekAvailable}
+        deliveryAvailable={deliveryAvailable || cdekAvailable || yandexAvailable}
         pickupAvailable={pickupAvailable}
         allowedPaymentMethods={allowedPaymentMethods}
         cardPrepaidAvailable={cardPrepaidAvailable}
         sellerDeliveryAvailable={deliveryAvailable}
         cdek={cdekConfig}
+        yandex={yandexConfig}
         sellerDelivery={sellerDelivery}
         deliveryProductIds={deliveryProductIds}
         initialFulfillmentMethod={

@@ -1198,6 +1198,20 @@ export const INSTALLMENT_UI = {
 export const CHECKOUT_FORM_UI = {
   HEADING: "Оформление заказа",
   SHIPPING_PROVIDER_CDEK: "СДЭК",
+  SHIPPING_PROVIDER_YANDEX: "Яндекс Доставка",
+  YANDEX_UNAVAILABLE: "Яндекс Доставка сейчас не отвечает",
+  YANDEX_POINT_REQUIRED:
+    "Выберите пункт выдачи Яндекса и укажите получателя с телефоном",
+  YANDEX_CARD_ONLY: "С Яндекс Доставкой оплата только картой в пункте выдачи",
+  YANDEX_POINT_LABEL: "Пункт выдачи Яндекса",
+  YANDEX_RECIPIENT_PHONE: "Телефон получателя — на него Яндекс пришлёт код получения",
+  YANDEX_NO_POINTS:
+    "В этом городе нет пунктов Яндекса с оплатой картой — выберите другую службу",
+  YANDEX_PRICE: (formatted: string, days: number | null) =>
+    days ? `${formatted} · ${days} дн.` : formatted,
+  YANDEX_PRICING: "Считаем доставку…",
+  YANDEX_CARD_ONLY_HINT:
+    "Товар и доставку вы оплатите картой в пункте выдачи Яндекса, когда заберёте заказ",
   SHIPPING_PROVIDER_BADGE_CAPTION: "Доставку выполняет",
   SHIPPING_PROVIDER_BADGE_SELLER: "Продавец",
   CDEK_UNAVAILABLE: "СДЭК сейчас не отвечает",

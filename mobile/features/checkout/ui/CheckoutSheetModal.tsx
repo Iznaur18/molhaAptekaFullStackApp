@@ -10,7 +10,11 @@ import {
   View,
 } from "react-native";
 import Animated from "react-native-reanimated";
-import type { CartSellerDelivery, CdekOrderSelection } from "@izibuy/shared-lib";
+import type {
+  CartSellerDelivery,
+  CdekOrderSelection,
+  YandexDeliveryOrderSelection,
+} from "@izibuy/shared-lib";
 
 import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
@@ -18,6 +22,7 @@ import type { CheckoutProductPickupGroup } from "@/entities/cart/lib/buildChecko
 import {
   CheckoutForm,
   type CheckoutCdekConfig,
+  type CheckoutYandexConfig,
 } from "@/features/checkout/ui/CheckoutForm";
 import { useCheckoutSheetModalAnimation } from "@/features/checkout/model/useCheckoutSheetModalAnimation";
 import { CHECKOUT_FORM_UI, CART_PAGE_UI } from "@/shared/config";
@@ -35,6 +40,7 @@ type CheckoutSheetModalProps = {
   cardPrepaidAvailable?: boolean;
   sellerDeliveryAvailable?: boolean;
   cdek?: CheckoutCdekConfig | null;
+  yandex?: CheckoutYandexConfig | null;
   sellerDelivery?: CartSellerDelivery | null;
   deliveryProductIds?: readonly string[];
   initialFulfillmentMethod?: OrderFulfillmentMethod | null;
@@ -51,6 +57,7 @@ type CheckoutSheetModalProps = {
     paymentMethod: OrderPaymentMethod;
     pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
     cdekShipment?: CdekOrderSelection;
+    yandexDeliveryShipment?: YandexDeliveryOrderSelection;
   }) => void | Promise<void>;
 };
 
@@ -64,6 +71,7 @@ export const CheckoutSheetModal = ({
   cardPrepaidAvailable = false,
   sellerDeliveryAvailable,
   cdek = null,
+  yandex = null,
   sellerDelivery = null,
   deliveryProductIds,
   initialFulfillmentMethod = null,
@@ -141,6 +149,7 @@ export const CheckoutSheetModal = ({
               cardPrepaidAvailable={cardPrepaidAvailable}
               sellerDeliveryAvailable={sellerDeliveryAvailable}
               cdek={cdek}
+              yandex={yandex}
               sellerDelivery={sellerDelivery}
               deliveryProductIds={deliveryProductIds}
               initialFulfillmentMethod={initialFulfillmentMethod}
