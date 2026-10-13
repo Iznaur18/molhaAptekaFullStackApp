@@ -801,6 +801,9 @@ export {
   cdekDeliveryPointsQuerySchema,
   cdekTariffOptionSchema,
   cdekDeliveryPointSchema,
+  cdekAvailabilityDataSchema,
+  cdekDeliveryPointsDataSchema,
+  cdekQuoteDataSchema,
 } from "./cdek.js";
 export {
   CDEK_STAGE_CREATED,

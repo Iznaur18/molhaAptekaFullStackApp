@@ -373,3 +373,9 @@ export type {
   CartSellerGroup,
   CartSellerGroupLine,
 } from "./cartSellerGroups.js";
+export {
+  buildCdekOrderSelection,
+  formatCarrierPeriodDays,
+  resolveCheckoutChosenCarrier,
+} from "./checkoutCarriers.js";
+export type { CdekOrderSelection } from "./checkoutCarriers.js";

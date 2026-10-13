@@ -3,6 +3,8 @@ import {
   ORDER_FULFILLMENT_PICKUP,
 } from "@molha/api-contract";
 
+import type { CdekOrderSelection } from "@izibuy/shared-lib";
+
 import { apiClient, parseCreateOrderData } from "@/shared/api";
 import { API_CLIENT_UI } from "@/shared/config";
 import { formatApiErrorMessage } from "@/shared/lib";
@@ -24,6 +26,11 @@ export type CreateOrderPayload = {
   priceOfferId?: string;
   affiliateCode?: string;
   pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
+  /**
+   * Доставка СДЭК до пункта выдачи. Клиент шлёт только выбор: цену сервер
+   * пересчитывает сам, адрес заказа берёт из пункта.
+   */
+  cdekShipment?: CdekOrderSelection;
   idempotencyKey: string;
 };
 

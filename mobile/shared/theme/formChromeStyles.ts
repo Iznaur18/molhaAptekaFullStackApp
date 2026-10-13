@@ -1076,3 +1076,91 @@ export const useCheckoutSellerDeliveryCostStyles = createThemedStyles((theme) =>
     color: theme.colors.textMuted,
   },
 }));
+
+/** Паритет с web `CdekPickupPointPicker.css`: город, тариф, пункт, получатель. */
+export const useCdekPickupPointPickerStyles = createThemedStyles((theme) => ({
+  root: {
+    gap: 12,
+    marginTop: theme.spacing[2],
+  },
+  field: {
+    gap: 6,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+  },
+  input: {
+    minHeight: 46,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 12,
+    backgroundColor: theme.colors.surface,
+    color: theme.colors.text,
+    fontSize: 16,
+  },
+  findButton: {
+    minHeight: 46,
+    paddingHorizontal: 16,
+    paddingVertical: 11,
+    borderRadius: 12,
+    backgroundColor: theme.colors.action,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  findButtonText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: theme.colors.onContrast,
+  },
+  disabled: {
+    opacity: 0.55,
+  },
+  options: {
+    gap: 8,
+  },
+  option: {
+    gap: 2,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 12,
+    backgroundColor: theme.colors.surface,
+  },
+  optionActive: {
+    borderWidth: 2,
+    borderColor: theme.colors.action,
+    backgroundColor: theme.colors.actionSoft,
+  },
+  optionTitle: {
+    fontSize: 14,
+    lineHeight: 19,
+    fontWeight: "600",
+    color: theme.colors.text,
+  },
+  optionMeta: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.textSecondary,
+  },
+  price: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: theme.colors.text,
+    fontVariant: ["tabular-nums"],
+  },
+  hint: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.textMuted,
+  },
+  error: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: theme.colors.danger,
+  },
+}));

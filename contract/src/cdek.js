@@ -202,6 +202,37 @@ export const cdekDeliveryPointSchema = z.object({
   hasCashless: z.boolean(),
 });
 
+/** `data` ответа `GET /order/cdek-availability` — подключён ли СДЭК у продавца. */
+export const cdekAvailabilityDataSchema = z
+  .object({ available: z.boolean() })
+  .passthrough();
+
+/** `data` ответа `GET /order/cdek-delivery-points` — пункты выдачи в городе. */
+export const cdekDeliveryPointsDataSchema = z
+  .object({
+    points: z.array(cdekDeliveryPointSchema.passthrough()).optional().default([]),
+    /** Код города у СДЭК; `null` — город не распознан. */
+    cityCode: z.number().int().nullable().optional().default(null),
+  })
+  .passthrough();
+
+/**
+ * `data` ответа `POST /order/cdek-quote` — тарифы до города покупателя.
+ *
+ * Цена здесь только для показа: при оформлении сервер пересчитывает её сам
+ * по ключу продавца.
+ */
+export const cdekQuoteDataSchema = z
+  .object({
+    available: z.boolean(),
+    options: z.array(cdekTariffOptionSchema.passthrough()).optional().default([]),
+    /** Самый дешёвый тариф — его показываем выбранным по умолчанию. */
+    best: cdekTariffOptionSchema.passthrough().nullable().optional(),
+    /** false — у части товаров нет веса и габаритов, цена приблизительная. */
+    exact: z.boolean().optional(),
+  })
+  .passthrough();
+
 /**
  * Маска ключа: последние 4 символа, остальное скрыто.
  *

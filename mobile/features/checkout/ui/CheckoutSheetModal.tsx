@@ -10,12 +10,15 @@ import {
   View,
 } from "react-native";
 import Animated from "react-native-reanimated";
-import type { CartSellerDelivery } from "@izibuy/shared-lib";
+import type { CartSellerDelivery, CdekOrderSelection } from "@izibuy/shared-lib";
 
 import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
 import type { CheckoutProductPickupGroup } from "@/entities/cart/lib/buildCheckoutPickupLocations";
-import { CheckoutForm } from "@/features/checkout/ui/CheckoutForm";
+import {
+  CheckoutForm,
+  type CheckoutCdekConfig,
+} from "@/features/checkout/ui/CheckoutForm";
 import { useCheckoutSheetModalAnimation } from "@/features/checkout/model/useCheckoutSheetModalAnimation";
 import { CHECKOUT_FORM_UI, CART_PAGE_UI } from "@/shared/config";
 import { resolveAppShellMaxWidthStyle } from "@/shared/lib/appShellLayout";
@@ -30,6 +33,8 @@ type CheckoutSheetModalProps = {
   pickupAvailable?: boolean;
   allowedPaymentMethods?: readonly string[] | null;
   cardPrepaidAvailable?: boolean;
+  sellerDeliveryAvailable?: boolean;
+  cdek?: CheckoutCdekConfig | null;
   sellerDelivery?: CartSellerDelivery | null;
   deliveryProductIds?: readonly string[];
   initialFulfillmentMethod?: OrderFulfillmentMethod | null;
@@ -45,6 +50,7 @@ type CheckoutSheetModalProps = {
     deliveryAddressFlat: string;
     paymentMethod: OrderPaymentMethod;
     pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
+    cdekShipment?: CdekOrderSelection;
   }) => void | Promise<void>;
 };
 
@@ -56,6 +62,8 @@ export const CheckoutSheetModal = ({
   pickupAvailable = true,
   allowedPaymentMethods = null,
   cardPrepaidAvailable = false,
+  sellerDeliveryAvailable,
+  cdek = null,
   sellerDelivery = null,
   deliveryProductIds,
   initialFulfillmentMethod = null,
@@ -131,6 +139,8 @@ export const CheckoutSheetModal = ({
               pickupAvailable={pickupAvailable}
               allowedPaymentMethods={allowedPaymentMethods}
               cardPrepaidAvailable={cardPrepaidAvailable}
+              sellerDeliveryAvailable={sellerDeliveryAvailable}
+              cdek={cdek}
               sellerDelivery={sellerDelivery}
               deliveryProductIds={deliveryProductIds}
               initialFulfillmentMethod={initialFulfillmentMethod}

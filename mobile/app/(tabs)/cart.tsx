@@ -16,12 +16,14 @@ import {
   resolveCartAllowedPaymentMethods,
   resolveCartFulfillmentBySeller,
   resolveCartSellerDelivery,
+  type CdekOrderSelection,
 } from "@izibuy/shared-lib";
 
 import { buildCheckoutPickupGroups } from "@/entities/cart/lib/buildCheckoutPickupLocations";
 import { getCartLineExclusionReason } from "@/entities/cart/lib/getCartLineExclusionReason";
 import { resolveCartGroupDeliveryHint } from "@/entities/cart/lib/resolveCartGroupDeliveryHint";
 import { resolveCheckoutSellers } from "@/entities/cart/lib/resolveCheckoutSellers";
+import { useCdekAvailabilityQuery } from "@/entities/cdek/model/useCdekAvailabilityQuery";
 import {
   CartSellerList,
   type CartSellerEntry,
@@ -336,6 +338,33 @@ export default function CartScreen() {
     ]);
   }, [acceptedBidsQuery, cartQuery, productsQuery]);
 
+  // СДЭК предлагаем, только если продавец подключил свой договор. На
+  // аукционном оформлении его нет — как и на сайте.
+  const cdekSellerId = activeSellerEntry?.group.sellerId ?? "";
+  const cdekAvailabilityQuery = useCdekAvailabilityQuery(cdekSellerId, {
+    enabled: isAuthorized,
+  });
+  const cdekAvailable = cdekAvailabilityQuery.data === true && !auctionCheckoutBid;
+  const sessionUser = sessionQuery.data?.user;
+  const cdekConfig = useMemo(
+    () =>
+      cdekAvailable && cdekSellerId
+        ? {
+            sellerId: cdekSellerId,
+            productIds: activeSummary.selectedLines.map((line) => line.productId),
+            recipientName: String(sessionUser?.userFullName ?? ""),
+            recipientPhone: String(sessionUser?.userPhoneNumber ?? ""),
+          }
+        : null,
+    [
+      cdekAvailable,
+      cdekSellerId,
+      activeSummary.selectedLines,
+      sessionUser?.userFullName,
+      sessionUser?.userPhoneNumber,
+    ],
+  );
+
   // Тариф собственной доставки продавца. Считаем так, будто выбрана доставка:
   // блок с ценой форма показывает только в этом режиме. Сумму собирает функция
   // контракта, расстояние по дорогам приходит котировкой с сервера.
@@ -464,6 +493,7 @@ export default function CartScreen() {
     deliveryAddressFlat: string;
     paymentMethod: OrderPaymentMethod;
     pickupSelections?: Array<{ productId: string; pickupLocationId: string }>;
+    cdekShipment?: CdekOrderSelection;
   }) => {
     setSubmitState({ isSubmitting: true, error: "", success: "" });
     const orderedProductIds = activeSummary.selectedLines.map((line) => line.productId);
@@ -487,6 +517,8 @@ export default function CartScreen() {
         deliveryAddressFlat: payload.deliveryAddressFlat,
         paymentMethod: payload.paymentMethod,
         pickupSelections: payload.pickupSelections,
+        // СДЭК везёт по договору продавца: адрес сервер возьмёт из пункта.
+        ...(payload.cdekShipment ? { cdekShipment: payload.cdekShipment } : {}),
       });
       await removeItems(orderedProductIds);
       setIsSellerCheckoutOpen(false);
@@ -649,10 +681,13 @@ export default function CartScreen() {
         visible={isSellerCheckoutOpen && activeSellerEntry != null}
         defaultUser={sessionQuery.data?.user}
         pickupGroups={pickupGroups}
-        deliveryAvailable={deliveryAvailable}
+        // «Доставка» доступна и тогда, когда у продавца есть только СДЭК.
+        deliveryAvailable={deliveryAvailable || cdekAvailable}
         pickupAvailable={pickupAvailable}
         allowedPaymentMethods={allowedPaymentMethods}
         cardPrepaidAvailable={cardPrepaidAvailable}
+        sellerDeliveryAvailable={deliveryAvailable}
+        cdek={cdekConfig}
         sellerDelivery={sellerDelivery}
         deliveryProductIds={deliveryProductIds}
         initialFulfillmentMethod={
