@@ -361,6 +361,15 @@ export const CART_PAGE_UI = {
   SECTION_PICKUP: "Самовывоз",
   SECTION_DELIVERY: "Доставка",
   SECTION_FULFILLMENT_HINT: "Оформляется отдельным заказом",
+  SECTION_SELLER_FALLBACK: "Продавец",
+  /** Товары одного продавца везут разные службы — одним заказом с доставкой нельзя. */
+  MIXED_CARRIERS_NOTE: "Товары едут разными службами — оформите по отдельности",
+  /** Цена доставки в строке продавца — ещё до оформления. */
+  DELIVERY_HINT_FREE: "Доставка бесплатно",
+  DELIVERY_HINT_FROM: (formatted: string) => `Доставка от ${formatted}`,
+  DELIVERY_HINT_BY_TARIFF: "Доставка по тарифу продавца",
+  SELLER_ROW_OPEN: "Перейти",
+  BACK_TO_SELLERS: "К продавцам",
   STOCK_REMAINING: (left: number) => `Осталось ${left} шт`,
   STOCK_QUANTITY_LIMITED: "Количество ограничено",
   CHECKOUT_OPEN: "Оформить заказ",
@@ -1184,6 +1193,21 @@ export const INSTALLMENT_UI = {
 
 export const CHECKOUT_FORM_UI = {
   HEADING: "Оформление заказа",
+  SELLER_DELIVERY_LEGEND: "Доставка продавцом",
+  SELLER_DELIVERY_FREE: "Бесплатно",
+  SELLER_DELIVERY_FROM: (price: string) => `от ${price}`,
+  SELLER_DELIVERY_NEED_ADDRESS:
+    "Точная сумма появится, когда выберете адрес: она зависит от расстояния по дорогам",
+  SELLER_DELIVERY_CALCULATING: "Считаем расстояние по дорогам…",
+  SELLER_DELIVERY_FREE_FROM: (price: string) => `Бесплатно от ${price}`,
+  SELLER_DELIVERY_DISTANCE: (km: number) => `${km} км по дорогам`,
+  SELLER_DELIVERY_DISTANCE_ESTIMATE: (km: number) =>
+    `≈ ${km} км по дорогам — маршрут сейчас не построился, расстояние оценено по карте`,
+  SELLER_DELIVERY_MAP_ATTRIBUTION: "Маршрут по данным © участники OpenStreetMap",
+  SELLER_DELIVERY_QUOTE_FALLBACK: "Не удалось посчитать доставку",
+  TOTAL_GOODS: "Товары",
+  TOTAL_DELIVERY: "Доставка",
+  TOTAL_TO_PAY: "Итого",
   LABEL_FULFILLMENT: "Способ получения",
   LABEL_SAVED_ADDRESSES: "Сохранённые адреса",
   SAVED_ADDRESS_OTHER: "Указать другой на карте",

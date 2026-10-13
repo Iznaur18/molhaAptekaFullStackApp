@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import Animated from "react-native-reanimated";
+import type { CartSellerDelivery } from "@izibuy/shared-lib";
 
 import type { OrderFulfillmentMethod } from "@/entities/order/api/createOrder";
 import type { OrderPaymentMethod } from "@/entities/order/model/constants";
@@ -29,6 +30,10 @@ type CheckoutSheetModalProps = {
   pickupAvailable?: boolean;
   allowedPaymentMethods?: readonly string[] | null;
   cardPrepaidAvailable?: boolean;
+  sellerDelivery?: CartSellerDelivery | null;
+  deliveryProductIds?: readonly string[];
+  initialFulfillmentMethod?: OrderFulfillmentMethod | null;
+  onFulfillmentMethodChange?: (method: OrderFulfillmentMethod) => void;
   isSubmitting: boolean;
   submitError: string;
   submitSuccess: string;
@@ -51,6 +56,10 @@ export const CheckoutSheetModal = ({
   pickupAvailable = true,
   allowedPaymentMethods = null,
   cardPrepaidAvailable = false,
+  sellerDelivery = null,
+  deliveryProductIds,
+  initialFulfillmentMethod = null,
+  onFulfillmentMethodChange,
   isSubmitting,
   submitError,
   submitSuccess,
@@ -122,6 +131,10 @@ export const CheckoutSheetModal = ({
               pickupAvailable={pickupAvailable}
               allowedPaymentMethods={allowedPaymentMethods}
               cardPrepaidAvailable={cardPrepaidAvailable}
+              sellerDelivery={sellerDelivery}
+              deliveryProductIds={deliveryProductIds}
+              initialFulfillmentMethod={initialFulfillmentMethod}
+              onFulfillmentMethodChange={onFulfillmentMethodChange}
               isSubmitting={isSubmitting}
               submitError={submitError}
               submitSuccess={submitSuccess}

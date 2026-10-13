@@ -101,6 +101,26 @@ export const sellerDeliveryQuoteBodySchema = z.object({
     .optional(),
 });
 
+/**
+ * `data` ответа `POST /order/seller-delivery-quote`: тариф каждого продавца и
+ * расстояние по дорогам до адреса покупателя. Сумму клиент собирает сам
+ * функцией `calculateSellerDeliveryFee` — той же, что сервер в заказе.
+ */
+export const sellerDeliveryQuoteDataSchema = z.object({
+  sellers: z
+    .array(
+      z
+        .object({
+          sellerId: z.string(),
+          distanceKm: z.number().nullable().optional(),
+          distanceSource: z.string().nullable().optional(),
+        })
+        .passthrough(),
+    )
+    .optional()
+    .default([]),
+});
+
 /** Тело `POST /order` (структура; DaData — отдельно на сервере для delivery). */
 export const createOrderBodySchema = z
   .object({

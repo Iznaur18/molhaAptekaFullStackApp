@@ -16,6 +16,8 @@ export type OrderFulfillmentMethod =
 export type CreateOrderPayload = {
   items: { productId: string; quantity: number }[];
   fulfillmentMethod?: OrderFulfillmentMethod;
+  /** Способ получения на продавца: заказ распадается на отправления. */
+  fulfillmentBySellerId?: Record<string, OrderFulfillmentMethod>;
   deliveryAddress: string;
   deliveryAddressFlat?: string;
   paymentMethod: OrderPaymentMethod;

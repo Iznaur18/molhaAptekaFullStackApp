@@ -995,3 +995,84 @@ export const useAuthGateStyles = createThemedStyles((theme) => ({
     marginBottom: theme.spacing[4],
   },
 }));
+
+/** Паритет с web `CheckoutSellerDeliveryCost.css`: цена доставки по тарифу продавца. */
+export const useCheckoutSellerDeliveryCostStyles = createThemedStyles((theme) => ({
+  root: {
+    gap: 6,
+    marginTop: theme.spacing[2],
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 12,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  legend: {
+    flexShrink: 1,
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.textSecondary,
+  },
+  value: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: theme.colors.text,
+    fontVariant: ["tabular-nums"],
+  },
+  hint: {
+    fontSize: 12.5,
+    lineHeight: 17,
+    color: theme.colors.textMuted,
+  },
+  hintError: {
+    color: theme.colors.danger,
+  },
+  totals: {
+    gap: 4,
+    marginTop: 4,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+  },
+  totalRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  totalRowSum: {
+    marginTop: 4,
+  },
+  totalLabel: {
+    fontSize: 13.5,
+    color: theme.colors.textSecondary,
+  },
+  totalValue: {
+    fontSize: 13.5,
+    color: theme.colors.text,
+    fontVariant: ["tabular-nums"],
+  },
+  totalSumLabel: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: theme.colors.text,
+  },
+  totalSumValue: {
+    fontSize: 16,
+    fontWeight: "800",
+    color: theme.colors.text,
+    fontVariant: ["tabular-nums"],
+  },
+  attribution: {
+    fontSize: 11,
+    lineHeight: 14,
+    color: theme.colors.textMuted,
+  },
+}));

@@ -7,7 +7,10 @@ import {
   PRODUCT_DELIVERY_FULFILLMENT_ENABLED,
   SHIPPING_PROVIDERS_CHECKOUT_SOON_HINT,
 } from "@molha/api-contract";
-import { resolveCheckoutPaymentMethodOptions } from "@izibuy/shared-lib";
+import {
+  resolveCheckoutPaymentMethodOptions,
+  type CartSellerDelivery,
+} from "@izibuy/shared-lib";
 
 import { addressValueFromUser } from "@/entities/address/lib/addressValueFromUser";
 import { validateRuDeliveryAddressForm } from "@/entities/address/lib/validateRuDeliveryAddressForm";
@@ -37,6 +40,9 @@ import {
 import { userSavedAddressesFromUser } from "@/entities/address/lib/userSavedAddressesFromUser";
 import { AddressSuggestInput } from "@/entities/address/ui/AddressSuggestInput";
 import { CheckoutSavedAddressPicker } from "@/features/checkout/ui/CheckoutSavedAddressPicker";
+import { CheckoutSellerDeliveryCost } from "@/features/checkout/ui/CheckoutSellerDeliveryCost";
+
+const EMPTY_PRODUCT_IDS: readonly string[] = [];
 
 type CheckoutFormProps = {
   defaultUser?: Record<string, unknown> | null;
@@ -47,6 +53,13 @@ type CheckoutFormProps = {
   allowedPaymentMethods?: readonly string[] | null;
   /** Продавцы входят в список предоплаты площадки — доступна СБП. */
   cardPrepaidAvailable?: boolean;
+  /** Тариф собственной доставки продавца; `null` — считать нечего. */
+  sellerDelivery?: CartSellerDelivery | null;
+  /** Товары, которые везут: по ним считается расстояние. */
+  deliveryProductIds?: readonly string[];
+  /** Способ, выбранный покупателем у этого продавца раньше. */
+  initialFulfillmentMethod?: OrderFulfillmentMethod | null;
+  onFulfillmentMethodChange?: (method: OrderFulfillmentMethod) => void;
   isSubmitting: boolean;
   submitError: string;
   submitSuccess: string;
@@ -69,6 +82,10 @@ export const CheckoutForm = ({
   pickupAvailable = true,
   allowedPaymentMethods = null,
   cardPrepaidAvailable = false,
+  sellerDelivery = null,
+  deliveryProductIds = EMPTY_PRODUCT_IDS,
+  initialFulfillmentMethod = null,
+  onFulfillmentMethodChange,
   isSubmitting,
   submitError,
   submitSuccess,
@@ -81,8 +98,12 @@ export const CheckoutForm = ({
   const insets = useSafeAreaInsets();
   const checkoutStyles = useCheckoutFormStyles();
   const [fulfillmentMethod, setFulfillmentMethod] = useState<OrderFulfillmentMethod>(
-    ORDER_FULFILLMENT_PICKUP,
+    initialFulfillmentMethod ?? ORDER_FULFILLMENT_PICKUP,
   );
+  // Корзина помнит способ по продавцам: по нему считается доставка в итоге.
+  useEffect(() => {
+    onFulfillmentMethodChange?.(fulfillmentMethod);
+  }, [fulfillmentMethod, onFulfillmentMethodChange]);
   /** Книга адресов профиля — источник для выбора без повторного ввода. */
   const savedAddresses = useMemo(
     () => (defaultUser != null ? userSavedAddressesFromUser(defaultUser) : []),
@@ -494,6 +515,15 @@ export const CheckoutForm = ({
               />
 
               <CheckoutShippingProviderPicker disabled={isDisabled || isSubmitting} />
+
+              {sellerDelivery ? (
+                <CheckoutSellerDeliveryCost
+                  sellerDelivery={sellerDelivery}
+                  productIds={deliveryProductIds}
+                  address={deliveryAddress}
+                  isAddressValid={isAddressValid}
+                />
+              ) : null}
             </View>
           </View>
         )}

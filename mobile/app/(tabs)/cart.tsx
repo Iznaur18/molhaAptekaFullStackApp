@@ -1,23 +1,31 @@
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Feather } from "@expo/vector-icons";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
-  CART_FULFILLMENT_SECTION_DELIVERY,
-  CART_FULFILLMENT_SECTION_PICKUP,
+  ORDER_FULFILLMENT_DELIVERY,
   doProductsSupportPickup,
   doProductsSupportSellerDelivery,
 } from "@molha/api-contract";
 import {
+  groupCartLinesBySeller,
+  hasMixedDeliveryCarriers,
   isProductBuyNFreeActive,
   resolveCartAllowedPaymentMethods,
+  resolveCartFulfillmentBySeller,
+  resolveCartSellerDelivery,
 } from "@izibuy/shared-lib";
 
 import { buildCheckoutPickupGroups } from "@/entities/cart/lib/buildCheckoutPickupLocations";
 import { getCartLineExclusionReason } from "@/entities/cart/lib/getCartLineExclusionReason";
-import { groupCartLinesByFulfillment } from "@/entities/cart/lib/groupCartLinesByFulfillment";
+import { resolveCartGroupDeliveryHint } from "@/entities/cart/lib/resolveCartGroupDeliveryHint";
 import { resolveCheckoutSellers } from "@/entities/cart/lib/resolveCheckoutSellers";
+import {
+  CartSellerList,
+  type CartSellerEntry,
+} from "@/entities/cart/ui/CartSellerList";
 import { useCardPrepaidAvailable } from "@/entities/payment/model/usePaymentConfigQuery";
 import { selectCartCheckoutSummary } from "@/entities/cart/lib/selectCartCheckoutSummary";
 import { selectCartLines } from "@/entities/cart/lib/selectCartLines";
@@ -47,8 +55,10 @@ import {
   CART_PAGE_UI,
   CHECKOUT_FORM_UI,
 } from "@/shared/config";
-import { formatApiErrorMessage } from "@/shared/lib";
+import { formatApiErrorMessage, formatPriceRub } from "@/shared/lib";
 import { resolveMobileBottomNavLayoutHeight } from "@/shared/lib/mobileBottomNavLayout";
+import { useAppTheme } from "@/shared/theme/AppThemeProvider";
+import { useCartSellerListStyles } from "@/shared/theme/cartFulfillmentStyles";
 import { useCartScreenStyles } from "@/shared/theme/catalogProductStyles";
 import { useScreenLayout } from "@/shared/model/useScreenLayout";
 import { AppButton } from "@/shared/ui/AppButton";
@@ -58,6 +68,8 @@ import { ScreenErrorState, ScreenLoadingState } from "@/shared/ui/ScreenStates";
 export default function CartScreen() {
   const router = useRouter();
   const styles = useCartScreenStyles();
+  const sellerListStyles = useCartSellerListStyles();
+  const theme = useAppTheme();
   const insets = useSafeAreaInsets();
   const { contentPaddingTop, centeredContentStyle } = useScreenLayout();
   const bottomNavLayoutHeight = resolveMobileBottomNavLayoutHeight(insets.bottom);
@@ -68,9 +80,13 @@ export default function CartScreen() {
   const { clearCart, removeItems, isUpdating } = useCartActions();
   const createOrderMutation = useCreateOrderMutation();
 
-  const [checkoutSection, setCheckoutSection] = useState<"pickup" | "delivery" | null>(
-    null,
-  );
+  /** Открытая корзина продавца; null — общий список продавцов. */
+  const [activeSellerCartId, setActiveSellerCartId] = useState<string | null>(null);
+  const [isSellerCheckoutOpen, setIsSellerCheckoutOpen] = useState(false);
+  /** Выбор покупателя по продавцам; пусто = способ по умолчанию у отправления. */
+  const [chosenFulfillmentBySeller, setChosenFulfillmentBySeller] = useState<
+    Record<string, OrderFulfillmentMethod>
+  >({});
   const [auctionCheckoutBid, setAuctionCheckoutBid] = useState<MyPriceOfferBid | null>(
     null,
   );
@@ -164,22 +180,17 @@ export default function CartScreen() {
     [lines, currentUserId],
   );
 
-  const { pickupLines, deliveryLines } = useMemo(
-    () => groupCartLinesByFulfillment(visibleLines),
+  // Корзина делится на отправления — по одному на продавца. Способ получения
+  // покупатель выбирает у каждого: раньше его выбирала сама корзина, и товар
+  // с обоими способами всегда уезжал в самовывоз.
+  const sellerGroups = useMemo(
+    () => groupCartLinesBySeller(visibleLines),
     [visibleLines],
   );
 
   const purchasableIds = useMemo(
     () => visibleLines.map((line) => line.productId),
     [visibleLines],
-  );
-  const pickupIds = useMemo(
-    () => pickupLines.map((line) => line.productId),
-    [pickupLines],
-  );
-  const deliveryIds = useMemo(
-    () => deliveryLines.map((line) => line.productId),
-    [deliveryLines],
   );
 
   const {
@@ -191,21 +202,62 @@ export default function CartScreen() {
     selectedCountIn,
   } = useCartSelection(purchasableIds);
 
-  const pickupSummary = useMemo(
-    () => selectCartCheckoutSummary(pickupLines, currentUserId, deselectedIds),
-    [pickupLines, currentUserId, deselectedIds],
-  );
-  const deliverySummary = useMemo(
-    () => selectCartCheckoutSummary(deliveryLines, currentUserId, deselectedIds),
-    [deliveryLines, currentUserId, deselectedIds],
+  /** Свод на каждое отправление — у продавца свои итоги и галочки. */
+  const sellerEntries = useMemo<CartSellerEntry[]>(
+    () =>
+      sellerGroups.map((group) => ({
+        group,
+        summary: selectCartCheckoutSummary(group.lines, currentUserId, deselectedIds),
+        productIds: group.lines.map((line) => line.productId),
+      })),
+    [sellerGroups, currentUserId, deselectedIds],
   );
 
-  const activeSummary =
-    checkoutSection === CART_FULFILLMENT_SECTION_DELIVERY
-      ? deliverySummary
-      : pickupSummary;
+  /**
+   * Итоговый выбор способов. Считается от групп, а не от состояния:
+   * сохранённый выбор мог стать недоступным, если покупатель убрал товар,
+   * который его разрешал.
+   */
+  const fulfillmentBySellerId = useMemo(
+    () => resolveCartFulfillmentBySeller(sellerGroups, chosenFulfillmentBySeller),
+    [sellerGroups, chosenFulfillmentBySeller],
+  );
 
-  const canCheckoutActive = activeSummary.selectedLines.length > 0;
+  // Продавец исчез из корзины (товары убрали или заказали) — назад к списку.
+  useEffect(() => {
+    if (
+      activeSellerCartId != null &&
+      !sellerGroups.some((group) => group.sellerId === activeSellerCartId)
+    ) {
+      setActiveSellerCartId(null);
+      setIsSellerCheckoutOpen(false);
+    }
+  }, [activeSellerCartId, sellerGroups]);
+
+  const activeSellerEntry = useMemo(
+    () =>
+      activeSellerCartId == null
+        ? null
+        : (sellerEntries.find((entry) => entry.group.sellerId === activeSellerCartId) ??
+          null),
+    [activeSellerCartId, sellerEntries],
+  );
+
+  const emptySummary = useMemo(
+    () => selectCartCheckoutSummary([], currentUserId, deselectedIds),
+    [currentUserId, deselectedIds],
+  );
+  const activeSummary = activeSellerEntry?.summary ?? emptySummary;
+
+  /** Отмеченные товары везут разные службы — одной доставкой не оформить. */
+  const checkoutMixedCarriers = useMemo(
+    () =>
+      hasMixedDeliveryCarriers(activeSummary.selectedLines.map((line) => line.product)),
+    [activeSummary.selectedLines],
+  );
+
+  const canCheckoutActive =
+    activeSummary.selectedLines.length > 0 && !activeSummary.checkoutBlockReason;
 
   const pickupGroups = useMemo(() => {
     if (auctionCheckoutBid) {
@@ -284,17 +336,84 @@ export default function CartScreen() {
     ]);
   }, [acceptedBidsQuery, cartQuery, productsQuery]);
 
+  // Тариф собственной доставки продавца. Считаем так, будто выбрана доставка:
+  // блок с ценой форма показывает только в этом режиме. Сумму собирает функция
+  // контракта, расстояние по дорогам приходит котировкой с сервера.
+  const sellerDelivery = useMemo(() => {
+    if (auctionCheckoutBid || !activeSellerEntry || checkoutMixedCarriers) {
+      return null;
+    }
+    const sellerId = activeSellerEntry.group.sellerId;
+    return resolveCartSellerDelivery({
+      sellerGroups: [{ sellerId, lines: activeSummary.selectedLines }],
+      fulfillmentBySellerId: { [sellerId]: ORDER_FULFILLMENT_DELIVERY },
+      goodsTotalRub: activeSummary.selectedTotal,
+    });
+  }, [
+    auctionCheckoutBid,
+    activeSellerEntry,
+    checkoutMixedCarriers,
+    activeSummary.selectedLines,
+    activeSummary.selectedTotal,
+  ]);
+  const deliveryProductIds = useMemo(
+    () => activeSummary.selectedLines.map((line) => line.productId),
+    [activeSummary.selectedLines],
+  );
+
+  /** Что известно о цене доставки у открытого продавца — в итоге корзины. */
+  const activeDeliveryHint = useMemo(() => {
+    if (!activeSellerEntry || checkoutMixedCarriers) {
+      return "";
+    }
+    const hint = resolveCartGroupDeliveryHint(
+      activeSellerEntry.group,
+      activeSummary.selectedTotal,
+    );
+    if (!hint) return "";
+    if (hint.kind === "free") return CART_PAGE_UI.DELIVERY_HINT_FREE;
+    if (hint.kind === "from") {
+      return CART_PAGE_UI.DELIVERY_HINT_FROM(formatPriceRub(hint.baseFeeRub));
+    }
+    return CART_PAGE_UI.DELIVERY_HINT_BY_TARIFF;
+  }, [activeSellerEntry, checkoutMixedCarriers, activeSummary.selectedTotal]);
+
   const handleOpenAuctionCheckout = (bid: MyPriceOfferBid) => {
     setSubmitState({ isSubmitting: false, error: "", success: "" });
-    setCheckoutSection(null);
+    setIsSellerCheckoutOpen(false);
     setAuctionCheckoutBid(bid);
   };
 
-  const openSectionCheckout = (section: "pickup" | "delivery") => {
+  const openSellerCart = (sellerId: string) => {
+    setAuctionCheckoutBid(null);
+    setIsSellerCheckoutOpen(false);
+    setSubmitState({ isSubmitting: false, error: "", success: "" });
+    setActiveSellerCartId(sellerId);
+  };
+
+  const closeSellerCart = () => {
+    setIsSellerCheckoutOpen(false);
+    setSubmitState({ isSubmitting: false, error: "", success: "" });
+    setActiveSellerCartId(null);
+  };
+
+  const openSellerCheckout = () => {
     setAuctionCheckoutBid(null);
     setSubmitState({ isSubmitting: false, error: "", success: "" });
-    setCheckoutSection(section);
+    setIsSellerCheckoutOpen(true);
   };
+
+  const handleSellerFulfillmentChange = useCallback(
+    (method: OrderFulfillmentMethod) => {
+      if (activeSellerCartId == null) return;
+      setChosenFulfillmentBySeller((prev) =>
+        prev[activeSellerCartId] === method
+          ? prev
+          : { ...prev, [activeSellerCartId]: method },
+      );
+    },
+    [activeSellerCartId],
+  );
 
   const handleAuctionCheckoutSubmit = async (payload: {
     fulfillmentMethod: OrderFulfillmentMethod;
@@ -354,13 +473,23 @@ export default function CartScreen() {
           quantity: line.quantity,
         })),
         fulfillmentMethod: payload.fulfillmentMethod,
+        // Заказ оформляется у одного продавца: способ получения — его
+        // отправления, а не всего заказа «по умолчанию».
+        ...(activeSellerCartId
+          ? {
+              fulfillmentBySellerId: {
+                [activeSellerCartId]: payload.fulfillmentMethod,
+              },
+            }
+          : {}),
         deliveryAddress: payload.deliveryAddress,
         deliveryAddressFlat: payload.deliveryAddressFlat,
         paymentMethod: payload.paymentMethod,
         pickupSelections: payload.pickupSelections,
       });
       await removeItems(orderedProductIds);
-      setCheckoutSection(null);
+      setIsSellerCheckoutOpen(false);
+      setActiveSellerCartId(null);
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: orderQueryKeys.my() }),
         queryClient.invalidateQueries({ queryKey: orderQueryKeys.myActionCount() }),
@@ -468,55 +597,74 @@ export default function CartScreen() {
             />
           }
         >
-          <CartAuctionSection
-            bids={auctionBids}
-            onCheckout={handleOpenAuctionCheckout}
-          />
+          {activeSellerEntry ? (
+            <>
+              <Pressable
+                style={sellerListStyles.backRow}
+                onPress={closeSellerCart}
+                accessibilityRole="button"
+                hitSlop={8}
+              >
+                <Feather name="chevron-left" size={18} color={theme.colors.text} />
+                <Text style={sellerListStyles.backText}>
+                  {CART_PAGE_UI.BACK_TO_SELLERS}
+                </Text>
+              </Pressable>
 
-          <CartFulfillmentSection
-            title={CART_PAGE_UI.SECTION_PICKUP}
-            lines={pickupLines}
-            selectedCount={selectedCountIn(pickupIds)}
-            areAllSelected={areAllSelectedIn(pickupIds)}
-            onToggleAll={() => toggleAllIn(pickupIds)}
-            isLineSelected={isLineSelected}
-            onToggleSelected={toggleLine}
-            summary={pickupSummary}
-            canCheckout={pickupSummary.selectedLines.length > 0}
-            onCheckout={() => openSectionCheckout(CART_FULFILLMENT_SECTION_PICKUP)}
-            checkoutDisabled={isUpdating}
-          />
+              <CartFulfillmentSection
+                key={activeSellerEntry.group.sellerId || "unknown-seller"}
+                title={
+                  activeSellerEntry.group.sellerName.trim() ||
+                  CART_PAGE_UI.SECTION_SELLER_FALLBACK
+                }
+                note={checkoutMixedCarriers ? CART_PAGE_UI.MIXED_CARRIERS_NOTE : null}
+                deliveryHint={activeDeliveryHint}
+                lines={activeSellerEntry.group.lines}
+                selectedCount={selectedCountIn(activeSellerEntry.productIds)}
+                areAllSelected={areAllSelectedIn(activeSellerEntry.productIds)}
+                onToggleAll={() => toggleAllIn(activeSellerEntry.productIds)}
+                isLineSelected={isLineSelected}
+                onToggleSelected={toggleLine}
+                summary={activeSellerEntry.summary}
+                canCheckout={canCheckoutActive}
+                onCheckout={openSellerCheckout}
+                checkoutDisabled={isUpdating}
+              />
+            </>
+          ) : (
+            <>
+              <CartAuctionSection
+                bids={auctionBids}
+                onCheckout={handleOpenAuctionCheckout}
+              />
 
-          <CartFulfillmentSection
-            title={CART_PAGE_UI.SECTION_DELIVERY}
-            lines={deliveryLines}
-            selectedCount={selectedCountIn(deliveryIds)}
-            areAllSelected={areAllSelectedIn(deliveryIds)}
-            onToggleAll={() => toggleAllIn(deliveryIds)}
-            isLineSelected={isLineSelected}
-            onToggleSelected={toggleLine}
-            summary={deliverySummary}
-            canCheckout={deliverySummary.selectedLines.length > 0}
-            onCheckout={() => openSectionCheckout(CART_FULFILLMENT_SECTION_DELIVERY)}
-            checkoutDisabled={isUpdating}
-            showDeliveryFeeNote
-          />
+              <CartSellerList entries={sellerEntries} onOpenSeller={openSellerCart} />
+            </>
+          )}
         </ScrollView>
       </View>
 
       <CheckoutSheetModal
-        visible={checkoutSection != null}
+        visible={isSellerCheckoutOpen && activeSellerEntry != null}
         defaultUser={sessionQuery.data?.user}
         pickupGroups={pickupGroups}
         deliveryAvailable={deliveryAvailable}
         pickupAvailable={pickupAvailable}
         allowedPaymentMethods={allowedPaymentMethods}
         cardPrepaidAvailable={cardPrepaidAvailable}
+        sellerDelivery={sellerDelivery}
+        deliveryProductIds={deliveryProductIds}
+        initialFulfillmentMethod={
+          activeSellerCartId
+            ? (fulfillmentBySellerId[activeSellerCartId] ?? null)
+            : null
+        }
+        onFulfillmentMethodChange={handleSellerFulfillmentChange}
         isSubmitting={submitState.isSubmitting}
         submitError={submitState.error}
         submitSuccess={submitState.success}
         isDisabled={!canCheckoutActive}
-        onClose={() => setCheckoutSection(null)}
+        onClose={() => setIsSellerCheckoutOpen(false)}
         onSubmit={handleCheckoutSubmit}
       />
 

@@ -689,7 +689,10 @@ export {
   sellerDeliveryDistanceKm,
   normalizeGeoCoord,
 } from "./sellerDeliveryTariff.js";
-export { sellerDeliveryQuoteBodySchema } from "./order.js";
+export {
+  sellerDeliveryQuoteBodySchema,
+  sellerDeliveryQuoteDataSchema,
+} from "./order.js";
 export {
   PLATFORM_COMMISSION_PERCENT_DEFAULT,
   PLATFORM_COMMISSION_PERCENT_MAX,

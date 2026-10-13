@@ -360,3 +360,16 @@ export type {
   MarketingTouch,
   MarketingTouchSummary,
 } from "./marketingAttribution.js";
+export {
+  groupCartLinesBySeller,
+  hasMixedDeliveryCarriers,
+  quoteCartSellerDelivery,
+  resolveCartFulfillmentBySeller,
+  resolveCartSellerDelivery,
+} from "./cartSellerGroups.js";
+export type {
+  CartSellerDelivery,
+  CartSellerDeliveryQuote,
+  CartSellerGroup,
+  CartSellerGroupLine,
+} from "./cartSellerGroups.js";
