@@ -30,6 +30,7 @@ import { siteHeaderBannerCampaignRouter } from "./siteHeaderBannerCampaignRouter
 import { introAdRouter } from "./introAdRouter.js";
 import { sellerPersonalCategoryRouter } from "./sellerPersonalCategoryRouter.js";
 import sellerShelfRouter from "./sellerShelfRouter.js";
+import dealRequestRouter from "./dealRequestRouter.js";
 import { auditRouter } from "./auditRouter.js";
 import { analyticsRouter } from "./analyticsRouter.js";
 import { staffRouter } from "./staffRouter.js";
@@ -59,6 +60,7 @@ export {
   introAdRouter,
   sellerPersonalCategoryRouter,
   sellerShelfRouter,
+  dealRequestRouter,
   auditRouter,
   analyticsRouter,
   staffRouter,

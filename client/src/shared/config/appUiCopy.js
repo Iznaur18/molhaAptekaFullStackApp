@@ -213,3 +213,7 @@ export {
   PRODUCT_BADGE_EXPLAIN_ADMIN_UI,
 } from "./copy/admin.js";
 export { FAQ_UI, LEGAL_UI } from "./copy/faq-legal.js";
+export {
+  PRODUCT_DEAL_ACTIONS_UI,
+  DEAL_REQUESTS_PAGE_UI,
+} from "./copy/deal-requests.js";

@@ -25,6 +25,8 @@ export const JOB_PROCESS_ONEC_COMMERCEML_IMPORT = "processOneCCommerceMlImport";
 export const JOB_PROCESS_ANALYTICS_RECONCILIATION = "processAnalyticsReconciliation";
 export const JOB_PROCESS_LOBO_CRON = "processLoboCronTasks";
 export const JOB_PROCESS_CDEK_STATUS_SYNC = "processCdekStatusSync";
+/** Заявки на осмотр и услуги: сгорание без ответа и автоподтверждение. */
+export const JOB_PROCESS_DEAL_REQUESTS = "process-deal-requests";
 /** Разморозка эскроу по сроку после вручения. */
 export const JOB_PROCESS_ESCROW_RELEASE = "process-escrow-release";
 /** Срок оплаты заказов по СБП: напоминание и отмена неоплаченных. */

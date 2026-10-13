@@ -37,6 +37,7 @@ import { IntroAdCampaignModel } from "./IntroAdCampaignModel.js";
 import { SellerPersonalCategoryModel } from "./SellerPersonalCategoryModel.js";
 import { SellerPersonalCategoryCampaignModel } from "./SellerPersonalCategoryCampaignModel.js";
 import { SellerShelfModel } from "./SellerShelfModel.js";
+import { DealRequestModel } from "./DealRequestModel.js";
 import { AccountDeviceLinkModel } from "./AccountDeviceLinkModel.js";
 import ProductBuyNFreeProgressModel from "./ProductBuyNFreeProgressModel.js";
 import StaffAuditLogModel from "./StaffAuditLogModel.js";
@@ -101,6 +102,7 @@ export {
   SellerPersonalCategoryModel,
   SellerPersonalCategoryCampaignModel,
   SellerShelfModel,
+  DealRequestModel,
   AccountDeviceLinkModel,
   ProductBuyNFreeProgressModel,
   StaffAuditLogModel,

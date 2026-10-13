@@ -23,6 +23,7 @@ import {
   PROFILE_TAB_ADVERTISING,
   PROFILE_TAB_ONEC_INTEGRATION,
   PROFILE_TAB_DELIVERY_PAYMENT,
+  PROFILE_TAB_DEAL_REQUESTS,
   PROFILE_TAB_SAFE_DEAL,
   PROFILE_TAB_SAFE_DEAL_MODERATION,
   PROFILE_TAB_EDIT_PROFILE,
@@ -196,6 +197,10 @@ export const useHomeProfileNavigation = ({
     navigateFromProfileTab(PROFILE_TAB_DELIVERY_PAYMENT);
   }, [navigateFromProfileTab]);
 
+  const handleDealRequestsFromProfile = useCallback(() => {
+    navigateFromProfileTab(PROFILE_TAB_DEAL_REQUESTS);
+  }, [navigateFromProfileTab]);
+
   const handleSafeDealFromProfile = useCallback(() => {
     navigateFromProfileTab(PROFILE_TAB_SAFE_DEAL);
   }, [navigateFromProfileTab]);
@@ -293,6 +298,7 @@ export const useHomeProfileNavigation = ({
     handleOneCIntegrationFromProfile,
 
     handleDeliveryPaymentFromProfile,
+    handleDealRequestsFromProfile,
 
     handleSafeDealFromProfile,
 
