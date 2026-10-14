@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, useWindowDimensions, View } from "react-native";
 import { hasMixedDeliveryCarriers, type CartSellerGroup } from "@izibuy/shared-lib";
 
 import { resolveCartGroupDeliveryHint } from "@/entities/cart/lib/resolveCartGroupDeliveryHint";
@@ -15,7 +15,10 @@ import { UserPremiumDisplayName } from "@/entities/user/ui/UserPremiumDisplayNam
 import { CART_PAGE_UI } from "@/shared/config";
 import { formatPriceRub } from "@/shared/lib";
 import { useAppTheme } from "@/shared/theme/AppThemeProvider";
-import { useCartSellerListStyles } from "@/shared/theme/cartFulfillmentStyles";
+import {
+  CART_SELLER_ROW_STACK_MAX_WIDTH,
+  useCartSellerListStyles,
+} from "@/shared/theme/cartFulfillmentStyles";
 import { CachedProductImage } from "@/shared/ui/CachedProductImage";
 
 export type CartSellerEntry = {
@@ -49,6 +52,8 @@ const CartSellerRow = ({
 }) => {
   const styles = useCartSellerListStyles();
   const theme = useAppTheme();
+  const { width: windowWidth } = useWindowDimensions();
+  const isStacked = windowWidth <= CART_SELLER_ROW_STACK_MAX_WIDTH;
   const [avatarFailed, setAvatarFailed] = useState(false);
 
   const sellerForPhoto = useMemo(
@@ -79,7 +84,7 @@ const CartSellerRow = ({
 
   return (
     <View style={styles.row}>
-      <View style={styles.top}>
+      <View style={[styles.top, isStacked && styles.topStacked]}>
         <Pressable
           style={styles.main}
           onPress={open}
@@ -108,7 +113,11 @@ const CartSellerRow = ({
           </View>
         </Pressable>
 
-        <Pressable style={styles.checkout} onPress={open} accessibilityRole="button">
+        <Pressable
+          style={[styles.checkout, isStacked && styles.checkoutStacked]}
+          onPress={open}
+          accessibilityRole="button"
+        >
           <Text style={styles.checkoutPrice}>
             {formatPriceRub(summary.selectedTotal)}
           </Text>

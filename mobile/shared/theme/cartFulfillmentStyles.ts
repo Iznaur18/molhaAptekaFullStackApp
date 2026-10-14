@@ -159,6 +159,13 @@ export const useCartFulfillmentSectionStyles = createThemedStyles((theme) => ({
 }));
 
 /** Паритет с web `CartSellerList.css`: продавцы блоками (аватар + ник). */
+/**
+ * Паритет web `CartSellerList.css` `@media (max-width: 480px)`: на узком экране
+ * кнопка с суммой уходит под имя продавца на всю ширину — иначе имя режется
+ * до трёх-четырёх букв.
+ */
+export const CART_SELLER_ROW_STACK_MAX_WIDTH = 480;
+
 export const useCartSellerListStyles = createThemedStyles((theme) => ({
   list: {
     gap: 8,
@@ -208,14 +215,21 @@ export const useCartSellerListStyles = createThemedStyles((theme) => ({
     fontSize: 14,
     color: theme.colors.textMuted,
   },
+  topStacked: {
+    flexWrap: "wrap",
+  },
   checkout: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     gap: 12,
     paddingVertical: 9,
     paddingHorizontal: 14,
     borderRadius: 12,
     backgroundColor: theme.colors.accent,
+  },
+  checkoutStacked: {
+    width: "100%",
   },
   checkoutPrice: {
     fontSize: 14,
