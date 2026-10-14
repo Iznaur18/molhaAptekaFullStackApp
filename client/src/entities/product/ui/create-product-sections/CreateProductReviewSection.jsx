@@ -8,12 +8,11 @@ import {
 } from "../../lib/productListingOrigin.js";
 import { CREATE_PRODUCT_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
 import { getProductFieldEditLabel } from "../../lib/productFieldRegistry.js";
-import { resolveCreateProductWizardStepIndex } from "../../../../features/create-product-wizard/lib/createProductWizardSteps.js";
-
 /**
  * @param {{
  *   form: Record<string, unknown>;
  *   discountPreviewPercent: number | null;
+ *   stepIds: readonly string[]; шаги мастера: у осмотра и услуги их меньше
  *   onEditStep: (stepIndex: number) => void;
  *   className?: string;
  * }} props
@@ -21,6 +20,7 @@ import { resolveCreateProductWizardStepIndex } from "../../../../features/create
 export function CreateProductReviewSection({
   form,
   discountPreviewPercent,
+  stepIds,
   onEditStep,
   className = "",
 }) {
@@ -45,12 +45,12 @@ export function CreateProductReviewSection({
     {
       label: getProductFieldEditLabel("productName"),
       value: String(form.productName ?? "").trim(),
-      stepIndex: 0,
+      stepId: "basic",
     },
     {
       label: getProductFieldEditLabel("productDescription"),
       value: String(form.productDescription ?? "").trim(),
-      stepIndex: 0,
+      stepId: "basic",
       multiline: true,
     },
     {
@@ -60,7 +60,7 @@ export function CreateProductReviewSection({
             (option) => option.value === form.productListingOrigin,
           )?.label ?? CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_EMPTY)
         : CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_EMPTY,
-      stepIndex: resolveCreateProductWizardStepIndex("originality"),
+      stepId: "originality",
     },
     {
       label: CREATE_PRODUCT_MODAL_UI.SECTION_MEDIA,
@@ -68,19 +68,19 @@ export function CreateProductReviewSection({
         imageCount,
         form.productPreviewVideoUrl,
       ),
-      stepIndex: resolveCreateProductWizardStepIndex("media"),
+      stepId: "media",
     },
     {
       label: CREATE_PRODUCT_MODAL_UI.LABEL_CATEGORY,
       value: categoryLabel,
-      stepIndex: 3,
+      stepId: "category",
     },
     {
       label: CREATE_PRODUCT_MODAL_UI.LABEL_SALE_REGION,
       value:
         getRuRegionByCode(String(form.productRegionCode ?? "").trim())?.name ||
         CREATE_PRODUCT_MODAL_UI.HINT_SALE_REGION_FROM_ADDRESS,
-      stepIndex: 4,
+      stepId: "category",
     },
     {
       label: CREATE_PRODUCT_MODAL_UI.LABEL_PICKUP_ADDRESS,
@@ -99,29 +99,29 @@ export function CreateProductReviewSection({
           CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_EMPTY
         );
       })(),
-      stepIndex: 4,
+      stepId: "pickup",
     },
     {
       label: getProductFieldEditLabel("productPrice"),
       value: `${String(form.productPrice ?? "").trim()} ₽${
         discountPreviewPercent != null ? ` (−${discountPreviewPercent}%)` : ""
       }`,
-      stepIndex: 5,
+      stepId: "commerce",
     },
     {
       label: getProductFieldEditLabel("productStockQuantity"),
       value: form.productIsAvailable
         ? `${String(form.productStockQuantity ?? "").trim()} шт.`
         : CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_HIDDEN,
-      stepIndex: 5,
+      stepId: "commerce",
     },
     {
       label: CREATE_PRODUCT_MODAL_UI.LABEL_RETURN_ENABLED,
       value: returnSummary,
-      stepIndex: 6,
+      stepId: "returns",
       multiline: true,
     },
-  ];
+  ].filter((row) => stepIds.includes(row.stepId));
 
   return (
     <div className={["create-product-review", className].filter(Boolean).join(" ")}>
@@ -144,7 +144,7 @@ export function CreateProductReviewSection({
             <button
               type="button"
               className="create-product-review__edit"
-              onClick={() => onEditStep(row.stepIndex)}
+              onClick={() => onEditStep(stepIds.indexOf(row.stepId))}
             >
               {CREATE_PRODUCT_MODAL_UI.WIZARD_REVIEW_EDIT}
             </button>

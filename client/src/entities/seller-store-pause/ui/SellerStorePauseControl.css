@@ -74,7 +74,7 @@
   font-size: 13px;
   font-weight: 700;
   line-height: 1.2;
-  color: var(--iz-color-on-action, #fff);
+  color: var(--iz-color-on-contrast);
   white-space: nowrap;
   cursor: pointer;
 }

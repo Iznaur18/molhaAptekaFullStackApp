@@ -3,7 +3,7 @@ import { PRODUCT_STOCK_QUANTITY_MAX } from "../../model/productStockConstants.js
 import { CREATE_PRODUCT_MODAL_UI } from "../../../../shared/config/appUiCopy.js";
 import { getProductFieldEditLabel } from "../../lib/productFieldRegistry.js";
 import { FormFieldLabel } from "../../../../shared/ui/FormFieldLabel/FormFieldLabel.jsx";
-import { normalizeCategoryDealType } from "@molha/api-contract";
+import { isCartDealType, normalizeCategoryDealType } from "@molha/api-contract";
 
 import { CreateProductDealTermsFields } from "./CreateProductDealTermsFields.jsx";
 
@@ -112,59 +112,62 @@ export function CreateProductCommerceSection({
       ) : null}
 
       {/* Вес и габариты нужны службам доставки. Поля необязательные: пустые
-          означают «не знаю», и тогда расчёт идёт по средней коробке. */}
-      <div
-        className="create-product-section__label create-product-section__shipping"
-        role="group"
-        aria-label={CREATE_PRODUCT_MODAL_UI.SHIPPING_DIMENSIONS_TITLE}
-      >
-        <FormFieldLabel>
-          {CREATE_PRODUCT_MODAL_UI.SHIPPING_DIMENSIONS_TITLE}
-        </FormFieldLabel>
-        <p className="create-product-section__lead">
-          {CREATE_PRODUCT_MODAL_UI.SHIPPING_DIMENSIONS_HINT}
-        </p>
-        <div className="create-product-section__shipping-grid">
-          {[
-            [
-              "productWeightG",
-              CREATE_PRODUCT_MODAL_UI.SHIPPING_FIELD_WEIGHT,
-              CREATE_PRODUCT_MODAL_UI.LABEL_WEIGHT_G,
-            ],
-            [
-              "productLengthCm",
-              CREATE_PRODUCT_MODAL_UI.SHIPPING_FIELD_LENGTH,
-              CREATE_PRODUCT_MODAL_UI.LABEL_LENGTH_CM,
-            ],
-            [
-              "productWidthCm",
-              CREATE_PRODUCT_MODAL_UI.SHIPPING_FIELD_WIDTH,
-              CREATE_PRODUCT_MODAL_UI.LABEL_WIDTH_CM,
-            ],
-            [
-              "productHeightCm",
-              CREATE_PRODUCT_MODAL_UI.SHIPPING_FIELD_HEIGHT,
-              CREATE_PRODUCT_MODAL_UI.LABEL_HEIGHT_CM,
-            ],
-          ].map(([name, shortLabel, fullLabel]) => (
-            <label key={name} className="create-product-section__shipping-field">
-              <span className="create-product-section__shipping-field-label">
-                {shortLabel}
-              </span>
-              <input
-                {...INTEGER_INPUT_FIELD_PROPS}
-                className="create-product-section__input"
-                name={name}
-                aria-label={fullLabel}
-                value={String(form[name] ?? "")}
-                onChange={handleChange}
-                maxLength={6}
-                disabled={isSubmitting}
-              />
-            </label>
-          ))}
+          означают «не знаю», и тогда расчёт идёт по средней коробке. Осмотр и
+          услугу посылкой не отправляют — блока у них нет. */}
+      {isCartDealType(form.categoryDealType) ? (
+        <div
+          className="create-product-section__label create-product-section__shipping"
+          role="group"
+          aria-label={CREATE_PRODUCT_MODAL_UI.SHIPPING_DIMENSIONS_TITLE}
+        >
+          <FormFieldLabel>
+            {CREATE_PRODUCT_MODAL_UI.SHIPPING_DIMENSIONS_TITLE}
+          </FormFieldLabel>
+          <p className="create-product-section__lead">
+            {CREATE_PRODUCT_MODAL_UI.SHIPPING_DIMENSIONS_HINT}
+          </p>
+          <div className="create-product-section__shipping-grid">
+            {[
+              [
+                "productWeightG",
+                CREATE_PRODUCT_MODAL_UI.SHIPPING_FIELD_WEIGHT,
+                CREATE_PRODUCT_MODAL_UI.LABEL_WEIGHT_G,
+              ],
+              [
+                "productLengthCm",
+                CREATE_PRODUCT_MODAL_UI.SHIPPING_FIELD_LENGTH,
+                CREATE_PRODUCT_MODAL_UI.LABEL_LENGTH_CM,
+              ],
+              [
+                "productWidthCm",
+                CREATE_PRODUCT_MODAL_UI.SHIPPING_FIELD_WIDTH,
+                CREATE_PRODUCT_MODAL_UI.LABEL_WIDTH_CM,
+              ],
+              [
+                "productHeightCm",
+                CREATE_PRODUCT_MODAL_UI.SHIPPING_FIELD_HEIGHT,
+                CREATE_PRODUCT_MODAL_UI.LABEL_HEIGHT_CM,
+              ],
+            ].map(([name, shortLabel, fullLabel]) => (
+              <label key={name} className="create-product-section__shipping-field">
+                <span className="create-product-section__shipping-field-label">
+                  {shortLabel}
+                </span>
+                <input
+                  {...INTEGER_INPUT_FIELD_PROPS}
+                  className="create-product-section__input"
+                  name={name}
+                  aria-label={fullLabel}
+                  value={String(form[name] ?? "")}
+                  onChange={handleChange}
+                  maxLength={6}
+                  disabled={isSubmitting}
+                />
+              </label>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }

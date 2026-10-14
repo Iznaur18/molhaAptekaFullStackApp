@@ -170,7 +170,7 @@
 .faq-page__link-admin-save {
   border: none;
   background: var(--iz-color-action);
-  color: var(--iz-color-on-action, #fff);
+  color: var(--iz-color-on-contrast);
 }
 
 .faq-page__link-admin-clear {

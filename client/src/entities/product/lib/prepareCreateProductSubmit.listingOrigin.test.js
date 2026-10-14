@@ -76,4 +76,36 @@ describe("create product with productListingOrigin", () => {
       expect(parsed.data.productIsOriginal).toBe(false);
     }
   });
+
+  it("viewing and service skip the step: origin defaults to own, no parcel size", () => {
+    for (const categoryDealType of ["viewing", "service"]) {
+      const prepared = prepareCreateProductSubmit({
+        form: {
+          ...validForm,
+          categoryDealType,
+          productListingOrigin: null,
+          productWeightG: "500",
+        },
+        isEdit: false,
+        showCatalogAvailabilityToggle: true,
+        ...sellerContext,
+      });
+
+      expect(prepared.ok).toBe(true);
+      if (prepared.ok) {
+        expect(prepared.createBody?.productListingOrigin).toBe("own");
+        expect(prepared.createBody?.productWeightG).toBeNull();
+      }
+    }
+  });
+
+  it("goods still require the listing origin step", () => {
+    const prepared = prepareCreateProductSubmit({
+      form: { ...validForm, categoryDealType: "goods", productListingOrigin: null },
+      isEdit: false,
+      showCatalogAvailabilityToggle: true,
+      ...sellerContext,
+    });
+    expect(prepared.ok).toBe(false);
+  });
 });

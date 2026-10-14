@@ -275,6 +275,12 @@
   mix-blend-mode: plus-darker;
 }
 
+/* Тёмная тема: plus-darker на тёмной дорожке гасил подпись почти в ноль. */
+:root[data-theme="dark"] .product-details-buy-n-free__meter-label {
+  color: #fff;
+  mix-blend-mode: normal;
+}
+
 @keyframes product-details-buy-n-free-pop {
   0% {
     transform: scale(0.92);
