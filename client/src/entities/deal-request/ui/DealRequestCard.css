@@ -1,0 +1,146 @@
+.deal-request-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 1.125rem;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  list-style: none;
+}
+
+.deal-request-card_closed {
+  background: var(--iz-color-surface-muted);
+}
+
+.deal-request-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.deal-request-card__kind {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--iz-color-text-muted);
+}
+
+.deal-request-card__status {
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: var(--iz-color-surface-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--iz-color-text-secondary);
+}
+
+.deal-request-card__status_pending,
+.deal-request-card__status_done {
+  background: var(--iz-color-action-soft);
+  color: var(--iz-color-action);
+}
+
+.deal-request-card__status_accepted,
+.deal-request-card__status_completed {
+  background: color-mix(in srgb, var(--iz-color-success) 14%, transparent);
+  color: var(--iz-color-success);
+}
+
+.deal-request-card__status_declined,
+.deal-request-card__status_no_show {
+  background: var(--iz-color-danger-surface);
+  color: var(--iz-color-danger-text);
+}
+
+.deal-request-card__product {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--iz-color-text);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.deal-request-card__product:hover {
+  color: var(--iz-color-link);
+}
+
+.deal-request-card__price {
+  margin: 0;
+  font-weight: 600;
+}
+
+.deal-request-card__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.5rem 1rem;
+  margin: 0;
+}
+
+.deal-request-card__facts dt {
+  font-size: 0.8125rem;
+  color: var(--iz-color-text-muted);
+}
+
+.deal-request-card__facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.deal-request-card__facts a {
+  color: var(--iz-color-link);
+}
+
+.deal-request-card__hint {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--iz-color-text-muted);
+}
+
+.deal-request-card__error {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--iz-color-danger-text);
+}
+
+.deal-request-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.deal-request-card__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.85rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.875rem;
+  background: var(--iz-color-bg);
+}
+
+.deal-request-card__form-title {
+  margin: 0;
+  font-weight: 700;
+}
+
+.deal-request-card__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.875rem;
+  color: var(--iz-color-text-secondary);
+}
+
+.deal-request-card__field input {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--iz-color-border);
+  border-radius: 0.75rem;
+  background: var(--iz-color-surface);
+  color: var(--iz-color-text);
+  /* 16px: меньше — iOS приближает страницу при фокусе. */
+  font: inherit;
+  font-size: 1rem;
+}

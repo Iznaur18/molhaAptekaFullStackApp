@@ -151,6 +151,9 @@ export const PRODUCT_DETAILS_MODAL_UI = {
   RETURNS_NONE: "Возврат не предусмотрен.",
   DELIVERY_TITLE: "Получение",
   DELIVERY_SECTION_ARIA: "Самовывоз и доставка",
+  // У объявлений без корзины вкладка «Получение» говорит о месте встречи.
+  DEAL_TAB_TITLE: { viewing: "Осмотр", service: "Адрес" },
+  DEAL_SECTION_ARIA: { viewing: "Место осмотра", service: "Адрес исполнителя" },
   DELIVERY_IN_DEVELOPMENT: "В разработке",
   COPY_ID_ARIA: "Скопировать ID",
   COPY_ID_DONE_ARIA: "ID скопирован",

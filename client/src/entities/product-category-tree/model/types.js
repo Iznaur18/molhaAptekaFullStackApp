@@ -11,6 +11,7 @@
  * @property {string | null} [legacyProductCategory]
  * @property {string[]} searchKeywords
  * @property {string[]} [defaultCharacteristicKeys]
+ * @property {"goods" | "viewing" | "service"} [dealType] итоговый тип сделки категории
  */
 
 /**

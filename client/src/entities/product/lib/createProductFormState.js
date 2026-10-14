@@ -38,6 +38,12 @@ export const CREATE_PRODUCT_INITIAL_FORM = {
   affiliatePercent: "10",
   productCharacteristicRows: [],
   categoryDefaultCharacteristicKeys: [],
+  // Тип сделки выбранной категории: от него зависит шаг «Получение».
+  categoryDealType: "",
+  productServicePriceMode: "",
+  productServicePriceUnit: "",
+  productServiceLocations: [],
+  productViewingSchedule: "",
   productCharacteristicsSellerTouched: false,
   productCharacteristicsAutoAppliedForCategoryId: null,
   productRegionCode: "",
@@ -110,6 +116,13 @@ export function createProductFormStateFromProduct(product) {
       product.productCharacteristics,
     ),
     categoryDefaultCharacteristicKeys: [],
+    categoryDealType: String(product.productDealType ?? ""),
+    productServicePriceMode: String(product.productServicePriceMode ?? ""),
+    productServicePriceUnit: String(product.productServicePriceUnit ?? ""),
+    productServiceLocations: Array.isArray(product.productServiceLocations)
+      ? product.productServiceLocations
+      : [],
+    productViewingSchedule: String(product.productViewingSchedule ?? ""),
     productCharacteristicsSellerTouched: true,
     productCharacteristicsAutoAppliedForCategoryId: null,
     productRegionCode: product.productRegionCode?.trim() || "RU-MOW",

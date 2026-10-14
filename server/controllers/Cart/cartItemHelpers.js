@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { CATEGORY_DEAL_TYPES_WITHOUT_CART } from "@molha/api-contract";
 
 import {
   CART_LINE_ITEM_QUANTITY_MAX,
@@ -79,6 +80,8 @@ export const filterCartItemsToPurchasableProducts = async (
     productIsAvailable: { $ne: false },
     productOutOfStock: { $ne: true },
     productStockQuantity: { $gt: 0 },
+    // Авто, недвижимость и услуги в корзину не кладут — у них своя сделка.
+    productDealType: { $nin: CATEGORY_DEAL_TYPES_WITHOUT_CART },
   })
     .select("_id productSeller")
     .lean();

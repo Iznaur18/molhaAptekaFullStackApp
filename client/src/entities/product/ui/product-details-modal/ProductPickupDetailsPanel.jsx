@@ -3,6 +3,8 @@ import {
   PRODUCT_DELIVERY_CARRIER_GITORG,
   PRODUCT_DELIVERY_CARRIER_LABEL_RU,
   PRODUCT_DELIVERY_CARRIER_LOBO,
+  isCartDealType,
+  normalizeCategoryDealType,
   productPickupLocationsFromProduct,
   productShipsToBuyer,
   resolveProductDeliveryCarrier,
@@ -18,25 +20,31 @@ import { AppIcon } from "../../../../shared/ui/icon/index.js";
  * }} props
  */
 export function ProductPickupDetailsPanel({ product }) {
-  const pickupOn = product.productPickupEnabled !== false;
+  // Авто, недвижимость и услуги: адрес — место встречи, доставки нет. Флаги
+  // самовывоза и доставки на товаре остаются, но покупателю их не показываем.
+  const dealType = normalizeCategoryDealType(product.productDealType);
+  const isCartDeal = isCartDealType(dealType);
+  const pickupOn = !isCartDeal || product.productPickupEnabled !== false;
   // Перевозчик — из поля товара: у ЛОБО старые флаги доставки сняты.
-  const deliveryOn = productShipsToBuyer(product);
+  const deliveryOn = isCartDeal && productShipsToBuyer(product);
+  const detailsTitle = isCartDeal
+    ? PRODUCT_PICKUP_UI.DETAILS_TITLE
+    : PRODUCT_PICKUP_UI.DEAL_DETAILS_TITLE[dealType];
+  const noAddressLabel = isCartDeal
+    ? PRODUCT_PICKUP_UI.DETAILS_NO_ADDRESS
+    : `${PRODUCT_PICKUP_UI.DEAL_DETAILS_NO_ADDRESS[dealType]}. ${PRODUCT_PICKUP_UI.DEAL_DETAILS_HINT}`;
   const carrier = resolveProductDeliveryCarrier(product);
   const locations = productPickupLocationsFromProduct(product);
 
   if (!pickupOn && !deliveryOn) {
     return (
-      <p className="product-details-content-switcher__description">
-        {PRODUCT_PICKUP_UI.DETAILS_NO_ADDRESS}
-      </p>
+      <p className="product-details-content-switcher__description">{noAddressLabel}</p>
     );
   }
 
   if (pickupOn && locations.length === 0 && !deliveryOn) {
     return (
-      <p className="product-details-content-switcher__description">
-        {PRODUCT_PICKUP_UI.DETAILS_NO_ADDRESS}
-      </p>
+      <p className="product-details-content-switcher__description">{noAddressLabel}</p>
     );
   }
 
@@ -58,8 +66,8 @@ export function ProductPickupDetailsPanel({ product }) {
                 ? PRODUCT_PICKUP_UI.DETAILS_ROUTE
                 : PRODUCT_PICKUP_UI.DETAILS_OPEN_MAP;
             const title = location.label
-              ? `${PRODUCT_PICKUP_UI.DETAILS_TITLE}: ${location.label}`
-              : PRODUCT_PICKUP_UI.DETAILS_TITLE;
+              ? `${detailsTitle}: ${location.label}`
+              : detailsTitle;
 
             return (
               <button
@@ -109,6 +117,11 @@ export function ProductPickupDetailsPanel({ product }) {
           </span>
         </div>
       ) : null}
+      {isCartDeal ? null : (
+        <p className="product-details-content-switcher__description">
+          {PRODUCT_PICKUP_UI.DEAL_DETAILS_HINT}
+        </p>
+      )}
     </div>
   );
 }

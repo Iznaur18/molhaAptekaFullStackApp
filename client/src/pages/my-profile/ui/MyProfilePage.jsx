@@ -78,6 +78,7 @@ import "./MyProfilePage.css";
  * onAdvertisingClick?: () => void;
  * onOneCIntegrationClick?: () => void;
  * onDeliveryPaymentClick?: () => void;
+ * onDealRequestsClick?: () => void;
  * onSafeDealClick?: () => void;
  * onSafeDealModerationClick?: () => void;
  * onIntroAdModerationClick?: () => void;
@@ -144,6 +145,7 @@ export function MyProfilePage({
   onAdvertisingClick,
   onOneCIntegrationClick,
   onDeliveryPaymentClick,
+  onDealRequestsClick,
   onSafeDealClick,
   onSafeDealModerationClick,
   onIntroAdModerationClick,
@@ -264,6 +266,7 @@ export function MyProfilePage({
     onAdvertisingClick,
     onOneCIntegrationClick,
     onDeliveryPaymentClick,
+    onDealRequestsClick,
     onSafeDealClick,
     onSafeDealModerationClick,
     onEditProfileClick,

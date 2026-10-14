@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import {
   ORDER_FULFILLMENT_PICKUP,
   PRODUCT_DELIVERY_NOT_ENABLED_FOR_ITEMS_MESSAGE,
+  CATEGORY_DEAL_TYPE_NOT_PURCHASABLE_MESSAGE,
+  CATEGORY_DEAL_TYPES_WITHOUT_CART,
   PRODUCT_PICKUP_MISSING_FOR_ORDER_MESSAGE,
   PRODUCT_PICKUP_NOT_ENABLED_FOR_ITEMS_MESSAGE,
 } from "@molha/api-contract";
@@ -203,9 +205,30 @@ const buildItemsWithPriceSnapshot = (
 };
 
 /**
+ * Авто, недвижимость и услуги не оформляются заказом.
+ *
+ * Отдельная проверка до общей выборки, а не ещё одно условие в ней: иначе
+ * покупатель увидел бы «товары не найдены или недоступны» и не понял, что
+ * делать дальше.
+ *
+ * @param {string[]} productIds
+ */
+export const assertProductsPurchasableViaCart = async (productIds) => {
+  const blocked = await ProductModel.exists({
+    _id: { $in: productIds },
+    productDealType: { $in: CATEGORY_DEAL_TYPES_WITHOUT_CART },
+  });
+  if (blocked) {
+    throw new AppError(400, CATEGORY_DEAL_TYPE_NOT_PURCHASABLE_MESSAGE);
+  }
+};
+
+/**
  * @param {string[]} productIds
  */
 export const fetchAvailableProductsForOrder = async (productIds) => {
+  await assertProductsPurchasableViaCart(productIds);
+
   const products = await ProductModel.find({
     _id: { $in: productIds },
     productModerationStatus: PRODUCT_MODERATION_APPROVED,
@@ -560,6 +583,7 @@ export async function createOrder({
         userId,
         productId,
       );
+      await assertProductsPurchasableViaCart([productId]);
       const product = await ProductModel.findById(productId)
         .select(
           "loyaltyPointsPerUnit productSeller productPickupAddress productPickupLat productPickupLon productPickupLocations productPickupEnabled productDeliveryEnabled productCourierDeliveryEnabled productRegionCode affiliateEnabled affiliatePercent productBuyNFreeEnabled productBuyNFreeThreshold",

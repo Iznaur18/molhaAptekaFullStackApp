@@ -73,6 +73,7 @@ export const reassignProductsToCategoryLeaves = async ({
     const $set = {
       productCategoryId: categoryWrite.productCategoryId,
       productCategory: categoryWrite.productCategory,
+      productDealType: categoryWrite.productDealType,
       categoryPathIds: categoryWrite.categoryPathIds,
       categoryBreadcrumbRu: categoryWrite.categoryBreadcrumbRu,
     };

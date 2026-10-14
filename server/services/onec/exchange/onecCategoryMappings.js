@@ -1,3 +1,5 @@
+import { CATEGORY_DEAL_TYPE_DEFAULT } from "@molha/api-contract";
+
 import { ONEC_CATEGORY_MAPPINGS_MAX_PER_REQUEST } from "../../../constants/onecExchangeConstants.js";
 import { UNCATEGORIZED_PRODUCT_CATEGORY_SLUG } from "../../../constants/productCategoryTreeConstants.js";
 import { AppError } from "../../../errors/AppError.js";
@@ -13,6 +15,7 @@ export const UNCATEGORIZED_CATEGORY_WRITE = Object.freeze({
   categoryPathIds: [],
   categoryBreadcrumbRu: "",
   productCategory: UNCATEGORIZED_PRODUCT_CATEGORY_SLUG,
+  productDealType: CATEGORY_DEAL_TYPE_DEFAULT,
   categorySearchKeywords: [],
   categoryPathLabelRu: [],
 });
@@ -302,6 +305,7 @@ export async function remapOneCProductsForSeller(sellerId) {
             // и агрегация приняла бы её за путь к полю.
             productCategory: { $literal: categoryWrite.productCategory },
             productCategoryId: categoryWrite.productCategoryId,
+            productDealType: categoryWrite.productDealType,
             categoryPathIds: categoryWrite.categoryPathIds,
             categoryBreadcrumbRu: { $literal: categoryWrite.categoryBreadcrumbRu },
             productIsAvailable: availability,

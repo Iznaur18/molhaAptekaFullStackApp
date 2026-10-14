@@ -1,3 +1,5 @@
+import { normalizeCategoryDealType } from "@molha/api-contract";
+
 import { CreateProductCategoryPicker } from "../../../product-category-tree/ui/CreateProductCategoryPicker.jsx";
 
 /**
@@ -29,12 +31,14 @@ export function CreateProductCategorySection({
           categoryBreadcrumbRu,
           productCategory,
           defaultCharacteristicKeys = [],
+          dealType,
         }) =>
           setForm((prev) => ({
             ...prev,
             productCategoryId,
             categoryBreadcrumbRu,
             productCategory,
+            categoryDealType: normalizeCategoryDealType(dealType),
             categoryDefaultCharacteristicKeys: Array.isArray(defaultCharacteristicKeys)
               ? defaultCharacteristicKeys
               : [],

@@ -55,6 +55,7 @@ import { getActiveProfileNavLabel } from "../lib/getActiveProfileNavLabel.js";
  *   onAdvertisingClick?: () => void;
  *   onOneCIntegrationClick?: () => void;
  *   onDeliveryPaymentClick?: () => void;
+ *   onDealRequestsClick?: () => void;
  *   onSafeDealClick?: () => void;
  *   onSafeDealModerationClick?: () => void;
  *   onEditProfileClick?: () => void;
@@ -114,6 +115,7 @@ export function useMyProfileNav({
   onAdvertisingClick,
   onOneCIntegrationClick,
   onDeliveryPaymentClick,
+  onDealRequestsClick,
   onSafeDealClick,
   onSafeDealModerationClick,
   onEditProfileClick,
@@ -173,6 +175,8 @@ export function useMyProfileNav({
   // Безопасную сделку подключает любой авторизованный: подтверждение ИП или
   // ООО и есть фильтр, отдельного признака продавца в профиле нет.
   const canUseDeliveryPayment = isProfileReady && Boolean(onDeliveryPaymentClick);
+  // Заявки есть у обеих сторон: покупатель записывается, продавец отвечает.
+  const canUseDealRequests = isProfileReady && Boolean(onDealRequestsClick);
   const canUseSafeDeal = isProfileReady && Boolean(onSafeDealClick);
   // Сверять ИНН с ЕГРЮЛ — работа модератора, как и модерация курьеров.
   const canUseSafeDealModeration =
@@ -247,6 +251,7 @@ export function useMyProfileNav({
         canUseAdvertising,
         canUseOneCIntegration,
         canUseDeliveryPayment,
+        canUseDealRequests,
         canUseSafeDeal,
         canUseSafeDealModeration,
         canUseEditProfile,
@@ -300,6 +305,7 @@ export function useMyProfileNav({
         onAdvertisingClick,
         onOneCIntegrationClick,
         onDeliveryPaymentClick,
+        onDealRequestsClick,
         onSafeDealClick,
         onSafeDealModerationClick,
         onEditProfileClick,
@@ -328,6 +334,7 @@ export function useMyProfileNav({
       canUseAdvertising,
       canUseOneCIntegration,
       canUseDeliveryPayment,
+      canUseDealRequests,
       canUseSafeDeal,
       canUseSafeDealModeration,
       canUseMyOrders,
@@ -366,6 +373,7 @@ export function useMyProfileNav({
       onAdvertisingClick,
       onOneCIntegrationClick,
       onDeliveryPaymentClick,
+      onDealRequestsClick,
       onSafeDealClick,
       onSafeDealModerationClick,
       onIntroAdModerationClick,

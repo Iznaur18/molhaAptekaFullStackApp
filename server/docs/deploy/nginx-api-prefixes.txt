@@ -21,6 +21,7 @@
 /auth
 /cart
 /couriers
+/deal-requests
 /favorites
 /faq
 /installment

@@ -26,6 +26,7 @@ import { ProductDetailsContentSwitcher } from "./ProductDetailsContentSwitcher.j
 import { ProductDetailsFlashSaleCountdown } from "./ProductDetailsFlashSaleCountdown.jsx";
 import { invalidateCatalogProducts } from "../../lib/catalogProductsQueryCache.js";
 import { ProductDetailsInstallmentTeaser } from "./ProductDetailsInstallmentTeaser.jsx";
+import { ProductDealActions } from "../../../deal-request/ui/ProductDealActions.jsx";
 import { ProductDetailsModalPurchaseActions } from "./ProductDetailsModalPurchaseActions.jsx";
 import { ProductDetailsPromoTeaser } from "./ProductDetailsPromoTeaser.jsx";
 import { ProductDetailsQaTeaser } from "./ProductDetailsQaTeaser.jsx";
@@ -233,6 +234,13 @@ export function ProductDetailsModalDetailsTab({
           unitPriceSnapshot={unitPriceSnapshot}
         />
       ) : null}
+      {/* Объявление без корзины: вместо «В корзину» — заявка и телефон. */}
+      <ProductDealActions
+        product={product}
+        isAuthorized={isAuthorized}
+        isOwnProduct={isOwnProduct}
+        onRequestLogin={onRequestLogin}
+      />
       <ProductDetailsWholesaleOffer
         product={product}
         isAuthorized={isAuthorized}

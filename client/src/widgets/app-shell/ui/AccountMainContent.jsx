@@ -88,6 +88,7 @@ export function AccountMainContent({
   handleAdvertisingFromProfile,
   handleOneCIntegrationFromProfile,
   handleDeliveryPaymentFromProfile,
+  handleDealRequestsFromProfile,
   handleSafeDealFromProfile,
   handleSafeDealModerationFromProfile,
   handleIntroAdModerationFromProfile,
@@ -246,6 +247,7 @@ export function AccountMainContent({
         onDeliveryPaymentClick={
           isAuthorized ? handleDeliveryPaymentFromProfile : undefined
         }
+        onDealRequestsClick={isAuthorized ? handleDealRequestsFromProfile : undefined}
         onSafeDealClick={isAuthorized ? handleSafeDealFromProfile : undefined}
         onSafeDealModerationClick={
           canModerateProducts ? handleSafeDealModerationFromProfile : undefined

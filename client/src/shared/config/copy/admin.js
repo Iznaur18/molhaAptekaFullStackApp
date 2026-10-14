@@ -387,6 +387,11 @@ export const CATEGORY_TREE_ADMIN_PAGE_UI = {
   DEFAULT_CHARACTERISTICS_PLACEHOLDER: "Состояние\nЦвет\nПамять\nОЗУ",
   LABEL_LEGACY: "Legacy productCategory",
   LEGACY_NONE: "—",
+  LABEL_DEAL_TYPE: "Как проходит сделка",
+  /** @param {string} label */
+  DEAL_TYPE_INHERIT: (label) => `Как у родителя — ${label}`,
+  DEAL_TYPE_HINT:
+    "У «Осмотра» и «Услуги» нет корзины, доставки и самовывоза. Выбор действует на все подкатегории, где не задан свой.",
   CREATE_BUTTON: "Создать",
   COL_PATH: "Путь",
   COL_SLUG: "Slug",

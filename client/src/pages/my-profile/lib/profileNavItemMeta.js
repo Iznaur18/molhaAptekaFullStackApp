@@ -46,6 +46,7 @@ export const PROFILE_NAV_ITEM_META = {
   "my-products": { icon: Package },
   "my-sales": { icon: Store },
   "my-orders": { icon: ShoppingBag },
+  "deal-requests": { icon: ClipboardCheck },
   auction: { icon: Gavel },
   "installment-payments": { icon: CreditCard },
   "installment-sales": { icon: Wallet },

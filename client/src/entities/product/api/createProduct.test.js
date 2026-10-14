@@ -127,4 +127,24 @@ describe("createProduct: тело запроса", () => {
     expect(payload.productDeliveryEnabled).toBe(false);
     expect(payload.productCourierDeliveryEnabled).toBe(false);
   });
+  it("условия сделки доезжают до сервера, а у обычного товара их нет", async () => {
+    await createProduct({
+      ...PICKUP_BODY,
+      productFulfillmentSource: "profile",
+      productServicePriceMode: "from",
+      productServicePriceUnit: "hour",
+      productServiceLocations: ["at_client", "online"],
+    });
+
+    const payload = sentPayload();
+    // Белый список уже однажды терял выбор перевозчика — и эти поля терял тоже.
+    expect(payload.productServicePriceMode).toBe("from");
+    expect(payload.productServicePriceUnit).toBe("hour");
+    expect(payload.productServiceLocations).toEqual(["at_client", "online"]);
+    expect(payload).not.toHaveProperty("productViewingSchedule");
+
+    postMock.mockClear();
+    await createProduct({ ...PICKUP_BODY, productFulfillmentSource: "profile" });
+    expect(sentPayload()).not.toHaveProperty("productServicePriceMode");
+  });
 });
